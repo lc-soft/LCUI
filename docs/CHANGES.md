@@ -1,5 +1,46 @@
 # LCUI ChangeLog
 
+## 1.0.0 Beta (2018-02-07)
+
+### Features
+
+- **font:** add support for font-weight and font-style selection
+- **textlayer:** add `[bgcolor]` tag support (#110)
+- **textlayer:** add `[i]` tag support (#115)
+- **textlayer:** add `[b]` tag support (#112)
+- **textlayer:** using FreeType to get space width
+- **widget:** add content trimming support for textview (#97)
+- **widget:** add anchor widget (#105)
+- **widget:** add word-break property support for textview (#71)
+- **widget:** add `WTT_RESIZE_WITH_SURFACE` task for sync surface size (#104)
+- **widget:** add Widget_UnbindEventByHandlerId() function
+- **css:** add css font-face rule parser (#95)
+- **css:** add relative path support for url() parser (#98)
+- **css:** add css property parser for parsing justify-content (#117)
+- **css:** add support to parse "border: 0"
+- **css:** add support to parse "line-height: 1"
+- **layout:** add simple support for flex display and justify-content (#117)
+- **bulder:** add short name `<w>` for `<widget>` (#103)
+- **core:** add LCUIWorker for async task support (#106)
+
+### Bug fixes
+
+- **textlayer:** text vertical position is not center (#100)
+- **widget:** textview height computation error (#111)
+- **css:** stylesheet selection bug (#113)
+- **graphic:** segmentation fault bug in Graph_FillRectARGB() (#110)
+- **linux:** set "--enable-video-ouput=no" will make the linker output errors
+- **renderer:** widget border rendering is incomplete when position is non-integer (#108)
+
+### Improvements
+
+- **layout:** improve widget size computation
+- **font:** improve font data storage and operation method
+- **mainloop:** set run all tasks in one frame
+- **mainloop:** set the widget tree to update least once per frame
+
+You can view [this pull request](https://github.com/lc-soft/LCUI/pull/120). for detailed code changes.
+
 ## CHANGES BETWEEN 1.0 alpha and 1.0 alpha2
 
 - Adjust the code structure

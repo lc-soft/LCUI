@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * textstyle.h -- text style processing module.
  *
- * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * textstyle.h -- 文本样式处理模块
  *
- * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -42,60 +42,49 @@
 
 LCUI_BEGIN_HEADER
 
-/** 下面三种字体样式虽然有定义，但还未添加能够实现该字体样式效果的功能 */
-
-enum FontStyle {
-	FONT_STYLE_NORMAL,
-	FONT_STYLE_ITALIC,
-	FONT_STYLE_OBLIQUE
-};
-
-enum FontWeight {
-	FONT_WEIGHT_NORMAL,
-	FONT_WEIGHT_BOLD
-};
-
-enum FontDecoration {
-	FONT_DECORATION_NONE,		/* 无装饰 */
-	FONT_DECORATION_BLINK,		/* 闪烁 */
-	FONT_DECORATION_UNDERLINE,	/* 下划线 */
-	FONT_DECORATION_LINE_THROUGH,	/* 贯穿线 */
-	FONT_DECORATION_OVERLINE	/* 上划线 */
-};
-
-typedef struct LCUI_TextStyle {
+typedef struct LCUI_TextStyleRec_ {
 	LCUI_BOOL has_family:1;
 	LCUI_BOOL has_style:1;
 	LCUI_BOOL has_weight:1;
-	LCUI_BOOL has_decoration:1;
 	LCUI_BOOL has_back_color:1;
 	LCUI_BOOL has_fore_color:1;
 	LCUI_BOOL has_pixel_size:1;
 
+	int style;
+	int weight;
 	int *font_ids;
-	int style:3;
-	int weight:3;
-	int decoration:4;
 
 	LCUI_Color fore_color;
 	LCUI_Color back_color;
 
 	int pixel_size;
-} LCUI_TextStyle;
+} LCUI_TextStyleRec, *LCUI_TextStyle;
 
 /** 初始化字体样式数据 */
-LCUI_API void TextStyle_Init ( LCUI_TextStyle *data );
+LCUI_API void TextStyle_Init( LCUI_TextStyle data );
 
-LCUI_API int TextStyle_Copy( LCUI_TextStyle *dst, LCUI_TextStyle *src );
+LCUI_API int TextStyle_CopyFamily( LCUI_TextStyle dst, LCUI_TextStyle src );
 
-LCUI_API void TextStyle_Destroy( LCUI_TextStyle *data );
+LCUI_API int TextStyle_Copy( LCUI_TextStyle dst, LCUI_TextStyle src );
+
+LCUI_API void TextStyle_Destroy( LCUI_TextStyle data );
+
+LCUI_API void TextStyle_Merge( LCUI_TextStyle base, LCUI_TextStyle target );
+
+/* 设置字体粗细程度 */
+LCUI_API int TextStyle_SetWeight( LCUI_TextStyle ts, LCUI_FontWeight weight );
+
+LCUI_API int TextStyle_SetStyle( LCUI_TextStyle ts, LCUI_FontStyle style );
 
 /**
  * 设置字体
  * @param[in][out] ts 字体样式数据
  * @param[in] str 字体名称，如果有多个名称则用逗号分隔
  */
-LCUI_API int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str );
+LCUI_API int TextStyle_SetFont( LCUI_TextStyle ts, const char *str );
+
+/** 设置使用默认的字体 */
+int TextStyle_SetDefaultFont( LCUI_TextStyle ts );
 
 /*-------------------------- StyleTag --------------------------------*/
 
@@ -110,7 +99,7 @@ LCUI_API const wchar_t *ScanStyleEndingTag( const wchar_t *wstr, wchar_t *name )
 
 LCUI_API void StyleTags_Clear( LinkedList *tags );
 
-LCUI_API LCUI_TextStyle* StyleTags_GetTextStyle( LinkedList *tags );
+LCUI_API LCUI_TextStyle StyleTags_GetTextStyle( LinkedList *tags );
 
 /** 处理样式标签 */
 LCUI_API const wchar_t* StyleTags_GetStart( LinkedList *tags,

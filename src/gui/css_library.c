@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * css_library.c -- css library operation module.
  *
- * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * css_library.c -- CSS 样式库操作模块
  *
- * 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -135,6 +135,7 @@ static KeyNameGroupRec style_name_map[] = {
 	{ key_left, "left" },
 	{ key_bottom, "bottom" },
 	{ key_position, "position" },
+	{ key_opacity, "opacity" },
 	{ key_vertical_align, "vertical-align" },
 	{ key_background_color, "background-color" },
 	{ key_background_position, "background-position" },
@@ -171,7 +172,8 @@ static KeyNameGroupRec style_name_map[] = {
 	{ key_box_shadow_color, "box-shadow-color" },
 	{ key_pointer_events, "pointer-events" },
 	{ key_focusable, "focusable" },
-	{ key_box_sizing, "box-sizing" }
+	{ key_box_sizing, "box-sizing" },
+	{ key_justify_content, "justify-content" }
 };
 
 /** 样式字符串与标识码的映射表 */
@@ -208,6 +210,9 @@ static KeyNameGroupRec style_value_map[] = {
 	{ SV_ABSOLUTE, "absolute" },
 	{ SV_BLOCK, "block" },
 	{ SV_INLINE_BLOCK, "inline-block" },
+	{ SV_FLEX, "flex" },
+	{ SV_FLEX_START, "flex-start" },
+	{ SV_FLEX_END, "flex-end" },
 	{ SV_NOWRAP, "nowrap" }
 };
 
@@ -233,7 +238,7 @@ int LCUI_SetStyleName( int key, const char *name )
 	return -1;
 }
 
-int LCUI_AddStyleName( const char *name )
+int LCUI_AddCSSPropertyName( const char *name )
 {
 	int key;
 	LCUIMutex_Lock( &library.mutex );
@@ -942,6 +947,15 @@ LCUI_Selector Selector( const char *selector )
 		return NULL;
 	}
 	if( is_saving ) {
+		if( !node ) {
+			node = NEW( LCUI_SelectorNodeRec, 1 );
+			if( si >= MAX_SELECTOR_DEPTH ) {
+				_DEBUG_MSG( "%s: selector node list is too long.\n",
+					    selector );
+				return NULL;
+			}
+			s->nodes[si] = node;
+		}
 		rank = SelectorNode_Save( s->nodes[si], name, ni, type );
 		if( rank > 0 ) {
 			SelectorNode_Update( s->nodes[si] );
@@ -1051,7 +1065,6 @@ static LCUI_StyleSheet LCUI_SelectStyleSheet( LCUI_Selector selector,
 	StyleLink link;
 	StyleNode snode;
 	StyleLinkGroup slg;
-	LinkedListNode *node;
 	LCUI_SelectorNode sn;
 	Dict *group, *parents;
 	char buf[MAX_SELECTOR_LEN];
@@ -1100,18 +1113,6 @@ static LCUI_StyleSheet LCUI_SelectStyleSheet( LCUI_Selector selector,
 	}
 	if( !link ) {
 		return NULL;
-	}
-	for( LinkedList_Each( node, &link->styles ) ) {
-		snode = node->data;
-		if( snode->space && space ) {
-			if( strcmp( snode->space, space ) == 0 ) {
-				return snode->sheet;
-			}
-		} else {
-			if( snode->space == space ) {
-				return snode->sheet;
-			}
-		}
 	}
 	snode = NEW( StyleNodeRec, 1 );
 	if( space ) {
@@ -1298,8 +1299,11 @@ void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 		case SVT_STYLE:
 			LOG( "%s", LCUI_GetStyleValueName( s->val_style ) );
 			break;
+		case SVT_VALUE:
+			LOG( "%d", s->val_int );
+			break;
 		default:
-			LOG( "%d", s->value );
+			LOG( "%g", s->value );
 			break;
 		}
 		LOG( ";\n" );
@@ -1333,8 +1337,8 @@ static void LCUI_PrintStyleLink( StyleLink link, const char *selector )
 	}
 	for( LinkedList_Each( node, &link->styles ) ) {
 		StyleNode snode = node->data;
-		LOG( "\n[%s]\n", snode->space ? snode->space : "<none>" );
-		LOG( "[rank: %d]\n", snode->rank, fullname );
+		LOG( "\n[%s]", snode->space ? snode->space : "<none>" );
+		LOG( "[rank: %d]\n%s {\n", snode->rank, fullname );
 		LCUI_PrintStyleSheet( snode->sheet );
 		LOG("}\n");
 	}

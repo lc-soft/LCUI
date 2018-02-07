@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * freetype.c -- The FreeType font-engine support module.
  *
- * Copyright (C) 2015 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * freetype.c -- FreeType 字体引擎的支持模块。
  *
- * 版权所有 (C) 2015 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -57,10 +57,10 @@ static struct {
 	FT_Library library;
 } freetype;
 
-static int FreeType_Open( const char *filepath, LCUI_Font ***outfonts )
+static int FreeType_Open( const char *filepath, LCUI_Font **outfonts )
 {
 	FT_Face face;
-	LCUI_Font **fonts;
+	LCUI_Font font, *fonts;
 	int i, err, num_faces;
 
 	err = FT_New_Face( freetype.library, filepath, -1, &face );
@@ -73,20 +73,18 @@ static int FreeType_Open( const char *filepath, LCUI_Font ***outfonts )
 	if( num_faces < 1 ) {
 		return 0;
 	}
-	fonts = malloc( sizeof(LCUI_Font*) * num_faces );
+	fonts = malloc( sizeof(LCUI_FontRec*) * num_faces );
 	if( !fonts ) {
 		return -ENOMEM;
 	}
 	for( i = 0; i < num_faces; ++i ) {
-		LCUI_Font *font = malloc( sizeof( LCUI_Font ) );
 		err = FT_New_Face( freetype.library, filepath, i, &face );
 		if( err ) {
 			fonts[i] = NULL;
 			continue;
 		}
 		FT_Select_Charmap( face, FT_ENCODING_UNICODE );
-		font->family_name = strdup2( face->family_name );
-		font->style_name = strdup2( face->style_name );
+		font = Font( face->family_name, face->style_name );
 		font->data = face;
 		fonts[i] = font;
 	}
@@ -185,21 +183,14 @@ static size_t Convert_FTGlyph( LCUI_FontBitmap *bmp, FT_GlyphSlot slot, int mode
 }
 
 static int FreeType_Render( LCUI_FontBitmap *bmp, wchar_t ch,
-			    int pixel_size, LCUI_Font *font )
+			    int pixel_size, LCUI_Font font )
 {
 	int ret = 0;
-	size_t size;
 	FT_UInt index;
-	LCUI_BOOL has_space = FALSE;
 	FT_Face ft_face = (FT_Face)font->data;
 
 	/* 设定字体尺寸 */
 	FT_Set_Pixel_Sizes( ft_face, 0, pixel_size );
-	/* 如果是空格 */
-	if( ch == ' ' ) {
-		ch = 'a';
-		has_space = TRUE;
-	}
 	index = FT_Get_Char_Index( ft_face, ch );
 	if( index == 0 ) {
 		ret = -1;
@@ -208,12 +199,7 @@ static int FreeType_Render( LCUI_FontBitmap *bmp, wchar_t ch,
 	if( FT_Load_Glyph( ft_face, index, LCUI_FONT_LOAD_FALGS ) != 0 ) {
 		return -2;
 	}
-	size = Convert_FTGlyph( bmp, ft_face->glyph, LCUI_FONT_RENDER_MODE );
-	/* 如果是空格则将位图内容清空 */
-	if( has_space ) {
-		memset( bmp->buffer, 0, size );
-		bmp->advance.x = bmp->advance.x / 2 + 1;
-	}
+	Convert_FTGlyph( bmp, ft_face->glyph, LCUI_FONT_RENDER_MODE );
 	return ret;
 }
 

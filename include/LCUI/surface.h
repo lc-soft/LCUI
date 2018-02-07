@@ -93,7 +93,7 @@ LCUI_API LCUI_PaintContext Surface_BeginPaint( LCUI_Surface surface, LCUI_Rect *
  * @param[in] surface	目标 surface
  * @param[in] paint_ctx	绘制上下文句柄
  */
-LCUI_API void Surface_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint_ctx );
+LCUI_API void Surface_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint );
 
 /** 将帧缓存中的数据呈现至Surface的窗口内 */
 LCUI_API void Surface_Present( LCUI_Surface surface );

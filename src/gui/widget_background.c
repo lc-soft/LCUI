@@ -167,7 +167,7 @@ static void AsyncLoadImage( LCUI_Widget widget, const char *path )
 {
 	ImageRef ref;
 	ImageCache cache;
-	LCUI_AppTaskRec task = { 0 };
+	LCUI_TaskRec task = { 0 };
 	LCUI_Style s = &widget->style->sheet[key_background_image];
 
 	if( !self.is_inited ) {
@@ -194,7 +194,7 @@ static void AsyncLoadImage( LCUI_Widget widget, const char *path )
 	task.arg[0] = widget;
 	task.arg[1] = strdup2( path );
 	task.destroy_arg[1] = free;
-	LCUI_PostTask( &task );
+	LCUI_PostAsyncTask( &task );
 }
 
 void LCUIWidget_InitImageLoader( void )

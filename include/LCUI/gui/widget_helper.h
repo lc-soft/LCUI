@@ -42,6 +42,8 @@
 
 LCUI_BEGIN_HEADER
 
+#define Widget_IsVisible(W) (W)->computed_style.visible
+
  /** 设置内边距 */
 LCUI_API void Widget_SetPadding( LCUI_Widget w, float top, float right,
 				 float bottom, float left );
@@ -63,6 +65,9 @@ LCUI_API void Widget_Move( LCUI_Widget w, float left, float top );
 
 /** 调整部件尺寸 */
 LCUI_API void Widget_Resize( LCUI_Widget w, float width, float height );
+
+LCUI_API void Widget_ResizeWithSurface( LCUI_Widget w,
+					float width, float height );
 
 LCUI_API void Widget_Show( LCUI_Widget w );
 

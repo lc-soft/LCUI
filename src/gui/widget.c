@@ -43,6 +43,7 @@
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/widget/textcaret.h>
 #include <LCUI/gui/widget/textedit.h>
+#include <LCUI/gui/widget/anchor.h>
 #include <LCUI/gui/widget/button.h>
 #include <LCUI/gui/widget/sidebar.h>
 #include <LCUI/gui/widget/scrollbar.h>
@@ -56,6 +57,7 @@ void LCUI_InitWidget( void )
 	LCUIWidget_InitRenderer();
 	LCUIWidget_InitImageLoader();
 	LCUIWidget_AddTextView();
+	LCUIWidget_AddAnchor();
 	LCUIWidget_AddButton();
 	LCUIWidget_AddSideBar();
 	LCUIWidget_AddTScrollBar();

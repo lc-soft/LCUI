@@ -40,8 +40,85 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <ctype.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h> 
+
+#define STRTRIM_CODE(TYPE, OUTSTR, INSTR, CHARLIST, DCHARLIST) \
+	LCUI_BOOL clear, clear_left = TRUE; \
+	TYPE *op = OUTSTR, *last_blank = NULL; \
+	const TYPE *default_charlist = DCHARLIST, *ip = INSTR, *c; \
+\
+	if( !CHARLIST ) {\
+		CHARLIST = default_charlist;\
+	}\
+	for( ; *ip; ip++ ) {\
+		for( clear = FALSE, c = CHARLIST; *c; ++c ) {\
+			if( *ip == *c ) {\
+				clear = TRUE;\
+				break;\
+			}\
+		}\
+		if( clear ) {\
+			if( !clear_left ) {\
+				*op = *ip;\
+				if( !last_blank ) {\
+					last_blank = op;\
+				}\
+				++op;\
+			}\
+			continue;\
+		}\
+		if( clear_left ) {\
+			clear_left = FALSE;\
+		}\
+		last_blank = NULL;\
+		*op = *ip;\
+		++op;\
+	}\
+	if( last_blank ) {\
+		*last_blank = 0;\
+	}\
+	*op = 0;\
+	return op - outstr;
+
+size_t strsize( const char *str )
+{
+	if( !str ) {
+		return sizeof( char );
+	}
+	return (strlen( str ) + 1) * sizeof( char );
+}
+
+size_t wcssize( const wchar_t *str )
+{
+	if( !str ) {
+		return sizeof( wchar_t );
+	}
+	return (wcslen( str ) + 1) * sizeof( wchar_t );
+}
+
+size_t strtolower( char *outstr, const char *instr )
+{
+	char *op = outstr;
+	const char *ip = instr;
+	for( ; *ip; ++ip, ++op ) {
+		*op = tolower( *ip );
+	}
+	*op = 0;
+	return ip - instr;
+}
+
+size_t strntolower( char *outstr, size_t max_len, const char *instr )
+{
+	char *op = outstr;
+	const char *ip = instr;
+	for( ; *ip && max_len > 1; ++ip, ++op, --max_len ) {
+		*op = tolower( *ip );
+	}
+	*op = 0;
+	return ip - instr;
+}
 
 char *strdup2( const char *str )
 {
@@ -67,42 +144,12 @@ wchar_t *wcsdup2( const wchar_t *str )
 
 int strtrim( char *outstr, const char *instr, const char *charlist )
 {
-	LCUI_BOOL clear, clear_left = TRUE;
-	char *op = outstr, *last_blank = NULL;
-	const char *default_char_list = "\t\n\r ", *ip = instr, *c;
+	STRTRIM_CODE( char, outstr, instr, charlist, "\t\n\r " );
+}
 
-	if( !charlist ) {
-		charlist = default_char_list;
-	}
-	for( ; *ip; ip++ ) {
-		for( clear = FALSE, c = charlist; *c;  ++c ) {
-			if( *ip == *c ) {
-				clear = TRUE;
-				break;
-			}
-		}
-		if( clear ) {
-			if( !clear_left ) {	
-				*op = *ip;
-				if( !last_blank ) {
-					last_blank = op;
-				}
-				++op;
-			}
-			continue;
-		}
-		if( clear_left ) {
-			clear_left = FALSE;
-		}
-		last_blank = NULL;
-		*op = *ip;
-		++op;
-	}
-	if( last_blank ) {
-		*last_blank = 0;
-	}
-	*op = 0;
-	return op - outstr;
+int wcstrim( wchar_t *outstr, const wchar_t *instr, const wchar_t *charlist )
+{
+	STRTRIM_CODE( wchar_t, outstr, instr, charlist, L"\t\n\r " );
 }
 
 int wcsreplace( wchar_t *str, size_t max_len,

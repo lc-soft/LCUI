@@ -103,15 +103,21 @@ void Widget_Resize( LCUI_Widget w, float width, float height )
 	Widget_UpdateStyle( w, FALSE );
 }
 
+void Widget_ResizeWithSurface( LCUI_Widget w, float width, float height )
+{
+	Widget_Resize( w, width, height );
+	Widget_AddTask( w, WTT_RESIZE_WITH_SURFACE );
+}
+
 void Widget_Show( LCUI_Widget w )
 {
-	Widget_SetStyle( w, key_visible, TRUE, int );
+	Widget_SetStyle( w, key_visible, TRUE, bool );
 	Widget_UpdateStyle( w, FALSE );
 }
 
 void Widget_Hide( LCUI_Widget w )
 {
-	Widget_SetStyle( w, key_visible, FALSE, int );
+	Widget_SetStyle( w, key_visible, FALSE, bool );
 	Widget_UpdateStyle( w, FALSE );
 }
 

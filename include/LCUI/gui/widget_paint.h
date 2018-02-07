@@ -2,7 +2,7 @@
 /* ***************************************************************************
  * widget_paint.h -- LCUI widget paint module.
  * 
- * Copyright (C) 2013-2017 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2013-2018 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * widget_paint.h -- LCUI部件绘制模块
  *
- * 版权所有 (C) 2013-2017 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2013-2018 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -81,8 +81,9 @@ LCUI_API void RectToInvalidArea( const LCUI_Rect *rect, LCUI_Rect *area );
  * 渲染指定部件呈现的图形内容
  * @param[in] w		部件
  * @param[in] paint 	进行绘制时所需的上下文
+ * @return		返回实际渲染的部件的数量
  */
-LCUI_API void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint );
+LCUI_API size_t Widget_Render( LCUI_Widget w, LCUI_PaintContext paint );
 
 LCUI_API void LCUIWidget_InitRenderer( void );
 

@@ -47,6 +47,7 @@
 static struct WidgetTaskModule {
 	LinkedList trash;				/**< 待删除的部件列表 */
 	LCUI_WidgetFunction handlers[WTT_TOTAL_NUM];	/**< 任务处理器 */
+	unsigned int update_count;			/**< 刷新次数 */
 } self;
 
 static void HandleRefreshStyle( LCUI_Widget w )
@@ -62,7 +63,7 @@ static void HandleUpdateStyle( LCUI_Widget w )
 
 static void HandleSetTitle( LCUI_Widget w )
 {
-	Widget_PostSurfaceEvent( w, WET_TITLE );
+	Widget_PostSurfaceEvent( w, WET_TITLE, TRUE );
 }
 
 /** 处理主体刷新（标记主体区域为脏矩形，但不包括阴影区域） */
@@ -78,15 +79,21 @@ static void HandleRefresh( LCUI_Widget w )
 	Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
 }
 
-/** 更新当前任务状态，确保部件的任务能够被处理到 */
 void Widget_UpdateTaskStatus( LCUI_Widget widget )
 {
 	int i;
 	for( i = 0; i < WTT_TOTAL_NUM; ++i ) {
 		if( widget->task.buffer[i] ) {
-			widget->task.for_self = TRUE;
-			Widget_AddTask( widget, widget->task.buffer[i] );
+			break;
 		}
+	}
+	if( i >= WTT_TOTAL_NUM ) {
+		return;
+	}
+	widget->task.for_self = TRUE;
+	while( widget && !widget->task.for_children ) {
+		widget->task.for_children = TRUE;
+		widget = widget->parent;
 	}
 }
 
@@ -123,6 +130,7 @@ static void MapTaskHandler(void)
 	self.handlers[WTT_VISIBLE] = Widget_UpdateVisibility;
 	self.handlers[WTT_POSITION] = Widget_UpdatePosition;
 	self.handlers[WTT_RESIZE] = Widget_UpdateSize;
+	self.handlers[WTT_RESIZE_WITH_SURFACE] = Widget_UpdateSizeWithSurface;
 	self.handlers[WTT_SHADOW] = Widget_UpdateBoxShadow;
 	self.handlers[WTT_BORDER] = Widget_UpdateBorder;
 	self.handlers[WTT_OPACITY] = Widget_UpdateOpacity;
@@ -135,6 +143,7 @@ static void MapTaskHandler(void)
 	self.handlers[WTT_BACKGROUND] = Widget_UpdateBackground;
 	self.handlers[WTT_LAYOUT] = Widget_ExecUpdateLayout;
 	self.handlers[WTT_ZINDEX] = Widget_ExecUpdateZIndex;
+	self.handlers[WTT_DISPLAY] = Widget_UpdateDisplay;
 	self.handlers[WTT_PROPS] = Widget_UpdateProps;
 }
 
@@ -173,7 +182,7 @@ void Widget_AddToTrash( LCUI_Widget w )
 	LinkedList_Unlink( &w->parent->children, &w->node );
 	LinkedList_Unlink( &w->parent->children_show, &w->node_show );
 	LinkedList_AppendNode( &self.trash, &w->node );
-	Widget_PostSurfaceEvent( w, WET_REMOVE );
+	Widget_PostSurfaceEvent( w, WET_REMOVE, TRUE );
 }
 
 int Widget_Update( LCUI_Widget w )
@@ -202,18 +211,7 @@ int Widget_Update( LCUI_Widget w )
 			buffer[i] = FALSE;
 		}
 	}
-	/* 如果部件还处于未准备完毕的状态 */
-	if( w->state < WSTATE_READY ) {
-		w->state |= WSTATE_UPDATED;
-		/* 如果部件已经准备完毕则触发 ready 事件 */
-		if( w->state == WSTATE_READY ) {
-			LCUI_WidgetEventRec e = { 0 };
-			e.type = WET_READY;
-			e.cancel_bubble = TRUE;
-			Widget_TriggerEvent( w, &e, NULL );
-			w->state = WSTATE_NORMAL;
-		}
-	}
+	Widget_AddState( w, WSTATE_UPDATED );
 
 proc_children_task:
 
@@ -243,6 +241,12 @@ void LCUIWidget_Update( void )
 {
 	int count = 0;
 	LCUI_Widget root;
+	/* 前两次更新需要主动刷新所有部件的样式，主要是为了省去在应用程序里手动调用
+	 * LCUIWidget_RefreshStyle() 的麻烦 */
+	if( self.update_count < 2 ) {
+		LCUIWidget_RefreshStyle();
+		self.update_count += 1;
+	}
 	root = LCUIWidget_GetRoot();
 	while( Widget_Update( root ) && count++ < 5 );
 	LCUIWidget_ClearTrash();

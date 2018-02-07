@@ -44,6 +44,7 @@
 #include <LCUI/thread.h>
 #include <LCUI/gui/widget_base.h>
 #include <LCUI/gui/widget_helper.h>
+#include <LCUI/gui/widget_layout.h>
 #include <LCUI/gui/widget_task.h>
 #include <LCUI/gui/widget_paint.h>
 #include <LCUI/gui/widget_prototype.h>

@@ -42,7 +42,7 @@
 
 #include <LCUI/font/textstyle.h>
 
-enum FontStyleKey {
+enum LCUI_CSSFontStyleKey {
 	key_color,
 	key_font_size,
 	key_font_style,
@@ -55,18 +55,18 @@ enum FontStyleKey {
 	TOTAL_FONT_STYLE_KEY
 };
 
-typedef struct LCUI_FontStyleRec_ {
+typedef struct LCUI_CSSFontStyleRec_ {
 	int font_size;
-	int font_weight;
-	int font_style;
+	int line_height;
 	int *font_ids;
 	char *font_family;
-	int text_align;
-	int white_space;
-	int line_height;
-	LCUI_Color color;
 	wchar_t *content;
-} LCUI_FontStyleRec, *LCUI_FontStyle;
+	LCUI_Color color;
+	LCUI_FontStyle font_style;
+	LCUI_FontWeight font_weight;
+	LCUI_StyleValue text_align;
+	LCUI_StyleValue white_space;
+} LCUI_CSSFontStyleRec, *LCUI_CSSFontStyle;
 
 #define Widget_SetFontStyle(W, K, V, T) do {\
 	int key = LCUI_GetFontStyleKey( K ); \
@@ -75,13 +75,13 @@ typedef struct LCUI_FontStyleRec_ {
 
 int LCUI_GetFontStyleKey( int key );
 
-void LCUIFontStyle_Init( LCUI_FontStyle fs );
+void CSSFontStyle_Init( LCUI_CSSFontStyle fs );
 
-void LCUIFontStyle_Destroy( LCUI_FontStyle fs );
+void CSSFontStyle_Destroy( LCUI_CSSFontStyle fs );
 
-void LCUIFontStyle_Compute( LCUI_FontStyle fs, LCUI_StyleSheet ss );
+void CSSFontStyle_Compute( LCUI_CSSFontStyle fs, LCUI_StyleSheet ss );
 
-void LCUIFontStyle_GetTextStyle( LCUI_FontStyle fs, LCUI_TextStyle *ts );
+void CSSFontStyle_GetTextStyle( LCUI_CSSFontStyle fs, LCUI_TextStyle ts );
 
 void LCUI_InitCSSFontStyle( void );
 

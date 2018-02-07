@@ -28,7 +28,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
   </PropertyGroup>
@@ -42,7 +42,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -274,8 +274,10 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\css_fontstyle.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\css_library.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\css_parser.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\css_rule_font_face.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\metrics.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\anchor.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\button.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\scrollbar.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\sidebar.h" />
@@ -285,6 +287,7 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_base.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_event.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_helper.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_layout.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_prototype.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_task.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_paint.h" />
@@ -300,6 +303,7 @@
     <ClInclude Include="..\..\..\include\LCUI\input.h" />
     <ClInclude Include="..\..\..\include\LCUI\ime.h" />
     <ClInclude Include="..\..\..\include\LCUI\main.h" />
+    <ClInclude Include="..\..\..\include\LCUI\painter.h" />
     <ClInclude Include="..\..\..\include\LCUI\platform.h" />
     <ClInclude Include="..\..\..\include\LCUI\platform\windows\windows_display.h" />
     <ClInclude Include="..\..\..\include\LCUI\platform\windows\windows_events.h" />
@@ -321,7 +325,9 @@
     <ClInclude Include="..\..\..\include\LCUI\util\rbtree.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\rect.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\string.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\task.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\time.h" />
+    <ClInclude Include="..\..\..\include\LCUI\worker.h" />
     <ClInclude Include="..\..\..\include\LCUI_Build.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
@@ -344,8 +350,10 @@
     <ClCompile Include="..\..\..\src\gui\css_fontstyle.c" />
     <ClCompile Include="..\..\..\src\gui\css_library.c" />
     <ClCompile Include="..\..\..\src\gui\css_parser.c" />
+    <ClCompile Include="..\..\..\src\gui\css_rule_font_face.c" />
     <ClCompile Include="..\..\..\src\gui\metrics.c" />
     <ClCompile Include="..\..\..\src\gui\widget.c" />
+    <ClCompile Include="..\..\..\src\gui\widget\anchor.c" />
     <ClCompile Include="..\..\..\src\gui\widget\button.c" />
     <ClCompile Include="..\..\..\src\gui\widget\scrollbar.c" />
     <ClCompile Include="..\..\..\src\gui\widget\sidebar.c" />
@@ -357,6 +365,7 @@
     <ClCompile Include="..\..\..\src\gui\widget_border.c" />
     <ClCompile Include="..\..\..\src\gui\widget_event.c" />
     <ClCompile Include="..\..\..\src\gui\widget_helper.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_layout.c" />
     <ClCompile Include="..\..\..\src\gui\widget_prototype.c" />
     <ClCompile Include="..\..\..\src\gui\widget_paint.c" />
     <ClCompile Include="..\..\..\src\gui\widget_shadow.c" />
@@ -374,11 +383,14 @@
     <ClCompile Include="..\..\..\src\ime.c" />
     <ClCompile Include="..\..\..\src\keyboard.c" />
     <ClCompile Include="..\..\..\src\main.c" />
+    <ClCompile Include="..\..\..\src\painter.c" />
     <ClCompile Include="..\..\..\src\platform\windows\windows_display.c" />
     <ClCompile Include="..\..\..\src\platform\windows\windows_events.c" />
     <ClCompile Include="..\..\..\src\platform\windows\windows_ime.c" />
     <ClCompile Include="..\..\..\src\platform\windows\windows_keyboard.c" />
     <ClCompile Include="..\..\..\src\platform\windows\windows_mouse.c" />
+    <ClCompile Include="..\..\..\src\util\task.c" />
+    <ClCompile Include="..\..\..\src\worker.c" />
     <ClCompile Include="..\..\..\src\thread\win32\cond.c" />
     <ClCompile Include="..\..\..\src\thread\win32\mutex.c" />
     <ClCompile Include="..\..\..\src\thread\win32\thread.c">

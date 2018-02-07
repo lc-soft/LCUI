@@ -236,13 +236,12 @@ static void WidgetEventTranslator( LCUI_Event e, LCUI_WidgetEventPack pack )
 	pack->event.type = e->type;
 	pack->event.data = handler->data;
 	handler->func( w, &pack->event, pack->data );
-	if( pack->event.cancel_bubble || !w->parent ) {
-		return;
+	while( !pack->event.cancel_bubble && w->parent ) {
+		w = w->parent;
+		pack->widget = w;
+		/** 向父级部件冒泡传递事件 */
+		EventTrigger_Trigger( w->trigger, e->type, pack );
 	}
-	w = w->parent;
-	pack->widget = w;
-	/** 向父级部件冒泡传递事件 */
-	EventTrigger_Trigger( w->trigger, e->type, pack );
 }
 
 /** 复制部件事件 */
@@ -460,6 +459,11 @@ int Widget_UnbindEventById( LCUI_Widget widget, int event_id,
 				     CompareEventHandlerKey, func );
 }
 
+int Widget_UnbindEventByHandlerId( LCUI_Widget widget, int handler_id )
+{
+	return EventTrigger_Unbind2( widget->trigger, handler_id );
+}
+
 int Widget_UnbindEvent( LCUI_Widget widget, const char *event_name,
 			LCUI_WidgetEventFunc func )
 {
@@ -571,7 +575,7 @@ LCUI_BOOL Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent ev,
 			    void *data, void( *destroy_data )(void*) )
 {
 	LCUI_Event sys_ev;
-	LCUI_AppTaskRec task;
+	LCUI_TaskRec task;
 	LCUI_WidgetEventPack pack;
 	if( widget->state == WSTATE_DELETED ) {
 		return FALSE;
@@ -580,7 +584,7 @@ LCUI_BOOL Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent ev,
 		ev->target = widget;
 	}
 	/* 准备任务 */
-	task.func = (LCUI_AppTaskFunc)OnWidgetEvent;
+	task.func = (LCUI_TaskFunc)OnWidgetEvent;
 	task.arg[0] = malloc( sizeof( LCUI_EventRec ) );
 	task.arg[1] = malloc( sizeof( LCUI_WidgetEventPackRec ) );
 	/* 这两个参数都需要在任务执行完后释放 */
@@ -596,7 +600,11 @@ LCUI_BOOL Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent ev,
 	CopyWidgetEvent( &pack->event, ev );
 	Widget_AddEventRecord( widget, pack );
 	/* 把任务扔给当前跑主循环的线程 */
-	return LCUI_PostTask( &task );
+	if( !LCUI_PostTask( &task ) ) {
+		LCUITask_Destroy( &task );
+		return FALSE;
+	}
+	return TRUE;
 }
 
 int Widget_TriggerEvent( LCUI_Widget widget, LCUI_WidgetEvent e, void *data )
@@ -1031,7 +1039,8 @@ int Widget_ReleaseTouchCapture( LCUI_Widget w, int point_id )
 	return ret;
 }
 
-int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type )
+int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type,
+			     LCUI_BOOL sync_props )
 {
 	int *data;
 	LCUI_WidgetEventRec e = { 0 };
@@ -1042,11 +1051,12 @@ int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type )
 	e.target = w;
 	e.type = WET_SURFACE;
 	e.cancel_bubble = TRUE;
-	data = malloc( sizeof( int ) );
+	data = malloc( sizeof( int ) * 2 );
 	if( !data ) {
 		return -ENOMEM;
 	}
-	*data = event_type;
+	data[0] = event_type;
+	data[1] = sync_props;
 	return Widget_PostEvent( root, &e, data, free );
 }
 

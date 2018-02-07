@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * css_library.h -- css library operation module.
  *
- * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2018 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * css_library.h -- CSS 样式库操作模块
  *
- * 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015-2018 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -64,10 +64,10 @@ enum LCUI_StyleKeyName {
 	key_opacity,
 	key_box_sizing,
 	key_width,
-	key_min_width,
-	key_max_width,
 	key_height,
+	key_min_width,
 	key_min_height,
+	key_max_width,
 	key_max_height,
 	
 	// margin start
@@ -128,13 +128,15 @@ enum LCUI_StyleKeyName {
 	key_box_shadow_color,
 	// box shadow end
 
+	key_justify_content,
+
 	key_pointer_events,
 	key_focusable,
 	STYLE_KEY_TOTAL
 };
 
-#define key_display_start	key_visible
-#define key_display_end		key_display
+#define key_flex_style_start	key_justify_content
+#define key_flex_style_end	key_justify_content
 #define key_position_start	key_left
 #define key_position_end	key_position
 #define key_margin_start	key_margin_top
@@ -186,6 +188,8 @@ typedef struct LCUI_SelectorRec_ {
 
 #define LCUI_FindStyleSheet(S, L) LCUI_FindStyleSheetFromGroup(0, NULL, S, L)
 
+#define StyleSheet_GetStyle(S, K) &((S)->sheet[K])
+
 LCUI_API LCUI_StyleSheet StyleSheet( void );
 
 LCUI_API void StyleSheet_Clear( LCUI_StyleSheet ss );
@@ -234,7 +238,7 @@ LCUI_API void LCUI_PrintStyleSheetsBySelector( LCUI_Selector s );
 
 LCUI_API int LCUI_SetStyleName( int key, const char *name );
 
-LCUI_API int LCUI_AddStyleName( const char *name );
+LCUI_API int LCUI_AddCSSPropertyName( const char *name );
 
 LCUI_API int LCUI_AddStyleValue( int key, const char *name );
 

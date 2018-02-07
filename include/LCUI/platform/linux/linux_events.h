@@ -1,7 +1,7 @@
 /* ***************************************************************************
- * linux_events.c -- event loop support for linux.
+ * linux_events.h -- event loop support for linux.
  *
- * Copyright (C) 2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2016-2018 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -20,9 +20,9 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * linux_events.c -- linux 平台的事件驱动支持。
+ * linux_events.h -- linux 平台的事件驱动支持。
  *
- * 版权所有 (C) 2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2016-2018 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -40,7 +40,9 @@
 #ifndef LCUI_LINUX_EVENTS_H
 #define LCUI_LINUX_EVENTS_H
 
+#ifdef LCUI_VIDEO_DRIVER_X11
 #include <LCUI/platform/linux/linux_x11events.h>
+#endif
 
 LCUI_AppDriver LCUI_CreateLinuxAppDriver( void );
 void LCUI_DestroyLinuxAppDriver( LCUI_AppDriver app );

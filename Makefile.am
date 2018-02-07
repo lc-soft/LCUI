@@ -24,6 +24,11 @@ test/test_char_render.c \
 test/test_css_parser.css \
 test/test_css_parser.xml \
 test/test_css_parser.c \
+test/test_xml_parser.xml \
+test/test_xml_parser.c \
+test/test_font_load.c \
+test/test_font_load.css \
+test/test_font_load.ttf \
 test/test_image_reader.c \
 test/test_image_reader.bmp \
 test/test_image_reader.jpg \
@@ -31,6 +36,12 @@ test/test_image_reader.png \
 test/test_widget_layout.c \
 test/test_widget_layout.css \
 test/test_widget_layout.xml \
+test/test_widget_flex_layout.c \
+test/test_widget_flex_layout.css \
+test/test_widget_flex_layout.xml \
+test/test_widget_inline_block_layout.c \
+test/test_widget_inline_block_layout.css \
+test/test_widget_inline_block_layout.xml \
 test/test_widget_rect.c
 
 @CODE_COVERAGE_RULES@

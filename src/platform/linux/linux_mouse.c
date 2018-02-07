@@ -1,7 +1,7 @@
 /* ***************************************************************************
- * linux_x11mouse.c -- mouse support for linux.
+ * linux_mouse.c -- mouse support for linux.
  *
- * Copyright (C) 2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2016-2018 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -20,9 +20,9 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * linux_x11mouse.c -- linux 平台的鼠标支持
+ * linux_mouse.c -- linux 平台的鼠标支持
  *
- * 版权所有 (C) 2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2016-2018 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -46,15 +46,22 @@
 
 void LCUI_InitLinuxMouse( void )
 {
+#ifdef LCUI_VIDEO_DRIVER_X11
 	LCUI_BOOL is_x11_mode = TRUE;
 	if( is_x11_mode ) {
 		LCUI_InitLinuxX11Mouse();
 	}
+#endif
 }
 
 void LCUI_ExitLinuxMouse( void )
 {
-
+#ifdef LCUI_VIDEO_DRIVER_X11
+	LCUI_BOOL is_x11_mode = TRUE;
+	if( is_x11_mode ) {
+		LCUI_ExitLinuxX11Mouse();
+	}
+#endif
 }
 
 #endif

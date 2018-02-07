@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * widget_base.c -- the widget base operation set.
  *
- * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2018 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * widget_base.c -- 部件的基本操作集。
  *
- * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2018 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -50,10 +50,39 @@ static struct LCUIWidgetModule {
 	LCUI_Widget root;		/**< 根级部件 */
 	Dict *ids;			/**< 各种部件的ID索引 */
 	LCUI_Mutex mutex;		/**< 互斥锁 */
+	DictType dt_ids;		/**< 部件ID映射表的类型模板 */
 	DictType dt_attributes;		/**< 部件属性表的类型模板 */
 } LCUIWidget;
 
 #define StrList_Destroy freestrs
+
+static inline float ToBorderBoxWidth( LCUI_Widget w, float content_width )
+{
+	return content_width + w->padding.left + w->padding.right
+		+ w->computed_style.border.left.width
+		+ w->computed_style.border.right.width;
+}
+
+static inline float ToBorderBoxHeight( LCUI_Widget w, float content_height )
+{
+	return content_height + w->padding.top + w->padding.bottom
+		+ w->computed_style.border.top.width
+		+ w->computed_style.border.bottom.width;
+}
+
+static inline float ToContentBoxWidth( LCUI_Widget w, float width )
+{
+	return width - w->padding.left - w->padding.right
+		- w->computed_style.border.left.width
+		- w->computed_style.border.right.width;
+}
+
+static inline float ToContentBoxHeight( LCUI_Widget w, float height )
+{
+	return height - w->padding.top - w->padding.bottom
+		- w->computed_style.border.top.width
+		- w->computed_style.border.bottom.width;
+}
 
 LCUI_Widget LCUIWidget_GetRoot( void )
 {
@@ -116,7 +145,7 @@ int Widget_Unlink( LCUI_Widget widget )
 	node = &widget->node;
 	LinkedList_Unlink( &widget->parent->children, node );
 	LinkedList_Unlink( &widget->parent->children_show, snode );
-	Widget_PostSurfaceEvent( widget, WET_REMOVE );
+	Widget_PostSurfaceEvent( widget, WET_REMOVE, TRUE );
 	widget->parent = NULL;
 	return 0;
 }
@@ -146,8 +175,9 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 		child->index += 1;
 		node = node->next;
 	}
-	Widget_PostSurfaceEvent( widget, WET_ADD );
-	Widget_AddTaskForChildren( widget, WTT_REFRESH_STYLE );
+	Widget_UpdateStyle( widget, TRUE );
+	Widget_UpdateChildrenStyle( widget, TRUE );
+	Widget_PostSurfaceEvent( widget, WET_ADD, TRUE );
 	Widget_UpdateTaskStatus( widget );
 	Widget_UpdateStatus( widget );
 	Widget_UpdateLayout( parent );
@@ -180,7 +210,7 @@ int Widget_Prepend( LCUI_Widget parent, LCUI_Widget widget )
 		child->index += 1;
 		node = node->next;
 	}
-	Widget_PostSurfaceEvent( widget, WET_ADD );
+	Widget_PostSurfaceEvent( widget, WET_ADD, TRUE );
 	Widget_AddTaskForChildren( widget, WTT_REFRESH_STYLE );
 	Widget_UpdateTaskStatus( widget );
 	Widget_UpdateStatus( widget );
@@ -203,7 +233,7 @@ int Widget_Unwrap( LCUI_Widget widget )
 	if( widget->children.length > 0 ) {
 		node = LinkedList_GetNode( &widget->children, 0 );
 		Widget_RemoveStatus( node->data, "first-child" );
-		node = LinkedList_GetNode( &widget->children, -1 );
+		node = LinkedList_GetNodeAtTail( &widget->children, 0 );
 		Widget_RemoveStatus( node->data, "last-child" );
 	}
 	node = &widget->node;
@@ -227,7 +257,7 @@ int Widget_Unwrap( LCUI_Widget widget )
 		Widget_AddStatus( target->next->data, "first-child" );
 	}
 	if( widget->index == list->length - 1 ) {
-		node = LinkedList_GetNode( list, -1 );
+		node = LinkedList_GetNodeAtTail( list, 0 );
 		Widget_AddStatus( node->data, "last-child" );
 	}
 	Widget_Destroy( widget );
@@ -422,14 +452,19 @@ void Widget_GetOffset( LCUI_Widget w, LCUI_Widget parent,
 	*offset_y = y;
 }
 
-LCUI_Widget LCUIWidget_GetById( const char *idstr )
+LCUI_Widget LCUIWidget_GetById( const char *id )
 {
-	LCUI_Widget w;
-	if( !idstr ) {
+	LinkedList *list;
+	LCUI_Widget w = NULL;
+
+	if( !id ) {
 		return NULL;
 	}
 	LCUIMutex_Lock( &LCUIWidget.mutex );
-	w = Dict_FetchValue( LCUIWidget.ids, idstr );
+	list = Dict_FetchValue( LCUIWidget.ids, id );
+	if( list ) {
+		w = LinkedList_Get( list, 0 );
+	}
 	LCUIMutex_Unlock( &LCUIWidget.mutex );
 	return w;
 }
@@ -452,9 +487,17 @@ LCUI_Widget Widget_GetNext( LCUI_Widget w )
 	return NULL;
 }
 
+LCUI_Widget Widget_GetChild( LCUI_Widget w, size_t index )
+{
+	LinkedListNode *node = LinkedList_GetNode( &w->children, index );
+	if( node ) {
+		return node->data;
+	}
+	return NULL;
+}
+
 int Widget_Top( LCUI_Widget w )
 {
-	DEBUG_MSG("tip\n");
 	return Widget_Append( LCUIWidget.root, w );
 }
 
@@ -477,27 +520,84 @@ void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title )
 	Widget_AddTask( w, WTT_TITLE );
 }
 
+static int Widget_RemoveId( LCUI_Widget w )
+{
+	LinkedList *list;
+	LinkedListNode *node;
+
+	if( !w->id ) {
+		return -1;
+	}
+	list = Dict_FetchValue( LCUIWidget.ids, w->id );
+	if( !list ) {
+		return -2;
+	}
+	for( LinkedList_Each( node, list ) ) {
+		if( node->data == w ) {
+			free( w->id );
+			w->id = NULL;
+			LinkedList_Unlink( list, node );
+			LinkedListNode_Delete( node );
+			return 0;
+		}
+	}
+	return -3;
+}
+
 int Widget_SetId( LCUI_Widget w, const char *idstr )
 {
+	LinkedList *list;
 	LCUIMutex_Lock( &LCUIWidget.mutex );
-	if( w->id ) {
-		Dict_Delete( LCUIWidget.ids, w->id );
-		free( w->id );
-		w->id = NULL;
-	}
+	Widget_RemoveId( w );
 	if( !idstr ) {
 		LCUIMutex_Unlock( &LCUIWidget.mutex );
 		return -1;
 	}
 	w->id = strdup2( idstr );
-	if( Dict_Add( LCUIWidget.ids, w->id, w ) == 0 ) {
-		LCUIMutex_Unlock( &LCUIWidget.mutex );
-		return 0;
+	if( !w->id ) {
+		goto error_exit;
+	}
+	list = Dict_FetchValue( LCUIWidget.ids, w->id );
+	if( !list ) {
+		list = malloc( sizeof( LinkedList ) );
+		if( !list ) {
+			goto error_exit;
+		}
+		LinkedList_Init( list );
+		if( Dict_Add( LCUIWidget.ids, w->id, list ) != 0 ) {
+			free( list );
+			goto error_exit;
+		}
+	}
+	if( !LinkedList_Append( list, w ) ) {
+		goto error_exit;
 	}
 	LCUIMutex_Unlock( &LCUIWidget.mutex );
-	free( w->id );
-	w->id = NULL;
+	return 0;
+
+error_exit:
+	LCUIMutex_Unlock( &LCUIWidget.mutex );
+	if( w->id ) {
+		free( w->id );
+		w->id = NULL;
+	}
 	return -2;
+}
+
+void Widget_AddState( LCUI_Widget w, LCUI_WidgetState state )
+{
+	/* 如果部件还处于未准备完毕的状态 */
+	if( w->state < WSTATE_READY ) {
+		w->state |= state;
+		/* 如果部件已经准备完毕则触发 ready 事件 */
+		if( w->state == WSTATE_READY ) {
+			LCUI_WidgetEventRec e = { 0 };
+			e.type = WET_READY;
+			e.cancel_bubble = TRUE;
+			Widget_TriggerEvent( w, &e, NULL );
+			w->state = WSTATE_NORMAL;
+		}
+	}
 }
 
 static float ComputeXMetric( LCUI_Widget w, int key )
@@ -543,15 +643,31 @@ static int ComputeStyleOption( LCUI_Widget w, int key, int default_value )
 
 void Widget_UpdateVisibility( LCUI_Widget w )
 {
-	int display = w->computed_style.display;
 	LCUI_Style s = &w->style->sheet[key_visible];
 	LCUI_BOOL visible = w->computed_style.visible;
 	if( w->computed_style.display == SV_NONE ) {
-		visible = FALSE;
+		w->computed_style.visible = FALSE;
+	} else if( s->is_valid && s->type == SVT_BOOL ) {
+		w->computed_style.visible = s->val_bool;
+	} else {
+		w->computed_style.visible = TRUE;
 	}
-	w->computed_style.visible = !(s->is_valid && !s->value);
-	s = &w->style->sheet[key_display];
-	if( s->is_valid ) {
+	if( visible == w->computed_style.visible ) {
+		return;
+	}
+	if( w->parent ) {
+		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
+	}
+	visible = w->computed_style.visible;
+	DEBUG_MSG( "visible: %s\n", visible ? "TRUE" : "FALSE" );
+	Widget_PostSurfaceEvent( w, visible ? WET_SHOW : WET_HIDE, TRUE );
+}
+
+void Widget_UpdateDisplay( LCUI_Widget w )
+{
+	int display = w->computed_style.display;
+	LCUI_Style s = &w->style->sheet[key_display];
+	if( s->is_valid && s->type == SVT_STYLE ) {
 		w->computed_style.display = s->style;
 		if( w->computed_style.display == SV_NONE ) {
 			w->computed_style.visible = FALSE;
@@ -559,19 +675,15 @@ void Widget_UpdateVisibility( LCUI_Widget w )
 	} else {
 		w->computed_style.display = SV_BLOCK;
 	}
-	if( visible == w->computed_style.visible ) {
+	if( w->computed_style.display == display ) {
 		return;
 	}
-	visible = w->computed_style.visible;
-	if( w->parent ) {
-		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
-		if( w->computed_style.display != display ||
-		    w->computed_style.position != SV_ABSOLUTE ) {
-			Widget_UpdateLayout( w->parent );
-		}
+	if( w->parent && display == SV_NONE &&
+	    w->computed_style.position != SV_ABSOLUTE ) {
+		Widget_UpdateLayout( w->parent );
 	}
-	DEBUG_MSG( "visible: %s\n", visible ? "TRUE" : "FALSE" );
-	Widget_PostSurfaceEvent( w, visible ? WET_SHOW : WET_HIDE );
+	Widget_UpdateVisibility( w );
+	Widget_UpdateLayout( w );
 }
 
 void Widget_UpdateOpacity( LCUI_Widget w )
@@ -653,14 +765,14 @@ void Widget_ExecUpdateZIndex( LCUI_Widget w )
 /** 清除已计算的尺寸 */
 static void Widget_ClearComputedSize( LCUI_Widget w )
 {
-	LCUI_Style sw = &w->style->sheet[key_width];
-	LCUI_Style sh = &w->style->sheet[key_height];
-	if( !sw->is_valid || (sw->is_valid && sw->type == SVT_AUTO) ) {
+	if( Widget_HasAutoStyle( w, key_width ) ) {
 		w->width = 0;
+		w->box.graph.width = 0;
 		w->box.content.width = 0;
 	}
-	if( !sh->is_valid || (sh->is_valid && sh->type == SVT_AUTO) ) {
+	if( Widget_HasAutoStyle( w, key_height ) ) {
 		w->height = 0;
+		w->box.graph.height = 0;
 		w->box.content.height = 0;
 	}
 }
@@ -671,17 +783,12 @@ static void Widget_UpdateChildrenSize( LCUI_Widget w )
 	for( LinkedList_Each( node, &w->children ) ) {
 		LCUI_Widget child = node->data;
 		LCUI_StyleSheet s = child->style;
-		if( child->computed_style.display == SV_BLOCK ) {
-			if( CheckStyleType( s, key_width, AUTO ) ||
-			    CheckStyleType( s, key_height, AUTO ) ) {
-				Widget_AddTask( child, WTT_RESIZE );
-			}
-		}
-		if( CheckStyleType( s, key_width, SCALE ) ||
-		    CheckStyleType( s, key_height, SCALE ) ) {
+		if( Widget_HasFillAvailableWidth( child ) ) {
+			Widget_AddTask( child, WTT_RESIZE );
+		} else if( Widget_HasScaleSize( child ) ) {
 			Widget_AddTask( child, WTT_RESIZE );
 		}
-		if( child->computed_style.position == SV_ABSOLUTE ) {
+		if( Widget_HasAbsolutePosition( child ) ) {
 			if( s->sheet[key_right].is_valid ||
 			    s->sheet[key_bottom].is_valid ||
 			    CheckStyleType( s, key_left, scale ) ||
@@ -689,8 +796,8 @@ static void Widget_UpdateChildrenSize( LCUI_Widget w )
 				Widget_AddTask( child, WTT_POSITION );
 			}
 		}
-		if( CheckStyleValue( s, key_margin_left, AUTO ) ||
-		    CheckStyleValue( s, key_margin_right, AUTO ) ) {
+		if( Widget_HasAutoStyle( child, key_margin_left ) ||
+		    Widget_HasAutoStyle( child, key_margin_right ) ) {
 			Widget_AddTask( child, WTT_MARGIN );
 		}
 		if( child->computed_style.vertical_align != SV_TOP ) {
@@ -804,7 +911,7 @@ void Widget_UpdatePosition( LCUI_Widget w )
 		Widget_InvalidateArea( w->parent, &rect, SV_PADDING_BOX );
 	}
 	/* 检测是否为顶级部件并做相应处理 */
-	Widget_PostSurfaceEvent( w, WET_MOVE );
+	Widget_PostSurfaceEvent( w, WET_MOVE, TRUE );
 }
 
 /** 更新位图尺寸 */
@@ -821,55 +928,52 @@ static void Widget_UpdateGraphBox( LCUI_Widget w )
 static void Widget_ComputeContentSize( LCUI_Widget w,
 				       float *out_width, float *out_height )
 {
-	LCUI_Style s;
 	LinkedListNode *node;
-	float n, width = 0, height = 0;
+	float width = 0, height = 0, value;
 
 	for( LinkedList_Each( node, &w->children_show ) ) {
 		LCUI_Widget child = node->data;
 		LCUI_WidgetBoxRect *box = &child->box;
 		LCUI_WidgetStyle *style = &child->computed_style;
 		/* 忽略不可见、绝对定位的部件 */
-		if( !style->visible || style->position == SV_ABSOLUTE ) {
+		if( style->display == SV_NONE || 
+		    style->position == SV_ABSOLUTE ) {
 			continue;
 		}
-		s = &child->style->sheet[key_width];
 		/* 对于宽度以百分比做单位的，计算尺寸时自动去除外间距框、
 		 * 内间距框和边框占用的空间
 		 */
-		if( s->type == SVT_SCALE ) {
+		if( Widget_CheckStyleType( child, key_width, scale ) ) {
 			if( style->box_sizing == SV_BORDER_BOX ) {
-				n = box->border.x + box->border.width;
+				value = box->border.x + box->border.width;
 			} else {
-				n = box->content.x + box->content.width;
-				n -= box->content.x - box->border.x;
+				value = box->content.x + box->content.width;
+				value -= box->content.x - box->border.x;
 			}
-			n -= box->outer.x - box->border.x;
+			value -= box->outer.x - box->border.x;
 		} else if( box->outer.width <= 0 ) {
 			continue;
 		} else {
-			n = box->outer.x + box->outer.width;
+			value = box->outer.x + box->outer.width;
 		}
-		if( n > width ) {
-			width = n;
+		if( value > width ) {
+			width = value;
 		}
-		s = &child->style->sheet[key_height];
-		n = box->outer.y + box->outer.height;
-		if( s->type == SVT_SCALE ) {
+		if( Widget_CheckStyleType( child, key_height, scale ) ) {
 			if( style->box_sizing == SV_BORDER_BOX ) {
-				n = box->border.y + box->border.height;
+				value = box->border.y + box->border.height;
 			} else {
-				n = box->content.y + box->content.height;
-				n -= box->content.y - box->border.y;
+				value = box->content.y + box->content.height;
+				value -= box->content.y - box->border.y;
 			}
-			n -= box->outer.y - box->border.y;
+			value -= box->outer.y - box->border.y;
 		} else if( box->outer.height <= 0 ) {
 			continue;
 		} else {
-			n = box->outer.y + box->outer.height;
+			value = box->outer.y + box->outer.height;
 		}
-		if( n > height ) {
-			height = n;
+		if( value > height ) {
+			height = value;
 		}
 	}
 	/* 计算出来的尺寸是包含 padding-left 和 padding-top 的，因此需要减去它们 */
@@ -889,20 +993,44 @@ LCUI_BOOL Widget_HasAutoStyle( LCUI_Widget w, int key )
 		Widget_CheckStyleType( w, key, AUTO );
 }
 
-LCUI_BOOL Widget_HasAutoWidth( LCUI_Widget w )
+LCUI_BOOL Widget_HasStaticWidthParent( LCUI_Widget widget )
 {
-	return Widget_HasAutoStyle( w, key_width ) && (
-		Widget_HasAbsolutePosition( w ) ||
-		Widget_HasAbsolutePosition( w->parent ) ||
-		Widget_HasInlineBlockDisplay( w ));
+	LCUI_Widget w;
+	for( w = widget->parent; w; w = w->parent ) {
+		if( w->computed_style.max_width >= 0 ) {
+			return TRUE;
+		}
+		if( !Widget_HasAutoStyle( w, key_width ) ) {
+			return TRUE;
+		}
+		if( Widget_HasAbsolutePosition( w ) ||
+		    Widget_HasInlineBlockDisplay( w ) ) {
+			return FALSE;
+		}
+	}
+	return FALSE;
+}
+
+LCUI_BOOL Widget_HasFitContentWidth( LCUI_Widget w )
+{
+	if( !Widget_HasAutoStyle( w, key_width ) ) {
+		return FALSE;
+	}
+	if( Widget_HasInlineBlockDisplay( w ) ) {
+		return TRUE;
+	}
+	if( Widget_HasAbsolutePosition( w ) ||
+	    !Widget_HasStaticWidthParent( w ) ) {
+		return TRUE;
+	}
+	return FALSE;
 }
 
 /** 根据当前部件的内外间距，获取调整后宽度 */
 static float Widget_GetAdjustedWidth( LCUI_Widget w, float width )
 {
-	/* 如果不是块级元素，或为绝对定位，则不根据内/外间距调整宽度 */
-	if( !Widget_HasBlockDisplay( w ) ||
-	    Widget_HasAbsolutePosition( w ) ) {
+	/* 如果部件的宽度不具备自动填满剩余空间的特性，则不调整 */
+	if( !Widget_HasFillAvailableWidth( w ) ) {
 		return width;
 	}
 	if( !Widget_HasAutoStyle( w, key_margin_left ) ) {
@@ -930,73 +1058,17 @@ static float Widget_GetAdjustedWidth( LCUI_Widget w, float width )
 	return width;
 }
 
-float Widget_GetFillAvailableWidth( LCUI_Widget w )
+float Widget_ComputeFillAvailableWidth( LCUI_Widget w )
 {
 	float width;
-	if( !w->parent || Widget_HasAutoWidth( w->parent ) ) {
-		return 0;
-	}
 	width = Widget_ComputeMaxAvaliableWidth( w );
 	return Widget_GetAdjustedWidth( w, width );
 }
 
-/** 计算尺寸 */
-static void Widget_ComputeSize( LCUI_Widget w )
+static void Widget_ComputeLimitSize( LCUI_Widget w )
 {
-	float width = 0, height = 0;
-	LCUI_RectF *box, *pbox = &w->box.padding;
-	LCUI_WidgetStyle *style = &w->computed_style;
-	LCUI_BorderStyle *bbox = &style->border;
-	width = ComputeXMetric( w, key_width );
-	height = ComputeYMetric( w, key_height );
-	while( width <= 0 && Widget_HasAutoStyle( w, key_width ) ) {
-		float content_width = 0;
-		if( Widget_HasBlockDisplay( w ) &&
-		    !Widget_HasAbsolutePosition( w ) ) {
-			width = Widget_GetFillAvailableWidth( w );
-			if( width > 0 ) {
-				break;
-			}
-		}
-		if( w->proto && w->proto->autosize ) {
-			w->proto->autosize( w, &width, &height );
-		}
-		Widget_ComputeContentSize( w, &content_width, NULL );
-		width = max( width, content_width );
-		/* 转换为边框盒宽度 */
-		if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
-			width += w->padding.left + w->padding.right;
-			width += bbox->left.width + bbox->right.width;
-		}
-		/* 如果该部件和父部件的宽度都是自适应 */
-		if( w->parent && Widget_HasAutoWidth( w->parent ) &&
-		    width > 0 && !Widget_HasAbsolutePosition( w ) ) {
-			/* 如果超出父部件的内容框宽度则让父部件重新调整宽度 */
-			if( width > w->parent->box.content.width ) {
-				Widget_AddTask( w->parent, WTT_RESIZE );
-			} else if( Widget_HasBlockDisplay( w ) ) {
-				width = w->parent->box.content.width;
-			}
-		}
-		width = Widget_GetAdjustedWidth( w, width );
-		break;
-	}
-	while( height <= 0 && Widget_HasAutoStyle( w, key_height ) ) {
-		float content_height = 0;
-		if( w->proto && w->proto->autosize ) {
-			w->proto->autosize( w, &width, &height );
-		}
-		Widget_ComputeContentSize( w, NULL, &content_height );
-		height = max( height, content_height );
-		/* 转换为边框盒高度 */
-		if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
-			height += w->padding.top + w->padding.bottom;
-			height += bbox->top.width + bbox->bottom.width;
-		}
-		break;
-	}
-	w->width = width;
-	w->height = height;
+	LCUI_WidgetStyle *style;
+	style = &w->computed_style;
 	style->max_width = -1;
 	style->min_width = -1;
 	style->max_height = -1;
@@ -1008,29 +1080,56 @@ static void Widget_ComputeSize( LCUI_Widget w )
 		style->min_width = ComputeXMetric( w, key_min_width );
 	}
 	if( Widget_CheckStyleValid( w, key_max_height ) ) {
-		style->max_height = ComputeXMetric( w, key_max_height );
+		style->max_height = ComputeYMetric( w, key_max_height );
 	}
 	if( Widget_CheckStyleValid( w, key_min_height ) ) {
-		style->min_height = ComputeXMetric( w, key_min_height );
+		style->min_height = ComputeYMetric( w, key_min_height );
 	}
-	if( style->max_width > -1 && w->width > style->max_width ) {
-		w->width = style->max_width;
+}
+
+static float GetLimitedWidth( LCUI_Widget w, float width )
+{
+	LCUI_WidgetStyle *style;
+	style = &w->computed_style;
+	if( style->max_width > -1 && width > style->max_width ) {
+		width = style->max_width;
 	}
-	if( style->max_height > -1 && w->height > style->max_height ) {
-		w->height = style->max_height;
+	if( width < style->min_width ) {
+		width = style->min_width;
 	}
-	if( w->width < style->min_width ) {
-		w->width = style->min_width;
+	return width;
+}
+
+static float GetLimitedHeight( LCUI_Widget w, float height )
+{
+	LCUI_WidgetStyle *style;
+	style = &w->computed_style;
+	if( style->max_height > -1 && height > style->max_height ) {
+		height = style->max_height;
 	}
-	if( w->height < style->min_height ) {
-		w->height = style->min_height;
+	if( height < style->min_height ) {
+		height = style->min_height;
 	}
+	return height;
+}
+
+static void Widget_SetSize( LCUI_Widget w, float width, float height )
+{
+	LCUI_RectF *box, *pbox;
+	LCUI_BorderStyle *bbox;
+
+	w->width = width;
+	w->height = height;
+	w->width = GetLimitedWidth( w, width );
+	w->height = GetLimitedHeight( w, height );
 	w->box.border.width = w->width;
 	w->box.border.height = w->height;
 	w->box.content.width = w->width;
 	w->box.content.height = w->height;
 	w->box.padding.width = w->width;
 	w->box.padding.height = w->height;
+	pbox = &w->box.padding;
+	bbox = &w->computed_style.border;
 	/* 如果是以边框盒作为尺寸调整对象，则需根据边框盒计算内容框尺寸 */
 	if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
 		box = &w->box.content;
@@ -1058,6 +1157,114 @@ static void Widget_ComputeSize( LCUI_Widget w )
 	w->box.outer.height += w->margin.top + w->margin.bottom;
 }
 
+/**
+ * 计算合适的宽度
+ * @param height[in][out]
+ *	内容区域高度。当部件有自定义的尺寸计算函数时，会同时计算出内容高度和宽度，
+ *	为避免重复调用该函数，height 参数同时也是输出参数。
+ * @return
+ *	计算后的内容宽度
+ */
+static float Widget_ComputeAutoWidth( LCUI_Widget w, float *height )
+{
+	float width = 0, max_width = -1, content_width = 0;
+
+	if( Widget_HasFillAvailableWidth( w ) ) {
+		width = Widget_ComputeFillAvailableWidth( w );
+		if( Widget_HasStaticWidthParent( w ) ) {
+			goto finish;
+		}
+		max_width = width;
+		width = 0;
+	}
+	if( w->proto && w->proto->autosize ) {
+		if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
+			*height = ToContentBoxHeight( w, *height );
+		}
+		w->proto->autosize( w, &width, height );
+	}
+	Widget_ComputeContentSize( w, &content_width, NULL );
+	width = max( width, content_width );
+	/* 转换为边框盒宽度 */
+	if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
+		width = ToBorderBoxWidth( w, width );
+		if( max_width != -1 ) {
+			max_width = ToBorderBoxWidth( w, max_width );
+		}
+		if( w->proto && w->proto->autosize ) {
+			*height = ToBorderBoxHeight( w, *height );
+		}
+	}
+	/* 如果该部件和父部件的宽度都是自适应 */
+	if( !Widget_HasStaticWidthParent( w->parent ) &&
+	    width > 0 && !Widget_HasAbsolutePosition( w ) ) {
+		/* 如果超出父部件的内容框宽度则让父部件重新布局 */
+		if( width > w->parent->box.content.width ) {
+			Widget_AddTask( w->parent, WTT_LAYOUT );
+		} else if( Widget_HasFillAvailableWidth( w ) ) {
+			width = w->parent->box.content.width;
+		}
+	}
+	width = Widget_GetAdjustedWidth( w, width );
+
+finish:
+	if( max_width != -1 && width > max_width ) {
+		width = max_width;
+	}
+	return width;
+}
+
+/**
+ * 计算合适的高度
+ * @param width[in][out]
+ *	内容区域宽度。当部件有自定义的尺寸计算函数时，会同时计算出内容高度和宽度，
+ *	为避免重复调用该函数，width 参数同时也是输出参数。
+ * @return
+ *	计算后的内容高度
+ */
+static float Widget_ComputeAutoHeight( LCUI_Widget w, float *width )
+{
+	float height = 0, content_height = 0;
+
+	if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
+		*width = ToContentBoxWidth( w, *width );
+	}
+	if( w->proto && w->proto->autosize ) {
+		w->proto->autosize( w, width, &height );
+	}
+	Widget_ComputeContentSize( w, NULL, &content_height );
+	height = max( height, content_height );
+	if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
+		height = ToBorderBoxHeight( w, height );
+		*width = ToBorderBoxWidth( w, *width );
+	}
+	return height;
+}
+
+/** 计算尺寸 */
+static void Widget_ComputeSize( LCUI_Widget w )
+{
+	float width, height;
+
+	Widget_ComputeLimitSize( w );
+	width = ComputeXMetric( w, key_width );
+	height = ComputeYMetric( w, key_height );
+	/* 当宽度可被直接计算出来时，转换成内容宽度，作为计算自动尺寸时的初始宽度 */
+	if( width > 0 ) {
+		width = GetLimitedWidth( w, width );
+	}
+	if( height > 0 ) {
+		height = GetLimitedHeight( w, height );
+	}
+	if( width <= 0 && Widget_HasAutoStyle( w, key_width ) ) {
+		width = Widget_ComputeAutoWidth( w, &height );
+	}
+	if( height <= 0 && Widget_HasAutoStyle( w, key_height ) ) {
+		height = Widget_ComputeAutoHeight( w, &width );
+	}
+	Widget_SetSize( w, width, height );
+}
+
 static void Widget_SendResizeEvent( LCUI_Widget w )
 {
 	LCUI_WidgetEventRec e;
@@ -1067,7 +1274,7 @@ static void Widget_SendResizeEvent( LCUI_Widget w )
 	e.cancel_bubble = TRUE;
 	Widget_TriggerEvent( w, &e, NULL );
 	Widget_AddTask( w, WTT_REFRESH );
-	Widget_PostSurfaceEvent( w, WET_RESIZE );
+	Widget_PostSurfaceEvent( w, WET_RESIZE, FALSE );
 }
 
 void Widget_UpdateMargin( LCUI_Widget w )
@@ -1098,15 +1305,8 @@ void Widget_UpdateMargin( LCUI_Widget w )
 	/* 如果有父级部件，则处理 margin-left 和 margin-right 的值 */
 	if( w->parent ) {
 		float width = w->parent->box.content.width;
-		float margin_left = SVT_AUTO, margin_right = SVT_AUTO;
-		if( w->style->sheet[key_margin_left].is_valid ) {
-			margin_left = w->style->sheet[key_margin_left].type;
-		}
-		if( w->style->sheet[key_margin_right].is_valid ) {
-			margin_right = w->style->sheet[key_margin_right].type;
-		}
-		if( margin_left == SVT_AUTO ) {
-			if( margin_right == SVT_AUTO ) {
+		if( Widget_HasAutoStyle( w, key_margin_left ) ) {
+			if( Widget_HasAutoStyle( w, key_margin_right ) ) {
 				w->margin.left = (width - w->width) / 2;
 				if( w->margin.left < 0 ) {
 					w->margin.left = 0;
@@ -1119,7 +1319,7 @@ void Widget_UpdateMargin( LCUI_Widget w )
 					w->margin.left = 0;
 				}
 			}
-		} else if( margin_right == SVT_AUTO ) {
+		} else if( Widget_HasAutoStyle( w, key_margin_right ) ) {
 			w->margin.right = width - w->width;
 			w->margin.right -= w->margin.left;
 			if( w->margin.right < 0 ) {
@@ -1128,8 +1328,8 @@ void Widget_UpdateMargin( LCUI_Widget w )
 		}
 	}
 	if( w->parent ) {
-		if( w->parent->style->sheet[key_width].type == SVT_AUTO ||
-		    w->parent->style->sheet[key_height].type == SVT_AUTO ) {
+		if( Widget_HasAutoStyle( w->parent, key_width ) ||
+		    Widget_HasAutoStyle( w->parent, key_height ) ) {
 			Widget_AddTask( w->parent, WTT_RESIZE );
 		}
 		if( w->computed_style.display != SV_NONE &&
@@ -1195,16 +1395,14 @@ void Widget_UpdateSize( LCUI_Widget w )
 	    (rect.width <= 0 || rect.height <= 0) ) {
 		return;
 	}
-	if( w->style->sheet[key_height].type != SVT_AUTO ) {
-		Widget_UpdateLayout( w );
-	}
+	Widget_UpdateLayout( w );
 	/* 如果垂直对齐方式不为顶部对齐 */
 	if( w->computed_style.vertical_align != SV_TOP ) {
 		Widget_UpdatePosition( w );
 	} else if( w->computed_style.position == SV_ABSOLUTE ) {
 		/* 如果是绝对定位，且指定了右间距或底间距 */
-		if( !Widget_CheckStyleValue( w, key_right, AUTO ) ||
-		    !Widget_CheckStyleValue( w, key_bottom, AUTO ) ) {
+		if( !Widget_HasAutoStyle( w, key_right ) ||
+		    !Widget_HasAutoStyle( w, key_bottom ) ) {
 			Widget_UpdatePosition( w );
 		}
 	}
@@ -1213,8 +1411,8 @@ void Widget_UpdateSize( LCUI_Widget w )
 		rect.width = w->box.graph.width;
 		rect.height = w->box.graph.height;
 		Widget_InvalidateArea( w->parent, &rect, SV_PADDING_BOX );
-		if( w->parent->style->sheet[key_width].type == SVT_AUTO
-		    || w->parent->style->sheet[key_height].type == SVT_AUTO ) {
+		if( Widget_HasAutoStyle( w->parent, key_width ) ||
+		    Widget_HasAutoStyle( w->parent, key_height ) ) {
 			Widget_AddTask( w->parent, WTT_RESIZE );
 		}
 		if( w->computed_style.display != SV_NONE &&
@@ -1224,6 +1422,12 @@ void Widget_UpdateSize( LCUI_Widget w )
 	}
 	Widget_SendResizeEvent( w );
 	Widget_UpdateChildrenSize( w );
+}
+
+void Widget_UpdateSizeWithSurface( LCUI_Widget w )
+{
+	Widget_UpdateSize( w );
+	Widget_PostSurfaceEvent( w, WET_RESIZE, TRUE );
 }
 
 void Widget_UpdateProps( LCUI_Widget w )
@@ -1256,8 +1460,8 @@ int Widget_SetAttributeEx( LCUI_Widget w, const char *name, void *value,
 		attr->name = strdup2( name );
 		Dict_Add( w->attributes, attr->name, attr );
 	}
+	attr->value.data = value;
 	attr->value.type = value_type;
-	attr->value.string = strdup2( value );
 	attr->value.destructor = value_destructor;
 	return 0;
 }
@@ -1265,6 +1469,14 @@ int Widget_SetAttributeEx( LCUI_Widget w, const char *name, void *value,
 int Widget_SetAttribute( LCUI_Widget w, const char *name, const char *value )
 {
 	char *value_str;
+	if( strcmp( name, "disabled" ) == 0 ) {
+		if( !value || strcmp( value, "false" ) != 0 ) {
+			Widget_SetDisabled( w, TRUE );
+		} else {
+			Widget_SetDisabled( w, FALSE );
+		}
+		return 0;
+	}
 	if( !value ) {
 		return Widget_SetAttributeEx( w, name, NULL, SVT_NONE, NULL );
 	}
@@ -1371,7 +1583,8 @@ float Widget_ComputeMaxAvaliableWidth( LCUI_Widget widget )
 	LCUI_Widget w;
 	float width = 0, padding = 0;
 	for( w = widget->parent; w; w = w->parent ) {
-		if( !Widget_HasAutoWidth( w ) ) {
+		if( !Widget_HasAutoStyle( w, key_width ) ||
+		    w->computed_style.max_width >= 0) {
 			width = w->box.content.width;
 			break;
 		}
@@ -1390,11 +1603,10 @@ float Widget_ComputeMaxAvaliableWidth( LCUI_Widget widget )
 float Widget_ComputeMaxWidth( LCUI_Widget widget )
 {
 	float width;
-	if( Widget_HasAutoStyle( widget, key_width ) ) {
-		width = Widget_ComputeMaxAvaliableWidth( widget );
-	} else {
-		width = widget->width;
+	if( !Widget_HasAutoStyle( widget, key_width ) ) {
+		return widget->box.border.width;
 	}
+	width = Widget_ComputeMaxAvaliableWidth( widget );
 	if( !Widget_HasAutoStyle( widget, key_max_width ) ) {
 		if( widget->computed_style.max_width > -1 &&
 		    width < widget->computed_style.max_width ) {
@@ -1404,96 +1616,12 @@ float Widget_ComputeMaxWidth( LCUI_Widget widget )
 	return width;
 }
 
-void Widget_UpdateLayout( LCUI_Widget w )
+float Widget_ComputeMaxContentWidth( LCUI_Widget w )
 {
-	Widget_AddTask( w, WTT_LAYOUT );
-}
-
-void Widget_ExecUpdateLayout( LCUI_Widget w )
-{
-	struct {
-		float x, y;
-		float line_height;
-		LCUI_Widget prev;
-		int prev_display;
-		float max_width;
-	} ctx = { 0 };
-	LCUI_Widget child;
-	LCUI_WidgetEventRec e = { 0 };
-	LinkedListNode *node;
-
-	ctx.max_width = Widget_ComputeMaxWidth( w );
-	for( LinkedList_Each( node, &w->children ) ) {
-		child = node->data;
-		if( child->computed_style.position != SV_STATIC &&
-		    child->computed_style.position != SV_RELATIVE ) {
-			/* 如果部件还处于未准备完毕的状态 */
-			if( child->state < WSTATE_READY ) {
-				child->state |= WSTATE_LAYOUTED;
-				/* 如果部件已经准备完毕则触发 ready 事件 */
-				if( child->state == WSTATE_READY ) {
-					LCUI_WidgetEventRec e = { 0 };
-					e.type = WET_READY;
-					e.cancel_bubble = TRUE;
-					Widget_TriggerEvent( child, &e, NULL );
-					child->state = WSTATE_NORMAL;
-				}
-			}
-			continue;
-		}
-		switch( child->computed_style.display ) {
-		case SV_BLOCK:
-			ctx.x = 0;
-			if( ctx.prev && ctx.prev_display != SV_BLOCK ) {
-				ctx.y += ctx.line_height;
-			}
-			child->origin_x = ctx.x;
-			child->origin_y = ctx.y;
-			ctx.line_height = child->box.outer.height;
-			ctx.y += child->box.outer.height;
-			break;
-		case SV_INLINE_BLOCK:
-			if( ctx.prev && ctx.prev_display == SV_BLOCK ) {
-				ctx.x = 0;
-				ctx.line_height = 0;
-			}
-			child->origin_x = ctx.x;
-			ctx.x += child->box.outer.width;
-			/* 只考虑小数点后两位 */
-			if( ctx.x - ctx.max_width >= 0.01 ) {
-				child->origin_x = 0;
-				ctx.y += ctx.line_height;
-				ctx.x = child->box.outer.width;
-			}
-			child->origin_y = ctx.y;
-			if( child->box.outer.height > ctx.line_height ) {
-				ctx.line_height = child->box.outer.height;
-			}
-			break;
-		case SV_NONE:
-		default: continue;
-		}
-		Widget_UpdatePosition( child );
-		if( child->state < WSTATE_READY ) {
-			child->state |= WSTATE_LAYOUTED;
-			if( child->state == WSTATE_READY ) {
-				LCUI_WidgetEventRec e;
-				e.type = WET_READY;
-				e.cancel_bubble = TRUE;
-				Widget_TriggerEvent( child, &e, NULL );
-				child->state = WSTATE_NORMAL;
-			}
-		}
-		ctx.prev = child;
-		ctx.prev_display = child->computed_style.display;
-	}
-	if( w->style->sheet[key_width].type == SVT_AUTO ||
-	    w->style->sheet[key_height].type == SVT_AUTO ) {
-		Widget_AddTask( w, WTT_RESIZE );
-	}
-	e.cancel_bubble = TRUE;
-	e.type = WET_AFTERLAYOUT;
-	Widget_TriggerEvent( w, &e, NULL );
+	float width = Widget_ComputeMaxWidth( w );
+	width = Widget_GetAdjustedWidth( w, width );
+	width = ToContentBoxWidth( w, width );
+	return width;
 }
 
 static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth, const char *prefix )
@@ -1556,15 +1684,25 @@ static void OnClearWidgetAttribute( void *privdata, void *data )
 	free( attr->name );
 	attr->name = NULL;
 	attr->value.data = NULL;
+	free( attr );
+}
+
+static void OnClearWidgetList( void *privdata, void *data )
+{
+	LinkedList *list = data;
+	LinkedList_Clear( list, NULL );
+	free( list );
 }
 
 void LCUIWidget_InitBase( void )
 {
 	LCUIMutex_Init( &LCUIWidget.mutex );
-	LCUIWidget.ids = Dict_Create( &DictType_StringKey, NULL );
 	LCUIWidget.root = LCUIWidget_New( "root" );
+	LCUIWidget.dt_ids = DictType_StringCopyKey;
+	LCUIWidget.dt_ids.valDestructor = OnClearWidgetList;
 	LCUIWidget.dt_attributes = DictType_StringCopyKey;
 	LCUIWidget.dt_attributes.valDestructor = OnClearWidgetAttribute;
+	LCUIWidget.ids = Dict_Create( &LCUIWidget.dt_ids, NULL );
 	Widget_SetTitleW( LCUIWidget.root, L"LCUI Display" );
 }
 

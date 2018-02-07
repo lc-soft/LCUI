@@ -44,7 +44,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
-#include <LCUI/gui/css_library.h>
+#include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/css_fontstyle.h>
 
 typedef struct {
@@ -199,12 +199,23 @@ void Widget_PrintStyleSheets( LCUI_Widget w )
 	Selector_Delete( s );
 }
 
-void Widget_UpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
+void Widget_UpdateStyle( LCUI_Widget w, LCUI_BOOL is_refresh_all )
 {
-	if( is_update_all ) {
+	if( is_refresh_all ) {
+		StyleSheet_Clear( w->style );
 		Widget_AddTask( w, WTT_REFRESH_STYLE );
 	} else {
 		Widget_AddTask( w, WTT_UPDATE_STYLE );
+	}
+}
+
+void Widget_UpdateChildrenStyle( LCUI_Widget w, LCUI_BOOL is_refresh_all )
+{
+	LinkedListNode *node;
+	w->task.for_children = TRUE;
+	for( LinkedList_Each( node, &w->children ) ) {
+		Widget_UpdateStyle( node->data, is_refresh_all );
+		Widget_UpdateChildrenStyle( node->data, is_refresh_all );
 	}
 }
 
@@ -214,19 +225,29 @@ void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 	LCUI_Style s;
 	LCUI_StyleSheet ss;
 	TaskMap task_map[] = {
-		{ key_display_start, key_display_end, WTT_VISIBLE, TRUE },
+		{ key_visible, key_visible, WTT_VISIBLE, TRUE },
+		{ key_display, key_display, WTT_DISPLAY, TRUE },
+		{ key_flex_style_start, key_flex_style_end, WTT_LAYOUT, TRUE },
 		{ key_opacity, key_opacity, WTT_OPACITY, TRUE },
 		{ key_z_index, key_z_index, WTT_ZINDEX, TRUE },
 		{ key_width, key_height, WTT_RESIZE, TRUE },
-		{ key_padding_start, key_padding_end, WTT_RESIZE, TRUE },
+		{
+			key_min_width, key_max_height,
+			WTT_RESIZE_WITH_SURFACE, TRUE
+		}, {
+			key_padding_start, key_padding_end,
+			WTT_RESIZE_WITH_SURFACE, TRUE
+		}, {
+			key_box_sizing, key_box_sizing,
+			WTT_RESIZE_WITH_SURFACE, TRUE
+		},
 		{ key_margin_start, key_margin_end, WTT_MARGIN, TRUE },
 		{ key_position_start, key_position_end, WTT_POSITION, TRUE },
 		{ key_vertical_align, key_vertical_align, WTT_POSITION, TRUE },
 		{ key_border_start, key_border_end, WTT_BORDER, TRUE },
 		{ key_background_start, key_background_end, WTT_BACKGROUND, TRUE },
 		{ key_box_shadow_start, key_box_shadow_end, WTT_SHADOW, TRUE },
-		{ key_pointer_events, key_focusable, WTT_PROPS, TRUE },
-		{ key_box_sizing, key_box_sizing, WTT_RESIZE, TRUE }
+		{ key_pointer_events, key_focusable, WTT_PROPS, TRUE }
 	};
 
 	if( is_update_all ) {

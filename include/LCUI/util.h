@@ -51,5 +51,6 @@
 #include <LCUI/util/parse.h>
 #include <LCUI/util/event.h>
 #include <LCUI/util/logger.h>
+#include <LCUI/util/task.h>
 #endif
 

@@ -112,6 +112,9 @@ LCUI_BOOL Widget_CheckType( LCUI_Widget w, const char *type )
 	if( strcmp( w->type, type ) == 0 ) {
 		return TRUE;
 	}
+	if( !w->proto ) {
+		return FALSE;
+	}
 	for( proto = w->proto->proto; proto; proto = proto->proto ) {
 		if( strcmp( proto->name, type ) == 0 ) {
 			return TRUE;

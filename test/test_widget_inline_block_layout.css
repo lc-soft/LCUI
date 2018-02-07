@@ -1,0 +1,29 @@
+.inline-block {
+    padding: 5px;
+    display: inline-block;
+    border: 1px solid #ddd;
+}
+.box-1 {
+    width: 64px;
+    height: 64px;
+    background-color: #80bdff;
+}
+.box-2 {
+    background-color: #957bbe;
+}
+.dropdown-menu {
+    left: 20px;
+    bottom: 20px;
+    position: absolute;
+    min-width: 100px;
+    padding: 8px 0;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 6px rgba(0, 0, 0, .2);
+}
+.dropdown-item {
+    width: 100%;
+    display: block;
+    line-height: 24px;
+    padding: 5px 20px;
+    box-sizing: border-box;
+}

@@ -42,6 +42,7 @@
 #include <LCUI/timer.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/textcaret.h>
+#include <LCUI/gui/css_parser.h>
 
 #define CARET_HIDE 0
 #define CARET_SHOW 1

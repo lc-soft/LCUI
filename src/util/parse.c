@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * parse.c -- parse data from string
  *
- * Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2018 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * parse.c -- 字符串中的书局解析
  *
- * 版权所有 (C) 2015-2017 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015-2018 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -37,37 +37,43 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
 
+#include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/util/parse.h>
+#include <LCUI/font/fontlibrary.h>
 
-/** 从字符串中解析出数值，包括px、%、dp等单位 */
 LCUI_BOOL ParseNumber( LCUI_Style s, const char *str )
 {
 	int n = 0;
+	const char *p;
 	char num_str[32];
-	const char *p = str;
-	LCUI_BOOL has_sign = FALSE, has_point = FALSE;
+	LCUI_BOOL has_point = FALSE;
 
 	if( str == NULL ) {
 		return FALSE;
 	}
 	/* 先取出数值 */
-	while( 1 ) {
+	for( p = str; *p && n < 30; ++p ) {
 		if( *p >= '0' && *p <= '9' );
-		else if( !has_sign && (*p == '-' || *p == '+') ) {
-			has_sign = TRUE;
-		} else if( !has_point && *p == '.' ) {
+		else if( *p == '-' || *p == '+' ) {
+			if( n > 0 ) {
+				n = 0;
+				break;
+			}
+		} else if( *p == '.' ) {
+			if( has_point ) {
+				n = 0;
+				break;
+			}
 			has_point = TRUE;
 		} else {
 			break;
 		}
-		if( n < 30 ) {
-			num_str[n++] = *p;
-		}
-		++p;
+		num_str[n++] = *p;
 	}
 	if( n == 0 ) {
 		return FALSE;
@@ -219,7 +225,6 @@ LCUI_BOOL ParseRGB( LCUI_Style var, const char *str )
 	return TRUE;
 }
 
-/** 从字符串中解析出色彩值，支持格式：#fff、#ffffff, rgba(R,G,B,A)、rgb(R,G,B) */
 LCUI_BOOL ParseColor( LCUI_Style var, const char *str )
 {
 	const char *p;
@@ -280,4 +285,107 @@ LCUI_BOOL ParseColor( LCUI_Style var, const char *str )
 		return TRUE;
 	}
 	return FALSE;
+}
+
+static LCUI_BOOL IsAbsolutePath( const char *path )
+{
+	if( path[0] == '/' ) {
+		return TRUE;
+	}
+	if( isalpha( path[0] ) && path[1] == ':' && path[2] == '/' ) {
+		return TRUE;
+	}
+	return FALSE;
+}
+
+LCUI_BOOL ParseUrl( LCUI_Style s, const char *str, const char *dirname )
+{
+	size_t n, dirname_len;
+	const char *p, *head, *tail;
+
+	p = str;
+	tail = head = strstr( p, "url(" );
+	if( !head ) {
+		return FALSE;
+	}
+	while( p ) {
+		tail = p;
+		p = strstr( p + 1, ")" );
+	}
+	if( tail == head ) {
+		return FALSE;
+	}
+	head += 4;
+	if( *head == '"' ) {
+		++head;
+	}
+	n = tail - head;
+	s->type = SVT_STRING;
+	if( dirname && !IsAbsolutePath( head ) ) {
+		n += (dirname_len = strlen( dirname ));
+		s->val_string = malloc( (n + 1) * sizeof( char ) );
+		if( !s->val_string ) {
+			return FALSE;
+		}
+		strcpy( s->val_string, dirname );
+		if( s->val_string[dirname_len - 1] != '/' ) {
+			s->val_string[dirname_len] = '/';
+			dirname_len += 1;
+		}
+		strncpy( s->val_string + dirname_len,
+			 head, n - dirname_len );
+		s->val_string[n] = 0;
+	} else {
+		s->val_string = malloc( (n + 1) * sizeof( char ) );
+		if( !s->val_string ) {
+			return FALSE;
+		}
+		strncpy( s->val_string, head, n );
+	}
+	s->is_valid = TRUE;
+	s->val_string[n] = 0;
+	if( n > 0 && s->val_string[n - 1] == '"' ) {
+		n -= 1;
+		s->val_string[n] = 0;
+	}
+	return TRUE;
+}
+
+LCUI_BOOL ParseFontWeight( const char *str, int *weight )
+{
+	int value;
+	if( strcmp( str, "normal" ) == 0 ) {
+		*weight = FONT_WEIGHT_NORMAL;
+		return TRUE;
+	}
+	if( strcmp( str, "bold" ) == 0 ) {
+		*weight = FONT_WEIGHT_BOLD;
+		return TRUE;
+	}
+	if( sscanf( str, "%d", &value ) != 1 ) {
+		*weight = FONT_WEIGHT_NORMAL;
+		return FALSE;
+	}
+	if( value < 100 ) {
+		*weight = FONT_WEIGHT_THIN;
+		return TRUE;
+	}
+	*weight = iround( value / 100.0 ) * 100;
+	return TRUE;
+}
+
+LCUI_BOOL ParseFontStyle( const char *str, int *style )
+{
+	char value[64] = "";
+	strtrim( value, str, NULL );
+	if( strcmp( value, "normal" ) == 0 ) {
+		*style = FONT_STYLE_NORMAL;
+	} else if( strcmp( value, "italic" ) == 0 ) {
+		*style = FONT_STYLE_ITALIC;
+	} else if( strcmp( value, "oblique" ) == 0 ) {
+		*style = FONT_STYLE_OBLIQUE;
+	} else {
+		return FALSE;
+	}
+	return TRUE;
 }

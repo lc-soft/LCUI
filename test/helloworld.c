@@ -26,7 +26,7 @@ int main( int argc, char **argv )
         }
         Widget_Append( root, pack ); 
         Widget_Unwrap( pack );
-        btn = LCUIWidget_GetById( "btn-ok" );
+        btn = LCUIWidget_GetById( "btn" );
         Widget_BindEvent( btn, "click", OnBtnClick, NULL, NULL );
         return LCUI_Main();
 }

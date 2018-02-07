@@ -47,6 +47,7 @@
 #include <LCUI/input.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/metrics.h>
+#include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/css_fontstyle.h>
 #include <LCUI/gui/widget/textedit.h>
 #include <LCUI/gui/widget/textcaret.h>
@@ -68,7 +69,7 @@ enum TaskType {
 };
 
 typedef struct LCUI_TextEditRec_ {
-	LCUI_FontStyleRec style;		/**< 字体样式 */
+	LCUI_CSSFontStyleRec style;		/**< 字体样式 */
 	LCUI_TextLayer layer_source;		/**< 实际文本层 */
 	LCUI_TextLayer layer_mask;		/**< 屏蔽后的文本层 */
 	LCUI_TextLayer layer_placeholder;	/**< 占位符的文本层 */
@@ -376,7 +377,7 @@ static void TextEdit_UpdateTextLayer( LCUI_Widget w )
 	LinkedList rects;
 	LCUI_RectF rect;
 	LCUI_TextEdit edit;
-	LCUI_TextStyle style;
+	LCUI_TextStyleRec style;
 	LinkedListNode *node;
 	LinkedList_Init( &rects );
 	scale = LCUIMetrics_GetScale();
@@ -774,10 +775,7 @@ static void TextEdit_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	LCUI_TextEdit edit = GetData( w );
 	if( !w->style->sheet[key_width].is_valid ||
 	    w->style->sheet[key_width].type == SVT_AUTO ) {
-		max_width = Widget_ComputeMaxWidth( w );
-		max_width -= w->computed_style.border.left.width;
-		max_width -= w->computed_style.border.right.width;
-		max_width -= w->padding.left + w->padding.right;
+		max_width = Widget_ComputeMaxContentWidth( w );
 	} else {
 		max_width = width = w->box.content.width;
 	}
@@ -852,7 +850,7 @@ static void TextEdit_OnReady( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 static void TextEdit_SetAttr( LCUI_Widget w, const char *name, 
 			      const char *val )
 {
-	if( strcasecmp( name, "data-placeholder" ) == 0 ) {
+	if( strcmp( name, "placeholder" ) == 0 ) {
 		TextEdit_SetPlaceHolder( w, val );
 	}
 }
@@ -889,7 +887,7 @@ static void TextEdit_OnInit( LCUI_Widget w )
 	Widget_Append( w, edit->caret );
 	Widget_Hide( edit->caret );
 	LCUIMutex_Init( &edit->mutex );
-	LCUIFontStyle_Init( &edit->style );
+	CSSFontStyle_Init( &edit->style );
 }
 
 static void TextEdit_OnDestroy( LCUI_Widget widget )
@@ -899,7 +897,7 @@ static void TextEdit_OnDestroy( LCUI_Widget widget )
 	TextLayer_Destroy( edit->layer_source );
 	TextLayer_Destroy( edit->layer_placeholder );
 	TextLayer_Destroy( edit->layer_mask );
-	LCUIFontStyle_Destroy( &edit->style );
+	CSSFontStyle_Destroy( &edit->style );
 	LinkedList_Clear( &edit->text_blocks, TextBlock_OnDestroy );
 }
 
@@ -929,7 +927,7 @@ static void TextEdit_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	TextLayer_DrawToGraph( edit->layer, rect, pos, &canvas );
 }
 
-static void TextEdit_SetTextStyle( LCUI_Widget w, LCUI_TextStyle *ts )
+static void TextEdit_SetTextStyle( LCUI_Widget w, LCUI_TextStyle ts )
 {
 	LCUI_TextEdit edit = GetData( w );
 	TextLayer_SetTextStyle( edit->layer_placeholder, ts );
@@ -941,11 +939,11 @@ static void TextEdit_SetTextStyle( LCUI_Widget w, LCUI_TextStyle *ts )
 
 static void TextEdit_OnUpdate( LCUI_Widget w )
 {
-	LCUI_TextStyle ts;
+	LCUI_TextStyleRec ts;
 	LCUI_TextEdit edit = GetData( w );
-	LCUI_FontStyle fs = &edit->style;
-	LCUIFontStyle_Compute( fs, w->style );
-	LCUIFontStyle_GetTextStyle( fs, &ts );
+	LCUI_CSSFontStyle fs = &edit->style;
+	CSSFontStyle_Compute( fs, w->style );
+	CSSFontStyle_GetTextStyle( fs, &ts );
 	TextEdit_SetTaskForLineHeight( w, fs->line_height );
 	TextEdit_SetTaskForMultiline( w, fs->white_space != SV_NOWRAP );
 	TextEdit_SetTextStyle( w, &ts );

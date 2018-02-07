@@ -120,7 +120,7 @@ static void TimerThread( void *arg )
 {
 	long n_ms, lost_ms;
 	LinkedListNode *node;
-	LCUI_AppTaskRec task = {0};
+	LCUI_TaskRec task = { 0 };
 	LCUIMutex_Lock( &self.mutex );
 	LOG( "[timer] timer thread is working\n" );
 	while( self.is_running ) {
@@ -165,6 +165,7 @@ static void TimerThread( void *arg )
 	}
 	LOG( "[timer] timer thread stopped working\n" );
 	LCUIMutex_Unlock( &self.mutex );
+	LCUIThread_Exit( NULL );
 }
 
 static Timer TimerList_Find( int timer_id )

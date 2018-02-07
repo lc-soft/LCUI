@@ -5,6 +5,7 @@ libgui_la_SOURCES =\
 widget.c		\
 widget_base.c		\
 widget_helper.c		\
+widget_layout.c		\
 widget_event.c		\
 widget_prototype.c	\
 widget_style.c		\
@@ -14,6 +15,7 @@ widget_background.c	\
 widget_border.c		\
 widget_shadow.c		\
 css_parser.c		\
+css_rule_font_face.c	\
 css_library.c		\
 css_fontstyle.c		\
 builder.c		\
@@ -23,4 +25,5 @@ widget/textcaret.c	\
 widget/textedit.c	\
 widget/sidebar.c	\
 widget/scrollbar.c	\
+widget/anchor.c		\
 widget/button.c

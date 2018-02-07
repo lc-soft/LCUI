@@ -45,6 +45,7 @@
 #include <LCUI/font.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/builder.h>
+#include <LCUI/gui/css_parser.h>
 
 #define WARN_TXT "[builder] warning: this module is not enabled before build.\n"
 
@@ -155,7 +156,7 @@ static int ParseUI( XMLParserContext ctx, xmlNodePtr node )
 static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 {
 	xmlAttrPtr prop;
-	char *prop_val = NULL;
+	char *prop_val = NULL, *prop_name;
 	LCUI_Widget w = NULL, parent = ctx->widget;
 
 	if( ctx->parent && ctx->parent->id != ID_UI &&
@@ -206,11 +207,13 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 			Widget_AddClass( w, prop_val );
 			continue;
 		}
-		if( !w->proto || !w->proto->setattr ) {
-			continue;
+		prop_name = malloc( strsize( (const char*)prop->name ) );
+		strtolower( prop_name, (const char*)prop->name );
+		Widget_SetAttribute( w, prop_name, prop_val );
+		if( w->proto && w->proto->setattr ) {
+			w->proto->setattr( w, prop_name, prop_val );
 		}
-		Widget_SetAttribute( w, (const char*)prop->name, prop_val );
-		w->proto->setattr( w, (const char*)prop->name, prop_val );
+		free( prop_name );
 	}
 	if( prop_val ) {
 		xmlFree( prop_val );
@@ -219,9 +222,10 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 }
 
 static Parser parser_list[] = {
-	{ID_UI, "ui", ParseUI },
-	{ID_WIDGET, "widget", ParseWidget },
-	{ID_RESOURCE, "resource", ParseResource }
+	{ ID_UI, "ui", ParseUI },
+	{ ID_WIDGET, "w", ParseWidget },
+	{ ID_WIDGET, "widget", ParseWidget },
+	{ ID_RESOURCE, "resource", ParseResource }
 };
 
 static int CompareName( void *data, const void *keydata )

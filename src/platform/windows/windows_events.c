@@ -65,8 +65,8 @@ static LRESULT CALLBACK WndProc( HWND hwnd, UINT msg,
 
 	switch( msg ) {
 	case WM_LCUI_TASK:
-		LCUI_RunTask( (LCUI_AppTask)arg2 );
-		LCUI_DeleteTask( (LCUI_AppTask)arg2 );
+		LCUITask_Run( (LCUI_Task)arg2 );
+		LCUITask_Destroy( (LCUI_Task)arg2 );
 		return 0;
 	case WM_DESTROY:
 		return 0;
@@ -87,20 +87,6 @@ static LRESULT CALLBACK WndProc( HWND hwnd, UINT msg,
 		return DefWindowProc( hwnd, msg, arg1, arg2 );
 	}
 	return 0;
-}
-
-static LCUI_BOOL WIN_PostTask( LCUI_AppTask task )
-{
-	return PostMessage( win.main_hwnd, WM_LCUI_TASK, 0, (LPARAM)task );
-}
-
-static LCUI_BOOL WIN_WaitEvent( void )
-{
-	MSG msg;
-	if( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) ) {
-		return TRUE;
-	}
-	return WaitMessage();
 }
 
 static void WIN_ProcessEvents( void )

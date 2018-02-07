@@ -31,7 +31,7 @@ void App::Load( Platform::String^ entryPoint )
 	}
 	Widget_Append( root, pack ); 
 	Widget_Unwrap( pack );
-	btn = LCUIWidget_GetById( "btn-ok" );
+	btn = LCUIWidget_GetById( "btn" );
 	Widget_BindEvent( btn, "click", OnBtnClick, NULL, NULL );
 }
 

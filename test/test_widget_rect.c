@@ -72,7 +72,7 @@ static void test_move_widget( void *ar1, void *arg2 )
 		}
 		break;
 	default:
-		LCUI_Exit( self.pass );
+		LCUI_Exit( self.pass - self.count );
 		return;
 	}
 	Widget_Move( self.widget, x, y );
@@ -113,8 +113,9 @@ static void check_widget_rect( LCUI_SysEvent ev, void *arg )
 			  rect.x, rect.y, rect.width, rect.height,
 			  paint_rect->x, paint_rect->y,
 			  paint_rect->width, paint_rect->height );
+	} else {
+		self.pass += 1;
 	}
-	self.pass += ret;
 	self.count += 1;
 	self.x = self.widget->x;
 	self.y = self.widget->y;
@@ -175,7 +176,9 @@ int test_widget_rect( void )
 		/* 等一段时间后再开始测试，避免初始化 LCUI 时产生的脏矩形影响测试结果 */
 		LCUITimer_Set( 100, start_test, NULL, FALSE );
 		LCUIWidget_Update();
-		ret += LCUI_Main() == 0 ? 0 : -1;
+		if( LCUI_Main() != 0 ) {
+			ret -= 1;
+		}
 	}
 	return ret;
 }

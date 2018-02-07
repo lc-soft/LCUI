@@ -45,8 +45,8 @@ textview {
     line-height: 18px;
 }
 .picture {
-    width: 256px;
-    height: 256px;
+    width: 128px;
+    height: 128px;
     padding: 20px;
     text-align: center;
     display: inline-block;
@@ -75,6 +75,47 @@ textview {
     font-size: 14px;
     display: inline-block;
     background-color: rgba(255, 255, 255, 0.1);
+}
+.grid-box {
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #eee;
+}
+.grid-box-text {
+    font-size: 18px;
+    line-height: 24px;
+    text-align: center;
+    display: block;
+    margin-bottom: 15px;
+}
+.grid-box .row {
+    margin: 0 -5px;
+}
+/* Test whether the max-width of col-6 and col-3 will be overwritten */
+.grid-box .col-6,
+.grid-box .col-3 {
+    max-width: 100%;
+}
+.grid-box .col {
+    width: 100%;
+    max-width: 100%;
+    padding: 5px;
+    display: inline-block;
+    box-sizing: border-box;
+}
+.grid-box .col-6 {
+    max-width: 50%;
+}
+.grid-box .col-3 {
+    max-width: 25%;
+}
+.grid-box .col-content {
+    display: block;
+    line-height: 40px;
+    text-align: center;
+    box-sizing: border-box;
+    border: 1px solid rgba(86,61,124,.2);
+    background-color: rgba(86,61,124,.15);
 }
 .overflow-box {
     height: 128px;

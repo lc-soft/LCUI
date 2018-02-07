@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * textlayer.h -- text bitmap layer processing module.
  * 
- * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2018 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * textlayer.h -- 文本图层处理模块
  *
- * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2018 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -44,7 +44,7 @@ LCUI_BEGIN_HEADER
 
 typedef struct TextCharRec_ {
         wchar_t char_code;		/**< 字符码 */
-        LCUI_TextStyle *style;		/**< 该字符使用的样式数据 */
+        LCUI_TextStyle style;		/**< 该字符使用的样式数据 */
 	const LCUI_FontBitmap *bitmap;	/**< 字体位图数据(只读) */
 } TextCharRec, *TextChar;
 
@@ -72,6 +72,12 @@ typedef struct TextRowListRec_ {
         TextRow *rows;		/**< 每一行文本的数据 */
 } TextRowListRec, *TextRowList;
 
+/** 单词内断行模式 */
+typedef enum WordBreakMode {
+	WORD_BREAK_MODE_NORMAL,		/**< 默认的断行规则，将宽度溢出的单词放到下一行 */
+	WORD_BREAK_MODE_BREAK_ALL	/**< 任意字符间断行 */
+} WordBreakMode;
+
 typedef struct LCUI_TextLayerRec_  {
         int offset_x;			/**< X轴坐标偏移量 */
         int offset_y;			/**< Y轴坐标偏移量 */
@@ -94,14 +100,15 @@ typedef struct LCUI_TextLayerRec_  {
 	int max_width, max_height;
 
 	int length;			/**< 文本长度 */
+	WordBreakMode word_break;	/**< 单词内断行模式 */
 	LCUI_BOOL is_mulitiline_mode;	/**< 是否启用多行文本模式 */
         LCUI_BOOL is_autowrap_mode;	/**< 是否启用自动换行模式 */
 	LCUI_BOOL is_using_style_tags;	/**< 是否使用文本样式标签 */
         LCUI_BOOL is_using_buffer;	/**< 是否使用缓存空间来存储文本位图 */
 	LinkedList dirty_rect;		/**< 脏矩形记录 */
         int text_align;			/**< 文本的对齐方式 */
-        TextRowListRec rowlist;		/**< 文本行列表 */
-        LCUI_TextStyle text_style;	/**< 文本全局样式 */
+        TextRowListRec text_rows;	/**< 文本行列表 */
+        LCUI_TextStyleRec text_style;	/**< 文本全局样式 */
 	LinkedList style_cache;		/**< 样式缓存 */
 	int line_height;		/**< 全局文本行高度 */
 	struct {
@@ -215,7 +222,10 @@ LCUI_API int TextLayer_TextDelete( LCUI_TextLayer layer, int n_char );
 LCUI_API int TextLayer_TextBackspace( LCUI_TextLayer layer, int n_char );
 
 /** 设置是否启用自动换行模式 */
-LCUI_API void TextLayer_SetAutoWrap( LCUI_TextLayer layer, int is_true );
+LCUI_API void TextLayer_SetAutoWrap( LCUI_TextLayer layer, LCUI_BOOL autowrap );
+
+/** 设置单词内断行模式 */
+LCUI_API void TextLayer_SetWordBreak( LCUI_TextLayer layer, WordBreakMode mode );
 
 /** 设置是否使用样式标签 */
 LCUI_API void TextLayer_SetUsingStyleTags( LCUI_TextLayer layer, LCUI_BOOL is_true );
@@ -243,7 +253,7 @@ LCUI_API int TextLayer_Draw( LCUI_TextLayer layer );
 LCUI_API void TextLayer_ClearInvalidRect( LCUI_TextLayer layer );
 
 /** 设置全局文本样式 */
-LCUI_API void TextLayer_SetTextStyle( LCUI_TextLayer layer, LCUI_TextStyle *style );
+LCUI_API void TextLayer_SetTextStyle( LCUI_TextLayer layer, LCUI_TextStyle style );
 
 /** 设置文本行的高度 */
 LCUI_API void TextLayer_SetLineHeight( LCUI_TextLayer layer, int height );

@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * widget_base.h -- the widget base operation set.
  *
- * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2018 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * widget_base.h -- 部件的基本操作集。
  *
- * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2018 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -41,7 +41,6 @@
 #define LCUI_WIDGET_BASE_H
 
 #include <LCUI/gui/css_library.h>
-#include <LCUI/gui/css_parser.h>
 
 LCUI_BEGIN_HEADER
 
@@ -64,6 +63,7 @@ typedef struct LCUI_WidgetStyle {
 	LCUI_BorderStyle border;		/**< 边框 */
 	LCUI_BoxShadowStyle shadow;		/**< 盒形阴影 */
 	LCUI_BackgroundStyle background;	/**< 背景 */
+	LCUI_FlexLayoutStyle flex;		/**< 弹性布局相关样式 */
 	int pointer_events;			/**< 事件的处理方式 */
 } LCUI_WidgetStyle;
 
@@ -77,11 +77,13 @@ enum WidgetTaskType {
 	WTT_PADDING,
 	WTT_MARGIN,
 	WTT_VISIBLE,
+	WTT_DISPLAY,
 	WTT_SHADOW,
 	WTT_BORDER,
 	WTT_BACKGROUND,
 	WTT_LAYOUT,
 	WTT_RESIZE,
+	WTT_RESIZE_WITH_SURFACE,
 	WTT_POSITION,
 	WTT_ZINDEX,
 	WTT_OPACITY,
@@ -106,14 +108,14 @@ typedef struct LCUI_WidgetTaskBoxRec_ {
 } LCUI_WidgetTaskBoxRec;
 
 /** 部件状态 */
-enum LCUI_WidgetState {
+typedef enum LCUI_WidgetState {
 	WSTATE_CREATED = 0,
 	WSTATE_UPDATED,
 	WSTATE_LAYOUTED,
 	WSTATE_READY,
 	WSTATE_NORMAL,
 	WSTATE_DELETED,
-};
+} LCUI_WidgetState;
 
 typedef struct LCUI_WidgetRec_* LCUI_Widget;
 typedef struct LCUI_WidgetPrototypeRec_ *LCUI_WidgetPrototype;
@@ -164,11 +166,11 @@ typedef struct LCUI_WidgetAttributeRec_ {
 
 /** 部件结构 */
 typedef struct LCUI_WidgetRec_ {
-	int			state;			/**< 状态 */
+	LCUI_WidgetState	state;			/**< 状态 */
 	float			x, y;			/**< 当前坐标（由 origin 计算而来） */
 	float			origin_x, origin_y;	/**< 当前布局下计算出的坐标 */
 	float			width, height;		/**< 部件区域大小，包括边框和内边距占用区域 */
-	int			index;			/**< 部件索引位置 */
+	uint_t			index;			/**< 部件索引位置 */
 	char			*id;			/**< ID */
 	char			*type;			/**< 类型 */
 	char			**classes;		/**< 类列表 */
@@ -207,14 +209,28 @@ typedef struct LCUI_WidgetRec_ {
 #define Widget_HasBlockDisplay(W) \
 ((W)->computed_style.display == SV_BLOCK)
 
+#define Widget_HasFlexDisplay(W) \
+((W)->computed_style.display == SV_FLEX)
+
 #define Widget_HasInlineBlockDisplay(W) \
 ((W)->computed_style.display == SV_INLINE_BLOCK)
+
+#define Widget_HasFillAvailableWidth(W) \
+((Widget_HasBlockDisplay( W ) || Widget_HasFlexDisplay( W )) && \
+!Widget_HasAbsolutePosition( W ))
+
+#define Widget_HasScaleSize(W) \
+(Widget_CheckStyleType( W, key_width, SCALE ) ||\
+Widget_CheckStyleType( W, key_height, SCALE ))
 
 /** 部件是否有值为自动（默认）的样式 */
 LCUI_API LCUI_BOOL Widget_HasAutoStyle( LCUI_Widget w, int key );
 
-/** 部件是否有能够自动调整的宽度 */
-LCUI_API LCUI_BOOL Widget_HasAutoWidth( LCUI_Widget w );
+/** 父级部件有可直接获取的静态宽度 */
+LCUI_API LCUI_BOOL Widget_HasStaticWidthParent( LCUI_Widget widget );
+
+/** 如果部件具有自适应内容的宽度 */
+LCUI_API LCUI_BOOL Widget_HasFitContentWidth( LCUI_Widget w );
 
 /** 获取根级部件 */
 LCUI_API LCUI_Widget LCUIWidget_GetRoot(void);
@@ -251,6 +267,9 @@ LCUI_API LCUI_Widget Widget_GetPrev( LCUI_Widget w );
 
 /** 获取下一个部件 */
 LCUI_API LCUI_Widget Widget_GetNext( LCUI_Widget w );
+
+/** 获取一个子部件 */
+LCUI_API LCUI_Widget Widget_GetChild( LCUI_Widget w, size_t index );
 
 /** 获取当前点命中的最上层可见部件 */
 LCUI_API LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y );
@@ -308,6 +327,9 @@ LCUI_API void Widget_PaintBoxShadow( LCUI_Widget w, LCUI_PaintContext paint );
 /** 更新可见性 */
 LCUI_API void Widget_UpdateVisibility( LCUI_Widget w );
 
+/** 更新显示方式 */
+LCUI_API void Widget_UpdateDisplay( LCUI_Widget w );
+
 /** 设置部件为顶级部件 */
 LCUI_API int Widget_Top( LCUI_Widget w );
 
@@ -325,6 +347,9 @@ LCUI_API void Widget_UpdateMargin( LCUI_Widget w );
 /** 刷新尺寸 */
 LCUI_API void Widget_UpdateSize( LCUI_Widget w );
 
+/** 刷新部件尺寸以及与之绑定的表面的尺寸 */
+LCUI_API void Widget_UpdateSizeWithSurface( LCUI_Widget w );
+
 /** 刷新各项属性 */
 LCUI_API void Widget_UpdateProps( LCUI_Widget w );
 
@@ -336,6 +361,9 @@ LCUI_API void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title );
 
 /** 设置部件ID */
 LCUI_API int Widget_SetId( LCUI_Widget w, const char *idstr );
+
+/** 为部件添加状态 */
+LCUI_API void Widget_AddState( LCUI_Widget w, LCUI_WidgetState state );
 
 /** 为部件设置属性 */
 LCUI_API int Widget_SetAttributeEx( LCUI_Widget w, const char *name, void *value,
@@ -374,15 +402,14 @@ LCUI_API void Widget_SetDisabled( LCUI_Widget w, LCUI_BOOL disabled );
 /** 计算部件的最大宽度 */
 LCUI_API float Widget_ComputeMaxWidth( LCUI_Widget w );
 
+/** 计算部件可利用的宽度 */
+LCUI_API float Widget_ComputeFillAvailableWidth( LCUI_Widget w );
+
+/** 计算部件的最大内容宽度 */
+LCUI_API float Widget_ComputeMaxContentWidth( LCUI_Widget w );
+
 /** 计算部件的最大可用宽度 */
 LCUI_API float Widget_ComputeMaxAvaliableWidth( LCUI_Widget widget );
-
-LCUI_API void Widget_UpdateLayout( LCUI_Widget w );
-
-/** 更新子部件的布局 */
-LCUI_API void Widget_UpdateLayout( LCUI_Widget w );
-
-LCUI_API void Widget_ExecUpdateLayout( LCUI_Widget w );
 
 /** 从部件中移除一个状态 */
 int Widget_RemoveStatus( LCUI_Widget w, const char *status_name );

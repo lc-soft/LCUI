@@ -129,37 +129,48 @@ LCUI_API const char *LCUIWidget_GetEventName( int event_id );
 LCUI_API int LCUIWidget_GetEventId( const char *event_name );
 
 /**
-* 添加部件事件绑定
-* @param[in] widget 目标部件
-* @param[in] event_id 事件标识号
-* @param[in] func 事件处理函数
-* @param[in] data 事件处理函数的附加数据
-* @param[in] destroy_data 数据的销毁函数
+ * 添加部件事件绑定
+ * @param[in] widget 目标部件
+ * @param[in] event_id 事件标识号
+ * @param[in] func 事件处理函数
+ * @param[in] data 事件处理函数的附加数据
+ * @param[in] destroy_data 数据的销毁函数
+ * @return 成功则返回事件处理器的标识号，失败则返回负数
 */
 LCUI_API int Widget_BindEventById( LCUI_Widget widget, int event_id,
 				   LCUI_WidgetEventFunc func, void *data,
 				   void( *destroy_data )(void*) );
 
 /**
-* 添加部件事件绑定
-* @param[in] widget 目标部件
-* @param[in] event_name 事件名称
-* @param[in] func 事件处理函数
-* @param[in] data 事件处理函数的附加数据
-* @param[in] destroy_data 数据的销毁函数
-*/
+ * 添加部件事件绑定
+ * @param[in] widget 目标部件
+ * @param[in] event_name 事件名称
+ * @param[in] func 事件处理函数
+ * @param[in] data 事件处理函数的附加数据
+ * @param[in] destroy_data 数据的销毁函数
+ * @return 成功则返回事件处理器的标识号，失败则返回负数
+ */
 LCUI_API int Widget_BindEvent( LCUI_Widget widget, const char *event_name,
 			       LCUI_WidgetEventFunc func, void *data,
 			       void( *destroy_data )(void*) );
 
 /**
-* 解除部件事件绑定
-* @param[in] widget 目标部件
-* @param[in] event_id 事件标识号
-* @param[in] func 与事件绑定的函数
-*/
+ * 解除部件事件绑定
+ * @param[in] widget 目标部件
+ * @param[in] event_id 事件标识号
+ * @param[in] func 与事件绑定的函数
+ */
 LCUI_API int Widget_UnbindEventById( LCUI_Widget widget, int event_id,
 				     LCUI_WidgetEventFunc func );
+
+
+/**
+ * 解除部件事件绑定
+ * @param[in] widget 目标部件
+ * @param[in] handler_id 事件处理器标识号
+ */
+LCUI_API int Widget_UnbindEventByHandlerId( LCUI_Widget widget, int handler_id );
+
 /**
  * 解除部件事件绑定
  * @param[in] widget 目标部件
@@ -169,11 +180,14 @@ LCUI_API int Widget_UnbindEventById( LCUI_Widget widget, int event_id,
 LCUI_API int Widget_UnbindEvent( LCUI_Widget widget, const char *event_name,
 				 LCUI_WidgetEventFunc func );
 /**
- * 投递 surface 事件
- * surface 是与顶层部件绑定在一起的，只有当部件为顶层部件时，才能投递 surface 事件。
- * surface 事件主要用于让 surface 与 widget 同步一些数据，如：大小、位置、显示/隐藏。
+ * 投递表面（surface）事件
+ * 表面是与顶层部件绑定在一起的，只有当部件为顶层部件时，才能投递表面事件。
+ * 表面事件主要用于让表面与部件同步一些数据，如：大小、位置、显示/隐藏。
+ * @param event_type 事件类型
+ * @param @sync_props 是否将部件的属性同步给表面
  */
-LCUI_API int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type );
+LCUI_API int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type,
+				      LCUI_BOOL sync_props );
 
 /** 清除事件对象，通常在部件销毁时调用该函数，以避免部件销毁后还有事件发送给它 */
 LCUI_API void LCUIWidget_ClearEventTarget( LCUI_Widget widget );

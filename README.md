@@ -1,56 +1,88 @@
-# The LCUI Project
+<p align="center">
+  <a href="http://lcui.org/">
+    <img src="https://lcui.lc-soft.io/static/images/lcui-logo-lg.png" alt="" width=72 height=72>
+  </a>
+  <h3 align="center">LCUI</h3>
+  <p align="center">
+    A small C library for building user interfaces with C, XML and CSS.
+  </p>
+  <p align="center">
+    <a href="https://travis-ci.org/lc-soft/LCUI"><img src="https://travis-ci.org/lc-soft/LCUI.png?branch=master" alt="Build Status"></a>
+    <a href="https://coveralls.io/github/lc-soft/LCUI?branch=develop"><img src="https://coveralls.io/repos/github/lc-soft/LCUI/badge.svg?branch=develop" alt="Coverage Status"></a>
+    <a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html"><img src="https://img.shields.io/badge/license-GPLv2-blue.svg" alt="License"></a>
+    <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/release/lc-soft/LCUI/all.svg" alt="Github Release"></a>
+    <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/downloads/lc-soft/LCUI/total.svg" alt="Github All Releases"></a>
+    <img src="https://img.shields.io/github/repo-size/lc-soft/LCUI.svg" alt="Repo size">
+    <img src="https://img.shields.io/github/languages/code-size/lc-soft/LCUI.svg" alt="Code size">
+  </p>
+</p>
 
-![LCUI Logo](https://lcui.lc-soft.io/static/images/lcui-logo-lg.png)
+## Table of contents
 
-[![Join the chat at https://gitter.im/lc-soft/LCUI](https://badges.gitter.im/lc-soft/LCUI.svg)](https://gitter.im/lc-soft/LCUI?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![加入讨论组 https://lcsoft.bearychat.com/apply](https://img.shields.io/badge/%E8%AE%A8%E8%AE%BA%E7%BB%84-bearychat-2dbe60.svg)](https://lcsoft.bearychat.com/apply)
-[![Build Status](https://travis-ci.org/lc-soft/LCUI.png?branch=master)](https://travis-ci.org/lc-soft/LCUI)
-[![Coverage Status](https://coveralls.io/repos/github/lc-soft/LCUI/badge.svg?branch=develop)](https://coveralls.io/github/lc-soft/LCUI?branch=develop)
-[![Github All Releases](https://img.shields.io/github/downloads/lc-soft/LCUI/total.svg)](https://github.com/lc-soft/LCUI/releases)
-[![License](https://img.shields.io/badge/license-GPLv2-blue.svg)](http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
-[![OpenCollective](https://opencollective.com/lcui/backers/badge.svg)](#backers) 
-[![OpenCollective](https://opencollective.com/lcui/sponsors/badge.svg)](#sponsors)
+- [Introduction](#introduction)
+- [License](#license)
+- [Documentation](#documentation)
+- [Building](#building)
+- [Contribution](#contribution)
+- [Backers](#backers)
+- [Sponsors](#sponsors)
 
-## Description
+## Introduction
+
+LCUI is a freely available software library for building user interfaces. It is written in C, support the use XML and CSS to describe the graphical interface, you can use it to build simple desktop apps.
 
 [中文版说明文档](README.zh-cn.md)
 
-LCUI is a freely available software library to create GUI application.
-  
-It is written in C, support the use XML and CSS describe the graphical 
-interface, you can use it to make some simple effects, like in this example:
+### Features
 
-![example screenshot](https://lcui.lc-soft.io/static/images/feature-screenshot-02.png)
+- **written in C:** Suitable for applications that are smaller and are primarily written in C.
+- **Cross platform:** Support for Windows and Linux, you can write Windows Desktop apps and Universal Windows Platform apps, as well as Linux Desktop apps.
+- **XML parsing:** Support for using XML markup language to describe the structure of the graphical user interface.
+- **CSS parsing:** Support for using CSS language to describing the presentation of the graphical user interface.
+- **HTML-Like layout:** Support the **block**, **inline-block** and simple **flex** layout, If you have web page development experience, then the use of LCUI will be easier to get started.
+- **Flexible:** Support for adapting the interface to screens of different pixel densities by setting global scaling, And also support for using screen density related sp and dp units to describe position and size of the elements.
+- **Text rendering:** Support for the text to set the global font, line height, horizontal alignment, and also support to set the color, background color, bold, italic for some text blocks separately.
+- **Font management:** Support for loading multiple font files, and support to use font of different family, weight and style.
+- **Image processing:** Provide image read interfaces, support for reading jpg, png and bmp format images.
+- **Touch:** Support multi-touch, but currently only support Windows system.
 
-Author is from China, but his English is not very good, so, some 
-files will appear chinese character, please understand. thanks.
+### Screenshots
 
-Please read the file `docs/CHANGES.md`, it contains IMPORTANT INFORMATION.
+![Hello, World!](https://lcui.lc-soft.io/static/images/screenshot-lcui-hello.png)
 
-Read the file `INSTALL` for installation instructions.
+[![LCUI.css](https://lcui.lc-soft.io/static/images/screenshot-lcui-css.png)](https://github.com/lc-ui/LCUI.css)
 
-See the  file `docs/LICENSE.TXT`  for the available licenses.
+[![LCFinder](https://lcui.lc-soft.io/static/images/screenshot-lcfinder.png)](https://github.com/lc-soft/LC-Finder)
 
-## Documentation 
+## Documentation
 
-Tutorial: https://lcui.lc-soft.io/guide/
+- Tutorial: [https://lcui.lc-soft.io/guide/](https://lcui.lc-soft.io/guide/)
+- Changelog: [docs/CHANGES.md](docs/CHANGES.md)
 
-API reference documentation has not yet been prepared, you can refer to the 
-header files, source code, and sample programs.
+API reference documentation has not yet been prepared, you can refer to the header files, source code, and tests.
 
 ## Building
 
 ### Bootstrap
 
-To bootstrap the build you need to run `./configure` (in the root of the 
-source tree). 
+To bootstrap the build you need to run `./configure` (in the root of the source tree).
 
 In the simplest case you would run:
 
-	git clone https://github.com/lc-soft/LCUI.git
-	cd LCUI
-	./autogen.sh
-	./configure
+    git clone https://github.com/lc-soft/LCUI.git
+    cd LCUI
+    ./autogen.sh
+    ./configure
+    make
+    make install
+
+If you want to experience the effect of demo, please run:
+
+    cd test
+    make
+    ./hellowrold
+
+If you want to custom building options, please read the [INSTALL](INSTALL) file for more details.
 
 ### Prerequisites
 
@@ -65,109 +97,19 @@ If you want to build full-featured LCUI, we suggest you install the following
 
 If you system is Ubuntu, you can run following command to install dependencies:
 
-	apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev
+    apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev
 
 ### Building On Windows
 
-LCUI is mainly develop in the Windows environment, you can use VisualStudio 
-to open file `build/windows/LCUI.sln` and compile LCUI.
+LCUI is mainly develop in the Windows environment, you can use VisualStudio to open file `build/windows/LCUI.sln` and compile LCUI.
 
-## Bugs 
+## Contribution
 
-Please report bugs  by e-mail to `lc-soft@live.cn`. Don't forget to send a 
-detailed explanation of  the problem --  there is nothing worse than receiving
-a terse message that only says `it doesn't work`.
+Please read through our [contributing guidelines](/.github/CONTRIBUTING.md). Included are directions for opening issues, coding standards, and notes on development.
 
-## Contributing
+## License
 
-**You can send pull requests via GitHub.**
-
-Patches should:
-
-1. Follow the style of the existing code.
-2. One commit should do exactly one thing.
-3. Commit messages should start with a summary line below 80 characters 
-   followed by a blank line, and then the reasoning/analysis for why the
-    change was made (if appropriate).
-4. Commits that fix a bug in a previous commit (which has already been 
-   merged) should start with `fixup!` and then the summary line of the 
-   commit it fixes. If you are writing your commit message in LCUI
-   then type `fix⇥` to get the prefix and a menu allowing you to pick 
-   the summary line from one of the last 15 commits.
-5. Rebase your branch against the upstream’s master. We don’t want to 
-   pull redundant merge commits.
-6. **Be clear about what license applies to your patch:** The files with
-   in this repository are under the [GPL 2][] (or later) but (as the 
-   original creator) we are still allowed to create non-free derivatives.
-   However, if patches are given to us under GPL then those cannot make 
-   it into any non-free derivatives we may later wish to create. So to 
-   make it easier for us (and avoid any legal issues) we prefer if 
-   patches are released as public domain.
-
-**You can donate support the development of LCUI.**
-
-I'm currently an independent developer and your contributions are useful. 
-I have setup an [LCUI Patreon page](https://www.patreon.com/lcsoft) if you 
-want to donate and enable me to spend more time improving the library. 
-One-off donations are also greatly appreciated. Thanks!
-
-### GitHub Workflow
-
-Developing patches should follow this workflow:
-
-#### Initial Setup
-
-1.	Fork on GitHub (click Fork button)
-2.	Clone to computer: `git clone git@github.com:«github account»/LCUI.git`
-3.	cd into your repo: `cd LCUI`
-4.	Set up remote upstream: `git remote add -f upstream git://github.com/lc-soft/LCUI.git`
-
-#### Adding a Feature
-
-1.	Create a branch for the new feature: `git checkout -b my_new_feature`
-2.	Work on your feature, add and commit as usual
-
-Creating a branch is not strictly necessary, but it makes it easy to 
-delete your branch when the feature has been merged into upstream, diff
- your branch with the version that actually ended in upstream, and to 
- submit pull requests for multiple features (branches).
-
-#### Pushing to GitHub
-
-8.	Push branch to GitHub: `git push origin my_new_feature`
-9.	Issue pull request: Click Pull Request button on GitHub
-
-#### Useful Commands
-
-If a lot of changes has happened upstream you can replay your local changes
- on top of these, this is done with `rebase`, e.g.:
-
-	git fetch upstream
-	git rebase upstream/master
-
-This will fetch changes and re-apply your commits on top of these.
-
-This is generally better than merge, as it will give a clear picture of which 
-commits are local to your branch. It will also “prune” any of your local 
-commits if the same changes have been applied upstream.
-
-You can use `-i` with `rebase` for an “interactive” rebase. This allows
- you to drop, re-arrange, merge, and reword commits, e.g.:
-
-	git rebase -i upstream/master
-
-
-## Legal
-
-The LCUI Project is released under the GNU General Public License as published
- by the Free Software Foundation, either version 2 of the License, or (at your 
-option) any later version.
-
-## Thanks to 
-
-Liu Chao <lc-soft@live.cn>
-
-Special thanks to Liu Chao for his great work on the LCUI's development.
+The LCUI Project is released under the GNU General Public License as published by the Free Software Foundation, either version 2 of the License, or (at your option) any later version.
 
 ## Backers
 
@@ -238,5 +180,3 @@ Become a sponsor and get your logo on our README on Github with a link to your s
 <a href="https://opencollective.com/lcui/sponsor/27/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/27/avatar.svg"></a>
 <a href="https://opencollective.com/lcui/sponsor/28/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/28/avatar.svg"></a>
 <a href="https://opencollective.com/lcui/sponsor/29/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/29/avatar.svg"></a>
-
---- end of README.md ---

@@ -363,8 +363,8 @@ static int Graph_FillRectRGB( LCUI_Graph *graph, LCUI_Color color, LCUI_Rect rec
 	Graph_Quote( &canvas, graph, &rect );
 	Graph_GetValidRect( &canvas, &rect );
 	graph = Graph_GetQuote( &canvas );
-	rowbytep = graph->bytes + rect.y*graph->bytes_per_row;
-	rowbytep += rect.x*graph->bytes_per_pixel;
+	rowbytep = graph->bytes + rect.y * graph->bytes_per_row;
+	rowbytep += rect.x * graph->bytes_per_pixel;
 	for( y = 0; y < rect.height; ++y ) {
 		bytep = rowbytep;
 		for( x = 0; x < rect.width; ++x ) {
@@ -684,32 +684,32 @@ static int Graph_FillRectARGB( LCUI_Graph *graph, LCUI_Color color,
 			       LCUI_Rect rect, LCUI_BOOL with_alpha )
 {
 	int x, y;
-	LCUI_Rect rect_src;
-	LCUI_ARGB *px_p, *px_row_p;
+	LCUI_Graph canvas;
+	LCUI_ARGB *pixel, *pixel_row;
 
 	if( !Graph_IsValid( graph ) ) {
 		return -1;
 	}
-	Graph_GetValidRect( graph, &rect_src );
-	graph = Graph_GetQuote( graph );
-	px_row_p = graph->argb + (rect_src.y + rect.y)*graph->width;
-	px_row_p += rect.x + rect_src.x;
+	Graph_Quote( &canvas, graph, &rect );
+	Graph_GetValidRect( &canvas, &rect );
+	graph = Graph_GetQuote( &canvas );
+	pixel_row = graph->argb + rect.y * graph->width + rect.x;
 	if( with_alpha ) {
 		for( y = 0; y < rect.height; ++y ) {
-			px_p = px_row_p;
+			pixel = pixel_row;
 			for( x = 0; x < rect.width; ++x ) {
-				*px_p++ = color;
+				*pixel++ = color;
 			}
-			px_row_p += graph->width;
+			pixel_row += graph->width;
 		}
 	} else {
 		for( y = 0; y < rect.height; ++y ) {
-			px_p = px_row_p;
+			pixel = pixel_row;
 			for( x = 0; x < rect.width; ++x ) {
-				color.alpha = px_p->alpha;
-				*px_p++ = color;
+				color.alpha = pixel->alpha;
+				*pixel++ = color;
 			}
-			px_row_p += graph->width;
+			pixel_row += graph->width;
 		}
 	}
 	return 0;

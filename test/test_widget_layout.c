@@ -47,7 +47,7 @@ static int check_content( void )
 	int ret = 0;
 	SelectWidget( content, "content" );
 	CHECK( content->width == 860 );
-	CHECK( content->height == 590 );
+	CHECK( content->height == 630 );
 	return ret;
 }
 
@@ -71,8 +71,8 @@ static int check_picture( void )
 	CHECK( background->position.value == SV_TOP_CENTER );
 	CHECK( background->size.using_value );
 	CHECK( background->size.value == SV_COVER );
-	CHECK( picture->width == 256 );
-	CHECK( picture->height == 256 );
+	CHECK( picture->width == 128 );
+	CHECK( picture->height == 128 );
 	return ret;
 }
 
@@ -82,7 +82,7 @@ static int check_offset_box( void )
 	SelectWidget( box, "offset-box" );
 	CHECK( box->computed_style.position == SV_RELATIVE );
 	CHECK( box->x == 10 );
-	CHECK( box->y == 426 - 10 );
+	CHECK( box->y == 473 );
 	return ret;
 }
 
@@ -140,7 +140,7 @@ int test_widget_layout( void )
 	Logger_SetHandlerW( LoggerHandlerW );
 #endif
 	TEST_LOG( "test widget layout\n" );
-	LCUIDisplay_SetSize( 960, 640 );
+	LCUIDisplay_SetSize( 960, 680 );
 	root = LCUIWidget_GetRoot();
 	CHECK( pack = LCUIBuilder_LoadFile( "test_widget_layout.xml" ) );
 	if( !pack ) {
