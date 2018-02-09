@@ -44,6 +44,6 @@
 #include <LCUI/font/textstyle.h>
 #include <LCUI/font/textlayer.h>
 #include <LCUI/font/charset.h>
-
+#include <LCUI/font/fontconfig.h>
 
 #endif
