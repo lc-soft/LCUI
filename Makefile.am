@@ -44,5 +44,10 @@ test/test_widget_inline_block_layout.css \
 test/test_widget_inline_block_layout.xml \
 test/test_widget_rect.c
 
+.PHONY: test
+
+test:
+	cd test && make && ./test && valgrind --leak-check=full --error-exitcode=42 .libs/lt-test
+
 @CODE_COVERAGE_RULES@
 
