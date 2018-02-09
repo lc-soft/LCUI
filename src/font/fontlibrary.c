@@ -855,21 +855,22 @@ void LCUI_InitFontLibrary(void)
 		{ FONTDIR "msyh.ttc", "Microsoft YaHei", NULL }
 	};
 #else
-#define FONTDIR "/usr/share/fonts/"
-#define MAX_FONTFILE_NUM 4
+#define MAX_FONTFILE_NUM 3
 	struct {
 		const char *path;
 		const char *family;
 		const char *style;
 	} fonts[MAX_FONTFILE_NUM] = {
-		{ FONTDIR "truetype/ubuntu-font-family/Ubuntu-R.ttf", "Ubuntu",
-		NULL },
-		{ FONTDIR "opentype/noto/NotoSansCJK-Regular.ttc",
-		"Noto Sans CJK SC", NULL },
-		{ FONTDIR "opentype/noto/NotoSansCJK.ttc", "Noto Sans CJK SC",
-		NULL },
-		{ FONTDIR "truetype/wqy/wqy-microhei.ttc",
-		"WenQuanYi Micro Hei", NULL }
+		{
+			Fontconfig_GetPath( "Ubuntu" ),
+			"Ubuntu", NULL
+		}, {
+			Fontconfig_GetPath( "Noto Sans CJK SC" ),
+			"Noto Sans CJK SC", NULL
+		}, {
+			Fontconfig_GetPath( "WenQuanYi Micro Hei" ),
+			"WenQuanYi Micro Hei", NULL
+		}
 	};
 #endif
 
@@ -912,6 +913,11 @@ void LCUI_InitFontLibrary(void)
 			break;
 		}
 	}
+#ifndef LCUI_BUILD_IN_WIN32
+	for( i = 0; i < MAX_FONTFILE_NUM; ++i ) {
+		free( fonts[i].path );
+	}
+#endif
 }
 
 void LCUI_FreeFontLibrary(void)

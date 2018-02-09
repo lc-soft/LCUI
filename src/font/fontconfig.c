@@ -1,8 +1,8 @@
-﻿/*
- * font.h -- The font processing module of LCUI
+/* ***************************************************************************
+ * fontconfig.c -- The Fontconfig support module.
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ * Copyright (c) 2018, Liu Chao <lc-soft@live.cn> All rights reserved.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -28,13 +28,44 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_FONT_H
-#define LCUI_FONT_H
+#ifndef LCUI_BUILD_IN_WIN32
 
-#include <LCUI/font/fontlibrary.h>
-#include <LCUI/font/textstyle.h>
-#include <LCUI/font/textlayer.h>
-#include <LCUI/font/charset.h>
-#include <LCUI/font/fontconfig.h>
+#include <LCUI/config.h>
+#include <stdlib.h>
+#include <string.h>
+#include <fontconfig/fontconfig.h>
+
+char* Fontconfig_GetPath( char* name )
+{
+#ifdef USE_FONTCONFIG
+	FcConfig* config = FcInitLoadConfigAndFonts();
+	char* path = "";
+
+	FcPattern* pat = FcNameParse( (const FcChar8*)name );
+	FcConfigSubstitute( config, pat, FcMatchPattern );
+	FcDefaultSubstitute( pat );
+
+	FcResult result;
+	FcPattern* font = FcFontMatch( config, pat, &result );
+
+	if( font ) {
+		FcChar8* file = NULL;
+		if( FcPatternGetString( font, FC_FILE, 0, &file ) == FcResultMatch ) {
+			size_t path_len = strlen( (char*)file ) + 1;
+			path = (char*)malloc( path_len );
+			memset( path, '\0', path_len );
+			strncpy( path, (char*)file, path_len );
+		}
+		FcPatternDestroy( font );
+	}
+
+	FcPatternDestroy( pat );
+	FcConfigDestroy( config );
+
+	return path;
+#else
+	return NULL;
+#endif
+}
 
 #endif

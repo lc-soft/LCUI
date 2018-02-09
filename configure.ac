@@ -107,6 +107,23 @@ else
 	want_font_engine=no
 fi
 
+# fontconfig
+want_fontconfig=yes
+AC_ARG_ENABLE(fontconfig, AC_HELP_STRING([--enable-fontconfig],
+[turn on fontconfig [[default=yes]]]), [want_fontconfig=$enableval])
+if test "$want_fontconfig" = yes; then
+	AC_CHECK_HEADERS([fontconfig/fontconfig.h], [
+		AC_CHECK_LIB([fontconfig], [FcInitLoadConfigAndFonts], [
+			want_fontconfig=yes
+			LCUI_LIBS="$LCUI_LIBS `pkg-config --libs fontconfig`"
+			CFLAGS="$CFLAGS `pkg-config --cflags-only-I fontconfig`"
+			AC_DEFINE_UNQUOTED([USE_FONTCONFIG], 1, [Define to 1 if you have Fontconfig.])
+		], [want_fontconfig=no])
+	], [want_fontconfig=no])
+else
+	want_fontconfig=no
+fi
+
 # 检测图形输出设备
 want_video_output=yes
 want_video_driver_x11=no
@@ -204,6 +221,7 @@ echo -e "Build with lcui-builder support .... : $enable_builder"
 echo -e "Build with libpng support .......... : $want_png"
 echo -e "Build with libjpeg support ......... : $want_jpeg"
 echo -e "Build with font-engine support ..... : $font_engine_name"
+echo -e "Build with fontconfig support ...... : $want_fontconfig"
 echo -e "Build with thread support .......... : $thread_name"
 echo -e "Build with video support ........... : $video_driver_name"
 echo

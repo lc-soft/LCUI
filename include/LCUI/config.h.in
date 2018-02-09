@@ -3,6 +3,9 @@
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
+/* Define to 1 if you have the <fontconfig/fontconfig.h> header file. */
+#undef HAVE_FONTCONFIG_FONTCONFIG_H
+
 /* Define to 1 if you have the <ft2build.h> header file. */
 #undef HAVE_FT2BUILD_H
 
@@ -143,6 +146,9 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
+
+/* Define to 1 if you have Fontconfig. */
+#undef USE_FONTCONFIG
 
 /* Define to 1 if you enabled LCUIBuilder function module. */
 #undef USE_LCUI_BUILDER

@@ -1,8 +1,8 @@
-﻿/*
- * font.h -- The font processing module of LCUI
+/* ***************************************************************************
+ * fontconfig.c -- The Fontconfig support module.
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ * Copyright (c) 2018, Liu Chao <lc-soft@live.cn> All rights reserved.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -28,13 +28,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_FONT_H
-#define LCUI_FONT_H
+#ifndef LCUI_FONTCONFIG_H
+#define LCUI_FONTCONFIG_H
 
-#include <LCUI/font/fontlibrary.h>
-#include <LCUI/font/textstyle.h>
-#include <LCUI/font/textlayer.h>
-#include <LCUI/font/charset.h>
-#include <LCUI/font/fontconfig.h>
+LCUI_BEGIN_HEADER
+
+char* Fontconfig_GetPath( char* name );
+
+LCUI_END_HEADER
 
 #endif
