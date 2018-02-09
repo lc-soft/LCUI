@@ -46,6 +46,20 @@ LCUI is a freely available software library for building user interfaces. It is 
 - **Image processing:** Provide image read interfaces, support for reading jpg, png and bmp format images.
 - **Touch:** Support multi-touch, but currently only support Windows system.
 
+### Defects
+
+LCUI is a personal project, its main purpose is to allow author to easily develop simple GUI applications, what is "simple"? it means fewer features, for example:
+
+- No hardware acceleration, graphics rendering inefficient.
+- Cannot select text and copy it on interface.
+- Cannot use CTRL+C to copy content, and cannot use CTRL+V to paste content to input box.
+- Cannot use the Input Method Engine to input non-ASCII characters, ike Chinese, Japanese, etc.
+- rounded corners border is not supported on this version.
+- Layout system is simple, grid and table layout is not supported.
+- No English documents, it is hard to use.
+
+If you have the above problem solving experience, you can provide technical support to author by submitting issue or pull request.
+
 ### Screenshots
 
 ![Hello, World!](https://lcui.lc-soft.io/static/images/screenshot-lcui-hello.png)
