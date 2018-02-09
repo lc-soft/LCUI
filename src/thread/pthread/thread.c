@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * thread.c -- the pthread edition thread opreation set.
  *
- * Copyright (C) 2013-2017 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2013-2018 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * thread.c -- pthread版的线程操作集
  *
- * 版权所有 (C) 2013-2017 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2013-2018 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -62,7 +62,11 @@ static void *LCUIThread_Run( void *arg )
 {
 	LCUI_ThreadContext ctx = arg;
 	ctx->func( ctx->arg );
-	return NULL;
+	LCUIMutex_Lock( &self.mutex );
+	LinkedList_Unlink( &self.threads, &ctx->node );
+	LCUIMutex_Unlock( &self.mutex );
+	free( ctx );
+	pthread_exit( NULL );
 }
 
 static LCUI_ThreadContext LCUIThread_Find( LCUI_Thread tid )
@@ -129,10 +133,9 @@ void LCUIThread_Exit( void *retval )
 	LCUI_ThreadContext ctx;
 	tid = LCUIThread_SelfID();
 	ctx = LCUIThread_Get( tid );
-	if( !ctx ) {
-		return;
+	if( ctx ) {
+		free( ctx );
 	}
-	free( ctx );
 	pthread_exit( retval );
 }
 
