@@ -111,7 +111,7 @@ If you want to build full-featured LCUI, we suggest you install the following
 
 If you system is Ubuntu, you can run following command to install dependencies:
 
-    apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev
+    apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev libtool-dev
 
 ### Building On Windows
 
