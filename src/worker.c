@@ -99,6 +99,7 @@ LCUI_BOOL LCUIWorker_RunTask( LCUI_Worker worker )
 static void LCUIWorker_Thread( void *arg )
 {
 	LCUI_Worker worker = arg;
+	LCUIMutex_Lock( &worker->mutex );
 	while( worker->active ) {
 		if( LCUIWorker_RunTask( worker ) ) {
 			continue;
@@ -107,6 +108,7 @@ static void LCUIWorker_Thread( void *arg )
 			LCUICond_Wait( &worker->cond, &worker->mutex );
 		}
 	}
+	LCUIMutex_Unlock( &worker->mutex );
 	LCUIThread_Exit( NULL );
 }
 

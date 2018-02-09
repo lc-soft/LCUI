@@ -23,8 +23,9 @@ int main( void )
 	Logger_SetHandler( LoggerHandler );
 	Logger_SetHandlerW( LoggerHandlerW );
 #endif
-	ret += test_font_load();
 	ret += test_string();
+	ret += test_thread();
+	ret += test_font_load();
 	ret += test_image_reader();
 	ret += test_css_parser();
 	ret += test_xml_parser();
