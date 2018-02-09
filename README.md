@@ -110,10 +110,11 @@ If you want to build full-featured LCUI, we suggest you install the following
  * [libxml2](http://xmlsoft.org/) — The XML C parser and toolkit
  * [libx11](https://www.x.org/) — X11 client-side library
  * [freetype](https://www.freetype.org/) — Font engine
+ * [fontconfig](https://www.freedesktop.org/wiki/Software/fontconfig/) — Font configuration & location
 
 If your system is Ubuntu, you can run following command to install dependencies:
 
-    apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev
+    apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev libfontconfig1-dev
 
 ### Building On Windows
 
