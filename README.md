@@ -9,7 +9,7 @@
   <p align="center">
     <a href="https://travis-ci.org/lc-soft/LCUI"><img src="https://travis-ci.org/lc-soft/LCUI.png?branch=master" alt="Build Status"></a>
     <a href="https://coveralls.io/github/lc-soft/LCUI?branch=develop"><img src="https://coveralls.io/repos/github/lc-soft/LCUI/badge.svg?branch=develop" alt="Coverage Status"></a>
-    <a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html"><img src="https://img.shields.io/badge/license-GPLv2-blue.svg" alt="License"></a>
+    <a href="http://opensource.org/licenses/MIT"><img src="https://img.shields.io/github/license/lc-soft/LCUI.svg" alt="License"></a>
     <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/release/lc-soft/LCUI/all.svg" alt="Github Release"></a>
     <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/downloads/lc-soft/LCUI/total.svg" alt="Github All Releases"></a>
     <img src="https://img.shields.io/github/repo-size/lc-soft/LCUI.svg" alt="Repo size">
@@ -123,7 +123,7 @@ Please read through our [contributing guidelines](/.github/CONTRIBUTING.md). Inc
 
 ## License
 
-The LCUI Project is released under the GNU General Public License as published by the Free Software Foundation, either version 2 of the License, or (at your option) any later version.
+The LCUI Project is released under [the MIT License]((http://opensource.org/licenses/MIT)).
 
 ## Backers
 

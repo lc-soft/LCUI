@@ -9,7 +9,7 @@
   <p align="center">
     <a href="https://travis-ci.org/lc-soft/LCUI"><img src="https://travis-ci.org/lc-soft/LCUI.png?branch=master" alt="Build Status"></a>
     <a href="https://coveralls.io/github/lc-soft/LCUI?branch=develop"><img src="https://coveralls.io/repos/github/lc-soft/LCUI/badge.svg?branch=develop" alt="Coverage Status"></a>
-    <a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html"><img src="https://img.shields.io/badge/license-GPLv2-blue.svg" alt="License"></a>
+    <a href="http://opensource.org/licenses/MIT"><img src="https://img.shields.io/github/license/lc-soft/LCUI.svg" alt="License"></a>
     <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/release/lc-soft/LCUI/all.svg" alt="Github Release"></a>
     <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/downloads/lc-soft/LCUI/total.svg" alt="Github All Releases"></a>
     <img src="https://img.shields.io/github/repo-size/lc-soft/LCUI.svg" alt="Repo size">
@@ -68,16 +68,13 @@ LCUI 是一个个人项目，其主要用途是方便作者能够开发简单的
 
 ## 许可
 
-LCUI 采用的开源许可证是 [GNU通用公共许可证第二版](http://www.gnu.org/licenses/gpl-2.0.html)，简称 GPLv2。简而言之，你有权利使用、修改、传播 LCUI 的副本，当你传播给其他人时，你也必须让他们对你传播的 LCUI 副本拥有同样的权利。另外需要注意的是，如果你的应用程序用到了 LCUI 的代码，并且想传播给其他人，那么除系统库和通用工具外，该应用程序及其它依赖项的源代码都必须向他们公开。
-
-或许该许可协议在国内没有多大作用，如果你不想遵循该许可协议，那么使用 LCUI 也就意味着你需要独自解决它带来的各种问题，例如：功能缺陷、偶尔崩溃、性能和内存占用等问题，作者不承担任何责任，也不要试图联系作者协助解决问题，因为作者没有义务浪费时间为违反协议的人提供技术支持。
+LCUI 采用的开源许可证是 [MIT](http://opensource.org/licenses/MIT)。
 
 ## 文档
 
 - 在线教程：[https://lcui.lc-soft.io/guide/](https://lcui.lc-soft.io/guide/)
 - 更新日志：[docs/CHANGES.zh-cn.md](docs/CHANGES.zh-cn.md)
 - 常见问题：[docs/FAQ.zh-cn.md](docs/FAQ.zh-cn.md)
-- 许可协议：[LICENSE.TXT](LICENSE.TXT)
 
 目前还没有 API 参考文档，你可以参考头文件、源代码、示例程序以及作者开发过的相关程序来了解基本用法。
 
