@@ -38,7 +38,7 @@ LCUI is a freely available software library for building user interfaces. It is 
 - **written in C:** Suitable for applications that are smaller and are primarily written in C.
 - **Cross platform:** Support for Windows and Linux, you can write Windows Desktop apps and Universal Windows Platform apps, as well as Linux Desktop apps.
 - **XML parsing:** Support for using XML markup language to describe the structure of the graphical user interface.
-- **CSS parsing:** Support for using CSS language to describing the presentation of the graphical user interface.
+- **CSS parsing:** Support for using CSS language to describing the presentation of the graphical user interface, But the range of CSS support and browser is different, it is a simplified version, cannot support all the features of CSS, like `transition`, `transform`, `animation`, `@media`, `@key-frames` etc, you can read the file [css_parser.c](https://github.com/lc-soft/LCUI/blob/53e268251a53bf371ca7aaa7862ec69fb4d0015a/src/gui/css_parser.c#L550) for more details.
 - **HTML-Like layout:** Support the **block**, **inline-block** and simple **flex** layout, If you have web page development experience, then the use of LCUI will be easier to get started.
 - **Flexible:** Support for adapting the interface to screens of different pixel densities by setting global scaling, And also support for using screen density related sp and dp units to describe position and size of the elements.
 - **Text rendering:** Support for the text to set the global font, line height, horizontal alignment, and also support to set the color, background color, bold, italic for some text blocks separately.
