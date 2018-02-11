@@ -195,7 +195,8 @@ static int OnParseImage( LCUI_CSSParserStyleContext ctx, const char *str )
 	return -1;
 }
 
-static int OnParseStyleOption( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseStyleOption( LCUI_CSSParserStyleContext ctx,
+			       const char *str )
 {
 	LCUI_Style s = &ctx->sheet->sheet[ctx->parser->key];
 	int v = LCUI_GetStyleValue( str );
@@ -208,7 +209,8 @@ static int OnParseStyleOption( LCUI_CSSParserStyleContext ctx, const char *str )
 	return 0;
 }
 
-static int OnParseBorder( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseBorder( LCUI_CSSParserStyleContext ctx,
+			  const char *str )
 {
 	LCUI_StyleSheet ss = ctx->sheet;
 	LCUI_StyleRec slist[3] = { { 0 }, { 0 }, { 0 } };
@@ -246,7 +248,8 @@ static int OnParseBorder( LCUI_CSSParserStyleContext ctx, const char *str )
 	return 0;
 }
 
-static int OnParseBorderRadius( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseBorderRadius( LCUI_CSSParserStyleContext ctx,
+				const char *str )
 {
 	LCUI_StyleRec s;
 	LCUI_StyleSheet ss = ctx->sheet;
@@ -260,12 +263,13 @@ static int OnParseBorderRadius( LCUI_CSSParserStyleContext ctx, const char *str 
 	return 0;
 }
 
-static int OnParseBorderLeft( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseBorderLeft( LCUI_CSSParserStyleContext ctx,
+			      const char *str )
 {
 	LCUI_StyleRec slist[3];
 	LCUI_StyleSheet ss = ctx->sheet;
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
-	if( SplitValues(str, slist, 3, mode) < 3 ) {
+	if( SplitValues(str, slist, 3, mode) < 1 ) {
 		return -1;
 	}
 	for( i = 0; i < 3; ++i ) {
@@ -274,6 +278,7 @@ static int OnParseBorderLeft( LCUI_CSSParserStyleContext ctx, const char *str )
 			ss->sheet[key_border_left_color] = slist[i];
 			break;
 		case SVT_PX:
+		case SVT_VALUE:
 			ss->sheet[key_border_left_width] = slist[i];
 			break;
 		case SVT_style:
@@ -285,12 +290,13 @@ static int OnParseBorderLeft( LCUI_CSSParserStyleContext ctx, const char *str )
 	return 0;
 }
 
-static int OnParseBorderTop( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseBorderTop( LCUI_CSSParserStyleContext ctx,
+			     const char *str )
 {
 	LCUI_StyleRec slist[3];
 	LCUI_StyleSheet ss = ctx->sheet;
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
-	if( SplitValues(str, slist, 3, mode) < 3 ) {
+	if( SplitValues(str, slist, 3, mode) < 1 ) {
 		return -1;
 	}
 	for( i = 0; i < 3; ++i ) {
@@ -299,6 +305,7 @@ static int OnParseBorderTop( LCUI_CSSParserStyleContext ctx, const char *str )
 			ss->sheet[key_border_top_color] = slist[i];
 			break;
 		case SVT_PX:
+		case SVT_VALUE:
 			ss->sheet[key_border_top_width] = slist[i];
 			break;
 		case SVT_style:
@@ -310,12 +317,13 @@ static int OnParseBorderTop( LCUI_CSSParserStyleContext ctx, const char *str )
 	return 0;
 }
 
-static int OnParseBorderRight( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseBorderRight( LCUI_CSSParserStyleContext ctx,
+			       const char *str )
 {
 	LCUI_StyleRec slist[3];
 	LCUI_StyleSheet ss = ctx->sheet;
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
-	if( SplitValues(str, slist, 3, mode) < 3 ) {
+	if( SplitValues(str, slist, 3, mode) < 1 ) {
 		return -1;
 	}
 	for( i = 0; i < 3; ++i ) {
@@ -324,6 +332,7 @@ static int OnParseBorderRight( LCUI_CSSParserStyleContext ctx, const char *str )
 			ss->sheet[key_border_right_color] = slist[i];
 			break;
 		case SVT_PX:
+		case SVT_VALUE:
 			ss->sheet[key_border_right_width] = slist[i];
 			break;
 		case SVT_style:
@@ -335,12 +344,13 @@ static int OnParseBorderRight( LCUI_CSSParserStyleContext ctx, const char *str )
 	return 0;
 }
 
-static int OnParseBorderBottom( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseBorderBottom( LCUI_CSSParserStyleContext ctx,
+				const char *str )
 {
 	LCUI_StyleRec slist[3];
 	LCUI_StyleSheet ss = ctx->sheet;
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
-	if( SplitValues(str, slist, 3, mode) < 3 ) {
+	if( SplitValues(str, slist, 3, mode) < 1 ) {
 		return -1;
 	}
 	for( i = 0; i < 3; ++i ) {
@@ -349,6 +359,7 @@ static int OnParseBorderBottom( LCUI_CSSParserStyleContext ctx, const char *str 
 			ss->sheet[key_border_bottom_color] = slist[i];
 			break;
 		case SVT_PX:
+		case SVT_VALUE:
 			ss->sheet[key_border_bottom_width] = slist[i];
 			break;
 		case SVT_style:
