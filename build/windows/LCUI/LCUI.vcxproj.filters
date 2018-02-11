@@ -284,12 +284,6 @@
     <ClCompile Include="..\..\..\src\draw\border.c">
       <Filter>源文件\draw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\draw\rotate.c">
-      <Filter>源文件\draw</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\draw\smooth.c">
-      <Filter>源文件\draw</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\thread\win32\mutex.c">
       <Filter>源文件\thread\win32</Filter>
     </ClCompile>
