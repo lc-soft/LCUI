@@ -40,7 +40,7 @@ enum ScrollBarDirection {
 
 LCUI_API void ScrollBar_BindBox( LCUI_Widget w, LCUI_Widget box );
 
-LCUI_API void ScrollBar_BindLayer( LCUI_Widget w, LCUI_Widget layer );
+LCUI_API void ScrollBar_BindTarget( LCUI_Widget w, LCUI_Widget layer );
 
 /** 获取滚动条的位置 */
 LCUI_API int ScrollBar_GetPosition( LCUI_Widget w );
