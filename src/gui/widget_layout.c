@@ -70,7 +70,7 @@ void Widget_UpdateLayout( LCUI_Widget w )
 	if( w->computed_style.display == SV_FLEX ) {
 		Widget_ComputeFlexLayoutStyle( w );
 	}
-	Widget_AddTask( w, WTT_LAYOUT );
+	Widget_AddTask( w, LCUI_WTASK_LAYOUT );
 }
 
 /** 布局当前行的所有元素 */
@@ -206,7 +206,7 @@ void Widget_ExecUpdateLayout( LCUI_Widget w )
 	LCUILayout_End( ctx );
 	if( w->style->sheet[key_width].type == SVT_AUTO ||
 	    w->style->sheet[key_height].type == SVT_AUTO ) {
-		Widget_AddTask( w, WTT_RESIZE );
+		Widget_AddTask( w, LCUI_WTASK_RESIZE );
 	}
 	ev.cancel_bubble = TRUE;
 	ev.type = LCUI_WEVENT_AFTERLAYOUT;

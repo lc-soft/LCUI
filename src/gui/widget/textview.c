@@ -192,7 +192,7 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 		TextView_SetTextW( w, fs->content );
 	}
 	txt->tasks[TASK_UPDATE].is_valid = TRUE;
-	Widget_AddTask( w, WTT_USER );
+	Widget_AddTask( w, LCUI_WTASK_USER );
 	TextStyle_Destroy( &ts );
 }
 
@@ -322,7 +322,7 @@ static void TextView_OnRefresh( LCUI_Widget w )
 {
 	LCUI_TextView txt = GetData( w );
 	txt->tasks[TASK_UPDATE_SIZE].is_valid = TRUE;
-	Widget_AddTask( w, WTT_USER );
+	Widget_AddTask( w, LCUI_WTASK_USER );
 }
 
 /** 私有的任务处理接口 */
@@ -398,7 +398,7 @@ static void TextView_OnTask( LCUI_Widget w )
 	TextLayer_ClearInvalidRect( txt->layer );
 	if( w->style->sheet[key_width].type == SVT_AUTO
 	 || w->style->sheet[key_height].type == SVT_AUTO ) {
-		Widget_AddTask( w, WTT_RESIZE );
+		Widget_AddTask( w, LCUI_WTASK_RESIZE );
 	}
 }
 
@@ -464,7 +464,7 @@ int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
 	}
 	txt->tasks[TASK_SET_TEXT].is_valid = TRUE;
 	txt->tasks[TASK_SET_TEXT].text = newtext;
-	Widget_AddTask( w, WTT_USER );
+	Widget_AddTask( w, LCUI_WTASK_USER );
 	LCUIMutex_Unlock( &txt->mutex );
 	return 0;
 }
@@ -507,7 +507,7 @@ void TextView_SetMulitiline( LCUI_Widget w, LCUI_BOOL enable )
 	LCUI_TextView txt = GetData( w );
 	txt->tasks[TASK_SET_MULITILINE].enable = enable;
 	txt->tasks[TASK_SET_MULITILINE].is_valid = TRUE;
-	Widget_AddTask( w, WTT_USER );
+	Widget_AddTask( w, LCUI_WTASK_USER );
 }
 
 void LCUIWidget_AddTextView( void )

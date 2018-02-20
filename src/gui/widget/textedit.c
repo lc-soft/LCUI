@@ -187,7 +187,7 @@ static void TextEdit_UpdateCaret( LCUI_Widget widget )
 		int iy = iround( (y - caret_y) * scale );
 		TextLayer_SetOffset( edit->layer, ix, iy );
 		edit->tasks[TASK_UPDATE] = TRUE;
-		Widget_AddTask( widget, WTT_USER );
+		Widget_AddTask( widget, LCUI_WTASK_USER );
 	}
 	x += widget->padding.left;
 	y += widget->padding.top;
@@ -218,7 +218,7 @@ static void TextEdit_SetTaskForLineHeight( LCUI_Widget w, int height )
 	TextLayer_SetLineHeight( edit->layer_source, height );
 	TextLayer_SetLineHeight( edit->layer_mask, height );
 	edit->tasks[TASK_UPDATE] = TRUE;
-	Widget_AddTask( w, WTT_USER );
+	Widget_AddTask( w, LCUI_WTASK_USER );
 }
 
 static void TextEdit_SetTaskForMultiline( LCUI_Widget widget, LCUI_BOOL is_true )
@@ -316,7 +316,7 @@ static int TextEdit_AddTextToBuffer( LCUI_Widget widget, const wchar_t *wtext,
 		LinkedList_Append( &edit->text_blocks, txtblk );
 	}
 	edit->tasks[TASK_SET_TEXT] = TRUE;
-	Widget_AddTask( widget, WTT_USER );
+	Widget_AddTask( widget, LCUI_WTASK_USER );
 	return 0;
 }
 
@@ -502,7 +502,7 @@ void TextEdit_ClearText( LCUI_Widget widget )
 	TextLayer_ClearText( edit->layer_source );
 	StyleTags_Clear( &edit->text_tags );
 	edit->tasks[TASK_UPDATE] = TRUE;
-	Widget_AddTask( widget, WTT_USER );
+	Widget_AddTask( widget, LCUI_WTASK_USER );
 	LCUIMutex_Unlock( &edit->mutex );
 	Widget_InvalidateArea( widget, NULL, SV_PADDING_BOX );
 }
@@ -544,7 +544,7 @@ void TextEdit_SetPasswordChar( LCUI_Widget w, wchar_t ch )
 	LCUI_TextEdit edit = GetData( w );
 	edit->password_char = ch;
 	edit->tasks[TASK_UPDATE_MASK] = TRUE;
-	Widget_AddTask( w, WTT_USER );
+	Widget_AddTask( w, LCUI_WTASK_USER );
 }
 
 /** 为文本框追加文本（宽字符版） */
@@ -604,7 +604,7 @@ static void TextEdit_OnFocus( LCUI_Widget widget, LCUI_WidgetEvent e, void *arg 
 	TextCaret_SetVisible( edit->caret, TRUE );
 	TextCaret_BlinkHide( edit->caret );
 	edit->tasks[TASK_UPDATE_CARET] = TRUE;
-	Widget_AddTask( widget, WTT_USER );
+	Widget_AddTask( widget, LCUI_WTASK_USER );
 }
 
 static void TextEdit_OnBlur( LCUI_Widget widget, LCUI_WidgetEvent e, void *arg )
@@ -625,7 +625,7 @@ static void TextEdit_TextBackspace( LCUI_Widget widget, int n_ch )
 	}
 	TextCaret_BlinkShow( edit->caret );
 	edit->tasks[TASK_UPDATE] = TRUE;
-	Widget_AddTask( widget, WTT_USER );
+	Widget_AddTask( widget, LCUI_WTASK_USER );
 	LCUIMutex_Unlock( &edit->mutex );
 	ev.type = self.event_id;
 	ev.cancel_bubble = TRUE;
@@ -644,7 +644,7 @@ static void TextEdit_TextDelete(LCUI_Widget widget, int n_ch )
 	}
 	TextCaret_BlinkShow( edit->caret );
 	edit->tasks[TASK_UPDATE] = TRUE;
-	Widget_AddTask( widget, WTT_USER );
+	Widget_AddTask( widget, LCUI_WTASK_USER );
 	LCUIMutex_Unlock( &edit->mutex );
 	ev.type = self.event_id;
 	ev.cancel_bubble = TRUE;
@@ -926,7 +926,7 @@ static void TextEdit_SetTextStyle( LCUI_Widget w, LCUI_TextStyle ts )
 	TextLayer_SetTextStyle( edit->layer_source, ts );
 	TextLayer_SetTextStyle( edit->layer_mask, ts );
 	edit->tasks[TASK_UPDATE] = TRUE;
-	Widget_AddTask( w, WTT_USER );
+	Widget_AddTask( w, LCUI_WTASK_USER );
 }
 
 static void TextEdit_OnUpdate( LCUI_Widget w )

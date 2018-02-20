@@ -140,7 +140,7 @@ static void ExecLoadImage( void *arg1, void *arg2 )
 	}
 	Graph_Quote( &widget->computed_style.background.image,
 		     &cache->image, NULL );
-	Widget_AddTask( widget, WTT_BODY );
+	Widget_AddTask( widget, LCUI_WTASK_BODY );
 }
 
 static int OnCompareWidget( void *data, const void *keydata )
@@ -179,7 +179,7 @@ static void AsyncLoadImage( LCUI_Widget widget, const char *path )
 		AddImageRef( widget, cache );
 		Graph_Quote( &widget->computed_style.background.image,
 			     &cache->image, NULL );
-		Widget_AddTask( widget, WTT_BODY );
+		Widget_AddTask( widget, LCUI_WTASK_BODY );
 		return;
 	}
 	task.func = ExecLoadImage;
@@ -310,7 +310,7 @@ void Widget_UpdateBackground( LCUI_Widget widget )
 		default: break;
 		}
 	}
-	Widget_AddTask( widget, WTT_BODY );
+	Widget_AddTask( widget, LCUI_WTASK_BODY );
 }
 
 /** 计算部件背景样式的实际值 */

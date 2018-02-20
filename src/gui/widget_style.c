@@ -38,10 +38,13 @@
 #include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/css_fontstyle.h>
 
-typedef struct {
-	int start, end, task;
+#define ARRAY_LEN(ARR) sizeof( ARR ) / sizeof( ARR[0] )
+
+typedef struct LCUI_TaskCacheStatus {
+	size_t start, end;
+	LCUI_WidgetTaskType task;
 	LCUI_BOOL is_valid;
-} TaskMap;
+} LCUI_TaskStatus;
 
 /** 部件的缺省样式 */
 const char *global_css = CodeToString(
@@ -169,7 +172,7 @@ int Widget_HandleChildrenStyleChange( LCUI_Widget w, int type, const char *name 
 	LinkedList_Clear( &snames, free );
 	/* 若子部件的样式受到了影响，则标记子部件需要刷新 */
 	if( count > 0 ) {
-		Widget_AddTaskForChildren( w, WTT_REFRESH_STYLE );
+		Widget_AddTaskForChildren( w, LCUI_WTASK_REFRESH_STYLE );
 	}
 	freestrs( names );
 	return count;
@@ -194,9 +197,9 @@ void Widget_UpdateStyle( LCUI_Widget w, LCUI_BOOL is_refresh_all )
 {
 	if( is_refresh_all ) {
 		StyleSheet_Clear( w->style );
-		Widget_AddTask( w, WTT_REFRESH_STYLE );
+		Widget_AddTask( w, LCUI_WTASK_REFRESH_STYLE );
 	} else {
-		Widget_AddTask( w, WTT_UPDATE_STYLE );
+		Widget_AddTask( w, LCUI_WTASK_UPDATE_STYLE );
 	}
 }
 
@@ -212,33 +215,54 @@ void Widget_UpdateChildrenStyle( LCUI_Widget w, LCUI_BOOL is_refresh_all )
 
 void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 {
-	int i, key;
+	size_t i, key;
 	LCUI_Style s;
 	LCUI_StyleSheet ss;
-	TaskMap task_map[] = {
-		{ key_visible, key_visible, WTT_VISIBLE, TRUE },
-		{ key_display, key_display, WTT_DISPLAY, TRUE },
-		{ key_flex_style_start, key_flex_style_end, WTT_LAYOUT, TRUE },
-		{ key_opacity, key_opacity, WTT_OPACITY, TRUE },
-		{ key_z_index, key_z_index, WTT_ZINDEX, TRUE },
-		{ key_width, key_height, WTT_RESIZE, TRUE },
+	LCUI_TaskStatus task_status[] = {
 		{
+			key_visible, key_visible, LCUI_WTASK_VISIBLE, TRUE
+		}, {
+			key_display, key_display, LCUI_WTASK_DISPLAY, TRUE
+		}, {
+			key_flex_style_start, key_flex_style_end,
+			LCUI_WTASK_LAYOUT, TRUE
+		}, {
+			key_opacity, key_opacity, LCUI_WTASK_OPACITY, TRUE
+		}, {
+			key_z_index, key_z_index, LCUI_WTASK_ZINDEX, TRUE
+		}, {
+			key_width, key_height, LCUI_WTASK_RESIZE, TRUE
+		}, {
 			key_min_width, key_max_height,
-			WTT_RESIZE_WITH_SURFACE, TRUE
+			LCUI_WTASK_RESIZE_WITH_SURFACE, TRUE
 		}, {
 			key_padding_start, key_padding_end,
-			WTT_RESIZE_WITH_SURFACE, TRUE
+			LCUI_WTASK_RESIZE_WITH_SURFACE, TRUE
 		}, {
 			key_box_sizing, key_box_sizing,
-			WTT_RESIZE_WITH_SURFACE, TRUE
-		},
-		{ key_margin_start, key_margin_end, WTT_MARGIN, TRUE },
-		{ key_position_start, key_position_end, WTT_POSITION, TRUE },
-		{ key_vertical_align, key_vertical_align, WTT_POSITION, TRUE },
-		{ key_border_start, key_border_end, WTT_BORDER, TRUE },
-		{ key_background_start, key_background_end, WTT_BACKGROUND, TRUE },
-		{ key_box_shadow_start, key_box_shadow_end, WTT_SHADOW, TRUE },
-		{ key_pointer_events, key_focusable, WTT_PROPS, TRUE }
+			LCUI_WTASK_RESIZE_WITH_SURFACE, TRUE
+		}, {
+			key_margin_start, key_margin_end,
+			LCUI_WTASK_MARGIN, TRUE
+		}, {
+			key_position_start, key_position_end,
+			LCUI_WTASK_POSITION, TRUE
+		}, {
+			key_vertical_align, key_vertical_align,
+			LCUI_WTASK_POSITION, TRUE
+		}, {
+			key_border_start, key_border_end,
+			LCUI_WTASK_BORDER, TRUE
+		}, {
+			key_background_start, key_background_end,
+			LCUI_WTASK_BACKGROUND, TRUE
+		}, {
+			key_box_shadow_start, key_box_shadow_end,
+			LCUI_WTASK_SHADOW, TRUE
+		}, {
+			key_pointer_events, key_focusable,
+			LCUI_WTASK_PROPS, TRUE
+		}
 	};
 
 	if( is_update_all ) {
@@ -260,14 +284,14 @@ void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 		    ss->sheet[key].value == s->value ) {
 			continue;
 		}
-		for( i = 0; i < sizeof( task_map ) / sizeof( TaskMap ); ++i ) {
-			if( key >= task_map[i].start &&
-			    key <= task_map[i].end ) {
-				if( !task_map[i].is_valid ) {
+		for( i = 0; i < ARRAY_LEN( task_status ); ++i ) {
+			if( key >= task_status[i].start &&
+			    key <= task_status[i].end ) {
+				if( !task_status[i].is_valid ) {
 					break;
 				}
-				task_map[i].is_valid = FALSE;
-				Widget_AddTask( w, task_map[i].task );
+				task_status[i].is_valid = FALSE;
+				Widget_AddTask( w, task_status[i].task );
 			}
 		}
 	}

@@ -97,7 +97,7 @@ void Widget_Resize( LCUI_Widget w, float width, float height )
 void Widget_ResizeWithSurface( LCUI_Widget w, float width, float height )
 {
 	Widget_Resize( w, width, height );
-	Widget_AddTask( w, WTT_RESIZE_WITH_SURFACE );
+	Widget_AddTask( w, LCUI_WTASK_RESIZE_WITH_SURFACE );
 }
 
 void Widget_Show( LCUI_Widget w )

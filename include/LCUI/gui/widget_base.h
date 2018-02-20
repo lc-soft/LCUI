@@ -59,30 +59,30 @@ typedef struct LCUI_WidgetStyle {
 } LCUI_WidgetStyle;
 
 /** 部件任务类型，按照任务的依赖顺序排列 */
-enum WidgetTaskType {
-	WTT_REFRESH_STYLE,	/**< 刷新部件全部样式 */
-	WTT_UPDATE_STYLE,	/**< 更新部件自定义样式 */
-	WTT_TITLE,
-	WTT_PROPS,		/**< 更新一些属性 */
-	WTT_BOX_SIZING,
-	WTT_PADDING,
-	WTT_MARGIN,
-	WTT_VISIBLE,
-	WTT_DISPLAY,
-	WTT_SHADOW,
-	WTT_BORDER,
-	WTT_BACKGROUND,
-	WTT_LAYOUT,
-	WTT_RESIZE,
-	WTT_RESIZE_WITH_SURFACE,
-	WTT_POSITION,
-	WTT_ZINDEX,
-	WTT_OPACITY,
-	WTT_BODY,
-	WTT_REFRESH,
-	WTT_USER,
-	WTT_TOTAL_NUM
-};
+typedef enum LCUI_WidgetTaskType {
+	LCUI_WTASK_REFRESH_STYLE,	/**< 刷新部件全部样式 */
+	LCUI_WTASK_UPDATE_STYLE,	/**< 更新部件自定义样式 */
+	LCUI_WTASK_TITLE,
+	LCUI_WTASK_PROPS,		/**< 更新一些属性 */
+	LCUI_WTASK_BOX_SIZING,
+	LCUI_WTASK_PADDING,
+	LCUI_WTASK_MARGIN,
+	LCUI_WTASK_VISIBLE,
+	LCUI_WTASK_DISPLAY,
+	LCUI_WTASK_SHADOW,
+	LCUI_WTASK_BORDER,
+	LCUI_WTASK_BACKGROUND,
+	LCUI_WTASK_LAYOUT,
+	LCUI_WTASK_RESIZE,
+	LCUI_WTASK_RESIZE_WITH_SURFACE,
+	LCUI_WTASK_POSITION,
+	LCUI_WTASK_ZINDEX,
+	LCUI_WTASK_OPACITY,
+	LCUI_WTASK_BODY,
+	LCUI_WTASK_REFRESH,
+	LCUI_WTASK_USER,
+	LCUI_WTASK_TOTAL_NUM
+} LCUI_WidgetTaskType;
 
 typedef struct LCUI_WidgetBoxRect {
 	LCUI_RectF content;	/**< 内容框的区域 */
@@ -95,7 +95,7 @@ typedef struct LCUI_WidgetBoxRect {
 typedef struct LCUI_WidgetTaskBoxRec_ {
 	LCUI_BOOL for_self;			/**< 标志，指示当前部件是否有待处理的任务 */
 	LCUI_BOOL for_children;			/**< 标志，指示是否有待处理的子级部件 */
-	LCUI_BOOL buffer[WTT_TOTAL_NUM];	/**< 记录缓存 */
+	LCUI_BOOL buffer[LCUI_WTASK_TOTAL_NUM];	/**< 记录缓存 */
 } LCUI_WidgetTaskBoxRec;
 
 /** 部件状态 */

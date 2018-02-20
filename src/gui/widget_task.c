@@ -38,14 +38,14 @@
 /** 部件任务模块数据 */
 static struct WidgetTaskModule {
 	LinkedList trash;				/**< 待删除的部件列表 */
-	LCUI_WidgetFunction handlers[WTT_TOTAL_NUM];	/**< 任务处理器 */
+	LCUI_WidgetFunction handlers[LCUI_WTASK_TOTAL_NUM];	/**< 任务处理器 */
 	unsigned int update_count;			/**< 刷新次数 */
 } self;
 
 static void HandleRefreshStyle( LCUI_Widget w )
 {
 	Widget_ExecUpdateStyle( w, TRUE );
-	w->task.buffer[WTT_UPDATE_STYLE] = FALSE;
+	w->task.buffer[LCUI_WTASK_UPDATE_STYLE] = FALSE;
 }
 
 static void HandleUpdateStyle( LCUI_Widget w )
@@ -74,12 +74,12 @@ static void HandleRefresh( LCUI_Widget w )
 void Widget_UpdateTaskStatus( LCUI_Widget widget )
 {
 	int i;
-	for( i = 0; i < WTT_TOTAL_NUM; ++i ) {
+	for( i = 0; i < LCUI_WTASK_TOTAL_NUM; ++i ) {
 		if( widget->task.buffer[i] ) {
 			break;
 		}
 	}
-	if( i >= WTT_TOTAL_NUM ) {
+	if( i >= LCUI_WTASK_TOTAL_NUM ) {
 		return;
 	}
 	widget->task.for_self = TRUE;
@@ -119,24 +119,24 @@ void Widget_AddTask( LCUI_Widget widget, int task )
 /** 映射任务处理器 */
 static void MapTaskHandler(void)
 {
-	self.handlers[WTT_VISIBLE] = Widget_UpdateVisibility;
-	self.handlers[WTT_POSITION] = Widget_UpdatePosition;
-	self.handlers[WTT_RESIZE] = Widget_UpdateSize;
-	self.handlers[WTT_RESIZE_WITH_SURFACE] = Widget_UpdateSizeWithSurface;
-	self.handlers[WTT_SHADOW] = Widget_UpdateBoxShadow;
-	self.handlers[WTT_BORDER] = Widget_UpdateBorder;
-	self.handlers[WTT_OPACITY] = Widget_UpdateOpacity;
-	self.handlers[WTT_MARGIN] = Widget_UpdateMargin;
-	self.handlers[WTT_BODY] = HandleBody;
-	self.handlers[WTT_TITLE] = HandleSetTitle;
-	self.handlers[WTT_REFRESH] = HandleRefresh;
-	self.handlers[WTT_UPDATE_STYLE] = HandleUpdateStyle;
-	self.handlers[WTT_REFRESH_STYLE] = HandleRefreshStyle;
-	self.handlers[WTT_BACKGROUND] = Widget_UpdateBackground;
-	self.handlers[WTT_LAYOUT] = Widget_ExecUpdateLayout;
-	self.handlers[WTT_ZINDEX] = Widget_ExecUpdateZIndex;
-	self.handlers[WTT_DISPLAY] = Widget_UpdateDisplay;
-	self.handlers[WTT_PROPS] = Widget_UpdateProps;
+	self.handlers[LCUI_WTASK_VISIBLE] = Widget_UpdateVisibility;
+	self.handlers[LCUI_WTASK_POSITION] = Widget_UpdatePosition;
+	self.handlers[LCUI_WTASK_RESIZE] = Widget_UpdateSize;
+	self.handlers[LCUI_WTASK_RESIZE_WITH_SURFACE] = Widget_UpdateSizeWithSurface;
+	self.handlers[LCUI_WTASK_SHADOW] = Widget_UpdateBoxShadow;
+	self.handlers[LCUI_WTASK_BORDER] = Widget_UpdateBorder;
+	self.handlers[LCUI_WTASK_OPACITY] = Widget_UpdateOpacity;
+	self.handlers[LCUI_WTASK_MARGIN] = Widget_UpdateMargin;
+	self.handlers[LCUI_WTASK_BODY] = HandleBody;
+	self.handlers[LCUI_WTASK_TITLE] = HandleSetTitle;
+	self.handlers[LCUI_WTASK_REFRESH] = HandleRefresh;
+	self.handlers[LCUI_WTASK_UPDATE_STYLE] = HandleUpdateStyle;
+	self.handlers[LCUI_WTASK_REFRESH_STYLE] = HandleRefreshStyle;
+	self.handlers[LCUI_WTASK_BACKGROUND] = Widget_UpdateBackground;
+	self.handlers[LCUI_WTASK_LAYOUT] = Widget_ExecUpdateLayout;
+	self.handlers[LCUI_WTASK_ZINDEX] = Widget_ExecUpdateZIndex;
+	self.handlers[LCUI_WTASK_DISPLAY] = Widget_UpdateDisplay;
+	self.handlers[LCUI_WTASK_PROPS] = Widget_UpdateProps;
 }
 
 static void LCUIWidget_ClearTrash( void )
@@ -190,10 +190,10 @@ int Widget_Update( LCUI_Widget w )
 	w->task.for_self = FALSE;
 	buffer = w->task.buffer;
 	/* 如果有用户自定义任务 */
-	if( buffer[WTT_USER] && w->proto && w->proto->runtask ) {
+	if( buffer[LCUI_WTASK_USER] && w->proto && w->proto->runtask ) {
 		w->proto->runtask( w );
 	}
-	for( i = 0; i < WTT_USER; ++i ) {
+	for( i = 0; i < LCUI_WTASK_USER; ++i ) {
 		if( buffer[i] ) {
 			buffer[i] = FALSE;
 			if( self.handlers[i] ) {
@@ -248,5 +248,5 @@ void LCUIWidget_RefreshStyle( void )
 {
 	LCUI_Widget root = LCUIWidget_GetRoot();
 	Widget_UpdateStyle( root, TRUE );
-	Widget_AddTaskForChildren( root, WTT_REFRESH_STYLE );
+	Widget_AddTaskForChildren( root, LCUI_WTASK_REFRESH_STYLE );
 }

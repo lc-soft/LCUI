@@ -138,8 +138,8 @@ void Widget_UpdateBorder( LCUI_Widget w )
 	    ob.right.width != nb->right.width ||
 	    ob.bottom.width != nb->bottom.width ||
 	    ob.left.width != nb->left.width ) {
-		Widget_AddTask( w, WTT_RESIZE );
-		Widget_AddTask( w, WTT_POSITION );
+		Widget_AddTask( w, LCUI_WTASK_RESIZE );
+		Widget_AddTask( w, LCUI_WTASK_POSITION );
 		return;
 	}
 	Widget_InvalidateArea( w, NULL, SV_BORDER_BOX );

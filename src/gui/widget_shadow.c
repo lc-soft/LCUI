@@ -107,8 +107,8 @@ void Widget_UpdateBoxShadow( LCUI_Widget w )
 		}
 		return;
 	}
-	Widget_AddTask( w, WTT_RESIZE );
-	Widget_AddTask( w, WTT_POSITION );
+	Widget_AddTask( w, LCUI_WTASK_RESIZE );
+	Widget_AddTask( w, LCUI_WTASK_POSITION );
 }
 
 float Widget_GetBoxShadowOffsetX( LCUI_Widget w )

@@ -203,7 +203,7 @@ int Widget_Prepend( LCUI_Widget parent, LCUI_Widget widget )
 		node = node->next;
 	}
 	Widget_PostSurfaceEvent( widget, LCUI_WEVENT_ADD, TRUE );
-	Widget_AddTaskForChildren( widget, WTT_REFRESH_STYLE );
+	Widget_AddTaskForChildren( widget, LCUI_WTASK_REFRESH_STYLE );
 	Widget_UpdateTaskStatus( widget );
 	Widget_UpdateStatus( widget );
 	Widget_UpdateLayout( parent );
@@ -241,7 +241,7 @@ int Widget_Unwrap( LCUI_Widget widget )
 		child->parent = widget->parent;
 		LinkedList_Link( list, target, node );
 		LinkedList_AppendNode( list_show, snode );
-		Widget_AddTaskForChildren( child, WTT_REFRESH_STYLE );
+		Widget_AddTaskForChildren( child, LCUI_WTASK_REFRESH_STYLE );
 		Widget_UpdateTaskStatus( child );
 		node = prev;
 	}
@@ -302,7 +302,7 @@ LCUI_Widget LCUIWidget_New( const char *type )
 			widget->type = strdup2( type );
 		}
 	}
-	Widget_AddTask( widget, WTT_REFRESH_STYLE );
+	Widget_AddTask( widget, LCUI_WTASK_REFRESH_STYLE );
 	return widget;
 }
 
@@ -392,7 +392,7 @@ void Widget_Empty( LCUI_Widget w )
 			node = next;
 		}
 		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
-		Widget_AddTask( w, WTT_LAYOUT );
+		Widget_AddTask( w, LCUI_WTASK_LAYOUT );
 	} else {
 		LinkedList_ClearData( &w->children_show, NULL );
 		LinkedList_ClearData( &w->children, Widget_OnDestroy );
@@ -509,7 +509,7 @@ void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title )
 	if( old_title ) {
 		free( old_title );
 	}
-	Widget_AddTask( w, WTT_TITLE );
+	Widget_AddTask( w, LCUI_WTASK_TITLE );
 }
 
 static int Widget_RemoveId( LCUI_Widget w )
@@ -704,7 +704,7 @@ void Widget_UpdateOpacity( LCUI_Widget w )
 
 void Widget_UpdateZIndex( LCUI_Widget w )
 {
-	Widget_AddTask( w, WTT_ZINDEX );
+	Widget_AddTask( w, LCUI_WTASK_ZINDEX );
 }
 
 void Widget_ExecUpdateZIndex( LCUI_Widget w )
@@ -753,7 +753,7 @@ void Widget_ExecUpdateZIndex( LCUI_Widget w )
 		LinkedList_AppendNode( list, snode );
 	}
 	if( w->computed_style.position != SV_STATIC ) {
-		Widget_AddTask( w, WTT_REFRESH );
+		Widget_AddTask( w, LCUI_WTASK_REFRESH );
 	}
 }
 
@@ -779,24 +779,24 @@ static void Widget_UpdateChildrenSize( LCUI_Widget w )
 		LCUI_Widget child = node->data;
 		LCUI_StyleSheet s = child->style;
 		if( Widget_HasFillAvailableWidth( child ) ) {
-			Widget_AddTask( child, WTT_RESIZE );
+			Widget_AddTask( child, LCUI_WTASK_RESIZE );
 		} else if( Widget_HasScaleSize( child ) ) {
-			Widget_AddTask( child, WTT_RESIZE );
+			Widget_AddTask( child, LCUI_WTASK_RESIZE );
 		}
 		if( Widget_HasAbsolutePosition( child ) ) {
 			if( s->sheet[key_right].is_valid ||
 			    s->sheet[key_bottom].is_valid ||
 			    CheckStyleType( s, key_left, scale ) ||
 			    CheckStyleType( s, key_top, scale ) ) {
-				Widget_AddTask( child, WTT_POSITION );
+				Widget_AddTask( child, LCUI_WTASK_POSITION );
 			}
 		}
 		if( Widget_HasAutoStyle( child, key_margin_left ) ||
 		    Widget_HasAutoStyle( child, key_margin_right ) ) {
-			Widget_AddTask( child, WTT_MARGIN );
+			Widget_AddTask( child, LCUI_WTASK_MARGIN );
 		}
 		if( child->computed_style.vertical_align != SV_TOP ) {
-			Widget_AddTask( child, WTT_POSITION );
+			Widget_AddTask( child, LCUI_WTASK_POSITION );
 		}
 	}
 }
@@ -1195,7 +1195,7 @@ static float Widget_ComputeAutoWidth( LCUI_Widget w, float *height )
 	    width > 0 && !Widget_HasAbsolutePosition( w ) ) {
 		/* 如果超出父部件的内容框宽度则让父部件重新布局 */
 		if( width > w->parent->box.content.width ) {
-			Widget_AddTask( w->parent, WTT_LAYOUT );
+			Widget_AddTask( w->parent, LCUI_WTASK_LAYOUT );
 		} else if( Widget_HasFillAvailableWidth( w ) ) {
 			width = w->parent->box.content.width;
 		}
@@ -1268,7 +1268,7 @@ static void Widget_SendResizeEvent( LCUI_Widget w )
 	e.type = LCUI_WEVENT_RESIZE;
 	e.cancel_bubble = TRUE;
 	Widget_TriggerEvent( w, &e, NULL );
-	Widget_AddTask( w, WTT_REFRESH );
+	Widget_AddTask( w, LCUI_WTASK_REFRESH );
 	Widget_PostSurfaceEvent( w, LCUI_WEVENT_RESIZE, FALSE );
 }
 
@@ -1325,14 +1325,14 @@ void Widget_UpdateMargin( LCUI_Widget w )
 	if( w->parent ) {
 		if( Widget_HasAutoStyle( w->parent, key_width ) ||
 		    Widget_HasAutoStyle( w->parent, key_height ) ) {
-			Widget_AddTask( w->parent, WTT_RESIZE );
+			Widget_AddTask( w->parent, LCUI_WTASK_RESIZE );
 		}
 		if( w->computed_style.display != SV_NONE &&
 		    w->computed_style.position == SV_STATIC ) {
 			Widget_UpdateLayout( w->parent );
 		}
 	}
-	Widget_AddTask( w, WTT_POSITION );
+	Widget_AddTask( w, LCUI_WTASK_POSITION );
 }
 
 void Widget_UpdateSize( LCUI_Widget w )
@@ -1408,7 +1408,7 @@ void Widget_UpdateSize( LCUI_Widget w )
 		Widget_InvalidateArea( w->parent, &rect, SV_PADDING_BOX );
 		if( Widget_HasAutoStyle( w->parent, key_width ) ||
 		    Widget_HasAutoStyle( w->parent, key_height ) ) {
-			Widget_AddTask( w->parent, WTT_RESIZE );
+			Widget_AddTask( w->parent, LCUI_WTASK_RESIZE );
 		}
 		if( w->computed_style.display != SV_NONE &&
 		    w->computed_style.position == SV_STATIC ) {
