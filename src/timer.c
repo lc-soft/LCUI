@@ -200,6 +200,20 @@ int LCUITimer_Set( long int n_ms, void (*func)(void*),
 	return timer->id;
 }
 
+int LCUITimer_SetTimeout( long int n_ms,
+			  void( *callback )(void*),
+			  void *arg )
+{
+	return LCUITimer_Set( n_ms, callback, arg, FALSE );
+}
+
+int LCUITimer_SetInterval( long int n_ms,
+			   void( *callback )(void*),
+			   void *arg )
+{
+	return LCUITimer_Set( n_ms, callback, arg, TRUE );
+}
+
 int LCUITimer_Free( int timer_id )
 {
 	Timer timer;

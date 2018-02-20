@@ -49,6 +49,16 @@ LCUI_BEGIN_HEADER
 LCUI_API int LCUITimer_Set( long int n_ms, void (*callback_func)(void*),
 			    void *arg, LCUI_BOOL reuse );
 
+/** repeatedly calls a function, with a fixed time delay between each call. */
+LCUI_API int LCUITimer_SetTimeout( long int n_ms,
+				   void( *callback )(void*),
+				   void *arg );
+
+/** set a timer which execute a function once after the timer expires. */
+LCUI_API int LCUITimer_SetInterval( long int n_ms,
+				    void( *callback )(void*),
+				    void *arg );
+
 /**
  * 释放定时器
  * 当不需要定时器时，可以使用该函数释放定时器占用的资源，并移除程序任务队列
