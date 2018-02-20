@@ -183,7 +183,7 @@ void Widget_ExecUpdateLayout( LCUI_Widget w )
 		ctx->current = node->data;
 		if( ctx->current->computed_style.position != SV_STATIC &&
 		    ctx->current->computed_style.position != SV_RELATIVE ) {
-			Widget_AddState( ctx->current, WSTATE_LAYOUTED );
+			Widget_AddState( ctx->current, LCUI_WSTATE_LAYOUTED );
 			continue;
 		}
 		switch( ctx->current->computed_style.display ) {
@@ -199,7 +199,7 @@ void Widget_ExecUpdateLayout( LCUI_Widget w )
 			continue;
 		}
 		Widget_UpdatePosition( ctx->current );
-		Widget_AddState( ctx->current, WSTATE_LAYOUTED );
+		Widget_AddState( ctx->current, LCUI_WSTATE_LAYOUTED );
 		ctx->prev_display = ctx->current->computed_style.display;
 		ctx->prev = ctx->current;
 	}

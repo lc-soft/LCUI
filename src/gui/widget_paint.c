@@ -381,7 +381,7 @@ static size_t WidgetRenderer_RenderChildren( LCUI_WidgetRenderer that )
 	for( LinkedList_EachReverse( node, &that->target->children_show ) ) {
 		child = node->data;
 		if( !child->computed_style.visible ||
-		    child->state != WSTATE_NORMAL ) {
+		    child->state != LCUI_WSTATE_NORMAL ) {
 			continue;
 		}
 		rect.width = child->box.graph.width;

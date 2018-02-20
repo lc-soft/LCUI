@@ -154,7 +154,7 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 	}
 	Widget_Unlink( widget );
 	widget->parent = parent;
-	widget->state = WSTATE_CREATED;
+	widget->state = LCUI_WSTATE_CREATED;
 	widget->index = parent->children.length;
 	node = &widget->node;
 	snode = &widget->node_show;
@@ -190,7 +190,7 @@ int Widget_Prepend( LCUI_Widget parent, LCUI_Widget widget )
 	Widget_Unlink( widget );
 	widget->index = 0;
 	widget->parent = parent;
-	widget->state = WSTATE_CREATED;
+	widget->state = LCUI_WSTATE_CREATED;
 	node = &widget->node;
 	snode = &widget->node_show;
 	LinkedList_InsertNode( &parent->children, 0, node );
@@ -260,7 +260,7 @@ int Widget_Unwrap( LCUI_Widget widget )
 static void Widget_Init( LCUI_Widget widget )
 {
 	ZEROSET( widget, LCUI_Widget );
-	widget->state = WSTATE_CREATED;
+	widget->state = LCUI_WSTATE_CREATED;
 	widget->trigger = EventTrigger();
 	widget->style = StyleSheet();
 	widget->custom_style = StyleSheet();
@@ -353,7 +353,7 @@ void Widget_Destroy( LCUI_Widget w )
 	if( root != LCUIWidget.root ) {
 		LCUI_WidgetEventRec e = { 0 };
 		e.type = LCUI_WEVENT_REMOVE;
-		w->state = WSTATE_DELETED;
+		w->state = LCUI_WSTATE_DELETED;
 		Widget_TriggerEvent( w, &e, NULL );
 		Widget_ExecDestroy( w );
 		return;
@@ -579,15 +579,15 @@ error_exit:
 void Widget_AddState( LCUI_Widget w, LCUI_WidgetState state )
 {
 	/* 如果部件还处于未准备完毕的状态 */
-	if( w->state < WSTATE_READY ) {
+	if( w->state < LCUI_WSTATE_READY ) {
 		w->state |= state;
 		/* 如果部件已经准备完毕则触发 ready 事件 */
-		if( w->state == WSTATE_READY ) {
+		if( w->state == LCUI_WSTATE_READY ) {
 			LCUI_WidgetEventRec e = { 0 };
 			e.type = LCUI_WEVENT_READY;
 			e.cancel_bubble = TRUE;
 			Widget_TriggerEvent( w, &e, NULL );
-			w->state = WSTATE_NORMAL;
+			w->state = LCUI_WSTATE_NORMAL;
 		}
 	}
 }
@@ -721,7 +721,7 @@ void Widget_ExecUpdateZIndex( LCUI_Widget w )
 	if( !w->parent ) {
 		return;
 	}
-	if( w->state == WSTATE_NORMAL ) {
+	if( w->state == LCUI_WSTATE_NORMAL ) {
 		if( w->computed_style.z_index == z_index ) {
 			return;
 		}

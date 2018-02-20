@@ -568,7 +568,7 @@ LCUI_BOOL Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent ev,
 	LCUI_Event sys_ev;
 	LCUI_TaskRec task;
 	LCUI_WidgetEventPack pack;
-	if( widget->state == WSTATE_DELETED ) {
+	if( widget->state == LCUI_WSTATE_DELETED ) {
 		return FALSE;
 	}
 	if( !ev->target ) {
@@ -649,7 +649,7 @@ static void Widget_UpdateStatus( LCUI_Widget widget, int type )
 	}
 	i = depth;
 	for( w = old_w; w != root && w; w = w->parent ) {
-		if( w->state == WSTATE_DELETED ) {
+		if( w->state == LCUI_WSTATE_DELETED ) {
 			depth = i;
 			old_w = w;
 		}

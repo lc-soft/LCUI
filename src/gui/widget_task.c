@@ -103,7 +103,7 @@ void Widget_AddTaskForChildren( LCUI_Widget widget, int task )
 
 void Widget_AddTask( LCUI_Widget widget, int task )
 {
-	if( widget->state == WSTATE_DELETED ) {
+	if( widget->state == LCUI_WSTATE_DELETED ) {
 		return;
 	}
 	widget->task.for_self = TRUE;
@@ -166,7 +166,7 @@ void Widget_AddToTrash( LCUI_Widget w )
 {
 	LCUI_WidgetEventRec e = { 0 };
 	e.type = LCUI_WEVENT_REMOVE;
-	w->state = WSTATE_DELETED;
+	w->state = LCUI_WSTATE_DELETED;
 	Widget_TriggerEvent( w, &e, NULL );
 	if( !w->parent ) {
 		return;
@@ -203,7 +203,7 @@ int Widget_Update( LCUI_Widget w )
 			buffer[i] = FALSE;
 		}
 	}
-	Widget_AddState( w, WSTATE_UPDATED );
+	Widget_AddState( w, LCUI_WSTATE_UPDATED );
 
 proc_children_task:
 
