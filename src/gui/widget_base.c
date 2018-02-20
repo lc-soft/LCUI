@@ -107,6 +107,7 @@ static void Widget_UpdateStatus( LCUI_Widget widget )
 int Widget_Unlink( LCUI_Widget widget )
 {
 	LCUI_Widget child;
+	LCUI_WidgetEventRec ev = { 0 };
 	LinkedListNode *node, *snode;
 	if( !widget->parent ) {
 		return -1;
@@ -135,9 +136,12 @@ int Widget_Unlink( LCUI_Widget widget )
 		node = node->next;
 	}
 	node = &widget->node;
+	ev.cancel_bubble = TRUE;
+	ev.type = LCUI_WEVENT_UNLINK;
+	Widget_PostEvent( widget, &ev, NULL, NULL );
 	LinkedList_Unlink( &widget->parent->children, node );
 	LinkedList_Unlink( &widget->parent->children_show, snode );
-	Widget_PostSurfaceEvent( widget, LCUI_WEVENT_REMOVE, TRUE );
+	Widget_PostSurfaceEvent( widget, LCUI_WEVENT_UNLINK, TRUE );
 	widget->parent = NULL;
 	return 0;
 }
@@ -145,6 +149,7 @@ int Widget_Unlink( LCUI_Widget widget )
 int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 {
 	LCUI_Widget child;
+	LCUI_WidgetEventRec ev = { 0 };
 	LinkedListNode *node, *snode;
 	if( !parent || !widget ) {
 		return -1;
@@ -167,9 +172,12 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 		child->index += 1;
 		node = node->next;
 	}
+	ev.cancel_bubble = TRUE;
+	ev.type = LCUI_WEVENT_LINK;
 	Widget_UpdateStyle( widget, TRUE );
 	Widget_UpdateChildrenStyle( widget, TRUE );
-	Widget_PostSurfaceEvent( widget, LCUI_WEVENT_ADD, TRUE );
+	Widget_PostEvent( widget, &ev, NULL, NULL );
+	Widget_PostSurfaceEvent( widget, LCUI_WEVENT_LINK, TRUE );
 	Widget_UpdateTaskStatus( widget );
 	Widget_UpdateStatus( widget );
 	Widget_UpdateLayout( parent );
@@ -179,6 +187,7 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 int Widget_Prepend( LCUI_Widget parent, LCUI_Widget widget )
 {
 	LCUI_Widget child;
+	LCUI_WidgetEventRec ev = { 0 };
 	LinkedListNode *node, *snode;
 	if( !parent || !widget ) {
 		return -1;
@@ -202,7 +211,10 @@ int Widget_Prepend( LCUI_Widget parent, LCUI_Widget widget )
 		child->index += 1;
 		node = node->next;
 	}
-	Widget_PostSurfaceEvent( widget, LCUI_WEVENT_ADD, TRUE );
+	ev.cancel_bubble = TRUE;
+	ev.type = LCUI_WEVENT_LINK;
+	Widget_PostEvent( widget, &ev, NULL, NULL );
+	Widget_PostSurfaceEvent( widget, LCUI_WEVENT_LINK, TRUE );
 	Widget_AddTaskForChildren( widget, LCUI_WTASK_REFRESH_STYLE );
 	Widget_UpdateTaskStatus( widget );
 	Widget_UpdateStatus( widget );
@@ -352,7 +364,7 @@ void Widget_Destroy( LCUI_Widget w )
 	}
 	if( root != LCUIWidget.root ) {
 		LCUI_WidgetEventRec e = { 0 };
-		e.type = LCUI_WEVENT_REMOVE;
+		e.type = LCUI_WEVENT_UNLINK;
 		w->state = LCUI_WSTATE_DELETED;
 		Widget_TriggerEvent( w, &e, NULL );
 		Widget_ExecDestroy( w );

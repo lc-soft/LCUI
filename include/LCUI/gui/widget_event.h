@@ -36,10 +36,10 @@ LCUI_BEGIN_HEADER
 /** 部件事件类型枚举 */
 typedef enum LCUI_WidgetEventType {
 	LCUI_WEVENT_NONE,
-	LCUI_WEVENT_ADD,
-	LCUI_WEVENT_READY,		/**< 在初次更新尺寸和位置后 */
-	LCUI_WEVENT_REMOVE,		/**< 在被标记需要移除时 */
-	LCUI_WEVENT_DESTROY,		/**< 在开始彻底销毁前 */
+	LCUI_WEVENT_LINK,		/**< link widget node to the parent widget children list */
+	LCUI_WEVENT_UNLINK,		/**< unlink widget node from the parent widget children list */
+	LCUI_WEVENT_READY,		/**< after widget initial layout was completed */
+	LCUI_WEVENT_DESTROY,		/**< before destroy */
 	LCUI_WEVENT_MOVE,		/**< 在移动位置时 */
 	LCUI_WEVENT_RESIZE,		/**< 改变尺寸 */
 	LCUI_WEVENT_SHOW,		/**< 显示 */

@@ -487,7 +487,8 @@ static LCUI_Widget Widget_GetNextAt( LCUI_Widget widget, int x, int y )
 	return NULL;
 }
 
-static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEventPack pack )
+static int Widget_TriggerEventEx( LCUI_Widget widget,
+				  LCUI_WidgetEventPack pack )
 {
 	LCUI_WidgetEvent e = &pack->event;
 	pack->widget = widget;
@@ -1065,8 +1066,9 @@ void LCUIWidget_InitEvent(void)
 		int id;
 		const char *name;
 	} mappings[] = {
+		{ LCUI_WEVENT_LINK, "link" },
+		{ LCUI_WEVENT_UNLINK, "unlink" },
 		{ LCUI_WEVENT_READY, "ready" },
-		{ LCUI_WEVENT_REMOVE, "remove" },
 		{ LCUI_WEVENT_DESTROY, "destroy" },
 		{ LCUI_WEVENT_MOUSEDOWN, "mousedown" },
 		{ LCUI_WEVENT_MOUSEUP, "mouseup" },

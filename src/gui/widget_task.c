@@ -165,7 +165,7 @@ void LCUIWidget_FreeTasks( void )
 void Widget_AddToTrash( LCUI_Widget w )
 {
 	LCUI_WidgetEventRec e = { 0 };
-	e.type = LCUI_WEVENT_REMOVE;
+	e.type = LCUI_WEVENT_UNLINK;
 	w->state = LCUI_WSTATE_DELETED;
 	Widget_TriggerEvent( w, &e, NULL );
 	if( !w->parent ) {
@@ -174,7 +174,7 @@ void Widget_AddToTrash( LCUI_Widget w )
 	LinkedList_Unlink( &w->parent->children, &w->node );
 	LinkedList_Unlink( &w->parent->children_show, &w->node_show );
 	LinkedList_AppendNode( &self.trash, &w->node );
-	Widget_PostSurfaceEvent( w, LCUI_WEVENT_REMOVE, TRUE );
+	Widget_PostSurfaceEvent( w, LCUI_WEVENT_UNLINK, TRUE );
 }
 
 int Widget_Update( LCUI_Widget w )

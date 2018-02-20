@@ -582,11 +582,11 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	root = LCUIWidget_GetRoot();
 	surface = LCUIDisplay_GetBindSurface( e->target );
 	if( display.mode == LCDM_SEAMLESS ) {
-		if( !surface && event_type != LCUI_WEVENT_ADD ) {
+		if( !surface && event_type != LCUI_WEVENT_LINK ) {
 			return;
 		}
 	} else if ( e->target == root ) {
-		if( !surface && event_type != LCUI_WEVENT_ADD ) {
+		if( !surface && event_type != LCUI_WEVENT_LINK ) {
 			return;
 		}
 	} else {
@@ -594,10 +594,10 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	}
 	rect = &e->target->box.graph;
 	switch( event_type ) {
-	case LCUI_WEVENT_ADD:
+	case LCUI_WEVENT_LINK:
 		LCUIDisplay_BindSurface( e->target );
 		break;
-	case LCUI_WEVENT_REMOVE:
+	case LCUI_WEVENT_UNLINK:
 	case LCUI_WEVENT_DESTROY:
 		LCUIDisplay_UnbindSurface( e->target );
 		break;
