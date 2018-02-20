@@ -309,6 +309,14 @@ static void Slider_OnMouseDown( LCUI_Widget slider,
 	Widget_BindEvent( slider, "mouseup", Slider_OnMouseUp, w, NULL );
 }
 
+static void ScrollBar_OnLink( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
+{
+	LCUI_ScrollBar scrollbar = Widget_GetData( w, self.prototype );
+	if( !scrollbar->box ) {
+		ScrollBar_BindBox( w, w->parent );
+	}
+}
+
 static void ScrollBar_OnInit( LCUI_Widget w )
 {
 	LCUI_Widget slider;
@@ -329,9 +337,9 @@ static void ScrollBar_OnInit( LCUI_Widget w )
 	InitInertialScrolling( &scrollbar->effect );
 	Widget_BindEvent( slider, "mousedown", 
 			  Slider_OnMouseDown, w, NULL );
+	Widget_BindEvent( w, "link", ScrollBar_OnLink, NULL, NULL );
 	Widget_AddClass( slider, "scrollbar-slider" );
 	Widget_Append( w, slider );
-	ScrollBar_BindBox( w, w->parent );
 }
 
 static void ScrollBar_UpdateSize( LCUI_Widget w )
@@ -493,8 +501,10 @@ void ScrollBar_BindBox( LCUI_Widget w, LCUI_Widget box )
 				    ScrollBar_OnUpdateSize );
 	}
 	scrollbar->box = box;
-	Widget_BindEvent( box, "resize", ScrollBar_OnUpdateSize, w, NULL );
-	Widget_BindEvent( box, "setscroll", ScrollBar_OnSetPosition, w, NULL );
+	if( box ) {
+		Widget_BindEvent( box, "resize", ScrollBar_OnUpdateSize, w, NULL );
+		Widget_BindEvent( box, "setscroll", ScrollBar_OnSetPosition, w, NULL );
+	}
 	ScrollBar_UpdateSize( w );
 }
 
