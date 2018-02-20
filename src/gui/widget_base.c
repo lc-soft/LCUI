@@ -137,7 +137,7 @@ int Widget_Unlink( LCUI_Widget widget )
 	node = &widget->node;
 	LinkedList_Unlink( &widget->parent->children, node );
 	LinkedList_Unlink( &widget->parent->children_show, snode );
-	Widget_PostSurfaceEvent( widget, WET_REMOVE, TRUE );
+	Widget_PostSurfaceEvent( widget, LCUI_WEVENT_REMOVE, TRUE );
 	widget->parent = NULL;
 	return 0;
 }
@@ -169,7 +169,7 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 	}
 	Widget_UpdateStyle( widget, TRUE );
 	Widget_UpdateChildrenStyle( widget, TRUE );
-	Widget_PostSurfaceEvent( widget, WET_ADD, TRUE );
+	Widget_PostSurfaceEvent( widget, LCUI_WEVENT_ADD, TRUE );
 	Widget_UpdateTaskStatus( widget );
 	Widget_UpdateStatus( widget );
 	Widget_UpdateLayout( parent );
@@ -202,7 +202,7 @@ int Widget_Prepend( LCUI_Widget parent, LCUI_Widget widget )
 		child->index += 1;
 		node = node->next;
 	}
-	Widget_PostSurfaceEvent( widget, WET_ADD, TRUE );
+	Widget_PostSurfaceEvent( widget, LCUI_WEVENT_ADD, TRUE );
 	Widget_AddTaskForChildren( widget, WTT_REFRESH_STYLE );
 	Widget_UpdateTaskStatus( widget );
 	Widget_UpdateStatus( widget );
@@ -313,7 +313,7 @@ static void Widget_OnDestroy( void *arg )
 
 void Widget_ExecDestroy( LCUI_Widget widget )
 {
-	LCUI_WidgetEventRec e = { WET_DESTROY, 0 };
+	LCUI_WidgetEventRec e = { LCUI_WEVENT_DESTROY, 0 };
 	Widget_TriggerEvent( widget, &e, NULL );
 	Widget_ReleaseMouseCapture( widget );
 	Widget_ReleaseTouchCapture( widget, -1 );
@@ -352,7 +352,7 @@ void Widget_Destroy( LCUI_Widget w )
 	}
 	if( root != LCUIWidget.root ) {
 		LCUI_WidgetEventRec e = { 0 };
-		e.type = WET_REMOVE;
+		e.type = LCUI_WEVENT_REMOVE;
 		w->state = WSTATE_DELETED;
 		Widget_TriggerEvent( w, &e, NULL );
 		Widget_ExecDestroy( w );
@@ -584,7 +584,7 @@ void Widget_AddState( LCUI_Widget w, LCUI_WidgetState state )
 		/* 如果部件已经准备完毕则触发 ready 事件 */
 		if( w->state == WSTATE_READY ) {
 			LCUI_WidgetEventRec e = { 0 };
-			e.type = WET_READY;
+			e.type = LCUI_WEVENT_READY;
 			e.cancel_bubble = TRUE;
 			Widget_TriggerEvent( w, &e, NULL );
 			w->state = WSTATE_NORMAL;
@@ -651,8 +651,11 @@ void Widget_UpdateVisibility( LCUI_Widget w )
 		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
 	}
 	visible = w->computed_style.visible;
-	DEBUG_MSG( "visible: %s\n", visible ? "TRUE" : "FALSE" );
-	Widget_PostSurfaceEvent( w, visible ? WET_SHOW : WET_HIDE, TRUE );
+	if( visible ) {
+		Widget_PostSurfaceEvent( w, LCUI_WEVENT_SHOW, TRUE );
+	} else {
+		Widget_PostSurfaceEvent( w, LCUI_WEVENT_HIDE, TRUE );
+	}
 }
 
 void Widget_UpdateDisplay( LCUI_Widget w )
@@ -903,7 +906,7 @@ void Widget_UpdatePosition( LCUI_Widget w )
 		Widget_InvalidateArea( w->parent, &rect, SV_PADDING_BOX );
 	}
 	/* 检测是否为顶级部件并做相应处理 */
-	Widget_PostSurfaceEvent( w, WET_MOVE, TRUE );
+	Widget_PostSurfaceEvent( w, LCUI_WEVENT_MOVE, TRUE );
 }
 
 /** 更新位图尺寸 */
@@ -1262,11 +1265,11 @@ static void Widget_SendResizeEvent( LCUI_Widget w )
 	LCUI_WidgetEventRec e;
 	e.target = w;
 	e.data = NULL;
-	e.type = WET_RESIZE;
+	e.type = LCUI_WEVENT_RESIZE;
 	e.cancel_bubble = TRUE;
 	Widget_TriggerEvent( w, &e, NULL );
 	Widget_AddTask( w, WTT_REFRESH );
-	Widget_PostSurfaceEvent( w, WET_RESIZE, FALSE );
+	Widget_PostSurfaceEvent( w, LCUI_WEVENT_RESIZE, FALSE );
 }
 
 void Widget_UpdateMargin( LCUI_Widget w )
@@ -1419,7 +1422,7 @@ void Widget_UpdateSize( LCUI_Widget w )
 void Widget_UpdateSizeWithSurface( LCUI_Widget w )
 {
 	Widget_UpdateSize( w );
-	Widget_PostSurfaceEvent( w, WET_RESIZE, TRUE );
+	Widget_PostSurfaceEvent( w, LCUI_WEVENT_RESIZE, TRUE );
 }
 
 void Widget_UpdateProps( LCUI_Widget w )

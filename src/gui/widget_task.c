@@ -55,7 +55,7 @@ static void HandleUpdateStyle( LCUI_Widget w )
 
 static void HandleSetTitle( LCUI_Widget w )
 {
-	Widget_PostSurfaceEvent( w, WET_TITLE, TRUE );
+	Widget_PostSurfaceEvent( w, LCUI_WEVENT_TITLE, TRUE );
 }
 
 /** 处理主体刷新（标记主体区域为脏矩形，但不包括阴影区域） */
@@ -165,7 +165,7 @@ void LCUIWidget_FreeTasks( void )
 void Widget_AddToTrash( LCUI_Widget w )
 {
 	LCUI_WidgetEventRec e = { 0 };
-	e.type = WET_REMOVE;
+	e.type = LCUI_WEVENT_REMOVE;
 	w->state = WSTATE_DELETED;
 	Widget_TriggerEvent( w, &e, NULL );
 	if( !w->parent ) {
@@ -174,7 +174,7 @@ void Widget_AddToTrash( LCUI_Widget w )
 	LinkedList_Unlink( &w->parent->children, &w->node );
 	LinkedList_Unlink( &w->parent->children_show, &w->node_show );
 	LinkedList_AppendNode( &self.trash, &w->node );
-	Widget_PostSurfaceEvent( w, WET_REMOVE, TRUE );
+	Widget_PostSurfaceEvent( w, LCUI_WEVENT_REMOVE, TRUE );
 }
 
 int Widget_Update( LCUI_Widget w )

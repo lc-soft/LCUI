@@ -209,6 +209,6 @@ void Widget_ExecUpdateLayout( LCUI_Widget w )
 		Widget_AddTask( w, WTT_RESIZE );
 	}
 	ev.cancel_bubble = TRUE;
-	ev.type = WET_AFTERLAYOUT;
+	ev.type = LCUI_WEVENT_AFTERLAYOUT;
 	Widget_TriggerEvent( w, &ev, NULL );
 }

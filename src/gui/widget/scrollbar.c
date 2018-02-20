@@ -405,7 +405,7 @@ static void ScrollLayer_OnTouch( LCUI_Widget target,
 		point = &e->touch.points[0];
 		/* 如果这个触点的状态不是 TOUCHDOWN，则说明是上次触控拖拽操
 		 * 作时的多余触点，直接忽略这次触控事件 */
-		if( point->state != WET_TOUCHDOWN ) {
+		if( point->state != LCUI_WEVENT_TOUCHDOWN ) {
 			return;
 		}
 		scrollbar->touch_point_id = point->id;
@@ -421,7 +421,7 @@ static void ScrollLayer_OnTouch( LCUI_Widget target,
 		}
 	}
 	switch( point->state ) {
-	case WET_TOUCHDOWN:
+	case LCUI_WEVENT_TOUCHDOWN:
 		scrollbar->distance = 0;
 		scrollbar->effect.speed = 0;
 		scrollbar->effect.is_running = FALSE;
@@ -433,7 +433,7 @@ static void ScrollLayer_OnTouch( LCUI_Widget target,
 		scrollbar->mouse_x = point->x;
 		scrollbar->mouse_y = point->y;
 		break;
-	case WET_TOUCHUP:
+	case LCUI_WEVENT_TOUCHUP:
 		Widget_ReleaseTouchCapture( target, -1 );
 		time_delta = (uint_t)LCUI_GetTimeDelta( scrollbar->timestamp );
 		if( scrollbar->is_dragging && time_delta < 50 ) {
@@ -443,7 +443,7 @@ static void ScrollLayer_OnTouch( LCUI_Widget target,
 		scrollbar->is_dragging = FALSE;
 		Widget_BlockEvent( target, FALSE );
 		break;
-	case WET_TOUCHMOVE:
+	case LCUI_WEVENT_TOUCHMOVE:
 		pos = scrollbar->old_pos;
 		if( scrollbar->direction == SBD_HORIZONTAL ) {
 			pos -= point->x - scrollbar->mouse_x;

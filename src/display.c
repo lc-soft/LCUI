@@ -582,11 +582,11 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	root = LCUIWidget_GetRoot();
 	surface = LCUIDisplay_GetBindSurface( e->target );
 	if( display.mode == LCDM_SEAMLESS ) {
-		if( !surface && event_type != WET_ADD ) {
+		if( !surface && event_type != LCUI_WEVENT_ADD ) {
 			return;
 		}
 	} else if ( e->target == root ) {
-		if( !surface && event_type != WET_ADD ) {
+		if( !surface && event_type != LCUI_WEVENT_ADD ) {
 			return;
 		}
 	} else {
@@ -594,20 +594,20 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	}
 	rect = &e->target->box.graph;
 	switch( event_type ) {
-	case WET_ADD:
+	case LCUI_WEVENT_ADD:
 		LCUIDisplay_BindSurface( e->target );
 		break;
-	case WET_REMOVE:
-	case WET_DESTROY:
+	case LCUI_WEVENT_REMOVE:
+	case LCUI_WEVENT_DESTROY:
 		LCUIDisplay_UnbindSurface( e->target );
 		break;
-	case WET_SHOW:
+	case LCUI_WEVENT_SHOW:
 		Surface_Show( surface );
 		break;
-	case WET_HIDE:
+	case LCUI_WEVENT_HIDE:
 		Surface_Hide( surface );
 		break;
-	case WET_RESIZE:
+	case LCUI_WEVENT_RESIZE:
 	{
 		LCUI_Rect area;
 		RectFToInvalidArea( rect, &area );
@@ -617,7 +617,7 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 		LCUIDisplay_InvalidateArea( &area );
 		break;
 	}
-	case WET_TITLE:
+	case LCUI_WEVENT_TITLE:
 		Surface_SetCaptionW( surface, e->target->title );
 		break;
 	default: break;
