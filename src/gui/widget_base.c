@@ -447,10 +447,16 @@ void Widget_GetOffset( LCUI_Widget w, LCUI_Widget parent,
 		       float *offset_x, float *offset_y )
 {
 	float x = 0, y = 0;
-	while( w && w != parent ) {
+	while( w != parent ) {
 		x += w->box.border.x;
 		y += w->box.border.y;
 		w = w->parent;
+		if( w ) {
+			x += w->box.padding.x - w->box.border.x;
+			y += w->box.padding.y - w->box.border.y;
+		} else {
+			break;
+		}
 	}
 	*offset_x = x;
 	*offset_y = y;
