@@ -56,10 +56,11 @@ typedef struct InertialScrollingRec_ {
 
 /** 滚动条的相关数据 */
 typedef struct LCUI_ScrollBarRec_ {
-	LCUI_Widget box;		/**< 容器 */
-	LCUI_Widget target;		/**< 滚动层 */
-	LCUI_Widget slider;		/**< 滑块 */
-	LCUI_BOOL is_dragging;		/**< 是否处于拖拽状态 */
+	LCUI_Widget box;		/**< a container containing scrollbar and target, the default is the parent of scrollbar */
+	LCUI_Widget target;		/**< scroll target */
+	LCUI_Widget slider;		/**< slider of scrollbar */
+	LCUI_BOOL is_dragged;		/**< whether the target is dragged */
+	LCUI_BOOL is_draggable;		/**< whether the target can be dragged */
 	float slider_x, slider_y;	/**< 拖拽开始时的滑块位置 */
 	int mouse_x, mouse_y;		/**< 拖拽开始时的鼠标坐标 */
 	int touch_point_id;		/**< 触点的ID */
@@ -214,7 +215,7 @@ static void Slider_OnMouseMove( LCUI_Widget slider,
 	float n, box_size, size, layer_pos, x, y;
 
 	scrollbar = Widget_GetData( w, self.prototype );
-	if( !scrollbar->is_dragging || !scrollbar->target ) {
+	if( !scrollbar->is_dragged || !scrollbar->target ) {
 		return;
 	}
 	target = scrollbar->target;
@@ -288,7 +289,7 @@ static void Slider_OnMouseUp( LCUI_Widget slider,
 	Widget_UnbindEvent( slider, "mousemove", Slider_OnMouseMove );
 	Widget_UnbindEvent( slider, "mouseup", Slider_OnMouseUp );
 	Widget_ReleaseMouseCapture( slider );
-	scrollbar->is_dragging = FALSE;
+	scrollbar->is_dragged = FALSE;
 }
 
 static void Slider_OnMouseDown( LCUI_Widget slider, 
@@ -296,14 +297,14 @@ static void Slider_OnMouseDown( LCUI_Widget slider,
 {
 	LCUI_Widget w = e->data;
 	LCUI_ScrollBar scrollbar = Widget_GetData( w, self.prototype );
-	if( scrollbar->is_dragging ) {
+	if( scrollbar->is_dragged ) {
 		return;
 	}
 	scrollbar->slider_x = slider->x;
 	scrollbar->slider_y = slider->y;
 	scrollbar->mouse_x = e->motion.x;
 	scrollbar->mouse_y = e->motion.y;
-	scrollbar->is_dragging = TRUE;
+	scrollbar->is_dragged = TRUE;
 	Widget_SetMouseCapture( slider );
 	Widget_BindEvent( slider, "mousemove", Slider_OnMouseMove, w, NULL );
 	Widget_BindEvent( slider, "mouseup", Slider_OnMouseUp, w, NULL );
@@ -326,7 +327,8 @@ static void ScrollBar_OnInit( LCUI_Widget w )
 	slider = LCUIWidget_New( NULL );
 	scrollbar = Widget_AddData( w, self.prototype, data_size );
 	scrollbar->direction = SBD_VERTICAL;
-	scrollbar->is_dragging = FALSE;
+	scrollbar->is_dragged = FALSE;
+	scrollbar->is_draggable = FALSE;
 	scrollbar->scroll_step = 64;
 	scrollbar->slider = slider;
 	scrollbar->target = NULL;
@@ -385,15 +387,20 @@ static void ScrollBar_UpdateSize( LCUI_Widget w )
 static void ScrollLayer_OnWheel( LCUI_Widget target,
 				 LCUI_WidgetEvent e, void *arg )
 {
+	int pos, new_pos;
 	LCUI_Widget w = e->data;
 	LCUI_ScrollBar scrollbar = Widget_GetData( w, self.prototype );
-	int pos = ScrollBar_GetPosition( w );
+	pos = ScrollBar_GetPosition( w );
 	if( e->wheel.delta > 0 ) {
-		pos -= scrollbar->scroll_step;
+		new_pos = pos - scrollbar->scroll_step;
 	} else {
-		pos += scrollbar->scroll_step;
+		new_pos = pos + scrollbar->scroll_step;
 	}
-	ScrollBar_SetPosition( w, pos );
+	/* If the position of the scroll bar is changed, then prevent
+	 * the event bubbling, to avoid change the parent scroll bars */
+	if( pos != ScrollBar_SetPosition( w, new_pos ) ) {
+		e->cancel_bubble = TRUE;
+	}
 }
 
 /** 滚动层的触屏事件响应 */
@@ -434,24 +441,28 @@ static void ScrollLayer_OnTouch( LCUI_Widget target,
 		scrollbar->effect.speed = 0;
 		scrollbar->effect.is_running = FALSE;
 		scrollbar->old_pos = scrollbar->pos;
-		if( scrollbar->is_dragging ) {
+		if( scrollbar->is_dragged ) {
 			return;
 		}
-		Widget_SetTouchCapture( target, point->id );
 		scrollbar->mouse_x = point->x;
 		scrollbar->mouse_y = point->y;
+		scrollbar->is_draggable = TRUE;
 		break;
 	case LCUI_WEVENT_TOUCHUP:
 		Widget_ReleaseTouchCapture( target, -1 );
 		time_delta = (uint_t)LCUI_GetTimeDelta( scrollbar->timestamp );
-		if( scrollbar->is_dragging && time_delta < 50 ) {
+		if( scrollbar->is_dragged && time_delta < 50 ) {
 			StartInertialScrolling( w );
 		}
 		scrollbar->touch_point_id = -1;
-		scrollbar->is_dragging = FALSE;
+		scrollbar->is_dragged = FALSE;
 		Widget_BlockEvent( target, FALSE );
 		break;
 	case LCUI_WEVENT_TOUCHMOVE:
+		if( !scrollbar->is_draggable ) {
+			break;
+		}
+		e->cancel_bubble = TRUE;
 		pos = scrollbar->old_pos;
 		if( scrollbar->direction == SBD_HORIZONTAL ) {
 			pos -= point->x - scrollbar->mouse_x;
@@ -460,11 +471,6 @@ static void ScrollLayer_OnTouch( LCUI_Widget target,
 		}
 		if( pos == scrollbar->pos ) {
 			break;
-		}
-		if( !scrollbar->is_dragging ) {
-			scrollbar->is_dragging = TRUE;
-			LCUIWidget_ClearEventTarget( NULL );
-			Widget_BlockEvent( target, TRUE );
 		}
 		distance = pos - scrollbar->pos;
 		if( (scrollbar->distance > 0) != (distance > 0) ||
@@ -475,6 +481,23 @@ static void ScrollLayer_OnTouch( LCUI_Widget target,
 		scrollbar->distance = distance;
 		scrollbar->timestamp = LCUI_GetTime();
 		ScrollBar_SetPosition( w, pos );
+		if( scrollbar->is_dragged ) {
+			break;
+		}
+		/* If the position of the scroll bar is not changed, then
+		 * mark current drag action should be ignore */
+		if( scrollbar->is_draggable &&
+		    scrollbar->old_pos == scrollbar->pos ) {
+			scrollbar->is_dragged = FALSE;
+			scrollbar->is_draggable = FALSE;
+			e->cancel_bubble = FALSE;
+			break;
+		}
+		/* start drag action and block all events of target */
+		scrollbar->is_dragged = TRUE;
+		LCUIWidget_ClearEventTarget( NULL );
+		Widget_BlockEvent( target, TRUE );
+		Widget_SetTouchCapture( target, point->id );
 	default: break;
 	}
 }
@@ -530,7 +553,7 @@ int ScrollBar_GetPosition( LCUI_Widget w )
 	return scrollbar->pos;
 }
 
-void ScrollBar_SetPosition( LCUI_Widget w, int pos )
+int ScrollBar_SetPosition( LCUI_Widget w, int pos )
 {
 	float new_pos, box_size, size, slider_pos;
 	LCUI_ScrollBar scrollbar = Widget_GetData( w, self.prototype );
@@ -539,7 +562,7 @@ void ScrollBar_SetPosition( LCUI_Widget w, int pos )
 	LCUI_WidgetEvent e;
 
 	if( !target ) {
-		return;
+		return 0;
 	}
 	new_pos = 1.0f * pos;
 	memset( &e, 0, sizeof( e ) );
@@ -592,6 +615,7 @@ void ScrollBar_SetPosition( LCUI_Widget w, int pos )
 	scrollbar->pos = pos;
 	Widget_UpdateStyle( slider, FALSE );
 	Widget_UpdateStyle( target, FALSE );
+	return pos;
 }
 
 void ScrollBar_SetDirection( LCUI_Widget w, int direction )
