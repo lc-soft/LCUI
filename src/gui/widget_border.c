@@ -174,8 +174,8 @@ void Widget_PaintBorder( LCUI_Widget w, LCUI_PaintContext paint )
 	LCUI_RectF fbox;
 	LCUI_Border border;
 	Widget_ComputeBorder( w, &border );
-	fbox.x = w->box.border.x - w->box.graph.x;
-	fbox.y = w->box.border.y - w->box.graph.y;
+	fbox.x = w->box.border.x - w->box.canvas.x;
+	fbox.y = w->box.border.y - w->box.canvas.y;
 	fbox.width = w->box.border.width;
 	fbox.height = w->box.border.height;
 	box.x = LCUIMetrics_ComputeActual( fbox.x, SVT_PX );

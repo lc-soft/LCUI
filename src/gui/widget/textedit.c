@@ -902,8 +902,8 @@ static void TextEdit_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	LCUI_TextEdit edit = GetData( w );
 
 	rectf = w->box.content;
-	rectf.x -= w->box.graph.x;
-	rectf.y -= w->box.graph.y;
+	rectf.x -= w->box.canvas.x;
+	rectf.y -= w->box.canvas.y;
 	LCUIMetrics_ComputeRectActual( &content_rect, &rectf );
 	if( !LCUIRect_GetOverlayRect( &content_rect, &paint->rect, &rect ) ) {
 		return;

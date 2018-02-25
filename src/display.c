@@ -263,7 +263,7 @@ static void LCUIDisplay_BindSurface( LCUI_Widget widget )
 	record->rendered = FALSE;
 	LinkedList_Init( &record->rects );
 	Surface_SetCaptionW( record->surface, widget->title );
-	LCUIMetrics_ComputeRectActual( &rect, &widget->box.graph );
+	LCUIMetrics_ComputeRectActual( &rect, &widget->box.canvas );
 	if( widget->style->sheet[key_top].is_valid &&
 	    widget->style->sheet[key_left].is_valid ) {
 		Surface_Move( record->surface, rect.x, rect.y );
@@ -592,7 +592,7 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	} else {
 		return;
 	}
-	rect = &e->target->box.graph;
+	rect = &e->target->box.canvas;
 	switch( event_type ) {
 	case LCUI_WEVENT_LINK:
 		LCUIDisplay_BindSurface( e->target );
@@ -683,7 +683,7 @@ static void OnMinMaxInfo( LCUI_Event e, void *arg )
 	}
 	if( resizable ) {
 		LCUI_Rect area;
-		RectFToInvalidArea( &widget->box.graph, &area );
+		RectFToInvalidArea( &widget->box.canvas, &area );
 		Surface_Resize( s, area.width, area.height );
 	}
 }

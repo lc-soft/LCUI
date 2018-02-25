@@ -84,13 +84,13 @@ typedef enum LCUI_WidgetTaskType {
 	LCUI_WTASK_TOTAL_NUM
 } LCUI_WidgetTaskType;
 
-typedef struct LCUI_WidgetBoxRect {
+typedef struct LCUI_WidgetBoxModelRec_ {
 	LCUI_RectF content;	/**< 内容框的区域 */
 	LCUI_RectF padding;	/**< 内边距框的区域 */
 	LCUI_RectF border;	/**< 边框盒的区域，包括内边距框和内容框区域 */
 	LCUI_RectF outer;	/**< 外边距框的区域，包括边框盒和外边距框区域 */
-	LCUI_RectF graph;	/**< 图层的区域，包括边框盒和阴影区域 */
-} LCUI_WidgetBoxRect;
+	LCUI_RectF canvas;	/**< 图层的区域，包括边框盒和阴影区域 */
+} LCUI_WidgetBoxModelRec, *LCUI_WidgetBoxModel;
 
 typedef struct LCUI_WidgetTaskBoxRec_ {
 	LCUI_BOOL for_self;			/**< 标志，指示当前部件是否有待处理的任务 */
@@ -169,7 +169,7 @@ typedef struct LCUI_WidgetRec_ {
 	wchar_t			*title;			/**< 标题 */
 	LCUI_Rect2F		padding;		/**< 内边距框 */
 	LCUI_Rect2F		margin;			/**< 外边距框 */
-	LCUI_WidgetBoxRect	box;			/**< 部件的各个区域信息 */
+	LCUI_WidgetBoxModelRec	box;			/**< 部件的各个区域信息 */
 	LCUI_StyleSheet		style;			/**< 当前完整样式表 */
 	LCUI_StyleSheet		custom_style;		/**< 自定义样式表 */
 	LCUI_StyleSheet		inherited_style;	/**< 通过继承得到的样式表 */

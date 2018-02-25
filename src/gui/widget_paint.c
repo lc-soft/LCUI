@@ -96,7 +96,7 @@ static void Widget_AdjustArea(	LCUI_Widget w, LCUI_RectF *in_rect,
 	LCUI_RectF *box;
 	switch( box_type ) {
 	case SV_BORDER_BOX: box = &w->box.border; break;
-	case SV_GRAPH_BOX: box = &w->box.graph; break;
+	case SV_GRAPH_BOX: box = &w->box.canvas; break;
 	case SV_PADDING_BOX: box = &w->box.padding; break;
 	case SV_CONTENT_BOX:
 	default: box = &w->box.content; break;
@@ -111,8 +111,8 @@ static void Widget_AdjustArea(	LCUI_Widget w, LCUI_RectF *in_rect,
 		LCUIRectF_ValidateArea( out_rect, box->width, box->height );
 	}
 	/* 将坐标转换成相对于图像呈现区的坐标 */
-	out_rect->x += box->x - w->box.graph.x;
-	out_rect->y += box->y - w->box.graph.y;
+	out_rect->x += box->x - w->box.canvas.x;
+	out_rect->y += box->y - w->box.canvas.y;
 }
 
 void RectFToInvalidArea( const LCUI_RectF *rect, LCUI_Rect *area )
@@ -142,8 +142,8 @@ LCUI_BOOL Widget_InvalidateArea( LCUI_Widget widget,
 	}
 	mode = LCUIDisplay_GetMode();
 	Widget_AdjustArea( w, in_rect, &rect, box_type );
-	rect.x += w->box.graph.x;
-	rect.y += w->box.graph.y;
+	rect.x += w->box.canvas.x;
+	rect.y += w->box.canvas.y;
 	while( w && w->parent ) {
 		LCUIRectF_ValidateArea( &rect, w->parent->box.padding.width,
 					w->parent->box.padding.height );
@@ -254,8 +254,8 @@ int Widget_ConvertArea( LCUI_Widget w, LCUI_Rect *in_rect,
 		return -2;
 	}
 	/* 转换成相对坐标 */
-	rect.x -= w->box.graph.x;
-	rect.y -= w->box.graph.y;
+	rect.x -= w->box.canvas.x;
+	rect.y -= w->box.canvas.y;
 	out_rect->x = in_rect->x - (int)rect.x;
 	out_rect->y = in_rect->y - (int)rect.y;
 	out_rect->width = in_rect->width;
@@ -293,8 +293,8 @@ static LCUI_WidgetRenderer WidgetRenderer( LCUI_Widget w,
 	that->has_content_graph = FALSE;
 	if( parent ) {
 		that->root_paint = parent->root_paint;
-		that->x = parent->x + parent->content_left + w->box.graph.x;
-		that->y = parent->y + parent->content_top + w->box.graph.y;
+		that->x = parent->x + parent->content_left + w->box.canvas.x;
+		that->y = parent->y + parent->content_top + w->box.canvas.y;
 	} else {
 		that->x = that->y = 0;
 		that->root_paint = that->paint;
@@ -325,8 +325,8 @@ static LCUI_WidgetRenderer WidgetRenderer( LCUI_Widget w,
 			      that->paint->rect.height );
 	}
 	/* 获取内容框相对于图层的间距 */
-	that->content_left = w->box.padding.x - w->box.graph.x;
-	that->content_top = w->box.padding.y - w->box.graph.y;
+	that->content_left = w->box.padding.x - w->box.canvas.x;
+	that->content_top = w->box.padding.y - w->box.canvas.y;
 	/* 获取内容区域，相对于根级部件 */
 	rect.x = that->x + that->content_left;
 	rect.y = that->y + that->content_top;
@@ -384,10 +384,10 @@ static size_t WidgetRenderer_RenderChildren( LCUI_WidgetRenderer that )
 		    child->state != LCUI_WSTATE_NORMAL ) {
 			continue;
 		}
-		rect.width = child->box.graph.width;
-		rect.height = child->box.graph.height;
-		rect.x = that->x + child->box.graph.x + that->content_left;
-		rect.y = that->y + child->box.graph.y + that->content_top;
+		rect.width = child->box.canvas.width;
+		rect.height = child->box.canvas.height;
+		rect.x = that->x + child->box.canvas.x + that->content_left;
+		rect.y = that->y + child->box.canvas.y + that->content_top;
 		/* 栅格化部件区域，即：转换为相对于根级部件的实际区域 */
 		LCUIMetrics_ComputeRectActual( &actual_rect, &rect );
 		if( !LCUIRect_GetOverlayRect( &that->content_rect,

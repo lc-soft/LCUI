@@ -104,7 +104,7 @@ static void check_widget_rect( LCUI_SysEvent ev, void *arg )
 	rectf.width = WIDGET_WIDTH;
 	rectf.height = WIDGET_WIDTH;
 	LCUIMetrics_ComputeRectActual( &old_rect, &rectf );
-	LCUIMetrics_ComputeRectActual( &rect, &self.widget->box.graph );
+	LCUIMetrics_ComputeRectActual( &rect, &self.widget->box.canvas );
 	LCUIRect_MergeRect( &rect, &rect, &old_rect );
 	CHECK2( check_rect_correct( &rect, paint_rect ) );
 	if( ret != 0 ) {

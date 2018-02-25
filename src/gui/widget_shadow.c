@@ -97,12 +97,12 @@ void Widget_UpdateBoxShadow( LCUI_Widget w )
 	if( sd->x == old_sd.x && sd->y == old_sd.y &&
 	    sd->blur == old_sd.blur ) {
 		LCUIRectF_ToRect( &w->box.border, &rb, 1.0f );
-		LCUIRectF_ToRect( &w->box.graph, &rg, 1.0f );
+		LCUIRectF_ToRect( &w->box.canvas, &rg, 1.0f );
 		LCUIRect_CutFourRect( &rb, &rg, rects );
 		for( i = 0; i < 4; ++i ) {
 			LCUIRect_ToRectF( &rects[i], &rect, 1.0f );
-			rect.x -= w->box.graph.x;
-			rect.y -= w->box.graph.y;
+			rect.x -= w->box.canvas.x;
+			rect.y -= w->box.canvas.y;
 			Widget_InvalidateArea( w, &rect, SV_GRAPH_BOX );
 		}
 		return;
@@ -177,7 +177,7 @@ void Widget_PaintBoxShadow( LCUI_Widget w, LCUI_PaintContext paint )
 	LCUI_BoxShadow shadow;
 	box.x = box.y = 0;
 	Widget_ComputeBoxShadow( w, &shadow );
-	box.width = LCUIMetrics_ComputeActual( w->box.graph.width, SVT_PX );
-	box.height = LCUIMetrics_ComputeActual( w->box.graph.height, SVT_PX );
+	box.width = LCUIMetrics_ComputeActual( w->box.canvas.width, SVT_PX );
+	box.height = LCUIMetrics_ComputeActual( w->box.canvas.height, SVT_PX );
 	Graph_DrawBoxShadow( paint, &box, &shadow );	
 }

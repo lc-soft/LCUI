@@ -780,12 +780,12 @@ static void Widget_ClearComputedSize( LCUI_Widget w )
 {
 	if( Widget_HasAutoStyle( w, key_width ) ) {
 		w->width = 0;
-		w->box.graph.width = 0;
+		w->box.canvas.width = 0;
 		w->box.content.width = 0;
 	}
 	if( Widget_HasAutoStyle( w, key_height ) ) {
 		w->height = 0;
-		w->box.graph.height = 0;
+		w->box.canvas.height = 0;
 		w->box.content.height = 0;
 	}
 }
@@ -842,7 +842,7 @@ void Widget_UpdatePosition( LCUI_Widget w )
 	}
 	w->computed_style.position = position;
 	Widget_UpdateZIndex( w );
-	rect = w->box.graph;
+	rect = w->box.canvas;
 	w->x = w->origin_x;
 	w->y = w->origin_y;
 	switch( position ) {
@@ -909,15 +909,15 @@ void Widget_UpdatePosition( LCUI_Widget w )
 	w->box.padding.y = w->y;
 	w->box.border.x = w->x;
 	w->box.border.y = w->y;
-	w->box.graph.x = w->x;
-	w->box.graph.y = w->y;
+	w->box.canvas.x = w->x;
+	w->box.canvas.y = w->y;
 	/* 计算各个框的坐标 */
 	w->box.padding.x += w->computed_style.border.left.width;
 	w->box.padding.y += w->computed_style.border.top.width;
 	w->box.content.x = w->box.padding.x + w->padding.left;
 	w->box.content.y = w->box.padding.y + w->padding.top;
-	w->box.graph.x -= Widget_GetBoxShadowOffsetX( w );
-	w->box.graph.y -= Widget_GetBoxShadowOffsetY( w );
+	w->box.canvas.x -= Widget_GetBoxShadowOffsetX( w );
+	w->box.canvas.y -= Widget_GetBoxShadowOffsetY( w );
 	if( w->parent ) {
 		/* 标记移动前后的区域 */
 		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
@@ -930,7 +930,7 @@ void Widget_UpdatePosition( LCUI_Widget w )
 /** 更新位图尺寸 */
 static void Widget_UpdateGraphBox( LCUI_Widget w )
 {
-	LCUI_RectF *rg = &w->box.graph;
+	LCUI_RectF *rg = &w->box.canvas;
 	rg->x = w->x - Widget_GetBoxShadowOffsetX( w );
 	rg->y = w->y - Widget_GetBoxShadowOffsetY( w );
 	rg->width = Widget_GetGraphWidth( w );
@@ -946,7 +946,7 @@ static void Widget_ComputeContentSize( LCUI_Widget w,
 
 	for( LinkedList_Each( node, &w->children_show ) ) {
 		LCUI_Widget child = node->data;
-		LCUI_WidgetBoxRect *box = &child->box;
+		LCUI_WidgetBoxModelRec *box = &child->box;
 		LCUI_WidgetStyle *style = &child->computed_style;
 		/* 忽略不可见、绝对定位的部件 */
 		if( style->display == SV_NONE || 
@@ -1369,7 +1369,7 @@ void Widget_UpdateSize( LCUI_Widget w )
 		{ &pbox->bottom, &w->padding.bottom, key_padding_bottom },
 		{ &pbox->left, &w->padding.left, key_padding_left }
 	};
-	rect = w->box.graph;
+	rect = w->box.canvas;
 	/* 内边距的单位暂时都用 px  */
 	for( i = 0; i < 4; ++i ) {
 		LCUI_Style s = &w->style->sheet[pd_map[i].key];
@@ -1395,8 +1395,8 @@ void Widget_UpdateSize( LCUI_Widget w )
 		Widget_UpdateMargin( w );
 	}
 	/* 若尺寸无变化则不继续处理 */
-	if( rect.width == w->box.graph.width &&
-	    rect.height == w->box.graph.height && 
+	if( rect.width == w->box.canvas.width &&
+	    rect.height == w->box.canvas.height && 
 	    padding.top == w->padding.top &&
 	    padding.right == w->padding.right &&
 	    padding.bottom == w->padding.bottom &&
@@ -1404,7 +1404,7 @@ void Widget_UpdateSize( LCUI_Widget w )
 		return;
 	}
 	/* 若在变化前后的宽高中至少有一个为 0，则不继续处理 */
-	if( (w->box.graph.width <= 0 || w->box.graph.height <= 0) &&
+	if( (w->box.canvas.width <= 0 || w->box.canvas.height <= 0) &&
 	    (rect.width <= 0 || rect.height <= 0) ) {
 		return;
 	}
@@ -1421,8 +1421,8 @@ void Widget_UpdateSize( LCUI_Widget w )
 	}
 	if( w->parent ) {
 		Widget_InvalidateArea( w->parent, &rect, SV_PADDING_BOX );
-		rect.width = w->box.graph.width;
-		rect.height = w->box.graph.height;
+		rect.width = w->box.canvas.width;
+		rect.height = w->box.canvas.height;
 		Widget_InvalidateArea( w->parent, &rect, SV_PADDING_BOX );
 		if( Widget_HasAutoStyle( w->parent, key_width ) ||
 		    Widget_HasAutoStyle( w->parent, key_height ) ) {

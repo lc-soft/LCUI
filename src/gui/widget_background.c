@@ -471,8 +471,8 @@ void Widget_PaintBakcground( LCUI_Widget w, LCUI_PaintContext paint )
 	LCUI_RectF fbox;
 	LCUI_Background background;
 	Widget_ComputeBackground( w, &background );
-	fbox.x = w->box.padding.x - w->box.graph.x;
-	fbox.y = w->box.padding.y - w->box.graph.y;
+	fbox.x = w->box.padding.x - w->box.canvas.x;
+	fbox.y = w->box.padding.y - w->box.canvas.y;
 	fbox.width = w->box.padding.width;
 	fbox.height = w->box.padding.height;
 	box.x = LCUIMetrics_ComputeActual( fbox.x, SVT_PX );

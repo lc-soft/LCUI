@@ -54,6 +54,9 @@
     <ClCompile Include="..\..\..\test\test_xml_parser.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\test_thread.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\test\test.h">
