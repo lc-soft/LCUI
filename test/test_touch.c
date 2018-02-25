@@ -28,10 +28,10 @@ static void OnTouchWidget( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	binding = e->data;
 	point = & e->touch.points[0];
 	switch( point->state ) {
-	case WET_TOUCHMOVE:
+	case LCUI_WEVENT_TOUCHMOVE:
 		Widget_Move( w, point->x - 32.0f, point->y - 32.0f );
 		break;
-	case WET_TOUCHUP:
+	case LCUI_WEVENT_TOUCHUP:
 		if( !binding->is_valid ) {
 			break;
 		}
@@ -42,7 +42,7 @@ static void OnTouchWidget( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 		Widget_Destroy( w );
 		free( binding );
 		break;
-	case WET_TOUCHDOWN:
+	case LCUI_WEVENT_TOUCHDOWN:
 	default: break;
 	}
 }
