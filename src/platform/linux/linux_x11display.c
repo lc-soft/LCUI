@@ -237,6 +237,8 @@ static void OnDestroySurface( void *data )
 {
 	LCUI_Surface s = data;
 	X11Surface_ClearTasks( s );
+	XDestroyImage( s->ximage );
+	XFreeGC( x11.app->display, s->gc );
 	free( s );
 }
 

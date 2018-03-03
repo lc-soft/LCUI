@@ -55,6 +55,7 @@ void TextStyle_Init( LCUI_TextStyle data )
 	data->has_style = FALSE;
 	data->has_weight = FALSE;
 	data->has_family = FALSE;
+	data->has_pixel_size = FALSE;
 	data->has_back_color = FALSE;
 	data->has_fore_color = FALSE;
 	data->font_ids = NULL;
@@ -273,15 +274,16 @@ LCUI_TextStyle StyleTags_GetTextStyle( LinkedList *tags )
 /** 将指定标签的样式数据从队列中删除，只删除队列尾部第一个匹配的标签 */
 static void StyleTags_Delete( LinkedList *tags, int id )
 {
-	LCUI_TextStyleTag *p;
+	LCUI_TextStyleTag *tag;
 	LinkedListNode *node;
 	DEBUG_MSG( "delete start, total tag: %d\n", total );
 	if( tags->length <= 0 ) {
 		return;
 	}
 	for( LinkedList_Each( node, tags ) ) {
-		p = (LCUI_TextStyleTag*)node->data;
-		if( p->id == id ) {
+		tag = node->data;
+		if( tag->id == id ) {
+			free( tag );
 			LinkedList_DeleteNode( tags, node );
 			break;
 		}
@@ -508,7 +510,7 @@ const wchar_t *StyleTags_GetStart( LinkedList *tags, const wchar_t *str )
 	q = ScanStyleTagData( str, tag );
 	if( q ) {
 		/* 将标签样式数据加入队列 */
-		LinkedList_Append( tags, tag );
+		LinkedList_Insert( tags, 0, tag );
 	} else {
 		free( tag );
 	}

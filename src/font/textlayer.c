@@ -321,12 +321,25 @@ static void TextRowList_Destroy( TextRowList list )
 	list->rows = NULL;
 }
 
+static void OnDestroyTextStyle( void *data )
+{
+	TextStyle_Destroy( data );
+	free( data );
+}
+
+static void TextLayer_DestroyStyleCache( LCUI_TextLayer layer )
+{
+	LinkedList_Clear( &layer->style_cache, OnDestroyTextStyle );
+}
+
 /** 销毁TextLayer */
 void TextLayer_Destroy( LCUI_TextLayer layer )
 {
+
 	RectList_Clear( &layer->dirty_rect );
 	TextStyle_Destroy( &layer->text_style );
 	TextRowList_Destroy( &layer->text_rows );
+	TextLayer_DestroyStyleCache( layer );
 	Graph_Free( &layer->graph );
 	free( layer );
 }
@@ -531,8 +544,8 @@ void TextLayer_ClearText( LCUI_TextLayer layer )
 	layer->length = 0;
 	layer->insert_x = 0;
 	layer->insert_y = 0;
+	TextLayer_DestroyStyleCache( layer );
 	TextRowList_Destroy( &layer->text_rows );
-	LinkedList_Clear( &layer->style_cache, (FuncPtr)TextStyle_Destroy );
 	TextRowList_InsertNewRow( &layer->text_rows, 0 );
 	layer->task.redraw_all = TRUE;
 }

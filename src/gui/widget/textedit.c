@@ -415,7 +415,8 @@ static void TextEdit_OnTask( LCUI_Widget widget )
 	if( edit->tasks[TASK_SET_TEXT] ) {
 		LinkedList blocks;
 		LinkedListNode *node;
-		LCUI_WidgetEventRec ev;
+		LCUI_WidgetEventRec ev = { 0 };
+
 		LinkedList_Init( &blocks );
 		LCUIMutex_Lock( &edit->mutex );
 		LinkedList_Concat( &blocks, &edit->text_blocks );

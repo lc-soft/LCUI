@@ -300,8 +300,11 @@ size_t LCUIFont_UpdateWeight( const int *font_ids,
 		}
 	}
 	ids[count] = 0;
-	if( new_font_ids ) {
+	if( new_font_ids && count > 0 ) {
 		*new_font_ids = ids;
+	} else {
+*		new_font_ids = NULL;
+		free( ids );
 	}
 	return count;
 }
@@ -333,8 +336,11 @@ size_t LCUIFont_UpdateStyle( const int *font_ids,
 		}
 	}
 	ids[count] = 0;
-	if( new_font_ids ) {
+	if( new_font_ids && count > 0 ) {
 		*new_font_ids = ids;
+	} else {
+		*new_font_ids = NULL;
+		free( ids );
 	}
 	return count;
 }
