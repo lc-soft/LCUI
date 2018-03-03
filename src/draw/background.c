@@ -33,9 +33,9 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
 
-void Graph_DrawBackground( LCUI_PaintContext paint,
-			   const LCUI_Rect *box,
-			   const LCUI_Background *bg )
+void Background_Paint( const LCUI_Background *bg,
+		       const LCUI_Rect *box,
+		       LCUI_PaintContext paint )
 {
 	double scale;
 	LCUI_Graph graph, buffer;

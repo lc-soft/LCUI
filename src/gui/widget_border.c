@@ -146,7 +146,7 @@ void Widget_UpdateBorder( LCUI_Widget w )
 }
 
 /** 计算部件边框样式的实际值 */
-static void Widget_ComputeBorder( LCUI_Widget w, LCUI_Border *out )
+void Widget_ComputeBorder( LCUI_Widget w, LCUI_Border *out )
 {
 	LCUI_BorderStyle *s;
 	s = &w->computed_style.border;
@@ -168,19 +168,13 @@ static void Widget_ComputeBorder( LCUI_Widget w, LCUI_Border *out )
 	out->bottom_right_radius = ComputeActual( s->bottom_right_radius );
 }
 
-void Widget_PaintBorder( LCUI_Widget w, LCUI_PaintContext paint )
+void Widget_PaintBorder( LCUI_Widget w, LCUI_PaintContext paint,
+			 LCUI_WidgetActualStyle style )
 {
 	LCUI_Rect box;
-	LCUI_RectF fbox;
-	LCUI_Border border;
-	Widget_ComputeBorder( w, &border );
-	fbox.x = w->box.border.x - w->box.canvas.x;
-	fbox.y = w->box.border.y - w->box.canvas.y;
-	fbox.width = w->box.border.width;
-	fbox.height = w->box.border.height;
-	box.x = LCUIMetrics_ComputeActual( fbox.x, SVT_PX );
-	box.y = LCUIMetrics_ComputeActual( fbox.y, SVT_PX );
-	box.width = LCUIMetrics_ComputeActual( fbox.width, SVT_PX );
-	box.height = LCUIMetrics_ComputeActual( fbox.height, SVT_PX );
-	Graph_DrawBorder( paint, &box, &border );
+	box.x = style->border_box.x - style->canvas_box.x;
+	box.y = style->border_box.y - style->canvas_box.y;
+	box.width = style->border_box.width;
+	box.height = style->border_box.height;
+	Border_Paint( &style->border, &box, paint );
 }

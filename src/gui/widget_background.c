@@ -313,7 +313,6 @@ void Widget_UpdateBackground( LCUI_Widget widget )
 	Widget_AddTask( widget, LCUI_WTASK_BODY );
 }
 
-/** 计算部件背景样式的实际值 */
 void Widget_ComputeBackground( LCUI_Widget w, LCUI_Background *out )
 {
 	LCUI_StyleType type;
@@ -465,19 +464,13 @@ void Widget_ComputeBackground( LCUI_Widget w, LCUI_Background *out )
 	out->repeat.y = bg->repeat.y;
 }
 
-void Widget_PaintBakcground( LCUI_Widget w, LCUI_PaintContext paint )
+void Widget_PaintBakcground( LCUI_Widget w, LCUI_PaintContext paint,
+			     LCUI_WidgetActualStyle style )
 {
 	LCUI_Rect box;
-	LCUI_RectF fbox;
-	LCUI_Background background;
-	Widget_ComputeBackground( w, &background );
-	fbox.x = w->box.padding.x - w->box.canvas.x;
-	fbox.y = w->box.padding.y - w->box.canvas.y;
-	fbox.width = w->box.padding.width;
-	fbox.height = w->box.padding.height;
-	box.x = LCUIMetrics_ComputeActual( fbox.x, SVT_PX );
-	box.y = LCUIMetrics_ComputeActual( fbox.y, SVT_PX );
-	box.width = LCUIMetrics_ComputeActual( fbox.width, SVT_PX );
-	box.height = LCUIMetrics_ComputeActual( fbox.height, SVT_PX );
-	Graph_DrawBackground( paint, &box, &background );
+	box.x = style->padding_box.x - style->canvas_box.x;
+	box.y = style->padding_box.y - style->canvas_box.y;
+	box.width = style->padding_box.width;
+	box.height = style->padding_box.height;
+	Background_Paint( &style->background, &box, paint );
 }

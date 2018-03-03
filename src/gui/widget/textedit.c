@@ -894,18 +894,17 @@ static void TextEdit_OnDestroy( LCUI_Widget widget )
 	LinkedList_Clear( &edit->text_blocks, TextBlock_OnDestroy );
 }
 
-static void TextEdit_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
+static void TextEdit_OnPaint( LCUI_Widget w, LCUI_PaintContext paint,
+			      LCUI_WidgetActualStyle style )
 {
 	LCUI_Pos pos;
-	LCUI_RectF rectf;
 	LCUI_Graph canvas;
 	LCUI_Rect content_rect, rect;
 	LCUI_TextEdit edit = GetData( w );
-
-	rectf = w->box.content;
-	rectf.x -= w->box.canvas.x;
-	rectf.y -= w->box.canvas.y;
-	LCUIMetrics_ComputeRectActual( &content_rect, &rectf );
+	content_rect.width = style->content_box.width;
+	content_rect.height = style->content_box.height;
+	content_rect.x = style->content_box.x - style->canvas_box.x;
+	content_rect.y = style->content_box.y - style->canvas_box.y;
 	if( !LCUIRect_GetOverlayRect( &content_rect, &paint->rect, &rect ) ) {
 		return;
 	}

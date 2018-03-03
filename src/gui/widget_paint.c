@@ -52,6 +52,7 @@ typedef struct LCUI_WidgetRendererRec_ {
 	float content_top;			/**< content area top spacing, it relative to widget canvas */
 	float content_left;			/**< content area left spacing, it relative to widget canvas */
 	LCUI_Widget target;			/**< target widget */
+	LCUI_WidgetActualStyle style;
 	LCUI_PaintContext paint;		/**< current target widget paint context */
 	LCUI_PaintContext root_paint;		/**< root paint context */
 	LCUI_Graph content_graph;		/**< content canvas */
@@ -219,13 +220,14 @@ void LCUIWidget_FreeRenderer( void )
 }
 
 /** 当前部件的绘制函数 */
-static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
+static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint,
+			    LCUI_WidgetActualStyle style )
 {
-	Widget_PaintBoxShadow( w, paint );
-	Widget_PaintBakcground( w, paint );
-	Widget_PaintBorder( w, paint );
+	Widget_PaintBoxShadow( w, paint, style );
+	Widget_PaintBakcground( w, paint, style );
+	Widget_PaintBorder( w, paint, style );
 	if( w->proto && w->proto->paint ) {
-		w->proto->paint( w, paint );
+		w->proto->paint( w, paint, style );
 	}
 }
 
@@ -283,13 +285,14 @@ int Widget_ConvertArea( LCUI_Widget w, LCUI_Rect *in_rect,
 
 static LCUI_WidgetRenderer WidgetRenderer( LCUI_Widget w,
 					   LCUI_PaintContext paint,
+					   LCUI_WidgetActualStyle style,
 					   LCUI_WidgetRenderer parent )
 {
-	LCUI_RectF rect;
 	LCUI_Rect paint_rect;
 	ASSIGN( that, LCUI_WidgetRenderer );
 
 	that->target = w;
+	that->style = style;
 	that->paint = paint;
 	that->is_cover_border = FALSE;
 	that->has_self_graph = FALSE;
@@ -330,24 +333,27 @@ static LCUI_WidgetRenderer WidgetRenderer( LCUI_Widget w,
 	/* get content rectangle left spacing and top */
 	that->content_left = w->box.padding.x - w->box.canvas.x;
 	that->content_top = w->box.padding.y - w->box.canvas.y;
-	/* get content rectangle, it relative to root canvas */
-	rect.x = that->x + that->content_left;
-	rect.y = that->y + that->content_top;
-	rect.width = w->box.padding.width;
-	rect.height = w->box.padding.height;
-	LCUIMetrics_ComputeRectActual( &that->content_rect, &rect );
 	/* convert position of paint rectangle to root canvas relative */
-	rect.x = that->x;
-	rect.y = that->y;
-	LCUIMetrics_ComputeRectActual( &paint_rect, &rect );
-	paint_rect.x += that->paint->rect.x;
-	paint_rect.y += that->paint->rect.y;
+	paint_rect.x = that->style->canvas_box.x + that->paint->rect.x;
+	paint_rect.y = that->style->canvas_box.y + that->paint->rect.y;
 	paint_rect.width = that->paint->rect.width;
 	paint_rect.height = that->paint->rect.height;
+	DEBUG_MSG( "[%s] content_rect: (%d, %d, %d, %d)\n",
+		    w->id, that->content_rect.x, that->content_rect.y,
+		    that->content_rect.width, that->content_rect.height );
+	DEBUG_MSG( "[%s] paint_rect: (%d, %d, %d, %d)\n",
+		    w->id, paint_rect.x, paint_rect.y,
+		    paint_rect.width, paint_rect.height );
 	/* get actual paint rectangle in widget content rectangle */
 	that->can_render_centent = LCUIRect_GetOverlayRect(
-		&that->content_rect, &paint_rect, &that->content_rect
+		&that->style->padding_box, &paint_rect, &that->content_rect
 	);
+	DEBUG_MSG( "[%s] content_box: (%d, %d, %d, %d)\n",
+		    w->id, style->content_box.x, style->content_box.y,
+		    style->content_box.width, style->content_box.height );
+	DEBUG_MSG( "[%s] border_box: (%d, %d, %d, %d)\n",
+		    w->id, style->border_box.x, style->border_box.y,
+		    style->border_box.width, style->border_box.height );
 	DEBUG_MSG( "[%s][%d/%d] content_rect: (%d,%d,%d,%d), "
 		   "canvas_rect: (%d,%d,%d,%d)\n",
 		   w->id, w->index,
@@ -379,15 +385,57 @@ static void WidgetRenderer_Delete( LCUI_WidgetRenderer renderer )
 
 static size_t WidgetRenderer_Render( LCUI_WidgetRenderer renderer );
 
+static void Widget_ComputeActualBorderBox( LCUI_Widget w,
+					   LCUI_WidgetActualStyle s )
+{
+	LCUI_RectF rect;
+	rect.x = s->x + w->box.border.x;
+	rect.y = s->y + w->box.border.y;
+	rect.width = w->box.border.width;
+	rect.height = w->box.border.height;
+	Widget_ComputeBorder( w, &s->border );
+	LCUIMetrics_ComputeRectActual( &s->border_box, &rect );
+}
+
+static void Widget_ComputeActualCanvasBox( LCUI_Widget w,
+					   LCUI_WidgetActualStyle s )
+{
+	Widget_ComputeBoxShadow( w, &s->shadow );
+	BoxShadow_GetCanvasRect( &s->shadow, &s->border_box, &s->canvas_box );
+}
+
+static void Widget_ComputeActualPaddingBox( LCUI_Widget w,
+					    LCUI_WidgetActualStyle s )
+{
+	Widget_ComputeBackground( w, &s->background );
+	s->padding_box.x = s->border_box.x + s->border.left.width;
+	s->padding_box.y = s->border_box.y + s->border.top.width;
+	s->padding_box.width = s->border_box.width - s->border.left.width;
+	s->padding_box.width -= s->border.right.width;
+	s->padding_box.height = s->border_box.height - s->border.top.width;
+	s->padding_box.height -= s->border.bottom.width;
+}
+
+static void Widget_ComputeActualContentBox( LCUI_Widget w,
+					    LCUI_WidgetActualStyle s )
+{
+	LCUI_RectF rect;
+	rect.x = s->x + w->box.content.x;
+	rect.y = s->y + w->box.content.y;
+	rect.width = w->box.content.width;
+	rect.height = w->box.content.height;
+	LCUIMetrics_ComputeRectActual( &s->content_box, &rect );
+}
+
 static size_t WidgetRenderer_RenderChildren( LCUI_WidgetRenderer that )
 {
 	size_t count = 0;
 	LCUI_Widget child;
+	LCUI_Rect paint_rect;
 	LinkedListNode *node;
-	LCUI_RectF rect;
 	LCUI_PaintContextRec paint;
 	LCUI_WidgetRenderer renderer;
-	LCUI_Rect actual_rect, paint_rect;
+	LCUI_WidgetActualStyleRec style;
 
 	/* 按照显示顺序，从底到顶，递归遍历子级部件 */
 	for( LinkedList_EachReverse( node, &that->target->children_show ) ) {
@@ -396,17 +444,17 @@ static size_t WidgetRenderer_RenderChildren( LCUI_WidgetRenderer that )
 		    child->state != LCUI_WSTATE_NORMAL ) {
 			continue;
 		}
-		rect.width = child->box.canvas.width;
-		rect.height = child->box.canvas.height;
-		rect.x = that->x + child->box.canvas.x + that->content_left;
-		rect.y = that->y + child->box.canvas.y + that->content_top;
-		/* 栅格化部件区域，即：转换为相对于根级部件的实际区域 */
-		LCUIMetrics_ComputeRectActual( &actual_rect, &rect );
+		style.x = that->x + that->content_left;
+		style.y = that->y + that->content_top;
+		Widget_ComputeActualBorderBox( child, &style );
+		Widget_ComputeActualCanvasBox( child, &style );
 		if( !LCUIRect_GetOverlayRect( &that->content_rect,
-					      &actual_rect,
+					      &style.canvas_box,
 					      &paint_rect ) ) {
 			continue;
 		}
+		Widget_ComputeActualPaddingBox( child, &style );
+		Widget_ComputeActualContentBox( child, &style );
 		if( that->has_content_graph ) {
 			paint.with_alpha = TRUE;
 		} else {
@@ -414,14 +462,14 @@ static size_t WidgetRenderer_RenderChildren( LCUI_WidgetRenderer that )
 		}
 		paint.rect = paint_rect;
 		/* 转换绘制区域坐标为相对于自身图层区域 */
-		paint.rect.x -= actual_rect.x;
-		paint.rect.y -= actual_rect.y;
+		paint.rect.x -= style.canvas_box.x;
+		paint.rect.y -= style.canvas_box.y;
 		/* 转换绘制区域坐标为相对于部件内容区域，作为子部件的绘制区域 */
 		paint_rect.x -= that->root_paint->rect.x;
 		paint_rect.y -= that->root_paint->rect.y;
 		Graph_Quote( &paint.canvas, &that->root_paint->canvas,
 			     &paint_rect );
-		renderer = WidgetRenderer( child, &paint, that );
+		renderer = WidgetRenderer( child, &paint, &style, that );
 		count += WidgetRenderer_Render( renderer );
 		WidgetRenderer_Delete( renderer );
 	}
@@ -442,7 +490,7 @@ static size_t WidgetRenderer_Render( LCUI_WidgetRenderer renderer )
 		count += 1;
 		self_paint = *that->paint;
 		self_paint.canvas = that->self_graph;
-		Widget_OnPaint( that->target, &self_paint );
+		Widget_OnPaint( that->target, &self_paint, that->style );
 #ifdef DEBUG_FRAME_RENDER
 		sprintf( filename,
 			 "frame-%lu-%s-self-paint-(%d,%d,%d,%d).png",
@@ -518,7 +566,14 @@ size_t Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 {
 	size_t count;
 	LCUI_WidgetRenderer renderer;
-	renderer = WidgetRenderer( w, paint, NULL );
+	LCUI_WidgetActualStyleRec style;
+
+	style.x = style.y = 0;
+	Widget_ComputeActualBorderBox( w, &style );
+	Widget_ComputeActualCanvasBox( w, &style );
+	Widget_ComputeActualPaddingBox( w, &style );
+	Widget_ComputeActualContentBox( w, &style );
+	renderer = WidgetRenderer( w, paint, &style, NULL );
 	count = WidgetRenderer_Render( renderer );
 	WidgetRenderer_Delete( renderer );
 	return count;

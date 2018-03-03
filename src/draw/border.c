@@ -563,15 +563,15 @@ static int Graph_DrawRoundBorderBottomRight( LCUI_Graph *dst, LCUI_Pos center,
 	return 0;
 }
 
-int Graph_DrawBorder( LCUI_PaintContext paint, 
-		      const LCUI_Rect *box,
-		      const LCUI_Border *border )
+int Border_Paint( const LCUI_Border *border,
+		  const LCUI_Rect *box,
+		  LCUI_PaintContext paint )
 {
 	LCUI_Pos pos;
 	LCUI_Graph canvas;
 	LCUI_Rect bound, rect;
 
-	if( !Graph_IsValid(&paint->canvas) ) {
+	if( !Graph_IsValid( &paint->canvas ) ) {
 		return -1;
 	}
 	/* 左上角的圆角 */
@@ -655,13 +655,13 @@ int Graph_DrawBorder( LCUI_PaintContext paint,
 		rect.y -= paint->rect.y;
 		Graph_Quote( &canvas, &paint->canvas, &rect );
 		Graph_DrawRoundBorderRightBottom( &canvas, pos,
-						 border->bottom_right_radius,
-						 border->right.width,
-						 border->right.color );
+						  border->bottom_right_radius,
+						  border->right.width,
+						  border->right.color );
 		Graph_DrawRoundBorderBottomRight( &canvas, pos,
-						 border->bottom_right_radius,
-						 border->bottom.width,
-						 border->bottom.color );
+						  border->bottom_right_radius,
+						  border->bottom.width,
+						  border->bottom.color );
 	}
 	/* 绘制上边框线 */
 	bound.x = box->x + border->top_left_radius;

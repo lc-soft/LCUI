@@ -159,8 +159,7 @@ float Widget_GetGraphHeight( LCUI_Widget widget )
 	return height + SHADOW_WIDTH( shadow ) * 2;
 }
 
-/** 计算部件阴影样式的实际值 */
-static void Widget_ComputeBoxShadow( LCUI_Widget w, LCUI_BoxShadow *out )
+void Widget_ComputeBoxShadow( LCUI_Widget w, LCUI_BoxShadow *out )
 {
 	LCUI_BoxShadowStyle *s;
 	s = &w->computed_style.shadow;
@@ -171,13 +170,12 @@ static void Widget_ComputeBoxShadow( LCUI_Widget w, LCUI_BoxShadow *out )
 	out->color = s->color;
 }
 
-void Widget_PaintBoxShadow( LCUI_Widget w, LCUI_PaintContext paint )
+void Widget_PaintBoxShadow( LCUI_Widget w, LCUI_PaintContext paint,
+			    LCUI_WidgetActualStyle style )
 {
 	LCUI_Rect box;
-	LCUI_BoxShadow shadow;
 	box.x = box.y = 0;
-	Widget_ComputeBoxShadow( w, &shadow );
-	box.width = LCUIMetrics_ComputeActual( w->box.canvas.width, SVT_PX );
-	box.height = LCUIMetrics_ComputeActual( w->box.canvas.height, SVT_PX );
-	Graph_DrawBoxShadow( paint, &box, &shadow );	
+	box.width = style->canvas_box.width;
+	box.height = style->canvas_box.height;
+	BoxShadow_Paint( &style->shadow, &box, paint );
 }

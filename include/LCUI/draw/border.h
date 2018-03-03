@@ -39,9 +39,9 @@ LCUI_BEGIN_HEADER
  * @param[in] box 需要绘制边框的矩形框
  * @param[in] border 边框参数
  */
-LCUI_API int Graph_DrawBorder( LCUI_PaintContext paint, 
-			       const LCUI_Rect *box,
-			       const LCUI_Border *border );
+LCUI_API int Border_Paint( const LCUI_Border *border,
+			   const LCUI_Rect *box,
+			   LCUI_PaintContext paint );
 
 LCUI_END_HEADER
 

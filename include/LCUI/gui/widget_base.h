@@ -58,6 +58,17 @@ typedef struct LCUI_WidgetStyle {
 	int pointer_events;			/**< 事件的处理方式 */
 } LCUI_WidgetStyle;
 
+typedef struct LCUI_WidgetActualStyleRec_ {
+	float x, y;
+	LCUI_Rect canvas_box;
+	LCUI_Rect border_box;
+	LCUI_Rect padding_box;
+	LCUI_Rect content_box;
+	LCUI_Border border;
+	LCUI_BoxShadow shadow;
+	LCUI_Background background;
+} LCUI_WidgetActualStyleRec, *LCUI_WidgetActualStyle;
+
 /** 部件任务类型，按照任务的依赖顺序排列 */
 typedef enum LCUI_WidgetTaskType {
 	LCUI_WTASK_REFRESH_STYLE,	/**< 刷新部件全部样式 */
@@ -116,7 +127,8 @@ typedef void( *LCUI_WidgetFunction )(LCUI_Widget);
 typedef void( *LCUI_WidgetResizer )(LCUI_Widget, float*, float*);
 typedef void( *LCUI_WidgetAttrSetter )(LCUI_Widget, const char*, const char*);
 typedef void( *LCUI_WidgetTextSetter )(LCUI_Widget, const char*);
-typedef void( *LCUI_WidgetPainter )(LCUI_Widget, LCUI_PaintContext);
+typedef void( *LCUI_WidgetPainter )(LCUI_Widget, LCUI_PaintContext,
+				     LCUI_WidgetActualStyle);
 
 /** 部件原型数据结构 */
 typedef struct LCUI_WidgetPrototypeRec_ {
@@ -285,13 +297,21 @@ LCUI_API void Widget_DestroyBackground( LCUI_Widget w );
 LCUI_API void Widget_UpdateBackground( LCUI_Widget widget );
 
 /** 绘制部件背景 */
-LCUI_API void Widget_PaintBakcground( LCUI_Widget w, LCUI_PaintContext paint );
+LCUI_API void Widget_PaintBakcground( LCUI_Widget w, LCUI_PaintContext paint,
+				      LCUI_WidgetActualStyle style );
+
+/** 计算部件背景样式的实际值 */
+LCUI_API void Widget_ComputeBackground( LCUI_Widget w, LCUI_Background *out );
 
 /** 更新部件边框样式 */
 LCUI_API void Widget_UpdateBorder( LCUI_Widget w );
 
+/** 计算部件边框样式的实际值 */
+LCUI_API void Widget_ComputeBorder( LCUI_Widget w, LCUI_Border *out );
+
 /** 绘制部件边框 */
-LCUI_API void Widget_PaintBorder( LCUI_Widget w, LCUI_PaintContext paint );
+LCUI_API void Widget_PaintBorder( LCUI_Widget w, LCUI_PaintContext paint,
+				  LCUI_WidgetActualStyle style );
 
 LCUI_API float Widget_GetGraphWidth( LCUI_Widget widget );
 
@@ -312,8 +332,12 @@ LCUI_API float Widget_GetGraphWidth( LCUI_Widget w );
 /** 更新部件矩形阴影样式 */
 LCUI_API void Widget_UpdateBoxShadow( LCUI_Widget w );
 
+/** 计算部件阴影样式的实际值 */
+LCUI_API void Widget_ComputeBoxShadow( LCUI_Widget w, LCUI_BoxShadow *out );
+
 /** 绘制部件阴影 */
-LCUI_API void Widget_PaintBoxShadow( LCUI_Widget w, LCUI_PaintContext paint );
+LCUI_API void Widget_PaintBoxShadow( LCUI_Widget w, LCUI_PaintContext paint,
+				     LCUI_WidgetActualStyle style );
 
 /** 更新可见性 */
 LCUI_API void Widget_UpdateVisibility( LCUI_Widget w );
