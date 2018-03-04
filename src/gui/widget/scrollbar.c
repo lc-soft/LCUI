@@ -525,8 +525,10 @@ void ScrollBar_BindBox( LCUI_Widget w, LCUI_Widget box )
 	}
 	scrollbar->box = box;
 	if( box ) {
-		Widget_BindEvent( box, "resize", ScrollBar_OnUpdateSize, w, NULL );
-		Widget_BindEvent( box, "setscroll", ScrollBar_OnSetPosition, w, NULL );
+		Widget_BindEvent( box, "resize",
+				  ScrollBar_OnUpdateSize, w, NULL );
+		Widget_BindEvent( box, "setscroll",
+				  ScrollBar_OnSetPosition, w, NULL );
 	}
 	ScrollBar_UpdateSize( w );
 }
