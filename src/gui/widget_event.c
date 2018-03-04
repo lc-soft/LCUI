@@ -915,17 +915,21 @@ static int DispatchTouchEvent( LinkedList *capturers,
 			       LCUI_TouchPoint points, int n_points )
 {
 	int i, count;
+	float scale;
 	LCUI_WidgetEventRec ev = { 0 };
 	LCUI_Widget target, root, w;
 	LinkedListNode *node, *ptnode;
 
+	root = LCUIWidget_GetRoot();
+	scale = LCUIMetrics_GetScale();
 	ev.type = LCUI_WEVENT_TOUCH;
 	ev.cancel_bubble = FALSE;
-	root = LCUIWidget_GetRoot();
 	ev.touch.points = NEW( LCUI_TouchPointRec, n_points );
 	/* 先将各个触点按命中的部件进行分组 */
 	for( i = 0; i < n_points; ++i ) {
-		target = Widget_At( root, points[i].x, points[i].y );
+		target = Widget_At( root,
+				    iround( points[i].x / scale ),
+				    iround( points[i].y / scale ) );
 		if( !target ) {
 			continue;
 		}
