@@ -131,7 +131,7 @@ float Widget_GetBoxShadowOffsetY( LCUI_Widget w )
 	return SHADOW_WIDTH( shadow ) - shadow->y;
 }
 
-float Widget_GetGraphWidth( LCUI_Widget widget )
+float Widget_GetCanvasWidth( LCUI_Widget widget )
 {
 	float width;
 	const LCUI_BoxShadowStyle *shadow;
@@ -145,7 +145,7 @@ float Widget_GetGraphWidth( LCUI_Widget widget )
 	return width + SHADOW_WIDTH( shadow ) * 2;
 }
 
-float Widget_GetGraphHeight( LCUI_Widget widget )
+float Widget_GetCanvasHeight( LCUI_Widget widget )
 {
 	float height;
 	const LCUI_BoxShadowStyle *shadow;

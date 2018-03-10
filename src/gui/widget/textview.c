@@ -146,7 +146,8 @@ static void TextView_SetTaskForLineHeight( LCUI_Widget w, int height )
 	txt->tasks[TASK_UPDATE].is_valid = TRUE;
 }
 
-static void TextView_SetTaskForTextStyle( LCUI_Widget w, LCUI_TextStyle style )
+static void TextView_SetTaskForTextStyle( LCUI_Widget w,
+					  LCUI_TextStyle style )
 {
 	LCUI_TextView txt = GetData( w );
 	TextStyle_Copy( &txt->tasks[TASK_SET_TEXT_STYLE].style, style );
@@ -196,19 +197,16 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 	TextStyle_Destroy( &ts );
 }
 
-static void TextView_UpdateSize( LCUI_Widget w )
+static void TextView_UpdateLayerSize( LCUI_Widget w )
 {
-	LCUI_RectF rect;
 	LCUI_TextView txt;
-	LinkedList rects;
-	LinkedListNode *node;
 	int width = 0, height = 0;
 	float scale, max_width = 0, max_height = 0;
 
 	txt = GetData( w );
-	LinkedList_Init( &rects );
 	scale = LCUIMetrics_GetScale();
-	if( Widget_HasFitContentWidth( w ) ) {
+	if( Widget_HasFitContentWidth( w ) ||
+	    Widget_HasParentDependentWidth( w ) ) {
 		max_width = Widget_ComputeMaxContentWidth( w );
 	} else {
 		max_width = w->box.content.width;
@@ -223,6 +221,20 @@ static void TextView_UpdateSize( LCUI_Widget w )
 	width = LCUIMetrics_ComputeActual( max_width, SVT_PX );
 	height = LCUIMetrics_ComputeActual( max_height, SVT_PX );
 	TextLayer_SetMaxSize( txt->layer, width, height );
+}
+
+static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
+{
+	float scale;
+	LCUI_RectF rect;
+	LCUI_TextView txt;
+	LinkedList rects;
+	LinkedListNode *node;
+
+	txt = GetData( w );
+	LinkedList_Init( &rects );
+	scale = LCUIMetrics_GetScale();
+	TextView_UpdateLayerSize( w );
 	TextLayer_Update( txt->layer, &rects );
 	for( LinkedList_Each( node, &rects ) ) {
 		LCUIRect_ToRectF( node->data, &rect, 1.0f / scale );
@@ -230,11 +242,6 @@ static void TextView_UpdateSize( LCUI_Widget w )
 	}
 	RectList_Clear( &rects );
 	TextLayer_ClearInvalidRect( txt->layer );
-}
-
-static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
-{
-	TextView_UpdateSize( w );
 }
 
 /** 初始化 TextView 部件数据 */
@@ -287,14 +294,22 @@ static void TextView_OnDestroy( LCUI_Widget w )
 
 static void TextView_AutoSize( LCUI_Widget w, float *width, float *height )
 {
+	float max_width;
+	int fixed_w, fixed_h;
 	LCUI_TextView txt = GetData( w );
 	float scale = LCUIMetrics_GetScale();
+
+	TextView_UpdateLayerSize( w );
+	fixed_w = txt->layer->fixed_width;
+	fixed_h = txt->layer->fixed_height;
 	if( Widget_HasFitContentWidth( w ) ||
 	    !Widget_HasStaticWidthParent( w ) ) {
-		int fixed_w = txt->layer->fixed_width;
-		int fixed_h = txt->layer->fixed_height;
 		/* 解除固定宽高设置，以计算最大宽高 */
 		TextLayer_SetFixedSize( txt->layer, (int)(*width * scale), 0 );
+		if( Widget_HasParentDependentWidth( w ) ) {
+			max_width = scale * Widget_ComputeMaxContentWidth( w );
+			TextLayer_SetMaxSize( txt->layer, (int)max_width, 0 );
+		}
 		TextLayer_Update( txt->layer, NULL );
 		if( *width <= 0 ) {
 			*width = TextLayer_GetWidth( txt->layer ) / scale;
@@ -379,8 +394,12 @@ static void TextView_OnTask( LCUI_Widget w )
 	}
 	i = TASK_UPDATE_SIZE;
 	if( txt->tasks[i].is_valid ) {
-		TextView_UpdateSize( w );
+		TextView_UpdateLayerSize( w );
+		if( Widget_HasFitContentWidth( w ) ) {
+			Widget_AddTask( w, LCUI_WTASK_RESIZE );
+		}
 		txt->tasks[i].is_valid = FALSE;
+		txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	}
 	i = TASK_UPDATE;
 	if( !txt->tasks[i].is_valid ) {
@@ -396,9 +415,10 @@ static void TextView_OnTask( LCUI_Widget w )
 	}
 	RectList_Clear( &rects );
 	TextLayer_ClearInvalidRect( txt->layer );
-	if( w->style->sheet[key_width].type == SVT_AUTO
-	 || w->style->sheet[key_height].type == SVT_AUTO ) {
-		Widget_AddTask( w, LCUI_WTASK_RESIZE );
+	if( Widget_HasParentDependentWidth( w ) ||
+	    Widget_HasAutoStyle( w, key_width ) ||
+	    Widget_HasAutoStyle( w, key_height ) ) {
+		Widget_AddTask( w->parent, LCUI_WTASK_RESIZE );
 	}
 }
 

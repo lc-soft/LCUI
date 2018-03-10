@@ -116,27 +116,27 @@ void Widget_AddTask( LCUI_Widget widget, int task )
 	}
 }
 
-/** 映射任务处理器 */
 static void MapTaskHandler(void)
 {
-	self.handlers[LCUI_WTASK_VISIBLE] = Widget_UpdateVisibility;
-	self.handlers[LCUI_WTASK_POSITION] = Widget_UpdatePosition;
-	self.handlers[LCUI_WTASK_RESIZE] = Widget_UpdateSize;
-	self.handlers[LCUI_WTASK_RESIZE_WITH_SURFACE] = Widget_UpdateSizeWithSurface;
-	self.handlers[LCUI_WTASK_SHADOW] = Widget_UpdateBoxShadow;
-	self.handlers[LCUI_WTASK_BORDER] = Widget_UpdateBorder;
-	self.handlers[LCUI_WTASK_OPACITY] = Widget_UpdateOpacity;
-	self.handlers[LCUI_WTASK_MARGIN] = Widget_UpdateMargin;
-	self.handlers[LCUI_WTASK_BODY] = HandleBody;
-	self.handlers[LCUI_WTASK_TITLE] = HandleSetTitle;
-	self.handlers[LCUI_WTASK_REFRESH] = HandleRefresh;
-	self.handlers[LCUI_WTASK_UPDATE_STYLE] = HandleUpdateStyle;
-	self.handlers[LCUI_WTASK_REFRESH_STYLE] = HandleRefreshStyle;
-	self.handlers[LCUI_WTASK_BACKGROUND] = Widget_UpdateBackground;
-	self.handlers[LCUI_WTASK_LAYOUT] = Widget_ExecUpdateLayout;
-	self.handlers[LCUI_WTASK_ZINDEX] = Widget_ExecUpdateZIndex;
-	self.handlers[LCUI_WTASK_DISPLAY] = Widget_UpdateDisplay;
-	self.handlers[LCUI_WTASK_PROPS] = Widget_UpdateProps;
+#define SetHandler(NAME, HANDLER) self.handlers[LCUI_WTASK_##NAME] = HANDLER
+	SetHandler( VISIBLE, Widget_UpdateVisibility );
+	SetHandler( POSITION, Widget_UpdatePosition );
+	SetHandler( RESIZE, Widget_UpdateSize );
+	SetHandler( RESIZE_WITH_SURFACE, Widget_UpdateSizeWithSurface );
+	SetHandler( SHADOW, Widget_UpdateBoxShadow );
+	SetHandler( BORDER, Widget_UpdateBorder );
+	SetHandler( OPACITY, Widget_UpdateOpacity );
+	SetHandler( MARGIN, Widget_UpdateMargin );
+	SetHandler( BODY, HandleBody );
+	SetHandler( TITLE, HandleSetTitle );
+	SetHandler( REFRESH, HandleRefresh );
+	SetHandler( UPDATE_STYLE, HandleUpdateStyle );
+	SetHandler( REFRESH_STYLE, HandleRefreshStyle );
+	SetHandler( BACKGROUND, Widget_UpdateBackground );
+	SetHandler( LAYOUT, Widget_ExecUpdateLayout );
+	SetHandler( ZINDEX, Widget_ExecUpdateZIndex );
+	SetHandler( DISPLAY, Widget_UpdateDisplay );
+	SetHandler( PROPS, Widget_UpdateProps );
 }
 
 static void LCUIWidget_ClearTrash( void )

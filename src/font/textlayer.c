@@ -913,6 +913,9 @@ int TextLayer_GetWidth( LCUI_TextLayer layer )
 	int i, row, w, max_w;
 	TextRow txtrow;
 
+	DEBUG_MSG( "rows: %d, font-size: %d\n",
+		   layer->text_rows.length,
+		   layer->text_style.pixel_size );
 	for( row = 0, max_w = 0; row < layer->text_rows.length; ++row ) {
 		txtrow = layer->text_rows.rows[row];
 		for( i = 0, w = 0; i < txtrow->length; ++i ) {
@@ -921,6 +924,12 @@ int TextLayer_GetWidth( LCUI_TextLayer layer )
 				continue;
 			}
 			w += txtrow->string[i]->bitmap->advance.x;
+			DEBUG_MSG("[%d/%d] %d %c, width: %d/%d\n", 
+				    i, txtrow->length,
+				    txtrow->string[i]->char_code,
+				    txtrow->string[i]->char_code,
+				    txtrow->string[i]->bitmap->advance.x,
+				    w);
 		}
 		if( w > max_w ) {
 			max_w = w;
@@ -1247,7 +1256,7 @@ static void TextLayer_ValidateArea( LCUI_TextLayer layer, LCUI_Rect *area )
 		width = layer->width;
 	}
 	if( layer->fixed_height > 0 ) {
-		height = layer->fixed_width;
+		height = layer->fixed_height;
 	} else {
 		height = TextLayer_GetHeight( layer );
 	}

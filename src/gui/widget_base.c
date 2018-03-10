@@ -776,7 +776,7 @@ void Widget_ExecUpdateZIndex( LCUI_Widget w )
 }
 
 /** 清除已计算的尺寸 */
-static void Widget_ClearComputedSize( LCUI_Widget w )
+void Widget_ClearComputedSize( LCUI_Widget w )
 {
 	if( Widget_HasAutoStyle( w, key_width ) ) {
 		w->width = 0;
@@ -927,76 +927,86 @@ void Widget_UpdatePosition( LCUI_Widget w )
 	Widget_PostSurfaceEvent( w, LCUI_WEVENT_MOVE, TRUE );
 }
 
-/** 更新位图尺寸 */
-static void Widget_UpdateGraphBox( LCUI_Widget w )
+static void Widget_UpdateCanvasBox( LCUI_Widget w )
 {
 	LCUI_RectF *rg = &w->box.canvas;
 	rg->x = w->x - Widget_GetBoxShadowOffsetX( w );
 	rg->y = w->y - Widget_GetBoxShadowOffsetY( w );
-	rg->width = Widget_GetGraphWidth( w );
-	rg->height = Widget_GetGraphHeight( w );
+	rg->width = Widget_GetCanvasWidth( w );
+	rg->height = Widget_GetCanvasHeight( w );
 }
 
-/** 计算合适的内容框大小 */
-static void Widget_ComputeContentSize( LCUI_Widget w,
-				       float *out_width, float *out_height )
+static LCUI_BOOL Widget_ComputeStaticSize( LCUI_Widget w,
+					   float *width, float *height )
+{
+	LCUI_WidgetBoxModelRec *box = &w->box;
+	LCUI_WidgetStyle *style = &w->computed_style;
+
+	/* If it is non-static layout */
+	if( style->display == SV_NONE || style->position == SV_ABSOLUTE ) {
+		return FALSE;
+	}
+	if( Widget_HasParentDependentWidth( w ) ) {
+		/* Compute the full size of child widget */
+		Widget_AutoSize( w );
+		/* Recompute the actual size of child widget later */
+		Widget_AddTask( w, LCUI_WTASK_RESIZE );
+	}
+	/* If its width is a percentage, it ignores the effect of its outer
+	 * and inner spacing on the static width. */
+	if( Widget_CheckStyleType( w, key_width, scale ) ) {
+		if( style->box_sizing == SV_BORDER_BOX ) {
+			*width = box->border.x + box->border.width;
+		} else {
+			*width = box->content.x + box->content.width;
+			*width -= box->content.x - box->border.x;
+		}
+		*width -= box->outer.x - box->border.x;
+	} else if( box->outer.width <= 0 ) {
+		return FALSE;
+	} else {
+		*width = box->outer.x + box->outer.width;
+	}
+	if( Widget_CheckStyleType( w, key_height, scale ) ) {
+		if( style->box_sizing == SV_BORDER_BOX ) {
+			*height = box->border.y + box->border.height;
+		} else {
+			*height = box->content.y + box->content.height;
+			*height -= box->content.y - box->border.y;
+		}
+		*height -= box->outer.y - box->border.y;
+	} else if( box->outer.height <= 0 ) {
+		return FALSE;
+	} else {
+		*height = box->outer.y + box->outer.height;
+	}
+	return TRUE;
+}
+
+static void Widget_ComputeStaticContentSize( LCUI_Widget w,
+					     float *out_width,
+					     float *out_height )
 {
 	LinkedListNode *node;
-	float width = 0, height = 0, value;
+	float content_width = 0, content_height = 0, width, height;
 
 	for( LinkedList_Each( node, &w->children_show ) ) {
-		LCUI_Widget child = node->data;
-		LCUI_WidgetBoxModelRec *box = &child->box;
-		LCUI_WidgetStyle *style = &child->computed_style;
-		/* 忽略不可见、绝对定位的部件 */
-		if( style->display == SV_NONE || 
-		    style->position == SV_ABSOLUTE ) {
+		if( !Widget_ComputeStaticSize( node->data,
+					       &width, &height ) ) {
 			continue;
 		}
-		/* 对于宽度以百分比做单位的，计算尺寸时自动去除外间距框、
-		 * 内间距框和边框占用的空间
-		 */
-		if( Widget_CheckStyleType( child, key_width, scale ) ) {
-			if( style->box_sizing == SV_BORDER_BOX ) {
-				value = box->border.x + box->border.width;
-			} else {
-				value = box->content.x + box->content.width;
-				value -= box->content.x - box->border.x;
-			}
-			value -= box->outer.x - box->border.x;
-		} else if( box->outer.width <= 0 ) {
-			continue;
-		} else {
-			value = box->outer.x + box->outer.width;
-		}
-		if( value > width ) {
-			width = value;
-		}
-		if( Widget_CheckStyleType( child, key_height, scale ) ) {
-			if( style->box_sizing == SV_BORDER_BOX ) {
-				value = box->border.y + box->border.height;
-			} else {
-				value = box->content.y + box->content.height;
-				value -= box->content.y - box->border.y;
-			}
-			value -= box->outer.y - box->border.y;
-		} else if( box->outer.height <= 0 ) {
-			continue;
-		} else {
-			value = box->outer.y + box->outer.height;
-		}
-		if( value > height ) {
-			height = value;
-		}
+		content_width = max( content_width, width );
+		content_height = max( content_height, height );
 	}
-	/* 计算出来的尺寸是包含 padding-left 和 padding-top 的，因此需要减去它们 */
-	width -= w->padding.left;
-	height -= w->padding.top;
+	/* The child widget's coordinates are relative to the padding box,
+	 * not the content_box, so it needs to be converted */
+	content_width -= w->padding.left;
+	content_height -= w->padding.top;
 	if( out_width && *out_width <= 0 ) {
-		*out_width = width;
+		*out_width = content_width;
 	}
 	if( out_height && *out_height <= 0 ) {
-		*out_height = height;
+		*out_height = content_height;
 	}
 }
 
@@ -1052,22 +1062,6 @@ static float Widget_GetAdjustedWidth( LCUI_Widget w, float width )
 	if( !Widget_HasAutoStyle( w, key_margin_right ) ) {
 		width -= w->margin.right;
 	}
-	/* 如果不是按内容框调整尺寸的，则不根据内间距调整宽度 */
-	if( w->computed_style.box_sizing != SV_CONTENT_BOX ) {
-		return width;
-	}
-	if( !Widget_HasAutoStyle( w, key_padding_left ) ) {
-		width -= w->padding.left;
-	}
-	if( !Widget_HasAutoStyle( w, key_padding_right ) ) {
-		width -= w->padding.right;
-	}
-	if( !Widget_HasAutoStyle( w, key_border_left_width ) ) {
-		width -= w->computed_style.border.left.width;
-	}
-	if( !Widget_HasAutoStyle( w, key_border_right_width ) ) {
-		width -= w->computed_style.border.right.width;
-	}
 	return width;
 }
 
@@ -1078,7 +1072,7 @@ float Widget_ComputeFillAvailableWidth( LCUI_Widget w )
 	return Widget_GetAdjustedWidth( w, width );
 }
 
-static void Widget_ComputeLimitSize( LCUI_Widget w )
+void Widget_ComputeLimitSize( LCUI_Widget w )
 {
 	LCUI_WidgetStyle *style;
 	style = &w->computed_style;
@@ -1100,27 +1094,27 @@ static void Widget_ComputeLimitSize( LCUI_Widget w )
 	}
 }
 
-static float GetLimitedWidth( LCUI_Widget w, float width )
+float Widget_GetLimitedWidth( LCUI_Widget w, float width )
 {
 	LCUI_WidgetStyle *style;
 	style = &w->computed_style;
 	if( style->max_width > -1 && width > style->max_width ) {
 		width = style->max_width;
 	}
-	if( width < style->min_width ) {
+	if( style->min_width > -1 && width < style->min_width ) {
 		width = style->min_width;
 	}
 	return width;
 }
 
-static float GetLimitedHeight( LCUI_Widget w, float height )
+float Widget_GetLimitedHeight( LCUI_Widget w, float height )
 {
 	LCUI_WidgetStyle *style;
 	style = &w->computed_style;
 	if( style->max_height > -1 && height > style->max_height ) {
 		height = style->max_height;
 	}
-	if( height < style->min_height ) {
+	if( style->min_height > -1 && height < style->min_height ) {
 		height = style->min_height;
 	}
 	return height;
@@ -1133,8 +1127,8 @@ static void Widget_SetSize( LCUI_Widget w, float width, float height )
 
 	w->width = width;
 	w->height = height;
-	w->width = GetLimitedWidth( w, width );
-	w->height = GetLimitedHeight( w, height );
+	w->width = Widget_GetLimitedWidth( w, width );
+	w->height = Widget_GetLimitedHeight( w, height );
 	w->box.border.width = w->width;
 	w->box.border.height = w->height;
 	w->box.content.width = w->width;
@@ -1168,112 +1162,109 @@ static void Widget_SetSize( LCUI_Widget w, float width, float height )
 	w->box.outer.height = w->box.border.height;
 	w->box.outer.width += w->margin.left + w->margin.right;
 	w->box.outer.height += w->margin.top + w->margin.bottom;
+	Widget_UpdateCanvasBox( w );
 }
 
-/**
- * 计算合适的宽度
- * @param height[in][out]
- *	内容区域高度。当部件有自定义的尺寸计算函数时，会同时计算出内容高度和宽度，
- *	为避免重复调用该函数，height 参数同时也是输出参数。
- * @return
- *	计算后的内容宽度
- */
-static float Widget_ComputeAutoWidth( LCUI_Widget w, float *height )
+void Widget_ComputeContentSize( LCUI_Widget w, float *width, float *height )
 {
-	float width = 0, max_width = -1, content_width = 0;
+	float limited_width;
+	float static_width = 0, static_height = 0;
+	float content_width = width ? *width : 0;
+	float content_height = height ? *height : 0;
 
-	if( Widget_HasFillAvailableWidth( w ) ) {
-		width = Widget_ComputeFillAvailableWidth( w );
-		if( Widget_HasStaticWidthParent( w ) ) {
-			goto finish;
-		}
-		max_width = width;
-		width = 0;
-	}
+	Widget_ComputeLimitSize( w );
+	Widget_ComputeStaticContentSize( w, &static_width, &static_height );
 	if( w->proto && w->proto->autosize ) {
-		if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
-			*height = ToContentBoxHeight( w, *height );
-		}
-		w->proto->autosize( w, &width, height );
+		w->proto->autosize( w, &content_width, &content_height );
 	}
-	Widget_ComputeContentSize( w, &content_width, NULL );
-	width = max( width, content_width );
-	/* 转换为边框盒宽度 */
+	if( width && *width > 0 ) {
+		goto done;
+	}
+	content_width = max( content_width, static_width );
 	if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
-		width = ToBorderBoxWidth( w, width );
-		if( max_width != -1 ) {
-			max_width = ToBorderBoxWidth( w, max_width );
+		content_width = ToBorderBoxWidth( w, content_width );
+	}
+	limited_width = Widget_GetLimitedWidth( w, content_width );
+	if( limited_width != content_width ) {
+		content_height = 0;
+		content_width = limited_width;
+		if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
+			content_width = ToContentBoxWidth( w, content_width );
 		}
 		if( w->proto && w->proto->autosize ) {
-			*height = ToBorderBoxHeight( w, *height );
+			w->proto->autosize( w, &content_width,
+					    &content_height );
+		}
+	} else {
+		if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
+			content_width = ToContentBoxWidth( w, content_width );
 		}
 	}
-	/* 如果该部件和父部件的宽度都是自适应 */
-	if( !Widget_HasStaticWidthParent( w->parent ) &&
-	    width > 0 && !Widget_HasAbsolutePosition( w ) ) {
-		/* 如果超出父部件的内容框宽度则让父部件重新布局 */
-		if( width > w->parent->box.content.width ) {
-			Widget_AddTask( w->parent, LCUI_WTASK_LAYOUT );
-		} else if( Widget_HasFillAvailableWidth( w ) ) {
-			width = w->parent->box.content.width;
-		}
-	}
-	width = Widget_GetAdjustedWidth( w, width );
 
-finish:
-	if( max_width != -1 && width > max_width ) {
-		width = max_width;
+done:
+	content_height = max( content_height, static_height );
+	if( width && *width <= 0 ) {
+		*width = content_width;
 	}
-	return width;
+	if( height && *height <= 0 ) {
+		*height = content_height;
+	}
 }
 
-/**
- * 计算合适的高度
- * @param width[in][out]
- *	内容区域宽度。当部件有自定义的尺寸计算函数时，会同时计算出内容高度和宽度，
- *	为避免重复调用该函数，width 参数同时也是输出参数。
- * @return
- *	计算后的内容高度
- */
-static float Widget_ComputeAutoHeight( LCUI_Widget w, float *width )
+void Widget_AutoSize( LCUI_Widget w )
 {
-	float height = 0, content_height = 0;
-
-	if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
-		*width = ToContentBoxWidth( w, *width );
-	}
-	if( w->proto && w->proto->autosize ) {
-		w->proto->autosize( w, width, &height );
-	}
-	Widget_ComputeContentSize( w, NULL, &content_height );
-	height = max( height, content_height );
-	if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
-		height = ToBorderBoxHeight( w, height );
-		*width = ToBorderBoxWidth( w, *width );
-	}
-	return height;
+	float width = 0, height = 0;
+	Widget_ComputeContentSize( w, &width, &height );
+	width = Widget_GetAdjustedWidth( w, width );
+	Widget_SetSize( w, ToBorderBoxWidth( w, width ),
+			ToBorderBoxHeight( w, height ) );
 }
 
-/** 计算尺寸 */
 static void Widget_ComputeSize( LCUI_Widget w )
 {
-	float width, height;
+	float width, height, max_width = -1;
 
 	Widget_ComputeLimitSize( w );
 	width = ComputeXMetric( w, key_width );
 	height = ComputeYMetric( w, key_height );
-	/* 当宽度可被直接计算出来时，转换成内容宽度，作为计算自动尺寸时的初始宽度 */
 	if( width > 0 ) {
-		width = GetLimitedWidth( w, width );
+		width = Widget_GetLimitedWidth( w, width );
 	}
 	if( height > 0 ) {
-		height = GetLimitedHeight( w, height );
+		height = Widget_GetLimitedHeight( w, height );
 	}
-	if( width <= 0 && Widget_HasAutoStyle( w, key_width ) ) {
-		width = Widget_ComputeAutoWidth( w, &height );
+	if( !Widget_HasAutoStyle( w, key_width ) &&
+	    !Widget_HasAutoStyle( w, key_height ) ) {
+		if( w->computed_style.box_sizing == SV_CONTENT_BOX ) {
+			width = ToBorderBoxWidth( w, width );
+			height = ToBorderBoxHeight( w, height );
+		}
+		Widget_SetSize( w, width, height );
+		return;
 	}
-	if( height <= 0 && Widget_HasAutoStyle( w, key_height ) ) {
-		height = Widget_ComputeAutoHeight( w, &width );
+	if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
+		width = ToContentBoxWidth( w, width );
+		height = ToContentBoxHeight( w, height );
+	}
+	if( Widget_HasAutoStyle( w, key_width ) ) {
+		if( Widget_HasFillAvailableWidth( w ) ) {
+			width = Widget_ComputeFillAvailableWidth( w );
+			width = ToContentBoxWidth( w, width );
+			if( !Widget_HasStaticWidthParent( w ) ) {
+				max_width = width;
+				width = 0;
+			}
+		}
+		Widget_ComputeContentSize( w, &width, &height );
+	} else {
+		Widget_ComputeContentSize( w, &width, &height );
+	}
+	if( max_width != -1 && width > max_width ) {
+		width = max_width;
+	}
+	if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
+		width = ToBorderBoxWidth( w, width );
+		height = ToBorderBoxHeight( w, height );
 	}
 	Widget_SetSize( w, width, height );
 }
@@ -1385,7 +1376,6 @@ void Widget_UpdateSize( LCUI_Widget w )
 	box_sizing = ComputeStyleOption( w, key_box_sizing, SV_CONTENT_BOX );
 	w->computed_style.box_sizing = box_sizing;
 	Widget_ComputeSize( w );
-	Widget_UpdateGraphBox( w );
 	/* 如果左右外间距是 auto 类型的，则需要计算外间距 */
 	if( w->style->sheet[key_margin_left].is_valid &&
 	    w->style->sheet[key_margin_left].type == SVT_AUTO ) {
@@ -1401,6 +1391,7 @@ void Widget_UpdateSize( LCUI_Widget w )
 	    padding.right == w->padding.right &&
 	    padding.bottom == w->padding.bottom &&
 	    padding.left == w->padding.left ) {
+		DEBUG_MSG( "[%d] %s, size not change\n", w->index, w->id );
 		return;
 	}
 	/* 若在变化前后的宽高中至少有一个为 0，则不继续处理 */
@@ -1420,17 +1411,23 @@ void Widget_UpdateSize( LCUI_Widget w )
 		}
 	}
 	if( w->parent ) {
+		/* Mark old area and new area need to repaint */
 		Widget_InvalidateArea( w->parent, &rect, SV_PADDING_BOX );
 		rect.width = w->box.canvas.width;
 		rect.height = w->box.canvas.height;
 		Widget_InvalidateArea( w->parent, &rect, SV_PADDING_BOX );
-		if( Widget_HasAutoStyle( w->parent, key_width ) ||
-		    Widget_HasAutoStyle( w->parent, key_height ) ) {
-			Widget_AddTask( w->parent, LCUI_WTASK_RESIZE );
-		}
-		if( w->computed_style.display != SV_NONE &&
-		    w->computed_style.position == SV_STATIC ) {
-			Widget_UpdateLayout( w->parent );
+		/* If its width depends on the parent, there is no need to 
+		 * repeatedly update the parent size and layout.
+		 * See Widget_ComputeStaticSize() for more details. */
+		if( !Widget_HasParentDependentWidth( w ) ) {
+			if( Widget_HasAutoStyle( w->parent, key_width ) ||
+			    Widget_HasAutoStyle( w->parent, key_height ) ) {
+				Widget_AddTask( w->parent, LCUI_WTASK_RESIZE );
+			}
+			if( w->computed_style.display != SV_NONE &&
+			    w->computed_style.position == SV_STATIC ) {
+				Widget_UpdateLayout( w->parent );
+			}
 		}
 	}
 	Widget_SendResizeEvent( w );
@@ -1597,7 +1594,7 @@ float Widget_ComputeMaxAvaliableWidth( LCUI_Widget widget )
 	float width = 0, padding = 0;
 	for( w = widget->parent; w; w = w->parent ) {
 		if( !Widget_HasAutoStyle( w, key_width ) ||
-		    w->computed_style.max_width >= 0) {
+		    w->computed_style.max_width >= 0 ) {
 			width = w->box.content.width;
 			break;
 		}
@@ -1616,7 +1613,8 @@ float Widget_ComputeMaxAvaliableWidth( LCUI_Widget widget )
 float Widget_ComputeMaxWidth( LCUI_Widget widget )
 {
 	float width;
-	if( !Widget_HasAutoStyle( widget, key_width ) ) {
+	if( !Widget_HasAutoStyle( widget, key_width ) &&
+	    !Widget_HasParentDependentWidth( widget ) ) {
 		return widget->box.border.width;
 	}
 	width = Widget_ComputeMaxAvaliableWidth( widget );
@@ -1633,8 +1631,7 @@ float Widget_ComputeMaxContentWidth( LCUI_Widget w )
 {
 	float width = Widget_ComputeMaxWidth( w );
 	width = Widget_GetAdjustedWidth( w, width );
-	width = ToContentBoxWidth( w, width );
-	return width;
+	return ToContentBoxWidth( w, width );
 }
 
 static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth, const char *prefix )

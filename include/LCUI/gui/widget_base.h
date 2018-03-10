@@ -226,6 +226,10 @@ typedef struct LCUI_WidgetRec_ {
 (Widget_CheckStyleType( W, key_width, SCALE ) ||\
 Widget_CheckStyleType( W, key_height, SCALE ))
 
+#define Widget_HasParentDependentWidth(W) \
+	(Widget_CheckStyleType( W, key_width, scale ) &&\
+	!Widget_HasStaticWidthParent( W ))
+
 /** 部件是否有值为自动（默认）的样式 */
 LCUI_API LCUI_BOOL Widget_HasAutoStyle( LCUI_Widget w, int key );
 
@@ -313,9 +317,15 @@ LCUI_API void Widget_ComputeBorder( LCUI_Widget w, LCUI_Border *out );
 LCUI_API void Widget_PaintBorder( LCUI_Widget w, LCUI_PaintContext paint,
 				  LCUI_WidgetActualStyle style );
 
-LCUI_API float Widget_GetGraphWidth( LCUI_Widget widget );
+LCUI_API float Widget_GetCanvasWidth( LCUI_Widget widget );
 
-LCUI_API float Widget_GetGraphHeight( LCUI_Widget widget );
+LCUI_API float Widget_GetCanvasHeight( LCUI_Widget widget );
+
+LCUI_API float Widget_GetLimitedWidth( LCUI_Widget w, float width );
+
+LCUI_API float Widget_GetLimitedHeight( LCUI_Widget w, float height );
+
+LCUI_API void Widget_AutoSize( LCUI_Widget w );
 
 /** 根据阴影参数获取部件区域的横向偏移距离 */
 LCUI_API float Widget_GetBoxShadowOffsetX( LCUI_Widget w );
@@ -324,10 +334,10 @@ LCUI_API float Widget_GetBoxShadowOffsetX( LCUI_Widget w );
 LCUI_API float Widget_GetBoxShadowOffsetY( LCUI_Widget w );
 
 /** 获取部件在添加阴影后的高度 */
-LCUI_API float Widget_GetGraphWidth( LCUI_Widget w );
+LCUI_API float Widget_GetCanvasWidth( LCUI_Widget w );
 
 /** 获取部件在添加阴影后的宽度 */
-LCUI_API float Widget_GetGraphWidth( LCUI_Widget w );
+LCUI_API float Widget_GetCanvasWidth( LCUI_Widget w );
 
 /** 更新部件矩形阴影样式 */
 LCUI_API void Widget_UpdateBoxShadow( LCUI_Widget w );
@@ -426,8 +436,10 @@ LCUI_API float Widget_ComputeMaxContentWidth( LCUI_Widget w );
 /** 计算部件的最大可用宽度 */
 LCUI_API float Widget_ComputeMaxAvaliableWidth( LCUI_Widget widget );
 
+LCUI_API void Widget_ComputeLimitSize( LCUI_Widget w );
+
 /** 从部件中移除一个状态 */
-int Widget_RemoveStatus( LCUI_Widget w, const char *status_name );
+LCUI_API int Widget_RemoveStatus( LCUI_Widget w, const char *status_name );
 
 /** 打印部件树 */
 LCUI_API void Widget_PrintTree( LCUI_Widget w );
