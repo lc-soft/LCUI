@@ -33,19 +33,19 @@
 
 LCUI_BEGIN_HEADER
 
-typedef struct TextCharRec_ {
-        wchar_t char_code;		/**< 字符码 */
+typedef struct LCUI_TextCharRec_ {
+        wchar_t code;			/**< 字符码 */
         LCUI_TextStyle style;		/**< 该字符使用的样式数据 */
 	const LCUI_FontBitmap *bitmap;	/**< 字体位图数据(只读) */
-} TextCharRec, *TextChar;
+} LCUI_TextCharRec, *LCUI_TextChar;
 
-/** 文本行结尾符 */
-typedef enum EOLChar {
-	EOL_NONE,	/**< 无换行 */
-	EOL_CR,		/**< Mac OS 格式换行，CF = Carriage-Return，字符：\r */
-	EOL_LF,		/**< UNIX/Linux 格式换行，LF = Line-Feed，字符：\r */
-	EOL_CR_LF	/**< Windows 格式换行： \r\n */
-} EOLChar;
+/** End Of Line character */
+typedef enum LCUI_EOLChar {
+	LCUI_EOL_NONE,		/**< 无换行 */
+	LCUI_EOL_CR,		/**< Mac OS 格式换行，CF = Carriage-Return，字符：\r */
+	LCUI_EOL_LF,		/**< UNIX/Linux 格式换行，LF = Line-Feed，字符：\r */
+	LCUI_EOL_CR_LF		/**< Windows 格式换行： \r\n */
+} LCUI_EOLChar;
 
 /* 文本行 */
 typedef struct TextRowRec_ {
@@ -53,21 +53,26 @@ typedef struct TextRowRec_ {
         int height;			/**< 高度 */
 	int text_height;		/**< 当前行中最大字体的高度 */
         int length;			/**< 该行文本长度 */
-        TextChar *string;		/**< 该行文本的数据 */
-	EOLChar eol;			/**< 行尾结束类型 */
-} TextRowRec, *TextRow;
+        LCUI_TextChar *string;		/**< 该行文本的数据 */
+	LCUI_EOLChar eol;		/**< 行尾结束类型 */
+} LCUI_TextRowRec, *LCUI_TextRow;
 
 /* 文本行列表 */
-typedef struct TextRowListRec_ {
-        int length;		/**< 当前总行数 */
-        TextRow *rows;		/**< 每一行文本的数据 */
-} TextRowListRec, *TextRowList;
+typedef struct LCUI_TextRowListRec_ {
+        int length;			/**< 当前总行数 */
+        LCUI_TextRow *rows;		/**< 每一行文本的数据 */
+} LCUI_TextRowListRec, *LCUI_TextRowList;
 
-/** 单词内断行模式 */
-typedef enum WordBreakMode {
-	WORD_BREAK_MODE_NORMAL,		/**< 默认的断行规则，将宽度溢出的单词放到下一行 */
-	WORD_BREAK_MODE_BREAK_ALL	/**< 任意字符间断行 */
-} WordBreakMode;
+/**
+ * word-break mode
+ * The word-break mode specifies whether or not the textlayer should
+ * insert line breaks wherever the text would otherwise overflow its
+ * content box.
+ */
+typedef enum LCUI_WordBreakMode {
+	LCUI_WORD_BREAK_NORMAL,		/**< 默认的断行规则，将宽度溢出的单词放到下一行 */
+	LCUI_WORD_BREAK_BREAK_ALL	/**< 任意字符间断行 */
+} LCUI_WordBreakMode;
 
 typedef struct LCUI_TextLayerRec_  {
         int offset_x;			/**< X轴坐标偏移量 */
@@ -90,25 +95,25 @@ typedef struct LCUI_TextLayerRec_  {
 	 */
 	int max_width, max_height;
 
-	int length;			/**< 文本长度 */
-	WordBreakMode word_break;	/**< 单词内断行模式 */
-	LCUI_BOOL is_mulitiline_mode;	/**< 是否启用多行文本模式 */
-        LCUI_BOOL is_autowrap_mode;	/**< 是否启用自动换行模式 */
-	LCUI_BOOL is_using_style_tags;	/**< 是否使用文本样式标签 */
-        LCUI_BOOL is_using_buffer;	/**< 是否使用缓存空间来存储文本位图 */
-	LinkedList dirty_rect;		/**< 脏矩形记录 */
-        int text_align;			/**< 文本的对齐方式 */
-        TextRowListRec text_rows;	/**< 文本行列表 */
-        LCUI_TextStyleRec text_style;	/**< 文本全局样式 */
-	LinkedList style_cache;		/**< 样式缓存 */
-	int line_height;		/**< 全局文本行高度 */
+	int length;				/**< 文本长度 */
+	int line_height;			/**< 全局文本行高度 */
+	int text_align;				/**< 文本的对齐方式 */
+	LCUI_WordBreakMode word_break;		/**< 单词内断行模式 */
+	LCUI_BOOL enable_mulitiline;		/**< 是否启用多行文本模式 */
+        LCUI_BOOL enable_autowrap;		/**< 是否启用自动换行模式 */
+	LCUI_BOOL enable_style_tags;		/**< 是否使用文本样式标签 */
+        LCUI_BOOL enable_canvas;		/**< 是否使用缓存空间来存储文本位图 */
+	LinkedList dirty_rects;			/**< 脏矩形记录 */
+	LinkedList text_styles;			/**< 样式缓存 */
+	LCUI_TextStyleRec text_default_style;	/**< 文本全局样式 */
+        LCUI_TextRowListRec text_rows;		/**< 文本行列表 */
 	struct {
 		LCUI_BOOL update_bitmap;	/**< 更新文本的字体位图 */
 		LCUI_BOOL update_typeset;	/**< 重新对文本进行排版 */
 		int typeset_start_row;		/**< 排版处理的起始行 */	
 		LCUI_BOOL redraw_all;		/**< 重绘所有字体位图 */
-	} task;				/**< 待处理的任务 */
-        LCUI_Graph graph;		/**< 文本位图缓存 */
+	} task;					/**< 待处理的任务 */
+        LCUI_Graph canvas;			/**< 文本位图缓存 */
 } LCUI_TextLayerRec, *LCUI_TextLayer;
 
 /** 获取文本行总数 */
@@ -216,7 +221,7 @@ LCUI_API int TextLayer_TextBackspace( LCUI_TextLayer layer, int n_char );
 LCUI_API void TextLayer_SetAutoWrap( LCUI_TextLayer layer, LCUI_BOOL autowrap );
 
 /** 设置单词内断行模式 */
-LCUI_API void TextLayer_SetWordBreak( LCUI_TextLayer layer, WordBreakMode mode );
+LCUI_API void TextLayer_SetWordBreak( LCUI_TextLayer layer, LCUI_WordBreakMode mode );
 
 /** 设置是否使用样式标签 */
 LCUI_API void TextLayer_SetUsingStyleTags( LCUI_TextLayer layer, LCUI_BOOL is_true );
@@ -232,13 +237,13 @@ LCUI_API void TextLayer_Update( LCUI_TextLayer layer, LinkedList *rects );
  * @param layer 要使用的文本图层
  * @param area 文本图层中需要绘制的区域
  * @param layer_pos 文本图层在目标图像中的位置
- * @param graph 目标图像
+ * @param cavans 目标画布
  */
-LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,
-				    LCUI_Pos layer_pos, LCUI_Graph *graph );
+LCUI_API int TextLayer_RenderTo( LCUI_TextLayer layer, LCUI_Rect area,
+				 LCUI_Pos layer_pos, LCUI_Graph *canvas );
 
 /** 绘制文本 */
-LCUI_API int TextLayer_Draw( LCUI_TextLayer layer );
+LCUI_API int TextLayer_RenderAll( LCUI_TextLayer layer );
 
 /** 清除已记录的无效矩形 */
 LCUI_API void TextLayer_ClearInvalidRect( LCUI_TextLayer layer );

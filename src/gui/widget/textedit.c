@@ -274,7 +274,7 @@ static int TextEdit_AddTextToBuffer( LCUI_Widget widget, const wchar_t *wtext,
 			return -ENOMEM;
 		}
 		/* 如果未启用样式标签功能 */
-		if( !edit->layer->is_using_style_tags ) {
+		if( !edit->layer->enable_style_tags ) {
 			for( j = 0; i < len && j < size - 1; ++j, ++i ) {
 				txtblk->text[j] = wtext[i];
 			}
@@ -374,7 +374,7 @@ static void TextEdit_UpdateTextLayer( LCUI_Widget w )
 	LinkedList_Init( &rects );
 	scale = LCUIMetrics_GetScale();
 	edit = Widget_GetData( w, self.prototype );
-	TextStyle_Copy( &style, &edit->layer_source->text_style );
+	TextStyle_Copy( &style, &edit->layer_source->text_default_style );
 	if( edit->password_char ) {
 		TextLayer_SetTextStyle( edit->layer_mask, &style );
 	}
@@ -916,7 +916,7 @@ static void TextEdit_OnPaint( LCUI_Widget w, LCUI_PaintContext paint,
 	rect = paint->rect;
 	rect.x -= content_rect.x;
 	rect.y -= content_rect.y;
-	TextLayer_DrawToGraph( edit->layer, rect, pos, &canvas );
+	TextLayer_RenderTo( edit->layer, rect, pos, &canvas );
 }
 
 static void TextEdit_SetTextStyle( LCUI_Widget w, LCUI_TextStyle ts )

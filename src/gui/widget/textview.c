@@ -67,7 +67,7 @@ typedef struct LCUI_TextViewRec_ {
 		union {
 			wchar_t *text;
 			LCUI_BOOL enable;
-			WordBreakMode mode;
+			LCUI_WordBreakMode mode;
 			LCUI_TextStyleRec style;
 			int align;
 		};
@@ -104,15 +104,15 @@ static int OnParseWordBreak( LCUI_CSSParserStyleContext ctx,
 	return 0;
 }
 
-static WordBreakMode ComputeWordBreakMode( LCUI_StyleSheet sheet )
+static LCUI_WordBreakMode ComputeWordBreakMode( LCUI_StyleSheet sheet )
 {
 	LCUI_Style s = &sheet->sheet[self.key_word_break];
 	if( s->is_valid && s->type == SVT_STRING && s->string ) {
 		if( strcmp( s->string, "break-all" ) == 0 ) {
-			return WORD_BREAK_MODE_BREAK_ALL;
+			return LCUI_WORD_BREAK_BREAK_ALL;
 		}
 	}
-	return WORD_BREAK_MODE_NORMAL;
+	return LCUI_WORD_BREAK_NORMAL;
 }
 
 static void TextView_OnParseAttr( LCUI_Widget w, const char *name, 
@@ -128,7 +128,7 @@ static void TextView_OnParseAttr( LCUI_Widget w, const char *name,
 	}
 	if( strcmp( name, "multiline" ) == 0 ) {
 		LCUI_BOOL enable = ParseBoolean( value );
-		if( enable != txt->layer->is_mulitiline_mode ) {
+		if( enable != txt->layer->enable_mulitiline ) {
 			TextView_SetMulitiline( w, enable );
 		}
 	}
@@ -168,7 +168,7 @@ static void TextView_SetTaskForAutoWrap( LCUI_Widget w, LCUI_BOOL enable )
 	txt->tasks[TASK_SET_AUTOWRAP].is_valid = TRUE;
 }
 
-static void TextView_SetTaskForWordBreak( LCUI_Widget w, WordBreakMode mode )
+static void TextView_SetTaskForWordBreak( LCUI_Widget w, LCUI_WordBreakMode mode )
 {
 	LCUI_TextView txt = GetData( w );
 	txt->tasks[TASK_SET_WORD_BREAK].mode = mode;
@@ -445,7 +445,7 @@ static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint,
 	rect = paint->rect;
 	rect.x -= content_rect.x;
 	rect.y -= content_rect.y;
-	TextLayer_DrawToGraph( txt->layer, rect, pos, &canvas );
+	TextLayer_RenderTo( txt->layer, rect, pos, &canvas );
 }
 
 int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
