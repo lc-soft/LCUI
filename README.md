@@ -46,7 +46,7 @@ LCUI is a freely available software library for building user interfaces. It is 
 - **Image processing:** Provide image read interfaces, support for reading jpg, png and bmp format images.
 - **Touch:** Support multi-touch, but currently only support Windows system.
 
-### Defects
+### Missing features
 
 LCUI is a personal project, its main purpose is to allow author to easily develop simple GUI applications, what is "simple"? it means fewer features, for example:
 
