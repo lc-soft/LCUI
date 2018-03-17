@@ -5,7 +5,7 @@ pkgconfigdir = $(prefix)/lib/pkgconfig
 pkgconfig_DATA = $(PACKAGE).pc
 
 EXTRA_DIST=autogen.sh README README.zh-cn.md README.md LICENSE.TXT \
-docs/CHANGES.md docs/CHANGES.zh-cn.md docs/FAQ.md \
+CHANGELOG.md CHANGELOG.zh-cn.md docs/FAQ.md \
 docs/FAQ.zh-cn.md \
 docs/CodingStyle.zh-cn.md \
 test/README.zh-cn \
