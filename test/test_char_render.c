@@ -4,7 +4,7 @@
 #include <LCUI/image.h>
 #include <LCUI/font.h>
 
-int test_char_render( void )
+int main( void )
 {
 	int ret, fid;
 	LCUI_Graph img;

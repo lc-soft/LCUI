@@ -1,6 +1,7 @@
-﻿/** testtouch.c -- test touch support */
+﻿/** test_touch.c -- test touch support */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>

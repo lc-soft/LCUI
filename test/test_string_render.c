@@ -4,7 +4,7 @@
 #include <LCUI/image.h>
 #include <LCUI/font.h>
 
-int test_string_render( void )
+int main( void )
 {
 	int ret;
 	LCUI_Graph img;
@@ -34,7 +34,7 @@ int test_string_render( void )
 	TextLayer_Update( txt, NULL );
 
 	/* 将文本图层绘制到图像中，然后将图像写入至 png 文件中 */
-	TextLayer_DrawToGraph( txt, area, pos, &img );
+	TextLayer_RenderTo( txt, area, pos, &img );
 	ret = LCUI_WritePNGFile( "test_string_render.png", &img );
 	Graph_Free( &img );
 
