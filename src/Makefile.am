@@ -1,8 +1,8 @@
 AUTOMAKE_OPTIONS=foreign
 ##设定在编译时头文件的查找位置
 AM_CFLAGS = -I$(abs_top_srcdir)/include $(CODE_COVERAGE_CFLAGS)
-##以下是给Libtool的参数
-LCUI_LDFLAGS = -version-info 3:0:0
+
+LCUI_LDFLAGS = -version-info 1:0:0
 LCUI_SOURCES = graph.c ime.c cursor.c worker.c main.c timer.c display.c keyboard.c
 LCUI_LIBADD = thread/libthread.la util/libutil.la platform/libplatform.la \
 image/libimage.la draw/libdraw.la gui/libgui.la font/libfont.la \

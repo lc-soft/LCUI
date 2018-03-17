@@ -1,10 +1,8 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
-#
-# http://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.69/html_node/index.html
 
-AC_PREREQ([2.68])
-AC_INIT(LCUI, 1.0.0, lc-soft@live.cn)
+AC_PREREQ([2.69])
+AC_INIT(LCUI, 1.0.0-beta.2, lc-soft@live.cn)
 
 # Silence warning: ar: 'u' modifier ignored since 'D' is the default
 AC_SUBST(AR_FLAGS, [cr])
@@ -17,31 +15,42 @@ AC_CONFIG_SRCDIR([include/LCUI_Build.h])
 AC_CONFIG_HEADERS([include/LCUI/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
-# Make --enable-silent-rules the default.
-# To get verbose build output you may configure
-# with --disable-silent-rules or use "make V=1".
-# 默认情况下，是 Make --enable-silent-rules， 也就是启用无声规则，make时输出的是精简的信息。
-# 要获得详细的编译输出，你可以在运行configurue时加上--disable-silent-rules参数或使用"make V=1".
-AM_SILENT_RULES([yes])
-
 # Checks for programs.
+AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
+AC_PROG_RANLIB
+
+# Checks for libraries.
+# FIXME: Replace `main' with a function in `-lm':
+AC_CHECK_LIB([m], [main])
 
 # Checks for header files.
-AC_CHECK_HEADERS([fcntl.h limits.h malloc.h memory.h stddef.h stdlib.h string.h strings.h sys/ioctl.h termio.h unistd.h wchar.h])
+AC_PATH_X
+AC_CHECK_HEADERS([limits.h locale.h stdint.h stdlib.h string.h sys/time.h unistd.h wchar.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
+AC_CHECK_HEADER_STDBOOL
+AC_C_INLINE
+AC_TYPE_INT32_T
+AC_TYPE_INT64_T
 AC_TYPE_SIZE_T
-AC_HEADER_STDBOOL
-AC_C_RESTRICT
+AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
+AC_TYPE_UINT64_T
 
 # Checks for library functions.
-AC_CHECK_FUNCS([memset munmap select strcasecmp sysinfo])
+AC_FUNC_MALLOC
+AC_FUNC_REALLOC
+AC_CHECK_FUNCS([gettimeofday memset pow select sqrt strcasecmp strstr])
+
+# Make --enable-silent-rules the default.
+# To get verbose build output you may configure
+# with --disable-silent-rules or use "make V=1".
+AM_SILENT_RULES([yes])
 
 AX_CODE_COVERAGE
 
