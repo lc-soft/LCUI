@@ -62,7 +62,7 @@ LCUI 是一个个人项目，其主要用途是方便作者能够开发简单的
 
 ![Hello, World!](https://lcui.lc-soft.io/static/images/screenshot-lcui-hello.png)
 
-[![LCUI.css](https://lcui.lc-soft.io/static/images/screenshot-lcui-css.png)](https://github.com/lc-ui/LCUI.css)
+[![LCUI.css](https://lcui.lc-soft.io/static/images/screenshot-lcui-css.gif)](https://github.com/lc-ui/LCUI.css)
 
 [![LCFinder](https://lcui.lc-soft.io/static/images/screenshot-lcfinder.png)](https://github.com/lc-soft/LC-Finder)
 
