@@ -67,6 +67,7 @@ static int check_menu_short_text( void )
 	CHECK( menu->height == MENU_HEIGHT );
 	return ret;
 }
+
 static int check_menu_long_text( void )
 {
 	int ret = 0;
@@ -111,6 +112,16 @@ int test_widget_inline_block_layout( void )
 
 int tests_count = 0;
 
+static void SetLongTextItem( void *arg )
+{
+	check_menu_long_text();
+}
+
+static void SetShortTextItem( void *arg )
+{
+	check_menu_short_text();
+}
+
 int main( void )
 {
 	LCUI_Widget root, pack;
@@ -123,6 +134,8 @@ int main( void )
 		LCUI_Destroy();
 		return -ENOENT;
 	}
+	LCUITimer_SetTimeout( 2000, SetLongTextItem, NULL );
+	LCUITimer_SetTimeout( 4000, SetShortTextItem, NULL );
 	Widget_Append( root, pack );
 	Widget_Unwrap( pack );
 	return LCUI_Main();

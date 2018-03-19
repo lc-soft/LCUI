@@ -32,10 +32,7 @@ int main( void )
 	ret += test_widget_layout();
 	ret += test_widget_flex_layout();
 	ret += test_widget_inline_block_layout();
-	ret += test_widget_rect();/*
-	ret += test_widget_render();
-	ret += test_char_render();
-	ret += test_string_render();*/
+	ret += test_widget_rect();
 	PRINT_TEST_RESULT( ret );
 	return ret;
 }
