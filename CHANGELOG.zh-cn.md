@@ -1,5 +1,30 @@
 # LCUI的更新记录
 
+## 1.0.0 Beta 2 (2018-03-18)
+
+### 问题修复
+
+* 一些内存泄露问题 ([#135](https://github.com/lc-soft/LCUI/issues/135)) ([9995b23](https://github.com/lc-soft/LCUI/commit/9995b23))
+* **gui:** 部件大小计算错误 ([095f4b8](https://github.com/lc-soft/LCUI/commit/095f4b8))
+* **renderer:** 部件内容区域计算错误 ([#122](https://github.com/lc-soft/LCUI/issues/122),[#123](https://github.com/lc-soft/LCUI/issues/123)) ([0f81863](https://github.com/lc-soft/LCUI/commit/0f81863))
+* **renderer:** 部件内容溢出 ([#144](https://github.com/lc-soft/LCUI/issues/144)) ([2a923a6](https://github.com/lc-soft/LCUI/commit/2a923a6))
+* **thread:** 线程在退出后未释放之前申请的内存资源 ([402bc03](https://github.com/lc-soft/LCUI/commit/402bc03))
+* **widget:** 滚动条未取消事件冒泡 ([#145](https://github.com/lc-soft/LCUI/issues/145)) ([7dd60ac](https://github.com/lc-soft/LCUI/commit/7dd60ac))
+* **widget:** Scrollbar_BindBox() 在滚动条初始化后未能正常工作 ([196f47c](https://github.com/lc-soft/LCUI/commit/196f47c))
+* **widget:** Widget_GetOffset() 返回的结果未包含内间距 ([0a893f4](https://github.com/lc-soft/LCUI/commit/0a893f4))
+* **widget-event:** 部件触控事件中的触点坐标未根据全局缩放比例进行转换 ([a40eda2](https://github.com/lc-soft/LCUI/commit/a40eda2))
+* **worker:** 工作线程获取新任务前未进入阻塞状态 ([#134](https://github.com/lc-soft/LCUI/issues/134)) ([8dae96f](https://github.com/lc-soft/LCUI/commit/8dae96f))
+
+### 新特性
+
+* **css:** 添加支持解析 "border-left: 0;" ([30de5b8](https://github.com/lc-soft/LCUI/commit/30de5b8))
+* **timer:** 添加更具语义的 LCUITimer_SetTimeout() 和 LCUITimer_SetInterval() ([f032f6f](https://github.com/lc-soft/LCUI/commit/f032f6f))
+* **widget-event:** 添加 "link" 事件, 重命名 "remove" 事件为 "unlink" ([8c1d105](https://github.com/lc-soft/LCUI/commit/8c1d105))
+
+### 改进
+
+* **widget:** 重命名滚动条的属性名称和 CSS 选择符 ([d397914](https://github.com/lc-soft/LCUI/commit/d397914))
+
 ## 1.0 Beta (2018-02-07)
 
 ### 新特性

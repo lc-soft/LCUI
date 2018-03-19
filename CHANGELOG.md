@@ -1,5 +1,30 @@
 # LCUI ChangeLog
 
+## 1.0.0 Beta 2 (2018-03-18)
+
+### Bug Fixes
+
+* some memory leak bugs ([#135](https://github.com/lc-soft/LCUI/issues/135)) ([9995b23](https://github.com/lc-soft/LCUI/commit/9995b23))
+* **gui:** widget auto size computation bug ([095f4b8](https://github.com/lc-soft/LCUI/commit/095f4b8))
+* **renderer:** incorrect widget content rectangle computation ([#122](https://github.com/lc-soft/LCUI/issues/122),[#123](https://github.com/lc-soft/LCUI/issues/123)) ([0f81863](https://github.com/lc-soft/LCUI/commit/0f81863))
+* **renderer:** widget content overflow ([#144](https://github.com/lc-soft/LCUI/issues/144)) ([2a923a6](https://github.com/lc-soft/LCUI/commit/2a923a6))
+* **thread:** memory leak bug when running test ([402bc03](https://github.com/lc-soft/LCUI/commit/402bc03))
+* **widget:** scrollbar did not cancel the event bubbling ([#145](https://github.com/lc-soft/LCUI/issues/145)) ([7dd60ac](https://github.com/lc-soft/LCUI/commit/7dd60ac))
+* **widget:** Scrollbar_BindBox() not working after scrollbar initialize ([196f47c](https://github.com/lc-soft/LCUI/commit/196f47c))
+* **widget:** Widget_GetOffset() result does not include padding spacing ([0a893f4](https://github.com/lc-soft/LCUI/commit/0a893f4))
+* **widget-event:** the touch point coordinate are not been converted ([a40eda2](https://github.com/lc-soft/LCUI/commit/a40eda2))
+* **worker:** worker did not enter the blocked state ([#134](https://github.com/lc-soft/LCUI/issues/134)) ([8dae96f](https://github.com/lc-soft/LCUI/commit/8dae96f))
+
+### Features
+
+* **css:** add parsing support for "border-left: 0;" ([30de5b8](https://github.com/lc-soft/LCUI/commit/30de5b8))
+* **timer:** add LCUITimer_SetTimeout() and LCUITimer_SetInterval() ([f032f6f](https://github.com/lc-soft/LCUI/commit/f032f6f))
+* **widget-event:** add "link" event, rename "remove" event to "unlink" ([8c1d105](https://github.com/lc-soft/LCUI/commit/8c1d105))
+
+### Performance Improvements
+
+* **widget:** rename scrollbar widget attributes ([d397914](https://github.com/lc-soft/LCUI/commit/d397914))
+
 ## 1.0.0 Beta (2018-02-07)
 
 ### Features
