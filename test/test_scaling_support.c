@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/timer.h>
@@ -11,6 +12,7 @@ enum {
 	TYPE_SCALE
 };
 
+#ifdef LCUI_BUILD_IN_WIN32
 static void LoggerHandler( const char *str )
 {
 	OutputDebugStringA( str );
@@ -20,6 +22,7 @@ static void LoggerHandlerW( const wchar_t *str )
 {
 	OutputDebugStringW( str );
 }
+#endif
 
 static void OnButtonClick( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 {
@@ -75,8 +78,10 @@ int main( int argc, char **argv )
 	LCUI_Widget root, pack;
 
 	LCUI_Init();
+#ifdef LCUI_BUILD_IN_WIN32
 	Logger_SetHandler( LoggerHandler );
 	Logger_SetHandlerW( LoggerHandlerW );
+#endif
 	root = LCUIWidget_GetRoot();
 	pack = LCUIBuilder_LoadFile( "test_scaling_support.xml" );
 	if( !pack ) {

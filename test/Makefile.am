@@ -4,7 +4,7 @@ AM_CFLAGS = -I$(top_builddir)/include $(CODE_COVERAGE_CFLAGS)
 ##需要编译的测试程序, noinst指的是不安装
 noinst_PROGRAMS = helloworld test test_touch test_char_render \
 test_string_render test_widget_render test_widget_layout test_widget_flex_layout \
-test_widget_inline_block_layout
+test_widget_inline_block_layout test_scaling_support
 
 ##指定测试程序的源码文件
 helloworld_SOURCES = helloworld.c
@@ -40,5 +40,9 @@ test_widget_flex_layout_CFLAGS = $(AM_CFLAGS) -D PREVIEW_MODE
 test_widget_inline_block_layout_SOURCES = test_widget_inline_block_layout.c
 test_widget_inline_block_layout_LDADD = $(top_builddir)/src/libLCUI.la
 test_widget_inline_block_layout_CFLAGS = $(AM_CFLAGS) -D PREVIEW_MODE
+
+test_scaling_support_SOURCES = test_scaling_support.c
+test_scaling_support_LDADD = $(top_builddir)/src/libLCUI.la
+
 @CODE_COVERAGE_RULES@
 
