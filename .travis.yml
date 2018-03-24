@@ -1,6 +1,5 @@
 dist: trusty
 language: c
-
 compiler:
   - clang
   - gcc
@@ -9,8 +8,11 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install valgrind libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev lcov -qq
   - pip install --user cpp-coveralls
+  - npm install
+  - npm install --save-dev @commitlint/travis-cli
 
-before_script: ./autogen.sh
+before_script:
+  - ./node_modules/.bin/commitlint-travis && ./autogen.sh
 
 script:
   - ./configure --enable-code-coverage
