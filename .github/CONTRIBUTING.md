@@ -76,7 +76,9 @@ To ensure consistency throughout the source code, keep these rules in mind as yo
 
 - All features or bug fixes **must be tested** by one or more specs (unit-tests).
 - All public API methods **must be documented**. (Details TBC).
-- Follow the existing code style.
+- Follow the existing code style. You have the following two ways to format the code:
+  - Use [clang-format](http://clang.llvm.org/docs/ClangFormat.html) to format the changed files: `clang-format --style=file [src/????.c]`.
+  - Install the [NodeJS](https://nodejs.org/en/) Environment and run `npm install`, which will add a git hook to format the changed code, and it will run before you run `git commit`.
 
 ## Commit Message Guidelines
 
