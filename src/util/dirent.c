@@ -143,8 +143,7 @@ LCUI_DirEntry* LCUI_ReadDirW( LCUI_Dir *dir )
 		return NULL;
 	}
 	dir->entry.dirent = *d;
-	LCUI_DecodeString( dir->entry.name, d->d_name, 
-			   d->d_reclen + 1, ENCODING_UTF8 );
+	LCUI_DecodeString( dir->entry.name, d->d_name, 0, ENCODING_UTF8 );
 	return &dir->entry;
 #endif
 }
