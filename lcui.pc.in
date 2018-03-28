@@ -7,5 +7,5 @@ Name: LCUI
 Description: A small C library for building user interfaces with C, XML and CSS. 
 Version: @PACKAGE_VERSION@
 Libs: -L${libdir} -lLCUI
-Libs.private: -lpthread -lfreetype -lpng -ljpeg -lX11 -lxml2
+Libs.private: -lpthread -lfreetype -lpng -ljpeg -lX11 -lxml2 -lfontconfig
 Cflags: -I${includedir}
