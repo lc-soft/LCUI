@@ -1,0 +1,26 @@
+{
+  "editor.formatOnSave": true,
+  "editor.rulers": [
+    78,
+    80
+  ],
+  "files.exclude": {
+    "**/*.lo": true,
+    "**/*.o": true,
+    "**/*.gcno": true
+  },
+  "[c]": {
+    "editor.tabSize": 8,
+    "editor.insertSpaces": false
+  },
+  "[cpp]": {
+    "editor.tabSize": 8,
+    "editor.insertSpaces": false
+  },
+  "files.associations": {
+    "unistd.h": "c",
+    "errno.h": "c",
+    "fcntl.h": "c",
+    "metrics.h": "c"
+  }
+}
