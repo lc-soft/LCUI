@@ -31,5 +31,5 @@ SpacesInCStyleCastParentheses: false
 SpacesInContainerLiterals: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
-UseTab: Always
-
+SortIncludes: false
+UseTab: ForContinuationAndIndentation
