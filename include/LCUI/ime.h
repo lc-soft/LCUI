@@ -2,7 +2,7 @@
  * ime.h -- Input Method Engine
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -41,35 +41,35 @@ typedef struct LCUI_IMEHandlerRec_ {
 } LCUI_IMEHandlerRec, *LCUI_IMEHandler;
 
 /** 注册一个输入法 */
-LCUI_API int LCUIIME_Register( const char *ime_name, LCUI_IMEHandler handler );
+LCUI_API int LCUIIME_Register(const char *ime_name, LCUI_IMEHandler handler);
 
 /** 选定输入法 */
-LCUI_API LCUI_BOOL LCUIIME_Select( int ime_id );
+LCUI_API LCUI_BOOL LCUIIME_Select(int ime_id);
 
-LCUI_API LCUI_BOOL LCUIIME_SelectByName( const char *name );
+LCUI_API LCUI_BOOL LCUIIME_SelectByName(const char *name);
 
 /** 检测键值是否为字符键值 */
-LCUI_API LCUI_BOOL LCUIIME_CheckCharKey( int key );
+LCUI_API LCUI_BOOL LCUIIME_CheckCharKey(int key);
 
 /** 切换至下一个输入法 */
-LCUI_API void LCUIIME_Switch( void );
+LCUI_API void LCUIIME_Switch(void);
 
 /** 检测输入法是否要处理按键事件 */
-LCUI_API LCUI_BOOL LCUIIME_ProcessKey( LCUI_SysEvent e );
+LCUI_API LCUI_BOOL LCUIIME_ProcessKey(LCUI_SysEvent e);
 
 /** 提交输入法输入的内容至目标 */
-LCUI_API int LCUIIME_Commit( const wchar_t *str, size_t len );
+LCUI_API int LCUIIME_Commit(const wchar_t *str, size_t len);
 
 /* 初始化LCUI输入法模块 */
-LCUI_API void LCUI_InitIME( void );
+LCUI_API void LCUI_InitIME(void);
 
 /* 停用LCUI输入法模块 */
-LCUI_API void LCUI_FreeIME( void );
+LCUI_API void LCUI_FreeIME(void);
 
 #ifdef LCUI_BUILD_IN_WIN32
-int LCUI_RegisterWin32IME( void );
+int LCUI_RegisterWin32IME(void);
 #else
-int LCUI_RegisterLinuxIME( void );
+int LCUI_RegisterLinuxIME(void);
 #endif
 
 LCUI_END_HEADER
