@@ -60,7 +60,7 @@ void LCUI_InitWinKeyboard( void )
 	LCUI_BindSysEvent( WM_KEYUP, OnKeyboardMessage, NULL, NULL );
 }
 
-void LCUI_ExitWinKeyboard( void )
+void LCUI_FreeWinKeyboard( void )
 {
 	LCUI_UnbindSysEvent( WM_KEYDOWN, OnKeyboardMessage );
 	LCUI_UnbindSysEvent( WM_KEYUP, OnKeyboardMessage );

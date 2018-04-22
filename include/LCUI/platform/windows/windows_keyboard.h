@@ -2,7 +2,7 @@
  * windows_keyboard.h -- Keyboard support for windows platform.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -31,8 +31,8 @@
 #ifndef LCUI_WINDOWS_KEYBOARD_H
 #define LCUI_WINDOWS_KEYBOARD_H
 
-void LCUI_InitWinKeyboard( void );
+void LCUI_InitWinKeyboard(void);
 
-void LCUI_ExitWinKeyboard( void );
+void LCUI_FreeWinKeyboard(void);
 
 #endif

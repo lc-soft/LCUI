@@ -37,24 +37,43 @@
 #include LCUI_EVENTS_H
 #include LCUI_DISPLAY_H
 
+static enum DisplayDriver {
+	NONE,
+	FRAMEBUFFER,
+	X11
+} driver_type;
+
 LCUI_DisplayDriver LCUI_CreateLinuxDisplayDriver( void )
 {
+	LCUI_DisplayDriver driver = NULL;
 #ifdef LCUI_VIDEO_DRIVER_X11
-	LCUI_BOOL is_x11_mode = TRUE;
-	if( is_x11_mode ) {
-		return LCUI_CreateLinuxX11DisplayDriver();
+	driver_type = X11;
+	driver = LCUI_CreateLinuxX11DisplayDriver();
+#endif
+#ifdef LCUI_VIDEO_DRIVER_FRAMEBUFFER
+	if (!driver) {
+		driver_type = FRAMEBUFFER;
+		driver = LCUI_CreateLinuxFBDisplayDriver();
 	}
 #endif
-	return NULL;
+	return driver;
 }
 
 void LCUI_DestroyLinuxDisplayDriver( LCUI_DisplayDriver driver )
 {
+	switch (driver_type) {
 #ifdef LCUI_VIDEO_DRIVER_X11
-	LCUI_BOOL is_x11_mode = TRUE;
-	if( is_x11_mode ) {
+	case X11:
 		LCUI_DestroyLinuxX11DisplayDriver( driver );
-	}
+		break;
 #endif
+#ifdef LCUI_VIDEO_DRIVER_X11
+	case FRAMEBUFFER:
+		LCUI_DestroyLinuxFBDisplayDriver( driver );
+		break;
+#endif
+	default:
+		break;
+	}
 }
 #endif

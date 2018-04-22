@@ -157,7 +157,7 @@ void LCUI_InitWinMouse( void )
 	LCUI_BindSysEvent( WM_TOUCH, OnMouseMessage, NULL, NULL );
 }
 
-void LCUI_ExitWinMouse( void )
+void LCUI_FreeWinMouse( void )
 {
 	LCUI_UnbindSysEvent( WM_MOUSEMOVE, OnMouseMessage );
 	LCUI_UnbindSysEvent( WM_LBUTTONDOWN, OnMouseMessage );

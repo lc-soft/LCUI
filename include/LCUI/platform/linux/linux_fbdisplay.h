@@ -27,3 +27,12 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
+#ifndef LCUI_LINUX_FB_DISPLAY_H_
+#define LCUI_LINUX_FB_DISPLAY_H_
+
+LCUI_API LCUI_DisplayDriver LCUI_CreateLinuxFBDisplayDriver(void);
+
+LCUI_API void LCUI_DestroyLinuxFBDisplayDriver(LCUI_DisplayDriver driver);
+
+#endif

@@ -2,7 +2,7 @@
  * linux_keyboard.c -- Keyboard support for linux.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -28,7 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/platform.h>
@@ -36,22 +35,22 @@
 #include LCUI_KEYBOARD_H
 #ifdef LCUI_BUILD_IN_LINUX
 
-void LCUI_InitLinuxKeyboard( void )
+void LCUI_InitLinuxKeyboard(void)
 {
 #ifdef LCUI_VIDEO_DRIVER_X11
 	LCUI_BOOL is_x11_mode = TRUE;
-	if( is_x11_mode ) {
+	if (is_x11_mode) {
 		LCUI_InitLinuxX11Keyboard();
 	}
 #endif
 }
 
-void LCUI_ExitLinuxKeyboard( void )
+void LCUI_FreeLinuxKeyboard(void)
 {
 #ifdef LCUI_VIDEO_DRIVER_X11
 	LCUI_BOOL is_x11_mode = TRUE;
-	if( is_x11_mode ) {
-		LCUI_ExitLinuxX11Keyboard();
+	if (is_x11_mode) {
+		LCUI_FreeLinuxX11Keyboard();
 	}
 #endif
 }
