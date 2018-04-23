@@ -662,13 +662,13 @@ static void TextEdit_OnKeyDown( LCUI_Widget widget, LCUI_WidgetEvent e, void *ar
 	rows = TextLayer_GetRowTotal( edit->layer );
 	cols = TextLayer_GetRowTextLength( edit->layer, cur_row );
 	switch( e->key.code ) {
-	case LCUIKEY_HOME: // home键移动光标至行首
+	case LCUI_KEY_HOME: // home键移动光标至行首
 		cur_col = 0;
 		break;
-	case LCUIKEY_END: // end键移动光标至行尾
+	case LCUI_KEY_END: // end键移动光标至行尾
 		cur_col = cols;
 		break;
-	case LCUIKEY_LEFT:
+	case LCUI_KEY_LEFT:
 		if( cur_col > 0 ) {
 			--cur_col;
 		} else if( cur_row > 0 ) {
@@ -677,7 +677,7 @@ static void TextEdit_OnKeyDown( LCUI_Widget widget, LCUI_WidgetEvent e, void *ar
 							      cur_row );
 		}
 		break;
-	case LCUIKEY_RIGHT:
+	case LCUI_KEY_RIGHT:
 		if( cur_col < cols ) {
 			++cur_col;
 		} else if( cur_row < rows - 1 ) {
@@ -685,20 +685,20 @@ static void TextEdit_OnKeyDown( LCUI_Widget widget, LCUI_WidgetEvent e, void *ar
 			cur_col = 0;
 		}
 		break;
-	case LCUIKEY_UP:
+	case LCUI_KEY_UP:
 		if( cur_row > 0 ) {
 			--cur_row;
 		}
 		break;
-	case LCUIKEY_DOWN:
+	case LCUI_KEY_DOWN:
 		if( cur_row < rows - 1 ) {
 			++cur_row;
 		}
 		break;
-	case LCUIKEY_BACKSPACE: // 删除光标左边的字符
+	case LCUI_KEY_BACKSPACE: // 删除光标左边的字符
 		TextEdit_TextBackspace( widget, 1 );
 		return;
-	case LCUIKEY_DELETE: // 删除光标右边的字符
+	case LCUI_KEY_DELETE: // 删除光标右边的字符
 		TextEdit_TextDelete( widget, 1 );
 		return;
 	default:break;

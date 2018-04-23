@@ -168,22 +168,22 @@ static void LCUIIME_OnDestroy(void *arg)
 LCUI_BOOL LCUIIME_CheckCharKey(int key)
 {
 	switch (key) {
-	case LCUIKEY_TAB:
-	case LCUIKEY_ENTER:
-	case LCUIKEY_SPACE:
-	case LCUIKEY_SEMICOLON:
-	case LCUIKEY_MINUS:
-	case LCUIKEY_EQUAL:
-	case LCUIKEY_COMMA:
-	case LCUIKEY_PERIOD:
-	case LCUIKEY_SLASH:
-	case LCUIKEY_BRACKETLEFT:
-	case LCUIKEY_BACKSLASH:
-	case LCUIKEY_BRACKETRIGHT:
-	case LCUIKEY_APOSTROPHE:
+	case LCUI_KEY_TAB:
+	case LCUI_KEY_ENTER:
+	case LCUI_KEY_SPACE:
+	case LCUI_KEY_SEMICOLON:
+	case LCUI_KEY_MINUS:
+	case LCUI_KEY_EQUAL:
+	case LCUI_KEY_COMMA:
+	case LCUI_KEY_PERIOD:
+	case LCUI_KEY_SLASH:
+	case LCUI_KEY_BRACKETLEFT:
+	case LCUI_KEY_BACKSLASH:
+	case LCUI_KEY_BRACKETRIGHT:
+	case LCUI_KEY_APOSTROPHE:
 		return TRUE;
 	default:
-		if (key >= LCUIKEY_0 && key <= LCUIKEY_Z) {
+		if (key >= LCUI_KEY_0 && key <= LCUI_KEY_Z) {
 			return TRUE;
 		}
 		break;
@@ -273,40 +273,40 @@ static void LCUIIME_ToText(LCUI_SysEvent e)
 {
 	int ch = e->key.code;
 	switch (ch) {
-	case LCUIKEY_TAB:
+	case LCUI_KEY_TAB:
 		ch = '\t';
 		break;
-	case LCUIKEY_ENTER:
+	case LCUI_KEY_ENTER:
 		ch = '\n';
 		break;
-	case LCUIKEY_SEMICOLON:
+	case LCUI_KEY_SEMICOLON:
 		ch = ';';
 		break;
-	case LCUIKEY_MINUS:
+	case LCUI_KEY_MINUS:
 		ch = '-';
 		break;
-	case LCUIKEY_EQUAL:
+	case LCUI_KEY_EQUAL:
 		ch = '=';
 		break;
-	case LCUIKEY_COMMA:
+	case LCUI_KEY_COMMA:
 		ch = ',';
 		break;
-	case LCUIKEY_PERIOD:
+	case LCUI_KEY_PERIOD:
 		ch = '.';
 		break;
-	case LCUIKEY_SLASH:
+	case LCUI_KEY_SLASH:
 		ch = '/';
 		break;
-	case LCUIKEY_BRACKETLEFT:
+	case LCUI_KEY_BRACKETLEFT:
 		ch = '[';
 		break;
-	case LCUIKEY_BACKSLASH:
+	case LCUI_KEY_BACKSLASH:
 		ch = '\\';
 		break;
-	case LCUIKEY_BRACKETRIGHT:
+	case LCUI_KEY_BRACKETRIGHT:
 		ch = ']';
 		break;
-	case LCUIKEY_APOSTROPHE:
+	case LCUI_KEY_APOSTROPHE:
 		ch = '\'';
 		break;
 	default:
@@ -319,7 +319,7 @@ static void LCUIIME_ToText(LCUI_SysEvent e)
 		break;
 	}
 	/* 如果shift键处于按下状态 */
-	if (LCUIKeyboard_IsHit(LCUIKEY_SHIFT)) {
+	if (LCUIKeyboard_IsHit(LCUI_KEY_SHIFT)) {
 		_DEBUG_MSG("hit shift, ch: %c\n", ch);
 		ch = LCUIIME_ToUpperCase(ch);
 	}
@@ -338,16 +338,16 @@ LCUI_BOOL LCUIIME_ProcessKey(LCUI_SysEvent e)
 	int key_state;
 	/* 根据事件类型判定按键状态 */
 	if (e->type == LCUI_KEYUP) {
-		key_state = LCUIKEYSTATE_RELEASE;
+		key_state = LCUI_KSTATE_RELEASE;
 		/* 如果是 caps lock 按键被释放 */
-		if (e->key.code == LCUIKEY_CAPITAL) {
+		if (e->key.code == LCUI_KEY_CAPITAL) {
 			self.enable_caps_lock = !self.enable_caps_lock;
 			return FALSE;
 		}
 	} else {
-		key_state = LCUIKEYSTATE_PRESSED;
+		key_state = LCUI_KSTATE_PRESSED;
 		/* 如果按下的是 shift 键，但没释放，则直接退出 */
-		if (e->key.code == LCUIKEY_SHIFT) {
+		if (e->key.code == LCUI_KEY_SHIFT) {
 			return FALSE;
 		}
 	}

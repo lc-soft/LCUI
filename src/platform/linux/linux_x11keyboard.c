@@ -63,91 +63,91 @@ static void OnKeyboardMessage(LCUI_Event ev, void *arg)
 	keysym = XkbKeycodeToKeysym(x11->display, x_ev->xkey.keycode, 0, 0);
 	switch (keysym) {
 	case XK_Tab:
-		key = LCUIKEY_TAB;
+		key = LCUI_KEY_TAB;
 		break;
 	case XK_Escape:
-		key = LCUIKEY_ESCAPE;
+		key = LCUI_KEY_ESCAPE;
 		break;
 	case XK_Return:
-		key = LCUIKEY_ENTER;
+		key = LCUI_KEY_ENTER;
 		break;
 	case XK_Delete:
-		key = LCUIKEY_DELETE;
+		key = LCUI_KEY_DELETE;
 		break;
 	case XK_BackSpace:
-		key = LCUIKEY_BACKSPACE;
+		key = LCUI_KEY_BACKSPACE;
 		break;
 	case XK_Home:
-		key = LCUIKEY_HOME;
+		key = LCUI_KEY_HOME;
 		break;
 	case XK_Left:
-		key = LCUIKEY_LEFT;
+		key = LCUI_KEY_LEFT;
 		break;
 	case XK_Up:
-		key = LCUIKEY_UP;
+		key = LCUI_KEY_UP;
 		break;
 	case XK_Right:
-		key = LCUIKEY_RIGHT;
+		key = LCUI_KEY_RIGHT;
 		break;
 	case XK_Down:
-		key = LCUIKEY_DOWN;
+		key = LCUI_KEY_DOWN;
 		break;
 	case XK_Page_Up:
-		key = LCUIKEY_PAGEUP;
+		key = LCUI_KEY_PAGEUP;
 		break;
 	case XK_Page_Down:
-		key = LCUIKEY_PAGEDOWN;
+		key = LCUI_KEY_PAGEDOWN;
 		break;
 	case XK_End:
-		key = LCUIKEY_END;
+		key = LCUI_KEY_END;
 		break;
 	case XK_Control_R:
 	case XK_Control_L:
-		key = LCUIKEY_CONTROL;
+		key = LCUI_KEY_CONTROL;
 		break;
 	case XK_Shift_R:
 	case XK_Shift_L:
-		key = LCUIKEY_SHIFT;
+		key = LCUI_KEY_SHIFT;
 		break;
 	case XK_Alt_L:
 	case XK_Alt_R:
-		key = LCUIKEY_ALT;
+		key = LCUI_KEY_ALT;
 		break;
 	case XK_Caps_Lock:
-		key = LCUIKEY_CAPITAL;
+		key = LCUI_KEY_CAPITAL;
 		break;
 	case XK_comma:
-		key = LCUIKEY_COMMA;
+		key = LCUI_KEY_COMMA;
 		break;
 	case XK_period:
-		key = LCUIKEY_PERIOD;
+		key = LCUI_KEY_PERIOD;
 		break;
 	case XK_minus:
-		key = LCUIKEY_MINUS;
+		key = LCUI_KEY_MINUS;
 		break;
 	case XK_slash:
-		key = LCUIKEY_SLASH;
+		key = LCUI_KEY_SLASH;
 		break;
 	case XK_semicolon:
-		key = LCUIKEY_SEMICOLON;
+		key = LCUI_KEY_SEMICOLON;
 		break;
 	case XK_equal:
-		key = LCUIKEY_EQUAL;
+		key = LCUI_KEY_EQUAL;
 		break;
 	case XK_bracketleft:
-		key = LCUIKEY_BRACKETLEFT;
+		key = LCUI_KEY_BRACKETLEFT;
 		break;
 	case XK_bracketright:
-		key = LCUIKEY_BRACKETRIGHT;
+		key = LCUI_KEY_BRACKETRIGHT;
 		break;
 	case XK_backslash:
-		key = LCUIKEY_BACKSLASH;
+		key = LCUI_KEY_BACKSLASH;
 		break;
 	case XK_apostrophe:
-		key = LCUIKEY_APOSTROPHE;
+		key = LCUI_KEY_APOSTROPHE;
 		break;
 	case XK_grave:
-		key = LCUIKEY_GRAVE;
+		key = LCUI_KEY_GRAVE;
 		break;
 	default:
 		key = keysym;

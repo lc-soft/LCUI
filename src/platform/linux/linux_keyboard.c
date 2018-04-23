@@ -115,34 +115,34 @@ static void DispatchKeyboardEvent(void *arg1, void *arg2)
 	ev.key.code = *((int *)arg1);
 	switch (ev.key.code) {
 	case 183:
-		ev.key.code = LCUIKEY_UP;
+		ev.key.code = LCUI_KEY_UP;
 		break;
 	case 184:
-		ev.key.code = LCUIKEY_DOWN;
+		ev.key.code = LCUI_KEY_DOWN;
 		break;
 	case 185:
-		ev.key.code = LCUIKEY_RIGHT;
+		ev.key.code = LCUI_KEY_RIGHT;
 		break;
 	case 186:
-		ev.key.code = LCUIKEY_LEFT;
+		ev.key.code = LCUI_KEY_LEFT;
 		break;
 	case 127:
-		ev.key.code = LCUIKEY_BACKSPACE;
+		ev.key.code = LCUI_KEY_BACKSPACE;
 		break;
 	case 293:
-		ev.key.code = LCUIKEY_HOME;
+		ev.key.code = LCUI_KEY_HOME;
 		break;
 	case 295:
-		ev.key.code = LCUIKEY_DELETE;
+		ev.key.code = LCUI_KEY_DELETE;
 		break;
 	case 296:
-		ev.key.code = LCUIKEY_END;
+		ev.key.code = LCUI_KEY_END;
 		break;
 	case 297:
-		ev.key.code = LCUIKEY_PAGEUP;
+		ev.key.code = LCUI_KEY_PAGEUP;
 		break;
 	case 298:
-		ev.key.code = LCUIKEY_PAGEDOWN;
+		ev.key.code = LCUI_KEY_PAGEDOWN;
 	default:
 		break;
 	}

@@ -58,28 +58,28 @@ static void OnMouseMessage( LCUI_Event ev, void *arg )
 	}
 	case WM_LBUTTONDOWN:
 		sys_ev.type = LCUI_MOUSEDOWN;
-		sys_ev.button.button = LCUIKEY_LEFTBUTTON;
+		sys_ev.button.button = LCUI_KEY_LEFTBUTTON;
 		sys_ev.button.x = mouse_pos.x;
 		sys_ev.button.y = mouse_pos.y;
 		SetCapture( msg->hwnd );
 		break;
 	case WM_LBUTTONUP:
 		sys_ev.type = LCUI_MOUSEUP;
-		sys_ev.button.button = LCUIKEY_LEFTBUTTON;
+		sys_ev.button.button = LCUI_KEY_LEFTBUTTON;
 		sys_ev.button.x = mouse_pos.x;
 		sys_ev.button.y = mouse_pos.y;
 		ReleaseCapture();
 		break;
 	case WM_RBUTTONDOWN:
 		sys_ev.type = LCUI_MOUSEDOWN;
-		sys_ev.button.button = LCUIKEY_RIGHTBUTTON;
+		sys_ev.button.button = LCUI_KEY_RIGHTBUTTON;
 		sys_ev.button.x = mouse_pos.x;
 		sys_ev.button.y = mouse_pos.y;
 		SetCapture( msg->hwnd );
 		break;
 	case WM_RBUTTONUP:
 		sys_ev.type = LCUI_MOUSEUP;
-		sys_ev.button.button = LCUIKEY_RIGHTBUTTON;
+		sys_ev.button.button = LCUI_KEY_RIGHTBUTTON;
 		sys_ev.button.x = mouse_pos.x;
 		sys_ev.button.y = mouse_pos.y;
 		ReleaseCapture();

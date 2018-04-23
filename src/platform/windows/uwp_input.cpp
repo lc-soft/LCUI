@@ -114,10 +114,10 @@ void InputDriver::OnPointerPressed( CoreWindow^ sender,
 	switch( point->PointerDevice->PointerDeviceType ) {
 	case PointerDeviceType::Mouse:
 		if( pointProps->IsLeftButtonPressed ) {
-			ev.button.button = LCUIKEY_LEFTBUTTON;
+			ev.button.button = LCUI_KEY_LEFTBUTTON;
 			m_mouse.leftButtonPressed = true;
 		} else if( pointProps->IsRightButtonPressed ) {
-			ev.button.button = LCUIKEY_RIGHTBUTTON;
+			ev.button.button = LCUI_KEY_RIGHTBUTTON;
 			m_mouse.rightButtonPressed = true;
 		}
 		break;
@@ -130,7 +130,7 @@ void InputDriver::OnPointerPressed( CoreWindow^ sender,
 		ClearInvalidTouchPoints( &m_touch.points );
 		/* 如果该触点是主触点，则顺便触发鼠标事件 */
 		if( tp->is_primary ) {
-			ev.button.button = LCUIKEY_LEFTBUTTON;
+			ev.button.button = LCUI_KEY_LEFTBUTTON;
 			m_mouse.leftButtonPressed = true;
 			break;
 		}
@@ -202,12 +202,12 @@ void InputDriver::OnPointerReleased( CoreWindow^ sender, PointerEventArgs^ args 
 		if( !pointProps->IsLeftButtonPressed &&
 		    m_mouse.leftButtonPressed ) {
 			m_mouse.leftButtonPressed = false;
-			ev.button.button = LCUIKEY_LEFTBUTTON;
+			ev.button.button = LCUI_KEY_LEFTBUTTON;
 		}
 		if( pointProps->IsRightButtonPressed &&
 		    m_mouse.rightButtonPressed ) {
 			m_mouse.rightButtonPressed = false;
-			ev.button.button = LCUIKEY_RIGHTBUTTON;
+			ev.button.button = LCUI_KEY_RIGHTBUTTON;
 		}
 		break;
 	case PointerDeviceType::Touch:
@@ -219,7 +219,7 @@ void InputDriver::OnPointerReleased( CoreWindow^ sender, PointerEventArgs^ args 
 		LCUI_DestroyEvent( &ev );
 		if( tp->is_primary ) {
 			m_mouse.leftButtonPressed = false;
-			ev.button.button = LCUIKEY_LEFTBUTTON;
+			ev.button.button = LCUI_KEY_LEFTBUTTON;
 		}
 		break;
 	default:return;
