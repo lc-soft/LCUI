@@ -195,7 +195,7 @@ static int OnParseStyleOption( LCUI_CSSParserStyleContext ctx, const char *str )
 		return -1;
 	}
 	s->style = v;
-	s->type = SVT_STYLE;
+	s->type = LCUI_STYPE_STYLE;
 	s->is_valid = TRUE;
 	return 0;
 }
@@ -220,7 +220,7 @@ static void OnComputeFontSize( LCUI_CSSFontStyle fs, LCUI_Style s )
 		);
 		return;
 	}
-	fs->font_size = LCUIMetrics_ComputeActual( DEFAULT_FONT_SIZE, SVT_PX );
+	fs->font_size = LCUIMetrics_ComputeActual( DEFAULT_FONT_SIZE, LCUI_STYPE_PX );
 }
 
 static void OnComputeColor( LCUI_CSSFontStyle fs, LCUI_Style s )
@@ -281,9 +281,9 @@ static void OnComputeLineHeight( LCUI_CSSFontStyle fs, LCUI_Style s )
 {
 	int h;
 	if( s->is_valid ) {
-		if( s->type == SVT_VALUE ) {
+		if( s->type == LCUI_STYPE_VALUE ) {
 			h = iround( fs->font_size * s->val_int );
-		} else if( s->type == SVT_SCALE ) {
+		} else if( s->type == LCUI_STYPE_SCALE ) {
 			h = iround( fs->font_size * s->val_scale );
 		} else {
 			h = LCUIMetrics_ComputeActual( s->value, s->type );
@@ -307,7 +307,7 @@ static void OnComputeContent( LCUI_CSSFontStyle fs, LCUI_Style s )
 
 static void OnComputeWhiteSpace( LCUI_CSSFontStyle fs, LCUI_Style s )
 {
-	if( s->is_valid && s->type == SVT_STYLE ) {
+	if( s->is_valid && s->type == LCUI_STYPE_STYLE ) {
 		fs->white_space = s->val_style;
 	}  else {
 		fs->white_space = SV_AUTO;

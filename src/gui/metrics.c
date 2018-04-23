@@ -43,10 +43,10 @@ static struct LCUI_MetricsModule {
 float LCUIMetrics_Compute( float value, LCUI_StyleType type )
 {
 	switch( type ) {
-	case SVT_PX: break;
-	case SVT_DIP: value = value * metrics.density; break;
-	case SVT_SP: value = value * metrics.scaled_density; break;
-	case SVT_PT: value = value * metrics.dpi / 72.0f; break;
+	case LCUI_STYPE_PX: break;
+	case LCUI_STYPE_DIP: value = value * metrics.density; break;
+	case LCUI_STYPE_SP: value = value * metrics.scaled_density; break;
+	case LCUI_STYPE_PT: value = value * metrics.dpi / 72.0f; break;
 	default: value = 0; break;
 	}
 	return value;
@@ -59,10 +59,10 @@ int LCUIMetrics_ComputeActual( float value, LCUI_StyleType type )
 
 void LCUIMetrics_ComputeRectActual( LCUI_Rect *dst, const LCUI_RectF *src )
 {
-	dst->x = LCUIMetrics_ComputeActual( src->x, SVT_PX );
-	dst->y = LCUIMetrics_ComputeActual( src->y, SVT_PX );
-	dst->width = LCUIMetrics_ComputeActual( src->width, SVT_PX );
-	dst->height = LCUIMetrics_ComputeActual( src->height, SVT_PX );
+	dst->x = LCUIMetrics_ComputeActual( src->x, LCUI_STYPE_PX );
+	dst->y = LCUIMetrics_ComputeActual( src->y, LCUI_STYPE_PX );
+	dst->width = LCUIMetrics_ComputeActual( src->width, LCUI_STYPE_PX );
+	dst->height = LCUIMetrics_ComputeActual( src->height, LCUI_STYPE_PX );
 }
 
 float LCUIMetrics_GetScale( void )

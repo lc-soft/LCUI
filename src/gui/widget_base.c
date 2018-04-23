@@ -38,7 +38,7 @@
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/metrics.h>
 
-static struct LCUIWidgetModule {
+static struct LCUI_WidgetModule {
 	LCUI_Widget root;		/**< 根级部件 */
 	Dict *ids;			/**< 各种部件的ID索引 */
 	LCUI_Mutex mutex;		/**< 互斥锁 */
@@ -284,14 +284,14 @@ static void Widget_Init( LCUI_Widget widget )
 	widget->computed_style.position = SV_STATIC;
 	widget->computed_style.pointer_events = SV_AUTO;
 	widget->computed_style.box_sizing = SV_CONTENT_BOX;
-	widget->computed_style.margin.top.type = SVT_PX;
-	widget->computed_style.margin.right.type = SVT_PX;
-	widget->computed_style.margin.bottom.type = SVT_PX;
-	widget->computed_style.margin.left.type = SVT_PX;
-	widget->computed_style.padding.top.type = SVT_PX;
-	widget->computed_style.padding.right.type = SVT_PX;
-	widget->computed_style.padding.bottom.type = SVT_PX;
-	widget->computed_style.padding.left.type = SVT_PX;
+	widget->computed_style.margin.top.type = LCUI_STYPE_PX;
+	widget->computed_style.margin.right.type = LCUI_STYPE_PX;
+	widget->computed_style.margin.bottom.type = LCUI_STYPE_PX;
+	widget->computed_style.margin.left.type = LCUI_STYPE_PX;
+	widget->computed_style.padding.top.type = LCUI_STYPE_PX;
+	widget->computed_style.padding.right.type = LCUI_STYPE_PX;
+	widget->computed_style.padding.bottom.type = LCUI_STYPE_PX;
+	widget->computed_style.padding.left.type = LCUI_STYPE_PX;
 	Widget_InitBackground( widget );
 	LinkedList_Init( &widget->children );
 	LinkedList_Init( &widget->children_show );
@@ -613,7 +613,7 @@ void Widget_AddState( LCUI_Widget w, LCUI_WidgetState state )
 static float ComputeXMetric( LCUI_Widget w, int key )
 {
 	LCUI_Style s = &w->style->sheet[key];
-	if( s->type == SVT_SCALE ) {
+	if( s->type == LCUI_STYPE_SCALE ) {
 		if( !w->parent ) {
 			return 0;
 		}
@@ -628,7 +628,7 @@ static float ComputeXMetric( LCUI_Widget w, int key )
 static float ComputeYMetric( LCUI_Widget w, int key )
 {
 	LCUI_Style s = &w->style->sheet[key];
-	if( s->type == SVT_SCALE ) {
+	if( s->type == LCUI_STYPE_SCALE ) {
 		if( !w->parent ) {
 			return 0;
 		}
@@ -645,7 +645,7 @@ static int ComputeStyleOption( LCUI_Widget w, int key, int default_value )
 	if( !w->style->sheet[key].is_valid ) {
 		return default_value;
 	}
-	if( w->style->sheet[key].type != SVT_STYLE ) {
+	if( w->style->sheet[key].type != LCUI_STYPE_STYLE ) {
 		return default_value;
 	}
 	return w->style->sheet[key].style;
@@ -657,7 +657,7 @@ void Widget_UpdateVisibility( LCUI_Widget w )
 	LCUI_BOOL visible = w->computed_style.visible;
 	if( w->computed_style.display == SV_NONE ) {
 		w->computed_style.visible = FALSE;
-	} else if( s->is_valid && s->type == SVT_BOOL ) {
+	} else if( s->is_valid && s->type == LCUI_STYPE_BOOL ) {
 		w->computed_style.visible = s->val_bool;
 	} else {
 		w->computed_style.visible = TRUE;
@@ -680,7 +680,7 @@ void Widget_UpdateDisplay( LCUI_Widget w )
 {
 	int display = w->computed_style.display;
 	LCUI_Style s = &w->style->sheet[key_display];
-	if( s->is_valid && s->type == SVT_STYLE ) {
+	if( s->is_valid && s->type == LCUI_STYPE_STYLE ) {
 		w->computed_style.display = s->style;
 		if( w->computed_style.display == SV_NONE ) {
 			w->computed_style.visible = FALSE;
@@ -705,8 +705,8 @@ void Widget_UpdateOpacity( LCUI_Widget w )
 	LCUI_Style s = &w->style->sheet[key_opacity];
 	if( s->is_valid ) {
 		switch( s->type ) {
-		case SVT_VALUE: opacity = 1.0f * s->value; break;
-		case SVT_SCALE: opacity = s->val_scale; break;
+		case LCUI_STYPE_VALUE: opacity = 1.0f * s->value; break;
+		case LCUI_STYPE_SCALE: opacity = s->val_scale; break;
 		default: opacity = 1.0f; break;
 		}
 		if( opacity > 1.0 ) {
@@ -731,7 +731,7 @@ void Widget_ExecUpdateZIndex( LCUI_Widget w )
 	LinkedList *list;
 	LinkedListNode *cnode, *csnode, *snode;
 	LCUI_Style s = &w->style->sheet[key_z_index];
-	if( s->is_valid && s->type == SVT_VALUE ) {
+	if( s->is_valid && s->type == LCUI_STYPE_VALUE ) {
 		z_index = s->val_int;
 	} else {
 		z_index = 0;
@@ -1298,7 +1298,7 @@ void Widget_UpdateMargin( LCUI_Widget w )
 	for( i = 0; i < 4; ++i ) {
 		LCUI_Style s = &w->style->sheet[pd_map[i].key];
 		if( !s->is_valid ) {
-			pd_map[i].sval->type = SVT_PX;
+			pd_map[i].sval->type = LCUI_STYPE_PX;
 			pd_map[i].sval->px = 0.0;
 			*pd_map[i].fval = 0.0;
 			continue;
@@ -1365,7 +1365,7 @@ void Widget_UpdateSize( LCUI_Widget w )
 	for( i = 0; i < 4; ++i ) {
 		LCUI_Style s = &w->style->sheet[pd_map[i].key];
 		if( !s->is_valid ) {
-			pd_map[i].sval->type = SVT_PX;
+			pd_map[i].sval->type = LCUI_STYPE_PX;
 			pd_map[i].sval->px = 0.0;
 			*pd_map[i].ival = 0.0;
 			continue;
@@ -1378,10 +1378,10 @@ void Widget_UpdateSize( LCUI_Widget w )
 	Widget_ComputeSize( w );
 	/* 如果左右外间距是 auto 类型的，则需要计算外间距 */
 	if( w->style->sheet[key_margin_left].is_valid &&
-	    w->style->sheet[key_margin_left].type == SVT_AUTO ) {
+	    w->style->sheet[key_margin_left].type == LCUI_STYPE_AUTO ) {
 		Widget_UpdateMargin( w );
 	} else if( w->style->sheet[key_margin_right].is_valid &&
-		   w->style->sheet[key_margin_right].type == SVT_AUTO ) {
+		   w->style->sheet[key_margin_right].type == LCUI_STYPE_AUTO ) {
 		Widget_UpdateMargin( w );
 	}
 	/* 若尺寸无变化则不继续处理 */
@@ -1446,7 +1446,7 @@ void Widget_UpdateProps( LCUI_Widget w )
 	int prop = ComputeStyleOption( w, key_pointer_events, SV_AUTO );
 	w->computed_style.pointer_events = prop;
 	s = &w->style->sheet[key_focusable];
-	if( s->is_valid && s->type == SVT_BOOL && s->value == 0 ) {
+	if( s->is_valid && s->type == LCUI_STYPE_BOOL && s->value == 0 ) {
 		w->computed_style.focusable = FALSE;
 	} else {
 		w->computed_style.focusable = TRUE;
@@ -1488,13 +1488,13 @@ int Widget_SetAttribute( LCUI_Widget w, const char *name, const char *value )
 		return 0;
 	}
 	if( !value ) {
-		return Widget_SetAttributeEx( w, name, NULL, SVT_NONE, NULL );
+		return Widget_SetAttributeEx( w, name, NULL, LCUI_STYPE_NONE, NULL );
 	}
 	value_str = strdup2( value );
 	if( !value_str ) {
 		return -ENOMEM;
 	}
-	return Widget_SetAttributeEx( w, name, value_str, SVT_STRING, free );
+	return Widget_SetAttributeEx( w, name, value_str, LCUI_STYPE_STRING, free );
 }
 
 const char *Widget_GetAttribute( LCUI_Widget w, const char *name )

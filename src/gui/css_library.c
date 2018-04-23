@@ -439,8 +439,8 @@ void StyleSheet_Clear( LCUI_StyleSheet ss )
 	for( i = 0; i < ss->length; ++i ) {
 		s = &ss->sheet[i];
 		switch( s->type ) {
-		case SVT_STRING:
-		case SVT_WSTRING:
+		case LCUI_STYPE_STRING:
+		case LCUI_STYPE_WSTRING:
 			if( s->is_valid && s->string ) {
 				free( s->string );
 			}
@@ -481,10 +481,10 @@ int StyleSheet_Merge( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 		}
 		++count;
 		switch( src->sheet[i].type ) {
-		case SVT_STRING:
+		case LCUI_STYPE_STRING:
 			s->string = strdup2( src->sheet[i].string );
 			break;
-		case SVT_WSTRING:
+		case LCUI_STYPE_WSTRING:
 			size = wcslen( src->sheet[i].wstring ) + 1;
 			s->wstring = malloc( size * sizeof( wchar_t ) );
 			wcscpy( s->wstring, src->sheet[i].wstring );
@@ -521,13 +521,13 @@ int StyleSheet_Replace( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 		}
 		s = &dest->sheet[i];
 		switch( src->sheet[i].type ) {
-		case SVT_STRING:
+		case LCUI_STYPE_STRING:
 			if( s->is_valid && s->string ) {
 				free( s->string );
 			}
 			s->string = strdup2( src->sheet[i].string );
 			break;
-		case SVT_WSTRING:
+		case LCUI_STYPE_WSTRING:
 			if( s->is_valid && s->string ) {
 				free( s->wstring );
 			}
@@ -1257,13 +1257,13 @@ void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 		}
 		LOG( "%s: ", key > STYLE_KEY_TOTAL ? " (+)" : "" );
 		switch( s->type ) {
-		case SVT_AUTO:
+		case LCUI_STYPE_AUTO:
 			LOG( "auto" );
 			break;
-		case SVT_BOOL:
+		case LCUI_STYPE_BOOL:
 			LOG( "%s", s->val_bool ? "true" : "false" );
 			break;
-		case SVT_COLOR: {
+		case LCUI_STYPE_COLOR: {
 			LCUI_Color *clr = &s->val_color;
 			if( clr->alpha < 255 ) {
 				LOG( "rgba(%d,%d,%d,%g)", clr->r,
@@ -1273,25 +1273,25 @@ void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 			}
 			break;
 		}
-		case SVT_PX:
+		case LCUI_STYPE_PX:
 			LOG( "%gpx", s->val_px );
 			break;
-		case SVT_DIP:
+		case LCUI_STYPE_DIP:
 			LOG( "%gdip", s->val_dip );
 			break;
-		case SVT_SP:
+		case LCUI_STYPE_SP:
 			LOG( "%gsp", s->val_sp );
 			break;
-		case SVT_STRING:
+		case LCUI_STYPE_STRING:
 			LOG( "%s", s->val_string );
 			break;
-		case SVT_SCALE:
+		case LCUI_STYPE_SCALE:
 			LOG( "%g%%", s->val_scale * 100 );
 			break;
-		case SVT_STYLE:
+		case LCUI_STYPE_STYLE:
 			LOG( "%s", LCUI_GetStyleValueName( s->val_style ) );
 			break;
-		case SVT_VALUE:
+		case LCUI_STYPE_VALUE:
 			LOG( "%d", s->val_int );
 			break;
 		default:

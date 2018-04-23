@@ -95,7 +95,7 @@ static int OnParseWordBreak(LCUI_CSSParserStyleContext ctx, const char *value)
 	if (s->is_valid && s->string) {
 		free(s->string);
 	}
-	s->type = SVT_STRING;
+	s->type = LCUI_STYPE_STRING;
 	s->is_valid = TRUE;
 	s->string = str;
 	return 0;
@@ -104,7 +104,7 @@ static int OnParseWordBreak(LCUI_CSSParserStyleContext ctx, const char *value)
 static LCUI_WordBreakMode ComputeWordBreakMode(LCUI_StyleSheet sheet)
 {
 	LCUI_Style s = &sheet->sheet[self.key_word_break];
-	if (s->is_valid && s->type == SVT_STRING && s->string) {
+	if (s->is_valid && s->type == LCUI_STYPE_STRING && s->string) {
 		if (strcmp(s->string, "break-all") == 0) {
 			return LCUI_WORD_BREAK_BREAK_ALL;
 		}
@@ -209,11 +209,11 @@ static void TextView_UpdateLayerSize(LCUI_Widget w)
 		max_height = w->box.content.height;
 	}
 	/* 将当前部件宽高作为文本层的固定宽高 */
-	width = LCUIMetrics_ComputeActual(w->box.content.width, SVT_PX);
-	height = LCUIMetrics_ComputeActual(w->box.content.height, SVT_PX);
+	width = LCUIMetrics_ComputeActual(w->box.content.width, LCUI_STYPE_PX);
+	height = LCUIMetrics_ComputeActual(w->box.content.height, LCUI_STYPE_PX);
 	TextLayer_SetFixedSize(txt->layer, width, height);
-	width = LCUIMetrics_ComputeActual(max_width, SVT_PX);
-	height = LCUIMetrics_ComputeActual(max_height, SVT_PX);
+	width = LCUIMetrics_ComputeActual(max_width, LCUI_STYPE_PX);
+	height = LCUIMetrics_ComputeActual(max_height, LCUI_STYPE_PX);
 	TextLayer_SetMaxSize(txt->layer, width, height);
 }
 

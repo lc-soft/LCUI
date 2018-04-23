@@ -36,7 +36,7 @@
 #include <LCUI/display.h>
 
 //#define DEBUG_FRAME_RENDER
-#define ComputeActualPX(VAL) LCUIMetrics_ComputeActual( VAL, SVT_PX )
+#define ComputeActualPX(VAL) LCUIMetrics_ComputeActual( VAL, LCUI_STYPE_PX )
 
 #ifdef DEBUG_FRAME_RENDER
 #include <LCUI/image.h>

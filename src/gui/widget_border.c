@@ -37,7 +37,7 @@
 
 static float ComputeXMetric( LCUI_Widget w, LCUI_Style s )
 {
-	if( s->type == SVT_SCALE ) {
+	if( s->type == LCUI_STYPE_SCALE ) {
 		return w->width * s->scale;
 	}
 	return LCUIMetrics_Compute( s->value, s->type );
@@ -45,7 +45,7 @@ static float ComputeXMetric( LCUI_Widget w, LCUI_Style s )
 
 static float ComputeYMetric( LCUI_Widget w, LCUI_Style s )
 {
-	if( s->type == SVT_SCALE ) {
+	if( s->type == LCUI_STYPE_SCALE ) {
 		return w->height * s->scale;
 	}
 	return LCUIMetrics_Compute( s->value, s->type );
@@ -120,7 +120,7 @@ void Widget_ComputeBorderStyle( LCUI_Widget w )
 static unsigned int ComputeActual( float width )
 {
 	unsigned int w;
-	w = LCUIMetrics_ComputeActual( width, SVT_PX );
+	w = LCUIMetrics_ComputeActual( width, LCUI_STYPE_PX );
 	if( width > 0 && w < 1 ) {
 		return 1;
 	}

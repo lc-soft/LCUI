@@ -252,10 +252,10 @@ void Widget_UpdateBackground( LCUI_Widget widget )
 				break;
 			}
 			switch( s->type ) {
-			case SVT_STRING:
+			case LCUI_STYPE_STRING:
 				AsyncLoadImage( widget, s->string );
 				break;
-			case SVT_IMAGE:
+			case LCUI_STYPE_IMAGE:
 				if( !s->image ) {
 					Graph_Init( &bg->image );
 					break;
@@ -266,7 +266,7 @@ void Widget_UpdateBackground( LCUI_Widget widget )
 			}
 			break;
 		case key_background_position:
-			if( s->is_valid && s->type != SVT_NONE ) {
+			if( s->is_valid && s->type != LCUI_STYPE_NONE ) {
 				bg->position.using_value = TRUE;
 				bg->position.value = s->val_style;
 			} else {
@@ -275,19 +275,19 @@ void Widget_UpdateBackground( LCUI_Widget widget )
 			}
 			break;
 		case key_background_position_x:
-			if( s->is_valid && s->type != SVT_NONE ) {
+			if( s->is_valid && s->type != LCUI_STYPE_NONE ) {
 				bg->position.using_value = FALSE;
 				bg->position.x = *s;
 			}
 			break;
 		case key_background_position_y:
-			if( s->is_valid && s->type != SVT_NONE ) {
+			if( s->is_valid && s->type != LCUI_STYPE_NONE ) {
 				bg->position.using_value = FALSE;
 				bg->position.y = *s;
 			}
 			break;
 		case key_background_size:
-			if( s->is_valid && s->type != SVT_NONE ) {
+			if( s->is_valid && s->type != LCUI_STYPE_NONE ) {
 				bg->size.using_value = TRUE;
 				bg->size.value = s->val_style;
 			} else {
@@ -296,13 +296,13 @@ void Widget_UpdateBackground( LCUI_Widget widget )
 			}
 			break;
 		case key_background_size_width:
-			if( s->is_valid && s->type != SVT_NONE ) {
+			if( s->is_valid && s->type != LCUI_STYPE_NONE ) {
 				bg->size.using_value = FALSE;
 				bg->size.width = *s;
 			}
 			break;
 		case key_background_size_height:
-			if( s->is_valid && s->type != SVT_NONE ) {
+			if( s->is_valid && s->type != LCUI_STYPE_NONE ) {
 				bg->size.using_value = FALSE;
 				bg->size.height = *s;
 			}
@@ -351,18 +351,18 @@ void Widget_ComputeBackground( LCUI_Widget w, LCUI_Background *out )
 			height = (float)bg->image.height;
 			break;
 		}
-		out->position.x = LCUIMetrics_ComputeActual( x, SVT_PX );
-		out->position.y = LCUIMetrics_ComputeActual( y, SVT_PX );
-		out->size.width = LCUIMetrics_ComputeActual( width, SVT_PX );
-		out->size.height = LCUIMetrics_ComputeActual( height, SVT_PX );
+		out->position.x = LCUIMetrics_ComputeActual( x, LCUI_STYPE_PX );
+		out->position.y = LCUIMetrics_ComputeActual( y, LCUI_STYPE_PX );
+		out->size.width = LCUIMetrics_ComputeActual( width, LCUI_STYPE_PX );
+		out->size.height = LCUIMetrics_ComputeActual( height, LCUI_STYPE_PX );
 	} else {
-		type = SVT_PX;
+		type = LCUI_STYPE_PX;
 		switch( type ) {
-		case SVT_SCALE:
+		case LCUI_STYPE_SCALE:
 			width = box->width * bg->size.width.scale;
 			break;
-		case SVT_NONE:
-		case SVT_AUTO:
+		case LCUI_STYPE_NONE:
+		case LCUI_STYPE_AUTO:
 			width = (float)bg->image.width;
 			break;
 		default:
@@ -371,13 +371,13 @@ void Widget_ComputeBackground( LCUI_Widget w, LCUI_Background *out )
 			break;
 		}
 		out->size.width = LCUIMetrics_ComputeActual( width, type );
-		type = SVT_PX;
+		type = LCUI_STYPE_PX;
 		switch( type ) {
-		case SVT_SCALE:
+		case LCUI_STYPE_SCALE:
 			height = box->height * bg->size.height.scale;
 			break;
-		case SVT_NONE:
-		case SVT_AUTO:
+		case LCUI_STYPE_NONE:
+		case LCUI_STYPE_AUTO:
 			height = (float)bg->image.height;
 			break;
 		default:
@@ -427,14 +427,14 @@ void Widget_ComputeBackground( LCUI_Widget w, LCUI_Background *out )
 		default: break;
 		}
 	} else {
-		type = SVT_PX;
+		type = LCUI_STYPE_PX;
 		switch( bg->position.x.type ) {
-		case SVT_SCALE:
+		case LCUI_STYPE_SCALE:
 			x = box->width - width;
 			x = x * bg->position.x.scale;
 			break;
-		case SVT_NONE:
-		case SVT_AUTO:
+		case LCUI_STYPE_NONE:
+		case LCUI_STYPE_AUTO:
 			break;
 		default:
 			x = bg->position.x.value;
@@ -442,14 +442,14 @@ void Widget_ComputeBackground( LCUI_Widget w, LCUI_Background *out )
 			break;
 		}
 		out->position.x = LCUIMetrics_ComputeActual( x, type );
-		type = SVT_PX;
+		type = LCUI_STYPE_PX;
 		switch( bg->position.y.type ) {
-		case SVT_SCALE:
+		case LCUI_STYPE_SCALE:
 			y = box->height - height;
 			y = y * bg->position.y.scale;
 			break;
-		case SVT_NONE:
-		case SVT_AUTO:
+		case LCUI_STYPE_NONE:
+		case LCUI_STYPE_AUTO:
 			break;
 		default:
 			y = bg->position.y.value;

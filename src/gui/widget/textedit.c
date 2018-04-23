@@ -767,13 +767,13 @@ static void TextEdit_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	float max_width = 0, max_height = 0;
 	LCUI_TextEdit edit = GetData( w );
 	if( !w->style->sheet[key_width].is_valid ||
-	    w->style->sheet[key_width].type == SVT_AUTO ) {
+	    w->style->sheet[key_width].type == LCUI_STYPE_AUTO ) {
 		max_width = Widget_ComputeMaxContentWidth( w );
 	} else {
 		max_width = width = w->box.content.width;
 	}
 	if( w->style->sheet[key_height].is_valid &&
-	    w->style->sheet[key_height].type != SVT_AUTO ) {
+	    w->style->sheet[key_height].type != LCUI_STYPE_AUTO ) {
 		max_height = height = w->box.content.width;
 	}
 	LinkedList_Init( &rects );

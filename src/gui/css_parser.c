@@ -89,7 +89,7 @@ static int SplitValues( const char *str, LCUI_Style slist,
 	for( vj = 0; vj < vi; ++vj ) {
 		DEBUG_MSG( "[%d] %s\n", vj, values[vj] );
 		if( strcmp( values[vj], "auto" ) == 0 ) {
-			slist[vj].type = SVT_AUTO;
+			slist[vj].type = LCUI_STYPE_AUTO;
 			slist[vj].value = SV_AUTO;
 			slist[vj].is_valid = TRUE;
 			continue;
@@ -110,7 +110,7 @@ static int SplitValues( const char *str, LCUI_Style slist,
 			val = LCUI_GetStyleValue( values[vj] );
 			if( val > 0 ) {
 				slist[vj].style = val;
-				slist[vj].type = SVT_style;
+				slist[vj].type = LCUI_STYPE_style;
 				slist[vj].is_valid = TRUE;
 				DEBUG_MSG( "[%d]:parse ok\n", vj );
 				continue;
@@ -133,7 +133,7 @@ static int OnParseValue( LCUI_CSSParserStyleContext ctx, const char *str )
 	LCUI_Style s = &ctx->sheet->sheet[ctx->parser->key];
 	if( sscanf( str, "%d", &s->val_int ) == 1 ) {
 		s->is_valid = TRUE;
-		s->type = SVT_VALUE;
+		s->type = LCUI_STYPE_VALUE;
 		return 0;
 	}
 	return -1;
@@ -147,7 +147,7 @@ static int OnParseNumber( LCUI_CSSParserStyleContext ctx, const char *str )
 	}
 	if( strcmp("auto", str) == 0 ) {
 		s->is_valid = TRUE;
-		s->type = SVT_AUTO;
+		s->type = LCUI_STYPE_AUTO;
 		s->style = SV_AUTO;
 		return 0;
 	}
@@ -159,18 +159,18 @@ static int OnParseBoolean( LCUI_CSSParserStyleContext ctx, const char *str )
 	LCUI_Style s = &ctx->sheet->sheet[ctx->parser->key];
 	if( strcasecmp(str, "true") == 0 ) {
 		s->is_valid = TRUE;
-		s->type = SVT_BOOL;
+		s->type = LCUI_STYPE_BOOL;
 		s->value = TRUE;
 		return 0;
 	} else if( strcasecmp(str, "false") == 0 ) {
 		s->is_valid = TRUE;
-		s->type = SVT_BOOL;
+		s->type = LCUI_STYPE_BOOL;
 		s->value = FALSE;
 		return 0;
 	}
 	if( strcmp("auto", str) == 0 ) {
 		s->is_valid = TRUE;
-		s->type = SVT_AUTO;
+		s->type = LCUI_STYPE_AUTO;
 		s->style = SV_AUTO;
 		return 0;
 	}
@@ -204,7 +204,7 @@ static int OnParseStyleOption( LCUI_CSSParserStyleContext ctx,
 		return -1;
 	}
 	s->style = v;
-	s->type = SVT_STYLE;
+	s->type = LCUI_STYPE_STYLE;
 	s->is_valid = TRUE;
 	return 0;
 }
@@ -223,20 +223,20 @@ static int OnParseBorder( LCUI_CSSParserStyleContext ctx,
 			break;
 		}
 		switch( slist[i].type ) {
-		case SVT_COLOR:
+		case LCUI_STYPE_COLOR:
 			ss->sheet[key_border_top_color] = slist[i];
 			ss->sheet[key_border_right_color] = slist[i];
 			ss->sheet[key_border_bottom_color] = slist[i];
 			ss->sheet[key_border_left_color] = slist[i];
 			break;
-		case SVT_PX:
-		case SVT_VALUE:
+		case LCUI_STYPE_PX:
+		case LCUI_STYPE_VALUE:
 			ss->sheet[key_border_top_width] = slist[i];
 			ss->sheet[key_border_right_width] = slist[i];
 			ss->sheet[key_border_bottom_width] = slist[i];
 			ss->sheet[key_border_left_width] = slist[i];
 			break;
-		case SVT_style:
+		case LCUI_STYPE_style:
 			ss->sheet[key_border_top_style] = slist[i];
 			ss->sheet[key_border_right_style] = slist[i];
 			ss->sheet[key_border_bottom_style] = slist[i];
@@ -274,14 +274,14 @@ static int OnParseBorderLeft( LCUI_CSSParserStyleContext ctx,
 	}
 	for( i = 0; i < 3; ++i ) {
 		switch( slist[i].type ) {
-		case SVT_COLOR:
+		case LCUI_STYPE_COLOR:
 			ss->sheet[key_border_left_color] = slist[i];
 			break;
-		case SVT_PX:
-		case SVT_VALUE:
+		case LCUI_STYPE_PX:
+		case LCUI_STYPE_VALUE:
 			ss->sheet[key_border_left_width] = slist[i];
 			break;
-		case SVT_style:
+		case LCUI_STYPE_style:
 			ss->sheet[key_border_left_style] = slist[i];
 			break;
 		default: return -1;
@@ -301,14 +301,14 @@ static int OnParseBorderTop( LCUI_CSSParserStyleContext ctx,
 	}
 	for( i = 0; i < 3; ++i ) {
 		switch( slist[i].type ) {
-		case SVT_COLOR:
+		case LCUI_STYPE_COLOR:
 			ss->sheet[key_border_top_color] = slist[i];
 			break;
-		case SVT_PX:
-		case SVT_VALUE:
+		case LCUI_STYPE_PX:
+		case LCUI_STYPE_VALUE:
 			ss->sheet[key_border_top_width] = slist[i];
 			break;
-		case SVT_style:
+		case LCUI_STYPE_style:
 			ss->sheet[key_border_top_style] = slist[i];
 			break;
 		default: return -1;
@@ -328,14 +328,14 @@ static int OnParseBorderRight( LCUI_CSSParserStyleContext ctx,
 	}
 	for( i = 0; i < 3; ++i ) {
 		switch( slist[i].type ) {
-		case SVT_COLOR:
+		case LCUI_STYPE_COLOR:
 			ss->sheet[key_border_right_color] = slist[i];
 			break;
-		case SVT_PX:
-		case SVT_VALUE:
+		case LCUI_STYPE_PX:
+		case LCUI_STYPE_VALUE:
 			ss->sheet[key_border_right_width] = slist[i];
 			break;
-		case SVT_style:
+		case LCUI_STYPE_style:
 			ss->sheet[key_border_right_style] = slist[i];
 			break;
 		default: return -1;
@@ -355,14 +355,14 @@ static int OnParseBorderBottom( LCUI_CSSParserStyleContext ctx,
 	}
 	for( i = 0; i < 3; ++i ) {
 		switch( slist[i].type ) {
-		case SVT_COLOR:
+		case LCUI_STYPE_COLOR:
 			ss->sheet[key_border_bottom_color] = slist[i];
 			break;
-		case SVT_PX:
-		case SVT_VALUE:
+		case LCUI_STYPE_PX:
+		case LCUI_STYPE_VALUE:
 			ss->sheet[key_border_bottom_width] = slist[i];
 			break;
-		case SVT_style:
+		case LCUI_STYPE_style:
 			ss->sheet[key_border_bottom_style] = slist[i];
 			break;
 		default: return -1;

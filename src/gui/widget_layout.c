@@ -52,7 +52,7 @@ typedef struct LCUI_LayoutContextRec_ {
 
 static void HandleJustifyContent( LCUI_FlexLayoutStyle *data, LCUI_Style style )
 {
-	if( style->type != SVT_STYLE || !style->is_valid ) {
+	if( style->type != LCUI_STYPE_STYLE || !style->is_valid ) {
 		data->justify_content = SV_FLEX_START;
 		return;
 	}
@@ -204,8 +204,8 @@ void Widget_ExecUpdateLayout( LCUI_Widget w )
 		ctx->prev = ctx->current;
 	}
 	LCUILayout_End( ctx );
-	if( w->style->sheet[key_width].type == SVT_AUTO ||
-	    w->style->sheet[key_height].type == SVT_AUTO ) {
+	if( w->style->sheet[key_width].type == LCUI_STYPE_AUTO ||
+	    w->style->sheet[key_height].type == LCUI_STYPE_AUTO ) {
 		Widget_AddTask( w, LCUI_WTASK_RESIZE );
 	}
 	ev.cancel_bubble = TRUE;

@@ -72,18 +72,18 @@ LCUI_BOOL ParseNumber( LCUI_Style s, const char *str )
 	switch( *p ) {
 	case 'd':
 	case 'D':
-		s->type = SVT_NONE;
+		s->type = LCUI_STYPE_NONE;
 		if( !p[1] ) {
 			break;
 		}
 		if( p[1] == 'p' || p[1] == 'P' ) {
-			s->type = SVT_DIP;
+			s->type = LCUI_STYPE_DIP;
 			sscanf( num_str, "%f", &s->dip );
 			break;
 		}
 		if( p[1] == 'i' || p[1] == 'I' ) {
 			if( p[2] == 'p' || p[2] == 'P' ) {
-				s->type = SVT_DIP;
+				s->type = LCUI_STYPE_DIP;
 				sscanf( num_str, "%f", &s->dip );
 				break;
 			}
@@ -92,22 +92,22 @@ LCUI_BOOL ParseNumber( LCUI_Style s, const char *str )
 	case 's':
 	case 'S':
 		if( p[1] == 'p' || p[1] == 'P' ) {
-			s->type = SVT_SP;
+			s->type = LCUI_STYPE_SP;
 			sscanf( num_str, "%f", &s->sp );
 		} else {
-			s->type = SVT_NONE;
+			s->type = LCUI_STYPE_NONE;
 		}
 		break;
 	case 'P':
 	case 'p':
 		if( p[1] == 'x' || p[1] == 'X' ) {
-			s->type = SVT_PX;
+			s->type = LCUI_STYPE_PX;
 			sscanf( num_str, "%f", &s->px );
 		} else if( p[1] == 't' || p[1] == 'T' ) {
-			s->type = SVT_PT;
+			s->type = LCUI_STYPE_PT;
 			sscanf( num_str, "%f", &s->pt );
 		} else {
-			s->type = SVT_NONE;
+			s->type = LCUI_STYPE_NONE;
 		}
 		break;
 	case '%':
@@ -115,19 +115,19 @@ LCUI_BOOL ParseNumber( LCUI_Style s, const char *str )
 			return FALSE;
 		}
 		s->scale /= 100.0;
-		s->type = SVT_SCALE;
+		s->type = LCUI_STYPE_SCALE;
 		break;
 	case 0:
 		if( has_point && 1 == sscanf( num_str, "%f", &s->scale ) ) {
-			s->type = SVT_SCALE;
+			s->type = LCUI_STYPE_SCALE;
 			break;
 		}
 		if( 1 == sscanf( num_str, "%d", &s->val_int ) ) {
-			s->type = SVT_VALUE;
+			s->type = LCUI_STYPE_VALUE;
 			break;
 		}
 	default:
-		s->type = SVT_NONE;
+		s->type = LCUI_STYPE_NONE;
 		s->is_valid = FALSE;
 		return FALSE;
 	}
@@ -166,7 +166,7 @@ LCUI_BOOL ParseRGBA( LCUI_Style var, const char *str )
 	if( *p ) {
 		return FALSE;
 	}
-	var->type = SVT_COLOR;
+	var->type = LCUI_STYPE_COLOR;
 	var->color.a = (uchar_t)(255.0 * data[3]);
 	var->color.r = (uchar_t)data[0];
 	var->color.g = (uchar_t)data[1];
@@ -206,7 +206,7 @@ LCUI_BOOL ParseRGB( LCUI_Style var, const char *str )
 	if( *p ) {
 		return FALSE;
 	}
-	var->type = SVT_COLOR;
+	var->type = LCUI_STYPE_COLOR;
 	var->color.a = 255;
 	var->color.r = (uchar_t)data[0];
 	var->color.g = (uchar_t)data[1];
@@ -257,7 +257,7 @@ LCUI_BOOL ParseColor( LCUI_Style var, const char *str )
 	default:break;
 	}
 	if( status == 3 ) {
-		var->type = SVT_COLOR;
+		var->type = LCUI_STYPE_COLOR;
 		var->color.a = 255;
 		var->color.r = r;
 		var->color.g = g;
@@ -271,7 +271,7 @@ LCUI_BOOL ParseColor( LCUI_Style var, const char *str )
 		var->color.red = 255;
 		var->color.green = 255;
 		var->color.blue = 255;
-		var->type = SVT_COLOR;
+		var->type = LCUI_STYPE_COLOR;
 		return TRUE;
 	}
 	return FALSE;
@@ -310,7 +310,7 @@ LCUI_BOOL ParseUrl( LCUI_Style s, const char *str, const char *dirname )
 		++head;
 	}
 	n = tail - head;
-	s->type = SVT_STRING;
+	s->type = LCUI_STYPE_STRING;
 	if( dirname && !IsAbsolutePath( head ) ) {
 		n += (dirname_len = strlen( dirname ));
 		s->val_string = malloc( (n + 1) * sizeof( char ) );

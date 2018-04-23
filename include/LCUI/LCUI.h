@@ -153,39 +153,39 @@ typedef enum LCUI_StyleValue {
 
 /** 样式变量类型 */
 typedef enum LCUI_StyleType {
-	SVT_NONE,
-	SVT_AUTO,
-	SVT_SCALE,
-	SVT_PX,
-	SVT_PT,
-	SVT_DIP,
-	SVT_SP,
-	SVT_COLOR,
-	SVT_IMAGE,
-	SVT_STYLE,
-	SVT_VALUE,
-	SVT_BOOL,
-	SVT_STRING,
-	SVT_WSTRING
+	LCUI_STYPE_NONE,
+	LCUI_STYPE_AUTO,
+	LCUI_STYPE_SCALE,
+	LCUI_STYPE_PX,
+	LCUI_STYPE_PT,
+	LCUI_STYPE_DIP,
+	LCUI_STYPE_SP,
+	LCUI_STYPE_COLOR,
+	LCUI_STYPE_IMAGE,
+	LCUI_STYPE_STYLE,
+	LCUI_STYPE_VALUE,
+	LCUI_STYPE_BOOL,
+	LCUI_STYPE_STRING,
+	LCUI_STYPE_WSTRING
 } LCUI_StyleType;
 
-#define SVT_px		SVT_PX
-#define SVT_pt		SVT_PT
-#define SVT_value	SVT_VALUE
-#define SVT_int		SVT_VALUE
-#define SVT_color	SVT_COLOR
-#define SVT_scale	SVT_SCALE
-#define SVT_style	SVT_STYLE
-#define SVT_data	SVT_DATA
-#define SVT_bool	SVT_BOOL
-#define SVT_image	SVT_IMAGE
-#define SVT_string	SVT_STRING
-#define SVT_wstring	SVT_WSTRING
-#define SVT_sp		SVT_SP
-#define SVT_dp		SVT_DIP
-#define SVT_dip		SVT_DIP
-#define SVT_0		SVT_NONE
-#define SVT_none	SVT_NONE
+#define LCUI_STYPE_px		LCUI_STYPE_PX
+#define LCUI_STYPE_pt		LCUI_STYPE_PT
+#define LCUI_STYPE_value	LCUI_STYPE_VALUE
+#define LCUI_STYPE_int		LCUI_STYPE_VALUE
+#define LCUI_STYPE_color	LCUI_STYPE_COLOR
+#define LCUI_STYPE_scale	LCUI_STYPE_SCALE
+#define LCUI_STYPE_style	LCUI_STYPE_STYLE
+#define LCUI_STYPE_data		LCUI_STYPE_DATA
+#define LCUI_STYPE_bool		LCUI_STYPE_BOOL
+#define LCUI_STYPE_image	LCUI_STYPE_IMAGE
+#define LCUI_STYPE_string	LCUI_STYPE_STRING
+#define LCUI_STYPE_wstring	LCUI_STYPE_WSTRING
+#define LCUI_STYPE_sp		LCUI_STYPE_SP
+#define LCUI_STYPE_dp		LCUI_STYPE_DIP
+#define LCUI_STYPE_dip		LCUI_STYPE_DIP
+#define LCUI_STYPE_0		LCUI_STYPE_NONE
+#define LCUI_STYPE_none	LCUI_STYPE_NONE
 
 typedef struct LCUI_BoxShadowStyle {
 	float x, y;

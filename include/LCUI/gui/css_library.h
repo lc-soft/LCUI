@@ -166,15 +166,15 @@ typedef struct LCUI_SelectorRec_ {
 } LCUI_SelectorRec, *LCUI_Selector;
 
 
-#define CheckStyleType(S, K, T) (S->sheet[K].is_valid && S->sheet[K].type == SVT_##T)
+#define CheckStyleType(S, K, T) (S->sheet[K].is_valid && S->sheet[K].type == LCUI_STYPE_##T)
 #define CheckStyleValue(S, K, V) (S->sheet[K].is_valid && S->sheet[K].type == SV_##V)
 
 #define SetStyle(S, NAME, VAL, TYPE)	S->sheet[NAME].is_valid = TRUE, \
-					S->sheet[NAME].type = SVT_##TYPE, \
+					S->sheet[NAME].type = LCUI_STYPE_##TYPE, \
 					S->sheet[NAME].val_##TYPE = VAL
 
 #define UnsetStyle(S, NAME)	S->sheet[NAME].is_valid = FALSE, \
-				S->sheet[NAME].type = SVT_NONE, \
+				S->sheet[NAME].type = LCUI_STYPE_NONE, \
 				S->sheet[NAME].val_int = 0
 
 #define LCUI_FindStyleSheet(S, L) LCUI_FindStyleSheetFromGroup(0, NULL, S, L)

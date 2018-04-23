@@ -37,7 +37,7 @@
 
 static float ComputeXMetric( LCUI_Widget w, LCUI_Style s )
 {
-	if( s->type == SVT_SCALE ) {
+	if( s->type == LCUI_STYPE_SCALE ) {
 		return w->width * s->scale;
 	}
 	return LCUIMetrics_Compute( s->value, s->type );
@@ -45,7 +45,7 @@ static float ComputeXMetric( LCUI_Widget w, LCUI_Style s )
 
 static float ComputeYMetric( LCUI_Widget w, LCUI_Style s )
 {
-	if( s->type == SVT_SCALE ) {
+	if( s->type == LCUI_STYPE_SCALE ) {
 		return w->height * s->scale;
 	}
 	return LCUIMetrics_Compute( s->value, s->type );
@@ -163,10 +163,10 @@ void Widget_ComputeBoxShadow( LCUI_Widget w, LCUI_BoxShadow *out )
 {
 	LCUI_BoxShadowStyle *s;
 	s = &w->computed_style.shadow;
-	out->x = LCUIMetrics_ComputeActual( s->x, SVT_PX );
-	out->y = LCUIMetrics_ComputeActual( s->y, SVT_PX );
-	out->blur = LCUIMetrics_ComputeActual( s->blur, SVT_PX );
-	out->spread = LCUIMetrics_ComputeActual( s->spread, SVT_PX );
+	out->x = LCUIMetrics_ComputeActual( s->x, LCUI_STYPE_PX );
+	out->y = LCUIMetrics_ComputeActual( s->y, LCUI_STYPE_PX );
+	out->blur = LCUIMetrics_ComputeActual( s->blur, LCUI_STYPE_PX );
+	out->spread = LCUIMetrics_ComputeActual( s->spread, LCUI_STYPE_PX );
 	out->color = s->color;
 }
 
