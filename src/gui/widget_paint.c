@@ -154,7 +154,7 @@ LCUI_BOOL Widget_InvalidateArea( LCUI_Widget widget,
 		if( rect.width <= 0 || rect.height <= 0 ) {
 			return FALSE;
 		}
-		if( mode != LCDM_SEAMLESS && w->parent == root ) {
+		if( mode != LCUI_DMODE_SEAMLESS && w->parent == root ) {
 			break;
 		}
 		w = w->parent;
@@ -162,7 +162,7 @@ LCUI_BOOL Widget_InvalidateArea( LCUI_Widget widget,
 		rect.y += w->box.padding.y;
 	}
 	RectFToInvalidArea( &rect, &area );
-	if( mode != LCDM_SEAMLESS ) {
+	if( mode != LCUI_DMODE_SEAMLESS ) {
 		RectList_Add( &self.rects, &area );
 		return TRUE;
 	}

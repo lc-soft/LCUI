@@ -2,7 +2,7 @@
  * display.h -- Graphic display control
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -38,21 +38,21 @@
 LCUI_BEGIN_HEADER
 
 /** 图形显示模式 */
-enum LCUIDisplayMode {
-	LCDM_WINDOWED = 1,	/**< 窗口化 */
-	LCDM_SEAMLESS,		/**< 与系统GUI无缝结合 */
-	LCDM_FULLSCREEN		/**< 全屏模式 */
+enum LCUI_DisplayMode {
+	LCUI_DMODE_WINDOWED = 1, /**< 窗口化 */
+	LCUI_DMODE_SEAMLESS,     /**< 与系统GUI无缝结合 */
+	LCUI_DMODE_FULLSCREEN    /**< 全屏模式 */
 };
 
-#define LCDM_DEFAULT LCDM_WINDOWED
+#define LCUI_DMODE_DEFAULT LCUI_DMODE_WINDOWED
 
 /** 显示驱动的事件类型 */
 enum LCUI_DisplayEventType {
-	DET_NONE,
-	DET_PAINT,
-	DET_RESIZE,
-	DET_MINMAXINFO,
-	DET_READY
+	LCUI_DEVENT_NONE,
+	LCUI_DEVENT_PAINT,
+	LCUI_DEVENT_RESIZE,
+	LCUI_DEVENT_MINMAXINFO,
+	LCUI_DEVENT_READY
 };
 
 /** 显示驱动的事件数据结构 */
@@ -74,76 +74,76 @@ typedef struct LCUI_DisplayEventRec_ {
 
 /** surface 的操作方法集 */
 typedef struct LCUI_DisplayDriverRec_ {
-	char			name[256];
-	int			(*getWidth)(void);
-	int			(*getHeight)(void);
-	LCUI_Surface		(*create)(void);
-	void			(*destroy)(LCUI_Surface);
-	void			(*close)(LCUI_Surface);
-	void			(*resize)(LCUI_Surface,int,int);
-	void			(*move)(LCUI_Surface,int,int);
-	void			(*show)(LCUI_Surface);
-	void			(*hide)(LCUI_Surface);
-	void			(*update)(LCUI_Surface);
-	void			(*present)(LCUI_Surface);
-	LCUI_BOOL		(*isReady)(LCUI_Surface);
-	LCUI_PaintContext	(*beginPaint)(LCUI_Surface,LCUI_Rect*);
-	void			(*endPaint)(LCUI_Surface,LCUI_PaintContext);
-	void			(*setCaptionW)(LCUI_Surface,const wchar_t*);
-	void			(*setRenderMode)(LCUI_Surface,int);
-	void*			(*getHandle)(LCUI_Surface);
-	int			(*getSurfaceWidth)(LCUI_Surface);
-	int			(*getSurfaceHeight)(LCUI_Surface);
-	void			(*setOpacity)(LCUI_Surface,float);
-	int			(*bindEvent)(int,LCUI_EventFunc,void*,void(*)(void*));
+	char name[256];
+	int (*getWidth)(void);
+	int (*getHeight)(void);
+	LCUI_Surface (*create)(void);
+	void (*destroy)(LCUI_Surface);
+	void (*close)(LCUI_Surface);
+	void (*resize)(LCUI_Surface, int, int);
+	void (*move)(LCUI_Surface, int, int);
+	void (*show)(LCUI_Surface);
+	void (*hide)(LCUI_Surface);
+	void (*update)(LCUI_Surface);
+	void (*present)(LCUI_Surface);
+	LCUI_BOOL (*isReady)(LCUI_Surface);
+	LCUI_PaintContext (*beginPaint)(LCUI_Surface, LCUI_Rect *);
+	void (*endPaint)(LCUI_Surface, LCUI_PaintContext);
+	void (*setCaptionW)(LCUI_Surface, const wchar_t *);
+	void (*setRenderMode)(LCUI_Surface, int);
+	void *(*getHandle)(LCUI_Surface);
+	int (*getSurfaceWidth)(LCUI_Surface);
+	int (*getSurfaceHeight)(LCUI_Surface);
+	void (*setOpacity)(LCUI_Surface, float);
+	int (*bindEvent)(int, LCUI_EventFunc, void *, void (*)(void *));
 } LCUI_DisplayDriverRec, *LCUI_DisplayDriver;
 
 /* 设置呈现模式 */
-LCUI_API int LCUIDisplay_SetMode( int mode );
+LCUI_API int LCUIDisplay_SetMode(int mode);
 
 /** 获取屏幕显示模式 */
-LCUI_API int LCUIDisplay_GetMode( void );
+LCUI_API int LCUIDisplay_GetMode(void);
 
 /** 更新各种图形元素 */
-LCUI_API void LCUIDisplay_Update( void );
+LCUI_API void LCUIDisplay_Update(void);
 
 /** 渲染内容 */
-LCUI_API size_t LCUIDisplay_Render( void );
+LCUI_API size_t LCUIDisplay_Render(void);
 
 /** 呈现渲染后的内容 */
-LCUI_API void LCUIDisplay_Present( void );
+LCUI_API void LCUIDisplay_Present(void);
 
-LCUI_API void LCUIDisplay_ShowRectBorder( void );
+LCUI_API void LCUIDisplay_ShowRectBorder(void);
 
-LCUI_API void LCUIDisplay_HideRectBorder( void );
+LCUI_API void LCUIDisplay_HideRectBorder(void);
 
 /** 设置显示区域的尺寸，仅在窗口化、全屏模式下有效 */
-LCUI_API void LCUIDisplay_SetSize( int width, int height );
+LCUI_API void LCUIDisplay_SetSize(int width, int height);
 
 /** 获取屏幕宽度 */
-LCUI_API int LCUIDisplay_GetWidth( void );
+LCUI_API int LCUIDisplay_GetWidth(void);
 
 /** 获取屏幕高度 */
-LCUI_API int LCUIDisplay_GetHeight( void );
+LCUI_API int LCUIDisplay_GetHeight(void);
 
 /** 添加无效区域 */
-LCUI_API void LCUIDisplay_InvalidateArea( LCUI_Rect *rect );
+LCUI_API void LCUIDisplay_InvalidateArea(LCUI_Rect *rect);
 
 /** 获取当前部件所属的 surface */
-LCUI_API LCUI_Surface LCUIDisplay_GetSurfaceOwner( LCUI_Widget w );
+LCUI_API LCUI_Surface LCUIDisplay_GetSurfaceOwner(LCUI_Widget w);
 
 /** 根据 handle 获取 surface */
-LCUI_Surface LCUIDisplay_GetSurfaceByHandle( void *handle );
+LCUI_Surface LCUIDisplay_GetSurfaceByHandle(void *handle);
 
 /** 绑定 surface 触发的事件 */
-LCUI_API int LCUIDisplay_BindEvent( int event_id, LCUI_EventFunc func, void *arg,
-				    void *data, void( *destroy_data )(void*) );
+LCUI_API int LCUIDisplay_BindEvent(int event_id, LCUI_EventFunc func, void *arg,
+				   void *data, void (*destroy_data)(void *));
 
 /** 初始化图形输出模块 */
-LCUI_API int LCUI_InitDisplay( LCUI_DisplayDriver driver );
+LCUI_API int LCUI_InitDisplay(LCUI_DisplayDriver driver);
 
 /** 停用图形输出模块 */
-LCUI_API int LCUI_FreeDisplay( void );
+LCUI_API int LCUI_FreeDisplay(void);
 
 LCUI_END_HEADER
 

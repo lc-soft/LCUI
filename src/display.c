@@ -114,7 +114,7 @@ void LCUIDisplay_Update(void)
 		/* 收集无效区域记录 */
 		Widget_GetInvalidArea(record->widget, &record->rects);
 	}
-	if (display.mode == LCDM_SEAMLESS || !record) {
+	if (display.mode == LCUI_DMODE_SEAMLESS || !record) {
 		return;
 	}
 	for (LinkedList_Each(node, &display.rects)) {
@@ -163,7 +163,7 @@ size_t LCUIDisplay_Render(void)
 			if (display.show_rect_border) {
 				DrawBorder(paint);
 			}
-			if (display.mode != LCDM_SEAMLESS) {
+			if (display.mode != LCUI_DMODE_SEAMLESS) {
 				LCUICursor_Paint(paint);
 			}
 			Surface_EndPaint(s, paint);
@@ -235,7 +235,7 @@ static LCUI_Surface LCUIDisplay_GetBindSurface(LCUI_Widget widget)
 
 LCUI_Surface LCUIDisplay_GetSurfaceOwner(LCUI_Widget w)
 {
-	if (LCUIDisplay_GetMode() == LCDM_SEAMLESS) {
+	if (LCUIDisplay_GetMode() == LCUI_DMODE_SEAMLESS) {
 		while (w->parent) {
 			w = w->parent;
 		}
@@ -304,19 +304,19 @@ static int LCUIDisplay_Windowed(void)
 {
 	LCUI_Widget root = LCUIWidget_GetRoot();
 	switch (display.mode) {
-	case LCDM_WINDOWED:
+	case LCUI_DMODE_WINDOWED:
 		return 0;
-	case LCDM_FULLSCREEN:
+	case LCUI_DMODE_FULLSCREEN:
 		LCUIDisplay_GetBindSurface(root);
 		break;
-	case LCDM_SEAMLESS:
+	case LCUI_DMODE_SEAMLESS:
 	default:
 		LCUIDisplay_CleanSurfaces();
 		LCUIDisplay_BindSurface(root);
 		break;
 	}
 	LCUIDisplay_SetSize(display.width, display.height);
-	display.mode = LCDM_WINDOWED;
+	display.mode = LCUI_DMODE_WINDOWED;
 	return 0;
 }
 
@@ -324,16 +324,16 @@ static int LCUIDisplay_FullScreen(void)
 {
 	LCUI_Widget root = LCUIWidget_GetRoot();
 	switch (display.mode) {
-	case LCDM_SEAMLESS:
+	case LCUI_DMODE_SEAMLESS:
 		LCUIDisplay_CleanSurfaces();
 		LCUIDisplay_BindSurface(root);
-	case LCDM_WINDOWED:
+	case LCUI_DMODE_WINDOWED:
 	default:
 		break;
-	case LCDM_FULLSCREEN:
+	case LCUI_DMODE_FULLSCREEN:
 		return 0;
 	}
-	display.mode = LCDM_FULLSCREEN;
+	display.mode = LCUI_DMODE_FULLSCREEN;
 	display.width = LCUIDisplay_GetWidth();
 	display.height = LCUIDisplay_GetHeight();
 	LCUIDisplay_SetSize(display.width, display.height);
@@ -346,10 +346,10 @@ static int LCUIDisplay_Seamless(void)
 	LCUI_Widget root = LCUIWidget_GetRoot();
 	DEBUG_MSG("display.mode: %d\n", display.mode);
 	switch (display.mode) {
-	case LCDM_SEAMLESS:
+	case LCUI_DMODE_SEAMLESS:
 		return 0;
-	case LCDM_FULLSCREEN:
-	case LCDM_WINDOWED:
+	case LCUI_DMODE_FULLSCREEN:
+	case LCUI_DMODE_WINDOWED:
 	default:
 		LCUIDisplay_CleanSurfaces();
 		break;
@@ -357,7 +357,7 @@ static int LCUIDisplay_Seamless(void)
 	for (LinkedList_Each(node, &root->children)) {
 		LCUIDisplay_BindSurface(node->data);
 	}
-	display.mode = LCDM_SEAMLESS;
+	display.mode = LCUI_DMODE_SEAMLESS;
 	return 0;
 }
 
@@ -367,13 +367,13 @@ int LCUIDisplay_SetMode(int mode)
 	int ret;
 	DEBUG_MSG("mode: %d\n", mode);
 	switch (mode) {
-	case LCDM_WINDOWED:
+	case LCUI_DMODE_WINDOWED:
 		ret = LCUIDisplay_Windowed();
 		break;
-	case LCDM_SEAMLESS:
+	case LCUI_DMODE_SEAMLESS:
 		ret = LCUIDisplay_Seamless();
 		break;
-	case LCDM_FULLSCREEN:
+	case LCUI_DMODE_FULLSCREEN:
 	default:
 		ret = LCUIDisplay_FullScreen();
 		break;
@@ -403,7 +403,7 @@ void LCUIDisplay_SetSize(int width, int height)
 	float scale;
 	LCUI_Widget root;
 	LCUI_Surface surface;
-	if (display.mode == LCDM_SEAMLESS) {
+	if (display.mode == LCUI_DMODE_SEAMLESS) {
 		return;
 	}
 	root = LCUIWidget_GetRoot();
@@ -418,7 +418,8 @@ int LCUIDisplay_GetWidth(void)
 	if (!display.is_working) {
 		return 0;
 	}
-	if (display.mode == LCDM_WINDOWED || display.mode == LCDM_FULLSCREEN) {
+	if (display.mode == LCUI_DMODE_WINDOWED ||
+	    display.mode == LCUI_DMODE_FULLSCREEN) {
 		return iround(LCUIWidget_GetRoot()->width);
 	}
 	return display.driver->getWidth();
@@ -429,7 +430,8 @@ int LCUIDisplay_GetHeight(void)
 	if (!display.is_working) {
 		return 0;
 	}
-	if (display.mode == LCDM_WINDOWED || display.mode == LCDM_FULLSCREEN) {
+	if (display.mode == LCUI_DMODE_WINDOWED ||
+	    display.mode == LCUI_DMODE_FULLSCREEN) {
 		return iround(LCUIWidget_GetRoot()->height);
 	}
 	return display.driver->getHeight();
@@ -588,7 +590,7 @@ static void OnSurfaceEvent(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 	sync_props = data[1];
 	root = LCUIWidget_GetRoot();
 	surface = LCUIDisplay_GetBindSurface(e->target);
-	if (display.mode == LCDM_SEAMLESS) {
+	if (display.mode == LCUI_DMODE_SEAMLESS) {
 		if (!surface && event_type != LCUI_WEVENT_LINK) {
 			return;
 		}
@@ -724,16 +726,17 @@ int LCUI_InitDisplay(LCUI_DisplayDriver driver)
 	}
 	if (!display.driver) {
 		LOG("[display] init failed\n");
-		LCUIDisplay_SetMode(LCDM_DEFAULT);
+		LCUIDisplay_SetMode(LCUI_DMODE_DEFAULT);
 		LCUIDisplay_Update();
 		return -2;
 	}
 	root = LCUIWidget_GetRoot();
-	display.driver->bindEvent(DET_RESIZE, OnResize, NULL, NULL);
-	display.driver->bindEvent(DET_MINMAXINFO, OnMinMaxInfo, NULL, NULL);
-	display.driver->bindEvent(DET_PAINT, OnPaint, NULL, NULL);
+	display.driver->bindEvent(LCUI_DEVENT_RESIZE, OnResize, NULL, NULL);
+	display.driver->bindEvent(LCUI_DEVENT_MINMAXINFO, OnMinMaxInfo, NULL,
+				  NULL);
+	display.driver->bindEvent(LCUI_DEVENT_PAINT, OnPaint, NULL, NULL);
 	Widget_BindEvent(root, "surface", OnSurfaceEvent, NULL, NULL);
-	LCUIDisplay_SetMode(LCDM_DEFAULT);
+	LCUIDisplay_SetMode(LCUI_DMODE_DEFAULT);
 	LCUIDisplay_Update();
 	LOG("[display] init ok, driver name: %s\n", display.driver->name);
 	return 0;

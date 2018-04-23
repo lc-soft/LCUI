@@ -421,10 +421,10 @@ static void OnExpose(LCUI_Event e, void *arg)
 	if (!surface) {
 		return;
 	}
-	dpy_ev.type = DET_PAINT;
+	dpy_ev.type = LCUI_DEVENT_PAINT;
 	dpy_ev.surface = surface;
 	dpy_ev.paint.rect = rect;
-	EventTrigger_Trigger(x11.trigger, DET_PAINT, &dpy_ev);
+	EventTrigger_Trigger(x11.trigger, LCUI_DEVENT_PAINT, &dpy_ev);
 }
 
 /** 响应 X11 的 ConfigureNotify 事件，它通常在 x11 窗口位置、尺寸改变时触发 */
@@ -438,11 +438,11 @@ static void OnConfigureNotify(LCUI_Event e, void *arg)
 		return;
 	}
 	dpy_ev.surface = s;
-	dpy_ev.type = DET_RESIZE;
+	dpy_ev.type = LCUI_DEVENT_RESIZE;
 	dpy_ev.resize.width = xce.width;
 	dpy_ev.resize.height = xce.height;
 	X11Surface_OnResize(s, xce.width, xce.height);
-	EventTrigger_Trigger(x11.trigger, DET_RESIZE, &dpy_ev);
+	EventTrigger_Trigger(x11.trigger, LCUI_DEVENT_RESIZE, &dpy_ev);
 }
 
 LCUI_DisplayDriver LCUI_CreateLinuxX11DisplayDriver(void)
