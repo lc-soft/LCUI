@@ -126,6 +126,11 @@ typedef struct LCUI_Rect2F_ {
 	float left, top, right, bottom;
 } LCUI_Rect2F;
 
+/* FIXME: remove LCUI_StyleValue
+ * These values do not need to put in LCUI_StyleValue, because they are not 
+ * strongly related and should be defined separately where they are needed.
+ */
+
 /** 样式值枚举，用于代替使用字符串 */
 typedef enum LCUI_StyleValue {
 	SV_NONE,

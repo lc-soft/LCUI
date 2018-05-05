@@ -405,15 +405,19 @@ static int Graph_CutARGB(const LCUI_Graph *graph, LCUI_Rect rect,
 
 	buff->opacity = graph->opacity;
 	for (y = 0; y < rect.height; ++y) {
-		pixel_des = buff->argb + y*buff->width;
+		pixel_des = buff->argb + y * buff->width;
 		pixel_src = graph->argb;
-		pixel_src += (rect.y + y)*graph->width + rect.x;
+		pixel_src += (rect.y + y) * graph->width + rect.x;
 		for (x = 0; x < rect.width; ++x) {
 			*pixel_des++ = *pixel_src++;
 		}
 	}
 	return 0;
 }
+
+/* FIXME: imrpove alpha blending method
+ * Existing alpha blending methods are inefficient and need to be optimized
+ */
 
 static void Graph_MixARGBWithAlpha(LCUI_Graph *dst, LCUI_Rect des_rect,
 				   const LCUI_Graph *src, int src_x, int src_y)
@@ -489,8 +493,8 @@ static void Graph_MixARGB(LCUI_Graph *dest, LCUI_Rect des_rect,
 	uchar_t a;
 	LCUI_ARGB *px_src, *px_dest;
 	LCUI_ARGB *px_row_src, *px_row_des;
-	px_row_src = src->argb + src_y*src->width + src_x;
-	px_row_des = dest->argb + des_rect.y*dest->width + des_rect.x;
+	px_row_src = src->argb + src_y * src->width + src_x;
+	px_row_des = dest->argb + des_rect.y * dest->width + des_rect.x;
 	if (src->opacity < 1.0) {
 		goto mix_with_opacity;
 	}
@@ -531,9 +535,9 @@ static void Graph_MixARGBToRGB(LCUI_Graph *des, LCUI_Rect des_rect,
 	uchar_t *rowbytep, *bytep;
 
 	/* 计算并保存第一行的首个像素的位置 */
-	px_row = src->argb + src_y*src->width + src_x;
-	rowbytep = des->bytes + des_rect.y*des->bytes_per_row;
-	rowbytep += des_rect.x*des->bytes_per_pixel;
+	px_row = src->argb + src_y * src->width + src_x;
+	rowbytep = des->bytes + des_rect.y * des->bytes_per_row;
+	rowbytep += des_rect.x * des->bytes_per_pixel;
 	if (src->opacity < 1.0) {
 		goto mix_with_opacity;
 	}

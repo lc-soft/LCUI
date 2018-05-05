@@ -28,8 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-//#define DEBUG
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -486,6 +484,11 @@ void TextEdit_SetUsingStyleTags(LCUI_Widget widget, LCUI_BOOL is_true)
 	TextLayer_SetUsingStyleTags(edit->layer, is_true);
 }
 
+/* FIXME: improve multiline editing mode of the textedit widget
+ * The multipline editing mode of the textedit widget have not been fully
+ * tested, it may have many problems.
+ */
+
 void TextEdit_SetMultiline(LCUI_Widget w, LCUI_BOOL enable)
 {
 	if (enable) {
@@ -653,7 +656,8 @@ static void TextEdit_TextDelete(LCUI_Widget widget, int n_ch)
 }
 
 /** 处理按键事件 */
-static void TextEdit_OnKeyDown(LCUI_Widget widget, LCUI_WidgetEvent e, void *arg)
+static void TextEdit_OnKeyDown(LCUI_Widget widget,
+			       LCUI_WidgetEvent e, void *arg)
 {
 	int cols, rows, cur_col, cur_row;
 	LCUI_TextEdit edit = Widget_GetData(widget, self.prototype);
