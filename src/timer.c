@@ -49,7 +49,7 @@ typedef struct TimerRec_ {
 	long int total_ms;  /**< 定时时间（单位：毫秒） */
 	long int pause_ms; /**< 定时器处于暂停状态的时长（单位：毫秒） */
 
-	void (*func)(void *); /**< 回调函数 */
+	void(*func)(void *); /**< 回调函数 */
 	void *arg;            /**< 函数的参数 */
 	LinkedListNode node;  /**< 位于定时器列表中的节点 */
 } TimerRec, *Timer;
@@ -98,11 +98,11 @@ static void TimerList_Print(void)
 	for (LinkedList_Each(node, &self.timers)) {
 		timer = node->data;
 		_DEBUG_MSG(
-		    "[%02d] %ld, func: %p, cur_ms: %ldms, total_ms: %ldms\n",
-		    i++, timer->id, timer->func,
-		    timer->total_ms -
+			"[%02d] %ld, func: %p, cur_ms: %ldms, total_ms: %ldms\n",
+			i++, timer->id, timer->func,
+			timer->total_ms -
 			(long int)LCUI_GetTimeDelta(timer->start_time),
-		    timer->total_ms);
+			timer->total_ms);
 	}
 	_DEBUG_MSG("timer list end\n\n");
 }
@@ -176,7 +176,7 @@ static Timer TimerList_Find(int timer_id)
 
 /*----------------------------- Public -------------------------------*/
 
-int LCUITimer_Set(long int n_ms, void (*func)(void *), void *arg,
+int LCUITimer_Set(long int n_ms, void(*func)(void *), void *arg,
 		  LCUI_BOOL reuse)
 {
 	Timer timer;
@@ -204,12 +204,12 @@ int LCUITimer_Set(long int n_ms, void (*func)(void *), void *arg,
 	return timer->id;
 }
 
-int LCUITimer_SetTimeout(long int n_ms, void (*callback)(void *), void *arg)
+int LCUITimer_SetTimeout(long int n_ms, void(*callback)(void *), void *arg)
 {
 	return LCUITimer_Set(n_ms, callback, arg, FALSE);
 }
 
-int LCUITimer_SetInterval(long int n_ms, void (*callback)(void *), void *arg)
+int LCUITimer_SetInterval(long int n_ms, void(*callback)(void *), void *arg)
 {
 	return LCUITimer_Set(n_ms, callback, arg, TRUE);
 }
@@ -262,7 +262,7 @@ int LCUITimer_Continue(int timer_id)
 	if (timer) {
 		/* 计算处于暂停状态的时长 */
 		timer->pause_ms +=
-		    (long int)LCUI_GetTimeDelta(timer->pause_time);
+			(long int)LCUI_GetTimeDelta(timer->pause_time);
 		timer->state = STATE_RUN;
 	}
 	LCUICond_Signal(&self.sleep_cond);

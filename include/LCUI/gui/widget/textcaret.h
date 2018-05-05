@@ -2,7 +2,7 @@
  * textcaret.h -- textcaret widget, used in textedit.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -31,15 +31,15 @@
 #ifndef LCUI_TEXTCARET_H
 #define LCUI_TEXTCARET_H
 
-LCUI_API void TextCaret_BlinkShow( LCUI_Widget widget );
+LCUI_API void TextCaret_BlinkShow(LCUI_Widget widget);
 
-LCUI_API void TextCaret_BlinkHide( LCUI_Widget widget );
+LCUI_API void TextCaret_BlinkHide(LCUI_Widget widget);
 
-LCUI_API void TextCaret_SetVisible( LCUI_Widget widget, LCUI_BOOL visible );
+LCUI_API void TextCaret_SetVisible(LCUI_Widget widget, LCUI_BOOL visible);
 
 /** 设置闪烁的时间间隔 */
-LCUI_API void TextCaret_SetBlinkTime( LCUI_Widget widget, unsigned int n_ms );
+LCUI_API void TextCaret_SetBlinkTime(LCUI_Widget widget, unsigned int n_ms);
 
-LCUI_API void LCUIWidget_AddTextCaret( void );
+LCUI_API void LCUIWidget_AddTextCaret(void);
 
 #endif

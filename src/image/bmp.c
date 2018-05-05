@@ -2,7 +2,7 @@
  * bmp.c -- LCUI BMP image file processing module.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -67,7 +67,7 @@ typedef struct LCUI_BMPReaderRec_ {
 	INFOHEADER info;
 } LCUI_BMPReaderRec, *LCUI_BMPReader;
 
-static void BMPHeader_Init( HEADER *header, uint16_t buffer[8] )
+static void BMPHeader_Init(HEADER *header, uint16_t buffer[8])
 {
 	header->type = buffer[0];
 	header->size = *(uint32_t*)(buffer + 1);
@@ -76,98 +76,98 @@ static void BMPHeader_Init( HEADER *header, uint16_t buffer[8] )
 	header->offset = buffer[5];
 }
 
-int LCUI_InitBMPReader( LCUI_ImageReader reader )
+int LCUI_InitBMPReader(LCUI_ImageReader reader)
 {
-	ASSIGN( bmp_reader, LCUI_BMPReader );
+	ASSIGN(bmp_reader, LCUI_BMPReader);
 	reader->data = bmp_reader;
 	reader->destructor = free;
 	reader->type = LCUI_BMP_READER;
 	reader->env = &reader->env_src;
-	if( reader->fn_begin ) {
-		reader->fn_begin( reader->stream_data );
+	if (reader->fn_begin) {
+		reader->fn_begin(reader->stream_data);
 	}
 	return 0;
 }
 
-int LCUI_ReadBMPHeader( LCUI_ImageReader reader )
+int LCUI_ReadBMPHeader(LCUI_ImageReader reader)
 {
 	size_t n;
 	uint16_t buffer[8];
 	LCUI_BMPReader bmp_reader = reader->data;
 	INFOHEADER *info = &bmp_reader->info;
 	reader->header.type = LCUI_UNKNOWN_IMAGE;
-	if( reader->type != LCUI_BMP_READER ) {
+	if (reader->type != LCUI_BMP_READER) {
 		return -EINVAL;
 	}
-	n = reader->fn_read( reader->stream_data, buffer, 14 );
+	n = reader->fn_read(reader->stream_data, buffer, 14);
 	/* 受到字节对齐影响，直接将读到的写到结构体变量里会让最后一个成员
 	 * 变量的值不正常，因此需要手动为其成员变量赋值 */
-	BMPHeader_Init( &bmp_reader->header, buffer );
-	if( n < 14 || bmp_reader->header.type != 0x4D42 ) {
+	BMPHeader_Init(&bmp_reader->header, buffer);
+	if (n < 14 || bmp_reader->header.type != 0x4D42) {
 		return -ENODATA;
 	}
-	n = reader->fn_read( reader->stream_data, info, sizeof( INFOHEADER ) );
-	if( n < sizeof( INFOHEADER ) ) {
+	n = reader->fn_read(reader->stream_data, info, sizeof(INFOHEADER));
+	if (n < sizeof(INFOHEADER)) {
 		return -ENODATA;
 	}
 	reader->header.width = info->width;
 	reader->header.height = info->height;
 	reader->header.type = LCUI_BMP_IMAGE;
-	if( info->bits == 24 ) {
+	if (info->bits == 24) {
 		reader->header.color_type = COLOR_TYPE_RGB;
 		reader->header.bit_depth = 24;
 	}
 	return 0;
 }
 
-int LCUI_ReadBMP( LCUI_ImageReader reader, LCUI_Graph *graph )
+int LCUI_ReadBMP(LCUI_ImageReader reader, LCUI_Graph *graph)
 {
 	size_t n, row, bytes_per_row;
 	unsigned char *buffer, *dest;
 	LCUI_BMPReader bmp_reader = reader->data;
 	INFOHEADER *info = &bmp_reader->info;
-	if( reader->type != LCUI_BMP_READER ) {
+	if (reader->type != LCUI_BMP_READER) {
 		return -EINVAL;
 	}
-	if( reader->header.type == LCUI_UNKNOWN_IMAGE ) {
-		if( LCUI_ReadBMPHeader( reader ) != 0 ) {
+	if (reader->header.type == LCUI_UNKNOWN_IMAGE) {
+		if (LCUI_ReadBMPHeader(reader) != 0) {
 			return -ENODATA;
 		}
 	}
 	/* 信息头中的偏移位置是相对于起始处，需要减去当前已经偏移的位置 */
 	n = bmp_reader->header.offset - bmp_reader->info.size - 14;
-	reader->fn_skip( reader->stream_data, n );
-	if( 0 != Graph_Create( graph, info->width, info->height ) ) {
+	reader->fn_skip(reader->stream_data, n);
+	if (0 != Graph_Create(graph, info->width, info->height)) {
 		return -ENOMEM;
 	}
 	/* 暂时不实现其它色彩类型处理 */
-	if( info->bits != 24 ) {
+	if (info->bits != 24) {
 		return -ENOSYS;
 	}
 	bytes_per_row = (info->bits * info->width + 31) / 32 * 4;
-	if( bytes_per_row < graph->bytes_per_row ) {
+	if (bytes_per_row < graph->bytes_per_row) {
 		return -EINVAL;
 	}
-	buffer = malloc( bytes_per_row );
-	if( !buffer ) {
+	buffer = malloc(bytes_per_row);
+	if (!buffer) {
 		return -ENOMEM;
 	}
 	/* 从最后一行开始保存 */
 	dest = graph->bytes + graph->bytes_per_row * (graph->height - 1);
-	for( row = 0; row < info->height; ++row ) {
-		n = reader->fn_read( reader->stream_data,
-				     buffer, bytes_per_row );
-		if( n < bytes_per_row ) {
+	for (row = 0; row < info->height; ++row) {
+		n = reader->fn_read(reader->stream_data,
+				    buffer, bytes_per_row);
+		if (n < bytes_per_row) {
 			break;
 		}
-		memcpy( dest, buffer, graph->bytes_per_row );
+		memcpy(dest, buffer, graph->bytes_per_row);
 		dest -= graph->bytes_per_row;
-		if( reader->fn_prog ) {
-			reader->fn_prog( reader->prog_arg,
-					 100.0f * row / info->height );
+		if (reader->fn_prog) {
+			reader->fn_prog(reader->prog_arg,
+					100.0f * row / info->height);
 		}
 	}
-	free( buffer );
+	free(buffer);
 	return 0;
 }
 

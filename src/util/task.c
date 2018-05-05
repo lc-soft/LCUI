@@ -30,20 +30,20 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 
-void LCUITask_Destroy( LCUI_Task task )
+void LCUITask_Destroy(LCUI_Task task)
 {
-	if( task->destroy_arg[0] && task->arg[0] ) {
-		task->destroy_arg[0]( task->arg[0] );
+	if (task->destroy_arg[0] && task->arg[0]) {
+		task->destroy_arg[0](task->arg[0]);
 	}
-	if( task->destroy_arg[1] && task->arg[1] ) {
-		task->destroy_arg[1]( task->arg[1] );
+	if (task->destroy_arg[1] && task->arg[1]) {
+		task->destroy_arg[1](task->arg[1]);
 	}
 }
 
-int LCUITask_Run( LCUI_Task task )
+int LCUITask_Run(LCUI_Task task)
 {
-	if( task && task->func ) {
-		task->func( task->arg[0], task->arg[1] );
+	if (task && task->func) {
+		task->func(task->arg[0], task->arg[1]);
 		return 0;
 	}
 	return -1;

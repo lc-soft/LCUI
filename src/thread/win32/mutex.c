@@ -1,7 +1,7 @@
 ﻿/* mutex.c -- The win32 edition mutex lock
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -33,22 +33,22 @@
 
 #ifdef LCUI_THREAD_WIN32
 
-int LCUIMutex_Init( LCUI_Mutex *mutex )
+int LCUIMutex_Init(LCUI_Mutex *mutex)
 {
-	*mutex = CreateMutex( NULL, FALSE, NULL );
+	*mutex = CreateMutex(NULL, FALSE, NULL);
 	return 0;
 }
 
 /* Free the mutex */
-void LCUIMutex_Destroy( LCUI_Mutex *mutex )
+void LCUIMutex_Destroy(LCUI_Mutex *mutex)
 {
-	CloseHandle( *mutex );
+	CloseHandle(*mutex);
 }
 
 /* Try lock the mutex */
-int LCUIMutex_TryLock( LCUI_Mutex *mutex )
+int LCUIMutex_TryLock(LCUI_Mutex *mutex)
 {
-	switch ( WaitForSingleObject( *mutex, 0 ) ) {
+	switch (WaitForSingleObject(*mutex, 0)) {
 	case WAIT_FAILED:
 		return -1;
 	case WAIT_OBJECT_0:
@@ -60,18 +60,18 @@ int LCUIMutex_TryLock( LCUI_Mutex *mutex )
 }
 
 /* Lock the mutex */
-int LCUIMutex_Lock( LCUI_Mutex *mutex )
+int LCUIMutex_Lock(LCUI_Mutex *mutex)
 {
-	if ( WaitForSingleObject( *mutex, INFINITE ) == WAIT_FAILED ) {
+	if (WaitForSingleObject(*mutex, INFINITE) == WAIT_FAILED) {
 		return -1;
 	}
 	return 0;
 }
 
 /* Unlock the mutex */
-int LCUIMutex_Unlock( LCUI_Mutex *mutex )
+int LCUIMutex_Unlock(LCUI_Mutex *mutex)
 {
-	if ( ReleaseMutex( *mutex ) == FALSE ) {
+	if (ReleaseMutex(*mutex) == FALSE) {
 		return -1;
 	}
 	return 0;

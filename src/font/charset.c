@@ -2,7 +2,7 @@
  * charset.c -- The charset opreation set.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -47,99 +47,99 @@ MultiByteToWideChar(CP, 0, STR, -1, WSTR, LEN)
 #endif
 
 /** 将UTF-8字符串解码成 Unicode 字符串 */
-static int DecodeFromUTF8( wchar_t *wstr, int max_len, const char *str )
+static int DecodeFromUTF8(wchar_t *wstr, int max_len, const char *str)
 {
 	wchar_t unicode;
 	const char *inptr;
 	int i, len = 0, count = 0;
 	unsigned char *p, byte, ch[MAX_SAVE_NUM];
 
-	for( inptr = str; *inptr; ++inptr ) {
-		if( max_len > 0 && len >= max_len ) {
+	for (inptr = str; *inptr; ++inptr) {
+		if (max_len > 0 && len >= max_len) {
 			break;
 		}
 		byte = *inptr;
-		if( (byte >> 7) == 0 ) { // 0xxxxxxx
-			if( wstr ) {
+		if ((byte >> 7) == 0) { // 0xxxxxxx
+			if (wstr) {
 				wstr[len] = byte;
 			}
 			++len;
 			continue;
 		}
-		if( (byte >> 5) == 6 ) { // 110xxxxx 
+		if ((byte >> 5) == 6) { // 110xxxxx 
 			count = 2;
-		} else if( (byte >> 4) == 14 ) { // 1110xxxx 
+		} else if ((byte >> 4) == 14) { // 1110xxxx 
 			count = 3;
-		} else if( (byte >> 3) == 30 ) { // 11110xxx 
+		} else if ((byte >> 3) == 30) { // 11110xxx 
 			count = 4;
-		} else if( (byte >> 2) == 62 ) { // 111110xx 
+		} else if ((byte >> 2) == 62) { // 111110xx 
 			count = 5;
-		} else if( (byte >> 1) == 126 ) { // 1111110x 
+		} else if ((byte >> 1) == 126) { // 1111110x 
 			count = 6;
 		} else {
 			continue;
 		}
 		p = (unsigned char*)inptr;
-		for( i = 0; i < count; ++i ) {
+		for (i = 0; i < count; ++i) {
 			ch[i] = *p++;
 		}
 		count = 0;
 		unicode = ch[0];
-		if( unicode >= 0xF0 ) {
+		if (unicode >= 0xF0) {
 			unicode = (wchar_t)(ch[0] & 0x07) << 18;
 			unicode |= (wchar_t)(ch[1] & 0x3F) << 12;
 			unicode |= (wchar_t)(ch[2] & 0x3F) << 6;
 			unicode |= (wchar_t)(ch[3] & 0x3F);
-		} else if( unicode >= 0xE0 ) {
+		} else if (unicode >= 0xE0) {
 			unicode = (wchar_t)(ch[0] & 0x0F) << 12;
 			unicode |= (wchar_t)(ch[1] & 0x3F) << 6;
 			unicode |= (wchar_t)(ch[2] & 0x3F);
-		} else if( unicode >= 0xC0 ) {
+		} else if (unicode >= 0xC0) {
 			unicode = (wchar_t)(ch[0] & 0x1F) << 6;
 			unicode |= (wchar_t)(ch[1] & 0x3F);
 		}
-		if( wstr ) {
+		if (wstr) {
 			wstr[len] = unicode;
 		}
 		++len;
 	}
-	if( len < max_len && wstr ) {
+	if (len < max_len && wstr) {
 		wstr[len] = 0;
 	}
 	return len;
 }
 
-int LCUI_DecodeString( wchar_t *wstr, const char *str, 
-		       int max_len, int encoding )
+int LCUI_DecodeString(wchar_t *wstr, const char *str,
+		      int max_len, int encoding)
 {
 #ifdef LCUI_BUILD_IN_WIN32
 	// 暂时不处理其它编码方式
-	switch( encoding ) {
+	switch (encoding) {
 	case ENCODING_ANSI:
-		return decode( CP_ACP, str, wstr, max_len );
+		return decode(CP_ACP, str, wstr, max_len);
 	case ENCODING_UTF8:
-		return DecodeFromUTF8( wstr, max_len, str );
+		return DecodeFromUTF8(wstr, max_len, str);
 	default: break;
 	}
 	return 0;
 #else
-	return DecodeFromUTF8( wstr, max_len, str );
+	return DecodeFromUTF8(wstr, max_len, str);
 #endif
 }
 
-int LCUI_EncodeString( char *str, const wchar_t *wstr, 
-		       int max_len, int encoding )
+int LCUI_EncodeString(char *str, const wchar_t *wstr,
+		      int max_len, int encoding)
 {
 #ifdef LCUI_BUILD_IN_WIN32
 	int cp;
 	// 暂时不处理其它编码方式
-	switch( encoding ) {
+	switch (encoding) {
 	case ENCODING_ANSI: cp = CP_ACP; break;
 	case ENCODING_UTF8: cp = CP_UTF8; break;
 	default: return -1;
 	}
-	return encode( cp, wstr, str, max_len );
+	return encode(cp, wstr, str, max_len);
 #else
-	return wcstombs( str, wstr, max_len );
+	return wcstombs(str, wstr, max_len);
 #endif
 }

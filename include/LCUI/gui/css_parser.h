@@ -2,7 +2,7 @@
  * css_parser.h -- CSS parser module
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -95,7 +95,7 @@ typedef struct LCUI_CSSParserCommentContextRec_ LCUI_CSSParserCommentContextRec;
 typedef struct LCUI_CSSParserCommentContextRec_ *LCUI_CSSParserCommentContext;
 typedef struct LCUI_CSSParserRuleContextRec_ LCUI_CSSParserRuleContextRec;
 typedef struct LCUI_CSSParserRuleContextRec_ *LCUI_CSSParserRuleContext;
-typedef int( *LCUI_CSSParserFunction )(LCUI_CSSParserContext ctx);
+typedef int(*LCUI_CSSParserFunction)(LCUI_CSSParserContext ctx);
 
 struct LCUI_CSSParserRec_ {
 	LCUI_CSSParserFunction parse;
@@ -115,7 +115,7 @@ typedef LCUI_CSSRuleParserRec LCUI_CSSRuleParsers[CSS_RULE_TOTAL_NUM];
 struct LCUI_CSSPropertyParserRec_ {
 	int key;	/**< 标识，在解析数据时可以使用它访问样式表中的自定义属性 */
 	char *name;	/**< 名称，对应 CSS 样式属性名称 */
-	int( *parse )(LCUI_CSSParserStyleContext, const char*);
+	int(*parse)(LCUI_CSSParserStyleContext, const char*);
 };
 
 struct LCUI_CSSParserStyleContextRec_ {
@@ -153,33 +153,33 @@ struct LCUI_CSSParserContextRec_ {
 	LCUI_CSSParserCommentContextRec comment;
 };
 
-LCUI_API int LCUI_GetStyleValue( const char *str );
+LCUI_API int LCUI_GetStyleValue(const char *str);
 
-LCUI_API const char *LCUI_GetStyleValueName( int val );
+LCUI_API const char *LCUI_GetStyleValueName(int val);
 
-LCUI_API const char *LCUI_GetStyleName( int key );
+LCUI_API const char *LCUI_GetStyleName(int key);
 
 /** 初始化 LCUI 的 CSS 代码解析功能 */
-LCUI_API void LCUI_InitCSSParser( void );
+LCUI_API void LCUI_InitCSSParser(void);
 
 /** 从文件中载入CSS样式数据，并导入至样式库中 */
-LCUI_API int LCUI_LoadCSSFile( const char *filepath );
+LCUI_API int LCUI_LoadCSSFile(const char *filepath);
 
 /** 从字符串中载入CSS样式数据，并导入至样式库中 */
-LCUI_API int LCUI_LoadCSSString( const char *str, const char *space );
+LCUI_API int LCUI_LoadCSSString(const char *str, const char *space);
 
-LCUI_API LCUI_CSSParserContext CSSParser_Begin( size_t buffer_size, const char *space );
+LCUI_API LCUI_CSSParserContext CSSParser_Begin(size_t buffer_size, const char *space);
 
-LCUI_API void CSSParser_EndParseRuleData( LCUI_CSSParserContext ctx );
+LCUI_API void CSSParser_EndParseRuleData(LCUI_CSSParserContext ctx);
 
-LCUI_API void CSSParser_End( LCUI_CSSParserContext ctx );
+LCUI_API void CSSParser_End(LCUI_CSSParserContext ctx);
 
-LCUI_API int CSSParser_BeginParseComment( LCUI_CSSParserContext ctx );
+LCUI_API int CSSParser_BeginParseComment(LCUI_CSSParserContext ctx);
 
 LCUI_API void LCUI_FreeCSSParser(void);
 
 /** 注册新的属性和对应的属性值解析器 */
-LCUI_API int LCUI_AddCSSPropertyParser( LCUI_CSSPropertyParser sp );
+LCUI_API int LCUI_AddCSSPropertyParser(LCUI_CSSPropertyParser sp);
 
 #include <LCUI/gui/css_rule_font_face.h>
 

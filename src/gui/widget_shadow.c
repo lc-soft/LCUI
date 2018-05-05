@@ -2,7 +2,7 @@
  * widget_shadow.c -- widget shadow style processing module.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -35,47 +35,47 @@
 #include <LCUI/gui/widget.h>
 #include <LCUI/draw/boxshadow.h>
 
-static float ComputeXMetric( LCUI_Widget w, LCUI_Style s )
+static float ComputeXMetric(LCUI_Widget w, LCUI_Style s)
 {
-	if( s->type == LCUI_STYPE_SCALE ) {
+	if (s->type == LCUI_STYPE_SCALE) {
 		return w->width * s->scale;
 	}
-	return LCUIMetrics_Compute( s->value, s->type );
+	return LCUIMetrics_Compute(s->value, s->type);
 }
 
-static float ComputeYMetric( LCUI_Widget w, LCUI_Style s )
+static float ComputeYMetric(LCUI_Widget w, LCUI_Style s)
 {
-	if( s->type == LCUI_STYPE_SCALE ) {
+	if (s->type == LCUI_STYPE_SCALE) {
 		return w->height * s->scale;
 	}
-	return LCUIMetrics_Compute( s->value, s->type );
+	return LCUIMetrics_Compute(s->value, s->type);
 }
 
 /** 计算部件阴影样式 */
-static void Widget_ComputeBoxShadowStyle( LCUI_Widget w )
+static void Widget_ComputeBoxShadowStyle(LCUI_Widget w)
 {
 	int key;
 	LCUI_Style s;
 	LCUI_BoxShadowStyle *sd;
 	sd = &w->computed_style.shadow;
-	memset( sd, 0, sizeof( LCUI_BoxShadowStyle ) );
-	for( key = key_box_shadow_start; key <= key_box_shadow_end; ++key ) {
+	memset(sd, 0, sizeof(LCUI_BoxShadowStyle));
+	for (key = key_box_shadow_start; key <= key_box_shadow_end; ++key) {
 		s = &w->style->sheet[key];
-		if( !s->is_valid ) {
+		if (!s->is_valid) {
 			continue;
 		}
-		switch( key ) {
+		switch (key) {
 		case key_box_shadow_x:
-			sd->x = ComputeXMetric( w, s );
+			sd->x = ComputeXMetric(w, s);
 			break;
 		case key_box_shadow_y:
-			sd->y = ComputeYMetric( w, s );
+			sd->y = ComputeYMetric(w, s);
 			break;
 		case key_box_shadow_spread:
-			sd->spread = LCUIMetrics_Compute( s->value, s->type );
+			sd->spread = LCUIMetrics_Compute(s->value, s->type);
 			break;
 		case key_box_shadow_blur:
-			sd->blur = LCUIMetrics_Compute( s->value, s->type );
+			sd->blur = LCUIMetrics_Compute(s->value, s->type);
 			break;
 		case key_box_shadow_color:
 			sd->color = s->color;
@@ -85,97 +85,97 @@ static void Widget_ComputeBoxShadowStyle( LCUI_Widget w )
 	}
 }
 
-void Widget_UpdateBoxShadow( LCUI_Widget w )
+void Widget_UpdateBoxShadow(LCUI_Widget w)
 {
 	int i;
 	LCUI_RectF rect;
 	LCUI_Rect rects[4], rb, rg;
 	LCUI_BoxShadowStyle *sd = &w->computed_style.shadow;
 	LCUI_BoxShadowStyle old_sd = w->computed_style.shadow;
-	Widget_ComputeBoxShadowStyle( w );
+	Widget_ComputeBoxShadowStyle(w);
 	/* 如果阴影变化并未导致图层尺寸变化，则只重绘阴影 */
-	if( sd->x == old_sd.x && sd->y == old_sd.y &&
-	    sd->blur == old_sd.blur ) {
-		LCUIRectF_ToRect( &w->box.border, &rb, 1.0f );
-		LCUIRectF_ToRect( &w->box.canvas, &rg, 1.0f );
-		LCUIRect_CutFourRect( &rb, &rg, rects );
-		for( i = 0; i < 4; ++i ) {
-			LCUIRect_ToRectF( &rects[i], &rect, 1.0f );
+	if (sd->x == old_sd.x && sd->y == old_sd.y &&
+	    sd->blur == old_sd.blur) {
+		LCUIRectF_ToRect(&w->box.border, &rb, 1.0f);
+		LCUIRectF_ToRect(&w->box.canvas, &rg, 1.0f);
+		LCUIRect_CutFourRect(&rb, &rg, rects);
+		for (i = 0; i < 4; ++i) {
+			LCUIRect_ToRectF(&rects[i], &rect, 1.0f);
 			rect.x -= w->box.canvas.x;
 			rect.y -= w->box.canvas.y;
-			Widget_InvalidateArea( w, &rect, SV_GRAPH_BOX );
+			Widget_InvalidateArea(w, &rect, SV_GRAPH_BOX);
 		}
 		return;
 	}
-	Widget_AddTask( w, LCUI_WTASK_RESIZE );
-	Widget_AddTask( w, LCUI_WTASK_POSITION );
+	Widget_AddTask(w, LCUI_WTASK_RESIZE);
+	Widget_AddTask(w, LCUI_WTASK_POSITION);
 }
 
-float Widget_GetBoxShadowOffsetX( LCUI_Widget w )
+float Widget_GetBoxShadowOffsetX(LCUI_Widget w)
 {
 	const LCUI_BoxShadowStyle *shadow;
 	shadow = &w->computed_style.shadow;
-	if( shadow->x >= SHADOW_WIDTH( shadow ) ) {
+	if (shadow->x >= SHADOW_WIDTH(shadow)) {
 		return 0;
 	}
-	return SHADOW_WIDTH( shadow ) - shadow->x;
+	return SHADOW_WIDTH(shadow) - shadow->x;
 }
 
-float Widget_GetBoxShadowOffsetY( LCUI_Widget w )
+float Widget_GetBoxShadowOffsetY(LCUI_Widget w)
 {
 	const LCUI_BoxShadowStyle *shadow;
 	shadow = &w->computed_style.shadow;
-	if( shadow->y >= SHADOW_WIDTH( shadow ) ) {
+	if (shadow->y >= SHADOW_WIDTH(shadow)) {
 		return 0;
 	}
-	return SHADOW_WIDTH( shadow ) - shadow->y;
+	return SHADOW_WIDTH(shadow) - shadow->y;
 }
 
-float Widget_GetCanvasWidth( LCUI_Widget widget )
+float Widget_GetCanvasWidth(LCUI_Widget widget)
 {
 	float width;
 	const LCUI_BoxShadowStyle *shadow;
 	width = widget->box.border.width;
 	shadow = &widget->computed_style.shadow;
-	if( shadow->x >= SHADOW_WIDTH( shadow ) ) {
-		return width + SHADOW_WIDTH( shadow ) + shadow->x;
-	} else if( shadow->x <= -SHADOW_WIDTH( shadow ) ) {
-		return width + SHADOW_WIDTH( shadow ) - shadow->x;
+	if (shadow->x >= SHADOW_WIDTH(shadow)) {
+		return width + SHADOW_WIDTH(shadow) + shadow->x;
+	} else if (shadow->x <= -SHADOW_WIDTH(shadow)) {
+		return width + SHADOW_WIDTH(shadow) - shadow->x;
 	}
-	return width + SHADOW_WIDTH( shadow ) * 2;
+	return width + SHADOW_WIDTH(shadow) * 2;
 }
 
-float Widget_GetCanvasHeight( LCUI_Widget widget )
+float Widget_GetCanvasHeight(LCUI_Widget widget)
 {
 	float height;
 	const LCUI_BoxShadowStyle *shadow;
 	height = widget->box.border.height;
 	shadow = &widget->computed_style.shadow;
-	if( shadow->y >= SHADOW_WIDTH( shadow ) ) {
-		return height + SHADOW_WIDTH( shadow ) + shadow->y;
-	} else if( shadow->y <= -SHADOW_WIDTH( shadow ) ) {
-		return height + SHADOW_WIDTH( shadow ) - shadow->y;
+	if (shadow->y >= SHADOW_WIDTH(shadow)) {
+		return height + SHADOW_WIDTH(shadow) + shadow->y;
+	} else if (shadow->y <= -SHADOW_WIDTH(shadow)) {
+		return height + SHADOW_WIDTH(shadow) - shadow->y;
 	}
-	return height + SHADOW_WIDTH( shadow ) * 2;
+	return height + SHADOW_WIDTH(shadow) * 2;
 }
 
-void Widget_ComputeBoxShadow( LCUI_Widget w, LCUI_BoxShadow *out )
+void Widget_ComputeBoxShadow(LCUI_Widget w, LCUI_BoxShadow *out)
 {
 	LCUI_BoxShadowStyle *s;
 	s = &w->computed_style.shadow;
-	out->x = LCUIMetrics_ComputeActual( s->x, LCUI_STYPE_PX );
-	out->y = LCUIMetrics_ComputeActual( s->y, LCUI_STYPE_PX );
-	out->blur = LCUIMetrics_ComputeActual( s->blur, LCUI_STYPE_PX );
-	out->spread = LCUIMetrics_ComputeActual( s->spread, LCUI_STYPE_PX );
+	out->x = LCUIMetrics_ComputeActual(s->x, LCUI_STYPE_PX);
+	out->y = LCUIMetrics_ComputeActual(s->y, LCUI_STYPE_PX);
+	out->blur = LCUIMetrics_ComputeActual(s->blur, LCUI_STYPE_PX);
+	out->spread = LCUIMetrics_ComputeActual(s->spread, LCUI_STYPE_PX);
 	out->color = s->color;
 }
 
-void Widget_PaintBoxShadow( LCUI_Widget w, LCUI_PaintContext paint,
-			    LCUI_WidgetActualStyle style )
+void Widget_PaintBoxShadow(LCUI_Widget w, LCUI_PaintContext paint,
+			   LCUI_WidgetActualStyle style)
 {
 	LCUI_Rect box;
 	box.x = box.y = 0;
 	box.width = style->canvas_box.width;
 	box.height = style->canvas_box.height;
-	BoxShadow_Paint( &style->shadow, &box, paint );
+	BoxShadow_Paint(&style->shadow, &box, paint);
 }

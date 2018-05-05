@@ -2,7 +2,7 @@
  * windows_display.h -- Surface support for windows platform.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -31,8 +31,8 @@
 #ifndef LCUI_WINDOWS_DISPLAY_H
 #define LCUI_WINDOWS_DISPLAY_H
 
-LCUI_DisplayDriver LCUI_CreateWinDisplay( void );
+LCUI_DisplayDriver LCUI_CreateWinDisplay(void);
 
-void LCUI_DestroyWinDisplay( LCUI_DisplayDriver driver );
+void LCUI_DestroyWinDisplay(LCUI_DisplayDriver driver);
 
 #endif

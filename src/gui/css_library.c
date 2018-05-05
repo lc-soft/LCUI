@@ -2,7 +2,7 @@
  * css_library.c -- CSS library operation module.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -113,7 +113,7 @@ typedef struct KeyNameGroupRec_ {
 } KeyNameGroupRec, *KeyNameGroup;
 
 static KeyNameGroupRec style_name_map[] = {
-	{ key_visible, "visible"},
+	{ key_visible, "visible" },
 	{ key_width, "width" },
 	{ key_height, "height" },
 	{ key_min_width, "min-width" },
@@ -208,151 +208,151 @@ static KeyNameGroupRec style_value_map[] = {
 	{ SV_NOWRAP, "nowrap" }
 };
 
-static int LCUI_DirectAddStyleName( int key, const char *name )
+static int LCUI_DirectAddStyleName(int key, const char *name)
 {
-	return Dict_AddCopy( library.names, &key, name );
+	return Dict_AddCopy(library.names, &key, name);
 }
 
-int LCUI_SetStyleName( int key, const char *name )
+int LCUI_SetStyleName(int key, const char *name)
 {
 	char *newname;
 	DictEntry *entry;
-	LCUIMutex_Lock( &library.mutex );
-	entry = Dict_Find( library.names, &key );
-	if( entry ) {
-		newname = strdup2( name );
-		free( entry->v.val );
+	LCUIMutex_Lock(&library.mutex);
+	entry = Dict_Find(library.names, &key);
+	if (entry) {
+		newname = strdup2(name);
+		free(entry->v.val);
 		entry->v.val = newname;
-		LCUIMutex_Unlock( &library.mutex );
+		LCUIMutex_Unlock(&library.mutex);
 		return 0;
 	}
-	LCUIMutex_Unlock( &library.mutex );
+	LCUIMutex_Unlock(&library.mutex);
 	return -1;
 }
 
-int LCUI_AddCSSPropertyName( const char *name )
+int LCUI_AddCSSPropertyName(const char *name)
 {
 	int key;
-	LCUIMutex_Lock( &library.mutex );
+	LCUIMutex_Lock(&library.mutex);
 	key = library.count++;
-	if( LCUI_DirectAddStyleName( key, name ) != 0 ) {
+	if (LCUI_DirectAddStyleName(key, name) != 0) {
 		--library.count;
-		LCUIMutex_Unlock( &library.mutex );
+		LCUIMutex_Unlock(&library.mutex);
 		return -1;
 	}
-	LCUIMutex_Unlock( &library.mutex );
+	LCUIMutex_Unlock(&library.mutex);
 	return key;
 }
 
-const char *LCUI_GetStyleName( int key )
+const char *LCUI_GetStyleName(int key)
 {
-	return Dict_FetchValue( library.names, &key );
+	return Dict_FetchValue(library.names, &key);
 }
 
-static KeyNameGroup CreateKeyNameGroup( int key, const char *name )
+static KeyNameGroup CreateKeyNameGroup(int key, const char *name)
 {
 	KeyNameGroup group;
-	group = malloc( sizeof( KeyNameGroupRec ) );
-	group->name = strdup2( name );
+	group = malloc(sizeof(KeyNameGroupRec));
+	group->name = strdup2(name);
 	group->key = key;
 	return group;
 }
 
-static void DestroyKeyNameGroup( void *data )
+static void DestroyKeyNameGroup(void *data)
 {
 	KeyNameGroup group = data;
-	free( group->name );
-	free( group );
+	free(group->name);
+	free(group);
 }
 
-static void KeyNameGroupDestructor( void *privdata, void *data )
+static void KeyNameGroupDestructor(void *privdata, void *data)
 {
-	DestroyKeyNameGroup( data );
+	DestroyKeyNameGroup(data);
 }
 
-int LCUI_AddStyleValue( int key, const char *name )
+int LCUI_AddStyleValue(int key, const char *name)
 {
-	KeyNameGroup group = CreateKeyNameGroup( key, name );
-	if( Dict_Add( library.value_keys, group->name, group ) ) {
-		DestroyKeyNameGroup( group );
+	KeyNameGroup group = CreateKeyNameGroup(key, name);
+	if (Dict_Add(library.value_keys, group->name, group)) {
+		DestroyKeyNameGroup(group);
 		return -1;
 	}
-	if( Dict_Add( library.value_names, &group->key, group ) ) {
-		DestroyKeyNameGroup( group );
+	if (Dict_Add(library.value_names, &group->key, group)) {
+		DestroyKeyNameGroup(group);
 		return -2;
 	}
 	return 0;
 }
 
-int LCUI_GetStyleValue( const char *str )
+int LCUI_GetStyleValue(const char *str)
 {
 	KeyNameGroup group;
-	group = Dict_FetchValue( library.value_keys, str );
-	if( group ) {
+	group = Dict_FetchValue(library.value_keys, str);
+	if (group) {
 		return group->key;
 	}
 	return -1;
 }
 
-const char *LCUI_GetStyleValueName( int val )
+const char *LCUI_GetStyleValueName(int val)
 {
 	KeyNameGroup group;
-	group = Dict_FetchValue( library.value_names, &val );
-	if( group ) {
+	group = Dict_FetchValue(library.value_names, &val);
+	if (group) {
 		return group->name;
 	}
 	return NULL;
 }
 
-int LCUI_GetStyleTotal( void )
+int LCUI_GetStyleTotal(void)
 {
 	return library.count;
 }
 
-LCUI_BOOL SelectorNode_Match( LCUI_SelectorNode sn1, 
-			      LCUI_SelectorNode sn2 )
+LCUI_BOOL SelectorNode_Match(LCUI_SelectorNode sn1,
+			     LCUI_SelectorNode sn2)
 {
 	int i, j;
-	if( sn2->id ) {
-		if( !sn1->id || strcmp( sn1->id, sn2->id ) != 0 ) {
+	if (sn2->id) {
+		if (!sn1->id || strcmp(sn1->id, sn2->id) != 0) {
 			return FALSE;
 		}
 	}
-	if( sn2->type && strcmp(sn2->type, "*") != 0 ) {
-		if( !sn1->type || strcmp( sn1->type, sn2->type ) != 0 ) {
+	if (sn2->type && strcmp(sn2->type, "*") != 0) {
+		if (!sn1->type || strcmp(sn1->type, sn2->type) != 0) {
 			return FALSE;
 		}
 	}
-	if( sn2->classes ) {
-		if( !sn1->classes ) {
+	if (sn2->classes) {
+		if (!sn1->classes) {
 			return FALSE;
 		}
-		for( i = 0; sn2->classes[i]; ++i ) {
-			for( j = 0; sn1->classes[j]; ++j ) {
-				if( strcmp( sn2->classes[i],
-					    sn1->classes[i] ) == 0 ) {
+		for (i = 0; sn2->classes[i]; ++i) {
+			for (j = 0; sn1->classes[j]; ++j) {
+				if (strcmp(sn2->classes[i],
+					   sn1->classes[i]) == 0) {
 					j = -1;
 					break;
 				}
 			}
-			if( j != -1 ) {
+			if (j != -1) {
 				return FALSE;
 			}
 		}
 	}
-	if( sn2->status ) {
-		if( !sn1->status ) {
+	if (sn2->status) {
+		if (!sn1->status) {
 			return FALSE;
 		}
-		for( i = 0; sn2->status[i]; ++i ) {
-			for( j = 0; sn1->status[j]; ++j ) {
-				if( strcmp( sn2->status[i],
-					    sn1->status[i] ) == 0 ) {
+		for (i = 0; sn2->status[i]; ++i) {
+			for (j = 0; sn1->status[j]; ++j) {
+				if (strcmp(sn2->status[i],
+					   sn1->status[i]) == 0) {
 					j = -1;
 					break;
 				}
 			}
-			if( j != -1 ) {
+			if (j != -1) {
 				return FALSE;
 			}
 		}
@@ -360,89 +360,89 @@ LCUI_BOOL SelectorNode_Match( LCUI_SelectorNode sn1,
 	return TRUE;
 }
 
-static void SelectorNode_Copy( LCUI_SelectorNode dst, LCUI_SelectorNode src )
+static void SelectorNode_Copy(LCUI_SelectorNode dst, LCUI_SelectorNode src)
 {
 	int i;
-	dst->id = src->id ? strdup2( src->id ) : NULL;
-	dst->type = src->type ? strdup2( src->type ) : NULL;
-	dst->fullname = src->fullname ? strdup2( src->fullname ) : NULL;
-	if( src->classes ) {
-		for( i = 0; src->classes[i]; ++i ) {
-			sortedstrsadd( &dst->classes, src->classes[i] );
+	dst->id = src->id ? strdup2(src->id) : NULL;
+	dst->type = src->type ? strdup2(src->type) : NULL;
+	dst->fullname = src->fullname ? strdup2(src->fullname) : NULL;
+	if (src->classes) {
+		for (i = 0; src->classes[i]; ++i) {
+			sortedstrsadd(&dst->classes, src->classes[i]);
 		}
 	}
-	if( src->status ) {
-		for( i = 0; src->status[i]; ++i ) {
-			sortedstrsadd( &dst->status, src->status[i] );
+	if (src->status) {
+		for (i = 0; src->status[i]; ++i) {
+			sortedstrsadd(&dst->status, src->status[i]);
 		}
 	}
 }
 
-void SelectorNode_Delete( LCUI_SelectorNode node )
+void SelectorNode_Delete(LCUI_SelectorNode node)
 {
-	if( node->type ) {
-		free( node->type );
+	if (node->type) {
+		free(node->type);
 		node->type = NULL;
 	}
-	if( node->id ) {
-		free( node->id );
+	if (node->id) {
+		free(node->id);
 		node->id = NULL;
 	}
-	if( node->classes ) {
-		freestrs( node->classes );
+	if (node->classes) {
+		freestrs(node->classes);
 		node->classes = NULL;
 	}
-	if( node->status ) {
-		freestrs( node->status );
+	if (node->status) {
+		freestrs(node->status);
 		node->status = NULL;
 	}
-	if( node->fullname ) {
-		free( node->fullname );
+	if (node->fullname) {
+		free(node->fullname);
 		node->fullname = NULL;
 	}
-	free( node );
+	free(node);
 }
 
-void Selector_Delete( LCUI_Selector s )
+void Selector_Delete(LCUI_Selector s)
 {
 	int i;
-	for( i = 0; i < MAX_SELECTOR_DEPTH; ++i ) {
-		if( !s->nodes[i] ) {
+	for (i = 0; i < MAX_SELECTOR_DEPTH; ++i) {
+		if (!s->nodes[i]) {
 			break;
 		}
-		SelectorNode_Delete( s->nodes[i] );
+		SelectorNode_Delete(s->nodes[i]);
 		s->nodes[i] = NULL;
 	}
 	s->rank = 0;
 	s->length = 0;
 	s->batch_num = 0;
-	free( s->nodes );
-	free( s );
+	free(s->nodes);
+	free(s);
 }
 
-LCUI_StyleSheet StyleSheet( void )
+LCUI_StyleSheet StyleSheet(void)
 {
 	LCUI_StyleSheet ss;
-	ss = NEW( LCUI_StyleSheetRec, 1 );
-	if( !ss ) {
+	ss = NEW(LCUI_StyleSheetRec, 1);
+	if (!ss) {
 		return ss;
 	}
 	ss->length = LCUI_GetStyleTotal();
-	ss->sheet = NEW( LCUI_StyleRec, ss->length + 1 );
+	ss->sheet = NEW(LCUI_StyleRec, ss->length + 1);
 	return ss;
 }
 
-void StyleSheet_Clear( LCUI_StyleSheet ss )
+void StyleSheet_Clear(LCUI_StyleSheet ss)
 {
 	int i;
 	LCUI_Style s;
-	for( i = 0; i < ss->length; ++i ) {
+	for (i = 0; i < ss->length; ++i) {
 		s = &ss->sheet[i];
-		switch( s->type ) {
+		switch (s->type) {
 		case LCUI_STYPE_STRING:
 		case LCUI_STYPE_WSTRING:
-			if( s->is_valid && s->string ) {
-				free( s->string );
+			if (s->is_valid && s->string) {
+				free(s->string);
 			}
 			s->string = NULL;
 		default: break;
@@ -451,43 +451,43 @@ void StyleSheet_Clear( LCUI_StyleSheet ss )
 	}
 }
 
-void StyleSheet_Delete( LCUI_StyleSheet ss )
+void StyleSheet_Delete(LCUI_StyleSheet ss)
 {
-	StyleSheet_Clear( ss );
-	free( ss->sheet );
-	free( ss );
+	StyleSheet_Clear(ss);
+	free(ss->sheet);
+	free(ss);
 }
 
-int StyleSheet_Merge( LCUI_StyleSheet dest, LCUI_StyleSheet src )
+int StyleSheet_Merge(LCUI_StyleSheet dest, LCUI_StyleSheet src)
 {
 	LCUI_Style s;
 	int i, count, size;
-	if( src->length > dest->length ) {
-		size = sizeof( LCUI_StyleRec )*src->length;
-		s = realloc( dest->sheet, size );
-		if( !s ) {
+	if (src->length > dest->length) {
+		size = sizeof(LCUI_StyleRec)*src->length;
+		s = realloc(dest->sheet, size);
+		if (!s) {
 			return -1;
 		}
-		for( i = dest->length; i < src->length; ++i ) {
+		for (i = dest->length; i < src->length; ++i) {
 			s[i].is_valid = FALSE;
 		}
 		dest->sheet = s;
 		dest->length = src->length;
 	}
-	for( count = 0, i = 0; i < src->length; ++i ) {
+	for (count = 0, i = 0; i < src->length; ++i) {
 		s = &dest->sheet[i];
-		if( !src->sheet[i].is_valid || s->is_valid ) {
+		if (!src->sheet[i].is_valid || s->is_valid) {
 			continue;
 		}
 		++count;
-		switch( src->sheet[i].type ) {
+		switch (src->sheet[i].type) {
 		case LCUI_STYPE_STRING:
-			s->string = strdup2( src->sheet[i].string );
+			s->string = strdup2(src->sheet[i].string);
 			break;
 		case LCUI_STYPE_WSTRING:
-			size = wcslen( src->sheet[i].wstring ) + 1;
-			s->wstring = malloc( size * sizeof( wchar_t ) );
-			wcscpy( s->wstring, src->sheet[i].wstring );
+			size = wcslen(src->sheet[i].wstring) + 1;
+			s->wstring = malloc(size * sizeof(wchar_t));
+			wcscpy(s->wstring, src->sheet[i].wstring);
 			break;
 		default:
 			*s = src->sheet[i];
@@ -499,41 +499,41 @@ int StyleSheet_Merge( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 	return 0;
 }
 
-int StyleSheet_Replace( LCUI_StyleSheet dest, LCUI_StyleSheet src )
+int StyleSheet_Replace(LCUI_StyleSheet dest, LCUI_StyleSheet src)
 {
 	LCUI_Style s;
 	int i, count, size;
-	if( src->length > dest->length ) {
-		size = sizeof( LCUI_StyleRec )*src->length;
-		s = realloc( dest->sheet, size );
-		if( !s ) {
+	if (src->length > dest->length) {
+		size = sizeof(LCUI_StyleRec)*src->length;
+		s = realloc(dest->sheet, size);
+		if (!s) {
 			return -1;
 		}
-		for( i = dest->length; i < src->length; ++i ) {
+		for (i = dest->length; i < src->length; ++i) {
 			s[i].is_valid = FALSE;
 		}
 		dest->sheet = s;
 		dest->length = src->length;
 	}
-	for( count = 0, i = 0; i < src->length; ++i ) {
-		if( !src->sheet[i].is_valid ) {
+	for (count = 0, i = 0; i < src->length; ++i) {
+		if (!src->sheet[i].is_valid) {
 			continue;
 		}
 		s = &dest->sheet[i];
-		switch( src->sheet[i].type ) {
+		switch (src->sheet[i].type) {
 		case LCUI_STYPE_STRING:
-			if( s->is_valid && s->string ) {
-				free( s->string );
+			if (s->is_valid && s->string) {
+				free(s->string);
 			}
-			s->string = strdup2( src->sheet[i].string );
+			s->string = strdup2(src->sheet[i].string);
 			break;
 		case LCUI_STYPE_WSTRING:
-			if( s->is_valid && s->string ) {
-				free( s->wstring );
+			if (s->is_valid && s->string) {
+				free(s->wstring);
 			}
-			size = wcslen( src->sheet[i].wstring ) + 1;
-			s->wstring = malloc( size * sizeof( wchar_t ) );
-			wcscpy( s->wstring, src->sheet[i].wstring );
+			size = wcslen(src->sheet[i].wstring) + 1;
+			s->wstring = malloc(size * sizeof(wchar_t));
+			wcscpy(s->wstring, src->sheet[i].wstring);
 			break;
 		default:
 			*s = src->sheet[i];
@@ -547,7 +547,7 @@ int StyleSheet_Replace( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 }
 
 /** 初始化样式表查找器 */
-static void NamesFinder_Init( NamesFinder sfinder, LCUI_SelectorNode snode )
+static void NamesFinder_Init(NamesFinder sfinder, LCUI_SelectorNode snode)
 {
 	sfinder->level = 0;
 	sfinder->class_i = 0;
@@ -558,7 +558,7 @@ static void NamesFinder_Init( NamesFinder sfinder, LCUI_SelectorNode snode )
 }
 
 /** 销毁样式表查找器 */
-static void NamesFinder_Destroy( NamesFinder sfinder )
+static void NamesFinder_Destroy(NamesFinder sfinder)
 {
 	sfinder->name_i = 0;
 	sfinder->name[0] = 0;
@@ -569,51 +569,51 @@ static void NamesFinder_Destroy( NamesFinder sfinder )
 }
 
 /* 生成选择器全名列表 */
-static int NamesFinder_Find( NamesFinder sfinder, LinkedList *list )
+static int NamesFinder_Find(NamesFinder sfinder, LinkedList *list)
 {
 	int i, len, old_len, old_level, count = 0;
 	char *fullname = sfinder->name + sfinder->name_i;
-	old_len = len = strlen( fullname );
+	old_len = len = strlen(fullname);
 	old_level = sfinder->level;
-	switch( sfinder->level ) {
-	case LEVEL_TYPE: 
+	switch (sfinder->level) {
+	case LEVEL_TYPE:
 		/* 按类型选择器生成选择器全名 */
-		if( !sfinder->node->type ) {
+		if (!sfinder->node->type) {
 			return 0;
 		}
-		strcpy( fullname, sfinder->node->type );
-		LinkedList_Append( list, strdup2( fullname ) );
+		strcpy(fullname, sfinder->node->type);
+		LinkedList_Append(list, strdup2(fullname));
 		break;
-	case LEVEL_ID: 
+	case LEVEL_ID:
 		/* 按ID选择器生成选择器全名 */
-		if( !sfinder->node->id ) {
+		if (!sfinder->node->id) {
 			return 0;
 		}
 		fullname[len++] = '#';
 		fullname[len] = 0;
-		strcpy( fullname + len, sfinder->node->id );
-		LinkedList_Append( list, strdup2( fullname ) );
+		strcpy(fullname + len, sfinder->node->id);
+		LinkedList_Append(list, strdup2(fullname));
 		break;
 	case LEVEL_CLASS:
-		if( !sfinder->node->classes ) {
+		if (!sfinder->node->classes) {
 			return 0;
 		}
 		/* 按类选择器生成选择器全名
-		 * 假设当前选择器全名为：textview#main-btn-text，且有 .a .b .c 
+		 * 假设当前选择器全名为：textview#main-btn-text，且有 .a .b .c
 		 * 这三个类，那么下面的处理将会拆分成以下三个选择器：
 		 * textview#test-text.a
 		 * textview#test-text.b
 		 * textview#test-text.a
 		 */
 		fullname[len++] = '.';
-		for( i = 0; sfinder->node->classes[i]; ++i ) {
+		for (i = 0; sfinder->node->classes[i]; ++i) {
 			sfinder->level += 1;
 			sfinder->class_i = i;
-			strcpy( fullname + len, sfinder->node->classes[i] );
-			LinkedList_Append( list, strdup2( fullname ) );
+			strcpy(fullname + len, sfinder->node->classes[i]);
+			LinkedList_Append(list, strdup2(fullname));
 			/* 将当前选择器名与其它层级的选择器名组合 */
-			while( sfinder->level < LEVEL_TOTAL_NUM ) {
-				count += NamesFinder_Find( sfinder, list );
+			while (sfinder->level < LEVEL_TOTAL_NUM) {
+				count += NamesFinder_Find(sfinder, list);
 				sfinder->level += 1;
 			}
 			sfinder->level = LEVEL_CLASS;
@@ -623,38 +623,38 @@ static int NamesFinder_Find( NamesFinder sfinder, LinkedList *list )
 		sfinder->class_i = 0;
 		return count;
 	case LEVEL_CLASS_2:
-		if( !sfinder->node->classes ) {
+		if (!sfinder->node->classes) {
 			return 0;
 		}
-		/* 按类选择器生成选择器全名，结果类似于这样： 
+		/* 按类选择器生成选择器全名，结果类似于这样：
 		 * textview#test-text.a.b
 		 * textview#test-text.a.c
 		 * textview#test-text.b.c
 		 * textview#test-text.a.b.c
 		 */
 		fullname[len++] = '.';
-		for( i = 0; sfinder->node->classes[i]; ++i ) {
-			if( i <= sfinder->class_i ) {
+		for (i = 0; sfinder->node->classes[i]; ++i) {
+			if (i <= sfinder->class_i) {
 				continue;
 			}
-			strcpy( fullname + len, sfinder->node->classes[i] );
-			LinkedList_Append( list, strdup2( fullname ) );
+			strcpy(fullname + len, sfinder->node->classes[i]);
+			LinkedList_Append(list, strdup2(fullname));
 			sfinder->class_i = i;
-			count += NamesFinder_Find( sfinder, list );
-			sfinder->class_i  = 0;
+			count += NamesFinder_Find(sfinder, list);
+			sfinder->class_i = 0;
 			sfinder->level = LEVEL_STATUS;
 			/**
 			 * 递归拼接伪类名，例如：
 			 * textview#main-btn-text:active
 			 */
-			count += NamesFinder_Find( sfinder, list );
+			count += NamesFinder_Find(sfinder, list);
 			sfinder->level = LEVEL_CLASS_2;
 		}
 		fullname[old_len] = 0;
 		sfinder->level = LEVEL_CLASS_2;
 		return count;
 	case LEVEL_STATUS:
-		if( !sfinder->node->status ) {
+		if (!sfinder->node->status) {
 			return 0;
 		}
 		fullname[len++] = ':';
@@ -671,86 +671,86 @@ static int NamesFinder_Find( NamesFinder sfinder, LinkedList *list )
 		 * textview#main-btn-text:focus:hover
 		 * textview#main-btn-text:hover
 		 */
-		for( i = 0; sfinder->node->status[i]; ++i ) {
+		for (i = 0; sfinder->node->status[i]; ++i) {
 			sfinder->status_i = i;
-			strcpy( fullname + len, sfinder->node->status[i] );
-			LinkedList_Append( list, strdup2( fullname ) );
+			strcpy(fullname + len, sfinder->node->status[i]);
+			LinkedList_Append(list, strdup2(fullname));
 			/**
 			 * 递归调用，以一层层拼接出像下面这样的选择器：
 			 * textview#main-btn-text:active:focus:hover
 			 */
-			count += NamesFinder_Find( sfinder, list );
+			count += NamesFinder_Find(sfinder, list);
 		}
 		sfinder->level = LEVEL_STATUS;
 		fullname[old_len] = 0;
 		sfinder->status_i = 0;
 		return count;
 	case LEVEL_STATUS_2:
-		if( !sfinder->node->status ) {
+		if (!sfinder->node->status) {
 			return 0;
 		}
 		/** 按伪类选择器生成选择器全名 */
-		for( i = 0; sfinder->node->status[i]; ++i ) {
-			if( i <= sfinder->status_i ) {
+		for (i = 0; sfinder->node->status[i]; ++i) {
+			if (i <= sfinder->status_i) {
 				continue;
 			}
 			fullname[len] = ':';
-			strcpy( fullname + len + 1, sfinder->node->status[i] );
-			LinkedList_Append( list, strdup2( fullname ) );
+			strcpy(fullname + len + 1, sfinder->node->status[i]);
+			LinkedList_Append(list, strdup2(fullname));
 			sfinder->status_i = i;
-			count += NamesFinder_Find( sfinder, list );
+			count += NamesFinder_Find(sfinder, list);
 			sfinder->status_i = 0;
 		}
 		fullname[old_len] = 0;
 		return count;
 	default:break;
 	}
-	for( i = sfinder->level + 1; i < LEVEL_TOTAL_NUM; ++i ) {
-		if( i == LEVEL_STATUS_2 || i == LEVEL_CLASS_2 ) {
+	for (i = sfinder->level + 1; i < LEVEL_TOTAL_NUM; ++i) {
+		if (i == LEVEL_STATUS_2 || i == LEVEL_CLASS_2) {
 			continue;
 		}
 		sfinder->level = i;
-		count += NamesFinder_Find( sfinder, list );
+		count += NamesFinder_Find(sfinder, list);
 	}
 	fullname[old_len] = 0;
 	sfinder->level = old_level;
 	return count;
 }
 
-static int SelectorNode_Save( LCUI_SelectorNode node,
-			      const char *name, int len, char type )
+static int SelectorNode_Save(LCUI_SelectorNode node,
+			     const char *name, int len, char type)
 {
 	char *str;
-	if( len < 1 ) {
+	if (len < 1) {
 		return 0;
 	}
-	switch( type ) {
+	switch (type) {
 	case 0:
-		if( node->type ) {
+		if (node->type) {
 			break;
 		}
 		len += 1;
-		str = malloc( sizeof( char ) * len );
-		strncpy( str, name, len );
+		str = malloc(sizeof(char) * len);
+		strncpy(str, name, len);
 		node->type = str;
 		return TYPE_RANK;
 	case ':':
-		if( sortedstrsadd( &node->status, name ) == 0 ) {
+		if (sortedstrsadd(&node->status, name) == 0) {
 			return PCLASS_RANK;
 		}
 		break;
 	case '.':
-		if( sortedstrsadd( &node->classes, name ) == 0 ) {
+		if (sortedstrsadd(&node->classes, name) == 0) {
 			return CLASS_RANK;
 		}
 		break;
 	case '#':
-		if( node->id ) {
+		if (node->id) {
 			break;
 		}
 		len += 1;
-		str = malloc( sizeof( char ) * len );
-		strncpy( str, name, len );
+		str = malloc(sizeof(char) * len);
+		strncpy(str, name, len);
 		node->id = str;
 		return ID_RANK;
 	default: break;
@@ -758,94 +758,94 @@ static int SelectorNode_Save( LCUI_SelectorNode node,
 	return 0;
 }
 
-int SelectorNode_GetNames( LCUI_SelectorNode sn, LinkedList *names )
+int SelectorNode_GetNames(LCUI_SelectorNode sn, LinkedList *names)
 {
 	int count;
 	NamesFinderRec sfinder;
-	NamesFinder_Init( &sfinder, sn );
-	count = NamesFinder_Find( &sfinder, names );
-	NamesFinder_Destroy( &sfinder );
+	NamesFinder_Init(&sfinder, sn);
+	count = NamesFinder_Find(&sfinder, names);
+	NamesFinder_Destroy(&sfinder);
 	return count;
 }
 
-int SelectorNode_Update( LCUI_SelectorNode node )
+int SelectorNode_Update(LCUI_SelectorNode node)
 {
 	int i, len = 0;
 	char *fullname;
 
 	node->rank = 0;
-	if( node->id ) {
-		len += strlen( node->id ) + 1;
+	if (node->id) {
+		len += strlen(node->id) + 1;
 		node->rank += ID_RANK;
 	}
-	if( node->type ) {
-		len += strlen( node->type ) + 1;
+	if (node->type) {
+		len += strlen(node->type) + 1;
 		node->rank += TYPE_RANK;
 	}
-	if( node->classes ) {
-		for( i = 0; node->classes[i]; ++i ) {
-			len += strlen( node->classes[i] ) + 1;
+	if (node->classes) {
+		for (i = 0; node->classes[i]; ++i) {
+			len += strlen(node->classes[i]) + 1;
 			node->rank += CLASS_RANK;
 		}
 	}
-	if( node->status ) {
-		for( i = 0; node->status[i]; ++i ) {
-			len += strlen( node->status[i] ) + 1;
+	if (node->status) {
+		for (i = 0; node->status[i]; ++i) {
+			len += strlen(node->status[i]) + 1;
 			node->rank += PCLASS_RANK;
 		}
 	}
-	if( len > 0 ) {
-		fullname = malloc( sizeof( char ) * (len + 1) );
-		if( !fullname ) {
+	if (len > 0) {
+		fullname = malloc(sizeof(char) * (len + 1));
+		if (!fullname) {
 			return -ENOMEM;
 		}
 		fullname[0] = 0;
-		if( node->type ) {
-			strcat( fullname, node->type );
+		if (node->type) {
+			strcat(fullname, node->type);
 		}
-		if( node->id ) {
-			strcat( fullname, "#" );
-			strcat( fullname, node->id );
+		if (node->id) {
+			strcat(fullname, "#");
+			strcat(fullname, node->id);
 		}
-		if( node->classes ) {
-			for( i = 0; node->classes[i]; ++i ) {
-				strcat( fullname, "." );
-				strcat( fullname, node->classes[i] );
+		if (node->classes) {
+			for (i = 0; node->classes[i]; ++i) {
+				strcat(fullname, ".");
+				strcat(fullname, node->classes[i]);
 			}
 			len += 1;
 		}
-		if( node->status ) {
-			for( i = 0; node->status[i]; ++i ) {
-				strcat( fullname, ":" );
-				strcat( fullname, node->status[i] );
+		if (node->status) {
+			for (i = 0; node->status[i]; ++i) {
+				strcat(fullname, ":");
+				strcat(fullname, node->status[i]);
 			}
 			len += 1;
 		}
 	} else {
 		fullname = NULL;
 	}
-	if( node->fullname ) {
-		free( node->fullname );
+	if (node->fullname) {
+		free(node->fullname);
 	}
 	node->fullname = fullname;
 	return len;
 }
 
-void Selector_Update( LCUI_Selector s )
+void Selector_Update(LCUI_Selector s)
 {
 	int i;
 	const unsigned char *p;
 	unsigned int hash = 5381;
-	for( i = 0; i < s->length; ++i ) {
+	for (i = 0; i < s->length; ++i) {
 		p = (unsigned char*)s->nodes[i]->fullname;
-		while( *p ) {
+		while (*p) {
 			hash = ((hash << 5) + hash) + (*p++);
 		}
 	}
 	s->hash = hash;
 }
 
-LCUI_Selector Selector( const char *selector )
+LCUI_Selector Selector(const char *selector)
 {
 	const char *p;
 	int ni, si, rank;
@@ -853,46 +853,46 @@ LCUI_Selector Selector( const char *selector )
 	char type = 0, name[MAX_NAME_LEN];
 	LCUI_BOOL is_saving = FALSE;
 	LCUI_SelectorNode node = NULL;
-	LCUI_Selector s = NEW( LCUI_SelectorRec, 1 );
+	LCUI_Selector s = NEW(LCUI_SelectorRec, 1);
 
 	s->batch_num = ++batch_num;
-	s->nodes = NEW( LCUI_SelectorNode, MAX_SELECTOR_DEPTH );
-	if( !selector ) {
+	s->nodes = NEW(LCUI_SelectorNode, MAX_SELECTOR_DEPTH);
+	if (!selector) {
 		s->length = 0;
 		s->nodes[0] = NULL;
 		return s;
 	}
-	for( ni = 0, si = 0, p = selector; *p; ++p ) {
-		if( !node && is_saving ) {
-			node = NEW( LCUI_SelectorNodeRec, 1 );
-			if( si >= MAX_SELECTOR_DEPTH ) {
-				_DEBUG_MSG( "%s: selector node list is too long.\n",
-					    selector );
+	for (ni = 0, si = 0, p = selector; *p; ++p) {
+		if (!node && is_saving) {
+			node = NEW(LCUI_SelectorNodeRec, 1);
+			if (si >= MAX_SELECTOR_DEPTH) {
+				_DEBUG_MSG("%s: selector node list is too long.\n",
+					   selector);
 				return NULL;
 			}
 			s->nodes[si] = node;
 		}
-		switch( *p ) {
+		switch (*p) {
 		case ':':
 		case '.':
 		case '#':
-			if( !is_saving ) {
+			if (!is_saving) {
 				is_saving = TRUE;
 				type = *p;
 				continue;
 			}
 			/* 保存上个结点 */
-			rank = SelectorNode_Save( node, name, ni, type );
+			rank = SelectorNode_Save(node, name, ni, type);
 			is_saving = TRUE;
 			type = *p;
-			if( rank > 0 ) {
+			if (rank > 0) {
 				s->rank += rank;
 				ni = 0;
 				continue;
 			}
-			_DEBUG_MSG( "%s: invalid selector node at %ld.\n",
-					selector, p - selector - ni );
-			SelectorNode_Delete( node );
+			_DEBUG_MSG("%s: invalid selector node at %ld.\n",
+				   selector, p - selector - ni);
+			SelectorNode_Delete(node);
 			node = NULL;
 			ni = 0;
 			continue;
@@ -900,33 +900,33 @@ LCUI_Selector Selector( const char *selector )
 		case '\r':
 		case '\n':
 		case '\t':
-			if( !is_saving ) {
+			if (!is_saving) {
 				ni = 0;
 				node = NULL;
 				continue;
 			}
 			is_saving = FALSE;
-			rank = SelectorNode_Save( node, name, ni, type );
-			if( rank > 0 ) {
-				SelectorNode_Update( node );
+			rank = SelectorNode_Save(node, name, ni, type);
+			if (rank > 0) {
+				SelectorNode_Update(node);
 				s->rank += rank;
 				node = NULL;
 				ni = 0;
 				si++;
 				continue;
 			}
-			_DEBUG_MSG( "%s: invalid selector node at %ld.\n",
-				    selector, p - selector - ni );
-			SelectorNode_Delete( node );
+			_DEBUG_MSG("%s: invalid selector node at %ld.\n",
+				   selector, p - selector - ni);
+			SelectorNode_Delete(node);
 			node = NULL;
 			ni = 0;
 			continue;
 		default: break;
 		}
-		if( *p == '-' || *p == '_' || *p == '*'
+		if (*p == '-' || *p == '_' || *p == '*'
 		    || (*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z')
-		    || (*p >= '0' && *p <= '9') ) {
-			if( !is_saving ) {
+		    || (*p >= '0' && *p <= '9')) {
+			if (!is_saving) {
 				type = 0;
 				is_saving = TRUE;
 			}
@@ -934,124 +934,124 @@ LCUI_Selector Selector( const char *selector )
 			name[ni] = 0;
 			continue;
 		}
-		_DEBUG_MSG( "%s: unknown char 0x%02x at %ld.\n",
-			    selector, *p, p - selector );
+		_DEBUG_MSG("%s: unknown char 0x%02x at %ld.\n",
+			   selector, *p, p - selector);
 		return NULL;
 	}
-	if( is_saving ) {
-		if( !node ) {
-			node = NEW( LCUI_SelectorNodeRec, 1 );
-			if( si >= MAX_SELECTOR_DEPTH ) {
-				_DEBUG_MSG( "%s: selector node list is too long.\n",
-					    selector );
+	if (is_saving) {
+		if (!node) {
+			node = NEW(LCUI_SelectorNodeRec, 1);
+			if (si >= MAX_SELECTOR_DEPTH) {
+				_DEBUG_MSG("%s: selector node list is too long.\n",
+					   selector);
 				return NULL;
 			}
 			s->nodes[si] = node;
 		}
-		rank = SelectorNode_Save( s->nodes[si], name, ni, type );
-		if( rank > 0 ) {
-			SelectorNode_Update( s->nodes[si] );
+		rank = SelectorNode_Save(s->nodes[si], name, ni, type);
+		if (rank > 0) {
+			SelectorNode_Update(s->nodes[si]);
 			s->rank += rank;
 			si++;
 		} else {
-			SelectorNode_Delete( s->nodes[si] );
+			SelectorNode_Delete(s->nodes[si]);
 		}
 	}
 	s->nodes[si] = NULL;
 	s->length = si;
-	Selector_Update( s );
+	Selector_Update(s);
 	return s;
 }
 
-static void DeleteStyleNode( StyleNode node )
+static void DeleteStyleNode(StyleNode node)
 {
-	if( node->space ) {
-		free( node->space );
+	if (node->space) {
+		free(node->space);
 		node->space = NULL;
 	}
-	if( node->selector ) {
-		free( node->selector );
+	if (node->selector) {
+		free(node->selector);
 		node->selector = NULL;
 	}
-	StyleSheet_Delete( node->sheet );
+	StyleSheet_Delete(node->sheet);
 	node->sheet = NULL;
-	free( node );
+	free(node);
 }
 
-static StyleLink CreateStyleLink( void )
+static StyleLink CreateStyleLink(void)
 {
-	StyleLink link = NEW( StyleLinkRec, 1 );
+	StyleLink link = NEW(StyleLinkRec, 1);
 	link->group = NULL;
-	LinkedList_Init( &link->styles );
-	link->parents = Dict_Create( &DictType_StringCopyKey, NULL );
+	LinkedList_Init(&link->styles);
+	link->parents = Dict_Create(&DictType_StringCopyKey, NULL);
 	return link;
 }
 
-static void DeleteStyleLink( StyleLink link )
+static void DeleteStyleLink(StyleLink link)
 {
-	Dict_Release( link->parents );
-	LinkedList_Clear( &link->styles, (FuncPtr)DeleteStyleNode );
-	free( link->selector );
+	Dict_Release(link->parents);
+	LinkedList_Clear(&link->styles, (FuncPtr)DeleteStyleNode);
+	free(link->selector);
 	link->selector = NULL;
 	link->parents = NULL;
 	link->group = NULL;
-	free( link );
+	free(link);
 }
 
-static void StyleLinkDestructor( void *privdata, void *data )
+static void StyleLinkDestructor(void *privdata, void *data)
 {
-	DeleteStyleLink( data );
+	DeleteStyleLink(data);
 }
 
-static StyleLinkGroup CreateStyleLinkGroup( LCUI_SelectorNode snode )
+static StyleLinkGroup CreateStyleLinkGroup(LCUI_SelectorNode snode)
 {
-	DictType *dtype = NEW( DictType, 1 );
-	StyleLinkGroup group = NEW( StyleLinkGroupRec, 1 );
-	group->snode = NEW( LCUI_SelectorNodeRec, 1 );
-	SelectorNode_Copy( group->snode, snode );
+	DictType *dtype = NEW(DictType, 1);
+	StyleLinkGroup group = NEW(StyleLinkGroupRec, 1);
+	group->snode = NEW(LCUI_SelectorNodeRec, 1);
+	SelectorNode_Copy(group->snode, snode);
 	group->name = group->snode->fullname;
 	*dtype = DictType_StringCopyKey;
 	dtype->valDestructor = StyleLinkDestructor;
-	group->links = Dict_Create( dtype, dtype );
+	group->links = Dict_Create(dtype, dtype);
 	return group;
 }
 
-static void DeleteStyleLinkGroup( StyleLinkGroup group )
+static void DeleteStyleLinkGroup(StyleLinkGroup group)
 {
 	DictType *dtype;
 	dtype = group->links->privdata;
-	SelectorNode_Delete( group->snode );
-	Dict_Release( group->links );
-	free( dtype );
-	free( group );
+	SelectorNode_Delete(group->snode);
+	Dict_Release(group->links);
+	free(dtype);
+	free(group);
 }
 
-static void StyleLinkGroupDestructor( void *privdata, void *data )
+static void StyleLinkGroupDestructor(void *privdata, void *data)
 {
-	DeleteStyleLinkGroup( data );
+	DeleteStyleLinkGroup(data);
 }
 
-static Dict *CreateStyleGroup( void )
+static Dict *CreateStyleGroup(void)
 {
 	Dict *dict;
-	DictType *dtype = NEW( DictType, 1 );
+	DictType *dtype = NEW(DictType, 1);
 	*dtype = DictType_StringCopyKey;
 	dtype->valDestructor = StyleLinkGroupDestructor;
-	dict = Dict_Create( dtype, dtype );
+	dict = Dict_Create(dtype, dtype);
 	return dict;
 }
 
-static void DeleteStyleGroup( Dict *dict )
+static void DeleteStyleGroup(Dict *dict)
 {
 	DictType *dtype;
 	dtype = dict->privdata;
-	Dict_Release( dict );
-	free( dtype );
+	Dict_Release(dict);
+	free(dtype);
 }
 
 /** 根据选择器，选中匹配的样式表 */
-static LCUI_StyleSheet LCUI_SelectStyleSheet( LCUI_Selector selector, 
-					      const char *space )
+static LCUI_StyleSheet LCUI_SelectStyleSheet(LCUI_Selector selector,
+					     const char *space)
 {
 	int i, right;
 	StyleLink link;
@@ -1064,115 +1064,115 @@ static LCUI_StyleSheet LCUI_SelectStyleSheet( LCUI_Selector selector,
 
 	link = NULL;
 	parents = NULL;
-	for( i = 0, right = selector->length - 1; right >= 0; --right, ++i ) {
-		group = LinkedList_Get( &library.groups, i );
-		if( !group ) {
+	for (i = 0, right = selector->length - 1; right >= 0; --right, ++i) {
+		group = LinkedList_Get(&library.groups, i);
+		if (!group) {
 			group = CreateStyleGroup();
-			LinkedList_Append( &library.groups, group );
+			LinkedList_Append(&library.groups, group);
 		}
 		sn = selector->nodes[right];
-		slg = Dict_FetchValue( group, sn->fullname );
-		if( !slg ) {
-			slg = CreateStyleLinkGroup( sn );
-			Dict_Add( group, sn->fullname, slg );
+		slg = Dict_FetchValue(group, sn->fullname);
+		if (!slg) {
+			slg = CreateStyleLinkGroup(sn);
+			Dict_Add(group, sn->fullname, slg);
 		}
-		if( i == 0 ) {
-			strcpy( fullname, "*" );
+		if (i == 0) {
+			strcpy(fullname, "*");
 		} else {
-			strcpy( fullname, buf );
+			strcpy(fullname, buf);
 		}
-		link = Dict_FetchValue( slg->links, fullname );
-		if( !link ) {
+		link = Dict_FetchValue(slg->links, fullname);
+		if (!link) {
 			link = CreateStyleLink();
 			link->group = slg;
-			link->selector = strdup2( fullname );
-			Dict_Add( slg->links, fullname, link );
+			link->selector = strdup2(fullname);
+			Dict_Add(slg->links, fullname, link);
 		}
-		if( i == 0 ) {
-			strcpy( buf, sn->fullname );
-			strcpy( fullname, buf );
+		if (i == 0) {
+			strcpy(buf, sn->fullname);
+			strcpy(fullname, buf);
 		} else {
-			strcpy( fullname, buf );
-			sprintf( buf, "%s %s", sn->fullname, fullname );
+			strcpy(fullname, buf);
+			sprintf(buf, "%s %s", sn->fullname, fullname);
 		}
 		/* 如果有上一级的父链接记录，则将当前链接添加进去 */
-		if( parents ) {
-			if( !Dict_FetchValue( parents, sn->fullname ) ) {
-				Dict_Add( parents, sn->fullname, link );
+		if (parents) {
+			if (!Dict_FetchValue(parents, sn->fullname)) {
+				Dict_Add(parents, sn->fullname, link);
 			}
 		}
 		parents = link->parents;
 	}
-	if( !link ) {
+	if (!link) {
 		return NULL;
 	}
-	snode = NEW( StyleNodeRec, 1 );
-	if( space ) {
-		snode->space = NEW( char, strlen(space) + 1 );
-		strcpy( snode->space, space );
+	snode = NEW(StyleNodeRec, 1);
+	if (space) {
+		snode->space = NEW(char, strlen(space) + 1);
+		strcpy(snode->space, space);
 	} else {
 		snode->space = NULL;
 	}
 	snode->sheet = StyleSheet();
 	snode->rank = selector->rank;
-	snode->selector = strdup2( fullname );
+	snode->selector = strdup2(fullname);
 	snode->batch_num = selector->batch_num;
-	LinkedList_Append( &link->styles, snode );
+	LinkedList_Append(&link->styles, snode);
 	return snode->sheet;
 }
 
-int LCUI_PutStyleSheet( LCUI_Selector selector,
-			LCUI_StyleSheet in_ss, const char *space )
+int LCUI_PutStyleSheet(LCUI_Selector selector,
+		       LCUI_StyleSheet in_ss, const char *space)
 {
 	LCUI_StyleSheet ss;
-	LCUIMutex_Lock( &library.mutex );
-	Dict_Empty( library.cache );
-	ss = LCUI_SelectStyleSheet( selector, space );
-	if( ss ) {
-		StyleSheet_Replace( ss, in_ss );
+	LCUIMutex_Lock(&library.mutex);
+	Dict_Empty(library.cache);
+	ss = LCUI_SelectStyleSheet(selector, space);
+	if (ss) {
+		StyleSheet_Replace(ss, in_ss);
 	}
-	LCUIMutex_Unlock( &library.mutex );
+	LCUIMutex_Unlock(&library.mutex);
 	return 0;
 }
 
-static int StyleLink_GetStyleSheets( StyleLink link, LinkedList *outlist )
+static int StyleLink_GetStyleSheets(StyleLink link, LinkedList *outlist)
 {
 	StyleNode snode, out_snode;
 	LinkedListNode *node, *out_node;
 
-	if( !outlist ) {
+	if (!outlist) {
 		return link->styles.length;
 	}
-	for( LinkedList_Each( node, &link->styles ) ) {
+	for (LinkedList_Each(node, &link->styles)) {
 		int pos = -1, i = 0;
 		snode = node->data;
-		for( LinkedList_Each( out_node, outlist ) ) {
+		for (LinkedList_Each(out_node, outlist)) {
 			out_snode = out_node->data;
-			if( snode->rank > out_snode->rank ) {
+			if (snode->rank > out_snode->rank) {
 				pos = i;
 				break;
 			}
-			if( snode->rank != out_snode->rank ) {
+			if (snode->rank != out_snode->rank) {
 				i += 1;
 				continue;
 			}
-			if( snode->batch_num > out_snode->batch_num ) {
+			if (snode->batch_num > out_snode->batch_num) {
 				pos = i;
 				break;
 			}
 			i += 1;
 		}
-		if( pos >= 0 ) {
-			LinkedList_Insert( outlist, pos, snode );
+		if (pos >= 0) {
+			LinkedList_Insert(outlist, pos, snode);
 		} else {
-			LinkedList_Append( outlist, snode );
+			LinkedList_Append(outlist, snode);
 		}
 	}
 	return link->styles.length;
 }
 
-static int LCUI_FindStyleSheetFromLink( StyleLink link, LCUI_Selector s,
-					int i, LinkedList *list )
+static int LCUI_FindStyleSheetFromLink(StyleLink link, LCUI_Selector s,
+				       int i, LinkedList *list)
 {
 	int count = 0;
 	StyleLink parent;
@@ -1180,26 +1180,26 @@ static int LCUI_FindStyleSheetFromLink( StyleLink link, LCUI_Selector s,
 	LinkedListNode *node;
 	LCUI_SelectorNode sn;
 
-	LinkedList_Init( &names );
-	count += StyleLink_GetStyleSheets( link, list );
-	while( --i >= 0 ) {
+	LinkedList_Init(&names);
+	count += StyleLink_GetStyleSheets(link, list);
+	while (--i >= 0) {
 		sn = s->nodes[i];
-		SelectorNode_GetNames( sn, &names );
-		for( LinkedList_Each( node, &names ) ) {
-			parent = Dict_FetchValue( link->parents, node->data );
-			if( !parent ) {
+		SelectorNode_GetNames(sn, &names);
+		for (LinkedList_Each(node, &names)) {
+			parent = Dict_FetchValue(link->parents, node->data);
+			if (!parent) {
 				continue;
 			}
-			count += LCUI_FindStyleSheetFromLink( parent, s,
-							      i, list );
+			count += LCUI_FindStyleSheetFromLink(parent, s,
+							     i, list);
 		}
-		LinkedList_Clear( &names, free );
+		LinkedList_Clear(&names, free);
 	}
 	return count;
 }
 
-int LCUI_FindStyleSheetFromGroup( int group, const char *name, 
-				  LCUI_Selector s, LinkedList *list )
+int LCUI_FindStyleSheetFromGroup(int group, const char *name,
+				 LCUI_Selector s, LinkedList *list)
 {
 	int i, count;
 	Dict *groups;
@@ -1207,142 +1207,143 @@ int LCUI_FindStyleSheetFromGroup( int group, const char *name,
 	LinkedListNode *node;
 	LinkedList names;
 
-	groups = LinkedList_Get( &library.groups, group );
-	if( !groups || s->length < 1 ) {
+	groups = LinkedList_Get(&library.groups, group);
+	if (!groups || s->length < 1) {
 		return 0;
 	}
 	count = 0;
 	i = s->length - 1;
-	LinkedList_Init( &names );
-	if( name ) {
-		LinkedList_Append( &names, strdup2( name ) );
+	LinkedList_Init(&names);
+	if (name) {
+		LinkedList_Append(&names, strdup2(name));
 	} else {
-		SelectorNode_GetNames( s->nodes[i], &names );
-		LinkedList_Append( &names, strdup2( "*" ) );
+		SelectorNode_GetNames(s->nodes[i], &names);
+		LinkedList_Append(&names, strdup2("*"));
 	}
-	for( LinkedList_Each( node, &names ) ) {
+	for (LinkedList_Each(node, &names)) {
 		DictEntry *entry;
 		DictIterator *iter;
 		char *name = node->data;
-		slg = Dict_FetchValue( groups, name );
-		if( !slg ) {
+		slg = Dict_FetchValue(groups, name);
+		if (!slg) {
 			continue;
 		}
-		iter = Dict_GetIterator( slg->links );
-		while( (entry = Dict_Next( iter )) ) {
-			StyleLink link = DictEntry_GetVal( entry );
-			count += LCUI_FindStyleSheetFromLink( link, s, 
-							      i, list );
+		iter = Dict_GetIterator(slg->links);
+		while ((entry = Dict_Next(iter))) {
+			StyleLink link = DictEntry_GetVal(entry);
+			count += LCUI_FindStyleSheetFromLink(link, s,
+							     i, list);
 		}
-		Dict_ReleaseIterator( iter );
+		Dict_ReleaseIterator(iter);
 	}
-	LinkedList_Clear( &names, free );
+	LinkedList_Clear(&names, free);
 	return count;
 }
 
-void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
+void LCUI_PrintStyleSheet(LCUI_StyleSheet ss)
 {
 	int key;
 	const char *name;
-	for( key = 0; key < ss->length; ++key ) {
+	for (key = 0; key < ss->length; ++key) {
 		LCUI_Style s = &ss->sheet[key];
-		if( !s->is_valid ) {
+		if (!s->is_valid) {
 			continue;
 		}
-		name = LCUI_GetStyleName( key );
-		if( name ) {
-			LOG( "\t%s", name );
+		name = LCUI_GetStyleName(key);
+		if (name) {
+			LOG("\t%s", name);
 		} else {
-			LOG( "\t<unknown style %d>", key );
+			LOG("\t<unknown style %d>", key);
 		}
-		LOG( "%s: ", key > STYLE_KEY_TOTAL ? " (+)" : "" );
-		switch( s->type ) {
+		LOG("%s: ", key > STYLE_KEY_TOTAL ? " (+)" : "");
+		switch (s->type) {
 		case LCUI_STYPE_AUTO:
-			LOG( "auto" );
+			LOG("auto");
 			break;
 		case LCUI_STYPE_BOOL:
-			LOG( "%s", s->val_bool ? "true" : "false" );
+			LOG("%s", s->val_bool ? "true" : "false");
 			break;
-		case LCUI_STYPE_COLOR: {
+		case LCUI_STYPE_COLOR:
+		{
 			LCUI_Color *clr = &s->val_color;
-			if( clr->alpha < 255 ) {
-				LOG( "rgba(%d,%d,%d,%g)", clr->r,
-					clr->g, clr->b, clr->a / 255.0 );
+			if (clr->alpha < 255) {
+				LOG("rgba(%d,%d,%d,%g)", clr->r,
+				    clr->g, clr->b, clr->a / 255.0);
 			} else {
-				LOG( "#%02x%02x%02x", clr->r, clr->g, clr->b );
+				LOG("#%02x%02x%02x", clr->r, clr->g, clr->b);
 			}
 			break;
 		}
 		case LCUI_STYPE_PX:
-			LOG( "%gpx", s->val_px );
+			LOG("%gpx", s->val_px);
 			break;
 		case LCUI_STYPE_DIP:
-			LOG( "%gdip", s->val_dip );
+			LOG("%gdip", s->val_dip);
 			break;
 		case LCUI_STYPE_SP:
-			LOG( "%gsp", s->val_sp );
+			LOG("%gsp", s->val_sp);
 			break;
 		case LCUI_STYPE_STRING:
-			LOG( "%s", s->val_string );
+			LOG("%s", s->val_string);
 			break;
 		case LCUI_STYPE_SCALE:
-			LOG( "%g%%", s->val_scale * 100 );
+			LOG("%g%%", s->val_scale * 100);
 			break;
 		case LCUI_STYPE_STYLE:
-			LOG( "%s", LCUI_GetStyleValueName( s->val_style ) );
+			LOG("%s", LCUI_GetStyleValueName(s->val_style));
 			break;
 		case LCUI_STYPE_VALUE:
-			LOG( "%d", s->val_int );
+			LOG("%d", s->val_int);
 			break;
 		default:
-			LOG( "%g", s->value );
+			LOG("%g", s->value);
 			break;
 		}
-		LOG( ";\n" );
+		LOG(";\n");
 	}
 }
 
-void LCUI_PrintSelector( LCUI_Selector selector )
+void LCUI_PrintSelector(LCUI_Selector selector)
 {
 	char path[MAX_SELECTOR_LEN];
 	LCUI_SelectorNode *sn;
 
 	path[0] = 0;
-	for( sn = selector->nodes; *sn; ++sn ) {
-		strcat( path, (*sn)->fullname );
-		strcat( path, " " );
+	for (sn = selector->nodes; *sn; ++sn) {
+		strcat(path, (*sn)->fullname);
+		strcat(path, " ");
 	}
 	LOG("path: %s (rank = %d, batch_num = %d)\n", path,
-		selector->rank, selector->batch_num);
+	    selector->rank, selector->batch_num);
 }
 
-static void LCUI_PrintStyleLink( StyleLink link, const char *selector )
+static void LCUI_PrintStyleLink(StyleLink link, const char *selector)
 {
 	DictEntry *entry;
 	DictIterator *iter;
 	LinkedListNode *node;
 	char fullname[MAX_SELECTOR_LEN];
-	if( selector ) {
-		sprintf( fullname, "%s %s", link->group->name, selector );
+	if (selector) {
+		sprintf(fullname, "%s %s", link->group->name, selector);
 	} else {
-		strcpy( fullname, link->group->name );
+		strcpy(fullname, link->group->name);
 	}
-	for( LinkedList_Each( node, &link->styles ) ) {
+	for (LinkedList_Each(node, &link->styles)) {
 		StyleNode snode = node->data;
-		LOG( "\n[%s]", snode->space ? snode->space : "<none>" );
-		LOG( "[rank: %d]\n%s {\n", snode->rank, fullname );
-		LCUI_PrintStyleSheet( snode->sheet );
+		LOG("\n[%s]", snode->space ? snode->space : "<none>");
+		LOG("[rank: %d]\n%s {\n", snode->rank, fullname);
+		LCUI_PrintStyleSheet(snode->sheet);
 		LOG("}\n");
 	}
-	iter = Dict_GetIterator( link->parents );
-	while( (entry = Dict_Next( iter )) ) {
-		StyleLink parent = DictEntry_GetVal( entry );
-		LCUI_PrintStyleLink( parent, fullname );
+	iter = Dict_GetIterator(link->parents);
+	while ((entry = Dict_Next(iter))) {
+		StyleLink parent = DictEntry_GetVal(entry);
+		LCUI_PrintStyleLink(parent, fullname);
 	}
-	Dict_ReleaseIterator( iter );
+	Dict_ReleaseIterator(iter);
 }
 
-void LCUI_PrintCSSLibrary( void )
+void LCUI_PrintCSSLibrary(void)
 {
 	Dict *group;
 	StyleLink link;
@@ -1351,114 +1352,114 @@ void LCUI_PrintCSSLibrary( void )
 	DictEntry *entry;
 
 	link = NULL;
-	LOG( "style library begin\n" );
-	group = LinkedList_Get( &library.groups, 0 );
-	iter = Dict_GetIterator( group );
-	while( (entry = Dict_Next(iter)) ) {
+	LOG("style library begin\n");
+	group = LinkedList_Get(&library.groups, 0);
+	iter = Dict_GetIterator(group);
+	while ((entry = Dict_Next(iter))) {
 		DictEntry *entry_slg;
 		DictIterator *iter_slg;
-		slg = DictEntry_GetVal( entry );
-		iter_slg = Dict_GetIterator( slg->links );
-		while( (entry_slg = Dict_Next(iter_slg)) ) {
-			link = DictEntry_GetVal( entry_slg );
-			LCUI_PrintStyleLink( link, NULL );
+		slg = DictEntry_GetVal(entry);
+		iter_slg = Dict_GetIterator(slg->links);
+		while ((entry_slg = Dict_Next(iter_slg))) {
+			link = DictEntry_GetVal(entry_slg);
+			LCUI_PrintStyleLink(link, NULL);
 		}
-		Dict_ReleaseIterator( iter_slg );
+		Dict_ReleaseIterator(iter_slg);
 	}
-	Dict_ReleaseIterator( iter );
-	LOG( "style library end\n" );
+	Dict_ReleaseIterator(iter);
+	LOG("style library end\n");
 }
 
-void LCUI_GetStyleSheet( LCUI_Selector s, LCUI_StyleSheet out_ss )
+void LCUI_GetStyleSheet(LCUI_Selector s, LCUI_StyleSheet out_ss)
 {
 	LinkedList list;
 	LinkedListNode *node;
 	LCUI_StyleSheet ss;
-	LinkedList_Init( &list );
-	StyleSheet_Clear( out_ss );
-	LCUIMutex_Lock( &library.mutex );
-	ss = Dict_FetchValue( library.cache, &s->hash );
-	if( ss ) {
-		StyleSheet_Replace( out_ss, ss );
-		LCUIMutex_Unlock( &library.mutex );
+	LinkedList_Init(&list);
+	StyleSheet_Clear(out_ss);
+	LCUIMutex_Lock(&library.mutex);
+	ss = Dict_FetchValue(library.cache, &s->hash);
+	if (ss) {
+		StyleSheet_Replace(out_ss, ss);
+		LCUIMutex_Unlock(&library.mutex);
 		return;
 	}
 	ss = StyleSheet();
-	LCUI_FindStyleSheet( s, &list );
-	for( LinkedList_Each( node, &list ) ) {
+	LCUI_FindStyleSheet(s, &list);
+	for (LinkedList_Each(node, &list)) {
 		StyleNode sn = node->data;
-		StyleSheet_Merge( ss, sn->sheet );
+		StyleSheet_Merge(ss, sn->sheet);
 	}
-	LinkedList_Clear( &list, NULL );
-	Dict_Add( library.cache, &s->hash, ss );
-	StyleSheet_Replace( out_ss, ss );
-	LCUIMutex_Unlock( &library.mutex );
+	LinkedList_Clear(&list, NULL);
+	Dict_Add(library.cache, &s->hash, ss);
+	StyleSheet_Replace(out_ss, ss);
+	LCUIMutex_Unlock(&library.mutex);
 }
 
-void LCUI_PrintStyleSheetsBySelector( LCUI_Selector s )
+void LCUI_PrintStyleSheetsBySelector(LCUI_Selector s)
 {
 	LinkedList list;
 	LinkedListNode *node;
 	LCUI_StyleSheet ss;
-	LinkedList_Init( &list );
+	LinkedList_Init(&list);
 	ss = StyleSheet();
-	LCUI_FindStyleSheet( s, &list );
-	LOG( "selector(%u) stylesheets begin\n", s->hash );
-	for( LinkedList_Each( node, &list ) ) {
+	LCUI_FindStyleSheet(s, &list);
+	LOG("selector(%u) stylesheets begin\n", s->hash);
+	for (LinkedList_Each(node, &list)) {
 		StyleNode sn = node->data;
-		LOG( "\n[%s]", sn->space ? sn->space : "<none>" );
-		LOG( "[rank: %d]\n%s {\n", sn->rank, sn->selector );
-		LCUI_PrintStyleSheet( sn->sheet );
+		LOG("\n[%s]", sn->space ? sn->space : "<none>");
+		LOG("[rank: %d]\n%s {\n", sn->rank, sn->selector);
+		LCUI_PrintStyleSheet(sn->sheet);
 		LOG("}\n");
-		StyleSheet_Merge( ss, sn->sheet );
+		StyleSheet_Merge(ss, sn->sheet);
 	}
-	LinkedList_Clear( &list, NULL );
-	LOG( "[selector(%u) final stylesheet] {\n", s->hash );
-	LCUI_PrintStyleSheet( ss );
-	LOG( "}\n");
-	StyleSheet_Delete( ss );
-	LOG( "selector(%u) stylesheets end\n", s->hash );
+	LinkedList_Clear(&list, NULL);
+	LOG("[selector(%u) final stylesheet] {\n", s->hash);
+	LCUI_PrintStyleSheet(ss);
+	LOG("}\n");
+	StyleSheet_Delete(ss);
+	LOG("selector(%u) stylesheets end\n", s->hash);
 }
 
-static void StyleSheetCacheDestructor( void *privdata, void *val )
+static void StyleSheetCacheDestructor(void *privdata, void *val)
 {
-	StyleSheet_Delete( val );
+	StyleSheet_Delete(val);
 }
 
-static void *DupStyleName( void *privdata, const void *val )
+static void *DupStyleName(void *privdata, const void *val)
 {
-	return strdup2( val );
+	return strdup2(val);
 }
 
-static void StyleNameDestructor( void *privdata, void *val )
+static void StyleNameDestructor(void *privdata, void *val)
 {
-	free( val );
+	free(val);
 }
 
-static unsigned int IntKeyDict_HashFunction( const void *key )
+static unsigned int IntKeyDict_HashFunction(const void *key)
 {
-	return Dict_IdentityHashFunction( *(unsigned int*)key );
+	return Dict_IdentityHashFunction(*(unsigned int*)key);
 }
 
-static int IntKeyDict_KeyCompare( void *privdata,
-				 const void *key1, const void *key2 )
+static int IntKeyDict_KeyCompare(void *privdata,
+				 const void *key1, const void *key2)
 {
 	return *(unsigned int*)key1 == *(unsigned int*)key2;
 }
 
-static void IntKeyDict_KeyDestructor( void *privdata, void *key )
+static void IntKeyDict_KeyDestructor(void *privdata, void *key)
 {
-	free( key );
+	free(key);
 }
 
-static void *IntKeyDict_KeyDup( void *privdata, const void *key )
+static void *IntKeyDict_KeyDup(void *privdata, const void *key)
 {
-	unsigned int *newkey = malloc( sizeof(unsigned int) );
+	unsigned int *newkey = malloc(sizeof(unsigned int));
 	*newkey = *(unsigned int*)key;
 	return newkey;
 }
 
-static void LCUI_InitStylesheetCache( void )
+static void LCUI_InitStylesheetCache(void)
 {
 	static DictType cachedict;
 	cachedict.valDup = NULL;
@@ -1468,16 +1469,16 @@ static void LCUI_InitStylesheetCache( void )
 	cachedict.keyDestructor = IntKeyDict_KeyDestructor;
 	cachedict.valDestructor = StyleSheetCacheDestructor;
 	cachedict.keyDestructor = IntKeyDict_KeyDestructor;
-	library.cache = Dict_Create( &cachedict, NULL );
+	library.cache = Dict_Create(&cachedict, NULL);
 }
 
-static void LCUI_DestroyStylesheetCache( void )
+static void LCUI_DestroyStylesheetCache(void)
 {
-	Dict_Release( library.cache );
+	Dict_Release(library.cache);
 	library.cache = NULL;
 }
 
-static void LCUI_InitStyleNameLibrary( void )
+static void LCUI_InitStyleNameLibrary(void)
 {
 	static DictType namedict = { 0 };
 	namedict.valDup = DupStyleName;
@@ -1486,16 +1487,16 @@ static void LCUI_InitStyleNameLibrary( void )
 	namedict.valDestructor = StyleNameDestructor;
 	namedict.hashFunction = IntKeyDict_HashFunction;
 	namedict.keyDestructor = IntKeyDict_KeyDestructor;
-	library.names = Dict_Create( &namedict, NULL );
+	library.names = Dict_Create(&namedict, NULL);
 }
 
-static void LCUI_DestroyStyleNameLibrary( void )
+static void LCUI_DestroyStyleNameLibrary(void)
 {
-	Dict_Release( library.names );
+	Dict_Release(library.names);
 	library.names = NULL;
 }
 
-static void LCUI_InitStyleValueLibrary( void )
+static void LCUI_InitStyleValueLibrary(void)
 {
 	static DictType valdict, namedict = { 0 };
 	valdict = DictType_StringKey;
@@ -1503,45 +1504,45 @@ static void LCUI_InitStyleValueLibrary( void )
 	namedict.hashFunction = IntKeyDict_HashFunction;
 	valdict.valDestructor = KeyNameGroupDestructor;
 	/* value_keys 表用于存放 key 和 name 数据 */
-	library.value_keys = Dict_Create( &valdict, NULL );
+	library.value_keys = Dict_Create(&valdict, NULL);
 	/* value_names 表仅引用 value_keys 里的数据  */
-	library.value_names = Dict_Create( &namedict, NULL );
+	library.value_names = Dict_Create(&namedict, NULL);
 }
 
-static void LCUI_DestroyStyleValueLibrary( void )
+static void LCUI_DestroyStyleValueLibrary(void)
 {
-	Dict_Release( library.value_names );
-	Dict_Release( library.value_keys );
+	Dict_Release(library.value_names);
+	Dict_Release(library.value_keys);
 	library.value_keys = NULL;
 	library.value_names = NULL;
 }
 
-void LCUI_InitCSSLibrary( void )
+void LCUI_InitCSSLibrary(void)
 {
 	KeyNameGroup skn, skn_end;
 	LCUI_InitStylesheetCache();
 	LCUI_InitStyleNameLibrary();
 	LCUI_InitStyleValueLibrary();
-	LCUIMutex_Init( &library.mutex );
-	LinkedList_Init( &library.groups );
-	skn_end = style_name_map + LEN( style_name_map );
-	for( skn = style_name_map; skn < skn_end; ++skn ) {
-		LCUI_DirectAddStyleName( skn->key, skn->name );
+	LCUIMutex_Init(&library.mutex);
+	LinkedList_Init(&library.groups);
+	skn_end = style_name_map + LEN(style_name_map);
+	for (skn = style_name_map; skn < skn_end; ++skn) {
+		LCUI_DirectAddStyleName(skn->key, skn->name);
 	}
-	skn_end = style_value_map + LEN( style_value_map );
-	for( skn = style_value_map; skn < skn_end; ++skn ) {
-		LCUI_AddStyleValue( skn->key, skn->name );
+	skn_end = style_value_map + LEN(style_value_map);
+	for (skn = style_value_map; skn < skn_end; ++skn) {
+		LCUI_AddStyleValue(skn->key, skn->name);
 	}
 	library.count = STYLE_KEY_TOTAL;
 	library.is_inited = TRUE;
 }
 
-void LCUI_FreeCSSLibrary( void )
+void LCUI_FreeCSSLibrary(void)
 {
 	library.is_inited = FALSE;
 	LCUI_DestroyStylesheetCache();
 	LCUI_DestroyStyleNameLibrary();
 	LCUI_DestroyStyleValueLibrary();
-	LCUIMutex_Destroy( &library.mutex );
-	LinkedList_Clear( &library.groups, (FuncPtr)DeleteStyleGroup );
+	LCUIMutex_Destroy(&library.mutex);
+	LinkedList_Clear(&library.groups, (FuncPtr)DeleteStyleGroup);
 }

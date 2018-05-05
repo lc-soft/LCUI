@@ -2,12 +2,10 @@
 
 #include <ppltasks.h>	// 对于 create_task
 
-namespace DX
-{
+namespace DX {
 	inline void ThrowIfFailed(HRESULT hr)
 	{
-		if (FAILED(hr))
-		{
+		if (FAILED(hr)) {
 			// 在此行中设置断点，以捕获 Win32 API 错误。
 			throw Platform::Exception::CreateException(hr);
 		}
@@ -21,11 +19,9 @@ namespace DX
 
 		auto folder = Windows::ApplicationModel::Package::Current->InstalledLocation;
 
-		return create_task(folder->GetFileAsync(Platform::StringReference(filename.c_str()))).then([] (StorageFile^ file) 
-		{
+		return create_task(folder->GetFileAsync(Platform::StringReference(filename.c_str()))).then([](StorageFile^ file) {
 			return FileIO::ReadBufferAsync(file);
-		}).then([] (Streams::IBuffer^ fileBuffer) -> std::vector<byte> 
-		{
+		}).then([](Streams::IBuffer^ fileBuffer) -> std::vector<byte> {
 			std::vector<byte> returnBuffer;
 			returnBuffer.resize(fileBuffer->Length);
 			Streams::DataReader::FromBuffer(fileBuffer)->ReadBytes(Platform::ArrayReference<byte>(returnBuffer.data(), fileBuffer->Length));
@@ -55,7 +51,7 @@ namespace DX
 			nullptr,                    // 无需保留 D3D 设备引用。
 			nullptr,                    // 无需知道功能级别。
 			nullptr                     // 无需保留 D3D 设备上下文引用。
-			);
+		);
 
 		return SUCCEEDED(hr);
 	}

@@ -2,7 +2,7 @@
  * widget_layout.c -- the widget layout processing module.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -31,8 +31,8 @@
 #ifndef LCUI_WIDGET_LAYOUT_H
 #define LCUI_WIDGET_LAYOUT_H
 
-LCUI_API void Widget_UpdateLayout( LCUI_Widget w );
+LCUI_API void Widget_UpdateLayout(LCUI_Widget w);
 
-LCUI_API void Widget_ExecUpdateLayout( LCUI_Widget w );
+LCUI_API void Widget_ExecUpdateLayout(LCUI_Widget w);
 
 #endif

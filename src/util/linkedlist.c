@@ -32,7 +32,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/util/linkedlist.h>
 
-void LinkedList_Init( LinkedList *list )
+void LinkedList_Init(LinkedList *list)
 {
 	list->length = 0;
 	list->head.next = list->tail.next = NULL;
@@ -40,125 +40,125 @@ void LinkedList_Init( LinkedList *list )
 	list->head.prev = list->tail.prev = NULL;
 }
 
-void LinkedList_Unlink( LinkedList *list, LinkedListNode *node )
+void LinkedList_Unlink(LinkedList *list, LinkedListNode *node)
 {
-	if( list->length > 0 ) {
+	if (list->length > 0) {
 		list->length -= 1;
 	}
-	if( node->next ) {
+	if (node->next) {
 		node->next->prev = node->prev;
 	}
-	if( node == list->tail.prev ) {
+	if (node == list->tail.prev) {
 		list->tail.prev = node->prev;
 	}
-	if( node->prev ) {
+	if (node->prev) {
 		node->prev->next = node->next;
 	}
 	node->prev = NULL;
 	node->next = NULL;
 }
 
-void LinkedList_ClearEx( LinkedList *list, void(*on_destroy)(void*),
-			 int free_node )
+void LinkedList_ClearEx(LinkedList *list, void(*on_destroy)(void*),
+			int free_node)
 {
 	LinkedListNode *prev, *node;
 	node = list->tail.prev;
 	list->head.next = NULL;
 	list->tail.prev = NULL;
 	list->length = 0;
-	while( node && node != &list->head ) {
+	while (node && node != &list->head) {
 		prev = node->prev;
 		node->prev = NULL;
 		node->next = NULL;
-		if( node->data && on_destroy ) {
-			on_destroy( node->data );
+		if (node->data && on_destroy) {
+			on_destroy(node->data);
 		}
-		if( free_node ) {
-			free( node );
+		if (free_node) {
+			free(node);
 		}
 		node = prev;
 	}
 }
 
-LinkedListNode *LinkedList_GetNodeAtTail( LinkedList *list, size_t pos )
+LinkedListNode *LinkedList_GetNodeAtTail(LinkedList *list, size_t pos)
 {
 	LinkedListNode *node;
-	if( pos >= list->length ) {
+	if (pos >= list->length) {
 		return NULL;
 	}
 	pos += 1;
 	node = list->tail.prev;
-	while( --pos >= 1 && node ) {
+	while (--pos >= 1 && node) {
 		node = node->prev;
 	}
 	return node;
 }
 
-LinkedListNode *LinkedList_GetNode( LinkedList *list, size_t pos )
+LinkedListNode *LinkedList_GetNode(LinkedList *list, size_t pos)
 {
 	LinkedListNode *node;
-	if( pos >= list->length ) {
+	if (pos >= list->length) {
 		return NULL;
 	}
-	if( pos > list->length / 2 ) {
+	if (pos > list->length / 2) {
 		pos = list->length - pos;
 		node = list->tail.prev;
-		while( --pos >= 1 && node ) {
+		while (--pos >= 1 && node) {
 			node = node->prev;
 		}
 	} else {
 		pos += 1;
 		node = list->head.next;
-		while( --pos >= 1 && node ) {
+		while (--pos >= 1 && node) {
 			node = node->next;
 		}
 	}
 	return node;
 }
 
-void LinkedList_Link( LinkedList *list, LinkedListNode *cur,
-		      LinkedListNode *node )
+void LinkedList_Link(LinkedList *list, LinkedListNode *cur,
+		     LinkedListNode *node)
 {
 	node->prev = cur;
 	node->next = cur->next;
-	if( cur->next ) {
+	if (cur->next) {
 		cur->next->prev = node;
 	}
 	cur->next = node;
 	list->length += 1;
 }
 
-void LinkedList_InsertNode( LinkedList *list, size_t pos, LinkedListNode *node )
+void LinkedList_InsertNode(LinkedList *list, size_t pos, LinkedListNode *node)
 {
 	LinkedListNode *target;
-	target = LinkedList_GetNode( list, pos );
-	if( target ) {
-		LinkedList_Link( list, target->prev, node );
+	target = LinkedList_GetNode(list, pos);
+	if (target) {
+		LinkedList_Link(list, target->prev, node);
 	} else {
-		LinkedList_AppendNode( list, node );
+		LinkedList_AppendNode(list, node);
 	}
 }
 
-LinkedListNode *LinkedList_Insert( LinkedList *list, size_t pos, void *data )
+LinkedListNode *LinkedList_Insert(LinkedList *list, size_t pos, void *data)
 {
 	LinkedListNode *node;
-	node = malloc( sizeof( LinkedListNode ) );
+	node = malloc(sizeof(LinkedListNode));
 	node->data = data;
-	LinkedList_InsertNode( list, pos, node );
+	LinkedList_InsertNode(list, pos, node);
 	return node;
 }
 
-void LinkedList_DeleteNode( LinkedList *list, LinkedListNode *node )
+void LinkedList_DeleteNode(LinkedList *list, LinkedListNode *node)
 {
-	LinkedList_Unlink( list, node );
+	LinkedList_Unlink(list, node);
 	node->data = NULL;
-	free( node );
+	free(node);
 	node = NULL;
 }
 
-void LinkedList_AppendNode( LinkedList *list, LinkedListNode *node )
+void LinkedList_AppendNode(LinkedList *list, LinkedListNode *node)
 {
-	if( list->head.next ) {
+	if (list->head.next) {
 		node->prev = list->tail.prev;
 		list->tail.prev->next = node;
 		list->tail.prev = node;
@@ -171,39 +171,39 @@ void LinkedList_AppendNode( LinkedList *list, LinkedListNode *node )
 	list->length += 1;
 }
 
-void LinkedList_Delete( LinkedList *list, size_t pos )
+void LinkedList_Delete(LinkedList *list, size_t pos)
 {
-	LinkedListNode *node = LinkedList_GetNode( list, pos );
-	LinkedList_DeleteNode( list, node );
+	LinkedListNode *node = LinkedList_GetNode(list, pos);
+	LinkedList_DeleteNode(list, node);
 }
 
-void *LinkedList_Get( LinkedList *list, size_t pos )
+void *LinkedList_Get(LinkedList *list, size_t pos)
 {
-	LinkedListNode *node = LinkedList_GetNode( list, pos );
+	LinkedListNode *node = LinkedList_GetNode(list, pos);
 	return node ? node->data:NULL;
 }
 
-LinkedListNode *LinkedList_Append( LinkedList *list, void *data )
+LinkedListNode *LinkedList_Append(LinkedList *list, void *data)
 {
 	LinkedListNode *node;
-	node = malloc( sizeof( LinkedListNode ) );
+	node = malloc(sizeof(LinkedListNode));
 	node->data = data;
 	node->next = NULL;
-	LinkedList_AppendNode( list, node );
+	LinkedList_AppendNode(list, node);
 	return node;
 }
 
-void LinkedListNode_Delete( LinkedListNode *node )
+void LinkedListNode_Delete(LinkedListNode *node)
 {
-	free( node );
+	free(node);
 }
 
-void LinkedList_Concat( LinkedList *list1, LinkedList *list2 )
+void LinkedList_Concat(LinkedList *list1, LinkedList *list2)
 {
-	if( !list2->head.next ) {
+	if (!list2->head.next) {
 		return;
 	}
-	if( list1->head.next ) {
+	if (list1->head.next) {
 		list1->tail.prev->next = list2->head.next;
 		list2->head.next->prev = list1->tail.prev;
 	} else {
@@ -222,8 +222,8 @@ typedef struct SortRange_ {
 	LinkedListNode *snode, *enode;
 } SortRange;
 
-static SortRange NewSortRange( int s, LinkedListNode *snode, 
-			       int e, LinkedListNode *enode )
+static SortRange NewSortRange(int s, LinkedListNode *snode,
+			      int e, LinkedListNode *enode)
 {
 	SortRange r;
 	r.end = e;
@@ -233,29 +233,29 @@ static SortRange NewSortRange( int s, LinkedListNode *snode,
 	return r;
 }
 
-void LinkedList_SwapNode( LinkedList *list, LinkedListNode *a, LinkedListNode *b )
+void LinkedList_SwapNode(LinkedList *list, LinkedListNode *a, LinkedListNode *b)
 {
 	LinkedListNode *node;
-	if( list->tail.prev == a ) {
+	if (list->tail.prev == a) {
 		list->tail.prev = b;
-	} else if( list->tail.prev == b ) {
+	} else if (list->tail.prev == b) {
 		list->tail.prev = a;
 	}
-	if( a->prev == b ) {
+	if (a->prev == b) {
 		a->prev = b->prev;
 		a->prev->next = a;
 		b->prev = a;
 		b->next = a->next;
-		if( b->next ) {
+		if (b->next) {
 			b->next->prev = b;
 		}
 		a->next = b;
-	} else if( b->prev == a ) {
+	} else if (b->prev == a) {
 		b->prev = a->prev;
 		b->prev->next = b;
 		a->prev = b;
 		a->next = b->next;
-		if( a->next ) {
+		if (a->next) {
 			a->next->prev = a;
 		}
 		b->next = a;
@@ -267,56 +267,56 @@ void LinkedList_SwapNode( LinkedList *list, LinkedListNode *a, LinkedListNode *b
 		b->prev->next = b;
 		node = a->next;
 		a->next = b->next;
-		if( a->next ) {
+		if (a->next) {
 			a->next->prev = a;
 		}
 		b->next = node;
-		if( b->next ) {
+		if (b->next) {
 			b->next->prev = b;
 		}
 	}
 }
 
-void LinkedList_QuickSort( LinkedList *list, int (*cmp)(void*, void*) )
+void LinkedList_QuickSort(LinkedList *list, int(*cmp)(void*, void*))
 {
 	int p = 0;
 	SortRange *r;
-	if( list->length <= 0 ) {
+	if (list->length <= 0) {
 		return;
 	}
-	r = malloc( list->length * sizeof(SortRange) );
-	r[p++] = NewSortRange( 0, list->head.next, 
-			       list->length - 1, list->tail.prev );
-	while( p ) {
+	r = malloc(list->length * sizeof(SortRange));
+	r[p++] = NewSortRange(0, list->head.next,
+			      list->length - 1, list->tail.prev);
+	while (p) {
 		int left, right;
 		SortRange range = r[--p];
 		LinkedListNode *mnode, *lnode, *rnode, *node;
-		if( range.start >= range.end ) {
+		if (range.start >= range.end) {
 			continue;
 		}
 		mnode = range.enode;
 		left = range.start, right = range.end - 1;
 		lnode = range.snode, rnode = range.enode->prev;
-		while( left < right ) {
-			while( left < right && 
-			       cmp( lnode->data, mnode->data ) < 0 ) {
+		while (left < right) {
+			while (left < right &&
+			       cmp(lnode->data, mnode->data) < 0) {
 				left++, lnode = lnode->next;
 			}
-			while( left < right &&
-			       cmp( rnode->data, mnode->data ) >= 0 ) {
+			while (left < right &&
+			       cmp(rnode->data, mnode->data) >= 0) {
 				right--, rnode = rnode->prev;
 			}
-			LinkedList_SwapNode( list, lnode, rnode );
-			if( lnode == range.snode ) {
+			LinkedList_SwapNode(list, lnode, rnode);
+			if (lnode == range.snode) {
 				range.snode = rnode;
 			}
 			node = lnode;
 			lnode = rnode;
 			rnode = node;
 		}
-		if( cmp( lnode->data, range.enode->data) >= 0 ) {
-			LinkedList_SwapNode( list, lnode, range.enode );
-			if( mnode == range.enode ) {
+		if (cmp(lnode->data, range.enode->data) >= 0) {
+			LinkedList_SwapNode(list, lnode, range.enode);
+			if (mnode == range.enode) {
 				mnode = lnode;
 			}
 			node = lnode;
@@ -325,25 +325,25 @@ void LinkedList_QuickSort( LinkedList *list, int (*cmp)(void*, void*) )
 		} else {
 			left++, lnode = lnode->next;
 		}
-		r[p++] = NewSortRange( range.start, range.snode, 
-				       left - 1, lnode->prev );
-		r[p++] = NewSortRange( left + 1, lnode->next, 
-				       range.end, range.enode );
+		r[p++] = NewSortRange(range.start, range.snode,
+				      left - 1, lnode->prev);
+		r[p++] = NewSortRange(left + 1, lnode->next,
+				      range.end, range.enode);
 	}
-	free( r );
+	free(r);
 }
 
-void LinkedList_BubbleSort( LinkedList *list, int( *cmp )(void*, void*) )
+void LinkedList_BubbleSort(LinkedList *list, int(*cmp)(void*, void*))
 {
 	size_t i, j;
 	LinkedListNode *node, *cur, *next;
-	for( i = 0; i < list->length - 1; ++i ) {
+	for (i = 0; i < list->length - 1; ++i) {
 		int no_swap = 1;
 		cur = list->head.next;
-		for( j = 0; j < list->length - 1 - i; ++j ) {
+		for (j = 0; j < list->length - 1 - i; ++j) {
 			next = cur->next;
-			if( cmp( cur->data, next->data ) >= 0 ) {
-				LinkedList_SwapNode( list, cur, next );
+			if (cmp(cur->data, next->data) >= 0) {
+				LinkedList_SwapNode(list, cur, next);
 				node = cur;
 				cur = next;
 				next = node;
@@ -351,7 +351,7 @@ void LinkedList_BubbleSort( LinkedList *list, int( *cmp )(void*, void*) )
 			}
 			cur = cur->next;
 		}
-		if( no_swap ) {
+		if (no_swap) {
 			break;
 		}
 	}

@@ -2,7 +2,7 @@
  * rbtree.h -- Red Black Trees
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -36,39 +36,39 @@ LCUI_BEGIN_HEADER
 typedef struct RBTreeNodeRec_ RBTreeNode;
 
 struct RBTreeNodeRec_ {
-        unsigned char color;
-        int key;
+	unsigned char color;
+	int key;
 	union {
 		void *data;
 		char *str;
 	};
-        RBTreeNode *parent, *left, *right;
+	RBTreeNode *parent, *left, *right;
 };
 
 typedef struct RBTreeRec_ {
-        int total_node;
-	int (*compare)(void*, const void*);
-	void (*destroy)(void*);
-        RBTreeNode *root;
+	int total_node;
+	int(*compare)(void*, const void*);
+	void(*destroy)(void*);
+	RBTreeNode *root;
 } RBTree;
 
 #define RBTree_GetTotal(rbt) (rbt)->total_node;
 #define RBTree_OnCompare(rbt, func) (rbt)->compare = func
 #define RBTree_OnDestroy(rbt, func) (rbt)->destroy = func
 
-LCUI_API void RBTree_Init( RBTree *rbt );
-LCUI_API void RBTree_Destroy( RBTree *rbt );
-LCUI_API RBTreeNode *RBTree_First( const RBTree *rbt );
-LCUI_API RBTreeNode *RBTree_Next( const RBTreeNode *node );
-LCUI_API RBTreeNode* RBTree_Search( RBTree* rbt, int key );
-LCUI_API void* RBTree_GetData( RBTree* rbt, int key );
-LCUI_API RBTreeNode* RBTree_Insert( RBTree *rbt, int key, void *data );
-LCUI_API int RBTree_Erase( RBTree *rbt, int key );
-LCUI_API void RBTree_EraseNode( RBTree *rbt, RBTreeNode *node );
-LCUI_API int RBTree_CustomErase( RBTree *rbt, const void *keydata );
-LCUI_API RBTreeNode* RBTree_CustomSearch( RBTree* rbt, const void *keydata );
-LCUI_API void* RBTree_CustomGetData( RBTree* rbt, const void *keydata );
-LCUI_API RBTreeNode* RBTree_CustomInsert( RBTree *rbt, const void *keydata, void *data );
+LCUI_API void RBTree_Init(RBTree *rbt);
+LCUI_API void RBTree_Destroy(RBTree *rbt);
+LCUI_API RBTreeNode *RBTree_First(const RBTree *rbt);
+LCUI_API RBTreeNode *RBTree_Next(const RBTreeNode *node);
+LCUI_API RBTreeNode* RBTree_Search(RBTree* rbt, int key);
+LCUI_API void* RBTree_GetData(RBTree* rbt, int key);
+LCUI_API RBTreeNode* RBTree_Insert(RBTree *rbt, int key, void *data);
+LCUI_API int RBTree_Erase(RBTree *rbt, int key);
+LCUI_API void RBTree_EraseNode(RBTree *rbt, RBTreeNode *node);
+LCUI_API int RBTree_CustomErase(RBTree *rbt, const void *keydata);
+LCUI_API RBTreeNode* RBTree_CustomSearch(RBTree* rbt, const void *keydata);
+LCUI_API void* RBTree_CustomGetData(RBTree* rbt, const void *keydata);
+LCUI_API RBTreeNode* RBTree_CustomInsert(RBTree *rbt, const void *keydata, void *data);
 
 LCUI_END_HEADER
 

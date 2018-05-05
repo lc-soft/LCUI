@@ -44,4 +44,3 @@
 #include <LCUI/util/logger.h>
 #include <LCUI/util/task.h>
 #endif
-

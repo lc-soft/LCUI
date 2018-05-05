@@ -167,8 +167,8 @@ static void OnCreateSurface(void *arg1, void *arg2)
 	instance = LCUI_GetAppData();
 	/* 为 Surface 创建窗口 */
 	surface->hwnd = CreateWindow(
-	    TEXT("LCUI"), TEXT("LCUI Surface"), WIN32_WINDOW_STYLE,
-	    CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, NULL, NULL, instance, NULL);
+		TEXT("LCUI"), TEXT("LCUI Surface"), WIN32_WINDOW_STYLE,
+		CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, NULL, NULL, instance, NULL);
 #ifdef ENABLE_TOUCH_SUPPORT
 	RegisterTouchWindow(surface->hwnd, 0);
 #endif
@@ -495,7 +495,7 @@ static void OnWMSize(LCUI_Event e, void *arg)
 }
 
 static int WinDisplay_BindEvent(int event_id, LCUI_EventFunc func, void *data,
-				void (*destroy_data)(void *))
+				void(*destroy_data)(void *))
 {
 	return EventTrigger_Bind(win.trigger, event_id, func, data,
 				 destroy_data);

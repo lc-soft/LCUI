@@ -2,7 +2,7 @@
  * in_core_font.c -- basic in-core font-engine.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -39,50 +39,50 @@ enum in_core_font_type {
 	FONT_INCONSOLATA
 };
 
-static int InCoreFont_Open( const char *filepath, LCUI_Font **outfonts )
+static int InCoreFont_Open(const char *filepath, LCUI_Font **outfonts)
 {
 	int *code;
 	LCUI_Font *fonts, font;
-	if( strcmp( filepath, "in-core.inconsolata" ) != 0 ) {
+	if (strcmp(filepath, "in-core.inconsolata") != 0) {
 		return 0;
 	}
-	code = malloc( sizeof( int ) );
+	code = malloc(sizeof(int));
 	*code = FONT_INCONSOLATA;
-	font = Font( "inconsolata", "Regular" );
-	fonts = malloc( sizeof( LCUI_Font ) );
+	font = Font("inconsolata", "Regular");
+	fonts = malloc(sizeof(LCUI_Font));
 	font->data = code;
 	fonts[0] = font;
 	*outfonts = fonts;
 	return 1;
 }
 
-static void InCoreFont_Close( void *face )
+static void InCoreFont_Close(void *face)
 {
-	free( face );
+	free(face);
 }
 
-static int InCoreFont_Render( LCUI_FontBitmap *bmp, wchar_t ch,
-			      int pixel_size, LCUI_Font font )
+static int InCoreFont_Render(LCUI_FontBitmap *bmp, wchar_t ch,
+			     int pixel_size, LCUI_Font font)
 {
 	int *code = (int*)font->data;
-	switch( *code ) {
+	switch (*code) {
 	case FONT_INCONSOLATA:
 	default:
-		return FontInconsolata_GetBitmap( bmp, ch, pixel_size );
+		return FontInconsolata_GetBitmap(bmp, ch, pixel_size);
 	}
 	return -1;
 }
 
-int LCUIFont_InitInCoreFont( LCUI_FontEngine *engine )
+int LCUIFont_InitInCoreFont(LCUI_FontEngine *engine)
 {
 	engine->render = InCoreFont_Render;
 	engine->close = InCoreFont_Close;
 	engine->open = InCoreFont_Open;
-	strcpy( engine->name, "in-core" );
+	strcpy(engine->name, "in-core");
 	return 0;
 }
 
-int LCUIFont_ExitInCoreFont( void )
+int LCUIFont_ExitInCoreFont(void)
 {
 	return 0;
 }

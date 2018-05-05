@@ -1,6 +1,6 @@
 ﻿/*
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,10 +34,8 @@
 #include "uwp_renderer.h"
 
 // 在屏幕上呈现 Direct2D 和 3D 内容。
-namespace LCUICore
-{
-	class Main : public DX::IDeviceNotify
-	{
+namespace LCUICore {
+	class Main : public DX::IDeviceNotify {
 	public:
 		Main(const std::shared_ptr<DX::DeviceResources>& deviceResources);
 		~Main();

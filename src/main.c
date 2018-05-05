@@ -62,12 +62,14 @@
 #define MAX_FRAMES_PER_SEC 120
 
 /** 主循环的状态 */
-enum MainLoopState { STATE_PAUSED, STATE_RUNNING, STATE_EXITED };
+enum MainLoopState {
+	STATE_PAUSED, STATE_RUNNING, STATE_EXITED
+};
 
 typedef struct SysEventHandlerRec_ {
 	LCUI_SysEventFunc func;
 	void *data;
-	void (*destroy_data)(void *);
+	void(*destroy_data)(void *);
 } SysEventHandlerRec, *SysEventHandler;
 
 typedef struct SysEventPackRec_ {
@@ -94,7 +96,7 @@ static struct LCUI_App {
 	LCUI_BOOL active; /**< 是否已经初始化并处于活动状态 */
 	LCUI_Mutex loop_mutex; /**< 互斥锁，确保一次只允许一个线程跑主循环 */
 	LCUI_Cond
-	    loop_changed; /**< 条件变量，用于指示当前运行的主循环是否改变 */
+		loop_changed; /**< 条件变量，用于指示当前运行的主循环是否改变 */
 	LCUI_MainLoop loop;    /**< 当前运行的主循环 */
 	LinkedList loops;      /**< 主循环列表 */
 	StepTimer timer;       /**< 渲染循环计数器 */
@@ -142,7 +144,7 @@ static void DestroySysEventHandler(void *arg)
 }
 
 int LCUI_BindEvent(int id, LCUI_SysEventFunc func, void *data,
-		   void (*destroy_data)(void *))
+		   void(*destroy_data)(void *))
 {
 	int ret;
 	SysEventHandler handler;
@@ -408,7 +410,7 @@ static void LCUI_FreeApp(void)
 }
 
 int LCUI_BindSysEvent(int event_id, LCUI_EventFunc func, void *data,
-		      void (*destroy_data)(void *))
+		      void(*destroy_data)(void *))
 {
 	if (MainApp.driver_ready) {
 		return MainApp.driver->BindSysEvent(event_id, func, data,

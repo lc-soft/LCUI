@@ -2,7 +2,7 @@
  * css_library.h -- CSS library operation module.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -37,8 +37,8 @@ LCUI_BEGIN_HEADER
 #define MAX_SELECTOR_DEPTH	32
 
  /** 样式属性名 */
-enum LCUI_StyleKeyName {
-	// position start
+	enum LCUI_StyleKeyName {
+		// position start
 	key_left,
 	key_right,
 	key_top,
@@ -60,7 +60,7 @@ enum LCUI_StyleKeyName {
 	key_min_height,
 	key_max_width,
 	key_max_height,
-	
+
 	// margin start
 	key_margin_top,
 	key_margin_right,
@@ -181,37 +181,37 @@ typedef struct LCUI_SelectorRec_ {
 
 #define StyleSheet_GetStyle(S, K) &((S)->sheet[K])
 
-LCUI_API LCUI_StyleSheet StyleSheet( void );
+LCUI_API LCUI_StyleSheet StyleSheet(void);
 
-LCUI_API void StyleSheet_Clear( LCUI_StyleSheet ss );
+LCUI_API void StyleSheet_Clear(LCUI_StyleSheet ss);
 
-LCUI_API void StyleSheet_Delete( LCUI_StyleSheet ss );
+LCUI_API void StyleSheet_Delete(LCUI_StyleSheet ss);
 
-LCUI_API int StyleSheet_Merge( LCUI_StyleSheet dest, LCUI_StyleSheet src );
+LCUI_API int StyleSheet_Merge(LCUI_StyleSheet dest, LCUI_StyleSheet src);
 
-LCUI_API int StyleSheet_Replace( LCUI_StyleSheet dest, LCUI_StyleSheet src );
+LCUI_API int StyleSheet_Replace(LCUI_StyleSheet dest, LCUI_StyleSheet src);
 
-LCUI_API LCUI_Selector Selector( const char *selector );
+LCUI_API LCUI_Selector Selector(const char *selector);
 
-LCUI_API void Selector_Update( LCUI_Selector s );
+LCUI_API void Selector_Update(LCUI_Selector s);
 
-LCUI_API void Selector_Delete( LCUI_Selector s );
+LCUI_API void Selector_Delete(LCUI_Selector s);
 
-LCUI_API int SelectorNode_GetNames( LCUI_SelectorNode sn, LinkedList *names );
+LCUI_API int SelectorNode_GetNames(LCUI_SelectorNode sn, LinkedList *names);
 
-LCUI_API int SelectorNode_Update( LCUI_SelectorNode node );
+LCUI_API int SelectorNode_Update(LCUI_SelectorNode node);
 
-LCUI_API void SelectorNode_Delete( LCUI_SelectorNode node );
+LCUI_API void SelectorNode_Delete(LCUI_SelectorNode node);
 
-/** 
+/**
  * 匹配选择器节点
  * 左边的选择器必须包含右边的选择器的所有属性。
  */
-LCUI_API LCUI_BOOL SelectorNode_Match( LCUI_SelectorNode sn1,
-				       LCUI_SelectorNode sn2 );
+LCUI_API LCUI_BOOL SelectorNode_Match(LCUI_SelectorNode sn1,
+				      LCUI_SelectorNode sn2);
 
-LCUI_API int LCUI_PutStyleSheet( LCUI_Selector selector,
-				 LCUI_StyleSheet in_ss, const char *space );
+LCUI_API int LCUI_PutStyleSheet(LCUI_Selector selector,
+				LCUI_StyleSheet in_ss, const char *space);
 
 /**
  * 从指定组中查找样式表
@@ -220,36 +220,36 @@ LCUI_API int LCUI_PutStyleSheet( LCUI_Selector selector,
  * @param[in] s 选择器
  * @param[out] list 找到的样式表列表
  */
-LCUI_API int LCUI_FindStyleSheetFromGroup( int group, const char *name,
-					   LCUI_Selector s, LinkedList *list );
+LCUI_API int LCUI_FindStyleSheetFromGroup(int group, const char *name,
+					  LCUI_Selector s, LinkedList *list);
 
-LCUI_API void LCUI_GetStyleSheet( LCUI_Selector s, LCUI_StyleSheet out_ss );
+LCUI_API void LCUI_GetStyleSheet(LCUI_Selector s, LCUI_StyleSheet out_ss);
 
-LCUI_API void LCUI_PrintStyleSheetsBySelector( LCUI_Selector s );
+LCUI_API void LCUI_PrintStyleSheetsBySelector(LCUI_Selector s);
 
-LCUI_API int LCUI_SetStyleName( int key, const char *name );
+LCUI_API int LCUI_SetStyleName(int key, const char *name);
 
-LCUI_API int LCUI_AddCSSPropertyName( const char *name );
+LCUI_API int LCUI_AddCSSPropertyName(const char *name);
 
-LCUI_API int LCUI_AddStyleValue( int key, const char *name );
+LCUI_API int LCUI_AddStyleValue(int key, const char *name);
 
-LCUI_API int LCUI_GetStyleValue( const char *str );
+LCUI_API int LCUI_GetStyleValue(const char *str);
 
-LCUI_API const char *LCUI_GetStyleValueName( int val );
+LCUI_API const char *LCUI_GetStyleValueName(int val);
 
-LCUI_API const char *LCUI_GetStyleName( int key );
+LCUI_API const char *LCUI_GetStyleName(int key);
 
-LCUI_API int LCUI_GetStyleTotal( void );
+LCUI_API int LCUI_GetStyleTotal(void);
 
-LCUI_API void LCUI_PrintStyleSheet( LCUI_StyleSheet ss );
+LCUI_API void LCUI_PrintStyleSheet(LCUI_StyleSheet ss);
 
-LCUI_API void LCUI_PrintSelector( LCUI_Selector selector );
+LCUI_API void LCUI_PrintSelector(LCUI_Selector selector);
 
-LCUI_API void LCUI_PrintCSSLibrary( void );
+LCUI_API void LCUI_PrintCSSLibrary(void);
 
-LCUI_API void LCUI_InitCSSLibrary( void );
+LCUI_API void LCUI_InitCSSLibrary(void);
 
-LCUI_API void LCUI_FreeCSSLibrary( void );
+LCUI_API void LCUI_FreeCSSLibrary(void);
 
 LCUI_END_HEADER
 

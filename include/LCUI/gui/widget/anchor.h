@@ -3,7 +3,7 @@
  * similar to <a> element in HTML.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -32,8 +32,8 @@
 #ifndef LCUI_WIDGET_ANCHOR_H
 #define LCUI_WIDGET_ANCHOR_H
 
-LCUI_API void Anchor_Open( LCUI_Widget w );
+LCUI_API void Anchor_Open(LCUI_Widget w);
 
-LCUI_API void LCUIWidget_AddAnchor( void );
+LCUI_API void LCUIWidget_AddAnchor(void);
 
 #endif

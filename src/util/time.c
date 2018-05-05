@@ -41,26 +41,26 @@
 static int hires_timer_available = 0;	/**< 标志，指示高精度计数器是否可用 */
 static LONGLONG hires_ticks_per_second;	/**< 高精度计数器每秒的滴答数 */
 
-void LCUITime_Init( void )
+void LCUITime_Init(void)
 {
 	LARGE_INTEGER hires;
-	if( QueryPerformanceFrequency( &hires ) ) {
+	if (QueryPerformanceFrequency(&hires)) {
 		hires_timer_available = 1;
 		hires_ticks_per_second = hires.QuadPart;
 	}
 }
 
-int64_t LCUI_GetTime( void )
+int64_t LCUI_GetTime(void)
 {
 	int64_t time;
 	LARGE_INTEGER hires_now;
 	FILETIME *ft = (FILETIME*)&time;
-	if( hires_timer_available ) {
-		QueryPerformanceCounter( &hires_now );
+	if (hires_timer_available) {
+		QueryPerformanceCounter(&hires_now);
 		time = hires_now.QuadPart * 1000;
 		return time / hires_ticks_per_second;
 	}
-	GetSystemTimeAsFileTime( ft );
+	GetSystemTimeAsFileTime(ft);
 	return time / 1000 - 11644473600000;
 }
 
@@ -69,46 +69,46 @@ int64_t LCUI_GetTime( void )
 #include <sys/time.h>
 
 
-void LCUITime_Init( void )
+void LCUITime_Init(void)
 {
 	return;
 }
 
-int64_t LCUI_GetTime( void )
+int64_t LCUI_GetTime(void)
 {
 	int64_t t;
 	struct timeval tv;
 
-	gettimeofday( &tv, NULL );
-	t = tv.tv_sec*1000 + tv.tv_usec/1000;
+	gettimeofday(&tv, NULL);
+	t = tv.tv_sec * 1000 + tv.tv_usec / 1000;
 	return t;
 }
 
 #endif
 
-int64_t LCUI_GetTimeDelta( int64_t start )
+int64_t LCUI_GetTimeDelta(int64_t start)
 {
 	int64_t now = LCUI_GetTime();
-	if( now < start ) {
+	if (now < start) {
 		return (TIME_WRAP_VALUE - start) + now;
 	}
 	return now - start;
 }
 
-void LCUI_Sleep( unsigned int s )
+void LCUI_Sleep(unsigned int s)
 {
 #ifdef LCUI_BUILD_IN_WIN32
-	Sleep( s * 1000 );
+	Sleep(s * 1000);
 #else
-	sleep( s );
+	sleep(s);
 #endif
 }
 
-void LCUI_MSleep( unsigned int ms )
+void LCUI_MSleep(unsigned int ms)
 {
 #ifdef LCUI_BUILD_IN_WIN32
-	Sleep( ms );
+	Sleep(ms);
 #else
-	usleep( ms * 1000 );
+	usleep(ms * 1000);
 #endif
 }

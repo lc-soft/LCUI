@@ -2,7 +2,7 @@
  * builder.h -- The GUI build module, parse UI config code and build UI.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -38,14 +38,14 @@ LCUI_BEGIN_HEADER
  * @param[in] str 包含界面配置代码的字符串
  * @return 正常解析会返回一个部件，出现错误则返回 NULL
  */
-LCUI_API LCUI_Widget LCUIBuilder_LoadString( const char *str, int size );
+LCUI_API LCUI_Widget LCUIBuilder_LoadString(const char *str, int size);
 
 /**
  * 从文件中载入界面配置代码，解析并生成相应的图形界面(元素)
  * @param[in] filepath 文件路径
  * @return 正常解析会返回一个部件，出现错误则返回 NULL
  */
-LCUI_API LCUI_Widget LCUIBuilder_LoadFile( const char *filepath );
+LCUI_API LCUI_Widget LCUIBuilder_LoadFile(const char *filepath);
 
 LCUI_END_HEADER
 

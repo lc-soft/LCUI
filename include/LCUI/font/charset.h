@@ -2,7 +2,7 @@
  * charset.h -- The charset opreation set.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -44,11 +44,11 @@ LCUI_DecodeString(WSTR, STR, MAXLEN, ENCODING_UTF8)
 #define LCUI_EncodeUTF8String(STR, WSTR, MAXLEN ) \
 LCUI_DecodeString(STR, WSTR, MAXLEN, ENCODING_UTF8)
 
-LCUI_API int LCUI_DecodeString( wchar_t *wstr, const char *str,
-				int max_len, int encoding );
+LCUI_API int LCUI_DecodeString(wchar_t *wstr, const char *str,
+			       int max_len, int encoding);
 
-LCUI_API int LCUI_EncodeString( char *str, const wchar_t *wstr,
-				int max_len, int encoding );
+LCUI_API int LCUI_EncodeString(char *str, const wchar_t *wstr,
+			       int max_len, int encoding);
 LCUI_END_HEADER
 
 #endif

@@ -52,17 +52,19 @@ typedef struct TouchCapturerRec_ {
 typedef struct WidgetEventHandlerRec_ {
 	LCUI_WidgetEventFunc func;
 	void *data;
-	void (*destroy_data)(void *);
+	void(*destroy_data)(void *);
 } WidgetEventHandlerRec, *WidgetEventHandler;
 
 typedef struct LCUI_WidgetEventPackRec_ {
 	void *data;                   /**< 额外数据 */
-	void (*destroy_data)(void *); /**< 数据的销毁函数 */
+	void(*destroy_data)(void *); /**< 数据的销毁函数 */
 	LCUI_Widget widget;           /**< 当前处理该事件的部件 */
 	LCUI_WidgetEventRec event;    /**< 事件数据 */
 } LCUI_WidgetEventPackRec, *LCUI_WidgetEventPack;
 
-enum WidgetStatusType { WST_HOVER, WST_ACTIVE, WST_FOCUS, WST_TOTAL };
+enum WidgetStatusType {
+	WST_HOVER, WST_ACTIVE, WST_FOCUS, WST_TOTAL
+};
 
 /** 部件事件记录结点 */
 typedef struct WidgetEventRecordRec_ {
@@ -404,7 +406,7 @@ int LCUIWidget_GetEventId(const char *event_name)
 
 int Widget_BindEventById(LCUI_Widget widget, int event_id,
 			 LCUI_WidgetEventFunc func, void *data,
-			 void (*destroy_data)(void *))
+			 void(*destroy_data)(void *))
 {
 	WidgetEventHandler handler;
 	handler = NEW(WidgetEventHandlerRec, 1);
@@ -412,13 +414,13 @@ int Widget_BindEventById(LCUI_Widget widget, int event_id,
 	handler->data = data;
 	handler->destroy_data = destroy_data;
 	return EventTrigger_Bind(widget->trigger, event_id,
-				 (LCUI_EventFunc)WidgetEventTranslator, handler,
+		(LCUI_EventFunc)WidgetEventTranslator, handler,
 				 DestroyWidgetEventHandler);
 }
 
 int Widget_BindEvent(LCUI_Widget widget, const char *event_name,
 		     LCUI_WidgetEventFunc func, void *data,
-		     void (*destroy_data)(void *))
+		     void(*destroy_data)(void *))
 {
 	int id = LCUIWidget_GetEventId(event_name);
 	if (id < 0) {
@@ -555,7 +557,7 @@ static void OnWidgetEvent(LCUI_Event e, LCUI_WidgetEventPack pack)
 }
 
 LCUI_BOOL Widget_PostEvent(LCUI_Widget widget, LCUI_WidgetEvent ev, void *data,
-			   void (*destroy_data)(void *))
+			   void(*destroy_data)(void *))
 {
 	LCUI_Event sys_ev;
 	LCUI_TaskRec task;
@@ -1075,33 +1077,33 @@ void LCUIWidget_InitEvent(void)
 		int id;
 		const char *name;
 	} mappings[] = { { LCUI_WEVENT_LINK, "link" },
-			 { LCUI_WEVENT_UNLINK, "unlink" },
-			 { LCUI_WEVENT_READY, "ready" },
-			 { LCUI_WEVENT_DESTROY, "destroy" },
-			 { LCUI_WEVENT_MOUSEDOWN, "mousedown" },
-			 { LCUI_WEVENT_MOUSEUP, "mouseup" },
-			 { LCUI_WEVENT_MOUSEMOVE, "mousemove" },
-			 { LCUI_WEVENT_MOUSEWHEEL, "mousewheel" },
-			 { LCUI_WEVENT_CLICK, "click" },
-			 { LCUI_WEVENT_DBLCLICK, "dblclick" },
-			 { LCUI_WEVENT_MOUSEOUT, "mouseout" },
-			 { LCUI_WEVENT_MOUSEOVER, "mouseover" },
-			 { LCUI_WEVENT_KEYDOWN, "keydown" },
-			 { LCUI_WEVENT_KEYUP, "keyup" },
-			 { LCUI_WEVENT_KEYPRESS, "keypress" },
-			 { LCUI_WEVENT_TOUCH, "touch" },
-			 { LCUI_WEVENT_TEXTINPUT, "textinput" },
-			 { LCUI_WEVENT_TOUCHDOWN, "touchdown" },
-			 { LCUI_WEVENT_TOUCHMOVE, "touchmove" },
-			 { LCUI_WEVENT_TOUCHUP, "touchup" },
-			 { LCUI_WEVENT_RESIZE, "resize" },
-			 { LCUI_WEVENT_AFTERLAYOUT, "afterlayout" },
-			 { LCUI_WEVENT_FOCUS, "focus" },
-			 { LCUI_WEVENT_BLUR, "blur" },
-			 { LCUI_WEVENT_SHOW, "show" },
-			 { LCUI_WEVENT_HIDE, "hide" },
-			 { LCUI_WEVENT_SURFACE, "surface" },
-			 { LCUI_WEVENT_TITLE, "title" } };
+	{ LCUI_WEVENT_UNLINK, "unlink" },
+	{ LCUI_WEVENT_READY, "ready" },
+	{ LCUI_WEVENT_DESTROY, "destroy" },
+	{ LCUI_WEVENT_MOUSEDOWN, "mousedown" },
+	{ LCUI_WEVENT_MOUSEUP, "mouseup" },
+	{ LCUI_WEVENT_MOUSEMOVE, "mousemove" },
+	{ LCUI_WEVENT_MOUSEWHEEL, "mousewheel" },
+	{ LCUI_WEVENT_CLICK, "click" },
+	{ LCUI_WEVENT_DBLCLICK, "dblclick" },
+	{ LCUI_WEVENT_MOUSEOUT, "mouseout" },
+	{ LCUI_WEVENT_MOUSEOVER, "mouseover" },
+	{ LCUI_WEVENT_KEYDOWN, "keydown" },
+	{ LCUI_WEVENT_KEYUP, "keyup" },
+	{ LCUI_WEVENT_KEYPRESS, "keypress" },
+	{ LCUI_WEVENT_TOUCH, "touch" },
+	{ LCUI_WEVENT_TEXTINPUT, "textinput" },
+	{ LCUI_WEVENT_TOUCHDOWN, "touchdown" },
+	{ LCUI_WEVENT_TOUCHMOVE, "touchmove" },
+	{ LCUI_WEVENT_TOUCHUP, "touchup" },
+	{ LCUI_WEVENT_RESIZE, "resize" },
+	{ LCUI_WEVENT_AFTERLAYOUT, "afterlayout" },
+	{ LCUI_WEVENT_FOCUS, "focus" },
+	{ LCUI_WEVENT_BLUR, "blur" },
+	{ LCUI_WEVENT_SHOW, "show" },
+	{ LCUI_WEVENT_HIDE, "hide" },
+	{ LCUI_WEVENT_SURFACE, "surface" },
+	{ LCUI_WEVENT_TITLE, "title" } };
 
 	LCUIMutex_Init(&self.mutex);
 	RBTree_Init(&self.event_names);

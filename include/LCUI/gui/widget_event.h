@@ -2,7 +2,7 @@
  * widget_event.h -- LCUI widget event module.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -100,24 +100,24 @@ typedef void(*LCUI_WidgetEventFunc)(LCUI_Widget, LCUI_WidgetEvent, void*);
 #define Widget_BlockEvent(WIDGET, FLAG) (WIDGET)->event_blocked = FLAG
 
 /** 触发事件，让事件处理器在主循环中调用 */
-LCUI_API LCUI_BOOL Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent ev,
-				     void *data, void( *destroy_data )(void*) );
+LCUI_API LCUI_BOOL Widget_PostEvent(LCUI_Widget widget, LCUI_WidgetEvent ev,
+				    void *data, void(*destroy_data)(void*));
 
 /** 触发事件，直接调用事件处理器 */
-LCUI_API int Widget_TriggerEvent( LCUI_Widget widget,
-				  LCUI_WidgetEvent e, void *data );
+LCUI_API int Widget_TriggerEvent(LCUI_Widget widget,
+				 LCUI_WidgetEvent e, void *data);
 
 /** 自动分配一个可用的事件标识号 */
-LCUI_API int LCUIWidget_AllocEventId( void );
+LCUI_API int LCUIWidget_AllocEventId(void);
 
 /** 设置与事件标识号对应的名称 */
-LCUI_API int LCUIWidget_SetEventName( int event_id, const char *event_name );
+LCUI_API int LCUIWidget_SetEventName(int event_id, const char *event_name);
 
 /** 获取与事件标识号对应的名称 */
-LCUI_API const char *LCUIWidget_GetEventName( int event_id );
+LCUI_API const char *LCUIWidget_GetEventName(int event_id);
 
 /** 获取与事件名称对应的标识号 */
-LCUI_API int LCUIWidget_GetEventId( const char *event_name );
+LCUI_API int LCUIWidget_GetEventId(const char *event_name);
 
 /**
  * 添加部件事件绑定
@@ -128,9 +128,9 @@ LCUI_API int LCUIWidget_GetEventId( const char *event_name );
  * @param[in] destroy_data 数据的销毁函数
  * @return 成功则返回事件处理器的标识号，失败则返回负数
 */
-LCUI_API int Widget_BindEventById( LCUI_Widget widget, int event_id,
-				   LCUI_WidgetEventFunc func, void *data,
-				   void( *destroy_data )(void*) );
+LCUI_API int Widget_BindEventById(LCUI_Widget widget, int event_id,
+				  LCUI_WidgetEventFunc func, void *data,
+				  void(*destroy_data)(void*));
 
 /**
  * 添加部件事件绑定
@@ -141,9 +141,9 @@ LCUI_API int Widget_BindEventById( LCUI_Widget widget, int event_id,
  * @param[in] destroy_data 数据的销毁函数
  * @return 成功则返回事件处理器的标识号，失败则返回负数
  */
-LCUI_API int Widget_BindEvent( LCUI_Widget widget, const char *event_name,
-			       LCUI_WidgetEventFunc func, void *data,
-			       void( *destroy_data )(void*) );
+LCUI_API int Widget_BindEvent(LCUI_Widget widget, const char *event_name,
+			      LCUI_WidgetEventFunc func, void *data,
+			      void(*destroy_data)(void*));
 
 /**
  * 解除部件事件绑定
@@ -151,8 +151,8 @@ LCUI_API int Widget_BindEvent( LCUI_Widget widget, const char *event_name,
  * @param[in] event_id 事件标识号
  * @param[in] func 与事件绑定的函数
  */
-LCUI_API int Widget_UnbindEventById( LCUI_Widget widget, int event_id,
-				     LCUI_WidgetEventFunc func );
+LCUI_API int Widget_UnbindEventById(LCUI_Widget widget, int event_id,
+				    LCUI_WidgetEventFunc func);
 
 
 /**
@@ -160,7 +160,7 @@ LCUI_API int Widget_UnbindEventById( LCUI_Widget widget, int event_id,
  * @param[in] widget 目标部件
  * @param[in] handler_id 事件处理器标识号
  */
-LCUI_API int Widget_UnbindEventByHandlerId( LCUI_Widget widget, int handler_id );
+LCUI_API int Widget_UnbindEventByHandlerId(LCUI_Widget widget, int handler_id);
 
 /**
  * 解除部件事件绑定
@@ -168,8 +168,8 @@ LCUI_API int Widget_UnbindEventByHandlerId( LCUI_Widget widget, int handler_id )
  * @param[in] event_name 事件名称
  * @param[in] func 与事件绑定的函数
  */
-LCUI_API int Widget_UnbindEvent( LCUI_Widget widget, const char *event_name,
-				 LCUI_WidgetEventFunc func );
+LCUI_API int Widget_UnbindEvent(LCUI_Widget widget, const char *event_name,
+				LCUI_WidgetEventFunc func);
 /**
  * 投递表面（surface）事件
  * 表面是与顶层部件绑定在一起的，只有当部件为顶层部件时，才能投递表面事件。
@@ -177,23 +177,23 @@ LCUI_API int Widget_UnbindEvent( LCUI_Widget widget, const char *event_name,
  * @param event_type 事件类型
  * @param @sync_props 是否将部件的属性同步给表面
  */
-LCUI_API int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type,
-				      LCUI_BOOL sync_props );
+LCUI_API int Widget_PostSurfaceEvent(LCUI_Widget w, int event_type,
+				     LCUI_BOOL sync_props);
 
 /** 清除事件对象，通常在部件销毁时调用该函数，以避免部件销毁后还有事件发送给它 */
-LCUI_API void LCUIWidget_ClearEventTarget( LCUI_Widget widget );
+LCUI_API void LCUIWidget_ClearEventTarget(LCUI_Widget widget);
 
 /** 将一个部件设置为焦点 */
-LCUI_API int LCUIWidget_SetFocus( LCUI_Widget widget );
+LCUI_API int LCUIWidget_SetFocus(LCUI_Widget widget);
 
 /** 停止部件的事件传播 */
-LCUI_API int Widget_StopEventPropagation( LCUI_Widget widget );
+LCUI_API int Widget_StopEventPropagation(LCUI_Widget widget);
 
 /** 为部件设置鼠标捕获，设置后将捕获全局范围内的鼠标事件 */
-LCUI_API void Widget_SetMouseCapture( LCUI_Widget w );
+LCUI_API void Widget_SetMouseCapture(LCUI_Widget w);
 
 /** 为部件解除鼠标捕获 */
-LCUI_API void Widget_ReleaseMouseCapture( LCUI_Widget w );
+LCUI_API void Widget_ReleaseMouseCapture(LCUI_Widget w);
 
 /**
  * 为部件设置触点捕获，设置后将捕获全局范围内的触点事件
@@ -201,14 +201,14 @@ LCUI_API void Widget_ReleaseMouseCapture( LCUI_Widget w );
  * @param[in] point_id 触点ID，当值为 -1 时则捕获全部触点
  * @returns 设置成功返回 0，如果其它部件已经捕获该触点则返回 -1
  */
-LCUI_API int Widget_SetTouchCapture( LCUI_Widget w, int point_id );
+LCUI_API int Widget_SetTouchCapture(LCUI_Widget w, int point_id);
 
 /**
  * 为部件解除触点捕获
  * @param[in] w 部件
  * @param[in] point_id 触点ID，当值为 -1 时则解除全部触点的捕获
  */
-LCUI_API int Widget_ReleaseTouchCapture( LCUI_Widget w, int point_id );
+LCUI_API int Widget_ReleaseTouchCapture(LCUI_Widget w, int point_id);
 
 /** 初始化 LCUI 部件的事件系统 */
 void LCUIWidget_InitEvent(void);

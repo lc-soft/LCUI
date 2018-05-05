@@ -2,7 +2,7 @@
  * css_rule_font_face.h -- CSS @font-face rule parser module
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -38,11 +38,11 @@ typedef struct LCUI_CSSFontFaceRec_ {
 	char *src;
 } LCUI_CSSFontFaceRec, *LCUI_CSSFontFace;
 
-LCUI_API void CSSRuleParser_OnFontFace( LCUI_CSSParserContext ctx,
-					void( *func )(const LCUI_CSSFontFace) );
+LCUI_API void CSSRuleParser_OnFontFace(LCUI_CSSParserContext ctx,
+				       void(*func)(const LCUI_CSSFontFace));
 
-LCUI_API int CSSParser_InitFontFaceRuleParser( LCUI_CSSParserContext ctx );
+LCUI_API int CSSParser_InitFontFaceRuleParser(LCUI_CSSParserContext ctx);
 
-LCUI_API void CSSParser_FreeFontFaceRuleParser( LCUI_CSSParserContext ctx );
+LCUI_API void CSSParser_FreeFontFaceRuleParser(LCUI_CSSParserContext ctx);
 
 #endif

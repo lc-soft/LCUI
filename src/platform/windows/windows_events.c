@@ -2,7 +2,7 @@
  * windows_events.c -- App events support for windows platform.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -49,22 +49,22 @@ static struct WindowsDriver {
 	const wchar_t *class_name;
 } win;
 
-static LRESULT CALLBACK WndProc( HWND hwnd, UINT msg,
-				 WPARAM arg1, LPARAM arg2 )
+static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg,
+				WPARAM arg1, LPARAM arg2)
 {
 	MSG win_ev;
 	LCUI_Surface surface;
 
-	switch( msg ) {
+	switch (msg) {
 	case WM_LCUI_TASK:
-		LCUITask_Run( (LCUI_Task)arg2 );
-		LCUITask_Destroy( (LCUI_Task)arg2 );
+		LCUITask_Run((LCUI_Task)arg2);
+		LCUITask_Destroy((LCUI_Task)arg2);
 		return 0;
 	case WM_DESTROY:
 		return 0;
 	case WM_CLOSE:
-		surface = LCUIDisplay_GetSurfaceByHandle( hwnd );
-		Surface_Destroy( surface );
+		surface = LCUIDisplay_GetSurfaceByHandle(hwnd);
+		Surface_Destroy(surface);
 		LCUI_Quit();
 	default:break;
 	}
@@ -72,53 +72,53 @@ static LRESULT CALLBACK WndProc( HWND hwnd, UINT msg,
 	win_ev.wParam = arg1;
 	win_ev.lParam = arg2;
 	win_ev.message = msg;
-	if( !win.active ) {
-		return DefWindowProc( hwnd, msg, arg1, arg2 );
+	if (!win.active) {
+		return DefWindowProc(hwnd, msg, arg1, arg2);
 	}
-	if( EventTrigger_Trigger( win.trigger, msg, &win_ev ) == 0 ) {
-		return DefWindowProc( hwnd, msg, arg1, arg2 );
+	if (EventTrigger_Trigger(win.trigger, msg, &win_ev) == 0) {
+		return DefWindowProc(hwnd, msg, arg1, arg2);
 	}
 	return 0;
 }
 
-static void WIN_ProcessEvents( void )
+static void WIN_ProcessEvents(void)
 {
 	MSG msg;
-	while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) ) {
-		TranslateMessage( &msg );
-		DispatchMessage( &msg );
+	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
 	}
 }
 
-static int WIN_BindSysEvent( int event_id, LCUI_EventFunc func,
-			     void *data, void(*destroy_data)(void*) )
+static int WIN_BindSysEvent(int event_id, LCUI_EventFunc func,
+			    void *data, void(*destroy_data)(void*))
 {
-	return EventTrigger_Bind( win.trigger, event_id, func,
-				  data, destroy_data );
+	return EventTrigger_Bind(win.trigger, event_id, func,
+				 data, destroy_data);
 }
 
-static int WIN_UnbindSysEvent( int event_id, LCUI_EventFunc func )
+static int WIN_UnbindSysEvent(int event_id, LCUI_EventFunc func)
 {
-	return EventTrigger_Unbind( win.trigger, event_id, func );
+	return EventTrigger_Unbind(win.trigger, event_id, func);
 }
 
-static int WIN_UnbindSysEvent2( int handler_id )
+static int WIN_UnbindSysEvent2(int handler_id)
 {
-	return EventTrigger_Unbind2( win.trigger, handler_id );
+	return EventTrigger_Unbind2(win.trigger, handler_id);
 }
 
-static void *WIN_GetData( void )
+static void *WIN_GetData(void)
 {
 	return win.main_instance;
 }
 
-void LCUI_SetMainWindow( HWND hwnd )
+void LCUI_SetMainWindow(HWND hwnd)
 {
 	win.main_hwnd = hwnd;
 }
 
 /** win32的动态库的入口函数 */
-BOOL APIENTRY DllMain( HMODULE hModule, DWORD reason, LPVOID unused )
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID unused)
 {
 	switch (reason) {
 	case DLL_PROCESS_ATTACH:
@@ -131,15 +131,15 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD reason, LPVOID unused )
 	return TRUE;
 }
 
-void LCUI_PreInitWinApp( void *data )
+void LCUI_PreInitWinApp(void *data)
 {
 	win.main_instance = data;
 }
 
-LCUI_AppDriver LCUI_CreateWinAppDriver( void )
+LCUI_AppDriver LCUI_CreateWinAppDriver(void)
 {
 	WNDCLASSW wndclass;
-	ASSIGN( app, LCUI_AppDriver );
+	ASSIGN(app, LCUI_AppDriver);
 
 	win.class_name = L"LCUI";
 	wndclass.cbClsExtra = 0;
@@ -150,14 +150,14 @@ LCUI_AppDriver LCUI_CreateWinAppDriver( void )
 	wndclass.lpszClassName = win.class_name;
 	wndclass.hInstance = win.main_instance;
 	wndclass.style = CS_HREDRAW | CS_VREDRAW;
-	wndclass.hCursor = LoadCursor( NULL, IDC_ARROW );
-	wndclass.hIcon = LoadIcon( win.dll_instance,
-				   MAKEINTRESOURCE( IDI_LCUI_ICON ) );
-	if( !RegisterClassW( &wndclass ) ) {
+	wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wndclass.hIcon = LoadIcon(win.dll_instance,
+				  MAKEINTRESOURCE(IDI_LCUI_ICON));
+	if (!RegisterClassW(&wndclass)) {
 		wchar_t str[256];
-		swprintf( str, 255, __FUNCTIONW__
-			  L": error code: %d\n", GetLastError() );
-		MessageBoxW( NULL, str, win.class_name, MB_ICONERROR );
+		swprintf(str, 255, __FUNCTIONW__
+			 L": error code: %d\n", GetLastError());
+		MessageBoxW(NULL, str, win.class_name, MB_ICONERROR);
 		return NULL;
 	}
 	app->GetData = WIN_GetData;
@@ -170,12 +170,12 @@ LCUI_AppDriver LCUI_CreateWinAppDriver( void )
 	return app;
 }
 
-void LCUI_DestroyWinAppDriver( LCUI_AppDriver app )
+void LCUI_DestroyWinAppDriver(LCUI_AppDriver app)
 {
 	win.active = FALSE;
-	UnregisterClassW( win.class_name, win.main_instance );
-	EventTrigger_Destroy( win.trigger );
-	free( app );
+	UnregisterClassW(win.class_name, win.main_instance);
+	EventTrigger_Destroy(win.trigger);
+	free(app);
 }
 
 #endif

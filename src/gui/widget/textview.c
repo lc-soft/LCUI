@@ -524,7 +524,7 @@ void TextView_SetMulitiline(LCUI_Widget w, LCUI_BOOL enable)
 void LCUIWidget_AddTextView(void)
 {
 	LCUI_CSSPropertyParserRec parser = { 0, "word-break",
-					     OnParseWordBreak };
+		OnParseWordBreak };
 	self.key_word_break = LCUI_AddCSSPropertyName("word-break");
 	self.prototype = LCUIWidget_NewPrototype("textview", NULL);
 	self.prototype->init = TextView_OnInit;

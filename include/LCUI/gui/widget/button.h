@@ -2,7 +2,7 @@
  * button.h -- LCUI‘s Button widget
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -33,11 +33,11 @@
 
 LCUI_BEGIN_HEADER
 
-LCUI_API void Button_SetTextW( LCUI_Widget w, const wchar_t *wstr );
+LCUI_API void Button_SetTextW(LCUI_Widget w, const wchar_t *wstr);
 
-LCUI_API void Button_SetText( LCUI_Widget w, const char *str );
+LCUI_API void Button_SetText(LCUI_Widget w, const char *str);
 
-LCUI_API void LCUIWidget_AddButton( void );
+LCUI_API void LCUIWidget_AddButton(void);
 
 LCUI_END_HEADER
 

@@ -2,7 +2,7 @@
  * widget_task.h -- LCUI widget task module.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,31 +34,31 @@
 LCUI_BEGIN_HEADER
 
 /** 更新当前任务状态，确保部件的任务能够被处理到 */
-LCUI_API void Widget_UpdateTaskStatus( LCUI_Widget widget );
+LCUI_API void Widget_UpdateTaskStatus(LCUI_Widget widget);
 
 /** 添加任务 */
-LCUI_API void Widget_AddTask( LCUI_Widget widget, int task_type );
+LCUI_API void Widget_AddTask(LCUI_Widget widget, int task_type);
 
 /** 处理部件中当前积累的任务 */
-LCUI_API int Widget_Update( LCUI_Widget w );
+LCUI_API int Widget_Update(LCUI_Widget w);
 
 /** 将部件标记为垃圾，等待销毁 */
-LCUI_API void Widget_AddToTrash( LCUI_Widget w );
+LCUI_API void Widget_AddToTrash(LCUI_Widget w);
 
 /** 为子级部件添加任务 */
-LCUI_API void Widget_AddTaskForChildren( LCUI_Widget widget, int task );
+LCUI_API void Widget_AddTaskForChildren(LCUI_Widget widget, int task);
 
 /** 初始化 LCUI 部件任务处理功能 */
-LCUI_API void LCUIWidget_InitTasks( void );
+LCUI_API void LCUIWidget_InitTasks(void);
 
 /** 销毁（释放） LCUI 部件任务处理功能的相关资源 */
-LCUI_API void LCUIWidget_FreeTasks( void );
+LCUI_API void LCUIWidget_FreeTasks(void);
 
 /** 处理一次当前积累的部件任务 */
-LCUI_API void LCUIWidget_Update( void );
+LCUI_API void LCUIWidget_Update(void);
 
 /** 刷新所有部件的样式 */
-LCUI_API void LCUIWidget_RefreshStyle( void );
+LCUI_API void LCUIWidget_RefreshStyle(void);
 
 LCUI_END_HEADER
 

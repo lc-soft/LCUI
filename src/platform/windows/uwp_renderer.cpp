@@ -55,14 +55,13 @@ typedef struct LCUI_SurfaceRec_ {
 void UpdateSurfaceSize(void);
 
 Renderer::Renderer(const std::shared_ptr<DX::DeviceResources> &deviceResources)
-									: m_deviceResources(
-									      deviceResources)
+	: m_deviceResources(deviceResources)
 {
 	m_bmp = nullptr;
 	m_backBmp = nullptr;
 	m_frameSwapable = false;
 	m_deviceResources->GetD2DFactory()->CreateDrawingStateBlock(
-	    &m_stateBlock);
+		&m_stateBlock);
 	display.renderer = this;
 	CreateDeviceDependentResources();
 	CreateWindowSizeDependentResources();
@@ -109,7 +108,7 @@ void Renderer::SwapFrames()
 	rect.bottom = rect.top + (FLOAT)display.rect.height;
 	auto pos = D2D1::Point2U((UINT)rect.left, (UINT)rect.top);
 	auto readRect = D2D1::RectU((UINT)rect.left, (UINT)rect.top,
-				    (UINT)rect.right, (UINT)rect.bottom);
+		(UINT)rect.right, (UINT)rect.bottom);
 	m_backBmp->CopyFromMemory(&readRect, display.frame.bytes,
 				  display.frame.bytes_per_row);
 	m_bmp->CopyFromBitmap(&pos, m_backBmp.Get(), &readRect);
@@ -125,15 +124,15 @@ void Renderer::CreateWindowSizeDependentResources()
 	Size outputSize = m_deviceResources->GetOutputSize();
 	auto context = m_deviceResources->GetD2DDeviceContext();
 	D2D1_BITMAP_PROPERTIES1 props = { { DXGI_FORMAT_B8G8R8A8_UNORM,
-					    D2D1_ALPHA_MODE_IGNORE },
-					  dpi,
-					  dpi,
-					  D2D1_BITMAP_OPTIONS_NONE,
-					  0 };
+		D2D1_ALPHA_MODE_IGNORE },
+		dpi,
+		dpi,
+		D2D1_BITMAP_OPTIONS_NONE,
+		0 };
 	m_frameSwapable = true;
 	m_frameSize = { (UINT32)outputSize.Width, (UINT32)outputSize.Height };
 	Graph_Create(&display.frame, (int)m_frameSize.width,
-		     (int)m_frameSize.height);
+		(int)m_frameSize.height);
 	Graph_FillRect(&display.frame, RGB(255, 255, 255), NULL, TRUE);
 	context->CreateBitmap(m_frameSize, nullptr, 0, &props, &m_bmp);
 	context->CreateBitmap(m_frameSize, nullptr, 0, &props, &m_backBmp);
@@ -170,7 +169,7 @@ static int UWPDisplay_GetHeight(void)
 }
 
 static int UWPDisplay_BindEvent(int event_id, LCUI_EventFunc func, void *data,
-				void (*destroy_data)(void *))
+				void(*destroy_data)(void *))
 {
 	return EventTrigger_Bind(display.trigger, event_id, func, data,
 				 destroy_data);

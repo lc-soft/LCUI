@@ -44,95 +44,95 @@ typedef struct LCUI_WorkerRec_ {
 	LCUI_Thread thread;		/**< 所在的线程 */
 } LCUI_WorkerRec;
 
-LCUI_Worker LCUIWorker_New( void )
+LCUI_Worker LCUIWorker_New(void)
 {
-	LCUI_Worker worker = NEW( LCUI_WorkerRec, 1 );
-	LCUIMutex_Init( &worker->mutex );
-	LCUICond_Init( &worker->cond );
-	LinkedList_Init( &worker->tasks );
+	LCUI_Worker worker = NEW(LCUI_WorkerRec, 1);
+	LCUIMutex_Init(&worker->mutex);
+	LCUICond_Init(&worker->cond);
+	LinkedList_Init(&worker->tasks);
 	worker->active = FALSE;
 	worker->thread = 0;
 	return worker;
 }
 
-void LCUIWorker_PostTask( LCUI_Worker worker, LCUI_Task task )
+void LCUIWorker_PostTask(LCUI_Worker worker, LCUI_Task task)
 {
 	LCUI_Task newtask;
-	newtask = NEW( LCUI_TaskRec, 1 );
+	newtask = NEW(LCUI_TaskRec, 1);
 	*newtask = *task;
-	LCUIMutex_Lock( &worker->mutex );
-	LinkedList_Append( &worker->tasks, newtask );
-	LCUICond_Signal( &worker->cond );
-	LCUIMutex_Unlock( &worker->mutex );
+	LCUIMutex_Lock(&worker->mutex);
+	LinkedList_Append(&worker->tasks, newtask);
+	LCUICond_Signal(&worker->cond);
+	LCUIMutex_Unlock(&worker->mutex);
 }
 
-LCUI_BOOL LCUIWorker_RunTask( LCUI_Worker worker )
+LCUI_BOOL LCUIWorker_RunTask(LCUI_Worker worker)
 {
 	LCUI_Task task;
 	LinkedListNode *node;
-	LCUIMutex_Lock( &worker->mutex );
-	node = LinkedList_GetNode( &worker->tasks, 0 );
-	if( node ) {
+	LCUIMutex_Lock(&worker->mutex);
+	node = LinkedList_GetNode(&worker->tasks, 0);
+	if (node) {
 		task = node->data;
-		LinkedList_Unlink( &worker->tasks, node );
-		LCUIMutex_Unlock( &worker->mutex );
-		LCUITask_Run( task );
-		LCUITask_Destroy( task );
-		free( task );
-		free( node );
+		LinkedList_Unlink(&worker->tasks, node);
+		LCUIMutex_Unlock(&worker->mutex);
+		LCUITask_Run(task);
+		LCUITask_Destroy(task);
+		free(task);
+		free(node);
 		return TRUE;
 	}
-	LCUIMutex_Unlock( &worker->mutex );
+	LCUIMutex_Unlock(&worker->mutex);
 	return FALSE;
 }
 
-static void LCUIWorker_Thread( void *arg )
+static void LCUIWorker_Thread(void *arg)
 {
 	LCUI_Worker worker = arg;
-	LCUIMutex_Lock( &worker->mutex );
-	while( worker->active ) {
-		if( LCUIWorker_RunTask( worker ) ) {
+	LCUIMutex_Lock(&worker->mutex);
+	while (worker->active) {
+		if (LCUIWorker_RunTask(worker)) {
 			continue;
 		}
-		if( worker->active ) {
-			LCUICond_Wait( &worker->cond, &worker->mutex );
+		if (worker->active) {
+			LCUICond_Wait(&worker->cond, &worker->mutex);
 		}
 	}
-	LCUIMutex_Unlock( &worker->mutex );
-	LCUIThread_Exit( NULL );
+	LCUIMutex_Unlock(&worker->mutex);
+	LCUIThread_Exit(NULL);
 }
 
-int LCUIWorker_RunAsync( LCUI_Worker worker )
+int LCUIWorker_RunAsync(LCUI_Worker worker)
 {
-	if( worker->thread != 0 ) {
+	if (worker->thread != 0) {
 		return -EEXIST;
 	}
 	worker->active = TRUE;
-	LCUIThread_Create( &worker->thread, LCUIWorker_Thread, worker );
-	LOG( "[worker] worker %u is running\n", worker->thread );
+	LCUIThread_Create(&worker->thread, LCUIWorker_Thread, worker);
+	LOG("[worker] worker %u is running\n", worker->thread);
 	return 0;
 }
 
-static void OnDeleteTask( void *arg )
+static void OnDeleteTask(void *arg)
 {
-	LCUITask_Destroy( arg );
-	free( arg );
+	LCUITask_Destroy(arg);
+	free(arg);
 }
 
-void LCUIWorker_Destroy( LCUI_Worker worker )
+void LCUIWorker_Destroy(LCUI_Worker worker)
 {
-	if( worker->thread != 0 ) {
-		LOG( "[worker] worker %u is stopping...\n", worker->thread );
-		LCUIMutex_Lock( &worker->mutex );
+	if (worker->thread != 0) {
+		LOG("[worker] worker %u is stopping...\n", worker->thread);
+		LCUIMutex_Lock(&worker->mutex);
 		worker->active = FALSE;
-		LCUICond_Signal( &worker->cond );
-		LCUIMutex_Unlock( &worker->mutex );
-		LCUIThread_Join( worker->thread, NULL );
-		LOG( "[worker] worker %u has stopped\n", worker->thread );
+		LCUICond_Signal(&worker->cond);
+		LCUIMutex_Unlock(&worker->mutex);
+		LCUIThread_Join(worker->thread, NULL);
+		LOG("[worker] worker %u has stopped\n", worker->thread);
 		worker->thread = 0;
 	}
-	LCUIMutex_Destroy( &worker->mutex );
-	LCUICond_Destroy( &worker->cond );
-	LinkedList_Clear( &worker->tasks, OnDeleteTask );
-	free( worker );
+	LCUIMutex_Destroy(&worker->mutex);
+	LCUICond_Destroy(&worker->cond);
+	LinkedList_Clear(&worker->tasks, OnDeleteTask);
+	free(worker);
 }

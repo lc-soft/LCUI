@@ -616,7 +616,8 @@ static void OnSurfaceEvent(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 	case LCUI_WEVENT_HIDE:
 		Surface_Hide(surface);
 		break;
-	case LCUI_WEVENT_RESIZE: {
+	case LCUI_WEVENT_RESIZE:
+	{
 		LCUI_Rect area;
 		RectFToInvalidArea(rect, &area);
 		if (sync_props) {
@@ -698,7 +699,7 @@ static void OnMinMaxInfo(LCUI_Event e, void *arg)
 }
 
 int LCUIDisplay_BindEvent(int event_id, LCUI_EventFunc func, void *arg,
-			  void *data, void (*destroy_data)(void *))
+			  void *data, void(*destroy_data)(void *))
 {
 	if (display.is_working) {
 		return display.driver->bindEvent(event_id, func, data,

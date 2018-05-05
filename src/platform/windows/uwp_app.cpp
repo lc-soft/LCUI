@@ -1,9 +1,9 @@
 ﻿/*
- * uwp_app.cpp -- UWP app implementation, responsible for initializing the 
+ * uwp_app.cpp -- UWP app implementation, responsible for initializing the
  * related drivers for LCUI.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -52,39 +52,39 @@ static struct UWPAppModule {
 	App^ core;
 	LCUI::Application *app;
 	Direct3DApplicationSource^ source;
-	void (*update)(LCUI_Surface);
-	void (*present)(LCUI_Surface);
+	void(*update)(LCUI_Surface);
+	void(*present)(LCUI_Surface);
 } UWPApp;
 
-static void UWPApp_ProcessEvents( void )
+static void UWPApp_ProcessEvents(void)
 {
 	UWPApp.core->ProcessEvents();
 }
 
-static int UWPApp_BindSysEvent( int type, LCUI_EventFunc func,
-				void *data, void( *destroy_data )(void*) )
+static int UWPApp_BindSysEvent(int type, LCUI_EventFunc func,
+			       void *data, void(*destroy_data)(void*))
 {
 	return -1;
 }
 
-static int UWPApp_UnbindSysEvent( int type, LCUI_EventFunc func )
+static int UWPApp_UnbindSysEvent(int type, LCUI_EventFunc func)
 {
 	return -1;
 }
 
-static int UWPApp_UnbindSysEvent2( int handler_id )
+static int UWPApp_UnbindSysEvent2(int handler_id)
 {
 	return -1;
 }
 
-static void *UWPApp_GetData( void )
+static void *UWPApp_GetData(void)
 {
 	return (void*)UWPApp.core;
 }
 
-static LCUI_AppDriver LCUI_CreateUWPAppDriver( App^ app )
+static LCUI_AppDriver LCUI_CreateUWPAppDriver(App^ app)
 {
-	ASSIGN( driver, LCUI_AppDriver );
+	ASSIGN(driver, LCUI_AppDriver);
 	driver->BindSysEvent = UWPApp_BindSysEvent;
 	driver->UnbindSysEvent = UWPApp_UnbindSysEvent;
 	driver->UnbindSysEvent2 = UWPApp_UnbindSysEvent2;
@@ -94,15 +94,15 @@ static LCUI_AppDriver LCUI_CreateUWPAppDriver( App^ app )
 	return driver;
 }
 
-static void UWPDisplay_Update( LCUI_Surface surface )
+static void UWPDisplay_Update(LCUI_Surface surface)
 {
-	UWPApp.update( surface );
+	UWPApp.update(surface);
 	UWPApp.core->Update();
 }
 
-static void UWPDisplay_Present( LCUI_Surface surface )
+static void UWPDisplay_Present(LCUI_Surface surface)
 {
-	UWPApp.present( surface );
+	UWPApp.present(surface);
 	UWPApp.core->Present();
 }
 
@@ -138,104 +138,104 @@ void App::Initialize(CoreApplicationView^ applicationView)
 }
 
 // 创建(或重新创建) CoreWindow 对象时调用。
-void App::SetWindow( CoreWindow^ window )
+void App::SetWindow(CoreWindow^ window)
 {
 	window->SizeChanged +=
-		ref new TypedEventHandler<CoreWindow^, WindowSizeChangedEventArgs^>( this, &App::OnWindowSizeChanged );
+		ref new TypedEventHandler<CoreWindow^, WindowSizeChangedEventArgs^>(this, &App::OnWindowSizeChanged);
 
 	window->VisibilityChanged +=
-		ref new TypedEventHandler<CoreWindow^, VisibilityChangedEventArgs^>( this, &App::OnVisibilityChanged );
+		ref new TypedEventHandler<CoreWindow^, VisibilityChangedEventArgs^>(this, &App::OnVisibilityChanged);
 
 	window->Closed +=
-		ref new TypedEventHandler<CoreWindow^, CoreWindowEventArgs^>( this, &App::OnWindowClosed );
+		ref new TypedEventHandler<CoreWindow^, CoreWindowEventArgs^>(this, &App::OnWindowClosed);
 
 	DisplayInformation^ currentDisplayInformation = DisplayInformation::GetForCurrentView();
 
 	currentDisplayInformation->DpiChanged +=
-		ref new TypedEventHandler<DisplayInformation^, Object^>( this, &App::OnDpiChanged );
+		ref new TypedEventHandler<DisplayInformation^, Object^>(this, &App::OnDpiChanged);
 
 	currentDisplayInformation->OrientationChanged +=
-		ref new TypedEventHandler<DisplayInformation^, Object^>( this, &App::OnOrientationChanged );
+		ref new TypedEventHandler<DisplayInformation^, Object^>(this, &App::OnOrientationChanged);
 
 	DisplayInformation::DisplayContentsInvalidated +=
-		ref new TypedEventHandler<DisplayInformation^, Object^>( this, &App::OnDisplayContentsInvalidated );
+		ref new TypedEventHandler<DisplayInformation^, Object^>(this, &App::OnDisplayContentsInvalidated);
 
 	window->PointerPressed +=
-		ref new TypedEventHandler<CoreWindow^, PointerEventArgs^>( this, &App::OnPointerPressed );
+		ref new TypedEventHandler<CoreWindow^, PointerEventArgs^>(this, &App::OnPointerPressed);
 	window->PointerMoved +=
-		ref new TypedEventHandler<CoreWindow^, PointerEventArgs^>( this, &App::OnPointerMoved );
+		ref new TypedEventHandler<CoreWindow^, PointerEventArgs^>(this, &App::OnPointerMoved);
 	window->PointerReleased +=
-		ref new TypedEventHandler<CoreWindow^, PointerEventArgs^>( this, &App::OnPointerReleased );
+		ref new TypedEventHandler<CoreWindow^, PointerEventArgs^>(this, &App::OnPointerReleased);
 	window->PointerWheelChanged +=
-		ref new TypedEventHandler<CoreWindow^, PointerEventArgs^>( this, &App::OnPointerWheelChanged );
+		ref new TypedEventHandler<CoreWindow^, PointerEventArgs^>(this, &App::OnPointerWheelChanged);
 	window->KeyUp +=
-		ref new TypedEventHandler<CoreWindow^, KeyEventArgs^>( this, &App::OnKeyUp );
+		ref new TypedEventHandler<CoreWindow^, KeyEventArgs^>(this, &App::OnKeyUp);
 	window->KeyDown +=
-		ref new TypedEventHandler<CoreWindow^, KeyEventArgs^>( this, &App::OnKeyDown );
+		ref new TypedEventHandler<CoreWindow^, KeyEventArgs^>(this, &App::OnKeyDown);
 
-	m_deviceResources->SetWindow( window );
+	m_deviceResources->SetWindow(window);
 }
 
 void App::OnPointerPressed(CoreWindow^ window, PointerEventArgs^ args)
 {
-	m_inputDriver->OnPointerPressed( window, args );
+	m_inputDriver->OnPointerPressed(window, args);
 }
 
 void App::OnPointerMoved(CoreWindow^ window, PointerEventArgs^ args)
 {
-	m_inputDriver->OnPointerMoved( window, args );
+	m_inputDriver->OnPointerMoved(window, args);
 }
 
 void App::OnPointerReleased(CoreWindow^ window, PointerEventArgs^ args)
 {
-	m_inputDriver->OnPointerReleased( window, args );
+	m_inputDriver->OnPointerReleased(window, args);
 }
 
 void App::OnPointerWheelChanged(CoreWindow^ window, PointerEventArgs^ args)
 {
-	m_inputDriver->OnPointerWheelChanged( window, args );
+	m_inputDriver->OnPointerWheelChanged(window, args);
 }
 
-void App::OnKeyDown( Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::KeyEventArgs^ args )
+void App::OnKeyDown(Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::KeyEventArgs^ args)
 {
-	m_inputDriver->OnKeyDown( sender, args );
+	m_inputDriver->OnKeyDown(sender, args);
 }
 
-void App::OnKeyUp( Windows::UI::Core::CoreWindow^ sender,Windows::UI::Core:: KeyEventArgs^ args )
+void App::OnKeyUp(Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::KeyEventArgs^ args)
 {
-	m_inputDriver->OnKeyUp( sender, args );
+	m_inputDriver->OnKeyUp(sender, args);
 }
 
 // 初始化场景资源或加载之前保存的应用程序状态。
-void App::Load( Platform::String^ entryPoint )
+void App::Load(Platform::String^ entryPoint)
 {
-	if( m_main ) {
+	if (m_main) {
 		return;
 	}
 
 	m_displayDriver = LCUI_CreateUWPDisplay();
-	m_inputDriver = std::unique_ptr<InputDriver>( new InputDriver );
-	m_main = std::unique_ptr<Main>( new Main( m_deviceResources ) );
-	m_appDriver = LCUI_CreateUWPAppDriver( this );
+	m_inputDriver = std::unique_ptr<InputDriver>(new InputDriver);
+	m_main = std::unique_ptr<Main>(new Main(m_deviceResources));
+	m_appDriver = LCUI_CreateUWPAppDriver(this);
 	UWPApp.update = m_displayDriver->update;
 	UWPApp.present = m_displayDriver->present;
 	m_displayDriver->update = UWPDisplay_Update;
 	m_displayDriver->present = UWPDisplay_Present;
 
 	LCUI_InitBase();
-	LCUI_InitApp( m_appDriver );
-	LCUI_InitDisplay( m_displayDriver );
+	LCUI_InitApp(m_appDriver);
+	LCUI_InitDisplay(m_displayDriver);
 	LCUI_InitIME();
 	LCUI_InitCursor();
 	m_inputDriver->RegisterIME();
 	m_inputDriver->SelectIME();
-	UWPApp.app->Load( entryPoint );
+	UWPApp.app->Load(entryPoint);
 }
 
 void App::Present()
 {
-	if( m_windowVisible ) {
-		if( m_main->Render() ) {
+	if (m_windowVisible) {
+		if (m_main->Render()) {
 			m_deviceResources->Present();
 		}
 	}
@@ -243,22 +243,22 @@ void App::Present()
 
 void App::Update()
 {
-	if( m_windowVisible ) {
+	if (m_windowVisible) {
 		m_main->Update();
 	}
 }
 
 void App::ProcessEvents()
 {
-	if( m_windowClosed ) {
+	if (m_windowClosed) {
 		LCUI_Quit();
 		return;
 	}
 	auto dispathcer = CoreWindow::GetForCurrentThread()->Dispatcher;
-	if( m_windowVisible ) {
-		dispathcer->ProcessEvents( CoreProcessEventsOption::ProcessAllIfPresent );
+	if (m_windowVisible) {
+		dispathcer->ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
 	} else {
-		dispathcer->ProcessEvents( CoreProcessEventsOption::ProcessOneAndAllPending );
+		dispathcer->ProcessEvents(CoreProcessEventsOption::ProcessOneAndAllPending);
 	}
 }
 
@@ -291,8 +291,7 @@ void App::OnSuspending(Platform::Object^ sender, SuspendingEventArgs^ args)
 	// 将强制应用程序退出。
 	SuspendingDeferral^ deferral = args->SuspendingOperation->GetDeferral();
 
-	create_task([this, deferral]()
-	{
+	create_task([this, deferral]() {
 		m_deviceResources->Trim();
 
 		// 在此处插入代码。
@@ -361,7 +360,7 @@ LCUI::Application::Application()
 
 }
 
-void LCUI::Application::Load( Platform::String^ entryPoint )
+void LCUI::Application::Load(Platform::String^ entryPoint)
 {
 
 }
@@ -371,8 +370,8 @@ void LCUI::Application::Run()
 	LCUI_Main();
 }
 
-void LCUI::Run( LCUI::Application &app )
+void LCUI::Run(LCUI::Application &app)
 {
 	UWPApp.app = &app;
-	CoreApplication::Run( UWPApp.source );
+	CoreApplication::Run(UWPApp.source);
 }
