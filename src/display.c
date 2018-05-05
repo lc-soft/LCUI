@@ -54,13 +54,11 @@ typedef struct SurfaceRecordRec_ {
 	LCUI_Widget widget;		/**< target widget */
 } SurfaceRecordRec, *SurfaceRecord;
 
-/** 图形显示功能的上下文数据 */
-static struct DisplayContext {
-	int mode;			/**< 显示模式 */
-	size_t width, height;		/**< 当前缓存的屏幕尺寸 */
+static struct LCUI_DisplayModule {
+	unsigned width, height;		/**< 当前缓存的屏幕尺寸 */
+	LCUI_DisplayMode mode;		/**< 显示模式 */
 	LCUI_BOOL show_rect_border;	/**< 是否为重绘的区域显示边框 */
-	LCUI_BOOL active;		/**< 标志，指示当前模块是否处于工作状态 */
-	LCUI_Thread thread;		/**< 线程，负责画面更新工作 */
+	LCUI_BOOL active;		/**< 当前模块是否处于工作状态 */
 	LinkedList surfaces;		/**< surface 列表 */
 	LinkedList rects;		/**< 无效区域列表 */
 	LCUI_DisplayDriver driver;

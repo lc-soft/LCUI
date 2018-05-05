@@ -38,22 +38,22 @@
 LCUI_BEGIN_HEADER
 
 /** 图形显示模式 */
-enum LCUI_DisplayMode {
+typedef enum LCUI_DisplayMode {
 	LCUI_DMODE_WINDOWED = 1, /**< 窗口化 */
 	LCUI_DMODE_SEAMLESS,     /**< 与系统GUI无缝结合 */
 	LCUI_DMODE_FULLSCREEN    /**< 全屏模式 */
-};
+} LCUI_DisplayMode;
 
 #define LCUI_DMODE_DEFAULT LCUI_DMODE_WINDOWED
 
 /** 显示驱动的事件类型 */
-enum LCUI_DisplayEventType {
+typedef enum LCUI_DisplayEventType {
 	LCUI_DEVENT_NONE,
 	LCUI_DEVENT_PAINT,
 	LCUI_DEVENT_RESIZE,
 	LCUI_DEVENT_MINMAXINFO,
 	LCUI_DEVENT_READY
-};
+} LCUI_DisplayEventType;
 
 /** 显示驱动的事件数据结构 */
 typedef struct LCUI_DisplayEventRec_ {
