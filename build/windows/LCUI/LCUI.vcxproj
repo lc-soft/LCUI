@@ -313,7 +313,6 @@
     <ClInclude Include="..\..\..\include\LCUI\thread.h" />
     <ClInclude Include="..\..\..\include\LCUI\timer.h" />
     <ClInclude Include="..\..\..\include\LCUI\util.h" />
-    <ClInclude Include="..\..\..\include\LCUI\util\delay.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\dict.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\dirent.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\event.h" />

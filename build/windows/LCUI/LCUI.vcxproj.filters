@@ -195,9 +195,6 @@
     <ClInclude Include="..\..\..\include\LCUI\timer.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\util\delay.h">
-      <Filter>头文件\LCUI\util</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\util\dict.h">
       <Filter>头文件\LCUI\util</Filter>
     </ClInclude>
