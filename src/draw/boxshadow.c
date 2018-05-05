@@ -194,7 +194,7 @@ static void DrawCircle(LCUI_Graph *graph, LCUI_Pos center,
 	if (circle.bottom > area.y + area.height) {
 		circle.bottom = area.y + area.height;
 	}
-	if (src->color_type != COLOR_TYPE_ARGB) {
+	if (src->color_type != LCUI_COLOR_TYPE_ARGB) {
 		return;
 	}
 	px_row_bytes = src->bytes + circle.top*src->bytes_per_row;

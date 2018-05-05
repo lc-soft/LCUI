@@ -322,10 +322,10 @@ static LCUI_WidgetRenderer WidgetRenderer(LCUI_Widget w,
 	Graph_Init(&that->self_graph);
 	Graph_Init(&that->layer_graph);
 	Graph_Init(&that->content_graph);
-	that->layer_graph.color_type = COLOR_TYPE_ARGB;
+	that->layer_graph.color_type = LCUI_COLOR_TYPE_ARGB;
 	that->can_render_self = Widget_IsPaintable(w);
 	if (that->can_render_self) {
-		that->self_graph.color_type = COLOR_TYPE_ARGB;
+		that->self_graph.color_type = LCUI_COLOR_TYPE_ARGB;
 		Graph_Create(&that->self_graph,
 			     that->paint->rect.width,
 			     that->paint->rect.height);
@@ -368,7 +368,7 @@ static LCUI_WidgetRenderer WidgetRenderer(LCUI_Widget w,
 		return that;
 	}
 	if (that->has_content_graph) {
-		that->content_graph.color_type = COLOR_TYPE_ARGB;
+		that->content_graph.color_type = LCUI_COLOR_TYPE_ARGB;
 		Graph_Create(&that->content_graph, that->content_rect.width,
 			     that->content_rect.height);
 	}

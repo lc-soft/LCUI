@@ -805,7 +805,7 @@ int FontBitmap_Mix(LCUI_Graph *graph, LCUI_Pos pos, const LCUI_FontBitmap *bmp,
 	Graph_GetValidRect(&write_slot, &w_rect);
 	/* 获取背景图引用的源图形 */
 	graph = Graph_GetQuote(graph);
-	if (graph->color_type == COLOR_TYPE_ARGB) {
+	if (graph->color_type == LCUI_COLOR_TYPE_ARGB) {
 		FontBitmap_MixARGB(graph, &w_rect, bmp, color, &r_rect);
 	} else {
 		FontBitmap_MixRGB(graph, &w_rect, bmp, color, &r_rect);

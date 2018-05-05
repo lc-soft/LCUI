@@ -447,10 +447,10 @@ static void FBDisplay_InitCanvas(void)
 	display.canvas.mem_size = display.fb.mem_len;
 	switch (display.fb.var_info.bits_per_pixel) {
 	case 32:
-		display.canvas.color_type = COLOR_TYPE_ARGB8888;
+		display.canvas.color_type = LCUI_COLOR_TYPE_ARGB8888;
 		break;
 	case 24:
-		display.canvas.color_type = COLOR_TYPE_RGB888;
+		display.canvas.color_type = LCUI_COLOR_TYPE_RGB888;
 		break;
 	case 8:
 		ioctl(display.fb.dev_fd, FBIOGETCMAP, &display.fb.cmap);
@@ -468,7 +468,7 @@ static void FBDisplay_InitSurface(void)
 	LCUIMutex_Init(&surface->mutex);
 	LinkedList_Init(&surface->rects);
 	display.surface_count = 0;
-	surface->canvas.color_type = COLOR_TYPE_ARGB;
+	surface->canvas.color_type = LCUI_COLOR_TYPE_ARGB;
 	FBSurface_Resize(surface, display.width, display.height);
 }
 

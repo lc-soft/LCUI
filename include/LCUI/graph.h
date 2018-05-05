@@ -37,21 +37,6 @@ LCUI_BEGIN_HEADER
 #undef RGB
 #endif
 
-/** 色彩模式 */
-enum GraphColorType {
-	COLOR_TYPE_INDEX8,	/**< 8位索引 */
-	COLOR_TYPE_GRAY8,	/**< 8位灰度 */
-	COLOR_TYPE_RGB323,	/**< RGB323 */
-	COLOR_TYPE_ARGB2222,	/**< ARGB2222 */
-	COLOR_TYPE_RGB555,	/**< RGB555 */
-	COLOR_TYPE_RGB565,	/**< RGB565 */
-	COLOR_TYPE_RGB888,	/**< RGB888 */
-	COLOR_TYPE_ARGB8888	/**< RGB8888 */
-};
-
-#define COLOR_TYPE_RGB COLOR_TYPE_RGB888
-#define COLOR_TYPE_ARGB COLOR_TYPE_ARGB8888
-
 /* 将两个像素点的颜色值进行alpha混合 */
 #define _ALPHA_BLEND(__back__ , __fore__, __alpha__)	\
     ((((__fore__-__back__)*(__alpha__))>>8)+__back__)
@@ -108,7 +93,7 @@ enum GraphColorType {
 #define Graph_GetQuote(g) (g)->quote.is_valid ? (g)->quote.source:(g)
 
 #define Graph_SetPixel(G, X, Y, C) 						\
-	if( (G)->color_type == COLOR_TYPE_ARGB ) {				\
+	if( (G)->color_type == LCUI_COLOR_TYPE_ARGB ) {				\
 		(G)->argb[(G)->width*(Y)+(X)] = (C);			\
 	} else {								\
 		(G)->bytes[(G)->bytes_per_row*(Y)+(X)*3] = (C).value>>8;	\
@@ -163,8 +148,8 @@ LCUI_API int Graph_QuoteReadOnly(LCUI_Graph *self,
 /** 判断图像是否有Alpha透明通道 */
 #define Graph_HasAlpha(G) 						\
 	((G)->quote.is_valid ? (					\
-		(G)->quote.source->color_type == COLOR_TYPE_ARGB	\
-	) : ((G)->color_type == COLOR_TYPE_ARGB))
+		(G)->quote.source->color_type == LCUI_COLOR_TYPE_ARGB	\
+	) : ((G)->color_type == LCUI_COLOR_TYPE_ARGB))
 
 /** 判断图像是否有效 */
 #define Graph_IsValid(G)							\

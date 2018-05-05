@@ -305,7 +305,7 @@ LCUI_TextLayer TextLayer_New(void)
 	layer->task.redraw_all = 0;
 	Graph_Init(&layer->canvas);
 	LinkedList_Init(&layer->dirty_rects);
-	layer->canvas.color_type = COLOR_TYPE_ARGB;
+	layer->canvas.color_type = LCUI_COLOR_TYPE_ARGB;
 	TextRowList_InsertNewRow(&layer->text_rows, 0);
 	return layer;
 }

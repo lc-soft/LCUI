@@ -28,7 +28,7 @@ void Graph_DrawHorizLine(LCUI_Graph *graph, LCUI_Color color, int size,
 	if (start.y + size > area.y + area.height) {
 		size = area.y + area.height - start.y;
 	}
-	if (des->color_type == COLOR_TYPE_ARGB) {
+	if (des->color_type == LCUI_COLOR_TYPE_ARGB) {
 		LCUI_ARGB *pPixel, *pRowPixel;
 		pRowPixel = des->argb + start.y*des->width + start.x;
 		for (y = 0; y < size; ++y) {
@@ -85,7 +85,7 @@ LCUI_API void Graph_DrawVertiLine(LCUI_Graph *graph, LCUI_Color color,
 		len = area.y + area.height - start.y;
 	}
 
-	if (des->color_type == COLOR_TYPE_ARGB) {
+	if (des->color_type == LCUI_COLOR_TYPE_ARGB) {
 		LCUI_ARGB *pPixel, *pRowPixel;
 		pRowPixel = des->argb + start.y*des->width + start.x;
 		for (y = 0; y < len; ++y) {

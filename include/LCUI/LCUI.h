@@ -57,6 +57,21 @@ typedef unsigned char LCUI_BOOL;
 typedef unsigned char uchar_t;
 typedef void (*CallBackFunc)(void*,void*);
 
+/** 色彩模式 */
+typedef enum LCUI_ColorType {
+	LCUI_COLOR_TYPE_INDEX8,		/**< 8位索引 */
+	LCUI_COLOR_TYPE_GRAY8,		/**< 8位灰度 */
+	LCUI_COLOR_TYPE_RGB323,		/**< RGB323 */
+	LCUI_COLOR_TYPE_ARGB2222,	/**< ARGB2222 */
+	LCUI_COLOR_TYPE_RGB555,		/**< RGB555 */
+	LCUI_COLOR_TYPE_RGB565,		/**< RGB565 */
+	LCUI_COLOR_TYPE_RGB888,		/**< RGB888 */
+	LCUI_COLOR_TYPE_ARGB8888	/**< RGB8888 */
+} LCUI_ColorType;
+
+#define LCUI_COLOR_TYPE_RGB	LCUI_COLOR_TYPE_RGB888
+#define LCUI_COLOR_TYPE_ARGB	LCUI_COLOR_TYPE_ARGB8888
+
 typedef union LCUI_RGB565_ {
 	short unsigned int value;
 	struct {

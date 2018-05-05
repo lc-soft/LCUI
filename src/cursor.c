@@ -116,7 +116,7 @@ static int LCUICursor_LoadDefualtGraph(LCUI_Graph *buff)
 		Graph_Free(buff);
 	}
 	Graph_Init(buff);
-	buff->color_type = COLOR_TYPE_ARGB;
+	buff->color_type = LCUI_COLOR_TYPE_ARGB;
 	if (Graph_Create(buff, 12, 19) != 0) {
 		return -1;
 	}

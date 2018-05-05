@@ -191,7 +191,7 @@ int LCUI_ReadJPEGHeader(LCUI_ImageReader reader)
 	header->height = cinfo->image_height;
 	header->type = LCUI_JPEG_IMAGE;
 	if (cinfo->jpeg_color_space == JCS_RGB) {
-		header->color_type = COLOR_TYPE_RGB;
+		header->color_type = LCUI_COLOR_TYPE_RGB;
 		header->bit_depth = 24;
 	} else {
 		header->color_type = 0;
@@ -256,7 +256,7 @@ int LCUI_ReadJPEG(LCUI_ImageReader reader, LCUI_Graph *graph)
 	if (cinfo->num_components != 3) {
 		return -ENOSYS;
 	}
-	graph->color_type = COLOR_TYPE_RGB;
+	graph->color_type = LCUI_COLOR_TYPE_RGB;
 	if (0 != Graph_Create(graph, cinfo->output_width,
 			      cinfo->output_height)) {
 		return -ENOMEM;

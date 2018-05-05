@@ -138,10 +138,10 @@ int LCUI_ReadPNGHeader(LCUI_ImageReader reader)
 	reader->header.type = LCUI_PNG_IMAGE;
 	switch (reader->header.color_type) {
 	case PNG_COLOR_TYPE_RGB_ALPHA:
-		reader->header.color_type = COLOR_TYPE_ARGB;
+		reader->header.color_type = LCUI_COLOR_TYPE_ARGB;
 		break;
 	case PNG_COLOR_TYPE_RGB:
-		reader->header.color_type = COLOR_TYPE_RGB;
+		reader->header.color_type = LCUI_COLOR_TYPE_RGB;
 		break;
 	default:
 		reader->header.color_type = 0;
@@ -180,16 +180,16 @@ int LCUI_ReadPNG(LCUI_ImageReader reader, LCUI_Graph *graph)
 	}
 	/* 根据不同的色彩类型进行相应处理 */
 	switch (header->color_type) {
-	case COLOR_TYPE_ARGB:
-		graph->color_type = COLOR_TYPE_ARGB;
+	case LCUI_COLOR_TYPE_ARGB:
+		graph->color_type = LCUI_COLOR_TYPE_ARGB;
 		ret = Graph_Create(graph, header->width, header->height);
 		if (ret != 0) {
 			ret = -ENOMEM;
 			break;
 		}
 		break;
-	case COLOR_TYPE_RGB:
-		graph->color_type = COLOR_TYPE_RGB;
+	case LCUI_COLOR_TYPE_RGB:
+		graph->color_type = LCUI_COLOR_TYPE_RGB;
 		ret = Graph_Create(graph, header->width, header->height);
 		if (ret != 0) {
 			ret = -ENOMEM;
@@ -278,7 +278,7 @@ int LCUI_WritePNGFile(const char *file_name, const LCUI_Graph *graph)
 
 	Graph_GetValidRect(graph, &rect);
 	graph = Graph_GetQuote(graph);
-	if (graph->color_type == COLOR_TYPE_ARGB) {
+	if (graph->color_type == LCUI_COLOR_TYPE_ARGB) {
 		LCUI_ARGB *px_ptr, *px_row_ptr;
 
 		row_size = png_get_rowbytes(png_ptr, info_ptr);

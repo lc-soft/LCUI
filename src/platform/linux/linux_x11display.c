@@ -143,7 +143,7 @@ static void X11Surface_OnResize(LCUI_Surface s, int width, int height)
 	switch (depth) {
 	case 32:
 	case 24:
-		s->fb.color_type = COLOR_TYPE_ARGB;
+		s->fb.color_type = LCUI_COLOR_TYPE_ARGB;
 		break;
 	default:
 		LOG("[x11display] unsupport depth: %d.\n", depth);
@@ -274,7 +274,7 @@ static LCUI_Surface X11Surface_New(void)
 	Graph_Init(&surface->fb);
 	LCUIMutex_Init(&surface->mutex);
 	LinkedList_Init(&surface->rects);
-	surface->fb.color_type = COLOR_TYPE_ARGB;
+	surface->fb.color_type = LCUI_COLOR_TYPE_ARGB;
 	LinkedList_AppendNode(&x11.surfaces, &surface->node);
 	LCUI_PostSimpleTask(X11Surface_OnCreate, surface, NULL);
 	return surface;

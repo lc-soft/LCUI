@@ -47,7 +47,7 @@ void Graph_PrintInfo(LCUI_Graph *graph)
 	LOG("width:%d, ", graph->width);
 	LOG("height:%d, ", graph->height);
 	LOG("opacity:%.2f, ", graph->opacity);
-	LOG("%s\n", graph->color_type == COLOR_TYPE_ARGB ? "RGBA" : "RGB");
+	LOG("%s\n", graph->color_type == LCUI_COLOR_TYPE_ARGB ? "RGBA" : "RGB");
 	if (graph->quote.is_valid) {
 		LOG("graph src:");
 		Graph_PrintInfo(Graph_GetQuote(graph));
@@ -61,7 +61,7 @@ void Graph_Init(LCUI_Graph *graph)
 	graph->quote.top = 0;
 	graph->quote.left = 0;
 	graph->palette = NULL;
-	graph->color_type = COLOR_TYPE_RGB;
+	graph->color_type = LCUI_COLOR_TYPE_RGB;
 	graph->bytes = NULL;
 	graph->opacity = 1.0;
 	graph->mem_size = 0;
@@ -94,17 +94,17 @@ LCUI_Color ARGB(uchar_t a, uchar_t r, uchar_t g, uchar_t b)
 static size_t get_pixel_size(int color_type)
 {
 	switch (color_type) {
-	case COLOR_TYPE_INDEX8:
-	case COLOR_TYPE_GRAY8:
-	case COLOR_TYPE_RGB323:
-	case COLOR_TYPE_ARGB2222:
+	case LCUI_COLOR_TYPE_INDEX8:
+	case LCUI_COLOR_TYPE_GRAY8:
+	case LCUI_COLOR_TYPE_RGB323:
+	case LCUI_COLOR_TYPE_ARGB2222:
 		return 1;
-	case COLOR_TYPE_RGB555:
-	case COLOR_TYPE_RGB565:
+	case LCUI_COLOR_TYPE_RGB555:
+	case LCUI_COLOR_TYPE_RGB565:
 		return 2;
-	case COLOR_TYPE_RGB888:
+	case LCUI_COLOR_TYPE_RGB888:
 		return 3;
-	case COLOR_TYPE_ARGB8888:
+	case LCUI_COLOR_TYPE_ARGB8888:
 	default:break;
 	}
 	return 4;
@@ -161,14 +161,14 @@ void PixelsFormat(const uchar_t *in_pixels, int in_color_type,
 		  size_t pixel_count)
 {
 	switch (in_color_type) {
-	case COLOR_TYPE_ARGB8888:
-		if (out_color_type == COLOR_TYPE_ARGB8888) {
+	case LCUI_COLOR_TYPE_ARGB8888:
+		if (out_color_type == LCUI_COLOR_TYPE_ARGB8888) {
 			return;
 		}
 		PixelsFormatRGB(in_pixels, out_pixels, pixel_count);
 		break;
-	case COLOR_TYPE_RGB888:
-		if (out_color_type == COLOR_TYPE_RGB888) {
+	case LCUI_COLOR_TYPE_RGB888:
+		if (out_color_type == LCUI_COLOR_TYPE_RGB888) {
 			return;
 		}
 		PixelsFormatARGB(in_pixels, out_pixels, pixel_count);
@@ -205,7 +205,7 @@ static int Graph_RGBToARGB(LCUI_Graph *graph)
 	}
 	free(graph->argb);
 	graph->argb = buffer;
-	graph->color_type = COLOR_TYPE_ARGB8888;
+	graph->color_type = LCUI_COLOR_TYPE_ARGB8888;
 	return 0;
 }
 
@@ -387,7 +387,7 @@ static int Graph_ARGBToRGB(LCUI_Graph *graph)
 	}
 	free(graph->argb);
 	graph->bytes = buffer;
-	graph->color_type = COLOR_TYPE_RGB888;
+	graph->color_type = LCUI_COLOR_TYPE_RGB888;
 	graph->bytes_per_pixel = 3;
 	return 0;
 }
@@ -701,16 +701,16 @@ int Graph_SetColorType(LCUI_Graph *graph, int color_type)
 		return -1;
 	}
 	switch (graph->color_type) {
-	case COLOR_TYPE_ARGB8888:
+	case LCUI_COLOR_TYPE_ARGB8888:
 		switch (color_type) {
-		case COLOR_TYPE_RGB888:
+		case LCUI_COLOR_TYPE_RGB888:
 			return Graph_ARGBToRGB(graph);
 		default:break;
 		}
 		break;
-	case COLOR_TYPE_RGB888:
+	case LCUI_COLOR_TYPE_RGB888:
 		switch (color_type) {
-		case COLOR_TYPE_ARGB8888:
+		case LCUI_COLOR_TYPE_ARGB8888:
 			return Graph_RGBToARGB(graph);
 		default:break;
 		}
@@ -862,7 +862,7 @@ int Graph_SetAlphaBits(LCUI_Graph *graph, uchar_t *a, size_t size)
 	if (size > (size_t)(graph->width * graph->height)) {
 		size = (size_t)(graph->width * graph->height);
 	}
-	if (graph->color_type != COLOR_TYPE_ARGB) {
+	if (graph->color_type != LCUI_COLOR_TYPE_ARGB) {
 		return -2;
 	}
 	for (i = 0; i < size; ++i) {
@@ -879,7 +879,7 @@ int Graph_SetRedBits(LCUI_Graph *graph, uchar_t *r, size_t size)
 	if (size > (size_t)(graph->width * graph->height)) {
 		size = (size_t)(graph->width * graph->height);
 	}
-	if (graph->color_type == COLOR_TYPE_ARGB) {
+	if (graph->color_type == LCUI_COLOR_TYPE_ARGB) {
 		for (i = 0; i < size; ++i) {
 			graph->argb[i].r = r[i];
 		}
@@ -901,7 +901,7 @@ int Graph_SetGreenBits(LCUI_Graph *graph, uchar_t *g, size_t size)
 	if (size > (size_t)(graph->width * graph->height)) {
 		size = (size_t)(graph->width * graph->height);
 	}
-	if (graph->color_type == COLOR_TYPE_ARGB) {
+	if (graph->color_type == LCUI_COLOR_TYPE_ARGB) {
 		for (i = 0; i < size; ++i) {
 			graph->argb[i].g = g[i];
 		}
@@ -923,7 +923,7 @@ int Graph_SetBlueBits(LCUI_Graph *graph, uchar_t *b, size_t size)
 	if (size > (size_t)(graph->width * graph->height)) {
 		size = (size_t)(graph->width * graph->height);
 	}
-	if (graph->color_type == COLOR_TYPE_ARGB) {
+	if (graph->color_type == LCUI_COLOR_TYPE_ARGB) {
 		for (i = 0; i < size; ++i) {
 			graph->argb[i].b = b[i];
 		}
@@ -975,7 +975,7 @@ int Graph_Zoom(const LCUI_Graph *graph, LCUI_Graph *buff,
 	if (Graph_Create(buff, width, height) < 0) {
 		return -2;
 	}
-	if (graph->color_type == COLOR_TYPE_ARGB) {
+	if (graph->color_type == LCUI_COLOR_TYPE_ARGB) {
 		LCUI_ARGB *px_src, *px_des, *px_row_src;
 		for (y = 0; y < height; ++y) {
 			src_y = (int)(y * scale_y);
@@ -1020,9 +1020,9 @@ int Graph_Cut(const LCUI_Graph *graph, LCUI_Rect rect,
 		return -3;
 	}
 	switch (graph->color_type) {
-	case COLOR_TYPE_ARGB8888:
+	case LCUI_COLOR_TYPE_ARGB8888:
 		return Graph_CutARGB(graph, rect, buff);
-	case COLOR_TYPE_RGB888:
+	case LCUI_COLOR_TYPE_RGB888:
 		return Graph_CutRGB(graph, rect, buff);
 	default:break;
 	}
@@ -1033,9 +1033,9 @@ int Graph_HorizFlip(const LCUI_Graph *graph, LCUI_Graph *buff)
 {
 
 	switch (graph->color_type) {
-	case COLOR_TYPE_RGB888:
+	case LCUI_COLOR_TYPE_RGB888:
 		return Graph_HorizFlipRGB(graph, buff);
-	case COLOR_TYPE_ARGB8888:
+	case LCUI_COLOR_TYPE_ARGB8888:
 		return Graph_HorizFlipARGB(graph, buff);
 	default:break;
 	}
@@ -1045,9 +1045,9 @@ int Graph_HorizFlip(const LCUI_Graph *graph, LCUI_Graph *buff)
 int Graph_VertiFlip(const LCUI_Graph *graph, LCUI_Graph *buff)
 {
 	switch (graph->color_type) {
-	case COLOR_TYPE_RGB888:
+	case LCUI_COLOR_TYPE_RGB888:
 		return Graph_VertiFlipRGB(graph, buff);
-	case COLOR_TYPE_ARGB8888:
+	case LCUI_COLOR_TYPE_ARGB8888:
 		return Graph_VertiFlipARGB(graph, buff);
 	default:break;
 	}
@@ -1066,9 +1066,9 @@ int Graph_FillRect(LCUI_Graph *graph, LCUI_Color color,
 		rect2.height = graph->height;
 	}
 	switch (graph->color_type) {
-	case COLOR_TYPE_RGB888:
+	case LCUI_COLOR_TYPE_RGB888:
 		return Graph_FillRectRGB(graph, color, rect2);
-	case COLOR_TYPE_ARGB8888:
+	case LCUI_COLOR_TYPE_ARGB8888:
 		return Graph_FillRectARGB(graph, color, rect2, with_alpha);
 	default:break;
 	}
@@ -1157,15 +1157,15 @@ int Graph_Mix(LCUI_Graph *back, const LCUI_Graph *fore,
 	fore = Graph_GetQuote(fore);
 	back = Graph_GetQuote(back);
 	switch (fore->color_type) {
-	case COLOR_TYPE_RGB888:
-		if (back->color_type == COLOR_TYPE_RGB888) {
+	case LCUI_COLOR_TYPE_RGB888:
+		if (back->color_type == LCUI_COLOR_TYPE_RGB888) {
 			mixer = Graph_ReplaceRGB;
 		} else {
 			mixer = Graph_ReplaceToARGB;
 		}
 		break;
-	case COLOR_TYPE_ARGB8888:
-		if (back->color_type == COLOR_TYPE_RGB888) {
+	case LCUI_COLOR_TYPE_ARGB8888:
+		if (back->color_type == LCUI_COLOR_TYPE_RGB888) {
 			mixer = Graph_MixARGBToRGB;
 		} else {
 			if (with_alpha) {
@@ -1207,10 +1207,10 @@ int Graph_Replace(LCUI_Graph *back, const LCUI_Graph *fore, int left, int top)
 	fore = Graph_GetQuote(fore);
 	back = Graph_GetQuote(back);
 	switch (fore->color_type) {
-	case COLOR_TYPE_RGB888:
+	case LCUI_COLOR_TYPE_RGB888:
 		Graph_ReplaceRGB(back, write_rect, fore, left, top);
 		break;
-	case COLOR_TYPE_ARGB8888:
+	case LCUI_COLOR_TYPE_ARGB8888:
 		Graph_ReplaceARGB(back, write_rect, fore, left, top);
 	default:break;
 	}

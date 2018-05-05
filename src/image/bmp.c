@@ -114,7 +114,7 @@ int LCUI_ReadBMPHeader(LCUI_ImageReader reader)
 	reader->header.height = info->height;
 	reader->header.type = LCUI_BMP_IMAGE;
 	if (info->bits == 24) {
-		reader->header.color_type = COLOR_TYPE_RGB;
+		reader->header.color_type = LCUI_COLOR_TYPE_RGB;
 		reader->header.bit_depth = 24;
 	}
 	return 0;
