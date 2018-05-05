@@ -71,19 +71,6 @@ void Graph_Init(LCUI_Graph *graph)
 	graph->bytes_per_row = 0;
 }
 
-LCUI_Graph *Graph_New(void)
-{
-	LCUI_Graph *g = (LCUI_Graph*)malloc(sizeof(LCUI_Graph));
-	Graph_Init(g);
-	return g;
-}
-
-void Graph_Delete(LCUI_Graph *graph)
-{
-	Graph_Free(graph);
-	free(graph);
-}
-
 LCUI_Color RGB(uchar_t r, uchar_t g, uchar_t b)
 {
 	LCUI_Color color;
@@ -125,9 +112,9 @@ static size_t get_pixel_size(int color_type)
 
 /*----------------------------------- RGB ----------------------------------*/
 
-static void Pixels_ARGBFormatToRGB(const uchar_t *in_pixels,
-				   uchar_t *out_pixels,
-				   size_t pixel_count)
+static void PixelsFormatRGB(const uchar_t *in_pixels,
+			    uchar_t *out_pixels,
+			    size_t pixel_count)
 {
 	const LCUI_ARGB8888 *p_px, *p_end_px;
 	LCUI_ARGB8888 *p_out_px;
@@ -150,9 +137,9 @@ static void Pixels_ARGBFormatToRGB(const uchar_t *in_pixels,
 	*p_out_byte++ = p_px->red;
 }
 
-static void Pixels_RGBFormatToARGB(const uchar_t *in_pixels,
-				   uchar_t *out_pixels,
-				   size_t pixel_count)
+static void PixelsFormatARGB(const uchar_t *in_pixels,
+			     uchar_t *out_pixels,
+			     size_t pixel_count)
 {
 	LCUI_ARGB8888 *p_px, *p_end_px;
 	const uchar_t *p_in_byte;
@@ -178,13 +165,13 @@ void PixelsFormat(const uchar_t *in_pixels, int in_color_type,
 		if (out_color_type == COLOR_TYPE_ARGB8888) {
 			return;
 		}
-		Pixels_ARGBFormatToRGB(in_pixels, out_pixels, pixel_count);
+		PixelsFormatRGB(in_pixels, out_pixels, pixel_count);
 		break;
 	case COLOR_TYPE_RGB888:
 		if (out_color_type == COLOR_TYPE_RGB888) {
 			return;
 		}
-		Pixels_RGBFormatToARGB(in_pixels, out_pixels, pixel_count);
+		PixelsFormatARGB(in_pixels, out_pixels, pixel_count);
 		break;
 	default: break;
 	}
@@ -244,8 +231,8 @@ static int Graph_CutRGB(const LCUI_Graph *graph, LCUI_Rect rect,
 	return 0;
 }
 
-static void Graph_ARGBReplaceRGB(LCUI_Graph *des, LCUI_Rect des_rect,
-				 const LCUI_Graph *src, int src_x, int src_y)
+static void Graph_ReplaceToARGB(LCUI_Graph *des, LCUI_Rect des_rect,
+				const LCUI_Graph *src, int src_x, int src_y)
 {
 	int y;
 	uchar_t *byte_row_des, *byte_row_src;
@@ -263,15 +250,15 @@ static void Graph_ARGBReplaceRGB(LCUI_Graph *des, LCUI_Rect des_rect,
 	}
 }
 
-static void Graph_RGBReplaceRGB(LCUI_Graph *des, LCUI_Rect des_rect,
-				const LCUI_Graph *src, int src_x, int src_y)
+static void Graph_ReplaceRGB(LCUI_Graph *des, LCUI_Rect des_rect,
+			     const LCUI_Graph *src, int src_x, int src_y)
 {
 	int y;
 	uchar_t *byte_row_des, *byte_row_src;
 	byte_row_src = src->bytes + src_y * src->bytes_per_row;
 	byte_row_des = des->bytes + des_rect.y * des->bytes_per_row;
 	byte_row_src += src_x * src->bytes_per_pixel;
-	byte_row_des += des_rect.x* src->bytes_per_pixel;
+	byte_row_des += des_rect.x * src->bytes_per_pixel;
 	for (y = 0; y < des_rect.height; ++y) {
 		memcpy(byte_row_des, byte_row_src, des->bytes_per_row);
 		byte_row_src += src->bytes_per_row;
@@ -428,8 +415,8 @@ static int Graph_CutARGB(const LCUI_Graph *graph, LCUI_Rect rect,
 	return 0;
 }
 
-static void Graph_ARGBMixARGB(LCUI_Graph *dst, LCUI_Rect des_rect,
-			      const LCUI_Graph *src, int src_x, int src_y)
+static void Graph_MixARGBWithAlpha(LCUI_Graph *dst, LCUI_Rect des_rect,
+				   const LCUI_Graph *src, int src_x, int src_y)
 {
 	int x, y;
 	LCUI_ARGB *px_src, *px_dst;
@@ -495,8 +482,8 @@ mix_with_opacity:
 	}
 }
 
-static void Graph_ARGBMixARGB2(LCUI_Graph *dest, LCUI_Rect des_rect,
-			       const LCUI_Graph *src, int src_x, int src_y)
+static void Graph_MixARGB(LCUI_Graph *dest, LCUI_Rect des_rect,
+			  const LCUI_Graph *src, int src_x, int src_y)
 {
 	int x, y;
 	uchar_t a;
@@ -535,8 +522,8 @@ mix_with_opacity:
 	}
 }
 
-static void Graph_RGBMixARGB(LCUI_Graph *des, LCUI_Rect des_rect,
-			     const LCUI_Graph *src, int src_x, int src_y)
+static void Graph_MixARGBToRGB(LCUI_Graph *des, LCUI_Rect des_rect,
+			       const LCUI_Graph *src, int src_x, int src_y)
 {
 	int x, y;
 	uchar_t a;
@@ -584,31 +571,31 @@ mix_with_opacity:
 	}
 }
 
-static int Graph_ARGBReplaceARGB(LCUI_Graph *des, LCUI_Rect des_rect,
-				 const LCUI_Graph *src, int src_x, int src_y)
+static int Graph_ReplaceARGB(LCUI_Graph *des, LCUI_Rect des_rect,
+			     const LCUI_Graph *src, int src_x, int src_y)
 {
 	int x, y, row_size;
 	LCUI_ARGB *px_row_src, *px_row_des, *px_src, *px_des;
-	px_row_src = src->argb + src_y*src->width + src_x;
-	px_row_des = des->argb + des_rect.y*des->width + des_rect.x;
-	if (src->opacity < 1.0) {
+	px_row_src = src->argb + src_y * src->width + src_x;
+	px_row_des = des->argb + des_rect.y * des->width + des_rect.x;
+	if (src->opacity - 1.0f < 0.01f) {
+		row_size = sizeof(LCUI_ARGB) * des_rect.width;
 		for (y = 0; y < des_rect.height; ++y) {
-			px_src = px_row_src;
-			px_des = px_row_des;
-			for (x = 0; x < des_rect.width; ++x) {
-				px_des->b = px_src->b;
-				px_des->g = px_src->g;
-				px_des->r = px_src->r;
-				px_des->a = (uchar_t)(src->opacity*px_src->a);
-			}
+			memcpy(px_row_des, px_row_src, row_size);
 			px_row_src += src->width;
 			px_row_des += des->width;
 		}
 		return 0;
 	}
-	row_size = sizeof(LCUI_ARGB)*des_rect.width;
 	for (y = 0; y < des_rect.height; ++y) {
-		memcpy(px_row_des, px_row_src, row_size);
+		px_src = px_row_src;
+		px_des = px_row_des;
+		for (x = 0; x < des_rect.width; ++x) {
+			px_des->b = px_src->b;
+			px_des->g = px_src->g;
+			px_des->r = px_src->r;
+			px_des->a = (uchar_t)(src->opacity * px_src->a);
+		}
 		px_row_src += src->width;
 		px_row_des += des->width;
 	}
@@ -633,8 +620,8 @@ static int Graph_HorizFlipARGB(const LCUI_Graph *graph, LCUI_Graph *buff)
 	}
 
 	for (y = 0; y < rect.height; ++y) {
-		pixel_des = buff->argb + y*buff->width;
-		pixel_src = graph->argb + (rect.y + y)*graph->width;
+		pixel_des = buff->argb + y * buff->width;
+		pixel_src = graph->argb + (rect.y + y) * graph->width;
 		pixel_src += rect.x + rect.width - 1;
 		for (x = 0; x < rect.width; ++x) {
 			*pixel_des++ = *pixel_src--;
@@ -1172,19 +1159,19 @@ int Graph_Mix(LCUI_Graph *back, const LCUI_Graph *fore,
 	switch (fore->color_type) {
 	case COLOR_TYPE_RGB888:
 		if (back->color_type == COLOR_TYPE_RGB888) {
-			mixer = Graph_RGBReplaceRGB;
+			mixer = Graph_ReplaceRGB;
 		} else {
-			mixer = Graph_ARGBReplaceRGB;
+			mixer = Graph_ReplaceToARGB;
 		}
 		break;
 	case COLOR_TYPE_ARGB8888:
 		if (back->color_type == COLOR_TYPE_RGB888) {
-			mixer = Graph_RGBMixARGB;
+			mixer = Graph_MixARGBToRGB;
 		} else {
 			if (with_alpha) {
-				mixer = Graph_ARGBMixARGB;
+				mixer = Graph_MixARGBWithAlpha;
 			} else {
-				mixer = Graph_ARGBMixARGB2;
+				mixer = Graph_MixARGB;
 			}
 		}
 	default:break;
@@ -1221,10 +1208,10 @@ int Graph_Replace(LCUI_Graph *back, const LCUI_Graph *fore, int left, int top)
 	back = Graph_GetQuote(back);
 	switch (fore->color_type) {
 	case COLOR_TYPE_RGB888:
-		Graph_RGBReplaceRGB(back, write_rect, fore, left, top);
+		Graph_ReplaceRGB(back, write_rect, fore, left, top);
 		break;
 	case COLOR_TYPE_ARGB8888:
-		Graph_ARGBReplaceARGB(back, write_rect, fore, left, top);
+		Graph_ReplaceARGB(back, write_rect, fore, left, top);
 	default:break;
 	}
 	return -1;
