@@ -28,7 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -50,7 +49,7 @@ typedef struct ImageRefRec_ {
 } ImageRefRec, *ImageRef;
 
 struct LCUI_WidgetBackgroundModule {
-	LCUI_BOOL is_inited;
+	LCUI_BOOL active;
 	DictType dtype;
 	Dict *images;
 	RBTree refs;
@@ -162,7 +161,7 @@ static void AsyncLoadImage(LCUI_Widget widget, const char *path)
 	LCUI_TaskRec task = { 0 };
 	LCUI_Style s = &widget->style->sheet[key_background_image];
 
-	if (!self.is_inited) {
+	if (!self.active) {
 		return;
 	}
 	if (Widget_CheckStyleType(widget, key_background_image, string)) {
@@ -197,7 +196,7 @@ void LCUIWidget_InitImageLoader(void)
 	self.images = Dict_Create(&self.dtype, NULL);
 	RBTree_OnCompare(&self.refs, OnCompareWidget);
 	RBTree_OnDestroy(&self.refs, free);
-	self.is_inited = TRUE;
+	self.active = TRUE;
 }
 
 void LCUIWidget_FreeImageLoader(void)
@@ -205,7 +204,7 @@ void LCUIWidget_FreeImageLoader(void)
 	Dict_Release(self.images);
 	RBTree_Destroy(&self.refs);
 	self.images = NULL;
-	self.is_inited = FALSE;
+	self.active = FALSE;
 }
 
 void Widget_InitBackground(LCUI_Widget w)

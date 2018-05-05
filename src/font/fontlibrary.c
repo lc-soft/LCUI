@@ -37,8 +37,10 @@
 #include <LCUI/graph.h>
 #include <LCUI/font.h>
 
-#define FONT_CACHE_SIZE 32
-#define FONT_CACHE_MAX_SIZE 1024
+ /* clang-format off */
+
+#define FONT_CACHE_SIZE		32
+#define FONT_CACHE_MAX_SIZE	1024
 
 /**
  * 库中缓存的字体位图是分组存放的，共有三级分组，分别为：
@@ -59,8 +61,6 @@ typedef struct LCUI_FontCacheRec {
 	LCUI_Font fonts[FONT_CACHE_SIZE];
 } LCUI_FontCacheRec, *LCUI_FontCache;
 
-/* clang-format off */
-
 /** 字体字族索引结点 */
 typedef struct LCUI_FontFamilyNodeRec_ {
 	char *family_name;		/**< 字体的字族名称  */
@@ -76,7 +76,7 @@ typedef struct LCUI_FontPathNode {
 static struct LCUI_FontLibraryModule {
 	int count;			/**< 计数器，主要用于为字体信息生成标识号 */
 	int font_cache_num;		/**< 字体信息缓存区的数量 */
-	LCUI_BOOL is_inited;		/**< 标记，指示数据库是否初始化 */
+	LCUI_BOOL active;		/**< 标记，指示数据库是否初始化 */
 	Dict *font_families;		/**< 字族信息库，以字族名称索引字体信息 */
 	DictType font_families_type;	/**< 字族信息库的字典类型数据 */
 	RBTree bitmap_cache;		/**< 字体位图缓存区 */
@@ -290,7 +290,7 @@ int LCUIFont_Add(LCUI_Font font)
 
 LCUI_Font LCUIFont_GetById(int id)
 {
-	if (!fontlib.is_inited) {
+	if (!fontlib.active) {
 		return NULL;
 	}
 	if (id < 0 || id >= fontlib.font_cache_num * FONT_CACHE_SIZE) {
@@ -479,7 +479,7 @@ int LCUIFont_GetId(const char *family_name, LCUI_FontStyle style,
 	LCUI_FontStyleNode snode;
 	LCUI_FontFamilyNode fnode;
 
-	if (!fontlib.is_inited) {
+	if (!fontlib.active) {
 		return -1;
 	}
 	fnode = SelectFontFamliy(family_name);
@@ -525,7 +525,7 @@ LCUI_FontBitmap *LCUIFont_AddBitmap(wchar_t ch, int font_id, int size,
 	LCUI_FontBitmap *bmp_cache;
 	RBTree *tree_font, *tree_bmp;
 
-	if (!fontlib.is_inited) {
+	if (!fontlib.active) {
 		return NULL;
 	}
 	/* 获取字符的字体信息集 */
@@ -576,7 +576,7 @@ int LCUIFont_GetBitmap(wchar_t ch, int font_id, int size,
 	LCUI_FontBitmap bmp_cache;
 
 	*bmp = NULL;
-	if (!fontlib.is_inited) {
+	if (!fontlib.active) {
 		return -2;
 	}
 	if (font_id <= 0) {
@@ -881,7 +881,7 @@ void LCUI_InitFontLibrary(void)
 	fontlib.font_families_type.valDestructor = DestroyFontFamilyNode;
 	fontlib.font_families = Dict_Create(&fontlib.font_families_type, NULL);
 	RBTree_OnDestroy(&fontlib.bitmap_cache, DestroyTreeNode);
-	fontlib.is_inited = TRUE;
+	fontlib.active = TRUE;
 
 	/* 先初始化内置的字体引擎 */
 	fontlib.engine = &fontlib.engines[0];
@@ -916,10 +916,10 @@ void LCUI_InitFontLibrary(void)
 
 void LCUI_FreeFontLibrary(void)
 {
-	if (!fontlib.is_inited) {
+	if (!fontlib.active) {
 		return;
 	}
-	fontlib.is_inited = FALSE;
+	fontlib.active = FALSE;
 	while (fontlib.font_cache_num > 0) {
 		--fontlib.font_cache_num;
 		DeleteFontCache(fontlib.font_cache[fontlib.font_cache_num]);

@@ -78,7 +78,7 @@ struct XMLParserContextRec_ {
 };
 
 static struct ModuleContext {
-	LCUI_BOOL is_inited;
+	LCUI_BOOL active;
 	RBTree parsers;
 } self;
 
@@ -235,7 +235,7 @@ static void LCUIBuilder_Init(void)
 		p = &parser_list[i];
 		RBTree_CustomInsert(&self.parsers, p->name, p);
 	}
-	self.is_inited = TRUE;
+	self.active = TRUE;
 }
 
 /** 解析 xml 文档结点 */
@@ -299,7 +299,7 @@ LCUI_Widget LCUIBuilder_LoadString(const char *str, int size)
 		LOG("[builder] error root node name: %s\n", cur->name);
 		goto FAILED;
 	}
-	if (!self.is_inited) {
+	if (!self.active) {
 		LCUIBuilder_Init();
 	}
 	ParseNode(&ctx, cur->children);
@@ -335,7 +335,7 @@ LCUI_Widget LCUIBuilder_LoadFile(const char *filepath)
 		LOG("[builder] error root node name: %s\n", cur->name);
 		goto FAILED;
 	}
-	if (!self.is_inited) {
+	if (!self.active) {
 		LCUIBuilder_Init();
 	}
 	ParseNode(&ctx, cur->children);

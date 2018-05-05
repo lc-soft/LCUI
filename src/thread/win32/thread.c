@@ -47,7 +47,7 @@ typedef struct _LCUI_ThreadContextRec_ {
 } LCUI_ThreadContextRec, *LCUI_ThreadContext;
 
 static struct LCUIThreadModule {
-	LCUI_BOOL is_inited;
+	LCUI_BOOL active;
 	LCUI_Mutex mutex;
 	LinkedList threads;
 } self;
@@ -63,10 +63,10 @@ static unsigned __stdcall run_thread(void *arg)
 int LCUIThread_Create(LCUI_Thread *tid, void(*func)(void*), void *arg)
 {
 	LCUI_ThreadContext ctx;
-	if (!self.is_inited) {
+	if (!self.active) {
 		LinkedList_Init(&self.threads);
 		LCUIMutex_Init(&self.mutex);
-		self.is_inited = TRUE;
+		self.active = TRUE;
 	}
 	ctx = NEW(LCUI_ThreadContextRec, 1);
 	if (!ctx) {

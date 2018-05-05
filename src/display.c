@@ -59,7 +59,7 @@ static struct DisplayContext {
 	int mode;			/**< 显示模式 */
 	size_t width, height;		/**< 当前缓存的屏幕尺寸 */
 	LCUI_BOOL show_rect_border;	/**< 是否为重绘的区域显示边框 */
-	LCUI_BOOL is_working;		/**< 标志，指示当前模块是否处于工作状态 */
+	LCUI_BOOL active;		/**< 标志，指示当前模块是否处于工作状态 */
 	LCUI_Thread thread;		/**< 线程，负责画面更新工作 */
 	LinkedList surfaces;		/**< surface 列表 */
 	LinkedList rects;		/**< 无效区域列表 */
@@ -102,7 +102,7 @@ void LCUIDisplay_Update(void)
 	LinkedListNode *node;
 	SurfaceRecord record = NULL;
 
-	if (!display.is_working) {
+	if (!display.active) {
 		return;
 	}
 	LCUICursor_Update();
@@ -137,7 +137,7 @@ size_t LCUIDisplay_Render(void)
 	LinkedListNode *sn, *rn;
 	SurfaceRecord record;
 
-	if (!display.is_working) {
+	if (!display.active) {
 		return 0;
 	}
 	ev.type = LCUI_PAINT;
@@ -180,7 +180,7 @@ size_t LCUIDisplay_Render(void)
 void LCUIDisplay_Present(void)
 {
 	LinkedListNode *sn;
-	if (!display.is_working) {
+	if (!display.active) {
 		return;
 	}
 	for (LinkedList_Each(sn, &display.surfaces)) {
@@ -198,7 +198,7 @@ void LCUIDisplay_Present(void)
 void LCUIDisplay_InvalidateArea(LCUI_Rect *rect)
 {
 	LCUI_Rect area;
-	if (!display.is_working) {
+	if (!display.active) {
 		return;
 	}
 	if (!rect) {
@@ -423,7 +423,7 @@ void LCUIDisplay_SetSize(int width, int height)
 
 int LCUIDisplay_GetWidth(void)
 {
-	if (!display.is_working) {
+	if (!display.active) {
 		return 0;
 	}
 	if (display.mode == LCUI_DMODE_WINDOWED ||
@@ -435,7 +435,7 @@ int LCUIDisplay_GetWidth(void)
 
 int LCUIDisplay_GetHeight(void)
 {
-	if (!display.is_working) {
+	if (!display.active) {
 		return 0;
 	}
 	if (display.mode == LCUI_DMODE_WINDOWED ||
@@ -447,14 +447,14 @@ int LCUIDisplay_GetHeight(void)
 
 void Surface_Close(LCUI_Surface surface)
 {
-	if (display.is_working) {
+	if (display.active) {
 		display.driver->close(surface);
 	}
 }
 
 void Surface_Destroy(LCUI_Surface surface)
 {
-	if (!display.is_working) {
+	if (!display.active) {
 		return;
 	}
 	LinkedListNode *node;
@@ -709,7 +709,7 @@ static void OnMinMaxInfo(LCUI_Event e, void *arg)
 int LCUIDisplay_BindEvent(int event_id, LCUI_EventFunc func, void *arg,
 			  void *data, void(*destroy_data)(void *))
 {
-	if (display.is_working) {
+	if (display.active) {
 		return display.driver->bindEvent(event_id, func, data,
 						 destroy_data);
 	}
@@ -719,13 +719,13 @@ int LCUIDisplay_BindEvent(int event_id, LCUI_EventFunc func, void *arg,
 int LCUI_InitDisplay(LCUI_DisplayDriver driver)
 {
 	LCUI_Widget root;
-	if (display.is_working) {
+	if (display.active) {
 		return -1;
 	}
 	LOG("[display] init ...\n");
 	display.mode = 0;
 	display.driver = driver;
-	display.is_working = TRUE;
+	display.active = TRUE;
 	display.width = DEFAULT_WIDTH;
 	display.height = DEFAULT_HEIGHT;
 	LinkedList_Init(&display.rects);
@@ -754,10 +754,10 @@ int LCUI_InitDisplay(LCUI_DisplayDriver driver)
 /** 停用图形输出模块 */
 int LCUI_FreeDisplay(void)
 {
-	if (!display.is_working) {
+	if (!display.active) {
 		return -1;
 	}
-	display.is_working = FALSE;
+	display.active = FALSE;
 	RectList_Clear(&display.rects);
 	LCUIDisplay_CleanSurfaces();
 	if (display.driver) {

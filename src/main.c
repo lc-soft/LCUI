@@ -77,15 +77,17 @@ typedef struct SysEventPackRec_ {
 	void *arg;
 } SysEventPackRec, *SysEventPack;
 
+/* clang-format off */
+
 /** LCUI 系统相关数据 */
 static struct LCUI_System {
-	int state;                  /**< 状态 */
-	int mode;                   /**< LCUI的运行模式 */
-	int exit_code;              /**< 退出码 */
-	unsigned long int main_tid; /**< 主线程ID */
+	int state;				/**< 状态 */
+	int mode;				/**< LCUI的运行模式 */
+	int exit_code;				/**< 退出码 */
+	unsigned long int main_tid;		/**< 主线程ID */
 	struct {
-		LCUI_EventTrigger trigger; /**< 系统事件容器 */
-		LCUI_Mutex mutex;          /**< 互斥锁 */
+		LCUI_EventTrigger trigger;	/**< 系统事件容器 */
+		LCUI_Mutex mutex;		/**< 互斥锁 */
 	} event;
 } System;
 
@@ -93,30 +95,29 @@ static struct LCUI_System {
 
 /** LCUI 应用程序数据 */
 static struct LCUI_App {
-	LCUI_BOOL active; /**< 是否已经初始化并处于活动状态 */
-	LCUI_Mutex loop_mutex; /**< 互斥锁，确保一次只允许一个线程跑主循环 */
-	LCUI_Cond
-		loop_changed; /**< 条件变量，用于指示当前运行的主循环是否改变 */
-	LCUI_MainLoop loop;    /**< 当前运行的主循环 */
-	LinkedList loops;      /**< 主循环列表 */
-	StepTimer timer;       /**< 渲染循环计数器 */
-	LCUI_AppDriver driver; /**< 程序事件驱动支持 */
-	LCUI_BOOL driver_ready; /**< 事件驱动支持是否已经准备就绪 */
-	LCUI_Worker main_worker;              /**< 主工作线程 */
-	LCUI_Worker workers[LCUI_WORKER_NUM]; /**< 普通工作线程 */
-	int worker_next; /**< 下一个工作线程编号 */
+	LCUI_BOOL active;			/**< 是否已经初始化并处于活动状态 */
+	LCUI_Mutex loop_mutex;			/**< 互斥锁，确保一次只允许一个线程跑主循环 */
+	LCUI_Cond loop_changed;			/**< 条件变量，用于指示当前运行的主循环是否改变 */
+	LCUI_MainLoop loop;			/**< 当前运行的主循环 */
+	LinkedList loops;			/**< 主循环列表 */
+	StepTimer timer;			/**< 渲染循环计数器 */
+	LCUI_AppDriver driver;			/**< 程序事件驱动支持 */
+	LCUI_BOOL driver_ready;			/**< 事件驱动支持是否已经准备就绪 */
+	LCUI_Worker main_worker;		/**< 主工作线程 */
+	LCUI_Worker workers[LCUI_WORKER_NUM];	/**< 普通工作线程 */
+	int worker_next;			/**< 下一个工作线程编号 */
 } MainApp;
+
+/* clang-format on */
 
 /*-------------------------- system event <START> ---------------------------*/
 
-/** 初始化事件模块 */
 static void LCUI_InitEvent(void)
 {
 	LCUIMutex_Init(&System.event.mutex);
 	System.event.trigger = EventTrigger();
 }
 
-/** 停用事件模块并进行清理 */
 static void LCUI_FreeEvent(void)
 {
 	LCUIMutex_Destroy(&System.event.mutex);

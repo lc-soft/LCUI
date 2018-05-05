@@ -96,7 +96,7 @@ typedef struct StyleLinkRec_ {
 } StyleLinkRec, *StyleLink;
 
 static struct {
-	LCUI_BOOL is_inited;
+	LCUI_BOOL active;
 	LCUI_Mutex mutex;		/**< 互斥锁 */
 	LinkedList groups;		/**< 样式组列表 */
 	Dict *cache;			/**< 样式表缓存，以选择器的 hash 值索引 */
@@ -1534,12 +1534,12 @@ void LCUI_InitCSSLibrary(void)
 		LCUI_AddStyleValue(skn->key, skn->name);
 	}
 	library.count = STYLE_KEY_TOTAL;
-	library.is_inited = TRUE;
+	library.active = TRUE;
 }
 
 void LCUI_FreeCSSLibrary(void)
 {
-	library.is_inited = FALSE;
+	library.active = FALSE;
 	LCUI_DestroyStylesheetCache();
 	LCUI_DestroyStyleNameLibrary();
 	LCUI_DestroyStyleValueLibrary();

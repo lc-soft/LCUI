@@ -82,7 +82,7 @@ struct LCUI_SurfaceRec_ {
 
 /** windows 下图形显示功能所需的数据 */
 static struct WIN_Display {
-	LCUI_BOOL is_inited;       /**< 是否已经初始化 */
+	LCUI_BOOL active;       /**< 是否已经初始化 */
 	LinkedList surfaces;       /**< surface 记录 */
 	LCUI_EventTrigger trigger; /**< 事件触发器 */
 } win;
@@ -546,13 +546,13 @@ LCUI_DisplayDriver LCUI_CreateWinDisplay(void)
 	LCUI_BindSysEvent(WM_GETMINMAXINFO, OnWMGetMinMaxInfo, NULL, NULL);
 	LinkedList_Init(&win.surfaces);
 	win.trigger = EventTrigger();
-	win.is_inited = TRUE;
+	win.active = TRUE;
 	return driver;
 }
 
 void LCUI_DestroyWinDisplay(LCUI_DisplayDriver driver)
 {
-	win.is_inited = FALSE;
+	win.active = FALSE;
 	LCUI_UnbindSysEvent(WM_SIZE, OnWMSize);
 	LCUI_UnbindSysEvent(WM_PAINT, OnWMPaint);
 	LCUI_UnbindSysEvent(WM_GETMINMAXINFO, OnWMGetMinMaxInfo);
