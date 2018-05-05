@@ -27,6 +27,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* FIXME: redesign the input method engine
+ * The current design used is not robust and needs to be redesigned with
+ * reference to other complete input method engine frameworks.
+ */
+
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>

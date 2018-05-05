@@ -42,28 +42,31 @@
 #include LCUI_DISPLAY_H
 #endif
 
-#define DEFAULT_WIDTH 800
-#define DEFAULT_HEIGHT 600
+/* clang-format off */
 
-/** surface 记录 */
+#define DEFAULT_WIDTH	800
+#define DEFAULT_HEIGHT	600
+
 typedef struct SurfaceRecordRec_ {
-	LCUI_BOOL rendered;   /**< 是否已渲染了新内容 */
-	LinkedList rects;     /**< 需重绘的区域列表 */
-	LCUI_Surface surface; /**< surface */
-	LCUI_Widget widget;   /**< surface 所映射的 widget */
+	LCUI_BOOL rendered;		/**< whether new content has been rendered */
+	LinkedList rects;		/**< rectangles to be render */
+	LCUI_Surface surface;		/**< target surface */
+	LCUI_Widget widget;		/**< target widget */
 } SurfaceRecordRec, *SurfaceRecord;
 
 /** 图形显示功能的上下文数据 */
 static struct DisplayContext {
-	int mode;                   /**< 显示模式 */
-	size_t width, height;       /**< 当前缓存的屏幕尺寸 */
-	LCUI_BOOL show_rect_border; /**< 是否为重绘的区域显示边框 */
-	LCUI_BOOL is_working; /**< 标志，指示当前模块是否处于工作状态 */
-	LCUI_Thread thread;  /**< 线程，负责画面更新工作 */
-	LinkedList surfaces; /**< surface 列表 */
-	LinkedList rects;    /**< 无效区域列表 */
+	int mode;			/**< 显示模式 */
+	size_t width, height;		/**< 当前缓存的屏幕尺寸 */
+	LCUI_BOOL show_rect_border;	/**< 是否为重绘的区域显示边框 */
+	LCUI_BOOL is_working;		/**< 标志，指示当前模块是否处于工作状态 */
+	LCUI_Thread thread;		/**< 线程，负责画面更新工作 */
+	LinkedList surfaces;		/**< surface 列表 */
+	LinkedList rects;		/**< 无效区域列表 */
 	LCUI_DisplayDriver driver;
 } display;
+
+/* clang-format on */
 
 #define LCUIDisplay_CleanSurfaces() \
 	LinkedList_Clear(&display.surfaces, OnDestroySurfaceRecord)
@@ -339,6 +342,11 @@ static int LCUIDisplay_FullScreen(void)
 	LCUIDisplay_SetSize(display.width, display.height);
 	return 0;
 }
+
+/* FIXME: improve the seamless display mode
+ * the seamless display mode has not been updated for a long time, we not
+ * sure if it can work.
+ */
 
 static int LCUIDisplay_Seamless(void)
 {

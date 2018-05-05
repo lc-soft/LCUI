@@ -75,6 +75,7 @@ void LCUIRectF_ToRect(const LCUI_RectF *rectf,
 	rect->height = iround(rectf->height * scale);
 }
 
+/* FIXME: need new shorter name */
 void LCUIRect_GetCutArea(int box_w, int box_h,
 			 LCUI_Rect rect, LCUI_Rect *cut)
 {
@@ -82,7 +83,6 @@ void LCUIRect_GetCutArea(int box_w, int box_h,
 	cut->y = 0;
 	cut->width = rect.width;
 	cut->height = rect.height;
-	/* 获取需裁剪的区域 */
 	if (rect.x < 0) {
 		cut->width += rect.x;
 		cut->x = 0 - rect.x;
@@ -100,6 +100,7 @@ void LCUIRect_GetCutArea(int box_w, int box_h,
 	}
 }
 
+/* FIXME: need new shorter name */
 void LCUIRect_ValidateArea(LCUI_Rect *rect, int box_w, int box_h)
 {
 	if (rect->x < 0) {
@@ -154,6 +155,7 @@ void LCUIRectF_ValidateArea(LCUI_RectF *rect, float box_w, float box_h)
 	}
 }
 
+/* FIXME: need new shorter name */
 LCUI_BOOL LCUIRect_IsCoverRect(LCUI_Rect *rect1, LCUI_Rect *rect2)
 {
 	if (rect1->x > rect2->x) {
@@ -177,6 +179,7 @@ LCUI_BOOL LCUIRect_IsCoverRect(LCUI_Rect *rect1, LCUI_Rect *rect2)
 	return TRUE;
 }
 
+/* FIXME: need new shorter name */
 LCUI_BOOL LCUIRect_GetOverlayRect(const LCUI_Rect *a,
 				  const LCUI_Rect *b,
 				  LCUI_Rect *out)
@@ -281,6 +284,7 @@ void LCUIRect_MergeRect(LCUI_Rect *big, LCUI_Rect *a, LCUI_Rect *b)
 	}
 }
 
+/* FIXME: need new shorter name */
 void LCUIRect_CutFourRect(LCUI_Rect *rect1, LCUI_Rect *rect2,
 			  LCUI_Rect rects[4])
 {
