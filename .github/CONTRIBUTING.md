@@ -112,6 +112,16 @@ Samples: (even more [samples](https://github.com/lc-soft/LCUI/commits/master))
 docs(changelog): update change log to beta.1
 ```
 
+Use this format, we can easily filter out commits that we do not want to see, for example:
+
+``` shell
+# show commits that contain new features
+git log --pretty=format:"%h %ad %s %d" --date=short --grep "^feat"
+
+# show commits that contain functional code changes (including features, bug fixes, refactorings and improvements)
+git log --pretty=format:"%h %ad %s %d" --date=short --grep "^\(feat\|fix\|refactor\|perf\)"
+```
+
 ### Revert
 
 If the commit reverts a previous commit, it should begin with `revert: `, followed by the header of the reverted commit. In the body it should say: `This reverts commit <hash>.`, where the hash is the SHA of the commit being reverted.
@@ -158,7 +168,7 @@ reference GitHub issues that this commit **Closes**.
 
 As a pure community-driven project without major corporate backing, we also welcome financial contributions via Patreon or OpenCollective.
 
-- [Become a backer or sponsor on Patreon](https://www.patreon.com/lc-soft)
+- [Become a backer or sponsor on Patreon](https://www.patreon.com/lcsoft)
 - [Become a backer or sponsor on OpenCollective](https://opencollective.com/LCUI)
 
 **What's the difference between Patreon and OpenCollective?**
