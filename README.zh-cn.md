@@ -73,8 +73,7 @@ LCUI 采用的开源许可证是 [MIT](http://opensource.org/licenses/MIT)。
 ## 文档
 
 - 在线教程：[https://lcui.lc-soft.io/guide/](https://lcui.lc-soft.io/guide/)
-- 更新日志：[docs/CHANGES.zh-cn.md](docs/CHANGES.zh-cn.md)
-- 常见问题：[docs/FAQ.zh-cn.md](docs/FAQ.zh-cn.md)
+- 更新日志：[CHANGELOG.zh-cn.md](CHANGELOG.zh-cn.md)
 
 目前还没有 API 参考文档，你可以参考头文件、源代码、示例程序以及作者开发过的相关程序来了解基本用法。
 
