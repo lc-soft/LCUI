@@ -1,6 +1,6 @@
 {
   "name": "lcui",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "description": "A small C library for building user interfaces with C, XML and CSS.",
   "main": "index.js",
   "directories": {
