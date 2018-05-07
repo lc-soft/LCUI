@@ -1,5 +1,19 @@
 # LCUI的更新记录
 
+## 1.0.0 Beta 3 (2018-05-08)
+
+### 问题修复
+
+* **font:** 因字体缓存位置计算错误而导致的 DeleteFont() 段错误 ([5465c6b](https://github.com/lc-soft/LCUI/commit/5465c6b))
+* **timer:** 定时器线程在被创建后可能会立刻退出 ([0b01f88](https://github.com/lc-soft/LCUI/commit/0b01f88))
+* **util:** 在 Unix 系统下编译会报错：'struct dirent' has no member named 'd_reclen' ([#141](https://github.com/lc-soft/LCUI/issues/141)) ([0416c42](https://github.com/lc-soft/LCUI/commit/0416c42))
+
+### 新特性
+
+* **platform:** 添加 linux 平台的帧缓存（FrameBuffer）驱动 ([6015838](https://github.com/lc-soft/LCUI/commit/6015838))
+* **platform:** 添加 linux 平台的键盘驱动 ([ad3348e](https://github.com/lc-soft/LCUI/commit/ad3348e))
+* **platform:** 添加 linux 平台的鼠标驱动 ([0ff7b70](https://github.com/lc-soft/LCUI/commit/0ff7b70))
+
 ## 1.0.0 Beta 2 (2018-03-18)
 
 ### 问题修复
