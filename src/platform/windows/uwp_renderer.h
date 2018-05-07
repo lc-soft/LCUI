@@ -2,7 +2,7 @@
  * uwp_renderer.h -- UWP display support for LCUI.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -40,26 +40,24 @@
 #include "Common/StepTimer.h"
 
 namespace LCUICore {
+	class Renderer {
+	public:
+		Renderer(const std::shared_ptr<DX::DeviceResources>& deviceResources);
+		void CreateDeviceDependentResources();
+		void CreateWindowSizeDependentResources();
+		void ReleaseDeviceDependentResources();
+		void Update(DX::StepTimer const& timer);
+		void Render();
+		void SwapFrames();
+		bool m_frameSwapable;
+		D2D1_SIZE_U m_frameSize;
 
-class Renderer {
-public:
-	Renderer( const std::shared_ptr<DX::DeviceResources>& deviceResources );
-	void CreateDeviceDependentResources();
-	void CreateWindowSizeDependentResources();
-	void ReleaseDeviceDependentResources();
-	void Update( DX::StepTimer const& timer );
-	void Render();
-	void SwapFrames();
-	bool m_frameSwapable;
-	D2D1_SIZE_U m_frameSize;
-
-private:
-	std::shared_ptr<DX::DeviceResources> m_deviceResources;
-	Microsoft::WRL::ComPtr<ID2D1DrawingStateBlock1> m_stateBlock;
-	Microsoft::WRL::ComPtr<ID2D1Bitmap1> m_bmp;
-	Microsoft::WRL::ComPtr<ID2D1Bitmap1> m_backBmp;
-};
-
+	private:
+		std::shared_ptr<DX::DeviceResources> m_deviceResources;
+		Microsoft::WRL::ComPtr<ID2D1DrawingStateBlock1> m_stateBlock;
+		Microsoft::WRL::ComPtr<ID2D1Bitmap1> m_bmp;
+		Microsoft::WRL::ComPtr<ID2D1Bitmap1> m_backBmp;
+	};
 }
 
-LCUI_DisplayDriver LCUI_CreateUWPDisplay( void );
+LCUI_DisplayDriver LCUI_CreateUWPDisplay(void);

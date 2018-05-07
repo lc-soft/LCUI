@@ -2,7 +2,7 @@
  * windows_keyboard.c -- keyboard support for windows platform.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -35,12 +35,12 @@
 #include LCUI_EVENTS_H
 #include LCUI_KEYBOARD_H
 
-static void OnKeyboardMessage( LCUI_Event ev, void *arg )
+static void OnKeyboardMessage(LCUI_Event ev, void *arg)
 {
 	MSG* msg = arg;
 	static POINT mouse_pos;
 	LCUI_SysEventRec sys_ev;
-	switch( msg->message ) {
+	switch (msg->message) {
 	case WM_KEYDOWN:
 		sys_ev.type = LCUI_KEYDOWN;
 		sys_ev.key.code = msg->wParam;
@@ -51,19 +51,19 @@ static void OnKeyboardMessage( LCUI_Event ev, void *arg )
 		break;
 	default: return;
 	}
-	LCUI_TriggerEvent( &sys_ev, NULL );
+	LCUI_TriggerEvent(&sys_ev, NULL);
 }
 
-void LCUI_InitWinKeyboard( void )
+void LCUI_InitWinKeyboard(void)
 {
-	LCUI_BindSysEvent( WM_KEYDOWN, OnKeyboardMessage, NULL, NULL );
-	LCUI_BindSysEvent( WM_KEYUP, OnKeyboardMessage, NULL, NULL );
+	LCUI_BindSysEvent(WM_KEYDOWN, OnKeyboardMessage, NULL, NULL);
+	LCUI_BindSysEvent(WM_KEYUP, OnKeyboardMessage, NULL, NULL);
 }
 
-void LCUI_ExitWinKeyboard( void )
+void LCUI_FreeWinKeyboard(void)
 {
-	LCUI_UnbindSysEvent( WM_KEYDOWN, OnKeyboardMessage );
-	LCUI_UnbindSysEvent( WM_KEYUP, OnKeyboardMessage );
+	LCUI_UnbindSysEvent(WM_KEYDOWN, OnKeyboardMessage);
+	LCUI_UnbindSysEvent(WM_KEYUP, OnKeyboardMessage);
 }
 
 #endif

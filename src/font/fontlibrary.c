@@ -2,7 +2,7 @@
  * fontlibrary.c -- The font info and font bitmap cache module.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -28,7 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,7 +37,10 @@
 #include <LCUI/graph.h>
 #include <LCUI/font.h>
 
-#define FONT_CACHE_SIZE	32
+ /* clang-format off */
+
+#define FONT_CACHE_SIZE		32
+#define FONT_CACHE_MAX_SIZE	1024
 
 /**
  * 库中缓存的字体位图是分组存放的，共有三级分组，分别为：
@@ -74,7 +76,7 @@ typedef struct LCUI_FontPathNode {
 static struct LCUI_FontLibraryModule {
 	int count;			/**< 计数器，主要用于为字体信息生成标识号 */
 	int font_cache_num;		/**< 字体信息缓存区的数量 */
-	LCUI_BOOL is_inited;		/**< 标记，指示数据库是否初始化 */
+	LCUI_BOOL active;		/**< 标记，指示数据库是否初始化 */
 	Dict *font_families;		/**< 字族信息库，以字族名称索引字体信息 */
 	DictType font_families_type;	/**< 字族信息库的字典类型数据 */
 	RBTree bitmap_cache;		/**< 字体位图缓存区 */
@@ -85,270 +87,292 @@ static struct LCUI_FontLibraryModule {
 	LCUI_FontEngine *engine;	/**< 当前选择的字体引擎 */
 } fontlib;
 
-#define FontBitmap_IsValid(fbmp) (fbmp && fbmp->width>0 && fbmp->rows>0)
-#define SelectChar(ch) (RBTree*)RBTree_GetData( &fontlib.bitmap_cache, ch )
-#define SelectFont(ch, font_id) (RBTree*)RBTree_GetData( ch, font_id )
-#define SelectBitmap(font, size) (LCUI_FontBitmap*)RBTree_GetData( font, size )
-#define SelectFontFamliy(family_name) (LCUI_FontFamilyNode)\
-	Dict_FetchValue( fontlib.font_families, family_name );
+/* clang-format on */
+
+#define FontBitmap_IsValid(fbmp) (fbmp && fbmp->width > 0 && fbmp->rows > 0)
+#define SelectChar(ch) (RBTree *)RBTree_GetData(&fontlib.bitmap_cache, ch)
+#define SelectFont(ch, font_id) (RBTree *)RBTree_GetData(ch, font_id)
+#define SelectBitmap(font, size) (LCUI_FontBitmap *)RBTree_GetData(font, size)
+#define SelectFontFamliy(family_name) \
+	(LCUI_FontFamilyNode)         \
+	    Dict_FetchValue(fontlib.font_families, family_name);
 #define SelectFontStyle(FNODE, S) (&(FNODE)->styles[S])
 #define SelectFontWeight(SNODE, W) ((SNODE)->weights[W / 100 - 1])
-#define SetFontWeight(SNODE, FONT) do {\
-	(SNODE)->weights[(FONT)->weight / 100 - 1] = FONT;\
-} while( 0 );
-#define SelectFontCache(id) \
-	fontlib.font_cache[fontlib.font_cache_num-1]->fonts[id % FONT_CACHE_SIZE]
+#define ClearFontWeight(SNODE, W)                     \
+	do {                                          \
+		(SNODE)->weights[W / 100 - 1] = NULL; \
+	} while (0);
+#define SetFontWeight(SNODE, FONT)                                 \
+	do {                                                       \
+		(SNODE)->weights[(FONT)->weight / 100 - 1] = FONT; \
+	} while (0);
 
-#define SetFontCache(font) do {\
-	SelectFontCache(font->id) = font;\
-} while( 0 );
-
-static LCUI_FontCache FontCache( void )
+static LCUI_FontCache FontCache(void)
 {
 	LCUI_FontCache cache;
-	if( !(cache = malloc( sizeof( LCUI_FontCacheRec ) )) ) {
+	if (!(cache = malloc(sizeof(LCUI_FontCacheRec)))) {
 		return NULL;
 	}
-	memset( cache->fonts, 0, sizeof( cache->fonts ) );
+	memset(cache->fonts, 0, sizeof(cache->fonts));
 	return cache;
 }
 
-static void DeleteFontCache( LCUI_FontCache cache )
+static void DeleteFontCache(LCUI_FontCache cache)
 {
 	int i;
-	for( i = 0; i < FONT_CACHE_SIZE; ++i ) {
-		if( cache->fonts[i] ) {
-			DeleteFont( cache->fonts[i] );
+	for (i = 0; i < FONT_CACHE_SIZE; ++i) {
+		if (cache->fonts[i]) {
+			DeleteFont(cache->fonts[i]);
 		}
 		cache->fonts[i] = NULL;
 	}
-	free( cache );
+	free(cache);
 }
 
-LCUI_FontWeight LCUIFont_DetectWeight( const char *str )
+static LCUI_Font GetFontCache(int id)
 {
-	char *buf;
-	LCUI_FontWeight weight = FONT_WEIGHT_NORMAL;
-	if( !(buf = malloc( strsize( str ) )) ) {
-		return weight;
+	if (id > fontlib.font_cache_num * FONT_CACHE_SIZE) {
+		return NULL;
 	}
-	strtolower( buf, str );
-	if( strstr( buf, "thin" ) ) {
-		weight = FONT_WEIGHT_THIN;
-	} else if( strstr( buf, "light" ) ) {
-		weight = FONT_WEIGHT_EXTRA_LIGHT;
-	} else if( strstr( buf, "semilight" ) ) {
-		weight = FONT_WEIGHT_LIGHT;
-	} else if( strstr( buf, "medium" ) ) {
-		weight = FONT_WEIGHT_MEDIUM;
-	} else if( strstr( buf, "semibold" ) ) {
-		weight = FONT_WEIGHT_SEMI_BOLD;
-	} else if( strstr( buf, "bold" ) ) {
-		weight = FONT_WEIGHT_BOLD;
-	} else if( strstr( buf, "black" ) ) {
-		weight = FONT_WEIGHT_BLACK;
+	return fontlib.font_cache[id / FONT_CACHE_SIZE]
+		->fonts[id % FONT_CACHE_SIZE];
+}
+
+static int SetFontCache(LCUI_Font font)
+{
+	size_t size;
+	LCUI_FontCache *caches, cache;
+
+	if (font->id > FONT_CACHE_MAX_SIZE) {
+		LOG("[font] font cache size is the max size\n");
+		return -1;
 	}
-	free( buf );
-	return weight;
-}
-
-LCUI_FontStyle LCUIFont_DetectStyle( const char *str )
-{
-	char *buf;
-	LCUI_FontStyle style = FONT_STYLE_NORMAL;
-
-	if( !(buf = malloc( strsize( str ) )) ) {
-		return style;
-	}
-	strtolower( buf, str );
-	if( strstr( buf, "oblique" ) ) {
-		style = FONT_STYLE_OBLIQUE;
-	} else if( strstr( buf, "italic" ) ) {
-		style = FONT_STYLE_ITALIC;
-	}
-	free( buf );
-	return style;
-}
-
-LCUI_Font Font( const char *family_name, const char *style_name )
-{
-	ASSIGN( font, LCUI_Font );
-	font->id = 0;
-	font->data = NULL;
-	font->engine = NULL;
-	font->family_name = strdup2( family_name );
-	font->style_name = strdup2( style_name );
-	font->weight = LCUIFont_DetectWeight( style_name );
-	font->style = LCUIFont_DetectStyle( style_name );
-	return font;
-}
-
-void DeleteFont( LCUI_Font font )
-{
-	free( font->family_name );
-	free( font->style_name );
-	font->engine->close( font->data );
-	font->data = NULL;
-	font->engine = NULL;
-	free( font );
-}
-
-static void DestroyFontFamilyNode( void *privdata, void *data )
-{
-	LCUI_FontFamilyNode node = data;
-	if( node->family_name ) {
-		free( node->family_name );
-	}
-	node->family_name = NULL;
-	memset( node->styles, 0, sizeof( node->styles ) );
-	free( node );
-}
-
-static void DestroyFontBitmap( void *arg )
-{
-	FontBitmap_Free( arg );
-	free( arg );
-}
-
-static void DestroyTreeNode( void *arg )
-{
-	RBTree_Destroy( arg );
-	free( arg );
-}
-
-int LCUIFont_Add( LCUI_Font font )
-{
-	LCUI_Font exists_font;
-	LCUI_FontFamilyNode node;
-	LCUI_FontStyleNode snode;
-	node = SelectFontFamliy( font->family_name );
-	if( !node ) {
-		node = NEW( LCUI_FontFamilyNodeRec, 1 );
-		node->family_name = strdup2( font->family_name );
-		memset( node->styles, 0, sizeof( node->styles ) );
-		Dict_Add( fontlib.font_families, node->family_name, node );
-	}
-	snode = SelectFontStyle( node, font->style );
-	exists_font = SelectFontWeight( snode, font->weight );
-	if( exists_font ) {
-		font->id = exists_font->id;
-		if( fontlib.default_font &&
-		    font->id == fontlib.default_font->id ) {
-			fontlib.default_font = font;
-		}
-		DeleteFont( exists_font );
-	} else {
-		font->id = ++fontlib.count;
-	}
-	if( font->id >= fontlib.font_cache_num * FONT_CACHE_SIZE ) {
-		size_t size;
-		LCUI_FontCache *caches, cache;
+	while (font->id >= fontlib.font_cache_num * FONT_CACHE_SIZE) {
 		fontlib.font_cache_num += 1;
-		size = fontlib.font_cache_num * sizeof( LCUI_FontCache );
-		caches = realloc( fontlib.font_cache, size );
-		if( !caches ) {
+		size = fontlib.font_cache_num * sizeof(LCUI_FontCache);
+		caches = realloc(fontlib.font_cache, size);
+		if (!caches) {
 			fontlib.font_cache_num -= 1;
 			return -ENOMEM;
 		}
 		cache = FontCache();
-		if( !cache ) {
+		if (!cache) {
 			return -ENOMEM;
 		}
 		caches[fontlib.font_cache_num - 1] = cache;
 		fontlib.font_cache = caches;
 	}
-	SetFontWeight( snode, font );
-	SetFontCache( font );
+	fontlib.font_cache[font->id / FONT_CACHE_SIZE]
+		->fonts[font->id % FONT_CACHE_SIZE] = font;
+	return 0;
+}
+
+LCUI_FontWeight LCUIFont_DetectWeight(const char *str)
+{
+	char *buf;
+	LCUI_FontWeight weight = FONT_WEIGHT_NORMAL;
+	if (!(buf = malloc(strsize(str)))) {
+		return weight;
+	}
+	strtolower(buf, str);
+	if (strstr(buf, "thin")) {
+		weight = FONT_WEIGHT_THIN;
+	} else if (strstr(buf, "light")) {
+		weight = FONT_WEIGHT_EXTRA_LIGHT;
+	} else if (strstr(buf, "semilight")) {
+		weight = FONT_WEIGHT_LIGHT;
+	} else if (strstr(buf, "medium")) {
+		weight = FONT_WEIGHT_MEDIUM;
+	} else if (strstr(buf, "semibold")) {
+		weight = FONT_WEIGHT_SEMI_BOLD;
+	} else if (strstr(buf, "bold")) {
+		weight = FONT_WEIGHT_BOLD;
+	} else if (strstr(buf, "black")) {
+		weight = FONT_WEIGHT_BLACK;
+	}
+	free(buf);
+	return weight;
+}
+
+LCUI_FontStyle LCUIFont_DetectStyle(const char *str)
+{
+	char *buf;
+	LCUI_FontStyle style = FONT_STYLE_NORMAL;
+
+	if (!(buf = malloc(strsize(str)))) {
+		return style;
+	}
+	strtolower(buf, str);
+	if (strstr(buf, "oblique")) {
+		style = FONT_STYLE_OBLIQUE;
+	} else if (strstr(buf, "italic")) {
+		style = FONT_STYLE_ITALIC;
+	}
+	free(buf);
+	return style;
+}
+
+LCUI_Font Font(const char *family_name, const char *style_name)
+{
+	ASSIGN(font, LCUI_Font);
+	font->id = 0;
+	font->data = NULL;
+	font->engine = NULL;
+	font->family_name = strdup2(family_name);
+	font->style_name = strdup2(style_name);
+	font->weight = LCUIFont_DetectWeight(style_name);
+	font->style = LCUIFont_DetectStyle(style_name);
+	return font;
+}
+
+void DeleteFont(LCUI_Font font)
+{
+	free(font->family_name);
+	free(font->style_name);
+	font->engine->close(font->data);
+	font->data = NULL;
+	font->engine = NULL;
+	free(font);
+}
+
+static void DestroyFontFamilyNode(void *privdata, void *data)
+{
+	LCUI_FontFamilyNode node = data;
+	if (node->family_name) {
+		free(node->family_name);
+	}
+	node->family_name = NULL;
+	memset(node->styles, 0, sizeof(node->styles));
+	free(node);
+}
+
+static void DestroyFontBitmap(void *arg)
+{
+	FontBitmap_Free(arg);
+	free(arg);
+}
+
+static void DestroyTreeNode(void *arg)
+{
+	RBTree_Destroy(arg);
+	free(arg);
+}
+
+int LCUIFont_Add(LCUI_Font font)
+{
+	LCUI_Font exists_font;
+	LCUI_FontFamilyNode node;
+	LCUI_FontStyleNode snode;
+	node = SelectFontFamliy(font->family_name);
+	if (!node) {
+		node = NEW(LCUI_FontFamilyNodeRec, 1);
+		node->family_name = strdup2(font->family_name);
+		memset(node->styles, 0, sizeof(node->styles));
+		Dict_Add(fontlib.font_families, node->family_name, node);
+	}
+	snode = SelectFontStyle(node, font->style);
+	exists_font = SelectFontWeight(snode, font->weight);
+	if (exists_font) {
+		font->id = exists_font->id;
+		if (fontlib.default_font &&
+		    font->id == fontlib.default_font->id) {
+			fontlib.default_font = font;
+		}
+		ClearFontWeight(snode, font->weight);
+		DeleteFont(exists_font);
+	} else {
+		font->id = ++fontlib.count;
+	}
+	SetFontWeight(snode, font);
+	SetFontCache(font);
 	return font->id;
 }
 
-LCUI_Font LCUIFont_GetById( int id )
+LCUI_Font LCUIFont_GetById(int id)
 {
-	if( !fontlib.is_inited ) {
+	if (!fontlib.active) {
 		return NULL;
 	}
-	if( id < 0 || id >= fontlib.font_cache_num * FONT_CACHE_SIZE ) {
+	if (id < 0 || id >= fontlib.font_cache_num * FONT_CACHE_SIZE) {
 		return NULL;
 	}
-	return SelectFontCache( id );
+	return GetFontCache(id);
 }
 
-size_t LCUIFont_UpdateWeight( const int *font_ids,
-			      LCUI_FontWeight weight,
-			      int **new_font_ids )
+size_t LCUIFont_UpdateWeight(const int *font_ids, LCUI_FontWeight weight,
+			     int **new_font_ids)
 {
 	int id, *ids;
 	LCUI_Font font;
 	size_t i, count, len;
 
-	if( !font_ids ) {
+	if (!font_ids) {
 		return 0;
 	}
-	for( len = 0; font_ids[len]; ++len );
-	if( len < 1 ) {
+	for (len = 0; font_ids[len]; ++len)
+		;
+	if (len < 1) {
 		return 0;
 	}
-	ids = malloc( (len + 1) * sizeof( int ) );
-	if( !ids ) {
+	ids = malloc((len + 1) * sizeof(int));
+	if (!ids) {
 		return 0;
 	}
-	for( i = 0, count = 0; i < len; ++i ) {
-		font = LCUIFont_GetById( font_ids[i] );
-		id = LCUIFont_GetId( font->family_name, font->style, weight );
-		if( id > 0 ) {
+	for (i = 0, count = 0; i < len; ++i) {
+		font = LCUIFont_GetById(font_ids[i]);
+		id = LCUIFont_GetId(font->family_name, font->style, weight);
+		if (id > 0) {
 			ids[count++] = id;
 		}
 	}
 	ids[count] = 0;
-	if( new_font_ids && count > 0 ) {
-		*new_font_ids = ids;
-	} else {
-*		new_font_ids = NULL;
-		free( ids );
-	}
-	return count;
-}
-
-size_t LCUIFont_UpdateStyle( const int *font_ids,
-			     LCUI_FontStyle style,
-			     int **new_font_ids )
-{
-	int id, *ids;
-	LCUI_Font font;
-	size_t i, count, len;
-
-	if( !font_ids ) {
-		return 0;
-	}
-	for( len = 0; font_ids[len]; ++len );
-	if( len < 1 ) {
-		return 0;
-	}
-	ids = malloc( (len + 1) * sizeof( int ) );
-	if( !ids ) {
-		return 0;
-	}
-	for( i = 0, count = 0; i < len; ++i ) {
-		font = LCUIFont_GetById( font_ids[i] );
-		id = LCUIFont_GetId( font->family_name, style, font->weight );
-		if( id > 0 ) {
-			ids[count++] = id;
-		}
-	}
-	ids[count] = 0;
-	if( new_font_ids && count > 0 ) {
+	if (new_font_ids && count > 0) {
 		*new_font_ids = ids;
 	} else {
 		*new_font_ids = NULL;
-		free( ids );
+		free(ids);
 	}
 	return count;
 }
 
-size_t LCUIFont_GetIdByNames( int **font_ids,
-			      LCUI_FontStyle style,
-			      LCUI_FontWeight weight,
-			      const char *names )
+size_t LCUIFont_UpdateStyle(const int *font_ids, LCUI_FontStyle style,
+			    int **new_font_ids)
+{
+	int id, *ids;
+	LCUI_Font font;
+	size_t i, count, len;
+
+	if (!font_ids) {
+		return 0;
+	}
+	for (len = 0; font_ids[len]; ++len)
+		;
+	if (len < 1) {
+		return 0;
+	}
+	ids = malloc((len + 1) * sizeof(int));
+	if (!ids) {
+		return 0;
+	}
+	for (i = 0, count = 0; i < len; ++i) {
+		font = LCUIFont_GetById(font_ids[i]);
+		id = LCUIFont_GetId(font->family_name, style, font->weight);
+		if (id > 0) {
+			ids[count++] = id;
+		}
+	}
+	ids[count] = 0;
+	if (new_font_ids && count > 0) {
+		*new_font_ids = ids;
+	} else {
+		*new_font_ids = NULL;
+		free(ids);
+	}
+	return count;
+}
+
+size_t LCUIFont_GetIdByNames(int **font_ids, LCUI_FontStyle style,
+			     LCUI_FontWeight weight, const char *names)
 {
 	int *ids;
 	char name[256];
@@ -356,62 +380,62 @@ size_t LCUIFont_GetIdByNames( int **font_ids,
 	size_t count, i;
 
 	*font_ids = NULL;
-	if( !names ) {
+	if (!names) {
 		return 0;
 	}
-	for( p = names, count = 1; *p; ++p ) {
-		if( *p == ',' ) {
+	for (p = names, count = 1; *p; ++p) {
+		if (*p == ',') {
 			++count;
 		}
 	}
-	if( p - names == 0 ) {
+	if (p - names == 0) {
 		return 0;
 	}
-	ids = NEW( int, count + 1 );
-	if( !ids ) {
+	ids = NEW(int, count + 1);
+	if (!ids) {
 		return 0;
 	}
-	for( p = names, count = 0, i = 0; ; ++p ) {
-		if( *p != ',' && *p ) {
+	for (p = names, count = 0, i = 0;; ++p) {
+		if (*p != ',' && *p) {
 			name[i++] = *p;
 			continue;
 		}
 		name[i] = 0;
-		strtrim( name, name, "'\"\n\r\t " );
-		ids[count] = LCUIFont_GetId( name, style, weight );
-		if( ids[count] > 0 ) {
+		strtrim(name, name, "'\"\n\r\t ");
+		ids[count] = LCUIFont_GetId(name, style, weight);
+		if (ids[count] > 0) {
 			++count;
 		}
 		i = 0;
-		if( !*p ) {
+		if (!*p) {
 			break;
 		}
 	}
 	ids[count] = 0;
-	if( count < 1 ) {
-		free( ids );
+	if (count < 1) {
+		free(ids);
 		ids = NULL;
 	}
 	*font_ids = ids;
 	return count;
 }
 
-static LCUI_FontWeight FindBolderWeight( LCUI_FontStyleNode snode,
-					  LCUI_FontWeight weight )
+static LCUI_FontWeight FindBolderWeight(LCUI_FontStyleNode snode,
+					LCUI_FontWeight weight)
 {
-	for( weight += 100; weight <= FONT_WEIGHT_BLACK; weight += 100 ) {
-		if( SelectFontWeight( snode, weight ) ) {
+	for (weight += 100; weight <= FONT_WEIGHT_BLACK; weight += 100) {
+		if (SelectFontWeight(snode, weight)) {
 			return weight;
 		}
 	}
 	return FONT_WEIGHT_NONE;
 }
 
-static LCUI_FontWeight FindLighterWeight( LCUI_FontStyleNode snode,
-					  LCUI_FontWeight weight )
+static LCUI_FontWeight FindLighterWeight(LCUI_FontStyleNode snode,
+					 LCUI_FontWeight weight)
 {
-	for( weight -= 100; weight >= FONT_WEIGHT_THIN; weight -= 100 ) {
-		if( SelectFontWeight( snode, weight ) ) {
+	for (weight -= 100; weight >= FONT_WEIGHT_THIN; weight -= 100) {
+		if (SelectFontWeight(snode, weight)) {
 			return weight;
 		}
 	}
@@ -422,219 +446,218 @@ static LCUI_FontWeight FindLighterWeight( LCUI_FontStyleNode snode,
  * 在未找到指定粗细程度的字体时进行回退，找到合适的字体
  * 回退规则的参考文档：https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight#Fallback_weights
  */
-static LCUI_FontWeight FontWeightFallback( LCUI_FontStyleNode snode,
-					   LCUI_FontWeight weight )
+static LCUI_FontWeight FontWeightFallback(LCUI_FontStyleNode snode,
+					  LCUI_FontWeight weight)
 {
-	if( weight > FONT_WEIGHT_MEDIUM ) {
-		return FindBolderWeight( snode, weight );
+	if (weight > FONT_WEIGHT_MEDIUM) {
+		return FindBolderWeight(snode, weight);
 	}
-	if( weight < FONT_WEIGHT_NORMAL ) {
-		return FindLighterWeight( snode, weight );
+	if (weight < FONT_WEIGHT_NORMAL) {
+		return FindLighterWeight(snode, weight);
 	}
-	if( weight == FONT_WEIGHT_NORMAL ) {
-		if( SelectFontWeight( snode, FONT_WEIGHT_MEDIUM ) ) {
+	if (weight == FONT_WEIGHT_NORMAL) {
+		if (SelectFontWeight(snode, FONT_WEIGHT_MEDIUM)) {
 			return FONT_WEIGHT_MEDIUM;
 		}
-	} else if( weight == FONT_WEIGHT_MEDIUM ) {
-		if( SelectFontWeight( snode, FONT_WEIGHT_NORMAL ) ) {
+	} else if (weight == FONT_WEIGHT_MEDIUM) {
+		if (SelectFontWeight(snode, FONT_WEIGHT_NORMAL)) {
 			return FONT_WEIGHT_NORMAL;
 		}
 	}
-	weight = FindLighterWeight( snode, weight );
-	if( weight != FONT_WEIGHT_NONE ) {
+	weight = FindLighterWeight(snode, weight);
+	if (weight != FONT_WEIGHT_NONE) {
 		return weight;
 	}
 	return FONT_WEIGHT_NONE;
 }
 
-int LCUIFont_GetId( const char *family_name,
-		    LCUI_FontStyle style,
-		    LCUI_FontWeight weight )
+int LCUIFont_GetId(const char *family_name, LCUI_FontStyle style,
+		   LCUI_FontWeight weight)
 {
 	int style_num;
 	LCUI_FontWeight w;
 	LCUI_FontStyleNode snode;
 	LCUI_FontFamilyNode fnode;
 
-	if( !fontlib.is_inited ) {
+	if (!fontlib.active) {
 		return -1;
 	}
-	fnode = SelectFontFamliy( family_name );
-	if( !fnode ) {
+	fnode = SelectFontFamliy(family_name);
+	if (!fnode) {
 		return -2;
 	}
-	if( weight == 0 ) {
+	if (weight == 0) {
 		weight = FONT_WEIGHT_NORMAL;
 	}
-	for( style_num = style; style_num >= 0; --style_num ) {
+	for (style_num = style; style_num >= 0; --style_num) {
 		snode = &fnode->styles[style_num];
-		if( SelectFontWeight( snode, weight ) ) {
-			return SelectFontWeight( snode, weight )->id;
+		if (SelectFontWeight(snode, weight)) {
+			return SelectFontWeight(snode, weight)->id;
 		}
-		w = FontWeightFallback( snode, weight );
-		if( w ) {
-			return SelectFontWeight( snode, w )->id;
+		w = FontWeightFallback(snode, weight);
+		if (w) {
+			return SelectFontWeight(snode, w)->id;
 		}
 	}
 	return -3;
 }
 
-int LCUIFont_GetDefault( void )
+int LCUIFont_GetDefault(void)
 {
-	if( !fontlib.default_font ) {
+	if (!fontlib.default_font) {
 		return -1;
 	}
 	return fontlib.default_font->id;
 }
 
-void LCUIFont_SetDefault( int id )
+void LCUIFont_SetDefault(int id)
 {
-	LCUI_Font font = LCUIFont_GetById( id );
-	if( font ) {
+	LCUI_Font font = LCUIFont_GetById(id);
+	if (font) {
 		fontlib.default_font = font;
-		LOG( "[font] select: %s\n", font->family_name );
+		LOG("[font] select: %s\n", font->family_name);
 	}
 }
 
-LCUI_FontBitmap* LCUIFont_AddBitmap( wchar_t ch, int font_id,
-				     int size, const LCUI_FontBitmap *bmp )
+LCUI_FontBitmap *LCUIFont_AddBitmap(wchar_t ch, int font_id, int size,
+				    const LCUI_FontBitmap *bmp)
 {
 	LCUI_FontBitmap *bmp_cache;
 	RBTree *tree_font, *tree_bmp;
 
-	if( !fontlib.is_inited ) {
+	if (!fontlib.active) {
 		return NULL;
 	}
 	/* 获取字符的字体信息集 */
-	tree_font = SelectChar( ch );
-	if( !tree_font ) {
-		tree_font = NEW( RBTree, 1 );
-		if( !tree_font ) {
+	tree_font = SelectChar(ch);
+	if (!tree_font) {
+		tree_font = NEW(RBTree, 1);
+		if (!tree_font) {
 			return NULL;
 		}
-		RBTree_Init( tree_font );
-		RBTree_OnDestroy( tree_font, DestroyTreeNode );
-		RBTree_Insert( &fontlib.bitmap_cache, ch, tree_font );
+		RBTree_Init(tree_font);
+		RBTree_OnDestroy(tree_font, DestroyTreeNode);
+		RBTree_Insert(&fontlib.bitmap_cache, ch, tree_font);
 	}
 	/* 当字体ID不大于0时，使用内置字体 */
-	if( font_id <= 0 ) {
+	if (font_id <= 0) {
 		font_id = fontlib.incore_font->id;
 	}
 	/* 获取相应字体样式标识号的字体位图库 */
-	tree_bmp = SelectFont( tree_font, font_id );
-	if( !tree_bmp ) {
-		tree_bmp = NEW( RBTree, 1 );
-		if( !tree_bmp ) {
+	tree_bmp = SelectFont(tree_font, font_id);
+	if (!tree_bmp) {
+		tree_bmp = NEW(RBTree, 1);
+		if (!tree_bmp) {
 			return NULL;
 		}
-		RBTree_Init( tree_bmp );
-		RBTree_OnDestroy( tree_bmp, DestroyFontBitmap );
-		RBTree_Insert( tree_font, font_id, tree_bmp );
+		RBTree_Init(tree_bmp);
+		RBTree_OnDestroy(tree_bmp, DestroyFontBitmap);
+		RBTree_Insert(tree_font, font_id, tree_bmp);
 	}
 	/* 在字体位图库中获取指定像素大小的字体位图 */
-	bmp_cache = SelectBitmap( tree_bmp, size );
-	if( !bmp_cache ) {
-		bmp_cache = NEW( LCUI_FontBitmap, 1 );
-		if( !bmp_cache ) {
+	bmp_cache = SelectBitmap(tree_bmp, size);
+	if (!bmp_cache) {
+		bmp_cache = NEW(LCUI_FontBitmap, 1);
+		if (!bmp_cache) {
 			return NULL;
 		}
-		RBTree_Insert( tree_bmp, size, bmp_cache );
+		RBTree_Insert(tree_bmp, size, bmp_cache);
 	}
 	/* 拷贝数据至该空间内 */
-	memcpy( bmp_cache, bmp, sizeof( LCUI_FontBitmap ) );
+	memcpy(bmp_cache, bmp, sizeof(LCUI_FontBitmap));
 	return bmp_cache;
 }
 
-int LCUIFont_GetBitmap( wchar_t ch, int font_id, int size,
-			const LCUI_FontBitmap **bmp )
+int LCUIFont_GetBitmap(wchar_t ch, int font_id, int size,
+		       const LCUI_FontBitmap **bmp)
 {
 	int ret;
 	RBTree *ctx;
 	LCUI_FontBitmap bmp_cache;
 
 	*bmp = NULL;
-	if( !fontlib.is_inited ) {
+	if (!fontlib.active) {
 		return -2;
 	}
-	if( font_id <= 0 ) {
-		if( fontlib.default_font ) {
+	if (font_id <= 0) {
+		if (fontlib.default_font) {
 			font_id = fontlib.default_font->id;
 		} else {
 			font_id = fontlib.incore_font->id;
 		}
 	}
 	do {
-		if( !(ctx = SelectChar( ch )) ) {
+		if (!(ctx = SelectChar(ch))) {
 			break;
 		}
-		ctx = SelectFont( ctx, font_id );
-		if( !ctx ) {
+		ctx = SelectFont(ctx, font_id);
+		if (!ctx) {
 			break;
 		}
-		*bmp = SelectBitmap( ctx, size );
-		if( *bmp ) {
+		*bmp = SelectBitmap(ctx, size);
+		if (*bmp) {
 			return 0;
 		}
 		break;
-	} while( 0 );
-	if( ch == 0 ) {
+	} while (0);
+	if (ch == 0) {
 		return -1;
 	}
-	FontBitmap_Init( &bmp_cache );
-	ret = LCUIFont_RenderBitmap( &bmp_cache, ch, font_id, size );
-	if( ret == 0 ) {
-		*bmp = LCUIFont_AddBitmap( ch, font_id, size, &bmp_cache );
+	FontBitmap_Init(&bmp_cache);
+	ret = LCUIFont_RenderBitmap(&bmp_cache, ch, font_id, size);
+	if (ret == 0) {
+		*bmp = LCUIFont_AddBitmap(ch, font_id, size, &bmp_cache);
 		return 0;
 	}
-	ret = LCUIFont_GetBitmap( 0, font_id, size, bmp );
-	if( ret != 0 ) {
-		*bmp = LCUIFont_AddBitmap( 0, font_id, size, &bmp_cache );
+	ret = LCUIFont_GetBitmap(0, font_id, size, bmp);
+	if (ret != 0) {
+		*bmp = LCUIFont_AddBitmap(0, font_id, size, &bmp_cache);
 	}
 	return -1;
 }
 
-static int LCUIFont_LoadFileEx( LCUI_FontEngine *engine, const char *file )
+static int LCUIFont_LoadFileEx(LCUI_FontEngine *engine, const char *file)
 {
 	LCUI_Font *fonts;
 	int i, num_fonts, id;
 
-	LOG( "[font] load file: %s\n", file );
-	if( !engine ) {
+	LOG("[font] load file: %s\n", file);
+	if (!engine) {
 		return -1;
 	}
-	num_fonts = fontlib.engine->open( file, &fonts );
-	if( num_fonts < 1 ) {
-		LOG( "[font] failed to load file: %s\n", file );
+	num_fonts = fontlib.engine->open(file, &fonts);
+	if (num_fonts < 1) {
+		LOG("[font] failed to load file: %s\n", file);
 		return -2;
 	}
-	for( i = 0; i < num_fonts; ++i ) {
+	for (i = 0; i < num_fonts; ++i) {
 		fonts[i]->engine = engine;
-		id = LCUIFont_Add( fonts[i] );
-		LOG( "[font] add family: %s, style name: %s, id: %d\n",
-		     fonts[i]->family_name, fonts[i]->style_name, id );
+		id = LCUIFont_Add(fonts[i]);
+		LOG("[font] add family: %s, style name: %s, id: %d\n",
+		    fonts[i]->family_name, fonts[i]->style_name, id);
 	}
-	free( fonts );
+	free(fonts);
 	return 0;
 }
 
-int LCUIFont_LoadFile( const char *filepath )
+int LCUIFont_LoadFile(const char *filepath)
 {
-	return LCUIFont_LoadFileEx( fontlib.engine, filepath );
+	return LCUIFont_LoadFileEx(fontlib.engine, filepath);
 }
 
 /** 打印字体位图的信息 */
-void FontBitmap_PrintInfo( LCUI_FontBitmap *bitmap )
+void FontBitmap_PrintInfo(LCUI_FontBitmap *bitmap)
 {
-	LOG("address:%p\n",bitmap);
-	if( !bitmap ) {
+	LOG("address:%p\n", bitmap);
+	if (!bitmap) {
 		return;
 	}
-	LOG("top: %d, left: %d, width:%d, rows:%d\n",
-	bitmap->top, bitmap->left, bitmap->width, bitmap->rows);
+	LOG("top: %d, left: %d, width:%d, rows:%d\n", bitmap->top, bitmap->left,
+	    bitmap->width, bitmap->rows);
 }
 
 /** 初始化字体位图 */
-void FontBitmap_Init( LCUI_FontBitmap *bitmap )
+void FontBitmap_Init(LCUI_FontBitmap *bitmap)
 {
 	bitmap->rows = 0;
 	bitmap->width = 0;
@@ -644,59 +667,59 @@ void FontBitmap_Init( LCUI_FontBitmap *bitmap )
 }
 
 /** 释放字体位图占用的资源 */
-void FontBitmap_Free( LCUI_FontBitmap *bitmap )
+void FontBitmap_Free(LCUI_FontBitmap *bitmap)
 {
-	if( FontBitmap_IsValid( bitmap ) ) {
-		free( bitmap->buffer );
-		FontBitmap_Init( bitmap );
+	if (FontBitmap_IsValid(bitmap)) {
+		free(bitmap->buffer);
+		FontBitmap_Init(bitmap);
 	}
 }
 
 /** 创建字体位图 */
-int FontBitmap_Create( LCUI_FontBitmap *bitmap, int width, int rows )
+int FontBitmap_Create(LCUI_FontBitmap *bitmap, int width, int rows)
 {
 	size_t size;
-	if( width < 0 || rows < 0 ) {
-		FontBitmap_Free( bitmap );
+	if (width < 0 || rows < 0) {
+		FontBitmap_Free(bitmap);
 		return -1;
 	}
-	if( FontBitmap_IsValid( bitmap ) ) {
-		FontBitmap_Free( bitmap );
+	if (FontBitmap_IsValid(bitmap)) {
+		FontBitmap_Free(bitmap);
 	}
 	bitmap->width = width;
 	bitmap->rows = rows;
-	size = width*rows * sizeof( uchar_t );
-	bitmap->buffer = (uchar_t*)malloc( size );
-	if( bitmap->buffer == NULL ) {
+	size = width * rows * sizeof(uchar_t);
+	bitmap->buffer = (uchar_t *)malloc(size);
+	if (bitmap->buffer == NULL) {
 		return -2;
 	}
 	return 0;
 }
 
 /** 在屏幕打印以0和1表示字体位图 */
-int FontBitmap_Print( LCUI_FontBitmap *fontbmp )
+int FontBitmap_Print(LCUI_FontBitmap *fontbmp)
 {
 	int x, y, m;
-	for( y = 0; y < fontbmp->rows; ++y ) {
-		m = y*fontbmp->width;
-		for( x = 0; x < fontbmp->width; ++x, ++m ) {
-			if( fontbmp->buffer[m] > 128 ) {
-				LOG( "#" );
-			} else if( fontbmp->buffer[m] > 64 ) {
-				LOG( "-" );
+	for (y = 0; y < fontbmp->rows; ++y) {
+		m = y * fontbmp->width;
+		for (x = 0; x < fontbmp->width; ++x, ++m) {
+			if (fontbmp->buffer[m] > 128) {
+				LOG("#");
+			} else if (fontbmp->buffer[m] > 64) {
+				LOG("-");
 			} else {
-				LOG( " " );
+				LOG(" ");
 			}
 		}
-		LOG( "\n" );
+		LOG("\n");
 	}
-	LOG( "\n" );
+	LOG("\n");
 	return 0;
 }
 
-static void FontBitmap_MixARGB( LCUI_Graph *graph, LCUI_Rect *write_rect,
-				const LCUI_FontBitmap *bmp, LCUI_Color color,
-				LCUI_Rect *read_rect )
+static void FontBitmap_MixARGB(LCUI_Graph *graph, LCUI_Rect *write_rect,
+			       const LCUI_FontBitmap *bmp, LCUI_Color color,
+			       LCUI_Rect *read_rect)
 {
 	int x, y;
 	LCUI_ARGB *px, *px_row_des;
@@ -707,17 +730,17 @@ static void FontBitmap_MixARGB( LCUI_Graph *graph, LCUI_Rect *write_rect,
 	byte_row_ptr += read_rect->x;
 	px_row_des += write_rect->x;
 	ca = color.alpha / 255.0;
-	for( y = 0; y < read_rect->height; ++y ) {
+	for (y = 0; y < read_rect->height; ++y) {
 		px = px_row_des;
 		byte_ptr = byte_row_ptr;
-		for( x = 0; x < read_rect->width; ++x, ++byte_ptr, ++px ) {
+		for (x = 0; x < read_rect->width; ++x, ++byte_ptr, ++px) {
 			src_a = *byte_ptr / 255.0 * ca;
 			a = (1.0 - src_a) * px->a / 255.0;
 			out_r = px->r * a + color.r * src_a;
 			out_g = px->g * a + color.g * src_a;
 			out_b = px->b * a + color.b * src_a;
 			out_a = src_a + a;
-			if( out_a > 0 ) {
+			if (out_a > 0) {
 				out_r /= out_a;
 				out_g /= out_a;
 				out_b /= out_a;
@@ -732,25 +755,25 @@ static void FontBitmap_MixARGB( LCUI_Graph *graph, LCUI_Rect *write_rect,
 	}
 }
 
-static void FontBitmap_MixRGB( LCUI_Graph *graph, LCUI_Rect *write_rect,
-			       const LCUI_FontBitmap *bmp, LCUI_Color color,
-			       LCUI_Rect *read_rect )
+static void FontBitmap_MixRGB(LCUI_Graph *graph, LCUI_Rect *write_rect,
+			      const LCUI_FontBitmap *bmp, LCUI_Color color,
+			      LCUI_Rect *read_rect)
 {
 	int x, y;
 	uchar_t *byte_src, *byte_row_src, *byte_row_des, *byte_des, alpha;
-	byte_row_src = bmp->buffer + read_rect->y*bmp->width + read_rect->x;
+	byte_row_src = bmp->buffer + read_rect->y * bmp->width + read_rect->x;
 	byte_row_des = graph->bytes + write_rect->y * graph->bytes_per_row;
-	byte_row_des += write_rect->x*graph->bytes_per_pixel;
-	for( y = 0; y < read_rect->height; ++y ) {
+	byte_row_des += write_rect->x * graph->bytes_per_pixel;
+	for (y = 0; y < read_rect->height; ++y) {
 		byte_src = byte_row_src;
 		byte_des = byte_row_des;
-		for( x = 0; x < read_rect->width; ++x ) {
+		for (x = 0; x < read_rect->width; ++x) {
 			alpha = (uchar_t)(*byte_src * color.alpha / 255);
-			ALPHA_BLEND( *byte_des, color.b, alpha );
+			ALPHA_BLEND(*byte_des, color.b, alpha);
 			++byte_des;
-			ALPHA_BLEND( *byte_des, color.g, alpha );
+			ALPHA_BLEND(*byte_des, color.g, alpha);
 			++byte_des;
-			ALPHA_BLEND( *byte_des, color.r, alpha );
+			ALPHA_BLEND(*byte_des, color.r, alpha);
 			++byte_des;
 			++byte_src;
 		}
@@ -759,12 +782,12 @@ static void FontBitmap_MixRGB( LCUI_Graph *graph, LCUI_Rect *write_rect,
 	}
 }
 
-int FontBitmap_Mix( LCUI_Graph *graph, LCUI_Pos pos,
-		    const LCUI_FontBitmap *bmp, LCUI_Color color )
+int FontBitmap_Mix(LCUI_Graph *graph, LCUI_Pos pos, const LCUI_FontBitmap *bmp,
+		   LCUI_Color color)
 {
 	LCUI_Graph write_slot;
 	LCUI_Rect r_rect, w_rect;
-	if( pos.x > (int)graph->width || pos.y > (int)graph->height ) {
+	if (pos.x > (int)graph->width || pos.y > (int)graph->height) {
 		return -2;
 	}
 	/* 获取写入区域 */
@@ -773,49 +796,49 @@ int FontBitmap_Mix( LCUI_Graph *graph, LCUI_Pos pos,
 	w_rect.width = bmp->width;
 	w_rect.height = bmp->rows;
 	/* 获取需要裁剪的区域 */
-	LCUIRect_GetCutArea( graph->width, graph->height, w_rect, &r_rect );
+	LCUIRect_GetCutArea(graph->width, graph->height, w_rect, &r_rect);
 	w_rect.x += r_rect.x;
 	w_rect.y += r_rect.y;
 	w_rect.width = r_rect.width;
 	w_rect.height = r_rect.height;
-	Graph_Quote( &write_slot, graph, &w_rect );
-	Graph_GetValidRect( &write_slot, &w_rect );
+	Graph_Quote(&write_slot, graph, &w_rect);
+	Graph_GetValidRect(&write_slot, &w_rect);
 	/* 获取背景图引用的源图形 */
-	graph = Graph_GetQuote( graph );
-	if( graph->color_type == COLOR_TYPE_ARGB ) {
-		FontBitmap_MixARGB( graph, &w_rect, bmp, color, &r_rect );
+	graph = Graph_GetQuote(graph);
+	if (graph->color_type == LCUI_COLOR_TYPE_ARGB) {
+		FontBitmap_MixARGB(graph, &w_rect, bmp, color, &r_rect);
 	} else {
-		FontBitmap_MixRGB( graph, &w_rect, bmp, color, &r_rect );
+		FontBitmap_MixRGB(graph, &w_rect, bmp, color, &r_rect);
 	}
 	return 0;
 }
 
-int LCUIFont_RenderBitmap( LCUI_FontBitmap *buff, wchar_t ch,
-			   int font_id, int pixel_size )
+int LCUIFont_RenderBitmap(LCUI_FontBitmap *buff, wchar_t ch, int font_id,
+			  int pixel_size)
 {
 	LCUI_Font font = fontlib.default_font;
 	do {
-		if( font_id < 0 || !fontlib.engine ) {
+		if (font_id < 0 || !fontlib.engine) {
 			break;
 		}
-		font = LCUIFont_GetById( font_id );
-		if( font ) {
+		font = LCUIFont_GetById(font_id);
+		if (font) {
 			break;
 		}
-		if( fontlib.default_font ) {
+		if (fontlib.default_font) {
 			font = fontlib.default_font;
 		} else {
 			font = fontlib.incore_font;
 		}
 		break;
-	} while( 0 );
-	if( !font ) {
+	} while (0);
+	if (!font) {
 		return -1;
 	}
-	return font->engine->render( buff, ch, pixel_size, font );
+	return font->engine->render(buff, ch, pixel_size, font);
 }
 
-void LCUI_InitFontLibrary( void )
+void LCUI_InitFontLibrary(void)
 {
 	int i, fid;
 #ifdef LCUI_BUILD_IN_WIN32
@@ -826,10 +849,10 @@ void LCUI_InitFontLibrary( void )
 		const char *family;
 		const char *style;
 	} fonts[MAX_FONTFILE_NUM] = {
-		{ FONTDIR"consola.ttf", "Consola", NULL },
-		{ FONTDIR"simsun.ttc", "SimSun", NULL },
-		{ FONTDIR"msyh.ttf", "Microsoft YaHei", NULL },
-		{ FONTDIR"msyh.ttc", "Microsoft YaHei", NULL }
+		{ FONTDIR "consola.ttf", "Consola", NULL },
+		{ FONTDIR "simsun.ttc", "SimSun", NULL },
+		{ FONTDIR "msyh.ttf", "Microsoft YaHei", NULL },
+		{ FONTDIR "msyh.ttc", "Microsoft YaHei", NULL }
 	};
 #else
 #define FONTDIR "/usr/share/fonts/"
@@ -839,76 +862,71 @@ void LCUI_InitFontLibrary( void )
 		const char *family;
 		const char *style;
 	} fonts[MAX_FONTFILE_NUM] = {
-		{
-			FONTDIR"truetype/ubuntu-font-family/Ubuntu-R.ttf",
-			"Ubuntu", NULL
-		}, {
-			FONTDIR"opentype/noto/NotoSansCJK-Regular.ttc",
-			"Noto Sans CJK SC", NULL
-		}, {
-			FONTDIR"opentype/noto/NotoSansCJK.ttc",
-			"Noto Sans CJK SC", NULL
-		}, {
-			FONTDIR"truetype/wqy/wqy-microhei.ttc",
-			"WenQuanYi Micro Hei", NULL
-		}
+		{ FONTDIR "truetype/ubuntu-font-family/Ubuntu-R.ttf", "Ubuntu",
+		NULL },
+		{ FONTDIR "opentype/noto/NotoSansCJK-Regular.ttc",
+		"Noto Sans CJK SC", NULL },
+		{ FONTDIR "opentype/noto/NotoSansCJK.ttc", "Noto Sans CJK SC",
+		NULL },
+		{ FONTDIR "truetype/wqy/wqy-microhei.ttc",
+		"WenQuanYi Micro Hei", NULL }
 	};
 #endif
 
 	fontlib.font_cache_num = 1;
-	fontlib.font_cache = NEW( LCUI_FontCache, 1 );
+	fontlib.font_cache = NEW(LCUI_FontCache, 1);
 	fontlib.font_cache[0] = FontCache();
-	RBTree_Init( &fontlib.bitmap_cache );
+	RBTree_Init(&fontlib.bitmap_cache);
 	fontlib.font_families_type = DictType_StringKey;
 	fontlib.font_families_type.valDestructor = DestroyFontFamilyNode;
-	fontlib.font_families = Dict_Create( &fontlib.font_families_type, NULL );
-	RBTree_OnDestroy( &fontlib.bitmap_cache, DestroyTreeNode );
-	fontlib.is_inited = TRUE;
+	fontlib.font_families = Dict_Create(&fontlib.font_families_type, NULL);
+	RBTree_OnDestroy(&fontlib.bitmap_cache, DestroyTreeNode);
+	fontlib.active = TRUE;
 
 	/* 先初始化内置的字体引擎 */
 	fontlib.engine = &fontlib.engines[0];
-	LCUIFont_InitInCoreFont( fontlib.engine );
-	LCUIFont_LoadFile( "in-core.inconsolata" );
-	fid = LCUIFont_GetId( "inconsolata", 0, 0 );
-	fontlib.incore_font = LCUIFont_GetById( fid );
+	LCUIFont_InitInCoreFont(fontlib.engine);
+	LCUIFont_LoadFile("in-core.inconsolata");
+	fid = LCUIFont_GetId("inconsolata", 0, 0);
+	fontlib.incore_font = LCUIFont_GetById(fid);
 	fontlib.default_font = fontlib.incore_font;
 	/* 然后看情况启用其它字体引擎 */
 #ifdef LCUI_FONT_ENGINE_FREETYPE
-	if( LCUIFont_InitFreeType( &fontlib.engines[1] ) == 0 ) {
+	if (LCUIFont_InitFreeType(&fontlib.engines[1]) == 0) {
 		fontlib.engine = &fontlib.engines[1];
 	}
 #endif
-	if( fontlib.engine && fontlib.engine != &fontlib.engines[0] ) {
-		LOG( "[font] current font engine is: %s\n", 
-			fontlib.engine->name );
+	if (fontlib.engine && fontlib.engine != &fontlib.engines[0]) {
+		LOG("[font] current font engine is: %s\n",
+		    fontlib.engine->name);
 	} else {
-		LOG( "[font] warning: not font engine support!\n" );
+		LOG("[font] warning: not font engine support!\n");
 	}
-	for( i = 0; i < MAX_FONTFILE_NUM; ++i ) {
-		LCUIFont_LoadFile( fonts[i].path );
+	for (i = 0; i < MAX_FONTFILE_NUM; ++i) {
+		LCUIFont_LoadFile(fonts[i].path);
 	}
-	for( i = MAX_FONTFILE_NUM - 1; i >= 0; --i ) {
-		fid = LCUIFont_GetId( fonts[i].family, 0, 0 );
-		if( fid > 0 ) {
-			LCUIFont_SetDefault( fid );
+	for (i = MAX_FONTFILE_NUM - 1; i >= 0; --i) {
+		fid = LCUIFont_GetId(fonts[i].family, 0, 0);
+		if (fid > 0) {
+			LCUIFont_SetDefault(fid);
 			break;
 		}
 	}
 }
 
-void LCUI_FreeFontLibrary( void )
+void LCUI_FreeFontLibrary(void)
 {
-	if( !fontlib.is_inited ) {
+	if (!fontlib.active) {
 		return;
 	}
-	fontlib.is_inited = FALSE;
-	while( fontlib.font_cache_num > 0 ) {
+	fontlib.active = FALSE;
+	while (fontlib.font_cache_num > 0) {
 		--fontlib.font_cache_num;
-		DeleteFontCache( fontlib.font_cache[fontlib.font_cache_num] );
+		DeleteFontCache(fontlib.font_cache[fontlib.font_cache_num]);
 	}
-	Dict_Release( fontlib.font_families );
-	RBTree_Destroy( &fontlib.bitmap_cache );
-	free( fontlib.font_cache );
+	Dict_Release(fontlib.font_families);
+	RBTree_Destroy(&fontlib.bitmap_cache);
+	free(fontlib.font_cache);
 	fontlib.font_cache = NULL;
 	LCUIFont_ExitInCoreFont();
 #ifdef LCUI_FONT_ENGINE_FREETYPE

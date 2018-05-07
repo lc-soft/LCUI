@@ -2,7 +2,7 @@
  * button.c -- LCUI‘s Button widget
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -67,25 +67,25 @@ button:disabled {
 
 );
 
-static void Button_OnInit( LCUI_Widget w )
+static void Button_OnInit(LCUI_Widget w)
 {
-	prototype->proto->init( w );
+	prototype->proto->init(w);
 	w->computed_style.focusable = TRUE;
 }
 
-void Button_SetTextW( LCUI_Widget w, const wchar_t *wstr )
+void Button_SetTextW(LCUI_Widget w, const wchar_t *wstr)
 {
-	TextView_SetTextW( w, wstr );
+	TextView_SetTextW(w, wstr);
 }
 
-void Button_SetText( LCUI_Widget w, const char *str )
+void Button_SetText(LCUI_Widget w, const char *str)
 {
-	TextView_SetText( w, str );
+	TextView_SetText(w, str);
 }
 
-void LCUIWidget_AddButton( void )
+void LCUIWidget_AddButton(void)
 {
-	prototype = LCUIWidget_NewPrototype( "button", "textview" );
+	prototype = LCUIWidget_NewPrototype("button", "textview");
 	prototype->init = Button_OnInit;
-	LCUI_LoadCSSString( button_css, __FILE__ );
+	LCUI_LoadCSSString(button_css, __FILE__);
 }

@@ -2,7 +2,7 @@
  * sidebar.h -- Sidebar widget
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -33,12 +33,12 @@
 
 LCUI_BEGIN_HEADER
 
-LCUI_API LCUI_Widget SideBar_AppendItem( LCUI_Widget sidebar,
-					 const wchar_t *id,
-					 const wchar_t *icon,
-					 const wchar_t *text );
+LCUI_API LCUI_Widget SideBar_AppendItem(LCUI_Widget sidebar,
+					const wchar_t *id,
+					const wchar_t *icon,
+					const wchar_t *text);
 
-LCUI_API void LCUIWidget_AddSideBar( void );
+LCUI_API void LCUIWidget_AddSideBar(void);
 
 LCUI_END_HEADER
 

@@ -2,7 +2,7 @@
  * textstyle.h -- Text style processing module.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -52,53 +52,53 @@ typedef struct LCUI_TextStyleRec_ {
 } LCUI_TextStyleRec, *LCUI_TextStyle;
 
 /** 初始化字体样式数据 */
-LCUI_API void TextStyle_Init( LCUI_TextStyle data );
+LCUI_API void TextStyle_Init(LCUI_TextStyle data);
 
-LCUI_API int TextStyle_CopyFamily( LCUI_TextStyle dst, LCUI_TextStyle src );
+LCUI_API int TextStyle_CopyFamily(LCUI_TextStyle dst, LCUI_TextStyle src);
 
-LCUI_API int TextStyle_Copy( LCUI_TextStyle dst, LCUI_TextStyle src );
+LCUI_API int TextStyle_Copy(LCUI_TextStyle dst, LCUI_TextStyle src);
 
-LCUI_API void TextStyle_Destroy( LCUI_TextStyle data );
+LCUI_API void TextStyle_Destroy(LCUI_TextStyle data);
 
-LCUI_API void TextStyle_Merge( LCUI_TextStyle base, LCUI_TextStyle target );
+LCUI_API void TextStyle_Merge(LCUI_TextStyle base, LCUI_TextStyle target);
 
 /* 设置字体粗细程度 */
-LCUI_API int TextStyle_SetWeight( LCUI_TextStyle ts, LCUI_FontWeight weight );
+LCUI_API int TextStyle_SetWeight(LCUI_TextStyle ts, LCUI_FontWeight weight);
 
-LCUI_API int TextStyle_SetStyle( LCUI_TextStyle ts, LCUI_FontStyle style );
+LCUI_API int TextStyle_SetStyle(LCUI_TextStyle ts, LCUI_FontStyle style);
 
 /**
  * 设置字体
  * @param[in][out] ts 字体样式数据
  * @param[in] str 字体名称，如果有多个名称则用逗号分隔
  */
-LCUI_API int TextStyle_SetFont( LCUI_TextStyle ts, const char *str );
+LCUI_API int TextStyle_SetFont(LCUI_TextStyle ts, const char *str);
 
 /** 设置使用默认的字体 */
-int TextStyle_SetDefaultFont( LCUI_TextStyle ts );
+int TextStyle_SetDefaultFont(LCUI_TextStyle ts);
 
 /*-------------------------- StyleTag --------------------------------*/
 
 #define StyleTags_Init LinkedList_Init
 
 /** 从字符串中获取样式标签的名字及样式属性 */
-LCUI_API const wchar_t *ScanStyleTag( const wchar_t *wstr, wchar_t *name,
-				      int max_name_len, wchar_t *data );
+LCUI_API const wchar_t *ScanStyleTag(const wchar_t *wstr, wchar_t *name,
+				     int max_name_len, wchar_t *data);
 
 /** 在字符串中获取样式的结束标签，输出的是标签名 */
-LCUI_API const wchar_t *ScanStyleEndingTag( const wchar_t *wstr, wchar_t *name );
+LCUI_API const wchar_t *ScanStyleEndingTag(const wchar_t *wstr, wchar_t *name);
 
-LCUI_API void StyleTags_Clear( LinkedList *tags );
+LCUI_API void StyleTags_Clear(LinkedList *tags);
 
-LCUI_API LCUI_TextStyle StyleTags_GetTextStyle( LinkedList *tags );
+LCUI_API LCUI_TextStyle StyleTags_GetTextStyle(LinkedList *tags);
 
 /** 处理样式标签 */
-LCUI_API const wchar_t* StyleTags_GetStart( LinkedList *tags,
-						const wchar_t *str );
+LCUI_API const wchar_t* StyleTags_GetStart(LinkedList *tags,
+					   const wchar_t *str);
 
 /** 处理样式结束标签 */
-LCUI_API const wchar_t* StyleTags_GetEnd( LinkedList *tags,
-						 const wchar_t *str );
+LCUI_API const wchar_t* StyleTags_GetEnd(LinkedList *tags,
+					 const wchar_t *str);
 
 /*------------------------- End StyleTag -----------------------------*/
 

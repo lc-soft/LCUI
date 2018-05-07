@@ -2,7 +2,7 @@
  * border.h -- Border draw support.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -33,15 +33,9 @@
 
 LCUI_BEGIN_HEADER
 
-/**
- * 绘制边框
- * @param[in] paint 绘制上下文
- * @param[in] box 需要绘制边框的矩形框
- * @param[in] border 边框参数
- */
-LCUI_API int Border_Paint( const LCUI_Border *border,
-			   const LCUI_Rect *box,
-			   LCUI_PaintContext paint );
+LCUI_API int Border_Paint(const LCUI_Border *border,
+			  const LCUI_Rect *box,
+			  LCUI_PaintContext paint);
 
 LCUI_END_HEADER
 

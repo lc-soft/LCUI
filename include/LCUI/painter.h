@@ -2,7 +2,7 @@
  * painter.h -- The painter context operation set.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -31,8 +31,8 @@
 #ifndef LCUI_PAINTER_H
 #define LCUI_PAINTER_H
 
-LCUI_PaintContext LCUIPainter_Begin( LCUI_Graph *canvas, LCUI_Rect *rect );
+LCUI_API LCUI_PaintContext LCUIPainter_Begin(LCUI_Graph *canvas, LCUI_Rect *rect);
 
-void LCUIPainter_End( LCUI_PaintContext paint );
+LCUI_API void LCUIPainter_End(LCUI_PaintContext paint);
 
 #endif

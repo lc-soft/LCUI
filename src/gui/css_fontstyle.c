@@ -2,7 +2,7 @@
  * css_fontstyle.c -- CSS font style parse and operation set.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -55,7 +55,7 @@ enum FontStyleType {
 	FS_OBLIQUE
 };
 
-typedef void (*StyleHandler)( LCUI_CSSFontStyle, LCUI_Style );
+typedef void(*StyleHandler)(LCUI_CSSFontStyle, LCUI_Style);
 
 static struct LCUI_CSSFontStyleModule {
 	int keys[TOTAL_FONT_STYLE_KEY];
@@ -63,139 +63,139 @@ static struct LCUI_CSSFontStyleModule {
 } self;
 
 
-static int unescape( const wchar_t *instr, wchar_t *outstr )
+static int unescape(const wchar_t *instr, wchar_t *outstr)
 {
 	int i = -1;
 	wchar_t buff[6];
 	wchar_t *pout = outstr;
 	const wchar_t *pin = instr;
 
-	for( ; *pin; ++pin ) {
-		if( i >= 0 ) {
+	for (; *pin; ++pin) {
+		if (i >= 0) {
 			buff[i++] = *pin;
-			if( i >= 4 ) {
+			if (i >= 4) {
 				buff[i] = 0;
-				swscanf( buff, L"%hx", pout );
+				swscanf(buff, L"%hx", pout);
 				++pout;
 				i = -1;
 			}
 			continue;
 		}
-		if( *pin == L'\\' ) {
+		if (*pin == L'\\') {
 			i = 0;
 			continue;
 		}
 		*pout++ = *pin;
 	}
-	if( i >= 4 ) {
+	if (i >= 4) {
 		buff[i] = 0;
-		swscanf( buff, L"%hx", pout );
+		swscanf(buff, L"%hx", pout);
 		++pout;
 	}
 	*pout = 0;
 	return pout - outstr;
 }
 
-static int OnParseContent( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseContent(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	int i;
 	wchar_t *content;
-	size_t len = strlen( str ) + 1;
-	content = malloc( len * sizeof( wchar_t ) );
-	LCUI_DecodeString( content, str, (int)len, ENCODING_UTF8 );
-	if( content[0] == '"' ) {
-		for( i = 0; content[i + 1]; ++i ) {
+	size_t len = strlen(str) + 1;
+	content = malloc(len * sizeof(wchar_t));
+	LCUI_DecodeString(content, str, (int)len, ENCODING_UTF8);
+	if (content[0] == '"') {
+		for (i = 0; content[i + 1]; ++i) {
 			content[i] = content[i + 1];
 		}
-		if( content[i - 1] != '"' ) {
-			free( content );
+		if (content[i - 1] != '"') {
+			free(content);
 			return -1;
 		}
 		content[i - 1] = 0;
 	}
-	unescape( content, content );
-	SetFontStyle( ctx, content, wstring );
+	unescape(content, content);
+	SetFontStyle(ctx, content, wstring);
 	return 0;
 }
 
-static int OnParseColor( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseColor(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_Style s = GetFontStyle( ctx );
-	if( ParseColor( s, str ) ) {
+	LCUI_Style s = GetFontStyle(ctx);
+	if (ParseColor(s, str)) {
 		return 0;
 	}
 	return -1;
 }
 
-static int OnParseFontSize( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseFontSize(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_Style s = GetFontStyle( ctx );
-	if( ParseNumber( s, str ) ) {
+	LCUI_Style s = GetFontStyle(ctx);
+	if (ParseNumber(s, str)) {
 		return 0;
 	}
 	return -1;
 }
 
-static int OnParseFontFamily( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseFontFamily(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	char *name = strdup2( str );
-	LCUI_Style s = GetFontStyle( ctx );
-	if( s->is_valid && s->string ) {
-		free( s->string );
+	char *name = strdup2(str);
+	LCUI_Style s = GetFontStyle(ctx);
+	if (s->is_valid && s->string) {
+		free(s->string);
 	}
-	SetFontStyle( ctx, name, string );
+	SetFontStyle(ctx, name, string);
 	return 0;
 }
 
-static int OnParseFontStyle( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseFontStyle(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	int style;
-	if( ParseFontStyle( str, &style ) ) {
-		SetFontStyle( ctx, style, int );
+	if (ParseFontStyle(str, &style)) {
+		SetFontStyle(ctx, style, int);
 		return 0;
 	}
 	return -1;
 }
 
-static int OnParseFontWeight( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseFontWeight(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	int weight;
-	if( ParseFontWeight( str, &weight ) ) {
-		SetFontStyle( ctx, weight, int );
+	if (ParseFontWeight(str, &weight)) {
+		SetFontStyle(ctx, weight, int);
 		return 0;
 	}
 	return -1;
 }
 
-static int OnParseTextAlign( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseTextAlign(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	int val = LCUI_GetStyleValue( str );
-	if( val < 0 ) {
+	int val = LCUI_GetStyleValue(str);
+	if (val < 0) {
 		return -1;
 	}
-	SetFontStyle( ctx, val, style );
+	SetFontStyle(ctx, val, style);
 	return 0;
 }
 
-static int OnParseLineHeight( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseLineHeight(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	LCUI_StyleRec sv;
-	if( !ParseNumber(&sv, str) ) {
+	if (!ParseNumber(&sv, str)) {
 		return -1;
 	}
 	ctx->sheet->sheet[self.keys[ctx->parser->key]] = sv;
 	return 0;
 }
 
-static int OnParseStyleOption( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseStyleOption(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_Style s = GetFontStyle( ctx );
-	int v = LCUI_GetStyleValue( str );
-	if( v < 0 ) {
+	LCUI_Style s = GetFontStyle(ctx);
+	int v = LCUI_GetStyleValue(str);
+	if (v < 0) {
 		return -1;
 	}
 	s->style = v;
-	s->type = SVT_STYLE;
+	s->type = LCUI_STYPE_STYLE;
 	s->is_valid = TRUE;
 	return 0;
 }
@@ -212,109 +212,109 @@ static LCUI_CSSPropertyParserRec style_parsers[] = {
 	{ key_white_space, "white-space", OnParseStyleOption }
 };
 
-static void OnComputeFontSize( LCUI_CSSFontStyle fs, LCUI_Style s )
+static void OnComputeFontSize(LCUI_CSSFontStyle fs, LCUI_Style s)
 {
-	if( s->is_valid ) {
+	if (s->is_valid) {
 		fs->font_size = LCUIMetrics_ComputeActual(
-			max( MIN_FONT_SIZE, s->value ), s->type
+			max(MIN_FONT_SIZE, s->value), s->type
 		);
 		return;
 	}
-	fs->font_size = LCUIMetrics_ComputeActual( DEFAULT_FONT_SIZE, SVT_PX );
+	fs->font_size = LCUIMetrics_ComputeActual(DEFAULT_FONT_SIZE, LCUI_STYPE_PX);
 }
 
-static void OnComputeColor( LCUI_CSSFontStyle fs, LCUI_Style s )
+static void OnComputeColor(LCUI_CSSFontStyle fs, LCUI_Style s)
 {
-	if( s->is_valid ) {
+	if (s->is_valid) {
 		fs->color = s->color;
 	} else {
 		fs->color.value = DEFAULT_COLOR;
 	}
 }
 
-static void OnComputeFontFamily( LCUI_CSSFontStyle fs, LCUI_Style s )
+static void OnComputeFontFamily(LCUI_CSSFontStyle fs, LCUI_Style s)
 {
-	if( fs->font_ids ) {
-		free( fs->font_ids );
+	if (fs->font_ids) {
+		free(fs->font_ids);
 		fs->font_ids = NULL;
 	}
-	if( fs->font_family ) {
-		free( fs->font_family );
+	if (fs->font_family) {
+		free(fs->font_family);
 		fs->font_family = NULL;
 	}
-	if( !s->is_valid ) {
+	if (!s->is_valid) {
 		return;
 	}
-	fs->font_family = strdup2( s->string );
-	LCUIFont_GetIdByNames( &fs->font_ids, fs->font_style,
-			       fs->font_weight, fs->font_family );
+	fs->font_family = strdup2(s->string);
+	LCUIFont_GetIdByNames(&fs->font_ids, fs->font_style,
+			      fs->font_weight, fs->font_family);
 }
 
-static void OnComputeFontStyle( LCUI_CSSFontStyle fs, LCUI_Style s )
+static void OnComputeFontStyle(LCUI_CSSFontStyle fs, LCUI_Style s)
 {
-	if( s->is_valid ) {
+	if (s->is_valid) {
 		fs->font_style = s->val_int;
 	} else {
 		fs->font_style = FONT_STYLE_NORMAL;
 	}
 }
 
-static void OnComputeFontWeight( LCUI_CSSFontStyle fs, LCUI_Style s )
+static void OnComputeFontWeight(LCUI_CSSFontStyle fs, LCUI_Style s)
 {
-	if( s->is_valid ) {
+	if (s->is_valid) {
 		fs->font_weight = s->val_int;
 	} else {
 		fs->font_weight = FONT_WEIGHT_NORMAL;
 	}
 }
 
-static void OnComputeTextAlign( LCUI_CSSFontStyle fs, LCUI_Style s )
+static void OnComputeTextAlign(LCUI_CSSFontStyle fs, LCUI_Style s)
 {
-	if( s->is_valid ) {
+	if (s->is_valid) {
 		fs->text_align = s->val_style;
 	} else {
 		fs->text_align = SV_LEFT;
 	}
 }
 
-static void OnComputeLineHeight( LCUI_CSSFontStyle fs, LCUI_Style s )
+static void OnComputeLineHeight(LCUI_CSSFontStyle fs, LCUI_Style s)
 {
 	int h;
-	if( s->is_valid ) {
-		if( s->type == SVT_VALUE ) {
-			h = iround( fs->font_size * s->val_int );
-		} else if( s->type == SVT_SCALE ) {
-			h = iround( fs->font_size * s->val_scale );
+	if (s->is_valid) {
+		if (s->type == LCUI_STYPE_VALUE) {
+			h = iround(fs->font_size * s->val_int);
+		} else if (s->type == LCUI_STYPE_SCALE) {
+			h = iround(fs->font_size * s->val_scale);
 		} else {
-			h = LCUIMetrics_ComputeActual( s->value, s->type );
+			h = LCUIMetrics_ComputeActual(s->value, s->type);
 		}
 	} else {
-		h = iround( fs->font_size * LINE_HEIGHT_SCALE );
+		h = iround(fs->font_size * LINE_HEIGHT_SCALE);
 	}
 	fs->line_height = h;
 }
 
-static void OnComputeContent( LCUI_CSSFontStyle fs, LCUI_Style s )
+static void OnComputeContent(LCUI_CSSFontStyle fs, LCUI_Style s)
 {
-	if( fs->content ) {
-		free( fs->content );
+	if (fs->content) {
+		free(fs->content);
 		fs->content = NULL;
 	}
-	if( s->is_valid ) {
-		fs->content = wcsdup2( s->wstring );
+	if (s->is_valid) {
+		fs->content = wcsdup2(s->wstring);
 	}
 }
 
-static void OnComputeWhiteSpace( LCUI_CSSFontStyle fs, LCUI_Style s )
+static void OnComputeWhiteSpace(LCUI_CSSFontStyle fs, LCUI_Style s)
 {
-	if( s->is_valid && s->type == SVT_STYLE ) {
+	if (s->is_valid && s->type == LCUI_STYPE_STYLE) {
 		fs->white_space = s->val_style;
-	}  else {
+	} else {
 		fs->white_space = SV_AUTO;
 	}
 }
 
-void CSSFontStyle_Init( LCUI_CSSFontStyle fs )
+void CSSFontStyle_Init(LCUI_CSSFontStyle fs)
 {
 	fs->content = NULL;
 	fs->font_ids = NULL;
@@ -323,39 +323,39 @@ void CSSFontStyle_Init( LCUI_CSSFontStyle fs )
 	fs->font_weight = FONT_WEIGHT_NORMAL;
 }
 
-void CSSFontStyle_Destroy( LCUI_CSSFontStyle fs )
+void CSSFontStyle_Destroy(LCUI_CSSFontStyle fs)
 {
-	if( fs->font_ids ) {
-		free( fs->font_ids );
+	if (fs->font_ids) {
+		free(fs->font_ids);
 		fs->font_ids = NULL;
 	}
-	if( fs->font_family ) {
-		free( fs->font_family );
+	if (fs->font_family) {
+		free(fs->font_family);
 		fs->font_family = NULL;
 	}
-	if( fs->content ) {
-		free( fs->content );
+	if (fs->content) {
+		free(fs->content);
 		fs->content = NULL;
 	}
 }
 
-int LCUI_GetFontStyleKey( int key )
+int LCUI_GetFontStyleKey(int key)
 {
 	return self.keys[key];
 }
 
-void CSSFontStyle_Compute( LCUI_CSSFontStyle fs, LCUI_StyleSheet ss )
+void CSSFontStyle_Compute(LCUI_CSSFontStyle fs, LCUI_StyleSheet ss)
 {
 	int i;
-	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
-		if( self.keys[i] < 0 ) {
+	for (i = 0; i < TOTAL_FONT_STYLE_KEY; ++i) {
+		if (self.keys[i] < 0) {
 			continue;
 		}
-		self.handlers[i]( fs, &ss->sheet[self.keys[i]] );
+		self.handlers[i](fs, &ss->sheet[self.keys[i]]);
 	}
 }
 
-void CSSFontStyle_GetTextStyle( LCUI_CSSFontStyle fs, LCUI_TextStyle ts )
+void CSSFontStyle_GetTextStyle(LCUI_CSSFontStyle fs, LCUI_TextStyle ts)
 {
 	size_t len;
 	ts->font_ids = NULL;
@@ -369,21 +369,21 @@ void CSSFontStyle_GetTextStyle( LCUI_CSSFontStyle fs, LCUI_TextStyle ts )
 	ts->pixel_size = fs->font_size;
 	ts->weight = fs->font_weight;
 	ts->style = fs->font_style;
-	if( fs->font_ids ) {
-		for( len = 0; fs->font_ids[len]; ++len );
-		ts->font_ids = malloc( sizeof( int ) * ++len );
-		memcpy( ts->font_ids, fs->font_ids, len * sizeof( int ) );
+	if (fs->font_ids) {
+		for (len = 0; fs->font_ids[len]; ++len);
+		ts->font_ids = malloc(sizeof(int) * ++len);
+		memcpy(ts->font_ids, fs->font_ids, len * sizeof(int));
 		ts->has_family = TRUE;
 	}
 }
 
-void LCUI_InitCSSFontStyle( void )
+void LCUI_InitCSSFontStyle(void)
 {
 	int i;
-	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
+	for (i = 0; i < TOTAL_FONT_STYLE_KEY; ++i) {
 		LCUI_CSSPropertyParser p = &style_parsers[i];
-		self.keys[p->key] = LCUI_AddCSSPropertyName( p->name );
-		LCUI_AddCSSPropertyParser( p );
+		self.keys[p->key] = LCUI_AddCSSPropertyName(p->name);
+		LCUI_AddCSSPropertyParser(p);
 	}
 	self.handlers[key_color] = OnComputeColor;
 	self.handlers[key_font_size] = OnComputeFontSize;
@@ -396,7 +396,7 @@ void LCUI_InitCSSFontStyle( void )
 	self.handlers[key_content] = OnComputeContent;
 }
 
-void LCUI_FreeCSSFontStyle( void )
+void LCUI_FreeCSSFontStyle(void)
 {
 
 }

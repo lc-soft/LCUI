@@ -2,7 +2,7 @@
  * time.c -- The time operation set.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -33,15 +33,15 @@
 
 LCUI_BEGIN_HEADER
 
-LCUI_API void LCUITime_Init( void );
+LCUI_API void LCUITime_Init(void);
 
-LCUI_API int64_t LCUI_GetTime( void );
+LCUI_API int64_t LCUI_GetTime(void);
 
-LCUI_API int64_t LCUI_GetTimeDelta( int64_t start );
+LCUI_API int64_t LCUI_GetTimeDelta(int64_t start);
 
-LCUI_API void LCUI_Sleep( unsigned int s );
+LCUI_API void LCUI_Sleep(unsigned int s);
 
-LCUI_API void LCUI_MSleep( unsigned int ms );
+LCUI_API void LCUI_MSleep(unsigned int ms);
 
 
 LCUI_END_HEADER

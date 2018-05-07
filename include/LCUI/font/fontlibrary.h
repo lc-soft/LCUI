@@ -2,7 +2,7 @@
  * fontlibrary.h -- The font info and font bitmap cache module.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -81,69 +81,69 @@ typedef struct LCUI_FontRec_ {
 
 struct LCUI_FontEngine {
 	char name[64];
-	int (*open)(const char*, LCUI_Font**);
-	int (*render)(LCUI_FontBitmap*, wchar_t, int, LCUI_Font);
-	void (*close)(void*);
+	int(*open)(const char*, LCUI_Font**);
+	int(*render)(LCUI_FontBitmap*, wchar_t, int, LCUI_Font);
+	void(*close)(void*);
 };
 
 /**
  * 根据字符串内容猜测字体粗细程度
  * 文档：https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight
  */
-LCUI_API LCUI_FontWeight LCUIFont_DetectWeight( const char *str );
+LCUI_API LCUI_FontWeight LCUIFont_DetectWeight(const char *str);
 
 /**
  * 根据字符串内容猜测字体风格
  * 文档：https://developer.mozilla.org/en-US/docs/Web/CSS/font-style
  */
-LCUI_API LCUI_FontStyle LCUIFont_DetectStyle( const char *str );
+LCUI_API LCUI_FontStyle LCUIFont_DetectStyle(const char *str);
 
 #ifndef _XTYPEDEF_FONT
-LCUI_API LCUI_Font Font( const char *family_name, const char *style_name );
+LCUI_API LCUI_Font Font(const char *family_name, const char *style_name);
 #endif
 
-LCUI_API void DeleteFont( LCUI_Font font );
+LCUI_API void DeleteFont(LCUI_Font font);
 
-int LCUIFont_InitInCoreFont( LCUI_FontEngine *engine );
+int LCUIFont_InitInCoreFont(LCUI_FontEngine *engine);
 
-int LCUIFont_ExitInCoreFont( void );
+int LCUIFont_ExitInCoreFont(void);
 
 #ifdef LCUI_FONT_ENGINE_FREETYPE
 
-int LCUIFont_InitFreeType( LCUI_FontEngine *engine );
+int LCUIFont_InitFreeType(LCUI_FontEngine *engine);
 
-int LCUIFont_ExitFreeType( void );
+int LCUIFont_ExitFreeType(void);
 
 #endif
 
 /** 获取内置的 Inconsolata 字体位图 */
-LCUI_API int FontInconsolata_GetBitmap( LCUI_FontBitmap *bmp, wchar_t ch, int size );
+LCUI_API int FontInconsolata_GetBitmap(LCUI_FontBitmap *bmp, wchar_t ch, int size);
 
 /** 打印字体位图的信息 */
-LCUI_API void FontBitmap_PrintInfo( LCUI_FontBitmap *bitmap );
+LCUI_API void FontBitmap_PrintInfo(LCUI_FontBitmap *bitmap);
 
 /** 初始化字体位图 */
-LCUI_API void FontBitmap_Init( LCUI_FontBitmap *bitmap );
+LCUI_API void FontBitmap_Init(LCUI_FontBitmap *bitmap);
 
 /** 释放字体位图占用的资源 */
-LCUI_API void FontBitmap_Free( LCUI_FontBitmap *bitmap );
+LCUI_API void FontBitmap_Free(LCUI_FontBitmap *bitmap);
 
 /** 创建字体位图 */
-LCUI_API int FontBitmap_Create( LCUI_FontBitmap *bitmap, int width, int rows );
+LCUI_API int FontBitmap_Create(LCUI_FontBitmap *bitmap, int width, int rows);
 
 /** 在屏幕打印以0和1表示字体位图 */
-LCUI_API int FontBitmap_Print( LCUI_FontBitmap *fontbmp );
+LCUI_API int FontBitmap_Print(LCUI_FontBitmap *fontbmp);
 
 /** 将字体位图绘制到目标图像上 */
-LCUI_API int FontBitmap_Mix( LCUI_Graph *graph, LCUI_Pos pos,
-			     const LCUI_FontBitmap *bmp, LCUI_Color color );
+LCUI_API int FontBitmap_Mix(LCUI_Graph *graph, LCUI_Pos pos,
+			    const LCUI_FontBitmap *bmp, LCUI_Color color);
 
 /** 载入字体位图 */
-LCUI_API int LCUIFont_RenderBitmap( LCUI_FontBitmap *buff, wchar_t ch,
-			   int font_id, int pixel_size );
+LCUI_API int LCUIFont_RenderBitmap(LCUI_FontBitmap *buff, wchar_t ch,
+				   int font_id, int pixel_size);
 
-/** 添加字体族，并返回该字族的ID */
-LCUI_API int LCUIFont_Add( LCUI_Font font );
+	/** 添加字体族，并返回该字族的ID */
+LCUI_API int LCUIFont_Add(LCUI_Font font);
 
 /**
  * 获取字体的ID
@@ -151,9 +151,9 @@ LCUI_API int LCUIFont_Add( LCUI_Font font );
  * @param[in] style 字体风格
  * @param[in] weight 字体粗细程度，若为值 0，则默认为 FONT_WEIGHT_NORMAL
  */
-LCUI_API int LCUIFont_GetId( const char *family_name,
-			     LCUI_FontStyle style,
-			     LCUI_FontWeight weight );
+LCUI_API int LCUIFont_GetId(const char *family_name,
+			    LCUI_FontStyle style,
+			    LCUI_FontWeight weight);
 
 /**
  * 更新当前字体的粗细程度
@@ -161,9 +161,9 @@ LCUI_API int LCUIFont_GetId( const char *family_name,
  * @params[in] weight 字体粗细程度
  * @params[out] new_font_ids 更新字体粗细程度后的字体 id 列表
  */
-LCUI_API size_t LCUIFont_UpdateWeight( const int *font_ids,
-				       LCUI_FontWeight weight,
-				       int **new_font_ids );
+LCUI_API size_t LCUIFont_UpdateWeight(const int *font_ids,
+				      LCUI_FontWeight weight,
+				      int **new_font_ids);
 
 /**
  * 更新当前字体的风格
@@ -171,9 +171,9 @@ LCUI_API size_t LCUIFont_UpdateWeight( const int *font_ids,
  * @params[in] style 字体风格
  * @params[out] new_font_ids 更新字体粗细程度后的字体 id 列表
  */
-LCUI_API size_t LCUIFont_UpdateStyle( const int *font_ids,
-				      LCUI_FontStyle style,
-				      int **new_font_ids );
+LCUI_API size_t LCUIFont_UpdateStyle(const int *font_ids,
+				     LCUI_FontStyle style,
+				     int **new_font_ids);
 
 /**
  * 根据字族名称获取对应的字体 ID 列表
@@ -183,19 +183,19 @@ LCUI_API size_t LCUIFont_UpdateStyle( const int *font_ids,
  * @param[in] names 字族名称，多个名字用逗号隔开
  * @return 获取到的字体 ID 的数量
  */
-LCUI_API size_t LCUIFont_GetIdByNames( int **font_ids,
-				       LCUI_FontStyle style,
-				       LCUI_FontWeight weight,
-				       const char *names );
+LCUI_API size_t LCUIFont_GetIdByNames(int **font_ids,
+				      LCUI_FontStyle style,
+				      LCUI_FontWeight weight,
+				      const char *names);
 
 /** 获取指定字体ID的字体信息 */
-LCUI_API LCUI_Font LCUIFont_GetById( int id );
+LCUI_API LCUI_Font LCUIFont_GetById(int id);
 
 /** 获取默认的字体ID */
-LCUI_API int LCUIFont_GetDefault( void );
+LCUI_API int LCUIFont_GetDefault(void);
 
 /** 设定默认的字体 */
-LCUI_API void LCUIFont_SetDefault( int id );
+LCUI_API void LCUIFont_SetDefault(int id);
 
 /**
  * 向字体缓存中添加字体位图
@@ -206,8 +206,8 @@ LCUI_API void LCUIFont_SetDefault( int id );
  * @warning 此函数仅仅是将 bmp 复制进缓存中，并未重新分配新的空间储存位图数
  * 据，因此，请勿在调用此函数后手动释放 bmp。
  */
-LCUI_API LCUI_FontBitmap* LCUIFont_AddBitmap( wchar_t ch, int font_id,
-				int size, const LCUI_FontBitmap *bmp );
+LCUI_API LCUI_FontBitmap* LCUIFont_AddBitmap(wchar_t ch, int font_id,
+					     int size, const LCUI_FontBitmap *bmp);
 
 /**
  * 从缓存中获取字体位图
@@ -218,17 +218,17 @@ LCUI_API LCUI_FontBitmap* LCUIFont_AddBitmap( wchar_t ch, int font_id,
  * @warning 请勿释放 bmp，bmp 仅仅是引用缓存中的字体位图，并未建分配新
  * 空间存储字体位图的拷贝。
  */
-LCUI_API int LCUIFont_GetBitmap( wchar_t ch, int font_id, int size,
-				 const LCUI_FontBitmap **bmp );
+LCUI_API int LCUIFont_GetBitmap(wchar_t ch, int font_id, int size,
+				const LCUI_FontBitmap **bmp);
 
 /** 载入字体至数据库中 */
-LCUI_API int LCUIFont_LoadFile( const char *filepath );
+LCUI_API int LCUIFont_LoadFile(const char *filepath);
 
 /** 初始化字体处理模块 */
-LCUI_API void LCUI_InitFontLibrary( void );
+LCUI_API void LCUI_InitFontLibrary(void);
 
 /** 停用字体处理模块 */
-LCUI_API void LCUI_FreeFontLibrary( void );
+LCUI_API void LCUI_FreeFontLibrary(void);
 
 LCUI_END_HEADER
 

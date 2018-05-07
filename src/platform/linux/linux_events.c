@@ -2,7 +2,7 @@
  * linux_events.c -- The event loop support for linux.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -28,7 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #include <LCUI_Build.h>
 #ifdef LCUI_BUILD_IN_LINUX
 #include <LCUI/LCUI.h>
@@ -36,28 +35,62 @@
 #include <LCUI/platform.h>
 #include LCUI_EVENTS_H
 
-void LCUI_PreInitLinuxApp( void *data )
+void LCUI_PreInitLinuxApp(void *data)
 {
 	return;
 }
 
-LCUI_AppDriver LCUI_CreateLinuxAppDriver( void )
+static void LinuxApp_ProcessEvents(void)
 {
-#ifdef LCUI_VIDEO_DRIVER_X11
-	LCUI_BOOL is_x11_mode = TRUE;
-	if( is_x11_mode ) {
-		return LCUI_CreateLinuxX11AppDriver();
-	}
-#endif
+}
+
+static int LinuxApp_BindSysEvent(int event_id, LCUI_EventFunc func, void *data,
+				 void (*destroy_data)(void *))
+{
+	return -1;
+}
+
+static int LinuxApp_UnbindSysEvent(int event_id, LCUI_EventFunc func)
+{
+	return -1;
+}
+
+static int LinuxApp_UnbindSysEvent2(int handler_id)
+{
+	return -1;
+}
+
+static void *LinuxApp_GetData(void)
+{
 	return NULL;
 }
 
-void LCUI_DestroyLinuxAppDriver( LCUI_AppDriver driver )
+LCUI_AppDriver LCUI_CreateLinuxAppDriver(void)
+{
+	LCUI_AppDriver driver = NULL;
+	static LCUI_AppDriverRec dummy_driver = {
+		.id = LCUI_APP_LINUX,
+		.ProcessEvents = LinuxApp_ProcessEvents,
+		.BindSysEvent = LinuxApp_BindSysEvent,
+		.UnbindSysEvent = LinuxApp_UnbindSysEvent,
+		.UnbindSysEvent2 = LinuxApp_UnbindSysEvent2,
+		.GetData = LinuxApp_GetData
+	};
+
+#ifdef LCUI_VIDEO_DRIVER_X11
+	driver = LCUI_CreateLinuxX11AppDriver();
+#endif
+	if (!driver) {
+		driver = &dummy_driver;
+	}
+	return driver;
+}
+
+void LCUI_DestroyLinuxAppDriver(LCUI_AppDriver driver)
 {
 #ifdef LCUI_VIDEO_DRIVER_X11
-	LCUI_BOOL is_x11_mode = TRUE;
-	if( is_x11_mode ) {
-		LCUI_DestroyLinuxX11AppDriver( driver );
+	if (driver->id == LCUI_APP_LINUX_X11) {
+		LCUI_DestroyLinuxX11AppDriver(driver);
 	}
 #endif
 }

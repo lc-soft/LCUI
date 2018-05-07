@@ -2,7 +2,7 @@
  * event.h -- Event processing module.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -48,10 +48,10 @@ typedef struct LCUI_EventTriggerRec_ {
 } LCUI_EventTriggerRec, *LCUI_EventTrigger;
 
 /** 构建一个事件触发器 */
-LCUI_API LCUI_EventTrigger EventTrigger( void );
+LCUI_API LCUI_EventTrigger EventTrigger(void);
 
 /** 销毁一个事件触发器 */
-LCUI_API void EventTrigger_Destroy( LCUI_EventTrigger trigger );
+LCUI_API void EventTrigger_Destroy(LCUI_EventTrigger trigger);
 
 /**
  * 绑定一个事件处理器
@@ -61,47 +61,47 @@ LCUI_API void EventTrigger_Destroy( LCUI_EventTrigger trigger );
  * @param[in] destroy_data 参数的销毁函数
  * @returns 返回处理器ID
  */
-LCUI_API int EventTrigger_Bind( LCUI_EventTrigger trigger, int event_id,
-				LCUI_EventFunc func, void *data,
-				void( *destroy_data )(void*) );
+LCUI_API int EventTrigger_Bind(LCUI_EventTrigger trigger, int event_id,
+			       LCUI_EventFunc func, void *data,
+			       void(*destroy_data)(void*));
 
-/** 
+/**
  * 解除绑定事件处理器
  * @param[in] trigger  事件触发器
  * @param[in] event_id 事件标识号
  * @param[in] func     事件处理函数
  * @returns 解绑成功返回 0，失败则返回 -1
  */
-LCUI_API int EventTrigger_Unbind( LCUI_EventTrigger trigger, int event_id,
-				  LCUI_EventFunc func );
+LCUI_API int EventTrigger_Unbind(LCUI_EventTrigger trigger, int event_id,
+				 LCUI_EventFunc func);
 
-/** 
-* 根据事件处理器的标识号来解除事件绑定
-* @param[in] trigger    事件触发器
-* @param[in] handler_id 事件处理器的标识号
-* @returns 解绑成功返回 0，失败则返回 -1
-*/
-LCUI_API int EventTrigger_Unbind2( LCUI_EventTrigger trigger, int handler_id );
+/**
+ * 根据事件处理器的标识号来解除事件绑定
+ * @param[in] trigger    事件触发器
+ * @param[in] handler_id 事件处理器的标识号
+ * @returns 解绑成功返回 0，失败则返回 -1
+ */
+LCUI_API int EventTrigger_Unbind2(LCUI_EventTrigger trigger, int handler_id);
 
-/** 
-* 根据自定义的判断方法来解除事件绑定
-* @param[in] trigger       事件触发器
-* @param[in] event_id      事件标识号
-* @param[in] compare_func  比较函数，一致返回 1，不一致则返回 0
-* @param[in] key           用于比较的关键数据
-* @returns 解绑成功返回 0，失败则返回 -1
-*/
-LCUI_API int EventTrigger_Unbind3( LCUI_EventTrigger trigger, int event_id,
-				   int (*compare_func)(void*, void*), void *key );
+/**
+ * 根据自定义的判断方法来解除事件绑定
+ * @param[in] trigger       事件触发器
+ * @param[in] event_id      事件标识号
+ * @param[in] compare_func  比较函数，一致返回 1，不一致则返回 0
+ * @param[in] key           用于比较的关键数据
+ * @returns 解绑成功返回 0，失败则返回 -1
+ */
+LCUI_API int EventTrigger_Unbind3(LCUI_EventTrigger trigger, int event_id,
+				  int(*compare_func)(void*, void*), void *key);
 
-/** 
-* 触发事件
-* @param[in] trigger    事件触发器
-* @param[in] event_id   事件标识号
-* @param[in] arg        与事件相关的数据
-* @returns 返回已调用的事件处理器的数量
-*/
-LCUI_API int EventTrigger_Trigger( LCUI_EventTrigger trigger, int event_id, void *arg );
+/**
+ * 触发事件
+ * @param[in] trigger    事件触发器
+ * @param[in] event_id   事件标识号
+ * @param[in] arg        与事件相关的数据
+ * @returns 返回已调用的事件处理器的数量
+ */
+LCUI_API int EventTrigger_Trigger(LCUI_EventTrigger trigger, int event_id, void *arg);
 
 LCUI_END_HEADER
 

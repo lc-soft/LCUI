@@ -29,36 +29,38 @@
 
 ## Introduction
 
-LCUI is a freely available software library for building user interfaces. It is written in C, support the use XML and CSS to describe the graphical interface, you can use it to build simple desktop apps.
+LCUI is a freely available software library for building user interfaces. It is written in C and supports the use of XML and CSS to describe the graphical interface of simple desktop apps.
 
 [中文版说明文档](README.zh-cn.md)
 
 ### Features
 
-- **written in C:** Suitable for applications that are smaller and are primarily written in C.
+- **Written in C:** Suitable for small applications written primarily in C.
 - **Cross platform:** Support for Windows and Linux, you can write Windows Desktop apps and Universal Windows Platform apps, as well as Linux Desktop apps.
 - **XML parsing:** Support for using XML markup language to describe the structure of the graphical user interface.
-- **CSS parsing:** Support for using CSS language to describing the presentation of the graphical user interface, But the range of CSS support and browser is different, it is a simplified version, cannot support all the features of CSS, like `transition`, `transform`, `animation`, `@media`, `@key-frames` etc, you can read the file [css_parser.c](https://github.com/lc-soft/LCUI/blob/53e268251a53bf371ca7aaa7862ec69fb4d0015a/src/gui/css_parser.c#L550) for more details.
-- **HTML-Like layout:** Support the **block**, **inline-block** and simple **flex** layout, If you have web page development experience, then the use of LCUI will be easier to get started.
-- **Flexible:** Support for adapting the interface to screens of different pixel densities by setting global scaling, And also support for using screen density related sp and dp units to describe position and size of the elements.
+- **CSS parsing:** Support for using a simplified version of CSS to describe the presentation of the graphical user interface. The CSS version used does not support all the features of CSS, like `transition`, `transform`, `animation`, `@media`, `@key-frames` etc, you can read the file [css_parser.c](https://github.com/lc-soft/LCUI/blob/53e268251a53bf371ca7aaa7862ec69fb4d0015a/src/gui/css_parser.c#L550) for more details.
+- **HTML-Like layout:** Support the **block**, **inline-block** and simple **flex** layout, If you have web page development experience, then LCUI will be familiar.
+- **Flexible:** Support for adapting the interface to screens of different pixel densities by setting global scaling. Support for using screen density related sp and dp units to describe position and size of the elements.
 - **Text rendering:** Support for the text to set the global font, line height, horizontal alignment, and also support to set the color, background color, bold, italic for some text blocks separately.
-- **Font management:** Support for loading multiple font files, and support to use font of different family, weight and style.
-- **Image processing:** Provide image read interfaces, support for reading jpg, png and bmp format images.
-- **Touch:** Support multi-touch, but currently only support Windows system.
+- **Font management:** Support for loading multiple font files and using fonts of different families, weights and styles.
+- **Image processing:** Provide image read interfaces: support for reading jpg, png and bmp format images.
+- **Touch:** Supports multi-touch, but currently only on Windows platforms.
 
 ### Missing features
 
-LCUI is a personal project, its main purpose is to allow author to easily develop simple GUI applications, what is "simple"? it means fewer features, for example:
+LCUI is a personal project, its main purpose is to allow the author to easily develop simple GUI applications. 
 
-- No hardware acceleration, graphics rendering inefficient.
+What is "simple"? It means fewer features, for example:
+
+- No hardware acceleration, graphics rendering is inefficient.
 - Cannot select text and copy it on user interface.
-- Cannot use CTRL+C to copy content, and cannot use CTRL+V to paste content to input box.
+- Cannot use CTRL+C to copy content, and cannot use CTRL+V to paste content to input boxes.
 - Cannot use the Input Method Engine to input non-ASCII characters, like Chinese, Japanese, etc.
-- rounded corners border is not supported on this version.
-- Layout system is simple, grid and table layout is not supported.
-- No English documents, it is hard to use.
+- Rounded corner borders are not supported in this version.
+- Layout system is simple. Grid and table layouts are not supported.
+- No English documentation, it is hard to use.
 
-If you have the above problem solving experience, you can provide technical support to author by submitting issue or pull request.
+If you can solve any of the above problems, you can provide technical support to the author by submitting an issue or pull request.
 
 ### Screenshots
 
@@ -90,13 +92,13 @@ In the simplest case you would run:
     make
     make install
 
-If you want to experience the effect of demo, please run:
+If you want to experience the demo, please run:
 
     cd test
     make
     ./hellowrold
 
-If you want to custom building options, please read the [INSTALL](INSTALL) file for more details.
+If you want to use custom building options, please read the [INSTALL](INSTALL) file for more details.
 
 ### Prerequisites
 
@@ -109,13 +111,13 @@ If you want to build full-featured LCUI, we suggest you install the following
  * [libx11](https://www.x.org/) — X11 client-side library
  * [freetype](https://www.freetype.org/) — Font engine
 
-If you system is Ubuntu, you can run following command to install dependencies:
+If your system is Ubuntu, you can run following command to install dependencies:
 
     apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev
 
 ### Building On Windows
 
-LCUI is mainly develop in the Windows environment, you can use VisualStudio to open file `build/windows/LCUI.sln` and compile LCUI.
+LCUI is mainly developed in the Windows environment, you can use VisualStudio to open the file `build/windows/LCUI.sln` and compile LCUI.
 
 ## Contribution
 

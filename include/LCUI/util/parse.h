@@ -2,7 +2,7 @@
  * parse.h -- Parse data from string
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,21 +34,21 @@
 LCUI_BEGIN_HEADER
 
 /** 从字符串中解析出数字，支持的单位：点(pt)、像素(px)、百分比(%) */
-LCUI_API LCUI_BOOL ParseNumber( LCUI_Style var, const char *str );
+LCUI_API LCUI_BOOL ParseNumber(LCUI_Style var, const char *str);
 
-LCUI_API LCUI_BOOL ParseRGB( LCUI_Style var, const char *str );
+LCUI_API LCUI_BOOL ParseRGB(LCUI_Style var, const char *str);
 
-LCUI_API LCUI_BOOL ParseRGBA( LCUI_Style var, const char *str );
+LCUI_API LCUI_BOOL ParseRGBA(LCUI_Style var, const char *str);
 
 /** 从字符串中解析出色彩值，支持格式：#fff、#ffffff, rgba(R,G,B,A)、rgb(R,G,B) */
-LCUI_API LCUI_BOOL ParseColor( LCUI_Style var, const char *str );
+LCUI_API LCUI_BOOL ParseColor(LCUI_Style var, const char *str);
 
 /** 解析资源路径 */
-LCUI_BOOL ParseUrl( LCUI_Style s, const char *str, const char *dirname );
+LCUI_BOOL ParseUrl(LCUI_Style s, const char *str, const char *dirname);
 
-LCUI_BOOL ParseFontWeight( const char *str, int *weight );
+LCUI_BOOL ParseFontWeight(const char *str, int *weight);
 
-LCUI_BOOL ParseFontStyle( const char *str, int *style );
+LCUI_BOOL ParseFontStyle(const char *str, int *style);
 
 LCUI_END_HEADER
 

@@ -2,7 +2,7 @@
  * logger.h -- Logger module
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -33,13 +33,13 @@
 
 LCUI_BEGIN_HEADER
 
-LCUI_API int Logger_Log( const char* fmt, ... );
+LCUI_API int Logger_Log(const char* fmt, ...);
 
-LCUI_API int Logger_LogW( const wchar_t* fmt, ... );
+LCUI_API int Logger_LogW(const wchar_t* fmt, ...);
 
-LCUI_API void Logger_SetHandler( void( *handler )(const char*) );
+LCUI_API void Logger_SetHandler(void(*handler)(const char*));
 
-LCUI_API void Logger_SetHandlerW( void( *handler )(const wchar_t*) );
+LCUI_API void Logger_SetHandlerW(void(*handler)(const wchar_t*));
 
 LCUI_END_HEADER
 

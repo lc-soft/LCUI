@@ -2,7 +2,7 @@
  * metrics.c -- Display related metrics operation set.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -40,40 +40,40 @@ static struct LCUI_MetricsModule {
 	float scale;
 } metrics;
 
-float LCUIMetrics_Compute( float value, LCUI_StyleType type )
+float LCUIMetrics_Compute(float value, LCUI_StyleType type)
 {
-	switch( type ) {
-	case SVT_PX: break;
-	case SVT_DIP: value = value * metrics.density; break;
-	case SVT_SP: value = value * metrics.scaled_density; break;
-	case SVT_PT: value = value * metrics.dpi / 72.0f; break;
+	switch (type) {
+	case LCUI_STYPE_PX: break;
+	case LCUI_STYPE_DIP: value = value * metrics.density; break;
+	case LCUI_STYPE_SP: value = value * metrics.scaled_density; break;
+	case LCUI_STYPE_PT: value = value * metrics.dpi / 72.0f; break;
 	default: value = 0; break;
 	}
 	return value;
 }
 
-int LCUIMetrics_ComputeActual( float value, LCUI_StyleType type )
+int LCUIMetrics_ComputeActual(float value, LCUI_StyleType type)
 {
-	return iround( LCUIMetrics_Compute( value, type ) * metrics.scale );
+	return iround(LCUIMetrics_Compute(value, type) * metrics.scale);
 }
 
-void LCUIMetrics_ComputeRectActual( LCUI_Rect *dst, const LCUI_RectF *src )
+void LCUIMetrics_ComputeRectActual(LCUI_Rect *dst, const LCUI_RectF *src)
 {
-	dst->x = LCUIMetrics_ComputeActual( src->x, SVT_PX );
-	dst->y = LCUIMetrics_ComputeActual( src->y, SVT_PX );
-	dst->width = LCUIMetrics_ComputeActual( src->width, SVT_PX );
-	dst->height = LCUIMetrics_ComputeActual( src->height, SVT_PX );
+	dst->x = LCUIMetrics_ComputeActual(src->x, LCUI_STYPE_PX);
+	dst->y = LCUIMetrics_ComputeActual(src->y, LCUI_STYPE_PX);
+	dst->width = LCUIMetrics_ComputeActual(src->width, LCUI_STYPE_PX);
+	dst->height = LCUIMetrics_ComputeActual(src->height, LCUI_STYPE_PX);
 }
 
-float LCUIMetrics_GetScale( void )
+float LCUIMetrics_GetScale(void)
 {
 	return metrics.scale;
 }
 
-static float ComputeDensityByLevel( LCUI_DensityLevel level )
+static float ComputeDensityByLevel(LCUI_DensityLevel level)
 {
 	float density = metrics.dpi / 96.0f;
-	switch( level ) {
+	switch (level) {
 	case DENSITY_LEVEL_SMALL: density *= 0.75f; break;
 	case DENSITY_LEVEL_LARGE: density *= 1.25f; break;
 	case DENSITY_LEVEL_BIG: density *= 1.5f; break;
@@ -83,47 +83,47 @@ static float ComputeDensityByLevel( LCUI_DensityLevel level )
 	return density;
 }
 
-void LCUIMetrics_SetDensity( float density )
+void LCUIMetrics_SetDensity(float density)
 {
 	metrics.density = density;
 }
 
-void LCUIMetrics_SetScaledDensity( float density )
+void LCUIMetrics_SetScaledDensity(float density)
 {
 	metrics.scaled_density = density;
 }
 
-void LCUIMetrics_SetDensityLevel( LCUI_DensityLevel level )
+void LCUIMetrics_SetDensityLevel(LCUI_DensityLevel level)
 {
-	metrics.density = ComputeDensityByLevel( level );
+	metrics.density = ComputeDensityByLevel(level);
 }
 
-void LCUIMetrics_SetScaledDensityLevel( LCUI_DensityLevel level )
+void LCUIMetrics_SetScaledDensityLevel(LCUI_DensityLevel level)
 {
-	metrics.scaled_density = ComputeDensityByLevel( level );
+	metrics.scaled_density = ComputeDensityByLevel(level);
 }
 
-void LCUIMetrics_SetDpi( float dpi )
+void LCUIMetrics_SetDpi(float dpi)
 {
 	metrics.dpi = dpi;
-	LCUIMetrics_SetDensityLevel( DENSITY_LEVEL_NORMAL );
-	LCUIMetrics_SetScaledDensityLevel( DENSITY_LEVEL_NORMAL );
+	LCUIMetrics_SetDensityLevel(DENSITY_LEVEL_NORMAL);
+	LCUIMetrics_SetScaledDensityLevel(DENSITY_LEVEL_NORMAL);
 }
 
-void LCUIMetrics_SetScale( float scale )
+void LCUIMetrics_SetScale(float scale)
 {
-	scale = max( 0.5f, scale );
-	scale = min( 5.0f, scale );
+	scale = max(0.5f, scale);
+	scale = min(5.0f, scale);
 	metrics.scale = scale;
 }
 
-void LCUI_InitMetrics( void )
+void LCUI_InitMetrics(void)
 {
 	metrics.scale = 1.0f;
-	LCUIMetrics_SetDpi( 96.0f );
+	LCUIMetrics_SetDpi(96.0f);
 }
 
-void LCUI_FreeMetrics( void )
+void LCUI_FreeMetrics(void)
 {
 
 }

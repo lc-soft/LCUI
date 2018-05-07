@@ -2,7 +2,7 @@
  * rect.h -- Rectangle area handling
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,52 +34,52 @@
 LCUI_BEGIN_HEADER
 
 /* 将数值转换成LCUI_Rect型结构体 */
-LCUI_API LCUI_Rect Rect( int x, int y, int w, int h );
+LCUI_API LCUI_Rect Rect(int x, int y, int w, int h);
 
 /** 根据容器尺寸，获取指定区域中需要裁剪的区域 */
-LCUI_API void LCUIRect_GetCutArea( int box_w, int box_h, 
-				   LCUI_Rect rect, LCUI_Rect *cut );
+LCUI_API void LCUIRect_GetCutArea(int box_w, int box_h,
+				  LCUI_Rect rect, LCUI_Rect *cut);
 
 #define LCUIRect_HasPoint(rect, X, Y) (X >= (rect)->x && Y >= (rect)->y \
 					&& X < (rect)->x + (rect)->width \
 					&& Y < (rect)->y + (rect)->height)
 
 /** 将矩形区域范围调整在容器有效范围内 */
-LCUI_API void LCUIRect_ValidateArea( LCUI_Rect *rect, int box_w, int box_h );
+LCUI_API void LCUIRect_ValidateArea(LCUI_Rect *rect, int box_w, int box_h);
 
-LCUI_API void LCUIRectF_ValidateArea( LCUI_RectF *rect, float box_w, float box_h );
+LCUI_API void LCUIRectF_ValidateArea(LCUI_RectF *rect, float box_w, float box_h);
 
-LCUI_API void LCUIRect_ToRectF( const LCUI_Rect *rect,
-				LCUI_RectF *rectf, float scale );
+LCUI_API void LCUIRect_ToRectF(const LCUI_Rect *rect,
+			       LCUI_RectF *rectf, float scale);
 
-LCUI_API void LCUIRect_Scale( const LCUI_Rect *src,
-			      LCUI_Rect *dst, float scale );
+LCUI_API void LCUIRect_Scale(const LCUI_Rect *src,
+			     LCUI_Rect *dst, float scale);
 
-LCUI_API void LCUIRectF_ToRect( const LCUI_RectF *rectf,
-				LCUI_Rect *rect, float scale );
+LCUI_API void LCUIRectF_ToRect(const LCUI_RectF *rectf,
+			       LCUI_Rect *rect, float scale);
 
 /** 检测矩形是否遮盖另一个矩形 */
-LCUI_API LCUI_BOOL LCUIRect_IsCoverRect( LCUI_Rect *rect1, LCUI_Rect *rect2 );
+LCUI_API LCUI_BOOL LCUIRect_IsCoverRect(LCUI_Rect *rect1, LCUI_Rect *rect2);
 
-/** 
+/**
  * 获取两个矩形中的重叠矩形
  * @param[in] a		矩形A
  * @param[in] b		矩形B
  * @param[out] out	矩形A和B重叠处的矩形
  * @returns 如果两个矩形重叠，则返回TRUE，否则返回FALSE
  */
-LCUI_API LCUI_BOOL LCUIRect_GetOverlayRect( const LCUI_Rect *a, 
-					    const LCUI_Rect *b, 
-					    LCUI_Rect *out );
+LCUI_API LCUI_BOOL LCUIRect_GetOverlayRect(const LCUI_Rect *a,
+					   const LCUI_Rect *b,
+					   LCUI_Rect *out);
 
-LCUI_API LCUI_BOOL LCUIRectF_GetOverlayRect( const LCUI_RectF *a,
-					     const LCUI_RectF *b,
-					     LCUI_RectF *out );
+LCUI_API LCUI_BOOL LCUIRectF_GetOverlayRect(const LCUI_RectF *a,
+					    const LCUI_RectF *b,
+					    LCUI_RectF *out);
 
 /** 合并两个矩形 */
-LCUI_API void LCUIRect_MergeRect( LCUI_Rect *big, LCUI_Rect *a, LCUI_Rect *b );
+LCUI_API void LCUIRect_MergeRect(LCUI_Rect *big, LCUI_Rect *a, LCUI_Rect *b);
 
-/** 
+/**
  * 根据重叠矩形 rect1，将矩形 rect2 分割成四个矩形
  * 分割方法如下：
  * ┏━━┳━━━━━━┓
@@ -93,14 +93,14 @@ LCUI_API void LCUIRect_MergeRect( LCUI_Rect *big, LCUI_Rect *a, LCUI_Rect *b );
  *
  * rect2 必须被 rect1 完全包含
  */
-LCUI_API void LCUIRect_CutFourRect( LCUI_Rect *rect1, LCUI_Rect *rect2, 
-				    LCUI_Rect rects[4] );
+LCUI_API void LCUIRect_CutFourRect(LCUI_Rect *rect1, LCUI_Rect *rect2,
+				   LCUI_Rect rects[4]);
 
 /** 添加一个脏矩形记录 */
-LCUI_API int RectList_Add( LinkedList *list, LCUI_Rect *rect );
+LCUI_API int RectList_Add(LinkedList *list, LCUI_Rect *rect);
 
 /** 删除脏矩形 */
-LCUI_API int RectList_Delete( LinkedList *list, LCUI_Rect *rect );
+LCUI_API int RectList_Delete(LinkedList *list, LCUI_Rect *rect);
 
 #define RectList_Clear(LIST) LinkedList_Clear( LIST, free )
 

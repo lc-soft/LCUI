@@ -2,7 +2,7 @@
  * worker.h -- worker threading and task
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -37,14 +37,14 @@ typedef struct LCUI_WorkerRec_ *LCUI_Worker;
 typedef void* LCUI_Worker;
 #endif
 
-LCUI_API LCUI_Worker LCUIWorker_New( void );
+LCUI_API LCUI_Worker LCUIWorker_New(void);
 
-LCUI_API void LCUIWorker_PostTask( LCUI_Worker worker, LCUI_Task task );
+LCUI_API void LCUIWorker_PostTask(LCUI_Worker worker, LCUI_Task task);
 
-LCUI_API LCUI_BOOL LCUIWorker_RunTask( LCUI_Worker worker );
+LCUI_API LCUI_BOOL LCUIWorker_RunTask(LCUI_Worker worker);
 
-LCUI_API int LCUIWorker_RunAsync( LCUI_Worker worker );
+LCUI_API int LCUIWorker_RunAsync(LCUI_Worker worker);
 
-LCUI_API void LCUIWorker_Destroy( LCUI_Worker worker );
+LCUI_API void LCUIWorker_Destroy(LCUI_Worker worker);
 
 #endif

@@ -2,7 +2,7 @@
  * css_parser.c -- css code parser module
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -52,191 +52,191 @@ static struct CSSParserModule {
 	Dict *parsers;		/**< 解析器表，以名称进行索引 */
 } self;
 
-static int SplitValues( const char *str, LCUI_Style slist,
-			int max_len, int mode )
+static int SplitValues(const char *str, LCUI_Style slist,
+		       int max_len, int mode)
 {
 	char **values;
 	const char *p;
 	int val, vi = 0, vj = 0, n_quotes = 0;
 
-	values = (char**)calloc( max_len, sizeof( char* ) );
-	values[0] = (char*)malloc( sizeof( char ) * 64 );
-	for( p = str; *p; ++p ) {
-		if( *p == '(' ) {
+	values = (char**)calloc(max_len, sizeof(char*));
+	values[0] = (char*)malloc(sizeof(char) * 64);
+	for (p = str; *p; ++p) {
+		if (*p == '(') {
 			n_quotes += 1;
 			values[vi][vj++] = *p;
 			continue;
-		} else if( *p == ')' ) {
+		} else if (*p == ')') {
 			n_quotes -= 1;
 			values[vi][vj++] = *p;
 			continue;
-		} else if( *p != ' ' || n_quotes != 0 ) {
+		} else if (*p != ' ' || n_quotes != 0) {
 			values[vi][vj++] = *p;
 			continue;
 		}
-		if( vj > 0 ) {
+		if (vj > 0) {
 			values[vi][vj] = 0;
 			++vi;
 			vj = 0;
-			if( vi >= max_len ) {
+			if (vi >= max_len) {
 				goto clean;
 			}
-			values[vi] = (char*)malloc( sizeof( char ) * 64 );
+			values[vi] = (char*)malloc(sizeof(char) * 64);
 		}
 	}
 	values[vi][vj] = 0;
 	vi++;
-	for( vj = 0; vj < vi; ++vj ) {
-		DEBUG_MSG( "[%d] %s\n", vj, values[vj] );
-		if( strcmp( values[vj], "auto" ) == 0 ) {
-			slist[vj].type = SVT_AUTO;
+	for (vj = 0; vj < vi; ++vj) {
+		DEBUG_MSG("[%d] %s\n", vj, values[vj]);
+		if (strcmp(values[vj], "auto") == 0) {
+			slist[vj].type = LCUI_STYPE_AUTO;
 			slist[vj].value = SV_AUTO;
 			slist[vj].is_valid = TRUE;
 			continue;
 		}
-		if( mode & SPLIT_NUMBER ) {
-			if( ParseNumber( &slist[vj], values[vj] ) ) {
-				DEBUG_MSG( "[%d]:parse ok\n", vj );
+		if (mode & SPLIT_NUMBER) {
+			if (ParseNumber(&slist[vj], values[vj])) {
+				DEBUG_MSG("[%d]:parse ok\n", vj);
 				continue;
 			}
 		}
-		if( mode & SPLIT_COLOR ) {
-			if( ParseColor( &slist[vj], values[vj] ) ) {
-				DEBUG_MSG( "[%d]:parse ok\n", vj );
+		if (mode & SPLIT_COLOR) {
+			if (ParseColor(&slist[vj], values[vj])) {
+				DEBUG_MSG("[%d]:parse ok\n", vj);
 				continue;
 			}
 		}
-		if( mode & SPLIT_STYLE ) {
-			val = LCUI_GetStyleValue( values[vj] );
-			if( val > 0 ) {
+		if (mode & SPLIT_STYLE) {
+			val = LCUI_GetStyleValue(values[vj]);
+			if (val > 0) {
 				slist[vj].style = val;
-				slist[vj].type = SVT_style;
+				slist[vj].type = LCUI_STYPE_style;
 				slist[vj].is_valid = TRUE;
-				DEBUG_MSG( "[%d]:parse ok\n", vj );
+				DEBUG_MSG("[%d]:parse ok\n", vj);
 				continue;
 			}
 		}
 		vi = -1;
-		DEBUG_MSG( "[%d]:parse error\n", vj );
+		DEBUG_MSG("[%d]:parse error\n", vj);
 		goto clean;
 	}
 clean:
-	for( vj = 0; vj < max_len; ++vj ) {
-		values[vj] ? free( values[vj] ) : 0;
+	for (vj = 0; vj < max_len; ++vj) {
+		values[vj] ? free(values[vj]) : 0;
 	}
-	free( values );
+	free(values);
 	return vi;
 }
 
-static int OnParseValue( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseValue(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	LCUI_Style s = &ctx->sheet->sheet[ctx->parser->key];
-	if( sscanf( str, "%d", &s->val_int ) == 1 ) {
+	if (sscanf(str, "%d", &s->val_int) == 1) {
 		s->is_valid = TRUE;
-		s->type = SVT_VALUE;
+		s->type = LCUI_STYPE_VALUE;
 		return 0;
 	}
 	return -1;
 }
 
-static int OnParseNumber( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseNumber(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	LCUI_Style s = &ctx->sheet->sheet[ctx->parser->key];
-	if( ParseNumber( s, str ) ) {
+	if (ParseNumber(s, str)) {
 		return 0;
 	}
-	if( strcmp("auto", str) == 0 ) {
+	if (strcmp("auto", str) == 0) {
 		s->is_valid = TRUE;
-		s->type = SVT_AUTO;
+		s->type = LCUI_STYPE_AUTO;
 		s->style = SV_AUTO;
 		return 0;
 	}
 	return -1;
 }
 
-static int OnParseBoolean( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseBoolean(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	LCUI_Style s = &ctx->sheet->sheet[ctx->parser->key];
-	if( strcasecmp(str, "true") == 0 ) {
+	if (strcasecmp(str, "true") == 0) {
 		s->is_valid = TRUE;
-		s->type = SVT_BOOL;
+		s->type = LCUI_STYPE_BOOL;
 		s->value = TRUE;
 		return 0;
-	} else if( strcasecmp(str, "false") == 0 ) {
+	} else if (strcasecmp(str, "false") == 0) {
 		s->is_valid = TRUE;
-		s->type = SVT_BOOL;
+		s->type = LCUI_STYPE_BOOL;
 		s->value = FALSE;
 		return 0;
 	}
-	if( strcmp("auto", str) == 0 ) {
+	if (strcmp("auto", str) == 0) {
 		s->is_valid = TRUE;
-		s->type = SVT_AUTO;
+		s->type = LCUI_STYPE_AUTO;
 		s->style = SV_AUTO;
 		return 0;
 	}
 	return -1;
 }
 
-static int OnParseColor( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseColor(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	LCUI_Style s = &ctx->sheet->sheet[ctx->parser->key];
-	if( ParseColor( s, str ) ) {
+	if (ParseColor(s, str)) {
 		return 0;
 	}
 	return -1;
 }
 
-static int OnParseImage( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseImage(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	LCUI_Style s = &ctx->sheet->sheet[ctx->parser->key];
-	if( ParseUrl( s, str, ctx->dirname ) ) {
+	if (ParseUrl(s, str, ctx->dirname)) {
 		return 0;
 	}
 	return -1;
 }
 
-static int OnParseStyleOption( LCUI_CSSParserStyleContext ctx,
-			       const char *str )
+static int OnParseStyleOption(LCUI_CSSParserStyleContext ctx,
+			      const char *str)
 {
 	LCUI_Style s = &ctx->sheet->sheet[ctx->parser->key];
-	int v = LCUI_GetStyleValue( str );
-	if( v < 0 ) {
+	int v = LCUI_GetStyleValue(str);
+	if (v < 0) {
 		return -1;
 	}
 	s->style = v;
-	s->type = SVT_STYLE;
+	s->type = LCUI_STYPE_STYLE;
 	s->is_valid = TRUE;
 	return 0;
 }
 
-static int OnParseBorder( LCUI_CSSParserStyleContext ctx,
-			  const char *str )
+static int OnParseBorder(LCUI_CSSParserStyleContext ctx,
+			 const char *str)
 {
 	LCUI_StyleSheet ss = ctx->sheet;
 	LCUI_StyleRec slist[3] = { { 0 }, { 0 }, { 0 } };
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
-	if( SplitValues(str, slist, 3, mode) < 1 ) {
+	if (SplitValues(str, slist, 3, mode) < 1) {
 		return -1;
 	}
-	for( i = 0; i < 3; ++i ) {
-		if( !slist[i].is_valid ) {
+	for (i = 0; i < 3; ++i) {
+		if (!slist[i].is_valid) {
 			break;
 		}
-		switch( slist[i].type ) {
-		case SVT_COLOR:
+		switch (slist[i].type) {
+		case LCUI_STYPE_COLOR:
 			ss->sheet[key_border_top_color] = slist[i];
 			ss->sheet[key_border_right_color] = slist[i];
 			ss->sheet[key_border_bottom_color] = slist[i];
 			ss->sheet[key_border_left_color] = slist[i];
 			break;
-		case SVT_PX:
-		case SVT_VALUE:
+		case LCUI_STYPE_PX:
+		case LCUI_STYPE_VALUE:
 			ss->sheet[key_border_top_width] = slist[i];
 			ss->sheet[key_border_right_width] = slist[i];
 			ss->sheet[key_border_bottom_width] = slist[i];
 			ss->sheet[key_border_left_width] = slist[i];
 			break;
-		case SVT_style:
+		case LCUI_STYPE_style:
 			ss->sheet[key_border_top_style] = slist[i];
 			ss->sheet[key_border_right_style] = slist[i];
 			ss->sheet[key_border_bottom_style] = slist[i];
@@ -248,12 +248,12 @@ static int OnParseBorder( LCUI_CSSParserStyleContext ctx,
 	return 0;
 }
 
-static int OnParseBorderRadius( LCUI_CSSParserStyleContext ctx,
-				const char *str )
+static int OnParseBorderRadius(LCUI_CSSParserStyleContext ctx,
+			       const char *str)
 {
 	LCUI_StyleRec s;
 	LCUI_StyleSheet ss = ctx->sheet;
-	if( !ParseNumber( &s, str ) ) {
+	if (!ParseNumber(&s, str)) {
 		return -1;
 	}
 	ss->sheet[key_border_top_left_radius] = s;
@@ -263,25 +263,25 @@ static int OnParseBorderRadius( LCUI_CSSParserStyleContext ctx,
 	return 0;
 }
 
-static int OnParseBorderLeft( LCUI_CSSParserStyleContext ctx,
-			      const char *str )
+static int OnParseBorderLeft(LCUI_CSSParserStyleContext ctx,
+			     const char *str)
 {
 	LCUI_StyleRec slist[3];
 	LCUI_StyleSheet ss = ctx->sheet;
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
-	if( SplitValues(str, slist, 3, mode) < 1 ) {
+	if (SplitValues(str, slist, 3, mode) < 1) {
 		return -1;
 	}
-	for( i = 0; i < 3; ++i ) {
-		switch( slist[i].type ) {
-		case SVT_COLOR:
+	for (i = 0; i < 3; ++i) {
+		switch (slist[i].type) {
+		case LCUI_STYPE_COLOR:
 			ss->sheet[key_border_left_color] = slist[i];
 			break;
-		case SVT_PX:
-		case SVT_VALUE:
+		case LCUI_STYPE_PX:
+		case LCUI_STYPE_VALUE:
 			ss->sheet[key_border_left_width] = slist[i];
 			break;
-		case SVT_style:
+		case LCUI_STYPE_style:
 			ss->sheet[key_border_left_style] = slist[i];
 			break;
 		default: return -1;
@@ -290,25 +290,25 @@ static int OnParseBorderLeft( LCUI_CSSParserStyleContext ctx,
 	return 0;
 }
 
-static int OnParseBorderTop( LCUI_CSSParserStyleContext ctx,
-			     const char *str )
+static int OnParseBorderTop(LCUI_CSSParserStyleContext ctx,
+			    const char *str)
 {
 	LCUI_StyleRec slist[3];
 	LCUI_StyleSheet ss = ctx->sheet;
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
-	if( SplitValues(str, slist, 3, mode) < 1 ) {
+	if (SplitValues(str, slist, 3, mode) < 1) {
 		return -1;
 	}
-	for( i = 0; i < 3; ++i ) {
-		switch( slist[i].type ) {
-		case SVT_COLOR:
+	for (i = 0; i < 3; ++i) {
+		switch (slist[i].type) {
+		case LCUI_STYPE_COLOR:
 			ss->sheet[key_border_top_color] = slist[i];
 			break;
-		case SVT_PX:
-		case SVT_VALUE:
+		case LCUI_STYPE_PX:
+		case LCUI_STYPE_VALUE:
 			ss->sheet[key_border_top_width] = slist[i];
 			break;
-		case SVT_style:
+		case LCUI_STYPE_style:
 			ss->sheet[key_border_top_style] = slist[i];
 			break;
 		default: return -1;
@@ -317,25 +317,25 @@ static int OnParseBorderTop( LCUI_CSSParserStyleContext ctx,
 	return 0;
 }
 
-static int OnParseBorderRight( LCUI_CSSParserStyleContext ctx,
-			       const char *str )
+static int OnParseBorderRight(LCUI_CSSParserStyleContext ctx,
+			      const char *str)
 {
 	LCUI_StyleRec slist[3];
 	LCUI_StyleSheet ss = ctx->sheet;
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
-	if( SplitValues(str, slist, 3, mode) < 1 ) {
+	if (SplitValues(str, slist, 3, mode) < 1) {
 		return -1;
 	}
-	for( i = 0; i < 3; ++i ) {
-		switch( slist[i].type ) {
-		case SVT_COLOR:
+	for (i = 0; i < 3; ++i) {
+		switch (slist[i].type) {
+		case LCUI_STYPE_COLOR:
 			ss->sheet[key_border_right_color] = slist[i];
 			break;
-		case SVT_PX:
-		case SVT_VALUE:
+		case LCUI_STYPE_PX:
+		case LCUI_STYPE_VALUE:
 			ss->sheet[key_border_right_width] = slist[i];
 			break;
-		case SVT_style:
+		case LCUI_STYPE_style:
 			ss->sheet[key_border_right_style] = slist[i];
 			break;
 		default: return -1;
@@ -344,25 +344,25 @@ static int OnParseBorderRight( LCUI_CSSParserStyleContext ctx,
 	return 0;
 }
 
-static int OnParseBorderBottom( LCUI_CSSParserStyleContext ctx,
-				const char *str )
+static int OnParseBorderBottom(LCUI_CSSParserStyleContext ctx,
+			       const char *str)
 {
 	LCUI_StyleRec slist[3];
 	LCUI_StyleSheet ss = ctx->sheet;
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
-	if( SplitValues(str, slist, 3, mode) < 1 ) {
+	if (SplitValues(str, slist, 3, mode) < 1) {
 		return -1;
 	}
-	for( i = 0; i < 3; ++i ) {
-		switch( slist[i].type ) {
-		case SVT_COLOR:
+	for (i = 0; i < 3; ++i) {
+		switch (slist[i].type) {
+		case LCUI_STYPE_COLOR:
 			ss->sheet[key_border_bottom_color] = slist[i];
 			break;
-		case SVT_PX:
-		case SVT_VALUE:
+		case LCUI_STYPE_PX:
+		case LCUI_STYPE_VALUE:
 			ss->sheet[key_border_bottom_width] = slist[i];
 			break;
-		case SVT_style:
+		case LCUI_STYPE_style:
 			ss->sheet[key_border_bottom_style] = slist[i];
 			break;
 		default: return -1;
@@ -371,11 +371,11 @@ static int OnParseBorderBottom( LCUI_CSSParserStyleContext ctx,
 	return 0;
 }
 
-static int OnParseBorderColor( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseBorderColor(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	LCUI_StyleRec s;
 	LCUI_StyleSheet ss = ctx->sheet;
-	if( !ParseColor( &s, str ) ) {
+	if (!ParseColor(&s, str)) {
 		return -1;
 	}
 	ss->sheet[key_border_top_color] = s;
@@ -385,11 +385,11 @@ static int OnParseBorderColor( LCUI_CSSParserStyleContext ctx, const char *str )
 	return 0;
 }
 
-static int OnParseBorderWidth( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseBorderWidth(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	LCUI_StyleRec s;
 	LCUI_StyleSheet ss = ctx->sheet;
-	if( !ParseNumber( &s, str ) ) {
+	if (!ParseNumber(&s, str)) {
 		return -1;
 	}
 	ss->sheet[key_border_top_width] = s;
@@ -399,14 +399,14 @@ static int OnParseBorderWidth( LCUI_CSSParserStyleContext ctx, const char *str )
 	return 0;
 }
 
-static int OnParseBorderStyle( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseBorderStyle(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	LCUI_StyleRec s;
 	LCUI_StyleSheet ss = ctx->sheet;
 
 	s.is_valid = TRUE;
-	s.val_style = LCUI_GetStyleValue( str );
-	if( s.val_style < 0 ) {
+	s.val_style = LCUI_GetStyleValue(str);
+	if (s.val_style < 0) {
 		return -1;
 	}
 	ss->sheet[key_border_top_style] = s;
@@ -416,11 +416,11 @@ static int OnParseBorderStyle( LCUI_CSSParserStyleContext ctx, const char *str )
 	return 0;
 }
 
-static int OnParsePadding( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParsePadding(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	LCUI_StyleRec s[4];
 	LCUI_StyleSheet ss = ctx->sheet;
-	switch( SplitValues( str, s, 4, SPLIT_NUMBER ) ) {
+	switch (SplitValues(str, s, 4, SPLIT_NUMBER)) {
 	case 1:
 		ss->sheet[key_padding_top] = s[0];
 		ss->sheet[key_padding_right] = s[0];
@@ -449,11 +449,11 @@ static int OnParsePadding( LCUI_CSSParserStyleContext ctx, const char *str )
 	return 0;
 }
 
-static int OnParseMargin( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseMargin(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	LCUI_StyleRec s[4];
 	LCUI_StyleSheet ss = ctx->sheet;
-	switch( SplitValues( str, s, 4, SPLIT_NUMBER ) ) {
+	switch (SplitValues(str, s, 4, SPLIT_NUMBER)) {
 	case 1:
 		ss->sheet[key_margin_top] = s[0];
 		ss->sheet[key_margin_right] = s[0];
@@ -482,19 +482,19 @@ static int OnParseMargin( LCUI_CSSParserStyleContext ctx, const char *str )
 	return 0;
 }
 
-static int OnParseBoxShadow( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseBoxShadow(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	LCUI_StyleRec s[5];
 	LCUI_StyleSheet ss = ctx->sheet;
-	if( strcasecmp( str, "none" ) == 0 ) {
-		SetStyle( ss, key_box_shadow_x, 0, none );
-		SetStyle( ss, key_box_shadow_y, 0, none );
-		SetStyle( ss, key_box_shadow_blur, 0, none );
-		SetStyle( ss, key_box_shadow_spread, 0, none );
-		SetStyle( ss, key_box_shadow_color, 0, none );
+	if (strcasecmp(str, "none") == 0) {
+		SetStyle(ss, key_box_shadow_x, 0, none);
+		SetStyle(ss, key_box_shadow_y, 0, none);
+		SetStyle(ss, key_box_shadow_blur, 0, none);
+		SetStyle(ss, key_box_shadow_spread, 0, none);
+		SetStyle(ss, key_box_shadow_color, 0, none);
 		return 0;
 	}
-	switch( SplitValues( str, s, 5, SPLIT_NUMBER | SPLIT_COLOR ) ) {
+	switch (SplitValues(str, s, 5, SPLIT_NUMBER | SPLIT_COLOR)) {
 	case 5:
 		ss->sheet[key_box_shadow_x] = s[0];
 		ss->sheet[key_box_shadow_y] = s[1];
@@ -513,19 +513,19 @@ static int OnParseBoxShadow( LCUI_CSSParserStyleContext ctx, const char *str )
 	return 0;
 }
 
-static int OnParseBackground( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseBackground(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	return 0;
 }
 
-static int OnParseBackgroundPosition( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseBackgroundPosition(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	LCUI_StyleRec slist[2];
-	int ret = OnParseStyleOption( ctx, str );
-	if( ret == 0 ) {
+	int ret = OnParseStyleOption(ctx, str);
+	if (ret == 0) {
 		return 0;
 	}
-	if( SplitValues( str, slist, 2, SPLIT_NUMBER ) == 2 ) {
+	if (SplitValues(str, slist, 2, SPLIT_NUMBER) == 2) {
 		ctx->sheet->sheet[key_background_position_x] = slist[0];
 		ctx->sheet->sheet[key_background_position_y] = slist[1];
 		return 0;
@@ -533,26 +533,26 @@ static int OnParseBackgroundPosition( LCUI_CSSParserStyleContext ctx, const char
 	return -2;
 }
 
-static int OnParseBackgroundSize( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseBackgroundSize(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	LCUI_StyleRec slist[2];
-	int ret = OnParseStyleOption( ctx, str );
-	if( ret == 0 ) {
-		SetStyle( ctx->sheet, key_background_size_width, 0, 0 );
-		SetStyle( ctx->sheet, key_background_size_height, 0, 0 );
+	int ret = OnParseStyleOption(ctx, str);
+	if (ret == 0) {
+		SetStyle(ctx->sheet, key_background_size_width, 0, 0);
+		SetStyle(ctx->sheet, key_background_size_height, 0, 0);
 		return 0;
 	}
-	ret = SplitValues( str, slist, 2, SPLIT_NUMBER | SPLIT_STYLE );
-	if( ret != 2 ) {
+	ret = SplitValues(str, slist, 2, SPLIT_NUMBER | SPLIT_STYLE);
+	if (ret != 2) {
 		return -1;
 	}
-	SetStyle( ctx->sheet, ctx->parser->key, 0, 0 );
+	SetStyle(ctx->sheet, ctx->parser->key, 0, 0);
 	ctx->sheet->sheet[key_background_size_width] = slist[0];
 	ctx->sheet->sheet[key_background_size_height] = slist[1];
 	return 0;
 }
 
-static int OnParseBackgroundRepeat( LCUI_CSSParserStyleContext ctx, const char *str )
+static int OnParseBackgroundRepeat(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	return 0;
 }
@@ -619,105 +619,105 @@ static LCUI_CSSPropertyParserRec style_parser_map[] = {
 	{ -1, "background", OnParseBackground }
 };
 
-static int CSSParser_ParseComment( LCUI_CSSParserContext ctx )
+static int CSSParser_ParseComment(LCUI_CSSParserContext ctx)
 {
-	if( ctx->comment.is_line_comment ) {
-		if( *ctx->cur == '\n' ) {
+	if (ctx->comment.is_line_comment) {
+		if (*ctx->cur == '\n') {
 			ctx->target = ctx->comment.prev_target;
 		}
 		return 0;
 	}
-	if( *ctx->cur == '/' && *(ctx->cur - 1) == '*' ) {
+	if (*ctx->cur == '/' && *(ctx->cur - 1) == '*') {
 		ctx->target = ctx->comment.prev_target;
 	}
 	return 0;
 }
 
-int CSSParser_BeginParseComment( LCUI_CSSParserContext ctx )
+int CSSParser_BeginParseComment(LCUI_CSSParserContext ctx)
 {
-	switch( *(ctx->cur + 1) ) {
+	switch (*(ctx->cur + 1)) {
 	case '/': ctx->comment.is_line_comment = TRUE; break;
 	case '*': ctx->comment.is_line_comment = FALSE; break;
 	default:
-		CSSParser_GetChar( ctx );
+		CSSParser_GetChar(ctx);
 		return -1;
 	}
-	if( ctx->comment.prev_target != CSS_TARGET_COMMENT ) {
+	if (ctx->comment.prev_target != CSS_TARGET_COMMENT) {
 		ctx->comment.prev_target = ctx->target;
 		ctx->target = CSS_TARGET_COMMENT;
 	}
 	return 0;
 }
 
-static void CSSParser_EndParseSheet( LCUI_CSSParserContext ctx )
+static void CSSParser_EndParseSheet(LCUI_CSSParserContext ctx)
 {
 	LinkedListNode *node;
 	/* 将记录的样式表添加至匹配到的选择器中 */
-	for( LinkedList_Each( node, &ctx->style.selectors ) ) {
-		LCUI_PutStyleSheet( node->data, ctx->style.sheet, ctx->space );
+	for (LinkedList_Each(node, &ctx->style.selectors)) {
+		LCUI_PutStyleSheet(node->data, ctx->style.sheet, ctx->space);
 	}
-	LinkedList_Clear( &ctx->style.selectors, (FuncPtr)Selector_Delete );
-	StyleSheet_Delete( ctx->style.sheet );
+	LinkedList_Clear(&ctx->style.selectors, (FuncPtr)Selector_Delete);
+	StyleSheet_Delete(ctx->style.sheet);
 }
 
-static int CSSParser_ParseSelector( LCUI_CSSParserContext ctx )
+static int CSSParser_ParseSelector(LCUI_CSSParserContext ctx)
 {
 	LCUI_Selector s;
-	switch( *ctx->cur ) {
+	switch (*ctx->cur) {
 	case '/':
-		return CSSParser_BeginParseComment( ctx );
+		return CSSParser_BeginParseComment(ctx);
 	case '{':
 		ctx->target = CSS_TARGET_KEY;
 		ctx->style.sheet = StyleSheet();
 	case ',':
-		CSSParser_EndBuffer( ctx );
-		DEBUG_MSG( "selector: %s\n", ctx->buffer );
-		s = Selector( ctx->buffer );
-		if( !s ) {
+		CSSParser_EndBuffer(ctx);
+		DEBUG_MSG("selector: %s\n", ctx->buffer);
+		s = Selector(ctx->buffer);
+		if (!s) {
 			return -1;
 		}
-		LinkedList_Append( &ctx->style.selectors, s );
+		LinkedList_Append(&ctx->style.selectors, s);
 		break;
 	default:
-		CSSParser_GetChar( ctx );
+		CSSParser_GetChar(ctx);
 		break;
 	}
 	return 0;
 }
 
-static int CSSParser_SetRuleParser( LCUI_CSSParserContext ctx,
-				    const char *name )
+static int CSSParser_SetRuleParser(LCUI_CSSParserContext ctx,
+				   const char *name)
 {
 	LCUI_CSSRule rule;
 	LCUI_CSSRuleParser parser;
-	for( rule = CSS_RULE_NONE; rule < CSS_RULE_TOTAL_NUM; ++rule ) {
+	for (rule = CSS_RULE_NONE; rule < CSS_RULE_TOTAL_NUM; ++rule) {
 		parser = &ctx->rule.parsers[rule];
-		if( strlen(parser->name) < 1 ) {
+		if (strlen(parser->name) < 1) {
 			continue;
 		}
-		if( strcmp( parser->name, name ) == 0 ) {
+		if (strcmp(parser->name, name) == 0) {
 			ctx->rule.rule = rule;
-			parser->begin( ctx );
+			parser->begin(ctx);
 			return 0;
 		}
 	}
 	return -ENOENT;
 }
 
-static int CSSParser_ParseRuleName( LCUI_CSSParserContext ctx )
+static int CSSParser_ParseRuleName(LCUI_CSSParserContext ctx)
 {
-	switch( *ctx->cur ) {
+	switch (*ctx->cur) {
 	CASE_WHITE_SPACE:
-		if( ctx->pos > 0 ) {
+		if (ctx->pos > 0) {
 			break;
 		}
 		return -1;
 	default:
-		CSSParser_GetChar( ctx );
+		CSSParser_GetChar(ctx);
 		return 0;
 	}
-	CSSParser_EndBuffer( ctx );
-	if( CSSParser_SetRuleParser( ctx, ctx->buffer ) == 0 ) {
+	CSSParser_EndBuffer(ctx);
+	if (CSSParser_SetRuleParser(ctx, ctx->buffer) == 0) {
 		ctx->target = CSS_TARGET_RULE_DATA;
 	} else {
 		return -1;
@@ -725,76 +725,76 @@ static int CSSParser_ParseRuleName( LCUI_CSSParserContext ctx )
 	return 0;
 }
 
-static int CSSParser_ParseRuleData( LCUI_CSSParserContext ctx )
+static int CSSParser_ParseRuleData(LCUI_CSSParserContext ctx)
 {
 	LCUI_CSSRuleParser parser;
 	parser = &ctx->rule.parsers[ctx->rule.rule];
-	if( parser->parse ) {
-		return parser->parse( ctx );
+	if (parser->parse) {
+		return parser->parse(ctx);
 	}
 	return -1;
 }
 
-static int CSSParser_ParseStyleName( LCUI_CSSParserContext ctx )
+static int CSSParser_ParseStyleName(LCUI_CSSParserContext ctx)
 {
-	switch( *ctx->cur ) {
+	switch (*ctx->cur) {
 	CASE_WHITE_SPACE:
 	case ';':
 		return -1;
 	case ':':
 		ctx->target = CSS_TARGET_VALUE;
-		CSSParser_EndBuffer( ctx );
-		CSSParser_SetStyleParser( ctx, ctx->buffer );
-		DEBUG_MSG( "select style: %s, parser: %p\n",
-			   ctx->buffer, ctx->style_parser );
+		CSSParser_EndBuffer(ctx);
+		CSSParser_SetStyleParser(ctx, ctx->buffer);
+		DEBUG_MSG("select style: %s, parser: %p\n",
+			  ctx->buffer, ctx->style_parser);
 		break;
 	case '}':
 		ctx->target = CSS_TARGET_NONE;
-		CSSParser_EndParseSheet( ctx );
+		CSSParser_EndParseSheet(ctx);
 		break;
 	default:
-		CSSParser_GetChar( ctx );
+		CSSParser_GetChar(ctx);
 		break;
 	}
 	return 0;
 }
 
-static int CSSParser_ParseStyleValue( LCUI_CSSParserContext ctx )
+static int CSSParser_ParseStyleValue(LCUI_CSSParserContext ctx)
 {
-	switch( *ctx->cur ) {
+	switch (*ctx->cur) {
 	case '/':
-		return CSSParser_BeginParseComment( ctx );
+		return CSSParser_BeginParseComment(ctx);
 	case '}':
 	case ';':
 		break;
 	CASE_WHITE_SPACE:
-		if( ctx->pos == 0 ) {
+		if (ctx->pos == 0) {
 			return 0;
 		}
 	default:
-		CSSParser_GetChar( ctx );
+		CSSParser_GetChar(ctx);
 		return 0;
 	}
-	if( *ctx->cur == ';' ) {
+	if (*ctx->cur == ';') {
 		ctx->target = CSS_TARGET_KEY;
 	}
-	CSSParser_EndBuffer( ctx );
-	if( ctx->style.parser ) {
-		ctx->style.parser->parse( &ctx->style, ctx->buffer );
+	CSSParser_EndBuffer(ctx);
+	if (ctx->style.parser) {
+		ctx->style.parser->parse(&ctx->style, ctx->buffer);
 	}
-	DEBUG_MSG( "parse style value: %s\n", ctx->buffer );
-	if( *ctx->cur == '}' ) {
+	DEBUG_MSG("parse style value: %s\n", ctx->buffer);
+	if (*ctx->cur == '}') {
 		ctx->target = CSS_TARGET_NONE;
-		CSSParser_EndParseSheet( ctx );
+		CSSParser_EndParseSheet(ctx);
 	}
 	return 0;
 }
 
-static int CSSParser_ParseTarget( LCUI_CSSParserContext ctx )
+static int CSSParser_ParseTarget(LCUI_CSSParserContext ctx)
 {
-	switch( *ctx->cur ) {
+	switch (*ctx->cur) {
 	case '/':
-		return CSSParser_BeginParseComment( ctx );
+		return CSSParser_BeginParseComment(ctx);
 	CASE_WHITE_SPACE:
 	case ',':
 	case '{':
@@ -806,74 +806,74 @@ static int CSSParser_ParseTarget( LCUI_CSSParserContext ctx )
 		break;
 	}
 	ctx->pos = 0;
-	if( *ctx->cur == '@' ) {
+	if (*ctx->cur == '@') {
 		ctx->target = CSS_TARGET_RULE_NAME;
 	} else {
-		CSSParser_GetChar( ctx );
+		CSSParser_GetChar(ctx);
 		ctx->target = CSS_TARGET_SELECTOR;
 	}
 	return 0;
 }
 
-void CSSParser_EndParseRuleData( LCUI_CSSParserContext ctx )
+void CSSParser_EndParseRuleData(LCUI_CSSParserContext ctx)
 {
 	ctx->rule.rule = CSS_RULE_NONE;
 	ctx->target = CSS_TARGET_NONE;
 }
 
-static void LoadFontFile( void *arg1, void *arg2 )
+static void LoadFontFile(void *arg1, void *arg2)
 {
-	LCUIFont_LoadFile( arg1 );
+	LCUIFont_LoadFile(arg1);
 }
 
-static void OnParsedFontFace( LCUI_CSSFontFace face )
+static void OnParsedFontFace(LCUI_CSSFontFace face)
 {
 	static int worker_id = -1;
 	LCUI_TaskRec task = { 0 };
 	task.func = LoadFontFile;
-	task.arg[0] = strdup2( face->src );
+	task.arg[0] = strdup2(face->src);
 	task.destroy_arg[0] = free;
-	if( worker_id > -1 ) {
-		LCUI_PostAsyncTaskTo( &task, worker_id );
+	if (worker_id > -1) {
+		LCUI_PostAsyncTaskTo(&task, worker_id);
 	} else {
-		worker_id = LCUI_PostAsyncTask( &task );
+		worker_id = LCUI_PostAsyncTask(&task);
 	}
 }
 
-static char *getdirname( const char *path )
+static char *getdirname(const char *path)
 {
 	char *dirname;
 	size_t i, pos;
-	for( i = 0, pos = SIZE_MAX; path[i]; ++i ) {
-		if( path[i] == '/' ) {
+	for (i = 0, pos = SIZE_MAX; path[i]; ++i) {
+		if (path[i] == '/') {
 			pos = i;
 		}
 	}
-	if( pos > i ) {
+	if (pos > i) {
 		return NULL;
 	}
-	dirname = malloc( sizeof( char ) * i );
-	if( !dirname ) {
+	dirname = malloc(sizeof(char) * i);
+	if (!dirname) {
 		return NULL;
 	}
-	for( i = 0; i < pos; ++i ) {
+	for (i = 0; i < pos; ++i) {
 		dirname[i] = path[i];
 	}
 	dirname[i] = 0;
 	return dirname;
 }
 
-LCUI_CSSParserContext CSSParser_Begin( size_t buffer_size, const char *space )
+LCUI_CSSParserContext CSSParser_Begin(size_t buffer_size, const char *space)
 {
-	ASSIGN( ctx, LCUI_CSSParserContext );
-	if( space ) {
-		ctx->space = strdup2( space );
-		ctx->style.dirname = getdirname( ctx->space );
+	ASSIGN(ctx, LCUI_CSSParserContext);
+	if (space) {
+		ctx->space = strdup2(space);
+		ctx->style.dirname = getdirname(ctx->space);
 	} else {
 		ctx->space = NULL;
 		ctx->style.dirname = NULL;
 	}
-	ctx->buffer = NEW( char, buffer_size );
+	ctx->buffer = NEW(char, buffer_size);
 	ctx->buffer_size = buffer_size;
 	ctx->target = CSS_TARGET_NONE;
 	ctx->style.space = ctx->space;
@@ -885,132 +885,132 @@ LCUI_CSSParserContext CSSParser_Begin( size_t buffer_size, const char *space )
 	ctx->parsers[CSS_TARGET_VALUE].parse = CSSParser_ParseStyleValue;
 	ctx->parsers[CSS_TARGET_COMMENT].parse = CSSParser_ParseComment;
 	ctx->comment.prev_target = CSS_TARGET_NONE;
-	LinkedList_Init( &ctx->style.selectors );
-	memset( &ctx->rule, 0, sizeof( ctx->rule ) );
-	CSSParser_InitFontFaceRuleParser( ctx );
-	CSSRuleParser_OnFontFace( ctx, OnParsedFontFace );
+	LinkedList_Init(&ctx->style.selectors);
+	memset(&ctx->rule, 0, sizeof(ctx->rule));
+	CSSParser_InitFontFaceRuleParser(ctx);
+	CSSRuleParser_OnFontFace(ctx, OnParsedFontFace);
 	return ctx;
 }
 
-void CSSParser_End( LCUI_CSSParserContext ctx )
+void CSSParser_End(LCUI_CSSParserContext ctx)
 {
-	LinkedList_Clear( &ctx->style.selectors, (FuncPtr)Selector_Delete );
-	CSSParser_FreeFontFaceRuleParser( ctx );
-	if( ctx->space ) {
-		free( ctx->space );
+	LinkedList_Clear(&ctx->style.selectors, (FuncPtr)Selector_Delete);
+	CSSParser_FreeFontFaceRuleParser(ctx);
+	if (ctx->space) {
+		free(ctx->space);
 	}
-	if( ctx->style.dirname ) {
-		free( ctx->style.dirname );
+	if (ctx->style.dirname) {
+		free(ctx->style.dirname);
 	}
-	free( ctx->buffer );
-	free( ctx );
+	free(ctx->buffer);
+	free(ctx);
 }
 
 /** 载入CSS代码块，用于实现CSS代码的分块载入 */
-static int LCUI_LoadCSSBlock( LCUI_CSSParserContext ctx, const char *str )
+static int LCUI_LoadCSSBlock(LCUI_CSSParserContext ctx, const char *str)
 {
 	size_t size = 0;
 	ctx->cur = str;
-	while( *ctx->cur && size < ctx->buffer_size ) {
-		ctx->parsers[ctx->target].parse( ctx );
+	while (*ctx->cur && size < ctx->buffer_size) {
+		ctx->parsers[ctx->target].parse(ctx);
 		++ctx->cur;
 		++size;
 	}
 	return size;
 }
 
-int LCUI_LoadCSSFile( const char *filepath )
+int LCUI_LoadCSSFile(const char *filepath)
 {
 	int n;
 	FILE *fp;
 	char buff[512];
 	LCUI_CSSParserContext ctx;
 
-	fp = fopen( filepath, "r" );
-	if( !fp ) {
+	fp = fopen(filepath, "r");
+	if (!fp) {
 		return -1;
 	}
-	ctx = CSSParser_Begin( 512, filepath );
-	n = fread( buff, 1, 511, fp );
-	while( n > 0 ) {
+	ctx = CSSParser_Begin(512, filepath);
+	n = fread(buff, 1, 511, fp);
+	while (n > 0) {
 		buff[n] = 0;
-		LCUI_LoadCSSBlock( ctx, buff );
-		n = fread( buff, 1, 511, fp );
+		LCUI_LoadCSSBlock(ctx, buff);
+		n = fread(buff, 1, 511, fp);
 	}
-	CSSParser_End( ctx );
-	fclose( fp );
+	CSSParser_End(ctx);
+	fclose(fp);
 	return 0;
 }
 
-int LCUI_LoadCSSString( const char *str, const char *space )
+int LCUI_LoadCSSString(const char *str, const char *space)
 {
 	int len = 1;
 	const char *cur;
 	LCUI_CSSParserContext ctx;
 	DEBUG_MSG("parse begin\n");
-	ctx = CSSParser_Begin( 512, space );
-	for( cur = str; len > 0; cur += len ) {
-		len = LCUI_LoadCSSBlock( ctx, cur );
+	ctx = CSSParser_Begin(512, space);
+	for (cur = str; len > 0; cur += len) {
+		len = LCUI_LoadCSSBlock(ctx, cur);
 	}
-	CSSParser_End( ctx );
+	CSSParser_End(ctx);
 	DEBUG_MSG("parse end\n");
 	return 0;
 }
 
-int LCUI_AddCSSPropertyParser( LCUI_CSSPropertyParser sp )
+int LCUI_AddCSSPropertyParser(LCUI_CSSPropertyParser sp)
 {
 	LCUI_CSSPropertyParser new_sp;
-	if( !sp->name || strlen( sp->name ) < 1 ) {
+	if (!sp->name || strlen(sp->name) < 1) {
 		return -1;
 	}
-	if( Dict_FetchValue( self.parsers, sp->name ) ) {
+	if (Dict_FetchValue(self.parsers, sp->name)) {
 		return -2;
 	}
 	self.count += 1;
-	new_sp = NEW( LCUI_CSSPropertyParserRec, 1 );
+	new_sp = NEW(LCUI_CSSPropertyParserRec, 1);
 	new_sp->key = sp->key;
 	new_sp->parse = sp->parse;
-	new_sp->name = strdup2( sp->name );
-	Dict_Add( self.parsers, new_sp->name, new_sp );
+	new_sp->name = strdup2(sp->name);
+	Dict_Add(self.parsers, new_sp->name, new_sp);
 	return 0;
 }
 
-static void DestroyStyleParser( void *privdata, void *val )
+static void DestroyStyleParser(void *privdata, void *val)
 {
 	LCUI_CSSPropertyParser sp = val;
-	free( sp->name );
-	free( sp );
+	free(sp->name);
+	free(sp);
 }
 
 /** 初始化 LCUI 的 CSS 代码解析功能 */
-void LCUI_InitCSSParser( void )
+void LCUI_InitCSSParser(void)
 {
 	LCUI_CSSPropertyParser new_sp, sp, sp_end;
 
 	self.count = 0;
 	self.dicttype = DictType_StringKey;
 	self.dicttype.valDestructor = DestroyStyleParser;
-	self.parsers = Dict_Create( &self.dicttype, NULL );
-	sp_end = style_parser_map + LEN( style_parser_map );
-	for( sp = style_parser_map; sp < sp_end; ++sp ) {
-		new_sp = malloc( sizeof( LCUI_CSSPropertyParserRec ) );
+	self.parsers = Dict_Create(&self.dicttype, NULL);
+	sp_end = style_parser_map + LEN(style_parser_map);
+	for (sp = style_parser_map; sp < sp_end; ++sp) {
+		new_sp = malloc(sizeof(LCUI_CSSPropertyParserRec));
 		new_sp->key = sp->key;
 		new_sp->parse = sp->parse;
-		if( !sp->name && sp->key >= 0 ) {
-			const char *name = LCUI_GetStyleName( sp->key );
-			if( !name ) {
-				free( new_sp );
+		if (!sp->name && sp->key >= 0) {
+			const char *name = LCUI_GetStyleName(sp->key);
+			if (!name) {
+				free(new_sp);
 				continue;
 			}
-			new_sp->name = strdup2( name );
+			new_sp->name = strdup2(name);
 		} else {
-			new_sp->name = strdup2( sp->name );
+			new_sp->name = strdup2(sp->name);
 		}
-		Dict_Add( self.parsers, new_sp->name, new_sp );
+		Dict_Add(self.parsers, new_sp->name, new_sp);
 	}
 }
 
-void LCUI_FreeCSSParser( void )
+void LCUI_FreeCSSParser(void)
 {
-	Dict_Release( self.parsers );
+	Dict_Release(self.parsers);
 }

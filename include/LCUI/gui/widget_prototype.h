@@ -2,7 +2,7 @@
  * widget_prototype.h -- LCUI widget prototype library management module.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -33,22 +33,22 @@
 
 LCUI_BEGIN_HEADER
 
-LCUI_API void LCUIWidget_InitPrototype( void );
+LCUI_API void LCUIWidget_InitPrototype(void);
 
-LCUI_API void LCUIWidget_FreePrototype( void );
+LCUI_API void LCUIWidget_FreePrototype(void);
 
-LCUI_API LCUI_WidgetPrototype LCUIWidget_GetPrototype( const char *name );
+LCUI_API LCUI_WidgetPrototype LCUIWidget_GetPrototype(const char *name);
 
-LCUI_API LCUI_WidgetPrototype LCUIWidget_NewPrototype( const char *name,
-						       const char *parent_name );
+LCUI_API LCUI_WidgetPrototype LCUIWidget_NewPrototype(const char *name,
+						      const char *parent_name);
 
-LCUI_API void *Widget_GetData( LCUI_Widget widget, LCUI_WidgetPrototype proto );
+LCUI_API void *Widget_GetData(LCUI_Widget widget, LCUI_WidgetPrototype proto);
 
-LCUI_API void *Widget_AddData( LCUI_Widget widget,
-			       LCUI_WidgetPrototype proto, size_t data_size );
+LCUI_API void *Widget_AddData(LCUI_Widget widget,
+			      LCUI_WidgetPrototype proto, size_t data_size);
 
 /** 清除部件自带的原型数据 */
-LCUI_API void Widget_ClearPrototype( LCUI_Widget widget );
+LCUI_API void Widget_ClearPrototype(LCUI_Widget widget);
 
 LCUI_END_HEADER
 

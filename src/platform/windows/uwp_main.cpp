@@ -2,7 +2,7 @@
  * uwp_main.h -- UWP application main implementation
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -61,7 +61,7 @@ Main::~Main()
 }
 
 // 在窗口大小更改(例如，设备方向更改)时更新应用程序状态
-void Main::CreateWindowSizeDependentResources() 
+void Main::CreateWindowSizeDependentResources()
 {
 	m_renderer->CreateWindowSizeDependentResources();
 }
@@ -70,18 +70,17 @@ void Main::CreateWindowSizeDependentResources()
 void Main::Update()
 {
 	// 更新场景对象。
-	m_timer.Tick( [&]() {
-		m_renderer->Update( m_timer );
-	} );
+	m_timer.Tick([&]() {
+		m_renderer->Update(m_timer);
+	});
 }
 
 // 根据当前应用程序状态呈现当前帧。
 // 如果帧已呈现并且已准备好显示，则返回 true。
-bool Main::Render() 
+bool Main::Render()
 {
 	// 在首次更新前，请勿尝试呈现任何内容。
-	if (m_timer.GetFrameCount() == 0)
-	{
+	if (m_timer.GetFrameCount() == 0) {
 		return false;
 	}
 

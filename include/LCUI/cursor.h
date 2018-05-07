@@ -2,7 +2,7 @@
  * cursor.h -- Mouse cursor operation set.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -32,44 +32,40 @@
 #define LCUI_CURSOR_H
 
 LCUI_BEGIN_HEADER
-	
-/* 初始化游标数据 */
-LCUI_API void LCUI_InitCursor( void );
 
-LCUI_API void LCUI_FreeCursor( void );
+/* 初始化游标数据 */
+LCUI_API void LCUI_InitCursor(void);
+
+LCUI_API void LCUI_FreeCursor(void);
 
 /* 获取鼠标游标的区域范围 */
-LCUI_API void LCUICursor_GetRect( LCUI_Rect *rect );
+LCUI_API void LCUICursor_GetRect(LCUI_Rect *rect);
 
 /* 刷新鼠标游标在屏幕上显示的图形 */
-LCUI_API void LCUICursor_Refresh( void );
+LCUI_API void LCUICursor_Refresh(void);
 
 /* 检测鼠标游标是否可见 */
-LCUI_API LCUI_BOOL LCUICursor_IsVisible( void );
+LCUI_API LCUI_BOOL LCUICursor_IsVisible(void);
 
 /* 显示鼠标游标 */
-LCUI_API void LCUICursor_Show( void );
+LCUI_API void LCUICursor_Show(void);
 
 /* 隐藏鼠标游标 */
-LCUI_API void LCUICursor_Hide( void );
+LCUI_API void LCUICursor_Hide(void);
 
 /* 更新鼠标指针的位置 */
-LCUI_API void LCUICursor_Update( void );
+LCUI_API void LCUICursor_Update(void);
 
 /* 设定游标的位置 */
-LCUI_API void LCUICursor_SetPos( LCUI_Pos pos );
+LCUI_API void LCUICursor_SetPos(LCUI_Pos pos);
 
 /** 设置游标的图形 */
-LCUI_API int LCUICursor_SetGraph( LCUI_Graph *graph );
+LCUI_API int LCUICursor_SetGraph(LCUI_Graph *graph);
 
 /* 获取鼠标指针当前的坐标 */
-LCUI_API void LCUICursor_GetPos( LCUI_Pos *pos );
+LCUI_API void LCUICursor_GetPos(LCUI_Pos *pos);
 
-/* 检测鼠标游标是否覆盖在矩形区域上 */
-LCUI_BOOL LCUICursor_IsCoverRect( LCUI_Rect rect );
-
-/* 将当前鼠标游标的图像叠加至目标图像指定位置 */
-int LCUICursor_MixGraph( LCUI_Graph *buff, LCUI_Pos pos );
+LCUI_API int LCUICursor_Paint(LCUI_PaintContext paint);
 
 LCUI_END_HEADER
 

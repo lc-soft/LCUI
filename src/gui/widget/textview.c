@@ -2,7 +2,7 @@
  * textview.c -- TextView widget for display text.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -56,12 +56,12 @@ enum TaskType {
 };
 
 typedef struct LCUI_TextViewRec_ {
-	LCUI_Widget widget;		/**< 所属的部件 */
-	wchar_t *content;		/**< 原始内容 */
-	LCUI_BOOL trimming;		/**< 是否清除首尾空白符 */
-	LCUI_Mutex mutex;		/**< 互斥锁 */
-	LCUI_TextLayer layer;		/**< 文本图层 */
-	LCUI_CSSFontStyleRec style;	/**< 文字样式 */
+	LCUI_Widget widget;         /**< 所属的部件 */
+	wchar_t *content;           /**< 原始内容 */
+	LCUI_BOOL trimming;         /**< 是否清除首尾空白符 */
+	LCUI_Mutex mutex;           /**< 互斥锁 */
+	LCUI_TextLayer layer;       /**< 文本图层 */
+	LCUI_CSSFontStyleRec style; /**< 文字样式 */
 	struct {
 		LCUI_BOOL is_valid;
 		union {
@@ -79,151 +79,145 @@ static struct LCUI_TextViewModule {
 	LCUI_WidgetPrototype prototype;
 } self;
 
-static LCUI_BOOL ParseBoolean( const char *str )
+static LCUI_BOOL ParseBoolean(const char *str)
 {
-	if( strcmp( str, "on" ) == 0 &&
-	    strcmp( str, "true" ) == 0 &&
-	    strcmp( str, "yes" ) == 0 &&
-	    strcmp( str, "1" ) == 0 ) {
+	if (strcmp(str, "on") == 0 && strcmp(str, "true") == 0 &&
+	    strcmp(str, "yes") == 0 && strcmp(str, "1") == 0) {
 		return TRUE;
 	}
 	return FALSE;
 }
 
-static int OnParseWordBreak( LCUI_CSSParserStyleContext ctx,
-			     const char *value )
+static int OnParseWordBreak(LCUI_CSSParserStyleContext ctx, const char *value)
 {
-	char *str = strdup2( value );
+	char *str = strdup2(value);
 	LCUI_Style s = &ctx->sheet->sheet[self.key_word_break];
-	if( s->is_valid && s->string ) {
-		free( s->string );
+	if (s->is_valid && s->string) {
+		free(s->string);
 	}
-	s->type = SVT_STRING;
+	s->type = LCUI_STYPE_STRING;
 	s->is_valid = TRUE;
 	s->string = str;
 	return 0;
 }
 
-static LCUI_WordBreakMode ComputeWordBreakMode( LCUI_StyleSheet sheet )
+static LCUI_WordBreakMode ComputeWordBreakMode(LCUI_StyleSheet sheet)
 {
 	LCUI_Style s = &sheet->sheet[self.key_word_break];
-	if( s->is_valid && s->type == SVT_STRING && s->string ) {
-		if( strcmp( s->string, "break-all" ) == 0 ) {
+	if (s->is_valid && s->type == LCUI_STYPE_STRING && s->string) {
+		if (strcmp(s->string, "break-all") == 0) {
 			return LCUI_WORD_BREAK_BREAK_ALL;
 		}
 	}
 	return LCUI_WORD_BREAK_NORMAL;
 }
 
-static void TextView_OnParseAttr( LCUI_Widget w, const char *name, 
-				  const char *value )
+static void TextView_OnParseAttr(LCUI_Widget w, const char *name,
+				 const char *value)
 {
-	LCUI_TextView txt = GetData( w );
-	if( strcmp( name, "trimming" ) == 0 ) {
-		if( ParseBoolean( value ) != txt->trimming ) {
+	LCUI_TextView txt = GetData(w);
+	if (strcmp(name, "trimming") == 0) {
+		if (ParseBoolean(value) != txt->trimming) {
 			txt->trimming = !txt->trimming;
-			TextView_SetTextW( w, txt->content );
+			TextView_SetTextW(w, txt->content);
 		}
 		return;
 	}
-	if( strcmp( name, "multiline" ) == 0 ) {
-		LCUI_BOOL enable = ParseBoolean( value );
-		if( enable != txt->layer->enable_mulitiline ) {
-			TextView_SetMulitiline( w, enable );
+	if (strcmp(name, "multiline") == 0) {
+		LCUI_BOOL enable = ParseBoolean(value);
+		if (enable != txt->layer->enable_mulitiline) {
+			TextView_SetMulitiline(w, enable);
 		}
 	}
 }
 
-static void TextView_OnParseText( LCUI_Widget w, const char *text )
+static void TextView_OnParseText(LCUI_Widget w, const char *text)
 {
-	TextView_SetText( w, text );
+	TextView_SetText(w, text);
 }
 
-static void TextView_SetTaskForLineHeight( LCUI_Widget w, int height )
+static void TextView_SetTaskForLineHeight(LCUI_Widget w, int height)
 {
-	LCUI_TextView txt = GetData( w );
-	TextLayer_SetLineHeight( txt->layer, height );
+	LCUI_TextView txt = GetData(w);
+	TextLayer_SetLineHeight(txt->layer, height);
 	txt->tasks[TASK_UPDATE].is_valid = TRUE;
 }
 
-static void TextView_SetTaskForTextStyle( LCUI_Widget w,
-					  LCUI_TextStyle style )
+static void TextView_SetTaskForTextStyle(LCUI_Widget w, LCUI_TextStyle style)
 {
-	LCUI_TextView txt = GetData( w );
-	TextStyle_Copy( &txt->tasks[TASK_SET_TEXT_STYLE].style, style );
+	LCUI_TextView txt = GetData(w);
+	TextStyle_Copy(&txt->tasks[TASK_SET_TEXT_STYLE].style, style);
 	txt->tasks[TASK_SET_TEXT_STYLE].is_valid = TRUE;
 }
 
-static void TextView_SetTaskForTextAlign( LCUI_Widget w, int align )
+static void TextView_SetTaskForTextAlign(LCUI_Widget w, int align)
 {
-	LCUI_TextView txt = GetData( w );
+	LCUI_TextView txt = GetData(w);
 	txt->tasks[TASK_SET_TEXT_ALIGN].align = align;
 	txt->tasks[TASK_SET_TEXT_ALIGN].is_valid = TRUE;
 }
 
-static void TextView_SetTaskForAutoWrap( LCUI_Widget w, LCUI_BOOL enable )
+static void TextView_SetTaskForAutoWrap(LCUI_Widget w, LCUI_BOOL enable)
 {
-	LCUI_TextView txt = GetData( w );
+	LCUI_TextView txt = GetData(w);
 	txt->tasks[TASK_SET_AUTOWRAP].enable = enable;
 	txt->tasks[TASK_SET_AUTOWRAP].is_valid = TRUE;
 }
 
-static void TextView_SetTaskForWordBreak( LCUI_Widget w, LCUI_WordBreakMode mode )
+static void TextView_SetTaskForWordBreak(LCUI_Widget w, LCUI_WordBreakMode mode)
 {
-	LCUI_TextView txt = GetData( w );
+	LCUI_TextView txt = GetData(w);
 	txt->tasks[TASK_SET_WORD_BREAK].mode = mode;
 	txt->tasks[TASK_SET_WORD_BREAK].is_valid = TRUE;
 }
 
-static void TextView_UpdateStyle( LCUI_Widget w )
+static void TextView_UpdateStyle(LCUI_Widget w)
 {
 	LCUI_TextStyleRec ts;
-	LCUI_TextView txt = GetData( w );
+	LCUI_TextView txt = GetData(w);
 	LCUI_CSSFontStyle fs = &txt->style;
 	const wchar_t *content = fs->content;
-	CSSFontStyle_Compute( fs, w->style );
-	CSSFontStyle_GetTextStyle( fs, &ts );
+	CSSFontStyle_Compute(fs, w->style);
+	CSSFontStyle_GetTextStyle(fs, &ts);
 	/* 设置任务，统一处理属性变更 */
-	TextView_SetTaskForTextAlign( w, fs->text_align );
-	TextView_SetTaskForLineHeight( w, fs->line_height );
-	TextView_SetTaskForAutoWrap( w, fs->white_space != SV_NOWRAP );
-	TextView_SetTaskForWordBreak( w, ComputeWordBreakMode( w->style ) );
-	TextView_SetTaskForTextStyle( w, &ts );
-	if( content != fs->content ) {
-		TextView_SetTextW( w, fs->content );
+	TextView_SetTaskForTextAlign(w, fs->text_align);
+	TextView_SetTaskForLineHeight(w, fs->line_height);
+	TextView_SetTaskForAutoWrap(w, fs->white_space != SV_NOWRAP);
+	TextView_SetTaskForWordBreak(w, ComputeWordBreakMode(w->style));
+	TextView_SetTaskForTextStyle(w, &ts);
+	if (content != fs->content) {
+		TextView_SetTextW(w, fs->content);
 	}
 	txt->tasks[TASK_UPDATE].is_valid = TRUE;
-	Widget_AddTask( w, LCUI_WTASK_USER );
-	TextStyle_Destroy( &ts );
+	Widget_AddTask(w, LCUI_WTASK_USER);
+	TextStyle_Destroy(&ts);
 }
 
-static void TextView_UpdateLayerSize( LCUI_Widget w )
+static void TextView_UpdateLayerSize(LCUI_Widget w)
 {
 	LCUI_TextView txt;
 	int width = 0, height = 0;
-	float scale, max_width = 0, max_height = 0;
+	float max_width = 0, max_height = 0;
 
-	txt = GetData( w );
-	scale = LCUIMetrics_GetScale();
-	if( Widget_HasFitContentWidth( w ) ||
-	    Widget_HasParentDependentWidth( w ) ) {
-		max_width = Widget_ComputeMaxContentWidth( w );
+	txt = GetData(w);
+	if (Widget_HasFitContentWidth(w) || Widget_HasParentDependentWidth(w)) {
+		max_width = Widget_ComputeMaxContentWidth(w);
 	} else {
 		max_width = w->box.content.width;
 	}
-	if( !Widget_HasAutoStyle( w, key_height ) ) {
+	if (!Widget_HasAutoStyle(w, key_height)) {
 		max_height = w->box.content.height;
 	}
 	/* 将当前部件宽高作为文本层的固定宽高 */
-	width = LCUIMetrics_ComputeActual( w->box.content.width, SVT_PX );
-	height = LCUIMetrics_ComputeActual( w->box.content.height, SVT_PX );
-	TextLayer_SetFixedSize( txt->layer, width, height );
-	width = LCUIMetrics_ComputeActual( max_width, SVT_PX );
-	height = LCUIMetrics_ComputeActual( max_height, SVT_PX );
-	TextLayer_SetMaxSize( txt->layer, width, height );
+	width = LCUIMetrics_ComputeActual(w->box.content.width, LCUI_STYPE_PX);
+	height = LCUIMetrics_ComputeActual(w->box.content.height, LCUI_STYPE_PX);
+	TextLayer_SetFixedSize(txt->layer, width, height);
+	width = LCUIMetrics_ComputeActual(max_width, LCUI_STYPE_PX);
+	height = LCUIMetrics_ComputeActual(max_height, LCUI_STYPE_PX);
+	TextLayer_SetMaxSize(txt->layer, width, height);
 }
 
-static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
+static void TextView_OnResize(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 {
 	float scale;
 	LCUI_RectF rect;
@@ -231,27 +225,26 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	LinkedList rects;
 	LinkedListNode *node;
 
-	txt = GetData( w );
-	LinkedList_Init( &rects );
+	txt = GetData(w);
+	LinkedList_Init(&rects);
 	scale = LCUIMetrics_GetScale();
-	TextView_UpdateLayerSize( w );
-	TextLayer_Update( txt->layer, &rects );
-	for( LinkedList_Each( node, &rects ) ) {
-		LCUIRect_ToRectF( node->data, &rect, 1.0f / scale );
-		Widget_InvalidateArea( w, &rect, SV_CONTENT_BOX );
+	TextView_UpdateLayerSize(w);
+	TextLayer_Update(txt->layer, &rects);
+	for (LinkedList_Each(node, &rects)) {
+		LCUIRect_ToRectF(node->data, &rect, 1.0f / scale);
+		Widget_InvalidateArea(w, &rect, SV_CONTENT_BOX);
 	}
-	RectList_Clear( &rects );
-	TextLayer_ClearInvalidRect( txt->layer );
+	RectList_Clear(&rects);
+	TextLayer_ClearInvalidRect(txt->layer);
 }
 
 /** 初始化 TextView 部件数据 */
-static void TextView_OnInit( LCUI_Widget w )
+static void TextView_OnInit(LCUI_Widget w)
 {
 	int i;
 	LCUI_TextView txt;
-	txt = Widget_AddData( w, self.prototype,
-			      sizeof( LCUI_TextViewRec ) );
-	for( i = 0; i < TASK_TOTAL; ++i ) {
+	txt = Widget_AddData(w, self.prototype, sizeof(LCUI_TextViewRec));
+	for (i = 0; i < TASK_TOTAL; ++i) {
 		txt->tasks[i].is_valid = FALSE;
 	}
 	txt->widget = w;
@@ -261,281 +254,279 @@ static void TextView_OnInit( LCUI_Widget w )
 	/* 初始化文本图层 */
 	txt->layer = TextLayer_New();
 	/* 启用多行文本显示 */
-	TextLayer_SetAutoWrap( txt->layer, TRUE );
-	TextLayer_SetMultiline( txt->layer, TRUE );
+	TextLayer_SetAutoWrap(txt->layer, TRUE);
+	TextLayer_SetMultiline(txt->layer, TRUE);
 	/* 启用样式标签的支持 */
-	TextLayer_SetUsingStyleTags( txt->layer, TRUE );
-	Widget_BindEvent( w, "resize", TextView_OnResize, NULL, NULL );
-	CSSFontStyle_Init( &txt->style );
-	LCUIMutex_Init( &txt->mutex );
+	TextLayer_SetUsingStyleTags(txt->layer, TRUE);
+	Widget_BindEvent(w, "resize", TextView_OnResize, NULL, NULL);
+	CSSFontStyle_Init(&txt->style);
+	LCUIMutex_Init(&txt->mutex);
 }
 
-static void TextView_ClearTasks( LCUI_Widget w )
+static void TextView_ClearTasks(LCUI_Widget w)
 {
 	int i = TASK_SET_TEXT;
-	LCUI_TextView txt = GetData( w );
-	if( txt->tasks[i].is_valid ) {
+	LCUI_TextView txt = GetData(w);
+	if (txt->tasks[i].is_valid) {
 		txt->tasks[i].is_valid = FALSE;
-		free( txt->tasks[i].text );
+		free(txt->tasks[i].text);
 		txt->tasks[i].text = NULL;
 	}
 }
 
 /** 释放 TextView 部件占用的资源 */
-static void TextView_OnDestroy( LCUI_Widget w )
+static void TextView_OnDestroy(LCUI_Widget w)
 {
-	LCUI_TextView txt = GetData( w );
-	CSSFontStyle_Destroy( &txt->style );
-	TextLayer_Destroy( txt->layer );
-	LCUIMutex_Unlock( &txt->mutex );
-	TextView_ClearTasks( w );
-	free( txt->content );
+	LCUI_TextView txt = GetData(w);
+	CSSFontStyle_Destroy(&txt->style);
+	TextLayer_Destroy(txt->layer);
+	LCUIMutex_Unlock(&txt->mutex);
+	TextView_ClearTasks(w);
+	free(txt->content);
 }
 
-static void TextView_AutoSize( LCUI_Widget w, float *width, float *height )
+static void TextView_AutoSize(LCUI_Widget w, float *width, float *height)
 {
 	float max_width;
 	int fixed_w, fixed_h;
-	LCUI_TextView txt = GetData( w );
+	LCUI_TextView txt = GetData(w);
 	float scale = LCUIMetrics_GetScale();
 
-	TextView_UpdateLayerSize( w );
+	TextView_UpdateLayerSize(w);
 	fixed_w = txt->layer->fixed_width;
 	fixed_h = txt->layer->fixed_height;
-	if( Widget_HasFitContentWidth( w ) ||
-	    !Widget_HasStaticWidthParent( w ) ) {
+	if (Widget_HasFitContentWidth(w) || !Widget_HasStaticWidthParent(w)) {
 		/* 解除固定宽高设置，以计算最大宽高 */
-		TextLayer_SetFixedSize( txt->layer, (int)(*width * scale), 0 );
-		if( Widget_HasParentDependentWidth( w ) ) {
-			max_width = scale * Widget_ComputeMaxContentWidth( w );
-			TextLayer_SetMaxSize( txt->layer, (int)max_width, 0 );
+		TextLayer_SetFixedSize(txt->layer, (int)(*width * scale), 0);
+		if (Widget_HasParentDependentWidth(w)) {
+			max_width = scale * Widget_ComputeMaxContentWidth(w);
+			TextLayer_SetMaxSize(txt->layer, (int)max_width, 0);
 		}
-		TextLayer_Update( txt->layer, NULL );
-		if( *width <= 0 ) {
-			*width = TextLayer_GetWidth( txt->layer ) / scale;
+		TextLayer_Update(txt->layer, NULL);
+		if (*width <= 0) {
+			*width = TextLayer_GetWidth(txt->layer) / scale;
 		}
-		if( *height <= 0 ) {
-			*height = TextLayer_GetHeight( txt->layer ) / scale;
+		if (*height <= 0) {
+			*height = TextLayer_GetHeight(txt->layer) / scale;
 		}
 		/* 还原固定宽高设置 */
-		TextLayer_SetFixedSize( txt->layer, fixed_w, fixed_h );
-		TextLayer_Update( txt->layer, NULL );
+		TextLayer_SetFixedSize(txt->layer, fixed_w, fixed_h);
+		TextLayer_Update(txt->layer, NULL);
 		return;
 	}
-	if( *width <= 0 ) {
-		*width = TextLayer_GetWidth( txt->layer ) / scale;
-		if( *width <= 0 ) {
+	if (*width <= 0) {
+		*width = TextLayer_GetWidth(txt->layer) / scale;
+		if (*width <= 0) {
 			return;
 		}
 	}
-	TextLayer_SetFixedSize( txt->layer, (int)(*width * scale), 0 );
-	TextLayer_Update( txt->layer, NULL );
-	*height = TextLayer_GetHeight( txt->layer ) / scale;
+	TextLayer_SetFixedSize(txt->layer, (int)(*width * scale), 0);
+	TextLayer_Update(txt->layer, NULL);
+	*height = TextLayer_GetHeight(txt->layer) / scale;
 }
 
-static void TextView_OnRefresh( LCUI_Widget w )
+static void TextView_OnRefresh(LCUI_Widget w)
 {
-	LCUI_TextView txt = GetData( w );
+	LCUI_TextView txt = GetData(w);
 	txt->tasks[TASK_UPDATE_SIZE].is_valid = TRUE;
-	Widget_AddTask( w, LCUI_WTASK_USER );
+	Widget_AddTask(w, LCUI_WTASK_USER);
 }
 
 /** 私有的任务处理接口 */
-static void TextView_OnTask( LCUI_Widget w )
+static void TextView_OnTask(LCUI_Widget w)
 {
 	int i;
 	float scale;
 	LCUI_RectF rect;
 	LinkedList rects;
 	LinkedListNode *node;
-	LCUI_TextView txt = GetData( w );
+	LCUI_TextView txt = GetData(w);
 
-	LinkedList_Init( &rects );
+	LinkedList_Init(&rects);
 	i = TASK_SET_TEXT;
-	if( txt->tasks[i].is_valid ) {
-		LCUIMutex_Lock( &txt->mutex );
+	if (txt->tasks[i].is_valid) {
+		LCUIMutex_Lock(&txt->mutex);
 		txt->tasks[i].is_valid = FALSE;
-		TextLayer_SetTextW( txt->layer, txt->tasks[i].text, NULL );
+		TextLayer_SetTextW(txt->layer, txt->tasks[i].text, NULL);
 		txt->tasks[TASK_UPDATE].is_valid = TRUE;
-		free( txt->tasks[i].text );
+		free(txt->tasks[i].text);
 		txt->tasks[i].text = NULL;
-		LCUIMutex_Unlock( &txt->mutex );
+		LCUIMutex_Unlock(&txt->mutex);
 	}
 	i = TASK_SET_AUTOWRAP;
-	if( txt->tasks[i].is_valid ) {
+	if (txt->tasks[i].is_valid) {
 		txt->tasks[i].is_valid = FALSE;
-		TextLayer_SetAutoWrap( txt->layer, txt->tasks[i].enable );
+		TextLayer_SetAutoWrap(txt->layer, txt->tasks[i].enable);
 		txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	}
 	i = TASK_SET_WORD_BREAK;
-	if( txt->tasks[i].is_valid ) {
+	if (txt->tasks[i].is_valid) {
 		txt->tasks[i].is_valid = FALSE;
-		TextLayer_SetWordBreak( txt->layer, txt->tasks[i].mode );
+		TextLayer_SetWordBreak(txt->layer, txt->tasks[i].mode);
 		txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	}
 	i = TASK_SET_TEXT_STYLE;
-	if( txt->tasks[i].is_valid ) {
+	if (txt->tasks[i].is_valid) {
 		txt->tasks[i].is_valid = FALSE;
-		TextLayer_SetTextStyle( txt->layer, &txt->tasks[i].style );
-		TextStyle_Destroy( &txt->tasks[i].style );
+		TextLayer_SetTextStyle(txt->layer, &txt->tasks[i].style);
+		TextStyle_Destroy(&txt->tasks[i].style);
 		txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	}
 	i = TASK_SET_TEXT_ALIGN;
-	if( txt->tasks[i].is_valid ) {
+	if (txt->tasks[i].is_valid) {
 		txt->tasks[i].is_valid = FALSE;
-		TextLayer_SetTextAlign( txt->layer, txt->tasks[i].align );
+		TextLayer_SetTextAlign(txt->layer, txt->tasks[i].align);
 		txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	}
 	i = TASK_SET_MULITILINE;
-	if( txt->tasks[i].is_valid ) {
+	if (txt->tasks[i].is_valid) {
 		txt->tasks[i].is_valid = FALSE;
-		TextLayer_SetMultiline( txt->layer, txt->tasks[i].enable );
+		TextLayer_SetMultiline(txt->layer, txt->tasks[i].enable);
 		txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	}
 	i = TASK_UPDATE_SIZE;
-	if( txt->tasks[i].is_valid ) {
-		TextView_UpdateLayerSize( w );
-		if( Widget_HasFitContentWidth( w ) ) {
-			Widget_AddTask( w, LCUI_WTASK_RESIZE );
+	if (txt->tasks[i].is_valid) {
+		TextView_UpdateLayerSize(w);
+		if (Widget_HasFitContentWidth(w)) {
+			Widget_AddTask(w, LCUI_WTASK_RESIZE);
 		}
 		txt->tasks[i].is_valid = FALSE;
 		txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	}
 	i = TASK_UPDATE;
-	if( !txt->tasks[i].is_valid ) {
+	if (!txt->tasks[i].is_valid) {
 		return;
 	}
 	txt->tasks[i].is_valid = FALSE;
-	LinkedList_Init( &rects );
+	LinkedList_Init(&rects);
 	scale = LCUIMetrics_GetScale();
-	TextLayer_Update( txt->layer, &rects );
-	for( LinkedList_Each( node, &rects ) ) {
-		LCUIRect_ToRectF( node->data, &rect, 1.0f / scale );
-		Widget_InvalidateArea( w, &rect, SV_CONTENT_BOX );
+	TextLayer_Update(txt->layer, &rects);
+	for (LinkedList_Each(node, &rects)) {
+		LCUIRect_ToRectF(node->data, &rect, 1.0f / scale);
+		Widget_InvalidateArea(w, &rect, SV_CONTENT_BOX);
 	}
-	RectList_Clear( &rects );
-	TextLayer_ClearInvalidRect( txt->layer );
-	if( Widget_HasParentDependentWidth( w ) ||
-	    Widget_HasAutoStyle( w, key_width ) ||
-	    Widget_HasAutoStyle( w, key_height ) ) {
-		Widget_AddTask( w->parent, LCUI_WTASK_RESIZE );
+	RectList_Clear(&rects);
+	TextLayer_ClearInvalidRect(txt->layer);
+	if (Widget_HasParentDependentWidth(w) ||
+	    Widget_HasAutoStyle(w, key_width) ||
+	    Widget_HasAutoStyle(w, key_height)) {
+		Widget_AddTask(w->parent, LCUI_WTASK_RESIZE);
 	}
 }
 
 /** 绘制 TextView 部件 */
-static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint,
-			      LCUI_WidgetActualStyle style )
+static void TextView_OnPaint(LCUI_Widget w, LCUI_PaintContext paint,
+			     LCUI_WidgetActualStyle style)
 {
 	LCUI_Pos pos;
 	LCUI_Graph canvas;
 	LCUI_Rect content_rect, rect;
-	LCUI_TextView txt = GetData( w );
+	LCUI_TextView txt = GetData(w);
 	content_rect.width = style->content_box.width;
 	content_rect.height = style->content_box.height;
 	content_rect.x = style->content_box.x - style->canvas_box.x;
 	content_rect.y = style->content_box.y - style->canvas_box.y;
-	if( !LCUIRect_GetOverlayRect( &content_rect, &paint->rect, &rect ) ) {
+	if (!LCUIRect_GetOverlayRect(&content_rect, &paint->rect, &rect)) {
 		return;
 	}
 	pos.x = content_rect.x - rect.x;
 	pos.y = content_rect.y - rect.y;
 	rect.x -= paint->rect.x;
 	rect.y -= paint->rect.y;
-	Graph_Quote( &canvas, &paint->canvas, &rect );
+	Graph_Quote(&canvas, &paint->canvas, &rect);
 	rect = paint->rect;
 	rect.x -= content_rect.x;
 	rect.y -= content_rect.y;
-	TextLayer_RenderTo( txt->layer, rect, pos, &canvas );
+	TextLayer_RenderTo(txt->layer, rect, pos, &canvas);
 }
 
-int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
+int TextView_SetTextW(LCUI_Widget w, const wchar_t *text)
 {
-	LCUI_TextView txt = GetData( w );
-	wchar_t *newtext = malloc( wcssize( text ) );
-	if( !newtext ) {
+	LCUI_TextView txt = GetData(w);
+	wchar_t *newtext = malloc(wcssize(text));
+	if (!newtext) {
 		return -ENOMEM;
 	}
-	if( txt->content ) {
-		free( txt->content );
+	if (txt->content) {
+		free(txt->content);
 	}
-	txt->content = malloc( wcssize( text ) );
-	if( !txt->content ) {
-		free( newtext );
+	txt->content = malloc(wcssize(text));
+	if (!txt->content) {
+		free(newtext);
 		return -ENOMEM;
 	}
 	do {
-		if( !text ) {
+		if (!text) {
 			newtext[0] = 0;
 			txt->content[0] = 0;
 			break;
 		}
-		wcscpy( txt->content, text );
-		if( !txt->trimming ) {
-			wcscpy( newtext, text );
+		wcscpy(txt->content, text);
+		if (!txt->trimming) {
+			wcscpy(newtext, text);
 			break;
 		}
-		wcstrim( newtext, text, NULL );
-	} while( 0 );
-	LCUIMutex_Lock( &txt->mutex );
-	if( txt->tasks[TASK_SET_TEXT].is_valid &&
-	    txt->tasks[TASK_SET_TEXT].text ) {
-		free( txt->tasks[TASK_SET_TEXT].text );
+		wcstrim(newtext, text, NULL);
+	} while (0);
+	LCUIMutex_Lock(&txt->mutex);
+	if (txt->tasks[TASK_SET_TEXT].is_valid &&
+	    txt->tasks[TASK_SET_TEXT].text) {
+		free(txt->tasks[TASK_SET_TEXT].text);
 	}
 	txt->tasks[TASK_SET_TEXT].is_valid = TRUE;
 	txt->tasks[TASK_SET_TEXT].text = newtext;
-	Widget_AddTask( w, LCUI_WTASK_USER );
-	LCUIMutex_Unlock( &txt->mutex );
+	Widget_AddTask(w, LCUI_WTASK_USER);
+	LCUIMutex_Unlock(&txt->mutex);
 	return 0;
 }
 
-int TextView_SetText( LCUI_Widget w, const char *utf8_text )
+int TextView_SetText(LCUI_Widget w, const char *utf8_text)
 {
 	int ret;
 	wchar_t *wstr;
-	size_t len = strlen( utf8_text ) + 1;
-	wstr = malloc( sizeof( wchar_t )*len );
-	LCUI_DecodeString( wstr, utf8_text, len, ENCODING_UTF8 );
-	ret = TextView_SetTextW( w, wstr );
-	if( wstr ) {
-		free( wstr );
+	size_t len = strlen(utf8_text) + 1;
+	wstr = malloc(sizeof(wchar_t) * len);
+	LCUI_DecodeString(wstr, utf8_text, len, ENCODING_UTF8);
+	ret = TextView_SetTextW(w, wstr);
+	if (wstr) {
+		free(wstr);
 	}
 	return ret;
 }
 
-void TextView_SetLineHeight( LCUI_Widget w, int height )
+void TextView_SetLineHeight(LCUI_Widget w, int height)
 {
-	Widget_SetFontStyle( w, key_line_height, (float)height, px );
+	Widget_SetFontStyle(w, key_line_height, (float)height, px);
 }
 
-void TextView_SetTextAlign( LCUI_Widget w, int align )
+void TextView_SetTextAlign(LCUI_Widget w, int align)
 {
-	Widget_SetFontStyle( w, key_text_align, align, style );
+	Widget_SetFontStyle(w, key_text_align, align, style);
 }
 
-void TextView_SetAutoWrap( LCUI_Widget w, LCUI_BOOL enable )
+void TextView_SetAutoWrap(LCUI_Widget w, LCUI_BOOL enable)
 {
-	if( enable ) {
-		Widget_SetFontStyle( w, key_white_space, SV_AUTO, style );
+	if (enable) {
+		Widget_SetFontStyle(w, key_white_space, SV_AUTO, style);
 	} else {
-		Widget_SetFontStyle( w, key_white_space, SV_NOWRAP, style );
+		Widget_SetFontStyle(w, key_white_space, SV_NOWRAP, style);
 	}
 }
 
-void TextView_SetMulitiline( LCUI_Widget w, LCUI_BOOL enable )
+void TextView_SetMulitiline(LCUI_Widget w, LCUI_BOOL enable)
 {
-	LCUI_TextView txt = GetData( w );
+	LCUI_TextView txt = GetData(w);
 	txt->tasks[TASK_SET_MULITILINE].enable = enable;
 	txt->tasks[TASK_SET_MULITILINE].is_valid = TRUE;
-	Widget_AddTask( w, LCUI_WTASK_USER );
+	Widget_AddTask(w, LCUI_WTASK_USER);
 }
 
-void LCUIWidget_AddTextView( void )
+void LCUIWidget_AddTextView(void)
 {
-	LCUI_CSSPropertyParserRec parser = {
-		0, "word-break", OnParseWordBreak
-	};
-	self.key_word_break = LCUI_AddCSSPropertyName( "word-break" );
-	self.prototype = LCUIWidget_NewPrototype( "textview", NULL );
+	LCUI_CSSPropertyParserRec parser = { 0, "word-break",
+		OnParseWordBreak };
+	self.key_word_break = LCUI_AddCSSPropertyName("word-break");
+	self.prototype = LCUIWidget_NewPrototype("textview", NULL);
 	self.prototype->init = TextView_OnInit;
 	self.prototype->paint = TextView_OnPaint;
 	self.prototype->refresh = TextView_OnRefresh;
@@ -545,5 +536,5 @@ void LCUIWidget_AddTextView( void )
 	self.prototype->settext = TextView_OnParseText;
 	self.prototype->setattr = TextView_OnParseAttr;
 	self.prototype->runtask = TextView_OnTask;
-	LCUI_AddCSSPropertyParser( &parser );
+	LCUI_AddCSSPropertyParser(&parser);
 }

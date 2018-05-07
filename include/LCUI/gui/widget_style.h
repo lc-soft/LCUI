@@ -2,7 +2,7 @@
  * widget_style.h -- widget style library module for LCUI.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -32,33 +32,33 @@
 #define LCUI_WIDGET_STYLE_LIBRARY_H
 
 /** 初始化 */
-void LCUIWidget_InitStyle( void );
+void LCUIWidget_InitStyle(void);
 
 /** 销毁，释放资源 */
-void LCUIWidget_FreeStyle( void );
+void LCUIWidget_FreeStyle(void);
 
 /** 计算部件继承得到的样式表 */
-LCUI_API void Widget_GetInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss );
+LCUI_API void Widget_GetInheritStyle(LCUI_Widget w, LCUI_StyleSheet out_ss);
 
 /** 打印部件的样式表 */
-LCUI_API void Widget_PrintStyleSheets( LCUI_Widget w );
+LCUI_API void Widget_PrintStyleSheets(LCUI_Widget w);
 
 /** 更新当前部件的样式 */
-LCUI_API void Widget_UpdateStyle( LCUI_Widget w, LCUI_BOOL is_refresh_all );
+LCUI_API void Widget_UpdateStyle(LCUI_Widget w, LCUI_BOOL is_refresh_all);
 
 /** 更新当前部件的子级部件样式 */
-LCUI_API void Widget_UpdateChildrenStyle( LCUI_Widget w, LCUI_BOOL is_refresh_all );
+LCUI_API void Widget_UpdateChildrenStyle(LCUI_Widget w, LCUI_BOOL is_refresh_all);
 
 /** 直接更新当前部件的样式 */
-LCUI_API void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all );
+LCUI_API void Widget_ExecUpdateStyle(LCUI_Widget w, LCUI_BOOL is_update_all);
 
 /** 获取选择器结点 */
-LCUI_SelectorNode Widget_GetSelectorNode( LCUI_Widget w );
+LCUI_SelectorNode Widget_GetSelectorNode(LCUI_Widget w);
 
 /** 获取选择器 */
-LCUI_API LCUI_Selector Widget_GetSelector( LCUI_Widget w );
+LCUI_API LCUI_Selector Widget_GetSelector(LCUI_Widget w);
 
 /** 处理子级部件样式变化 */
-LCUI_API int Widget_HandleChildrenStyleChange( LCUI_Widget w, int type, const char *name );
+LCUI_API int Widget_HandleChildrenStyleChange(LCUI_Widget w, int type, const char *name);
 
 #endif

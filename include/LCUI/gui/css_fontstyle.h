@@ -2,7 +2,7 @@
  * css_fontstyle.h -- CSS font style parse and operation set.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -32,6 +32,8 @@
 #define LCUI_CSS_FONT_STYLE_H
 
 #include <LCUI/font/textstyle.h>
+
+LCUI_BEGIN_HEADER
 
 enum LCUI_CSSFontStyleKey {
 	key_color,
@@ -64,18 +66,20 @@ typedef struct LCUI_CSSFontStyleRec_ {
 	SetStyle( (W)->custom_style, key, V, T ); \
 } while( 0 )
 
-int LCUI_GetFontStyleKey( int key );
+int LCUI_GetFontStyleKey(int key);
 
-void CSSFontStyle_Init( LCUI_CSSFontStyle fs );
+void CSSFontStyle_Init(LCUI_CSSFontStyle fs);
 
-void CSSFontStyle_Destroy( LCUI_CSSFontStyle fs );
+void CSSFontStyle_Destroy(LCUI_CSSFontStyle fs);
 
-void CSSFontStyle_Compute( LCUI_CSSFontStyle fs, LCUI_StyleSheet ss );
+void CSSFontStyle_Compute(LCUI_CSSFontStyle fs, LCUI_StyleSheet ss);
 
-void CSSFontStyle_GetTextStyle( LCUI_CSSFontStyle fs, LCUI_TextStyle ts );
+void CSSFontStyle_GetTextStyle(LCUI_CSSFontStyle fs, LCUI_TextStyle ts);
 
-void LCUI_InitCSSFontStyle( void );
+void LCUI_InitCSSFontStyle(void);
 
-void LCUI_FreeCSSFontStyle( void );
+void LCUI_FreeCSSFontStyle(void);
+
+LCUI_END_HEADER
 
 #endif

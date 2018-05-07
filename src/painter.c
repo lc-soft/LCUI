@@ -27,23 +27,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
-#include <LCUI/painter.h>
 #include <LCUI/gui/metrics.h>
+#include <LCUI/painter.h>
 
-LCUI_PaintContext LCUIPainter_Begin( LCUI_Graph *canvas, LCUI_Rect *rect )
+LCUI_PaintContext LCUIPainter_Begin(LCUI_Graph *canvas, LCUI_Rect *rect)
 {
-	ASSIGN( paint, LCUI_PaintContext );
+	ASSIGN(paint, LCUI_PaintContext);
 	paint->rect = *rect;
 	paint->with_alpha = FALSE;
-	Graph_Init( &paint->canvas );
-	Graph_Quote( &paint->canvas, canvas, &paint->rect );
+	Graph_Init(&paint->canvas);
+	Graph_Quote(&paint->canvas, canvas, &paint->rect);
 	return paint;
 }
 
-void LCUIPainter_End( LCUI_PaintContext paint )
+void LCUIPainter_End(LCUI_PaintContext paint)
 {
-	free( paint );
+	free(paint);
 }

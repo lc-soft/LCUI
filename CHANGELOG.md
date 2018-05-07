@@ -1,5 +1,19 @@
 # LCUI ChangeLog
 
+## 1.0.0 Beta 3 (2018-05-08)
+
+### Bug Fixes
+
+* **font:** segmentation fault in DeleteFont() ([5465c6b](https://github.com/lc-soft/LCUI/commit/5465c6b))
+* **timer:** timer thread may quit after it is created ([0b01f88](https://github.com/lc-soft/LCUI/commit/0b01f88))
+* **util:** 'struct dirent' has no member named 'd_reclen' ([#141](https://github.com/lc-soft/LCUI/issues/141)) ([0416c42](https://github.com/lc-soft/LCUI/commit/0416c42))
+
+### Features
+
+* **platform:** add linux framebuffer driver ([6015838](https://github.com/lc-soft/LCUI/commit/6015838))
+* **platform:** add linux keyboard driver ([ad3348e](https://github.com/lc-soft/LCUI/commit/ad3348e))
+* **platform:** add linux mouse driver ([0ff7b70](https://github.com/lc-soft/LCUI/commit/0ff7b70))
+
 ## 1.0.0 Beta 2 (2018-03-18)
 
 ### Bug Fixes

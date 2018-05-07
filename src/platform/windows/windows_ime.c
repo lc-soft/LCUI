@@ -2,7 +2,7 @@
  * windows_ime.c -- Input method engine support for windows platform.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -28,7 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
@@ -41,24 +40,24 @@
 #include <LCUI/platform.h>
 #include LCUI_EVENTS_H
 
-static LCUI_BOOL IME_ProcessKey( int key, int key_state )
+static LCUI_BOOL IME_ProcessKey(int key, int key_state)
 {
 	return FALSE;
 }
 
-static void IME_ToText( int ch )
+static void IME_ToText(int ch)
 {
 	wchar_t text[2] = { ch, 0 };
-	LCUIIME_Commit( text, 2 );
+	LCUIIME_Commit(text, 2);
 }
 
-static void WinIME_OnChar( LCUI_Event e, void *arg )
+static void WinIME_OnChar(LCUI_Event e, void *arg)
 {
 	MSG *msg = arg;
 	wchar_t text[2];
 	text[0] = msg->wParam;
 	text[1] = 0;
-	LCUIIME_Commit( text, 2 );
+	LCUIIME_Commit(text, 2);
 }
 
 /**
@@ -67,25 +66,25 @@ static void WinIME_OnChar( LCUI_Event e, void *arg )
 **/
 static LCUI_BOOL IME_Open(void)
 {
-	LCUI_BindSysEvent( WM_CHAR, WinIME_OnChar, NULL, NULL );
+	LCUI_BindSysEvent(WM_CHAR, WinIME_OnChar, NULL, NULL);
 	return TRUE;
 }
 
 /** 输入法被关闭时的处理 */
 static LCUI_BOOL IME_Close(void)
 {
-	LCUI_UnbindSysEvent( WM_CHAR, WinIME_OnChar );
+	LCUI_UnbindSysEvent(WM_CHAR, WinIME_OnChar);
 	return TRUE;
 }
 
-int LCUI_RegisterWin32IME( void )
+int LCUI_RegisterWin32IME(void)
 {
 	LCUI_IMEHandlerRec handler;
 	handler.prockey = IME_ProcessKey;
 	handler.totext = IME_ToText;
 	handler.close = IME_Close;
 	handler.open = IME_Open;
-	return LCUIIME_Register( "LCUI Input Method", &handler );
+	return LCUIIME_Register("LCUI Input Method", &handler);
 }
 
 #endif

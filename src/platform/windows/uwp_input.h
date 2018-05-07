@@ -2,7 +2,7 @@
  * uwp_input.h -- UWP input support for LCUI
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,29 +34,27 @@
 #include <LCUI/LCUI.h>
 
 namespace LCUICore {
-
-class InputDriver  {
-public:
-	InputDriver();
-	void OnPointerPressed( Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::PointerEventArgs^ args );
-	void OnPointerMoved( Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::PointerEventArgs^ args );
-	void OnPointerReleased( Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::PointerEventArgs^ args );
-	void OnPointerWheelChanged( Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::PointerEventArgs^ args );
-	void OnKeyDown( Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::KeyEventArgs^ args );
-	void OnKeyUp( Windows::UI::Core::CoreWindow^ sender,Windows::UI::Core:: KeyEventArgs^ args );
-	void RegisterIME( void );
-	void SelectIME( void );
-private:
-	int m_ime;
-	struct {
-		bool actived;
-		bool leftButtonPressed;
-		bool rightButtonPressed;
-		Windows::Foundation::Point position;
-	} m_mouse;
-	struct {
-		LinkedList points;
-	} m_touch;
-};
-
+	class InputDriver {
+	public:
+		InputDriver();
+		void OnPointerPressed(Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::PointerEventArgs^ args);
+		void OnPointerMoved(Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::PointerEventArgs^ args);
+		void OnPointerReleased(Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::PointerEventArgs^ args);
+		void OnPointerWheelChanged(Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::PointerEventArgs^ args);
+		void OnKeyDown(Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::KeyEventArgs^ args);
+		void OnKeyUp(Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::KeyEventArgs^ args);
+		void RegisterIME(void);
+		void SelectIME(void);
+	private:
+		int m_ime;
+		struct {
+			bool actived;
+			bool leftButtonPressed;
+			bool rightButtonPressed;
+			Windows::Foundation::Point position;
+		} m_mouse;
+		struct {
+			LinkedList points;
+		} m_touch;
+	};
 }

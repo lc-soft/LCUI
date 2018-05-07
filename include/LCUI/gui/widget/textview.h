@@ -2,7 +2,7 @@
  * textview.h -- TextView widget for display text.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,19 +34,19 @@
 LCUI_BEGIN_HEADER
 
 /** 设定与标签关联的文本内容 */
-LCUI_API int TextView_SetTextW( LCUI_Widget w, const wchar_t *text );
+LCUI_API int TextView_SetTextW(LCUI_Widget w, const wchar_t *text);
 
-LCUI_API int TextView_SetText( LCUI_Widget w, const char *utf8_text );
+LCUI_API int TextView_SetText(LCUI_Widget w, const char *utf8_text);
 
-LCUI_API void TextView_SetLineHeight( LCUI_Widget w, int height );
+LCUI_API void TextView_SetLineHeight(LCUI_Widget w, int height);
 
-LCUI_API void TextView_SetTextAlign( LCUI_Widget w, int align );
+LCUI_API void TextView_SetTextAlign(LCUI_Widget w, int align);
 
-LCUI_API void TextView_SetAutoWrap( LCUI_Widget w, LCUI_BOOL enable );
+LCUI_API void TextView_SetAutoWrap(LCUI_Widget w, LCUI_BOOL enable);
 
-LCUI_API void TextView_SetMulitiline( LCUI_Widget w, LCUI_BOOL enable );
+LCUI_API void TextView_SetMulitiline(LCUI_Widget w, LCUI_BOOL enable);
 
-LCUI_API void LCUIWidget_AddTextView( void );
+LCUI_API void LCUIWidget_AddTextView(void);
 
 LCUI_END_HEADER
 

@@ -2,7 +2,7 @@
  * scrollbar.c -- LCUI's scrollbar widget
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -38,20 +38,20 @@ enum ScrollBarDirection {
 	SBD_VERTICAL
 };
 
-LCUI_API void ScrollBar_BindBox( LCUI_Widget w, LCUI_Widget box );
+LCUI_API void ScrollBar_BindBox(LCUI_Widget w, LCUI_Widget box);
 
-LCUI_API void ScrollBar_BindTarget( LCUI_Widget w, LCUI_Widget layer );
+LCUI_API void ScrollBar_BindTarget(LCUI_Widget w, LCUI_Widget layer);
 
 /** 获取滚动条的位置 */
-LCUI_API int ScrollBar_GetPosition( LCUI_Widget w );
+LCUI_API int ScrollBar_GetPosition(LCUI_Widget w);
 
 /** 将与滚动条绑定的内容滚动至指定位置 */
-LCUI_API int ScrollBar_SetPosition( LCUI_Widget w, int pos );
+LCUI_API int ScrollBar_SetPosition(LCUI_Widget w, int pos);
 
 /** 设置滚动条的方向 */
-LCUI_API void ScrollBar_SetDirection( LCUI_Widget w, int direction );
+LCUI_API void ScrollBar_SetDirection(LCUI_Widget w, int direction);
 
-LCUI_API void LCUIWidget_AddTScrollBar( void );
+LCUI_API void LCUIWidget_AddTScrollBar(void);
 
 LCUI_END_HEADER
 

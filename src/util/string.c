@@ -74,172 +74,172 @@
 	*op = 0;\
 	return op - outstr;
 
-size_t strsize( const char *str )
+size_t strsize(const char *str)
 {
-	if( !str ) {
-		return sizeof( char );
+	if (!str) {
+		return sizeof(char);
 	}
-	return (strlen( str ) + 1) * sizeof( char );
+	return (strlen(str) + 1) * sizeof(char);
 }
 
-size_t wcssize( const wchar_t *str )
+size_t wcssize(const wchar_t *str)
 {
-	if( !str ) {
-		return sizeof( wchar_t );
+	if (!str) {
+		return sizeof(wchar_t);
 	}
-	return (wcslen( str ) + 1) * sizeof( wchar_t );
+	return (wcslen(str) + 1) * sizeof(wchar_t);
 }
 
-size_t strtolower( char *outstr, const char *instr )
+size_t strtolower(char *outstr, const char *instr)
 {
 	char *op = outstr;
 	const char *ip = instr;
-	for( ; *ip; ++ip, ++op ) {
-		*op = tolower( *ip );
+	for (; *ip; ++ip, ++op) {
+		*op = tolower(*ip);
 	}
 	*op = 0;
 	return ip - instr;
 }
 
-size_t strntolower( char *outstr, size_t max_len, const char *instr )
+size_t strntolower(char *outstr, size_t max_len, const char *instr)
 {
 	char *op = outstr;
 	const char *ip = instr;
-	for( ; *ip && max_len > 1; ++ip, ++op, --max_len ) {
-		*op = tolower( *ip );
+	for (; *ip && max_len > 1; ++ip, ++op, --max_len) {
+		*op = tolower(*ip);
 	}
 	*op = 0;
 	return ip - instr;
 }
 
-char *strdup2( const char *str )
+char *strdup2(const char *str)
 {
-	size_t len = strlen( str ) + 1;
-	char *out = malloc( sizeof( char ) * len );
-	if( !out ) {
+	size_t len = strlen(str) + 1;
+	char *out = malloc(sizeof(char) * len);
+	if (!out) {
 		return NULL;
 	}
-	strncpy( out, str, len );
+	strncpy(out, str, len);
 	return out;
 }
 
-wchar_t *wcsdup2( const wchar_t *str )
+wchar_t *wcsdup2(const wchar_t *str)
 {
-	size_t len = wcslen( str ) + 1;
-	wchar_t *out = malloc( sizeof( wchar_t ) * len );
-	if( !out ) {
+	size_t len = wcslen(str) + 1;
+	wchar_t *out = malloc(sizeof(wchar_t) * len);
+	if (!out) {
 		return NULL;
 	}
-	wcsncpy( out, str, len );
+	wcsncpy(out, str, len);
 	return out;
 }
 
-int strtrim( char *outstr, const char *instr, const char *charlist )
+int strtrim(char *outstr, const char *instr, const char *charlist)
 {
-	STRTRIM_CODE( char, outstr, instr, charlist, "\t\n\r " );
+	STRTRIM_CODE(char, outstr, instr, charlist, "\t\n\r ");
 }
 
-int wcstrim( wchar_t *outstr, const wchar_t *instr, const wchar_t *charlist )
+int wcstrim(wchar_t *outstr, const wchar_t *instr, const wchar_t *charlist)
 {
-	STRTRIM_CODE( wchar_t, outstr, instr, charlist, L"\t\n\r " );
+	STRTRIM_CODE(wchar_t, outstr, instr, charlist, L"\t\n\r ");
 }
 
-int wcsreplace( wchar_t *str, size_t max_len,
-		const wchar_t *substr, const wchar_t *newstr )
+int wcsreplace(wchar_t *str, size_t max_len,
+	       const wchar_t *substr, const wchar_t *newstr)
 {
 	size_t len, buf_len;
 	wchar_t *buf, *p, *q;
-	len = wcslen( newstr );
-	p = wcsstr( str, substr );
-	if( !p ) {
+	len = wcslen(newstr);
+	p = wcsstr(str, substr);
+	if (!p) {
 		return 0;
 	}
-	buf_len = wcslen( str ) + len;
-	buf = malloc( buf_len * sizeof( wchar_t ) );
-	wcscpy( buf, str );
+	buf_len = wcslen(str) + len;
+	buf = malloc(buf_len * sizeof(wchar_t));
+	wcscpy(buf, str);
 	q = buf + (p - str);
-	wcscpy( q, newstr );
-	p += wcslen( substr );
+	wcscpy(q, newstr);
+	p += wcslen(substr);
 	q += len;
-	wcscpy( q, p );
-	wcsncpy( str, buf, max_len );
-	free( buf );
+	wcscpy(q, p);
+	wcsncpy(str, buf, max_len);
+	free(buf);
 	return 1;
 }
 
-void freestrs( char **strs )
+void freestrs(char **strs)
 {
 	int i = 0;
-	while( strs[i] ) {
-		free( strs[i] );
+	while (strs[i]) {
+		free(strs[i]);
 		++i;
 	}
-	free( strs );
+	free(strs);
 }
 
-int cmdsplit( const char *cmd, char ***outargv )
+int cmdsplit(const char *cmd, char ***outargv)
 {
 	size_t size;
 	char **argv = NULL, **tmp;
 	const char *cur = cmd, *p = NULL;
 	int argc = 0, spaces = 0, qoutes = 0, len = 0;
 
-	if( outargv ) {
-		argv = malloc( sizeof( char* ) );
-		if( !argv ) {
+	if (outargv) {
+		argv = malloc(sizeof(char*));
+		if (!argv) {
 			return -ENOMEM;
 		}
 		argv[0] = NULL;
 	}
-	while( 1 ) {
-		switch( *cur ) {
+	while (1) {
+		switch (*cur) {
 		case 0:
 		case '\n':
 		case '\r':
 		case '\t':
 		case ' ':
-			if( *cur != 0 ) {
-				if( spaces != 0 ) {
+			if (*cur != 0) {
+				if (spaces != 0) {
 					break;
 				}
 				++spaces;
-				if( qoutes > 0 && qoutes % 2 != 0 ) {
+				if (qoutes > 0 && qoutes % 2 != 0) {
 					++len;
 					break;
 				}
 			}
-			if( argv && len > 0 ) {
-				size = sizeof( char* ) * (argc + 2);
-				tmp = realloc( argv, size );
-				if( !tmp ) {
+			if (argv && len > 0) {
+				size = sizeof(char*) * (argc + 2);
+				tmp = realloc(argv, size);
+				if (!tmp) {
 					goto faild;
 				}
 				len += 1;
 				argv = tmp;
 				argv[argc + 1] = NULL;
-				size = sizeof( char ) * len;
-				argv[argc] = malloc( size );
-				if( !argv[argc] ) {
+				size = sizeof(char) * len;
+				argv[argc] = malloc(size);
+				if (!argv[argc]) {
 					goto faild;
 				}
 				len -= 1;
-				strncpy( argv[argc], p, len );
+				strncpy(argv[argc], p, len);
 				argv[argc][len] = 0;
 			}
 			p = NULL;
-			if( len > 0 ) {
+			if (len > 0) {
 				++argc;
 			}
 			qoutes = 0;
 			len = 0;
-			if( *cur == 0 ) {
+			if (*cur == 0) {
 				goto done;
 			}
 			break;
 		case '"':
 			++qoutes;
-		default: 
-			if( !p ) {
+		default:
+			if (!p) {
 				p = cur;
 			}
 			spaces = 0;
@@ -250,220 +250,220 @@ int cmdsplit( const char *cmd, char ***outargv )
 	}
 
 done:
-	if( argv ) {
+	if (argv) {
 		*outargv = argv;
 	}
 	return argc;
 
 faild:
 	argc += 1;
-	while( argc-- > 0 ) {
-		if( argv[argc] ) {
-			free( argv[argc] );
+	while (argc-- > 0) {
+		if (argv[argc]) {
+			free(argv[argc]);
 			argv[argc] = NULL;
 		}
 	}
-	free( argv );
+	free(argv);
 	return -ENOMEM;
 }
 
-int strsplit( const char *instr, const char *sep, char ***outstrs )
+int strsplit(const char *instr, const char *sep, char ***outstrs)
 {
 	int i = 0;
 	const char *prev = instr;
-	size_t len, sep_len = strlen( sep );
-	char *next = strstr( prev, sep );
+	size_t len, sep_len = strlen(sep);
+	char *next = strstr(prev, sep);
 	char **newstrs = NULL;
 
-	while( 1 ) {
+	while (1) {
 		char **tmp, *str;
-		if( next ) {
+		if (next) {
 			len = next - prev + 1;
 		} else {
-			len = strlen( prev ) + 1;
+			len = strlen(prev) + 1;
 		}
-		str = malloc( sizeof( char ) * len );
-		tmp = realloc( newstrs, sizeof( char* ) * (i + 2) );
-		if( !tmp ) {
-			freestrs( newstrs );
+		str = malloc(sizeof(char) * len);
+		tmp = realloc(newstrs, sizeof(char*) * (i + 2));
+		if (!tmp) {
+			freestrs(newstrs);
 			return 0;
 		}
 		newstrs = tmp;
-		strncpy( str, prev, len - 1 );
+		strncpy(str, prev, len - 1);
 		str[len - 1] = 0;
 		newstrs[i] = str;
 		newstrs[i + 1] = NULL;
-		if( next ) {
+		if (next) {
 			prev = next + sep_len;
 		} else {
 			break;
 		}
-		next = strstr( prev, sep );
+		next = strstr(prev, sep);
 		i += 1;
 	}
 	*outstrs = newstrs;
 	return i + 1;
 }
 
-static int strsaddone( char ***strlist, const char *str )
+static int strsaddone(char ***strlist, const char *str)
 {
 	int i = 0;
 	char **newlist;
 
-	if( !*strlist ) {
-		newlist = (char**)malloc( sizeof( char* ) * 2 );
+	if (!*strlist) {
+		newlist = (char**)malloc(sizeof(char*) * 2);
 		goto check_done;
 	}
-	for( i = 0; (*strlist)[i]; ++i ) {
-		if( strcmp( (*strlist)[i], str ) == 0 ) {
+	for (i = 0; (*strlist)[i]; ++i) {
+		if (strcmp((*strlist)[i], str) == 0) {
 			return 0;
 		}
 	}
-	newlist = (char**)realloc( *strlist, (i + 2) * sizeof( char* ) );
+	newlist = (char**)realloc(*strlist, (i + 2) * sizeof(char*));
 check_done:
-	if( !newlist ) {
+	if (!newlist) {
 		return 0;
 	}
-	newlist[i] = strdup2( str );
+	newlist[i] = strdup2(str);
 	newlist[i + 1] = NULL;
 	*strlist = newlist;
 	return 1;
 }
 
-int strsadd( char ***strlist, const char *str )
+int strsadd(char ***strlist, const char *str)
 {
 	char buff[256];
 	int count = 0, i, head;
-	for( head = 0, i = 0; str[i]; ++i ) {
-		if( str[i] != ' ' ) {
+	for (head = 0, i = 0; str[i]; ++i) {
+		if (str[i] != ' ') {
 			continue;
 		}
-		if( i > head ) {
-			strncpy( buff, &str[head], i - head );
+		if (i > head) {
+			strncpy(buff, &str[head], i - head);
 			buff[i - head] = 0;
-			count += strsaddone( strlist, buff );
+			count += strsaddone(strlist, buff);
 		}
 		head = i + 1;
 	}
-	if( i > head ) {
-		strncpy( buff, &str[head], i - head );
+	if (i > head) {
+		strncpy(buff, &str[head], i - head);
 		buff[i - head] = 0;
-		count += strsaddone( strlist, buff );
+		count += strsaddone(strlist, buff);
 	}
 	return count;
 }
 
-int strshas( char **strlist, const char *str )
+int strshas(char **strlist, const char *str)
 {
 	int i;
-	if( !strlist ) {
+	if (!strlist) {
 		return 0;
 	}
-	for( i = 0; strlist[i]; ++i ) {
-		if( strcmp(strlist[i], str) == 0 ) {
+	for (i = 0; strlist[i]; ++i) {
+		if (strcmp(strlist[i], str) == 0) {
 			return 1;
 		}
 	}
 	return 0;
 }
 
-static int strsdelone( char ***strlist, const char *str )
+static int strsdelone(char ***strlist, const char *str)
 {
 	int i, pos, len;
 	char **newlist;
 
-	if( !*strlist ) {
+	if (!*strlist) {
 		return 0;
 	}
-	for( len = 0; (*strlist)[len]; ++len );
-	for( pos = -1, i = 0; i < len; ++i ) {
-		if( strcmp( (*strlist)[i], str ) == 0 ) {
+	for (len = 0; (*strlist)[len]; ++len);
+	for (pos = -1, i = 0; i < len; ++i) {
+		if (strcmp((*strlist)[i], str) == 0) {
 			pos = i;
 			break;
 		}
 	}
-	if( pos == -1 ) {
+	if (pos == -1) {
 		return 0;
 	}
-	free( (*strlist)[pos] );
-	if( pos == 0 && len < 2 ) {
-		free( *strlist );
+	free((*strlist)[pos]);
+	if (pos == 0 && len < 2) {
+		free(*strlist);
 		*strlist = NULL;
 		return 1;
 	}
-	newlist = (char**)malloc( len * sizeof( char* ) );
-	for( i = 0; i < pos; ++i ) {
+	newlist = (char**)malloc(len * sizeof(char*));
+	for (i = 0; i < pos; ++i) {
 		newlist[i] = (*strlist)[i];
 	}
-	for( i = pos; i < len; ++i ) {
+	for (i = pos; i < len; ++i) {
 		newlist[i] = (*strlist)[i + 1];
 	}
 	newlist[len - 1] = NULL;
-	free( *strlist );
+	free(*strlist);
 	*strlist = newlist;
 	return 1;
 }
 
-int strsdel( char ***strlist, const char *str )
+int strsdel(char ***strlist, const char *str)
 {
 	char buff[256];
 	int count = 0, i, head;
 
-	for( head = 0, i = 0; str[i]; ++i ) {
-		if( str[i] != ' ' ) {
+	for (head = 0, i = 0; str[i]; ++i) {
+		if (str[i] != ' ') {
 			continue;
 		}
-		if( i - 1 > head ) {
-			strncpy( buff, &str[head], i - head );
+		if (i - 1 > head) {
+			strncpy(buff, &str[head], i - head);
 			buff[i - head] = 0;
-			count += strsdelone( strlist, buff );
+			count += strsdelone(strlist, buff);
 		}
 		head = i + 1;
 	}
-	if( i - 1 > head ) {
-		strncpy( buff, &str[head], i - head );
+	if (i - 1 > head) {
+		strncpy(buff, &str[head], i - head);
 		buff[i - head] = 0;
-		count += strsdelone( strlist, buff );
+		count += strsdelone(strlist, buff);
 	}
 	return count;
 }
 
-int sortedstrsadd( char ***strlist, const char *str )
+int sortedstrsadd(char ***strlist, const char *str)
 {
 	int i, pos;
 	size_t len, n;
 	char **newlist, *newstr;
 
-	if( *strlist ) {
-		for( i = 0; (*strlist)[i]; ++i );
+	if (*strlist) {
+		for (i = 0; (*strlist)[i]; ++i);
 		n = i + 2;
 	} else {
 		n = 2;
 	}
-	newlist = realloc( *strlist, sizeof( char* ) * n );
-	if( !newlist ) {
+	newlist = realloc(*strlist, sizeof(char*) * n);
+	if (!newlist) {
 		return -ENOMEM;
 	}
 	newlist[n - 2] = NULL;
-	for( i = 0, pos = -1; newlist[i]; ++i ) {
-		int tmp = strcmp( newlist[i], str );
-		if( tmp < 0 ) {
+	for (i = 0, pos = -1; newlist[i]; ++i) {
+		int tmp = strcmp(newlist[i], str);
+		if (tmp < 0) {
 			continue;
-		} else if( tmp == 0 ) {
+		} else if (tmp == 0) {
 			return 1;
 		} else {
 			pos = i;
 			break;
 		}
 	}
-	len = strlen( str ) + 1;
-	newstr = malloc( sizeof(char) * len );
-	if( !newstr ) {
+	len = strlen(str) + 1;
+	newstr = malloc(sizeof(char) * len);
+	if (!newstr) {
 		return -ENOMEM;
 	}
-	strncpy( newstr, str, len );
-	if( pos >= 0 ) {
-		for( i = n - 2; i > pos; --i ) {
+	strncpy(newstr, str, len);
+	if (pos >= 0) {
+		for (i = n - 2; i > pos; --i) {
 			newlist[i] = newlist[i - 1];
 		}
 		newlist[pos] = newstr;

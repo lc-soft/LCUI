@@ -2,7 +2,7 @@
  * linux_keyboard.c -- Keyboard support for linux.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -35,8 +35,8 @@
 #include <LCUI/platform/linux/linux_x11keyboard.h>
 #endif
 
-void LCUI_InitLinuxKeyboard( void );
+void LCUI_InitLinuxKeyboard(void);
 
-void LCUI_ExitLinuxKeyboard( void );
+void LCUI_FreeLinuxKeyboard(void);
 
 #endif

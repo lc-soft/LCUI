@@ -2,13 +2,11 @@
 
 #include <wrl.h>
 
-namespace DX
-{
+namespace DX {
 	// 动画和模拟计时的帮助程序类。
-	class StepTimer
-	{
+	class StepTimer {
 	public:
-		StepTimer() : 
+		StepTimer() :
 			m_elapsedTicks(0),
 			m_totalTicks(0),
 			m_leftOverTicks(0),
@@ -19,13 +17,11 @@ namespace DX
 			m_isFixedTimeStep(false),
 			m_targetElapsedTicks(TicksPerSecond / 60)
 		{
-			if (!QueryPerformanceFrequency(&m_qpcFrequency))
-			{
+			if (!QueryPerformanceFrequency(&m_qpcFrequency)) {
 				throw ref new Platform::FailureException();
 			}
 
-			if (!QueryPerformanceCounter(&m_qpcLastTime))
-			{
+			if (!QueryPerformanceCounter(&m_qpcLastTime)) {
 				throw ref new Platform::FailureException();
 			}
 
@@ -34,40 +30,72 @@ namespace DX
 		}
 
 		// 获取上一次 Update 调用后的运行时间。
-		uint64 GetElapsedTicks() const						{ return m_elapsedTicks; }
-		double GetElapsedSeconds() const					{ return TicksToSeconds(m_elapsedTicks); }
+		uint64 GetElapsedTicks() const
+		{
+			return m_elapsedTicks;
+		}
+		double GetElapsedSeconds() const
+		{
+			return TicksToSeconds(m_elapsedTicks);
+		}
 
-		// 获取程序启动之后的总时间。
-		uint64 GetTotalTicks() const						{ return m_totalTicks; }
-		double GetTotalSeconds() const						{ return TicksToSeconds(m_totalTicks); }
+// 获取程序启动之后的总时间。
+		uint64 GetTotalTicks() const
+		{
+			return m_totalTicks;
+		}
+		double GetTotalSeconds() const
+		{
+			return TicksToSeconds(m_totalTicks);
+		}
 
-		// 获取自程序启动之后的更新次数。
-		uint32 GetFrameCount() const						{ return m_frameCount; }
+// 获取自程序启动之后的更新次数。
+		uint32 GetFrameCount() const
+		{
+			return m_frameCount;
+		}
 
-		// 获取当前帧速率。
-		uint32 GetFramesPerSecond() const					{ return m_framesPerSecond; }
+	 // 获取当前帧速率。
+		uint32 GetFramesPerSecond() const
+		{
+			return m_framesPerSecond;
+		}
 
-		// 设置是使用固定的还是可变的时间步长模式。
-		void SetFixedTimeStep(bool isFixedTimestep)			{ m_isFixedTimeStep = isFixedTimestep; }
+    // 设置是使用固定的还是可变的时间步长模式。
+		void SetFixedTimeStep(bool isFixedTimestep)
+		{
+			m_isFixedTimeStep = isFixedTimestep;
+		}
 
-		// 当使用固定时间步长模式时，设置调用 Update 的频率。
-		void SetTargetElapsedTicks(uint64 targetElapsed)	{ m_targetElapsedTicks = targetElapsed; }
-		void SetTargetElapsedSeconds(double targetElapsed)	{ m_targetElapsedTicks = SecondsToTicks(targetElapsed); }
+// 当使用固定时间步长模式时，设置调用 Update 的频率。
+		void SetTargetElapsedTicks(uint64 targetElapsed)
+		{
+			m_targetElapsedTicks = targetElapsed;
+		}
+		void SetTargetElapsedSeconds(double targetElapsed)
+		{
+			m_targetElapsedTicks = SecondsToTicks(targetElapsed);
+		}
 
-		// 整数格式使用每秒 10,000,000 次滴答来表示时间。
+// 整数格式使用每秒 10,000,000 次滴答来表示时间。
 		static const uint64 TicksPerSecond = 10000000;
 
-		static double TicksToSeconds(uint64 ticks)			{ return static_cast<double>(ticks) / TicksPerSecond; }
-		static uint64 SecondsToTicks(double seconds)		{ return static_cast<uint64>(seconds * TicksPerSecond); }
+		static double TicksToSeconds(uint64 ticks)
+		{
+			return static_cast<double>(ticks) / TicksPerSecond;
+		}
+		static uint64 SecondsToTicks(double seconds)
+		{
+			return static_cast<uint64>(seconds * TicksPerSecond);
+		}
 
-		// 在故意中断计时(例如，阻止性 IO 操作)之后
-		// 调用此函数以避免固定时间步长逻辑尝试一系列弥补
-		// Update 调用。
+// 在故意中断计时(例如，阻止性 IO 操作)之后
+// 调用此函数以避免固定时间步长逻辑尝试一系列弥补
+// Update 调用。
 
 		void ResetElapsedTime()
 		{
-			if (!QueryPerformanceCounter(&m_qpcLastTime))
-			{
+			if (!QueryPerformanceCounter(&m_qpcLastTime)) {
 				throw ref new Platform::FailureException();
 			}
 
@@ -84,8 +112,7 @@ namespace DX
 			// 查询当前时间。
 			LARGE_INTEGER currentTime;
 
-			if (!QueryPerformanceCounter(&currentTime))
-			{
+			if (!QueryPerformanceCounter(&currentTime)) {
 				throw ref new Platform::FailureException();
 			}
 
@@ -95,8 +122,7 @@ namespace DX
 			m_qpcSecondCounter += timeDelta;
 
 			// 固定过大的时间增量(例如， 在调试器中暂停之后)。
-			if (timeDelta > m_qpcMaxDelta)
-			{
+			if (timeDelta > m_qpcMaxDelta) {
 				timeDelta = m_qpcMaxDelta;
 			}
 
@@ -106,8 +132,7 @@ namespace DX
 
 			uint32 lastFrameCount = m_frameCount;
 
-			if (m_isFixedTimeStep)
-			{
+			if (m_isFixedTimeStep) {
 				// 固定时间步长更新逻辑
 
 				// 如果应用程序的运行时间十分接近目标运行时间(1/4 毫秒内)，可直接固定
@@ -117,15 +142,13 @@ namespace DX
 				// 累积足够多的小错误而导致掉帧。 最好将
 				// 将小偏差圆整到零，保持一切平稳运行。
 
-				if (abs(static_cast<int64>(timeDelta - m_targetElapsedTicks)) < TicksPerSecond / 4000)
-				{
+				if (abs(static_cast<int64>(timeDelta - m_targetElapsedTicks)) < TicksPerSecond / 4000) {
 					timeDelta = m_targetElapsedTicks;
 				}
 
 				m_leftOverTicks += timeDelta;
 
-				while (m_leftOverTicks >= m_targetElapsedTicks)
-				{
+				while (m_leftOverTicks >= m_targetElapsedTicks) {
 					m_elapsedTicks = m_targetElapsedTicks;
 					m_totalTicks += m_targetElapsedTicks;
 					m_leftOverTicks -= m_targetElapsedTicks;
@@ -133,9 +156,7 @@ namespace DX
 
 					update();
 				}
-			}
-			else
-			{
+			} else {
 				// 可变时间步长更新逻辑。
 				m_elapsedTicks = timeDelta;
 				m_totalTicks += timeDelta;
@@ -146,13 +167,11 @@ namespace DX
 			}
 
 			// 跟踪当前帧速率。
-			if (m_frameCount != lastFrameCount)
-			{
+			if (m_frameCount != lastFrameCount) {
 				m_framesThisSecond++;
 			}
 
-			if (m_qpcSecondCounter >= static_cast<uint64>(m_qpcFrequency.QuadPart))
-			{
+			if (m_qpcSecondCounter >= static_cast<uint64>(m_qpcFrequency.QuadPart)) {
 				m_framesPerSecond = m_framesThisSecond;
 				m_framesThisSecond = 0;
 				m_qpcSecondCounter %= m_qpcFrequency.QuadPart;

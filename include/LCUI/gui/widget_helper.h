@@ -2,7 +2,7 @@
  * widget.c -- GUI widget helper APIs.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -35,38 +35,38 @@ LCUI_BEGIN_HEADER
 
 #define Widget_IsVisible(W) (W)->computed_style.visible
 
- /** 设置内边距 */
-LCUI_API void Widget_SetPadding( LCUI_Widget w, float top, float right,
-				 float bottom, float left );
+/** 设置内边距 */
+LCUI_API void Widget_SetPadding(LCUI_Widget w, float top, float right,
+				float bottom, float left);
 
 /** 设置外边距 */
-LCUI_API void Widget_SetMargin( LCUI_Widget w, float top, float right,
-				float bottom, float left );
+LCUI_API void Widget_SetMargin(LCUI_Widget w, float top, float right,
+			       float bottom, float left);
 
 /** 设置边框样式 */
-LCUI_API void Widget_SetBorder( LCUI_Widget w, float width,
-				int style, LCUI_Color clr );
+LCUI_API void Widget_SetBorder(LCUI_Widget w, float width,
+			       int style, LCUI_Color clr);
 
 /** 设置阴影样式 */
-LCUI_API void Widget_SetBoxShadow( LCUI_Widget w, float x, float y,
-				   float blur, LCUI_Color color );
+LCUI_API void Widget_SetBoxShadow(LCUI_Widget w, float x, float y,
+				  float blur, LCUI_Color color);
 
 /** 移动部件位置 */
-LCUI_API void Widget_Move( LCUI_Widget w, float left, float top );
+LCUI_API void Widget_Move(LCUI_Widget w, float left, float top);
 
 /** 调整部件尺寸 */
-LCUI_API void Widget_Resize( LCUI_Widget w, float width, float height );
+LCUI_API void Widget_Resize(LCUI_Widget w, float width, float height);
 
-LCUI_API void Widget_ResizeWithSurface( LCUI_Widget w,
-					float width, float height );
+LCUI_API void Widget_ResizeWithSurface(LCUI_Widget w,
+				       float width, float height);
 
-LCUI_API void Widget_Show( LCUI_Widget w );
+LCUI_API void Widget_Show(LCUI_Widget w);
 
-LCUI_API void Widget_Hide( LCUI_Widget w );
+LCUI_API void Widget_Hide(LCUI_Widget w);
 
-LCUI_API void Widget_SetPosition( LCUI_Widget w, LCUI_StyleValue position );
+LCUI_API void Widget_SetPosition(LCUI_Widget w, LCUI_StyleValue position);
 
-LCUI_API void Widget_SetBoxSizing( LCUI_Widget w, LCUI_StyleValue sizing );
+LCUI_API void Widget_SetBoxSizing(LCUI_Widget w, LCUI_StyleValue sizing);
 
 LCUI_END_HEADER
 

@@ -2,7 +2,7 @@
  * textedit.c -- textedit widget, used to allow user edit text.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -36,43 +36,43 @@ LCUI_BEGIN_HEADER
 #define TextEdit_New() Widget_New("textedit")
 
 /** 指定文本框是否处理控制符 */
-LCUI_API void TextEdit_SetUsingStyleTags( LCUI_Widget widget, LCUI_BOOL is_true );
+LCUI_API void TextEdit_SetUsingStyleTags(LCUI_Widget widget, LCUI_BOOL is_true);
 
 /** 指定文本框是否启用多行文本显示 */
-LCUI_API void TextEdit_SetMultiline( LCUI_Widget widget, LCUI_BOOL is_true );
+LCUI_API void TextEdit_SetMultiline(LCUI_Widget widget, LCUI_BOOL is_true);
 
 /** 清空文本内容 */
-LCUI_API void TextEdit_ClearText( LCUI_Widget widget );
+LCUI_API void TextEdit_ClearText(LCUI_Widget widget);
 
 /** 获取文本内容 */
-LCUI_API int TextEdit_GetTextW( LCUI_Widget widget, int start, int max_len, wchar_t *buf );
+LCUI_API int TextEdit_GetTextW(LCUI_Widget widget, int start, int max_len, wchar_t *buf);
 
 /** 获取文本长度 */
-LCUI_API int TextEdit_GetTextLength( LCUI_Widget w );
+LCUI_API int TextEdit_GetTextLength(LCUI_Widget w);
 
 /** 设置文本编辑框内的光标，指定是否闪烁、闪烁时间间隔 */
-LCUI_API void TextEdit_SetCaretBlink( LCUI_Widget w, LCUI_BOOL enabled, int time );
+LCUI_API void TextEdit_SetCaretBlink(LCUI_Widget w, LCUI_BOOL enabled, int time);
 
 /** 为文本框设置文本（宽字符版） */
-LCUI_API int TextEdit_SetTextW( LCUI_Widget widget, const wchar_t *wstr );
+LCUI_API int TextEdit_SetTextW(LCUI_Widget widget, const wchar_t *wstr);
 
-LCUI_API int TextEdit_SetText( LCUI_Widget widget, const char *utf8_str );
+LCUI_API int TextEdit_SetText(LCUI_Widget widget, const char *utf8_str);
 
 /** 为文本框追加文本（宽字符版） */
-LCUI_API int TextEdit_AppendTextW( LCUI_Widget widget, const wchar_t *wstr );
+LCUI_API int TextEdit_AppendTextW(LCUI_Widget widget, const wchar_t *wstr);
 
 /** 为文本框插入文本（宽字符版） */
-LCUI_API int TextEdit_InsertTextW( LCUI_Widget widget, const wchar_t *wstr );
+LCUI_API int TextEdit_InsertTextW(LCUI_Widget widget, const wchar_t *wstr);
 
 /** 设置占位符，当文本编辑框内容为空时显示占位符 */
-LCUI_API int TextEdit_SetPlaceHolderW( LCUI_Widget w, const wchar_t *wstr );
+LCUI_API int TextEdit_SetPlaceHolderW(LCUI_Widget w, const wchar_t *wstr);
 
-LCUI_API int TextEdit_SetPlaceHolder( LCUI_Widget w, const char *str );
+LCUI_API int TextEdit_SetPlaceHolder(LCUI_Widget w, const char *str);
 
 /** 设置密码屏蔽符 */
-LCUI_API void TextEdit_SetPasswordChar( LCUI_Widget w, wchar_t ch );
+LCUI_API void TextEdit_SetPasswordChar(LCUI_Widget w, wchar_t ch);
 
-LCUI_API void LCUIWidget_AddTextEdit( void );
+LCUI_API void LCUIWidget_AddTextEdit(void);
 
 LCUI_END_HEADER
 

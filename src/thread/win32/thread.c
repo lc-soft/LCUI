@@ -1,7 +1,7 @@
 ﻿/* thread.c -- The win32 edition thread opreation set.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -39,7 +39,7 @@
 typedef struct _LCUI_ThreadContextRec_ {
 	HANDLE handle;
 	unsigned int tid;
-	void (*func)(void*);
+	void(*func)(void*);
 	void *arg;
 	void *retval;
 	LCUI_BOOL has_waiter;
@@ -47,7 +47,7 @@ typedef struct _LCUI_ThreadContextRec_ {
 } LCUI_ThreadContextRec, *LCUI_ThreadContext;
 
 static struct LCUIThreadModule {
-	LCUI_BOOL is_inited;
+	LCUI_BOOL active;
 	LCUI_Mutex mutex;
 	LinkedList threads;
 } self;
@@ -56,127 +56,127 @@ static unsigned __stdcall run_thread(void *arg)
 {
 	LCUI_ThreadContext thread;
 	thread = (LCUI_ThreadContext)arg;
-	thread->func( thread->arg );
+	thread->func(thread->arg);
 	return 0;
 }
 
-int LCUIThread_Create( LCUI_Thread *tid, void( *func )(void*), void *arg )
+int LCUIThread_Create(LCUI_Thread *tid, void(*func)(void*), void *arg)
 {
 	LCUI_ThreadContext ctx;
-	if( !self.is_inited ) {
-		LinkedList_Init( &self.threads );
-		LCUIMutex_Init( &self.mutex );
-		self.is_inited = TRUE;
+	if (!self.active) {
+		LinkedList_Init(&self.threads);
+		LCUIMutex_Init(&self.mutex);
+		self.active = TRUE;
 	}
-	ctx = NEW( LCUI_ThreadContextRec, 1 );
-	if( !ctx ) {
+	ctx = NEW(LCUI_ThreadContextRec, 1);
+	if (!ctx) {
 		return -ENOMEM;
 	}
 	ctx->func = func;
 	ctx->arg = arg;
 	ctx->retval = NULL;
 	ctx->node.data = ctx;
-	ctx->handle = (HANDLE)_beginthreadex( NULL, 0, run_thread,
-					      ctx, 0, &ctx->tid );
-	if( ctx->handle == 0 ) {
+	ctx->handle = (HANDLE)_beginthreadex(NULL, 0, run_thread,
+					     ctx, 0, &ctx->tid);
+	if (ctx->handle == 0) {
 		*tid = 0;
 		return -1;
 	}
-	LCUIMutex_Lock( &self.mutex );
-	LinkedList_AppendNode( &self.threads, &ctx->node );
-	LCUIMutex_Unlock( &self.mutex );
+	LCUIMutex_Lock(&self.mutex);
+	LinkedList_AppendNode(&self.threads, &ctx->node);
+	LCUIMutex_Unlock(&self.mutex);
 	*tid = ctx->tid;
 	return 0;
 }
 
-static LCUI_ThreadContext LCUIThread_Find( LCUI_Thread tid )
+static LCUI_ThreadContext LCUIThread_Find(LCUI_Thread tid)
 {
 	LinkedListNode *node;
 	LCUI_ThreadContext ctx;
-	for( LinkedList_Each( node, &self.threads ) ) {
+	for (LinkedList_Each(node, &self.threads)) {
 		ctx = node->data;
-		if( ctx && ctx->tid == tid ) {
+		if (ctx && ctx->tid == tid) {
 			return ctx;
 		}
 	}
 	return NULL;
 }
 
-static LCUI_ThreadContext LCUIThread_Get( LCUI_Thread tid )
+static LCUI_ThreadContext LCUIThread_Get(LCUI_Thread tid)
 {
 	LCUI_ThreadContext ctx;
-	LCUIMutex_Lock( &self.mutex );
-	ctx = LCUIThread_Find( tid );
-	if( ctx ) {
-		LinkedList_Unlink( &self.threads, &ctx->node );
+	LCUIMutex_Lock(&self.mutex);
+	ctx = LCUIThread_Find(tid);
+	if (ctx) {
+		LinkedList_Unlink(&self.threads, &ctx->node);
 	}
-	LCUIMutex_Unlock( &self.mutex );
+	LCUIMutex_Unlock(&self.mutex);
 	return ctx;
 }
 
-static void LCUIThread_Destroy( LCUI_ThreadContext ctx )
+static void LCUIThread_Destroy(LCUI_ThreadContext ctx)
 {
-	CloseHandle( ctx->handle );
+	CloseHandle(ctx->handle);
 	ctx->handle = NULL;
-	free( ctx );
+	free(ctx);
 }
 
-LCUI_Thread LCUIThread_SelfID( void )
+LCUI_Thread LCUIThread_SelfID(void)
 {
 	return GetCurrentThreadId();
 }
 
-void LCUIThread_Exit( void *retval )
+void LCUIThread_Exit(void *retval)
 {
 	LCUI_Thread tid;
 	LCUI_ThreadContext ctx;
 	tid = LCUIThread_SelfID();
-	ctx = LCUIThread_Get( tid );
-	if( !ctx ) {
+	ctx = LCUIThread_Get(tid);
+	if (!ctx) {
 		return;
 	}
 	ctx->retval = retval;
-	if( !ctx->has_waiter ) {
-		LCUIThread_Destroy( ctx );
+	if (!ctx->has_waiter) {
+		LCUIThread_Destroy(ctx);
 	}
 	_endthread();
 }
 
-void LCUIThread_Cancel( LCUI_Thread tid )
+void LCUIThread_Cancel(LCUI_Thread tid)
 {
 #ifdef WINAPI_FAMILY_APP
 	abort();
 #else
 	LCUI_ThreadContext ctx;
-	ctx = LCUIThread_Get( tid );
-	if( ctx ) {
-		TerminateThread( ctx->handle, 0 );
-		LCUIThread_Destroy( ctx );
+	ctx = LCUIThread_Get(tid);
+	if (ctx) {
+		TerminateThread(ctx->handle, 0);
+		LCUIThread_Destroy(ctx);
 	}
 #endif
 }
 
-int LCUIThread_Join( LCUI_Thread thread, void **retval )
+int LCUIThread_Join(LCUI_Thread thread, void **retval)
 {
 	DWORD code;
 	LCUI_ThreadContext ctx;
-	LCUIMutex_Lock( &self.mutex );
-	ctx = LCUIThread_Find( thread );
-	if( ctx == NULL ) {
-		LCUIMutex_Unlock( &self.mutex );
+	LCUIMutex_Lock(&self.mutex);
+	ctx = LCUIThread_Find(thread);
+	if (ctx == NULL) {
+		LCUIMutex_Unlock(&self.mutex);
 		return -1;
 	}
 	ctx->has_waiter = TRUE;
-	LCUIMutex_Unlock( &self.mutex );
-	if( !GetExitCodeThread( ctx->handle, &code ) ) {
-		WaitForSingleObject( ctx->handle, 5000 );
+	LCUIMutex_Unlock(&self.mutex);
+	if (!GetExitCodeThread(ctx->handle, &code)) {
+		WaitForSingleObject(ctx->handle, 5000);
 	}
-	ctx = LCUIThread_Get( thread );
-	if( ctx ) {
-		if( retval ) {
+	ctx = LCUIThread_Get(thread);
+	if (ctx) {
+		if (retval) {
 			*retval = ctx->retval;
 		}
-		LCUIThread_Destroy( ctx );
+		LCUIThread_Destroy(ctx);
 		return 0;
 	}
 	return -1;

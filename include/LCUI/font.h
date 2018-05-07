@@ -36,5 +36,4 @@
 #include <LCUI/font/textlayer.h>
 #include <LCUI/font/charset.h>
 
-
 #endif

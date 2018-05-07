@@ -2,7 +2,7 @@
  * input.h -- The input devices handling module of LCUI.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -31,99 +31,101 @@
 #ifndef LCUI_INPUT_H
 #define LCUI_INPUT_H
 
-#define LCUIKEY_BACKSPACE	8
-#define LCUIKEY_TAB		9
-#define LCUIKEY_ENTER		13
-#define LCUIKEY_SHIFT		16
-#define LCUIKEY_CONTROL		17
-#define LCUIKEY_ALT		18
-#define LCUIKEY_CAPITAL		20
-#define LCUIKEY_ESCAPE		27
-#define LCUIKEY_SPACE		' '
-#define LCUIKEY_PAGEUP		33
-#define LCUIKEY_PAGEDOWN	34
-#define LCUIKEY_END		35
-#define LCUIKEY_HOME		36
-#define LCUIKEY_LEFT		37
-#define LCUIKEY_UP		38
-#define LCUIKEY_RIGHT		39
-#define LCUIKEY_DOWN		40
-#define LCUIKEY_INSERT		45
-#define LCUIKEY_DELETE		46
-#define LCUIKEY_0		'0'
-#define LCUIKEY_1		'1'
-#define LCUIKEY_2		'2'
-#define LCUIKEY_3		'3'
-#define LCUIKEY_4		'4'
-#define LCUIKEY_5		'5'
-#define LCUIKEY_6		'6'
-#define LCUIKEY_7		'7'
-#define LCUIKEY_8		'8'
-#define LCUIKEY_9		'9'
-#define LCUIKEY_A		'A'
-#define LCUIKEY_B		'B'
-#define LCUIKEY_C		'C'
-#define LCUIKEY_D		'D'
-#define LCUIKEY_E		'E'
-#define LCUIKEY_F		'F'
-#define LCUIKEY_G		'G'
-#define LCUIKEY_H		'H'
-#define LCUIKEY_I		'I'
-#define LCUIKEY_J		'J'
-#define LCUIKEY_K		'K'
-#define LCUIKEY_L		'L'
-#define LCUIKEY_M		'M'
-#define LCUIKEY_N		'N'
-#define LCUIKEY_O		'O'
-#define LCUIKEY_P		'P'
-#define LCUIKEY_Q		'Q'
-#define LCUIKEY_R		'R'
-#define LCUIKEY_S		'S'
-#define LCUIKEY_T		'T'
-#define LCUIKEY_U		'U'
-#define LCUIKEY_V		'V'
-#define LCUIKEY_W		'W'
-#define LCUIKEY_X		'X'
-#define LCUIKEY_Y		'Y'
-#define LCUIKEY_Z		'Z'
-#define LCUIKEY_SEMICOLON	186
-#define LCUIKEY_EQUAL		187
-#define LCUIKEY_COMMA		188
-#define LCUIKEY_MINUS		189
-#define LCUIKEY_PERIOD		190
-#define LCUIKEY_SLASH 		191
-#define LCUIKEY_GRAVE		192
-#define LCUIKEY_BRACKETLEFT	219
-#define LCUIKEY_BACKSLASH	220
-#define LCUIKEY_BRACKETRIGHT	221
-#define LCUIKEY_APOSTROPHE	222
+/* clang-format off */
+#define LCUI_KEY_BACKSPACE	8
+#define LCUI_KEY_TAB		9
+#define LCUI_KEY_ENTER		13
+#define LCUI_KEY_SHIFT		16
+#define LCUI_KEY_CONTROL	17
+#define LCUI_KEY_ALT		18
+#define LCUI_KEY_CAPITAL	20
+#define LCUI_KEY_ESCAPE		27
+#define LCUI_KEY_SPACE		' '
+#define LCUI_KEY_PAGEUP		33
+#define LCUI_KEY_PAGEDOWN	34
+#define LCUI_KEY_END		35
+#define LCUI_KEY_HOME		36
+#define LCUI_KEY_LEFT		37
+#define LCUI_KEY_UP		38
+#define LCUI_KEY_RIGHT		39
+#define LCUI_KEY_DOWN		40
+#define LCUI_KEY_INSERT		45
+#define LCUI_KEY_DELETE		46
+#define LCUI_KEY_0		'0'
+#define LCUI_KEY_1		'1'
+#define LCUI_KEY_2		'2'
+#define LCUI_KEY_3		'3'
+#define LCUI_KEY_4		'4'
+#define LCUI_KEY_5		'5'
+#define LCUI_KEY_6		'6'
+#define LCUI_KEY_7		'7'
+#define LCUI_KEY_8		'8'
+#define LCUI_KEY_9		'9'
+#define LCUI_KEY_A		'A'
+#define LCUI_KEY_B		'B'
+#define LCUI_KEY_C		'C'
+#define LCUI_KEY_D		'D'
+#define LCUI_KEY_E		'E'
+#define LCUI_KEY_F		'F'
+#define LCUI_KEY_G		'G'
+#define LCUI_KEY_H		'H'
+#define LCUI_KEY_I		'I'
+#define LCUI_KEY_J		'J'
+#define LCUI_KEY_K		'K'
+#define LCUI_KEY_L		'L'
+#define LCUI_KEY_M		'M'
+#define LCUI_KEY_N		'N'
+#define LCUI_KEY_O		'O'
+#define LCUI_KEY_P		'P'
+#define LCUI_KEY_Q		'Q'
+#define LCUI_KEY_R		'R'
+#define LCUI_KEY_S		'S'
+#define LCUI_KEY_T		'T'
+#define LCUI_KEY_U		'U'
+#define LCUI_KEY_V		'V'
+#define LCUI_KEY_W		'W'
+#define LCUI_KEY_X		'X'
+#define LCUI_KEY_Y		'Y'
+#define LCUI_KEY_Z		'Z'
+#define LCUI_KEY_SEMICOLON	186
+#define LCUI_KEY_EQUAL		187
+#define LCUI_KEY_COMMA		188
+#define LCUI_KEY_MINUS		189
+#define LCUI_KEY_PERIOD		190
+#define LCUI_KEY_SLASH 		191
+#define LCUI_KEY_GRAVE		192
+#define LCUI_KEY_BRACKETLEFT	219
+#define LCUI_KEY_BACKSLASH	220
+#define LCUI_KEY_BRACKETRIGHT	221
+#define LCUI_KEY_APOSTROPHE	222
+#define LCUI_KEY_LEFTBUTTON	1	/* 鼠标左键 */
+#define LCUI_KEY_RIGHTBUTTON	2	/* 鼠标右键 */
+#define LCUI_KSTATE_PRESSED	1
+#define LCUI_KSTATE_RELEASE	0
 
-#define LCUIKEY_LEFTBUTTON	1	/* 鼠标左键 */
-#define LCUIKEY_RIGHTBUTTON	2	/* 鼠标右键 */
-#define LCUIKEYSTATE_PRESSED	1
-#define LCUIKEYSTATE_RELEASE	0
+/* clang-format on */
 
 LCUI_BEGIN_HEADER
 
 /** 检测指定键值的按键是否处于按下状态 */
-LCUI_API LCUI_BOOL LCUIKeyboard_IsHit( int key_code );
+LCUI_API LCUI_BOOL LCUIKeyboard_IsHit(int key_code);
 
 /**
-* 检测指定键值的按键是否按了两次
-* @param key_code 要检测的按键的键值
-* @param interval_time 该按键倒数第二次按下时的时间与当前时间的最大间隔
-*/
-LCUI_API LCUI_BOOL LCUIKeyboard_IsDoubleHit( int key_code, int interval_time );
+ * 检测指定键值的按键是否按了两次
+ * @param key_code 要检测的按键的键值
+ * @param interval_time 该按键倒数第二次按下时的时间与当前时间的最大间隔
+ */
+LCUI_API LCUI_BOOL LCUIKeyboard_IsDoubleHit(int key_code, int interval_time);
 
 /** 添加已被按下的按键 */
-LCUI_API void LCUIKeyboard_HitKey( int key_code );
+LCUI_API void LCUIKeyboard_HitKey(int key_code);
 
 /** 标记指定键值的按键已释放 */
-LCUI_API void LCUIKeyboard_ReleaseKey( int key_code );
+LCUI_API void LCUIKeyboard_ReleaseKey(int key_code);
 
-void LCUI_InitKeyboard( void );
+void LCUI_InitKeyboard(void);
 
-void LCUI_FreeKeyboard( void );
+void LCUI_FreeKeyboard(void);
 
 LCUI_END_HEADER
 

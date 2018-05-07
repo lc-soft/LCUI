@@ -21,9 +21,6 @@
     <Filter Include="头文件\LCUI\font">
       <UniqueIdentifier>{e82633f2-1d26-4ccb-9d8b-acf3bca828a4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="docs">
-      <UniqueIdentifier>{55f58a5e-9a60-4e9d-b65e-7377c4486a7f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="源文件">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
@@ -194,9 +191,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\timer.h">
       <Filter>头文件\LCUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\util\delay.h">
-      <Filter>头文件\LCUI\util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\util\dict.h">
       <Filter>头文件\LCUI\util</Filter>
@@ -493,31 +487,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\README" />
-    <None Include="..\..\..\README.md" />
-    <None Include="..\..\..\README.zh-cn.md" />
-    <None Include="..\..\..\INSTALL" />
-    <None Include="..\..\..\AUTHORS" />
-    <None Include="..\..\..\docs\CHANGES">
-      <Filter>docs</Filter>
-    </None>
-    <None Include="..\..\..\docs\CHANGES.zh-cn">
-      <Filter>docs</Filter>
-    </None>
-    <None Include="..\..\..\docs\CodingStyle.zh-cn.md">
-      <Filter>docs</Filter>
-    </None>
-    <None Include="..\..\..\docs\FAQ">
-      <Filter>docs</Filter>
-    </None>
-    <None Include="..\..\..\docs\FAQ.zh-cn">
-      <Filter>docs</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\..\..\docs\LICENSE.TXT">
-      <Filter>docs</Filter>
-    </Text>
+    <Text Include="..\..\..\LICENSE.TXT" />
+    <Text Include="..\..\..\README" />
+    <Text Include="..\..\..\README.md" />
+    <Text Include="..\..\..\README.zh-cn.md" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LCUI.rc">

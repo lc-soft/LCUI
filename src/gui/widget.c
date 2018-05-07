@@ -2,7 +2,7 @@
  * widget.c -- GUI widget APIs.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -40,7 +40,7 @@
 #include <LCUI/gui/widget/sidebar.h>
 #include <LCUI/gui/widget/scrollbar.h>
 
-void LCUI_InitWidget( void )
+void LCUI_InitWidget(void)
 {
 	LCUIWidget_InitTasks();
 	LCUIWidget_InitEvent();
@@ -58,7 +58,7 @@ void LCUI_InitWidget( void )
 	LCUIWidget_InitBase();
 }
 
-void LCUI_FreeWidget( void )
+void LCUI_FreeWidget(void)
 {
 	LCUIWidget_FreeTasks();
 	LCUIWidget_FreeRoot();

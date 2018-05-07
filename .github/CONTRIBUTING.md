@@ -76,7 +76,9 @@ To ensure consistency throughout the source code, keep these rules in mind as yo
 
 - All features or bug fixes **must be tested** by one or more specs (unit-tests).
 - All public API methods **must be documented**. (Details TBC).
-- Follow the existing code style.
+- Follow the existing code style. You have the following two ways to format the code:
+  - Use [clang-format](http://clang.llvm.org/docs/ClangFormat.html) to format the changed files: `clang-format --style=file [src/????.c]`.
+  - Install the [NodeJS](https://nodejs.org/en/) Environment and run `npm install`, which will add a git hook to format the changed code, and it will run before you run `git commit`.
 
 ## Commit Message Guidelines
 
@@ -108,6 +110,16 @@ Samples: (even more [samples](https://github.com/lc-soft/LCUI/commits/master))
 
 ``` text
 docs(changelog): update change log to beta.1
+```
+
+Use this format, we can easily filter out commits that we do not want to see, for example:
+
+``` shell
+# show commits that contain new features
+git log --pretty=format:"%h %ad %s %d" --date=short --grep "^feat"
+
+# show commits that contain functional code changes (including features, bug fixes, refactorings and improvements)
+git log --pretty=format:"%h %ad %s %d" --date=short --grep "^\(feat\|fix\|refactor\|perf\)"
 ```
 
 ### Revert
@@ -156,7 +168,7 @@ reference GitHub issues that this commit **Closes**.
 
 As a pure community-driven project without major corporate backing, we also welcome financial contributions via Patreon or OpenCollective.
 
-- [Become a backer or sponsor on Patreon](https://www.patreon.com/lc-soft)
+- [Become a backer or sponsor on Patreon](https://www.patreon.com/lcsoft)
 - [Become a backer or sponsor on OpenCollective](https://opencollective.com/LCUI)
 
 **What's the difference between Patreon and OpenCollective?**

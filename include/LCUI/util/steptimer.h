@@ -3,7 +3,7 @@
  * second for the rendering loop.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -41,22 +41,22 @@ typedef void* StepTimer;
 #endif
 
 /** 新建帧数控制实例 */
-LCUI_API StepTimer StepTimer_Create( void );
+LCUI_API StepTimer StepTimer_Create(void);
 
 /** 销毁帧数控制相关资源 */
-LCUI_API void StepTimer_Destroy( StepTimer timer );
+LCUI_API void StepTimer_Destroy(StepTimer timer);
 
 /** 设置最大FPS（帧数/秒） */
-LCUI_API void StepTimer_SetFrameLimit( StepTimer timer, unsigned int max );
+LCUI_API void StepTimer_SetFrameLimit(StepTimer timer, unsigned int max);
 
 /** 获取当前FPS */
-LCUI_API int StepTimer_GetFrameCount( StepTimer timer );
+LCUI_API int StepTimer_GetFrameCount(StepTimer timer);
 
 /** 让当前帧停留一定时间 */
-LCUI_API void StepTimer_Remain( StepTimer timer );
+LCUI_API void StepTimer_Remain(StepTimer timer);
 
 /** 暂停数据帧的更新 */
-LCUI_API void StepTimer_Pause( StepTimer timer, LCUI_BOOL need_pause );
+LCUI_API void StepTimer_Pause(StepTimer timer, LCUI_BOOL need_pause);
 
 LCUI_END_HEADER
 

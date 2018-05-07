@@ -40,61 +40,61 @@ static struct Logger {
 	char inited;
 	char buffer[BUFFER_SIZE];
 	wchar_t bufferw[BUFFER_SIZE];
-	void( *handler )(const char*);
-	void( *handlerw )(const wchar_t*);
+	void(*handler)(const char*);
+	void(*handlerw)(const wchar_t*);
 	LCUI_Mutex mutex;
 } logger = { 0 };
 
-int Logger_Log( const char* fmt, ... )
+int Logger_Log(const char* fmt, ...)
 {
 	int len;
 	va_list args;
-	if( !logger.inited ) {
-		LCUIMutex_Init( &logger.mutex );
+	if (!logger.inited) {
+		LCUIMutex_Init(&logger.mutex);
 		logger.inited = 1;
 	}
-	va_start( args, fmt );
-	LCUIMutex_Lock( &logger.mutex );
-	if( logger.handler ) {
-		len = vsnprintf( logger.buffer, BUFFER_SIZE, fmt, args );
+	va_start(args, fmt);
+	LCUIMutex_Lock(&logger.mutex);
+	if (logger.handler) {
+		len = vsnprintf(logger.buffer, BUFFER_SIZE, fmt, args);
 		logger.buffer[BUFFER_SIZE - 1] = 0;
-		logger.handler( logger.buffer );
+		logger.handler(logger.buffer);
 	} else {
-		len = vprintf( fmt, args );
+		len = vprintf(fmt, args);
 	}
-	LCUIMutex_Unlock( &logger.mutex );
-	va_end( args );
+	LCUIMutex_Unlock(&logger.mutex);
+	va_end(args);
 	return len;
 }
 
-int Logger_LogW( const wchar_t* fmt, ... )
+int Logger_LogW(const wchar_t* fmt, ...)
 {
 	int len;
 	va_list args;
-	if( !logger.inited ) {
-		LCUIMutex_Init( &logger.mutex );
+	if (!logger.inited) {
+		LCUIMutex_Init(&logger.mutex);
 		logger.inited = 1;
 	}
-	va_start( args, fmt );
-	LCUIMutex_Lock( &logger.mutex );
-	if( logger.handlerw ) {
-		len = vswprintf( logger.bufferw, BUFFER_SIZE, fmt, args );
+	va_start(args, fmt);
+	LCUIMutex_Lock(&logger.mutex);
+	if (logger.handlerw) {
+		len = vswprintf(logger.bufferw, BUFFER_SIZE, fmt, args);
 		logger.bufferw[BUFFER_SIZE - 1] = 0;
-		logger.handlerw( logger.bufferw );
+		logger.handlerw(logger.bufferw);
 	} else {
-		len = vwprintf( fmt, args );
+		len = vwprintf(fmt, args);
 	}
-	LCUIMutex_Unlock( &logger.mutex );
-	va_end( args );
+	LCUIMutex_Unlock(&logger.mutex);
+	va_end(args);
 	return len;
 }
 
-void Logger_SetHandler( void (*handler)(const char*) )
+void Logger_SetHandler(void(*handler)(const char*))
 {
 	logger.handler = handler;
 }
 
-void Logger_SetHandlerW( void (*handler)(const wchar_t*) )
+void Logger_SetHandlerW(void(*handler)(const wchar_t*))
 {
 	logger.handlerw = handler;
 }

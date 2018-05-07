@@ -2,7 +2,7 @@
  * linux_x11events.c -- Event loop support for linux xwindow.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -39,116 +39,119 @@
 
 static LCUI_X11AppDriverRec x11;
 
-void LCUI_SetLinuxX11MainWindow( Window win )
+void LCUI_SetLinuxX11MainWindow(Window win)
 {
 	x11.win_main = win;
-	XSetWMProtocols( x11.display, win, &x11.wm_delete, 1 );
-	XSelectInput( x11.display, win, ExposureMask | KeyPressMask | 
-		      ButtonPress | StructureNotifyMask | ButtonReleaseMask |
-                      KeyReleaseMask | EnterWindowMask | LeaveWindowMask |
-                      PointerMotionMask | Button1MotionMask | 
-                      VisibilityChangeMask );
-	XFlush( x11.display );
+	XSetWMProtocols(x11.display, win, &x11.wm_delete, 1);
+	XSelectInput(x11.display, win,
+		     ExposureMask | KeyPressMask | ButtonPress |
+			 StructureNotifyMask | ButtonReleaseMask |
+			 KeyReleaseMask | EnterWindowMask | LeaveWindowMask |
+			 PointerMotionMask | Button1MotionMask |
+			 VisibilityChangeMask);
+	XFlush(x11.display);
 }
 
-static LCUI_BOOL X11_WaitEvent( void )
+static LCUI_BOOL X11_WaitEvent(void)
 {
 	int fd;
 	fd_set fdset;
 	struct timeval tv;
-	XFlush( x11.display );
-	fd = ConnectionNumber( x11.display );
-	if( XEventsQueued( x11.display, QueuedAlready ) ) {
+	XFlush(x11.display);
+	fd = ConnectionNumber(x11.display);
+	if (XEventsQueued(x11.display, QueuedAlready)) {
 		return TRUE;
 	}
-	FD_ZERO( &fdset );
-	FD_SET( fd, &fdset );
+	FD_ZERO(&fdset);
+	FD_SET(fd, &fdset);
 	tv.tv_sec = 0;
 	tv.tv_usec = 10000;
-	if( select(fd + 1, &fdset, NULL, NULL, &tv) == 1 ) {
-	    return XPending( x11.display );
+	if (select(fd + 1, &fdset, NULL, NULL, &tv) == 1) {
+		return XPending(x11.display);
 	}
 	return FALSE;
 }
 
-static LCUI_BOOL X11_DispatchEvent( void )
+static LCUI_BOOL X11_DispatchEvent(void)
 {
 	XEvent xevent;
-	if( !XEventsQueued( x11.display, QueuedAlready ) ) {
+	if (!XEventsQueued(x11.display, QueuedAlready)) {
 		return FALSE;
 	}
-	XNextEvent( x11.display, &xevent );
-	EventTrigger_Trigger( x11.trigger, xevent.type, &xevent );
-	if( xevent.type == ClientMessage ) {
-		if( xevent.xclient.data.l[0] == x11.wm_delete ) {
+	XNextEvent(x11.display, &xevent);
+	EventTrigger_Trigger(x11.trigger, xevent.type, &xevent);
+	if (xevent.type == ClientMessage) {
+		if (xevent.xclient.data.l[0] == x11.wm_delete) {
 			LCUI_Quit();
 		}
 	}
 	return TRUE;
 }
 
-static void X11_ProcessEvents( void )
+static void X11_ProcessEvents(void)
 {
 	int i;
-	if( !X11_WaitEvent() ) {
+	if (!X11_WaitEvent()) {
 		return;
 	}
-	for( i = 0; X11_DispatchEvent() && i < 100; ++i );
+	for (i = 0; X11_DispatchEvent() && i < 100; ++i)
+		;
 }
 
-static int X11_BindSysEvent( int event_id, LCUI_EventFunc func,
-			      void *data, void(*destroy_data)(void*) )
+static int X11_BindSysEvent(int event_id, LCUI_EventFunc func, void *data,
+			    void (*destroy_data)(void *))
 {
-	return EventTrigger_Bind( x11.trigger, event_id,
-				  func, data, destroy_data );
+	return EventTrigger_Bind(x11.trigger, event_id, func, data,
+				 destroy_data);
 }
 
-static int X11_UnbindSysEvent( int event_id, LCUI_EventFunc func )
+static int X11_UnbindSysEvent(int event_id, LCUI_EventFunc func)
 {
-	return EventTrigger_Unbind( x11.trigger, event_id, func );
+	return EventTrigger_Unbind(x11.trigger, event_id, func);
 }
 
-static int X11_UnbindSysEvent2( int handler_id )
+static int X11_UnbindSysEvent2(int handler_id)
 {
-	return EventTrigger_Unbind2( x11.trigger, handler_id );
+	return EventTrigger_Unbind2(x11.trigger, handler_id);
 }
 
-static void *X11_GetData( void )
+static void *X11_GetData(void)
 {
 	return &x11;
 }
 
-void LCUI_PreInitLinuxX11App( void *data )
+void LCUI_PreInitLinuxX11App(void *data)
 {
 	return;
 }
 
-LCUI_AppDriver LCUI_CreateLinuxX11AppDriver( void )
+LCUI_AppDriver LCUI_CreateLinuxX11AppDriver(void)
 {
-	ASSIGN( app, LCUI_AppDriver );
-	x11.display = XOpenDisplay( NULL );
-	if( !x11.display ) {
-		free( app );
+	ASSIGN(app, LCUI_AppDriver);
+	x11.display = XOpenDisplay(NULL);
+	if (!x11.display) {
+		free(app);
 		return NULL;
 	}
-	x11.screen = DefaultScreen( x11.display );
-	x11.win_root = RootWindow( x11.display, x11.screen );
-	x11.cmap = DefaultColormap( x11.display, x11.screen );
-	x11.wm_delete = XInternAtom( x11.display, "WM_DELETE_WINDOW", FALSE );
+	x11.screen = DefaultScreen(x11.display);
+	x11.win_root = RootWindow(x11.display, x11.screen);
+	x11.cmap = DefaultColormap(x11.display, x11.screen);
+	x11.wm_delete = XInternAtom(x11.display, "WM_DELETE_WINDOW", FALSE);
 	app->ProcessEvents = X11_ProcessEvents;
 	app->BindSysEvent = X11_BindSysEvent;
 	app->UnbindSysEvent = X11_UnbindSysEvent;
 	app->UnbindSysEvent2 = X11_UnbindSysEvent2;
 	app->GetData = X11_GetData;
+	app->id = LCUI_APP_LINUX_X11;
 	x11.trigger = EventTrigger();
 	return app;
 }
 
-void LCUI_DestroyLinuxX11AppDriver( LCUI_AppDriver app )
+void LCUI_DestroyLinuxX11AppDriver(LCUI_AppDriver app)
 {
-	EventTrigger_Destroy( x11.trigger );
-	XCloseDisplay( x11.display );
+	EventTrigger_Destroy(x11.trigger);
+	XCloseDisplay(x11.display);
 	x11.trigger = NULL;
-	free( app );
+	free(app);
 }
 #endif

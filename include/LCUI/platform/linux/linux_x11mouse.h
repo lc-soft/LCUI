@@ -2,7 +2,7 @@
  * linux_x11mouse.h -- Mouse support for linux xwindow.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -31,8 +31,8 @@
 #ifndef LCUI_LINUX_X11_MOUSE_H
 #define LCUI_LINUX_X11_MOUSE_H
 
-void LCUI_InitLinuxX11Mouse( void );
+void LCUI_InitLinuxX11Mouse(void);
 
-void LCUI_ExitLinuxX11Mouse( void );
+void LCUI_FreeLinuxX11Mouse(void);
 
 #endif

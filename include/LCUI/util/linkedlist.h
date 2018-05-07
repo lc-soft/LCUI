@@ -2,7 +2,7 @@
  * linkedlist.h -- Linked list
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -55,28 +55,28 @@ struct LinkedListRec_ {
 #define LinkedList_ForEach(node, list) for( LinkedList_Each(node, list) )
 #define LinkedList_ForEachReverse(node, list) for( LinkedList_EachReverse(node, list) )
 
-LCUI_API LinkedListNode *LinkedList_Append( LinkedList *list, void *data );
-LCUI_API LinkedListNode *LinkedList_Insert( LinkedList *list, size_t pos, void *data );
-LCUI_API LinkedListNode *LinkedList_GetNode( LinkedList *list, size_t pos );
-LCUI_API LinkedListNode *LinkedList_GetNodeAtTail( LinkedList *list, size_t pos );
-LCUI_API void LinkedList_Init( LinkedList *list );
-LCUI_API void *LinkedList_Get( LinkedList *list, size_t pos );
-LCUI_API void LinkedList_Unlink( LinkedList *list, LinkedListNode *node );
-LCUI_API void LinkedList_Link( LinkedList *list, LinkedListNode *cur, LinkedListNode *node );
-LCUI_API void LinkedList_Delete( LinkedList *list, size_t pos );
-LCUI_API void LinkedList_DeleteNode( LinkedList *list, LinkedListNode *node );
-LCUI_API void LinkedList_AppendNode( LinkedList *list, LinkedListNode *node );
-LCUI_API void LinkedList_InsertNode( LinkedList *list, size_t pos, LinkedListNode *node );
-LCUI_API void LinkedList_ClearEx( LinkedList *list, void(*on_destroy)(void*), int free_node );
-LCUI_API void LinkedList_Concat( LinkedList *list1, LinkedList *list2 );
-LCUI_API void LinkedListNode_Delete( LinkedListNode *node );
+LCUI_API LinkedListNode *LinkedList_Append(LinkedList *list, void *data);
+LCUI_API LinkedListNode *LinkedList_Insert(LinkedList *list, size_t pos, void *data);
+LCUI_API LinkedListNode *LinkedList_GetNode(LinkedList *list, size_t pos);
+LCUI_API LinkedListNode *LinkedList_GetNodeAtTail(LinkedList *list, size_t pos);
+LCUI_API void LinkedList_Init(LinkedList *list);
+LCUI_API void *LinkedList_Get(LinkedList *list, size_t pos);
+LCUI_API void LinkedList_Unlink(LinkedList *list, LinkedListNode *node);
+LCUI_API void LinkedList_Link(LinkedList *list, LinkedListNode *cur, LinkedListNode *node);
+LCUI_API void LinkedList_Delete(LinkedList *list, size_t pos);
+LCUI_API void LinkedList_DeleteNode(LinkedList *list, LinkedListNode *node);
+LCUI_API void LinkedList_AppendNode(LinkedList *list, LinkedListNode *node);
+LCUI_API void LinkedList_InsertNode(LinkedList *list, size_t pos, LinkedListNode *node);
+LCUI_API void LinkedList_ClearEx(LinkedList *list, void(*on_destroy)(void*), int free_node);
+LCUI_API void LinkedList_Concat(LinkedList *list1, LinkedList *list2);
+LCUI_API void LinkedListNode_Delete(LinkedListNode *node);
 
 #define LinkedList_Clear(list, func) LinkedList_ClearEx( list, func, 1 )
 #define LinkedList_ClearData(list, func) LinkedList_ClearEx( list, func, 0 )
 
-LCUI_API void LinkedList_SwapNode( LinkedList *list, LinkedListNode *a, LinkedListNode *b );
-LCUI_API void LinkedList_QuickSort( LinkedList *list, int( *cmp )(void*, void*) );
-LCUI_API void LinkedList_BubbleSort( LinkedList *list, int( *cmp )(void*, void*) );
+LCUI_API void LinkedList_SwapNode(LinkedList *list, LinkedListNode *a, LinkedListNode *b);
+LCUI_API void LinkedList_QuickSort(LinkedList *list, int(*cmp)(void*, void*));
+LCUI_API void LinkedList_BubbleSort(LinkedList *list, int(*cmp)(void*, void*));
 
 LCUI_END_HEADER
 

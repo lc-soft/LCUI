@@ -2,7 +2,7 @@
  * sidebar.c -- sidebar widget
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -96,78 +96,78 @@ sidebar sidebar-item:active {
 
 );
 
-LCUI_Widget SideBar_AppendItem( LCUI_Widget sidebar, const wchar_t *id,
-				const wchar_t *icon, const wchar_t *text )
+LCUI_Widget SideBar_AppendItem(LCUI_Widget sidebar, const wchar_t *id,
+			       const wchar_t *icon, const wchar_t *text)
 {
 	SideBar sb;
 	SideBarItem sbi;
 	LCUI_Widget w;
-	size_t len = id ? wcslen( id ) + 1 : 0;
-	wchar_t *newid = NEW( wchar_t, len );
-	if( !newid ) {
+	size_t len = id ? wcslen(id) + 1 : 0;
+	wchar_t *newid = NEW(wchar_t, len);
+	if (!newid) {
 		return NULL;
 	}
-	sb = Widget_GetData( sidebar, self.sidebar );
-	w = LCUIWidget_New( "sidebar-item" );
-	sbi = Widget_GetData( sidebar, self.item );
-	id ? wcscpy( newid, id ) : (newid[0] = 0, NULL);
-	sbi->id ? free( sbi->id ) : 0;
+	sb = Widget_GetData(sidebar, self.sidebar);
+	w = LCUIWidget_New("sidebar-item");
+	sbi = Widget_GetData(sidebar, self.item);
+	id ? wcscpy(newid, id) : (newid[0] = 0, NULL);
+	sbi->id ? free(sbi->id) : 0;
 	sbi->id = newid;
-	Widget_Append( sidebar, w );
-	TextView_SetTextW( sbi->icon, icon );
-	TextView_SetTextW( sbi->text, text );
-	Widget_Show( w );
-	Widget_Show( sbi->icon );
-	Widget_Show( sbi->text );
-	LinkedList_Append( &sb->items, sbi );
+	Widget_Append(sidebar, w);
+	TextView_SetTextW(sbi->icon, icon);
+	TextView_SetTextW(sbi->text, text);
+	Widget_Show(w);
+	Widget_Show(sbi->icon);
+	Widget_Show(sbi->text);
+	LinkedList_Append(&sb->items, sbi);
 	return w;
 }
 
-static void SideBarItem_OnInit( LCUI_Widget w )
+static void SideBarItem_OnInit(LCUI_Widget w)
 {
-	const size_t data_size = sizeof( SideBarItemRec );
-	SideBarItem sbi = Widget_AddData( w, self.item, data_size );
-	Widget_AddData( w, self.item, data_size );
+	const size_t data_size = sizeof(SideBarItemRec);
+	SideBarItem sbi = Widget_AddData(w, self.item, data_size);
+	Widget_AddData(w, self.item, data_size);
 	sbi->icon = LCUIWidget_New("textview");
 	sbi->text = LCUIWidget_New("textview");
 	sbi->id = NULL;
-	Widget_AddClass( sbi->icon, "icon" );
-	Widget_AddClass( sbi->text, "text" );
-	Widget_Append( w, sbi->icon );
-	Widget_Append( w, sbi->text );
+	Widget_AddClass(sbi->icon, "icon");
+	Widget_AddClass(sbi->text, "text");
+	Widget_Append(w, sbi->icon);
+	Widget_Append(w, sbi->text);
 }
 
-static void SideBar_OnInit( LCUI_Widget w )
+static void SideBar_OnInit(LCUI_Widget w)
 {
-	const size_t data_size = sizeof( SideBarRec );
-	SideBar sb = Widget_AddData( w, self.sidebar, data_size );
-	LinkedList_Init( &sb->items );
+	const size_t data_size = sizeof(SideBarRec);
+	SideBar sb = Widget_AddData(w, self.sidebar, data_size);
+	LinkedList_Init(&sb->items);
 }
 
-static void OnToggle( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
+static void OnToggle(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 {
 	LCUI_Widget sidebar = w->parent->parent;
-	if( Widget_HasClass( sidebar, "sidebar-mini" ) ) {
-		Widget_RemoveClass( sidebar, "sidebar-mini" );
+	if (Widget_HasClass(sidebar, "sidebar-mini")) {
+		Widget_RemoveClass(sidebar, "sidebar-mini");
 	} else {
-		Widget_AddClass( sidebar, "sidebar-mini" );
+		Widget_AddClass(sidebar, "sidebar-mini");
 	}
-	Widget_UpdateStyle( sidebar, TRUE );
+	Widget_UpdateStyle(sidebar, TRUE);
 	e->cancel_bubble = TRUE;
 }
 
-static void SideBarToggle_OnInit( LCUI_Widget w )
+static void SideBarToggle_OnInit(LCUI_Widget w)
 {
-	Widget_BindEvent( w, "click", OnToggle, NULL, NULL );
+	Widget_BindEvent(w, "click", OnToggle, NULL, NULL);
 }
 
-void LCUIWidget_AddSideBar( void )
+void LCUIWidget_AddSideBar(void)
 {
-	self.sidebar = LCUIWidget_NewPrototype( "sidebar", NULL );
-	self.item = LCUIWidget_NewPrototype( "sidebar-item", NULL );
-	self.toggle = LCUIWidget_NewPrototype( "sidebar-toggle", NULL );
+	self.sidebar = LCUIWidget_NewPrototype("sidebar", NULL);
+	self.item = LCUIWidget_NewPrototype("sidebar-item", NULL);
+	self.toggle = LCUIWidget_NewPrototype("sidebar-toggle", NULL);
 	self.sidebar->init = SideBar_OnInit;
 	self.item->init = SideBarItem_OnInit;
 	self.toggle->init = SideBarToggle_OnInit;
-	LCUI_LoadCSSString( sidebar_css, __FILE__ );
+	LCUI_LoadCSSString(sidebar_css, __FILE__);
 }

@@ -2,7 +2,7 @@
  * linux_ime.c -- The input method engine support for linux.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -28,13 +28,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <LCUI_Build.h>
+
+#ifdef LCUI_BUILD_IN_LINUX
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <LCUI_Build.h>
-
-#ifdef LCUI_BUILD_IN_LINUX
 #include <LCUI/LCUI.h>
 #include <LCUI/input.h>
 #include <LCUI/gui/widget.h>
@@ -42,40 +42,43 @@
 #include <LCUI/platform.h>
 #include LCUI_EVENTS_H
 
-static LCUI_BOOL X11IME_ProcessKey( int key, int key_state )
+#ifdef LCUI_VIDEO_DRIVER_X11
+static LCUI_BOOL X11IME_ProcessKey(int key, int key_state)
 {
-	return LCUIIME_CheckCharKey( key );
+	return LCUIIME_CheckCharKey(key);
 }
 
-static void X11IME_ToText( int ch )
+static void X11IME_ToText(int ch)
 {
 	wchar_t text[2];
 	text[0] = ch;
 	text[1] = '\0';
-	LCUIIME_Commit( text, 2 );
+	LCUIIME_Commit(text, 2);
 }
 
-static LCUI_BOOL X11IME_Open( void )
+static LCUI_BOOL X11IME_Open(void)
 {
 	return TRUE;
 }
 
-static LCUI_BOOL X11IME_Close( void )
+static LCUI_BOOL X11IME_Close(void)
 {
 	return TRUE;
 }
+#endif
 
-int LCUI_RegisterLinuxIME( void )
+int LCUI_RegisterLinuxIME(void)
 {
 	LCUI_IMEHandlerRec handler;
-	LCUI_BOOL is_x11_mode = TRUE;
-	if( is_x11_mode ) {
+#ifdef LCUI_VIDEO_DRIVER_X11
+	if (LCUI_GetAppId() == LCUI_APP_LINUX_X11) {
 		handler.prockey = X11IME_ProcessKey;
 		handler.totext = X11IME_ToText;
 		handler.close = X11IME_Close;
 		handler.open = X11IME_Open;
-		return LCUIIME_Register( "LCUI Input Method", &handler );
+		return LCUIIME_Register("LCUI X11 Input Method", &handler);
 	}
+#endif
 	return -1;
 }
 

@@ -2,7 +2,7 @@
  * platform.c -- cross-platform driver interface
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -33,7 +33,7 @@
 
 #ifdef LCUI_BUILD_IN_WIN32
 #ifdef WINAPI_FAMILY_APP
-#define LCUI_CreateAppDriver() NULL 
+#define LCUI_CreateAppDriver() NULL
 #define LCUI_DestroyAppDriver(X) NULL
 #define LCUI_PreInitApp() NULL
 #define LCUI_CreateDisplayDriver() NULL
@@ -54,12 +54,12 @@
 #define LCUI_FreeKeyboardDriver LCUI_FreeWinKeyboard
 #endif
 #if defined(WINAPI_PARTITION_APP)
-#define LCUI_APP_H	<LCUI/platform/windows/uwp.h>
+#define LCUI_APP_H <LCUI/platform/windows/uwp.h>
 #else
-#define LCUI_EVENTS_H	<LCUI/platform/windows/windows_events.h>
-#define LCUI_MOUSE_H	<LCUI/platform/windows/windows_mouse.h>
-#define LCUI_KEYBOARD_H	<LCUI/platform/windows/windows_keyboard.h>
-#define LCUI_DISPLAY_H	<LCUI/platform/windows/windows_display.h>
+#define LCUI_EVENTS_H <LCUI/platform/windows/windows_events.h>
+#define LCUI_MOUSE_H <LCUI/platform/windows/windows_mouse.h>
+#define LCUI_KEYBOARD_H <LCUI/platform/windows/windows_keyboard.h>
+#define LCUI_DISPLAY_H <LCUI/platform/windows/windows_display.h>
 #endif
 #elif defined(LCUI_BUILD_IN_LINUX)
 #define LCUI_CreateAppDriver LCUI_CreateLinuxAppDriver
@@ -74,10 +74,10 @@
 #ifdef linux
 #undef linux
 #endif
-#define LCUI_EVENTS_H	<LCUI/platform/linux/linux_events.h>
-#define LCUI_MOUSE_H	<LCUI/platform/linux/linux_mouse.h>
-#define LCUI_KEYBOARD_H	<LCUI/platform/linux/linux_keyboard.h>
-#define LCUI_DISPLAY_H	<LCUI/platform/linux/linux_display.h>
+#define LCUI_EVENTS_H <LCUI/platform/linux/linux_events.h>
+#define LCUI_MOUSE_H <LCUI/platform/linux/linux_mouse.h>
+#define LCUI_KEYBOARD_H <LCUI/platform/linux/linux_keyboard.h>
+#define LCUI_DISPLAY_H <LCUI/platform/linux/linux_display.h>
 #else
 #error current platform is not supported.
 #endif

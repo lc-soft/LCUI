@@ -2,7 +2,7 @@
  * string.h -- The string operation set.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -54,17 +54,17 @@ typedef char TCHAR;
 LCUI_BEGIN_HEADER
 
 /** strdup() 的再实现版本，用于清除编译错误 */
-LCUI_API char *strdup2( const char *str );
-LCUI_API wchar_t *wcsdup2( const wchar_t *str );
+LCUI_API char *strdup2(const char *str);
+LCUI_API wchar_t *wcsdup2(const wchar_t *str);
 
 /** 计算字符串占用的内存空间大小 */
-LCUI_API size_t strsize( const char *str );
-LCUI_API size_t wcssize( const wchar_t *str );
+LCUI_API size_t strsize(const char *str);
+LCUI_API size_t wcssize(const wchar_t *str);
 
 /** 将字符串中的字母转成小写字母 */
-LCUI_API size_t strtolower( char *outstr, const char *instr );
+LCUI_API size_t strtolower(char *outstr, const char *instr);
 
-LCUI_API size_t strntolower( char *outstr, size_t max_len, const char *instr );
+LCUI_API size_t strntolower(char *outstr, size_t max_len, const char *instr);
 
 /**
  * 清除字符串首尾的字符
@@ -73,8 +73,8 @@ LCUI_API size_t strntolower( char *outstr, size_t max_len, const char *instr );
  * @param[in] charlist 需要清除的字符列表，当为NULL时，默认清除空白符
  * @return 处理后的字符串的长度
  */
-LCUI_API int strtrim( char *outstr, const char *instr, const char *charlist );
-LCUI_API int wcstrim( wchar_t *outstr, const wchar_t *instr, const wchar_t *charlist );
+LCUI_API int strtrim(char *outstr, const char *instr, const char *charlist);
+LCUI_API int wcstrim(wchar_t *outstr, const wchar_t *instr, const wchar_t *charlist);
 
 /**
  * 字符串替换
@@ -83,16 +83,16 @@ LCUI_API int wcstrim( wchar_t *outstr, const wchar_t *instr, const wchar_t *char
  * @param[in] substr 字符串中需要被替换的子字符串
  * @param[in] newstr 替换的新字符串
  */
-LCUI_API int wcsreplace( wchar_t *str, size_t max_len,
-			 const wchar_t *substr, const wchar_t *newstr );
+LCUI_API int wcsreplace(wchar_t *str, size_t max_len,
+			const wchar_t *substr, const wchar_t *newstr);
 
 /**
-* 分割命令行字符串
-* @param[in] cmd 需分割的命令行字符串
-* @param[out] outargv 分割后的命令行参数列表
-* @return 参数数量
-*/
-LCUI_API int cmdsplit( const char *cmd, char ***outargv );
+ * 分割命令行字符串
+ * @param[in] cmd 需分割的命令行字符串
+ * @param[out] outargv 分割后的命令行参数列表
+ * @return 参数数量
+ */
+LCUI_API int cmdsplit(const char *cmd, char ***outargv);
 
 /**
  * 分割字符串
@@ -100,7 +100,7 @@ LCUI_API int cmdsplit( const char *cmd, char ***outargv );
  * @param[in] sep 分割标记字符串
  * @param[out] outstrs 分割后的字符串列表
  */
-LCUI_API int strsplit( const char *instr, const char *sep, char ***outstrs );
+LCUI_API int strsplit(const char *instr, const char *sep, char ***outstrs);
 
 
 /**
@@ -108,7 +108,7 @@ LCUI_API int strsplit( const char *instr, const char *sep, char ***outstrs );
  * @param[in][out] strlist 字符串组
  * @param[in] str 字符串
  */
-LCUI_API int strsadd( char ***strlist, const char *str );
+LCUI_API int strsadd(char ***strlist, const char *str);
 
 /**
  * 判断字符串组中是否包含指定字符串
@@ -116,7 +116,7 @@ LCUI_API int strsadd( char ***strlist, const char *str );
  * @param[in] str 字符串
  * @returns 如果包含则返回 1， 否则返回 0
  */
-LCUI_API int strshas( char **strlist, const char *str );
+LCUI_API int strshas(char **strlist, const char *str);
 
 /**
  * 从字符串组中删除指定字符串
@@ -124,17 +124,17 @@ LCUI_API int strshas( char **strlist, const char *str );
  * @param[in] str 字符串
  * @returns 如果删除成功则返回 1， 否则返回 0
  */
-LCUI_API int strsdel( char ***strlist, const char *str );
+LCUI_API int strsdel(char ***strlist, const char *str);
 
 /**
  * 向已排序的字符串组添加字符串
  * @param[in][out] strlist 字符串组
  * @param[in] str 字符串
  */
-LCUI_API int sortedstrsadd( char ***strlist, const char *str );
+LCUI_API int sortedstrsadd(char ***strlist, const char *str);
 
 /** 释放字符串组 */
-LCUI_API void freestrs( char **strs );
+LCUI_API void freestrs(char **strs);
 
 LCUI_END_HEADER
 

@@ -2,7 +2,7 @@
  * task.h -- task operation set.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -31,16 +31,16 @@
 #ifndef LCUI_UTIL_TASK_H
 #define LCUI_UTIL_TASK_H
 
-typedef void( *LCUI_TaskFunc )(void*, void*);
+typedef void(*LCUI_TaskFunc)(void*, void*);
 
 typedef struct LCUI_TaskRec_ {
 	LCUI_TaskFunc func;		/**< 任务处理函数 */
 	void *arg[2];			/**< 两个参数 */
-	void( *destroy_arg[2] )(void*);	/**< 参数的销毁函数 */
+	void(*destroy_arg[2])(void*);	/**< 参数的销毁函数 */
 } LCUI_TaskRec, *LCUI_Task;
 
-LCUI_API void LCUITask_Destroy( LCUI_Task task );
+LCUI_API void LCUITask_Destroy(LCUI_Task task);
 
-LCUI_API int LCUITask_Run( LCUI_Task task );
+LCUI_API int LCUITask_Run(LCUI_Task task);
 
 #endif

@@ -109,17 +109,21 @@ fi
 
 # 检测图形输出设备
 want_video_output=yes
-video_driver_name=framebuffer
+want_video_driver_x11=no
+want_video_driver_framebuffer=no
+video_driver_name=none
 AC_ARG_ENABLE(video-output, AC_HELP_STRING([--enable-video-output],
 [turn on video-output [[default=yes]]]), [want_video_output=$enableval])
 if test "$want_video_output" = yes; then
 	AC_CHECK_HEADERS([linux/fb.h],[
 		video_driver_name=framebuffer
+		want_video_driver_framebuffer=yes
 		AC_DEFINE_UNQUOTED([LCUI_VIDEO_DRIVER_FRAMEBUFFER], 1, [Define to 1 if you select FrameBuffer for video support.])
-	], [video_driver_name=none])
+	], [])
 	AC_CHECK_HEADERS([X11/Xlib.h],[
 		AC_CHECK_LIB([X11], [XOpenDisplay], [
 			video_driver_name=x11
+			want_video_driver_x11=yes
 			LCUI_LIBS="$LCUI_LIBS `pkg-config --libs x11`"
 			CFLAGS="$CFLAGS `pkg-config --cflags-only-I x11`"
 			AC_DEFINE_UNQUOTED([LCUI_VIDEO_DRIVER_X11], 1, [Define to 1 if you select XWindow for video support.])
@@ -127,7 +131,6 @@ if test "$want_video_output" = yes; then
 	], [])
 else
 	want_video_output=no
-	video_driver_name=none
 fi
 
 want_png=no

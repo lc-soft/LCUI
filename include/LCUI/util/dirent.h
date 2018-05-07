@@ -2,7 +2,7 @@
  * dirent.h -- Directory entry operation set.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -74,23 +74,23 @@ typedef struct LCUI_Dir_ {
 #endif
 
 
-LCUI_API int LCUI_OpenDirW( const wchar_t *filepath, LCUI_Dir *dir );
+LCUI_API int LCUI_OpenDirW(const wchar_t *filepath, LCUI_Dir *dir);
 
-LCUI_API int LCUI_OpenDirA( const char *filepath, LCUI_Dir *dir );
+LCUI_API int LCUI_OpenDirA(const char *filepath, LCUI_Dir *dir);
 
-LCUI_API LCUI_DirEntry* LCUI_ReadDirA( LCUI_Dir *dir );
+LCUI_API LCUI_DirEntry* LCUI_ReadDirA(LCUI_Dir *dir);
 
-LCUI_API LCUI_DirEntry* LCUI_ReadDirW( LCUI_Dir *dir );
+LCUI_API LCUI_DirEntry* LCUI_ReadDirW(LCUI_Dir *dir);
 
-LCUI_API int LCUI_CloseDir( LCUI_Dir *dir );
+LCUI_API int LCUI_CloseDir(LCUI_Dir *dir);
 
-LCUI_API char *LCUI_GetFileNameA( LCUI_DirEntry *entry );
+LCUI_API char *LCUI_GetFileNameA(LCUI_DirEntry *entry);
 
-LCUI_API wchar_t *LCUI_GetFileNameW( LCUI_DirEntry *entry );
+LCUI_API wchar_t *LCUI_GetFileNameW(LCUI_DirEntry *entry);
 
-LCUI_API int LCUI_FileIsDirectory( LCUI_DirEntry *entry );
+LCUI_API int LCUI_FileIsDirectory(LCUI_DirEntry *entry);
 
-LCUI_API int LCUI_FileIsRegular( LCUI_DirEntry *entry );
+LCUI_API int LCUI_FileIsRegular(LCUI_DirEntry *entry);
 
 LCUI_END_HEADER
 
