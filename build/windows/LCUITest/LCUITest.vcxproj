@@ -104,13 +104,11 @@
     <ClCompile Include="..\..\..\test\test_font_load.c" />
     <ClCompile Include="..\..\..\test\test_image_reader.c" />
     <ClCompile Include="..\..\..\test\test_string.c" />
-    <ClCompile Include="..\..\..\test\test_char_render.c" />
-    <ClCompile Include="..\..\..\test\test_string_render.c" />
+    <ClCompile Include="..\..\..\test\test_thread.c" />
     <ClCompile Include="..\..\..\test\test_widget_flex_layout.c" />
     <ClCompile Include="..\..\..\test\test_widget_inline_block_layout.c" />
     <ClCompile Include="..\..\..\test\test_widget_layout.c" />
     <ClCompile Include="..\..\..\test\test_widget_rect.c" />
-    <ClCompile Include="..\..\..\test\test_widget_render.c" />
     <ClCompile Include="..\..\..\test\test_xml_parser.c" />
   </ItemGroup>
   <ItemGroup>

@@ -21,16 +21,7 @@
     <ClCompile Include="..\..\..\test\test.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\test_widget_render.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\test\test_string.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\test_char_render.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\test_string_render.c">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\test_image_reader.c">
@@ -52,6 +43,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\test_xml_parser.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\test_thread.c">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,41 +1,32 @@
-﻿/* ***************************************************************************
-* scrollbar.c -- LCUI's scrollbar widget
-*
-* Copyright (C) 2016-2017 by Liu Chao <lc-soft@live.cn>
-*
-* This file is part of the LCUI project, and may only be used, modified, and
-* distributed under the terms of the GPLv2.
-*
-* (GPLv2 is abbreviation of GNU General Public License Version 2)
-*
-* By continuing to use, modify, or distribute this file you indicate that you
-* have read the license and understand and accept it fully.
-*
-* The LCUI project is distributed in the hope that it will be useful, but
-* WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-* or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
-*
-* You should have received a copy of the GPLv2 along with this file. It is
-* usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
-* ****************************************************************************/
-
-/* ****************************************************************************
-* scrollbar.c -- LCUI 的滚动条部件
-*
-* 版权所有 (C) 2016-2017 归属于 刘超 <lc-soft@live.cn>
-*
-* 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
-*
-* (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
-*
-* 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
-*
-* LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
-* 定用途的隐含担保，详情请参照GPLv2许可协议。
-*
-* 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
-* 没有，请查看：<http://www.gnu.org/licenses/>.
-* ****************************************************************************/
+﻿/*
+ * scrollbar.c -- LCUI's scrollbar widget
+ *
+ * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of LCUI nor the names of its contributors may be used
+ *     to endorse or promote products derived from this software without
+ *     specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -65,10 +56,11 @@ typedef struct InertialScrollingRec_ {
 
 /** 滚动条的相关数据 */
 typedef struct LCUI_ScrollBarRec_ {
-	LCUI_Widget box;		/**< 容器 */
-	LCUI_Widget layer;		/**< 滚动层 */
-	LCUI_Widget slider;		/**< 滑块 */
-	LCUI_BOOL is_dragging;		/**< 是否处于拖拽状态 */
+	LCUI_Widget box;		/**< a container containing scrollbar and target, the default is the parent of scrollbar */
+	LCUI_Widget target;		/**< scroll target */
+	LCUI_Widget slider;		/**< slider of scrollbar */
+	LCUI_BOOL is_dragged;		/**< whether the target is dragged */
+	LCUI_BOOL is_draggable;		/**< whether the target can be dragged */
 	float slider_x, slider_y;	/**< 拖拽开始时的滑块位置 */
 	int mouse_x, mouse_y;		/**< 拖拽开始时的鼠标坐标 */
 	int touch_point_id;		/**< 触点的ID */
@@ -97,7 +89,7 @@ scrollbar {
 	background-color: #fafafa;
 	border: 1px solid #eee;
 }
-scrollbar .slider {
+.scrollbar-slider {
 	top: 0;
 	left: 0;
 	width: 14px;
@@ -107,13 +99,13 @@ scrollbar .slider {
 	position: absolute;
 	background-color: #aaa;
 }
-scrollbar .slider:hover {
+.scrollbar-slider:hover {
 	background-color: #bbb;
 }
-scrollbar .slider:active {
+.scrollbar-slider:active {
 	background-color: #999;
 }
-.scrolllayer {
+.scrollbar-target {
 	top: 0;
 	left: 0;
 	position: relative;
@@ -217,16 +209,16 @@ static void StartInertialScrolling( LCUI_Widget w )
 static void Slider_OnMouseMove( LCUI_Widget slider, 
 				LCUI_WidgetEvent e, void *arg )
 {
-	LCUI_Widget layer;
+	LCUI_Widget target;
 	LCUI_Widget w = e->data;
 	LCUI_ScrollBar scrollbar;
 	float n, box_size, size, layer_pos, x, y;
 
 	scrollbar = Widget_GetData( w, self.prototype );
-	if( !scrollbar->is_dragging || !scrollbar->layer ) {
+	if( !scrollbar->is_dragged || !scrollbar->target ) {
 		return;
 	}
-	layer = scrollbar->layer;
+	target = scrollbar->target;
 	if( scrollbar->direction == SBD_HORIZONTAL ) {
 		y = 0;
 		x = scrollbar->slider_x;
@@ -236,7 +228,7 @@ static void Slider_OnMouseMove( LCUI_Widget slider,
 		} else {
 			box_size = w->parent->box.content.width;
 		}
-		layer_pos = scrollbar->layer->box.outer.width - box_size;
+		layer_pos = scrollbar->target->box.outer.width - box_size;
 		size = w->box.content.width - slider->width;
 		if( x > size ) {
 			x = size;
@@ -251,7 +243,7 @@ static void Slider_OnMouseMove( LCUI_Widget slider,
 			}
 		}
 		layer_pos = layer_pos * n;
-		SetStyle( layer->custom_style, key_left, -layer_pos, px );
+		Widget_SetStyle( target, key_left, -layer_pos, px );
 	} else {
 		x = 0;
 		y = scrollbar->slider_y;
@@ -261,7 +253,7 @@ static void Slider_OnMouseMove( LCUI_Widget slider,
 		} else {
 			box_size = w->parent->box.content.height;
 		}
-		layer_pos = scrollbar->layer->box.outer.height - box_size;
+		layer_pos = scrollbar->target->box.outer.height - box_size;
 		size = w->box.content.height - slider->height;
 		if( y > size ) {
 			y = size;
@@ -276,16 +268,16 @@ static void Slider_OnMouseMove( LCUI_Widget slider,
 			}
 		}
 		layer_pos = layer_pos * n;
-		SetStyle( layer->custom_style, key_top, -layer_pos, px );
+		Widget_SetStyle( target, key_top, -layer_pos, px );
 	}
 	if( scrollbar->pos != iround( layer_pos ) ) {
 		LCUI_WidgetEventRec e;
 		e.type = self.event_id;
 		e.cancel_bubble = TRUE;
-		Widget_TriggerEvent( layer, &e, &layer_pos );
+		Widget_TriggerEvent( target, &e, &layer_pos );
 	}
 	scrollbar->pos = iround( layer_pos );
-	Widget_UpdateStyle( layer, FALSE );
+	Widget_UpdateStyle( target, FALSE );
 	Widget_Move( slider, x, y );
 }
 
@@ -297,7 +289,7 @@ static void Slider_OnMouseUp( LCUI_Widget slider,
 	Widget_UnbindEvent( slider, "mousemove", Slider_OnMouseMove );
 	Widget_UnbindEvent( slider, "mouseup", Slider_OnMouseUp );
 	Widget_ReleaseMouseCapture( slider );
-	scrollbar->is_dragging = FALSE;
+	scrollbar->is_dragged = FALSE;
 }
 
 static void Slider_OnMouseDown( LCUI_Widget slider, 
@@ -305,17 +297,25 @@ static void Slider_OnMouseDown( LCUI_Widget slider,
 {
 	LCUI_Widget w = e->data;
 	LCUI_ScrollBar scrollbar = Widget_GetData( w, self.prototype );
-	if( scrollbar->is_dragging ) {
+	if( scrollbar->is_dragged ) {
 		return;
 	}
 	scrollbar->slider_x = slider->x;
 	scrollbar->slider_y = slider->y;
 	scrollbar->mouse_x = e->motion.x;
 	scrollbar->mouse_y = e->motion.y;
-	scrollbar->is_dragging = TRUE;
+	scrollbar->is_dragged = TRUE;
 	Widget_SetMouseCapture( slider );
 	Widget_BindEvent( slider, "mousemove", Slider_OnMouseMove, w, NULL );
 	Widget_BindEvent( slider, "mouseup", Slider_OnMouseUp, w, NULL );
+}
+
+static void ScrollBar_OnLink( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
+{
+	LCUI_ScrollBar scrollbar = Widget_GetData( w, self.prototype );
+	if( !scrollbar->box ) {
+		ScrollBar_BindBox( w, w->parent );
+	}
 }
 
 static void ScrollBar_OnInit( LCUI_Widget w )
@@ -327,10 +327,11 @@ static void ScrollBar_OnInit( LCUI_Widget w )
 	slider = LCUIWidget_New( NULL );
 	scrollbar = Widget_AddData( w, self.prototype, data_size );
 	scrollbar->direction = SBD_VERTICAL;
-	scrollbar->is_dragging = FALSE;
+	scrollbar->is_dragged = FALSE;
+	scrollbar->is_draggable = FALSE;
 	scrollbar->scroll_step = 64;
 	scrollbar->slider = slider;
-	scrollbar->layer = NULL;
+	scrollbar->target = NULL;
 	scrollbar->box = NULL;
 	scrollbar->old_pos = 0;
 	scrollbar->pos = 0;
@@ -338,7 +339,8 @@ static void ScrollBar_OnInit( LCUI_Widget w )
 	InitInertialScrolling( &scrollbar->effect );
 	Widget_BindEvent( slider, "mousedown", 
 			  Slider_OnMouseDown, w, NULL );
-	Widget_AddClass( slider, "slider" );
+	Widget_BindEvent( w, "link", ScrollBar_OnLink, NULL, NULL );
+	Widget_AddClass( slider, "scrollbar-slider" );
 	Widget_Append( w, slider );
 }
 
@@ -351,8 +353,8 @@ static void ScrollBar_UpdateSize( LCUI_Widget w )
 		return;
 	}
 	if( scrollbar->direction == SBD_HORIZONTAL ) {
-		if( scrollbar->layer ) {
-			size = scrollbar->layer->box.outer.width;
+		if( scrollbar->target ) {
+			size = scrollbar->target->box.outer.width;
 		} else {
 			size = 0;
 		}
@@ -362,8 +364,8 @@ static void ScrollBar_UpdateSize( LCUI_Widget w )
 		}
 		SetStyle( slider->custom_style, key_width, n, scale );
 	} else {
-		if( scrollbar->layer ) {
-			size = scrollbar->layer->box.outer.height;
+		if( scrollbar->target ) {
+			size = scrollbar->target->box.outer.height;
 		} else {
 			size = 0;
 		}
@@ -382,22 +384,27 @@ static void ScrollBar_UpdateSize( LCUI_Widget w )
 	}
 }
 
-static void ScrollLayer_OnWheel( LCUI_Widget layer,
+static void ScrollLayer_OnWheel( LCUI_Widget target,
 				 LCUI_WidgetEvent e, void *arg )
 {
+	int pos, new_pos;
 	LCUI_Widget w = e->data;
 	LCUI_ScrollBar scrollbar = Widget_GetData( w, self.prototype );
-	int pos = ScrollBar_GetPosition( w );
+	pos = ScrollBar_GetPosition( w );
 	if( e->wheel.delta > 0 ) {
-		pos -= scrollbar->scroll_step;
+		new_pos = pos - scrollbar->scroll_step;
 	} else {
-		pos += scrollbar->scroll_step;
+		new_pos = pos + scrollbar->scroll_step;
 	}
-	ScrollBar_SetPosition( w, pos );
+	/* If the position of the scroll bar is changed, then prevent
+	 * the event bubbling, to avoid change the parent scroll bars */
+	if( pos != ScrollBar_SetPosition( w, new_pos ) ) {
+		e->cancel_bubble = TRUE;
+	}
 }
 
 /** 滚动层的触屏事件响应 */
-static void ScrollLayer_OnTouch( LCUI_Widget layer,
+static void ScrollLayer_OnTouch( LCUI_Widget target,
 				 LCUI_WidgetEvent e, void *arg )
 {
 	uint_t time_delta;
@@ -413,7 +420,7 @@ static void ScrollLayer_OnTouch( LCUI_Widget layer,
 		point = &e->touch.points[0];
 		/* 如果这个触点的状态不是 TOUCHDOWN，则说明是上次触控拖拽操
 		 * 作时的多余触点，直接忽略这次触控事件 */
-		if( point->state != WET_TOUCHDOWN ) {
+		if( point->state != LCUI_WEVENT_TOUCHDOWN ) {
 			return;
 		}
 		scrollbar->touch_point_id = point->id;
@@ -429,29 +436,33 @@ static void ScrollLayer_OnTouch( LCUI_Widget layer,
 		}
 	}
 	switch( point->state ) {
-	case WET_TOUCHDOWN:
+	case LCUI_WEVENT_TOUCHDOWN:
 		scrollbar->distance = 0;
 		scrollbar->effect.speed = 0;
 		scrollbar->effect.is_running = FALSE;
 		scrollbar->old_pos = scrollbar->pos;
-		if( scrollbar->is_dragging ) {
+		if( scrollbar->is_dragged ) {
 			return;
 		}
-		Widget_SetTouchCapture( layer, point->id );
 		scrollbar->mouse_x = point->x;
 		scrollbar->mouse_y = point->y;
+		scrollbar->is_draggable = TRUE;
 		break;
-	case WET_TOUCHUP:
-		Widget_ReleaseTouchCapture( layer, -1 );
+	case LCUI_WEVENT_TOUCHUP:
+		Widget_ReleaseTouchCapture( target, -1 );
 		time_delta = (uint_t)LCUI_GetTimeDelta( scrollbar->timestamp );
-		if( scrollbar->is_dragging && time_delta < 50 ) {
+		if( scrollbar->is_dragged && time_delta < 50 ) {
 			StartInertialScrolling( w );
 		}
 		scrollbar->touch_point_id = -1;
-		scrollbar->is_dragging = FALSE;
-		Widget_BlockEvent( layer, FALSE );
+		scrollbar->is_dragged = FALSE;
+		Widget_BlockEvent( target, FALSE );
 		break;
-	case WET_TOUCHMOVE:
+	case LCUI_WEVENT_TOUCHMOVE:
+		if( !scrollbar->is_draggable ) {
+			break;
+		}
+		e->cancel_bubble = TRUE;
 		pos = scrollbar->old_pos;
 		if( scrollbar->direction == SBD_HORIZONTAL ) {
 			pos -= point->x - scrollbar->mouse_x;
@@ -460,11 +471,6 @@ static void ScrollLayer_OnTouch( LCUI_Widget layer,
 		}
 		if( pos == scrollbar->pos ) {
 			break;
-		}
-		if( !scrollbar->is_dragging ) {
-			scrollbar->is_dragging = TRUE;
-			LCUIWidget_ClearEventTarget( NULL );
-			Widget_BlockEvent( layer, TRUE );
 		}
 		distance = pos - scrollbar->pos;
 		if( (scrollbar->distance > 0) != (distance > 0) ||
@@ -475,6 +481,23 @@ static void ScrollLayer_OnTouch( LCUI_Widget layer,
 		scrollbar->distance = distance;
 		scrollbar->timestamp = LCUI_GetTime();
 		ScrollBar_SetPosition( w, pos );
+		if( scrollbar->is_dragged ) {
+			break;
+		}
+		/* If the position of the scroll bar is not changed, then
+		 * mark current drag action should be ignore */
+		if( scrollbar->is_draggable &&
+		    scrollbar->old_pos == scrollbar->pos ) {
+			scrollbar->is_dragged = FALSE;
+			scrollbar->is_draggable = FALSE;
+			e->cancel_bubble = FALSE;
+			break;
+		}
+		/* start drag action and block all events of target */
+		scrollbar->is_dragged = TRUE;
+		LCUIWidget_ClearEventTarget( NULL );
+		Widget_BlockEvent( target, TRUE );
+		Widget_SetTouchCapture( target, point->id );
 	default: break;
 	}
 }
@@ -501,22 +524,28 @@ void ScrollBar_BindBox( LCUI_Widget w, LCUI_Widget box )
 				    ScrollBar_OnUpdateSize );
 	}
 	scrollbar->box = box;
-	Widget_BindEvent( box, "resize", ScrollBar_OnUpdateSize, w, NULL );
-	Widget_BindEvent( box, "setscroll", ScrollBar_OnSetPosition, w, NULL );
+	if( box ) {
+		Widget_BindEvent( box, "resize",
+				  ScrollBar_OnUpdateSize, w, NULL );
+		Widget_BindEvent( box, "setscroll",
+				  ScrollBar_OnSetPosition, w, NULL );
+	}
 	ScrollBar_UpdateSize( w );
 }
 
-void ScrollBar_BindLayer( LCUI_Widget w, LCUI_Widget layer )
+void ScrollBar_BindTarget( LCUI_Widget w, LCUI_Widget target )
 {
 	LCUI_ScrollBar scrollbar = Widget_GetData( w, self.prototype );
-	if( scrollbar->layer ) {
-		Widget_UnbindEvent( scrollbar->layer, "resize",
+	if( scrollbar->target ) {
+		Widget_RemoveClass( scrollbar->target, "scrollbar-target" );
+		Widget_UnbindEvent( scrollbar->target, "resize",
 				    ScrollBar_OnUpdateSize );
 	}
-	scrollbar->layer = layer;
-	Widget_BindEvent( layer, "resize", ScrollBar_OnUpdateSize, w, NULL );
-	Widget_BindEvent( layer, "mousewheel", ScrollLayer_OnWheel, w, NULL );
-	Widget_BindEvent( layer, "touch", ScrollLayer_OnTouch, w, NULL );
+	scrollbar->target = target;
+	Widget_AddClass( target, "scrollbar-target" );
+	Widget_BindEvent( target, "resize", ScrollBar_OnUpdateSize, w, NULL );
+	Widget_BindEvent( target, "mousewheel", ScrollLayer_OnWheel, w, NULL );
+	Widget_BindEvent( target, "touch", ScrollLayer_OnTouch, w, NULL );
 	ScrollBar_UpdateSize( w );
 }
 
@@ -526,21 +555,21 @@ int ScrollBar_GetPosition( LCUI_Widget w )
 	return scrollbar->pos;
 }
 
-void ScrollBar_SetPosition( LCUI_Widget w, int pos )
+int ScrollBar_SetPosition( LCUI_Widget w, int pos )
 {
 	float new_pos, box_size, size, slider_pos;
 	LCUI_ScrollBar scrollbar = Widget_GetData( w, self.prototype );
 	LCUI_Widget slider = scrollbar->slider;
-	LCUI_Widget layer = scrollbar->layer;
+	LCUI_Widget target = scrollbar->target;
 	LCUI_WidgetEvent e;
 
-	if( !layer ) {
-		return;
+	if( !target ) {
+		return 0;
 	}
 	new_pos = 1.0f * pos;
 	memset( &e, 0, sizeof( e ) );
 	if( scrollbar->direction == SBD_HORIZONTAL ) {
-		size = scrollbar->layer->box.outer.width;
+		size = scrollbar->target->box.outer.width;
 		if( scrollbar->box ) {
 			box_size = scrollbar->box->box.content.width;
 		} else {
@@ -555,9 +584,9 @@ void ScrollBar_SetPosition( LCUI_Widget w, int pos )
 		slider_pos = w->box.content.width - slider->width;
 		slider_pos = slider_pos * new_pos / (size - box_size);
 		Widget_SetStyle( slider, key_left, slider_pos, px );
-		Widget_SetStyle( layer, key_left, -new_pos, px );
+		Widget_SetStyle( target, key_left, -new_pos, px );
 	} else {
-		size = scrollbar->layer->box.outer.height;
+		size = scrollbar->target->box.outer.height;
 		if( scrollbar->box ) {
 			box_size = scrollbar->box->box.content.height;
 		} else {
@@ -576,18 +605,19 @@ void ScrollBar_SetPosition( LCUI_Widget w, int pos )
 			slider_pos = slider_pos * new_pos / (size - box_size);
 		}
 		Widget_SetStyle( slider, key_top, slider_pos, px );
-		Widget_SetStyle( layer, key_top, -new_pos, px );
+		Widget_SetStyle( target, key_top, -new_pos, px );
 	}
 	pos = iround( new_pos );
 	if( scrollbar->pos != pos ) {
 		LCUI_WidgetEventRec e;
 		e.type = self.event_id;
 		e.cancel_bubble = TRUE;
-		Widget_TriggerEvent( layer, &e, &new_pos );
+		Widget_TriggerEvent( target, &e, &new_pos );
 	}
 	scrollbar->pos = pos;
 	Widget_UpdateStyle( slider, FALSE );
-	Widget_UpdateStyle( layer, FALSE );
+	Widget_UpdateStyle( target, FALSE );
+	return pos;
 }
 
 void ScrollBar_SetDirection( LCUI_Widget w, int direction )
@@ -605,15 +635,15 @@ static void ScrollBar_OnSetAttr( LCUI_Widget w,
 				 const char *name, const char *value )
 {
 	LCUI_Widget target;
-	if( strcmp( name, "data-parent" ) == 0 ) {
+	if( strcmp( name, "parent" ) == 0 ) {
 		target = LCUIWidget_GetById( value );
 		if( target ) {
 			ScrollBar_BindBox( w, target );
 		}
-	} else if( strcmp( name, "data-layer" ) == 0 ) {
+	} else if( strcmp( name, "target" ) == 0 ) {
 		target = LCUIWidget_GetById( value );
 		if( target ) {
-			ScrollBar_BindLayer( w, target );
+			ScrollBar_BindTarget( w, target );
 		}
 	}
 }

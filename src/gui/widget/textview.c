@@ -1,42 +1,33 @@
-﻿/* ***************************************************************************
- * textview.c -- LCUI's TextView Widget
+﻿/*
+ * textview.c -- TextView widget for display text.
  *
- * Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
+ * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * This file is part of the LCUI project, and may only be used, modified, and
- * distributed under the terms of the GPLv2.
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of LCUI nor the names of its contributors may be used
+ *     to endorse or promote products derived from this software without
+ *     specific prior written permission.
  *
- * (GPLv2 is abbreviation of GNU General Public License Version 2)
- *
- * By continuing to use, modify, or distribute this file you indicate that you
- * have read the license and understand and accept it fully.
- *
- * The LCUI project is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- *
- * You should have received a copy of the GPLv2 along with this file. It is
- * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
- * ****************************************************************************/
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
 
-/* ****************************************************************************
- * textview.c -- LCUI 的文本显示部件
- *
- * 版权所有 (C) 2015-2017 归属于 刘超 <lc-soft@live.cn>
- *
- * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
- *
- * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- *
- * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- *
- * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
- * 定用途的隐含担保，详情请参照GPLv2许可协议。
- *
- * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>.
- * ****************************************************************************/
-//#define DEBUG
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -76,7 +67,7 @@ typedef struct LCUI_TextViewRec_ {
 		union {
 			wchar_t *text;
 			LCUI_BOOL enable;
-			WordBreakMode mode;
+			LCUI_WordBreakMode mode;
 			LCUI_TextStyleRec style;
 			int align;
 		};
@@ -113,15 +104,15 @@ static int OnParseWordBreak( LCUI_CSSParserStyleContext ctx,
 	return 0;
 }
 
-static WordBreakMode ComputeWordBreakMode( LCUI_StyleSheet sheet )
+static LCUI_WordBreakMode ComputeWordBreakMode( LCUI_StyleSheet sheet )
 {
 	LCUI_Style s = &sheet->sheet[self.key_word_break];
 	if( s->is_valid && s->type == SVT_STRING && s->string ) {
 		if( strcmp( s->string, "break-all" ) == 0 ) {
-			return WORD_BREAK_MODE_BREAK_ALL;
+			return LCUI_WORD_BREAK_BREAK_ALL;
 		}
 	}
-	return WORD_BREAK_MODE_NORMAL;
+	return LCUI_WORD_BREAK_NORMAL;
 }
 
 static void TextView_OnParseAttr( LCUI_Widget w, const char *name, 
@@ -137,7 +128,7 @@ static void TextView_OnParseAttr( LCUI_Widget w, const char *name,
 	}
 	if( strcmp( name, "multiline" ) == 0 ) {
 		LCUI_BOOL enable = ParseBoolean( value );
-		if( enable != txt->layer->is_mulitiline_mode ) {
+		if( enable != txt->layer->enable_mulitiline ) {
 			TextView_SetMulitiline( w, enable );
 		}
 	}
@@ -155,7 +146,8 @@ static void TextView_SetTaskForLineHeight( LCUI_Widget w, int height )
 	txt->tasks[TASK_UPDATE].is_valid = TRUE;
 }
 
-static void TextView_SetTaskForTextStyle( LCUI_Widget w, LCUI_TextStyle style )
+static void TextView_SetTaskForTextStyle( LCUI_Widget w,
+					  LCUI_TextStyle style )
 {
 	LCUI_TextView txt = GetData( w );
 	TextStyle_Copy( &txt->tasks[TASK_SET_TEXT_STYLE].style, style );
@@ -176,7 +168,7 @@ static void TextView_SetTaskForAutoWrap( LCUI_Widget w, LCUI_BOOL enable )
 	txt->tasks[TASK_SET_AUTOWRAP].is_valid = TRUE;
 }
 
-static void TextView_SetTaskForWordBreak( LCUI_Widget w, WordBreakMode mode )
+static void TextView_SetTaskForWordBreak( LCUI_Widget w, LCUI_WordBreakMode mode )
 {
 	LCUI_TextView txt = GetData( w );
 	txt->tasks[TASK_SET_WORD_BREAK].mode = mode;
@@ -201,23 +193,20 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 		TextView_SetTextW( w, fs->content );
 	}
 	txt->tasks[TASK_UPDATE].is_valid = TRUE;
-	Widget_AddTask( w, WTT_USER );
+	Widget_AddTask( w, LCUI_WTASK_USER );
 	TextStyle_Destroy( &ts );
 }
 
-static void TextView_UpdateSize( LCUI_Widget w )
+static void TextView_UpdateLayerSize( LCUI_Widget w )
 {
-	LCUI_RectF rect;
 	LCUI_TextView txt;
-	LinkedList rects;
-	LinkedListNode *node;
 	int width = 0, height = 0;
 	float scale, max_width = 0, max_height = 0;
 
 	txt = GetData( w );
-	LinkedList_Init( &rects );
 	scale = LCUIMetrics_GetScale();
-	if( Widget_HasFitContentWidth( w ) ) {
+	if( Widget_HasFitContentWidth( w ) ||
+	    Widget_HasParentDependentWidth( w ) ) {
 		max_width = Widget_ComputeMaxContentWidth( w );
 	} else {
 		max_width = w->box.content.width;
@@ -232,6 +221,20 @@ static void TextView_UpdateSize( LCUI_Widget w )
 	width = LCUIMetrics_ComputeActual( max_width, SVT_PX );
 	height = LCUIMetrics_ComputeActual( max_height, SVT_PX );
 	TextLayer_SetMaxSize( txt->layer, width, height );
+}
+
+static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
+{
+	float scale;
+	LCUI_RectF rect;
+	LCUI_TextView txt;
+	LinkedList rects;
+	LinkedListNode *node;
+
+	txt = GetData( w );
+	LinkedList_Init( &rects );
+	scale = LCUIMetrics_GetScale();
+	TextView_UpdateLayerSize( w );
 	TextLayer_Update( txt->layer, &rects );
 	for( LinkedList_Each( node, &rects ) ) {
 		LCUIRect_ToRectF( node->data, &rect, 1.0f / scale );
@@ -239,11 +242,6 @@ static void TextView_UpdateSize( LCUI_Widget w )
 	}
 	RectList_Clear( &rects );
 	TextLayer_ClearInvalidRect( txt->layer );
-}
-
-static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
-{
-	TextView_UpdateSize( w );
 }
 
 /** 初始化 TextView 部件数据 */
@@ -296,14 +294,22 @@ static void TextView_OnDestroy( LCUI_Widget w )
 
 static void TextView_AutoSize( LCUI_Widget w, float *width, float *height )
 {
+	float max_width;
+	int fixed_w, fixed_h;
 	LCUI_TextView txt = GetData( w );
 	float scale = LCUIMetrics_GetScale();
+
+	TextView_UpdateLayerSize( w );
+	fixed_w = txt->layer->fixed_width;
+	fixed_h = txt->layer->fixed_height;
 	if( Widget_HasFitContentWidth( w ) ||
 	    !Widget_HasStaticWidthParent( w ) ) {
-		int fixed_w = txt->layer->fixed_width;
-		int fixed_h = txt->layer->fixed_height;
 		/* 解除固定宽高设置，以计算最大宽高 */
 		TextLayer_SetFixedSize( txt->layer, (int)(*width * scale), 0 );
+		if( Widget_HasParentDependentWidth( w ) ) {
+			max_width = scale * Widget_ComputeMaxContentWidth( w );
+			TextLayer_SetMaxSize( txt->layer, (int)max_width, 0 );
+		}
 		TextLayer_Update( txt->layer, NULL );
 		if( *width <= 0 ) {
 			*width = TextLayer_GetWidth( txt->layer ) / scale;
@@ -331,7 +337,7 @@ static void TextView_OnRefresh( LCUI_Widget w )
 {
 	LCUI_TextView txt = GetData( w );
 	txt->tasks[TASK_UPDATE_SIZE].is_valid = TRUE;
-	Widget_AddTask( w, WTT_USER );
+	Widget_AddTask( w, LCUI_WTASK_USER );
 }
 
 /** 私有的任务处理接口 */
@@ -388,8 +394,12 @@ static void TextView_OnTask( LCUI_Widget w )
 	}
 	i = TASK_UPDATE_SIZE;
 	if( txt->tasks[i].is_valid ) {
-		TextView_UpdateSize( w );
+		TextView_UpdateLayerSize( w );
+		if( Widget_HasFitContentWidth( w ) ) {
+			Widget_AddTask( w, LCUI_WTASK_RESIZE );
+		}
 		txt->tasks[i].is_valid = FALSE;
+		txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	}
 	i = TASK_UPDATE;
 	if( !txt->tasks[i].is_valid ) {
@@ -405,25 +415,25 @@ static void TextView_OnTask( LCUI_Widget w )
 	}
 	RectList_Clear( &rects );
 	TextLayer_ClearInvalidRect( txt->layer );
-	if( w->style->sheet[key_width].type == SVT_AUTO
-	 || w->style->sheet[key_height].type == SVT_AUTO ) {
-		Widget_AddTask( w, WTT_RESIZE );
+	if( Widget_HasParentDependentWidth( w ) ||
+	    Widget_HasAutoStyle( w, key_width ) ||
+	    Widget_HasAutoStyle( w, key_height ) ) {
+		Widget_AddTask( w->parent, LCUI_WTASK_RESIZE );
 	}
 }
 
 /** 绘制 TextView 部件 */
-static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
+static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint,
+			      LCUI_WidgetActualStyle style )
 {
 	LCUI_Pos pos;
-	LCUI_RectF rectf;
 	LCUI_Graph canvas;
 	LCUI_Rect content_rect, rect;
 	LCUI_TextView txt = GetData( w );
-
-	rectf = w->box.content;
-	rectf.x -= w->box.graph.x;
-	rectf.y -= w->box.graph.y;
-	LCUIMetrics_ComputeRectActual( &content_rect, &rectf );
+	content_rect.width = style->content_box.width;
+	content_rect.height = style->content_box.height;
+	content_rect.x = style->content_box.x - style->canvas_box.x;
+	content_rect.y = style->content_box.y - style->canvas_box.y;
 	if( !LCUIRect_GetOverlayRect( &content_rect, &paint->rect, &rect ) ) {
 		return;
 	}
@@ -435,7 +445,7 @@ static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	rect = paint->rect;
 	rect.x -= content_rect.x;
 	rect.y -= content_rect.y;
-	TextLayer_DrawToGraph( txt->layer, rect, pos, &canvas );
+	TextLayer_RenderTo( txt->layer, rect, pos, &canvas );
 }
 
 int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
@@ -473,7 +483,7 @@ int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
 	}
 	txt->tasks[TASK_SET_TEXT].is_valid = TRUE;
 	txt->tasks[TASK_SET_TEXT].text = newtext;
-	Widget_AddTask( w, WTT_USER );
+	Widget_AddTask( w, LCUI_WTASK_USER );
 	LCUIMutex_Unlock( &txt->mutex );
 	return 0;
 }
@@ -516,7 +526,7 @@ void TextView_SetMulitiline( LCUI_Widget w, LCUI_BOOL enable )
 	LCUI_TextView txt = GetData( w );
 	txt->tasks[TASK_SET_MULITILINE].enable = enable;
 	txt->tasks[TASK_SET_MULITILINE].is_valid = TRUE;
-	Widget_AddTask( w, WTT_USER );
+	Widget_AddTask( w, LCUI_WTASK_USER );
 }
 
 void LCUIWidget_AddTextView( void )

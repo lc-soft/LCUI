@@ -5,7 +5,7 @@ pkgconfigdir = $(prefix)/lib/pkgconfig
 pkgconfig_DATA = $(PACKAGE).pc
 
 EXTRA_DIST=autogen.sh README README.zh-cn.md README.md LICENSE.TXT \
-docs/CHANGES.md docs/CHANGES.zh-cn.md docs/FAQ.md \
+CHANGELOG.md CHANGELOG.zh-cn.md docs/FAQ.md \
 docs/FAQ.zh-cn.md \
 docs/CodingStyle.zh-cn.md \
 test/README.zh-cn \
@@ -18,6 +18,7 @@ test/test.c \
 test/test.h \
 test/test_touch.c \
 test/test_string.c \
+test/test_thread.c \
 test/test_string_render.c \
 test/test_widget_render.c \
 test/test_char_render.c \
@@ -43,6 +44,11 @@ test/test_widget_inline_block_layout.c \
 test/test_widget_inline_block_layout.css \
 test/test_widget_inline_block_layout.xml \
 test/test_widget_rect.c
+
+.PHONY: test
+
+test:
+	cd test && make && ./test && valgrind --leak-check=full --error-exitcode=42 .libs/lt-test
 
 @CODE_COVERAGE_RULES@
 

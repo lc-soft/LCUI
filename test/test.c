@@ -23,18 +23,16 @@ int main( void )
 	Logger_SetHandler( LoggerHandler );
 	Logger_SetHandlerW( LoggerHandlerW );
 #endif
-	ret += test_font_load();
 	ret += test_string();
+	ret += test_thread();
+	ret += test_font_load();
 	ret += test_image_reader();
 	ret += test_css_parser();
 	ret += test_xml_parser();
 	ret += test_widget_layout();
 	ret += test_widget_flex_layout();
 	ret += test_widget_inline_block_layout();
-	ret += test_widget_rect();/*
-	ret += test_widget_render();
-	ret += test_char_render();
-	ret += test_string_render();*/
+	ret += test_widget_rect();
 	PRINT_TEST_RESULT( ret );
 	return ret;
 }

@@ -1,60 +1,51 @@
-﻿/* ***************************************************************************
- * textlayer.h -- text bitmap layer processing module.
- * 
- * Copyright (C) 2012-2018 by Liu Chao <lc-soft@live.cn>
- * 
- * This file is part of the LCUI project, and may only be used, modified, and
- * distributed under the terms of the GPLv2.
- * 
- * (GPLv2 is abbreviation of GNU General Public License Version 2)
- * 
- * By continuing to use, modify, or distribute this file you indicate that you
- * have read the license and understand and accept it fully.
- *  
- * The LCUI project is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- * 
- * You should have received a copy of the GPLv2 along with this file. It is 
- * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
- * ****************************************************************************/
- 
-/* ****************************************************************************
- * textlayer.h -- 文本图层处理模块
+﻿/*
+ * textlayer.h -- Text layout and rendering module.
  *
- * 版权所有 (C) 2012-2018 归属于 刘超 <lc-soft@live.cn>
+ * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  * 
- * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- * 
- * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- * 
- * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
- * 定用途的隐含担保，详情请参照GPLv2许可协议。
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of LCUI nor the names of its contributors may be used
+ *     to endorse or promote products derived from this software without
+ *     specific prior written permission.
  *
- * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>. 
- * ****************************************************************************/
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #ifndef LCUI_TEXTLAYER_H
 #define LCUI_TEXTLAYER_H
 
 LCUI_BEGIN_HEADER
 
-typedef struct TextCharRec_ {
-        wchar_t char_code;		/**< 字符码 */
+typedef struct LCUI_TextCharRec_ {
+        wchar_t code;			/**< 字符码 */
         LCUI_TextStyle style;		/**< 该字符使用的样式数据 */
 	const LCUI_FontBitmap *bitmap;	/**< 字体位图数据(只读) */
-} TextCharRec, *TextChar;
+} LCUI_TextCharRec, *LCUI_TextChar;
 
-/** 文本行结尾符 */
-typedef enum EOLChar {
-	EOL_NONE,	/**< 无换行 */
-	EOL_CR,		/**< Mac OS 格式换行，CF = Carriage-Return，字符：\r */
-	EOL_LF,		/**< UNIX/Linux 格式换行，LF = Line-Feed，字符：\r */
-	EOL_CR_LF	/**< Windows 格式换行： \r\n */
-} EOLChar;
+/** End Of Line character */
+typedef enum LCUI_EOLChar {
+	LCUI_EOL_NONE,		/**< 无换行 */
+	LCUI_EOL_CR,		/**< Mac OS 格式换行，CF = Carriage-Return，字符：\r */
+	LCUI_EOL_LF,		/**< UNIX/Linux 格式换行，LF = Line-Feed，字符：\r */
+	LCUI_EOL_CR_LF		/**< Windows 格式换行： \r\n */
+} LCUI_EOLChar;
 
 /* 文本行 */
 typedef struct TextRowRec_ {
@@ -62,21 +53,26 @@ typedef struct TextRowRec_ {
         int height;			/**< 高度 */
 	int text_height;		/**< 当前行中最大字体的高度 */
         int length;			/**< 该行文本长度 */
-        TextChar *string;		/**< 该行文本的数据 */
-	EOLChar eol;			/**< 行尾结束类型 */
-} TextRowRec, *TextRow;
+        LCUI_TextChar *string;		/**< 该行文本的数据 */
+	LCUI_EOLChar eol;		/**< 行尾结束类型 */
+} LCUI_TextRowRec, *LCUI_TextRow;
 
 /* 文本行列表 */
-typedef struct TextRowListRec_ {
-        int length;		/**< 当前总行数 */
-        TextRow *rows;		/**< 每一行文本的数据 */
-} TextRowListRec, *TextRowList;
+typedef struct LCUI_TextRowListRec_ {
+        int length;			/**< 当前总行数 */
+        LCUI_TextRow *rows;		/**< 每一行文本的数据 */
+} LCUI_TextRowListRec, *LCUI_TextRowList;
 
-/** 单词内断行模式 */
-typedef enum WordBreakMode {
-	WORD_BREAK_MODE_NORMAL,		/**< 默认的断行规则，将宽度溢出的单词放到下一行 */
-	WORD_BREAK_MODE_BREAK_ALL	/**< 任意字符间断行 */
-} WordBreakMode;
+/**
+ * word-break mode
+ * The word-break mode specifies whether or not the textlayer should
+ * insert line breaks wherever the text would otherwise overflow its
+ * content box.
+ */
+typedef enum LCUI_WordBreakMode {
+	LCUI_WORD_BREAK_NORMAL,		/**< 默认的断行规则，将宽度溢出的单词放到下一行 */
+	LCUI_WORD_BREAK_BREAK_ALL	/**< 任意字符间断行 */
+} LCUI_WordBreakMode;
 
 typedef struct LCUI_TextLayerRec_  {
         int offset_x;			/**< X轴坐标偏移量 */
@@ -99,25 +95,25 @@ typedef struct LCUI_TextLayerRec_  {
 	 */
 	int max_width, max_height;
 
-	int length;			/**< 文本长度 */
-	WordBreakMode word_break;	/**< 单词内断行模式 */
-	LCUI_BOOL is_mulitiline_mode;	/**< 是否启用多行文本模式 */
-        LCUI_BOOL is_autowrap_mode;	/**< 是否启用自动换行模式 */
-	LCUI_BOOL is_using_style_tags;	/**< 是否使用文本样式标签 */
-        LCUI_BOOL is_using_buffer;	/**< 是否使用缓存空间来存储文本位图 */
-	LinkedList dirty_rect;		/**< 脏矩形记录 */
-        int text_align;			/**< 文本的对齐方式 */
-        TextRowListRec text_rows;	/**< 文本行列表 */
-        LCUI_TextStyleRec text_style;	/**< 文本全局样式 */
-	LinkedList style_cache;		/**< 样式缓存 */
-	int line_height;		/**< 全局文本行高度 */
+	int length;				/**< 文本长度 */
+	int line_height;			/**< 全局文本行高度 */
+	int text_align;				/**< 文本的对齐方式 */
+	LCUI_WordBreakMode word_break;		/**< 单词内断行模式 */
+	LCUI_BOOL enable_mulitiline;		/**< 是否启用多行文本模式 */
+        LCUI_BOOL enable_autowrap;		/**< 是否启用自动换行模式 */
+	LCUI_BOOL enable_style_tags;		/**< 是否使用文本样式标签 */
+        LCUI_BOOL enable_canvas;		/**< 是否使用缓存空间来存储文本位图 */
+	LinkedList dirty_rects;			/**< 脏矩形记录 */
+	LinkedList text_styles;			/**< 样式缓存 */
+	LCUI_TextStyleRec text_default_style;	/**< 文本全局样式 */
+        LCUI_TextRowListRec text_rows;		/**< 文本行列表 */
 	struct {
 		LCUI_BOOL update_bitmap;	/**< 更新文本的字体位图 */
 		LCUI_BOOL update_typeset;	/**< 重新对文本进行排版 */
 		int typeset_start_row;		/**< 排版处理的起始行 */	
 		LCUI_BOOL redraw_all;		/**< 重绘所有字体位图 */
-	} task;				/**< 待处理的任务 */
-        LCUI_Graph graph;		/**< 文本位图缓存 */
+	} task;					/**< 待处理的任务 */
+        LCUI_Graph canvas;			/**< 文本位图缓存 */
 } LCUI_TextLayerRec, *LCUI_TextLayer;
 
 /** 获取文本行总数 */
@@ -225,7 +221,7 @@ LCUI_API int TextLayer_TextBackspace( LCUI_TextLayer layer, int n_char );
 LCUI_API void TextLayer_SetAutoWrap( LCUI_TextLayer layer, LCUI_BOOL autowrap );
 
 /** 设置单词内断行模式 */
-LCUI_API void TextLayer_SetWordBreak( LCUI_TextLayer layer, WordBreakMode mode );
+LCUI_API void TextLayer_SetWordBreak( LCUI_TextLayer layer, LCUI_WordBreakMode mode );
 
 /** 设置是否使用样式标签 */
 LCUI_API void TextLayer_SetUsingStyleTags( LCUI_TextLayer layer, LCUI_BOOL is_true );
@@ -241,13 +237,13 @@ LCUI_API void TextLayer_Update( LCUI_TextLayer layer, LinkedList *rects );
  * @param layer 要使用的文本图层
  * @param area 文本图层中需要绘制的区域
  * @param layer_pos 文本图层在目标图像中的位置
- * @param graph 目标图像
+ * @param cavans 目标画布
  */
-LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,
-				    LCUI_Pos layer_pos, LCUI_Graph *graph );
+LCUI_API int TextLayer_RenderTo( LCUI_TextLayer layer, LCUI_Rect area,
+				 LCUI_Pos layer_pos, LCUI_Graph *canvas );
 
 /** 绘制文本 */
-LCUI_API int TextLayer_Draw( LCUI_TextLayer layer );
+LCUI_API int TextLayer_RenderAll( LCUI_TextLayer layer );
 
 /** 清除已记录的无效矩形 */
 LCUI_API void TextLayer_ClearInvalidRect( LCUI_TextLayer layer );

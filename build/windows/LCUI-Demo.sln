@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.9
+VisualStudioVersion = 15.0.27004.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LCUITest", "LCUITest\LCUITest.vcxproj", "{D639E1FA-B41B-40E5-8EC8-6FA3E5D946E7}"
 EndProject
@@ -16,6 +16,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_widget_rect", "test_widget_rect\test_widget_rect.vcxproj", "{E2D6078C-0255-4EA0-8B93-2A305A21D94A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LCUIApp", "LCUIApp\LCUIApp.vcxproj", "{7640E9C9-442F-4C10-9953-E4989BACC3F4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_widget_flex_layout", "test_widget_flex_layout\test_widget_flex_layout.vcxproj", "{C8EE1440-D130-4D71-A267-7C59AEE60E1C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_widget_inline_block_layout", "test_widget_inline_block_layout\test_widget_inline_block_layout.vcxproj", "{CFFE389C-260F-46FB-A0F3-6DE5670287F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,8 +105,31 @@ Global
 		{7640E9C9-442F-4C10-9953-E4989BACC3F4}.Release|x64.ActiveCfg = Release|x64
 		{7640E9C9-442F-4C10-9953-E4989BACC3F4}.Release|x64.Build.0 = Release|x64
 		{7640E9C9-442F-4C10-9953-E4989BACC3F4}.Release|x64.Deploy.0 = Release|x64
+		{C8EE1440-D130-4D71-A267-7C59AEE60E1C}.Debug|ARM.ActiveCfg = Debug|Win32
+		{C8EE1440-D130-4D71-A267-7C59AEE60E1C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C8EE1440-D130-4D71-A267-7C59AEE60E1C}.Debug|Win32.Build.0 = Debug|Win32
+		{C8EE1440-D130-4D71-A267-7C59AEE60E1C}.Debug|x64.ActiveCfg = Debug|x64
+		{C8EE1440-D130-4D71-A267-7C59AEE60E1C}.Debug|x64.Build.0 = Debug|x64
+		{C8EE1440-D130-4D71-A267-7C59AEE60E1C}.Release|ARM.ActiveCfg = Release|Win32
+		{C8EE1440-D130-4D71-A267-7C59AEE60E1C}.Release|Win32.ActiveCfg = Release|Win32
+		{C8EE1440-D130-4D71-A267-7C59AEE60E1C}.Release|Win32.Build.0 = Release|Win32
+		{C8EE1440-D130-4D71-A267-7C59AEE60E1C}.Release|x64.ActiveCfg = Release|x64
+		{C8EE1440-D130-4D71-A267-7C59AEE60E1C}.Release|x64.Build.0 = Release|x64
+		{CFFE389C-260F-46FB-A0F3-6DE5670287F9}.Debug|ARM.ActiveCfg = Debug|Win32
+		{CFFE389C-260F-46FB-A0F3-6DE5670287F9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CFFE389C-260F-46FB-A0F3-6DE5670287F9}.Debug|Win32.Build.0 = Debug|Win32
+		{CFFE389C-260F-46FB-A0F3-6DE5670287F9}.Debug|x64.ActiveCfg = Debug|x64
+		{CFFE389C-260F-46FB-A0F3-6DE5670287F9}.Debug|x64.Build.0 = Debug|x64
+		{CFFE389C-260F-46FB-A0F3-6DE5670287F9}.Release|ARM.ActiveCfg = Release|Win32
+		{CFFE389C-260F-46FB-A0F3-6DE5670287F9}.Release|Win32.ActiveCfg = Release|Win32
+		{CFFE389C-260F-46FB-A0F3-6DE5670287F9}.Release|Win32.Build.0 = Release|Win32
+		{CFFE389C-260F-46FB-A0F3-6DE5670287F9}.Release|x64.ActiveCfg = Release|x64
+		{CFFE389C-260F-46FB-A0F3-6DE5670287F9}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1D5C2BED-8979-4565-B871-56F23AABE353}
 	EndGlobalSection
 EndGlobal

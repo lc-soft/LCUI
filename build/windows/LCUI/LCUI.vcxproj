@@ -337,8 +337,6 @@
     <ClCompile Include="..\..\..\src\draw\border.c" />
     <ClCompile Include="..\..\..\src\draw\boxshadow.c" />
     <ClCompile Include="..\..\..\src\draw\line.c" />
-    <ClCompile Include="..\..\..\src\draw\rotate.c" />
-    <ClCompile Include="..\..\..\src\draw\smooth.c" />
     <ClCompile Include="..\..\..\src\font\charset.c" />
     <ClCompile Include="..\..\..\src\font\fontlibrary.c" />
     <ClCompile Include="..\..\..\src\font\freetype.c" />

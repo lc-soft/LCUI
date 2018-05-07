@@ -157,3 +157,26 @@ int test_widget_flex_layout( void )
 	LCUI_Destroy();
 	return ret;
 }
+
+#ifdef PREVIEW_MODE
+#include <errno.h>
+
+int tests_count = 0;
+
+int main( void )
+{
+	LCUI_Widget root, pack;
+
+	LCUI_Init();
+	LCUIDisplay_SetSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+	root = LCUIWidget_GetRoot();
+	pack = LCUIBuilder_LoadFile( "test_widget_flex_layout.xml" );
+	if( !pack ) {
+		LCUI_Destroy();
+		return -ENOENT;
+	}
+	Widget_Append( root, pack );
+	Widget_Unwrap( pack );
+	return LCUI_Main();
+}
+#endif

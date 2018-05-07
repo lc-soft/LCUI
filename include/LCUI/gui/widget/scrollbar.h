@@ -1,41 +1,32 @@
-﻿/* ***************************************************************************
-* scrollbar.c -- LCUI's scrollbar widget
-*
-* Copyright (C) 2016 by Liu Chao <lc-soft@live.cn>
-*
-* This file is part of the LCUI project, and may only be used, modified, and
-* distributed under the terms of the GPLv2.
-*
-* (GPLv2 is abbreviation of GNU General Public License Version 2)
-*
-* By continuing to use, modify, or distribute this file you indicate that you
-* have read the license and understand and accept it fully.
-*
-* The LCUI project is distributed in the hope that it will be useful, but
-* WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-* or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
-*
-* You should have received a copy of the GPLv2 along with this file. It is
-* usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
-* ****************************************************************************/
-
-/* ****************************************************************************
-* scrollbar.c -- LCUI 的滚动条部件
-*
-* 版权所有 (C) 2016 归属于 刘超 <lc-soft@live.cn>
-*
-* 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
-*
-* (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
-*
-* 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
-*
-* LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
-* 定用途的隐含担保，详情请参照GPLv2许可协议。
-*
-* 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
-* 没有，请查看：<http://www.gnu.org/licenses/>.
-* ****************************************************************************/
+﻿/*
+ * scrollbar.c -- LCUI's scrollbar widget
+ *
+ * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of LCUI nor the names of its contributors may be used
+ *     to endorse or promote products derived from this software without
+ *     specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #ifndef LCUI_SCROLLBAR_H
 #define LCUI_SCROLLBAR_H
@@ -49,13 +40,13 @@ enum ScrollBarDirection {
 
 LCUI_API void ScrollBar_BindBox( LCUI_Widget w, LCUI_Widget box );
 
-LCUI_API void ScrollBar_BindLayer( LCUI_Widget w, LCUI_Widget layer );
+LCUI_API void ScrollBar_BindTarget( LCUI_Widget w, LCUI_Widget layer );
 
 /** 获取滚动条的位置 */
 LCUI_API int ScrollBar_GetPosition( LCUI_Widget w );
 
 /** 将与滚动条绑定的内容滚动至指定位置 */
-LCUI_API void ScrollBar_SetPosition( LCUI_Widget w, int pos );
+LCUI_API int ScrollBar_SetPosition( LCUI_Widget w, int pos );
 
 /** 设置滚动条的方向 */
 LCUI_API void ScrollBar_SetDirection( LCUI_Widget w, int direction );

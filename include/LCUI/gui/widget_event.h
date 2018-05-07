@@ -1,41 +1,32 @@
-﻿/* ***************************************************************************
+﻿/*
  * widget_event.h -- LCUI widget event module.
  *
- * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
+ * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * This file is part of the LCUI project, and may only be used, modified, and
- * distributed under the terms of the GPLv2.
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of LCUI nor the names of its contributors may be used
+ *     to endorse or promote products derived from this software without
+ *     specific prior written permission.
  *
- * (GPLv2 is abbreviation of GNU General Public License Version 2)
- *
- * By continuing to use, modify, or distribute this file you indicate that you
- * have read the license and understand and accept it fully.
- *
- * The LCUI project is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- *
- * You should have received a copy of the GPLv2 along with this file. It is
- * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
- * ***************************************************************************/
-
-/* ****************************************************************************
- * widget_event.h -- LCUI部件事件模块
- *
- * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
- *
- * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
- *
- * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- *
- * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- *
- * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
- * 定用途的隐含担保，详情请参照GPLv2许可协议。
- *
- * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>.
- * ***************************************************************************/
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #ifndef LCUI_WIDGET_EVENT_H
 #define LCUI_WIDGET_EVENT_H
@@ -43,41 +34,41 @@
 LCUI_BEGIN_HEADER
 
 /** 部件事件类型枚举 */
-enum WidgetEventType {
-	WET_NONE,
-	WET_ADD,
-	WET_READY,		/**< 在初次更新尺寸和位置后 */
-	WET_REMOVE,		/**< 在被标记需要移除时 */
-	WET_DESTROY,		/**< 在开始彻底销毁前 */
-	WET_MOVE,		/**< 在移动位置时 */
-	WET_RESIZE,		/**< 改变尺寸 */
-	WET_SHOW,		/**< 显示 */
-	WET_HIDE,		/**< 隐藏 */
-	WET_FOCUS,		/**< 获得焦点 */
-	WET_BLUR,		/**< 失去焦点 */
-	WET_AFTERLAYOUT,	/**< 在子部件布局完成后 */
-	WET_KEYDOWN,		/**< 按键按下 */
-	WET_KEYUP,		/**< 按键释放 */
-	WET_KEYPRESS,		/**< 按键字符输入 */
-	WET_TEXTINPUT,		/**< 文本输入 */
+typedef enum LCUI_WidgetEventType {
+	LCUI_WEVENT_NONE,
+	LCUI_WEVENT_LINK,		/**< link widget node to the parent widget children list */
+	LCUI_WEVENT_UNLINK,		/**< unlink widget node from the parent widget children list */
+	LCUI_WEVENT_READY,		/**< after widget initial layout was completed */
+	LCUI_WEVENT_DESTROY,		/**< before destroy */
+	LCUI_WEVENT_MOVE,		/**< 在移动位置时 */
+	LCUI_WEVENT_RESIZE,		/**< 改变尺寸 */
+	LCUI_WEVENT_SHOW,		/**< 显示 */
+	LCUI_WEVENT_HIDE,		/**< 隐藏 */
+	LCUI_WEVENT_FOCUS,		/**< 获得焦点 */
+	LCUI_WEVENT_BLUR,		/**< 失去焦点 */
+	LCUI_WEVENT_AFTERLAYOUT,	/**< 在子部件布局完成后 */
+	LCUI_WEVENT_KEYDOWN,		/**< 按键按下 */
+	LCUI_WEVENT_KEYUP,		/**< 按键释放 */
+	LCUI_WEVENT_KEYPRESS,		/**< 按键字符输入 */
+	LCUI_WEVENT_TEXTINPUT,		/**< 文本输入 */
 
-	WET_MOUSEOVER,		/**< 鼠标在部件上 */
-	WET_MOUSEMOVE,		/**< 鼠标在部件上移动 */
-	WET_MOUSEOUT,		/**< 鼠标从部件上移开 */
-	WET_MOUSEDOWN,		/**< 鼠标按键按下 */
-	WET_MOUSEUP,		/**< 鼠标按键释放 */
-	WET_MOUSEWHEEL,		/**< 鼠标滚轮滚动时 */
-	WET_CLICK,		/**< 鼠标单击 */
-	WET_DBLCLICK,		/**< 鼠标双击 */
-	WET_TOUCH,		/**< 触控 */
-	WET_TOUCHDOWN,		/**< 触点按下 */
-	WET_TOUCHUP,		/**< 触点释放 */
-	WET_TOUCHMOVE,		/**< 触点移动 */
+	LCUI_WEVENT_MOUSEOVER,		/**< 鼠标在部件上 */
+	LCUI_WEVENT_MOUSEMOVE,		/**< 鼠标在部件上移动 */
+	LCUI_WEVENT_MOUSEOUT,		/**< 鼠标从部件上移开 */
+	LCUI_WEVENT_MOUSEDOWN,		/**< 鼠标按键按下 */
+	LCUI_WEVENT_MOUSEUP,		/**< 鼠标按键释放 */
+	LCUI_WEVENT_MOUSEWHEEL,		/**< 鼠标滚轮滚动时 */
+	LCUI_WEVENT_CLICK,		/**< 鼠标单击 */
+	LCUI_WEVENT_DBLCLICK,		/**< 鼠标双击 */
+	LCUI_WEVENT_TOUCH,		/**< 触控 */
+	LCUI_WEVENT_TOUCHDOWN,		/**< 触点按下 */
+	LCUI_WEVENT_TOUCHUP,		/**< 触点释放 */
+	LCUI_WEVENT_TOUCHMOVE,		/**< 触点移动 */
 
-	WET_TITLE,
-	WET_SURFACE,
-	WET_USER
-};
+	LCUI_WEVENT_TITLE,
+	LCUI_WEVENT_SURFACE,
+	LCUI_WEVENT_USER
+} LCUI_WidgetEventType;
 
 /* 部件的事件数据结构和系统事件一样 */
 typedef LCUI_MouseMotionEvent LCUI_WidgetMouseMotionEvent;

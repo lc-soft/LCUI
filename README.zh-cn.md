@@ -9,7 +9,7 @@
   <p align="center">
     <a href="https://travis-ci.org/lc-soft/LCUI"><img src="https://travis-ci.org/lc-soft/LCUI.png?branch=master" alt="Build Status"></a>
     <a href="https://coveralls.io/github/lc-soft/LCUI?branch=develop"><img src="https://coveralls.io/repos/github/lc-soft/LCUI/badge.svg?branch=develop" alt="Coverage Status"></a>
-    <a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html"><img src="https://img.shields.io/badge/license-GPLv2-blue.svg" alt="License"></a>
+    <a href="http://opensource.org/licenses/MIT"><img src="https://img.shields.io/github/license/lc-soft/LCUI.svg" alt="License"></a>
     <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/release/lc-soft/LCUI/all.svg" alt="Github Release"></a>
     <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/downloads/lc-soft/LCUI/total.svg" alt="Github All Releases"></a>
     <img src="https://img.shields.io/github/repo-size/lc-soft/LCUI.svg" alt="Repo size">
@@ -45,26 +45,36 @@ LCUI 是一种自由和开放源代码的图形界面开发库，主要使用 C 
 - **图片处理：** 提供图片读取接口，支持读取 jpg、png 和 bmp 格式的图片。支持逐行读取，可在读取图片的过程反馈读取进度。
 - **触控：** 支持多点触控，但目前只支持 Windows 系统。
 
+### 缺少的特性
+
+LCUI 是一个个人项目，其主要用途是方便作者能够开发简单的图形界面应用，简单也就意味着功能很少，比如：
+
+- 没有硬件加速，图形渲染效率低下。
+- 不支持选中和复制界面中的文本。
+- 不支持实用 CTRL+C 复制内容，不支持使用 CTRL+V 粘贴内容到输入框。
+- 不支持使用输入法输入非英文字符，例如：中文，日文，等。
+- 当前版本并不支持渲染圆角边框。
+- 布局系统简单，不支持网格、表格等布局。
+
+如果你有上述问题的相关解决经验，可以通过提交问题（Issue）或拉取请求（Pull Request）来向作者提供技术支持。
+
 ### 效果图
 
 ![Hello, World!](https://lcui.lc-soft.io/static/images/screenshot-lcui-hello.png)
 
-[![LCUI.css](https://lcui.lc-soft.io/static/images/screenshot-lcui-css.png)](https://github.com/lc-ui/LCUI.css)
+[![LCUI.css](https://lcui.lc-soft.io/static/images/screenshot-lcui-css.gif)](https://github.com/lc-ui/LCUI.css)
 
 [![LCFinder](https://lcui.lc-soft.io/static/images/screenshot-lcfinder.png)](https://github.com/lc-soft/LC-Finder)
 
 ## 许可
 
-LCUI 采用的开源许可证是 [GNU通用公共许可证第二版](http://www.gnu.org/licenses/gpl-2.0.html)，简称 GPLv2。简而言之，你有权利使用、修改、传播 LCUI 的副本，当你传播给其他人时，你也必须让他们对你传播的 LCUI 副本拥有同样的权利。另外需要注意的是，如果你的应用程序用到了 LCUI 的代码，并且想传播给其他人，那么除系统库和通用工具外，该应用程序及其它依赖项的源代码都必须向他们公开。
-
-或许该许可协议在国内没有多大作用，如果你不想遵循该许可协议，那么使用 LCUI 也就意味着你需要独自解决它带来的各种问题，例如：功能缺陷、偶尔崩溃、性能和内存占用等问题，作者不承担任何责任，也不要试图联系作者协助解决问题，因为作者没有义务浪费时间为违反协议的人提供技术支持。
+LCUI 采用的开源许可证是 [MIT](http://opensource.org/licenses/MIT)。
 
 ## 文档
 
 - 在线教程：[https://lcui.lc-soft.io/guide/](https://lcui.lc-soft.io/guide/)
 - 更新日志：[docs/CHANGES.zh-cn.md](docs/CHANGES.zh-cn.md)
 - 常见问题：[docs/FAQ.zh-cn.md](docs/FAQ.zh-cn.md)
-- 许可协议：[LICENSE.TXT](LICENSE.TXT)
 
 目前还没有 API 参考文档，你可以参考头文件、源代码、示例程序以及作者开发过的相关程序来了解基本用法。
 

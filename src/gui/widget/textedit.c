@@ -1,41 +1,33 @@
-﻿/* ***************************************************************************
+﻿/*
  * textedit.c -- textedit widget, used to allow user edit text.
  *
- * Copyright (C) 2016-2017 by Liu Chao <lc-soft@live.cn>
+ * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * This file is part of the LCUI project, and may only be used, modified, and
- * distributed under the terms of the GPLv2.
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of LCUI nor the names of its contributors may be used
+ *     to endorse or promote products derived from this software without
+ *     specific prior written permission.
  *
- * (GPLv2 is abbreviation of GNU General Public License Version 2)
- *
- * By continuing to use, modify, or distribute this file you indicate that you
- * have read the license and understand and accept it fully.
- *
- * The LCUI project is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- *
- * You should have received a copy of the GPLv2 along with this file. It is
- * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
- * ****************************************************************************/
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
 
-/* ****************************************************************************
- * textedit.c -- 文本编辑部件，用于让用户编辑文本。
- *
- * 版权所有 (C) 2016-2017 归属于 刘超 <lc-soft@live.cn>
- *
- * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
- *
- * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- *
- * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- *
- * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
- * 定用途的隐含担保，详情请参照GPLv2许可协议。
- *
- * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>.
- * ****************************************************************************/
 
 //#define DEBUG
 #include <errno.h>
@@ -195,7 +187,7 @@ static void TextEdit_UpdateCaret( LCUI_Widget widget )
 		int iy = iround( (y - caret_y) * scale );
 		TextLayer_SetOffset( edit->layer, ix, iy );
 		edit->tasks[TASK_UPDATE] = TRUE;
-		Widget_AddTask( widget, WTT_USER );
+		Widget_AddTask( widget, LCUI_WTASK_USER );
 	}
 	x += widget->padding.left;
 	y += widget->padding.top;
@@ -226,7 +218,7 @@ static void TextEdit_SetTaskForLineHeight( LCUI_Widget w, int height )
 	TextLayer_SetLineHeight( edit->layer_source, height );
 	TextLayer_SetLineHeight( edit->layer_mask, height );
 	edit->tasks[TASK_UPDATE] = TRUE;
-	Widget_AddTask( w, WTT_USER );
+	Widget_AddTask( w, LCUI_WTASK_USER );
 }
 
 static void TextEdit_SetTaskForMultiline( LCUI_Widget widget, LCUI_BOOL is_true )
@@ -282,7 +274,7 @@ static int TextEdit_AddTextToBuffer( LCUI_Widget widget, const wchar_t *wtext,
 			return -ENOMEM;
 		}
 		/* 如果未启用样式标签功能 */
-		if( !edit->layer->is_using_style_tags ) {
+		if( !edit->layer->enable_style_tags ) {
 			for( j = 0; i < len && j < size - 1; ++j, ++i ) {
 				txtblk->text[j] = wtext[i];
 			}
@@ -324,7 +316,7 @@ static int TextEdit_AddTextToBuffer( LCUI_Widget widget, const wchar_t *wtext,
 		LinkedList_Append( &edit->text_blocks, txtblk );
 	}
 	edit->tasks[TASK_SET_TEXT] = TRUE;
-	Widget_AddTask( widget, WTT_USER );
+	Widget_AddTask( widget, LCUI_WTASK_USER );
 	return 0;
 }
 
@@ -382,7 +374,7 @@ static void TextEdit_UpdateTextLayer( LCUI_Widget w )
 	LinkedList_Init( &rects );
 	scale = LCUIMetrics_GetScale();
 	edit = Widget_GetData( w, self.prototype );
-	TextStyle_Copy( &style, &edit->layer_source->text_style );
+	TextStyle_Copy( &style, &edit->layer_source->text_default_style );
 	if( edit->password_char ) {
 		TextLayer_SetTextStyle( edit->layer_mask, &style );
 	}
@@ -423,7 +415,8 @@ static void TextEdit_OnTask( LCUI_Widget widget )
 	if( edit->tasks[TASK_SET_TEXT] ) {
 		LinkedList blocks;
 		LinkedListNode *node;
-		LCUI_WidgetEventRec ev;
+		LCUI_WidgetEventRec ev = { 0 };
+
 		LinkedList_Init( &blocks );
 		LCUIMutex_Lock( &edit->mutex );
 		LinkedList_Concat( &blocks, &edit->text_blocks );
@@ -510,7 +503,7 @@ void TextEdit_ClearText( LCUI_Widget widget )
 	TextLayer_ClearText( edit->layer_source );
 	StyleTags_Clear( &edit->text_tags );
 	edit->tasks[TASK_UPDATE] = TRUE;
-	Widget_AddTask( widget, WTT_USER );
+	Widget_AddTask( widget, LCUI_WTASK_USER );
 	LCUIMutex_Unlock( &edit->mutex );
 	Widget_InvalidateArea( widget, NULL, SV_PADDING_BOX );
 }
@@ -552,7 +545,7 @@ void TextEdit_SetPasswordChar( LCUI_Widget w, wchar_t ch )
 	LCUI_TextEdit edit = GetData( w );
 	edit->password_char = ch;
 	edit->tasks[TASK_UPDATE_MASK] = TRUE;
-	Widget_AddTask( w, WTT_USER );
+	Widget_AddTask( w, LCUI_WTASK_USER );
 }
 
 /** 为文本框追加文本（宽字符版） */
@@ -612,7 +605,7 @@ static void TextEdit_OnFocus( LCUI_Widget widget, LCUI_WidgetEvent e, void *arg 
 	TextCaret_SetVisible( edit->caret, TRUE );
 	TextCaret_BlinkHide( edit->caret );
 	edit->tasks[TASK_UPDATE_CARET] = TRUE;
-	Widget_AddTask( widget, WTT_USER );
+	Widget_AddTask( widget, LCUI_WTASK_USER );
 }
 
 static void TextEdit_OnBlur( LCUI_Widget widget, LCUI_WidgetEvent e, void *arg )
@@ -633,7 +626,7 @@ static void TextEdit_TextBackspace( LCUI_Widget widget, int n_ch )
 	}
 	TextCaret_BlinkShow( edit->caret );
 	edit->tasks[TASK_UPDATE] = TRUE;
-	Widget_AddTask( widget, WTT_USER );
+	Widget_AddTask( widget, LCUI_WTASK_USER );
 	LCUIMutex_Unlock( &edit->mutex );
 	ev.type = self.event_id;
 	ev.cancel_bubble = TRUE;
@@ -652,7 +645,7 @@ static void TextEdit_TextDelete(LCUI_Widget widget, int n_ch )
 	}
 	TextCaret_BlinkShow( edit->caret );
 	edit->tasks[TASK_UPDATE] = TRUE;
-	Widget_AddTask( widget, WTT_USER );
+	Widget_AddTask( widget, LCUI_WTASK_USER );
 	LCUIMutex_Unlock( &edit->mutex );
 	ev.type = self.event_id;
 	ev.cancel_bubble = TRUE;
@@ -901,18 +894,17 @@ static void TextEdit_OnDestroy( LCUI_Widget widget )
 	LinkedList_Clear( &edit->text_blocks, TextBlock_OnDestroy );
 }
 
-static void TextEdit_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
+static void TextEdit_OnPaint( LCUI_Widget w, LCUI_PaintContext paint,
+			      LCUI_WidgetActualStyle style )
 {
 	LCUI_Pos pos;
-	LCUI_RectF rectf;
 	LCUI_Graph canvas;
 	LCUI_Rect content_rect, rect;
 	LCUI_TextEdit edit = GetData( w );
-
-	rectf = w->box.content;
-	rectf.x -= w->box.graph.x;
-	rectf.y -= w->box.graph.y;
-	LCUIMetrics_ComputeRectActual( &content_rect, &rectf );
+	content_rect.width = style->content_box.width;
+	content_rect.height = style->content_box.height;
+	content_rect.x = style->content_box.x - style->canvas_box.x;
+	content_rect.y = style->content_box.y - style->canvas_box.y;
 	if( !LCUIRect_GetOverlayRect( &content_rect, &paint->rect, &rect ) ) {
 		return;
 	}
@@ -924,7 +916,7 @@ static void TextEdit_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	rect = paint->rect;
 	rect.x -= content_rect.x;
 	rect.y -= content_rect.y;
-	TextLayer_DrawToGraph( edit->layer, rect, pos, &canvas );
+	TextLayer_RenderTo( edit->layer, rect, pos, &canvas );
 }
 
 static void TextEdit_SetTextStyle( LCUI_Widget w, LCUI_TextStyle ts )
@@ -934,7 +926,7 @@ static void TextEdit_SetTextStyle( LCUI_Widget w, LCUI_TextStyle ts )
 	TextLayer_SetTextStyle( edit->layer_source, ts );
 	TextLayer_SetTextStyle( edit->layer_mask, ts );
 	edit->tasks[TASK_UPDATE] = TRUE;
-	Widget_AddTask( w, WTT_USER );
+	Widget_AddTask( w, LCUI_WTASK_USER );
 }
 
 static void TextEdit_OnUpdate( LCUI_Widget w )

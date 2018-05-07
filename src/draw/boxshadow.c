@@ -1,41 +1,33 @@
-﻿/* ****************************************************************************
-* boxshadow.c -- graph box shadow draw support.
-*
-* Copyright (C) 2014-2017 by Liu Chao <lc-soft@live.cn>
-*
-* This file is part of the LCUI project, and may only be used, modified, and
-* distributed under the terms of the GPLv2.
-*
-* (GPLv2 is abbreviation of GNU General Public License Version 2)
-*
-* By continuing to use, modify, or distribute this file you indicate that you
-* have read the license and understand and accept it fully.
-*
-* The LCUI project is distributed in the hope that it will be useful, but
-* WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-* or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
-*
-* You should have received a copy of the GPLv2 along with this file. It is
-* usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
-* ***************************************************************************/
+﻿/*
+ * boxshadow.c -- Box shadow draw support.
+ *
+ * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of LCUI nor the names of its contributors may be used
+ *     to endorse or promote products derived from this software without
+ *     specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
 
-/* ****************************************************************************
-* boxshadow.c -- 矩形阴影绘制支持
-*
-* 版权所有 (C) 2014-2017 归属于 刘超 <lc-soft@live.cn>
-*
-* 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
-*
-* (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
-*
-* 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
-*
-* LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
-* 定用途的隐含担保，详情请参照GPLv2许可协议。
-*
-* 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
-* 没有，请查看：<http://www.gnu.org/licenses/>.
-* ***************************************************************************/
 
 /**
  * 本模块的主要用于实现阴影绘制，但不是通用的，仅适用于矩形框，不能用于绘制文
@@ -76,8 +68,7 @@ static uchar_t gradient_compute( gradient_t *g, int t, int val )
 	return (uchar_t)(val >> 8);
 }
 
- /** 计算Box在添加阴影后的宽度 */
-static int BoxShadow_GetBoxWidth( const LCUI_BoxShadow *shadow, int w )
+int BoxShadow_GetBoxWidth( const LCUI_BoxShadow *shadow, int w )
 {
 	w -= SHADOW_WIDTH( shadow ) * 2;
 	/* 如果水平向右的偏移距离大于阴影宽度，说明内容区左上角与容器一致 */
@@ -94,8 +85,7 @@ static int BoxShadow_GetBoxWidth( const LCUI_BoxShadow *shadow, int w )
 	return w;
 }
 
-/** 计算Box在添加阴影后的高度 */
-static int BoxShadow_GetBoxHeight( const LCUI_BoxShadow *shadow, int h )
+int BoxShadow_GetBoxHeight( const LCUI_BoxShadow *shadow, int h )
 {
 	h -= SHADOW_WIDTH( shadow ) * 2;
 	if( shadow->y >= SHADOW_WIDTH( shadow ) ) {
@@ -106,8 +96,7 @@ static int BoxShadow_GetBoxHeight( const LCUI_BoxShadow *shadow, int h )
 	return h;
 }
 
-/** 计算Box在添加阴影后的宽度 */
-static int BoxShadow_GetWidth( const LCUI_BoxShadow *shadow, int box_w )
+int BoxShadow_GetWidth( const LCUI_BoxShadow *shadow, int box_w )
 {
 	if( shadow->x >= SHADOW_WIDTH( shadow ) ) {
 		return box_w + SHADOW_WIDTH( shadow ) + shadow->x;
@@ -117,8 +106,7 @@ static int BoxShadow_GetWidth( const LCUI_BoxShadow *shadow, int box_w )
 	return box_w + SHADOW_WIDTH( shadow ) * 2;
 }
 
-/** 计算Box在添加阴影后的高度 */
-static int BoxShadow_GetHeight( const LCUI_BoxShadow *shadow, int box_h )
+int BoxShadow_GetHeight( const LCUI_BoxShadow *shadow, int box_h )
 {
 	if( shadow->y >= SHADOW_WIDTH( shadow ) ) {
 		return box_h + SHADOW_WIDTH( shadow ) + shadow->y;
@@ -128,7 +116,7 @@ static int BoxShadow_GetHeight( const LCUI_BoxShadow *shadow, int box_h )
 	return box_h + SHADOW_WIDTH( shadow ) * 2;
 }
 
-static int BoxShadow_GetBoxX( const LCUI_BoxShadow *shadow )
+int BoxShadow_GetBoxX( const LCUI_BoxShadow *shadow )
 {
 	if( shadow->x >= SHADOW_WIDTH(shadow) ) {
 		return 0;
@@ -136,7 +124,7 @@ static int BoxShadow_GetBoxX( const LCUI_BoxShadow *shadow )
 	return SHADOW_WIDTH(shadow) - shadow->x;
 }
 
-static int BoxShadow_GetBoxY( const LCUI_BoxShadow *shadow )
+int BoxShadow_GetBoxY( const LCUI_BoxShadow *shadow )
 {
 	if( shadow->y >= SHADOW_WIDTH(shadow) ) {
 		return 0;
@@ -144,7 +132,7 @@ static int BoxShadow_GetBoxY( const LCUI_BoxShadow *shadow )
 	return SHADOW_WIDTH(shadow) - shadow->y;
 }
 
-static int BoxShadow_GetY( const LCUI_BoxShadow *shadow )
+int BoxShadow_GetY( const LCUI_BoxShadow *shadow )
 {
 	if( shadow->y <= SHADOW_WIDTH(shadow) ) {
 		return 0;
@@ -152,7 +140,7 @@ static int BoxShadow_GetY( const LCUI_BoxShadow *shadow )
 	return shadow->y - SHADOW_WIDTH(shadow);
 }
 
-static int BoxShadow_GetX( const LCUI_BoxShadow *shadow )
+int BoxShadow_GetX( const LCUI_BoxShadow *shadow )
 {
 	if( shadow->x <= SHADOW_WIDTH(shadow) ) {
 		return 0;
@@ -230,9 +218,9 @@ static void DrawCircle( LCUI_Graph *graph, LCUI_Pos center,
 	}
 }
 
-static void Graph_DrawTopLeftShadow( LCUI_PaintContext paint,
-				     const LCUI_Rect *box,
-				     const LCUI_BoxShadow *sd )
+static void BoxShadow_PaintTopLeft( const LCUI_BoxShadow *sd,
+				    const LCUI_Rect *box,
+				    LCUI_PaintContext paint )
 {
 	LCUI_Pos pos;
 	LCUI_Rect bound;
@@ -259,9 +247,9 @@ static void Graph_DrawTopLeftShadow( LCUI_PaintContext paint,
 	}
 }
 
-static void Graph_DrawTopRightShadow( LCUI_PaintContext paint,
-				      const LCUI_Rect *box,
-				      const LCUI_BoxShadow *sd )
+static void BoxShadow_PaintTopRight( const LCUI_BoxShadow *sd,
+				     const LCUI_Rect *box,
+				     LCUI_PaintContext paint )
 {
 	LCUI_Pos pos;
 	LCUI_Rect bound;
@@ -284,9 +272,9 @@ static void Graph_DrawTopRightShadow( LCUI_PaintContext paint,
 	}
 }
 
-static void Graph_DrawBottomLeftShadow( LCUI_PaintContext paint,
-					const LCUI_Rect *box,
-					const LCUI_BoxShadow *sd )
+static void BoxShadow_PaintBottomLeft( const LCUI_BoxShadow *sd,
+				       const LCUI_Rect *box,
+				       LCUI_PaintContext paint )
 {
 	LCUI_Pos pos;
 	LCUI_Rect bound;
@@ -308,9 +296,9 @@ static void Graph_DrawBottomLeftShadow( LCUI_PaintContext paint,
 	}
 }
 
-static void Graph_DrawBottomRightShadow( LCUI_PaintContext paint,
-					 const LCUI_Rect *box,
-					 const LCUI_BoxShadow *sd )
+static void BoxShadow_PaintBottomRight( const LCUI_BoxShadow *sd,
+					const LCUI_Rect *box,
+					LCUI_PaintContext paint )
 {
 	LCUI_Pos pos;
 	LCUI_Rect bound;
@@ -340,9 +328,9 @@ static void Graph_DrawBottomRightShadow( LCUI_PaintContext paint,
  * @param[in] box 可供绘制阴影的区域范围
  * @param[in] shadow 阴影参数
  */
-static void Graph_DrawTopShadow( LCUI_PaintContext paint,
-				 const LCUI_Rect *box,
-				 const LCUI_BoxShadow *sd )
+static void BoxShadow_PaintTop( const LCUI_BoxShadow *sd,
+				const LCUI_Rect *box,
+				LCUI_PaintContext paint )
 {
 	gradient_t g;
 	LCUI_Color color;
@@ -406,9 +394,9 @@ static void Graph_DrawTopShadow( LCUI_PaintContext paint,
 	}
 }
 
-static void Graph_DrawBottomShadow( LCUI_PaintContext paint,
-				    const LCUI_Rect *box,
-				    const LCUI_BoxShadow *sd )
+static void BoxShadow_PaintBottom( const LCUI_BoxShadow *sd,
+				   const LCUI_Rect *box,
+				   LCUI_PaintContext paint )
 {
 	gradient_t g;
 	LCUI_Color color;
@@ -454,7 +442,7 @@ static void Graph_DrawBottomShadow( LCUI_PaintContext paint,
 	for( t = area.y - shadow_area.y, y = area.y; y < bound_y; ++y, ++t ) {
 		color.alpha = gradient_compute( &g, t, sd->color.a );
 		for( x = area.x; x < bound_x; ++x ) {
-			if( y >= box_area.y && x >= box_area.x && 
+			if( y >= box_area.y && x >= box_area.x &&
 			    y < box_area.y + box_area.height &&
 			    x < box_area.x + box_area.width ) {
 				continue;
@@ -464,9 +452,9 @@ static void Graph_DrawBottomShadow( LCUI_PaintContext paint,
 	}
 }
 
-static void Graph_DrawLeftShadow( LCUI_PaintContext paint,
-				  const LCUI_Rect *box,
-				  const LCUI_BoxShadow *sd )
+static void BoxShadow_PaintLeft( const LCUI_BoxShadow *sd,
+				 const LCUI_Rect *box,
+				 LCUI_PaintContext paint )
 {
 	gradient_t g;
 	LCUI_Color color;
@@ -522,9 +510,9 @@ static void Graph_DrawLeftShadow( LCUI_PaintContext paint,
 	}
 }
 
-static void Graph_DrawRightShadow( LCUI_PaintContext paint,
-				   const LCUI_Rect *box,
-				   const LCUI_BoxShadow *sd )
+static void BoxShadow_PaintRight( const LCUI_BoxShadow *sd,
+				  const LCUI_Rect *box,
+				  LCUI_PaintContext paint )
 {
 	gradient_t g;
 	LCUI_Color color;
@@ -581,39 +569,9 @@ static void Graph_DrawRightShadow( LCUI_PaintContext paint,
 	}
 }
 
-void Graph_ClearShadowArea( LCUI_PaintContext paint,
-			    const LCUI_Rect *box,
-			    const LCUI_BoxShadow *shadow )
-{
-	int i;
-	LCUI_Graph canvas;
-	LCUI_Color color = { 0 };
-	LCUI_Rect rect, box_area, rects[4];
-
-	rect.width = box->width;
-	rect.height = box->height;
-	rect.x = rect.y = 0;
-	/* 获取内容框区域 */
-	box_area.x = box->x + BoxShadow_GetBoxX( shadow );
-	box_area.y = box->y + BoxShadow_GetBoxY( shadow );
-	box_area.width = BoxShadow_GetBoxWidth( shadow, box->width );
-	box_area.height = BoxShadow_GetBoxHeight( shadow, box->height );
-	/* 获取内容框外的阴影区域 */
-	LCUIRect_CutFourRect( &box_area, &rect, rects );
-	for( i = 0; i < 4; ++i ) {
-		if( LCUIRect_GetOverlayRect( &paint->rect,
-					     &rects[i], &rects[i] ) ) {
-			rects[i].x -= paint->rect.x;
-			rects[i].y -= paint->rect.y;
-			Graph_Quote( &canvas, &paint->canvas, &rects[i] );
-			Graph_FillRect( &canvas, color, NULL, TRUE );
-		}
-	}
-}
-
-static void Graph_DrawInnerShadow( LCUI_PaintContext paint,
-				   const LCUI_Rect *box,
-				   const LCUI_BoxShadow *s )
+static void BoxShadow_PaintInner( const LCUI_BoxShadow *s,
+				  const LCUI_Rect *box,
+				  LCUI_PaintContext paint )
 {
 	int i;
 	LCUI_Graph canvas;
@@ -622,17 +580,17 @@ static void Graph_DrawInnerShadow( LCUI_PaintContext paint,
 	rb.y = BoxShadow_GetBoxY( s );
 	rb.width = BoxShadow_GetBoxWidth( s, box->width );
 	rb.height = BoxShadow_GetBoxHeight( s, box->height );
-	rsd.x = BoxShadow_GetX( s ) + BLUR_WIDTH(s);
-	rsd.y = BoxShadow_GetY( s ) + BLUR_WIDTH(s);
-	rsd.width = rb.width + INNER_SHADOW_WIDTH(s)*2;
-	rsd.height = rb.height + INNER_SHADOW_WIDTH(s)*2;
+	rsd.x = BoxShadow_GetX( s ) + BLUR_WIDTH( s );
+	rsd.y = BoxShadow_GetY( s ) + BLUR_WIDTH( s );
+	rsd.width = rb.width + INNER_SHADOW_WIDTH( s ) * 2;
+	rsd.height = rb.height + INNER_SHADOW_WIDTH( s ) * 2;
 	/* 截取出与内容区重叠的区域 */
-	if( LCUIRect_GetOverlayRect(&rb, &rsd, &rb) ) {
+	if( LCUIRect_GetOverlayRect( &rb, &rsd, &rb ) ) {
 		LCUIRect_CutFourRect( &rb, &rsd, rects );
 		/* 从阴影区域中排除部件占用的区域 */
-		for( i=0; i<4; ++i ) {
+		for( i = 0; i < 4; ++i ) {
 			if( !LCUIRect_GetOverlayRect(
-				&paint->rect, &rects[i],&rects[i]) ) {
+				&paint->rect, &rects[i], &rects[i] ) ) {
 				continue;
 			}
 			rects[i].x -= paint->rect.x;
@@ -643,7 +601,7 @@ static void Graph_DrawInnerShadow( LCUI_PaintContext paint,
 		return;
 	}
 	/* 不重叠则直接填充 */
-	if( LCUIRect_GetOverlayRect(&paint->rect, &rsd, &rb) ) {
+	if( LCUIRect_GetOverlayRect( &paint->rect, &rsd, &rb ) ) {
 		rb.x -= paint->rect.x;
 		rb.y -= paint->rect.y;
 		Graph_Quote( &canvas, &paint->canvas, &rb );
@@ -662,23 +620,33 @@ void BoxShadow_Init( LCUI_BoxShadow *shadow )
 	shadow->y = 0;
 }
 
-int Graph_DrawBoxShadow( LCUI_PaintContext paint,
-			 const LCUI_Rect *box,
-			 const LCUI_BoxShadow *shadow )
+void BoxShadow_GetCanvasRect( const LCUI_BoxShadow *shadow,
+			      const LCUI_Rect *box_rect,
+			      LCUI_Rect *canvas_rect )
+{
+	canvas_rect->x = box_rect->x - BoxShadow_GetBoxX( shadow );
+	canvas_rect->y = box_rect->y - BoxShadow_GetBoxY( shadow );
+	canvas_rect->width = BoxShadow_GetWidth( shadow, box_rect->width );
+	canvas_rect->height = BoxShadow_GetHeight( shadow, box_rect->height );
+}
+
+int BoxShadow_Paint( const LCUI_BoxShadow *shadow,
+		     const LCUI_Rect *box,
+		     LCUI_PaintContext paint )
 {
 	/* 判断容器尺寸是否低于阴影占用的最小尺寸 */
-	if( box->width < BoxShadow_GetWidth(shadow, 0)
-	 || box->height < BoxShadow_GetHeight(shadow, 0) ) {
+	if( box->width < BoxShadow_GetWidth( shadow, 0 ) ||
+	    box->height < BoxShadow_GetHeight( shadow, 0 ) ) {
 		return -1;
 	}
-	Graph_DrawInnerShadow( paint, box, shadow );
-	Graph_DrawTopLeftShadow( paint, box, shadow );
-	Graph_DrawTopRightShadow( paint, box, shadow );
-	Graph_DrawBottomLeftShadow( paint, box, shadow );
-	Graph_DrawBottomRightShadow( paint, box, shadow );
-	Graph_DrawTopShadow( paint, box, shadow );
-	Graph_DrawBottomShadow( paint, box, shadow );
-	Graph_DrawLeftShadow( paint, box, shadow );
-	Graph_DrawRightShadow( paint, box, shadow );
+	BoxShadow_PaintInner( shadow, box, paint );
+	BoxShadow_PaintTopLeft( shadow, box, paint );
+	BoxShadow_PaintTopRight( shadow, box, paint );
+	BoxShadow_PaintBottomLeft( shadow, box, paint );
+	BoxShadow_PaintBottomRight( shadow, box, paint );
+	BoxShadow_PaintTop( shadow, box, paint );
+	BoxShadow_PaintBottom( shadow, box, paint );
+	BoxShadow_PaintLeft( shadow, box, paint );
+	BoxShadow_PaintRight( shadow, box, paint );
 	return 0;
 }

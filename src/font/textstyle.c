@@ -1,41 +1,32 @@
-﻿/* ***************************************************************************
+﻿/*
  * textstyle.c -- text style processing module.
  *
- * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
+ * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * This file is part of the LCUI project, and may only be used, modified, and
- * distributed under the terms of the GPLv2.
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of LCUI nor the names of its contributors may be used
+ *     to endorse or promote products derived from this software without
+ *     specific prior written permission.
  *
- * (GPLv2 is abbreviation of GNU General Public License Version 2)
- *
- * By continuing to use, modify, or distribute this file you indicate that you
- * have read the license and understand and accept it fully.
- *
- * The LCUI project is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- *
- * You should have received a copy of the GPLv2 along with this file. It is
- * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
- * ****************************************************************************/
-
-/* ****************************************************************************
- * textstyle.c -- 文本样式处理模块
- *
- * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
- *
- * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
- *
- * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- *
- * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- *
- * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
- * 定用途的隐含担保，详情请参照GPLv2许可协议。
- *
- * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>.
- * ****************************************************************************/
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #include <string.h>
 #include <stdlib.h>
@@ -64,6 +55,7 @@ void TextStyle_Init( LCUI_TextStyle data )
 	data->has_style = FALSE;
 	data->has_weight = FALSE;
 	data->has_family = FALSE;
+	data->has_pixel_size = FALSE;
 	data->has_back_color = FALSE;
 	data->has_fore_color = FALSE;
 	data->font_ids = NULL;
@@ -282,15 +274,16 @@ LCUI_TextStyle StyleTags_GetTextStyle( LinkedList *tags )
 /** 将指定标签的样式数据从队列中删除，只删除队列尾部第一个匹配的标签 */
 static void StyleTags_Delete( LinkedList *tags, int id )
 {
-	LCUI_TextStyleTag *p;
+	LCUI_TextStyleTag *tag;
 	LinkedListNode *node;
 	DEBUG_MSG( "delete start, total tag: %d\n", total );
 	if( tags->length <= 0 ) {
 		return;
 	}
 	for( LinkedList_Each( node, tags ) ) {
-		p = (LCUI_TextStyleTag*)node->data;
-		if( p->id == id ) {
+		tag = node->data;
+		if( tag->id == id ) {
+			free( tag );
 			LinkedList_DeleteNode( tags, node );
 			break;
 		}
@@ -517,7 +510,7 @@ const wchar_t *StyleTags_GetStart( LinkedList *tags, const wchar_t *str )
 	q = ScanStyleTagData( str, tag );
 	if( q ) {
 		/* 将标签样式数据加入队列 */
-		LinkedList_Append( tags, tag );
+		LinkedList_Insert( tags, 0, tag );
 	} else {
 		free( tag );
 	}

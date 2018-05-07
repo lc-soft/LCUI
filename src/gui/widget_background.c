@@ -1,41 +1,33 @@
-﻿/* ***************************************************************************
- * widget_background.c -- the widget background style processing module.
- * 
- * Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
- * 
- * This file is part of the LCUI project, and may only be used, modified, and
- * distributed under the terms of the GPLv2.
- * 
- * (GPLv2 is abbreviation of GNU General Public License Version 2)
- * 
- * By continuing to use, modify, or distribute this file you indicate that you
- * have read the license and understand and accept it fully.
- *  
- * The LCUI project is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- * 
- * You should have received a copy of the GPLv2 along with this file. It is 
- * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
- * ***************************************************************************/
- 
-/* ****************************************************************************
- * widget_background.c -- 部件背景样式处理模块
+﻿/*
+ * widget_background.c -- The widget background style processing module.
  *
- * 版权所有 (C) 2015-2017 归属于 刘超 <lc-soft@live.cn>
+ * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  * 
- * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- * 
- * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- * 
- * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
- * 定用途的隐含担保，详情请参照GPLv2许可协议。
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of LCUI nor the names of its contributors may be used
+ *     to endorse or promote products derived from this software without
+ *     specific prior written permission.
  *
- * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>. 
- * ***************************************************************************/
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -148,7 +140,7 @@ static void ExecLoadImage( void *arg1, void *arg2 )
 	}
 	Graph_Quote( &widget->computed_style.background.image,
 		     &cache->image, NULL );
-	Widget_AddTask( widget, WTT_BODY );
+	Widget_AddTask( widget, LCUI_WTASK_BODY );
 }
 
 static int OnCompareWidget( void *data, const void *keydata )
@@ -187,7 +179,7 @@ static void AsyncLoadImage( LCUI_Widget widget, const char *path )
 		AddImageRef( widget, cache );
 		Graph_Quote( &widget->computed_style.background.image,
 			     &cache->image, NULL );
-		Widget_AddTask( widget, WTT_BODY );
+		Widget_AddTask( widget, LCUI_WTASK_BODY );
 		return;
 	}
 	task.func = ExecLoadImage;
@@ -318,10 +310,9 @@ void Widget_UpdateBackground( LCUI_Widget widget )
 		default: break;
 		}
 	}
-	Widget_AddTask( widget, WTT_BODY );
+	Widget_AddTask( widget, LCUI_WTASK_BODY );
 }
 
-/** 计算部件背景样式的实际值 */
 void Widget_ComputeBackground( LCUI_Widget w, LCUI_Background *out )
 {
 	LCUI_StyleType type;
@@ -473,19 +464,13 @@ void Widget_ComputeBackground( LCUI_Widget w, LCUI_Background *out )
 	out->repeat.y = bg->repeat.y;
 }
 
-void Widget_PaintBakcground( LCUI_Widget w, LCUI_PaintContext paint )
+void Widget_PaintBakcground( LCUI_Widget w, LCUI_PaintContext paint,
+			     LCUI_WidgetActualStyle style )
 {
 	LCUI_Rect box;
-	LCUI_RectF fbox;
-	LCUI_Background background;
-	Widget_ComputeBackground( w, &background );
-	fbox.x = w->box.padding.x - w->box.graph.x;
-	fbox.y = w->box.padding.y - w->box.graph.y;
-	fbox.width = w->box.padding.width;
-	fbox.height = w->box.padding.height;
-	box.x = LCUIMetrics_ComputeActual( fbox.x, SVT_PX );
-	box.y = LCUIMetrics_ComputeActual( fbox.y, SVT_PX );
-	box.width = LCUIMetrics_ComputeActual( fbox.width, SVT_PX );
-	box.height = LCUIMetrics_ComputeActual( fbox.height, SVT_PX );
-	Graph_DrawBackground( paint, &box, &background );
+	box.x = style->padding_box.x - style->canvas_box.x;
+	box.y = style->padding_box.y - style->canvas_box.y;
+	box.width = style->padding_box.width;
+	box.height = style->padding_box.height;
+	Background_Paint( &style->background, &box, paint );
 }

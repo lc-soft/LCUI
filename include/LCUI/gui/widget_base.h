@@ -1,41 +1,32 @@
-﻿/* ***************************************************************************
- * widget_base.h -- the widget base operation set.
+﻿/*
+ * widget_base.h -- The widget base operation set.
  *
- * Copyright (C) 2012-2018 by Liu Chao <lc-soft@live.cn>
+ * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * This file is part of the LCUI project, and may only be used, modified, and
- * distributed under the terms of the GPLv2.
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of LCUI nor the names of its contributors may be used
+ *     to endorse or promote products derived from this software without
+ *     specific prior written permission.
  *
- * (GPLv2 is abbreviation of GNU General Public License Version 2)
- *
- * By continuing to use, modify, or distribute this file you indicate that you
- * have read the license and understand and accept it fully.
- *
- * The LCUI project is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- *
- * You should have received a copy of the GPLv2 along with this file. It is
- * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
- * ****************************************************************************/
-
-/* ****************************************************************************
- * widget_base.h -- 部件的基本操作集。
- *
- * 版权所有 (C) 2012-2018 归属于 刘超 <lc-soft@live.cn>
- *
- * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
- *
- * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- *
- * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- *
- * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
- * 定用途的隐含担保，详情请参照GPLv2许可协议。
- *
- * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>.
- * ****************************************************************************/
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #ifndef LCUI_WIDGET_BASE_H
 #define LCUI_WIDGET_BASE_H
@@ -67,54 +58,65 @@ typedef struct LCUI_WidgetStyle {
 	int pointer_events;			/**< 事件的处理方式 */
 } LCUI_WidgetStyle;
 
-/** 部件任务类型，按照任务的依赖顺序排列 */
-enum WidgetTaskType {
-	WTT_REFRESH_STYLE,	/**< 刷新部件全部样式 */
-	WTT_UPDATE_STYLE,	/**< 更新部件自定义样式 */
-	WTT_TITLE,
-	WTT_PROPS,		/**< 更新一些属性 */
-	WTT_BOX_SIZING,
-	WTT_PADDING,
-	WTT_MARGIN,
-	WTT_VISIBLE,
-	WTT_DISPLAY,
-	WTT_SHADOW,
-	WTT_BORDER,
-	WTT_BACKGROUND,
-	WTT_LAYOUT,
-	WTT_RESIZE,
-	WTT_RESIZE_WITH_SURFACE,
-	WTT_POSITION,
-	WTT_ZINDEX,
-	WTT_OPACITY,
-	WTT_BODY,
-	WTT_REFRESH,
-	WTT_USER,
-	WTT_TOTAL_NUM
-};
+typedef struct LCUI_WidgetActualStyleRec_ {
+	float x, y;
+	LCUI_Rect canvas_box;
+	LCUI_Rect border_box;
+	LCUI_Rect padding_box;
+	LCUI_Rect content_box;
+	LCUI_Border border;
+	LCUI_BoxShadow shadow;
+	LCUI_Background background;
+} LCUI_WidgetActualStyleRec, *LCUI_WidgetActualStyle;
 
-typedef struct LCUI_WidgetBoxRect {
+/** 部件任务类型，按照任务的依赖顺序排列 */
+typedef enum LCUI_WidgetTaskType {
+	LCUI_WTASK_REFRESH_STYLE,	/**< 刷新部件全部样式 */
+	LCUI_WTASK_UPDATE_STYLE,	/**< 更新部件自定义样式 */
+	LCUI_WTASK_TITLE,
+	LCUI_WTASK_PROPS,		/**< 更新一些属性 */
+	LCUI_WTASK_BOX_SIZING,
+	LCUI_WTASK_PADDING,
+	LCUI_WTASK_MARGIN,
+	LCUI_WTASK_VISIBLE,
+	LCUI_WTASK_DISPLAY,
+	LCUI_WTASK_SHADOW,
+	LCUI_WTASK_BORDER,
+	LCUI_WTASK_BACKGROUND,
+	LCUI_WTASK_LAYOUT,
+	LCUI_WTASK_RESIZE,
+	LCUI_WTASK_RESIZE_WITH_SURFACE,
+	LCUI_WTASK_POSITION,
+	LCUI_WTASK_ZINDEX,
+	LCUI_WTASK_OPACITY,
+	LCUI_WTASK_BODY,
+	LCUI_WTASK_REFRESH,
+	LCUI_WTASK_USER,
+	LCUI_WTASK_TOTAL_NUM
+} LCUI_WidgetTaskType;
+
+typedef struct LCUI_WidgetBoxModelRec_ {
 	LCUI_RectF content;	/**< 内容框的区域 */
 	LCUI_RectF padding;	/**< 内边距框的区域 */
 	LCUI_RectF border;	/**< 边框盒的区域，包括内边距框和内容框区域 */
 	LCUI_RectF outer;	/**< 外边距框的区域，包括边框盒和外边距框区域 */
-	LCUI_RectF graph;	/**< 图层的区域，包括边框盒和阴影区域 */
-} LCUI_WidgetBoxRect;
+	LCUI_RectF canvas;	/**< 图层的区域，包括边框盒和阴影区域 */
+} LCUI_WidgetBoxModelRec, *LCUI_WidgetBoxModel;
 
 typedef struct LCUI_WidgetTaskBoxRec_ {
 	LCUI_BOOL for_self;			/**< 标志，指示当前部件是否有待处理的任务 */
 	LCUI_BOOL for_children;			/**< 标志，指示是否有待处理的子级部件 */
-	LCUI_BOOL buffer[WTT_TOTAL_NUM];	/**< 记录缓存 */
+	LCUI_BOOL buffer[LCUI_WTASK_TOTAL_NUM];	/**< 记录缓存 */
 } LCUI_WidgetTaskBoxRec;
 
 /** 部件状态 */
 typedef enum LCUI_WidgetState {
-	WSTATE_CREATED = 0,
-	WSTATE_UPDATED,
-	WSTATE_LAYOUTED,
-	WSTATE_READY,
-	WSTATE_NORMAL,
-	WSTATE_DELETED,
+	LCUI_WSTATE_CREATED = 0,
+	LCUI_WSTATE_UPDATED,
+	LCUI_WSTATE_LAYOUTED,
+	LCUI_WSTATE_READY,
+	LCUI_WSTATE_NORMAL,
+	LCUI_WSTATE_DELETED,
 } LCUI_WidgetState;
 
 typedef struct LCUI_WidgetRec_* LCUI_Widget;
@@ -125,7 +127,8 @@ typedef void( *LCUI_WidgetFunction )(LCUI_Widget);
 typedef void( *LCUI_WidgetResizer )(LCUI_Widget, float*, float*);
 typedef void( *LCUI_WidgetAttrSetter )(LCUI_Widget, const char*, const char*);
 typedef void( *LCUI_WidgetTextSetter )(LCUI_Widget, const char*);
-typedef void( *LCUI_WidgetPainter )(LCUI_Widget, LCUI_PaintContext);
+typedef void( *LCUI_WidgetPainter )(LCUI_Widget, LCUI_PaintContext,
+				     LCUI_WidgetActualStyle);
 
 /** 部件原型数据结构 */
 typedef struct LCUI_WidgetPrototypeRec_ {
@@ -178,7 +181,7 @@ typedef struct LCUI_WidgetRec_ {
 	wchar_t			*title;			/**< 标题 */
 	LCUI_Rect2F		padding;		/**< 内边距框 */
 	LCUI_Rect2F		margin;			/**< 外边距框 */
-	LCUI_WidgetBoxRect	box;			/**< 部件的各个区域信息 */
+	LCUI_WidgetBoxModelRec	box;			/**< 部件的各个区域信息 */
 	LCUI_StyleSheet		style;			/**< 当前完整样式表 */
 	LCUI_StyleSheet		custom_style;		/**< 自定义样式表 */
 	LCUI_StyleSheet		inherited_style;	/**< 通过继承得到的样式表 */
@@ -222,6 +225,10 @@ typedef struct LCUI_WidgetRec_ {
 #define Widget_HasScaleSize(W) \
 (Widget_CheckStyleType( W, key_width, SCALE ) ||\
 Widget_CheckStyleType( W, key_height, SCALE ))
+
+#define Widget_HasParentDependentWidth(W) \
+	(Widget_CheckStyleType( W, key_width, scale ) &&\
+	!Widget_HasStaticWidthParent( W ))
 
 /** 部件是否有值为自动（默认）的样式 */
 LCUI_API LCUI_BOOL Widget_HasAutoStyle( LCUI_Widget w, int key );
@@ -294,17 +301,31 @@ LCUI_API void Widget_DestroyBackground( LCUI_Widget w );
 LCUI_API void Widget_UpdateBackground( LCUI_Widget widget );
 
 /** 绘制部件背景 */
-LCUI_API void Widget_PaintBakcground( LCUI_Widget w, LCUI_PaintContext paint );
+LCUI_API void Widget_PaintBakcground( LCUI_Widget w, LCUI_PaintContext paint,
+				      LCUI_WidgetActualStyle style );
+
+/** 计算部件背景样式的实际值 */
+LCUI_API void Widget_ComputeBackground( LCUI_Widget w, LCUI_Background *out );
 
 /** 更新部件边框样式 */
 LCUI_API void Widget_UpdateBorder( LCUI_Widget w );
 
+/** 计算部件边框样式的实际值 */
+LCUI_API void Widget_ComputeBorder( LCUI_Widget w, LCUI_Border *out );
+
 /** 绘制部件边框 */
-LCUI_API void Widget_PaintBorder( LCUI_Widget w, LCUI_PaintContext paint );
+LCUI_API void Widget_PaintBorder( LCUI_Widget w, LCUI_PaintContext paint,
+				  LCUI_WidgetActualStyle style );
 
-LCUI_API float Widget_GetGraphWidth( LCUI_Widget widget );
+LCUI_API float Widget_GetCanvasWidth( LCUI_Widget widget );
 
-LCUI_API float Widget_GetGraphHeight( LCUI_Widget widget );
+LCUI_API float Widget_GetCanvasHeight( LCUI_Widget widget );
+
+LCUI_API float Widget_GetLimitedWidth( LCUI_Widget w, float width );
+
+LCUI_API float Widget_GetLimitedHeight( LCUI_Widget w, float height );
+
+LCUI_API void Widget_AutoSize( LCUI_Widget w );
 
 /** 根据阴影参数获取部件区域的横向偏移距离 */
 LCUI_API float Widget_GetBoxShadowOffsetX( LCUI_Widget w );
@@ -313,16 +334,20 @@ LCUI_API float Widget_GetBoxShadowOffsetX( LCUI_Widget w );
 LCUI_API float Widget_GetBoxShadowOffsetY( LCUI_Widget w );
 
 /** 获取部件在添加阴影后的高度 */
-LCUI_API float Widget_GetGraphWidth( LCUI_Widget w );
+LCUI_API float Widget_GetCanvasWidth( LCUI_Widget w );
 
 /** 获取部件在添加阴影后的宽度 */
-LCUI_API float Widget_GetGraphWidth( LCUI_Widget w );
+LCUI_API float Widget_GetCanvasWidth( LCUI_Widget w );
 
 /** 更新部件矩形阴影样式 */
 LCUI_API void Widget_UpdateBoxShadow( LCUI_Widget w );
 
+/** 计算部件阴影样式的实际值 */
+LCUI_API void Widget_ComputeBoxShadow( LCUI_Widget w, LCUI_BoxShadow *out );
+
 /** 绘制部件阴影 */
-LCUI_API void Widget_PaintBoxShadow( LCUI_Widget w, LCUI_PaintContext paint );
+LCUI_API void Widget_PaintBoxShadow( LCUI_Widget w, LCUI_PaintContext paint,
+				     LCUI_WidgetActualStyle style );
 
 /** 更新可见性 */
 LCUI_API void Widget_UpdateVisibility( LCUI_Widget w );
@@ -411,8 +436,10 @@ LCUI_API float Widget_ComputeMaxContentWidth( LCUI_Widget w );
 /** 计算部件的最大可用宽度 */
 LCUI_API float Widget_ComputeMaxAvaliableWidth( LCUI_Widget widget );
 
+LCUI_API void Widget_ComputeLimitSize( LCUI_Widget w );
+
 /** 从部件中移除一个状态 */
-int Widget_RemoveStatus( LCUI_Widget w, const char *status_name );
+LCUI_API int Widget_RemoveStatus( LCUI_Widget w, const char *status_name );
 
 /** 打印部件树 */
 LCUI_API void Widget_PrintTree( LCUI_Widget w );

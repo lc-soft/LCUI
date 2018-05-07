@@ -5,7 +5,7 @@
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/textview.h>
 
-int test_widget_render( void )
+int main( void )
 {
 	int ret;
 	LCUI_Graph canvas;

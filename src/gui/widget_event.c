@@ -1,42 +1,33 @@
-﻿/* ***************************************************************************
+﻿/*
  * widget_event.c -- LCUI widget event module.
  *
- * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
+ * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * This file is part of the LCUI project, and may only be used, modified, and
- * distributed under the terms of the GPLv2.
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of LCUI nor the names of its contributors may be used
+ *     to endorse or promote products derived from this software without
+ *     specific prior written permission.
  *
- * (GPLv2 is abbreviation of GNU General Public License Version 2)
- *
- * By continuing to use, modify, or distribute this file you indicate that you
- * have read the license and understand and accept it fully.
- *
- * The LCUI project is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- *
- * You should have received a copy of the GPLv2 along with this file. It is
- * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
- * ***************************************************************************/
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
 
-/* ****************************************************************************
- * widget_event.c -- LCUI部件事件模块
- *
- * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
- *
- * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
- *
- * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- *
- * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- *
- * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
- * 定用途的隐含担保，详情请参照GPLv2许可协议。
- *
- * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>.
- * ***************************************************************************/
-//#define DEBUG
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -123,14 +114,14 @@ static void DestroyEventMapping( void *data )
 static void DestroyWidgetEvent( LCUI_WidgetEvent e )
 {
 	switch( e->type ) {
-	case WET_TOUCH:
+	case LCUI_WEVENT_TOUCH:
 		if( e->touch.points ) {
 			free( e->touch.points );
 		}
 		e->touch.points = NULL;
 		e->touch.n_points = 0;
 		break;
-	case WET_TEXTINPUT:
+	case LCUI_WEVENT_TEXTINPUT:
 		if( e->text.text ) {
 			free( e->text.text );
 		}
@@ -253,7 +244,7 @@ static int CopyWidgetEvent( LCUI_WidgetEvent dst,
 
 	*dst = *src;
 	switch( src->type ) {
-	case WET_TOUCH:
+	case LCUI_WEVENT_TOUCH:
 		if( dst->touch.n_points <= 0 ) {
 			break;
 		}
@@ -266,7 +257,7 @@ static int CopyWidgetEvent( LCUI_WidgetEvent dst,
 		memcpy( dst->touch.points,
 			src->touch.points, size );
 		break;
-	case WET_TEXTINPUT:
+	case LCUI_WEVENT_TEXTINPUT:
 		if( !dst->text.text ) {
 			break;
 		}
@@ -496,17 +487,18 @@ static LCUI_Widget Widget_GetNextAt( LCUI_Widget widget, int x, int y )
 	return NULL;
 }
 
-static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEventPack pack )
+static int Widget_TriggerEventEx( LCUI_Widget widget,
+				  LCUI_WidgetEventPack pack )
 {
 	LCUI_WidgetEvent e = &pack->event;
 	pack->widget = widget;
 	switch( e->type ) {
-	case WET_CLICK:
-	case WET_MOUSEDOWN:
-	case WET_MOUSEUP:
-	case WET_MOUSEMOVE:
-	case WET_MOUSEOVER:
-	case WET_MOUSEOUT:
+	case LCUI_WEVENT_CLICK:
+	case LCUI_WEVENT_MOUSEDOWN:
+	case LCUI_WEVENT_MOUSEUP:
+	case LCUI_WEVENT_MOUSEMOVE:
+	case LCUI_WEVENT_MOUSEOVER:
+	case LCUI_WEVENT_MOUSEOUT:
 		if( widget->computed_style.pointer_events == SV_NONE ) {
 			break;
 		}
@@ -531,15 +523,15 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEventPack pack 
 		float  x, y;
 
 		switch( e->type ) {
-		case WET_CLICK:
-		case WET_MOUSEDOWN:
-		case WET_MOUSEUP:
+		case LCUI_WEVENT_CLICK:
+		case LCUI_WEVENT_MOUSEDOWN:
+		case LCUI_WEVENT_MOUSEUP:
 			pointer_x = e->button.x;
 			pointer_y = e->button.y;
 			break;
-		case WET_MOUSEMOVE:
-		case WET_MOUSEOVER:
-		case WET_MOUSEOUT:
+		case LCUI_WEVENT_MOUSEMOVE:
+		case LCUI_WEVENT_MOUSEOVER:
+		case LCUI_WEVENT_MOUSEOUT:
 			pointer_x = e->motion.x;
 			pointer_y = e->motion.y;
 			break;
@@ -577,7 +569,7 @@ LCUI_BOOL Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent ev,
 	LCUI_Event sys_ev;
 	LCUI_TaskRec task;
 	LCUI_WidgetEventPack pack;
-	if( widget->state == WSTATE_DELETED ) {
+	if( widget->state == LCUI_WSTATE_DELETED ) {
 		return FALSE;
 	}
 	if( !ev->target ) {
@@ -658,7 +650,7 @@ static void Widget_UpdateStatus( LCUI_Widget widget, int type )
 	}
 	i = depth;
 	for( w = old_w; w != root && w; w = w->parent ) {
-		if( w->state == WSTATE_DELETED ) {
+		if( w->state == LCUI_WSTATE_DELETED ) {
 			depth = i;
 			old_w = w;
 		}
@@ -672,7 +664,7 @@ static void Widget_UpdateStatus( LCUI_Widget widget, int type )
 			Widget_AddStatus( new_w, sname );
 			if( type == WST_HOVER ) {
 				e.target = w;
-				e.type = WET_MOUSEOVER;
+				e.type = LCUI_WEVENT_MOUSEOVER;
 				e.cancel_bubble = FALSE;
 				Widget_PostEvent( new_w, &e, NULL, NULL );
 			}
@@ -682,7 +674,7 @@ static void Widget_UpdateStatus( LCUI_Widget widget, int type )
 			Widget_RemoveStatus( old_w, sname );
 			if( type == WST_HOVER ) {
 				e.target = old_w;
-				e.type = WET_MOUSEOUT;
+				e.type = LCUI_WEVENT_MOUSEOUT;
 				e.cancel_bubble = FALSE;
 				Widget_PostEvent( old_w, &e, NULL, NULL );
 			}
@@ -738,7 +730,7 @@ int LCUIWidget_SetFocus( LCUI_Widget widget )
 		return 0;
 	}
 	if( self.targets[WST_FOCUS] ) {
-		ev.type = WET_BLUR;
+		ev.type = LCUI_WEVENT_BLUR;
 		ev.target = self.targets[WST_FOCUS];
 		Widget_RemoveStatus( ev.target, "focus" );
 		Widget_PostEvent( ev.target, &ev, NULL, NULL );
@@ -747,7 +739,7 @@ int LCUIWidget_SetFocus( LCUI_Widget widget )
 		return -1;
 	}
 	ev.target = w;
-	ev.type = WET_FOCUS;
+	ev.type = LCUI_WEVENT_FOCUS;
 	ev.cancel_bubble = FALSE;
 	self.targets[WST_FOCUS] = w;
 	Widget_AddStatus( ev.target, "focus" );
@@ -785,7 +777,7 @@ static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 	ev.cancel_bubble = FALSE;
 	switch( sys_ev->type ) {
 	case LCUI_MOUSEDOWN:
-		ev.type = WET_MOUSEDOWN;
+		ev.type = LCUI_WEVENT_MOUSEDOWN;
 		ev.button.x = pos.x;
 		ev.button.y = pos.y;
 		ev.button.button = sys_ev->button.button;
@@ -807,7 +799,7 @@ static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 		LCUIWidget_SetFocus( target );
 		break;
 	case LCUI_MOUSEUP:
-		ev.type = WET_MOUSEUP;
+		ev.type = LCUI_WEVENT_MOUSEUP;
 		ev.button.x = pos.x;
 		ev.button.y = pos.y;
 		ev.button.button = sys_ev->button.button;
@@ -821,7 +813,7 @@ static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 			Widget_UpdateStatus( NULL, WST_ACTIVE );
 			break;
 		}
-		ev.type = WET_CLICK;
+		ev.type = LCUI_WEVENT_CLICK;
 		Widget_PostEvent( target, &ev, NULL, NULL );
 		Widget_UpdateStatus( NULL, WST_ACTIVE );
 		if(self.click.widget != target ) {
@@ -832,7 +824,7 @@ static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 			break;
 		}
 		if( self.click.interval < DBLCLICK_INTERVAL ) {
-			ev.type = WET_DBLCLICK;
+			ev.type = LCUI_WEVENT_DBLCLICK;
 			self.click.x = 0;
 			self.click.y = 0;
 			self.click.time = 0;
@@ -842,7 +834,7 @@ static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 		Widget_UpdateStatus( NULL, WST_ACTIVE );
 		break;
 	case LCUI_MOUSEMOVE:
-		ev.type = WET_MOUSEMOVE;
+		ev.type = LCUI_WEVENT_MOUSEMOVE;
 		ev.motion.x = pos.x;
 		ev.motion.y = pos.y;
 		if( abs( self.click.x - pos.x ) >= 8 ||
@@ -853,7 +845,7 @@ static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 		Widget_PostEvent( target, &ev, NULL, NULL );
 		break;
 	case LCUI_MOUSEWHEEL:
-		ev.type = WET_MOUSEWHEEL;
+		ev.type = LCUI_WEVENT_MOUSEWHEEL;
 		ev.wheel.x = pos.x;
 		ev.wheel.y = pos.y;
 		ev.wheel.delta = sys_ev->wheel.delta;
@@ -870,9 +862,9 @@ static void OnKeyboardEvent( LCUI_SysEvent e, void *arg )
 		return;
 	}
 	switch( e->type ) {
-	case LCUI_KEYDOWN: ev.type = WET_KEYDOWN; break;
-	case LCUI_KEYUP: ev.type = WET_KEYUP; break;
-	case LCUI_KEYPRESS: ev.type = WET_KEYPRESS; break;
+	case LCUI_KEYDOWN: ev.type = LCUI_WEVENT_KEYDOWN; break;
+	case LCUI_KEYUP: ev.type = LCUI_WEVENT_KEYUP; break;
+	case LCUI_KEYPRESS: ev.type = LCUI_WEVENT_KEYPRESS; break;
 	default: return;
 	}
 	ev.target = self.targets[WST_FOCUS];
@@ -890,7 +882,7 @@ static void OnTextInput( LCUI_SysEvent e, void *arg )
 		return;
 	}
 	ev.target = target;
-	ev.type = WET_TEXTINPUT;
+	ev.type = LCUI_WEVENT_TEXTINPUT;
 	ev.cancel_bubble = FALSE;
 	ev.text.length = e->text.length;
 	ev.text.text = NEW( wchar_t, e->text.length + 1 );
@@ -908,9 +900,9 @@ static void ConvertTouchPoint( LCUI_TouchPoint point )
 {
 	float scale;
 	switch( point->state ) {
-	case LCUI_TOUCHDOWN: point->state = WET_TOUCHDOWN; break;
-	case LCUI_TOUCHUP: point->state = WET_TOUCHUP; break;
-	case LCUI_TOUCHMOVE: point->state = WET_TOUCHMOVE; break;
+	case LCUI_TOUCHDOWN: point->state = LCUI_WEVENT_TOUCHDOWN; break;
+	case LCUI_TOUCHUP: point->state = LCUI_WEVENT_TOUCHUP; break;
+	case LCUI_TOUCHMOVE: point->state = LCUI_WEVENT_TOUCHMOVE; break;
 	default:break;
 	}
 	scale = LCUIMetrics_GetScale();
@@ -923,17 +915,21 @@ static int DispatchTouchEvent( LinkedList *capturers,
 			       LCUI_TouchPoint points, int n_points )
 {
 	int i, count;
+	float scale;
 	LCUI_WidgetEventRec ev = { 0 };
 	LCUI_Widget target, root, w;
 	LinkedListNode *node, *ptnode;
 
-	ev.type = WET_TOUCH;
-	ev.cancel_bubble = FALSE;
 	root = LCUIWidget_GetRoot();
+	scale = LCUIMetrics_GetScale();
+	ev.type = LCUI_WEVENT_TOUCH;
+	ev.cancel_bubble = FALSE;
 	ev.touch.points = NEW( LCUI_TouchPointRec, n_points );
 	/* 先将各个触点按命中的部件进行分组 */
 	for( i = 0; i < n_points; ++i ) {
-		target = Widget_At( root, points[i].x, points[i].y );
+		target = Widget_At( root,
+				    iround( points[i].x / scale ),
+				    iround( points[i].y / scale ) );
 		if( !target ) {
 			continue;
 		}
@@ -1049,7 +1045,7 @@ int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type,
 		return -1;
 	}
 	e.target = w;
-	e.type = WET_SURFACE;
+	e.type = LCUI_WEVENT_SURFACE;
 	e.cancel_bubble = TRUE;
 	data = malloc( sizeof( int ) * 2 );
 	if( !data ) {
@@ -1074,33 +1070,34 @@ void LCUIWidget_InitEvent(void)
 		int id;
 		const char *name;
 	} mappings[] = {
-		{ WET_READY, "ready" },
-		{ WET_REMOVE, "remove" },
-		{ WET_DESTROY, "destroy" },
-		{ WET_MOUSEDOWN, "mousedown" },
-		{ WET_MOUSEUP, "mouseup" },
-		{ WET_MOUSEMOVE, "mousemove" },
-		{ WET_MOUSEWHEEL, "mousewheel" },
-		{ WET_CLICK, "click" },
-		{ WET_DBLCLICK, "dblclick" },
-		{ WET_MOUSEOUT, "mouseout" },
-		{ WET_MOUSEOVER, "mouseover" },
-		{ WET_KEYDOWN, "keydown" },
-		{ WET_KEYUP, "keyup" },
-		{ WET_KEYPRESS, "keypress" },
-		{ WET_TOUCH, "touch" },
-		{ WET_TEXTINPUT, "textinput" },
-		{ WET_TOUCHDOWN, "touchdown" },
-		{ WET_TOUCHMOVE, "touchmove" },
-		{ WET_TOUCHUP, "touchup" },
-		{ WET_RESIZE, "resize" },
-		{ WET_AFTERLAYOUT, "afterlayout" },
-		{ WET_FOCUS, "focus" },
-		{ WET_BLUR, "blur" },
-		{ WET_SHOW, "show" },
-		{ WET_HIDE, "hide" },
-		{ WET_SURFACE, "surface" },
-		{ WET_TITLE, "title" }
+		{ LCUI_WEVENT_LINK, "link" },
+		{ LCUI_WEVENT_UNLINK, "unlink" },
+		{ LCUI_WEVENT_READY, "ready" },
+		{ LCUI_WEVENT_DESTROY, "destroy" },
+		{ LCUI_WEVENT_MOUSEDOWN, "mousedown" },
+		{ LCUI_WEVENT_MOUSEUP, "mouseup" },
+		{ LCUI_WEVENT_MOUSEMOVE, "mousemove" },
+		{ LCUI_WEVENT_MOUSEWHEEL, "mousewheel" },
+		{ LCUI_WEVENT_CLICK, "click" },
+		{ LCUI_WEVENT_DBLCLICK, "dblclick" },
+		{ LCUI_WEVENT_MOUSEOUT, "mouseout" },
+		{ LCUI_WEVENT_MOUSEOVER, "mouseover" },
+		{ LCUI_WEVENT_KEYDOWN, "keydown" },
+		{ LCUI_WEVENT_KEYUP, "keyup" },
+		{ LCUI_WEVENT_KEYPRESS, "keypress" },
+		{ LCUI_WEVENT_TOUCH, "touch" },
+		{ LCUI_WEVENT_TEXTINPUT, "textinput" },
+		{ LCUI_WEVENT_TOUCHDOWN, "touchdown" },
+		{ LCUI_WEVENT_TOUCHMOVE, "touchmove" },
+		{ LCUI_WEVENT_TOUCHUP, "touchup" },
+		{ LCUI_WEVENT_RESIZE, "resize" },
+		{ LCUI_WEVENT_AFTERLAYOUT, "afterlayout" },
+		{ LCUI_WEVENT_FOCUS, "focus" },
+		{ LCUI_WEVENT_BLUR, "blur" },
+		{ LCUI_WEVENT_SHOW, "show" },
+		{ LCUI_WEVENT_HIDE, "hide" },
+		{ LCUI_WEVENT_SURFACE, "surface" },
+		{ LCUI_WEVENT_TITLE, "title" }
 	};
 	LCUIMutex_Init( &self.mutex );
 	RBTree_Init( &self.event_names );
@@ -1116,7 +1113,7 @@ void LCUIWidget_InitEvent(void)
 	self.click.time = 0;
 	self.click.widget= NULL;
 	self.click.interval = DBLCLICK_INTERVAL;
-	self.base_event_id = WET_USER + 1000;
+	self.base_event_id = LCUI_WEVENT_USER + 1000;
 	self.event_ids = Dict_Create( &DictType_StringKey, NULL );
 	n = sizeof( mappings ) / sizeof( mappings[0] );
 	for( i = 0; i < n; ++i ) {
