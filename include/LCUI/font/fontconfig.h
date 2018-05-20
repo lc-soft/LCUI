@@ -33,7 +33,7 @@
 
 LCUI_BEGIN_HEADER
 
-char* Fontconfig_GetPath( char* name );
+LCUI_API char *Fontconfig_GetPath(const char *name);
 
 LCUI_END_HEADER
 

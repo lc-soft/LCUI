@@ -1,4 +1,4 @@
-/* ***************************************************************************
+/*
  * fontconfig.c -- The Fontconfig support module.
  *
  * Copyright (c) 2018, Liu Chao <lc-soft@live.cn> All rights reserved.
@@ -35,32 +35,34 @@
 #include <string.h>
 #include <fontconfig/fontconfig.h>
 
-char* Fontconfig_GetPath( char* name )
+char *Fontconfig_GetPath(const char *name)
 {
 #ifdef USE_FONTCONFIG
-	FcConfig* config = FcInitLoadConfigAndFonts();
-	char* path = "";
-
-	FcPattern* pat = FcNameParse( (const FcChar8*)name );
-	FcConfigSubstitute( config, pat, FcMatchPattern );
-	FcDefaultSubstitute( pat );
+	char *path = NULL;
+	size_t path_len;
 
 	FcResult result;
-	FcPattern* font = FcFontMatch( config, pat, &result );
+	FcPattern *font;
+	FcChar8 *file = NULL;
+	FcConfig *config = FcInitLoadConfigAndFonts();
+	FcPattern *pat = FcNameParse((const FcChar8 *)name);
 
-	if( font ) {
-		FcChar8* file = NULL;
-		if( FcPatternGetString( font, FC_FILE, 0, &file ) == FcResultMatch ) {
-			size_t path_len = strlen( (char*)file ) + 1;
-			path = (char*)malloc( path_len );
-			memset( path, '\0', path_len );
-			strncpy( path, (char*)file, path_len );
+	FcConfigSubstitute(config, pat, FcMatchPattern);
+	FcDefaultSubstitute(pat);
+
+	if ((font = FcFontMatch(config, pat, &result))) {
+		if (FcPatternGetString(font, FC_FILE, 0, &file) ==
+		    FcResultMatch) {
+			path_len = strlen((char *)file);
+			path = (char *)malloc(path_len + 1);
+			strncpy(path, (char *)file, path_len);
+			path[path_len] = 0;
 		}
-		FcPatternDestroy( font );
+		FcPatternDestroy(font);
 	}
 
-	FcPatternDestroy( pat );
-	FcConfigDestroy( config );
+	FcPatternDestroy(pat);
+	FcConfigDestroy(config);
 
 	return path;
 #else
