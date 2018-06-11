@@ -34,6 +34,8 @@ test/test_image_reader.c \
 test/test_image_reader.bmp \
 test/test_image_reader.jpg \
 test/test_image_reader.png \
+test/test_scrollbar.c \
+test/test_scrollbar.xml \
 test/test_widget_layout.c \
 test/test_widget_layout.css \
 test/test_widget_layout.xml \
