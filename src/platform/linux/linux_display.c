@@ -43,7 +43,7 @@ static enum DisplayDriver {
 	X11
 } driver_type;
 
-LCUI_DisplayDriver LCUI_CreateLinuxDisplayDriver( void )
+LCUI_DisplayDriver LCUI_CreateLinuxDisplayDriver(void)
 {
 	LCUI_DisplayDriver driver = NULL;
 #ifdef LCUI_VIDEO_DRIVER_X11
@@ -59,17 +59,17 @@ LCUI_DisplayDriver LCUI_CreateLinuxDisplayDriver( void )
 	return driver;
 }
 
-void LCUI_DestroyLinuxDisplayDriver( LCUI_DisplayDriver driver )
+void LCUI_DestroyLinuxDisplayDriver(LCUI_DisplayDriver driver)
 {
 	switch (driver_type) {
 #ifdef LCUI_VIDEO_DRIVER_X11
 	case X11:
-		LCUI_DestroyLinuxX11DisplayDriver( driver );
+		LCUI_DestroyLinuxX11DisplayDriver(driver);
 		break;
 #endif
-#ifdef LCUI_VIDEO_DRIVER_X11
+#ifdef LCUI_VIDEO_DRIVER_FRAMEBUFFER
 	case FRAMEBUFFER:
-		LCUI_DestroyLinuxFBDisplayDriver( driver );
+		LCUI_DestroyLinuxFBDisplayDriver(driver);
 		break;
 #endif
 	default:
