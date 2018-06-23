@@ -415,7 +415,7 @@ static int Graph_CutARGB(const LCUI_Graph *graph, LCUI_Rect rect,
 	return 0;
 }
 
-/* FIXME: imrpove alpha blending method
+/* FIXME: improve alpha blending method
  * Existing alpha blending methods are inefficient and need to be optimized
  */
 
