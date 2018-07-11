@@ -22,8 +22,6 @@ Stack Overflow is a much better place to ask questions since:
 
 To save your and our time, we will systematically close all issues that are requests for general support and redirect people to Stack Overflow.
 
-If you would like to chat about the question in real-time, you can reach out via [our gitter channel][gitter].
-
 ## Issues and Bugs
 
 If you find a bug in the source code, you can help us by
@@ -164,24 +162,6 @@ reference GitHub issues that this commit **Closes**.
 
 **Breaking Changes** should start with the word `BREAKING CHANGE:` with a space or two newlines. The rest of the commit message is then used for this.
 
-## Financial Contribution
-
-As a pure community-driven project without major corporate backing, we also welcome financial contributions via Patreon or OpenCollective.
-
-- [Become a backer or sponsor on Patreon](https://www.patreon.com/lcsoft)
-- [Become a backer or sponsor on OpenCollective](https://opencollective.com/LCUI)
-
-**What's the difference between Patreon and OpenCollective?**
-
-Funds donated via Patreon goes directly to support Liu Chao's full-time work on LCUI. Funds donated via OpenCollective are managed with transparent expenses and will be used for compensating work and expenses by core team members or sponsoring community events. Your name/logo will receive proper recognition and exposure by donating on either platform.
-
-## Credits
-
-Thank you to all the people who have already contributed to LCUI!
-
-[![contributors](https://opencollective.com/LCUI/contributors.svg?width=890)](https://github.com/lc-soft/LCUI/graphs/contributors)
-
 [coc]: CODE_OF_CONDUCT.md
 [github]: https://github.com/lc-soft/LCUI
-[gitter]: https://gitter.im/lc-soft/LCUI
 [stackoverflow]: http://stackoverflow.com/questions/tagged/LCUI
