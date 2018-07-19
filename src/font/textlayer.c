@@ -29,7 +29,7 @@
  */
 
 #include <stdlib.h>
-#include <ctype.h>
+#include <wctype.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
@@ -625,7 +625,7 @@ static void TextLayer_TextRowTypeset(LCUI_TextLayer layer, int row)
 		if (!txtchar->bitmap) {
 			continue;
 		}
-		if (!isalpha(txtchar->code)) {
+		if (!iswalpha(txtchar->code)) {
 			word_col = col + 1;
 		}
 		/* 累加行宽度 */
