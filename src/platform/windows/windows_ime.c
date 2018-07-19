@@ -60,17 +60,12 @@ static void WinIME_OnChar(LCUI_Event e, void *arg)
 	LCUIIME_Commit(text, 2);
 }
 
-/**
-* 输入法被打开时的处理
-* 可以在输入法被打开时，初始化相关数据，链接至词库什么的
-**/
 static LCUI_BOOL IME_Open(void)
 {
 	LCUI_BindSysEvent(WM_CHAR, WinIME_OnChar, NULL, NULL);
 	return TRUE;
 }
 
-/** 输入法被关闭时的处理 */
 static LCUI_BOOL IME_Close(void)
 {
 	LCUI_UnbindSysEvent(WM_CHAR, WinIME_OnChar);

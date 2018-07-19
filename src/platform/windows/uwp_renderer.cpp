@@ -274,7 +274,7 @@ LCUI_DisplayDriver LCUI_CreateUWPDisplay(void)
 	driver->endPaint = UWPSurface_EndPaint;
 	driver->bindEvent = UWPDisplay_BindEvent;
 	Graph_Init(&display.frame);
-	display.frame.color_type = COLOR_TYPE_ARGB;
+	display.frame.color_type = LCUI_COLOR_TYPE_ARGB;
 	display.surface = NULL;
 	display.trigger = EventTrigger();
 	display.is_inited = TRUE;

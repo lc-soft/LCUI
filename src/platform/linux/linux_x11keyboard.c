@@ -135,6 +135,8 @@ static void OnKeyboardMessage(LCUI_Event ev, void *arg)
 	_DEBUG_MSG("keycode: %d, keyscancode: %u, keysym: %lu\n", keysym,
 		   x_ev->xkey.keycode, keysym);
 	sys_ev.key.code = ConvertKeyCode(keysym);
+	sys_ev.key.shift_key = x_ev->xkey.state & ShiftMask ? TRUE : FALSE;
+	sys_ev.key.ctrl_key = x_ev->xkey.state & ControlMask ? TRUE : FALSE;
 	_DEBUG_MSG("shift: %d, ctrl: %d\n", sys_ev.key.shift_key,
 		   sys_ev.key.ctrl_key);
 	LCUI_TriggerEvent(&sys_ev, NULL);

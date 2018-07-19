@@ -68,8 +68,16 @@ typedef struct LCUI_PaintEvent_ {
 	LCUI_Rect rect;
 } LCUI_PaintEvent;
 
+/** The event structure to describe a user interaction with the keyboard */
 typedef struct LCUI_KeyboardEvent_ {
+	/** The virtual-key code of the nonsystem key */
 	int code;
+
+	/** whether the Ctrl key was active when the key event was generated */
+	LCUI_BOOL ctrl_key;
+
+	/** whether the Shift key was active when the key event was generated */
+	LCUI_BOOL shift_key;
 } LCUI_KeyboardEvent;
 
 typedef struct LCUI_MouseMotionEvent_ {

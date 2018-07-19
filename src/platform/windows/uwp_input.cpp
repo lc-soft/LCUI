@@ -35,10 +35,10 @@
 #include <LCUI/ime.h>
 
 using namespace LCUICore;
+using namespace Windows::UI;
 using namespace Windows::UI::Core;
 using namespace Windows::UI::Input;
 using namespace Windows::Devices::Input;
-using namespace Windows::UI;
 using namespace Windows::Foundation;
 using namespace Windows::System;
 
@@ -253,6 +253,8 @@ void InputDriver::OnKeyDown(CoreWindow^ sender, KeyEventArgs^ args)
 {
 	LCUI_SysEventRec ev;
 	ev.type = LCUI_KEYDOWN;
+	ev.key.ctrl_key = FALSE;
+	ev.key.shift_key = FALSE;
 	ev.key.code = static_cast<int>(args->VirtualKey);
 	LCUI_TriggerEvent(&ev, NULL);
 	LCUI_DestroyEvent(&ev);
@@ -262,6 +264,8 @@ void InputDriver::OnKeyUp(CoreWindow^ sender, KeyEventArgs^ args)
 {
 	LCUI_SysEventRec ev;
 	ev.type = LCUI_KEYUP;
+	ev.key.ctrl_key = FALSE;
+	ev.key.shift_key = FALSE;
 	ev.key.code = static_cast<int>(args->VirtualKey);
 	LCUI_TriggerEvent(&ev, NULL);
 	LCUI_DestroyEvent(&ev);

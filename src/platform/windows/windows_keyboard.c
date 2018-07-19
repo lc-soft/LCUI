@@ -38,19 +38,20 @@
 static void OnKeyboardMessage(LCUI_Event ev, void *arg)
 {
 	MSG* msg = arg;
-	static POINT mouse_pos;
 	LCUI_SysEventRec sys_ev;
+
 	switch (msg->message) {
 	case WM_KEYDOWN:
 		sys_ev.type = LCUI_KEYDOWN;
-		sys_ev.key.code = msg->wParam;
 		break;
 	case WM_KEYUP:
 		sys_ev.type = LCUI_KEYUP;
-		sys_ev.key.code = msg->wParam;
 		break;
 	default: return;
 	}
+	sys_ev.key.code = msg->wParam;
+	sys_ev.key.shift_key = (GetKeyState(VK_SHIFT) & 0x8000) ? TRUE : FALSE;
+	sys_ev.key.ctrl_key = (GetKeyState(VK_CONTROL) & 0x8000) ? TRUE : FALSE;
 	LCUI_TriggerEvent(&sys_ev, NULL);
 }
 
