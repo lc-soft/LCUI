@@ -38,9 +38,82 @@
 #include LCUI_KEYBOARD_H
 #include <X11/XKBlib.h>
 
+static int ConvertKeyCode(KeySym keysym)
+{
+	switch (keysym) {
+	case XK_Tab:
+		return LCUI_KEY_TAB;
+	case XK_Escape:
+		return LCUI_KEY_ESCAPE;
+	case XK_Return:
+		return LCUI_KEY_ENTER;
+	case XK_Delete:
+		return LCUI_KEY_DELETE;
+	case XK_BackSpace:
+		return LCUI_KEY_BACKSPACE;
+	case XK_Home:
+		return LCUI_KEY_HOME;
+	case XK_Left:
+		return LCUI_KEY_LEFT;
+	case XK_Up:
+		return LCUI_KEY_UP;
+	case XK_Right:
+		return LCUI_KEY_RIGHT;
+	case XK_Down:
+		return LCUI_KEY_DOWN;
+	case XK_Page_Up:
+		return LCUI_KEY_PAGEUP;
+	case XK_Page_Down:
+		return LCUI_KEY_PAGEDOWN;
+	case XK_End:
+		return LCUI_KEY_END;
+	case XK_Control_R:
+	case XK_Control_L:
+		return LCUI_KEY_CONTROL;
+	case XK_Shift_R:
+	case XK_Shift_L:
+		return LCUI_KEY_SHIFT;
+	case XK_Alt_L:
+	case XK_Alt_R:
+		return LCUI_KEY_ALT;
+	case XK_Caps_Lock:
+		return LCUI_KEY_CAPITAL;
+	case XK_comma:
+		return LCUI_KEY_COMMA;
+	case XK_period:
+		return LCUI_KEY_PERIOD;
+	case XK_minus:
+		return LCUI_KEY_MINUS;
+	case XK_slash:
+		return LCUI_KEY_SLASH;
+	case XK_semicolon:
+		return LCUI_KEY_SEMICOLON;
+	case XK_equal:
+		return LCUI_KEY_EQUAL;
+	case XK_bracketleft:
+		return LCUI_KEY_BRACKETLEFT;
+	case XK_bracketright:
+		return LCUI_KEY_BRACKETRIGHT;
+	case XK_backslash:
+		return LCUI_KEY_BACKSLASH;
+	case XK_apostrophe:
+		return LCUI_KEY_APOSTROPHE;
+	case XK_grave:
+		return LCUI_KEY_GRAVE;
+	default:
+		break;
+	}
+	return keysym;
+}
+
+static int ConvertKeyCodeToChar(LCUI_X11AppDriver x11, XEvent *e)
+{
+	return XkbKeycodeToKeysym(x11->display, e->xkey.keycode, 0,
+				  e->xkey.state & ShiftMask ? 1 : 0);
+}
+
 static void OnKeyboardMessage(LCUI_Event ev, void *arg)
 {
-	int key;
 	KeySym keysym;
 	XEvent *x_ev = arg;
 	LCUI_X11AppDriver x11;
@@ -57,116 +130,19 @@ static void OnKeyboardMessage(LCUI_Event ev, void *arg)
 	}
 	x11 = LCUI_GetAppData();
 	XAutoRepeatOn(x11->display);
-	// keysym = XKeycodeToKeysym( x11->display, x_ev->xkey.keycode, 0 );
-	// XLookupString( &x_ev->xkey, buf, sizeof buf, &keysym, NULL );
-	// keysym = XLookupKeysym( &x_ev->xkey, 0 );
-	keysym = XkbKeycodeToKeysym(x11->display, x_ev->xkey.keycode, 0, 0);
-	switch (keysym) {
-	case XK_Tab:
-		key = LCUI_KEY_TAB;
-		break;
-	case XK_Escape:
-		key = LCUI_KEY_ESCAPE;
-		break;
-	case XK_Return:
-		key = LCUI_KEY_ENTER;
-		break;
-	case XK_Delete:
-		key = LCUI_KEY_DELETE;
-		break;
-	case XK_BackSpace:
-		key = LCUI_KEY_BACKSPACE;
-		break;
-	case XK_Home:
-		key = LCUI_KEY_HOME;
-		break;
-	case XK_Left:
-		key = LCUI_KEY_LEFT;
-		break;
-	case XK_Up:
-		key = LCUI_KEY_UP;
-		break;
-	case XK_Right:
-		key = LCUI_KEY_RIGHT;
-		break;
-	case XK_Down:
-		key = LCUI_KEY_DOWN;
-		break;
-	case XK_Page_Up:
-		key = LCUI_KEY_PAGEUP;
-		break;
-	case XK_Page_Down:
-		key = LCUI_KEY_PAGEDOWN;
-		break;
-	case XK_End:
-		key = LCUI_KEY_END;
-		break;
-	case XK_Control_R:
-	case XK_Control_L:
-		key = LCUI_KEY_CONTROL;
-		break;
-	case XK_Shift_R:
-	case XK_Shift_L:
-		key = LCUI_KEY_SHIFT;
-		break;
-	case XK_Alt_L:
-	case XK_Alt_R:
-		key = LCUI_KEY_ALT;
-		break;
-	case XK_Caps_Lock:
-		key = LCUI_KEY_CAPITAL;
-		break;
-	case XK_comma:
-		key = LCUI_KEY_COMMA;
-		break;
-	case XK_period:
-		key = LCUI_KEY_PERIOD;
-		break;
-	case XK_minus:
-		key = LCUI_KEY_MINUS;
-		break;
-	case XK_slash:
-		key = LCUI_KEY_SLASH;
-		break;
-	case XK_semicolon:
-		key = LCUI_KEY_SEMICOLON;
-		break;
-	case XK_equal:
-		key = LCUI_KEY_EQUAL;
-		break;
-	case XK_bracketleft:
-		key = LCUI_KEY_BRACKETLEFT;
-		break;
-	case XK_bracketright:
-		key = LCUI_KEY_BRACKETRIGHT;
-		break;
-	case XK_backslash:
-		key = LCUI_KEY_BACKSLASH;
-		break;
-	case XK_apostrophe:
-		key = LCUI_KEY_APOSTROPHE;
-		break;
-	case XK_grave:
-		key = LCUI_KEY_GRAVE;
-		break;
-	default:
-		key = keysym;
-		if (key >= XK_a && key <= XK_z) {
-			key -= 'a' - 'A';
-		}
-		break;
-	}
+	keysym = XkbKeycodeToKeysym(x11->display, x_ev->xkey.keycode, 0, 1);
 	_DEBUG_MSG("keyname: %s\n", XKeysymToString(keysym));
-	sys_ev.key.code = key;
-	_DEBUG_MSG("keycode: %d, keyscancode: %u, keysym: %lu\n", key,
+	_DEBUG_MSG("keycode: %d, keyscancode: %u, keysym: %lu\n", keysym,
 		   x_ev->xkey.keycode, keysym);
+	sys_ev.key.code = ConvertKeyCode(keysym);
+	_DEBUG_MSG("shift: %d, ctrl: %d\n", sys_ev.key.shift_key,
+		   sys_ev.key.ctrl_key);
 	LCUI_TriggerEvent(&sys_ev, NULL);
-	keysym = XkbKeycodeToKeysym(x11->display, x_ev->xkey.keycode, 0,
-				    x_ev->xkey.state & ShiftMask ? 1 : 0);
-	if (keysym >= XK_space && keysym <= XK_asciitilde) {
-		sys_ev.key.code = keysym;
+	if (keysym >= XK_space && keysym <= XK_asciitilde &&
+	    sys_ev.type == LCUI_KEYDOWN) {
 		sys_ev.type = LCUI_KEYPRESS;
-		_DEBUG_MSG("char: %c\n", keysym);
+		sys_ev.key.code = ConvertKeyCodeToChar(x11, x_ev);
+		_DEBUG_MSG("char: %c\n", sys_ev.key.code);
 		LCUI_TriggerEvent(&sys_ev, NULL);
 	}
 }

@@ -120,7 +120,8 @@ static LCUI_BOOL LCUIIME_Open(LCUI_IME ime)
 static LCUI_BOOL LCUIIME_Close(LCUI_IME ime)
 {
 	if (ime && ime->handler.close) {
-		return ime->handler.open();
+		LOG("[ime] close engine: %s\n", ime->name);
+		return ime->handler.close();
 	}
 	return FALSE;
 }
@@ -130,6 +131,7 @@ LCUI_BOOL LCUIIME_Select(int ime_id)
 	LCUI_IME ime = LCUIIME_Find(ime_id);
 	if (ime) {
 		LCUIIME_Close(self.ime);
+		LOG("[ime] select engine: %s\n", ime->name);
 		self.ime = ime;
 		LCUIIME_Open(self.ime);
 		return TRUE;
@@ -196,146 +198,9 @@ LCUI_BOOL LCUIIME_CheckCharKey(int key)
 	return FALSE;
 }
 
-static int LCUIIME_ToUpperCase(int ch)
-{
-	if (ch >= 'a' && ch <= 'z') {
-		ch = ch - 32;
-	} else if (ch >= 'A' && ch <= 'Z') {
-		ch = ch + 32;
-	} else {
-		switch (ch) {
-		case '0':
-			ch = ')';
-			break;
-		case '1':
-			ch = '!';
-			break;
-		case '2':
-			ch = '@';
-			break;
-		case '3':
-			ch = '#';
-			break;
-		case '4':
-			ch = '$';
-			break;
-		case '5':
-			ch = '%';
-			break;
-		case '6':
-			ch = '^';
-			break;
-		case '7':
-			ch = '&';
-			break;
-		case '8':
-			ch = '*';
-			break;
-		case '9':
-			ch = '(';
-			break;
-		case '`':
-			ch = '~';
-			break;
-		case '-':
-			ch = '_';
-			break;
-		case '=':
-			ch = '+';
-			break;
-		case '[':
-			ch = '{';
-			break;
-		case ']':
-			ch = '}';
-			break;
-		case '\\':
-			ch = '|';
-			break;
-		case ';':
-			ch = ':';
-			break;
-		case '\'':
-			ch = '"';
-			break;
-		case ',':
-			ch = '<';
-			break;
-		case '.':
-			ch = '>';
-			break;
-		case '/':
-			ch = '?';
-			break;
-		default:
-			break;
-		}
-	}
-	return ch;
-}
-
 static void LCUIIME_ToText(LCUI_SysEvent e)
 {
-	int ch = e->key.code;
-	switch (ch) {
-	case LCUI_KEY_TAB:
-		ch = '\t';
-		break;
-	case LCUI_KEY_ENTER:
-		ch = '\n';
-		break;
-	case LCUI_KEY_SEMICOLON:
-		ch = ';';
-		break;
-	case LCUI_KEY_MINUS:
-		ch = '-';
-		break;
-	case LCUI_KEY_EQUAL:
-		ch = '=';
-		break;
-	case LCUI_KEY_COMMA:
-		ch = ',';
-		break;
-	case LCUI_KEY_PERIOD:
-		ch = '.';
-		break;
-	case LCUI_KEY_SLASH:
-		ch = '/';
-		break;
-	case LCUI_KEY_BRACKETLEFT:
-		ch = '[';
-		break;
-	case LCUI_KEY_BACKSLASH:
-		ch = '\\';
-		break;
-	case LCUI_KEY_BRACKETRIGHT:
-		ch = ']';
-		break;
-	case LCUI_KEY_APOSTROPHE:
-		ch = '\'';
-		break;
-	default:
-		/* 如果没开启大写锁定，则将字母转换成小写 */
-		if (!self.enable_caps_lock) {
-			if (ch >= 'A' && ch <= 'Z') {
-				ch = e->key.code + 32;
-			}
-		}
-		break;
-	}
-	/* 如果shift键处于按下状态 */
-	if (LCUIKeyboard_IsHit(LCUI_KEY_SHIFT)) {
-		_DEBUG_MSG("hit shift, ch: %c\n", ch);
-		ch = LCUIIME_ToUpperCase(ch);
-	}
-	if ((ch >= 32 && ch <= 126) || ch == '\t' || ch == '\n' || ch == ' ') {
-		LCUI_SysEventRec ev = { 0 };
-		ev.type = LCUI_KEYPRESS;
-		ev.key.code = ch;
-		LCUI_TriggerEvent(&ev, NULL);
-	}
-	DEBUG_MSG("ch = %c\n", ch);
-	self.ime->handler.totext(ch);
+	self.ime->handler.totext(e->key.code);
 }
 
 LCUI_BOOL LCUIIME_ProcessKey(LCUI_SysEvent e)
@@ -408,5 +273,6 @@ void LCUI_InitIME(void)
 void LCUI_FreeIME(void)
 {
 	self.active = FALSE;
+	LCUIIME_Close(self.ime);
 	LinkedList_ClearData(&self.list, LCUIIME_OnDestroy);
 }
