@@ -30,10 +30,14 @@
 
 #ifndef LCUI_BUILD_IN_WIN32
 
-#include <LCUI/config.h>
+#include <LCUI_Build.h>
 #include <stdlib.h>
 #include <string.h>
+#include <LCUI/font/fontconfig.h>
+
+#ifdef USE_FONTCONFIG
 #include <fontconfig/fontconfig.h>
+#endif
 
 char *Fontconfig_GetPath(const char *name)
 {
