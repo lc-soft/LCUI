@@ -37,7 +37,9 @@
 #ifdef ASSERT
 #undef ASSERT
 #endif
-#define ASSERT(X) if(!(X)) goto error;
+#define ASSERT(X) \
+	if (!(X)) \
+		goto error;
 
 #ifdef USE_LIBPNG
 #include <png.h>
@@ -54,14 +56,14 @@ static void DestroyPNGReader(void *data)
 {
 	LCUI_PNGReader reader = data;
 	if (reader->png_ptr) {
-		png_destroy_read_struct(&reader->png_ptr,
-					&reader->info_ptr, NULL);
+		png_destroy_read_struct(&reader->png_ptr, &reader->info_ptr,
+					NULL);
 	}
 	free(reader);
 }
 
-static void PNGReader_OnRead(png_structp png_ptr,
-			     png_bytep buffer, png_size_t size)
+static void PNGReader_OnRead(png_structp png_ptr, png_bytep buffer,
+			     png_size_t size)
 {
 	size_t read_size;
 	LCUI_ImageReader reader = png_get_io_ptr(png_ptr);
@@ -84,8 +86,8 @@ int LCUI_InitPNGReader(LCUI_ImageReader reader)
 {
 #ifdef USE_LIBPNG
 	ASSIGN(png_reader, LCUI_PNGReader);
-	png_reader->png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
-						     NULL, NULL, NULL);
+	png_reader->png_ptr =
+	    png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	ASSERT(png_reader->png_ptr);
 	png_reader->info_ptr = png_create_info_struct(png_reader->png_ptr);
 	ASSERT(png_reader->info_ptr);
@@ -122,11 +124,11 @@ int LCUI_ReadPNGHeader(LCUI_ImageReader reader)
 	info_ptr = png_reader->info_ptr;
 	n = reader->fn_read(reader->stream_data, buf, PNG_BYTES_TO_CHECK);
 	if (n < PNG_BYTES_TO_CHECK) {
-		return -ENODATA;
+		return -2;
 	}
 	/* 检测数据是否为PNG的签名 */
 	if (!png_check_sig(buf, PNG_BYTES_TO_CHECK)) {
-		return -ENODATA;
+		return -2;
 	}
 	png_set_sig_bytes(png_reader->png_ptr, PNG_BYTES_TO_CHECK);
 	/* 读取PNG图片信息 */
@@ -175,7 +177,7 @@ int LCUI_ReadPNG(LCUI_ImageReader reader, LCUI_Graph *graph)
 	info_ptr = png_reader->info_ptr;
 	if (header->type == LCUI_UNKNOWN_IMAGE) {
 		if (LCUI_ReadPNGHeader(reader) != 0) {
-			return -ENODATA;
+			return -2;
 		}
 	}
 	/* 根据不同的色彩类型进行相应处理 */
@@ -198,7 +200,7 @@ int LCUI_ReadPNG(LCUI_ImageReader reader, LCUI_Graph *graph)
 		break;
 	default:
 		/* 其它色彩类型的图像就不处理了 */
-		return -ENODATA;
+		return -2;
 	}
 	png_set_bgr(png_ptr);
 	png_set_expand(png_ptr);
@@ -239,11 +241,13 @@ int LCUI_WritePNGFile(const char *file_name, const LCUI_Graph *graph)
 	/* create file */
 	fp = fopen(file_name, "wb");
 	if (!fp) {
-		_DEBUG_MSG("file %s could not be opened for writing\n", file_name);
+		_DEBUG_MSG("file %s could not be opened for writing\n",
+			   file_name);
 		return -1;
 	}
 	/* initialize stuff */
-	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	png_ptr =
+	    png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!png_ptr) {
 		fclose(fp);
 		_DEBUG_MSG("png_create_write_struct failed\n");
@@ -269,9 +273,9 @@ int LCUI_WritePNGFile(const char *file_name, const LCUI_Graph *graph)
 		color_type = PNG_COLOR_TYPE_RGB;
 	}
 	/* write header */
-	png_set_IHDR(png_ptr, info_ptr, graph->width, graph->height,
-		     8, color_type, PNG_INTERLACE_NONE,
-		     PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+	png_set_IHDR(png_ptr, info_ptr, graph->width, graph->height, 8,
+		     color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE,
+		     PNG_FILTER_TYPE_BASE);
 
 	png_write_info(png_ptr, info_ptr);
 	/* write bytes */
@@ -283,7 +287,8 @@ int LCUI_WritePNGFile(const char *file_name, const LCUI_Graph *graph)
 
 		row_size = png_get_rowbytes(png_ptr, info_ptr);
 		px_row_ptr = graph->argb + rect.y * graph->width + rect.x;
-		row_pointers = (png_bytep*)malloc(rect.height * sizeof(png_bytep));
+		row_pointers =
+		    (png_bytep *)malloc(rect.height * sizeof(png_bytep));
 		for (y = 0; y < rect.height; ++y) {
 			row_pointers[y] = png_malloc(png_ptr, row_size);
 			px_ptr = px_row_ptr;
@@ -301,14 +306,15 @@ int LCUI_WritePNGFile(const char *file_name, const LCUI_Graph *graph)
 		row_size = png_get_rowbytes(png_ptr, info_ptr);
 		px_row_ptr = graph->bytes + rect.y * graph->bytes_per_row;
 		px_row_ptr += rect.x * graph->bytes_per_pixel;
-		row_pointers = (png_bytep*)malloc(rect.height * sizeof(png_bytep));
+		row_pointers =
+		    (png_bytep *)malloc(rect.height * sizeof(png_bytep));
 		for (y = 0; y < rect.height; ++y) {
 			row_pointers[y] = (png_bytep)malloc(row_size);
 			px_ptr = px_row_ptr;
 			for (x = 0; x < row_size; x += 3) {
-				row_pointers[y][x + 2] = *px_ptr++; // blue
-				row_pointers[y][x + 1] = *px_ptr++; // green
-				row_pointers[y][x] = *px_ptr++;   // red
+				row_pointers[y][x + 2] = *px_ptr++;    // blue
+				row_pointers[y][x + 1] = *px_ptr++;    // green
+				row_pointers[y][x] = *px_ptr++;        // red
 			}
 			px_row_ptr += graph->bytes_per_row;
 		}

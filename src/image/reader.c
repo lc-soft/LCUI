@@ -39,14 +39,15 @@
 
 typedef struct LCUI_ImageInterfaceRec_ {
 	const char *suffix;
-	int(*init)(LCUI_ImageReader);
-	int(*read_header)(LCUI_ImageReader);
-	int(*read)(LCUI_ImageReader, LCUI_Graph*);
+	int (*init)(LCUI_ImageReader);
+	int (*read_header)(LCUI_ImageReader);
+	int (*read)(LCUI_ImageReader, LCUI_Graph *);
 } LCUI_ImageInterfaceRec, *LCUI_ImageInterface;
 
 static const LCUI_ImageInterfaceRec interfaces[] = {
 	{ ".png", LCUI_InitPNGReader, LCUI_ReadPNGHeader, LCUI_ReadPNG },
-	{ ".jpeg .jpg", LCUI_InitJPEGReader, LCUI_ReadJPEGHeader, LCUI_ReadJPEG },
+	{ ".jpeg .jpg", LCUI_InitJPEGReader, LCUI_ReadJPEGHeader,
+	  LCUI_ReadJPEG },
 	{ ".bmp", LCUI_InitBMPReader, LCUI_ReadBMPHeader, LCUI_ReadBMP }
 };
 
@@ -92,10 +93,10 @@ static int LCUI_InitImageReaderByType(LCUI_ImageReader reader, int type)
 	reader->fn_rewind(reader->stream_data);
 	ret = interfaces[type].init(reader);
 	if (ret != 0) {
-		return -ENODATA;
+		return -2;
 	}
 	if (LCUI_SetImageReaderJump(reader)) {
-		return -ENODATA;
+		return -2;
 	}
 	return interfaces[type].read_header(reader);
 }
@@ -135,7 +136,7 @@ int LCUI_ReadImageHeader(LCUI_ImageReader reader)
 	if (i < n_interfaces && i >= 0) {
 		return interfaces[i].read_header(reader);
 	}
-	return -ENODATA;
+	return -2;
 }
 
 int LCUI_ReadImage(LCUI_ImageReader reader, LCUI_Graph *out)
@@ -144,7 +145,7 @@ int LCUI_ReadImage(LCUI_ImageReader reader, LCUI_Graph *out)
 	if (i < n_interfaces && i >= 0) {
 		return interfaces[i].read(reader, out);
 	}
-	return -ENODATA;
+	return -2;
 }
 
 int LCUI_ReadImageFile(const char *filepath, LCUI_Graph *out)
@@ -165,18 +166,17 @@ int LCUI_ReadImageFile(const char *filepath, LCUI_Graph *out)
 	if (ret < 0) {
 		if (LCUI_InitImageReader(&reader) != 0) {
 			fclose(fp);
-			return -ENODATA;
+			return -2;
 		}
 	}
 	if (LCUI_SetImageReaderJump(&reader)) {
-		ret = -ENODATA;
-		goto exit;
+		ret = -2;
+	} else {
+		ret = LCUI_ReadImage(&reader, out);
 	}
-	ret = LCUI_ReadImage(&reader, out);
-exit:
 	LCUI_DestroyImageReader(&reader);
 	fclose(fp);
-	return  ret;
+	return ret;
 }
 
 int LCUI_GetImageSize(const char *filepath, int *width, int *height)
@@ -197,7 +197,7 @@ int LCUI_GetImageSize(const char *filepath, int *width, int *height)
 	if (ret < 0) {
 		if (LCUI_InitImageReader(&reader) != 0) {
 			fclose(fp);
-			return -ENODATA;
+			return -2;
 		}
 	}
 	*width = reader.header.width;
@@ -206,4 +206,3 @@ int LCUI_GetImageSize(const char *filepath, int *width, int *height)
 	fclose(fp);
 	return 0;
 }
-

@@ -37,6 +37,8 @@
 #include <LCUI/graph.h>
 #include <LCUI/image.h>
 
+/* clang-format off */
+
 typedef struct {
 	uint16_t type;		/**< Magic identifier */
 	uint32_t size;		/**< File size in bytes */
@@ -67,10 +69,12 @@ typedef struct LCUI_BMPReaderRec_ {
 	INFOHEADER info;
 } LCUI_BMPReaderRec, *LCUI_BMPReader;
 
+/* clang-format on */
+
 static void BMPHeader_Init(HEADER *header, uint16_t buffer[8])
 {
 	header->type = buffer[0];
-	header->size = *(uint32_t*)(buffer + 1);
+	header->size = *(uint32_t *)(buffer + 1);
 	header->reserved1 = buffer[3];
 	header->reserved2 = buffer[4];
 	header->offset = buffer[5];
@@ -104,11 +108,11 @@ int LCUI_ReadBMPHeader(LCUI_ImageReader reader)
 	 * 变量的值不正常，因此需要手动为其成员变量赋值 */
 	BMPHeader_Init(&bmp_reader->header, buffer);
 	if (n < 14 || bmp_reader->header.type != 0x4D42) {
-		return -ENODATA;
+		return -2;
 	}
 	n = reader->fn_read(reader->stream_data, info, sizeof(INFOHEADER));
 	if (n < sizeof(INFOHEADER)) {
-		return -ENODATA;
+		return -2;
 	}
 	reader->header.width = info->width;
 	reader->header.height = info->height;
@@ -131,7 +135,7 @@ int LCUI_ReadBMP(LCUI_ImageReader reader, LCUI_Graph *graph)
 	}
 	if (reader->header.type == LCUI_UNKNOWN_IMAGE) {
 		if (LCUI_ReadBMPHeader(reader) != 0) {
-			return -ENODATA;
+			return -2;
 		}
 	}
 	/* 信息头中的偏移位置是相对于起始处，需要减去当前已经偏移的位置 */
@@ -155,8 +159,7 @@ int LCUI_ReadBMP(LCUI_ImageReader reader, LCUI_Graph *graph)
 	/* 从最后一行开始保存 */
 	dest = graph->bytes + graph->bytes_per_row * (graph->height - 1);
 	for (row = 0; row < info->height; ++row) {
-		n = reader->fn_read(reader->stream_data,
-				    buffer, bytes_per_row);
+		n = reader->fn_read(reader->stream_data, buffer, bytes_per_row);
 		if (n < bytes_per_row) {
 			break;
 		}
@@ -170,4 +173,3 @@ int LCUI_ReadBMP(LCUI_ImageReader reader, LCUI_Graph *graph)
 	free(buffer);
 	return 0;
 }
-

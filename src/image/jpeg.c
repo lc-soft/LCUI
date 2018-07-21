@@ -52,11 +52,11 @@ typedef struct LCUI_JPEGErrorRec_ {
 } LCUI_JPEGErrorRec, *LCUI_JPEGError;
 
 typedef struct LCUI_JPEGReaderRec_ {
-	struct jpeg_source_mgr src;		/**< JPEG 资源管理接口 */
-	LCUI_JPEGErrorRec err;			/**< JPEG 的错误处理接口 */
-	LCUI_BOOL start_of_file;		/**< 是否刚开始读文件 */
-	LCUI_ImageReader base;			/**< 所属的图片读取器 */
-	unsigned char buffer[BUFFER_SIZE];	/**< 数据缓存 */
+	struct jpeg_source_mgr src;        /**< JPEG 资源管理接口 */
+	LCUI_JPEGErrorRec err;             /**< JPEG 的错误处理接口 */
+	LCUI_BOOL start_of_file;           /**< 是否刚开始读文件 */
+	LCUI_ImageReader base;             /**< 所属的图片读取器 */
+	unsigned char buffer[BUFFER_SIZE]; /**< 数据缓存 */
 } LCUI_JPEGReaderRec, *LCUI_JPEGReader;
 
 static void DestroyJPEGReader(void *data)
@@ -94,8 +94,8 @@ static boolean JPEGReader_OnRead(j_decompress_ptr cinfo)
 	LCUI_JPEGReader jpeg_reader;
 	jpeg_reader = (LCUI_JPEGReader)cinfo->src;
 	reader = jpeg_reader->base;
-	size = reader->fn_read(reader->stream_data,
-			       jpeg_reader->buffer, BUFFER_SIZE);
+	size = reader->fn_read(reader->stream_data, jpeg_reader->buffer,
+			       BUFFER_SIZE);
 	if (size <= 0) {
 		/* 将空的输入文件视为致命错误 */
 		if (jpeg_reader->start_of_file) {
@@ -159,8 +159,8 @@ static void JPEGReader_OnTerminate(j_decompress_ptr cinfo)
 
 static void *jpeg_malloc(j_decompress_ptr cinfo, size_t size)
 {
-	return cinfo->mem->alloc_small((j_common_ptr)cinfo,
-				       JPOOL_PERMANENT, size);
+	return cinfo->mem->alloc_small((j_common_ptr)cinfo, JPOOL_PERMANENT,
+				       size);
 }
 
 int LCUI_ReadJPEGHeader(LCUI_ImageReader reader)
@@ -178,13 +178,13 @@ int LCUI_ReadJPEGHeader(LCUI_ImageReader reader)
 	size = reader->fn_read(reader->stream_data, jpeg_reader->buffer,
 			       sizeof(short int));
 	if (size < sizeof(short int)) {
-		return -ENODATA;
+		return -2;
 	}
 	jpeg_reader->src.bytes_in_buffer = sizeof(short int);
 	jpeg_reader->src.next_input_byte = jpeg_reader->buffer;
-	buffer = (short int*)jpeg_reader->buffer;
+	buffer = (short int *)jpeg_reader->buffer;
 	if (buffer[0] != -9985) {
-		return -ENODATA;
+		return -2;
 	}
 	jpeg_read_header(cinfo, TRUE);
 	header->width = cinfo->image_width;
@@ -222,7 +222,7 @@ int LCUI_InitJPEGReader(LCUI_ImageReader reader)
 	reader->header.type = LCUI_UNKNOWN_IMAGE;
 	reader->destructor = DestroyJPEGReader;
 	reader->env = &reader->env_src;
-	cinfo->src = (struct jpeg_source_mgr*)jpeg_reader;
+	cinfo->src = (struct jpeg_source_mgr *)jpeg_reader;
 	cinfo->err = jpeg_std_error(&jpeg_reader->err.pub);
 	jpeg_reader->err.pub.error_exit = JPEGReader_OnErrorExit;
 	jpeg_reader->err.reader = reader;
@@ -247,7 +247,7 @@ int LCUI_ReadJPEG(LCUI_ImageReader reader, LCUI_Graph *graph)
 	}
 	if (reader->header.type == LCUI_UNKNOWN_IMAGE) {
 		if (LCUI_ReadJPEGHeader(reader) != 0) {
-			return -ENODATA;
+			return -2;
 		}
 	}
 	cinfo = reader->data;
@@ -257,13 +257,13 @@ int LCUI_ReadJPEG(LCUI_ImageReader reader, LCUI_Graph *graph)
 		return -ENOSYS;
 	}
 	graph->color_type = LCUI_COLOR_TYPE_RGB;
-	if (0 != Graph_Create(graph, cinfo->output_width,
-			      cinfo->output_height)) {
+	if (0 !=
+	    Graph_Create(graph, cinfo->output_width, cinfo->output_height)) {
 		return -ENOMEM;
 	}
 	row_stride = cinfo->output_width * cinfo->output_components;
-	buffer = cinfo->mem->alloc_sarray((j_common_ptr)cinfo,
-					  JPOOL_IMAGE, row_stride, 1);
+	buffer = cinfo->mem->alloc_sarray((j_common_ptr)cinfo, JPOOL_IMAGE,
+					  row_stride, 1);
 	while (cinfo->output_scanline < cinfo->output_height) {
 		bytep = graph->bytes;
 		bytep += cinfo->output_scanline * graph->bytes_per_row;
@@ -276,8 +276,8 @@ int LCUI_ReadJPEG(LCUI_ImageReader reader, LCUI_Graph *graph)
 		}
 		if (reader->fn_prog) {
 			reader->fn_prog(reader->prog_arg,
-					100.0f * cinfo->output_scanline
-					/ cinfo->output_height);
+					100.0f * cinfo->output_scanline /
+					    cinfo->output_height);
 		}
 	}
 	return 0;
@@ -286,4 +286,3 @@ int LCUI_ReadJPEG(LCUI_ImageReader reader, LCUI_Graph *graph)
 #endif
 	return -ENOSYS;
 }
-
