@@ -524,6 +524,16 @@ void LCUI_Init(void)
 	LCUI_InitKeyboard();
 	LCUI_InitCursor();
 	LCUI_InitIME();
+
+	switch (LCUI_GetAppId()) {
+	case LCUI_APP_LINUX_X11:
+	case LCUI_APP_UWP:
+	case LCUI_APP_WINDOWS:
+		LCUICursor_Hide();
+		break;
+	default:
+		break;
+	}
 }
 
 int LCUI_Destroy(void)

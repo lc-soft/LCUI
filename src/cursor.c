@@ -231,6 +231,9 @@ void LCUICursor_GetPos(LCUI_Pos *pos)
 int LCUICursor_Paint(LCUI_PaintContext paint)
 {
 	int x, y;
+	if (!cursor.visible) {
+		return 0;
+	}
 	x = cursor.pos.x - paint->rect.x;
 	y = cursor.pos.y - paint->rect.y;
 	return Graph_Mix(&paint->canvas, &cursor.graph, x, y, FALSE);

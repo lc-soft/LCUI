@@ -227,6 +227,7 @@ void App::Load(Platform::String^ entryPoint)
 	LCUI_InitDisplay(m_displayDriver);
 	LCUI_InitIME();
 	LCUI_InitCursor();
+	LCUICursor_Hide();
 	m_inputDriver->RegisterIME();
 	m_inputDriver->SelectIME();
 	UWPApp.app->Load(entryPoint);
