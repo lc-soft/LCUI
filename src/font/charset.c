@@ -28,14 +28,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
-#include <LCUI/font/charset.h>
-
+#include <wchar.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
+
+#include <LCUI_Build.h>
+#include <LCUI/font/charset.h>
 
 #define MAX_SAVE_NUM   20
 

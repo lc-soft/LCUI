@@ -31,7 +31,8 @@
 
 #include <LCUI_Build.h>
 #ifdef LCUI_FONT_ENGINE_FREETYPE
-#include <LCUI/LCUI.h>
+#include <LCUI/types.h>
+#include <LCUI/util/linkedlist.h>
 #include <LCUI/font.h>
 #include <stdlib.h>
 #include <errno.h>

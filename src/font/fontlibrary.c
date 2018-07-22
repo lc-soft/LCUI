@@ -33,7 +33,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI/types.h>
+#include <LCUI/util.h>
 #include <LCUI/graph.h>
 #include <LCUI/font.h>
 

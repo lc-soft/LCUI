@@ -30,7 +30,8 @@
 
 
 #include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI/types.h>
+#include <LCUI/util/math.h>
 #include <LCUI/gui/metrics.h>
 
 static struct LCUI_MetricsModule {

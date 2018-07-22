@@ -32,7 +32,10 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI/types.h>
+#include <LCUI/util/math.h>
+#include <LCUI/util/parse.h>
+#include <LCUI/util/linkedlist.h>
 #include <LCUI/font.h>
 
 typedef enum LCUI_TextStyleTagType_ {

@@ -62,14 +62,12 @@
 #define MAX_FRAMES_PER_SEC 120
 
 /** 主循环的状态 */
-enum MainLoopState {
-	STATE_PAUSED, STATE_RUNNING, STATE_EXITED
-};
+enum LCUI_MainLoopState { STATE_PAUSED, STATE_RUNNING, STATE_EXITED };
 
 typedef struct SysEventHandlerRec_ {
 	LCUI_SysEventFunc func;
 	void *data;
-	void(*destroy_data)(void *);
+	void (*destroy_data)(void *);
 } SysEventHandlerRec, *SysEventHandler;
 
 typedef struct SysEventPackRec_ {
@@ -145,7 +143,7 @@ static void DestroySysEventHandler(void *arg)
 }
 
 int LCUI_BindEvent(int id, LCUI_SysEventFunc func, void *data,
-		   void(*destroy_data)(void *))
+		   void (*destroy_data)(void *))
 {
 	int ret;
 	SysEventHandler handler;
@@ -411,7 +409,7 @@ static void LCUI_FreeApp(void)
 }
 
 int LCUI_BindSysEvent(int event_id, LCUI_EventFunc func, void *data,
-		      void(*destroy_data)(void *))
+		      void (*destroy_data)(void *))
 {
 	if (MainApp.driver_ready) {
 		return MainApp.driver->BindSysEvent(event_id, func, data,
@@ -450,7 +448,7 @@ static void LCUIApp_QuitAllMainLoop(void)
 
 static void LCUI_ShowCopyrightText(void)
 {
-	Logger_Log("LCUI (LC's UI) version " LCUI_VERSION "\n"
+	Logger_Log("LCUI (LC's UI) version " PACKAGE_VERSION "\n"
 #ifdef _MSC_VER
 		   "Build tool: "
 #if (_MSC_VER > 1912)
@@ -562,9 +560,4 @@ int LCUI_Main(void)
 	loop = LCUIMainLoop_New();
 	LCUIMainLoop_Run(loop);
 	return LCUI_Destroy();
-}
-
-int LCUI_GetSelfVersion(char *out)
-{
-	return sprintf(out, "%s", LCUI_VERSION);
 }
