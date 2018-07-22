@@ -64,4 +64,10 @@ build/*.jpg
 build/VS2012/*/*.png
 build/VS2012/*/*.jpg
 include/LCUI/config.h
-node_modules
+test/*
+!test/*.c
+!test/*.css
+!test/*.xml
+!test/*.jpg
+!test/*.bmp
+!test/*.png
