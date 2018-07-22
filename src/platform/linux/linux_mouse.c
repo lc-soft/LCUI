@@ -32,6 +32,7 @@
 #ifdef LCUI_BUILD_IN_LINUX
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>

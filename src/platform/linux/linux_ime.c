@@ -81,8 +81,8 @@ static LCUI_BOOL X11IME_Close(void)
 
 int LCUI_RegisterLinuxIME(void)
 {
-	LCUI_IMEHandlerRec handler;
 #ifdef LCUI_VIDEO_DRIVER_X11
+	LCUI_IMEHandlerRec handler;
 	if (LCUI_GetAppId() == LCUI_APP_LINUX_X11) {
 		handler.prockey = X11IME_ProcessKey;
 		handler.totext = X11IME_ToText;

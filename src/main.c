@@ -26,7 +26,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
+#define LCUI_MAIN_C
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -61,6 +61,11 @@
 /** 一秒内的最大更新帧数 */
 #define MAX_FRAMES_PER_SEC 120
 
+typedef struct LCUI_MainLoopRec_ {
+	int state;       /**< 主循环的状态 */
+	LCUI_Thread tid; /**< 当前运行该主循环的线程的ID */
+} LCUI_MainLoopRec;
+
 /** 主循环的状态 */
 enum LCUI_MainLoopState { STATE_PAUSED, STATE_RUNNING, STATE_EXITED };
 
@@ -82,7 +87,7 @@ static struct LCUI_System {
 	int state;				/**< 状态 */
 	int mode;				/**< LCUI的运行模式 */
 	int exit_code;				/**< 退出码 */
-	unsigned long int main_tid;		/**< 主线程ID */
+	LCUI_Thread thread;			/**< 主线程 */
 	struct {
 		LCUI_EventTrigger trigger;	/**< 系统事件容器 */
 		LCUI_Mutex mutex;		/**< 互斥锁 */
@@ -500,7 +505,7 @@ void LCUI_InitBase(void)
 	}
 	System.exit_code = 0;
 	System.state = STATE_ACTIVE;
-	System.main_tid = LCUIThread_SelfID();
+	System.thread = LCUIThread_SelfID();
 	LCUI_ShowCopyrightText();
 	LCUI_InitEvent();
 	LCUI_InitFontLibrary();
