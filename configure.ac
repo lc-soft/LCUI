@@ -190,31 +190,33 @@ else
 	AC_MSG_RESULT(no)
 fi
 
-# 输出变量到每个Makefile中
 AC_SUBST(LCUI_LIBS)
 AC_SUBST(CFLAGS)
+AC_SUBST(CXXFLAGS)
+AC_CONFIG_FILES([
+	lcui.pc
+	Makefile
+	build/Makefile
+	include/Makefile
+	include/LCUI/Makefile
+	include/LCUI/font/Makefile
+	include/LCUI/draw/Makefile
+	include/LCUI/gui/widget/Makefile
+	include/LCUI/gui/Makefile
+	include/LCUI/util/Makefile
+	src/Makefile
+	src/font/Makefile
+	src/font/in-core/Makefile
+	src/draw/Makefile
+	src/thread/Makefile
+	src/image/Makefile
+	src/util/Makefile
+	src/gui/Makefile
+	src/platform/Makefile
+	test/Makefile
+])
+AC_OUTPUT
 
-# 输出文件
-AC_OUTPUT([Makefile
-	 lcui.pc
-	 build/Makefile
-	 include/Makefile
-	 include/LCUI/Makefile
-	 include/LCUI/font/Makefile
-	 include/LCUI/draw/Makefile
-	 include/LCUI/gui/widget/Makefile
-	 include/LCUI/gui/Makefile
-	 include/LCUI/util/Makefile
-	 src/Makefile
-	 src/font/Makefile
-	 src/font/in-core/Makefile
-	 src/draw/Makefile
-	 src/thread/Makefile
-	 src/image/Makefile
-	 src/util/Makefile
-	 src/gui/Makefile
-	 src/platform/Makefile
-	 test/Makefile])
 echo
 echo
 echo -e "Build with lcui-builder support .... : $enable_builder"
