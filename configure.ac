@@ -54,7 +54,7 @@ AM_SILENT_RULES([yes])
 
 AX_CODE_COVERAGE
 
-LCUI_LIBS=""
+PACKAGE_LIBS=""
 CFLAGS="-Wall -D _GNU_SOURCE"
 CXXFLAG="-Wall -D _GNU_SOURCE"
 export C_INCLUDE_PATH=$C_INCLUDE_PATH:/usr/include/libxml2:/usr/include/freetype2/
@@ -68,7 +68,7 @@ if test "x$with_pthread" != "xno"; then
 		want_thread=yes
 		CC="$PTHREAD_CC"
 		CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
-		LCUI_LIBS="$LCUI_LIBS $PTHREAD_LIBS"
+		PACKAGE_LIBS="$PACKAGE_LIBS $PTHREAD_LIBS"
 		AC_DEFINE_UNQUOTED([LCUI_THREAD_PTHREAD], 1, [Define to 1 if you are using pthread support.])
 	], [AC_MSG_ERROR([The support could not be configured for the POSIX thread programming interface.])])
 fi
@@ -81,7 +81,7 @@ if test "$enable_builder" = "yes"; then
 	AC_CHECK_HEADERS([libxml/parser.h],[
 		AC_CHECK_LIB([xml2], [xmlParseFile], [
 			enable_builder=yes
-			LCUI_LIBS="$LCUI_LIBS -lxml2"
+			PACKAGE_LIBS="$PACKAGE_LIBS -lxml2"
 			CFLAGS="$CFLAGS -I/usr/include/libxml2"
 			AC_DEFINE_UNQUOTED([USE_LCUI_BUILDER], 1, [Define to 1 if you enabled LCUIBuilder function module.])
 		], [enable_builder=no])
@@ -98,7 +98,7 @@ if test "$want_font_engine" = yes; then
 		AC_CHECK_LIB([freetype], [FT_Init_FreeType], [
 			want_font_engine=yes
 			font_engine_name=freetype2
-			LCUI_LIBS="$LCUI_LIBS `pkg-config --libs freetype2`"
+			PACKAGE_LIBS="$PACKAGE_LIBS `pkg-config --libs freetype2`"
 			CFLAGS="$CFLAGS `pkg-config --cflags-only-I freetype2`"
 			AC_DEFINE_UNQUOTED([LCUI_FONT_ENGINE_FREETYPE], 1, [Define to 1 if you have the FreeType font engine.])
 		], [want_font_engine=no])
@@ -115,7 +115,7 @@ if test "$want_fontconfig" = yes; then
 	AC_CHECK_HEADERS([fontconfig/fontconfig.h], [
 		AC_CHECK_LIB([fontconfig], [FcInitLoadConfigAndFonts], [
 			want_fontconfig=yes
-			LCUI_LIBS="$LCUI_LIBS `pkg-config --libs fontconfig`"
+			PACKAGE_LIBS="$PACKAGE_LIBS `pkg-config --libs fontconfig`"
 			CFLAGS="$CFLAGS `pkg-config --cflags-only-I fontconfig`"
 			AC_DEFINE_UNQUOTED([USE_FONTCONFIG], 1, [Define to 1 if you have Fontconfig.])
 		], [want_fontconfig=no])
@@ -141,7 +141,7 @@ if test "$want_video_output" = yes; then
 		AC_CHECK_LIB([X11], [XOpenDisplay], [
 			video_driver_name=x11
 			want_video_driver_x11=yes
-			LCUI_LIBS="$LCUI_LIBS `pkg-config --libs x11`"
+			PACKAGE_LIBS="$PACKAGE_LIBS `pkg-config --libs x11`"
 			CFLAGS="$CFLAGS `pkg-config --cflags-only-I x11`"
 			AC_DEFINE_UNQUOTED([LCUI_VIDEO_DRIVER_X11], 1, [Define to 1 if you select XWindow for video support.])
 		], [])
@@ -156,7 +156,7 @@ if test "x$with_png" != "xno"; then
 	AC_CHECK_HEADERS([png.h],[
 		AC_CHECK_LIB([png], [png_sig_cmp],[
 			want_png=yes
-			LCUI_LIBS="$LCUI_LIBS `pkg-config --libs libpng`"
+			PACKAGE_LIBS="$PACKAGE_LIBS `pkg-config --libs libpng`"
 			CFLAGS="$CFLAGS `pkg-config --cflags-only-I libpng`"
 			AC_DEFINE_UNQUOTED([USE_LIBPNG], 1, [Define to 1 if you have the libpng.])
 		], [want_png=no])
@@ -169,7 +169,7 @@ if test "x$with_jpeg" != "xno"; then
 	AC_CHECK_HEADERS([jpeglib.h setjmp.h],[
 		AC_CHECK_LIB([jpeg], [jpeg_start_decompress],[
 			want_jpeg=yes
-			LCUI_LIBS="$LCUI_LIBS -ljpeg"
+			PACKAGE_LIBS="$PACKAGE_LIBS -ljpeg"
 			AC_DEFINE_UNQUOTED([USE_LIBJPEG], 1, [Define to 1 if you have the libjpeg])
 		], [want_jpeg=no])
 	], [want_jpeg=no])
@@ -190,7 +190,7 @@ else
 	AC_MSG_RESULT(no)
 fi
 
-AC_SUBST(LCUI_LIBS)
+AC_SUBST(PACKAGE_LIBS)
 AC_SUBST(CFLAGS)
 AC_SUBST(CXXFLAGS)
 AC_CONFIG_FILES([

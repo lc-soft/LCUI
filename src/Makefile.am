@@ -6,7 +6,7 @@ LCUI_LDFLAGS = -version-info 1:0:0
 LCUI_SOURCES = graph.c ime.c cursor.c worker.c main.c timer.c painter.c display.c keyboard.c
 LCUI_LIBADD = thread/libthread.la util/libutil.la platform/libplatform.la \
 image/libimage.la draw/libdraw.la gui/libgui.la font/libfont.la \
-font/in-core/libfont_incore.la $(LCUI_LIBS)
+font/in-core/libfont_incore.la $(PACKAGE_LIBS)
 
 SUBDIRS = image util draw font thread gui platform
 
