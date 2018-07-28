@@ -106,10 +106,6 @@ LCUI_API void Graph_PrintInfo(LCUI_Graph *graph);
 
 LCUI_API void Graph_Init(LCUI_Graph *graph);
 
-LCUI_API LCUI_Graph *Graph_New(void);
-
-LCUI_API void Graph_Delete(LCUI_Graph *graph);
-
 LCUI_API LCUI_Color RGB(uchar_t r, uchar_t g, uchar_t b);
 
 LCUI_API LCUI_Color ARGB(uchar_t a, uchar_t r, uchar_t g, uchar_t b);
