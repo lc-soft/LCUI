@@ -45,10 +45,12 @@ typedef union LCUI_DirEntry_ {
 
 #elif defined(LCUI_BUILD_IN_LINUX)
 #include <dirent.h>
+#define LCUI_DIRENT_NAME_LEN 256
+
 typedef DIR* LCUI_DirHandle;
 typedef struct LCUI_DirEntry_ {
 	struct dirent dirent;
-	wchar_t name[256];
+	wchar_t name[LCUI_DIRENT_NAME_LEN];
 } LCUI_DirEntry;
 
 #define PATH_DELIMITER '/'
