@@ -903,21 +903,21 @@ static void LCUIFont_FreeEngine(void)
 #ifdef LCUI_BUILD_IN_WIN32
 static void LCUIFont_LoadFontsForWindows(void)
 {
-	int i;
-	int ids[4];
+	size_t i;
+	int *ids = NULL;
+	const char *names = "Consola, Simsun, Microsoft YaHei";
 	const char *fonts[] = { "C:/Windows/Fonts/consola.ttf",
 				"C:/Windows/Fonts/simsun.ttc",
 				"C:/Windows/Fonts/msyh.ttf",
 				"C:/Windows/Fonts/msyh.ttc" };
 
-	for (i = 0; i < 4; ++i) {
-		ids[i] = LCUIFont_LoadFile(fonts[i]);
+	for (i = 0; i < sizeof(fonts) / sizeof(char *); ++i) {
+		LCUIFont_LoadFile(fonts[i]);
 	}
-	for (i = 3; i >= 0; --i) {
-		if (ids[i] > 0) {
-			LCUIFont_SetDefault(ids[i]);
-			break;
-		}
+	i = LCUIFont_GetIdByNames(&ids, FONT_STYLE_NORMAL, FONT_WEIGHT_NORMAL,
+				  names);
+	if (i > 0) {
+		LCUIFont_SetDefault(ids[i - 1]);
 	}
 }
 
@@ -927,26 +927,22 @@ static void LCUIFont_LoadFontsForWindows(void)
 
 static void LCUIFont_LoadFontsByFontConfig(void)
 {
-	int i;
-	int ids[3];
+	size_t i;
 	char *path;
+	int *ids = NULL;
+	const char *names = "Noto Sans CJK, Ubuntu, WenQuanYi Micro Hei";
 	const char *fonts[] = { "Ubuntu", "Noto Sans CJK SC",
 				"WenQuanYi Micro Hei" };
 
-	for (i = 0; i < 3; ++i) {
+	for (i = 0; i < sizeof(fonts) / sizeof(char *); ++i) {
 		path = Fontconfig_GetPath(fonts[i]);
-		if (path) {
-			ids[i] = LCUIFont_LoadFile(path);
-		} else {
-			ids[i] = -1;
-		}
+		LCUIFont_LoadFile(path);
 		free(path);
 	}
-	for (i = 2; i >= 0; --i) {
-		if (ids[i] > 0) {
-			LCUIFont_SetDefault(ids[i]);
-			break;
-		}
+	i = LCUIFont_GetIdByNames(&ids, FONT_STYLE_NORMAL, FONT_WEIGHT_NORMAL,
+				  names);
+	if (i > 0) {
+		LCUIFont_SetDefault(ids[i - 1]);
 	}
 }
 
@@ -954,23 +950,30 @@ static void LCUIFont_LoadFontsByFontConfig(void)
 
 static void LCUIFont_LoadFontsForLinux(void)
 {
-	int i;
-	int ids[4];
+	size_t i;
+	int *ids = NULL;
+	const char *names = "Noto Sans CJK SC, Ubuntu, WenQuanYi Micro Hei";
 	const char *fonts[] = {
 		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-R.ttf",
+		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-RI.ttf",
+		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-B.ttf",
+		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-BI.ttf",
+		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-M.ttf",
+		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-MI.ttf",
+		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-L.ttf",
+		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-LI.ttf",
 		"/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
 		"/usr/share/fonts/opentype/noto/NotoSansCJK.ttc",
 		"/usr/share/fonts/truetype/wqy/wqy-microhei.ttc"
 	};
 
-	for (i = 0; i < 4; ++i) {
-		ids[i] = LCUIFont_LoadFile(fonts[i]);
+	for (i = 0; i < sizeof(fonts) / sizeof(char *); ++i) {
+		LCUIFont_LoadFile(fonts[i]);
 	}
-	for (i = 3; i >= 0; --i) {
-		if (ids[i] > 0) {
-			LCUIFont_SetDefault(ids[i]);
-			break;
-		}
+	i = LCUIFont_GetIdByNames(&ids, FONT_STYLE_NORMAL, FONT_WEIGHT_NORMAL,
+				  names);
+	if (i > 0) {
+		LCUIFont_SetDefault(ids[i - 1]);
 	}
 }
 #endif
