@@ -53,14 +53,29 @@ static void OnMotionNotify(LCUI_Event e, void *arg)
 	LCUI_DestroyEvent(&sys_ev);
 }
 
+#define MOUSE_WHEEL_DELTA 20
+
 static void OnButtonPress(LCUI_Event e, void *arg)
 {
 	XEvent *ev = arg;
 	LCUI_SysEventRec sys_ev;
-	sys_ev.type = LCUI_MOUSEDOWN;
-	sys_ev.button.x = ev->xbutton.x;
-	sys_ev.button.y = ev->xbutton.y;
-	sys_ev.button.button = ev->xbutton.button;
+
+	if (ev->xbutton.button == Button4) {
+		sys_ev.type = LCUI_MOUSEWHEEL;
+		sys_ev.wheel.x = ev->xbutton.x;
+		sys_ev.wheel.y = ev->xbutton.y;
+		sys_ev.wheel.delta = MOUSE_WHEEL_DELTA;
+	} else if (ev->xbutton.button == Button5) {
+		sys_ev.type = LCUI_MOUSEWHEEL;
+		sys_ev.wheel.x = ev->xbutton.x;
+		sys_ev.wheel.y = ev->xbutton.y;
+		sys_ev.wheel.delta = -MOUSE_WHEEL_DELTA;
+	} else {
+		sys_ev.type = LCUI_MOUSEDOWN;
+		sys_ev.button.x = ev->xbutton.x;
+		sys_ev.button.y = ev->xbutton.y;
+		sys_ev.button.button = ev->xbutton.button;
+	}
 	LCUI_TriggerEvent(&sys_ev, NULL);
 	LCUI_DestroyEvent(&sys_ev);
 }
