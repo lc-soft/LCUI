@@ -485,6 +485,7 @@ static size_t WidgetRenderer_Render(LCUI_WidgetRenderer renderer)
 	char filename[256];
 	static size_t frame = 0;
 #endif
+	DEBUG_MSG("[%d] %s: start render\n", that->target->index, that->target->type);
 	/* 如果部件有需要绘制的内容 */
 	if (that->can_render_self) {
 		count += 1;
@@ -531,6 +532,7 @@ static size_t WidgetRenderer_Render(LCUI_WidgetRenderer renderer)
 		LCUI_WritePNGFile(filename,
 				  &that->root_paint->canvas);
 #endif
+		DEBUG_MSG("[%d] %s: end render, count: %lu\n", that->target->index, that->target->type, count);
 		return count;
 	}
 	/* 若需要绘制的是当前部件图层，则先混合部件自身位图和内容位图，得出当
@@ -559,6 +561,7 @@ static size_t WidgetRenderer_Render(LCUI_WidgetRenderer renderer)
 		frame++, renderer->target->id);
 	LCUI_WritePNGFile(filename, &that->root_paint->canvas);
 #endif
+	DEBUG_MSG("[%d] %s: end render, count: %lu\n", that->target->index, that->target->type, count);
 	return count;
 }
 
@@ -574,7 +577,9 @@ size_t Widget_Render(LCUI_Widget w, LCUI_PaintContext paint)
 	Widget_ComputeActualPaddingBox(w, &style);
 	Widget_ComputeActualContentBox(w, &style);
 	renderer = WidgetRenderer(w, paint, &style, NULL);
+	DEBUG_MSG("[%d] %s: start render\n", renderer->target->index, renderer->target->type);
 	count = WidgetRenderer_Render(renderer);
+	DEBUG_MSG("[%d] %s: end render, count: %lu\n", renderer->target->index, renderer->target->type, count);
 	WidgetRenderer_Delete(renderer);
 	return count;
 }

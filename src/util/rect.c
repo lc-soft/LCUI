@@ -309,6 +309,22 @@ void LCUIRect_CutFourRect(LCUI_Rect *rect1, LCUI_Rect *rect2,
 	rects[3].height = rect1->y - rect2->y;
 }
 
+int LCUIRect_GetXDistance(LCUI_Rect *a, LCUI_Rect *b)
+{
+	if (a->x <= b->x) {
+		return a->x + a->width - b->x;
+	}
+	return b->x + b->width - a->x;
+}
+
+int LCUIRect_GetYDistance(LCUI_Rect *a, LCUI_Rect *b)
+{
+	if (a->y <= b->y) {
+		return a->y + a->height - b->y;
+	}
+	return b->y + b->height - a->y;
+}
+
 int RectList_Add(LinkedList *list, LCUI_Rect *rect)
 {
 	LCUI_Rect *added_rect, union_rect;
@@ -330,11 +346,11 @@ int RectList_Add(LinkedList *list, LCUI_Rect *rect)
 			node = prev;
 			continue;
 		}
-		/* 如果与现有的矩形不重叠 */
-		if (!LCUIRect_GetOverlayRect(rect, added_rect, &union_rect)) {
+		/* If the distance between two rectangles exceeds 10px */
+		if (LCUIRect_GetXDistance(rect, added_rect) > 10 ||
+		LCUIRect_GetYDistance(rect, added_rect) > 10) {
 			continue;
 		}
-		/* 直接合并 */
 		LCUIRect_MergeRect(&union_rect, added_rect, rect);
 		free(node->data);
 		LinkedList_DeleteNode(list, node);

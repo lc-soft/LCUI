@@ -118,10 +118,7 @@ void LCUIDisplay_Update(void)
 	if (display.mode == LCUI_DMODE_SEAMLESS || !record) {
 		return;
 	}
-	for (LinkedList_Each(node, &display.rects)) {
-		RectList_Add(&record->rects, node->data);
-	}
-	RectList_Clear(&display.rects);
+	LinkedList_Concat(&record->rects, &display.rects);
 }
 
 size_t LCUIDisplay_Render(void)
@@ -132,6 +129,7 @@ size_t LCUIDisplay_Render(void)
 	LCUI_SysEventRec ev;
 	LCUI_BOOL can_render;
 	LCUI_PaintContext paint;
+	LinkedList rects;
 	LinkedListNode *sn, *rn;
 	SurfaceRecord record;
 
@@ -139,14 +137,20 @@ size_t LCUIDisplay_Render(void)
 		return 0;
 	}
 	ev.type = LCUI_PAINT;
+	LinkedList_Init(&rects);
 	/* 遍历当前的 surface 记录列表 */
 	for (LinkedList_Each(sn, &display.surfaces)) {
 		record = sn->data;
 		s = record->surface;
 		can_render = record->widget && s && Surface_IsReady(s);
 		record->rendered = FALSE;
-		/* 在 surface 上逐个重绘无效区域 */
+		/* collect and merge scattered rectangles */
 		for (LinkedList_Each(rn, &record->rects)) {
+			rect = rn->data;
+			RectList_Add(&rects, rn->data);
+		}
+		/* 在 surface 上逐个重绘无效区域 */
+		for (LinkedList_Each(rn, &rects)) {
 			rect = rn->data;
 			ev.paint.rect = *rect;
 			LCUI_TriggerEvent(&ev, NULL);
@@ -170,6 +174,7 @@ size_t LCUIDisplay_Render(void)
 			Surface_EndPaint(s, paint);
 			record->rendered = TRUE;
 		}
+		RectList_Clear(&rects);
 		RectList_Clear(&record->rects);
 	}
 	return count;

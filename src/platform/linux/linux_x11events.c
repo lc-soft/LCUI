@@ -94,8 +94,7 @@ static void X11_ProcessEvents(void)
 	if (!X11_WaitEvent()) {
 		return;
 	}
-	for (i = 0; X11_DispatchEvent() && i < 100; ++i)
-		;
+	for (i = 0; X11_DispatchEvent() && i < 100; ++i);
 }
 
 static int X11_BindSysEvent(int event_id, LCUI_EventFunc func, void *data,

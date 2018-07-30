@@ -37,6 +37,8 @@
 #include LCUI_EVENTS_H
 #include LCUI_MOUSE_H
 
+#define MOUSE_WHEEL_DELTA 20
+
 static void OnMotionNotify(LCUI_Event e, void *arg)
 {
 	XEvent *ev = arg;
@@ -52,8 +54,6 @@ static void OnMotionNotify(LCUI_Event e, void *arg)
 	LCUI_TriggerEvent(&sys_ev, NULL);
 	LCUI_DestroyEvent(&sys_ev);
 }
-
-#define MOUSE_WHEEL_DELTA 20
 
 static void OnButtonPress(LCUI_Event e, void *arg)
 {
