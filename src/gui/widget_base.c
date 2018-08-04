@@ -848,18 +848,18 @@ void Widget_UpdatePosition(LCUI_Widget w)
 	switch (position) {
 	case SV_ABSOLUTE:
 		w->x = w->y = 0;
-		if (Widget_CheckStyleValid(w, key_left)) {
+		if (!Widget_HasAutoStyle(w, key_left)) {
 			w->x = w->computed_style.left;
-		} else if (Widget_CheckStyleValid(w, key_right)) {
+		} else if (!Widget_HasAutoStyle(w, key_right)) {
 			if (w->parent) {
 				w->x = w->parent->box.border.width;
 				w->x -= w->width;
 			}
 			w->x -= w->computed_style.right;
 		}
-		if (Widget_CheckStyleValid(w, key_top)) {
+		if (!Widget_HasAutoStyle(w, key_top)) {
 			w->y = w->computed_style.top;
-		} else if (Widget_CheckStyleValid(w, key_bottom)) {
+		} else if (!Widget_HasAutoStyle(w, key_bottom)) {
 			if (w->parent) {
 				w->y = w->parent->box.border.height;
 				w->y -= w->height;
@@ -868,14 +868,14 @@ void Widget_UpdatePosition(LCUI_Widget w)
 		}
 		break;
 	case SV_RELATIVE:
-		if (Widget_CheckStyleValid(w, key_left)) {
+		if (!Widget_HasAutoStyle(w, key_left)) {
 			w->x += w->computed_style.left;
-		} else if (Widget_CheckStyleValid(w, key_right)) {
+		} else if (!Widget_HasAutoStyle(w, key_right)) {
 			w->x -= w->computed_style.right;
 		}
-		if (Widget_CheckStyleValid(w, key_top)) {
+		if (!Widget_HasAutoStyle(w, key_top)) {
 			w->y += w->computed_style.top;
-		} else if (Widget_CheckStyleValid(w, key_bottom)) {
+		} else if (!Widget_HasAutoStyle(w, key_bottom)) {
 			w->y -= w->computed_style.bottom;
 		}
 	default:
