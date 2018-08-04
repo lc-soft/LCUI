@@ -37,6 +37,8 @@
 #include <LCUI/gui/metrics.h>
 #include <LCUI/gui/widget.h>
 
+#define ComputeActual LCUIMetrics_ComputeActual
+
 typedef struct ImageCacheRec_ {
 	char *path;
 	LCUI_Graph image;
@@ -121,7 +123,7 @@ static void ExecLoadImage(void *arg1, void *arg2)
 {
 	char *path = arg2;
 	LCUI_Graph image;
-	LCUI_Widget widget = arg1;
+	LCUI_Widget w = arg1;
 	ImageCache cache;
 
 	Graph_Init(&image);
@@ -133,13 +135,12 @@ static void ExecLoadImage(void *arg1, void *arg2)
 	cache->path = strdup2(path);
 	LinkedList_Init(&cache->refs);
 	if (Dict_Add(self.images, cache->path, cache) == 0) {
-		AddImageRef(widget, cache);
+		AddImageRef(w, cache);
 	} else {
 		DestroyImageCache(cache);
 	}
-	Graph_Quote(&widget->computed_style.background.image,
-		    &cache->image, NULL);
-	Widget_AddTask(widget, LCUI_WTASK_BODY);
+	Graph_Quote(&w->computed_style.background.image, &cache->image, NULL);
+	Widget_AddTask(w, LCUI_WTASK_BODY);
 }
 
 static int OnCompareWidget(void *data, const void *keydata)
@@ -148,7 +149,7 @@ static int OnCompareWidget(void *data, const void *keydata)
 	if (ref->widget == keydata) {
 		return 0;
 	}
-	if ((void*)ref->widget > keydata) {
+	if ((void *)ref->widget > keydata) {
 		return 1;
 	}
 	return -1;
@@ -261,7 +262,8 @@ void Widget_UpdateBackground(LCUI_Widget widget)
 				}
 				Graph_Quote(&bg->image, s->image, NULL);
 				DeleteImageRef(widget);
-			default: break;
+			default:
+				break;
 			}
 			break;
 		case key_background_position:
@@ -306,7 +308,8 @@ void Widget_UpdateBackground(LCUI_Widget widget)
 				bg->size.height = *s;
 			}
 			break;
-		default: break;
+		default:
+			break;
 		}
 	}
 	Widget_AddTask(widget, LCUI_WTASK_BODY);
@@ -350,13 +353,13 @@ void Widget_ComputeBackground(LCUI_Widget w, LCUI_Background *out)
 			height = (float)bg->image.height;
 			break;
 		}
-		out->position.x = LCUIMetrics_ComputeActual(x, LCUI_STYPE_PX);
-		out->position.y = LCUIMetrics_ComputeActual(y, LCUI_STYPE_PX);
-		out->size.width = LCUIMetrics_ComputeActual(width, LCUI_STYPE_PX);
-		out->size.height = LCUIMetrics_ComputeActual(height, LCUI_STYPE_PX);
+		out->position.x = ComputeActual(x, LCUI_STYPE_PX);
+		out->position.y = ComputeActual(y, LCUI_STYPE_PX);
+		out->size.width = ComputeActual(width, LCUI_STYPE_PX);
+		out->size.height = ComputeActual(height, LCUI_STYPE_PX);
 	} else {
 		type = LCUI_STYPE_PX;
-		switch (type) {
+		switch (bg->size.width.type) {
 		case LCUI_STYPE_SCALE:
 			width = box->width * bg->size.width.scale;
 			break;
@@ -369,9 +372,9 @@ void Widget_ComputeBackground(LCUI_Widget w, LCUI_Background *out)
 			type = bg->size.width.type;
 			break;
 		}
-		out->size.width = LCUIMetrics_ComputeActual(width, type);
+		out->size.width = ComputeActual(width, type);
 		type = LCUI_STYPE_PX;
-		switch (type) {
+		switch (bg->size.height.type) {
 		case LCUI_STYPE_SCALE:
 			height = box->height * bg->size.height.scale;
 			break;
@@ -383,7 +386,7 @@ void Widget_ComputeBackground(LCUI_Widget w, LCUI_Background *out)
 			height = (float)bg->size.height.value;
 			break;
 		}
-		out->size.height = LCUIMetrics_ComputeActual(height, type);
+		out->size.height = ComputeActual(height, type);
 	}
 	/* 计算背景图的像素坐标 */
 	if (bg->position.using_value) {
@@ -423,8 +426,11 @@ void Widget_ComputeBackground(LCUI_Widget w, LCUI_Background *out)
 			y = box->height - height;
 			break;
 		case SV_TOP_LEFT:
-		default: break;
+		default:
+			break;
 		}
+		out->position.x = ComputeActual(x, LCUI_STYPE_PX);
+		out->position.y = ComputeActual(y, LCUI_STYPE_PX);
 	} else {
 		type = LCUI_STYPE_PX;
 		switch (bg->position.x.type) {
@@ -440,7 +446,7 @@ void Widget_ComputeBackground(LCUI_Widget w, LCUI_Background *out)
 			type = bg->position.x.type;
 			break;
 		}
-		out->position.x = LCUIMetrics_ComputeActual(x, type);
+		out->position.x = ComputeActual(x, type);
 		type = LCUI_STYPE_PX;
 		switch (bg->position.y.type) {
 		case LCUI_STYPE_SCALE:
@@ -455,7 +461,7 @@ void Widget_ComputeBackground(LCUI_Widget w, LCUI_Background *out)
 			type = bg->position.y.type;
 			break;
 		}
-		out->position.y = LCUIMetrics_ComputeActual(y, type);
+		out->position.y = ComputeActual(y, type);
 	}
 	out->color = bg->color;
 	out->image = &bg->image;
