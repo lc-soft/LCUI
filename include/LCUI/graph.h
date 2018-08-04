@@ -147,14 +147,10 @@ LCUI_API int Graph_QuoteReadOnly(LCUI_Graph *self,
 		(G)->quote.source->color_type == LCUI_COLOR_TYPE_ARGB	\
 	) : ((G)->color_type == LCUI_COLOR_TYPE_ARGB))
 
-/** 判断图像是否有效 */
-#define Graph_IsValid(G)							\
-	((G)->quote.is_valid ? ((G)->quote.source				\
-	 && (G)->quote.source->width > 0 && (G)->quote.source->height > 0	\
-	) : ((G) && (G)->bytes && (G)->height > 0 && (G)->width > 0))
-
 #define Graph_IsWritable(G) (Graph_IsValid(G) && \
 	((G)->quote.is_valid ? (G)->quote.is_writable : TRUE))
+
+LCUI_BOOL Graph_IsValid(const LCUI_Graph *graph);
 
 LCUI_API void Graph_GetValidRect(const LCUI_Graph *graph, LCUI_Rect *rect);
 
