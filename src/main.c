@@ -113,7 +113,72 @@ static struct LCUI_App {
 
 /* clang-format on */
 
-/*-------------------------- system event <START> ---------------------------*/
+enum LCUI_StatsTarget {
+	LCUI_STATS_EVENTS,
+	LCUI_STATS_LAYOUT,
+	LCUI_STATS_RENDER,
+	LCUI_STATS_PRESENT
+};
+
+typedef struct LCUI_StatsRec_ {
+	size_t frame;
+	int64_t start_time;
+	uint32_t total_time;
+	size_t render_count;
+	union {
+		uint32_t time_list[4];
+		struct {
+			uint32_t events_time;
+			uint32_t layout_time;
+			uint32_t render_time;
+			uint32_t present_time;
+		} time;
+	};
+} LCUI_StatsRec, *LCUI_Stats;
+
+void LCUIStats_Begin(LCUI_Stats stats)
+{
+	memset(stats, 0, sizeof(LCUI_StatsRec));
+	stats->start_time = LCUI_GetTime();
+	stats->frame = LCUI_GetFrameCount();
+}
+
+void LCUIStats_RecordTime(LCUI_Stats stats, unsigned num)
+{
+	unsigned i;
+	uint32_t delta;
+
+	delta = (uint32_t)LCUI_GetTimeDelta(stats->start_time);
+	for (i = 0; i < num && i < 4; ++i) {
+		if (delta > stats->time_list[i]) {
+			delta -= stats->time_list[i];
+		} else {
+			delta = 0;
+			break;
+		}
+	}
+	stats->time_list[num] = delta;
+}
+
+void LCUIStats_Print(LCUI_Stats stats)
+{
+	LOG("[stats] total time: %ums, events time: %ums, "
+	    "layout time: %ums, render time: %ums, render count: %lu, "
+	    "present time: %ums\n",
+	    stats->total_time, stats->time.events_time, stats->time.layout_time,
+	    stats->time.render_time, stats->render_count,
+	    stats->time.present_time);
+}
+
+void LCUIStats_End(LCUI_Stats stats)
+{
+	stats->total_time = (uint32_t)LCUI_GetTimeDelta(stats->start_time);
+	if (stats->total_time > 100) {
+		LOG("[stats] \e[1;33mwarning:\e[0m current frame takes "
+		    "too long\n");
+		LCUIStats_Print(stats);
+	}
+}
 
 static void LCUI_InitEvent(void)
 {
@@ -225,8 +290,6 @@ void LCUI_DestroyEvent(LCUI_SysEvent e)
 	e->type = LCUI_NONE;
 }
 
-/*--------------------------- system event <END> ----------------------------*/
-
 void LCUI_ProcessEvents(void)
 {
 	if (MainApp.driver_ready) {
@@ -282,61 +345,6 @@ LCUI_MainLoop LCUIMainLoop_New(void)
 	return loop;
 }
 
-typedef struct LCUI_StatsRec_ {
-	size_t frame;
-	int64_t start_time;
-	uint32_t total_time;
-	size_t render_count;
-	union {
-		uint32_t time_list[4];
-		struct {
-			uint32_t events_time;
-			uint32_t layout_time;
-			uint32_t render_time;
-			uint32_t present_time;
-		} time;
-	};
-} LCUI_StatsRec, *LCUI_Stats;
-
-void LCUIStats_Begin(LCUI_Stats stats)
-{
-	memset(stats, 0, sizeof(LCUI_StatsRec));
-	stats->start_time = LCUI_GetTime();
-	stats->frame = LCUI_GetFrameCount();
-}
-
-void LCUIStats_End(LCUI_Stats stats)
-{
-	stats->total_time = (uint32_t)LCUI_GetTimeDelta(stats->start_time);
-}
-
-void LCUIStats_RecordTime(LCUI_Stats stats, unsigned num)
-{
-	unsigned i;
-	uint32_t delta;
-
-	delta = (uint32_t)LCUI_GetTimeDelta(stats->start_time);
-	for (i = 0; i < num && i < 4; ++i) {
-		if (delta > stats->time_list[i]) {
-			delta -= stats->time_list[i];
-		} else {
-			delta = 0;
-			break;
-		}
-	}
-	stats->time_list[num] = delta;
-}
-
-void LCUIStats_Print(LCUI_Stats stats)
-{
-	LOG("[stats] in frame %lu, total time: %ums, events time: %ums, "
-	    "layout time: %ums, render time: %ums, render_count: %lu, "
-	    "present time: %ums\n",
-	    stats->frame, stats->total_time, stats->time.events_time,
-	    stats->time.layout_time, stats->time.render_time,
-	    stats->render_count, stats->time.present_time);
-}
-
 /** 运行目标主循环 */
 int LCUIMainLoop_Run(LCUI_MainLoop loop)
 {
@@ -364,18 +372,14 @@ int LCUIMainLoop_Run(LCUI_MainLoop loop)
 	while (loop->state != STATE_EXITED) {
 		LCUIStats_Begin(&stats);
 		LCUI_ProcessEvents();
-		LCUIStats_RecordTime(&stats, 0);
+		LCUIStats_RecordTime(&stats, LCUI_STATS_EVENTS);
 		LCUIDisplay_Update();
-		LCUIStats_RecordTime(&stats, 1);
+		LCUIStats_RecordTime(&stats, LCUI_STATS_LAYOUT);
 		stats.render_count = LCUIDisplay_Render();
-		LCUIStats_RecordTime(&stats, 2);
+		LCUIStats_RecordTime(&stats, LCUI_STATS_RENDER);
 		LCUIDisplay_Present();
-		LCUIStats_RecordTime(&stats, 3);
+		LCUIStats_RecordTime(&stats, LCUI_STATS_PRESENT);
 		LCUIStats_End(&stats);
-		if (stats.total_time > 100) {
-			LOG("[stats] \e[1;33mwarning:\e[0m current frame takes too long\n");
-			LCUIStats_Print(&stats);
-		}
 		StepTimer_Remain(MainApp.timer);
 		/* 如果当前运行的主循环不是自己 */
 		while (MainApp.loop != loop) {
