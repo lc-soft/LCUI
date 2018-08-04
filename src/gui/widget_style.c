@@ -38,7 +38,7 @@
 #include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/css_fontstyle.h>
 
-#define ARRAY_LEN(ARR) sizeof( ARR ) / sizeof( ARR[0] )
+#define ARRAY_LEN(ARR) sizeof(ARR) / sizeof(ARR[0])
 
 typedef struct LCUI_TaskCacheStatus {
 	size_t start, end;
@@ -46,25 +46,29 @@ typedef struct LCUI_TaskCacheStatus {
 	LCUI_BOOL is_valid;
 } LCUI_TaskStatus;
 
+/* clang-format off */
+
 /** 部件的缺省样式 */
 const char *global_css = CodeToString(
 
-	*{
-width: auto;
-height:	auto;
-	background - color: transparent;
-border: 0px solid #000;
-display: block;
-position: static;
+* {
+	width: auto;
+	height:	auto;
+	background-color: transparent;
+	border: 0px solid #000;
+	display: block;
+	position: static;
 	padding: 0;
-		 margin: 0;
+	margin: 0;
 }
 
 root{
-focusable: true;
+	focusable: true;
 }
 
 );
+
+/* clang-format on */
 
 LCUI_SelectorNode Widget_GetSelectorNode(LCUI_Widget w)
 {
@@ -97,8 +101,8 @@ LCUI_Selector Widget_GetSelector(LCUI_Widget w)
 	s = Selector(NULL);
 	LinkedList_Init(&list);
 	for (parent = w; parent; parent = parent->parent) {
-		if (parent->id || parent->type ||
-		    parent->classes || parent->status) {
+		if (parent->id || parent->type || parent->classes ||
+		    parent->status) {
 			LinkedList_Append(&list, parent);
 		}
 	}
@@ -130,9 +134,14 @@ int Widget_HandleChildrenStyleChange(LCUI_Widget w, int type, const char *name)
 
 	/* 选择相应的前缀 */
 	switch (type) {
-	case 0: ch = '.'; break;
-	case 1: ch = ':'; break;
-	default: return 0;
+	case 0:
+		ch = '.';
+		break;
+	case 1:
+		ch = ':';
+		break;
+	default:
+		return 0;
 	}
 	LinkedList_Init(&snames);
 	s = Widget_GetSelector(w);
@@ -157,15 +166,17 @@ int Widget_HandleChildrenStyleChange(LCUI_Widget w, int type, const char *name)
 				switch (*p) {
 				case 0:
 				case ':':
-				case '.': break;
-				default: continue;
+				case '.':
+					break;
+				default:
+					continue;
 				}
 				break;
 			}
 		}
 		if (i < n) {
-			count += LCUI_FindStyleSheetFromGroup(1, sname,
-							      s, NULL);
+			count +=
+			    LCUI_FindStyleSheetFromGroup(1, sname, s, NULL);
 		}
 	}
 	Selector_Delete(s);
@@ -219,50 +230,30 @@ void Widget_ExecUpdateStyle(LCUI_Widget w, LCUI_BOOL is_update_all)
 	LCUI_Style s;
 	LCUI_StyleSheet ss;
 	LCUI_TaskStatus task_status[] = {
-		{
-			key_visible, key_visible, LCUI_WTASK_VISIBLE, TRUE
-		}, {
-			key_display, key_display, LCUI_WTASK_DISPLAY, TRUE
-		}, {
-			key_flex_style_start, key_flex_style_end,
-			LCUI_WTASK_LAYOUT, TRUE
-		}, {
-			key_opacity, key_opacity, LCUI_WTASK_OPACITY, TRUE
-		}, {
-			key_z_index, key_z_index, LCUI_WTASK_ZINDEX, TRUE
-		}, {
-			key_width, key_height, LCUI_WTASK_RESIZE, TRUE
-		}, {
-			key_min_width, key_max_height,
-			LCUI_WTASK_RESIZE_WITH_SURFACE, TRUE
-		}, {
-			key_padding_start, key_padding_end,
-			LCUI_WTASK_RESIZE_WITH_SURFACE, TRUE
-		}, {
-			key_box_sizing, key_box_sizing,
-			LCUI_WTASK_RESIZE_WITH_SURFACE, TRUE
-		}, {
-			key_margin_start, key_margin_end,
-			LCUI_WTASK_MARGIN, TRUE
-		}, {
-			key_position_start, key_position_end,
-			LCUI_WTASK_POSITION, TRUE
-		}, {
-			key_vertical_align, key_vertical_align,
-			LCUI_WTASK_POSITION, TRUE
-		}, {
-			key_border_start, key_border_end,
-			LCUI_WTASK_BORDER, TRUE
-		}, {
-			key_background_start, key_background_end,
-			LCUI_WTASK_BACKGROUND, TRUE
-		}, {
-			key_box_shadow_start, key_box_shadow_end,
-			LCUI_WTASK_SHADOW, TRUE
-		}, {
-			key_pointer_events, key_focusable,
-			LCUI_WTASK_PROPS, TRUE
-		}
+		{ key_visible, key_visible, LCUI_WTASK_VISIBLE, TRUE },
+		{ key_display, key_display, LCUI_WTASK_DISPLAY, TRUE },
+		{ key_flex_style_start, key_flex_style_end, LCUI_WTASK_LAYOUT,
+		  TRUE },
+		{ key_opacity, key_opacity, LCUI_WTASK_OPACITY, TRUE },
+		{ key_z_index, key_z_index, LCUI_WTASK_ZINDEX, TRUE },
+		{ key_width, key_height, LCUI_WTASK_RESIZE, TRUE },
+		{ key_min_width, key_max_height, LCUI_WTASK_RESIZE_WITH_SURFACE,
+		  TRUE },
+		{ key_padding_start, key_padding_end,
+		  LCUI_WTASK_RESIZE_WITH_SURFACE, TRUE },
+		{ key_box_sizing, key_box_sizing,
+		  LCUI_WTASK_RESIZE_WITH_SURFACE, TRUE },
+		{ key_margin_start, key_margin_end, LCUI_WTASK_MARGIN, TRUE },
+		{ key_position_start, key_position_end, LCUI_WTASK_POSITION,
+		  TRUE },
+		{ key_vertical_align, key_vertical_align, LCUI_WTASK_POSITION,
+		  TRUE },
+		{ key_border_start, key_border_end, LCUI_WTASK_BORDER, TRUE },
+		{ key_background_start, key_background_end,
+		  LCUI_WTASK_BACKGROUND, TRUE },
+		{ key_box_shadow_start, key_box_shadow_end, LCUI_WTASK_SHADOW,
+		  TRUE },
+		{ key_pointer_events, key_focusable, LCUI_WTASK_PROPS, TRUE }
 	};
 
 	if (is_update_all) {
