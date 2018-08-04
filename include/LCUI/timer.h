@@ -46,18 +46,16 @@ LCUI_BEGIN_HEADER
  * @return
  *	该定时器的标识符
  **/
-LCUI_API int LCUITimer_Set(long int n_ms, void(*callback_func)(void*),
+LCUI_API int LCUITimer_Set(long int n_ms, void (*callback_func)(void *),
 			   void *arg, LCUI_BOOL reuse);
 
-       /** repeatedly calls a function, with a fixed time delay between each call. */
-LCUI_API int LCUITimer_SetTimeout(long int n_ms,
-				  void(*callback)(void*),
-				  void *arg);
+/** repeatedly calls a function, with a fixed time delay between each call. */
+LCUI_API int LCUI_SetTimeout(long int n_ms, void (*callback)(void *),
+			     void *arg);
 
 /** set a timer which execute a function once after the timer expires. */
-LCUI_API int LCUITimer_SetInterval(long int n_ms,
-				   void(*callback)(void*),
-				   void *arg);
+LCUI_API int LCUI_SetInterval(long int n_ms, void (*callback)(void *),
+			      void *arg);
 
 /**
  * 释放定时器
