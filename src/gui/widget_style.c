@@ -230,7 +230,7 @@ void Widget_ExecUpdateStyle(LCUI_Widget w, LCUI_BOOL is_update_all)
 	LCUI_Style s;
 	LCUI_StyleSheet ss;
 	LCUI_TaskStatus task_status[] = {
-		{ key_visible, key_visible, LCUI_WTASK_VISIBLE, TRUE },
+		{ key_visibility, key_visibility, LCUI_WTASK_VISIBLE, TRUE },
 		{ key_display, key_display, LCUI_WTASK_DISPLAY, TRUE },
 		{ key_flex_style_start, key_flex_style_end, LCUI_WTASK_LAYOUT,
 		  TRUE },

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * css_parser.c -- css code parser module
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
@@ -557,6 +557,15 @@ static int OnParseBackgroundRepeat(LCUI_CSSParserStyleContext ctx, const char *s
 	return 0;
 }
 
+static int OnParseVisibility(LCUI_CSSParserStyleContext ctx, const char *str)
+{
+	if (strcmp(str, "visible") == 0 || strcmp(str, "hidden") == 0) {
+		SetStyle(ctx->sheet, ctx->parser->key, strdup2(str), string);
+		return 0;
+	}
+	return -1;
+}
+
 /** 各个样式的解析器映射表 */
 static LCUI_CSSPropertyParserRec style_parser_map[] = {
 	{ key_width, NULL, OnParseNumber },
@@ -572,7 +581,7 @@ static LCUI_CSSPropertyParserRec style_parser_map[] = {
 	{ key_z_index, NULL, OnParseValue },
 	{ key_opacity, NULL, OnParseNumber },
 	{ key_position, NULL, OnParseStyleOption },
-	{ key_visible, NULL, OnParseBoolean },
+	{ key_visibility, NULL, OnParseVisibility },
 	{ key_vertical_align, NULL, OnParseStyleOption },
 	{ key_display, NULL, OnParseStyleOption },
 	{ key_background_color, NULL, OnParseColor },

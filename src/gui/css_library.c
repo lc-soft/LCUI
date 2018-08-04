@@ -114,7 +114,7 @@ typedef struct KeyNameGroupRec_ {
 } KeyNameGroupRec, *KeyNameGroup;
 
 static KeyNameGroupRec style_name_map[] = {
-	{ key_visible, "visible" },
+	{ key_visibility, "visibility" },
 	{ key_width, "width" },
 	{ key_height, "height" },
 	{ key_min_width, "min-width" },

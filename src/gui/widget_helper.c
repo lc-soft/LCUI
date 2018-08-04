@@ -102,13 +102,13 @@ void Widget_ResizeWithSurface(LCUI_Widget w, float width, float height)
 
 void Widget_Show(LCUI_Widget w)
 {
-	Widget_SetStyle(w, key_visible, TRUE, bool);
+	Widget_SetStyle(w, key_visibility, strdup2("visible"), string);
 	Widget_UpdateStyle(w, FALSE);
 }
 
 void Widget_Hide(LCUI_Widget w)
 {
-	Widget_SetStyle(w, key_visible, FALSE, bool);
+	Widget_SetStyle(w, key_visibility, strdup2("hidden"), string);
 	Widget_UpdateStyle(w, FALSE);
 }
 

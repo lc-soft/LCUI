@@ -47,7 +47,7 @@ LCUI_BEGIN_HEADER
 	// position end
 
 	// display start
-	key_visible,
+	key_visibility,
 	key_display,
 	// display end
 
