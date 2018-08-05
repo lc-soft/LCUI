@@ -1004,7 +1004,7 @@ static void Widget_ComputeStaticContentSize(LCUI_Widget w, float *out_width,
 		content_height = max(content_height, height);
 	}
 	/* The child widget's coordinates are relative to the padding box,
-	 * not the content_box, so it needs to be converted */
+	 * not the content box, so it needs to be converted */
 	content_width -= w->padding.left;
 	content_height -= w->padding.top;
 	if (out_width && *out_width <= 0) {
@@ -1345,11 +1345,9 @@ void Widget_UpdateMargin(LCUI_Widget w)
 	Widget_AddTask(w, LCUI_WTASK_POSITION);
 }
 
-void Widget_UpdateSize(LCUI_Widget w)
+void Widget_ComputePadding(LCUI_Widget w)
 {
-	LCUI_RectF rect;
-	int i, box_sizing;
-	LCUI_Rect2F padding = w->padding;
+	int i;
 	LCUI_BoundBox *pbox = &w->computed_style.padding;
 	struct {
 		LCUI_Style sval;
@@ -1360,7 +1358,6 @@ void Widget_UpdateSize(LCUI_Widget w)
 			{ &pbox->bottom, &w->padding.bottom,
 			  key_padding_bottom },
 			{ &pbox->left, &w->padding.left, key_padding_left } };
-	rect = w->box.canvas;
 	/* 内边距的单位暂时都用 px  */
 	for (i = 0; i < 4; ++i) {
 		LCUI_Style s = &w->style->sheet[pd_map[i].key];
@@ -1373,8 +1370,17 @@ void Widget_UpdateSize(LCUI_Widget w)
 		*pd_map[i].sval = *s;
 		*pd_map[i].ival = LCUIMetrics_Compute(s->value, s->type);
 	}
+}
+
+void Widget_UpdateSize(LCUI_Widget w)
+{
+	int box_sizing;
+	LCUI_RectF rect = w->box.canvas;
+	LCUI_Rect2F padding = w->padding;
+
 	box_sizing = ComputeStyleOption(w, key_box_sizing, SV_CONTENT_BOX);
 	w->computed_style.box_sizing = box_sizing;
+	Widget_ComputePadding(w);
 	Widget_ComputeSize(w);
 	/* 如果左右外间距是 auto 类型的，则需要计算外间距 */
 	if (w->style->sheet[key_margin_left].is_valid &&
