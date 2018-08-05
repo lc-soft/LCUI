@@ -19,10 +19,23 @@
           <w type="textview" class="box-2">Hello, World!</w>
         </w>
       </w>
+      <w id="test-block" class="box-3" />
     </w>
     <w id="test-dropdown" class="dropdown-menu">
       <w id="test-text" type="textview" class="dropdown-item">Hello, World!</w>
       <w type="textview" class="dropdown-item">Test dropdown menu auto width</w>
+      <w type="textview" class="dropdown-item">Dropdown menu item</w>
+    </w>
+    <w id="test-dropdown-right" class="dropdown-menu right">
+      <w class="dropdown-item">
+        <w type="textview" class="inline-block">Hello,</w>
+        <w type="textview" class="inline-block">World!</w>
+      </w>
+      <w class="dropdown-item">
+        <w type="textview" class="inline-block">Test </w>
+        <w type="textview" class="inline-block">dropdown </w>
+        <w type="textview" class="inline-block">menu auto width</w>
+      </w>
       <w type="textview" class="dropdown-item">Dropdown menu item</w>
     </w>
   </ui>
