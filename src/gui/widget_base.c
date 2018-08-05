@@ -1217,6 +1217,12 @@ done:
 void Widget_AutoSize(LCUI_Widget w)
 {
 	float width = 0, height = 0;
+	if (!Widget_CheckStyleType(w, key_width, scale)) {
+		width = ComputeXMetric(w, key_width);
+	}
+	if (!Widget_CheckStyleType(w, key_height, scale)) {
+		height = ComputeYMetric(w, key_height);
+	}
 	Widget_ComputeContentSize(w, &width, &height);
 	width = Widget_GetAdjustedWidth(w, width);
 	Widget_SetSize(w, ToBorderBoxWidth(w, width),
