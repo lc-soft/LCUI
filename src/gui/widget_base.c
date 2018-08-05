@@ -1225,7 +1225,8 @@ void Widget_AutoSize(LCUI_Widget w)
 
 static void Widget_ComputeSize(LCUI_Widget w)
 {
-	float width, height, max_width = -1;
+	float width, height;
+	float max_width = -1, default_width = -1;
 
 	Widget_ComputeLimitSize(w);
 	width = ComputeXMetric(w, key_width);
@@ -1249,18 +1250,21 @@ static void Widget_ComputeSize(LCUI_Widget w)
 		width = ToContentBoxWidth(w, width);
 		height = ToContentBoxHeight(w, height);
 	}
-	if (Widget_HasAutoStyle(w, key_width)) {
-		if (Widget_HasFillAvailableWidth(w)) {
-			width = Widget_ComputeFillAvailableWidth(w);
-			width = ToContentBoxWidth(w, width);
-			if (!Widget_HasStaticWidthParent(w)) {
-				max_width = width;
-				width = 0;
+	if (Widget_HasAutoStyle(w, key_width) && Widget_HasFillAvailableWidth(w)) {
+		width = Widget_ComputeFillAvailableWidth(w);
+		width = ToContentBoxWidth(w, width);
+		if (!Widget_HasStaticWidthParent(w)) {
+			default_width = w->parent->box.content.width;
+			if (w->computed_style.box_sizing == SV_BORDER_BOX) {
+				default_width = ToContentBoxWidth(w, default_width);
 			}
+			max_width = width;
+			width = 0;
 		}
-		Widget_ComputeContentSize(w, &width, &height);
-	} else {
-		Widget_ComputeContentSize(w, &width, &height);
+	}
+	Widget_ComputeContentSize(w, &width, &height);
+	if (default_width != -1 && width < default_width) {
+		width = default_width;
 	}
 	if (max_width != -1 && width > max_width) {
 		width = max_width;
