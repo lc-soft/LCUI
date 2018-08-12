@@ -46,7 +46,11 @@ LCUI_API void TextView_SetAutoWrap(LCUI_Widget w, LCUI_BOOL enable);
 
 LCUI_API void TextView_SetMulitiline(LCUI_Widget w, LCUI_BOOL enable);
 
+LCUI_API size_t LCUIWidget_RefreshTextView(void);
+
 LCUI_API void LCUIWidget_AddTextView(void);
+
+LCUI_API void LCUIWidget_FreeTextView(void);
 
 LCUI_END_HEADER
 

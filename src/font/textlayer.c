@@ -263,7 +263,7 @@ static void TextChar_UpdateBitmap(LCUI_TextChar ch, LCUI_TextStyle style)
 			size = ch->style->pixel_size;
 		}
 	}
-	while (font_ids && font_ids[i] >= 0) {
+	while (font_ids && font_ids[i] > 0) {
 		int ret = LCUIFont_GetBitmap(ch->code, font_ids[i],
 					     size, &ch->bitmap);
 		if (ret == 0) {

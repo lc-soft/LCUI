@@ -60,6 +60,7 @@ void LCUI_InitWidget(void)
 
 void LCUI_FreeWidget(void)
 {
+	LCUIWidget_FreeTextView();
 	LCUIWidget_FreeTasks();
 	LCUIWidget_FreeRoot();
 	LCUIWidget_FreeEvent();

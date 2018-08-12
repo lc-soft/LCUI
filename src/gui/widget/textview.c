@@ -42,6 +42,7 @@
 #include <LCUI/gui/widget/textview.h>
 
 #define GetData(W) Widget_GetData(W, self.prototype)
+#define ComputeActual LCUIMetrics_ComputeActual
 
 enum TaskType {
 	TASK_SET_TEXT,
@@ -56,12 +57,13 @@ enum TaskType {
 };
 
 typedef struct LCUI_TextViewRec_ {
-	LCUI_Widget widget;         /**< 所属的部件 */
-	wchar_t *content;           /**< 原始内容 */
-	LCUI_BOOL trimming;         /**< 是否清除首尾空白符 */
-	LCUI_Mutex mutex;           /**< 互斥锁 */
-	LCUI_TextLayer layer;       /**< 文本图层 */
-	LCUI_CSSFontStyleRec style; /**< 文字样式 */
+	wchar_t *content;
+	LCUI_BOOL trimming;
+	LCUI_Widget widget;
+	LCUI_Mutex mutex;
+	LCUI_TextLayer layer;
+	LCUI_CSSFontStyleRec style;
+	LinkedListNode node;
 	struct {
 		LCUI_BOOL is_valid;
 		union {
@@ -76,6 +78,8 @@ typedef struct LCUI_TextViewRec_ {
 
 static struct LCUI_TextViewModule {
 	int key_word_break;
+	LinkedList list;
+	LCUI_Mutex mutex;
 	LCUI_WidgetPrototype prototype;
 } self;
 
@@ -177,6 +181,7 @@ static void TextView_UpdateStyle(LCUI_Widget w)
 	LCUI_TextView txt = GetData(w);
 	LCUI_CSSFontStyle fs = &txt->style;
 	const wchar_t *content = fs->content;
+
 	CSSFontStyle_Compute(fs, w->style);
 	CSSFontStyle_GetTextStyle(fs, &ts);
 	/* 设置任务，统一处理属性变更 */
@@ -209,11 +214,11 @@ static void TextView_UpdateLayerSize(LCUI_Widget w)
 		max_height = w->box.content.height;
 	}
 	/* 将当前部件宽高作为文本层的固定宽高 */
-	width = LCUIMetrics_ComputeActual(w->box.content.width, LCUI_STYPE_PX);
-	height = LCUIMetrics_ComputeActual(w->box.content.height, LCUI_STYPE_PX);
+	width = ComputeActual(w->box.content.width, LCUI_STYPE_PX);
+	height = ComputeActual(w->box.content.height, LCUI_STYPE_PX);
 	TextLayer_SetFixedSize(txt->layer, width, height);
-	width = LCUIMetrics_ComputeActual(max_width, LCUI_STYPE_PX);
-	height = LCUIMetrics_ComputeActual(max_height, LCUI_STYPE_PX);
+	width = ComputeActual(max_width, LCUI_STYPE_PX);
+	height = ComputeActual(max_height, LCUI_STYPE_PX);
 	TextLayer_SetMaxSize(txt->layer, width, height);
 }
 
@@ -261,6 +266,9 @@ static void TextView_OnInit(LCUI_Widget w)
 	Widget_BindEvent(w, "resize", TextView_OnResize, NULL, NULL);
 	CSSFontStyle_Init(&txt->style);
 	LCUIMutex_Init(&txt->mutex);
+	txt->node.data = txt;
+	txt->node.prev = txt->node.next = NULL;
+	LinkedList_AppendNode(&self.list, &txt->node);
 }
 
 static void TextView_ClearTasks(LCUI_Widget w)
@@ -283,6 +291,9 @@ static void TextView_OnDestroy(LCUI_Widget w)
 	LCUIMutex_Unlock(&txt->mutex);
 	TextView_ClearTasks(w);
 	free(txt->content);
+	LCUIMutex_Lock(&self.mutex);
+	LinkedList_Unlink(&self.list, &txt->node);
+	LCUIMutex_Unlock(&self.mutex);
 }
 
 static void TextView_AutoSize(LCUI_Widget w, float *width, float *height)
@@ -521,10 +532,28 @@ void TextView_SetMulitiline(LCUI_Widget w, LCUI_BOOL enable)
 	Widget_AddTask(w, LCUI_WTASK_USER);
 }
 
+size_t LCUIWidget_RefreshTextView(void)
+{
+	size_t count = 0;
+	LCUI_TextView txt;
+	LinkedListNode *node;
+
+	LCUIMutex_Lock(&self.mutex);
+	for(LinkedList_Each(node, &self.list)) {
+		txt = node->data;
+		if (txt->widget->state != LCUI_WSTATE_DELETED) {
+			Widget_UpdateStyle(txt->widget, TRUE);
+		}
+		count += 1;
+	}
+	LCUIMutex_Unlock(&self.mutex);
+	return count;
+}
+
 void LCUIWidget_AddTextView(void)
 {
 	LCUI_CSSPropertyParserRec parser = { 0, "word-break",
-		OnParseWordBreak };
+					     OnParseWordBreak };
 	self.key_word_break = LCUI_AddCSSPropertyName("word-break");
 	self.prototype = LCUIWidget_NewPrototype("textview", NULL);
 	self.prototype->init = TextView_OnInit;
@@ -537,4 +566,12 @@ void LCUIWidget_AddTextView(void)
 	self.prototype->setattr = TextView_OnParseAttr;
 	self.prototype->runtask = TextView_OnTask;
 	LCUI_AddCSSPropertyParser(&parser);
+	LCUIMutex_Init(&self.mutex);
+	LinkedList_Init(&self.list);
+}
+
+void LCUIWidget_FreeTextView(void)
+{
+	LinkedList_ClearData(&self.list, NULL);
+	LCUIMutex_Destroy(&self.mutex);
 }
