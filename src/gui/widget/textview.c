@@ -539,7 +539,7 @@ size_t LCUIWidget_RefreshTextView(void)
 	LinkedListNode *node;
 
 	LCUIMutex_Lock(&self.mutex);
-	for(LinkedList_Each(node, &self.list)) {
+	for (LinkedList_Each(node, &self.list)) {
 		txt = node->data;
 		if (txt->widget->state != LCUI_WSTATE_DELETED) {
 			Widget_UpdateStyle(txt->widget, TRUE);
