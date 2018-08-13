@@ -33,22 +33,19 @@
 
 LCUI_BEGIN_HEADER
 
-enum EncodingType {
-	ENCODING_ANSI,
-	ENCODING_UTF8
-};
+enum EncodingType { ENCODING_ANSI, ENCODING_UTF8 };
 
-#define LCUI_DecodeUTF8String(WSTR, STR, MAXLEN ) \
-LCUI_DecodeString(WSTR, STR, MAXLEN, ENCODING_UTF8)
+#define LCUI_DecodeUTF8String(WSTR, STR, MAX_LEN) \
+	LCUI_DecodeString(WSTR, STR, MAX_LEN, ENCODING_UTF8)
 
-#define LCUI_EncodeUTF8String(STR, WSTR, MAXLEN ) \
-LCUI_DecodeString(STR, WSTR, MAXLEN, ENCODING_UTF8)
+#define LCUI_EncodeUTF8String(STR, WSTR, MAX_LEN) \
+	LCUI_EncodeString(STR, WSTR, MAX_LEN, ENCODING_UTF8)
 
-LCUI_API int LCUI_DecodeString(wchar_t *wstr, const char *str,
-			       int max_len, int encoding);
+LCUI_API size_t LCUI_DecodeString(wchar_t *wstr, const char *str,
+				  size_t max_len, int encoding);
 
-LCUI_API int LCUI_EncodeString(char *str, const wchar_t *wstr,
-			       int max_len, int encoding);
+LCUI_API size_t LCUI_EncodeString(char *str, const wchar_t *wstr,
+				  size_t max_len, int encoding);
 LCUI_END_HEADER
 
 #endif

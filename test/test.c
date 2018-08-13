@@ -23,6 +23,7 @@ int main( void )
 	Logger_SetHandler( LoggerHandler );
 	Logger_SetHandlerW( LoggerHandlerW );
 #endif
+	ret += test_charset();
 	ret += test_string();
 	ret += test_thread();
 	ret += test_font_load();
