@@ -193,7 +193,6 @@ typedef enum LCUI_StyleType {
 #define LCUI_STYPE_color LCUI_STYPE_COLOR
 #define LCUI_STYPE_scale LCUI_STYPE_SCALE
 #define LCUI_STYPE_style LCUI_STYPE_STYLE
-#define LCUI_STYPE_data LCUI_STYPE_DATA
 #define LCUI_STYPE_bool LCUI_STYPE_BOOL
 #define LCUI_STYPE_image LCUI_STYPE_IMAGE
 #define LCUI_STYPE_string LCUI_STYPE_STRING
