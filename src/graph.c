@@ -955,7 +955,10 @@ int Graph_Zoom(const LCUI_Graph *graph, LCUI_Graph *buff, LCUI_BOOL keep_scale,
 	       int width, int height)
 {
 	LCUI_Rect rect;
-	int x, y, src_x, src_y;
+	int a, b, c, d, x, y, index;
+	float x_diff, y_diff;
+	LCUI_ARGB alpha, blue, red, green;
+	int offset = 0;
 	double scale_x = 0.0, scale_y = 0.0;
 	if (!Graph_IsValid(graph) || (width <= 0 && height <= 0)) {
 		return -1;
@@ -990,33 +993,106 @@ int Graph_Zoom(const LCUI_Graph *graph, LCUI_Graph *buff, LCUI_BOOL keep_scale,
 		return -2;
 	}
 	if (graph->color_type == LCUI_COLOR_TYPE_ARGB) {
-		LCUI_ARGB *px_src, *px_des, *px_row_src;
-		for (y = 0; y < height; ++y) {
-			src_y = (int)(y * scale_y);
-			px_row_src = graph->argb;
-			px_row_src += (src_y + rect.y) * graph->width + rect.x;
-			px_des = buff->argb + y * width;
-			for (x = 0; x < width; ++x) {
-				src_x = (int)(x * scale_x);
-				px_src = px_row_src + src_x;
-				*px_des++ = *px_src;
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				x = (int)(scale_x * j);
+				y = (int)(scale_y * i);
+				x_diff = (scale_x * j) - x;
+				y_diff = (scale_y * i) - y;
+				index = (y * graph->width + x);
+				a = graph->argb[index].value;
+				b = graph->argb[index + 1].value;
+				c = graph->argb[index + graph->width].value;
+				d = graph->argb[index + graph->width + 1].value;
+				blue.value =
+					(a & 0xff) * (1 - x_diff) * (1 - y_diff) +
+					(b & 0xff) * (x_diff) * (1 - y_diff) +
+					(c & 0xff) * (y_diff) * (1 - x_diff) +
+					(d & 0xff) * (x_diff * y_diff);
+				green.value = ((a >> 8) & 0xff) * (1 - x_diff) *
+						(1 - y_diff) +
+					((b >> 8) & 0xff) * (x_diff) *
+						(1 - y_diff) +
+					((c >> 8) & 0xff) * (y_diff) *
+						(1 - x_diff) +
+					((d >> 8) & 0xff) * (x_diff * y_diff);
+				red.value = ((a >> 16) & 0xff) * (1 - x_diff) *
+						(1 - y_diff) +
+					((b >> 16) & 0xff) * (x_diff) *
+						(1 - y_diff) +
+					((c >> 16) & 0xff) * (y_diff) *
+						(1 - x_diff) +
+					((d >> 16) & 0xff) * (x_diff * y_diff);
+				alpha.value = ((a >> 24) & 0xff) * (1 - x_diff) *
+						(1 - y_diff) +
+					((b >> 24) & 0xff) * (x_diff) *
+						(1 - y_diff) +
+					((c >> 24) & 0xff) * (y_diff) *
+						(1 - x_diff) +
+					((d >> 24) & 0xff) * (x_diff * y_diff);
+
+				buff->argb[offset++].value =
+					((((int)alpha.value) << 24) & 0xff000000) |
+					((((int)red.value) << 16) & 0xff0000) |
+					((((int)green.value) << 8) & 0xff00) |
+					((int)blue.value);
 			}
 		}
 	} else {
-		uchar_t *byte_src, *byte_des, *byte_row_src;
-		for (y = 0; y < height; ++y) {
-			src_y = (int)(y * scale_y);
-			byte_row_src = graph->bytes;
-			byte_row_src += (src_y + rect.y) * graph->bytes_per_row;
-			byte_row_src += rect.x * graph->bytes_per_pixel;
-			byte_des = buff->bytes + y * buff->bytes_per_row;
-			for (x = 0; x < width; ++x) {
-				src_x = (int)(x * scale_x);
-				src_x *= graph->bytes_per_pixel;
-				byte_src = byte_row_src + src_x;
-				*byte_des++ = *byte_src++;
-				*byte_des++ = *byte_src++;
-				*byte_des++ = *byte_src;
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				x = (int)(scale_x * j);
+				y = (int)(scale_y * i);
+				x_diff = (scale_x * j) - x;
+				y_diff = (scale_y * i) - y;
+				index = (y * graph->width + x);
+				a = (0xff << 24) |
+					(graph->bytes[index * 3] << 16) |
+					(graph->bytes[index * 3 + 1] << 8) |
+					(graph->bytes[index * 3 + 2] << 0);
+				b = (0xff << 24) |
+					(graph->bytes[(index + 1) * 3] << 16) |
+					(graph->bytes[(index + 1) * 3 + 1] << 8) |
+					(graph->bytes[(index + 1) * 3 + 2] << 0);
+				c = (0xff << 24) |
+					(graph->bytes[(index + graph->width) * 3] << 16) |
+					(graph->bytes[(index + graph->width) * 3 + 1] << 8) |
+					(graph->bytes[(index + graph->width) * 3 + 2] << 0);
+				d = (0xff << 24) |
+					(graph->bytes[(index + graph->width + 1) * 3] << 16) |
+					(graph->bytes[(index + graph->width + 1) * 3 + 1] << 8) |
+					(graph->bytes[(index + graph->width + 1) * 3 + 2] << 0);
+				blue.value =
+					(a & 0xff) * (1 - x_diff) * (1 - y_diff) +
+					(b & 0xff) * (x_diff) * (1 - y_diff) +
+					(c & 0xff) * (y_diff) * (1 - x_diff) +
+					(d & 0xff) * (x_diff * y_diff);
+				green.value = ((a >> 8) & 0xff) * (1 - x_diff) *
+						(1 - y_diff) +
+					((b >> 8) & 0xff) * (x_diff) *
+						(1 - y_diff) +
+					((c >> 8) & 0xff) * (y_diff) *
+						(1 - x_diff) +
+					((d >> 8) & 0xff) * (x_diff * y_diff);
+				red.value = ((a >> 16) & 0xff) * (1 - x_diff) *
+						(1 - y_diff) +
+					((b >> 16) & 0xff) * (x_diff) *
+						(1 - y_diff) +
+					((c >> 16) & 0xff) * (y_diff) *
+						(1 - x_diff) +
+					((d >> 16) & 0xff) * (x_diff * y_diff);
+				alpha.value = ((a >> 24) & 0xff) * (1 - x_diff) *
+						(1 - y_diff) +
+					((b >> 24) & 0xff) * (x_diff) *
+						(1 - y_diff) +
+					((c >> 24) & 0xff) * (y_diff) *
+						(1 - x_diff) +
+					((d >> 24) & 0xff) * (x_diff * y_diff);
+
+				buff->bytes[offset * 3] = red.value;
+				buff->bytes[offset * 3 + 1] = green.value;
+				buff->bytes[offset * 3 + 2] = blue.value;
+				offset++;
 			}
 		}
 	}
