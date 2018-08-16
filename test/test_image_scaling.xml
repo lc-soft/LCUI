@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <resource type="text/css" src="test_image_scaling.css"/>
+  <ui>
+    <widget class="image"></widget>
+  </ui>
+</lcui-app>
