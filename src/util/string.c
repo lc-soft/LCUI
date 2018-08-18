@@ -28,50 +28,49 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <ctype.h>
 #include <LCUI_Build.h>
-#include <LCUI/LCUI.h> 
+#include <LCUI/LCUI.h>
 
-#define STRTRIM_CODE(TYPE, OUTSTR, INSTR, CHARLIST, DCHARLIST) \
-	LCUI_BOOL clear, clear_left = TRUE; \
-	TYPE *op = OUTSTR, *last_blank = NULL; \
+#define STRTRIM_CODE(TYPE, OUTSTR, INSTR, CHARLIST, DCHARLIST)     \
+	LCUI_BOOL clear, clear_left = TRUE;                        \
+	TYPE *op = OUTSTR, *last_blank = NULL;                     \
 	const TYPE *default_charlist = DCHARLIST, *ip = INSTR, *c; \
-\
-	if( !CHARLIST ) {\
-		CHARLIST = default_charlist;\
-	}\
-	for( ; *ip; ip++ ) {\
-		for( clear = FALSE, c = CHARLIST; *c; ++c ) {\
-			if( *ip == *c ) {\
-				clear = TRUE;\
-				break;\
-			}\
-		}\
-		if( clear ) {\
-			if( !clear_left ) {\
-				*op = *ip;\
-				if( !last_blank ) {\
-					last_blank = op;\
-				}\
-				++op;\
-			}\
-			continue;\
-		}\
-		if( clear_left ) {\
-			clear_left = FALSE;\
-		}\
-		last_blank = NULL;\
-		*op = *ip;\
-		++op;\
-	}\
-	if( last_blank ) {\
-		*last_blank = 0;\
-	}\
-	*op = 0;\
+                                                                   \
+	if (!CHARLIST) {                                           \
+		CHARLIST = default_charlist;                       \
+	}                                                          \
+	for (; *ip; ip++) {                                        \
+		for (clear = FALSE, c = CHARLIST; *c; ++c) {       \
+			if (*ip == *c) {                           \
+				clear = TRUE;                      \
+				break;                             \
+			}                                          \
+		}                                                  \
+		if (clear) {                                       \
+			if (!clear_left) {                         \
+				*op = *ip;                         \
+				if (!last_blank) {                 \
+					last_blank = op;           \
+				}                                  \
+				++op;                              \
+			}                                          \
+			continue;                                  \
+		}                                                  \
+		if (clear_left) {                                  \
+			clear_left = FALSE;                        \
+		}                                                  \
+		last_blank = NULL;                                 \
+		*op = *ip;                                         \
+		++op;                                              \
+	}                                                          \
+	if (last_blank) {                                          \
+		*last_blank = 0;                                   \
+	}                                                          \
+	*op = 0;                                                   \
 	return op - outstr;
 
 size_t strsize(const char *str)
@@ -144,27 +143,29 @@ int wcstrim(wchar_t *outstr, const wchar_t *instr, const wchar_t *charlist)
 	STRTRIM_CODE(wchar_t, outstr, instr, charlist, L"\t\n\r ");
 }
 
-int wcsreplace(wchar_t *str, size_t max_len,
-	       const wchar_t *substr, const wchar_t *newstr)
+size_t wcsreplace(wchar_t *str, size_t max_len, const wchar_t *substr,
+		  const wchar_t *newstr)
 {
 	size_t len, buf_len;
-	wchar_t *buf, *p, *q;
-	len = wcslen(newstr);
-	p = wcsstr(str, substr);
-	if (!p) {
+	wchar_t *buf, *pout, *pin;
+
+	pin = wcsstr(str, substr);
+	if (!pin) {
 		return 0;
 	}
-	buf_len = wcslen(str) + len;
+	len = wcslen(newstr);
+	buf_len = wcslen(str) + len + 1;
 	buf = malloc(buf_len * sizeof(wchar_t));
 	wcscpy(buf, str);
-	q = buf + (p - str);
-	wcscpy(q, newstr);
-	p += wcslen(substr);
-	q += len;
-	wcscpy(q, p);
+	pout = buf + (pin - str);
+	wcscpy(pout, newstr);
+	pin += wcslen(substr);
+	pout += len;
+	wcscpy(pout, pin);
+	buf[buf_len - 1] = 0;
 	wcsncpy(str, buf, max_len);
 	free(buf);
-	return 1;
+	return min(buf_len, max_len);
 }
 
 void freestrs(char **strs)
@@ -185,7 +186,7 @@ int cmdsplit(const char *cmd, char ***outargv)
 	int argc = 0, spaces = 0, qoutes = 0, len = 0;
 
 	if (outargv) {
-		argv = malloc(sizeof(char*));
+		argv = malloc(sizeof(char *));
 		if (!argv) {
 			return -ENOMEM;
 		}
@@ -209,7 +210,7 @@ int cmdsplit(const char *cmd, char ***outargv)
 				}
 			}
 			if (argv && len > 0) {
-				size = sizeof(char*) * (argc + 2);
+				size = sizeof(char *) * (argc + 2);
 				tmp = realloc(argv, size);
 				if (!tmp) {
 					goto faild;
@@ -283,7 +284,7 @@ int strsplit(const char *instr, const char *sep, char ***outstrs)
 			len = strlen(prev) + 1;
 		}
 		str = malloc(sizeof(char) * len);
-		tmp = realloc(newstrs, sizeof(char*) * (i + 2));
+		tmp = realloc(newstrs, sizeof(char *) * (i + 2));
 		if (!tmp) {
 			freestrs(newstrs);
 			return 0;
@@ -311,7 +312,7 @@ static int strsaddone(char ***strlist, const char *str)
 	char **newlist;
 
 	if (!*strlist) {
-		newlist = (char**)malloc(sizeof(char*) * 2);
+		newlist = (char **)malloc(sizeof(char *) * 2);
 		goto check_done;
 	}
 	for (i = 0; (*strlist)[i]; ++i) {
@@ -319,7 +320,7 @@ static int strsaddone(char ***strlist, const char *str)
 			return 0;
 		}
 	}
-	newlist = (char**)realloc(*strlist, (i + 2) * sizeof(char*));
+	newlist = (char **)realloc(*strlist, (i + 2) * sizeof(char *));
 check_done:
 	if (!newlist) {
 		return 0;
@@ -375,7 +376,8 @@ static int strsdelone(char ***strlist, const char *str)
 	if (!*strlist) {
 		return 0;
 	}
-	for (len = 0; (*strlist)[len]; ++len);
+	for (len = 0; (*strlist)[len]; ++len)
+		;
 	for (pos = -1, i = 0; i < len; ++i) {
 		if (strcmp((*strlist)[i], str) == 0) {
 			pos = i;
@@ -391,7 +393,7 @@ static int strsdelone(char ***strlist, const char *str)
 		*strlist = NULL;
 		return 1;
 	}
-	newlist = (char**)malloc(len * sizeof(char*));
+	newlist = (char **)malloc(len * sizeof(char *));
 	for (i = 0; i < pos; ++i) {
 		newlist[i] = (*strlist)[i];
 	}
@@ -435,12 +437,13 @@ int sortedstrsadd(char ***strlist, const char *str)
 	char **newlist, *newstr;
 
 	if (*strlist) {
-		for (i = 0; (*strlist)[i]; ++i);
+		for (i = 0; (*strlist)[i]; ++i)
+			;
 		n = i + 2;
 	} else {
 		n = 2;
 	}
-	newlist = realloc(*strlist, sizeof(char*) * n);
+	newlist = realloc(*strlist, sizeof(char *) * n);
 	if (!newlist) {
 		return -ENOMEM;
 	}

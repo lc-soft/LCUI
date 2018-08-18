@@ -36,7 +36,7 @@
 #define strcasecmp _stricmp
 #else
 #ifdef _UNICODE
-#define __T(x) L ## x
+#define __T(x) L##x
 #define _T(x) __T(x)
 #else
 #define __T(x) x
@@ -45,7 +45,7 @@
 #endif
 
 #ifndef _TCHAR_DEFINED
-#if     !__STDC__
+#if !__STDC__
 typedef char TCHAR;
 #endif
 #define _TCHAR_DEFINED
@@ -74,7 +74,8 @@ LCUI_API size_t strntolower(char *outstr, size_t max_len, const char *instr);
  * @return 处理后的字符串的长度
  */
 LCUI_API int strtrim(char *outstr, const char *instr, const char *charlist);
-LCUI_API int wcstrim(wchar_t *outstr, const wchar_t *instr, const wchar_t *charlist);
+LCUI_API int wcstrim(wchar_t *outstr, const wchar_t *instr,
+		     const wchar_t *charlist);
 
 /**
  * 字符串替换
@@ -82,9 +83,10 @@ LCUI_API int wcstrim(wchar_t *outstr, const wchar_t *instr, const wchar_t *charl
  * @param[in] max_len 输出字符串的最大长度
  * @param[in] substr 字符串中需要被替换的子字符串
  * @param[in] newstr 替换的新字符串
+ * @returns 替换后的字符串长度
  */
-LCUI_API int wcsreplace(wchar_t *str, size_t max_len,
-			const wchar_t *substr, const wchar_t *newstr);
+LCUI_API size_t wcsreplace(wchar_t *str, size_t max_len, const wchar_t *substr,
+			   const wchar_t *newstr);
 
 /**
  * 分割命令行字符串
@@ -101,7 +103,6 @@ LCUI_API int cmdsplit(const char *cmd, char ***outargv);
  * @param[out] outstrs 分割后的字符串列表
  */
 LCUI_API int strsplit(const char *instr, const char *sep, char ***outstrs);
-
 
 /**
  * 向字符串组添加字符串
