@@ -360,6 +360,7 @@ static void TextView_OnTask(LCUI_Widget w)
 		txt->tasks[i].is_valid = FALSE;
 		TextLayer_SetTextW(txt->layer, txt->tasks[i].text, NULL);
 		txt->tasks[TASK_UPDATE].is_valid = TRUE;
+		txt->tasks[TASK_UPDATE_SIZE].is_valid = TRUE;
 		free(txt->tasks[i].text);
 		txt->tasks[i].text = NULL;
 		LCUIMutex_Unlock(&txt->mutex);
@@ -398,7 +399,9 @@ static void TextView_OnTask(LCUI_Widget w)
 	i = TASK_UPDATE_SIZE;
 	if (txt->tasks[i].is_valid) {
 		TextView_UpdateLayerSize(w);
-		if (Widget_HasFitContentWidth(w)) {
+		if (Widget_HasFitContentWidth(w) ||
+		    Widget_HasAutoStyle(w, key_width) ||
+		    Widget_HasAutoStyle(w, key_height)) {
 			Widget_AddTask(w, LCUI_WTASK_RESIZE);
 		}
 		txt->tasks[i].is_valid = FALSE;

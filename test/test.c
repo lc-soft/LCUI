@@ -5,23 +5,23 @@
 #include "test.h"
 
 #ifdef LCUI_BUILD_IN_WIN32
-static void LoggerHandler( const char *str )
+static void LoggerHandler(const char *str)
 {
-	OutputDebugStringA( str );
+	OutputDebugStringA(str);
 }
 
-static void LoggerHandlerW( const wchar_t *str )
+static void LoggerHandlerW(const wchar_t *str)
 {
-	OutputDebugStringW( str );
+	OutputDebugStringW(str);
 }
 #endif
 
-int main( void )
+int main(void)
 {
 	int ret = 0;
 #ifdef LCUI_BUILD_IN_WIN32
-	Logger_SetHandler( LoggerHandler );
-	Logger_SetHandlerW( LoggerHandlerW );
+	Logger_SetHandler(LoggerHandler);
+	Logger_SetHandlerW(LoggerHandlerW);
 #endif
 	ret += test_charset();
 	ret += test_string();
@@ -34,6 +34,7 @@ int main( void )
 	ret += test_widget_flex_layout();
 	ret += test_widget_inline_block_layout();
 	ret += test_widget_rect();
-	PRINT_TEST_RESULT( ret );
+	ret += test_textview_resize();
+	PRINT_TEST_RESULT(ret);
 	return ret;
 }

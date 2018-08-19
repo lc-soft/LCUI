@@ -1256,13 +1256,15 @@ static void Widget_ComputeSize(LCUI_Widget w)
 		width = ToContentBoxWidth(w, width);
 		height = ToContentBoxHeight(w, height);
 	}
-	if (Widget_HasAutoStyle(w, key_width) && Widget_HasFillAvailableWidth(w)) {
+	if (Widget_HasAutoStyle(w, key_width) &&
+	    Widget_HasFillAvailableWidth(w)) {
 		width = Widget_ComputeFillAvailableWidth(w);
 		width = ToContentBoxWidth(w, width);
 		if (!Widget_HasStaticWidthParent(w)) {
 			default_width = w->parent->box.content.width;
 			if (w->computed_style.box_sizing == SV_BORDER_BOX) {
-				default_width = ToContentBoxWidth(w, default_width);
+				default_width =
+				    ToContentBoxWidth(w, default_width);
 			}
 			max_width = width;
 			width = 0;
@@ -1407,7 +1409,6 @@ void Widget_UpdateSize(LCUI_Widget w)
 	    padding.right == w->padding.right &&
 	    padding.bottom == w->padding.bottom &&
 	    padding.left == w->padding.left) {
-		DEBUG_MSG("[%d] %s, size not change\n", w->index, w->id);
 		return;
 	}
 	/* 若在变化前后的宽高中至少有一个为 0，则不继续处理 */

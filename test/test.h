@@ -43,4 +43,5 @@ int test_widget_layout(void);
 int test_widget_flex_layout(void);
 int test_widget_inline_block_layout(void);
 int test_widget_rect(void);
+int test_textview_resize(void);
 int test_image_reader(void);
