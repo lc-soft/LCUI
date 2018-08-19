@@ -1287,6 +1287,9 @@ void LCUI_PrintStyleSheet(LCUI_StyleSheet ss)
 		case LCUI_STYPE_STRING:
 			LOG("%s", s->val_string);
 			break;
+		case LCUI_STYPE_WSTRING:
+			LOG("%S", s->val_wstring);
+			break;
 		case LCUI_STYPE_SCALE:
 			LOG("%g%%", s->val_scale * 100);
 			break;
