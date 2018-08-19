@@ -103,7 +103,7 @@ static int OnParseContent(LCUI_CSSParserStyleContext ctx, const char *str)
 	char *content;
 
 	len = strlen(str);
-	if (len < 1 || str[0] == '"' && str[len - 1] != '"') {
+	if (len < 1 || (str[0] == '"' && str[len - 1] != '"')) {
 		return -1;
 	}
 	content = malloc(sizeof(char) * (len + 1));

@@ -180,7 +180,6 @@ static void TextView_UpdateStyle(LCUI_Widget w)
 	LCUI_TextStyleRec ts;
 	LCUI_TextView txt = GetData(w);
 	LCUI_CSSFontStyle fs = &txt->style;
-	const wchar_t *content = fs->content;
 
 	CSSFontStyle_Compute(fs, w->style);
 	CSSFontStyle_GetTextStyle(fs, &ts);
@@ -190,8 +189,10 @@ static void TextView_UpdateStyle(LCUI_Widget w)
 	TextView_SetTaskForAutoWrap(w, fs->white_space != SV_NOWRAP);
 	TextView_SetTaskForWordBreak(w, ComputeWordBreakMode(w->style));
 	TextView_SetTaskForTextStyle(w, &ts);
-	if (content != fs->content) {
-		TextView_SetTextW(w, fs->content);
+	if (fs->content) {
+		if (!txt->content || wcscmp(fs->content, txt->content) != 0) {
+			TextView_SetTextW(w, fs->content);
+		}
 	}
 	txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	Widget_AddTask(w, LCUI_WTASK_USER);
