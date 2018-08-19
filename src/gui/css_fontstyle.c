@@ -28,7 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #include <string.h>
 #include <stdlib.h>
 #include <LCUI_Build.h>
@@ -40,29 +39,30 @@
 #include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/css_fontstyle.h>
 
+/* clang-format off */
+
 #define DEFAULT_FONT_SIZE	14
 #define DEFAULT_COLOR		0xff333333
 #define MIN_FONT_SIZE		12
 #define LINE_HEIGHT_SCALE	1.42857143
 
+/* clang-format on */
+
+#define ComputeActual LCUIMetrics_ComputeActual
 #define GetFontStyle(CTX) &(CTX)->sheet->sheet[self.keys[(CTX)->parser->key]]
-#define SetFontStyle(CTX, V, T) do {\
-	SetStyle((CTX)->sheet, self.keys[(CTX)->parser->key], V, T );\
-} while( 0 )
+#define SetFontStyle(CTX, V, T)                                              \
+	do {                                                                 \
+		SetStyle((CTX)->sheet, self.keys[(CTX)->parser->key], V, T); \
+	} while (0)
 
-enum FontStyleType {
-	FS_NORMAL,
-	FS_ITALIC,
-	FS_OBLIQUE
-};
+enum FontStyleType { FS_NORMAL, FS_ITALIC, FS_OBLIQUE };
 
-typedef void(*StyleHandler)(LCUI_CSSFontStyle, LCUI_Style);
+typedef void (*StyleHandler)(LCUI_CSSFontStyle, LCUI_Style);
 
 static struct LCUI_CSSFontStyleModule {
 	int keys[TOTAL_FONT_STYLE_KEY];
 	StyleHandler handlers[TOTAL_FONT_STYLE_KEY];
 } self;
-
 
 static int unescape(const wchar_t *instr, wchar_t *outstr)
 {
@@ -99,23 +99,19 @@ static int unescape(const wchar_t *instr, wchar_t *outstr)
 
 static int OnParseContent(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	int i;
-	wchar_t *content;
-	size_t len = strlen(str) + 1;
-	content = malloc(len * sizeof(wchar_t));
-	LCUI_DecodeString(content, str, (int)len, ENCODING_UTF8);
-	if (content[0] == '"') {
-		for (i = 0; content[i + 1]; ++i) {
-			content[i] = content[i + 1];
-		}
-		if (content[i - 1] != '"') {
-			free(content);
-			return -1;
-		}
-		content[i - 1] = 0;
+	size_t len;
+	char *content;
+
+	len = strlen(str);
+	if (len < 1 || str[0] == '"' && str[len - 1] != '"') {
+		return -1;
 	}
-	unescape(content, content);
-	SetFontStyle(ctx, content, wstring);
+	content = malloc(sizeof(char) * (len + 1));
+	if (!content) {
+		return -1;
+	}
+	strcpy(content, str);
+	SetFontStyle(ctx, content, string);
 	return 0;
 }
 
@@ -216,12 +212,11 @@ static LCUI_CSSPropertyParserRec style_parsers[] = {
 static void OnComputeFontSize(LCUI_CSSFontStyle fs, LCUI_Style s)
 {
 	if (s->is_valid) {
-		fs->font_size = LCUIMetrics_ComputeActual(
-			max(MIN_FONT_SIZE, s->value), s->type
-		);
+		fs->font_size =
+		    ComputeActual(max(MIN_FONT_SIZE, s->value), s->type);
 		return;
 	}
-	fs->font_size = LCUIMetrics_ComputeActual(DEFAULT_FONT_SIZE, LCUI_STYPE_PX);
+	fs->font_size = ComputeActual(DEFAULT_FONT_SIZE, LCUI_STYPE_PX);
 }
 
 static void OnComputeColor(LCUI_CSSFontStyle fs, LCUI_Style s)
@@ -247,8 +242,8 @@ static void OnComputeFontFamily(LCUI_CSSFontStyle fs, LCUI_Style s)
 		return;
 	}
 	fs->font_family = strdup2(s->string);
-	LCUIFont_GetIdByNames(&fs->font_ids, fs->font_style,
-			      fs->font_weight, fs->font_family);
+	LCUIFont_GetIdByNames(&fs->font_ids, fs->font_style, fs->font_weight,
+			      fs->font_family);
 }
 
 static void OnComputeFontStyle(LCUI_CSSFontStyle fs, LCUI_Style s)
@@ -287,7 +282,7 @@ static void OnComputeLineHeight(LCUI_CSSFontStyle fs, LCUI_Style s)
 		} else if (s->type == LCUI_STYPE_SCALE) {
 			h = iround(fs->font_size * s->val_scale);
 		} else {
-			h = LCUIMetrics_ComputeActual(s->value, s->type);
+			h = ComputeActual(s->value, s->type);
 		}
 	} else {
 		h = iround(fs->font_size * LINE_HEIGHT_SCALE);
@@ -297,13 +292,34 @@ static void OnComputeLineHeight(LCUI_CSSFontStyle fs, LCUI_Style s)
 
 static void OnComputeContent(LCUI_CSSFontStyle fs, LCUI_Style s)
 {
+	size_t i;
+	size_t len;
+	wchar_t *content;
+
 	if (fs->content) {
 		free(fs->content);
 		fs->content = NULL;
 	}
-	if (s->is_valid) {
-		fs->content = wcsdup2(s->wstring);
+	if (!s->is_valid) {
+		return;
 	}
+
+	len = LCUI_DecodeUTF8String(NULL, s->val_string, 0);
+	content = malloc((len + 1) * sizeof(wchar_t));
+	len = LCUI_DecodeUTF8String(content, s->val_string, len);
+	content[len] = 0;
+	if (content[0] == '"') {
+		for (i = 0; content[i + 1]; ++i) {
+			content[i] = content[i + 1];
+		}
+		if (content[i - 1] != '"') {
+			free(content);
+			return;
+		}
+		content[i - 1] = 0;
+	}
+	unescape(content, content);
+	fs->content = content;
 }
 
 static void OnComputeWhiteSpace(LCUI_CSSFontStyle fs, LCUI_Style s)
@@ -399,5 +415,4 @@ void LCUI_InitCSSFontStyle(void)
 
 void LCUI_FreeCSSFontStyle(void)
 {
-
 }
