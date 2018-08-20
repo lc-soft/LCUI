@@ -59,6 +59,7 @@ static int SplitValues(const char *str, LCUI_Style slist, int max_len, int mode)
 	const char *p;
 	int val, vi = 0, vj = 0, n_quotes = 0;
 
+	memset(slist, 0, sizeof(LCUI_StyleRec) * max_len);
 	values = (char **)calloc(max_len, sizeof(char *));
 	values[0] = (char *)malloc(sizeof(char) * 64);
 	for (p = str; *p; ++p) {
@@ -210,8 +211,8 @@ static int OnParseStyleOption(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBorder(LCUI_CSSParserStyleContext ctx, const char *str)
 {
+	LCUI_StyleRec slist[3];
 	LCUI_StyleSheet ss = ctx->sheet;
-	LCUI_StyleRec slist[3] = { 0 };
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
 	if (SplitValues(str, slist, 3, mode) < 1) {
 		return -1;
@@ -263,8 +264,8 @@ static int OnParseBorderRadius(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBorderLeft(LCUI_CSSParserStyleContext ctx, const char *str)
 {
+	LCUI_StyleRec slist[3];
 	LCUI_StyleSheet ss = ctx->sheet;
-	LCUI_StyleRec slist[3] = { 0 };
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
 	if (SplitValues(str, slist, 3, mode) < 1) {
 		return -1;
@@ -290,8 +291,8 @@ static int OnParseBorderLeft(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBorderTop(LCUI_CSSParserStyleContext ctx, const char *str)
 {
+	LCUI_StyleRec slist[3];
 	LCUI_StyleSheet ss = ctx->sheet;
-	LCUI_StyleRec slist[3] = { 0 };
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
 	if (SplitValues(str, slist, 3, mode) < 1) {
 		return -1;
@@ -317,8 +318,8 @@ static int OnParseBorderTop(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBorderRight(LCUI_CSSParserStyleContext ctx, const char *str)
 {
+	LCUI_StyleRec slist[3];
 	LCUI_StyleSheet ss = ctx->sheet;
-	LCUI_StyleRec slist[3] = { 0 };
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
 	if (SplitValues(str, slist, 3, mode) < 1) {
 		return -1;
@@ -344,8 +345,8 @@ static int OnParseBorderRight(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBorderBottom(LCUI_CSSParserStyleContext ctx, const char *str)
 {
+	LCUI_StyleRec slist[3];
 	LCUI_StyleSheet ss = ctx->sheet;
-	LCUI_StyleRec slist[3] = { 0 };
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
 	if (SplitValues(str, slist, 3, mode) < 1) {
 		return -1;
@@ -416,7 +417,7 @@ static int OnParseBorderStyle(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParsePadding(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec s[4] = { 0 };
+	LCUI_StyleRec s[4];
 	LCUI_StyleSheet ss = ctx->sheet;
 	switch (SplitValues(str, s, 4, SPLIT_NUMBER)) {
 	case 1:
@@ -450,7 +451,7 @@ static int OnParsePadding(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseMargin(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec s[4] = { 0 };
+	LCUI_StyleRec s[4];
 	LCUI_StyleSheet ss = ctx->sheet;
 	switch (SplitValues(str, s, 4, SPLIT_NUMBER)) {
 	case 1:
@@ -484,7 +485,7 @@ static int OnParseMargin(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBoxShadow(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec s[5] = { 0 };
+	LCUI_StyleRec s[5];
 	LCUI_StyleSheet ss = ctx->sheet;
 	if (strcasecmp(str, "none") == 0) {
 		SetStyle(ss, key_box_shadow_x, 0, none);
@@ -522,7 +523,7 @@ static int OnParseBackground(LCUI_CSSParserStyleContext ctx, const char *str)
 static int OnParseBackgroundPosition(LCUI_CSSParserStyleContext ctx,
 				     const char *str)
 {
-	LCUI_StyleRec slist[2] = { 0 };
+	LCUI_StyleRec slist[2];
 	int ret = OnParseStyleOption(ctx, str);
 	if (ret == 0) {
 		return 0;
@@ -538,7 +539,7 @@ static int OnParseBackgroundPosition(LCUI_CSSParserStyleContext ctx,
 static int OnParseBackgroundSize(LCUI_CSSParserStyleContext ctx,
 				 const char *str)
 {
-	LCUI_StyleRec slist[2] = { 0 };
+	LCUI_StyleRec slist[2];
 	int ret = OnParseStyleOption(ctx, str);
 	if (ret == 0) {
 		SetStyle(ctx->sheet, key_background_size_width, 0, 0);
