@@ -841,6 +841,7 @@ int LCUIFont_RenderBitmap(LCUI_FontBitmap *buff, wchar_t ch, int font_id,
 
 static void LCUIFont_InitBase(void)
 {
+	fontlib.count = 0;
 	fontlib.font_cache_num = 1;
 	fontlib.font_cache = NEW(LCUI_FontCache, 1);
 	fontlib.font_cache[0] = FontCache();
