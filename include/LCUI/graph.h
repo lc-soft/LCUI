@@ -96,11 +96,27 @@ LCUI_BEGIN_HEADER
 	if( (G)->color_type == LCUI_COLOR_TYPE_ARGB ) {				\
 		(G)->argb[(G)->width*(Y)+(X)] = (C);			\
 	} else {								\
-		(G)->bytes[(G)->bytes_per_row*(Y)+(X)*3] = (C).value>>8;	\
+		(G)->bytes[(G)->bytes_per_row*(Y)+(X)*3] = (C).b;	\
+		(G)->bytes[(G)->bytes_per_row*(Y)+(X)*3+1] = (C).g;	\
+		(G)->bytes[(G)->bytes_per_row*(Y)+(X)*3+2] = (C).r;	\
 	}
 
 #define Graph_SetPixelAlpha(G, X, Y, A)\
 (G)->argb[(G)->width*(Y)+(X)].alpha = (A)
+
+#define Graph_GetPixel(G, X, Y, C)					\
+	if( (G)->color_type == LCUI_COLOR_TYPE_ARGB ) {			\
+		(C) = (G)->argb[(G)->width*((Y)%(G)->height)+((X)%(G)->width)];	\
+	} else {							\
+		(C).value =						\
+		(G)->bytes[(G)->bytes_per_row*((Y)%(G)->height)		\
+		+((X)%(G)->width)*(G)->bytes_per_pixel]<<0		\
+		| (G)->bytes[(G)->bytes_per_row*((Y)%(G)->height)	\
+		+((X)%(G)->width)*(G)->bytes_per_pixel+1]<<8		\
+		| (G)->bytes[(G)->bytes_per_row*((Y)%(G)->height)	\
+		+((X)%(G)->width)*(G)->bytes_per_pixel+2]<<16		\
+		| 0xff<<24;						\
+	}
 
 LCUI_API void Graph_PrintInfo(LCUI_Graph *graph);
 
@@ -163,6 +179,9 @@ LCUI_API int Graph_SetGreenBits(LCUI_Graph *graph, uchar_t *g, size_t size);
 LCUI_API int Graph_SetBlueBits(LCUI_Graph *graph, uchar_t *b, size_t size);
 
 LCUI_API int Graph_Zoom(const LCUI_Graph *graph, LCUI_Graph *buff,
+			LCUI_BOOL keep_scale, int width, int height);
+
+LCUI_API int Graph_ZoomBilinear(const LCUI_Graph *graph, LCUI_Graph *buff,
 			LCUI_BOOL keep_scale, int width, int height);
 
 LCUI_API int Graph_Cut(const LCUI_Graph *graph, LCUI_Rect rect,
