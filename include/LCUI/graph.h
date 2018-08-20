@@ -38,85 +38,100 @@ LCUI_BEGIN_HEADER
 #endif
 
 /* 将两个像素点的颜色值进行alpha混合 */
-#define _ALPHA_BLEND(__back__ , __fore__, __alpha__)	\
-    ((((__fore__-__back__)*(__alpha__))>>8)+__back__)
+#define _ALPHA_BLEND(__back__, __fore__, __alpha__) \
+	((((__fore__ - __back__) * (__alpha__)) >> 8) + __back__)
 
-#define ALPHA_BLEND(__back__ , __fore__, __alpha__)		\
-{								\
-    __back__ =_ALPHA_BLEND(__back__,__fore__,__alpha__);	\
-}
+#define ALPHA_BLEND(__back__, __fore__, __alpha__)                      \
+	{                                                               \
+		__back__ = _ALPHA_BLEND(__back__, __fore__, __alpha__); \
+	}
 
-#define PIXEL_BLEND(px1, px2, a) {		\
-	ALPHA_BLEND( (px1)->r, (px2)->r, a );	\
-	ALPHA_BLEND( (px1)->g, (px2)->g, a );	\
-	ALPHA_BLEND( (px1)->b, (px2)->b, a );	\
-}
+#define PIXEL_BLEND(px1, px2, a)                    \
+	{                                           \
+		ALPHA_BLEND((px1)->r, (px2)->r, a); \
+		ALPHA_BLEND((px1)->g, (px2)->g, a); \
+		ALPHA_BLEND((px1)->b, (px2)->b, a); \
+	}
 
 /* 获取像素的RGB值 */
-#define RGB_FROM_RGB565(pixel, r, g, b)	\
-{\
-	r = (((pixel&0xF800)>>11)<<3);	\
-	g = (((pixel&0x07E0)>>5)<<2);	\
-	b = ((pixel&0x001F)<<3);	\
-}
+#define RGB_FROM_RGB565(pixel, r, g, b)              \
+	{                                            \
+		r = (((pixel & 0xF800) >> 11) << 3); \
+		g = (((pixel & 0x07E0) >> 5) << 2);  \
+		b = ((pixel & 0x001F) << 3);         \
+	}
 
-#define RGB_FROM_RGB555(pixel, r, g, b)	\
-{\
-	r = (((pixel&0x7C00)>>10)<<3);	\
-	g = (((pixel&0x03E0)>>5)<<3);	\
-	b = ((pixel&0x001F)<<3);	\
-}
+#define RGB_FROM_RGB555(pixel, r, g, b)              \
+	{                                            \
+		r = (((pixel & 0x7C00) >> 10) << 3); \
+		g = (((pixel & 0x03E0) >> 5) << 3);  \
+		b = ((pixel & 0x001F) << 3);         \
+	}
 
-#define RGB_FROM_RGB888(pixel, r, g, b)	\
-{\
-	r = ((pixel&0xFF0000)>>16);	\
-	g = ((pixel&0xFF00)>>8);	\
-	b = (pixel&0xFF);		\
-}
+#define RGB_FROM_RGB888(pixel, r, g, b)         \
+	{                                       \
+		r = ((pixel & 0xFF0000) >> 16); \
+		g = ((pixel & 0xFF00) >> 8);    \
+		b = (pixel & 0xFF);             \
+	}
 
 /* 混合像素的RGB值 */
-#define RGB565_FROM_RGB(pixel, r, g, b)			\
-{							\
-    pixel = ((r>>3)<<11)|((g>>2)<<5)|(b>>3);		\
-}
-
-#define RGB555_FROM_RGB(pixel, r, g, b)			\
-{							\
-	pixel = ((r>>3)<<10)|((g>>3)<<5)|(b>>3);	\
-}
-
-#define RGB888_FROM_RGB(pixel, r, g, b)			\
-{							\
-	pixel = (r<<16)|(g<<8)|b;			\
-}
-
-#define Graph_GetQuote(g) (g)->quote.is_valid ? (g)->quote.source:(g)
-
-#define Graph_SetPixel(G, X, Y, C) 						\
-	if( (G)->color_type == LCUI_COLOR_TYPE_ARGB ) {				\
-		(G)->argb[(G)->width*(Y)+(X)] = (C);			\
-	} else {								\
-		(G)->bytes[(G)->bytes_per_row*(Y)+(X)*3] = (C).b;	\
-		(G)->bytes[(G)->bytes_per_row*(Y)+(X)*3+1] = (C).g;	\
-		(G)->bytes[(G)->bytes_per_row*(Y)+(X)*3+2] = (C).r;	\
+#define RGB565_FROM_RGB(pixel, r, g, b)                                \
+	{                                                              \
+		pixel = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3); \
 	}
 
-#define Graph_SetPixelAlpha(G, X, Y, A)\
-(G)->argb[(G)->width*(Y)+(X)].alpha = (A)
-
-#define Graph_GetPixel(G, X, Y, C)					\
-	if( (G)->color_type == LCUI_COLOR_TYPE_ARGB ) {			\
-		(C) = (G)->argb[(G)->width*((Y)%(G)->height)+((X)%(G)->width)];	\
-	} else {							\
-		(C).value =						\
-		(G)->bytes[(G)->bytes_per_row*((Y)%(G)->height)		\
-		+((X)%(G)->width)*(G)->bytes_per_pixel]<<0		\
-		| (G)->bytes[(G)->bytes_per_row*((Y)%(G)->height)	\
-		+((X)%(G)->width)*(G)->bytes_per_pixel+1]<<8		\
-		| (G)->bytes[(G)->bytes_per_row*((Y)%(G)->height)	\
-		+((X)%(G)->width)*(G)->bytes_per_pixel+2]<<16		\
-		| 0xff<<24;						\
+#define RGB555_FROM_RGB(pixel, r, g, b)                                \
+	{                                                              \
+		pixel = ((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3); \
 	}
+
+#define RGB888_FROM_RGB(pixel, r, g, b)           \
+	{                                         \
+		pixel = (r << 16) | (g << 8) | b; \
+	}
+
+#define Graph_GetQuote(g) (g)->quote.is_valid ? (g)->quote.source : (g)
+
+#define Graph_SetPixel(G, X, Y, C)                                        \
+	if ((G)->color_type == LCUI_COLOR_TYPE_ARGB) {                    \
+		(G)->argb[(G)->width * (Y) + (X)] = (C);                  \
+	} else {                                                          \
+		(G)->bytes[(G)->bytes_per_row * (Y) + (X)*3] = (C).b;     \
+		(G)->bytes[(G)->bytes_per_row * (Y) + (X)*3 + 1] = (C).g; \
+		(G)->bytes[(G)->bytes_per_row * (Y) + (X)*3 + 2] = (C).r; \
+	}
+
+#define Graph_SetPixelAlpha(G, X, Y, A) \
+	(G)->argb[(G)->width * (Y) + (X)].alpha = (A)
+
+#define Graph_GetPixel(G, X, Y, C)                                            \
+	if ((G)->color_type == LCUI_COLOR_TYPE_ARGB) {                        \
+		(C) = (G)->argb[(G)->width * ((Y) % (G)->height) +            \
+				((X) % (G)->width)];                          \
+	} else {                                                              \
+		(C).value =                                                   \
+		    (G)->bytes[(G)->bytes_per_row * ((Y) % (G)->height) +     \
+			       ((X) % (G)->width) * (G)->bytes_per_pixel]     \
+			<< 0 |                                                \
+		    (G)->bytes[(G)->bytes_per_row * ((Y) % (G)->height) +     \
+			       ((X) % (G)->width) * (G)->bytes_per_pixel + 1] \
+			<< 8 |                                                \
+		    (G)->bytes[(G)->bytes_per_row * ((Y) % (G)->height) +     \
+			       ((X) % (G)->width) * (G)->bytes_per_pixel + 2] \
+			<< 16 |                                               \
+		    0xff << 24;                                               \
+	}
+
+/** 判断图像是否有Alpha通道 */
+#define Graph_HasAlpha(G)                                              \
+	((G)->quote.is_valid                                           \
+	     ? ((G)->quote.source->color_type == LCUI_COLOR_TYPE_ARGB) \
+	     : ((G)->color_type == LCUI_COLOR_TYPE_ARGB))
+
+#define Graph_IsWritable(G)  \
+	(Graph_IsValid(G) && \
+	 ((G)->quote.is_valid ? (G)->quote.is_writable : TRUE))
 
 LCUI_API void Graph_PrintInfo(LCUI_Graph *graph);
 
@@ -145,26 +160,17 @@ LCUI_API void Graph_Free(LCUI_Graph *graph);
  * @param source 引用的源图像
  * &param rect 引用的区域，若为NULL，则引用整个图像
  */
-LCUI_API int Graph_Quote(LCUI_Graph *self, LCUI_Graph *source, const LCUI_Rect *rect);
+LCUI_API int Graph_Quote(LCUI_Graph *self, LCUI_Graph *source,
+			 const LCUI_Rect *rect);
 
 /**
-* 为图像创建一个只读引用
-* @param self 用于存放图像引用的缓存区
-* @param source 引用的源图像
-* &param rect 引用的区域，若为NULL，则引用整个图像
-*/
-LCUI_API int Graph_QuoteReadOnly(LCUI_Graph *self,
-				 const LCUI_Graph *source,
+ * 为图像创建一个只读引用
+ * @param self 用于存放图像引用的缓存区
+ * @param source 引用的源图像
+ * &param rect 引用的区域，若为NULL，则引用整个图像
+ */
+LCUI_API int Graph_QuoteReadOnly(LCUI_Graph *self, const LCUI_Graph *source,
 				 const LCUI_Rect *rect);
-
-/** 判断图像是否有Alpha透明通道 */
-#define Graph_HasAlpha(G) 						\
-	((G)->quote.is_valid ? (					\
-		(G)->quote.source->color_type == LCUI_COLOR_TYPE_ARGB	\
-	) : ((G)->color_type == LCUI_COLOR_TYPE_ARGB))
-
-#define Graph_IsWritable(G) (Graph_IsValid(G) && \
-	((G)->quote.is_valid ? (G)->quote.is_writable : TRUE))
 
 LCUI_BOOL Graph_IsValid(const LCUI_Graph *graph);
 
@@ -182,7 +188,7 @@ LCUI_API int Graph_Zoom(const LCUI_Graph *graph, LCUI_Graph *buff,
 			LCUI_BOOL keep_scale, int width, int height);
 
 LCUI_API int Graph_ZoomBilinear(const LCUI_Graph *graph, LCUI_Graph *buff,
-			LCUI_BOOL keep_scale, int width, int height);
+				LCUI_BOOL keep_scale, int width, int height);
 
 LCUI_API int Graph_Cut(const LCUI_Graph *graph, LCUI_Rect rect,
 		       LCUI_Graph *buff);
@@ -215,10 +221,11 @@ LCUI_API int Graph_Tile(LCUI_Graph *buff, const LCUI_Graph *graph,
  * @param[in] top 前景图层的上边距
  * @param[in] with_alpha 是否需要处理alpha通道
  */
-LCUI_API int Graph_Mix(LCUI_Graph *back, const LCUI_Graph *fore,
-		       int left, int top, LCUI_BOOL with_alpha);
+LCUI_API int Graph_Mix(LCUI_Graph *back, const LCUI_Graph *fore, int left,
+		       int top, LCUI_BOOL with_alpha);
 
-LCUI_API int Graph_Replace(LCUI_Graph *back, const LCUI_Graph *fore, int left, int top);
+LCUI_API int Graph_Replace(LCUI_Graph *back, const LCUI_Graph *fore, int left,
+			   int top);
 
 LCUI_END_HEADER
 

@@ -1035,10 +1035,11 @@ int Graph_ZoomBilinear(const LCUI_Graph *graph, LCUI_Graph *buff,
 {
 	LCUI_Rect rect;
 	LCUI_ARGB a, b, c, d, t_color;
+
 	int x, y, i, j;
 	float x_diff, y_diff;
 	double scale_x = 0.0, scale_y = 0.0;
-	
+
 	if (graph->color_type != LCUI_COLOR_TYPE_RGB &&
 	    graph->color_type != LCUI_COLOR_TYPE_ARGB) {
 		/* fall back to nearest scaling */
