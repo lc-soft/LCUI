@@ -101,7 +101,7 @@ static int check_textview_set_short_content_css(void)
 
 	CHECK(self.block->width == 122.0f);
 	CHECK(self.block->height < 45.0f);
-	CHECK(self.inline_block->width < 60.0f);
+	CHECK(self.inline_block->width < 70.0f);
 	CHECK(self.inline_block->height < 45.0f);
 
 	return ret;

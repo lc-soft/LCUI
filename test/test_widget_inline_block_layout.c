@@ -89,7 +89,7 @@ static int check_menu_long_text(void)
 	menu = LCUIWidget_GetById("test-dropdown");
 	TextView_SetText(w, "test test test test test test test test test");
 	LCUIWidget_Update();
-	CHECK(menu->width > 280 && menu->width < 340);
+	CHECK(menu->width > 280 && menu->width < 360);
 	CHECK(menu->height == MENU_HEIGHT);
 	return ret;
 }
