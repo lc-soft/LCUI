@@ -697,6 +697,13 @@ static int Graph_FillRectARGB(LCUI_Graph *graph, LCUI_Color color,
 	return 0;
 }
 
+static uchar_t Graph_BilinearResamplingCore(uchar_t a, uchar_t b, uchar_t c,
+					    uchar_t d, float dx, float dy)
+{
+	return a * (1 - dx) * (1 - dy) + b * (dx) * (1 - dy) +
+	       c * (dy) * (1 - dx) + d * (dx * dy);
+}
+
 /*-------------------------------- End ARGB --------------------------------*/
 
 int Graph_SetColorType(LCUI_Graph *graph, int color_type)
@@ -1018,6 +1025,91 @@ int Graph_Zoom(const LCUI_Graph *graph, LCUI_Graph *buff, LCUI_BOOL keep_scale,
 				*byte_des++ = *byte_src++;
 				*byte_des++ = *byte_src;
 			}
+		}
+	}
+	return 0;
+}
+
+int Graph_ZoomBilinear(const LCUI_Graph *graph, LCUI_Graph *buff,
+		       LCUI_BOOL keep_scale, int width, int height)
+{
+	LCUI_Rect rect;
+	LCUI_ARGB a, b, c, d, t_color;
+	int x, y, i, j;
+	float x_diff, y_diff;
+	double scale_x = 0.0, scale_y = 0.0;
+	
+	if (graph->color_type != LCUI_COLOR_TYPE_RGB &&
+	    graph->color_type != LCUI_COLOR_TYPE_ARGB) {
+		/* fall back to nearest scaling */
+		LOG("[graph] unable to perform bilinear scaling, "
+		    "fallback...\n");
+		return Graph_Zoom(graph, buff, keep_scale, width, height);
+	}
+	if (!Graph_IsValid(graph) || (width <= 0 && height <= 0)) {
+		return -1;
+	}
+	/* 获取引用的有效区域，以及指向引用的对象的指针 */
+	Graph_GetValidRect(graph, &rect);
+	graph = Graph_GetQuote(graph);
+	if (width > 0) {
+		scale_x = 1.0 * rect.width / width;
+	}
+	if (height > 0) {
+		scale_y = 1.0 * rect.height / height;
+	}
+	if (width <= 0) {
+		scale_x = scale_y;
+		width = (int)(0.5 + 1.0 * graph->width / scale_x);
+	}
+	if (height <= 0) {
+		scale_y = scale_x;
+		height = (int)(0.5 + 1.0 * graph->height / scale_y);
+	}
+	/* 如果保持宽高比 */
+	if (keep_scale) {
+		if (scale_x < scale_y) {
+			scale_y = scale_x;
+		} else {
+			scale_x = scale_y;
+		}
+	}
+	buff->color_type = graph->color_type;
+	if (Graph_Create(buff, width, height) < 0) {
+		return -2;
+	}
+	for (i = 0; i < height; i++) {
+		for (j = 0; j < width; j++) {
+			/*
+			 * Qmn = (m, n).
+			 * Qxy1 = (x2 - x) / (x2 - x1) * Q11 + (x - x1) / (x2
+			 * - x1) * Q21
+			 * Qxy2 = (x2 - x) / (x2 - x1) * Q12 + (x - x1) / (x2
+			 * - x1) * Q22
+			 * Qxy = (y2 - y) / (y2 - y1) * Qxy1 + (y - y1) / (y2 -
+			 * y1) * Qxy2
+			 */
+			x = (int)(scale_x * j);
+			y = (int)(scale_y * i);
+			x_diff = (scale_x * j) - x;
+			y_diff = (scale_y * i) - y;
+			Graph_GetPixel(graph, x + rect.x + 0, y + rect.y + 0,
+				       a);
+			Graph_GetPixel(graph, x + rect.x + 1, y + rect.y + 0,
+				       b);
+			Graph_GetPixel(graph, x + rect.x + 0, y + rect.y + 1,
+				       c);
+			Graph_GetPixel(graph, x + rect.x + 1, y + rect.y + 1,
+				       d);
+			t_color.b = Graph_BilinearResamplingCore(
+			    a.b, b.b, c.b, d.b, x_diff, y_diff);
+			t_color.g = Graph_BilinearResamplingCore(
+			    a.g, b.g, c.g, d.g, x_diff, y_diff);
+			t_color.r = Graph_BilinearResamplingCore(
+			    a.r, b.r, c.r, d.r, x_diff, y_diff);
+			t_color.a = Graph_BilinearResamplingCore(
+			    a.a, b.a, c.a, d.a, x_diff, y_diff);
+			Graph_SetPixel(buff, j, i, t_color);
 		}
 	}
 	return 0;
