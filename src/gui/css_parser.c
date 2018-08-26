@@ -925,9 +925,10 @@ void CSSParser_End(LCUI_CSSParserContext ctx)
 }
 
 /** 载入CSS代码块，用于实现CSS代码的分块载入 */
-static int LCUI_LoadCSSBlock(LCUI_CSSParserContext ctx, const char *str)
+static size_t LCUI_LoadCSSBlock(LCUI_CSSParserContext ctx, const char *str)
 {
 	size_t size = 0;
+
 	ctx->cur = str;
 	while (*ctx->cur && size < ctx->buffer_size) {
 		ctx->parsers[ctx->target].parse(ctx);
@@ -960,11 +961,12 @@ int LCUI_LoadCSSFile(const char *filepath)
 	return 0;
 }
 
-int LCUI_LoadCSSString(const char *str, const char *space)
+size_t LCUI_LoadCSSString(const char *str, const char *space)
 {
-	int len = 1;
+	size_t len = 1;
 	const char *cur;
 	LCUI_CSSParserContext ctx;
+
 	DEBUG_MSG("parse begin\n");
 	ctx = CSSParser_Begin(512, space);
 	for (cur = str; len > 0; cur += len) {
