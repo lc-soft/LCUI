@@ -40,6 +40,8 @@
 #include <LCUI/gui/widget/scrollbar.h>
 #include <LCUI/gui/css_parser.h>
 
+/* clang-format off */
+
 #define EFFECT_FRAMES 80
 
 /** 惯性滚动效果的相关数据 */
@@ -121,6 +123,8 @@ scrollbar {
 
 );
 
+/* clang-format on */
+
 static void OnInertialScrolling(void *arg)
 {
 	int pos;
@@ -140,7 +144,7 @@ static void OnInertialScrolling(void *arg)
 	while (effect->is_running) {
 		double speed = effect->speed + effect->speed_delta * time;
 		if ((effect->speed > 0 && speed <= 0) ||
-			(effect->speed < 0 && speed >= 0)) {
+		    (effect->speed < 0 && speed >= 0)) {
 			break;
 		}
 		ScrollBar_SetPosition(w, pos);
@@ -198,16 +202,16 @@ static void StartInertialScrolling(LCUI_Widget w)
 	if (effect->timer > 0) {
 		LCUITimer_Free(effect->timer);
 	}
-	effect->timer = LCUITimer_Set(effect->interval,
-				      OnInertialScrolling, w, TRUE);
-	DEBUG_MSG("start_pos: %d, end_pos: %d\n",
-		  effect->start_pos, effect->end_pos);
-	DEBUG_MSG("effect->speed: %g, distance: %d, time: %d\n",
-		  effect->speed, distance, (int)time_delta);
+	effect->timer =
+	    LCUITimer_Set(effect->interval, OnInertialScrolling, w, TRUE);
+	DEBUG_MSG("start_pos: %d, end_pos: %d\n", effect->start_pos,
+		  effect->end_pos);
+	DEBUG_MSG("effect->speed: %g, distance: %d, time: %d\n", effect->speed,
+		  distance, (int)time_delta);
 }
 
-static void Slider_OnMouseMove(LCUI_Widget slider,
-			       LCUI_WidgetEvent e, void *arg)
+static void Slider_OnMouseMove(LCUI_Widget slider, LCUI_WidgetEvent e,
+			       void *arg)
 {
 	LCUI_Widget target;
 	LCUI_Widget w = e->data;
@@ -271,7 +275,7 @@ static void Slider_OnMouseMove(LCUI_Widget slider,
 		Widget_SetStyle(target, key_top, -layer_pos, px);
 	}
 	if (scrollbar->pos != iround(layer_pos)) {
-		LCUI_WidgetEventRec e;
+		LCUI_WidgetEventRec e = { 0 };
 		e.type = self.event_id;
 		e.cancel_bubble = TRUE;
 		Widget_TriggerEvent(target, &e, &layer_pos);
@@ -281,8 +285,7 @@ static void Slider_OnMouseMove(LCUI_Widget slider,
 	Widget_Move(slider, x, y);
 }
 
-static void Slider_OnMouseUp(LCUI_Widget slider,
-			     LCUI_WidgetEvent e, void *arg)
+static void Slider_OnMouseUp(LCUI_Widget slider, LCUI_WidgetEvent e, void *arg)
 {
 	LCUI_Widget w = e->data;
 	LCUI_ScrollBar scrollbar = Widget_GetData(w, self.prototype);
@@ -292,8 +295,8 @@ static void Slider_OnMouseUp(LCUI_Widget slider,
 	scrollbar->is_dragged = FALSE;
 }
 
-static void Slider_OnMouseDown(LCUI_Widget slider,
-			       LCUI_WidgetEvent e, void *arg)
+static void Slider_OnMouseDown(LCUI_Widget slider, LCUI_WidgetEvent e,
+			       void *arg)
 {
 	LCUI_Widget w = e->data;
 	LCUI_ScrollBar scrollbar = Widget_GetData(w, self.prototype);
@@ -337,8 +340,7 @@ static void ScrollBar_OnInit(LCUI_Widget w)
 	scrollbar->pos = 0;
 	scrollbar->touch_point_id = -1;
 	InitInertialScrolling(&scrollbar->effect);
-	Widget_BindEvent(slider, "mousedown",
-			 Slider_OnMouseDown, w, NULL);
+	Widget_BindEvent(slider, "mousedown", Slider_OnMouseDown, w, NULL);
 	Widget_BindEvent(w, "link", ScrollBar_OnLink, NULL, NULL);
 	Widget_AddClass(slider, "scrollbar-slider");
 	Widget_Append(w, slider);
@@ -384,8 +386,8 @@ static void ScrollBar_UpdateSize(LCUI_Widget w)
 	}
 }
 
-static void ScrollLayer_OnWheel(LCUI_Widget target,
-				LCUI_WidgetEvent e, void *arg)
+static void ScrollLayer_OnWheel(LCUI_Widget target, LCUI_WidgetEvent e,
+				void *arg)
 {
 	int pos, new_pos;
 	LCUI_Widget w = e->data;
@@ -404,8 +406,8 @@ static void ScrollLayer_OnWheel(LCUI_Widget target,
 }
 
 /** 滚动层的触屏事件响应 */
-static void ScrollLayer_OnTouch(LCUI_Widget target,
-				LCUI_WidgetEvent e, void *arg)
+static void ScrollLayer_OnTouch(LCUI_Widget target, LCUI_WidgetEvent e,
+				void *arg)
 {
 	uint_t time_delta;
 	int i, pos, distance;
@@ -498,18 +500,19 @@ static void ScrollLayer_OnTouch(LCUI_Widget target,
 		LCUIWidget_ClearEventTarget(NULL);
 		Widget_BlockEvent(target, TRUE);
 		Widget_SetTouchCapture(target, point->id);
-	default: break;
+	default:
+		break;
 	}
 }
 
-static void ScrollBar_OnUpdateSize(LCUI_Widget box,
-				   LCUI_WidgetEvent e, void *arg)
+static void ScrollBar_OnUpdateSize(LCUI_Widget box, LCUI_WidgetEvent e,
+				   void *arg)
 {
 	ScrollBar_UpdateSize(e->data);
 }
 
-static void ScrollBar_OnSetPosition(LCUI_Widget box,
-				    LCUI_WidgetEvent e, void *arg)
+static void ScrollBar_OnSetPosition(LCUI_Widget box, LCUI_WidgetEvent e,
+				    void *arg)
 {
 	int *pos = arg;
 	ScrollBar_SetPosition(e->data, *pos);
@@ -525,10 +528,10 @@ void ScrollBar_BindBox(LCUI_Widget w, LCUI_Widget box)
 	}
 	scrollbar->box = box;
 	if (box) {
-		Widget_BindEvent(box, "resize",
-				 ScrollBar_OnUpdateSize, w, NULL);
-		Widget_BindEvent(box, "setscroll",
-				 ScrollBar_OnSetPosition, w, NULL);
+		Widget_BindEvent(box, "resize", ScrollBar_OnUpdateSize, w,
+				 NULL);
+		Widget_BindEvent(box, "setscroll", ScrollBar_OnSetPosition, w,
+				 NULL);
 	}
 	ScrollBar_UpdateSize(w);
 }
@@ -561,7 +564,7 @@ int ScrollBar_SetPosition(LCUI_Widget w, int pos)
 	LCUI_ScrollBar scrollbar = Widget_GetData(w, self.prototype);
 	LCUI_Widget slider = scrollbar->slider;
 	LCUI_Widget target = scrollbar->target;
-	LCUI_WidgetEvent e;
+	LCUI_WidgetEvent e = { 0 };
 
 	if (!target) {
 		return 0;
@@ -609,7 +612,7 @@ int ScrollBar_SetPosition(LCUI_Widget w, int pos)
 	}
 	pos = iround(new_pos);
 	if (scrollbar->pos != pos) {
-		LCUI_WidgetEventRec e;
+		LCUI_WidgetEventRec e = { 0 };
 		e.type = self.event_id;
 		e.cancel_bubble = TRUE;
 		Widget_TriggerEvent(target, &e, &new_pos);
@@ -631,8 +634,8 @@ void ScrollBar_SetDirection(LCUI_Widget w, int direction)
 	scrollbar->direction = direction;
 }
 
-static void ScrollBar_OnSetAttr(LCUI_Widget w,
-				const char *name, const char *value)
+static void ScrollBar_OnSetAttr(LCUI_Widget w, const char *name,
+				const char *value)
 {
 	LCUI_Widget target;
 	if (strcmp(name, "parent") == 0) {
