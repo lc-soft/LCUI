@@ -23,6 +23,7 @@ int main(void)
 	Logger_SetHandler(LoggerHandler);
 	Logger_SetHandlerW(LoggerHandlerW);
 #endif
+	ret += test_widget_opacity();
 	ret += test_charset();
 	ret += test_string();
 	ret += test_thread();
@@ -33,6 +34,7 @@ int main(void)
 	ret += test_widget_layout();
 	ret += test_widget_flex_layout();
 	ret += test_widget_inline_block_layout();
+	ret += test_widget_opacity();
 	ret += test_widget_rect();
 	ret += test_textview_resize();
 	PRINT_TEST_RESULT(ret);

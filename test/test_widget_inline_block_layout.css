@@ -37,9 +37,6 @@
     padding: 5px 20px;
     box-sizing: border-box;
 }
-.dropdown-item:last-child {
-    border: 0;
-}
 .dropdown-item textview {
     line-height: 24px;
 }
