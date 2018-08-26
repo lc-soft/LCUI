@@ -66,6 +66,8 @@ LCUI_API void Widget_Hide(LCUI_Widget w);
 
 LCUI_API void Widget_SetPosition(LCUI_Widget w, LCUI_StyleValue position);
 
+LCUI_API void Widget_SetOpacity(LCUI_Widget w, float opacity);
+
 LCUI_API void Widget_SetBoxSizing(LCUI_Widget w, LCUI_StyleValue sizing);
 
 LCUI_END_HEADER

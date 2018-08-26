@@ -118,6 +118,12 @@ void Widget_SetPosition(LCUI_Widget w, LCUI_StyleValue position)
 	Widget_UpdateStyle(w, FALSE);
 }
 
+void Widget_SetOpacity(LCUI_Widget w, float opacity)
+{
+	Widget_SetStyle(w, key_opacity, opacity, scale);
+	Widget_UpdateStyle(w, FALSE);
+}
+
 void Widget_SetBoxSizing(LCUI_Widget w, LCUI_StyleValue sizing)
 {
 	Widget_SetStyle(w, key_box_sizing, sizing, style);
