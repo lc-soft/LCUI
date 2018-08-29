@@ -310,8 +310,7 @@ size_t LCUIFont_UpdateWeight(const int *font_ids, LCUI_FontWeight weight,
 	if (!font_ids) {
 		return 0;
 	}
-	for (len = 0; font_ids[len]; ++len)
-		;
+	for (len = 0; font_ids[len]; ++len);
 	if (len < 1) {
 		return 0;
 	}
@@ -945,6 +944,7 @@ static void LCUIFont_LoadFontsByFontConfig(void)
 	if (i > 0) {
 		LCUIFont_SetDefault(ids[i - 1]);
 	}
+	free(ids);
 }
 
 #else
@@ -976,6 +976,7 @@ static void LCUIFont_LoadFontsForLinux(void)
 	if (i > 0) {
 		LCUIFont_SetDefault(ids[i - 1]);
 	}
+	free(ids);
 }
 #endif
 
