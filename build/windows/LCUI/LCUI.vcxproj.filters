@@ -273,6 +273,9 @@
     <ClInclude Include="..\..\..\include\LCUI\painter.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\types.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
