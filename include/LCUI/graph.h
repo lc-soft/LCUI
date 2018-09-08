@@ -172,7 +172,7 @@ LCUI_API int Graph_Quote(LCUI_Graph *self, LCUI_Graph *source,
 LCUI_API int Graph_QuoteReadOnly(LCUI_Graph *self, const LCUI_Graph *source,
 				 const LCUI_Rect *rect);
 
-LCUI_BOOL Graph_IsValid(const LCUI_Graph *graph);
+LCUI_API LCUI_BOOL Graph_IsValid(const LCUI_Graph *graph);
 
 LCUI_API void Graph_GetValidRect(const LCUI_Graph *graph, LCUI_Rect *rect);
 
