@@ -1,5 +1,4 @@
-/*
- * types.h -- The common macros and types definition for LCUI
+﻿/* types.h -- The common macros and types definition for LCUI
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *

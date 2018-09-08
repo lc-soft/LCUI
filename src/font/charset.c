@@ -29,6 +29,7 @@
  */
 
 #include <wchar.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -49,6 +50,7 @@
 #define UNICODE_UTF8_4 0x1fffff
 
 #ifdef LCUI_BUILD_IN_WIN32
+#include <Windows.h>
 #define encode(CP, WSTR, STR, LEN) \
 	WideCharToMultiByte(CP, 0, WSTR, -1, STR, LEN, NULL, NULL)
 #define decode(CP, STR, WSTR, LEN) \
@@ -103,7 +105,7 @@ static size_t utf8_to_ucs2(const char *utf8, wchar_t *ucs2)
 
 /* https://github.com/benkasminbullock/unicode-c/blob/master/unicode.c#L310 */
 
-size_t ucs2_to_utf8(wchar_t ucs2, unsigned char *utf8)
+size_t ucs2_to_utf8(int32_t ucs2, unsigned char *utf8)
 {
 	if (ucs2 < 0x80) {
 		utf8[0] = ucs2;
