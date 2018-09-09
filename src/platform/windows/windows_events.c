@@ -160,6 +160,7 @@ LCUI_AppDriver LCUI_CreateWinAppDriver(void)
 		MessageBoxW(NULL, str, win.class_name, MB_ICONERROR);
 		return NULL;
 	}
+	app->id = LCUI_APP_WINDOWS;
 	app->GetData = WIN_GetData;
 	app->ProcessEvents = WIN_ProcessEvents;
 	app->BindSysEvent = WIN_BindSysEvent;
