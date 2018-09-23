@@ -95,7 +95,7 @@ typedef struct LCUI_TextLayerRec_ {
 	 */
 	int max_width, max_height;
 
-	int length;				/**< 文本长度 */
+	size_t length;				/**< 文本长度 */
 	int line_height;			/**< 全局文本行高度 */
 	int text_align;				/**< 文本的对齐方式 */
 	LCUI_WordBreakMode word_break;		/**< 单词内断行模式 */

@@ -48,7 +48,7 @@ LCUI_API void TextEdit_ClearText(LCUI_Widget widget);
 LCUI_API int TextEdit_GetTextW(LCUI_Widget widget, int start, int max_len, wchar_t *buf);
 
 /** 获取文本长度 */
-LCUI_API int TextEdit_GetTextLength(LCUI_Widget w);
+LCUI_API size_t TextEdit_GetTextLength(LCUI_Widget w);
 
 /** 设置文本编辑框内的光标，指定是否闪烁、闪烁时间间隔 */
 LCUI_API void TextEdit_SetCaretBlink(LCUI_Widget w, LCUI_BOOL enabled, int time);

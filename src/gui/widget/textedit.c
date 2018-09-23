@@ -517,7 +517,7 @@ int TextEdit_GetTextW(LCUI_Widget w, int start, int max_len, wchar_t *buf)
 	return TextLayer_GetTextW(edit->layer_source, start, max_len, buf);
 }
 
-int TextEdit_GetTextLength(LCUI_Widget w)
+size_t TextEdit_GetTextLength(LCUI_Widget w)
 {
 	LCUI_TextEdit edit = GetData(w);
 	return edit->layer_source->length;
