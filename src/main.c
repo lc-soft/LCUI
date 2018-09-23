@@ -113,6 +113,8 @@ static struct LCUI_App {
 
 /* clang-format on */
 
+#ifdef DEBUG
+
 enum LCUI_StatsTarget {
 	LCUI_STATS_EVENTS,
 	LCUI_STATS_LAYOUT,
@@ -179,6 +181,8 @@ void LCUIStats_End(LCUI_Stats stats)
 		LCUIStats_Print(stats);
 	}
 }
+
+#endif
 
 static void LCUI_InitEvent(void)
 {
@@ -348,7 +352,9 @@ LCUI_MainLoop LCUIMainLoop_New(void)
 /** 运行目标主循环 */
 int LCUIMainLoop_Run(LCUI_MainLoop loop)
 {
+#ifdef DEBUG
 	LCUI_StatsRec stats;
+#endif
 	LCUI_BOOL at_same_thread = FALSE;
 	if (loop->state == STATE_RUNNING) {
 		DEBUG_MSG("error: main-loop already running.\n");
@@ -370,6 +376,7 @@ int LCUIMainLoop_Run(LCUI_MainLoop loop)
 	DEBUG_MSG("loop: %p, enter\n", loop);
 	MainApp.loop = loop;
 	while (loop->state != STATE_EXITED) {
+#ifdef DEBUG
 		LCUIStats_Begin(&stats);
 		LCUI_ProcessEvents();
 		LCUIStats_RecordTime(&stats, LCUI_STATS_EVENTS);
@@ -380,6 +387,11 @@ int LCUIMainLoop_Run(LCUI_MainLoop loop)
 		LCUIDisplay_Present();
 		LCUIStats_RecordTime(&stats, LCUI_STATS_PRESENT);
 		LCUIStats_End(&stats);
+#endif
+		LCUI_ProcessEvents();
+		LCUIDisplay_Update();
+		LCUIDisplay_Render();
+		LCUIDisplay_Present();
 		StepTimer_Remain(MainApp.timer);
 		/* 如果当前运行的主循环不是自己 */
 		while (MainApp.loop != loop) {
