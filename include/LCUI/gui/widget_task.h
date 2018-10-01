@@ -42,9 +42,6 @@ LCUI_API void Widget_AddTask(LCUI_Widget widget, int task_type);
 /** 处理部件中当前积累的任务 */
 LCUI_API int Widget_Update(LCUI_Widget w);
 
-/** 将部件标记为垃圾，等待销毁 */
-LCUI_API void Widget_AddToTrash(LCUI_Widget w);
-
 /** 为子级部件添加任务 */
 LCUI_API void Widget_AddTaskForChildren(LCUI_Widget widget, int task);
 

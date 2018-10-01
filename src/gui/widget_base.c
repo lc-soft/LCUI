@@ -32,17 +32,21 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <assert.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/metrics.h>
 
 static struct LCUI_WidgetModule {
-	LCUI_Widget root;       /**< 根级部件 */
 	Dict *ids;              /**< 各种部件的ID索引 */
-	LCUI_Mutex mutex;       /**< 互斥锁 */
 	DictType dt_ids;        /**< 部件ID映射表的类型模板 */
 	DictType dt_attributes; /**< 部件属性表的类型模板 */
+
+	LCUI_Widget root;       /**< 根级部件 */
+	LCUI_Mutex mutex;       /**< 互斥锁 */
+
+	LinkedList trash;	/**< 待删除的部件列表 */
 } LCUIWidget;
 
 #define StrList_Destroy freestrs
@@ -101,6 +105,32 @@ static void Widget_UpdateStatus(LCUI_Widget widget)
 			Widget_RemoveStatus(child, "first-child");
 		}
 	}
+}
+
+void LCUIWidget_ClearTrash(void)
+{
+	LinkedListNode *node;
+	node = LCUIWidget.trash.head.next;
+	while (node) {
+		LinkedListNode *next = node->next;
+		LinkedList_Unlink(&LCUIWidget.trash, node);
+		Widget_ExecDestroy(node->data);
+		node = next;
+	}
+}
+
+static void Widget_AddToTrash(LCUI_Widget w)
+{
+	LCUI_WidgetEventRec e = { 0 };
+	e.type = LCUI_WEVENT_UNLINK;
+	w->state = LCUI_WSTATE_DELETED;
+	Widget_TriggerEvent(w, &e, NULL);
+	if (!w->parent) {
+		return;
+	}
+	Widget_Unlink(w);
+	LinkedList_AppendNode(&LCUIWidget.trash, &w->node);
+	Widget_PostSurfaceEvent(w, LCUI_WEVENT_UNLINK, TRUE);
 }
 
 int Widget_Unlink(LCUI_Widget widget)
@@ -223,44 +253,47 @@ int Widget_Prepend(LCUI_Widget parent, LCUI_Widget widget)
 
 int Widget_Unwrap(LCUI_Widget widget)
 {
-	int i;
+	size_t len;
 	LCUI_Widget child;
-	LinkedList *list, *list_show;
+	LinkedList *children, *children_show;
 	LinkedListNode *target, *node, *prev, *snode;
 
 	if (!widget->parent) {
 		return -1;
 	}
-	list = &widget->parent->children;
-	list_show = &widget->parent->children_show;
-	if (widget->children.length > 0) {
+	children = &widget->parent->children;
+	children_show = &widget->parent->children_show;
+	len = widget->children.length;
+	if (len > 0) {
 		node = LinkedList_GetNode(&widget->children, 0);
 		Widget_RemoveStatus(node->data, "first-child");
 		node = LinkedList_GetNodeAtTail(&widget->children, 0);
 		Widget_RemoveStatus(node->data, "last-child");
 	}
 	node = &widget->node;
-	i = widget->children.length;
 	target = node->prev;
 	node = widget->children.tail.prev;
-	while (i-- > 0) {
+	while (len > 0) {
+		assert(node != NULL);
+		assert(node->data != NULL);
 		prev = node->prev;
 		child = node->data;
 		snode = &child->node_show;
 		LinkedList_Unlink(&widget->children, node);
 		LinkedList_Unlink(&widget->children_show, snode);
 		child->parent = widget->parent;
-		LinkedList_Link(list, target, node);
-		LinkedList_AppendNode(list_show, snode);
+		LinkedList_Link(children, target, node);
+		LinkedList_AppendNode(children_show, snode);
 		Widget_AddTaskForChildren(child, LCUI_WTASK_REFRESH_STYLE);
 		Widget_UpdateTaskStatus(child);
 		node = prev;
+		--len;
 	}
 	if (widget->index == 0) {
 		Widget_AddStatus(target->next->data, "first-child");
 	}
-	if (widget->index == list->length - 1) {
-		node = LinkedList_GetNodeAtTail(list, 0);
+	if (widget->index == children->length - 1) {
+		node = LinkedList_GetNodeAtTail(children, 0);
 		Widget_AddStatus(node->data, "last-child");
 	}
 	Widget_Destroy(widget);
@@ -325,6 +358,11 @@ static void Widget_OnDestroy(void *arg)
 void Widget_ExecDestroy(LCUI_Widget widget)
 {
 	LCUI_WidgetEventRec e = { LCUI_WEVENT_DESTROY, 0 };
+
+	if (widget->parent) {
+		Widget_UpdateLayout(widget->parent);
+		Widget_Unlink(widget);
+	}
 	Widget_TriggerEvent(widget, &e, NULL);
 	Widget_ReleaseMouseCapture(widget);
 	Widget_ReleaseTouchCapture(widget, -1);
@@ -340,9 +378,6 @@ void Widget_ExecDestroy(LCUI_Widget widget)
 	StyleSheet_Delete(widget->inherited_style);
 	StyleSheet_Delete(widget->custom_style);
 	StyleSheet_Delete(widget->style);
-	if (widget->parent) {
-		Widget_UpdateLayout(widget->parent);
-	}
 	if (widget->title) {
 		free(widget->title);
 		widget->title = NULL;
@@ -361,6 +396,7 @@ void Widget_Destroy(LCUI_Widget w)
 	while (root->parent) {
 		root = root->parent;
 	}
+	/* If this widget is not mounted in the root widget tree */
 	if (root != LCUIWidget.root) {
 		LCUI_WidgetEventRec e = { 0 };
 		e.type = LCUI_WEVENT_UNLINK;
@@ -372,8 +408,9 @@ void Widget_Destroy(LCUI_Widget w)
 	if (w->parent) {
 		LCUI_Widget child;
 		LinkedListNode *node;
-		node = &w->node;
-		node = node->next;
+
+		/* Update the index of the siblings behind it */
+		node = w->node.next;
 		while (node) {
 			child = node->data;
 			child->index -= 1;
@@ -1727,6 +1764,7 @@ static void OnClearWidgetList(void *privdata, void *data)
 
 void LCUIWidget_InitBase(void)
 {
+	LinkedList_Init(&LCUIWidget.trash);
 	LCUIMutex_Init(&LCUIWidget.mutex);
 	LCUIWidget.root = LCUIWidget_New("root");
 	LCUIWidget.dt_ids = DictType_StringCopyKey;

@@ -449,6 +449,8 @@ LCUI_API int Widget_RemoveStatus(LCUI_Widget w, const char *status_name);
 /** 打印部件树 */
 LCUI_API void Widget_PrintTree(LCUI_Widget w);
 
+LCUI_API void LCUIWidget_ClearTrash(void);
+
 LCUI_API void LCUIWidget_InitBase(void);
 
 LCUI_API void LCUIWidget_FreeRoot(void);

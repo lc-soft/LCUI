@@ -37,9 +37,8 @@
 
 /** 部件任务模块数据 */
 static struct WidgetTaskModule {
-	LinkedList trash;				/**< 待删除的部件列表 */
 	LCUI_WidgetFunction handlers[LCUI_WTASK_TOTAL_NUM];	/**< 任务处理器 */
-	unsigned int update_count;			/**< 刷新次数 */
+	unsigned int update_count;				/**< 刷新次数 */
 } self;
 
 static void HandleRefreshStyle(LCUI_Widget w)
@@ -139,42 +138,14 @@ static void MapTaskHandler(void)
 	SetHandler(PROPS, Widget_UpdateProps);
 }
 
-static void LCUIWidget_ClearTrash(void)
-{
-	LinkedListNode *node;
-	node = self.trash.head.next;
-	while (node) {
-		LinkedListNode *next = node->next;
-		LinkedList_Unlink(&self.trash, node);
-		Widget_ExecDestroy(node->data);
-		node = next;
-	}
-}
-
 void LCUIWidget_InitTasks(void)
 {
 	MapTaskHandler();
-	LinkedList_Init(&self.trash);
 }
 
 void LCUIWidget_FreeTasks(void)
 {
-	LCUIWidget_ClearTrash();
-}
 
-void Widget_AddToTrash(LCUI_Widget w)
-{
-	LCUI_WidgetEventRec e = { 0 };
-	e.type = LCUI_WEVENT_UNLINK;
-	w->state = LCUI_WSTATE_DELETED;
-	Widget_TriggerEvent(w, &e, NULL);
-	if (!w->parent) {
-		return;
-	}
-	LinkedList_Unlink(&w->parent->children, &w->node);
-	LinkedList_Unlink(&w->parent->children_show, &w->node_show);
-	LinkedList_AppendNode(&self.trash, &w->node);
-	Widget_PostSurfaceEvent(w, LCUI_WEVENT_UNLINK, TRUE);
 }
 
 int Widget_Update(LCUI_Widget w)
