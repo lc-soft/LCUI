@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <lcui-app>
   <ui>
-    <w id="test-attr-disabed-1" type="textview" disabled="">Disabed element 1</w>
-    <w id="test-attr-disabed-2" type="textview" disabled="disabled">Disabed element 2</w>
-    <w id="test-attr-disabed-3" type="textview" disabled="test">Disabed element 3</w>
-    <w id="test-attr-disabed-4" type="textview" disabled="false">Normal element 1</w>
+    <w id="test-attr-disabled-1" type="textview" disabled="">Disabed element 1</w>
+    <w id="test-attr-disabled-2" type="textview" disabled="disabled">Disabed element 2</w>
+    <w id="test-attr-disabled-3" type="textview" disabled="test">Disabed element 3</w>
+    <resource type="text/xml" src="test_xml_parser.nested.xml" />
+    <w id="test-attr-disabled-4" type="textview" disabled="false">Normal element 4</w>
   </ui>
 </lcui-app>

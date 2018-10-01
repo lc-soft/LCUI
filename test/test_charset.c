@@ -1,4 +1,4 @@
-#include <wchar.h>
+﻿#include <wchar.h>
 #include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/util/logger.h>

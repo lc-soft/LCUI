@@ -1,4 +1,4 @@
-﻿/* ***************************************************************************
+/* ***************************************************************************
  * builder.c -- the GUI build module, parse UI config code and build UI.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
@@ -43,7 +43,7 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
-#define PropNameIs(type) (xmlStrcasecmp(prop->name, BAD_CAST type) == 0)
+#define PropNameIs(PROP, NAME) (xmlStrcasecmp(PROP->name, (xmlChar*)NAME) == 0)
 
 enum ParserID {
 	ID_ROOT,
@@ -71,9 +71,10 @@ typedef struct Parser {
 
 struct XMLParserContextRec_ {
 	int id;
-	LCUI_Widget widget;
 	LCUI_Widget root;
-	ParserPtr parent;
+	LCUI_Widget widget;
+	LCUI_Widget parent_widget;
+	ParserPtr parent_parser;
 	const char *space;
 };
 
@@ -82,10 +83,15 @@ static struct ModuleContext {
 	RBTree parsers;
 } self;
 
+#define EXIT(CODE) code = CODE; goto exit;
+
 /** 解析<resource>元素，根据相关参数载入资源 */
 static int ParseResource(XMLParserContext ctx, xmlNodePtr node)
 {
+
 	xmlAttrPtr prop;
+
+	int code = PB_NEXT;
 	char *prop_val, *type = NULL, *src = NULL;
 
 	if (node->type != XML_ELEMENT_NODE) {
@@ -94,9 +100,9 @@ static int ParseResource(XMLParserContext ctx, xmlNodePtr node)
 	prop = node->properties;
 	while (prop) {
 		prop_val = (char*)xmlGetProp(node, prop->name);
-		if (PropNameIs("type")) {
+		if (PropNameIs(prop, "type")) {
 			type = prop_val;
-		} else if (PropNameIs("src")) {
+		} else if (PropNameIs(prop, "src")) {
 			src = prop_val;
 		} else {
 			xmlFree(prop_val);
@@ -107,10 +113,14 @@ static int ParseResource(XMLParserContext ctx, xmlNodePtr node)
 		return PB_WARNING;
 	}
 	if (strstr(type, "application/font-")) {
-		LCUIFont_LoadFile(src);
-	} else if (strstr(type, "text/css")) {
+		if (LCUIFont_LoadFile(src) < 1) {
+			EXIT(PB_WARNING);
+		}
+	} else if (strcmp(type, "text/css") == 0) {
 		if (src) {
-			LCUI_LoadCSSFile(src);
+			if (LCUI_LoadCSSFile(src) != 0) {
+				EXIT(PB_WARNING);
+			}
 		}
 		for (node = node->children; node; node = node->next) {
 			if (node->type != XML_TEXT_NODE) {
@@ -118,14 +128,33 @@ static int ParseResource(XMLParserContext ctx, xmlNodePtr node)
 			}
 			LCUI_LoadCSSString((char*)node->content, ctx->space);
 		}
+	} else if (strcmp(type, "text/xml") == 0) {
+		LCUI_Widget pack;
+		if (!src) {
+			EXIT(PB_WARNING);
+		}
+		pack = LCUIBuilder_LoadFile(src);
+		if (!pack) {
+			EXIT(PB_WARNING);
+		}
+		if (ctx->parent_widget) {
+			Widget_Append(ctx->parent_widget, pack);
+		} else if (ctx->root) {
+			Widget_Append(ctx->root, pack);
+		} else {
+			Widget_Destroy(pack);
+			EXIT(PB_WARNING);
+		}
+		Widget_Unwrap(pack);
 	}
+exit:
 	if (src) {
 		xmlFree(src);
 	}
 	if (type) {
 		xmlFree(type);
 	}
-	return PB_NEXT;
+	return code;
 }
 
 /** 解析<ui>元素，主要作用是创建一个容纳全部部件的根级部件 */
@@ -134,7 +163,7 @@ static int ParseUI(XMLParserContext ctx, xmlNodePtr node)
 	if (node->type != XML_ELEMENT_NODE) {
 		return PB_NEXT;
 	}
-	if (ctx->parent && ctx->parent->id != ID_ROOT) {
+	if (ctx->parent_parser && ctx->parent_parser->id != ID_ROOT) {
 		return PB_ERROR;
 	}
 	ctx->widget = LCUIWidget_New(NULL);
@@ -149,8 +178,8 @@ static int ParseWidget(XMLParserContext ctx, xmlNodePtr node)
 	char *prop_val = NULL, *prop_name;
 	LCUI_Widget w = NULL, parent = ctx->widget;
 
-	if (ctx->parent && ctx->parent->id != ID_UI &&
-	    ctx->parent->id != ID_WIDGET) {
+	if (ctx->parent_parser && ctx->parent_parser->id != ID_UI &&
+	    ctx->parent_parser->id != ID_WIDGET) {
 		return PB_ERROR;
 	}
 	switch (node->type) {
@@ -178,7 +207,7 @@ static int ParseWidget(XMLParserContext ctx, xmlNodePtr node)
 			xmlFree(prop_val);
 		}
 		prop_val = (char*)xmlGetProp(node, prop->name);
-		if (PropNameIs("type")) {
+		if (PropNameIs(prop, "type")) {
 			DEBUG_MSG("widget: %p, set type: %s\n", w, prop_val);
 			w->proto = LCUIWidget_GetPrototype(prop_val);
 			if (w->proto && w->proto->init) {
@@ -188,11 +217,11 @@ static int ParseWidget(XMLParserContext ctx, xmlNodePtr node)
 				w->type = strdup2(prop_val);
 			}
 			continue;
-		} else if (PropNameIs("id")) {
+		} else if (PropNameIs(prop, "id")) {
 			DEBUG_MSG("widget: %p, set id: %s\n", w, prop_val);
 			Widget_SetId(w, prop_val);
 			continue;
-		} else if (PropNameIs("class")) {
+		} else if (PropNameIs(prop, "class")) {
 			DEBUG_MSG("widget: %p, add class: %s\n", w, prop_val);
 			Widget_AddClass(w, prop_val);
 			continue;
@@ -243,19 +272,21 @@ static void ParseNode(XMLParserContext ctx, xmlNodePtr node)
 {
 	ParserPtr p;
 	XMLParserContextRec cur_ctx;
+
 	for (; node; node = node->next) {
 		if (node->type == XML_ELEMENT_NODE) {
 			p = RBTree_CustomGetData(&self.parsers, node->name);
 		} else {
-			p = ctx->parent;
+			p = ctx->parent_parser;
 		}
 		if (!p) {
 			continue;
 		}
 		cur_ctx = *ctx;
+		cur_ctx.parent_widget = ctx->widget;
 		switch (p->parse(&cur_ctx, node)) {
 		case PB_ENTER:
-			cur_ctx.parent = p;
+			cur_ctx.parent_parser = p;
 			ParseNode(&cur_ctx, node->children);
 			break;
 		case PB_NEXT: break;
@@ -285,10 +316,7 @@ LCUI_Widget LCUIBuilder_LoadString(const char *str, int size)
 	xmlNodePtr cur;
 	XMLParserContextRec ctx;
 
-	ctx.root = NULL;
-	ctx.widget = NULL;
-	ctx.parent = NULL;
-	ctx.space = NULL;
+	memset(&ctx, 0, sizeof(ctx));
 	doc = xmlParseMemory(str, size);
 	if (!doc) {
 		LOG("[builder] Failed to parse xml form memory\n");
@@ -321,9 +349,7 @@ LCUI_Widget LCUIBuilder_LoadFile(const char *filepath)
 	xmlNodePtr cur;
 	XMLParserContextRec ctx;
 
-	ctx.root = NULL;
-	ctx.widget = NULL;
-	ctx.parent = NULL;
+	memset(&ctx, 0, sizeof(ctx));
 	ctx.space = filepath;
 	doc = xmlParseFile(filepath);
 	if (!doc) {

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <w id="test-nested-1" type="textview">Element 1 from nested xml file</w>
+    <w id="box">
+      <w id="test-nested-2" type="textview">Element 2 from nested xml file</w>
+      <w id="test-nested-3" type="textview">Element 3 from nested xml file</w>
+      <w id="test-nested-4" type="textview">Element 4 from nested xml file</w>
+    </w>
+  </ui>
+</lcui-app>
