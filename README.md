@@ -24,8 +24,6 @@
 - [Documentation](#documentation)
 - [Building](#building)
 - [Contribution](#contribution)
-- [Backers](#backers)
-- [Sponsors](#sponsors)
 
 ## Introduction
 
