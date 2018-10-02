@@ -1,4 +1,4 @@
-﻿/*
+/*
  * textlayer.c -- Text layout and rendering module.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
@@ -49,6 +49,7 @@ enum TextAddType {
 #define TextLayer_GetRow(layer, n) \
 	(n >= layer->text_rows.length) ? NULL:layer->text_rows.rows[n]
 #define GetDefaultLineHeight(H) iround( H * 1.42857143 )
+#define ISALPHA(CH) (CH >= 'a' && CH <= 'z') || (CH >= 'A' && CH <= 'Z')
 
 /* 根据对齐方式，计算文本行的起始X轴位置 */
 static int TextLayer_GetRowStartX(LCUI_TextLayer layer, LCUI_TextRow txtrow)
@@ -628,13 +629,14 @@ static void TextLayer_TextRowTypeset(LCUI_TextLayer layer, int row)
 		if (!txtchar->bitmap) {
 			continue;
 		}
-		if (!iswalpha(txtchar->code)) {
-			word_col = col + 1;
-		}
 		/* 累加行宽度 */
 		row_width += txtchar->bitmap->advance.x;
 		/* 如果是当前行的第一个字符，或者行宽度没有超过宽度限制 */
 		if (not_autowrap || col < 1 || row_width <= max_width) {
+			if (ISALPHA(txtchar->code)) {
+			} else {
+				word_col = col + 1;
+			}
 			continue;
 		}
 		if (layer->word_break == LCUI_WORD_BREAK_NORMAL) {
