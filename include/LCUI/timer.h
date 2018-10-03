@@ -98,10 +98,13 @@ LCUI_API int LCUITimer_Continue(int timer_id);
  * */
 LCUI_API int LCUITimer_Reset(int timer_id, long int n_ms);
 
-/* 初始化定时器模块 */
+/* Process all active timers */
+LCUI_API int LCUI_ProcessTimers(void);
+
+/* Init the timer module */
 LCUI_API void LCUI_InitTimer(void);
 
-/* 停用定时器模块 */
+/* Free the timer module */
 LCUI_API void LCUI_FreeTimer(void);
 
 LCUI_END_HEADER

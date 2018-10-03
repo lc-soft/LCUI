@@ -378,6 +378,7 @@ int LCUIMainLoop_Run(LCUI_MainLoop loop)
 	while (loop->state != STATE_EXITED) {
 #ifdef DEBUG
 		LCUIStats_Begin(&stats);
+		LCUI_ProcessTimers();
 		LCUI_ProcessEvents();
 		LCUIStats_RecordTime(&stats, LCUI_STATS_EVENTS);
 		LCUIDisplay_Update();
@@ -388,6 +389,7 @@ int LCUIMainLoop_Run(LCUI_MainLoop loop)
 		LCUIStats_RecordTime(&stats, LCUI_STATS_PRESENT);
 		LCUIStats_End(&stats);
 #endif
+		LCUI_ProcessTimers();
 		LCUI_ProcessEvents();
 		LCUIDisplay_Update();
 		LCUIDisplay_Render();
