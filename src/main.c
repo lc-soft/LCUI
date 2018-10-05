@@ -58,9 +58,6 @@
 #define STATE_ACTIVE 1
 #define STATE_KILLED 0
 
-/** 一秒内的最大更新帧数 */
-#define MAX_FRAMES_PER_SEC 120
-
 typedef struct LCUI_MainLoopRec_ {
 	int state;       /**< 主循环的状态 */
 	LCUI_Thread tid; /**< 当前运行该主循环的线程的ID */
@@ -445,7 +442,7 @@ void LCUI_InitApp(LCUI_AppDriver app)
 		MainApp.workers[i] = LCUIWorker_New();
 		LCUIWorker_RunAsync(MainApp.workers[i]);
 	}
-	StepTimer_SetFrameLimit(MainApp.timer, MAX_FRAMES_PER_SEC);
+	StepTimer_SetFrameLimit(MainApp.timer, LCUI_MAX_FRAMES_PER_SEC);
 	if (!app) {
 		app = LCUI_CreateAppDriver();
 		if (!app) {

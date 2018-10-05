@@ -31,6 +31,9 @@
 #ifndef LCUI_MAIN_H
 #define LCUI_MAIN_H
 
+ /** 一秒内的最大更新帧数 */
+#define LCUI_MAX_FRAMES_PER_SEC 120
+
 LCUI_BEGIN_HEADER
 
 typedef LCUI_TaskFunc LCUI_AppTaskFunc;
