@@ -130,7 +130,6 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libxml2.lib;libpng16.lib;jpeg.lib;freetype271.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT;MSVCRT</IgnoreSpecificDefaultLibraries>
       <LinkStatus>false</LinkStatus>
@@ -196,7 +195,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libxml2.lib;libpng16.lib;jpeg.lib;freetype271.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT;MSVCRTD</IgnoreSpecificDefaultLibraries>
       <ShowProgress>NotSet</ShowProgress>
