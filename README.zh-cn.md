@@ -77,6 +77,20 @@ LCUI 采用的开源许可证是 [MIT](http://opensource.org/licenses/MIT)。
 
 ## 构建
 
+### 依赖项
+
+如果你想构建全特性的 LCUI，建议安装以下依赖库：
+
+- [libpng](http://www.libpng.org/pub/png/libpng.html) — PNG 图像压缩库
+- [libjpeg](http://www.ijg.org/) — JPEG 图像压缩库
+- [libxml2](http://xmlsoft.org/) — XML 解析器及相关工具集
+- [libx11](https://www.x.org/) — X11 客户端库
+- [freetype](https://www.freetype.org/) — 字体渲染引擎
+
+如果你的系统是 Ubuntu，可运行以下命令来安装依赖：
+
+    apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev
+
 ### 引导
 
 你需要运行 `./configure` (在源码根目录中) 以引导项目的构建。
@@ -105,25 +119,15 @@ LCUI 采用的开源许可证是 [MIT](http://opensource.org/licenses/MIT)。
 
     ./helloworld
 
-### 依赖项
-
-如果你想构建全特性的 LCUI，建议安装以下依赖库：
-
-- [libpng](http://www.libpng.org/pub/png/libpng.html) — PNG 图像压缩库
-- [libjpeg](http://www.ijg.org/) — JPEG 图像压缩库
-- [libxml2](http://xmlsoft.org/) — XML 解析器及相关工具集
-- [libx11](https://www.x.org/) — X11 客户端库
-- [freetype](https://www.freetype.org/) — 字体渲染引擎
-
-如果你的系统是 Ubuntu，可运行以下命令来安装依赖：
-
-    apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev
-
 ### 在 Windows 中构建
 
-LCUI 主要是在 Windows 系统环境下开发的，你可以使用 VisualStudio 打开 `/build/windows/LCUI.sln` 文件，然后编译生成 LCUI。如果你用的是其它 IDE，请尝试按该 IDE 的方式创建项目并将源文件添加至项目内，然后编译。
+LCUI 主要是在 Windows 系统环境下开发的，目前只提供 Visual Studio 的解决方案文件（.sln）,你可以使用 [Visual Studio](https://visualstudio.microsoft.com/) 打开 `/build/windows/LCUI.sln` 文件，然后编译生成 LCUI。如果你用的是其它 IDE，请尝试按该 IDE 的方式创建项目并将源文件添加至项目内，然后编译。
 
-上述的依赖库中除 Windows 系统用不到的 libx11 库外，都可以在 Windows 系统环境下编译生成，具体的编译方法你可以在教程中找到。如果你觉得编译这些依赖库很麻烦，可以试试用 [vcpkg](https://github.com/Microsoft/vcpkg) 来安装它们，而[发行版](https://github.com/lc-soft/LCUI/releases)的附件列表中一般也会有一个包含所有依赖库的压缩包可供使用。
+上述的依赖库中除 Windows 系统用不到的 libx11 库外，都可以在 Windows 系统环境下编译生成，具体的编译方法你可以在教程中找到。如果你觉得编译这些依赖库很麻烦，可以使用 [vcpkg](https://github.com/Microsoft/vcpkg) 来安装它们，只需在命令行里输入如下命令：
+
+    ./vcpkg install freetype libxml2 libjpeg-turbo libpng
+
+[发行版](https://github.com/lc-soft/LCUI/releases)的附件列表中一般也会有一个包含所有依赖库的压缩包可供使用。
 
 ## 社区
 

@@ -77,6 +77,30 @@ API reference documentation has not yet been prepared, you can refer to the head
 
 ## Building
 
+### Prerequisites
+
+If you want to build full-featured LCUI, we suggest you install the following
+ dependent libraries:
+
+ * [libpng](http://www.libpng.org/pub/png/libpng.html) — PNG image compression library
+ * [libjpeg](http://www.ijg.org/) — JPEG image compression library
+ * [libxml2](http://xmlsoft.org/) — The XML C parser and toolkit
+ * [libx11](https://www.x.org/) — X11 client-side library
+ * [freetype](https://www.freetype.org/) — Font engine
+ * [fontconfig](https://www.freedesktop.org/wiki/Software/fontconfig/) — Font configuration & location
+
+If your system is Ubuntu, you can run following command to install dependencies:
+
+    apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev libfontconfig1-dev
+
+### Building On Windows
+
+LCUI is mainly developed in the Windows environment, currently only Visual Studio solution file are available, you can use [Visual Studio](https://visualstudio.microsoft.com/) to open the file `build/windows/LCUI.sln` and build LCUI.
+
+Installing a dependency library in windows is troublesome, but you can choose to use [vcpkg](https://github.com/Microsoft/vcpkg) to solve it:
+
+    ./vcpkg install freetype libxml2 libjpeg-turbo libpng
+
 ### Bootstrap
 
 To bootstrap the build you need to run `./configure` (in the root of the source tree).
@@ -97,26 +121,6 @@ If you want to experience the demo, please run:
     ./hellowrold
 
 If you want to use custom building options, please read the [INSTALL](INSTALL) file for more details.
-
-### Prerequisites
-
-If you want to build full-featured LCUI, we suggest you install the following
- dependent libraries:
-
- * [libpng](http://www.libpng.org/pub/png/libpng.html) — PNG image compression library
- * [libjpeg](http://www.ijg.org/) — JPEG image compression library
- * [libxml2](http://xmlsoft.org/) — The XML C parser and toolkit
- * [libx11](https://www.x.org/) — X11 client-side library
- * [freetype](https://www.freetype.org/) — Font engine
- * [fontconfig](https://www.freedesktop.org/wiki/Software/fontconfig/) — Font configuration & location
-
-If your system is Ubuntu, you can run following command to install dependencies:
-
-    apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev libfontconfig1-dev
-
-### Building On Windows
-
-LCUI is mainly developed in the Windows environment, you can use VisualStudio to open the file `build/windows/LCUI.sln` and compile LCUI.
 
 ## Contribution
 
