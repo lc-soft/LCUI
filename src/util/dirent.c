@@ -34,19 +34,20 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/font/charset.h>
 
-int LCUI_OpenDirA(const char *filepath, LCUI_Dir *dir)
+int LCUI_OpenDirA(const char *path, LCUI_Dir *dir)
 {
 #if defined(LCUI_BUILD_IN_WIN32) || (_WIN32)
-	int len;
+	size_t len;
 	char *newpath;
+	char name[] = "\\*";
 
-	len = strlen(filepath) + 5;
-	newpath = malloc(len * sizeof(char));
+	len = strlen(path) + 1;
+	newpath = malloc(len * sizeof(char) + sizeof(name));
 	if (newpath == NULL) {
 		return -ENOMEM;
 	}
-	/* 需要加上通配符 */
-	sprintf_s(newpath, len, "%s\\*", filepath);
+	strcpy(newpath, path);
+	strcpy(newpath + len - 1, name);
 	dir->handle = FindFirstFileA(newpath, &dir->entry.dataA);
 	free(newpath);
 	if (dir->handle == INVALID_HANDLE_VALUE) {
@@ -68,15 +69,18 @@ int LCUI_OpenDirA(const char *filepath, LCUI_Dir *dir)
 int LCUI_OpenDirW(const wchar_t *path, LCUI_Dir *dir)
 {
 #if defined(LCUI_BUILD_IN_WIN32) || (_WIN32)
-	int len;
+	size_t len;
 	wchar_t *newpath;
+	wchar_t name[] = L"\\*";
+	
 
-	len = wcslen(path) + 5;
-	newpath = malloc(len * sizeof(wchar_t));
+	len = wcslen(path) + 1;
+	newpath = malloc(len * sizeof(wchar_t) + sizeof(name));
 	if (!newpath) {
 		return -ENOMEM;
 	}
-	swprintf(newpath, len, L"%s\\*", path);
+	wcscpy(newpath, path);
+	wcscpy(newpath + len - 1, name);
 	dir->handle = FindFirstFileW(newpath, &dir->entry.dataW);
 	free(newpath);
 	if (dir->handle == INVALID_HANDLE_VALUE) {
