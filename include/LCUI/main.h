@@ -33,6 +33,7 @@
 
  /** 一秒内的最大更新帧数 */
 #define LCUI_MAX_FRAMES_PER_SEC 120
+#define LCUI_MAX_FRAME_MSEC	((int)(1000.0 / LCUI_MAX_FRAMES_PER_SEC + 0.5))
 
 LCUI_BEGIN_HEADER
 
