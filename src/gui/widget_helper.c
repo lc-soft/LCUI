@@ -28,6 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <assert.h>
 #include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
@@ -100,16 +101,31 @@ void Widget_ResizeWithSurface(LCUI_Widget w, float width, float height)
 	Widget_AddTask(w, LCUI_WTASK_RESIZE_WITH_SURFACE);
 }
 
+LCUI_Style Widget_GetStyle(LCUI_Widget w, int key)
+{
+	assert(key >= 0 && key < w->custom_style->length);
+	return &w->custom_style->sheet[key];
+}
+
+void Widget_SetVisibility(LCUI_Widget w, const char *value)
+{
+	LCUI_Style s = Widget_GetStyle(w, key_visibility);
+	if (s->is_valid && s->type == LCUI_STYPE_STRING) {
+		free(s->val_string);
+		s->val_string = NULL;
+	}
+	Widget_SetStyle(w, key_visibility, strdup2(value), string);
+	Widget_UpdateStyle(w, FALSE);
+}
+
 void Widget_Show(LCUI_Widget w)
 {
-	Widget_SetStyle(w, key_visibility, strdup2("visible"), string);
-	Widget_UpdateStyle(w, FALSE);
+	Widget_SetVisibility(w, "visible");
 }
 
 void Widget_Hide(LCUI_Widget w)
 {
-	Widget_SetStyle(w, key_visibility, strdup2("hidden"), string);
-	Widget_UpdateStyle(w, FALSE);
+	Widget_SetVisibility(w, "hidden");
 }
 
 void Widget_SetPosition(LCUI_Widget w, LCUI_StyleValue position)
