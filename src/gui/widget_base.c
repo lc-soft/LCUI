@@ -723,8 +723,7 @@ void Widget_UpdateDisplay(LCUI_Widget w)
 	if (w->computed_style.display == display) {
 		return;
 	}
-	if (w->parent && display == SV_NONE &&
-	    w->computed_style.position != SV_ABSOLUTE) {
+	if (w->parent && w->computed_style.position != SV_ABSOLUTE) {
 		Widget_UpdateLayout(w->parent);
 	}
 	Widget_UpdateVisibility(w);
