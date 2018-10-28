@@ -21,9 +21,6 @@
     <Filter Include="头文件\LCUI\font">
       <UniqueIdentifier>{e82633f2-1d26-4ccb-9d8b-acf3bca828a4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="docs">
-      <UniqueIdentifier>{55f58a5e-9a60-4e9d-b65e-7377c4486a7f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="源文件">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
