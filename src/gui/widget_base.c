@@ -121,14 +121,10 @@ void LCUIWidget_ClearTrash(void)
 
 static void Widget_AddToTrash(LCUI_Widget w)
 {
-	LCUI_WidgetEventRec e = { 0 };
-	e.type = LCUI_WEVENT_UNLINK;
 	w->state = LCUI_WSTATE_DELETED;
-	Widget_TriggerEvent(w, &e, NULL);
-	if (!w->parent) {
+	if (Widget_Unlink(w) != 0) {
 		return;
 	}
-	Widget_Unlink(w);
 	LinkedList_AppendNode(&LCUIWidget.trash, &w->node);
 	Widget_PostSurfaceEvent(w, LCUI_WEVENT_UNLINK, TRUE);
 }
@@ -393,15 +389,14 @@ void Widget_ExecDestroy(LCUI_Widget widget)
 void Widget_Destroy(LCUI_Widget w)
 {
 	LCUI_Widget root = w;
+
+	assert(w->state != LCUI_WSTATE_DELETED);
 	while (root->parent) {
 		root = root->parent;
 	}
 	/* If this widget is not mounted in the root widget tree */
 	if (root != LCUIWidget.root) {
-		LCUI_WidgetEventRec e = { 0 };
-		e.type = LCUI_WEVENT_UNLINK;
 		w->state = LCUI_WSTATE_DELETED;
-		Widget_TriggerEvent(w, &e, NULL);
 		Widget_ExecDestroy(w);
 		return;
 	}
