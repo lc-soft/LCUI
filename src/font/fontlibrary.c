@@ -90,7 +90,7 @@ static struct LCUI_FontLibraryModule {
 
 /* clang-format on */
 
-#define FontBitmap_IsValid(fbmp) (fbmp && fbmp->width > 0 && fbmp->rows > 0)
+#define FontBitmap_IsValid(fbmp) ((fbmp) && (fbmp)->width > 0 && (fbmp)->rows > 0)
 #define SelectChar(ch) (RBTree *)RBTree_GetData(&fontlib.bitmap_cache, ch)
 #define SelectFont(ch, font_id) (RBTree *)RBTree_GetData(ch, font_id)
 #define SelectBitmap(font, size) (LCUI_FontBitmap *)RBTree_GetData(font, size)
@@ -919,6 +919,7 @@ static void LCUIFont_LoadFontsForWindows(void)
 	if (i > 0) {
 		LCUIFont_SetDefault(ids[i - 1]);
 	}
+	free(ids);
 }
 
 #else
