@@ -510,6 +510,9 @@ static void OnWMSize(LCUI_Event e, void *arg)
 	EventTrigger_Trigger(win.trigger, LCUI_DEVENT_RESIZE, &dpy_ev);
 	WinSurface_ResizeFrameBuffer(surface, dpy_ev.resize.width,
 				     dpy_ev.resize.height);
+	LCUIDisplay_Update();
+	LCUIDisplay_Render();
+	LCUIDisplay_Present();
 }
 
 static int WinDisplay_BindEvent(int event_id, LCUI_EventFunc func, void *data,
