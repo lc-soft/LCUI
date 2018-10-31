@@ -55,6 +55,11 @@ typedef enum LCUI_DisplayEventType {
 	LCUI_DEVENT_READY
 } LCUI_DisplayEventType;
 
+typedef struct LCUI_MinMaxInfoRec_ {
+	int min_width, min_height;
+	int max_width, max_height;
+} LCUI_MinMaxInfoRec, *LCUI_MinMaxInfo;
+
 /** 显示驱动的事件数据结构 */
 typedef struct LCUI_DisplayEventRec_ {
 	int type;
@@ -65,9 +70,7 @@ typedef struct LCUI_DisplayEventRec_ {
 		struct {
 			int width, height;
 		} resize;
-		struct {
-			int min_width, min_height, max_width, max_height;
-		} minmaxinfo;
+		LCUI_MinMaxInfoRec minmaxinfo;
 	};
 	LCUI_Surface surface;
 } LCUI_DisplayEventRec, *LCUI_DisplayEvent;

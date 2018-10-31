@@ -39,9 +39,11 @@
 #include LCUI_DISPLAY_H
 #include LCUI_EVENTS_H
 
-#define MIN_WIDTH 480
-#define MIN_HEIGHT 500
-#define WIN32_WINDOW_STYLE (WS_OVERLAPPEDWINDOW | WS_MAXIMIZEBOX)
+/* clang-format off */
+
+#define MIN_WIDTH		480
+#define MIN_HEIGHT		500
+#define WIN32_WINDOW_STYLE	(WS_OVERLAPPEDWINDOW | WS_MAXIMIZEBOX)
 
 enum SurfaceTaskType {
 	TASK_MOVE,
@@ -68,24 +70,26 @@ typedef struct LCUI_SurfaceTask {
 
 /** 适用于 windows 平台的 surface 数据结构 */
 struct LCUI_SurfaceRec_ {
-	HWND hwnd;          /**< windows 窗口句柄 */
-	int mode;           /**< 渲染模式 */
-	int width, height;  /**< 窗口宽高 */
-	HDC hdc_fb;         /**< 帧缓存的设备上下文 */
-	HDC hdc_client;     /**< 窗口的设备上下文 */
-	HBITMAP fb_bmp;     /**< 帧缓存 */
-	LCUI_BOOL is_ready; /**< 是否已经准备好 */
-	LCUI_Graph fb; /**< 帧缓存，保存当前窗口内呈现的图像内容 */
+	HWND hwnd;				/**< windows 窗口句柄 */
+	int mode;				/**< 渲染模式 */
+	int width, height;			/**< 窗口宽高 */
+	HDC hdc_fb;				/**< 帧缓存的设备上下文 */
+	HDC hdc_client;				/**< 窗口的设备上下文 */
+	HBITMAP fb_bmp;				/**< 帧缓存 */
+	LCUI_BOOL is_ready;			/**< 是否已经准备好 */
+	LCUI_Graph fb;				/**< 帧缓存，保存当前窗口内呈现的图像内容 */
 	LCUI_SurfaceTask tasks[TASK_TOTAL_NUM]; /**< 任务缓存 */
 	LinkedListNode node;                    /**< 在链表中的结点 */
 };
 
 /** windows 下图形显示功能所需的数据 */
 static struct WIN_Display {
-	LCUI_BOOL active;       /**< 是否已经初始化 */
-	LinkedList surfaces;       /**< surface 记录 */
-	LCUI_EventTrigger trigger; /**< 事件触发器 */
+	LCUI_BOOL active;		/**< 是否已经初始化 */
+	LinkedList surfaces;		/**< surface 记录 */
+	LCUI_EventTrigger trigger;	/**< 事件触发器 */
 } win;
+
+/* clang-format on */
 
 /** 根据 hwnd 获取 Surface */
 static LCUI_Surface GetSurfaceByHWND(HWND hwnd)
@@ -265,7 +269,6 @@ static void WinSurface_ExecResize(LCUI_Surface surface, int w, int h)
 	}
 	WinSurface_ExecResizeFrameBuffer(surface, w, h);
 	SurfaceSizeToWindowSize(surface, &w, &h);
-	// SetWindowLong( surface->hwnd, GWL_STYLE, WIN32_WINDOW_STYLE );
 	SetWindowPos(surface->hwnd, HWND_NOTOPMOST, 0, 0, w, h,
 		     SWP_NOMOVE | SWP_NOZORDER);
 }
@@ -451,29 +454,43 @@ static void OnWMPaint(LCUI_Event e, void *arg)
 
 static void OnWMGetMinMaxInfo(LCUI_Event e, void *arg)
 {
+	int style;
 	MSG *msg = arg;
 	LCUI_DisplayEventRec dpy_ev;
+	LCUI_MinMaxInfo info = &dpy_ev.minmaxinfo;
 	LCUI_Surface surface = GetSurfaceByHWND(msg->hwnd);
 	MINMAXINFO *mminfo = (PMINMAXINFO)msg->lParam;
 
 	if (!surface) {
 		return;
 	}
+
 	dpy_ev.surface = surface;
 	dpy_ev.type = LCUI_DEVENT_MINMAXINFO;
-	dpy_ev.minmaxinfo.min_width = MIN_WIDTH;
-	dpy_ev.minmaxinfo.min_height = MIN_HEIGHT;
-	dpy_ev.minmaxinfo.max_width = GetSystemMetrics(SM_CXMAXTRACK);
-	dpy_ev.minmaxinfo.max_height = GetSystemMetrics(SM_CYMAXTRACK);
+
+	info->min_width = MIN_WIDTH;
+	info->min_height = MIN_HEIGHT;
+	info->max_width = GetSystemMetrics(SM_CXMAXTRACK);
+	info->max_height = GetSystemMetrics(SM_CYMAXTRACK);
+
 	EventTrigger_Trigger(win.trigger, LCUI_DEVENT_MINMAXINFO, &dpy_ev);
-	SurfaceSizeToWindowSize(surface, &dpy_ev.minmaxinfo.min_width,
-				&dpy_ev.minmaxinfo.min_height);
-	SurfaceSizeToWindowSize(surface, &dpy_ev.minmaxinfo.max_width,
-				&dpy_ev.minmaxinfo.max_height);
-	mminfo->ptMinTrackSize.x = dpy_ev.minmaxinfo.min_width;
-	mminfo->ptMinTrackSize.y = dpy_ev.minmaxinfo.min_height;
-	mminfo->ptMaxTrackSize.x = dpy_ev.minmaxinfo.max_width;
-	mminfo->ptMaxTrackSize.y = dpy_ev.minmaxinfo.max_height;
+	SurfaceSizeToWindowSize(surface, &info->min_width, &info->min_height);
+	SurfaceSizeToWindowSize(surface, &info->max_width, &info->max_height);
+
+	mminfo->ptMinTrackSize.x = info->min_width;
+	mminfo->ptMinTrackSize.y = info->min_height;
+	mminfo->ptMaxTrackSize.x = info->max_width;
+	mminfo->ptMaxTrackSize.y = info->max_height;
+
+	style = GetWindowLong(msg->hwnd, GWL_STYLE);
+	if (info->min_width == info->max_width &&
+	    info->min_height == info->max_height) {
+		style &= ~(WS_SIZEBOX | WS_MAXIMIZEBOX);
+	} else if (info->min_width == info->max_width || 
+		   info->min_height == info->max_height) {
+			style &= ~WS_MAXIMIZEBOX;
+	}
+	SetWindowLong(msg->hwnd, GWL_STYLE, style);
 }
 
 static void OnWMSize(LCUI_Event e, void *arg)
@@ -481,6 +498,7 @@ static void OnWMSize(LCUI_Event e, void *arg)
 	MSG *msg = arg;
 	LCUI_Surface surface;
 	LCUI_DisplayEventRec dpy_ev;
+
 	surface = GetSurfaceByHWND(msg->hwnd);
 	if (!surface) {
 		return;
