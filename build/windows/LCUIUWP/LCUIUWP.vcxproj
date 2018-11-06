@@ -274,10 +274,11 @@
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
-      <AdditionalDependencies>kernel32.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;libxml2.lib;WindowsApp.lib;vccorlibd.lib;msvcrtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib\uwp\$(TargetedSDKArchitecture)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib\$(PlatformTarget)-uwp\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ShowProgress>NotSet</ShowProgress>
-      <IgnoreSpecificDefaultLibraries>msvcrt;vccorlibd.lib;msvcrtd.lib</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <AdditionalDependencies>libxml2.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;WindowsApp.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -292,9 +293,10 @@
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
-      <AdditionalDependencies>kernel32.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;libxml2.lib;vccorlibd.lib;msvcrt.lib;WindowsApp.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib\uwp\$(TargetedSDKArchitecture)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <IgnoreSpecificDefaultLibraries>vccorlib;msvcrt;msvcrtd;libcmt;</IgnoreSpecificDefaultLibraries>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib\$(PlatformTarget)-uwp\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <AdditionalDependencies>libxml2.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;WindowsApp.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm'">
