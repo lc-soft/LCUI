@@ -107,6 +107,12 @@ LCUI_Style Widget_GetStyle(LCUI_Widget w, int key)
 	return &w->custom_style->sheet[key];
 }
 
+LCUI_Style Widget_GetInheritedStyle(LCUI_Widget w, int key)
+{
+	assert(key >= 0 && key < w->inherited_style->length);
+	return &w->inherited_style->sheet[key];
+}
+
 void Widget_SetVisibility(LCUI_Widget w, const char *value)
 {
 	LCUI_Style s = Widget_GetStyle(w, key_visibility);
@@ -118,14 +124,39 @@ void Widget_SetVisibility(LCUI_Widget w, const char *value)
 	Widget_UpdateStyle(w, FALSE);
 }
 
-void Widget_Show(LCUI_Widget w)
+void Widget_SetVisible(LCUI_Widget w)
 {
 	Widget_SetVisibility(w, "visible");
 }
 
-void Widget_Hide(LCUI_Widget w)
+void Widget_SetHidden(LCUI_Widget w)
 {
 	Widget_SetVisibility(w, "hidden");
+}
+
+void Widget_Show(LCUI_Widget w)
+{
+	LCUI_Style s = Widget_GetStyle(w, key_display);
+
+	if (s->is_valid && s->type == LCUI_STYPE_STYLE &&
+	    s->val_style == SV_NONE) {
+		Widget_UnsetStyle(w, key_display);
+	} else if (!w->computed_style.visible) {
+		s = Widget_GetInheritedStyle(w, key_display);
+		if (s->is_valid && s->type == LCUI_STYPE_STYLE &&
+		    s->val_style != SV_NONE) {
+			Widget_SetStyle(w, key_display, s->val_style, style);
+		} else {
+			Widget_SetStyle(w, key_display, SV_BLOCK, style);
+		}
+	}
+	Widget_UpdateStyle(w, FALSE);
+}
+
+void Widget_Hide(LCUI_Widget w)
+{
+	Widget_SetStyle(w, key_display, SV_NONE, style);
+	Widget_UpdateStyle(w, FALSE);
 }
 
 void Widget_SetPosition(LCUI_Widget w, LCUI_StyleValue position)
