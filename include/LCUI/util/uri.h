@@ -1,8 +1,8 @@
-﻿/*
- * util.h -- Utilities
+/*
+ * uri.c -- uri processing
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -28,20 +28,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_UTIL_H
-#define LCUI_UTIL_H
-#include <LCUI/util/math.h>
-#include <LCUI/util/time.h>
-#include <LCUI/util/dirent.h>
-#include <LCUI/util/rbtree.h>
-#include <LCUI/util/linkedlist.h>
-#include <LCUI/util/dict.h>
-#include <LCUI/util/rect.h>
-#include <LCUI/util/steptimer.h>
-#include <LCUI/util/string.h>
-#include <LCUI/util/parse.h>
-#include <LCUI/util/event.h>
-#include <LCUI/util/logger.h>
-#include <LCUI/util/task.h>
-#include <LCUI/util/uri.h>
+#ifndef LCUI_UTIL_URI_H
+#define LCUI_UTIL_URI_H
+
+LCUI_BEGIN_HEADER
+
+LCUI_API int OpenUri(const char *uri);
+
+LCUI_END_HEADER
+
 #endif

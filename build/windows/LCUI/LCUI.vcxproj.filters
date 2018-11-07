@@ -276,6 +276,9 @@
     <ClInclude Include="..\..\..\include\LCUI\types.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\uri.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -487,6 +490,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\painter.c">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\uri.c">
+      <Filter>源文件\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

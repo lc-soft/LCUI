@@ -38,12 +38,6 @@
 #include <LCUI/gui/widget/anchor.h>
 #include <LCUI/gui/builder.h>
 
-#ifdef LCUI_BUILD_IN_WIN32
-#define URL_LUANCHER "start"
-#else
-#define URL_LUANCHER "xdg-open"
-#endif
-
 typedef struct LCUI_XMLLoaderRec_ {
 	char *key;		/**< 键，作为在视图加载完后传给事件处理器的额外参数 */
 	char *filepath;		/**< 视图文件路径 */
@@ -170,17 +164,6 @@ static void XMLLoader_StartLoad(LCUI_XMLLoader loader)
 	LCUI_PostAsyncTask(&task);
 }
 
-static int OpenUrl(const char *url)
-{
-#if defined(LCUI_BUILD_IN_WIN32) && defined(WINAPI_PARTITION_APP)
-	return -1;
-#else
-	char cmd[512] = { 0 };
-	snprintf(cmd, 511, URL_LUANCHER" %s", url);
-	return system(cmd);
-#endif
-}
-
 void Anchor_Open(LCUI_Widget w)
 {
 	LCUI_XMLLoader loader;
@@ -191,12 +174,12 @@ void Anchor_Open(LCUI_Widget w)
 		return;
 	}
 	if (strstr(attr_href, "file:") == attr_href) {
-		OpenUrl(attr_href + 5);
+		OpenUri(attr_href + 5);
 		return;
 	}
 	if (strstr(attr_href, "http://") == attr_href ||
 	    strstr(attr_href, "https://") == attr_href) {
-		OpenUrl(attr_href);
+		OpenUri(attr_href);
 		return;
 	}
 	loader = XMLLoader_New(w);

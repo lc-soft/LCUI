@@ -159,6 +159,10 @@
     <ClCompile Include="..\..\..\src\util\string.c" />
     <ClCompile Include="..\..\..\src\util\task.c" />
     <ClCompile Include="..\..\..\src\util\time.c" />
+    <ClCompile Include="..\..\..\src\util\uri.cpp">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</CompileAsWinRT>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\worker.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -276,9 +280,8 @@
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib\$(PlatformTarget)-uwp\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ShowProgress>NotSet</ShowProgress>
-      <IgnoreSpecificDefaultLibraries>
-      </IgnoreSpecificDefaultLibraries>
-      <AdditionalDependencies>libxml2.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;WindowsApp.lib;</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>vccorlibd.lib;msvcrtd.lib</IgnoreSpecificDefaultLibraries>
+      <AdditionalDependencies>vccorlibd.lib;msvcrtd.lib;libxml2.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;WindowsApp.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -294,9 +297,8 @@
       </IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib\$(PlatformTarget)-uwp\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <IgnoreSpecificDefaultLibraries>
-      </IgnoreSpecificDefaultLibraries>
-      <AdditionalDependencies>libxml2.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;WindowsApp.lib;</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>vccorlib.lib;msvcrt.lib;</IgnoreSpecificDefaultLibraries>
+      <AdditionalDependencies>vccorlib.lib;msvcrt.lib;libxml2.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;WindowsApp.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm'">

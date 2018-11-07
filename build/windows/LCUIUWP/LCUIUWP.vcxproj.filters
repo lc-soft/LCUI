@@ -431,5 +431,8 @@
     <ClCompile Include="..\..\..\src\painter.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\util\uri.cpp">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -329,6 +329,7 @@
     <ClInclude Include="..\..\..\include\LCUI\util\string.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\task.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\time.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\uri.h" />
     <ClInclude Include="..\..\..\include\LCUI\worker.h" />
     <ClInclude Include="..\..\..\include\LCUI_Build.h" />
     <ClInclude Include="resource.h" />
@@ -390,6 +391,7 @@
     <ClCompile Include="..\..\..\src\platform\windows\windows_keyboard.c" />
     <ClCompile Include="..\..\..\src\platform\windows\windows_mouse.c" />
     <ClCompile Include="..\..\..\src\util\task.c" />
+    <ClCompile Include="..\..\..\src\util\uri.c" />
     <ClCompile Include="..\..\..\src\worker.c" />
     <ClCompile Include="..\..\..\src\thread\win32\cond.c" />
     <ClCompile Include="..\..\..\src\thread\win32\mutex.c" />
