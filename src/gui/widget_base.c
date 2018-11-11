@@ -107,16 +107,20 @@ static void Widget_UpdateStatus(LCUI_Widget widget)
 	}
 }
 
-void LCUIWidget_ClearTrash(void)
+size_t LCUIWidget_ClearTrash(void)
 {
+	size_t count;
 	LinkedListNode *node;
+
 	node = LCUIWidget.trash.head.next;
+	count = LCUIWidget.trash.length;
 	while (node) {
 		LinkedListNode *next = node->next;
 		LinkedList_Unlink(&LCUIWidget.trash, node);
 		Widget_ExecDestroy(node->data);
 		node = next;
 	}
+	return count;
 }
 
 static void Widget_AddToTrash(LCUI_Widget w)
