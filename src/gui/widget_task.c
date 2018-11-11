@@ -145,7 +145,7 @@ void LCUIWidget_InitTasks(void)
 
 void LCUIWidget_FreeTasks(void)
 {
-
+	LCUIWidget_ClearTrash();
 }
 
 int Widget_Update(LCUI_Widget w)
