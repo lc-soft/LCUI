@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<lcui-app>
+  <resource type="text/css" src="test_widget_opacity.css"/>
+  <ui>
+    <w class="container">
+      <w class="list" id="parent">
+        <w id="child" class="list-item active">
+          <w type="textview">item 1 content</w>
+          <w type="textview" class="list-item-footer">footer</w>
+        </w>
+        <w class="list-item">
+          <w type="textview">item 2 content</w>
+          <w type="textview" class="list-item-footer">footer</w>
+        </w>
+        <w class="list-item">
+          <w type="textview">item 3 content</w>
+          <w type="textview" class="list-item-footer">footer</w>
+        </w>
+        <w class="list-item">
+          <w type="textview">item 4 content</w>
+          <w type="textview" class="list-item-footer">footer</w>
+        </w>
+      </w>
+    </w>
+    <w class="buttons">
+      <w type="button" id="btn-plus">--</w>
+      <w type="textview" id="current-opacity">1</w>
+      <w type="button" id="btn-minus">++</w>
+    </w>
+  </ui>
+</lcui-app>

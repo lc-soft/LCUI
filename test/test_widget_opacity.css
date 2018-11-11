@@ -1,0 +1,62 @@
+.container {
+    padding: 10px;
+    background-color: #fbfbfb;
+}
+
+.list {
+    padding: 20px;
+    margin: 20px;
+    background-color: #f00;
+    border: 20px solid #000;
+    box-sizing: border-box;
+}
+
+.list-item {
+    width: 150px;
+    height: 100px;
+    margin: 5px;
+    position: relative;
+    display: inline-block;
+    background-color: #0f0;
+}
+
+.list-item:hover {
+    top: -3px;
+}
+
+.list-item:active,
+.list-item.active {
+    top: 0;
+    opacity: 0.5;
+}
+
+.list-item textview {
+    text-align: center;
+}
+
+.list-item-footer {
+    width: 100%;
+    bottom: 0;
+    position: absolute;
+    padding: 10px 0;
+    line-height: 20px;
+    text-align: center;
+    background-color: #fff;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+}
+
+.buttons button {
+    margin: 10px 5px;
+}
+
+.buttons textview {
+    width: 30px;
+    margin: 10px 5px;
+    text-align: center;
+    line-height: 32px;
+    display: inline-block;
+}

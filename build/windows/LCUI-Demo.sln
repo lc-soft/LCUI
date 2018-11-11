@@ -21,6 +21,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_widget_flex_layout", "
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_widget_inline_block_layout", "test_widget_inline_block_layout\test_widget_inline_block_layout.vcxproj", "{CFFE389C-260F-46FB-A0F3-6DE5670287F9}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_widget_opacity", "test_widget_opacity\test_widget_opacity.vcxproj", "{A110B7C2-3C20-4E8C-BFFB-FCF3CF1CCB2A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -125,6 +127,14 @@ Global
 		{CFFE389C-260F-46FB-A0F3-6DE5670287F9}.Release|Win32.Build.0 = Release|Win32
 		{CFFE389C-260F-46FB-A0F3-6DE5670287F9}.Release|x64.ActiveCfg = Release|x64
 		{CFFE389C-260F-46FB-A0F3-6DE5670287F9}.Release|x64.Build.0 = Release|x64
+		{A110B7C2-3C20-4E8C-BFFB-FCF3CF1CCB2A}.Debug|ARM.ActiveCfg = Debug|Win32
+		{A110B7C2-3C20-4E8C-BFFB-FCF3CF1CCB2A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A110B7C2-3C20-4E8C-BFFB-FCF3CF1CCB2A}.Debug|Win32.Build.0 = Debug|Win32
+		{A110B7C2-3C20-4E8C-BFFB-FCF3CF1CCB2A}.Debug|x64.ActiveCfg = Debug|Win32
+		{A110B7C2-3C20-4E8C-BFFB-FCF3CF1CCB2A}.Release|ARM.ActiveCfg = Release|Win32
+		{A110B7C2-3C20-4E8C-BFFB-FCF3CF1CCB2A}.Release|Win32.ActiveCfg = Release|Win32
+		{A110B7C2-3C20-4E8C-BFFB-FCF3CF1CCB2A}.Release|Win32.Build.0 = Release|Win32
+		{A110B7C2-3C20-4E8C-BFFB-FCF3CF1CCB2A}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

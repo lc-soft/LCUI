@@ -1,55 +1,51 @@
+#include <stdio.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/gui/widget.h>
-#include <LCUI/gui/css_parser.h>
 #include <LCUI/image.h>
+#include <LCUI/gui/widget.h>
+#include <LCUI/gui/widget/textview.h>
+#include <LCUI/gui/css_parser.h>
+#include <LCUI/gui/builder.h>
 #include "test.h"
 
-#define OPACITY 0.1
-
-/* clang-format off */
+#define PARENT_OPACITY	0.8f
+#define CHILD_OPACITY	0.5f
 
 static struct {
 	LCUI_Widget parent;
 	LCUI_Widget child;
+	LCUI_Widget text;
 } self;
 
-static const char *css = CodeToString(
-
-.parent {
-	opacity: 0.1;
-	padding: 20px;
-	margin: 20px;
-	display: inline-block;
-	background-color: #f00;
-	border: 20px solid #000;
+#ifdef LCUI_BUILD_IN_WIN32
+static void LoggerHandler(const char *str)
+{
+	OutputDebugStringA(str);
 }
 
-.child {
-	width: 100px;
-	height: 100px;
-	background-color: #0f0;
+static void LoggerHandlerW(const wchar_t *str)
+{
+	OutputDebugStringW(str);
 }
-
-);
-
-/* clang-format on */
+#endif
 
 static void build(void)
 {
-	self.child = LCUIWidget_New(NULL);
-	self.parent = LCUIWidget_New(NULL);
-	Widget_SetId(self.parent, "parent");
-	Widget_SetId(self.child, "child");
-	Widget_AddClass(self.parent, "parent");
-	Widget_AddClass(self.child, "child");
-	Widget_Append(self.parent, self.child);
-	LCUI_LoadCSSString(css, __FILE__);
+	LCUI_Widget pack, root;
+
+	pack = LCUIBuilder_LoadFile("test_widget_opacity.xml");
+	root = LCUIWidget_GetRoot();
+	Widget_Append(root, pack);
+	Widget_Unwrap(pack);
+
+	self.parent = LCUIWidget_GetById("parent");
+	self.child = LCUIWidget_GetById("child");
+	self.text = LCUIWidget_GetById("current-opacity");
 }
 
-static void destroy(void)
+static int check_color(LCUI_Color a, LCUI_Color b)
 {
-	Widget_Destroy(self.parent);
+	return abs(a.r - b.r) < 2 && abs(a.g - b.g) < 2 && abs(a.b - b.b) < 2;
 }
 
 static int check_widget_opactiy(void)
@@ -57,12 +53,14 @@ static int check_widget_opactiy(void)
 	int ret = 0;
 	LCUI_Graph canvas;
 	LCUI_Color color;
+	LCUI_Color tmp;
 	LCUI_Color expected_color;
 	LCUI_Color child_bgcolor = RGB(0, 255, 0);
+	LCUI_Color child_footer_bgcolor = RGB(255, 255, 255);
 	LCUI_Color parent_bgcolor = RGB(255, 0, 0);
 	LCUI_Color parent_bcolor = RGB(0, 0, 0);
 	LCUI_Color bgcolor = RGB(255, 255, 255);
-	LCUI_Rect rect = { 0, 0, 220, 220 };
+	LCUI_Rect rect = { 0, 0, 400, 256 };
 	LCUI_PaintContextRec paint;
 
 	Graph_Init(&canvas);
@@ -70,35 +68,62 @@ static int check_widget_opactiy(void)
 	Graph_FillRect(&canvas, bgcolor, NULL, FALSE);
 
 	paint.with_alpha = FALSE;
+	paint.rect.width = 400;
+	paint.rect.height = 256;
 	paint.rect.x = paint.rect.y = 0;
-	paint.rect.width = paint.rect.height = 180;
 	Graph_Quote(&paint.canvas, &canvas, &rect);
 
+	Widget_SetOpacity(self.parent, 0.8f);
+	Widget_Resize(self.parent, 512, 256);
 	Widget_UpdateStyle(self.child, TRUE);
 	Widget_UpdateStyle(self.parent, TRUE);
 	Widget_Update(self.child);
+	Widget_Update(self.parent);
 	Widget_Update(self.parent);
 
 	Widget_Render(self.parent, &paint);
 
 	expected_color = bgcolor;
 	Graph_GetPixel(&canvas, 10, 10, color);
-	PIXEL_BLEND(&expected_color, &parent_bcolor, (int)(OPACITY * 255));
+	PIXEL_BLEND(&expected_color, &parent_bcolor, (int)(PARENT_OPACITY * 255));
 	CHECK_WITH_TEXT("check parent border color",
-			expected_color.value == color.value);
+			check_color(expected_color, color));
 
 	expected_color = bgcolor;
 	Graph_GetPixel(&canvas, 30, 30, color);
-	PIXEL_BLEND(&expected_color, &parent_bgcolor, (int)(OPACITY * 255));
+	PIXEL_BLEND(&expected_color, &parent_bgcolor, (int)(PARENT_OPACITY * 255));
 	CHECK_WITH_TEXT("check parent background color",
-			expected_color.value == color.value);
+			check_color(expected_color, color));
+
+	tmp = parent_bgcolor;
+	expected_color = bgcolor;
+	Graph_GetPixel(&canvas, 60, 90, color);
+	PIXEL_BLEND(&tmp, &child_bgcolor, (int)(CHILD_OPACITY * 255));
+	PIXEL_BLEND(&expected_color, &tmp, (int)(PARENT_OPACITY * 255));
+	CHECK_WITH_TEXT("check child 1 background color",
+			check_color(expected_color, color));
+
+	tmp = parent_bgcolor;
+	expected_color = bgcolor;
+	Graph_GetPixel(&canvas, 60, 120, color);
+	PIXEL_BLEND(&tmp, &child_footer_bgcolor, (int)(CHILD_OPACITY * 255));
+	PIXEL_BLEND(&expected_color, &tmp, (int)(PARENT_OPACITY * 255));
+	CHECK_WITH_TEXT("check child 1 footer background color",
+			check_color(expected_color, color));
 
 	expected_color = bgcolor;
-	Graph_GetPixel(&canvas, 90, 90, color);
-	PIXEL_BLEND(&expected_color, &child_bgcolor, (int)(OPACITY * 255));
-	CHECK_WITH_TEXT("check child background color",
-			expected_color.value == color.value);
+	Graph_GetPixel(&canvas, 220, 90, color);
+	PIXEL_BLEND(&expected_color, &child_bgcolor,
+		    (int)(PARENT_OPACITY * 255));
+	CHECK_WITH_TEXT("check child 2 background color",
+			check_color(expected_color, color));
 
+	expected_color = child_footer_bgcolor;
+	Graph_GetPixel(&canvas, 220, 120, color);
+	CHECK_WITH_TEXT("check child 2 footer background color",
+			check_color(expected_color, color));
+
+	LCUI_WritePNGFile("test_widget_opacity.png", &canvas);
 	Graph_Free(&canvas);
 	return ret;
 }
@@ -111,7 +136,6 @@ int test_widget_opacity(void)
 
 	build();
 	ret = check_widget_opactiy();
-	destroy();
 
 	LCUI_Destroy();
 	return ret;
@@ -121,16 +145,48 @@ int test_widget_opacity(void)
 
 int tests_count = 0;
 
+static void OnOpacityPlus(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
+{
+	wchar_t str[32];
+	float opacity = self.parent->computed_style.opacity - 0.1f;
+
+	if (opacity < 0.1f) {
+		opacity = 0.1f;
+	}
+	swprintf(str, 32, L"%.1f", opacity);
+	Widget_SetOpacity(self.parent, opacity);
+	TextView_SetTextW(self.text, str);
+}
+
+static void OnOpacityMinus(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
+{
+	wchar_t str[32];
+	float opacity = self.parent->computed_style.opacity + 0.1f;
+
+	if (opacity > 1.0f) {
+		opacity = 1.0f;
+	}
+	swprintf(str, 32, L"%.1f", opacity);
+	Widget_SetOpacity(self.parent, opacity);
+	TextView_SetTextW(self.text, str);
+}
+
 int main(void)
 {
-	LCUI_Widget root;
+	LCUI_Widget btn_plus, btn_minus;
 
+#ifdef LCUI_BUILD_IN_WIN32
+	Logger_SetHandler(LoggerHandler);
+	Logger_SetHandlerW(LoggerHandlerW);
+#endif
 	LCUI_Init();
 
 	build();
 
-	root = LCUIWidget_GetRoot();
-	Widget_Append(root, self.parent);
+	btn_plus = LCUIWidget_GetById("btn-plus");
+	btn_minus = LCUIWidget_GetById("btn-minus");
+	Widget_BindEvent(btn_plus, "click", OnOpacityPlus, NULL, NULL);
+	Widget_BindEvent(btn_minus, "click", OnOpacityMinus, NULL, NULL);
 
 	return LCUI_Main();
 }
