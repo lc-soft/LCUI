@@ -30,6 +30,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>

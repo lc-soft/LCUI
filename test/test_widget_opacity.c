@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/image.h>
@@ -137,6 +138,7 @@ int test_widget_opacity(void)
 	build();
 	ret = check_widget_opactiy();
 
+	Widget_PrintTree(NULL);
 	LCUI_Destroy();
 	return ret;
 }
