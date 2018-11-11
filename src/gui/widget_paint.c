@@ -28,6 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+//#define DEBUG
 #include <stdio.h>
 #include <stdlib.h>
 #include <LCUI_Build.h>
@@ -533,8 +534,8 @@ static size_t WidgetRenderer_RenderContent(LCUI_WidgetRenderer that)
 	if (that->has_content_graph) {
 		/* create a render context and it's render rectangle is relative
 		 * to this widget canvas */
-		style.x = -that->style->canvas_box.x;
-		style.y = -that->style->canvas_box.y;
+		style.x = that->style->x - that->style->canvas_box.x;
+		style.y = that->style->y - that->style->canvas_box.y;
 		paint.rect = that->content_rect;
 		paint.rect.x -= that->style->canvas_box.x;
 		paint.rect.y -= that->style->canvas_box.y;
@@ -596,7 +597,8 @@ static size_t WidgetRenderer_Render(LCUI_WidgetRenderer renderer)
 	if (!that->has_layer_graph) {
 		if (that->has_content_graph) {
 			Graph_Mix(&that->paint->canvas, &that->content_graph,
-				  that->content_left, that->content_top, TRUE);
+				  iround(that->content_left),
+				  iround(that->content_top), TRUE);
 		}
 #ifdef DEBUG_FRAME_RENDER
 		sprintf(filename, "frame-%lu-%s-canvas-L%d.png", frame++,
@@ -649,8 +651,8 @@ size_t Widget_Render(LCUI_Widget w, LCUI_PaintContext paint)
 	Widget_ComputeActualBorderBox(w, &style);
 	Widget_ComputeActualCanvasBox(w, &style);
 	/* reset widget position to relative paint rect */
-	style.x = -style.canvas_box.x;
-	style.y = -style.canvas_box.y;
+	style.x = (float)-style.canvas_box.x;
+	style.y = (float)-style.canvas_box.y;
 	Widget_ComputeActualBorderBox(w, &style);
 	Widget_ComputeActualCanvasBox(w, &style);
 	Widget_ComputeActualPaddingBox(w, &style);
