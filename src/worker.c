@@ -89,6 +89,21 @@ LCUI_BOOL LCUIWorker_RunTask(LCUI_Worker worker)
 	return FALSE;
 }
 
+static void OnDeleteTask(void *arg)
+{
+	LCUITask_Destroy(arg);
+	free(arg);
+}
+
+static void LCUIWorker_ExecDestroy(LCUI_Worker worker)
+{
+	LinkedList_Clear(&worker->tasks, OnDeleteTask);
+	LCUIMutex_Unlock(&worker->mutex);
+	LCUIMutex_Destroy(&worker->mutex);
+	LCUICond_Destroy(&worker->cond);
+	free(worker);
+}
+
 static void LCUIWorker_Thread(void *arg)
 {
 	LCUI_Worker worker = arg;
@@ -101,7 +116,7 @@ static void LCUIWorker_Thread(void *arg)
 			LCUICond_Wait(&worker->cond, &worker->mutex);
 		}
 	}
-	LCUIMutex_Unlock(&worker->mutex);
+	LCUIWorker_ExecDestroy(worker);
 	LCUIThread_Exit(NULL);
 }
 
@@ -116,26 +131,19 @@ int LCUIWorker_RunAsync(LCUI_Worker worker)
 	return 0;
 }
 
-static void OnDeleteTask(void *arg)
-{
-	LCUITask_Destroy(arg);
-	free(arg);
-}
-
 void LCUIWorker_Destroy(LCUI_Worker worker)
 {
-	if (worker->thread != 0) {
-		LOG("[worker] worker %u is stopping...\n", worker->thread);
+	LCUI_Thread thread = worker->thread;
+
+	if (worker->active) {
+		LOG("[worker] worker %u is stopping...\n", thread);
 		LCUIMutex_Lock(&worker->mutex);
 		worker->active = FALSE;
 		LCUICond_Signal(&worker->cond);
 		LCUIMutex_Unlock(&worker->mutex);
-		LCUIThread_Join(worker->thread, NULL);
-		LOG("[worker] worker %u has stopped\n", worker->thread);
-		worker->thread = 0;
+		LCUIThread_Join(thread, NULL);
+		LOG("[worker] worker %u has stopped\n", thread);
+		return;
 	}
-	LCUIMutex_Destroy(&worker->mutex);
-	LCUICond_Destroy(&worker->cond);
-	LinkedList_Clear(&worker->tasks, OnDeleteTask);
-	free(worker);
+	LCUIWorker_ExecDestroy(worker);
 }
