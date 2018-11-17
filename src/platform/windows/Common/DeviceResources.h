@@ -27,7 +27,7 @@ namespace DX {
 			return m_outputSize;
 		}
 
-	 // 呈现器目标的大小，以 dip 为单位。
+		// 呈现器目标的大小，以 dip 为单位。
 		Windows::Foundation::Size GetLogicalSize() const
 		{
 			return m_logicalSize;
@@ -37,7 +37,7 @@ namespace DX {
 			return m_effectiveDpi;
 		}
 
-       // D3D 访问器。
+		// D3D 访问器。
 		ID3D11Device3* GetD3DDevice() const
 		{
 			return m_d3dDevice.Get();
@@ -116,7 +116,7 @@ namespace DX {
 		// Direct3D 渲染对象。3D 所必需的。
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView1>	m_d3dRenderTargetView;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView>	m_d3dDepthStencilView;
-		D3D11_VIEWPORT									m_screenViewport;
+		D3D11_VIEWPORT					m_screenViewport;
 
 		// Direct2D 绘制组件。
 		Microsoft::WRL::ComPtr<ID2D1Factory3>		m_d2dFactory;
@@ -132,7 +132,7 @@ namespace DX {
 		Platform::Agile<Windows::UI::Core::CoreWindow> m_window;
 
 		// 缓存的设备属性。
-		D3D_FEATURE_LEVEL								m_d3dFeatureLevel;
+		D3D_FEATURE_LEVEL				m_d3dFeatureLevel;
 		Windows::Foundation::Size			m_d3dRenderTargetSize;
 		Windows::Foundation::Size			m_outputSize;
 		Windows::Foundation::Size			m_logicalSize;
