@@ -52,6 +52,8 @@ LCUI_API void Widget_UpdateChildrenStyle(LCUI_Widget w, LCUI_BOOL is_refresh_all
 /** 直接更新当前部件的样式 */
 LCUI_API void Widget_ExecUpdateStyle(LCUI_Widget w, LCUI_BOOL is_update_all);
 
+LCUI_API void Widget_DestroyStyleSheets(LCUI_Widget w);
+
 /** 获取选择器结点 */
 LCUI_SelectorNode Widget_GetSelectorNode(LCUI_Widget w);
 

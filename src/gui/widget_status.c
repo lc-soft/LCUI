@@ -1,5 +1,5 @@
 ﻿/*
- * widget.h -- GUI widget APIs.
+ * widget_status.c -- The widget status operation set.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
@@ -28,27 +28,81 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_WIDGET_BUILD_H
-#define LCUI_WIDGET_BUILD_H
-
-#include <LCUI/graph.h>
-#include <LCUI/thread.h>
+#include <LCUI_Build.h>
+#include <LCUI/LCUI.h>
 #include <LCUI/gui/widget_base.h>
-#include <LCUI/gui/widget_attribute.h>
-#include <LCUI/gui/widget_id.h>
-#include <LCUI/gui/widget_class.h>
 #include <LCUI/gui/widget_status.h>
-#include <LCUI/gui/widget_helper.h>
-#include <LCUI/gui/widget_tree.h>
-#include <LCUI/gui/widget_layout.h>
-#include <LCUI/gui/widget_task.h>
-#include <LCUI/gui/widget_paint.h>
-#include <LCUI/gui/widget_prototype.h>
-#include <LCUI/gui/widget_event.h>
 #include <LCUI/gui/widget_style.h>
+#include <LCUI/gui/widget_tree.h>
 
-void LCUI_InitWidget(void);
+int Widget_AddStatus(LCUI_Widget w, const char *status_name)
+{
+	if (strshas(w->status, status_name)) {
+		return 0;
+	}
+	if (strsadd(&w->status, status_name) <= 0) {
+		return 0;
+	}
+	Widget_HandleChildrenStyleChange(w, 1, status_name);
+	Widget_UpdateStyle(w, TRUE);
+	return 1;
+}
 
-void LCUI_FreeWidget(void);
+LCUI_BOOL Widget_HasStatus(LCUI_Widget w, const char *status_name)
+{
+	if (strshas(w->status, status_name)) {
+		return TRUE;
+	}
+	return FALSE;
+}
 
-#endif
+int Widget_RemoveStatus(LCUI_Widget w, const char *status_name)
+{
+	if (strshas(w->status, status_name)) {
+		Widget_HandleChildrenStyleChange(w, 1, status_name);
+		strsdel(&w->status, status_name);
+		Widget_UpdateStyle(w, TRUE);
+		return 1;
+	}
+	return 0;
+}
+
+void Widget_UpdateStatus(LCUI_Widget widget)
+{
+	LCUI_Widget child;
+	if (!widget->parent) {
+		return;
+	}
+	if (widget->index == widget->parent->children.length - 1) {
+		Widget_AddStatus(widget, "last-child");
+		child = Widget_GetPrev(widget);
+		if (child) {
+			Widget_RemoveStatus(child, "last-child");
+		}
+	}
+	if (widget->index == 0) {
+		Widget_AddStatus(widget, "first-child");
+		child = Widget_GetNext(widget);
+		if (child) {
+			Widget_RemoveStatus(child, "first-child");
+		}
+	}
+}
+
+void Widget_SetDisabled(LCUI_Widget w, LCUI_BOOL disabled)
+{
+	w->disabled = disabled;
+	if (w->disabled) {
+		Widget_AddStatus(w, "disabled");
+	} else {
+		Widget_RemoveStatus(w, "disabled");
+	}
+}
+
+void Widget_DestroyStatus(LCUI_Widget w)
+{
+	if (w->status) {
+		freestrs(w->status);
+	}
+	w->status = NULL;
+}

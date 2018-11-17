@@ -1,5 +1,5 @@
 ﻿/*
- * widget.c -- GUI widget APIs.
+ * widget_class.c -- The widget class operation set.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
@@ -28,47 +28,48 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/gui/widget.h>
-#include <LCUI/gui/widget/textview.h>
-#include <LCUI/gui/widget/textcaret.h>
-#include <LCUI/gui/widget/textedit.h>
-#include <LCUI/gui/widget/anchor.h>
-#include <LCUI/gui/widget/button.h>
-#include <LCUI/gui/widget/sidebar.h>
-#include <LCUI/gui/widget/scrollbar.h>
+#include <LCUI/gui/widget_base.h>
+#include <LCUI/gui/widget_class.h>
+#include <LCUI/gui/widget_style.h>
 
-void LCUI_InitWidget(void)
+int Widget_AddClass(LCUI_Widget w, const char *class_name)
 {
-	LCUIWidget_InitTasks();
-	LCUIWidget_InitEvent();
-	LCUIWidget_InitPrototype();
-	LCUIWidget_InitStyle();
-	LCUIWidget_InitRenderer();
-	LCUIWidget_InitImageLoader();
-	LCUIWidget_AddTextView();
-	LCUIWidget_AddAnchor();
-	LCUIWidget_AddButton();
-	LCUIWidget_AddSideBar();
-	LCUIWidget_AddTScrollBar();
-	LCUIWidget_AddTextCaret();
-	LCUIWidget_AddTextEdit();
-	LCUIWidget_InitBase();
-	LCUIWidget_InitIdLibrary();
+	if (strshas(w->classes, class_name)) {
+		return 1;
+	}
+	if (strsadd(&w->classes, class_name) <= 0) {
+		return 0;
+	}
+	Widget_HandleChildrenStyleChange(w, 0, class_name);
+	Widget_UpdateStyle(w, TRUE);
+	return 1;
 }
 
-void LCUI_FreeWidget(void)
+LCUI_BOOL Widget_HasClass(LCUI_Widget w, const char *class_name)
 {
-	LCUIWidget_FreeTextView();
-	LCUIWidget_FreeTasks();
-	LCUIWidget_FreeRoot();
-	LCUIWidget_FreeEvent();
-	LCUIWidget_FreeStyle();
-	LCUIWidget_FreePrototype();
-	LCUIWidget_FreeRenderer();
-	LCUIWidget_FreeImageLoader();
-	LCUIWidget_FreeIdLibrary();
-	LCUIWidget_FreeBase();
+	if (strshas(w->classes, class_name)) {
+		return TRUE;
+	}
+	return FALSE;
+}
+
+int Widget_RemoveClass(LCUI_Widget w, const char *class_name)
+{
+	if (strshas(w->classes, class_name)) {
+		Widget_HandleChildrenStyleChange(w, 0, class_name);
+		strsdel(&w->classes, class_name);
+		Widget_UpdateStyle(w, TRUE);
+		return 1;
+	}
+	return 0;
+}
+
+void Widget_DestroyClasses(LCUI_Widget w)
+{
+	if (w->classes) {
+		freestrs(w->classes);
+	}
+	w->classes = NULL;
 }

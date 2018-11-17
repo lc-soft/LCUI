@@ -1,5 +1,5 @@
 ﻿/*
- * widget.c -- GUI widget APIs.
+ * widget_tree.h -- The widget tree operation set.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
@@ -28,47 +28,42 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef LCUI_WIDGET_TREE_H
+#define LCUI_WIDGET_TREE_H
 
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
-#include <LCUI/gui/widget.h>
-#include <LCUI/gui/widget/textview.h>
-#include <LCUI/gui/widget/textcaret.h>
-#include <LCUI/gui/widget/textedit.h>
-#include <LCUI/gui/widget/anchor.h>
-#include <LCUI/gui/widget/button.h>
-#include <LCUI/gui/widget/sidebar.h>
-#include <LCUI/gui/widget/scrollbar.h>
+LCUI_BEGIN_HEADER
 
-void LCUI_InitWidget(void)
-{
-	LCUIWidget_InitTasks();
-	LCUIWidget_InitEvent();
-	LCUIWidget_InitPrototype();
-	LCUIWidget_InitStyle();
-	LCUIWidget_InitRenderer();
-	LCUIWidget_InitImageLoader();
-	LCUIWidget_AddTextView();
-	LCUIWidget_AddAnchor();
-	LCUIWidget_AddButton();
-	LCUIWidget_AddSideBar();
-	LCUIWidget_AddTScrollBar();
-	LCUIWidget_AddTextCaret();
-	LCUIWidget_AddTextEdit();
-	LCUIWidget_InitBase();
-	LCUIWidget_InitIdLibrary();
-}
+/** 将部件与子部件列表断开链接 */
+LCUI_API int Widget_Unlink(LCUI_Widget widget);
 
-void LCUI_FreeWidget(void)
-{
-	LCUIWidget_FreeTextView();
-	LCUIWidget_FreeTasks();
-	LCUIWidget_FreeRoot();
-	LCUIWidget_FreeEvent();
-	LCUIWidget_FreeStyle();
-	LCUIWidget_FreePrototype();
-	LCUIWidget_FreeRenderer();
-	LCUIWidget_FreeImageLoader();
-	LCUIWidget_FreeIdLibrary();
-	LCUIWidget_FreeBase();
-}
+/** 向子部件列表追加部件 */
+LCUI_API int Widget_Append(LCUI_Widget container, LCUI_Widget widget);
+
+/** 将部件插入到子部件列表的开头处 */
+LCUI_API int Widget_Prepend(LCUI_Widget parent, LCUI_Widget widget);
+
+/** 移除部件，并将其子级部件转移至父部件内 */
+LCUI_API int Widget_Unwrap(LCUI_Widget widget);
+
+/** 清空部件内的子级部件 */
+LCUI_API void Widget_Empty(LCUI_Widget widget);
+
+/** 获取上一个部件 */
+LCUI_API LCUI_Widget Widget_GetPrev(LCUI_Widget w);
+
+/** 获取下一个部件 */
+LCUI_API LCUI_Widget Widget_GetNext(LCUI_Widget w);
+
+/** 获取一个子部件 */
+LCUI_API LCUI_Widget Widget_GetChild(LCUI_Widget w, size_t index);
+
+/** 获取当前点命中的最上层可见部件 */
+LCUI_API LCUI_Widget Widget_At(LCUI_Widget widget, int x, int y);
+
+LCUI_API void Widget_DestroyChildren(LCUI_Widget w);
+
+LCUI_API void Widget_PrintTree(LCUI_Widget w);
+
+LCUI_END_HEADER
+
+#endif

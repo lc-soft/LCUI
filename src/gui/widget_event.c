@@ -441,12 +441,18 @@ static int CompareEventHandlerKey(void *key, void *func_data)
 int Widget_UnbindEventById(LCUI_Widget widget, int event_id,
 			   LCUI_WidgetEventFunc func)
 {
+	if (!widget->trigger) {
+		return -1;
+	}
 	return EventTrigger_Unbind3(widget->trigger, event_id,
 				    CompareEventHandlerKey, func);
 }
 
 int Widget_UnbindEventByHandlerId(LCUI_Widget widget, int handler_id)
 {
+	if (!widget->trigger) {
+		return -1;
+	}
 	return EventTrigger_Unbind2(widget->trigger, handler_id);
 }
 
@@ -485,6 +491,10 @@ static LCUI_Widget Widget_GetNextAt(LCUI_Widget widget, int x, int y)
 static int Widget_TriggerEventEx(LCUI_Widget widget, LCUI_WidgetEventPack pack)
 {
 	LCUI_WidgetEvent e = &pack->event;
+
+	if (!widget->trigger) {
+		return -1;
+	}
 	pack->widget = widget;
 	switch (e->type) {
 	case LCUI_WEVENT_CLICK:
@@ -625,7 +635,7 @@ int Widget_StopEventPropagation(LCUI_Widget widget)
 }
 
 /** 更新状态 */
-static void Widget_UpdateStatus(LCUI_Widget widget, int type)
+static void Widget_UpdateStatusByPointer(LCUI_Widget widget, int type)
 {
 	int depth = 0, i;
 	LCUI_WidgetEventRec e;
@@ -697,12 +707,12 @@ void LCUIWidget_ClearEventTarget(LCUI_Widget widget)
 	LCUIMutex_Unlock(&self.mutex);
 	for (i = 0; i < WST_TOTAL; ++i) {
 		if (!widget) {
-			Widget_UpdateStatus(NULL, i);
+			Widget_UpdateStatusByPointer(NULL, i);
 			continue;
 		}
 		for (w = self.targets[i]; w; w = w->parent) {
 			if (w == widget) {
-				Widget_UpdateStatus(NULL, i);
+				Widget_UpdateStatusByPointer(NULL, i);
 				break;
 			}
 		}
@@ -758,7 +768,7 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 	} else {
 		target = Widget_At(w, pos.x, pos.y);
 		if (!target) {
-			Widget_UpdateStatus(NULL, WST_HOVER);
+			Widget_UpdateStatusByPointer(NULL, WST_HOVER);
 			return;
 		}
 	}
@@ -789,7 +799,7 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 		}
 		self.click.time = LCUI_GetTime();
 		self.click.widget = target;
-		Widget_UpdateStatus(target, WST_ACTIVE);
+		Widget_UpdateStatusByPointer(target, WST_ACTIVE);
 		LCUIWidget_SetFocus(target);
 		break;
 	case LCUI_MOUSEUP:
@@ -804,12 +814,12 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 			self.click.y = 0;
 			self.click.time = 0;
 			self.click.widget = NULL;
-			Widget_UpdateStatus(NULL, WST_ACTIVE);
+			Widget_UpdateStatusByPointer(NULL, WST_ACTIVE);
 			break;
 		}
 		ev.type = LCUI_WEVENT_CLICK;
 		Widget_PostEvent(target, &ev, NULL, NULL);
-		Widget_UpdateStatus(NULL, WST_ACTIVE);
+		Widget_UpdateStatusByPointer(NULL, WST_ACTIVE);
 		if (self.click.widget != target) {
 			self.click.x = 0;
 			self.click.y = 0;
@@ -825,7 +835,7 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 			self.click.widget = NULL;
 			Widget_PostEvent(target, &ev, NULL, NULL);
 		}
-		Widget_UpdateStatus(NULL, WST_ACTIVE);
+		Widget_UpdateStatusByPointer(NULL, WST_ACTIVE);
 		break;
 	case LCUI_MOUSEMOVE:
 		ev.type = LCUI_WEVENT_MOUSEMOVE;
@@ -847,7 +857,7 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 	default:
 		return;
 	}
-	Widget_UpdateStatus(target, WST_HOVER);
+	Widget_UpdateStatusByPointer(target, WST_HOVER);
 }
 
 static void OnKeyboardEvent(LCUI_SysEvent e, void *arg)
@@ -1061,6 +1071,18 @@ int Widget_PostSurfaceEvent(LCUI_Widget w, int event_type, LCUI_BOOL sync_props)
 	data[0] = event_type;
 	data[1] = sync_props;
 	return Widget_PostEvent(root, &e, data, free);
+}
+
+void Widget_DestroyEventTrigger(LCUI_Widget w)
+{
+	LCUI_WidgetEventRec e = { LCUI_WEVENT_DESTROY, 0 };
+	Widget_TriggerEvent(w, &e, NULL);
+	Widget_ReleaseMouseCapture(w);
+	Widget_ReleaseTouchCapture(w, -1);
+	Widget_StopEventPropagation(w);
+	LCUIWidget_ClearEventTarget(w);
+	EventTrigger_Destroy(w->trigger);
+	w->trigger = NULL;
 }
 
 static void BindSysEvent(int e, LCUI_SysEventFunc func)

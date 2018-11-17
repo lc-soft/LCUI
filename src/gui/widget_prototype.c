@@ -115,6 +115,17 @@ LCUI_BOOL Widget_CheckType(LCUI_Widget w, const char *type)
 	return FALSE;
 }
 
+LCUI_BOOL Widget_CheckPrototype(LCUI_Widget w, LCUI_WidgetPrototypeC proto)
+{
+	LCUI_WidgetPrototypeC p;
+	for (p = w->proto; p; p = p->proto) {
+		if (p == proto) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
 void *Widget_GetData(LCUI_Widget widget, LCUI_WidgetPrototype proto)
 {
 	uint_t i;

@@ -177,13 +177,3 @@ void Widget_SetBoxSizing(LCUI_Widget w, LCUI_StyleValue sizing)
 	Widget_SetStyle(w, key_box_sizing, sizing, style);
 	Widget_UpdateStyle(w, FALSE);
 }
-
-void Widget_SetDisabled(LCUI_Widget w, LCUI_BOOL disabled)
-{
-	w->disabled = disabled;
-	if (w->disabled) {
-		Widget_AddStatus(w, "disabled");
-	} else {
-		Widget_RemoveStatus(w, "disabled");
-	}
-}

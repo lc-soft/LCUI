@@ -210,7 +210,9 @@ LCUI_API int Widget_SetTouchCapture(LCUI_Widget w, int point_id);
  */
 LCUI_API int Widget_ReleaseTouchCapture(LCUI_Widget w, int point_id);
 
-/** 初始化 LCUI 部件的事件系统 */
+LCUI_API void Widget_DestroyEventTrigger(LCUI_Widget w);
+
+    /** 初始化 LCUI 部件的事件系统 */
 void LCUIWidget_InitEvent(void);
 
 /** 销毁（释放） LCUI 部件的事件系统的相关资源 */

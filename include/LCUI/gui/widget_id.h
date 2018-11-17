@@ -1,5 +1,5 @@
 ﻿/*
- * widget.c -- GUI widget APIs.
+ * widget_id.h -- The widget ID operation set.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
@@ -28,47 +28,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef LCUI_WIDGET_ID_H
+#define LCUI_WIDGET_ID_H
 
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
-#include <LCUI/gui/widget.h>
-#include <LCUI/gui/widget/textview.h>
-#include <LCUI/gui/widget/textcaret.h>
-#include <LCUI/gui/widget/textedit.h>
-#include <LCUI/gui/widget/anchor.h>
-#include <LCUI/gui/widget/button.h>
-#include <LCUI/gui/widget/sidebar.h>
-#include <LCUI/gui/widget/scrollbar.h>
+LCUI_BEGIN_HEADER
 
-void LCUI_InitWidget(void)
-{
-	LCUIWidget_InitTasks();
-	LCUIWidget_InitEvent();
-	LCUIWidget_InitPrototype();
-	LCUIWidget_InitStyle();
-	LCUIWidget_InitRenderer();
-	LCUIWidget_InitImageLoader();
-	LCUIWidget_AddTextView();
-	LCUIWidget_AddAnchor();
-	LCUIWidget_AddButton();
-	LCUIWidget_AddSideBar();
-	LCUIWidget_AddTScrollBar();
-	LCUIWidget_AddTextCaret();
-	LCUIWidget_AddTextEdit();
-	LCUIWidget_InitBase();
-	LCUIWidget_InitIdLibrary();
-}
+LCUI_API int Widget_DestroyId(LCUI_Widget w);
 
-void LCUI_FreeWidget(void)
-{
-	LCUIWidget_FreeTextView();
-	LCUIWidget_FreeTasks();
-	LCUIWidget_FreeRoot();
-	LCUIWidget_FreeEvent();
-	LCUIWidget_FreeStyle();
-	LCUIWidget_FreePrototype();
-	LCUIWidget_FreeRenderer();
-	LCUIWidget_FreeImageLoader();
-	LCUIWidget_FreeIdLibrary();
-	LCUIWidget_FreeBase();
-}
+LCUI_API int Widget_SetId(LCUI_Widget w, const char *idstr);
+
+LCUI_API LCUI_Widget LCUIWidget_GetById(const char *id);
+
+LCUI_API void LCUIWidget_InitIdLibrary(void);
+
+LCUI_API void LCUIWidget_FreeIdLibrary(void);
+
+LCUI_END_HEADER
+
+#endif

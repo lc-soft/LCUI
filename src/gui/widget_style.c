@@ -294,6 +294,13 @@ void Widget_ExecUpdateStyle(LCUI_Widget w, LCUI_BOOL is_update_all)
 	StyleSheet_Delete(ss);
 }
 
+void Widget_DestroyStyleSheets(LCUI_Widget w)
+{
+	StyleSheet_Delete(w->inherited_style);
+	StyleSheet_Delete(w->custom_style);
+	StyleSheet_Delete(w->style);
+}
+
 void LCUIWidget_InitStyle(void)
 {
 	LCUI_InitCSSLibrary();
