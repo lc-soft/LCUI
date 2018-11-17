@@ -31,9 +31,7 @@
 #ifndef LCUI_TEXTCARET_H
 #define LCUI_TEXTCARET_H
 
-LCUI_API void TextCaret_BlinkShow(LCUI_Widget widget);
-
-LCUI_API void TextCaret_BlinkHide(LCUI_Widget widget);
+LCUI_API void TextCaret_Refresh(LCUI_Widget widget);
 
 LCUI_API void TextCaret_SetVisible(LCUI_Widget widget, LCUI_BOOL visible);
 

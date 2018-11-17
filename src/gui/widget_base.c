@@ -690,6 +690,7 @@ void Widget_UpdateVisibility(LCUI_Widget w)
 {
 	LCUI_Style s = &w->style->sheet[key_visibility];
 	LCUI_BOOL visible = w->computed_style.visible;
+
 	if (w->computed_style.display == SV_NONE) {
 		w->computed_style.visible = FALSE;
 	} else if (s->is_valid && s->type == LCUI_STYPE_STRING &&
@@ -718,9 +719,6 @@ void Widget_UpdateDisplay(LCUI_Widget w)
 	LCUI_Style s = &w->style->sheet[key_display];
 	if (s->is_valid && s->type == LCUI_STYPE_STYLE) {
 		w->computed_style.display = s->style;
-		if (w->computed_style.display == SV_NONE) {
-			w->computed_style.visible = FALSE;
-		}
 	} else {
 		w->computed_style.display = SV_BLOCK;
 	}
@@ -1715,11 +1713,12 @@ static void _LCUIWidget_PrintTree(LCUI_Widget w, int depth, const char *prefix)
 		}
 		snode = Widget_GetSelectorNode(child);
 		LOG("%s%s %s, xy:(%g,%g), size:(%g,%g), "
-		    "visible: %s, padding: (%g,%g,%g,%g), margin: "
+		    "visible: %s, display: %d, padding: (%g,%g,%g,%g), margin: "
 		    "(%g,%g,%g,%g)\n",
 		    prefix, str, snode->fullname, child->x, child->y,
 		    child->width, child->height,
 		    child->computed_style.visible ? "true" : "false",
+		    child->computed_style.display,
 		    child->padding.top, child->padding.right,
 		    child->padding.bottom, child->padding.left,
 		    child->margin.top, child->margin.right,

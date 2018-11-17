@@ -190,7 +190,7 @@ static void TextEdit_UpdateCaret(LCUI_Widget widget)
 	x += widget->padding.left;
 	y += widget->padding.top;
 	Widget_Move(edit->caret, x, y);
-	TextCaret_BlinkShow(edit->caret);
+	TextCaret_Refresh(edit->caret);
 	if (edit->password_char) {
 		TextLayer_SetCaretPos(edit->layer_source,
 				      edit->layer->insert_y,
@@ -606,7 +606,6 @@ static void TextEdit_OnFocus(LCUI_Widget widget, LCUI_WidgetEvent e, void *arg)
 {
 	LCUI_TextEdit edit = Widget_GetData(widget, self.prototype);
 	TextCaret_SetVisible(edit->caret, TRUE);
-	TextCaret_BlinkHide(edit->caret);
 	edit->tasks[TASK_UPDATE_CARET] = TRUE;
 	Widget_AddTask(widget, LCUI_WTASK_USER);
 }
@@ -627,7 +626,7 @@ static void TextEdit_TextBackspace(LCUI_Widget widget, int n_ch)
 	if (edit->password_char) {
 		TextLayer_TextBackspace(edit->layer_mask, n_ch);
 	}
-	TextCaret_BlinkShow(edit->caret);
+	TextCaret_Refresh(edit->caret);
 	edit->tasks[TASK_UPDATE] = TRUE;
 	Widget_AddTask(widget, LCUI_WTASK_USER);
 	LCUIMutex_Unlock(&edit->mutex);
@@ -646,7 +645,7 @@ static void TextEdit_TextDelete(LCUI_Widget widget, int n_ch)
 	if (edit->password_char) {
 		TextLayer_TextDelete(edit->layer_mask, n_ch);
 	}
-	TextCaret_BlinkShow(edit->caret);
+	TextCaret_Refresh(edit->caret);
 	edit->tasks[TASK_UPDATE] = TRUE;
 	Widget_AddTask(widget, LCUI_WTASK_USER);
 	LCUIMutex_Unlock(&edit->mutex);

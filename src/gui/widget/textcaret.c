@@ -57,7 +57,7 @@ textcaret {
 
 );
 
-void TextCaret_BlinkShow(LCUI_Widget widget)
+void TextCaret_Refresh(LCUI_Widget widget)
 {
 	LCUI_TextCaret caret = Widget_GetData(widget, prototype);
 	if (!caret->visible) {
@@ -65,13 +65,6 @@ void TextCaret_BlinkShow(LCUI_Widget widget)
 	}
 	LCUITimer_Reset(caret->timer_id, caret->blink_interval);
 	Widget_Show(widget);
-}
-
-void TextCaret_BlinkHide(LCUI_Widget widget)
-{
-	LCUI_TextCaret caret = Widget_GetData(widget, prototype);
-	LCUITimer_Reset(caret->timer_id, caret->blink_interval);
-	Widget_Hide(widget);
 }
 
 static void TextCaret_OnBlink(void *arg)
@@ -89,14 +82,14 @@ static void TextCaret_OnBlink(void *arg)
 
 void TextCaret_SetVisible(LCUI_Widget widget, LCUI_BOOL visible)
 {
-
 	LCUI_TextCaret caret;
 	caret = Widget_GetData(widget, prototype);
 	caret->visible = visible;
 	if (visible) {
-		TextCaret_BlinkShow(widget);
+		TextCaret_Refresh(widget);
 	} else {
-		TextCaret_BlinkHide(widget);
+		LCUITimer_Reset(caret->timer_id, caret->blink_interval);
+		Widget_Hide(widget);
 	}
 }
 
