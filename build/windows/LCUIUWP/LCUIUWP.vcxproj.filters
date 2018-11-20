@@ -434,5 +434,20 @@
     <ClCompile Include="..\..\..\src\util\uri.cpp">
       <Filter>源文件\util</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_attribute.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_class.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_id.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_status.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_tree.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

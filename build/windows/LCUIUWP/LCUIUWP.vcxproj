@@ -113,15 +113,19 @@
     <ClCompile Include="..\..\..\src\gui\widget\textcaret.c" />
     <ClCompile Include="..\..\..\src\gui\widget\textedit.c" />
     <ClCompile Include="..\..\..\src\gui\widget\textview.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_attribute.c" />
     <ClCompile Include="..\..\..\src\gui\widget_background.c" />
     <ClCompile Include="..\..\..\src\gui\widget_base.c" />
     <ClCompile Include="..\..\..\src\gui\widget_border.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_class.c" />
     <ClCompile Include="..\..\..\src\gui\widget_event.c" />
     <ClCompile Include="..\..\..\src\gui\widget_helper.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_id.c" />
     <ClCompile Include="..\..\..\src\gui\widget_layout.c" />
     <ClCompile Include="..\..\..\src\gui\widget_prototype.c" />
     <ClCompile Include="..\..\..\src\gui\widget_paint.c" />
     <ClCompile Include="..\..\..\src\gui\widget_shadow.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_status.c" />
     <ClCompile Include="..\..\..\src\gui\widget_style.c" />
     <ClCompile Include="..\..\..\src\gui\widget_task.c" />
     <ClCompile Include="..\..\..\src\cursor.c" />
@@ -129,6 +133,7 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MaxSpeed</Optimization>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_tree.c" />
     <ClCompile Include="..\..\..\src\image\bmp.c" />
     <ClCompile Include="..\..\..\src\image\jpeg.c" />
     <ClCompile Include="..\..\..\src\image\png.c" />
