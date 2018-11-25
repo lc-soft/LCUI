@@ -60,13 +60,12 @@ What is "simple"? It means fewer features, for example:
 
 If you can solve any of the above problems, you can provide technical support to the author by submitting an issue or pull request.
 
-### Screenshots
+### Related Projects
 
-![Hello, World!](https://lcui.lc-soft.io/static/images/screenshot-lcui-hello.png)
+Want to know what LCUI can do? You can view the following projects:
 
-[![LCUI.css](https://lcui.lc-soft.io/static/images/screenshot-lcui-css.gif)](https://github.com/lc-ui/LCUI.css)
-
-[![LCFinder](https://lcui.lc-soft.io/static/images/screenshot-lcfinder.png)](https://github.com/lc-soft/LC-Finder)
+- [LCUI.css](https://github.com/lc-ui/lcui.css) - A UI component framework for building LCUI application.
+- [LCFinder](https://github.com/lc-soft/LC-Finder) - An image manager, it uses most of the features of LCUI, and you can use it as a reference to evaluate whether LCUI's performance and development complexity meets your needs.
 
 ## Documentation
 

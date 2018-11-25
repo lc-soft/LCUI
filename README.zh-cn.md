@@ -49,20 +49,19 @@ LCUI 是一个个人项目，其主要用途是方便作者能够开发简单的
 
 - 没有硬件加速，图形渲染效率低下。
 - 不支持选中和复制界面中的文本。
-- 不支持实用 CTRL+C 复制内容，不支持使用 CTRL+V 粘贴内容到输入框。
+- 不支持使用 CTRL+C 复制内容，不支持使用 CTRL+V 粘贴内容到输入框。
 - 不支持使用输入法输入非英文字符，例如：中文，日文，等。
 - 当前版本并不支持渲染圆角边框。
 - 布局系统简单，不支持网格、表格等布局。
 
 如果你有上述问题的相关解决经验，可以通过提交问题（Issue）或拉取请求（Pull Request）来向作者提供技术支持。
 
-### 效果图
+### 相关项目
 
-![Hello, World!](https://lcui.lc-soft.io/static/images/screenshot-lcui-hello.png)
+想要了解 LCUI 具体能做什么？你可以查看以下项目：
 
-[![LCUI.css](https://lcui.lc-soft.io/static/images/screenshot-lcui-css.gif)](https://github.com/lc-ui/LCUI.css)
-
-[![LCFinder](https://lcui.lc-soft.io/static/images/screenshot-lcfinder.png)](https://github.com/lc-soft/LC-Finder)
+- [LCUI.css](https://github.com/lc-ui/lcui.css) - LCUI 组件库，包含了一些通用组件和 css 样式。
+- [LCFinder](https://github.com/lc-soft/LC-Finder) - 图片管理器，LCUI 的旗舰级应用程序，你可以将它作为参考对象，以此评估 LCUI 的性能、界面效果和开发复杂度是否符合你的需求。
 
 ## 许可
 
