@@ -1,4 +1,58 @@
-# LCUI的更新记录
+# [1.0.0-beta.4](https://github.com/lc-soft/LCUI/compare/v1.0.0-beta.3...v1.0.0-beta.4) (2018-11-19)
+
+### 问题修复
+
+* **dirent:** LCUI_ReadDirW() UNINITIALIZED READ ([dd610ad](https://github.com/lc-soft/LCUI/commit/dd610ad))
+* **display:** 调整窗口尺寸时会暂停渲染 ([#164](https://github.com/lc-soft/LCUI/issues/164)) ([8ad667a](https://github.com/lc-soft/LCUI/commit/8ad667a))
+* **display:** 一帧内有过多的重复的脏矩形 ([b5d9040](https://github.com/lc-soft/LCUI/commit/b5d9040))
+* **font:** 在加载完字体文件后设置默认字体会失败 ([9b4c005](https://github.com/lc-soft/LCUI/commit/9b4c005))
+* **font:** 在模块被重新初始化后，字体编号未重置 ([d75b4ca](https://github.com/lc-soft/LCUI/commit/d75b4ca))
+* **gui:** 当部件的显示角色改变后应该更新布局 ([96c1cef](https://github.com/lc-soft/LCUI/commit/96c1cef))
+* **gui:** 当模块被销毁时应该清空废弃的部件 ([1ad6be1](https://github.com/lc-soft/LCUI/commit/1ad6be1))
+* **gui:** 块级元素的默认宽度应该为 100% ([adcb9e7](https://github.com/lc-soft/LCUI/commit/adcb9e7))
+* **gui:** 在销毁部件前应该解除结点 ([3249490](https://github.com/lc-soft/LCUI/commit/3249490))
+* **gui:** unlink 事件被重复触发 ([89faa5d](https://github.com/lc-soft/LCUI/commit/89faa5d))
+* **gui:** 部件背景图未渲染 ([e76f3f9](https://github.com/lc-soft/LCUI/commit/e76f3f9))
+* **gui:** Widget_AutoSize() 不应该改变静态的宽度或高度 ([8bee9c2](https://github.com/lc-soft/LCUI/commit/8bee9c2))
+* **ime:** 无法正确识别非 qwerty 键盘布局的按键输入 ([#147](https://github.com/lc-soft/LCUI/issues/147)) ([4b1f050](https://github.com/lc-soft/LCUI/commit/4b1f050))
+* **layout:** "left: auto" 被计算为 "left: 0" ([f4990da](https://github.com/lc-soft/LCUI/commit/f4990da))
+* **platform:** linux 帧缓存驱动未被销毁 ([#157](https://github.com/lc-soft/LCUI/issues/157)) ([87f79f0](https://github.com/lc-soft/LCUI/commit/87f79f0))
+* **renderer:** 当部件整体透明时，子级部件未正确渲染 ([#160](https://github.com/lc-soft/LCUI/issues/160)) ([d13b554](https://github.com/lc-soft/LCUI/commit/d13b554))
+* **renderer:** 有透明效果的部件，渲染不正确 ([6668165](https://github.com/lc-soft/LCUI/commit/6668165))
+* **textlayer:** 中文文本断行错误 ([1e5a262](https://github.com/lc-soft/LCUI/commit/1e5a262))
+* **textlayer:** isalpha() 断言失败 ([cd39a46](https://github.com/lc-soft/LCUI/commit/cd39a46))
+* **textview:** 在改变 "content" 属性后没有效果 ([d1ab50d](https://github.com/lc-soft/LCUI/commit/d1ab50d))
+* **textview:** 设置文本后未更新自身尺寸 ([31e0582](https://github.com/lc-soft/LCUI/commit/31e0582))
+* **util:** LCUI_DirEntry::name 的值不正确 ([367febe](https://github.com/lc-soft/LCUI/commit/367febe))
+* **worker:** 工作线程内存访问越界 ([5a7e2c0](https://github.com/lc-soft/LCUI/commit/5a7e2c0))
+* 当不支持 jpeg 和 png 时连接器会报错 ([2bbabe1](https://github.com/lc-soft/LCUI/commit/2bbabe1))
+* PACKAGE_VERSION 未定义 ([70660de](https://github.com/lc-soft/LCUI/commit/70660de))
+* 当系统中存在窗口管理系统时应该隐藏鼠标指针 ([acf9454](https://github.com/lc-soft/LCUI/commit/acf9454))
+* LCUI_GetAppId() 返回值不正确 ([46ec607](https://github.com/lc-soft/LCUI/commit/46ec607))
+* 在 FreeBSD 上编译时，"linux/input.h" 文件不存在 ([7d95f3f](https://github.com/lc-soft/LCUI/commit/7d95f3f))
+* 在 FreeBSD 上编译时，ENODATA 未定义 ([2cd0b27](https://github.com/lc-soft/LCUI/commit/2cd0b27))
+* 未解析的外部符号 _Graph_IsValid ([1328a2d](https://github.com/lc-soft/LCUI/commit/1328a2d))
+
+### 新特性
+
+* **builder:** `<resource>` 支持加载 xml 文件 ([d5e162c](https://github.com/lc-soft/LCUI/commit/d5e162c))
+* **display:** 自动禁用窗口最大化按钮 ([#164](https://github.com/lc-soft/LCUI/issues/164)) ([82fad1b](https://github.com/lc-soft/LCUI/commit/82fad1b))
+* **event:** 添加 ctrl_key 和 shift_key 成员至 LCUI_KeyboardEvent ([6f5f17c](https://github.com/lc-soft/LCUI/commit/6f5f17c))
+* **gui:** 添加 Widget_SetOpacity() ([e6ad163](https://github.com/lc-soft/LCUI/commit/e6ad163))
+* **gui:** 添加 Widget_SetVisibility() ([145d9ee](https://github.com/lc-soft/LCUI/commit/145d9ee))
+* **gui:** 添加 Widget_SetVisible() 和 Widget_SetHidden() ([2f581b8](https://github.com/lc-soft/LCUI/commit/2f581b8))
+* **gui:** LCUIWidget_ClearTrash() 返回值为实际销毁的部件数量 ([6262f20](https://github.com/lc-soft/LCUI/commit/6262f20))
+* **linux:** 为 x11 系统添加鼠标滚轮事件处理 ([#54](https://github.com/lc-soft/LCUI/issues/54)) ([1061592](https://github.com/lc-soft/LCUI/commit/1061592))
+* **linux:** 使用 fontconfig 定位字体文件路径 ([2932246](https://github.com/lc-soft/LCUI/commit/2932246))
+* **textview:** 在加载新的字体文件后刷新所有 textview 部件 ([3fcfa99](https://github.com/lc-soft/LCUI/commit/3fcfa99))
+* **util:** 添加 OpenUri() ([ec20c99](https://github.com/lc-soft/LCUI/commit/ec20c99))
+* 添加 LCUI_MAX_FRAMES_PER_SEC 宏定义 ([6fa2995](https://github.com/lc-soft/LCUI/commit/6fa2995))
+* 添加 LCUI_MAX_FRAME_MSEC 宏定义 ([7abc901](https://github.com/lc-soft/LCUI/commit/7abc901))
+
+### 改进
+
+* **charset:** 改进 utf-8 和 unicode 字符串转换 ([1efd856](https://github.com/lc-soft/LCUI/commit/1efd856))
+* **graph:** 添加新的图片缩放方式 (issue [#39](https://github.com/lc-soft/LCUI/issues/39)) ([bbfb9af](https://github.com/lc-soft/LCUI/commit/bbfb9af))
 
 ## 1.0.0 Beta 3 (2018-05-08)
 

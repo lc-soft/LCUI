@@ -1,4 +1,58 @@
-# LCUI ChangeLog
+# [1.0.0-beta.4](https://github.com/lc-soft/LCUI/compare/v1.0.0-beta.3...v1.0.0-beta.4) (2018-11-19)
+
+### Bug Fixes
+
+* **dirent:** LCUI_ReadDirW() UNINITIALIZED READ ([dd610ad](https://github.com/lc-soft/LCUI/commit/dd610ad))
+* **display:** the renderer pauses when resizing the window ([#164](https://github.com/lc-soft/LCUI/issues/164)) ([8ad667a](https://github.com/lc-soft/LCUI/commit/8ad667a))
+* **display:** too many duplicate dirty rectangles in one frame ([b5d9040](https://github.com/lc-soft/LCUI/commit/b5d9040))
+* **font:** failed to set default font after loading font file ([9b4c005](https://github.com/lc-soft/LCUI/commit/9b4c005))
+* **font:** font number is not reset after module reinitialization ([d75b4ca](https://github.com/lc-soft/LCUI/commit/d75b4ca))
+* **gui:** layout should be updated after widget display role is changed ([96c1cef](https://github.com/lc-soft/LCUI/commit/96c1cef))
+* **gui:** should clear trash widget when module destroyed ([1ad6be1](https://github.com/lc-soft/LCUI/commit/1ad6be1))
+* **gui:** the block element default width should be 100% ([adcb9e7](https://github.com/lc-soft/LCUI/commit/adcb9e7))
+* **gui:** the node should unlinked before destroying widget ([3249490](https://github.com/lc-soft/LCUI/commit/3249490))
+* **gui:** the unlink event is triggered repeatedly ([89faa5d](https://github.com/lc-soft/LCUI/commit/89faa5d))
+* **gui:** widget background image is not rendered ([e76f3f9](https://github.com/lc-soft/LCUI/commit/e76f3f9))
+* **gui:** Widget_AutoSize() should not change the static width or height ([8bee9c2](https://github.com/lc-soft/LCUI/commit/8bee9c2))
+* **ime:** non-qwerty keyboard layouts broken ([#147](https://github.com/lc-soft/LCUI/issues/147)) ([4b1f050](https://github.com/lc-soft/LCUI/commit/4b1f050))
+* **layout:** "left: auto" is calculated as "left: 0" ([f4990da](https://github.com/lc-soft/LCUI/commit/f4990da))
+* **platform:** linux framebuffer driver has not been destroyed ([#157](https://github.com/lc-soft/LCUI/issues/157)) ([87f79f0](https://github.com/lc-soft/LCUI/commit/87f79f0))
+* **renderer:** problem when widget has transparency ([#160](https://github.com/lc-soft/LCUI/issues/160)) ([d13b554](https://github.com/lc-soft/LCUI/commit/d13b554))
+* **renderer:** transparent widgets are rendered incorrectly ([6668165](https://github.com/lc-soft/LCUI/commit/6668165))
+* **textlayer:** chinese text line break error ([1e5a262](https://github.com/lc-soft/LCUI/commit/1e5a262))
+* **textlayer:** isalpha() assertion failed ([cd39a46](https://github.com/lc-soft/LCUI/commit/cd39a46))
+* **textview:** no effect after changing the "content" property ([d1ab50d](https://github.com/lc-soft/LCUI/commit/d1ab50d))
+* **textview:** size not updated after setting text ([31e0582](https://github.com/lc-soft/LCUI/commit/31e0582))
+* **util:** incorrect value of LCUI_DirEntry::name ([367febe](https://github.com/lc-soft/LCUI/commit/367febe))
+* **worker:** worker thread memory access violation ([5a7e2c0](https://github.com/lc-soft/LCUI/commit/5a7e2c0))
+* linker errors when jpeg and png are not supported ([2bbabe1](https://github.com/lc-soft/LCUI/commit/2bbabe1))
+* PACKAGE_VERSION is not defined ([70660de](https://github.com/lc-soft/LCUI/commit/70660de))
+* the mouse cursor should be hidden when the window system exists ([acf9454](https://github.com/lc-soft/LCUI/commit/acf9454))
+* the return value of LCUI_GetAppId() is incorrect ([46ec607](https://github.com/lc-soft/LCUI/commit/46ec607))
+* "linux/input.h" file not found on FreeBSD ([7d95f3f](https://github.com/lc-soft/LCUI/commit/7d95f3f))
+* undefined ENODATA on FreeBSD ([2cd0b27](https://github.com/lc-soft/LCUI/commit/2cd0b27))
+* unresolved external symbol _Graph_IsValid ([1328a2d](https://github.com/lc-soft/LCUI/commit/1328a2d))
+
+### Features
+
+* **builder:** `<resource>` support load xml file ([d5e162c](https://github.com/lc-soft/LCUI/commit/d5e162c))
+* **display:** auto disable window maximize button ([#164](https://github.com/lc-soft/LCUI/issues/164)) ([82fad1b](https://github.com/lc-soft/LCUI/commit/82fad1b))
+* **event:** add ctrl_key and shift_key to LCUI_KeyboardEvent ([6f5f17c](https://github.com/lc-soft/LCUI/commit/6f5f17c))
+* **gui:** add Widget_SetOpacity() ([e6ad163](https://github.com/lc-soft/LCUI/commit/e6ad163))
+* **gui:** add Widget_SetVisibility() ([145d9ee](https://github.com/lc-soft/LCUI/commit/145d9ee))
+* **gui:** add Widget_SetVisible() and Widget_SetHidden() ([2f581b8](https://github.com/lc-soft/LCUI/commit/2f581b8))
+* **gui:** LCUIWidget_ClearTrash() will return count ([6262f20](https://github.com/lc-soft/LCUI/commit/6262f20))
+* **linux:** add mouse wheel event handing for x11 ([#54](https://github.com/lc-soft/LCUI/issues/54)) ([1061592](https://github.com/lc-soft/LCUI/commit/1061592))
+* **linux:** use fontconfig to locate fonts ([2932246](https://github.com/lc-soft/LCUI/commit/2932246))
+* **textview:** refresh all textview after loading new font ([3fcfa99](https://github.com/lc-soft/LCUI/commit/3fcfa99))
+* **util:** add OpenUri() ([ec20c99](https://github.com/lc-soft/LCUI/commit/ec20c99))
+* make LCUI_MAX_FRAMES_PER_SEC public ([6fa2995](https://github.com/lc-soft/LCUI/commit/6fa2995))
+* add LCUI_MAX_FRAME_MSEC macro ([7abc901](https://github.com/lc-soft/LCUI/commit/7abc901))
+
+### Performance Improvements
+
+* **charset:** improve utf-8 and unicode string convert ([1efd856](https://github.com/lc-soft/LCUI/commit/1efd856))
+* **graph:** improve image scaling quality (issue [#39](https://github.com/lc-soft/LCUI/issues/39)) ([bbfb9af](https://github.com/lc-soft/LCUI/commit/bbfb9af))
 
 ## 1.0.0 Beta 3 (2018-05-08)
 
