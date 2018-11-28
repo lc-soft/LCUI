@@ -1,4 +1,4 @@
-/*
+﻿/*
  * textlayer.c -- Text layout and rendering module.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.

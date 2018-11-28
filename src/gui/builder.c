@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * builder.c -- the GUI build module, parse UI config code and build UI.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
