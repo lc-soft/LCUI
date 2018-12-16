@@ -1296,7 +1296,7 @@ void LCUI_PrintStyleSheet(LCUI_StyleSheet ss)
 		case LCUI_STYPE_STYLE:
 			LOG("%s", LCUI_GetStyleValueName(s->val_style));
 			break;
-		case LCUI_STYPE_VALUE:
+		case LCUI_STYPE_INT:
 			LOG("%d", s->val_int);
 			break;
 		default:

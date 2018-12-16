@@ -134,7 +134,7 @@ static int OnParseValue(LCUI_CSSParserStyleContext ctx, const char *str)
 	LCUI_Style s = &ctx->sheet->sheet[ctx->parser->key];
 	if (sscanf(str, "%d", &s->val_int) == 1) {
 		s->is_valid = TRUE;
-		s->type = LCUI_STYPE_VALUE;
+		s->type = LCUI_STYPE_INT;
 		return 0;
 	}
 	return -1;
@@ -229,7 +229,7 @@ static int OnParseBorder(LCUI_CSSParserStyleContext ctx, const char *str)
 			ss->sheet[key_border_left_color] = slist[i];
 			break;
 		case LCUI_STYPE_PX:
-		case LCUI_STYPE_VALUE:
+		case LCUI_STYPE_INT:
 			ss->sheet[key_border_top_width] = slist[i];
 			ss->sheet[key_border_right_width] = slist[i];
 			ss->sheet[key_border_bottom_width] = slist[i];
@@ -276,7 +276,7 @@ static int OnParseBorderLeft(LCUI_CSSParserStyleContext ctx, const char *str)
 			ss->sheet[key_border_left_color] = slist[i];
 			break;
 		case LCUI_STYPE_PX:
-		case LCUI_STYPE_VALUE:
+		case LCUI_STYPE_INT:
 			ss->sheet[key_border_left_width] = slist[i];
 			break;
 		case LCUI_STYPE_style:
@@ -303,7 +303,7 @@ static int OnParseBorderTop(LCUI_CSSParserStyleContext ctx, const char *str)
 			ss->sheet[key_border_top_color] = slist[i];
 			break;
 		case LCUI_STYPE_PX:
-		case LCUI_STYPE_VALUE:
+		case LCUI_STYPE_INT:
 			ss->sheet[key_border_top_width] = slist[i];
 			break;
 		case LCUI_STYPE_style:
@@ -330,7 +330,7 @@ static int OnParseBorderRight(LCUI_CSSParserStyleContext ctx, const char *str)
 			ss->sheet[key_border_right_color] = slist[i];
 			break;
 		case LCUI_STYPE_PX:
-		case LCUI_STYPE_VALUE:
+		case LCUI_STYPE_INT:
 			ss->sheet[key_border_right_width] = slist[i];
 			break;
 		case LCUI_STYPE_style:
@@ -357,7 +357,7 @@ static int OnParseBorderBottom(LCUI_CSSParserStyleContext ctx, const char *str)
 			ss->sheet[key_border_bottom_color] = slist[i];
 			break;
 		case LCUI_STYPE_PX:
-		case LCUI_STYPE_VALUE:
+		case LCUI_STYPE_INT:
 			ss->sheet[key_border_bottom_width] = slist[i];
 			break;
 		case LCUI_STYPE_style:

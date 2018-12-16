@@ -381,8 +381,8 @@ void Widget_UpdateOpacity(LCUI_Widget w)
 	LCUI_Style s = &w->style->sheet[key_opacity];
 	if (s->is_valid) {
 		switch (s->type) {
-		case LCUI_STYPE_VALUE:
-			opacity = 1.0f * s->value;
+		case LCUI_STYPE_INT:
+			opacity = 1.0f * s->val_int;
 			break;
 		case LCUI_STYPE_SCALE:
 			opacity = s->val_scale;
@@ -413,7 +413,7 @@ void Widget_ExecUpdateZIndex(LCUI_Widget w)
 	LinkedList *list;
 	LinkedListNode *cnode, *csnode, *snode;
 	LCUI_Style s = &w->style->sheet[key_z_index];
-	if (s->is_valid && s->type == LCUI_STYPE_VALUE) {
+	if (s->is_valid && s->type == LCUI_STYPE_INT) {
 		z_index = s->val_int;
 	} else {
 		z_index = 0;

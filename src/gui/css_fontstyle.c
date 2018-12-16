@@ -277,7 +277,7 @@ static void OnComputeLineHeight(LCUI_CSSFontStyle fs, LCUI_Style s)
 {
 	int h;
 	if (s->is_valid) {
-		if (s->type == LCUI_STYPE_VALUE) {
+		if (s->type == LCUI_STYPE_INT) {
 			h = iround(fs->font_size * s->val_int);
 		} else if (s->type == LCUI_STYPE_SCALE) {
 			h = iround(fs->font_size * s->val_scale);

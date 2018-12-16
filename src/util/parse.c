@@ -123,7 +123,7 @@ LCUI_BOOL ParseNumber(LCUI_Style s, const char *str)
 			break;
 		}
 		if (1 == sscanf(num_str, "%d", &s->val_int)) {
-			s->type = LCUI_STYPE_VALUE;
+			s->type = LCUI_STYPE_INT;
 			break;
 		}
 	default:
