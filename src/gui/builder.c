@@ -229,9 +229,6 @@ static int ParseWidget(XMLParserContext ctx, xmlNodePtr node)
 		prop_name = malloc(strsize((const char*)prop->name));
 		strtolower(prop_name, (const char*)prop->name);
 		Widget_SetAttribute(w, prop_name, prop_val);
-		if (w->proto && w->proto->setattr) {
-			w->proto->setattr(w, prop_name, prop_val);
-		}
 		free(prop_name);
 	}
 	if (prop_val) {

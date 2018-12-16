@@ -86,7 +86,9 @@ int Widget_SetAttributeEx(LCUI_Widget w, const char *name, void *value,
 
 int Widget_SetAttribute(LCUI_Widget w, const char *name, const char *value)
 {
+	int ret;
 	char *value_str;
+
 	if (strcmp(name, "disabled") == 0) {
 		if (!value || strcmp(value, "false") != 0) {
 			Widget_SetDisabled(w, TRUE);
@@ -95,16 +97,21 @@ int Widget_SetAttribute(LCUI_Widget w, const char *name, const char *value)
 		}
 		return 0;
 	}
-	if (!value) {
-		return Widget_SetAttributeEx(w, name, NULL, LCUI_STYPE_NONE,
-					     NULL);
+	if (value) {
+		value_str = strdup2(value);
+		if (!value_str) {
+			return -ENOMEM;
+		}
+		ret = Widget_SetAttributeEx(w, name, value_str,
+					    LCUI_STYPE_STRING, free);
+	} else {
+		ret = Widget_SetAttributeEx(w, name, NULL, LCUI_STYPE_NONE,
+					    NULL);
 	}
-	value_str = strdup2(value);
-	if (!value_str) {
-		return -ENOMEM;
+	if (w->proto && w->proto->setattr) {
+		w->proto->setattr(w, name, value);
 	}
-	return Widget_SetAttributeEx(w, name, value_str, LCUI_STYPE_STRING,
-				     free);
+	return ret;
 }
 
 const char *Widget_GetAttribute(LCUI_Widget w, const char *name)
