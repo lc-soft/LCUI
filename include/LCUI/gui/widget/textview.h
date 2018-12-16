@@ -42,6 +42,8 @@ LCUI_API void TextView_SetLineHeight(LCUI_Widget w, int height);
 
 LCUI_API void TextView_SetTextAlign(LCUI_Widget w, int align);
 
+LCUI_API void TextView_SetColor(LCUI_Widget w, LCUI_Color color);
+
 LCUI_API void TextView_SetAutoWrap(LCUI_Widget w, LCUI_BOOL enable);
 
 LCUI_API void TextView_SetMulitiline(LCUI_Widget w, LCUI_BOOL enable);

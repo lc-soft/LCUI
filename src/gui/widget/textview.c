@@ -519,6 +519,11 @@ void TextView_SetTextAlign(LCUI_Widget w, int align)
 	Widget_SetFontStyle(w, key_text_align, align, style);
 }
 
+void TextView_SetColor(LCUI_Widget w, LCUI_Color color)
+{
+	Widget_SetFontStyle(w, key_color, color, color);
+}
+
 void TextView_SetAutoWrap(LCUI_Widget w, LCUI_BOOL enable)
 {
 	if (enable) {
