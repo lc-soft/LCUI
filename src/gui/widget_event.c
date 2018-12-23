@@ -41,6 +41,8 @@
 #include <LCUI/cursor.h>
 #include <LCUI/thread.h>
 
+/* clang-format off */
+
 #define DBLCLICK_INTERVAL 500
 
 typedef struct TouchCapturerRec_ {
@@ -92,14 +94,16 @@ static struct LCUIWidgetEvnetModule {
 	LinkedList touch_capturers;     /**< 触点占用记录 */
 	LCUI_Widget targets[WST_TOTAL]; /**< 相关的部件 */
 	LinkedList events;              /**< 已绑定的事件 */
-	LinkedList event_mappings; /**< 事件标识号和名称映射记录列表  */
-	RBTree event_records; /**< 当前正执行的事件的记录 */
-	RBTree event_names;   /**< 事件名称表，以标识号作为索引 */
-	Dict *event_ids; /**< 事件标识号表，以事件名称作为索引 */
-	int base_event_id; /**< 事件标识号计数器 */
-	ClickRecord click; /**< 上次鼠标点击记录 */
-	LCUI_Mutex mutex;  /**< 互斥锁 */
+	LinkedList event_mappings;	/**< 事件标识号和名称映射记录列表  */
+	RBTree event_records;		/**< 当前正执行的事件的记录 */
+	RBTree event_names;		/**< 事件名称表，以标识号作为索引 */
+	Dict *event_ids;		/**< 事件标识号表，以事件名称作为索引 */
+	int base_event_id;		/**< 事件标识号计数器 */
+	ClickRecord click;		/**< 上次鼠标点击记录 */
+	LCUI_Mutex mutex;		/**< 互斥锁 */
 } self;
+
+/* clang-format on */
 
 static void DestroyEventMapping(void *data)
 {
@@ -166,6 +170,23 @@ static void DestroyWidgetEventHandler(void *arg)
 	}
 	handler->data = NULL;
 	free(handler);
+}
+
+static int GetEventId(const char *event_name)
+{
+	int id = LCUIWidget_GetEventId(event_name);
+	if (id < 0) {
+		id = LCUIWidget_AllocEventId();
+		LCUIWidget_SetEventName(id, event_name);
+	}
+	return id;
+}
+
+void LCUI_InitWidgetEvent(LCUI_WidgetEvent e, const char *name)
+{
+	e->type = GetEventId(name);
+	e->cancel_bubble = FALSE;
+	e->data = NULL;
 }
 
 /**
@@ -422,11 +443,8 @@ int Widget_BindEvent(LCUI_Widget widget, const char *event_name,
 		     LCUI_WidgetEventFunc func, void *data,
 		     void(*destroy_data)(void *))
 {
-	int id = LCUIWidget_GetEventId(event_name);
-	if (id < 0) {
-		return -1;
-	}
-	return Widget_BindEventById(widget, id, func, data, destroy_data);
+	return Widget_BindEventById(widget, GetEventId(event_name),
+				    func, data, destroy_data);
 }
 
 static int CompareEventHandlerKey(void *key, void *func_data)
@@ -459,11 +477,7 @@ int Widget_UnbindEventByHandlerId(LCUI_Widget widget, int handler_id)
 int Widget_UnbindEvent(LCUI_Widget widget, const char *event_name,
 		       LCUI_WidgetEventFunc func)
 {
-	int id = LCUIWidget_GetEventId(event_name);
-	if (id < 0) {
-		return -1;
-	}
-	return Widget_UnbindEventById(widget, id, func);
+	return Widget_UnbindEventById(widget, GetEventId(event_name), func);
 }
 
 static LCUI_Widget Widget_GetNextAt(LCUI_Widget widget, int x, int y)

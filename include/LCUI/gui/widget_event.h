@@ -119,6 +119,8 @@ LCUI_API const char *LCUIWidget_GetEventName(int event_id);
 /** 获取与事件名称对应的标识号 */
 LCUI_API int LCUIWidget_GetEventId(const char *event_name);
 
+LCUI_API void LCUI_InitWidgetEvent(LCUI_WidgetEvent e, const char *name);
+
 /**
  * 添加部件事件绑定
  * @param[in] widget 目标部件
