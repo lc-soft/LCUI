@@ -43,13 +43,19 @@ LCUI_API void Widget_SetPadding(LCUI_Widget w, float top, float right,
 LCUI_API void Widget_SetMargin(LCUI_Widget w, float top, float right,
 			       float bottom, float left);
 
+LCUI_API void Widget_SetBorderColor(LCUI_Widget w, LCUI_Color color);
+
+LCUI_API void Widget_SetBorderWidth(LCUI_Widget w, float width);
+
+LCUI_API void Widget_SetBorderStyle(LCUI_Widget w, float style);
+
 /** 设置边框样式 */
-LCUI_API void Widget_SetBorder(LCUI_Widget w, float width,
-			       int style, LCUI_Color clr);
+LCUI_API void Widget_SetBorder(LCUI_Widget w, float width, int style,
+			       LCUI_Color clr);
 
 /** 设置阴影样式 */
-LCUI_API void Widget_SetBoxShadow(LCUI_Widget w, float x, float y,
-				  float blur, LCUI_Color color);
+LCUI_API void Widget_SetBoxShadow(LCUI_Widget w, float x, float y, float blur,
+				  LCUI_Color color);
 
 /** 移动部件位置 */
 LCUI_API void Widget_Move(LCUI_Widget w, float left, float top);
@@ -57,8 +63,8 @@ LCUI_API void Widget_Move(LCUI_Widget w, float left, float top);
 /** 调整部件尺寸 */
 LCUI_API void Widget_Resize(LCUI_Widget w, float width, float height);
 
-LCUI_API void Widget_ResizeWithSurface(LCUI_Widget w,
-				       float width, float height);
+LCUI_API void Widget_ResizeWithSurface(LCUI_Widget w, float width,
+				       float height);
 
 LCUI_API LCUI_Style Widget_GetStyle(LCUI_Widget w, int key);
 

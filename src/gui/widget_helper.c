@@ -55,21 +55,37 @@ void Widget_SetMargin(LCUI_Widget w, float top, float right,
 	Widget_UpdateStyle(w, FALSE);
 }
 
-void Widget_SetBorder(LCUI_Widget w, float width, int style, LCUI_Color clr)
+void Widget_SetBorderColor(LCUI_Widget w, LCUI_Color color)
 {
-	Widget_SetStyle(w, key_border_top_color, clr, color);
-	Widget_SetStyle(w, key_border_right_color, clr, color);
-	Widget_SetStyle(w, key_border_bottom_color, clr, color);
-	Widget_SetStyle(w, key_border_left_color, clr, color);
+	Widget_SetStyle(w, key_border_top_color, color, color);
+	Widget_SetStyle(w, key_border_right_color, color, color);
+	Widget_SetStyle(w, key_border_bottom_color, color, color);
+	Widget_SetStyle(w, key_border_left_color, color, color);
+	Widget_UpdateStyle(w, FALSE);
+}
+
+void Widget_SetBorderWidth(LCUI_Widget w, float width)
+{
 	Widget_SetStyle(w, key_border_top_width, width, px);
 	Widget_SetStyle(w, key_border_right_width, width, px);
 	Widget_SetStyle(w, key_border_bottom_width, width, px);
 	Widget_SetStyle(w, key_border_left_width, width, px);
+	Widget_UpdateStyle(w, FALSE);
+}
+
+void Widget_SetBorderStyle(LCUI_Widget w, float style)
+{
 	Widget_SetStyle(w, key_border_top_style, style, style);
 	Widget_SetStyle(w, key_border_right_style, style, style);
 	Widget_SetStyle(w, key_border_bottom_style, style, style);
 	Widget_SetStyle(w, key_border_left_style, style, style);
-	Widget_UpdateStyle(w, FALSE);
+}
+
+void Widget_SetBorder(LCUI_Widget w, float width, int style, LCUI_Color color)
+{
+	Widget_SetBorderColor(w, color);
+	Widget_SetBorderWidth(w, width);
+	Widget_SetBorderStyle(w, style);
 }
 
 void Widget_SetBoxShadow(LCUI_Widget w, float x, float y,
