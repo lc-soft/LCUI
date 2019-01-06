@@ -175,7 +175,7 @@ typedef struct LCUI_WidgetRec_ {
 	float			x, y;			/**< 当前坐标（由 origin 计算而来） */
 	float			origin_x, origin_y;	/**< 当前布局下计算出的坐标 */
 	float			width, height;		/**< 部件区域大小，包括边框和内边距占用区域 */
-	uint_t			index;			/**< 部件索引位置 */
+	size_t			index;			/**< 部件索引位置 */
 	char			*id;			/**< ID */
 	char			*type;			/**< 类型 */
 	char			**classes;		/**< 类列表 */

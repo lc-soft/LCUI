@@ -45,7 +45,8 @@ LCUI_API void TextEdit_SetMultiline(LCUI_Widget widget, LCUI_BOOL is_true);
 LCUI_API void TextEdit_ClearText(LCUI_Widget widget);
 
 /** 获取文本内容 */
-LCUI_API int TextEdit_GetTextW(LCUI_Widget widget, int start, int max_len, wchar_t *buf);
+LCUI_API size_t TextEdit_GetTextW(LCUI_Widget w, size_t start,
+				      size_t max_len, wchar_t *buf);
 
 /** 获取文本长度 */
 LCUI_API size_t TextEdit_GetTextLength(LCUI_Widget w);

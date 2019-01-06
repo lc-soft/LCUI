@@ -391,10 +391,11 @@ static void TextEdit_UpdateTextLayer(LCUI_Widget w)
 
 static void TextEdit_OnTask(LCUI_Widget widget)
 {
+	size_t i, len;
+	wchar_t text[256];
 	LCUI_TextEdit edit = Widget_GetData(widget, self.prototype);
+
 	while (edit->tasks[TASK_UPDATE_MASK]) {
-		int i, len;
-		wchar_t text[256];
 		edit->tasks[TASK_UPDATE] = TRUE;
 		edit->tasks[TASK_UPDATE_MASK] = FALSE;
 		TextLayer_ClearText(edit->layer_mask);
@@ -511,7 +512,8 @@ void TextEdit_ClearText(LCUI_Widget widget)
 	Widget_InvalidateArea(widget, NULL, SV_PADDING_BOX);
 }
 
-int TextEdit_GetTextW(LCUI_Widget w, int start, int max_len, wchar_t *buf)
+size_t TextEdit_GetTextW(LCUI_Widget w, size_t start, size_t max_len,
+			 wchar_t *buf)
 {
 	LCUI_TextEdit edit = GetData(w);
 	return TextLayer_GetTextW(edit->layer_source, start, max_len, buf);
@@ -660,10 +662,12 @@ static void TextEdit_OnKeyDown(LCUI_Widget widget,
 {
 	int cols, rows, cur_col, cur_row;
 	LCUI_TextEdit edit = Widget_GetData(widget, self.prototype);
+
 	cur_row = edit->layer->insert_y;
 	cur_col = edit->layer->insert_x;
 	rows = TextLayer_GetRowTotal(edit->layer);
 	cols = TextLayer_GetRowTextLength(edit->layer, cur_row);
+	e->cancel_bubble = TRUE;
 	switch (e->key.code) {
 	case LCUI_KEY_HOME: // home键移动光标至行首
 		cur_col = 0;

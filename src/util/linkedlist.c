@@ -218,12 +218,12 @@ void LinkedList_Concat(LinkedList *list1, LinkedList *list2)
 
 
 typedef struct SortRange_ {
-	int start, end;
+	size_t start, end;
 	LinkedListNode *snode, *enode;
 } SortRange;
 
-static SortRange NewSortRange(int s, LinkedListNode *snode,
-			      int e, LinkedListNode *enode)
+static SortRange NewSortRange(size_t s, LinkedListNode *snode,
+			      size_t e, LinkedListNode *enode)
 {
 	SortRange r;
 	r.end = e;
@@ -273,86 +273,6 @@ void LinkedList_SwapNode(LinkedList *list, LinkedListNode *a, LinkedListNode *b)
 		b->next = node;
 		if (b->next) {
 			b->next->prev = b;
-		}
-	}
-}
-
-void LinkedList_QuickSort(LinkedList *list, int(*cmp)(void*, void*))
-{
-	int p = 0;
-	SortRange *r;
-	if (list->length <= 0) {
-		return;
-	}
-	r = malloc(list->length * sizeof(SortRange));
-	r[p++] = NewSortRange(0, list->head.next,
-			      list->length - 1, list->tail.prev);
-	while (p) {
-		int left, right;
-		SortRange range = r[--p];
-		LinkedListNode *mnode, *lnode, *rnode, *node;
-		if (range.start >= range.end) {
-			continue;
-		}
-		mnode = range.enode;
-		left = range.start, right = range.end - 1;
-		lnode = range.snode, rnode = range.enode->prev;
-		while (left < right) {
-			while (left < right &&
-			       cmp(lnode->data, mnode->data) < 0) {
-				left++, lnode = lnode->next;
-			}
-			while (left < right &&
-			       cmp(rnode->data, mnode->data) >= 0) {
-				right--, rnode = rnode->prev;
-			}
-			LinkedList_SwapNode(list, lnode, rnode);
-			if (lnode == range.snode) {
-				range.snode = rnode;
-			}
-			node = lnode;
-			lnode = rnode;
-			rnode = node;
-		}
-		if (cmp(lnode->data, range.enode->data) >= 0) {
-			LinkedList_SwapNode(list, lnode, range.enode);
-			if (mnode == range.enode) {
-				mnode = lnode;
-			}
-			node = lnode;
-			lnode = range.enode;
-			range.enode = node;
-		} else {
-			left++, lnode = lnode->next;
-		}
-		r[p++] = NewSortRange(range.start, range.snode,
-				      left - 1, lnode->prev);
-		r[p++] = NewSortRange(left + 1, lnode->next,
-				      range.end, range.enode);
-	}
-	free(r);
-}
-
-void LinkedList_BubbleSort(LinkedList *list, int(*cmp)(void*, void*))
-{
-	size_t i, j;
-	LinkedListNode *node, *cur, *next;
-	for (i = 0; i < list->length - 1; ++i) {
-		int no_swap = 1;
-		cur = list->head.next;
-		for (j = 0; j < list->length - 1 - i; ++j) {
-			next = cur->next;
-			if (cmp(cur->data, next->data) >= 0) {
-				LinkedList_SwapNode(list, cur, next);
-				node = cur;
-				cur = next;
-				next = node;
-				no_swap = 0;
-			}
-			cur = cur->next;
-		}
-		if (no_swap) {
-			break;
 		}
 	}
 }

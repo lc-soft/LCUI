@@ -432,9 +432,9 @@ int strsdel(char ***strlist, const char *str)
 
 int sortedstrsadd(char ***strlist, const char *str)
 {
-	int i, pos;
-	size_t len, n;
+	int i, pos, n;
 	char **newlist, *newstr;
+	size_t len;
 
 	if (*strlist) {
 		for (i = 0; (*strlist)[i]; ++i)

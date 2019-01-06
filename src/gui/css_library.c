@@ -28,7 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,8 +39,8 @@
 #include <LCUI/gui/css_library.h>
 #include <LCUI/gui/css_parser.h>
 
-#define MAX_NAME_LEN	256
-#define LEN(A)		sizeof( A ) / sizeof( *A )
+#define MAX_NAME_LEN 256
+#define LEN(A) sizeof(A) / sizeof(*A)
 
 enum SelectorRank {
 	GENERAL_RANK = 0,
@@ -64,47 +63,47 @@ enum SelectorFinderLevel {
 
 /* 样式表查找器的上下文数据结构 */
 typedef struct NamesFinderRec_ {
-	int level;			/**< 当前选择器层级 */
-	int class_i;			/**< 当前处理到第几个类名 */
-	int status_i;			/**< 当前处理到第几个状态名（伪类名） */
-	int name_i;			/**< 选择器名称从第几个字符开始 */
-	char name[MAX_NAME_LEN];	/**< 选择器名称缓存 */
-	LCUI_SelectorNode node;		/**< 针对的选择器结点 */
+	int level;    /**< 当前选择器层级 */
+	int class_i;  /**< 当前处理到第几个类名 */
+	int status_i; /**< 当前处理到第几个状态名（伪类名） */
+	int name_i;   /**< 选择器名称从第几个字符开始 */
+	char name[MAX_NAME_LEN]; /**< 选择器名称缓存 */
+	LCUI_SelectorNode node;  /**< 针对的选择器结点 */
 } NamesFinderRec, *NamesFinder;
 
 /** 样式链接记录组 */
 typedef struct StyleLinkGroupRec_ {
-	Dict *links;			/**< 样式链接表 */
-	char *name;			/**< 选择器名称 */
-	LCUI_SelectorNode snode;	/**< 选择器结点 */
+	Dict *links;             /**< 样式链接表 */
+	char *name;              /**< 选择器名称 */
+	LCUI_SelectorNode snode; /**< 选择器结点 */
 } StyleLinkGroupRec, *StyleLinkGroup;
 
 /** 样式结点记录 */
 typedef struct StyleNodeRec_ {
-	int rank;		/**< 权值，决定优先级 */
-	int batch_num;		/**< 批次号 */
-	char *space;		/**< 所属的空间 */
-	char *selector;		/**< 选择器 */
-	LCUI_StyleSheet sheet;	/**< 样式表 */
+	int rank;              /**< 权值，决定优先级 */
+	int batch_num;         /**< 批次号 */
+	char *space;           /**< 所属的空间 */
+	char *selector;        /**< 选择器 */
+	LCUI_StyleSheet sheet; /**< 样式表 */
 } StyleNodeRec, *StyleNode;
 
 /** 样式链接记录 */
 typedef struct StyleLinkRec_ {
-	char *selector;		/**< 选择器 */
-	StyleLinkGroup group;	/**< 所属组 */
-	LinkedList styles;	/**< 作用于当前选择器的样式 */
-	Dict *parents;		/**< 父级节点 */
+	char *selector;       /**< 选择器 */
+	StyleLinkGroup group; /**< 所属组 */
+	LinkedList styles;    /**< 作用于当前选择器的样式 */
+	Dict *parents;        /**< 父级节点 */
 } StyleLinkRec, *StyleLink;
 
 static struct {
 	LCUI_BOOL active;
-	LCUI_Mutex mutex;		/**< 互斥锁 */
-	LinkedList groups;		/**< 样式组列表 */
-	Dict *cache;			/**< 样式表缓存，以选择器的 hash 值索引 */
-	Dict *names;			/**< 样式属性名称表，以值的名称索引 */
-	Dict *value_keys;		/**< 样式属性值表，以值的名称索引 */
-	Dict *value_names;		/**< 样式属性值名称表，以值索引 */
-	size_t count;			/**< 当前记录的属性数量 */
+	LCUI_Mutex mutex;  /**< 互斥锁 */
+	LinkedList groups; /**< 样式组列表 */
+	Dict *cache; /**< 样式表缓存，以选择器的 hash 值索引 */
+	Dict *names; /**< 样式属性名称表，以值的名称索引 */
+	Dict *value_keys;  /**< 样式属性值表，以值的名称索引 */
+	Dict *value_names; /**< 样式属性值名称表，以值索引 */
+	int count;         /**< 当前记录的属性数量 */
 } library;
 
 /** 样式字符串值与标识码 */
@@ -310,8 +309,7 @@ int LCUI_GetStyleTotal(void)
 	return library.count;
 }
 
-LCUI_BOOL SelectorNode_Match(LCUI_SelectorNode sn1,
-			     LCUI_SelectorNode sn2)
+LCUI_BOOL SelectorNode_Match(LCUI_SelectorNode sn1, LCUI_SelectorNode sn2)
 {
 	int i, j;
 	if (sn2->id) {
@@ -330,8 +328,8 @@ LCUI_BOOL SelectorNode_Match(LCUI_SelectorNode sn1,
 		}
 		for (i = 0; sn2->classes[i]; ++i) {
 			for (j = 0; sn1->classes[j]; ++j) {
-				if (strcmp(sn2->classes[i],
-					   sn1->classes[i]) == 0) {
+				if (strcmp(sn2->classes[i], sn1->classes[i]) ==
+				    0) {
 					j = -1;
 					break;
 				}
@@ -347,8 +345,8 @@ LCUI_BOOL SelectorNode_Match(LCUI_SelectorNode sn1,
 		}
 		for (i = 0; sn2->status[i]; ++i) {
 			for (j = 0; sn1->status[j]; ++j) {
-				if (strcmp(sn2->status[i],
-					   sn1->status[i]) == 0) {
+				if (strcmp(sn2->status[i], sn1->status[i]) ==
+				    0) {
 					j = -1;
 					break;
 				}
@@ -446,7 +444,8 @@ void StyleSheet_Clear(LCUI_StyleSheet ss)
 				free(s->string);
 			}
 			s->string = NULL;
-		default: break;
+		default:
+			break;
 		}
 		s->is_valid = FALSE;
 	}
@@ -462,9 +461,10 @@ void StyleSheet_Delete(LCUI_StyleSheet ss)
 int StyleSheet_Merge(LCUI_StyleSheet dest, LCUI_StyleSheet src)
 {
 	LCUI_Style s;
-	int i, count, size;
+	size_t i, count, size;
+
 	if (src->length > dest->length) {
-		size = sizeof(LCUI_StyleRec)*src->length;
+		size = sizeof(LCUI_StyleRec) * src->length;
 		s = realloc(dest->sheet, size);
 		if (!s) {
 			return -1;
@@ -503,9 +503,10 @@ int StyleSheet_Merge(LCUI_StyleSheet dest, LCUI_StyleSheet src)
 int StyleSheet_Replace(LCUI_StyleSheet dest, LCUI_StyleSheet src)
 {
 	LCUI_Style s;
-	int i, count, size;
+	size_t i, count, size;
+
 	if (src->length > dest->length) {
-		size = sizeof(LCUI_StyleRec)*src->length;
+		size = sizeof(LCUI_StyleRec) * src->length;
 		s = realloc(dest->sheet, size);
 		if (!s) {
 			return -1;
@@ -544,7 +545,7 @@ int StyleSheet_Replace(LCUI_StyleSheet dest, LCUI_StyleSheet src)
 		s->type = src->sheet[i].type;
 		++count;
 	}
-	return count;
+	return (int)count;
 }
 
 /** 初始化样式表查找器 */
@@ -572,8 +573,10 @@ static void NamesFinder_Destroy(NamesFinder sfinder)
 /* 生成选择器全名列表 */
 static int NamesFinder_Find(NamesFinder sfinder, LinkedList *list)
 {
-	int i, len, old_len, old_level, count = 0;
+	size_t len, old_len;
+	int i, old_level, count = 0;
 	char *fullname = sfinder->name + sfinder->name_i;
+
 	old_len = len = strlen(fullname);
 	old_level = sfinder->level;
 	switch (sfinder->level) {
@@ -704,7 +707,8 @@ static int NamesFinder_Find(NamesFinder sfinder, LinkedList *list)
 		}
 		fullname[old_len] = 0;
 		return count;
-	default:break;
+	default:
+		break;
 	}
 	for (i = sfinder->level + 1; i < LEVEL_TOTAL_NUM; ++i) {
 		if (i == LEVEL_STATUS_2 || i == LEVEL_CLASS_2) {
@@ -718,8 +722,8 @@ static int NamesFinder_Find(NamesFinder sfinder, LinkedList *list)
 	return count;
 }
 
-static int SelectorNode_Save(LCUI_SelectorNode node,
-			     const char *name, int len, char type)
+static int SelectorNode_Save(LCUI_SelectorNode node, const char *name, int len,
+			     char type)
 {
 	char *str;
 	if (len < 1) {
@@ -754,7 +758,8 @@ static int SelectorNode_Save(LCUI_SelectorNode node,
 		strncpy(str, name, len);
 		node->id = str;
 		return ID_RANK;
-	default: break;
+	default:
+		break;
 	}
 	return 0;
 }
@@ -771,7 +776,7 @@ int SelectorNode_GetNames(LCUI_SelectorNode sn, LinkedList *names)
 
 int SelectorNode_Update(LCUI_SelectorNode node)
 {
-	int i, len = 0;
+	size_t i, len = 0;
 	char *fullname;
 
 	node->rank = 0;
@@ -829,7 +834,7 @@ int SelectorNode_Update(LCUI_SelectorNode node)
 		free(node->fullname);
 	}
 	node->fullname = fullname;
-	return len;
+	return 0;
 }
 
 void Selector_Update(LCUI_Selector s)
@@ -838,7 +843,7 @@ void Selector_Update(LCUI_Selector s)
 	const unsigned char *p;
 	unsigned int hash = 5381;
 	for (i = 0; i < s->length; ++i) {
-		p = (unsigned char*)s->nodes[i]->fullname;
+		p = (unsigned char *)s->nodes[i]->fullname;
 		while (*p) {
 			hash = ((hash << 5) + hash) + (*p++);
 		}
@@ -867,8 +872,9 @@ LCUI_Selector Selector(const char *selector)
 		if (!node && is_saving) {
 			node = NEW(LCUI_SelectorNodeRec, 1);
 			if (si >= MAX_SELECTOR_DEPTH) {
-				_DEBUG_MSG("%s: selector node list is too long.\n",
-					   selector);
+				_DEBUG_MSG(
+				    "%s: selector node list is too long.\n",
+				    selector);
 				return NULL;
 			}
 			s->nodes[si] = node;
@@ -922,11 +928,12 @@ LCUI_Selector Selector(const char *selector)
 			node = NULL;
 			ni = 0;
 			continue;
-		default: break;
+		default:
+			break;
 		}
-		if (*p == '-' || *p == '_' || *p == '*'
-		    || (*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z')
-		    || (*p >= '0' && *p <= '9')) {
+		if (*p == '-' || *p == '_' || *p == '*' ||
+		    (*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') ||
+		    (*p >= '0' && *p <= '9')) {
 			if (!is_saving) {
 				type = 0;
 				is_saving = TRUE;
@@ -935,16 +942,17 @@ LCUI_Selector Selector(const char *selector)
 			name[ni] = 0;
 			continue;
 		}
-		_DEBUG_MSG("%s: unknown char 0x%02x at %ld.\n",
-			   selector, *p, p - selector);
+		_DEBUG_MSG("%s: unknown char 0x%02x at %ld.\n", selector, *p,
+			   p - selector);
 		return NULL;
 	}
 	if (is_saving) {
 		if (!node) {
 			node = NEW(LCUI_SelectorNodeRec, 1);
 			if (si >= MAX_SELECTOR_DEPTH) {
-				_DEBUG_MSG("%s: selector node list is too long.\n",
-					   selector);
+				_DEBUG_MSG(
+				    "%s: selector node list is too long.\n",
+				    selector);
 				return NULL;
 			}
 			s->nodes[si] = node;
@@ -1122,8 +1130,8 @@ static LCUI_StyleSheet LCUI_SelectStyleSheet(LCUI_Selector selector,
 	return snode->sheet;
 }
 
-int LCUI_PutStyleSheet(LCUI_Selector selector,
-		       LCUI_StyleSheet in_ss, const char *space)
+int LCUI_PutStyleSheet(LCUI_Selector selector, LCUI_StyleSheet in_ss,
+		       const char *space)
 {
 	LCUI_StyleSheet ss;
 	LCUIMutex_Lock(&library.mutex);
@@ -1136,8 +1144,10 @@ int LCUI_PutStyleSheet(LCUI_Selector selector,
 	return 0;
 }
 
-static int StyleLink_GetStyleSheets(StyleLink link, LinkedList *outlist)
+static size_t StyleLink_GetStyleSheets(StyleLink link, LinkedList *outlist)
 {
+	size_t i;
+	LCUI_BOOL found;
 	StyleNode snode, out_snode;
 	LinkedListNode *node, *out_node;
 
@@ -1145,12 +1155,13 @@ static int StyleLink_GetStyleSheets(StyleLink link, LinkedList *outlist)
 		return link->styles.length;
 	}
 	for (LinkedList_Each(node, &link->styles)) {
-		int pos = -1, i = 0;
+		i = 0;
+		found = FALSE;
 		snode = node->data;
 		for (LinkedList_Each(out_node, outlist)) {
 			out_snode = out_node->data;
 			if (snode->rank > out_snode->rank) {
-				pos = i;
+				found = TRUE;
 				break;
 			}
 			if (snode->rank != out_snode->rank) {
@@ -1158,13 +1169,13 @@ static int StyleLink_GetStyleSheets(StyleLink link, LinkedList *outlist)
 				continue;
 			}
 			if (snode->batch_num > out_snode->batch_num) {
-				pos = i;
+				found = TRUE;
 				break;
 			}
 			i += 1;
 		}
-		if (pos >= 0) {
-			LinkedList_Insert(outlist, pos, snode);
+		if (found) {
+			LinkedList_Insert(outlist, i, snode);
 		} else {
 			LinkedList_Append(outlist, snode);
 		}
@@ -1172,10 +1183,10 @@ static int StyleLink_GetStyleSheets(StyleLink link, LinkedList *outlist)
 	return link->styles.length;
 }
 
-static int LCUI_FindStyleSheetFromLink(StyleLink link, LCUI_Selector s,
-				       int i, LinkedList *list)
+static size_t LCUI_FindStyleSheetFromLink(StyleLink link, LCUI_Selector s,
+					  int i, LinkedList *list)
 {
-	int count = 0;
+	size_t count = 0;
 	StyleLink parent;
 	LinkedList names;
 	LinkedListNode *node;
@@ -1191,18 +1202,19 @@ static int LCUI_FindStyleSheetFromLink(StyleLink link, LCUI_Selector s,
 			if (!parent) {
 				continue;
 			}
-			count += LCUI_FindStyleSheetFromLink(parent, s,
-							     i, list);
+			count +=
+			    LCUI_FindStyleSheetFromLink(parent, s, i, list);
 		}
 		LinkedList_Clear(&names, free);
 	}
 	return count;
 }
 
-int LCUI_FindStyleSheetFromGroup(int group, const char *name,
-				 LCUI_Selector s, LinkedList *list)
+int LCUI_FindStyleSheetFromGroup(int group, const char *name, LCUI_Selector s,
+				 LinkedList *list)
 {
-	int i, count;
+	int i;
+	size_t count;
 	Dict *groups;
 	StyleLinkGroup slg;
 	LinkedListNode *node;
@@ -1232,13 +1244,12 @@ int LCUI_FindStyleSheetFromGroup(int group, const char *name,
 		iter = Dict_GetIterator(slg->links);
 		while ((entry = Dict_Next(iter))) {
 			StyleLink link = DictEntry_GetVal(entry);
-			count += LCUI_FindStyleSheetFromLink(link, s,
-							     i, list);
+			count += LCUI_FindStyleSheetFromLink(link, s, i, list);
 		}
 		Dict_ReleaseIterator(iter);
 	}
 	LinkedList_Clear(&names, free);
-	return count;
+	return (int)count;
 }
 
 void LCUI_PrintStyleSheet(LCUI_StyleSheet ss)
@@ -1264,12 +1275,11 @@ void LCUI_PrintStyleSheet(LCUI_StyleSheet ss)
 		case LCUI_STYPE_BOOL:
 			LOG("%s", s->val_bool ? "true" : "false");
 			break;
-		case LCUI_STYPE_COLOR:
-		{
+		case LCUI_STYPE_COLOR: {
 			LCUI_Color *clr = &s->val_color;
 			if (clr->alpha < 255) {
-				LOG("rgba(%d,%d,%d,%g)", clr->r,
-				    clr->g, clr->b, clr->a / 255.0);
+				LOG("rgba(%d,%d,%d,%g)", clr->r, clr->g, clr->b,
+				    clr->a / 255.0);
 			} else {
 				LOG("#%02x%02x%02x", clr->r, clr->g, clr->b);
 			}
@@ -1317,8 +1327,8 @@ void LCUI_PrintSelector(LCUI_Selector selector)
 		strcat(path, (*sn)->fullname);
 		strcat(path, " ");
 	}
-	LOG("path: %s (rank = %d, batch_num = %d)\n", path,
-	    selector->rank, selector->batch_num);
+	LOG("path: %s (rank = %d, batch_num = %d)\n", path, selector->rank,
+	    selector->batch_num);
 }
 
 static void LCUI_PrintStyleLink(StyleLink link, const char *selector)
@@ -1442,13 +1452,13 @@ static void StyleNameDestructor(void *privdata, void *val)
 
 static unsigned int IntKeyDict_HashFunction(const void *key)
 {
-	return Dict_IdentityHashFunction(*(unsigned int*)key);
+	return Dict_IdentityHashFunction(*(unsigned int *)key);
 }
 
-static int IntKeyDict_KeyCompare(void *privdata,
-				 const void *key1, const void *key2)
+static int IntKeyDict_KeyCompare(void *privdata, const void *key1,
+				 const void *key2)
 {
-	return *(unsigned int*)key1 == *(unsigned int*)key2;
+	return *(unsigned int *)key1 == *(unsigned int *)key2;
 }
 
 static void IntKeyDict_KeyDestructor(void *privdata, void *key)
@@ -1459,7 +1469,7 @@ static void IntKeyDict_KeyDestructor(void *privdata, void *key)
 static void *IntKeyDict_KeyDup(void *privdata, const void *key)
 {
 	unsigned int *newkey = malloc(sizeof(unsigned int));
-	*newkey = *(unsigned int*)key;
+	*newkey = *(unsigned int *)key;
 	return newkey;
 }
 

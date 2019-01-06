@@ -245,7 +245,7 @@ void Widget_DestroyChildren(LCUI_Widget w)
 
 static void _LCUIWidget_PrintTree(LCUI_Widget w, int depth, const char *prefix)
 {
-	int len;
+	size_t len;
 	LCUI_Widget child;
 	LinkedListNode *node;
 	LCUI_SelectorNode snode;

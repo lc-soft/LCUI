@@ -129,8 +129,10 @@ int Widget_HandleChildrenStyleChange(LCUI_Widget w, int type, const char *name)
 	LCUI_Selector s;
 	LinkedList snames;
 	LinkedListNode *node;
-	int i, n, count = 0;
-	char ch, **names = NULL;
+
+	size_t i, n, len;
+	int count = 0;
+	char ch, *str, **names = NULL;
 
 	/* 选择相应的前缀 */
 	switch (type) {
@@ -148,8 +150,8 @@ int Widget_HandleChildrenStyleChange(LCUI_Widget w, int type, const char *name)
 	n = strsplit(name, " ", &names);
 	/* 为分割出来的字符串加上前缀 */
 	for (i = 0; i < n; ++i) {
-		int len = strlen(names[i]) + 2;
-		char *str = malloc(len * sizeof(char));
+		len = strlen(names[i]) + 2;
+		str = malloc(len * sizeof(char));
 		strncpy(str + 1, names[i], len - 1);
 		str[0] = ch;
 		free(names[i]);

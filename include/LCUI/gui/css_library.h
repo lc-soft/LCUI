@@ -143,7 +143,7 @@ LCUI_BEGIN_HEADER
 
 typedef struct LCUI_StyleSheetRec_ {
 	LCUI_Style sheet;
-	int length;
+	size_t length;
 } LCUI_StyleSheetRec, *LCUI_StyleSheet;
 
 /** 选择器结点结构 */

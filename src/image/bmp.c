@@ -126,10 +126,12 @@ int LCUI_ReadBMPHeader(LCUI_ImageReader reader)
 
 int LCUI_ReadBMP(LCUI_ImageReader reader, LCUI_Graph *graph)
 {
-	size_t n, row, bytes_per_row;
+	long offset;
 	unsigned char *buffer, *dest;
+	size_t n, row, bytes_per_row;
 	LCUI_BMPReader bmp_reader = reader->data;
 	INFOHEADER *info = &bmp_reader->info;
+
 	if (reader->type != LCUI_BMP_READER) {
 		return -EINVAL;
 	}
@@ -139,8 +141,8 @@ int LCUI_ReadBMP(LCUI_ImageReader reader, LCUI_Graph *graph)
 		}
 	}
 	/* 信息头中的偏移位置是相对于起始处，需要减去当前已经偏移的位置 */
-	n = bmp_reader->header.offset - bmp_reader->info.size - 14;
-	reader->fn_skip(reader->stream_data, n);
+	offset = bmp_reader->header.offset - bmp_reader->info.size - 14;
+	reader->fn_skip(reader->stream_data, offset);
 	if (0 != Graph_Create(graph, info->width, info->height)) {
 		return -ENOMEM;
 	}

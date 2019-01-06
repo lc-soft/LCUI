@@ -269,8 +269,8 @@ typedef struct LCUI_GraphQuote_ {
 } LCUI_GraphQuote;
 
 struct LCUI_Graph_ {
-	uint32_t width;        /**< 宽度 */
-	uint32_t height;       /**< 高度 */
+	unsigned width;        /**< 宽度 */
+	unsigned height;       /**< 高度 */
 	LCUI_GraphQuote quote; /**< 引用记录 */
 	/** 像素数据缓存区 */
 	union {
@@ -278,8 +278,8 @@ struct LCUI_Graph_ {
 		LCUI_ARGB *argb; /**< 指针，用于一次访问一个像素的数据 */
 	};
 	int color_type;           /**< 色彩类型 */
-	uint32_t bytes_per_pixel; /**< 每个像素共占多少个字节 */
-	uint32_t bytes_per_row;   /**< 每行像素共占多少个字节 */
+	unsigned bytes_per_pixel; /**< 每个像素共占多少个字节 */
+	unsigned bytes_per_row;   /**< 每行像素共占多少个字节 */
 	float opacity;    /**< 全局不透明度，取值范围为 0~1.0 */
 	size_t mem_size;  /**< 像素数据缓冲区大小 */
 	uchar_t *palette; /**< 调色板 */

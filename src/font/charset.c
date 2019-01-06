@@ -52,9 +52,9 @@
 #ifdef LCUI_BUILD_IN_WIN32
 #include <Windows.h>
 #define encode(CP, WSTR, STR, LEN) \
-	WideCharToMultiByte(CP, 0, WSTR, -1, STR, LEN, NULL, NULL)
+	WideCharToMultiByte(CP, 0, WSTR, -1, STR, (int)LEN, NULL, NULL)
 #define decode(CP, STR, WSTR, LEN) \
-	MultiByteToWideChar(CP, 0, STR, -1, WSTR, LEN)
+	MultiByteToWideChar(CP, 0, STR, -1, WSTR, (int)LEN)
 #endif
 
 static size_t utf8_to_ucs2(const char *utf8, wchar_t *ucs2)

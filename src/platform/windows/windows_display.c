@@ -171,8 +171,8 @@ static void OnCreateSurface(void *arg1, void *arg2)
 	instance = LCUI_GetAppData();
 	/* 为 Surface 创建窗口 */
 	surface->hwnd = CreateWindow(
-		TEXT("LCUI"), TEXT("LCUI Surface"), WIN32_WINDOW_STYLE,
-		CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, NULL, NULL, instance, NULL);
+	    TEXT("LCUI"), TEXT("LCUI Surface"), WIN32_WINDOW_STYLE,
+	    CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, NULL, NULL, instance, NULL);
 #ifdef ENABLE_TOUCH_SUPPORT
 	RegisterTouchWindow(surface->hwnd, 0);
 #endif
@@ -368,7 +368,8 @@ static void WinSurface_Present(LCUI_Surface surface)
 	RECT client_rect;
 
 	DEBUG_MSG("surface: %p, hwnd: %p\n", surface, surface->hwnd);
-	SetBitmapBits(surface->fb_bmp, surface->fb.mem_size, surface->fb.bytes);
+	SetBitmapBits(surface->fb_bmp, (DWORD)surface->fb.mem_size,
+		      surface->fb.bytes);
 	switch (surface->mode) {
 	case RENDER_MODE_STRETCH_BLT:
 		GetClientRect(surface->hwnd, &client_rect);
@@ -486,9 +487,9 @@ static void OnWMGetMinMaxInfo(LCUI_Event e, void *arg)
 	if (info->min_width == info->max_width &&
 	    info->min_height == info->max_height) {
 		style &= ~(WS_SIZEBOX | WS_MAXIMIZEBOX);
-	} else if (info->min_width == info->max_width || 
+	} else if (info->min_width == info->max_width ||
 		   info->min_height == info->max_height) {
-			style &= ~WS_MAXIMIZEBOX;
+		style &= ~WS_MAXIMIZEBOX;
 	}
 	SetWindowLong(msg->hwnd, GWL_STYLE, style);
 }
@@ -516,7 +517,7 @@ static void OnWMSize(LCUI_Event e, void *arg)
 }
 
 static int WinDisplay_BindEvent(int event_id, LCUI_EventFunc func, void *data,
-				void(*destroy_data)(void *))
+				void (*destroy_data)(void *))
 {
 	return EventTrigger_Bind(win.trigger, event_id, func, data,
 				 destroy_data);

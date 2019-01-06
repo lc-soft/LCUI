@@ -148,7 +148,7 @@ LCUI_API void PixelsFormat(const uchar_t *in_pixels, int in_color_type,
 /** 改变色彩类型 */
 LCUI_API int Graph_SetColorType(LCUI_Graph *graph, int color_type);
 
-LCUI_API int Graph_Create(LCUI_Graph *graph, size_t width, size_t height);
+LCUI_API int Graph_Create(LCUI_Graph *graph, unsigned width, unsigned height);
 
 LCUI_API void Graph_Copy(LCUI_Graph *des, const LCUI_Graph *src);
 

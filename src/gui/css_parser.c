@@ -940,7 +940,7 @@ static size_t LCUI_LoadCSSBlock(LCUI_CSSParserContext ctx, const char *str)
 
 int LCUI_LoadCSSFile(const char *filepath)
 {
-	int n;
+	size_t n;
 	FILE *fp;
 	char buff[512];
 	LCUI_CSSParserContext ctx;

@@ -91,7 +91,7 @@ LCUI_Color ARGB(uchar_t a, uchar_t r, uchar_t g, uchar_t b)
 	return color;
 }
 
-static size_t get_pixel_size(int color_type)
+static unsigned get_pixel_size(int color_type)
 {
 	switch (color_type) {
 	case LCUI_COLOR_TYPE_INDEX8:
@@ -734,7 +734,7 @@ int Graph_SetColorType(LCUI_Graph *graph, int color_type)
 	return -2;
 }
 
-int Graph_Create(LCUI_Graph *graph, size_t width, size_t height)
+int Graph_Create(LCUI_Graph *graph, unsigned width, unsigned height)
 {
 	size_t size;
 	if (width > 10000 || height > 10000) {
@@ -1214,7 +1214,7 @@ int Graph_Tile(LCUI_Graph *buff, const LCUI_Graph *graph, LCUI_BOOL replace,
 	       LCUI_BOOL with_alpha)
 {
 	int ret = 0;
-	size_t x, y;
+	unsigned x, y;
 
 	if (!Graph_IsValid(graph) || !Graph_IsValid(buff)) {
 		return -1;

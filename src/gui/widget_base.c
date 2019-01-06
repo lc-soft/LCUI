@@ -255,7 +255,7 @@ int Widget_Top(LCUI_Widget w)
 
 void Widget_SetTitleW(LCUI_Widget w, const wchar_t *title)
 {
-	int len;
+	size_t len;
 	wchar_t *new_title, *old_title;
 
 	len = wcslen(title) + 1;

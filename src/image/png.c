@@ -233,7 +233,7 @@ int LCUI_WritePNGFile(const char *file_name, const LCUI_Graph *graph)
 	png_structp png_ptr;
 	png_infop info_ptr;
 	png_bytep *row_pointers;
-	int x, y, row_size;
+	size_t x, y, row_size;
 
 	if (!Graph_IsValid(graph)) {
 		_DEBUG_MSG("graph is not valid\n");
@@ -322,7 +322,7 @@ int LCUI_WritePNGFile(const char *file_name, const LCUI_Graph *graph)
 	}
 	png_write_image(png_ptr, row_pointers);
 	/* cleanup heap allocation */
-	for (y = 0; y < rect.height; ++y) {
+	for (y = 0; y < (size_t)rect.height; ++y) {
 		free(row_pointers[y]);
 	}
 	free(row_pointers);
