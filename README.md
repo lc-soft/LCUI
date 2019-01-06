@@ -69,10 +69,10 @@ Want to know what LCUI can do? You can view the following projects:
 
 ## Documentation
 
-- Tutorial: [https://lcui.lc-soft.io/guide/](https://lcui.lc-soft.io/guide/)
+- Tutorial: [https://docs.lcui.lc-soft.io/](https://docs.lcui.lc-soft.io/) 
 - Changelog: [docs/CHANGES.md](docs/CHANGES.md)
 
-API reference documentation has not yet been prepared, you can refer to the header files, source code, and tests.
+The English version of the documentation is not available, please check the files in the [test](test) directory and the source code of the related projects above.
 
 ## Building
 
