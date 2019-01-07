@@ -31,26 +31,6 @@
 #ifndef LCUI_UTIL_STRING_H
 #define LCUI_UTIL_STRING_H
 
-#ifdef LCUI_BUILD_IN_WIN32
-#include <tchar.h>
-#define strcasecmp _stricmp
-#else
-#ifdef _UNICODE
-#define __T(x) L##x
-#define _T(x) __T(x)
-#else
-#define __T(x) x
-#define _T(x) __T(x)
-#endif
-#endif
-
-#ifndef _TCHAR_DEFINED
-#if !__STDC__
-typedef char TCHAR;
-#endif
-#define _TCHAR_DEFINED
-#endif
-
 LCUI_BEGIN_HEADER
 
 /** strdup() 的再实现版本，用于清除编译错误 */

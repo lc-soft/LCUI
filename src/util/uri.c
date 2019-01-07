@@ -35,6 +35,7 @@
 #include <LCUI/util/uri.h>
 
 #if defined(LCUI_BUILD_IN_WIN32) && !defined(WINAPI_PARTITION_APP)
+#pragma warning(disable:4091)
 #include <Windows.h>
 #include <ShlObj.h>
 

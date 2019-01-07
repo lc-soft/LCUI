@@ -158,12 +158,12 @@ static int OnParseNumber(LCUI_CSSParserStyleContext ctx, const char *str)
 static int OnParseBoolean(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	LCUI_Style s = &ctx->sheet->sheet[ctx->parser->key];
-	if (strcasecmp(str, "true") == 0) {
+	if (strcmp(str, "true") == 0) {
 		s->is_valid = TRUE;
 		s->type = LCUI_STYPE_BOOL;
 		s->value = TRUE;
 		return 0;
-	} else if (strcasecmp(str, "false") == 0) {
+	} else if (strcmp(str, "false") == 0) {
 		s->is_valid = TRUE;
 		s->type = LCUI_STYPE_BOOL;
 		s->value = FALSE;
@@ -487,7 +487,7 @@ static int OnParseBoxShadow(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	LCUI_StyleRec s[5];
 	LCUI_StyleSheet ss = ctx->sheet;
-	if (strcasecmp(str, "none") == 0) {
+	if (strcmp(str, "none") == 0) {
 		SetStyle(ss, key_box_shadow_x, 0, none);
 		SetStyle(ss, key_box_shadow_y, 0, none);
 		SetStyle(ss, key_box_shadow_blur, 0, none);
