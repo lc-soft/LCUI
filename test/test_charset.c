@@ -2,7 +2,7 @@
 #include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/util/logger.h>
-#include <LCUI/font/charset.h>
+#include <LCUI/util/charset.h>
 #include "test.h"
 
 int test_charset(void)

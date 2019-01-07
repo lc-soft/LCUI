@@ -1,8 +1,8 @@
 ﻿/*
- * util.h -- Utilities
+ * charset.h -- The charset opreation set.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -28,21 +28,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_UTIL_H
-#define LCUI_UTIL_H
-#include <LCUI/util/math.h>
-#include <LCUI/util/time.h>
-#include <LCUI/util/dirent.h>
-#include <LCUI/util/rbtree.h>
-#include <LCUI/util/linkedlist.h>
-#include <LCUI/util/dict.h>
-#include <LCUI/util/rect.h>
-#include <LCUI/util/steptimer.h>
-#include <LCUI/util/string.h>
-#include <LCUI/util/parse.h>
-#include <LCUI/util/event.h>
-#include <LCUI/util/logger.h>
-#include <LCUI/util/task.h>
-#include <LCUI/util/uri.h>
-#include <LCUI/util/charset.h>
+#ifndef LCUI_CHARSET_H
+#define LCUI_CHARSET_H
+
+LCUI_BEGIN_HEADER
+
+enum EncodingType { ENCODING_ANSI, ENCODING_UTF8 };
+
+#define LCUI_DecodeUTF8String(WSTR, STR, MAX_LEN) \
+	LCUI_DecodeString(WSTR, STR, MAX_LEN, ENCODING_UTF8)
+
+#define LCUI_EncodeUTF8String(STR, WSTR, MAX_LEN) \
+	LCUI_EncodeString(STR, WSTR, MAX_LEN, ENCODING_UTF8)
+
+LCUI_API size_t LCUI_DecodeString(wchar_t *wstr, const char *str,
+				  size_t max_len, int encoding);
+
+LCUI_API size_t LCUI_EncodeString(char *str, const wchar_t *wstr,
+				  size_t max_len, int encoding);
+LCUI_END_HEADER
+
 #endif

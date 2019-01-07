@@ -294,6 +294,9 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_tree.h">
       <Filter>头文件\LCUI\gui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\charset.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -304,9 +307,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\thread\win32\thread.c">
       <Filter>源文件\thread\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\font\charset.c">
-      <Filter>源文件\font</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\font\fontlibrary.c">
       <Filter>源文件\font</Filter>
@@ -523,6 +523,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\gui\widget_tree.c">
       <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\charset.c">
+      <Filter>源文件\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

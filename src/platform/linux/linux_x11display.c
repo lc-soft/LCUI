@@ -36,7 +36,6 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/display.h>
 #include <LCUI/platform.h>
-#include <LCUI/font/charset.h>
 #include LCUI_DISPLAY_H
 #include LCUI_EVENTS_H
 

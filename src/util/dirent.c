@@ -31,8 +31,9 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
-#include <LCUI/font/charset.h>
+#include <LCUI/types.h>
+#include <LCUI/util/charset.h>
+#include <LCUI/util/dirent.h>
 
 int LCUI_OpenDirA(const char *path, LCUI_Dir *dir)
 {
