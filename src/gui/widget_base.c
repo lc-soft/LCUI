@@ -116,7 +116,7 @@ static void Widget_Init(LCUI_Widget widget)
 	widget->computed_style.focusable = FALSE;
 	widget->computed_style.display = SV_BLOCK;
 	widget->computed_style.position = SV_STATIC;
-	widget->computed_style.pointer_events = SV_AUTO;
+	widget->computed_style.pointer_events = SV_INHERIT;
 	widget->computed_style.box_sizing = SV_CONTENT_BOX;
 	widget->computed_style.margin.top.type = LCUI_STYPE_PX;
 	widget->computed_style.margin.right.type = LCUI_STYPE_PX;
@@ -1136,7 +1136,7 @@ void Widget_UpdateSizeWithSurface(LCUI_Widget w)
 void Widget_UpdateProps(LCUI_Widget w)
 {
 	LCUI_Style s;
-	int prop = ComputeStyleOption(w, key_pointer_events, SV_AUTO);
+	int prop = ComputeStyleOption(w, key_pointer_events, SV_INHERIT);
 	w->computed_style.pointer_events = prop;
 	s = &w->style->sheet[key_focusable];
 	if (s->is_valid && s->type == LCUI_STYPE_BOOL && s->value == 0) {

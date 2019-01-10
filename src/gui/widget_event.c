@@ -306,8 +306,8 @@ static void DestroyTouchCapturer(void *arg)
 }
 
 #define TouchCapturers_Clear(LIST) \
-	\
-LinkedList_ClearData(LIST, DestroyTouchCapturer)
+                                   \
+	LinkedList_ClearData(LIST, DestroyTouchCapturer)
 
 static int TouchCapturers_Add(LinkedList *list, LCUI_Widget w, int point_id)
 {
@@ -427,7 +427,7 @@ int LCUIWidget_GetEventId(const char *event_name)
 
 int Widget_BindEventById(LCUI_Widget widget, int event_id,
 			 LCUI_WidgetEventFunc func, void *data,
-			 void(*destroy_data)(void *))
+			 void (*destroy_data)(void *))
 {
 	WidgetEventHandler handler;
 	handler = NEW(WidgetEventHandlerRec, 1);
@@ -435,16 +435,16 @@ int Widget_BindEventById(LCUI_Widget widget, int event_id,
 	handler->data = data;
 	handler->destroy_data = destroy_data;
 	return EventTrigger_Bind(widget->trigger, event_id,
-		(LCUI_EventFunc)WidgetEventTranslator, handler,
+				 (LCUI_EventFunc)WidgetEventTranslator, handler,
 				 DestroyWidgetEventHandler);
 }
 
 int Widget_BindEvent(LCUI_Widget widget, const char *event_name,
 		     LCUI_WidgetEventFunc func, void *data,
-		     void(*destroy_data)(void *))
+		     void (*destroy_data)(void *))
 {
-	return Widget_BindEventById(widget, GetEventId(event_name),
-				    func, data, destroy_data);
+	return Widget_BindEventById(widget, GetEventId(event_name), func, data,
+				    destroy_data);
 }
 
 static int CompareEventHandlerKey(void *key, void *func_data)
@@ -484,6 +484,7 @@ static LCUI_Widget Widget_GetNextAt(LCUI_Widget widget, int x, int y)
 {
 	LCUI_Widget w;
 	LinkedListNode *node;
+
 	node = &widget->node;
 	for (node = node->next; node; node = node->next) {
 		w = node->data;
@@ -581,7 +582,7 @@ static void OnWidgetEvent(LCUI_Event e, LCUI_WidgetEventPack pack)
 }
 
 LCUI_BOOL Widget_PostEvent(LCUI_Widget widget, LCUI_WidgetEvent ev, void *data,
-			   void(*destroy_data)(void *))
+			   void (*destroy_data)(void *))
 {
 	LCUI_Event sys_ev;
 	LCUI_TaskRec task;
@@ -648,67 +649,179 @@ int Widget_StopEventPropagation(LCUI_Widget widget)
 	return 0;
 }
 
-/** 更新状态 */
-static void Widget_UpdateStatusByPointer(LCUI_Widget widget, int type)
+static LCUI_Widget GetSameParent(LCUI_Widget a, LCUI_Widget b)
 {
 	int depth = 0, i;
-	LCUI_WidgetEventRec e;
-	const char *sname = (type == WST_HOVER ? "hover" : "active");
-	LCUI_Widget w, root, new_w = widget, old_w = self.targets[type];
+	LCUI_Widget w, root;
 
-	if (self.targets[type] == widget) {
-		return;
-	}
 	root = LCUIWidget_GetRoot();
-	self.targets[type] = widget;
-	/* 先计算两个部件的嵌套深度的差值 */
-	for (w = new_w; w != root && w; w = w->parent) {
+	for (w = a; w != root && w; w = w->parent) {
 		++depth;
 	}
-	i = depth;
-	for (w = old_w; w != root && w; w = w->parent) {
-		if (w->state == LCUI_WSTATE_DELETED) {
-			depth = i;
-			old_w = w;
-		}
+	for (w = b; w != root && w; w = w->parent) {
 		--depth;
 	}
-	i = depth > 0 ? depth : -depth;
-	/* 然后向父级遍历，直到两个部件的父级部件相同为止 */
-	while (new_w != old_w) {
-		/* 如果是新部件嵌套得较深，则先遍历几次直到深度相同时再一起遍历
-		 */
-		if (new_w && (i == 0 || (i > 0 && depth > 0))) {
-			Widget_AddStatus(new_w, sname);
-			if (type == WST_HOVER) {
-				e.target = w;
-				e.type = LCUI_WEVENT_MOUSEOVER;
-				e.cancel_bubble = FALSE;
-				Widget_PostEvent(new_w, &e, NULL, NULL);
-			}
-			new_w = new_w->parent;
+	if (depth > 0) {
+		for (i = 0; i < depth; ++i) {
+			a = a->parent;
 		}
-		if (old_w && (i == 0 || (i > 0 && depth < 0))) {
-			Widget_RemoveStatus(old_w, sname);
-			if (type == WST_HOVER) {
-				e.target = old_w;
-				e.type = LCUI_WEVENT_MOUSEOUT;
-				e.cancel_bubble = FALSE;
-				Widget_PostEvent(old_w, &e, NULL, NULL);
-			}
-			old_w = old_w->parent;
+	} else {
+		for (i = 0; i < -depth; ++i) {
+			b = b->parent;
 		}
-		i > 0 ? --i : 0;
+	}
+	while (a && b && a != b) {
+		a = a->parent;
+		b = b->parent;
+	}
+	if (a && a == b && a != root) {
+		return a;
+	}
+	return NULL;
+}
+
+static LCUI_Widget Widget_GetActualEventTarget(LCUI_Widget widget)
+{
+	LCUI_BOOL found = FALSE;
+	LCUI_Widget w = widget;
+	LCUI_Widget target = NULL;
+	LCUI_Widget root = LCUIWidget_GetRoot();
+
+	while (w && w != root) {
+		if (w->state == LCUI_WSTATE_DELETED ||
+		    w->computed_style.pointer_events == SV_NONE) {
+			target = w->parent;
+			found = TRUE;
+		} else if (!found &&
+			   w->computed_style.pointer_events == SV_AUTO) {
+			return widget;
+		}
+		w = w->parent;
+	}
+	if (found) {
+		return target;
+	}
+	return widget;
+}
+
+static void Widget_TriggerMouseOverEvent(LCUI_Widget widget, LCUI_Widget parent)
+{
+	LCUI_Widget w;
+	LCUI_WidgetEventRec ev = { 0 };
+
+	ev.cancel_bubble = FALSE;
+	ev.type = LCUI_WEVENT_MOUSEOVER;
+	for (w = widget; w && w != parent; w = w->parent) {
+		ev.target = w;
+		Widget_AddStatus(w, "hover");
+		Widget_TriggerEvent(w, &ev, NULL);
+	}
+}
+
+static void Widget_TriggerMouseOutEvent(LCUI_Widget widget, LCUI_Widget parent)
+{
+	LCUI_Widget w;
+	LCUI_WidgetEventRec ev = { 0 };
+
+	ev.cancel_bubble = FALSE;
+	ev.type = LCUI_WEVENT_MOUSEOUT;
+	for (w = widget; w && w != parent; w = w->parent) {
+		ev.target = w;
+		Widget_RemoveStatus(w, "hover");
+		Widget_TriggerEvent(w, &ev, NULL);
+	}
+}
+
+static void Widget_OnMouseOverEvent(LCUI_Widget widget)
+{
+	LCUI_Widget parent = NULL;
+
+	if (self.targets[WST_HOVER] == widget) {
+		return;
+	}
+	if (widget && self.targets[WST_HOVER]) {
+		parent = GetSameParent(widget, self.targets[WST_HOVER]);
+	}
+	if (widget) {
+		Widget_TriggerMouseOverEvent(widget, parent);
+	}
+	if (self.targets[WST_HOVER]) {
+		Widget_TriggerMouseOutEvent(self.targets[WST_HOVER], parent);
+	}
+	self.targets[WST_HOVER] = widget;
+}
+
+static void Widget_OnMouseDownEvent(LCUI_Widget widget)
+{
+	LCUI_Widget w, parent;
+
+	if (self.targets[WST_ACTIVE] == widget) {
+		return;
+	}
+	parent = GetSameParent(widget, self.targets[WST_ACTIVE]);
+	for (w = self.targets[WST_ACTIVE]; w && w != parent; w = w->parent) {
+		Widget_RemoveStatus(w, "active");
+	}
+	for (w = widget; w && w != parent; w = w->parent) {
+		Widget_AddStatus(w, "active");
+	}
+	self.targets[WST_ACTIVE] = widget;
+}
+
+static void ClearMouseOverTarget(LCUI_Widget target)
+{
+	LCUI_Widget w;
+
+	if (!target) {
+		Widget_OnMouseOverEvent(NULL);
+		return;
+	}
+	for (w = self.targets[WST_HOVER]; w; w = w->parent) {
+		if (w == target) {
+			Widget_OnMouseOverEvent(NULL);
+			break;
+		}
+	}
+}
+
+static void ClearMouseDownTarget(LCUI_Widget target)
+{
+	LCUI_Widget w;
+
+	if (!target) {
+		Widget_OnMouseDownEvent(NULL);
+		return;
+	}
+	for (w = self.targets[WST_ACTIVE]; w; w = w->parent) {
+		if (w == target) {
+			Widget_OnMouseDownEvent(NULL);
+			break;
+		}
+	}
+}
+
+static void ClearFocusTarget(LCUI_Widget target)
+{
+	LCUI_Widget w;
+
+	if (!target) {
+		self.targets[WST_FOCUS] = NULL;
+		return;
+	}
+	for (w = self.targets[WST_FOCUS]; w; w = w->parent) {
+		if (w == target) {
+			self.targets[WST_FOCUS] = NULL;
+			break;
+		}
 	}
 }
 
 void LCUIWidget_ClearEventTarget(LCUI_Widget widget)
 {
-	int i;
-	LCUI_Widget w;
 	LinkedListNode *node;
 	WidgetEventRecord record;
 	LCUI_WidgetEventPack pack;
+
 	LCUIMutex_Lock(&self.mutex);
 	record = RBTree_CustomGetData(&self.event_records, widget);
 	if (record) {
@@ -719,18 +832,9 @@ void LCUIWidget_ClearEventTarget(LCUI_Widget widget)
 		}
 	}
 	LCUIMutex_Unlock(&self.mutex);
-	for (i = 0; i < WST_TOTAL; ++i) {
-		if (!widget) {
-			Widget_UpdateStatusByPointer(NULL, i);
-			continue;
-		}
-		for (w = self.targets[i]; w; w = w->parent) {
-			if (w == widget) {
-				Widget_UpdateStatusByPointer(NULL, i);
-				break;
-			}
-		}
-	}
+	ClearMouseOverTarget(widget);
+	ClearMouseDownTarget(widget);
+	ClearFocusTarget(widget);
 }
 
 int LCUIWidget_SetFocus(LCUI_Widget widget)
@@ -772,6 +876,7 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 	LCUI_Pos pos;
 	LCUI_Widget target, w;
 	LCUI_WidgetEventRec ev = { 0 };
+
 	w = LCUIWidget_GetRoot();
 	LCUICursor_GetPos(&pos);
 	scale = LCUIMetrics_GetScale();
@@ -781,8 +886,9 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 		target = self.mouse_capturer;
 	} else {
 		target = Widget_At(w, pos.x, pos.y);
+		target = Widget_GetActualEventTarget(target);
 		if (!target) {
-			Widget_UpdateStatusByPointer(NULL, WST_HOVER);
+			Widget_OnMouseOverEvent(NULL);
 			return;
 		}
 	}
@@ -813,7 +919,7 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 		}
 		self.click.time = LCUI_GetTime();
 		self.click.widget = target;
-		Widget_UpdateStatusByPointer(target, WST_ACTIVE);
+		Widget_OnMouseDownEvent(target);
 		LCUIWidget_SetFocus(target);
 		break;
 	case LCUI_MOUSEUP:
@@ -828,12 +934,12 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 			self.click.y = 0;
 			self.click.time = 0;
 			self.click.widget = NULL;
-			Widget_UpdateStatusByPointer(NULL, WST_ACTIVE);
+			Widget_OnMouseDownEvent(NULL);
 			break;
 		}
 		ev.type = LCUI_WEVENT_CLICK;
 		Widget_PostEvent(target, &ev, NULL, NULL);
-		Widget_UpdateStatusByPointer(NULL, WST_ACTIVE);
+		Widget_OnMouseDownEvent(NULL);
 		if (self.click.widget != target) {
 			self.click.x = 0;
 			self.click.y = 0;
@@ -849,7 +955,7 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 			self.click.widget = NULL;
 			Widget_PostEvent(target, &ev, NULL, NULL);
 		}
-		Widget_UpdateStatusByPointer(NULL, WST_ACTIVE);
+		Widget_OnMouseDownEvent(NULL);
 		break;
 	case LCUI_MOUSEMOVE:
 		ev.type = LCUI_WEVENT_MOUSEMOVE;
@@ -871,7 +977,7 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 	default:
 		return;
 	}
-	Widget_UpdateStatusByPointer(target, WST_HOVER);
+	Widget_OnMouseOverEvent(target);
 }
 
 static void OnKeyboardEvent(LCUI_SysEvent e, void *arg)
@@ -1113,33 +1219,33 @@ void LCUIWidget_InitEvent(void)
 		int id;
 		const char *name;
 	} mappings[] = { { LCUI_WEVENT_LINK, "link" },
-	{ LCUI_WEVENT_UNLINK, "unlink" },
-	{ LCUI_WEVENT_READY, "ready" },
-	{ LCUI_WEVENT_DESTROY, "destroy" },
-	{ LCUI_WEVENT_MOUSEDOWN, "mousedown" },
-	{ LCUI_WEVENT_MOUSEUP, "mouseup" },
-	{ LCUI_WEVENT_MOUSEMOVE, "mousemove" },
-	{ LCUI_WEVENT_MOUSEWHEEL, "mousewheel" },
-	{ LCUI_WEVENT_CLICK, "click" },
-	{ LCUI_WEVENT_DBLCLICK, "dblclick" },
-	{ LCUI_WEVENT_MOUSEOUT, "mouseout" },
-	{ LCUI_WEVENT_MOUSEOVER, "mouseover" },
-	{ LCUI_WEVENT_KEYDOWN, "keydown" },
-	{ LCUI_WEVENT_KEYUP, "keyup" },
-	{ LCUI_WEVENT_KEYPRESS, "keypress" },
-	{ LCUI_WEVENT_TOUCH, "touch" },
-	{ LCUI_WEVENT_TEXTINPUT, "textinput" },
-	{ LCUI_WEVENT_TOUCHDOWN, "touchdown" },
-	{ LCUI_WEVENT_TOUCHMOVE, "touchmove" },
-	{ LCUI_WEVENT_TOUCHUP, "touchup" },
-	{ LCUI_WEVENT_RESIZE, "resize" },
-	{ LCUI_WEVENT_AFTERLAYOUT, "afterlayout" },
-	{ LCUI_WEVENT_FOCUS, "focus" },
-	{ LCUI_WEVENT_BLUR, "blur" },
-	{ LCUI_WEVENT_SHOW, "show" },
-	{ LCUI_WEVENT_HIDE, "hide" },
-	{ LCUI_WEVENT_SURFACE, "surface" },
-	{ LCUI_WEVENT_TITLE, "title" } };
+			 { LCUI_WEVENT_UNLINK, "unlink" },
+			 { LCUI_WEVENT_READY, "ready" },
+			 { LCUI_WEVENT_DESTROY, "destroy" },
+			 { LCUI_WEVENT_MOUSEDOWN, "mousedown" },
+			 { LCUI_WEVENT_MOUSEUP, "mouseup" },
+			 { LCUI_WEVENT_MOUSEMOVE, "mousemove" },
+			 { LCUI_WEVENT_MOUSEWHEEL, "mousewheel" },
+			 { LCUI_WEVENT_CLICK, "click" },
+			 { LCUI_WEVENT_DBLCLICK, "dblclick" },
+			 { LCUI_WEVENT_MOUSEOUT, "mouseout" },
+			 { LCUI_WEVENT_MOUSEOVER, "mouseover" },
+			 { LCUI_WEVENT_KEYDOWN, "keydown" },
+			 { LCUI_WEVENT_KEYUP, "keyup" },
+			 { LCUI_WEVENT_KEYPRESS, "keypress" },
+			 { LCUI_WEVENT_TOUCH, "touch" },
+			 { LCUI_WEVENT_TEXTINPUT, "textinput" },
+			 { LCUI_WEVENT_TOUCHDOWN, "touchdown" },
+			 { LCUI_WEVENT_TOUCHMOVE, "touchmove" },
+			 { LCUI_WEVENT_TOUCHUP, "touchup" },
+			 { LCUI_WEVENT_RESIZE, "resize" },
+			 { LCUI_WEVENT_AFTERLAYOUT, "afterlayout" },
+			 { LCUI_WEVENT_FOCUS, "focus" },
+			 { LCUI_WEVENT_BLUR, "blur" },
+			 { LCUI_WEVENT_SHOW, "show" },
+			 { LCUI_WEVENT_HIDE, "hide" },
+			 { LCUI_WEVENT_SURFACE, "surface" },
+			 { LCUI_WEVENT_TITLE, "title" } };
 
 	LCUIMutex_Init(&self.mutex);
 	RBTree_Init(&self.event_names);

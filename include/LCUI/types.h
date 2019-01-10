@@ -131,6 +131,7 @@ typedef struct LCUI_Rect2F_ {
 typedef enum LCUI_StyleValue {
 	SV_NONE,
 	SV_AUTO,
+	SV_INHERIT,
 	SV_CONTAIN,
 	SV_COVER,
 	SV_LEFT,
