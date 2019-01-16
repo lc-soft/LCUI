@@ -69,24 +69,35 @@ void LCUIWorker_PostTask(LCUI_Worker worker, LCUI_Task task)
 	LCUIMutex_Unlock(&worker->mutex);
 }
 
-LCUI_BOOL LCUIWorker_RunTask(LCUI_Worker worker)
+LCUI_Task LCUIWorker_GetTask(LCUI_Worker worker)
 {
 	LCUI_Task task;
 	LinkedListNode *node;
-	LCUIMutex_Lock(&worker->mutex);
+
 	node = LinkedList_GetNode(&worker->tasks, 0);
-	if (node) {
-		task = node->data;
-		LinkedList_Unlink(&worker->tasks, node);
-		LCUIMutex_Unlock(&worker->mutex);
-		LCUITask_Run(task);
-		LCUITask_Destroy(task);
-		free(task);
-		free(node);
-		return TRUE;
+	if (!node) {
+		return NULL;
 	}
+	task = node->data;
+	LinkedList_Unlink(&worker->tasks, node);
+	free(node);
+	return task;
+}
+
+LCUI_BOOL LCUIWorker_RunTask(LCUI_Worker worker)
+{
+	LCUI_Task task;
+
+	LCUIMutex_Lock(&worker->mutex);
+	task = LCUIWorker_GetTask(worker);
 	LCUIMutex_Unlock(&worker->mutex);
-	return FALSE;
+	if (!task) {
+		return FALSE;
+	}
+	LCUITask_Run(task);
+	LCUITask_Destroy(task);
+	free(task);
+	return TRUE;
 }
 
 static void OnDeleteTask(void *arg)
@@ -106,10 +117,18 @@ static void LCUIWorker_ExecDestroy(LCUI_Worker worker)
 
 static void LCUIWorker_Thread(void *arg)
 {
+	LCUI_Task task;
 	LCUI_Worker worker = arg;
+
 	LCUIMutex_Lock(&worker->mutex);
 	while (worker->active) {
-		if (LCUIWorker_RunTask(worker)) {
+		task = LCUIWorker_GetTask(worker);
+		if (task) {
+			LCUIMutex_Unlock(&worker->mutex);
+			LCUITask_Run(task);
+			LCUITask_Destroy(task);
+			free(task);
+			LCUIMutex_Lock(&worker->mutex);
 			continue;
 		}
 		if (worker->active) {
