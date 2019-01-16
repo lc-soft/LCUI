@@ -143,6 +143,31 @@ int wcstrim(wchar_t *outstr, const wchar_t *instr, const wchar_t *charlist)
 	STRTRIM_CODE(wchar_t, outstr, instr, charlist, L"\t\n\r ");
 }
 
+size_t strreplace(char *str, size_t max_len, const char *substr,
+		  const char *newstr)
+{
+	size_t len, buf_len;
+	char *buf, *pout, *pin;
+
+	pin = strstr(str, substr);
+	if (!pin) {
+		return 0;
+	}
+	len = strlen(newstr);
+	buf_len = strlen(str) + len + 1;
+	buf = malloc(buf_len * sizeof(wchar_t));
+	strcpy(buf, str);
+	pout = buf + (pin - str);
+	strcpy(pout, newstr);
+	pin += strlen(substr);
+	pout += len;
+	strcpy(pout, pin);
+	buf[buf_len - 1] = 0;
+	strncpy(str, buf, max_len);
+	free(buf);
+	return min(buf_len, max_len);
+}
+
 size_t wcsreplace(wchar_t *str, size_t max_len, const wchar_t *substr,
 		  const wchar_t *newstr)
 {

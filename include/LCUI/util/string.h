@@ -63,10 +63,13 @@ LCUI_API int wcstrim(wchar_t *outstr, const wchar_t *instr,
  * @param[in] max_len 输出字符串的最大长度
  * @param[in] substr 字符串中需要被替换的子字符串
  * @param[in] newstr 替换的新字符串
- * @returns 替换后的字符串长度
+ * @returns 替换后的字符串长度，若未替换，则返回 0
  */
 LCUI_API size_t wcsreplace(wchar_t *str, size_t max_len, const wchar_t *substr,
 			   const wchar_t *newstr);
+
+LCUI_API size_t strreplace(char *str, size_t max_len, const char *substr,
+			   const char *newstr);
 
 /**
  * 分割命令行字符串
