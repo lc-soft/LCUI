@@ -161,12 +161,12 @@ static int OnParseBoolean(LCUI_CSSParserStyleContext ctx, const char *str)
 	if (strcmp(str, "true") == 0) {
 		s->is_valid = TRUE;
 		s->type = LCUI_STYPE_BOOL;
-		s->value = TRUE;
+		s->val_bool = TRUE;
 		return 0;
 	} else if (strcmp(str, "false") == 0) {
 		s->is_valid = TRUE;
 		s->type = LCUI_STYPE_BOOL;
-		s->value = FALSE;
+		s->val_bool = FALSE;
 		return 0;
 	}
 	if (strcmp("auto", str) == 0) {

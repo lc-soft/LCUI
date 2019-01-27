@@ -837,14 +837,24 @@ void LCUIWidget_ClearEventTarget(LCUI_Widget widget)
 	ClearFocusTarget(widget);
 }
 
+static LCUI_BOOL Widget_Focusable(LCUI_Widget w)
+{
+	return w && w->computed_style.pointer_events != SV_NONE &&
+	       w->computed_style.focusable && !w->disabled;
+}
+
+LCUI_Widget LCUIWidget_GetFocus(void)
+{
+	return self.targets[WST_FOCUS];
+}
+
 int LCUIWidget_SetFocus(LCUI_Widget widget)
 {
 	LCUI_Widget w;
 	LCUI_WidgetEventRec ev;
-	/* 开始处理焦点 */
+
 	for (w = widget; w; w = w->parent) {
-		if (w->computed_style.pointer_events != SV_NONE &&
-		    w->computed_style.focusable && !w->disabled) {
+		if (Widget_Focusable(w)) {
 			break;
 		}
 	}
@@ -856,8 +866,9 @@ int LCUIWidget_SetFocus(LCUI_Widget widget)
 		ev.target = self.targets[WST_FOCUS];
 		Widget_RemoveStatus(ev.target, "focus");
 		Widget_PostEvent(ev.target, &ev, NULL, NULL);
+		self.targets[WST_FOCUS] = NULL;
 	}
-	if (!w || !w->computed_style.focusable || w->disabled) {
+	if (!Widget_Focusable(w)) {
 		return -1;
 	}
 	ev.target = w;
@@ -887,15 +898,29 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 	} else {
 		target = Widget_At(w, pos.x, pos.y);
 		target = Widget_GetActualEventTarget(target);
-		if (!target) {
-			Widget_OnMouseOverEvent(NULL);
-			return;
-		}
 	}
 	for (w = target; w; w = w->parent) {
 		if (w->event_blocked) {
 			return;
 		}
+	}
+	if (!target) {
+		Widget_OnMouseOverEvent(NULL);
+		switch (sys_ev->type) {
+		case LCUI_MOUSEDOWN:
+			LCUIWidget_SetFocus(NULL);
+			break;
+		case LCUI_MOUSEUP:
+			if (sys_ev->button.button == LCUI_KEY_LEFTBUTTON) {
+				self.click.x = 0;
+				self.click.y = 0;
+				self.click.time = 0;
+				self.click.widget = NULL;
+				Widget_OnMouseDownEvent(NULL);
+				break;
+			}
+		}
+		return;
 	}
 	ev.target = target;
 	ev.cancel_bubble = FALSE;

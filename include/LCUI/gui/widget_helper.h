@@ -70,6 +70,9 @@ LCUI_API LCUI_Style Widget_GetStyle(LCUI_Widget w, int key);
 
 LCUI_API LCUI_Style Widget_GetInheritedStyle(LCUI_Widget w, int key);
 
+LCUI_API LCUI_BOOL Widget_CheckStyleBooleanValue(LCUI_Widget w, int key,
+						 LCUI_BOOL value);
+
 LCUI_API void Widget_SetVisibility(LCUI_Widget w, const char *value);
 
 LCUI_API void Widget_SetVisible(LCUI_Widget w);

@@ -62,10 +62,6 @@ const char *global_css = CodeToString(
 	margin: 0;
 }
 
-root{
-	focusable: true;
-}
-
 );
 
 /* clang-format on */

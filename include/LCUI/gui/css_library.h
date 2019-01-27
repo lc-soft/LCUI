@@ -167,7 +167,6 @@ typedef struct LCUI_SelectorRec_ {
 
 
 #define CheckStyleType(S, K, T) (S->sheet[K].is_valid && S->sheet[K].type == LCUI_STYPE_##T)
-#define CheckStyleValue(S, K, V) (S->sheet[K].is_valid && S->sheet[K].type == SV_##V)
 
 #define SetStyle(S, NAME, VAL, TYPE)	S->sheet[NAME].is_valid = TRUE, \
 					S->sheet[NAME].type = LCUI_STYPE_##TYPE, \

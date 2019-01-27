@@ -185,7 +185,10 @@ LCUI_API int Widget_PostSurfaceEvent(LCUI_Widget w, int event_type,
 /** 清除事件对象，通常在部件销毁时调用该函数，以避免部件销毁后还有事件发送给它 */
 LCUI_API void LCUIWidget_ClearEventTarget(LCUI_Widget widget);
 
-/** 将一个部件设置为焦点 */
+/** get current focused widget */
+LCUI_API LCUI_Widget LCUIWidget_GetFocus(void);
+
+    /** 将一个部件设置为焦点 */
 LCUI_API int LCUIWidget_SetFocus(LCUI_Widget widget);
 
 /** 停止部件的事件传播 */

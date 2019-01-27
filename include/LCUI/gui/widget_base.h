@@ -207,7 +207,6 @@ typedef struct LCUI_WidgetRec_ {
 #define Widget_SetStyle(W, K, V, T) SetStyle((W)->custom_style, K, V, T)
 #define Widget_UnsetStyle(W, K) UnsetStyle((W)->custom_style, K)
 #define Widget_CheckStyleType(W, K, T) CheckStyleType((W)->style, K, T)
-#define Widget_CheckStyleValue(W, K, T) CheckStyleValue((W)->style, K, T)
 #define Widget_CheckStyleValid(W, K) W->style->sheet[K].is_valid
 
 #define Widget_HasAbsolutePosition(W) \

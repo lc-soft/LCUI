@@ -130,6 +130,13 @@ LCUI_Style Widget_GetInheritedStyle(LCUI_Widget w, int key)
 	return &w->inherited_style->sheet[key];
 }
 
+LCUI_BOOL Widget_CheckStyleBooleanValue(LCUI_Widget w, int key, LCUI_BOOL value)
+{
+	LCUI_Style s = &w->style->sheet[key_focusable];
+
+	return s->is_valid && s->type == LCUI_STYPE_BOOL && s->val_bool == value;
+}
+
 void Widget_SetVisibility(LCUI_Widget w, const char *value)
 {
 	LCUI_Style s = Widget_GetStyle(w, key_visibility);
