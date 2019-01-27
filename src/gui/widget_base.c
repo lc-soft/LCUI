@@ -1,4 +1,4 @@
-﻿/*
+/*
  * widget_base.c -- The widget base operation set.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
@@ -39,8 +39,8 @@
 #include <LCUI/gui/metrics.h>
 
 static struct LCUI_WidgetModule {
-	LCUI_Widget root;       /**< 根级部件 */
-	LinkedList trash;	/**< 待删除的部件列表 */
+	LCUI_Widget root; /**< 根级部件 */
+	LinkedList trash; /**< 待删除的部件列表 */
 } LCUIWidget;
 
 static inline float ToBorderBoxWidth(LCUI_Widget w, float content_width)
@@ -399,7 +399,6 @@ void Widget_UpdateOpacity(LCUI_Widget w)
 	}
 	w->computed_style.opacity = opacity;
 	Widget_InvalidateArea(w, NULL, SV_GRAPH_BOX);
-	DEBUG_MSG("opacity: %0.2f\n", opacity);
 }
 
 void Widget_UpdateZIndex(LCUI_Widget w)
@@ -690,7 +689,6 @@ static void Widget_ComputeStaticContentSize(LCUI_Widget w, float *out_width,
 		*out_height = content_height;
 	}
 }
-
 LCUI_BOOL Widget_HasAutoStyle(LCUI_Widget w, int key)
 {
 	return !Widget_CheckStyleValid(w, key) ||
@@ -1149,16 +1147,20 @@ void Widget_UpdateProps(LCUI_Widget w)
 float Widget_ComputeMaxAvaliableWidth(LCUI_Widget widget)
 {
 	LCUI_Widget w;
-	float width = 0, padding = 0;
+	float width = 0, padding = 0, margin = 0;
+
 	for (w = widget->parent; w; w = w->parent) {
 		if (!Widget_HasAutoStyle(w, key_width) ||
 		    w->computed_style.max_width >= 0) {
 			width = w->box.content.width;
 			break;
 		}
+		if (Widget_HasFillAvailableWidth(w)) {
+			margin += w->box.outer.width - w->box.border.width;
+		}
 		padding += w->box.border.width - w->box.content.width;
 	}
-	width -= padding;
+	width -= padding + margin;
 	if (Widget_HasAbsolutePosition(widget)) {
 		width += widget->padding.left + widget->padding.right;
 	}
