@@ -35,8 +35,8 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
 
-void Widget_SetPadding(LCUI_Widget w, float top, float right,
-		       float bottom, float left)
+void Widget_SetPadding(LCUI_Widget w, float top, float right, float bottom,
+		       float left)
 {
 	Widget_SetStyle(w, key_padding_top, top, px);
 	Widget_SetStyle(w, key_padding_right, right, px);
@@ -45,8 +45,8 @@ void Widget_SetPadding(LCUI_Widget w, float top, float right,
 	Widget_UpdateStyle(w, FALSE);
 }
 
-void Widget_SetMargin(LCUI_Widget w, float top, float right,
-		      float bottom, float left)
+void Widget_SetMargin(LCUI_Widget w, float top, float right, float bottom,
+		      float left)
 {
 	Widget_SetStyle(w, key_margin_top, top, px);
 	Widget_SetStyle(w, key_margin_right, right, px);
@@ -88,8 +88,8 @@ void Widget_SetBorder(LCUI_Widget w, float width, int style, LCUI_Color color)
 	Widget_SetBorderStyle(w, style);
 }
 
-void Widget_SetBoxShadow(LCUI_Widget w, float x, float y,
-			 float blur, LCUI_Color color)
+void Widget_SetBoxShadow(LCUI_Widget w, float x, float y, float blur,
+			 LCUI_Color color)
 {
 	Widget_SetStyle(w, key_box_shadow_x, x, px);
 	Widget_SetStyle(w, key_box_shadow_y, y, px);
@@ -134,7 +134,8 @@ LCUI_BOOL Widget_CheckStyleBooleanValue(LCUI_Widget w, int key, LCUI_BOOL value)
 {
 	LCUI_Style s = &w->style->sheet[key_focusable];
 
-	return s->is_valid && s->type == LCUI_STYPE_BOOL && s->val_bool == value;
+	return s->is_valid && s->type == LCUI_STYPE_BOOL &&
+	       s->val_bool == value;
 }
 
 void Widget_SetVisibility(LCUI_Widget w, const char *value)
@@ -199,4 +200,16 @@ void Widget_SetBoxSizing(LCUI_Widget w, LCUI_StyleValue sizing)
 {
 	Widget_SetStyle(w, key_box_sizing, sizing, style);
 	Widget_UpdateStyle(w, FALSE);
+}
+
+LCUI_Widget Widget_GetClosest(LCUI_Widget w, const char *type)
+{
+	LCUI_Widget target;
+
+	for (target = w; target; target = target->parent) {
+		if (Widget_CheckType(target, type)) {
+			return target;
+		}
+	}
+	return NULL;
 }

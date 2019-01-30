@@ -89,6 +89,12 @@ LCUI_API void Widget_SetOpacity(LCUI_Widget w, float opacity);
 
 LCUI_API void Widget_SetBoxSizing(LCUI_Widget w, LCUI_StyleValue sizing);
 
+/**
+ * Get the first widget that match the type by testing the widget itself and
+ * traversing up through its ancestors.
+ */
+LCUI_API LCUI_Widget Widget_GetClosest(LCUI_Widget w, const char *type);
+
 LCUI_END_HEADER
 
 #endif
