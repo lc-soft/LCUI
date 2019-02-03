@@ -118,8 +118,9 @@ textview {
     background-color: rgba(86,61,124,.15);
 }
 .overflow-box {
-    height: 128px;
-    margin: 10px -15px;
+    min-height: 50px;
+    margin: -10px;
+    padding: 15px;
     text-align: center;
     background-color: #fafbfc;
     border: 1px solid #ddd;

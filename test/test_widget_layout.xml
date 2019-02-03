@@ -47,7 +47,14 @@
             </w>
           </w>
           <w id="picture" type="textview" class="picture">Picture</w>
-          <w id="overflow-box" class="overflow-box" type="textview">Overflow box</w>
+          <w id="overflow-box-1" class="overflow-box">
+            <w type="textview">Overflow box 1</w>
+            <w id="overflow-box-2" class="overflow-box" type="textview">
+              <w type="textview">Overflow box 2</w>
+              <w id="overflow-box-3" class="overflow-box" type="textview">Overflow box 3</w>
+            </w>
+          </w>
+          <w class="overflow-box" type="textview">Overflow box 4</w>
           <w id="offset-box" class="offset-box" type="textview">Offset box</w>
         </w>
         <w id="alert" class="alert">

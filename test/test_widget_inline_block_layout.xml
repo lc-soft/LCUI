@@ -21,6 +21,11 @@
       </w>
       <w id="test-block" class="box-3" />
     </w>
+    <w id="test-panel" class="panel">
+      <w id="test-panel-header" class="header" type="textview">Header</w>
+      <w id="test-panel-body" class="body"></w>
+      <w id="test-panel-footer" class="footer" type="textview">Footer</w>
+    </w>
     <w id="test-dropdown" class="dropdown-menu">
       <w id="test-text" type="textview" class="dropdown-item">Hello, World!</w>
       <w type="textview" class="dropdown-item">Test dropdown menu auto width</w>

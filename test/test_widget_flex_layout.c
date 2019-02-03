@@ -30,7 +30,7 @@ static int check_flex_box_1( void )
 	CHECK( box->height == BLOCK_SIZE * 3 + 1 );
 	for( LinkedList_Each( node, &box->children ) ) {
 		child = node->data;
-		sprintf( str, "[%d] (%g, %g) == (%g, %g)", child->index,
+		sprintf( str, "[%zu] (%g, %g) == (%g, %g)", child->index,
 			 child->x, child->y, simples[i][0], simples[i][1] );
 		CHECK_WITH_TEXT( str, child->x == simples[i][0] &&
 				 child->y == simples[i][1] );
@@ -60,7 +60,7 @@ static int check_flex_box_2( void )
 	CHECK( box->height == BLOCK_SIZE * 3 + 1 );
 	for( LinkedList_Each( node, &box->children ) ) {
 		child = node->data;
-		sprintf( str, "[%d] (%g, %g) == (%g, %g)", child->index,
+		sprintf( str, "[%zu] (%g, %g) == (%g, %g)", child->index,
 			 child->x, child->y, simples[i][0], simples[i][1] );
 		CHECK_WITH_TEXT( str, child->x == simples[i][0] &&
 				 child->y == simples[i][1] );
@@ -90,7 +90,7 @@ static int check_flex_box_3( void )
 	CHECK( box->height == BLOCK_SIZE * 3 + 1 );
 	for( LinkedList_Each( node, &box->children ) ) {
 		child = node->data;
-		sprintf( str, "[%d] (%g, %g) == (%g, %g)", child->index,
+		sprintf( str, "[%zu] (%g, %g) == (%g, %g)", child->index,
 			 child->x, child->y, simples[i][0], simples[i][1] );
 		CHECK_WITH_TEXT( str, child->x == simples[i][0] &&
 				 child->y == simples[i][1] );
@@ -116,7 +116,7 @@ static int check_flex_box_4( void )
 	CHECK( box->height == BLOCK_SIZE * 2 );
 	for( LinkedList_Each( node, &box->children ) ) {
 		child = node->data;
-		sprintf( str, "[%d] (%g, %g) == (%g, %g)", child->index,
+		sprintf( str, "[%zu] (%g, %g) == (%g, %g)", child->index,
 			 child->x, child->y, simples[i][0], simples[i][1] );
 		CHECK_WITH_TEXT( str, child->x == simples[i][0] &&
 				 child->y == simples[i][1] );
