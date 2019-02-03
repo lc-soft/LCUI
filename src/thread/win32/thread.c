@@ -55,6 +55,7 @@ static struct LCUIThreadModule {
 static unsigned __stdcall run_thread(void *arg)
 {
 	LCUI_ThreadContext thread;
+
 	thread = (LCUI_ThreadContext)arg;
 	thread->func(thread->arg);
 	return 0;
@@ -63,6 +64,7 @@ static unsigned __stdcall run_thread(void *arg)
 int LCUIThread_Create(LCUI_Thread *tid, void(*func)(void*), void *arg)
 {
 	LCUI_ThreadContext ctx;
+
 	if (!self.active) {
 		LinkedList_Init(&self.threads);
 		LCUIMutex_Init(&self.mutex);
@@ -93,6 +95,7 @@ static LCUI_ThreadContext LCUIThread_Find(LCUI_Thread tid)
 {
 	LinkedListNode *node;
 	LCUI_ThreadContext ctx;
+
 	for (LinkedList_Each(node, &self.threads)) {
 		ctx = node->data;
 		if (ctx && ctx->tid == tid) {
@@ -105,6 +108,7 @@ static LCUI_ThreadContext LCUIThread_Find(LCUI_Thread tid)
 static LCUI_ThreadContext LCUIThread_Get(LCUI_Thread tid)
 {
 	LCUI_ThreadContext ctx;
+
 	LCUIMutex_Lock(&self.mutex);
 	ctx = LCUIThread_Find(tid);
 	if (ctx) {
@@ -130,6 +134,7 @@ void LCUIThread_Exit(void *retval)
 {
 	LCUI_Thread tid;
 	LCUI_ThreadContext ctx;
+
 	tid = LCUIThread_SelfID();
 	ctx = LCUIThread_Get(tid);
 	if (!ctx) {
@@ -148,6 +153,7 @@ void LCUIThread_Cancel(LCUI_Thread tid)
 	abort();
 #else
 	LCUI_ThreadContext ctx;
+
 	ctx = LCUIThread_Get(tid);
 	if (ctx) {
 		TerminateThread(ctx->handle, 0);
@@ -160,6 +166,7 @@ int LCUIThread_Join(LCUI_Thread thread, void **retval)
 {
 	DWORD code;
 	LCUI_ThreadContext ctx;
+
 	LCUIMutex_Lock(&self.mutex);
 	ctx = LCUIThread_Find(thread);
 	if (ctx == NULL) {
@@ -168,9 +175,17 @@ int LCUIThread_Join(LCUI_Thread thread, void **retval)
 	}
 	ctx->has_waiter = TRUE;
 	LCUIMutex_Unlock(&self.mutex);
-	if (!GetExitCodeThread(ctx->handle, &code)) {
-		WaitForSingleObject(ctx->handle, 5000);
-	}
+	do {
+		code = 0;
+		if (GetExitCodeThread(ctx->handle, &code) == 0) {
+			break;
+		}
+		if (code == STILL_ACTIVE) {
+			WaitForSingleObject(ctx->handle, 5000);
+		} else {
+			break;
+		}
+	} while (1);
 	ctx = LCUIThread_Get(thread);
 	if (ctx) {
 		if (retval) {
