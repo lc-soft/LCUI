@@ -38,6 +38,8 @@
 #include <LCUI_Build.h>
 #include <LCUI/util/charset.h>
 
+/* clang-format off */
+
 #define MAX_SAVE_NUM 20
 
 #define UNI_SUR_HIGH_START  0xD800
@@ -49,12 +51,35 @@
    UTF-8. This is larger than UNICODE_MAXIMUM. */
 #define UNICODE_UTF8_4 0x1fffff
 
+/* clang-format on */
+
 #ifdef LCUI_BUILD_IN_WIN32
 #include <Windows.h>
-#define encode(CP, WSTR, STR, LEN) \
-	WideCharToMultiByte(CP, 0, WSTR, -1, STR, (int)LEN, NULL, NULL)
-#define decode(CP, STR, WSTR, LEN) \
-	MultiByteToWideChar(CP, 0, STR, -1, WSTR, (int)LEN)
+
+static size_t encode(char *str, const wchar_t *wcs, size_t maxlen, int codepage)
+{
+	size_t bytes;
+
+	bytes = WideCharToMultiByte(codepage, 0, wcs, -1, str, (int)maxlen,
+				    NULL, NULL);
+	if (bytes > 0 && bytes < maxlen) {
+		// Excluding the terminating NULL
+		bytes -= 1;
+	}
+	return bytes;
+}
+
+static size_t decode(wchar_t *wcs, const char *str, size_t maxlen, int codepage)
+{
+	size_t len;
+
+	len = MultiByteToWideChar(codepage, 0, str, -1, wcs, (int)maxlen);
+	if (len > 0 && len < maxlen) {
+		// Excluding the terminating NULL
+		len -= 1;
+	}
+	return len;
+}
 #endif
 
 static size_t utf8_to_ucs2(const char *utf8, wchar_t *ucs2)
@@ -180,7 +205,6 @@ static size_t DecodeUTF8(wchar_t *wcs, const char *str, size_t max_len)
 			}
 			count += 1;
 		}
-
 	}
 	return count;
 }
@@ -203,7 +227,7 @@ size_t EncodeToUTF8(char *str, const wchar_t *wcs, size_t max_len)
 				count -= n;
 				break;
 			}
-			strncpy(p, (char*)buf, n);
+			strncpy(p, (char *)buf, n);
 			p += n;
 			++wp;
 		}
@@ -226,7 +250,7 @@ size_t LCUI_DecodeString(wchar_t *wstr, const char *str, size_t max_len,
 	// 暂时不处理其它编码方式
 	switch (encoding) {
 	case ENCODING_ANSI:
-		return decode(CP_ACP, str, wstr, max_len);
+		return decode(wstr, str, max_len, CP_ACP);
 	case ENCODING_UTF8:
 		return DecodeUTF8(wstr, str, max_len);
 	default:
@@ -253,7 +277,7 @@ size_t LCUI_EncodeString(char *str, const wchar_t *wstr, size_t max_len,
 	default:
 		return 0;
 	}
-	return encode(cp, wstr, str, max_len);
+	return encode(str, wstr, max_len, cp);
 #else
 	return EncodeToUTF8(str, wstr, max_len);
 #endif

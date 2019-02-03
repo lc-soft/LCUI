@@ -15,19 +15,28 @@ int test_charset(void)
 	len = LCUI_DecodeUTF8String(wcs, "hello", 64);
 	CHECK_WITH_TEXT("test decode ascii string",
 			len == 5 && wcscmp(wcs, L"hello") == 0);
+#ifdef WIN32
+	len = LCUI_DecodeString(wcs, "简体中文", 64, ENCODING_ANSI);
+	CHECK_WITH_TEXT("test decode ansi string",
+			len == 4 && wcscmp(wcs, L"简体中文") == 0);
 
+	len = LCUI_EncodeString(str, L"简体中文", 64, ENCODING_ANSI);
+	CHECK_WITH_TEXT(
+	    "test encode unicode string to ansi",
+	    len == strlen("简体中文") && strcmp(str, "简体中文") == 0);
+#else
 	len = LCUI_DecodeUTF8String(wcs, "简体中文", 64);
 	CHECK_WITH_TEXT("test decode utf-8 string",
 			len == 4 && wcscmp(wcs, L"简体中文") == 0);
-
-	len = LCUI_EncodeUTF8String(str, L"hello", 64);
-	CHECK_WITH_TEXT("test encode ascii string to utf-8",
-			len == 5 && strcmp(str, "hello") == 0);
 
 	len = LCUI_EncodeUTF8String(str, L"简体中文", 64);
 	CHECK_WITH_TEXT(
 	    "test encode unicode string to utf-8",
 	    len == strlen("简体中文") && strcmp(str, "简体中文") == 0);
+#endif
+	len = LCUI_EncodeUTF8String(str, L"hello", 64);
+	CHECK_WITH_TEXT("test encode ascii string to utf-8",
+			len == 5 && strcmp(str, "hello") == 0);
 
 	return ret;
 }
