@@ -1,8 +1,8 @@
-﻿/*
- * util.h -- Utilities
+/*
+ * strpool.h -- string pool
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ * Copyright (c) 2019, Liu chao <lc-soft@live.cn> All rights reserved.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -28,22 +28,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_UTIL_H
-#define LCUI_UTIL_H
-#include <LCUI/util/math.h>
-#include <LCUI/util/time.h>
-#include <LCUI/util/dirent.h>
-#include <LCUI/util/rbtree.h>
-#include <LCUI/util/linkedlist.h>
-#include <LCUI/util/dict.h>
-#include <LCUI/util/rect.h>
-#include <LCUI/util/steptimer.h>
-#include <LCUI/util/string.h>
-#include <LCUI/util/strpool.h>
-#include <LCUI/util/parse.h>
-#include <LCUI/util/event.h>
-#include <LCUI/util/logger.h>
-#include <LCUI/util/task.h>
-#include <LCUI/util/uri.h>
-#include <LCUI/util/charset.h>
+#ifndef LCUI_UTIL_STRPOOL_H
+#define LCUI_UTIL_STRPOOL_H
+
+typedef struct strpool strpool_t;
+
+LCUI_API strpool_t *strpool_create(void);
+
+LCUI_API char *strpool_alloc_str(strpool_t *pool, const char *str);
+
+LCUI_API int strpool_free_str(char *str);
+
+LCUI_API size_t strpool_size(strpool_t *pool);
+
+LCUI_API void strpool_destroy(strpool_t *pool);
+
 #endif

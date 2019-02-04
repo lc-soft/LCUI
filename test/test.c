@@ -25,6 +25,7 @@ int main(void)
 #endif
 	ret += test_charset();
 	ret += test_string();
+	ret += test_strpool();
 	ret += test_thread();
 	ret += test_font_load();
 	ret += test_image_reader();

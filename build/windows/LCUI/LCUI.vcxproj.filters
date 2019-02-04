@@ -297,6 +297,9 @@
     <ClInclude Include="..\..\..\include\LCUI\util\charset.h">
       <Filter>头文件\LCUI\util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\strpool.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -525,6 +528,9 @@
       <Filter>源文件\gui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\util\charset.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\strpool.c">
       <Filter>源文件\util</Filter>
     </ClCompile>
   </ItemGroup>

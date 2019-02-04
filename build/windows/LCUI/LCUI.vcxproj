@@ -339,6 +339,7 @@
     <ClInclude Include="..\..\..\include\LCUI\util\rbtree.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\rect.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\string.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\strpool.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\task.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\time.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\uri.h" />
@@ -407,6 +408,7 @@
     <ClCompile Include="..\..\..\src\platform\windows\windows_keyboard.c" />
     <ClCompile Include="..\..\..\src\platform\windows\windows_mouse.c" />
     <ClCompile Include="..\..\..\src\util\charset.c" />
+    <ClCompile Include="..\..\..\src\util\strpool.c" />
     <ClCompile Include="..\..\..\src\util\task.c" />
     <ClCompile Include="..\..\..\src\util\uri.c" />
     <ClCompile Include="..\..\..\src\worker.c" />

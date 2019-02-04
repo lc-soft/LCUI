@@ -57,6 +57,9 @@
     <ClCompile Include="..\..\..\test\test_textview_resize.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\test_strpool.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\test\test.h">
