@@ -40,6 +40,7 @@
 #include <LCUI/util/steptimer.h>
 #include <LCUI/util/string.h>
 #include <LCUI/util/strpool.h>
+#include <LCUI/util/strlist.h>
 #include <LCUI/util/parse.h>
 #include <LCUI/util/event.h>
 #include <LCUI/util/logger.h>

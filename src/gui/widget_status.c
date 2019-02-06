@@ -37,10 +37,10 @@
 
 int Widget_AddStatus(LCUI_Widget w, const char *status_name)
 {
-	if (strshas(w->status, status_name)) {
+	if (strlist_has(w->status, status_name)) {
 		return 0;
 	}
-	if (strsadd(&w->status, status_name) <= 0) {
+	if (strlist_add(&w->status, status_name) <= 0) {
 		return 0;
 	}
 	Widget_HandleChildrenStyleChange(w, 1, status_name);
@@ -50,7 +50,7 @@ int Widget_AddStatus(LCUI_Widget w, const char *status_name)
 
 LCUI_BOOL Widget_HasStatus(LCUI_Widget w, const char *status_name)
 {
-	if (strshas(w->status, status_name)) {
+	if (strlist_has(w->status, status_name)) {
 		return TRUE;
 	}
 	return FALSE;
@@ -58,9 +58,9 @@ LCUI_BOOL Widget_HasStatus(LCUI_Widget w, const char *status_name)
 
 int Widget_RemoveStatus(LCUI_Widget w, const char *status_name)
 {
-	if (strshas(w->status, status_name)) {
+	if (strlist_has(w->status, status_name)) {
 		Widget_HandleChildrenStyleChange(w, 1, status_name);
-		strsdel(&w->status, status_name);
+		strlist_remove(&w->status, status_name);
 		Widget_UpdateStyle(w, TRUE);
 		return 1;
 	}
@@ -102,7 +102,7 @@ void Widget_SetDisabled(LCUI_Widget w, LCUI_BOOL disabled)
 void Widget_DestroyStatus(LCUI_Widget w)
 {
 	if (w->status) {
-		freestrs(w->status);
+		strlist_free(w->status);
 	}
 	w->status = NULL;
 }

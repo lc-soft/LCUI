@@ -31,6 +31,7 @@
 #ifndef LCUI_WIDGET_BASE_H
 #define LCUI_WIDGET_BASE_H
 
+#include <LCUI/util/strlist.h>
 #include <LCUI/gui/css_library.h>
 
 LCUI_BEGIN_HEADER
@@ -178,8 +179,8 @@ typedef struct LCUI_WidgetRec_ {
 	size_t			index;			/**< 部件索引位置 */
 	char			*id;			/**< ID */
 	char			*type;			/**< 类型 */
-	char			**classes;		/**< 类列表 */
-	char			**status;		/**< 状态列表 */
+	strlist_t		classes;		/**< 类列表 */
+	strlist_t		status;			/**< 状态列表 */
 	wchar_t			*title;			/**< 标题 */
 	LCUI_Rect2F		padding;		/**< 内边距框 */
 	LCUI_Rect2F		margin;			/**< 外边距框 */

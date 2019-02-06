@@ -1,4 +1,4 @@
-﻿/*
+/*
  * css_library.c -- CSS library operation module.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
@@ -367,12 +367,12 @@ static void SelectorNode_Copy(LCUI_SelectorNode dst, LCUI_SelectorNode src)
 	dst->fullname = src->fullname ? strdup2(src->fullname) : NULL;
 	if (src->classes) {
 		for (i = 0; src->classes[i]; ++i) {
-			sortedstrsadd(&dst->classes, src->classes[i]);
+			sortedstrlist_add(&dst->classes, src->classes[i]);
 		}
 	}
 	if (src->status) {
 		for (i = 0; src->status[i]; ++i) {
-			sortedstrsadd(&dst->status, src->status[i]);
+			sortedstrlist_add(&dst->status, src->status[i]);
 		}
 	}
 }
@@ -388,11 +388,11 @@ void SelectorNode_Delete(LCUI_SelectorNode node)
 		node->id = NULL;
 	}
 	if (node->classes) {
-		freestrs(node->classes);
+		strlist_free(node->classes);
 		node->classes = NULL;
 	}
 	if (node->status) {
-		freestrs(node->status);
+		strlist_free(node->status);
 		node->status = NULL;
 	}
 	if (node->fullname) {
@@ -740,12 +740,12 @@ static int SelectorNode_Save(LCUI_SelectorNode node, const char *name, int len,
 		node->type = str;
 		return TYPE_RANK;
 	case ':':
-		if (sortedstrsadd(&node->status, name) == 0) {
+		if (sortedstrlist_add(&node->status, name) == 0) {
 			return PCLASS_RANK;
 		}
 		break;
 	case '.':
-		if (sortedstrsadd(&node->classes, name) == 0) {
+		if (sortedstrlist_add(&node->classes, name) == 0) {
 			return CLASS_RANK;
 		}
 		break;

@@ -78,10 +78,10 @@ LCUI_SelectorNode Widget_GetSelectorNode(LCUI_Widget w)
 		sn->type = strdup2(w->type);
 	}
 	for (i = 0; w->classes && w->classes[i]; ++i) {
-		sortedstrsadd(&sn->classes, w->classes[i]);
+		sortedstrlist_add(&sn->classes, w->classes[i]);
 	}
 	for (i = 0; w->status && w->status[i]; ++i) {
-		sortedstrsadd(&sn->status, w->status[i]);
+		sortedstrlist_add(&sn->status, w->status[i]);
 	}
 	SelectorNode_Update(sn);
 	return sn;
@@ -94,6 +94,7 @@ LCUI_Selector Widget_GetSelector(LCUI_Widget w)
 	LCUI_Selector s;
 	LCUI_Widget parent;
 	LinkedListNode *node;
+
 	s = Selector(NULL);
 	LinkedList_Init(&list);
 	for (parent = w; parent; parent = parent->parent) {
@@ -183,7 +184,10 @@ int Widget_HandleChildrenStyleChange(LCUI_Widget w, int type, const char *name)
 	if (count > 0) {
 		Widget_AddTaskForChildren(w, LCUI_WTASK_REFRESH_STYLE);
 	}
-	freestrs(names);
+	for (i = 0; names[i]; ++i) {
+		free(names[i]);
+	}
+	free(names);
 	return count;
 }
 

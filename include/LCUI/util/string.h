@@ -87,39 +87,6 @@ LCUI_API int cmdsplit(const char *cmd, char ***outargv);
  */
 LCUI_API int strsplit(const char *instr, const char *sep, char ***outstrs);
 
-/**
- * 向字符串组添加字符串
- * @param[in][out] strlist 字符串组
- * @param[in] str 字符串
- */
-LCUI_API int strsadd(char ***strlist, const char *str);
-
-/**
- * 判断字符串组中是否包含指定字符串
- * @param[in][out] strlist 字符串组
- * @param[in] str 字符串
- * @returns 如果包含则返回 1， 否则返回 0
- */
-LCUI_API int strshas(char **strlist, const char *str);
-
-/**
- * 从字符串组中删除指定字符串
- * @param[in][out] strlist 字符串组
- * @param[in] str 字符串
- * @returns 如果删除成功则返回 1， 否则返回 0
- */
-LCUI_API int strsdel(char ***strlist, const char *str);
-
-/**
- * 向已排序的字符串组添加字符串
- * @param[in][out] strlist 字符串组
- * @param[in] str 字符串
- */
-LCUI_API int sortedstrsadd(char ***strlist, const char *str);
-
-/** 释放字符串组 */
-LCUI_API void freestrs(char **strs);
-
 LCUI_END_HEADER
 
 #endif

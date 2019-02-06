@@ -1,7 +1,7 @@
 ﻿/*
- * widget_class.c -- The widget class operation set.
+ * strlist.h -- string list
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2019, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,48 +28,48 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
-#include <LCUI/gui/widget_base.h>
-#include <LCUI/gui/widget_class.h>
-#include <LCUI/gui/widget_style.h>
+#ifndef LCUI_UTIL_STRLIST_H
+#define LCUI_UTIL_STRLIST_H
 
-int Widget_AddClass(LCUI_Widget w, const char *class_name)
-{
-	if (strlist_has(w->classes, class_name)) {
-		return 1;
-	}
-	if (strlist_add(&w->classes, class_name) <= 0) {
-		return 0;
-	}
-	Widget_HandleChildrenStyleChange(w, 0, class_name);
-	Widget_UpdateStyle(w, TRUE);
-	return 1;
-}
+typedef char** strlist_t;
 
-LCUI_BOOL Widget_HasClass(LCUI_Widget w, const char *class_name)
-{
-	if (strlist_has(w->classes, class_name)) {
-		return TRUE;
-	}
-	return FALSE;
-}
+LCUI_API int sortedstrlist_add(strlist_t *strlist, const char *str);
 
-int Widget_RemoveClass(LCUI_Widget w, const char *class_name)
-{
-	if (strlist_has(w->classes, class_name)) {
-		Widget_HandleChildrenStyleChange(w, 0, class_name);
-		strlist_remove(&w->classes, class_name);
-		Widget_UpdateStyle(w, TRUE);
-		return 1;
-	}
-	return 0;
-}
+LCUI_API int strlist_add_one(strlist_t *strlist, const char *str);
 
-void Widget_DestroyClasses(LCUI_Widget w)
-{
-	if (w->classes) {
-		strlist_free(w->classes);
-	}
-	w->classes = NULL;
-}
+LCUI_API int strlist_remove_one(strlist_t *strlist, const char *str);
+
+/**
+ * 向字符串组添加字符串
+ * @param[in][out] strlist 字符串组
+ * @param[in] str 字符串
+ */
+LCUI_API int strlist_add(strlist_t *strlist, const char *str);
+
+/**
+ * 判断字符串组中是否包含指定字符串
+ * @param[in][out] strlist 字符串组
+ * @param[in] str 字符串
+ * @returns 如果包含则返回 1， 否则返回 0
+ */
+LCUI_API int strlist_has(strlist_t strlist, const char *str);
+
+/**
+ * 从字符串组中移除指定字符串
+ * @param[in][out] strlist 字符串组
+ * @param[in] str 字符串
+ * @returns 如果删除成功则返回 1， 否则返回 0
+ */
+LCUI_API int strlist_remove(strlist_t *strlist, const char *str);
+
+/**
+ * 向已排序的字符串组添加字符串
+ * @param[in][out] strlist 字符串组
+ * @param[in] str 字符串
+ */
+LCUI_API int sortedstrlist_add(strlist_t *strlist, const char *str);
+
+/** 释放字符串组 */
+LCUI_API void strlist_free(strlist_t strs);
+
+#endif
