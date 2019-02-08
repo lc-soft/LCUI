@@ -82,11 +82,12 @@ typedef struct StyleLinkGroupRec_ {
 
 /** 样式结点记录 */
 typedef struct StyleNodeRec_ {
-	int rank;              /**< 权值，决定优先级 */
-	int batch_num;         /**< 批次号 */
-	char *space;           /**< 所属的空间 */
-	char *selector;        /**< 选择器 */
-	LCUI_StyleSheet sheet; /**< 样式表 */
+	int rank;		/**< 权值，决定优先级 */
+	int batch_num;		/**< 批次号 */
+	char *space;		/**< 所属的空间 */
+	char *selector;		/**< 选择器 */
+	LCUI_StyleList list;	/**< 样式表 */
+	LinkedListNode node;	/**< 在链表中的结点 */
 } StyleNodeRec, *StyleNode;
 
 /** 样式链接记录 */
@@ -111,6 +112,7 @@ static struct {
 	DictType style_link_dict;	/**< 样式链接表的类型 */
 	DictType style_group_dict;	/**< 样式组的类型 */
 	DictType cache_dict;		/**< 样式表缓存的类型 */
+	strpool_t *strpool;		/**< 字符串池 */
 	int count;			/**< 当前记录的属性数量 */
 } library;
 
@@ -429,10 +431,69 @@ void Selector_Delete(LCUI_Selector s)
 	free(s);
 }
 
+LCUI_StyleList StyleList(void)
+{
+	LCUI_StyleList list;
+
+	list = malloc(sizeof(LCUI_StyleListRec));
+	LinkedList_Init(list);
+	return list;
+}
+
+static void DestroyStyle(LCUI_Style s)
+{
+	switch (s->type) {
+	case LCUI_STYPE_STRING:
+		if (s->is_valid && s->string) {
+			free(s->string);
+		}
+		s->string = NULL;
+		break;
+	case LCUI_STYPE_WSTRING:
+		if (s->is_valid && s->string) {
+			free(s->wstring);
+		}
+		s->wstring = NULL;
+		break;
+	default:
+		break;
+	}
+	s->is_valid = FALSE;
+}
+
+static void MergeStyle(LCUI_Style dst, LCUI_Style src)
+{
+	switch (src->type) {
+	case LCUI_STYPE_STRING:
+		dst->string = strdup2(src->string);
+		break;
+	case LCUI_STYPE_WSTRING:
+		dst->wstring = wcsdup2(src->wstring);
+		break;
+	default:
+		*dst = *src;
+		break;
+	}
+	dst->is_valid = TRUE;
+	dst->type = src->type;
+}
+
+static DeleteStyleListNode(LCUI_StyleListNode node)
+{
+	DestroyStyle(&node->style);
+	free(node);
+}
+
+void StyleList_Delete(LCUI_StyleList list)
+{
+	LinkedList_ClearData(list, (FuncPtr)DeleteStyleListNode);
+	free(list);
+}
+
 LCUI_StyleSheet StyleSheet(void)
 {
 	LCUI_StyleSheet ss;
-	sizeof(LCUI_StyleRec);
+
 	ss = NEW(LCUI_StyleSheetRec, 1);
 	if (!ss) {
 		return ss;
@@ -445,20 +506,9 @@ LCUI_StyleSheet StyleSheet(void)
 void StyleSheet_Clear(LCUI_StyleSheet ss)
 {
 	int i;
-	LCUI_Style s;
+
 	for (i = 0; i < ss->length; ++i) {
-		s = &ss->sheet[i];
-		switch (s->type) {
-		case LCUI_STYPE_STRING:
-		case LCUI_STYPE_WSTRING:
-			if (s->is_valid && s->string) {
-				free(s->string);
-			}
-			s->string = NULL;
-		default:
-			break;
-		}
-		s->is_valid = FALSE;
+		DestroyStyle(&ss->sheet[i]);
 	}
 }
 
@@ -469,10 +519,29 @@ void StyleSheet_Delete(LCUI_StyleSheet ss)
 	free(ss);
 }
 
+static size_t StyleList_Merge(LCUI_StyleList list, LCUI_StyleSheet sheet)
+{
+	size_t i, count;
+	LCUI_StyleListNode node;
+
+	for (count = 0, i = 0; i < sheet->length; ++i) {
+		if (!sheet->sheet[i].is_valid) {
+			continue;
+		}
+		node = malloc(sizeof(LCUI_StyleListNodeRec));
+		node->key = (int)i;
+		MergeStyle(&node->style, &sheet->sheet[i]);
+		node->node.data = node;
+		LinkedList_AppendNode(list, &node->node);
+		count += 1;
+	}
+	return count;
+}
+
 int StyleSheet_Merge(LCUI_StyleSheet dest, LCUI_StyleSheet src)
 {
 	LCUI_Style s;
-	size_t i, count, size;
+	size_t i, size;
 
 	if (src->length > dest->length) {
 		size = sizeof(LCUI_StyleRec) * src->length;
@@ -486,29 +555,41 @@ int StyleSheet_Merge(LCUI_StyleSheet dest, LCUI_StyleSheet src)
 		dest->sheet = s;
 		dest->length = src->length;
 	}
-	for (count = 0, i = 0; i < src->length; ++i) {
-		s = &dest->sheet[i];
-		if (!src->sheet[i].is_valid || s->is_valid) {
-			continue;
+	for (i = 0; i < src->length; ++i) {
+		if (src->sheet[i].is_valid && !dest->sheet[i].is_valid) {
+			MergeStyle(&dest->sheet[i], &src->sheet[i]);
 		}
-		++count;
-		switch (src->sheet[i].type) {
-		case LCUI_STYPE_STRING:
-			s->string = strdup2(src->sheet[i].string);
-			break;
-		case LCUI_STYPE_WSTRING:
-			size = wcslen(src->sheet[i].wstring) + 1;
-			s->wstring = malloc(size * sizeof(wchar_t));
-			wcscpy(s->wstring, src->sheet[i].wstring);
-			break;
-		default:
-			*s = src->sheet[i];
-			break;
-		}
-		s->is_valid = TRUE;
-		s->type = src->sheet[i].type;
 	}
 	return 0;
+}
+
+int StyleSheet_MergeList(LCUI_StyleSheet ss, LCUI_StyleList list)
+{
+	LCUI_Style s;
+	LCUI_StyleListNode snode;
+	LinkedListNode *node;
+	size_t i = 0, count = 0, size;
+
+	for (LinkedList_Each(node, list)) {
+		snode = node->data;
+		if (snode->key > ss->length) {
+			size = sizeof(LCUI_StyleRec) * (snode->key + 1);
+			s = realloc(ss->sheet, size);
+			if (!s) {
+				return -1;
+			}
+			for (i = ss->length; i <= snode->key; ++i) {
+				s[i].is_valid = FALSE;
+			}
+			ss->sheet = s;
+			ss->length = snode->key + 1;
+		}
+		if (!ss->sheet[snode->key].is_valid) {
+			MergeStyle(&ss->sheet[snode->key], &snode->style);
+			++count;
+		}
+	}
+	return (int)count;
 }
 
 int StyleSheet_Replace(LCUI_StyleSheet dest, LCUI_StyleSheet src)
@@ -532,26 +613,8 @@ int StyleSheet_Replace(LCUI_StyleSheet dest, LCUI_StyleSheet src)
 		if (!src->sheet[i].is_valid) {
 			continue;
 		}
-		s = &dest->sheet[i];
-		switch (src->sheet[i].type) {
-		case LCUI_STYPE_STRING:
-			if (s->is_valid && s->string) {
-				free(s->string);
-			}
-			s->string = strdup2(src->sheet[i].string);
-			break;
-		case LCUI_STYPE_WSTRING:
-			if (s->is_valid && s->string) {
-				free(s->wstring);
-			}
-			s->wstring = wcsdup2(src->sheet[i].wstring);
-			break;
-		default:
-			*s = src->sheet[i];
-			break;
-		}
-		s->is_valid = TRUE;
-		s->type = src->sheet[i].type;
+		DestroyStyle(&dest->sheet[i]);
+		MergeStyle(&dest->sheet[i], &src->sheet[i]);
 		++count;
 	}
 	return (int)count;
@@ -984,15 +1047,15 @@ LCUI_Selector Selector(const char *selector)
 static void DeleteStyleNode(StyleNode node)
 {
 	if (node->space) {
-		free(node->space);
+		strpool_free_str(node->space);
 		node->space = NULL;
 	}
 	if (node->selector) {
 		free(node->selector);
 		node->selector = NULL;
 	}
-	StyleSheet_Delete(node->sheet);
-	node->sheet = NULL;
+	StyleList_Delete(node->list);
+	node->list = NULL;
 	free(node);
 }
 
@@ -1008,7 +1071,7 @@ static StyleLink CreateStyleLink(void)
 static void DeleteStyleLink(StyleLink link)
 {
 	Dict_Release(link->parents);
-	LinkedList_Clear(&link->styles, (FuncPtr)DeleteStyleNode);
+	LinkedList_ClearData(&link->styles, (FuncPtr)DeleteStyleNode);
 	free(link->selector);
 	link->selector = NULL;
 	link->parents = NULL;
@@ -1060,8 +1123,8 @@ static void DeleteStyleGroup(Dict *dict)
 }
 
 /** 根据选择器，选中匹配的样式表 */
-static LCUI_StyleSheet LCUI_SelectStyleSheet(LCUI_Selector selector,
-					     const char *space)
+static LCUI_StyleList LCUI_SelectStyleList(LCUI_Selector selector,
+					   const char *space)
 {
 	int i, right;
 	StyleLink link;
@@ -1118,28 +1181,29 @@ static LCUI_StyleSheet LCUI_SelectStyleSheet(LCUI_Selector selector,
 	}
 	snode = NEW(StyleNodeRec, 1);
 	if (space) {
-		snode->space = NEW(char, strlen(space) + 1);
+		snode->space = strpool_alloc_str(library.strpool, space);
 		strcpy(snode->space, space);
 	} else {
 		snode->space = NULL;
 	}
-	snode->sheet = StyleSheet();
+	snode->node.data = snode;
+	snode->list = StyleList();
 	snode->rank = selector->rank;
 	snode->selector = strdup2(fullname);
 	snode->batch_num = selector->batch_num;
-	LinkedList_Append(&link->styles, snode);
-	return snode->sheet;
+	LinkedList_AppendNode(&link->styles, &snode->node);
+	return snode->list;
 }
 
 int LCUI_PutStyleSheet(LCUI_Selector selector, LCUI_StyleSheet in_ss,
 		       const char *space)
 {
-	LCUI_StyleSheet ss;
+	LCUI_StyleList list;
 	LCUIMutex_Lock(&library.mutex);
 	Dict_Empty(library.cache);
-	ss = LCUI_SelectStyleSheet(selector, space);
-	if (ss) {
-		StyleSheet_Replace(ss, in_ss);
+	list = LCUI_SelectStyleList(selector, space);
+	if (list) {
+		StyleList_Merge(list, in_ss);
 	}
 	LCUIMutex_Unlock(&library.mutex);
 	return 0;
@@ -1253,68 +1317,94 @@ int LCUI_FindStyleSheetFromGroup(int group, const char *name, LCUI_Selector s,
 	return (int)count;
 }
 
+static void PrintStyleName(int key)
+{
+	const char *name;
+
+	name = LCUI_GetStyleName(key);
+	if (name) {
+		LOG("\t%s", name);
+	} else {
+		LOG("\t<unknown style %d>", key);
+	}
+	LOG("%s: ", key > STYLE_KEY_TOTAL ? " (+)" : "");
+}
+
+static void PrintStyleValue(LCUI_Style s)
+{
+	switch (s->type) {
+	case LCUI_STYPE_AUTO:
+		LOG("auto");
+		break;
+	case LCUI_STYPE_BOOL:
+		LOG("%s", s->val_bool ? "true" : "false");
+		break;
+	case LCUI_STYPE_COLOR: {
+		LCUI_Color *clr = &s->val_color;
+		if (clr->alpha < 255) {
+			LOG("rgba(%d,%d,%d,%g)", clr->r, clr->g, clr->b,
+				clr->a / 255.0);
+		} else {
+			LOG("#%02x%02x%02x", clr->r, clr->g, clr->b);
+		}
+		break;
+	}
+	case LCUI_STYPE_PX:
+		LOG("%gpx", s->val_px);
+		break;
+	case LCUI_STYPE_DIP:
+		LOG("%gdip", s->val_dip);
+		break;
+	case LCUI_STYPE_SP:
+		LOG("%gsp", s->val_sp);
+		break;
+	case LCUI_STYPE_STRING:
+		LOG("%s", s->val_string);
+		break;
+	case LCUI_STYPE_WSTRING:
+		LOG("%S", s->val_wstring);
+		break;
+	case LCUI_STYPE_SCALE:
+		LOG("%g%%", s->val_scale * 100);
+		break;
+	case LCUI_STYPE_STYLE:
+		LOG("%s", LCUI_GetStyleValueName(s->val_style));
+		break;
+	case LCUI_STYPE_INT:
+		LOG("%d", s->val_int);
+		break;
+	default:
+		LOG("%g", s->value);
+		break;
+	}
+	LOG(";\n");
+}
+
+void LCUI_PrintStyleList(LCUI_StyleList list)
+{
+	LinkedListNode *node;
+	LCUI_StyleListNode snode;
+
+	for (LinkedList_Each(node, list)) {
+		snode = node->data;
+		if (snode->style.is_valid) {
+			PrintStyleName(snode->key);
+			PrintStyleValue(&snode->style);
+		}
+	}
+}
+
 void LCUI_PrintStyleSheet(LCUI_StyleSheet ss)
 {
 	int key;
-	const char *name;
+	LCUI_Style s;
+
 	for (key = 0; key < ss->length; ++key) {
-		LCUI_Style s = &ss->sheet[key];
-		if (!s->is_valid) {
-			continue;
+		s = &ss->sheet[key];
+		if (s->is_valid) {
+			PrintStyleName(key);
+			PrintStyleValue(s);
 		}
-		name = LCUI_GetStyleName(key);
-		if (name) {
-			LOG("\t%s", name);
-		} else {
-			LOG("\t<unknown style %d>", key);
-		}
-		LOG("%s: ", key > STYLE_KEY_TOTAL ? " (+)" : "");
-		switch (s->type) {
-		case LCUI_STYPE_AUTO:
-			LOG("auto");
-			break;
-		case LCUI_STYPE_BOOL:
-			LOG("%s", s->val_bool ? "true" : "false");
-			break;
-		case LCUI_STYPE_COLOR: {
-			LCUI_Color *clr = &s->val_color;
-			if (clr->alpha < 255) {
-				LOG("rgba(%d,%d,%d,%g)", clr->r, clr->g, clr->b,
-				    clr->a / 255.0);
-			} else {
-				LOG("#%02x%02x%02x", clr->r, clr->g, clr->b);
-			}
-			break;
-		}
-		case LCUI_STYPE_PX:
-			LOG("%gpx", s->val_px);
-			break;
-		case LCUI_STYPE_DIP:
-			LOG("%gdip", s->val_dip);
-			break;
-		case LCUI_STYPE_SP:
-			LOG("%gsp", s->val_sp);
-			break;
-		case LCUI_STYPE_STRING:
-			LOG("%s", s->val_string);
-			break;
-		case LCUI_STYPE_WSTRING:
-			LOG("%S", s->val_wstring);
-			break;
-		case LCUI_STYPE_SCALE:
-			LOG("%g%%", s->val_scale * 100);
-			break;
-		case LCUI_STYPE_STYLE:
-			LOG("%s", LCUI_GetStyleValueName(s->val_style));
-			break;
-		case LCUI_STYPE_INT:
-			LOG("%d", s->val_int);
-			break;
-		default:
-			LOG("%g", s->value);
-			break;
-		}
-		LOG(";\n");
 	}
 }
 
@@ -1347,7 +1437,7 @@ static void LCUI_PrintStyleLink(StyleLink link, const char *selector)
 		StyleNode snode = node->data;
 		LOG("\n[%s]", snode->space ? snode->space : "<none>");
 		LOG("[rank: %d]\n%s {\n", snode->rank, fullname);
-		LCUI_PrintStyleSheet(snode->sheet);
+		LCUI_PrintStyleList(snode->list);
 		LOG("}\n");
 	}
 	iter = Dict_GetIterator(link->parents);
@@ -1391,6 +1481,7 @@ void LCUI_GetStyleSheet(LCUI_Selector s, LCUI_StyleSheet out_ss)
 	LinkedList list;
 	LinkedListNode *node;
 	LCUI_StyleSheet ss;
+
 	LinkedList_Init(&list);
 	StyleSheet_Clear(out_ss);
 	LCUIMutex_Lock(&library.mutex);
@@ -1404,7 +1495,7 @@ void LCUI_GetStyleSheet(LCUI_Selector s, LCUI_StyleSheet out_ss)
 	LCUI_FindStyleSheet(s, &list);
 	for (LinkedList_Each(node, &list)) {
 		StyleNode sn = node->data;
-		StyleSheet_Merge(ss, sn->sheet);
+		StyleSheet_MergeList(ss, sn->list);
 	}
 	LinkedList_Clear(&list, NULL);
 	Dict_Add(library.cache, &s->hash, ss);
@@ -1425,9 +1516,9 @@ void LCUI_PrintStyleSheetsBySelector(LCUI_Selector s)
 		StyleNode sn = node->data;
 		LOG("\n[%s]", sn->space ? sn->space : "<none>");
 		LOG("[rank: %d]\n%s {\n", sn->rank, sn->selector);
-		LCUI_PrintStyleSheet(sn->sheet);
+		LCUI_PrintStyleList(sn->list);
 		LOG("}\n");
-		StyleSheet_Merge(ss, sn->sheet);
+		StyleSheet_MergeList(ss, sn->list);
 	}
 	LinkedList_Clear(&list, NULL);
 	LOG("[selector(%u) final stylesheet] {\n", s->hash);
@@ -1553,6 +1644,7 @@ void LCUI_InitCSSLibrary(void)
 {
 	KeyNameGroup skn, skn_end;
 
+	library.strpool = strpool_create();
 	InitStyleLinkDict();
 	InitStyleGroupDict();
 	InitStylesheetCache();
@@ -1580,4 +1672,5 @@ void LCUI_FreeCSSLibrary(void)
 	DestroyStyleValueLibrary();
 	LCUIMutex_Destroy(&library.mutex);
 	LinkedList_Clear(&library.groups, (FuncPtr)DeleteStyleGroup);
+	strpool_destroy(library.strpool);
 }

@@ -31,14 +31,18 @@
 #ifndef LCUI_CSS_LIBRARY_H
 #define LCUI_CSS_LIBRARY_H
 
+#include <LCUI/util/linkedlist.h>
+
 LCUI_BEGIN_HEADER
+
+/* clang-format off */
 
 #define MAX_SELECTOR_LEN	1024
 #define MAX_SELECTOR_DEPTH	32
 
  /** 样式属性名 */
-	enum LCUI_StyleKeyName {
-		// position start
+enum LCUI_StyleKeyName {
+	// position start
 	key_left,
 	key_right,
 	key_top,
@@ -146,6 +150,15 @@ typedef struct LCUI_StyleSheetRec_ {
 	size_t length;
 } LCUI_StyleSheetRec, *LCUI_StyleSheet;
 
+typedef LinkedList LCUI_StyleListRec;
+typedef LinkedList* LCUI_StyleList;
+
+typedef struct LCUI_StyleListNodeRec_ {
+	int key;
+	LCUI_StyleRec style;
+	LinkedListNode node;
+} LCUI_StyleListNodeRec, *LCUI_StyleListNode;
+
 /** 选择器结点结构 */
 typedef struct LCUI_SelectorNodeRec_ {
 	char *id;			/**< ID */
@@ -165,6 +178,7 @@ typedef struct LCUI_SelectorRec_ {
 	LCUI_SelectorNode *nodes;	/**< 选择器结点列表 */
 } LCUI_SelectorRec, *LCUI_Selector;
 
+/* clang-format on */
 
 #define CheckStyleType(S, K, T) (S->sheet[K].is_valid && S->sheet[K].type == LCUI_STYPE_##T)
 
