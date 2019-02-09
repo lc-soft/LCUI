@@ -44,7 +44,7 @@ static LCUI_WidgetPrototype prototype = NULL;
 static const char *button_css = CodeToString(
 
 button {
-	padding: 6px 12px;
+	padding: 5px 10px;
 	focusable: true;
 	text-align: center;
 	display: inline-block;
