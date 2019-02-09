@@ -28,6 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <LCUI_Build.h>
@@ -186,14 +187,21 @@ void Widget_EndUpdate(LCUI_WidgetTaskContext ctx)
 size_t Widget_UpdateWithContext(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 {
 	int i;
-	size_t count = 0;
+	clock_t msec;
+	size_t total = 0, update_count = 0, count;
+
 	LCUI_BOOL *states;
 	LCUI_Widget child;
 	LCUI_WidgetTaskContext self_ctx;
+	LCUI_WidgetRulesData data;
 	LinkedListNode *node, *next;
 
 	if (!w->task.for_self && !w->task.for_children) {
 		return 0;
+	}
+	data = (LCUI_WidgetRulesData)w->rules;
+	if (data) {
+		msec = clock();
 	}
 	self_ctx = Widget_BeginUpdate(w, ctx);
 	if (w->task.for_self) {
@@ -214,7 +222,7 @@ size_t Widget_UpdateWithContext(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 			}
 		}
 		Widget_AddState(w, LCUI_WSTATE_UPDATED);
-		count += 1;
+		total += 1;
 	}
 	if (w->task.for_children) {
 		/* 如果子级部件中有待处理的部件，则递归进去 */
@@ -228,15 +236,58 @@ size_t Widget_UpdateWithContext(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 			 */
 			next = node->next;
 			/* 如果该级部件的任务需要留到下次再处理 */
-			count += Widget_UpdateWithContext(child, self_ctx);
+			count = Widget_UpdateWithContext(child, self_ctx);
 			if (child->task.for_self || child->task.for_children) {
 				w->task.for_children = TRUE;
 			}
+			total += count;
 			node = next;
+			if (!data) {
+				continue;
+			}
+			if (count > 0) {
+				data->current_index = max(data->current_index, child->index);
+				update_count += 1;
+			}
+			if (data->rules.max_update_children_count < 0) {
+				continue;
+			}
+			if (data->rules.max_update_children_count > 0) {
+				if (update_count >=
+				    data->rules.max_update_children_count) {
+					w->task.for_children = TRUE;
+					break;
+				}
+			}
+			if (update_count < data->default_max_update_count) {
+				continue;
+			}
+			w->task.for_children = TRUE;
+			/*
+			 * Conversion from:
+			 * (1000 / LCUI_MAX_FRAMES_PER_SEC /
+			 * ((clock() - start) / CLOCKS_PER_SEC * 1000 /
+			 * update_count);
+			 */
+			msec = (clock() - msec);
+			if (msec < 1) {
+				data->default_max_update_count += 2048;	
+				continue;
+			}
+			data->default_max_update_count =
+			update_count * CLOCKS_PER_SEC /
+			LCUI_MAX_FRAMES_PER_SEC / msec;
+			if (data->default_max_update_count < 1) {
+				data->default_max_update_count = 32;
+			}
+			break;
 		}
 	}
+	if (data && data->rules.on_update_progress) {
+		data->rules.on_update_progress(w, data->current_index);
+	}
 	Widget_EndUpdate(self_ctx);
-	return count;
+	return total;
 }
 
 size_t Widget_Update(LCUI_Widget w)
@@ -257,7 +308,7 @@ size_t LCUIWidget_Update(void)
 		self.update_count += 1;
 	}
 	root = LCUIWidget_GetRoot();
-	for (total = 0, i = 0; i < 5; ++i) {
+	for (total = 0, i = 0; i < 2; ++i) {
 		count = Widget_Update(root);
 		if (count < 1) {
 			break;

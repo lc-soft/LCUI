@@ -122,17 +122,16 @@ LCUI_Selector Widget_GetSelector(LCUI_Widget w)
 	return s;
 }
 
-int Widget_HandleChildrenStyleChange(LCUI_Widget w, int type, const char *name)
+size_t Widget_GetChildrenStyleChanges(LCUI_Widget w, int type, const char *name)
 {
 	LCUI_Selector s;
 	LinkedList snames;
 	LinkedListNode *node;
 
 	size_t i, n, len;
-	int count = 0;
+	size_t count = 0;
 	char ch, *str, **names = NULL;
 
-	/* 选择相应的前缀 */
 	switch (type) {
 	case 0:
 		ch = '.';
@@ -181,10 +180,6 @@ int Widget_HandleChildrenStyleChange(LCUI_Widget w, int type, const char *name)
 	}
 	Selector_Delete(s);
 	LinkedList_Clear(&snames, free);
-	/* 若子部件的样式受到了影响，则标记子部件需要刷新 */
-	if (count > 0) {
-		Widget_AddTaskForChildren(w, LCUI_WTASK_REFRESH_STYLE);
-	}
 	for (i = 0; names[i]; ++i) {
 		free(names[i]);
 	}

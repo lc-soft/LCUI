@@ -59,7 +59,7 @@ LCUI_SelectorNode Widget_GetSelectorNode(LCUI_Widget w);
 /** 获取选择器 */
 LCUI_API LCUI_Selector Widget_GetSelector(LCUI_Widget w);
 
-/** 处理子级部件样式变化 */
-LCUI_API int Widget_HandleChildrenStyleChange(LCUI_Widget w, int type, const char *name);
+/** 获取样式受到影响的子级部件数量 */
+LCUI_API size_t Widget_GetChildrenStyleChanges(LCUI_Widget w, int type, const char *name);
 
 #endif

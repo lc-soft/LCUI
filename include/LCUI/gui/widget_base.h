@@ -158,6 +158,37 @@ typedef struct LCUI_WidgetData_ {
 	LCUI_WidgetDataEntryRec *list;
 } LCUI_WidgetData;
 
+typedef struct LCUI_WidgetTaskContextRec_ {
+	LCUI_Selector selector;
+	LCUI_Widget widget;
+} LCUI_WidgetTaskContextRec, *LCUI_WidgetTaskContext;
+
+typedef struct LCUI_WidgetRulesRec_ {
+	/** Refresh the style of all child widgets if the status has changed */
+	LCUI_BOOL ignore_status_change;
+	
+	/** Refresh the style of all child widgets if the classes has changed */
+	LCUI_BOOL ignore_classes_change;
+
+	/**
+	 * Maximum number of children updated at each update
+	 * values:
+	 * -1 - Update all children at once
+	 * 0  - Automatically calculates the appropriate maximum number
+	 * N  - Custom maximum number
+	 */
+	int max_update_children_count;
+
+	/** A callback function on update progress */
+	void (*on_update_progress)(LCUI_Widget, size_t);
+} LCUI_WidgetRulesRec, *LCUI_WidgetRules;
+
+typedef struct LCUI_WidgetRulesDataRec_ {
+	LCUI_WidgetRulesRec rules;
+	size_t default_max_update_count;
+	size_t current_index;
+} LCUI_WidgetRulesDataRec, *LCUI_WidgetRulesData;
+
 typedef struct LCUI_WidgetAttributeRec_ {
 	char *name;
 	struct {
@@ -197,6 +228,7 @@ typedef struct LCUI_WidgetRec_ {
 	LCUI_WidgetPrototypeC	proto;			/**< 原型 */
 	LCUI_EventTrigger	trigger;		/**< 事件触发器 */
 	LCUI_WidgetTaskBoxRec	task;			/**< 任务记录 */
+	LCUI_WidgetRules	rules;			/**< 更新部件时采用的规则 */
 	LCUI_BOOL		event_blocked;		/**< 是否阻止自己和子级部件的事件处理 */
 	LCUI_BOOL		disabled;		/**< 是否禁用 */
 	LinkedListNode		node;			/**< 在部件链表中的结点 */
@@ -368,6 +400,9 @@ LCUI_API void Widget_SetTitleW(LCUI_Widget w, const wchar_t *title);
 
 /** 为部件添加状态 */
 LCUI_API void Widget_AddState(LCUI_Widget w, LCUI_WidgetState state);
+
+/** Set widget updating rules */
+LCUI_API int Widget_SetRules(LCUI_Widget w, const LCUI_WidgetRulesRec *rules);
 
 /** 计算部件的最大宽度 */
 LCUI_API float Widget_ComputeMaxWidth(LCUI_Widget w);

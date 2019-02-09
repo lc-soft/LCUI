@@ -169,6 +169,7 @@ void Widget_ExecDestroy(LCUI_Widget w)
 	Widget_DestroyAttributes(w);
 	Widget_DestroyClasses(w);
 	Widget_DestroyStatus(w);
+	Widget_SetRules(w, NULL);
 	free(w);
 }
 
@@ -268,6 +269,28 @@ void Widget_SetTitleW(LCUI_Widget w, const wchar_t *title)
 		free(old_title);
 	}
 	Widget_AddTask(w, LCUI_WTASK_TITLE);
+}
+
+int Widget_SetRules(LCUI_Widget w, const LCUI_WidgetRulesRec *rules)
+{
+	LCUI_WidgetRulesData data;
+
+	if (w->rules) {
+		free(w->rules);
+		w->rules = NULL;
+	}
+	if (!rules) {
+		return 0;
+	}
+	data = malloc(sizeof(LCUI_WidgetRulesDataRec));
+	if (!data) {
+		return -ENOMEM;
+	}
+	data->rules = *rules;
+	data->current_index = 0;
+	data->default_max_update_count = 2048;
+	w->rules = (LCUI_WidgetRules)data;
+	return 0;
 }
 
 void Widget_AddState(LCUI_Widget w, LCUI_WidgetState state)

@@ -33,7 +33,34 @@
 #include <LCUI/gui/widget_base.h>
 #include <LCUI/gui/widget_status.h>
 #include <LCUI/gui/widget_style.h>
+#include <LCUI/gui/widget_task.h>
 #include <LCUI/gui/widget_tree.h>
+
+static void Widget_MarkChildrenRefreshByStatus(LCUI_Widget w)
+{
+	LinkedListNode *node;
+
+	if (w->rules && w->rules->ignore_status_change) {
+		return;
+	}
+	Widget_AddTask(w, LCUI_WTASK_REFRESH_STYLE);
+	for (LinkedList_Each(node, &w->children)) {
+		Widget_MarkChildrenRefreshByStatus(node->data);
+	}
+}
+
+static int Widget_HandleStatusChange(LCUI_Widget w, const char *name)
+{
+	Widget_UpdateStyle(w, TRUE);
+	if (w->rules && w->rules->ignore_status_change) {
+		return 0;
+	}
+	if (Widget_GetChildrenStyleChanges(w, 1, name) > 0) {
+		Widget_MarkChildrenRefreshByStatus(w);
+		return 1;
+	}
+	return 0;
+}
 
 int Widget_AddStatus(LCUI_Widget w, const char *status_name)
 {
@@ -43,9 +70,7 @@ int Widget_AddStatus(LCUI_Widget w, const char *status_name)
 	if (strlist_add(&w->status, status_name) <= 0) {
 		return 0;
 	}
-	Widget_HandleChildrenStyleChange(w, 1, status_name);
-	Widget_UpdateStyle(w, TRUE);
-	return 1;
+	return Widget_HandleStatusChange(w, status_name);
 }
 
 LCUI_BOOL Widget_HasStatus(LCUI_Widget w, const char *status_name)
@@ -59,9 +84,8 @@ LCUI_BOOL Widget_HasStatus(LCUI_Widget w, const char *status_name)
 int Widget_RemoveStatus(LCUI_Widget w, const char *status_name)
 {
 	if (strlist_has(w->status, status_name)) {
-		Widget_HandleChildrenStyleChange(w, 1, status_name);
+		Widget_HandleStatusChange(w, status_name);
 		strlist_remove(&w->status, status_name);
-		Widget_UpdateStyle(w, TRUE);
 		return 1;
 	}
 	return 0;
