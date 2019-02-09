@@ -40,7 +40,11 @@ LCUI_API void Widget_UpdateTaskStatus(LCUI_Widget widget);
 LCUI_API void Widget_AddTask(LCUI_Widget widget, int task_type);
 
 /** 处理部件中当前积累的任务 */
-LCUI_API int Widget_Update(LCUI_Widget w);
+LCUI_API size_t Widget_Update(LCUI_Widget w);
+
+/** 根据给定的上下文来处理部件中当前积累的任务 */
+LCUI_API size_t Widget_UpdateWithContext(LCUI_Widget w,
+					 LCUI_WidgetTaskContext ctx);
 
 /** 为子级部件添加任务 */
 LCUI_API void Widget_AddTaskForChildren(LCUI_Widget widget, int task);
@@ -52,7 +56,7 @@ LCUI_API void LCUIWidget_InitTasks(void);
 LCUI_API void LCUIWidget_FreeTasks(void);
 
 /** 处理一次当前积累的部件任务 */
-LCUI_API void LCUIWidget_Update(void);
+LCUI_API size_t LCUIWidget_Update(void);
 
 /** 刷新所有部件的样式 */
 LCUI_API void LCUIWidget_RefreshStyle(void);

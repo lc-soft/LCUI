@@ -37,9 +37,6 @@ void LCUIWidget_InitStyle(void);
 /** 销毁，释放资源 */
 void LCUIWidget_FreeStyle(void);
 
-/** 计算部件继承得到的样式表 */
-LCUI_API void Widget_GetInheritStyle(LCUI_Widget w, LCUI_StyleSheet out_ss);
-
 /** 打印部件的样式表 */
 LCUI_API void Widget_PrintStyleSheets(LCUI_Widget w);
 
@@ -48,6 +45,8 @@ LCUI_API void Widget_UpdateStyle(LCUI_Widget w, LCUI_BOOL is_refresh_all);
 
 /** 更新当前部件的子级部件样式 */
 LCUI_API void Widget_UpdateChildrenStyle(LCUI_Widget w, LCUI_BOOL is_refresh_all);
+
+LCUI_API void Widget_AddTaskByStyle(LCUI_Widget w, int key);
 
 /** 直接更新当前部件的样式 */
 LCUI_API void Widget_ExecUpdateStyle(LCUI_Widget w, LCUI_BOOL is_update_all);

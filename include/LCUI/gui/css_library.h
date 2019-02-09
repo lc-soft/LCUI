@@ -147,8 +147,10 @@ enum LCUI_StyleKeyName {
 
 typedef struct LCUI_StyleSheetRec_ {
 	LCUI_Style sheet;
-	size_t length;
+	int length;
 } LCUI_StyleSheetRec, *LCUI_StyleSheet;
+
+typedef const LCUI_StyleSheetRec *LCUI_CachedStyleSheet;
 
 typedef LinkedList LCUI_StyleListRec;
 typedef LinkedList* LCUI_StyleList;
@@ -180,19 +182,31 @@ typedef struct LCUI_SelectorRec_ {
 
 /* clang-format on */
 
-#define CheckStyleType(S, K, T) (S->sheet[K].is_valid && S->sheet[K].type == LCUI_STYPE_##T)
+#define CheckStyleType(S, K, T) \
+	(S->sheet[K].is_valid && S->sheet[K].type == LCUI_STYPE_##T)
 
-#define SetStyle(S, NAME, VAL, TYPE)	S->sheet[NAME].is_valid = TRUE, \
-					S->sheet[NAME].type = LCUI_STYPE_##TYPE, \
-					S->sheet[NAME].val_##TYPE = VAL
+#define SetStyle(S, NAME, VAL, TYPE)             \
+	S->sheet[NAME].is_valid = TRUE,          \
+	S->sheet[NAME].type = LCUI_STYPE_##TYPE, \
+	S->sheet[NAME].val_##TYPE = VAL
 
-#define UnsetStyle(S, NAME)	S->sheet[NAME].is_valid = FALSE, \
-				S->sheet[NAME].type = LCUI_STYPE_NONE, \
-				S->sheet[NAME].val_int = 0
+#define UnsetStyle(S, NAME)              \
+	S->sheet[NAME].is_valid = FALSE, \
+	S->sheet[NAME].type = LCUI_STYPE_NONE, S->sheet[NAME].val_int = 0
 
 #define LCUI_FindStyleSheet(S, L) LCUI_FindStyleSheetFromGroup(0, NULL, S, L)
 
 #define StyleSheet_GetStyle(S, K) &((S)->sheet[K])
+
+LCUI_API LCUI_StyleList StyleList(void);
+
+LCUI_API LCUI_StyleListNode StyleList_GetNode(LCUI_StyleList list, int key);
+
+LCUI_API int StyleList_RemoveNode(LCUI_StyleList list, int key);
+
+LCUI_API LCUI_StyleListNode StyleList_AddNode(LCUI_StyleList list, int key);
+
+LCUI_API void StyleList_Delete(LCUI_StyleList list);
 
 LCUI_API LCUI_StyleSheet StyleSheet(void);
 
@@ -200,11 +214,20 @@ LCUI_API void StyleSheet_Clear(LCUI_StyleSheet ss);
 
 LCUI_API void StyleSheet_Delete(LCUI_StyleSheet ss);
 
-LCUI_API int StyleSheet_Merge(LCUI_StyleSheet dest, LCUI_StyleSheet src);
+LCUI_API int StyleSheet_Merge(LCUI_StyleSheet dest,
+			      const LCUI_StyleSheetRec *src);
 
-LCUI_API int StyleSheet_Replace(LCUI_StyleSheet dest, LCUI_StyleSheet src);
+LCUI_API int StyleSheet_MergeList(LCUI_StyleSheet ss, LCUI_StyleList list);
+
+LCUI_API int StyleSheet_Replace(LCUI_StyleSheet dest,
+				const LCUI_StyleSheetRec *src);
 
 LCUI_API LCUI_Selector Selector(const char *selector);
+
+LCUI_API LCUI_Selector Selector_Copy(LCUI_Selector selector);
+
+LCUI_API int Selector_AppendNode(LCUI_Selector selector,
+				 LCUI_SelectorNode node);
 
 LCUI_API void Selector_Update(LCUI_Selector s);
 
@@ -223,8 +246,8 @@ LCUI_API void SelectorNode_Delete(LCUI_SelectorNode node);
 LCUI_API LCUI_BOOL SelectorNode_Match(LCUI_SelectorNode sn1,
 				      LCUI_SelectorNode sn2);
 
-LCUI_API int LCUI_PutStyleSheet(LCUI_Selector selector,
-				LCUI_StyleSheet in_ss, const char *space);
+LCUI_API int LCUI_PutStyleSheet(LCUI_Selector selector, LCUI_StyleSheet in_ss,
+				const char *space);
 
 /**
  * 从指定组中查找样式表
@@ -235,6 +258,8 @@ LCUI_API int LCUI_PutStyleSheet(LCUI_Selector selector,
  */
 LCUI_API int LCUI_FindStyleSheetFromGroup(int group, const char *name,
 					  LCUI_Selector s, LinkedList *list);
+
+LCUI_API LCUI_CachedStyleSheet LCUI_GetCachedStyleSheet(LCUI_Selector s);
 
 LCUI_API void LCUI_GetStyleSheet(LCUI_Selector s, LCUI_StyleSheet out_ss);
 

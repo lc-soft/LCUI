@@ -96,6 +96,7 @@ static void DrawBorder(LCUI_PaintContext paint)
 
 void LCUIDisplay_Update(void)
 {
+	size_t count;
 	LCUI_Surface surface;
 	LinkedListNode *node;
 	SurfaceRecord record = NULL;
@@ -104,7 +105,7 @@ void LCUIDisplay_Update(void)
 		return;
 	}
 	LCUICursor_Update();
-	LCUIWidget_Update();
+	count = LCUIWidget_Update();
 	/* 遍历当前的 surface 记录列表 */
 	for (LinkedList_Each(node, &display.surfaces)) {
 		record = node->data;
@@ -278,8 +279,8 @@ static void LCUIDisplay_BindSurface(LCUI_Widget widget)
 	LinkedList_Init(&record->rects);
 	Surface_SetCaptionW(record->surface, widget->title);
 	LCUIMetrics_ComputeRectActual(&rect, &widget->box.canvas);
-	if (widget->style->sheet[key_top].is_valid &&
-	    widget->style->sheet[key_left].is_valid) {
+	if (Widget_CheckStyleValid(widget, key_top) &&
+	    Widget_CheckStyleValid(widget, key_left)) {
 		Surface_Move(record->surface, rect.x, rect.y);
 	}
 	Surface_Resize(record->surface, rect.width, rect.height);

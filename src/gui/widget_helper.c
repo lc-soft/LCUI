@@ -120,12 +120,38 @@ void Widget_ResizeWithSurface(LCUI_Widget w, float width, float height)
 
 LCUI_Style Widget_GetStyle(LCUI_Widget w, int key)
 {
-	assert(key >= 0 && key < w->custom_style->length);
-	return &w->custom_style->sheet[key];
+	LCUI_StyleListNode node;
+
+	if (w->custom_style) {
+		node = StyleList_GetNode(w->custom_style, key);
+		if (node) {
+			return &node->style;
+		}
+	} else {
+		w->custom_style = StyleList();
+	}
+	node = StyleList_AddNode(w->custom_style, key);
+	return &node->style;
+}
+
+int Widget_UnsetStyle(LCUI_Widget w, int key)
+{
+	if (!w->custom_style) {
+		return -1;
+	}
+	Widget_AddTaskByStyle(w, key);
+	return StyleList_RemoveNode(w->custom_style, key);
 }
 
 LCUI_Style Widget_GetInheritedStyle(LCUI_Widget w, int key)
 {
+	LCUI_Selector selector;
+
+	if (!w->inherited_style) {
+		selector = Widget_GetSelector(w);
+		w->inherited_style = LCUI_GetCachedStyleSheet(selector);
+		Selector_Delete(selector);
+	}
 	assert(key >= 0 && key < w->inherited_style->length);
 	return &w->inherited_style->sheet[key];
 }
@@ -136,6 +162,11 @@ LCUI_BOOL Widget_CheckStyleBooleanValue(LCUI_Widget w, int key, LCUI_BOOL value)
 
 	return s->is_valid && s->type == LCUI_STYPE_BOOL &&
 	       s->val_bool == value;
+}
+
+LCUI_BOOL Widget_CheckStyleValid(LCUI_Widget w, int key)
+{
+	return w->style && w->style->sheet[key].is_valid;
 }
 
 void Widget_SetVisibility(LCUI_Widget w, const char *value)

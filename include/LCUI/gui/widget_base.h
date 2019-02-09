@@ -109,7 +109,7 @@ typedef struct LCUI_WidgetBoxModelRec_ {
 typedef struct LCUI_WidgetTaskBoxRec_ {
 	LCUI_BOOL for_self;			/**< 标志，指示当前部件是否有待处理的任务 */
 	LCUI_BOOL for_children;			/**< 标志，指示是否有待处理的子级部件 */
-	LCUI_BOOL buffer[LCUI_WTASK_TOTAL_NUM];	/**< 记录缓存 */
+	LCUI_BOOL states[LCUI_WTASK_TOTAL_NUM];	/**< 各个任务的状态标记 */
 } LCUI_WidgetTaskBoxRec;
 
 /** 部件状态 */
@@ -154,7 +154,7 @@ typedef struct LCUI_WidgetDataEntryRec_ {
 } LCUI_WidgetDataEntryRec;
 
 typedef struct LCUI_WidgetData_ {
-	uint_t length;
+	unsigned length;
 	LCUI_WidgetDataEntryRec *list;
 } LCUI_WidgetData;
 
@@ -186,8 +186,8 @@ typedef struct LCUI_WidgetRec_ {
 	LCUI_Rect2F		margin;			/**< 外边距框 */
 	LCUI_WidgetBoxModelRec	box;			/**< 部件的各个区域信息 */
 	LCUI_StyleSheet		style;			/**< 当前完整样式表 */
-	LCUI_StyleSheet		custom_style;		/**< 自定义样式表 */
-	LCUI_StyleSheet		inherited_style;	/**< 通过继承得到的样式表 */
+	LCUI_StyleList		custom_style;		/**< 自定义样式表 */
+	LCUI_CachedStyleSheet	inherited_style;	/**< 通过继承得到的样式表 */
 	LCUI_WidgetStyle	computed_style;		/**< 已经计算的样式数据 */
 	LCUI_Widget		parent;			/**< 父部件 */
 	LinkedList		children;		/**< 子部件 */
@@ -205,10 +205,17 @@ typedef struct LCUI_WidgetRec_ {
 
 /* clang-format on */
 
-#define Widget_SetStyle(W, K, V, T) SetStyle((W)->custom_style, K, V, T)
-#define Widget_UnsetStyle(W, K) UnsetStyle((W)->custom_style, K)
+#define Widget_SetStyle(W, K, VAL, TYPE)      \
+	do {                                  \
+		LCUI_Style _s;                \
+		_s = Widget_GetStyle(W, K);   \
+		_s->is_valid = TRUE;          \
+		_s->type = LCUI_STYPE_##TYPE; \
+		_s->val_##TYPE = VAL;         \
+		Widget_AddTaskByStyle(W, K);  \
+	} while (0)
+
 #define Widget_CheckStyleType(W, K, T) CheckStyleType((W)->style, K, T)
-#define Widget_CheckStyleValid(W, K) W->style->sheet[K].is_valid
 
 #define Widget_HasAbsolutePosition(W) \
 	((W)->computed_style.position == SV_ABSOLUTE)

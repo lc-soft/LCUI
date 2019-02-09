@@ -109,8 +109,6 @@ static void Widget_Init(LCUI_Widget widget)
 	widget->state = LCUI_WSTATE_CREATED;
 	widget->trigger = EventTrigger();
 	widget->style = StyleSheet();
-	widget->custom_style = StyleSheet();
-	widget->inherited_style = StyleSheet();
 	widget->computed_style.opacity = 1.0;
 	widget->computed_style.visible = TRUE;
 	widget->computed_style.focusable = FALSE;

@@ -28,23 +28,26 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
 
-/** 部件任务模块数据 */
 static struct WidgetTaskModule {
-	LCUI_WidgetFunction handlers[LCUI_WTASK_TOTAL_NUM];	/**< 任务处理器 */
-	unsigned int update_count;				/**< 刷新次数 */
+	LCUI_WidgetFunction handlers[LCUI_WTASK_TOTAL_NUM];
+	unsigned update_count;
 } self;
 
 static void HandleRefreshStyle(LCUI_Widget w)
 {
+	int i;
+
 	Widget_ExecUpdateStyle(w, TRUE);
-	w->task.buffer[LCUI_WTASK_UPDATE_STYLE] = FALSE;
+	for (i = LCUI_WTASK_UPDATE_STYLE + 1; i < LCUI_WTASK_TOTAL_NUM; ++i) {
+		w->task.states[i] = TRUE;
+	}
+	w->task.states[LCUI_WTASK_UPDATE_STYLE] = FALSE;
 }
 
 static void HandleUpdateStyle(LCUI_Widget w)
@@ -74,7 +77,7 @@ void Widget_UpdateTaskStatus(LCUI_Widget widget)
 {
 	int i;
 	for (i = 0; i < LCUI_WTASK_TOTAL_NUM; ++i) {
-		if (widget->task.buffer[i]) {
+		if (widget->task.states[i]) {
 			break;
 		}
 	}
@@ -92,6 +95,7 @@ void Widget_AddTaskForChildren(LCUI_Widget widget, int task)
 {
 	LCUI_Widget child;
 	LinkedListNode *node;
+
 	widget->task.for_children = TRUE;
 	for (LinkedList_Each(node, &widget->children)) {
 		child = node->data;
@@ -106,7 +110,7 @@ void Widget_AddTask(LCUI_Widget widget, int task)
 		return;
 	}
 	widget->task.for_self = TRUE;
-	widget->task.buffer[task] = TRUE;
+	widget->task.states[task] = TRUE;
 	widget = widget->parent;
 	/* 向没有标记的父级部件添加标记 */
 	while (widget && !widget->task.for_children) {
@@ -115,7 +119,7 @@ void Widget_AddTask(LCUI_Widget widget, int task)
 	}
 }
 
-static void MapTaskHandler(void)
+void LCUIWidget_InitTasks(void)
 {
 #define SetHandler(NAME, HANDLER) self.handlers[LCUI_WTASK_##NAME] = HANDLER
 	SetHandler(VISIBLE, Widget_UpdateVisibility);
@@ -138,72 +142,114 @@ static void MapTaskHandler(void)
 	SetHandler(PROPS, Widget_UpdateProps);
 }
 
-void LCUIWidget_InitTasks(void)
-{
-	MapTaskHandler();
-}
-
 void LCUIWidget_FreeTasks(void)
 {
 	LCUIWidget_ClearTrash();
 }
 
-int Widget_Update(LCUI_Widget w)
+LCUI_WidgetTaskContext Widget_BeginUpdate(LCUI_Widget w,
+					  LCUI_WidgetTaskContext ctx)
 {
-	int i;
-	LCUI_BOOL *buffer;
-	LinkedListNode *node, *next;
+	LCUI_CachedStyleSheet inherited_style;
+	LCUI_WidgetTaskContext self_ctx;
 
-	/* 如果该部件没有任务需要处理 */
-	if (!w->task.for_self) {
-		goto proc_children_task;
+	self_ctx = malloc(sizeof(LCUI_WidgetTaskContextRec));
+	if (!self_ctx) {
+		return NULL;
 	}
-	w->task.for_self = FALSE;
-	buffer = w->task.buffer;
-	/* 如果有用户自定义任务 */
-	if (buffer[LCUI_WTASK_USER] && w->proto && w->proto->runtask) {
-		w->proto->runtask(w);
-	}
-	for (i = 0; i < LCUI_WTASK_USER; ++i) {
-		if (buffer[i]) {
-			buffer[i] = FALSE;
-			if (self.handlers[i]) {
-				self.handlers[i](w);
-			}
-		} else {
-			buffer[i] = FALSE;
+	if (ctx) {
+		self_ctx->selector = Selector_Copy(ctx->selector);
+		if (0 != Selector_AppendNode(self_ctx->selector,
+					     Widget_GetSelectorNode(w))) {
+			return NULL;
 		}
+	} else {
+		self_ctx->selector = Widget_GetSelector(w);
 	}
-	Widget_AddState(w, LCUI_WSTATE_UPDATED);
-
-proc_children_task:
-
-	if (!w->task.for_children) {
-		return w->task.for_self;
+	inherited_style = w->inherited_style;
+	w->inherited_style = LCUI_GetCachedStyleSheet(self_ctx->selector);
+	if (w->inherited_style != inherited_style) {
+		Widget_AddTask(w, LCUI_WTASK_REFRESH_STYLE);
 	}
-	/* 如果子级部件中有待处理的部件，则递归进去 */
-	w->task.for_children = FALSE;
-	node = w->children.head.next;
-	while (node) {
-		LCUI_Widget child = node->data;
-		/* 如果当前部件有销毁任务，结点空间会连同部件一起被
-		 * 释放，为避免因访问非法空间而出现异常，预先保存下
-		 * 个结点。
-		 */
-		next = node->next;
-		/* 如果该级部件的任务需要留到下次再处理 */
-		if (Widget_Update(child)) {
-			w->task.for_children = TRUE;
-		}
-		node = next;
-	}
-	return w->task.for_self || w->task.for_children;
+	self_ctx->widget = w;
+	return self_ctx;
 }
 
-void LCUIWidget_Update(void)
+void Widget_EndUpdate(LCUI_WidgetTaskContext ctx)
 {
-	int count = 0;
+	Selector_Delete(ctx->selector);
+	ctx->selector = NULL;
+	ctx->widget = NULL;
+	free(ctx);
+}
+
+size_t Widget_UpdateWithContext(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
+{
+	int i;
+	size_t count = 0;
+	LCUI_BOOL *states;
+	LCUI_Widget child;
+	LCUI_WidgetTaskContext self_ctx;
+	LinkedListNode *node, *next;
+
+	if (!w->task.for_self && !w->task.for_children) {
+		return 0;
+	}
+	self_ctx = Widget_BeginUpdate(w, ctx);
+	if (w->task.for_self) {
+		w->task.for_self = FALSE;
+		states = w->task.states;
+		/* 如果有用户自定义任务 */
+		if (states[LCUI_WTASK_USER] && w->proto && w->proto->runtask) {
+			w->proto->runtask(w);
+		}
+		for (i = 0; i < LCUI_WTASK_USER; ++i) {
+			if (states[i]) {
+				states[i] = FALSE;
+				if (self.handlers[i]) {
+					self.handlers[i](w);
+				}
+			} else {
+				states[i] = FALSE;
+			}
+		}
+		Widget_AddState(w, LCUI_WSTATE_UPDATED);
+		count += 1;
+	}
+	if (w->task.for_children) {
+		/* 如果子级部件中有待处理的部件，则递归进去 */
+		w->task.for_children = FALSE;
+		node = w->children.head.next;
+		while (node) {
+			child = node->data;
+			/* 如果当前部件有销毁任务，结点空间会连同部件一起被
+			 * 释放，为避免因访问非法空间而出现异常，预先保存下
+			 * 个结点。
+			 */
+			next = node->next;
+			/* 如果该级部件的任务需要留到下次再处理 */
+			count += Widget_UpdateWithContext(child, self_ctx);
+			if (child->task.for_self || child->task.for_children) {
+				w->task.for_children = TRUE;
+			}
+			node = next;
+		}
+	}
+	Widget_EndUpdate(self_ctx);
+	return count;
+}
+
+size_t Widget_Update(LCUI_Widget w)
+{
+	return Widget_UpdateWithContext(w, NULL);
+}
+
+size_t LCUIWidget_Update(void)
+{
+	int i;
+	size_t total, count;
 	LCUI_Widget root;
+
 	/* 前两次更新需要主动刷新所有部件的样式，主要是为了省去在应用程序里手动调用
 	 * LCUIWidget_RefreshStyle() 的麻烦 */
 	if (self.update_count < 2) {
@@ -211,8 +257,15 @@ void LCUIWidget_Update(void)
 		self.update_count += 1;
 	}
 	root = LCUIWidget_GetRoot();
-	while (Widget_Update(root) && count++ < 5);
+	for (total = 0, i = 0; i < 5; ++i) {
+		count = Widget_Update(root);
+		if (count < 1) {
+			break;
+		}
+		total += count;
+	}
 	LCUIWidget_ClearTrash();
+	return total;
 }
 
 void LCUIWidget_RefreshStyle(void)

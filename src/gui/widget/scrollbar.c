@@ -364,7 +364,7 @@ static void ScrollBar_UpdateSize(LCUI_Widget w)
 		if (size > box_size && box_size > 0) {
 			n = box_size / size;
 		}
-		SetStyle(slider->custom_style, key_width, n, scale);
+		Widget_SetStyle(slider, key_width, n, scale);
 	} else {
 		if (scrollbar->target) {
 			size = scrollbar->target->box.outer.height;
@@ -375,7 +375,7 @@ static void ScrollBar_UpdateSize(LCUI_Widget w)
 		if (size > box_size && box_size > 0) {
 			n = box_size / size;
 		}
-		SetStyle(slider->custom_style, key_height, n, scale);
+		Widget_SetStyle(slider, key_height, n, scale);
 	}
 	ScrollBar_SetPosition(w, scrollbar->pos);
 	Widget_UpdateStyle(slider, FALSE);

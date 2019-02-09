@@ -35,6 +35,8 @@
 
 LCUI_BEGIN_HEADER
 
+/* clang-format on */
+
 enum LCUI_CSSFontStyleKey {
 	key_color,
 	key_font_size,
@@ -61,10 +63,13 @@ typedef struct LCUI_CSSFontStyleRec_ {
 	LCUI_StyleValue white_space;
 } LCUI_CSSFontStyleRec, *LCUI_CSSFontStyle;
 
-#define Widget_SetFontStyle(W, K, V, T) do {\
-	int key = LCUI_GetFontStyleKey( K ); \
-	SetStyle( (W)->custom_style, key, V, T ); \
-} while( 0 )
+#define Widget_SetFontStyle(W, K, V, T)                        \
+	do {                                                   \
+		int key = LCUI_GetFontStyleKey(K);             \
+		Widget_SetStyle(W, key, V, T); \
+	} while (0)
+
+/* clang-format off */
 
 int LCUI_GetFontStyleKey(int key);
 

@@ -41,7 +41,7 @@
 #define ARRAY_LEN(ARR) sizeof(ARR) / sizeof(ARR[0])
 
 typedef struct LCUI_TaskCacheStatus {
-	size_t start, end;
+	int start, end;
 	LCUI_WidgetTaskType task;
 	LCUI_BOOL is_valid;
 } LCUI_TaskStatus;
@@ -71,6 +71,7 @@ LCUI_SelectorNode Widget_GetSelectorNode(LCUI_Widget w)
 	int i;
 	ASSIGN(sn, LCUI_SelectorNode);
 	ZEROSET(sn, LCUI_SelectorNode);
+
 	if (w->id) {
 		sn->id = strdup2(w->id);
 	}
@@ -89,7 +90,7 @@ LCUI_SelectorNode Widget_GetSelectorNode(LCUI_Widget w)
 
 LCUI_Selector Widget_GetSelector(LCUI_Widget w)
 {
-	int ni = 0;
+	int i = 0;
 	LinkedList list;
 	LCUI_Selector s;
 	LCUI_Widget parent;
@@ -110,13 +111,13 @@ LCUI_Selector Widget_GetSelector(LCUI_Widget w)
 	}
 	for (LinkedList_EachReverse(node, &list)) {
 		parent = node->data;
-		s->nodes[ni] = Widget_GetSelectorNode(parent);
-		s->rank += s->nodes[ni]->rank;
-		ni += 1;
+		s->nodes[i] = Widget_GetSelectorNode(parent);
+		s->rank += s->nodes[i]->rank;
+		i += 1;
 	}
 	LinkedList_Clear(&list, NULL);
-	s->nodes[ni] = NULL;
-	s->length = ni;
+	s->nodes[i] = NULL;
+	s->length = i;
 	Selector_Update(s);
 	return s;
 }
@@ -191,14 +192,6 @@ int Widget_HandleChildrenStyleChange(LCUI_Widget w, int type, const char *name)
 	return count;
 }
 
-void Widget_GetInheritStyle(LCUI_Widget w, LCUI_StyleSheet out_ss)
-{
-	LCUI_Selector s;
-	s = Widget_GetSelector(w);
-	LCUI_GetStyleSheet(s, out_ss);
-	Selector_Delete(s);
-}
-
 void Widget_PrintStyleSheets(LCUI_Widget w)
 {
 	LCUI_Selector s = Widget_GetSelector(w);
@@ -209,7 +202,6 @@ void Widget_PrintStyleSheets(LCUI_Widget w)
 void Widget_UpdateStyle(LCUI_Widget w, LCUI_BOOL is_refresh_all)
 {
 	if (is_refresh_all) {
-		StyleSheet_Clear(w->style);
 		Widget_AddTask(w, LCUI_WTASK_REFRESH_STYLE);
 	} else {
 		Widget_AddTask(w, LCUI_WTASK_UPDATE_STYLE);
@@ -226,11 +218,9 @@ void Widget_UpdateChildrenStyle(LCUI_Widget w, LCUI_BOOL is_refresh_all)
 	}
 }
 
-void Widget_ExecUpdateStyle(LCUI_Widget w, LCUI_BOOL is_update_all)
+void Widget_AddTaskByStyle(LCUI_Widget w, int key)
 {
-	size_t i, key;
-	LCUI_Style s;
-	LCUI_StyleSheet ss;
+	size_t i;
 	LCUI_TaskStatus task_status[] = {
 		{ key_visibility, key_visibility, LCUI_WTASK_VISIBLE, TRUE },
 		{ key_display, key_display, LCUI_WTASK_DISPLAY, TRUE },
@@ -258,48 +248,43 @@ void Widget_ExecUpdateStyle(LCUI_Widget w, LCUI_BOOL is_update_all)
 		{ key_pointer_events, key_focusable, LCUI_WTASK_PROPS, TRUE }
 	};
 
+	for (i = 0; i < ARRAY_LEN(task_status); ++i) {
+		if (key >= task_status[i].start && key <= task_status[i].end) {
+			if (!task_status[i].is_valid) {
+				break;
+			}
+			task_status[i].is_valid = FALSE;
+			Widget_AddTask(w, task_status[i].task);
+		}
+	}
+}
+
+void Widget_ExecUpdateStyle(LCUI_Widget w, LCUI_BOOL is_update_all)
+{
+	StyleSheet_Clear(w->style);
 	if (is_update_all) {
 		/* 刷新该部件的相关数据 */
 		if (w->proto && w->proto->refresh) {
 			w->proto->refresh(w);
 		}
-		Widget_GetInheritStyle(w, w->inherited_style);
 	}
-	ss = w->style;
-	w->style = StyleSheet();
-	StyleSheet_Merge(w->style, w->custom_style);
+	if (w->custom_style) {
+		StyleSheet_MergeList(w->style, w->custom_style);
+	}
 	StyleSheet_Merge(w->style, w->inherited_style);
-	/* 对比两张样式表，确定哪些需要更新 */
-	for (key = 0; key < STYLE_KEY_TOTAL; ++key) {
-		s = &w->style->sheet[key];
-		if (ss->sheet[key].is_valid == s->is_valid &&
-		    ss->sheet[key].type == s->type &&
-		    ss->sheet[key].value == s->value) {
-			continue;
-		}
-		for (i = 0; i < ARRAY_LEN(task_status); ++i) {
-			if (key >= task_status[i].start &&
-			    key <= task_status[i].end) {
-				if (!task_status[i].is_valid) {
-					break;
-				}
-				task_status[i].is_valid = FALSE;
-				Widget_AddTask(w, task_status[i].task);
-			}
-		}
-	}
 	if (w->proto && w->proto->update &&
 	    w->style->length > STYLE_KEY_TOTAL) {
 		/* 扩展部分的样式交给该部件自己处理 */
 		w->proto->update(w);
 	}
-	StyleSheet_Delete(ss);
 }
 
 void Widget_DestroyStyleSheets(LCUI_Widget w)
 {
-	StyleSheet_Delete(w->inherited_style);
-	StyleSheet_Delete(w->custom_style);
+	w->inherited_style = NULL;
+	if (w->custom_style) {
+		StyleList_Delete(w->custom_style);
+	}
 	StyleSheet_Delete(w->style);
 }
 
