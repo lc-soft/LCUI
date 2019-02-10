@@ -165,12 +165,22 @@ typedef struct LCUI_WidgetTaskContextRec_ {
 	LCUI_WidgetTaskContext parent;
 } LCUI_WidgetTaskContextRec;
 
+/* clang-format on */
+
 typedef struct LCUI_WidgetRulesRec_ {
 	/**
 	 * Suspend update if the current widget is not visible or is
 	 * completely covered by other widgets
 	 */
 	LCUI_BOOL only_on_visible;
+
+	/**
+	 * First update the children in the visible area
+	 * If your widget has a lot of children and you want to see the
+	 * children who are currently seeing the priority update, we recommend
+	 * enabling this rule.
+	 */
+	LCUI_BOOL first_update_visible_children;
 
 	/**
 	 * Cache the stylesheets of children to improve the query speed of
@@ -183,7 +193,7 @@ typedef struct LCUI_WidgetRulesRec_ {
 
 	/** Refresh the style of all child widgets if the status has changed */
 	LCUI_BOOL ignore_status_change;
-	
+
 	/** Refresh the style of all child widgets if the classes has changed */
 	LCUI_BOOL ignore_classes_change;
 
@@ -203,11 +213,13 @@ typedef struct LCUI_WidgetRulesRec_ {
 	void (*on_update_progress)(LCUI_Widget, size_t);
 } LCUI_WidgetRulesRec, *LCUI_WidgetRules;
 
+/* clang-format off */
+
 typedef struct LCUI_WidgetRulesDataRec_ {
 	LCUI_WidgetRulesRec rules;
 	Dict *style_cache;
 	size_t default_max_update_count;
-	size_t current_index;
+	size_t progress;
 } LCUI_WidgetRulesDataRec, *LCUI_WidgetRulesData;
 
 typedef struct LCUI_WidgetAttributeRec_ {

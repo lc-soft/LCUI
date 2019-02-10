@@ -392,7 +392,7 @@ int Widget_SetRules(LCUI_Widget w, const LCUI_WidgetRulesRec *rules)
 		return -ENOMEM;
 	}
 	data->rules = *rules;
-	data->current_index = 0;
+	data->progress = 0;
 	data->style_cache = NULL;
 	data->default_max_update_count = 2048;
 	w->rules = (LCUI_WidgetRules)data;

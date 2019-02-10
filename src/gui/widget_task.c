@@ -37,6 +37,7 @@
 
 static struct WidgetTaskModule {
 	DictType style_cache_dict;
+	unsigned max_updates_per_frame;
 	LCUI_WidgetFunction handlers[LCUI_WTASK_TOTAL_NUM];
 	unsigned update_count;
 } self;
@@ -184,6 +185,7 @@ void LCUIWidget_InitTasks(void)
 	SetHandler(DISPLAY, Widget_UpdateDisplay);
 	SetHandler(PROPS, Widget_UpdateProps);
 	InitStylesheetCacheDict();
+	self.max_updates_per_frame = 4;
 }
 
 void LCUIWidget_FreeTasks(void)
@@ -260,6 +262,61 @@ void Widget_EndUpdate(LCUI_WidgetTaskContext ctx)
 	free(ctx);
 }
 
+static size_t Widget_UpdateVisibleChildren(LCUI_Widget w,
+					   LCUI_WidgetTaskContext ctx)
+{
+	size_t total = 0, count;
+	LCUI_BOOL found = FALSE;
+	LCUI_RectF rect, visible_rect;
+	LCUI_Widget child, parent;
+	LinkedListNode *node, *next;
+
+	rect = w->box.padding;
+	if (rect.width < 1 && Widget_HasAutoStyle(w, key_width)) {
+		rect.width = w->parent->box.padding.width;
+	}
+	if (rect.height < 1 && Widget_HasAutoStyle(w, key_height)) {
+		rect.height = w->parent->box.padding.height;
+	}
+	for (child = w, parent = w->parent; parent;
+	     child = parent, parent = parent->parent) {
+		if (child == w) {
+			continue;
+		}
+		rect.x += child->box.padding.x;
+		rect.y += child->box.padding.y;
+		LCUIRectF_ValidateArea(&rect, parent->box.padding.width,
+				       parent->box.padding.height);
+	}
+	visible_rect = rect;
+	rect = w->box.padding;
+	Widget_GetOffset(w, NULL, &rect.x, &rect.y);
+	if (!LCUIRectF_GetOverlayRect(&visible_rect, &rect, &visible_rect)) {
+		return 0;
+	}
+	visible_rect.x -= w->box.padding.x;
+	visible_rect.y -= w->box.padding.y;
+	for (node = w->children.head.next; node; node = next) {
+		child = node->data;
+		next = node->next;
+		if (!LCUIRectF_GetOverlayRect(&visible_rect, &child->box.border,
+					      &rect)) {
+			if (found) {
+				break;
+			}
+			continue;
+		}
+		found = TRUE;
+		count = Widget_UpdateWithContext(child, ctx);
+		if (child->task.for_self || child->task.for_children) {
+			w->task.for_children = TRUE;
+		}
+		total += count;
+		node = next;
+	}
+	return total;
+}
+
 static size_t Widget_UpdateChildren(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 {
 	clock_t msec;
@@ -268,24 +325,32 @@ static size_t Widget_UpdateChildren(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 	LinkedListNode *node, *next;
 	size_t total = 0, update_count = 0, count;
 
+	if (!w->task.for_children) {
+		return 0;
+	}
 	data = (LCUI_WidgetRulesData)w->rules;
+	node = w->children.head.next;
 	if (data) {
+		msec = clock();
 		if (data->rules.only_on_visible) {
 			if (!Widget_InVisibleArea(w)) {
 				DEBUG_MSG("%s %s: is not visible\n", w->type,
-					   w->id);
+					  w->id);
 				return 0;
 			}
 		}
 		DEBUG_MSG("%s %s: is visible\n", w->type, w->id);
-		msec = clock();
+		if (data->rules.first_update_visible_children) {
+			total += Widget_UpdateVisibleChildren(w, ctx);
+			DEBUG_MSG("first update visible children count: %zu\n",
+				  total);
+		}
 	}
 	if (!w->task.for_children) {
 		return 0;
 	}
 	/* 如果子级部件中有待处理的部件，则递归进去 */
 	w->task.for_children = FALSE;
-	node = w->children.head.next;
 	while (node) {
 		child = node->data;
 		/* 如果当前部件有销毁任务，结点空间会连同部件一起被
@@ -304,10 +369,9 @@ static size_t Widget_UpdateChildren(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 			continue;
 		}
 		if (count > 0) {
-			data->current_index =
-			    max(data->current_index, child->index);
-			if (data->current_index >= w->children_show.length) {
-				data->current_index = child->index;
+			data->progress = max(child->index, data->progress);
+			if (data->progress > w->children_show.length) {
+				data->progress = child->index;
 			}
 			update_count += 1;
 		}
@@ -344,8 +408,11 @@ static size_t Widget_UpdateChildren(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 		break;
 	}
 	if (data) {
+		if (!w->task.for_children) {
+			data->progress = w->children_show.length;
+		}
 		if (data->rules.on_update_progress) {
-			data->rules.on_update_progress(w, data->current_index);
+			data->rules.on_update_progress(w, data->progress);
 		}
 	}
 	return total;
@@ -394,7 +461,7 @@ size_t Widget_Update(LCUI_Widget w)
 
 size_t LCUIWidget_Update(void)
 {
-	size_t count;
+	size_t i, count;
 	LCUI_Widget root;
 
 	/* 前两次更新需要主动刷新所有部件的样式，主要是为了省去在应用程序里手动调用
@@ -404,7 +471,9 @@ size_t LCUIWidget_Update(void)
 		self.update_count += 1;
 	}
 	root = LCUIWidget_GetRoot();
-	count = Widget_Update(root);
+	for (i = 0; i < self.max_updates_per_frame; ++i) {
+		count = Widget_Update(root);
+	}
 	LCUIWidget_ClearTrash();
 	return count;
 }
