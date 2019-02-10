@@ -105,6 +105,24 @@ static int check_overflow_box(void)
 	return ret;
 }
 
+static int check_change_visible(void)
+{
+	int ret = 0;
+	SelectWidget(alert, "alert");
+	CHECK(Widget_IsVisible(alert));
+	Widget_Hide(alert);
+	LCUIWidget_Update();
+	CHECK(alert->style->sheet[key_display].is_valid &&
+	      alert->style->sheet[key_display].val_style == SV_NONE);
+	CHECK(!Widget_IsVisible(alert));
+	Widget_Show(alert);
+	LCUIWidget_Update();
+	CHECK(Widget_IsVisible(alert));
+	CHECK(alert->style->sheet[key_display].is_valid &&
+	      alert->style->sheet[key_display].val_style == SV_BLOCK);
+	return ret;
+}
+
 static int check_layout(void)
 {
 	int ret = 0;
@@ -117,6 +135,7 @@ static int check_layout(void)
 	ret += check_picture();
 	ret += check_overflow_box();
 	ret += check_offset_box();
+	ret += check_change_visible();
 	return ret;
 }
 
@@ -161,7 +180,6 @@ int test_widget_layout(void)
 	Widget_Append(root, pack);
 	Widget_Unwrap(pack);
 	LCUIWidget_Update();
-	check_overflow_box();
 #ifdef PREVIEW_MODE
 	LCUI_PostSimpleTask(run_test, NULL, NULL);
 	return LCUI_Main();
