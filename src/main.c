@@ -173,8 +173,7 @@ void LCUIStats_End(LCUI_Stats stats)
 {
 	stats->total_time = (uint32_t)LCUI_GetTimeDelta(stats->start_time);
 	if (stats->total_time > 100) {
-		LOG("[stats] \e[1;33mwarning:\e[0m current frame takes "
-		    "too long\n");
+		LOG("[stats] warning: current frame takes too long\n");
 		LCUIStats_Print(stats);
 	}
 }
@@ -293,12 +292,11 @@ void LCUI_DestroyEvent(LCUI_SysEvent e)
 
 void LCUI_ProcessEvents(void)
 {
-	if (MainApp.driver_ready) {
-		MainApp.driver->ProcessEvents();
-	}
-	while (LCUIWorker_RunTask(MainApp.main_worker)) {
-		LCUIDisplay_Update();
-	}
+	do {
+		if (MainApp.driver_ready) {
+			MainApp.driver->ProcessEvents();
+		}
+	} while (LCUIWorker_RunTask(MainApp.main_worker));
 }
 
 LCUI_BOOL LCUI_PostTask(LCUI_Task task)
@@ -385,12 +383,13 @@ int LCUIMainLoop_Run(LCUI_MainLoop loop)
 		LCUIDisplay_Present();
 		LCUIStats_RecordTime(&stats, LCUI_STATS_PRESENT);
 		LCUIStats_End(&stats);
-#endif
+#else
 		LCUI_ProcessTimers();
 		LCUI_ProcessEvents();
 		LCUIDisplay_Update();
 		LCUIDisplay_Render();
 		LCUIDisplay_Present();
+#endif
 		StepTimer_Remain(MainApp.timer);
 		/* 如果当前运行的主循环不是自己 */
 		while (MainApp.loop != loop) {

@@ -246,9 +246,11 @@ static void WidgetEventTranslator(LCUI_Event e, LCUI_WidgetEventPack pack)
 	handler->func(w, &pack->event, pack->data);
 	while (!pack->event.cancel_bubble && w->parent) {
 		w = w->parent;
-		pack->widget = w;
-		/** 向父级部件冒泡传递事件 */
-		EventTrigger_Trigger(w->trigger, e->type, pack);
+		if (w->trigger) {
+			pack->widget = w;
+			/** 向父级部件冒泡传递事件 */
+			EventTrigger_Trigger(w->trigger, e->type, pack);
+		}
 	}
 }
 
@@ -434,6 +436,9 @@ int Widget_BindEventById(LCUI_Widget widget, int event_id,
 	handler->func = func;
 	handler->data = data;
 	handler->destroy_data = destroy_data;
+	if (!widget->trigger) {
+		widget->trigger = EventTrigger();
+	}
 	return EventTrigger_Bind(widget->trigger, event_id,
 				 (LCUI_EventFunc)WidgetEventTranslator, handler,
 				 DestroyWidgetEventHandler);
@@ -507,9 +512,6 @@ static int Widget_TriggerEventEx(LCUI_Widget widget, LCUI_WidgetEventPack pack)
 {
 	LCUI_WidgetEvent e = &pack->event;
 
-	if (!widget->trigger) {
-		return -1;
-	}
 	pack->widget = widget;
 	switch (e->type) {
 	case LCUI_WEVENT_CLICK:
@@ -522,7 +524,8 @@ static int Widget_TriggerEventEx(LCUI_Widget widget, LCUI_WidgetEventPack pack)
 			break;
 		}
 	default:
-		if (0 < EventTrigger_Trigger(widget->trigger, e->type, pack)) {
+		if (widget->trigger && 0 <
+		    EventTrigger_Trigger(widget->trigger, e->type, pack)) {
 			return 0;
 		}
 		if (!widget->parent || e->cancel_bubble) {
@@ -534,7 +537,8 @@ static int Widget_TriggerEventEx(LCUI_Widget widget, LCUI_WidgetEventPack pack)
 	if (!widget->parent || e->cancel_bubble) {
 		return -1;
 	}
-	while (widget->computed_style.pointer_events == SV_NONE) {
+	while (widget->trigger &&
+	       widget->computed_style.pointer_events == SV_NONE) {
 		LCUI_Widget w;
 		LCUI_BOOL is_pointer_event = TRUE;
 		int pointer_x, pointer_y;
@@ -587,6 +591,7 @@ LCUI_BOOL Widget_PostEvent(LCUI_Widget widget, LCUI_WidgetEvent ev, void *data,
 	LCUI_Event sys_ev;
 	LCUI_TaskRec task;
 	LCUI_WidgetEventPack pack;
+
 	if (widget->state == LCUI_WSTATE_DELETED) {
 		return FALSE;
 	}
@@ -620,6 +625,7 @@ LCUI_BOOL Widget_PostEvent(LCUI_Widget widget, LCUI_WidgetEvent ev, void *data,
 int Widget_TriggerEvent(LCUI_Widget widget, LCUI_WidgetEvent e, void *data)
 {
 	LCUI_WidgetEventPackRec pack;
+
 	if (!e->target) {
 		e->target = widget;
 	}
@@ -1203,6 +1209,7 @@ int Widget_PostSurfaceEvent(LCUI_Widget w, int event_type, LCUI_BOOL sync_props)
 	int *data;
 	LCUI_WidgetEventRec e = { 0 };
 	LCUI_Widget root = LCUIWidget_GetRoot();
+
 	if (w->parent != root && w != root) {
 		return -1;
 	}
@@ -1221,13 +1228,16 @@ int Widget_PostSurfaceEvent(LCUI_Widget w, int event_type, LCUI_BOOL sync_props)
 void Widget_DestroyEventTrigger(LCUI_Widget w)
 {
 	LCUI_WidgetEventRec e = { LCUI_WEVENT_DESTROY, 0 };
+
 	Widget_TriggerEvent(w, &e, NULL);
 	Widget_ReleaseMouseCapture(w);
 	Widget_ReleaseTouchCapture(w, -1);
 	Widget_StopEventPropagation(w);
 	LCUIWidget_ClearEventTarget(w);
-	EventTrigger_Destroy(w->trigger);
-	w->trigger = NULL;
+	if (w->trigger) {
+		EventTrigger_Destroy(w->trigger);
+		w->trigger = NULL;
+	}
 }
 
 static void BindSysEvent(int e, LCUI_SysEventFunc func)

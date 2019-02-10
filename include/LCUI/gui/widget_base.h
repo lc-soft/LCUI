@@ -124,6 +124,7 @@ typedef enum LCUI_WidgetState {
 
 typedef struct LCUI_WidgetRec_* LCUI_Widget;
 typedef struct LCUI_WidgetPrototypeRec_ *LCUI_WidgetPrototype;
+typedef struct LCUI_WidgetTaskContextRec_ *LCUI_WidgetTaskContext;
 typedef const struct LCUI_WidgetPrototypeRec_ *LCUI_WidgetPrototypeC;
 
 typedef void(*LCUI_WidgetFunction)(LCUI_Widget);
@@ -159,11 +160,21 @@ typedef struct LCUI_WidgetData_ {
 } LCUI_WidgetData;
 
 typedef struct LCUI_WidgetTaskContextRec_ {
-	LCUI_Selector selector;
-	LCUI_Widget widget;
-} LCUI_WidgetTaskContextRec, *LCUI_WidgetTaskContext;
+	Dict *style_cache;
+	unsigned style_hash;
+	LCUI_WidgetTaskContext parent;
+} LCUI_WidgetTaskContextRec;
 
 typedef struct LCUI_WidgetRulesRec_ {
+	/**
+	 * Cache the stylesheets of children to improve the query speed of
+	 * the stylesheet.
+	 * If this rule is enabled, we recommend that you manually call
+	 * Widget_GenerateHash() to generate a hash value for the children
+	 * of the widget.
+	 */
+	LCUI_BOOL cache_children_style;
+
 	/** Refresh the style of all child widgets if the status has changed */
 	LCUI_BOOL ignore_status_change;
 	
@@ -185,6 +196,7 @@ typedef struct LCUI_WidgetRulesRec_ {
 
 typedef struct LCUI_WidgetRulesDataRec_ {
 	LCUI_WidgetRulesRec rules;
+	Dict *style_cache;
 	size_t default_max_update_count;
 	size_t current_index;
 } LCUI_WidgetRulesDataRec, *LCUI_WidgetRulesData;
@@ -203,6 +215,7 @@ typedef struct LCUI_WidgetAttributeRec_ {
 
 /** 部件结构 */
 typedef struct LCUI_WidgetRec_ {
+	unsigned		hash;			/**< 哈希值 */
 	LCUI_WidgetState	state;			/**< 状态 */
 	float			x, y;			/**< 当前坐标（由 origin 计算而来） */
 	float			origin_x, origin_y;	/**< 当前布局下计算出的坐标 */
@@ -400,6 +413,12 @@ LCUI_API void Widget_SetTitleW(LCUI_Widget w, const wchar_t *title);
 
 /** 为部件添加状态 */
 LCUI_API void Widget_AddState(LCUI_Widget w, LCUI_WidgetState state);
+
+/** Generate a hash for a widget to identify it and siblings */
+LCUI_API void Widget_GenerateSelfHash(LCUI_Widget w);
+
+/** Generate hash values for a widget and its children */
+LCUI_API void Widget_GenerateHash(LCUI_Widget w);
 
 /** Set widget updating rules */
 LCUI_API int Widget_SetRules(LCUI_Widget w, const LCUI_WidgetRulesRec *rules);

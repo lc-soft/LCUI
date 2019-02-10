@@ -107,7 +107,6 @@ static void Widget_Init(LCUI_Widget widget)
 {
 	ZEROSET(widget, LCUI_Widget);
 	widget->state = LCUI_WSTATE_CREATED;
-	widget->trigger = EventTrigger();
 	widget->style = StyleSheet();
 	widget->computed_style.opacity = 1.0;
 	widget->computed_style.visible = TRUE;
@@ -271,12 +270,62 @@ void Widget_SetTitleW(LCUI_Widget w, const wchar_t *title)
 	Widget_AddTask(w, LCUI_WTASK_TITLE);
 }
 
+void Widget_GenerateSelfHash(LCUI_Widget widget)
+{
+	int i;
+	unsigned hash = 1080;
+	LCUI_Widget w;
+
+	for (w = widget; w; w = w->parent) {
+		if (w != widget) {
+			hash = strhash(hash, " ");
+		}
+		if (w->type) {
+			hash = strhash(hash, w->type);
+		} else {
+			hash = strhash(hash, "*");
+		}
+		if (w->id) {
+			hash = strhash(hash, "#");
+			hash = strhash(hash, w->id);
+		}
+		if (w->classes) {
+			for (i = 0; w->classes[i]; ++i) {
+				hash = strhash(hash, ".");
+				hash = strhash(hash, w->classes[i]);
+			}
+		}
+		if (w->status) {
+			for (i = 0; w->status[i]; ++i) {
+				hash = strhash(hash, ":");
+				hash = strhash(hash, w->status[i]);
+			}
+		}
+		if (w->rules && w->rules->cache_children_style) {
+			break;
+		}
+	}
+	widget->hash = hash;
+}
+
+void Widget_GenerateHash(LCUI_Widget w)
+{
+	LinkedListNode *node;
+
+	Widget_GenerateSelfHash(w);
+	for (LinkedList_Each(node, &w->children_show)) {
+		Widget_GenerateHash(node->data);
+	}
+}
+
 int Widget_SetRules(LCUI_Widget w, const LCUI_WidgetRulesRec *rules)
 {
 	LCUI_WidgetRulesData data;
 
-	if (w->rules) {
-		free(w->rules);
+	data = (LCUI_WidgetRulesData)w->rules;
+	if (data) {
+		Dict_Release(data->style_cache);
+		free(data);
 		w->rules = NULL;
 	}
 	if (!rules) {
@@ -288,6 +337,7 @@ int Widget_SetRules(LCUI_Widget w, const LCUI_WidgetRulesRec *rules)
 	}
 	data->rules = *rules;
 	data->current_index = 0;
+	data->style_cache = NULL;
 	data->default_max_update_count = 2048;
 	w->rules = (LCUI_WidgetRules)data;
 	return 0;

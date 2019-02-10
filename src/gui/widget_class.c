@@ -54,6 +54,11 @@ static int Widget_HandleClassesChange(LCUI_Widget w, const char *name)
 	if (w->rules && w->rules->ignore_classes_change) {
 		return 0;
 	}
+	/* If widget is not ready, indicate that the style of the children has
+	 * been marked needs to be refreshed */
+	if (w->state < LCUI_WSTATE_READY) {
+		return 1;
+	}
 	if (Widget_GetChildrenStyleChanges(w, 0, name) > 0) {
 		Widget_MarkChildrenRefreshByClasses(w);
 		return 1;

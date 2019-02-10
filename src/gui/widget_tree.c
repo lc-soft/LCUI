@@ -66,7 +66,7 @@ int Widget_Append(LCUI_Widget parent, LCUI_Widget widget)
 	ev.type = LCUI_WEVENT_LINK;
 	Widget_UpdateStyle(widget, TRUE);
 	Widget_UpdateChildrenStyle(widget, TRUE);
-	Widget_PostEvent(widget, &ev, NULL, NULL);
+	Widget_TriggerEvent(widget, &ev, NULL);
 	Widget_PostSurfaceEvent(widget, LCUI_WEVENT_LINK, TRUE);
 	Widget_UpdateTaskStatus(widget);
 	Widget_UpdateStatus(widget);
@@ -79,6 +79,7 @@ int Widget_Prepend(LCUI_Widget parent, LCUI_Widget widget)
 	LCUI_Widget child;
 	LCUI_WidgetEventRec ev = { 0 };
 	LinkedListNode *node, *snode;
+
 	if (!parent || !widget) {
 		return -1;
 	}
@@ -103,7 +104,7 @@ int Widget_Prepend(LCUI_Widget parent, LCUI_Widget widget)
 	}
 	ev.cancel_bubble = TRUE;
 	ev.type = LCUI_WEVENT_LINK;
-	Widget_PostEvent(widget, &ev, NULL, NULL);
+	Widget_TriggerEvent(widget, &ev, NULL);
 	Widget_PostSurfaceEvent(widget, LCUI_WEVENT_LINK, TRUE);
 	Widget_AddTaskForChildren(widget, LCUI_WTASK_REFRESH_STYLE);
 	Widget_UpdateTaskStatus(widget);
@@ -195,7 +196,7 @@ int Widget_Unlink(LCUI_Widget widget)
 	node = &widget->node;
 	ev.cancel_bubble = TRUE;
 	ev.type = LCUI_WEVENT_UNLINK;
-	Widget_PostEvent(widget, &ev, NULL, NULL);
+	Widget_TriggerEvent(widget, &ev, NULL);
 	LinkedList_Unlink(&widget->parent->children, node);
 	LinkedList_Unlink(&widget->parent->children_show, snode);
 	Widget_PostSurfaceEvent(widget, LCUI_WEVENT_UNLINK, TRUE);

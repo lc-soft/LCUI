@@ -52,6 +52,9 @@ static void Widget_MarkChildrenRefreshByStatus(LCUI_Widget w)
 static int Widget_HandleStatusChange(LCUI_Widget w, const char *name)
 {
 	Widget_UpdateStyle(w, TRUE);
+	if (w->state < LCUI_WSTATE_READY) {
+		return 1;
+	}
 	if (w->rules && w->rules->ignore_status_change) {
 		return 0;
 	}
@@ -94,6 +97,7 @@ int Widget_RemoveStatus(LCUI_Widget w, const char *status_name)
 void Widget_UpdateStatus(LCUI_Widget widget)
 {
 	LCUI_Widget child;
+
 	if (!widget->parent) {
 		return;
 	}

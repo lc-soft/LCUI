@@ -176,7 +176,7 @@ typedef struct LCUI_SelectorRec_ {
 	int rank;			/**< 权值，决定优先级 */
 	int batch_num;			/**< 批次号 */
 	int length;			/**< 选择器结点长度 */
-	unsigned int hash;		/**< 哈希值 */
+	unsigned hash;			/**< 哈希值 */
 	LCUI_SelectorNode *nodes;	/**< 选择器结点列表 */
 } LCUI_SelectorRec, *LCUI_Selector;
 

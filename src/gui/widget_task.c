@@ -36,9 +36,51 @@
 #include <LCUI/gui/widget.h>
 
 static struct WidgetTaskModule {
+	DictType style_cache_dict;
 	LCUI_WidgetFunction handlers[LCUI_WTASK_TOTAL_NUM];
 	unsigned update_count;
 } self;
+
+static unsigned int IntKeyDict_HashFunction(const void *key)
+{
+	return Dict_IdentityHashFunction(*(unsigned int *)key);
+}
+
+static int IntKeyDict_KeyCompare(void *privdata, const void *key1,
+				 const void *key2)
+{
+	return *(unsigned int *)key1 == *(unsigned int *)key2;
+}
+
+static void IntKeyDict_KeyDestructor(void *privdata, void *key)
+{
+	free(key);
+}
+
+static void *IntKeyDict_KeyDup(void *privdata, const void *key)
+{
+	unsigned int *newkey = malloc(sizeof(unsigned int));
+	*newkey = *(unsigned int *)key;
+	return newkey;
+}
+
+static void StyleSheetCacheDestructor(void *privdata, void *val)
+{
+	StyleSheet_Delete(val);
+}
+
+static void InitStylesheetCacheDict(void)
+{
+	DictType *dt = &self.style_cache_dict;
+
+	dt->valDup = NULL;
+	dt->keyDup = IntKeyDict_KeyDup;
+	dt->keyCompare = IntKeyDict_KeyCompare;
+	dt->hashFunction = IntKeyDict_HashFunction;
+	dt->keyDestructor = IntKeyDict_KeyDestructor;
+	dt->valDestructor = StyleSheetCacheDestructor;
+	dt->keyDestructor = IntKeyDict_KeyDestructor;
+}
 
 static void HandleRefreshStyle(LCUI_Widget w)
 {
@@ -141,6 +183,7 @@ void LCUIWidget_InitTasks(void)
 	SetHandler(ZINDEX, Widget_ExecUpdateZIndex);
 	SetHandler(DISPLAY, Widget_UpdateDisplay);
 	SetHandler(PROPS, Widget_UpdateProps);
+	InitStylesheetCacheDict();
 }
 
 void LCUIWidget_FreeTasks(void)
@@ -151,57 +194,162 @@ void LCUIWidget_FreeTasks(void)
 LCUI_WidgetTaskContext Widget_BeginUpdate(LCUI_Widget w,
 					  LCUI_WidgetTaskContext ctx)
 {
+	unsigned hash;
+	LCUI_Selector selector;
+	LCUI_StyleSheet style;
+	LCUI_WidgetRulesData data;
 	LCUI_CachedStyleSheet inherited_style;
 	LCUI_WidgetTaskContext self_ctx;
+	LCUI_WidgetTaskContext parent;
 
 	self_ctx = malloc(sizeof(LCUI_WidgetTaskContextRec));
 	if (!self_ctx) {
 		return NULL;
 	}
-	if (ctx) {
-		self_ctx->selector = Selector_Copy(ctx->selector);
-		if (0 != Selector_AppendNode(self_ctx->selector,
-					     Widget_GetSelectorNode(w))) {
-			return NULL;
+	self_ctx->parent = ctx;
+	self_ctx->style_cache = NULL;
+	for (parent = ctx; parent; parent = parent->parent) {
+		if (parent->style_cache) {
+			self_ctx->style_cache = parent->style_cache;
+			self_ctx->style_hash = parent->style_hash;
+			break;
 		}
-	} else {
-		self_ctx->selector = Widget_GetSelector(w);
+	}
+	if (w->hash && w->task.states[LCUI_WTASK_REFRESH_STYLE]) {
+		Widget_GenerateSelfHash(w);
+	}
+	if (!self_ctx->style_cache && w->rules &&
+	    w->rules->cache_children_style) {
+		data = (LCUI_WidgetRulesData)w->rules;
+		if (!data->style_cache) {
+			data->style_cache =
+			    Dict_Create(&self.style_cache_dict, NULL);
+		}
+		Widget_GenerateSelfHash(w);
+		self_ctx->style_hash = w->hash;
+		self_ctx->style_cache = data->style_cache;
 	}
 	inherited_style = w->inherited_style;
-	w->inherited_style = LCUI_GetCachedStyleSheet(self_ctx->selector);
+	if (self_ctx->style_cache && w->hash) {
+		hash = self_ctx->style_hash;
+		hash = ((hash << 5) + hash) + w->hash;
+		style = Dict_FetchValue(self_ctx->style_cache, &hash);
+		if (!style) {
+			style = StyleSheet();
+			selector = Widget_GetSelector(w);
+			LCUI_GetStyleSheet(selector, style);
+			Dict_Add(self_ctx->style_cache, &hash, style);
+			Selector_Delete(selector);
+		}
+		w->inherited_style = style;
+	} else {
+		selector = Widget_GetSelector(w);
+		w->inherited_style = LCUI_GetCachedStyleSheet(selector);
+		Selector_Delete(selector);
+	}
 	if (w->inherited_style != inherited_style) {
 		Widget_AddTask(w, LCUI_WTASK_REFRESH_STYLE);
 	}
-	self_ctx->widget = w;
 	return self_ctx;
 }
 
 void Widget_EndUpdate(LCUI_WidgetTaskContext ctx)
 {
-	Selector_Delete(ctx->selector);
-	ctx->selector = NULL;
-	ctx->widget = NULL;
+	ctx->style_cache = NULL;
+	ctx->parent = NULL;
 	free(ctx);
+}
+
+static size_t Widget_UpdateChildren(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
+{
+	clock_t msec;
+	LCUI_Widget child;
+	LCUI_WidgetRulesData data;
+	LinkedListNode *node, *next;
+	size_t total = 0, update_count = 0, count;
+
+	data = (LCUI_WidgetRulesData)w->rules;
+	if (data) {
+		msec = clock();
+	}
+	if (!w->task.for_children) {
+		return 0;
+	}
+	/* 如果子级部件中有待处理的部件，则递归进去 */
+	w->task.for_children = FALSE;
+	node = w->children.head.next;
+	while (node) {
+		child = node->data;
+		/* 如果当前部件有销毁任务，结点空间会连同部件一起被
+		 * 释放，为避免因访问非法空间而出现异常，预先保存下
+		 * 个结点。
+		 */
+		next = node->next;
+		/* 如果该级部件的任务需要留到下次再处理 */
+		count = Widget_UpdateWithContext(child, ctx);
+		if (child->task.for_self || child->task.for_children) {
+			w->task.for_children = TRUE;
+		}
+		total += count;
+		node = next;
+		if (!data) {
+			continue;
+		}
+		if (count > 0) {
+			data->current_index =
+			    max(data->current_index, child->index);
+			if (data->current_index >= w->children_show.length) {
+				data->current_index = child->index;
+			}
+			update_count += 1;
+		}
+		if (data->rules.max_update_children_count < 0) {
+			continue;
+		}
+		if (data->rules.max_update_children_count > 0) {
+			if (update_count >=
+			    data->rules.max_update_children_count) {
+				w->task.for_children = TRUE;
+				break;
+			}
+		}
+		if (update_count < data->default_max_update_count) {
+			continue;
+		}
+		w->task.for_children = TRUE;
+		/*
+		 * Conversion from:
+		 * (1000 / LCUI_MAX_FRAMES_PER_SEC) /
+		 * ((clock() - start) / CLOCKS_PER_SEC * 1000 / update_count);
+		 */
+		msec = (clock() - msec);
+		if (msec < 1) {
+			data->default_max_update_count += 2048;	
+			continue;
+		}
+		data->default_max_update_count =
+		update_count * CLOCKS_PER_SEC / self.max_updates_per_frame /
+		LCUI_MAX_FRAMES_PER_SEC / msec;
+		if (data->default_max_update_count < 1) {
+			data->default_max_update_count = 32;
+		}
+		break;
+	}
+	if (data && data->rules.on_update_progress) {
+		data->rules.on_update_progress(w, data->current_index);
+	}
+	return total;
 }
 
 size_t Widget_UpdateWithContext(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 {
 	int i;
-	clock_t msec;
-	size_t total = 0, update_count = 0, count;
-
+	size_t count = 0;
 	LCUI_BOOL *states;
-	LCUI_Widget child;
 	LCUI_WidgetTaskContext self_ctx;
-	LCUI_WidgetRulesData data;
-	LinkedListNode *node, *next;
 
 	if (!w->task.for_self && !w->task.for_children) {
 		return 0;
-	}
-	data = (LCUI_WidgetRulesData)w->rules;
-	if (data) {
-		msec = clock();
 	}
 	self_ctx = Widget_BeginUpdate(w, ctx);
 	if (w->task.for_self) {
@@ -222,72 +370,11 @@ size_t Widget_UpdateWithContext(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 			}
 		}
 		Widget_AddState(w, LCUI_WSTATE_UPDATED);
-		total += 1;
+		count += 1;
 	}
-	if (w->task.for_children) {
-		/* 如果子级部件中有待处理的部件，则递归进去 */
-		w->task.for_children = FALSE;
-		node = w->children.head.next;
-		while (node) {
-			child = node->data;
-			/* 如果当前部件有销毁任务，结点空间会连同部件一起被
-			 * 释放，为避免因访问非法空间而出现异常，预先保存下
-			 * 个结点。
-			 */
-			next = node->next;
-			/* 如果该级部件的任务需要留到下次再处理 */
-			count = Widget_UpdateWithContext(child, self_ctx);
-			if (child->task.for_self || child->task.for_children) {
-				w->task.for_children = TRUE;
-			}
-			total += count;
-			node = next;
-			if (!data) {
-				continue;
-			}
-			if (count > 0) {
-				data->current_index = max(data->current_index, child->index);
-				update_count += 1;
-			}
-			if (data->rules.max_update_children_count < 0) {
-				continue;
-			}
-			if (data->rules.max_update_children_count > 0) {
-				if (update_count >=
-				    data->rules.max_update_children_count) {
-					w->task.for_children = TRUE;
-					break;
-				}
-			}
-			if (update_count < data->default_max_update_count) {
-				continue;
-			}
-			w->task.for_children = TRUE;
-			/*
-			 * Conversion from:
-			 * (1000 / LCUI_MAX_FRAMES_PER_SEC /
-			 * ((clock() - start) / CLOCKS_PER_SEC * 1000 /
-			 * update_count);
-			 */
-			msec = (clock() - msec);
-			if (msec < 1) {
-				data->default_max_update_count += 2048;	
-				continue;
-			}
-			data->default_max_update_count =
-			update_count * CLOCKS_PER_SEC /
-			LCUI_MAX_FRAMES_PER_SEC / msec;
-			if (data->default_max_update_count < 1) {
-				data->default_max_update_count = 32;
-			}
-			break;
-		}
-	}
-	if (data && data->rules.on_update_progress) {
-		data->rules.on_update_progress(w, data->current_index);
-	}
+	count += Widget_UpdateChildren(w, self_ctx);
 	Widget_EndUpdate(self_ctx);
-	return total;
+	return count;
 }
 
 size_t Widget_Update(LCUI_Widget w)
@@ -297,8 +384,7 @@ size_t Widget_Update(LCUI_Widget w)
 
 size_t LCUIWidget_Update(void)
 {
-	int i;
-	size_t total, count;
+	size_t count;
 	LCUI_Widget root;
 
 	/* 前两次更新需要主动刷新所有部件的样式，主要是为了省去在应用程序里手动调用
@@ -308,15 +394,9 @@ size_t LCUIWidget_Update(void)
 		self.update_count += 1;
 	}
 	root = LCUIWidget_GetRoot();
-	for (total = 0, i = 0; i < 2; ++i) {
-		count = Widget_Update(root);
-		if (count < 1) {
-			break;
-		}
-		total += count;
-	}
+	count = Widget_Update(root);
 	LCUIWidget_ClearTrash();
-	return total;
+	return count;
 }
 
 void LCUIWidget_RefreshStyle(void)
