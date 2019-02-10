@@ -270,6 +270,14 @@ static size_t Widget_UpdateChildren(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 
 	data = (LCUI_WidgetRulesData)w->rules;
 	if (data) {
+		if (data->rules.only_on_visible) {
+			if (!Widget_InVisibleArea(w)) {
+				DEBUG_MSG("%s %s: is not visible\n", w->type,
+					   w->id);
+				return 0;
+			}
+		}
+		DEBUG_MSG("%s %s: is visible\n", w->type, w->id);
 		msec = clock();
 	}
 	if (!w->task.for_children) {
@@ -335,8 +343,10 @@ static size_t Widget_UpdateChildren(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 		}
 		break;
 	}
-	if (data && data->rules.on_update_progress) {
-		data->rules.on_update_progress(w, data->current_index);
+	if (data) {
+		if (data->rules.on_update_progress) {
+			data->rules.on_update_progress(w, data->current_index);
+		}
 	}
 	return total;
 }

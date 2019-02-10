@@ -28,15 +28,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-//#define DEBUG
 #include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-
-#define LCUIRect_IsIncludeRect(a,b)	\
-	b->x >= a->x && b->x + b->width <= a->x + a->width \
-	&& b->y >= a->y && b->y + b->height <= a->y + a->height
 
 LCUI_Rect Rect(int x, int y, int w, int h)
 {

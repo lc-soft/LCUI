@@ -270,6 +270,62 @@ void Widget_SetTitleW(LCUI_Widget w, const wchar_t *title)
 	Widget_AddTask(w, LCUI_WTASK_TITLE);
 }
 
+LCUI_BOOL Widget_InVisibleArea(LCUI_Widget w)
+{
+	LinkedListNode *node;
+	LCUI_RectF rect;
+	LCUI_Widget self, parent, child;
+	LCUI_WidgetStyle *style;
+
+	rect = w->box.padding;
+	/* If the size of the widget is not fixed, then set the maximum size to
+	 * avoid it being judged invisible all the time. */
+	if (rect.width < 1 && Widget_HasAutoStyle(w, key_width)) {
+		rect.width = w->parent->box.padding.width;
+	}
+	if (rect.height < 1 && Widget_HasAutoStyle(w, key_height)) {
+		rect.height = w->parent->box.padding.height;
+	}
+	for (self = w, parent = w->parent; parent;
+	     self = parent, parent = parent->parent) {
+		if (!Widget_IsVisible(parent)) {
+			return FALSE;
+		}
+		for (node = self->node_show.prev; node && node->prev;
+		     node = node->prev) {
+			child = node->data;
+			style = &child->computed_style;
+			if (child->state < LCUI_WSTATE_LAYOUTED ||
+			    child == self || !Widget_IsVisible(child)) {
+				continue;
+			}
+			DEBUG_MSG("rect: (%g,%g,%g,%g), child rect: "
+				   "(%g,%g,%g,%g), child: %s %s\n",
+				   rect.x, rect.y, rect.width, rect.height,
+				   child->box.border.x, child->box.border.y,
+				   child->box.border.width,
+				   child->box.border.height, child->type,
+				   child->id);
+			if (!LCUIRectF_IsIncludeRect(&child->box.border,
+						     &rect)) {
+				continue;
+			}
+			if (style->opacity == 1.0f &&
+			    style->background.color.alpha == 255) {
+				return FALSE;
+			}
+		}
+		rect.x += parent->box.padding.x;
+		rect.y += parent->box.padding.y;
+		LCUIRectF_ValidateArea(&rect, parent->box.padding.width,
+				       parent->box.padding.height);
+		if (rect.width < 1 || rect.height < 1) {
+			return FALSE;
+		}
+	}
+	return TRUE;
+}
+
 void Widget_GenerateSelfHash(LCUI_Widget widget)
 {
 	int i;

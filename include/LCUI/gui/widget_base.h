@@ -167,6 +167,12 @@ typedef struct LCUI_WidgetTaskContextRec_ {
 
 typedef struct LCUI_WidgetRulesRec_ {
 	/**
+	 * Suspend update if the current widget is not visible or is
+	 * completely covered by other widgets
+	 */
+	LCUI_BOOL only_on_visible;
+
+	/**
 	 * Cache the stylesheets of children to improve the query speed of
 	 * the stylesheet.
 	 * If this rule is enabled, we recommend that you manually call
@@ -190,7 +196,7 @@ typedef struct LCUI_WidgetRulesRec_ {
 	 */
 	int max_update_children_count;
 
-	/** Limit the number of children rendered */
+	/** Limit the number of children rendered  */
 	unsigned max_render_children_count;
 
 	/** A callback function on update progress */
@@ -416,6 +422,9 @@ LCUI_API void Widget_SetTitleW(LCUI_Widget w, const wchar_t *title);
 
 /** 为部件添加状态 */
 LCUI_API void Widget_AddState(LCUI_Widget w, LCUI_WidgetState state);
+
+/** Check whether the widget is in the visible area */
+LCUI_API LCUI_BOOL Widget_InVisibleArea(LCUI_Widget w);
 
 /** Generate a hash for a widget to identify it and siblings */
 LCUI_API void Widget_GenerateSelfHash(LCUI_Widget w);

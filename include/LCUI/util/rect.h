@@ -31,32 +31,38 @@
 #ifndef LCUI_UTIL_RECT_H
 #define LCUI_UTIL_RECT_H
 
+#define LCUIRect_IsIncludeRect(a, b)                                       \
+	((b)->x >= (a)->x && (b)->x + (b)->width <= (a)->x + (a)->width && \
+	 (b)->y >= (a)->y && (b)->y + (b)->height <= (a)->y + (a)->height)
+
+#define LCUIRectF_IsIncludeRect LCUIRect_IsIncludeRect
+
 LCUI_BEGIN_HEADER
 
 /* 将数值转换成LCUI_Rect型结构体 */
 LCUI_API LCUI_Rect Rect(int x, int y, int w, int h);
 
 /** 根据容器尺寸，获取指定区域中需要裁剪的区域 */
-LCUI_API void LCUIRect_GetCutArea(int box_w, int box_h,
-				  LCUI_Rect rect, LCUI_Rect *cut);
+LCUI_API void LCUIRect_GetCutArea(int box_w, int box_h, LCUI_Rect rect,
+				  LCUI_Rect *cut);
 
-#define LCUIRect_HasPoint(rect, X, Y) (X >= (rect)->x && Y >= (rect)->y \
-					&& X < (rect)->x + (rect)->width \
-					&& Y < (rect)->y + (rect)->height)
+#define LCUIRect_HasPoint(rect, X, Y)                                         \
+	(X >= (rect)->x && Y >= (rect)->y && X < (rect)->x + (rect)->width && \
+	 Y < (rect)->y + (rect)->height)
 
 /** 将矩形区域范围调整在容器有效范围内 */
 LCUI_API LCUI_BOOL LCUIRect_ValidateArea(LCUI_Rect *rect, int box_w, int box_h);
 
-LCUI_API LCUI_BOOL LCUIRectF_ValidateArea(LCUI_RectF *rect, float box_w, float box_h);
+LCUI_API LCUI_BOOL LCUIRectF_ValidateArea(LCUI_RectF *rect, float box_w,
+					  float box_h);
 
-LCUI_API void LCUIRect_ToRectF(const LCUI_Rect *rect,
-			       LCUI_RectF *rectf, float scale);
+LCUI_API void LCUIRect_ToRectF(const LCUI_Rect *rect, LCUI_RectF *rectf,
+			       float scale);
 
-LCUI_API void LCUIRect_Scale(const LCUI_Rect *src,
-			     LCUI_Rect *dst, float scale);
+LCUI_API void LCUIRect_Scale(const LCUI_Rect *src, LCUI_Rect *dst, float scale);
 
-LCUI_API void LCUIRectF_ToRect(const LCUI_RectF *rectf,
-			       LCUI_Rect *rect, float scale);
+LCUI_API void LCUIRectF_ToRect(const LCUI_RectF *rectf, LCUI_Rect *rect,
+			       float scale);
 
 /** 检测矩形是否遮盖另一个矩形 */
 LCUI_API LCUI_BOOL LCUIRect_IsCoverRect(LCUI_Rect *rect1, LCUI_Rect *rect2);
@@ -69,8 +75,7 @@ LCUI_API LCUI_BOOL LCUIRect_IsCoverRect(LCUI_Rect *rect1, LCUI_Rect *rect2);
  * @returns 如果两个矩形重叠，则返回TRUE，否则返回FALSE
  */
 LCUI_API LCUI_BOOL LCUIRect_GetOverlayRect(const LCUI_Rect *a,
-					   const LCUI_Rect *b,
-					   LCUI_Rect *out);
+					   const LCUI_Rect *b, LCUI_Rect *out);
 
 LCUI_API LCUI_BOOL LCUIRectF_GetOverlayRect(const LCUI_RectF *a,
 					    const LCUI_RectF *b,
@@ -102,7 +107,7 @@ LCUI_API int RectList_Add(LinkedList *list, LCUI_Rect *rect);
 /** 删除脏矩形 */
 LCUI_API int RectList_Delete(LinkedList *list, LCUI_Rect *rect);
 
-#define RectList_Clear(LIST) LinkedList_Clear( LIST, free )
+#define RectList_Clear(LIST) LinkedList_Clear(LIST, free)
 
 LCUI_END_HEADER
 
