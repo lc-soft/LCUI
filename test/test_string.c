@@ -45,6 +45,9 @@ int test_strs(void)
 	CHECK(!strlist_has(strs, "first-child"));
 	CHECK(!strlist_has(strs, "one"));
 	CHECK(strlist_has(strs, "two"));
+	CHECK(strhash(123, "123") == strhash(123, "123"));
+	CHECK(strhash(123, "123") != strhash(123, "312"));
+	CHECK(strhash(100, "123") != strhash(123, "123"));
 	CHECK(strlist_add(&strs, "first-child"));
 	strlist_free(strs);
 	return ret;

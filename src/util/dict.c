@@ -676,7 +676,7 @@ void Dict_DisableResize(void)
 static unsigned int StringCopyKeyDict_KeyHash(const void *key)
 {
 	const char *buf = key;
-	unsigned int hash = 5381;
+	unsigned int hash = dict_hash_function_seed;
 	while (*buf) {
 		hash = ((hash << 5) + hash) + (*buf++);
 	}

@@ -143,6 +143,16 @@ int wcstrim(wchar_t *outstr, const wchar_t *instr, const wchar_t *charlist)
 	STRTRIM_CODE(wchar_t, outstr, instr, charlist, L"\t\n\r ");
 }
 
+unsigned strhash(unsigned hash, const char *str)
+{
+	const unsigned char *p = (unsigned char *)str;
+
+	while (*p) {
+		hash = ((hash << 5) + hash) + (*p++);
+	}
+	return hash;
+}
+
 size_t strreplace(char *str, size_t max_len, const char *substr,
 		  const char *newstr)
 {

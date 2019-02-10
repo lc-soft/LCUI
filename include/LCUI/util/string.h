@@ -57,6 +57,8 @@ LCUI_API int strtrim(char *outstr, const char *instr, const char *charlist);
 LCUI_API int wcstrim(wchar_t *outstr, const wchar_t *instr,
 		     const wchar_t *charlist);
 
+LCUI_API unsigned strhash(unsigned hash, const char *str);
+
 /**
  * 字符串替换
  * @param[in][out] str 需要处理的字符串，替换成功后字符串内容也会被修改
