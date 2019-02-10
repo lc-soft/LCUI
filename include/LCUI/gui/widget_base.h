@@ -190,6 +190,9 @@ typedef struct LCUI_WidgetRulesRec_ {
 	 */
 	int max_update_children_count;
 
+	/** Limit the number of children rendered */
+	unsigned max_render_children_count;
+
 	/** A callback function on update progress */
 	void (*on_update_progress)(LCUI_Widget, size_t);
 } LCUI_WidgetRulesRec, *LCUI_WidgetRules;

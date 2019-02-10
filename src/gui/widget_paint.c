@@ -461,7 +461,7 @@ static void Widget_ComputeActualContentBox(LCUI_Widget w,
 
 static size_t WidgetRenderer_RenderChildren(LCUI_WidgetRenderer that)
 {
-	size_t count = 0;
+	size_t total = 0, count = 0;
 	LCUI_Widget child;
 	LCUI_Rect paint_rect;
 	LinkedListNode *node;
@@ -475,6 +475,11 @@ static size_t WidgetRenderer_RenderChildren(LCUI_WidgetRenderer that)
 		if (!child->computed_style.visible ||
 		    child->state != LCUI_WSTATE_NORMAL) {
 			continue;
+		}
+		if (that->target->rules &&
+		    that->target->rules->max_render_children_count &&
+		    count > that->target->rules->max_render_children_count) {
+			break;
 		}
 		style.x = that->x + that->content_left;
 		style.y = that->y + that->content_top;
@@ -490,8 +495,12 @@ static size_t WidgetRenderer_RenderChildren(LCUI_WidgetRenderer that)
 			  style.canvas_box.width, style.canvas_box.height);
 		if (!LCUIRect_GetOverlayRect(&that->content_rect,
 					     &style.canvas_box, &paint_rect)) {
+			if (count > 0) {
+				++count;
+			}
 			continue;
 		}
+		++count;
 		Widget_ComputeActualPaddingBox(child, &style);
 		Widget_ComputeActualContentBox(child, &style);
 		if (that->has_content_graph) {
@@ -515,10 +524,10 @@ static size_t WidgetRenderer_RenderChildren(LCUI_WidgetRenderer that)
 		Graph_Quote(&paint.canvas, &that->root_paint->canvas,
 			    &paint_rect);
 		renderer = WidgetRenderer(child, &paint, &style, that);
-		count += WidgetRenderer_Render(renderer);
+		total += WidgetRenderer_Render(renderer);
 		WidgetRenderer_Delete(renderer);
 	}
-	return count;
+	return total;
 }
 
 static size_t WidgetRenderer_RenderContent(LCUI_WidgetRenderer that)
