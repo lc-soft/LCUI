@@ -45,11 +45,30 @@ static struct Logger {
 	LCUI_Mutex mutex;
 } logger = { 0 };
 
+
+#ifdef LCUI_BUILD_IN_WIN32
+
+static void Win32Logger_LogA(const char *str)
+{
+	OutputDebugStringA(str);
+}
+
+static void Win32Logger_LogW(const wchar_t *wcs)
+{
+	OutputDebugStringW(wcs);
+}
+
+#endif
+
 int Logger_Log(const char* fmt, ...)
 {
 	int len;
 	va_list args;
+
 	if (!logger.inited) {
+#ifdef LCUI_BUILD_IN_WIN32
+		logger.handler = Win32Logger_LogA;
+#endif
 		LCUIMutex_Init(&logger.mutex);
 		logger.inited = 1;
 	}
@@ -71,7 +90,11 @@ int Logger_LogW(const wchar_t* fmt, ...)
 {
 	int len;
 	va_list args;
+
 	if (!logger.inited) {
+#ifdef LCUI_BUILD_IN_WIN32
+		logger.handlerw = Win32Logger_LogW;
+#endif
 		LCUIMutex_Init(&logger.mutex);
 		logger.inited = 1;
 	}
