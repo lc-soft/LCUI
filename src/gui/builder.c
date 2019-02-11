@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * builder.c -- the GUI build module, parse UI config code and build UI.
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -175,7 +175,7 @@ static int ParseUI(XMLParserContext ctx, xmlNodePtr node)
 static int ParseWidget(XMLParserContext ctx, xmlNodePtr node)
 {
 	xmlAttrPtr prop;
-	char *prop_val = NULL, *prop_name;
+	char *prop_val = NULL, *prop_name, *type = NULL;
 	LCUI_Widget w = NULL, parent = ctx->widget;
 
 	if (ctx->parent_parser && ctx->parent_parser->id != ID_UI &&
@@ -184,13 +184,6 @@ static int ParseWidget(XMLParserContext ctx, xmlNodePtr node)
 	}
 	switch (node->type) {
 	case XML_ELEMENT_NODE:
-		w = LCUIWidget_New(NULL);
-		if (!w) {
-			return PB_ERROR;
-		}
-		DEBUG_MSG("create widget: %p\n", w);
-		Widget_Append(parent, w);
-		ctx->widget = w;
 		break;
 	case XML_TEXT_NODE:
 		if (!parent->proto || !parent->proto->settext) {
@@ -203,36 +196,43 @@ static int ParseWidget(XMLParserContext ctx, xmlNodePtr node)
 	default: return PB_ERROR;
 	}
 	for (prop = node->properties; prop; prop = prop->next) {
+		prop_val = (char *)xmlGetProp(node, prop->name);
+		if (PropNameIs(prop, "type")) {
+			type = prop_val;
+			break;
+		}
 		if (prop_val) {
 			xmlFree(prop_val);
 		}
+	}
+	prop_val = NULL;
+	w = LCUIWidget_New(type);
+	if (type) {
+		xmlFree(type);
+	}
+	if (!w) {
+		return PB_ERROR;
+	}
+	DEBUG_MSG("create widget: %s\n", w->type);
+	Widget_Append(parent, w);
+	ctx->widget = w;
+	for (prop = node->properties; prop; prop = prop->next) {
 		prop_val = (char*)xmlGetProp(node, prop->name);
-		if (PropNameIs(prop, "type")) {
-			DEBUG_MSG("widget: %p, set type: %s\n", w, prop_val);
-			w->proto = LCUIWidget_GetPrototype(prop_val);
-			if (w->proto && w->proto->init) {
-				w->proto->init(w);
-				w->type = w->proto->name;
-			} else {
-				w->type = strdup2(prop_val);
-			}
-			continue;
-		} else if (PropNameIs(prop, "id")) {
+		if (PropNameIs(prop, "id")) {
 			DEBUG_MSG("widget: %p, set id: %s\n", w, prop_val);
 			Widget_SetId(w, prop_val);
-			continue;
 		} else if (PropNameIs(prop, "class")) {
 			DEBUG_MSG("widget: %p, add class: %s\n", w, prop_val);
 			Widget_AddClass(w, prop_val);
-			continue;
+		} else {
+			prop_name = malloc(strsize((const char*)prop->name));
+			strtolower(prop_name, (const char*)prop->name);
+			Widget_SetAttribute(w, prop_name, prop_val);
+			free(prop_name);
 		}
-		prop_name = malloc(strsize((const char*)prop->name));
-		strtolower(prop_name, (const char*)prop->name);
-		Widget_SetAttribute(w, prop_name, prop_val);
-		free(prop_name);
-	}
-	if (prop_val) {
-		xmlFree(prop_val);
+		if (prop_val) {
+			xmlFree(prop_val);
+		}
 	}
 	return PB_ENTER;
 }
