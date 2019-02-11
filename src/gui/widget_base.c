@@ -374,6 +374,96 @@ void Widget_GenerateHash(LCUI_Widget w)
 	}
 }
 
+size_t Widget_SetHashList(LCUI_Widget w, unsigned *hash_list, size_t len)
+{
+	size_t count = 0;
+	LCUI_Widget child;
+
+	child = w;
+	if (hash_list) {
+		child->hash = hash_list[count];
+	}
+	++count;
+	if (len > 0 && count >= len) {
+		return count;
+	}
+	while (child->children.length > 0) {
+		child = child->children.head.next->data;
+	}
+	while (child != w) {
+		while (child->children.length > 0) {
+			child = child->children.head.next->data;
+		}
+		if (hash_list) {
+			child->hash = hash_list[count];
+		}
+		++count;
+		if (len > 0 && count >= len) {
+			break;
+		}
+		if (child->node.next) {
+			child = child->node.next->data;
+			continue;
+		}
+		do {
+			child = child->parent;
+			if (child == w) {
+				break;
+			}
+			if (child->node.next) {
+				child = child->node.next->data;
+				break;
+			}
+		} while (1);
+	}
+	return count;
+}
+
+size_t Widget_GetHashList(LCUI_Widget w, unsigned *hash_list, size_t maxlen)
+{
+	size_t count = 0;
+	LCUI_Widget child;
+
+	child = w;
+	if (hash_list) {
+		hash_list[count] = child->hash;
+	}
+	++count;
+	if (maxlen > 0 && count >= maxlen) {
+		return count;
+	}
+	while (child->children.length > 0) {
+		child = child->children.head.next->data;
+	}
+	while (child != w) {
+		while (child->children.length > 0) {
+			child = child->children.head.next->data;
+		}
+		if (hash_list) {
+			hash_list[count] = child->hash;
+		}
+		++count;
+		if (maxlen > 0 && count >= maxlen) {
+			break;
+		}
+		if (child->node.next) {
+			child = child->node.next->data;
+			continue;
+		}
+		do {
+			child = child->parent;
+			if (child == w) {
+				break;
+			}
+			if (child->node.next) {
+				child = child->node.next->data;
+				break;
+			}
+		} while(1);
+	}
+	return count;
+}
+
 int Widget_SetRules(LCUI_Widget w, const LCUI_WidgetRulesRec *rules)
 {
 	LCUI_WidgetRulesData data;

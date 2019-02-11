@@ -444,6 +444,12 @@ LCUI_API void Widget_GenerateSelfHash(LCUI_Widget w);
 /** Generate hash values for a widget and its children */
 LCUI_API void Widget_GenerateHash(LCUI_Widget w);
 
+LCUI_API size_t Widget_SetHashList(LCUI_Widget w, unsigned *hash_list,
+				   size_t len);
+
+LCUI_API size_t Widget_GetHashList(LCUI_Widget w, unsigned *hash_list,
+				   size_t maxlen);
+
 /** Set widget updating rules */
 LCUI_API int Widget_SetRules(LCUI_Widget w, const LCUI_WidgetRulesRec *rules);
 
