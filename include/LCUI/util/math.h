@@ -42,7 +42,7 @@
 LCUI_BEGIN_HEADER
 
 /** round double to interger */
-LCUI_API int iround(double x);
+#define iround(X) (X < 0 ? (int)(X - 0.5) : (int)(X + 0.5))
 
 LCUI_END_HEADER
 

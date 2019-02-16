@@ -82,11 +82,15 @@ typedef struct LCUI_WidgetRendererRec_ {
 
 	/* actual paint rectangle in widget canvas rectangle, it relative to
 	 * root canvas */
-	LCUI_Rect paint_rect;
+	LCUI_Rect actual_paint_rect;
 
 	/* actual paint rectangle in widget content rectangle, it relative to
 	 * root canvas */
-	LCUI_Rect content_rect;
+	LCUI_Rect actual_content_rect;
+
+	/* Paint rectangle in widget content rectangle, it relative to
+	 * root canvas */
+	LCUI_RectF content_rect;
 
 	LCUI_BOOL has_content_graph;
 	LCUI_BOOL has_self_graph;
@@ -369,40 +373,49 @@ static LCUI_WidgetRenderer WidgetRenderer(LCUI_Widget w,
 	that->content_left = w->box.padding.x - w->box.canvas.x;
 	that->content_top = w->box.padding.y - w->box.canvas.y;
 	/* convert position of paint rectangle to root canvas relative */
-	that->paint_rect.x = that->style->canvas_box.x + that->paint->rect.x;
-	that->paint_rect.y = that->style->canvas_box.y + that->paint->rect.y;
-	that->paint_rect.width = that->paint->rect.width;
-	that->paint_rect.height = that->paint->rect.height;
+	that->actual_paint_rect.x =
+	    that->style->canvas_box.x + that->paint->rect.x;
+	that->actual_paint_rect.y =
+	    that->style->canvas_box.y + that->paint->rect.y;
+	that->actual_paint_rect.width = that->paint->rect.width;
+	that->actual_paint_rect.height = that->paint->rect.height;
 	DEBUG_MSG("[%s] paint_rect: (%d, %d, %d, %d)\n", w->id,
-		  that->paint_rect.x, that->paint_rect.y,
-		  that->paint_rect.width, that->paint_rect.height);
+		  that->actual_paint_rect.x, that->actual_paint_rect.y,
+		  that->actual_paint_rect.width,
+		  that->actual_paint_rect.height);
 	/* get actual paint rectangle in widget content rectangle */
 	that->can_render_centent = LCUIRect_GetOverlayRect(
-	    &that->style->padding_box, &that->paint_rect, &that->content_rect);
+	    &that->style->padding_box, &that->actual_paint_rect,
+	    &that->actual_content_rect);
+	;
+	LCUIRect_ToRectF(&that->actual_content_rect, &that->content_rect,
+			 1.0f / LCUIMetrics_GetScale());
 	DEBUG_MSG("[%s] content_rect: (%d, %d, %d, %d)\n", w->id,
-		  that->content_rect.x, that->content_rect.y,
-		  that->content_rect.width, that->content_rect.height);
+		  that->actual_content_rect.x, that->actual_content_rect.y,
+		  that->actual_content_rect.width,
+		  that->actual_content_rect.height);
 	DEBUG_MSG("[%s] content_box: (%d, %d, %d, %d)\n", w->id,
 		  style->content_box.x, style->content_box.y,
 		  style->content_box.width, style->content_box.height);
 	DEBUG_MSG("[%s] border_box: (%d, %d, %d, %d)\n", w->id,
 		  style->border_box.x, style->border_box.y,
 		  style->border_box.width, style->border_box.height);
-	DEBUG_MSG("[%s][%d/%d] content_rect: (%d,%d,%d,%d), "
-		  "canvas_rect: (%d,%d,%d,%d)\n",
-		  w->id, w->index,
-		  w->parent ? w->parent->children_show.length : 1,
-		  that->content_rect.x, that->content_rect.y,
-		  that->content_rect.width, that->content_rect.height,
-		  that->paint->canvas.quote.left, that->paint->canvas.quote.top,
-		  that->paint->canvas.width, that->paint->canvas.height);
+	DEBUG_MSG(
+	    "[%s][%d/%d] content_rect: (%d,%d,%d,%d), "
+	    "canvas_rect: (%d,%d,%d,%d)\n",
+	    w->id, w->index, w->parent ? w->parent->children_show.length : 1,
+	    that->actual_content_rect.x, that->actual_content_rect.y,
+	    that->actual_content_rect.width, that->actual_content_rect.height,
+	    that->paint->canvas.quote.left, that->paint->canvas.quote.top,
+	    that->paint->canvas.width, that->paint->canvas.height);
 	if (!that->can_render_centent) {
 		return that;
 	}
 	if (that->has_content_graph) {
 		that->content_graph.color_type = LCUI_COLOR_TYPE_ARGB;
-		Graph_Create(&that->content_graph, that->content_rect.width,
-			     that->content_rect.height);
+		Graph_Create(&that->content_graph,
+			     that->actual_content_rect.width,
+			     that->actual_content_rect.height);
 	}
 	return that;
 }
@@ -464,6 +477,7 @@ static size_t WidgetRenderer_RenderChildren(LCUI_WidgetRenderer that)
 	size_t total = 0, count = 0;
 	LCUI_Widget child;
 	LCUI_Rect paint_rect;
+	LCUI_RectF child_rect;
 	LinkedListNode *node;
 	LCUI_PaintContextRec paint;
 	LCUI_WidgetRenderer renderer;
@@ -481,23 +495,35 @@ static size_t WidgetRenderer_RenderChildren(LCUI_WidgetRenderer that)
 		    count > that->target->rules->max_render_children_count) {
 			break;
 		}
+		/*
+		 * The actual style calculation is time consuming, so here we
+		 * use the existing properties to determine whether we need to
+		 * render.
+		 */
 		style.x = that->x + that->content_left;
 		style.y = that->y + that->content_top;
+		child_rect.x = style.x + child->box.canvas.x;
+		child_rect.y = style.y + child->box.canvas.y;
+		child_rect.width = child->box.canvas.width;
+		child_rect.height = child->box.canvas.height;
+		if (!LCUIRectF_GetOverlayRect(&that->content_rect, &child_rect,
+					      &child_rect)) {
+			continue;
+		}
 		Widget_ComputeActualBorderBox(child, &style);
 		Widget_ComputeActualCanvasBox(child, &style);
 		DEBUG_MSG("content: %g, %g\n", that->content_left,
 			  that->content_top);
 		DEBUG_MSG("content rect: (%d, %d, %d, %d)\n",
-			  that->content_rect.x, that->content_rect.y,
-			  that->content_rect.width, that->content_rect.height);
+			  that->actual_content_rect.x,
+			  that->actual_content_rect.y,
+			  that->actual_content_rect.width,
+			  that->actual_content_rect.height);
 		DEBUG_MSG("child canvas rect: (%d, %d, %d, %d)\n",
 			  style.canvas_box.x, style.canvas_box.y,
 			  style.canvas_box.width, style.canvas_box.height);
-		if (!LCUIRect_GetOverlayRect(&that->content_rect,
+		if (!LCUIRect_GetOverlayRect(&that->actual_content_rect,
 					     &style.canvas_box, &paint_rect)) {
-			if (count > 0) {
-				++count;
-			}
 			continue;
 		}
 		++count;
@@ -545,7 +571,7 @@ static size_t WidgetRenderer_RenderContent(LCUI_WidgetRenderer that)
 		 * to this widget canvas */
 		style.x = that->style->x - that->style->canvas_box.x;
 		style.y = that->style->y - that->style->canvas_box.y;
-		paint.rect = that->content_rect;
+		paint.rect = that->actual_content_rect;
 		paint.rect.x -= that->style->canvas_box.x;
 		paint.rect.y -= that->style->canvas_box.y;
 		Widget_ComputeActualBorderBox(that->target, &style);
@@ -623,15 +649,18 @@ static size_t WidgetRenderer_Render(LCUI_WidgetRenderer renderer)
 	 */
 	if (that->can_render_self) {
 		Graph_Copy(&that->layer_graph, &that->self_graph);
-		Graph_Mix(&that->layer_graph, &that->content_graph,
-			  that->content_rect.x - that->paint_rect.x,
-			  that->content_rect.y - that->paint_rect.y, TRUE);
+		Graph_Mix(
+		    &that->layer_graph, &that->content_graph,
+		    that->actual_content_rect.x - that->actual_paint_rect.x,
+		    that->actual_content_rect.y - that->actual_paint_rect.y,
+		    TRUE);
 	} else {
 		Graph_Create(&that->layer_graph, that->paint->rect.width,
 			     that->paint->rect.height);
-		Graph_Replace(&that->layer_graph, &that->content_graph,
-			      that->content_rect.x - that->paint_rect.x,
-			      that->content_rect.y - that->paint_rect.y);
+		Graph_Replace(
+		    &that->layer_graph, &that->content_graph,
+		    that->actual_content_rect.x - that->actual_paint_rect.x,
+		    that->actual_content_rect.y - that->actual_paint_rect.y);
 	}
 	that->layer_graph.opacity = that->target->computed_style.opacity;
 	Graph_Mix(&that->paint->canvas, &that->layer_graph, 0, 0,

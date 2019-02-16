@@ -60,10 +60,10 @@ int LCUIMetrics_ComputeActual(float value, LCUI_StyleType type)
 
 void LCUIMetrics_ComputeRectActual(LCUI_Rect *dst, const LCUI_RectF *src)
 {
-	dst->x = LCUIMetrics_ComputeActual(src->x, LCUI_STYPE_PX);
-	dst->y = LCUIMetrics_ComputeActual(src->y, LCUI_STYPE_PX);
-	dst->width = LCUIMetrics_ComputeActual(src->width, LCUI_STYPE_PX);
-	dst->height = LCUIMetrics_ComputeActual(src->height, LCUI_STYPE_PX);
+	dst->x = iround(src->x * metrics.scale);
+	dst->y = iround(src->y * metrics.scale);
+	dst->width = iround(src->width * metrics.scale);
+	dst->height = iround(src->height * metrics.scale);
 }
 
 float LCUIMetrics_GetScale(void)
