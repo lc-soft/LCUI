@@ -217,6 +217,11 @@ LCUI_WidgetTaskContext Widget_BeginUpdate(LCUI_Widget w,
 			break;
 		}
 	}
+	if (ctx && ctx->profile) {
+		self_ctx->profile = ctx->profile;
+	} else {
+		self_ctx->profile = NULL;
+	}
 	if (w->hash && w->task.states[LCUI_WTASK_REFRESH_STYLE]) {
 		Widget_GenerateSelfHash(w);
 	}
@@ -396,7 +401,7 @@ static size_t Widget_UpdateChildren(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 		 */
 		msec = (clock() - msec);
 		if (msec < 1) {
-			data->default_max_update_count += 2048;	
+			data->default_max_update_count += 128;	
 			continue;
 		}
 		data->default_max_update_count =
@@ -435,6 +440,18 @@ size_t Widget_UpdateWithContext(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 		/* 如果有用户自定义任务 */
 		if (states[LCUI_WTASK_USER] && w->proto && w->proto->runtask) {
 			w->proto->runtask(w);
+			if (self_ctx->profile) {
+				self_ctx->profile->user_task_count += 1;
+			}
+		}
+		if (self_ctx->profile) {
+			if (states[LCUI_WTASK_REFRESH_STYLE]) {
+				self_ctx->profile->refresh_count += 1;
+			}
+			if (states[LCUI_WTASK_LAYOUT]) {
+				self_ctx->profile->layout_count += 1;
+			}
+			self_ctx->profile->update_count += 1;
 		}
 		for (i = 0; i < LCUI_WTASK_USER; ++i) {
 			if (states[i]) {
@@ -476,6 +493,38 @@ size_t LCUIWidget_Update(void)
 	}
 	LCUIWidget_ClearTrash();
 	return count;
+}
+
+void Widget_UpdateWithProfile(LCUI_Widget w, LCUI_WidgetTasksProfile profile)
+{
+	LCUI_WidgetTaskContext ctx;
+
+	ctx = Widget_BeginUpdate(w, NULL);
+	ctx->profile = profile;
+	Widget_UpdateWithContext(w, ctx);
+	Widget_EndUpdate(ctx);
+}
+
+void LCUIWidget_UpdateWithProfile(LCUI_WidgetTasksProfile profile)
+{
+	size_t i;
+	LCUI_Widget root;
+
+	profile->time = clock();
+	/* 初次更新时主动刷新所有部件的样式，为了省去在应用程序里手动调用
+	 * LCUIWidget_RefreshStyle() 的麻烦 */
+	if (self.update_count < 1) {
+		LCUIWidget_RefreshStyle();
+		self.update_count += 1;
+	}
+	root = LCUIWidget_GetRoot();
+	for (i = 0; i < self.max_updates_per_frame; ++i) {
+		 Widget_UpdateWithProfile(root, profile);
+	}
+	profile->time = clock() - profile->time;
+	profile->destroy_time = clock();
+	profile->destroy_count = LCUIWidget_ClearTrash();
+	profile->destroy_time = clock() - profile->destroy_time;
 }
 
 void LCUIWidget_RefreshStyle(void)

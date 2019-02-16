@@ -112,73 +112,104 @@ static struct LCUI_App {
 
 #ifdef DEBUG
 
-enum LCUI_StatsTarget {
-	LCUI_STATS_EVENTS,
-	LCUI_STATS_LAYOUT,
-	LCUI_STATS_RENDER,
-	LCUI_STATS_PRESENT
-};
-
-typedef struct LCUI_StatsRec_ {
-	size_t frame;
-	int64_t start_time;
-	uint32_t total_time;
-	size_t render_count;
-	union {
-		uint32_t time_list[4];
-		struct {
-			uint32_t events_time;
-			uint32_t layout_time;
-			uint32_t render_time;
-			uint32_t present_time;
-		} time;
-	};
-} LCUI_StatsRec, *LCUI_Stats;
-
-void LCUIStats_Begin(LCUI_Stats stats)
+static void LCUIProfile_Init(LCUI_Profile profile)
 {
-	memset(stats, 0, sizeof(LCUI_StatsRec));
-	stats->start_time = LCUI_GetTime();
-	stats->frame = LCUI_GetFrameCount();
+	memset(profile, 0, sizeof(LCUI_ProfileRec));
+	profile->start_time = clock();
 }
 
-void LCUIStats_RecordTime(LCUI_Stats stats, unsigned num)
+static void LCUIProfile_Print(LCUI_Profile profile)
 {
 	unsigned i;
-	uint32_t delta;
+	LCUI_FrameProfile frame;
 
-	delta = (uint32_t)LCUI_GetTimeDelta(stats->start_time);
-	for (i = 0; i < num && i < 4; ++i) {
-		if (delta > stats->time_list[i]) {
-			delta -= stats->time_list[i];
-		} else {
-			delta = 0;
-			break;
-		}
+	LOG("\nframes_count: %zu, time: %ld\n", profile->frames_count,
+	    profile->end_time - profile->start_time);
+	for (i = 0; i < profile->frames_count; ++i) {
+		frame = &profile->frames[i];
+		LOG("=== frame [%u/%u] ===\n", i + 1, profile->frames_count);
+		LOG("timers.count: %zu\ntimers.time: %ldms\n",
+		    frame->timers_count, frame->timers_time);
+		LOG("events.count: %zu\nevents.time: %ldms\n",
+		    frame->events_count, frame->events_time);
+		LOG("widget_tasks.time: %ldms\n"
+		    "widget_tasks.update_count: %u\n"
+		    "widget_tasks.refresh_count: %u\n"
+		    "widget_tasks.layout_count: %u\n"
+		    "widget_tasks.user_task_count: %u\n"
+		    "widget_tasks.destroy_count: %u\n"
+		    "widget_tasks.destroy_time: %ldms\n",
+		    frame->widget_tasks.time, frame->widget_tasks.update_count,
+		    frame->widget_tasks.refresh_count,
+		    frame->widget_tasks.layout_count,
+		    frame->widget_tasks.user_task_count,
+		    frame->widget_tasks.destroy_count,
+		    frame->widget_tasks.destroy_time);
+		LOG("render: %zu, %ldms, %ldms\n", frame->render_count,
+		    frame->render_time, frame->present_time);
 	}
-	stats->time_list[num] = delta;
 }
 
-void LCUIStats_Print(LCUI_Stats stats)
+static LCUI_FrameProfile LCUIProfile_BeginFrame(LCUI_Profile profile)
 {
-	LOG("[stats] total time: %ums, events time: %ums, "
-	    "layout time: %ums, render time: %ums, render count: %lu, "
-	    "present time: %ums\n",
-	    stats->total_time, stats->time.events_time, stats->time.layout_time,
-	    stats->time.render_time, stats->render_count,
-	    stats->time.present_time);
+	LCUI_FrameProfile frame;
+
+	frame = &profile->frames[profile->frames_count];
+	if (profile->frames_count > LCUI_MAX_FRAMES_PER_SEC) {
+		profile->frames_count = 0;
+	}
+	memset(frame, 0, sizeof(LCUI_FrameProfileRec));
+	return frame;
 }
 
-void LCUIStats_End(LCUI_Stats stats)
+static void LCUIProfile_EndFrame(LCUI_Profile profile)
 {
-	stats->total_time = (uint32_t)LCUI_GetTimeDelta(stats->start_time);
-	if (stats->total_time > 100) {
-		LOG("[stats] warning: current frame takes too long\n");
-		LCUIStats_Print(stats);
+	profile->frames_count += 1;
+	profile->end_time = clock();
+	if (profile->end_time - profile->start_time >= CLOCKS_PER_SEC) {
+		if (profile->frames_count < LCUI_MAX_FRAMES_PER_SEC / 4) {
+			LCUIProfile_Print(profile);
+		}
+		profile->frames_count = 0;
+		profile->start_time = profile->end_time;
 	}
 }
 
 #endif
+
+void LCUI_RunFrameWithProfile(LCUI_FrameProfile profile)
+{
+	profile->timers_time = clock();
+	profile->timers_count = LCUI_ProcessTimers();
+	profile->timers_time = clock() - profile->timers_time;
+
+	profile->events_time = clock();
+	profile->events_count = LCUI_ProcessEvents();
+	profile->events_time = clock() - profile->events_time;
+
+	LCUICursor_Update();
+	LCUIWidget_UpdateWithProfile(&profile->widget_tasks);
+
+	profile->render_time = clock();
+	LCUIDisplay_Update();
+	profile->render_count = LCUIDisplay_Render();
+	profile->render_time = clock() - profile->render_time;
+
+	profile->present_time = clock();
+	LCUIDisplay_Present();
+	profile->present_time = clock() - profile->present_time;
+}
+
+void LCUI_RunFrame(void)
+{
+	LCUI_ProcessTimers();
+	LCUI_ProcessEvents();
+	LCUICursor_Update();
+	LCUIWidget_Update();
+	LCUIDisplay_Update();
+	LCUIDisplay_Render();
+	LCUIDisplay_Present();
+}
 
 static void LCUI_InitEvent(void)
 {
@@ -290,13 +321,17 @@ void LCUI_DestroyEvent(LCUI_SysEvent e)
 	e->type = LCUI_NONE;
 }
 
-void LCUI_ProcessEvents(void)
+size_t LCUI_ProcessEvents(void)
 {
-	do {
-		if (MainApp.driver_ready) {
-			MainApp.driver->ProcessEvents();
-		}
-	} while (LCUIWorker_RunTask(MainApp.main_worker));
+	size_t count = 0;
+
+	if (MainApp.driver_ready) {
+		MainApp.driver->ProcessEvents();
+	}
+	while (LCUIWorker_RunTask(MainApp.main_worker)) {
+		++count;
+	}
+	return count;
 }
 
 LCUI_BOOL LCUI_PostTask(LCUI_Task task)
@@ -348,7 +383,8 @@ LCUI_MainLoop LCUIMainLoop_New(void)
 int LCUIMainLoop_Run(LCUI_MainLoop loop)
 {
 #ifdef DEBUG
-	LCUI_StatsRec stats;
+	LCUI_ProfileRec profile;
+	LCUI_FrameProfile frame;
 #endif
 	LCUI_BOOL at_same_thread = FALSE;
 	if (loop->state == STATE_RUNNING) {
@@ -370,25 +406,16 @@ int LCUIMainLoop_Run(LCUI_MainLoop loop)
 	}
 	DEBUG_MSG("loop: %p, enter\n", loop);
 	MainApp.loop = loop;
+#ifdef DEBUG
+	LCUIProfile_Init(&profile);
+#endif
 	while (loop->state != STATE_EXITED) {
 #ifdef DEBUG
-		LCUIStats_Begin(&stats);
-		LCUI_ProcessTimers();
-		LCUI_ProcessEvents();
-		LCUIStats_RecordTime(&stats, LCUI_STATS_EVENTS);
-		LCUIDisplay_Update();
-		LCUIStats_RecordTime(&stats, LCUI_STATS_LAYOUT);
-		stats.render_count = LCUIDisplay_Render();
-		LCUIStats_RecordTime(&stats, LCUI_STATS_RENDER);
-		LCUIDisplay_Present();
-		LCUIStats_RecordTime(&stats, LCUI_STATS_PRESENT);
-		LCUIStats_End(&stats);
+		frame = LCUIProfile_BeginFrame(&profile);
+		LCUI_RunFrameWithProfile(frame);
+		LCUIProfile_EndFrame(&profile);
 #else
-		LCUI_ProcessTimers();
-		LCUI_ProcessEvents();
-		LCUIDisplay_Update();
-		LCUIDisplay_Render();
-		LCUIDisplay_Present();
+		LCUI_RunFrame();
 #endif
 		StepTimer_Remain(MainApp.timer);
 		/* 如果当前运行的主循环不是自己 */

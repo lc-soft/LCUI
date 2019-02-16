@@ -96,7 +96,6 @@ static void DrawBorder(LCUI_PaintContext paint)
 
 void LCUIDisplay_Update(void)
 {
-	size_t count;
 	LCUI_Surface surface;
 	LinkedListNode *node;
 	SurfaceRecord record = NULL;
@@ -104,8 +103,6 @@ void LCUIDisplay_Update(void)
 	if (!display.active) {
 		return;
 	}
-	LCUICursor_Update();
-	count = LCUIWidget_Update();
 	/* 遍历当前的 surface 记录列表 */
 	for (LinkedList_Each(node, &display.surfaces)) {
 		record = node->data;
@@ -673,6 +670,7 @@ static void OnResize(LCUI_Event e, void *arg)
 	if (widget) {
 		Widget_Resize(widget, width, height);
 	}
+	LCUI_RunFrame();
 	LOG("[display] resize: (%d,%d)\n", dpy_ev->resize.width,
 	    dpy_ev->resize.height);
 }

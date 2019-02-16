@@ -41,6 +41,10 @@
 #define TRUE 1
 #endif
 
+#include <time.h>
+
+#define LCUI_MAX_FRAMES_PER_SEC 120
+#define LCUI_MAX_FRAME_MSEC ((int)(1000.0 / LCUI_MAX_FRAMES_PER_SEC + 0.5))
 #define ASSIGN(NAME, TYPE) TYPE NAME = (TYPE)malloc(sizeof(TYPE##Rec))
 #define ZEROSET(NAME, TYPE) memset(NAME, 0, sizeof(TYPE##Rec))
 #define NEW(TYPE, COUNT) (TYPE *)calloc(COUNT, sizeof(TYPE))
@@ -376,6 +380,37 @@ typedef struct LCUI_PaintContextRec_ {
 } LCUI_PaintContextRec, *LCUI_PaintContext;
 
 typedef void (*FuncPtr)(void *);
+
+typedef struct LCUI_WidgetTasksRec_ {
+	clock_t time;
+	size_t update_count;
+	size_t refresh_count;
+	size_t layout_count;
+	size_t user_task_count;
+	size_t destroy_count;
+	size_t destroy_time;
+} LCUI_WidgetTasksProfileRec, *LCUI_WidgetTasksProfile;
+
+typedef struct LCUI_FrameProfileRec_ {
+	size_t timers_count;
+	clock_t timers_time;
+
+	size_t events_count;
+	clock_t events_time;
+
+	size_t render_count;
+	clock_t render_time;
+	clock_t present_time;
+
+	LCUI_WidgetTasksProfileRec widget_tasks;
+} LCUI_FrameProfileRec, *LCUI_FrameProfile;
+
+typedef struct LCUI_ProfileRec_ {
+	clock_t start_time;
+	clock_t end_time;
+	unsigned frames_count;
+	LCUI_FrameProfileRec frames[LCUI_MAX_FRAMES_PER_SEC];
+} LCUI_ProfileRec, *LCUI_Profile;
 
 LCUI_END_HEADER
 

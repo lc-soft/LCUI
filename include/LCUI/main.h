@@ -31,10 +31,6 @@
 #ifndef LCUI_MAIN_H
 #define LCUI_MAIN_H
 
- /** 一秒内的最大更新帧数 */
-#define LCUI_MAX_FRAMES_PER_SEC 120
-#define LCUI_MAX_FRAME_MSEC	((int)(1000.0 / LCUI_MAX_FRAMES_PER_SEC + 0.5))
-
 LCUI_BEGIN_HEADER
 
 typedef LCUI_TaskFunc LCUI_AppTaskFunc;
@@ -171,7 +167,7 @@ LCUI_API void *LCUI_GetAppData(void);
 LCUI_AppDriverId LCUI_GetAppId(void);
 
 /** 处理当前所有事件 */
-LCUI_API void LCUI_ProcessEvents(void);
+LCUI_API size_t LCUI_ProcessEvents(void);
 
 /**
  * 添加任务
@@ -203,7 +199,11 @@ LCUI_API int LCUI_PostAsyncTask(LCUI_Task task);
 		LCUI_PostTask(&task);                 \
 	} while (0);
 
-/* 新建一个主循环 */
+LCUI_API void LCUI_RunFrame(void);
+
+LCUI_API void LCUI_RunFrameWithProfile(LCUI_FrameProfile profile);
+
+    /* 新建一个主循环 */
 LCUI_API LCUI_MainLoop LCUIMainLoop_New(void);
 
 /* 运行目标循环 */

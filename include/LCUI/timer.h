@@ -99,7 +99,7 @@ LCUI_API int LCUITimer_Continue(int timer_id);
 LCUI_API int LCUITimer_Reset(int timer_id, long int n_ms);
 
 /* Process all active timers */
-LCUI_API int LCUI_ProcessTimers(void);
+LCUI_API size_t LCUI_ProcessTimers(void);
 
 /* Init the timer module */
 LCUI_API void LCUI_InitTimer(void);

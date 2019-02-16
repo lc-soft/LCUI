@@ -227,9 +227,9 @@ int LCUI_SetInterval(long int n_ms, void(*callback)(void *), void *arg)
 	return LCUITimer_Set(n_ms, callback, arg, TRUE);
 }
 
-int LCUI_ProcessTimers(void)
+size_t LCUI_ProcessTimers(void)
 {
-	int count = 0;
+	size_t count = 0;
 	long lost_ms;
 
 	Timer timer = NULL;

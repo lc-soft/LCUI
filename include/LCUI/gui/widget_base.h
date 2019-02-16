@@ -163,6 +163,7 @@ typedef struct LCUI_WidgetTaskContextRec_ {
 	Dict *style_cache;
 	unsigned style_hash;
 	LCUI_WidgetTaskContext parent;
+	LCUI_WidgetTasksProfile profile;
 } LCUI_WidgetTaskContextRec;
 
 /* clang-format on */

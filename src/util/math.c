@@ -29,11 +29,3 @@
 
 #include <LCUI_Build.h>
 #include <LCUI/util/math.h>
-
-int iround(double x)
-{
-	if (x < 0) {
-		return (int)(x - 0.5);
-	}
-	return (int)(x + 0.5);
-}
