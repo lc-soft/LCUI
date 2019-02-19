@@ -167,6 +167,7 @@ int Widget_Unlink(LCUI_Widget widget)
 	LCUI_Widget child;
 	LCUI_WidgetEventRec ev = { 0 };
 	LinkedListNode *node, *snode;
+
 	if (!widget->parent) {
 		return -1;
 	}

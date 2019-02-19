@@ -208,23 +208,32 @@ void Widget_Destroy(LCUI_Widget w)
 void Widget_Empty(LCUI_Widget w)
 {
 	LCUI_Widget root = w;
+	LCUI_Widget child;
+	LinkedListNode *node;
+	LCUI_WidgetEventRec ev;
 
 	while (root->parent) {
 		root = root->parent;
 	}
-	if (root == LCUIWidget.root) {
-		LinkedListNode *next, *node;
-		node = w->children.head.next;
-		while (node) {
-			next = node->next;
-			Widget_AddToTrash(node->data);
-			node = next;
-		}
-		Widget_InvalidateArea(w, NULL, SV_GRAPH_BOX);
-		Widget_AddTask(w, LCUI_WTASK_LAYOUT);
-	} else {
+	if (root != LCUIWidget.root) {
 		Widget_DestroyChildren(w);
+		return;
 	}
+	LCUI_InitWidgetEvent(&ev, "unlink");
+	for (LinkedList_Each(node, &w->children)) {
+		child = node->data;
+		Widget_TriggerEvent(child, &ev, NULL);
+		if (child->parent == root) {
+			Widget_PostSurfaceEvent(child, LCUI_WEVENT_UNLINK,
+						TRUE);
+		}
+		child->state = LCUI_WSTATE_DELETED;
+		child->parent = NULL;
+	}
+	LinkedList_ClearData(&w->children_show, NULL);
+	LinkedList_Concat(&LCUIWidget.trash, &w->children);
+	Widget_InvalidateArea(w, NULL, SV_GRAPH_BOX);
+	Widget_AddTask(w, LCUI_WTASK_LAYOUT);
 }
 
 void Widget_GetOffset(LCUI_Widget w, LCUI_Widget parent, float *offset_x,

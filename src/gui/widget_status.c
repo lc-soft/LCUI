@@ -52,7 +52,7 @@ static void Widget_MarkChildrenRefreshByStatus(LCUI_Widget w)
 static int Widget_HandleStatusChange(LCUI_Widget w, const char *name)
 {
 	Widget_UpdateStyle(w, TRUE);
-	if (w->state < LCUI_WSTATE_READY) {
+	if (w->state < LCUI_WSTATE_READY || w->state == LCUI_WSTATE_DELETED) {
 		return 1;
 	}
 	if (w->rules && w->rules->ignore_status_change) {
