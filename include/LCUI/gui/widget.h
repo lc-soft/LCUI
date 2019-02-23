@@ -47,8 +47,8 @@
 #include <LCUI/gui/widget_event.h>
 #include <LCUI/gui/widget_style.h>
 
-void LCUI_InitWidget(void);
+LCUI_API void LCUI_InitWidget(void);
 
-void LCUI_FreeWidget(void);
+LCUI_API void LCUI_FreeWidget(void);
 
 #endif

@@ -407,6 +407,8 @@ LCUI_API void Widget_UpdateDisplay(LCUI_Widget w);
 /** 设置部件为顶级部件 */
 LCUI_API int Widget_Top(LCUI_Widget w);
 
+LCUI_API void Widget_SortChildrenShow(LCUI_Widget w);
+
 /** 刷新堆叠顺序 */
 LCUI_API void Widget_UpdateZIndex(LCUI_Widget w);
 

@@ -467,6 +467,7 @@ size_t Widget_UpdateWithContext(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 		count += 1;
 	}
 	count += Widget_UpdateChildren(w, self_ctx);
+	Widget_SortChildrenShow(w);
 	Widget_EndUpdate(self_ctx);
 	return count;
 }

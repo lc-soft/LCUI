@@ -37,9 +37,7 @@
 
 int Widget_Append(LCUI_Widget parent, LCUI_Widget widget)
 {
-	LCUI_Widget child;
 	LCUI_WidgetEventRec ev = { 0 };
-	LinkedListNode *node, *snode;
 
 	if (!parent || !widget) {
 		return -1;
@@ -51,17 +49,7 @@ int Widget_Append(LCUI_Widget parent, LCUI_Widget widget)
 	widget->parent = parent;
 	widget->state = LCUI_WSTATE_CREATED;
 	widget->index = parent->children.length;
-	node = &widget->node;
-	snode = &widget->node_show;
-	LinkedList_AppendNode(&parent->children, node);
-	LinkedList_AppendNode(&parent->children_show, snode);
-	/** 修改它后面的部件的 index 值 */
-	node = node->next;
-	while (node) {
-		child = node->data;
-		child->index += 1;
-		node = node->next;
-	}
+	LinkedList_AppendNode(&parent->children, &widget->node);
 	ev.cancel_bubble = TRUE;
 	ev.type = LCUI_WEVENT_LINK;
 	Widget_UpdateStyle(widget, TRUE);
@@ -78,7 +66,7 @@ int Widget_Prepend(LCUI_Widget parent, LCUI_Widget widget)
 {
 	LCUI_Widget child;
 	LCUI_WidgetEventRec ev = { 0 };
-	LinkedListNode *node, *snode;
+	LinkedListNode *node;
 
 	if (!parent || !widget) {
 		return -1;
@@ -92,9 +80,7 @@ int Widget_Prepend(LCUI_Widget parent, LCUI_Widget widget)
 	widget->parent = parent;
 	widget->state = LCUI_WSTATE_CREATED;
 	node = &widget->node;
-	snode = &widget->node_show;
 	LinkedList_InsertNode(&parent->children, 0, node);
-	LinkedList_InsertNode(&parent->children_show, 0, snode);
 	/** 修改它后面的部件的 index 值 */
 	node = node->next;
 	while (node) {
@@ -117,14 +103,13 @@ int Widget_Unwrap(LCUI_Widget widget)
 {
 	size_t len;
 	LCUI_Widget child;
-	LinkedList *children, *children_show;
-	LinkedListNode *target, *node, *prev, *snode;
+	LinkedList *children;
+	LinkedListNode *target, *node, *prev;
 
 	if (!widget->parent) {
 		return -1;
 	}
 	children = &widget->parent->children;
-	children_show = &widget->parent->children_show;
 	len = widget->children.length;
 	if (len > 0) {
 		node = LinkedList_GetNode(&widget->children, 0);
@@ -140,12 +125,9 @@ int Widget_Unwrap(LCUI_Widget widget)
 		assert(node->data != NULL);
 		prev = node->prev;
 		child = node->data;
-		snode = &child->node_show;
 		LinkedList_Unlink(&widget->children, node);
-		LinkedList_Unlink(&widget->children_show, snode);
 		child->parent = widget->parent;
 		LinkedList_Link(children, target, node);
-		LinkedList_AppendNode(children_show, snode);
 		Widget_AddTaskForChildren(child, LCUI_WTASK_REFRESH_STYLE);
 		Widget_UpdateTaskStatus(child);
 		node = prev;
@@ -162,27 +144,26 @@ int Widget_Unwrap(LCUI_Widget widget)
 	return 0;
 }
 
-int Widget_Unlink(LCUI_Widget widget)
+int Widget_Unlink(LCUI_Widget w)
 {
 	LCUI_Widget child;
 	LCUI_WidgetEventRec ev = { 0 };
-	LinkedListNode *node, *snode;
+	LinkedListNode *node;
 
-	if (!widget->parent) {
+	if (!w->parent) {
 		return -1;
 	}
-	node = &widget->node;
-	snode = &widget->node_show;
-	if (widget->index == widget->parent->children.length - 1) {
-		Widget_RemoveStatus(widget, "last-child");
-		child = Widget_GetPrev(widget);
+	node = &w->node;
+	if (w->index == w->parent->children.length - 1) {
+		Widget_RemoveStatus(w, "last-child");
+		child = Widget_GetPrev(w);
 		if (child) {
 			Widget_AddStatus(child, "last-child");
 		}
 	}
-	if (widget->index == 0) {
-		Widget_RemoveStatus(widget, "first-child");
-		child = Widget_GetNext(widget);
+	if (w->index == 0) {
+		Widget_RemoveStatus(w, "first-child");
+		child = Widget_GetNext(w);
 		if (child) {
 			Widget_AddStatus(child, "first-child");
 		}
@@ -194,14 +175,15 @@ int Widget_Unlink(LCUI_Widget widget)
 		child->index -= 1;
 		node = node->next;
 	}
-	node = &widget->node;
+	node = &w->node;
 	ev.cancel_bubble = TRUE;
 	ev.type = LCUI_WEVENT_UNLINK;
-	Widget_TriggerEvent(widget, &ev, NULL);
-	LinkedList_Unlink(&widget->parent->children, node);
-	LinkedList_Unlink(&widget->parent->children_show, snode);
-	Widget_PostSurfaceEvent(widget, LCUI_WEVENT_UNLINK, TRUE);
-	widget->parent = NULL;
+	Widget_TriggerEvent(w, &ev, NULL);
+	LinkedList_Unlink(&w->parent->children, node);
+	LinkedList_Unlink(&w->parent->children_show, &w->node_show);
+	Widget_PostSurfaceEvent(w, LCUI_WEVENT_UNLINK, TRUE);
+	Widget_UpdateLayout(w->parent);
+	w->parent = NULL;
 	return 0;
 }
 

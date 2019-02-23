@@ -233,7 +233,7 @@ void Widget_Empty(LCUI_Widget w)
 	LinkedList_ClearData(&w->children_show, NULL);
 	LinkedList_Concat(&LCUIWidget.trash, &w->children);
 	Widget_InvalidateArea(w, NULL, SV_GRAPH_BOX);
-	Widget_AddTask(w, LCUI_WTASK_LAYOUT);
+	Widget_UpdateStyle(w, TRUE);
 }
 
 void Widget_GetOffset(LCUI_Widget w, LCUI_Widget parent, float *offset_x,
@@ -309,12 +309,12 @@ LCUI_BOOL Widget_InVisibleArea(LCUI_Widget w)
 				continue;
 			}
 			DEBUG_MSG("rect: (%g,%g,%g,%g), child rect: "
-				   "(%g,%g,%g,%g), child: %s %s\n",
-				   rect.x, rect.y, rect.width, rect.height,
-				   child->box.border.x, child->box.border.y,
-				   child->box.border.width,
-				   child->box.border.height, child->type,
-				   child->id);
+				  "(%g,%g,%g,%g), child: %s %s\n",
+				  rect.x, rect.y, rect.width, rect.height,
+				  child->box.border.x, child->box.border.y,
+				  child->box.border.width,
+				  child->box.border.height, child->type,
+				  child->id);
 			if (!LCUIRectF_IsIncludeRect(&child->box.border,
 						     &rect)) {
 				continue;
@@ -468,7 +468,7 @@ size_t Widget_GetHashList(LCUI_Widget w, unsigned *hash_list, size_t maxlen)
 				child = child->node.next->data;
 				break;
 			}
-		} while(1);
+		} while (1);
 	}
 	return count;
 }
@@ -632,12 +632,51 @@ void Widget_UpdateZIndex(LCUI_Widget w)
 	Widget_AddTask(w, LCUI_WTASK_ZINDEX);
 }
 
+void Widget_SortChildrenShow(LCUI_Widget w)
+{
+	LCUI_Widget child, target;
+	LCUI_WidgetStyle *s, *ts;
+	LinkedListNode *node, *target_node;
+	LinkedList *list;
+
+	list = &w->children_show;
+	LinkedList_ClearData(list, NULL);
+	for (LinkedList_Each(node, &w->children)) {
+		child = node->data;
+		s = &child->computed_style;
+		if (child->state < LCUI_WSTATE_READY) {
+			continue;
+		}
+		for (LinkedList_Each(target_node, list)) {
+			target = target_node->data;
+			ts = &target->computed_style;
+			if (s->z_index == ts->z_index) {
+				if (s->position == ts->position) {
+					if (child->index < target->index) {
+						continue;
+					}
+				} else if (s->position < ts->position) {
+					continue;
+				}
+			} else if (s->z_index < ts->z_index) {
+				continue;
+			}
+			LinkedList_Link(list, target_node->prev,
+					&child->node_show);
+			break;
+		}
+		if (!target_node) {
+			LinkedList_AppendNode(list, &child->node_show);
+		}
+	}
+}
+
 void Widget_ExecUpdateZIndex(LCUI_Widget w)
 {
 	int z_index;
-	LinkedList *list;
-	LinkedListNode *cnode, *csnode, *snode;
+	;
 	LCUI_Style s = &w->style->sheet[key_z_index];
+
 	if (s->is_valid && s->type == LCUI_STYPE_INT) {
 		z_index = s->val_int;
 	} else {
@@ -652,31 +691,6 @@ void Widget_ExecUpdateZIndex(LCUI_Widget w)
 		}
 	}
 	w->computed_style.z_index = z_index;
-	snode = &w->node_show;
-	list = &w->parent->children_show;
-	LinkedList_Unlink(list, snode);
-	for (LinkedList_Each(cnode, list)) {
-		LCUI_Widget child = cnode->data;
-		LCUI_WidgetStyle *ccs = &child->computed_style;
-
-		csnode = &child->node_show;
-		if (w->computed_style.z_index < ccs->z_index) {
-			continue;
-		} else if (w->computed_style.z_index == ccs->z_index) {
-			if (w->computed_style.position == ccs->position) {
-				if (w->index < child->index) {
-					continue;
-				}
-			} else if (w->computed_style.position < ccs->position) {
-				continue;
-			}
-		}
-		LinkedList_Link(list, csnode->prev, snode);
-		break;
-	}
-	if (!cnode) {
-		LinkedList_AppendNode(list, snode);
-	}
 	if (w->computed_style.position != SV_STATIC) {
 		Widget_AddTask(w, LCUI_WTASK_REFRESH);
 	}
@@ -1160,7 +1174,7 @@ static void Widget_ComputeSize(LCUI_Widget w)
 	    Widget_HasFillAvailableWidth(w)) {
 		width = Widget_ComputeFillAvailableWidth(w);
 		width = ToContentBoxWidth(w, width);
-		if (!Widget_HasStaticWidthParent(w)) {
+		if (!Widget_HasStaticWidthParent(w) && w->parent) {
 			default_width = w->parent->box.content.width;
 			if (w->computed_style.box_sizing == SV_BORDER_BOX) {
 				default_width =
