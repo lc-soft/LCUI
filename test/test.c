@@ -24,6 +24,7 @@ int main(void)
 	Logger_SetHandlerW(LoggerHandlerW);
 #endif
 	ret += test_charset();
+	ret += test_linkedlist();
 	ret += test_string();
 	ret += test_strpool();
 	ret += test_thread();

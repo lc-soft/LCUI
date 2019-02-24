@@ -19,6 +19,7 @@ test/test.h \
 test/test_touch.c \
 test/test_string.c \
 test/test_thread.c \
+test/test_linkedlist.c \
 test/test_string_render.c \
 test/test_widget_render.c \
 test/test_char_render.c \
@@ -57,4 +58,3 @@ test:
 	cd test && make && ./test && valgrind --leak-check=full --error-exitcode=42 .libs/lt-test
 
 @CODE_COVERAGE_RULES@
-
