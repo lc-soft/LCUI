@@ -60,7 +60,6 @@ typedef struct LCUI_TextViewRec_ {
 	wchar_t *content;
 	LCUI_BOOL trimming;
 	LCUI_Widget widget;
-	LCUI_Mutex mutex;
 	LCUI_TextLayer layer;
 	LCUI_CSSFontStyleRec style;
 	LinkedListNode node;
@@ -79,7 +78,6 @@ typedef struct LCUI_TextViewRec_ {
 static struct LCUI_TextViewModule {
 	int key_word_break;
 	LinkedList list;
-	LCUI_Mutex mutex;
 	LCUI_WidgetPrototype prototype;
 } self;
 
@@ -266,7 +264,6 @@ static void TextView_OnInit(LCUI_Widget w)
 	TextLayer_SetUsingStyleTags(txt->layer, TRUE);
 	Widget_BindEvent(w, "resize", TextView_OnResize, NULL, NULL);
 	CSSFontStyle_Init(&txt->style);
-	LCUIMutex_Init(&txt->mutex);
 	txt->node.data = txt;
 	txt->node.prev = txt->node.next = NULL;
 	LinkedList_AppendNode(&self.list, &txt->node);
@@ -287,14 +284,12 @@ static void TextView_ClearTasks(LCUI_Widget w)
 static void TextView_OnDestroy(LCUI_Widget w)
 {
 	LCUI_TextView txt = GetData(w);
+
+	LinkedList_Unlink(&self.list, &txt->node);
 	CSSFontStyle_Destroy(&txt->style);
 	TextLayer_Destroy(txt->layer);
-	LCUIMutex_Unlock(&txt->mutex);
 	TextView_ClearTasks(w);
 	free(txt->content);
-	LCUIMutex_Lock(&self.mutex);
-	LinkedList_Unlink(&self.list, &txt->node);
-	LCUIMutex_Unlock(&self.mutex);
 }
 
 static void TextView_AutoSize(LCUI_Widget w, float *width, float *height)
@@ -357,14 +352,12 @@ static void TextView_OnTask(LCUI_Widget w)
 	LinkedList_Init(&rects);
 	i = TASK_SET_TEXT;
 	if (txt->tasks[i].is_valid) {
-		LCUIMutex_Lock(&txt->mutex);
 		txt->tasks[i].is_valid = FALSE;
 		TextLayer_SetTextW(txt->layer, txt->tasks[i].text, NULL);
 		txt->tasks[TASK_UPDATE].is_valid = TRUE;
 		txt->tasks[TASK_UPDATE_SIZE].is_valid = TRUE;
 		free(txt->tasks[i].text);
 		txt->tasks[i].text = NULL;
-		LCUIMutex_Unlock(&txt->mutex);
 	}
 	i = TASK_SET_AUTOWRAP;
 	if (txt->tasks[i].is_valid) {
@@ -483,7 +476,6 @@ int TextView_SetTextW(LCUI_Widget w, const wchar_t *text)
 		}
 		wcstrim(newtext, text, NULL);
 	} while (0);
-	LCUIMutex_Lock(&txt->mutex);
 	if (txt->tasks[TASK_SET_TEXT].is_valid &&
 	    txt->tasks[TASK_SET_TEXT].text) {
 		free(txt->tasks[TASK_SET_TEXT].text);
@@ -491,7 +483,6 @@ int TextView_SetTextW(LCUI_Widget w, const wchar_t *text)
 	txt->tasks[TASK_SET_TEXT].is_valid = TRUE;
 	txt->tasks[TASK_SET_TEXT].text = newtext;
 	Widget_AddTask(w, LCUI_WTASK_USER);
-	LCUIMutex_Unlock(&txt->mutex);
 	return 0;
 }
 
@@ -547,7 +538,6 @@ size_t LCUIWidget_RefreshTextView(void)
 	LCUI_TextView txt;
 	LinkedListNode *node;
 
-	LCUIMutex_Lock(&self.mutex);
 	for (LinkedList_Each(node, &self.list)) {
 		txt = node->data;
 		if (txt->widget->state != LCUI_WSTATE_DELETED) {
@@ -555,7 +545,6 @@ size_t LCUIWidget_RefreshTextView(void)
 		}
 		count += 1;
 	}
-	LCUIMutex_Unlock(&self.mutex);
 	return count;
 }
 
@@ -575,12 +564,10 @@ void LCUIWidget_AddTextView(void)
 	self.prototype->setattr = TextView_OnParseAttr;
 	self.prototype->runtask = TextView_OnTask;
 	LCUI_AddCSSPropertyParser(&parser);
-	LCUIMutex_Init(&self.mutex);
 	LinkedList_Init(&self.list);
 }
 
 void LCUIWidget_FreeTextView(void)
 {
 	LinkedList_ClearData(&self.list, NULL);
-	LCUIMutex_Destroy(&self.mutex);
 }
