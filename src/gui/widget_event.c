@@ -196,6 +196,7 @@ void LCUI_InitWidgetEvent(LCUI_WidgetEvent e, const char *name)
 static void Widget_AddEventRecord(LCUI_Widget widget, LCUI_WidgetEventPack pack)
 {
 	WidgetEventRecord record;
+
 	LCUIMutex_Lock(&self.mutex);
 	record = RBTree_CustomGetData(&self.event_records, widget);
 	if (!record) {
@@ -215,6 +216,7 @@ static int Widget_DeleteEventRecord(LCUI_Widget widget,
 	int ret = 0;
 	WidgetEventRecord record;
 	LinkedListNode *node, *prev;
+
 	LCUIMutex_Lock(&self.mutex);
 	record = RBTree_CustomGetData(&self.event_records, widget);
 	if (!record) {
@@ -238,6 +240,7 @@ static void WidgetEventTranslator(LCUI_Event e, LCUI_WidgetEventPack pack)
 {
 	WidgetEventHandler handler = e->data;
 	LCUI_Widget w = pack->widget;
+
 	if (!w) {
 		return;
 	}
@@ -641,6 +644,10 @@ int Widget_StopEventPropagation(LCUI_Widget widget)
 	LinkedListNode *node;
 	WidgetEventRecord record;
 	LCUI_WidgetEventPack pack;
+
+	if (self.event_records.total_node <= 1) {
+		return 0;
+	}
 	LCUIMutex_Lock(&self.mutex);
 	record = RBTree_CustomGetData(&self.event_records, widget);
 	if (!record) {
@@ -828,6 +835,9 @@ void LCUIWidget_ClearEventTarget(LCUI_Widget widget)
 	WidgetEventRecord record;
 	LCUI_WidgetEventPack pack;
 
+	if (self.event_records.total_node <= 1) {
+		return;
+	}
 	LCUIMutex_Lock(&self.mutex);
 	record = RBTree_CustomGetData(&self.event_records, widget);
 	if (record) {
@@ -1198,6 +1208,10 @@ int Widget_SetTouchCapture(LCUI_Widget w, int point_id)
 int Widget_ReleaseTouchCapture(LCUI_Widget w, int point_id)
 {
 	int ret;
+
+	if (self.touch_capturers.length <= 1) {
+		return 0;
+	}
 	LCUIMutex_Lock(&self.mutex);
 	ret = TouchCapturers_Delete(&self.touch_capturers, w, point_id);
 	LCUIMutex_Unlock(&self.mutex);
