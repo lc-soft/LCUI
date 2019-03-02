@@ -184,6 +184,7 @@ static int GetEventId(const char *event_name)
 
 void LCUI_InitWidgetEvent(LCUI_WidgetEvent e, const char *name)
 {
+	e->target = NULL;
 	e->type = GetEventId(name);
 	e->cancel_bubble = FALSE;
 	e->data = NULL;
