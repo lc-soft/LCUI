@@ -64,7 +64,7 @@ static struct LCUI_CSSFontStyleModule {
 	StyleHandler handlers[TOTAL_FONT_STYLE_KEY];
 } self;
 
-static int unescape(const wchar_t *instr, wchar_t *outstr)
+static size_t unescape(const wchar_t *instr, wchar_t *outstr)
 {
 	int i = -1;
 	wchar_t buff[6];

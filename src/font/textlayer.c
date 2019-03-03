@@ -879,16 +879,17 @@ int TextLayer_SetText(LCUI_TextLayer layer, const char *utf8_text)
 size_t TextLayer_GetTextW(LCUI_TextLayer layer, size_t start_pos,
 			  size_t max_len, wchar_t *wstr_buff)
 {
-	size_t row, col = 0, i;
+	size_t i;
+	int row, col;
 	LCUI_TextRow row_ptr;
 
 	if (max_len == 0) {
 		return 0;
 	}
 	/* 先根据一维坐标计算行列坐标 */
-	for (i = 0, row = 0; row < layer->text_rows.length; ++row) {
+	for (i = 0, row = 0, col = 0; row < layer->text_rows.length; ++row) {
 		if (i >= start_pos) {
-			col = start_pos - i;
+			col = (int)(start_pos - i);
 			break;
 		}
 		i += layer->text_rows.rows[row]->length;

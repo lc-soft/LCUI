@@ -700,8 +700,8 @@ static int Graph_FillRectARGB(LCUI_Graph *graph, LCUI_Color color,
 static uchar_t Graph_BilinearResamplingCore(uchar_t a, uchar_t b, uchar_t c,
 					    uchar_t d, float dx, float dy)
 {
-	return a * (1 - dx) * (1 - dy) + b * (dx) * (1 - dy) +
-	       c * (dy) * (1 - dx) + d * (dx * dy);
+	return (uchar_t)(a * (1 - dx) * (1 - dy) + b * (dx) * (1 - dy) +
+	       c * (dy) * (1 - dx) + d * (dx * dy));
 }
 
 /*-------------------------------- End ARGB --------------------------------*/
@@ -1092,8 +1092,8 @@ int Graph_ZoomBilinear(const LCUI_Graph *graph, LCUI_Graph *buff,
 			 */
 			x = (int)(scale_x * j);
 			y = (int)(scale_y * i);
-			x_diff = (scale_x * j) - x;
-			y_diff = (scale_y * i) - y;
+			x_diff = (float)((scale_x * j) - x);
+			y_diff = (float)((scale_y * i) - y);
 			Graph_GetPixel(graph, x + rect.x + 0, y + rect.y + 0,
 				       a);
 			Graph_GetPixel(graph, x + rect.x + 1, y + rect.y + 0,

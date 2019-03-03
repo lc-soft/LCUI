@@ -73,7 +73,7 @@ void Widget_SetBorderWidth(LCUI_Widget w, float width)
 	Widget_UpdateStyle(w, FALSE);
 }
 
-void Widget_SetBorderStyle(LCUI_Widget w, float style)
+void Widget_SetBorderStyle(LCUI_Widget w, int style)
 {
 	Widget_SetStyle(w, key_border_top_style, style, style);
 	Widget_SetStyle(w, key_border_right_style, style, style);

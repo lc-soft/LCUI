@@ -636,8 +636,9 @@ int StyleSheet_MergeList(LCUI_StyleSheet ss, LCUI_StyleList list)
 
 int StyleSheet_Replace(LCUI_StyleSheet dest, const LCUI_StyleSheetRec *src)
 {
+	int i;
 	LCUI_Style s;
-	size_t i, count, size;
+	size_t count, size;
 
 	if (src->length > dest->length) {
 		size = sizeof(LCUI_StyleRec) * src->length;

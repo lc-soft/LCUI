@@ -47,7 +47,7 @@ LCUI_API void Widget_SetBorderColor(LCUI_Widget w, LCUI_Color color);
 
 LCUI_API void Widget_SetBorderWidth(LCUI_Widget w, float width);
 
-LCUI_API void Widget_SetBorderStyle(LCUI_Widget w, float style);
+LCUI_API void Widget_SetBorderStyle(LCUI_Widget w, int style);
 
 /** 设置边框样式 */
 LCUI_API void Widget_SetBorder(LCUI_Widget w, float width, int style,

@@ -385,7 +385,7 @@ static size_t Widget_UpdateChildren(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 		}
 		if (data->rules.max_update_children_count > 0) {
 			if (update_count >=
-			    data->rules.max_update_children_count) {
+			    (size_t)data->rules.max_update_children_count) {
 				w->task.for_children = TRUE;
 				break;
 			}
@@ -401,12 +401,12 @@ static size_t Widget_UpdateChildren(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 		 */
 		msec = (clock() - msec);
 		if (msec < 1) {
-			data->default_max_update_count += 128;	
+			data->default_max_update_count += 128;
 			continue;
 		}
-		data->default_max_update_count =
-		update_count * CLOCKS_PER_SEC / self.max_updates_per_frame /
-		LCUI_MAX_FRAMES_PER_SEC / msec;
+		data->default_max_update_count = update_count * CLOCKS_PER_SEC /
+						 self.max_updates_per_frame /
+						 LCUI_MAX_FRAMES_PER_SEC / msec;
 		if (data->default_max_update_count < 1) {
 			data->default_max_update_count = 32;
 		}
@@ -520,7 +520,7 @@ void LCUIWidget_UpdateWithProfile(LCUI_WidgetTasksProfile profile)
 	}
 	root = LCUIWidget_GetRoot();
 	for (i = 0; i < self.max_updates_per_frame; ++i) {
-		 Widget_UpdateWithProfile(root, profile);
+		Widget_UpdateWithProfile(root, profile);
 	}
 	profile->time = clock() - profile->time;
 	profile->destroy_time = clock();

@@ -53,9 +53,9 @@ LCUI_API size_t strntolower(char *outstr, size_t max_len, const char *instr);
  * @param[in] charlist 需要清除的字符列表，当为NULL时，默认清除空白符
  * @return 处理后的字符串的长度
  */
-LCUI_API int strtrim(char *outstr, const char *instr, const char *charlist);
-LCUI_API int wcstrim(wchar_t *outstr, const wchar_t *instr,
-		     const wchar_t *charlist);
+LCUI_API size_t strtrim(char *outstr, const char *instr, const char *charlist);
+LCUI_API size_t wcstrim(wchar_t *outstr, const wchar_t *instr,
+			const wchar_t *charlist);
 
 LCUI_API unsigned strhash(unsigned hash, const char *str);
 

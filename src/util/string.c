@@ -133,12 +133,12 @@ wchar_t *wcsdup2(const wchar_t *str)
 	return out;
 }
 
-int strtrim(char *outstr, const char *instr, const char *charlist)
+size_t strtrim(char *outstr, const char *instr, const char *charlist)
 {
 	STRTRIM_CODE(char, outstr, instr, charlist, "\t\n\r ");
 }
 
-int wcstrim(wchar_t *outstr, const wchar_t *instr, const wchar_t *charlist)
+size_t wcstrim(wchar_t *outstr, const wchar_t *instr, const wchar_t *charlist)
 {
 	STRTRIM_CODE(wchar_t, outstr, instr, charlist, L"\t\n\r ");
 }

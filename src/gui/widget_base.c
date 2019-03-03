@@ -1,4 +1,4 @@
-/*
+﻿/*
  * widget_base.c -- The widget base operation set.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
