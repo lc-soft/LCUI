@@ -35,11 +35,12 @@ LCUI_BEGIN_HEADER
 
 #define TextEdit_New() Widget_New("textedit")
 
-/** 指定文本框是否处理控制符 */
-LCUI_API void TextEdit_SetUsingStyleTags(LCUI_Widget widget, LCUI_BOOL is_true);
+/** Enable style tag parser  */
+LCUI_API void TextEdit_EnableStyleTag(LCUI_Widget widget, LCUI_BOOL enable);
 
-/** 指定文本框是否启用多行文本显示 */
-LCUI_API void TextEdit_SetMultiline(LCUI_Widget widget, LCUI_BOOL is_true);
+LCUI_API void TextEdit_EnableMultiline(LCUI_Widget widget, LCUI_BOOL enable);
+
+LCUI_API void TextEdit_MoveCaret(LCUI_Widget widget, int row, int col);
 
 /** 清空文本内容 */
 LCUI_API void TextEdit_ClearText(LCUI_Widget widget);
@@ -52,7 +53,7 @@ LCUI_API size_t TextEdit_GetTextW(LCUI_Widget w, size_t start,
 LCUI_API size_t TextEdit_GetTextLength(LCUI_Widget w);
 
 /** 设置文本编辑框内的光标，指定是否闪烁、闪烁时间间隔 */
-LCUI_API void TextEdit_SetCaretBlink(LCUI_Widget w, LCUI_BOOL enabled, int time);
+LCUI_API void TextEdit_SetCaretBlink(LCUI_Widget w, LCUI_BOOL visible, int time);
 
 /** 为文本框设置文本（宽字符版） */
 LCUI_API int TextEdit_SetTextW(LCUI_Widget widget, const wchar_t *wstr);

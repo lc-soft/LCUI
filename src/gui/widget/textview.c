@@ -261,7 +261,7 @@ static void TextView_OnInit(LCUI_Widget w)
 	TextLayer_SetAutoWrap(txt->layer, TRUE);
 	TextLayer_SetMultiline(txt->layer, TRUE);
 	/* 启用样式标签的支持 */
-	TextLayer_SetUsingStyleTags(txt->layer, TRUE);
+	TextLayer_EnableStyleTag(txt->layer, TRUE);
 	Widget_BindEvent(w, "resize", TextView_OnResize, NULL, NULL);
 	CSSFontStyle_Init(&txt->style);
 	txt->node.data = txt;

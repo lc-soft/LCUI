@@ -38,11 +38,7 @@
 #include <LCUI/graph.h>
 #include <LCUI/font.h>
 
-/** 文本添加类型 */
-enum TextAddType {
-	TAT_INSERT, /**< 插入至插入点处 */
-	TAT_APPEND  /**< 追加至文本末尾 */
-};
+typedef enum { TEXT_ACTION_INSERT, TEXT_ACTION_APPEND } TextAction;
 
 #define TextRowList_AddNewRow(ROWLIST) \
 	TextRowList_InsertNewRow(ROWLIST, (ROWLIST)->length)
@@ -301,7 +297,7 @@ LCUI_TextLayer TextLayer_New(void)
 	layer->enable_canvas = FALSE;
 	layer->enable_autowrap = FALSE;
 	layer->enable_mulitiline = FALSE;
-	layer->enable_style_tags = FALSE;
+	layer->enable_style_tag = FALSE;
 	layer->word_break = LCUI_WORD_BREAK_NORMAL;
 	TextStyle_Init(&layer->text_default_style);
 	LinkedList_Init(&layer->text_styles);
@@ -709,7 +705,7 @@ static const wchar_t *TextLayer_ProcessStyleTag(LCUI_TextLayer layer,
 
 /** 对文本进行预处理 */
 static int TextLayer_ProcessText(LCUI_TextLayer layer, const wchar_t *wstr,
-				 int add_type, LinkedList *tags)
+				 TextAction action, LinkedList *tags)
 {
 	LCUI_EOLChar eol;
 	LCUI_TextRow txtrow;
@@ -730,7 +726,7 @@ static int TextLayer_ProcessText(LCUI_TextLayer layer, const wchar_t *wstr,
 		tags = &tmp_tags;
 	}
 	/* 如果是将文本追加至文本末尾 */
-	if (add_type == TAT_APPEND) {
+	if (action == TEXT_ACTION_APPEND) {
 		if (layer->text_rows.length > 0) {
 			cur_row = layer->text_rows.length - 1;
 		} else {
@@ -753,7 +749,7 @@ static int TextLayer_ProcessText(LCUI_TextLayer layer, const wchar_t *wstr,
 	ins_x = cur_col;
 	ins_y = cur_row;
 	for (p = wstr; *p; ++p) {
-		if (layer->enable_style_tags) {
+		if (layer->enable_style_tag) {
 			const wchar_t *pp;
 			pp = TextLayer_ProcessStyleTag(layer, p, tags, &style);
 			if (pp) {
@@ -798,7 +794,7 @@ static int TextLayer_ProcessText(LCUI_TextLayer layer, const wchar_t *wstr,
 	/* 更新当前行的尺寸 */
 	TextLayer_UpdateRowSize(layer, txtrow);
 	layer->width = max(layer->width, txtrow->width);
-	if (add_type == TAT_INSERT) {
+	if (action == TEXT_ACTION_INSERT) {
 		layer->insert_x = ins_x;
 		layer->insert_y = ins_y;
 	}
@@ -819,9 +815,9 @@ static int TextLayer_ProcessText(LCUI_TextLayer layer, const wchar_t *wstr,
 
 /** 插入文本内容（宽字符版） */
 int TextLayer_InsertTextW(LCUI_TextLayer layer, const wchar_t *wstr,
-			  LinkedList *tag_stack)
+			  LinkedList *tags)
 {
-	return TextLayer_ProcessText(layer, wstr, TAT_INSERT, tag_stack);
+	return TextLayer_ProcessText(layer, wstr, TEXT_ACTION_INSERT, tags);
 }
 
 /** 插入文本内容 */
@@ -840,7 +836,8 @@ int TextLayer_InsertText(LCUI_TextLayer layer, const char *utf8_str)
 int TextLayer_AppendTextW(LCUI_TextLayer layer, const wchar_t *wstr,
 			  LinkedList *tag_stack)
 {
-	return TextLayer_ProcessText(layer, wstr, TAT_APPEND, tag_stack);
+	return TextLayer_ProcessText(layer, wstr, TEXT_ACTION_APPEND,
+				     tag_stack);
 }
 
 /** 追加文本内容 */
@@ -1187,9 +1184,9 @@ void TextLayer_SetWordBreak(LCUI_TextLayer layer, LCUI_WordBreakMode mode)
 }
 
 /** 设置是否使用样式标签 */
-void TextLayer_SetUsingStyleTags(LCUI_TextLayer layer, LCUI_BOOL enable)
+void TextLayer_EnableStyleTag(LCUI_TextLayer layer, LCUI_BOOL enable)
 {
-	layer->enable_style_tags = enable;
+	layer->enable_style_tag = enable;
 }
 
 static void TextLayer_UpdateTextStyleCache(LCUI_TextLayer layer)

@@ -66,6 +66,9 @@
     <ClCompile Include="..\..\..\test\test_linkedlist.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\test_textedit.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\test\test.h">

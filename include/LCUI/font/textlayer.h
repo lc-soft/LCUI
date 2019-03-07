@@ -70,9 +70,8 @@ typedef struct LCUI_TextRowListRec_ {
  * content box.
  */
 typedef enum LCUI_WordBreakMode {
-	LCUI_WORD_BREAK_NORMAL, /**< 默认的断行规则，将宽度溢出的单词放到下一行
-				 */
-	LCUI_WORD_BREAK_BREAK_ALL /**< 任意字符间断行 */
+	LCUI_WORD_BREAK_NORMAL,
+	LCUI_WORD_BREAK_BREAK_ALL
 } LCUI_WordBreakMode;
 
 typedef struct LCUI_TextLayerRec_ {
@@ -102,7 +101,7 @@ typedef struct LCUI_TextLayerRec_ {
 	LCUI_WordBreakMode word_break; /**< 单词内断行模式 */
 	LCUI_BOOL enable_mulitiline;   /**< 是否启用多行文本模式 */
 	LCUI_BOOL enable_autowrap;     /**< 是否启用自动换行模式 */
-	LCUI_BOOL enable_style_tags;   /**< 是否使用文本样式标签 */
+	LCUI_BOOL enable_style_tag;    /**< 是否使用文本样式标签 */
 	LCUI_BOOL enable_canvas; /**< 是否使用缓存空间来存储文本位图 */
 	LinkedList dirty_rects;               /**< 脏矩形记录 */
 	LinkedList text_styles;               /**< 样式缓存 */
@@ -231,8 +230,7 @@ LCUI_API void TextLayer_SetWordBreak(LCUI_TextLayer layer,
 				     LCUI_WordBreakMode mode);
 
 /** 设置是否使用样式标签 */
-LCUI_API void TextLayer_SetUsingStyleTags(LCUI_TextLayer layer,
-					  LCUI_BOOL is_true);
+LCUI_API void TextLayer_EnableStyleTag(LCUI_TextLayer layer, LCUI_BOOL is_true);
 
 /** 重新载入各个文字的字体位图 */
 LCUI_API void TextLayer_ReloadCharBitmap(LCUI_TextLayer layer);

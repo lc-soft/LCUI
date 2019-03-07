@@ -50,7 +50,9 @@ test/test_widget_flex_layout.xml \
 test/test_widget_inline_block_layout.c \
 test/test_widget_inline_block_layout.css \
 test/test_widget_inline_block_layout.xml \
-test/test_widget_rect.c
+test/test_widget_rect.c \
+test/test_textview_resize.c \
+test/text_textedit.c
 
 .PHONY: test
 
