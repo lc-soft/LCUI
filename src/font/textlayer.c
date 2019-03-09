@@ -1427,8 +1427,12 @@ void TextLayer_SetLineHeight(LCUI_TextLayer layer, int height)
 	layer->task.typeset_start_row = 0;
 }
 
-void TextLayer_SetOffset(LCUI_TextLayer layer, int offset_x, int offset_y)
+LCUI_BOOL TextLayer_SetOffset(LCUI_TextLayer layer, int offset_x, int offset_y)
 {
-	layer->new_offset_x = offset_x;
-	layer->new_offset_y = offset_y;
+	if (layer->new_offset_x != offset_x || layer->new_offset_y != offset_y) {
+		layer->new_offset_x = offset_x;
+		layer->new_offset_y = offset_y;
+		return TRUE;
+	}
+	return FALSE;
 }

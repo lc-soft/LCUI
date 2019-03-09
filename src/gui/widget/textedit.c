@@ -1,7 +1,7 @@
 ﻿/*
  * textedit.c -- textedit widget, used to allow user edit text.
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -145,9 +145,10 @@ static void TextEdit_UpdateCaret(LCUI_Widget widget)
 	LCUI_TextEdit edit = GetData(widget);
 
 	int row = edit->layer->insert_y;
+	int offset_x, offset_y;
+	float height, width;
 	float scale = LCUIMetrics_GetScale();
 	float x, y, caret_x = 0, caret_y = 0;
-	float height, offset_x, offset_y;
 
 	if (!edit->is_placeholder_shown) {
 		LCUI_Pos pos;
@@ -157,33 +158,37 @@ static void TextEdit_UpdateCaret(LCUI_Widget widget)
 		caret_x = pos.x / scale;
 		caret_y = pos.y / scale;
 	}
-	offset_x = edit->layer->offset_x / scale;
-	offset_y = edit->layer->offset_y / scale;
+	offset_x = iround(edit->layer->offset_x / scale);
+	offset_y = iround(edit->layer->offset_y / scale);
 	x = caret_x + offset_x;
 	y = caret_y + offset_y;
+	width = edit->layer->width / scale;
 	height = TextLayer_GetRowHeight(edit->layer, row) / scale;
 	Widget_SetStyle(edit->caret, key_height, height, px);
-	/* 如果光标超出可见区域，则重新计算文本偏移距离 */
+	/* Keep the caret in the visible area */
 	if (x < 0) {
 		x = 0;
-		update_offset = TRUE;
 	}
 	if (y < 0) {
 		y = 0;
-		update_offset = TRUE;
 	}
 	if (x + edit->caret->width > widget->box.content.width) {
 		x = widget->box.content.width - edit->caret->width;
-		update_offset = TRUE;
 	}
 	if (y + edit->caret->height > widget->box.content.height) {
 		y = widget->box.content.height - edit->caret->height;
-		update_offset = TRUE;
 	}
-	if (update_offset) {
-		int ix = iround((x - caret_x) * scale);
-		int iy = iround((y - caret_y) * scale);
-		TextLayer_SetOffset(edit->layer, ix, iy);
+	/* Keep current line text in the visible area */
+	if (width < widget->box.content.width) {
+		x = caret_x;
+	} else if (edit->caret->width + offset_x + width <
+		   widget->box.content.width) {
+		x = caret_x + widget->box.content.width -
+		    (edit->layer->width / scale);
+	}
+	offset_x = iround((x - caret_x) * scale);
+	offset_y = iround((y - caret_y) * scale);
+	if (TextLayer_SetOffset(edit->layer, offset_x, offset_y)) {
 		edit->tasks[TASK_UPDATE] = TRUE;
 		Widget_AddTask(widget, LCUI_WTASK_USER);
 	}
@@ -235,7 +240,7 @@ static void TextBlock_OnDestroy(void *arg)
 }
 
 static int TextEdit_AddTextBlock(LCUI_Widget widget, const wchar_t *wtext,
-				TextBlockAction action, TextBlockOwner owner)
+				 TextBlockAction action, TextBlockOwner owner)
 {
 	const wchar_t *p;
 	LCUI_TextEdit edit;
@@ -253,7 +258,7 @@ static int TextEdit_AddTextBlock(LCUI_Widget widget, const wchar_t *wtext,
 			return -ENOMEM;
 		}
 		block->owner = owner;
-		block->type = action;
+		block->action = action;
 		size = edit->text_block_size;
 		if (i == 0) {
 			block->type = TEXT_BLOCK_BEGIN;
@@ -368,6 +373,7 @@ static void TextEdit_UpdateTextLayer(LCUI_Widget w)
 	LCUI_TextEdit edit;
 	LCUI_TextStyleRec style;
 	LinkedListNode *node;
+
 	LinkedList_Init(&rects);
 	scale = LCUIMetrics_GetScale();
 	edit = Widget_GetData(w, self.prototype);
@@ -525,7 +531,7 @@ int TextEdit_SetTextW(LCUI_Widget w, const wchar_t *wstr)
 {
 	TextEdit_ClearText(w);
 	return TextEdit_AddTextBlock(w, wstr, TEXT_BLOCK_ACTION_APPEND,
-				    TEXT_BLOCK_OWNER_SOURCE);
+				     TEXT_BLOCK_OWNER_SOURCE);
 }
 
 int TextEdit_SetText(LCUI_Widget widget, const char *utf8_str)
@@ -553,13 +559,13 @@ void TextEdit_SetPasswordChar(LCUI_Widget w, wchar_t ch)
 int TextEdit_AppendTextW(LCUI_Widget w, const wchar_t *wstr)
 {
 	return TextEdit_AddTextBlock(w, wstr, TEXT_BLOCK_ACTION_APPEND,
-				    TEXT_BLOCK_OWNER_SOURCE);
+				     TEXT_BLOCK_OWNER_SOURCE);
 }
 
 int TextEdit_InsertTextW(LCUI_Widget w, const wchar_t *wstr)
 {
 	return TextEdit_AddTextBlock(w, wstr, TEXT_BLOCK_ACTION_INSERT,
-				    TEXT_BLOCK_OWNER_SOURCE);
+				     TEXT_BLOCK_OWNER_SOURCE);
 }
 
 int TextEdit_SetPlaceHolderW(LCUI_Widget w, const wchar_t *wstr)
@@ -572,7 +578,7 @@ int TextEdit_SetPlaceHolderW(LCUI_Widget w, const wchar_t *wstr)
 		Widget_InvalidateArea(w, NULL, SV_PADDING_BOX);
 	}
 	return TextEdit_AddTextBlock(w, wstr, TEXT_BLOCK_ACTION_INSERT,
-				    TEXT_BLOCK_OWNER_PLACEHOLDER);
+				     TEXT_BLOCK_OWNER_PLACEHOLDER);
 }
 
 int TextEdit_SetPlaceHolder(LCUI_Widget w, const char *str)
@@ -603,7 +609,9 @@ static void TextEdit_OnParseText(LCUI_Widget w, const char *text)
 
 static void TextEdit_OnFocus(LCUI_Widget widget, LCUI_WidgetEvent e, void *arg)
 {
-	LCUI_TextEdit edit = Widget_GetData(widget, self.prototype);
+	LCUI_TextEdit edit;
+
+	edit = Widget_GetData(widget, self.prototype);
 	TextCaret_SetVisible(edit->caret, TRUE);
 	edit->tasks[TASK_UPDATE_CARET] = TRUE;
 	Widget_AddTask(widget, LCUI_WTASK_USER);
@@ -611,8 +619,16 @@ static void TextEdit_OnFocus(LCUI_Widget widget, LCUI_WidgetEvent e, void *arg)
 
 static void TextEdit_OnBlur(LCUI_Widget widget, LCUI_WidgetEvent e, void *arg)
 {
-	LCUI_TextEdit edit = Widget_GetData(widget, self.prototype);
+	LCUI_TextEdit edit;
+
+	edit = Widget_GetData(widget, self.prototype);
 	TextCaret_SetVisible(edit->caret, FALSE);
+	/* In single-line editing mode, we should reset the caret position to
+	 * the head, otherwise it will mistakenly think that only the last part
+	 * is entered after inputting long text. */
+	if (!edit->is_multiline_mode) {
+		TextEdit_MoveCaret(widget, 0, 0);
+	}
 }
 
 static void TextEdit_TextBackspace(LCUI_Widget widget, int n_ch)

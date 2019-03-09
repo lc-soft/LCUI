@@ -132,8 +132,8 @@ LCUI_API void TextLayer_AddUpdateTypeset(LCUI_TextLayer layer, int start_row);
 LCUI_API void TextLayer_SetTextAlign(LCUI_TextLayer layer, int align);
 
 /** 设置坐标偏移量 */
-LCUI_API void TextLayer_SetOffset(LCUI_TextLayer layer, int offset_x,
-				  int offset_y);
+LCUI_API LCUI_BOOL TextLayer_SetOffset(LCUI_TextLayer layer, int offset_x,
+				       int offset_y);
 
 LCUI_API LCUI_TextLayer TextLayer_New(void);
 
