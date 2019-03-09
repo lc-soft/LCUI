@@ -15,11 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\test\test_widget_flex_layout.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\..\..\test\test_widget_flex_layout.css">
       <Filter>资源文件</Filter>
     </None>
@@ -28,5 +23,10 @@
     <Xml Include="..\..\..\test\test_widget_flex_layout.xml">
       <Filter>资源文件</Filter>
     </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\test\test_widget_flex_layout.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
