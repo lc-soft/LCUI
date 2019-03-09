@@ -255,6 +255,7 @@ void Widget_GetOffset(LCUI_Widget w, LCUI_Widget parent, float *offset_x,
 	*offset_y = y;
 }
 
+/* FIXME: rename this function */
 int Widget_Top(LCUI_Widget w)
 {
 	return Widget_Append(LCUIWidget.root, w);

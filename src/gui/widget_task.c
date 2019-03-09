@@ -394,11 +394,6 @@ static size_t Widget_UpdateChildren(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 			continue;
 		}
 		w->task.for_children = TRUE;
-		/*
-		 * Conversion from:
-		 * (1000 / LCUI_MAX_FRAMES_PER_SEC) /
-		 * ((clock() - start) / CLOCKS_PER_SEC * 1000 / update_count);
-		 */
 		msec = (clock() - msec);
 		if (msec < 1) {
 			data->default_max_update_count += 128;
