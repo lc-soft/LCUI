@@ -70,7 +70,7 @@
 #define ENABLE_TOUCH_SUPPORT
 #undef LCUI_THREAD_PTHREAD
 #undef LCUI_VIDEO_DRIVER_FRAMEBUFFER
-#define PACKAGE_VERSION "1.0.0-beta.4"
+#define PACKAGE_VERSION "1.1.0-beta"
 #else
 #include <LCUI/config.h>
 #ifndef _GNU_SOURCE
