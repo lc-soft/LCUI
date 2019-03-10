@@ -1,3 +1,57 @@
+# [1.1.0-beta](https://github.com/lc-soft/LCUI/compare/v1.0.0-beta.4...v1.1.0-beta) (2019-03-10)
+
+
+### Bug Fixes
+
+* **builder:** widget should be initialized before appending ([f12e00b](https://github.com/lc-soft/LCUI/commit/f12e00b))
+* **gui:** event target should be initialized ([ebbd128](https://github.com/lc-soft/LCUI/commit/ebbd128))
+* **gui:** focus event and "focusable" property parsing bug ([d9a39a5](https://github.com/lc-soft/LCUI/commit/d9a39a5))
+* **gui:** mouse events should be ignored when pointer-events is none ([fc54a64](https://github.com/lc-soft/LCUI/commit/fc54a64))
+* **gui:** TextEdit should reset the caret position after blur ([8de4e71](https://github.com/lc-soft/LCUI/commit/8de4e71))
+* **gui:** TextEdit_SetTextW() does not clear the previous content ([51eef68](https://github.com/lc-soft/LCUI/commit/51eef68))
+* **gui:** the button height is different from the textedit ([5a918da](https://github.com/lc-soft/LCUI/commit/5a918da))
+* **gui:** widget width with margin is incorrectly calculated ([#167](https://github.com/lc-soft/LCUI/issues/167)) ([d14023e](https://github.com/lc-soft/LCUI/commit/d14023e))
+* **thread:** LCUIThread_Join() has not waited for the thread to exit ([4ddb833](https://github.com/lc-soft/LCUI/commit/4ddb833))
+* **util:** decoded string length should not include terminator ([93f3d77](https://github.com/lc-soft/LCUI/commit/93f3d77))
+* **worker:** task queue should not be blocked when running a task ([2b41f54](https://github.com/lc-soft/LCUI/commit/2b41f54))
+
+
+### Features
+
+* **gui:** add rule for allow widget updates only when visible ([93049c4](https://github.com/lc-soft/LCUI/commit/93049c4))
+* **gui:** add rule for cache children style ([50cc6b2](https://github.com/lc-soft/LCUI/commit/50cc6b2))
+* **gui:** add rule for first update visible children ([4cd6fdc](https://github.com/lc-soft/LCUI/commit/4cd6fdc))
+* **gui:** add rule for limit the number of children rendered ([ec5e0d6](https://github.com/lc-soft/LCUI/commit/ec5e0d6))
+* **gui:** add support for custom widget update rules ([bdd1d1c](https://github.com/lc-soft/LCUI/commit/bdd1d1c))
+* **gui:** add widget border helper ([e8d52df](https://github.com/lc-soft/LCUI/commit/e8d52df))
+* **gui:** add Widget_GetClosest() ([e740138](https://github.com/lc-soft/LCUI/commit/e740138))
+* **gui:** add Widget_SetHashList() ([f466dee](https://github.com/lc-soft/LCUI/commit/f466dee))
+* **gui:** auto assign an id to the event name ([fee31b0](https://github.com/lc-soft/LCUI/commit/fee31b0))
+* **gui:** Widget_SetAttribute() will call proto->setattr() ([19992d1](https://github.com/lc-soft/LCUI/commit/19992d1))
+* add LCUI_Profile for profiling performance ([f715a08](https://github.com/lc-soft/LCUI/commit/f715a08))
+* **textview:** add TextView_SetColor() ([3a7b53f](https://github.com/lc-soft/LCUI/commit/3a7b53f))
+* **util:** add return value for LCUIRect_ValidateArea() ([2fa6cf3](https://github.com/lc-soft/LCUI/commit/2fa6cf3))
+* **util:** add strhash() ([ebf843f](https://github.com/lc-soft/LCUI/commit/ebf843f))
+* **util:** add strpool ([c843df1](https://github.com/lc-soft/LCUI/commit/c843df1))
+* **util:** add strreplace() ([409395d](https://github.com/lc-soft/LCUI/commit/409395d))
+* **util:** default using OutputDebugString() to output log on Windows ([79ec21b](https://github.com/lc-soft/LCUI/commit/79ec21b))
+
+
+### Performance Improvements
+
+* **css:** change the stylesheet store struct to reduce memory usage ([9cc2957](https://github.com/lc-soft/LCUI/commit/9cc2957))
+* **css:** reduce duplicate memory alloc for DictType ([01fd3f6](https://github.com/lc-soft/LCUI/commit/01fd3f6))
+* **gui:** improve widget destruction performance ([87aff87](https://github.com/lc-soft/LCUI/commit/87aff87))
+* **gui:** improve Widget_Empty() performance ([1654963](https://github.com/lc-soft/LCUI/commit/1654963))
+* **gui:** reduce memory usage for widget style sheets ([3790fbd](https://github.com/lc-soft/LCUI/commit/3790fbd))
+* **gui:** remove the mutex in the textview widget ([6340d60](https://github.com/lc-soft/LCUI/commit/6340d60))
+* **gui:** save classes and status with strlist ([f611936](https://github.com/lc-soft/LCUI/commit/f611936))
+* **gui:** update the sort method of the widget list ([e9dbcea](https://github.com/lc-soft/LCUI/commit/e9dbcea))
+* **gui:** use LCUI_STYPE_INT instead of LCUI_STYPE_VALUE ([23090eb](https://github.com/lc-soft/LCUI/commit/23090eb))
+* **renderer:** improve the selection of the rendering target ([1df08b6](https://github.com/lc-soft/LCUI/commit/1df08b6))
+
+
+
 # [1.0.0-beta.4](https://github.com/lc-soft/LCUI/compare/v1.0.0-beta.3...v1.0.0-beta.4) (2018-11-19)
 
 ### Bug Fixes

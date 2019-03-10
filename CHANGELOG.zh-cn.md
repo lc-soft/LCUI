@@ -1,3 +1,55 @@
+# [1.1.0-beta](https://github.com/lc-soft/LCUI/compare/v1.0.0-beta.4...v1.1.0-beta) (2019-03-09)
+
+
+### 问题修复
+
+* **builder:** 在追加部件前应该将其初始化 ([f12e00b](https://github.com/lc-soft/LCUI/commit/f12e00b))
+* **gui:** focus 事件和 "focusable" 属性解析问题 ([d9a39a5](https://github.com/lc-soft/LCUI/commit/d9a39a5))
+* **gui:** 当 pointer-events 为 none 时应该忽略鼠标事件 ([fc54a64](https://github.com/lc-soft/LCUI/commit/fc54a64))
+* **gui:** TextEdit 应该在失去焦点后重置光标的位置 ([8de4e71](https://github.com/lc-soft/LCUI/commit/8de4e71))
+* **gui:** TextEdit_SetTextW() 未清空之前的内容 ([51eef68](https://github.com/lc-soft/LCUI/commit/51eef68))
+* **gui:** Button 的高度与 TextEdit 不一致 ([5a918da](https://github.com/lc-soft/LCUI/commit/5a918da))
+* **gui:** 设置部件外边距时会导致宽度计算错误 ([#167](https://github.com/lc-soft/LCUI/issues/167)) ([d14023e](https://github.com/lc-soft/LCUI/commit/d14023e))
+* **thread:** LCUIThread_Join() 未等待线程退出 ([4ddb833](https://github.com/lc-soft/LCUI/commit/4ddb833))
+* **util:** 解码后的字符串长度不应将结束符计算在内 ([93f3d77](https://github.com/lc-soft/LCUI/commit/93f3d77))
+* **worker:** 运行任务时不应阻塞任务队列 ([2b41f54](https://github.com/lc-soft/LCUI/commit/2b41f54))
+
+
+### 新功能
+
+* **gui:** 添加支持自定义部件更新规则 ([bdd1d1c](https://github.com/lc-soft/LCUI/commit/bdd1d1c))
+* **gui:** 添加支持限制最大的子部件渲染数量 ([ec5e0d6](https://github.com/lc-soft/LCUI/commit/ec5e0d6))
+* **gui:** 添加 `only_on_visible ` 规则，用于允许仅在部件可见时更新它 ([93049c4](https://github.com/lc-soft/LCUI/commit/93049c4))
+* **gui:** 添加 `cache_children_style` 规则，用于缓存子部件样式 ([50cc6b2](https://github.com/lc-soft/LCUI/commit/50cc6b2))
+* **gui:** 添加 `first_update_visible_children` 规则，用于优先更新可见的子部件 ([4cd6fdc](https://github.com/lc-soft/LCUI/commit/4cd6fdc))
+* **gui:** 添加部件边框样式相关操作接口 ([e8d52df](https://github.com/lc-soft/LCUI/commit/e8d52df))
+* **gui:** 添加 Widget_GetClosest() ([e740138](https://github.com/lc-soft/LCUI/commit/e740138))
+* **gui:** 添加 Widget_SetHashList() ([f466dee](https://github.com/lc-soft/LCUI/commit/f466dee))
+* **gui:** 自动为事件名生成 id ([fee31b0](https://github.com/lc-soft/LCUI/commit/fee31b0))
+* **gui:** Widget_SetAttribute() 将会调用 proto->setattr() ([19992d1](https://github.com/lc-soft/LCUI/commit/19992d1))
+* **textview:** 添加 TextView_SetColor() ([3a7b53f](https://github.com/lc-soft/LCUI/commit/3a7b53f))
+* **util:** 为 LCUIRect_ValidateArea() 添加返回值 ([2fa6cf3](https://github.com/lc-soft/LCUI/commit/2fa6cf3))
+* **util:** 添加 strhash() ([ebf843f](https://github.com/lc-soft/LCUI/commit/ebf843f))
+* **util:** 添加 strpool ([c843df1](https://github.com/lc-soft/LCUI/commit/c843df1))
+* **util:** 添加 strreplace() ([409395d](https://github.com/lc-soft/LCUI/commit/409395d))
+* **util:** 在 Windows 上默认使用 OutputDebugString() 输出日志 ([79ec21b](https://github.com/lc-soft/LCUI/commit/79ec21b))
+
+
+### 性能改进
+
+* **css:** 更改样式表存储结构以减少内存占用 ([9cc2957](https://github.com/lc-soft/LCUI/commit/9cc2957))
+* **css:** 减少重复的 DictType 内存分配 ([01fd3f6](https://github.com/lc-soft/LCUI/commit/01fd3f6))
+* **gui:** 改进部件销毁性能 ([87aff87](https://github.com/lc-soft/LCUI/commit/87aff87))
+* **gui:** 改进 Widget_Empty() 性能 ([1654963](https://github.com/lc-soft/LCUI/commit/1654963))
+* **gui:** 减少部件的样式表的内存占用 ([3790fbd](https://github.com/lc-soft/LCUI/commit/3790fbd))
+* **gui:** 移除 TextView 部件中的互斥锁 ([6340d60](https://github.com/lc-soft/LCUI/commit/6340d60))
+* **gui:** 使用 strlist 保存 classes 和 status ([f611936](https://github.com/lc-soft/LCUI/commit/f611936))
+* **gui:** 更新部件列表的排序方法 ([e9dbcea](https://github.com/lc-soft/LCUI/commit/e9dbcea))
+* **gui:** 改用 LCUI_STYPE_INT 代替 LCUI_STYPE_VALUE ([23090eb](https://github.com/lc-soft/LCUI/commit/23090eb))
+* **renderer:** 改进渲染目标的选择方法 ([1df08b6](https://github.com/lc-soft/LCUI/commit/1df08b6))
+
+
+
 # [1.0.0-beta.4](https://github.com/lc-soft/LCUI/compare/v1.0.0-beta.3...v1.0.0-beta.4) (2018-11-19)
 
 ### 问题修复
