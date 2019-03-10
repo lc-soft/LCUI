@@ -16,6 +16,10 @@
     "editor.tabSize": 8,
     "editor.insertSpaces": false
   },
+  "[javascript]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
   "files.associations": {
     "unistd.h": "c",
     "errno.h": "c",
