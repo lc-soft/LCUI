@@ -196,7 +196,7 @@ static void TextLayer_UpdateRowSize(LCUI_TextLayer layer, LCUI_TextRow txtrow)
 	if (layer->line_height > -1) {
 		txtrow->height = layer->line_height;
 	} else {
-		txtrow->height = GetDefaultLineHeight(txtrow->height);
+		txtrow->height = GetDefaultLineHeight(txtrow->text_height);
 	}
 }
 
