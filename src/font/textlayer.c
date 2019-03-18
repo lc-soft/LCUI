@@ -294,7 +294,6 @@ LCUI_TextLayer TextLayer_New(void)
 	layer->text_rows.length = 0;
 	layer->text_rows.rows = NULL;
 	layer->text_align = SV_LEFT;
-	layer->enable_canvas = FALSE;
 	layer->enable_autowrap = FALSE;
 	layer->enable_mulitiline = FALSE;
 	layer->enable_style_tag = FALSE;
@@ -305,9 +304,7 @@ LCUI_TextLayer TextLayer_New(void)
 	layer->task.update_typeset = 0;
 	layer->task.update_bitmap = 0;
 	layer->task.redraw_all = 0;
-	Graph_Init(&layer->canvas);
 	LinkedList_Init(&layer->dirty_rects);
-	layer->canvas.color_type = LCUI_COLOR_TYPE_ARGB;
 	TextRowList_InsertNewRow(&layer->text_rows, 0);
 	return layer;
 }
@@ -345,7 +342,6 @@ void TextLayer_Destroy(LCUI_TextLayer layer)
 	TextStyle_Destroy(&layer->text_default_style);
 	TextRowList_Destroy(&layer->text_rows);
 	TextLayer_DestroyStyleCache(layer);
-	Graph_Free(&layer->canvas);
 	free(layer);
 }
 
@@ -355,6 +351,7 @@ static int TextLayer_GetRowRect(LCUI_TextLayer layer, int i_row, int start_col,
 {
 	int i;
 	LCUI_TextRow txtrow;
+
 	if (i_row >= layer->text_rows.length) {
 		return -1;
 	}
@@ -901,14 +898,6 @@ size_t TextLayer_GetTextW(LCUI_TextLayer layer, size_t start_pos,
 	return i;
 }
 
-LCUI_Graph *TextLayer_GetGraphBuffer(LCUI_TextLayer layer)
-{
-	if (layer->enable_canvas) {
-		return &layer->canvas;
-	}
-	return NULL;
-}
-
 int TextLayer_GetWidth(LCUI_TextLayer layer)
 {
 	int i, row, w, max_w;
@@ -949,9 +938,6 @@ int TextLayer_SetFixedSize(LCUI_TextLayer layer, int width, int height)
 {
 	layer->fixed_width = width;
 	layer->fixed_height = height;
-	if (layer->enable_canvas) {
-		Graph_Create(&layer->canvas, width, height);
-	}
 	layer->task.redraw_all = TRUE;
 	if (layer->enable_autowrap) {
 		layer->task.typeset_start_row = 0;
@@ -964,9 +950,6 @@ int TextLayer_SetMaxSize(LCUI_TextLayer layer, int width, int height)
 {
 	layer->max_width = width;
 	layer->max_height = height;
-	if (layer->enable_canvas) {
-		Graph_Create(&layer->canvas, width, height);
-	}
 	layer->task.redraw_all = TRUE;
 	if (layer->enable_autowrap) {
 		layer->task.typeset_start_row = 0;
@@ -1369,37 +1352,9 @@ int TextLayer_RenderTo(LCUI_TextLayer layer, LCUI_Rect area, LCUI_Pos layer_pos,
 	return 0;
 }
 
-/** 绘制文本 */
-int TextLayer_RenderAll(LCUI_TextLayer layer)
-{
-	LCUI_Rect rect;
-	LCUI_Pos pos = { 0, 0 };
-
-	/* 如果文本位图缓存无效 */
-	if (layer->enable_canvas && !Graph_IsValid(&layer->canvas)) {
-		return -1;
-	}
-	rect.x = 0;
-	rect.y = 0;
-	rect.width = layer->max_width;
-	rect.height = layer->max_height;
-	return TextLayer_RenderTo(layer, rect, pos, &layer->canvas);
-}
-
 /** 清除已记录的无效矩形 */
 void TextLayer_ClearInvalidRect(LCUI_TextLayer layer)
 {
-	LinkedListNode *node;
-	LCUI_Graph invalid_graph;
-
-	if (!layer->enable_canvas) {
-		RectList_Clear(&layer->dirty_rects);
-		return;
-	}
-	for (LinkedList_Each(node, &layer->dirty_rects)) {
-		Graph_Quote(&invalid_graph, &layer->canvas, node->data);
-		Graph_FillAlpha(&invalid_graph, 0);
-	}
 	RectList_Clear(&layer->dirty_rects);
 }
 

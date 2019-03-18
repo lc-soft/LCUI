@@ -102,7 +102,6 @@ typedef struct LCUI_TextLayerRec_ {
 	LCUI_BOOL enable_mulitiline;   /**< 是否启用多行文本模式 */
 	LCUI_BOOL enable_autowrap;     /**< 是否启用自动换行模式 */
 	LCUI_BOOL enable_style_tag;    /**< 是否使用文本样式标签 */
-	LCUI_BOOL enable_canvas; /**< 是否使用缓存空间来存储文本位图 */
 	LinkedList dirty_rects;               /**< 脏矩形记录 */
 	LinkedList text_styles;               /**< 样式缓存 */
 	LCUI_TextStyleRec text_default_style; /**< 文本全局样式 */
@@ -113,7 +112,6 @@ typedef struct LCUI_TextLayerRec_ {
 		int typeset_start_row;    /**< 排版处理的起始行 */
 		LCUI_BOOL redraw_all;     /**< 重绘所有字体位图 */
 	} task;                           /**< 待处理的任务 */
-	LCUI_Graph canvas;                /**< 文本位图缓存 */
 } LCUI_TextLayerRec, *LCUI_TextLayer;
 
 /** 获取文本行总数 */
@@ -197,9 +195,6 @@ LCUI_API int TextLayer_SetText(LCUI_TextLayer layer, const char *utf8_text);
 LCUI_API size_t TextLayer_GetTextW(LCUI_TextLayer layer, size_t start_pos,
 				   size_t max_len, wchar_t *wstr_buff);
 
-/** 获取文本位图缓存 */
-LCUI_API LCUI_Graph *TextLayer_GetGraphBuffer(LCUI_TextLayer layer);
-
 /** 计算并获取文本的宽度 */
 LCUI_API int TextLayer_GetWidth(LCUI_TextLayer layer);
 
@@ -247,9 +242,6 @@ LCUI_API void TextLayer_Update(LCUI_TextLayer layer, LinkedList *rects);
  */
 LCUI_API int TextLayer_RenderTo(LCUI_TextLayer layer, LCUI_Rect area,
 				LCUI_Pos layer_pos, LCUI_Graph *canvas);
-
-/** 绘制文本 */
-LCUI_API int TextLayer_RenderAll(LCUI_TextLayer layer);
 
 /** 清除已记录的无效矩形 */
 LCUI_API void TextLayer_ClearInvalidRect(LCUI_TextLayer layer);
