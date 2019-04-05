@@ -303,6 +303,9 @@
     <ClInclude Include="..\..\..\include\LCUI\util\strlist.h">
       <Filter>头文件\LCUI\util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\object.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -537,6 +540,9 @@
       <Filter>源文件\util</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\util\strlist.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\object.c">
       <Filter>源文件\util</Filter>
     </ClCompile>
   </ItemGroup>

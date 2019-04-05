@@ -18,6 +18,7 @@ test/test.c \
 test/test.h \
 test/test_touch.c \
 test/test_string.c \
+test/test_object.c \
 test/test_thread.c \
 test/test_linkedlist.c \
 test/test_string_render.c \

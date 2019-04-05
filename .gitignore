@@ -31,6 +31,7 @@ build/windows/*/*.css
 build/windows/*/*.xml
 *~
 *.intermediate
+.vscode
 dist
 node_modules
 Debug

@@ -36,6 +36,7 @@
 #include <LCUI/util/rbtree.h>
 #include <LCUI/util/linkedlist.h>
 #include <LCUI/util/dict.h>
+#include <LCUI/util/object.h>
 #include <LCUI/util/rect.h>
 #include <LCUI/util/steptimer.h>
 #include <LCUI/util/string.h>

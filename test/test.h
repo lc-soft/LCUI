@@ -32,6 +32,7 @@ extern int tests_count;
 
 int test_charset(void);
 int test_string(void);
+int test_object(void);
 int test_thread(void);
 int test_font_load(void);
 int test_css_parser(void);

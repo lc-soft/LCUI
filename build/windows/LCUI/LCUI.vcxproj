@@ -327,6 +327,7 @@
     <ClInclude Include="..\..\..\include\LCUI\util\dict.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\dirent.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\event.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\object.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\steptimer.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\linkedlist.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\logger.h" />
@@ -405,6 +406,7 @@
     <ClCompile Include="..\..\..\src\platform\windows\windows_keyboard.c" />
     <ClCompile Include="..\..\..\src\platform\windows\windows_mouse.c" />
     <ClCompile Include="..\..\..\src\util\charset.c" />
+    <ClCompile Include="..\..\..\src\util\object.c" />
     <ClCompile Include="..\..\..\src\util\strlist.c" />
     <ClCompile Include="..\..\..\src\util\strpool.c" />
     <ClCompile Include="..\..\..\src\util\task.c" />

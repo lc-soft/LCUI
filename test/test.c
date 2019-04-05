@@ -12,6 +12,7 @@ int main(void)
 	ret += test_linkedlist();
 	ret += test_string();
 	ret += test_strpool();
+	ret += test_object();
 	ret += test_thread();
 	ret += test_font_load();
 	ret += test_image_reader();
