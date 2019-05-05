@@ -50,6 +50,7 @@ struct LCUI_ObjectTypeRec_ {
 	LCUI_Object (*operator)(LCUI_Object, const char *,
 				const LCUI_ObjectRec *);
 	void (*duplicator)(LCUI_Object, const LCUI_ObjectRec *);
+	void (*tostring)(LCUI_Object, LCUI_Object);
 };
 
 typedef struct LCUI_ObjectRec_ {
@@ -82,6 +83,8 @@ LCUI_API int Object_Compare(LCUI_Object a, LCUI_Object b);
 
 LCUI_API LCUI_Object Object_Operate(LCUI_Object self, const char *operator_str,
 				    LCUI_Object another);
+
+LCUI_API LCUI_Object Object_ToString(LCUI_Object object);
 
 LCUI_API LCUI_ObjectWatcher Object_Watch(LCUI_Object object,
 					 LCUI_ObjectWatcherFunc func,

@@ -1,4 +1,4 @@
-#include <wchar.h>
+﻿#include <wchar.h>
 #include <math.h>
 #include <string.h>
 #include <LCUI_Build.h>
@@ -46,20 +46,26 @@ static int test_wstring_object(void)
 {
 	int ret = 0;
 	LCUI_Object tmp;
-	LCUI_Object str1 = WString_New(L"����");
-	LCUI_Object str2 = WString_New(L"�ı�");
+	LCUI_Object str1 = WString_New(L"测试");
+	LCUI_Object str2 = WString_New(L"文本");
 	LCUI_ObjectRec str3;
+	LCUI_Object str4;
 
-	WString_Init(&str3, L"�����ı�");
+	WString_Init(&str3, L"测试文本");
 	tmp = Object_Operate(str1, "+", str2);
 	CHECK(Object_Compare(&str3, tmp) == 0);
 	CHECK(Object_Operate(str1, "+=", str2) == str1);
 	CHECK(Object_Compare(str1, &str3) == 0);
-	CHECK(wcscmp(str1->value.wstring, L"�����ı�") == 0);
+	CHECK(wcscmp(str1->value.wstring, L"测试文本") == 0);
+
+	WString_SetValue(&str3, L"1000");
+	str4 = Object_ToString(&str3);
+	CHECK(strcmp(str4->value.string, "1000") == 0);
 
 	Object_Delete(tmp);
 	Object_Delete(str1);
 	Object_Delete(str2);
+	Object_Delete(str4);
 	Object_Destroy(&str3);
 	return ret;
 }
@@ -69,6 +75,7 @@ static int test_number_object(void)
 	int ret = 0;
 	int object_changes = 0;
 	LCUI_Object tmp;
+	LCUI_Object str;
 	LCUI_ObjectRec num1;
 	LCUI_ObjectRec num2;
 	LCUI_ObjectWatcher watcher;
@@ -114,6 +121,9 @@ static int test_number_object(void)
 	CHECK(tmp->value.number == 5.0);
 	CHECK(object_changes == 6);
 	Object_Delete(tmp);
+
+	str = Object_ToString(&num1);
+	CHECK(strcmp(str->value.string, "5") == 0);
 
 	ObjectWatcher_Delete(watcher);
 	Object_Destroy(&num1);

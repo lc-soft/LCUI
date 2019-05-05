@@ -30,10 +30,12 @@
 #include <assert.h>
 #include <wchar.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/util/object.h>
 #include <LCUI/util/string.h>
+#include <LCUI/util/charset.h>
 
 typedef struct LCUI_ObjectWatcherRec_ {
 	void *data;
@@ -134,6 +136,16 @@ LCUI_Object Object_Operate(LCUI_Object self, const char *operator_str,
 		return self->type->operator(self, operator_str, another);
 	}
 	return self;
+}
+
+LCUI_Object Object_ToString(LCUI_Object object)
+{
+	LCUI_Object str;
+
+	assert(object->type && object->type->tostring);
+	str = String_New(NULL);
+	object->type->tostring(object, str);
+	return str;
 }
 
 LCUI_ObjectWatcher Object_Watch(LCUI_Object object, LCUI_ObjectWatcherFunc func,
@@ -285,6 +297,11 @@ LCUI_Object String_New(const char *value)
 	return object;
 }
 
+static void String_ToString(LCUI_Object str, LCUI_Object newstr)
+{
+	String_Duplicator(newstr, str);
+}
+
 static int WString_Comparator(LCUI_Object a, LCUI_Object b)
 {
 	return wcscmp(a->value.wstring, b->value.wstring);
@@ -373,6 +390,14 @@ LCUI_Object WString_New(const wchar_t *value)
 	object = Object_New(LCUI_WStringObject);
 	WString_SetValue(object, value);
 	return object;
+}
+
+static void WString_ToString(LCUI_Object str, LCUI_Object newstr)
+{
+	const size_t len = LCUI_EncodeUTF8String(NULL, str->value.wstring, 0) + 1;
+
+	String_Realloc(newstr, len);
+	LCUI_EncodeUTF8String(newstr->value.string, str->value.wstring, len);
 }
 
 void Number_Init(LCUI_Object object, double value)
@@ -474,23 +499,36 @@ static void Number_Duplicator(LCUI_Object dest, const LCUI_ObjectRec *src)
 	dest->value.number = src->value.number;
 }
 
-LCUI_ObjectTypeRec LCUI_NumberObjectRec = {
-	1, NULL, NULL, Number_Comparator, Number_Operator, Number_Duplicator
-};
+static void Number_ToString(LCUI_Object num, LCUI_Object str)
+{
+	String_Realloc(str, 24);
+	snprintf(str->value.string, 24, "%g", num->value.number);
+	str->value.string[23] = 0;
+}
+
+LCUI_ObjectTypeRec LCUI_NumberObjectRec = { 1,
+					    NULL,
+					    NULL,
+					    Number_Comparator,
+					    Number_Operator,
+					    Number_Duplicator,
+					    Number_ToString };
 
 LCUI_ObjectTypeRec LCUI_WStringObjectRec = { 2,
 					     NULL,
 					     WString_Destructor,
 					     WString_Comparator,
 					     WString_Operator,
-					     WString_Duplicator };
+					     WString_Duplicator,
+					     WString_ToString };
 
 LCUI_ObjectTypeRec LCUI_StringObjectRec = { 3,
 					    NULL,
 					    String_Destructor,
 					    String_Comparator,
 					    String_Operator,
-					    String_Duplicator };
+					    String_Duplicator,
+					    String_ToString };
 
 const LCUI_ObjectTypeRec *LCUI_WStringObject = &LCUI_WStringObjectRec;
 const LCUI_ObjectTypeRec *LCUI_StringObject = &LCUI_StringObjectRec;
