@@ -15,16 +15,25 @@ int test_textedit(void)
 	LCUI_InitWidget();
 
 	w = LCUIWidget_New("textedit");
+
 	TextEdit_SetTextW(w, L"hello");
 	Widget_Update(w);
 	CHECK(wcslen(L"hello") == TextEdit_GetTextLength(w));
 	CHECK(wcslen(L"hello") == TextEdit_GetTextW(w, 0, 64, wcs));
 	CHECK(wcscmp(L"hello", wcs) == 0);
+
+	Widget_SetText(w, "hello");
+	Widget_Update(w);
+	CHECK(wcslen(L"hello") == TextEdit_GetTextLength(w));
+	CHECK(wcslen(L"hello") == TextEdit_GetTextW(w, 0, 64, wcs));
+	CHECK(wcscmp(L"hello", wcs) == 0);
+
 	TextEdit_AppendTextW(w, L"world");
 	Widget_Update(w);
 	CHECK(wcslen(L"helloworld") == TextEdit_GetTextLength(w));
 	CHECK(wcslen(L"helloworld") == TextEdit_GetTextW(w, 0, 64, wcs));
 	CHECK(wcscmp(L"helloworld", wcs) == 0);
+
 	TextEdit_MoveCaret(w, 0, 5);
 	TextEdit_InsertTextW(w, L", ");
 	Widget_Update(w);
@@ -34,6 +43,7 @@ int test_textedit(void)
 	CHECK(wcslen(L"hello, world!") == TextEdit_GetTextLength(w));
 	CHECK(wcslen(L"hello, world!") == TextEdit_GetTextW(w, 0, 64, wcs));
 	CHECK(wcscmp(L"hello, world!", wcs) == 0);
+
 	Widget_Destroy(w);
 	LCUI_FreeWidget();
 	LCUI_FreeFontLibrary();

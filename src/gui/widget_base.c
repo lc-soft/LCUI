@@ -1039,6 +1039,13 @@ float Widget_GetLimitedHeight(LCUI_Widget w, float height)
 	return height;
 }
 
+void Widget_SetText(LCUI_Widget w, const char *text)
+{
+	if (w->proto && w->proto->settext) {
+		w->proto->settext(w, text);
+	}
+}
+
 static void Widget_SetSize(LCUI_Widget w, float width, float height)
 {
 	LCUI_RectF *box, *pbox;

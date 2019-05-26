@@ -456,6 +456,9 @@ LCUI_API size_t Widget_GetHashList(LCUI_Widget w, unsigned *hash_list,
 /** Set widget updating rules */
 LCUI_API int Widget_SetRules(LCUI_Widget w, const LCUI_WidgetRulesRec *rules);
 
+/** Set widget content text */
+LCUI_API void Widget_SetText(LCUI_Widget w, const char *text);
+
 /** 计算部件的最大宽度 */
 LCUI_API float Widget_ComputeMaxWidth(LCUI_Widget w);
 

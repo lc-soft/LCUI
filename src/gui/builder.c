@@ -186,10 +186,7 @@ static int ParseWidget(XMLParserContext ctx, xmlNodePtr node)
 	case XML_ELEMENT_NODE:
 		break;
 	case XML_TEXT_NODE:
-		if (!parent->proto || !parent->proto->settext) {
-			return PB_NEXT;
-		}
-		parent->proto->settext(parent, (char*)node->content);
+		Widget_SetText(parent, (char *)node->content);
 		DEBUG_MSG("widget: %s, set text: %s\n", parent->type,
 			(char*)node->content);
 		return PB_NEXT;
