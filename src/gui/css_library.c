@@ -440,7 +440,7 @@ LCUI_StyleList StyleList(void)
 	return list;
 }
 
-static void DestroyStyle(LCUI_Style s)
+void DestroyStyle(LCUI_Style s)
 {
 	switch (s->type) {
 	case LCUI_STYPE_STRING:
@@ -461,7 +461,7 @@ static void DestroyStyle(LCUI_Style s)
 	s->is_valid = FALSE;
 }
 
-static void MergeStyle(LCUI_Style dst, LCUI_Style src)
+void MergeStyle(LCUI_Style dst, LCUI_Style src)
 {
 	switch (src->type) {
 	case LCUI_STYPE_STRING:

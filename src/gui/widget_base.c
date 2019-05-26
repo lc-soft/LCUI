@@ -1389,10 +1389,11 @@ void Widget_UpdateSizeWithSurface(LCUI_Widget w)
 void Widget_UpdateProps(LCUI_Widget w)
 {
 	LCUI_Style s;
-	int prop = ComputeStyleOption(w, key_pointer_events, SV_INHERIT);
-	w->computed_style.pointer_events = prop;
+
 	s = &w->style->sheet[key_focusable];
-	if (s->is_valid && s->type == LCUI_STYPE_BOOL && s->value == 0) {
+	w->computed_style.pointer_events =
+	    ComputeStyleOption(w, key_pointer_events, SV_INHERIT);
+	if (s->is_valid && s->type == LCUI_STYPE_BOOL && s->val_bool == 0) {
 		w->computed_style.focusable = FALSE;
 	} else {
 		w->computed_style.focusable = TRUE;

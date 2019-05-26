@@ -40,7 +40,10 @@ void LCUIWidget_FreeStyle(void);
 /** 打印部件的样式表 */
 LCUI_API void Widget_PrintStyleSheets(LCUI_Widget w);
 
-/** 更新当前部件的样式 */
+/** Set widget style by string */
+LCUI_API void Widget_SetStyleString(LCUI_Widget w, const char *name, const char *value);
+
+    /** 更新当前部件的样式 */
 LCUI_API void Widget_UpdateStyle(LCUI_Widget w, LCUI_BOOL is_refresh_all);
 
 /** 更新当前部件的子级部件样式 */

@@ -198,6 +198,10 @@ typedef struct LCUI_SelectorRec_ {
 
 #define StyleSheet_GetStyle(S, K) &((S)->sheet[K])
 
+LCUI_API void DestroyStyle(LCUI_Style s);
+
+LCUI_API void MergeStyle(LCUI_Style dst, LCUI_Style src);
+
 LCUI_API LCUI_StyleList StyleList(void);
 
 LCUI_API LCUI_StyleListNode StyleList_GetNode(LCUI_StyleList list, int key);

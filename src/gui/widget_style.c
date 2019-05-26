@@ -213,6 +213,30 @@ void Widget_UpdateChildrenStyle(LCUI_Widget w, LCUI_BOOL is_refresh_all)
 	}
 }
 
+static void OnSetStyle(int key, LCUI_Style style, void *arg)
+{
+	LCUI_Widget w = arg;
+	LCUI_Style s = Widget_GetStyle(w, key);
+
+	if (style->is_valid) {
+		DestroyStyle(s);
+		*s = *style;
+		Widget_AddTaskByStyle(w, key);
+	} else {
+		Widget_UnsetStyle(w, key);
+	}
+}
+
+void Widget_SetStyleString(LCUI_Widget w, const char *name, const char *value)
+{
+	LCUI_CSSParserStyleContextRec ctx = { 0 };
+
+	ctx.style_handler = OnSetStyle;
+	ctx.style_handler_arg = w;
+	ctx.parser = LCUI_GetCSSPropertyParser(name);
+	ctx.parser->parse(&ctx, value);
+}
+
 void Widget_AddTaskByStyle(LCUI_Widget w, int key)
 {
 	size_t i;
