@@ -324,7 +324,7 @@ static size_t Widget_UpdateVisibleChildren(LCUI_Widget w,
 
 static size_t Widget_UpdateChildren(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 {
-	clock_t msec;
+	clock_t msec = 0;
 	LCUI_Widget child;
 	LCUI_WidgetRulesData data;
 	LinkedListNode *node, *next;
@@ -484,7 +484,7 @@ size_t LCUIWidget_Update(void)
 		self.update_count += 1;
 	}
 	root = LCUIWidget_GetRoot();
-	for (i = 0; i < self.max_updates_per_frame; ++i) {
+	for (count = i = 0; i < self.max_updates_per_frame; ++i) {
 		count = Widget_Update(root);
 	}
 	LCUIWidget_ClearTrash();

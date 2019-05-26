@@ -142,7 +142,6 @@ static void fillchar(wchar_t *str, wchar_t ch)
 
 static void TextEdit_UpdateCaret(LCUI_Widget widget)
 {
-	LCUI_BOOL update_offset = FALSE;
 	LCUI_TextEdit edit = GetData(widget);
 
 	int row = edit->layer->insert_y;
