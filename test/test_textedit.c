@@ -49,7 +49,8 @@ int test_textedit(void)
 	value = String_New("property name is 'value'");
 	Widget_BindProperty(w, "value", value);
 	Widget_Update(w);
-	CHECK(wcslen(L"property name is 'value'") == TextEdit_GetTextW(w, 0, 64, wcs));
+	CHECK(wcslen(L"property name is 'value'") ==
+	      TextEdit_GetTextW(w, 0, 64, wcs));
 	CHECK(wcscmp(L"property name is 'value'", wcs) == 0);
 
 	// change property value
