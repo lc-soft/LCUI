@@ -131,6 +131,7 @@ typedef void(*LCUI_WidgetFunction)(LCUI_Widget);
 typedef void(*LCUI_WidgetResizer)(LCUI_Widget, float*, float*);
 typedef void(*LCUI_WidgetAttrSetter)(LCUI_Widget, const char*, const char*);
 typedef void(*LCUI_WidgetTextSetter)(LCUI_Widget, const char*);
+typedef void(*LCUI_WidgetPropertyBinder)(LCUI_Widget, const char*, LCUI_Object);
 typedef void(*LCUI_WidgetPainter)(LCUI_Widget, LCUI_PaintContext,
 				  LCUI_WidgetActualStyle);
 
@@ -144,6 +145,7 @@ typedef struct LCUI_WidgetPrototypeRec_ {
 	LCUI_WidgetFunction runtask;		/**< 自定义任务处理函数 */
 	LCUI_WidgetAttrSetter setattr;		/**< 属性设置函数 */
 	LCUI_WidgetTextSetter settext;		/**< 文本内容设置函数 */
+	LCUI_WidgetPropertyBinder bindprop;	/**< 属性绑定函数 */
 	LCUI_WidgetResizer autosize;		/**< 内容尺寸计算函数 */
 	LCUI_WidgetPainter paint;		/**< 绘制函数 */
 	LCUI_WidgetPrototype proto;		/**< 父级原型 */

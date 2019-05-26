@@ -1046,6 +1046,13 @@ void Widget_SetText(LCUI_Widget w, const char *text)
 	}
 }
 
+void Widget_BindProperty(LCUI_Widget w, const char *name, LCUI_Object value)
+{
+	if (w->proto && w->proto->bindprop) {
+		w->proto->bindprop(w, name, value);
+	}
+}
+
 static void Widget_SetSize(LCUI_Widget w, float width, float height)
 {
 	LCUI_RectF *box, *pbox;
