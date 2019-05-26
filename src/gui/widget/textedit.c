@@ -64,18 +64,19 @@ typedef struct LCUI_TextEditRec_ {
 	LCUI_TextLayer layer_mask;        /**< 屏蔽后的文本层 */
 	LCUI_TextLayer layer_placeholder; /**< 占位符的文本层 */
 	LCUI_TextLayer layer;             /**< 当前使用的文本层 */
-	LCUI_Widget scrollbars[2];        /**< 两个滚动条 */
-	LCUI_Widget caret;                /**< 文本插入符 */
-	LCUI_BOOL is_read_only;           /**< 是否只读 */
-	LCUI_BOOL is_multiline_mode;      /**< 是否为多行模式 */
-	LCUI_BOOL is_placeholder_shown;   /**< 是否已经显示占位符 */
-	wchar_t *allow_input_char;        /**< 允许输入的字符 */
-	wchar_t password_char;            /**< 屏蔽符的副本 */
-	size_t text_block_size;           /**< 块大小 */
-	LinkedList text_blocks;           /**< 文本块缓冲区 */
-	LinkedList text_tags;             /**< 当前处理的标签列表 */
-	LCUI_BOOL tasks[TASK_TOTAL];      /**< 待处理的任务 */
-	LCUI_Mutex mutex;                 /**< 互斥锁 */
+	LCUI_ObjectWatcher value_watcher;
+	LCUI_Widget scrollbars[2];      /**< 两个滚动条 */
+	LCUI_Widget caret;              /**< 文本插入符 */
+	LCUI_BOOL is_read_only;         /**< 是否只读 */
+	LCUI_BOOL is_multiline_mode;    /**< 是否为多行模式 */
+	LCUI_BOOL is_placeholder_shown; /**< 是否已经显示占位符 */
+	wchar_t *allow_input_char;      /**< 允许输入的字符 */
+	wchar_t password_char;          /**< 屏蔽符的副本 */
+	size_t text_block_size;         /**< 块大小 */
+	LinkedList text_blocks;         /**< 文本块缓冲区 */
+	LinkedList text_tags;           /**< 当前处理的标签列表 */
+	LCUI_BOOL tasks[TASK_TOTAL];    /**< 待处理的任务 */
+	LCUI_Mutex mutex;               /**< 互斥锁 */
 } LCUI_TextEditRec, *LCUI_TextEdit;
 
 typedef enum {
@@ -886,6 +887,7 @@ static void TextEdit_OnInit(LCUI_Widget w)
 	edit->layer_source = TextLayer_New();
 	edit->layer_placeholder = TextLayer_New();
 	edit->layer = edit->layer_source;
+	edit->value_watcher = NULL;
 	edit->text_block_size = TEXT_BLOCK_SIZE;
 	edit->caret = LCUIWidget_New("textcaret");
 	w->computed_style.focusable = TRUE;
@@ -920,6 +922,10 @@ static void TextEdit_OnDestroy(LCUI_Widget widget)
 	TextLayer_Destroy(edit->layer_mask);
 	CSSFontStyle_Destroy(&edit->style);
 	TextBlocks_Clear(&edit->text_blocks);
+	if (edit->value_watcher) {
+		ObjectWatcher_Delete(edit->value_watcher);
+		edit->value_watcher = NULL;
+	}
 }
 
 static void TextEdit_OnPaint(LCUI_Widget w, LCUI_PaintContext paint,
@@ -973,6 +979,36 @@ static void TextEdit_OnUpdate(LCUI_Widget w)
 	TextStyle_Destroy(&ts);
 }
 
+static void TextEdit_OnValueChanged(LCUI_Object value, void *arg)
+{
+	LCUI_Widget w = arg;
+
+	if (value->type == LCUI_StringObject) {
+		TextEdit_SetText(w, value->value.string);
+	} else if (value->type == LCUI_WStringObject) {
+		TextEdit_SetTextW(w, value->value.wstring);
+	}
+}
+
+void TextEdit_BindProperty(LCUI_Widget w, const char *name, LCUI_Object value)
+{
+	LCUI_TextEdit edit = Widget_GetData(w, self.prototype);
+
+	if (strcmp(name, "value") == 0) {
+		if (edit->value_watcher) {
+			ObjectWatcher_Delete(edit->value_watcher);
+			edit->value_watcher = NULL;
+		}
+		if (value) {
+			edit->value_watcher =
+			    Object_Watch(value, TextEdit_OnValueChanged, w);
+			TextEdit_OnValueChanged(value, w);
+		} else {
+			TextEdit_ClearText(w);
+		}
+	}
+}
+
 void LCUIWidget_AddTextEdit(void)
 {
 	self.prototype = LCUIWidget_NewPrototype("textedit", NULL);
@@ -981,6 +1017,7 @@ void LCUIWidget_AddTextEdit(void)
 	self.prototype->destroy = TextEdit_OnDestroy;
 	self.prototype->settext = TextEdit_OnParseText;
 	self.prototype->setattr = TextEdit_SetAttr;
+	self.prototype->bindprop = TextEdit_BindProperty;
 	self.prototype->autosize = TextEdit_AutoSize;
 	self.prototype->runtask = TextEdit_OnTask;
 	self.prototype->update = TextEdit_OnUpdate;

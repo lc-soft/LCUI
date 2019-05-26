@@ -9,6 +9,7 @@ int test_textedit(void)
 {
 	int ret = 0;
 	LCUI_Widget w;
+	LCUI_Object value;
 	wchar_t wcs[64];
 
 	LCUI_InitFontLibrary();
@@ -44,7 +45,27 @@ int test_textedit(void)
 	CHECK(wcslen(L"hello, world!") == TextEdit_GetTextW(w, 0, 64, wcs));
 	CHECK(wcscmp(L"hello, world!", wcs) == 0);
 
+	// test property binding
+	value = String_New("property name is 'value'");
+	Widget_BindProperty(w, "value", value);
+	Widget_Update(w);
+	CHECK(wcslen(L"property name is 'value'") == TextEdit_GetTextW(w, 0, 64, wcs));
+	CHECK(wcscmp(L"property name is 'value'", wcs) == 0);
+
+	// change property value
+	String_SetValue(value, "hello");
+	Widget_Update(w);
+	CHECK(wcslen(L"hello") == TextEdit_GetTextW(w, 0, 64, wcs));
+	CHECK(wcscmp(L"hello", wcs) == 0);
+
+	// unbind property
+	Widget_BindProperty(w, "value", NULL);
+	Widget_Update(w);
+	CHECK(0 == TextEdit_GetTextLength(w));
+
 	Widget_Destroy(w);
+	Object_Delete(value);
+
 	LCUI_FreeWidget();
 	LCUI_FreeFontLibrary();
 	return ret;

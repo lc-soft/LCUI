@@ -461,6 +461,11 @@ LCUI_API int Widget_SetRules(LCUI_Widget w, const LCUI_WidgetRulesRec *rules);
 /** Set widget content text */
 LCUI_API void Widget_SetText(LCUI_Widget w, const char *text);
 
+/* Bind an object to a widget property, and the widget property is automatically
+ * updated when the value of the object changes */
+LCUI_API void Widget_BindProperty(LCUI_Widget w, const char *name,
+				  LCUI_Object value);
+
 /** 计算部件的最大宽度 */
 LCUI_API float Widget_ComputeMaxWidth(LCUI_Widget w);
 
