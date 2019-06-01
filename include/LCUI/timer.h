@@ -33,12 +33,14 @@
 
 LCUI_BEGIN_HEADER
 
+typedef void (*TimerCallback)(void *);
+
 /**
  * 设置定时器
  * 定时器的作用是让一个任务在经过指定时间后才执行
  * @param n_ms
  *	等待的时间，单位为毫秒
- * @param callback_func
+ * @param callback_
  *	用于响应定时器的回调函数
  * @param reuse
  *	指示该定时器是否重复使用，如果要用于循环定时处理某些任
@@ -46,15 +48,15 @@ LCUI_BEGIN_HEADER
  * @return
  *	该定时器的标识符
  **/
-LCUI_API int LCUITimer_Set(long int n_ms, void (*callback_func)(void *),
+LCUI_API int LCUITimer_Set(long int n_ms, TimerCallback callback,
 			   void *arg, LCUI_BOOL reuse);
 
 /** repeatedly calls a function, with a fixed time delay between each call. */
-LCUI_API int LCUI_SetTimeout(long int n_ms, void (*callback)(void *),
+LCUI_API int LCUI_SetTimeout(long int n_ms, TimerCallback callback,
 			     void *arg);
 
 /** set a timer which execute a function once after the timer expires. */
-LCUI_API int LCUI_SetInterval(long int n_ms, void (*callback)(void *),
+LCUI_API int LCUI_SetInterval(long int n_ms, TimerCallback callback,
 			      void *arg);
 
 /**
