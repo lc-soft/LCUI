@@ -28,7 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #include <string.h>
 #include <stdlib.h>
 #include <LCUI_Build.h>
@@ -38,12 +37,40 @@
 static struct LCUI_WidgetPrototypeModule {
 	Dict *prototypes;
 	DictType dicttype;
-	LCUI_WidgetPrototypeRec empty_prototype;
+	LCUI_WidgetPrototypeRec default_prototype;
 } self = { 0 };
+
+static void Widget_DefaultMethod(LCUI_Widget w)
+{
+}
+
+static void Widget_DefaultAttrSetter(LCUI_Widget w, const char *name,
+				     const char *value)
+{
+}
+
+static void Widget_DefaultTextSetter(LCUI_Widget w, const char *text)
+{
+}
+
+static void Widget_DefaultPropertyBinder(LCUI_Widget w, const char *name,
+					 LCUI_Object prop)
+{
+}
+
+static void Widget_DefaultResizer(LCUI_Widget w, float *width, float *height)
+{
+}
+
+static void Widget_DefaultPainter(LCUI_Widget w, LCUI_PaintContext paint,
+				  LCUI_WidgetActualStyle style)
+{
+}
 
 static void DeletePrototype(void *privdata, void *data)
 {
 	LCUI_WidgetPrototype proto = data;
+
 	free(proto->name);
 	free(proto);
 }
@@ -53,6 +80,15 @@ void LCUIWidget_InitPrototype(void)
 	self.dicttype = DictType_StringKey;
 	self.dicttype.valDestructor = DeletePrototype;
 	self.prototypes = Dict_Create(&self.dicttype, NULL);
+	self.default_prototype.init = Widget_DefaultMethod;
+	self.default_prototype.refresh = Widget_DefaultMethod;
+	self.default_prototype.destroy = Widget_DefaultMethod;
+	self.default_prototype.update = Widget_DefaultMethod;
+	self.default_prototype.runtask = Widget_DefaultMethod;
+	self.default_prototype.setattr = Widget_DefaultAttrSetter;
+	self.default_prototype.settext = Widget_DefaultTextSetter;
+	self.default_prototype.bindprop = Widget_DefaultPropertyBinder;
+	self.default_prototype.autosize = Widget_DefaultResizer;
 }
 
 void LCUIWidget_FreePrototype(void)
@@ -69,6 +105,7 @@ LCUI_WidgetPrototype LCUIWidget_NewPrototype(const char *name,
 					     const char *parent_name)
 {
 	LCUI_WidgetPrototype proto;
+
 	if (Dict_FetchValue(self.prototypes, name)) {
 		return NULL;
 	}
@@ -80,10 +117,10 @@ LCUI_WidgetPrototype LCUIWidget_NewPrototype(const char *name,
 			*proto = *parent;
 			proto->proto = parent;
 		} else {
-			*proto = self.empty_prototype;
+			*proto = self.default_prototype;
 		}
 	} else {
-		*proto = self.empty_prototype;
+		*proto = self.default_prototype;
 	}
 	proto->name = strdup2(name);
 	if (Dict_Add(self.prototypes, proto->name, proto) == 0) {
@@ -140,8 +177,8 @@ void *Widget_GetData(LCUI_Widget widget, LCUI_WidgetPrototype proto)
 	return NULL;
 }
 
-void *Widget_AddData(LCUI_Widget widget,
-		     LCUI_WidgetPrototype proto, size_t data_size)
+void *Widget_AddData(LCUI_Widget widget, LCUI_WidgetPrototype proto,
+		     size_t data_size)
 {
 	void *data;
 	LCUI_WidgetDataEntryRec *list;
