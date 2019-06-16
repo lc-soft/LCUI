@@ -55,7 +55,9 @@ LCUI_API size_t TextEdit_GetTextLength(LCUI_Widget w);
 /** 设置文本编辑框内的光标，指定是否闪烁、闪烁时间间隔 */
 LCUI_API void TextEdit_SetCaretBlink(LCUI_Widget w, LCUI_BOOL visible, int time);
 
-/** 为文本框设置文本（宽字符版） */
+LCUI_API LCUI_Object TextEdit_GetProperty(LCUI_Widget w, const char *name);
+
+    /** 为文本框设置文本（宽字符版） */
 LCUI_API int TextEdit_SetTextW(LCUI_Widget widget, const wchar_t *wstr);
 
 LCUI_API int TextEdit_SetText(LCUI_Widget widget, const char *utf8_str);

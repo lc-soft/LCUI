@@ -527,6 +527,22 @@ size_t TextEdit_GetTextLength(LCUI_Widget w)
 	return edit->layer_source->length;
 }
 
+LCUI_Object TextEdit_GetProperty(LCUI_Widget w, const char *name)
+{
+	size_t len = TextEdit_GetTextLength(w);
+	size_t size = (len + 1) * sizeof(wchar_t);
+	wchar_t *wcs = malloc(size);
+	LCUI_Object prop;
+
+	if (strcmp(name, "value") != 0) {
+		return NULL;
+	}
+	TextEdit_GetTextW(w, 0, len, wcs);
+	prop = WString_New(wcs);
+	free(wcs);
+	return prop;
+}
+
 int TextEdit_SetTextW(LCUI_Widget w, const wchar_t *wstr)
 {
 	TextEdit_ClearText(w);

@@ -878,6 +878,7 @@ size_t TextLayer_GetTextW(LCUI_TextLayer layer, size_t start_pos,
 	LCUI_TextRow row_ptr;
 
 	if (max_len == 0) {
+		wstr_buff[0] = 0;
 		return 0;
 	}
 	/* 先根据一维坐标计算行列坐标 */
@@ -894,7 +895,7 @@ size_t TextLayer_GetTextW(LCUI_TextLayer layer, size_t start_pos,
 			wstr_buff[i] = row_ptr->string[col]->code;
 		}
 	}
-	wstr_buff[i] = L'\0';
+	wstr_buff[i] = 0;
 	return i;
 }
 
