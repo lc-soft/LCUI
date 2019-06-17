@@ -34,6 +34,7 @@ LCUI is a freely available software library for building user interfaces. It is 
 ### Features
 
 - **Written in C:** Suitable for small applications written primarily in C.
+- **Trad language binding:** [Trad](https://github.com/lc-soft/trad) is a language designed for LCUI, it makes it easier to create interactive UIs.
 - **Cross platform:** Support for Windows and Linux, you can write Windows Desktop apps and Universal Windows Platform apps, as well as Linux Desktop apps.
 - **XML parsing:** Support for using XML markup language to describe the structure of the graphical user interface.
 - **CSS parsing:** Support for using a simplified version of CSS to describe the presentation of the graphical user interface. The CSS version used does not support all the features of CSS, like `transition`, `transform`, `animation`, `@media`, `@key-frames` etc, you can read the file [css_parser.c](https://github.com/lc-soft/LCUI/blob/53e268251a53bf371ca7aaa7862ec69fb4d0015a/src/gui/css_parser.c#L550) for more details.
@@ -46,7 +47,7 @@ LCUI is a freely available software library for building user interfaces. It is 
 
 ### Missing features
 
-LCUI is a personal project, its main purpose is to allow the author to easily develop simple GUI applications. 
+LCUI is a personal project, its main purpose is to allow the author to easily develop simple GUI applications.
 
 What is "simple"? It means fewer features, for example:
 
@@ -64,6 +65,7 @@ If you can solve any of the above problems, you can provide technical support to
 
 Want to know what LCUI can do? You can view the following projects:
 
+- [Trad](https://github.com/lc-soft/trad) - A lightweight and C based language for building user interfaces. it is a language designed for LCUI, with this language you can easily implement data binding and event binding in the UI.
 - [LCUI.css](https://github.com/lc-ui/lcui.css) - A UI component framework for building LCUI application.
 - [LCFinder](https://github.com/lc-soft/LC-Finder) - An image manager, it uses most of the features of LCUI, and you can use it as a reference to evaluate whether LCUI's performance and development complexity meets your needs.
 
