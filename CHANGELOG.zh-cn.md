@@ -1,3 +1,20 @@
+# [1.2.0-beta](https://github.com/lc-soft/LCUI/compare/v1.1.0-beta...v1.2.0-beta) (2019-06-17)
+
+### 问题修复
+
+* **textlayer:** 纠正文本行高计算 ([#169](https://github.com/lc-soft/LCUI/issues/169)) ([a4d2f0a](https://github.com/lc-soft/LCUI/commit/a4d2f0a))
+
+### 新功能
+
+* **gui:** 为部件原型设置默认方法 ([e68e8e5](https://github.com/lc-soft/LCUI/commit/e68e8e5))
+* **gui:** 添加 TextEdit_BindProperty() ([c9d8ded](https://github.com/lc-soft/LCUI/commit/c9d8ded))
+* **gui:** 添加 Widget_BindProperty() ([0d3fb68](https://github.com/lc-soft/LCUI/commit/0d3fb68))
+* **gui:** 添加 Widget_SetStyleString() ([5163363](https://github.com/lc-soft/LCUI/commit/5163363))
+* **gui:** 添加 Widget_SetText() ([02714bf](https://github.com/lc-soft/LCUI/commit/02714bf))
+* **textedit:** 添加 TextEdit_GetProperty() ([512706e](https://github.com/lc-soft/LCUI/commit/512706e))
+* **util:** 添加对象包装和操作集 ([241c652](https://github.com/lc-soft/LCUI/commit/241c652))
+* **util:** 添加 Object_ToString() ([13465c7](https://github.com/lc-soft/LCUI/commit/13465c7))
+
 # [1.1.0-beta](https://github.com/lc-soft/LCUI/compare/v1.0.0-beta.4...v1.1.0-beta) (2019-03-09)
 
 
