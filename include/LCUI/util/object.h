@@ -44,12 +44,12 @@ typedef void (*LCUI_ObjectWatcherFunc)(LCUI_Object, void *);
 
 struct LCUI_ObjectTypeRec_ {
 	unsigned hash;
-	void (*constructor)(LCUI_Object);
-	void (*destructor)(LCUI_Object);
-	int (*comparator)(LCUI_Object, LCUI_Object);
-	LCUI_Object (*operator)(LCUI_Object, const char *,
+	void (*init)(LCUI_Object);
+	void (*destroy)(LCUI_Object);
+	int (*compare)(LCUI_Object, LCUI_Object);
+	LCUI_Object (*opreate)(LCUI_Object, const char *,
 				const LCUI_ObjectRec *);
-	void (*duplicator)(LCUI_Object, const LCUI_ObjectRec *);
+	void (*duplicate)(LCUI_Object, const LCUI_ObjectRec *);
 	void (*tostring)(LCUI_Object, LCUI_Object);
 };
 

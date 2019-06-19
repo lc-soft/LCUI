@@ -53,10 +53,10 @@ LCUI_ObjectType ObjectType_New(const char *name)
 		return NULL;
 	}
 	type->hash = strhash(32, name);
-	type->constructor = NULL;
-	type->destructor = NULL;
-	type->duplicator = NULL;
-	type->operator= NULL;
+	type->init = NULL;
+	type->destroy = NULL;
+	type->duplicate = NULL;
+	type->opreate= NULL;
 	return type;
 }
 
@@ -71,15 +71,15 @@ void Object_Init(LCUI_Object object, const LCUI_ObjectTypeRec *type)
 	object->type = type;
 	object->watchers = NULL;
 	object->value.data = NULL;
-	if (type && type->constructor) {
-		type->constructor(object);
+	if (type && type->init) {
+		type->init(object);
 	}
 }
 
 void Object_Destroy(LCUI_Object object)
 {
-	if (object->type && object->type->destructor) {
-		object->type->destructor(object);
+	if (object->type && object->type->destroy) {
+		object->type->destroy(object);
 	}
 	if (object->watchers) {
 		LinkedList_ClearData(object->watchers, free);
@@ -113,16 +113,16 @@ LCUI_Object Object_Duplicate(LCUI_Object src)
 	if (!dest) {
 		return NULL;
 	}
-	if (src->type && src->type->duplicator) {
-		src->type->duplicator(dest, src);
+	if (src->type && src->type->duplicate) {
+		src->type->duplicate(dest, src);
 	}
 	return dest;
 }
 
 int Object_Compare(LCUI_Object a, LCUI_Object b)
 {
-	if (a->type == a->type && a->type->comparator) {
-		return a->type->comparator(a, b);
+	if (a->type == a->type && a->type->compare) {
+		return a->type->compare(a, b);
 	}
 	return a->value.string - b->value.string;
 }
@@ -132,8 +132,8 @@ LCUI_Object Object_Operate(LCUI_Object self, const char *operator_str,
 {
 	assert(self->type == another->type);
 
-	if (self->type->operator) {
-		return self->type->operator(self, operator_str, another);
+	if (self->type->opreate) {
+		return self->type->opreate(self, operator_str, another);
 	}
 	return self;
 }
