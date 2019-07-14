@@ -247,13 +247,15 @@ typedef struct LCUI_FlexLayoutStyle {
 	LCUI_StyleValue justify_content : 8;
 } LCUI_FlexLayoutStyle;
 
+typedef struct LCUI_BorderLine {
+	int style;
+	unsigned int width;
+	LCUI_Color color;
+} LCUI_BorderLine;
+
 /** 边框相关参数 */
 typedef struct LCUI_Border {
-	struct {
-		int style;
-		unsigned int width;
-		LCUI_Color color;
-	} top, right, bottom, left;
+	LCUI_BorderLine top, right, bottom, left;
 	unsigned int top_left_radius;
 	unsigned int top_right_radius;
 	unsigned int bottom_left_radius;
