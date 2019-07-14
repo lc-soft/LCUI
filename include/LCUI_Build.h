@@ -1,8 +1,8 @@
 ﻿/*
  * LCUI_Build.h -- Build-related configuration definitions
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ * Copyright (c) 2019, Liu chao <lc-soft@live.cn> All rights reserved.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -28,26 +28,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #ifndef LCUI_BUILD_H
 #define LCUI_BUILD_H
 
 #if defined(__GNUC__)
-#  define LCUI_API
-#elif (defined(_MSC_VER) && _MSC_VER < 800) ||\
-    (defined(__BORLANDC__) && __BORLANDC__ < 0x500)
-  /* older Borland and MSC
-   * compilers used '__export' and required this to be after
-   * the type.
-   */
-#  define LCUI_API __export
+#define LCUI_API
 #else /* newer compiler */
-#  ifdef LCUI_EXPORTS
-#    define LCUI_API __declspec(dllexport)
-#  else
-#    define LCUI_API
-#  endif
+#ifdef LCUI_EXPORTS
+#define LCUI_API __declspec(dllexport)
+#else
+#define LCUI_API
+#endif
 #endif /* compiler */
+#if defined(WIN32) && !defined(__cplusplus)
+#define INLINE __inline
+#else
+#define INLINE static inline
+#endif
 
 #ifdef DEBUG
 #define DEBUG_MSG _DEBUG_MSG
@@ -57,7 +54,9 @@
 
 #define LOG Logger_Log
 #define LOGW Logger_LogW
-#define _DEBUG_MSG(format, ...) Logger_Log(__FILE__" %d: %s(): "format, __LINE__, __FUNCTION__,##__VA_ARGS__)
+#define _DEBUG_MSG(format, ...)                                           \
+	Logger_Log(__FILE__ " %d: %s(): " format, __LINE__, __FUNCTION__, \
+		   ##__VA_ARGS__)
 
 #if defined(WIN32) || defined(_WIN32)
 #define LCUI_BUILD_IN_WIN32
@@ -82,10 +81,10 @@
 #endif
 
 #ifdef __cplusplus
-#define LCUI_BEGIN_HEADER  extern "C"{
-#define LCUI_END_HEADER  }
+#define LCUI_BEGIN_HEADER extern "C" {
+#define LCUI_END_HEADER }
 #else
-#define LCUI_BEGIN_HEADER  /* nothing */
+#define LCUI_BEGIN_HEADER /* nothing */
 #define LCUI_END_HEADER
 #endif
 

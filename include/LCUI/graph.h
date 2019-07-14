@@ -133,6 +133,48 @@ LCUI_BEGIN_HEADER
 	(Graph_IsValid(G) && \
 	 ((G)->quote.is_valid ? (G)->quote.is_writable : TRUE))
 
+/*
+ * Pixel over operator with alpha channel
+ * See more: https://en.wikipedia.org/wiki/Alpha_compositing
+ */
+INLINE void LCUI_OverPixel(LCUI_ARGB *dst, const LCUI_ARGB *src)
+{
+	double a, out_a, out_r, out_g, out_b, src_a;
+	/*
+	 * Original formula:
+	 *   Co = (Ca * aa + Cb * ab * (1 - aa)) / (aa + ab * (1 - aa))
+	 *   ao = aa + ab * (1 - aa)
+	 *
+	 * Variable full name:
+	 *   Co => colorOut
+	 *   Ca => colorA
+	 *   Cb => colorB
+	 *   aa => colorA.alpha
+	 *   ab => colorB.alpha
+	 *   ao => colorOut.alpha
+	 *
+	 * The formula used in the code:
+	 *   ai = ab * (1 - aa)
+	 *   Co = (Ca * aa + Cb * ai) / (aa + ai)
+	 *   ao = aa + ai
+	 */
+	src_a = src->a / 255.0;
+	a = (1.0 - src_a) * dst->a / 255.0;
+	out_r = src->r * src_a + dst->r * a;
+	out_g = src->g * src_a + dst->g * a;
+	out_b = src->b * src_a + dst->b * a;
+	out_a = src_a + a;
+	if (out_a > 0) {
+		out_r /= out_a;
+		out_g /= out_a;
+		out_b /= out_a;
+	}
+	dst->r = (unsigned char)(out_r + 0.5);
+	dst->g = (unsigned char)(out_g + 0.5);
+	dst->b = (unsigned char)(out_b + 0.5);
+	dst->a = (unsigned char)(255.0 * out_a + 0.5);
+}
+
 LCUI_API void Graph_PrintInfo(LCUI_Graph *graph);
 
 LCUI_API void Graph_Init(LCUI_Graph *graph);
