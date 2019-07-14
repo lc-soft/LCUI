@@ -722,33 +722,21 @@ static void FontBitmap_MixARGB(LCUI_Graph *graph, LCUI_Rect *write_rect,
 			       LCUI_Rect *read_rect)
 {
 	int x, y;
+	LCUI_Color tmpColor;
 	LCUI_ARGB *px, *px_row_des;
 	uchar_t *byte_ptr, *byte_row_ptr;
-	double a, ca, out_a, out_r, out_g, out_b, src_a;
+
 	byte_row_ptr = bmp->buffer + read_rect->y * bmp->width;
 	px_row_des = graph->argb + write_rect->y * graph->width;
 	byte_row_ptr += read_rect->x;
 	px_row_des += write_rect->x;
-	ca = color.alpha / 255.0;
 	for (y = 0; y < read_rect->height; ++y) {
 		px = px_row_des;
 		byte_ptr = byte_row_ptr;
 		for (x = 0; x < read_rect->width; ++x, ++byte_ptr, ++px) {
-			src_a = *byte_ptr / 255.0 * ca;
-			a = (1.0 - src_a) * px->a / 255.0;
-			out_r = px->r * a + color.r * src_a;
-			out_g = px->g * a + color.g * src_a;
-			out_b = px->b * a + color.b * src_a;
-			out_a = src_a + a;
-			if (out_a > 0) {
-				out_r /= out_a;
-				out_g /= out_a;
-				out_b /= out_a;
-			}
-			px->r = (uchar_t)(out_r + 0.5);
-			px->g = (uchar_t)(out_g + 0.5);
-			px->b = (uchar_t)(out_b + 0.5);
-			px->a = (uchar_t)(255.0 * out_a + 0.5);
+			tmpColor = color;
+			tmpColor.alpha = *byte_ptr * color.alpha / 255.0;
+			LCUI_OverPixel(px, &tmpColor);
 		}
 		px_row_des += graph->width;
 		byte_row_ptr += bmp->width;
