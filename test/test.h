@@ -30,6 +30,7 @@ extern int tests_count;
 		}                                                    \
 	} while (0);
 
+int test_border(void);
 int test_charset(void);
 int test_string(void);
 int test_object(void);

@@ -8,6 +8,8 @@ int main(void)
 {
 	int ret = 0;
 
+	ret += test_border();
+	/*
 	ret += test_charset();
 	ret += test_linkedlist();
 	ret += test_string();
@@ -24,7 +26,7 @@ int main(void)
 	ret += test_widget_opacity();
 	ret += test_widget_rect();
 	ret += test_textview_resize();
-	ret += test_textedit();
+	ret += test_textedit();*/
 	PRINT_TEST_RESULT(ret);
 	return ret;
 }

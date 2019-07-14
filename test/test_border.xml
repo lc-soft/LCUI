@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+<resource type="text/css" src="test_border.css"/>
+<ui>
+  <w class="content">
+    <w>
+      <w id="box-1" class="box" />
+      <w id="box-2" class="box" />
+      <w id="box-3" class="box" />
+      <w id="box-4" class="box" />
+      <w id="box-5" class="box" />
+      <w id="box-6" class="box" />
+    </w>
+    <w>
+      <w id="box-7" class="box" />
+      <w id="box-8" class="box" />
+      <w id="box-9" class="box" />
+      <w id="box-10" class="box" />
+      <w id="box-11" class="box" />
+    </w>
+  </w>
+</ui>
+</lcui-app>
