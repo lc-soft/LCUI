@@ -32,7 +32,6 @@
 #ifndef LCUI_H
 #define LCUI_H
 
-#include <LCUI_Build.h>
 #include <LCUI/types.h>
 #include <LCUI/util.h>
 #include <LCUI/main.h>
