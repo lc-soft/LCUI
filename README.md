@@ -19,11 +19,18 @@
 
 ## Table of contents
 
-- [Introduction](#introduction)
-- [License](#license)
-- [Documentation](#documentation)
-- [Building](#building)
-- [Contribution](#contribution)
+- [Table of contents](#Table-of-contents)
+- [Introduction](#Introduction)
+  - [Features](#Features)
+  - [Missing features](#Missing-features)
+  - [Related Projects](#Related-Projects)
+- [Documentation](#Documentation)
+- [Building](#Building)
+  - [Prerequisites](#Prerequisites)
+  - [Building On Windows](#Building-On-Windows)
+  - [Bootstrap](#Bootstrap)
+- [Contribution](#Contribution)
+- [License](#License)
 
 ## Introduction
 
@@ -119,7 +126,7 @@ If you want to experience the demo, please run:
 
     cd test
     make
-    ./hellowrold
+    ./helloworld
 
 If you want to use custom building options, please read the [INSTALL](INSTALL) file for more details.
 
