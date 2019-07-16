@@ -31,7 +31,7 @@ int test_border(void)
 	LCUI_Graph canvas;
 	LCUI_PaintContextRec paint;
 
-	b.top.width = 20;
+	b.top.width = 10;
 	b.right.width = 20;
 	b.bottom.width = 20;
 	b.left.width = 20;
@@ -45,7 +45,7 @@ int test_border(void)
 	b.left.color = RGB(0, 255, 0);
 	b.bottom_left_radius = 40;
 	b.bottom_right_radius = 40;
-	b.top_left_radius = 0;
+	b.top_left_radius = 40;
 	b.top_right_radius = 40;
 
 	rect.x = 20;
