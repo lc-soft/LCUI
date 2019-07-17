@@ -92,24 +92,36 @@
 		BorderRenderer_FillInnerEdgePixel();        \
 	}
 
-#define CIRCLE_X(X, Y) sqrt(fabs((X) * (X) - (Y) * (Y)))
-#define X_ELLIPSE_X(A, B, Y) \
-	sqrt(fabs((1.0 - 1.0 * ((Y) * (Y)) / ((B) * (B))) * (A) * (A)))
-#define Y_ELLIPSE_X(A, B, Y) \
-	sqrt(fabs((1.0 - 1.0 * ((Y) * (Y)) / ((A) * (A))) * (B) * (B)))
+static double ellipse_x(unsigned int radius_x, unsigned int radius_y, int y)
+{
+	double value;
+	if (radius_x == radius_y) {
+		value = radius_x * radius_x - y * y;
+	} else {
+		value = (1.0 - 1.0 * (y * y) / (radius_y * radius_y)) *
+			radius_x * radius_x;
+	}
+	if (value < 0) {
+		value = value;
+	}
+	return sqrt(value);
+}
 
 static int DrawRoundedBorder(LCUI_Graph *dst, int bound_left, int bound_top,
 			     const LCUI_BorderLine *vline,
-			     const LCUI_BorderLine *hline, int radius)
+			     const LCUI_BorderLine *hline, unsigned int radius)
 {
 	int x, y;
-	int a, b;
-	int circle_y;
-	int center_y;
 	int right;
 	int width;
+	int circle_y;
 	int outer_xi, split_xi, inner_xi;
 	double outer_x, split_x, inner_x;
+
+	int center_y = bound_top + radius;
+	int inner_center_y = bound_top + hline->width;
+	unsigned radius_x = radius - vline->width;
+	unsigned radius_y = radius - hline->width;
 
 	LCUI_Rect rect;
 	LCUI_ARGB *p;
@@ -123,56 +135,23 @@ static int DrawRoundedBorder(LCUI_Graph *dst, int bound_left, int bound_top,
 	}
 	width = max(radius, max(vline->width, hline->width));
 	right = min(rect.width, bound_left + width);
-	center_y = bound_top + radius;
-	// 计算椭圆的长轴短轴
-	if (vline->width == hline->width) {
-		a = b = radius - vline->width;
-	} else if (vline->width < hline->width) {
-		a = radius - vline->width;
-		b = radius - hline->width;
-	} else {
-		a = radius - hline->width;
-		b = radius - vline->width;
-	}
 	for (y = 0; y < rect.height; ++y) {
+		outer_x = 0;
+		split_x = 0;
+		inner_x = width;
 		circle_y = center_y - y;
 		if (circle_y > 0) {
-			outer_x = CIRCLE_X(radius, circle_y);
-			if (a == b) {
-				if (y >= bound_top + a) {
-					inner_x = CIRCLE_X(a, circle_y);
-					inner_x = radius - inner_x;
-				} else {
-					inner_x = width;
-				}
-			} else if (vline->width < hline->width) {
-				// 椭圆焦点在 x 轴上
-				circle_y = b - (y - (bound_top + hline->width));
-				if (circle_y >= 0 && circle_y < b) {
-					inner_x = X_ELLIPSE_X(a, b, circle_y);
-					inner_x = radius - inner_x;
-				} else {
-					inner_x = width;
-				}
-			} else {
-				// 椭圆焦点在 y 轴上
-				circle_y = a - (y - (bound_top + hline->width));
-				if (circle_y >= 0 && circle_y < a) {
-					inner_x = Y_ELLIPSE_X(a, b, circle_y);
-					inner_x = radius - inner_x;
-				} else {
-					inner_x = width;
-				}
+			outer_x = radius - ellipse_x(radius, radius, circle_y);
+			circle_y = radius_y - (y - inner_center_y);
+			if (circle_y >= 0 && circle_y < (int)radius_y) {
+				inner_x = radius - ellipse_x(radius_x, radius_y,
+							     circle_y);
 			}
-		} else {
-			outer_x = 0;
-			inner_x = width;
 		}
-		split_x = 0;
-		if (b > 0) {
-			split_x = a / b * y;
+		if (hline->width > 0) {
+			split_x = vline->width / hline->width * y;
 		}
-		outer_x = bound_left + radius - outer_x;
+		outer_x = bound_left + outer_x;
 		inner_x = bound_left + inner_x;
 		if (split_x < outer_x) {
 			outer_color = hline->color;
@@ -422,7 +401,7 @@ int Border_Paint(const LCUI_Border *border, const LCUI_Rect *box,
 		bound.x -= paint->rect.x;
 		bound.y -= paint->rect.y;
 		Graph_Quote(&canvas, &paint->canvas, &bound);
-		//Graph_FillRect(&canvas, border->top.color, NULL, TRUE);
+		// Graph_FillRect(&canvas, border->top.color, NULL, TRUE);
 	}
 	/* 绘制下边框线 */
 	bound.x = box->x + border->bottom_left_radius;
@@ -446,7 +425,7 @@ int Border_Paint(const LCUI_Border *border, const LCUI_Rect *box,
 		bound.x -= paint->rect.x;
 		bound.y -= paint->rect.y;
 		Graph_Quote(&canvas, &paint->canvas, &bound);
-		//Graph_FillRect(&canvas, border->left.color, NULL, TRUE);
+		// Graph_FillRect(&canvas, border->left.color, NULL, TRUE);
 	}
 	/* 绘制右边框线 */
 	bound.x = box->x + box->width - border->right.width;
