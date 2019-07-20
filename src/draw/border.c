@@ -117,15 +117,15 @@ static int DrawBorderTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 	int circle_y;
 	int outer_xi, split_xi, inner_xi;
 	double outer_x, split_x, inner_x;
-
-	int center_y = bound_top + radius;
-	int inner_center_y = bound_top + xline->width;
 	unsigned radius_x = radius - yline->width;
 	unsigned radius_y = radius - xline->width;
 
 	LCUI_Rect rect;
 	LCUI_ARGB *p;
 	LCUI_Color outer_color, inner_color;
+
+	int center_y = bound_top + radius;
+	int inner_center_y = bound_top + xline->width;
 
 	/* Get the actual rectagle that can be drawn */
 	Graph_GetValidRect(dst, &rect);
@@ -173,14 +173,16 @@ static int DrawBorderTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 		split_xi = (int)split_x;
 		p = Graph_GetPixelPointer(dst, rect.x, rect.y + y);
 		/* Clear pixels outside the border */
-		for (x = 0; x < outer_xi; ++x, ++p) {
+		for (x = 0; x <= outer_xi; ++x, ++p) {
 			p->alpha = 0;
 		}
-		for (x = outer_xi; x < split_xi; ++x, ++p) {
-			LCUI_OverPixel(p, &yline->color);
-		}
-		for (x = split_xi; x < inner_xi; ++x, ++p) {
-			LCUI_OverPixel(p, &xline->color);
+		if (x < inner_x) {
+			for (; x < split_xi; ++x, ++p) {
+				LCUI_OverPixel(p, &yline->color);
+			}
+			for (; x <= inner_xi; ++x, ++p) {
+				LCUI_OverPixel(p, &xline->color);
+			}	
 		}
 	}
 	return 0;

@@ -31,7 +31,7 @@ int test_border(void)
 	LCUI_Graph canvas;
 	LCUI_PaintContextRec paint;
 
-	b.top.width = 10;
+	b.top.width = 20;
 	b.right.width = 20;
 	b.bottom.width = 20;
 	b.left.width = 20;
@@ -40,8 +40,8 @@ int test_border(void)
 	b.bottom.style = SV_SOLID;
 	b.left.style = SV_SOLID;
 	b.top.color = RGB(255, 0, 0);
-	b.right.color = RGB(0, 0, 0);
-	b.bottom.color = RGB(0, 0, 0);
+	b.right.color = RGB(0, 255, 0);
+	b.bottom.color = RGB(255, 0, 0);
 	b.left.color = RGB(0, 255, 0);
 	b.bottom_left_radius = 40;
 	b.bottom_right_radius = 40;
