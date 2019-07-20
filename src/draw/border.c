@@ -107,9 +107,9 @@ static double ellipse_x(unsigned int radius_x, unsigned int radius_y, int y)
 	return sqrt(value);
 }
 
-static int DrawRoundedBorder(LCUI_Graph *dst, int bound_left, int bound_top,
-			     const LCUI_BorderLine *vline,
-			     const LCUI_BorderLine *hline, unsigned int radius)
+static int DrawBorderTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
+			     const LCUI_BorderLine *xline,
+			     const LCUI_BorderLine *yline, unsigned int radius)
 {
 	int x, y;
 	int right;
@@ -119,9 +119,9 @@ static int DrawRoundedBorder(LCUI_Graph *dst, int bound_left, int bound_top,
 	double outer_x, split_x, inner_x;
 
 	int center_y = bound_top + radius;
-	int inner_center_y = bound_top + hline->width;
-	unsigned radius_x = radius - vline->width;
-	unsigned radius_y = radius - hline->width;
+	int inner_center_y = bound_top + xline->width;
+	unsigned radius_x = radius - yline->width;
+	unsigned radius_y = radius - xline->width;
 
 	LCUI_Rect rect;
 	LCUI_ARGB *p;
@@ -133,7 +133,7 @@ static int DrawRoundedBorder(LCUI_Graph *dst, int bound_left, int bound_top,
 	if (!Graph_IsValid(dst)) {
 		return -1;
 	}
-	width = max(radius, max(vline->width, hline->width));
+	width = max(radius, max(yline->width, xline->width));
 	right = min(rect.width, bound_left + width);
 	for (y = 0; y < rect.height; ++y) {
 		outer_x = 0;
@@ -148,21 +148,21 @@ static int DrawRoundedBorder(LCUI_Graph *dst, int bound_left, int bound_top,
 							     circle_y);
 			}
 		}
-		if (hline->width > 0) {
-			split_x = vline->width / hline->width * y;
+		if (xline->width > 0) {
+			split_x = y * yline->width / xline->width;
+		}
+		if (split_x < outer_x) {
+			outer_color = xline->color;
+		} else {
+			outer_color = yline->color;
+		}
+		if (split_x < inner_x) {
+			inner_color = yline->color;
+		} else {
+			inner_color = xline->color;
 		}
 		outer_x = bound_left + outer_x;
 		inner_x = bound_left + inner_x;
-		if (split_x < outer_x) {
-			outer_color = hline->color;
-		} else {
-			outer_color = vline->color;
-		}
-		if (split_x < inner_x) {
-			inner_color = vline->color;
-		} else {
-			inner_color = hline->color;
-		}
 		/* Limit coordinates into the current drawing region */
 		outer_x = max(0, min(right, outer_x));
 		inner_x = max(0, min(right, inner_x));
@@ -176,238 +176,345 @@ static int DrawRoundedBorder(LCUI_Graph *dst, int bound_left, int bound_top,
 		for (x = 0; x < outer_xi; ++x, ++p) {
 			p->alpha = 0;
 		}
-		*p = outer_color;
-		/* Outer edge pixel anti aliasing */
-		p->alpha =
-		    (uchar_t)(p->alpha * (1.0 - outer_x + outer_xi * 1.0));
 		for (x = outer_xi; x < split_xi; ++x, ++p) {
-			LCUI_OverPixel(p, &hline->color);
+			LCUI_OverPixel(p, &yline->color);
 		}
 		for (x = split_xi; x < inner_xi; ++x, ++p) {
-			LCUI_OverPixel(p, &vline->color);
-		}
-		if (inner_xi < right) {
-			/* Inner edge pixel anti aliasing */
-			inner_color.alpha = (uchar_t)(
-			    inner_color.alpha * (inner_x - inner_xi * 1.0));
-			LCUI_OverPixel(p, &inner_color);
+			LCUI_OverPixel(p, &xline->color);
 		}
 	}
 	return 0;
 }
 
-static int Border_DrawTopLeft(const LCUI_Border *border, const LCUI_Rect *box,
-			      LCUI_PaintContext paint)
+static int DrawBorderTopRight(LCUI_Graph *dst, int bound_left, int bound_top,
+			      const LCUI_BorderLine *xline,
+			      const LCUI_BorderLine *yline, unsigned int radius)
 {
-	int center_x, center_y;
+	int x, y;
+	int right;
+	int width;
+	int circle_y;
+	int outer_xi, split_xi, inner_xi;
+	double outer_x, split_x, inner_x;
 
-	LCUI_Rect bound, rect;
-	LCUI_Graph canvas, *dest;
+	int center_y = bound_top + radius;
+	int inner_center_y = bound_top + xline->width;
+	unsigned radius_x = radius - yline->width;
+	unsigned radius_y = radius - xline->width;
 
-	bound.x = box->x;
-	bound.y = box->y;
-	bound.width = border->top_left_radius;
-	bound.height = border->top_left_radius;
-	if (!LCUIRect_GetOverlayRect(&bound, &paint->rect, &rect)) {
+	LCUI_Rect rect;
+	LCUI_ARGB *p;
+	LCUI_Color outer_color, inner_color;
+
+	/* Get the actual rectagle that can be drawn */
+	Graph_GetValidRect(dst, &rect);
+	dst = Graph_GetQuote(dst);
+	if (!Graph_IsValid(dst)) {
 		return -1;
 	}
-	center_x = border->top_left_radius;
-	center_y = border->top_left_radius;
-	center_x -= rect.x - bound.x;
-	center_y -= rect.y - bound.y;
-	rect.x -= paint->rect.x;
-	rect.y -= paint->rect.y;
-	Graph_Quote(&canvas, &paint->canvas, &rect);
-
-	Graph_GetValidRect(&canvas, &rect);
-	dest = Graph_GetQuote(&canvas);
-	if (!Graph_IsValid(dest)) {
-		return -1;
-	}
-}
-
-static int BorderRenderer_DrawTopRoundedLine(LCUI_Graph *dst, LCUI_Pos center,
-					     int radius, int width,
-					     LCUI_Color color)
-{
-	BorderRenderer_BeginYToX();
+	width = max(radius, max(yline->width, xline->width));
+	right = min(rect.width, bound_left + width);
 	for (y = 0; y < rect.height; ++y) {
-		y2 = pow(y - center.y, 2);
-		inner_y = y - (center.y - inner_h);
-		w = (1.0 - 1.0 * inner_y / inner_h) * width;
-		wi = (int)w;
-		/* Position the current pixel row */
-		row = Graph_GetPixelPointer(dst, rect.x, rect.y + y);
-		for (x = 0; x < rect.width; ++x) {
-			p = row + x;
-			/* Get the distance from the center of the circle */
-			d = sqrt(pow(x - center.x, 2) + y2);
-			di = (int)d;
-			BorderRenderer_FillPixel();
+		outer_x = width;
+		split_x = 0;
+		inner_x = 0;
+		circle_y = center_y - y;
+		if (circle_y > 0) {
+			outer_x = ellipse_x(radius, radius, circle_y);
+			circle_y = radius_y - (y - inner_center_y);
+			if (circle_y >= 0 && circle_y < (int)radius_y) {
+				inner_x =
+				    ellipse_x(radius_x, radius_y, circle_y);
+			}
+		}
+		if (xline->width > 0) {
+			split_x =
+			    (rect.height - y) * yline->width / xline->width;
+		}
+		if (split_x < outer_x) {
+			outer_color = yline->color;
+		} else {
+			outer_color = xline->color;
+		}
+		if (split_x > inner_x) {
+			inner_color = xline->color;
+		} else {
+			inner_color = yline->color;
+		}
+		outer_x = bound_left + outer_x;
+		inner_x = bound_left + inner_x;
+		split_x = bound_left + split_x;
+		/* Limit coordinates into the current drawing region */
+		outer_x = max(0, min(right, outer_x));
+		inner_x = max(0, min(right, inner_x));
+		split_x = max(inner_x, min(outer_x, split_x));
+		/* Coordinate rasterization */
+		outer_xi = (int)outer_x;
+		inner_xi = (int)inner_x;
+		split_xi = (int)split_x;
+		p = Graph_GetPixelPointer(dst, rect.x + inner_xi, rect.y + y);
+		for (x = inner_x; x < split_x; ++x, ++p) {
+			LCUI_OverPixel(p, &xline->color);
+		}
+		for (x = split_xi; x <= outer_xi; ++x, ++p) {
+			LCUI_OverPixel(p, &yline->color);
+		}
+		/* Clear pixels outside the border */
+		for (x = outer_xi + 1; x < right; ++x, ++p) {
+			p->alpha = 0;
 		}
 	}
 	return 0;
 }
 
-static int BorderRenderer_DrawLeftRoundedLine(LCUI_Graph *dst, LCUI_Pos center,
-					      int radius, int width,
-					      LCUI_Color color)
+static int DrawBorderBottomLeft(LCUI_Graph *dst, int bound_left, int bound_top,
+				const LCUI_BorderLine *xline,
+				const LCUI_BorderLine *yline,
+				unsigned int radius)
 {
-	BorderRenderer_BeginXToY();
-	for (x = 0; x < rect.width; ++x) {
-		x2 = pow(x - center.x, 2);
-		inner_x = x - (center.x - inner_w);
-		w = (1.0 - 1.0 * inner_x / inner_w) * width;
-		wi = (int)w;
-		/* Position the current pixel row */
-		row = Graph_GetPixelPointer(dst, rect.x + x, rect.y);
-		for (y = 0; y < rect.height; ++y) {
-			p = row + y * dst->width;
-			/* Get the distance from the center of the circle */
-			d = sqrt(pow(y - center.y, 2) + x2);
-			di = (int)d;
-			BorderRenderer_FillPixel();
+	int x, y;
+	int right;
+	int width;
+	int circle_y;
+	int outer_xi, split_xi, inner_xi;
+	double outer_x, split_x, inner_x;
+
+	int center_y = bound_top + radius;
+	int inner_center_y = bound_top;
+	unsigned radius_x = radius - yline->width;
+	unsigned radius_y = radius - xline->width;
+
+	LCUI_Rect rect;
+	LCUI_ARGB *p;
+	LCUI_Color outer_color, inner_color;
+
+	/* Get the actual rectagle that can be drawn */
+	Graph_GetValidRect(dst, &rect);
+	dst = Graph_GetQuote(dst);
+	if (!Graph_IsValid(dst)) {
+		return -1;
+	}
+	width = max(radius, max(yline->width, xline->width));
+	right = min(rect.width, bound_left + width);
+	for (y = 0; y < rect.height; ++y) {
+		outer_x = 0;
+		split_x = 0;
+		inner_x = width;
+		if (y <= center_y) {
+			circle_y = y;
+			outer_x = radius - ellipse_x(radius, radius, circle_y);
+			circle_y = y - inner_center_y;
+			if (circle_y >= 0 && circle_y < (int)radius_y) {
+				inner_x = radius - ellipse_x(radius_x, radius_y,
+							     circle_y);
+			}
+		}
+		if (xline->width > 0) {
+			split_x =
+			    (rect.height - y) * yline->width / xline->width;
+		}
+		if (split_x < outer_x) {
+			outer_color = xline->color;
+		} else {
+			outer_color = yline->color;
+		}
+		if (split_x < inner_x) {
+			inner_color = yline->color;
+		} else {
+			inner_color = xline->color;
+		}
+		outer_x = bound_left + outer_x;
+		inner_x = bound_left + inner_x;
+		/* Limit coordinates into the current drawing region */
+		outer_x = max(0, min(right, outer_x));
+		inner_x = max(0, min(right, inner_x));
+		split_x = max(outer_x, min(inner_x, split_x));
+		/* Coordinate rasterization */
+		outer_xi = (int)outer_x;
+		inner_xi = (int)inner_x;
+		split_xi = (int)split_x;
+		p = Graph_GetPixelPointer(dst, rect.x, rect.y + y);
+		/* Clear pixels outside the border */
+		for (x = 0; x < outer_xi; ++x, ++p) {
+			p->alpha = 0;
+		}
+		for (x = outer_xi; x < split_xi; ++x, ++p) {
+			LCUI_OverPixel(p, &yline->color);
+		}
+		for (x = split_xi; x < inner_xi; ++x, ++p) {
+			LCUI_OverPixel(p, &xline->color);
 		}
 	}
 	return 0;
 }
 
-/** Draw a line from right to top right */
-static int BorderRenderer_DrawRightToTopRight(LCUI_Graph *dst, LCUI_Pos center,
-					      int radius, int width,
-					      LCUI_Color color)
+static int DrawBorderBottomRight(LCUI_Graph *dst, int bound_left, int bound_top,
+				 const LCUI_BorderLine *xline,
+				 const LCUI_BorderLine *yline,
+				 unsigned int radius)
 {
-	BorderRenderer_BeginXToY();
-	for (x = 0; x < rect.width; ++x) {
-		x2 = pow(x - center.x, 2);
-		inner_x = x - (center.x - inner_w);
-		w = (1.0 - 1.0 * inner_x / inner_w) * width;
-		wi = (int)w;
-		/* Position the current pixel row */
-		row = Graph_GetPixelPointer(dst, rect.x + x, rect.y);
-		for (y = 0; y < rect.height; ++y) {
-			p = row + y * dst->width;
-			/* Get the distance from the center of the circle */
-			d = sqrt(pow(y - center.y, 2) + x2);
-			di = (int)d;
-			BorderRenderer_FillPixel();
+	int x, y;
+	int right;
+	int width;
+	int circle_y;
+	int outer_xi, split_xi, inner_xi;
+	double outer_x, split_x, inner_x;
+
+	int center_y = bound_top;
+	unsigned radius_x = radius - yline->width;
+	unsigned radius_y = radius - xline->width;
+
+	LCUI_Rect rect;
+	LCUI_ARGB *p;
+	LCUI_Color outer_color, inner_color;
+
+	/* Get the actual rectagle that can be drawn */
+	Graph_GetValidRect(dst, &rect);
+	dst = Graph_GetQuote(dst);
+	if (!Graph_IsValid(dst)) {
+		return -1;
+	}
+	width = max(radius, max(yline->width, xline->width));
+	right = min(rect.width, bound_left + width);
+	for (y = 0; y < rect.height; ++y) {
+		outer_x = 0;
+		split_x = 0;
+		inner_x = 0;
+		circle_y = y;
+		outer_x = ellipse_x(radius, radius, circle_y);
+		circle_y = y - center_y;
+		if (circle_y >= 0 && circle_y < (int)radius_y) {
+			inner_x = ellipse_x(radius_x, radius_y, circle_y);
+		}
+		if (xline->width > 0) {
+			split_x = y * yline->width / xline->width;
+		}
+		if (split_x < outer_x) {
+			outer_color = xline->color;
+		} else {
+			outer_color = yline->color;
+		}
+		if (split_x < inner_x) {
+			inner_color = yline->color;
+		} else {
+			inner_color = xline->color;
+		}
+		outer_x = bound_left + outer_x;
+		inner_x = bound_left + inner_x;
+		/* Limit coordinates into the current drawing region */
+		outer_x = max(0, min(right, outer_x));
+		inner_x = max(0, min(right, inner_x));
+		split_x = max(inner_x, min(outer_x, split_x));
+		/* Coordinate rasterization */
+		outer_xi = (int)outer_x;
+		inner_xi = (int)inner_x;
+		split_xi = (int)split_x;
+		p = Graph_GetPixelPointer(dst, rect.x + inner_xi, rect.y + y);
+		for (x = inner_x; x < split_x; ++x, ++p) {
+			LCUI_OverPixel(p, &xline->color);
+		}
+		for (x = split_xi; x <= outer_xi; ++x, ++p) {
+			LCUI_OverPixel(p, &yline->color);
+		}
+		/* Clear pixels outside the border */
+		for (x = outer_xi + 1; x < right; ++x, ++p) {
+			p->alpha = 0;
 		}
 	}
 	return 0;
-}
-
-/** Draw a line from left to bottom left */
-static int BorderRenderer_DrawLeftToBottomLeft(LCUI_Graph *dst, LCUI_Pos center,
-					       int radius, int width,
-					       LCUI_Color color)
-{
-}
-
-/** Draw a line from bottom left to left */
-static int BorderRenderer_DrawBottomLeftToLeft(LCUI_Graph *dst, LCUI_Pos center,
-					       int radius, int width,
-					       LCUI_Color color)
-{
-}
-
-/** Draw a line from right to bottom right */
-static int BorderRenderer_DrawRightToBottomRight(LCUI_Graph *dst,
-						 LCUI_Pos center, int radius,
-						 int width, LCUI_Color color)
-{
-}
-
-/** Draw a line from bottom right to right */
-static int BorderRenderer_DrawBottomRightToRight(LCUI_Graph *dst,
-						 LCUI_Pos center, int radius,
-						 int width, LCUI_Color color)
-{
 }
 
 int Border_Paint(const LCUI_Border *border, const LCUI_Rect *box,
 		 LCUI_PaintContext paint)
 {
-	LCUI_Pos pos;
 	LCUI_Graph canvas;
 	LCUI_Rect bound, rect;
+	int bound_top, bound_left;
+	int tl_width = max(border->top_left_radius, border->left.width);
+	int tl_height = max(border->top_left_radius, border->top.width);
+	int tr_width = max(border->top_left_radius, border->right.width);
+	int tr_height = max(border->top_left_radius, border->top.width);
+	int bl_width = max(border->bottom_left_radius, border->left.width);
+	int bl_height = max(border->bottom_left_radius, border->bottom.width);
+	int br_width = max(border->bottom_right_radius, border->right.width);
+	int br_height = max(border->bottom_right_radius, border->bottom.width);
 
 	if (!Graph_IsValid(&paint->canvas)) {
 		return -1;
 	}
-	/* 左上角的圆角 */
+	/* Draw border top left angle */
 	bound.x = box->x;
 	bound.y = box->y;
-	bound.width = max(border->top_left_radius, border->left.width);
-	bound.height = max(border->top_left_radius, border->top.width);
+	bound.width = tl_width;
+	bound.height = tl_height;
 	if (LCUIRect_GetOverlayRect(&bound, &paint->rect, &rect)) {
-		int bound_top, bound_left;
-
-		bound_top = rect.y - paint->rect.y;
-		bound_left = rect.x - paint->rect.x;
+		bound_top = rect.y - bound.y;
+		bound_left = rect.x - bound.x;
 		rect.x -= paint->rect.x;
 		rect.y -= paint->rect.y;
 		Graph_Quote(&canvas, &paint->canvas, &rect);
-		DrawRoundedBorder(&canvas, bound_left, bound_top, &border->left,
-				  &border->top, border->top_left_radius);
+		DrawBorderTopLeft(&canvas, bound_left, bound_top, &border->top,
+				  &border->left, border->top_left_radius);
 	}
-	/* 右上角的圆角 */
+	/* Draw border top right angle */
 	bound.y = box->y;
-	bound.width = border->top_right_radius;
-	bound.height = border->top_right_radius;
-	bound.x = box->x + box->width - border->top_right_radius;
+	bound.width = tr_height;
+	bound.height = tr_height;
+	bound.x = box->x + box->width - bound.width;
 	if (LCUIRect_GetOverlayRect(&bound, &paint->rect, &rect)) {
-		pos.x = 0;
-		pos.y = border->top_right_radius;
-		pos.x -= rect.x - bound.x;
-		pos.y -= rect.y - bound.y;
-		rect.x -= paint->rect.x;
-		rect.y -= paint->rect.y;
-	}
-	/* 左下角的圆角 */
-	bound.x = box->x;
-	bound.width = border->bottom_left_radius;
-	bound.height = border->bottom_left_radius;
-	bound.y = box->y + box->height - border->bottom_left_radius;
-	if (LCUIRect_GetOverlayRect(&bound, &paint->rect, &rect)) {
-		pos.y = 0;
-		pos.x = border->bottom_left_radius;
-		pos.x -= rect.x - bound.x;
-		pos.y -= rect.y - bound.y;
-		rect.x -= paint->rect.x;
-		rect.y -= paint->rect.y;
-		bound.x -= paint->rect.x;
-		bound.y -= paint->rect.y;
-	}
-	/* 右下角的圆角 */
-	bound.width = border->bottom_left_radius;
-	bound.height = border->bottom_left_radius;
-	bound.x = box->x + box->width - border->bottom_right_radius;
-	bound.y = box->y + box->height - border->bottom_right_radius;
-	if (LCUIRect_GetOverlayRect(&bound, &paint->rect, &rect)) {
-		pos.x = pos.y = 0;
-		pos.x -= rect.x - bound.x;
-		pos.y -= rect.y - bound.y;
+		bound_top = rect.y - bound.y;
+		bound_left = rect.x - bound.x;
 		rect.x -= paint->rect.x;
 		rect.y -= paint->rect.y;
 		Graph_Quote(&canvas, &paint->canvas, &rect);
+		DrawBorderTopRight(&canvas, bound_left, bound_top, &border->top,
+				   &border->right, border->top_right_radius);
 	}
-	/* 绘制上边框线 */
-	bound.x = box->x + border->top_left_radius;
+	/* Draw border bottom left angle */
+	bound.x = box->x;
+	bound.width = bl_width;
+	bound.height = bl_height;
+	bound.y = box->y + box->height - bound.height;
+	if (LCUIRect_GetOverlayRect(&bound, &paint->rect, &rect)) {
+		bound_top = rect.y - bound.y;
+		bound_left = rect.x - bound.x;
+		rect.x -= paint->rect.x;
+		rect.y -= paint->rect.y;
+		Graph_Quote(&canvas, &paint->canvas, &rect);
+		DrawBorderBottomLeft(&canvas, bound_left, bound_top,
+				     &border->bottom, &border->left,
+				     border->bottom_left_radius);
+	}
+	/* Draw border bottom right angle */
+	bound.width = br_width;
+	bound.height = br_height;
+	bound.x = box->x + box->width - bound.width;
+	bound.y = box->y + box->height - bound.height;
+	if (LCUIRect_GetOverlayRect(&bound, &paint->rect, &rect)) {
+		bound_top = rect.y - bound.y;
+		bound_left = rect.x - bound.x;
+		rect.x -= paint->rect.x;
+		rect.y -= paint->rect.y;
+		Graph_Quote(&canvas, &paint->canvas, &rect);
+		DrawBorderBottomRight(&canvas, bound_left, bound_top,
+				      &border->bottom, &border->right,
+				      border->bottom_right_radius);
+	}
+	/* Draw top border line */
+	bound.x = box->x + tl_width;
 	bound.y = box->y;
-	bound.width = box->width - border->top_right_radius;
-	bound.width -= border->top_left_radius;
+	bound.width = box->width - tl_width - tr_height;
 	bound.height = border->top.width;
 	if (LCUIRect_GetOverlayRect(&bound, &paint->rect, &bound)) {
 		bound.x -= paint->rect.x;
 		bound.y -= paint->rect.y;
 		Graph_Quote(&canvas, &paint->canvas, &bound);
-		// Graph_FillRect(&canvas, border->top.color, NULL, TRUE);
+		Graph_FillRect(&canvas, border->top.color, NULL, TRUE);
 	}
-	/* 绘制下边框线 */
-	bound.x = box->x + border->bottom_left_radius;
+	/* Draw bottom border line */
+	bound.x = box->x + bl_width;
 	bound.y = box->y + box->height - border->bottom.width;
-	bound.width = box->width - border->bottom_right_radius;
-	bound.width -= border->bottom_left_radius;
+	bound.width = box->width - bl_width - br_width;
 	bound.height = border->bottom.width;
 	if (LCUIRect_GetOverlayRect(&bound, &paint->rect, &bound)) {
 		bound.x -= paint->rect.x;
@@ -415,24 +522,22 @@ int Border_Paint(const LCUI_Border *border, const LCUI_Rect *box,
 		Graph_Quote(&canvas, &paint->canvas, &bound);
 		Graph_FillRect(&canvas, border->bottom.color, NULL, TRUE);
 	}
-	/* 绘制左边框线 */
-	bound.y = box->y + border->top_left_radius;
+	/* Draw left border line */
+	bound.y = box->y + bl_height;
 	bound.x = box->x;
 	bound.width = border->left.width;
-	bound.height = box->height - border->top_left_radius;
-	bound.height -= border->bottom_left_radius;
+	bound.height = box->height - tl_width - bl_width;
 	if (LCUIRect_GetOverlayRect(&bound, &paint->rect, &bound)) {
 		bound.x -= paint->rect.x;
 		bound.y -= paint->rect.y;
 		Graph_Quote(&canvas, &paint->canvas, &bound);
-		// Graph_FillRect(&canvas, border->left.color, NULL, TRUE);
+		Graph_FillRect(&canvas, border->left.color, NULL, TRUE);
 	}
-	/* 绘制右边框线 */
+	/* Draw right border line */
 	bound.x = box->x + box->width - border->right.width;
-	bound.y = box->y + border->top_right_radius;
+	bound.y = box->y + tr_height;
 	bound.width = border->right.width;
-	bound.height = box->height - border->top_right_radius;
-	bound.height -= border->bottom_right_radius;
+	bound.height = box->height - tr_height - br_height;
 	if (LCUIRect_GetOverlayRect(&bound, &paint->rect, &bound)) {
 		bound.x -= paint->rect.x;
 		bound.y -= paint->rect.y;
