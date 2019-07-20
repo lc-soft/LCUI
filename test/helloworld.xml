@@ -2,10 +2,10 @@
 <lcui-app>
   <resource type="text/css" src="helloworld.css"/>
   <ui>
-    <widget id="text-hello" type="textview" class="text-hello">
+    <textview id="text-hello" type="textview" class="text-hello">
       [i][color=#f00]Hello[/color][/i], [b][color=#fff][bgcolor=#f00]World![/bgcolor][/color][/b]
-    </widget>
-    <widget id="edit" type="textedit">[i][color=#f00]Hello[/color][/i], [b][color=#fff][bgcolor=#f00]World![/bgcolor][/color][/b]</widget>
-    <widget id="btn" type="button">Change</widget>
+    </textview>
+    <textedit id="edit">[i][color=#f00]Hello[/color][/i], [b][color=#fff][bgcolor=#f00]World![/bgcolor][/color][/b]</textedit>
+    <button id="btn">Change</button>
   </ui>
 </lcui-app>

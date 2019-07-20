@@ -1,7 +1,7 @@
 ﻿/*
  * widget_base.h -- The widget base operation set.
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -323,13 +323,16 @@ LCUI_API LCUI_Widget LCUIWidget_GetRoot(void);
 /** 获取指定ID的部件 */
 LCUI_API LCUI_Widget LCUIWidget_GetById(const char *idstr);
 
-/** 新建一个GUI部件 */
+/** Create a widget by prototype */
+LCUI_API LCUI_Widget LCUIWidget_NewWithPrototype(LCUI_WidgetPrototypeC proto);
+
+/** Create a widget by type name */
 LCUI_API LCUI_Widget LCUIWidget_New(const char *type_name);
 
-/** 直接销毁部件 */
+/** Execute destruction task */
 LCUI_API void Widget_ExecDestroy(LCUI_Widget w);
 
-/** 销毁部件 */
+/** Mark a Widget needs to be destroyed */
 LCUI_API void Widget_Destroy(LCUI_Widget w);
 
 /** 获取相对于父级指定部件的 XY 坐标 */

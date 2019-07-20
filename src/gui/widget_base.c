@@ -123,19 +123,32 @@ static void Widget_Init(LCUI_Widget widget)
 	widget->computed_style.padding.right.type = LCUI_STYPE_PX;
 	widget->computed_style.padding.bottom.type = LCUI_STYPE_PX;
 	widget->computed_style.padding.left.type = LCUI_STYPE_PX;
-	Widget_InitBackground(widget);
 	LinkedList_Init(&widget->children);
 	LinkedList_Init(&widget->children_show);
-}
-
-LCUI_Widget LCUIWidget_New(const char *type)
-{
-	ASSIGN(widget, LCUI_Widget);
-	Widget_Init(widget);
 	widget->node.data = widget;
 	widget->node_show.data = widget;
 	widget->node.next = widget->node.prev = NULL;
 	widget->node_show.next = widget->node_show.prev = NULL;
+	Widget_InitBackground(widget);
+}
+
+LCUI_Widget LCUIWidget_NewWithPrototype(LCUI_WidgetPrototypeC proto)
+{
+	LCUI_Widget widget = malloc(sizeof(LCUI_WidgetRec));
+
+	Widget_Init(widget);
+	widget->proto = proto;
+	widget->type = widget->proto->name;
+	widget->proto->init(widget);
+	Widget_AddTask(widget, LCUI_WTASK_REFRESH_STYLE);
+	return widget;
+}
+
+LCUI_Widget LCUIWidget_New(const char *type)
+{
+	LCUI_Widget widget = malloc(sizeof(LCUI_WidgetRec));
+
+	Widget_Init(widget);
 	if (type) {
 		widget->proto = LCUIWidget_GetPrototype(type);
 		if (widget->proto) {
