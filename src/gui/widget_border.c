@@ -58,7 +58,7 @@ void Widget_ComputeBorderStyle(LCUI_Widget w)
 	LCUI_BorderStyle *b;
 	b = &w->computed_style.border;
 	memset(b, 0, sizeof(LCUI_BorderStyle));
-	for (key = key_border_start; key < key_border_end; ++key) {
+	for (key = key_border_start; key <= key_border_end; ++key) {
 		s = &w->style->sheet[key];
 		if (!s->is_valid) {
 			continue;

@@ -1,5 +1,4 @@
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI.h>
 #include <LCUI/graph.h>
 #include <LCUI/image.h>
 #include <LCUI/draw/border.h>
@@ -7,7 +6,7 @@
 #include <LCUI/gui/builder.h>
 #include "test.h"
 
-int test_border1(void)
+int test_border(void)
 {
 	int ret = 0;
 	LCUI_Widget root, box;
@@ -24,7 +23,7 @@ int test_border1(void)
 	return LCUI_Main();
 }
 
-int test_border(void)
+int test_border1(void)
 {
 	LCUI_Border b;
 	LCUI_Rect rect;
