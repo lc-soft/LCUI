@@ -560,7 +560,8 @@ static void LCUIApp_QuitAllMainLoop(void)
 
 static void LCUI_ShowCopyrightText(void)
 {
-	Logger_Log("LCUI (LC's UI) version " PACKAGE_VERSION "\n"
+	Logger_Log(LOGGER_LEVEL_INFO,
+		   "LCUI (LC's UI) version " PACKAGE_VERSION "\n"
 #ifdef _MSC_VER
 		   "Build tool: "
 #if (_MSC_VER > 1912)
@@ -583,7 +584,7 @@ static void LCUI_ShowCopyrightText(void)
 		   "Build at "__DATE__
 		   " - "__TIME__
 		   "\n"
-		   "Copyright (C) 2012-2018 Liu Chao <root@lc-soft.io>.\n"
+		   "Copyright (C) 2012-2019 Liu Chao <root@lc-soft.io>.\n"
 		   "This is open source software, licensed under MIT. \n"
 		   "See source distribution for detailed copyright notices.\n"
 		   "To learn more, visit http://www.lcui.org.\n\n");
@@ -610,6 +611,7 @@ void LCUI_InitBase(void)
 	if (System.state == STATE_ACTIVE) {
 		return;
 	}
+	Logger_SetLevel(LOGGER_LEVEL_INFO);
 	System.exit_code = 0;
 	System.state = STATE_ACTIVE;
 	System.thread = LCUIThread_SelfID();

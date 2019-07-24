@@ -971,10 +971,9 @@ int Selector_AppendNode(LCUI_Selector selector, LCUI_SelectorNode node)
 	const unsigned char *p;
 
 	if (selector->length >= MAX_SELECTOR_DEPTH) {
-		LOG("[css] warning: the number of nodes in the selector has "
-		    "exceeded "
-		    "the %d limit\n",
-		    MAX_SELECTOR_DEPTH);
+		Logger_Warning("[css] warning: the number of nodes in the "
+			       "selector has exceeded the %d limit\n",
+			       MAX_SELECTOR_DEPTH);
 		return -1;
 	}
 	selector->nodes[selector->length++] = node;
@@ -1007,7 +1006,7 @@ LCUI_Selector Selector(const char *selector)
 		if (!node && is_saving) {
 			node = NEW(LCUI_SelectorNodeRec, 1);
 			if (si >= MAX_SELECTOR_DEPTH) {
-				_DEBUG_MSG(
+				Logger_Warning(
 				    "%s: selector node list is too long.\n",
 				    selector);
 				return NULL;
@@ -1032,8 +1031,8 @@ LCUI_Selector Selector(const char *selector)
 				ni = 0;
 				continue;
 			}
-			_DEBUG_MSG("%s: invalid selector node at %ld.\n",
-				   selector, p - selector - ni);
+			Logger_Error("%s: invalid selector node at %ld.\n",
+				     selector, p - selector - ni);
 			SelectorNode_Delete(node);
 			node = NULL;
 			ni = 0;
@@ -1057,8 +1056,8 @@ LCUI_Selector Selector(const char *selector)
 				si++;
 				continue;
 			}
-			_DEBUG_MSG("%s: invalid selector node at %ld.\n",
-				   selector, p - selector - ni);
+			Logger_Error("%s: invalid selector node at %ld.\n",
+				     selector, p - selector - ni);
 			SelectorNode_Delete(node);
 			node = NULL;
 			ni = 0;
@@ -1077,15 +1076,15 @@ LCUI_Selector Selector(const char *selector)
 			name[ni] = 0;
 			continue;
 		}
-		_DEBUG_MSG("%s: unknown char 0x%02x at %ld.\n", selector, *p,
-			   p - selector);
+		Logger_Warning("%s: unknown char 0x%02x at %ld.\n",
+			       selector, *p, p - selector);
 		return NULL;
 	}
 	if (is_saving) {
 		if (!node) {
 			node = NEW(LCUI_SelectorNodeRec, 1);
 			if (si >= MAX_SELECTOR_DEPTH) {
-				_DEBUG_MSG(
+				Logger_Warning(
 				    "%s: selector node list is too long.\n",
 				    selector);
 				return NULL;
@@ -1404,61 +1403,61 @@ static void PrintStyleName(int key)
 
 	name = LCUI_GetStyleName(key);
 	if (name) {
-		LOG("\t%s", name);
+		printf("\t%s", name);
 	} else {
-		LOG("\t<unknown style %d>", key);
+		printf("\t<unknown style %d>", key);
 	}
-	LOG("%s: ", key > STYLE_KEY_TOTAL ? " (+)" : "");
+	printf("%s: ", key > STYLE_KEY_TOTAL ? " (+)" : "");
 }
 
 static void PrintStyleValue(LCUI_Style s)
 {
 	switch (s->type) {
 	case LCUI_STYPE_AUTO:
-		LOG("auto");
+		printf("auto");
 		break;
 	case LCUI_STYPE_BOOL:
-		LOG("%s", s->val_bool ? "true" : "false");
+		printf("%s", s->val_bool ? "true" : "false");
 		break;
 	case LCUI_STYPE_COLOR: {
 		LCUI_Color *clr = &s->val_color;
 		if (clr->alpha < 255) {
-			LOG("rgba(%d,%d,%d,%g)", clr->r, clr->g, clr->b,
+			printf("rgba(%d,%d,%d,%g)", clr->r, clr->g, clr->b,
 				clr->a / 255.0);
 		} else {
-			LOG("#%02x%02x%02x", clr->r, clr->g, clr->b);
+			printf("#%02x%02x%02x", clr->r, clr->g, clr->b);
 		}
 		break;
 	}
 	case LCUI_STYPE_PX:
-		LOG("%gpx", s->val_px);
+		printf("%gpx", s->val_px);
 		break;
 	case LCUI_STYPE_DIP:
-		LOG("%gdip", s->val_dip);
+		printf("%gdip", s->val_dip);
 		break;
 	case LCUI_STYPE_SP:
-		LOG("%gsp", s->val_sp);
+		printf("%gsp", s->val_sp);
 		break;
 	case LCUI_STYPE_STRING:
-		LOG("%s", s->val_string);
+		printf("%s", s->val_string);
 		break;
 	case LCUI_STYPE_WSTRING:
-		LOG("%S", s->val_wstring);
+		printf("%S", s->val_wstring);
 		break;
 	case LCUI_STYPE_SCALE:
-		LOG("%g%%", s->val_scale * 100);
+		printf("%g%%", s->val_scale * 100);
 		break;
 	case LCUI_STYPE_STYLE:
-		LOG("%s", LCUI_GetStyleValueName(s->val_style));
+		printf("%s", LCUI_GetStyleValueName(s->val_style));
 		break;
 	case LCUI_STYPE_INT:
-		LOG("%d", s->val_int);
+		printf("%d", s->val_int);
 		break;
 	default:
-		LOG("%g", s->value);
+		printf("%g", s->value);
 		break;
 	}
-	LOG(";\n");
+	printf(";\n");
 }
 
 void LCUI_PrintStyleList(LCUI_StyleList list)
@@ -1499,7 +1498,7 @@ void LCUI_PrintSelector(LCUI_Selector selector)
 		strcat(path, (*sn)->fullname);
 		strcat(path, " ");
 	}
-	LOG("path: %s (rank = %d, batch_num = %d)\n", path, selector->rank,
+	printf("path: %s (rank = %d, batch_num = %d)\n", path, selector->rank,
 	    selector->batch_num);
 }
 
@@ -1516,10 +1515,10 @@ static void LCUI_PrintStyleLink(StyleLink link, const char *selector)
 	}
 	for (LinkedList_Each(node, &link->styles)) {
 		StyleNode snode = node->data;
-		LOG("\n[%s]", snode->space ? snode->space : "<none>");
-		LOG("[rank: %d]\n%s {\n", snode->rank, fullname);
+		printf("\n[%s]", snode->space ? snode->space : "<none>");
+		printf("[rank: %d]\n%s {\n", snode->rank, fullname);
 		LCUI_PrintStyleList(snode->list);
-		LOG("}\n");
+		printf("}\n");
 	}
 	iter = Dict_GetIterator(link->parents);
 	while ((entry = Dict_Next(iter))) {
@@ -1538,7 +1537,7 @@ void LCUI_PrintCSSLibrary(void)
 	DictEntry *entry;
 
 	link = NULL;
-	LOG("style library begin\n");
+	printf("style library begin\n");
 	group = LinkedList_Get(&library.groups, 0);
 	iter = Dict_GetIterator(group);
 	while ((entry = Dict_Next(iter))) {
@@ -1554,7 +1553,7 @@ void LCUI_PrintCSSLibrary(void)
 		Dict_ReleaseIterator(iter_slg);
 	}
 	Dict_ReleaseIterator(iter);
-	LOG("style library end\n");
+	printf("style library end\n");
 }
 
 LCUI_CachedStyleSheet LCUI_GetCachedStyleSheet(LCUI_Selector s)
@@ -1596,21 +1595,21 @@ void LCUI_PrintStyleSheetsBySelector(LCUI_Selector s)
 	LinkedList_Init(&list);
 	ss = StyleSheet();
 	LCUI_FindStyleSheet(s, &list);
-	LOG("selector(%u) stylesheets begin\n", s->hash);
+	printf("selector(%u) stylesheets begin\n", s->hash);
 	for (LinkedList_Each(node, &list)) {
 		StyleNode sn = node->data;
-		LOG("\n[%s]", sn->space ? sn->space : "<none>");
-		LOG("[rank: %d]\n%s {\n", sn->rank, sn->selector);
+		printf("\n[%s]", sn->space ? sn->space : "<none>");
+		printf("[rank: %d]\n%s {\n", sn->rank, sn->selector);
 		LCUI_PrintStyleList(sn->list);
-		LOG("}\n");
+		printf("}\n");
 		StyleSheet_MergeList(ss, sn->list);
 	}
 	LinkedList_Clear(&list, NULL);
-	LOG("[selector(%u) final stylesheet] {\n", s->hash);
+	printf("[selector(%u) final stylesheet] {\n", s->hash);
 	LCUI_PrintStyleSheet(ss);
-	LOG("}\n");
+	printf("}\n");
 	StyleSheet_Delete(ss);
-	LOG("selector(%u) stylesheets end\n", s->hash);
+	printf("selector(%u) stylesheets end\n", s->hash);
 }
 
 static void StyleSheetCacheDestructor(void *privdata, void *val)

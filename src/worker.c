@@ -146,7 +146,7 @@ int LCUIWorker_RunAsync(LCUI_Worker worker)
 	}
 	worker->active = TRUE;
 	LCUIThread_Create(&worker->thread, LCUIWorker_Thread, worker);
-	LOG("[worker] worker %u is running\n", worker->thread);
+	Logger_Info("[worker] worker %u is running\n", worker->thread);
 	return 0;
 }
 
@@ -155,13 +155,13 @@ void LCUIWorker_Destroy(LCUI_Worker worker)
 	LCUI_Thread thread = worker->thread;
 
 	if (worker->active) {
-		LOG("[worker] worker %u is stopping...\n", thread);
+		Logger_Info("[worker] worker %u is stopping...\n", thread);
 		LCUIMutex_Lock(&worker->mutex);
 		worker->active = FALSE;
 		LCUICond_Signal(&worker->cond);
 		LCUIMutex_Unlock(&worker->mutex);
 		LCUIThread_Join(thread, NULL);
-		LOG("[worker] worker %u has stopped\n", thread);
+		Logger_Info("[worker] worker %u has stopped\n", thread);
 		return;
 	}
 	LCUIWorker_ExecDestroy(worker);

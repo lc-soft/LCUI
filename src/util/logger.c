@@ -42,6 +42,7 @@ static struct Logger {
 	wchar_t bufferw[BUFFER_SIZE];
 	void(*handler)(const char*);
 	void(*handlerw)(const wchar_t*);
+	LoggerLevel level;
 	LCUI_Mutex mutex;
 } logger = { 0 };
 
@@ -60,11 +61,19 @@ static void Win32Logger_LogW(const wchar_t *wcs)
 
 #endif
 
-int Logger_Log(const char* fmt, ...)
+void Logger_SetLevel(LoggerLevel level)
+{
+	logger.level = level;
+}
+
+int Logger_Log(LoggerLevel level, const char* fmt, ...)
 {
 	int len;
 	va_list args;
 
+	if (level < logger.level) {
+		return 0;
+	}
 	if (!logger.inited) {
 #ifdef LCUI_BUILD_IN_WIN32
 		logger.handler = Win32Logger_LogA;
@@ -86,11 +95,14 @@ int Logger_Log(const char* fmt, ...)
 	return len;
 }
 
-int Logger_LogW(const wchar_t* fmt, ...)
+int Logger_LogW(LoggerLevel level, const wchar_t* fmt, ...)
 {
 	int len;
 	va_list args;
 
+	if (level < logger.level) {
+		return 0;
+	}
 	if (!logger.inited) {
 #ifdef LCUI_BUILD_IN_WIN32
 		logger.handlerw = Win32Logger_LogW;

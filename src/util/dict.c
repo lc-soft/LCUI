@@ -45,13 +45,13 @@
 #include <LCUI/LCUI.h>
 
 /* Using Dict_EnableResize() / Dict_DisableResize() we make possible to
-* enable/disable resizing of the hash table as needed. This is very important
-* for Redis, as we use copy-on-write and don't want to move too much memory
-* around when there is a child performing saving operations.
-*
-* Note that even when dict_can_resize is set to 0, not all resizes are
-* prevented: an hash table is still allowed to grow if the ratio between
-* the number of elements and the buckets > dict_force_resize_ratio. */
+ * enable/disable resizing of the hash table as needed. This is very important
+ * for Redis, as we use copy-on-write and don't want to move too much memory
+ * around when there is a child performing saving operations.
+ *
+ * Note that even when dict_can_resize is set to 0, not all resizes are
+ * prevented: an hash table is still allowed to grow if the ratio between
+ * the number of elements and the buckets > dict_force_resize_ratio. */
 static int dict_can_resize = 1;
 static unsigned int dict_force_resize_ratio = 5;
 
@@ -94,7 +94,7 @@ unsigned int Dict_GetHashFunctionSeed(void)
 }
 
 /* Generic hash function (a popular one from Bernstein).
-* I tested a few and this was the best. */
+ * I tested a few and this was the best. */
 unsigned int Dict_GenHashFunction(const unsigned char *buf, int len)
 {
 	unsigned int hash = dict_hash_function_seed;
@@ -109,7 +109,8 @@ unsigned int Dict_GenCaseHashFunction(const unsigned char *buf, int len)
 {
 	unsigned int hash = dict_hash_function_seed;
 	while (len--) {
-		hash = ((hash << 5) + hash) + (tolower(*buf++)); /* hash * 33 + c */
+		hash = ((hash << 5) + hash) +
+		       (tolower(*buf++)); /* hash * 33 + c */
 	}
 	return hash;
 }
@@ -174,7 +175,7 @@ int Dict_Expand(Dict *d, unsigned long size)
 	n.used = 0;
 	n.size = realsize;
 	n.sizemask = realsize - 1;
-	n.table = calloc(realsize, sizeof(DictEntry*));
+	n.table = calloc(realsize, sizeof(DictEntry *));
 	/* 如果字典的 0 号哈希表未初始化，则将新建的哈希表作为字典的 0 号哈
 	 * 希表，否则，将新建哈希表作为字典的 1 号哈希表，并将它用于 rehash
 	 */
@@ -542,14 +543,16 @@ static int Dict_ExpandIfNeeded(Dict *d)
 		return Dict_Expand(d, DICT_HT_INITIAL_SIZE);
 	}
 	/* If we reached the 1:1 ratio, and we are allowed to resize the hash
-	* table (global setting) or we should avoid it but the ratio between
-	* elements/buckets is over the "safe" threshold, we resize doubling
-	* the number of buckets. */
+	 * table (global setting) or we should avoid it but the ratio between
+	 * elements/buckets is over the "safe" threshold, we resize doubling
+	 * the number of buckets. */
 	if (d->ht[0].used >= d->ht[0].size &&
-		(dict_can_resize ||
-		 d->ht[0].used / d->ht[0].size > dict_force_resize_ratio)) {
-		return Dict_Expand(d, ((d->ht[0].size > d->ht[0].used) ?
-				       d->ht[0].size : d->ht[0].used) * 2);
+	    (dict_can_resize ||
+	     d->ht[0].used / d->ht[0].size > dict_force_resize_ratio)) {
+		return Dict_Expand(
+		    d, ((d->ht[0].size > d->ht[0].used) ? d->ht[0].size
+							: d->ht[0].used) *
+			   2);
 	}
 	return 0;
 }
@@ -558,7 +561,8 @@ static unsigned long Dict_NextPower(unsigned long size)
 {
 	unsigned long i = DICT_HT_INITIAL_SIZE;
 
-	if (size >= LONG_MAX) return LONG_MAX;
+	if (size >= LONG_MAX)
+		return LONG_MAX;
 	while (1) {
 		if (i >= size)
 			return i;
@@ -609,7 +613,7 @@ static void Dict_PrintStatsHt(DictHashTable *ht)
 	unsigned long clvector[DICT_STATS_VECTLEN];
 	unsigned long i, slots = 0, chainlen, maxchainlen = 0;
 	if (ht->used == 0) {
-		LOG("No stats available for empty dictionaries\n");
+		Logger_Info("No stats available for empty dictionaries\n");
 		return;
 	}
 	for (i = 0; i < DICT_STATS_VECTLEN; i++) clvector[i] = 0;
@@ -636,21 +640,23 @@ static void Dict_PrintStatsHt(DictHashTable *ht)
 		}
 		totchainlen += chainlen;
 	}
-	LOG("Hash table stats:\n");
-	LOG(" table size: %ld\n", ht->size);
-	LOG(" number of elements: %ld\n", ht->used);
-	LOG(" different slots: %ld\n", slots);
-	LOG(" max chain length: %ld\n", maxchainlen);
-	LOG(" avg chain length (counted): %.02f\n", (float)totchainlen / slots);
-	LOG(" avg chain length (computed): %.02f\n", (float)ht->used / slots);
-	LOG(" Chain length distribution:\n");
+	printf("Hash table stats:\n");
+	printf(" table size: %ld\n", ht->size);
+	printf(" number of elements: %ld\n", ht->used);
+	printf(" different slots: %ld\n", slots);
+	printf(" max chain length: %ld\n", maxchainlen);
+	printf(" avg chain length (counted): %.02f\n",
+	       (float)totchainlen / slots);
+	printf(" avg chain length (computed): %.02f\n",
+	       (float)ht->used / slots);
+	printf(" Chain length distribution:\n");
 	for (i = 0; i < DICT_STATS_VECTLEN - 1; i++) {
 		if (clvector[i] == 0) {
 			continue;
 		}
-		LOG("   %s%ld: %ld (%.02f%%)\n",
-			(i == DICT_STATS_VECTLEN - 1) ? ">= " : "",
-		    i, clvector[i], ((float)clvector[i] / ht->size) * 100);
+		printf("   %s%ld: %ld (%.02f%%)\n",
+		       (i == DICT_STATS_VECTLEN - 1) ? ">= " : "", i,
+		       clvector[i], ((float)clvector[i] / ht->size) * 100);
 	}
 }
 
@@ -658,7 +664,7 @@ void Dict_PrintStats(Dict *d)
 {
 	Dict_PrintStatsHt(&d->ht[0]);
 	if (Dict_IsRehashing(d)) {
-		LOG("-- Rehashing into ht[1]:\n");
+		printf("-- Rehashing into ht[1]:\n");
 		Dict_PrintStatsHt(&d->ht[1]);
 	}
 }
@@ -704,20 +710,10 @@ static void StringCopyKeyDict_KeyDestructor(void *privdata, void *key)
 	free(key);
 }
 
-DictType DictType_StringKey = {
-	StringCopyKeyDict_KeyHash,
-	NULL,
-	NULL,
-	StringCopyKeyDict_KeyCompare,
-	NULL,
-	NULL
-};
+DictType DictType_StringKey = { StringCopyKeyDict_KeyHash,    NULL, NULL,
+				StringCopyKeyDict_KeyCompare, NULL, NULL };
 
 DictType DictType_StringCopyKey = {
-	StringCopyKeyDict_KeyHash,
-	StringCopyKeyDict_KeyDup,
-	NULL,
-	StringCopyKeyDict_KeyCompare,
-	StringCopyKeyDict_KeyDestructor,
-	NULL
+	StringCopyKeyDict_KeyHash,    StringCopyKeyDict_KeyDup,        NULL,
+	StringCopyKeyDict_KeyCompare, StringCopyKeyDict_KeyDestructor, NULL
 };

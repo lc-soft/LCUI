@@ -625,8 +625,7 @@ static void OnSurfaceEvent(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 	case LCUI_WEVENT_HIDE:
 		Surface_Hide(surface);
 		break;
-	case LCUI_WEVENT_RESIZE:
-	{
+	case LCUI_WEVENT_RESIZE: {
 		LCUI_Rect area;
 		RectFToInvalidArea(rect, &area);
 		if (sync_props) {
@@ -671,8 +670,8 @@ static void OnResize(LCUI_Event e, void *arg)
 		Widget_Resize(widget, width, height);
 	}
 	LCUI_RunFrame();
-	LOG("[display] resize: (%d,%d)\n", dpy_ev->resize.width,
-	    dpy_ev->resize.height);
+	Logger_Debug("[display] resize: (%d,%d)\n", dpy_ev->resize.width,
+		     dpy_ev->resize.height);
 }
 
 static void OnMinMaxInfo(LCUI_Event e, void *arg)
@@ -709,7 +708,7 @@ static void OnMinMaxInfo(LCUI_Event e, void *arg)
 }
 
 int LCUIDisplay_BindEvent(int event_id, LCUI_EventFunc func, void *arg,
-			  void *data, void(*destroy_data)(void *))
+			  void *data, void (*destroy_data)(void *))
 {
 	if (display.active) {
 		return display.driver->bindEvent(event_id, func, data,
@@ -724,7 +723,7 @@ int LCUI_InitDisplay(LCUI_DisplayDriver driver)
 	if (display.active) {
 		return -1;
 	}
-	LOG("[display] init ...\n");
+	Logger_Info("[display] init ...\n");
 	display.mode = 0;
 	display.driver = driver;
 	display.active = TRUE;
@@ -736,7 +735,7 @@ int LCUI_InitDisplay(LCUI_DisplayDriver driver)
 		display.driver = LCUI_CreateDisplayDriver();
 	}
 	if (!display.driver) {
-		LOG("[display] init failed\n");
+		Logger_Warning("[display] init failed\n");
 		LCUIDisplay_SetMode(LCUI_DMODE_DEFAULT);
 		LCUIDisplay_Update();
 		return -2;
@@ -749,7 +748,8 @@ int LCUI_InitDisplay(LCUI_DisplayDriver driver)
 	Widget_BindEvent(root, "surface", OnSurfaceEvent, NULL, NULL);
 	LCUIDisplay_SetMode(LCUI_DMODE_DEFAULT);
 	LCUIDisplay_Update();
-	LOG("[display] init ok, driver name: %s\n", display.driver->name);
+	Logger_Info("[display] init ok, driver name: %s\n",
+		    display.driver->name);
 	return 0;
 }
 

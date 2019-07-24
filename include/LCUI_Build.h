@@ -52,11 +52,9 @@
 #define DEBUG_MSG(format, ...)
 #endif
 
-#define LOG Logger_Log
-#define LOGW Logger_LogW
-#define _DEBUG_MSG(format, ...)                                           \
-	Logger_Log(__FILE__ " %d: %s(): " format, __LINE__, __FUNCTION__, \
-		   ##__VA_ARGS__)
+#define _DEBUG_MSG(format, ...)                                       \
+	Logger_Log(LOGGER_LEVEL_DEBUG, __FILE__ " %d: %s(): " format, \
+		   __LINE__, __FUNCTION__, ##__VA_ARGS__)
 
 #if defined(WIN32) || defined(_WIN32)
 #define LCUI_BUILD_IN_WIN32
@@ -69,7 +67,7 @@
 #define ENABLE_TOUCH_SUPPORT
 #undef LCUI_THREAD_PTHREAD
 #undef LCUI_VIDEO_DRIVER_FRAMEBUFFER
-#define PACKAGE_VERSION "1.1.0-beta"
+#define PACKAGE_VERSION "1.3.0"
 #else
 #include <LCUI/config.h>
 #ifndef _GNU_SOURCE
