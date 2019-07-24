@@ -72,7 +72,7 @@ METHODDEF(void) JPEGReader_OnErrorExit(j_common_ptr cinfo)
 	char msg[JMSG_LENGTH_MAX];
 	LCUI_JPEGError err = (LCUI_JPEGError)cinfo->err;
 	cinfo->err->format_message(cinfo, msg);
-	LOG("%s\n", msg);
+	Logger_Error("%s\n", msg);
 	longjmp(*err->reader->env, 1);
 }
 
@@ -229,7 +229,7 @@ int LCUI_InitJPEGReader(LCUI_ImageReader reader)
 	jpeg_reader->err.reader = reader;
 	return 0;
 #else
-	LOG("warning: not JPEG support!");
+	Logger_Warning("warning: not JPEG support!");
 #endif
 	return -1;
 }
@@ -283,7 +283,7 @@ int LCUI_ReadJPEG(LCUI_ImageReader reader, LCUI_Graph *graph)
 	}
 	return 0;
 #else
-	LOG("warning: not JPEG support!");
+	Logger_Warning("warning: not JPEG support!");
 #endif
 	return -ENOSYS;
 }

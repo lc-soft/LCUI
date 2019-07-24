@@ -123,30 +123,32 @@ static void LCUIProfile_Print(LCUI_Profile profile)
 	unsigned i;
 	LCUI_FrameProfile frame;
 
-	LOG("\nframes_count: %zu, time: %ld\n", profile->frames_count,
-	    profile->end_time - profile->start_time);
+	Logger_Debug("\nframes_count: %zu, time: %ld\n", profile->frames_count,
+		     profile->end_time - profile->start_time);
 	for (i = 0; i < profile->frames_count; ++i) {
 		frame = &profile->frames[i];
-		LOG("=== frame [%u/%u] ===\n", i + 1, profile->frames_count);
-		LOG("timers.count: %zu\ntimers.time: %ldms\n",
-		    frame->timers_count, frame->timers_time);
-		LOG("events.count: %zu\nevents.time: %ldms\n",
-		    frame->events_count, frame->events_time);
-		LOG("widget_tasks.time: %ldms\n"
-		    "widget_tasks.update_count: %u\n"
-		    "widget_tasks.refresh_count: %u\n"
-		    "widget_tasks.layout_count: %u\n"
-		    "widget_tasks.user_task_count: %u\n"
-		    "widget_tasks.destroy_count: %u\n"
-		    "widget_tasks.destroy_time: %ldms\n",
-		    frame->widget_tasks.time, frame->widget_tasks.update_count,
-		    frame->widget_tasks.refresh_count,
-		    frame->widget_tasks.layout_count,
-		    frame->widget_tasks.user_task_count,
-		    frame->widget_tasks.destroy_count,
-		    frame->widget_tasks.destroy_time);
-		LOG("render: %zu, %ldms, %ldms\n", frame->render_count,
-		    frame->render_time, frame->present_time);
+		Logger_Debug("=== frame [%u/%u] ===\n", i + 1,
+			     profile->frames_count);
+		Logger_Debug("timers.count: %zu\ntimers.time: %ldms\n",
+			     frame->timers_count, frame->timers_time);
+		Logger_Debug("events.count: %zu\nevents.time: %ldms\n",
+			     frame->events_count, frame->events_time);
+		Logger_Debug("widget_tasks.time: %ldms\n"
+			     "widget_tasks.update_count: %u\n"
+			     "widget_tasks.refresh_count: %u\n"
+			     "widget_tasks.layout_count: %u\n"
+			     "widget_tasks.user_task_count: %u\n"
+			     "widget_tasks.destroy_count: %u\n"
+			     "widget_tasks.destroy_time: %ldms\n",
+			     frame->widget_tasks.time,
+			     frame->widget_tasks.update_count,
+			     frame->widget_tasks.refresh_count,
+			     frame->widget_tasks.layout_count,
+			     frame->widget_tasks.user_task_count,
+			     frame->widget_tasks.destroy_count,
+			     frame->widget_tasks.destroy_time);
+		Logger_Debug("render: %zu, %ldms, %ldms\n", frame->render_count,
+			     frame->render_time, frame->present_time);
 	}
 }
 
@@ -560,7 +562,8 @@ static void LCUIApp_QuitAllMainLoop(void)
 
 static void LCUI_ShowCopyrightText(void)
 {
-	Logger_Log("LCUI (LC's UI) version " PACKAGE_VERSION "\n"
+	Logger_Log(LOGGER_LEVEL_INFO,
+		   "LCUI (LC's UI) version " PACKAGE_VERSION "\n"
 #ifdef _MSC_VER
 		   "Build tool: "
 #if (_MSC_VER > 1912)
@@ -583,7 +586,7 @@ static void LCUI_ShowCopyrightText(void)
 		   "Build at "__DATE__
 		   " - "__TIME__
 		   "\n"
-		   "Copyright (C) 2012-2018 Liu Chao <root@lc-soft.io>.\n"
+		   "Copyright (C) 2012-2019 Liu Chao <root@lc-soft.io>.\n"
 		   "This is open source software, licensed under MIT. \n"
 		   "See source distribution for detailed copyright notices.\n"
 		   "To learn more, visit http://www.lcui.org.\n\n");

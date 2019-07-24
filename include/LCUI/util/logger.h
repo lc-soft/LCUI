@@ -33,13 +33,40 @@
 
 LCUI_BEGIN_HEADER
 
-LCUI_API int Logger_Log(const char* fmt, ...);
+typedef enum LoggerLevel {
+	LOGGER_LEVEL_ALL,
+	LOGGER_LEVEL_DEBUG,
+	LOGGER_LEVEL_INFO,
+	LOGGER_LEVEL_WARNING,
+	LOGGER_LEVEL_ERROR,
+	LOGGER_LEVEL_OFF
+} LoggerLevel;
 
-LCUI_API int Logger_LogW(const wchar_t* fmt, ...);
+LCUI_API void Logger_SetLevel(LoggerLevel level);
 
-LCUI_API void Logger_SetHandler(void(*handler)(const char*));
+LCUI_API int Logger_Log(LoggerLevel level, const char* fmt, ...);
 
-LCUI_API void Logger_SetHandlerW(void(*handler)(const wchar_t*));
+LCUI_API int Logger_LogW(LoggerLevel level, const wchar_t* fmt, ...);
+
+LCUI_API void Logger_SetHandler(void (*handler)(const char*));
+
+LCUI_API void Logger_SetHandlerW(void (*handler)(const wchar_t*));
+
+#define Logger_Info(fmt, ...) Logger_Log(LOGGER_LEVEL_INFO, fmt, ##__VA_ARGS__)
+#define Logger_Debug(fmt, ...) \
+	Logger_Log(LOGGER_LEVEL_DEBUG, fmt, ##__VA_ARGS__)
+#define Logger_Warning(fmt, ...) \
+	Logger_Log(LOGGER_LEVEL_WARNING, fmt, ##__VA_ARGS__)
+#define Logger_Error(fmt, ...) \
+	Logger_Log(LOGGER_LEVEL_ERROR, fmt, ##__VA_ARGS__)
+#define Logger_InfoW(fmt, ...) \
+	Logger_LogW(LOGGER_LEVEL_INFO, fmt, ##__VA_ARGS__)
+#define Logger_DebugW(fmt, ...) \
+	Logger_LogW(LOGGER_LEVEL_DEBUG, fmt, ##__VA_ARGS__)
+#define Logger_WarningW(fmt, ...) \
+	Logger_LogW(LOGGER_LEVEL_WARNING, fmt, ##__VA_ARGS__)
+#define Logger_ErrorW(fmt, ...) \
+	Logger_LogW(LOGGER_LEVEL_ERROR, fmt, ##__VA_ARGS__)
 
 LCUI_END_HEADER
 

@@ -51,8 +51,7 @@ static struct LCUI_Anchor {
 	LCUI_WidgetPrototype proto;
 } self;
 
-static void Loader_OnClearWidget(LCUI_Widget w,
-				 LCUI_WidgetEvent e, void *arg)
+static void Loader_OnClearWidget(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 {
 	LCUI_XMLLoader loader = e->data;
 	loader->widget = NULL;
@@ -121,10 +120,9 @@ static void XMLLoader_Load(LCUI_XMLLoader loader)
 	char *path, dirname[] = "assets/views/";
 
 	if (loader->filepath[0] != '/') {
-		path = malloc(strsize(loader->filepath) +
-			      sizeof(dirname));
+		path = malloc(strsize(loader->filepath) + sizeof(dirname));
 		if (!path) {
-			LOG("[anchor] out of memory\n");
+			Logger_Error("[anchor] out of memory\n");
 			return;
 		}
 		strcpy(path, dirname);
@@ -133,8 +131,8 @@ static void XMLLoader_Load(LCUI_XMLLoader loader)
 		free(path);
 		if (pack) {
 			loader->pack = pack;
-			LCUI_PostSimpleTask(XMLLoader_AppendToTarget,
-					    loader, NULL);
+			LCUI_PostSimpleTask(XMLLoader_AppendToTarget, loader,
+					    NULL);
 			return;
 		}
 	}
@@ -144,7 +142,7 @@ static void XMLLoader_Load(LCUI_XMLLoader loader)
 		LCUI_PostSimpleTask(XMLLoader_AppendToTarget, loader, NULL);
 		return;
 	}
-	LOG("[anchor] href (%s): cannot load xml resource\n",
+	Logger_Error("[anchor] href (%s): cannot load xml resource\n",
 	    loader->filepath);
 	XMLLoader_Destroy(loader);
 }
@@ -155,7 +153,8 @@ static void XMLLoader_StartLoad(LCUI_XMLLoader loader)
 	LCUI_TaskRec task = { 0 };
 	target = LCUIWidget_GetById(loader->target_id);
 	if (!target) {
-		LOG("[anchor] target (%s): not found\n", loader->target_id);
+		Logger_Error("[anchor] target (%s): not found\n",
+			     loader->target_id);
 		return;
 	}
 	Widget_Empty(target);
@@ -170,7 +169,7 @@ void Anchor_Open(LCUI_Widget w)
 	const char *attr_href = Widget_GetAttribute(w, "href");
 
 	if (!attr_href) {
-		LOG("[anchor] href are required\n");
+		Logger_Error("[anchor] href are required\n");
 		return;
 	}
 	if (strstr(attr_href, "file:") == attr_href) {
@@ -184,7 +183,7 @@ void Anchor_Open(LCUI_Widget w)
 	}
 	loader = XMLLoader_New(w);
 	if (!loader) {
-		LOG("[anchor] out of memory\n");
+		Logger_Error("[anchor] out of memory\n");
 		return;
 	}
 	LCUI_PostSimpleTask(XMLLoader_StartLoad, loader, NULL);

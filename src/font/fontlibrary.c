@@ -90,7 +90,8 @@ static struct LCUI_FontLibraryModule {
 
 /* clang-format on */
 
-#define FontBitmap_IsValid(fbmp) ((fbmp) && (fbmp)->width > 0 && (fbmp)->rows > 0)
+#define FontBitmap_IsValid(fbmp) \
+	((fbmp) && (fbmp)->width > 0 && (fbmp)->rows > 0)
 #define SelectChar(ch) (RBTree *)RBTree_GetData(&fontlib.bitmap_cache, ch)
 #define SelectFont(ch, font_id) (RBTree *)RBTree_GetData(ch, font_id)
 #define SelectBitmap(font, size) (LCUI_FontBitmap *)RBTree_GetData(font, size)
@@ -145,7 +146,7 @@ static int SetFontCache(LCUI_Font font)
 	LCUI_FontCache *caches, cache;
 
 	if (font->id > FONT_CACHE_MAX_SIZE) {
-		LOG("[font] font cache size is the max size\n");
+		Logger_Error("[font] font cache size is the max size\n");
 		return -1;
 	}
 	while (font->id >= fontlib.font_cache_num * FONT_CACHE_SIZE) {
@@ -310,7 +311,8 @@ size_t LCUIFont_UpdateWeight(const int *font_ids, LCUI_FontWeight weight,
 	if (!font_ids) {
 		return 0;
 	}
-	for (len = 0; font_ids[len]; ++len);
+	for (len = 0; font_ids[len]; ++len)
+		;
 	if (len < 1) {
 		return 0;
 	}
@@ -515,7 +517,7 @@ void LCUIFont_SetDefault(int id)
 	LCUI_Font font = LCUIFont_GetById(id);
 	if (font) {
 		fontlib.default_font = font;
-		LOG("[font] select: %s\n", font->family_name);
+		Logger_Info("[font] select: %s\n", font->family_name);
 	}
 }
 
@@ -621,20 +623,20 @@ static int LCUIFont_LoadFileEx(LCUI_FontEngine *engine, const char *file)
 	LCUI_Font *fonts;
 	int i, num_fonts, id;
 
-	LOG("[font] load file: %s\n", file);
+	Logger_Debug("[font] load file: %s\n", file);
 	if (!engine) {
 		return -1;
 	}
 	num_fonts = fontlib.engine->open(file, &fonts);
 	if (num_fonts < 1) {
-		LOG("[font] failed to load file: %s\n", file);
+		Logger_Debug("[font] failed to load file: %s\n", file);
 		return -2;
 	}
 	for (i = 0; i < num_fonts; ++i) {
 		fonts[i]->engine = engine;
 		id = LCUIFont_Add(fonts[i]);
-		LOG("[font] add family: %s, style name: %s, id: %d\n",
-		    fonts[i]->family_name, fonts[i]->style_name, id);
+		Logger_Info("[font] add family: %s, style name: %s, id: %d\n",
+			    fonts[i]->family_name, fonts[i]->style_name, id);
 	}
 	free(fonts);
 	return 0;
@@ -648,11 +650,11 @@ int LCUIFont_LoadFile(const char *filepath)
 /** 打印字体位图的信息 */
 void FontBitmap_PrintInfo(LCUI_FontBitmap *bitmap)
 {
-	LOG("address:%p\n", bitmap);
+	printf("address:%p\n", bitmap);
 	if (!bitmap) {
 		return;
 	}
-	LOG("top: %d, left: %d, width:%d, rows:%d\n", bitmap->top, bitmap->left,
+	printf("top: %d, left: %d, width:%d, rows:%d\n", bitmap->top, bitmap->left,
 	    bitmap->width, bitmap->rows);
 }
 
@@ -704,16 +706,16 @@ int FontBitmap_Print(LCUI_FontBitmap *fontbmp)
 		m = y * fontbmp->width;
 		for (x = 0; x < fontbmp->width; ++x, ++m) {
 			if (fontbmp->buffer[m] > 128) {
-				LOG("#");
+				printf("#");
 			} else if (fontbmp->buffer[m] > 64) {
-				LOG("-");
+				printf("-");
 			} else {
-				LOG(" ");
+				printf(" ");
 			}
 		}
-		LOG("\n");
+		printf("\n");
 	}
-	LOG("\n");
+	printf("\n");
 	return 0;
 }
 
@@ -857,10 +859,10 @@ static void LCUIFont_InitEngine(void)
 	}
 #endif
 	if (fontlib.engine && fontlib.engine != &fontlib.engines[0]) {
-		LOG("[font] current font engine is: %s\n",
+		Logger_Info("[font] current font engine is: %s\n",
 		    fontlib.engine->name);
 	} else {
-		LOG("[font] warning: not font engine support!\n");
+		Logger_Warning("[font] warning: not font engine support!\n");
 	}
 }
 
@@ -976,7 +978,7 @@ static void LCUIFont_LoadDefaultFonts(void)
 #ifdef LCUI_BUILD_IN_WIN32
 	LCUIFont_LoadFontsForWindows();
 #elif defined(USE_FONTCONFIG)
-	LOG("[font] fontconfig enabled\n");
+	Logger_Info("[font] fontconfig enabled\n");
 	LCUIFont_LoadFontsByFontConfig();
 #else
 	LCUIFont_LoadFontsForLinux();

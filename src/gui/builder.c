@@ -272,20 +272,23 @@ static void ParseNode(XMLParserContext ctx, xmlNodePtr node)
 		if (node->type == XML_ELEMENT_NODE) {
 			p = RBTree_CustomGetData(&self.parsers, node->name);
 			if (!p) {
-				proto = LCUIWidget_GetPrototype(node->name);
+				proto =
+				    LCUIWidget_GetPrototype((char *)node->name);
 				/* If there is no suitable parser, but a widget
 				 * prototype with the same name already exists,
 				 * use the widget parser
 				 */
 				if (proto) {
 					p = &parser_list[1];
+				} else {
+					continue;
 				}
 			}
 		} else {
 			p = ctx->parent_parser;
-		}
-		if (!p) {
-			continue;
+			if (!p) {
+				continue;
+			}
 		}
 		cur_ctx = *ctx;
 		cur_ctx.parent_widget = ctx->widget;
@@ -298,12 +301,12 @@ static void ParseNode(XMLParserContext ctx, xmlNodePtr node)
 		case PB_NEXT:
 			break;
 		case PB_WARNING:
-			LOG("[builder] %s (%d): warning: %s node.\n",
+			Logger_Warning("[builder] %s (%d): warning: %s node.\n",
 			    node->doc->name, node->line, node->name);
 			break;
 		case PB_ERROR:
 		default:
-			LOG("[builder] %s (%d): error: %s node.\n",
+			Logger_Error("[builder] %s (%d): error: %s node.\n",
 			    node->doc->name, node->line, node->name);
 			break;
 		}
@@ -317,7 +320,7 @@ static void ParseNode(XMLParserContext ctx, xmlNodePtr node)
 LCUI_Widget LCUIBuilder_LoadString(const char *str, int size)
 {
 #ifndef USE_LCUI_BUILDER
-	LOG(WARN_TXT);
+	Logger_Warning(WARN_TXT);
 #else
 	xmlDocPtr doc;
 	xmlNodePtr cur;
@@ -326,12 +329,12 @@ LCUI_Widget LCUIBuilder_LoadString(const char *str, int size)
 	memset(&ctx, 0, sizeof(ctx));
 	doc = xmlParseMemory(str, size);
 	if (!doc) {
-		LOG("[builder] Failed to parse xml form memory\n");
+		Logger_Error("[builder] Failed to parse xml form memory\n");
 		goto FAILED;
 	}
 	cur = xmlDocGetRootElement(doc);
 	if (xmlStrcasecmp(cur->name, BAD_CAST "lcui-app")) {
-		LOG("[builder] error root node name: %s\n", cur->name);
+		Logger_Error("[builder] error root node name: %s\n", cur->name);
 		goto FAILED;
 	}
 	if (!self.active) {
@@ -350,7 +353,7 @@ FAILED:
 LCUI_Widget LCUIBuilder_LoadFile(const char *filepath)
 {
 #ifndef USE_LCUI_BUILDER
-	LOG(WARN_TXT);
+	Logger_Warning(WARN_TXT);
 #else
 	xmlDocPtr doc;
 	xmlNodePtr cur;
@@ -360,12 +363,13 @@ LCUI_Widget LCUIBuilder_LoadFile(const char *filepath)
 	ctx.space = filepath;
 	doc = xmlParseFile(filepath);
 	if (!doc) {
-		LOG("[builder] Failed to parse xml file: %s\n", filepath);
+		Logger_Error("[builder] Failed to parse xml file: %s\n",
+			     filepath);
 		goto FAILED;
 	}
 	cur = xmlDocGetRootElement(doc);
 	if (xmlStrcasecmp(cur->name, BAD_CAST "lcui-app")) {
-		LOG("[builder] error root node name: %s\n", cur->name);
+		Logger_Error("[builder] error root node name: %s\n", cur->name);
 		goto FAILED;
 	}
 	if (!self.active) {

@@ -2,32 +2,32 @@
 extern int tests_count;
 
 #define TEST_LOG(format, ...) \
-	Logger_Log("[test] %s(): " format, __FUNCTION__, ##__VA_ARGS__)
+	Logger_Info("[test] %s(): " format, __FUNCTION__, ##__VA_ARGS__)
 
 #define PRINT_TEST_RESULT(N) \
-	Logger_Log("[test] %d tests, %d pass.\n", tests_count, tests_count + N)
+	Logger_Info("[test] %d tests, %d pass.\n", tests_count, tests_count + N)
 
-#define CHECK(X)                                                       \
-	do {                                                           \
-		tests_count += 1;                                      \
-		LOG("[test] %s(): %s. # %s\n", __FUNCTION__, "" #X "", \
-		    (X) ? "PASS" : (ret -= 1, "NO PASS!"));            \
+#define CHECK(X)                                                               \
+	do {                                                                   \
+		tests_count += 1;                                              \
+		Logger_Info("[test] %s(): %s. # %s\n", __FUNCTION__, "" #X "", \
+			    (X) ? "PASS" : (ret -= 1, "NO PASS!"));            \
 	} while (0);
 
-#define CHECK_WITH_TEXT(TEXT, X)                                   \
-	do {                                                       \
-		tests_count += 1;                                  \
-		LOG("[test] %s(): %s. # %s\n", __FUNCTION__, TEXT, \
-		    (X) ? "PASS" : (ret -= 1, "NO PASS!"));        \
-	} while (0);
-
-#define CHECK2(X)                                                          \
+#define CHECK_WITH_TEXT(TEXT, X)                                           \
 	do {                                                               \
-		if (!(X)) {                                                \
-			LOG("[test] %s(): %s. # NO PASS!\n", __FUNCTION__, \
-			    "" #X "");                                     \
-			ret -= 1;                                          \
-		}                                                          \
+		tests_count += 1;                                          \
+		Logger_Info("[test] %s(): %s. # %s\n", __FUNCTION__, TEXT, \
+			    (X) ? "PASS" : (ret -= 1, "NO PASS!"));        \
+	} while (0);
+
+#define CHECK2(X)                                                    \
+	do {                                                         \
+		if (!(X)) {                                          \
+			Logger_Info("[test] %s(): %s. # NO PASS!\n", \
+				    __FUNCTION__, "" #X "");         \
+			ret -= 1;                                    \
+		}                                                    \
 	} while (0);
 
 int test_charset(void);

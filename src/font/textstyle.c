@@ -314,7 +314,6 @@ const wchar_t *ScanStyleEndingTag(const wchar_t *wstr, wchar_t *name)
 	size_t i, j, len;
 
 	len = wcslen(wstr);
-	//LOG("string: %S\n", wstr);
 	if (wstr[0] != '[' || wstr[1] != '/') {
 		return NULL;
 	}

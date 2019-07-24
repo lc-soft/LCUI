@@ -39,17 +39,18 @@
 
 void Graph_PrintInfo(LCUI_Graph *graph)
 {
-	LOG("address:%p\n", graph);
+	printf("address:%p\n", graph);
 	if (!graph) {
 		return;
 	}
 
-	LOG("width:%d, ", graph->width);
-	LOG("height:%d, ", graph->height);
-	LOG("opacity:%.2f, ", graph->opacity);
-	LOG("%s\n", graph->color_type == LCUI_COLOR_TYPE_ARGB ? "RGBA" : "RGB");
+	printf("width:%d, ", graph->width);
+	printf("height:%d, ", graph->height);
+	printf("opacity:%.2f, ", graph->opacity);
+	printf("%s\n",
+	       graph->color_type == LCUI_COLOR_TYPE_ARGB ? "RGBA" : "RGB");
 	if (graph->quote.is_valid) {
-		LOG("graph src:");
+		printf("graph src:");
 		Graph_PrintInfo(Graph_GetQuote(graph));
 	}
 }
@@ -701,7 +702,7 @@ static uchar_t Graph_BilinearResamplingCore(uchar_t a, uchar_t b, uchar_t c,
 					    uchar_t d, float dx, float dy)
 {
 	return (uchar_t)(a * (1 - dx) * (1 - dy) + b * (dx) * (1 - dy) +
-	       c * (dy) * (1 - dx) + d * (dx * dy));
+			 c * (dy) * (1 - dx) + d * (dx * dy));
 }
 
 /*-------------------------------- End ARGB --------------------------------*/
@@ -1043,8 +1044,8 @@ int Graph_ZoomBilinear(const LCUI_Graph *graph, LCUI_Graph *buff,
 	if (graph->color_type != LCUI_COLOR_TYPE_RGB &&
 	    graph->color_type != LCUI_COLOR_TYPE_ARGB) {
 		/* fall back to nearest scaling */
-		LOG("[graph] unable to perform bilinear scaling, "
-		    "fallback...\n");
+		Logger_Debug("[graph] unable to perform bilinear scaling, "
+			     "fallback...\n");
 		return Graph_Zoom(graph, buff, keep_scale, width, height);
 	}
 	if (!Graph_IsValid(graph) || (width <= 0 && height <= 0)) {
