@@ -40,8 +40,7 @@ LCUI is a freely available software library for building user interfaces. It is 
 
 ### Features
 
-- **Written in C:** Suitable for small applications written primarily in C.
-- **Trad language binding:** [Trad](https://github.com/lc-soft/trad) is a language designed for LCUI, it makes it easier to create interactive UIs.
+- **Written in C:** Suitable for small applications written primarily in C.language designed for LCUI, it makes it easier to create interactive UIs.
 - **Cross platform:** Support for Windows and Linux, you can write Windows Desktop apps and Universal Windows Platform apps, as well as Linux Desktop apps.
 - **XML parsing:** Support for using XML markup language to describe the structure of the graphical user interface.
 - **CSS parsing:** Support for using a simplified version of CSS to describe the presentation of the graphical user interface. The CSS version used does not support all the features of CSS, like `transition`, `transform`, `animation`, `@media`, `@key-frames` etc, you can read the file [css_parser.c](https://github.com/lc-soft/LCUI/blob/53e268251a53bf371ca7aaa7862ec69fb4d0015a/src/gui/css_parser.c#L550) for more details.
