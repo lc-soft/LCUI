@@ -213,12 +213,15 @@ typedef struct LCUI_BoxShadowStyle {
 	LCUI_Color color;
 } LCUI_BoxShadowStyle;
 
-/** 盒形阴影相关参数 */
 typedef struct LCUI_BoxShadow {
-	int x, y;         /**< 位置 */
-	int blur;         /**< 模糊距离 */
-	int spread;       /**< 扩散大小 */
-	LCUI_Color color; /**<　颜色　*/
+	int x, y;
+	int blur;
+	int spread;
+	LCUI_Color color;
+	unsigned int top_left_radius;
+	unsigned int top_right_radius;
+	unsigned int bottom_left_radius;
+	unsigned int bottom_right_radius;
 } LCUI_BoxShadow;
 
 typedef struct LCUI_BorderStyle {

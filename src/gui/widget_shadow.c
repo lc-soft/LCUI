@@ -159,15 +159,24 @@ float Widget_GetCanvasHeight(LCUI_Widget widget)
 	return height + SHADOW_WIDTH(shadow) * 2;
 }
 
+#define ComputeActual(X) LCUIMetrics_ComputeActual(X, LCUI_STYPE_PX)
+
 void Widget_ComputeBoxShadow(LCUI_Widget w, LCUI_BoxShadow *out)
 {
 	LCUI_BoxShadowStyle *s;
+	LCUI_BorderStyle *b;
+
+	b = &w->computed_style.border;
 	s = &w->computed_style.shadow;
-	out->x = LCUIMetrics_ComputeActual(s->x, LCUI_STYPE_PX);
-	out->y = LCUIMetrics_ComputeActual(s->y, LCUI_STYPE_PX);
-	out->blur = LCUIMetrics_ComputeActual(s->blur, LCUI_STYPE_PX);
-	out->spread = LCUIMetrics_ComputeActual(s->spread, LCUI_STYPE_PX);
+	out->x = ComputeActual(s->x);
+	out->y = ComputeActual(s->y);
+	out->blur = ComputeActual(s->blur);
+	out->spread = ComputeActual(s->spread);
 	out->color = s->color;
+	out->top_left_radius = ComputeActual(b->top_left_radius);
+	out->top_right_radius = ComputeActual(b->top_right_radius);
+	out->bottom_left_radius = ComputeActual(b->bottom_left_radius);
+	out->bottom_right_radius = ComputeActual(b->bottom_right_radius);
 }
 
 void Widget_PaintBoxShadow(LCUI_Widget w, LCUI_PaintContext paint,

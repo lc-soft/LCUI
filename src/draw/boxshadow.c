@@ -1,7 +1,7 @@
 ﻿/*
- * boxshadow.c -- Box shadow draw support.
+ * boxshadow.c -- Box shadow drawing
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -224,13 +224,15 @@ static void BoxShadow_PaintTopLeft(const LCUI_BoxShadow *sd,
 	LCUI_Pos pos;
 	LCUI_Rect bound;
 	LCUI_Graph canvas;
+	unsigned radius = BLUR_WIDTH(sd) + sd->top_left_radius;
+
 	/* 计算阴影边界区域，相对于部件内容框 */
-	bound.width = bound.height = BLUR_WIDTH(sd);
+	bound.width = bound.height = radius;
 	bound.x = box->x + BoxShadow_GetX(sd);
 	bound.y = box->y + BoxShadow_GetY(sd);
 	/* 确定圆心的坐标 */
-	pos.x = bound.x + BLUR_WIDTH(sd);
-	pos.y = bound.y + BLUR_WIDTH(sd);
+	pos.x = bound.x + radius;
+	pos.y = bound.y + radius;
 	if (LCUIRect_GetOverlayRect(&bound, &paint->rect, &bound)) {
 		Graph_Init(&canvas);
 		/* 将圆心的坐标转换为相对于边界区域 */
@@ -242,7 +244,7 @@ static void BoxShadow_PaintTopLeft(const LCUI_BoxShadow *sd,
 		/* 从绘制区域中引用实际的绘制区域 */
 		Graph_Quote(&canvas, &paint->canvas, &bound);
 		/* 在该区域里绘制阴影 */
-		DrawCircle(&canvas, pos, BLUR_WIDTH(sd), sd->color);
+		DrawCircle(&canvas, pos, radius, sd->color);
 	}
 }
 
@@ -253,12 +255,14 @@ static void BoxShadow_PaintTopRight(const LCUI_BoxShadow *sd,
 	LCUI_Pos pos;
 	LCUI_Rect bound;
 	LCUI_Graph canvas;
-	bound.width = bound.height = BLUR_WIDTH(sd);
+	unsigned radius = BLUR_WIDTH(sd) + sd->top_right_radius;
+
+	bound.width = bound.height = radius;
 	bound.y = box->y + BoxShadow_GetY(sd);
 	bound.x = box->x + BoxShadow_GetX(sd);
 	bound.x += BoxShadow_GetBoxWidth(sd, box->width);
-	bound.x += BLUR_WIDTH(sd) + INNER_SHADOW_WIDTH(sd) * 2;
-	pos.y = bound.y + BLUR_WIDTH(sd);
+	bound.x += radius + INNER_SHADOW_WIDTH(sd) * 2;
+	pos.y = bound.y + radius;
 	pos.x = bound.x;
 	if (LCUIRect_GetOverlayRect(&bound, &paint->rect, &bound)) {
 		Graph_Init(&canvas);
@@ -267,7 +271,7 @@ static void BoxShadow_PaintTopRight(const LCUI_BoxShadow *sd,
 		bound.x -= paint->rect.x;
 		bound.y -= paint->rect.y;
 		Graph_Quote(&canvas, &paint->canvas, &bound);
-		DrawCircle(&canvas, pos, BLUR_WIDTH(sd), sd->color);
+		DrawCircle(&canvas, pos, radius, sd->color);
 	}
 }
 
@@ -278,12 +282,14 @@ static void BoxShadow_PaintBottomLeft(const LCUI_BoxShadow *sd,
 	LCUI_Pos pos;
 	LCUI_Rect bound;
 	LCUI_Graph canvas;
+	unsigned radius = BLUR_WIDTH(sd) + sd->bottom_left_radius;
+
 	bound.x = box->x + BoxShadow_GetX(sd);
 	bound.y = box->y + BoxShadow_GetY(sd);
 	bound.y += BoxShadow_GetBoxHeight(sd, box->height);
-	bound.y += INNER_SHADOW_WIDTH(sd) * 2 + BLUR_WIDTH(sd);
-	bound.width = bound.height = BLUR_WIDTH(sd);
-	pos.x = bound.x + BLUR_WIDTH(sd);
+	bound.y += INNER_SHADOW_WIDTH(sd) * 2 + radius;
+	bound.width = bound.height = radius;
+	pos.x = bound.x + radius;
 	pos.y = bound.y;
 	if (LCUIRect_GetOverlayRect(&bound, &paint->rect, &bound)) {
 		pos.x -= bound.x;
@@ -291,7 +297,7 @@ static void BoxShadow_PaintBottomLeft(const LCUI_BoxShadow *sd,
 		bound.x -= paint->rect.x;
 		bound.y -= paint->rect.y;
 		Graph_Quote(&canvas, &paint->canvas, &bound);
-		DrawCircle(&canvas, pos, BLUR_WIDTH(sd), sd->color);
+		DrawCircle(&canvas, pos, radius, sd->color);
 	}
 }
 
@@ -302,9 +308,11 @@ static void BoxShadow_PaintBottomRight(const LCUI_BoxShadow *sd,
 	LCUI_Pos pos;
 	LCUI_Rect bound;
 	LCUI_Graph canvas;
-	bound.width = bound.height = BLUR_WIDTH(sd);
-	bound.x = BoxShadow_GetX(sd) + BLUR_WIDTH(sd);
-	bound.y = BoxShadow_GetY(sd) + BLUR_WIDTH(sd);
+	unsigned radius = BLUR_WIDTH(sd) + sd->bottom_right_radius;
+
+	bound.width = bound.height = radius;
+	bound.x = BoxShadow_GetX(sd) + radius;
+	bound.y = BoxShadow_GetY(sd) + radius;
 	bound.x += BoxShadow_GetBoxWidth(sd, box->width);
 	bound.y += BoxShadow_GetBoxHeight(sd, box->height);
 	bound.y += INNER_SHADOW_WIDTH(sd) * 2 + box->x;
@@ -317,7 +325,7 @@ static void BoxShadow_PaintBottomRight(const LCUI_BoxShadow *sd,
 		bound.x -= paint->rect.x;
 		bound.y -= paint->rect.y;
 		Graph_Quote(&canvas, &paint->canvas, &bound);
-		DrawCircle(&canvas, pos, BLUR_WIDTH(sd), sd->color);
+		DrawCircle(&canvas, pos, radius, sd->color);
 	}
 }
 
@@ -346,7 +354,7 @@ static void BoxShadow_PaintTop(const LCUI_BoxShadow *sd,
 	box_area.width = BoxShadow_GetBoxWidth(sd, box->width);
 	box_area.height = BoxShadow_GetBoxHeight(sd, box->height);
 	/* 计算需要绘制的阴影区域 */
-	shadow_area.x = BoxShadow_GetX(sd) + BLUR_WIDTH(sd);
+	shadow_area.x = BoxShadow_GetX(sd) + BLUR_WIDTH(sd) + sd->top_left_radius;
 	shadow_area.y = BoxShadow_GetY(sd);
 	shadow_area.width = box_area.width + INNER_SHADOW_WIDTH(sd) * 2;
 	shadow_area.height = BLUR_WIDTH(sd);
@@ -575,12 +583,13 @@ static void BoxShadow_PaintInner(const LCUI_BoxShadow *s,
 	int i;
 	LCUI_Graph canvas;
 	LCUI_Rect rsd, rb, rects[4];
+
 	rb.x = BoxShadow_GetBoxX(s);
 	rb.y = BoxShadow_GetBoxY(s);
 	rb.width = BoxShadow_GetBoxWidth(s, box->width);
 	rb.height = BoxShadow_GetBoxHeight(s, box->height);
-	rsd.x = BoxShadow_GetX(s) + BLUR_WIDTH(s);
-	rsd.y = BoxShadow_GetY(s) + BLUR_WIDTH(s);
+	rsd.x = BoxShadow_GetX(s) + BLUR_WIDTH(s) + s->top_left_radius;
+	rsd.y = BoxShadow_GetY(s) + BLUR_WIDTH(s) + s->top_left_radius;
 	rsd.width = rb.width + INNER_SHADOW_WIDTH(s) * 2;
 	rsd.height = rb.height + INNER_SHADOW_WIDTH(s) * 2;
 	/* 截取出与内容区重叠的区域 */

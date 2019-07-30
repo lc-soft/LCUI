@@ -1,7 +1,7 @@
 ﻿/*
  * widget_boarder.c -- widget border style processing module.
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,10 +28,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <string.h>
 #include <math.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <string.h>
+#include <LCUI.h>
 #include <LCUI/gui/metrics.h>
 #include <LCUI/gui/widget.h>
 
@@ -120,6 +119,7 @@ void Widget_ComputeBorderStyle(LCUI_Widget w)
 static unsigned int ComputeActual(float width)
 {
 	unsigned int w;
+
 	w = LCUIMetrics_ComputeActual(width, LCUI_STYPE_PX);
 	if (width > 0 && w < 1) {
 		return 1;
