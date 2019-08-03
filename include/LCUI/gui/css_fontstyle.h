@@ -1,7 +1,7 @@
 ﻿/*
  * css_fontstyle.h -- CSS font style parse and operation set.
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -71,19 +71,19 @@ typedef struct LCUI_CSSFontStyleRec_ {
 
 /* clang-format off */
 
-int LCUI_GetFontStyleKey(int key);
+LCUI_API int LCUI_GetFontStyleKey(int key);
 
-void CSSFontStyle_Init(LCUI_CSSFontStyle fs);
+LCUI_API void CSSFontStyle_Init(LCUI_CSSFontStyle fs);
 
-void CSSFontStyle_Destroy(LCUI_CSSFontStyle fs);
+LCUI_API void CSSFontStyle_Destroy(LCUI_CSSFontStyle fs);
 
-void CSSFontStyle_Compute(LCUI_CSSFontStyle fs, LCUI_StyleSheet ss);
+LCUI_API void CSSFontStyle_Compute(LCUI_CSSFontStyle fs, LCUI_StyleSheet ss);
 
-void CSSFontStyle_GetTextStyle(LCUI_CSSFontStyle fs, LCUI_TextStyle ts);
+LCUI_API void CSSFontStyle_GetTextStyle(LCUI_CSSFontStyle fs, LCUI_TextStyle ts);
 
-void LCUI_InitCSSFontStyle(void);
+LCUI_API void LCUI_InitCSSFontStyle(void);
 
-void LCUI_FreeCSSFontStyle(void);
+LCUI_API void LCUI_FreeCSSFontStyle(void);
 
 LCUI_END_HEADER
 
