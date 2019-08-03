@@ -1,0 +1,58 @@
+{
+  "name": "LCUI",
+  "version": "1.3.0",
+  "description": "A small C library for building user interfaces with C, XML and CSS.",
+  "author": "Liu",
+  "arch": [
+    "x86",
+    "x64"
+  ],
+  "platform": [
+    "windows",
+    "uwp"
+  ],
+  "mode": [
+    "debug",
+    "release"
+  ],
+  "package": {
+    "output": "dist",
+    "entry": {
+      "lib": "bin/${arch}-${platform}/${mode}",
+      "bin": "bin/${arch}-${platform}/${mode}",
+      "include": "include"
+    }
+  },
+  "dependencies": {
+    "libxml2-lite": {
+      "version": "latest",
+      "uri": "vcpkg:libxml2-lite",
+      "linkage": "static"
+    },
+    "libpng": {
+      "version": "latest",
+      "uri": "vcpkg:libpng",
+      "linkage": "static"
+    },
+    "libjpeg-turbo": {
+      "version": "latest",
+      "uri": "vcpkg:libjpeg-turbo",
+      "linkage": "static"
+    },
+    "freetype": {
+      "version": "latest",
+      "uri": "vcpkg:freetype",
+      "linkage": "static"
+    },
+    "zlib": {
+      "version": "latest",
+      "uri": "vcpkg:zlib",
+      "linkage": "static"
+    },
+    "bzip2": {
+      "version": "latest",
+      "uri": "vcpkg:bzip2",
+      "linkage": "static"
+    }
+  }
+}
