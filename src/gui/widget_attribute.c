@@ -87,20 +87,19 @@ int Widget_SetAttributeEx(LCUI_Widget w, const char *name, void *value,
 int Widget_SetAttribute(LCUI_Widget w, const char *name, const char *value)
 {
 	int ret;
-	char *value_str;
+	char *value_str = NULL;
 
-	if (strcmp(name, "disabled") == 0) {
-		if (!value || strcmp(value, "false") != 0) {
-			Widget_SetDisabled(w, TRUE);
-		} else {
-			Widget_SetDisabled(w, FALSE);
-		}
-		return 0;
-	}
 	if (value) {
 		value_str = strdup2(value);
 		if (!value_str) {
 			return -ENOMEM;
+		}
+		if (strcmp(name, "disabled") == 0) {
+			if (!value || strcmp(value, "false") != 0) {
+				Widget_SetDisabled(w, TRUE);
+			} else {
+				Widget_SetDisabled(w, FALSE);
+			}
 		}
 		ret = Widget_SetAttributeEx(w, name, value_str,
 					    LCUI_STYPE_STRING, free);
@@ -109,7 +108,7 @@ int Widget_SetAttribute(LCUI_Widget w, const char *name, const char *value)
 					    NULL);
 	}
 	if (w->proto && w->proto->setattr) {
-		w->proto->setattr(w, name, value);
+		w->proto->setattr(w, name, value_str);
 	}
 	return ret;
 }
