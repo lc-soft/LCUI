@@ -1,0 +1,5 @@
+The package libxml2-lite is compatible with built-in CMake targets:
+
+    find_package(libxml2-lite REQUIRED)
+    target_include_directories(main PRIVATE ${LIBXML2_LITE_INCLUDE_DIR})
+    target_link_libraries(main PRIVATE ${LIBXML2_LITE_LIBRARIES})

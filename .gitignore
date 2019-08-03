@@ -73,3 +73,5 @@ test/*
 !test/*.jpg
 !test/*.bmp
 !test/*.png
+lcpkg/*
+!lcpkg/ports
