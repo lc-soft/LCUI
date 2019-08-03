@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -23,6 +23,8 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>LCUI</RootNamespace>
     <WindowsTargetPlatformVersion>7.0</WindowsTargetPlatformVersion>
+    <VcpkgTriplet Condition="'$(Platform)'=='Win32'">x86-windows-static</VcpkgTriplet>
+    <VcpkgTriplet Condition="'$(Platform)'=='x64'">x64-windows-static</VcpkgTriplet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -119,7 +121,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>LCUI_EXPORTS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\;$(SolutionDir)..\..\include\;$(SolutionDir)..\..\vendor\include\;$(SolutionDir)..\..\vendor\include\freetype2\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\;$(SolutionDir)..\..\include\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\include\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\include\libxml2-lite\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsC</CompileAs>
       <DisableSpecificWarnings>4819;4244;4996;</DisableSpecificWarnings>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -134,11 +136,11 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib\$(PlatformTarget)-windows\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\debug\lib\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT;LIBCMTD;MSVCRT;</IgnoreSpecificDefaultLibraries>
       <LinkStatus>false</LinkStatus>
       <ShowProgress>NotSet</ShowProgress>
-      <AdditionalDependencies>libxml2.lib;freetype.lib;libpng16.lib;zlib.lib;jpeg.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libxml2-lite.lib;freetyped.lib;libpng16d.lib;bz2d.lib;zlibd.lib;jpegd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <Culture>0x0804</Culture>
@@ -153,7 +155,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>LCUI_EXPORTS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\;$(SolutionDir)..\..\include\;$(SolutionDir)..\..\vendor\include\;$(SolutionDir)..\..\vendor\include\freetype2\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\;$(SolutionDir)..\..\include\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\include\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\include\libxml2-lite\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsC</CompileAs>
       <DisableSpecificWarnings>4819;4244;4996;</DisableSpecificWarnings>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -168,8 +170,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libxml2.lib;freetype.lib;libpng16.lib;zlib.lib;jpeg.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib\$(PlatformTarget)-windows\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2-lite.lib;freetyped.lib;libpng16d.lib;bz2d.lib;zlibd.lib;jpegd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\debug\lib\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT;LIBCMTD;MSVCRT;</IgnoreSpecificDefaultLibraries>
       <LinkStatus>false</LinkStatus>
     </Link>
@@ -188,7 +190,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>LCUI_EXPORTS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\;$(SolutionDir)..\..\include\;$(SolutionDir)..\..\vendor\include\;$(SolutionDir)..\..\vendor\include\freetype2\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\;$(SolutionDir)..\..\include\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\include\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\include\libxml2-lite\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsC</CompileAs>
       <DisableSpecificWarnings>4819;4244;4996</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -200,10 +202,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib\$(PlatformTarget)-windows\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\lib\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT;LIBCMTD;MSVCRTD;</IgnoreSpecificDefaultLibraries>
       <ShowProgress>NotSet</ShowProgress>
-      <AdditionalDependencies>libxml2.lib;freetype.lib;libpng16.lib;zlib.lib;jpeg.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libxml2-lite.lib;freetype.lib;libpng16.lib;bz2.lib;zlib.lib;jpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
       <AdditionalDependencies>libpng16.lib;libxml2.lib;jpeg.lib;freetype271.lib;zlib.lib;</AdditionalDependencies>
@@ -231,7 +233,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>LCUI_EXPORTS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\;$(SolutionDir)..\..\include\;$(SolutionDir)..\..\vendor\include\;$(SolutionDir)..\..\vendor\include\freetype2\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\;$(SolutionDir)..\..\include\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\include\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\include\libxml2-lite\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsC</CompileAs>
       <DisableSpecificWarnings>4819;4244;4996</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -243,8 +245,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libxml2.lib;freetype.lib;libpng16.lib;zlib.lib;jpeg.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib\$(PlatformTarget)-windows\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2-lite.lib;freetype.lib;libpng16.lib;bz2.lib;zlib.lib;jpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\lib\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT;LIBCMTD;MSVCRTD;</IgnoreSpecificDefaultLibraries>
     </Link>
     <Lib>
@@ -283,6 +285,7 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\anchor.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\button.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\canvas.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\scrollbar.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\sidebar.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\textcaret.h" />
@@ -366,6 +369,7 @@
     <ClCompile Include="..\..\..\src\gui\widget.c" />
     <ClCompile Include="..\..\..\src\gui\widget\anchor.c" />
     <ClCompile Include="..\..\..\src\gui\widget\button.c" />
+    <ClCompile Include="..\..\..\src\gui\widget\canvas.c" />
     <ClCompile Include="..\..\..\src\gui\widget\scrollbar.c" />
     <ClCompile Include="..\..\..\src\gui\widget\sidebar.c" />
     <ClCompile Include="..\..\..\src\gui\widget\textcaret.c" />

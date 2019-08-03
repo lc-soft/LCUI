@@ -1,6 +1,6 @@
-AUTOMAKE_OPTIONS=foreign
+AUTOMAKE_OPTIONS=subdir-objects foreign
 ##设定在编译时头文件的查找位置
-AM_CFLAGS = -I$(top_builddir)/include $(CODE_COVERAGE_CFLAGS)
+AM_CFLAGS = -I$(top_srcdir)/include $(CODE_COVERAGE_CFLAGS)
 ##需要编译的测试程序, noinst指的是不安装
 noinst_PROGRAMS = helloworld test test_charset test_touch test_char_render \
 test_string_render test_widget_render test_widget_layout  test_widget_rect \
