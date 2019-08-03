@@ -947,7 +947,7 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 		ev.button.x = pos.x;
 		ev.button.y = pos.y;
 		ev.button.button = sys_ev->button.button;
-		Widget_PostEvent(target, &ev, NULL, NULL);
+		Widget_TriggerEvent(target, &ev, NULL);
 		self.click.interval = DBLCLICK_INTERVAL;
 		if (ev.button.button == LCUI_KEY_LEFTBUTTON &&
 		    self.click.widget == target) {
@@ -969,7 +969,7 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 		ev.button.x = pos.x;
 		ev.button.y = pos.y;
 		ev.button.button = sys_ev->button.button;
-		Widget_PostEvent(target, &ev, NULL, NULL);
+		Widget_TriggerEvent(target, &ev, NULL);
 		if (self.targets[WST_ACTIVE] != target ||
 		    ev.button.button != LCUI_KEY_LEFTBUTTON) {
 			self.click.x = 0;
@@ -980,7 +980,7 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 			break;
 		}
 		ev.type = LCUI_WEVENT_CLICK;
-		Widget_PostEvent(target, &ev, NULL, NULL);
+		Widget_TriggerEvent(target, &ev, NULL);
 		Widget_OnMouseDownEvent(NULL);
 		if (self.click.widget != target) {
 			self.click.x = 0;
@@ -995,7 +995,7 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 			self.click.y = 0;
 			self.click.time = 0;
 			self.click.widget = NULL;
-			Widget_PostEvent(target, &ev, NULL, NULL);
+			Widget_TriggerEvent(target, &ev, NULL);
 		}
 		Widget_OnMouseDownEvent(NULL);
 		break;
@@ -1008,14 +1008,14 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 			self.click.time = 0;
 			self.click.widget = NULL;
 		}
-		Widget_PostEvent(target, &ev, NULL, NULL);
+		Widget_TriggerEvent(target, &ev, NULL);
 		break;
 	case LCUI_MOUSEWHEEL:
 		ev.type = LCUI_WEVENT_MOUSEWHEEL;
 		ev.wheel.x = pos.x;
 		ev.wheel.y = pos.y;
 		ev.wheel.delta = sys_ev->wheel.delta;
-		Widget_PostEvent(target, &ev, NULL, NULL);
+		Widget_TriggerEvent(target, &ev, NULL);
 	default:
 		return;
 	}
