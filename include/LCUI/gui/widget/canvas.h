@@ -38,9 +38,11 @@ typedef struct LCUI_CanvasRenderingContextRec_ *LCUI_CanvasRenderingContext;
 typedef LCUI_CanvasRenderingContext LCUI_CanvasContext;
 
 struct LCUI_CanvasRenderingContextRec_ {
+	LCUI_BOOL available;
 	LCUI_Color fill_color;
 	LCUI_Graph buffer;
 	LCUI_Widget canvas;
+	LinkedListNode node;
 
 	float scale;
 	int width;
@@ -48,6 +50,7 @@ struct LCUI_CanvasRenderingContextRec_ {
 
 	void (*fillRect)(LCUI_CanvasContext, int, int, int, int);
 	void (*clearRect)(LCUI_CanvasContext, int, int, int, int);
+	void (*release)(LCUI_CanvasContext);
 };
 
 LCUI_API LCUI_CanvasContext Canvas_GetContext(LCUI_Widget w);

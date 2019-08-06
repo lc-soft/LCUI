@@ -36,6 +36,7 @@
 
 typedef struct CanvasRec_ {
 	LCUI_Graph buffer;
+	LinkedList contexts;
 } CanvasRec, *Canvas;
 
 struct {
@@ -64,8 +65,23 @@ static void Canvas_OnInit(LCUI_Widget w)
 	Canvas canvas = Widget_AddData(w, self.proto, sizeof(CanvasRec));
 
 	Graph_Init(&canvas->buffer);
+	LinkedList_Init(&canvas->contexts);
 	Widget_BindEventById(w, LCUI_WEVENT_RESIZE, Canvas_OnResize, NULL,
 			     NULL);
+}
+
+static void Canvas_OnDestroy(LCUI_Widget w)
+{
+	LinkedListNode *node;
+	LCUI_CanvasContext ctx;
+	Canvas canvas = Widget_AddData(w, self.proto, sizeof(CanvasRec));
+
+	for (LinkedList_Each(node, &canvas->contexts)) {
+		ctx = node->data;
+		ctx->available = FALSE;
+	}
+	LinkedList_ClearData(&canvas->contexts, NULL);
+	Graph_Free(&canvas->buffer);
 }
 
 static void Canvas_AutoSize(LCUI_Widget w, float *width, float *height)
@@ -123,12 +139,24 @@ static void CanvasContext_FillRect(LCUI_CanvasContext ctx, int x, int y,
 	Graph_FillRect(&ctx->buffer, ctx->fill_color, &rect, TRUE);
 }
 
+static void CanvasContext_Release(LCUI_CanvasContext ctx)
+{
+	Canvas canvas;
+
+	if (ctx->available) {
+		canvas = Widget_GetData(ctx->canvas, self.proto);
+		LinkedList_Unlink(&canvas->contexts, &ctx->node);
+	}
+	free(ctx);
+}
+
 LCUI_CanvasContext Canvas_GetContext(LCUI_Widget w)
 {
 	ASSIGN(ctx, LCUI_CanvasRenderingContext);
 	Canvas canvas = Widget_GetData(w, self.proto);
 
 	ctx->canvas = w;
+	ctx->available = TRUE;
 	ctx->buffer = canvas->buffer;
 	ctx->width = ctx->buffer.width;
 	ctx->height = ctx->buffer.height;
@@ -136,6 +164,10 @@ LCUI_CanvasContext Canvas_GetContext(LCUI_Widget w)
 	ctx->scale = LCUIMetrics_GetScale();
 	ctx->clearRect = CanvasContext_ClearRect;
 	ctx->fillRect = CanvasContext_FillRect;
+	ctx->release = CanvasContext_Release;
+	ctx->node.data = ctx;
+	ctx->node.next = ctx->node.prev = NULL;
+	LinkedList_AppendNode(&canvas->contexts, &ctx->node);
 	return ctx;
 }
 
@@ -143,6 +175,7 @@ void LCUIWidget_AddCanvas(void)
 {
 	self.proto = LCUIWidget_NewPrototype("canvas", NULL);
 	self.proto->init = Canvas_OnInit;
+	self.proto->destroy = Canvas_OnDestroy;
 	self.proto->paint = Canvas_OnPaint;
 	self.proto->autosize = Canvas_AutoSize;
 }
