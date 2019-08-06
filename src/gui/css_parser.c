@@ -1,7 +1,7 @@
 ﻿/*
  * css_parser.c -- css code parser module
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -397,6 +397,10 @@ static int OnParseBorderColor(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	LCUI_StyleRec s;
 
+	// TODO: support parsing multiple values
+	// border-color: #eee transparent;
+	// border-color: #f00 #0f0 transparent;
+	// border-color: #0f0 #f00 #f00 #0f0;
 	if (!ParseColor(&s, str)) {
 		return -1;
 	}
@@ -411,6 +415,10 @@ static int OnParseBorderWidth(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	LCUI_StyleRec s;
 
+	// TODO: support parsing multiple values
+	// border-width: 4px 0;
+	// border-width: 4px 8px 0;
+	// border-width: 4px 0 0 4px;
 	if (!ParseNumber(&s, str)) {
 		return -1;
 	}
@@ -542,6 +550,10 @@ static int OnParseBoxShadow(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBackground(LCUI_CSSParserStyleContext ctx, const char *str)
 {
+	// TODO: support parsing multiple values
+	// background: #eee;
+	// background: url(image.png);
+	// background: url(image.png) bottom center #eee;
 	return 0;
 }
 
