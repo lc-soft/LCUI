@@ -42,8 +42,7 @@ LCUI_Rect Rect(int x, int y, int w, int h)
 	return r;
 }
 
-void LCUIRect_ToRectF(const LCUI_Rect *rect,
-		      LCUI_RectF *rectf, float scale)
+void LCUIRect_ToRectF(const LCUI_Rect *rect, LCUI_RectF *rectf, float scale)
 {
 	rectf->x = rect->x * scale;
 	rectf->y = rect->y * scale;
@@ -51,8 +50,7 @@ void LCUIRect_ToRectF(const LCUI_Rect *rect,
 	rectf->height = rect->height * scale;
 }
 
-void LCUIRect_Scale(const LCUI_Rect *src,
-		    LCUI_Rect *dst, float scale)
+void LCUIRect_Scale(const LCUI_Rect *src, LCUI_Rect *dst, float scale)
 {
 	dst->x = iround(src->x * scale);
 	dst->y = iround(src->y * scale);
@@ -60,8 +58,7 @@ void LCUIRect_Scale(const LCUI_Rect *src,
 	dst->height = iround(src->height * scale);
 }
 
-void LCUIRectF_ToRect(const LCUI_RectF *rectf,
-		      LCUI_Rect *rect, float scale)
+void LCUIRectF_ToRect(const LCUI_RectF *rectf, LCUI_Rect *rect, float scale)
 {
 	rect->x = iround(rectf->x * scale);
 	rect->y = iround(rectf->y * scale);
@@ -70,8 +67,7 @@ void LCUIRectF_ToRect(const LCUI_RectF *rectf,
 }
 
 /* FIXME: need new shorter name */
-void LCUIRect_GetCutArea(int box_w, int box_h,
-			 LCUI_Rect rect, LCUI_Rect *cut)
+void LCUIRect_GetCutArea(int box_w, int box_h, LCUI_Rect rect, LCUI_Rect *cut)
 {
 	cut->x = 0;
 	cut->y = 0;
@@ -188,8 +184,7 @@ LCUI_BOOL LCUIRect_IsCoverRect(LCUI_Rect *rect1, LCUI_Rect *rect2)
 }
 
 /* FIXME: need new shorter name */
-LCUI_BOOL LCUIRect_GetOverlayRect(const LCUI_Rect *a,
-				  const LCUI_Rect *b,
+LCUI_BOOL LCUIRect_GetOverlayRect(const LCUI_Rect *a, const LCUI_Rect *b,
 				  LCUI_Rect *out)
 {
 	if (a->x > b->x) {
@@ -228,8 +223,7 @@ LCUI_BOOL LCUIRect_GetOverlayRect(const LCUI_Rect *a,
 	return TRUE;
 }
 
-LCUI_BOOL LCUIRectF_GetOverlayRect(const LCUI_RectF *a,
-				   const LCUI_RectF *b,
+LCUI_BOOL LCUIRectF_GetOverlayRect(const LCUI_RectF *a, const LCUI_RectF *b,
 				   LCUI_RectF *out)
 {
 	if (a->x > b->x) {
@@ -317,6 +311,72 @@ void LCUIRect_CutFourRect(LCUI_Rect *rect1, LCUI_Rect *rect2,
 	rects[3].height = rect1->y - rect2->y;
 }
 
+void LCUIRect_Split(LCUI_Rect *base, LCUI_Rect *target, LCUI_Rect rects[4])
+{
+	if (LCUIRect_IsIncludeRect(base, target)) {
+		LCUIRect_CutFourRect(base, target, rects);
+		return;
+	}
+	/* Right */
+	if (target->x >= base->x) {
+		/* Top */
+		if (target->y < base->y) {
+			rects[0].x = target->x;
+			rects[0].y = target->y;
+			rects[0].width = target->width;
+			rects[0].height = base->y - target->y;
+			rects[1].x = base->x + base->width;
+			rects[1].y = base->y;
+			rects[1].width =
+			    target->x + target->width - base->x - base->width;
+			rects[1].height = target->y + target->height - base->y;
+		} else {
+			/* Bottom */
+			rects[0].x = base->x + base->width;
+			rects[0].y = target->y;
+			rects[0].width =
+			    target->x + target->width - base->x - base->width;
+			rects[0].height = target->height;
+			rects[1].x = target->x;
+			rects[1].y = base->y + base->height;
+			rects[1].width = base->x + base->width - target->x;
+			rects[1].height =
+			    target->y + target->height - base->y - base->height;
+		}
+	} else {
+		/* Top */
+		if (target->y < base->y) {
+			rects[0].x = target->x;
+			rects[0].y = target->y;
+			rects[0].width = target->width;
+			rects[0].height = base->y - target->y;
+			rects[1].x = target->x;
+			rects[1].y = base->y;
+			rects[1].width = base->x - target->x;
+			rects[1].height = target->y + target->height - base->y;
+		} else {
+			/* Bottom */
+			rects[0].x = target->x;
+			rects[0].y = target->y;
+			rects[0].width = base->x - target->x;
+			rects[0].height = target->height;
+			rects[1].x = base->x;
+			rects[1].y = base->y + base->height;
+			rects[1].width = target->x + target->width - base->x;
+			rects[1].height =
+			    target->y + target->height - base->y - base->height;
+		}
+	}
+	rects[2].x = 0;
+	rects[2].y = 0;
+	rects[2].width = 0;
+	rects[2].height = 0;
+	rects[3].x = 0;
+	rects[3].y = 0;
+	rects[3].width = 0;
+	rects[3].height = 0;
+}
+
 int RectList_Add(LinkedList *list, LCUI_Rect *rect)
 {
 	LCUI_Rect *added_rect, union_rect;
@@ -380,8 +440,8 @@ int RectList_Delete(LinkedList *list, LCUI_Rect *rect)
 			LinkedList_DeleteNode(list, node);
 			node = prev;
 			for (i = 0; i < 4; ++i) {
-				if (tmp_rect[i].width <= 0
-				    || tmp_rect[i].height <= 0) {
+				if (tmp_rect[i].width <= 0 ||
+				    tmp_rect[i].height <= 0) {
 					continue;
 				}
 				LinkedList_Insert(list, 0, &tmp_rect[0]);

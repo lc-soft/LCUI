@@ -8,7 +8,8 @@ int main(void)
 {
 	int ret = 0;
 
-	ret += test_border();
+	//ret += test_border();
+	ret += test_box_shadow();
 	/*
 	ret += test_charset();
 	ret += test_linkedlist();

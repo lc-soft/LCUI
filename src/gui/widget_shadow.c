@@ -57,6 +57,7 @@ static void Widget_ComputeBoxShadowStyle(LCUI_Widget w)
 	int key;
 	LCUI_Style s;
 	LCUI_BoxShadowStyle *sd;
+
 	sd = &w->computed_style.shadow;
 	memset(sd, 0, sizeof(LCUI_BoxShadowStyle));
 	for (key = key_box_shadow_start; key <= key_box_shadow_end; ++key) {
@@ -80,7 +81,8 @@ static void Widget_ComputeBoxShadowStyle(LCUI_Widget w)
 		case key_box_shadow_color:
 			sd->color = s->color;
 			break;
-		default: break;
+		default:
+			break;
 		}
 	}
 }
@@ -92,10 +94,10 @@ void Widget_UpdateBoxShadow(LCUI_Widget w)
 	LCUI_Rect rects[4], rb, rg;
 	LCUI_BoxShadowStyle *sd = &w->computed_style.shadow;
 	LCUI_BoxShadowStyle old_sd = w->computed_style.shadow;
+
 	Widget_ComputeBoxShadowStyle(w);
 	/* 如果阴影变化并未导致图层尺寸变化，则只重绘阴影 */
-	if (sd->x == old_sd.x && sd->y == old_sd.y &&
-	    sd->blur == old_sd.blur) {
+	if (sd->x == old_sd.x && sd->y == old_sd.y && sd->blur == old_sd.blur) {
 		LCUIRectF_ToRect(&w->box.border, &rb, 1.0f);
 		LCUIRectF_ToRect(&w->box.canvas, &rg, 1.0f);
 		LCUIRect_CutFourRect(&rb, &rg, rects);
@@ -114,6 +116,7 @@ void Widget_UpdateBoxShadow(LCUI_Widget w)
 float Widget_GetBoxShadowOffsetX(LCUI_Widget w)
 {
 	const LCUI_BoxShadowStyle *shadow;
+
 	shadow = &w->computed_style.shadow;
 	if (shadow->x >= SHADOW_WIDTH(shadow)) {
 		return 0;
@@ -124,6 +127,7 @@ float Widget_GetBoxShadowOffsetX(LCUI_Widget w)
 float Widget_GetBoxShadowOffsetY(LCUI_Widget w)
 {
 	const LCUI_BoxShadowStyle *shadow;
+
 	shadow = &w->computed_style.shadow;
 	if (shadow->y >= SHADOW_WIDTH(shadow)) {
 		return 0;
@@ -135,6 +139,7 @@ float Widget_GetCanvasWidth(LCUI_Widget widget)
 {
 	float width;
 	const LCUI_BoxShadowStyle *shadow;
+
 	width = widget->box.border.width;
 	shadow = &widget->computed_style.shadow;
 	if (shadow->x >= SHADOW_WIDTH(shadow)) {
@@ -149,6 +154,7 @@ float Widget_GetCanvasHeight(LCUI_Widget widget)
 {
 	float height;
 	const LCUI_BoxShadowStyle *shadow;
+
 	height = widget->box.border.height;
 	shadow = &widget->computed_style.shadow;
 	if (shadow->y >= SHADOW_WIDTH(shadow)) {
@@ -186,5 +192,6 @@ void Widget_PaintBoxShadow(LCUI_Widget w, LCUI_PaintContext paint,
 	box.x = box.y = 0;
 	box.width = style->canvas_box.width;
 	box.height = style->canvas_box.height;
-	BoxShadow_Paint(&style->shadow, &box, paint);
+	BoxShadow_Paint(&style->shadow, &box, style->content_box.width,
+			style->content_box.height, paint);
 }

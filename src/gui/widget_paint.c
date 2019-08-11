@@ -271,9 +271,9 @@ void LCUIWidget_FreeRenderer(void)
 static void Widget_OnPaint(LCUI_Widget w, LCUI_PaintContext paint,
 			   LCUI_WidgetActualStyle style)
 {
-	Widget_PaintBoxShadow(w, paint, style);
 	Widget_PaintBakcground(w, paint, style);
 	Widget_PaintBorder(w, paint, style);
+	Widget_PaintBoxShadow(w, paint, style);
 	if (w->proto && w->proto->paint) {
 		w->proto->paint(w, paint, style);
 	}

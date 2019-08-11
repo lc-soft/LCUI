@@ -218,10 +218,10 @@ typedef struct LCUI_BoxShadow {
 	int blur;
 	int spread;
 	LCUI_Color color;
-	unsigned int top_left_radius;
-	unsigned int top_right_radius;
-	unsigned int bottom_left_radius;
-	unsigned int bottom_right_radius;
+	int top_left_radius;
+	int top_right_radius;
+	int bottom_left_radius;
+	int bottom_right_radius;
 } LCUI_BoxShadow;
 
 typedef struct LCUI_BorderStyle {

@@ -42,6 +42,14 @@
 #define BLUR_WIDTH(sd) (int)(sd->blur * BLUR_N)
 #define INNER_SHADOW_WIDTH(sd) (SHADOW_WIDTH(sd) - BLUR_WIDTH(sd))
 
+typedef struct BoxShadowRenderingContextRec {
+	const LCUI_BoxShadow *shadow;
+	const LCUI_Rect *box;
+	LCUI_Rect shadow_box;
+	LCUI_Rect content_box;
+	LCUI_PaintContext paint;
+} BoxShadowRenderingContextRec, *BoxShadowRenderingContext;
+
 typedef struct gradient {
 	int s;
 	float v;
@@ -67,6 +75,10 @@ static uchar_t gradient_compute(gradient_t *g, int t, int val)
 	return (uchar_t)(val >> 8);
 }
 
+/**
+ * Get width of content box
+ * @param w canvas box width
+ */
 int BoxShadow_GetBoxWidth(const LCUI_BoxShadow *shadow, int w)
 {
 	w -= SHADOW_WIDTH(shadow) * 2;
@@ -95,24 +107,14 @@ int BoxShadow_GetBoxHeight(const LCUI_BoxShadow *shadow, int h)
 	return h;
 }
 
-int BoxShadow_GetWidth(const LCUI_BoxShadow *shadow, int box_w)
+int BoxShadow_GetWidth(const LCUI_BoxShadow *shadow, int content_width)
 {
-	if (shadow->x >= SHADOW_WIDTH(shadow)) {
-		return box_w + SHADOW_WIDTH(shadow) + shadow->x;
-	} else if (shadow->x <= -SHADOW_WIDTH(shadow)) {
-		return box_w + SHADOW_WIDTH(shadow) - shadow->x;
-	}
-	return box_w + SHADOW_WIDTH(shadow) * 2;
+	return content_width + SHADOW_WIDTH(shadow) * 2;
 }
 
-int BoxShadow_GetHeight(const LCUI_BoxShadow *shadow, int box_h)
+int BoxShadow_GetHeight(const LCUI_BoxShadow *shadow, int content_height)
 {
-	if (shadow->y >= SHADOW_WIDTH(shadow)) {
-		return box_h + SHADOW_WIDTH(shadow) + shadow->y;
-	} else if (shadow->y <= -SHADOW_WIDTH(shadow)) {
-		return box_h + SHADOW_WIDTH(shadow) - shadow->y;
-	}
-	return box_h + SHADOW_WIDTH(shadow) * 2;
+	return content_height + SHADOW_WIDTH(shadow) * 2;
 }
 
 int BoxShadow_GetBoxX(const LCUI_BoxShadow *shadow)
@@ -573,50 +575,6 @@ static void BoxShadow_PaintRight(const LCUI_BoxShadow *sd, const LCUI_Rect *box,
 	}
 }
 
-static void BoxShadow_PaintInner(const LCUI_BoxShadow *s, const LCUI_Rect *box,
-				 LCUI_PaintContext paint)
-{
-	int i;
-	LCUI_Graph canvas;
-	LCUI_Rect shadow_rect, box_rect, rects[4];
-
-	/* Get widget content box */
-	box_rect.x = BoxShadow_GetBoxX(s);
-	box_rect.y = BoxShadow_GetBoxY(s);
-	box_rect.width = BoxShadow_GetBoxWidth(s, box->width);
-	box_rect.height = BoxShadow_GetBoxHeight(s, box->height);
-	/* Get shadow box */
-	shadow_rect.x = BoxShadow_GetX(s) + BLUR_WIDTH(s) + s->top_left_radius;
-	shadow_rect.y = BoxShadow_GetY(s) + BLUR_WIDTH(s) + s->top_left_radius;
-	shadow_rect.width = box_rect.width + INNER_SHADOW_WIDTH(s) * 2;
-	shadow_rect.height = box_rect.height + INNER_SHADOW_WIDTH(s) * 2;
-	/* If widget content box overlaps with shadow box */
-	if (LCUIRect_GetOverlayRect(&box_rect, &shadow_rect, &box_rect)) {
-		/* Split the shadow box to exclude the area of the widget's
-		 * content box */
-		LCUIRect_CutFourRect(&box_rect, &shadow_rect, rects);
-		for (i = 0; i < 4; ++i) {
-			/* If this rectangle is not in the paint rectangle then
-			 * ignore it */
-			if (!LCUIRect_GetOverlayRect(&paint->rect, &rects[i],
-						     &rects[i])) {
-				continue;
-			}
-			rects[i].x -= paint->rect.x;
-			rects[i].y -= paint->rect.y;
-			Graph_Quote(&canvas, &paint->canvas, &rects[i]);
-			Graph_FillRect(&canvas, s->color, NULL, TRUE);
-		}
-		return;
-	}
-	if (LCUIRect_GetOverlayRect(&paint->rect, &shadow_rect, &box_rect)) {
-		box_rect.x -= paint->rect.x;
-		box_rect.y -= paint->rect.y;
-		Graph_Quote(&canvas, &paint->canvas, &box_rect);
-		Graph_FillRect(&canvas, s->color, NULL, TRUE);
-	}
-}
-
 void BoxShadow_Init(LCUI_BoxShadow *shadow)
 {
 	shadow->color.r = 0;
@@ -631,21 +589,158 @@ void BoxShadow_Init(LCUI_BoxShadow *shadow)
 void BoxShadow_GetCanvasRect(const LCUI_BoxShadow *shadow,
 			     const LCUI_Rect *box_rect, LCUI_Rect *canvas_rect)
 {
-	canvas_rect->x = box_rect->x - BoxShadow_GetBoxX(shadow);
-	canvas_rect->y = box_rect->y - BoxShadow_GetBoxY(shadow);
-	canvas_rect->width = BoxShadow_GetWidth(shadow, box_rect->width);
-	canvas_rect->height = BoxShadow_GetHeight(shadow, box_rect->height);
+	LCUI_Rect shadow_rect;
+
+	shadow_rect.x = box_rect->x - SHADOW_WIDTH(shadow) + shadow->x;
+	shadow_rect.y = box_rect->y - SHADOW_WIDTH(shadow) + shadow->y;
+	shadow_rect.width = BoxShadow_GetWidth(shadow, box_rect->width);
+	shadow_rect.height = BoxShadow_GetHeight(shadow, box_rect->height);
+	canvas_rect->x = min(box_rect->x, shadow_rect.x);
+	canvas_rect->y = min(box_rect->x, shadow_rect.x);
+	canvas_rect->width = max(shadow_rect.x + shadow_rect.width,
+				 box_rect->x + box_rect->width) -
+			     canvas_rect->x;
+	canvas_rect->height = max(shadow_rect.y + shadow_rect.height,
+				  box_rect->y + box_rect->height) -
+			      canvas_rect->y;
+}
+
+/** Check if a pixel is in the content area */
+static LCUI_BOOL BoxShadow_CheckPixelInContentBox(BoxShadowRenderingContext ctx,
+						  int x, int y)
+{
+	x -= ctx->content_box.x;
+	y -= ctx->content_box.y;
+	if (x < 0 || x >= ctx->content_box.width || y < 0 ||
+	    y >= ctx->content_box.height) {
+		return FALSE;
+	}
+	if (x < ctx->shadow->top_left_radius &&
+	    y < ctx->shadow->top_left_radius) {
+		return x * x + y * y <= ctx->shadow->top_left_radius;
+	}
+	if (x >= ctx->content_box.width - ctx->shadow->top_right_radius &&
+	    y < ctx->shadow->top_right_radius) {
+		x -= ctx->content_box.width - ctx->shadow->top_right_radius;
+		return x * x + y * y <= ctx->shadow->top_right_radius;
+	}
+	if (x < ctx->shadow->bottom_left_radius &&
+	    y >= ctx->content_box.height - ctx->shadow->bottom_left_radius) {
+		y -= ctx->content_box.height - ctx->shadow->bottom_left_radius;
+		return x * x + y * y <= ctx->shadow->bottom_left_radius;
+	}
+	if (x >= ctx->content_box.width - ctx->shadow->bottom_right_radius &&
+	    y >= ctx->content_box.height - ctx->shadow->bottom_right_radius) {
+		x -= ctx->content_box.width - ctx->shadow->bottom_right_radius;
+		y -= ctx->content_box.height - ctx->shadow->bottom_right_radius;
+		return x * x + y * y <= ctx->shadow->bottom_right_radius;
+	}
+	return TRUE;
+}
+
+static LCUI_BOOL FillPixelsOutsideCircle(BoxShadowRenderingContext ctx,
+					 const LCUI_Rect *circle_rect,
+					 int center_x, int center_y, int radius)
+{
+	int x, y;
+	int y2, x2;
+	int r2 = radius * radius;
+
+	LCUI_Rect rect;
+	LCUI_Graph ref;
+	LCUI_Graph *canvas;
+	LCUI_ARGB *pixel;
+
+	if (!LCUIRect_GetOverlayRect(&ctx->shadow_box, circle_rect, &rect)) {
+		return FALSE;
+	}
+	if (!LCUIRect_GetOverlayRect(&ctx->paint->rect, &rect, &rect)) {
+		return FALSE;
+	}
+	center_x = circle_rect->x + center_x - rect.x;
+	center_y = circle_rect->y + center_y - rect.y;
+	rect.x -= ctx->paint->rect.x;
+	rect.y -= ctx->paint->rect.y;
+	Graph_Quote(&ref, &ctx->paint->canvas, &rect);
+	Graph_GetValidRect(&ref, &rect);
+	canvas = Graph_GetQuote(&ref);
+	for (y = 0; y < rect.height; ++y) {
+		y2 = (y - center_y) * (y - center_y);
+		pixel = canvas->argb + (rect.y + y) * canvas->width + rect.x;
+		for (x = 0; x < rect.width; ++x, ++pixel) {
+			x2 = (x - center_x) * (x - center_x);
+			if (y2 + x2 <= r2) {
+				continue;
+			}
+			LCUI_OverPixel(pixel, &ctx->shadow->color);
+		}
+	}
+	return TRUE;
+}
+
+static void BoxShadow_FillRect(BoxShadowRenderingContext ctx)
+{
+	int i;
+
+	LCUI_Rect rect;
+	LCUI_Rect rects[4];
+
+	/* Fill the shaded area, not including the content area */
+	LCUIRect_Split(&ctx->content_box, &ctx->shadow_box, rects);
+	for (i = 0; i < 4; ++i) {
+		if (rects[i].width < 1 || rects[i].height < 1) {
+			continue;
+		}
+		LCUIRect_GetOverlayRect(&rects[i], &ctx->paint->rect, &rect);
+		Graph_FillRect(&ctx->paint->canvas, ctx->shadow->color, &rect,
+			       TRUE);
+	}
+	rect.width = rect.height = ctx->shadow->top_left_radius;
+	rect.x = ctx->content_box.x;
+	rect.y = ctx->content_box.y;
+	FillPixelsOutsideCircle(ctx, &rect, rect.width, rect.width, rect.width);
+
+	rect.width = rect.height = ctx->shadow->top_right_radius;
+	rect.x = ctx->content_box.x + ctx->content_box.width - rect.width;
+	rect.y = ctx->content_box.y;
+	FillPixelsOutsideCircle(ctx, &rect, 0, rect.height, rect.width);
+
+	rect.width = rect.height = ctx->shadow->bottom_left_radius;
+	rect.x = ctx->content_box.x;
+	rect.y = ctx->content_box.y + ctx->content_box.height - rect.height;
+	FillPixelsOutsideCircle(ctx, &rect, rect.width, 0, rect.width);
+	
+	rect.width = rect.height = ctx->shadow->bottom_right_radius;
+	rect.x = ctx->content_box.x + ctx->content_box.width - rect.width;
+	rect.y = ctx->content_box.y + ctx->content_box.height - rect.height;
+	FillPixelsOutsideCircle(ctx, &rect, 0, 0, rect.width);
 }
 
 int BoxShadow_Paint(const LCUI_BoxShadow *shadow, const LCUI_Rect *box,
+		    int content_width, int content_height,
 		    LCUI_PaintContext paint)
 {
+	BoxShadowRenderingContextRec ctx;
+
 	/* 判断容器尺寸是否低于阴影占用的最小尺寸 */
 	if (box->width < BoxShadow_GetWidth(shadow, 0) ||
 	    box->height < BoxShadow_GetHeight(shadow, 0)) {
 		return -1;
 	}
-	BoxShadow_PaintInner(shadow, box, paint);/*
+	ctx.box = box;
+	ctx.paint = paint;
+	ctx.shadow = shadow;
+	ctx.shadow_box.x = BoxShadow_GetX(shadow);
+	ctx.shadow_box.y = BoxShadow_GetY(shadow);
+	ctx.shadow_box.width = BoxShadow_GetWidth(shadow, content_width);
+	ctx.shadow_box.height = BoxShadow_GetWidth(shadow, content_height);
+	ctx.content_box.x = BoxShadow_GetBoxX(shadow);
+	ctx.content_box.y = BoxShadow_GetBoxY(shadow);
+	ctx.content_box.width = content_width;
+	ctx.content_box.height = content_width;
+	BoxShadow_FillRect(&ctx);
+
+	/*
 	BoxShadow_PaintTopLeft(shadow, box, paint);
 	BoxShadow_PaintTopRight(shadow, box, paint);
 	BoxShadow_PaintBottomLeft(shadow, box, paint);

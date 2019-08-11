@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+<resource type="text/css" src="test_box_shadow.css"/>
+<ui>
+  <w class="content">
+    <!-- <w>
+      <w class="box"></w>
+      <w class="box rounded"></w>
+      <w class="box square rounded"></w>
+      <w class="box square rounded-2"></w>
+    </w>
+    <w class="shadow-2">
+      <w class="box"></w>
+      <w class="box rounded"></w>
+      <w class="box square rounded"></w>
+      <w class="box square rounded-2"></w>
+    </w> -->
+    <w class="shadow-container shadow-3">
+      <!-- <w class="box"></w> -->
+      <w class="box square rounded"></w>
+      <!-- <w class="box rounded"></w>
+      <w class="box square rounded"></w>
+      <w class="box square rounded-2"></w> -->
+    </w>
+  </w>
+</ui>
+</lcui-app>
