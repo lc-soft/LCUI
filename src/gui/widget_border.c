@@ -162,8 +162,8 @@ void Widget_ComputeBorder(LCUI_Widget w, LCUI_Border *out)
 	out->left.width = ComputeActual(s->left.width);
 	out->right.width = ComputeActual(s->right.width);
 	out->bottom.width = ComputeActual(s->bottom.width);
-	out->top_left_radius = ComputeActual(s->bottom_left_radius);
-	out->top_right_radius = ComputeActual(s->bottom_right_radius);
+	out->top_left_radius = ComputeActual(s->top_left_radius);
+	out->top_right_radius = ComputeActual(s->top_right_radius);
 	out->bottom_left_radius = ComputeActual(s->bottom_left_radius);
 	out->bottom_right_radius = ComputeActual(s->bottom_right_radius);
 }

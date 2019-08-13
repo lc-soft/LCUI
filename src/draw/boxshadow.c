@@ -193,8 +193,8 @@ static LCUI_BOOL CheckPixelInContentBox(BoxShadowRenderingContext ctx, int x,
 	}
 	if (x < ctx->shadow->top_left_radius &&
 	    y < ctx->shadow->top_left_radius) {
-		x -= ctx->shadow->top_right_radius;
-		y = ctx->shadow->top_right_radius - y;
+		x -= ctx->shadow->top_left_radius;
+		y = ctx->shadow->top_left_radius - y;
 		return x * x + y * y <= POW2(ctx->shadow->top_left_radius);
 	}
 	if (x >= ctx->content_box.width - ctx->shadow->top_right_radius &&
@@ -507,7 +507,7 @@ static LCUI_BOOL BoxShadow_PaintBottomRightBlur(BoxShadowRenderingContext ctx)
 {
 	LCUI_Rect rect;
 
-	rect.width = BLUR_WIDTH(ctx->shadow) + ctx->shadow->top_right_radius;
+	rect.width = BLUR_WIDTH(ctx->shadow) + ctx->shadow->bottom_right_radius;
 	rect.height = rect.width;
 	rect.x = ctx->shadow_box.x + ctx->shadow_box.width - rect.width;
 	rect.y = ctx->shadow_box.y + ctx->shadow_box.height - rect.height;
