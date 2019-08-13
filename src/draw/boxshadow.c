@@ -76,78 +76,44 @@ static uchar_t gradient_compute(gradient_t *g, double t, int val)
 	return (uchar_t)(val >> 8);
 }
 
-/**
- * Get width of content box
- * @param w canvas box width
- */
-int BoxShadow_GetBoxWidth(const LCUI_BoxShadow *shadow, int w)
-{
-	w -= SHADOW_WIDTH(shadow) * 2;
-	/* 如果水平向右的偏移距离大于阴影宽度，说明内容区左上角与容器一致 */
-	if (shadow->x >= SHADOW_WIDTH(shadow)) {
-		return w - (shadow->x - SHADOW_WIDTH(shadow));
-	}
-	/* 如果水平向左的偏移距离大于阴影宽度，说明阴影区左上角与容器一致 */
-	else if (shadow->x <= -SHADOW_WIDTH(shadow)) {
-		return w + shadow->x + SHADOW_WIDTH(shadow);
-	}
-	/* 水平偏移距离没有超出阴影宽度，容器大小会是固定的，所以直接减
-	 * 去两边的阴影宽度即可得到内容区宽度
-	 */
-	return w;
-}
-
-int BoxShadow_GetBoxHeight(const LCUI_BoxShadow *shadow, int h)
-{
-	h -= SHADOW_WIDTH(shadow) * 2;
-	if (shadow->y >= SHADOW_WIDTH(shadow)) {
-		return h - shadow->y + SHADOW_WIDTH(shadow);
-	} else if (shadow->y <= -SHADOW_WIDTH(shadow)) {
-		return h + shadow->y + SHADOW_WIDTH(shadow);
-	}
-	return h;
-}
-
-int BoxShadow_GetWidth(const LCUI_BoxShadow *shadow, int content_width)
+static INLINE int BoxShadow_GetWidth(const LCUI_BoxShadow *shadow,
+				     int content_width)
 {
 	return content_width + SHADOW_WIDTH(shadow) * 2;
 }
 
-int BoxShadow_GetHeight(const LCUI_BoxShadow *shadow, int content_height)
+static INLINE int BoxShadow_GetHeight(const LCUI_BoxShadow *shadow,
+				      int content_height)
 {
 	return content_height + SHADOW_WIDTH(shadow) * 2;
 }
 
-int BoxShadow_GetBoxX(const LCUI_BoxShadow *shadow)
+static int BoxShadow_GetBoxX(const LCUI_BoxShadow *shadow)
 {
-	if (shadow->x >= SHADOW_WIDTH(shadow)) {
-		return 0;
-	}
-	return SHADOW_WIDTH(shadow) - shadow->x;
+	return shadow->x >= SHADOW_WIDTH(shadow)
+		   ? 0
+		   : SHADOW_WIDTH(shadow) - shadow->x;
 }
 
-int BoxShadow_GetBoxY(const LCUI_BoxShadow *shadow)
+static int BoxShadow_GetBoxY(const LCUI_BoxShadow *shadow)
 {
-	if (shadow->y >= SHADOW_WIDTH(shadow)) {
-		return 0;
-	}
-	return SHADOW_WIDTH(shadow) - shadow->y;
+	return shadow->y >= SHADOW_WIDTH(shadow)
+		   ? 0
+		   : SHADOW_WIDTH(shadow) - shadow->y;
 }
 
-int BoxShadow_GetY(const LCUI_BoxShadow *shadow)
+static int BoxShadow_GetY(const LCUI_BoxShadow *shadow)
 {
-	if (shadow->y <= SHADOW_WIDTH(shadow)) {
-		return 0;
-	}
-	return shadow->y - SHADOW_WIDTH(shadow);
+	return shadow->y <= SHADOW_WIDTH(shadow)
+		   ? 0
+		   : shadow->y - SHADOW_WIDTH(shadow);
 }
 
-int BoxShadow_GetX(const LCUI_BoxShadow *shadow)
+static int BoxShadow_GetX(const LCUI_BoxShadow *shadow)
 {
-	if (shadow->x <= SHADOW_WIDTH(shadow)) {
-		return 0;
-	}
-	return shadow->x - SHADOW_WIDTH(shadow);
+	return shadow->x <= SHADOW_WIDTH(shadow)
+		   ? 0
+		   : shadow->x - SHADOW_WIDTH(shadow);
 }
 
 void BoxShadow_Init(LCUI_BoxShadow *shadow)
