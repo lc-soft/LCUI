@@ -29,7 +29,8 @@
  */
 
 #include <math.h>
-#include <LCUI.h>
+#include <LCUI_Build.h>
+#include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
 
 #define Graph_GetPixelPointer(G, X, Y) ((G)->argb + (G)->width * (Y) + (X))
