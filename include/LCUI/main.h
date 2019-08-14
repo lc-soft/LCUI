@@ -53,7 +53,6 @@ enum LCUI_SysEventType {
 	LCUI_PAINT,
 	LCUI_WIDGET,
 	LCUI_QUIT, /**< 在 LCUI 退出前触发的事件 */
-	LCUI_CARETPOSCHANGED,
 	LCUI_USER = 100 /**< 用户事件，可以把这个当成系统事件与用户事件的分界 */
 };
 
@@ -249,9 +248,6 @@ LCUI_API void LCUI_Exit(int code);
 
 /** 检测当前是否在主线程上 */
 LCUI_API LCUI_BOOL LCUI_IsOnMainLoop(void);
-
-LCUI_API int LCUI_SetCaretPos(LCUI_Pos x);
-LCUI_API LCUI_Pos LCUI_GetCaretPos();
 
 LCUI_END_HEADER
 

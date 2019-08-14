@@ -89,7 +89,6 @@ static struct LCUI_System {
 		LCUI_EventTrigger trigger;	/**< 系统事件容器 */
 		LCUI_Mutex mutex;		/**< 互斥锁 */
 	} event;
-	LCUI_Pos caret_pos;
 } System;
 
 #define LCUI_WORKER_NUM 4
@@ -537,21 +536,6 @@ int LCUI_UnbindSysEvent(int event_id, LCUI_EventFunc func)
 		return MainApp.driver->UnbindSysEvent(event_id, func);
 	}
 	return -1;
-}
-
-int LCUI_SetCaretPos(LCUI_Pos newValue)
-{
-	LCUI_SysEventRec sys_ev;
-	static POINT mouse_pos = { 0, 0 };
-	sys_ev.type = LCUI_CARETPOSCHANGED;
-	System.caret_pos = newValue;
-	LCUI_TriggerEvent(&sys_ev, NULL);
-	return 0;
-}
-
-LCUI_Pos LCUI_GetCaretPos()
-{
-	return System.caret_pos;
 }
 
 void *LCUI_GetAppData(void)
