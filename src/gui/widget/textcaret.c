@@ -49,10 +49,10 @@ static const char *textcaret_css = CodeToString(
 
 textcaret {
 	pointer-events: none;
-    focusable: false;
-    width: 1px;
-    height:14px;
-    position: absolute;
+	focusable: false;
+	width: 1px;
+	height:14px;
+	position: absolute;
 	background-color: #000;
 }
 
