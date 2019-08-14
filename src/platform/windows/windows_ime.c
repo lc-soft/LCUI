@@ -32,7 +32,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <LCUI_Build.h>
-
 #ifdef LCUI_BUILD_IN_WIN32
 #include <LCUI/LCUI.h>
 #include <LCUI/input.h>
@@ -40,6 +39,7 @@
 #include <LCUI/platform.h>
 #include LCUI_EVENTS_H
 
+#pragma comment(lib, "Imm32.lib")
 static LCUI_BOOL IME_ProcessKey(int key, int key_state)
 {
 	return FALSE;
@@ -60,14 +60,39 @@ static void WinIME_OnChar(LCUI_Event e, void *arg)
 	LCUIIME_Commit(text, 2);
 }
 
+static void WinIME_OnCaretPosChanged(LCUI_SysEvent e, void *arg)
+{
+	HWND hwnd = GetActiveWindow();
+	HIMC hIMC = ImmGetContext(hwnd);
+	LCUI_Pos caret_pos;
+	if (hIMC) {
+		POINT point;
+		caret_pos = LCUI_GetCaretPos();
+		point.x = caret_pos.x;
+		point.y = caret_pos.y;
+
+		COMPOSITIONFORM Composition;
+		Composition.dwStyle = CFS_POINT;
+		Composition.ptCurrentPos.x = point.x;
+		Composition.ptCurrentPos.y = point.y;
+		ImmSetCompositionWindow(hIMC, &Composition);
+
+		ImmReleaseContext(hwnd, hIMC);
+	}
+}
+
+static int OnCaretPosChanged_Id;
 static LCUI_BOOL IME_Open(void)
 {
+	OnCaretPosChanged_Id = LCUI_BindEvent(
+	    LCUI_CARETPOSCHANGED, WinIME_OnCaretPosChanged, NULL, NULL);
 	LCUI_BindSysEvent(WM_CHAR, WinIME_OnChar, NULL, NULL);
 	return TRUE;
 }
 
 static LCUI_BOOL IME_Close(void)
 {
+	LCUI_UnbindEvent(OnCaretPosChanged_Id);
 	LCUI_UnbindSysEvent(WM_CHAR, WinIME_OnChar);
 	return TRUE;
 }

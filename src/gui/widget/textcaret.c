@@ -48,14 +48,24 @@ static const char *textcaret_css = CodeToString(
 
 textcaret {
 	pointer-events: none;
-	focusable: false;
-	width: 1px;
-	height:14px;
-	position: absolute;
+    focusable: false;
+    width: 1px;
+    height:14px;
+    position: absolute;
 	background-color: #000;
 }
 
 );
+
+static void TextCaret_UpdateCaretPos(LCUI_Widget widget)
+{
+	LCUI_Pos pos;
+	float x, y;
+	Widget_GetOffset(widget, LCUIWidget_GetRoot(), &x, &y);
+	pos.x = (int)x;
+	pos.y = (int)y;
+	LCUI_SetCaretPos(pos);
+}
 
 void TextCaret_Refresh(LCUI_Widget widget)
 {
@@ -64,6 +74,7 @@ void TextCaret_Refresh(LCUI_Widget widget)
 		return;
 	}
 	LCUITimer_Reset(caret->timer_id, caret->blink_interval);
+	TextCaret_UpdateCaretPos(widget);
 	Widget_Show(widget);
 }
 
@@ -101,7 +112,7 @@ static void TextCaret_OnInit(LCUI_Widget widget)
 	caret->blink_interval = 500;
 	caret->visible = FALSE;
 	caret->timer_id = LCUI_SetInterval(caret->blink_interval,
-					   TextCaret_OnBlink, widget);
+		TextCaret_OnBlink, widget);
 }
 
 void TextCaret_SetBlinkTime(LCUI_Widget widget, unsigned int n_ms)
