@@ -270,11 +270,11 @@ void LCUI_InitIME(void)
 #endif
 }
 
-void LCUIIME_SetCaret(LCUI_Pos pos)
+void LCUIIME_SetCaret(int x, int y)
 {
-	if (self.ime->handler.setcaret == NULL)
-		return;
-	self.ime->handler.setcaret(pos);
+	if (self.ime->handler.setcaret) {
+		self.ime->handler.setcaret(x, y);
+	}
 }
 
 void LCUI_FreeIME(void)

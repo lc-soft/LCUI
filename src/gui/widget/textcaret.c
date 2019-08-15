@@ -60,17 +60,16 @@ textcaret {
 
 void TextCaret_Refresh(LCUI_Widget widget)
 {
-	LCUI_TextCaret caret = Widget_GetData(widget, prototype);
-	LCUI_Pos pos;
 	float x, y;
+
+	LCUI_TextCaret caret = Widget_GetData(widget, prototype);
+
 	if (!caret->visible) {
 		return;
 	}
 	LCUITimer_Reset(caret->timer_id, caret->blink_interval);
 	Widget_GetOffset(widget, LCUIWidget_GetRoot(), &x, &y);
-	pos.x = (int)x;
-	pos.y = (int)y;
-	LCUIIME_SetCaret(pos);
+	LCUIIME_SetCaret((int)x, (int)y);
 	Widget_Show(widget);
 }
 

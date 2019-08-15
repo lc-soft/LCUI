@@ -61,17 +61,17 @@ static void WinIME_OnChar(LCUI_Event e, void *arg)
 	LCUIIME_Commit(text, 2);
 }
 
-static void IME_SetCaret(LCUI_Pos pos)
+static void IME_SetCaret(int x, int y)
 {
 	HWND hwnd = GetActiveWindow();
-	HIMC hIMC = ImmGetContext(hwnd);
-	if (hIMC) {
-		COMPOSITIONFORM Composition;
-		Composition.dwStyle = CFS_POINT;
-		Composition.ptCurrentPos.x = pos.x;
-		Composition.ptCurrentPos.y = pos.y;
-		ImmSetCompositionWindow(hIMC, &Composition);
-		ImmReleaseContext(hwnd, hIMC);
+	HIMC himc = ImmGetContext(hwnd);
+	if (himc) {
+		COMPOSITIONFORM composition;
+		composition.dwStyle = CFS_POINT;
+		composition.ptCurrentPos.x = x;
+		composition.ptCurrentPos.y = y;
+		ImmSetCompositionWindow(himc, &composition);
+		ImmReleaseContext(hwnd, himc);
 	}
 }
 
