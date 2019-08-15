@@ -88,6 +88,7 @@ int LCUI_RegisterLinuxIME(void)
 		handler.totext = X11IME_ToText;
 		handler.close = X11IME_Close;
 		handler.open = X11IME_Open;
+		handler.setcaret = NULL;
 		return LCUIIME_Register("LCUI X11 Input Method", &handler);
 	}
 #endif

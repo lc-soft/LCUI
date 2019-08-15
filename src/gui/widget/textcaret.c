@@ -34,6 +34,7 @@
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/textcaret.h>
 #include <LCUI/gui/css_parser.h>
+#include <LCUI/ime.h>
 
 /** 文本插入符相关数据 */
 typedef struct LCUI_TextCaretRec_ {
@@ -59,11 +60,16 @@ textcaret {
 
 void TextCaret_Refresh(LCUI_Widget widget)
 {
+	float x, y;
+
 	LCUI_TextCaret caret = Widget_GetData(widget, prototype);
+
 	if (!caret->visible) {
 		return;
 	}
 	LCUITimer_Reset(caret->timer_id, caret->blink_interval);
+	Widget_GetOffset(widget, LCUIWidget_GetRoot(), &x, &y);
+	LCUIIME_SetCaret((int)x, (int)y);
 	Widget_Show(widget);
 }
 
@@ -101,7 +107,7 @@ static void TextCaret_OnInit(LCUI_Widget widget)
 	caret->blink_interval = 500;
 	caret->visible = FALSE;
 	caret->timer_id = LCUI_SetInterval(caret->blink_interval,
-					   TextCaret_OnBlink, widget);
+		TextCaret_OnBlink, widget);
 }
 
 void TextCaret_SetBlinkTime(LCUI_Widget widget, unsigned int n_ms)

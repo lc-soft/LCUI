@@ -270,6 +270,13 @@ void LCUI_InitIME(void)
 #endif
 }
 
+void LCUIIME_SetCaret(int x, int y)
+{
+	if (self.ime->handler.setcaret) {
+		self.ime->handler.setcaret(x, y);
+	}
+}
+
 void LCUI_FreeIME(void)
 {
 	self.active = FALSE;
