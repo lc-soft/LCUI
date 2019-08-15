@@ -32,13 +32,14 @@
 #include <string.h>
 #include <stdlib.h>
 #include <LCUI_Build.h>
-
 #ifdef LCUI_BUILD_IN_WIN32
 #include <LCUI/LCUI.h>
 #include <LCUI/input.h>
 #include <LCUI/ime.h>
 #include <LCUI/platform.h>
 #include LCUI_EVENTS_H
+
+#pragma comment(lib, "Imm32.lib")
 
 static LCUI_BOOL IME_ProcessKey(int key, int key_state)
 {
@@ -60,6 +61,20 @@ static void WinIME_OnChar(LCUI_Event e, void *arg)
 	LCUIIME_Commit(text, 2);
 }
 
+static void IME_SetCaret(int x, int y)
+{
+	HWND hwnd = GetActiveWindow();
+	HIMC himc = ImmGetContext(hwnd);
+	if (himc) {
+		COMPOSITIONFORM composition;
+		composition.dwStyle = CFS_POINT;
+		composition.ptCurrentPos.x = x;
+		composition.ptCurrentPos.y = y;
+		ImmSetCompositionWindow(himc, &composition);
+		ImmReleaseContext(hwnd, himc);
+	}
+}
+
 static LCUI_BOOL IME_Open(void)
 {
 	LCUI_BindSysEvent(WM_CHAR, WinIME_OnChar, NULL, NULL);
@@ -79,6 +94,7 @@ int LCUI_RegisterWin32IME(void)
 	handler.totext = IME_ToText;
 	handler.close = IME_Close;
 	handler.open = IME_Open;
+	handler.setcaret = IME_SetCaret;
 	return LCUIIME_Register("LCUI Input Method", &handler);
 }
 

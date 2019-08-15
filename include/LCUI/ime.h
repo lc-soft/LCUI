@@ -38,6 +38,7 @@ typedef struct LCUI_IMEHandlerRec_ {
 	void (*totext)(int);
 	LCUI_BOOL (*open)(void);
 	LCUI_BOOL (*close)(void);
+	void (*setcaret)(int, int);
 } LCUI_IMEHandlerRec, *LCUI_IMEHandler;
 
 /** 注册一个输入法 */
@@ -71,6 +72,8 @@ int LCUI_RegisterWin32IME(void);
 #else
 int LCUI_RegisterLinuxIME(void);
 #endif
+
+LCUI_API void LCUIIME_SetCaret(int x, int y);
 
 LCUI_END_HEADER
 
