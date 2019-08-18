@@ -3,23 +3,29 @@
 <resource type="text/css" src="test_box_shadow.css"/>
 <ui>
   <w class="content">
-    <!-- <w class="shadow-container">
+    <w class="shadow-container">
       <w class="box"></w>
       <w class="box rounded"></w>
       <w class="box square rounded"></w>
       <w class="box square rounded-2"></w>
+      <w class="box rounded-3"></w>
+      <w class="box rounded-4"></w>
     </w>
     <w class="shadow-container shadow-2">
       <w class="box"></w>
       <w class="box rounded"></w>
       <w class="box square rounded"></w>
       <w class="box square rounded-2"></w>
-    </w> -->
+      <w class="box rounded-3"></w>
+      <w class="box rounded-4"></w>
+    </w>
     <w class="shadow-container shadow-3">
       <w class="box"></w>
       <w class="box rounded"></w>
       <w class="box square rounded"></w>
       <w class="box square rounded-2"></w>
+      <w class="box rounded-3"></w>
+      <w class="box rounded-4"></w>
     </w>
   </w>
 </ui>

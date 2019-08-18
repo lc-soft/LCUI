@@ -6,12 +6,11 @@
   box-sizing: border-box;
   display: inline-block;
   background-color: #eee;
+  border: 1px solid #f00;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
 }
 .shadow-container {
-  padding: 0 0 40px 0;
-  border: 1px solid #f00;
-  box-sizing: padding-box;
+  padding: 0 0 30px 0;
 }
 .shadow-2 .box {
   box-shadow: 15px 15px 8px rgba(0, 0, 0, 0.8);

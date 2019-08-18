@@ -4,22 +4,22 @@
     <ShowAllFiles>false</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommand>$(OutDir)\helloworld.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>$(OutDir)\LCUITest.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>$(SolutionDir)..\..\test\</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommand>$(OutDir)\helloworld.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>$(OutDir)\LCUITest.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>$(SolutionDir)..\..\test\</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LocalDebuggerCommand>$(OutDir)\helloworld.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>$(OutDir)\LCUITest.exe</LocalDebuggerCommand>
     <LocalDebuggerWorkingDirectory>$(SolutionDir)..\..\test\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommand>$(OutDir)\helloworld.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>$(OutDir)\LCUITest.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>$(SolutionDir)..\..\test\</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
