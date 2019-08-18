@@ -136,6 +136,11 @@ static int DrawBorderTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 		inner_x = max(0, min(right, inner_x));
 		split_x = max(outer_x, min(inner_x, split_x));
 		p = Graph_GetPixelPointer(dst, rect.x, rect.y + y);
+		/*
+		 * FIXME: 改进圆角边框抗锯齿算法
+		 * 现在的从左到右横向遍历只处理了左右像素，边框顶部依然有锯齿，
+		 * 需要再从上到下纵向遍历一次像素点，处理上下像素
+		 */
 		ClearPixels(p, 0, floor(outer_x));
 		if (outer_x < split_x) {
 			FillPixels(p, yline->color, outer_x, split_x);
