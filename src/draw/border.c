@@ -33,13 +33,16 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
 
+#define SmoothLeftPixel(PX, X) (uchar_t)((PX)->a * (1.0 - (X - 1.0 * (int)X)));
+
+#define SmoothRightPixel(PX, X) (uchar_t)((PX)->a * (X - 1.0 * (int)X));
+
 #define Graph_GetPixelPointer(G, X, Y) ((G)->argb + (G)->width * (Y) + (X))
 
 #define BorderRenderContext()                            \
-	int x, y;                                        \
+	int y;                                           \
 	int right;                                       \
 	int circle_y;                                    \
-	int outer_xi, split_xi, inner_xi;                \
 	double outer_x, split_x, inner_x;                \
                                                          \
 	const unsigned radius_x = radius - yline->width; \
@@ -59,9 +62,39 @@ static double ellipse_x(unsigned int radius_x, unsigned int radius_y, int y)
 			radius_x * radius_x;
 	}
 	if (value < 0) {
-		value = value;
+		value = -value;
 	}
 	return sqrt(value);
+}
+
+static ClearPixels(LCUI_ARGB *pixels, int start, int end)
+{
+	LCUI_ARGB *p = pixels + start;
+	LCUI_ARGB *p_end = pixels + end;
+
+	for (p; p < p_end; ++p) {
+		p->alpha = 0;
+	}
+}
+
+static void FillPixels(LCUI_ARGB *pixels, LCUI_Color color, double start,
+		       double end)
+{
+	LCUI_Color c;
+	LCUI_ARGB *p = pixels + (int)start;
+	LCUI_ARGB *p_end = pixels + (int)end;
+
+	c = color;
+	c.alpha = SmoothLeftPixel(&c, start);
+	LCUI_OverPixel(p, &c);
+	for (++p; p < p_end; ++p) {
+		LCUI_OverPixel(p, &color);
+	}
+	if ((int)end - (int)start > 0) {
+		c = color;
+		c.alpha = SmoothRightPixel(&c, end);
+		LCUI_OverPixel(p_end, &c);
+	}
 }
 
 static int DrawBorderTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
@@ -101,21 +134,18 @@ static int DrawBorderTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 		/* Limit coordinates into the current drawing region */
 		outer_x = max(0, min(right, outer_x));
 		inner_x = max(0, min(right, inner_x));
-		split_x = min(inner_x, split_x);
-		/* Coordinate rasterization */
-		outer_xi = (int)outer_x;
-		inner_xi = (int)inner_x;
-		split_xi = (int)split_x;
+		split_x = max(outer_x, min(inner_x, split_x));
 		p = Graph_GetPixelPointer(dst, rect.x, rect.y + y);
-		/* Clear pixels outside the border */
-		for (x = 0; x < outer_xi; ++x, ++p) {
-			p->alpha = 0;
+		ClearPixels(p, 0, floor(outer_x));
+		if (outer_x < split_x) {
+			FillPixels(p, yline->color, outer_x, split_x);
 		}
-		for (; x < split_xi; ++x, ++p) {
-			LCUI_OverPixel(p, &yline->color);
+		if (split_x < inner_x) {
+			FillPixels(p, xline->color, split_x, inner_x);
 		}
-		for (; x < inner_xi; ++x, ++p) {
-			LCUI_OverPixel(p, &xline->color);
+		if (outer_x < right) {
+			p += (int)outer_x;
+			p->alpha = SmoothLeftPixel(p, outer_x);
 		}
 	}
 	return 0;
@@ -161,21 +191,18 @@ static int DrawBorderTopRight(LCUI_Graph *dst, int bound_left, int bound_top,
 		/* Limit coordinates into the current drawing region */
 		outer_x = max(0, min(right, outer_x));
 		inner_x = max(0, min(outer_x, inner_x));
-		split_x = min(outer_x, split_x);
-		/* Coordinate rasterization */
-		outer_xi = (int)outer_x;
-		inner_xi = (int)inner_x;
-		split_xi = (int)split_x;
-		p = Graph_GetPixelPointer(dst, rect.x + inner_xi, rect.y + y);
-		for (x = inner_x; x < split_xi; ++x, ++p) {
-			LCUI_OverPixel(p, &xline->color);
+		split_x = max(inner_x, min(outer_x, split_x));
+		p = Graph_GetPixelPointer(dst, rect.x, rect.y + y);
+		if (inner_x < split_x) {
+			FillPixels(p, xline->color, inner_x, split_x);
 		}
-		for (; x < outer_xi; ++x, ++p) {
-			LCUI_OverPixel(p, &yline->color);
+		if (split_x < outer_x) {
+			FillPixels(p, yline->color, split_x, outer_x);
 		}
-		/* Clear pixels outside the border */
-		for (; x < right; ++x, ++p) {
-			p->alpha = 0;
+		ClearPixels(p, ceil(outer_x), right);
+		if (outer_x < right) {
+			p += (int)outer_x;
+			p->alpha = SmoothRightPixel(p, outer_x);
 		}
 	}
 	return 0;
@@ -221,21 +248,18 @@ static int DrawBorderBottomLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 		/* Limit coordinates into the current drawing region */
 		outer_x = max(0, min(right, outer_x));
 		inner_x = max(0, min(right, inner_x));
-		split_x = min(inner_x, split_x);
-		/* Coordinate rasterization */
-		outer_xi = (int)outer_x;
-		inner_xi = (int)inner_x;
-		split_xi = (int)split_x;
+		split_x = max(outer_x, min(inner_x, split_x));
 		p = Graph_GetPixelPointer(dst, rect.x, rect.y + y);
-		/* Clear pixels outside the border */
-		for (x = 0; x < outer_xi; ++x, ++p) {
-			p->alpha = 0;
+		ClearPixels(p, 0, floor(outer_x));
+		if (outer_x < split_x) {
+			FillPixels(p, yline->color, outer_x, split_x);
 		}
-		for (; x < split_xi; ++x, ++p) {
-			LCUI_OverPixel(p, &yline->color);
+		if (split_x < inner_x) {
+			FillPixels(p, xline->color, split_x, inner_x);
 		}
-		for (; x < inner_xi; ++x, ++p) {
-			LCUI_OverPixel(p, &xline->color);
+		if (outer_x < right) {
+			p += (int)outer_x;
+			p->alpha = SmoothLeftPixel(p, outer_x);
 		}
 	}
 	return 0;
@@ -283,21 +307,18 @@ static int DrawBorderBottomRight(LCUI_Graph *dst, int bound_left, int bound_top,
 		/* Limit coordinates into the current drawing region */
 		outer_x = max(0, min(right, outer_x));
 		inner_x = max(0, min(right, inner_x));
-		split_x = min(outer_x, split_x);
-		/* Coordinate rasterization */
-		outer_xi = (int)outer_x;
-		inner_xi = (int)inner_x;
-		split_xi = (int)split_x;
-		p = Graph_GetPixelPointer(dst, rect.x + inner_xi, rect.y + y);
-		for (x = inner_x; x < split_xi; ++x, ++p) {
-			LCUI_OverPixel(p, &xline->color);
+		split_x = max(inner_x, min(outer_x, split_x));
+		p = Graph_GetPixelPointer(dst, rect.x, rect.y + y);
+		if (inner_x < split_x) {
+			FillPixels(p, xline->color, inner_x, split_x);
 		}
-		for (; x < outer_xi; ++x, ++p) {
-			LCUI_OverPixel(p, &yline->color);
+		if (split_x < outer_x) {
+			FillPixels(p, yline->color, split_x, outer_x);
 		}
-		/* Clear pixels outside the border */
-		for (; x < right; ++x, ++p) {
-			p->alpha = 0;
+		ClearPixels(p, ceil(outer_x), right);
+		if (outer_x < right) {
+			p += (int)outer_x;
+			p->alpha = SmoothRightPixel(p, outer_x);
 		}
 	}
 	return 0;
@@ -308,6 +329,7 @@ int Border_Paint(const LCUI_Border *border, const LCUI_Rect *box,
 {
 	LCUI_Graph canvas;
 	LCUI_Rect bound, rect;
+
 	int bound_top, bound_left;
 	int tl_width = max(border->top_left_radius, border->left.width);
 	int tl_height = max(border->top_left_radius, border->top.width);

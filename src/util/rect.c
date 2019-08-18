@@ -313,7 +313,7 @@ void LCUIRect_CutFourRect(LCUI_Rect *rect1, LCUI_Rect *rect2,
 
 void LCUIRect_Split(LCUI_Rect *base, LCUI_Rect *target, LCUI_Rect rects[4])
 {
-	if (LCUIRect_IsIncludeRect(base, target)) {
+	if (LCUIRect_IsIncludeRect(target, base)) {
 		LCUIRect_CutFourRect(base, target, rects);
 		return;
 	}
