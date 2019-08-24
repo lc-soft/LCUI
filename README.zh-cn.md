@@ -48,7 +48,7 @@ LCUI 是一个桌面端图形界面开发库，主要使用 C 语言编写，支
 
 ### 缺少的特性
 
-LCUI 是一个个人项目，其主要用途是方便作者能够开发简单的图形界面应用，简单也就意味着功能很少，比如：
+LCUI 是一个个人项目，其主要用途是方便作者开发简单的图形界面应用，简单也就意味着功能很少，比如：
 
 - 没有硬件加速，图形渲染效率低下。
 - 不支持剪切板，你不能选中和复制界面中的文本，也不能从其它程序复制文本到 LCUI 程序中。
@@ -69,77 +69,81 @@ LCUI 是一个个人项目，其主要用途是方便作者能够开发简单的
 
 - [SDL](https://github.com/SDL-mirror/SDL/tree/master/src/video/x11) — x11 的驱动代码参考
 - [FreeType](https://www.freetype.org/freetype2/docs/design/design-3.html#section-1) — 数据结构的命名风格参考
+- [LevelDB](https://github.com/google/leveldb/blob/master/include/leveldb/c.h) - 函数命名风格参考
 - [jQuery](https://jquery.com/) — 部件操作接口的命名风格参考
 - [MDN](https://developer.mozilla.org/zh-CN/docs/Web/CSS) — CSS 标准参考
 
-## 构建
+## 快速上手
 
-### 依赖项
+### Windows
 
-如果你想构建全特性的 LCUI，建议安装以下依赖库：
+从已有的示例项目开始：
 
-- [libpng](http://www.libpng.org/pub/png/libpng.html) — PNG 图像压缩库
-- [libjpeg](http://www.ijg.org/) — JPEG 图像压缩库
-- [libxml2](http://xmlsoft.org/) — XML 解析器及相关工具集
-- [libx11](https://www.x.org/) — X11 客户端库
-- [freetype](https://www.freetype.org/) — 字体渲染引擎
+    # 克隆示例项目的仓库
+    $ git clone https://github.com/lc-ui/lcui-quick-start
 
-如果你的系统是 Ubuntu，可运行以下命令来安装依赖：
+    # 进入这个仓库
+    $ cd lcui-quick-start
 
-    apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev
+    # 安装依赖并运行
+    $ lcpkg install && lcpkg start
 
-### 引导
+或者使用 [lcpkg](https://github.com/lc-soft/lcpkg) 为你的项目安装已编译的 LCUI 库：
 
-你需要运行 `./configure` (在源码根目录中) 以引导项目的构建。
+    lcpkg install github.com/lc-soft/LCUI
 
-在最简单的情况下，你可以运行：
+安装成功后，按照 lcpkg 输出的帮助文档来配置你项目的编译参数。
+
+如果你想手动从源码编译 LCUI，请在 LCUI 的源码目录中使用 lcpkg 安装依赖库：
+
+    lcpkg install
+
+之后，使用 [Visual Studio](https://visualstudio.microsoft.com/) 打开 `build/windows/LCUI.sln` 文件，然后b编译生成 LCUI。
+
+### Ubuntu
+
+安装依赖库：
+
+    sudo apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev
+
+下载源代码：
 
     git clone https://github.com/lc-soft/LCUI.git
+
+编译：
+
     cd LCUI
     ./configure
-
-如果未找到 ./configure，请运行 ./autogen.sh 脚本生成它。
-
-在 `./configure` 执行完后，运行以下命令编译源代码并安装 LCUI 的函数库和头文件：
-
     make
-    make install
 
-如果需要自定义编译器、编译参数、安装位置等配置，请阅读 [INSTALL](INSTALL) 文件了解详情。
+> **提示：** 如果需要自定义编译器、编译参数、安装位置等配置，请查阅 [INSTALL](INSTALL) 文件。
 
-测试和示例程序都存放在 test 目录中，如果需要运行他们请运行以下命令：
+如果需要安装的话：
+
+    sudo make install
+
+编译测试程序：
 
     cd test
     make
 
-运行 helloworld 示例：
+运行 helloworld 程序：
 
     ./helloworld
 
-### 在 Windows 中构建
+## 路线图
 
-LCUI 主要是在 Windows 系统环境下开发的，目前只提供 Visual Studio 的解决方案文件（.sln）,你可以使用 [Visual Studio](https://visualstudio.microsoft.com/) 打开 `/build/windows/LCUI.sln` 文件，然后编译生成 LCUI。如果你用的是其它 IDE，请尝试按该 IDE 的方式创建项目并将源文件添加至项目内，然后编译。
-
-上述的依赖库中除 Windows 系统用不到的 libx11 库外，都可以在 Windows 系统环境下编译生成，具体的编译方法你可以在教程中找到。如果你觉得编译这些依赖库很麻烦，可以使用 [vcpkg](https://github.com/Microsoft/vcpkg) 来安装它们，只需在命令行里输入如下命令：
-
-    ./vcpkg install freetype libxml2 libjpeg-turbo libpng
-
-[发行版](https://github.com/lc-soft/LCUI/releases)的附件列表中一般也会有一个包含所有依赖库的压缩包可供使用。
+目前没有明确的发展规划，现有的功能大都是作者在接触其它技术后开发的，如果你是一位有着丰富的 GUI 应用开发经验的开发者，可以考虑为此项目的发展提供建议和灵感。
 
 ## 贡献
 
-本项目是以技术交流为主要目的而开放源代码的，如果你有相关问题解决经验，可以向此项目提供支持，贡献方式有如下几种：
-
 - [反馈问题](https://github.com/lc-soft/LCUI/issues)并在问题关闭时帮助我们验证它们是否已经修复
+- 在 OpenCollective 上为此项目提供捐赠
+- 在 IssueHunt 上为感兴趣的 issue 设置悬赏，吸引其他开发者参与开发
 - 审查[源代码的改动](https://github.com/lc-soft/LCUI/pulls)
-- [开源问答](https://www.oschina.net/question/ask)、[思否](https://segmentfault.com/)上与其他 LCUI 用户和开发人员交流
 - [修复已知问题](CONTRIBUTING.zh-cn.md)
 
 本项目采用了参与者公约定义的行为准则，该文档应用于许多开源社区，有关更多信息，请参阅[《行为准则》](CODE_OF_CONDUCT.zh-cn.md)。
-
-## 许可
-
-LCUI 采用的开源许可证是 [MIT](http://opensource.org/licenses/MIT)。
 
 ## 文档
 
@@ -150,9 +154,13 @@ LCUI 采用的开源许可证是 [MIT](http://opensource.org/licenses/MIT)。
 
 ## 常见问题
 
+1. 这是一个浏览器内核吗？或者是像 Electron 这样的集成了浏览器环境的开发库？
+
+    不是，你可以当成是一个吸收部分 Web 技术的传统 GUI 开发库。LCUI 的存在意义不是成为轻量级浏览器内核，而是探索新的 GUI 开发方式。
+
 1. 适合哪些人使用？
 
-    适合有 GUI 开发经验、熟悉 Web 前端开发技术、有意向参与开源项目的 C 开发者使用，最好是具备两年 C 开发经验和一年 web 前端开发经验。以时间来衡量上手门槛可能有点模糊，以下按照技术方向分别列出了一些主要条件，你可自行判断自己是否能够快速上手。
+    适合有 GUI 应用开发经验、熟悉 Web 前端开发技术、有意向参与开源项目的 C 开发者使用，最好是具备两年 C 开发经验和一年 web 前端开发经验。以时间来衡量上手门槛可能有点模糊，以下按照技术方向分别列出了一些主要条件，你可自行判断自己是否能够快速上手。
 
     C：
 
@@ -170,10 +178,12 @@ LCUI 采用的开源许可证是 [MIT](http://opensource.org/licenses/MIT)。
 
 1. 和写网页一样吗？需要注意什么？
 
-    主要有以下差异需要注意：
+    不完全一样，主要有以下差异需要注意：
 
+    - 界面描述文件格式是 XML，与 HTML 有一点区别。
+    - 没有 `<script>` 标签，你不能像 HTML 那样内嵌 JavaScript 或 C 代码。
     - 部件是基本的界面元素，不是文字，不支持图文混排，不存在 `inline` 显示类型。
-    - 在内容溢出窗口时不会自动显示滚动条，因为滚动条是一个独立的部件，你需要主动创建它。
+    - 滚动条是一个独立的部件，使用 `ouverflow: scroll;` 样式不会自动出现滚动条，你需要主动创建它并指定容器和滚动层。
     - 所有文本由 TextView 部件渲染，它的显示类型为 `inline-block` 而不是 `inline`。
     - 部件不会溢出父级部件的边界框，效果类似于已应用样式：`overflow: hidden;`。
     - 绝对定位的部件始终相对于其父级部件，而不是父级第一个非静态定位的部件。
@@ -270,10 +280,14 @@ LCUI 采用的开源许可证是 [MIT](http://opensource.org/licenses/MIT)。
 
     不频繁，每个月除去工作日就那么点时间，能干的事情不多。
 
-1. 我想要 ?????? 功能，就像 ???? 里的那样。
+1. 我想要 ???? 功能，就像 ???? 里的那样。
 
     请先[新建 issue](https://github.com/lc-soft/LCUI/issues/new/choose)，按照已有的模板补全内容。
 
 1. 求添加 JavaScript/Python/Go/Rust/PHP/C#/Java 语言绑定
 
-    已有官方支持的 [Trad](https://github.com/lc-soft/trad) 语言绑定，不考虑添加其它语言绑定。实在需要的话，你可以自己动手设计，毕竟你比作者更懂这些语言的编程思想和设计哲学。
+    已有官方支持的 [Trad](https://github.com/lc-soft/trad) 语言绑定，不考虑添加其它语言绑定。实在需要的话，你可以自己动手设计，毕竟你比作者更懂这些语言的编程思想和设计哲学，也算是一个展现技术实力的好机会。
+
+## 许可
+
+LCUI 采用的开源许可证是 [MIT](http://opensource.org/licenses/MIT)。
