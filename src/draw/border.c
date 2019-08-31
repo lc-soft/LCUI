@@ -33,26 +33,38 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
 
-#define SmoothLeftPixel(PX, X) (uchar_t)((PX)->a * (1.0 - (X - 1.0 * (int)X)));
+/**
+ * FIXME: 精简圆角边框绘制算法
+ * 现在的圆角是分成四个部分绘制的，四个函数的代码大部分一样，应该将它们合并成一个
+ */
 
-#define SmoothRightPixel(PX, X) (uchar_t)((PX)->a * (X - 1.0 * (int)X));
+#define POW2(X) ((X) * (X))
+#define CIRCLE_R(R) (R - 0.5)
+#define CIRCLE_Y(Y, CENTER_Y) ((CENTER_Y)-Y)
+#define CIRCLE_X(X, CENTER_X) (X - (CENTER_X))
 
+#define SmoothLeftPixel(PX, X) (uchar_t)((PX)->a * (1.0 - (X - 1.0 * (int)X)))
+#define SmoothRightPixel(PX, X) (uchar_t)((PX)->a * (X - 1.0 * (int)X))
 #define Graph_GetPixelPointer(G, X, Y) ((G)->argb + (G)->width * (Y) + (X))
 
-#define BorderRenderContext()                            \
-	int y;                                           \
-	int right;                                       \
-	int circle_y;                                    \
-	double outer_x, split_x, inner_x;                \
-                                                         \
-	const unsigned radius_x = radius - yline->width; \
-	const unsigned radius_y = radius - xline->width; \
-	const int width = max(radius, yline->width);     \
-                                                         \
-	LCUI_Rect rect;                                  \
-	LCUI_ARGB *p;
+#define BorderRenderContext()                             \
+	int x, y;                                         \
+	int right;                                        \
+	double circle_x, circle_y;                        \
+	int outer_xi, inner_xi;                           \
+	double outer_x, split_x, inner_x;                 \
+	double outer_d, inner_d;                          \
+                                                          \
+	const double r = CIRCLE_R(radius);                \
+	const double radius_x = max(0, r - yline->width); \
+	const double radius_y = max(0, r - xline->width);    \
+	const int width = max(radius, yline->width);      \
+                                                          \
+	LCUI_Rect rect;                                   \
+	LCUI_ARGB *p;                                     \
+	LCUI_Color color;
 
-static double ellipse_x(unsigned int radius_x, unsigned int radius_y, int y)
+static double ellipse_x(double radius_x, double radius_y, double y)
 {
 	double value;
 	if (radius_x == radius_y) {
@@ -67,45 +79,14 @@ static double ellipse_x(unsigned int radius_x, unsigned int radius_y, int y)
 	return sqrt(value);
 }
 
-static ClearPixels(LCUI_ARGB *pixels, int start, int end)
-{
-	LCUI_ARGB *p = pixels + start;
-	LCUI_ARGB *p_end = pixels + end;
-
-	for (p; p < p_end; ++p) {
-		p->alpha = 0;
-	}
-}
-
-static void FillPixels(LCUI_ARGB *pixels, LCUI_Color color, double start,
-		       double end)
-{
-	LCUI_Color c;
-	LCUI_ARGB *p = pixels + (int)start;
-	LCUI_ARGB *p_end = pixels + (int)end;
-
-	c = color;
-	c.alpha = SmoothLeftPixel(&c, start);
-	LCUI_OverPixel(p, &c);
-	for (++p; p < p_end; ++p) {
-		LCUI_OverPixel(p, &color);
-	}
-	if ((int)end - (int)start > 0) {
-		c = color;
-		c.alpha = SmoothRightPixel(&c, end);
-		LCUI_OverPixel(p_end, &c);
-	}
-}
-
 static int DrawBorderTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 			     const LCUI_BorderLine *xline,
 			     const LCUI_BorderLine *yline, unsigned int radius)
 {
 	BorderRenderContext();
 
-	int circle_top = bound_top;
-	int circle_center = circle_top + radius;
-	int inner_ellipse_top = circle_top + xline->width;
+	double circle_center = bound_top + r;
+	int inner_ellipse_top = bound_top + xline->width;
 
 	/* Get the actual rectagle that can be drawn */
 	Graph_GetValidRect(dst, &rect);
@@ -118,12 +99,13 @@ static int DrawBorderTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 		outer_x = 0;
 		split_x = 0;
 		inner_x = width;
-		if (radius > 0 && y <= circle_center) {
-			circle_y = circle_center - y;
-			outer_x = radius - ellipse_x(radius, radius, circle_y);
+		circle_y = CIRCLE_Y(y, circle_center);
+		if (r > 0 && circle_y >= 0) {
+			outer_x = radius + 0.5 - ellipse_x(r, r, circle_y);
 			if (radius_y > 0 && y >= inner_ellipse_top) {
-				inner_x = radius - ellipse_x(radius_x, radius_y,
-							     circle_y);
+				inner_x =
+				    radius + 0.5 -
+				    ellipse_x(radius_x, radius_y, circle_y);
 			}
 		}
 		if (xline->width > 0) {
@@ -134,23 +116,53 @@ static int DrawBorderTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 		/* Limit coordinates into the current drawing region */
 		outer_x = max(0, min(right, outer_x));
 		inner_x = max(0, min(right, inner_x));
-		split_x = max(outer_x, min(inner_x, split_x));
+		outer_xi = max(0, (int)outer_x - (int)radius / 2);
+		inner_xi = min(right, (int)inner_x + (int)radius / 2);
 		p = Graph_GetPixelPointer(dst, rect.x, rect.y + y);
-		/*
-		 * FIXME: 改进圆角边框抗锯齿算法
-		 * 现在的从左到右横向遍历只处理了左右像素，边框顶部依然有锯齿，
-		 * 需要再从上到下纵向遍历一次像素点，处理上下像素
-		 */
-		ClearPixels(p, 0, floor(outer_x));
-		if (outer_x < split_x) {
-			FillPixels(p, yline->color, outer_x, split_x);
+		/* Clear the outer pixels */
+		for (x = 0; x < outer_xi; ++x, ++p) {
+			p->alpha = 0;
 		}
-		if (split_x < inner_x) {
-			FillPixels(p, xline->color, split_x, inner_x);
-		}
-		if (outer_x < right) {
-			p += (int)outer_x;
-			p->alpha = SmoothLeftPixel(p, outer_x);
+		for (; x < inner_xi; ++x, ++p) {
+			outer_d = -1;
+			circle_x = x - r;
+			inner_d = inner_x - 1.0 * x;
+			/* If in the circle */
+			if (r > 0 && circle_y >= 0 && circle_x <= 0) {
+				outer_d =
+				    sqrt(POW2(circle_x) + POW2(circle_y)) - r;
+				/* If the inside is a circle is not an ellipse,
+				 * Use the same anti-aliasing method
+				 */
+				if (radius_x == radius_y && radius_y > 0 &&
+				    y >= inner_ellipse_top) {
+					inner_d = outer_d + r - radius_x;
+				}
+			}
+			if (outer_d >= 1.0) {
+				p->alpha = 0;
+				continue;
+			}
+			if (x < split_x) {
+				color = yline->color;
+			} else {
+				color = xline->color;
+			}
+			if (outer_d >= 0) {
+				/* Fill the border color if the border width is
+				 * valid */
+				if (inner_d - outer_d >= 0.4) {
+					*p = color;
+				}
+				p->a = SmoothLeftPixel(p, outer_d);
+			} else if (inner_d >= 1.0) {
+				LCUI_OverPixel(p, &color);
+			} else if (inner_d >= 0) {
+				color.a = SmoothRightPixel(&color, inner_d);
+				LCUI_OverPixel(p, &color);
+			} else {
+				break;
+			}
 		}
 	}
 	return 0;
@@ -162,9 +174,8 @@ static int DrawBorderTopRight(LCUI_Graph *dst, int bound_left, int bound_top,
 {
 	BorderRenderContext();
 
-	int circle_top = bound_top;
-	int circle_center = circle_top + radius;
-	int inner_ellipse_top = circle_top + xline->width;
+	double circle_center = bound_top + r;
+	double inner_ellipse_top = bound_top + xline->width;
 
 	/* Get the actual rectagle that can be drawn */
 	Graph_GetValidRect(dst, &rect);
@@ -176,14 +187,13 @@ static int DrawBorderTopRight(LCUI_Graph *dst, int bound_left, int bound_top,
 	for (y = 0; y < rect.height; ++y) {
 		outer_x = width;
 		split_x = 0;
-		inner_x = 0;
-		if (radius > 0 && y <= circle_center) {
-			circle_y = circle_center - y;
-			outer_x = width - radius +
-				  ellipse_x(radius, radius, circle_y);
+		inner_x = -1.0;
+		circle_y = CIRCLE_Y(y, circle_center);
+		if (r > 0 && circle_y >= 0) {
+			outer_x = width - radius + ellipse_x(r, r, circle_y);
 			if (radius_y > 0 && y >= inner_ellipse_top) {
 				inner_x =
-				    width - radius +
+				    width - radius - 0.5 +
 				    ellipse_x(radius_x, radius_y, circle_y);
 			}
 		}
@@ -195,19 +205,45 @@ static int DrawBorderTopRight(LCUI_Graph *dst, int bound_left, int bound_top,
 		inner_x = bound_left + inner_x;
 		/* Limit coordinates into the current drawing region */
 		outer_x = max(0, min(right, outer_x));
-		inner_x = max(0, min(outer_x, inner_x));
-		split_x = max(inner_x, min(outer_x, split_x));
-		p = Graph_GetPixelPointer(dst, rect.x, rect.y + y);
-		if (inner_x < split_x) {
-			FillPixels(p, xline->color, inner_x, split_x);
+		inner_x = max(-1.0, min(outer_x, inner_x));
+		inner_xi = max(0, (int)inner_x - (int)radius / 2);
+		outer_xi = min(right, (int)outer_x + (int)radius / 2);
+		p = Graph_GetPixelPointer(dst, rect.x + inner_xi, rect.y + y);
+		for (x = inner_xi; x < outer_xi; ++x, ++p) {
+			outer_d = -1.0;
+			inner_d = x - inner_x;
+			circle_x = CIRCLE_X(x, width - radius - 0.5);
+			if (r > 0 && circle_y >= 0 && circle_x >= 0) {
+				outer_d =
+				    sqrt(POW2(circle_x) + POW2(circle_y)) - r;
+				if (radius_x == radius_y && radius_y > 0 &&
+				    y >= inner_ellipse_top) {
+					inner_d = outer_d + r - radius_x;
+				}
+			}
+			if (outer_d >= 1.0) {
+				break;
+			}
+			if (x < split_x) {
+				color = xline->color;
+			} else {
+				color = yline->color;
+			}
+			if (outer_d >= 0) {
+				if (inner_d - outer_d >= 0.4) {
+					*p = color;
+				}
+				p->a = SmoothLeftPixel(p, outer_d);
+			} else if (inner_d >= 0.5) {
+				LCUI_OverPixel(p, &color);
+			} else if (inner_d >= 0) {
+				color.a = SmoothRightPixel(&color, inner_d);
+				LCUI_OverPixel(p, &color);
+			}
 		}
-		if (split_x < outer_x) {
-			FillPixels(p, yline->color, split_x, outer_x);
-		}
-		ClearPixels(p, ceil(outer_x), right);
-		if (outer_x < right) {
-			p += (int)outer_x;
-			p->alpha = SmoothRightPixel(p, outer_x);
+		/* Clear the outer pixels */
+		for (; x < right; ++x, ++p) {
+			p->alpha = 0;
 		}
 	}
 	return 0;
@@ -221,9 +257,9 @@ static int DrawBorderBottomLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 	BorderRenderContext();
 
 	int height = max(radius, xline->width);
-	int circle_bottom = bound_top + height;
-	int circle_center = circle_bottom - radius;
-	int inner_ellipse_bottom = circle_center + radius_y;
+	double circle_top = bound_top + radius_y;
+	double circle_center = bound_top + height - radius - 0.5;
+	double inner_ellipse_bottom = circle_center + radius_y;
 
 	/* Get the actual rectagle that can be drawn */
 	Graph_GetValidRect(dst, &rect);
@@ -236,12 +272,12 @@ static int DrawBorderBottomLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 		outer_x = 0;
 		split_x = 0;
 		inner_x = width;
-		if (radius > 0 && y >= circle_center) {
-			circle_y = y - circle_center;
-			outer_x = radius - ellipse_x(radius, radius, circle_y);
+		circle_y = CIRCLE_Y(y, circle_center);
+		if (r > 0 && circle_y <= 0) {
+			outer_x = r - ellipse_x(r, r, circle_y);
 			if (radius_y > 0 && y <= inner_ellipse_bottom) {
-				inner_x = radius - ellipse_x(radius_x, radius_y,
-							     circle_y);
+				inner_x =
+				    r - ellipse_x(radius_x, radius_y, circle_y);
 			}
 		}
 		if (xline->width > 0) {
@@ -253,18 +289,46 @@ static int DrawBorderBottomLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 		/* Limit coordinates into the current drawing region */
 		outer_x = max(0, min(right, outer_x));
 		inner_x = max(0, min(right, inner_x));
-		split_x = max(outer_x, min(inner_x, split_x));
+		outer_xi = max(0, (int)outer_x - (int)radius / 2);
+		inner_xi = min(right, (int)inner_x + (int)radius / 2);
 		p = Graph_GetPixelPointer(dst, rect.x, rect.y + y);
-		ClearPixels(p, 0, floor(outer_x));
-		if (outer_x < split_x) {
-			FillPixels(p, yline->color, outer_x, split_x);
+		for (x = 0; x < outer_xi; ++x, ++p) {
+			p->alpha = 0;
 		}
-		if (split_x < inner_x) {
-			FillPixels(p, xline->color, split_x, inner_x);
-		}
-		if (outer_x < right) {
-			p += (int)outer_x;
-			p->alpha = SmoothLeftPixel(p, outer_x);
+		for (; x < inner_xi; ++x, ++p) {
+			outer_d = -1;
+			inner_d = inner_x - 1.0 * x;
+			circle_x = x - r;
+			if (r > 0 && circle_y <= 0 && circle_x <= 0) {
+				outer_d =
+				    sqrt(POW2(circle_x) + POW2(circle_y)) - r;
+				if (radius_x == radius_y && radius_y > 0 &&
+				    y <= inner_ellipse_bottom) {
+					inner_d = outer_d + r - radius_x;
+				}
+			}
+			if (outer_d >= 1.0) {
+				p->alpha = 0;
+				continue;
+			}
+			if (x < split_x) {
+				color = yline->color;
+			} else {
+				color = xline->color;
+			}
+			if (outer_d >= 0) {
+				if (inner_d - outer_d >= 0.5) {
+					*p = color;
+				}
+				p->a = SmoothLeftPixel(p, outer_d);
+			} else if (inner_d >= 1.0) {
+				LCUI_OverPixel(p, &color);
+			} else if (inner_d >= 0) {
+				color.a = SmoothRightPixel(&color, inner_d);
+				LCUI_OverPixel(p, &color);
+			} else {
+				break;
+			}
 		}
 	}
 	return 0;
@@ -278,9 +342,8 @@ static int DrawBorderBottomRight(LCUI_Graph *dst, int bound_left, int bound_top,
 	BorderRenderContext();
 
 	int height = max(radius, xline->width);
-	int circle_bottom = bound_top + height;
-	int circle_center = circle_bottom - radius;
-	int inner_ellipse_bottom = circle_center + radius_y;
+	double circle_center = bound_top + height - radius - 0.5;
+	double inner_ellipse_bottom = circle_center + radius_y;
 
 	/* Get the actual rectagle that can be drawn */
 	Graph_GetValidRect(dst, &rect);
@@ -292,14 +355,14 @@ static int DrawBorderBottomRight(LCUI_Graph *dst, int bound_left, int bound_top,
 	for (y = 0; y < rect.height; ++y) {
 		outer_x = width;
 		split_x = 0;
-		inner_x = 0;
-		if (radius > 0 && y >= circle_center) {
-			circle_y = y - circle_center;
-			outer_x = width - radius +
-				  ellipse_x(radius, radius, circle_y);
-			if (radius_y > 0 && y <= inner_ellipse_bottom) {
+		inner_x = -1.0;
+		circle_y = CIRCLE_Y(y, circle_center);
+		if (r > 0 && circle_y <= 0) {
+			outer_x = width - r + ellipse_x(r, r, circle_y);
+			if (radius_y > 0 && y <= inner_ellipse_bottom &&
+			    y >= circle_center) {
 				inner_x =
-				    width - radius +
+				    width - radius - 0.5 +
 				    ellipse_x(radius_x, radius_y, circle_y);
 			}
 		}
@@ -309,21 +372,46 @@ static int DrawBorderBottomRight(LCUI_Graph *dst, int bound_left, int bound_top,
 		}
 		outer_x = bound_left + outer_x;
 		inner_x = bound_left + inner_x;
-		/* Limit coordinates into the current drawing region */
 		outer_x = max(0, min(right, outer_x));
-		inner_x = max(0, min(right, inner_x));
-		split_x = max(inner_x, min(outer_x, split_x));
-		p = Graph_GetPixelPointer(dst, rect.x, rect.y + y);
-		if (inner_x < split_x) {
-			FillPixels(p, xline->color, inner_x, split_x);
+		inner_x = max(-1.0, min(outer_x, inner_x));
+		inner_xi = max(0, (int)inner_x - (int)radius / 2);
+		outer_xi = min(right, (int)outer_x + (int)radius / 2);
+		p = Graph_GetPixelPointer(dst, rect.x + inner_xi, rect.y + y);
+		for (x = inner_xi; x < outer_xi; ++x, ++p) {
+			outer_d = -1.0;
+			inner_d = 1.0 * x - inner_x;
+			circle_x = CIRCLE_X(x, width - radius - 0.5);
+			if (r > 0 && circle_y <= 0 && circle_x >= 0) {
+				outer_d =
+				    sqrt(POW2(circle_x) + POW2(circle_y)) - r;
+				if (radius_x == radius_y && radius_y > 0 &&
+				    y <= inner_ellipse_bottom) {
+					inner_d = outer_d + r - radius_x;
+				}
+			}
+			if (outer_d >= 1.0) {
+				break;
+			}
+			if (x < split_x) {
+				color = xline->color;
+			} else {
+				color = yline->color;
+			}
+			if (outer_d >= 0) {
+				if (inner_d - outer_d >= 0.4) {
+					*p = color;
+				}
+				p->a = SmoothLeftPixel(p, outer_d);
+			} else if (inner_d >= 0.5) {
+				LCUI_OverPixel(p, &color);
+			} else if (inner_d >= 0) {
+				color.a = SmoothRightPixel(&color, inner_d);
+				LCUI_OverPixel(p, &color);
+			}
 		}
-		if (split_x < outer_x) {
-			FillPixels(p, yline->color, split_x, outer_x);
-		}
-		ClearPixels(p, ceil(outer_x), right);
-		if (outer_x < right) {
-			p += (int)outer_x;
-			p->alpha = SmoothRightPixel(p, outer_x);
+		/* Clear the outer pixels */
+		for (; x < right; ++x, ++p) {
+			p->alpha = 0;
 		}
 	}
 	return 0;
