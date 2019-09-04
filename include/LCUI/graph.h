@@ -91,7 +91,7 @@ LCUI_BEGIN_HEADER
 		pixel = (r << 16) | (g << 8) | b; \
 	}
 
-#define Graph_GetQuote(g) (g)->quote.is_valid ? (g)->quote.source : (g)
+#define Graph_GetQuote(g) ((g)->quote.is_valid ? (g)->quote.source : (g))
 
 #define Graph_SetPixel(G, X, Y, C)                                        \
 	if ((G)->color_type == LCUI_COLOR_TYPE_ARGB) {                    \
@@ -122,6 +122,8 @@ LCUI_BEGIN_HEADER
 			<< 16 |                                               \
 		    0xff << 24;                                               \
 	}
+
+#define Graph_GetPixelPointer(G, X, Y) ((G)->argb + (G)->width * (Y) + (X))
 
 /** 判断图像是否有Alpha通道 */
 #define Graph_HasAlpha(G)                                              \
