@@ -121,7 +121,7 @@ LCUI_Object Object_Duplicate(LCUI_Object src)
 
 int Object_Compare(LCUI_Object a, LCUI_Object b)
 {
-	if (a->type == a->type && a->type->compare) {
+	if (a->type == b->type && a->type->compare) {
 		return a->type->compare(a, b);
 	}
 	return a->value.string - b->value.string;
