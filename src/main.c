@@ -611,7 +611,11 @@ void LCUI_InitBase(void)
 	if (System.state == STATE_ACTIVE) {
 		return;
 	}
+#ifdef _DEBUG
+	Logger_SetLevel(LOGGER_LEVEL_DEBUG);
+#else
 	Logger_SetLevel(LOGGER_LEVEL_INFO);
+#endif
 	System.exit_code = 0;
 	System.state = STATE_ACTIVE;
 	System.thread = LCUIThread_SelfID();
