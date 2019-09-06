@@ -55,7 +55,7 @@ const char *global_css = CodeToString(
 	width: auto;
 	height:	auto;
 	background-color: transparent;
-	border: 0px solid #000;
+	border: 0px solid transparent;
 	display: block;
 	position: static;
 	padding: 0;
@@ -312,7 +312,7 @@ void LCUIWidget_InitStyle(void)
 	LCUI_InitCSSLibrary();
 	LCUI_InitCSSParser();
 	LCUI_InitCSSFontStyle();
-	LCUI_LoadCSSString(global_css, NULL);
+	LCUI_LoadCSSString(global_css, __FILE__);
 }
 
 void LCUIWidget_FreeStyle(void)
