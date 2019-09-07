@@ -10,18 +10,6 @@
 #include <LCUI/graph.h>
 #include <LCUI/image.h>
 
-#ifdef LCUI_BUILD_IN_WIN32
-static void LoggerHandler(const char *str)
-{
-	OutputDebugStringA(str);
-}
-
-static void LoggerHandlerW(const wchar_t *str)
-{
-	OutputDebugStringW(str);
-}
-#endif
-
 int main(int argc, char **argv)
 {
 	int i;
@@ -32,10 +20,6 @@ int main(int argc, char **argv)
 	LCUI_Graph g_src, g_dst;
 	LCUI_Color t_color;
 
-#ifdef LCUI_BUILD_IN_WIN32
-	Logger_SetHandler(LoggerHandler);
-	Logger_SetHandlerW(LoggerHandlerW);
-#endif
 	Graph_Init(&g_src);
 	g_src.color_type = LCUI_COLOR_TYPE_ARGB;
 	if (Graph_Create(&g_src, 960, 540) < 0) {
@@ -43,8 +27,7 @@ int main(int argc, char **argv)
 	}
 	t_color.value = 0xffaa5500;
 	Graph_FillRect(&g_src, t_color, NULL, false);
-	LOG("%-20s%-20s%s\n", "image size\\method", "Graph_Zoom()",
-	    "Graph_ZoomBilinear()");
+	Logger_Info("%-20s%-20s%s\n", "image size\\method", "Graph_Zoom()", "Graph_ZoomBilinear()");
 	for (i = 0; i < sizeof(resx) / sizeof(int); i++) {
 		resy = resx[i] * 9 / 16;
 		t0 = LCUI_GetTime();
@@ -59,7 +42,7 @@ int main(int argc, char **argv)
 		sprintf(s_res, "%dx%d", resx[i], resy);
 		sprintf(s_t0, "%ldms", t1 - t0);
 		sprintf(s_t1, "%ldms", t2 - t1);
-		LOG("%-20s%-20s%-20s\n", s_res, s_t0, s_t1);
+		Logger_Info("%-20s%-20s%-20s\n", s_res, s_t0, s_t1);
 	}
 	Graph_Free(&g_src);
 	return 0;
