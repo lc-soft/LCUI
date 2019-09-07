@@ -89,6 +89,7 @@ void LCUIWidget_InitPrototype(void)
 	self.default_prototype.settext = Widget_DefaultTextSetter;
 	self.default_prototype.bindprop = Widget_DefaultPropertyBinder;
 	self.default_prototype.autosize = Widget_DefaultResizer;
+	self.default_prototype.paint = Widget_DefaultPainter;
 }
 
 void LCUIWidget_FreePrototype(void)
