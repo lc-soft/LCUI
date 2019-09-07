@@ -414,10 +414,10 @@ static LCUI_BOOL BoxShadow_PaintCircleBlur(BoxShadowRenderingContext ctx,
 	top = rect.y;
 	left = rect.x;
 	color = ctx->shadow->color;
-	rect.x -= ctx->paint->rect.x;
-	rect.y -= ctx->paint->rect.y;
 	center_x = center_x + circle_rect->x - rect.x;
 	center_y = center_y + circle_rect->y - rect.y;
+	rect.x -= ctx->paint->rect.x;
+	rect.y -= ctx->paint->rect.y;
 	Graph_Quote(&ref, &ctx->paint->canvas, &rect);
 	Graph_GetValidRect(&ref, &rect);
 	canvas = Graph_GetQuote(&ref);
@@ -567,6 +567,8 @@ static void BoxShadow_FillRect(BoxShadowRenderingContext ctx)
 			continue;
 		}
 		LCUIRect_GetOverlayRect(&rects[i], &ctx->paint->rect, &rect);
+		rect.x -= ctx->paint->rect.x;
+		rect.y -= ctx->paint->rect.y;
 		Graph_FillRect(&ctx->paint->canvas, ctx->shadow->color, &rect,
 			       TRUE);
 	}

@@ -86,7 +86,7 @@ static int DrawBorderTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 
 	double cirlce_center_x = bound_left + r;
 	double circle_center_y = bound_top + r;
-	int inner_ellipse_top = bound_top + xline->width;
+	int inner_ellipse_top = bound_top + 1.0 * xline->width;
 
 	/* Get the actual rectagle that can be drawn */
 	Graph_GetValidRect(dst, &rect);
@@ -175,7 +175,7 @@ static int DrawBorderTopRight(LCUI_Graph *dst, int bound_left, int bound_top,
 
 	double circle_center_y = bound_top + r;
 	double circle_center_x = bound_left + width - 1.0 * radius - 0.5;
-	double inner_ellipse_top = bound_top + xline->width;
+	double inner_ellipse_top = bound_top + 1.0 * xline->width;
 
 	/* Get the actual rectagle that can be drawn */
 	Graph_GetValidRect(dst, &rect);
@@ -257,7 +257,6 @@ static int DrawBorderBottomLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 	BorderRenderContext();
 
 	int height = max(radius, xline->width);
-	double circle_top = bound_top + radius_y;
 	double cirlce_center_x = bound_left + r;
 	double circle_center_y = bound_top + height - 1.0 * radius - 0.5;
 	double inner_ellipse_bottom = circle_center_y + radius_y;
