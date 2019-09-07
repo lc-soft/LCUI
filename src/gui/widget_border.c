@@ -111,7 +111,8 @@ void Widget_ComputeBorderStyle(LCUI_Widget w)
 		case key_border_bottom_right_radius:
 			b->bottom_right_radius = ComputeXMetric(w, s);
 			break;
-		default: break;
+		default:
+			break;
 		}
 	}
 }
@@ -146,26 +147,28 @@ void Widget_UpdateBorder(LCUI_Widget w)
 }
 
 /** 计算部件边框样式的实际值 */
-void Widget_ComputeBorder(LCUI_Widget w, LCUI_Border *out)
+void Widget_ComputeBorder(LCUI_Widget w, LCUI_Border *b)
 {
 	LCUI_BorderStyle *s;
+	float r = min(w->width, w->height) / 2.0;
+
 	s = &w->computed_style.border;
-	out->top.color = s->top.color;
-	out->left.color = s->left.color;
-	out->right.color = s->right.color;
-	out->bottom.color = s->bottom.color;
-	out->top.style = s->top.style;
-	out->left.style = s->left.style;
-	out->right.style = s->right.style;
-	out->bottom.style = s->bottom.style;
-	out->top.width = ComputeActual(s->top.width);
-	out->left.width = ComputeActual(s->left.width);
-	out->right.width = ComputeActual(s->right.width);
-	out->bottom.width = ComputeActual(s->bottom.width);
-	out->top_left_radius = ComputeActual(s->top_left_radius);
-	out->top_right_radius = ComputeActual(s->top_right_radius);
-	out->bottom_left_radius = ComputeActual(s->bottom_left_radius);
-	out->bottom_right_radius = ComputeActual(s->bottom_right_radius);
+	b->top.color = s->top.color;
+	b->left.color = s->left.color;
+	b->right.color = s->right.color;
+	b->bottom.color = s->bottom.color;
+	b->top.style = s->top.style;
+	b->left.style = s->left.style;
+	b->right.style = s->right.style;
+	b->bottom.style = s->bottom.style;
+	b->top.width = ComputeActual(s->top.width);
+	b->left.width = ComputeActual(s->left.width);
+	b->right.width = ComputeActual(s->right.width);
+	b->bottom.width = ComputeActual(s->bottom.width);
+	b->top_left_radius = ComputeActual(min(s->top_left_radius, r));
+	b->top_right_radius = ComputeActual(min(s->top_right_radius, r));
+	b->bottom_left_radius = ComputeActual(min(s->bottom_left_radius, r));
+	b->bottom_right_radius = ComputeActual(min(s->bottom_right_radius, r));
 }
 
 void Widget_PaintBorder(LCUI_Widget w, LCUI_PaintContext paint,
