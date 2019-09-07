@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT(LCUI, 1.1.0-beta, lc-soft@live.cn)
+AC_INIT(LCUI, 1.3.0, lc-soft@live.cn)
 
 # Silence warning: ar: 'u' modifier ignored since 'D' is the default
 AC_SUBST(AR_FLAGS, [cr])
@@ -59,7 +59,7 @@ CFLAGS="-Wall -D _GNU_SOURCE"
 CXXFLAG="-Wall -D _GNU_SOURCE"
 export C_INCLUDE_PATH=$C_INCLUDE_PATH:/usr/include/libxml2:/usr/include/freetype2/
 
-# 检测是否启用线程支持
+# pthread
 want_thread=no
 thread_name=pthread
 AC_ARG_WITH(pthread, AC_HELP_STRING([--with-pthread], [use pthread (default)]))
@@ -73,10 +73,10 @@ if test "x$with_pthread" != "xno"; then
 	], [AC_MSG_ERROR([The support could not be configured for the POSIX thread programming interface.])])
 fi
 
-# 检测是否有libxml2库，必须有 libxml2 库才能启用 LCUIBuilder 功能模块
+# libxml2
 enable_builder=yes
 AC_ARG_ENABLE(lcui-builder, AC_HELP_STRING([--enable-lcui-builder],
-[enable lcui-builder function module [[default=yes]]]), [enable_builder=$enableval])
+[enable lcui-builder module to build GUI with XML [default=yes]]), [enable_builder=$enableval])
 if test "$enable_builder" = "yes"; then
 	AC_CHECK_HEADERS([libxml/parser.h],[
 		AC_CHECK_LIB([xml2], [xmlParseFile], [
@@ -88,11 +88,11 @@ if test "$enable_builder" = "yes"; then
 	], [enable_builder=no])
 fi
 
-# 检测是否有freetype库
+# freetype
 want_font_engine=yes
 font_engine_name=none
 AC_ARG_ENABLE(font-engine, AC_HELP_STRING([--enable-font-engine],
-[turn on font-engine [[default=yes]]]), [want_font_engine=$enableval])
+[turn on font-engine [default=yes]]), [want_font_engine=$enableval])
 if test "$want_font_engine" = yes; then
 	AC_CHECK_HEADERS([ft2build.h], [
 		AC_CHECK_LIB([freetype], [FT_Init_FreeType], [
@@ -110,7 +110,7 @@ fi
 # fontconfig
 want_fontconfig=yes
 AC_ARG_ENABLE(fontconfig, AC_HELP_STRING([--enable-fontconfig],
-[turn on fontconfig [[default=yes]]]), [want_fontconfig=$enableval])
+[turn on fontconfig [default=yes]]), [want_fontconfig=$enableval])
 if test "$want_fontconfig" = yes; then
 	AC_CHECK_HEADERS([fontconfig/fontconfig.h], [
 		AC_CHECK_LIB([fontconfig], [FcInitLoadConfigAndFonts], [
@@ -124,13 +124,13 @@ else
 	want_fontconfig=no
 fi
 
-# 检测图形输出设备
+# video output
 want_video_output=yes
 want_video_driver_x11=no
 want_video_driver_framebuffer=no
 video_driver_name=none
 AC_ARG_ENABLE(video-output, AC_HELP_STRING([--enable-video-output],
-[turn on video-output [[default=yes]]]), [want_video_output=$enableval])
+[turn on video-output [default=yes]]), [want_video_output=$enableval])
 if test "$want_video_output" = yes; then
 	AC_CHECK_HEADERS([linux/fb.h],[
 		video_driver_name=framebuffer
@@ -150,6 +150,7 @@ else
 	want_video_output=no
 fi
 
+# libpng
 want_png=no
 AC_ARG_WITH(png, AC_HELP_STRING([--with-png], [use libpng (default)]))
 if test "x$with_png" != "xno"; then
@@ -163,6 +164,7 @@ if test "x$with_png" != "xno"; then
 	], [want_png=no])
 fi
 
+# libjpeg
 want_jpeg=no
 AC_ARG_WITH(jpeg, AC_HELP_STRING([--with-jpeg], [use libjpeg (default)]))
 if test "x$with_jpeg" != "xno"; then
@@ -175,11 +177,11 @@ if test "x$with_jpeg" != "xno"; then
 	], [want_jpeg=no])
 fi
 
-# 调试选项，如果需要对项目进行调试，可启用调试选项
+# debug
 want_debug=no
 AC_MSG_CHECKING(whether to enable debugging)
 AC_ARG_ENABLE(debug, AC_HELP_STRING([--enable-debug],
-[turn on debugging [[default=no]]]), want_debug=$enableval)
+[turn on debugging [default=no]]), want_debug=$enableval)
 if test "$want_debug" = "yes"; then
 	CFLAGS="$CFLAGS -g"
 	CXXFLAG="$CXXFLAGS -g"
