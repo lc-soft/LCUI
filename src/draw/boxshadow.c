@@ -153,8 +153,6 @@ static LCUI_BOOL CheckPixelInContentBox(BoxShadowRenderingContext ctx, int x,
 					int y)
 {
 	double r;
-	double circle_x;
-	double circle_y;
 	double center_x;
 	double center_y;
 
@@ -167,36 +165,28 @@ static LCUI_BOOL CheckPixelInContentBox(BoxShadowRenderingContext ctx, int x,
 
 	r = ctx->shadow->top_left_radius;
 	if (x <= r && y <= r) {
-		circle_x = x - r;
-		circle_y = r - y;
-		return circle_x >= -sqrt(r * r - circle_y * circle_y);
+		return POW2(x - r) + POW2(r - y) <= r * r;
 	}
 
 	r = ctx->shadow->top_right_radius;
-	center_y = r - 0.5;
+	center_y = r;
 	center_x = ctx->content_box.width - r - 0.5;
 	if (x >= center_x && y <= center_y) {
-		circle_x = x - center_x;
-		circle_y = center_y - y;
-		return circle_x <= sqrt(r * r - circle_y * circle_y);
+		return POW2(x - center_x) + POW2(center_y - y) <= r * r;
 	}
 
 	r = ctx->shadow->bottom_left_radius;
-	center_x = r - 0.5;
+	center_x = r;
 	center_y = ctx->content_box.height - r - 0.5;
 	if (x <= center_x && y >= center_y) {
-		circle_x = x - center_x;
-		circle_y = center_y - y;
-		return circle_x >= -sqrt(r * r - circle_y * circle_y);
+		return POW2(x - center_x) + POW2(center_y - y) <= r * r;
 	}
 
 	r = ctx->shadow->bottom_right_radius;
 	center_x = ctx->content_box.width - r - 0.5;
 	center_y = ctx->content_box.height - r - 0.5;
 	if (x >= center_x && y >= center_y) {
-		circle_x = x - center_x;
-		circle_y = center_y - y;
-		return circle_x <= sqrt(r * r - circle_y * circle_y);
+		return POW2(x - center_x) + POW2(center_y - y) <= r * r;
 	}
 	return TRUE;
 }
@@ -547,13 +537,13 @@ static LCUI_BOOL FillPixelsOutsideCircle(BoxShadowRenderingContext ctx,
 		row = canvas->argb + (rect.y + y) * canvas->width + rect.x;
 		circle_x = sqrt(r2 - POW2(center_y - y));
 		pixel = row;
-		right = center_x - (int)circle_x - 1;
+		right = center_x - circle_x - 0.5;
 		right = min(right, rect.width);
 		for (x = 0; x < right; ++x) {
 			LCUI_OverPixel(pixel, &ctx->shadow->color);
 			++pixel;
 		}
-		x = center_x + (int)circle_x + 1;
+		x = center_x + circle_x + 0.5;
 		pixel = row + x;
 		for (; x < rect.width; ++x) {
 			LCUI_OverPixel(pixel, &ctx->shadow->color);
