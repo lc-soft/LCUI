@@ -145,7 +145,7 @@ static void X11Surface_OnResize(LCUI_Surface s, int width, int height)
 		s->fb.color_type = LCUI_COLOR_TYPE_ARGB;
 		break;
 	default:
-		LOG("[x11display] unsupport depth: %d.\n", depth);
+		Logger_Error("[x11display] unsupport depth: %d.\n", depth);
 		break;
 	}
 	Graph_Create(&s->fb, width, height);
@@ -154,14 +154,14 @@ static void X11Surface_OnResize(LCUI_Surface s, int width, int height)
 				 (char *)(s->fb.bytes), width, height, 32, 0);
 	if (!s->ximage) {
 		Graph_Free(&s->fb);
-		LOG("[x11display] create XImage faild.\n");
+		Logger_Error("[x11display] create XImage faild.\n");
 		return;
 	}
 	gcv.graphics_exposures = False;
 	s->gc =
 	    XCreateGC(x11.app->display, s->window, GCGraphicsExposures, &gcv);
 	if (!s->gc) {
-		LOG("[x11display] create graphics context faild.\n");
+		Logger_Error("[x11display] create graphics context faild.\n");
 		return;
 	}
 }

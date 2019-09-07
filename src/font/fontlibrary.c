@@ -978,7 +978,7 @@ static void LCUIFont_LoadDefaultFonts(void)
 #ifdef LCUI_BUILD_IN_WIN32
 	LCUIFont_LoadFontsForWindows();
 #elif defined(USE_FONTCONFIG)
-	LOG("[font] fontconfig enabled\n");
+	Logger_Info("[font] fontconfig enabled\n");
 	LCUIFont_LoadFontsByFontConfig();
 #else
 	LCUIFont_LoadFontsForLinux();

@@ -69,7 +69,7 @@ static void LinuxKeybnoardThread(void *arg)
 	struct input_event data;
 
 	keyboard.active = TRUE;
-	LOG("[input] keyboard driver thread: %lld\n", keyboard.tid);
+	Logger_Debug("[input] keyboard driver thread: %lld\n", keyboard.tid);
 	while (keyboard.active) {
 		bytes = read(keyboard.dev_fd, &data, sizeof(data));
 		if (bytes > 0 && data.type == EV_KEY) {
@@ -87,7 +87,7 @@ static int InitLinuxKeybord(void)
 	}
 	if ((keyboard.dev_fd = open(keyboard.dev_path, O_RDONLY | O_NONBLOCK)) <
 	    0) {
-		perror("[input] open keyboard device failed");
+		Logger_Error("[input] open keyboard device failed");
 		return -1;
 	}
 	LCUIThread_Create(&keyboard.tid, LinuxKeybnoardThread, NULL);
@@ -248,7 +248,7 @@ static int InitLinuxKeybord(void)
 		signal(signals[i], on_signal);
 	}
 	LCUIThread_Create(&keyboard.tid, LinuxKeybnoardThread, NULL);
-	LOG("[input] keyboard driver thread: %lld\n", keyboard.tid);
+	Logger_Debug("[input] keyboard driver thread: %lld\n", keyboard.tid);
 	return 0;
 }
 

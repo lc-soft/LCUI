@@ -333,7 +333,7 @@ int LCUI_WritePNGFile(const char *file_name, const LCUI_Graph *graph)
 	fclose(fp);
 	return 0;
 #else
-	LOG("warning: not PNG support!");
+	Logger_Warning("warning: not PNG support!");
 	return -ENOSYS;
 #endif
 }

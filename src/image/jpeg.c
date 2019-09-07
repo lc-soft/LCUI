@@ -229,7 +229,7 @@ int LCUI_InitJPEGReader(LCUI_ImageReader reader)
 	jpeg_reader->err.reader = reader;
 	return 0;
 #else
-	LOG("warning: not JPEG support!");
+	Logger_Warning("warning: not JPEG support!");
 #endif
 	return -1;
 }
@@ -283,7 +283,7 @@ int LCUI_ReadJPEG(LCUI_ImageReader reader, LCUI_Graph *graph)
 	}
 	return 0;
 #else
-	LOG("warning: not JPEG support!");
+	Logger_Warning("warning: not JPEG support!");
 #endif
 	return -ENOSYS;
 }

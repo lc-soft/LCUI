@@ -320,7 +320,7 @@ static void ParseNode(XMLParserContext ctx, xmlNodePtr node)
 LCUI_Widget LCUIBuilder_LoadString(const char *str, int size)
 {
 #ifndef USE_LCUI_BUILDER
-	LOG(WARN_TXT);
+	Logger_Warning(WARN_TXT);
 #else
 	xmlDocPtr doc;
 	xmlNodePtr cur;
@@ -353,7 +353,7 @@ FAILED:
 LCUI_Widget LCUIBuilder_LoadFile(const char *filepath)
 {
 #ifndef USE_LCUI_BUILDER
-	LOG(WARN_TXT);
+	Logger_Warning(WARN_TXT);
 #else
 	xmlDocPtr doc;
 	xmlNodePtr cur;
