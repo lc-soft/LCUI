@@ -17,11 +17,11 @@ before_script:
 script:
   - ./configure --enable-code-coverage
   - make
-  - make check
+  - make distcheck
   - cd test
   - make
   - ./test
-  - valgrind --leak-check=full --error-exitcode=42 .libs/lt-test
+  - ../libtool --mode=execute valgrind --leak-check=full --error-exitcode=42 ./test
 
 after_success:
   - coveralls --gcov-options '\-lp'
