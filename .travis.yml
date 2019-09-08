@@ -1,4 +1,4 @@
-dist: trusty
+dist: bionic
 language: c
 compiler:
   - clang
