@@ -16,7 +16,7 @@ int main(int argc, char **argv)
 	int64_t t0, t1, t2;
 	int resx[] = { 480, 960, 1280, 1366, 1920, 2560, 3840 }, resy;
 	char s_res[32], s_t0[32], s_t1[32];
-	
+
 	LCUI_Graph g_src, g_dst;
 	LCUI_Color t_color;
 
@@ -27,7 +27,8 @@ int main(int argc, char **argv)
 	}
 	t_color.value = 0xffaa5500;
 	Graph_FillRect(&g_src, t_color, NULL, false);
-	Logger_Info("%-20s%-20s%s\n", "image size\\method", "Graph_Zoom()", "Graph_ZoomBilinear()");
+	Logger_Info("%-20s%-20s%s\n", "image size\\method", "Graph_Zoom()",
+		    "Graph_ZoomBilinear()");
 	for (i = 0; i < sizeof(resx) / sizeof(int); i++) {
 		resy = resx[i] * 9 / 16;
 		t0 = LCUI_GetTime();
