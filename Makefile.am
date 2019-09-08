@@ -1,5 +1,5 @@
 AUTOMAKE_OPTIONS=foreign
-SUBDIRS=src build include
+SUBDIRS=src build include test
 ACLOCAL_AMFLAGS=-I m4
 pkgconfigdir = $(prefix)/lib/pkgconfig
 pkgconfig_DATA = $(PACKAGE).pc
@@ -53,7 +53,7 @@ test/test_widget_inline_block_layout.css \
 test/test_widget_inline_block_layout.xml \
 test/test_widget_rect.c \
 test/test_textview_resize.c \
-test/text_textedit.c
+test/test_textedit.c
 
 .PHONY: test
 

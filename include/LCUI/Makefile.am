@@ -14,6 +14,7 @@ platform/linux/linux_fbdisplay.h \
 platform/linux/linux_x11display.h \
 platform/linux/linux_x11events.h \
 platform/linux/linux_x11mouse.h \
+platform/linux/linux_x11keyboard.h \
 platform/windows/windows_display.h \
 platform/windows/windows_events.h \
 platform/windows/windows_mouse.h \
