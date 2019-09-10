@@ -175,9 +175,22 @@ void Widget_PaintBorder(LCUI_Widget w, LCUI_PaintContext paint,
 			LCUI_WidgetActualStyle style)
 {
 	LCUI_Rect box;
+
 	box.x = style->border_box.x - style->canvas_box.x;
 	box.y = style->border_box.y - style->canvas_box.y;
 	box.width = style->border_box.width;
 	box.height = style->border_box.height;
 	Border_Paint(&style->border, &box, paint);
+}
+
+void Widget_CropContent(LCUI_Widget w, LCUI_PaintContext paint,
+			LCUI_WidgetActualStyle style)
+{
+	LCUI_Rect box;
+
+	box.x = style->border_box.x - style->canvas_box.x;
+	box.y = style->border_box.y - style->canvas_box.y;
+	box.width = style->border_box.width;
+	box.height = style->border_box.height;
+	Border_CropContent(&style->border, &box, paint);
 }

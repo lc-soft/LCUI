@@ -33,15 +33,14 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
 
-/**
- * FIXME: 精简圆角边框绘制算法
- * 现在的圆角是分成四个部分绘制的，四个函数的代码大部分一样，应该将它们合并成一个
- */
-
 #define POW2(X) ((X) * (X))
 #define CIRCLE_R(R) (R - 0.5)
-#define CIRCLE_Y(Y, CENTER_Y) ((CENTER_Y)-Y)
-#define CIRCLE_X(X, CENTER_X) (X - (CENTER_X))
+
+/*  Convert screen Y coordinate to geometric Y coordinate */
+#define ToGeoY(Y, CENTER_Y) ((CENTER_Y)-Y)
+
+/*  Convert screen X coordinate to geometric X coordinate */
+#define ToGeoX(X, CENTER_X) (X - (CENTER_X))
 
 #define SmoothLeftPixel(PX, X) (uchar_t)((PX)->a * (1.0 - (X - 1.0 * (int)X)))
 #define SmoothRightPixel(PX, X) (uchar_t)((PX)->a * (X - 1.0 * (int)X))
@@ -78,6 +77,12 @@ static double ellipse_x(double radius_x, double radius_y, double y)
 	return sqrt(value);
 }
 
+/**
+ * FIXME: Improve the rounded border drawing code
+ * Merge the four functions of DrawBorder* into one function and make it simple.
+ */
+
+/** Draw border top left corner */
 static int DrawBorderTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 			     const LCUI_BorderLine *xline,
 			     const LCUI_BorderLine *yline, unsigned int radius)
@@ -86,7 +91,10 @@ static int DrawBorderTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 
 	double cirlce_center_x = bound_left + r;
 	double circle_center_y = bound_top + r;
-	int inner_ellipse_top = bound_top + 1.0 * xline->width;
+	double split_k = 1.0 * yline->width / xline->width;
+	double split_center_x = bound_left + 1.0 * yline->width;
+	double split_center_y = bound_top + 1.0 * xline->width;
+	int inner_ellipse_top = split_center_y;
 
 	/* Get the actual rectagle that can be drawn */
 	Graph_GetValidRect(dst, &rect);
@@ -99,7 +107,7 @@ static int DrawBorderTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 		outer_x = 0;
 		split_x = 0;
 		inner_x = width;
-		circle_y = CIRCLE_Y(y, circle_center_y);
+		circle_y = ToGeoY(y, circle_center_y);
 		if (r > 0 && circle_y >= 0) {
 			outer_x = r - ellipse_x(r, r, circle_y);
 			if (radius_y > 0 && y >= inner_ellipse_top) {
@@ -108,7 +116,8 @@ static int DrawBorderTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 			}
 		}
 		if (xline->width > 0) {
-			split_x = 1.0 * y * yline->width / xline->width;
+			split_x = split_center_x -
+				  ToGeoY(y, split_center_y) * split_k;
 		}
 		outer_x = bound_left + outer_x;
 		inner_x = bound_left + inner_x;
@@ -125,7 +134,7 @@ static int DrawBorderTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 		for (; x < inner_xi; ++x, ++p) {
 			outer_d = -1;
 			inner_d = inner_x - 1.0 * x;
-			circle_x = CIRCLE_X(x, cirlce_center_x);
+			circle_x = ToGeoX(x, cirlce_center_x);
 			/* If in the circle */
 			if (r > 0 && circle_y >= 0 && circle_x <= 0) {
 				outer_d =
@@ -175,7 +184,10 @@ static int DrawBorderTopRight(LCUI_Graph *dst, int bound_left, int bound_top,
 
 	double circle_center_y = bound_top + r;
 	double circle_center_x = bound_left + width - 1.0 * radius - 0.5;
-	double inner_ellipse_top = bound_top + 1.0 * xline->width;
+	double split_k = 1.0 * yline->width / xline->width;
+	double split_center_x = bound_left + width - 1.0 * yline->width;
+	double split_center_y = bound_top + 1.0 * xline->width;
+	double inner_ellipse_top = split_center_y;
 
 	/* Get the actual rectagle that can be drawn */
 	Graph_GetValidRect(dst, &rect);
@@ -188,7 +200,7 @@ static int DrawBorderTopRight(LCUI_Graph *dst, int bound_left, int bound_top,
 		outer_x = width;
 		split_x = 0;
 		inner_x = -1.0;
-		circle_y = CIRCLE_Y(y, circle_center_y);
+		circle_y = ToGeoY(y, circle_center_y);
 		if (r > 0 && circle_y >= 0) {
 			outer_x = width - radius + ellipse_x(r, r, circle_y);
 			if (radius_y > 0 && y >= inner_ellipse_top) {
@@ -198,8 +210,8 @@ static int DrawBorderTopRight(LCUI_Graph *dst, int bound_left, int bound_top,
 			}
 		}
 		if (xline->width > 0) {
-			split_x =
-			    1.0 * width - 1.0 * y * yline->width / xline->width;
+			split_x = split_center_x +
+				  ToGeoY(y, split_center_y) * split_k;
 		}
 		outer_x = bound_left + outer_x;
 		inner_x = bound_left + inner_x;
@@ -212,7 +224,7 @@ static int DrawBorderTopRight(LCUI_Graph *dst, int bound_left, int bound_top,
 		for (x = inner_xi; x < outer_xi; ++x, ++p) {
 			outer_d = -1.0;
 			inner_d = x - inner_x;
-			circle_x = CIRCLE_X(x, circle_center_x);
+			circle_x = ToGeoX(x, circle_center_x);
 			if (r > 0 && circle_y >= 0 && circle_x >= 0) {
 				outer_d =
 				    sqrt(POW2(circle_x) + POW2(circle_y)) - r;
@@ -259,6 +271,9 @@ static int DrawBorderBottomLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 	int height = max(radius, xline->width);
 	double cirlce_center_x = bound_left + r;
 	double circle_center_y = bound_top + height - 1.0 * radius - 0.5;
+	double split_k = 1.0 * yline->width / xline->width;
+	double split_center_x = bound_left + 1.0 * yline->width;
+	double split_center_y = bound_top + height - 1.0 * xline->width;
 	double inner_ellipse_bottom = circle_center_y + radius_y;
 
 	/* Get the actual rectagle that can be drawn */
@@ -272,7 +287,7 @@ static int DrawBorderBottomLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 		outer_x = 0;
 		split_x = 0;
 		inner_x = width;
-		circle_y = CIRCLE_Y(y, circle_center_y);
+		circle_y = ToGeoY(y, circle_center_y);
 		if (r > 0 && circle_y <= 0) {
 			outer_x = r - ellipse_x(r, r, circle_y);
 			if (radius_y > 0 && y <= inner_ellipse_bottom) {
@@ -281,8 +296,8 @@ static int DrawBorderBottomLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 			}
 		}
 		if (xline->width > 0) {
-			split_x =
-			    1.0 * (height - y) * yline->width / xline->width;
+			split_x = split_center_x +
+				  ToGeoY(y, split_center_y) * split_k;
 		}
 		outer_x = bound_left + outer_x;
 		inner_x = bound_left + inner_x;
@@ -298,7 +313,7 @@ static int DrawBorderBottomLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 		for (; x < inner_xi; ++x, ++p) {
 			outer_d = -1;
 			inner_d = inner_x - 1.0 * x;
-			circle_x = CIRCLE_X(x, cirlce_center_x);
+			circle_x = ToGeoX(x, cirlce_center_x);
 			if (r > 0 && circle_y <= 0 && circle_x <= 0) {
 				outer_d =
 				    sqrt(POW2(circle_x) + POW2(circle_y)) - r;
@@ -344,6 +359,9 @@ static int DrawBorderBottomRight(LCUI_Graph *dst, int bound_left, int bound_top,
 	int height = max(radius, xline->width);
 	double circle_center_y = bound_top + height - 1.0 * radius - 0.5;
 	double circle_center_x = bound_left + width - 1.0 * radius - 0.5;
+	double split_k = 1.0 * yline->width / xline->width;
+	double split_center_x = bound_left + width - 1.0 * yline->width;
+	double split_center_y = bound_top + height - 1.0 * xline->width;
 	double inner_ellipse_bottom = circle_center_y + radius_y;
 
 	/* Get the actual rectagle that can be drawn */
@@ -357,7 +375,7 @@ static int DrawBorderBottomRight(LCUI_Graph *dst, int bound_left, int bound_top,
 		outer_x = width;
 		split_x = 0;
 		inner_x = -1.0;
-		circle_y = CIRCLE_Y(y, circle_center_y);
+		circle_y = ToGeoY(y, circle_center_y);
 		if (r > 0 && circle_y <= 0) {
 			outer_x = width - r + ellipse_x(r, r, circle_y);
 			if (radius_y > 0 && y <= inner_ellipse_bottom &&
@@ -368,8 +386,8 @@ static int DrawBorderBottomRight(LCUI_Graph *dst, int bound_left, int bound_top,
 			}
 		}
 		if (xline->width > 0) {
-			split_x = width - 1.0 * (height - y) * yline->width /
-					      xline->width;
+			split_x = split_center_x -
+				  ToGeoY(y, split_center_y) * split_k;
 		}
 		outer_x = bound_left + outer_x;
 		inner_x = bound_left + inner_x;
@@ -381,7 +399,7 @@ static int DrawBorderBottomRight(LCUI_Graph *dst, int bound_left, int bound_top,
 		for (x = inner_xi; x < outer_xi; ++x, ++p) {
 			outer_d = -1.0;
 			inner_d = 1.0 * x - inner_x;
-			circle_x = CIRCLE_X(x, circle_center_x);
+			circle_x = ToGeoX(x, circle_center_x);
 			if (r > 0 && circle_y <= 0 && circle_x >= 0) {
 				outer_d =
 				    sqrt(POW2(circle_x) + POW2(circle_y)) - r;
@@ -414,6 +432,331 @@ static int DrawBorderBottomRight(LCUI_Graph *dst, int bound_left, int bound_top,
 		for (; x < right; ++x, ++p) {
 			p->alpha = 0;
 		}
+	}
+	return 0;
+}
+
+/**
+ * FIXME: Improve the content cropping code
+ * Merge the four functions of CropContent* into one function and make it
+ * simple.
+ */
+
+/** Crop the top left corner of the content area */
+static int CropContentTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
+			      double radius_x, double radius_y)
+{
+	int xi, yi;
+	int outer_xi;
+	double x, y, d;
+	double outer_x;
+	double center_x, center_y;
+
+	LCUI_Rect rect;
+	LCUI_ARGB *p;
+
+	radius_x -= 0.5;
+	radius_y -= 0.5;
+	center_x = bound_left + radius_x;
+	center_y = bound_top + radius_y;
+	Graph_GetValidRect(dst, &rect);
+	dst = Graph_GetQuote(dst);
+	if (!Graph_IsValid(dst)) {
+		return -1;
+	}
+	for (yi = 0; yi < rect.height; ++yi) {
+		y = ToGeoY(yi, center_y);
+		x = ellipse_x(radius_x + 1.0, radius_y + 1.0, y);
+		outer_xi = (int)center_x - x;
+		outer_xi = max(0, min(outer_xi, rect.width));
+		p = Graph_GetPixelPointer(dst, rect.x, rect.y + yi);
+		for (xi = 0; xi < outer_xi; ++xi, ++p) {
+			p->alpha = 0;
+		}
+		/* If inner ellipse is circle */
+		if (radius_x == radius_y) {
+			for (; xi < rect.width; ++xi, ++p) {
+				x = ToGeoX(xi, center_x);
+				d = sqrt(x * x + y * y) - radius_x;
+				if (d >= 1.0) {
+					p->alpha = 0;
+				} else if (d >= 0) {
+					p->alpha = SmoothLeftPixel(p, d);
+				} else {
+					break;
+				}
+			}
+		} else {
+			outer_x =
+			    ToGeoX(ellipse_x(radius_x, radius_y, y), center_x);
+			for (; xi < rect.width; ++xi, ++p) {
+				x = ToGeoX(xi, center_x);
+				d = x - outer_x;
+				if (d >= 1.0) {
+					p->alpha = 0;
+				} else if (d >= 0) {
+					p->alpha = SmoothLeftPixel(p, d);
+				} else {
+					break;
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+static int CropContentTopRight(LCUI_Graph *dst, int bound_left, int bound_top,
+			       double radius_x, double radius_y)
+{
+	int xi, yi;
+	int outer_xi;
+	double x, y, d;
+	double outer_x;
+	double center_x, center_y;
+
+	LCUI_Rect rect;
+	LCUI_ARGB *p;
+
+	radius_x -= 0.5;
+	radius_y -= 0.5;
+	center_x = bound_left;
+	center_y = bound_top + radius_y;
+	Graph_GetValidRect(dst, &rect);
+	dst = Graph_GetQuote(dst);
+	if (!Graph_IsValid(dst)) {
+		return -1;
+	}
+	for (yi = 0; yi < rect.height; ++yi) {
+		y = ToGeoY(yi, center_y);
+		x = ellipse_x(max(0, radius_x - 1), max(0, radius_y - 1), y);
+		outer_xi = (int)(center_x + x);
+		outer_xi = max(0, outer_xi);
+		p = Graph_GetPixelPointer(dst, rect.x + outer_xi, rect.y + yi);
+		if (radius_x == radius_y) {
+			for (xi = outer_xi; xi < rect.width; ++xi, ++p) {
+				x = ToGeoX(xi, center_x);
+				d = sqrt(x * x + y * y) - radius_x;
+				if (d >= 1.0) {
+					break;
+				}
+				if (d >= 0) {
+					p->alpha = SmoothLeftPixel(p, d);
+				}
+			}
+		} else {
+			outer_x =
+			    ToGeoX(ellipse_x(radius_x, radius_y, y), center_x);
+			for (xi = outer_xi; xi < rect.width; ++xi, ++p) {
+				x = ToGeoX(xi, center_x);
+				d = x - outer_x;
+				if (d >= 1.0) {
+					break;
+				}
+				if (d >= 0) {
+					p->alpha = SmoothLeftPixel(p, d);
+				}
+			}
+		}
+		for (; xi < rect.width; ++xi, ++p) {
+			p->alpha = 0;
+		}
+	}
+	return 0;
+}
+
+static int CropContentBottomLeft(LCUI_Graph *dst, int bound_left, int bound_top,
+				 double radius_x, double radius_y)
+{
+	int xi, yi;
+	int outer_xi;
+	double x, y, d;
+	double outer_x;
+	double center_x, center_y;
+
+	LCUI_Rect rect;
+	LCUI_ARGB *p;
+
+	radius_x -= 0.5;
+	radius_y -= 0.5;
+	center_x = bound_left + radius_x;
+	center_y = bound_top;
+	Graph_GetValidRect(dst, &rect);
+	dst = Graph_GetQuote(dst);
+	if (!Graph_IsValid(dst)) {
+		return -1;
+	}
+	for (yi = 0; yi < rect.height; ++yi) {
+		y = ToGeoY(yi, center_y);
+		x = ellipse_x(radius_x + 1.0, radius_y + 1.0, y);
+		outer_xi = (int)center_x - x;
+		outer_xi = max(0, min(outer_xi, rect.width));
+		p = Graph_GetPixelPointer(dst, rect.x, rect.y + yi);
+		for (xi = 0; xi < outer_xi; ++xi, ++p) {
+			p->alpha = 0;
+		}
+		if (radius_x == radius_y) {
+			for (; xi < rect.width; ++xi, ++p) {
+				x = ToGeoX(xi, center_x);
+				d = sqrt(x * x + y * y) - radius_x;
+				if (d >= 1.0) {
+					p->alpha = 0;
+				} else if (d >= 0) {
+					p->alpha = SmoothLeftPixel(p, d);
+				} else {
+					break;
+				}
+			}
+		} else {
+			outer_x =
+			    ToGeoX(ellipse_x(radius_x, radius_y, y), center_x);
+			for (; xi < rect.width; ++xi, ++p) {
+				x = ToGeoX(xi, center_x);
+				d = x - outer_x;
+				if (d >= 1.0) {
+					p->alpha = 0;
+				} else if (d >= 0) {
+					p->alpha = SmoothLeftPixel(p, d);
+				} else {
+					break;
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+static int CropContentBottomRight(LCUI_Graph *dst, int bound_left,
+				  int bound_top, double radius_x,
+				  double radius_y)
+{
+	int xi, yi;
+	int outer_xi;
+	double x, y, d;
+	double outer_x;
+	double center_x, center_y;
+
+	LCUI_Rect rect;
+	LCUI_ARGB *p;
+
+	radius_x -= 0.5;
+	radius_y -= 0.5;
+	center_x = bound_left;
+	center_y = bound_top;
+	Graph_GetValidRect(dst, &rect);
+	dst = Graph_GetQuote(dst);
+	if (!Graph_IsValid(dst)) {
+		return -1;
+	}
+	for (yi = 0; yi < rect.height; ++yi) {
+		y = ToGeoY(yi, center_y);
+		x = ellipse_x(max(0, radius_x - 1), max(0, radius_y - 1), y);
+		outer_xi = (int)(center_x + x);
+		outer_xi = max(0, outer_xi);
+		p = Graph_GetPixelPointer(dst, rect.x + outer_xi, rect.y + yi);
+		if (radius_x == radius_y) {
+			for (xi = outer_xi; xi < rect.width; ++xi, ++p) {
+				x = ToGeoX(xi, center_x);
+				d = sqrt(x * x + y * y) - radius_x;
+				if (d >= 1.0) {
+					break;
+				}
+				if (d >= 0) {
+					p->alpha = SmoothLeftPixel(p, d);
+				}
+			}
+		} else {
+			outer_x =
+			    ToGeoX(ellipse_x(radius_x, radius_y, y), center_x);
+			for (xi = outer_xi; xi < rect.width; ++xi, ++p) {
+				x = ToGeoX(xi, center_x);
+				d = x - outer_x;
+				if (d >= 1.0) {
+					break;
+				}
+				if (d >= 0) {
+					p->alpha = SmoothLeftPixel(p, d);
+				}
+			}
+		}
+		for (; xi < rect.width; ++xi, ++p) {
+			p->alpha = 0;
+		}
+	}
+	return 0;
+}
+
+int Border_CropContent(const LCUI_Border *border, const LCUI_Rect *box,
+		       LCUI_PaintContext paint)
+{
+	LCUI_Graph canvas;
+	LCUI_Rect bound, rect;
+
+	int radius;
+	int bound_top, bound_left;
+
+	radius = border->top_left_radius;
+	bound.x = box->x + border->left.width;
+	bound.y = box->y + border->top.width;
+	bound.width = radius - border->left.width;
+	bound.height = radius - border->top.width;
+	if (bound.width > 0 && bound.height > 0 &&
+	    LCUIRect_GetOverlayRect(&bound, &paint->rect, &rect)) {
+		bound_left = bound.x - rect.x;
+		bound_top = bound.y - rect.y;
+		rect.x -= paint->rect.x;
+		rect.y -= paint->rect.y;
+		Graph_Quote(&canvas, &paint->canvas, &rect);
+		CropContentTopLeft(&canvas, bound_left, bound_top, bound.width,
+				   bound.height);
+	}
+
+	radius = border->top_right_radius;
+	bound.x = box->x + box->width - radius;
+	bound.y = box->y + border->top.width;
+	bound.width = radius - border->right.width;
+	bound.height = radius - border->top.width;
+	if (bound.width > 0 && bound.height > 0 &&
+	    LCUIRect_GetOverlayRect(&bound, &paint->rect, &rect)) {
+		bound_left = bound.x - rect.x;
+		bound_top = bound.y - rect.y;
+		rect.x -= paint->rect.x;
+		rect.y -= paint->rect.y;
+		Graph_Quote(&canvas, &paint->canvas, &rect);
+		CropContentTopRight(&canvas, bound_left, bound_top, bound.width,
+				    bound.height);
+	}
+
+	radius = border->bottom_left_radius;
+	bound.x = box->x + border->left.width;
+	bound.y = box->y + box->height - radius;
+	bound.width = radius - border->left.width;
+	bound.height = radius - border->bottom.width;
+	if (bound.width > 0 && bound.height > 0 &&
+	    LCUIRect_GetOverlayRect(&bound, &paint->rect, &rect)) {
+		bound_left = bound.x - rect.x;
+		bound_top = bound.y - rect.y;
+		rect.x -= paint->rect.x;
+		rect.y -= paint->rect.y;
+		Graph_Quote(&canvas, &paint->canvas, &rect);
+		CropContentBottomLeft(&canvas, bound_left, bound_top,
+				      bound.width, bound.height);
+	}
+
+	radius = border->bottom_right_radius;
+	bound.x = box->x + box->width - radius;
+	bound.y = box->y + box->height - radius;
+	;
+	bound.width = radius - border->right.width;
+	bound.height = radius - border->bottom.width;
+	if (bound.width > 0 && bound.height > 0 &&
+	    LCUIRect_GetOverlayRect(&bound, &paint->rect, &rect)) {
+		bound_left = bound.x - rect.x;
+		bound_top = bound.y - rect.y;
+		rect.x -= paint->rect.x;
+		rect.y -= paint->rect.y;
+		Graph_Quote(&canvas, &paint->canvas, &rect);
+		CropContentBottomRight(&canvas, bound_left, bound_top,
+				       bound.width, bound.height);
 	}
 	return 0;
 }

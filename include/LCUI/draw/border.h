@@ -33,6 +33,9 @@
 
 LCUI_BEGIN_HEADER
 
+LCUI_API int Border_CropContent(const LCUI_Border *border, const LCUI_Rect *box,
+				LCUI_PaintContext paint);
+
 LCUI_API int Border_Paint(const LCUI_Border *border,
 			  const LCUI_Rect *box,
 			  LCUI_PaintContext paint);
