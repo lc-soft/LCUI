@@ -1,8 +1,5 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/graph.h>
-#include <LCUI/image.h>
-#include <LCUI/draw/border.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/builder.h>
 #include "test.h"
