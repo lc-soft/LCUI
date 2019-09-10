@@ -20,6 +20,14 @@
     "editor.tabSize": 2,
     "editor.insertSpaces": true
   },
+  "[xml]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
+  "[css]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
   "files.associations": {
     "unistd.h": "c",
     "errno.h": "c",
