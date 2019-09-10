@@ -185,8 +185,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\test\test.c" />
-    <ClCompile Include="..\..\..\test\test_border.c" />
-    <ClCompile Include="..\..\..\test\test_box_shadow.c" />
     <ClCompile Include="..\..\..\test\test_charset.c" />
     <ClCompile Include="..\..\..\test\test_css_parser.c" />
     <ClCompile Include="..\..\..\test\test_font_load.c" />
