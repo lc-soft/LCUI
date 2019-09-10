@@ -379,8 +379,10 @@ void LCUIRect_Split(LCUI_Rect *base, LCUI_Rect *target, LCUI_Rect rects[4])
 
 int RectList_Add(LinkedList *list, LCUI_Rect *rect)
 {
+	int x_distance, y_distance;
 	LCUI_Rect *added_rect, union_rect;
 	LinkedListNode *node, *prev;
+
 	if (rect->width <= 0 || rect->height <= 0) {
 		return -1;
 	}
@@ -398,14 +400,17 @@ int RectList_Add(LinkedList *list, LCUI_Rect *rect)
 			node = prev;
 			continue;
 		}
-		/* If it does not overlap with an existing rectangle */
-		if (!LCUIRect_GetOverlayRect(rect, added_rect, &union_rect)) {
-			continue;
+		x_distance =
+		    added_rect->x + added_rect->width - rect->x - rect->width;
+		y_distance =
+		    added_rect->y + added_rect->height - rect->y - rect->height;
+		if ((x_distance <= 10 && x_distance >= -10) &&
+		    (y_distance <= 10 && y_distance >= -10)) {
+			LCUIRect_MergeRect(&union_rect, added_rect, rect);
+			free(node->data);
+			LinkedList_DeleteNode(list, node);
+			return RectList_Add(list, &union_rect);
 		}
-		LCUIRect_MergeRect(&union_rect, added_rect, rect);
-		free(node->data);
-		LinkedList_DeleteNode(list, node);
-		return RectList_Add(list, &union_rect);
 	}
 	added_rect = NEW(LCUI_Rect, 1);
 	*added_rect = *rect;
