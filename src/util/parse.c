@@ -313,7 +313,7 @@ LCUI_BOOL ParseUrl(LCUI_Style s, const char *str, const char *dirname)
 	s->type = LCUI_STYPE_STRING;
 	if (dirname && !IsAbsolutePath(head)) {
 		n += (dirname_len = strlen(dirname));
-		s->val_string = malloc((n + 1) * sizeof(char));
+		s->val_string = malloc((n + 2) * sizeof(char));
 		if (!s->val_string) {
 			return FALSE;
 		}
@@ -321,6 +321,7 @@ LCUI_BOOL ParseUrl(LCUI_Style s, const char *str, const char *dirname)
 		if (s->val_string[dirname_len - 1] != '/') {
 			s->val_string[dirname_len] = '/';
 			dirname_len += 1;
+			n += 1;
 		}
 		strncpy(s->val_string + dirname_len,
 			head, n - dirname_len);
