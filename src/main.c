@@ -651,6 +651,11 @@ void LCUI_Init(void)
 	}
 }
 
+const char *LCUI_GetVersion(void)
+{
+	return PACKAGE_VERSION;
+}
+
 int LCUI_Destroy(void)
 {
 	LCUI_SysEventRec e;
