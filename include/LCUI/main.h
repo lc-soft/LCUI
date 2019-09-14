@@ -235,7 +235,7 @@ LCUI_API void LCUI_Init(void);
 LCUI_API int LCUI_Main(void);
 
 /** 获取LCUI的版本 */
-LCUI_API int LCUI_GetSelfVersion(char *out);
+LCUI_API const char *LCUI_GetVersion(void);
 
 /** 释放LCUI占用的资源 */
 LCUI_API int LCUI_Destroy(void);
