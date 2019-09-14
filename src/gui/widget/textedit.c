@@ -502,10 +502,20 @@ void TextEdit_EnableMultiline(LCUI_Widget w, LCUI_BOOL enable)
 void TextEdit_ClearText(LCUI_Widget widget)
 {
 	LCUI_TextEdit edit;
+	LCUI_TextBlock block;
+	LinkedListNode *node, *prev;
 
 	edit = Widget_GetData(widget, self.prototype);
 	LCUIMutex_Lock(&edit->mutex);
-	TextBlocks_Clear(&edit->text_blocks);
+	for (LinkedList_Each(node, &edit->text_blocks)) {
+		block = node->data;
+		prev = node->prev;
+		if (block->owner == TEXT_BLOCK_OWNER_SOURCE) {
+			TextBlock_OnDestroy(block);
+			LinkedList_DeleteNode(&edit->text_blocks, node);
+			node = prev;
+		}
+	}
 	TextLayer_ClearText(edit->layer_source);
 	StyleTags_Clear(&edit->text_tags);
 	edit->tasks[TASK_UPDATE] = TRUE;
@@ -555,10 +565,12 @@ int TextEdit_SetText(LCUI_Widget widget, const char *utf8_str)
 	int ret;
 	size_t len = strlen(utf8_str) + 1;
 	wchar_t *wstr = malloc(len * sizeof(wchar_t));
+
 	if (!wstr) {
 		return -ENOMEM;
 	}
-	LCUI_DecodeString(wstr, utf8_str, (int)len, ENCODING_UTF8);
+	len = LCUI_DecodeString(wstr, utf8_str, len, ENCODING_UTF8);
+	wstr[len] = 0;
 	ret = TextEdit_SetTextW(widget, wstr);
 	free(wstr);
 	return ret;
@@ -602,10 +614,12 @@ int TextEdit_SetPlaceHolder(LCUI_Widget w, const char *str)
 	int ret;
 	size_t len = strlen(str) + 1;
 	wchar_t *wstr = malloc(len * sizeof(wchar_t));
+
 	if (!wstr) {
 		return -ENOMEM;
 	}
-	LCUI_DecodeString(wstr, str, (int)len, ENCODING_UTF8);
+	len = LCUI_DecodeString(wstr, str, len, ENCODING_UTF8);
+	wstr[len] = 0;
 	ret = TextEdit_SetPlaceHolderW(w, wstr);
 	free(wstr);
 	return ret;
