@@ -4,7 +4,7 @@
   </a>
   <h3 align="center">LCUI</h3>
   <p align="center">
-    面向 C 的图形界面开发库，可借助 XML 和 CSS 构建简单的跨平台桌面应用
+    C 的图形界面开发库，可借助 XML 和 CSS 构建简单的跨平台桌面应用
   </p>
   <p align="center">
     <a href="https://travis-ci.org/lc-soft/LCUI"><img src="https://travis-ci.org/lc-soft/LCUI.png?branch=master" alt="Build Status"></a>
@@ -19,19 +19,19 @@
 
 ## 目录
 
+- [目录](#目录)
 - [介绍](#介绍)
-  - [主要特性](#主要特性)
-  - [缺少的特性](#缺少的特性)
-  - [相关项目](#相关项目)
-  - [设计参考](#设计参考)
-- [构建](#构建)
-  - [依赖项](#依赖项)
-  - [引导](#引导)
-  - [在 Windows 中构建](#在-windows-中构建)
+    - [主要特性](#主要特性)
+    - [缺少的特性](#缺少的特性)
+    - [相关项目](#相关项目)
+    - [设计参考](#设计参考)
+- [快速上手](#快速上手)
+    - [Windows](#windows)
+    - [Ubuntu](#ubuntu)
 - [贡献](#贡献)
-- [许可](#许可)
 - [文档](#文档)
 - [常见问题](#常见问题)
+- [许可](#许可)
 
 ## 介绍
 
@@ -48,22 +48,22 @@ LCUI 是一个桌面端图形界面开发库，主要使用 C 语言编写，支
 
 ### 缺少的特性
 
-LCUI 是一个个人项目，其主要用途是方便作者开发简单的图形界面应用，简单也就意味着功能很少，比如：
+LCUI 的主要用途是方便作者开发简单的图形界面应用，简单也就意味着功能很少，比如：
 
 - 没有硬件加速，图形渲染效率低下。
 - 不支持剪切板，你不能选中和复制界面中的文本，也不能从其它程序复制文本到 LCUI 程序中。
 - 输入法支持差，在 Linux 中仅支持输入英文字母和符号。
 - 布局系统简单，不支持网格、表格等布局。
 
-如今可参考的同类开源项目有很多，例如：[SDL](https://github.com/SDL-mirror/SDL)、[imgui](https://github.com/ocornut/imgui)，LCUI 中大部分缺少的特性都能从这些项目中找到相关实现，开发成本和复杂度也因此而降低了很多，如果你有这些项目的研究经验和使用经验，可以考虑向我们分享改进方案。
+如今可参考的同类开源项目有很多，例如：[SDL](https://github.com/SDL-mirror/SDL)、[imgui](https://github.com/ocornut/imgui)，LCUI 中大部分缺少的特性都能从这些项目中找到相关实现，开发成本和复杂度也因此而降低了很多，开源此项目的原因之一是进行技术交流，如果你有这些项目的研究经验和使用经验，可以考虑向我们分享改进方案。
 
 ### 相关项目
 
 想要了解 LCUI 具体能做什么？你可以查看以下项目：
 
-- [Trad](https://github.com/lc-soft/trad) — 一个基于 JavaScript 语法且可编译为 C 的语言，预置 LCUI 绑定，凭借其语言特性和 JSX 语法支持可轻松地基于 LCUI 来创建交互式的图形界面。
 - [LC Design](https://github.com/lc-ui/lc-design) — 专为 LCUI 开发的组件库，包含了一些通用组件和 css 样式。
 - [LC Finder](https://github.com/lc-soft/LC-Finder) — 图片管理器，LCUI 的旗舰级应用程序，你可以将它作为参考对象，以此评估 LCUI 的性能、界面效果和开发复杂度是否符合你的需求。
+- [Trad](https://github.com/lc-soft/trad) — 一个基于 JavaScript 语法且可编译为 C 的语言，预置 LCUI 绑定，凭借其语言特性和 JSX 语法支持可轻松地基于 LCUI 来创建交互式的图形界面。
 
 ### 设计参考
 
@@ -77,67 +77,83 @@ LCUI 是一个个人项目，其主要用途是方便作者开发简单的图形
 
 ### Windows
 
-从已有的示例项目开始：
+从已有的[示例项目](https://github.com/lc-ui/lcui-quick-start)快速开始：
 
-    # 克隆示例项目的仓库
-    $ git clone https://github.com/lc-ui/lcui-quick-start
+```shell
+# 克隆这个仓库
+git clone https://github.com/lc-ui/lcui-quick-start
 
-    # 进入这个仓库
-    $ cd lcui-quick-start
+# 进入仓库
+cd lcui-quick-start
 
-    # 安装依赖库并运行
-    $ lcpkg install && lcpkg run start
+# 安装 NodeJS 依赖包
+npm install
+
+# 安装适用于 x64 CPU 架构的 C/C++ 依赖库
+lcpkg install --arch x64
+
+# 以调试模式运行应用程序
+lcpkg run start --mode debug
+```
 
 或者使用 [lcpkg](https://github.com/lc-soft/lcpkg) 为你的项目安装已编译的 LCUI 库：
 
-    lcpkg install github.com/lc-soft/LCUI
+```shell
+lcpkg install github.com/lc-soft/LCUI
+```
 
 安装成功后，按照 lcpkg 输出的帮助文档来配置你项目的编译参数。
 
 如果你想手动从源码编译 LCUI，请在 LCUI 的源码目录中使用 lcpkg 安装依赖库：
 
-    lcpkg install
+```shell
+lcpkg install
+```
 
-之后，使用 [Visual Studio](https://visualstudio.microsoft.com/) 打开 `build/windows/LCUI.sln` 文件，然后b编译生成 LCUI。
+之后，使用 [Visual Studio](https://visualstudio.microsoft.com/) 打开 `build/windows/LCUI.sln` 文件，然后编译生成 LCUI。
 
 ### Ubuntu
 
-安装依赖库：
+```shell
+# 安装依赖库
+sudo apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev
 
-    sudo apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev
+# 克隆代码库
+git clone https://github.com/lc-soft/LCUI.git
 
-下载源代码：
+# 进入源码目录
+cd LCUI
 
-    git clone https://github.com/lc-soft/LCUI.git
+# 生成配置脚本
+./autogen.sh
 
-编译：
+# 配置环境及构建工具
+./configure
 
-    cd LCUI
-    ./configure
-    make
+# 构建
+make
+
+# 如果需要安装的话
+sudo make install
+
+# 进入测试程序目录
+cd test
+
+#  运行 helloworld 程序
+./helloworld
+```
 
 > **提示：** 如果需要自定义编译器、编译参数、安装位置等配置，请查阅 [INSTALL](INSTALL) 文件。
 
-如果需要安装的话：
-
-    sudo make install
-
-编译测试程序：
-
-    cd test
-    make
-
-运行 helloworld 程序：
-
-    ./helloworld
-
 ## 贡献
+
+有很多方式可以为此项目的发展做贡献：
 
 - [反馈问题](https://github.com/lc-soft/LCUI/issues)并在问题关闭时帮助我们验证它们是否已经修复
 - 在 IssueHunt 上为感兴趣的 issue 设置悬赏，吸引其他开发者参与开发
-- 在 OpenCollective 上为此项目提供捐赠
+- 在 OpenCollective 上赞助此项目
 - 审查[源代码的改动](https://github.com/lc-soft/LCUI/pulls)
-- [修复已知问题](CONTRIBUTING.zh-cn.md)
+- 修复已知问题
 
 本项目采用了参与者公约定义的行为准则，该文档应用于许多开源社区，有关更多信息，请参阅[《行为准则》](CODE_OF_CONDUCT.zh-cn.md)。
 
@@ -160,6 +176,10 @@ LCUI 是一个个人项目，其主要用途是方便作者开发简单的图形
 1. 这是一个浏览器内核吗？或者是像 Electron 这样的集成了浏览器环境的开发库？
 
     不是，你可以当成是一个吸收了部分 Web 技术的传统 GUI 开发库。
+
+1. 我为什么要用 LCUI，而不是 Electron？
+
+    除了技术研究和交流外，你没有理由用 LCUI。
 
 1. 适合哪些人使用？
 
@@ -185,9 +205,10 @@ LCUI 是一个个人项目，其主要用途是方便作者开发简单的图形
 
     - 界面描述文件格式是 XML，与 HTML 有一点区别。
     - 没有 `<script>` 标签，你不能像 HTML 那样内嵌 JavaScript 或 C 代码。
+    - 本质上是在写 C 代码，开发效率比 JavaScript 低很多。
     - 部件是基本的界面布局元素，不是文字，不支持图文混排，不存在 `inline` 显示类型。
     - 滚动条是一个独立的部件，使用 `overflow: scroll;` 样式不会自动出现滚动条，你需要主动创建它并指定容器和滚动层。
-    - 所有文本由 TextView 部件渲染，它的显示类型为 `inline-block` 而不是 `inline`。
+    - 所有文本由 TextView 部件渲染，它的显示类型为 `block` 而不是 `inline`。
     - 部件不会溢出父级部件的边界框，效果类似于已应用样式：`overflow: hidden;`。
     - 绝对定位的部件始终相对于其父级部件，而不是父级第一个非静态定位的部件。
     - 没有像 [Chrome Devtools](https://developers.google.com/web/tools/chrome-devtools) 这样的工具来调试图形界面，你需要凭借自己的想象力和开发经验来验证 BUG 是来自你的代码还是 LCUI 内部的。
