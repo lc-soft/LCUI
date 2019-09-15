@@ -27,6 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 #define LCUI_MAIN_C
+#include "config.h"
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>

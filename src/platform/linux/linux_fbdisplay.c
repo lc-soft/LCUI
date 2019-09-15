@@ -29,6 +29,7 @@
  */
 
 #define LCUI_SURFACE_C
+#include "config.h"
 #include <LCUI_Build.h>
 
 #if defined(LCUI_BUILD_IN_LINUX) && defined(LCUI_VIDEO_DRIVER_FRAMEBUFFER)
