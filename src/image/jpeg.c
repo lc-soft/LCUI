@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <LCUI_Build.h>
+#include "config.h"
 #include <LCUI/types.h>
 #include <LCUI/util/logger.h>
 #include <LCUI/graph.h>

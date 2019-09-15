@@ -31,20 +31,16 @@
 #ifndef LCUI_THREAD_H
 #define LCUI_THREAD_H
 
-#ifdef LCUI_THREAD_PTHREAD
-#include <pthread.h>
-typedef pthread_t LCUI_Thread;
-typedef pthread_mutex_t LCUI_Mutex;
-typedef pthread_cond_t LCUI_Cond;
-#else
-#ifdef LCUI_THREAD_WIN32
+#ifdef _WIN32
 #include <windows.h>
 typedef HANDLE LCUI_Mutex;
 typedef HANDLE LCUI_Cond;
 typedef unsigned int LCUI_Thread;
 #else
-#error 'Need thread implementation for this platform'
-#endif
+#include <pthread.h>
+typedef pthread_t LCUI_Thread;
+typedef pthread_mutex_t LCUI_Mutex;
+typedef pthread_cond_t LCUI_Cond;
 #endif
 
 LCUI_BEGIN_HEADER

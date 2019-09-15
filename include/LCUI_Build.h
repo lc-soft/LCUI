@@ -40,10 +40,17 @@
 #define LCUI_API
 #endif
 #endif /* compiler */
+
 #if defined(WIN32) && !defined(__cplusplus)
 #define INLINE __inline
 #else
 #define INLINE static inline
+#endif
+
+#if defined(WIN32) || defined(_WIN32)
+#define LCUI_BUILD_IN_WIN32
+#else
+#define LCUI_BUILD_IN_LINUX
 #endif
 
 #ifdef DEBUG
@@ -55,28 +62,6 @@
 #define _DEBUG_MSG(format, ...)                                       \
 	Logger_Log(LOGGER_LEVEL_DEBUG, __FILE__ " %d: %s(): " format, \
 		   __LINE__, __FUNCTION__, ##__VA_ARGS__)
-
-#if defined(WIN32) || defined(_WIN32)
-#define LCUI_BUILD_IN_WIN32
-#define LCUI_THREAD_WIN32
-#define LCUI_VIDEO_DRIVER_WIN32
-#define LCUI_FONT_ENGINE_FREETYPE
-#define USE_LIBPNG
-#define USE_LIBJPEG
-#define USE_LCUI_BUILDER
-#define ENABLE_TOUCH_SUPPORT
-#undef LCUI_THREAD_PTHREAD
-#undef LCUI_VIDEO_DRIVER_FRAMEBUFFER
-#define PACKAGE_VERSION "1.3.0"
-#else
-#include <LCUI/config.h>
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
-#define LCUI_BUILD_IN_LINUX
-#define LCUI_KEYBOARD_DRIVER_LINUX
-#define LCUI_MOUSE_DRIVER_LINUX
-#endif
 
 #ifdef __cplusplus
 #define LCUI_BEGIN_HEADER extern "C" {

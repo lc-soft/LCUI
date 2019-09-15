@@ -1,6 +1,6 @@
 /* cond.c -- Condition variables, for the mechanism of thread synchronization
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,34 +27,35 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "config.h"
 #include <LCUI_Build.h>
+
+#ifdef LCUI_THREAD_PTHREAD
+#include <errno.h>
+#include <sys/time.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/thread.h>
 
-#ifdef LCUI_BUILD_IN_LINUX
-#include <errno.h>
-#include <sys/time.h>
-
 /** 初始化一个条件变量 */
-int LCUICond_Init( LCUI_Cond *cond )
+int LCUICond_Init(LCUI_Cond *cond)
 {
-	return pthread_cond_init( cond, NULL );
+	return pthread_cond_init(cond, NULL);
 }
 
 /** 销毁一个条件变量 */
-int LCUICond_Destroy( LCUI_Cond *cond )
+int LCUICond_Destroy(LCUI_Cond *cond)
 {
-	return pthread_cond_destroy( cond );
+	return pthread_cond_destroy(cond);
 }
 
 /** 阻塞当前线程，等待条件成立 */
-int LCUICond_Wait( LCUI_Cond *cond, LCUI_Mutex *mutex )
+int LCUICond_Wait(LCUI_Cond *cond, LCUI_Mutex *mutex)
 {
-	return pthread_cond_wait( cond, mutex );
+	return pthread_cond_wait(cond, mutex);
 }
 
 /** 计时阻塞当前线程，等待条件成立 */
-int LCUICond_TimedWait( LCUI_Cond *cond, LCUI_Mutex *mutex, unsigned int ms )
+int LCUICond_TimedWait(LCUI_Cond *cond, LCUI_Mutex *mutex, unsigned int ms)
 {
 	int ret;
 	long int out_usec;
@@ -62,30 +63,34 @@ int LCUICond_TimedWait( LCUI_Cond *cond, LCUI_Mutex *mutex, unsigned int ms )
 	struct timespec outtime;
 
 	gettimeofday(&now, NULL);
-	out_usec = now.tv_usec + ms*1000;
+	out_usec = now.tv_usec + ms * 1000;
 	outtime.tv_sec = now.tv_sec + out_usec / 1000000;
-	outtime.tv_nsec = (out_usec % 1000000) *1000;
+	outtime.tv_nsec = (out_usec % 1000000) * 1000;
 	DEBUG_MSG("wait, ms = %u, outtime.tv_nsec: %ld\n", ms, outtime.tv_nsec);
-	ret = pthread_cond_timedwait( cond, mutex, &outtime );
-	DEBUG_MSG("ret: %d, ETIMEDOUT = %d, EINVAL = %d\n", ret, ETIMEDOUT, EINVAL);
-	switch( ret ) {
-	case 0: return 0;
-	case ETIMEDOUT: return 1;
-	default: break;
+	ret = pthread_cond_timedwait(cond, mutex, &outtime);
+	DEBUG_MSG("ret: %d, ETIMEDOUT = %d, EINVAL = %d\n", ret, ETIMEDOUT,
+		  EINVAL);
+	switch (ret) {
+	case 0:
+		return 0;
+	case ETIMEDOUT:
+		return 1;
+	default:
+		break;
 	}
 	return -1;
 }
 
 /** 唤醒一个阻塞等待条件成立的线程 */
-int LCUICond_Signal( LCUI_Cond *cond )
+int LCUICond_Signal(LCUI_Cond *cond)
 {
-	return pthread_cond_signal( cond );
+	return pthread_cond_signal(cond);
 }
 
 /** 唤醒所有阻塞等待条件成立的线程 */
-int LCUICond_Broadcast( LCUI_Cond *cond )
+int LCUICond_Broadcast(LCUI_Cond *cond)
 {
-	return pthread_cond_broadcast( cond );
+	return pthread_cond_broadcast(cond);
 }
 
 #endif

@@ -28,6 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "config.h"
 #include <errno.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>

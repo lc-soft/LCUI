@@ -33,7 +33,7 @@
 
 LCUI_BEGIN_HEADER
 
-#if defined (LCUI_BUILD_IN_WIN32) || (_WIN32)
+#ifdef _WIN32
 #include <Windows.h>
 typedef HANDLE LCUI_DirHandle;
 typedef union LCUI_DirEntry_ {
@@ -42,8 +42,7 @@ typedef union LCUI_DirEntry_ {
 } LCUI_DirEntry;
 
 #define PATH_DELIMITER '\\'
-
-#elif defined(LCUI_BUILD_IN_LINUX)
+#else
 #include <dirent.h>
 #define LCUI_DIRENT_NAME_LEN 256
 
@@ -55,8 +54,6 @@ typedef struct LCUI_DirEntry_ {
 
 #define PATH_DELIMITER '/'
 
-#else
-#error 'Does not support your platform!'
 #endif
 
 typedef struct LCUI_Dir_ {
@@ -65,7 +62,7 @@ typedef struct LCUI_Dir_ {
 	int cached;
 } LCUI_Dir;
 
-#if defined (LCUI_BUILD_IN_LINUX) || _UNICODE
+#if defined(_UNICODE) || !defined(_WIN32)
 #define LCUI_OpenDir LCUI_OpenDirW
 #define LCUI_ReadDir LCUI_ReadDirW
 #define LCUI_GetFileName LCUI_GetFileNameW

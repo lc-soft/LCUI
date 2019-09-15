@@ -28,6 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "config.h"
 #include <LCUI_Build.h>
 #ifdef LCUI_BUILD_IN_LINUX
 #include <LCUI/LCUI.h>
