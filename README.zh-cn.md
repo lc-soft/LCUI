@@ -19,7 +19,6 @@
 
 ## 目录
 
-- [目录](#目录)
 - [介绍](#介绍)
     - [主要特性](#主要特性)
     - [缺少的特性](#缺少的特性)
@@ -55,7 +54,7 @@ LCUI 的主要用途是方便作者开发简单的图形界面应用，简单也
 - 输入法支持差，在 Linux 中仅支持输入英文字母和符号。
 - 布局系统简单，不支持网格、表格等布局。
 
-如今可参考的同类开源项目有很多，例如：[SDL](https://github.com/SDL-mirror/SDL)、[imgui](https://github.com/ocornut/imgui)，LCUI 中大部分缺少的特性都能从这些项目中找到相关实现，开发成本和复杂度也因此而降低了很多，开源此项目的原因之一是进行技术交流，如果你有这些项目的研究经验和使用经验，可以考虑向我们分享改进方案。
+如今可参考的同类开源项目有很多，例如：[SDL](https://github.com/SDL-mirror/SDL)、[imgui](https://github.com/ocornut/imgui)，LCUI 中大部分缺少的特性都能在这些项目中找到相关实现，新功能的开发成本和复杂度也因此而降低了很多。开源此项目的原因之一是进行技术交流，如果你有同类项目的研究和使用经验，可以考虑向此项目提供改进方案。
 
 ### 相关项目
 
@@ -69,7 +68,7 @@ LCUI 的主要用途是方便作者开发简单的图形界面应用，简单也
 
 - [SDL](https://github.com/SDL-mirror/SDL/tree/master/src/video/x11) — x11 的驱动代码参考
 - [FreeType](https://www.freetype.org/freetype2/docs/design/design-3.html#section-1) — 数据结构的命名风格参考
-- [LevelDB](https://github.com/google/leveldb/blob/master/include/leveldb/c.h) - 函数命名风格参考
+- [LevelDB](https://github.com/google/leveldb/blob/master/include/leveldb/c.h) — 函数命名风格参考
 - [jQuery](https://jquery.com/) — 部件操作接口的命名风格参考
 - [MDN](https://developer.mozilla.org/zh-CN/docs/Web/CSS) — CSS 标准参考
 
@@ -96,9 +95,13 @@ lcpkg install --arch x64
 lcpkg run start --mode debug
 ```
 
-或者使用 [lcpkg](https://github.com/lc-soft/lcpkg) 为你的项目安装已编译的 LCUI 库：
+想从零开始编写一个 LCUI 应用程序？你可以在你的项目目录里使用 [lcpkg](https://github.com/lc-soft/lcpkg) 来快速安装 LCUI：
 
 ```shell
+# 初始化 lcpkg 配置文件，告诉 lcpkg 你的项目相关信息
+lcpkg init
+
+# 从 GitHub 下载安装已编译好的 LCUI 库
 lcpkg install github.com/lc-soft/LCUI
 ```
 
@@ -150,8 +153,8 @@ cd test
 有很多方式可以为此项目的发展做贡献：
 
 - [反馈问题](https://github.com/lc-soft/LCUI/issues)并在问题关闭时帮助我们验证它们是否已经修复
-- 在 IssueHunt 上为感兴趣的 issue 设置悬赏，吸引其他开发者参与开发
-- 在 OpenCollective 上赞助此项目
+- 在 [IssueHunt](https://issuehunt.io/r/lc-soft/LCUI) 上为感兴趣的 issue 设置悬赏，吸引其他开发者参与开发
+- 在 [OpenCollective](https://opencollective.com/LCUI) 上赞助此项目
 - 审查[源代码的改动](https://github.com/lc-soft/LCUI/pulls)
 - 修复已知问题
 
@@ -175,11 +178,11 @@ cd test
 
 1. 这是一个浏览器内核吗？或者是像 Electron 这样的集成了浏览器环境的开发库？
 
-    不是，你可以当成是一个吸收了部分 Web 技术的传统 GUI 开发库。
+    不是，你可以当成是一个应用了部分 Web 技术的传统 GUI 开发库。
 
 1. 我为什么要用 LCUI，而不是 Electron？
 
-    除了技术研究和交流外，你没有理由用 LCUI。
+    相较于功能完备的 Electron 而言，文件体积小、内存占用低并没有什么用，除了技术研究和交流外，你没有理由用 LCUI，
 
 1. 适合哪些人使用？
 
@@ -204,8 +207,8 @@ cd test
     不完全一样，主要有以下差异需要注意：
 
     - 界面描述文件格式是 XML，与 HTML 有一点区别。
-    - 没有 `<script>` 标签，你不能像 HTML 那样内嵌 JavaScript 或 C 代码。
     - 本质上是在写 C 代码，开发效率比 JavaScript 低很多。
+    - 没有 `<script>` 标签，你不能像 HTML 那样内嵌 JavaScript 或 C 代码。
     - 部件是基本的界面布局元素，不是文字，不支持图文混排，不存在 `inline` 显示类型。
     - 滚动条是一个独立的部件，使用 `overflow: scroll;` 样式不会自动出现滚动条，你需要主动创建它并指定容器和滚动层。
     - 所有文本由 TextView 部件渲染，它的显示类型为 `block` 而不是 `inline`。
