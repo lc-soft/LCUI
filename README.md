@@ -19,18 +19,18 @@
 
 ## Table of contents
 
-- [Table of contents](#Table-of-contents)
-- [Introduction](#Introduction)
-  - [Features](#Features)
-  - [Missing features](#Missing-features)
-  - [Related Projects](#Related-Projects)
-- [Documentation](#Documentation)
-- [Building](#Building)
-  - [Prerequisites](#Prerequisites)
-  - [Building On Windows](#Building-On-Windows)
-  - [Bootstrap](#Bootstrap)
-- [Contribution](#Contribution)
-- [License](#License)
+- [Introduction](#introduction)
+    - [Features](#features)
+    - [Missing features](#missing-features)
+    - [Related projects](#related-projects)
+    - [Design reference](#design-reference)
+- [Quick start](#quick-start)
+    - [Windows](#windows)
+    - [Ubuntu](#ubuntu)
+- [Contribution](#contribution)
+- [Documentation](#documentation)
+- [FAQ](#faq)
+- [License](#license)
 
 ## Introduction
 
@@ -40,16 +40,11 @@ LCUI is a freely available software library for building user interfaces. It is 
 
 ### Features
 
-- **Written in C:** Suitable for small applications written primarily in C.
-- **Trad language binding:** [Trad](https://github.com/lc-soft/trad) is a language designed for LCUI, it makes it easier to create interactive UIs.
+- **Written in C:** Suitable for small applications written primarily in C.language designed for LCUI, it makes it easier to create interactive UIs.
 - **Cross platform:** Support for Windows and Linux, you can write Windows Desktop apps and Universal Windows Platform apps, as well as Linux Desktop apps.
-- **XML parsing:** Support for using XML markup language to describe the structure of the graphical user interface.
-- **CSS parsing:** Support for using a simplified version of CSS to describe the presentation of the graphical user interface. The CSS version used does not support all the features of CSS, like `transition`, `transform`, `animation`, `@media`, `@key-frames` etc, you can read the file [css_parser.c](https://github.com/lc-soft/LCUI/blob/53e268251a53bf371ca7aaa7862ec69fb4d0015a/src/gui/css_parser.c#L550) for more details.
-- **HTML-Like layout:** Support the **block**, **inline-block** and simple **flex** layout, If you have web page development experience, then LCUI will be familiar.
+- **XML + CSS:** Support the use of XML and CSS to describe the GUI layout and style, saving interface development time and maintenance costs.
 - **Flexible:** Support for adapting the interface to screens of different pixel densities by setting global scaling. Support for using screen density related sp and dp units to describe position and size of the elements.
-- **Text rendering:** Support for the text to set the global font, line height, horizontal alignment, and also support to set the color, background color, bold, italic for some text blocks separately.
-- **Font management:** Support for loading multiple font files and using fonts of different families, weights and styles.
-- **Image processing:** Provide image read interfaces: support for reading jpg, png and bmp format images.
+- **Simple image reading:** Provide jpg, png and bmp image read APIs.
 - **Touch:** Supports multi-touch, but currently only on Windows platforms.
 
 ### Missing features
@@ -62,77 +57,239 @@ What is "simple"? It means fewer features, for example:
 - Cannot select text and copy it on user interface.
 - Cannot use CTRL+C to copy content, and cannot use CTRL+V to paste content to input boxes.
 - Cannot use the Input Method Engine to input non-ASCII characters, like Chinese, Japanese, etc.
-- Rounded corner borders are not supported in this version.
 - Layout system is simple. Grid and table layouts are not supported.
 - No English documentation, it is hard to use.
 
-If you can solve any of the above problems, you can provide technical support to the author by submitting an issue or pull request.
+There are many similar open source projects(E.g: [SDL](https://github.com/SDL-mirror/SDL), [imgui](https://github.com/ocornut/imgui)) that can be referenced today, most of the missing features in LCUI can find relevant implementations from these projects, so the development cost of LCUI is also reduced a lot. One of the reasons for open source this project is to conduct technical exchanges. If you have research experience in similar projects, please consider providing improvements to this project.
 
-### Related Projects
+### Related projects
 
 Want to know what LCUI can do? You can view the following projects:
 
-- [Trad](https://github.com/lc-soft/trad) - A lightweight and C based language for building user interfaces. it is a language designed for LCUI, with this language you can easily implement data binding and event binding in the UI.
-- [LCUI.css](https://github.com/lc-ui/lcui.css) - A UI component framework for building LCUI application.
-- [LCFinder](https://github.com/lc-soft/LC-Finder) - An image manager, it uses most of the features of LCUI, and you can use it as a reference to evaluate whether LCUI's performance and development complexity meets your needs.
+- [LC Design](https://github.com/lc-ui/lc-design) - A UI component framework for building LCUI application.
+- [LC Finder](https://github.com/lc-soft/LC-Finder) - An image manager, it uses most of the features of LCUI, and you can use it as a reference to evaluate whether LCUI's performance and development complexity meets your needs.
+- [Trad](https://github.com/lc-soft/trad) - A language based on JavaScript syntax that can be compiled into C, it pre-built LCUI bindings, with its language features and JSX syntax support to easily create interactive graphical interfaces based on LCUI.
 
-## Documentation
+### Design reference
 
-- Tutorial: [https://docs.lcui.lc-soft.io/](https://docs.lcui.lc-soft.io/) 
-- Changelog: [docs/CHANGES.md](docs/CHANGES.md)
+- [SDL](https://github.com/SDL-mirror/SDL/tree/master/src/video/x11) — X11 driver code reference
+- [FreeType](https://www.freetype.org/freetype2/docs/design/design-3.html#section-1) — Data structure naming style reference
+- [LevelDB](https://github.com/google/leveldb/blob/master/include/leveldb/c.h) — Function naming style reference
+- [jQuery](https://jquery.com/) — Widget operation method naming style reference
+- [MDN](https://developer.mozilla.org/zh-CN/docs/Web/CSS) — CSS standard reference
 
-The English version of the documentation is not available, please check the files in the [test](test) directory and the source code of the related projects above.
+## Quick start
 
-## Building
+### Windows
 
-### Prerequisites
+clone and run the [lc-ui/lcui-quick-start](https://github.com/lc-ui/lcui-quick-start) repository to see a minimal LCUI app in action:
 
-If you want to build full-featured LCUI, we suggest you install the following
- dependent libraries:
+```shell
+# Clone repository
+git clone https://github.com/lc-ui/lcui-quick-start
 
- * [libpng](http://www.libpng.org/pub/png/libpng.html) — PNG image compression library
- * [libjpeg](http://www.ijg.org/) — JPEG image compression library
- * [libxml2](http://xmlsoft.org/) — The XML C parser and toolkit
- * [libx11](https://www.x.org/) — X11 client-side library
- * [freetype](https://www.freetype.org/) — Font engine
- * [fontconfig](https://www.freedesktop.org/wiki/Software/fontconfig/) — Font configuration & location
+# Go into the repository
+cd lcui-quick-start
 
-If your system is Ubuntu, you can run following command to install dependencies:
+# Install NodeJS dependencies
+npm install
 
-    apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev libfontconfig1-dev
+# Install C/C++ dependencies for x64 CPU architecture
+lcpkg install --arch x64
 
-### Building On Windows
+# Run the app with debug mode
+lcpkg run start --mode debug
+```
 
-LCUI is mainly developed in the Windows environment, currently only Visual Studio solution file are available, you can use [Visual Studio](https://visualstudio.microsoft.com/) to open the file `build/windows/LCUI.sln` and build LCUI.
+Want to write an LCUI application from scratch? you can use [lcpkg](https://github.com/lc-soft/lcpkg) to quick install LCUI in your project directory:
 
-Installing a dependency library in windows is troublesome, but you can choose to use [vcpkg](https://github.com/Microsoft/vcpkg) to solve it:
+```shell
+# Initialize the lcpkg configuration file to tell lcpkg about your project
+lcpkg init
 
-    ./vcpkg install freetype libxml2 libjpeg-turbo libpng
+# Download and install the compiled LCUI library from GitHub
+lcpkg install github.com/lc-soft/LCUI
+```
 
-### Bootstrap
+After successful installation, follow the help documentation output by lcpkg to configure your project's build configuration.
 
-To bootstrap the build you need to run `./configure` (in the root of the source tree).
+If you want to manually compile LCUI from source code, use lcpkg in the LCUI source directory to install the dependency libraries:
 
-In the simplest case you would run:
+```shell
+lcpkg install
+```
 
-    git clone https://github.com/lc-soft/LCUI.git
-    cd LCUI
-    ./autogen.sh
-    ./configure
-    make
-    make install
+After that, [Visual Studio](https://visualstudio.microsoft.com/) to open the `build/windows/LCUI.sln` file, and then build LCUI.
 
-If you want to experience the demo, please run:
+### Ubuntu
 
-    cd test
-    make
-    ./helloworld
+```shell
+# Install the dependencies
+sudo apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev
 
-If you want to use custom building options, please read the [INSTALL](INSTALL) file for more details.
+# Clone this repository
+git clone https://github.com/lc-soft/LCUI.git
+
+# Go into the repository
+cd LCUI
+
+# Generate automake configure script
+./autogen.sh
+
+# Check the build environment and configure automake scripts
+./configure
+
+# Build
+make
+
+# If you wnat install LCUI
+sudo make install
+
+# Go into test directory
+cd test
+
+# Run helloworld application
+./helloworld
+```
+
+> **Note:** If you want to customize the compiler, compile flags, install location, and other configuration items, read the [INSTALL](INSTALL) file.
 
 ## Contribution
 
-Please read through our [contributing guidelines](/.github/CONTRIBUTING.md). Included are directions for opening issues, coding standards, and notes on development.
+There are many ways to [contribute](CONTRIBUTING.md) to LCUI.
+
+- [Submit bugs](https://github.com/lc-soft/LCUI/issues) and help us verify fixes as they are checked in.
+- Fund to you interested issue on [IssueHunt](https://issuehunt.io/r/lc-soft/LCUI) to attract other developers to contribute.
+- Support this project on [OpenCollective](https://opencollective.com/LCUI).
+- Review the [source code changes](https://github.com/lc-soft/LCUI/pulls).
+- [Contribute bug fixes](CONTRIBUTING.md).
+
+LCUI has adopted the code of conduct defined by the Contributor Covenant. This document is used across many open source communities, and we think it articulates our values well. For more, see the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## Documentation
+
+- Tutorial: [https://docs.lcui.lc-soft.io/](https://docs.lcui.lc-soft.io/) (Chinese version only)
+- Changelog: [docs/CHANGES.md](docs/CHANGES.md)
+
+The English version of the documentation is not available, because the author does not have time to write the English version, please read the files in the [test](test) directory and related projects to learn how to use LCUI.
+
+## FAQ
+
+1. Why develop it?
+
+   - To explore and experiment new GUI development way
+   - Get more good job and make more money
+   - Leave a mark on the world
+   - Pass the time
+
+1. Is this a browser kernel? Or a development library like Electron that integrates the browser environment?
+
+    No, you can think of it as a traditional GUI development library that applied some Web technologies.
+
+1. Why do I choose the LCUI instead of Electron?
+
+    In contrast to fully functional Electron, small file size and low memory usage doesn't matter, except for technical research and communication, there's no reason to use LCUI.
+
+1. Is it the same as writing a web page?
+
+    Not exactly, there are the following differences need to be noted:
+
+    - The interface description file format is XML, slightly different from HTML.
+    - You need to implement all the features of your application in C code, which is much less development efficiency than JavaScript.
+    - No `<script>` tag, you can't embed JavaScript or C code like HTML.
+    - The widget is the basic layout element, not the text, and there is no `inline` display type.
+    - The scrollbar is a widget, and the `overflow: scroll;` style doesn't show scrollbars automatically, you need to create it and specify the container and scroll layer.
+    - All text is rendered by the TextView widget, which has a display type of `block` instead of `inline`.
+    - The widget does not overflow the bounding box of the parent widget, and the effect is similar to the applied style: `overflow: hidden;`.
+    - An absolutely positioned widget is always relative to its parent widget, not the first non-statically positioned widget of the parent.
+    - There are no tools like [Chrome Devtools](https://developers.google.com/web/tools/chrome-devtools) to debug graphical interfaces, you need to rely on your own imagination and development experience to verify that the bug is from your code or LCUI.。
+
+1. How about CSS support?
+
+    The following is a list of supported CSS features. Checked is supported (But does not mean full support). Unlisted properties are not supported by default.
+
+    <details>
+      <summary>CSS feature coverage</summary>
+
+      - at rules
+        - [x] `@font-face`
+        - [ ] `@keyframes`
+        - [ ] `@media`
+      - keywords
+        - [ ] `!important`
+      - selectors
+        - [x] `*`
+        - [x] `type`
+        - [x] `#id`
+        - [x] `.class`
+        - [x] `:hover`
+        - [x] `:focus`
+        - [x] `:active`
+        - [x] `:first-child`
+        - [x] `:last-child`
+        - [ ] `[attr="value"]`
+        - [ ] `:not()`
+        - [ ] `:nth-child()`
+        - [ ] `parent > child`
+        - [ ] `a ~ b`
+        - [ ] `::after`
+        - [ ] `::before`
+        - [ ] ...
+      - units
+        - [x] px
+        - [x] dp
+        - [x] sp
+        - [x] pt
+        - [x] %
+        - [ ] rem
+        - [ ] vh
+        - [ ] vw
+      - properties
+        - [x] top, right, bottom, left
+        - [x] width, height
+        - [x] visiblility
+        - [x] display
+          - [x] none
+          - [x] inline-block
+          - [x] block
+          - [x] flex
+          - [ ] inline
+          - [ ] grid
+          - [ ] table
+          - [ ] table-cell
+          - [ ] table-row
+          - [ ] table-column
+          - [ ] ...
+        - [x] position
+          - [x] static
+          - [x] relative
+          - [x] absolute
+          - [ ] fixed
+        - [x] box-sizing
+          - [x] border-box
+          - [x] content-box
+        - [x] border
+        - [x] border-radius
+        - [x] background-color
+        - [x] background-image
+        - [x] background-position
+        - [x] background-cover
+        - [ ] background
+        - [x] pointer-evnets
+        - [x] font-face
+        - [x] font-family
+        - [x] font-size
+        - [x] font-style
+        - [x] justify-content
+          - [x] flex-start
+          - [x] center
+          - [x] flex-end
+        - [ ] float
+        - [ ] transition
+        - [ ] transform
+        - [ ] flex
+        - [ ] ...
+    </details>
 
 ## License
 
