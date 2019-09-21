@@ -1,7 +1,7 @@
 ﻿/*
  * widget_boarder.c -- widget border style processing module.
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,8 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <string.h>
 #include <math.h>
+#include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/metrics.h>
@@ -58,7 +58,7 @@ void Widget_ComputeBorderStyle(LCUI_Widget w)
 	LCUI_BorderStyle *b;
 	b = &w->computed_style.border;
 	memset(b, 0, sizeof(LCUI_BorderStyle));
-	for (key = key_border_start; key < key_border_end; ++key) {
+	for (key = key_border_start; key <= key_border_end; ++key) {
 		s = &w->style->sheet[key];
 		if (!s->is_valid) {
 			continue;
@@ -112,7 +112,8 @@ void Widget_ComputeBorderStyle(LCUI_Widget w)
 		case key_border_bottom_right_radius:
 			b->bottom_right_radius = ComputeXMetric(w, s);
 			break;
-		default: break;
+		default:
+			break;
 		}
 	}
 }
@@ -120,6 +121,7 @@ void Widget_ComputeBorderStyle(LCUI_Widget w)
 static unsigned int ComputeActual(float width)
 {
 	unsigned int w;
+
 	w = LCUIMetrics_ComputeActual(width, LCUI_STYPE_PX);
 	if (width > 0 && w < 1) {
 		return 1;
@@ -146,35 +148,50 @@ void Widget_UpdateBorder(LCUI_Widget w)
 }
 
 /** 计算部件边框样式的实际值 */
-void Widget_ComputeBorder(LCUI_Widget w, LCUI_Border *out)
+void Widget_ComputeBorder(LCUI_Widget w, LCUI_Border *b)
 {
 	LCUI_BorderStyle *s;
+	float r = min(w->width, w->height) / 2.0;
+
 	s = &w->computed_style.border;
-	out->top.color = s->top.color;
-	out->left.color = s->left.color;
-	out->right.color = s->right.color;
-	out->bottom.color = s->bottom.color;
-	out->top.style = s->top.style;
-	out->left.style = s->left.style;
-	out->right.style = s->right.style;
-	out->bottom.style = s->bottom.style;
-	out->top.width = ComputeActual(s->top.width);
-	out->left.width = ComputeActual(s->left.width);
-	out->right.width = ComputeActual(s->right.width);
-	out->bottom.width = ComputeActual(s->bottom.width);
-	out->top_left_radius = ComputeActual(s->bottom_left_radius);
-	out->top_right_radius = ComputeActual(s->bottom_right_radius);
-	out->bottom_left_radius = ComputeActual(s->bottom_left_radius);
-	out->bottom_right_radius = ComputeActual(s->bottom_right_radius);
+	b->top.color = s->top.color;
+	b->left.color = s->left.color;
+	b->right.color = s->right.color;
+	b->bottom.color = s->bottom.color;
+	b->top.style = s->top.style;
+	b->left.style = s->left.style;
+	b->right.style = s->right.style;
+	b->bottom.style = s->bottom.style;
+	b->top.width = ComputeActual(s->top.width);
+	b->left.width = ComputeActual(s->left.width);
+	b->right.width = ComputeActual(s->right.width);
+	b->bottom.width = ComputeActual(s->bottom.width);
+	b->top_left_radius = ComputeActual(min(s->top_left_radius, r));
+	b->top_right_radius = ComputeActual(min(s->top_right_radius, r));
+	b->bottom_left_radius = ComputeActual(min(s->bottom_left_radius, r));
+	b->bottom_right_radius = ComputeActual(min(s->bottom_right_radius, r));
 }
 
 void Widget_PaintBorder(LCUI_Widget w, LCUI_PaintContext paint,
 			LCUI_WidgetActualStyle style)
 {
 	LCUI_Rect box;
+
 	box.x = style->border_box.x - style->canvas_box.x;
 	box.y = style->border_box.y - style->canvas_box.y;
 	box.width = style->border_box.width;
 	box.height = style->border_box.height;
 	Border_Paint(&style->border, &box, paint);
+}
+
+void Widget_CropContent(LCUI_Widget w, LCUI_PaintContext paint,
+			LCUI_WidgetActualStyle style)
+{
+	LCUI_Rect box;
+
+	box.x = style->border_box.x - style->canvas_box.x;
+	box.y = style->border_box.y - style->canvas_box.y;
+	box.width = style->border_box.width;
+	box.height = style->border_box.height;
+	Border_CropContent(&style->border, &box, paint);
 }

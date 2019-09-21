@@ -647,9 +647,11 @@ static void OnPaint(LCUI_Event e, void *arg)
 {
 	LCUI_RectF rect;
 	LinkedListNode *node;
+	SurfaceRecord record;
 	LCUI_DisplayEvent dpy_ev = arg;
+
 	for (LinkedList_Each(node, &display.surfaces)) {
-		SurfaceRecord record = node->data;
+		record = node->data;
 		if (record && record->surface != dpy_ev->surface) {
 			continue;
 		}
@@ -665,6 +667,7 @@ static void OnResize(LCUI_Event e, void *arg)
 	float scale = LCUIMetrics_GetScale();
 	float width = dpy_ev->resize.width / scale;
 	float height = dpy_ev->resize.height / scale;
+
 	widget = LCUIDisplay_GetBindWidget(dpy_ev->surface);
 	if (widget) {
 		Widget_Resize(widget, width, height);

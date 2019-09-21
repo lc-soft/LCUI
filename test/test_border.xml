@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+<resource type="text/css" src="test_border.css"/>
+<ui>
+  <w class="content">
+    <w>
+      <w class="box"></w>
+      <w class="box box-1"></w>
+      <w class="box box-2"></w>
+      <w class="box box-3"></w>
+      <w class="box box-4"></w>
+      <w class="box box-5"></w>
+      <w class="box box-6"></w>
+      <w class="box square"></w>
+    </w>
+    <w>
+      <w class="rounded box">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="rounded box box-1">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="rounded box box-2">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="rounded box box-3">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="rounded box box-4">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="rounded box box-5">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="rounded box box-6">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="rounded square box">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+    </w>
+    <w>
+      <w class="rounded-2 box">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="rounded-2 box box-1">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="rounded-2 box box-2">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="rounded-2 box box-3">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview id="debug" class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="rounded-2 box box-4">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="rounded-2 box box-5">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="rounded-2 box box-6">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="rounded-2 square box">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+    </w>
+  </w>
+</ui>
+</lcui-app>

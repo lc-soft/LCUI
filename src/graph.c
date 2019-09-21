@@ -760,13 +760,12 @@ int Graph_Create(LCUI_Graph *graph, unsigned width, unsigned height)
 		Graph_Free(graph);
 	}
 	graph->mem_size = size;
-	graph->bytes = malloc(size);
+	graph->bytes = calloc(1, size);
 	if (!graph->bytes) {
 		graph->width = 0;
 		graph->height = 0;
 		return -2;
 	}
-	memset(graph->bytes, 0, graph->mem_size);
 	graph->width = width;
 	graph->height = height;
 	return 0;

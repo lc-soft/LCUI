@@ -271,9 +271,9 @@ void LCUIWidget_FreeRenderer(void)
 static void Widget_OnPaint(LCUI_Widget w, LCUI_PaintContext paint,
 			   LCUI_WidgetActualStyle style)
 {
-	Widget_PaintBoxShadow(w, paint, style);
 	Widget_PaintBakcground(w, paint, style);
 	Widget_PaintBorder(w, paint, style);
+	Widget_PaintBoxShadow(w, paint, style);
 	if (w->proto && w->proto->paint) {
 		w->proto->paint(w, paint, style);
 	}
@@ -542,8 +542,8 @@ static size_t WidgetRenderer_RenderChildren(LCUI_WidgetRenderer that)
 			child_paint.with_alpha = that->paint->with_alpha;
 			paint_rect.x -= that->actual_paint_rect.x;
 			paint_rect.y -= that->actual_paint_rect.y;
-			Graph_Quote(&child_paint.canvas,
-				    &that->paint->canvas, &paint_rect);
+			Graph_Quote(&child_paint.canvas, &that->paint->canvas,
+				    &paint_rect);
 		}
 		DEBUG_MSG("child paint rect: (%d, %d, %d, %d)\n", paint_rect.x,
 			  paint_rect.y, paint_rect.width, paint_rect.height);
@@ -573,6 +573,7 @@ static size_t WidgetRenderer_Render(LCUI_WidgetRenderer renderer)
 	if (that->can_render_self) {
 		count += 1;
 		self_paint = *that->paint;
+		self_paint.with_alpha = TRUE;
 		self_paint.canvas = that->self_graph;
 		Widget_OnPaint(that->target, &self_paint, that->style);
 #ifdef DEBUG_FRAME_RENDER
@@ -597,6 +598,13 @@ static size_t WidgetRenderer_Render(LCUI_WidgetRenderer renderer)
 	}
 	if (that->can_render_centent) {
 		count += WidgetRenderer_RenderChildren(that);
+	}
+	if (that->has_content_graph && Widget_HasRoundBorder(that->target)) {
+		self_paint.rect = that->actual_content_rect;
+		self_paint.rect.x -= that->style->canvas_box.x;
+		self_paint.rect.y -= that->style->canvas_box.y;
+		self_paint.canvas = that->content_graph;
+		Widget_CropContent(that->target, &self_paint, that->style);
 	}
 	if (!that->has_layer_graph) {
 		if (that->has_content_graph) {

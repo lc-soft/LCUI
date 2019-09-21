@@ -101,6 +101,12 @@ LCUI_API void LCUIRect_MergeRect(LCUI_Rect *big, LCUI_Rect *a, LCUI_Rect *b);
 LCUI_API void LCUIRect_CutFourRect(LCUI_Rect *rect1, LCUI_Rect *rect2,
 				   LCUI_Rect rects[4]);
 
+LCUI_API void LCUIRect_Split(LCUI_Rect *base, LCUI_Rect *target,
+			     LCUI_Rect rects[4]);
+
+LCUI_API int RectList_AddEx(LinkedList *list, LCUI_Rect *rect,
+			    LCUI_BOOL auto_merge);
+
 /** 添加一个脏矩形记录 */
 LCUI_API int RectList_Add(LinkedList *list, LCUI_Rect *rect);
 

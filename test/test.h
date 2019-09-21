@@ -1,4 +1,5 @@
-﻿
+﻿#include <stdio.h>
+
 extern int tests_count;
 
 #define TEST_LOG(format, ...) \
@@ -30,6 +31,8 @@ extern int tests_count;
 		}                                                    \
 	} while (0);
 
+int test_border(void);
+int test_box_shadow(void);
 int test_charset(void);
 int test_string(void);
 int test_object(void);

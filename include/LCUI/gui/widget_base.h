@@ -371,6 +371,9 @@ LCUI_API void Widget_ComputeBorder(LCUI_Widget w, LCUI_Border *out);
 LCUI_API void Widget_PaintBorder(LCUI_Widget w, LCUI_PaintContext paint,
 				 LCUI_WidgetActualStyle style);
 
+LCUI_API void Widget_CropContent(LCUI_Widget w, LCUI_PaintContext paint,
+				 LCUI_WidgetActualStyle style);
+
 LCUI_API float Widget_GetCanvasWidth(LCUI_Widget widget);
 
 LCUI_API float Widget_GetCanvasHeight(LCUI_Widget widget);

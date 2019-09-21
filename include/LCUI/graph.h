@@ -91,7 +91,7 @@ LCUI_BEGIN_HEADER
 		pixel = (r << 16) | (g << 8) | b; \
 	}
 
-#define Graph_GetQuote(g) (g)->quote.is_valid ? (g)->quote.source : (g)
+#define Graph_GetQuote(g) ((g)->quote.is_valid ? (g)->quote.source : (g))
 
 #define Graph_SetPixel(G, X, Y, C)                                        \
 	if ((G)->color_type == LCUI_COLOR_TYPE_ARGB) {                    \
@@ -123,6 +123,8 @@ LCUI_BEGIN_HEADER
 		    0xff << 24;                                               \
 	}
 
+#define Graph_GetPixelPointer(G, X, Y) ((G)->argb + (G)->width * (Y) + (X))
+
 /** 判断图像是否有Alpha通道 */
 #define Graph_HasAlpha(G)                                              \
 	((G)->quote.is_valid                                           \
@@ -139,7 +141,6 @@ LCUI_BEGIN_HEADER
  */
 INLINE void LCUI_OverPixel(LCUI_ARGB *dst, const LCUI_ARGB *src)
 {
-	double a, out_a, out_r, out_g, out_b, src_a;
 	/*
 	 * Original formula:
 	 *   Co = (Ca * aa + Cb * ab * (1 - aa)) / (aa + ab * (1 - aa))
@@ -158,21 +159,28 @@ INLINE void LCUI_OverPixel(LCUI_ARGB *dst, const LCUI_ARGB *src)
 	 *   Co = (Ca * aa + Cb * ai) / (aa + ai)
 	 *   ao = aa + ai
 	 */
-	src_a = src->a / 255.0;
-	a = (1.0 - src_a) * dst->a / 255.0;
-	out_r = src->r * src_a + dst->r * a;
-	out_g = src->g * src_a + dst->g * a;
-	out_b = src->b * src_a + dst->b * a;
-	out_a = src_a + a;
+	double src_a = src->a / 255.0;
+	double a = (1.0 - src_a) * dst->a / 255.0;
+	double out_a = src_a + a;
+
 	if (out_a > 0) {
-		out_r /= out_a;
-		out_g /= out_a;
-		out_b /= out_a;
+		src_a /= out_a;
+		a /= out_a;
 	}
-	dst->r = (unsigned char)(out_r + 0.5);
-	dst->g = (unsigned char)(out_g + 0.5);
-	dst->b = (unsigned char)(out_b + 0.5);
-	dst->a = (unsigned char)(255.0 * out_a + 0.5);
+	dst->r = (unsigned char)(src->r * src_a + dst->r * a);
+	dst->g = (unsigned char)(src->g * src_a + dst->g * a);
+	dst->b = (unsigned char)(src->b * src_a + dst->b * a);
+	dst->a = (unsigned char)(255.0 * out_a);
+
+	/* If it is assumed that all color values are premultiplied by their
+	 * alpha values, we can rewrite the equation for output color as:
+
+		const double a = 1.0 - src->a / 255.0;
+		dst->r = src->r + (unsigned char)(dst->r * a);
+		dst->g = src->g + (unsigned char)(dst->g * a);
+		dst->b = src->b + (unsigned char)(dst->b * a);
+		dst->a = src->a + (unsigned char)(dst->a * a);
+	*/
 }
 
 LCUI_API void Graph_PrintInfo(LCUI_Graph *graph);

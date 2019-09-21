@@ -1,7 +1,7 @@
 ﻿/*
- * boxshadow.h -- Box shadow draw support.
+ * boxshadow.h -- Box shadow drawing
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,32 +33,12 @@
 
 #define SHADOW_WIDTH(sd) (sd->blur + sd->spread)
 
- /* 计算Box在添加阴影后的宽度 */
-LCUI_API int BoxShadow_GetBoxWidth(const LCUI_BoxShadow *shadow, int w);
-
-/** 计算Box在添加阴影后的高度 */
-LCUI_API int BoxShadow_GetBoxHeight(const LCUI_BoxShadow *shadow, int h);
-
-/** 计算Box在添加阴影后的宽度 */
-LCUI_API int BoxShadow_GetWidth(const LCUI_BoxShadow *shadow, int box_w);
-
-/** 计算Box在添加阴影后的高度 */
-LCUI_API int BoxShadow_GetHeight(const LCUI_BoxShadow *shadow, int box_h);
-
-LCUI_API int BoxShadow_GetBoxX(const LCUI_BoxShadow *shadow);
-
-LCUI_API int BoxShadow_GetBoxY(const LCUI_BoxShadow *shadow);
-
-LCUI_API int BoxShadow_GetY(const LCUI_BoxShadow *shadow);
-
-LCUI_API int BoxShadow_GetX(const LCUI_BoxShadow *shadow);
-
 LCUI_API void BoxShadow_GetCanvasRect(const LCUI_BoxShadow *shadow,
 				      const LCUI_Rect *box_rect,
 				      LCUI_Rect *canvas_rect);
 
-LCUI_API int BoxShadow_Paint(const LCUI_BoxShadow *shadow,
-			     const LCUI_Rect *box,
+LCUI_API int BoxShadow_Paint(const LCUI_BoxShadow *shadow, const LCUI_Rect *box,
+			     int centent_width, int content_height,
 			     LCUI_PaintContext paint);
 
 #endif

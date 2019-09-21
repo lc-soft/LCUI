@@ -1,7 +1,7 @@
 ﻿/*
- * border.h -- Border draw support.
+ * border.h -- Border drawing
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,6 +32,9 @@
 #define LCUI_DRAW_BORDER_H
 
 LCUI_BEGIN_HEADER
+
+LCUI_API int Border_CropContent(const LCUI_Border *border, const LCUI_Rect *box,
+				LCUI_PaintContext paint);
 
 LCUI_API int Border_Paint(const LCUI_Border *border,
 			  const LCUI_Rect *box,

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+<resource type="text/css" src="test_box_shadow.css"/>
+<ui>
+  <w class="content">
+    <w class="shadow-container">
+      <w class="box">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="box rounded">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="box square rounded">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="box square rounded-2">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="box rounded-3">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="box rounded-4">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+    </w>
+    <w class="shadow-container shadow-2">
+      <w class="box">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="box rounded">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="box square rounded">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="box square rounded-2">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="box rounded-3">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="box rounded-4">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+    </w>
+    <w class="shadow-container shadow-3">
+      <w class="box">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="box rounded">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="box square rounded">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="box square rounded-2">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="box rounded-3">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+      <w class="box rounded-4">
+        <textview class="box-content">
+          Box content 1
+        </textview>
+        <textview class="box-content">
+          Box content 2
+        </textview>
+      </w>
+    </w>
+  </w>
+</ui>
+</lcui-app>

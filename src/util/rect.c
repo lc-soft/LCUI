@@ -42,8 +42,7 @@ LCUI_Rect Rect(int x, int y, int w, int h)
 	return r;
 }
 
-void LCUIRect_ToRectF(const LCUI_Rect *rect,
-		      LCUI_RectF *rectf, float scale)
+void LCUIRect_ToRectF(const LCUI_Rect *rect, LCUI_RectF *rectf, float scale)
 {
 	rectf->x = rect->x * scale;
 	rectf->y = rect->y * scale;
@@ -51,8 +50,7 @@ void LCUIRect_ToRectF(const LCUI_Rect *rect,
 	rectf->height = rect->height * scale;
 }
 
-void LCUIRect_Scale(const LCUI_Rect *src,
-		    LCUI_Rect *dst, float scale)
+void LCUIRect_Scale(const LCUI_Rect *src, LCUI_Rect *dst, float scale)
 {
 	dst->x = iround(src->x * scale);
 	dst->y = iround(src->y * scale);
@@ -60,8 +58,7 @@ void LCUIRect_Scale(const LCUI_Rect *src,
 	dst->height = iround(src->height * scale);
 }
 
-void LCUIRectF_ToRect(const LCUI_RectF *rectf,
-		      LCUI_Rect *rect, float scale)
+void LCUIRectF_ToRect(const LCUI_RectF *rectf, LCUI_Rect *rect, float scale)
 {
 	rect->x = iround(rectf->x * scale);
 	rect->y = iround(rectf->y * scale);
@@ -70,8 +67,7 @@ void LCUIRectF_ToRect(const LCUI_RectF *rectf,
 }
 
 /* FIXME: need new shorter name */
-void LCUIRect_GetCutArea(int box_w, int box_h,
-			 LCUI_Rect rect, LCUI_Rect *cut)
+void LCUIRect_GetCutArea(int box_w, int box_h, LCUI_Rect rect, LCUI_Rect *cut)
 {
 	cut->x = 0;
 	cut->y = 0;
@@ -188,8 +184,7 @@ LCUI_BOOL LCUIRect_IsCoverRect(LCUI_Rect *rect1, LCUI_Rect *rect2)
 }
 
 /* FIXME: need new shorter name */
-LCUI_BOOL LCUIRect_GetOverlayRect(const LCUI_Rect *a,
-				  const LCUI_Rect *b,
+LCUI_BOOL LCUIRect_GetOverlayRect(const LCUI_Rect *a, const LCUI_Rect *b,
 				  LCUI_Rect *out)
 {
 	if (a->x > b->x) {
@@ -228,8 +223,7 @@ LCUI_BOOL LCUIRect_GetOverlayRect(const LCUI_Rect *a,
 	return TRUE;
 }
 
-LCUI_BOOL LCUIRectF_GetOverlayRect(const LCUI_RectF *a,
-				   const LCUI_RectF *b,
+LCUI_BOOL LCUIRectF_GetOverlayRect(const LCUI_RectF *a, const LCUI_RectF *b,
 				   LCUI_RectF *out)
 {
 	if (a->x > b->x) {
@@ -317,96 +311,164 @@ void LCUIRect_CutFourRect(LCUI_Rect *rect1, LCUI_Rect *rect2,
 	rects[3].height = rect1->y - rect2->y;
 }
 
-int RectList_Add(LinkedList *list, LCUI_Rect *rect)
+void LCUIRect_Split(LCUI_Rect *base, LCUI_Rect *target, LCUI_Rect rects[4])
 {
-	LCUI_Rect *added_rect, union_rect;
+	if (LCUIRect_IsIncludeRect(target, base)) {
+		LCUIRect_CutFourRect(base, target, rects);
+		return;
+	}
+	/* Right */
+	if (target->x >= base->x) {
+		/* Top */
+		if (target->y < base->y) {
+			rects[0].x = target->x;
+			rects[0].y = target->y;
+			rects[0].width = target->width;
+			rects[0].height = base->y - target->y;
+			rects[1].x = base->x + base->width;
+			rects[1].y = base->y;
+			rects[1].width =
+			    target->x + target->width - base->x - base->width;
+			rects[1].height = target->y + target->height - base->y;
+		} else {
+			/* Bottom */
+			rects[0].x = base->x + base->width;
+			rects[0].y = target->y;
+			rects[0].width =
+			    target->x + target->width - base->x - base->width;
+			rects[0].height = target->height;
+			rects[1].x = target->x;
+			rects[1].y = base->y + base->height;
+			rects[1].width = base->x + base->width - target->x;
+			rects[1].height =
+			    target->y + target->height - base->y - base->height;
+		}
+	} else {
+		/* Top */
+		if (target->y < base->y) {
+			rects[0].x = target->x;
+			rects[0].y = target->y;
+			rects[0].width = target->width;
+			rects[0].height = base->y - target->y;
+			rects[1].x = target->x;
+			rects[1].y = base->y;
+			rects[1].width = base->x - target->x;
+			rects[1].height = target->y + target->height - base->y;
+		} else {
+			/* Bottom */
+			rects[0].x = target->x;
+			rects[0].y = target->y;
+			rects[0].width = base->x - target->x;
+			rects[0].height = target->height;
+			rects[1].x = base->x;
+			rects[1].y = base->y + base->height;
+			rects[1].width = target->x + target->width - base->x;
+			rects[1].height =
+			    target->y + target->height - base->y - base->height;
+		}
+	}
+	rects[2].x = 0;
+	rects[2].y = 0;
+	rects[2].width = 0;
+	rects[2].height = 0;
+	rects[3].x = 0;
+	rects[3].y = 0;
+	rects[3].width = 0;
+	rects[3].height = 0;
+}
+
+int RectList_AddEx(LinkedList *list, LCUI_Rect *rect, LCUI_BOOL auto_merge)
+{
+	int x_distance, y_distance;
+
+	LCUI_Rect *p, union_rect;
 	LinkedListNode *node, *prev;
+
 	if (rect->width <= 0 || rect->height <= 0) {
 		return -1;
 	}
 	for (LinkedList_Each(node, list)) {
-		added_rect = node->data;
+		p = node->data;
 		/* 如果被现有的矩形包含 */
-		if (LCUIRect_IsIncludeRect(added_rect, rect)) {
+		if (LCUIRect_IsIncludeRect(p, rect)) {
 			return -2;
 		}
 		/* 如果包含现有的矩形 */
-		if (LCUIRect_IsIncludeRect(rect, added_rect)) {
+		if (LCUIRect_IsIncludeRect(rect, p)) {
 			prev = node->prev;
 			free(node->data);
 			LinkedList_DeleteNode(list, node);
 			node = prev;
 			continue;
 		}
-		/* If it does not overlap with an existing rectangle */
-		if (!LCUIRect_GetOverlayRect(rect, added_rect, &union_rect)) {
+		if (!auto_merge) {
 			continue;
 		}
-		LCUIRect_MergeRect(&union_rect, added_rect, rect);
-		free(node->data);
-		LinkedList_DeleteNode(list, node);
-		return RectList_Add(list, &union_rect);
+		x_distance = p->x + p->width - rect->x - rect->width;
+		y_distance = p->y + p->height - rect->y - rect->height;
+		if ((x_distance <= 10 && x_distance >= -10) &&
+		    (y_distance <= 10 && y_distance >= -10)) {
+			LCUIRect_MergeRect(&union_rect, p, rect);
+			free(node->data);
+			LinkedList_DeleteNode(list, node);
+			return RectList_Add(list, &union_rect);
+		}
 	}
-	added_rect = NEW(LCUI_Rect, 1);
-	*added_rect = *rect;
-	LinkedList_Append(list, added_rect);
+	p = NEW(LCUI_Rect, 1);
+	*p = *rect;
+	LinkedList_Append(list, p);
 	return 0;
+}
+
+int RectList_Add(LinkedList *list, LCUI_Rect *rect)
+{
+	return RectList_AddEx(list, rect, TRUE);
 }
 
 int RectList_Delete(LinkedList *list, LCUI_Rect *rect)
 {
 	int i;
+
+	LCUI_BOOL deletable;
+	LCUI_Rect *p, child_rects[4];
+
+	LinkedList extra_list;
 	LinkedListNode *prev, *node;
-	LCUI_Rect *p_rect, o_rect, tmp_rect[4];
 
 	if (rect->width <= 0 || rect->height <= 0) {
 		return -1;
 	}
+	LinkedList_Init(&extra_list);
 	for (LinkedList_Each(node, list)) {
-		p_rect = node->data;
+		p = node->data;
 		/* 如果包含现有的矩形 */
-		if (LCUIRect_IsIncludeRect(rect, p_rect)) {
+		if (LCUIRect_IsIncludeRect(rect, p)) {
 			prev = node->prev;
 			free(node->data);
 			LinkedList_DeleteNode(list, node);
 			node = prev;
 			continue;
 		}
-		/* 如果被现有的矩形包含，则分割现有矩形 */
-		if (LCUIRect_IsIncludeRect(p_rect, rect)) {
-			LCUIRect_CutFourRect(rect, p_rect, tmp_rect);
-			prev = node->prev;
-			free(node->data);
-			LinkedList_DeleteNode(list, node);
-			node = prev;
-			for (i = 0; i < 4; ++i) {
-				if (tmp_rect[i].width <= 0
-				    || tmp_rect[i].height <= 0) {
-					continue;
-				}
-				LinkedList_Insert(list, 0, &tmp_rect[0]);
-			}
-			/*
-			 * 既然现有矩形包含了这个矩形，那么不用继续遍历了，
-			 * 因为不会有其它矩形会与这个矩形相交，直接退出即可。
-			 */
-			return 0;
-		}
-		/* 如果与现有的矩形不重叠 */
-		if (!LCUIRect_GetOverlayRect(rect, p_rect, &o_rect)) {
+		if (!LCUIRect_IsCoverRect(p, rect)) {
 			continue;
 		}
-		LCUIRect_CutFourRect(&o_rect, p_rect, tmp_rect);
-		prev = node->prev;
-		free(node->data);
-		LinkedList_DeleteNode(list, node);
-		node = prev;
+		deletable = TRUE;
+		LCUIRect_Split(rect, p, child_rects);
 		for (i = 0; i < 4; ++i) {
-			if (tmp_rect[i].width <= 0 || tmp_rect[i].height <= 0) {
+			if (child_rects[i].width <= 0 ||
+			    child_rects[i].height <= 0) {
 				continue;
 			}
-			LinkedList_Insert(list, 0, &tmp_rect[i]);
+			if (deletable) {
+				prev = node->prev;
+				free(node->data);
+				LinkedList_DeleteNode(list, node);
+				node = prev;
+				deletable = FALSE;
+			}
+			RectList_AddEx(&extra_list, &child_rects[i], FALSE);
 		}
 	}
+	LinkedList_Concat(list, &extra_list);
 	return 1;
 }
