@@ -1,7 +1,6 @@
 AUTOMAKE_OPTIONS=foreign
 SUBDIRS=src build include test
 ACLOCAL_AMFLAGS=-I m4
-pkgconfigdir = $(prefix)/lib/pkgconfig
 pkgconfig_DATA = $(PACKAGE).pc
 
 EXTRA_DIST=autogen.sh README README.zh-cn.md README.md LICENSE.TXT \
