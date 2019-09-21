@@ -6,6 +6,10 @@
   box-sizing: border-box;
   display: inline-block;
 }
+.box-content {
+  background-color: #fff;
+  border: 1px solid #000;
+}
 .rounded.box {
   border-radius: 20px;
 }

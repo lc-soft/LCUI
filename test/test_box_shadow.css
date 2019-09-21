@@ -9,6 +9,10 @@
   border: 1px solid #f00;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
 }
+.box-content {
+  background-color: #fff;
+  border: 1px solid #000;
+}
 .shadow-container {
   padding: 0 0 30px 0;
 }
