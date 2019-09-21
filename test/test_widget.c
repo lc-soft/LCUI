@@ -7,10 +7,10 @@
 #include <time.h>
 #include "test.h"
 
-int test_widget(void)
+int main(void)
 {
 	clock_t c;
-	size_t i, n = 500000;
+	size_t i, n = 100000;
 	double sec;
 
 	LCUI_Widget box, w;
@@ -29,7 +29,7 @@ int test_widget(void)
 	}
 	sec = (clock() - c) * 1.0 / CLOCKS_PER_SEC;
 	TEST_LOG("%zu widgets have been created, which took %gs\n", n, sec);
-	TEST_LOG("it should take less than 5s\n");
+	TEST_LOG("it should take less than 1s\n");
 
 	TEST_LOG("start update %zu widgets...\n", n);
 	c = clock();
@@ -37,21 +37,21 @@ int test_widget(void)
 	LCUIWidget_Update();
 	sec = (clock() - c) * 1.0 / CLOCKS_PER_SEC;
 	TEST_LOG("%zu widgets have been updated, which took %gs\n", n, sec);
-	TEST_LOG("it should take less than 32s\n");
+	TEST_LOG("it should take less than 6s\n");
 
 	TEST_LOG("start remove %zu widgets...\n", n);
 	c = clock();
 	Widget_Empty(box);
 	sec = (clock() - c) * 1.0 / CLOCKS_PER_SEC;
 	TEST_LOG("%zu widgets have been removed, which took %gs\n", n, sec);
-	TEST_LOG("it should take less than 0.24s\n");
+	TEST_LOG("it should take less than 0.5s\n");
 
 	TEST_LOG("start destroy %zu widgets...\n", n);
 	c = clock();
 	LCUIWidget_Update();
 	sec = (clock() - c) * 1.0 / CLOCKS_PER_SEC;
 	TEST_LOG("%zu widgets have been destroyed, which took %gs\n", n, sec);
-	TEST_LOG("it should take less than 5s\n");
+	TEST_LOG("it should take less than 1s\n");
 
 	LCUI_FreeWidget();
 	LCUI_FreeFontLibrary();
