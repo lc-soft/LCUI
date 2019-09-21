@@ -478,9 +478,13 @@ static int CropContentTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 			for (; xi < rect.width; ++xi, ++p) {
 				x = ToGeoX(xi, center_x);
 				d = sqrt(x * x + y * y) - radius_x;
-				if (d >= 1.0) {
+				if (d > 0) {
 					p->alpha = 0;
-				} else if (d >= 0) {
+				} else if (d == 0) {
+					p->alpha = 0;
+					break;
+				} else if (d > -1.0) {
+					d = -d;
 					p->alpha = SmoothLeftPixel(p, d);
 				} else {
 					break;
@@ -492,9 +496,13 @@ static int CropContentTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 			for (; xi < rect.width; ++xi, ++p) {
 				x = ToGeoX(xi, center_x);
 				d = x - outer_x;
-				if (d >= 1.0) {
+				if (d > 0) {
 					p->alpha = 0;
-				} else if (d >= 0) {
+				} else if (d == 0) {
+					p->alpha = 0;
+					break;
+				} else if (d > -1.0) {
+					d = -d;
 					p->alpha = SmoothLeftPixel(p, d);
 				} else {
 					break;
@@ -536,10 +544,12 @@ static int CropContentTopRight(LCUI_Graph *dst, int bound_left, int bound_top,
 			for (xi = outer_xi; xi < rect.width; ++xi, ++p) {
 				x = ToGeoX(xi, center_x);
 				d = sqrt(x * x + y * y) - radius_x;
-				if (d >= 1.0) {
+				if (d >= 0) {
+					p->alpha = 0;
 					break;
 				}
-				if (d >= 0) {
+				if (d > -1.0) {
+					d = -d;
 					p->alpha = SmoothLeftPixel(p, d);
 				}
 			}
@@ -598,9 +608,13 @@ static int CropContentBottomLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 			for (; xi < rect.width; ++xi, ++p) {
 				x = ToGeoX(xi, center_x);
 				d = sqrt(x * x + y * y) - radius_x;
-				if (d >= 1.0) {
+				if (d > 0) {
 					p->alpha = 0;
-				} else if (d >= 0) {
+				} else if (d == 0) {
+					p->alpha = 0;
+					break;
+				} else if (d > -1.0) {
+					d = -d;
 					p->alpha = SmoothLeftPixel(p, d);
 				} else {
 					break;
@@ -612,9 +626,13 @@ static int CropContentBottomLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 			for (; xi < rect.width; ++xi, ++p) {
 				x = ToGeoX(xi, center_x);
 				d = x - outer_x;
-				if (d >= 1.0) {
+				if (d > 0) {
 					p->alpha = 0;
-				} else if (d >= 0) {
+				} else if (d == 0) {
+					p->alpha = 0;
+					break;
+				} else if (d > -1.0) {
+					d = -d;
 					p->alpha = SmoothLeftPixel(p, d);
 				} else {
 					break;
@@ -657,10 +675,12 @@ static int CropContentBottomRight(LCUI_Graph *dst, int bound_left,
 			for (xi = outer_xi; xi < rect.width; ++xi, ++p) {
 				x = ToGeoX(xi, center_x);
 				d = sqrt(x * x + y * y) - radius_x;
-				if (d >= 1.0) {
+				if (d >= 0) {
+					p->alpha = 0;
 					break;
 				}
-				if (d >= 0) {
+				if (d > -1.0) {
+					d = -d;
 					p->alpha = SmoothLeftPixel(p, d);
 				}
 			}
@@ -670,10 +690,12 @@ static int CropContentBottomRight(LCUI_Graph *dst, int bound_left,
 			for (xi = outer_xi; xi < rect.width; ++xi, ++p) {
 				x = ToGeoX(xi, center_x);
 				d = x - outer_x;
-				if (d >= 1.0) {
+				if (d >= 0) {
+					p->alpha = 0;
 					break;
 				}
-				if (d >= 0) {
+				if (d > -1.0) {
+					d = -d;
 					p->alpha = SmoothLeftPixel(p, d);
 				}
 			}
