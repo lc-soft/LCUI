@@ -1,0 +1,8 @@
+{
+  ignore_libfakeroot-sysv_msgsnd_param
+  Memcheck:Param
+  msgsnd(msgp->mtext)
+  fun:msgsnd
+  obj:*/lib*/libfakeroot-sysv.*so*
+}
+
