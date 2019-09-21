@@ -159,6 +159,7 @@ cd test
 There are many ways to [contribute](CONTRIBUTING.md) to LCUI.
 
 - [Submit bugs](https://github.com/lc-soft/LCUI/issues) and help us verify fixes as they are checked in.
+- [Search for FIXME comments](https://github.com/lc-soft/LCUI/search?l=C&q=FIXME) in the source code and try to fix them.
 - Fund to you interested issue on [IssueHunt](https://issuehunt.io/r/lc-soft/LCUI) to attract other developers to contribute.
 - Support this project on [OpenCollective](https://opencollective.com/LCUI).
 - Review the [source code changes](https://github.com/lc-soft/LCUI/pulls).
@@ -175,22 +176,22 @@ The English version of the documentation is not available, because the author do
 
 ## FAQ
 
-1. Why develop it?
+1. **Why develop it?**
 
    - To explore and experiment new GUI development way
    - Get more good job and make more money
    - Leave a mark on the world
    - Pass the time
 
-1. Is this a browser kernel? Or a development library like Electron that integrates the browser environment?
+1. **Is this a browser kernel? Or a development library like Electron that integrates the browser environment?**
 
     No, you can think of it as a traditional GUI development library that applied some Web technologies.
 
-1. Why do I choose the LCUI instead of Electron?
+1. **Why do I choose the LCUI instead of Electron?**
 
     In contrast to fully functional Electron, small file size and low memory usage doesn't matter, except for technical research and communication, there's no reason to use LCUI.
 
-1. Is it the same as writing a web page?
+1. **Is it the same as writing a web page?**
 
     Not exactly, there are the following differences need to be noted:
 
@@ -204,7 +205,7 @@ The English version of the documentation is not available, because the author do
     - An absolutely positioned widget is always relative to its parent widget, not the first non-statically positioned widget of the parent.
     - There are no tools like [Chrome Devtools](https://developers.google.com/web/tools/chrome-devtools) to debug graphical interfaces, you need to rely on your own imagination and development experience to verify that the bug is from your code or LCUI.。
 
-1. How about CSS support?
+1. **How about CSS support?**
 
     The following is a list of supported CSS features. Checked is supported (But does not mean full support). Unlisted properties are not supported by default.
 

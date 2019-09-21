@@ -153,6 +153,7 @@ cd test
 有很多方式可以为此项目的发展做贡献：
 
 - [反馈问题](https://github.com/lc-soft/LCUI/issues)并在问题关闭时帮助我们验证它们是否已经修复
+- 在源码中[搜索 FIXME 注释](https://github.com/lc-soft/LCUI/search?l=C&q=FIXME)，然后尝试解决它们
 - 在 [IssueHunt](https://issuehunt.io/r/lc-soft/LCUI) 上为感兴趣的 issue 设置悬赏，吸引其他开发者参与开发
 - 在 [OpenCollective](https://opencollective.com/LCUI) 上赞助此项目
 - 审查[源代码的改动](https://github.com/lc-soft/LCUI/pulls)
@@ -169,22 +170,22 @@ cd test
 
 ## 常见问题
 
-1. 为什么开发它？
+1. **为什么开发它？**
 
    - 探索和实验新的 GUI 开发方式
    - 给职业生涯赚点加分项
    - 找点存在感
    - 打发时间
 
-1. 这是一个浏览器内核吗？或者是像 Electron 这样的集成了浏览器环境的开发库？
+1. **这是一个浏览器内核吗？或者是像 Electron 这样的集成了浏览器环境的开发库？**
 
     不是，你可以当成是一个应用了部分 Web 技术的传统 GUI 开发库。
 
-1. 我为什么要用 LCUI，而不是 Electron？
+1. **我为什么要用 LCUI，而不是 Electron？**
 
     相较于功能完备的 Electron 而言，文件体积小、内存占用低并没有什么用，除了技术研究和交流外，你没有理由用 LCUI，
 
-1. 适合哪些人使用？
+1. **适合哪些人使用？**
 
     适合有 GUI 应用开发经验、熟悉 Web 前端开发技术、有意向参与开源项目的 C 开发者使用，最好是具备两年 C 开发经验和一年 web 前端开发经验。以时间来衡量上手门槛可能有点模糊，以下按照技术方向分别列出了一些主要条件，你可自行判断自己是否能够快速上手。
 
@@ -202,7 +203,7 @@ cd test
     - 熟悉 CSS 盒子模型和常用属性
     - 有良好的 CSS 编码风格
 
-1. 和写网页一样吗？需要注意什么？
+1. **和写网页一样吗？需要注意什么？**
 
     不完全一样，主要有以下差异需要注意：
 
@@ -216,7 +217,7 @@ cd test
     - 绝对定位的部件始终相对于其父级部件，而不是父级第一个非静态定位的部件。
     - 没有像 [Chrome Devtools](https://developers.google.com/web/tools/chrome-devtools) 这样的工具来调试图形界面，你需要凭借自己的想象力和开发经验来验证 BUG 是来自你的代码还是 LCUI 内部的。
 
-1. CSS 支持度如何？
+1. **CSS 支持度如何？**
 
     以下是支持的 CSS 特性列表，已勾选的是表示已支持（至少支持基本功能），未列出的属性则默认不支持。
 
@@ -303,11 +304,11 @@ cd test
         - [ ] ...
     </details>
 
-1. 我想要 ???? 功能，就像 ???? 里的那样。
+1. **我想要 ???? 功能，就像 ???? 里的那样。**
 
     请先[新建 issue](https://github.com/lc-soft/LCUI/issues/new/choose)，按照已有的模板补全内容。
 
-1. 求添加 JavaScript/Python/Go/Rust/PHP/C#/Java 语言绑定
+1. **求添加 JavaScript/Python/Go/Rust/PHP/C#/Java 语言绑定**
 
     已有官方支持的 [Trad](https://github.com/lc-soft/trad) 语言绑定，不考虑添加其它语言绑定。如果你实在需要的话可以自己动手设计，毕竟你比作者更懂这些语言的编程思想和设计哲学，也算是一个展现技术实力的好机会。
 
