@@ -51,7 +51,7 @@ AC_CHECK_FUNCS([gettimeofday memset pow select sqrt strcasecmp strstr])
 # To get verbose build output you may configure
 # with --disable-silent-rules or use "make V=1".
 AM_SILENT_RULES([yes])
-
+PKG_INSTALLDIR
 AX_CODE_COVERAGE
 
 PACKAGE_LIBS=""
