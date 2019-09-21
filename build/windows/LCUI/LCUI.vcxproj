@@ -190,7 +190,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>LCUI_EXPORTS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\;$(SolutionDir)..\..\include\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\include\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\include\libxml2-lite\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\;$(SolutionDir)..\..\include\;$(SolutionDir)..\..\include\LCUI\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\include\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\include\libxml2-lite\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsC</CompileAs>
       <DisableSpecificWarnings>4819;4244;4996</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -233,7 +233,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>LCUI_EXPORTS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\;$(SolutionDir)..\..\include\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\include\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\include\libxml2-lite\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\;$(SolutionDir)..\..\include\;$(SolutionDir)..\..\include\LCUI\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\include\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\include\libxml2-lite\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsC</CompileAs>
       <DisableSpecificWarnings>4819;4244;4996</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
