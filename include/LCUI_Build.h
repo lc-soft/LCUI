@@ -44,7 +44,7 @@
 #if defined(WIN32) && !defined(__cplusplus)
 #define INLINE __inline
 #else
-#define INLINE inline
+#define INLINE static inline
 #endif
 
 #if defined(WIN32) || defined(_WIN32)
