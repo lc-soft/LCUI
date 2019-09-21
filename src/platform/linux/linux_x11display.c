@@ -301,19 +301,23 @@ static void X11Surface_Resize(LCUI_Surface surface, int width, int height)
 
 static void X11Surface_SetCaptionW(LCUI_Surface surface, const wchar_t *wstr)
 {
-	int len;
+	size_t len;
+	char *caption;
+
 	LCUI_SurfaceTask task;
+
 	task = &surface->tasks[TASK_SET_CAPTION];
+	X11Surface_ReleaseTask(surface, TASK_SET_CAPTION);
 	if (wstr) {
-		char *caption;
 		len = LCUI_EncodeString(NULL, wstr, 0, ENCODING_UTF8) + 1;
 		caption = malloc(sizeof(char) * len);
 		if (!caption) {
 			return;
 		}
-		LCUI_EncodeString(caption, wstr, len, ENCODING_UTF8);
+		len = LCUI_EncodeString(caption, wstr, len, ENCODING_UTF8);
 		task->caption = caption;
-		task->caption_len = len - 1;
+		task->caption[len] = 0;
+		task->caption_len = len;
 	} else {
 		task->caption = NULL;
 		task->caption_len = 0;
