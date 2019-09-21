@@ -18,7 +18,6 @@ int main(void)
 	ret += test_image_reader();
 	ret += test_css_parser();
 	ret += test_xml_parser();
-	ret += test_widget();
 	ret += test_widget_layout();
 	ret += test_widget_flex_layout();
 	ret += test_widget_inline_block_layout();
