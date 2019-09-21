@@ -6,7 +6,20 @@ pkgconfig_DATA = $(PACKAGE).pc
 EXTRA_DIST=autogen.sh README README.zh-cn.md README.md LICENSE.TXT \
 CHANGELOG.md \
 CHANGELOG.zh-cn.md \
+debian/compat \
+debian/lcui-dev.install \
+debian/control \
+debian/copyright \
+debian/source \
+debian/source/format \
+debian/rules \
+debian/changelog \
+debian/lcui-dev.dirs \
+debian/lcui-docs.docs \
+debian/lcui1.install \
+debian/lcui1.dirs \
 docs/CodingStyle.zh-cn.md \
+test/valgrind-suppressions.txt \
 test/README.zh-cn \
 test/Makefile.in \
 test/Makefile.am \
@@ -27,6 +40,7 @@ test/test_css_parser.css \
 test/test_css_parser.xml \
 test/test_css_parser.c \
 test/test_xml_parser.xml \
+test/test_xml_parser.nested.xml \
 test/test_xml_parser.c \
 test/test_font_load.c \
 test/test_font_load.css \
@@ -57,6 +71,6 @@ test/test_textedit.c
 .PHONY: test
 
 test:
-	cd test && make && ./test && valgrind --leak-check=full --error-exitcode=42 .libs/lt-test
+	cd test && make && ../libtool --mode=execute valgrind --suppressions="valgrind-suppressions.txt" --leak-check=full --error-exitcode=42 ./test
 
 @CODE_COVERAGE_RULES@
