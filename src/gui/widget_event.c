@@ -528,8 +528,8 @@ static int Widget_TriggerEventEx(LCUI_Widget widget, LCUI_WidgetEventPack pack)
 			break;
 		}
 	default:
-		if (widget->trigger && 0 <
-		    EventTrigger_Trigger(widget->trigger, e->type, pack)) {
+		if (widget->trigger &&
+		    0 < EventTrigger_Trigger(widget->trigger, e->type, pack)) {
 			return 0;
 		}
 		if (!widget->parent || e->cancel_bubble) {
@@ -694,28 +694,37 @@ static LCUI_Widget GetSameParent(LCUI_Widget a, LCUI_Widget b)
 	return NULL;
 }
 
-static LCUI_Widget Widget_GetActualEventTarget(LCUI_Widget widget)
+static LCUI_Widget Widget_GetEventTarget(LCUI_Widget widget, float x, float y,
+					 int inherited_pointer_events)
 {
-	LCUI_BOOL found = FALSE;
-	LCUI_Widget w = widget;
-	LCUI_Widget target = NULL;
-	LCUI_Widget root = LCUIWidget_GetRoot();
+	int pointer_events;
 
-	while (w && w != root) {
-		if (w->state == LCUI_WSTATE_DELETED ||
-		    w->computed_style.pointer_events == SV_NONE) {
-			target = w->parent;
-			found = TRUE;
-		} else if (!found &&
-			   w->computed_style.pointer_events == SV_AUTO) {
-			return widget;
+	LCUI_Widget child;
+	LCUI_Widget target = NULL;
+	LinkedListNode *node;
+
+	for (LinkedList_Each(node, &widget->children_show)) {
+		child = node->data;
+		if (!child->computed_style.visible ||
+		    child->state != LCUI_WSTATE_NORMAL ||
+		    !LCUIRect_HasPoint(&child->box.border, x, y)) {
+			continue;
 		}
-		w = w->parent;
+		pointer_events = child->computed_style.pointer_events;
+		if (pointer_events == SV_INHERIT) {
+			pointer_events = inherited_pointer_events;
+		}
+		target = Widget_GetEventTarget(child, x - child->box.padding.x,
+					       y - child->box.padding.y,
+					       pointer_events);
+		if (target) {
+			return target;
+		}
+		if (pointer_events == SV_AUTO) {
+			return child;
+		}
 	}
-	if (found) {
-		return target;
-	}
-	return widget;
+	return target;
 }
 
 static void Widget_TriggerMouseOverEvent(LCUI_Widget widget, LCUI_Widget parent)
@@ -913,15 +922,14 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 	if (self.mouse_capturer) {
 		target = self.mouse_capturer;
 	} else {
-		target = Widget_At(w, pos.x, pos.y);
-		target = Widget_GetActualEventTarget(target);
+		target = Widget_GetEventTarget(w, pos.x, pos.y, SV_AUTO);
 	}
 	for (w = target; w; w = w->parent) {
 		if (w->event_blocked) {
 			return;
 		}
 	}
-	if (!target) {
+	if (!target || target == LCUIWidget_GetRoot()) {
 		Widget_OnMouseOverEvent(NULL);
 		switch (sys_ev->type) {
 		case LCUI_MOUSEDOWN:

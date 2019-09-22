@@ -301,9 +301,7 @@ LCUI_Widget Widget_At(LCUI_Widget widget, int ix, int iy)
 			if (!c->computed_style.visible) {
 				continue;
 			}
-			ix = iround(x);
-			iy = iround(y);
-			if (LCUIRect_HasPoint(&c->box.border, ix, iy)) {
+			if (LCUIRect_HasPoint(&c->box.border, x, y)) {
 				target = c;
 				x -= c->box.padding.x;
 				y -= c->box.padding.y;
