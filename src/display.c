@@ -147,7 +147,14 @@ size_t LCUIDisplay_Render(void)
 			rect = rn->data;
 			RectList_Add(&rects, rn->data);
 		}
-		/* 在 surface 上逐个重绘无效区域 */
+
+		/**
+		 * FIXME: add OpenMP support
+		 * Dirty rectangle repaint tasks can be assigned to multiple CPU
+		 * cores to improve rendering performance
+		 */
+
+		/* Repaint dirty rectangles of surface */
 		for (LinkedList_Each(rn, &rects)) {
 			rect = rn->data;
 			ev.paint.rect = *rect;
@@ -163,6 +170,11 @@ size_t LCUIDisplay_Render(void)
 				  paint->rect.y, paint->rect.width,
 				  paint->rect.height);
 			count += Widget_Render(record->widget, paint);
+			/**
+			 * FIXME: Improve highlighting of repainted areas
+			 * Let the highlighted areas disappear after a short
+			 * period of time, just like flashing
+			 */
 			if (display.show_rect_border) {
 				DrawBorder(paint);
 			}
