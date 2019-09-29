@@ -5,7 +5,6 @@ compiler:
   - gcc
 
 before_install:
-  - sudo apt-get update -qq
   - sudo apt-get install valgrind libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev lcov -qq
   - pip install --user cpp-coveralls
   - npm install
