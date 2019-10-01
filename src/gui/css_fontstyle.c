@@ -49,11 +49,9 @@
 /* clang-format on */
 
 #define ComputeActual LCUIMetrics_ComputeActual
-#define GetFontStyle(CTX) &(CTX)->sheet->sheet[self.keys[(CTX)->parser->key]]
-#define SetFontStyle(CTX, V, T)                                              \
-	do {                                                                 \
-		SetStyle((CTX)->sheet, self.keys[(CTX)->parser->key], V, T); \
-	} while (0)
+#define GetFontStyleKey(CTX) self.keys[(CTX)->parser->key]
+#define SetFontStyleProperty(CTX, S) \
+	CSSStyleParser_SetCSSProperty(CTX, GetFontStyleKey(CTX), S);
 
 enum FontStyleType { FS_NORMAL, FS_ITALIC, FS_OBLIQUE };
 
@@ -100,25 +98,29 @@ static size_t unescape(const wchar_t *instr, wchar_t *outstr)
 static int OnParseContent(LCUI_CSSParserStyleContext ctx, const char *str)
 {
 	size_t len;
-	char *content;
+	LCUI_StyleRec s;
 
 	len = strlen(str);
 	if (len < 1 || (str[0] == '"' && str[len - 1] != '"')) {
 		return -1;
 	}
-	content = malloc(sizeof(char) * (len + 1));
-	if (!content) {
+	s.is_valid = TRUE;
+	s.type = LCUI_STYPE_STRING;
+	s.val_string = malloc(sizeof(char) * (len + 1));
+	if (!s.val_string) {
 		return -1;
 	}
-	strcpy(content, str);
-	SetFontStyle(ctx, content, string);
+	strcpy(s.val_string, str);
+	SetFontStyleProperty(ctx, &s);
 	return 0;
 }
 
 static int OnParseColor(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_Style s = GetFontStyle(ctx);
-	if (ParseColor(s, str)) {
+	LCUI_StyleRec s;
+
+	if (ParseColor(&s, str)) {
+		SetFontStyleProperty(ctx, &s);
 		return 0;
 	}
 	return -1;
@@ -126,8 +128,10 @@ static int OnParseColor(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseFontSize(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_Style s = GetFontStyle(ctx);
-	if (ParseNumber(s, str)) {
+	LCUI_StyleRec s;
+
+	if (ParseNumber(&s, str)) {
+		SetFontStyleProperty(ctx, &s);
 		return 0;
 	}
 	return -1;
@@ -135,20 +139,23 @@ static int OnParseFontSize(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseFontFamily(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	char *name = strdup2(str);
-	LCUI_Style s = GetFontStyle(ctx);
-	if (s->is_valid && s->string) {
-		free(s->string);
-	}
-	SetFontStyle(ctx, name, string);
+	LCUI_StyleRec s;
+
+	s.is_valid = TRUE;
+	s.type = LCUI_STYPE_STRING;
+	s.val_string = strdup2(str);
+	SetFontStyleProperty(ctx, &s);
 	return 0;
 }
 
 static int OnParseFontStyle(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	int style;
-	if (ParseFontStyle(str, &style)) {
-		SetFontStyle(ctx, style, int);
+	LCUI_StyleRec s;
+
+	if (ParseFontStyle(str, &s.val_int)) {
+		s.is_valid = TRUE;
+		s.type = LCUI_STYPE_INT;
+		SetFontStyleProperty(ctx, &s);
 		return 0;
 	}
 	return -1;
@@ -156,9 +163,12 @@ static int OnParseFontStyle(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseFontWeight(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	int weight;
-	if (ParseFontWeight(str, &weight)) {
-		SetFontStyle(ctx, weight, int);
+	LCUI_StyleRec s;
+
+	if (ParseFontWeight(str, &s.val_int)) {
+		s.is_valid = TRUE;
+		s.type = LCUI_STYPE_INT;
+		SetFontStyleProperty(ctx, &s);
 		return 0;
 	}
 	return -1;
@@ -166,34 +176,41 @@ static int OnParseFontWeight(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseTextAlign(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	int val = LCUI_GetStyleValue(str);
-	if (val < 0) {
+	LCUI_StyleRec s;
+
+	s.is_valid = TRUE;
+	s.type = LCUI_STYPE_STYLE;
+	s.val_style = LCUI_GetStyleValue(str);
+
+	if (s.val_style < 0) {
 		return -1;
 	}
-	SetFontStyle(ctx, val, style);
+	SetFontStyleProperty(ctx, &s);
 	return 0;
 }
 
 static int OnParseLineHeight(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec sv;
-	if (!ParseNumber(&sv, str)) {
+	LCUI_StyleRec s;
+
+	if (!ParseNumber(&s, str)) {
 		return -1;
 	}
-	ctx->sheet->sheet[self.keys[ctx->parser->key]] = sv;
+	SetFontStyleProperty(ctx, &s);
 	return 0;
 }
 
 static int OnParseStyleOption(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_Style s = GetFontStyle(ctx);
-	int v = LCUI_GetStyleValue(str);
-	if (v < 0) {
+	LCUI_StyleRec s;
+
+	s.is_valid = TRUE;
+	s.type = LCUI_STYPE_STYLE;
+	s.val_style = LCUI_GetStyleValue(str);
+	if (s.val_style < 0) {
 		return -1;
 	}
-	s->style = v;
-	s->type = LCUI_STYPE_STYLE;
-	s->is_valid = TRUE;
+	SetFontStyleProperty(ctx, &s);
 	return 0;
 }
 
