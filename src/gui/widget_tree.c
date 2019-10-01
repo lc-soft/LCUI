@@ -282,6 +282,27 @@ void Widget_PrintTree(LCUI_Widget w)
 	_LCUIWidget_PrintTree(w, 0, "  ");
 }
 
+size_t Widget_Each(LCUI_Widget w, void (*callback)(LCUI_Widget, void *),
+		   void *arg)
+{
+	size_t count = 0;
+
+	LCUI_Widget next;
+	LCUI_Widget child = LinkedList_Get(&w->children, 0);
+
+	while (child && child != w) {
+		callback(child, arg);
+		++count;
+		next = LinkedList_Get(&child->children, 0);
+		while (!next && child != w) {
+			next = Widget_GetNext(child);
+			child = child->parent;
+		}
+		child = next;
+	}
+	return count;
+}
+
 LCUI_Widget Widget_At(LCUI_Widget widget, int ix, int iy)
 {
 	float x, y;

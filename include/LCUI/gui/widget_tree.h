@@ -57,6 +57,10 @@ LCUI_API LCUI_Widget Widget_GetNext(LCUI_Widget w);
 /** 获取一个子部件 */
 LCUI_API LCUI_Widget Widget_GetChild(LCUI_Widget w, size_t index);
 
+/** Traverse the child widget tree */
+LCUI_API size_t Widget_Each(LCUI_Widget w,
+			    void (*callback)(LCUI_Widget, void *), void *arg);
+
 /** 获取当前点命中的最上层可见部件 */
 LCUI_API LCUI_Widget Widget_At(LCUI_Widget widget, int x, int y);
 
