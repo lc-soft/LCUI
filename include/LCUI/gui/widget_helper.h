@@ -93,6 +93,9 @@ LCUI_API void Widget_SetOpacity(LCUI_Widget w, float opacity);
 
 LCUI_API void Widget_SetBoxSizing(LCUI_Widget w, LCUI_StyleValue sizing);
 
+/** Collect all child widget that have a ref attribute specified */
+LCUI_API Dict *Widget_CollectReferences(LCUI_Widget w);
+
 /**
  * Get the first widget that match the type by testing the widget itself and
  * traversing up through its ancestors.
