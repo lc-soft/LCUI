@@ -82,7 +82,23 @@ Want to know what LCUI can do? You can view the following projects:
 
 ### Windows
 
-clone and run the [lc-ui/lcui-quick-start](https://github.com/lc-ui/lcui-quick-start) repository to see a minimal LCUI app in action:
+Quickly create an LCUI project using [lcui-cli](https://github.com/lc-ui/lcui-cli):
+
+```shell
+# Install lcui-cli
+npm install -g @lcui/cli
+
+# Create an LCUI project named myapp
+lcui create myapp
+
+# Go into project directory
+cd myapp
+
+# Run it
+npm run start
+```
+
+Or, you can clone and run the [lc-ui/lcui-quick-start](https://github.com/lc-ui/lcui-quick-start) repository to see a minimal LCUI app in action:
 
 ```shell
 # Clone repository

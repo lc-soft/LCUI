@@ -76,13 +76,29 @@ LCUI 的主要用途是方便作者开发简单的图形界面应用，简单也
 
 ### Windows
 
-从已有的[示例项目](https://github.com/lc-ui/lcui-quick-start)快速开始：
+使用 [lcui-cli](https://github.com/lc-ui/lcui-cli) 快速创建一个 LCUI 项目：
 
 ```shell
-# 克隆这个仓库
+# 安装 lcui-cli
+npm install -g @lcui/cli
+
+# 创建一个名为 myapp 的 LCUI 项目
+lcui create myapp
+
+# 进入项目目录
+cd myapp
+
+# 运行这个项目
+npm run start
+```
+
+或者，你可以从已有的[示例项目](https://github.com/lc-ui/lcui-quick-start)快速开始：
+
+```shell
+# 克隆示例代码库
 git clone https://github.com/lc-ui/lcui-quick-start
 
-# 进入仓库
+# 进入代码库
 cd lcui-quick-start
 
 # 安装 NodeJS 依赖包
