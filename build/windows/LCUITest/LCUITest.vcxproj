@@ -202,7 +202,6 @@
     <ClCompile Include="..\..\..\test\test_widget_opacity.c" />
     <ClCompile Include="..\..\..\test\test_widget_rect.c" />
     <ClCompile Include="..\..\..\test\test_xml_parser.c" />
-    <ClCompile Include="..\..\..\test\test_widget.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\test\test.h" />

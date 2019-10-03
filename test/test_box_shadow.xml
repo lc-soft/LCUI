@@ -4,154 +4,28 @@
 <ui>
   <w class="content">
     <w class="shadow-container">
-      <w class="box">
-        <textview class="box-content">
-          Box content 1
-        </textview>
-        <textview class="box-content">
-          Box content 2
-        </textview>
-      </w>
-      <w class="box rounded">
-        <textview class="box-content">
-          Box content 1
-        </textview>
-        <textview class="box-content">
-          Box content 2
-        </textview>
-      </w>
-      <w class="box square rounded">
-        <textview class="box-content">
-          Box content 1
-        </textview>
-        <textview class="box-content">
-          Box content 2
-        </textview>
-      </w>
-      <w class="box square rounded-2">
-        <textview class="box-content">
-          Box content 1
-        </textview>
-        <textview class="box-content">
-          Box content 2
-        </textview>
-      </w>
-      <w class="box rounded-3">
-        <textview class="box-content">
-          Box content 1
-        </textview>
-        <textview class="box-content">
-          Box content 2
-        </textview>
-      </w>
-      <w class="box rounded-4">
-        <textview class="box-content">
-          Box content 1
-        </textview>
-        <textview class="box-content">
-          Box content 2
-        </textview>
-      </w>
+      <w class="box" />
+      <w class="box rounded" />
+      <w class="box square rounded" />
+      <w class="box square rounded-2" />
+      <w class="box rounded-3" />
+      <w class="box rounded-4" />
     </w>
     <w class="shadow-container shadow-2">
-      <w class="box">
-        <textview class="box-content">
-          Box content 1
-        </textview>
-        <textview class="box-content">
-          Box content 2
-        </textview>
-      </w>
-      <w class="box rounded">
-        <textview class="box-content">
-          Box content 1
-        </textview>
-        <textview class="box-content">
-          Box content 2
-        </textview>
-      </w>
-      <w class="box square rounded">
-        <textview class="box-content">
-          Box content 1
-        </textview>
-        <textview class="box-content">
-          Box content 2
-        </textview>
-      </w>
-      <w class="box square rounded-2">
-        <textview class="box-content">
-          Box content 1
-        </textview>
-        <textview class="box-content">
-          Box content 2
-        </textview>
-      </w>
-      <w class="box rounded-3">
-        <textview class="box-content">
-          Box content 1
-        </textview>
-        <textview class="box-content">
-          Box content 2
-        </textview>
-      </w>
-      <w class="box rounded-4">
-        <textview class="box-content">
-          Box content 1
-        </textview>
-        <textview class="box-content">
-          Box content 2
-        </textview>
-      </w>
+      <w class="box" />
+      <w class="box rounded" />
+      <w class="box square rounded" />
+      <w class="box square rounded-2" />
+      <w class="box rounded-3" />
+      <w class="box rounded-4" />
     </w>
     <w class="shadow-container shadow-3">
-      <w class="box">
-        <textview class="box-content">
-          Box content 1
-        </textview>
-        <textview class="box-content">
-          Box content 2
-        </textview>
-      </w>
-      <w class="box rounded">
-        <textview class="box-content">
-          Box content 1
-        </textview>
-        <textview class="box-content">
-          Box content 2
-        </textview>
-      </w>
-      <w class="box square rounded">
-        <textview class="box-content">
-          Box content 1
-        </textview>
-        <textview class="box-content">
-          Box content 2
-        </textview>
-      </w>
-      <w class="box square rounded-2">
-        <textview class="box-content">
-          Box content 1
-        </textview>
-        <textview class="box-content">
-          Box content 2
-        </textview>
-      </w>
-      <w class="box rounded-3">
-        <textview class="box-content">
-          Box content 1
-        </textview>
-        <textview class="box-content">
-          Box content 2
-        </textview>
-      </w>
-      <w class="box rounded-4">
-        <textview class="box-content">
-          Box content 1
-        </textview>
-        <textview class="box-content">
-          Box content 2
-        </textview>
-      </w>
+      <w class="box" />
+      <w class="box rounded" />
+      <w class="box square rounded" />
+      <w class="box square rounded-2" />
+      <w class="box rounded-3" />
+      <w class="box rounded-4" />
     </w>
   </w>
 </ui>
