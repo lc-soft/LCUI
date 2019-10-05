@@ -40,7 +40,6 @@ int test_css_parser(void);
 int test_xml_parser(void);
 int test_strpool(void);
 int test_linkedlist(void);
-int test_widget(void);
 int test_widget_layout(void);
 int test_widget_flex_layout(void);
 int test_widget_inline_block_layout(void);
