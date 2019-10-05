@@ -112,11 +112,11 @@ LCUI_API void Number_SetValue(LCUI_Object object, double value);
 
 LCUI_API LCUI_Object Number_New(double value);
 
-LCUI_API const LCUI_ObjectTypeRec *LCUI_WStringObject;
+extern const LCUI_ObjectTypeRec *LCUI_WStringObject;
 
-LCUI_API const LCUI_ObjectTypeRec *LCUI_StringObject;
+extern const LCUI_ObjectTypeRec *LCUI_StringObject;
 
-LCUI_API const LCUI_ObjectTypeRec *LCUI_NumberObject;
+extern const LCUI_ObjectTypeRec *LCUI_NumberObject;
 
 LCUI_END_HEADER
 

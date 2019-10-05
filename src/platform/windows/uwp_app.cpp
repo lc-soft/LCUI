@@ -358,7 +358,6 @@ void LCUI::Initialize()
 
 LCUI::Application::Application()
 {
-
 }
 
 void LCUI::Application::Load(Platform::String^ entryPoint)

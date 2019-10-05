@@ -94,7 +94,7 @@ static int DrawBorderTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 	double split_k = 1.0 * yline->width / xline->width;
 	double split_center_x = bound_left + 1.0 * yline->width;
 	double split_center_y = bound_top + 1.0 * xline->width;
-	int inner_ellipse_top = split_center_y;
+	int inner_ellipse_top = (int)split_center_y;
 
 	/* Get the actual rectagle that can be drawn */
 	Graph_GetValidRect(dst, &rect);
@@ -467,7 +467,7 @@ static int CropContentTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 	for (yi = 0; yi < rect.height; ++yi) {
 		y = ToGeoY(yi, center_y);
 		x = ellipse_x(radius_x + 1.0, radius_y + 1.0, y);
-		outer_xi = (int)center_x - x;
+		outer_xi = (int)(center_x - x);
 		outer_xi = max(0, min(outer_xi, rect.width));
 		p = Graph_GetPixelPointer(dst, rect.x, rect.y + yi);
 		for (xi = 0; xi < outer_xi; ++xi, ++p) {
@@ -588,7 +588,7 @@ static int CropContentBottomLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 	for (yi = 0; yi < rect.height; ++yi) {
 		y = ToGeoY(yi, center_y);
 		x = ellipse_x(radius_x + 1.0, radius_y + 1.0, y);
-		outer_xi = (int)center_x - x;
+		outer_xi = (int)(center_x - x);
 		outer_xi = max(0, min(outer_xi, rect.width));
 		p = Graph_GetPixelPointer(dst, rect.x, rect.y + yi);
 		for (xi = 0; xi < outer_xi; ++xi, ++p) {

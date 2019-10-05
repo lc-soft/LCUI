@@ -33,10 +33,11 @@
  * 字、多边形等不规则图形的阴影。
  */
 
+#include <math.h>
+#include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
-#include <math.h>
 
 #define BLUR_N 1.5
 #define BLUR_WIDTH(sd) (int)(sd->blur * BLUR_N)
@@ -307,7 +308,7 @@ static LCUI_BOOL BoxShadow_PaintBottomBlur(BoxShadowRenderingContext ctx)
 	if (!LCUIRect_GetOverlayRect(&ctx->paint->rect, &rect, &rect)) {
 		return FALSE;
 	}
-	top -= rect.y + 1.0;
+	top -= rect.y + 1;
 	paint_rect.width = rect.width;
 	paint_rect.height = rect.height;
 	paint_rect.x = rect.x - ctx->paint->rect.x;
@@ -337,7 +338,6 @@ static LCUI_BOOL BoxShadow_PaintCircleBlur(BoxShadowRenderingContext ctx,
 	double outer_r2 = POW2(r);
 	double inner_r = max(0, r - BLUR_WIDTH(ctx->shadow));
 	double inner_smooth_r2 = POW2(inner_r + 1.0);
-	double inner_r2 = POW2(inner_r);
 
 	int x, y;
 	unsigned char a = ctx->shadow->color.alpha;

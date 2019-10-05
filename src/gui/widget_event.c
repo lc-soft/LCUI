@@ -922,7 +922,8 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 	if (self.mouse_capturer) {
 		target = self.mouse_capturer;
 	} else {
-		target = Widget_GetEventTarget(w, pos.x, pos.y, SV_AUTO);
+		target = Widget_GetEventTarget(w, (float)pos.x, (float)pos.y,
+					       SV_AUTO);
 	}
 	for (w = target; w; w = w->parent) {
 		if (w->event_blocked) {

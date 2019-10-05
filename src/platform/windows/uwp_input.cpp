@@ -91,7 +91,7 @@ static int CreateTouchEvent(LCUI_SysEvent e, LinkedList *points)
 	for (LinkedList_Each(node, points)) {
 		list[i++] = *(LCUI_TouchPoint)node->data;
 	}
-	return LCUI_CreateTouchEvent(e, list, points->length);
+	return LCUI_CreateTouchEvent(e, list, (int)points->length);
 }
 
 InputDriver::InputDriver()

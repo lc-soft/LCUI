@@ -41,13 +41,13 @@
 #endif
 #endif /* compiler */
 
-#if defined(WIN32) && !defined(__cplusplus)
+#if defined(_WIN32) && !defined(__cplusplus)
 #define INLINE __inline
 #else
 #define INLINE static inline
 #endif
 
-#if defined(WIN32) || defined(_WIN32)
+#if defined(_WIN32)
 #define LCUI_BUILD_IN_WIN32
 #else
 #define LCUI_BUILD_IN_LINUX

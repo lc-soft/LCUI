@@ -151,7 +151,7 @@ void Widget_UpdateBorder(LCUI_Widget w)
 void Widget_ComputeBorder(LCUI_Widget w, LCUI_Border *b)
 {
 	LCUI_BorderStyle *s;
-	float r = min(w->width, w->height) / 2.0;
+	float r = min(w->width, w->height) / 2.0f;
 
 	s = &w->computed_style.border;
 	b->top.color = s->top.color;

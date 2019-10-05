@@ -124,7 +124,7 @@ int Object_Compare(LCUI_Object a, LCUI_Object b)
 	if (a->type == b->type && a->type->compare) {
 		return a->type->compare(a, b);
 	}
-	return a->value.string - b->value.string;
+	return -1;
 }
 
 LCUI_Object Object_Operate(LCUI_Object self, const char *operator_str,
