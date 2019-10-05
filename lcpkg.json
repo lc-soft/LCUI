@@ -16,11 +16,20 @@
     "release"
   ],
   "package": {
-    "output": "dist",
     "entry": {
       "lib": "bin/${arch}-${platform}/${mode}",
-      "bin": "bin/${arch}-${platform}/${mode}",
-      "include": "include"
+      "bin": {
+        "input": "bin/${arch}-${platform}/${mode}",
+        "targets": [
+          "LCUI",
+          "LCUIMain",
+          "LCUIApp"
+        ]
+      },
+      "include": {
+        "input": "include",
+        "recursive": true
+      }
     }
   },
   "dependencies": {
