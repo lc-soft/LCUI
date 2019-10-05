@@ -234,6 +234,33 @@
     <ClInclude Include="..\..\..\include\LCUI\painter.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\charset.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\object.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\strlist.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\strpool.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\task.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\uri.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\anchor.h">
+      <Filter>头文件\LCUI\gui\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\canvas.h">
+      <Filter>头文件\LCUI\gui\widget</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -455,5 +482,16 @@
     <ClCompile Include="..\..\..\src\util\strpool.c">
       <Filter>源文件\util</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\util\object.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget\canvas.c">
+      <Filter>源文件\gui\widget</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\include\LCUI\config.win32.h.in">
+      <Filter>头文件\LCUI</Filter>
+    </None>
   </ItemGroup>
 </Project>

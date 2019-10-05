@@ -27,6 +27,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\include\LCUI.h" />
     <ClInclude Include="..\..\..\include\LCUI\draw\background.h" />
     <ClInclude Include="..\..\..\include\LCUI\draw\border.h" />
     <ClInclude Include="..\..\..\include\LCUI\draw\boxshadow.h" />
@@ -40,7 +41,9 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\css_parser.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\metrics.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\anchor.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\button.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\canvas.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\scrollbar.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\sidebar.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\textcaret.h" />
@@ -70,10 +73,12 @@
     <ClInclude Include="..\..\..\include\LCUI\thread.h" />
     <ClInclude Include="..\..\..\include\LCUI\timer.h" />
     <ClInclude Include="..\..\..\include\LCUI\util.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\charset.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\delay.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\dict.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\dirent.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\event.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\object.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\steptimer.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\linkedlist.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\logger.h" />
@@ -82,7 +87,11 @@
     <ClInclude Include="..\..\..\include\LCUI\util\rbtree.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\rect.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\string.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\strlist.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\strpool.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\task.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\time.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\uri.h" />
     <ClInclude Include="..\..\..\include\LCUI_Build.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
@@ -107,6 +116,7 @@
     <ClCompile Include="..\..\..\src\gui\widget.c" />
     <ClCompile Include="..\..\..\src\gui\widget\anchor.c" />
     <ClCompile Include="..\..\..\src\gui\widget\button.c" />
+    <ClCompile Include="..\..\..\src\gui\widget\canvas.c" />
     <ClCompile Include="..\..\..\src\gui\widget\scrollbar.c" />
     <ClCompile Include="..\..\..\src\gui\widget\sidebar.c" />
     <ClCompile Include="..\..\..\src\gui\widget\textcaret.c" />
@@ -154,6 +164,7 @@
     <ClCompile Include="..\..\..\src\util\dict.c" />
     <ClCompile Include="..\..\..\src\util\dirent.c" />
     <ClCompile Include="..\..\..\src\util\event.c" />
+    <ClCompile Include="..\..\..\src\util\object.c" />
     <ClCompile Include="..\..\..\src\util\steptimer.c" />
     <ClCompile Include="..\..\..\src\util\linkedlist.c" />
     <ClCompile Include="..\..\..\src\util\logger.c" />
@@ -175,6 +186,9 @@
       <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</CompileAsWinRT>
     </ClCompile>
     <ClCompile Include="..\..\..\src\worker.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\include\LCUI\config.win32.h.in" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{48523b96-5f4e-4efd-8580-6b1c0a762ee4}</ProjectGuid>
@@ -294,17 +308,17 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;LCUI_EXPORTS;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\;$(SolutionDir)..\..\vendor\include\;$(SolutionDir)..\..\vendor\include\freetype2\;$(SolutionDir)..\..\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\include\LCUI\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-uwp\include\libxml2-lite\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-uwp\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib\$(PlatformTarget)-uwp\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-uwp\debug\lib</AdditionalLibraryDirectories>
       <ShowProgress>NotSet</ShowProgress>
       <IgnoreSpecificDefaultLibraries>vccorlibd.lib;msvcrtd.lib</IgnoreSpecificDefaultLibraries>
-      <AdditionalDependencies>vccorlibd.lib;msvcrtd.lib;libxml2.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;WindowsApp.lib;</AdditionalDependencies>
+      <AdditionalDependencies>vccorlibd.lib;msvcrtd.lib;libxml2-lite.lib;freetyped.lib;zlibd.lib;libpng16d.lib;jpegd.lib;WindowsApp.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -312,53 +326,55 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;LCUI_EXPORTS;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\;$(SolutionDir)..\..\vendor\include\;$(SolutionDir)..\..\vendor\include\freetype2\;$(SolutionDir)..\..\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\include\LCUI\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-uwp\include\libxml2-lite\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-uwp\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib\$(PlatformTarget)-uwp\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-uwp\lib</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>vccorlib.lib;msvcrt.lib;</IgnoreSpecificDefaultLibraries>
-      <AdditionalDependencies>vccorlib.lib;msvcrt.lib;libxml2.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;WindowsApp.lib;</AdditionalDependencies>
+      <AdditionalDependencies>vccorlib.lib;msvcrt.lib;libxml2-lite.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;WindowsApp.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\;$(SolutionDir)..\..\vendor\include\;$(SolutionDir)..\..\vendor\include\freetype2\;$(SolutionDir)..\..\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\include\LCUI\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-uwp\include\libxml2-lite\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-uwp\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
-      <AdditionalDependencies>vccorlibd.lib;msvcrtd.lib;libxml2.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;WindowsApp.lib;</AdditionalDependencies>
+      <AdditionalDependencies>vccorlibd.lib;msvcrtd.lib;libxml2-lite.lib;freetyped.lib;zlibd.lib;libpng16d.lib;jpegd.lib;WindowsApp.lib;</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>vccorlibd.lib;msvcrtd.lib</IgnoreSpecificDefaultLibraries>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-uwp\debug\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\;$(SolutionDir)..\..\vendor\include\;$(SolutionDir)..\..\vendor\include\freetype2\;$(SolutionDir)..\..\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\include\LCUI\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-uwp\include\libxml2-lite\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-uwp\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
-      <AdditionalDependencies>vccorlib.lib;msvcrt.lib;libxml2.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;WindowsApp.lib;</AdditionalDependencies>
+      <AdditionalDependencies>vccorlib.lib;msvcrt.lib;libxml2-lite.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;WindowsApp.lib;</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>vccorlib.lib;msvcrt.lib;</IgnoreSpecificDefaultLibraries>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-uwp\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\;$(SolutionDir)..\..\vendor\include\;$(SolutionDir)..\..\vendor\include\freetype2\;$(SolutionDir)..\..\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\include\LCUI\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-uwp\include\libxml2-lite\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-uwp\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;LCUI_EXPORTS;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -366,15 +382,16 @@
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
-      <AdditionalDependencies>vccorlibd.lib;msvcrtd.lib;libxml2.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;WindowsApp.lib;</AdditionalDependencies>
+      <AdditionalDependencies>vccorlibd.lib;msvcrtd.lib;libxml2-lite.lib;freetyped.lib;zlibd.lib;libpng16d.lib;jpegd.lib;WindowsApp.lib;</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>vccorlibd.lib;msvcrtd.lib</IgnoreSpecificDefaultLibraries>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-uwp\debug\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\;$(SolutionDir)..\..\vendor\include\;$(SolutionDir)..\..\vendor\include\freetype2\;$(SolutionDir)..\..\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\include\LCUI\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-uwp\include\libxml2-lite\;$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-uwp\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;LCUI_EXPORTS;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -382,8 +399,9 @@
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
-      <AdditionalDependencies>vccorlib.lib;msvcrt.lib;libxml2.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;WindowsApp.lib;</AdditionalDependencies>
+      <AdditionalDependencies>vccorlib.lib;msvcrt.lib;libxml2-lite.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;WindowsApp.lib;</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>vccorlib.lib;msvcrt.lib;</IgnoreSpecificDefaultLibraries>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-uwp\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
