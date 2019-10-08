@@ -1,3 +1,36 @@
+# [1.3.0](https://github.com/lc-soft/LCUI/compare/v1.2.0-beta...v1.3.0) (2019-10-07)
+
+### Bug Fixes
+
+* conflict with C++ "operator" keyword ([5a5ba8c](https://github.com/lc-soft/LCUI/commit/5a5ba8c))
+* **css:** setting font style parser's style_handler doesn't work ([6869683](https://github.com/lc-soft/LCUI/commit/6869683))
+* **display:** memory leak from X11Surface_SetCaptionW() ([484c3d7](https://github.com/lc-soft/LCUI/commit/484c3d7))
+* **font:** failed to get bitmap when font_size > 18 ([d6315c5](https://github.com/lc-soft/LCUI/commit/d6315c5))
+* **gui:** the default border color of the widget should be transparent ([5164955](https://github.com/lc-soft/LCUI/commit/5164955))
+* **gui:** event target selection bug when widget pointer-events is none ([0f26c8b](https://github.com/lc-soft/LCUI/commit/0f26c8b))
+* **gui:** TextEdit placeholder are not working ([d827767](https://github.com/lc-soft/LCUI/commit/d827767))
+* **gui:** the mousemove event should fire before the mouseout event ([5020b91](https://github.com/lc-soft/LCUI/commit/5020b91))
+* **gui:** widget attribute value should always be available ([4b0a2ed](https://github.com/lc-soft/LCUI/commit/4b0a2ed))
+* **ime:** composition window position problem ([#36](https://github.com/lc-soft/LCUI/issues/36), [#175](https://github.com/lc-soft/LCUI/issues/175)) ([1107f91](https://github.com/lc-soft/LCUI/commit/1107f91))
+* **renderer:** widget content rendering incorrect ([f8b0f8b](https://github.com/lc-soft/LCUI/commit/f8b0f8b))
+* **util:** incorrect object type checking in Object_Operate() ([a326e8c](https://github.com/lc-soft/LCUI/commit/a326e8c))
+* **util:** ParseUrl() parsing result is incorrect ([3f9450c](https://github.com/lc-soft/LCUI/commit/3f9450c))
+
+
+### Features
+
+* add LCUI_GetVersion() ([de40c7c](https://github.com/lc-soft/LCUI/commit/de40c7c))
+* add rounded border rendering ([#174](https://github.com/lc-soft/LCUI/issues/174)) ([f36d071](https://github.com/lc-soft/LCUI/commit/f36d071))
+* add include/LCUI.h file ([#173](https://github.com/lc-soft/LCUI/issues/173)) ([113af6a](https://github.com/lc-soft/LCUI/commit/113af6a))
+* **builder:** tag name can be an existing widget type name ([4f6a01c](https://github.com/lc-soft/LCUI/commit/4f6a01c))
+* **css:** make CSSFontStyle_* functions public ([568c915](https://github.com/lc-soft/LCUI/commit/568c915))
+* **graph:** add LCUI_OverPixel() ([d8075d9](https://github.com/lc-soft/LCUI/commit/d8075d9))
+* **gui:** add canvas widget ([e246843](https://github.com/lc-soft/LCUI/commit/e246843))
+* **gui:** add Widget_CollectReferences() ([811585b](https://github.com/lc-soft/LCUI/commit/811585b))
+* **gui:** add Widget_Each() ([2d7d1ee](https://github.com/lc-soft/LCUI/commit/2d7d1ee))
+* **logger:** support setting logging level ([173b92f](https://github.com/lc-soft/LCUI/commit/173b92f))
+* **scrollbar:** capture touch and mousewheel events from the container ([f2f9162](https://github.com/lc-soft/LCUI/commit/f2f9162))
+
 # [1.2.0-beta](https://github.com/lc-soft/LCUI/compare/v1.1.0-beta...v1.2.0-beta) (2019-06-17)
 
 ### Bug Fixes

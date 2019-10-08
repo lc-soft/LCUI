@@ -1,3 +1,35 @@
+# [1.3.0](https://github.com/lc-soft/LCUI/compare/v1.2.0-beta...v1.3.0) (2019-10-07)
+
+### 问题修复
+
+* C++ "operator" 关键字冲突 ([5a5ba8c](https://github.com/lc-soft/LCUI/commit/5a5ba8c))
+* **css:** 设置字体样式解析器的 style_handler 后未起作用 ([6869683](https://github.com/lc-soft/LCUI/commit/6869683))
+* **display:** X11Surface_SetCaptionW() 内存泄漏 ([484c3d7](https://github.com/lc-soft/LCUI/commit/484c3d7))
+* **font:** 当 font_size > 18 时字体位图获取失败 ([d6315c5](https://github.com/lc-soft/LCUI/commit/d6315c5))
+* **gui:** 部件的默认边框颜色应为透明 (transparent) ([5164955](https://github.com/lc-soft/LCUI/commit/5164955))
+* **gui:** 当部件 pointer-events 为 none 时的事件目标选择问题 ([0f26c8b](https://github.com/lc-soft/LCUI/commit/0f26c8b))
+* **gui:** TextEdit 占位符未起作用 ([d827767](https://github.com/lc-soft/LCUI/commit/d827767))
+* **gui:** mousemove 事件应在 mouseout 事件前触发 ([5020b91](https://github.com/lc-soft/LCUI/commit/5020b91))
+* **gui:** 部件属性值应始终有效 ([4b0a2ed](https://github.com/lc-soft/LCUI/commit/4b0a2ed))
+* **ime:** 输入法候选词窗口定位问题 ([#36](https://github.com/lc-soft/LCUI/issues/36), [#175](https://github.com/lc-soft/LCUI/issues/175)) ([1107f91](https://github.com/lc-soft/LCUI/commit/1107f91))
+* **renderer:** 部件内容区渲染不正确 ([f8b0f8b](https://github.com/lc-soft/LCUI/commit/f8b0f8b))
+* **util:** Object_Operate() 中的对象类型判断不正确 ([a326e8c](https://github.com/lc-soft/LCUI/commit/a326e8c))
+* **util:** ParseUrl() 解析结果不正确 ([3f9450c](https://github.com/lc-soft/LCUI/commit/3f9450c))
+
+### 新功能
+
+* 添加 LCUI_GetVersion() ([de40c7c](https://github.com/lc-soft/LCUI/commit/de40c7c))
+* 添加圆角边框渲染，改进盒阴影渲染 ([#174](https://github.com/lc-soft/LCUI/issues/174)) ([f36d071](https://github.com/lc-soft/LCUI/commit/f36d071))
+* 添加 include/LCUI.h 文件 ([#173](https://github.com/lc-soft/LCUI/issues/173)) ([113af6a](https://github.com/lc-soft/LCUI/commit/113af6a))
+* **builder:** 标签名称可以是一个已存在的部件类型名称 ([4f6a01c](https://github.com/lc-soft/LCUI/commit/4f6a01c))
+* **css:** 将 CSSFontStyle_* 系列函数改为公共函数 ([568c915](https://github.com/lc-soft/LCUI/commit/568c915))
+* **graph:** 添加 LCUI_OverPixel() ([d8075d9](https://github.com/lc-soft/LCUI/commit/d8075d9))
+* **gui:** 添加 canvas 部件 ([e246843](https://github.com/lc-soft/LCUI/commit/e246843))
+* **gui:** 添加 Widget_CollectReferences() ([811585b](https://github.com/lc-soft/LCUI/commit/811585b))
+* **gui:** 添加 Widget_Each() ([2d7d1ee](https://github.com/lc-soft/LCUI/commit/2d7d1ee))
+* **logger:** 支持设置日志等级 ([173b92f](https://github.com/lc-soft/LCUI/commit/173b92f))
+* **scrollbar:** 从容器捕获 touch 和 mousewheel 事件 ([f2f9162](https://github.com/lc-soft/LCUI/commit/f2f9162))
+
 # [1.2.0-beta](https://github.com/lc-soft/LCUI/compare/v1.1.0-beta...v1.2.0-beta) (2019-06-17)
 
 ### 问题修复
