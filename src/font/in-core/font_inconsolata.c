@@ -7609,21 +7609,21 @@ int FontInconsolata_GetBitmap(LCUI_FontBitmap *bmp, wchar_t ch, int size)
 	int i, j, *ptr;
 	const uchar_t *byte_ptr;
 
-	if (size < 12 || size > 18) {
+	if (size < 12) {
 		return -1;
 	}
 	/* 不在范围内的字符都用框框表示 */
-	if (ch < ' ' || ch > '~') {
+	if (ch < ' ' || ch > '~' || size > 18) {
 		bmp->advance.x = (int)(size / 2.0 + 0.5);
 		bmp->advance.y = size;
 		bmp->rows = size;
 		bmp->width = bmp->advance.x;
-		bmp->buffer = calloc(bmp->rows*bmp->width, 1);
+		bmp->buffer = calloc(bmp->rows * bmp->width, 1);
 		bmp->pitch = bmp->width;
 		bmp->pixel_mode = 0;
 		bmp->top = size * 4 / 5;
 		bmp->left = 0;
-		j = (bmp->rows - 1)*bmp->width;
+		j = (bmp->rows - 1) * bmp->width;
 		for (i = 0; i < bmp->width; ++i, ++j) {
 			bmp->buffer[i] = 255;
 			bmp->buffer[j] = 255;
