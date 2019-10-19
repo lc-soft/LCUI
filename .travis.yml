@@ -23,4 +23,6 @@ script:
   - ../libtool --mode=execute valgrind --leak-check=full --error-exitcode=42 ./test
 
 after_success:
-  - coveralls --gcov-options '\-lp'
+  - if [[ $CC == clang ]] ; then coveralls --gcov-options '\-lp' --gcov 'llvm-cov gcov' ; fi
+  - if [[ $CC == gcc ]] ; then coveralls --gcov-options '\-lp' ; fi
+
