@@ -23,4 +23,4 @@ script:
   - ../libtool --mode=execute valgrind --leak-check=full --error-exitcode=42 ./test
 
 after_success:
-  - coveralls --gcov-options '\-lp'
+  - coveralls --gcov-options '\-lp' --gcov 'llvm-cov gcov'
