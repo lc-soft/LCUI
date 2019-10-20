@@ -172,11 +172,11 @@ cd test
 
 ## Contribution
 
-There are many ways to [contribute](CONTRIBUTING.md) to LCUI.
+There are many ways to [contribute](.github/CONTRIBUTING.md) to LCUI.
 
 - [Submit bugs](https://github.com/lc-soft/LCUI/issues) and help us verify fixes as they are checked in.
 - [Search for FIXME comments](https://github.com/lc-soft/LCUI/search?l=C&q=FIXME) in the source code and try to fix them.
-- Fund to you interested issue on [IssueHunt](https://issuehunt.io/r/lc-soft/LCUI) to attract other developers to contribute.
+- Fund the issues that interest you on [IssueHunt](https://issuehunt.io/r/lc-soft/LCUI) to attract other developers to contribute.
 - Support this project on [OpenCollective](https://opencollective.com/LCUI).
 - Review the [source code changes](https://github.com/lc-soft/LCUI/pulls).
 - [Contribute bug fixes](CONTRIBUTING.md).
