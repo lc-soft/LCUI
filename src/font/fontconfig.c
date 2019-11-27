@@ -28,6 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "config.h"
+
 #ifndef LCUI_BUILD_IN_WIN32
 
 #include <LCUI_Build.h>
