@@ -58,7 +58,7 @@ void LinkedList_Unlink(LinkedList *list, LinkedListNode *node)
 	node->next = NULL;
 }
 
-void LinkedList_ClearEx(LinkedList *list, void(*on_destroy)(void*),
+void LinkedList_ClearEx(LinkedList *list, void (*on_destroy)(void *),
 			int free_node)
 {
 	LinkedListNode *prev, *node;
@@ -80,7 +80,7 @@ void LinkedList_ClearEx(LinkedList *list, void(*on_destroy)(void*),
 	}
 }
 
-LinkedListNode *LinkedList_GetNodeAtTail(LinkedList *list, size_t pos)
+LinkedListNode *LinkedList_GetNodeAtTail(const LinkedList *list, size_t pos)
 {
 	LinkedListNode *node;
 	if (pos >= list->length) {
@@ -94,7 +94,7 @@ LinkedListNode *LinkedList_GetNodeAtTail(LinkedList *list, size_t pos)
 	return node;
 }
 
-LinkedListNode *LinkedList_GetNode(LinkedList *list, size_t pos)
+LinkedListNode *LinkedList_GetNode(const LinkedList *list, size_t pos)
 {
 	LinkedListNode *node;
 	if (pos >= list->length) {
@@ -177,10 +177,10 @@ void LinkedList_Delete(LinkedList *list, size_t pos)
 	LinkedList_DeleteNode(list, node);
 }
 
-void *LinkedList_Get(LinkedList *list, size_t pos)
+void *LinkedList_Get(const LinkedList *list, size_t pos)
 {
 	LinkedListNode *node = LinkedList_GetNode(list, pos);
-	return node ? node->data:NULL;
+	return node ? node->data : NULL;
 }
 
 LinkedListNode *LinkedList_Append(LinkedList *list, void *data)

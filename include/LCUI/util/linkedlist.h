@@ -57,10 +57,10 @@ struct LinkedListRec_ {
 
 LCUI_API LinkedListNode *LinkedList_Append(LinkedList *list, void *data);
 LCUI_API LinkedListNode *LinkedList_Insert(LinkedList *list, size_t pos, void *data);
-LCUI_API LinkedListNode *LinkedList_GetNode(LinkedList *list, size_t pos);
-LCUI_API LinkedListNode *LinkedList_GetNodeAtTail(LinkedList *list, size_t pos);
+LCUI_API LinkedListNode *LinkedList_GetNode(const LinkedList *list, size_t pos);
+LCUI_API LinkedListNode *LinkedList_GetNodeAtTail(const LinkedList *list, size_t pos);
 LCUI_API void LinkedList_Init(LinkedList *list);
-LCUI_API void *LinkedList_Get(LinkedList *list, size_t pos);
+LCUI_API void *LinkedList_Get(const LinkedList *list, size_t pos);
 LCUI_API void LinkedList_Unlink(LinkedList *list, LinkedListNode *node);
 LCUI_API void LinkedList_Link(LinkedList *list, LinkedListNode *cur, LinkedListNode *node);
 LCUI_API void LinkedList_Delete(LinkedList *list, size_t pos);
