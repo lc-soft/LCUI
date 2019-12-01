@@ -32,14 +32,14 @@
 #define LCUI_BUILD_H
 
 #if defined(__GNUC__)
-#define LCUI_API
-#else /* newer compiler */
+#define LCUI_API extern
+#else
 #ifdef LCUI_EXPORTS
 #define LCUI_API __declspec(dllexport)
 #else
-#define LCUI_API
+#define LCUI_API __declspec(dllimport)
 #endif
-#endif /* compiler */
+#endif
 
 #if defined(_WIN32) && !defined(__cplusplus)
 #define INLINE __inline

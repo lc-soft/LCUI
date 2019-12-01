@@ -238,9 +238,15 @@ LCUI_API int Dict_RehashMilliseconds(Dict *d, int ms);
 LCUI_API void Dict_SetHashFunctionSeed(unsigned int initval);
 LCUI_API unsigned int Dict_GetHashFunctionSeed(void);
 
+LCUI_API unsigned int StringKeyDict_KeyHash(const void *key);
+LCUI_API int StringKeyDict_KeyCompare(void *privdata, const void *key1,
+				      const void *key2);
+LCUI_API void *StringKeyDict_KeyDup(void *privdata, const void *key);
+LCUI_API void StringKeyDict_KeyDestructor(void *privdata, void *key);
+
 /* Hash table types */
-extern DictType DictType_StringKey;
-extern DictType DictType_StringCopyKey;
+LCUI_API DictType DictType_StringKey;
+LCUI_API DictType DictType_StringCopyKey;
 
 LCUI_END_HEADER
 

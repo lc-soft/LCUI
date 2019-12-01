@@ -679,7 +679,7 @@ void Dict_DisableResize(void)
 	dict_can_resize = 0;
 }
 
-static unsigned int StringCopyKeyDict_KeyHash(const void *key)
+unsigned int StringKeyDict_KeyHash(const void *key)
 {
 	const char *buf = key;
 	unsigned int hash = dict_hash_function_seed;
@@ -689,7 +689,7 @@ static unsigned int StringCopyKeyDict_KeyHash(const void *key)
 	return hash;
 }
 
-static int StringCopyKeyDict_KeyCompare(void *privdata, const void *key1,
+int StringKeyDict_KeyCompare(void *privdata, const void *key1,
 					const void *key2)
 {
 	if (strcmp(key1, key2) == 0) {
@@ -698,22 +698,22 @@ static int StringCopyKeyDict_KeyCompare(void *privdata, const void *key1,
 	return 0;
 }
 
-static void *StringCopyKeyDict_KeyDup(void *privdata, const void *key)
+void *StringKeyDict_KeyDup(void *privdata, const void *key)
 {
 	char *newkey = malloc((strlen(key) + 1) * sizeof(char));
 	strcpy(newkey, key);
 	return newkey;
 }
 
-static void StringCopyKeyDict_KeyDestructor(void *privdata, void *key)
+void StringKeyDict_KeyDestructor(void *privdata, void *key)
 {
 	free(key);
 }
 
-DictType DictType_StringKey = { StringCopyKeyDict_KeyHash,    NULL, NULL,
-				StringCopyKeyDict_KeyCompare, NULL, NULL };
+DictType DictType_StringKey = { StringKeyDict_KeyHash,    NULL, NULL,
+				StringKeyDict_KeyCompare, NULL, NULL };
 
 DictType DictType_StringCopyKey = {
-	StringCopyKeyDict_KeyHash,    StringCopyKeyDict_KeyDup,        NULL,
-	StringCopyKeyDict_KeyCompare, StringCopyKeyDict_KeyDestructor, NULL
+	StringKeyDict_KeyHash,    StringKeyDict_KeyDup,        NULL,
+	StringKeyDict_KeyCompare, StringKeyDict_KeyDestructor, NULL
 };
