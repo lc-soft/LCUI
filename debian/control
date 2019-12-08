@@ -8,14 +8,14 @@ Homepage: https://lcui.org
 Vcs-Git: https://github.com/lc-soft/LCUI.git
 Vcs-Browser: https://github.com/lc-soft/LCUI
 
-Package: lcui-dev
+Package: liblcui1-dev
 Section: libdevel
 Architecture: any
 Multi-Arch: same
 Depends: lcui (= ${binary:Version}), ${misc:Depends}
 Description: A small C library for building user interfaces.
 
-Package: lcui
+Package: liblcui1
 Architecture: any
 Multi-Arch: same
 Depends: libpng, libjpeg, libxml2, libfreetype6, libx11
