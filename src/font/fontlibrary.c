@@ -672,10 +672,10 @@ void FontBitmap_Init(LCUI_FontBitmap *bitmap)
 /** 释放字体位图占用的资源 */
 void FontBitmap_Free(LCUI_FontBitmap *bitmap)
 {
-	if (FontBitmap_IsValid(bitmap)) {
+	if (bitmap->buffer) {
 		free(bitmap->buffer);
-		FontBitmap_Init(bitmap);
 	}
+	FontBitmap_Init(bitmap);
 }
 
 /** 创建字体位图 */
