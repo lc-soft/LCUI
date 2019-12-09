@@ -609,11 +609,29 @@ LCUI_BOOL LCUI_IsOnMainLoop(void)
 	return (MainApp.loop->tid == LCUIThread_SelfID());
 }
 
+#ifdef LCUI_BUILD_IN_WIN32
+
+static void Win32Logger_LogA(const char *str)
+{
+	OutputDebugStringA(str);
+}
+
+static void Win32Logger_LogW(const wchar_t *wcs)
+{
+	OutputDebugStringW(wcs);
+}
+
+#endif
+
 void LCUI_InitBase(void)
 {
 	if (System.state == STATE_ACTIVE) {
 		return;
 	}
+#ifdef LCUI_BUILD_IN_WIN32
+	Logger_SetHandler(Win32Logger_LogA);
+	Logger_SetHandlerW(Win32Logger_LogW);
+#endif
 	System.exit_code = 0;
 	System.state = STATE_ACTIVE;
 	System.thread = LCUIThread_SelfID();

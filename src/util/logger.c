@@ -46,21 +46,6 @@ static struct Logger {
 	LCUI_Mutex mutex;
 } logger = { 0 };
 
-
-#ifdef LCUI_BUILD_IN_WIN32
-
-static void Win32Logger_LogA(const char *str)
-{
-	OutputDebugStringA(str);
-}
-
-static void Win32Logger_LogW(const wchar_t *wcs)
-{
-	OutputDebugStringW(wcs);
-}
-
-#endif
-
 void Logger_SetLevel(LoggerLevel level)
 {
 	logger.level = level;
@@ -75,9 +60,6 @@ int Logger_Log(LoggerLevel level, const char* fmt, ...)
 		return 0;
 	}
 	if (!logger.inited) {
-#ifdef LCUI_BUILD_IN_WIN32
-		logger.handler = Win32Logger_LogA;
-#endif
 		LCUIMutex_Init(&logger.mutex);
 		logger.inited = 1;
 	}
@@ -104,9 +86,6 @@ int Logger_LogW(LoggerLevel level, const wchar_t* fmt, ...)
 		return 0;
 	}
 	if (!logger.inited) {
-#ifdef LCUI_BUILD_IN_WIN32
-		logger.handlerw = Win32Logger_LogW;
-#endif
 		LCUIMutex_Init(&logger.mutex);
 		logger.inited = 1;
 	}
