@@ -270,6 +270,9 @@ static void ParseNode(XMLParserContext ctx, xmlNodePtr node)
 
 	for (; node; node = node->next) {
 		proto = NULL;
+		if (node->type == XML_COMMENT_NODE) {
+			continue;
+		}
 		if (node->type == XML_ELEMENT_NODE) {
 			p = RBTree_CustomGetData(&self.parsers, node->name);
 			if (!p) {
@@ -303,12 +306,12 @@ static void ParseNode(XMLParserContext ctx, xmlNodePtr node)
 			break;
 		case PB_WARNING:
 			Logger_Warning("[builder] %s (%d): warning: %s node.\n",
-			    node->doc->name, node->line, node->name);
+				       node->doc->name, node->line, node->name);
 			break;
 		case PB_ERROR:
 		default:
 			Logger_Error("[builder] %s (%d): error: %s node.\n",
-			    node->doc->name, node->line, node->name);
+				     node->doc->name, node->line, node->name);
 			break;
 		}
 		if (!ctx->root && cur_ctx.root) {
