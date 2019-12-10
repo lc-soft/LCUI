@@ -66,11 +66,13 @@ There are many similar open source projects(E.g: [SDL](https://github.com/SDL-mi
 
 Want to know what LCUI can do? You can view the following projects:
 
+- [LCUI CLI](https://github.com/lc-ui/lcui-cli) - Command line interface for rapid LCUI development.
+- [LCUI Router](https://github.com/lc-soft/lcui-router) - The official router for LCUI. It provides a similar development experience to the [Vue Router](https://github.com/vuejs/vue-router) and make building multiple views applications with LCUI a breeze.
 - [LC Design](https://github.com/lc-ui/lc-design) - A UI component framework for building LCUI application.
 - [LC Finder](https://github.com/lc-soft/LC-Finder) - An image manager, it uses most of the features of LCUI, and you can use it as a reference to evaluate whether LCUI's performance and development complexity meets your needs.
-- [Trad](https://github.com/lc-soft/trad) - A language based on JavaScript syntax that can be compiled into C, it pre-built LCUI bindings, with its language features and JSX syntax support to easily create interactive graphical interfaces based on LCUI.
+- [Trad](https://github.com/lc-soft/trad) - A language based on JavaScript syntax that can be compiled into C, it preset LCUI bindings, provides [React](https://reactjs.org/) like development experience, makes it painless to create interactive UIs based on LCUI.
 
-### Design reference
+### Design references
 
 - [SDL](https://github.com/SDL-mirror/SDL/tree/master/src/video/x11) — X11 driver code reference
 - [FreeType](https://www.freetype.org/freetype2/docs/design/design-3.html#section-1) — Data structure naming style reference
@@ -135,7 +137,7 @@ If you want to manually compile LCUI from source code, use lcpkg in the LCUI sou
 lcpkg install
 ```
 
-After that, [Visual Studio](https://visualstudio.microsoft.com/) to open the `build/windows/LCUI.sln` file, and then build LCUI.
+After that, open the `build/windows/LCUI.sln` file with [Visual Studio](https://visualstudio.microsoft.com/), and then build LCUI.
 
 ### Ubuntu
 
@@ -172,9 +174,10 @@ cd test
 
 ## Contribution
 
-There are many ways to [contribute](.github/CONTRIBUTING.md) to LCUI.
+Think LCUI is slow to update? there are many ways to [contribute](.github/CONTRIBUTING.md) to LCUI.
 
 - [Submit bugs](https://github.com/lc-soft/LCUI/issues) and help us verify fixes as they are checked in.
+- Share some interesting ideas related to GUI development in the [issues page](https://github.com/lc-soft/LCUI/issues).
 - [Search for FIXME comments](https://github.com/lc-soft/LCUI/search?l=C&q=FIXME) in the source code and try to fix them.
 - Fund the issues that interest you on [IssueHunt](https://issuehunt.io/r/lc-soft/LCUI) to attract other developers to contribute.
 - Support this project on [OpenCollective](https://opencollective.com/LCUI).
@@ -194,9 +197,10 @@ The English version of the documentation is not available, because the author do
 
 1. **Why develop it?**
 
-   - To explore and experiment new GUI development way
-   - Get more good job and make more money
-   - Leave a mark on the world
+   - Explore and experiment new GUI development way
+   - Let other developers share about how to write better code
+   - Leave a proof of existence in the world
+   - Get more better jobs and make more money
    - Pass the time
 
 1. **Is this a browser kernel? Or a development library like Electron that integrates the browser environment?**
@@ -205,7 +209,7 @@ The English version of the documentation is not available, because the author do
 
 1. **Why do I choose the LCUI instead of Electron?**
 
-    In contrast to fully functional Electron, small file size and low memory usage doesn't matter, except for technical research and communication, there's no reason to use LCUI.
+    In contrast to fully functional Electron, these features of lcui, such as small binary file size and low memory usage, are not worth mentioning, except for technical research and share, you have no reason to use LCUI.
 
 1. **Is it the same as writing a web page?**
 

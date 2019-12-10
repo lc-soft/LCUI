@@ -54,15 +54,17 @@ LCUI 的主要用途是方便作者开发简单的图形界面应用，简单也
 - 输入法支持差，在 Linux 中仅支持输入英文字母和符号。
 - 布局系统简单，不支持网格、表格等布局。
 
-如今可参考的同类开源项目有很多，例如：[SDL](https://github.com/SDL-mirror/SDL)、[imgui](https://github.com/ocornut/imgui)，LCUI 中大部分缺少的特性都能在这些项目中找到相关实现，新功能的开发成本和复杂度也因此而降低了很多。开源此项目的原因之一是进行技术交流，如果你有同类项目的研究和使用经验，可以考虑向此项目提供改进方案。
+如今可参考的同类开源项目有很多，例如：[SDL](https://github.com/SDL-mirror/SDL)、[imgui](https://github.com/ocornut/imgui)，LCUI 中大部分缺少的特性都能在这些项目中找到相关实现，新功能的开发成本和复杂度也因此而降低了很多。开源此项目的目的之一是技术交流和分享，如果你有同类项目的研究和使用经验，可以考虑向此项目提供改进方案。
 
 ### 相关项目
 
 想要了解 LCUI 具体能做什么？你可以查看以下项目：
 
+- [LCUI CLI](https://github.com/lc-ui/lcui-cli) - 用于开发 LCUI 应用程序的命令行工具。
+- [LCUI Router](https://github.com/lc-soft/lcui-router) - LCUI 的路由管理器，它提供类似于 [Vue Router](https://github.com/vuejs/vue-router) 的开发体验，能让你基于 LCUI 构建多视图的应用程序变得更简单。
 - [LC Design](https://github.com/lc-ui/lc-design) — 专为 LCUI 开发的组件库，包含了一些通用组件和 css 样式。
 - [LC Finder](https://github.com/lc-soft/LC-Finder) — 图片管理器，LCUI 的旗舰级应用程序，你可以将它作为参考对象，以此评估 LCUI 的性能、界面效果和开发复杂度是否符合你的需求。
-- [Trad](https://github.com/lc-soft/trad) — 一个基于 JavaScript 语法且可编译为 C 的语言，预置 LCUI 绑定，凭借其语言特性和 JSX 语法支持可轻松地基于 LCUI 来创建交互式的图形界面。
+- [Trad](https://github.com/lc-soft/trad) — 一个基于 JavaScript 语法且可编译为 C 的语言，预置 LCUI 绑定，提供类似于 [React](https://reactjs.org/) 的开发体验，能让你轻松基于 LCUI 创建响应式用户界面。
 
 ### 设计参考
 
