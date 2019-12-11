@@ -30,6 +30,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <omp.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/input.h>
@@ -155,7 +156,12 @@ size_t LCUIDisplay_Render(void)
 		 */
 
 		/* Repaint dirty rectangles of surface */
+
+		#pragma omp parallel
+		#pragma omp single
 		for (LinkedList_Each(rn, &rects)) {
+			#pragma omp task firstprivate(rn)
+			printf("thread_num: %d\n", omp_get_thread_num());
 			rect = rn->data;
 			ev.paint.rect = *rect;
 			LCUI_TriggerEvent(&ev, NULL);
@@ -184,6 +190,7 @@ size_t LCUIDisplay_Render(void)
 			Surface_EndPaint(s, paint);
 			record->rendered = TRUE;
 		}
+		#pragma omp taskwait
 		RectList_Clear(&rects);
 		RectList_Clear(&record->rects);
 	}
