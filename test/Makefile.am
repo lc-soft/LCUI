@@ -6,7 +6,7 @@ noinst_PROGRAMS = helloworld test test_charset test_touch test_char_render \
 test_string_render test_widget_render test_widget_layout  test_widget_rect \
 test_widget_opacity test_widget_flex_layout test_widget_inline_block_layout \
 test_scaling_support test_widget test_scrollbar test_textview_resize \
-test_image_scaling_bench
+test_image_scaling_bench test_render
 
 ##指定测试程序的源码文件
 helloworld_SOURCES = helloworld.c
@@ -69,6 +69,9 @@ test_scrollbar_LDADD = $(top_builddir)/src/libLCUI.la
 
 test_widget_SOURCES = test_widget.c
 test_widget_LDADD = $(top_builddir)/src/libLCUI.la
+
+test_render_SOURCES = test_render.c
+test_render_LDADD = $(top_builddir)/src/libLCUI.la
 
 test_image_scaling_bench_LDADD = $(top_builddir)/src/libLCUI.la
 
