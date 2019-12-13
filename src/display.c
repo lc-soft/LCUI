@@ -27,7 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <LCUI/config.h>
+#include "config.h"
 
 #include <time.h>
 #include <stdio.h>
@@ -167,7 +167,6 @@ size_t LCUIDisplay_Render(void)
 		for (LinkedList_Each(rn, &rects)) {
 #ifdef USE_OPENMP
 #pragma omp task firstprivate(rn)
-			printf("thread_num: %d\n", omp_get_thread_num());
 #endif
 			rect = rn->data;
 			ev.paint.rect = *rect;
