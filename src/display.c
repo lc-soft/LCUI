@@ -27,10 +27,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <LCUI/config.h>
+
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef USE_OPENMP
 #include <omp.h>
+#endif
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/input.h>
@@ -156,12 +160,15 @@ size_t LCUIDisplay_Render(void)
 		 */
 
 		/* Repaint dirty rectangles of surface */
-
-		#pragma omp parallel
-		#pragma omp single
+#ifdef USE_OPENMP
+#pragma omp parallel
+#pragma omp single
+#endif
 		for (LinkedList_Each(rn, &rects)) {
-			#pragma omp task firstprivate(rn)
+#ifdef USE_OPENMP
+#pragma omp task firstprivate(rn)
 			printf("thread_num: %d\n", omp_get_thread_num());
+#endif
 			rect = rn->data;
 			ev.paint.rect = *rect;
 			LCUI_TriggerEvent(&ev, NULL);
@@ -190,7 +197,9 @@ size_t LCUIDisplay_Render(void)
 			Surface_EndPaint(s, paint);
 			record->rendered = TRUE;
 		}
-		#pragma omp taskwait
+#ifdef USE_OPENMP
+#pragma omp taskwait
+#endif
 		RectList_Clear(&rects);
 		RectList_Clear(&record->rects);
 	}

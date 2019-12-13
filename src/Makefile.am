@@ -1,5 +1,5 @@
 AUTOMAKE_OPTIONS=foreign
-AM_CFLAGS = -I$(abs_top_srcdir)/include $(CODE_COVERAGE_CFLAGS) -fopenmp
+AM_CFLAGS = -I$(abs_top_srcdir)/include $(CODE_COVERAGE_CFLAGS)
 
 LCUI_LDFLAGS = -version-info 1:1:1
 LCUI_SOURCES = graph.c ime.c cursor.c worker.c main.c timer.c painter.c display.c keyboard.c

@@ -159,6 +159,9 @@
 /* Define to 1 if you have the libpng. */
 #undef USE_LIBPNG
 
+/* Define to 1 if you are using OpenMP support. */
+#undef USE_OPENMP
+
 /* Version number of package */
 #undef VERSION
 
