@@ -100,7 +100,7 @@ static void DrawBorder(LCUI_PaintContext paint)
 }
 
 static void SurfaceRecord_DumpRects(SurfaceRecord record,
-				    LinkedList rects_group[4])
+				    LinkedList *rects)
 {
 	LCUI_Rect rect;
 	const int width = Surface_GetWidth(record->surface);
@@ -111,42 +111,49 @@ static void SurfaceRecord_DumpRects(SurfaceRecord record,
 	rect.y = 0;
 	rect.width = width / 2;
 	rect.height = height / 2;
-	RectList_SplitWith(&record->rects, &rect, &rects_group[0]);
+	RectList_SplitWith(&record->rects, &rect, rects);
 
 	/* top right */
 	rect.x = width / 2;
 	rect.width = width - rect.x;
-	RectList_SplitWith(&record->rects, &rect, &rects_group[1]);
+	RectList_SplitWith(&record->rects, &rect, rects);
 
 	/* bottom left */
 	rect.x = 0;
 	rect.y = height / 2;
 	rect.width = width / 2;
 	rect.height = height - rect.y;
-	RectList_SplitWith(&record->rects, &rect, &rects_group[2]);
+	RectList_SplitWith(&record->rects, &rect, rects);
 
 	/* bottom right */
 	rect.x = width / 2;
 	rect.width = width - rect.x;
-	RectList_SplitWith(&record->rects, &rect, &rects_group[3]);
+	RectList_SplitWith(&record->rects, &rect, rects);
 
 	RectList_Clear(&record->rects);
 }
 
-static size_t LCUIDisplay_RenderSurfaceEx(SurfaceRecord record,
-					  LinkedList *rects)
+static size_t LCUIDisplay_RenderSurface(SurfaceRecord record)
 {
 	size_t count = 0;
 	LCUI_Rect *rect;
 	LCUI_PaintContext paint;
 	LCUI_SysEventRec ev;
+	LinkedList rects;
 	LinkedListNode *node;
 	LCUI_BOOL can_render;
 
 	ev.type = LCUI_PAINT;
 	can_render = record->widget && record->surface &&
 		     Surface_IsReady(record->surface);
-	for (LinkedList_Each(node, rects)) {
+	record->rendered = FALSE;
+	LinkedList_Init(&rects);
+	SurfaceRecord_DumpRects(record, &rects);
+#ifdef USE_OPENMP
+#pragma omp parallel
+#pragma omp single
+#endif
+	for (LinkedList_Each(node, &rects)) {
 		rect = node->data;
 		ev.paint.rect = *rect;
 		LCUI_TriggerEvent(&ev, NULL);
@@ -173,36 +180,10 @@ static size_t LCUIDisplay_RenderSurfaceEx(SurfaceRecord record,
 		}
 		Surface_EndPaint(record->surface, paint);
 	}
-	return count;
-}
-
-static size_t LCUIDisplay_RenderSurface(SurfaceRecord record)
-{
-	size_t i;
-	size_t count;
-	LinkedList rects_group[4];
-
-	record->rendered = FALSE;
-	LinkedList_Init(&rects_group[0]);
-	LinkedList_Init(&rects_group[1]);
-	LinkedList_Init(&rects_group[2]);
-	LinkedList_Init(&rects_group[3]);
-	SurfaceRecord_DumpRects(record, rects_group);
-#ifdef USE_OPENMP
-#pragma omp parallel
-#pragma omp single
-#endif
-	/* Repaint dirty rectangles of surface */
-	for (count = 0, i = 0; i < 4; ++i) {
-		count += LCUIDisplay_RenderSurfaceEx(record, &rects_group[i]);
-	}
 #ifdef USE_OPENMP
 #pragma omp taskwait
 #endif
-	RectList_Clear(&rects_group[0]);
-	RectList_Clear(&rects_group[1]);
-	RectList_Clear(&rects_group[2]);
-	RectList_Clear(&rects_group[3]);
+	RectList_Clear(&rects);
 	record->rendered = count > 0;
 	return count;
 }
