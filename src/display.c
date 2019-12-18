@@ -136,7 +136,7 @@ static void SurfaceRecord_DumpRects(SurfaceRecord record,
 static size_t LCUIDisplay_RenderSurface(SurfaceRecord record)
 {
 	size_t count = 0;
-	int i = 0;
+	int i;
 	LCUI_Rect *rect;
 	LCUI_PaintContext paint;
 	LCUI_SysEventRec ev;
@@ -153,6 +153,7 @@ static size_t LCUIDisplay_RenderSurface(SurfaceRecord record)
 	SurfaceRecord_DumpRects(record, &rects);
 
 	rectArray = (LCUI_Rect **)malloc(sizeof(LCUI_Rect*) * rects.length);
+	i = 0;
 	for (LinkedList_Each(node, &rects)) {
 		rectArray[i] = node->data;
 		i++;
