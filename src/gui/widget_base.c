@@ -392,7 +392,7 @@ void Widget_GenerateHash(LCUI_Widget w)
 	LinkedListNode *node;
 
 	Widget_GenerateSelfHash(w);
-	for (LinkedList_Each(node, &w->children_show)) {
+	for (LinkedList_Each(node, &w->children)) {
 		Widget_GenerateHash(node->data);
 	}
 }
