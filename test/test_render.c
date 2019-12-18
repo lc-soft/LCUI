@@ -80,6 +80,7 @@ void InitBackground(void)
 	LCUI_Widget w;
 	LCUI_Widget root;
 	LCUI_Color color;
+	LCUI_WidgetRulesRec rules = { 0 };
 	const float width = SCREEN_WIDTH * 1.0f / n;
 	const float height = SCREEN_HEIGHT * 1.0f / n;
 
@@ -101,6 +102,13 @@ void InitBackground(void)
 		Widget_SetStyle(w, key_background_color, color, color);
 		Widget_Append(self.box, w);
 	}
+	rules.cache_children_style = TRUE;
+	rules.ignore_classes_change = TRUE;
+	rules.ignore_status_change = TRUE;
+	rules.max_update_children_count = -1;
+	rules.max_render_children_count = 0;
+	Widget_GenerateHash(self.box);
+	Widget_SetRules(self.box, &rules);
 	Widget_Append(root, self.box);
 }
 
