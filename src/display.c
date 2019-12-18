@@ -136,12 +136,14 @@ static void SurfaceRecord_DumpRects(SurfaceRecord record,
 static size_t LCUIDisplay_RenderSurface(SurfaceRecord record)
 {
 	size_t count = 0;
+	int i = 0;
 	LCUI_Rect *rect;
 	LCUI_PaintContext paint;
 	LCUI_SysEventRec ev;
 	LinkedList rects;
 	LinkedListNode *node;
 	LCUI_BOOL can_render;
+	LCUI_Rect **rectArray;
 
 	ev.type = LCUI_PAINT;
 	can_render = record->widget && record->surface &&
@@ -149,12 +151,23 @@ static size_t LCUIDisplay_RenderSurface(SurfaceRecord record)
 	record->rendered = FALSE;
 	LinkedList_Init(&rects);
 	SurfaceRecord_DumpRects(record, &rects);
-#ifdef USE_OPENMP
-#pragma omp parallel
-#pragma omp single
-#endif
+
+	rectArray = (LCUI_Rect **)malloc(sizeof(LCUI_Rect*) * rects.length);
 	for (LinkedList_Each(node, &rects)) {
-		rect = node->data;
+		rectArray[i] = node->data;
+		i++;
+	}
+
+#ifdef USE_OPENMP
+#pragma omp parallel for \
+	default(none) \
+	shared(can_render, display, rects, rectArray) \
+	private(rect, paint) \
+	firstprivate(record, ev) \
+	reduction(+:count)
+#endif
+	for (i = 0; i < rects.length; i++) {
+		rect = rectArray[i];
 		ev.paint.rect = *rect;
 		LCUI_TriggerEvent(&ev, NULL);
 		if (!can_render) {
@@ -180,9 +193,6 @@ static size_t LCUIDisplay_RenderSurface(SurfaceRecord record)
 		}
 		Surface_EndPaint(record->surface, paint);
 	}
-#ifdef USE_OPENMP
-#pragma omp taskwait
-#endif
 	RectList_Clear(&rects);
 	record->rendered = count > 0;
 	return count;
