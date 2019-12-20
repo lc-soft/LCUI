@@ -73,6 +73,22 @@ if test "x$with_pthread" != "xno"; then
 	], [AC_MSG_ERROR([The support could not be configured for the POSIX thread programming interface.])])
 fi
 
+# openmp
+want_openmp=no
+AC_ARG_WITH(openmp, AC_HELP_STRING([--with-openmp], [use openmp (default)]))
+if test "x$with_openmp" != "xno"; then
+	AC_OPENMP
+	if test "x$OPENMP_CFLAGS" != "x"; then
+		want_openmp=yes
+		CFLAGS="$CFLAGS $OPENMP_CFLAGS"
+		AC_DEFINE_UNQUOTED(USE_OPENMP, 1, Define to 1 if you are using OpenMP support.)
+	else
+		AC_MSG_ERROR([The support could not be configured for the OpenMP.])
+	fi
+else
+	want_openmp=no
+fi
+
 # libxml2
 enable_builder=yes
 AC_ARG_ENABLE(lcui-builder, AC_HELP_STRING([--enable-lcui-builder],
@@ -227,6 +243,7 @@ echo -e "Build with libjpeg support ......... : $want_jpeg"
 echo -e "Build with font-engine support ..... : $font_engine_name"
 echo -e "Build with fontconfig support ...... : $want_fontconfig"
 echo -e "Build with thread support .......... : $thread_name"
+echo -e "Build with OpenMP support .......... : $want_openmp"
 echo -e "Build with video support ........... : $video_driver_name"
 echo
 

@@ -113,6 +113,13 @@ LCUI_API int RectList_Add(LinkedList *list, LCUI_Rect *rect);
 /** 删除脏矩形 */
 LCUI_API int RectList_Delete(LinkedList *list, LCUI_Rect *rect);
 
+/**
+ * Split each rectangle with the bounding box
+ */
+LCUI_API
+size_t RectList_SplitWith(LinkedList *rects, const LCUI_Rect *bounding,
+			  LinkedList *splited_rects);
+
 #define RectList_Clear(LIST) LinkedList_Clear(LIST, free)
 
 LCUI_END_HEADER

@@ -55,6 +55,10 @@ LCUI_API LCUI_BOOL Surface_IsReady(LCUI_Surface surface);
 
 LCUI_API void Surface_Move(LCUI_Surface surface, int x, int y);
 
+LCUI_API int Surface_GetWidth(LCUI_Surface surface);
+
+LCUI_API int Surface_GetHeight(LCUI_Surface surface);
+
 LCUI_API void Surface_Resize(LCUI_Surface surface, int w, int h);
 
 LCUI_API void Surface_SetCaptionW(LCUI_Surface surface, const wchar_t *str);
