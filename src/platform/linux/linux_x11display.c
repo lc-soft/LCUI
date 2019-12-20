@@ -399,6 +399,16 @@ static void *X11Surface_GetHandle(LCUI_Surface s)
 	return NULL;
 }
 
+static int X11Surface_GetWidth(LCUI_Surface s)
+{
+	return s->width;
+}
+
+static int X11Surface_GetHeight(LCUI_Surface s)
+{
+	return s->height;
+}
+
 static int X11Display_GetWidth(void)
 {
 	Screen *s = DefaultScreenOfDisplay(x11.app->display);
@@ -476,6 +486,8 @@ LCUI_DisplayDriver LCUI_CreateLinuxX11DisplayDriver(void)
 	driver->beginPaint = X11Surface_BeginPaint;
 	driver->endPaint = X11Surface_EndPaint;
 	driver->bindEvent = X11Display_BindEvent;
+	driver->getSurfaceWidth = X11Surface_GetWidth;
+	driver->getSurfaceHeight = X11Surface_GetHeight;
 	LinkedList_Init(&x11.surfaces);
 	LCUI_BindSysEvent(Expose, OnExpose, NULL, NULL);
 	LCUI_BindSysEvent(ConfigureNotify, OnConfigureNotify, NULL, NULL);

@@ -27,9 +27,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "config.h"
+
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef USE_OPENMP
+#include <omp.h>
+#endif
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/input.h>
@@ -94,6 +99,108 @@ static void DrawBorder(LCUI_PaintContext paint)
 	Graph_DrawHorizLine(&paint->canvas, color, 1, pos, end_x);
 }
 
+static void SurfaceRecord_DumpRects(SurfaceRecord record,
+				    LinkedList *rects)
+{
+	LCUI_Rect rect;
+	const int width = Surface_GetWidth(record->surface);
+	const int height = Surface_GetHeight(record->surface);
+
+	/* top left */
+	rect.x = 0;
+	rect.y = 0;
+	rect.width = width / 2;
+	rect.height = height / 2;
+	RectList_SplitWith(&record->rects, &rect, rects);
+
+	/* top right */
+	rect.x = width / 2;
+	rect.width = width - rect.x;
+	RectList_SplitWith(&record->rects, &rect, rects);
+
+	/* bottom left */
+	rect.x = 0;
+	rect.y = height / 2;
+	rect.width = width / 2;
+	rect.height = height - rect.y;
+	RectList_SplitWith(&record->rects, &rect, rects);
+
+	/* bottom right */
+	rect.x = width / 2;
+	rect.width = width - rect.x;
+	RectList_SplitWith(&record->rects, &rect, rects);
+
+	RectList_Clear(&record->rects);
+}
+
+static size_t LCUIDisplay_RenderSurface(SurfaceRecord record)
+{
+	size_t count = 0;
+	int i;
+	LCUI_Rect *rect;
+	LCUI_PaintContext paint;
+	LCUI_SysEventRec ev;
+	LinkedList rects;
+	LinkedListNode *node;
+	LCUI_BOOL can_render;
+	LCUI_Rect **rectArray;
+
+	ev.type = LCUI_PAINT;
+	can_render = record->widget && record->surface &&
+		     Surface_IsReady(record->surface);
+	record->rendered = FALSE;
+	LinkedList_Init(&rects);
+	SurfaceRecord_DumpRects(record, &rects);
+	if (rects.length < 1) {
+		return 0;
+	}
+
+	rectArray = (LCUI_Rect **)malloc(sizeof(LCUI_Rect*) * rects.length);
+	i = 0;
+	for (LinkedList_Each(node, &rects)) {
+		rectArray[i] = node->data;
+		i++;
+	}
+#ifdef USE_OPENMP
+#pragma omp parallel for \
+	default(none) \
+	shared(can_render, display, rects, rectArray) \
+	private(rect, paint) \
+	firstprivate(record, ev) \
+	reduction(+:count)
+#endif
+	for (i = 0; i < rects.length; i++) {
+		rect = rectArray[i];
+		ev.paint.rect = *rect;
+		LCUI_TriggerEvent(&ev, NULL);
+		if (!can_render) {
+			continue;
+		}
+		paint = Surface_BeginPaint(record->surface, rect);
+		if (!paint) {
+			continue;
+		}
+		DEBUG_MSG("rect: (%d,%d,%d,%d)\n", paint->rect.x, paint->rect.y,
+			  paint->rect.width, paint->rect.height);
+		count += Widget_Render(record->widget, paint);
+		/**
+		 * FIXME: Improve highlighting of repainted areas
+		 * Let the highlighted areas disappear after a short
+		 * period of time, just like flashing
+		 */
+		if (display.show_rect_border) {
+			DrawBorder(paint);
+		}
+		if (display.mode != LCUI_DMODE_SEAMLESS) {
+			LCUICursor_Paint(paint);
+		}
+		Surface_EndPaint(record->surface, paint);
+	}
+	RectList_Clear(&rects);
+	record->rendered = count > 0;
+	return count;
+}
+
 void LCUIDisplay_Update(void)
 {
 	LCUI_Surface surface;
@@ -122,70 +229,14 @@ void LCUIDisplay_Update(void)
 size_t LCUIDisplay_Render(void)
 {
 	size_t count = 0;
-	LCUI_Rect *rect;
-	LCUI_Surface s;
-	LCUI_SysEventRec ev;
-	LCUI_BOOL can_render;
-	LCUI_PaintContext paint;
-	LinkedList rects;
-	LinkedListNode *sn, *rn;
-	SurfaceRecord record;
+	LinkedListNode *node;
 
 	if (!display.active) {
 		return 0;
 	}
-	ev.type = LCUI_PAINT;
-	LinkedList_Init(&rects);
-	/* 遍历当前的 surface 记录列表 */
-	for (LinkedList_Each(sn, &display.surfaces)) {
-		record = sn->data;
-		s = record->surface;
-		can_render = record->widget && s && Surface_IsReady(s);
-		record->rendered = FALSE;
-		/* collect and merge scattered rectangles */
-		for (LinkedList_Each(rn, &record->rects)) {
-			rect = rn->data;
-			RectList_Add(&rects, rn->data);
-		}
-
-		/**
-		 * FIXME: add OpenMP support
-		 * Dirty rectangle repaint tasks can be assigned to multiple CPU
-		 * cores to improve rendering performance
-		 */
-
-		/* Repaint dirty rectangles of surface */
-		for (LinkedList_Each(rn, &rects)) {
-			rect = rn->data;
-			ev.paint.rect = *rect;
-			LCUI_TriggerEvent(&ev, NULL);
-			if (!can_render) {
-				continue;
-			}
-			paint = Surface_BeginPaint(s, rect);
-			if (!paint) {
-				continue;
-			}
-			DEBUG_MSG("rect: (%d,%d,%d,%d)\n", paint->rect.x,
-				  paint->rect.y, paint->rect.width,
-				  paint->rect.height);
-			count += Widget_Render(record->widget, paint);
-			/**
-			 * FIXME: Improve highlighting of repainted areas
-			 * Let the highlighted areas disappear after a short
-			 * period of time, just like flashing
-			 */
-			if (display.show_rect_border) {
-				DrawBorder(paint);
-			}
-			if (display.mode != LCUI_DMODE_SEAMLESS) {
-				LCUICursor_Paint(paint);
-			}
-			Surface_EndPaint(s, paint);
-			record->rendered = TRUE;
-		}
-		RectList_Clear(&rects);
-		RectList_Clear(&record->rects);
+	for (LinkedList_Each(node, &display.surfaces)) {
+		count += LCUIDisplay_RenderSurface(node->data);
+		count += LCUIDisplay_UpdateFlashRects(node->data);
 	}
 	return count;
 }
@@ -193,6 +244,7 @@ size_t LCUIDisplay_Render(void)
 void LCUIDisplay_Present(void)
 {
 	LinkedListNode *sn;
+
 	if (!display.active) {
 		return;
 	}
@@ -211,6 +263,7 @@ void LCUIDisplay_Present(void)
 void LCUIDisplay_InvalidateArea(LCUI_Rect *rect)
 {
 	LCUI_Rect area;
+
 	if (!display.active) {
 		return;
 	}
@@ -227,9 +280,11 @@ void LCUIDisplay_InvalidateArea(LCUI_Rect *rect)
 
 static LCUI_Widget LCUIDisplay_GetBindWidget(LCUI_Surface surface)
 {
+	SurfaceRecord record;
 	LinkedListNode *node;
+
 	for (LinkedList_Each(node, &display.surfaces)) {
-		SurfaceRecord record = node->data;
+		record = node->data;
 		if (record && record->surface == surface) {
 			return record->widget;
 		}
@@ -239,9 +294,11 @@ static LCUI_Widget LCUIDisplay_GetBindWidget(LCUI_Surface surface)
 
 static LCUI_Surface LCUIDisplay_GetBindSurface(LCUI_Widget widget)
 {
+	SurfaceRecord record;
 	LinkedListNode *node;
+
 	for (LinkedList_Each(node, &display.surfaces)) {
-		SurfaceRecord record = node->data;
+		record = node->data;
 		if (record && record->widget == widget) {
 			return record->surface;
 		}
@@ -264,6 +321,7 @@ LCUI_Surface LCUIDisplay_GetSurfaceOwner(LCUI_Widget w)
 LCUI_Surface LCUIDisplay_GetSurfaceByHandle(void *handle)
 {
 	LinkedListNode *node;
+
 	for (LinkedList_Each(node, &display.surfaces)) {
 		SurfaceRecord record = node->data;
 		if (Surface_GetHandle(record->surface) == handle) {
@@ -278,6 +336,7 @@ static void LCUIDisplay_BindSurface(LCUI_Widget widget)
 {
 	LCUI_Rect rect;
 	SurfaceRecord record;
+
 	if (LCUIDisplay_GetBindSurface(widget)) {
 		return;
 	}
@@ -305,9 +364,11 @@ static void LCUIDisplay_BindSurface(LCUI_Widget widget)
 /** 解除 widget 与 sruface 的绑定 */
 static void LCUIDisplay_UnbindSurface(LCUI_Widget widget)
 {
+	SurfaceRecord record;
 	LinkedListNode *node;
+
 	for (LinkedList_Each(node, &display.surfaces)) {
-		SurfaceRecord record = node->data;
+		record = node->data;
 		if (record && record->widget == widget) {
 			Surface_Close(record->surface);
 			LinkedList_DeleteNode(&display.surfaces, node);
@@ -318,7 +379,9 @@ static void LCUIDisplay_UnbindSurface(LCUI_Widget widget)
 
 static int LCUIDisplay_Windowed(void)
 {
-	LCUI_Widget root = LCUIWidget_GetRoot();
+	LCUI_Widget root;
+
+	root = LCUIWidget_GetRoot();
 	switch (display.mode) {
 	case LCUI_DMODE_WINDOWED:
 		return 0;
@@ -338,7 +401,9 @@ static int LCUIDisplay_Windowed(void)
 
 static int LCUIDisplay_FullScreen(void)
 {
-	LCUI_Widget root = LCUIWidget_GetRoot();
+	LCUI_Widget root;
+
+	root = LCUIWidget_GetRoot();
 	switch (display.mode) {
 	case LCUI_DMODE_SEAMLESS:
 		LCUIDisplay_CleanSurfaces();
@@ -365,7 +430,7 @@ static int LCUIDisplay_Seamless(void)
 {
 	LinkedListNode *node;
 	LCUI_Widget root = LCUIWidget_GetRoot();
-	DEBUG_MSG("display.mode: %d\n", display.mode);
+
 	switch (display.mode) {
 	case LCUI_DMODE_SEAMLESS:
 		return 0;
@@ -386,7 +451,7 @@ static int LCUIDisplay_Seamless(void)
 int LCUIDisplay_SetMode(int mode)
 {
 	int ret;
-	DEBUG_MSG("mode: %d\n", mode);
+
 	switch (mode) {
 	case LCUI_DMODE_WINDOWED:
 		ret = LCUIDisplay_Windowed();
@@ -424,6 +489,7 @@ void LCUIDisplay_SetSize(int width, int height)
 	float scale;
 	LCUI_Widget root;
 	LCUI_Surface surface;
+
 	if (display.mode == LCUI_DMODE_SEAMLESS) {
 		return;
 	}
@@ -467,10 +533,11 @@ void Surface_Close(LCUI_Surface surface)
 
 void Surface_Destroy(LCUI_Surface surface)
 {
+	LinkedListNode *node;
+
 	if (!display.active) {
 		return;
 	}
-	LinkedListNode *node;
 	for (LinkedList_Each(node, &display.surfaces)) {
 		SurfaceRecord record = node->data;
 		if (record && record->surface == surface) {
