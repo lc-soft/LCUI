@@ -1,7 +1,7 @@
 ﻿/*
  * widget_paint.c -- LCUI widget paint module.
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -38,6 +38,9 @@
 
 //#define DEBUG_FRAME_RENDER
 #define ComputeActualPX(VAL) LCUIMetrics_ComputeActual(VAL, LCUI_STYPE_PX)
+
+#define MAX_VISIBLE_WIDTH 20000
+#define MAX_VISIBLE_HEIGHT 20000
 
 #ifdef DEBUG_FRAME_RENDER
 #include <LCUI/image.h>
@@ -183,8 +186,8 @@ LCUI_BOOL Widget_InvalidateArea(LCUI_Widget widget, LCUI_RectF *in_rect,
 				int box_type)
 {
 	int mode;
-	LCUI_Rect area;
 	LCUI_RectF rect;
+	LCUI_Rect *actual_rect;
 	LCUI_Widget w = widget;
 	LCUI_Widget root = LCUIWidget_GetRoot();
 	LCUI_RectGroup group;
@@ -209,9 +212,14 @@ LCUI_BOOL Widget_InvalidateArea(LCUI_Widget widget, LCUI_RectF *in_rect,
 		rect.x += w->box.padding.x;
 		rect.y += w->box.padding.y;
 	}
-	RectFToInvalidArea(&rect, &area);
+	LCUIRectF_ValidateArea(&rect, MAX_VISIBLE_WIDTH, MAX_VISIBLE_HEIGHT);
+	if (rect.width <= 0 || rect.height <= 0) {
+		return FALSE;
+	}
+	actual_rect = malloc(sizeof(LCUI_Rect));
+	RectFToInvalidArea(&rect, actual_rect);
 	if (mode != LCUI_DMODE_SEAMLESS) {
-		RectList_Add(&self.rects, &area);
+		LinkedList_Append(&self.rects, actual_rect);
 		return TRUE;
 	}
 	group = RBTree_CustomGetData(&self.groups, w);
@@ -221,12 +229,13 @@ LCUI_BOOL Widget_InvalidateArea(LCUI_Widget widget, LCUI_RectF *in_rect,
 		LinkedList_Init(&group->rects);
 		RBTree_CustomInsert(&self.groups, w, group);
 	}
-	return RectList_Add(&group->rects, &area) == 0;
+	return LinkedList_Append(&group->rects, actual_rect) == 0;
 }
 
 size_t Widget_GetInvalidArea(LCUI_Widget w, LinkedList *rects)
 {
 	LCUI_RectGroup group;
+
 	if (!w || w == LCUIWidget_GetRoot()) {
 		LinkedList_Concat(rects, &self.rects);
 		return (size_t)rects->length;

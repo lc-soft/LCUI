@@ -472,16 +472,3 @@ int RectList_Delete(LinkedList *list, LCUI_Rect *rect)
 	LinkedList_Concat(list, &extra_list);
 	return 1;
 }
-
-size_t RectList_SplitWith(LinkedList *rects, const LCUI_Rect *bounding,
-			  LinkedList *splited_rects)
-{
-	LCUI_Rect splited_rect;
-	LinkedListNode *node;
-
-	for (LinkedList_Each(node, rects)) {
-		LCUIRect_GetOverlayRect(bounding, node->data, &splited_rect);
-		RectList_AddEx(splited_rects, &splited_rect, FALSE);
-	}
-	return splited_rects->length;
-}

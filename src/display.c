@@ -52,11 +52,25 @@
 #define DEFAULT_WIDTH	800
 #define DEFAULT_HEIGHT	600
 
+#ifdef USE_OPENMP
+/**
+ * Parallel rendering threads
+ * We recommend that you set it to half the number of CPU logical cores
+ */
+#define PARALLEL_RENDERING_THREADS 4
+#else
+#define PARALLEL_RENDERING_THREADS 1
+#endif
+
 typedef struct SurfaceRecordRec_ {
-	LCUI_BOOL rendered;		/**< whether new content has been rendered */
-	LinkedList rects;		/**< rectangles to be render */
-	LCUI_Surface surface;		/**< target surface */
-	LCUI_Widget widget;		/**< target widget */
+	/**< whether new content has been rendered */
+	LCUI_BOOL rendered;
+
+	/** dirty rectangles for rendering */
+	LinkedList rects;
+
+	LCUI_Surface surface;
+	LCUI_Widget widget;
 } SurfaceRecordRec, *SurfaceRecord;
 
 static struct LCUI_DisplayModule {
@@ -99,51 +113,80 @@ static void DrawBorder(LCUI_PaintContext paint)
 	Graph_DrawHorizLine(&paint->canvas, color, 1, pos, end_x);
 }
 
-static void SurfaceRecord_DumpRects(SurfaceRecord record,
-				    LinkedList *rects)
+static void SurfaceRecord_DumpRects(SurfaceRecord record, LinkedList *rects)
 {
+	typedef struct DirtyLayerRec {
+		LinkedList rects;
+		LCUI_Rect rect;
+		int diry;
+	} DirtyLayerRec, *DirtyLayer;
+
+	int i;
+	int max_dirty;
+	int layer_width = LCUIDisplay_GetWidth();
+	int layer_height = LCUIDisplay_GetHeight();
+
 	LCUI_Rect rect;
-	const int width = Surface_GetWidth(record->surface);
-	const int height = Surface_GetHeight(record->surface);
+	LCUI_Rect *sub_rect;
+	DirtyLayer layer;
+	DirtyLayerRec layers[PARALLEL_RENDERING_THREADS];
+	LinkedListNode *node;
 
-	/* top left */
-	rect.x = 0;
-	rect.y = 0;
-	rect.width = width / 2;
-	rect.height = height / 2;
-	RectList_SplitWith(&record->rects, &rect, rects);
-
-	/* top right */
-	rect.x = width / 2;
-	rect.width = width - rect.x;
-	RectList_SplitWith(&record->rects, &rect, rects);
-
-	/* bottom left */
-	rect.x = 0;
-	rect.y = height / 2;
-	rect.width = width / 2;
-	rect.height = height - rect.y;
-	RectList_SplitWith(&record->rects, &rect, rects);
-
-	/* bottom right */
-	rect.x = width / 2;
-	rect.width = width - rect.x;
-	RectList_SplitWith(&record->rects, &rect, rects);
-
+	layer_height = max(200, layer_height / PARALLEL_RENDERING_THREADS + 1);
+	max_dirty = 0.8 * layer_width * layer_height;
+	for (i = 0; i < PARALLEL_RENDERING_THREADS; ++i) {
+		layer = &layers[i];
+		layer->diry = 0;
+		layer->rect.y = i * layer_height;
+		layer->rect.x = 0;
+		layer->rect.width = layer_width;
+		layer->rect.height = layer_height;
+		LinkedList_Init(&layer->rects);
+	}
+	sub_rect = malloc(sizeof(LCUI_Rect));
+	for (LinkedList_Each(node, &record->rects)) {
+		rect = *(LCUI_Rect *)node->data;
+		for (i = 0; i < PARALLEL_RENDERING_THREADS; ++i) {
+			layer = &layers[i];
+			if (layer->diry >= max_dirty) {
+				continue;
+			}
+			if (!LCUIRect_GetOverlayRect(&layer->rect, &rect,
+						     sub_rect)) {
+				continue;
+			}
+			LinkedList_Append(&layer->rects, sub_rect);
+			rect.y += sub_rect->height;
+			rect.height -= sub_rect->height;
+			layer->diry += sub_rect->width * sub_rect->height;
+			sub_rect = malloc(sizeof(LCUI_Rect));
+			if (rect.height < 1) {
+				break;
+			}
+		}
+	}
+	for (i = 0; i < PARALLEL_RENDERING_THREADS; ++i) {
+		layer = &layers[i];
+		if (layer->diry >= max_dirty) {
+			RectList_AddEx(rects, &layer->rect, FALSE);
+			RectList_Clear(&layer->rects);
+		} else {
+			LinkedList_Concat(rects, &layer->rects);
+		}
+	}
 	RectList_Clear(&record->rects);
+	free(sub_rect);
 }
 
 static size_t LCUIDisplay_RenderSurface(SurfaceRecord record)
 {
+	int i = 0;
 	size_t count = 0;
-	int i;
-	LCUI_Rect *rect;
-	LCUI_PaintContext paint;
+	LCUI_BOOL can_render;
+	LCUI_Rect **rect_array;
 	LCUI_SysEventRec ev;
 	LinkedList rects;
 	LinkedListNode *node;
-	LCUI_BOOL can_render;
-	LCUI_Rect **rectArray;
 
 	ev.type = LCUI_PAINT;
 	can_render = record->widget && record->surface &&
@@ -155,22 +198,23 @@ static size_t LCUIDisplay_RenderSurface(SurfaceRecord record)
 		return 0;
 	}
 
-	rectArray = (LCUI_Rect **)malloc(sizeof(LCUI_Rect*) * rects.length);
-	i = 0;
+	rect_array = (LCUI_Rect **)malloc(sizeof(LCUI_Rect *) * rects.length);
 	for (LinkedList_Each(node, &rects)) {
-		rectArray[i] = node->data;
+		rect_array[i] = node->data;
 		i++;
 	}
 #ifdef USE_OPENMP
 #pragma omp parallel for \
 	default(none) \
-	shared(can_render, display, rects, rectArray) \
-	private(rect, paint) \
+	shared(can_render, display, rects, rect_array) \
 	firstprivate(record, ev) \
 	reduction(+:count)
 #endif
-	for (i = 0; i < rects.length; i++) {
-		rect = rectArray[i];
+	for (i = 0; i < rects.length; ++i) {
+		LCUI_Rect *rect;
+		LCUI_PaintContext paint;
+
+		rect = rect_array[i];
 		ev.paint.rect = *rect;
 		LCUI_TriggerEvent(&ev, NULL);
 		if (!can_render) {
@@ -210,7 +254,6 @@ void LCUIDisplay_Update(void)
 	if (!display.active) {
 		return;
 	}
-	/* 遍历当前的 surface 记录列表 */
 	for (LinkedList_Each(node, &display.surfaces)) {
 		record = node->data;
 		surface = record->surface;
@@ -344,13 +387,12 @@ static void LCUIDisplay_BindSurface(LCUI_Widget widget)
 	record->surface = Surface_New();
 	record->widget = widget;
 	record->rendered = FALSE;
-	LinkedList_Init(&record->rects);
-	Surface_SetCaptionW(record->surface, widget->title);
 	LCUIMetrics_ComputeRectActual(&rect, &widget->box.canvas);
 	if (Widget_CheckStyleValid(widget, key_top) &&
 	    Widget_CheckStyleValid(widget, key_left)) {
 		Surface_Move(record->surface, rect.x, rect.y);
 	}
+	Surface_SetCaptionW(record->surface, widget->title);
 	Surface_Resize(record->surface, rect.width, rect.height);
 	if (widget->computed_style.visible) {
 		Surface_Show(record->surface);
