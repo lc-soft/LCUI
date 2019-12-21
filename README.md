@@ -86,7 +86,7 @@ Want to know what LCUI can do? You can view the following projects:
 
 Quickly create an LCUI project using [lcui-cli](https://github.com/lc-ui/lcui-cli):
 
-```shell
+```bash
 # Install lcui-cli
 npm install -g @lcui/cli
 
@@ -102,7 +102,7 @@ npm run start
 
 Or, you can clone and run the [lc-ui/lcui-quick-start](https://github.com/lc-ui/lcui-quick-start) repository to see a minimal LCUI app in action:
 
-```shell
+```bash
 # Clone repository
 git clone https://github.com/lc-ui/lcui-quick-start
 
@@ -121,7 +121,7 @@ lcpkg run start --mode debug
 
 Want to write an LCUI application from scratch? you can use [lcpkg](https://github.com/lc-soft/lcpkg) to quick install LCUI in your project directory:
 
-```shell
+```bash
 # Initialize the lcpkg configuration file to tell lcpkg about your project
 lcpkg init
 
@@ -131,17 +131,23 @@ lcpkg install github.com/lc-soft/LCUI
 
 After successful installation, follow the help documentation output by lcpkg to configure your project's build configuration.
 
-If you want to manually compile LCUI from source code, use lcpkg in the LCUI source directory to install the dependency libraries:
+If you want to manually compile LCUI from source code:
 
-```shell
-lcpkg install
-```
-
-After that, open the `build/windows/LCUI.sln` file with [Visual Studio](https://visualstudio.microsoft.com/), and then build LCUI.
+1. Open CMD window, and run following command in the LCUI source directory to install the dependency libraries:
+    ```bash
+    lcpkg install
+    # If you want compile for x64 CPU architecture
+    lcpkg install --arch x64
+    # If you want compile for Universal Windows Platform (UWP)
+    lcpkg install --platform uwp
+    lcpkg install --arch x64 --platform uwp
+    ```
+1. Rename `config.win.h.in` in the include directory to `config.h`.
+1. Open the `build/windows/LCUI.sln` file with [Visual Studio](https://visualstudio.microsoft.com/), and then build LCUI.
 
 ### Ubuntu
 
-```shell
+```bash
 # Install the dependencies
 sudo apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev
 
