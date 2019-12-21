@@ -30,12 +30,12 @@ void UpdateWidgetStyle(LCUI_Widget w, void *arg)
 	color.blue = 0;
 	color.alpha = 255;
 	Widget_SetStyle(w, key_background_color, color, color);
+	Widget_UpdateStyle(w, FALSE);
 }
 
 void UpdateFrame(void *arg)
 {
 	Widget_Each(arg, UpdateWidgetStyle, NULL);
-	LCUIWidget_RefreshStyle();
 }
 
 void UpdateRenderStatus(void *arg)
@@ -147,7 +147,7 @@ int main(void)
 	LCUI_RunFrame();
 	t = LCUI_GetTime();
 	self.color_index = 0;
-	for (i = 0; i < 120; ++i) {
+	for (i = 0; i < 600; ++i) {
 		UpdateFrame(self.box);
 		LCUI_ProcessTimers();
 		LCUI_ProcessEvents();
