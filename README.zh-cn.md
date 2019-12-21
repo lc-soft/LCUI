@@ -80,7 +80,7 @@ LCUI 的主要用途是方便作者开发简单的图形界面应用，简单也
 
 使用 [lcui-cli](https://github.com/lc-ui/lcui-cli) 快速创建一个 LCUI 项目：
 
-```shell
+```bash
 # 安装 lcui-cli
 npm install -g @lcui/cli
 
@@ -96,7 +96,7 @@ npm run start
 
 或者，你可以从已有的[示例项目](https://github.com/lc-ui/lcui-quick-start)快速开始：
 
-```shell
+```bash
 # 克隆示例代码库
 git clone https://github.com/lc-ui/lcui-quick-start
 
@@ -115,7 +115,7 @@ lcpkg run start --mode debug
 
 想从零开始编写一个 LCUI 应用程序？你可以在你的项目目录里使用 [lcpkg](https://github.com/lc-soft/lcpkg) 来快速安装 LCUI：
 
-```shell
+```bash
 # 初始化 lcpkg 配置文件，告诉 lcpkg 你的项目相关信息
 lcpkg init
 
@@ -125,17 +125,23 @@ lcpkg install github.com/lc-soft/LCUI
 
 安装成功后，按照 lcpkg 输出的帮助文档来配置你项目的编译参数。
 
-如果你想手动从源码编译 LCUI，请在 LCUI 的源码目录中使用 lcpkg 安装依赖库：
+如果你想手动从源码编译 LCUI：
 
-```shell
-lcpkg install
-```
-
-之后，使用 [Visual Studio](https://visualstudio.microsoft.com/) 打开 `build/windows/LCUI.sln` 文件，然后编译生成 LCUI。
+1. 打开命令行窗口，在 LCUI 的源码目录中使用以下命令安装依赖库：
+    ```bash
+    lcpkg install
+    # 如果你需要编译 x64 版本的话
+    lcpkg install --arch x64
+    # 如果你需要编译适用于 Windows 通用应用平台 (UWP) 版本的话
+    lcpkg install --platform uwp
+    lcpkg install --arch x64 --platform uwp
+    ```
+1. 重命名 include 目录中的 `config.win.h.in` 文件为 `config.h`。
+1. 使用 [Visual Studio](https://visualstudio.microsoft.com/) 打开 `build/windows/LCUI.sln` 文件，然后编译生成 LCUI。
 
 ### Ubuntu
 
-```shell
+```bash
 # 安装依赖库
 sudo apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev
 
