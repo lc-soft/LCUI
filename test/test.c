@@ -21,6 +21,7 @@ int main(void)
 	ret += test_widget_layout();
 	ret += test_widget_flex_layout();
 	ret += test_widget_inline_block_layout();
+	ret += test_widget_event();
 	ret += test_widget_opacity();
 	ret += test_widget_rect();
 	ret += test_textview_resize();

@@ -196,6 +196,7 @@
     <ClCompile Include="..\..\..\test\test_textedit.c" />
     <ClCompile Include="..\..\..\test\test_textview_resize.c" />
     <ClCompile Include="..\..\..\test\test_thread.c" />
+    <ClCompile Include="..\..\..\test\test_widget_event.c" />
     <ClCompile Include="..\..\..\test\test_widget_flex_layout.c" />
     <ClCompile Include="..\..\..\test\test_widget_inline_block_layout.c" />
     <ClCompile Include="..\..\..\test\test_widget_layout.c" />

@@ -28,6 +28,7 @@ test/helloworld.css \
 test/helloworld.xml \
 test/test.c \
 test/test.h \
+test/test_render.c \
 test/test_touch.c \
 test/test_string.c \
 test/test_object.c \
@@ -65,6 +66,7 @@ test/test_widget_inline_block_layout.c \
 test/test_widget_inline_block_layout.css \
 test/test_widget_inline_block_layout.xml \
 test/test_widget_rect.c \
+test/test_widget_event.c \
 test/test_textview_resize.c \
 test/test_textedit.c
 
