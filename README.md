@@ -23,7 +23,7 @@
     - [Features](#features)
     - [Missing features](#missing-features)
     - [Related projects](#related-projects)
-    - [Design reference](#design-reference)
+    - [Design reference](#design-references)
 - [Quick start](#quick-start)
     - [Windows](#windows)
     - [Ubuntu](#ubuntu)
