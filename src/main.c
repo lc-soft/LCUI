@@ -639,6 +639,7 @@ void LCUI_InitBase(void)
 	LCUI_InitEvent();
 	LCUI_InitFontLibrary();
 	LCUI_InitTimer();
+	LCUI_InitCursor();
 	LCUI_InitWidget();
 	LCUI_InitMetrics();
 }
@@ -651,7 +652,6 @@ void LCUI_Init(void)
 	LCUI_InitMouseDriver();
 	LCUI_InitKeyboardDriver();
 	LCUI_InitKeyboard();
-	LCUI_InitCursor();
 	LCUI_InitIME();
 
 	switch (LCUI_GetAppId()) {
@@ -682,8 +682,8 @@ int LCUI_Destroy(void)
 	LCUI_FreeApp();
 	LCUI_FreeIME();
 	LCUI_FreeKeyboard();
-	LCUI_FreeCursor();
 	LCUI_FreeWidget();
+	LCUI_FreeCursor();
 	LCUI_FreeFontLibrary();
 	LCUI_FreeTimer();
 	LCUI_FreeEvent();
