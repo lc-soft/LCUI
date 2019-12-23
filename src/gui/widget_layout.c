@@ -46,33 +46,6 @@ typedef struct LCUI_LayoutContextRec_ {
 	float max_width;	/**< 容器的最大宽度 */
 } LCUI_LayoutContextRec, *LCUI_LayoutContext;
 
-#define HandleStyle(W, DATA, FUNC, KEY) do {\
-	HandleJustifyContent( DATA, StyleSheet_GetStyle((W)->style, KEY) );\
-} while( 0 );
-
-static void HandleJustifyContent(LCUI_FlexLayoutStyle *data, LCUI_Style style)
-{
-	if (style->type != LCUI_STYPE_STYLE || !style->is_valid) {
-		data->justify_content = SV_FLEX_START;
-		return;
-	}
-	data->justify_content = style->val_style;
-}
-
-void Widget_ComputeFlexLayoutStyle(LCUI_Widget w)
-{
-	LCUI_FlexLayoutStyle *data = &w->computed_style.flex;
-	HandleStyle(w, data, HandleJustifyContent, key_justify_content);
-}
-
-void Widget_UpdateLayout(LCUI_Widget w)
-{
-	if (w->computed_style.display == SV_FLEX) {
-		Widget_ComputeFlexLayoutStyle(w);
-	}
-	Widget_AddTask(w, LCUI_WTASK_LAYOUT);
-}
-
 /** 布局当前行的所有元素 */
 static void LCUILayout_HandleCurrentLine(LCUI_LayoutContext ctx)
 {
@@ -105,7 +78,7 @@ static void LCUILayout_HandleCurrentLine(LCUI_LayoutContext ctx)
 		}
 		child = node->data;
 		child->origin_x += offset_x;
-		Widget_UpdatePosition(child);
+		Widget_AddTask(child, LCUI_WTASK_POSITION);
 		node = node->next;
 	}
 	ctx->start = ctx->current;
@@ -172,7 +145,7 @@ static void LCUILayout_End(LCUI_LayoutContext ctx)
 	free(ctx);
 }
 
-void Widget_ExecUpdateLayout(LCUI_Widget w)
+void Widget_DoLayout(LCUI_Widget w)
 {
 	LinkedListNode *node;
 	LCUI_LayoutContext ctx;
@@ -198,7 +171,7 @@ void Widget_ExecUpdateLayout(LCUI_Widget w)
 		default:
 			continue;
 		}
-		Widget_UpdatePosition(ctx->current);
+		Widget_AddTask(ctx->current, LCUI_WTASK_POSITION);
 		Widget_AddState(ctx->current, LCUI_WSTATE_LAYOUTED);
 		ctx->prev_display = ctx->current->computed_style.display;
 		ctx->prev = ctx->current;

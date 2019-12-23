@@ -415,11 +415,6 @@ static void TextView_OnTask(LCUI_Widget w)
 	}
 	RectList_Clear(&rects);
 	TextLayer_ClearInvalidRect(txt->layer);
-	if (Widget_HasParentDependentWidth(w) ||
-	    Widget_HasAutoStyle(w, key_width) ||
-	    Widget_HasAutoStyle(w, key_height)) {
-		Widget_AddTask(w->parent, LCUI_WTASK_RESIZE);
-	}
 }
 
 /** 绘制 TextView 部件 */

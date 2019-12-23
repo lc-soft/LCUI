@@ -3,10 +3,10 @@ AUTOMAKE_OPTIONS=subdir-objects foreign
 AM_CFLAGS = -I$(top_srcdir)/include $(CODE_COVERAGE_CFLAGS)
 ##需要编译的测试程序, noinst指的是不安装
 noinst_PROGRAMS = helloworld test test_charset test_touch test_char_render \
-test_string_render test_widget_render test_widget_layout  test_widget_rect \
+test_string_render test_widget_render test_widget_layout test_render \
 test_widget_opacity test_widget_flex_layout test_widget_inline_block_layout \
 test_scaling_support test_widget test_scrollbar test_textview_resize \
-test_image_scaling_bench test_render
+test_image_scaling_bench
 
 ##指定测试程序的源码文件
 helloworld_SOURCES = helloworld.c
@@ -53,10 +53,6 @@ test_charset_CFLAGS = $(AM_CFLAGS) -D PREVIEW_MODE
 test_textview_resize_SOURCES = test_textview_resize.c
 test_textview_resize_LDADD = $(top_builddir)/src/libLCUI.la
 test_textview_resize_CFLAGS = $(AM_CFLAGS) -D PREVIEW_MODE
-
-test_widget_rect_SOURCES = test_widget_rect.c
-test_widget_rect_LDADD = $(top_builddir)/src/libLCUI.la
-test_widget_rect_CFLAGS = $(AM_CFLAGS) -D PREVIEW_MODE
 
 test_widget_opacity_SOURCES = test_widget_opacity.c
 test_widget_opacity_LDADD = $(top_builddir)/src/libLCUI.la

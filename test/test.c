@@ -4,6 +4,8 @@
 #include <LCUI/LCUI.h>
 #include "test.h"
 
+int tests_count = 0;
+
 int main(void)
 {
 	int ret = 0;

@@ -8,6 +8,7 @@ widget_attribute.c	\
 widget_id.c		\
 widget_class.c		\
 widget_status.c		\
+widget_size.c 		\
 widget_tree.c		\
 widget_helper.c		\
 widget_layout.c		\

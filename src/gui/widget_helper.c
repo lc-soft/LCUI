@@ -112,12 +112,6 @@ void Widget_Resize(LCUI_Widget w, float width, float height)
 	Widget_UpdateStyle(w, FALSE);
 }
 
-void Widget_ResizeWithSurface(LCUI_Widget w, float width, float height)
-{
-	Widget_Resize(w, width, height);
-	Widget_AddTask(w, LCUI_WTASK_RESIZE_WITH_SURFACE);
-}
-
 LCUI_Style Widget_GetStyle(LCUI_Widget w, int key)
 {
 	LCUI_StyleListNode node;

@@ -207,8 +207,9 @@ static void SurfaceRecord_DumpRects(SurfaceRecord record, LinkedList *rects)
 
 	int i;
 	int max_dirty;
-	int layer_width = LCUIDisplay_GetWidth();
-	int layer_height = LCUIDisplay_GetHeight();
+	float scale = LCUIMetrics_GetScale();
+	int layer_width = LCUIDisplay_GetWidth() * scale;
+	int layer_height = LCUIDisplay_GetHeight() * scale;
 
 	LCUI_Rect rect;
 	LCUI_Rect *sub_rect;
@@ -872,10 +873,9 @@ static void OnResize(LCUI_Event e, void *arg)
 	widget = LCUIDisplay_GetBindWidget(dpy_ev->surface);
 	if (widget) {
 		Widget_Resize(widget, width, height);
+		widget->task.skip_surface_props_sync = TRUE;
 	}
 	LCUI_RunFrame();
-	Logger_Debug("[display] resize: (%d,%d)\n", dpy_ev->resize.width,
-		     dpy_ev->resize.height);
 }
 
 static void OnMinMaxInfo(LCUI_Event e, void *arg)

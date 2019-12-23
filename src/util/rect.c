@@ -160,23 +160,46 @@ LCUI_BOOL LCUIRectF_ValidateArea(LCUI_RectF *rect, float box_w, float box_h)
 }
 
 /* FIXME: need new shorter name */
-LCUI_BOOL LCUIRect_IsCoverRect(LCUI_Rect *rect1, LCUI_Rect *rect2)
+LCUI_BOOL LCUIRect_IsCoverRect(const LCUI_Rect *a, const LCUI_Rect *b)
 {
-	if (rect1->x > rect2->x) {
-		if (rect2->x + rect2->width <= rect1->x) {
+	if (a->x > b->x) {
+		if (b->x + b->width <= a->x) {
 			return FALSE;
 		}
 	} else {
-		if (rect1->x + rect1->width <= rect2->x) {
+		if (a->x + a->width <= b->x) {
 			return FALSE;
 		}
 	}
-	if (rect1->y > rect2->y) {
-		if (rect2->y + rect2->height <= rect1->y) {
+	if (a->y > b->y) {
+		if (b->y + b->height <= a->y) {
 			return FALSE;
 		}
 	} else {
-		if (rect1->y + rect1->height <= rect2->y) {
+		if (a->y + a->height <= b->y) {
+			return FALSE;
+		}
+	}
+	return TRUE;
+}
+
+LCUI_BOOL LCUIRectF_IsCoverRect(const LCUI_RectF *a, const LCUI_RectF *b)
+{
+	if (a->x > b->x) {
+		if (b->x + b->width <= a->x) {
+			return FALSE;
+		}
+	} else {
+		if (a->x + a->width <= b->x) {
+			return FALSE;
+		}
+	}
+	if (a->y > b->y) {
+		if (b->y + b->height <= a->y) {
+			return FALSE;
+		}
+	} else {
+		if (a->y + a->height <= b->y) {
 			return FALSE;
 		}
 	}
@@ -262,7 +285,31 @@ LCUI_BOOL LCUIRectF_GetOverlayRect(const LCUI_RectF *a, const LCUI_RectF *b,
 	return TRUE;
 }
 
-void LCUIRect_MergeRect(LCUI_Rect *big, LCUI_Rect *a, LCUI_Rect *b)
+void LCUIRect_MergeRect(LCUI_Rect *big, const LCUI_Rect *a, const LCUI_Rect *b)
+{
+	if (a->x < b->x) {
+		big->x = a->x;
+	} else {
+		big->x = b->x;
+	}
+	if (a->x + a->width < b->x + b->width) {
+		big->width = b->x + b->width - big->x;
+	} else {
+		big->width = a->x + a->width - big->x;
+	}
+	if (a->y < b->y) {
+		big->y = a->y;
+	} else {
+		big->y = b->y;
+	}
+	if (a->y + a->height < b->y + b->height) {
+		big->height = b->y + b->height - big->y;
+	} else {
+		big->height = a->y + a->height - big->y;
+	}
+}
+
+void LCUIRectF_MergeRect(LCUI_RectF *big, const LCUI_RectF *a, const LCUI_RectF *b)
 {
 	if (a->x < b->x) {
 		big->x = a->x;

@@ -34,12 +34,7 @@
 #include <LCUI/util/math.h>
 #include <LCUI/gui/metrics.h>
 
-static struct LCUI_MetricsModule {
-	float dpi;
-	float density;
-	float scaled_density;
-	float scale;
-} metrics;
+static LCUI_MetricsRec metrics;
 
 float LCUIMetrics_Compute(float value, LCUI_StyleType type)
 {
@@ -127,4 +122,9 @@ void LCUI_InitMetrics(void)
 void LCUI_FreeMetrics(void)
 {
 
+}
+
+const LCUI_MetricsRec *LCUI_GetMetrics(void)
+{
+	return &metrics;
 }

@@ -59,7 +59,7 @@ int Widget_Append(LCUI_Widget parent, LCUI_Widget widget)
 	Widget_PostSurfaceEvent(widget, LCUI_WEVENT_LINK, TRUE);
 	Widget_UpdateTaskStatus(widget);
 	Widget_UpdateStatus(widget);
-	Widget_UpdateLayout(parent);
+	Widget_AddTask(parent, LCUI_WTASK_LAYOUT);
 	return 0;
 }
 
@@ -96,7 +96,7 @@ int Widget_Prepend(LCUI_Widget parent, LCUI_Widget widget)
 	Widget_AddTaskForChildren(widget, LCUI_WTASK_REFRESH_STYLE);
 	Widget_UpdateTaskStatus(widget);
 	Widget_UpdateStatus(widget);
-	Widget_UpdateLayout(parent);
+	Widget_AddTask(parent, LCUI_WTASK_LAYOUT);
 	return 0;
 }
 
@@ -183,7 +183,7 @@ int Widget_Unlink(LCUI_Widget w)
 	LinkedList_Unlink(&w->parent->children, node);
 	LinkedList_Unlink(&w->parent->children_show, &w->node_show);
 	Widget_PostSurfaceEvent(w, LCUI_WEVENT_UNLINK, TRUE);
-	Widget_UpdateLayout(w->parent);
+	Widget_AddTask(w->parent, LCUI_WTASK_LAYOUT);
 	w->parent = NULL;
 	return 0;
 }

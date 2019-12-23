@@ -147,9 +147,6 @@
     <ClInclude Include="..\..\..\include\LCUI\cursor.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\config.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\draw\background.h">
       <Filter>头文件\LCUI\draw</Filter>
     </ClInclude>
@@ -308,6 +305,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\canvas.h">
       <Filter>头文件\LCUI\gui\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\config.h">
+      <Filter>头文件\LCUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -550,6 +550,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\gui\widget\canvas.c">
       <Filter>源文件\gui\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_size.c">
+      <Filter>源文件\gui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
