@@ -666,13 +666,12 @@ int Widget_StopEventPropagation(LCUI_Widget widget)
 static LCUI_Widget GetSameParent(LCUI_Widget a, LCUI_Widget b)
 {
 	int depth = 0, i;
-	LCUI_Widget w, root;
+	LCUI_Widget w;
 
-	root = LCUIWidget_GetRoot();
-	for (w = a; w != root && w; w = w->parent) {
+	for (w = a; w; w = w->parent) {
 		++depth;
 	}
-	for (w = b; w != root && w; w = w->parent) {
+	for (w = b; w; w = w->parent) {
 		--depth;
 	}
 	if (depth > 0) {
@@ -688,7 +687,7 @@ static LCUI_Widget GetSameParent(LCUI_Widget a, LCUI_Widget b)
 		a = a->parent;
 		b = b->parent;
 	}
-	if (a && a == b && a != root) {
+	if (a && a == b) {
 		return a;
 	}
 	return NULL;
@@ -762,9 +761,7 @@ static void Widget_OnMouseOverEvent(LCUI_Widget widget)
 	if (self.targets[WST_HOVER] == widget) {
 		return;
 	}
-	if (widget && self.targets[WST_HOVER]) {
-		parent = GetSameParent(widget, self.targets[WST_HOVER]);
-	}
+	parent = GetSameParent(widget, self.targets[WST_HOVER]);
 	if (widget) {
 		Widget_TriggerMouseOverEvent(widget, parent);
 	}
@@ -776,13 +773,14 @@ static void Widget_OnMouseOverEvent(LCUI_Widget widget)
 
 static void Widget_OnMouseDownEvent(LCUI_Widget widget)
 {
-	LCUI_Widget w, parent;
+	LCUI_Widget parent;
+	LCUI_Widget w = self.targets[WST_ACTIVE];
 
-	if (self.targets[WST_ACTIVE] == widget) {
+	if (w == widget) {
 		return;
 	}
-	parent = GetSameParent(widget, self.targets[WST_ACTIVE]);
-	for (w = self.targets[WST_ACTIVE]; w && w != parent; w = w->parent) {
+	parent = GetSameParent(widget, w);
+	for (; w && w != parent; w = w->parent) {
 		Widget_RemoveStatus(w, "active");
 	}
 	for (w = widget; w && w != parent; w = w->parent) {
@@ -911,10 +909,11 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 {
 	float scale;
 	LCUI_Pos pos;
+	LCUI_Widget root;
 	LCUI_Widget target, w;
 	LCUI_WidgetEventRec ev = { 0 };
 
-	w = LCUIWidget_GetRoot();
+	root = LCUIWidget_GetRoot();
 	LCUICursor_GetPos(&pos);
 	scale = LCUIMetrics_GetScale();
 	pos.x = iround(pos.x / scale);
@@ -922,7 +921,7 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 	if (self.mouse_capturer) {
 		target = self.mouse_capturer;
 	} else {
-		target = Widget_GetEventTarget(w, (float)pos.x, (float)pos.y,
+		target = Widget_GetEventTarget(root, 1.f * pos.x, 1.f * pos.y,
 					       SV_AUTO);
 	}
 	for (w = target; w; w = w->parent) {
@@ -930,23 +929,8 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 			return;
 		}
 	}
-	if (!target || target == LCUIWidget_GetRoot()) {
-		Widget_OnMouseOverEvent(NULL);
-		switch (sys_ev->type) {
-		case LCUI_MOUSEDOWN:
-			LCUIWidget_SetFocus(NULL);
-			break;
-		case LCUI_MOUSEUP:
-			if (sys_ev->button.button == LCUI_KEY_LEFTBUTTON) {
-				self.click.x = 0;
-				self.click.y = 0;
-				self.click.time = 0;
-				self.click.widget = NULL;
-				Widget_OnMouseDownEvent(NULL);
-				break;
-			}
-		}
-		return;
+	if (!target) {
+		target = root;
 	}
 	ev.target = target;
 	ev.cancel_bubble = FALSE;
