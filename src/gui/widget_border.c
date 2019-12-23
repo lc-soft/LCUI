@@ -129,24 +129,6 @@ static unsigned int ComputeActual(float width)
 	return w;
 }
 
-void Widget_UpdateBorder(LCUI_Widget w)
-{
-	LCUI_BorderStyle ob, *nb;
-	ob = w->computed_style.border;
-	Widget_ComputeBorderStyle(w);
-	nb = &w->computed_style.border;
-	/* 如果边框变化并未导致图层尺寸变化的话，则只重绘边框 */
-	if (ob.top.width != nb->top.width ||
-	    ob.right.width != nb->right.width ||
-	    ob.bottom.width != nb->bottom.width ||
-	    ob.left.width != nb->left.width) {
-		Widget_AddTask(w, LCUI_WTASK_RESIZE);
-		Widget_AddTask(w, LCUI_WTASK_POSITION);
-		return;
-	}
-	Widget_InvalidateArea(w, NULL, SV_BORDER_BOX);
-}
-
 /** 计算部件边框样式的实际值 */
 void Widget_ComputeBorder(LCUI_Widget w, LCUI_Border *b)
 {

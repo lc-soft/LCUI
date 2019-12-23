@@ -1,7 +1,7 @@
 ﻿/*
  * widget_background.c -- The widget background style processing module.
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -140,7 +140,7 @@ static void ExecLoadImage(void *arg1, void *arg2)
 		DestroyImageCache(cache);
 	}
 	Graph_Quote(&w->computed_style.background.image, &cache->image, NULL);
-	Widget_AddTask(w, LCUI_WTASK_BODY);
+	Widget_InvalidateArea(w, NULL, SV_BORDER_BOX);
 }
 
 static int OnCompareWidget(void *data, const void *keydata)
@@ -179,7 +179,7 @@ static void AsyncLoadImage(LCUI_Widget widget, const char *path)
 		AddImageRef(widget, cache);
 		Graph_Quote(&widget->computed_style.background.image,
 			    &cache->image, NULL);
-		Widget_AddTask(widget, LCUI_WTASK_BODY);
+		Widget_InvalidateArea(widget, NULL, SV_BORDER_BOX);
 		return;
 	}
 	task.func = ExecLoadImage;
@@ -229,7 +229,7 @@ void Widget_DestroyBackground(LCUI_Widget w)
 	}
 }
 
-void Widget_UpdateBackground(LCUI_Widget widget)
+void Widget_ComputeBackgroundStyle(LCUI_Widget widget)
 {
 	LCUI_Style s;
 	LCUI_StyleSheet ss = widget->style;
@@ -312,7 +312,6 @@ void Widget_UpdateBackground(LCUI_Widget widget)
 			break;
 		}
 	}
-	Widget_AddTask(widget, LCUI_WTASK_BODY);
 }
 
 void Widget_ComputeBackground(LCUI_Widget w, LCUI_Background *out)

@@ -1,7 +1,7 @@
 ﻿/*
  * rect.h -- Rectangle area handling
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -65,7 +65,10 @@ LCUI_API void LCUIRectF_ToRect(const LCUI_RectF *rectf, LCUI_Rect *rect,
 			       float scale);
 
 /** 检测矩形是否遮盖另一个矩形 */
-LCUI_API LCUI_BOOL LCUIRect_IsCoverRect(LCUI_Rect *rect1, LCUI_Rect *rect2);
+LCUI_API LCUI_BOOL LCUIRect_IsCoverRect(const LCUI_Rect *a, const LCUI_Rect *b);
+
+LCUI_API LCUI_BOOL LCUIRectF_IsCoverRect(const LCUI_RectF *a,
+					 const LCUI_RectF *b);
 
 /**
  * 获取两个矩形中的重叠矩形
@@ -82,7 +85,11 @@ LCUI_API LCUI_BOOL LCUIRectF_GetOverlayRect(const LCUI_RectF *a,
 					    LCUI_RectF *out);
 
 /** 合并两个矩形 */
-LCUI_API void LCUIRect_MergeRect(LCUI_Rect *big, LCUI_Rect *a, LCUI_Rect *b);
+LCUI_API void LCUIRect_MergeRect(LCUI_Rect *big, const LCUI_Rect *a,
+				 const LCUI_Rect *b);
+
+LCUI_API void LCUIRectF_MergeRect(LCUI_RectF *big, const LCUI_RectF *a,
+				  const LCUI_RectF *b);
 
 /**
  * 根据重叠矩形 rect1，将矩形 rect2 分割成四个矩形
@@ -103,6 +110,20 @@ LCUI_API void LCUIRect_CutFourRect(LCUI_Rect *rect1, LCUI_Rect *rect2,
 
 LCUI_API void LCUIRect_Split(LCUI_Rect *base, LCUI_Rect *target,
 			     LCUI_Rect rects[4]);
+
+INLINE LCUI_BOOL LCUIRectF_IsEquals(const LCUI_RectF *a, const LCUI_RectF *b)
+{
+	return (int)(100 * (a->x - b->x)) == 0 &&
+	       (int)(100 * (a->y - b->y)) == 0 &&
+	       (int)(100 * (a->width - b->width)) == 0 &&
+	       (int)(100 * (a->height - b->height)) == 0;
+}
+
+INLINE LCUI_BOOL LCUIRect_IsEquals(const LCUI_Rect *a, const LCUI_Rect *b)
+{
+	return a->x == b->x && a->y == b->y && a->width == b->width &&
+	       a->height == b->height;
+}
 
 LCUI_API int RectList_AddEx(LinkedList *list, LCUI_Rect *rect,
 			    LCUI_BOOL auto_merge);

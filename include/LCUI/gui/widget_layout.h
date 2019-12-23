@@ -31,8 +31,6 @@
 #ifndef LCUI_WIDGET_LAYOUT_H
 #define LCUI_WIDGET_LAYOUT_H
 
-LCUI_API void Widget_UpdateLayout(LCUI_Widget w);
-
-LCUI_API void Widget_ExecUpdateLayout(LCUI_Widget w);
+LCUI_API void Widget_DoLayout(LCUI_Widget w);
 
 #endif

@@ -45,10 +45,6 @@ LCUI_API size_t Widget_Update(LCUI_Widget w);
 LCUI_API void Widget_UpdateWithProfile(LCUI_Widget w,
 				       LCUI_WidgetTasksProfile profile);
 
-/** 根据给定的上下文来处理部件中当前积累的任务 */
-LCUI_API size_t Widget_UpdateWithContext(LCUI_Widget w,
-					 LCUI_WidgetTaskContext ctx);
-
 /** 为子级部件添加任务 */
 LCUI_API void Widget_AddTaskForChildren(LCUI_Widget widget, int task);
 

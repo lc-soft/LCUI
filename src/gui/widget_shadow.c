@@ -51,8 +51,7 @@ static float ComputeYMetric(LCUI_Widget w, LCUI_Style s)
 	return LCUIMetrics_Compute(s->value, s->type);
 }
 
-/** 计算部件阴影样式 */
-static void Widget_ComputeBoxShadowStyle(LCUI_Widget w)
+void Widget_ComputeBoxShadowStyle(LCUI_Widget w)
 {
 	int key;
 	LCUI_Style s;
@@ -85,32 +84,6 @@ static void Widget_ComputeBoxShadowStyle(LCUI_Widget w)
 			break;
 		}
 	}
-}
-
-void Widget_UpdateBoxShadow(LCUI_Widget w)
-{
-	int i;
-	LCUI_RectF rect;
-	LCUI_Rect rects[4], rb, rg;
-	LCUI_BoxShadowStyle *sd = &w->computed_style.shadow;
-	LCUI_BoxShadowStyle old_sd = w->computed_style.shadow;
-
-	Widget_ComputeBoxShadowStyle(w);
-	/* 如果阴影变化并未导致图层尺寸变化，则只重绘阴影 */
-	if (sd->x == old_sd.x && sd->y == old_sd.y && sd->blur == old_sd.blur) {
-		LCUIRectF_ToRect(&w->box.border, &rb, 1.0f);
-		LCUIRectF_ToRect(&w->box.canvas, &rg, 1.0f);
-		LCUIRect_CutFourRect(&rb, &rg, rects);
-		for (i = 0; i < 4; ++i) {
-			LCUIRect_ToRectF(&rects[i], &rect, 1.0f);
-			rect.x -= w->box.canvas.x;
-			rect.y -= w->box.canvas.y;
-			Widget_InvalidateArea(w, &rect, SV_GRAPH_BOX);
-		}
-		return;
-	}
-	Widget_AddTask(w, LCUI_WTASK_RESIZE);
-	Widget_AddTask(w, LCUI_WTASK_POSITION);
 }
 
 float Widget_GetBoxShadowOffsetX(LCUI_Widget w)

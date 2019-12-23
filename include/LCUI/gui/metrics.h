@@ -33,6 +33,13 @@
 
 LCUI_BEGIN_HEADER
 
+typedef struct LCUI_MetricsRec_ {
+	float dpi;
+	float density;
+	float scaled_density;
+	float scale;
+} LCUI_MetricsRec, *LCUI_Metrics;
+
 typedef enum LCUI_DensityLevel {
 	DENSITY_LEVEL_SMALL,
 	DENSITY_LEVEL_NORMAL,
@@ -71,6 +78,8 @@ LCUI_API void LCUIMetrics_SetDpi(float dpi);
 LCUI_API void LCUIMetrics_SetScale(float scale);
 
 LCUI_API void LCUI_InitMetrics(void);
+
+LCUI_API const LCUI_MetricsRec *LCUI_GetMetrics(void);
 
 void LCUI_FreeMetrics(void);
 
