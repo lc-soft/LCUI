@@ -63,10 +63,10 @@ typedef struct LCUI_CSSFontStyleRec_ {
 	LCUI_StyleValue white_space;
 } LCUI_CSSFontStyleRec, *LCUI_CSSFontStyle;
 
-#define Widget_SetFontStyle(W, K, V, T)                        \
-	do {                                                   \
-		int key = LCUI_GetFontStyleKey(K);             \
-		Widget_SetStyle(W, key, V, T); \
+#define Widget_SetFontStyle(W, K, V, T)            \
+	do {                                       \
+		int key = LCUI_GetFontStyleKey(K); \
+		Widget_SetStyle(W, key, V, T);     \
 	} while (0)
 
 /* clang-format off */
@@ -76,6 +76,9 @@ LCUI_API int LCUI_GetFontStyleKey(int key);
 LCUI_API void CSSFontStyle_Init(LCUI_CSSFontStyle fs);
 
 LCUI_API void CSSFontStyle_Destroy(LCUI_CSSFontStyle fs);
+
+LCUI_API LCUI_BOOL CSSFontStyle_IsEquals(const LCUI_CSSFontStyle a,
+					 const LCUI_CSSFontStyle b);
 
 LCUI_API void CSSFontStyle_Compute(LCUI_CSSFontStyle fs, LCUI_StyleSheet ss);
 

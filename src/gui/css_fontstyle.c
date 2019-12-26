@@ -378,6 +378,46 @@ int LCUI_GetFontStyleKey(int key)
 	return self.keys[key];
 }
 
+LCUI_BOOL CSSFontStyle_IsEquals(const LCUI_CSSFontStyle a,
+				const LCUI_CSSFontStyle b)
+{
+	int i;
+
+	if (a->color.value != b->color.value ||
+	    a->line_height != b->line_height ||
+	    a->text_align != b->text_align ||
+	    a->white_space != b->white_space ||
+	    a->font_style != b->font_style ||
+	    a->font_weight != b->font_weight ||
+	    a->font_size != b->font_size) {
+		return FALSE;
+	}
+	if (a->font_family && b->font_family) {
+		if (strcmp(a->font_family, b->font_family) != 0) {
+			return FALSE;
+		}
+	} else if (a->font_family != b->font_family) {
+		return FALSE;
+	}
+	if (a->content && b->content) {
+		if (wcscmp(a->content, b->content) != 0) {
+			return FALSE;
+		}
+	} else if (a->content != b->content) {
+		return FALSE;
+	}
+	if (a->font_ids && b->font_ids) {
+		for (i = 0; a->font_ids[i] && b->font_ids[i]; ++i) {
+			if (a->font_ids[i] != b->font_ids[i]) {
+				return FALSE;
+			}
+		}
+	} else if (a->font_ids != b->font_ids) {
+		return FALSE;
+	}
+	return TRUE;
+}
+
 void CSSFontStyle_Compute(LCUI_CSSFontStyle fs, LCUI_StyleSheet ss)
 {
 	int i;
@@ -404,7 +444,8 @@ void CSSFontStyle_GetTextStyle(LCUI_CSSFontStyle fs, LCUI_TextStyle ts)
 	ts->weight = fs->font_weight;
 	ts->style = fs->font_style;
 	if (fs->font_ids) {
-		for (len = 0; fs->font_ids[len]; ++len);
+		for (len = 0; fs->font_ids[len]; ++len)
+			;
 		ts->font_ids = malloc(sizeof(int) * ++len);
 		memcpy(ts->font_ids, fs->font_ids, len * sizeof(int));
 		ts->has_family = TRUE;
