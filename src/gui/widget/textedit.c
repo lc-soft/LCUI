@@ -212,25 +212,6 @@ void TextEdit_MoveCaret(LCUI_Widget widget, int row, int col)
 	TextEdit_UpdateCaret(widget);
 }
 
-static void TextEdit_SetTaskForLineHeight(LCUI_Widget w, int height)
-{
-	LCUI_TextEdit edit = GetData(w);
-	TextLayer_SetLineHeight(edit->layer_placeholder, height);
-	TextLayer_SetLineHeight(edit->layer_source, height);
-	TextLayer_SetLineHeight(edit->layer_mask, height);
-	edit->tasks[TASK_UPDATE] = TRUE;
-	Widget_AddTask(w, LCUI_WTASK_USER);
-}
-
-static void TextEdit_SetTaskForMultiline(LCUI_Widget widget, LCUI_BOOL is_true)
-{
-	LCUI_TextEdit edit = Widget_GetData(widget, self.prototype);
-	TextLayer_SetMultiline(edit->layer_placeholder, is_true);
-	TextLayer_SetMultiline(edit->layer_source, is_true);
-	TextLayer_SetMultiline(edit->layer_mask, is_true);
-	edit->is_multiline_mode = is_true;
-}
-
 static void TextBlock_OnDestroy(void *arg)
 {
 	LCUI_TextBlock blk = arg;
@@ -463,6 +444,7 @@ static void TextEdit_AutoSize(LCUI_Widget widget, float *width, float *height)
 	int i, n, h;
 	float scale = LCUIMetrics_GetScale();
 	LCUI_TextEdit edit = GetData(widget);
+
 	if (edit->is_multiline_mode) {
 		n = max(TextLayer_GetRowTotal(edit->layer), 3);
 		for (h = 0, i = 0; i < n; ++i) {
@@ -912,6 +894,7 @@ static void TextEdit_OnInit(LCUI_Widget w)
 	edit->password_char = 0;
 	edit->allow_input_char = NULL;
 	edit->is_placeholder_shown = FALSE;
+	edit->is_multiline_mode = FALSE;
 	edit->layer_mask = TextLayer_New();
 	edit->layer_source = TextLayer_New();
 	edit->layer_placeholder = TextLayer_New();
@@ -983,29 +966,35 @@ static void TextEdit_OnPaint(LCUI_Widget w, LCUI_PaintContext paint,
 	TextLayer_RenderTo(edit->layer, rect, pos, &canvas);
 }
 
-static void TextEdit_SetTextStyle(LCUI_Widget w, LCUI_TextStyle ts)
+static void TextEdit_OnUpdateStyle(LCUI_Widget w)
 {
-	LCUI_TextEdit edit = GetData(w);
+	int i;
 
-	TextLayer_SetTextStyle(edit->layer_placeholder, ts);
-	TextLayer_SetTextStyle(edit->layer_source, ts);
-	TextLayer_SetTextStyle(edit->layer_mask, ts);
+	LCUI_TextEdit edit = GetData(w);
+	LCUI_TextStyleRec text_style;
+	LCUI_CSSFontStyleRec style;
+	LCUI_TextLayer layers[3] = { edit->layer_mask, edit->layer_placeholder,
+				      edit->layer_source };
+
+	CSSFontStyle_Init(&style);
+	CSSFontStyle_Compute(&style, w->style);
+	if (CSSFontStyle_IsEquals(&style, &edit->style)) {
+		CSSFontStyle_Destroy(&style);
+		return;
+	}
+	CSSFontStyle_GetTextStyle(&style, &text_style);
+	for (i = 0; i < 3; ++i) {
+		TextLayer_SetTextAlign(layers[i], style.text_align);
+		TextLayer_SetLineHeight(layers[i], style.line_height);
+		TextLayer_SetAutoWrap(layers[i],
+				      style.white_space != SV_NOWRAP);
+		TextLayer_SetTextStyle(layers[i], &text_style);
+	}
+	CSSFontStyle_Destroy(&edit->style);
+	TextStyle_Destroy(&text_style);
+	edit->style = style;
 	edit->tasks[TASK_UPDATE] = TRUE;
 	Widget_AddTask(w, LCUI_WTASK_USER);
-}
-
-static void TextEdit_OnUpdate(LCUI_Widget w)
-{
-	LCUI_TextStyleRec ts;
-	LCUI_TextEdit edit = GetData(w);
-	LCUI_CSSFontStyle fs = &edit->style;
-
-	CSSFontStyle_Compute(fs, w->style);
-	CSSFontStyle_GetTextStyle(fs, &ts);
-	TextEdit_SetTaskForLineHeight(w, fs->line_height);
-	TextEdit_SetTaskForMultiline(w, fs->white_space != SV_NOWRAP);
-	TextEdit_SetTextStyle(w, &ts);
-	TextStyle_Destroy(&ts);
 }
 
 static void TextEdit_OnValueChanged(LCUI_Object value, void *arg)
@@ -1049,6 +1038,6 @@ void LCUIWidget_AddTextEdit(void)
 	self.prototype->bindprop = TextEdit_BindProperty;
 	self.prototype->autosize = TextEdit_AutoSize;
 	self.prototype->runtask = TextEdit_OnTask;
-	self.prototype->update = TextEdit_OnUpdate;
+	self.prototype->update = TextEdit_OnUpdateStyle;
 	LCUI_LoadCSSString(textedit_css, __FILE__);
 }

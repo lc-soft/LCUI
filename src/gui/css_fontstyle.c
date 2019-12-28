@@ -350,6 +350,7 @@ static void OnComputeWhiteSpace(LCUI_CSSFontStyle fs, LCUI_Style s)
 
 void CSSFontStyle_Init(LCUI_CSSFontStyle fs)
 {
+	fs->color.value = 0;
 	fs->content = NULL;
 	fs->font_ids = NULL;
 	fs->font_family = NULL;
