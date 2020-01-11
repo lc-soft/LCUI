@@ -39,13 +39,39 @@ static LCUI_MetricsRec metrics;
 float LCUIMetrics_Compute(float value, LCUI_StyleType type)
 {
 	switch (type) {
-	case LCUI_STYPE_PX: break;
-	case LCUI_STYPE_DIP: value = value * metrics.density; break;
-	case LCUI_STYPE_SP: value = value * metrics.scaled_density; break;
-	case LCUI_STYPE_PT: value = value * metrics.dpi / 72.0f; break;
-	default: value = 0; break;
+	case LCUI_STYPE_PX:
+		break;
+	case LCUI_STYPE_DIP:
+		value = value * metrics.density;
+		break;
+	case LCUI_STYPE_SP:
+		value = value * metrics.scaled_density;
+		break;
+	case LCUI_STYPE_PT:
+		value = value * metrics.dpi / 72.0f;
+		break;
+	default:
+		value = 0;
+		break;
 	}
 	return value;
+}
+
+float LCUIMetrics_ComputeStyle(LCUI_Style style)
+{
+	switch (style->type) {
+	case LCUI_STYPE_PX:
+		return style->val_px;
+	case LCUI_STYPE_DIP:
+		return style->val_dip * metrics.density;
+	case LCUI_STYPE_SP:
+		return style->val_sp * metrics.scaled_density;
+	case LCUI_STYPE_PT:
+		return style->val_pt * metrics.dpi / 72.0f;
+	default:
+		break;
+	}
+	return 0;
 }
 
 int LCUIMetrics_ComputeActual(float value, LCUI_StyleType type)

@@ -59,7 +59,7 @@ int Widget_Append(LCUI_Widget parent, LCUI_Widget widget)
 	Widget_PostSurfaceEvent(widget, LCUI_WEVENT_LINK, TRUE);
 	Widget_UpdateTaskStatus(widget);
 	Widget_UpdateStatus(widget);
-	Widget_AddTask(parent, LCUI_WTASK_LAYOUT);
+	Widget_AddTask(parent, LCUI_WTASK_REFLOW);
 	return 0;
 }
 
@@ -96,7 +96,7 @@ int Widget_Prepend(LCUI_Widget parent, LCUI_Widget widget)
 	Widget_AddTaskForChildren(widget, LCUI_WTASK_REFRESH_STYLE);
 	Widget_UpdateTaskStatus(widget);
 	Widget_UpdateStatus(widget);
-	Widget_AddTask(parent, LCUI_WTASK_LAYOUT);
+	Widget_AddTask(parent, LCUI_WTASK_REFLOW);
 	return 0;
 }
 
@@ -183,7 +183,7 @@ int Widget_Unlink(LCUI_Widget w)
 	LinkedList_Unlink(&w->parent->children, node);
 	LinkedList_Unlink(&w->parent->children_show, &w->node_show);
 	Widget_PostSurfaceEvent(w, LCUI_WEVENT_UNLINK, TRUE);
-	Widget_AddTask(w->parent, LCUI_WTASK_LAYOUT);
+	Widget_AddTask(w->parent, LCUI_WTASK_REFLOW);
 	w->parent = NULL;
 	return 0;
 }
@@ -254,7 +254,7 @@ static void _LCUIWidget_PrintTree(LCUI_Widget w, int depth, const char *prefix)
 			strcat(str, "┬");
 		}
 		snode = Widget_GetSelectorNode(child);
-		Logger_Debug(
+		Logger_Error(
 		    "%s%s %s, xy:(%g,%g), size:(%g,%g), "
 		    "visible: %s, display: %d, padding: (%g,%g,%g,%g), margin: "
 		    "(%g,%g,%g,%g)\n",
@@ -275,7 +275,7 @@ void Widget_PrintTree(LCUI_Widget w)
 	LCUI_SelectorNode node;
 	w = w ? w : LCUIWidget_GetRoot();
 	node = Widget_GetSelectorNode(w);
-	Logger_Debug("%s, xy:(%g,%g), size:(%g,%g), visible: %s\n",
+	Logger_Error("%s, xy:(%g,%g), size:(%g,%g), visible: %s\n",
 		     node->fullname, w->x, w->y, w->width, w->height,
 		     w->computed_style.visible ? "true" : "false");
 	SelectorNode_Delete(node);
