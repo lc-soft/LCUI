@@ -158,6 +158,7 @@ static void TextView_UpdateStyle(LCUI_Widget w)
 	txt->style = style;
 	txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	Widget_AddTask(w, LCUI_WTASK_USER);
+	Widget_AddTask(w, LCUI_WTASK_REFLOW);
 }
 
 static void TextView_UpdateLayerSize(LCUI_Widget w)

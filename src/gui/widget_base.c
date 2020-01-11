@@ -137,7 +137,7 @@ LCUI_Widget LCUIWidget_New(const char *type)
 void Widget_ExecDestroy(LCUI_Widget w)
 {
 	if (w->parent) {
-		Widget_AddTask(w->parent, LCUI_WTASK_LAYOUT);
+		Widget_AddTask(w->parent, LCUI_WTASK_REFLOW);
 		Widget_Unlink(w);
 	}
 	Widget_DestroyBackground(w);
@@ -183,7 +183,7 @@ void Widget_Destroy(LCUI_Widget w)
 			node = node->next;
 		}
 		if (w->computed_style.position != SV_ABSOLUTE) {
-			Widget_AddTask(w->parent, LCUI_WTASK_LAYOUT);
+			Widget_AddTask(w->parent, LCUI_WTASK_REFLOW);
 		}
 		Widget_InvalidateArea(w, NULL, SV_GRAPH_BOX);
 		Widget_AddToTrash(w);
@@ -503,6 +503,7 @@ void Widget_AddState(LCUI_Widget w, LCUI_WidgetState state)
 float Widget_ComputeXMetric(LCUI_Widget w, int key)
 {
 	LCUI_Style s = &w->style->sheet[key];
+
 	if (s->type == LCUI_STYPE_SCALE) {
 		if (!w->parent) {
 			return 0;
@@ -518,6 +519,7 @@ float Widget_ComputeXMetric(LCUI_Widget w, int key)
 float Widget_ComputeYMetric(LCUI_Widget w, int key)
 {
 	LCUI_Style s = &w->style->sheet[key];
+
 	if (s->type == LCUI_STYPE_SCALE) {
 		if (!w->parent) {
 			return 0;
@@ -619,6 +621,97 @@ void Widget_BindProperty(LCUI_Widget w, const char *name, LCUI_Object value)
 	if (w->proto && w->proto->bindprop) {
 		w->proto->bindprop(w, name, value);
 	}
+}
+
+void Widget_UpdateBoxPosition(LCUI_Widget w)
+{
+	float x = w->layout_x;
+	float y = w->layout_y;
+
+	switch (w->computed_style.position) {
+	case SV_ABSOLUTE:
+		if (!Widget_HasAutoStyle(w, key_left)) {
+			x = w->computed_style.left;
+		} else if (!Widget_HasAutoStyle(w, key_right)) {
+			if (w->parent) {
+				x = w->parent->box.border.width - w->width;
+			}
+			x -= w->computed_style.right;
+		}
+		if (!Widget_HasAutoStyle(w, key_top)) {
+			y = w->computed_style.top;
+		} else if (!Widget_HasAutoStyle(w, key_bottom)) {
+			if (w->parent) {
+				y = w->parent->box.border.height - w->height;
+			}
+			y -= w->computed_style.bottom;
+		}
+		break;
+	case SV_RELATIVE:
+		if (!Widget_HasAutoStyle(w, key_left)) {
+			x += w->computed_style.left;
+		} else if (!Widget_HasAutoStyle(w, key_right)) {
+			x -= w->computed_style.right;
+		}
+		if (!Widget_HasAutoStyle(w, key_top)) {
+			y += w->computed_style.top;
+		} else if (!Widget_HasAutoStyle(w, key_bottom)) {
+			y -= w->computed_style.bottom;
+		}
+	case SV_STATIC:
+	default:
+		break;
+	}
+	w->box.outer.x = x;
+	w->box.outer.y = y;
+	w->x = x + w->margin.left;
+	w->y = y + w->margin.top;
+	w->box.border.x = w->x;
+	w->box.border.y = w->y;
+	w->box.padding.x = w->x + w->computed_style.border.left.width;
+	w->box.padding.y = w->y + w->computed_style.border.top.width;
+	w->box.content.x = w->box.padding.x + w->padding.left;
+	w->box.content.y = w->box.padding.y + w->padding.top;
+	w->box.canvas.x = w->x - Widget_GetBoxShadowOffsetX(w);
+	w->box.canvas.y = w->y - Widget_GetBoxShadowOffsetY(w);
+}
+
+void Widget_UpdateCanvasBox(LCUI_Widget w)
+{
+	w->box.canvas.x = w->box.border.x - Widget_GetBoxShadowOffsetX(w);
+	w->box.canvas.y = w->box.border.y - Widget_GetBoxShadowOffsetY(w);
+	w->box.canvas.width = Widget_GetCanvasWidth(w);
+	w->box.canvas.height = Widget_GetCanvasHeight(w);
+}
+
+void Widget_UpdateBoxSize(LCUI_Widget w)
+{
+	const float padding_x = w->padding.left + w->padding.right;
+	const float padding_y = w->padding.top + w->padding.bottom;
+	const float border_x = w->computed_style.border.left.width +
+			       w->computed_style.border.right.width;
+	const float border_y = w->computed_style.border.top.width +
+			       w->computed_style.border.bottom.width;
+	const float margin_x = w->margin.left + w->margin.right;
+	const float margin_y = w->margin.top + w->margin.bottom;
+
+	w->box.border.width = w->width;
+	w->box.border.height = w->height;
+	w->box.padding.width = w->box.border.width - border_x;
+	w->box.padding.height = w->box.border.height - border_y;
+	w->box.content.width = w->box.padding.width - padding_x;
+	w->box.content.height = w->box.padding.height - padding_y;
+	w->box.outer.width = w->box.border.width + margin_x;
+	w->box.outer.height = w->box.border.height + margin_y;
+	w->box.canvas.width = Widget_GetCanvasWidth(w);
+	w->box.canvas.height = Widget_GetCanvasHeight(w);
+}
+
+void Widget_SetBorderBoxSize(LCUI_Widget w, float width, float height)
+{
+	w->width = Widget_GetLimitedWidth(w, width);
+	w->height = Widget_GetLimitedHeight(w, height);
+	Widget_UpdateBoxSize(w);
 }
 
 void LCUIWidget_InitBase(void)

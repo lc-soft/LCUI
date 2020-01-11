@@ -62,6 +62,10 @@ const char *global_css = CodeToString(
 	margin: 0;
 }
 
+root {
+	box-sizing: border-box;
+}
+
 );
 
 /* clang-format on */
@@ -243,7 +247,7 @@ void Widget_AddTaskByStyle(LCUI_Widget w, int key)
 	LCUI_TaskStatus task_status[] = {
 		{ key_visibility, key_visibility, LCUI_WTASK_VISIBLE, TRUE },
 		{ key_display, key_display, LCUI_WTASK_DISPLAY, TRUE },
-		{ key_flex_style_start, key_flex_style_end, LCUI_WTASK_LAYOUT,
+		{ key_flex_style_start, key_flex_style_end, LCUI_WTASK_REFLOW,
 		  TRUE },
 		{ key_opacity, key_opacity, LCUI_WTASK_OPACITY, TRUE },
 		{ key_z_index, key_z_index, LCUI_WTASK_ZINDEX, TRUE },

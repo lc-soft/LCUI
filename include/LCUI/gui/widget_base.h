@@ -86,35 +86,35 @@ typedef enum LCUI_WidgetTaskType {
 	LCUI_WTASK_SHADOW,
 	LCUI_WTASK_BORDER,
 	LCUI_WTASK_BACKGROUND,
-	LCUI_WTASK_LAYOUT,
 	LCUI_WTASK_RESIZE,
 	LCUI_WTASK_POSITION,
 	LCUI_WTASK_ZINDEX,
 	LCUI_WTASK_OPACITY,
+	LCUI_WTASK_REFLOW,
 	LCUI_WTASK_USER,
 	LCUI_WTASK_TOTAL_NUM
 } LCUI_WidgetTaskType;
 
+/** See more: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model */
 typedef struct LCUI_WidgetBoxModelRec_ {
-	LCUI_RectF content;	/**< 内容框的区域 */
-	LCUI_RectF padding;	/**< 内边距框的区域 */
-	LCUI_RectF border;	/**< 边框盒的区域，包括内边距框和内容框区域 */
-	LCUI_RectF outer;	/**< 外边距框的区域，包括边框盒和外边距框区域 */
-	LCUI_RectF canvas;	/**< 图层的区域，包括边框盒和阴影区域 */
+	LCUI_RectF content;
+	LCUI_RectF padding;
+	LCUI_RectF border;
+	LCUI_RectF canvas;
+	LCUI_RectF outer;
 } LCUI_WidgetBoxModelRec, *LCUI_WidgetBoxModel;
 
 typedef struct LCUI_WidgetTaskBoxRec_ {
-	/** update for self */
-
+	/** Should update for self? */
 	LCUI_BOOL for_self;
 
-	/** update for children */
+	/** Should update for children? */
 	LCUI_BOOL for_children;
 
-	/** skip the property synchronization of bound surface */
+	/** Should skip the property sync of bound surface? */
 	LCUI_BOOL skip_surface_props_sync;
 
-	/** states of tasks */
+	/** States of tasks */
 	LCUI_BOOL states[LCUI_WTASK_TOTAL_NUM];
 } LCUI_WidgetTaskBoxRec;
 
@@ -235,39 +235,81 @@ typedef struct LCUI_WidgetAttributeRec_ {
 	} value;
 } LCUI_WidgetAttributeRec, *LCUI_WidgetAttribute;
 
-/** 部件结构 */
 typedef struct LCUI_WidgetRec_ {
-	unsigned		hash;			/**< 哈希值 */
-	LCUI_WidgetState	state;			/**< 状态 */
-	float			x, y;			/**< 当前坐标（由 origin 计算而来） */
-	float			origin_x, origin_y;	/**< 当前布局下计算出的坐标 */
-	float			width, height;		/**< 部件区域大小，包括边框和内边距占用区域 */
-	size_t			index;			/**< 部件索引位置 */
-	char			*id;			/**< ID */
-	char			*type;			/**< 类型 */
-	strlist_t		classes;		/**< 类列表 */
-	strlist_t		status;			/**< 状态列表 */
-	wchar_t			*title;			/**< 标题 */
-	LCUI_Rect2F		padding;		/**< 内边距框 */
-	LCUI_Rect2F		margin;			/**< 外边距框 */
-	LCUI_WidgetBoxModelRec	box;			/**< 部件的各个区域信息 */
-	LCUI_StyleSheet		style;			/**< 当前完整样式表 */
-	LCUI_StyleList		custom_style;		/**< 自定义样式表 */
-	LCUI_CachedStyleSheet	inherited_style;	/**< 通过继承得到的样式表 */
-	LCUI_WidgetStyle	computed_style;		/**< 已经计算的样式数据 */
-	LCUI_Widget		parent;			/**< 父部件 */
-	LinkedList		children;		/**< 子部件 */
-	LinkedList		children_show;		/**< 子部件的堆叠顺序记录，由顶到底 */
-	LCUI_WidgetData		data;			/**< 私有数据 */
-	Dict			*attributes;		/**< 属性记录 */
-	LCUI_WidgetPrototypeC	proto;			/**< 原型 */
-	LCUI_EventTrigger	trigger;		/**< 事件触发器 */
-	LCUI_WidgetTaskBoxRec	task;			/**< 任务记录 */
-	LCUI_WidgetRules	rules;			/**< 更新部件时采用的规则 */
-	LCUI_BOOL		event_blocked;		/**< 是否阻止自己和子级部件的事件处理 */
-	LCUI_BOOL		disabled;		/**< 是否禁用 */
-	LinkedListNode		node;			/**< 在部件链表中的结点 */
-	LinkedListNode		node_show;		/**< 在部件显示链表中的结点 */
+	unsigned		hash;
+	LCUI_WidgetState	state;
+
+	char			*id;
+	char			*type;
+	strlist_t		classes;
+	strlist_t		status;
+	wchar_t			*title;
+	Dict			*attributes;
+	LCUI_BOOL		disabled;
+	LCUI_BOOL		event_blocked;
+	
+	/**
+	 * Coordinates calculated by the layout system
+	 * The position of the rectangular boxes is calculated based on it
+	 */
+	float			layout_x, layout_y;
+	
+	/**
+	 * Geometric parameters (readonly)
+	 * their values come from the box.border
+	 */
+	float			x, y;
+	float			width, height;
+
+	LCUI_Rect2F		padding;
+	LCUI_Rect2F		margin;
+	LCUI_WidgetBoxModelRec	box;
+
+	LCUI_StyleSheet		style;
+	LCUI_StyleList		custom_style;
+	LCUI_CachedStyleSheet	inherited_style;
+	LCUI_WidgetStyle	computed_style;
+
+	/** Some data bound to the prototype */
+	LCUI_WidgetData		data;
+
+	/**
+	 * Prototype chain
+	 * It is used to implement the inheritance of widgets,
+	 * Just like prototype chain in JavaScript
+	 */
+	LCUI_WidgetPrototypeC	proto;
+
+	/**
+	 * Update task context
+	 */
+	LCUI_WidgetTaskBoxRec	task;
+	LCUI_WidgetRules	rules;
+	LCUI_EventTrigger	trigger;
+	
+	/** Parent widiget */
+	LCUI_Widget		parent;
+
+	/** List of child widgets */
+	LinkedList		children;
+
+	/** List of child widgets in descending order by z-index */
+	LinkedList		children_show;
+	
+	/**
+	 * Position in the parent->children
+	 * this == LinkedList_Get(&this->parent->children, this.index)
+	 */
+	size_t			index;
+
+	/**
+	 * Node in the parent->children
+	 * &this->node == LinkedList_GetNode(&this->parent->children, this.index)
+	 */
+	LinkedListNode		node;
+	
+	/** Node in the parent->children_shoa */
+	LinkedListNode		node_show;
 } LCUI_WidgetRec;
 
 /* clang-format on */
@@ -383,10 +425,6 @@ LCUI_API float Widget_GetLimitedWidth(LCUI_Widget w, float width);
 
 LCUI_API float Widget_GetLimitedHeight(LCUI_Widget w, float height);
 
-LCUI_API void Widget_AutoSize(LCUI_Widget w);
-
-LCUI_API void Widget_ComputeSizeStyle(LCUI_Widget w);
-
 /** 根据阴影参数获取部件区域的横向偏移距离 */
 LCUI_API float Widget_GetBoxShadowOffsetX(LCUI_Widget w);
 
@@ -458,7 +496,13 @@ LCUI_API float Widget_ComputeMaxContentWidth(LCUI_Widget w);
 /** 计算部件的最大可用宽度 */
 LCUI_API float Widget_ComputeMaxAvaliableWidth(LCUI_Widget widget);
 
-LCUI_API void Widget_ComputeLimitSize(LCUI_Widget w);
+LCUI_API void Widget_UpdateBoxPosition(LCUI_Widget w);
+
+LCUI_API void Widget_UpdateCanvasBox(LCUI_Widget w);
+
+LCUI_API void Widget_UpdateBoxSize(LCUI_Widget w);
+
+LCUI_API void Widget_SetBorderBoxSize(LCUI_Widget w, float width, float height);
 
 LCUI_API size_t LCUIWidget_ClearTrash(void);
 
