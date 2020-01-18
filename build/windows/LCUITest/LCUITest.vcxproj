@@ -197,9 +197,6 @@
     <ClCompile Include="..\..\..\test\test_textview_resize.c" />
     <ClCompile Include="..\..\..\test\test_thread.c" />
     <ClCompile Include="..\..\..\test\test_widget_event.c" />
-    <ClCompile Include="..\..\..\test\test_widget_flex_layout.c" />
-    <ClCompile Include="..\..\..\test\test_widget_inline_block_layout.c" />
-    <ClCompile Include="..\..\..\test\test_widget_layout.c" />
     <ClCompile Include="..\..\..\test\test_widget_opacity.c" />
     <ClCompile Include="..\..\..\test\test_widget_rect.c" />
     <ClCompile Include="..\..\..\test\test_xml_parser.c" />

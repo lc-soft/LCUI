@@ -1,0 +1,110 @@
+<html>
+  <head>
+    <title>block layout</title>
+    <link href="./test_block_layout.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="example">
+        <div class="example__title">basic</div>
+        <div class="example__content">
+          <div class="box w-auto"></div>
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block"></div>
+          <div class="box w-auto"></div>
+          <div class="box w-3">w-3</div>
+          <div class="box w-3 ml-auto">w-3 ml-auto</div>
+          <div class="box w-3 ml-auto mr-auto">w-3 ml-auto mr-auto</div>
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block"></div>
+        </div>
+      </div>
+      <div class="example">
+        <div class="example__title">width</div>
+        <div class="example__content">
+          <div class="box w-min-50 d-inline-block">min-width: 50%; display: inline-block</div>
+          <div class="box w-50">width: 50%; display: block</div>
+          <div class="box w-100">width: 100%; display: block</div>
+          <div class="box w-50 d-inline-block">width: 50%; display: inline-block</div>
+          <div class="box w-50 d-inline-block">width: 50%; display: inline-block</div>
+          <div class="box w-25 d-inline-block">width: 25%; display: inline-block</div>
+          <div class="box w-25 d-inline-block">width: 25%; display: inline-block</div>
+          <div class="box w-25 d-inline-block">width: 25%; display: inline-block</div>
+          <div class="box w-25 d-inline-block">width: 25%; display: inline-block</div>
+        </div>
+      </div>
+      <div class="example">
+        <div class="example__title">margin</div>
+        <div class="example__content">
+          <div class="box-padding">
+            <div class="box w-auto m-2">margin: 16px</div>
+            <div class="box d-inline-block m-1">ml-1</div>
+            <div class="box d-inline-block m-1">ml-1</div>
+            <div class="box d-inline-block m-1">ml-1</div>
+            <div class="box d-inline-block m-1">ml-1</div>
+            <div class="box d-inline-block mr--2">mr--2</div>
+            <div class="box d-inline-block w-3 m-1">w-3 m-1</div>
+            <div class="box d-inline-block w-2 ml--2">w-2 ml--2</div>
+            <div class="box w-auto m--2">margin: -16px</div>
+          </div>
+          <div class="box-padding">
+            <div class="box w-auto">w-auto</div>
+            <div class="box w-auto ml--1">w-auto ml--1</div>
+            <div class="box w-auto ml--1 mr--1">w-auto ml--1 mr--1</div>
+            <div class="box w-4 ml--1 mr--1">w-auto ml--1 mr--1</div>
+            <div class="box w-100 ml--1 mr--1">width: 100%; margin-left: -8px; margin-right: -8px</div>
+          </div>
+        </div>
+      </div>
+      <div class="example">
+        <div class="example__title">vertical-align</div>
+        <div class="example__content">
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block h-2"></div>
+          <div class="box d-inline-block vertical-align-middle">middle</div>
+          <div class="box d-inline-block h-3"></div>
+          <div class="box d-inline-block vertical-align-bottom">bottom</div>
+          <div class="box d-inline-block h-2"></div>
+          <div class="box d-inline-block vertical-align-bottom">bottom</div>
+          <div class="box d-inline-block vertical-align-middle">middle</div>
+          <div class="box"></div>
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block vertical-align-middle">middle</div>
+          <div class="box d-inline-block vertical-align-bottom">bottom</div>
+          <div class="box d-inline-block h-2"></div>
+          <div class="box d-inline-block"></div>
+          <div class="box d-inline-block vertical-align-middle">middle</div>
+          <div class="box d-inline-block"></div>
+        </div>
+      </div>
+      <div class="example" id="example-position-absolute">
+        <div class="example__title">position: absolute</div>
+        <div class="example__content">
+            <div id="box-absolute-top-left" class="box"></div>
+            <div id="box-absolute-top-right" class="box"></div>
+            <div id="box-absolute-bottom-left" class="box"></div>
+            <div id="box-absolute-bottom-right" class="box"></div>
+            <div id="box-absolute-center" class="box"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

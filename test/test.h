@@ -31,6 +31,13 @@ extern int tests_count;
 		}                                                    \
 	} while (0);
 
+void it_i(const char *name, int actual, int expected);
+
+void it_b(const char *name, int actual, int expected);
+
+void it_s(const char *name, const char *actual,
+	  const char *expected);
+
 int test_charset(void);
 int test_string(void);
 int test_object(void);

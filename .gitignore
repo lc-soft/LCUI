@@ -71,6 +71,7 @@ test/*
 !test/*.c
 !test/*.css
 !test/*.xml
+!test/*.html
 !test/*.jpg
 !test/*.bmp
 !test/*.png
