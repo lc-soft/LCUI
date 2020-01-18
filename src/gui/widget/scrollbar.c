@@ -120,7 +120,12 @@ scrollbar {
 	width: 100%;
 	height: 14px;
 }
-
+.has-horizontal-scrollbar {
+	padding-bottom: 14px;
+}
+.has-vertical-scrollbar {
+	padding-right: 14px;
+}
 );
 
 /* clang-format on */
@@ -325,7 +330,8 @@ static void ScrollBar_OnLink(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 	}
 }
 
-static void ScrollBar_OnBoxDestroy(LCUI_Widget box, LCUI_WidgetEvent e, void *arg)
+static void ScrollBar_OnBoxDestroy(LCUI_Widget box, LCUI_WidgetEvent e,
+				   void *arg)
 {
 	LCUI_Widget w = e->data;
 
@@ -393,8 +399,22 @@ static void ScrollBar_UpdateSize(LCUI_Widget w)
 	Widget_UpdateStyle(slider, FALSE);
 	if (n < 1.0) {
 		Widget_Show(w);
+		if (scrollbar->direction == SBD_HORIZONTAL) {
+			Widget_AddClass(scrollbar->box,
+					"has-horizontal-scrollbar");
+		} else {
+			Widget_AddClass(scrollbar->box,
+					"has-vertical-scrollbar");
+		}
 	} else {
 		Widget_Hide(w);
+		if (scrollbar->direction == SBD_HORIZONTAL) {
+			Widget_RemoveClass(scrollbar->box,
+					   "has-horizontal-scrollbar");
+		} else {
+			Widget_RemoveClass(scrollbar->box,
+					   "has-vertical-scrollbar");
+		}
 	}
 }
 
