@@ -15,17 +15,20 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\test\test_widget_inline_block_layout.css">
+    <None Include="..\..\..\test\test_block_layout.css">
       <Filter>资源文件</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="..\..\..\test\test_widget_inline_block_layout.xml">
+    <Xml Include="..\..\..\test\test_block_layout.xml">
       <Filter>资源文件</Filter>
     </Xml>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\test\test_widget_inline_block_layout.c">
+    <ClCompile Include="..\..\..\test\test_block_layout.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\util.c">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -27,19 +27,10 @@
     <ClCompile Include="..\..\..\test\test_image_reader.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\test_widget_layout.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\test\test_widget_rect.c">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\test_font_load.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\test_widget_flex_layout.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\test\test_widget_inline_block_layout.c">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\test\test_xml_parser.c">
@@ -72,9 +63,18 @@
     <ClCompile Include="..\..\..\test\test_widget_event.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\test_block_layout.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\test\libtest.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\test\test.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\test\libtest.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

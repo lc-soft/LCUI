@@ -30,7 +30,7 @@ static void TestWorker_Thread(void *arg)
 		worker->data_count += 1;
 	}
 	LCUIMutex_Unlock(&worker->mutex);
-	TEST_LOG("count: %lu\n", worker->data_count);
+	TEST_LOG("count: %d\n", worker->data_count);
 	worker->active = FALSE;
 	LCUIThread_Exit(NULL);
 }
@@ -67,19 +67,19 @@ int test_thread(void)
 
 	TestWorker_Init(&worker);
 	LCUIThread_Create(&worker.thread, TestWorker_Thread, &worker);
-	LCUI_Sleep(1);
-	TestWorker_Send(&worker, "hello");
-	LCUI_MSleep(200);
-	TestWorker_Send(&worker, "world");
-	LCUI_Sleep(1);
-	TestWorker_Send(&worker, "this");
-	LCUI_MSleep(500);
-	TestWorker_Send(&worker, "is");
-	LCUI_Sleep(1);
-	TestWorker_Send(&worker, "test");
 	LCUI_MSleep(100);
+	TestWorker_Send(&worker, "hello");
+	LCUI_MSleep(20);
+	TestWorker_Send(&worker, "world");
+	LCUI_MSleep(100);
+	TestWorker_Send(&worker, "this");
+	LCUI_MSleep(50);
+	TestWorker_Send(&worker, "is");
+	LCUI_MSleep(100);
+	TestWorker_Send(&worker, "test");
+	LCUI_MSleep(50);
 	TestWorker_Send(&worker, "bye!");
-	LCUI_Sleep(1);
+	LCUI_MSleep(100);
 	TestWorker_Destroy(&worker);
 	CHECK(worker.data_count == 7);
 	CHECK(!worker.active);

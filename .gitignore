@@ -69,8 +69,10 @@ build/VS2012/*/*.jpg
 include/LCUI/config.h
 test/*
 !test/*.c
+!test/*.h
 !test/*.css
 !test/*.xml
+!test/*.html
 !test/*.jpg
 !test/*.bmp
 !test/*.png

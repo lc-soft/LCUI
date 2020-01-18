@@ -1,35 +1,35 @@
 ﻿#include <stdio.h>
 
-extern int tests_count;
-
 #define TEST_LOG(format, ...) \
-	Logger_Info("[test] %s(): " format, __FUNCTION__, ##__VA_ARGS__)
+	printf("[test] %s(): " format, __FUNCTION__, ##__VA_ARGS__)
 
 #define PRINT_TEST_RESULT(N) \
-	Logger_Info("[test] %d tests, %d pass.\n", tests_count, tests_count + N)
+	printf("[test] %d tests, %d pass.\n", tests_count, tests_count + N)
 
-#define CHECK(X)                                                               \
-	do {                                                                   \
-		tests_count += 1;                                              \
-		Logger_Info("[test] %s(): %s. # %s\n", __FUNCTION__, "" #X "", \
-			    (X) ? "PASS" : (ret -= 1, "NO PASS!"));            \
+#define CHECK(X)                                                          \
+	do {                                                              \
+		tests_count += 1;                                         \
+		printf("[test] %s(): %s. # %s\n", __FUNCTION__, "" #X "", \
+		       (X) ? "PASS" : (ret -= 1, "NO PASS!"));            \
 	} while (0);
 
-#define CHECK_WITH_TEXT(TEXT, X)                                           \
-	do {                                                               \
-		tests_count += 1;                                          \
-		Logger_Info("[test] %s(): %s. # %s\n", __FUNCTION__, TEXT, \
-			    (X) ? "PASS" : (ret -= 1, "NO PASS!"));        \
+#define CHECK_WITH_TEXT(TEXT, X)                                      \
+	do {                                                          \
+		tests_count += 1;                                     \
+		printf("[test] %s(): %s. # %s\n", __FUNCTION__, TEXT, \
+		       (X) ? "PASS" : (ret -= 1, "NO PASS!"));        \
 	} while (0);
 
-#define CHECK2(X)                                                    \
-	do {                                                         \
-		if (!(X)) {                                          \
-			Logger_Info("[test] %s(): %s. # NO PASS!\n", \
-				    __FUNCTION__, "" #X "");         \
-			ret -= 1;                                    \
-		}                                                    \
+#define CHECK2(X)                                                             \
+	do {                                                                  \
+		if (!(X)) {                                                   \
+			printf("[test] %s(): %s. # NO PASS!\n", __FUNCTION__, \
+			       "" #X "");                                     \
+			ret -= 1;                                             \
+		}                                                             \
 	} while (0);
+
+extern int tests_count;
 
 int test_charset(void);
 int test_string(void);
@@ -40,12 +40,11 @@ int test_css_parser(void);
 int test_xml_parser(void);
 int test_strpool(void);
 int test_linkedlist(void);
-int test_widget_layout(void);
-int test_widget_flex_layout(void);
-int test_widget_inline_block_layout(void);
 int test_widget_rect(void);
 int test_widget_opacity(void);
 int test_widget_event(void);
 int test_textview_resize(void);
 int test_textedit(void);
 int test_image_reader(void);
+
+void test_block_layout(void);

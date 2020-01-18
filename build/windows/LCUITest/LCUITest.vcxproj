@@ -110,7 +110,7 @@
       <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
       <AdditionalDependencies>LCUI.lib;LCUIMain.lib;</AdditionalDependencies>
@@ -127,7 +127,7 @@
       <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
       <AdditionalDependencies>LCUI.lib;LCUIMain.lib;</AdditionalDependencies>
@@ -147,7 +147,7 @@
       <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
@@ -172,7 +172,7 @@
       <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
@@ -185,6 +185,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\test\test.c" />
+    <ClCompile Include="..\..\..\test\test_block_layout.c" />
     <ClCompile Include="..\..\..\test\test_charset.c" />
     <ClCompile Include="..\..\..\test\test_css_parser.c" />
     <ClCompile Include="..\..\..\test\test_font_load.c" />
@@ -197,15 +198,14 @@
     <ClCompile Include="..\..\..\test\test_textview_resize.c" />
     <ClCompile Include="..\..\..\test\test_thread.c" />
     <ClCompile Include="..\..\..\test\test_widget_event.c" />
-    <ClCompile Include="..\..\..\test\test_widget_flex_layout.c" />
-    <ClCompile Include="..\..\..\test\test_widget_inline_block_layout.c" />
-    <ClCompile Include="..\..\..\test\test_widget_layout.c" />
     <ClCompile Include="..\..\..\test\test_widget_opacity.c" />
     <ClCompile Include="..\..\..\test\test_widget_rect.c" />
     <ClCompile Include="..\..\..\test\test_xml_parser.c" />
+    <ClCompile Include="..\..\..\test\libtest.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\test\test.h" />
+    <ClInclude Include="..\..\..\test\libtest.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
