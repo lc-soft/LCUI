@@ -104,6 +104,7 @@ int Widget_Unwrap(LCUI_Widget widget)
 {
 	size_t len;
 	LCUI_Widget child;
+	LCUI_WidgetEventRec ev = { 0 };
 	LinkedList *children;
 	LinkedListNode *target, *node, *prev;
 
@@ -121,14 +122,19 @@ int Widget_Unwrap(LCUI_Widget widget)
 	node = &widget->node;
 	target = node->prev;
 	node = widget->children.tail.prev;
+	ev.cancel_bubble = TRUE;
 	while (len > 0) {
 		assert(node != NULL);
 		assert(node->data != NULL);
 		prev = node->prev;
 		child = node->data;
+		ev.type = LCUI_WEVENT_UNLINK;
+		Widget_TriggerEvent(child, &ev, NULL);
 		LinkedList_Unlink(&widget->children, node);
-		child->parent = widget->parent;
 		LinkedList_Link(children, target, node);
+		child->parent = widget->parent;
+		ev.type = LCUI_WEVENT_LINK;
+		Widget_TriggerEvent(child, &ev, NULL);
 		Widget_AddTaskForChildren(child, LCUI_WTASK_REFRESH_STYLE);
 		Widget_UpdateTaskStatus(child);
 		node = prev;
