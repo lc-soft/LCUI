@@ -84,6 +84,13 @@ static struct ModuleContext {
 	code = CODE; \
 	goto exit;
 
+static void xmlPrintErrorMessage(xmlErrorPtr err)
+{
+	Logger_Error("[builder] %s (%d): error %d: %s\n",
+		     err->file ? err->file : "(memory)", err->line, err->code,
+		     err->message);
+}
+
 /** 解析 <resource> 元素，根据相关参数载入资源 */
 static int ParseResource(XMLParserContext ctx, xmlNodePtr node)
 {
@@ -333,7 +340,8 @@ LCUI_Widget LCUIBuilder_LoadString(const char *str, int size)
 	memset(&ctx, 0, sizeof(ctx));
 	doc = xmlParseMemory(str, size);
 	if (!doc) {
-		Logger_Error("[builder] Failed to parse xml form memory\n");
+		xmlPrintErrorMessage(xmlGetLastError());
+		Logger_Error("[builder] failed to parse xml form memory\n");
 		goto FAILED;
 	}
 	cur = xmlDocGetRootElement(doc);
@@ -367,8 +375,8 @@ LCUI_Widget LCUIBuilder_LoadFile(const char *filepath)
 	ctx.space = filepath;
 	doc = xmlParseFile(filepath);
 	if (!doc) {
-		Logger_Error("[builder] Failed to parse xml file: %s\n",
-			     filepath);
+		xmlPrintErrorMessage(xmlGetLastError());
+		Logger_Error("[builder] failed to parse xml form file\n");
 		goto FAILED;
 	}
 	cur = xmlDocGetRootElement(doc);
