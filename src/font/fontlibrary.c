@@ -518,7 +518,7 @@ void LCUIFont_SetDefault(int id)
 	LCUI_Font font = LCUIFont_GetById(id);
 	if (font) {
 		fontlib.default_font = font;
-		Logger_Info("[font] select: %s\n", font->family_name);
+		Logger_Debug("[font] select: %s\n", font->family_name);
 	}
 }
 
@@ -636,7 +636,7 @@ static int LCUIFont_LoadFileEx(LCUI_FontEngine *engine, const char *file)
 	for (i = 0; i < num_fonts; ++i) {
 		fonts[i]->engine = engine;
 		id = LCUIFont_Add(fonts[i]);
-		Logger_Info("[font] add family: %s, style name: %s, id: %d\n",
+		Logger_Debug("[font] add family: %s, style name: %s, id: %d\n",
 			    fonts[i]->family_name, fonts[i]->style_name, id);
 	}
 	free(fonts);
@@ -860,7 +860,7 @@ static void LCUIFont_InitEngine(void)
 	}
 #endif
 	if (fontlib.engine && fontlib.engine != &fontlib.engines[0]) {
-		Logger_Info("[font] current font engine is: %s\n",
+		Logger_Debug("[font] current font engine is: %s\n",
 		    fontlib.engine->name);
 	} else {
 		Logger_Warning("[font] warning: not font engine support!\n");
@@ -979,7 +979,7 @@ static void LCUIFont_LoadDefaultFonts(void)
 #ifdef LCUI_BUILD_IN_WIN32
 	LCUIFont_LoadFontsForWindows();
 #elif defined(USE_FONTCONFIG)
-	Logger_Info("[font] fontconfig enabled\n");
+	Logger_Debug("[font] fontconfig enabled\n");
 	LCUIFont_LoadFontsByFontConfig();
 #else
 	LCUIFont_LoadFontsForLinux();
