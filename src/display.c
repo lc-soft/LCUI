@@ -1,4 +1,4 @@
-﻿/* display.c -- Graphical display control
+/* display.c -- Graphical display control
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
@@ -921,7 +921,7 @@ int LCUI_InitDisplay(LCUI_DisplayDriver driver)
 	if (display.active) {
 		return -1;
 	}
-	Logger_Info("[display] init ...\n");
+	Logger_Debug("[display] init ...\n");
 	display.mode = 0;
 	display.driver = driver;
 	display.active = TRUE;
@@ -946,7 +946,7 @@ int LCUI_InitDisplay(LCUI_DisplayDriver driver)
 	Widget_BindEvent(root, "surface", OnSurfaceEvent, NULL, NULL);
 	LCUIDisplay_SetMode(LCUI_DMODE_DEFAULT);
 	LCUIDisplay_Update();
-	Logger_Info("[display] init ok, driver name: %s\n",
+	Logger_Debug("[display] init ok, driver name: %s\n",
 		    display.driver->name);
 	return 0;
 }

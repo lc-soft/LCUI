@@ -120,7 +120,7 @@ static LCUI_BOOL LCUIIME_Open(LCUI_IME ime)
 static LCUI_BOOL LCUIIME_Close(LCUI_IME ime)
 {
 	if (ime && ime->handler.close) {
-		Logger_Info("[ime] close engine: %s\n", ime->name);
+		Logger_Debug("[ime] close engine: %s\n", ime->name);
 		return ime->handler.close();
 	}
 	return FALSE;
@@ -131,7 +131,7 @@ LCUI_BOOL LCUIIME_Select(int ime_id)
 	LCUI_IME ime = LCUIIME_Find(ime_id);
 	if (ime) {
 		LCUIIME_Close(self.ime);
-		Logger_Info("[ime] select engine: %s\n", ime->name);
+		Logger_Debug("[ime] select engine: %s\n", ime->name);
 		self.ime = ime;
 		LCUIIME_Open(self.ime);
 		return TRUE;
