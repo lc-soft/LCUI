@@ -41,8 +41,8 @@
 
 /* clang-format off */
 
-#define MIN_WIDTH		480
-#define MIN_HEIGHT		500
+#define MIN_WIDTH		320
+#define MIN_HEIGHT		240
 #define WIN32_WINDOW_STYLE	(WS_OVERLAPPEDWINDOW | WS_MAXIMIZEBOX)
 
 enum SurfaceTaskType {
