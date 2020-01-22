@@ -214,7 +214,6 @@ static void LinuxKeybnoardThread(void *arg)
 	int key;
 	LCUI_TaskRec task = { 0 };
 
-	keyboard.active = TRUE;
 	task.func = DispatchKeyboardEvent;
 	task.destroy_arg[0] = free;
 	while (keyboard.active) {
@@ -248,6 +247,7 @@ static int InitLinuxKeybord(void)
 	for (; i < len; ++i) {
 		signal(signals[i], on_signal);
 	}
+	keyboard.active = TRUE;
 	LCUIThread_Create(&keyboard.tid, LinuxKeybnoardThread, NULL);
 	Logger_Debug("[input] keyboard driver thread: %lld\n", keyboard.tid);
 	return 0;
