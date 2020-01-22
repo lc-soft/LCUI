@@ -561,6 +561,7 @@ LCUI_StyleListNode StyleList_AddNode(LCUI_StyleList list, int key)
 	node = malloc(sizeof(LCUI_StyleListNodeRec));
 	node->key = key;
 	node->style.is_valid = FALSE;
+	node->style.type = LCUI_STYPE_NONE;
 	node->node.data = node;
 	LinkedList_AppendNode(list, &node->node);
 	return node;
