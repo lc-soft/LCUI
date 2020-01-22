@@ -11,6 +11,7 @@ before_install:
   - npm install --save-dev @commitlint/travis-cli
 
 before_script:
+  - export LD_LIBRARY_PATH=/usr/local/clang/lib:$LD_LIBRARY_PATH
   - ./node_modules/.bin/commitlint-travis && ./autogen.sh
 
 script:
