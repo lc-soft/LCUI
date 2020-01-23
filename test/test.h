@@ -36,7 +36,6 @@ int test_string(void);
 int test_object(void);
 int test_thread(void);
 int test_font_load(void);
-int test_css_parser(void);
 int test_xml_parser(void);
 int test_strpool(void);
 int test_linkedlist(void);
@@ -48,3 +47,4 @@ int test_textedit(void);
 int test_image_reader(void);
 
 void test_block_layout(void);
+void test_css_parser(void);

@@ -181,13 +181,23 @@ static KeyNameGroupRec style_name_map[] = {
 	{ key_pointer_events, "pointer-events" },
 	{ key_focusable, "focusable" },
 	{ key_box_sizing, "box-sizing" },
-	{ key_justify_content, "justify-content" }
+	{ key_flex_basis, "flex-basis" },
+	{ key_flex_direction, "flex-direction" },
+	{ key_flex_grow, "flex-grow" },
+	{ key_flex_shrink, "flex-shrink" },
+	{ key_flex_wrap, "flex-wrap" },
+	{ key_justify_content, "justify-content" },
+	{ key_justify_items, "justify-items" },
+	{ key_align_content, "align-content" },
+	{ key_align_items, "align-items" }
 };
 
 /** 样式字符串与标识码的映射表 */
 static KeyNameGroupRec style_value_map[] = {
 	{ SV_NONE, "none" },
 	{ SV_AUTO, "auto" },
+	{ SV_INHERIT, "inherit" },
+	{ SV_INITIAL, "initial" },
 	{ SV_CONTAIN, "contain" },
 	{ SV_COVER, "cover" },
 	{ SV_LEFT, "left" },
@@ -221,7 +231,10 @@ static KeyNameGroupRec style_value_map[] = {
 	{ SV_FLEX, "flex" },
 	{ SV_FLEX_START, "flex-start" },
 	{ SV_FLEX_END, "flex-end" },
-	{ SV_NOWRAP, "nowrap" }
+	{ SV_NOWRAP, "nowrap" },
+	{ SV_WRAP, "wrap" },
+	{ SV_ROW, "row" },
+	{ SV_COLUMN, "column" }
 };
 
 static int LCUI_DirectAddStyleName(int key, const char *name)

@@ -19,3 +19,40 @@
 .window .content .btn:hover .text {
 	background-size: contain;
 }
+
+#test-flex-auto {
+	flex: auto;
+}
+
+#test-flex-none {
+	flex: none;
+}
+
+#test-flex-initial {
+	flex: initial;
+}
+
+#test-flex-1 {
+	flex: 1;
+}
+
+#test-flex-100px {
+	flex: 100px;
+}
+
+#test-flex-1-100px {
+	flex: 1 100px;
+}
+
+#test-flex-0-0-100px {
+	flex: 0 0 100px;
+}
+
+#test-flex-box {
+	flex: 0 0 auto;
+	flex-flow: column nowrap;
+	justify-content: center;
+	justify-items: center;
+	align-items: flex-end;
+	align-content: flex-end;
+}

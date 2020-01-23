@@ -2,12 +2,20 @@
 <lcui-app>
 <resource type="text/css" src="test_css_parser.css"/>
 <ui>
-  <widget id="test-window" class="window">
-    <widget class="content">
-      <widget id="test-btn" class="btn">
-        <widget id="test-textview" type="textview" class="text">test</widget>
-      </widget>
-    </widget>
-  </widget>
+  <w id="test-window" class="window">
+    <w class="content">
+      <w id="test-flex-auto"></w>
+      <w id="test-flex-none"></w>
+      <w id="test-flex-initial"></w>
+      <w id="test-flex-1"></w>
+      <w id="test-flex-100px"></w>
+      <w id="test-flex-1-100px"></w>
+      <w id="test-flex-0-0-100px"></w>
+      <w id="test-flex-box"></w>
+      <w id="test-btn" class="btn">
+        <w id="test-textview" type="textview" class="text">test</w>
+      </w>
+    </w>
+  </w>
 </ui>
 </lcui-app>

@@ -103,7 +103,7 @@ static int SplitValues(const char *str, LCUI_Style slist, int max_len, int mode)
 		DEBUG_MSG("[%d] %s\n", vj, values[vj]);
 		if (strcmp(values[vj], "auto") == 0) {
 			slist[vj].type = LCUI_STYPE_AUTO;
-			slist[vj].value = SV_AUTO;
+			slist[vj].val_style = SV_AUTO;
 			slist[vj].is_valid = TRUE;
 			continue;
 		}
@@ -624,6 +624,175 @@ static int OnParseVisibility(LCUI_CSSParserStyleContext ctx, const char *str)
 	return -1;
 }
 
+/* See more: https://developer.mozilla.org/en-US/docs/Web/CSS/flex */
+
+static int OnParseFlex(LCUI_CSSParserStyleContext ctx, const char *str)
+{
+	LCUI_StyleRec s;
+	LCUI_StyleRec slist[3];
+	int i, mode = SPLIT_NUMBER | SPLIT_STYLE;
+
+	if (strcmp("initial", str) == 0) {
+		s.type = LCUI_STYPE_INT;
+		s.is_valid = TRUE;
+		s.val_int = 0;
+		SetCSSProperty(ctx, key_flex_grow, &s);
+
+		s.val_int = 1;
+		SetCSSProperty(ctx, key_flex_shrink, &s);
+
+		s.type = LCUI_STYPE_AUTO;
+		s.val_style = SV_AUTO;
+		SetCSSProperty(ctx, key_flex_basis, &s);
+		return 0;
+	}
+	if (strcmp("auto", str) == 0) {
+		s.type = LCUI_STYPE_INT;
+		s.is_valid = TRUE;
+		s.val_int = 1;
+		SetCSSProperty(ctx, key_flex_grow, &s);
+
+		s.val_int = 1;
+		SetCSSProperty(ctx, key_flex_shrink, &s);
+
+		s.type = LCUI_STYPE_AUTO;
+		s.val_style = SV_AUTO;
+		SetCSSProperty(ctx, key_flex_basis, &s);
+		return 0;
+	}
+	if (strcmp("none", str) == 0) {
+		s.type = LCUI_STYPE_INT;
+		s.is_valid = TRUE;
+		s.val_int = 0;
+		SetCSSProperty(ctx, key_flex_grow, &s);
+
+		s.val_int = 0;
+		SetCSSProperty(ctx, key_flex_shrink, &s);
+
+		s.type = LCUI_STYPE_AUTO;
+		s.val_style = SV_AUTO;
+		SetCSSProperty(ctx, key_flex_basis, &s);
+		return 0;
+	}
+
+	i = SplitValues(str, slist, 3, mode);
+	if (i == 3) {
+		SetCSSProperty(ctx, key_flex_grow, &slist[0]);
+		SetCSSProperty(ctx, key_flex_shrink, &slist[1]);
+		SetCSSProperty(ctx, key_flex_basis, &slist[2]);
+		return 0;
+	}
+	if (i == 2) {
+		SetCSSProperty(ctx, key_flex_shrink, &slist[0]);
+		SetCSSProperty(ctx, key_flex_basis, &slist[1]);
+		return 0;
+	}
+	if (i == 1) {
+		if (slist[0].type == LCUI_STYPE_INT) {
+			SetCSSProperty(ctx, key_flex_grow, &slist[0]);
+			return 0;
+		}
+		SetCSSProperty(ctx, key_flex_basis, &slist[0]);
+		return 0;
+	}
+	return -1;
+}
+
+/* See more: https://developer.mozilla.org/en-US/docs/Web/CSS/flex-flow */
+
+static int OnParseFlexFlow(LCUI_CSSParserStyleContext ctx, const char *str)
+{
+	LCUI_StyleRec s;
+	LCUI_StyleRec slist[2];
+
+	if (strcmp(str, "wrap") == 0) {
+		s.is_valid = TRUE;
+		s.type = LCUI_STYPE_STYLE;
+		s.val_style = SV_WRAP;
+		SetCSSProperty(ctx, key_flex_wrap, &s);
+
+		s.type = LCUI_STYPE_STYLE;
+		s.val_style = SV_INITIAL;
+		SetCSSProperty(ctx, key_flex_direction, &s);
+		return 0;
+	}
+	if (strcmp(str, "nowrap") == 0) {
+		s.is_valid = TRUE;
+		s.type = LCUI_STYPE_STYLE;
+		s.val_style = SV_NOWRAP;
+		SetCSSProperty(ctx, key_flex_wrap, &s);
+
+		s.type = LCUI_STYPE_STYLE;
+		s.val_style = SV_INITIAL;
+		SetCSSProperty(ctx, key_flex_direction, &s);
+		return 0;
+	}
+	if (strcmp(str, "row") == 0) {
+		s.is_valid = TRUE;
+		s.type = LCUI_STYPE_STYLE;
+		s.val_style = SV_ROW;
+		SetCSSProperty(ctx, key_flex_direction, &s);
+
+		s.type = LCUI_STYPE_STYLE;
+		s.val_style = SV_INITIAL;
+		SetCSSProperty(ctx, key_flex_wrap, &s);
+		return 0;
+	}
+	if (strcmp(str, "column") == 0) {
+		s.is_valid = TRUE;
+		s.type = LCUI_STYPE_STYLE;
+		s.val_style = SV_COLUMN;
+		SetCSSProperty(ctx, key_flex_direction, &s);
+
+		s.type = LCUI_STYPE_STYLE;
+		s.val_style = SV_INITIAL;
+		SetCSSProperty(ctx, key_flex_wrap, &s);
+		return 0;
+	}
+	if (SplitValues(str, slist, 2, SPLIT_STYLE) == 2) {
+		SetCSSProperty(ctx, key_flex_direction, &slist[0]);
+		SetCSSProperty(ctx, key_flex_wrap, &slist[1]);
+		return 0;
+	}
+	return -1;
+}
+
+static int OnParseFlexBasis(LCUI_CSSParserStyleContext ctx, const char *str)
+{
+	LCUI_StyleRec s;
+
+	if (OnParseStyleOption(ctx, str) == 0) {
+		return 0;
+	}
+	if (ParseNumber(&s, str)) {
+		SetCSSProperty(ctx, key_flex_basis, &s);
+		return 0;
+	}
+	return -1;
+}
+
+static int OnParseFlexGrow(LCUI_CSSParserStyleContext ctx, const char *str)
+{
+	LCUI_StyleRec s;
+
+	if (ParseNumber(&s, str)) {
+		SetCSSProperty(ctx, key_flex_grow, &s);
+		return 0;
+	}
+	return -1;
+}
+
+static int OnParseFlexShrink(LCUI_CSSParserStyleContext ctx, const char *str)
+{
+	LCUI_StyleRec s;
+
+	if (ParseNumber(&s, str)) {
+		SetCSSProperty(ctx, key_flex_grow, &s);
+		return 0;
+	}
+	return -1;
+}
+
 /** 各个样式的解析器映射表 */
 static LCUI_CSSPropertyParserRec style_parser_map[] = {
 	{ key_width, NULL, OnParseNumber },
@@ -674,7 +843,17 @@ static LCUI_CSSPropertyParserRec style_parser_map[] = {
 	{ key_focusable, NULL, OnParseBoolean },
 	{ key_pointer_events, NULL, OnParseStyleOption },
 	{ key_box_sizing, NULL, OnParseStyleOption },
+
+	{ key_flex_basis, NULL, OnParseFlexBasis },
+	{ key_flex_grow, NULL, OnParseFlexGrow },
+	{ key_flex_shrink, NULL, OnParseFlexShrink },
+	{ key_flex_direction, NULL, OnParseStyleOption },
+	{ key_flex_wrap, NULL, OnParseStyleOption },
 	{ key_justify_content, NULL, OnParseStyleOption },
+	{ key_justify_items, NULL, OnParseStyleOption },
+	{ key_align_content, NULL, OnParseStyleOption },
+	{ key_align_items, NULL, OnParseStyleOption },
+
 	{ -1, "border", OnParseBorder },
 	{ -1, "border-left", OnParseBorderLeft },
 	{ -1, "border-top", OnParseBorderTop },
@@ -687,7 +866,9 @@ static LCUI_CSSPropertyParserRec style_parser_map[] = {
 	{ -1, "padding", OnParsePadding },
 	{ -1, "margin", OnParseMargin },
 	{ -1, "box-shadow", OnParseBoxShadow },
-	{ -1, "background", OnParseBackground }
+	{ -1, "background", OnParseBackground },
+	{ -1, "flex-flow", OnParseFlexFlow },
+	{ -1, "flex", OnParseFlex }
 };
 
 static int CSSParser_ParseComment(LCUI_CSSParserContext ctx)
@@ -939,6 +1120,43 @@ static char *getdirname(const char *path)
 	return dirname;
 }
 
+void CSSParser_EndBuffer(LCUI_CSSParserContext ctx)
+{
+	int i;
+	int pos;
+
+	ctx->buffer[ctx->pos] = 0;
+	for (i = 0, pos = -1; i < ctx->pos && pos != -1; ++i) {
+		switch (ctx->buffer[ctx->pos]) {
+		CASE_WHITE_SPACE:
+			break;
+		default:
+			pos = i;
+			break;
+		}
+	}
+	if (pos != -1) {
+		ctx->pos -= pos;
+		/* trim left */
+		for (i = 0; i < ctx->pos; ++i) {
+			ctx->buffer[i] = ctx->buffer[pos + i];
+		}
+		ctx->buffer[ctx->pos] = 0;
+	}
+	/* trim right */
+	for (pos = -1, --ctx->pos; ctx->pos >= 0 && pos != -1; --ctx->pos) {
+		switch (ctx->buffer[ctx->pos]) {
+		CASE_WHITE_SPACE:
+			ctx->buffer[ctx->pos] = 0;
+			break;
+		default:
+			pos = i;
+			break;
+		}
+	}
+	ctx->pos = 0;
+}
+
 LCUI_CSSParserContext CSSParser_Begin(size_t buffer_size, const char *space)
 {
 	ASSIGN(ctx, LCUI_CSSParserContext);
@@ -1067,7 +1285,6 @@ static void DestroyStyleParser(void *privdata, void *val)
 	free(sp);
 }
 
-/** 初始化 LCUI 的 CSS 代码解析功能 */
 void LCUI_InitCSSParser(void)
 {
 	LCUI_CSSPropertyParser new_sp, sp, sp_end;

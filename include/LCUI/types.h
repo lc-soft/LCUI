@@ -131,11 +131,11 @@ typedef struct LCUI_Rect2F_ {
  * strongly related and should be defined separately where they are needed.
  */
 
-/** 样式值枚举，用于代替使用字符串 */
 typedef enum LCUI_StyleValue {
 	SV_NONE,
 	SV_AUTO,
 	SV_INHERIT,
+	SV_INITIAL,
 	SV_CONTAIN,
 	SV_COVER,
 	SV_LEFT,
@@ -169,7 +169,10 @@ typedef enum LCUI_StyleValue {
 	SV_FLEX,
 	SV_FLEX_START,
 	SV_FLEX_END,
-	SV_NOWRAP
+	SV_WRAP,
+	SV_NOWRAP,
+	SV_ROW,
+	SV_COLUMN
 } LCUI_StyleValue;
 
 /** 样式变量类型 */
@@ -236,7 +239,6 @@ typedef struct LCUI_BorderStyle {
 	float bottom_right_radius;
 } LCUI_BorderStyle;
 
-/** 弹性（Flex）布局相关样式 */
 typedef struct LCUI_FlexLayoutStyle {
 	LCUI_StyleValue wrap : 8;
 	LCUI_StyleValue flow : 8;
@@ -256,7 +258,6 @@ typedef struct LCUI_BorderLine {
 	LCUI_Color color;
 } LCUI_BorderLine;
 
-/** 边框相关参数 */
 typedef struct LCUI_Border {
 	LCUI_BorderLine top, right, bottom, left;
 	unsigned int top_left_radius;
@@ -268,31 +269,30 @@ typedef struct LCUI_Border {
 typedef struct LCUI_Graph_ LCUI_Graph;
 
 typedef struct LCUI_GraphQuote_ {
-	int top;            /**< 源图形中的引用区域的上间距 */
-	int left;           /**< 源图形中的引用区域的左间距 */
-	LCUI_BOOL is_valid; /**< 标志，指示是否引用了另一图形 */
-	LCUI_BOOL is_writable; /**< 标志，指示源图形是否可写 */
+	int top;
+	int left;
+	LCUI_BOOL is_valid;
+	LCUI_BOOL is_writable;
 	union {
-		LCUI_Graph *source;          /**< 所引用的源图形 */
-		const LCUI_Graph *source_ro; /**< 所引用的源图形(只读) */
+		LCUI_Graph *source;
+		const LCUI_Graph *source_ro;
 	};
 } LCUI_GraphQuote;
 
 struct LCUI_Graph_ {
-	unsigned width;        /**< 宽度 */
-	unsigned height;       /**< 高度 */
-	LCUI_GraphQuote quote; /**< 引用记录 */
-	/** 像素数据缓存区 */
+	unsigned width;
+	unsigned height;
+	LCUI_GraphQuote quote;
 	union {
-		uchar_t *bytes; /**< 指针，用于一次访问一个字节的数据 */
-		LCUI_ARGB *argb; /**< 指针，用于一次访问一个像素的数据 */
+		uchar_t *bytes;
+		LCUI_ARGB *argb;
 	};
-	int color_type;           /**< 色彩类型 */
-	unsigned bytes_per_pixel; /**< 每个像素共占多少个字节 */
-	unsigned bytes_per_row;   /**< 每行像素共占多少个字节 */
-	float opacity;    /**< 全局不透明度，取值范围为 0~1.0 */
-	size_t mem_size;  /**< 像素数据缓冲区大小 */
-	uchar_t *palette; /**< 调色板 */
+	int color_type;
+	unsigned bytes_per_pixel;
+	unsigned bytes_per_row;
+	float opacity;
+	size_t mem_size;
+	uchar_t *palette;
 };
 
 typedef struct LCUI_StyleRec_ {

@@ -122,16 +122,26 @@ enum LCUI_StyleKeyName {
 	key_box_shadow_blur,
 	key_box_shadow_color,
 	// box shadow end
-
+	
+	// flex style start
+	key_flex_basis,
+	key_flex_grow,
+	key_flex_shrink,
+	key_flex_direction,
+	key_flex_wrap,
 	key_justify_content,
+	key_justify_items,
+	key_align_content,
+	key_align_items,
+	// flex style end
 
 	key_pointer_events,
 	key_focusable,
 	STYLE_KEY_TOTAL
 };
 
-#define key_flex_style_start	key_justify_content
-#define key_flex_style_end	key_justify_content
+#define key_flex_style_start	key_flex_basis
+#define key_flex_style_end	key_align_content
 #define key_position_start	key_left
 #define key_position_end	key_position
 #define key_margin_start	key_margin_top

@@ -46,12 +46,6 @@ LCUI_BEGIN_HEADER
 		(CTX)->buffer[(ctx)->pos++] = *((CTX)->cur); \
 	} while (0);
 
-#define CSSParser_EndBuffer(CTX)               \
-	do {                                   \
-		(CTX)->buffer[(CTX)->pos] = 0; \
-		(CTX)->pos = 0;                \
-	} while (0);
-
 #define CSSParser_GetRuleParser(CTX) &ctx->rule.parsers[CSS_RULE_FONT_FACE]
 
 typedef enum LCUI_CSSParserTarget {
@@ -180,6 +174,8 @@ LCUI_API LCUI_CSSParserContext CSSParser_Begin(size_t buffer_size,
 					       const char *space);
 
 LCUI_API void CSSParser_EndParseRuleData(LCUI_CSSParserContext ctx);
+
+LCUI_API void CSSParser_EndBuffer(LCUI_CSSParserContext ctx);
 
 LCUI_API void CSSParser_End(LCUI_CSSParserContext ctx);
 
