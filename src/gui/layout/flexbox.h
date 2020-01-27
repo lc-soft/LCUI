@@ -1,7 +1,7 @@
-﻿/*
- * widget_layout.c -- the widget layout processing module.
+/*
+ * flexbox.c -- Flexible Box Layout
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2020, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,19 +28,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_WIDGET_LAYOUT_H
-#define LCUI_WIDGET_LAYOUT_H
+#ifndef LCUI_FLEXBOX_LAYOUT_H
+#define LCUI_FLEXBOX_LAYOUT_H
 
-typedef struct LCUI_WidgetLayoutContextRec_ {
-	int invalid_box;
-	LCUI_BOOL should_add_invalid_area;
-	LCUI_WidgetBoxModelRec box;
-	LCUI_Widget container;
-} LCUI_WidgetLayoutContextRec, *LCUI_WidgetLayoutContext;
-
-LCUI_API void LCUIWidgetLayout_Reflow(LCUI_WidgetLayoutContext ctx);
-
-LCUI_API void LCUIWidgetLayout_ReflowChild(LCUI_WidgetLayoutContext ctx,
-					   LCUI_Widget child);
+void LCUIFlexBoxLayout_Reflow(LCUI_WidgetLayoutContext ctx);
 
 #endif

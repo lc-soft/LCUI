@@ -130,7 +130,6 @@ enum LCUI_StyleKeyName {
 	key_flex_direction,
 	key_flex_wrap,
 	key_justify_content,
-	key_justify_items,
 	key_align_content,
 	key_align_items,
 	// flex style end

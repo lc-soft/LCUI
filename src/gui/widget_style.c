@@ -37,6 +37,7 @@
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/css_fontstyle.h>
+#include "widget_util.h"
 
 #define ARRAY_LEN(ARR) sizeof(ARR) / sizeof(ARR[0])
 
@@ -69,6 +70,311 @@ root {
 );
 
 /* clang-format on */
+
+INLINE int ComputeStyleOption(LCUI_Widget w, int key, int default_value)
+{
+	if (!w->style->sheet[key].is_valid ||
+	    w->style->sheet[key].type != LCUI_STYPE_STYLE) {
+		return default_value;
+	}
+	return w->style->sheet[key].style;
+}
+
+void Widget_ComputePaddingStyle(LCUI_Widget w)
+{
+	if (!Widget_HasAutoStyle(w, key_padding_top)) {
+		w->padding.top = Widget_ComputeYMetric(w, key_padding_top);
+	}
+	if (!Widget_HasAutoStyle(w, key_padding_right)) {
+		w->padding.right = Widget_ComputeXMetric(w, key_padding_right);
+	}
+	if (!Widget_HasAutoStyle(w, key_padding_bottom)) {
+		w->padding.bottom =
+		    Widget_ComputeYMetric(w, key_padding_bottom);
+	}
+	if (!Widget_HasAutoStyle(w, key_padding_left)) {
+		w->padding.left = Widget_ComputeXMetric(w, key_padding_left);
+	}
+}
+
+void Widget_ComputeMarginStyle(LCUI_Widget w)
+{
+	if (!Widget_HasAutoStyle(w, key_margin_top)) {
+		w->margin.top = Widget_ComputeYMetric(w, key_margin_top);
+	}
+	if (!Widget_HasAutoStyle(w, key_margin_right)) {
+		w->margin.right = Widget_ComputeXMetric(w, key_margin_right);
+	}
+	if (!Widget_HasAutoStyle(w, key_margin_bottom)) {
+		w->margin.bottom = Widget_ComputeYMetric(w, key_margin_bottom);
+	}
+	if (!Widget_HasAutoStyle(w, key_margin_left)) {
+		w->margin.left = Widget_ComputeXMetric(w, key_margin_left);
+	}
+}
+
+void Widget_ComputeProperties(LCUI_Widget w)
+{
+	LCUI_Style s;
+	LCUI_WidgetStyle *style = &w->computed_style;
+
+	s = &w->style->sheet[key_focusable];
+	style->pointer_events =
+	    ComputeStyleOption(w, key_pointer_events, SV_INHERIT);
+	if (s->is_valid && s->type == LCUI_STYPE_BOOL && s->val_bool == 0) {
+		style->focusable = FALSE;
+	} else {
+		style->focusable = TRUE;
+	}
+}
+
+void Widget_ComputeWidthStyle(LCUI_Widget w)
+{
+	LCUI_WidgetStyle *style;
+	const float border_spacing_x = w->padding.left + w->padding.right +
+				       w->computed_style.border.left.width +
+				       w->computed_style.border.right.width;
+
+	style = &w->computed_style;
+	style->max_width = -1;
+	style->min_width = -1;
+	if (Widget_CheckStyleValid(w, key_max_width)) {
+		style->max_width = Widget_ComputeXMetric(w, key_max_width);
+	}
+	if (Widget_CheckStyleValid(w, key_min_width)) {
+		style->min_width = Widget_ComputeXMetric(w, key_min_width);
+	}
+	if (w->computed_style.box_sizing != SV_BORDER_BOX) {
+		if (style->max_width != -1) {
+			style->max_width += border_spacing_x;
+		}
+		if (style->min_width != -1) {
+			style->min_width += border_spacing_x;
+		}
+	}
+	switch (Widget_GetWidthSizingRule(w)) {
+	case LCUI_SIZING_RULE_FIXED:
+		w->width = Widget_ComputeXMetric(w, key_width);
+		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
+			w->width += border_spacing_x;
+		}
+		break;
+	case LCUI_SIZING_RULE_FILL:
+		w->width = w->parent->box.content.width;
+		w->width -= w->margin.left + w->margin.right;
+		break;
+	default:
+		break;
+	}
+	w->width = Widget_GetLimitedWidth(w, w->width);
+}
+
+void Widget_ComputeHeightStyle(LCUI_Widget w)
+{
+	LCUI_WidgetStyle *style;
+	const float border_spacing_y = w->padding.top + w->padding.bottom +
+				       w->computed_style.border.top.width +
+				       w->computed_style.border.bottom.width;
+
+	style = &w->computed_style;
+	style->max_height = -1;
+	style->min_height = -1;
+	if (Widget_CheckStyleValid(w, key_max_height)) {
+		style->max_height = Widget_ComputeYMetric(w, key_max_height);
+	}
+	if (Widget_CheckStyleValid(w, key_min_height)) {
+		style->min_height = Widget_ComputeYMetric(w, key_min_height);
+	}
+	if (w->computed_style.box_sizing != SV_BORDER_BOX) {
+		if (style->max_height != -1) {
+			style->max_height += border_spacing_y;
+		}
+		if (style->min_height != -1) {
+			style->min_height += border_spacing_y;
+		}
+	}
+	switch (Widget_GetHeightSizingRule(w)) {
+	case LCUI_SIZING_RULE_FIXED:
+		w->height = Widget_ComputeYMetric(w, key_height);
+		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
+			w->height += border_spacing_y;
+		}
+		break;
+	default:
+		break;
+	}
+	w->height = Widget_GetLimitedHeight(w, w->height);
+}
+
+void Widget_ComputeSizeStyle(LCUI_Widget w)
+{
+	w->computed_style.box_sizing =
+	    ComputeStyleOption(w, key_box_sizing, SV_CONTENT_BOX);
+	Widget_ComputeWidthStyle(w);
+	Widget_ComputeHeightStyle(w);
+}
+
+void Widget_ComputeFlexBasisStyle(LCUI_Widget w)
+{
+	LCUI_FlexBoxLayoutStyle *flex = &w->computed_style.flex;
+
+	if (w->parent &&
+	    w->parent->computed_style.flex.direction == SV_COLUMN) {
+		if (Widget_HasAutoStyle(w, key_flex_basis)) {
+			if (!Widget_HasStaticHeight(w)) {
+				flex->basis =
+				    ToBorderBoxWidth(w, w->min_content_height);
+				return;
+			}
+			flex->basis = Widget_ComputeYMetric(w, key_height);
+			return;
+		}
+		flex->basis = Widget_ComputeYMetric(w, key_flex_basis);
+		return;
+	}
+	if (Widget_HasAutoStyle(w, key_flex_basis)) {
+		if (Widget_HasStaticWidth(w)) {
+			flex->basis = Widget_ComputeXMetric(w, key_width);
+			return;
+		}
+		flex->basis = ToBorderBoxWidth(w, w->min_content_width);
+		return;
+	}
+	flex->basis = Widget_ComputeXMetric(w, key_flex_basis);
+}
+
+void Widget_ComputeVisibilityStyle(LCUI_Widget w)
+{
+	LCUI_Style s = &w->style->sheet[key_visibility];
+
+	if (w->computed_style.display == SV_NONE) {
+		w->computed_style.visible = FALSE;
+	} else if (s->is_valid && s->type == LCUI_STYPE_STRING &&
+		   strcmp(s->val_string, "hidden") == 0) {
+		w->computed_style.visible = FALSE;
+	} else {
+		w->computed_style.visible = TRUE;
+	}
+}
+
+void Widget_ComputeDisplayStyle(LCUI_Widget w)
+{
+	LCUI_Style s = &w->style->sheet[key_display];
+	LCUI_WidgetStyle *style = &w->computed_style;
+
+	if (s->is_valid && s->type == LCUI_STYPE_STYLE) {
+		style->display = s->style;
+		if (style->display == SV_NONE) {
+			w->computed_style.visible = FALSE;
+		}
+	} else {
+		style->display = SV_BLOCK;
+	}
+	Widget_ComputeVisibilityStyle(w);
+}
+
+void Widget_ComputeOpacityStyle(LCUI_Widget w)
+{
+	float opacity = 1.0;
+	LCUI_Style s = &w->style->sheet[key_opacity];
+
+	if (s->is_valid) {
+		switch (s->type) {
+		case LCUI_STYPE_INT:
+			opacity = 1.0f * s->val_int;
+			break;
+		case LCUI_STYPE_SCALE:
+			opacity = s->val_scale;
+			break;
+		default:
+			opacity = 1.0f;
+			break;
+		}
+		if (opacity > 1.0) {
+			opacity = 1.0;
+		} else if (opacity < 0.0) {
+			opacity = 0.0;
+		}
+	}
+	w->computed_style.opacity = opacity;
+}
+
+void Widget_ComputeZIndexStyle(LCUI_Widget w)
+{
+	LCUI_Style s = &w->style->sheet[key_z_index];
+
+	if (s->is_valid && s->type == LCUI_STYPE_INT) {
+		w->computed_style.z_index = s->val_int;
+	} else {
+		w->computed_style.z_index = 0;
+	}
+}
+
+void Widget_ComputePositionStyle(LCUI_Widget w)
+{
+	int position = ComputeStyleOption(w, key_position, SV_STATIC);
+	int valign = ComputeStyleOption(w, key_vertical_align, SV_TOP);
+
+	w->computed_style.vertical_align = valign;
+	w->computed_style.left = Widget_ComputeXMetric(w, key_left);
+	w->computed_style.right = Widget_ComputeXMetric(w, key_right);
+	w->computed_style.top = Widget_ComputeYMetric(w, key_top);
+	w->computed_style.bottom = Widget_ComputeYMetric(w, key_bottom);
+	w->computed_style.position = position;
+	Widget_ComputeZIndexStyle(w);
+}
+
+void Widget_ComputeFlexBoxStyle(LCUI_Widget w)
+{
+	LCUI_Style s = w->style->sheet;
+	LCUI_FlexBoxLayoutStyle *flex = &w->computed_style.flex;
+
+	if (!Widget_IsFlexLayoutStyleWorks(w)) {
+		return;
+	}
+
+	/* Reset to default value */
+
+	flex->grow = 0;
+	flex->shrink = 1;
+	flex->wrap = SV_NOWRAP;
+	flex->direction = SV_ROW;
+	flex->justify_content = SV_NORMAL;
+	flex->align_content = SV_NORMAL;
+	flex->align_items = SV_NORMAL;
+
+	/* Compute style */
+
+	if (s[key_flex_grow].is_valid &&
+	    s[key_flex_grow].type == LCUI_STYPE_INT) {
+		flex->grow = s[key_flex_grow].val_int;
+	}
+	if (s[key_flex_shrink].is_valid &&
+	    s[key_flex_shrink].type == LCUI_STYPE_INT) {
+		flex->shrink = s[key_flex_shrink].val_int;
+	}
+	if (s[key_flex_wrap].is_valid &&
+	    s[key_flex_wrap].type == LCUI_STYPE_STYLE) {
+		flex->wrap = s[key_flex_wrap].val_style;
+	}
+	if (s[key_flex_direction].is_valid &&
+	    s[key_flex_direction].type == LCUI_STYPE_STYLE) {
+		flex->direction = s[key_flex_direction].val_style;
+	}
+	if (s[key_justify_content].is_valid &&
+	    s[key_justify_content].type == LCUI_STYPE_STYLE) {
+		flex->justify_content = s[key_justify_content].val_style;
+	}
+	if (s[key_align_content].is_valid &&
+	    s[key_align_content].type == LCUI_STYPE_STYLE) {
+		flex->align_content = s[key_align_content].val_style;
+	}
+	if (s[key_align_items].is_valid &&
+	    s[key_align_items].type == LCUI_STYPE_STYLE) {
+		flex->align_items = s[key_align_items].val_style;
+	}
+	Widget_ComputeFlexBasisStyle(w);
+}
 
 LCUI_SelectorNode Widget_GetSelectorNode(LCUI_Widget w)
 {
@@ -247,17 +553,14 @@ void Widget_AddTaskByStyle(LCUI_Widget w, int key)
 	LCUI_TaskStatus task_status[] = {
 		{ key_visibility, key_visibility, LCUI_WTASK_VISIBLE, TRUE },
 		{ key_display, key_display, LCUI_WTASK_DISPLAY, TRUE },
-		{ key_flex_style_start, key_flex_style_end, LCUI_WTASK_REFLOW,
+		{ key_flex_style_start, key_flex_style_end, LCUI_WTASK_FLEX,
 		  TRUE },
 		{ key_opacity, key_opacity, LCUI_WTASK_OPACITY, TRUE },
 		{ key_z_index, key_z_index, LCUI_WTASK_ZINDEX, TRUE },
 		{ key_width, key_height, LCUI_WTASK_RESIZE, TRUE },
-		{ key_min_width, key_max_height, LCUI_WTASK_RESIZE,
-		  TRUE },
-		{ key_padding_start, key_padding_end,
-		  LCUI_WTASK_RESIZE, TRUE },
-		{ key_box_sizing, key_box_sizing,
-		  LCUI_WTASK_RESIZE, TRUE },
+		{ key_min_width, key_max_height, LCUI_WTASK_RESIZE, TRUE },
+		{ key_padding_start, key_padding_end, LCUI_WTASK_RESIZE, TRUE },
+		{ key_box_sizing, key_box_sizing, LCUI_WTASK_RESIZE, TRUE },
 		{ key_margin_start, key_margin_end, LCUI_WTASK_MARGIN, TRUE },
 		{ key_position_start, key_position_end, LCUI_WTASK_POSITION,
 		  TRUE },

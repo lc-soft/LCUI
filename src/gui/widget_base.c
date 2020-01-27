@@ -37,6 +37,7 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/metrics.h>
+#include "widget_util.h"
 
 static struct LCUI_WidgetModule {
 	LCUI_Widget root; /**< 根级部件 */
@@ -87,14 +88,6 @@ static void Widget_Init(LCUI_Widget widget)
 	widget->computed_style.position = SV_STATIC;
 	widget->computed_style.pointer_events = SV_INHERIT;
 	widget->computed_style.box_sizing = SV_CONTENT_BOX;
-	widget->computed_style.margin.top.type = LCUI_STYPE_PX;
-	widget->computed_style.margin.right.type = LCUI_STYPE_PX;
-	widget->computed_style.margin.bottom.type = LCUI_STYPE_PX;
-	widget->computed_style.margin.left.type = LCUI_STYPE_PX;
-	widget->computed_style.padding.top.type = LCUI_STYPE_PX;
-	widget->computed_style.padding.right.type = LCUI_STYPE_PX;
-	widget->computed_style.padding.bottom.type = LCUI_STYPE_PX;
-	widget->computed_style.padding.left.type = LCUI_STYPE_PX;
 	LinkedList_Init(&widget->children);
 	LinkedList_Init(&widget->children_show);
 	widget->node.data = widget;
@@ -595,6 +588,50 @@ LCUI_BOOL Widget_HasStaticWidthParent(LCUI_Widget widget)
 	return FALSE;
 }
 
+LCUI_SizingRule Widget_GetWidthSizingRule(LCUI_Widget w)
+{
+	if (!Widget_HasAutoStyle(w, key_width)) {
+		return LCUI_SIZING_RULE_FIXED;
+	}
+	if (Widget_HasAbsolutePosition(w)) {
+		return LCUI_SIZING_RULE_FIT_CONTENT;
+	}
+	if (!w->parent) {
+		return LCUI_SIZING_RULE_FIT_CONTENT;
+	}
+	if (w->parent->computed_style.display == SV_FLEX) {
+		if (w->parent->computed_style.flex.direction == SV_COLUMN) {
+			return LCUI_SIZING_RULE_FILL;
+		}
+		return LCUI_SIZING_RULE_NONE;
+	}
+	if (w->computed_style.display == SV_BLOCK ||
+	    w->computed_style.display == SV_FLEX) {
+		return LCUI_SIZING_RULE_FILL;
+	}
+	return LCUI_SIZING_RULE_FIT_CONTENT;
+}
+
+LCUI_SizingRule Widget_GetHeightSizingRule(LCUI_Widget w)
+{
+	if (!Widget_HasAutoStyle(w, key_height)) {
+		return LCUI_SIZING_RULE_FIXED;
+	}
+	if (Widget_HasAbsolutePosition(w)) {
+		return LCUI_SIZING_RULE_FIT_CONTENT;
+	}
+	if (!w->parent) {
+		return LCUI_SIZING_RULE_FIT_CONTENT;
+	}
+	if (w->parent->computed_style.display == SV_FLEX) {
+		if (w->parent->computed_style.flex.direction == SV_COLUMN) {
+			return LCUI_SIZING_RULE_NONE;
+		}
+		return LCUI_SIZING_RULE_FILL;
+	}
+	return LCUI_SIZING_RULE_FIT_CONTENT;
+}
+
 LCUI_BOOL Widget_HasFitContentWidth(LCUI_Widget w)
 {
 	if (!Widget_HasAutoStyle(w, key_width)) {
@@ -607,6 +644,18 @@ LCUI_BOOL Widget_HasFitContentWidth(LCUI_Widget w)
 		return TRUE;
 	}
 	return FALSE;
+}
+
+LCUI_BOOL Widget_HasStaticWidth(LCUI_Widget w)
+{
+	return !Widget_HasAutoStyle(w, key_width) &&
+	       !Widget_CheckStyleType(w, key_width, scale);
+}
+
+LCUI_BOOL Widget_HasStaticHeight(LCUI_Widget w)
+{
+	return !Widget_HasAutoStyle(w, key_height) &&
+	       !Widget_CheckStyleType(w, key_height, scale);
 }
 
 void Widget_SetText(LCUI_Widget w, const char *text)
@@ -686,32 +735,54 @@ void Widget_UpdateCanvasBox(LCUI_Widget w)
 
 void Widget_UpdateBoxSize(LCUI_Widget w)
 {
-	const float padding_x = w->padding.left + w->padding.right;
-	const float padding_y = w->padding.top + w->padding.bottom;
-	const float border_x = w->computed_style.border.left.width +
-			       w->computed_style.border.right.width;
-	const float border_y = w->computed_style.border.top.width +
-			       w->computed_style.border.bottom.width;
-	const float margin_x = w->margin.left + w->margin.right;
-	const float margin_y = w->margin.top + w->margin.bottom;
-
+	w->width = Widget_GetLimitedWidth(w, w->width);
+	w->height = Widget_GetLimitedHeight(w, w->height);
 	w->box.border.width = w->width;
 	w->box.border.height = w->height;
-	w->box.padding.width = w->box.border.width - border_x;
-	w->box.padding.height = w->box.border.height - border_y;
-	w->box.content.width = w->box.padding.width - padding_x;
-	w->box.content.height = w->box.padding.height - padding_y;
-	w->box.outer.width = w->box.border.width + margin_x;
-	w->box.outer.height = w->box.border.height + margin_y;
+	w->box.padding.width = w->box.border.width - BorderX(w);
+	w->box.padding.height = w->box.border.height - BorderY(w);
+	w->box.content.width = w->box.padding.width - PaddingX(w);
+	w->box.content.height = w->box.padding.height - PaddingY(w);
+	w->box.outer.width = w->box.border.width + MarginX(w);
+	w->box.outer.height = w->box.border.height + MarginY(w);
 	w->box.canvas.width = Widget_GetCanvasWidth(w);
 	w->box.canvas.height = Widget_GetCanvasHeight(w);
 }
 
 void Widget_SetBorderBoxSize(LCUI_Widget w, float width, float height)
 {
-	w->width = Widget_GetLimitedWidth(w, width);
-	w->height = Widget_GetLimitedHeight(w, height);
+	w->width = width;
+	w->height = height;
 	Widget_UpdateBoxSize(w);
+}
+
+void Widget_SetContentSize(LCUI_Widget w, float width, float height)
+{
+	LCUI_SizingRule width_sizing = Widget_GetWidthSizingRule(w);
+	LCUI_SizingRule height_sizing = Widget_GetHeightSizingRule(w);
+
+	w->min_content_width = width;
+	w->min_content_height = height;
+	if (width_sizing != LCUI_SIZING_RULE_FIT_CONTENT) {
+		width = w->box.content.width;
+	}
+	if (height_sizing != LCUI_SIZING_RULE_FIT_CONTENT) {
+		height = w->box.content.height;
+	}
+	if (w->proto && w->proto->autosize) {
+		w->proto->autosize(w, &width, &height);
+		w->min_content_width = max(width, w->min_content_width);
+		w->min_content_height = max(height, w->min_content_height);
+		if (width_sizing != LCUI_SIZING_RULE_FIT_CONTENT) {
+			width = w->box.content.width;
+		}
+		if (height_sizing != LCUI_SIZING_RULE_FIT_CONTENT) {
+			height = w->box.content.height;
+		}
+	}
+	width = width + PaddingX(w) + BorderX(w);
+	height = height + PaddingY(w) + BorderY(w);
+	Widget_SetBorderBoxSize(w, width, height);
 }
 
 void LCUIWidget_InitBase(void)

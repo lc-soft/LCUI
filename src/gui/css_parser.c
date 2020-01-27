@@ -850,7 +850,6 @@ static LCUI_CSSPropertyParserRec style_parser_map[] = {
 	{ key_flex_direction, NULL, OnParseStyleOption },
 	{ key_flex_wrap, NULL, OnParseStyleOption },
 	{ key_justify_content, NULL, OnParseStyleOption },
-	{ key_justify_items, NULL, OnParseStyleOption },
 	{ key_align_content, NULL, OnParseStyleOption },
 	{ key_align_items, NULL, OnParseStyleOption },
 

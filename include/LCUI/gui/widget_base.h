@@ -52,12 +52,10 @@ typedef struct LCUI_WidgetStyle {
 	LCUI_StyleValue display;		/**< 显示方式，决定以何种布局显示该部件 */
 	LCUI_StyleValue box_sizing;		/**< 以何种方式计算宽度和高度 */
 	LCUI_StyleValue vertical_align;		/**< 垂直对齐方式 */
-	LCUI_BoundBox margin;			/**< 外边距 */
-	LCUI_BoundBox padding;			/**< 内边距 */
 	LCUI_BorderStyle border;		/**< 边框 */
 	LCUI_BoxShadowStyle shadow;		/**< 盒形阴影 */
 	LCUI_BackgroundStyle background;	/**< 背景 */
-	LCUI_FlexLayoutStyle flex;		/**< 弹性布局相关样式 */
+	LCUI_FlexBoxLayoutStyle flex;		/**< 弹性盒子布局相关样式 */
 	int pointer_events;			/**< 事件的处理方式 */
 } LCUI_WidgetStyle;
 
@@ -83,6 +81,7 @@ typedef enum LCUI_WidgetTaskType {
 	LCUI_WTASK_MARGIN,
 	LCUI_WTASK_VISIBLE,
 	LCUI_WTASK_DISPLAY,
+	LCUI_WTASK_FLEX,
 	LCUI_WTASK_SHADOW,
 	LCUI_WTASK_BORDER,
 	LCUI_WTASK_BACKGROUND,
@@ -255,8 +254,15 @@ typedef struct LCUI_WidgetRec_ {
 	float			layout_x, layout_y;
 	
 	/**
+	 * The smallest size a box could take that doesn’t lead to overflow
+	 * that could be avoided by choosing a larger size. 
+	 */
+	float			min_content_width;
+	float			min_content_height;
+
+	/**
 	 * Geometric parameters (readonly)
-	 * their values come from the box.border
+	 * Their values come from the box.border
 	 */
 	float			x, y;
 	float			width, height;
@@ -348,6 +354,13 @@ typedef struct LCUI_WidgetRec_ {
 	(Widget_CheckStyleType(W, key_width, scale) && \
 	 !Widget_HasStaticWidthParent(W))
 
+INLINE LCUI_BOOL Widget_IsFlexLayoutStyleWorks(LCUI_Widget w)
+{
+	return Widget_HasFlexDisplay(w) ||
+	       (!Widget_HasAbsolutePosition(w) && w->parent &&
+		Widget_HasFlexDisplay(w->parent));
+}
+
 LCUI_API float Widget_ComputeXMetric(LCUI_Widget w, int key);
 
 LCUI_API float Widget_ComputeYMetric(LCUI_Widget w, int key);
@@ -360,6 +373,14 @@ LCUI_API LCUI_BOOL Widget_HasStaticWidthParent(LCUI_Widget widget);
 
 /** 如果部件具有自适应内容的宽度 */
 LCUI_API LCUI_BOOL Widget_HasFitContentWidth(LCUI_Widget w);
+
+LCUI_API LCUI_BOOL Widget_HasStaticWidth(LCUI_Widget w);
+
+LCUI_API LCUI_BOOL Widget_HasStaticHeight(LCUI_Widget w);
+
+LCUI_API LCUI_SizingRule Widget_GetWidthSizingRule(LCUI_Widget w);
+
+LCUI_API LCUI_SizingRule Widget_GetHeightSizingRule(LCUI_Widget w);
 
 /** 获取根级部件 */
 LCUI_API LCUI_Widget LCUIWidget_GetRoot(void);
@@ -502,7 +523,11 @@ LCUI_API void Widget_UpdateCanvasBox(LCUI_Widget w);
 
 LCUI_API void Widget_UpdateBoxSize(LCUI_Widget w);
 
+LCUI_API void Widget_ComputeFlexBasisStyle(LCUI_Widget w);
+
 LCUI_API void Widget_SetBorderBoxSize(LCUI_Widget w, float width, float height);
+
+LCUI_API void Widget_SetContentSize(LCUI_Widget w, float width, float height);
 
 LCUI_API size_t LCUIWidget_ClearTrash(void);
 

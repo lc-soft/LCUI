@@ -70,6 +70,9 @@
     <Filter Include="源文件\image">
       <UniqueIdentifier>{dd6d7c8f-2626-480f-b8ca-002f4a4ce989}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\gui\layout">
+      <UniqueIdentifier>{641b0440-d588-4976-8da9-4a3c43b5a4a3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\LCUI_Build.h">
@@ -308,6 +311,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\config.h">
       <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\gui\layout\block.h">
+      <Filter>源文件\gui\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\gui\layout\flexbox.h">
+      <Filter>源文件\gui\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\gui\widget_util.h">
+      <Filter>源文件\gui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -553,6 +565,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\gui\widget_size.c">
       <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\layout\block.c">
+      <Filter>源文件\gui\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\layout\flexbox.c">
+      <Filter>源文件\gui\layout</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

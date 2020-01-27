@@ -61,6 +61,7 @@ typedef struct LCUI_WidgetTaskDiffRec_ {
 	LCUI_BoxShadowStyle shadow;
 	LCUI_BackgroundStyle background;
 	LCUI_WidgetBoxModelRec box;
+	LCUI_FlexBoxLayoutStyle flex;
 
 	int invalid_box;
 	LCUI_BOOL can_render;
@@ -82,7 +83,6 @@ typedef struct LCUI_WidgetTaskContextRec_ {
 	LCUI_WidgetTaskDiffRec diff;
 	LCUI_WidgetTaskContext parent;
 	LCUI_WidgetTasksProfile profile;
-	LCUI_WidgetLayoutTask layout_task;
 } LCUI_WidgetTaskContextRec;
 
 static struct WidgetTaskModule {
@@ -137,71 +137,6 @@ static void InitStylesheetCacheDict(void)
 	dt->keyDestructor = IntKeyDict_KeyDestructor;
 }
 
-static int ComputeStyleOption(LCUI_Widget w, int key, int default_value)
-{
-	if (!w->style->sheet[key].is_valid ||
-	    w->style->sheet[key].type != LCUI_STYPE_STYLE) {
-		return default_value;
-	}
-	return w->style->sheet[key].style;
-}
-
-static void Widget_ComputePaddingStyle(LCUI_Widget w)
-{
-	int i;
-	LCUI_Style s;
-	LCUI_BoundBox *pbox = &w->computed_style.padding;
-	struct {
-		LCUI_Style sval;
-		float *ival;
-		int key;
-	} pd_map[4] = { { &pbox->top, &w->padding.top, key_padding_top },
-			{ &pbox->right, &w->padding.right, key_padding_right },
-			{ &pbox->bottom, &w->padding.bottom,
-			  key_padding_bottom },
-			{ &pbox->left, &w->padding.left, key_padding_left } };
-
-	/* 内边距的单位暂时都用 px  */
-	for (i = 0; i < 4; ++i) {
-		s = &w->style->sheet[pd_map[i].key];
-		if (!s->is_valid) {
-			pd_map[i].sval->type = LCUI_STYPE_PX;
-			pd_map[i].sval->px = 0.0;
-			*pd_map[i].ival = 0.0;
-			continue;
-		}
-		*pd_map[i].sval = *s;
-		*pd_map[i].ival = LCUIMetrics_Compute(s->value, s->type);
-	}
-}
-
-static void Widget_ComputeMarginStyle(LCUI_Widget w)
-{
-	int i;
-	LCUI_Style s;
-	LCUI_BoundBox *mbox = &w->computed_style.margin;
-	struct {
-		LCUI_Style sval;
-		float *fval;
-		int key;
-	} pd_map[4] = { { &mbox->top, &w->margin.top, key_margin_top },
-			{ &mbox->right, &w->margin.right, key_margin_right },
-			{ &mbox->bottom, &w->margin.bottom, key_margin_bottom },
-			{ &mbox->left, &w->margin.left, key_margin_left } };
-
-	for (i = 0; i < 4; ++i) {
-		s = &w->style->sheet[pd_map[i].key];
-		if (!s->is_valid) {
-			pd_map[i].sval->type = LCUI_STYPE_PX;
-			pd_map[i].sval->px = 0.0;
-			*pd_map[i].fval = 0.0;
-			continue;
-		}
-		*pd_map[i].sval = *s;
-		*pd_map[i].fval = LCUIMetrics_Compute(s->value, s->type);
-	}
-}
-
 static void Widget_OnRefreshStyle(LCUI_Widget w)
 {
 	int i;
@@ -223,93 +158,6 @@ static void Widget_OnSetTitle(LCUI_Widget w)
 	Widget_PostSurfaceEvent(w, LCUI_WEVENT_TITLE, TRUE);
 }
 
-static void Widget_ComputeFlexLayoutStyle(LCUI_Widget w)
-{
-	LCUI_FlexLayoutStyle *data = &w->computed_style.flex;
-	LCUI_Style s = StyleSheet_GetStyle(w->style, key_justify_content);
-
-	if (s->type != LCUI_STYPE_STYLE || !s->is_valid) {
-		data->justify_content = SV_FLEX_START;
-		return;
-	}
-	data->justify_content = s->val_style;
-}
-
-static void Widget_OnUpdateBorder(LCUI_Widget w)
-{
-	Widget_ComputeBorderStyle(w);
-}
-
-static void Widget_OnUpdateVisible(LCUI_Widget w)
-{
-	LCUI_Style s = &w->style->sheet[key_visibility];
-
-	if (w->computed_style.display == SV_NONE) {
-		w->computed_style.visible = FALSE;
-	} else if (s->is_valid && s->type == LCUI_STYPE_STRING &&
-		   strcmp(s->val_string, "hidden") == 0) {
-		w->computed_style.visible = FALSE;
-	} else {
-		w->computed_style.visible = TRUE;
-	}
-}
-
-static void Widget_OnUpdateDisplay(LCUI_Widget w)
-{
-	LCUI_Style s = &w->style->sheet[key_display];
-	LCUI_WidgetStyle *style = &w->computed_style;
-
-	if (s->is_valid && s->type == LCUI_STYPE_STYLE) {
-		style->display = s->style;
-		if (style->display == SV_NONE) {
-			w->computed_style.visible = FALSE;
-		}
-	} else {
-		style->display = SV_BLOCK;
-	}
-	if (w->computed_style.display == SV_FLEX) {
-		Widget_ComputeFlexLayoutStyle(w);
-	}
-	Widget_OnUpdateVisible(w);
-}
-
-static void Widget_OnUpdateOpacity(LCUI_Widget w)
-{
-	float opacity = 1.0;
-	LCUI_Style s = &w->style->sheet[key_opacity];
-
-	if (s->is_valid) {
-		switch (s->type) {
-		case LCUI_STYPE_INT:
-			opacity = 1.0f * s->val_int;
-			break;
-		case LCUI_STYPE_SCALE:
-			opacity = s->val_scale;
-			break;
-		default:
-			opacity = 1.0f;
-			break;
-		}
-		if (opacity > 1.0) {
-			opacity = 1.0;
-		} else if (opacity < 0.0) {
-			opacity = 0.0;
-		}
-	}
-	w->computed_style.opacity = opacity;
-}
-
-static void Widget_OnUpdateZIndex(LCUI_Widget w)
-{
-	LCUI_Style s = &w->style->sheet[key_z_index];
-
-	if (s->is_valid && s->type == LCUI_STYPE_INT) {
-		w->computed_style.z_index = s->val_int;
-	} else {
-		w->computed_style.z_index = 0;
-	}
-}
-
 static void Widget_OnUpdateContentBox(LCUI_Widget w)
 {
 	LinkedListNode *node;
@@ -317,118 +165,6 @@ static void Widget_OnUpdateContentBox(LCUI_Widget w)
 	for (LinkedList_Each(node, &w->children)) {
 		Widget_AddTask(node->data, LCUI_WTASK_POSITION);
 		Widget_AddTask(node->data, LCUI_WTASK_RESIZE);
-	}
-}
-
-static void Widget_OnUpdatePosition(LCUI_Widget w)
-{
-	int position = ComputeStyleOption(w, key_position, SV_STATIC);
-	int valign = ComputeStyleOption(w, key_vertical_align, SV_TOP);
-
-	w->computed_style.vertical_align = valign;
-	w->computed_style.left = Widget_ComputeXMetric(w, key_left);
-	w->computed_style.right = Widget_ComputeXMetric(w, key_right);
-	w->computed_style.top = Widget_ComputeYMetric(w, key_top);
-	w->computed_style.bottom = Widget_ComputeYMetric(w, key_bottom);
-	w->computed_style.position = position;
-	Widget_OnUpdateZIndex(w);
-}
-
-static void Widget_OnUpdateMargin(LCUI_Widget w)
-{
-	Widget_ComputeMarginStyle(w);
-}
-
-static void Widget_OnUpdatePadding(LCUI_Widget w)
-{
-	Widget_ComputePaddingStyle(w);
-}
-
-static void Widget_OnUpdateSize(LCUI_Widget w)
-{
-	LCUI_WidgetStyle *style;
-	const float border_spacing_x = w->padding.left + w->padding.right +
-				       w->computed_style.border.left.width +
-				       w->computed_style.border.right.width;
-	const float border_spacing_y = w->padding.top + w->padding.bottom +
-				       w->computed_style.border.top.width +
-				       w->computed_style.border.bottom.width;
-
-	style = &w->computed_style;
-	style->max_width = -1;
-	style->min_width = -1;
-	style->max_height = -1;
-	style->min_height = -1;
-	style->box_sizing =
-	    ComputeStyleOption(w, key_box_sizing, SV_CONTENT_BOX);
-	if (Widget_CheckStyleValid(w, key_max_width)) {
-		style->max_width = Widget_ComputeXMetric(w, key_max_width);
-	}
-	if (Widget_CheckStyleValid(w, key_min_width)) {
-		style->min_width = Widget_ComputeXMetric(w, key_min_width);
-	}
-	if (Widget_CheckStyleValid(w, key_max_height)) {
-		style->max_height = Widget_ComputeYMetric(w, key_max_height);
-	}
-	if (Widget_CheckStyleValid(w, key_min_height)) {
-		style->min_height = Widget_ComputeYMetric(w, key_min_height);
-	}
-	if (w->computed_style.box_sizing != SV_BORDER_BOX) {
-		if (style->max_width != -1) {
-			style->max_width += border_spacing_x;
-		}
-		if (style->min_width != -1) {
-			style->min_width += border_spacing_x;
-		}
-		if (style->max_height != -1) {
-			style->max_height += border_spacing_y;
-		}
-		if (style->min_height != -1) {
-			style->min_height += border_spacing_y;
-		}
-	}
-	if (w->parent && Widget_HasFillAvailableWidth(w) &&
-	    Widget_HasAutoStyle(w, key_width)) {
-		w->width = w->parent->box.content.width;
-		w->width -= w->margin.left + w->margin.right;
-	} else {
-		w->width = Widget_ComputeXMetric(w, key_width);
-		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
-			w->width += border_spacing_x;
-		}
-	}
-	if (!Widget_HasAutoStyle(w, key_height)) {
-		w->height = Widget_ComputeYMetric(w, key_height);
-		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
-			w->height += border_spacing_y;
-		}
-	}
-	w->width = Widget_GetLimitedWidth(w, w->width);
-	w->height = Widget_GetLimitedHeight(w, w->height);
-}
-
-static void Widget_OnUpdateBoxShadow(LCUI_Widget w)
-{
-	Widget_ComputeBoxShadowStyle(w);
-}
-
-static void Widget_OnUpdateBackground(LCUI_Widget w)
-{
-	Widget_ComputeBackgroundStyle(w);
-}
-
-static void Widget_OnUpdateProps(LCUI_Widget w)
-{
-	LCUI_Style s;
-	LCUI_WidgetStyle *style = &w->computed_style;
-
-	s = &w->style->sheet[key_focusable];
-	style->pointer_events =
-	    ComputeStyleOption(w, key_pointer_events, SV_INHERIT);
-	if (s->is_valid && s->type == LCUI_STYPE_BOOL && s->val_bool == 0) {
-		style->focusable = FALSE;
-	} else {
-		style->focusable = TRUE;
 	}
 }
 
@@ -469,7 +205,7 @@ void Widget_AddTask(LCUI_Widget widget, int task)
 	if (widget->state == LCUI_WSTATE_DELETED) {
 		return;
 	}
-	DEBUG_MSG("%s, %d\n", widget->type, task);
+	DEBUG_MSG("[%lu] %s, %d\n", widget->index, widget->type, task);
 	widget->task.for_self = TRUE;
 	widget->task.states[task] = TRUE;
 	widget = widget->parent;
@@ -482,23 +218,23 @@ void Widget_AddTask(LCUI_Widget widget, int task)
 
 void LCUIWidget_InitTasks(void)
 {
-#define SetHandler(NAME, HANDLER) \
-	self.handlers[LCUI_WTASK_##NAME] = Widget_On##HANDLER
-	SetHandler(VISIBLE, UpdateVisible);
-	SetHandler(POSITION, UpdatePosition);
-	SetHandler(RESIZE, UpdateSize);
-	SetHandler(SHADOW, UpdateBoxShadow);
-	SetHandler(BORDER, UpdateBorder);
-	SetHandler(OPACITY, UpdateOpacity);
-	SetHandler(MARGIN, UpdateMargin);
-	SetHandler(PADDING, UpdatePadding);
-	SetHandler(TITLE, SetTitle);
-	SetHandler(UPDATE_STYLE, UpdateStyle);
-	SetHandler(REFRESH_STYLE, RefreshStyle);
-	SetHandler(BACKGROUND, UpdateBackground);
-	SetHandler(ZINDEX, UpdateZIndex);
-	SetHandler(DISPLAY, UpdateDisplay);
-	SetHandler(PROPS, UpdateProps);
+#define SetHandler(NAME, HANDLER) self.handlers[LCUI_WTASK_##NAME] = HANDLER
+	SetHandler(VISIBLE, Widget_ComputeVisibilityStyle);
+	SetHandler(POSITION, Widget_ComputePositionStyle);
+	SetHandler(RESIZE, Widget_ComputeSizeStyle);
+	SetHandler(SHADOW, Widget_ComputeBoxShadowStyle);
+	SetHandler(BORDER, Widget_ComputeBorderStyle);
+	SetHandler(OPACITY, Widget_ComputeOpacityStyle);
+	SetHandler(MARGIN, Widget_ComputeMarginStyle);
+	SetHandler(PADDING, Widget_ComputePaddingStyle);
+	SetHandler(BACKGROUND, Widget_ComputeBackgroundStyle);
+	SetHandler(ZINDEX, Widget_ComputeZIndexStyle);
+	SetHandler(DISPLAY, Widget_ComputeDisplayStyle);
+	SetHandler(FLEX, Widget_ComputeFlexBoxStyle);
+	SetHandler(PROPS, Widget_ComputeProperties);
+	SetHandler(UPDATE_STYLE, Widget_OnUpdateStyle);
+	SetHandler(REFRESH_STYLE, Widget_OnRefreshStyle);
+	SetHandler(TITLE, Widget_OnSetTitle);
 	self.handlers[LCUI_WTASK_REFLOW] = NULL;
 	InitStylesheetCacheDict();
 	self.refresh_all = TRUE;
@@ -556,6 +292,7 @@ static void Widget_BeginDiff(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 		ctx->diff.shadow = style->shadow;
 		ctx->diff.border = style->border;
 		ctx->diff.background = style->background;
+		ctx->diff.flex = style->flex;
 		ctx->diff.box = w->box;
 	}
 }
@@ -563,6 +300,9 @@ static void Widget_BeginDiff(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 INLINE void Widget_AddReflowTask(LCUI_Widget w)
 {
 	if (w) {
+		if (w->parent && Widget_IsFlexLayoutStyleWorks(w)) {
+			Widget_AddTask(w->parent, LCUI_WTASK_REFLOW);
+		}
 		Widget_AddTask(w, LCUI_WTASK_REFLOW);
 	}
 }
@@ -588,18 +328,31 @@ static int Widget_EndDiff(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 
 	/* check layout related property changes */
 
-	if (w->width != diff->width || w->height != diff->height ||
-	    MEMCMP(&diff->padding, &w->padding)) {
+	Widget_UpdateBoxSize(w);
+	Widget_UpdateBoxPosition(w);
+	if (MEMCMP(&diff->box.padding, &w->box.padding)) {
 		diff->invalid_box = SV_GRAPH_BOX;
-		Widget_UpdateBoxSize(w);
-		Widget_UpdateBoxPosition(w);
 		Widget_OnUpdateContentBox(w);
-		Widget_AddTask(w, LCUI_WTASK_REFLOW);
-	} else if (style->position != SV_STATIC &&
-		   (diff->left != style->left || diff->right != style->right ||
-		    diff->top != style->top || diff->bottom != style->bottom)) {
+		Widget_AddReflowTask(w);
+	} else if (MEMCMP(&diff->box.outer, &w->box.outer)) {
 		diff->invalid_box = SV_GRAPH_BOX;
-		Widget_UpdateBoxPosition(w);
+		Widget_AddReflowTask(w->parent);
+	} else if (MEMCMP(&diff->box.canvas, &w->box.canvas)) {
+		diff->invalid_box = SV_GRAPH_BOX;
+	}
+	if (Widget_IsFlexLayoutStyleWorks(w)) {
+		if (diff->flex.wrap != style->flex.wrap ||
+		    diff->flex.direction != style->flex.direction ||
+		    diff->flex.justify_content != style->flex.justify_content ||
+		    diff->flex.align_content != style->flex.align_content ||
+		    diff->flex.align_items != style->flex.align_items) {
+			Widget_AddReflowTask(w);
+		}
+		if (diff->flex.grow != style->flex.grow ||
+		    diff->flex.shrink != style->flex.shrink ||
+		    diff->flex.basis != style->flex.basis) {
+			Widget_AddReflowTask(w->parent);
+		}
 	}
 	if (diff->display != style->display) {
 		diff->invalid_box = SV_GRAPH_BOX;
@@ -607,16 +360,14 @@ static int Widget_EndDiff(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 			Widget_AddReflowTask(w->parent);
 		}
 		if (style->display != SV_NONE) {
-			Widget_AddTask(w, LCUI_WTASK_REFLOW);
+			Widget_AddReflowTask(w);
 		}
 	} else if (diff->position != style->position) {
 		diff->invalid_box = SV_GRAPH_BOX;
 		if (diff->position == SV_ABSOLUTE ||
 		    style->position == SV_ABSOLUTE) {
-			Widget_AddTask(w, LCUI_WTASK_REFLOW);
+			Widget_AddReflowTask(w);
 		}
-		Widget_AddReflowTask(w->parent);
-	} else if (MEMCMP(&diff->margin, &w->margin)) {
 		Widget_AddReflowTask(w->parent);
 	}
 
@@ -679,7 +430,6 @@ LCUI_WidgetTaskContext Widget_BeginUpdate(LCUI_Widget w,
 	}
 	self_ctx->parent = ctx;
 	self_ctx->style_cache = NULL;
-	self_ctx->layout_task = NULL;
 	for (parent_ctx = ctx; parent_ctx; parent_ctx = parent_ctx->parent) {
 		if (parent_ctx->style_cache) {
 			self_ctx->style_cache = parent_ctx->style_cache;
@@ -883,37 +633,6 @@ static size_t Widget_UpdateChildren(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 	return total;
 }
 
-static LCUI_WidgetLayoutTask WidgetLayoutTask_Create(LCUI_Widget w,
-						     LCUI_WidgetTaskContext ctx)
-{
-	LCUI_WidgetLayoutTask t;
-	LCUI_WidgetTaskContext parent_ctx;
-
-	t = malloc(sizeof(LCUI_WidgetLayoutTaskRec));
-	t->widget = w;
-	t->node.data = t;
-	t->node.prev = t->node.next = NULL;
-	t->ctx.container = w;
-	t->ctx.box = ctx->diff.box;
-	t->ctx.can_render = ctx->diff.can_render;
-	t->ctx.invalid_box = ctx->diff.invalid_box;
-	LinkedList_Init(&t->children);
-	parent_ctx = ctx;
-	while (parent_ctx && !parent_ctx->layout_task) {
-		parent_ctx = parent_ctx->parent;
-	}
-	if (!parent_ctx) {
-		t->parent = NULL;
-		t->ctx.should_add_invalid_area = TRUE;
-		return t;
-	}
-	t->parent = parent_ctx->layout_task;
-	t->ctx.should_add_invalid_area = ctx->diff.should_add_invalid_area &&
-					 t->parent->ctx.should_add_invalid_area;
-	LinkedList_AppendNode(&t->parent->children, &t->node);
-	return t;
-}
-
 static void Widget_UpdateSelf(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 {
 	int i;
@@ -938,6 +657,18 @@ static void Widget_UpdateSelf(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 	Widget_AddState(w, LCUI_WSTATE_UPDATED);
 }
 
+static void Widget_RunReflowTask(LCUI_Widget w, LCUI_WidgetTaskContext task)
+{
+	LCUI_WidgetLayoutContextRec ctx;
+
+	ctx.container = w;
+	ctx.box = task->diff.box;
+	ctx.invalid_box = task->diff.invalid_box;
+	ctx.should_add_invalid_area =
+	    task->diff.can_render && task->diff.should_add_invalid_area;
+	LCUIWidgetLayout_Reflow(&ctx);
+}
+
 static size_t Widget_UpdateWithContext(LCUI_Widget w,
 				       LCUI_WidgetTaskContext ctx)
 {
@@ -952,38 +683,15 @@ static size_t Widget_UpdateWithContext(LCUI_Widget w,
 	if (w->task.for_self) {
 		Widget_UpdateSelf(w, self_ctx);
 	}
-	if (w->task.states[LCUI_WTASK_REFLOW]) {
-		self_ctx->layout_task = WidgetLayoutTask_Create(w, self_ctx);
-		w->task.states[LCUI_WTASK_REFLOW] = FALSE;
-	}
 	if (w->task.for_children) {
 		count += Widget_UpdateChildren(w, self_ctx);
 	}
 	Widget_SortChildrenShow(w);
+	if (w->task.states[LCUI_WTASK_REFLOW]) {
+		Widget_RunReflowTask(w, self_ctx);
+		w->task.states[LCUI_WTASK_REFLOW] = FALSE;
+	}
 	Widget_EndUpdate(self_ctx);
-	return count;
-}
-
-static size_t WidgetLayoutTask_Run(LCUI_WidgetLayoutTask task)
-{
-	static int depth = 0;
-	size_t count = 0;
-	LCUI_WidgetLayoutTask child;
-
-	++depth;
-	DEBUG_MSG("[%d] layout start\n", depth);
-	while (task->children.length > 0) {
-		child = task->children.head.next->data;
-		LinkedList_Unlink(&task->children, &child->node);
-		count += WidgetLayoutTask_Run(child);
-	}
-	if (task->widget) {
-		LCUIWidgetLayout_Reflow(&task->ctx);
-		++count;
-	}
-	free(task);
-	--depth;
-	DEBUG_MSG("[%d] layout end\n", depth);
 	return count;
 }
 
@@ -991,17 +699,11 @@ size_t Widget_Update(LCUI_Widget w)
 {
 	size_t count;
 	LCUI_WidgetTaskContext ctx;
-	LCUI_WidgetLayoutTask task;
 
 	ctx = Widget_BeginUpdate(w, NULL);
 	Widget_InitDiff(w, ctx);
-	task = WidgetLayoutTask_Create(w, ctx);
-	task->widget = NULL;
-	ctx->layout_task = task;
 	count = Widget_UpdateWithContext(w, ctx);
 	Widget_EndUpdate(ctx);
-	WidgetLayoutTask_Run(task);
-	// Widget_PrintTree(w);
 	return count;
 }
 

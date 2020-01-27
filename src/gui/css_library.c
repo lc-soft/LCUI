@@ -187,7 +187,6 @@ static KeyNameGroupRec style_name_map[] = {
 	{ key_flex_shrink, "flex-shrink" },
 	{ key_flex_wrap, "flex-wrap" },
 	{ key_justify_content, "justify-content" },
-	{ key_justify_items, "justify-items" },
 	{ key_align_content, "align-content" },
 	{ key_align_items, "align-items" }
 };
@@ -229,8 +228,13 @@ static KeyNameGroupRec style_value_map[] = {
 	{ SV_BLOCK, "block" },
 	{ SV_INLINE_BLOCK, "inline-block" },
 	{ SV_FLEX, "flex" },
+	{ SV_NORMAL, "normal" },
 	{ SV_FLEX_START, "flex-start" },
 	{ SV_FLEX_END, "flex-end" },
+	{ SV_STRETCH, "stretch" },
+	{ SV_SPACE_BETWEEN, "space-between" },
+	{ SV_SPACE_AROUND, "space-around" },
+	{ SV_SPACE_EVENLY, "space-evenly" },
 	{ SV_NOWRAP, "nowrap" },
 	{ SV_WRAP, "wrap" },
 	{ SV_ROW, "row" },

@@ -134,6 +134,7 @@ typedef struct LCUI_Rect2F_ {
 typedef enum LCUI_StyleValue {
 	SV_NONE,
 	SV_AUTO,
+	SV_NORMAL,
 	SV_INHERIT,
 	SV_INITIAL,
 	SV_CONTAIN,
@@ -169,6 +170,10 @@ typedef enum LCUI_StyleValue {
 	SV_FLEX,
 	SV_FLEX_START,
 	SV_FLEX_END,
+	SV_STRETCH,
+	SV_SPACE_BETWEEN,
+	SV_SPACE_AROUND,
+	SV_SPACE_EVENLY,
 	SV_WRAP,
 	SV_NOWRAP,
 	SV_ROW,
@@ -239,19 +244,6 @@ typedef struct LCUI_BorderStyle {
 	float bottom_right_radius;
 } LCUI_BorderStyle;
 
-typedef struct LCUI_FlexLayoutStyle {
-	LCUI_StyleValue wrap : 8;
-	LCUI_StyleValue flow : 8;
-	LCUI_StyleValue grow : 8;
-	LCUI_StyleValue shrink : 8;
-	LCUI_StyleValue basis : 8;
-	LCUI_StyleValue direction : 8;
-	LCUI_StyleValue align_self : 8;
-	LCUI_StyleValue align_items : 8;
-	LCUI_StyleValue align_content : 8;
-	LCUI_StyleValue justify_content : 8;
-} LCUI_FlexLayoutStyle;
-
 typedef struct LCUI_BorderLine {
 	int style;
 	unsigned int width;
@@ -313,8 +305,8 @@ typedef struct LCUI_StyleRec_ {
 		float val_dip;
 		float sp;
 		float val_sp;
-		int style;
-		int val_style;
+		LCUI_StyleValue style;
+		LCUI_StyleValue val_style;
 		float scale;
 		float val_scale;
 		char *string;
@@ -328,6 +320,57 @@ typedef struct LCUI_StyleRec_ {
 		LCUI_BOOL val_bool;
 	};
 } LCUI_StyleRec, *LCUI_Style;
+
+typedef enum LCUI_SizingRule_ {
+	LCUI_SIZING_RULE_NONE,
+	LCUI_SIZING_RULE_FIXED,
+	LCUI_SIZING_RULE_FILL,
+	LCUI_SIZING_RULE_FIT_CONTENT
+} LCUI_SizingRule;
+
+typedef struct LCUI_FlexLayoutStyle {
+	/**
+	 * The flex shrink factor of a flex item
+	 * See more:
+	 * https://developer.mozilla.org/en-US/docs/Web/CSS/flex-shrink
+	 */
+	float shrink;
+
+	/* the flex grow factor of a flex item main size
+	 * See more: https://developer.mozilla.org/en-US/docs/Web/CSS/flex-grow
+	 */
+	float grow;
+
+	/**
+	 * The initial main size of a flex item
+	 * See more: https://developer.mozilla.org/en-US/docs/Web/CSS/flex-basis
+	 */
+	float basis;
+
+	LCUI_StyleValue wrap : 8;
+	LCUI_StyleValue direction : 8;
+
+	/**
+	 * Sets the align-self value on all direct children as a group
+	 * See more:
+	 * https://developer.mozilla.org/en-US/docs/Web/CSS/align-items
+	 */
+	LCUI_StyleValue align_items : 8;
+
+	/**
+	 * Sets the distribution of space between and around content items along
+	 * a flexbox's cross-axis
+	 * See more: https://developer.mozilla.org/en-US/docs/Web/CSS/align-content
+	 */
+	LCUI_StyleValue align_content : 8;
+
+	/**
+	 * Defines how the browser distributes space between and around content
+	 * items along the main-axis of a flex container See more:
+	 * https://developer.mozilla.org/en-US/docs/Web/CSS/justify-content
+	 */
+	LCUI_StyleValue justify_content : 8;
+} LCUI_FlexBoxLayoutStyle;
 
 typedef struct LCUI_BoundBoxRec {
 	LCUI_StyleRec top, right, bottom, left;

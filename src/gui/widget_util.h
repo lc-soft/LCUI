@@ -1,7 +1,7 @@
 ﻿/*
- * widget_layout.c -- the widget layout processing module.
+ * widget_util.h -- widget utility functions
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2020, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,19 +28,49 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_WIDGET_LAYOUT_H
-#define LCUI_WIDGET_LAYOUT_H
+#ifndef LCUI_WIDGET_UTIL_H
+#define LCUI_WIDGET_UTIL_H
 
-typedef struct LCUI_WidgetLayoutContextRec_ {
-	int invalid_box;
-	LCUI_BOOL should_add_invalid_area;
-	LCUI_WidgetBoxModelRec box;
-	LCUI_Widget container;
-} LCUI_WidgetLayoutContextRec, *LCUI_WidgetLayoutContext;
+INLINE float PaddingX(LCUI_Widget w)
+{
+	return w->padding.left + w->padding.right;
+}
 
-LCUI_API void LCUIWidgetLayout_Reflow(LCUI_WidgetLayoutContext ctx);
+INLINE float PaddingY(LCUI_Widget w)
+{
+	return w->padding.top + w->padding.bottom;
+}
 
-LCUI_API void LCUIWidgetLayout_ReflowChild(LCUI_WidgetLayoutContext ctx,
-					   LCUI_Widget child);
+INLINE float BorderX(LCUI_Widget w)
+{
+	return w->computed_style.border.left.width +
+	       w->computed_style.border.right.width;
+}
+
+INLINE float BorderY(LCUI_Widget w)
+{
+	return w->computed_style.border.top.width +
+	       w->computed_style.border.bottom.width;
+}
+
+INLINE float MarginX(LCUI_Widget w)
+{
+	return w->margin.left + w->margin.right;
+}
+
+INLINE float MarginY(LCUI_Widget w)
+{
+	return w->margin.top + w->margin.bottom;
+}
+
+INLINE float ToBorderBoxWidth(LCUI_Widget w, float content_width)
+{
+	return content_width + PaddingX(w) + BorderX(w);
+}
+
+INLINE float ToBorderBoxHeight(LCUI_Widget w, float content_height)
+{
+	return content_height + PaddingY(w) + BorderY(w);
+}
 
 #endif

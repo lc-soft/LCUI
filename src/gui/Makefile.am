@@ -20,12 +20,17 @@ widget_paint.c 		\
 widget_background.c	\
 widget_border.c		\
 widget_shadow.c		\
+widget_util.h		\
 css_parser.c		\
 css_rule_font_face.c	\
 css_library.c		\
 css_fontstyle.c		\
 builder.c		\
 metrics.c		\
+layout/block.c		\
+layout/block.h		\
+layout/flexbox.c	\
+layout/flexbox.h	\
 widget/textview.c	\
 widget/textcaret.c	\
 widget/textedit.c	\

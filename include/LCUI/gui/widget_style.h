@@ -41,13 +41,39 @@ void LCUIWidget_FreeStyle(void);
 LCUI_API void Widget_PrintStyleSheets(LCUI_Widget w);
 
 /** Set widget style by string */
-LCUI_API void Widget_SetStyleString(LCUI_Widget w, const char *name, const char *value);
+LCUI_API void Widget_SetStyleString(LCUI_Widget w, const char *name,
+				    const char *value);
 
-    /** 更新当前部件的样式 */
+LCUI_API void Widget_ComputePaddingStyle(LCUI_Widget w);
+
+LCUI_API void Widget_ComputeMarginStyle(LCUI_Widget w);
+
+LCUI_API void Widget_ComputeProperties(LCUI_Widget w);
+
+LCUI_API void Widget_ComputeHeightStyle(LCUI_Widget w);
+
+LCUI_API void Widget_ComputeWidthStyle(LCUI_Widget w);
+
+LCUI_API void Widget_ComputeSizeStyle(LCUI_Widget w);
+
+LCUI_API void Widget_ComputeVisibilityStyle(LCUI_Widget w);
+
+LCUI_API void Widget_ComputeDisplayStyle(LCUI_Widget w);
+
+LCUI_API void Widget_ComputeOpacityStyle(LCUI_Widget w);
+
+LCUI_API void Widget_ComputeZIndexStyle(LCUI_Widget w);
+
+LCUI_API void Widget_ComputePositionStyle(LCUI_Widget w);
+
+LCUI_API void Widget_ComputeFlexBoxStyle(LCUI_Widget w);
+
+/** 更新当前部件的样式 */
 LCUI_API void Widget_UpdateStyle(LCUI_Widget w, LCUI_BOOL is_refresh_all);
 
 /** 更新当前部件的子级部件样式 */
-LCUI_API void Widget_UpdateChildrenStyle(LCUI_Widget w, LCUI_BOOL is_refresh_all);
+LCUI_API void Widget_UpdateChildrenStyle(LCUI_Widget w,
+					 LCUI_BOOL is_refresh_all);
 
 LCUI_API void Widget_AddTaskByStyle(LCUI_Widget w, int key);
 
@@ -63,6 +89,7 @@ LCUI_SelectorNode Widget_GetSelectorNode(LCUI_Widget w);
 LCUI_API LCUI_Selector Widget_GetSelector(LCUI_Widget w);
 
 /** 获取样式受到影响的子级部件数量 */
-LCUI_API size_t Widget_GetChildrenStyleChanges(LCUI_Widget w, int type, const char *name);
+LCUI_API size_t Widget_GetChildrenStyleChanges(LCUI_Widget w, int type,
+					       const char *name);
 
 #endif

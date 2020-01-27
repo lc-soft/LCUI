@@ -346,6 +346,9 @@
     <ClInclude Include="..\..\..\include\LCUI\util\uri.h" />
     <ClInclude Include="..\..\..\include\LCUI\worker.h" />
     <ClInclude Include="..\..\..\include\LCUI_Build.h" />
+    <ClInclude Include="..\..\..\src\gui\layout\block.h" />
+    <ClInclude Include="..\..\..\src\gui\layout\flexbox.h" />
+    <ClInclude Include="..\..\..\src\gui\widget_util.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
@@ -365,6 +368,8 @@
     <ClCompile Include="..\..\..\src\gui\css_library.c" />
     <ClCompile Include="..\..\..\src\gui\css_parser.c" />
     <ClCompile Include="..\..\..\src\gui\css_rule_font_face.c" />
+    <ClCompile Include="..\..\..\src\gui\layout\block.c" />
+    <ClCompile Include="..\..\..\src\gui\layout\flexbox.c" />
     <ClCompile Include="..\..\..\src\gui\metrics.c" />
     <ClCompile Include="..\..\..\src\gui\widget.c" />
     <ClCompile Include="..\..\..\src\gui\widget\anchor.c" />
