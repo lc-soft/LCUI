@@ -46,5 +46,6 @@ int test_textview_resize(void);
 int test_textedit(void);
 int test_image_reader(void);
 
-void test_block_layout(void);
 void test_css_parser(void);
+void test_block_layout(void);
+void test_flex_layout(void);

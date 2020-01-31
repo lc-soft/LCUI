@@ -1,0 +1,307 @@
+<html>
+  <head>
+    <title>flex layout</title>
+    <link href="./test_flex_layout.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="example">
+        <div class="example__title">(0) Default</div>
+        <div class="example__content d-flex">
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+        </div>
+      </div>
+      <div class="example">
+        <div class="example__title">(1) justify-content: center;</div>
+        <div class="example__content d-flex justify-content-center">
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+        </div>
+      </div>
+      <div class="example">
+        <div class="example__title">(2) justify-content: flex-end;</div>
+        <div class="example__content d-flex justify-content-end">
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+        </div>
+      </div>
+      <div class="example">
+        <div class="example__title">(3) justify-content: space-between;</div>
+        <div class="example__content d-flex justify-content-space-between">
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+        </div>
+      </div>
+      <div class="example">
+        <div class="example__title">(4) justify-content: space-around;</div>
+        <div class="example__content d-flex justify-content-space-around">
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+        </div>
+      </div>
+      <div class="example">
+        <div class="example__title">(5) Auto margin</div>
+        <div class="example__content d-flex justify-content-center">
+          <div class="box mr-auto">mr-auto</div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box ml-auto">ml-auto</div>
+        </div>
+      </div>
+      <div class="example">
+        <div class="example__title">(6) flex-shrink</div>
+        <div class="example__content d-flex">
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box w-3">width: 150px</div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box w-2">width: 100px</div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box w-4">width: 200px</div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+        </div>
+      </div>
+      <div class="example">
+        <div class="example__title">(7) flex-grow</div>
+        <div class="example__content d-flex">
+          <div class="box flex-auto">auto</div>
+          <div class="box flex-auto">auto</div>
+          <div class="box flex-auto">auto</div>
+        </div>
+        <div class="example__content d-flex">
+          <div class="box flex-auto">auto</div>
+          <div class="box flex-initial">initial</div>
+          <div class="box flex-initial">initial</div>
+        </div>
+        <div class="example__content d-flex">
+          <div class="box flex-auto">auto</div>
+          <div class="box flex-auto">auto</div>
+          <div class="box flex-none">none</div>
+        </div>
+        <div class="example__content d-flex">
+          <div class="box flex-initial">initial</div>
+          <div class="box flex-auto">auto</div>
+          <div class="box flex-auto">auto</div>
+        </div>
+        <div class="example__content d-flex">
+          <div class="box flex-4">flex: 4</div>
+          <div class="box flex-2">flex: 2</div>
+          <div class="box flex-1">flex: 1</div>
+        </div>
+      </div>
+      <div class="example">
+        <div class="example__title">(8) flex-wrap: wrap;</div>
+        <div class="example__content d-flex felx-wrap">
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box w-3">width: 150px</div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box w-2">width: 100px</div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box w-4">width: 200px</div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+        </div>
+      </div>
+      <div class="example">
+        <div class="example__title">(9) flex-wrap: wrap; height: 300px;</div>
+        <div class="example__content d-flex felx-wrap h-6">
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box w-3">width: 150px</div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box w-2">width: 100px</div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box w-4">width: 200px</div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+        </div>
+      </div>
+      <div class="example">
+        <div class="example__title">(10) align-items: center; height: 300px;</div>
+        <div class="example__content d-flex felx-wrap h-6 align-items-center">
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box w-3">width: 150px</div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box w-2">width: 100px</div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box w-4">width: 200px</div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+        </div>
+      </div>
+      <div class="example">
+        <div class="example__title">(11) align-items: end; height: 300px;</div>
+        <div class="example__content d-flex felx-wrap h-6 align-items-end">
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box w-3">width: 150px</div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box w-2">width: 100px</div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box w-4">width: 200px</div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+        </div>
+      </div>
+      <div class="example">
+        <div class="example__title">(12) align-items: stretch; height: 300px;</div>
+        <div class="example__content d-flex felx-wrap h-6 align-items-stretch">
+          <div class="h-auto box">h-auto</div>
+          <div class="h-auto box">h-auto</div>
+          <div class="h-auto box">h-auto</div>
+          <div class="box"></div>
+          <div class="box w-3">width: 150px</div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box w-2">width: 100px</div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box w-4">width: 200px</div>
+          <div class="h-auto box">h-auto</div>
+          <div class="h-auto box">h-auto</div>
+          <div class="h-auto box">h-auto</div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="h-auto box">h-auto</div>
+          <div class="h-auto box">h-auto</div>
+          <div class="box"></div>
+          <div class="box"></div>
+        </div>
+      </div>
+      <div class="example">
+        <div class="example__title">(13) Vertically Centered Layout</div>
+        <div class="example__content d-flex h-6 justify-content-center align-items-center">
+          <div class="box"></div>
+        </div>
+      </div>
+      <div class="example">
+        <div class="example__title">(14) flex-direction: column;</div>
+        <div class="example__content d-flex flex-direction-column felx-wrap h-4">
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box w-3">width: 150px</div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box w-2">width: 100px</div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box w-4">width: 200px</div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+          <div class="box"></div>
+        </div>
+      </div>
+      <div class="example example-holy-grail-layout">
+        <div class="example__title">(15) Holy Grail Layout</div>
+        <div class="example__content">
+          <div class="box w-auto layout__header">Header</div>
+          <div class="layout__body">
+            <div class="box layout__left">Left</div>
+            <div class="box w-auto layout__center">Center</div>
+            <div class="box layout__right">Right</div>
+          </div>
+          <div class="box w-auto layout__footer">Footer</div>
+        </div>
+      </div>
+      <div class="example example-holy-grail-layout">
+        <div class="example__title">(16) Holy Grail Layout (height: 300px)</div>
+        <div class="example__content h-6">
+          <div class="box w-auto layout__header">Header</div>
+          <div class="layout__body">
+            <div class="box layout__left">Left</div>
+            <div class="box w-auto layout__center">Center</div>
+            <div class="box layout__right">Right</div>
+          </div>
+          <div class="box w-auto layout__footer">Footer</div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

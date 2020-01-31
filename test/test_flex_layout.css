@@ -1,0 +1,203 @@
+.example {
+  padding: 5px;
+  background-color: #f1f2f3;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+}
+
+.container {
+  max-width: 600px;
+  width: 100%;
+  padding: 10px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+textview, body {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.example__title {
+  padding: 5px;
+  font-size: 12px;
+  line-height: 22px;
+}
+
+.example__content {
+  padding: 5px;
+  background-color: #fff;
+  overflow: hidden;
+}
+
+.box {
+  width: 50px;
+  height: 50px;
+  background-color: #b8daff;
+  border: 1px solid #7cbbff;
+  box-sizing: border-box;
+  font-size: 12px;
+  padding: 5px
+}
+
+.d-inline-block {
+  display: inline-block;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.d-block {
+  display: block;
+}
+
+.ml-auto {
+  margin-left: auto;
+}
+
+.mr-auto {
+  margin-right: auto;
+}
+
+.ml-0 {
+  margin-left: 0;
+}
+
+.mr-0 {
+  margin-right: 0;
+}
+
+.w-auto {
+  width: auto;
+}
+
+.h-auto {
+  height: auto;
+}
+
+.w-2 {
+  width: 100px;
+}
+
+.w-3 {
+  width: 150px;
+}
+
+.w-4 {
+  width: 200px;
+}
+
+.h-1 {
+  height: 50px;
+}
+
+.h-2 {
+  height: 100px;
+}
+
+.h-3 {
+  height: 150px;
+}
+
+.h-4 {
+  height: 200px;
+}
+
+.h-5 {
+  height: 250px;
+}
+
+.h-6 {
+  height: 300px;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.flex-2 {
+  flex: 2;
+}
+
+.flex-4 {
+  flex: 4;
+}
+
+.flex-auto {
+  flex: auto;
+}
+
+.flex-none {
+  flex: none;
+}
+
+.flex-initial {
+  flex: initial;
+}
+
+.justify-content-center {
+  justify-content: center;
+}
+
+.justify-content-end {
+  justify-content: flex-end;
+}
+
+.justify-content-space-between {
+  justify-content: space-between;
+}
+
+.justify-content-space-around {
+  justify-content: space-around;
+}
+
+.felx-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-direction-column {
+  flex-direction: column;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.align-items-end {
+  align-items: flex-end;
+}
+
+.align-items-stretch {
+  align-items: stretch;
+}
+
+.example-1-flex-default .example__content {
+  display: flex;
+}
+
+.example-holy-grail-layout .example__content {
+  display: flex;
+  flex-direction: column;
+}
+
+.example-holy-grail-layout .box {
+  text-align: center;
+}
+
+.example-holy-grail-layout .layout__body {
+  display: flex;
+  flex: 1 1 auto;
+}
+
+.example-holy-grail-layout .layout__left,
+.example-holy-grail-layout .layout__right {
+  width: 100px;
+  height: 100%;
+  flex: 0 0 auto;
+}
+
+.example-holy-grail-layout .layout__center {
+  flex: 1 1 auto;
+  height: 100%;
+}

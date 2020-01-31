@@ -1,0 +1,307 @@
+<lcui-app>
+  <resource type="text/css" src="test_flex_layout.css"/>
+  <ui>
+    <w id="main">
+      <w class="container">
+        <w class="example">
+          <textview class="example__title">(0) Default</textview>
+          <w class="example__content d-flex">
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+          </w>
+        </w>
+        <w class="example">
+          <textview class="example__title">(1) justify-content: center;</textview>
+          <w class="example__content d-flex justify-content-center">
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+          </w>
+        </w>
+        <w class="example">
+          <textview class="example__title">(2) justify-content: flex-end;</textview>
+          <w class="example__content d-flex justify-content-end">
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+          </w>
+        </w>
+        <w class="example">
+          <textview class="example__title">(3) justify-content: space-between;</textview>
+          <w class="example__content d-flex justify-content-space-between">
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+          </w>
+        </w>
+        <w class="example">
+          <textview class="example__title">(4) justify-content: space-around;</textview>
+          <w class="example__content d-flex justify-content-space-around">
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+          </w>
+        </w>
+        <w class="example">
+          <textview class="example__title">(5) Auto margin</textview>
+          <w class="example__content d-flex justify-content-center">
+            <textview class="box mr-auto">mr-auto</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+            <textview class="box ml-auto">ml-auto</textview>
+          </w>
+        </w>
+        <w class="example">
+          <textview class="example__title">(6) flex-shrink</textview>
+          <w class="example__content d-flex">
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <textview class="box w-3">width: 150px</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+            <textview class="box w-2">width: 100px</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+            <textview class="box w-4">width: 200px</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+          </w>
+        </w>
+        <w class="example">
+          <textview class="example__title">(6) flex-grow</textview>
+          <w class="example__content d-flex">
+            <textview class="box flex-auto">auto</textview>
+            <textview class="box flex-auto">auto</textview>
+            <textview class="box flex-auto">auto</textview>
+          </w>
+          <w class="example__content d-flex">
+            <textview class="box flex-auto">auto</textview>
+            <textview class="box flex-initial">initial</textview>
+            <textview class="box flex-initial">initial</textview>
+          </w>
+          <w class="example__content d-flex">
+            <textview class="box flex-auto">auto</textview>
+            <textview class="box flex-auto">auto</textview>
+            <textview class="box flex-none">none</textview>
+          </w>
+          <w class="example__content d-flex">
+            <textview class="box flex-initial">initial</textview>
+            <textview class="box flex-auto">auto</textview>
+            <textview class="box flex-auto">auto</textview>
+          </w>
+          <w class="example__content d-flex">
+            <textview class="box flex-4">flex: 4</textview>
+            <textview class="box flex-2">flex: 2</textview>
+            <textview class="box flex-1">flex: 1</textview>
+          </w>
+        </w>
+        <w class="example">
+          <textview class="example__title">(7) flex-wrap: wrap;</textview>
+          <w class="example__content d-flex felx-wrap">
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <textview class="box w-3">width: 150px</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+            <textview class="box w-2">width: 100px</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+            <textview class="box w-4">width: 200px</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+          </w>
+        </w>
+        <w class="example">
+          <textview class="example__title">(8) flex-wrap: wrap; height: 300px;</textview>
+          <w class="example__content d-flex felx-wrap h-6">
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <textview class="box w-3">width: 150px</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+            <textview class="box w-2">width: 100px</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+            <textview class="box w-4">width: 200px</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+          </w>
+        </w>
+        <w class="example">
+          <textview class="example__title">(9) align-items: center; height: 300px;</textview>
+          <w class="example__content d-flex felx-wrap h-6 align-items-center">
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <textview class="box w-3">width: 150px</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+            <textview class="box w-2">width: 100px</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+            <textview class="box w-4">width: 200px</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+          </w>
+        </w>
+        <w class="example">
+          <textview class="example__title">(10) align-items: end; height: 300px;</textview>
+          <w class="example__content d-flex felx-wrap h-6 align-items-end">
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <textview class="box w-3">width: 150px</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+            <textview class="box w-2">width: 100px</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+            <textview class="box w-4">width: 200px</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+          </w>
+        </w>
+        <w class="example">
+          <textview class="example__title">(11) align-items: stretch; height: 300px;</textview>
+          <w class="example__content d-flex felx-wrap h-6 align-items-stretch">
+            <textview class="h-auto box">h-auto</textview>
+            <textview class="h-auto box">h-auto</textview>
+            <textview class="h-auto box">h-auto</textview>
+            <w class="box"></w>
+            <textview class="box w-3">width: 150px</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+            <textview class="box w-2">width: 100px</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+            <textview class="box w-4">width: 200px</textview>
+            <textview class="h-auto box">h-auto</textview>
+            <textview class="h-auto box">h-auto</textview>
+            <textview class="h-auto box">h-auto</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+            <textview class="h-auto box">h-auto</textview>
+            <textview class="h-auto box">h-auto</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+          </w>
+        </w>
+        <w class="example">
+          <textview class="example__title">(12) Vertically Centered Layout</textview>
+          <w class="example__content d-flex h-6 justify-content-center align-items-center">
+            <w class="box"></w>
+          </w>
+        </w>
+        <w class="example">
+          <textview class="example__title">(13) flex-direction: column;</textview>
+          <w class="example__content d-flex flex-direction-column felx-wrap h-4">
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <textview class="box w-3">width: 150px</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+            <textview class="box w-2">width: 100px</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+            <textview class="box w-4">width: 200px</textview>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+            <w class="box"></w>
+          </w>
+        </w>
+        <w class="example example-holy-grail-layout">
+          <textview class="example__title">(14) Holy Grail Layout</textview>
+          <w class="example__content">
+            <textview class="box w-auto layout__header">Header</textview>
+            <w class="layout__body">
+              <textview class="box layout__left">Left</textview>
+              <textview class="box w-auto layout__center">Center</textview>
+              <textview class="box layout__right">Right</textview>
+            </w>
+            <textview class="box w-auto layout__footer">Footer</textview>
+          </w>
+        </w>
+        <w class="example example-holy-grail-layout">
+          <textview class="example__title">(15) Holy Grail Layout (height: 300px)</textview>
+          <w class="example__content h-6">
+            <textview class="box w-auto layout__header">Header</textview>
+            <w class="layout__body">
+              <textview class="box layout__left">Left</textview>
+              <textview class="box w-auto layout__center">Center</textview>
+              <textview class="box layout__right">Right</textview>
+            </w>
+            <textview class="box w-auto layout__footer">Footer</textview>
+          </w>
+        </w>
+      </w>
+    </w>
+    <scrollbar target="main" />
+  </ui>
+</lcui-app>

@@ -188,6 +188,7 @@
     <ClCompile Include="..\..\..\test\test_block_layout.c" />
     <ClCompile Include="..\..\..\test\test_charset.c" />
     <ClCompile Include="..\..\..\test\test_css_parser.c" />
+    <ClCompile Include="..\..\..\test\test_flex_layout.c" />
     <ClCompile Include="..\..\..\test\test_font_load.c" />
     <ClCompile Include="..\..\..\test\test_image_reader.c" />
     <ClCompile Include="..\..\..\test\test_linkedlist.c" />

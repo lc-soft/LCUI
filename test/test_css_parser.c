@@ -39,7 +39,6 @@ static void test_flex_box(void)
 	it_i("flex-direction", s[key_flex_direction].val_style, SV_COLUMN);
 	it_i("flex-wrap", s[key_flex_wrap].val_style, SV_NOWRAP);
 	it_i("justify-content", s[key_justify_content].val_style, SV_CENTER);
-	it_i("justify-items", s[key_justify_items].val_style, SV_CENTER);
 	it_i("align-items", s[key_align_items].val_style, SV_FLEX_END);
 	it_i("align-content", s[key_align_content].val_style, SV_FLEX_END);
 }

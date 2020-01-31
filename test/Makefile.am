@@ -5,17 +5,32 @@ AM_CFLAGS = -I$(top_srcdir)/include $(CODE_COVERAGE_CFLAGS)
 noinst_PROGRAMS = helloworld test test_charset test_touch test_char_render \
 test_string_render test_widget_render test_render test_widget_opacity \
 test_scaling_support test_widget test_scrollbar test_textview_resize \
-test_image_scaling_bench test_block_layout
+test_image_scaling_bench test_block_layout test_flex_layout
 
 ##指定测试程序的源码文件
 helloworld_SOURCES = helloworld.c
 ##指定测试程序编译时需要链接的库
 helloworld_LDADD = $(top_builddir)/src/libLCUI.la
 
-test_SOURCES = test.c libtest.c test_charset.c test_css_parser.c test_xml_parser.c \
-test_string.c test_font_load.c test_image_reader.c test_widget_rect.c \
-test_widget_opacity.c test_block_layout.c test_textview_resize.c test_thread.c \
-test_strpool.c test_linkedlist.c test_textedit.c test_object.c test_widget_event.c
+test_SOURCES = test.c \
+libtest.c \
+test_charset.c \
+test_string.c \
+test_strpool.c \
+test_linkedlist.c \
+test_object.c \
+test_thread.c \
+test_font_load.c \
+test_css_parser.c \
+test_xml_parser.c \
+test_image_reader.c \
+test_block_layout.c \
+test_flex_layout.c \
+test_widget_rect.c \
+test_widget_opacity.c \
+test_widget_event.c \
+test_textview_resize.c \
+test_textedit.c
 
 test_LDADD = $(top_builddir)/src/libLCUI.la -lm $(CODE_COVERAGE_LIBS)
 
@@ -34,6 +49,10 @@ test_widget_render_LDADD = $(top_builddir)/src/libLCUI.la
 test_block_layout_SOURCES = test_block_layout.c libtest.c
 test_block_layout_LDADD = $(top_builddir)/src/libLCUI.la
 test_block_layout_CFLAGS = $(AM_CFLAGS) -D PREVIEW_MODE
+
+test_flex_layout_SOURCES = test_flex_layout.c libtest.c
+test_flex_layout_LDADD = $(top_builddir)/src/libLCUI.la
+test_flex_layout_CFLAGS = $(AM_CFLAGS) -D PREVIEW_MODE
 
 test_charset_SOURCES = test_charset.c
 test_charset_LDADD = $(top_builddir)/src/libLCUI.la
