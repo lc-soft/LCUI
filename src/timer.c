@@ -86,27 +86,6 @@ static void TimerList_AddNode(LinkedListNode *node)
 	LinkedList_AppendNode(&self.timers, node);
 }
 
-//#define DEBUG_TIMER
-#ifdef DEBUG_TIMER
-static void TimerList_Print(void)
-{
-	int i = 0;
-	Timer timer;
-	LinkedListNode *node;
-	_DEBUG_MSG("timer list(%d) start:\n", self.timers.length);
-	for (LinkedList_Each(node, &self.timers)) {
-		timer = node->data;
-		_DEBUG_MSG(
-		    "[%02d] %ld, func: %p, cur_ms: %ldms, total_ms: %ldms\n",
-		    i++, timer->id, timer->func,
-		    timer->total_ms -
-			(long int)LCUI_GetTimeDelta(timer->start_time),
-		    timer->total_ms);
-	}
-	_DEBUG_MSG("timer list end\n\n");
-}
-#endif
-
 static Timer FindTimer(int timer_id)
 {
 	Timer timer;
