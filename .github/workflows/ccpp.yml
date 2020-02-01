@@ -17,6 +17,11 @@ jobs:
       run: make
     - name: make check
       run: make check
+    - name: make test
+      run: |
+        cd test
+        ./test
+        cd ..
     - name: make distcheck
       run: make distcheck
     
