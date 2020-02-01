@@ -482,7 +482,7 @@ static int FBDisplay_Init(void)
 	Logger_Debug("[display] open framebuffer device: %s\n", display.fb.dev_path);
 	display.fb.dev_fd = open(display.fb.dev_path, O_RDWR);
 	if (display.fb.dev_fd == -1) {
-		Logger_Error("[display] open framebuffer device failed");
+		Logger_Error("[display] open framebuffer device failed\n");
 		return -1;
 	}
 	ioctl(display.fb.dev_fd, FBIOGET_VSCREENINFO, &display.fb.var_info);
@@ -493,7 +493,7 @@ static int FBDisplay_Init(void)
 	display.fb.mem = mmap(NULL, display.fb.mem_len, PROT_READ | PROT_WRITE,
 			      MAP_SHARED, display.fb.dev_fd, 0);
 	if ((void *)-1 == display.fb.mem) {
-		Logger_Error("[display] framebuffer mmap failed");
+		Logger_Error("[display] framebuffer mmap failed\n");
 		return -1;
 	}
 	FBDisplay_PrintInfo();

@@ -151,7 +151,7 @@ static int InitLinuxMouse(void)
 	}
 	Logger_Debug("[input] open mouse device: %s\n", mouse.dev_path);
 	if ((mouse.dev_fd = open(mouse.dev_path, O_RDONLY)) < 0) {
-		Logger_Error("[input] open mouse device failed");
+		Logger_Error("[input] open mouse device failed\n");
 		return -1;
 	}
 	LCUIThread_Create(&mouse.tid, LinuxMouseThread, NULL);
