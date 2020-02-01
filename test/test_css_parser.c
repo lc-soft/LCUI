@@ -132,7 +132,7 @@ void test_css_parser(void)
 	Widget_AddStatus(btn, "hover");
 	LCUIWidget_Update();
 
-	describe(".btn:hover .text", test_btn_text_style);
+	describe(".btn:hover .text", test_btn_hover_text_style);
 	describe("#test-flex-box", test_flex_box);
 	describe("parse 'flex: auto;'", test_parse_flex_auto);
 	describe("parse 'flex: none;'", test_parse_flex_none);
