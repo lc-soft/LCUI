@@ -628,7 +628,7 @@ static int LCUIFont_LoadFileEx(LCUI_FontEngine *engine, const char *file)
 	if (!engine) {
 		return -1;
 	}
-	num_fonts = fontlib.engine->open(file, &fonts);
+	num_fonts = engine->open(file, &fonts);
 	if (num_fonts < 1) {
 		Logger_Debug("[font] failed to load file: %s\n", file);
 		return -2;
