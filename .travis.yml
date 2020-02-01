@@ -18,11 +18,8 @@ script:
   - ./configure --enable-code-coverage
   - make
   - make distcheck
-  - cd test
-  - make
-  - ./test
-  - ../libtool --mode=execute valgrind --leak-check=full --error-exitcode=42 ./test
+  - make test
 
 after_success:
-  - if [[ $CC == clang ]] ; then coveralls --gcov-options '\-lp' --gcov 'llvm-cov gcov'  --exclude include --exclude test; fi
-  - if [[ $CC == gcc ]] ; then coveralls --gcov-options '\-lp'  --exclude include --exclude test; fi
+  - if [[ $CC == clang ]] ; then coveralls --exclude include --exclude test --gcov-options '\-lp' --gcov 'llvm-cov gcov'; fi
+  - if [[ $CC == gcc ]] ; then coveralls --exclude include --exclude test --gcov-options '\-lp'; fi
