@@ -67,9 +67,12 @@ test/test_widget_event.c \
 test/test_textview_resize.c \
 test/test_textedit.c
 
-.PHONY: test
+.PHONY: test test-with-valgrind
 
 test:
-	cd test && make && ../libtool --mode=execute valgrind --suppressions="valgrind-suppressions.txt" --leak-check=full --error-exitcode=42 ./test
+	cd test && ./test
+
+test-with-valgrind:
+	cd test && ../libtool --mode=execute valgrind --suppressions="valgrind-suppressions.txt" --leak-check=full --error-exitcode=42 ./test
 
 @CODE_COVERAGE_RULES@

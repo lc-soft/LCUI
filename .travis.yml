@@ -19,6 +19,7 @@ script:
   - make
   - make distcheck
   - make test
+  - make test-with-valgrind
 
 after_success:
   - if [[ $CC == clang ]] ; then coveralls --exclude include --exclude test --gcov-options '\-lp' --gcov 'llvm-cov gcov'; fi
