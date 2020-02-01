@@ -739,7 +739,7 @@ int Graph_Create(LCUI_Graph *graph, unsigned width, unsigned height)
 {
 	size_t size;
 	if (width > 10000 || height > 10000) {
-		_DEBUG_MSG("graph size is too large!");
+		Logger_Error("graph size is too large!");
 		abort();
 	}
 	if (width < 1 || height < 1) {

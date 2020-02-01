@@ -105,7 +105,7 @@ int LCUI_InitPNGReader(LCUI_ImageReader reader)
 error:
 	LCUI_DestroyImageReader(reader);
 #else
-	_DEBUG_MSG("warning: not PNG support!");
+	Logger_Warning("warning: not PNG support!");
 #endif
 	return -1;
 }
@@ -153,7 +153,7 @@ int LCUI_ReadPNGHeader(LCUI_ImageReader reader)
 	}
 	return 0;
 #else
-	_DEBUG_MSG("warning: not PNG support!");
+	Logger_Warning("warning: not PNG support!");
 	return -ENOSYS;
 #endif
 }
@@ -220,7 +220,7 @@ int LCUI_ReadPNG(LCUI_ImageReader reader, LCUI_Graph *graph)
 	}
 	return ret;
 #else
-	_DEBUG_MSG("warning: not PNG support!");
+	Logger_Warning("warning: not PNG support!");
 	return -ENOSYS;
 #endif
 }
@@ -238,13 +238,13 @@ int LCUI_WritePNGFile(const char *file_name, const LCUI_Graph *graph)
 	int y;
 
 	if (!Graph_IsValid(graph)) {
-		_DEBUG_MSG("graph is not valid\n");
+		Logger_Error("graph is not valid\n");
 		return -1;
 	}
 	/* create file */
 	fp = fopen(file_name, "wb");
 	if (!fp) {
-		_DEBUG_MSG("file %s could not be opened for writing\n",
+		Logger_Error("file %s could not be opened for writing\n",
 			   file_name);
 		return -1;
 	}
@@ -253,19 +253,19 @@ int LCUI_WritePNGFile(const char *file_name, const LCUI_Graph *graph)
 	    png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!png_ptr) {
 		fclose(fp);
-		_DEBUG_MSG("png_create_write_struct failed\n");
+		Logger_Error("png_create_write_struct failed\n");
 		return -1;
 	}
 	info_ptr = png_create_info_struct(png_ptr);
 	if (!info_ptr) {
 		fclose(fp);
-		_DEBUG_MSG("png_create_info_struct failed\n");
+		Logger_Error("png_create_info_struct failed\n");
 		png_destroy_write_struct(&png_ptr, &info_ptr);
 		return -1;
 	}
 	if (setjmp(png_jmpbuf(png_ptr))) {
 		fclose(fp);
-		_DEBUG_MSG("error during init_io\n");
+		Logger_Error("error during init_io\n");
 		png_destroy_write_struct(&png_ptr, &info_ptr);
 		return -1;
 	}
