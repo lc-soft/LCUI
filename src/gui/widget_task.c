@@ -640,18 +640,21 @@ static void Widget_UpdateSelf(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 
 	Widget_BeginDiff(w, ctx);
 	states = w->task.states;
-	if (states[LCUI_WTASK_USER] && w->proto && w->proto->runtask) {
-		states[LCUI_WTASK_USER] = FALSE;
-		w->proto->runtask(w);
-	}
 	w->task.for_self = FALSE;
 	for (i = 0; i < LCUI_WTASK_REFLOW; ++i) {
 		if (states[i]) {
+			if (w->proto && w->proto->runtask) {
+				w->proto->runtask(w, i);
+			}
 			states[i] = FALSE;
 			if (self.handlers[i]) {
 				self.handlers[i](w);
 			}
 		}
+	}
+	if (states[LCUI_WTASK_USER] && w->proto && w->proto->runtask) {
+		states[LCUI_WTASK_USER] = FALSE;
+		w->proto->runtask(w, LCUI_WTASK_USER);
 	}
 	Widget_EndDiff(w, ctx);
 	Widget_AddState(w, LCUI_WSTATE_UPDATED);
