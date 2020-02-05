@@ -103,7 +103,7 @@ typedef struct LCUI_WidgetBoxModelRec_ {
 	LCUI_RectF outer;
 } LCUI_WidgetBoxModelRec, *LCUI_WidgetBoxModel;
 
-typedef struct LCUI_WidgetTaskBoxRec_ {
+typedef struct LCUI_WidgetTaskRec_ {
 	/** Should update for self? */
 	LCUI_BOOL for_self;
 
@@ -115,7 +115,7 @@ typedef struct LCUI_WidgetTaskBoxRec_ {
 
 	/** States of tasks */
 	LCUI_BOOL states[LCUI_WTASK_TOTAL_NUM];
-} LCUI_WidgetTaskBoxRec;
+} LCUI_WidgetTaskRec;
 
 /** 部件状态 */
 typedef enum LCUI_WidgetState {
@@ -290,11 +290,11 @@ typedef struct LCUI_WidgetRec_ {
 	/**
 	 * Update task context
 	 */
-	LCUI_WidgetTaskBoxRec	task;
+	LCUI_WidgetTaskRec	task;
 	LCUI_WidgetRules	rules;
 	LCUI_EventTrigger	trigger;
 	
-	/** Parent widiget */
+	/** Parent widget */
 	LCUI_Widget		parent;
 
 	/** List of child widgets */
