@@ -43,7 +43,7 @@ typedef struct LCUI_BlockLayoutRowRec_ {
 } LCUI_BlockLayoutRowRec, *LCUI_BlockLayoutRow;
 
 typedef struct LCUI_BlockLayoutContextRec_ {
-	LCUI_WidgetLayoutContext base;
+	LCUI_Widget widget;
 
 	float x, y;
 	float content_width;
@@ -95,7 +95,7 @@ static void BlockLayout_UpdateElementPosition(LCUI_BlockLayoutContext ctx,
 
 static void BlockLayout_ApplySize(LCUI_BlockLayoutContext ctx)
 {
-	Widget_SetContentSize(ctx->base->container, ctx->content_width,
+	Widget_SetContentSize(ctx->widget, ctx->content_width,
 			      ctx->content_height);
 }
 
@@ -125,19 +125,19 @@ static void BlockLayout_NextRow(LCUI_BlockLayoutContext ctx)
 		ctx->content_height += ctx->row->height;
 		ctx->y += ctx->row->height;
 	}
-	ctx->x = ctx->base->container->padding.left;
+	ctx->x = ctx->widget->padding.left;
 	ctx->row = BlockLayoutRow_Create();
 	LinkedList_Append(&ctx->rows, ctx->row);
 }
 
-static LCUI_BlockLayoutContext BlockLayout_Begin(LCUI_WidgetLayoutContext base)
+static LCUI_BlockLayoutContext BlockLayout_Begin(LCUI_Widget w)
 {
 	ASSIGN(ctx, LCUI_BlockLayoutContext);
 
 	ctx->row = NULL;
-	ctx->base = base;
-	ctx->x = ctx->base->container->padding.left;
-	ctx->y = ctx->base->container->padding.right;
+	ctx->widget = w;
+	ctx->x = w->padding.left;
+	ctx->y = w->padding.right;
 	ctx->content_width = 0;
 	ctx->content_height = 0;
 	ctx->prev_display = SV_BLOCK;
@@ -154,7 +154,7 @@ static void BlockLayout_Load(LCUI_BlockLayoutContext ctx)
 	float static_width, static_height;
 
 	LCUI_Widget child;
-	LCUI_Widget w = ctx->base->container;
+	LCUI_Widget w = ctx->widget;
 	LCUI_SizingRule width_sizing = Widget_GetWidthSizingRule(w);
 	LCUI_SizingRule height_sizing = Widget_GetHeightSizingRule(w);
 	LinkedListNode *node;
@@ -232,7 +232,7 @@ static void BlockLayout_UpdateElementMargin(LCUI_BlockLayoutContext ctx,
 
 static void BlockLayout_ReflowRow(LCUI_BlockLayoutContext ctx, float row_y)
 {
-	float x = ctx->base->container->padding.left;
+	float x = ctx->widget->padding.left;
 
 	LCUI_Widget w;
 	LinkedListNode *node;
@@ -262,7 +262,7 @@ static void BlockLayout_ReflowFreeElements(LCUI_BlockLayoutContext ctx)
 static void BlockLayout_Reflow(LCUI_BlockLayoutContext ctx)
 {
 	float y;
-	LCUI_Widget w = ctx->base->container;
+	LCUI_Widget w = ctx->widget;
 	LinkedListNode *node;
 
 	y = w->padding.top;
@@ -279,22 +279,16 @@ static void BlockLayout_Reflow(LCUI_BlockLayoutContext ctx)
 
 static void BlockLayout_End(LCUI_BlockLayoutContext ctx)
 {
-	LCUI_Widget w = ctx->base->container;
-	LCUI_WidgetEventRec ev = { 0 };
-
-	ev.cancel_bubble = TRUE;
-	ev.type = LCUI_WEVENT_AFTERLAYOUT;
-	Widget_TriggerEvent(w, &ev, NULL);
 	LinkedList_Clear(&ctx->rows, BlockLayoutRow_Destroy);
 	LinkedList_Clear(&ctx->free_elements, NULL);
 	free(ctx);
 }
 
-void LCUIBlockLayout_Reflow(LCUI_WidgetLayoutContext base_ctx)
+void LCUIBlockLayout_Reflow(LCUI_Widget w)
 {
 	LCUI_BlockLayoutContext ctx;
 
-	ctx = BlockLayout_Begin(base_ctx);
+	ctx = BlockLayout_Begin(w);
 	BlockLayout_Load(ctx);
 	BlockLayout_ApplySize(ctx);
 	BlockLayout_Reflow(ctx);

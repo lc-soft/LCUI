@@ -39,83 +39,24 @@
 
 #define MEMCMP(A, B) memcmp(A, B, sizeof(*(A)))
 
-static void LCUIWidgetLayout_ApplyChanges(LCUI_WidgetLayoutContext ctx)
+void Widget_Reflow(LCUI_Widget w)
 {
-	LCUI_RectF rect;
-	LCUI_WidgetEventRec e;
-	LCUI_Widget w = ctx->container;
+	LCUI_WidgetEventRec ev = { 0 };
 
-	if (ctx->box.outer.x != w->box.outer.x ||
-	    ctx->box.outer.y != w->box.outer.y) {
-		ctx->invalid_box = SV_GRAPH_BOX;
-		Widget_PostSurfaceEvent(w, LCUI_WEVENT_MOVE,
-					!w->task.skip_surface_props_sync);
-		w->task.skip_surface_props_sync = TRUE;
-	}
-	if (ctx->box.outer.width != w->box.outer.width ||
-	    ctx->box.outer.height != w->box.outer.height) {
-		ctx->invalid_box = SV_GRAPH_BOX;
-		e.target = w;
-		e.data = NULL;
-		e.type = LCUI_WEVENT_RESIZE;
-		e.cancel_bubble = TRUE;
-		Widget_TriggerEvent(w, &e, NULL);
-		Widget_PostSurfaceEvent(w, LCUI_WEVENT_RESIZE,
-					!w->task.skip_surface_props_sync);
-		w->task.skip_surface_props_sync = TRUE;
-		if (w->parent) {
-			Widget_AddTask(w->parent, LCUI_WTASK_REFLOW);
-		}
-	}
-	if (!ctx->should_add_invalid_area || ctx->invalid_box == 0) {
-		return;
-	}
-	if (ctx->invalid_box == SV_GRAPH_BOX) {
-	} else if (MEMCMP(&ctx->box.canvas, &w->box.canvas)) {
-		ctx->invalid_box = SV_GRAPH_BOX;
-	} else if (MEMCMP(&ctx->box.padding, &w->box.padding)) {
-		ctx->invalid_box = max(ctx->invalid_box, SV_PADDING_BOX);
-	}
-	if (w->parent) {
-		if (!LCUIRectF_IsCoverRect(&ctx->box.canvas, &w->box.canvas)) {
-			Widget_InvalidateArea(w->parent, &ctx->box.canvas,
-					      SV_PADDING_BOX);
-			Widget_InvalidateArea(w, NULL, ctx->invalid_box);
-			return;
-		}
-		LCUIRectF_MergeRect(&rect, &ctx->box.canvas, &w->box.canvas);
-		Widget_InvalidateArea(w->parent, &rect, SV_PADDING_BOX);
-		return;
-	}
-	Widget_InvalidateArea(w, NULL, ctx->invalid_box);
-}
-
-void LCUIWidgetLayout_Reflow(LCUI_WidgetLayoutContext ctx)
-{
-	switch (ctx->container->computed_style.display) {
+	switch (w->computed_style.display) {
 	case SV_BLOCK:
 	case SV_INLINE_BLOCK:
-		LCUIBlockLayout_Reflow(ctx);
+		LCUIBlockLayout_Reflow(w);
 		break;
 	case SV_FLEX:
-		LCUIFlexBoxLayout_Reflow(ctx);
+		LCUIFlexBoxLayout_Reflow(w);
 		break;
 	case SV_NONE:
 	default:
 		break;
 	}
-	LCUIWidgetLayout_ApplyChanges(ctx);
-}
 
-void LCUIWidgetLayout_ReflowChild(LCUI_WidgetLayoutContext ctx,
-				  LCUI_Widget child)
-{
-	LCUI_WidgetLayoutContextRec child_ctx;
-
-	child_ctx.container = child;
-	child_ctx.box = child->box;
-	child_ctx.invalid_box = 0;
-	child_ctx.should_add_invalid_area =
-	    ctx->invalid_box == 0 && ctx->should_add_invalid_area;
-	LCUIWidgetLayout_Reflow(&child_ctx);
+	ev.cancel_bubble = TRUE;
+	ev.type = LCUI_WEVENT_AFTERLAYOUT;
+	Widget_TriggerEvent(w, &ev, NULL);
 }

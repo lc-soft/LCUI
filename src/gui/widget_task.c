@@ -40,7 +40,6 @@
 #define MEMCMP(A, B) memcmp(A, B, sizeof(*(A)))
 
 typedef struct LCUI_WidgetTaskContextRec_ *LCUI_WidgetTaskContext;
-typedef struct LCUI_WidgetLayoutTaskRec_ *LCUI_WidgetLayoutTask;
 
 /** for check widget difference */
 typedef struct LCUI_WidgetTaskDiffRec_ {
@@ -68,14 +67,6 @@ typedef struct LCUI_WidgetTaskDiffRec_ {
 	LCUI_BOOL sync_props_to_surface;
 	LCUI_BOOL should_add_invalid_area;
 } LCUI_WidgetTaskDiffRec, *LCUI_WidgetTaskDiff;
-
-typedef struct LCUI_WidgetLayoutTaskRec_ {
-	LCUI_Widget widget;
-	LinkedList children;
-	LinkedListNode node;
-	LCUI_WidgetLayoutTask parent;
-	LCUI_WidgetLayoutContextRec ctx;
-} LCUI_WidgetLayoutTaskRec;
 
 typedef struct LCUI_WidgetTaskContextRec_ {
 	unsigned style_hash;
@@ -309,7 +300,6 @@ INLINE void Widget_AddReflowTask(LCUI_Widget w)
 
 static int Widget_EndDiff(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 {
-	LCUI_RectF rect;
 	const LCUI_WidgetTaskDiff diff = &ctx->diff;
 	const LCUI_WidgetStyle *style = &w->computed_style;
 
@@ -390,26 +380,62 @@ static int Widget_EndDiff(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 	} else {
 		return 0;
 	}
+	return 1;
+}
 
-	/* invalid area will be processed after reflow */
-	if (w->task.states[LCUI_WTASK_REFLOW]) {
-		return 0;
-	}
+static int Widget_EndDiffLayout(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
+{
+	LCUI_RectF rect;
+	LCUI_WidgetEventRec e;
+	LCUI_WidgetTaskDiff diff = &ctx->diff;
+
 	if (diff->invalid_box >= SV_BORDER_BOX) {
 		Widget_UpdateCanvasBox(w);
+	}
+	if (diff->invalid_box == SV_GRAPH_BOX) {
+	} else if (MEMCMP(&diff->box.canvas, &w->box.canvas)) {
+		diff->invalid_box = SV_GRAPH_BOX;
+	}
+	if (diff->box.outer.x != w->box.outer.x ||
+	    diff->box.outer.y != w->box.outer.y) {
+		diff->invalid_box = SV_GRAPH_BOX;
+		Widget_PostSurfaceEvent(w, LCUI_WEVENT_MOVE,
+					!w->task.skip_surface_props_sync);
+		w->task.skip_surface_props_sync = TRUE;
+		Widget_AddReflowTask(w->parent);
+	}
+	if (diff->box.outer.width != w->box.outer.width ||
+	    diff->box.outer.height != w->box.outer.height) {
+		diff->invalid_box = SV_GRAPH_BOX;
+		e.target = w;
+		e.data = NULL;
+		e.type = LCUI_WEVENT_RESIZE;
+		e.cancel_bubble = TRUE;
+		Widget_TriggerEvent(w, &e, NULL);
+		Widget_PostSurfaceEvent(w, LCUI_WEVENT_RESIZE,
+					!w->task.skip_surface_props_sync);
+		w->task.skip_surface_props_sync = TRUE;
+		Widget_AddReflowTask(w->parent);
+	}
+	if (!diff->should_add_invalid_area || diff->invalid_box == 0) {
+		return 0;
 	}
 	if (!w->parent) {
 		Widget_InvalidateArea(w, NULL, diff->invalid_box);
 		return 1;
 	}
+	_DEBUG_MSG("%s, resized\n", w->id);
 	if (!LCUIRectF_IsCoverRect(&diff->box.canvas, &w->box.canvas)) {
 		Widget_InvalidateArea(w->parent, &diff->box.canvas,
 				      SV_PADDING_BOX);
 		Widget_InvalidateArea(w, NULL, diff->invalid_box);
+		_DEBUG_MSG("debug\n");
 		return 1;
 	}
 	LCUIRectF_MergeRect(&rect, &diff->box.canvas, &w->box.canvas);
 	Widget_InvalidateArea(w->parent, &rect, SV_PADDING_BOX);
+	_DEBUG_MSG("merged rect: (%g, %g, %g, %g)\n", rect.x, rect.y,
+		   rect.width, rect.height);
 	return 1;
 }
 
@@ -660,18 +686,6 @@ static void Widget_UpdateSelf(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 	Widget_AddState(w, LCUI_WSTATE_UPDATED);
 }
 
-static void Widget_RunReflowTask(LCUI_Widget w, LCUI_WidgetTaskContext task)
-{
-	LCUI_WidgetLayoutContextRec ctx;
-
-	ctx.container = w;
-	ctx.box = task->diff.box;
-	ctx.invalid_box = task->diff.invalid_box;
-	ctx.should_add_invalid_area =
-	    task->diff.can_render && task->diff.should_add_invalid_area;
-	LCUIWidgetLayout_Reflow(&ctx);
-}
-
 static size_t Widget_UpdateWithContext(LCUI_Widget w,
 				       LCUI_WidgetTaskContext ctx)
 {
@@ -691,9 +705,10 @@ static size_t Widget_UpdateWithContext(LCUI_Widget w,
 	}
 	Widget_SortChildrenShow(w);
 	if (w->task.states[LCUI_WTASK_REFLOW]) {
-		Widget_RunReflowTask(w, self_ctx);
+		Widget_Reflow(w);
 		w->task.states[LCUI_WTASK_REFLOW] = FALSE;
 	}
+	Widget_EndDiffLayout(w, self_ctx);
 	Widget_EndUpdate(self_ctx);
 	return count;
 }

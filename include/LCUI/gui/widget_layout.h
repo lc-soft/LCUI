@@ -31,16 +31,6 @@
 #ifndef LCUI_WIDGET_LAYOUT_H
 #define LCUI_WIDGET_LAYOUT_H
 
-typedef struct LCUI_WidgetLayoutContextRec_ {
-	int invalid_box;
-	LCUI_BOOL should_add_invalid_area;
-	LCUI_WidgetBoxModelRec box;
-	LCUI_Widget container;
-} LCUI_WidgetLayoutContextRec, *LCUI_WidgetLayoutContext;
-
-LCUI_API void LCUIWidgetLayout_Reflow(LCUI_WidgetLayoutContext ctx);
-
-LCUI_API void LCUIWidgetLayout_ReflowChild(LCUI_WidgetLayoutContext ctx,
-					   LCUI_Widget child);
+LCUI_API void Widget_Reflow(LCUI_Widget w);
 
 #endif

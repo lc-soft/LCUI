@@ -52,7 +52,6 @@ typedef struct LCUI_FlexBoxLineRec_ {
 } LCUI_FlexBoxLineRec, *LCUI_FlexBoxLine;
 
 typedef struct LCUI_FlexBoxLayoutContextRec_ {
-	LCUI_WidgetLayoutContext base;
 	LCUI_Widget widget;
 
 	float main_axis;
@@ -107,21 +106,19 @@ static void FlexBoxLayout_NextLine(LCUI_FlexBoxLayoutContext ctx)
 		ctx->cross_size += ctx->line->cross_size;
 		ctx->cross_axis += ctx->line->cross_size;
 	}
-	ctx->main_axis = ctx->base->container->padding.left;
+	ctx->main_axis = ctx->widget->padding.left;
 	ctx->line = FlexBoxLine_Create();
 	LinkedList_Append(&ctx->lines, ctx->line);
 }
 
-static LCUI_FlexBoxLayoutContext FlexBoxLayout_Begin(
-    LCUI_WidgetLayoutContext base)
+static LCUI_FlexBoxLayoutContext FlexBoxLayout_Begin(LCUI_Widget w)
 {
 	ASSIGN(ctx, LCUI_FlexBoxLayoutContext);
 
 	ctx->line = NULL;
-	ctx->base = base;
-	ctx->widget = ctx->base->container;
-	ctx->main_axis = ctx->widget->padding.left;
-	ctx->cross_axis = ctx->widget->padding.right;
+	ctx->widget = w;
+	ctx->main_axis = w->padding.left;
+	ctx->cross_axis = w->padding.right;
 	ctx->main_size = 0;
 	ctx->cross_size = 0;
 	LinkedList_Init(&ctx->free_elements);
@@ -132,12 +129,6 @@ static LCUI_FlexBoxLayoutContext FlexBoxLayout_Begin(
 
 static void FlexBoxLayout_End(LCUI_FlexBoxLayoutContext ctx)
 {
-	LCUI_Widget w = ctx->base->container;
-	LCUI_WidgetEventRec ev = { 0 };
-
-	ev.cancel_bubble = TRUE;
-	ev.type = LCUI_WEVENT_AFTERLAYOUT;
-	Widget_TriggerEvent(w, &ev, NULL);
 	LinkedList_Clear(&ctx->lines, FlexBoxLine_Destroy);
 	LinkedList_Clear(&ctx->free_elements, NULL);
 	free(ctx);
@@ -176,8 +167,8 @@ static void FlexBoxLayout_LoadRows(LCUI_FlexBoxLayoutContext ctx)
 		Widget_ComputeFlexBasisStyle(child);
 		basis = MarginX(child) + child->computed_style.flex.basis;
 		DEBUG_MSG("[line %lu][%lu] main_size: %g, basis: %g\n",
-			   ctx->lines.length, child->index,
-			   ctx->line->main_size, basis);
+			  ctx->lines.length, child->index, ctx->line->main_size,
+			  basis);
 		if (flex->wrap == SV_WRAP && ctx->line->elements.length > 0) {
 			if (ctx->line->main_size + basis > max_main_size) {
 				FlexBoxLayout_NextLine(ctx);
@@ -234,8 +225,8 @@ static void FlexBoxLayout_LoadColumns(LCUI_FlexBoxLayoutContext ctx)
 		Widget_ComputeFlexBasisStyle(child);
 		basis = MarginY(child) + child->computed_style.flex.basis;
 		DEBUG_MSG("[column %lu][%lu] main_size: %g, basis: %g\n",
-			   ctx->lines.length, child->index,
-			   ctx->line->main_size, basis);
+			  ctx->lines.length, child->index, ctx->line->main_size,
+			  basis);
 		if (flex->wrap == SV_WRAP && ctx->line->elements.length > 0 &&
 		    max_main_size >= 0) {
 			if (ctx->line->main_size + basis > max_main_size) {
@@ -333,16 +324,16 @@ static void FlexBoxLayout_ReflowRow(LCUI_FlexBoxLayoutContext ctx)
 			if (flex->grow > 0) {
 				w->width = flex->basis + k * flex->grow;
 				Widget_UpdateBoxSize(w);
-				LCUIWidgetLayout_ReflowChild(ctx->base, w);
+				Widget_Reflow(w);
 			}
 		} else if (flex->shrink > 0) {
 			w->width = flex->basis + k * flex->shrink;
 			Widget_UpdateBoxSize(w);
-			LCUIWidgetLayout_ReflowChild(ctx->base, w);
+			Widget_Reflow(w);
 		}
 		if (!Widget_HasStaticHeight(w)) {
 			Widget_ComputeHeightStyle(w);
-			LCUIWidgetLayout_ReflowChild(ctx->base, w);
+			Widget_Reflow(w);
 		}
 		Widget_AddState(w, LCUI_WSTATE_LAYOUTED);
 		main_axis += w->box.outer.width;
@@ -352,7 +343,7 @@ static void FlexBoxLayout_ReflowRow(LCUI_FlexBoxLayoutContext ctx)
 
 	/* auto margin */
 	DEBUG_MSG("free_space: %g, auto margin items: %lu\n", free_space,
-		   ctx->line->count_of_auto_margin_items);
+		  ctx->line->count_of_auto_margin_items);
 	if (free_space > 0 && ctx->line->count_of_auto_margin_items > 0) {
 		main_axis = 0;
 		k = free_space / ctx->line->count_of_auto_margin_items;
@@ -414,16 +405,16 @@ static void FlexBoxLayout_ReflowColumn(LCUI_FlexBoxLayoutContext ctx)
 			if (flex->grow > 0) {
 				w->height = flex->basis + k * flex->grow;
 				Widget_UpdateBoxSize(w);
-				LCUIWidgetLayout_ReflowChild(ctx->base, w);
+				Widget_Reflow(w);
 			}
 		} else if (flex->shrink > 0) {
 			w->height = flex->basis + k * flex->shrink;
 			Widget_UpdateBoxSize(w);
-			LCUIWidgetLayout_ReflowChild(ctx->base, w);
+			Widget_Reflow(w);
 		}
 		if (!Widget_HasStaticWidth(w)) {
 			Widget_ComputeWidthStyle(w);
-			LCUIWidgetLayout_ReflowChild(ctx->base, w);
+			Widget_Reflow(w);
 		}
 		Widget_AddState(w, LCUI_WSTATE_LAYOUTED);
 		main_axis += w->box.outer.height;
@@ -651,11 +642,11 @@ static void FlexBoxLayout_ReflowFreeElements(LCUI_FlexBoxLayoutContext ctx)
 	}
 }
 
-void LCUIFlexBoxLayout_Reflow(LCUI_WidgetLayoutContext base_ctx)
+void LCUIFlexBoxLayout_Reflow(LCUI_Widget w)
 {
 	LCUI_FlexBoxLayoutContext ctx;
 
-	ctx = FlexBoxLayout_Begin(base_ctx);
+	ctx = FlexBoxLayout_Begin(w);
 	FlexBoxLayout_Load(ctx);
 	FlexBoxLayout_ApplySize(ctx);
 	FlexBoxLayout_Reflow(ctx);
