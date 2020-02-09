@@ -182,69 +182,116 @@ void RectToInvalidArea(const LCUI_Rect *rect, LCUI_Rect *area)
 	LCUIMetrics_ComputeRectActual(area, &rectf);
 }
 
-LCUI_BOOL Widget_InvalidateArea(LCUI_Widget widget, LCUI_RectF *in_rect,
+LCUI_BOOL Widget_InvalidateArea(LCUI_Widget w, LCUI_RectF *in_rect,
 				int box_type)
 {
-	int mode;
 	LCUI_RectF rect;
-	LCUI_Rect *actual_rect;
-	LCUI_Widget w = widget;
-	LCUI_Widget root = LCUIWidget_GetRoot();
-	LCUI_RectGroup group;
 
 	if (!w) {
-		w = root;
+		w = LCUIWidget_GetRoot();
 	}
-	mode = LCUIDisplay_GetMode();
+	if (!w->computed_style.visible ||
+	    w->invalid_area_type > LCUI_INVALID_AREA_TYPE_CUSTOM) {
+		return FALSE;
+	}
 	Widget_AdjustArea(w, in_rect, &rect, box_type);
 	rect.x += w->box.canvas.x;
 	rect.y += w->box.canvas.y;
-	while (w && w->parent) {
-		LCUIRectF_ValidateArea(&rect, w->parent->box.padding.width,
-				       w->parent->box.padding.height);
-		if (rect.width <= 0 || rect.height <= 0) {
-			return FALSE;
-		}
-		if (mode != LCUI_DMODE_SEAMLESS && w->parent == root) {
+	if (w->invalid_area_type == LCUI_INVALID_AREA_TYPE_CUSTOM) {
+		LCUIRectF_MergeRect(&w->invalid_area, &rect, &w->invalid_area);
+	} else {
+		w->invalid_area = rect;
+	}
+	w->invalid_area_type = LCUI_INVALID_AREA_TYPE_CUSTOM;
+	while (w->parent) {
+		w->parent->has_child_invalid_area = TRUE;
+		w = w->parent;
+	}
+	return TRUE;
+}
+
+#define AddInvalidArea()                                               \
+	do {                                                           \
+		rect.x += x;                                           \
+		rect.y += y;                                           \
+		LCUIRectF_GetOverlayRect(&rect, &visible_area, &rect); \
+		if (rect.width > 0 && rect.height > 0) {               \
+			actual_rect = malloc(sizeof(LCUI_Rect));       \
+			RectFToInvalidArea(&rect, actual_rect);        \
+			LinkedList_Append(rects, actual_rect);         \
+		}                                                      \
+	} while (0)
+
+static void Widget_CollectInvalidArea(LCUI_Widget w, LinkedList *rects, float x,
+				      float y, LCUI_RectF visible_area)
+{
+	LCUI_RectF rect;
+	LCUI_Rect *actual_rect;
+	LinkedListNode *node;
+
+	if (w->parent && w->parent->invalid_area_type >=
+			     LCUI_INVALID_AREA_TYPE_PADDING_BOX) {
+		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_CANVAS_BOX;
+	} else if (w->invalid_area_type >= LCUI_INVALID_AREA_TYPE_PADDING_BOX) {
+		switch (w->invalid_area_type) {
+		case LCUI_INVALID_AREA_TYPE_PADDING_BOX:
+			rect = w->box.padding;
+			break;
+		case LCUI_INVALID_AREA_TYPE_BORDER_BOX:
+			rect = w->box.border;
+			break;
+		default:
+			rect = w->box.canvas;
 			break;
 		}
-		w = w->parent;
-		rect.x += w->box.padding.x;
-		rect.y += w->box.padding.y;
+		if (!LCUIRectF_IsCoverRect(&rect, &w->invalid_area)) {
+			AddInvalidArea();
+			rect = w->invalid_area;
+			AddInvalidArea();
+		} else {
+			LCUIRectF_MergeRect(&rect, &rect, &w->invalid_area);
+			AddInvalidArea();
+		}
+	} else if (w->invalid_area_type == LCUI_INVALID_AREA_TYPE_CUSTOM) {
+		rect = w->invalid_area;
+		AddInvalidArea();
 	}
-	LCUIRectF_ValidateArea(&rect, MAX_VISIBLE_WIDTH, MAX_VISIBLE_HEIGHT);
-	if (rect.width <= 0 || rect.height <= 0) {
-		return FALSE;
+	if (w->has_child_invalid_area) {
+		visible_area.x -= x;
+		visible_area.y -= y;
+		LCUIRectF_GetOverlayRect(&visible_area, &w->box.padding,
+					 &visible_area);
+		visible_area.x += x;
+		visible_area.y += y;
+		for (LinkedList_Each(node, &w->children_show)) {
+			Widget_CollectInvalidArea(
+			    node->data, rects, x + w->box.padding.x,
+			    y + w->box.padding.y, visible_area);
+		}
 	}
-	actual_rect = malloc(sizeof(LCUI_Rect));
-	RectFToInvalidArea(&rect, actual_rect);
-	if (mode != LCUI_DMODE_SEAMLESS) {
-		LinkedList_Append(&self.rects, actual_rect);
-		return TRUE;
-	}
-	group = RBTree_CustomGetData(&self.groups, w);
-	if (!group) {
-		group = NEW(LCUI_RectGroupRec, 1);
-		group->widget = w;
-		LinkedList_Init(&group->rects);
-		RBTree_CustomInsert(&self.groups, w, group);
-	}
-	return LinkedList_Append(&group->rects, actual_rect) == 0;
+	w->invalid_area_type = LCUI_INVALID_AREA_TYPE_NONE;
+	w->has_child_invalid_area = FALSE;
 }
 
 size_t Widget_GetInvalidArea(LCUI_Widget w, LinkedList *rects)
 {
-	LCUI_RectGroup group;
+	LCUI_Rect *rect;
+	LinkedListNode *node;
 
-	if (!w || w == LCUIWidget_GetRoot()) {
-		LinkedList_Concat(rects, &self.rects);
-		return (size_t)rects->length;
+	float scale = LCUIMetrics_GetScale();
+	int x = iround(w->box.padding.x * scale);
+	int y = iround(w->box.padding.y * scale);
+
+	Widget_CollectInvalidArea(w, rects, 0, 0, w->box.padding);
+	DEBUG_MSG("rects: %lu\n", rects->length);
+	for (LinkedList_Each(node, rects)) {
+		rect = node->data;
+		rect->x -= x;
+		rect->y -= y;
+		_DEBUG_MSG("(%d, %d, %d, %d)\n", rect->x, rect->y, rect->width,
+			   rect->height);
 	}
-	group = RBTree_CustomGetData(&self.groups, w);
-	if (group) {
-		LinkedList_Concat(rects, &group->rects);
-	}
-	return (size_t)rects->length;
+	return rects->length;
 }
 
 static int OnCompareGroup(void *data, const void *keydata)

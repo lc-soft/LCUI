@@ -62,7 +62,6 @@ typedef struct LCUI_WidgetTaskDiffRec_ {
 	LCUI_WidgetBoxModelRec box;
 	LCUI_FlexBoxLayoutStyle flex;
 
-	int invalid_box;
 	LCUI_BOOL can_render;
 	LCUI_BOOL sync_props_to_surface;
 	LCUI_BOOL should_add_invalid_area;
@@ -77,7 +76,6 @@ typedef struct LCUI_WidgetTaskContextRec_ {
 } LCUI_WidgetTaskContextRec;
 
 static struct WidgetTaskModule {
-	unsigned max_updates_per_frame;
 	DictType style_cache_dict;
 	LCUI_MetricsRec metrics;
 	LCUI_BOOL refresh_all;
@@ -229,7 +227,6 @@ void LCUIWidget_InitTasks(void)
 	self.handlers[LCUI_WTASK_REFLOW] = NULL;
 	InitStylesheetCacheDict();
 	self.refresh_all = TRUE;
-	self.max_updates_per_frame = 4;
 }
 
 void LCUIWidget_FreeTasks(void)
@@ -239,22 +236,26 @@ void LCUIWidget_FreeTasks(void)
 
 static void Widget_InitDiff(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 {
-	ctx->diff.can_render = TRUE;
-	ctx->diff.invalid_box = self.refresh_all ? SV_GRAPH_BOX : 0;
-	ctx->diff.should_add_invalid_area = FALSE;
 	ctx->diff.box = w->box;
+	ctx->diff.can_render = TRUE;
+	ctx->diff.should_add_invalid_area = FALSE;
+	if (self.refresh_all) {
+		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_CANVAS_BOX;
+	}
 	if (ctx->parent) {
 		if (!ctx->parent->diff.can_render) {
 			ctx->diff.can_render = FALSE;
 			return;
 		}
-		if (ctx->parent->diff.invalid_box >= SV_PADDING_BOX) {
-			ctx->diff.invalid_box = SV_GRAPH_BOX;
+		if (w->parent && w->parent->invalid_area_type >=
+				     LCUI_INVALID_AREA_TYPE_PADDING_BOX) {
+			w->invalid_area_type =
+			    LCUI_INVALID_AREA_TYPE_CANVAS_BOX;
 			return;
 		}
 	}
 	if (w->state < LCUI_WSTATE_LAYOUTED) {
-		ctx->diff.invalid_box = SV_GRAPH_BOX;
+		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_CANVAS_BOX;
 	}
 	ctx->diff.should_add_invalid_area = TRUE;
 }
@@ -308,7 +309,7 @@ static int Widget_EndDiff(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 	}
 	diff->can_render = style->visible;
 	if (style->visible != diff->visible) {
-		diff->invalid_box = SV_GRAPH_BOX;
+		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_CANVAS_BOX;
 		if (style->visible) {
 			Widget_PostSurfaceEvent(w, LCUI_WEVENT_SHOW, TRUE);
 		} else {
@@ -321,14 +322,14 @@ static int Widget_EndDiff(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 	Widget_UpdateBoxSize(w);
 	Widget_UpdateBoxPosition(w);
 	if (MEMCMP(&diff->box.padding, &w->box.padding)) {
-		diff->invalid_box = SV_GRAPH_BOX;
+		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_CANVAS_BOX;
 		Widget_OnUpdateContentBox(w);
 		Widget_AddReflowTask(w);
 	} else if (MEMCMP(&diff->box.outer, &w->box.outer)) {
-		diff->invalid_box = SV_GRAPH_BOX;
+		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_CANVAS_BOX;
 		Widget_AddReflowTask(w->parent);
 	} else if (MEMCMP(&diff->box.canvas, &w->box.canvas)) {
-		diff->invalid_box = SV_GRAPH_BOX;
+		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_CANVAS_BOX;
 	}
 	if (Widget_IsFlexLayoutStyleWorks(w)) {
 		if (diff->flex.wrap != style->flex.wrap ||
@@ -345,7 +346,7 @@ static int Widget_EndDiff(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 		}
 	}
 	if (diff->display != style->display) {
-		diff->invalid_box = SV_GRAPH_BOX;
+		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_CANVAS_BOX;
 		if (style->position != SV_ABSOLUTE) {
 			Widget_AddReflowTask(w->parent);
 		}
@@ -353,7 +354,7 @@ static int Widget_EndDiff(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 			Widget_AddReflowTask(w);
 		}
 	} else if (diff->position != style->position) {
-		diff->invalid_box = SV_GRAPH_BOX;
+		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_CANVAS_BOX;
 		if (diff->position == SV_ABSOLUTE ||
 		    style->position == SV_ABSOLUTE) {
 			Widget_AddReflowTask(w);
@@ -366,39 +367,44 @@ static int Widget_EndDiff(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 	if (!diff->should_add_invalid_area) {
 		return 0;
 	}
-	if (diff->invalid_box == SV_GRAPH_BOX) {
+	if (diff->opacity != w->computed_style.opacity) {
+		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_CANVAS_BOX;
+	} else if (w->invalid_area_type == LCUI_INVALID_AREA_TYPE_CANVAS_BOX) {
 	} else if (diff->z_index != style->z_index &&
 		   style->position != SV_STATIC) {
-		diff->invalid_box = SV_GRAPH_BOX;
+		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_CANVAS_BOX;
 	} else if (MEMCMP(&diff->shadow, &style->shadow)) {
-		diff->invalid_box = SV_GRAPH_BOX;
-	} else if (diff->invalid_box == SV_BORDER_BOX) {
+		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_CANVAS_BOX;
+	} else if (w->invalid_area_type == LCUI_INVALID_AREA_TYPE_BORDER_BOX) {
 	} else if (MEMCMP(&diff->border, &style->border)) {
-		diff->invalid_box = SV_BORDER_BOX;
+		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_BORDER_BOX;
 	} else if (MEMCMP(&diff->background, &style->background)) {
-		diff->invalid_box = SV_BORDER_BOX;
+		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_BORDER_BOX;
 	} else {
 		return 0;
+	}
+	while (w->parent) {
+		w->parent->has_child_invalid_area = TRUE;
+		w = w->parent;
 	}
 	return 1;
 }
 
 static int Widget_EndDiffLayout(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 {
-	LCUI_RectF rect;
 	LCUI_WidgetEventRec e;
 	LCUI_WidgetTaskDiff diff = &ctx->diff;
 
-	if (diff->invalid_box >= SV_BORDER_BOX) {
+	if (w->invalid_area_type >= LCUI_INVALID_AREA_TYPE_BORDER_BOX) {
 		Widget_UpdateCanvasBox(w);
 	}
-	if (diff->invalid_box == SV_GRAPH_BOX) {
-	} else if (MEMCMP(&diff->box.canvas, &w->box.canvas)) {
-		diff->invalid_box = SV_GRAPH_BOX;
+	if (w->invalid_area_type == LCUI_INVALID_AREA_TYPE_CANVAS_BOX) {
+	} else if (!LCUIRectF_IsEquals(&diff->box.canvas, &w->box.canvas)) {
+		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_CANVAS_BOX;
 	}
 	if (diff->box.outer.x != w->box.outer.x ||
 	    diff->box.outer.y != w->box.outer.y) {
-		diff->invalid_box = SV_GRAPH_BOX;
+		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_CANVAS_BOX;
 		Widget_PostSurfaceEvent(w, LCUI_WEVENT_MOVE,
 					!w->task.skip_surface_props_sync);
 		w->task.skip_surface_props_sync = TRUE;
@@ -406,7 +412,7 @@ static int Widget_EndDiffLayout(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 	}
 	if (diff->box.outer.width != w->box.outer.width ||
 	    diff->box.outer.height != w->box.outer.height) {
-		diff->invalid_box = SV_GRAPH_BOX;
+		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_CANVAS_BOX;
 		e.target = w;
 		e.data = NULL;
 		e.type = LCUI_WEVENT_RESIZE;
@@ -417,25 +423,29 @@ static int Widget_EndDiffLayout(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 		w->task.skip_surface_props_sync = TRUE;
 		Widget_AddReflowTask(w->parent);
 	}
-	if (!diff->should_add_invalid_area || diff->invalid_box == 0) {
+	if (!diff->should_add_invalid_area) {
+		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_NONE;
+		w->has_child_invalid_area = FALSE;
 		return 0;
 	}
-	if (!w->parent) {
-		Widget_InvalidateArea(w, NULL, diff->invalid_box);
-		return 1;
+	if (w->invalid_area_type < LCUI_INVALID_AREA_TYPE_PADDING_BOX) {
+		return 0;
 	}
-	_DEBUG_MSG("%s, resized\n", w->id);
-	if (!LCUIRectF_IsCoverRect(&diff->box.canvas, &w->box.canvas)) {
-		Widget_InvalidateArea(w->parent, &diff->box.canvas,
-				      SV_PADDING_BOX);
-		Widget_InvalidateArea(w, NULL, diff->invalid_box);
-		_DEBUG_MSG("debug\n");
-		return 1;
+	switch (w->invalid_area_type) {
+	case LCUI_INVALID_AREA_TYPE_PADDING_BOX:
+		w->invalid_area = ctx->diff.box.padding;
+		break;
+	case LCUI_INVALID_AREA_TYPE_BORDER_BOX:
+		w->invalid_area = ctx->diff.box.border;
+		break;
+	default:
+		w->invalid_area = ctx->diff.box.canvas;
+		break;
 	}
-	LCUIRectF_MergeRect(&rect, &diff->box.canvas, &w->box.canvas);
-	Widget_InvalidateArea(w->parent, &rect, SV_PADDING_BOX);
-	_DEBUG_MSG("merged rect: (%g, %g, %g, %g)\n", rect.x, rect.y,
-		   rect.width, rect.height);
+	while (w->parent) {
+		w->parent->has_child_invalid_area = TRUE;
+		w = w->parent;
+	}
 	return 1;
 }
 
@@ -641,7 +651,6 @@ static size_t Widget_UpdateChildren(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 			continue;
 		}
 		data->default_max_update_count = update_count * CLOCKS_PER_SEC /
-						 self.max_updates_per_frame /
 						 LCUI_MAX_FRAMES_PER_SEC / msec;
 		if (data->default_max_update_count < 1) {
 			data->default_max_update_count = 32;
@@ -703,13 +712,13 @@ static size_t Widget_UpdateWithContext(LCUI_Widget w,
 	if (w->task.for_children) {
 		count += Widget_UpdateChildren(w, self_ctx);
 	}
-	Widget_SortChildrenShow(w);
 	if (w->task.states[LCUI_WTASK_REFLOW]) {
-		Widget_Reflow(w);
+		Widget_Reflow(w, LCUI_LAYOUT_RULE_AUTO);
 		w->task.states[LCUI_WTASK_REFLOW] = FALSE;
 	}
 	Widget_EndDiffLayout(w, self_ctx);
 	Widget_EndUpdate(self_ctx);
+	Widget_SortChildrenShow(w);
 	return count;
 }
 
@@ -727,7 +736,6 @@ size_t Widget_Update(LCUI_Widget w)
 
 size_t LCUIWidget_Update(void)
 {
-	unsigned i;
 	size_t count;
 	LCUI_Widget root;
 	const LCUI_MetricsRec *metrics;
@@ -740,9 +748,7 @@ size_t LCUIWidget_Update(void)
 		LCUIWidget_RefreshStyle();
 	}
 	root = LCUIWidget_GetRoot();
-	for (count = i = 0; i < 4; ++i) {
-		count += Widget_Update(root);
-	}
+	count = Widget_Update(root);
 	root->state = LCUI_WSTATE_NORMAL;
 	LCUIWidget_ClearTrash();
 	self.metrics = *metrics;
@@ -762,7 +768,6 @@ void Widget_UpdateWithProfile(LCUI_Widget w, LCUI_WidgetTasksProfile profile)
 
 void LCUIWidget_UpdateWithProfile(LCUI_WidgetTasksProfile profile)
 {
-	unsigned i;
 	LCUI_Widget root;
 	const LCUI_MetricsRec *metrics;
 
@@ -778,9 +783,7 @@ void LCUIWidget_UpdateWithProfile(LCUI_WidgetTasksProfile profile)
 		LCUIWidget_RefreshStyle();
 	}
 	root = LCUIWidget_GetRoot();
-	for (i = 0; i < 4; ++i) {
-		Widget_UpdateWithProfile(root, profile);
-	}
+	Widget_UpdateWithProfile(root, profile);
 	root->state = LCUI_WSTATE_NORMAL;
 	profile->time = clock() - profile->time;
 	profile->destroy_time = clock();
