@@ -31,6 +31,6 @@
 #ifndef LCUI_FLEXBOX_LAYOUT_H
 #define LCUI_FLEXBOX_LAYOUT_H
 
-void LCUIFlexBoxLayout_Reflow(LCUI_Widget w);
+void LCUIFlexBoxLayout_Reflow(LCUI_Widget w, LCUI_LayoutRule rule);
 
 #endif

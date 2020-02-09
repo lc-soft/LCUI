@@ -707,6 +707,14 @@ static size_t Widget_UpdateWithContext(LCUI_Widget w,
 	self_ctx = Widget_BeginUpdate(w, ctx);
 	Widget_InitDiff(w, self_ctx);
 	if (w->task.for_self) {
+		if (self.refresh_all) {
+			memset(&self_ctx->style_diff, 0,
+			       sizeof(LCUI_WidgetStyleDiffRec));
+			Widget_InitStyleDiff(w, &self_ctx->style_diff);
+		} else {
+			Widget_InitStyleDiff(w, &self_ctx->style_diff);
+			Widget_BeginStyleDiff(w, &self_ctx->style_diff);
+		}
 		Widget_UpdateSelf(w, self_ctx);
 	}
 	if (w->task.for_children) {

@@ -114,15 +114,13 @@ LCUI_Widget LCUIWidget_New(const char *type)
 	LCUI_Widget widget = malloc(sizeof(LCUI_WidgetRec));
 
 	Widget_Init(widget);
-	if (type) {
-		widget->proto = LCUIWidget_GetPrototype(type);
-		if (widget->proto) {
-			widget->type = widget->proto->name;
-			widget->proto->init(widget);
-		} else {
-			widget->type = strdup2(type);
-		}
+	widget->proto = LCUIWidget_GetPrototype(type);
+	if (widget->proto->name) {
+		widget->type = widget->proto->name;
+	} else if (type) {
+		widget->type = strdup2(type);
 	}
+	widget->proto->init(widget);
 	Widget_AddTask(widget, LCUI_WTASK_REFRESH_STYLE);
 	return widget;
 }
@@ -588,39 +586,12 @@ LCUI_BOOL Widget_HasStaticWidthParent(LCUI_Widget widget)
 	return FALSE;
 }
 
-LCUI_SizingRule Widget_GetWidthSizingRule(LCUI_Widget w)
-{
-	if (!Widget_HasAutoStyle(w, key_width)) {
-		return LCUI_SIZING_RULE_FIXED;
-	}
-	if (Widget_HasAbsolutePosition(w)) {
-		return LCUI_SIZING_RULE_FIT_CONTENT;
-	}
-	if (!w->parent) {
-		return LCUI_SIZING_RULE_FIT_CONTENT;
-	}
-	if (w->parent->computed_style.display == SV_FLEX) {
-		if (w->parent->computed_style.flex.direction == SV_COLUMN) {
-			return LCUI_SIZING_RULE_FILL;
-		}
-		return LCUI_SIZING_RULE_NONE;
-	}
-	if (w->computed_style.display == SV_BLOCK ||
-	    w->computed_style.display == SV_FLEX) {
-		return LCUI_SIZING_RULE_FILL;
-	}
-	return LCUI_SIZING_RULE_FIT_CONTENT;
-}
-
 LCUI_SizingRule Widget_GetHeightSizingRule(LCUI_Widget w)
 {
 	if (!Widget_HasAutoStyle(w, key_height)) {
 		return LCUI_SIZING_RULE_FIXED;
 	}
-	if (Widget_HasAbsolutePosition(w)) {
-		return LCUI_SIZING_RULE_FIT_CONTENT;
-	}
-	if (!w->parent) {
+	if (!w->parent || Widget_HasAbsolutePosition(w)) {
 		return LCUI_SIZING_RULE_FIT_CONTENT;
 	}
 	if (w->parent->computed_style.display == SV_FLEX) {
@@ -630,32 +601,6 @@ LCUI_SizingRule Widget_GetHeightSizingRule(LCUI_Widget w)
 		return LCUI_SIZING_RULE_FILL;
 	}
 	return LCUI_SIZING_RULE_FIT_CONTENT;
-}
-
-LCUI_BOOL Widget_HasFitContentWidth(LCUI_Widget w)
-{
-	if (!Widget_HasAutoStyle(w, key_width)) {
-		return FALSE;
-	}
-	if (Widget_HasInlineBlockDisplay(w)) {
-		return TRUE;
-	}
-	if (Widget_HasAbsolutePosition(w) || !Widget_HasStaticWidthParent(w)) {
-		return TRUE;
-	}
-	return FALSE;
-}
-
-LCUI_BOOL Widget_HasStaticWidth(LCUI_Widget w)
-{
-	return !Widget_HasAutoStyle(w, key_width) &&
-	       !Widget_CheckStyleType(w, key_width, scale);
-}
-
-LCUI_BOOL Widget_HasStaticHeight(LCUI_Widget w)
-{
-	return !Widget_HasAutoStyle(w, key_height) &&
-	       !Widget_CheckStyleType(w, key_height, scale);
 }
 
 void Widget_SetText(LCUI_Widget w, const char *text)
@@ -715,6 +660,17 @@ void Widget_UpdateBoxPosition(LCUI_Widget w)
 	w->box.outer.y = y;
 	w->x = x + w->margin.left;
 	w->y = y + w->margin.top;
+	if (w->invalid_area_type == LCUI_INVALID_AREA_TYPE_NONE &&
+	    (w->x != w->box.border.x || w->y != w->box.border.y)) {
+		LCUI_Widget parent = w->parent;
+
+		w->invalid_area = w->box.canvas;
+		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_CANVAS_BOX;
+		while (parent) {
+			parent->has_child_invalid_area = TRUE;
+			parent = parent->parent;
+		}
+	}
 	w->box.border.x = w->x;
 	w->box.border.y = w->y;
 	w->box.padding.x = w->x + w->computed_style.border.left.width;
@@ -737,6 +693,18 @@ void Widget_UpdateBoxSize(LCUI_Widget w)
 {
 	w->width = Widget_GetLimitedWidth(w, w->width);
 	w->height = Widget_GetLimitedHeight(w, w->height);
+	if (w->invalid_area_type == LCUI_INVALID_AREA_TYPE_NONE &&
+	    (w->width != w->box.border.width ||
+	     w->height != w->box.border.height)) {
+		LCUI_Widget parent = w->parent;
+
+		w->invalid_area = w->box.canvas;
+		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_CANVAS_BOX;
+		while (parent) {
+			parent->has_child_invalid_area = TRUE;
+			parent = parent->parent;
+		}
+	}
 	w->box.border.width = w->width;
 	w->box.border.height = w->height;
 	w->box.padding.width = w->box.border.width - BorderX(w);
@@ -754,35 +722,6 @@ void Widget_SetBorderBoxSize(LCUI_Widget w, float width, float height)
 	w->width = width;
 	w->height = height;
 	Widget_UpdateBoxSize(w);
-}
-
-void Widget_SetContentSize(LCUI_Widget w, float width, float height)
-{
-	LCUI_SizingRule width_sizing = Widget_GetWidthSizingRule(w);
-	LCUI_SizingRule height_sizing = Widget_GetHeightSizingRule(w);
-
-	w->min_content_width = width;
-	w->min_content_height = height;
-	if (width_sizing != LCUI_SIZING_RULE_FIT_CONTENT) {
-		width = w->box.content.width;
-	}
-	if (height_sizing != LCUI_SIZING_RULE_FIT_CONTENT) {
-		height = w->box.content.height;
-	}
-	if (w->proto && w->proto->autosize) {
-		w->proto->autosize(w, &width, &height);
-		w->min_content_width = max(width, w->min_content_width);
-		w->min_content_height = max(height, w->min_content_height);
-		if (width_sizing != LCUI_SIZING_RULE_FIT_CONTENT) {
-			width = w->box.content.width;
-		}
-		if (height_sizing != LCUI_SIZING_RULE_FIT_CONTENT) {
-			height = w->box.content.height;
-		}
-	}
-	width = width + PaddingX(w) + BorderX(w);
-	height = height + PaddingY(w) + BorderY(w);
-	Widget_SetBorderBoxSize(w, width, height);
 }
 
 void LCUIWidget_InitBase(void)

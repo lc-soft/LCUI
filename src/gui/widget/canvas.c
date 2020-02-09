@@ -44,18 +44,17 @@ struct {
 	LCUI_WidgetPrototype proto;
 } self;
 
-static void Canvas_OnResize(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
+static void Canvas_OnResize(LCUI_Widget w, float width, float height)
 {
 	float scale = LCUIMetrics_GetScale();
-	unsigned width = (unsigned)(w->box.content.width * scale);
-	unsigned height = (unsigned)(w->box.content.height * scale);
 
 	LCUI_Graph buffer;
 	Canvas canvas = Widget_GetData(w, self.proto);
 
 	Graph_Init(&buffer);
 	buffer.color_type = LCUI_COLOR_TYPE_ARGB;
-	Graph_Create(&buffer, width, height);
+	Graph_Create(&buffer, (unsigned)(width * scale),
+		     (unsigned)(height * scale));
 	Graph_Replace(&buffer, &canvas->buffer, 0, 0);
 	Graph_Free(&canvas->buffer);
 	canvas->buffer = buffer;
@@ -67,8 +66,6 @@ static void Canvas_OnInit(LCUI_Widget w)
 
 	Graph_Init(&canvas->buffer);
 	LinkedList_Init(&canvas->contexts);
-	Widget_BindEventById(w, LCUI_WEVENT_RESIZE, Canvas_OnResize, NULL,
-			     NULL);
 }
 
 static void Canvas_OnDestroy(LCUI_Widget w)
@@ -85,7 +82,8 @@ static void Canvas_OnDestroy(LCUI_Widget w)
 	Graph_Free(&canvas->buffer);
 }
 
-static void Canvas_AutoSize(LCUI_Widget w, float *width, float *height)
+static void Canvas_OnAutoSize(LCUI_Widget w, float *width, float *height,
+			      LCUI_SizingRule rule)
 {
 	*width = 300;
 	*height = 150;
@@ -178,5 +176,6 @@ void LCUIWidget_AddCanvas(void)
 	self.proto->init = Canvas_OnInit;
 	self.proto->destroy = Canvas_OnDestroy;
 	self.proto->paint = Canvas_OnPaint;
-	self.proto->autosize = Canvas_AutoSize;
+	self.proto->autosize = Canvas_OnAutoSize;
+	self.proto->resize = Canvas_OnResize;
 }

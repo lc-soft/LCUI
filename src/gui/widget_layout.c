@@ -37,26 +37,25 @@
 #include "layout/block.h"
 #include "layout/flexbox.h"
 
-#define MEMCMP(A, B) memcmp(A, B, sizeof(*(A)))
-
-void Widget_Reflow(LCUI_Widget w)
+void Widget_Reflow(LCUI_Widget w, LCUI_LayoutRule rule)
 {
 	LCUI_WidgetEventRec ev = { 0 };
 
 	switch (w->computed_style.display) {
 	case SV_BLOCK:
 	case SV_INLINE_BLOCK:
-		LCUIBlockLayout_Reflow(w);
+		LCUIBlockLayout_Reflow(w, rule);
 		break;
 	case SV_FLEX:
-		LCUIFlexBoxLayout_Reflow(w);
+		LCUIFlexBoxLayout_Reflow(w, rule);
 		break;
 	case SV_NONE:
 	default:
 		break;
 	}
-
 	ev.cancel_bubble = TRUE;
 	ev.type = LCUI_WEVENT_AFTERLAYOUT;
 	Widget_TriggerEvent(w, &ev, NULL);
+	DEBUG_MSG("id: %s, type: %s, size: (%g, %g)\n", w->id, w->type,
+		  w->width, w->height);
 }

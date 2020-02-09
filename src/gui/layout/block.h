@@ -31,6 +31,6 @@
 #ifndef LCUI_BLOCK_LAYOUT_H
 #define LCUI_BLOCK_LAYOUT_H
 
-void LCUIBlockLayout_Reflow(LCUI_Widget w);
+void LCUIBlockLayout_Reflow(LCUI_Widget w, LCUI_LayoutRule rule);
 
 #endif

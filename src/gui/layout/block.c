@@ -35,6 +35,7 @@
 #include <LCUI/gui/widget.h>
 #include "block.h"
 #include "../widget_util.h"
+#include "../widget_diff.h"
 
 typedef struct LCUI_BlockLayoutRowRec_ {
 	float width;
@@ -44,6 +45,8 @@ typedef struct LCUI_BlockLayoutRowRec_ {
 
 typedef struct LCUI_BlockLayoutContextRec_ {
 	LCUI_Widget widget;
+	LCUI_LayoutRule rule;
+	LCUI_BOOL is_initiative;
 
 	float x, y;
 	float content_width;
@@ -93,12 +96,6 @@ static void BlockLayout_UpdateElementPosition(LCUI_BlockLayoutContext ctx,
 	Widget_UpdateBoxPosition(w);
 }
 
-static void BlockLayout_ApplySize(LCUI_BlockLayoutContext ctx)
-{
-	Widget_SetContentSize(ctx->widget, ctx->content_width,
-			      ctx->content_height);
-}
-
 static LCUI_BlockLayoutRow BlockLayoutRow_Create(void)
 {
 	LCUI_BlockLayoutRow row;
@@ -125,22 +122,65 @@ static void BlockLayout_NextRow(LCUI_BlockLayoutContext ctx)
 		ctx->content_height += ctx->row->height;
 		ctx->y += ctx->row->height;
 	}
+	ctx->prev_display = 0;
 	ctx->x = ctx->widget->padding.left;
 	ctx->row = BlockLayoutRow_Create();
 	LinkedList_Append(&ctx->rows, ctx->row);
 }
 
-static LCUI_BlockLayoutContext BlockLayout_Begin(LCUI_Widget w)
+static LCUI_BlockLayoutContext BlockLayout_Begin(LCUI_Widget w,
+						 LCUI_LayoutRule rule)
 {
+	LCUI_WidgetStyle *style = &w->computed_style;
 	ASSIGN(ctx, LCUI_BlockLayoutContext);
 
+	if (rule == LCUI_LAYOUT_RULE_AUTO) {
+		ctx->is_initiative = TRUE;
+		if (style->width_sizing == LCUI_SIZING_RULE_FIXED) {
+			if (style->height_sizing == LCUI_SIZING_RULE_FIXED) {
+				rule = LCUI_LAYOUT_RULE_FIXED;
+			} else {
+				rule = LCUI_LAYOUT_RULE_FIXED_WIDTH;
+			}
+		} else if (style->height_sizing == LCUI_SIZING_RULE_FIXED) {
+			rule = LCUI_LAYOUT_RULE_FIXED_HEIGHT;
+		} else {
+			rule = LCUI_LAYOUT_RULE_MAX_CONTENT;
+		}
+	} else {
+		ctx->is_initiative = FALSE;
+	}
+	if (style->position == SV_ABSOLUTE) {
+		if (rule == LCUI_LAYOUT_RULE_FIXED_HEIGHT &&
+		    style->width_sizing == LCUI_SIZING_RULE_PERCENT) {
+			rule = LCUI_LAYOUT_RULE_FIXED;
+		} else if (rule == LCUI_LAYOUT_RULE_FIXED_WIDTH &&
+			   style->height_sizing == LCUI_SIZING_RULE_PERCENT) {
+			rule = LCUI_LAYOUT_RULE_FIXED;
+		}
+	}
+	if (rule == LCUI_LAYOUT_RULE_MAX_CONTENT) {
+		if (style->width_sizing == LCUI_SIZING_RULE_FIXED) {
+			rule = LCUI_LAYOUT_RULE_FIXED_WIDTH;
+		}
+	}
+	if (rule == LCUI_LAYOUT_RULE_FIXED_WIDTH) {
+		if (style->height_sizing == LCUI_SIZING_RULE_FIXED) {
+			rule = LCUI_LAYOUT_RULE_FIXED;
+		}
+	} else if (rule == LCUI_LAYOUT_RULE_FIXED_HEIGHT) {
+		if (style->width_sizing == LCUI_SIZING_RULE_FIXED) {
+			rule = LCUI_LAYOUT_RULE_FIXED;
+		}
+	}
+	ctx->rule = rule;
 	ctx->row = NULL;
 	ctx->widget = w;
 	ctx->x = w->padding.left;
 	ctx->y = w->padding.right;
 	ctx->content_width = 0;
 	ctx->content_height = 0;
-	ctx->prev_display = SV_BLOCK;
+	ctx->prev_display = 0;
 	ctx->prev = NULL;
 	LinkedList_Init(&ctx->free_elements);
 	LinkedList_Init(&ctx->rows);
@@ -148,20 +188,46 @@ static LCUI_BlockLayoutContext BlockLayout_Begin(LCUI_Widget w)
 	return ctx;
 }
 
+static void UpdateBlockItemSize(LCUI_Widget w, LCUI_LayoutRule rule)
+{
+	float content_width = w->box.content.width;
+	float content_height = w->box.content.height;
+	LCUI_WidgetLayoutDiffRec diff;
+
+	Widget_BeginLayoutDiff(w, &diff);
+	Widget_ComputeWidthLimitStyle(w, LCUI_LAYOUT_RULE_FIXED);
+	Widget_ComputeHeightLimitStyle(w, LCUI_LAYOUT_RULE_FIXED);
+	Widget_ComputeWidthStyle(w);
+	Widget_ComputeHeightStyle(w);
+	Widget_UpdateBoxSize(w);
+	if (content_width == w->box.content.width &&
+	    content_height == w->box.content.height) {
+		return;
+	}
+	Widget_Reflow(w, rule);
+	Widget_EndLayoutDiff(w, &diff);
+	w->task.states[LCUI_WTASK_REFLOW] = FALSE;
+}
+
 static void BlockLayout_Load(LCUI_BlockLayoutContext ctx)
 {
 	float max_row_width = -1;
-	float static_width, static_height;
 
 	LCUI_Widget child;
 	LCUI_Widget w = ctx->widget;
-	LCUI_SizingRule width_sizing = Widget_GetWidthSizingRule(w);
-	LCUI_SizingRule height_sizing = Widget_GetHeightSizingRule(w);
 	LinkedListNode *node;
 
-	if (w->computed_style.display != SV_INLINE_BLOCK) {
-		max_row_width = w->box.content.width;
+	if (ctx->rule == LCUI_LAYOUT_RULE_FIXED_WIDTH ||
+	    ctx->rule == LCUI_LAYOUT_RULE_FIXED) {
+		max_row_width = ctx->widget->box.content.width;
+	} else {
+		if (w->computed_style.max_width != -1) {
+			max_row_width = w->computed_style.max_width -
+					PaddingX(w) - BorderX(w);
+		}
 	}
+	DEBUG_MSG("%s, start\n", ctx->widget->id);
+	DEBUG_MSG("%s, max_row_width: %g\n", ctx->widget->id, max_row_width);
 	for (LinkedList_Each(node, &w->children)) {
 		child = node->data;
 
@@ -169,26 +235,30 @@ static void BlockLayout_Load(LCUI_BlockLayoutContext ctx)
 			LinkedList_Append(&ctx->free_elements, child);
 			continue;
 		}
-		static_width = child->box.outer.width;
-		static_height = child->box.outer.height;
-		if (width_sizing == LCUI_SIZING_RULE_FIT_CONTENT &&
-		    !Widget_HasStaticWidth(child)) {
-			static_width -= child->box.content.width;
-			static_width += child->min_content_width;
+		if (child->computed_style.width_sizing !=
+			LCUI_SIZING_RULE_FIXED &&
+		    child->computed_style.width_sizing !=
+			LCUI_SIZING_RULE_FIT_CONTENT) {
+			UpdateBlockItemSize(child,
+					    LCUI_LAYOUT_RULE_MAX_CONTENT);
 		}
-		if (height_sizing == LCUI_SIZING_RULE_FIT_CONTENT &&
-		    !Widget_HasStaticHeight(child)) {
-			static_height -= child->box.content.height;
-			static_height += child->min_content_height;
-		}
+		DEBUG_MSG(
+		    "row %lu, child %lu, static size: (%g, %g), display: %d\n",
+		    ctx->rows.length, child->index, child->box.outer.width,
+		    child->box.outer.height, child->computed_style.display);
 		switch (child->computed_style.display) {
 		case SV_INLINE_BLOCK:
-			if (ctx->prev_display != SV_INLINE_BLOCK) {
+			if (ctx->prev_display &&
+			    ctx->prev_display != SV_INLINE_BLOCK) {
+				DEBUG_MSG("next row\n");
 				BlockLayout_NextRow(ctx);
 			}
 			if (max_row_width != -1 &&
 			    ctx->row->elements.length > 0 &&
-			    ctx->row->width + static_width > max_row_width) {
+			    ctx->row->width + child->box.outer.width -
+				    max_row_width >
+				0.4f) {
+				DEBUG_MSG("next row\n");
 				BlockLayout_NextRow(ctx);
 			}
 			break;
@@ -200,9 +270,11 @@ static void BlockLayout_Load(LCUI_BlockLayoutContext ctx)
 		default:
 			continue;
 		}
-		ctx->row->width += static_width;
-		if (static_height > ctx->row->height) {
-			ctx->row->height = static_height;
+		DEBUG_MSG("row %lu, xy: (%g, %g)\n", ctx->rows.length, ctx->x,
+			  ctx->y);
+		ctx->row->width += child->box.outer.width;
+		if (child->box.outer.height > ctx->row->height) {
+			ctx->row->height = child->box.outer.height;
 		}
 		LinkedList_Append(&ctx->row->elements, child);
 		ctx->prev_display = child->computed_style.display;
@@ -210,6 +282,9 @@ static void BlockLayout_Load(LCUI_BlockLayoutContext ctx)
 	}
 	ctx->content_width = max(ctx->content_width, ctx->row->width);
 	ctx->content_height += ctx->row->height;
+	DEBUG_MSG("content_size: %g, %g\n", ctx->content_width,
+		  ctx->content_height);
+	DEBUG_MSG("%s, end\n", ctx->widget->id);
 }
 
 static void BlockLayout_UpdateElementMargin(LCUI_BlockLayoutContext ctx,
@@ -239,6 +314,7 @@ static void BlockLayout_ReflowRow(LCUI_BlockLayoutContext ctx, float row_y)
 
 	for (LinkedList_Each(node, &ctx->row->elements)) {
 		w = node->data;
+		UpdateBlockItemSize(w, LCUI_LAYOUT_RULE_FIXED);
 		BlockLayout_UpdateElementMargin(ctx, w);
 		BlockLayout_UpdateElementPosition(ctx, w, x, row_y);
 		Widget_AddState(w, LCUI_WSTATE_LAYOUTED);
@@ -253,9 +329,12 @@ static void BlockLayout_ReflowFreeElements(LCUI_BlockLayoutContext ctx)
 
 	for (LinkedList_Each(node, &ctx->free_elements)) {
 		w = node->data;
-		Widget_UpdateBoxSize(node->data);
-		Widget_UpdateBoxPosition(node->data);
+		Widget_ComputeSizeStyle(w);
+		Widget_UpdateBoxSize(w);
+		Widget_UpdateBoxPosition(w);
 		Widget_AddState(w, LCUI_WSTATE_LAYOUTED);
+		w->proto->resize(w, w->box.content.width,
+				 w->box.content.height);
 	}
 }
 
@@ -284,11 +363,50 @@ static void BlockLayout_End(LCUI_BlockLayoutContext ctx)
 	free(ctx);
 }
 
-void LCUIBlockLayout_Reflow(LCUI_Widget w)
+static void BlockLayout_ApplySize(LCUI_BlockLayoutContext ctx)
+{
+	float width = 0, height = 0;
+
+	LCUI_Widget w = ctx->widget;
+
+	switch (ctx->rule) {
+	case LCUI_LAYOUT_RULE_FIXED_WIDTH:
+		width = w->box.content.width;
+		w->proto->autosize(w, &width, &height, ctx->rule);
+		width = w->box.content.width;
+		height = max(height, ctx->content_height);
+		break;
+	case LCUI_LAYOUT_RULE_FIXED_HEIGHT:
+		height = w->box.content.height;
+		w->proto->autosize(w, &width, &height, ctx->rule);
+		width = max(width, ctx->content_width);
+		height = w->box.content.height;
+		break;
+	case LCUI_LAYOUT_RULE_MAX_CONTENT:
+		w->proto->autosize(w, &width, &height, ctx->rule);
+		width = max(width, ctx->content_width);
+		height = max(height, ctx->content_height);
+		break;
+	default:
+		width = w->box.content.width;
+		height = w->box.content.height;
+		break;
+	}
+	w->width = ToBorderBoxWidth(w, width);
+	w->height = ToBorderBoxHeight(w, height);
+	Widget_UpdateBoxSize(w);
+	if (ctx->is_initiative) {
+		w->max_content_width = w->box.content.width;
+		w->max_content_height = w->box.content.height;
+	}
+	w->proto->resize(w, w->box.content.width, w->box.content.height);
+}
+
+void LCUIBlockLayout_Reflow(LCUI_Widget w, LCUI_LayoutRule rule)
 {
 	LCUI_BlockLayoutContext ctx;
 
-	ctx = BlockLayout_Begin(w);
+	ctx = BlockLayout_Begin(w, rule);
 	BlockLayout_Load(ctx);
 	BlockLayout_ApplySize(ctx);
 	BlockLayout_Reflow(ctx);

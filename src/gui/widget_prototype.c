@@ -58,7 +58,16 @@ static void Widget_DefaultPropertyBinder(LCUI_Widget w, const char *name,
 {
 }
 
-static void Widget_DefaultResizer(LCUI_Widget w, float *width, float *height)
+static void Widget_DefaultSizeGetter(LCUI_Widget w, float *width, float *height,
+				     LCUI_LayoutRule rule)
+{
+}
+
+static void Widget_DefaultSizeSetter(LCUI_Widget w, float width, float height)
+{
+}
+
+static void Widget_DefaultTaskHandler(LCUI_Widget w, int task)
 {
 }
 
@@ -80,15 +89,17 @@ void LCUIWidget_InitPrototype(void)
 	self.dicttype = DictType_StringKey;
 	self.dicttype.valDestructor = DeletePrototype;
 	self.prototypes = Dict_Create(&self.dicttype, NULL);
+	self.default_prototype.name = NULL;
 	self.default_prototype.init = Widget_DefaultMethod;
 	self.default_prototype.refresh = Widget_DefaultMethod;
 	self.default_prototype.destroy = Widget_DefaultMethod;
 	self.default_prototype.update = Widget_DefaultMethod;
-	self.default_prototype.runtask = Widget_DefaultMethod;
+	self.default_prototype.runtask = Widget_DefaultTaskHandler;
 	self.default_prototype.setattr = Widget_DefaultAttrSetter;
 	self.default_prototype.settext = Widget_DefaultTextSetter;
 	self.default_prototype.bindprop = Widget_DefaultPropertyBinder;
-	self.default_prototype.autosize = Widget_DefaultResizer;
+	self.default_prototype.autosize = Widget_DefaultSizeGetter;
+	self.default_prototype.resize = Widget_DefaultSizeSetter;
 	self.default_prototype.paint = Widget_DefaultPainter;
 }
 
@@ -99,7 +110,16 @@ void LCUIWidget_FreePrototype(void)
 
 LCUI_WidgetPrototype LCUIWidget_GetPrototype(const char *name)
 {
-	return Dict_FetchValue(self.prototypes, name);
+	LCUI_WidgetPrototype proto;
+
+	if (!name) {
+		return &self.default_prototype;
+	}
+	proto = Dict_FetchValue(self.prototypes, name);
+	if (!proto) {
+		return &self.default_prototype;
+	}
+	return proto;
 }
 
 LCUI_WidgetPrototype LCUIWidget_NewPrototype(const char *name,
@@ -208,7 +228,7 @@ void Widget_ClearPrototype(LCUI_Widget widget)
 	if (widget->data.list) {
 		free(widget->data.list);
 	}
-	if (widget->type && !widget->proto) {
+	if (widget->type && !widget->proto->name) {
 		free(widget->type);
 		widget->type = NULL;
 	}

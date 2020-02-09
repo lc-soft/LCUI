@@ -31,6 +31,6 @@
 #ifndef LCUI_WIDGET_LAYOUT_H
 #define LCUI_WIDGET_LAYOUT_H
 
-LCUI_API void Widget_Reflow(LCUI_Widget w);
+LCUI_API void Widget_Reflow(LCUI_Widget w, LCUI_LayoutRule rule);
 
 #endif

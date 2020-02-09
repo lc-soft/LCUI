@@ -40,23 +40,29 @@ LCUI_BEGIN_HEADER
 
 /** 部件样式 */
 typedef struct LCUI_WidgetStyle {
-	LCUI_BOOL visible;			/**< 是否可见 */
-	LCUI_BOOL focusable;			/**< 是否能够得到焦点 */
-	float min_width, min_height;		/**< 最小尺寸 */
-	float max_width, max_height;		/**< 最大尺寸 */
-	float left, top;			/**< 左边界、顶边界的偏移距离 */
-	float right, bottom;			/**< 右边界、底边界的偏移距离 */
-	int z_index;				/**< 堆叠顺序，该值越高，部件显示得越靠前 */
-	float opacity;				/**< 不透明度，有效范围从 0.0 （完全透明）到 1.0（完全不透明） */
-	LCUI_StyleValue position;		/**< 定位方式 */
-	LCUI_StyleValue display;		/**< 显示方式，决定以何种布局显示该部件 */
-	LCUI_StyleValue box_sizing;		/**< 以何种方式计算宽度和高度 */
-	LCUI_StyleValue vertical_align;		/**< 垂直对齐方式 */
-	LCUI_BorderStyle border;		/**< 边框 */
-	LCUI_BoxShadowStyle shadow;		/**< 盒形阴影 */
-	LCUI_BackgroundStyle background;	/**< 背景 */
-	LCUI_FlexBoxLayoutStyle flex;		/**< 弹性盒子布局相关样式 */
-	int pointer_events;			/**< 事件的处理方式 */
+	LCUI_BOOL visible;
+	LCUI_BOOL focusable;
+	LCUI_SizingRule width_sizing;
+	LCUI_SizingRule height_sizing;
+	float min_width;
+	float min_height;
+	float max_width;
+	float max_height;
+	float left;
+	float top;
+	float right;
+	float bottom;
+	int z_index;
+	float opacity;
+	LCUI_StyleValue position;
+	LCUI_StyleValue display;
+	LCUI_StyleValue box_sizing;
+	LCUI_StyleValue vertical_align;
+	LCUI_BorderStyle border;
+	LCUI_BoxShadowStyle shadow;
+	LCUI_BackgroundStyle background;
+	LCUI_FlexBoxLayoutStyle flex;
+	int pointer_events;
 } LCUI_WidgetStyle;
 
 typedef struct LCUI_WidgetActualStyleRec_ {
@@ -85,8 +91,8 @@ typedef enum LCUI_WidgetTaskType {
 	LCUI_WTASK_SHADOW,
 	LCUI_WTASK_BORDER,
 	LCUI_WTASK_BACKGROUND,
-	LCUI_WTASK_RESIZE,
 	LCUI_WTASK_POSITION,
+	LCUI_WTASK_RESIZE,
 	LCUI_WTASK_ZINDEX,
 	LCUI_WTASK_OPACITY,
 	LCUI_WTASK_REFLOW,
@@ -133,27 +139,28 @@ typedef const struct LCUI_WidgetPrototypeRec_ *LCUI_WidgetPrototypeC;
 
 typedef void(*LCUI_WidgetFunction)(LCUI_Widget);
 typedef void(*LCUI_WidgetTaskHandler)(LCUI_Widget, int);
-typedef void(*LCUI_WidgetResizer)(LCUI_Widget, float*, float*);
+typedef void(*LCUI_WidgetSizeGetter)(LCUI_Widget, float*, float*, LCUI_LayoutRule);
+typedef void(*LCUI_WidgetSizeSetter)(LCUI_Widget, float, float);
 typedef void(*LCUI_WidgetAttrSetter)(LCUI_Widget, const char*, const char*);
 typedef void(*LCUI_WidgetTextSetter)(LCUI_Widget, const char*);
 typedef void(*LCUI_WidgetPropertyBinder)(LCUI_Widget, const char*, LCUI_Object);
 typedef void(*LCUI_WidgetPainter)(LCUI_Widget, LCUI_PaintContext,
 				  LCUI_WidgetActualStyle);
 
-/** 部件原型数据结构 */
 typedef struct LCUI_WidgetPrototypeRec_ {
-	char *name;				/**< 名称 */
-	LCUI_WidgetFunction init;		/**< 构造函数  */
-	LCUI_WidgetFunction refresh;		/**< 数据刷新函数 */
-	LCUI_WidgetFunction destroy;		/**< 析构函数 */
-	LCUI_WidgetFunction update;		/**< 样式处理函数 */
-	LCUI_WidgetTaskHandler runtask;		/**< 自定义任务处理函数 */
-	LCUI_WidgetAttrSetter setattr;		/**< 属性设置函数 */
-	LCUI_WidgetTextSetter settext;		/**< 文本内容设置函数 */
-	LCUI_WidgetPropertyBinder bindprop;	/**< 属性绑定函数 */
-	LCUI_WidgetResizer autosize;		/**< 内容尺寸计算函数 */
-	LCUI_WidgetPainter paint;		/**< 绘制函数 */
-	LCUI_WidgetPrototype proto;		/**< 父级原型 */
+	char *name;
+	LCUI_WidgetFunction init;
+	LCUI_WidgetFunction refresh;
+	LCUI_WidgetFunction destroy;
+	LCUI_WidgetFunction update;
+	LCUI_WidgetTaskHandler runtask;
+	LCUI_WidgetAttrSetter setattr;
+	LCUI_WidgetTextSetter settext;
+	LCUI_WidgetPropertyBinder bindprop;
+	LCUI_WidgetSizeGetter autosize;
+	LCUI_WidgetSizeSetter resize;
+	LCUI_WidgetPainter paint;
+	LCUI_WidgetPrototype proto;
 } LCUI_WidgetPrototypeRec;
 
 typedef struct LCUI_WidgetDataEntryRec_ {
@@ -235,88 +242,97 @@ typedef struct LCUI_WidgetAttributeRec_ {
 	} value;
 } LCUI_WidgetAttributeRec, *LCUI_WidgetAttribute;
 
-typedef struct LCUI_WidgetRec_ {
-	unsigned		hash;
-	LCUI_WidgetState	state;
+typedef enum LCUI_InvalidAreaType_ {
+	LCUI_INVALID_AREA_TYPE_NONE,
+	LCUI_INVALID_AREA_TYPE_CUSTOM,
+	LCUI_INVALID_AREA_TYPE_PADDING_BOX,
+	LCUI_INVALID_AREA_TYPE_BORDER_BOX,
+	LCUI_INVALID_AREA_TYPE_CANVAS_BOX
+} LCUI_InvalidAreaType;
 
-	char			*id;
-	char			*type;
-	strlist_t		classes;
-	strlist_t		status;
-	wchar_t			*title;
-	Dict			*attributes;
-	LCUI_BOOL		disabled;
-	LCUI_BOOL		event_blocked;
+typedef struct LCUI_WidgetRec_ {
+	unsigned hash;
+	LCUI_WidgetState state;
+
+	char *id;
+	char *type;
+	strlist_t classes;
+	strlist_t status;
+	wchar_t *title;
+	Dict *attributes;
+	LCUI_BOOL disabled;
+	LCUI_BOOL event_blocked;
 	
 	/**
 	 * Coordinates calculated by the layout system
 	 * The position of the rectangular boxes is calculated based on it
 	 */
-	float			layout_x, layout_y;
-	
-	/**
-	 * The smallest size a box could take that doesn’t lead to overflow
-	 * that could be avoided by choosing a larger size. 
-	 */
-	float			min_content_width;
-	float			min_content_height;
+	float layout_x, layout_y;
 
 	/**
 	 * Geometric parameters (readonly)
 	 * Their values come from the box.border
 	 */
-	float			x, y;
-	float			width, height;
+	float x, y, width, height;
 
-	LCUI_Rect2F		padding;
-	LCUI_Rect2F		margin;
-	LCUI_WidgetBoxModelRec	box;
+	/**
+	 * A box’s “ideal” size in a given axis when given infinite available space.
+	 * See more: https://drafts.csswg.org/css-sizing-3/#max-content
+	 */
+	float max_content_width, max_content_height;
 
-	LCUI_StyleSheet		style;
-	LCUI_StyleList		custom_style;
-	LCUI_CachedStyleSheet	inherited_style;
-	LCUI_WidgetStyle	computed_style;
+	LCUI_Rect2F padding;
+	LCUI_Rect2F margin;
+	LCUI_WidgetBoxModelRec box;
+
+	LCUI_StyleSheet style;
+	LCUI_StyleList custom_style;
+	LCUI_CachedStyleSheet inherited_style;
+	LCUI_WidgetStyle computed_style;
 
 	/** Some data bound to the prototype */
-	LCUI_WidgetData		data;
+	LCUI_WidgetData data;
 
 	/**
 	 * Prototype chain
 	 * It is used to implement the inheritance of widgets,
 	 * Just like prototype chain in JavaScript
 	 */
-	LCUI_WidgetPrototypeC	proto;
+	LCUI_WidgetPrototypeC proto;
 
-	/**
-	 * Update task context
-	 */
-	LCUI_WidgetTaskRec	task;
-	LCUI_WidgetRules	rules;
-	LCUI_EventTrigger	trigger;
+	/** Update task context */
+	LCUI_WidgetTaskRec task;
+	LCUI_WidgetRules rules;
+	LCUI_EventTrigger trigger;
+
+	/** Invalid area (Dirty Rectangle) */
+	LCUI_RectF invalid_area;
+	LCUI_InvalidAreaType invalid_area_type;
+	LCUI_BOOL has_child_invalid_area;
 	
 	/** Parent widget */
-	LCUI_Widget		parent;
+	LCUI_Widget parent;
 
 	/** List of child widgets */
-	LinkedList		children;
+	LinkedList children;
 
 	/** List of child widgets in descending order by z-index */
-	LinkedList		children_show;
+	LinkedList children_show;
 	
 	/**
 	 * Position in the parent->children
 	 * this == LinkedList_Get(&this->parent->children, this.index)
 	 */
-	size_t			index;
+	size_t index;
 
 	/**
 	 * Node in the parent->children
 	 * &this->node == LinkedList_GetNode(&this->parent->children, this.index)
 	 */
-	LinkedListNode		node;
+	LinkedListNode node;
 	
 	/** Node in the parent->children_shoa */
-	LinkedListNode		node_show;
+	LinkedListNode node_show;
 } LCUI_WidgetRec;
 
 /* clang-format on */
@@ -369,21 +385,6 @@ LCUI_API float Widget_ComputeYMetric(LCUI_Widget w, int key);
 /** 部件是否有值为自动（默认）的样式 */
 LCUI_API LCUI_BOOL Widget_HasAutoStyle(LCUI_Widget w, int key);
 
-/** 父级部件有可直接获取的静态宽度 */
-LCUI_API LCUI_BOOL Widget_HasStaticWidthParent(LCUI_Widget widget);
-
-/** 如果部件具有自适应内容的宽度 */
-LCUI_API LCUI_BOOL Widget_HasFitContentWidth(LCUI_Widget w);
-
-LCUI_API LCUI_BOOL Widget_HasStaticWidth(LCUI_Widget w);
-
-LCUI_API LCUI_BOOL Widget_HasStaticHeight(LCUI_Widget w);
-
-LCUI_API LCUI_SizingRule Widget_GetWidthSizingRule(LCUI_Widget w);
-
-LCUI_API LCUI_SizingRule Widget_GetHeightSizingRule(LCUI_Widget w);
-
-/** 获取根级部件 */
 LCUI_API LCUI_Widget LCUIWidget_GetRoot(void);
 
 /** 获取指定ID的部件 */
@@ -527,8 +528,6 @@ LCUI_API void Widget_UpdateBoxSize(LCUI_Widget w);
 LCUI_API void Widget_ComputeFlexBasisStyle(LCUI_Widget w);
 
 LCUI_API void Widget_SetBorderBoxSize(LCUI_Widget w, float width, float height);
-
-LCUI_API void Widget_SetContentSize(LCUI_Widget w, float width, float height);
 
 LCUI_API size_t LCUIWidget_ClearTrash(void);
 

@@ -1,7 +1,7 @@
 ﻿/*
  * textview.c -- TextView widget for display text.
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2020, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -46,6 +46,7 @@
 #define ComputeActual LCUIMetrics_ComputeActual
 
 typedef struct LCUI_TextViewRec_ {
+	float available_width;
 	wchar_t *content;
 	LCUI_BOOL trimming;
 	LCUI_Widget widget;
@@ -117,12 +118,25 @@ static void TextView_OnParseText(LCUI_Widget w, const char *text)
 	TextView_SetText(w, text);
 }
 
-static void TextView_OnRunTask(LCUI_Widget w, int task)
+static void TextView_Update(LCUI_Widget w)
 {
-	if (task == LCUI_WTASK_RESIZE &&
-	    Widget_GetWidthSizingRule(w) == LCUI_SIZING_RULE_FIT_CONTENT) {
-		Widget_AddTask(w, LCUI_WTASK_REFLOW);
+	float scale = LCUIMetrics_GetScale();
+
+	LCUI_RectF rect;
+	LCUI_TextView txt = GetData(w);
+
+	LinkedList rects;
+	LinkedListNode *node;
+
+	LinkedList_Init(&rects);
+	TextLayer_Update(txt->layer, &rects);
+	TextLayer_ClearInvalidRect(txt->layer);
+	for (LinkedList_Each(node, &rects)) {
+		LCUIRect_ToRectF(node->data, &rect, 1.0f / scale);
+		Widget_InvalidateArea(w, &rect, SV_CONTENT_BOX);
 	}
+	RectList_Clear(&rects);
+	Widget_AddTask(w, LCUI_WTASK_REFLOW);
 }
 
 static void TextView_UpdateStyle(LCUI_Widget w)
@@ -151,7 +165,7 @@ static void TextView_UpdateStyle(LCUI_Widget w)
 	CSSFontStyle_Destroy(&txt->style);
 	TextStyle_Destroy(&text_style);
 	txt->style = style;
-	Widget_AddTask(w, LCUI_WTASK_USER);
+	TextView_Update(w);
 }
 
 static void TextView_OnInit(LCUI_Widget w)
@@ -160,6 +174,7 @@ static void TextView_OnInit(LCUI_Widget w)
 
 	txt = Widget_AddData(w, self.prototype, sizeof(LCUI_TextViewRec));
 	txt->widget = w;
+	txt->available_width = 0;
 	txt->content = NULL;
 	/* 默认清除首尾空白符 */
 	txt->trimming = TRUE;
@@ -186,13 +201,56 @@ static void TextView_OnDestroy(LCUI_Widget w)
 	free(txt->content);
 }
 
-static void TextView_AutoSize(LCUI_Widget w, float *content_width,
-			      float *content_height)
+static void TextView_OnAutoSize(LCUI_Widget w, float *width, float *height,
+				LCUI_LayoutRule rule)
 {
-	int max_width = 0, max_height = 0;
-	int fixed_width = 0, fixed_height = 0;
-	int text_width, text_height;
+	int max_width, max_height;
 	float scale = LCUIMetrics_GetScale();
+
+	LCUI_TextView txt = GetData(w);
+
+	LinkedList rects;
+
+	if (w->parent &&
+	    w->parent->computed_style.width_sizing == LCUI_SIZING_RULE_FIXED) {
+		txt->available_width = w->parent->box.content.width;
+		max_width = (int)(scale * txt->available_width - PaddingX(w) -
+				  BorderX(w));
+	} else {
+		txt->available_width = 0;
+		max_width = 0;
+	}
+	switch (rule) {
+	case LCUI_LAYOUT_RULE_FIXED_WIDTH:
+		max_width = (int)(scale * w->box.content.width);
+		max_height = 0;
+		break;
+	case LCUI_LAYOUT_RULE_FIXED_HEIGHT:
+		max_height = (int)(scale * w->box.content.height);
+		break;
+	case LCUI_LAYOUT_RULE_FIXED:
+		max_width = (int)(scale * w->box.content.width);
+		max_height = (int)(scale * w->box.content.height);
+		break;
+	default:
+		max_height = 0;
+		break;
+	}
+	LinkedList_Init(&rects);
+	TextLayer_SetFixedSize(txt->layer, 0, 0);
+	TextLayer_SetMaxSize(txt->layer, max_width, max_height);
+	TextLayer_Update(txt->layer, &rects);
+	TextLayer_ClearInvalidRect(txt->layer);
+	RectList_Clear(&rects);
+	*width = TextLayer_GetWidth(txt->layer) / scale;
+	*height = TextLayer_GetHeight(txt->layer) / scale;
+}
+
+static void TextView_OnResize(LCUI_Widget w, float width, float height)
+{
+	float scale = LCUIMetrics_GetScale();
+	int fixed_width = (int)(width * scale);
+	int fixed_height = (int)(height * scale);
 
 	LCUI_RectF rect;
 	LCUI_TextView txt = GetData(w);
@@ -200,51 +258,11 @@ static void TextView_AutoSize(LCUI_Widget w, float *content_width,
 	LinkedList rects;
 	LinkedListNode *node;
 
-	if (w->parent) {
-		if (Widget_GetWidthSizingRule(w->parent) !=
-		    LCUI_SIZING_RULE_FIT_CONTENT) {
-			max_width =
-			    (int)(scale * (w->parent->box.content.width -
-					   PaddingX(w) - BorderX(w)));
-		}
-		if (Widget_GetHeightSizingRule(w->parent) !=
-		    LCUI_SIZING_RULE_FIT_CONTENT) {
-			max_height =
-			    (int)(scale * (w->parent->box.content.height -
-					   PaddingY(w) - BorderY(w)));
-		}
-	}
-	if (Widget_GetWidthSizingRule(w) != LCUI_SIZING_RULE_FIT_CONTENT) {
-		fixed_width = (int)(scale * w->box.content.width);
-		max_width = fixed_width;
-	}
-	if (Widget_GetHeightSizingRule(w) != LCUI_SIZING_RULE_FIT_CONTENT) {
-		fixed_height = (int)(scale * w->box.content.height);
-		max_height = fixed_height;
-	}
 	LinkedList_Init(&rects);
 	TextLayer_SetFixedSize(txt->layer, fixed_width, fixed_height);
-	TextLayer_SetMaxSize(txt->layer, max_width, max_height);
+	TextLayer_SetMaxSize(txt->layer, fixed_width, fixed_height);
 	TextLayer_Update(txt->layer, &rects);
 	TextLayer_ClearInvalidRect(txt->layer);
-	text_width = TextLayer_GetWidth(txt->layer);
-	text_height = TextLayer_GetHeight(txt->layer);
-	if (fixed_width == 0 && *content_width > text_width) {
-		fixed_width = *content_width;
-		if (fixed_height == 0 && *content_height > text_height) {
-			fixed_height = *content_height;
-		}
-		TextLayer_SetFixedSize(txt->layer, fixed_width, fixed_height);
-		TextLayer_Update(txt->layer, &rects);
-		TextLayer_ClearInvalidRect(txt->layer);
-	} else if (fixed_height == 0 && *content_height > text_height) {
-		fixed_height = *content_height;
-		TextLayer_SetFixedSize(txt->layer, fixed_width, fixed_height);
-		TextLayer_Update(txt->layer, &rects);
-		TextLayer_ClearInvalidRect(txt->layer);
-	}
-	*content_width = TextLayer_GetWidth(txt->layer) / scale;
-	*content_height = TextLayer_GetHeight(txt->layer) / scale;
 	for (LinkedList_Each(node, &rects)) {
 		LCUIRect_ToRectF(node->data, &rect, 1.0f / scale);
 		Widget_InvalidateArea(w, &rect, SV_CONTENT_BOX);
@@ -308,7 +326,7 @@ int TextView_SetTextW(LCUI_Widget w, const wchar_t *text)
 		wcstrim(newtext, text, NULL);
 	} while (0);
 	TextLayer_SetTextW(txt->layer, newtext, NULL);
-	Widget_AddTask(w, LCUI_WTASK_REFLOW);
+	TextView_Update(w);
 	free(newtext);
 	return 0;
 }
@@ -376,6 +394,21 @@ size_t LCUIWidget_RefreshTextView(void)
 	return count;
 }
 
+static void TextVIew_OnTask(LCUI_Widget w, int task)
+{
+	LCUI_TextView txt;
+
+	if (task != LCUI_WTASK_RESIZE ||
+	    w->computed_style.width_sizing != LCUI_SIZING_RULE_FIT_CONTENT) {
+		return;
+	}
+	txt = GetData(w);
+	if (w->parent && w->parent->box.content.width != txt->available_width) {
+		txt->available_width = w->parent->box.content.width;
+		Widget_AddTask(w, LCUI_WTASK_REFLOW);
+	}
+}
+
 void LCUIWidget_AddTextView(void)
 {
 	LCUI_CSSPropertyParserRec parser = { 0, "word-break",
@@ -385,11 +418,12 @@ void LCUIWidget_AddTextView(void)
 	self.prototype->init = TextView_OnInit;
 	self.prototype->paint = TextView_OnPaint;
 	self.prototype->destroy = TextView_OnDestroy;
-	self.prototype->autosize = TextView_AutoSize;
+	self.prototype->autosize = TextView_OnAutoSize;
+	self.prototype->resize = TextView_OnResize;
 	self.prototype->update = TextView_UpdateStyle;
 	self.prototype->settext = TextView_OnParseText;
 	self.prototype->setattr = TextView_OnParseAttr;
-	self.prototype->runtask = TextView_OnRunTask;
+	self.prototype->runtask = TextVIew_OnTask;
 	LCUI_AddCSSPropertyParser(&parser);
 	LinkedList_Init(&self.list);
 }

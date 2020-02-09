@@ -50,6 +50,12 @@ LCUI_API void Widget_ComputeMarginStyle(LCUI_Widget w);
 
 LCUI_API void Widget_ComputeProperties(LCUI_Widget w);
 
+LCUI_API void Widget_ComputeWidthLimitStyle(LCUI_Widget w,
+					    LCUI_LayoutRule rule);
+
+LCUI_API void Widget_ComputeHeightLimitStyle(LCUI_Widget w,
+					     LCUI_LayoutRule rule);
+
 LCUI_API void Widget_ComputeHeightStyle(LCUI_Widget w);
 
 LCUI_API void Widget_ComputeWidthStyle(LCUI_Widget w);

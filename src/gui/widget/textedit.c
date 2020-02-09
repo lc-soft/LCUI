@@ -50,13 +50,7 @@
 #define AddData(W) Widget_AddData(W, self.prototype, sizeof(LCUI_TextEditRec))
 #define TextBlocks_Clear(blocks) LinkedList_Clear(blocks, TextBlock_OnDestroy)
 
-enum TaskType {
-	TASK_SET_TEXT,
-	TASK_UPDATE,
-	TASK_UPDATE_MASK,
-	TASK_UPDATE_CARET,
-	TASK_TOTAL
-};
+enum TaskType { TASK_SET_TEXT, TASK_UPDATE, TASK_TOTAL };
 
 typedef struct LCUI_TextEditRec_ {
 	LCUI_CSSFontStyleRec style;       /**< 字体样式 */
@@ -375,28 +369,10 @@ static void TextEdit_UpdateTextLayer(LCUI_Widget w)
 	RectList_Clear(&rects);
 }
 
-static void TextEdit_OnTask(LCUI_Widget widget)
+static void TextEdit_OnTask(LCUI_Widget widget, int task)
 {
-	size_t i, len;
-	wchar_t text[256];
 	LCUI_TextEdit edit = Widget_GetData(widget, self.prototype);
 
-	while (edit->tasks[TASK_UPDATE_MASK]) {
-		edit->tasks[TASK_UPDATE] = TRUE;
-		edit->tasks[TASK_UPDATE_MASK] = FALSE;
-		TextLayer_ClearText(edit->layer_mask);
-		if (!edit->password_char) {
-			edit->layer = edit->layer_source;
-			break;
-		}
-		edit->layer = edit->layer_mask;
-		len = TextEdit_GetTextLength(widget);
-		for (i = 0; i < len; i += 255) {
-			TextEdit_GetTextW(widget, i, 255, text);
-			fillchar(text, edit->password_char);
-			TextLayer_AppendTextW(edit->layer, text, NULL);
-		}
-	}
 	if (edit->tasks[TASK_SET_TEXT]) {
 		LinkedList blocks;
 		LinkedListNode *node;
@@ -430,35 +406,78 @@ static void TextEdit_OnTask(LCUI_Widget widget)
 			Widget_InvalidateArea(widget, NULL, SV_PADDING_BOX);
 		}
 		edit->is_placeholder_shown = is_shown;
-		edit->tasks[TASK_UPDATE_CARET] = TRUE;
 		edit->tasks[TASK_UPDATE] = FALSE;
-	}
-	if (edit->tasks[TASK_UPDATE_CARET]) {
-		edit->tasks[TASK_UPDATE_CARET] = FALSE;
 		TextEdit_UpdateCaret(widget);
 	}
 }
 
-static void TextEdit_AutoSize(LCUI_Widget widget, float *width, float *height)
+static void TextEdit_OnResize(LCUI_Widget w, float width, float height)
 {
-	int i, n, h;
 	float scale = LCUIMetrics_GetScale();
-	LCUI_TextEdit edit = GetData(widget);
 
-	if (edit->is_multiline_mode) {
-		n = max(TextLayer_GetRowTotal(edit->layer), 3);
-		for (h = 0, i = 0; i < n; ++i) {
-			h += TextLayer_GetRowHeight(edit->layer, i);
+	LinkedList rects;
+	LinkedListNode *node;
+
+	LCUI_RectF rect;
+	LCUI_TextEdit edit = GetData(w);
+
+	LinkedList_Init(&rects);
+	TextLayer_SetFixedSize(edit->layer, (int)(width * scale), (int)(width * scale));
+	TextLayer_SetMaxSize(edit->layer, (int)(height * scale), (int)(height * scale));
+	TextLayer_Update(edit->layer, &rects);
+	TextLayer_ClearInvalidRect(edit->layer);
+	for (LinkedList_Each(node, &rects)) {
+		LCUIRect_ToRectF(node->data, &rect, 1.0f / scale);
+		Widget_InvalidateArea(w, &rect, SV_CONTENT_BOX);
+	}
+	RectList_Clear(&rects);
+}
+
+static void TextEdit_OnAutoSize(LCUI_Widget w, float *width, float *height,
+				LCUI_LayoutRule rule)
+{
+	int i, n;
+	int max_width = 0, max_height = 0;
+	float scale = LCUIMetrics_GetScale();
+
+	LCUI_TextEdit edit = GetData(w);
+
+	switch (rule) {
+	case LCUI_LAYOUT_RULE_FIXED_WIDTH:
+		max_width = (int)(scale * w->box.content.width);
+		if (edit->is_multiline_mode) {
+			n = max(TextLayer_GetRowTotal(edit->layer), 6);
+			for (max_height = 0, i = 0; i < n; ++i) {
+				max_height +=
+				    TextLayer_GetRowHeight(edit->layer, i);
+			}
+		} else {
+			max_height = TextLayer_GetHeight(edit->layer);
 		}
-	} else {
-		h = TextLayer_GetHeight(edit->layer);
+		break;
+	case LCUI_LAYOUT_RULE_FIXED_HEIGHT:
+		max_width = (int)(scale * DEFAULT_WIDTH);
+		max_height = (int)(scale * w->box.content.height);
+		break;
+	case LCUI_LAYOUT_RULE_FIXED:
+		max_width = (int)(scale * w->box.content.width);
+		max_height = (int)(scale * w->box.content.height);
+		break;
+	default:
+		max_width = (int)(scale * DEFAULT_WIDTH);
+		if (edit->is_multiline_mode) {
+			n = max(TextLayer_GetRowTotal(edit->layer), 6);
+			for (max_height = 0, i = 0; i < n; ++i) {
+				max_height +=
+				    TextLayer_GetRowHeight(edit->layer, i);
+			}
+		} else {
+			max_height = TextLayer_GetHeight(edit->layer);
+		}
+		break;
 	}
-	if (*height <= 0) {
-		*height = h / scale;
-	}
-	if (*width <= 0) {
-		*width = DEFAULT_WIDTH;
-	}
+	*height = max_height / scale;
+	*width = max_width / scale;
 }
 
 void TextEdit_EnableStyleTag(LCUI_Widget widget, LCUI_BOOL enable)
@@ -560,10 +579,25 @@ int TextEdit_SetText(LCUI_Widget widget, const char *utf8_str)
 
 void TextEdit_SetPasswordChar(LCUI_Widget w, wchar_t ch)
 {
+	size_t i, len;
+	wchar_t text[256];
 	LCUI_TextEdit edit = GetData(w);
+
 	edit->password_char = ch;
-	edit->tasks[TASK_UPDATE_MASK] = TRUE;
+	edit->tasks[TASK_UPDATE] = TRUE;
 	Widget_AddTask(w, LCUI_WTASK_USER);
+	TextLayer_ClearText(edit->layer_mask);
+	if (!edit->password_char) {
+		edit->layer = edit->layer_source;
+		return;
+	}
+	edit->layer = edit->layer_mask;
+	len = TextEdit_GetTextLength(w);
+	for (i = 0; i < len; i += 255) {
+		TextEdit_GetTextW(w, i, 255, text);
+		fillchar(text, edit->password_char);
+		TextLayer_AppendTextW(edit->layer, text, NULL);
+	}
 }
 
 int TextEdit_AppendTextW(LCUI_Widget w, const wchar_t *wstr)
@@ -625,8 +659,7 @@ static void TextEdit_OnFocus(LCUI_Widget widget, LCUI_WidgetEvent e, void *arg)
 
 	edit = Widget_GetData(widget, self.prototype);
 	TextCaret_SetVisible(edit->caret, TRUE);
-	edit->tasks[TASK_UPDATE_CARET] = TRUE;
-	Widget_AddTask(widget, LCUI_WTASK_USER);
+	TextEdit_UpdateCaret(widget);
 }
 
 static void TextEdit_OnBlur(LCUI_Widget widget, LCUI_WidgetEvent e, void *arg)
@@ -792,48 +825,6 @@ static void TextEdit_OnTextInput(LCUI_Widget widget, LCUI_WidgetEvent e,
 	free(text);
 }
 
-static void TextEdit_OnResize(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
-{
-	int iw, ih;
-	float scale, width = 0, height = 0;
-	float max_width = 0, max_height = 0;
-
-	LCUI_RectF rect;
-	LinkedList rects;
-	LinkedListNode *node;
-	LCUI_TextEdit edit = GetData(w);
-
-	if (!w->style->sheet[key_width].is_valid ||
-	    w->style->sheet[key_width].type == LCUI_STYPE_AUTO) {
-		max_width = Widget_ComputeMaxContentWidth(w);
-	} else {
-		max_width = width = w->box.content.width;
-	}
-	if (w->style->sheet[key_height].is_valid &&
-	    w->style->sheet[key_height].type != LCUI_STYPE_AUTO) {
-		max_height = height = w->box.content.width;
-	}
-	LinkedList_Init(&rects);
-	iw = iround(width);
-	ih = iround(height);
-	TextLayer_SetFixedSize(edit->layer_mask, iw, ih);
-	TextLayer_SetFixedSize(edit->layer_source, iw, ih);
-	TextLayer_SetFixedSize(edit->layer_placeholder, iw, ih);
-	iw = iround(max_width);
-	ih = iround(max_height);
-	TextLayer_SetMaxSize(edit->layer_mask, iw, ih);
-	TextLayer_SetMaxSize(edit->layer_source, iw, ih);
-	TextLayer_SetMaxSize(edit->layer_placeholder, iw, ih);
-	TextLayer_Update(edit->layer, &rects);
-	scale = LCUIMetrics_GetScale();
-	for (LinkedList_Each(node, &rects)) {
-		LCUIRect_ToRectF(node->data, &rect, 1.0f / scale);
-		Widget_InvalidateArea(w, node->data, SV_CONTENT_BOX);
-	}
-	RectList_Clear(&rects);
-	TextLayer_ClearInvalidRect(edit->layer);
-}
-
 static void TextEdit_OnMouseMove(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 {
 	int x, y;
@@ -914,7 +905,6 @@ static void TextEdit_OnInit(LCUI_Widget w)
 	Widget_BindEvent(w, "mousedown", TextEdit_OnMouseDown, NULL, NULL);
 	Widget_BindEvent(w, "mouseup", TextEdit_OnMouseUp, NULL, NULL);
 	Widget_BindEvent(w, "keydown", TextEdit_OnKeyDown, NULL, NULL);
-	Widget_BindEvent(w, "resize", TextEdit_OnResize, NULL, NULL);
 	Widget_BindEvent(w, "focus", TextEdit_OnFocus, NULL, NULL);
 	Widget_BindEvent(w, "blur", TextEdit_OnBlur, NULL, NULL);
 	Widget_BindEvent(w, "ready", TextEdit_OnReady, NULL, NULL);
@@ -974,7 +964,7 @@ static void TextEdit_OnUpdateStyle(LCUI_Widget w)
 	LCUI_TextStyleRec text_style;
 	LCUI_CSSFontStyleRec style;
 	LCUI_TextLayer layers[3] = { edit->layer_mask, edit->layer_placeholder,
-				      edit->layer_source };
+				     edit->layer_source };
 
 	CSSFontStyle_Init(&style);
 	CSSFontStyle_Compute(&style, w->style);
@@ -1036,7 +1026,8 @@ void LCUIWidget_AddTextEdit(void)
 	self.prototype->settext = TextEdit_OnParseText;
 	self.prototype->setattr = TextEdit_SetAttr;
 	self.prototype->bindprop = TextEdit_BindProperty;
-	self.prototype->autosize = TextEdit_AutoSize;
+	self.prototype->autosize = TextEdit_OnAutoSize;
+	self.prototype->resize = TextEdit_OnResize;
 	self.prototype->runtask = TextEdit_OnTask;
 	self.prototype->update = TextEdit_OnUpdateStyle;
 	LCUI_LoadCSSString(textedit_css, __FILE__);
