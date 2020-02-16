@@ -399,21 +399,6 @@ LCUI_API void Widget_Destroy(LCUI_Widget w);
 LCUI_API void Widget_GetOffset(LCUI_Widget w, LCUI_Widget parent,
 			       float *offset_x, float *offset_y);
 
-LCUI_API void LCUIWidget_InitImageLoader(void);
-
-LCUI_API void LCUIWidget_FreeImageLoader(void);
-
-LCUI_API void Widget_InitBackground(LCUI_Widget w);
-
-LCUI_API void Widget_DestroyBackground(LCUI_Widget w);
-
-LCUI_API void Widget_ComputeBackgroundStyle(LCUI_Widget widget);
-
-LCUI_API void Widget_PaintBakcground(LCUI_Widget w, LCUI_PaintContext paint,
-				     LCUI_WidgetActualStyle style);
-
-LCUI_API void Widget_ComputeBackground(LCUI_Widget w, LCUI_Background *out);
-
 LCUI_API float Widget_GetCanvasWidth(LCUI_Widget widget);
 
 LCUI_API float Widget_GetCanvasHeight(LCUI_Widget widget);

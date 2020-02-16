@@ -1,7 +1,7 @@
 ﻿/*
- * widget.c -- GUI widget APIs.
+ * widget_background.c -- The widget background style processing module.
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2020, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,50 +28,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+void LCUIWidget_InitImageLoader(void);
 
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
-#include <LCUI/gui/widget.h>
-#include <LCUI/gui/widget/canvas.h>
-#include <LCUI/gui/widget/textview.h>
-#include <LCUI/gui/widget/textcaret.h>
-#include <LCUI/gui/widget/textedit.h>
-#include <LCUI/gui/widget/anchor.h>
-#include <LCUI/gui/widget/button.h>
-#include <LCUI/gui/widget/sidebar.h>
-#include <LCUI/gui/widget/scrollbar.h>
-#include "widget_background.h"
+void LCUIWidget_FreeImageLoader(void);
 
-void LCUI_InitWidget(void)
-{
-	LCUIWidget_InitTasks();
-	LCUIWidget_InitEvent();
-	LCUIWidget_InitPrototype();
-	LCUIWidget_InitStyle();
-	LCUIWidget_InitRenderer();
-	LCUIWidget_InitImageLoader();
-	LCUIWidget_AddTextView();
-	LCUIWidget_AddCanvas();
-	LCUIWidget_AddAnchor();
-	LCUIWidget_AddButton();
-	LCUIWidget_AddSideBar();
-	LCUIWidget_AddTScrollBar();
-	LCUIWidget_AddTextCaret();
-	LCUIWidget_AddTextEdit();
-	LCUIWidget_InitBase();
-	LCUIWidget_InitIdLibrary();
-}
+void Widget_InitBackground(LCUI_Widget w);
 
-void LCUI_FreeWidget(void)
-{
-	LCUIWidget_FreeTextView();
-	LCUIWidget_FreeTasks();
-	LCUIWidget_FreeRoot();
-	LCUIWidget_FreeEvent();
-	LCUIWidget_FreeStyle();
-	LCUIWidget_FreePrototype();
-	LCUIWidget_FreeRenderer();
-	LCUIWidget_FreeImageLoader();
-	LCUIWidget_FreeIdLibrary();
-	LCUIWidget_FreeBase();
-}
+void Widget_DestroyBackground(LCUI_Widget w);
+
+void Widget_ComputeBackgroundStyle(LCUI_Widget widget);
+
+void Widget_PaintBakcground(LCUI_Widget w, LCUI_PaintContext paint,
+				     LCUI_WidgetActualStyle style);
+
+void Widget_ComputeBackground(LCUI_Widget w, LCUI_Background *out);

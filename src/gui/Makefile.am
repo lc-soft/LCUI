@@ -38,9 +38,10 @@ widget/anchor.c		\
 widget/button.c		\
 widget/canvas.c
 
-
 noinst_HEADERS =\
 widget_border.h		\
+widget_background.h	\
+widget_shadow.h		\
 widget_diff.h		\
 widget_util.h		\
 layout/flexbox.h	\
