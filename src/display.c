@@ -85,12 +85,12 @@ typedef struct SurfaceRecordRec_ {
 } SurfaceRecordRec, *SurfaceRecord;
 
 static struct LCUI_DisplayModule {
-	unsigned width, height;		/**< 当前缓存的屏幕尺寸 */
-	LCUI_DisplayMode mode;		/**< 显示模式 */
-	LCUI_BOOL show_rect_border;	/**< 是否为重绘的区域显示边框 */
-	LCUI_BOOL active;		/**< 当前模块是否处于工作状态 */
-	LinkedList surfaces;		/**< surface 列表 */
-	LinkedList rects;		/**< 无效区域列表 */
+	unsigned width, height;
+	LCUI_BOOL active;
+	LCUI_BOOL enable_paint_flashing;
+	LCUI_DisplayMode mode;
+	LinkedList surfaces;
+	LinkedList rects;
 	LCUI_DisplayDriver driver;
 } display;
 
@@ -293,7 +293,7 @@ static size_t LCUIDisplay_RenderSurfaceRect(SurfaceRecord record,
 		  omp_get_num_threads(), paint->rect.x, paint->rect.y,
 		  paint->rect.width, paint->rect.height);
 	count = Widget_Render(record->widget, paint);
-	if (display.show_rect_border) {
+	if (display.enable_paint_flashing) {
 		LCUIDisplay_AppendFlashRects(record, &paint->rect);
 	}
 	if (display.mode != LCUI_DMODE_SEAMLESS) {
@@ -621,14 +621,9 @@ int LCUIDisplay_GetMode(void)
 	return display.mode;
 }
 
-void LCUIDisplay_ShowRectBorder(void)
+void LCUIDisplay_EnablePaintFlashing(LCUI_BOOL enable)
 {
-	display.show_rect_border = TRUE;
-}
-
-void LCUIDisplay_HideRectBorder(void)
-{
-	display.show_rect_border = FALSE;
+	display.enable_paint_flashing = enable;
 }
 
 /** 设置显示区域的尺寸，仅在窗口化、全屏模式下有效 */

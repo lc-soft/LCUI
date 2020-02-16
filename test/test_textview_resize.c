@@ -154,14 +154,11 @@ int test_textview_resize(void)
 
 #ifdef PREVIEW_MODE
 
-#include <LCUI/display.h>
-
 int tests_count = 0;
 
 int main(void)
 {
 	LCUI_Init();
-	LCUIDisplay_ShowRectBorder();
 
 	build();
 	LCUI_SetTimeout(6000, test_textview_set_text, NULL);
