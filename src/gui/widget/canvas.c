@@ -83,7 +83,7 @@ static void Canvas_OnDestroy(LCUI_Widget w)
 }
 
 static void Canvas_OnAutoSize(LCUI_Widget w, float *width, float *height,
-			      LCUI_SizingRule rule)
+			      LCUI_LayoutRule rule)
 {
 	*width = 300;
 	*height = 150;

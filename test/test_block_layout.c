@@ -740,8 +740,8 @@ void test_block_layout(void)
 	LCUIWidget_Update();
 
 	describe("root width 1280px", test_block_layout_1280);
-	// describe("root width 600px", test_block_layout_600);
-	// describe("root width 320px", test_block_layout_320);
+	describe("root width 600px", test_block_layout_600);
+	describe("root width 320px", test_block_layout_320);
 
 #ifndef PREVIEW_MODE
 	LCUI_Destroy();

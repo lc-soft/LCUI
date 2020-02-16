@@ -241,9 +241,9 @@ static void TextView_OnAutoSize(LCUI_Widget w, float *width, float *height,
 	TextLayer_SetMaxSize(txt->layer, max_width, max_height);
 	TextLayer_Update(txt->layer, &rects);
 	TextLayer_ClearInvalidRect(txt->layer);
-	RectList_Clear(&rects);
 	*width = TextLayer_GetWidth(txt->layer) / scale;
 	*height = TextLayer_GetHeight(txt->layer) / scale;
+	RectList_Clear(&rects);
 }
 
 static void TextView_OnResize(LCUI_Widget w, float width, float height)

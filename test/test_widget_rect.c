@@ -9,7 +9,6 @@
 
 void test_widget_rect(void)
 {
-	int ret = 0;
 	LCUI_Widget root;
 	LCUI_Widget parent, child;
 	LCUI_SysEventRec ev;

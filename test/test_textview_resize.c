@@ -5,7 +5,6 @@
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/css_parser.h>
 #include "test.h"
-#include "libtest.h"
 
 /* clang-format off */
 
@@ -134,26 +133,6 @@ static int check_textview_set_long_content_css(void)
 	return ret;
 }
 
-static void test_textview_set_font_size(void)
-{
-	Widget_SetStyleString(self.inline_block, "font-size", "24px");
-	Widget_SetStyleString(self.inline_block, "line-height", "32px");
-	LCUIWidget_Update();
-
-	it_i("inlineText.height", (int)self.inline_block->height, 54);
-}
-
-static void test_textview_set_font_weight(void)
-{
-	float width = self.inline_block->width;
-
-	Widget_SetStyleString(self.inline_block, "font-weight", "bold");
-	LCUIWidget_Update();
-
-	it_b("inlineText.width should be larger",
-	     self.inline_block->width > width, TRUE);
-}
-
 int test_textview_resize(void)
 {
 	int ret = 0;
@@ -185,11 +164,9 @@ int main(void)
 	LCUIDisplay_ShowRectBorder();
 
 	build();
-	//LCUI_SetTimeout(2000, (TimerCallback)test_textview_set_font_size, NULL);
-	LCUI_SetTimeout(4000, (TimerCallback)test_textview_set_font_weight, NULL);
-	// LCUI_SetTimeout(5000, test_textview_set_text, NULL);
-	// LCUI_SetTimeout(10000, test_textview_set_short_content_css, NULL);
-	// LCUI_SetTimeout(15000, test_textview_set_long_content_css, NULL);
+	LCUI_SetTimeout(6000, test_textview_set_text, NULL);
+	LCUI_SetTimeout(10000, test_textview_set_short_content_css, NULL);
+	LCUI_SetTimeout(15000, test_textview_set_long_content_css, NULL);
 
 	return LCUI_Main();
 }
