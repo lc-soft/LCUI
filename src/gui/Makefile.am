@@ -21,8 +21,6 @@ widget_background.c	\
 widget_border.c		\
 widget_shadow.c		\
 widget_diff.c		\
-widget_diff.h		\
-widget_util.h		\
 css_parser.c		\
 css_rule_font_face.c	\
 css_library.c		\
@@ -30,9 +28,7 @@ css_fontstyle.c		\
 builder.c		\
 metrics.c		\
 layout/block.c		\
-layout/block.h		\
 layout/flexbox.c	\
-layout/flexbox.h	\
 widget/textview.c	\
 widget/textcaret.c	\
 widget/textedit.c	\
@@ -41,3 +37,11 @@ widget/scrollbar.c	\
 widget/anchor.c		\
 widget/button.c		\
 widget/canvas.c
+
+
+noinst_HEADERS =\
+widget_border.h		\
+widget_diff.h		\
+widget_util.h		\
+layout/flexbox.h	\
+layout/block.h

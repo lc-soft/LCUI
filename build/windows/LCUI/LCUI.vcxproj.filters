@@ -327,6 +327,9 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_hash.h">
       <Filter>头文件\LCUI\gui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\gui\widget_border.h">
+      <Filter>源文件\gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">

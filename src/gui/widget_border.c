@@ -1,7 +1,7 @@
 ﻿/*
  * widget_boarder.c -- widget border style processing module.
  *
- * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2020, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -34,6 +34,7 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/metrics.h>
 #include <LCUI/gui/widget.h>
+#include "widget_border.h"
 
 static float ComputeXMetric(LCUI_Widget w, LCUI_Style s)
 {

@@ -37,6 +37,7 @@
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/metrics.h>
 #include "widget_diff.h"
+#include "widget_border.h"
 
 typedef struct LCUI_WidgetTaskContextRec_ *LCUI_WidgetTaskContext;
 

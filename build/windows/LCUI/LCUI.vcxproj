@@ -351,6 +351,7 @@
     <ClInclude Include="..\..\..\include\LCUI_Build.h" />
     <ClInclude Include="..\..\..\src\gui\layout\block.h" />
     <ClInclude Include="..\..\..\src\gui\layout\flexbox.h" />
+    <ClInclude Include="..\..\..\src\gui\widget_border.h" />
     <ClInclude Include="..\..\..\src\gui\widget_diff.h" />
     <ClInclude Include="..\..\..\src\gui\widget_util.h" />
     <ClInclude Include="resource.h" />
