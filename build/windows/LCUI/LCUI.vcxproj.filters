@@ -324,6 +324,9 @@
     <ClInclude Include="..\..\..\src\gui\widget_diff.h">
       <Filter>源文件\gui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_hash.h">
+      <Filter>头文件\LCUI\gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -566,9 +569,6 @@
     <ClCompile Include="..\..\..\src\gui\widget\canvas.c">
       <Filter>源文件\gui\widget</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\gui\widget_size.c">
-      <Filter>源文件\gui</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\gui\layout\block.c">
       <Filter>源文件\gui\layout</Filter>
     </ClCompile>
@@ -576,6 +576,9 @@
       <Filter>源文件\gui\layout</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\gui\widget_diff.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_hash.c">
       <Filter>源文件\gui</Filter>
     </ClCompile>
   </ItemGroup>

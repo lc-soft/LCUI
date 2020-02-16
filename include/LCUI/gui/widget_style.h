@@ -74,6 +74,8 @@ LCUI_API void Widget_ComputePositionStyle(LCUI_Widget w);
 
 LCUI_API void Widget_ComputeFlexBoxStyle(LCUI_Widget w);
 
+LCUI_API void Widget_ComputeFlexBasisStyle(LCUI_Widget w);
+
 /** 更新当前部件的样式 */
 LCUI_API void Widget_UpdateStyle(LCUI_Widget w, LCUI_BOOL is_refresh_all);
 

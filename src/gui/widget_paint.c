@@ -283,13 +283,10 @@ size_t Widget_GetInvalidArea(LCUI_Widget w, LinkedList *rects)
 	int y = iround(w->box.padding.y * scale);
 
 	Widget_CollectInvalidArea(w, rects, 0, 0, w->box.padding);
-	DEBUG_MSG("rects: %lu\n", rects->length);
 	for (LinkedList_Each(node, rects)) {
 		rect = node->data;
 		rect->x -= x;
 		rect->y -= y;
-		_DEBUG_MSG("(%d, %d, %d, %d)\n", rect->x, rect->y, rect->width,
-			   rect->height);
 	}
 	return rects->length;
 }

@@ -1,7 +1,7 @@
 ﻿/*
  * widget_base.h -- The widget base operation set.
  *
- * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2020, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -367,10 +367,6 @@ typedef struct LCUI_WidgetRec_ {
 	(Widget_CheckStyleType(W, key_width, SCALE) || \
 	 Widget_CheckStyleType(W, key_height, SCALE))
 
-#define Widget_HasParentDependentWidth(W)              \
-	(Widget_CheckStyleType(W, key_width, scale) && \
-	 !Widget_HasStaticWidthParent(W))
-
 INLINE LCUI_BOOL Widget_IsFlexLayoutStyleWorks(LCUI_Widget w)
 {
 	return Widget_HasFlexDisplay(w) ||
@@ -382,12 +378,10 @@ LCUI_API float Widget_ComputeXMetric(LCUI_Widget w, int key);
 
 LCUI_API float Widget_ComputeYMetric(LCUI_Widget w, int key);
 
-/** 部件是否有值为自动（默认）的样式 */
 LCUI_API LCUI_BOOL Widget_HasAutoStyle(LCUI_Widget w, int key);
 
 LCUI_API LCUI_Widget LCUIWidget_GetRoot(void);
 
-/** 获取指定ID的部件 */
 LCUI_API LCUI_Widget LCUIWidget_GetById(const char *idstr);
 
 /** Create a widget by prototype */
@@ -402,38 +396,28 @@ LCUI_API void Widget_ExecDestroy(LCUI_Widget w);
 /** Mark a Widget needs to be destroyed */
 LCUI_API void Widget_Destroy(LCUI_Widget w);
 
-/** 获取相对于父级指定部件的 XY 坐标 */
 LCUI_API void Widget_GetOffset(LCUI_Widget w, LCUI_Widget parent,
 			       float *offset_x, float *offset_y);
 
-/** 初始化图片加载器，用于加载部件背景图 */
 LCUI_API void LCUIWidget_InitImageLoader(void);
 
-/** 退出并销毁图片加载器 */
 LCUI_API void LCUIWidget_FreeImageLoader(void);
 
-/** 初始化部件背景样式 */
 LCUI_API void Widget_InitBackground(LCUI_Widget w);
 
-/** 销毁部件背景相关数据 */
 LCUI_API void Widget_DestroyBackground(LCUI_Widget w);
 
-/** 更新部件背景样式 */
 LCUI_API void Widget_ComputeBackgroundStyle(LCUI_Widget widget);
 
-/** 绘制部件背景 */
 LCUI_API void Widget_PaintBakcground(LCUI_Widget w, LCUI_PaintContext paint,
 				     LCUI_WidgetActualStyle style);
 
-/** 计算部件背景样式的实际值 */
 LCUI_API void Widget_ComputeBackground(LCUI_Widget w, LCUI_Background *out);
 
-/** 计算部件边框样式的实际值 */
 LCUI_API void Widget_ComputeBorder(LCUI_Widget w, LCUI_Border *out);
 
 LCUI_API void Widget_ComputeBorderStyle(LCUI_Widget w);
 
-/** 绘制部件边框 */
 LCUI_API void Widget_PaintBorder(LCUI_Widget w, LCUI_PaintContext paint,
 				 LCUI_WidgetActualStyle style);
 
@@ -444,57 +428,31 @@ LCUI_API float Widget_GetCanvasWidth(LCUI_Widget widget);
 
 LCUI_API float Widget_GetCanvasHeight(LCUI_Widget widget);
 
-LCUI_API float Widget_GetLimitedWidth(LCUI_Widget w, float width);
-
-LCUI_API float Widget_GetLimitedHeight(LCUI_Widget w, float height);
-
-/** 根据阴影参数获取部件区域的横向偏移距离 */
 LCUI_API float Widget_GetBoxShadowOffsetX(LCUI_Widget w);
 
-/** 根据阴影参数获取部件区域的纵向偏移距离 */
 LCUI_API float Widget_GetBoxShadowOffsetY(LCUI_Widget w);
 
-/** 获取部件在添加阴影后的高度 */
 LCUI_API float Widget_GetCanvasWidth(LCUI_Widget w);
 
-/** 获取部件在添加阴影后的宽度 */
 LCUI_API float Widget_GetCanvasWidth(LCUI_Widget w);
 
-/** 计算部件阴影样式的实际值 */
 LCUI_API void Widget_ComputeBoxShadow(LCUI_Widget w, LCUI_BoxShadow *out);
 
 LCUI_API void Widget_ComputeBoxShadowStyle(LCUI_Widget w);
 
-/** 绘制部件阴影 */
 LCUI_API void Widget_PaintBoxShadow(LCUI_Widget w, LCUI_PaintContext paint,
 				    LCUI_WidgetActualStyle style);
 
-/** 更新可见性 */
-/** 设置部件为顶级部件 */
 LCUI_API int Widget_Top(LCUI_Widget w);
 
 LCUI_API void Widget_SortChildrenShow(LCUI_Widget w);
 
-/** 设置部件标题 */
 LCUI_API void Widget_SetTitleW(LCUI_Widget w, const wchar_t *title);
 
-/** 为部件添加状态 */
 LCUI_API void Widget_AddState(LCUI_Widget w, LCUI_WidgetState state);
 
 /** Check whether the widget is in the visible area */
 LCUI_API LCUI_BOOL Widget_InVisibleArea(LCUI_Widget w);
-
-/** Generate a hash for a widget to identify it and siblings */
-LCUI_API void Widget_GenerateSelfHash(LCUI_Widget w);
-
-/** Generate hash values for a widget and its children */
-LCUI_API void Widget_GenerateHash(LCUI_Widget w);
-
-LCUI_API size_t Widget_SetHashList(LCUI_Widget w, unsigned *hash_list,
-				   size_t len);
-
-LCUI_API size_t Widget_GetHashList(LCUI_Widget w, unsigned *hash_list,
-				   size_t maxlen);
 
 /** Set widget updating rules */
 LCUI_API int Widget_SetRules(LCUI_Widget w, const LCUI_WidgetRulesRec *rules);
@@ -507,27 +465,11 @@ LCUI_API void Widget_SetText(LCUI_Widget w, const char *text);
 LCUI_API void Widget_BindProperty(LCUI_Widget w, const char *name,
 				  LCUI_Object value);
 
-/** 计算部件的最大宽度 */
-LCUI_API float Widget_ComputeMaxWidth(LCUI_Widget w);
-
-/** 计算部件可利用的宽度 */
-LCUI_API float Widget_ComputeFillAvailableWidth(LCUI_Widget w);
-
-/** 计算部件的最大内容宽度 */
-LCUI_API float Widget_ComputeMaxContentWidth(LCUI_Widget w);
-
-/** 计算部件的最大可用宽度 */
-LCUI_API float Widget_ComputeMaxAvaliableWidth(LCUI_Widget widget);
-
 LCUI_API void Widget_UpdateBoxPosition(LCUI_Widget w);
 
 LCUI_API void Widget_UpdateCanvasBox(LCUI_Widget w);
 
 LCUI_API void Widget_UpdateBoxSize(LCUI_Widget w);
-
-LCUI_API void Widget_ComputeFlexBasisStyle(LCUI_Widget w);
-
-LCUI_API void Widget_SetBorderBoxSize(LCUI_Widget w, float width, float height);
 
 LCUI_API size_t LCUIWidget_ClearTrash(void);
 

@@ -1,7 +1,7 @@
 ﻿/*
  * widget_base.c -- The widget base operation set.
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2020, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -312,144 +312,6 @@ LCUI_BOOL Widget_InVisibleArea(LCUI_Widget w)
 	return TRUE;
 }
 
-void Widget_GenerateSelfHash(LCUI_Widget widget)
-{
-	int i;
-	unsigned hash = 1080;
-	LCUI_Widget w;
-
-	for (w = widget; w; w = w->parent) {
-		if (w != widget) {
-			hash = strhash(hash, " ");
-		}
-		if (w->type) {
-			hash = strhash(hash, w->type);
-		} else {
-			hash = strhash(hash, "*");
-		}
-		if (w->id) {
-			hash = strhash(hash, "#");
-			hash = strhash(hash, w->id);
-		}
-		if (w->classes) {
-			for (i = 0; w->classes[i]; ++i) {
-				hash = strhash(hash, ".");
-				hash = strhash(hash, w->classes[i]);
-			}
-		}
-		if (w->status) {
-			for (i = 0; w->status[i]; ++i) {
-				hash = strhash(hash, ":");
-				hash = strhash(hash, w->status[i]);
-			}
-		}
-		if (w->rules && w->rules->cache_children_style) {
-			break;
-		}
-	}
-	widget->hash = hash;
-}
-
-void Widget_GenerateHash(LCUI_Widget w)
-{
-	LinkedListNode *node;
-
-	Widget_GenerateSelfHash(w);
-	for (LinkedList_Each(node, &w->children)) {
-		Widget_GenerateHash(node->data);
-	}
-}
-
-size_t Widget_SetHashList(LCUI_Widget w, unsigned *hash_list, size_t len)
-{
-	size_t count = 0;
-	LCUI_Widget child;
-
-	child = w;
-	if (hash_list) {
-		child->hash = hash_list[count];
-	}
-	++count;
-	if (len > 0 && count >= len) {
-		return count;
-	}
-	while (child->children.length > 0) {
-		child = child->children.head.next->data;
-	}
-	while (child != w) {
-		while (child->children.length > 0) {
-			child = child->children.head.next->data;
-		}
-		if (hash_list) {
-			child->hash = hash_list[count];
-		}
-		++count;
-		if (len > 0 && count >= len) {
-			break;
-		}
-		if (child->node.next) {
-			child = child->node.next->data;
-			continue;
-		}
-		do {
-			child = child->parent;
-			if (child == w) {
-				break;
-			}
-			if (child->node.next) {
-				child = child->node.next->data;
-				break;
-			}
-		} while (1);
-	}
-	return count;
-}
-
-size_t Widget_GetHashList(LCUI_Widget w, unsigned *hash_list, size_t maxlen)
-{
-	size_t count = 0;
-	LCUI_Widget child;
-
-	child = w;
-	if (hash_list) {
-		hash_list[count] = child->hash;
-	}
-	++count;
-	if (maxlen > 0 && count >= maxlen) {
-		return count;
-	}
-	while (child->children.length > 0) {
-		child = child->children.head.next->data;
-	}
-	while (child != w) {
-		while (child->children.length > 0) {
-			child = child->children.head.next->data;
-		}
-		if (hash_list) {
-			hash_list[count] = child->hash;
-		}
-		++count;
-		if (maxlen > 0 && count >= maxlen) {
-			break;
-		}
-		if (child->node.next) {
-			child = child->node.next->data;
-			continue;
-		}
-		do {
-			child = child->parent;
-			if (child == w) {
-				break;
-			}
-			if (child->node.next) {
-				child = child->node.next->data;
-				break;
-			}
-		} while (1);
-	}
-	return count;
-}
-
 int Widget_SetRules(LCUI_Widget w, const LCUI_WidgetRulesRec *rules)
 {
 	LCUI_WidgetRulesData data;
@@ -566,24 +428,6 @@ LCUI_BOOL Widget_HasAutoStyle(LCUI_Widget w, int key)
 {
 	return !Widget_CheckStyleValid(w, key) ||
 	       Widget_CheckStyleType(w, key, AUTO);
-}
-
-LCUI_BOOL Widget_HasStaticWidthParent(LCUI_Widget widget)
-{
-	LCUI_Widget w;
-	for (w = widget->parent; w; w = w->parent) {
-		if (w->computed_style.max_width >= 0) {
-			return TRUE;
-		}
-		if (!Widget_HasAutoStyle(w, key_width)) {
-			return TRUE;
-		}
-		if (Widget_HasAbsolutePosition(w) ||
-		    Widget_HasInlineBlockDisplay(w)) {
-			return FALSE;
-		}
-	}
-	return FALSE;
 }
 
 LCUI_SizingRule Widget_GetHeightSizingRule(LCUI_Widget w)
@@ -715,13 +559,6 @@ void Widget_UpdateBoxSize(LCUI_Widget w)
 	w->box.outer.height = w->box.border.height + MarginY(w);
 	w->box.canvas.width = Widget_GetCanvasWidth(w);
 	w->box.canvas.height = Widget_GetCanvasHeight(w);
-}
-
-void Widget_SetBorderBoxSize(LCUI_Widget w, float width, float height)
-{
-	w->width = width;
-	w->height = height;
-	Widget_UpdateBoxSize(w);
 }
 
 void LCUIWidget_InitBase(void)

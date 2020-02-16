@@ -73,4 +73,30 @@ INLINE float ToBorderBoxHeight(LCUI_Widget w, float content_height)
 	return content_height + PaddingY(w) + BorderY(w);
 }
 
+INLINE float Widget_GetLimitedWidth(LCUI_Widget w, float width)
+{
+	if (w->computed_style.max_width > -1 &&
+	    width > w->computed_style.max_width) {
+		width = w->computed_style.max_width;
+	}
+	if (w->computed_style.min_width > -1 &&
+	    width < w->computed_style.min_width) {
+		width = w->computed_style.min_width;
+	}
+	return width;
+}
+
+INLINE float Widget_GetLimitedHeight(LCUI_Widget w, float height)
+{
+	if (w->computed_style.max_height > -1 &&
+	    height > w->computed_style.max_height) {
+		height = w->computed_style.max_height;
+	}
+	if (w->computed_style.min_height > -1 &&
+	    height < w->computed_style.min_height) {
+		height = w->computed_style.min_height;
+	}
+	return height;
+}
+
 #endif
