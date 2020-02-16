@@ -39,6 +39,7 @@
 #include "widget_diff.h"
 #include "widget_border.h"
 #include "widget_background.h"
+#include "widget_shadow.h"
 
 typedef struct LCUI_WidgetTaskContextRec_ *LCUI_WidgetTaskContext;
 

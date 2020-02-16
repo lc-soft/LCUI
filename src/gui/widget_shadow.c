@@ -1,7 +1,7 @@
 ﻿/*
  * widget_shadow.c -- widget shadow style processing module.
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2020, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -34,6 +34,7 @@
 #include <LCUI/gui/metrics.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/draw/boxshadow.h>
+#include "widget_shadow.h"
 
 static float ComputeXMetric(LCUI_Widget w, LCUI_Style s)
 {

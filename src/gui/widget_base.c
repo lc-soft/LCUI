@@ -39,6 +39,7 @@
 #include <LCUI/gui/metrics.h>
 #include "widget_util.h"
 #include "widget_background.h"
+#include "widget_shadow.h"
 
 static struct LCUI_WidgetModule {
 	LCUI_Widget root; /**< 根级部件 */

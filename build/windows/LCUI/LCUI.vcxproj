@@ -354,6 +354,7 @@
     <ClInclude Include="..\..\..\src\gui\widget_background.h" />
     <ClInclude Include="..\..\..\src\gui\widget_border.h" />
     <ClInclude Include="..\..\..\src\gui\widget_diff.h" />
+    <ClInclude Include="..\..\..\src\gui\widget_shadow.h" />
     <ClInclude Include="..\..\..\src\gui\widget_util.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>

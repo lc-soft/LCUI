@@ -333,6 +333,9 @@
     <ClInclude Include="..\..\..\src\gui\widget_background.h">
       <Filter>源文件\gui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\gui\widget_shadow.h">
+      <Filter>源文件\gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">

@@ -399,25 +399,6 @@ LCUI_API void Widget_Destroy(LCUI_Widget w);
 LCUI_API void Widget_GetOffset(LCUI_Widget w, LCUI_Widget parent,
 			       float *offset_x, float *offset_y);
 
-LCUI_API float Widget_GetCanvasWidth(LCUI_Widget widget);
-
-LCUI_API float Widget_GetCanvasHeight(LCUI_Widget widget);
-
-LCUI_API float Widget_GetBoxShadowOffsetX(LCUI_Widget w);
-
-LCUI_API float Widget_GetBoxShadowOffsetY(LCUI_Widget w);
-
-LCUI_API float Widget_GetCanvasWidth(LCUI_Widget w);
-
-LCUI_API float Widget_GetCanvasWidth(LCUI_Widget w);
-
-LCUI_API void Widget_ComputeBoxShadow(LCUI_Widget w, LCUI_BoxShadow *out);
-
-LCUI_API void Widget_ComputeBoxShadowStyle(LCUI_Widget w);
-
-LCUI_API void Widget_PaintBoxShadow(LCUI_Widget w, LCUI_PaintContext paint,
-				    LCUI_WidgetActualStyle style);
-
 LCUI_API int Widget_Top(LCUI_Widget w);
 
 LCUI_API void Widget_SortChildrenShow(LCUI_Widget w);

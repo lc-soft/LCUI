@@ -37,6 +37,7 @@
 #include <LCUI/display.h>
 #include "widget_border.h"
 #include "widget_background.h"
+#include "widget_shadow.h"
 
 //#define DEBUG_FRAME_RENDER
 #define ComputeActualPX(VAL) LCUIMetrics_ComputeActual(VAL, LCUI_STYPE_PX)
