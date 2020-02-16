@@ -158,9 +158,10 @@ static size_t LCUIDisplay_UpdateFlashRects(SurfaceRecord record)
 			mask.color_type = LCUI_COLOR_TYPE_ARGB;
 			Graph_Create(&mask, flash_rect->rect.width,
 				     flash_rect->rect.height);
-			Graph_FillRect(&mask, ARGB(125, 124, 179, 5), NULL, TRUE);
-			mask.opacity =
-			    0.6 * (FLASH_DURATION - (float)period) / FLASH_DURATION;
+			Graph_FillRect(&mask, ARGB(125, 124, 179, 5), NULL,
+				       TRUE);
+			mask.opacity = 0.6 * (FLASH_DURATION - (float)period) /
+				       FLASH_DURATION;
 		}
 		paint = Surface_BeginPaint(record->surface, &flash_rect->rect);
 		if (!paint) {
@@ -197,6 +198,15 @@ static void LCUIDisplay_AppendFlashRects(SurfaceRecord record, LCUI_Rect *rect)
 	LinkedList_Append(&record->flash_rects, flash_rect);
 }
 
+static void GetRenderingLayerSize(int *width, int *height)
+{
+	float scale = LCUIMetrics_GetScale();
+
+	*width = LCUIDisplay_GetWidth() * scale;
+	*height = LCUIDisplay_GetHeight() * scale;
+	*height = max(200, *height / PARALLEL_RENDERING_THREADS + 1);
+}
+
 static void SurfaceRecord_DumpRects(SurfaceRecord record, LinkedList *rects)
 {
 	typedef struct DirtyLayerRec {
@@ -207,9 +217,8 @@ static void SurfaceRecord_DumpRects(SurfaceRecord record, LinkedList *rects)
 
 	int i;
 	int max_dirty;
-	float scale = LCUIMetrics_GetScale();
-	int layer_width = LCUIDisplay_GetWidth() * scale;
-	int layer_height = LCUIDisplay_GetHeight() * scale;
+	int layer_width;
+	int layer_height;
 
 	LCUI_Rect rect;
 	LCUI_Rect *sub_rect;
@@ -217,7 +226,7 @@ static void SurfaceRecord_DumpRects(SurfaceRecord record, LinkedList *rects)
 	DirtyLayerRec layers[PARALLEL_RENDERING_THREADS];
 	LinkedListNode *node;
 
-	layer_height = max(200, layer_height / PARALLEL_RENDERING_THREADS + 1);
+	GetRenderingLayerSize(&layer_width, &layer_height);
 	max_dirty = 0.8 * layer_width * layer_height;
 	for (i = 0; i < PARALLEL_RENDERING_THREADS; ++i) {
 		layer = &layers[i];
@@ -263,62 +272,79 @@ static void SurfaceRecord_DumpRects(SurfaceRecord record, LinkedList *rects)
 	free(sub_rect);
 }
 
+static size_t LCUIDisplay_RenderSurfaceRect(SurfaceRecord record,
+					    LCUI_Rect *rect)
+{
+	size_t count;
+	LCUI_SysEventRec ev;
+	LCUI_PaintContext paint;
+
+	ev.type = LCUI_PAINT;
+	ev.paint.rect = *rect;
+	LCUI_TriggerEvent(&ev, NULL);
+	if (!record->widget || !record->surface ||
+	    !Surface_IsReady(record->surface)) {
+		return 0;
+	}
+	paint = Surface_BeginPaint(record->surface, rect);
+	if (!paint) {
+		return 0;
+	}
+	DEBUG_MSG("[thread %d/%d] rect: (%d,%d,%d,%d)\n", omp_get_thread_num(),
+		  omp_get_num_threads(), paint->rect.x, paint->rect.y,
+		  paint->rect.width, paint->rect.height);
+	count = Widget_Render(record->widget, paint);
+	if (display.show_rect_border) {
+		LCUIDisplay_AppendFlashRects(record, &paint->rect);
+	}
+	if (display.mode != LCUI_DMODE_SEAMLESS) {
+		LCUICursor_Paint(paint);
+	}
+	Surface_EndPaint(record->surface, paint);
+	return count;
+}
+
 static size_t LCUIDisplay_RenderSurface(SurfaceRecord record)
 {
 	int i = 0;
+	int dirty = 0;
+	int layer_width;
+	int layer_height;
 	size_t count = 0;
-	LCUI_BOOL can_render;
 	LCUI_Rect **rect_array;
-	LCUI_SysEventRec ev;
 	LinkedList rects;
 	LinkedListNode *node;
 
-	ev.type = LCUI_PAINT;
-	can_render = record->widget && record->surface &&
-		     Surface_IsReady(record->surface);
-	record->rendered = FALSE;
 	LinkedList_Init(&rects);
+	GetRenderingLayerSize(&layer_width, &layer_height);
 	SurfaceRecord_DumpRects(record, &rects);
 	if (rects.length < 1) {
 		return 0;
 	}
-
 	rect_array = (LCUI_Rect **)malloc(sizeof(LCUI_Rect *) * rects.length);
 	for (LinkedList_Each(node, &rects)) {
 		rect_array[i] = node->data;
+		dirty += rect_array[i]->width * rect_array[i]->height;
 		i++;
 	}
+	// Use OPENMP if the render area is larger than two render layers
+	if (dirty >= layer_width * layer_height * 2) {
 #ifdef USE_OPENMP
 #pragma omp parallel for \
 	default(none) \
-	shared(can_render, display, rects, rect_array) \
-	firstprivate(record, ev) \
+	shared(display, rects, rect_array) \
+	firstprivate(record) \
 	reduction(+:count)
 #endif
-	for (i = 0; i < rects.length; ++i) {
-		LCUI_Rect *rect;
-		LCUI_PaintContext paint;
-
-		rect = rect_array[i];
-		ev.paint.rect = *rect;
-		LCUI_TriggerEvent(&ev, NULL);
-		if (!can_render) {
-			continue;
+		for (i = 0; i < rects.length; ++i) {
+			count += LCUIDisplay_RenderSurfaceRect(record,
+							       rect_array[i]);
 		}
-		paint = Surface_BeginPaint(record->surface, rect);
-		if (!paint) {
-			continue;
+	} else {
+		for (i = 0; i < rects.length; ++i) {
+			count += LCUIDisplay_RenderSurfaceRect(record,
+							       rect_array[i]);
 		}
-		DEBUG_MSG("rect: (%d,%d,%d,%d)\n", paint->rect.x, paint->rect.y,
-			  paint->rect.width, paint->rect.height);
-		count += Widget_Render(record->widget, paint);
-		if (display.show_rect_border) {
-			LCUIDisplay_AppendFlashRects(record, &paint->rect);
-		}
-		if (display.mode != LCUI_DMODE_SEAMLESS) {
-			LCUICursor_Paint(paint);
-		}
-		Surface_EndPaint(record->surface, paint);
 	}
 	RectList_Clear(&rects);
 	record->rendered = count > 0;
@@ -947,7 +973,7 @@ int LCUI_InitDisplay(LCUI_DisplayDriver driver)
 	LCUIDisplay_SetMode(LCUI_DMODE_DEFAULT);
 	LCUIDisplay_Update();
 	Logger_Debug("[display] init ok, driver name: %s\n",
-		    display.driver->name);
+		     display.driver->name);
 	return 0;
 }
 
