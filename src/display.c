@@ -1,6 +1,6 @@
 /* display.c -- Graphical display control
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2020, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -115,29 +115,51 @@ static void OnDestroySurfaceRecord(void *data)
 	free(record);
 }
 
-static void DrawBorder(LCUI_Graph *mask)
+static size_t LCUIDisplay_RenderFlashRect(SurfaceRecord record,
+					FlashRect flash_rect)
 {
+	size_t count;
+	int64_t period;
+
 	LCUI_Pos pos;
 	LCUI_Color color;
-	int end_x = mask->width - 1;
-	int end_y = mask->height - 1;
+	LCUI_Graph mask;
+	LCUI_PaintContext paint;
+
+	paint = Surface_BeginPaint(record->surface, &flash_rect->rect);
+	if (!paint) {
+		return 0;
+	}
+	period = LCUI_GetTimeDelta(flash_rect->paint_time);
+	count = Widget_Render(record->widget, paint);
+	if (period >= FLASH_DURATION) {
+		flash_rect->paint_time = 0;
+		Surface_EndPaint(record->surface, paint);
+		return count;
+	}
+	Graph_Init(&mask);
+	mask.color_type = LCUI_COLOR_TYPE_ARGB;
+	Graph_Create(&mask, flash_rect->rect.width, flash_rect->rect.height);
+	Graph_FillRect(&mask, ARGB(125, 124, 179, 5), NULL, TRUE);
+	mask.opacity = 0.6 * (FLASH_DURATION - (float)period) / FLASH_DURATION;
 	pos.x = pos.y = 0;
 	color = RGB(124, 179, 5);
-	Graph_DrawHorizLine(mask, color, 1, pos, end_x);
-	Graph_DrawVertiLine(mask, color, 1, pos, end_y);
-	pos.x = mask->width - 1;
-	Graph_DrawVertiLine(mask, color, 1, pos, end_y);
+	Graph_DrawHorizLine(&mask, color, 1, pos, mask.width - 1);
+	Graph_DrawVertiLine(&mask, color, 1, pos, mask.height - 1);
+	pos.x = mask.width - 1;
+	Graph_DrawVertiLine(&mask, color, 1, pos, mask.height - 1);
 	pos.x = 0;
-	pos.y = mask->height - 1;
-	Graph_DrawHorizLine(mask, color, 1, pos, end_x);
+	pos.y = mask.height - 1;
+	Graph_DrawHorizLine(&mask, color, 1, pos, mask.width - 1);
+	Graph_Mix(&paint->canvas, &mask, 0, 0, TRUE);
+	Graph_Free(&mask);
+	Surface_EndPaint(record->surface, paint);
+	return count;
 }
 
 static size_t LCUIDisplay_UpdateFlashRects(SurfaceRecord record)
 {
-	int64_t period;
 	size_t count = 0;
-	LCUI_Graph mask;
-	LCUI_PaintContext paint;
 	FlashRect flash_rect;
 	LinkedListNode *node, *prev;
 
@@ -150,30 +172,7 @@ static size_t LCUIDisplay_UpdateFlashRects(SurfaceRecord record)
 			node = prev;
 			continue;
 		}
-		period = LCUI_GetTimeDelta(flash_rect->paint_time);
-		if (period >= FLASH_DURATION) {
-			flash_rect->paint_time = 0;
-		} else {
-			Graph_Init(&mask);
-			mask.color_type = LCUI_COLOR_TYPE_ARGB;
-			Graph_Create(&mask, flash_rect->rect.width,
-				     flash_rect->rect.height);
-			Graph_FillRect(&mask, ARGB(125, 124, 179, 5), NULL,
-				       TRUE);
-			mask.opacity = 0.6 * (FLASH_DURATION - (float)period) /
-				       FLASH_DURATION;
-		}
-		paint = Surface_BeginPaint(record->surface, &flash_rect->rect);
-		if (!paint) {
-			continue;
-		}
-		count += Widget_Render(record->widget, paint);
-		if (flash_rect->paint_time != 0) {
-			DrawBorder(&mask);
-			Graph_Mix(&paint->canvas, &mask, 0, 0, TRUE);
-			Graph_Free(&mask);
-		}
-		Surface_EndPaint(record->surface, paint);
+		LCUIDisplay_RenderFlashRect(record, flash_rect);
 		record->rendered = TRUE;
 	}
 	return count;
