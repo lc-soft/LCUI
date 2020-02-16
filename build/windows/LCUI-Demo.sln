@@ -11,8 +11,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_scaling_support", "tes
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_touch", "test_touch\test_touch.vcxproj", "{E5E79245-9412-49C8-8FE7-3AF7A7111E2F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_widget_rect", "test_widget_rect\test_widget_rect.vcxproj", "{E2D6078C-0255-4EA0-8B93-2A305A21D94A}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LCUIApp", "LCUIApp\LCUIApp.vcxproj", "{7640E9C9-442F-4C10-9953-E4989BACC3F4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_widget_opacity", "test_widget_opacity\test_widget_opacity.vcxproj", "{A110B7C2-3C20-4E8C-BFFB-FCF3CF1CCB2A}"
@@ -83,16 +81,6 @@ Global
 		{E5E79245-9412-49C8-8FE7-3AF7A7111E2F}.Release|Win32.Build.0 = Release|Win32
 		{E5E79245-9412-49C8-8FE7-3AF7A7111E2F}.Release|x64.ActiveCfg = Release|x64
 		{E5E79245-9412-49C8-8FE7-3AF7A7111E2F}.Release|x64.Build.0 = Release|x64
-		{E2D6078C-0255-4EA0-8B93-2A305A21D94A}.Debug|ARM.ActiveCfg = Debug|Win32
-		{E2D6078C-0255-4EA0-8B93-2A305A21D94A}.Debug|Win32.ActiveCfg = Debug|Win32
-		{E2D6078C-0255-4EA0-8B93-2A305A21D94A}.Debug|Win32.Build.0 = Debug|Win32
-		{E2D6078C-0255-4EA0-8B93-2A305A21D94A}.Debug|x64.ActiveCfg = Debug|x64
-		{E2D6078C-0255-4EA0-8B93-2A305A21D94A}.Debug|x64.Build.0 = Debug|x64
-		{E2D6078C-0255-4EA0-8B93-2A305A21D94A}.Release|ARM.ActiveCfg = Release|Win32
-		{E2D6078C-0255-4EA0-8B93-2A305A21D94A}.Release|Win32.ActiveCfg = Release|Win32
-		{E2D6078C-0255-4EA0-8B93-2A305A21D94A}.Release|Win32.Build.0 = Release|Win32
-		{E2D6078C-0255-4EA0-8B93-2A305A21D94A}.Release|x64.ActiveCfg = Release|x64
-		{E2D6078C-0255-4EA0-8B93-2A305A21D94A}.Release|x64.Build.0 = Release|x64
 		{7640E9C9-442F-4C10-9953-E4989BACC3F4}.Debug|ARM.ActiveCfg = Debug|ARM
 		{7640E9C9-442F-4C10-9953-E4989BACC3F4}.Debug|ARM.Build.0 = Debug|ARM
 		{7640E9C9-442F-4C10-9953-E4989BACC3F4}.Debug|ARM.Deploy.0 = Debug|ARM

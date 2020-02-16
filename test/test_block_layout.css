@@ -267,3 +267,22 @@ textview, body {
   width: 100%;
   box-sizing: border-box;
 }
+
+#example-inline-block-nesting .example__content {
+  position: relative;
+}
+
+#example-inline-block-nesting .box {
+  width: auto;
+  height: auto;
+}
+
+#example-inline-block-nesting__block-1 {
+  display: inline-block;
+}
+
+#example-inline-block-nesting__block-2 {
+  top: 5px;
+  right: 5px;
+  position: absolute;
+}

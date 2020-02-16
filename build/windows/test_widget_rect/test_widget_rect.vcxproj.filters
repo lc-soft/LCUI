@@ -18,5 +18,8 @@
     <ClCompile Include="..\..\..\test\test_widget_rect.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\libtest.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

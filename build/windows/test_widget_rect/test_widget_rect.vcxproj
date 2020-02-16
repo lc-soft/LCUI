@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\test\libtest.c" />
     <ClCompile Include="..\..\..\test\test_widget_rect.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

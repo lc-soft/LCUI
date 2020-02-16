@@ -122,6 +122,25 @@
             </w>
           </w>
         </w>
+        <w class="example" id="example-inline-block-nesting">
+          <textview class="example__title">(7) Inline block nesting</textview>
+          <w class="example__content">
+            <w class="example__content">
+              <w id="example-inline-block-nesting__block-1">
+                <textview class="box d-inline-block">inline-block > inline-block</textview>
+                <textview class="box d-inline-block">inline-block > inline-block</textview>
+                <textview class="box">inline-block > block</textview>
+                <textview class="box">inline-block > block</textview>
+              </w>
+              <w id="example-inline-block-nesting__block-2">
+                <textview class="box d-inline-block">absolute-position > inline-block</textview>
+                <textview class="box d-inline-block">absolute-position > inline-block</textview>
+                <textview class="box">absolute-position > block</textview>
+                <textview class="box">absolute-position > block</textview>
+              </w>
+            </w>
+          </w>
+        </w>
       </w>
     </w>
     <scrollbar target="main" />

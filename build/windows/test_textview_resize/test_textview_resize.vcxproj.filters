@@ -23,5 +23,8 @@
     <ClCompile Include="..\..\..\test\test_textview_resize.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\libtest.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

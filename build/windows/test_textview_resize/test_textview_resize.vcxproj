@@ -187,6 +187,7 @@
     <ClInclude Include="..\..\..\test\test.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\test\libtest.c" />
     <ClCompile Include="..\..\..\test\test_textview_resize.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

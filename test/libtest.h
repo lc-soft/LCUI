@@ -15,6 +15,9 @@ void it_s(const char *name, const char *actual, const char *expected);
 void it_rectf(const char *name, const LCUI_RectF *actual,
 	      const LCUI_RectF *expected);
 
+void it_rect(const char *name, const LCUI_Rect *actual,
+	     const LCUI_Rect *expected);
+
 void test_begin(void);
 
 void test_end(void);

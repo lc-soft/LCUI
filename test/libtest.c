@@ -137,3 +137,27 @@ void it_rectf(const char *name, const LCUI_RectF *actual,
 	test_msg(GREEN("  + (%g, %g, %g, %g)\n\n"), expected->x, expected->y,
 		 expected->width, expected->height);
 }
+
+void it_rect(const char *name, const LCUI_Rect *actual,
+	      const LCUI_Rect *expected)
+{
+	tests_total++;
+	if (LCUIRect_IsEquals(actual, expected)) {
+		test_msg(GREEN("√ ") "%s == (%d, %d, %d, %d)\n", name,
+			 expected->x, expected->y, expected->width,
+			 expected->height);
+		tests_passed++;
+		return;
+	}
+	test_msg(RED("× %s == (%d, %d, %d, %d)\n"), name, expected->x,
+		 expected->y, expected->width, expected->height);
+	test_msg(
+	    RED("  AssertionError: (%d, %g, %d, %d) == (%d, %d, %d, %d)\n"),
+	    actual->x, actual->y, actual->width, actual->height, expected->x,
+	    expected->y, expected->width, expected->height);
+	test_msg(GREEN("  + expected ") RED("- actual\n\n"));
+	test_msg(RED("  - (%d, %d, %d, %d)\n"), actual->x, actual->y,
+		 actual->width, actual->height);
+	test_msg(GREEN("  + (%d, %d, %d, %d)\n\n"), expected->x, expected->y,
+		 expected->width, expected->height);
+}

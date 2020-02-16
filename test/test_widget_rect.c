@@ -5,15 +5,16 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/input.h>
 #include <LCUI/gui/widget.h>
-#include "test.h"
+#include "libtest.h"
 
-int test_widget_rect(void)
+void test_widget_rect(void)
 {
 	int ret = 0;
 	LCUI_Widget root;
 	LCUI_Widget parent, child;
 	LCUI_SysEventRec ev;
 	LCUI_Rect *rect;
+	LCUI_Rect expected_rect;
 	LinkedList rects;
 
 	LCUI_Init();
@@ -41,8 +42,8 @@ int test_widget_rect(void)
 	LCUI_TriggerEvent(&ev, NULL);
 	LCUIWidget_Update();
 	Widget_GetInvalidArea(root, &rects);
-	CHECK_WITH_TEXT("moving the mouse should not create dirty rectangle",
-			rects.length == 0);
+	it_b("moving the mouse should not create dirty rectangle",
+	     rects.length == 0, TRUE);
 
 	ev.motion.x = 80;
 	ev.motion.y = 80;
@@ -50,10 +51,15 @@ int test_widget_rect(void)
 	LCUIWidget_Update();
 	Widget_GetInvalidArea(root, &rects);
 	rect = rects.head.next->data;
-	CHECK_WITH_TEXT("moving the mouse over the button should create a "
-			"dirty rectangle: (0, 0, 100, 100)",
-			rects.length == 1 && rect->x == 0 && rect->y == 0 &&
-			    rect->width == 100 && rect->height == 100);
+	it_b("moving the mouse over the button should create a "
+	     "dirty rectangle",
+	     rects.length == 1, TRUE);
+
+	expected_rect.x = 0;
+	expected_rect.y = 0;
+	expected_rect.width = 100;
+	expected_rect.height = 100;
+	it_rect("root.getInvalidArea()[0]", rect, &expected_rect);
 	LinkedList_Clear(&rects, free);
 
 	ev.motion.x = 40;
@@ -61,9 +67,9 @@ int test_widget_rect(void)
 	LCUI_TriggerEvent(&ev, NULL);
 	LCUIWidget_Update();
 	Widget_GetInvalidArea(root, &rects);
-	CHECK_WITH_TEXT("moving the mouse over the textview should not create "
-			"dirty rectangle",
-			rects.length == 0);
+	it_b("moving the mouse over the textview should not create "
+	     "dirty rectangle",
+	     rects.length == 0, TRUE);
 
 	ev.type = LCUI_MOUSEDOWN;
 	ev.button.x = 40;
@@ -73,10 +79,11 @@ int test_widget_rect(void)
 	LCUIWidget_Update();
 	Widget_GetInvalidArea(root, &rects);
 	rect = rects.head.next->data;
-	CHECK_WITH_TEXT("pressing the mouse button should create a dirty "
-			"rectangle: (0, 0, 100, 100)",
-			rects.length == 1 && rect->x == 0 && rect->y == 0 &&
-			    rect->width == 100 && rect->height == 100);
+	it_b("pressing the mouse button should create a dirty rectangle",
+	     rects.length == 1, TRUE);
+	if (rects.length == 1) {
+		it_rect("root.getInvalidArea()[0]", rect, &expected_rect);
+	}
 	LinkedList_Clear(&rects, free);
 
 	ev.type = LCUI_MOUSEUP;
@@ -84,10 +91,11 @@ int test_widget_rect(void)
 	LCUIWidget_Update();
 	Widget_GetInvalidArea(root, &rects);
 	rect = rects.head.next->data;
-	CHECK_WITH_TEXT("releasing the mouse button should create a dirty "
-			"rectangle: (0, 0, 100, 100)",
-			rects.length == 1 && rect->x == 0 && rect->y == 0 &&
-			    rect->width == 100 && rect->height == 100);
+	it_b("releasing the mouse button should create a dirty rectangle",
+	     rects.length == 1, TRUE);
+	if (rects.length == 1) {
+		it_rect("root.getInvalidArea()[0]", rect, &expected_rect);
+	}
 	LinkedList_Clear(&rects, free);
 
 	ev.type = LCUI_MOUSEMOVE;
@@ -96,9 +104,9 @@ int test_widget_rect(void)
 	LCUI_TriggerEvent(&ev, NULL);
 	LCUIWidget_Update();
 	Widget_GetInvalidArea(root, &rects);
-	CHECK_WITH_TEXT("moving the mouse over the button should not create "
-			"dirty rectangle",
-			rects.length == 0);
+	it_b("moving the mouse over the button should not create dirty "
+	     "rectangle",
+	     rects.length == 0, TRUE);
 
 	ev.motion.x = 150;
 	ev.motion.y = 150;
@@ -108,12 +116,13 @@ int test_widget_rect(void)
 	LCUIWidget_Update();
 	Widget_GetInvalidArea(root, &rects);
 	rect = rects.head.next->data;
-	CHECK_WITH_TEXT("moving the mouse outside the button should create "
-			"a dirty rectangle",
-			rects.length == 1 && rect->x == 0 && rect->y == 0 &&
-			    rect->width == 100 && rect->height == 100);
+	it_b("moving the mouse outside the button should create a dirty "
+	     "rectangle",
+	     rects.length == 1, TRUE);
+	if (rects.length == 1) {
+		it_rect("root.getInvalidArea()[0]", rect, &expected_rect);
+	}
 	LinkedList_Clear(&rects, free);
 
 	LCUI_Destroy();
-	return ret;
 }
