@@ -20,6 +20,8 @@ widget_paint.c 		\
 widget_background.c	\
 widget_border.c		\
 widget_shadow.c		\
+widget_diff.c		\
+widget_diff.h		\
 widget_util.h		\
 css_parser.c		\
 css_rule_font_face.c	\

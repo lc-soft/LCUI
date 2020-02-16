@@ -348,6 +348,7 @@
     <ClInclude Include="..\..\..\include\LCUI_Build.h" />
     <ClInclude Include="..\..\..\src\gui\layout\block.h" />
     <ClInclude Include="..\..\..\src\gui\layout\flexbox.h" />
+    <ClInclude Include="..\..\..\src\gui\widget_diff.h" />
     <ClInclude Include="..\..\..\src\gui\widget_util.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
@@ -385,6 +386,7 @@
     <ClCompile Include="..\..\..\src\gui\widget_base.c" />
     <ClCompile Include="..\..\..\src\gui\widget_border.c" />
     <ClCompile Include="..\..\..\src\gui\widget_class.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_diff.c" />
     <ClCompile Include="..\..\..\src\gui\widget_event.c" />
     <ClCompile Include="..\..\..\src\gui\widget_helper.c" />
     <ClCompile Include="..\..\..\src\gui\widget_id.c" />

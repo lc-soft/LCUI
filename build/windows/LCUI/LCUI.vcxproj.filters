@@ -321,6 +321,9 @@
     <ClInclude Include="..\..\..\src\gui\widget_util.h">
       <Filter>源文件\gui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\gui\widget_diff.h">
+      <Filter>源文件\gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -571,6 +574,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\gui\layout\flexbox.c">
       <Filter>源文件\gui\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_diff.c">
+      <Filter>源文件\gui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
