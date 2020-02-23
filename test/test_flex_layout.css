@@ -201,3 +201,148 @@ textview, body {
   flex: 1 1 auto;
   height: 100%;
 }
+
+.example-browser .c-frame-tab__icon {
+  width: 16px;
+  flex: 0 0 auto;
+  line-height: 16px;
+  font-size: 16px;
+  margin-top: 2px;
+  text-align: center;
+  background-color: #b8daff;
+  border: 1px solid #7cbbff;
+}
+
+.example-browser .c-frame-tab__text {
+  flex: 1 1 auto;
+  height: 20px;
+  line-height: 20px;
+  margin: 0 8px 0 8px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.example-browser .c-frame-tab__close {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  font-size: 14px;
+  line-height: 18px;
+  text-align: center;
+  border-radius: 8px;
+  margin: 2px 0 0 auto;
+}
+
+.example-browser .c-frame-tab__close:hover {
+  background-color: #dee2e6;
+}
+
+.example-browser .c-frame-tab__close:active {
+  background-color: #ced4da;
+}
+
+.example-browser .c-frame-tab {
+  width: 100%;
+  min-width: 60px;
+  max-width: 25%;
+  position: relative;
+  margin-right: -1px;
+  padding: 8px;
+  display: flex;
+  box-sizing: border-box;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.example-browser .c-frame-tab:hover {
+  background-color: #e9ecef;
+}
+
+.example-browser .c-frame-tab.active {
+  background-color: #fff;
+}
+
+.example-browser .c-navbar {
+  display: flex;
+  padding: 5px 8px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.example-browser .v-frame {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+
+.example-browser .v-frame__navbar {
+  flex: 0 0 auto;
+}
+
+.example-browser .v-frame__client {
+  flex: 1 1 auto;
+}
+
+.example-browser .v-frame__content {
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+.example-browser .v-browser {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.example-browser .v-browser__tabbar {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  background-color: #dee2e6;
+  padding: 8px 8px 0 8px;
+}
+
+.example-browser .v-browser__btn-add-tab {
+  width: 28px;
+  font-size: 18px;
+  line-height: 28px;
+  border-radius: 14px;
+  margin-left: 10px;
+  text-align: center;
+  margin-top: 4px;
+  flex: 0 0 auto;
+}
+
+.example-browser .c-navbar__input:hover {
+  background-color: #dee2e6;
+}
+
+.example-browser .c-navbar__input:focus {
+  border: 0;
+  background-color: #fff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.4);
+}
+
+.example-browser .v-browser__btn-add-tab:hover {
+  background-color: #ced4da;
+}
+
+.example-browser .v-browser__btn-add-tab:active {
+  background-color: #adb5bd;
+}
+
+.example-browser .v-home {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.example-browser .v-home .container {
+  display: flex;
+  max-width: 256px;
+  width: 100%;
+  margin: 0 auto;
+  justify-content: center;
+  box-sizing: border-box;
+}

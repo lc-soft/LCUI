@@ -389,7 +389,6 @@ static void test_flex_layout_with_content_width(float width)
 	it_rectf("$('.example:eq(15) .layout__right')[0].box.border",
 		 &w->box.border, &rect);
 
-	
 	// (16) Holy Grail Layout (height: 300px)
 
 	example = Widget_GetChild(container, 16);
@@ -426,6 +425,38 @@ static void test_flex_layout_with_content_width(float width)
 	rect.x += rect.width;
 	rect.width = 100;
 	it_rectf("$('.example:eq(16) .layout__right')[0].box.border",
+		 &w->box.border, &rect);
+}
+
+static void test_browser_layout(void)
+{
+	LCUI_Widget w;
+	LCUI_RectF rect;
+
+	w = LCUIWidget_GetById("browser-tabbar");
+	w = Widget_GetChild(w, 0);
+	it_i("$('#browser-tabbar .c-frame-tab')[0].width", (int)w->width, 101);
+	w = Widget_GetNext(w);
+	it_i("$('#browser-tabbar .c-frame-tab')[1].width", (int)w->width, 101);
+	w = Widget_GetNext(w);
+	it_i("$('#browser-tabbar .c-frame-tab')[2].width", (int)w->width, 101);
+	w = Widget_GetNext(w);
+	it_i("$('#browser-tabbar .c-frame-tab')[3].width", (int)w->width, 101);
+	w = Widget_GetNext(w);
+	it_i("$('#browser-tabbar .c-frame-tab')[4].width", (int)w->width, 101);
+
+	w = LCUIWidget_GetById("browser-frame-client");
+	it_i("$('#browser-frame-client')[0].height", (int)w->height, 223);
+	w = LCUIWidget_GetById("browser-frame-content");
+	it_i("$('#browser-frame-content')[0].height", (int)w->height, 223);
+	w = LCUIWidget_GetById("browser-page-home");
+	it_i("$('#browser-page-home')[0].height", (int)w->height, 223);
+	w = LCUIWidget_GetById("browser-page-home-container");
+	rect.width = 256;
+	rect.height = 70;
+	rect.x = (538.f - rect.width) / 2.f + w->parent->padding.left;
+	rect.y = (203.f - rect.height) / 2.f + w->parent->padding.top;
+	it_rectf("$('#browser-page-home-container')[0].box.border",
 		 &w->box.border, &rect);
 }
 
@@ -690,6 +721,7 @@ void test_flex_layout(void)
 	Widget_Unwrap(wrapper);
 	LCUIWidget_Update();
 
+	describe("browser layout", test_browser_layout);
 	describe("root width 1280px", test_flex_layout_1280);
 	describe("root width 600px", test_flex_layout_600);
 	describe("root width 320px", test_flex_layout_320);

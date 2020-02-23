@@ -300,6 +300,58 @@
             <textview class="box w-auto layout__footer">Footer</textview>
           </w>
         </w>
+        <w class="example example-browser">
+          <textview class="example__title">(17) Browser Layout</textview>
+          <w class="example__content h-6">
+            <w class="v-browser">
+              <w id="browser-tabbar" class="v-browser__tabbar">
+                <w class="c-frame-tab active">
+                  <w class="c-frame-tab__icon"></w>
+                  <textview class="c-frame-tab__text">Tab 1</textview>
+                  <textview class="c-frame-tab__close">X</textview>
+                </w>
+                <w class="c-frame-tab">
+                  <w class="c-frame-tab__icon"></w>
+                  <textview class="c-frame-tab__text">Tab 2</textview>
+                  <textview class="c-frame-tab__close">X</textview>
+                </w>
+                <w class="c-frame-tab">
+                  <w class="c-frame-tab__icon"></w>
+                  <textview class="c-frame-tab__text">Tab 3</textview>
+                  <textview class="c-frame-tab__close">X</textview>
+                </w>
+                <w class="c-frame-tab">
+                  <w class="c-frame-tab__icon"></w>
+                  <textview class="c-frame-tab__text">Tab 4</textview>
+                  <textview class="c-frame-tab__close">X</textview>
+                </w>
+                <w class="c-frame-tab">
+                  <w class="c-frame-tab__icon"></w>
+                  <textview class="c-frame-tab__text">Tab 5</textview>
+                  <textview class="c-frame-tab__close">X</textview>
+                </w>
+                <textview class="v-browser__btn-add-tab">+</textview>
+              </w>
+              <w class="v-frame">
+                <textview class="v-frame__navbar c-navbar">
+                  Navbar
+                </textview>
+                <w id="browser-frame-client" class="v-frame__client">
+                  <w id="browser-frame-content" class="v-frame__content">
+                    <w id="browser-page-home" class="v-home">
+                      <w id="browser-page-home-container" class="container">
+                        <w class="box"></w>
+                        <w class="box"></w>
+                        <w class="box"></w>
+                        <w class="box"></w>
+                      </w>
+                    </w>
+                  </w>
+                </w>
+              </w>
+            </w>
+          </w>
+        </w>
       </w>
     </w>
     <scrollbar target="main" />
