@@ -8,7 +8,6 @@
   </p>
   <p align="center">
     <a href="https://travis-ci.org/lc-soft/LCUI"><img src="https://travis-ci.org/lc-soft/LCUI.png?branch=master" alt="Build Status"></a>
-    <a href="https://coveralls.io/github/lc-soft/LCUI?branch=develop"><img src="https://coveralls.io/repos/github/lc-soft/LCUI/badge.svg?branch=develop" alt="Coverage Status"></a>
     <a href="http://opensource.org/licenses/MIT"><img src="https://img.shields.io/github/license/lc-soft/LCUI.svg" alt="License"></a>
     <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/release/lc-soft/LCUI/all.svg" alt="Github Release"></a>
     <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/downloads/lc-soft/LCUI/total.svg" alt="Github All Releases"></a>
@@ -19,18 +18,29 @@
 
 ## 目录
 
+<!-- TOC -->
+
+- [目录](#目录)
 - [介绍](#介绍)
     - [主要特性](#主要特性)
-    - [缺少的特性](#缺少的特性)
+    - [效果图](#效果图)
     - [相关项目](#相关项目)
     - [设计参考](#设计参考)
 - [快速上手](#快速上手)
     - [Windows](#windows)
+        - [创建新的 LCUI 应用项目](#创建新的-lcui-应用项目)
+        - [为已有的项目安装 LCUI](#为已有的项目安装-lcui)
+        - [手动编译安装](#手动编译安装)
     - [Ubuntu](#ubuntu)
+- [路线图](#路线图)
+    - [主线](#主线)
+    - [支线](#支线)
 - [贡献](#贡献)
 - [文档](#文档)
 - [常见问题](#常见问题)
 - [许可](#许可)
+
+<!-- /TOC -->
 
 ## 介绍
 
@@ -45,16 +55,36 @@ LCUI 是一个桌面端图形界面开发库，主要使用 C 语言编写，支
 - **图片处理：** 支持读取 jpg、png 和 bmp 格式的图片。
 - **触控：** 支持多点触控，但目前只支持 Windows 系统。
 
-### 缺少的特性
+### 效果图
 
-LCUI 的主要用途是方便作者开发简单的图形界面应用，简单也就意味着功能很少，比如：
-
-- 没有硬件加速，图形渲染效率低下。
-- 不支持剪切板，你不能选中和复制界面中的文本，也不能从其它程序复制文本到 LCUI 程序中。
-- 输入法支持差，在 Linux 中仅支持输入英文字母和符号。
-- 布局系统简单，不支持网格、表格等布局。
-
-如今可参考的同类开源项目有很多，例如：[SDL](https://github.com/SDL-mirror/SDL)、[imgui](https://github.com/ocornut/imgui)，LCUI 中大部分缺少的特性都能在这些项目中找到相关实现，新功能的开发成本和复杂度也因此而降低了很多。开源此项目的目的之一是技术交流和分享，如果你有同类项目的研究和使用经验，可以考虑向此项目提供改进方案。
+<table>
+  <tbody>
+    <tr>
+      <td>
+        <a class="thumbnail" href="https://github.com/lc-soft/LCUI/blob/develop/test/helloworld.c">
+          <img src="https://lcui.org/static/images/showcase/screenshot-lcui-hello.png" alt="Hello App"/>
+        </a>
+      </td>
+      <td>
+        <a class="thumbnail" href="https://github.com/lc-soft/LC-Finder">
+          <img src="https://gitee.com/lc-soft/LC-Finder/raw/develop/screenshots/2.jpg" alt="LC Finder"/>
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <a class="thumbnail" href="https://github.com/lc-ui/lcui-router-app">
+          <img src="https://gitee.com/lc-ui/lcui-router-app/raw/master/screenshot.gif" alt="LCUI Router App"/>
+        </a>
+      </td>
+      <td>
+        <a class="thumbnail" href="https://github.com/lc-ui/lc-design">
+          <img src="https://lcui.lc-soft.io/static/images/showcase/lc-design-example-preview.png" alt="LC Design"/>
+        </a>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ### 相关项目
 
@@ -78,7 +108,9 @@ LCUI 的主要用途是方便作者开发简单的图形界面应用，简单也
 
 ### Windows
 
-使用 [lcui-cli](https://github.com/lc-ui/lcui-cli) 快速创建一个 LCUI 项目：
+#### 创建新的 LCUI 应用项目
+
+使用 [lcui-cli](https://github.com/lc-ui/lcui-cli) 快速创建一个 LCUI 应用项目：
 
 ```bash
 # 安装 lcui-cli
@@ -94,26 +126,9 @@ cd myapp
 npm run start
 ```
 
-或者，你可以从已有的[示例项目](https://github.com/lc-ui/lcui-quick-start)快速开始：
+#### 为已有的项目安装 LCUI
 
-```bash
-# 克隆示例代码库
-git clone https://github.com/lc-ui/lcui-quick-start
-
-# 进入代码库
-cd lcui-quick-start
-
-# 安装 NodeJS 依赖包
-npm install
-
-# 安装适用于 x64 CPU 架构的 C/C++ 依赖库
-lcpkg install --arch x64
-
-# 以调试模式运行应用程序
-lcpkg run start --mode debug
-```
-
-想从零开始编写一个 LCUI 应用程序？你可以在你的项目目录里使用 [lcpkg](https://github.com/lc-soft/lcpkg) 来快速安装 LCUI：
+在你的项目目录里使用 [lcpkg](https://github.com/lc-soft/lcpkg) 来快速安装 LCUI：
 
 ```bash
 # 初始化 lcpkg 配置文件，告诉 lcpkg 你的项目相关信息
@@ -123,7 +138,19 @@ lcpkg init
 lcpkg install github.com/lc-soft/LCUI
 ```
 
+如果你觉得从 GitHub 下载文件的速度很慢，可以试试从 npm 下载：
+
+```bash
+# 从 npm 包源下载已编译的 LCUI 二进制文件包
+npm install @lcui/engine
+
+# 让 lcpkg 从 npm 包的安装目录中安装 LCUI
+lcpkg install npm:@lcui/engine
+```
+
 安装成功后，按照 lcpkg 输出的帮助文档来配置你项目的编译参数。
+
+#### 手动编译安装
 
 如果你想手动从源码编译 LCUI：
 
@@ -172,6 +199,25 @@ cd test
 
 > **提示：** 如果需要自定义编译器、编译参数、安装位置等配置，请查阅 [INSTALL](INSTALL) 文件。
 
+## 路线图
+
+项目的发展路线分为主线和支线，主线由项目维护者推进，而支线则交给开源社区贡献者以及像你这样的开发者来推进。
+
+### 主线
+
+- 持续改进代码，让它更规范、更易于阅读和维护
+- 完善相关开发工具和示例应用，提升开发效率，降低上手难度
+
+### 支线
+
+- 探索新的开发方式，让 LCUI 与众不同
+- 探索和实现信息无障碍 (Accessbility) 技术方案
+- 研究 [SDL](https://github.com/SDL-mirror/SDL)、[imgui](https://github.com/ocornut/imgui) 等同类开源项目，并试着补上 LCUI 缺少的功能
+- 重构现有图形处理接口，使其能够轻松集成主流 2D 图形库，为 LCUI 带来更好的图形渲染性能
+- 添加 Mac OS、Android、iOS 端的驱动支持
+- 添加更多的鼠标光标样式
+- 添加粘贴板支持
+
 ## 贡献
 
 有很多方式可以为此项目的发展做贡献：
@@ -179,7 +225,6 @@ cd test
 - [反馈问题](https://github.com/lc-soft/LCUI/issues)并在问题关闭时帮助我们验证它们是否已经修复
 - 在源码中[搜索 FIXME 注释](https://github.com/lc-soft/LCUI/search?l=C&q=FIXME)，然后尝试解决它们
 - 在 [IssueHunt](https://issuehunt.io/r/lc-soft/LCUI) 上为感兴趣的 issue 设置悬赏，吸引其他开发者参与开发
-- 在 [OpenCollective](https://opencollective.com/LCUI) 上赞助此项目
 - 审查[源代码的改动](https://github.com/lc-soft/LCUI/pulls)
 - 修复已知问题
 
@@ -190,7 +235,7 @@ cd test
 - 在线教程：[https://lcui.lc-soft.io/guide/](https://lcui.lc-soft.io/guide/)
 - 更新日志：[CHANGELOG.zh-cn.md](CHANGELOG.zh-cn.md)
 
-目前还没有 API 参考文档，你可以参考头文件、源代码、示例程序以及上述的相关项目来了解基本用法。
+教程只有一部分，并且已经很久没有更新了，你可以参考头文件、源代码、示例程序以及上述的相关项目来了解基本用法。如果你希望我们能够为此项目提供完善的文档，可以考虑花时间帮助我们制定文档目录、章节和内容范围，相当于撰写一个文档模板，这样我们就不用花费时间在参考各种技术文档、思考初学者需要知道些什么、以及组织内容结构等工作上面，只需根据已定好的章节标题补全剩余内容即可。
 
 ## 常见问题
 
@@ -207,11 +252,11 @@ cd test
 
 1. **我为什么要用 LCUI，而不是 Electron？**
 
-    相较于功能完备的 Electron 而言，文件体积小、内存占用低并没有什么用，除了技术研究和交流外，你没有理由用 LCUI。
+    除了技术研究与交流，以及为开源社区发展做贡献外，你没有理由用 LCUI。相较于功能完备的 Electron 而言，文件体积小和内存占用低并没有什么用，毕竟现在机器配置都很高，即便 APP 的界面卡到爆，占用上百 MB 的内存和近 1 GB 的存储空间，只要能正常运作就够了。
 
 1. **适合哪些人使用？**
 
-    适合有 GUI 应用开发经验、熟悉 Web 前端开发技术、有意向参与开源项目的 C 开发者使用，最好是具备两年 C 开发经验和一年 web 前端开发经验。以时间来衡量上手门槛可能有点模糊，以下按照技术方向分别列出了一些主要条件，你可自行判断自己是否能够快速上手。
+    适合有 GUI 应用开发经验、熟悉 Web 前端开发技术、有意向参与开源项目的 C 开发者使用，最好是具备两年 C 开发经验和一年 web 前端开发经验。以时间来衡量上手门槛可能有点不妥，以下按照技术方向分别列出了一些主要条件，你可自行判断自己是否能够快速上手。
 
     C：
 
@@ -226,16 +271,17 @@ cd test
     - 熟练掌握常见布局
     - 熟悉 CSS 盒子模型和常用属性
     - 有良好的 CSS 编码风格
+    - 了解前端工程化和相关开发工具
 
 1. **和写网页一样吗？需要注意什么？**
 
-    不完全一样，主要有以下差异需要注意：
+    不一样，主要有以下差异需要注意：
 
     - 界面描述文件格式是 XML，与 HTML 有一点区别。
     - 本质上是在写 C 代码，开发效率比 JavaScript 低很多。
     - 没有 `<script>` 标签，你不能像 HTML 那样内嵌 JavaScript 或 C 代码。
-    - 部件是基本的界面布局元素，不是文字，不支持图文混排，不存在 `inline` 显示类型。
-    - 滚动条是一个独立的部件，使用 `overflow: scroll;` 样式不会自动出现滚动条，你需要主动创建它并指定容器和滚动层。
+    - 部件 (Widget) 是基本的界面布局元素，不是文字，不支持图文混排，不存在 `inline` 显示类型。
+    - 滚动条是一个独立的部件，使用 `overflow: scroll;` 样式不会出现滚动条，你需要主动创建它并指定容器和滚动层。
     - 所有文本由 TextView 部件渲染，它的显示类型为 `block` 而不是 `inline`。
     - 部件不会溢出父级部件的边界框，效果类似于已应用样式：`overflow: hidden;`。
     - 绝对定位的部件始终相对于其父级部件，而不是父级第一个非静态定位的部件。
@@ -290,6 +336,7 @@ cd test
           - [x] inline-block
           - [x] block
           - [x] flex
+          - [ ] inline-flex
           - [ ] inline
           - [ ] grid
           - [ ] table
@@ -317,14 +364,24 @@ cd test
         - [x] font-family
         - [x] font-size
         - [x] font-style
+        - [x] flex
+        - [x] flex-shrink
+        - [x] flex-grow
+        - [x] flex-basis
+        - [x] flex-wrap
+        - [x] flex-direction
         - [x] justify-content
           - [x] flex-start
           - [x] center
           - [x] flex-end
+        - [x] align-items
+          - [x] flex-start
+          - [x] center
+          - [x] flex-end
+          - [x] stretch
         - [ ] float
         - [ ] transition
         - [ ] transform
-        - [ ] flex
         - [ ] ...
     </details>
 
