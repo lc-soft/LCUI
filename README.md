@@ -8,7 +8,6 @@
   </p>
   <p align="center">
     <a href="https://travis-ci.org/lc-soft/LCUI"><img src="https://travis-ci.org/lc-soft/LCUI.png?branch=master" alt="Build Status"></a>
-    <a href="https://coveralls.io/github/lc-soft/LCUI?branch=develop"><img src="https://coveralls.io/repos/github/lc-soft/LCUI/badge.svg?branch=develop" alt="Coverage Status"></a>
     <a href="http://opensource.org/licenses/MIT"><img src="https://img.shields.io/github/license/lc-soft/LCUI.svg" alt="License"></a>
     <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/release/lc-soft/LCUI/all.svg" alt="Github Release"></a>
     <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/downloads/lc-soft/LCUI/total.svg" alt="Github All Releases"></a>
@@ -19,18 +18,29 @@
 
 ## Table of contents
 
+<!-- TOC -->
+
+- [Table of contents](#table-of-contents)
 - [Introduction](#introduction)
     - [Features](#features)
-    - [Missing features](#missing-features)
+    - [Screenshots](#screenshots)
     - [Related projects](#related-projects)
-    - [Design reference](#design-references)
+    - [Design references](#design-references)
 - [Quick start](#quick-start)
     - [Windows](#windows)
+        - [Create new LCUI project](#create-new-lcui-project)
+        - [Install LCUI for existing project](#install-lcui-for-existing-project)
+        - [Manual compilation and installation](#manual-compilation-and-installation)
     - [Ubuntu](#ubuntu)
+- [Roadmap](#roadmap)
+    - [Primary Roadmap](#primary-roadmap)
+    - [Secondary Roadmap](#secondary-roadmap)
 - [Contribution](#contribution)
 - [Documentation](#documentation)
 - [FAQ](#faq)
 - [License](#license)
+
+<!-- /TOC -->
 
 ## Introduction
 
@@ -48,7 +58,6 @@ LCUI is a freely available software library for building user interfaces. It is 
 - **Touch:** Supports multi-touch, but currently only on Windows platforms.
 
 ### Screenshots
-
 
 <table>
   <tbody>
