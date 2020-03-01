@@ -141,7 +141,7 @@ static void OnClearWidgetList(void *privdata, void *data)
 void LCUIWidget_InitIdLibrary(void)
 {
 	LCUIMutex_Init(&self.mutex);
-	self.dt_ids = DictType_StringCopyKey;
+	Dict_InitStringCopyKeyType(&self.dt_ids);
 	self.dt_ids.valDestructor = OnClearWidgetList;
 	self.ids = Dict_Create(&self.dt_ids, NULL);
 }

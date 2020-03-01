@@ -251,8 +251,10 @@ static void Widget_CollectReference(LCUI_Widget w, void *arg)
 Dict *Widget_CollectReferences(LCUI_Widget w)
 {
 	Dict *dict;
+	static DictType t;
 
-	dict = Dict_Create(&DictType_StringKey, NULL);
+	Dict_InitStringKeyType(&t);
+	dict = Dict_Create(&t, NULL);
 	Widget_Each(w, Widget_CollectReference, dict);
 	return dict;
 }

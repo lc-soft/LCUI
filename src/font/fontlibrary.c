@@ -836,7 +836,7 @@ static void LCUIFont_InitBase(void)
 	fontlib.font_cache = NEW(LCUI_FontCache, 1);
 	fontlib.font_cache[0] = FontCache();
 	RBTree_Init(&fontlib.bitmap_cache);
-	fontlib.font_families_type = DictType_StringKey;
+	Dict_InitStringKeyType(&fontlib.font_families_type);
 	fontlib.font_families_type.valDestructor = DestroyFontFamilyNode;
 	fontlib.font_families = Dict_Create(&fontlib.font_families_type, NULL);
 	RBTree_OnDestroy(&fontlib.bitmap_cache, DestroyTreeNode);

@@ -709,11 +709,3 @@ void StringKeyDict_KeyDestructor(void *privdata, void *key)
 {
 	free(key);
 }
-
-DictType DictType_StringKey = { StringKeyDict_KeyHash,    NULL, NULL,
-				StringKeyDict_KeyCompare, NULL, NULL };
-
-DictType DictType_StringCopyKey = {
-	StringKeyDict_KeyHash,    StringKeyDict_KeyDup,        NULL,
-	StringKeyDict_KeyCompare, StringKeyDict_KeyDestructor, NULL
-};

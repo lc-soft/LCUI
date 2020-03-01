@@ -61,7 +61,7 @@ int Widget_SetAttributeEx(LCUI_Widget w, const char *name, void *value,
 	LCUI_WidgetAttribute attr;
 
 	if (!self.available) {
-		self.dt_attributes = DictType_StringCopyKey;
+		Dict_InitStringKeyType(&self.dt_attributes);
 		self.dt_attributes.valDestructor = OnClearWidgetAttribute;
 		self.available = TRUE;
 	}

@@ -244,9 +244,25 @@ LCUI_API int StringKeyDict_KeyCompare(void *privdata, const void *key1,
 LCUI_API void *StringKeyDict_KeyDup(void *privdata, const void *key);
 LCUI_API void StringKeyDict_KeyDestructor(void *privdata, void *key);
 
-/* Hash table types */
-LCUI_API extern DictType DictType_StringKey;
-LCUI_API extern DictType DictType_StringCopyKey;
+INLINE void Dict_InitStringKeyType(DictType *t)
+{
+	t->hashFunction = StringKeyDict_KeyHash;
+	t->keyDup = NULL;
+	t->valDup = NULL;
+	t->keyCompare = StringKeyDict_KeyCompare;
+	t->keyDestructor = NULL;
+	t->valDestructor = NULL;
+}
+
+INLINE void Dict_InitStringCopyKeyType(DictType *t)
+{
+	t->hashFunction = StringKeyDict_KeyHash;
+	t->keyDup = StringKeyDict_KeyDup;
+	t->valDup = NULL;
+	t->keyCompare = StringKeyDict_KeyCompare;
+	t->keyDestructor = StringKeyDict_KeyDestructor;
+	t->valDestructor = NULL;
+}
 
 LCUI_END_HEADER
 

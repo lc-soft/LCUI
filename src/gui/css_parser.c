@@ -1289,7 +1289,7 @@ void LCUI_InitCSSParser(void)
 	LCUI_CSSPropertyParser new_sp, sp, sp_end;
 
 	self.count = 0;
-	self.dicttype = DictType_StringKey;
+	Dict_InitStringKeyType(&self.dicttype);
 	self.dicttype.valDestructor = DestroyStyleParser;
 	self.parsers = Dict_Create(&self.dicttype, NULL);
 	sp_end = style_parser_map + LEN(style_parser_map);

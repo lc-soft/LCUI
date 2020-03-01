@@ -63,7 +63,7 @@ strpool_t *strpool_create(void)
 		return NULL;
 	}
 	pool->size = 0;
-	pool->type = DictType_StringKey;
+	Dict_InitStringKeyType(&pool->type);
 	pool->dict = Dict_Create(&pool->type, NULL);
 	return pool;
 }

@@ -193,7 +193,7 @@ static void AsyncLoadImage(LCUI_Widget widget, const char *path)
 void LCUIWidget_InitImageLoader(void)
 {
 	RBTree_Init(&self.refs);
-	self.dtype = DictType_StringKey;
+	Dict_InitStringKeyType(&self.dtype);
 	self.dtype.valDestructor = ImageCacheDestructor;
 	self.images = Dict_Create(&self.dtype, NULL);
 	RBTree_OnCompare(&self.refs, OnCompareWidget);

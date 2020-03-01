@@ -97,6 +97,7 @@ static struct LCUIWidgetEvnetModule {
 	LinkedList event_mappings;	/**< 事件标识号和名称映射记录列表  */
 	RBTree event_records;		/**< 当前正执行的事件的记录 */
 	RBTree event_names;		/**< 事件名称表，以标识号作为索引 */
+	DictType event_ids_type;
 	Dict *event_ids;		/**< 事件标识号表，以事件名称作为索引 */
 	int base_event_id;		/**< 事件标识号计数器 */
 	ClickRecord click;		/**< 上次鼠标点击记录 */
@@ -1305,7 +1306,8 @@ void LCUIWidget_InitEvent(void)
 	self.click.widget = NULL;
 	self.click.interval = DBLCLICK_INTERVAL;
 	self.base_event_id = LCUI_WEVENT_USER + 1000;
-	self.event_ids = Dict_Create(&DictType_StringKey, NULL);
+	Dict_InitStringKeyType(&self.event_ids_type);
+	self.event_ids = Dict_Create(&self.event_ids_type, NULL);
 	n = sizeof(mappings) / sizeof(mappings[0]);
 	for (i = 0; i < n; ++i) {
 		LCUIWidget_SetEventName(mappings[i].id, mappings[i].name);

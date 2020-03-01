@@ -86,7 +86,7 @@ static void DeletePrototype(void *privdata, void *data)
 
 void LCUIWidget_InitPrototype(void)
 {
-	self.dicttype = DictType_StringKey;
+	Dict_InitStringKeyType(&self.dicttype);
 	self.dicttype.valDestructor = DeletePrototype;
 	self.prototypes = Dict_Create(&self.dicttype, NULL);
 	self.default_prototype.name = NULL;

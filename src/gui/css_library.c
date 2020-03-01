@@ -1164,9 +1164,12 @@ static void DeleteStyleNode(StyleNode node)
 static StyleLink CreateStyleLink(void)
 {
 	StyleLink link = NEW(StyleLinkRec, 1);
+	static DictType t;
+
+	Dict_InitStringCopyKeyType(&t);
 	link->group = NULL;
 	LinkedList_Init(&link->styles);
-	link->parents = Dict_Create(&DictType_StringCopyKey, NULL);
+	link->parents = Dict_Create(&t, NULL);
 	return link;
 }
 
@@ -1210,7 +1213,7 @@ static void InitStyleGroupDict(void)
 {
 	DictType *dt = &library.style_group_dict;
 
-	*dt = DictType_StringCopyKey;
+	Dict_InitStringCopyKeyType(dt);
 	dt->valDestructor = StyleLinkGroupDestructor;
 }
 
@@ -1700,7 +1703,7 @@ static void StyleLinkDestructor(void *privdata, void *data)
 
 static void InitStyleLinkDict(void)
 {
-	library.style_link_dict = DictType_StringCopyKey;
+	Dict_InitStringCopyKeyType(&library.style_link_dict);
 	library.style_link_dict.valDestructor = StyleLinkDestructor;
 }
 
@@ -1731,7 +1734,7 @@ static void InitStyleValueLibrary(void)
 	memset(names_dt, 0, sizeof(DictType));
 	names_dt->keyCompare = IntKeyDict_KeyCompare;
 	names_dt->hashFunction = IntKeyDict_HashFunction;
-	*keys_dt = DictType_StringKey;
+	Dict_InitStringKeyType(keys_dt);
 	keys_dt->valDestructor = KeyNameGroupDestructor;
 	/* value_keys 表用于存放 key 和 name 数据 */
 	library.value_keys = Dict_Create(keys_dt, NULL);
