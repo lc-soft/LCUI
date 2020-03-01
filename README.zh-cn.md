@@ -211,7 +211,7 @@ cd test
 ### 支线
 
 - 探索新的开发方式，让 LCUI 与众不同
-- 探索和实现信息无障碍 (Accessbility) 技术方案
+- 探索和实现[信息无障碍 (Accessbility)](https://developer.mozilla.org/en-US/docs/Learn/Accessibility/What_is_accessibility) 技术方案
 - 研究 [SDL](https://github.com/SDL-mirror/SDL)、[imgui](https://github.com/ocornut/imgui) 等同类开源项目，并试着补上 LCUI 缺少的功能
 - 重构现有图形处理接口，使其能够轻松集成主流 2D 图形库，为 LCUI 带来更好的图形渲染性能
 - 添加 Mac OS、Android、iOS 端的驱动支持

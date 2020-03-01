@@ -47,20 +47,37 @@ LCUI is a freely available software library for building user interfaces. It is 
 - **Simple image reading:** Provide jpg, png and bmp image read APIs.
 - **Touch:** Supports multi-touch, but currently only on Windows platforms.
 
-### Missing features
+### Screenshots
 
-LCUI is a personal project, its main purpose is to allow the author to easily develop simple GUI applications.
 
-What is "simple"? It means fewer features, for example:
-
-- No hardware acceleration, graphics rendering is inefficient.
-- Cannot select text and copy it on user interface.
-- Cannot use CTRL+C to copy content, and cannot use CTRL+V to paste content to input boxes.
-- Cannot use the Input Method Engine to input non-ASCII characters, like Chinese, Japanese, etc.
-- Layout system is simple. Grid and table layouts are not supported.
-- No English documentation, it is hard to use.
-
-There are many similar open source projects(E.g: [SDL](https://github.com/SDL-mirror/SDL), [imgui](https://github.com/ocornut/imgui)) that can be referenced today, most of the missing features in LCUI can find relevant implementations from these projects, so the development cost of LCUI is also reduced a lot. One of the reasons for open source this project is to conduct technical exchanges. If you have research experience in similar projects, please consider providing improvements to this project.
+<table>
+  <tbody>
+    <tr>
+      <td>
+        <a class="thumbnail" href="https://github.com/lc-soft/LCUI/blob/develop/test/helloworld.c">
+          <img src="https://lcui.org/static/images/showcase/screenshot-lcui-hello.png" alt="Hello App"/>
+        </a>
+      </td>
+      <td>
+        <a class="thumbnail" href="https://github.com/lc-soft/LC-Finder">
+          <img src="https://gitee.com/lc-soft/LC-Finder/raw/develop/screenshots/2.jpg" alt="LC Finder"/>
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <a class="thumbnail" href="https://github.com/lc-ui/lcui-router-app">
+          <img src="https://gitee.com/lc-ui/lcui-router-app/raw/master/screenshot.gif" alt="LCUI Router App"/>
+        </a>
+      </td>
+      <td>
+        <a class="thumbnail" href="https://github.com/lc-ui/lc-design">
+          <img src="https://lcui.lc-soft.io/static/images/showcase/lc-design-example-preview.png" alt="LC Design"/>
+        </a>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ### Related projects
 
@@ -84,6 +101,8 @@ Want to know what LCUI can do? You can view the following projects:
 
 ### Windows
 
+#### Create new LCUI project
+
 Quickly create an LCUI project using [lcui-cli](https://github.com/lc-ui/lcui-cli):
 
 ```bash
@@ -100,26 +119,9 @@ cd myapp
 npm run start
 ```
 
-Or, you can clone and run the [lc-ui/lcui-quick-start](https://github.com/lc-ui/lcui-quick-start) repository to see a minimal LCUI app in action:
+#### Install LCUI for existing project
 
-```bash
-# Clone repository
-git clone https://github.com/lc-ui/lcui-quick-start
-
-# Go into the repository
-cd lcui-quick-start
-
-# Install NodeJS dependencies
-npm install
-
-# Install C/C++ dependencies for x64 CPU architecture
-lcpkg install --arch x64
-
-# Run the app with debug mode
-lcpkg run start --mode debug
-```
-
-Want to write an LCUI application from scratch? you can use [lcpkg](https://github.com/lc-soft/lcpkg) to quick install LCUI in your project directory:
+Use [lcpkg](https://github.com/lc-soft/lcpkg) to quick install LCUI in your project directory:
 
 ```bash
 # Initialize the lcpkg configuration file to tell lcpkg about your project
@@ -130,6 +132,8 @@ lcpkg install github.com/lc-soft/LCUI
 ```
 
 After successful installation, follow the help documentation output by lcpkg to configure your project's build configuration.
+
+#### Manual compilation and installation
 
 If you want to manually compile LCUI from source code:
 
@@ -178,6 +182,25 @@ cd test
 
 > **Note:** If you want to customize the compiler, compile flags, install location, and other configuration items, read the [INSTALL](INSTALL) file.
 
+## Roadmap
+
+The roadmap for this project is divided into primary and secondary roadmaps, with the primary roadmap developed by the project maintainer and the secondary roadmap developed by the open source community contributors and developers like you.
+
+### Primary Roadmap
+
+- Make project code more standardized, readable, and maintainable
+- Improve relevant development tools and sample applications to improve the development efficiency and make it easier to use
+
+### Secondary Roadmap
+
+- Explore new GUI development methods to make LCUI unique
+- [Accessbility](https://developer.mozilla.org/en-US/docs/Learn/Accessibility/What_is_accessibility) support
+- Research [SDL](https://github.com/SDL-mirror/SDL), [imgui](https://github.com/ocornut/imgui) and other similar open source projects, and try to fill in what LCUI is missing
+- Refactor the existing graphics processing interface to make it easy to integrate with mainstream 2D graphics libraries and bring better graphics rendering performance to LCUI
+- Add driver support for Mac OS, Android and iOS
+- Add more mouse cursor styles
+- Add clipboard support
+
 ## Contribution
 
 Think LCUI is slow to update? there are many ways to [contribute](.github/CONTRIBUTING.md) to LCUI.
@@ -186,7 +209,6 @@ Think LCUI is slow to update? there are many ways to [contribute](.github/CONTRI
 - Share some interesting ideas related to GUI development in the [issues page](https://github.com/lc-soft/LCUI/issues).
 - [Search for FIXME comments](https://github.com/lc-soft/LCUI/search?l=C&q=FIXME) in the source code and try to fix them.
 - Fund the issues that interest you on [IssueHunt](https://issuehunt.io/r/lc-soft/LCUI) to attract other developers to contribute.
-- Support this project on [OpenCollective](https://opencollective.com/LCUI).
 - Review the [source code changes](https://github.com/lc-soft/LCUI/pulls).
 - [Contribute bug fixes](CONTRIBUTING.md).
 
@@ -236,7 +258,7 @@ The English version of the documentation is not available, because the author do
     The following is a list of supported CSS features. Checked is supported (But does not mean full support). Unlisted properties are not supported by default.
 
     <details>
-      <summary>CSS feature coverage</summary>
+      <summary>CSS 特性覆盖范围</summary>
 
       - at rules
         - [x] `@font-face`
@@ -280,6 +302,7 @@ The English version of the documentation is not available, because the author do
           - [x] inline-block
           - [x] block
           - [x] flex
+          - [ ] inline-flex
           - [ ] inline
           - [ ] grid
           - [ ] table
@@ -307,14 +330,24 @@ The English version of the documentation is not available, because the author do
         - [x] font-family
         - [x] font-size
         - [x] font-style
+        - [x] flex
+        - [x] flex-shrink
+        - [x] flex-grow
+        - [x] flex-basis
+        - [x] flex-wrap
+        - [x] flex-direction
         - [x] justify-content
           - [x] flex-start
           - [x] center
           - [x] flex-end
+        - [x] align-items
+          - [x] flex-start
+          - [x] center
+          - [x] flex-end
+          - [x] stretch
         - [ ] float
         - [ ] transition
         - [ ] transform
-        - [ ] flex
         - [ ] ...
     </details>
 
