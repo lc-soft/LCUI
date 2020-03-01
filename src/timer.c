@@ -130,7 +130,7 @@ int LCUITimer_Free(int timer_id)
 {
 	Timer timer;
 	if (!self.active) {
-		return -1;
+		return -2;
 	}
 	LCUIMutex_Lock(&self.mutex);
 	timer = FindTimer(timer_id);
@@ -148,7 +148,7 @@ int LCUITimer_Pause(int timer_id)
 {
 	Timer timer;
 	if (!self.active) {
-		return -1;
+		return -2;
 	}
 	LCUIMutex_Lock(&self.mutex);
 	timer = FindTimer(timer_id);
@@ -165,7 +165,7 @@ int LCUITimer_Continue(int timer_id)
 {
 	Timer timer;
 	if (!self.active) {
-		return -1;
+		return -2;
 	}
 	LCUIMutex_Lock(&self.mutex);
 	timer = FindTimer(timer_id);
@@ -183,7 +183,7 @@ int LCUITimer_Reset(int timer_id, long int n_ms)
 {
 	Timer timer;
 	if (!self.active) {
-		return -1;
+		return -2;
 	}
 	LCUIMutex_Lock(&self.mutex);
 	timer = FindTimer(timer_id);
@@ -233,7 +233,7 @@ size_t LCUI_ProcessTimers(void)
 		}
 		/* 若需要重复使用，则重置剩余等待时间 */
 		LinkedList_Unlink(&self.timers, node);
-		LCUI_PostSimpleTask(timer->callback, timer->arg, NULL);
+		timer->callback(timer->arg);
 		if (timer->reuse) {
 			timer->pause_ms = 0;
 			timer->start_time = LCUI_GetTime();

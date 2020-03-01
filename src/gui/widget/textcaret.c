@@ -140,7 +140,7 @@ static void TextCaret_OnDestroy(LCUI_Widget widget)
 
 	caret = Widget_GetData(widget, prototype);
 	caret->task->active = FALSE;
-	if (LCUITimer_Free(caret->timer_id) == 0) {
+	if (LCUITimer_Free(caret->timer_id) != -1) {
 		free(caret->task);
 		caret->task = NULL;
 	}
