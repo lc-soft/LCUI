@@ -107,6 +107,7 @@ typedef struct LCUI_WidgetRendererRec_ {
 
 static struct LCUI_WidgetRenderModule {
 	LCUI_BOOL active;
+	LCUI_WidgetPrototype default_proto;
 	RBTree groups;
 	LinkedList rects;
 } self = { 0 };
@@ -122,7 +123,7 @@ static LCUI_BOOL Widget_IsPaintable(LCUI_Widget w)
 	    s->shadow.spread > 0) {
 		return TRUE;
 	}
-	return w->proto && w->proto->paint;
+	return w->proto != self.default_proto;
 }
 
 static LCUI_BOOL Widget_HasRoundBorder(LCUI_Widget w)
@@ -313,6 +314,7 @@ void LCUIWidget_InitRenderer(void)
 	RBTree_OnCompare(&self.groups, OnCompareGroup);
 	RBTree_OnDestroy(&self.groups, OnDestroyGroup);
 	LinkedList_Init(&self.rects);
+	self.default_proto = LCUIWidget_GetPrototype(NULL);
 	self.active = TRUE;
 }
 
