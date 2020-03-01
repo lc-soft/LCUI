@@ -93,6 +93,13 @@
     <ClInclude Include="..\..\..\include\LCUI\util\time.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\uri.h" />
     <ClInclude Include="..\..\..\include\LCUI_Build.h" />
+    <ClInclude Include="..\..\..\src\gui\layout\block.h" />
+    <ClInclude Include="..\..\..\src\gui\layout\flexbox.h" />
+    <ClInclude Include="..\..\..\src\gui\widget_background.h" />
+    <ClInclude Include="..\..\..\src\gui\widget_border.h" />
+    <ClInclude Include="..\..\..\src\gui\widget_diff.h" />
+    <ClInclude Include="..\..\..\src\gui\widget_shadow.h" />
+    <ClInclude Include="..\..\..\src\gui\widget_util.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
@@ -112,6 +119,8 @@
     <ClCompile Include="..\..\..\src\gui\css_library.c" />
     <ClCompile Include="..\..\..\src\gui\css_parser.c" />
     <ClCompile Include="..\..\..\src\gui\css_rule_font_face.c" />
+    <ClCompile Include="..\..\..\src\gui\layout\block.c" />
+    <ClCompile Include="..\..\..\src\gui\layout\flexbox.c" />
     <ClCompile Include="..\..\..\src\gui\metrics.c" />
     <ClCompile Include="..\..\..\src\gui\widget.c" />
     <ClCompile Include="..\..\..\src\gui\widget\anchor.c" />
@@ -127,7 +136,9 @@
     <ClCompile Include="..\..\..\src\gui\widget_base.c" />
     <ClCompile Include="..\..\..\src\gui\widget_border.c" />
     <ClCompile Include="..\..\..\src\gui\widget_class.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_diff.c" />
     <ClCompile Include="..\..\..\src\gui\widget_event.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_hash.c" />
     <ClCompile Include="..\..\..\src\gui\widget_helper.c" />
     <ClCompile Include="..\..\..\src\gui\widget_id.c" />
     <ClCompile Include="..\..\..\src\gui\widget_layout.c" />

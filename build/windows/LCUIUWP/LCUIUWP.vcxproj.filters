@@ -58,6 +58,9 @@
     <Filter Include="源文件\image">
       <UniqueIdentifier>{dd6d7c8f-2626-480f-b8ca-002f4a4ce989}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\gui\layout">
+      <UniqueIdentifier>{9b6bd389-fccc-45ef-a373-0e0f050b3867}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\LCUI_Build.h">
@@ -260,6 +263,27 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\canvas.h">
       <Filter>头文件\LCUI\gui\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\gui\widget_background.h">
+      <Filter>源文件\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\gui\widget_border.h">
+      <Filter>源文件\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\gui\widget_diff.h">
+      <Filter>源文件\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\gui\widget_shadow.h">
+      <Filter>源文件\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\gui\widget_util.h">
+      <Filter>源文件\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\gui\layout\block.h">
+      <Filter>源文件\gui\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\gui\layout\flexbox.h">
+      <Filter>源文件\gui\layout</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -487,6 +511,18 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\gui\widget\canvas.c">
       <Filter>源文件\gui\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_diff.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_hash.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\layout\block.c">
+      <Filter>源文件\gui\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\layout\flexbox.c">
+      <Filter>源文件\gui\layout</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
