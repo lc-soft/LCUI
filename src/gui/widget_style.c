@@ -437,11 +437,11 @@ void Widget_ComputeFlexBoxStyle(LCUI_Widget w)
 
 	if (s[key_flex_grow].is_valid &&
 	    s[key_flex_grow].type == LCUI_STYPE_INT) {
-		flex->grow = s[key_flex_grow].val_int;
+		flex->grow = 1.f * s[key_flex_grow].val_int;
 	}
 	if (s[key_flex_shrink].is_valid &&
 	    s[key_flex_shrink].type == LCUI_STYPE_INT) {
-		flex->shrink = s[key_flex_shrink].val_int;
+		flex->shrink = 1.f * s[key_flex_shrink].val_int;
 	}
 	if (s[key_flex_wrap].is_valid &&
 	    s[key_flex_wrap].type == LCUI_STYPE_STYLE) {

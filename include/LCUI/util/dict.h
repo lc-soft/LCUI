@@ -245,8 +245,8 @@ LCUI_API void *StringKeyDict_KeyDup(void *privdata, const void *key);
 LCUI_API void StringKeyDict_KeyDestructor(void *privdata, void *key);
 
 /* Hash table types */
-LCUI_API DictType DictType_StringKey;
-LCUI_API DictType DictType_StringCopyKey;
+LCUI_API extern DictType DictType_StringKey;
+LCUI_API extern DictType DictType_StringCopyKey;
 
 LCUI_END_HEADER
 

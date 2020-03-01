@@ -1,4 +1,4 @@
-/* display.c -- Graphical display control
+﻿/* display.c -- Graphical display control
  *
  * Copyright (c) 2018-2020, Liu chao <lc-soft@live.cn> All rights reserved.
  *
@@ -63,8 +63,6 @@
 #define PARALLEL_RENDERING_THREADS 1
 #endif
 
-#define FLASH_DURATION	1000.0
-
 typedef struct FlashRectRec_ {
 	int64_t paint_time;
 	LCUI_Rect rect;
@@ -120,6 +118,7 @@ static size_t LCUIDisplay_RenderFlashRect(SurfaceRecord record,
 {
 	size_t count;
 	int64_t period;
+	float duraion = 1000;
 
 	LCUI_Pos pos;
 	LCUI_Color color;
@@ -132,7 +131,7 @@ static size_t LCUIDisplay_RenderFlashRect(SurfaceRecord record,
 	}
 	period = LCUI_GetTimeDelta(flash_rect->paint_time);
 	count = Widget_Render(record->widget, paint);
-	if (period >= FLASH_DURATION) {
+	if (period >= duraion) {
 		flash_rect->paint_time = 0;
 		Surface_EndPaint(record->surface, paint);
 		return count;
@@ -141,7 +140,7 @@ static size_t LCUIDisplay_RenderFlashRect(SurfaceRecord record,
 	mask.color_type = LCUI_COLOR_TYPE_ARGB;
 	Graph_Create(&mask, flash_rect->rect.width, flash_rect->rect.height);
 	Graph_FillRect(&mask, ARGB(125, 124, 179, 5), NULL, TRUE);
-	mask.opacity = 0.6 * (FLASH_DURATION - (float)period) / FLASH_DURATION;
+	mask.opacity = 0.6f * (duraion - (float)period) / duraion;
 	pos.x = pos.y = 0;
 	color = RGB(124, 179, 5);
 	Graph_DrawHorizLine(&mask, color, 1, pos, mask.width - 1);
@@ -201,8 +200,8 @@ static void GetRenderingLayerSize(int *width, int *height)
 {
 	float scale = LCUIMetrics_GetScale();
 
-	*width = LCUIDisplay_GetWidth() * scale;
-	*height = LCUIDisplay_GetHeight() * scale;
+	*width = (int)(LCUIDisplay_GetWidth() * scale);
+	*height = (int)(LCUIDisplay_GetHeight() * scale);
 	*height = max(200, *height / PARALLEL_RENDERING_THREADS + 1);
 }
 
@@ -226,7 +225,7 @@ static void SurfaceRecord_DumpRects(SurfaceRecord record, LinkedList *rects)
 	LinkedListNode *node;
 
 	GetRenderingLayerSize(&layer_width, &layer_height);
-	max_dirty = 0.8 * layer_width * layer_height;
+	max_dirty = (int)(0.8 * layer_width * layer_height);
 	for (i = 0; i < PARALLEL_RENDERING_THREADS; ++i) {
 		layer = &layers[i];
 		layer->diry = 0;
@@ -335,12 +334,12 @@ static size_t LCUIDisplay_RenderSurface(SurfaceRecord record)
 	firstprivate(record) \
 	reduction(+:count)
 #endif
-		for (i = 0; i < rects.length; ++i) {
+		for (i = 0; i < (int)rects.length; ++i) {
 			count += LCUIDisplay_RenderSurfaceRect(record,
 							       rect_array[i]);
 		}
 	} else {
-		for (i = 0; i < rects.length; ++i) {
+		for (i = 0; i < (int)rects.length; ++i) {
 			count += LCUIDisplay_RenderSurfaceRect(record,
 							       rect_array[i]);
 		}
