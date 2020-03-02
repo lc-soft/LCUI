@@ -1,3 +1,66 @@
+# [2.0.0](https://github.com/lc-soft/LCUI/compare/v1.3.0...v2.0.0) (2020-03-01)
+
+### 问题修复
+
+* **builder:** 注释结点应该被忽略 ([460ee00](https://github.com/lc-soft/LCUI/commit/460ee00))
+* **css:** 使用了未初始化的值 ([44486f1](https://github.com/lc-soft/LCUI/commit/44486f1))
+* **font:** 字体路径获取错误 ([#187](https://github.com/lc-soft/LCUI/issues/187)) ([6d54685](https://github.com/lc-soft/LCUI/commit/6d54685))
+* **font:** FontBitmap_Free() 内存泄露 ([c47a6c0](https://github.com/lc-soft/LCUI/commit/c47a6c0))
+* **gui:** 根部件缺少 hover 和 active 状态 ([02c03c7](https://github.com/lc-soft/LCUI/commit/02c03c7))
+* **gui:** 调整空窗口的尺寸时出现段错误 ([#199](https://github.com/lc-soft/LCUI/issues/199)) ([56ce0b5](https://github.com/lc-soft/LCUI/commit/56ce0b5))
+* **gui:** TextCaret 应该在销毁后移除定时器 ([a58b12d](https://github.com/lc-soft/LCUI/commit/a58b12d))
+* **linux:** InitLinuxKeybord() 内存泄漏 ([61cadc8](https://github.com/lc-soft/LCUI/commit/61cadc8))
+* **timer:** 在移除定时器后，其回调依然会被执行 ([43233b3](https://github.com/lc-soft/LCUI/commit/43233b3))
+* **util:** dict 类型未正确导出 ([20abb19](https://github.com/lc-soft/LCUI/commit/20abb19))
+* **windows:** 未默认启用触控支持 ([bc7710a](https://github.com/lc-soft/LCUI/commit/bc7710a))
+* 纠正变量的使用 ([513b3b9](https://github.com/lc-soft/LCUI/commit/513b3b9))
+* 光标的位置应该在处理部件事件之前更新 ([83fc949](https://github.com/lc-soft/LCUI/commit/83fc949))
+
+### 代码重构
+
+* **gui:** 添加 widget_background.h ([d69fbb0](https://github.com/lc-soft/LCUI/commit/d69fbb0))
+* **gui:** 添加 widget_border.h ([843232e](https://github.com/lc-soft/LCUI/commit/843232e))
+* **gui:** 添加 widget_shadow.h ([08ed51c](https://github.com/lc-soft/LCUI/commit/08ed51c))
+* **gui:** 改进部件更新流程 ([1a50aec](https://github.com/lc-soft/LCUI/commit/1a50aec))
+
+### 新功能
+
+* **builder:** 在出错时输出详细内容 ([f7ed3b8](https://github.com/lc-soft/LCUI/commit/f7ed3b8))
+* **css:** 添加 flexbox 相关属性解析器 ([07d2911](https://github.com/lc-soft/LCUI/commit/07d2911))
+* **display:** 添加 LCUIDisplay_EnablePaintFlashing() ([298ffa4](https://github.com/lc-soft/LCUI/commit/298ffa4))
+* **display:** 闪烁已渲染的矩形区域 ([#180](https://github.com/lc-soft/LCUI/issues/180)) ([#190](https://github.com/lc-soft/LCUI/issues/190)) ([5ad4fec](https://github.com/lc-soft/LCUI/commit/5ad4fec))
+* **display:** 设置最小屏幕尺寸为 320x240 ([317df70](https://github.com/lc-soft/LCUI/commit/317df70))
+* **gui:** 添加 CSSFontStyle_IsEquals() ([80d4149](https://github.com/lc-soft/LCUI/commit/80d4149))
+* **gui:** 添加弹性盒子布局 ([3cbb246](https://github.com/lc-soft/LCUI/commit/3cbb246))
+* **gui:** 更改部件原型上的 runtask() 方法的参数和调用时机 ([f058916](https://github.com/lc-soft/LCUI/commit/f058916))
+* **gui:** 重写部件布局系统 ([24e89aa](https://github.com/lc-soft/LCUI/commit/24e89aa))
+* **gui:** 滚动条部件将会在容器销毁后重置 ([61e0f2c](https://github.com/lc-soft/LCUI/commit/61e0f2c))
+* **gui:** 在滚动条可见时设置容器的内间距 ([a436f41](https://github.com/lc-soft/LCUI/commit/a436f41))
+* **gui:** unwrap() 将会为没给子部件触发 link 和 unlink 事件 ([48344bc](https://github.com/lc-soft/LCUI/commit/48344bc))
+* **gui:** 更新TextView 尺寸变动规则 ([ea7e9d2](https://github.com/lc-soft/LCUI/commit/ea7e9d2))
+* **util:** 使用内联函数代替全局变量 ([0991d14](https://github.com/lc-soft/LCUI/commit/0991d14))
+
+### 性能改进
+
+* **display:** 主窗口尺寸改变后无需添加无效区域 ([b0985a2](https://github.com/lc-soft/LCUI/commit/b0985a2))
+* **display:** OpenMP 将只在渲染区域较大时启用 ([1e57d9d](https://github.com/lc-soft/LCUI/commit/1e57d9d))
+* **gui:** 改进部件的无效区域收集方式 ([e9ea262](https://github.com/lc-soft/LCUI/commit/e9ea262))
+* **gui:** 改进 TextEdit 部件的更新流程 ([bbb7cbc](https://github.com/lc-soft/LCUI/commit/bbb7cbc))
+* **gui:** 改进 TextView 部件的更新流程 ([6824735](https://github.com/lc-soft/LCUI/commit/6824735))
+* 为部件渲染添加 OpenMP 支持 ([#118](https://github.com/lc-soft/LCUI/issues/118)) ([#189](https://github.com/lc-soft/LCUI/issues/189)) ([d858333](https://github.com/lc-soft/LCUI/commit/d858333))
+* 改进表面 (Surface) 的无效区域的收集方式 ([c81da29](https://github.com/lc-soft/LCUI/commit/c81da29))
+
+### 不兼容变动
+
+* **util:** `DictType_StringKey` and `DictType_StringCopyKey` 已改用内联函数代替
+* **display:** 已移除 `LCUIDisplay_ShowRectBorder()` 和 `LCUIDisplay_HideRectBorder()`
+* **gui:** 部件的阴影操作接口已改为私有
+* **gui:** 部件的背景操作接口已改为私有
+* **gui:** 部件的边框操作接口已改为私有
+* **gui:** TextView 部件必须在 UI 线程中操作
+* **gui:** 部件原型上的 runtask() 方法接受两个参数，并且会在每个任务被处理后调用
+* **gui:** 一些部件操作接口已重命名或已移除
+
 # [1.3.0](https://github.com/lc-soft/LCUI/compare/v1.2.0-beta...v1.3.0) (2019-10-07)
 
 ### 问题修复
