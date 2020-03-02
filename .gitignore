@@ -27,6 +27,7 @@
 *.res
 *.vcxproj.user
 *.gcno
+*.gcov
 build/windows/*/*.css
 build/windows/*/*.xml
 *~
