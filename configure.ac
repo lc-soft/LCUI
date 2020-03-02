@@ -212,7 +212,7 @@ AC_SUBST(PACKAGE_LIBS)
 AC_SUBST(CFLAGS)
 AC_SUBST(CXXFLAGS)
 AC_CONFIG_FILES([
-	lcui.pc
+	lcui2.pc
 	Makefile
 	build/Makefile
 	include/Makefile
