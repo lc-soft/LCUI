@@ -138,18 +138,6 @@ lcpkg init
 lcpkg install github.com/lc-soft/LCUI
 ```
 
-如果你觉得从 GitHub 下载文件的速度很慢，可以试试从 npm 下载：
-
-```bash
-# 从 npm 包源下载已编译的 LCUI 二进制文件包
-npm install @lcui/engine
-
-# 让 lcpkg 从 npm 包的安装目录中安装 LCUI
-lcpkg install npm:@lcui/engine
-```
-
-安装成功后，按照 lcpkg 输出的帮助文档来配置你项目的编译参数。
-
 #### 手动编译安装
 
 如果你想手动从源码编译 LCUI：
