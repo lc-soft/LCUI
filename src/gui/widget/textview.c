@@ -45,6 +45,11 @@
 #define GetData(W) Widget_GetData(W, self.prototype)
 #define ComputeActual LCUIMetrics_ComputeActual
 
+typedef struct LCUI_TextViewTaskRec_ {
+	wchar_t *content;
+	LCUI_BOOL update_content;
+} LCUI_TextViewTaskRec, *LCUI_TextViewTask;
+
 typedef struct LCUI_TextViewRec_ {
 	float available_width;
 	wchar_t *content;
@@ -52,6 +57,7 @@ typedef struct LCUI_TextViewRec_ {
 	LCUI_Widget widget;
 	LCUI_TextLayer layer;
 	LCUI_CSSFontStyleRec style;
+	LCUI_TextViewTaskRec task;
 	LinkedListNode node;
 } LCUI_TextViewRec, *LCUI_TextView;
 
@@ -175,15 +181,13 @@ static void TextView_OnInit(LCUI_Widget w)
 	txt = Widget_AddData(w, self.prototype, sizeof(LCUI_TextViewRec));
 	txt->widget = w;
 	txt->available_width = 0;
+	txt->task.update_content = FALSE;
+	txt->task.content = NULL;
 	txt->content = NULL;
-	/* 默认清除首尾空白符 */
 	txt->trimming = TRUE;
-	/* 初始化文本图层 */
 	txt->layer = TextLayer_New();
-	/* 启用多行文本显示 */
 	TextLayer_SetAutoWrap(txt->layer, TRUE);
 	TextLayer_SetMultiline(txt->layer, TRUE);
-	/* 启用样式标签的支持 */
 	TextLayer_EnableStyleTag(txt->layer, TRUE);
 	CSSFontStyle_Init(&txt->style);
 	txt->node.data = txt;
@@ -199,6 +203,10 @@ static void TextView_OnDestroy(LCUI_Widget w)
 	CSSFontStyle_Destroy(&txt->style);
 	TextLayer_Destroy(txt->layer);
 	free(txt->content);
+	if (txt->task.content) {
+		free(txt->task.content);
+		txt->task.content = NULL;
+	}
 }
 
 static void TextView_OnAutoSize(LCUI_Widget w, float *width, float *height,
@@ -325,9 +333,12 @@ int TextView_SetTextW(LCUI_Widget w, const wchar_t *text)
 		}
 		wcstrim(newtext, text, NULL);
 	} while (0);
-	TextLayer_SetTextW(txt->layer, newtext, NULL);
-	TextView_Update(w);
-	free(newtext);
+	if (txt->task.content) {
+		free(txt->task.content);
+	}
+	txt->task.update_content = TRUE;
+	txt->task.content = newtext;
+	Widget_AddTask(w, LCUI_WTASK_USER);
 	return 0;
 }
 
@@ -398,11 +409,18 @@ static void TextVIew_OnTask(LCUI_Widget w, int task)
 {
 	LCUI_TextView txt;
 
+	txt = GetData(w);
+	if (txt->task.update_content) {
+		TextLayer_SetTextW(txt->layer, txt->task.content, NULL);
+		TextView_Update(w);
+		free(txt->task.content);
+		txt->task.content = NULL;
+		txt->task.update_content = FALSE;
+	}
 	if (task != LCUI_WTASK_RESIZE ||
 	    w->computed_style.width_sizing != LCUI_SIZING_RULE_FIT_CONTENT) {
 		return;
 	}
-	txt = GetData(w);
 	if (w->parent && w->parent->box.content.width != txt->available_width) {
 		txt->available_width = w->parent->box.content.width;
 		Widget_AddTask(w, LCUI_WTASK_REFLOW);
