@@ -125,7 +125,7 @@ static void X11Surface_OnResize(LCUI_Surface s, int width, int height)
 	int depth;
 	XGCValues gcv;
 	Visual *visual;
-	if (width == s->width && height == s->height) {
+	if (width == s->width && height == s->height && s->ximage && s->gc) {
 		return;
 	}
 	if (s->ximage) {
