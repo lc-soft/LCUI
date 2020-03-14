@@ -41,7 +41,8 @@ void test_widget_rect(void)
 	LCUI_TriggerEvent(&ev, NULL);
 	LCUIWidget_Update();
 	Widget_GetInvalidArea(root, &rects);
-	it_b("moving the mouse should not create dirty rectangle",
+	it_b("app.trigger({ type: 'mousemove', x: 150, y: 150}), "
+	     "root.getInvalidArea().length == 0",
 	     rects.length == 0, TRUE);
 
 	ev.motion.x = 80;
@@ -50,8 +51,8 @@ void test_widget_rect(void)
 	LCUIWidget_Update();
 	Widget_GetInvalidArea(root, &rects);
 	rect = rects.head.next->data;
-	it_b("moving the mouse over the button should create a "
-	     "dirty rectangle",
+	it_b("app.trigger({ type: 'mousemove', x: 80, y: 80 }), "
+	     "root.getInvalidArea().length == 1",
 	     rects.length == 1, TRUE);
 
 	expected_rect.x = 0;
@@ -66,8 +67,8 @@ void test_widget_rect(void)
 	LCUI_TriggerEvent(&ev, NULL);
 	LCUIWidget_Update();
 	Widget_GetInvalidArea(root, &rects);
-	it_b("moving the mouse over the textview should not create "
-	     "dirty rectangle",
+	it_b("app.trigger({ type: 'mousemove', x: 40, y: 40 }), "
+	     "root.getInvalidArea().length == 0",
 	     rects.length == 0, TRUE);
 
 	ev.type = LCUI_MOUSEDOWN;
@@ -77,10 +78,11 @@ void test_widget_rect(void)
 	LCUI_TriggerEvent(&ev, NULL);
 	LCUIWidget_Update();
 	Widget_GetInvalidArea(root, &rects);
-	rect = rects.head.next->data;
-	it_b("pressing the mouse button should create a dirty rectangle",
+	it_b("app.trigger({ type: 'mousedown', x: 40, y: 40 }), "
+	     "root.getInvalidArea().length == 1",
 	     rects.length == 1, TRUE);
 	if (rects.length == 1) {
+		rect = rects.head.next->data;
 		it_rect("root.getInvalidArea()[0]", rect, &expected_rect);
 	}
 	LinkedList_Clear(&rects, free);
@@ -89,10 +91,11 @@ void test_widget_rect(void)
 	LCUI_TriggerEvent(&ev, NULL);
 	LCUIWidget_Update();
 	Widget_GetInvalidArea(root, &rects);
-	rect = rects.head.next->data;
-	it_b("releasing the mouse button should create a dirty rectangle",
+	it_b("app.trigger({ type: 'mouseup', x: 40, y: 40 }), "
+	     "root.getInvalidArea().length == 1",
 	     rects.length == 1, TRUE);
 	if (rects.length == 1) {
+		rect = rects.head.next->data;
 		it_rect("root.getInvalidArea()[0]", rect, &expected_rect);
 	}
 	LinkedList_Clear(&rects, free);
@@ -103,8 +106,8 @@ void test_widget_rect(void)
 	LCUI_TriggerEvent(&ev, NULL);
 	LCUIWidget_Update();
 	Widget_GetInvalidArea(root, &rects);
-	it_b("moving the mouse over the button should not create dirty "
-	     "rectangle",
+	it_b("app.trigger({ type: 'mousemove', x: 80, y: 80 }), "
+	     "root.getInvalidArea().length == 0",
 	     rects.length == 0, TRUE);
 
 	ev.motion.x = 150;
@@ -114,11 +117,42 @@ void test_widget_rect(void)
 	LCUI_TriggerEvent(&ev, NULL);
 	LCUIWidget_Update();
 	Widget_GetInvalidArea(root, &rects);
-	rect = rects.head.next->data;
-	it_b("moving the mouse outside the button should create a dirty "
-	     "rectangle",
+
+	it_b("app.trigger({ type: 'mousemove', x: 150, y: 150 }), "
+	     "root.getInvalidArea().length == 1",
 	     rects.length == 1, TRUE);
 	if (rects.length == 1) {
+		rect = rects.head.next->data;
+		it_rect("root.getInvalidArea()[0]", rect, &expected_rect);
+	}
+	LinkedList_Clear(&rects, free);
+
+	expected_rect.x = 21;
+	expected_rect.y = 11;
+	expected_rect.width = 50;
+	expected_rect.height = 50;
+	Widget_Destroy(child);
+	LCUIWidget_Update();
+	Widget_GetInvalidArea(root, &rects);
+	it_b("child.destroy(), root.getInvalidArea().length == 1",
+	     rects.length == 1, TRUE);
+	if (rects.length == 1) {
+		rect = rects.head.next->data;
+		it_rect("root.getInvalidArea()[0]", rect, &expected_rect);
+	}
+	LinkedList_Clear(&rects, free);
+
+	expected_rect.x = 0;
+	expected_rect.y = 0;
+	expected_rect.width = 100;
+	expected_rect.height = 100;
+	Widget_Destroy(parent);
+	LCUIWidget_Update();
+	Widget_GetInvalidArea(root, &rects);
+	it_b("parent.destroy(), root.getInvalidArea().length == 1",
+	     rects.length == 1, TRUE);
+	if (rects.length == 1) {
+		rect = rects.head.next->data;
 		it_rect("root.getInvalidArea()[0]", rect, &expected_rect);
 	}
 	LinkedList_Clear(&rects, free);

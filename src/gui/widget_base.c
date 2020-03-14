@@ -178,7 +178,8 @@ void Widget_Destroy(LCUI_Widget w)
 		if (w->computed_style.position != SV_ABSOLUTE) {
 			Widget_AddTask(w->parent, LCUI_WTASK_REFLOW);
 		}
-		Widget_InvalidateArea(w, NULL, SV_GRAPH_BOX);
+		Widget_InvalidateArea(w->parent, &w->box.canvas,
+				      SV_CONTENT_BOX);
 		Widget_AddToTrash(w);
 	}
 }

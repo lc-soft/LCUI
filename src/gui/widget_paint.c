@@ -1,7 +1,7 @@
 ﻿/*
  * widget_paint.c -- LCUI widget paint module.
  *
- * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2020, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -134,46 +134,6 @@ static LCUI_BOOL Widget_HasRoundBorder(LCUI_Widget w)
 	       s->bottom_left_radius || s->bottom_right_radius;
 }
 
-/**
- * 根据所处框区域，调整矩形
- * @param[in] w		目标部件
- * @param[in] in_rect	矩形
- * @param[out] out_rect	调整后的矩形
- * @param[in] box_type	区域相对于何种框进行定位
- */
-static void Widget_AdjustArea(LCUI_Widget w, LCUI_RectF *in_rect,
-			      LCUI_RectF *out_rect, int box_type)
-{
-	LCUI_RectF *box;
-	switch (box_type) {
-	case SV_BORDER_BOX:
-		box = &w->box.border;
-		break;
-	case SV_GRAPH_BOX:
-		box = &w->box.canvas;
-		break;
-	case SV_PADDING_BOX:
-		box = &w->box.padding;
-		break;
-	case SV_CONTENT_BOX:
-	default:
-		box = &w->box.content;
-		break;
-	}
-	/* 如果为NULL，则视为使用整个部件区域 */
-	if (!in_rect) {
-		out_rect->x = out_rect->y = 0;
-		out_rect->width = box->width;
-		out_rect->height = box->height;
-	} else {
-		*out_rect = *in_rect;
-		LCUIRectF_ValidateArea(out_rect, box->width, box->height);
-	}
-	/* 将坐标转换成相对于图像呈现区的坐标 */
-	out_rect->x += box->x - w->box.canvas.x;
-	out_rect->y += box->y - w->box.canvas.y;
-}
-
 void RectFToInvalidArea(const LCUI_RectF *rect, LCUI_Rect *area)
 {
 	LCUIMetrics_ComputeRectActual(area, rect);
@@ -190,26 +150,82 @@ LCUI_BOOL Widget_InvalidateArea(LCUI_Widget w, LCUI_RectF *in_rect,
 				int box_type)
 {
 	LCUI_RectF rect;
+	LCUI_InvalidAreaType type;
 
-	if (!w) {
-		w = LCUIWidget_GetRoot();
-	}
-	if (!w->computed_style.visible ||
-	    w->invalid_area_type > LCUI_INVALID_AREA_TYPE_CUSTOM) {
+	if (!w->computed_style.visible) {
 		return FALSE;
 	}
-	Widget_AdjustArea(w, in_rect, &rect, box_type);
+	if (!in_rect) {
+		switch (box_type) {
+		case SV_BORDER_BOX:
+			type = LCUI_INVALID_AREA_TYPE_BORDER_BOX;
+			break;
+		case SV_GRAPH_BOX:
+			type = LCUI_INVALID_AREA_TYPE_CANVAS_BOX;
+			break;
+		case SV_PADDING_BOX:
+		case SV_CONTENT_BOX:
+		default:
+			type = LCUI_INVALID_AREA_TYPE_PADDING_BOX;
+			break;
+		}
+		if (w->invalid_area_type >= type) {
+			return FALSE;
+		}
+		w->invalid_area_type = type;
+		while (w->parent) {
+			w->parent->has_child_invalid_area = TRUE;
+			w = w->parent;
+		}
+		return TRUE;
+	}
+
+	rect = *in_rect;
+	switch (box_type) {
+	case SV_GRAPH_BOX:
+		if (w->invalid_area_type == LCUI_INVALID_AREA_TYPE_CANVAS_BOX) {
+			return FALSE;
+		}
+		LCUIRectF_ValidateArea(&rect, w->box.canvas.width,
+				       w->box.canvas.height);
+		break;
+	case SV_BORDER_BOX:
+		if (w->invalid_area_type == LCUI_INVALID_AREA_TYPE_BORDER_BOX) {
+			return FALSE;
+		}
+		LCUIRectF_ValidateArea(&rect, w->box.border.width,
+				       w->box.border.height);
+		rect.x += w->box.border.x - w->box.canvas.x;
+		rect.y += w->box.border.y - w->box.canvas.y;
+		break;
+	case SV_PADDING_BOX:
+		if (w->invalid_area_type == LCUI_INVALID_AREA_TYPE_PADDING_BOX) {
+			return FALSE;
+		}
+		LCUIRectF_ValidateArea(&rect, w->box.padding.width,
+				       w->box.padding.height);
+		rect.x += w->box.padding.x - w->box.canvas.x;
+		rect.y += w->box.padding.y - w->box.canvas.y;
+		break;
+	case SV_CONTENT_BOX:
+	default:
+		LCUIRectF_ValidateArea(&rect, w->box.content.width,
+				       w->box.content.height);
+		rect.x += w->box.content.x - w->box.canvas.x;
+		rect.y += w->box.content.y - w->box.canvas.y;
+		break;
+	}
 	rect.x += w->box.canvas.x;
 	rect.y += w->box.canvas.y;
-	if (w->invalid_area_type == LCUI_INVALID_AREA_TYPE_CUSTOM) {
+	if (w->invalid_area_type > LCUI_INVALID_AREA_TYPE_NONE) {
 		LCUIRectF_MergeRect(&w->invalid_area, &rect, &w->invalid_area);
 	} else {
 		w->invalid_area = rect;
-	}
-	w->invalid_area_type = LCUI_INVALID_AREA_TYPE_CUSTOM;
-	while (w->parent) {
-		w->parent->has_child_invalid_area = TRUE;
-		w = w->parent;
+		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_CUSTOM;
+		while (w->parent) {
+			w->parent->has_child_invalid_area = TRUE;
+			w = w->parent;
+		}
 	}
 	return TRUE;
 }
@@ -541,7 +557,7 @@ static size_t WidgetRenderer_RenderChildren(LCUI_WidgetRenderer that)
 	LCUI_WidgetRenderer renderer;
 	LCUI_WidgetActualStyleRec style;
 
-	/* 按照显示顺序，从底到顶，递归遍历子级部件 */
+	/* Render the child widgets from bottom to top in stack order */
 	for (LinkedList_EachReverse(node, &that->target->children_show)) {
 		child = node->data;
 		if (!child->computed_style.visible ||
