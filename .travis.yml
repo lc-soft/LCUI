@@ -3,6 +3,14 @@ language: c
 compiler:
   - clang
   - gcc
+matrix:
+  include:
+    - os: linux
+      arch: amd64
+      compiler: gcc
+    - os: linux
+      arch: arm64
+      compiler: gcc
 
 before_install:
   - sudo apt-get install valgrind libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev lcov -qq
