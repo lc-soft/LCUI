@@ -20,7 +20,10 @@ before_install:
 
 before_script:
   - export LD_LIBRARY_PATH=/usr/local/clang/lib:$LD_LIBRARY_PATH
-  - ./node_modules/.bin/commitlint-travis && ./autogen.sh
+  - git config user.email "support@travis.org"
+  - git config user.name "Travis CI"
+  - ./node_modules/.bin/commitlint-travis
+  - ./autogen.sh
 
 script:
   - ./configure --enable-code-coverage
