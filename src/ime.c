@@ -272,7 +272,7 @@ void LCUI_InitIME(void)
 
 void LCUIIME_SetCaret(int x, int y)
 {
-	if (self.ime->handler.setcaret) {
+	if (self.ime && self.ime->handler.setcaret) {
 		self.ime->handler.setcaret(x, y);
 	}
 }
