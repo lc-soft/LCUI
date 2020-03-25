@@ -1,7 +1,7 @@
-﻿/*
- * widget_task.h -- LCUI widget task module.
+/*
+ * widget_fpsmeter.h -- The widget fps meter operation set.
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2020, Vasilyy Balyasnyy <v.balyasnyy@gmail.com> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,40 +28,42 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_WIDGET_TASK_H
-#define LCUI_WIDGET_TASK_H
+#ifndef LCUI_WIDGET_FPSMETER_H
+#define LCUI_WIDGET_FPSMETER_H
 
 LCUI_BEGIN_HEADER
 
-/** 更新当前任务状态，确保部件的任务能够被处理到 */
-LCUI_API void Widget_UpdateTaskStatus(LCUI_Widget widget);
+#include <LCUI/LCUI.h>
+#include <LCUI/gui/widget.h>
+#include <LCUI/gui/widget/textview.h>
 
-/** 添加任务 */
-LCUI_API void Widget_AddTask(LCUI_Widget widget, int task_type);
+typedef struct LCUI_FpsMeterRec_ {
+	LCUI_BOOL is_enabled;
 
-/** 处理部件中当前积累的任务 */
-LCUI_API size_t Widget_Update(LCUI_Widget w);
+	LCUI_Widget widget;
 
-LCUI_API size_t Widget_UpdateWithProfile(LCUI_Widget w,
-				       LCUI_WidgetTasksProfile profile);
+	int64_t last_time;
+	size_t frame_count;
 
-/** 为子级部件添加任务 */
-LCUI_API void Widget_AddTaskForChildren(LCUI_Widget widget, int task);
+	size_t fps;
+	int render_thread_count;
+	size_t render_count;
+	size_t widget_update_count;
+} LCUI_FpsMeterRec, *LCUI_FpsMeter;
 
-/** 初始化 LCUI 部件任务处理功能 */
-LCUI_API void LCUIWidget_InitTasks(void);
+void LCUI_FpsMeter_FrameCount(void);
 
-/** 销毁（释放） LCUI 部件任务处理功能的相关资源 */
-LCUI_API void LCUIWidget_FreeTasks(void);
+void LCUI_FpsMeter_RenderThreadCount(int count);
 
-/** 处理一次当前积累的部件任务 */
-LCUI_API size_t LCUIWidget_Update(void);
+void LCUI_FpsMeter_RenderCount(size_t count);
 
-LCUI_API void LCUIWidget_UpdateWithProfile(LCUI_WidgetTasksProfile profile);
+void LCUI_FpsMeter_WidgetUpdateCount(size_t count);
 
-/** 刷新所有部件的样式 */
-LCUI_API void LCUIWidget_RefreshStyle(void);
+void LCUI_FpsMeter_Enable(void);
+
+void LCUI_FpsMeter_Disable(void);
 
 LCUI_END_HEADER
 
 #endif
+

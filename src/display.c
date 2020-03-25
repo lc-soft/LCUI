@@ -44,6 +44,7 @@
 #include <LCUI/thread.h>
 #include <LCUI/display.h>
 #include <LCUI/platform.h>
+#include <LCUI/gui/widget_fpsmeter.h>
 #ifdef LCUI_DISPLAY_H
 #include LCUI_DISPLAY_H
 #endif
@@ -337,6 +338,9 @@ static size_t LCUIDisplay_RenderSurface(SurfaceRecord record)
 		for (i = 0; i < (int)rects.length; ++i) {
 			count += LCUIDisplay_RenderSurfaceRect(record,
 							       rect_array[i]);
+#ifdef USE_OPENMP
+			LCUI_FpsMeter_RenderThreadCount(omp_get_num_threads());
+#endif
 		}
 	} else {
 		for (i = 0; i < (int)rects.length; ++i) {
@@ -379,12 +383,14 @@ size_t LCUIDisplay_Render(void)
 	LinkedListNode *node;
 
 	if (!display.active) {
+		LCUI_FpsMeter_RenderCount(0);
 		return 0;
 	}
 	for (LinkedList_Each(node, &display.surfaces)) {
 		count += LCUIDisplay_RenderSurface(node->data);
 		count += LCUIDisplay_UpdateFlashRects(node->data);
 	}
+	LCUI_FpsMeter_RenderCount(count);
 	return count;
 }
 
@@ -405,6 +411,7 @@ void LCUIDisplay_Present(void)
 			Surface_Present(surface);
 		}
 	}
+	LCUI_FpsMeter_FrameCount();
 }
 
 void LCUIDisplay_InvalidateArea(LCUI_Rect *rect)

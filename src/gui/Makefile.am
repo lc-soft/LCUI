@@ -21,6 +21,7 @@ widget_background.c	\
 widget_border.c		\
 widget_shadow.c		\
 widget_diff.c		\
+widget_fpsmeter.c	\
 css_parser.c		\
 css_rule_font_face.c	\
 css_library.c		\

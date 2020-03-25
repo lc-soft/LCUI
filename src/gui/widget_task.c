@@ -35,6 +35,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
+#include <LCUI/gui/widget_fpsmeter.h>
 #include <LCUI/gui/metrics.h>
 #include "widget_diff.h"
 #include "widget_border.h"
@@ -514,23 +515,28 @@ size_t LCUIWidget_Update(void)
 	LCUIWidget_ClearTrash();
 	self.metrics = *metrics;
 	self.refresh_all = FALSE;
+	LCUI_FpsMeter_WidgetUpdateCount(count);
 	return count;
 }
 
-void Widget_UpdateWithProfile(LCUI_Widget w, LCUI_WidgetTasksProfile profile)
+size_t Widget_UpdateWithProfile(LCUI_Widget w, LCUI_WidgetTasksProfile profile)
 {
+	size_t count;
 	LCUI_WidgetTaskContext ctx;
 
 	ctx = Widget_BeginUpdate(w, NULL);
 	ctx->profile = profile;
-	Widget_UpdateWithContext(w, ctx);
+	count = Widget_UpdateWithContext(w, ctx);
 	Widget_EndUpdate(ctx);
+
+	return count;
 }
 
 void LCUIWidget_UpdateWithProfile(LCUI_WidgetTasksProfile profile)
 {
 	LCUI_Widget root;
 	const LCUI_MetricsRec *metrics;
+	size_t count = 0;
 
 	profile->time = clock();
 	metrics = LCUI_GetMetrics();
@@ -544,12 +550,13 @@ void LCUIWidget_UpdateWithProfile(LCUI_WidgetTasksProfile profile)
 		LCUIWidget_RefreshStyle();
 	}
 	root = LCUIWidget_GetRoot();
-	Widget_UpdateWithProfile(root, profile);
+	count = Widget_UpdateWithProfile(root, profile);
 	root->state = LCUI_WSTATE_NORMAL;
 	profile->time = clock() - profile->time;
 	profile->destroy_time = clock();
 	profile->destroy_count = LCUIWidget_ClearTrash();
 	profile->destroy_time = clock() - profile->destroy_time;
+	LCUI_FpsMeter_WidgetUpdateCount(count);
 }
 
 void LCUIWidget_RefreshStyle(void)
