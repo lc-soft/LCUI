@@ -14,6 +14,7 @@ helloworld_LDADD = $(top_builddir)/src/libLCUI.la
 
 test_SOURCES = test.c \
 libtest.c \
+test_mainloop.c \
 test_charset.c \
 test_string.c \
 test_strpool.c \
