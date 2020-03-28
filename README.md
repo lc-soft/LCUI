@@ -267,7 +267,7 @@ The English version of the documentation is not available, because the author do
     The following is a list of supported CSS features. Checked is supported (But does not mean full support). Unlisted properties are not supported by default.
 
     <details>
-      <summary>CSS 特性覆盖范围</summary>
+      <summary>CSS feature coverage</summary>
 
       - at rules
         - [x] `@font-face`
