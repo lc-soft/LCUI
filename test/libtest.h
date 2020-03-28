@@ -24,4 +24,6 @@ void test_end(void);
 
 int test_result(void);
 
+int print_test_result(void);
+
 #endif

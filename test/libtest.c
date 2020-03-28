@@ -19,6 +19,7 @@
 static size_t tests_passed = 0;
 static size_t tests_total = 0;
 static int test_msg_indent = 0;
+static int64_t test_start_time = 0;
 
 static int test_msg(const char *fmt, ...)
 {
@@ -35,6 +36,9 @@ static int test_msg(const char *fmt, ...)
 
 void test_begin(void)
 {
+	if (!test_start_time) {
+		test_start_time = LCUI_GetTime();
+	}
 	test_msg_indent++;
 }
 
@@ -48,6 +52,18 @@ int test_result(void)
 	if (tests_total > tests_passed) {
 		return (int)(tests_total - tests_passed);
 	}
+	return 0;
+}
+
+int print_test_result(void)
+{
+	printf(GREEN("  %lu passing")" (%ums)\n", tests_passed,
+	       (unsigned)LCUI_GetTimeDelta(test_start_time));
+	if (tests_total > tests_passed) {
+		printf(RED("  %lu faling\n\n"), tests_total - tests_passed);
+		return (int)(tests_total - tests_passed);
+	}
+	printf("\n");
 	return 0;
 }
 
@@ -139,7 +155,7 @@ void it_rectf(const char *name, const LCUI_RectF *actual,
 }
 
 void it_rect(const char *name, const LCUI_Rect *actual,
-	      const LCUI_Rect *expected)
+	     const LCUI_Rect *expected)
 {
 	tests_total++;
 	if (LCUIRect_IsEquals(actual, expected)) {
