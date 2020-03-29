@@ -53,7 +53,7 @@ LCUI (LC's UI Library) is a small C library for building user interfaces.
 - **Written in C:** Suitable for small applications written primarily in C.language designed for LCUI, it makes it easier to create interactive UIs.
 - **Cross platform:** Support for Windows and Linux, you can write Windows Desktop apps and Universal Windows Platform apps, as well as Linux Desktop apps.
 - **XML + CSS:** Includes XML and CSS parsers, you can use XML and CSS to describe interface structure and style.
-- **Web-like development experience:** Since the design and implementation of LCUI's functions, including layout, styles, and renderers, are mostly referenced from MDN documents and some popular web front-end development libraries, its development experience and interface effects will have some similarities to web pages. If you already have experience writing web pages with HTML and CSS, it will be easier to get started.
+- **Web-like development experience:** Since the design and implementation of LCUI's functions, including layout, CSS, and renderer, are mostly referenced from MDN documents and some popular web front-end development libraries, its development experience and interface effects will have some similarities to web pages. If you already have experience writing web pages with HTML and CSS, it will be easier to get started.
 - **Flexible:** Support for adapting the interface to screens of different pixel densities by setting global scaling. Support for using screen density related sp and dp units to describe position and size of the elements.
 
 ### Screenshots
