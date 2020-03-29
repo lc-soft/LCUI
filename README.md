@@ -44,7 +44,7 @@
 
 ## Introduction
 
-LCUI is a freely available software library for building user interfaces. It is written in C and supports the use of XML and CSS to describe the graphical interface of simple desktop apps.
+LCUI (LC's UI Library) is a small C library for building user interfaces.
 
 [中文版说明文档](README.zh-cn.md)
 
@@ -52,10 +52,9 @@ LCUI is a freely available software library for building user interfaces. It is 
 
 - **Written in C:** Suitable for small applications written primarily in C.language designed for LCUI, it makes it easier to create interactive UIs.
 - **Cross platform:** Support for Windows and Linux, you can write Windows Desktop apps and Universal Windows Platform apps, as well as Linux Desktop apps.
-- **XML + CSS:** Support the use of XML and CSS to describe the GUI layout and style, saving interface development time and maintenance costs.
+- **XML + CSS:** Includes XML and CSS parsers, you can use XML and CSS to describe interface structure and style.
+- **Web-like development experience:** Since the design and implementation of LCUI's functions, including layout, styles, and renderers, are mostly referenced from MDN documents and some popular web front-end development libraries, its development experience and interface effects will have some similarities to web pages. If you already have experience writing web pages with HTML and CSS, it will be easier to get started.
 - **Flexible:** Support for adapting the interface to screens of different pixel densities by setting global scaling. Support for using screen density related sp and dp units to describe position and size of the elements.
-- **Simple image reading:** Provide jpg, png and bmp image read APIs.
-- **Touch:** Supports multi-touch, but currently only on Windows platforms.
 
 ### Screenshots
 
@@ -236,17 +235,23 @@ The English version of the documentation is not available, because the author do
 
    - Explore and experiment new GUI development way
    - Let other developers share about how to write better code
-   - Leave a proof of existence in the world
-   - Get more better jobs and make more money
+   - Make it easier for me to find better jobs to make more money
    - Pass the time
 
 1. **Is this a browser kernel? Or a development library like Electron that integrates the browser environment?**
 
     No, you can think of it as a traditional GUI development library that applied some Web technologies.
 
+1. **What do I need to pay attention to if I'm going to use it?**
+
+    We recommend that your project meet the following requirements:
+
+    - The user interface is simple and does not require advanced features such as tables, animations, and transformations.
+    - The code design is reasonable, and the core function code and UI logic code are independent of each other. Even if you find that the requirements are not met after using LCUI, you can easily migrate to other GUI libraries.
+
 1. **Why do I choose the LCUI instead of Electron?**
 
-    In contrast to fully functional Electron, these features of lcui, such as small binary file size and low memory usage, are not worth mentioning, except for technical research and share, you have no reason to use LCUI.
+    In contrast to fully functional Electron, these features of LCUI, such as small binary file size and low memory usage, are not worth mentioning, except for technical research and share, you have no reason to use LCUI.
 
 1. **Is it the same as writing a web page?**
 
