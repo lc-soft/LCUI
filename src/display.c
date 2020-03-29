@@ -274,12 +274,8 @@ static size_t LCUIDisplay_RenderSurfaceRect(SurfaceRecord record,
 					    LCUI_Rect *rect)
 {
 	size_t count;
-	LCUI_SysEventRec ev;
 	LCUI_PaintContext paint;
 
-	ev.type = LCUI_PAINT;
-	ev.paint.rect = *rect;
-	LCUI_TriggerEvent(&ev, NULL);
 	if (!record->widget || !record->surface ||
 	    !Surface_IsReady(record->surface)) {
 		return 0;
@@ -321,7 +317,12 @@ static size_t LCUIDisplay_RenderSurface(SurfaceRecord record)
 	}
 	rect_array = (LCUI_Rect **)malloc(sizeof(LCUI_Rect *) * rects.length);
 	for (LinkedList_Each(node, &rects)) {
+		LCUI_SysEventRec ev;
+
 		rect_array[i] = node->data;
+		ev.type = LCUI_PAINT;
+		ev.paint.rect = *rect_array[i];
+		LCUI_TriggerEvent(&ev, NULL);
 		dirty += rect_array[i]->width * rect_array[i]->height;
 		i++;
 	}
