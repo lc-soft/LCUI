@@ -1,16 +1,19 @@
-dist: bionic
 language: c
-compiler:
-  - clang
-  - gcc
-matrix:
+jobs:
   include:
     - os: linux
-      arch: amd64
+      dist: bionic
+      compiler: clang
+    - os: linux
+      dist: bionic
       compiler: gcc
     - os: linux
+      dist: bionic
       arch: arm64
       compiler: gcc
+    - os: osx
+  allow_failures:
+    - os: osx
 
 before_install:
   - sudo apt-get install valgrind libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev lcov -qq
