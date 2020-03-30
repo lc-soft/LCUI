@@ -345,6 +345,7 @@ static size_t LCUIDisplay_RenderSurface(SurfaceRecord record)
 							       rect_array[i]);
 		}
 	}
+	free(rect_array);
 	RectList_Clear(&rects);
 	record->rendered = count > 0;
 	count += LCUIDisplay_UpdateFlashRects(record);
