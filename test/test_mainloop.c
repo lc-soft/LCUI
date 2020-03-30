@@ -44,11 +44,14 @@ static void OnTriggerBtnClick(void *arg)
 
 static void ObserverThread(void *arg)
 {
-	LCUI_BOOL *exited = (LCUI_BOOL*)arg;
+	int i;
+	LCUI_BOOL *exited = arg;
 
-	LCUI_MSleep(100);
-	it_b("main loop should exit after 50ms", *exited, TRUE);
-	if (!exited) {
+	for (i = 0; i < 10 && !*exited; ++i) {
+		LCUI_MSleep(100);
+	}
+	it_b("main loop should exit within 1000ms", *exited, TRUE);
+	if (!*exited) {
 		exit(-print_test_result());
 		return;
 	}
@@ -57,20 +60,20 @@ static void ObserverThread(void *arg)
 
 void test_mainloop(void)
 {
-	static LCUI_BOOL exited;
-
 	LCUI_Thread tid;
 	LCUI_Widget root, btn;
+	LCUI_BOOL exited = FALSE;
 
 	LCUI_Init();
-	exited = FALSE;
 	btn = LCUIWidget_New("button");
 	root = LCUIWidget_GetRoot();
 	Button_SetText(btn, "button");
 	Widget_BindEvent(btn, "click", OnBtnClick, NULL, NULL);
 	Widget_Append(root, btn);
+	/* Observe whether the main loop has exited in a new thread */
 	LCUIThread_Create(&tid, ObserverThread, &exited);
-	LCUI_SetTimeout(100, OnTriggerBtnClick, btn);
+	/* Trigger the click event after the first frame is updated */
+	LCUI_SetTimeout(50, OnTriggerBtnClick, btn);
 	LCUI_Main();
 	exited = TRUE;
 	LCUIThread_Join(tid, NULL);
