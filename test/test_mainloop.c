@@ -37,14 +37,17 @@ static void OnTriggerBtnClick(void *arg)
 	e.button.x = 5;
 	e.button.y = 5;
 	LCUI_TriggerEvent(&e, NULL);
+
+	e.type = LCUI_MOUSEUP;
+	LCUI_TriggerEvent(&e, NULL);
 }
 
 static void ObserverThread(void *arg)
 {
-	LCUI_BOOL exited = *((LCUI_BOOL*)arg);
+	LCUI_BOOL *exited = (LCUI_BOOL*)arg;
 
 	LCUI_MSleep(100);
-	it_b("main loop should exit after 50ms", exited, TRUE);
+	it_b("main loop should exit after 50ms", *exited, TRUE);
 	if (!exited) {
 		exit(-print_test_result());
 		return;
