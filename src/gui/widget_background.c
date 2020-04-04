@@ -51,7 +51,7 @@ typedef struct ImageRefRec_ {
 	ImageCache cache;
 } ImageRefRec, *ImageRef;
 
-struct LCUI_WidgetBackgroundModule {
+static struct LCUI_WidgetBackgroundModule {
 	LCUI_BOOL active;
 	DictType dtype;
 	Dict *images;

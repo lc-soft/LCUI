@@ -40,7 +40,7 @@ typedef struct CanvasRec_ {
 	LinkedList contexts;
 } CanvasRec, *Canvas;
 
-struct {
+static struct {
 	LCUI_WidgetPrototype proto;
 } self;
 
