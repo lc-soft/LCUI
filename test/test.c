@@ -24,11 +24,11 @@ int main(void)
 	ret += test_widget_opacity();
 	ret += test_textview_resize();
 	ret += test_textedit();
+	PRINT_TEST_RESULT(ret);
 	describe("test mainloop", test_mainloop);
 	describe("test css parser", test_css_parser);
 	describe("test block layout", test_block_layout);
 	describe("test flex layout", test_flex_layout);
 	describe("test widget rect", test_widget_rect);
-	PRINT_TEST_RESULT(ret);
 	return ret - print_test_result();
 }
