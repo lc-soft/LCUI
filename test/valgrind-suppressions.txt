@@ -14,7 +14,19 @@
    fun:_dl_allocate_tls
    fun:allocate_stack
    fun:pthread_create@@GLIBC_2.2.5
-   obj:/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0
+   obj:*/lib*/libgomp.so*
    fun:GOMP_parallel
+   fun:LCUIDisplay_RenderSurface
+}
+{
+   ignore_libomp_param_check
+   Memcheck:Param
+   sched_setaffinity(mask)
+   fun:syscall
+   obj:*/lib*/libomp.so*
+   obj:*/lib*/libomp.so*
+   obj:*/lib*/libomp.so*
+   obj:*/lib*/libomp.so*
+   fun:__kmpc_fork_call
    fun:LCUIDisplay_RenderSurface
 }
