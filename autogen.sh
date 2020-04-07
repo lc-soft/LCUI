@@ -59,5 +59,5 @@ fi
 
 $LIBTOOLIZE --force --copy --install
 aclocal -I m4 --force
-automake --add-missing
+automake --add-missing --copy
 autoconf --force

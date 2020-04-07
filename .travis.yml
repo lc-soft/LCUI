@@ -1,9 +1,18 @@
 language: c
+sudo: required
+services:
+  - docker
 jobs:
   include:
     - os: linux
       dist: bionic
       compiler: clang
+      env: BADGE=linux
+    - os: linux
+      dist: bionic
+      env:
+        - WASM=1
+        - BADGE=wasm
     - os: linux
       dist: bionic
       compiler: gcc
@@ -11,30 +20,19 @@ jobs:
       dist: bionic
       arch: arm64
       compiler: gcc
+      env:
+        - BADGE=arm64
+        - NO_VALGRIND=1
     - os: osx
+      env: BADGE=osx
   allow_failures:
     - os: osx
 
 before_install:
-  - sudo apt-get install valgrind libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev lcov -qq
-  - pip install --user cpp-coveralls
-  - npm install
-  - npm install --save-dev @commitlint/travis-cli
+  - sh ./scripts/ci-before-install.sh
 
 before_script:
-  - export LD_LIBRARY_PATH=/usr/local/clang/lib:$LD_LIBRARY_PATH
-  - git config user.email "support@travis.org"
-  - git config user.name "Travis CI"
-  - ./node_modules/.bin/commitlint-travis
-  - ./autogen.sh
+  - sh ./scripts/ci-before-script.sh
 
 script:
-  - ./configure --enable-code-coverage
-  - make
-  - make distcheck
-  - make test
-  - make test-with-valgrind
-
-after_success:
-  - if [[ $CC == clang ]] ; then coveralls --exclude include --exclude test --gcov-options '\-lp' --gcov 'llvm-cov gcov'; fi
-  - if [[ $CC == gcc ]] ; then coveralls --exclude include --exclude test --gcov-options '\-lp'; fi
+  - sh ./scripts/ci-script.sh
