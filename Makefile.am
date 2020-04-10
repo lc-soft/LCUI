@@ -62,6 +62,10 @@ test/test_block_layout.c \
 test/test_block_layout.css \
 test/test_block_layout.xml \
 test/test_block_layout.html \
+test/test_flex_layout.c \
+test/test_flex_layout.css \
+test/test_flex_layout.xml \
+test/test_flex_layout.html \
 test/test_widget_rect.c \
 test/test_widget_event.c \
 test/test_textview_resize.c \
