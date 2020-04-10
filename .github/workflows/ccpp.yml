@@ -9,6 +9,8 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
+    - name: install tools
+      run: sudo apt install debhelper
     - name: configure
       run: |
        ./autogen.sh
@@ -17,11 +19,5 @@ jobs:
       run: make
     - name: make check
       run: make check
-    - name: make test
-      run: |
-        cd test
-        ./test
-        cd ..
-    - name: make distcheck
-      run: make distcheck
-    
+    - name: make dist deb
+      run: sh ./scripts/make-dist-deb.sh
