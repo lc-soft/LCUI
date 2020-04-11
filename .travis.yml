@@ -16,6 +16,7 @@ jobs:
     - os: linux
       dist: bionic
       compiler: gcc
+      env: CODECOV=1
     - os: linux
       dist: bionic
       arch: arm64
@@ -36,3 +37,6 @@ before_script:
 
 script:
   - sh ./scripts/ci-script.sh
+
+after_success:
+  - if [ "$CODECOV" = "1" ]; then bash <(curl -s https://codecov.io/bash); fi
