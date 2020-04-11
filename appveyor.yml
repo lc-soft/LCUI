@@ -1,0 +1,41 @@
+version: 2.0.0.{build}
+pull_requests:
+  do_not_increment_build_number: true
+skip_commits:
+  message: /^docs|^chore|^ci\(github\)|^ci\(travis\)/
+environment:
+  nodejs_version: "12"
+image: Visual Studio 2017
+platform:
+- x64
+- x86
+shallow_clone: true
+install:
+- ps: Install-Product node $env:nodejs_version
+- cmd: >-
+    node -v
+
+    npm -v
+
+    npm install -g lcpkg
+
+    lcpkg config vcpkg.root C:\Tools\vcpkg
+
+    lcpkg install
+
+    lcpkg install --arch x64
+
+    lcpkg install --platform uwp
+
+    lcpkg install --platform uwp --arch x64
+before_build:
+- cmd: copy .\include\LCUI\config.win32.h.in .\include\LCUI\config.h
+build:
+  project: build/windows/LCUI.sln
+  verbosity: minimal
+after_build:
+- cmd: lcpkg pack
+artifacts:
+  - path: 'lcpkg\dist\LCUI-*_$(platform)-*.lcpkg.zip'
+cache:
+  - c:\tools\vcpkg\installed\
