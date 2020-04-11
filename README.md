@@ -61,9 +61,9 @@ LCUI (LC's UI Library) is a small C library for building user interfaces.
 
 Platform | CI Status
 ---------|:---------
-OSX      | [![OSX Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=osx&label=build&branch=develop)](https://travis-ci.org/lc-soft/LCUI)
-Linux    | [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=linux&label=build&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=arm64&label=build%20for%20ARM64&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=wasm&label=build%20for%20WebAssembly&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [!["GitHub Actions](https://github.com/lc-ui/lc-design/workflows/C%2FC%2B%2B%20CI/badge.svg)](https://github.com/lc-ui/lc-design/actions)
 Windows  | [![Windows Build status](https://ci.appveyor.com/api/projects/status/ps6mq5sy8jkbks0y?svg=true)](https://ci.appveyor.com/project/lc-soft/lcui)
+Linux    | [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=linux&label=build&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=arm64&label=build%20for%20ARM64&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=wasm&label=build%20for%20WebAssembly&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [!["GitHub Actions](https://github.com/lc-ui/lc-design/workflows/C%2FC%2B%2B%20CI/badge.svg)](https://github.com/lc-ui/lc-design/actions)
+OSX      | [![OSX Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=osx&label=build&branch=develop)](https://travis-ci.org/lc-soft/LCUI)
 
 ### Screenshots
 

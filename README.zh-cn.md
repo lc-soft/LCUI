@@ -57,11 +57,11 @@ LCUI 是一个用 C 语言编写的桌面端图形界面开发库。
 
 ### 状态
 
-平台 | 构建状态
+平台      | 构建状态
 ---------|:---------
-OSX      | [![OSX Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=osx&label=build&branch=develop)](https://travis-ci.org/lc-soft/LCUI)
-Linux    | [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=linux&label=build&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=arm64&label=build%20for%20ARM64&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=wasm&label=build%20for%20WebAssembly&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [!["GitHub Actions](https://github.com/lc-ui/lc-design/workflows/C%2FC%2B%2B%20CI/badge.svg)](https://github.com/lc-ui/lc-design/actions)
 Windows  | [![Windows Build status](https://ci.appveyor.com/api/projects/status/ps6mq5sy8jkbks0y?svg=true)](https://ci.appveyor.com/project/lc-soft/lcui)
+Linux    | [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=linux&label=build&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=arm64&label=build%20for%20ARM64&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=wasm&label=build%20for%20WebAssembly&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [!["GitHub Actions](https://github.com/lc-ui/lc-design/workflows/C%2FC%2B%2B%20CI/badge.svg)](https://github.com/lc-ui/lc-design/actions)
+OSX      | [![OSX Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=osx&label=build&branch=develop)](https://travis-ci.org/lc-soft/LCUI)
 
 ### 效果图
 
