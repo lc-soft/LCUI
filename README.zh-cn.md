@@ -7,7 +7,6 @@
     C 的图形界面开发库，可借助 XML 和 CSS 构建简单的跨平台桌面应用
   </p>
   <p align="center">
-    <a href="https://travis-ci.org/lc-soft/LCUI"><img src="https://travis-ci.org/lc-soft/LCUI.png?branch=master" alt="Build Status"></a>
     <a href="http://opensource.org/licenses/MIT"><img src="https://img.shields.io/github/license/lc-soft/LCUI.svg" alt="License"></a>
     <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/release/lc-soft/LCUI/all.svg" alt="Github Release"></a>
     <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/downloads/lc-soft/LCUI/total.svg" alt="Github All Releases"></a>
@@ -23,6 +22,7 @@
 - [目录](#目录)
 - [介绍](#介绍)
     - [主要特性](#主要特性)
+    - [状态](#状态)
     - [效果图](#效果图)
     - [相关项目](#相关项目)
     - [设计参考](#设计参考)
@@ -53,6 +53,14 @@ LCUI 是一个用 C 语言编写的桌面端图形界面开发库。
 - **XML + CSS：** 预置 XML 和 CSS 解析器，你可以使用 XML 和 CSS 来描述界面结构和样式。
 - **与网页类似的开发体验：** 由于 LCUI 的布局、样式和渲染器等相关功能的设计和实现大都参考了 MDN 文档和一些 Web 前端流行的开发库，因此开发体验和界面效果会与网页有一些类似之处，如果你已经有用 HTML 和 CSS 编过网页的经验，那么会比较容易上手。
 - **可缩放：** 支持全局缩放，支持使用基于屏幕密度的 sp 和 dp 单位表示界面元素的位置和大小。
+
+### 状态
+
+平台 | 构建状态
+---------|:---------
+OSX      | [![OSX Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=osx&label=build&branch=develop)](https://travis-ci.org/lc-soft/LCUI)
+Linux    | [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=linux&label=build&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=arm64&label=build%20for%20ARM64&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=wasm&label=build%20for%20WebAssembly&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [!["GitHub Actions](https://github.com/lc-ui/lc-design/workflows/C%2FC%2B%2B%20CI/badge.svg)](https://github.com/lc-ui/lc-design/actions)
+Windows  | [![Windows Build status](https://ci.appveyor.com/api/projects/status/ps6mq5sy8jkbks0y?svg=true)](https://ci.appveyor.com/project/lc-soft/lcui)
 
 ### 效果图
 

@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="http://lcui.org/">
+  <a href="https://lcui.org/">
     <img src="https://lcui.lc-soft.io/static/images/lcui-logo-lg.png" alt="" width=72 height=72>
   </a>
   <h3 align="center">LCUI</h3>
@@ -7,8 +7,7 @@
     A small C library for building user interfaces with C, XML and CSS.
   </p>
   <p align="center">
-    <a href="https://travis-ci.org/lc-soft/LCUI"><img src="https://travis-ci.org/lc-soft/LCUI.png?branch=master" alt="Build Status"></a>
-    <a href="http://opensource.org/licenses/MIT"><img src="https://img.shields.io/github/license/lc-soft/LCUI.svg" alt="License"></a>
+    <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/github/license/lc-soft/LCUI.svg" alt="License"></a>
     <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/release/lc-soft/LCUI/all.svg" alt="Github Release"></a>
     <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/downloads/lc-soft/LCUI/total.svg" alt="Github All Releases"></a>
     <img src="https://img.shields.io/github/repo-size/lc-soft/LCUI.svg" alt="Repo size">
@@ -23,6 +22,7 @@
 - [Table of contents](#table-of-contents)
 - [Introduction](#introduction)
     - [Features](#features)
+    - [Status](#status)
     - [Screenshots](#screenshots)
     - [Related projects](#related-projects)
     - [Design references](#design-references)
@@ -55,6 +55,14 @@ LCUI (LC's UI Library) is a small C library for building user interfaces.
 - **XML + CSS:** Includes XML and CSS parsers, you can use XML and CSS to describe interface structure and style.
 - **Web-like development experience:** Since the design and implementation of LCUI's functions, including layout, CSS, and renderer, are mostly referenced from MDN documents and some popular web front-end development libraries, its development experience and interface effects will have some similarities to web pages. If you already have experience writing web pages with HTML and CSS, it will be easier to get started.
 - **Flexible:** Support for adapting the interface to screens of different pixel densities by setting global scaling. Support for using screen density related sp and dp units to describe position and size of the elements.
+
+### Status
+
+Platform | CI Status
+---------|:---------
+OSX      | [![OSX Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=osx&label=build&branch=develop)](https://travis-ci.org/lc-soft/LCUI)
+Linux    | [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=linux&label=build&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=arm64&label=build%20for%20ARM64&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=wasm&label=build%20for%20WebAssembly&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [!["GitHub Actions](https://github.com/lc-ui/lc-design/workflows/C%2FC%2B%2B%20CI/badge.svg)](https://github.com/lc-ui/lc-design/actions)
+Windows  | [![Windows Build status](https://ci.appveyor.com/api/projects/status/ps6mq5sy8jkbks0y?svg=true)](https://ci.appveyor.com/project/lc-soft/lcui)
 
 ### Screenshots
 
@@ -367,4 +375,4 @@ The English version of the documentation is not available, because the author do
 
 ## License
 
-The LCUI Project is released under [the MIT License]((http://opensource.org/licenses/MIT)).
+The LCUI Project is released under [the MIT License]((https://opensource.org/licenses/MIT)).
