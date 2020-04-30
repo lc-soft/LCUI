@@ -100,9 +100,12 @@ OSX      | [![OSX Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI
 
 - [LCUI CLI](https://github.com/lc-ui/lcui-cli) - 用于开发 LCUI 应用程序的命令行工具。
 - [LCUI Router](https://github.com/lc-soft/lcui-router) - LCUI 的路由管理器，它提供类似于 [Vue Router](https://github.com/vuejs/vue-router) 的开发体验，能让你基于 LCUI 构建多视图的应用程序变得更简单。
-- [LC Design](https://github.com/lc-ui/lc-design) — 专为 LCUI 开发的组件库，包含了一些通用组件和 css 样式。
+- [LC Design](https://github.com/lc-ui/lc-design) — 专为 LCUI 开发的组件库，包含了一些通用组件和 CSS 样式。
 - [LC Finder](https://github.com/lc-soft/LC-Finder) — 图片管理器，LCUI 的旗舰级应用程序，你可以将它作为参考对象，以此评估 LCUI 的性能、界面效果和开发复杂度是否符合你的需求。
 - [Trad](https://github.com/lc-soft/trad) — 一个基于 JavaScript 语法且可编译为 C 的语言，预置 LCUI 绑定，提供类似于 [React](https://reactjs.org/) 的开发体验，能让你轻松基于 LCUI 创建响应式用户界面。
+- [LCUI Quick Start](https://github.com/lc-ui/lcui-quick-start) - LCUI 应用程序模板。
+- [LCUI Router App](https://blog.lc-soft.io/posts/build-a-browser-like-app.html) - LCUI Router 的应用程序模板，实现了和浏览器一样的图形界面、多标签页、路由导航等功能。
+- [LC Design App](https://github.com/lc-ui/lc-design-app) - LC Design 组件库的应用程序模板，展示了 LC Design 的一些组件的简单用法和效果。
 
 ### 设计参考
 

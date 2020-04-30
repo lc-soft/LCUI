@@ -105,6 +105,9 @@ Want to know what LCUI can do? You can view the following projects:
 - [LC Design](https://github.com/lc-ui/lc-design) - A UI component framework for building LCUI application.
 - [LC Finder](https://github.com/lc-soft/LC-Finder) - An image manager, it uses most of the features of LCUI, and you can use it as a reference to evaluate whether LCUI's performance and development complexity meets your needs.
 - [Trad](https://github.com/lc-soft/trad) - A language based on JavaScript syntax that can be compiled into C, it preset LCUI bindings, provides [React](https://reactjs.org/) like development experience, makes it painless to create interactive UIs based on LCUI.
+- [LCUI Quick Start](https://github.com/lc-ui/lcui-quick-start) - A minimal LCUI application.
+- [LCUI Router App](https://github.com/lc-ui/lcui-router-app) - A very simple browser-like application to show the LCUI and LCUI Router features.
+- [LC Design App](https://github.com/lc-ui/lc-design-app) - A minimal LCUI application for preview LC Design component library.
 
 ### Design references
 
