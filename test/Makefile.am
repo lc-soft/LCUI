@@ -55,15 +55,15 @@ test_flex_layout_SOURCES = test_flex_layout.c libtest.c
 test_flex_layout_LDADD = $(top_builddir)/src/libLCUI.la
 test_flex_layout_CFLAGS = $(AM_CFLAGS) -D PREVIEW_MODE
 
-test_charset_SOURCES = test_charset.c
+test_charset_SOURCES = test_charset.c libtest.c
 test_charset_LDADD = $(top_builddir)/src/libLCUI.la
 test_charset_CFLAGS = $(AM_CFLAGS) -D PREVIEW_MODE
 
-test_textview_resize_SOURCES = test_textview_resize.c
+test_textview_resize_SOURCES = test_textview_resize.c libtest.c
 test_textview_resize_LDADD = $(top_builddir)/src/libLCUI.la
 test_textview_resize_CFLAGS = $(AM_CFLAGS) -D PREVIEW_MODE
 
-test_widget_opacity_SOURCES = test_widget_opacity.c
+test_widget_opacity_SOURCES = test_widget_opacity.c libtest.c
 test_widget_opacity_LDADD = $(top_builddir)/src/libLCUI.la
 test_widget_opacity_CFLAGS = $(AM_CFLAGS) -D PREVIEW_MODE
 

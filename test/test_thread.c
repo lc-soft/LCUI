@@ -3,7 +3,9 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/thread.h>
+#include <LCUI/util/logger.h>
 #include "test.h"
+#include "libtest.h"
 
 typedef struct TestWorkerRec_ {
 	char data[32];
@@ -24,13 +26,13 @@ static void TestWorker_Thread(void *arg)
 	worker->data_count = 0;
 	LCUIMutex_Lock(&worker->mutex);
 	while (!worker->cancel && worker->data_count < 20) {
-		TEST_LOG("waiting...\n");
+		Logger_Debug("waiting...\n");
 		LCUICond_Wait(&worker->cond, &worker->mutex);
-		TEST_LOG("get data: %s\n", worker->data);
+		Logger_Debug("get data: %s\n", worker->data);
 		worker->data_count += 1;
 	}
 	LCUIMutex_Unlock(&worker->mutex);
-	TEST_LOG("count: %d\n", worker->data_count);
+	Logger_Debug("count: %d\n", worker->data_count);
 	worker->active = FALSE;
 	LCUIThread_Exit(NULL);
 }
@@ -60,9 +62,8 @@ static void TestWorker_Destroy(TestWorker worker)
 	LCUICond_Destroy(&worker->cond);
 }
 
-int test_thread(void)
+void test_thread(void)
 {
-	int ret = 0;
 	TestWorkerRec worker;
 
 	TestWorker_Init(&worker);
@@ -81,7 +82,6 @@ int test_thread(void)
 	TestWorker_Send(&worker, "bye!");
 	LCUI_MSleep(100);
 	TestWorker_Destroy(&worker);
-	CHECK(worker.data_count == 7);
-	CHECK(!worker.active);
-	return ret;
+	it_i("check worker data count", worker.data_count, 7);
+	it_b("check worker is no longer active", worker.active, FALSE);
 }
