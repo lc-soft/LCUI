@@ -5,22 +5,23 @@
 #include <LCUI/util/logger.h>
 #include <LCUI/util/strpool.h>
 #include "test.h"
+#include "libtest.h"
 
-int test_strpool(void)
+void test_strpool(void)
 {
-	int ret = 0;
 	char *str1, *str2;
 	strpool_t *pool;
 
-	CHECK(pool = strpool_create());
-	CHECK(str1 = strpool_alloc_str(pool, "hello"));
-	CHECK(str2 = strpool_alloc_str(pool, "hello"));
-	CHECK(str1 == str2);
-	CHECK(strpool_size(pool) > 0);
-	CHECK(strpool_free_str(str1) == 0);
-	CHECK(strcmp(str1, "hello") == 0);
-	CHECK(strpool_free_str(str2) == 0);
-	CHECK(strpool_size(pool) == 0);
+	it_b("check strpool_create()", (pool = strpool_create()) != NULL, TRUE);
+	it_b("check strpool_alloc",
+	     (str1 = strpool_alloc_str(pool, "hello")) != NULL, TRUE);
+	it_b("check strpool_alloc of already pooled string",
+	     (str2 = strpool_alloc_str(pool, "hello")) != NULL, TRUE);
+	it_b("check string reused", str1 == str2, TRUE);
+	it_b("check strpool_size", strpool_size(pool) > 0, TRUE);
+	it_i("check release str1", strpool_free_str(str1), 0);
+	it_s("check str1 is still valid", str1, "hello");
+	it_i("check release str2", strpool_free_str(str2), 0);
+	it_i("check strpool is empty", strpool_size(pool), 0);
 	strpool_destroy(pool);
-	return ret;
 }

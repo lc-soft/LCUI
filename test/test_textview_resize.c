@@ -5,6 +5,7 @@
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/css_parser.h>
 #include "test.h"
+#include "libtest.h"
 
 /* clang-format off */
 
@@ -76,18 +77,16 @@ static void test_textview_set_text(void *arg)
 				     "long long long long long long long text");
 }
 
-static int check_textview_set_text(void)
+static void check_textview_set_text(void)
 {
-	int ret = 0;
-
 	LCUIWidget_Update();
 
-	CHECK(self.block->width == 122.0f);
-	CHECK(self.block->height > 140.0f);
-	CHECK(self.inline_block->width > 520.0f);
-	CHECK(self.inline_block->height < 45.0f);
-
-	return ret;
+	it_b("check block width", self.block->width == 122.0f, TRUE);
+	it_b("check block height", self.block->height > 140.0f, TRUE);
+	it_b("check inline block width", self.inline_block->width > 520.0f,
+	     TRUE);
+	it_b("check inline block height", self.inline_block->height < 45.0f,
+	     TRUE);
 }
 
 static void test_textview_set_short_content_css(void *arg)
@@ -97,18 +96,16 @@ static void test_textview_set_short_content_css(void *arg)
 	Widget_AddClass(self.inline_block, "short-content");
 }
 
-static int check_textview_set_short_content_css(void)
+static void check_textview_set_short_content_css(void)
 {
-	int ret = 0;
-
 	LCUIWidget_Update();
 
-	CHECK(self.block->width == 122.0f);
-	CHECK(self.block->height < 45.0f);
-	CHECK(self.inline_block->width < 70.0f);
-	CHECK(self.inline_block->height < 45.0f);
-
-	return ret;
+	it_b("check block width", self.block->width == 122.0f, TRUE);
+	it_b("check block height", self.block->height < 45.0f, TRUE);
+	it_b("check inline block width", self.inline_block->width < 70.0f,
+	     TRUE);
+	it_b("check inline block height", self.inline_block->height < 45.0f,
+	     TRUE);
 }
 
 static void test_textview_set_long_content_css(void *arg)
@@ -120,36 +117,34 @@ static void test_textview_set_long_content_css(void *arg)
 	Widget_AddClass(self.inline_block, "long-content");
 }
 
-static int check_textview_set_long_content_css(void)
+static void check_textview_set_long_content_css(void)
 {
-	int ret = 0;
-
 	LCUIWidget_Update();
 
-	CHECK(self.block->width == 122.0f);
-	CHECK(self.block->height > 60.0f);
-	CHECK(self.inline_block->width > 250.0f);
-	CHECK(self.inline_block->height < 45.0f);
-	return ret;
+	it_b("check block width", self.block->width == 122.0f, TRUE);
+	it_b("check block height", self.block->height > 60.0f, TRUE);
+	it_b("check inline block width", self.inline_block->width > 250.0f,
+	     TRUE);
+	it_b("check inline block height", self.inline_block->height < 45.0f,
+	     TRUE);
 }
 
-int test_textview_resize(void)
+void test_textview_resize(void)
 {
-	int ret = 0;
-
 	LCUI_Init();
 
 	build();
 
 	test_textview_set_text(NULL);
-	ret += check_textview_set_text();
+	describe("check textview set text", check_textview_set_text);
 	test_textview_set_short_content_css(NULL);
-	ret += check_textview_set_short_content_css();
+	describe("check textview set short content css",
+		 check_textview_set_short_content_css);
 	test_textview_set_long_content_css(NULL);
-	ret += check_textview_set_long_content_css();
+	describe("check textview set long content css",
+		 check_textview_set_long_content_css);
 
 	LCUI_Destroy();
-	return ret;
 }
 
 #ifdef PREVIEW_MODE

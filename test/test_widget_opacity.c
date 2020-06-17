@@ -7,9 +7,10 @@
 #include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/builder.h>
 #include "test.h"
+#include "libtest.h"
 
-#define PARENT_OPACITY	0.8f
-#define CHILD_OPACITY	0.5f
+#define PARENT_OPACITY 0.8f
+#define CHILD_OPACITY 0.5f
 
 static struct {
 	LCUI_Widget parent;
@@ -36,9 +37,8 @@ static int check_color(LCUI_Color a, LCUI_Color b)
 	return abs(a.r - b.r) < 2 && abs(a.g - b.g) < 2 && abs(a.b - b.b) < 2;
 }
 
-static int check_widget_opactiy(void)
+static void check_widget_opactiy(void)
 {
-	int ret = 0;
 	LCUI_Graph canvas;
 	LCUI_Color color;
 	LCUI_Color tmp;
@@ -73,58 +73,55 @@ static int check_widget_opactiy(void)
 
 	expected_color = bgcolor;
 	Graph_GetPixel(&canvas, 10, 10, color);
-	PIXEL_BLEND(&expected_color, &parent_bcolor, (int)(PARENT_OPACITY * 255));
-	CHECK_WITH_TEXT("check parent border color",
-			check_color(expected_color, color));
+	PIXEL_BLEND(&expected_color, &parent_bcolor,
+		    (int)(PARENT_OPACITY * 255));
+	it_b("check parent border color", check_color(expected_color, color),
+	     TRUE);
 
 	expected_color = bgcolor;
 	Graph_GetPixel(&canvas, 30, 30, color);
-	PIXEL_BLEND(&expected_color, &parent_bgcolor, (int)(PARENT_OPACITY * 255));
-	CHECK_WITH_TEXT("check parent background color",
-			check_color(expected_color, color));
+	PIXEL_BLEND(&expected_color, &parent_bgcolor,
+		    (int)(PARENT_OPACITY * 255));
+	it_b("check parent background color",
+	     check_color(expected_color, color), TRUE);
 
 	tmp = parent_bgcolor;
 	expected_color = bgcolor;
 	Graph_GetPixel(&canvas, 60, 90, color);
 	PIXEL_BLEND(&tmp, &child_bgcolor, (int)(CHILD_OPACITY * 255));
 	PIXEL_BLEND(&expected_color, &tmp, (int)(PARENT_OPACITY * 255));
-	CHECK_WITH_TEXT("check child 1 background color",
-			check_color(expected_color, color));
+	it_b("check child 1 background color",
+	     check_color(expected_color, color), TRUE);
 
 	tmp = parent_bgcolor;
 	expected_color = bgcolor;
 	Graph_GetPixel(&canvas, 60, 120, color);
 	PIXEL_BLEND(&tmp, &child_footer_bgcolor, (int)(CHILD_OPACITY * 255));
 	PIXEL_BLEND(&expected_color, &tmp, (int)(PARENT_OPACITY * 255));
-	CHECK_WITH_TEXT("check child 1 footer background color",
-			check_color(expected_color, color));
+	it_b("check child 1 footer background color",
+	     check_color(expected_color, color), TRUE);
 
 	expected_color = bgcolor;
 	Graph_GetPixel(&canvas, 220, 90, color);
 	PIXEL_BLEND(&expected_color, &child_bgcolor,
 		    (int)(PARENT_OPACITY * 255));
-	CHECK_WITH_TEXT("check child 2 background color",
-			check_color(expected_color, color));
-
+	it_b("check child 2 background color",
+	     check_color(expected_color, color), TRUE);
 	expected_color = child_footer_bgcolor;
 	Graph_GetPixel(&canvas, 220, 120, color);
-	CHECK_WITH_TEXT("check child 2 footer background color",
-			check_color(expected_color, color));
+	it_b("check child 2 footer background color",
+	     check_color(expected_color, color), TRUE);
 
 	Graph_Free(&canvas);
-	return ret;
 }
 
-int test_widget_opacity(void)
+void test_widget_opacity(void)
 {
-	int ret;
-
 	LCUI_Init();
 
 	build();
-	ret = check_widget_opactiy();
+	describe("check widget opacity", check_widget_opactiy);
 	LCUI_Destroy();
-	return ret;
 }
 
 #ifdef PREVIEW_MODE

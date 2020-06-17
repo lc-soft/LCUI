@@ -2,10 +2,10 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include "test.h"
+#include "libtest.h"
 
-int test_linkedlist(void)
+void test_linkedlist(void)
 {
-	int ret = 0;
 	int arr[] = { 8, 4, 64, 16, 32, 1024 };
 
 	size_t i;
@@ -18,7 +18,7 @@ int test_linkedlist(void)
 	for (i = 0; i < n; ++i) {
 		LinkedList_Append(&list, arr + i);
 	}
-	CHECK_WITH_TEXT("LinkedList_Append() should work", list.length == n);
+	it_i("LinkedList_Append() should work", list.length, n);
 	i = 0;
 	for (LinkedList_Each(node, &list)) {
 		if (node->data != arr + i) {
@@ -26,8 +26,8 @@ int test_linkedlist(void)
 		}
 		++i;
 	}
-	CHECK_WITH_TEXT("LinkedList_Each() should work",
-			node == NULL && i == sizeof(arr) / sizeof(int));
+	it_b("LinkedList_Each() should work",
+	     node == NULL && i == sizeof(arr) / sizeof(int), TRUE);
 
 	i = n - 1;
 	for (LinkedList_EachReverse(node, &list)) {
@@ -40,10 +40,9 @@ int test_linkedlist(void)
 		}
 		--i;
 	}
-	CHECK_WITH_TEXT("LinkedList_EachReverse() should work", i == n);
+	it_i("LinkedList_EachReverse() should work", i, n);
 
 	LinkedList_Clear(&list, NULL);
-	CHECK_WITH_TEXT("LinkedList_ClearData() should work",
-			list.length == 0 && !list.head.next && !list.tail.prev);
-	return ret;
+	it_b("LinkedList_ClearData() should work",
+	     list.length == 0 && !list.head.next && !list.tail.prev, TRUE);
 }
