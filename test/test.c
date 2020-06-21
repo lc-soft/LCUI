@@ -15,6 +15,7 @@ int main(void)
 	describe("test linkedlist", test_linkedlist);
 	describe("test string", test_string);
 	describe("test strpool", test_strpool);
+	describe("test settings", test_settings);
 	describe("test object", test_object);
 	describe("test thread", test_thread);
 	describe("test font load", test_font_load);

@@ -5,6 +5,7 @@ extern int tests_count;
 void test_charset(void);
 void test_string(void);
 void test_object(void);
+void test_settings(void);
 void test_thread(void);
 void test_font_load(void);
 void test_xml_parser(void);

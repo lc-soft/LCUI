@@ -193,6 +193,7 @@
     <ClCompile Include="..\..\..\test\test_image_reader.c" />
     <ClCompile Include="..\..\..\test\test_linkedlist.c" />
     <ClCompile Include="..\..\..\test\test_object.c" />
+    <ClCompile Include="..\..\..\test\test_settings.c" />
     <ClCompile Include="..\..\..\test\test_string.c" />
     <ClCompile Include="..\..\..\test\test_strpool.c" />
     <ClCompile Include="..\..\..\test\test_textedit.c" />

@@ -123,6 +123,9 @@
     <ClInclude Include="..\..\..\include\LCUI\thread.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\settings.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\surface.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
@@ -438,6 +441,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\display.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\settings.c">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\timer.c">

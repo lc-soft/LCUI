@@ -53,6 +53,7 @@ enum LCUI_SysEventType {
 	LCUI_PAINT,
 	LCUI_WIDGET,
 	LCUI_QUIT, /**< 在 LCUI 退出前触发的事件 */
+	LCUI_SETTINGS_CHANGE,
 	LCUI_USER = 100 /**< 用户事件，可以把这个当成系统事件与用户事件的分界 */
 };
 
@@ -203,7 +204,7 @@ LCUI_API void LCUI_RunFrame(void);
 
 LCUI_API void LCUI_RunFrameWithProfile(LCUI_FrameProfile profile);
 
-    /* 新建一个主循环 */
+/* 新建一个主循环 */
 LCUI_API LCUI_MainLoop LCUIMainLoop_New(void);
 
 /* 运行目标循环 */

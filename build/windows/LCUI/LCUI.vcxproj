@@ -324,6 +324,7 @@
     <ClInclude Include="..\..\..\include\LCUI\platform\windows\windows_events.h" />
     <ClInclude Include="..\..\..\include\LCUI\platform\windows\windows_keyboard.h" />
     <ClInclude Include="..\..\..\include\LCUI\platform\windows\windows_mouse.h" />
+    <ClInclude Include="..\..\..\include\LCUI\settings.h" />
     <ClInclude Include="..\..\..\include\LCUI\surface.h" />
     <ClInclude Include="..\..\..\include\LCUI\thread.h" />
     <ClInclude Include="..\..\..\include\LCUI\timer.h" />
@@ -423,6 +424,7 @@
     <ClCompile Include="..\..\..\src\platform\windows\windows_ime.c" />
     <ClCompile Include="..\..\..\src\platform\windows\windows_keyboard.c" />
     <ClCompile Include="..\..\..\src\platform\windows\windows_mouse.c" />
+    <ClCompile Include="..\..\..\src\settings.c" />
     <ClCompile Include="..\..\..\src\util\charset.c" />
     <ClCompile Include="..\..\..\src\util\object.c" />
     <ClCompile Include="..\..\..\src\util\strlist.c" />
