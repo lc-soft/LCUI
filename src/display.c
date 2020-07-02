@@ -625,6 +625,14 @@ int LCUIDisplay_GetMode(void)
 	return display.mode;
 }
 
+void LCUIDisplay_EnablePaintFlashing(LCUI_BOOL enable)
+{
+	LCUI_SettingsRec settings;
+	Settings_Init(&settings);
+	settings.paint_flashing = enable;
+	LCUI_ApplySettings(&settings);
+}
+
 /** 设置显示区域的尺寸，仅在窗口化、全屏模式下有效 */
 void LCUIDisplay_SetSize(int width, int height)
 {
