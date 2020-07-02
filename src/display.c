@@ -44,6 +44,8 @@
 #include <LCUI/thread.h>
 #include <LCUI/display.h>
 #include <LCUI/platform.h>
+#include <LCUI/settings.h>
+#include <LCUI/main.h>
 #ifdef LCUI_DISPLAY_H
 #include LCUI_DISPLAY_H
 #endif
@@ -52,16 +54,6 @@
 
 #define DEFAULT_WIDTH	800
 #define DEFAULT_HEIGHT	600
-
-#ifdef USE_OPENMP
-/**
- * Parallel rendering threads
- * We recommend that you set it to half the number of CPU logical cores
- */
-#define PARALLEL_RENDERING_THREADS 4
-#else
-#define PARALLEL_RENDERING_THREADS 1
-#endif
 
 typedef struct FlashRectRec_ {
 	int64_t paint_time;
@@ -85,11 +77,12 @@ typedef struct SurfaceRecordRec_ {
 static struct LCUI_DisplayModule {
 	unsigned width, height;
 	LCUI_BOOL active;
-	LCUI_BOOL enable_paint_flashing;
 	LCUI_DisplayMode mode;
 	LinkedList surfaces;
 	LinkedList rects;
 	LCUI_DisplayDriver driver;
+	LCUI_SettingsRec settings;
+	int settings_change_handler_id;
 } display;
 
 /* clang-format on */
@@ -113,8 +106,13 @@ static void OnDestroySurfaceRecord(void *data)
 	free(record);
 }
 
+static void OnSettingsChangeEvent(LCUI_SysEvent e, void *arg)
+{
+	Settings_Init(&display.settings);
+}
+
 static size_t LCUIDisplay_RenderFlashRect(SurfaceRecord record,
-					FlashRect flash_rect)
+					  FlashRect flash_rect)
 {
 	size_t count;
 	int64_t period;
@@ -202,7 +200,8 @@ static void GetRenderingLayerSize(int *width, int *height)
 
 	*width = (int)(LCUIDisplay_GetWidth() * scale);
 	*height = (int)(LCUIDisplay_GetHeight() * scale);
-	*height = max(200, *height / PARALLEL_RENDERING_THREADS + 1);
+	*height =
+	    max(200, *height / display.settings.parallel_rendering_threads + 1);
 }
 
 static void SurfaceRecord_DumpRects(SurfaceRecord record, LinkedList *rects)
@@ -221,12 +220,14 @@ static void SurfaceRecord_DumpRects(SurfaceRecord record, LinkedList *rects)
 	LCUI_Rect rect;
 	LCUI_Rect *sub_rect;
 	DirtyLayer layer;
-	DirtyLayerRec layers[PARALLEL_RENDERING_THREADS];
+	DirtyLayerRec *layers;
 	LinkedListNode *node;
 
 	GetRenderingLayerSize(&layer_width, &layer_height);
 	max_dirty = (int)(0.8 * layer_width * layer_height);
-	for (i = 0; i < PARALLEL_RENDERING_THREADS; ++i) {
+	layers = malloc(sizeof(DirtyLayerRec) *
+			display.settings.parallel_rendering_threads);
+	for (i = 0; i < display.settings.parallel_rendering_threads; ++i) {
 		layer = &layers[i];
 		layer->diry = 0;
 		layer->rect.y = i * layer_height;
@@ -238,7 +239,8 @@ static void SurfaceRecord_DumpRects(SurfaceRecord record, LinkedList *rects)
 	sub_rect = malloc(sizeof(LCUI_Rect));
 	for (LinkedList_Each(node, &record->rects)) {
 		rect = *(LCUI_Rect *)node->data;
-		for (i = 0; i < PARALLEL_RENDERING_THREADS; ++i) {
+		for (i = 0; i < display.settings.parallel_rendering_threads;
+		     ++i) {
 			layer = &layers[i];
 			if (layer->diry >= max_dirty) {
 				continue;
@@ -257,7 +259,7 @@ static void SurfaceRecord_DumpRects(SurfaceRecord record, LinkedList *rects)
 			}
 		}
 	}
-	for (i = 0; i < PARALLEL_RENDERING_THREADS; ++i) {
+	for (i = 0; i < display.settings.parallel_rendering_threads; ++i) {
 		layer = &layers[i];
 		if (layer->diry >= max_dirty) {
 			RectList_AddEx(rects, &layer->rect, FALSE);
@@ -268,6 +270,7 @@ static void SurfaceRecord_DumpRects(SurfaceRecord record, LinkedList *rects)
 	}
 	RectList_Clear(&record->rects);
 	free(sub_rect);
+	free(layers);
 }
 
 static size_t LCUIDisplay_RenderSurfaceRect(SurfaceRecord record,
@@ -288,7 +291,7 @@ static size_t LCUIDisplay_RenderSurfaceRect(SurfaceRecord record,
 		  omp_get_num_threads(), paint->rect.x, paint->rect.y,
 		  paint->rect.width, paint->rect.height);
 	count = Widget_Render(record->widget, paint);
-	if (display.enable_paint_flashing) {
+	if (display.settings.paint_flashing) {
 		LCUIDisplay_AppendFlashRects(record, &paint->rect);
 	}
 	if (display.mode != LCUI_DMODE_SEAMLESS) {
@@ -624,7 +627,10 @@ int LCUIDisplay_GetMode(void)
 
 void LCUIDisplay_EnablePaintFlashing(LCUI_BOOL enable)
 {
-	display.enable_paint_flashing = enable;
+	LCUI_SettingsRec settings;
+	Settings_Init(&settings);
+	settings.paint_flashing = enable;
+	LCUI_ApplySettings(&settings);
 }
 
 /** 设置显示区域的尺寸，仅在窗口化、全屏模式下有效 */
@@ -948,6 +954,10 @@ int LCUI_InitDisplay(LCUI_DisplayDriver driver)
 	display.active = TRUE;
 	display.width = DEFAULT_WIDTH;
 	display.height = DEFAULT_HEIGHT;
+	Settings_Init(&display.settings);
+	display.settings_change_handler_id = LCUI_BindEvent(
+	    LCUI_SETTINGS_CHANGE, OnSettingsChangeEvent, NULL, NULL);
+
 	LinkedList_Init(&display.rects);
 	LinkedList_Init(&display.surfaces);
 	if (!display.driver) {
@@ -984,5 +994,7 @@ int LCUI_FreeDisplay(void)
 	if (display.driver) {
 		LCUI_DestroyDisplayDriver(display.driver);
 	}
+	LCUI_UnbindEvent(display.settings_change_handler_id);
+	display.settings_change_handler_id = -1;
 	return 0;
 }

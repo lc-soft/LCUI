@@ -4,7 +4,7 @@ SUBDIRS=font draw gui util
 # Headers which are installed to support the library
 INSTINCLUDES=LCUI.h types.h painter.h display.h graph.h draw.h \
 font.h surface.h ime.h input.h thread.h util.h timer.h main.h cursor.h \
-image.h worker.h
+image.h settings.h worker.h
 EXTRA_DIST=platform.h \
 platform/linux/linux_display.h \
 platform/linux/linux_events.h \
