@@ -32,6 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/thread.h>
@@ -42,6 +43,7 @@
 #include <LCUI/ime.h>
 #include <LCUI/platform.h>
 #include <LCUI/display.h>
+#include <LCUI/settings.h>
 #ifdef LCUI_EVENTS_H
 #include LCUI_EVENTS_H
 #endif
@@ -107,12 +109,13 @@ static struct LCUI_App {
 	LCUI_Worker main_worker;		/**< 主工作线程 */
 	LCUI_Worker workers[LCUI_WORKER_NUM];	/**< 普通工作线程 */
 	int worker_next;			/**< 下一个工作线程编号 */
+	LCUI_SettingsRec settings;
+	LCUI_ProfileRec profile;
+	LCUI_FrameProfile frame;
+	int settings_change_handler_id;
 } MainApp;
 
 /* clang-format on */
-
-#ifdef DEBUG
-
 static void LCUIProfile_Init(LCUI_Profile profile)
 {
 	memset(profile, 0, sizeof(LCUI_ProfileRec));
@@ -153,24 +156,25 @@ static void LCUIProfile_Print(LCUI_Profile profile)
 	}
 }
 
-static LCUI_FrameProfile LCUIProfile_BeginFrame(LCUI_Profile profile)
+static LCUI_FrameProfile LCUIProfile_BeginFrame(LCUI_Profile profile,
+						LCUI_Settings settings)
 {
 	LCUI_FrameProfile frame;
 
 	frame = &profile->frames[profile->frames_count];
-	if (profile->frames_count > LCUI_MAX_FRAMES_PER_SEC) {
+	if (profile->frames_count > settings->frame_rate_cap) {
 		profile->frames_count = 0;
 	}
 	memset(frame, 0, sizeof(LCUI_FrameProfileRec));
 	return frame;
 }
 
-static void LCUIProfile_EndFrame(LCUI_Profile profile)
+static void LCUIProfile_EndFrame(LCUI_Profile profile, LCUI_Settings settings)
 {
 	profile->frames_count += 1;
 	profile->end_time = clock();
 	if (profile->end_time - profile->start_time >= CLOCKS_PER_SEC) {
-		if (profile->frames_count < LCUI_MAX_FRAMES_PER_SEC / 4) {
+		if (profile->frames_count < settings->frame_rate_cap / 4) {
 			LCUIProfile_Print(profile);
 		}
 		profile->frames_count = 0;
@@ -178,7 +182,11 @@ static void LCUIProfile_EndFrame(LCUI_Profile profile)
 	}
 }
 
-#endif
+static void OnSettingsChangeEvent(LCUI_SysEvent e, void *arg)
+{
+	Settings_Init(&MainApp.settings);
+	StepTimer_SetFrameLimit(MainApp.timer, MainApp.settings.frame_rate_cap);
+}
 
 void LCUI_RunFrameWithProfile(LCUI_FrameProfile profile)
 {
@@ -279,6 +287,9 @@ int LCUI_UnbindEvent(int handler_id)
 
 int LCUI_TriggerEvent(LCUI_SysEvent e, void *arg)
 {
+	if (System.state != STATE_ACTIVE) {
+		return -1;
+	}
 	int ret;
 	SysEventPackRec pack;
 	pack.arg = arg;
@@ -385,10 +396,6 @@ LCUI_MainLoop LCUIMainLoop_New(void)
 /** 运行目标主循环 */
 int LCUIMainLoop_Run(LCUI_MainLoop loop)
 {
-#ifdef DEBUG
-	LCUI_ProfileRec profile;
-	LCUI_FrameProfile frame;
-#endif
 	LCUI_BOOL at_same_thread = FALSE;
 	if (loop->state == STATE_RUNNING) {
 		DEBUG_MSG("error: main-loop already running.\n");
@@ -409,17 +416,17 @@ int LCUIMainLoop_Run(LCUI_MainLoop loop)
 	}
 	DEBUG_MSG("loop: %p, enter\n", loop);
 	MainApp.loop = loop;
-#ifdef DEBUG
-	LCUIProfile_Init(&profile);
-#endif
 	while (loop->state != STATE_EXITED) {
-#ifdef DEBUG
-		frame = LCUIProfile_BeginFrame(&profile);
-		LCUI_RunFrameWithProfile(frame);
-		LCUIProfile_EndFrame(&profile);
-#else
-		LCUI_RunFrame();
-#endif
+		if (MainApp.settings.record_profile) {
+			MainApp.frame = LCUIProfile_BeginFrame(
+			    &MainApp.profile, &MainApp.settings);
+			LCUI_RunFrameWithProfile(MainApp.frame);
+			LCUIProfile_EndFrame(&MainApp.profile,
+					     &MainApp.settings);
+		} else {
+			LCUI_RunFrame();
+		}
+
 		StepTimer_Remain(MainApp.timer);
 		/* 如果当前运行的主循环不是自己 */
 		while (MainApp.loop != loop) {
@@ -466,12 +473,17 @@ void LCUI_InitApp(LCUI_AppDriver app)
 	LCUICond_Init(&MainApp.loop_changed);
 	LCUIMutex_Init(&MainApp.loop_mutex);
 	LinkedList_Init(&MainApp.loops);
+	LCUIProfile_Init(&MainApp.profile);
+	LCUI_ResetSettings();
+	MainApp.settings_change_handler_id = LCUI_BindEvent(
+	    LCUI_SETTINGS_CHANGE, OnSettingsChangeEvent, NULL, NULL);
+	Settings_Init(&MainApp.settings);
 	MainApp.main_worker = LCUIWorker_New();
 	for (i = 0; i < LCUI_WORKER_NUM; ++i) {
 		MainApp.workers[i] = LCUIWorker_New();
 		LCUIWorker_RunAsync(MainApp.workers[i]);
 	}
-	StepTimer_SetFrameLimit(MainApp.timer, LCUI_MAX_FRAMES_PER_SEC);
+	StepTimer_SetFrameLimit(MainApp.timer, MainApp.settings.frame_rate_cap);
 	if (!app) {
 		app = LCUI_CreateAppDriver();
 		if (!app) {
@@ -502,6 +514,8 @@ static void LCUI_FreeApp(void)
 	LCUI_MainLoop loop;
 	LinkedListNode *node;
 	MainApp.active = FALSE;
+	LCUI_UnbindEvent(MainApp.settings_change_handler_id);
+	MainApp.settings_change_handler_id = -1;
 	for (LinkedList_Each(node, &MainApp.loops)) {
 		loop = node->data;
 		LCUIMainLoop_Quit(loop);

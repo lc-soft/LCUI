@@ -31,7 +31,8 @@ test_widget_rect.c \
 test_widget_opacity.c \
 test_widget_event.c \
 test_textview_resize.c \
-test_textedit.c
+test_textedit.c \
+test_settings.c
 
 test_LDADD = $(top_builddir)/src/libLCUI.la -lm $(CODE_COVERAGE_LIBS)
 

@@ -69,6 +69,7 @@
     <ClInclude Include="..\..\..\include\LCUI\main.h" />
     <ClInclude Include="..\..\..\include\LCUI\painter.h" />
     <ClInclude Include="..\..\..\include\LCUI\platform.h" />
+    <ClInclude Include="..\..\..\include\LCUI\settings.h" />
     <ClInclude Include="..\..\..\include\LCUI\surface.h" />
     <ClInclude Include="..\..\..\include\LCUI\thread.h" />
     <ClInclude Include="..\..\..\include\LCUI\timer.h" />
@@ -162,6 +163,7 @@
     <ClCompile Include="..\..\..\src\keyboard.c" />
     <ClCompile Include="..\..\..\src\main.c" />
     <ClCompile Include="..\..\..\src\painter.c" />
+    <ClCompile Include="..\..\..\src\settings.c" />
     <ClCompile Include="..\..\..\src\thread\win32\cond.c" />
     <ClCompile Include="..\..\..\src\thread\win32\mutex.c" />
     <ClCompile Include="..\..\..\src\thread\win32\thread.c">

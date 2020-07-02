@@ -2,7 +2,7 @@ AUTOMAKE_OPTIONS=foreign
 AM_CFLAGS = -I$(abs_top_srcdir)/include $(CODE_COVERAGE_CFLAGS)
 
 LCUI_LDFLAGS = -version-info 2:0:0
-LCUI_SOURCES = graph.c ime.c cursor.c worker.c main.c timer.c painter.c display.c keyboard.c
+LCUI_SOURCES = graph.c ime.c cursor.c worker.c main.c timer.c painter.c display.c keyboard.c settings.c
 LCUI_LIBADD = thread/libthread.la util/libutil.la platform/libplatform.la \
 image/libimage.la draw/libdraw.la gui/libgui.la font/libfont.la \
 font/in-core/libfont_incore.la $(PACKAGE_LIBS)
