@@ -1,3 +1,22 @@
+# [2.1.0](https://github.com/lc-soft/LCUI/compare/v2.0.0...v2.1.0) (2020-07-05)
+
+
+### 问题修复
+
+* wasm-ld: error: duplicate symbol: self ([2b0424c](https://github.com/lc-soft/LCUI/commit/2b0424c))
+* **display:** rect_array 未被释放 ([224c433](https://github.com/lc-soft/LCUI/commit/224c433))
+* **gui:** 部件销毁后未标记无效区域 ([8e1f136](https://github.com/lc-soft/LCUI/commit/8e1f136))
+* **gui:** TextView_SetTextW() 段错误 ([#195](https://github.com/lc-soft/LCUI/issues/195)) ([a10df88](https://github.com/lc-soft/LCUI/commit/a10df88))
+* **ime:** 设置输入框文本光标时段错误 ([0b644e1](https://github.com/lc-soft/LCUI/commit/0b644e1))
+* **linux:** 在窗口处于最小尺寸时渲染会出现段错误 ([#200](https://github.com/lc-soft/LCUI/issues/200)) ([#201](https://github.com/lc-soft/LCUI/issues/201)) ([fa23f89](https://github.com/lc-soft/LCUI/commit/fa23f89))
+* **mainloop:** 将事件触发器从 OpenMP 并行循环中移出以解决主线程阻塞问题 ([#204](https://github.com/lc-soft/LCUI/issues/204)) ([#205](https://github.com/lc-soft/LCUI/issues/205)) ([6978f46](https://github.com/lc-soft/LCUI/commit/6978f46))
+
+
+### 新功能
+
+* 添加 settings 接口 ([#191](https://github.com/lc-soft/LCUI/issues/191)) ([#211](https://github.com/lc-soft/LCUI/issues/211)) ([#212](https://github.com/lc-soft/LCUI/issues/212)) ([1b8c6e6](https://github.com/lc-soft/LCUI/commit/1b8c6e6))
+
+
 # [2.0.0](https://github.com/lc-soft/LCUI/compare/v1.3.0...v2.0.0) (2020-03-01)
 
 ### 问题修复

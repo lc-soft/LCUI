@@ -1,3 +1,9 @@
+lcui (2.1.0-1) stable; urgency=medium
+
+  * Release note: https://github.com/lc-soft/LCUI/releases/tag/v2.1.0
+
+ -- lc <lc-soft@live.cn>  Sun, 05 Jul 2020 22:27:35 +0800
+
 lcui (2.0.0-1) stable; urgency=medium
 
   * Release note: https://github.com/lc-soft/LCUI/releases/tag/v2.0.0

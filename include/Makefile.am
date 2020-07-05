@@ -1,5 +1,5 @@
 AUTOMAKE_OPTIONS=foreign
-SUBDIRS=LCUI 
+SUBDIRS=LCUI
 # Headers to install
 include_HEADERS=LCUI.h LCUI_Build.h
 includedir=$(prefix)/include/

@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT(LCUI, 2.0.0, lc-soft@live.cn)
+AC_INIT(LCUI, 2.1.0, lc-soft@live.cn)
 
 # Silence warning: ar: 'u' modifier ignored since 'D' is the default
 AC_SUBST(AR_FLAGS, [cr])

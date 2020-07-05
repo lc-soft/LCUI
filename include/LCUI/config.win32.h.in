@@ -8,7 +8,7 @@
 #define PACKAGE_NAME "LCUI"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "LCUI 2.0.0"
+#define PACKAGE_STRING "LCUI 2.1.0"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "lcui"
@@ -17,7 +17,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "2.0.0"
+#define PACKAGE_VERSION "2.1.0"
 
 /* Define to 1 if you enabled LCUIBuilder function module. */
 #define USE_LCUI_BUILDER 1
@@ -29,7 +29,7 @@
 #define USE_LIBPNG 1
 
 /* Version number of package */
-#define VERSION "2.0.0"
+#define VERSION "2.1.0"
 
 #define LCUI_THREAD_WIN32
 #define LCUI_VIDEO_DRIVER_WIN32
