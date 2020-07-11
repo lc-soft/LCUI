@@ -9,6 +9,9 @@ image: Visual Studio 2017
 platform:
 - x64
 - x86
+configuration:
+- Debug
+- Release
 shallow_clone: true
 install:
 - ps: Install-Product node $env:nodejs_version
