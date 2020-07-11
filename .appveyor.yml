@@ -1,4 +1,4 @@
-version: 2.0.0.{build}
+version: 2.1.0.{build}
 pull_requests:
   do_not_increment_build_number: true
 skip_commits:
@@ -16,6 +16,8 @@ install:
     node -v
 
     npm -v
+
+    vcpkg version
 
     npm install -g lcpkg
 
@@ -38,4 +40,5 @@ after_build:
 artifacts:
   - path: 'lcpkg\dist\LCUI-*_$(platform)-*.lcpkg.zip'
 cache:
-  - c:\tools\vcpkg\installed\
+  - c:\tools\vcpkg\installed\ -> .appveyor.yml
+  - c:\tools\vcpkg\packages\ -> .appveyor.yml
