@@ -43,5 +43,6 @@ after_build:
 artifacts:
   - path: 'lcpkg\dist\LCUI-*_$(platform)-*.lcpkg.zip'
 cache:
+  - bin\ -> .appveyor.yml
   - c:\tools\vcpkg\installed\ -> .appveyor.yml
   - c:\tools\vcpkg\packages\ -> .appveyor.yml
