@@ -133,8 +133,11 @@ lcui create myapp
 # 进入项目目录
 cd myapp
 
-# 运行这个项目
-npm run start
+# 安装依赖库
+lcpkg install
+
+# 启动这个项目
+lcpkg run start
 ```
 
 #### 为已有的项目安装 LCUI
@@ -231,7 +234,7 @@ cd test
 
 ## 文档
 
-- 在线教程：[https://lcui.lc-soft.io/guide/](https://lcui.lc-soft.io/guide/)
+- 在线教程：[https://docs.lcui.lc-soft.io](https://docs.lcui.lc-soft.io)
 - 更新日志：[CHANGELOG.zh-cn.md](CHANGELOG.zh-cn.md)
 
 教程只有一部分，并且已经很久没有更新了，你可以参考头文件、源代码、示例程序以及上述的相关项目来了解基本用法。如果你希望我们能够为此项目提供完善的文档，可以考虑花时间帮助我们制定文档目录、章节和内容范围，相当于撰写一个文档模板，这样我们就不用花费时间在参考各种技术文档、思考初学者需要知道些什么、以及组织内容结构等工作上面，只需根据已定好的章节标题补全剩余内容即可。

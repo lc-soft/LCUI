@@ -135,8 +135,11 @@ lcui create myapp
 # Go into project directory
 cd myapp
 
+# Install dependencies
+lcpkg install
+
 # Run it
-npm run start
+lcpkg run start
 ```
 
 #### Install LCUI for existing project
