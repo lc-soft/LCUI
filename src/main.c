@@ -162,7 +162,7 @@ static LCUI_FrameProfile LCUIProfile_BeginFrame(LCUI_Profile profile,
 	LCUI_FrameProfile frame;
 
 	frame = &profile->frames[profile->frames_count];
-	if (profile->frames_count > settings->frame_rate_cap) {
+	if (profile->frames_count > (unsigned)settings->frame_rate_cap) {
 		profile->frames_count = 0;
 	}
 	memset(frame, 0, sizeof(LCUI_FrameProfileRec));
@@ -174,7 +174,7 @@ static void LCUIProfile_EndFrame(LCUI_Profile profile, LCUI_Settings settings)
 	profile->frames_count += 1;
 	profile->end_time = clock();
 	if (profile->end_time - profile->start_time >= CLOCKS_PER_SEC) {
-		if (profile->frames_count < settings->frame_rate_cap / 4) {
+		if (profile->frames_count < (unsigned)settings->frame_rate_cap / 4) {
 			LCUIProfile_Print(profile);
 		}
 		profile->frames_count = 0;
