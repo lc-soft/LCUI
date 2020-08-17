@@ -32,7 +32,8 @@ test_widget_opacity.c \
 test_widget_event.c \
 test_textview_resize.c \
 test_textedit.c \
-test_settings.c
+test_settings.c \
+test_scrollbar.c
 
 test_LDADD = $(top_builddir)/src/libLCUI.la -lm $(CODE_COVERAGE_LIBS)
 
@@ -71,8 +72,9 @@ test_widget_opacity_CFLAGS = $(AM_CFLAGS) -D PREVIEW_MODE
 test_scaling_support_SOURCES = test_scaling_support.c
 test_scaling_support_LDADD = $(top_builddir)/src/libLCUI.la
 
-test_scrollbar_SOURCES = test_scrollbar.c
+test_scrollbar_SOURCES = test_scrollbar.c libtest.c
 test_scrollbar_LDADD = $(top_builddir)/src/libLCUI.la
+test_scrollbar_CFLAGS = $(AM_CFLAGS) -D PREVIEW_MODE
 
 test_widget_SOURCES = test_widget.c
 test_widget_LDADD = $(top_builddir)/src/libLCUI.la

@@ -25,6 +25,7 @@ int main(void)
 	describe("test widget opacity", test_widget_opacity);
 	describe("test textview resize", test_textview_resize);
 	describe("test textedit", test_textedit);
+	describe("test scrollbar", test_scrollbar);
 	describe("test mainloop", test_mainloop);
 	describe("test css parser", test_css_parser);
 	describe("test block layout", test_block_layout);
