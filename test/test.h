@@ -15,6 +15,7 @@ void test_widget_opacity(void);
 void test_widget_event(void);
 void test_textview_resize(void);
 void test_textedit(void);
+void test_scrollbar(void);
 void test_image_reader(void);
 
 void test_css_parser(void);
