@@ -59,7 +59,7 @@ LCUI 是一个用 C 语言编写的桌面端图形界面开发库。
 平台      | 构建状态
 ---------|:---------
 Windows  | [![Windows Build status](https://ci.appveyor.com/api/projects/status/ps6mq5sy8jkbks0y?svg=true)](https://ci.appveyor.com/project/lc-soft/lcui)
-Linux    | [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=linux&label=build&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=arm64&label=build%20for%20ARM64&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=wasm&label=build%20for%20WebAssembly&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [!["GitHub Actions](https://github.com/lc-ui/lc-design/workflows/C%2FC%2B%2B%20CI/badge.svg)](https://github.com/lc-ui/lc-design/actions)
+Linux    | [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=linux&label=build&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=arm64&label=build%20for%20ARM64&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [![Linux Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=wasm&label=build%20for%20WebAssembly&branch=develop)](https://travis-ci.org/lc-soft/LCUI) [!["GitHub Actions](https://github.com/lc-ui/lc-design/workflows/C%2FC%2B%2B%20CI/badge.svg)](https://github.com/lc-soft/LCUI/actions)
 OSX      | [![OSX Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI?env=BADGE=osx&label=build&branch=develop)](https://travis-ci.org/lc-soft/LCUI)
 
 ### 效果图
@@ -98,10 +98,10 @@ OSX      | [![OSX Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI
 想要了解 LCUI 具体能做什么？你可以查看以下项目：
 
 - [LCUI CLI](https://github.com/lc-ui/lcui-cli) - 用于开发 LCUI 应用程序的命令行工具。
-- [LCUI Router](https://github.com/lc-soft/lcui-router) - LCUI 的路由管理器，它提供类似于 [Vue Router](https://github.com/vuejs/vue-router) 的开发体验，能让你基于 LCUI 构建多视图的应用程序变得更简单。
-- [LC Design](https://github.com/lc-ui/lc-design) — 专为 LCUI 开发的组件库，包含了一些通用组件和 CSS 样式。
+- [LCUI Router](https://github.com/lc-soft/lcui-router) - LCUI 的路由管理器，用于解决 LCUI 应用内多视图的切换和状态管理问题，代码设计参考自 [Vue Router](https://github.com/vuejs/vue-router)。
+- [LC Design](https://github.com/lc-ui/lc-design) — 专为 LCUI 开发的组件库，包含了一些通用组件和 CSS 样式，组件设计参考自 Bootstrap、ElementUI、AntDesign。
 - [LC Finder](https://github.com/lc-soft/LC-Finder) — 图片管理器，LCUI 的旗舰级应用程序，你可以将它作为参考对象，以此评估 LCUI 的性能、界面效果和开发复杂度是否符合你的需求。
-- [Trad](https://github.com/lc-soft/trad) — 一个基于 JavaScript 语法且可编译为 C 的语言，预置 LCUI 绑定，提供类似于 [React](https://reactjs.org/) 的开发体验，能让你轻松基于 LCUI 创建响应式用户界面。
+- [Trad](https://github.com/lc-soft/trad) — 基于 JavaScript 语法且可编译为 C 的语言，预置 LCUI 绑定，提供类似于 [React](https://reactjs.org/) 的声明式 UI 开发体验。
 - [LCUI Quick Start](https://github.com/lc-ui/lcui-quick-start) - LCUI 应用程序模板。
 - [LCUI Router App](https://blog.lc-soft.io/posts/build-a-browser-like-app.html) - LCUI Router 的应用程序模板，实现了和浏览器一样的图形界面、多标签页、路由导航等功能。
 - [LC Design App](https://github.com/lc-ui/lc-design-app) - LC Design 组件库的应用程序模板，展示了 LC Design 的一些组件的简单用法和效果。
@@ -220,11 +220,12 @@ cd test
 - 未来计划
   - 为移动端组件库添加 React 实现，使之能应用在 Web 前端项目
   - 重新设计 Trad 语言并重写其编译器，使之能应付基础的 UI 开发需求
-  - 重新设计图形 API，支持引入主流的图形库来丰富图形元素的渲染方式
+  - 重新设计图形抽象接口，支持引入主流的图形库来丰富图形元素的渲染方式
   - 优化 CSS 样式库的内存占用
   - 优化字体缓存库的内存占用
   - 支持编译为 WebAssembly 运行在浏览器上
   - 为 CSS 解析器添加支持 `@media` 查询
+  - 完善文档和教程
 
 其它的任务则归为支线，交给开源社区贡献者以及像你这样的开发者来推进。如需了解更多细节可查看 [issues](https://github.com/lc-soft/LCUI/issues) 和[项目](https://github.com/lc-soft/LCUI/projects/2)页面。
 
