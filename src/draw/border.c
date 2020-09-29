@@ -96,7 +96,7 @@ static int DrawBorderTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 	double split_center_y = bound_top + 1.0 * xline->width;
 	int inner_ellipse_top = (int)split_center_y;
 
-	/* Get the actual rectagle that can be drawn */
+	/* Get the actual rectangle that can be drawn */
 	Graph_GetValidRect(dst, &rect);
 	dst = Graph_GetQuote(dst);
 	if (!Graph_IsValid(dst)) {
@@ -189,7 +189,7 @@ static int DrawBorderTopRight(LCUI_Graph *dst, int bound_left, int bound_top,
 	double split_center_y = bound_top + 1.0 * xline->width;
 	double inner_ellipse_top = split_center_y;
 
-	/* Get the actual rectagle that can be drawn */
+	/* Get the actual rectangle that can be drawn */
 	Graph_GetValidRect(dst, &rect);
 	dst = Graph_GetQuote(dst);
 	if (!Graph_IsValid(dst)) {
@@ -276,7 +276,7 @@ static int DrawBorderBottomLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 	double split_center_y = bound_top + height - 1.0 * xline->width;
 	double inner_ellipse_bottom = circle_center_y + radius_y;
 
-	/* Get the actual rectagle that can be drawn */
+	/* Get the actual rectangle that can be drawn */
 	Graph_GetValidRect(dst, &rect);
 	dst = Graph_GetQuote(dst);
 	if (!Graph_IsValid(dst)) {
@@ -364,7 +364,7 @@ static int DrawBorderBottomRight(LCUI_Graph *dst, int bound_left, int bound_top,
 	double split_center_y = bound_top + height - 1.0 * xline->width;
 	double inner_ellipse_bottom = circle_center_y + radius_y;
 
-	/* Get the actual rectagle that can be drawn */
+	/* Get the actual rectangle that can be drawn */
 	Graph_GetValidRect(dst, &rect);
 	dst = Graph_GetQuote(dst);
 	if (!Graph_IsValid(dst)) {
