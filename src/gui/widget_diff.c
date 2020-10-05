@@ -39,11 +39,9 @@
 void Widget_InitStyleDiff(LCUI_Widget w, LCUI_WidgetStyleDiff diff)
 {
 	diff->box = w->box;
-	diff->can_render = TRUE;
 	diff->should_add_invalid_area = FALSE;
 	if (w->parent) {
 		if (!w->parent->computed_style.visible) {
-			diff->can_render = FALSE;
 			return;
 		}
 		if (w->parent->invalid_area_type >=
@@ -105,10 +103,6 @@ int Widget_EndStyleDiff(LCUI_Widget w, LCUI_WidgetStyleDiff diff)
 	LinkedListNode *node;
 	const LCUI_WidgetStyle *style = &w->computed_style;
 
-	if (!diff->can_render) {
-		return 0;
-	}
-	diff->can_render = style->visible;
 	if (style->visible != diff->visible) {
 		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_CANVAS_BOX;
 		if (style->visible) {

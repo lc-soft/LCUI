@@ -48,8 +48,6 @@ typedef struct LCUI_WidgetStyleDiffRec_ {
 	LCUI_BackgroundStyle background;
 	LCUI_WidgetBoxModelRec box;
 	LCUI_FlexBoxLayoutStyle flex;
-
-	LCUI_BOOL can_render;
 	LCUI_BOOL should_add_invalid_area;
 } LCUI_WidgetStyleDiffRec, *LCUI_WidgetStyleDiff;
 
