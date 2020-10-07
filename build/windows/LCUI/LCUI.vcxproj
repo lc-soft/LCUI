@@ -45,14 +45,14 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141_xp</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141_xp</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -136,11 +136,11 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\debug\lib\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\$(PlatformTarget)-windows\$(Configuration)\lib</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT;LIBCMTD;MSVCRT;</IgnoreSpecificDefaultLibraries>
       <LinkStatus>false</LinkStatus>
       <ShowProgress>NotSet</ShowProgress>
-      <AdditionalDependencies>libxml2-lite.lib;freetyped.lib;libpng16d.lib;bz2d.lib;zlibd.lib;jpegd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libxml2-lite.lib;brotlicommon-static.lib;brotlidec-static.lib;freetyped.lib;libpng16d.lib;bz2d.lib;zlibd.lib;jpegd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <Culture>0x0804</Culture>
@@ -148,6 +148,9 @@
     <Bscmake>
       <PreserveSbr>false</PreserveSbr>
     </Bscmake>
+    <PreBuildEvent>
+      <Command>lcpkg export --filter build --arch $(PlatformTarget) --mode $(Configuration) vendor/$(PlatformTarget)-windows/$(Configuration)</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -170,8 +173,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libxml2-lite.lib;freetyped.lib;libpng16d.lib;bz2d.lib;zlibd.lib;jpegd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\debug\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2-lite.lib;brotlicommon-static.lib;brotlidec-static.lib;freetyped.lib;libpng16d.lib;bz2d.lib;zlibd.lib;jpegd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\$(PlatformTarget)-windows\$(Configuration)\lib</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT;LIBCMTD;MSVCRT;</IgnoreSpecificDefaultLibraries>
       <LinkStatus>false</LinkStatus>
     </Link>
@@ -181,6 +184,9 @@
     <Bscmake>
       <PreserveSbr>false</PreserveSbr>
     </Bscmake>
+    <PreBuildEvent>
+      <Command>lcpkg export --filter build --arch $(PlatformTarget) --mode $(Configuration) vendor/$(PlatformTarget)-windows/$(Configuration)</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -203,10 +209,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\lib\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\$(PlatformTarget)-windows\$(Configuration)\lib</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT;LIBCMTD;MSVCRTD;</IgnoreSpecificDefaultLibraries>
       <ShowProgress>NotSet</ShowProgress>
-      <AdditionalDependencies>libxml2-lite.lib;freetype.lib;libpng16.lib;bz2.lib;zlib.lib;jpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libxml2-lite.lib;brotlicommon-static.lib;brotlidec-static.lib;freetype.lib;libpng16.lib;bz2.lib;zlib.lib;jpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
       <AdditionalDependencies>libpng16.lib;libxml2.lib;jpeg.lib;freetype271.lib;zlib.lib;</AdditionalDependencies>
@@ -225,6 +231,9 @@
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
     </Bscmake>
+    <PreBuildEvent>
+      <Command>lcpkg export --filter build --arch $(PlatformTarget) --mode $(Configuration) vendor/$(PlatformTarget)-windows/$(Configuration)</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -247,8 +256,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libxml2-lite.lib;freetype.lib;libpng16.lib;bz2.lib;zlib.lib;jpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\lcpkg\installed\$(PlatformTarget)-windows\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2-lite.lib;brotlicommon-static.lib;brotlidec-static.lib;freetype.lib;libpng16.lib;bz2.lib;zlib.lib;jpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\$(PlatformTarget)-windows\$(Configuration)\lib</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT;LIBCMTD;MSVCRTD;</IgnoreSpecificDefaultLibraries>
     </Link>
     <Lib>
@@ -268,6 +277,9 @@
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
     </Bscmake>
+    <PreBuildEvent>
+      <Command>lcpkg export --filter build --arch $(PlatformTarget) --mode $(Configuration) vendor/$(PlatformTarget)-windows/$(Configuration)</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\LCUI\draw\background.h" />

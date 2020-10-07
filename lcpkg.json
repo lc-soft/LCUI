@@ -33,35 +33,61 @@
     }
   },
   "dependencies": {
+    "brotli": {
+      "version": "latest",
+      "uri": "vcpkg:brotli",
+      "linkage": "static",
+      "triplet": "x64-windows-static",
+      "packageDir": "C:\\Users\\LC\\Documents\\GitHub\\vcpkg\\packages\\brotli_x64-windows-static",
+      "contentDir": null
+    },
     "libxml2-lite": {
       "version": "latest",
       "uri": "vcpkg:libxml2-lite",
-      "linkage": "static"
+      "linkage": "static",
+      "triplet": "x64-windows-static",
+      "packageDir": "C:\\Users\\LC\\Documents\\GitHub\\vcpkg\\packages\\libxml2-lite_x64-windows-static",
+      "contentDir": null
     },
     "libpng": {
       "version": "latest",
       "uri": "vcpkg:libpng",
-      "linkage": "static"
+      "linkage": "static",
+      "triplet": "x64-windows-static",
+      "packageDir": "C:\\Users\\LC\\Documents\\GitHub\\vcpkg\\packages\\libpng_x64-windows-static",
+      "contentDir": null
     },
     "libjpeg-turbo": {
       "version": "latest",
       "uri": "vcpkg:libjpeg-turbo",
-      "linkage": "static"
+      "linkage": "static",
+      "triplet": "x64-windows-static",
+      "packageDir": "C:\\Users\\LC\\Documents\\GitHub\\vcpkg\\packages\\libjpeg-turbo_x64-windows-static",
+      "contentDir": null
     },
     "freetype": {
       "version": "latest",
       "uri": "vcpkg:freetype",
-      "linkage": "static"
+      "linkage": "static",
+      "triplet": "x64-windows-static",
+      "packageDir": "C:\\Users\\LC\\Documents\\GitHub\\vcpkg\\packages\\freetype_x64-windows-static",
+      "contentDir": null
     },
     "zlib": {
       "version": "latest",
       "uri": "vcpkg:zlib",
-      "linkage": "static"
+      "linkage": "static",
+      "triplet": "x64-windows-static",
+      "packageDir": "C:\\Users\\LC\\Documents\\GitHub\\vcpkg\\packages\\zlib_x64-windows-static",
+      "contentDir": null
     },
     "bzip2": {
       "version": "latest",
       "uri": "vcpkg:bzip2",
-      "linkage": "static"
+      "linkage": "static",
+      "triplet": "x64-windows-static",
+      "packageDir": "C:\\Users\\LC\\Documents\\GitHub\\vcpkg\\packages\\bzip2_x64-windows-static",
+      "contentDir": null
     }
   }
 }

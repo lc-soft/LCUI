@@ -75,6 +75,9 @@
     <ClCompile Include="..\..\..\test\test_flex_layout.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\test\test_mainloop.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\test\test.h">
