@@ -18,7 +18,7 @@ void test_linkedlist(void)
 	for (i = 0; i < n; ++i) {
 		LinkedList_Append(&list, arr + i);
 	}
-	it_i("LinkedList_Append() should work", list.length, n);
+	it_i("LinkedList_Append() should work", (int)list.length, (int)n);
 	i = 0;
 	for (LinkedList_Each(node, &list)) {
 		if (node->data != arr + i) {
@@ -40,7 +40,7 @@ void test_linkedlist(void)
 		}
 		--i;
 	}
-	it_i("LinkedList_EachReverse() should work", i, n);
+	it_i("LinkedList_EachReverse() should work", (int)i, (int)n);
 
 	LinkedList_Clear(&list, NULL);
 	it_b("LinkedList_ClearData() should work",

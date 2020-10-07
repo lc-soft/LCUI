@@ -22,6 +22,6 @@ void test_strpool(void)
 	it_i("check release str1", strpool_free_str(str1), 0);
 	it_s("check str1 is still valid", str1, "hello");
 	it_i("check release str2", strpool_free_str(str2), 0);
-	it_i("check strpool is empty", strpool_size(pool), 0);
+	it_i("check strpool is empty", (int)strpool_size(pool), 0);
 	strpool_destroy(pool);
 }
