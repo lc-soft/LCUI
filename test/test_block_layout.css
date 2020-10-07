@@ -286,3 +286,23 @@ textview, body {
   right: 5px;
   position: absolute;
 }
+
+#example-progress-bar .message-box {
+	padding: 15px 25px;
+	display: inline-block;
+}
+
+#example-progress-bar .progress {
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 10px;
+    position: absolute;
+    background-color: #f0f0f0;
+}
+
+#example-progress-bar .progress-bar {
+    width: 50%;
+    height: 100%;
+    background-color: #7cbbff;
+}

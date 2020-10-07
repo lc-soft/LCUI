@@ -155,6 +155,14 @@ static void test_inline_block_nesting(void)
 		 &w->box.border, &rect);
 }
 
+static void test_absolutely_positioned_progress_bar(void)
+{
+	LCUI_Widget w;
+
+	w = LCUIWidget_GetById("example-progress-bar__bar");
+	it_i("It should have the correct width", (int)w->width, (int)(w->parent->box.content.width * 0.5));
+}
+
 static void test_block_layout_1280(void)
 {
 	LCUI_Widget w;
@@ -418,6 +426,8 @@ static void test_block_layout_1280(void)
 	describe("test auto size", test_auto_size);
 	describe("test dropdown", test_dropdown);
 	describe("test inline block nesting", test_inline_block_nesting);
+	describe("test absolutely positioned progress bar",
+		 test_absolutely_positioned_progress_bar);
 }
 
 static void test_block_layout_600(void)

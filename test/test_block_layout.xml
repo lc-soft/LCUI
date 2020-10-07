@@ -141,6 +141,17 @@
             </w>
           </w>
         </w>
+        <w class="example" id="example-progress-bar">
+          <textview class="example__title">(5) Absolutely positioned progress bar</textview>
+          <w class="example__content">
+            <w class="message-box">
+              <textview>loading...</textview>
+              <w class="progress">
+                <w class="progress-bar" id="example-progress-bar__bar"></w>
+              </w>
+            </w>
+          </w>
+        </w>
       </w>
     </w>
     <scrollbar target="main" />
