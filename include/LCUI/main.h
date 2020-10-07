@@ -191,13 +191,13 @@ LCUI_API void LCUI_PostAsyncTaskTo(LCUI_Task task, int target_worker_id);
 LCUI_API int LCUI_PostAsyncTask(LCUI_Task task);
 
 /** LCUI_PostTask 的简化版本 */
-#define LCUI_PostSimpleTask(FUNC, ARG1, ARG2)         \
-	do {                                          \
-		LCUI_TaskRec task = { 0 };            \
-		task.arg[0] = (void *)ARG1;           \
-		task.arg[1] = (void *)ARG2;           \
-		task.func = (LCUI_AppTaskFunc)(FUNC); \
-		LCUI_PostTask(&task);                 \
+#define LCUI_PostSimpleTask(FUNC, ARG1, ARG2)             \
+	do {                                              \
+		LCUI_TaskRec _ui_task = { 0 };            \
+		_ui_task.arg[0] = (void *)ARG1;           \
+		_ui_task.arg[1] = (void *)ARG2;           \
+		_ui_task.func = (LCUI_AppTaskFunc)(FUNC); \
+		LCUI_PostTask(&_ui_task);                 \
 	} while (0);
 
 LCUI_API void LCUI_RunFrame(void);
