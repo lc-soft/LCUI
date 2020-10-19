@@ -123,8 +123,8 @@ OSX      | [![OSX Build Status](https://badges.herokuapp.com/travis/lc-soft/LCUI
 使用 [lcui-cli](https://github.com/lc-ui/lcui-cli) 快速创建一个 LCUI 应用项目：
 
 ```bash
-# 安装 lcui-cli
-npm install -g @lcui/cli
+# 安装 lcui-cli 和 lcpkg
+npm install -g @lcui/cli lcpkg
 
 # 创建一个名为 myapp 的 LCUI 项目
 lcui create myapp

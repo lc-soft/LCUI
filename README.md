@@ -126,8 +126,8 @@ Want to know what LCUI can do? You can view the following projects:
 Quickly create an LCUI project using [lcui-cli](https://github.com/lc-ui/lcui-cli):
 
 ```bash
-# Install lcui-cli
-npm install -g @lcui/cli
+# Install lcui-cli and lcpkg
+npm install -g @lcui/cli lcpkg
 
 # Create an LCUI project named myapp
 lcui create myapp
