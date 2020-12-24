@@ -113,8 +113,8 @@ if test "$want_font_engine" = yes; then
 	PKG_CHECK_MODULES([FREETYPE], [freetype2], [
 		want_font_engine=yes
 		font_engine_name=freetype2
-		PACKAGE_LIBS="$PACKAGE_LIBS $FREETYPE2_LIBS"
-		CFLAGS="$CFLAGS $FREETYPE2_CFLAGS"
+		PACKAGE_LIBS="$PACKAGE_LIBS $FREETYPE_LIBS"
+		CFLAGS="$CFLAGS $FREETYPE_CFLAGS"
 		AC_DEFINE_UNQUOTED([LCUI_FONT_ENGINE_FREETYPE], 1, [Define to 1 if you have the FreeType font engine.])
 	], [want_font_engine=no])
 else
