@@ -84,8 +84,18 @@ void LCUI_SetImageReaderForFile(LCUI_ImageReader reader, FILE *fp)
 static int DetectImageType(const char *filename)
 {
 	int i;
+	const char *suffix = NULL;
+
+	for (i = 0; filename[i]; ++i) {
+		if (filename[i] == '.') {
+			suffix = filename + i;
+		}
+	}
+	if (!suffix) {
+		return -1;
+	}
 	for (i = 0; i < n_interfaces; ++i) {
-		if (strstr(filename, interfaces[i].suffix)) {
+		if (strstr(interfaces[i].suffix, suffix)) {
 			return i;
 		}
 	}
