@@ -60,7 +60,7 @@ void LCUI_ApplySettings(LCUI_Settings settings)
 /* Reset global settings to their defaults. */
 void LCUI_ResetSettings(void)
 {
-	self.frame_rate_cap = 120;
+	self.frame_rate_cap = LCUI_MAX_FRAMES_PER_SEC;
 	self.parallel_rendering_threads = 4;
 	self.record_profile = FALSE;
 	self.fps_meter = FALSE;
