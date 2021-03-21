@@ -348,7 +348,7 @@ cd test
       - properties
         - [x] top, right, bottom, left
         - [x] width, height
-        - [x] visiblility
+        - [x] visibility
         - [x] display
           - [x] none
           - [x] inline-block
@@ -377,7 +377,7 @@ cd test
         - [x] background-position
         - [x] background-cover
         - [ ] background
-        - [x] pointer-evnets
+        - [x] pointer-events
         - [x] font-face
         - [x] font-family
         - [x] font-size

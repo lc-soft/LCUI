@@ -325,7 +325,7 @@ The English version of the documentation is not available, because the author do
       - properties
         - [x] top, right, bottom, left
         - [x] width, height
-        - [x] visiblility
+        - [x] visibility
         - [x] display
           - [x] none
           - [x] inline-block
@@ -354,7 +354,7 @@ The English version of the documentation is not available, because the author do
         - [x] background-position
         - [x] background-cover
         - [ ] background
-        - [x] pointer-evnets
+        - [x] pointer-events
         - [x] font-face
         - [x] font-family
         - [x] font-size
