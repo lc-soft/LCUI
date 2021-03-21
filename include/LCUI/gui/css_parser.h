@@ -46,8 +46,6 @@ LCUI_BEGIN_HEADER
 		(CTX)->buffer[(ctx)->pos++] = *((CTX)->cur); \
 	} while (0);
 
-#define CSSParser_GetRuleParser(CTX) &ctx->rule.parsers[CSS_RULE_FONT_FACE]
-
 typedef enum LCUI_CSSParserTarget {
 	CSS_TARGET_NONE,      /**< 无 */
 	CSS_TARGET_RULE_NAME, /**< 规则名称 */

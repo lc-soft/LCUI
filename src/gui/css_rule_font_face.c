@@ -284,7 +284,8 @@ int CSSParser_InitFontFaceRuleParser(LCUI_CSSParserContext ctx)
 {
 	LCUI_CSSRuleParser parser;
 	FontFaceParserContext data;
-	parser = CSSParser_GetRuleParser(ctx);
+
+	parser = &ctx->rule.parsers[CSS_RULE_FONT_FACE];
 	data = NEW(FontFaceParserContextRec, 1);
 	if (!data) {
 		return -ENOMEM;
