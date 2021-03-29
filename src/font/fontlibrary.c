@@ -69,12 +69,6 @@ typedef struct LCUI_FontFamilyNodeRec_ {
 	LCUI_FontStyleList styles;	/**< 字体列表，按风格存放 */
 } LCUI_FontFamilyNodeRec, *LCUI_FontFamilyNode;
 
-/** 字体路径索引结点 */
-typedef struct LCUI_FontPathNode {
-	char *path;		/**< 路径  */
-	LCUI_Font font;		/**< 被索引的字体信息 */
-} LCUI_FontPathNode;
-
 static struct LCUI_FontLibraryModule {
 	int count;			/**< 计数器，主要用于为字体信息生成标识号 */
 	int font_cache_num;		/**< 字体信息缓存区的数量 */
@@ -446,7 +440,7 @@ static LCUI_FontWeight FindLighterWeight(LCUI_FontStyleNode snode,
 }
 
 /**
- * 在未找到指定粗细程度的字体时进行回退，找到合适的字体
+ * 在未找到指定字重的字体时进行回退，找到合适的字体
  * 回退规则的参考文档：https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight#Fallback_weights
  */
 static LCUI_FontWeight FontWeightFallback(LCUI_FontStyleNode snode,

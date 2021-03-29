@@ -600,23 +600,15 @@ static void TextLayer_MergeRow(LCUI_TextLayer layer, int row)
 /** 对指定行的文本进行排版 */
 static void TextLayer_TextRowTypeset(LCUI_TextLayer layer, int row)
 {
-	LCUI_TextRow txtrow;
-	LCUI_TextChar txtchar;
-	LCUI_BOOL not_autowrap;
-	int col, max_width, row_width = 0, word_col = 0;
+	int col, row_width = 0, word_col = 0;
+	int max_width =
+	    layer->fixed_width > 0 ? layer->fixed_width : layer->max_width;
 
-	if (layer->fixed_width > 0) {
-		max_width = layer->fixed_width;
-	} else {
-		max_width = layer->max_width;
-	}
-	if (max_width <= 0 || !layer->enable_autowrap ||
-	    (layer->enable_autowrap && !layer->enable_mulitiline)) {
-		not_autowrap = TRUE;
-	} else {
-		not_autowrap = FALSE;
-	}
-	txtrow = layer->text_rows.rows[row];
+	LCUI_TextChar txtchar;
+	LCUI_TextRow txtrow = layer->text_rows.rows[row];
+	LCUI_BOOL autowrap =
+	    max_width > 0 && layer->enable_autowrap && layer->enable_mulitiline;
+
 	for (col = 0; col < txtrow->length; ++col) {
 		txtchar = txtrow->string[col];
 		if (!txtchar->bitmap) {
@@ -625,7 +617,7 @@ static void TextLayer_TextRowTypeset(LCUI_TextLayer layer, int row)
 		/* 累加行宽度 */
 		row_width += txtchar->bitmap->advance.x;
 		/* 如果是当前行的第一个字符，或者行宽度没有超过宽度限制 */
-		if (not_autowrap || col < 1 || row_width <= max_width) {
+		if (!autowrap || col < 1 || row_width <= max_width) {
 			if (ISALPHA(txtchar->code)) {
 			} else {
 				word_col = col + 1;
@@ -960,11 +952,10 @@ int TextLayer_SetMaxSize(LCUI_TextLayer layer, int width, int height)
 }
 
 /** 设置是否启用多行文本模式 */
-void TextLayer_SetMultiline(LCUI_TextLayer layer, int is_true)
+void TextLayer_SetMultiline(LCUI_TextLayer layer, LCUI_BOOL enabled)
 {
-	if ((layer->enable_mulitiline && !is_true) ||
-	    (!layer->enable_mulitiline && is_true)) {
-		layer->enable_mulitiline = is_true;
+	if (layer->enable_mulitiline != enabled) {
+		layer->enable_mulitiline = enabled;
 		TextLayer_AddUpdateTypeset(layer, 0);
 	}
 }
@@ -1385,7 +1376,8 @@ void TextLayer_SetLineHeight(LCUI_TextLayer layer, int height)
 
 LCUI_BOOL TextLayer_SetOffset(LCUI_TextLayer layer, int offset_x, int offset_y)
 {
-	if (layer->new_offset_x != offset_x || layer->new_offset_y != offset_y) {
+	if (layer->new_offset_x != offset_x ||
+	    layer->new_offset_y != offset_y) {
 		layer->new_offset_x = offset_x;
 		layer->new_offset_y = offset_y;
 		return TRUE;

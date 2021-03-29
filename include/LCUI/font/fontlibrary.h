@@ -178,8 +178,8 @@ LCUI_API size_t LCUIFont_UpdateStyle(const int *font_ids,
 /**
  * 根据字族名称获取对应的字体 ID 列表
  * @param[out] ids 输出的字体 ID 列表
- * @param[in] style 字体风格
- * @param[in] weight 字体粗细程度，若为值 0，则默认为 FONT_WEIGHT_NORMAL
+ * @param[in] style 风格
+ * @param[in] weight 字重，若为值 0，则默认为 FONT_WEIGHT_NORMAL
  * @param[in] names 字族名称，多个名字用逗号隔开
  * @return 获取到的字体 ID 的数量
  */
