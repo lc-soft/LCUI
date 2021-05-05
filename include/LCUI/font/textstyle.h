@@ -74,6 +74,12 @@ LCUI_API int TextStyle_SetStyle(LCUI_TextStyle ts, LCUI_FontStyle style);
  */
 LCUI_API int TextStyle_SetFont(LCUI_TextStyle ts, const char *str);
 
+LCUI_API void TextStyle_SetSize(LCUI_TextStyle ts, int pixel_size);
+
+LCUI_API void TextStyle_SetForeColor(LCUI_TextStyle ts, LCUI_Color color);
+
+LCUI_API void TextStyle_SetBackColor(LCUI_TextStyle ts, LCUI_Color color);
+
 /** 设置使用默认的字体 */
 int TextStyle_SetDefaultFont(LCUI_TextStyle ts);
 

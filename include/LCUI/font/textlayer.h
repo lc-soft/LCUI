@@ -209,7 +209,7 @@ LCUI_API int TextLayer_SetFixedSize(LCUI_TextLayer layer, int width,
 LCUI_API int TextLayer_SetMaxSize(LCUI_TextLayer layer, int width, int height);
 
 /** 设置是否启用多行文本模式 */
-LCUI_API void TextLayer_SetMultiline(LCUI_TextLayer layer, int is_true);
+LCUI_API void TextLayer_SetMultiline(LCUI_TextLayer layer, LCUI_BOOL enabled);
 
 /** 删除文本光标的当前坐标右边的文本 */
 LCUI_API int TextLayer_TextDelete(LCUI_TextLayer layer, int n_char);
@@ -225,7 +225,7 @@ LCUI_API void TextLayer_SetWordBreak(LCUI_TextLayer layer,
 				     LCUI_WordBreakMode mode);
 
 /** 设置是否使用样式标签 */
-LCUI_API void TextLayer_EnableStyleTag(LCUI_TextLayer layer, LCUI_BOOL is_true);
+LCUI_API void TextLayer_EnableStyleTag(LCUI_TextLayer layer, LCUI_BOOL enabled);
 
 /** 重新载入各个文字的字体位图 */
 LCUI_API void TextLayer_ReloadCharBitmap(LCUI_TextLayer layer);

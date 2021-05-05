@@ -133,6 +133,24 @@ void TextStyle_Merge(LCUI_TextStyle base, LCUI_TextStyle target)
 	}
 }
 
+void TextStyle_SetSize(LCUI_TextStyle ts, int pixel_size)
+{
+	ts->pixel_size = pixel_size;
+	ts->has_pixel_size = TRUE;
+}
+
+void TextStyle_SetForeColor(LCUI_TextStyle ts, LCUI_Color color)
+{
+	ts->fore_color = color;
+	ts->has_fore_color = TRUE;
+}
+
+void TextStyle_SetBackColor(LCUI_TextStyle ts, LCUI_Color color)
+{
+	ts->back_color = color;
+	ts->has_back_color = TRUE;
+}
+
 int TextStyle_SetWeight(LCUI_TextStyle ts, LCUI_FontWeight weight)
 {
 	int *font_ids;
