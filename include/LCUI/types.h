@@ -102,6 +102,7 @@ typedef union LCUI_ARGB8888_ {
 	};
 } LCUI_ARGB, LCUI_ARGB8888, LCUI_Color;
 
+/** Position in plane coordinate system */
 typedef struct LCUI_Pos_ {
 	int x, y;
 } LCUI_Pos;
@@ -279,7 +280,7 @@ struct LCUI_Graph_ {
 		uchar_t *bytes;
 		LCUI_ARGB *argb;
 	};
-	int color_type;
+	LCUI_ColorType color_type;
 	unsigned bytes_per_pixel;
 	unsigned bytes_per_row;
 	float opacity;
