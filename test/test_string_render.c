@@ -1,6 +1,4 @@
-﻿#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
-#include <LCUI/graph.h>
+﻿#include <LCUI.h>
 #include <LCUI/image.h>
 #include <LCUI/font.h>
 

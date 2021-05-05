@@ -30,6 +30,7 @@
 *.gcov
 build/windows/*/*.css
 build/windows/*/*.xml
+build/windows/*/*.png
 *~
 *.intermediate
 .vscode

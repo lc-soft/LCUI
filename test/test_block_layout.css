@@ -288,8 +288,10 @@ textview, body {
 }
 
 #example-progress-bar .message-box {
+  font-size: 14px;
 	padding: 15px 25px;
 	display: inline-block;
+  position: relative;
 }
 
 #example-progress-bar .progress {
