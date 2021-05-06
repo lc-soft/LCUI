@@ -47,7 +47,7 @@ compile
 install-sh
 missing
 depcomp
-lcui.pc
+lcui2.pc
 libtool
 ltmain.sh
 config.log
@@ -66,9 +66,7 @@ vendor/include
 vendor/lib
 build/*.png
 build/*.jpg
-build/VS2012/*/*.png
-build/VS2012/*/*.jpg
-include/LCUI/config.h
+include/config.h
 test/*
 !test/*.c
 !test/*.h

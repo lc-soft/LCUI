@@ -12,7 +12,7 @@ AC_CANONICAL_TARGET
 
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([include/LCUI_Build.h])
-AC_CONFIG_HEADERS([include/LCUI/config.h])
+AC_CONFIG_HEADERS([include/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Checks for programs.
