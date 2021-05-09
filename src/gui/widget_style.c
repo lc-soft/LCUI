@@ -549,7 +549,7 @@ size_t Widget_GetChildrenStyleChanges(LCUI_Widget w, int type, const char *name)
 	for (i = 0; i < n; ++i) {
 		len = strlen(names[i]) + 2;
 		str = malloc(len * sizeof(char));
-		strncpy(str + 1, names[i], len - 1);
+		strcpy(str + 1, names[i]);
 		str[0] = ch;
 		free(names[i]);
 		names[i] = str;

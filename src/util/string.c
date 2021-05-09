@@ -118,7 +118,7 @@ char *strdup2(const char *str)
 	if (!out) {
 		return NULL;
 	}
-	strncpy(out, str, len);
+	strcpy(out, str, len);
 	return out;
 }
 
@@ -129,7 +129,7 @@ wchar_t *wcsdup2(const wchar_t *str)
 	if (!out) {
 		return NULL;
 	}
-	wcsncpy(out, str, len);
+	wcscpy(out, str, len);
 	return out;
 }
 
