@@ -89,7 +89,7 @@ void it_i(const char *name, int actual, int expected)
 	test_msg(RED("  AssertionError: %d == %d\n"), actual, expected);
 	test_msg(GREEN("  + expected ") RED("- actual\n\n"));
 	test_msg(RED("  - %d\n"), actual);
-	test_msg(RED("  + %d\n\n"), expected);
+	test_msg(GREEN("  + %d\n\n"), expected);
 }
 
 void it_b(const char *name, int actual, int expected)
