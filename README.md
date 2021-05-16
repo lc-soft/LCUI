@@ -169,7 +169,7 @@ If you want to manually compile LCUI from source code:
     lcpkg install --platform uwp
     lcpkg install --arch x64 --platform uwp
     ```
-1. Rename `config.win.h.in` in the include directory to `config.h`.
+1. Rename `config.win32.h.in` in the include directory to `config.h`.
 1. Open the `build/windows/LCUI.sln` file with [Visual Studio](https://visualstudio.microsoft.com/), and then build LCUI.
 
 ### Ubuntu

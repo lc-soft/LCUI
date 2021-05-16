@@ -282,6 +282,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\include\config.h" />
     <ClInclude Include="..\..\..\include\LCUI\draw\background.h" />
     <ClInclude Include="..\..\..\include\LCUI\draw\border.h" />
     <ClInclude Include="..\..\..\include\LCUI\draw\boxshadow.h" />
@@ -321,7 +322,6 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_tree.h" />
     <ClInclude Include="..\..\..\include\LCUI\image.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI.h" />
-    <ClInclude Include="..\..\..\include\LCUI\config.h" />
     <ClInclude Include="..\..\..\include\LCUI\cursor.h" />
     <ClInclude Include="..\..\..\include\LCUI\display.h" />
     <ClInclude Include="..\..\..\include\LCUI\draw.h" />

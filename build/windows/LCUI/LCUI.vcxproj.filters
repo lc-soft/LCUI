@@ -312,9 +312,6 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\canvas.h">
       <Filter>头文件\LCUI\gui\widget</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\config.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\gui\layout\block.h">
       <Filter>源文件\gui\layout</Filter>
     </ClInclude>
@@ -338,6 +335,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\gui\widget_shadow.h">
       <Filter>源文件\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\config.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
