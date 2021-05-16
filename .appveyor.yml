@@ -28,7 +28,7 @@ install:
 
     lcpkg install --platform uwp --arch x64
 before_build:
-- cmd: copy .\include\LCUI\config.win32.h.in .\include\LCUI\config.h
+- cmd: copy .\include\config.win32.h.in .\include\config.h
 build_script:
   - msbuild build/windows/LCUI.sln /p:Configuration=Debug /p:Platform=x86 /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
   - msbuild build/windows/LCUI.sln /p:Configuration=Debug /p:Platform=x64 /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
