@@ -361,6 +361,11 @@ static void UpdateFlexItemSize(LCUI_Widget w, LCUI_LayoutRule rule)
 	LCUI_WidgetLayoutDiffRec diff;
 
 	Widget_BeginLayoutDiff(w, &diff);
+	/*
+	 * As a widget of a flex item, its size is calculated by the flexbox
+	 * layout engine, so here we only need to calculate its width and
+	 * height limits.
+	 */
 	Widget_ComputeWidthLimitStyle(w, LCUI_LAYOUT_RULE_FIXED);
 	Widget_ComputeHeightLimitStyle(w, LCUI_LAYOUT_RULE_FIXED);
 	Widget_UpdateBoxSize(w);
@@ -368,14 +373,9 @@ static void UpdateFlexItemSize(LCUI_Widget w, LCUI_LayoutRule rule)
 	    content_height == w->box.padding.height) {
 		return;
 	}
-	if (rule == LCUI_LAYOUT_RULE_FIXED_WIDTH) {
-		if (w->computed_style.height_sizing != LCUI_SIZING_RULE_NONE) {
-			rule = LCUI_LAYOUT_RULE_FIXED;
-		}
-	} else if (rule == LCUI_LAYOUT_RULE_FIXED_HEIGHT) {
-		if (w->computed_style.width_sizing != LCUI_SIZING_RULE_NONE) {
-			rule = LCUI_LAYOUT_RULE_FIXED;
-		}
+	if (rule == LCUI_LAYOUT_RULE_FIXED_WIDTH ||
+	    rule == LCUI_LAYOUT_RULE_FIXED_HEIGHT) {
+		rule = LCUI_LAYOUT_RULE_FIXED;
 	}
 	Widget_Reflow(w, rule);
 	Widget_EndLayoutDiff(w, &diff);
@@ -716,17 +716,9 @@ static void FlexBoxLayout_Reflow(LCUI_FlexBoxLayoutContext ctx)
 
 static void FlexBoxLayout_ReflowFreeElements(LCUI_FlexBoxLayoutContext ctx)
 {
-	LCUI_Widget w;
 	LinkedListNode *node;
-
 	for (LinkedList_Each(node, &ctx->free_elements)) {
-		w = node->data;
-		Widget_ComputeSizeStyle(w);
-		Widget_UpdateBoxSize(w);
-		Widget_UpdateBoxPosition(w);
-		Widget_AddState(w, LCUI_WSTATE_LAYOUTED);
-		w->proto->resize(w, w->box.content.width,
-				 w->box.content.height);
+		Widget_AutoReflow(node->data, LCUI_LAYOUT_RULE_FIXED);
 	}
 }
 

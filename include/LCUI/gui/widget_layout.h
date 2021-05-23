@@ -33,4 +33,6 @@
 
 LCUI_API void Widget_Reflow(LCUI_Widget w, LCUI_LayoutRule rule);
 
+LCUI_API LCUI_BOOL Widget_AutoReflow(LCUI_Widget w, LCUI_LayoutRule rule);
+
 #endif

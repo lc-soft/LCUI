@@ -433,23 +433,6 @@ LCUI_BOOL Widget_HasAutoStyle(LCUI_Widget w, int key)
 	       Widget_CheckStyleType(w, key, AUTO);
 }
 
-LCUI_SizingRule Widget_GetHeightSizingRule(LCUI_Widget w)
-{
-	if (!Widget_HasAutoStyle(w, key_height)) {
-		return LCUI_SIZING_RULE_FIXED;
-	}
-	if (!w->parent || Widget_HasAbsolutePosition(w)) {
-		return LCUI_SIZING_RULE_FIT_CONTENT;
-	}
-	if (w->parent->computed_style.display == SV_FLEX) {
-		if (w->parent->computed_style.flex.direction == SV_COLUMN) {
-			return LCUI_SIZING_RULE_NONE;
-		}
-		return LCUI_SIZING_RULE_FILL;
-	}
-	return LCUI_SIZING_RULE_FIT_CONTENT;
-}
-
 void Widget_SetText(LCUI_Widget w, const char *text)
 {
 	if (w->proto && w->proto->settext) {

@@ -36,6 +36,7 @@
 #include <LCUI/gui/metrics.h>
 #include "layout/block.h"
 #include "layout/flexbox.h"
+#include "widget_diff.h"
 
 void Widget_Reflow(LCUI_Widget w, LCUI_LayoutRule rule)
 {
@@ -58,4 +59,25 @@ void Widget_Reflow(LCUI_Widget w, LCUI_LayoutRule rule)
 	Widget_TriggerEvent(w, &ev, NULL);
 	DEBUG_MSG("id: %s, type: %s, size: (%g, %g)\n", w->id, w->type,
 		  w->width, w->height);
+}
+
+LCUI_BOOL Widget_AutoReflow(LCUI_Widget w, LCUI_LayoutRule rule)
+{
+	float content_width = w->box.padding.width;
+	float content_height = w->box.padding.height;
+	LCUI_WidgetLayoutDiffRec diff;
+
+	Widget_BeginLayoutDiff(w, &diff);
+	Widget_ComputeSizeStyle(w);
+	Widget_UpdateBoxSize(w);
+	Widget_UpdateBoxPosition(w);
+	Widget_AddState(w, LCUI_WSTATE_LAYOUTED);
+	if (content_width == w->box.padding.width &&
+	    content_height == w->box.padding.height) {
+		return FALSE;
+	}
+	Widget_Reflow(w, rule);
+	Widget_EndLayoutDiff(w, &diff);
+	w->task.states[LCUI_WTASK_REFLOW] = FALSE;
+	return TRUE;
 }

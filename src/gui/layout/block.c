@@ -235,6 +235,12 @@ static void BlockLayout_Load(LCUI_BlockLayoutContext ctx)
 			LinkedList_Append(&ctx->free_elements, child);
 			continue;
 		}
+		/*
+		 * If the width of the child widget depends on the width of
+		 * the parent widget, we need to calculate the intrinsic
+		 * maximum width of its content to calculate the appropriate
+		 * size of the widget's content area.
+		 */
 		if (child->computed_style.width_sizing !=
 			LCUI_SIZING_RULE_FIXED &&
 		    child->computed_style.width_sizing !=
@@ -324,17 +330,9 @@ static void BlockLayout_ReflowRow(LCUI_BlockLayoutContext ctx, float row_y)
 
 static void BlockLayout_ReflowFreeElements(LCUI_BlockLayoutContext ctx)
 {
-	LCUI_Widget w;
 	LinkedListNode *node;
-
 	for (LinkedList_Each(node, &ctx->free_elements)) {
-		w = node->data;
-		Widget_ComputeSizeStyle(w);
-		Widget_UpdateBoxSize(w);
-		Widget_UpdateBoxPosition(w);
-		Widget_AddState(w, LCUI_WSTATE_LAYOUTED);
-		w->proto->resize(w, w->box.content.width,
-				 w->box.content.height);
+		Widget_AutoReflow(node->data, LCUI_LAYOUT_RULE_FIXED);
 	}
 }
 
