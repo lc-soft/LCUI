@@ -16,23 +16,6 @@
 
 * add settings api ([#191](https://github.com/lc-soft/LCUI/issues/191)) ([#211](https://github.com/lc-soft/LCUI/issues/211)) ([#212](https://github.com/lc-soft/LCUI/issues/212)) ([1b8c6e6](https://github.com/lc-soft/LCUI/commit/1b8c6e6))
 
-
-
-# [2.1.0](https://github.com/lc-soft/LCUI/compare/v2.0.0...v2.1.0) (2020-07-05)
-
-
-### Bug Fixes
-
-* wasm-ld: error: duplicate symbol: self ([2b0424c](https://github.com/lc-soft/LCUI/commit/2b0424c))
-* **display:** rect_array is not freed ([224c433](https://github.com/lc-soft/LCUI/commit/224c433))
-* **gui:** invalid area are not added after the widget is destroyed ([8e1f136](https://github.com/lc-soft/LCUI/commit/8e1f136))
-* **gui:** segmention fault in TextView_SetTextW() ([a10df88](https://github.com/lc-soft/LCUI/commit/a10df88)), closes [#195](https://github.com/lc-soft/LCUI/issues/195)
-* **ime:** segmentation fault when set caret ([0b644e1](https://github.com/lc-soft/LCUI/commit/0b644e1))
-* **linux:** segmentation fault on draw window with minimal size ([#200](https://github.com/lc-soft/LCUI/issues/200)) ([#201](https://github.com/lc-soft/LCUI/issues/201)) ([fa23f89](https://github.com/lc-soft/LCUI/commit/fa23f89))
-* **mainloop:** move out paint event trigger from openmp parallel loop ([#204](https://github.com/lc-soft/LCUI/issues/204)) ([#205](https://github.com/lc-soft/LCUI/issues/205)) ([6978f46](https://github.com/lc-soft/LCUI/commit/6978f46))
-
-
-
 # [2.0.0](https://github.com/lc-soft/LCUI/compare/v1.3.0...v2.0.0) (2020-03-02)
 
 
