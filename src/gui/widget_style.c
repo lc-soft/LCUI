@@ -218,6 +218,9 @@ void Widget_ComputeWidthStyle(LCUI_Widget w)
 				    LCUI_SIZING_RULE_FIT_CONTENT;
 				break;
 			}
+			// TODO: Improved sizing rule calculation
+			// We should consider whether to use other rules when
+			// the display value is inline-block, inline-flex or flex.
 			style->width_sizing = LCUI_SIZING_RULE_FILL;
 			if (w->parent->computed_style.width_sizing ==
 			    LCUI_SIZING_RULE_FIXED) {
