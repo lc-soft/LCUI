@@ -69,7 +69,14 @@ test/test_flex_layout.html \
 test/test_widget_rect.c \
 test/test_widget_event.c \
 test/test_textview_resize.c \
-test/test_textedit.c
+test/test_textedit.c \
+test/test_pixel_manipulation.c \
+test/test_paint_background.c \
+test/test_paint_border.c \
+test/test_paint_boxshadow.c \
+test/test_mix_rect_with_opacity.c \
+test/test_fill_rect.c \
+test/test_fill_rect_with_rgba.c
 
 .PHONY: test test-with-valgrind
 
