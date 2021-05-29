@@ -31,9 +31,9 @@ jobs:
           make
 
       - name: Run tests
-        continue-on-error: true  
+        continue-on-error: true
         run: make check
-      
+
       - name: Package
         run: sh ./scripts/make-dist-deb.sh
 
@@ -92,8 +92,8 @@ jobs:
           lcpkg install
           lcpkg install --arch x64
           lcpkg install --platform uwp
-          lcpkg install --platform uwp --arch x64 
-      
+          lcpkg install --platform uwp --arch x64
+
       - name: Cache windows build tools
         uses: actions/cache@v2
         with:
@@ -108,16 +108,16 @@ jobs:
 
       - name: "Use config"
         run: copy .\include\config.win32.h.in .\include\config.h
-      
+
       - name: "Build"
         run: |
           msbuild build/windows/LCUI.sln /p:Configuration=Debug /p:Platform=x86 /verbosity:minimal 
           msbuild build/windows/LCUI.sln /p:Configuration=Debug /p:Platform=x64 /verbosity:minimal 
           msbuild build/windows/LCUI.sln /p:Configuration=Release /p:Platform=x86 /verbosity:minimal
           msbuild build/windows/LCUI.sln /p:Configuration=Release /p:Platform=x64 /verbosity:minimal
-        
+
       - name: "Run tests"
-        continue-on-error: true  
+        continue-on-error: true
         run: |
           msbuild build\windows\LCUI-Demo.sln /p:Configuration=Debug /p:Platform=x64 /verbosity:minimal
           cd test
@@ -157,7 +157,7 @@ jobs:
 
       - name: Set release version
         run: python ./.github/scripts/get_release_version.py
-      
+
       - name: Create release notes
         run: python ./.github/scripts/get_release_notes.py
 
@@ -177,4 +177,4 @@ jobs:
           tag: ${{ github.ref }}
           file: ${{ env.ARTIFACT_DIR }}/*
           overwrite: true
-          file_glob: true 
+          file_glob: true
