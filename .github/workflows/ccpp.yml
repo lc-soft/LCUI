@@ -1,31 +1,180 @@
 name: C/C++ CI
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+      - release-*
+    tags:
+      - 'v*'
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-    
+  ubuntu_build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest']
+    runs-on: ${{ matrix.os }}
+    name: "Builds binaries on ${{ matrix.os }}"
     steps:
-    - uses: actions/checkout@v1
-    - name: install tools
-      run: sudo apt install debhelper
-    - name: configure
-      run: |
-       ./autogen.sh
-       ./configure
-    - name: make
-      run: make
-    - name: make check
-      run: make check
-    - name: make dist deb
-      run: sh ./scripts/make-dist-deb.sh
-    - uses: actions/upload-artifact@v1
-      with:
-        name: liblcui2-dev_2.1.0-1_amd64.deb
-        path: build/debian/liblcui2-dev_2.1.0-1_amd64.deb
-    - uses: actions/upload-artifact@v1
-      with:
-        name: liblcui2_2.1.0-1_amd64.deb
-        path: build/debian/liblcui2_2.1.0-1_amd64.deb
+      - uses: actions/checkout@v1
+
+      - name: install tools
+        run: sudo apt install debhelper
+
+      - name: make
+        run: |
+          ./autogen.sh
+          ./configure
+          make
+
+      - name: Run tests
+        continue-on-error: true  
+        run: make check
+      
+      - name: Package
+        run: sh ./scripts/make-dist-deb.sh
+
+      - uses: actions/upload-artifact@master
+        with:
+          name: build-ubuntu
+          path: |
+            build/debian/*.deb
+
+  windows_build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['windows-2016']
+        include:
+          - os: 'windows-2016'
+            triplet: 'x64-windows'
+    runs-on: ${{ matrix.os }}
+    name: "Builds binaries on ${{ matrix.os }}"
+
+    steps:
+      - uses: actions/checkout@master
+
+      # vcpkg cache bug fix
+      # NOTE: needs further investigation
+      # https://github.com/lukka/run-vcpkg/issues/61
+      - name: "vcpkg fix"
+        run: attrib -r "c:\vcpkg\.git\*.*" /s
+      # VCPKG
+      - name: Run vcpkg
+        uses: lukka/run-vcpkg@main
+        with:
+          vcpkgDirectory: ${{ github.workspace }}/vcpkg/
+          vcpkgTriplet: ${{ matrix.triplet }}
+          vcpkgGitCommitId: 7db401cb1ef1fc559ec9f9ce814d064c328fd767
+          setupOnly: true
+          appendedCacheKey: ${{ hashFiles('lcpkg.json') }}
+          additionalCachedPaths: ./lcpkg/
+
+      - name: "Display versions"
+        run: |
+          node -v
+          npm -va
+          vcpkg version
+
+      - name: Cache lcpkg dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ github.workspace }}/vcpkg/
+          key: ${{ matrix.os }}
+
+      - name: "Install lcpkg"
+        run: |
+          npm install -g lcpkg
+          lcpkg config vcpkg.root ${{ github.workspace }}/vcpkg/
+          lcpkg install
+          lcpkg install --arch x64
+          lcpkg install --platform uwp
+          lcpkg install --platform uwp --arch x64 
+      
+      - name: Cache windows build tools
+        uses: actions/cache@v2
+        with:
+          path: ~/.windows-build-tools
+          key: ${{ matrix.os }}
+
+      - name: "Setup windows-build-tools"
+        run: npm install --global --production windows-build-tools --vs2015
+
+      - name: "Setup msbuild"
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      - name: "Use config"
+        run: copy .\include\config.win32.h.in .\include\config.h
+      
+      - name: "Build"
+        run: |
+          msbuild build/windows/LCUI.sln /p:Configuration=Debug /p:Platform=x86 /verbosity:minimal 
+          msbuild build/windows/LCUI.sln /p:Configuration=Debug /p:Platform=x64 /verbosity:minimal 
+          msbuild build/windows/LCUI.sln /p:Configuration=Release /p:Platform=x86 /verbosity:minimal
+          msbuild build/windows/LCUI.sln /p:Configuration=Release /p:Platform=x64 /verbosity:minimal
+        
+      - name: "Run tests"
+        continue-on-error: true  
+        run: |
+          msbuild build\windows\LCUI-Demo.sln /p:Configuration=Debug /p:Platform=x64 /verbosity:minimal
+          cd test
+          ..\bin\x64-windows\Debug\LCUITest.exe
+
+      - name: "Pack"
+        run: |
+          lcpkg pack
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@master
+        with:
+          name: build-windows
+          path: .\lcpkg\dist\*.zip
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    needs: [ubuntu_build, windows_build]
+    env:
+      ARTIFACT_DIR: ./release
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Download artifacts [build-ubuntu]
+        uses: actions/download-artifact@master
+        with:
+          name: build-ubuntu
+          path: ${{ env.ARTIFACT_DIR }}
+
+      - name: Download artifacts [build-windows]
+        uses: actions/download-artifact@master
+        with:
+          name: build-windows
+          path: ${{ env.ARTIFACT_DIR }}
+
+      - name: Set release version
+        run: python ./.github/scripts/get_release_version.py
+      
+      - name: Create release notes
+        run: python ./.github/scripts/get_release_notes.py
+
+      - name: Read package.json
+        id: release_notes
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: RELEASE_NOTES.md
+          trim: false
+
+      - name: Create release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          body: ${{ steps.release_notes.outputs.content }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          release_name: LCUI ${{ env.REL_VERSION }}
+          tag: ${{ github.ref }}
+          file: ${{ env.ARTIFACT_DIR }}/*
+          overwrite: true
+          file_glob: true 
