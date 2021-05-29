@@ -22,20 +22,26 @@ jobs:
       - uses: actions/checkout@v1
 
       - name: install tools
-        run: sudo apt install debhelper
+        run: sudo apt install debhelper lcov valgrind
 
       - name: make
         run: |
           ./autogen.sh
-          ./configure
+          ./configure --enable-debug --enable-code-coverage
           make
 
       - name: Run tests
-        continue-on-error: true
-        run: make check
+        run: |
+          make test
+          make test-with-valgrind
+
+      - name: Upload reports to Codecov
+        run: bash <(curl -s https://codecov.io/bash);
 
       - name: Package
-        run: sh ./scripts/make-dist-deb.sh
+        run: |
+          make distcheck
+          sh ./scripts/make-dist-deb.sh
 
       - uses: actions/upload-artifact@master
         with:
