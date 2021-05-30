@@ -100,7 +100,7 @@ int BuildContentViewFromXML(void)
 void test_scrollbar(void)
 {
 	float left, top;
-	LCUI_SysEventRec e;
+	LCUI_SysEventRec e = { 0 };
 	LCUI_Widget content;
 
 	LCUI_Init();

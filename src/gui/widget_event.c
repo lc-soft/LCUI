@@ -876,7 +876,7 @@ LCUI_Widget LCUIWidget_GetFocus(void)
 int LCUIWidget_SetFocus(LCUI_Widget widget)
 {
 	LCUI_Widget w;
-	LCUI_WidgetEventRec ev;
+	LCUI_WidgetEventRec ev = { 0 };
 
 	for (w = widget; w; w = w->parent) {
 		if (Widget_Focusable(w)) {

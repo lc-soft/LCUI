@@ -238,7 +238,9 @@ static void X11Surface_ClearTasks(LCUI_Surface surface)
 static void OnDestroySurface(void *data)
 {
 	LCUI_Surface s = data;
+
 	X11Surface_ClearTasks(s);
+	LinkedList_Clear(&s->rects, free);
 	if (s->ximage) {
 		XDestroyImage(s->ximage);
 	}
