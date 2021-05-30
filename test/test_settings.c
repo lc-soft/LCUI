@@ -21,7 +21,7 @@ static void check_settings_frame_rate_cap(void *arg)
 
 	sprintf(str, "should work when frame cap is %d (actual %d)", fps_limit,
 		fps);
-	it_b(str, fps <= fps_limit && fps > fps_limit - 10, TRUE);
+	it_b(str, fps <= fps_limit && fps > fps_limit / 2, TRUE);
 	LCUI_Quit();
 }
 
