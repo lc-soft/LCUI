@@ -1,6 +1,6 @@
 {
   "name": "lcui",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "A small C library for building user interfaces with C, XML and CSS.",
   "main": "index.js",
   "directories": {
@@ -35,10 +35,9 @@
   },
   "homepage": "https://github.com/lc-soft/LCUI#readme",
   "devDependencies": {
-    "@commitlint/cli": "^8.2.0",
-    "@commitlint/config-conventional": "^8.2.0",
-    "@commitlint/travis-cli": "^8.2.0",
-    "commitlint": "^8.2.0",
+    "@commitlint/cli": "^8.3.5",
+    "@commitlint/config-conventional": "^8.3.4",
+    "commitlint": "^8.3.5",
     "husky": "^3.1.0"
   },
   "dependencies": {}

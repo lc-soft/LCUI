@@ -1,3 +1,24 @@
+# [2.2.0](https://github.com/lc-soft/LCUI/compare/v2.1.0...v2.2.0) (2021-05-30)
+
+
+### Bug Fixes
+
+* conditional jump or move depends on uninitialised value(s) ([7174868](https://github.com/lc-soft/LCUI/commit/717486861541b93e5ab95a246dfce90650d4273c))
+* **gui:** the horizontal scroll bar does not work ([#219](https://github.com/lc-soft/LCUI/issues/219)) ([31dee24](https://github.com/lc-soft/LCUI/commit/31dee2494d7e5c88af02052084f962cf71797141))
+* **gui:** the size of the absolutely positioned widget is incorrect ([35bfa3f](https://github.com/lc-soft/LCUI/commit/35bfa3f0e7d92c53f95fa9825217d115df8c74c0))
+* **gui:** the style of hidden widgets will not be updated ([f0a6e30](https://github.com/lc-soft/LCUI/commit/f0a6e30a6d85d466cbfffc5fd0c2e91aacb574c9))
+* **image:** incorrect image suffix detection ([46095e7](https://github.com/lc-soft/LCUI/commit/46095e70e39e5f1440fb1b5b9effaa35b76c6bbe))
+* **util:** ‘NULL’ is undeclared when the function of dict is inlined ([c9c9901](https://github.com/lc-soft/LCUI/commit/c9c990167d44da9ca54fd3fed5753567aade1825))
+* remove the incorrect `CSSParser_GetRuleParser()` macro ([3bd6b71](https://github.com/lc-soft/LCUI/commit/3bd6b715729255607760abadbf72c22d8c2681c8))
+* variable naming conflict in LCUI_PostSimpleTask() ([f0382d4](https://github.com/lc-soft/LCUI/commit/f0382d435a5b0d19a14165101605e7f021191e8a))
+
+
+### Features
+
+* **font:** add operation functions for TextStyle ([c0ccdf8](https://github.com/lc-soft/LCUI/commit/c0ccdf81e5404fc21cd804ec95e0a030800a75fc))
+
+
+
 # [2.1.0](https://github.com/lc-soft/LCUI/compare/v2.0.0...v2.1.0) (2020-07-05)
 
 
