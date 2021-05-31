@@ -28,14 +28,10 @@
     - [Related projects](#related-projects)
     - [Design references](#design-references)
 - [Quick start](#quick-start)
-    - [Windows](#windows)
-        - [Create new LCUI project](#create-new-lcui-project)
-        - [Install LCUI for existing project](#install-lcui-for-existing-project)
-        - [Manual compilation and installation](#manual-compilation-and-installation)
-    - [Ubuntu](#ubuntu)
-- [Roadmap](#roadmap)
-    - [Primary Roadmap](#primary-roadmap)
-    - [Secondary Roadmap](#secondary-roadmap)
+    - [Use LCUI CLI](#use-lcui-cli)
+    - [Manual compilation and installation](#manual-compilation-and-installation)
+        - [Windows](#windows)
+        - [Ubuntu](#ubuntu)
 - [Contribution](#contribution)
 - [Documentation](#documentation)
 - [FAQ](#faq)
@@ -111,11 +107,9 @@ Want to know what LCUI can do? You can view the following projects:
 
 ## Quick start
 
-### Windows
+### Use LCUI CLI
 
-#### Create new LCUI project
-
-Quickly create an LCUI project using [lcui-cli](https://github.com/lc-ui/lcui-cli):
+LCUI CLI is a command line tool, you need to install [Node.js](https://nodejs.org/) before using it, and then run the following command to quickly experience it:
 
 ```bash
 # Install lcui-cli and lcpkg
@@ -127,30 +121,19 @@ lcui create myapp
 # Go into project directory
 cd myapp
 
-# Install dependencies
-lcpkg install
+# set up the development environment for this project
+lcui setup
 
-# Run it
-lcpkg run start
+# Build project
+lcui build
+
+# run project
+lcui run
 ```
 
-#### Install LCUI for existing project
+### Manual compilation and installation
 
-Use [lcpkg](https://github.com/lc-soft/lcpkg) to quick install LCUI in your project directory:
-
-```bash
-# Initialize the lcpkg configuration file to tell lcpkg about your project
-lcpkg init
-
-# Download and install the compiled LCUI library from GitHub
-lcpkg install github.com/lc-soft/LCUI
-```
-
-After successful installation, follow the help documentation output by lcpkg to configure your project's build configuration.
-
-#### Manual compilation and installation
-
-If you want to manually compile LCUI from source code:
+#### Windows
 
 1. Open CMD window, and run following command in the LCUI source directory to install the dependency libraries:
     ```bash
@@ -164,7 +147,7 @@ If you want to manually compile LCUI from source code:
 1. Rename `config.win32.h.in` in the include directory to `config.h`.
 1. Open the `build/windows/LCUI.sln` file with [Visual Studio](https://visualstudio.microsoft.com/), and then build LCUI.
 
-### Ubuntu
+#### Ubuntu
 
 ```bash
 # Install the dependencies
@@ -196,25 +179,6 @@ cd test
 ```
 
 > **Note:** If you want to customize the compiler, compile flags, install location, and other configuration items, read the [INSTALL](INSTALL) file.
-
-## Roadmap
-
-The roadmap for this project is divided into primary and secondary roadmaps, with the primary roadmap developed by the project maintainer and the secondary roadmap developed by the open source community contributors and developers like you.
-
-### Primary Roadmap
-
-- Make project code more standardized, readable, and maintainable
-- Improve relevant development tools and sample applications to improve the development efficiency and make it easier to use
-
-### Secondary Roadmap
-
-- Explore new GUI development methods to make LCUI unique
-- [Accessbility](https://developer.mozilla.org/en-US/docs/Learn/Accessibility/What_is_accessibility) support
-- Research [SDL](https://github.com/SDL-mirror/SDL), [imgui](https://github.com/ocornut/imgui) and other similar open source projects, and try to fill in what LCUI is missing
-- Refactor the existing graphics processing interface to make it easy to integrate with mainstream 2D graphics libraries and bring better graphics rendering performance to LCUI
-- Add driver support for Mac OS, Android and iOS
-- Add more mouse cursor styles
-- Add clipboard support
 
 ## Contribution
 
