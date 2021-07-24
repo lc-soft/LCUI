@@ -53,7 +53,7 @@
 		#define LCUI_InitKeyboardDriver LCUI_InitWinKeyboard
 		#define LCUI_FreeKeyboardDriver LCUI_FreeWinKeyboard
 	#endif
-	#if defined(WINAPI_PARTITION_APP)
+	#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
 		#define LCUI_APP_H <LCUI/platform/windows/uwp.h>
 	#else
 		#define LCUI_EVENTS_H <LCUI/platform/windows/windows_events.h>

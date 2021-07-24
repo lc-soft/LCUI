@@ -108,7 +108,7 @@ int LCUIFont_InitInCoreFont(LCUI_FontEngine *engine);
 
 int LCUIFont_ExitInCoreFont(void);
 
-#ifdef LCUI_FONT_ENGINE_FREETYPE
+#ifdef USE_FREETYPE
 
 int LCUIFont_InitFreeType(LCUI_FontEngine *engine);
 
