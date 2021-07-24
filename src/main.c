@@ -601,7 +601,7 @@ static void LCUI_ShowCopyrightText(void)
 		   "Build at "__DATE__
 		   " - "__TIME__
 		   "\n"
-		   "Copyright (C) 2012-2019 Liu Chao <root@lc-soft.io>.\n"
+		   "Copyright (C) 2012-2021 Liu Chao <root@lc-soft.io>.\n"
 		   "This is open source software, licensed under MIT. \n"
 		   "See source distribution for detailed copyright notices.\n"
 		   "To learn more, visit http://www.lcui.org.\n\n");

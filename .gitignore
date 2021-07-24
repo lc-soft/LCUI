@@ -34,6 +34,7 @@ build/windows/*/*.png
 *~
 *.intermediate
 .vscode
+.xmake
 dist
 node_modules
 Debug
@@ -58,6 +59,7 @@ stamp-h1
 Thumbs.db
 m4/
 bin/
+build/packages
 build/debian
 build/*/*.sdf
 build/*/*.opensdf
@@ -66,15 +68,7 @@ vendor/include
 vendor/lib
 build/*.png
 build/*.jpg
-include/config.h
-test/*
-!test/*.c
-!test/*.h
-!test/*.css
-!test/*.xml
-!test/*.html
-!test/*.jpg
-!test/*.bmp
-!test/*.png
+config.h
+test/build
 lcpkg/*
 !lcpkg/ports
