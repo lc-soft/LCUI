@@ -5,6 +5,7 @@ add_includedirs("include")
 add_rpathdirs("@loader_path/lib", "@loader_path")
 add_defines("LCUI_EXPORTS", "_UNICODE")
 includes("lib/**/xmake.lua")
+includes("test/xmake.lua")
 set_warnings("all")
 
 if is_plat("windows") then

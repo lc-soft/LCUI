@@ -32,6 +32,8 @@
 #include <LCUI_Build.h>
 #define LCUI_SURFACE_C
 #ifdef LCUI_BUILD_IN_WIN32
+#pragma comment(lib, "User32")
+#pragma comment(lib, "Gdi32")
 #include <LCUI/LCUI.h>
 #include <LCUI/display.h>
 #include <LCUI/painter.h>

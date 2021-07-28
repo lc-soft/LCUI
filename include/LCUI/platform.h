@@ -32,7 +32,8 @@
 #define LCUI_PLATFORM_H
 
 #ifdef _WIN32
-	#ifdef WINAPI_FAMILY_APP
+	#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+		#define LCUI_APP_H <LCUI/platform/windows/uwp.h>
 		#define LCUI_CreateAppDriver() NULL
 		#define LCUI_DestroyAppDriver(X) NULL
 		#define LCUI_PreInitApp() NULL
@@ -43,6 +44,10 @@
 		#define LCUI_InitKeyboardDriver()
 		#define LCUI_FreeKeyboardDriver()
 	#else
+		#define LCUI_EVENTS_H <LCUI/platform/windows/windows_events.h>
+		#define LCUI_MOUSE_H <LCUI/platform/windows/windows_mouse.h>
+		#define LCUI_KEYBOARD_H <LCUI/platform/windows/windows_keyboard.h>
+		#define LCUI_DISPLAY_H <LCUI/platform/windows/windows_display.h>
 		#define LCUI_CreateAppDriver LCUI_CreateWinAppDriver
 		#define LCUI_DestroyAppDriver LCUI_DestroyWinAppDriver
 		#define LCUI_PreInitApp LCUI_PreInitWinApp
@@ -52,14 +57,6 @@
 		#define LCUI_FreeMouseDriver LCUI_FreeWinMouse
 		#define LCUI_InitKeyboardDriver LCUI_InitWinKeyboard
 		#define LCUI_FreeKeyboardDriver LCUI_FreeWinKeyboard
-	#endif
-	#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
-		#define LCUI_APP_H <LCUI/platform/windows/uwp.h>
-	#else
-		#define LCUI_EVENTS_H <LCUI/platform/windows/windows_events.h>
-		#define LCUI_MOUSE_H <LCUI/platform/windows/windows_mouse.h>
-		#define LCUI_KEYBOARD_H <LCUI/platform/windows/windows_keyboard.h>
-		#define LCUI_DISPLAY_H <LCUI/platform/windows/windows_display.h>
 	#endif
 #else
 	#undef linux
