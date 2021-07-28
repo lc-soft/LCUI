@@ -1,9 +1,13 @@
-add_repositories("local-repo ../build")
-add_requires("lcui")
 includes("lib/test/xmake.lua")
-set_warnings("all")
 
 target("run_tests")
+    set_default(false)
+    set_rundir("$(projectdir)/test")
     add_files("run_tests.c", "cases/*.c")
-    add_packages("lcui")
-    add_deps("test")
+    add_deps("LCUI", "test")
+
+target("helloworld")
+    set_default(false)
+    set_rundir("$(projectdir)/test")
+    add_files("helloworld.c")
+    add_deps("LCUI")

@@ -14,7 +14,7 @@ void test_charset(void)
 	len = LCUI_DecodeUTF8String(wcs, "hello", 64);
 	it_b("test decode ascii string", len == 5 && wcscmp(wcs, L"hello") == 0,
 	     TRUE);
-#ifdef WIN32
+#ifdef _WIN32
 	len = LCUI_DecodeString(wcs, "简体中文", 64, ENCODING_ANSI);
 	it_b("test decode ansi string",
 	     len == 4 && wcscmp(wcs, L"简体中文") == 0, TRUE);
