@@ -7,6 +7,12 @@ option("with-libx11")
     set_configvar("USE_LIBX11", 1)
 option_end()
 
+option("enable-openmp")
+    set_default(true)
+    set_showmenu(true)
+    set_configvar("ENABLE_OPENMP", 1)
+option_end()
+
 option("uwp", {showmenu = true, default = false})
 
 if has_config("with-libx11") then
@@ -51,6 +57,7 @@ target("lcui-platform")
     add_rules("c.openmp", "c++.openmp")
     set_configdir("src")
     add_configfiles("src/config.h.in")
+    add_packages("libomp")
     add_files("src/*.c")
     if is_plat("windows") then
         add_options("uwp")
