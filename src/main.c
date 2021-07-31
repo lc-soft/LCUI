@@ -701,7 +701,6 @@ int LCUI_Destroy(void)
 	LCUI_FreeFontLibrary();
 	LCUI_FreeTimer();
 	LCUI_FreeEvent();
-	LCUI_FreeMetrics();
 	return System.exit_code;
 }
 

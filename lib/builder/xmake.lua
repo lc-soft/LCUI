@@ -10,7 +10,7 @@ if has_config("with-libxml2") then
     add_requires("libxml2", {optional = true})
 end
 
-target("builder")
+target("lcui-builder")
     set_kind("static")
     add_files("src/*.c")
     set_configdir("src")

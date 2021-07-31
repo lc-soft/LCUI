@@ -1,6 +1,6 @@
 includes("lib/test/xmake.lua")
 set_rundir("$(projectdir)/test")
-add_deps("LCUI")
+add_deps("lcui")
 
 target("run_tests")
     set_default(false)

@@ -1,5 +1,5 @@
 add_rules("mode.debug", "mode.release")
 
-target("util")
-    set_kind("static")
+target("lcui-util")
+    set_kind("shared")
     add_files("src/*.c")
