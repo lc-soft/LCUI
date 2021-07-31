@@ -27,12 +27,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI.h>
 #include <LCUI/thread.h>
-
-#ifdef LCUI_THREAD_WIN32
 #include <process.h>
 #include <windows.h>
 
@@ -196,5 +192,3 @@ int LCUIThread_Join(LCUI_Thread thread, void **retval)
 	}
 	return -1;
 }
-
-#endif

@@ -1,5 +1,3 @@
-add_rules("mode.debug", "mode.release")
-
 option("with-libxml2")
     set_default(true)
     set_showmenu(true)
