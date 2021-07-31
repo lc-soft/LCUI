@@ -1,4 +1,3 @@
-add_rules("mode.debug", "mode.release")
 add_requires("libomp", {optional = true})
 add_includedirs("src")
 
@@ -63,3 +62,4 @@ target("lcui-platform")
     else
         add_deps("lcui-linux")
     end
+    add_deps("lcui-thread")

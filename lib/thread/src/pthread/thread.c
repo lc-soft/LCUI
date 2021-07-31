@@ -27,14 +27,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
 #include <stdlib.h>
 #include <errno.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI.h>
 #include <LCUI/thread.h>
-
-#ifdef LCUI_THREAD_PTHREAD
 
 typedef struct LCUI_ThreadContextRec {
 	void (*func)(void *);
@@ -143,4 +139,3 @@ int LCUIThread_Join(LCUI_Thread thread, void **retval)
 {
 	return pthread_join(thread, retval);
 }
-#endif

@@ -29,8 +29,7 @@
  */
 
 #include <stdlib.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI.h>
 
 LCUI_Rect Rect(int x, int y, int w, int h)
 {

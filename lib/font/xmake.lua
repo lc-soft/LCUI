@@ -1,5 +1,3 @@
-add_rules("mode.debug", "mode.release")
-
 option("with-freetype")
     set_showmenu(true)
     set_default(true)
