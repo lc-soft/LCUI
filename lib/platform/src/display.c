@@ -29,7 +29,7 @@
 
 #include "config.h"
 
-#ifdef USE_OPENMP
+#ifdef ENABLE_OPENMP
 #include <omp.h>
 #endif
 #include <time.h>
@@ -331,7 +331,7 @@ static size_t LCUIDisplay_RenderSurface(SurfaceRecord record)
 	}
 	// Use OPENMP if the render area is larger than two render layers
 	if (dirty >= layer_width * layer_height * 2) {
-#ifdef USE_OPENMP
+#ifdef ENABLE_OPENMP
 #pragma omp parallel for \
 	default(none) \
 	shared(display, rects, rect_array) \
