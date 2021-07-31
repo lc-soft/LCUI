@@ -162,12 +162,6 @@ LCUI_API void CSSStyleParser_SetCSSProperty(LCUI_CSSParserStyleContext ctx,
 
 LCUI_API LCUI_CSSPropertyParser LCUI_GetCSSPropertyParser(const char *name);
 
-/** 从文件中载入CSS样式数据，并导入至样式库中 */
-LCUI_API int LCUI_LoadCSSFile(const char *filepath);
-
-/** 从字符串中载入CSS样式数据，并导入至样式库中 */
-LCUI_API size_t LCUI_LoadCSSString(const char *str, const char *space);
-
 LCUI_API LCUI_CSSParserContext CSSParser_Begin(size_t buffer_size,
 					       const char *space);
 

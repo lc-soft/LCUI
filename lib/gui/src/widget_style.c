@@ -32,11 +32,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI.h>
+#include <LCUI/font.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/css_fontstyle.h>
+#include <LCUI/gui/widget/textview.h>
 #include "widget_util.h"
 
 #define ARRAY_LEN(ARR) sizeof(ARR) / sizeof(ARR[0])
@@ -706,6 +707,67 @@ void Widget_DestroyStyleSheets(LCUI_Widget w)
 		StyleList_Delete(w->custom_style);
 	}
 	StyleSheet_Delete(w->style);
+}
+
+/** 载入CSS代码块，用于实现CSS代码的分块载入 */
+static size_t LCUI_LoadCSSBlock(LCUI_CSSParserContext ctx, const char *str)
+{
+	size_t size = 0;
+
+	ctx->cur = str;
+	while (*ctx->cur && size < ctx->buffer_size) {
+		ctx->parsers[ctx->target].parse(ctx);
+		++ctx->cur;
+		++size;
+	}
+	return size;
+}
+
+static void OnParsedFontFace(LCUI_CSSFontFace face)
+{
+	LCUIFont_LoadFile(face->src);
+	LCUIWidget_RefreshTextView();
+}
+
+int LCUI_LoadCSSFile(const char *filepath)
+{
+	size_t n;
+	FILE *fp;
+	char buff[512];
+	LCUI_CSSParserContext ctx;
+
+	fp = fopen(filepath, "r");
+	if (!fp) {
+		return -1;
+	}
+	ctx = CSSParser_Begin(512, filepath);
+	CSSParser_OnFontFaceRule(ctx, OnParsedFontFace);
+	n = fread(buff, 1, 511, fp);
+	while (n > 0) {
+		buff[n] = 0;
+		LCUI_LoadCSSBlock(ctx, buff);
+		n = fread(buff, 1, 511, fp);
+	}
+	CSSParser_End(ctx);
+	fclose(fp);
+	return 0;
+}
+
+size_t LCUI_LoadCSSString(const char *str, const char *space)
+{
+	size_t len = 1;
+	const char *cur;
+	LCUI_CSSParserContext ctx;
+
+	DEBUG_MSG("parse begin\n");
+	ctx = CSSParser_Begin(512, space);
+	CSSParser_OnFontFaceRule(ctx, OnParsedFontFace);
+	for (cur = str; len > 0; cur += len) {
+		len = LCUI_LoadCSSBlock(ctx, cur);
+	}
+	CSSParser_End(ctx);
+	DEBUG_MSG("parse end\n");
+	return 0;
 }
 
 void LCUIWidget_InitStyle(void)
