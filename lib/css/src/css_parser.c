@@ -32,14 +32,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
-#include <LCUI/thread.h>
-#include <LCUI/gui/widget.h>
-#include <LCUI/gui/widget/textview.h>
+#include <LCUI.h>
 #include <LCUI/gui/css_library.h>
 #include <LCUI/gui/css_parser.h>
-#include <LCUI/font.h>
 
 #define SPLIT_NUMBER 1
 #define SPLIT_COLOR (1 << 1)
@@ -1076,26 +1071,6 @@ void CSSParser_EndParseRuleData(LCUI_CSSParserContext ctx)
 	ctx->target = CSS_TARGET_NONE;
 }
 
-static void LoadFontFile(void *arg1, void *arg2)
-{
-	LCUIFont_LoadFile(arg1);
-	LCUIWidget_RefreshTextView();
-}
-
-static void OnParsedFontFace(LCUI_CSSFontFace face)
-{
-	static int worker_id = -1;
-	LCUI_TaskRec task = { 0 };
-	task.func = LoadFontFile;
-	task.arg[0] = strdup2(face->src);
-	task.destroy_arg[0] = free;
-	if (worker_id > -1) {
-		LCUI_PostAsyncTaskTo(&task, worker_id);
-	} else {
-		worker_id = LCUI_PostAsyncTask(&task);
-	}
-}
-
 static char *getdirname(const char *path)
 {
 	char *dirname;
@@ -1183,7 +1158,6 @@ LCUI_CSSParserContext CSSParser_Begin(size_t buffer_size, const char *space)
 	LinkedList_Init(&ctx->style.selectors);
 	memset(&ctx->rule, 0, sizeof(ctx->rule));
 	CSSParser_InitFontFaceRuleParser(ctx);
-	CSSRuleParser_OnFontFace(ctx, OnParsedFontFace);
 	return ctx;
 }
 
@@ -1201,62 +1175,9 @@ void CSSParser_End(LCUI_CSSParserContext ctx)
 	free(ctx);
 }
 
-/** 载入CSS代码块，用于实现CSS代码的分块载入 */
-static size_t LCUI_LoadCSSBlock(LCUI_CSSParserContext ctx, const char *str)
-{
-	size_t size = 0;
-
-	ctx->cur = str;
-	while (*ctx->cur && size < ctx->buffer_size) {
-		ctx->parsers[ctx->target].parse(ctx);
-		++ctx->cur;
-		++size;
-	}
-	return size;
-}
-
 LCUI_CSSPropertyParser LCUI_GetCSSPropertyParser(const char *name)
 {
 	return Dict_FetchValue(self.parsers, name);
-}
-
-int LCUI_LoadCSSFile(const char *filepath)
-{
-	size_t n;
-	FILE *fp;
-	char buff[512];
-	LCUI_CSSParserContext ctx;
-
-	fp = fopen(filepath, "r");
-	if (!fp) {
-		return -1;
-	}
-	ctx = CSSParser_Begin(512, filepath);
-	n = fread(buff, 1, 511, fp);
-	while (n > 0) {
-		buff[n] = 0;
-		LCUI_LoadCSSBlock(ctx, buff);
-		n = fread(buff, 1, 511, fp);
-	}
-	CSSParser_End(ctx);
-	fclose(fp);
-	return 0;
-}
-
-size_t LCUI_LoadCSSString(const char *str, const char *space)
-{
-	size_t len = 1;
-	const char *cur;
-	LCUI_CSSParserContext ctx;
-
-	DEBUG_MSG("parse begin\n");
-	ctx = CSSParser_Begin(512, space);
-	for (cur = str; len > 0; cur += len) {
-		len = LCUI_LoadCSSBlock(ctx, cur);
-	}
-	CSSParser_End(ctx);
-	DEBUG_MSG("parse end\n");
-	return 0;
 }
 
 int LCUI_AddCSSPropertyParser(LCUI_CSSPropertyParser sp)

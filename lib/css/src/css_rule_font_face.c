@@ -272,7 +272,7 @@ int FontFaceParser_Parse(LCUI_CSSParserContext ctx)
 	return -1;
 }
 
-void CSSRuleParser_OnFontFace(LCUI_CSSParserContext ctx,
+void CSSParser_OnFontFaceRule(LCUI_CSSParserContext ctx,
 			      void(*func)(const LCUI_CSSFontFace))
 {
 	FontFaceParserContext data;

@@ -35,7 +35,6 @@
 #include <LCUI_Build.h>
 #include <LCUI/types.h>
 #include <LCUI/util.h>
-#include <LCUI/thread.h>
 #include <LCUI/gui/css_library.h>
 #include <LCUI/gui/css_parser.h>
 
@@ -100,7 +99,6 @@ typedef struct StyleLinkRec_ {
 
 static struct {
 	LCUI_BOOL active;
-	LCUI_Mutex mutex;		/**< 互斥锁 */
 	LinkedList groups;		/**< 样式组列表 */
 	Dict *cache;			/**< 样式表缓存，以选择器的 hash 值索引 */
 	Dict *names;			/**< 样式属性名称表，以值的名称索引 */
@@ -250,30 +248,24 @@ int LCUI_SetStyleName(int key, const char *name)
 {
 	char *newname;
 	DictEntry *entry;
-	LCUIMutex_Lock(&library.mutex);
 	entry = Dict_Find(library.names, &key);
 	if (entry) {
 		newname = strdup2(name);
 		free(entry->v.val);
 		entry->v.val = newname;
-		LCUIMutex_Unlock(&library.mutex);
 		return 0;
 	}
-	LCUIMutex_Unlock(&library.mutex);
 	return -1;
 }
 
 int LCUI_AddCSSPropertyName(const char *name)
 {
 	int key;
-	LCUIMutex_Lock(&library.mutex);
 	key = library.count++;
 	if (LCUI_DirectAddStyleName(key, name) != 0) {
 		--library.count;
-		LCUIMutex_Unlock(&library.mutex);
 		return -1;
 	}
-	LCUIMutex_Unlock(&library.mutex);
 	return key;
 }
 
@@ -1304,13 +1296,11 @@ int LCUI_PutStyleSheet(LCUI_Selector selector, LCUI_StyleSheet in_ss,
 		       const char *space)
 {
 	LCUI_StyleList list;
-	LCUIMutex_Lock(&library.mutex);
 	Dict_Empty(library.cache);
 	list = LCUI_SelectStyleList(selector, space);
 	if (list) {
 		StyleList_Merge(list, in_ss);
 	}
-	LCUIMutex_Unlock(&library.mutex);
 	return 0;
 }
 
@@ -1760,7 +1750,6 @@ void LCUI_InitCSSLibrary(void)
 	InitStylesheetCache();
 	InitStyleNameLibrary();
 	InitStyleValueLibrary();
-	LCUIMutex_Init(&library.mutex);
 	LinkedList_Init(&library.groups);
 	skn_end = style_name_map + LEN(style_name_map);
 	for (skn = style_name_map; skn < skn_end; ++skn) {
@@ -1780,7 +1769,6 @@ void LCUI_FreeCSSLibrary(void)
 	DestroyStylesheetCache();
 	DestroyStyleNameLibrary();
 	DestroyStyleValueLibrary();
-	LCUIMutex_Destroy(&library.mutex);
 	LinkedList_Clear(&library.groups, (FuncPtr)DeleteStyleGroup);
 	strpool_destroy(library.strpool);
 }

@@ -31,6 +31,12 @@
 #ifndef LCUI_WIDGET_STYLE_LIBRARY_H
 #define LCUI_WIDGET_STYLE_LIBRARY_H
 
+/** 从文件中载入CSS样式数据，并导入至样式库中 */
+LCUI_API int LCUI_LoadCSSFile(const char *filepath);
+
+/** 从字符串中载入CSS样式数据，并导入至样式库中 */
+LCUI_API size_t LCUI_LoadCSSString(const char *str, const char *space);
+
 /** 初始化 */
 void LCUIWidget_InitStyle(void);
 
