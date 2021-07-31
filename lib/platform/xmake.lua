@@ -14,7 +14,7 @@ if has_config("with-libx11") then
     add_requires("libx11", {optional = true})
 end
 
-target("uwp")
+target("lcui-uwp")
     if is_plat("windows") and has_config("uwp") then
         set_default(true)
     else
@@ -28,7 +28,7 @@ target("uwp")
     set_pcxxheader("src/uwp/pch.h")
     add_files("src/uwp/**.cpp")
 
-target("windows")
+target("lcui-windows")
     if is_plat("windows") and not has_config("uwp") then
         set_default(true)
     else
@@ -38,7 +38,7 @@ target("windows")
     add_files("src/windows/*.c")
     add_links("Shell32")
 
-target("linux")
+target("lcui-linux")
     if is_plat("linux") then
         set_default(true)
     else
@@ -47,7 +47,7 @@ target("linux")
     set_kind("static")
     add_files("src/linux/*.c")
 
-target("platform")
+target("lcui-platform")
     set_kind("static")
     add_rules("c.openmp", "c++.openmp")
     set_configdir("src")
@@ -56,10 +56,10 @@ target("platform")
     if is_plat("windows") then
         add_options("uwp")
         if has_config("uwp") then
-            add_deps("uwp")
+            add_deps("lcui-uwp")
         else
-            add_deps("windows")
+            add_deps("lcui-windows")
         end
     else
-        add_deps("linux")
+        add_deps("lcui-linux")
     end

@@ -145,11 +145,6 @@ void LCUI_InitMetrics(void)
 	LCUIMetrics_SetDpi(96.0f);
 }
 
-void LCUI_FreeMetrics(void)
-{
-
-}
-
 const LCUI_MetricsRec *LCUI_GetMetrics(void)
 {
 	return &metrics;
