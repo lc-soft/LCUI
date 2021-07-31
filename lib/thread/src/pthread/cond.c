@@ -27,13 +27,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include <LCUI_Build.h>
-
-#ifdef LCUI_THREAD_PTHREAD
 #include <errno.h>
 #include <sys/time.h>
-#include <LCUI/LCUI.h>
+#include <LCUI.h>
 #include <LCUI/thread.h>
 
 /** 初始化一个条件变量 */
@@ -92,5 +88,3 @@ int LCUICond_Broadcast(LCUI_Cond *cond)
 {
 	return pthread_cond_broadcast(cond);
 }
-
-#endif

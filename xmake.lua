@@ -1,4 +1,4 @@
-set_project("LCUI")
+set_project("lcui")
 set_version("2.2.1")
 add_rules("mode.debug", "mode.release", "c++.openmp")
 add_includedirs("include")
@@ -31,16 +31,16 @@ target("lcui")
     add_headerfiles("include/LCUI_Build.h")
     add_headerfiles("include/(LCUI/**.h)")
     add_deps(
-        "builder",
-        "css",
-        "font",
-        "gui",
-        "image",
-        "paint",
-        "platform",
-        "text",
-        "thread",
-        "timer",
-        "util",
-        "worker"
+        "lcui-util",
+        "lcui-thread",
+        "lcui-css",
+        "lcui-font",
+        "lcui-paint",
+        "lcui-image",
+        "lcui-gui",
+        "lcui-platform",
+        "lcui-text",
+        "lcui-builder",
+        "lcui-timer",
+        "lcui-worker"
     )

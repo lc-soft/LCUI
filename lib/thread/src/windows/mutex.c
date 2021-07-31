@@ -27,12 +27,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI.h>
 #include <LCUI/thread.h>
-
-#ifdef LCUI_THREAD_WIN32
 
 int LCUIMutex_Init(LCUI_Mutex *mutex)
 {
@@ -77,4 +73,3 @@ int LCUIMutex_Unlock(LCUI_Mutex *mutex)
 	}
 	return 0;
 }
-#endif
