@@ -83,8 +83,6 @@ LCUI_API void LCUI_InitMetrics(void);
 
 LCUI_API const LCUI_MetricsRec *LCUI_GetMetrics(void);
 
-void LCUI_FreeMetrics(void);
-
 LCUI_END_HEADER
 
 #endif

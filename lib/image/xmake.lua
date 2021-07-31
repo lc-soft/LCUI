@@ -20,10 +20,11 @@ if has_config("with-libjpeg") then
     add_requires("libjpeg", {optional = true})
 end
 
-target("image")
-    set_kind("static")
+target("lcui-image")
+    set_kind("shared")
     add_files("src/*.c")
     set_configdir("src")
     add_configfiles("src/config.h.in")
     add_options("with-libpng", "with-libjpeg")
     add_packages("libjpeg", "libpng")
+    add_deps("lcui-util", "lcui-paint")

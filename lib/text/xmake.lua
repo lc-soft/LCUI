@@ -1,5 +1,6 @@
 add_rules("mode.debug", "mode.release")
 
-target("text")
-    set_kind("static")
+target("lcui-text")
+    set_kind("shared")
     add_files("src/*.c")
+    add_deps("lcui-util", "lcui-font", "lcui-paint")
