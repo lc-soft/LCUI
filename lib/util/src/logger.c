@@ -31,7 +31,6 @@
 #include <stdarg.h>
 #include <wchar.h>
 #include <LCUI_Build.h>
-#include <LCUI/thread.h>
 #include <LCUI/util/logger.h>
 
 #define BUFFER_SIZE 2048
@@ -43,7 +42,6 @@ static struct Logger {
 	void(*handler)(const char*);
 	void(*handlerw)(const wchar_t*);
 	LoggerLevel level;
-	LCUI_Mutex mutex;
 } logger = { 0 };
 
 void Logger_SetLevel(LoggerLevel level)
@@ -60,11 +58,9 @@ int Logger_Log(LoggerLevel level, const char* fmt, ...)
 		return 0;
 	}
 	if (!logger.inited) {
-		LCUIMutex_Init(&logger.mutex);
 		logger.inited = 1;
 	}
 	va_start(args, fmt);
-	LCUIMutex_Lock(&logger.mutex);
 	if (logger.handler) {
 		len = vsnprintf(logger.buffer, BUFFER_SIZE, fmt, args);
 		logger.buffer[BUFFER_SIZE - 1] = 0;
@@ -72,7 +68,6 @@ int Logger_Log(LoggerLevel level, const char* fmt, ...)
 	} else {
 		len = vprintf(fmt, args);
 	}
-	LCUIMutex_Unlock(&logger.mutex);
 	va_end(args);
 	return len;
 }
@@ -86,11 +81,9 @@ int Logger_LogW(LoggerLevel level, const wchar_t* fmt, ...)
 		return 0;
 	}
 	if (!logger.inited) {
-		LCUIMutex_Init(&logger.mutex);
 		logger.inited = 1;
 	}
 	va_start(args, fmt);
-	LCUIMutex_Lock(&logger.mutex);
 	if (logger.handlerw) {
 		len = vswprintf(logger.bufferw, BUFFER_SIZE, fmt, args);
 		logger.bufferw[BUFFER_SIZE - 1] = 0;
@@ -98,7 +91,6 @@ int Logger_LogW(LoggerLevel level, const wchar_t* fmt, ...)
 	} else {
 		len = vwprintf(fmt, args);
 	}
-	LCUIMutex_Unlock(&logger.mutex);
 	va_end(args);
 	return len;
 }

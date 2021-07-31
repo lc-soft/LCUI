@@ -38,7 +38,7 @@ typedef struct LCUI_CSSFontFaceRec_ {
 	char *src;
 } LCUI_CSSFontFaceRec, *LCUI_CSSFontFace;
 
-LCUI_API void CSSRuleParser_OnFontFace(LCUI_CSSParserContext ctx,
+LCUI_API void CSSParser_OnFontFaceRule(LCUI_CSSParserContext ctx,
 				       void(*func)(const LCUI_CSSFontFace));
 
 LCUI_API int CSSParser_InitFontFaceRuleParser(LCUI_CSSParserContext ctx);
