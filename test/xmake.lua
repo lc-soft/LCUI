@@ -1,6 +1,8 @@
 includes("lib/test/xmake.lua")
 set_rundir("$(projectdir)/test")
-add_deps("lcui")
+add_repositories("local-repo ../build")
+add_requires("lcui")
+add_packages("lcui")
 add_includedirs("lib/test/include/")
 
 target("run_tests")
@@ -82,4 +84,3 @@ target("test_widget_opacity")
 
 target("test_widget_render")
     add_files("test_widget_render.c")
-
