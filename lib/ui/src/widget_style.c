@@ -38,7 +38,6 @@
 #include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/css_fontstyle.h>
 #include <LCUI/gui/widget/textview.h>
-#include "widget_util.h"
 
 #define ARRAY_LEN(ARR) sizeof(ARR) / sizeof(ARR[0])
 
@@ -158,7 +157,7 @@ void Widget_ComputeWidthLimitStyle(LCUI_Widget w, LCUI_LayoutRule rule)
 		}
 		style->max_width = Widget_ComputeXMetric(w, key_max_width);
 		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
-			style->max_width += BorderX(w) + PaddingX(w);
+			style->max_width += Widget_BorderX(w) + Widget_PaddingX(w);
 		}
 		break;
 	}
@@ -169,7 +168,7 @@ void Widget_ComputeWidthLimitStyle(LCUI_Widget w, LCUI_LayoutRule rule)
 		}
 		style->min_width = Widget_ComputeXMetric(w, key_min_width);
 		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
-			style->min_width += BorderX(w) + PaddingX(w);
+			style->min_width += Widget_BorderX(w) + Widget_PaddingX(w);
 		}
 		break;
 	}
@@ -188,7 +187,7 @@ void Widget_ComputeHeightLimitStyle(LCUI_Widget w, LCUI_LayoutRule rule)
 		}
 		style->max_height = Widget_ComputeYMetric(w, key_max_height);
 		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
-			style->max_height += BorderY(w) + PaddingY(w);
+			style->max_height += Widget_BorderY(w) + Widget_PaddingY(w);
 		}
 		break;
 	}
@@ -199,7 +198,7 @@ void Widget_ComputeHeightLimitStyle(LCUI_Widget w, LCUI_LayoutRule rule)
 		}
 		style->min_height = Widget_ComputeYMetric(w, key_min_height);
 		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
-			style->min_height += BorderY(w) + PaddingY(w);
+			style->min_height += Widget_BorderY(w) + Widget_PaddingY(w);
 		}
 		break;
 	}
@@ -227,7 +226,7 @@ void Widget_ComputeWidthStyle(LCUI_Widget w)
 			    LCUI_SIZING_RULE_FIXED) {
 				style->width_sizing = LCUI_SIZING_RULE_FIXED;
 			}
-			w->width = w->parent->box.content.width - MarginX(w);
+			w->width = w->parent->box.content.width - Widget_MarginX(w);
 			break;
 		}
 		if (Widget_CheckStyleType(w, key_width, scale)) {
@@ -247,7 +246,7 @@ void Widget_ComputeWidthStyle(LCUI_Widget w)
 			style->width_sizing = LCUI_SIZING_RULE_FIXED;
 		}
 		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
-			w->width += BorderX(w) + PaddingX(w);
+			w->width += Widget_BorderX(w) + Widget_PaddingX(w);
 		}
 	} while (0);
 	w->width = Widget_GetLimitedWidth(w, w->width);
@@ -280,7 +279,7 @@ void Widget_ComputeHeightStyle(LCUI_Widget w)
 			style->height_sizing = LCUI_SIZING_RULE_FIXED;
 		}
 		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
-			w->height += BorderY(w) + PaddingY(w);
+			w->height += Widget_BorderY(w) + Widget_PaddingY(w);
 		}
 	} while (0);
 	w->height = Widget_GetLimitedHeight(w, w->height);

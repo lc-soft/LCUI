@@ -34,7 +34,6 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
 #include "flexbox.h"
-#include "../widget_util.h"
 #include "../widget_diff.h"
 
 typedef struct LCUI_FlexBoxLineRec_ {
@@ -223,7 +222,7 @@ static void FlexBoxLayout_LoadRows(LCUI_FlexBoxLayoutContext ctx)
 			Widget_UpdateBoxSize(child);
 		}
 		Widget_ComputeFlexBasisStyle(child);
-		basis = MarginX(child) + child->computed_style.flex.basis;
+		basis = Widget_MarginX(child) + child->computed_style.flex.basis;
 		DEBUG_MSG("[line %lu][%lu] main_size: %g, basis: %g\n",
 			  ctx->lines.length, child->index, ctx->line->main_size,
 			  basis);
@@ -278,7 +277,7 @@ static void FlexBoxLayout_LoadColumns(LCUI_FlexBoxLayoutContext ctx)
 			continue;
 		}
 		Widget_ComputeFlexBasisStyle(child);
-		basis = MarginY(child) + child->computed_style.flex.basis;
+		basis = Widget_MarginY(child) + child->computed_style.flex.basis;
 		DEBUG_MSG("[column %lu][%lu] main_size: %g, basis: %g\n",
 			  ctx->lines.length, child->index, ctx->line->main_size,
 			  basis);
@@ -586,7 +585,7 @@ static void FlexBoxLayout_AlignItemsStretch(LCUI_FlexBoxLayoutContext ctx,
 			child->layout_x = base_cross_axis;
 			if (Widget_HasAutoStyle(child, key_width)) {
 				child->width =
-				    ctx->line->cross_size - MarginX(child);
+				    ctx->line->cross_size - Widget_MarginX(child);
 				UpdateFlexItemSize(child,
 						   LCUI_LAYOUT_RULE_FIXED);
 			}
@@ -598,7 +597,7 @@ static void FlexBoxLayout_AlignItemsStretch(LCUI_FlexBoxLayoutContext ctx,
 		child = node->data;
 		child->layout_y = base_cross_axis;
 		if (Widget_HasAutoStyle(child, key_height)) {
-			child->height = ctx->line->cross_size - MarginY(child);
+			child->height = ctx->line->cross_size - Widget_MarginY(child);
 			UpdateFlexItemSize(child, LCUI_LAYOUT_RULE_FIXED);
 		}
 		Widget_UpdateBoxPosition(child);

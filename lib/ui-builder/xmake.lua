@@ -8,11 +8,11 @@ if has_config("with-libxml2") then
     add_requires("libxml2", {optional = true})
 end
 
-target("lcui-builder")
+target("lcui-ui-builder")
     set_kind("static")
     add_files("src/*.c")
     set_configdir("src")
     add_configfiles("src/config.h.in")
-    -- add_options("with-libxml2")
-    -- add_packages("libxml2")
+    add_options("with-libxml2")
+    add_packages("libxml2")
     add_deps("lcui-util", "lcui-css", "lcui-font", "lcui-ui")

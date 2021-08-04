@@ -34,7 +34,6 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
 #include "block.h"
-#include "../widget_util.h"
 #include "../widget_diff.h"
 
 typedef struct LCUI_BlockLayoutRowRec_ {
@@ -223,7 +222,7 @@ static void BlockLayout_Load(LCUI_BlockLayoutContext ctx)
 	} else {
 		if (w->computed_style.max_width != -1) {
 			max_row_width = w->computed_style.max_width -
-					PaddingX(w) - BorderX(w);
+					Widget_PaddingX(w) - Widget_BorderX(w);
 		}
 	}
 	DEBUG_MSG("%s, start\n", ctx->widget->id);
