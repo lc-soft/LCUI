@@ -33,11 +33,9 @@
 #include <errno.h>
 #include <string.h>
 #include <assert.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/metrics.h>
-#include "widget_util.h"
 #include "widget_background.h"
 #include "widget_shadow.h"
 
@@ -537,12 +535,12 @@ void Widget_UpdateBoxSize(LCUI_Widget w)
 	}
 	w->box.border.width = w->width;
 	w->box.border.height = w->height;
-	w->box.padding.width = w->box.border.width - BorderX(w);
-	w->box.padding.height = w->box.border.height - BorderY(w);
-	w->box.content.width = w->box.padding.width - PaddingX(w);
-	w->box.content.height = w->box.padding.height - PaddingY(w);
-	w->box.outer.width = w->box.border.width + MarginX(w);
-	w->box.outer.height = w->box.border.height + MarginY(w);
+	w->box.padding.width = w->box.border.width - Widget_BorderX(w);
+	w->box.padding.height = w->box.border.height - Widget_BorderY(w);
+	w->box.content.width = w->box.padding.width - Widget_PaddingX(w);
+	w->box.content.height = w->box.padding.height - Widget_PaddingY(w);
+	w->box.outer.width = w->box.border.width + Widget_MarginX(w);
+	w->box.outer.height = w->box.border.height + Widget_MarginY(w);
 	w->box.canvas.width = Widget_GetCanvasWidth(w);
 	w->box.canvas.height = Widget_GetCanvasHeight(w);
 }

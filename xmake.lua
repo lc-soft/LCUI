@@ -36,10 +36,12 @@ target("lcui")
         "lcui-font",
         "lcui-paint",
         "lcui-image",
-        "lcui-gui",
+        "lcui-ui",
+        "lcui-ui-widgets",
+        "lcui-ui-anchor",
+        "lcui-ui-builder",
         "lcui-platform",
         "lcui-text",
-        "lcui-builder",
         "lcui-timer",
         "lcui-worker"
     )
