@@ -3,7 +3,7 @@ set_rundir("$(projectdir)")
 add_repositories("local-repo ../build")
 add_requires("lcui", "test")
 add_packages("lcui")
-add_includedirs("lib/test/include/")
+add_includedirs("../lib/test/include/")
 
 target("helloworld")
     add_files("helloworld.c")

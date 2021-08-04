@@ -31,46 +31,46 @@
 #ifndef LCUI_WIDGET_UTIL_H
 #define LCUI_WIDGET_UTIL_H
 
-INLINE float PaddingX(LCUI_Widget w)
+INLINE float Widget_PaddingX(LCUI_Widget w)
 {
 	return w->padding.left + w->padding.right;
 }
 
-INLINE float PaddingY(LCUI_Widget w)
+INLINE float Widget_PaddingY(LCUI_Widget w)
 {
 	return w->padding.top + w->padding.bottom;
 }
 
-INLINE float BorderX(LCUI_Widget w)
+INLINE float Widget_BorderX(LCUI_Widget w)
 {
 	return w->computed_style.border.left.width +
 	       w->computed_style.border.right.width;
 }
 
-INLINE float BorderY(LCUI_Widget w)
+INLINE float Widget_BorderY(LCUI_Widget w)
 {
 	return w->computed_style.border.top.width +
 	       w->computed_style.border.bottom.width;
 }
 
-INLINE float MarginX(LCUI_Widget w)
+INLINE float Widget_MarginX(LCUI_Widget w)
 {
 	return w->margin.left + w->margin.right;
 }
 
-INLINE float MarginY(LCUI_Widget w)
+INLINE float Widget_MarginY(LCUI_Widget w)
 {
 	return w->margin.top + w->margin.bottom;
 }
 
 INLINE float ToBorderBoxWidth(LCUI_Widget w, float content_width)
 {
-	return content_width + PaddingX(w) + BorderX(w);
+	return content_width + Widget_PaddingX(w) + Widget_BorderX(w);
 }
 
 INLINE float ToBorderBoxHeight(LCUI_Widget w, float content_height)
 {
-	return content_height + PaddingY(w) + BorderY(w);
+	return content_height + Widget_PaddingY(w) + Widget_BorderY(w);
 }
 
 INLINE float Widget_GetLimitedWidth(LCUI_Widget w, float width)

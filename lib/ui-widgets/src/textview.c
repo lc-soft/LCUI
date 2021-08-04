@@ -40,7 +40,6 @@
 #include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/css_fontstyle.h>
 #include <LCUI/gui/widget/textview.h>
-#include "../widget_util.h"
 
 #define GetData(W) Widget_GetData(W, self.prototype)
 #define ComputeActual LCUIMetrics_ComputeActual
@@ -222,8 +221,8 @@ static void TextView_OnAutoSize(LCUI_Widget w, float *width, float *height,
 	if (w->parent &&
 	    w->parent->computed_style.width_sizing == LCUI_SIZING_RULE_FIXED) {
 		txt->available_width = w->parent->box.content.width;
-		max_width = (int)(scale * txt->available_width - PaddingX(w) -
-				  BorderX(w));
+		max_width = (int)(scale * txt->available_width - Widget_PaddingX(w) -
+				  Widget_BorderX(w));
 	} else {
 		txt->available_width = 0;
 		max_width = 0;
