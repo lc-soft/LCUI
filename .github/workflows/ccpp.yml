@@ -1,15 +1,5 @@
 name: C/C++ CI
-
-on:
-  push:
-    branches:
-      - main
-      - master
-      - develop
-      - release-*
-    tags:
-      - 'v*'
-
+on: [push, pull_request]
 jobs:
   ubuntu_build:
     strategy:
@@ -20,34 +10,36 @@ jobs:
     name: "Builds binaries on ${{ matrix.os }}"
     steps:
       - uses: actions/checkout@v1
-
+      - uses: xmake-io/github-action-setup-xmake@v1
       - name: install tools
-        run: sudo apt install debhelper lcov valgrind
+        run: sudo apt install debhelper lcov valgrind -yy
 
-      - name: make
+      - name: Build
         run: |
-          ./autogen.sh
-          ./configure --enable-debug --enable-code-coverage
-          make
+          xmake config --mode=coverage -y
+          xmake config -v
+          xmake -v
 
       - name: Run tests
         run: |
-          make test
-          make test-with-valgrind
+          xmake build -v run-tests
+          xmake run run-tests --memcheck
 
       - name: Upload reports to Codecov
         run: bash <(curl -s https://codecov.io/bash);
 
       - name: Package
         run: |
-          make distcheck
-          sh ./scripts/make-dist-deb.sh
+          xmake clean
+          xmake config -m release -y
+          xmake -v
+          xmake package
 
       - uses: actions/upload-artifact@master
         with:
-          name: build-ubuntu
+          name: ubuntu-pacakges
           path: |
-            build/debian/*.deb
+            build/packages
 
   windows_build:
     strategy:
@@ -62,82 +54,31 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
-
-      # vcpkg cache bug fix
-      # NOTE: needs further investigation
-      # https://github.com/lukka/run-vcpkg/issues/61
-      - name: "vcpkg fix"
-        run: attrib -r "c:\vcpkg\.git\*.*" /s
-      # VCPKG
-      - name: Run vcpkg
-        uses: lukka/run-vcpkg@main
-        with:
-          vcpkgDirectory: ${{ github.workspace }}/vcpkg/
-          vcpkgTriplet: ${{ matrix.triplet }}
-          vcpkgGitCommitId: 7db401cb1ef1fc559ec9f9ce814d064c328fd767
-          setupOnly: true
-          appendedCacheKey: ${{ hashFiles('lcpkg.json') }}
-          additionalCachedPaths: ./lcpkg/
-
-      - name: "Display versions"
+      - uses: xmake-io/github-action-setup-xmake@v1
+      - name: Build
         run: |
-          node -v
-          npm -va
-          vcpkg version
-
-      - name: Cache lcpkg dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ github.workspace }}/vcpkg/
-          key: ${{ matrix.os }}
-
-      - name: "Install lcpkg"
-        run: |
-          npm install -g lcpkg
-          lcpkg config vcpkg.root ${{ github.workspace }}/vcpkg/
-          lcpkg install
-          lcpkg install --arch x64
-          lcpkg install --platform uwp
-          lcpkg install --platform uwp --arch x64
-
-      - name: Cache windows build tools
-        uses: actions/cache@v2
-        with:
-          path: ~/.windows-build-tools
-          key: ${{ matrix.os }}
-
-      - name: "Setup windows-build-tools"
-        run: npm install --global --production windows-build-tools --vs2015
-
-      - name: "Setup msbuild"
-        uses: microsoft/setup-msbuild@v1.0.2
-
-      - name: "Use config"
-        run: copy .\include\config.win32.h.in .\include\config.h
-
-      - name: "Build"
-        run: |
-          msbuild build/windows/LCUI.sln /p:Configuration=Debug /p:Platform=x86 /verbosity:minimal 
-          msbuild build/windows/LCUI.sln /p:Configuration=Debug /p:Platform=x64 /verbosity:minimal 
-          msbuild build/windows/LCUI.sln /p:Configuration=Release /p:Platform=x86 /verbosity:minimal
-          msbuild build/windows/LCUI.sln /p:Configuration=Release /p:Platform=x64 /verbosity:minimal
+          xmake config -y
+          xmake config -v
+          xmake -v
 
       - name: "Run tests"
         continue-on-error: true
         run: |
-          msbuild build\windows\LCUI-Demo.sln /p:Configuration=Debug /p:Platform=x64 /verbosity:minimal
-          cd test
-          ..\bin\x64-windows\Debug\LCUITest.exe
+          xmake build -v run-tests
+          xmake run run-tests
 
-      - name: "Pack"
+      - name: Package
         run: |
-          lcpkg pack
+          xmake clean
+          xmake config -m release -y
+          xmake -v
+          xmake package
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@master
         with:
-          name: build-windows
-          path: .\lcpkg\dist\*.zip
+          name: ubuntu-pacakges
+          path: |
+            build/packages
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -152,13 +93,13 @@ jobs:
       - name: Download artifacts [build-ubuntu]
         uses: actions/download-artifact@master
         with:
-          name: build-ubuntu
+          name: ubuntu-packages
           path: ${{ env.ARTIFACT_DIR }}
 
       - name: Download artifacts [build-windows]
         uses: actions/download-artifact@master
         with:
-          name: build-windows
+          name: windows-packages
           path: ${{ env.ARTIFACT_DIR }}
 
       - name: Set release version
