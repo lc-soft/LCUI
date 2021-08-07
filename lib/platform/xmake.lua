@@ -1,18 +1,7 @@
 add_requires("libomp", {optional = true})
 add_includedirs("src")
-
-option("with-libx11")
-    set_default(true)
-    set_showmenu(true)
-    set_configvar("USE_LIBX11", 1)
-option_end()
-
-option("enable-openmp")
-    set_default(true)
-    set_showmenu(true)
-    set_configvar("ENABLE_OPENMP", 1)
-option_end()
-
+option("with-libx11", {showmenu = true, default = true})
+option("enable-openmp", {showmenu = true, default = true})
 option("uwp", {showmenu = true, default = false})
 
 if has_config("with-libx11") then
@@ -49,6 +38,9 @@ target("lcui-linux")
     else
         set_default(false)
     end
+    if has_package("libx11") then
+        set_configvar("USE_LIBX11", 1)
+    end
     set_kind("static")
     add_files("src/linux/*.c")
 
@@ -59,6 +51,9 @@ target("lcui-platform")
     add_configfiles("src/config.h.in")
     add_packages("libomp")
     add_files("src/*.c")
+    if has_package("libomp") then
+        set_configvar("ENABLE_OPENMP", 1)
+    end
     if is_plat("windows") then
         add_options("uwp")
         if has_config("uwp") then
@@ -70,3 +65,4 @@ target("lcui-platform")
         add_deps("lcui-linux")
     end
     add_deps("lcui-thread")
+
