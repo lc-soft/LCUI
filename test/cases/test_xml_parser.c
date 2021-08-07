@@ -2,7 +2,7 @@
 #include <LCUI/display.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/builder.h>
-#include "../lib/test/include/test.h"
+#include "test.h"
 
 static void check_widget_attribute(void)
 {

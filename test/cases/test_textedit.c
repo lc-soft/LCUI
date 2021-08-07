@@ -2,7 +2,7 @@
 #include <LCUI/font.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/textedit.h>
-#include "../lib/test/include/test.h"
+#include "test.h"
 
 void test_textedit(void)
 {

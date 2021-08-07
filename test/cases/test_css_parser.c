@@ -3,7 +3,7 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/display.h>
 #include <LCUI/gui/builder.h>
-#include "../lib/test/include/test.h"
+#include "test.h"
 
 static void test_btn_text_style(void)
 {

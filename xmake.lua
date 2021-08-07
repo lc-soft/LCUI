@@ -49,6 +49,7 @@ target("lcui")
 target("run-tests")
     set_kind("binary")
     set_rundir("$(projectdir)/test")
+    add_includedirs("$(projectdir)/lib/test/include/")
     set_default(false)
     if is_plat("linux") and is_mode("coverage") then
         on_run(function (target)
