@@ -4,7 +4,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/util/logger.h>
 #include <LCUI/util/strpool.h>
-#include "../lib/test/include/test.h"
+#include "test.h"
 
 void test_strpool(void)
 {

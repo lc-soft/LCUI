@@ -4,7 +4,7 @@
 #include <LCUI.h>
 #include <LCUI/input.h>
 #include <LCUI/gui/widget.h>
-#include "../lib/test/include/test.h"
+#include "test.h"
 
 void test_widget_rect(void)
 {
