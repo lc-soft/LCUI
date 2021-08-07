@@ -4,7 +4,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/util/logger.h>
 #include <LCUI/util/object.h>
-#include "../lib/test/include/test.h"
+#include "test.h"
 
 static void on_object_change(LCUI_Object object, void *data)
 {

@@ -1,4 +1,4 @@
-﻿#include "../lib/test/include/test.h"
+﻿#include "test.h"
 #include <LCUI.h>
 #include <LCUI/display.h>
 #include <LCUI/gui/widget.h>

@@ -3,7 +3,8 @@
 #include <LCUI/font.h>
 #include <LCUI/gui/css_library.h>
 #include <LCUI/gui/css_parser.h>
-#include "../lib/test/include/test.h"
+#include "test.h"
+#include <stdio.h>
 
 #define GetSegoeUIFont(S, W) LCUIFont_GetId("Segoe UI", S, W)
 #define GetArialFont(S, W) LCUIFont_GetId("Arial", S, W)
@@ -122,7 +123,9 @@ void test_arial_font_load(void)
 
 void test_font_load(void)
 {
+	FILE *fp;
 	LCUI_InitFontLibrary();
+	fp = fopen("test_font_load.ttf", "rb");
 	/* 测试是否能够从字体文件中载入字体 */
 	it_i("check LCUIFont_LoadFile success",
 	     LCUIFont_LoadFile("test_font_load.ttf"), 0);
