@@ -1,6 +1,6 @@
-﻿#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+﻿#include <LCUI.h>
 #include <LCUI/font.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/css_library.h>
 #include <LCUI/gui/css_parser.h>
 #include "ctest.h"
@@ -123,27 +123,21 @@ void test_arial_font_load(void)
 
 void test_font_load(void)
 {
-	FILE *fp;
 	LCUI_InitFontLibrary();
-	fp = fopen("test_font_load.ttf", "rb");
 	/* 测试是否能够从字体文件中载入字体 */
 	it_i("check LCUIFont_LoadFile success",
 	     LCUIFont_LoadFile("test_font_load.ttf"), 0);
-#ifdef LCUI_BUILD_IN_WIN32
+#ifdef LCUI_PLATFORM_WIN32
 	describe("test segoe ui font load", test_segoe_ui_font_load);
 	describe("test arial font load", test_arial_font_load);
 #endif
 	LCUI_FreeFontLibrary();
 
-	LCUI_InitFontLibrary();
-	LCUI_InitCSSLibrary();
-	LCUI_InitCSSParser();
+	ui_init();
 	/* 测试是否能够根据 CSS 文件中定义的 @font-face 规则来载入字体 */
 	it_i("check LCUIFont_LoadCSSFile success",
-	     LCUI_LoadCSSFile("test_font_load.css"), 0);
+	     ui_load_css_file("test_font_load.css"), 0);
 	it_b("check LCUIFont_GetId success",
 	     LCUIFont_GetId("icomoon", 0, 0) > 0, TRUE);
-	LCUI_FreeCSSParser();
-	LCUI_FreeCSSLibrary();
-	LCUI_FreeFontLibrary();
+	ui_destroy();
 }

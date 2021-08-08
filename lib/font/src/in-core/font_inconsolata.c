@@ -30,8 +30,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI.h>
 #include <LCUI/font.h>
 
 enum font_index {

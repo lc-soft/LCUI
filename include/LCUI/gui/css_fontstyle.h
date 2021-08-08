@@ -32,6 +32,7 @@
 #define LCUI_CSS_FONT_STYLE_H
 
 #include <LCUI/font/textstyle.h>
+#include <LCUI/gui/css_library.h>
 
 LCUI_BEGIN_HEADER
 
@@ -66,7 +67,7 @@ typedef struct LCUI_CSSFontStyleRec_ {
 #define Widget_SetFontStyle(W, K, V, T)            \
 	do {                                       \
 		int key = LCUI_GetFontStyleKey(K); \
-		Widget_SetStyle(W, key, V, T);     \
+		ui_widget_set_style(W, key, V, T);     \
 	} while (0)
 
 /* clang-format off */

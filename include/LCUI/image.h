@@ -32,6 +32,7 @@
 #define LCUI_IMAGE_H
 
 #include <setjmp.h>
+#include <LCUI/header.h>
 #include <LCUI/graph.h>
 
 LCUI_BEGIN_HEADER

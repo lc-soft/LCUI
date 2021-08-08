@@ -29,7 +29,7 @@
  */
 
 #include "config.h"
-#include <LCUI_Build.h>
+#include <LCUI/header.h>
 #ifdef USE_FREETYPE
 #include <LCUI/types.h>
 #include <yutil.h>

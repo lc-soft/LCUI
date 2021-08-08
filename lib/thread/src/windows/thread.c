@@ -27,7 +27,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <LCUI.h>
+#include <LCUI/types.h>
+#include <LCUI/util.h>
 #include <LCUI/thread.h>
 #include <process.h>
 #include <windows.h>
@@ -66,7 +67,7 @@ int LCUIThread_Create(LCUI_Thread *tid, void(*func)(void*), void *arg)
 		LCUIMutex_Init(&self.mutex);
 		self.active = TRUE;
 	}
-	ctx = NEW(LCUI_ThreadContextRec, 1);
+	ctx = malloc(sizeof(LCUI_ThreadContextRec));
 	if (!ctx) {
 		return -ENOMEM;
 	}

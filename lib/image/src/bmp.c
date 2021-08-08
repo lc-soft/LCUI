@@ -32,7 +32,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <LCUI_Build.h>
+#include <LCUI/header.h>
 #include <LCUI/types.h>
 #include <LCUI/graph.h>
 #include <LCUI/image.h>
@@ -82,7 +82,9 @@ static void BMPHeader_Init(HEADER *header, uint16_t buffer[8])
 
 int LCUI_InitBMPReader(LCUI_ImageReader reader)
 {
-	ASSIGN(bmp_reader, LCUI_BMPReader);
+	LCUI_BMPReader bmp_reader;
+
+	bmp_reader = malloc(sizeof(LCUI_BMPReaderRec));
 	reader->data = bmp_reader;
 	reader->destructor = free;
 	reader->type = LCUI_BMP_READER;

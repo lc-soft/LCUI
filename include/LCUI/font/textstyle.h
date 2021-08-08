@@ -31,6 +31,9 @@
 #ifndef LCUI_TEXTSTYLE_H
 #define LCUI_TEXTSTYLE_H
 
+#include <LCUI/header.h>
+#include <LCUI/util.h>
+
 LCUI_BEGIN_HEADER
 
 typedef struct LCUI_TextStyleRec_ {

@@ -42,32 +42,25 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include <stdio.h>
-#include <LCUI_Build.h>
-#if defined(LCUI_BUILD_IN_LINUX) && defined(USE_LIBX11)
-#include <LCUI/LCUI.h>
-#include <LCUI/platform.h>
-#include <LCUI/clipboard.h>
+#include "../internal.h"
+#if defined(LCUI_PLATFORM_LINUX) && defined(USE_LIBX11)
 #include <LCUI/thread.h>
-#include LCUI_EVENTS_H
-#include <X11/Xatom.h>
 
 #define CLIPBOARD_TIMEOUT 1000
 
-typedef struct LCUI_ClipboardCallbackRec_ {
+typedef struct clipboard_action_t_ {
 	void *arg;
-	LCUI_ClipboardAction action;
+	clipboard_callback_t callback;
 	LCUI_BOOL running;
-} LCUI_ClipboardCallbackRec, *LCUI_ClipboardCallback;
+} clipboard_action_t;
 
 // @WhoAteDaCake
 // TODO: do we need a mutex here? As the action is unlikely to happen
 // often, safety seems to be a bigger priority than speed
-static struct LCUI_LinuxClipboardDriver {
+static struct x11_clipboard_module_t {
 	char *text;
 	size_t text_len;
-	LCUI_ClipboardCallback callback;
+	clipboard_action_t *action;
 	//
 	Atom xclipboard;
 	Atom xprimary;
@@ -77,73 +70,125 @@ static struct LCUI_LinuxClipboardDriver {
 	Atom xa_text;
 	// Observer thread
 	LCUI_Thread observer_thread;
-} clipboard;
+} x11_clipboard;
 
-void ExecuteCallback(LCUI_BOOL timed_out)
+void x11_clipboard_execute_action(LCUI_BOOL timed_out)
 {
+	wchar_t *wstr = NULL;
+	clipboard_t clipboard_data = { 0 };
+	clipboard_action_t *action = x11_clipboard.action;
+
 	if (!timed_out) {
 		_DEBUG_MSG("Didn't time out canceling observer thread\n");
-		LCUIThread_Cancel(clipboard.observer_thread);
+		LCUIThread_Cancel(x11_clipboard.observer_thread);
 	}
-	LCUI_ClipboardCallback callback = clipboard.callback;
-	LCUI_ClipboardRec clipboard_data = { 0 };
-	wchar_t *wstr = NULL;
 
-	if (!callback->running) {
-		_DEBUG_MSG("Tried to ExecuteCallback before copying started\n");
+	if (!action->running) {
+		_DEBUG_MSG("Tried to x11_clipboard_execute_action before "
+			   "copying started\n");
 		return;
 	}
 	if (timed_out) {
-		_DEBUG_MSG("Callback timed out\n");
+		_DEBUG_MSG("action timed out\n");
 	} else {
-		size_t len = clipboard.text_len + 1;
+		size_t len = x11_clipboard.text_len + 1;
 		wstr = malloc(sizeof(wchar_t) * len);
-		len = decode_utf8(wstr, clipboard.text, len);
+		len = decode_utf8(wstr, x11_clipboard.text, len);
 		wstr[len] = 0;
 		// Assign the data
 		clipboard_data.text = wstr;
 		clipboard_data.len = len;
 		clipboard_data.image = NULL;
 	}
-	callback->action(&clipboard_data, callback->arg);
+	action->callback(&clipboard_data, action->arg);
 	if (wstr != NULL) {
 		free(wstr);
 	}
 	// Reset properties, so if something goes wrongly, we crash
 	// instead of having undefined behaviour
-	callback->arg = NULL;
-	callback->action = NULL;
-	callback->running = FALSE;
+	action->arg = NULL;
+	action->callback = NULL;
+	action->running = FALSE;
 }
 
-void ClipboardRequestTimeout(void *arg)
+void x11_clipboard_request_timeout(void *arg)
 {
-	LCUI_ClipboardCallback callback = clipboard.callback;
 	sleep_ms(CLIPBOARD_TIMEOUT);
-	if (callback->running) {
-		ExecuteCallback(TRUE);
+	if (x11_clipboard.action->running) {
+		x11_clipboard_execute_action(TRUE);
 	}
 }
 
-void RequestClipboardContent(void)
+/**
+ * This function assumes that text pointer is only owned by clipboard
+ */
+int x11_clipboard_set_text(const wchar_t *text, size_t len)
 {
-	LCUI_X11AppDriver x11 = LCUI_GetAppData();
-	Display *display = x11->display;
-	Window window = x11->win_main;
-	// Atom CLIPBOARD = XInternAtom(display, "CLIPBOARD", FALSE);
+	Display *display = x11_app_get_display();
+	Window window = x11_app_get_main_window();
 	Window clipboard_owner =
-	    XGetSelectionOwner(display, clipboard.xclipboard);
+	    XGetSelectionOwner(display, x11_clipboard.xclipboard);
+
+	// X11 doesn't support wchar_t, so we need to send it regular char
+	char *raw_text = malloc((len + 1) * sizeof(char));
+	size_t raw_len = wcstombs(raw_text, text, len);
+
+	raw_text[raw_len] = '\0';
+	if (raw_len == -1) {
+		_DEBUG_MSG("Failed converting wchar_t* to char*\n");
+		// Something failed here, should probably add debug message
+		return -1;
+	}
+	// Make sure to free old text
+	if (x11_clipboard.text) {
+		free(x11_clipboard.text);
+	}
+
+	_DEBUG_MSG("Copying text to clipboard\n");
+	if (x11_clipboard.text) {
+		free(x11_clipboard.text);
+	}
+	x11_clipboard.text = raw_text;
+	x11_clipboard.text_len = raw_len;
+	if (clipboard_owner == window) {
+		_DEBUG_MSG("Clipboard already owned\n");
+		return -2;
+	}
+	XSetSelectionOwner(display, XA_PRIMARY, window, CurrentTime);
+	XSetSelectionOwner(display, x11_clipboard.xclipboard, window,
+			   CurrentTime);
+	_DEBUG_MSG("Taken ownership of the clipboard\n");
+	return 0;
+}
+
+int x11_clipboard_request_text(clipboard_callback_t callback, void *arg)
+{
+	Display *display = x11_app_get_display();
+	Window window = x11_app_get_main_window();
+	Atom XSEL_DATA = XInternAtom(display, "XSEL_DATA", FALSE);
+	Window clipboard_owner =
+	    XGetSelectionOwner(display, x11_clipboard.xclipboard);
+	clipboard_action_t *action = x11_clipboard.action;
+
+	if (action->running) {
+		_DEBUG_MSG("Tried to paste, while a paste was in progress\n");
+		return 1;
+	}
+	action->arg = arg;
+	action->callback = callback;
+	action->running = TRUE;
+
 	// No need to continue, we should have stored text already
 	// when copy was done
 	// This branch will only get executed once we implement copy event
 	if (clipboard_owner == window) {
 		_DEBUG_MSG("Clipboard owned by self\n");
-		ExecuteCallback(FALSE);
-		return;
+		x11_clipboard_execute_action(FALSE);
+		return 0;
 	}
 	if (clipboard_owner == None) {
 		_DEBUG_MSG("Clipboard owner not found\n");
-		return;
+		return 1;
 	}
 	// @WhoAteDaCake
 	// TODO: needs error handling if we can't access the clipboard?
@@ -151,77 +196,27 @@ void RequestClipboardContent(void)
 	// retrieved from UTF8_STRING, however, our implementation is not
 	// synchronous, so not sure how it would work, it needs further
 	// investigation
-	LCUIThread_Create(&clipboard.observer_thread, ClipboardRequestTimeout,
-			  NULL);
-	Atom XSEL_DATA = XInternAtom(display, "XSEL_DATA", FALSE);
-	XConvertSelection(display, clipboard.xclipboard, clipboard.xutf8_string,
-			  XSEL_DATA, window, CurrentTime);
+	LCUIThread_Create(&x11_clipboard.observer_thread,
+			  x11_clipboard_request_timeout, NULL);
+	XConvertSelection(display, x11_clipboard.xclipboard,
+			  x11_clipboard.xutf8_string, XSEL_DATA, window,
+			  CurrentTime);
 	_DEBUG_MSG("Clipboard content requested, expect SelectionNotify\n");
+	return 0;
 }
 
-/**
- * This function assumes that text pointer is only owned by clipboard
- */
-void LCUI_LinuxX11SetClipboardText(const wchar_t *text, size_t len)
+static void x11_clipboard_on_notify(app_native_event_t *ev, void *arg)
 {
-	// X11 doesn't support wchar_t, so we need to send it regular char
-	char *raw_text = malloc((len + 1) * sizeof(char));
-	size_t raw_len = wcstombs(raw_text, text, len);
-	raw_text[raw_len] = '\0';
-	if (raw_len == -1) {
-		_DEBUG_MSG("Failed converting wchar_t* to char*\n");
-		// Something failed here, should probably add debug message
-		return;
-	}
-	// Make sure to free old text
-	if (clipboard.text) {
-		free(clipboard.text);
-	}
+	XEvent *x_ev = arg;
+	clipboard_action_t *action = x11_clipboard.action;
 
-	LCUI_X11AppDriver x11 = LCUI_GetAppData();
-	Display *display = x11->display;
-	Window window = x11->win_main;
-	_DEBUG_MSG("Copying text to clipboard\n");
-	if (clipboard.text) {
-		free(clipboard.text);
-	}
-	clipboard.text = raw_text;
-	clipboard.text_len = raw_len;
-	Window clipboard_owner =
-	    XGetSelectionOwner(display, clipboard.xclipboard);
-	if (clipboard_owner == window) {
-		_DEBUG_MSG("Clipboard already owned\n");
-		return;
-	}
-	XSetSelectionOwner(display, XA_PRIMARY, window, CurrentTime);
-	XSetSelectionOwner(display, clipboard.xclipboard, window, CurrentTime);
-	_DEBUG_MSG("Taken ownership of the clipboard\n");
-}
-
-void LCUI_UseLinuxX11Clipboard(LCUI_ClipboardAction action, void *arg)
-{
-	LCUI_ClipboardCallback callback = clipboard.callback;
-	if (callback->running) {
-		_DEBUG_MSG("Tried to paste, while a paste was in progress\n");
-		return;
-	}
-	callback->arg = arg;
-	callback->action = action;
-	callback->running = TRUE;
-	RequestClipboardContent();
-}
-
-static void OnSelectionNotify(LCUI_Event ev, void *arg)
-{
-	LCUI_ClipboardCallback callback = clipboard.callback;
-	if (!callback->running) {
-		_DEBUG_MSG("SelectionNotify received, with no callback\n");
+	if (!action->running) {
+		_DEBUG_MSG("SelectionNotify received, with no action\n");
 		return;
 	}
 	_DEBUG_MSG("SelectionNotify received\n");
-	XEvent *x_ev = arg;
 
-	if (x_ev->xselection.selection == clipboard.xclipboard) {
+	if (x_ev->xselection.selection == x11_clipboard.xclipboard) {
 		_DEBUG_MSG("Received Clipboard event\n");
 		unsigned long N, size;
 		char *data;
@@ -231,39 +226,40 @@ static void OnSelectionNotify(LCUI_Event ev, void *arg)
 		    x_ev->xselection.display, x_ev->xselection.requestor,
 		    x_ev->xselection.property, 0L, (~0L), 0, AnyPropertyType,
 		    &target, &format, &size, &N, (unsigned char **)&data);
-		if (target == clipboard.xutf8_string ||
-		    target == clipboard.xa_string) {
-			clipboard.text = strndup(data, size);
-			clipboard.text_len = size;
+		if (target == x11_clipboard.xutf8_string ||
+		    target == x11_clipboard.xa_string) {
+			x11_clipboard.text = strndup(data, size);
+			x11_clipboard.text_len = size;
 			XFree(data);
 		}
 		XDeleteProperty(x_ev->xselection.display,
 				x_ev->xselection.requestor,
 				x_ev->xselection.property);
-		ExecuteCallback(FALSE);
+		x11_clipboard_execute_action(FALSE);
 	}
 }
 
-static void OnSelectionClear(LCUI_Event ev, void *arg)
+static void x11_clipboard_on_clear(app_native_event_t *ev, void *arg)
 {
 	// @WhoAteDaCake
 	// TODO: validate against timestamp of event
 	// if it has come too late, we should ignore event
 	_DEBUG_MSG("Lost ownership of the clipboard\n");
-	if (clipboard.text) {
-		free(clipboard.text);
+	if (x11_clipboard.text) {
+		free(x11_clipboard.text);
 	}
-	clipboard.text = NULL;
+	x11_clipboard.text = NULL;
 }
 
 // This function gets called when another process requests for the
 // text we copied in our clipboard
-static void OnSelectionRequest(LCUI_Event ev, void *arg)
+static void x11_clipboard_on_request(app_native_event_t *ev, void *arg)
 {
-	_DEBUG_MSG("Received SelectionRequest\n");
 	XEvent *x_ev = arg;
-	// Generates a refuse request by default
 	XEvent reply;
+
+	_DEBUG_MSG("Received SelectionRequest\n");
+	// Generates a refuse request by default
 	reply.xselection.type = SelectionNotify;
 	reply.xselection.requestor = x_ev->xselectionrequest.requestor;
 	reply.xselection.selection = x_ev->xselectionrequest.selection;
@@ -272,13 +268,13 @@ static void OnSelectionRequest(LCUI_Event ev, void *arg)
 	// ^ None means refusal
 	reply.xselection.time = x_ev->xselectionrequest.time;
 
-	if (x_ev->xselectionrequest.target == clipboard.xa_targets) {
+	if (x_ev->xselectionrequest.target == x11_clipboard.xa_targets) {
 		_DEBUG_MSG("Requested supported targets\n");
 		Atom target_list[4];
-		target_list[0] = clipboard.xa_targets;
-		target_list[1] = clipboard.xa_text;
-		target_list[2] = clipboard.xutf8_string;
-		target_list[3] = clipboard.xa_string;
+		target_list[0] = x11_clipboard.xa_targets;
+		target_list[1] = x11_clipboard.xa_text;
+		target_list[2] = x11_clipboard.xutf8_string;
+		target_list[3] = x11_clipboard.xa_string;
 
 		reply.xselection.property = x_ev->xselectionrequest.property;
 		XChangeProperty(x_ev->xselection.display,
@@ -286,21 +282,22 @@ static void OnSelectionRequest(LCUI_Event ev, void *arg)
 				reply.xselection.property, XA_ATOM, 32,
 				PropModeReplace, (unsigned char *)&target_list,
 				sizeof(target_list) / sizeof(target_list[0]));
-	} else if (reply.xselection.target == clipboard.xa_text ||
-		   reply.xselection.target == clipboard.xutf8_string ||
-		   reply.xselection.target == clipboard.xa_string) {
-		if (!clipboard.text) {
+	} else if (reply.xselection.target == x11_clipboard.xa_text ||
+		   reply.xselection.target == x11_clipboard.xutf8_string ||
+		   reply.xselection.target == x11_clipboard.xa_string) {
+		if (!x11_clipboard.text) {
 			_DEBUG_MSG("SelectionRequest received with no text\n");
 		} else {
 			_DEBUG_MSG("Requested for clipboard text\n");
 			reply.xselection.property =
 			    x_ev->xselectionrequest.property;
-			XChangeProperty(
-			    x_ev->xselection.display,
-			    x_ev->xselectionrequest.requestor,
-			    reply.xselection.property, reply.xselection.target,
-			    8, PropModeReplace, (unsigned char *)clipboard.text,
-			    clipboard.text_len);
+			XChangeProperty(x_ev->xselection.display,
+					x_ev->xselectionrequest.requestor,
+					reply.xselection.property,
+					reply.xselection.target, 8,
+					PropModeReplace,
+					(unsigned char *)x11_clipboard.text,
+					x11_clipboard.text_len);
 		}
 	}
 	XSendEvent(x_ev->xselection.display, x_ev->xselectionrequest.requestor,
@@ -309,34 +306,32 @@ static void OnSelectionRequest(LCUI_Event ev, void *arg)
 
 // @WhoAteDaCake
 // TODO: Implement INCR retrieval
-void LCUI_InitLinuxX11Clipboard(void)
+void x11_clipboard_init(void)
 {
-	LCUI_X11AppDriver x11 = LCUI_GetAppData();
-	Display *display = x11->display;
-	// Allocate callback once
-	LCUI_ClipboardCallback callback;
-	callback = NEW(LCUI_ClipboardCallbackRec, 1);
-	callback->running = FALSE;
-	clipboard.callback = callback;
-	// Set atoms, that will be re-used
-	clipboard.xclipboard = XInternAtom(display, "CLIPBOARD", FALSE);
-	clipboard.xprimary = XA_PRIMARY;
-	clipboard.xutf8_string = XInternAtom(display, "UTF8_STRING", FALSE);
-	clipboard.xa_string = XA_STRING;
-	clipboard.xa_targets = XInternAtom(display, "TARGETS", FALSE);
-	clipboard.xa_text = XInternAtom(display, "TEXT", FALSE);
+	Display *display = x11_app_get_display();
 
-	LCUI_BindSysEvent(SelectionNotify, OnSelectionNotify, NULL, NULL);
-	LCUI_BindSysEvent(SelectionClear, OnSelectionClear, NULL, NULL);
-	LCUI_BindSysEvent(SelectionRequest, OnSelectionRequest, NULL, NULL);
+	// Allocate action once
+	x11_clipboard.action = malloc(sizeof(clipboard_action_t));
+	x11_clipboard.action->running = FALSE;
+	// Set atoms, that will be re-used
+	x11_clipboard.xclipboard = XInternAtom(display, "CLIPBOARD", FALSE);
+	x11_clipboard.xprimary = XA_PRIMARY;
+	x11_clipboard.xutf8_string = XInternAtom(display, "UTF8_STRING", FALSE);
+	x11_clipboard.xa_string = XA_STRING;
+	x11_clipboard.xa_targets = XInternAtom(display, "TARGETS", FALSE);
+	x11_clipboard.xa_text = XInternAtom(display, "TEXT", FALSE);
+
+	app_on_native_event(SelectionNotify, x11_clipboard_on_notify, NULL);
+	app_on_native_event(SelectionClear, x11_clipboard_on_clear, NULL);
+	app_on_native_event(SelectionRequest, x11_clipboard_on_request, NULL);
 }
 
-void LCUI_FreeLinuxX11Clipboard(void)
+void x11_clipboard_destroy(void)
 {
-	free(clipboard.callback);
-	LCUI_UnbindSysEvent(SelectionNotify, OnSelectionNotify);
-	LCUI_UnbindSysEvent(SelectionClear, OnSelectionClear);
-	LCUI_UnbindSysEvent(SelectionRequest, OnSelectionRequest);
+	free(x11_clipboard.action);
+	app_off_native_event(SelectionNotify, x11_clipboard_on_notify);
+	app_off_native_event(SelectionClear, x11_clipboard_on_clear);
+	app_off_native_event(SelectionRequest, x11_clipboard_on_request);
 }
 
 #endif

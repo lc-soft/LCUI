@@ -1,44 +1,42 @@
 #include <stdlib.h>
 #include <LCUI.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI/ui.h>
+#include <LCUI/thread.h>
 #include <LCUI/gui/widget/button.h>
 #include <LCUI/timer.h>
-#include <LCUI/input.h>
-#include <LCUI/display.h>
 #include "ctest.h"
 
 static void OnRefreshScreen(void *arg)
 {
-	LCUIDisplay_InvalidateArea(NULL);
+	ui_refresh_style();
 }
 
 static void OnQuit(void *arg)
 {
-	LCUI_Quit();
+	lcui_quit();
 }
 
-static void OnBtnClick(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
+static void OnBtnClick(ui_widget_t* w, ui_event_t* ui_event, void *arg)
 {
-	LCUI_MainLoop loop;
+	app_event_t e = { 0 };
 
-	loop = LCUIMainLoop_New();
 	lcui_set_timeout(10, OnRefreshScreen, NULL);
 	lcui_set_timeout(50, OnQuit, NULL);
-	LCUIMainLoop_Run(loop);
+	lcui_process_events(APP_PROCESS_EVENTS_UNTIL_QUIT);
+	lcui_quit();
 }
 
 static void OnTriggerBtnClick(void *arg)
 {
-	LCUI_SysEventRec e;
+	app_event_t e;
 
-	e.type = LCUI_MOUSEDOWN;
-	e.button.button = LCUI_KEY_LEFTBUTTON;
-	e.button.x = 5;
-	e.button.y = 5;
-	LCUI_TriggerEvent(&e, NULL);
-
-	e.type = LCUI_MOUSEUP;
-	LCUI_TriggerEvent(&e, NULL);
+	e.type = APP_EVENT_MOUSEDOWN;
+	e.mouse.button = MOUSE_BUTTON_LEFT;
+	e.mouse.x = 5;
+	e.mouse.y = 5;
+	app_post_event(&e);
+	e.type = APP_EVENT_MOUSEUP;
+	app_post_event(&e);
 }
 
 static void ObserverThread(void *arg)
@@ -60,20 +58,19 @@ static void ObserverThread(void *arg)
 void test_mainloop(void)
 {
 	LCUI_Thread tid;
-	LCUI_Widget root, btn;
+	ui_widget_t *btn;
 	LCUI_BOOL exited = FALSE;
 
-	LCUI_Init();
-	btn = LCUIWidget_New("button");
-	root = LCUIWidget_GetRoot();
+	lcui_init();
+	btn = ui_create_widget("button");
 	Button_SetText(btn, "button");
-	Widget_BindEvent(btn, "click", OnBtnClick, NULL, NULL);
-	Widget_Append(root, btn);
+	ui_widget_on(btn, "click", OnBtnClick, NULL, NULL);
+	ui_root_append(btn);
 	/* Observe whether the main loop has exited in a new thread */
 	LCUIThread_Create(&tid, ObserverThread, &exited);
 	/* Trigger the click event after the first frame is updated */
 	lcui_set_timeout(50, OnTriggerBtnClick, btn);
-	LCUI_Main();
+	lcui_main();
 	exited = TRUE;
 	LCUIThread_Join(tid, NULL);
 }

@@ -31,6 +31,8 @@
 #ifndef LCUI_FONTCONFIG_H
 #define LCUI_FONTCONFIG_H
 
+#include <LCUI/header.h>
+
 LCUI_BEGIN_HEADER
 
 LCUI_API char *Fontconfig_GetPath(const char *name);

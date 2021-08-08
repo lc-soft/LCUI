@@ -31,7 +31,7 @@
 
 #include <errno.h>
 #include <stdlib.h>
-#include <LCUI_Build.h>
+#include <LCUI/header.h>
 #include <LCUI/types.h>
 #include <LCUI/util/task.h>
 #include <yutil.h>
@@ -48,7 +48,7 @@ typedef struct LCUI_WorkerRec_ {
 
 LCUI_Worker LCUIWorker_New(void)
 {
-	LCUI_Worker worker = NEW(LCUI_WorkerRec, 1);
+	LCUI_Worker worker = malloc(sizeof(LCUI_WorkerRec));
 	LCUIMutex_Init(&worker->mutex);
 	LCUICond_Init(&worker->cond);
 	list_create(&worker->tasks);
@@ -60,7 +60,7 @@ LCUI_Worker LCUIWorker_New(void)
 void LCUIWorker_PostTask(LCUI_Worker worker, LCUI_Task task)
 {
 	LCUI_Task newtask;
-	newtask = NEW(LCUI_TaskRec, 1);
+	newtask = malloc(sizeof(LCUI_TaskRec));
 	*newtask = *task;
 	LCUIMutex_Lock(&worker->mutex);
 	list_append(&worker->tasks, newtask);

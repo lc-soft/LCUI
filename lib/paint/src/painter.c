@@ -28,10 +28,9 @@
  */
 
 #include <stdlib.h>
-#include <LCUI_Build.h>
+#include <LCUI/header.h>
 #include <LCUI/types.h>
 #include <LCUI/graph.h>
-#include <LCUI/gui/metrics.h>
 #include <LCUI/painter.h>
 
 pd_paint_context_t* pd_painter_begin(pd_canvas_t *canvas, pd_rect_t *rect)

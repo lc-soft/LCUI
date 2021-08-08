@@ -31,10 +31,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <LCUI_Build.h>
+#include <LCUI/header.h>
 #include <LCUI/util/uri.h>
 
-#if defined(LCUI_BUILD_IN_WIN32) && !defined(WINAPI_PARTITION_APP)
+#if defined(LCUI_PLATFORM_WIN32) && !defined(WINAPI_PARTITION_APP)
 #pragma warning(disable:4091)
 #include <Windows.h>
 #include <ShlObj.h>

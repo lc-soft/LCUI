@@ -31,7 +31,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <LCUI_Build.h>
+#include <LCUI/header.h>
 #include <LCUI/types.h>
 #include <yutil.h>
 #include <LCUI/util/parse.h>
@@ -525,7 +525,9 @@ static const wchar_t *ScanStyleTagData(const wchar_t *wstr,
 const wchar_t *StyleTags_GetStart(list_t *tags, const wchar_t *str)
 {
 	const wchar_t *q;
-	LCUI_TextStyleTag *tag = NEW(LCUI_TextStyleTag, 1);
+	LCUI_TextStyleTag *tag;
+
+	tag = malloc(sizeof(LCUI_TextStyleTag));
 	q = ScanStyleTagData(str, tag);
 	if (q) {
 		/* 将标签样式数据加入队列 */

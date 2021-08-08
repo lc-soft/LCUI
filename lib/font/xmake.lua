@@ -2,7 +2,7 @@ option("with-freetype", {showmenu = true, default = true})
 option("with-fontconfig", {showmenu = true, default = true})
 
 if has_config("with-freetype") then
-    add_requires("freetype", {optional = true})
+    add_requires("freetype", {optional = true, configs = {shared = false}})
 end
 
 if has_config("with-fontconfig") then

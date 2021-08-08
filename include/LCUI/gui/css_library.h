@@ -31,7 +31,7 @@
 #ifndef LCUI_CSS_LIBRARY_H
 #define LCUI_CSS_LIBRARY_H
 
-#include <yutil.h>
+#include <LCUI/util.h>
 
 LCUI_BEGIN_HEADER
 
@@ -41,7 +41,7 @@ LCUI_BEGIN_HEADER
 #define MAX_SELECTOR_DEPTH	32
 
  /** 样式属性名 */
-enum LCUI_StyleKeyName {
+typedef enum LCUI_StyleKeyName {
 	// position start
 	key_left,
 	key_right,
@@ -122,7 +122,7 @@ enum LCUI_StyleKeyName {
 	key_box_shadow_blur,
 	key_box_shadow_color,
 	// box shadow end
-	
+
 	// flex style start
 	key_flex_basis,
 	key_flex_grow,
@@ -137,7 +137,7 @@ enum LCUI_StyleKeyName {
 	key_pointer_events,
 	key_focusable,
 	STYLE_KEY_TOTAL
-};
+} LCUI_StyleKeyName;
 
 #define key_flex_style_start	key_flex_basis
 #define key_flex_style_end	key_align_content
@@ -165,7 +165,7 @@ typedef list_t LCUI_StyleListRec;
 typedef list_t* LCUI_StyleList;
 
 typedef struct LCUI_StyleListNodeRec_ {
-	int key;
+	LCUI_StyleKeyName key;
 	LCUI_StyleRec style;
 	list_node_t node;
 } LCUI_StyleListNodeRec, *LCUI_StyleListNode;

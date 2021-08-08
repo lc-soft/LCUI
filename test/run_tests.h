@@ -1,8 +1,4 @@
-﻿#include <stdio.h>
-
-extern int tests_count;
-
-void test_object(void);
+﻿void test_object(void);
 void test_settings(void);
 void test_thread(void);
 void test_font_load(void);

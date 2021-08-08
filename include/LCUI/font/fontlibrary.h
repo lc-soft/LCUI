@@ -31,6 +31,10 @@
 #ifndef LCUI_FONT_LIBRARY_H
 #define LCUI_FONT_LIBRARY_H
 
+#include <LCUI/header.h>
+#include <LCUI/types.h>
+#include <stddef.h>
+
 LCUI_BEGIN_HEADER
 
 typedef enum LCUI_FontStyle {
@@ -61,7 +65,7 @@ typedef struct LCUI_FontBitmap_ {
 	int width;		/**< 位图宽度 */
 	int rows;		/**< 位图行数 */
 	int pitch;
-	uchar_t *buffer;	/**< 字体位图数据 */
+	unsigned char *buffer;	/**< 字体位图数据 */
 	short num_grays;
 	char pixel_mode;
 	pd_pos_t advance;	/**< XY轴的跨距 */

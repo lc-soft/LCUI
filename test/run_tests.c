@@ -1,10 +1,9 @@
 ﻿#include <stdio.h>
 #include <wchar.h>
 #include <LCUI.h>
+// #include <LCUI/main.h>
 #include "ctest.h"
 #include "run_tests.h"
-
-int tests_count = 0;
 
 int main(void)
 {
