@@ -8,9 +8,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "make test",
     "commitlint": "commitlint",
-    "build-win-dist": "lcpkg pack",
     "build-changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
     "update-changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
   },
