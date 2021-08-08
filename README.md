@@ -30,8 +30,6 @@
 - [Quick start](#quick-start)
     - [Use LCUI CLI](#use-lcui-cli)
     - [Manual compilation and installation](#manual-compilation-and-installation)
-        - [Windows](#windows)
-        - [Ubuntu](#ubuntu)
 - [Contribution](#contribution)
 - [Documentation](#documentation)
 - [FAQ](#faq)
@@ -133,52 +131,27 @@ lcui run
 
 ### Manual compilation and installation
 
-#### Windows
-
-1. Open CMD window, and run following command in the LCUI source directory to install the dependency libraries:
-    ```bash
-    lcpkg install
-    # If you want compile for x64 CPU architecture
-    lcpkg install --arch x64
-    # If you want compile for Universal Windows Platform (UWP)
-    lcpkg install --platform uwp
-    lcpkg install --arch x64 --platform uwp
-    ```
-1. Rename `config.win32.h.in` in the include directory to `config.h`.
-1. Open the `build/windows/LCUI.sln` file with [Visual Studio](https://visualstudio.microsoft.com/), and then build LCUI.
-
-#### Ubuntu
+Please install [XMake](https://xmake.io/) first, and then execute the following command:
 
 ```bash
-# Install the dependencies
-sudo apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev
-
-# Clone this repository
+# Clone repository
 git clone https://github.com/lc-soft/LCUI.git
 
 # Go into the repository
 cd LCUI
 
-# Generate automake configure script
-./autogen.sh
+# Package the project
+xmake
 
-# Check the build environment and configure automake scripts
-./configure
+# Package the project
+xmake package
 
-# Build
-make
-
-# If you want to install LCUI
-sudo make install
-
-# Go into test directory
-cd test
+# Build the helloworld application in the test directory
+xmake -P test helloworld
 
 # Run helloworld application
-./helloworld
+xmake run -P test helloworld
 ```
-
-> **Note:** If you want to customize the compiler, compile flags, install location, and other configuration items, read the [INSTALL](INSTALL) file.
 
 ## Contribution
 
