@@ -6,7 +6,8 @@
                 "${workspaceRoot}/include",
                 "/usr/include/x86_64-linux-gnu",
                 "/usr/include/linux",
-                "/usr/local/include"
+                "/usr/local/include",
+                "${workspaceFolder}/lib/app/include"
             ],
             "browse": {
                 "path": [

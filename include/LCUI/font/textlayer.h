@@ -31,6 +31,8 @@
 #ifndef LCUI_TEXTLAYER_H
 #define LCUI_TEXTLAYER_H
 
+#include <LCUI/header.h>
+
 LCUI_BEGIN_HEADER
 
 typedef struct LCUI_TextCharRec_ {

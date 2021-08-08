@@ -31,6 +31,8 @@
 #ifndef LCUI_THREAD_H
 #define LCUI_THREAD_H
 
+#include <LCUI/header.h>
+
 #ifdef _WIN32
 #include <windows.h>
 typedef HANDLE LCUI_Mutex;

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * css_rule_font_face.h -- CSS @font-face rule parser module
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
@@ -30,6 +30,8 @@
 
 #ifndef LCUI_CSS_RULE_FONT_FACE_PARSER_H
 #define LCUI_CSS_RULE_FONT_FACE_PARSER_H
+
+#include <LCUI/font/fontlibrary.h>
 
 typedef struct LCUI_CSSFontFaceRec_ {
 	char *font_family;

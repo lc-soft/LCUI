@@ -31,7 +31,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <LCUI_Build.h>
+#include <LCUI/header.h>
 #include <LCUI/util/uri.h>
 
 int OpenUri(const char *uri)

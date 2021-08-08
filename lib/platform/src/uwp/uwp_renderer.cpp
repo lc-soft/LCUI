@@ -153,9 +153,10 @@ static void UpdateSurfaceSize(void)
 	dpy_ev.surface = display.surface;
 	dpy_ev.resize.width = (int)display.renderer->m_frameSize.width;
 	dpy_ev.resize.height = (int)display.renderer->m_frameSize.height;
-	LCUIDisplay_SetSize(dpy_ev.resize.width, dpy_ev.resize.height);
+	ui_widget_resize(ui_root(), dpy_ev.resize.width, dpy_ev.resize.height);
 	EventTrigger_Trigger(display.trigger, LCUI_DEVENT_RESIZE, &dpy_ev);
-	LCUIDisplay_InvalidateArea(NULL);
+	//TODO:
+	//LCUIDisplay_InvalidateArea(NULL);
 }
 
 static int UWPDisplay_GetWidth(void)
@@ -177,7 +178,7 @@ static int UWPDisplay_BindEvent(int event_id, LCUI_EventFunc func, void *data,
 
 static LCUI_Surface UWPSurface_Create(void)
 {
-	LCUI_Surface surface = NEW(LCUI_SurfaceRec, 1);
+	LCUI_Surface surface = malloc(sizeof(LCUI_SurfaceRec));
 	surface->is_updated = FALSE;
 	surface->display = &display;
 	display.surface = surface;
@@ -239,7 +240,7 @@ static pd_paint_context_t* UWPSurface_BeginPaint(LCUI_Surface surface,
 	paint->with_alpha = FALSE;
 	pd_canvas_init(&paint->canvas);
 	LCUIRect_MergeRect(&display.rect, &display.rect, rect);
-	pd_rect_validate_area(&paint->rect, UWPDisplay_GetWidth(),
+	LCUIRect_ValidateArea(&paint->rect, UWPDisplay_GetWidth(),
 			      UWPDisplay_GetHeight());
 	pd_canvas_quote(&paint->canvas, &display.frame, &paint->rect);
 	pd_canvas_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);

@@ -29,9 +29,10 @@
  */
 
 #include <math.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI/header.h>
+#include <LCUI/types.h>
 #include <LCUI/graph.h>
+#include <LCUI/util.h>
 
 #define POW2(X) ((X) * (X))
 #define CIRCLE_R(R) (R - 0.5)

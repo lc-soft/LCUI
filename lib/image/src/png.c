@@ -31,7 +31,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <LCUI_Build.h>
+#include <LCUI/header.h>
 #include "config.h"
 #include <LCUI/types.h>
 #include <LCUI/util.h>
@@ -87,7 +87,9 @@ static void PNGReader_OnRead(png_structp png_ptr, png_bytep buffer,
 int LCUI_InitPNGReader(LCUI_ImageReader reader)
 {
 #ifdef USE_LIBPNG
-	ASSIGN(png_reader, LCUI_PNGReader);
+	LCUI_PNGReader png_reader;
+
+	png_reader = malloc(sizeof(LCUI_PNGReaderRec));
 	png_reader->png_ptr =
 	    png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	ASSERT(png_reader->png_ptr);

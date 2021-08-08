@@ -1,7 +1,7 @@
 ﻿#include <wchar.h>
 #include <math.h>
 #include <string.h>
-#include <LCUI_Build.h>
+#include <LCUI/header.h>
 #include <yutil.h>
 #include <LCUI/util/object.h>
 #include "ctest.h"

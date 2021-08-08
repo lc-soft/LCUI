@@ -1,36 +1,27 @@
 ﻿#include <stdio.h>
 #include <LCUI.h>
-#include <LCUI/settings.h>
-#include <LCUI/main.h>
 #include <LCUI/timer.h>
 #include "ctest.h"
-
-static int settings_change_count = 0;
-
-static void on_settings_change(LCUI_SysEvent object, void *data)
-{
-	++settings_change_count;
-}
 
 static void check_settings_frame_rate_cap(void *arg)
 {
 	char str[256];
 	int fps_limit = *((int *)arg);
-	int fps = LCUI_GetFrameCount();
+	int fps = (int)lcui_get_fps();
 
-	sprintf(str, "should work when frame cap is %d (actual %d)", fps_limit,
+	sprintf(str, "should work when frame cap is %u (actual %u)", fps_limit,
 		fps);
-	it_b(str, fps <= fps_limit && fps > fps_limit / 2, TRUE);
-	LCUI_Quit();
+	it_b(str, fps <= fps_limit + 2 && fps > fps_limit / 2, TRUE);
+	lcui_quit();
 }
 
 static void test_default_settings(void)
 {
-	LCUI_SettingsRec settings;
+	lcui_settings_t settings;
 
-	LCUI_Init();
-	LCUI_ResetSettings();
-	Settings_Init(&settings);
+	lcui_init();
+	lcui_reset_settings();
+	lcui_get_settings(&settings);
 
 	it_i("check default frame rate cap", settings.frame_rate_cap, 120);
 	it_i("check default parallel rendering threads",
@@ -38,15 +29,13 @@ static void test_default_settings(void)
 	it_b("check default record profile", settings.record_profile, FALSE);
 	it_b("check default fps meter", settings.fps_meter, FALSE);
 	it_b("check default paint flashing", settings.paint_flashing, FALSE);
-	LCUI_Destroy();
+	lcui_quit();
+	lcui_main();
 }
 
 static void test_apply_settings(void)
 {
-	LCUI_SettingsRec settings;
-
-	LCUI_Init();
-	int handler = LCUI_BindEvent(LCUI_SETTINGS_CHANGE, on_settings_change, NULL, NULL);
+	lcui_settings_t settings;
 
 	settings.frame_rate_cap = 60;
 	settings.parallel_rendering_threads = 2;
@@ -54,8 +43,9 @@ static void test_apply_settings(void)
 	settings.fps_meter = TRUE;
 	settings.paint_flashing = TRUE;
 
-	LCUI_ApplySettings(&settings);
-	Settings_Init(&settings);
+	lcui_init();
+	lcui_apply_settings(&settings);
+	lcui_get_settings(&settings);
 	it_i("check frame rate cap", settings.frame_rate_cap, 60);
 	it_i("check parallel rendering threads",
 	     settings.parallel_rendering_threads, 2);
@@ -63,56 +53,57 @@ static void test_apply_settings(void)
 	it_b("check fps meter", settings.fps_meter, TRUE);
 	it_b("check paint flashing", settings.paint_flashing, TRUE);
 
-	it_i("check settings change count", settings_change_count, 1);
-
 	settings.frame_rate_cap = -1;
 	settings.parallel_rendering_threads = -1;
 
-	LCUI_ApplySettings(&settings);
-	Settings_Init(&settings);
+	lcui_apply_settings(&settings);
+	lcui_get_settings(&settings);
+
 	it_i("check frame rate cap minimum", settings.frame_rate_cap, 1);
 	it_i("check parallel rendering threads minimum",
 	     settings.parallel_rendering_threads, 1);
-	it_i("check settings change count", settings_change_count, 2);
 
-	LCUI_ResetSettings();
-	it_i("check settings change count", settings_change_count, 3);
-	LCUI_UnbindEvent(handler);
-	LCUI_Destroy();
+	lcui_reset_settings();
+
+	lcui_get_settings(&settings);
+	it_i("check frame rate cap", settings.frame_rate_cap, LCUI_MAX_FRAMES_PER_SEC);
+	lcui_quit();
+	lcui_main();
 }
 
 void test_settings_frame_rate_cap(void)
 {
-	LCUI_SettingsRec settings;
-	LCUI_Init();
-	Settings_Init(&settings);
+	lcui_settings_t settings;
+
+	lcui_init();
+	lcui_get_settings(&settings);
 
 	settings.frame_rate_cap = 30;
-	LCUI_ApplySettings(&settings);
-	lcui_set_timeout(1000, check_settings_frame_rate_cap,
+	lcui_apply_settings(&settings);
+	lcui_set_timeout(1500, check_settings_frame_rate_cap,
 			&settings.frame_rate_cap);
-	LCUI_Main();
+	lcui_main();
 
-	LCUI_Init();
+	lcui_init();
 	settings.frame_rate_cap = 5;
-	LCUI_ApplySettings(&settings);
-	lcui_set_timeout(1000, check_settings_frame_rate_cap,
+	lcui_apply_settings(&settings);
+	lcui_set_timeout(1500, check_settings_frame_rate_cap,
 			&settings.frame_rate_cap);
-	LCUI_Main();
+	lcui_main();
 
-	LCUI_Init();
+	lcui_init();
 	settings.frame_rate_cap = 90;
-	LCUI_ApplySettings(&settings);
-	lcui_set_timeout(1000, check_settings_frame_rate_cap,
+	lcui_apply_settings(&settings);
+	lcui_set_timeout(1500, check_settings_frame_rate_cap,
 			&settings.frame_rate_cap);
-	LCUI_Main();
+	lcui_main();
 
-	LCUI_Init();
+	lcui_init();
 	settings.frame_rate_cap = 25;
-	LCUI_ApplySettings(&settings);
-	lcui_set_timeout(1000, check_settings_frame_rate_cap,
+	lcui_apply_settings(&settings);
+	lcui_set_timeout(1500, check_settings_frame_rate_cap,
 			&settings.frame_rate_cap);
-	LCUI_Main();
+	lcui_main();
 }
 
 void test_settings(void)

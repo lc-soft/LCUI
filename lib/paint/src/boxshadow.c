@@ -35,8 +35,7 @@
 
 #include <math.h>
 #include <stdlib.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI.h>
 #include <LCUI/graph.h>
 
 #define BLUR_N 1.5

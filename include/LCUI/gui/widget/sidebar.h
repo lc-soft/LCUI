@@ -33,7 +33,7 @@
 
 LCUI_BEGIN_HEADER
 
-LCUI_API LCUI_Widget SideBar_AppendItem(LCUI_Widget sidebar,
+LCUI_API ui_widget_t* SideBar_AppendItem(ui_widget_t* sidebar,
 					const wchar_t *id,
 					const wchar_t *icon,
 					const wchar_t *text);

@@ -31,6 +31,9 @@
 #ifndef LCUI_UTIL_RECT_H
 #define LCUI_UTIL_RECT_H
 
+#include <LCUI/header.h>
+#include <LCUI/types.h>
+
 #define LCUIRect_IsIncludeRect(a, b)                                       \
 	((b)->x >= (a)->x && (b)->x + (b)->width <= (a)->x + (a)->width && \
 	 (b)->y >= (a)->y && (b)->y + (b)->height <= (a)->y + (a)->height)
@@ -44,14 +47,21 @@ LCUI_API pd_rect_t Rect(int x, int y, int w, int h);
 
 /** 根据容器尺寸，获取指定区域中需要裁剪的区域 */
 LCUI_API void pd_rect_get_cut_area(int box_w, int box_h, pd_rect_t rect,
-				  pd_rect_t *cut);
+				   pd_rect_t *cut);
 
-#define LCUIRect_HasPoint(rect, X, Y)                                         \
-	(X >= (rect)->x && Y >= (rect)->y && X < (rect)->x + (rect)->width && \
-	 Y < (rect)->y + (rect)->height)
+INLINE LCUI_BOOL LCUIRect_HasPoint(pd_rect_t *rect, int x, int y)
+{
+	return x >= rect->x && y >= rect->y && x < rect->x + rect->width &&
+	       y < rect->y + rect->height;
+}
+INLINE LCUI_BOOL LCUIRectF_HasPoint(pd_rectf_t *rect, float x, float y)
+{
+	return x >= rect->x && y >= rect->y && x < rect->x + rect->width &&
+	       y < rect->y + rect->height;
+}
 
 /** 将矩形区域范围调整在容器有效范围内 */
-LCUI_API LCUI_BOOL pd_rect_validate_area(pd_rect_t *rect, int box_w, int box_h);
+LCUI_API LCUI_BOOL LCUIRect_ValidateArea(pd_rect_t *rect, int box_w, int box_h);
 
 LCUI_API LCUI_BOOL LCUIRectF_ValidateArea(pd_rectf_t *rect, float box_w,
 					  float box_h);
@@ -78,7 +88,7 @@ LCUI_API LCUI_BOOL LCUIRectF_IsCoverRect(const pd_rectf_t *a,
  * @returns 如果两个矩形重叠，则返回TRUE，否则返回FALSE
  */
 LCUI_API LCUI_BOOL pd_rect_get_overlay_rect(const pd_rect_t *a,
-					   const pd_rect_t *b, pd_rect_t *out);
+					    const pd_rect_t *b, pd_rect_t *out);
 
 LCUI_API LCUI_BOOL LCUIRectF_GetOverlayRect(const pd_rectf_t *a,
 					    const pd_rectf_t *b,

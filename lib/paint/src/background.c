@@ -28,13 +28,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI/header.h>
+#include <LCUI/types.h>
 #include <LCUI/graph.h>
+#include <LCUI/util.h>
 
-void pd_background_paint(const pd_background_t *bg,
-		      const pd_rect_t *box,
-		      pd_paint_context_t* paint)
+void pd_background_paint(const pd_background_t *bg, const pd_rect_t *box,
+			 pd_paint_context_t *paint)
 {
 	double scale;
 	pd_canvas_t canvas, buffer;
@@ -49,6 +49,9 @@ void pd_background_paint(const pd_background_t *bg,
 	pd_canvas_init(&buffer);
 	pd_canvas_quote(&canvas, &paint->canvas, &rect);
 	pd_canvas_fill_rect(&canvas, bg->color, NULL, TRUE);
+	if (!bg->image) {
+		return;
+	}
 	/* 将坐标转换为相对于背景内容框 */
 	rect.x += paint->rect.x - box->x;
 	rect.y += paint->rect.y - box->y;

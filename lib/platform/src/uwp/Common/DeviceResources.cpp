@@ -451,7 +451,7 @@ void DX::DeviceResources::UpdateRenderTargetSize()
 		// 当设备纵向显示时，高度大于宽度。请将
 		// 较大维度与宽度阈值比较，并将较小维度
 		// 与高度阈值进行比较。
-		if (max(width, height) > DisplayMetrics::WidthThreshold && min(width, height) > DisplayMetrics::HeightThreshold) {
+		if (y_max(width, height) > DisplayMetrics::WidthThreshold && y_minwidth, height) > DisplayMetrics::HeightThreshold) {
 			// 为了缩放应用，我们更改了有效 DPI。逻辑大小不变。
 			m_effectiveDpi /= 2.0f;
 		}
@@ -462,8 +462,8 @@ void DX::DeviceResources::UpdateRenderTargetSize()
 	m_outputSize.Height = DX::ConvertDipsToPixels(m_logicalSize.Height, m_effectiveDpi);
 
 	// 防止创建大小为零的 DirectX 内容。
-	m_outputSize.Width = max(m_outputSize.Width, 1);
-	m_outputSize.Height = max(m_outputSize.Height, 1);
+	m_outputSize.Width = y_max(m_outputSize.Width, 1);
+	m_outputSize.Height = y_max(m_outputSize.Height, 1);
 }
 
 // 当创建(或重新创建) CoreWindow 时调用此方法。

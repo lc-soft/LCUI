@@ -32,17 +32,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI.h>
+#include <LCUI/ui.h>
 #include <LCUI/font.h>
-#include <LCUI/gui/metrics.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI/graph.h>
 #include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/css_fontstyle.h>
 #include <LCUI/gui/widget/textview.h>
 
-#define GetData(W) Widget_GetData(W, self.prototype)
-#define ComputeActual LCUIMetrics_ComputeActual
+#define GetData(W) ui_widget_get_data(W, self.prototype)
 
 typedef struct LCUI_TextViewTaskRec_ {
 	wchar_t *content;
@@ -53,7 +51,7 @@ typedef struct LCUI_TextViewRec_ {
 	float available_width;
 	wchar_t *content;
 	LCUI_BOOL trimming;
-	LCUI_Widget widget;
+	ui_widget_t* widget;
 	LCUI_TextLayer layer;
 	LCUI_CSSFontStyleRec style;
 	LCUI_TextViewTaskRec task;
@@ -63,7 +61,7 @@ typedef struct LCUI_TextViewRec_ {
 static struct LCUI_TextViewModule {
 	int key_word_break;
 	list_t list;
-	LCUI_WidgetPrototype prototype;
+	ui_widget_prototype_t *prototype;
 } self;
 
 static LCUI_BOOL ParseBoolean(const char *str)
@@ -99,7 +97,7 @@ static LCUI_WordBreakMode ComputeWordBreakMode(LCUI_StyleSheet sheet)
 	return LCUI_WORD_BREAK_NORMAL;
 }
 
-static void TextView_OnParseAttr(LCUI_Widget w, const char *name,
+static void TextView_OnParseAttr(ui_widget_t* w, const char *name,
 				 const char *value)
 {
 	LCUI_TextView txt = GetData(w);
@@ -113,19 +111,19 @@ static void TextView_OnParseAttr(LCUI_Widget w, const char *name,
 	if (strcmp(name, "multiline") == 0) {
 		LCUI_BOOL enable = ParseBoolean(value);
 		if (enable != txt->layer->enable_mulitiline) {
-			TextView_SetMulitiline(w, enable);
+			ui_textview_set_multiline(w, enable);
 		}
 	}
 }
 
-static void TextView_OnParseText(LCUI_Widget w, const char *text)
+static void TextView_OnParseText(ui_widget_t* w, const char *text)
 {
 	TextView_SetText(w, text);
 }
 
-static void TextView_Update(LCUI_Widget w)
+static void TextView_Update(ui_widget_t* w)
 {
-	float scale = LCUIMetrics_GetScale();
+	float scale = ui_get_scale();
 
 	pd_rectf_t rect;
 	LCUI_TextView txt = GetData(w);
@@ -138,13 +136,13 @@ static void TextView_Update(LCUI_Widget w)
 	TextLayer_ClearInvalidRect(txt->layer);
 	for (list_each(node, &rects)) {
 		LCUIRect_ToRectF(node->data, &rect, 1.0f / scale);
-		Widget_InvalidateArea(w, &rect, SV_CONTENT_BOX);
+		ui_widget_mark_dirty_rect(w, &rect, SV_CONTENT_BOX);
 	}
 	RectList_Clear(&rects);
-	Widget_AddTask(w, LCUI_WTASK_REFLOW);
+	ui_widget_add_task(w, UI_TASK_REFLOW);
 }
 
-static void TextView_UpdateStyle(LCUI_Widget w)
+static void TextView_UpdateStyle(ui_widget_t* w)
 {
 	LCUI_CSSFontStyleRec style;
 	LCUI_TextStyleRec text_style;
@@ -173,11 +171,11 @@ static void TextView_UpdateStyle(LCUI_Widget w)
 	TextView_Update(w);
 }
 
-static void TextView_OnInit(LCUI_Widget w)
+static void TextView_OnInit(ui_widget_t* w)
 {
 	LCUI_TextView txt;
 
-	txt = Widget_AddData(w, self.prototype, sizeof(LCUI_TextViewRec));
+	txt = ui_widget_add_data(w, self.prototype, sizeof(LCUI_TextViewRec));
 	txt->widget = w;
 	txt->available_width = 0;
 	txt->task.update_content = FALSE;
@@ -194,7 +192,7 @@ static void TextView_OnInit(LCUI_Widget w)
 	list_append_node(&self.list, &txt->node);
 }
 
-static void TextView_OnDestroy(LCUI_Widget w)
+static void TextView_OnDestroy(ui_widget_t* w)
 {
 	LCUI_TextView txt = GetData(w);
 
@@ -208,34 +206,34 @@ static void TextView_OnDestroy(LCUI_Widget w)
 	}
 }
 
-static void TextView_OnAutoSize(LCUI_Widget w, float *width, float *height,
-				LCUI_LayoutRule rule)
+static void TextView_OnAutoSize(ui_widget_t* w, float *width, float *height,
+				ui_layout_rule_t rule)
 {
 	int max_width, max_height;
-	float scale = LCUIMetrics_GetScale();
+	float scale = ui_get_scale();
 
 	LCUI_TextView txt = GetData(w);
 
 	list_t rects;
 
 	if (w->parent &&
-	    w->parent->computed_style.width_sizing == LCUI_SIZING_RULE_FIXED) {
+	    w->parent->computed_style.width_sizing == UI_SIZING_RULE_FIXED) {
 		txt->available_width = w->parent->box.content.width;
-		max_width = (int)(scale * txt->available_width - Widget_PaddingX(w) -
-				  Widget_BorderX(w));
+		max_width = (int)(scale * txt->available_width - padding_x(w) -
+				  border_x(w));
 	} else {
 		txt->available_width = 0;
 		max_width = 0;
 	}
 	switch (rule) {
-	case LCUI_LAYOUT_RULE_FIXED_WIDTH:
+	case UI_LAYOUT_RULE_FIXED_WIDTH:
 		max_width = (int)(scale * w->box.content.width);
 		max_height = 0;
 		break;
-	case LCUI_LAYOUT_RULE_FIXED_HEIGHT:
+	case UI_LAYOUT_RULE_FIXED_HEIGHT:
 		max_height = (int)(scale * w->box.content.height);
 		break;
-	case LCUI_LAYOUT_RULE_FIXED:
+	case UI_LAYOUT_RULE_FIXED:
 		max_width = (int)(scale * w->box.content.width);
 		max_height = (int)(scale * w->box.content.height);
 		break;
@@ -253,9 +251,9 @@ static void TextView_OnAutoSize(LCUI_Widget w, float *width, float *height,
 	RectList_Clear(&rects);
 }
 
-static void TextView_OnResize(LCUI_Widget w, float width, float height)
+static void TextView_OnResize(ui_widget_t* w, float width, float height)
 {
-	float scale = LCUIMetrics_GetScale();
+	float scale = ui_get_scale();
 	int fixed_width = (int)(width * scale);
 	int fixed_height = (int)(height * scale);
 
@@ -272,13 +270,13 @@ static void TextView_OnResize(LCUI_Widget w, float width, float height)
 	TextLayer_ClearInvalidRect(txt->layer);
 	for (list_each(node, &rects)) {
 		LCUIRect_ToRectF(node->data, &rect, 1.0f / scale);
-		Widget_InvalidateArea(w, &rect, SV_CONTENT_BOX);
+		ui_widget_mark_dirty_rect(w, &rect, SV_CONTENT_BOX);
 	}
 	RectList_Clear(&rects);
 }
 
-static void TextView_OnPaint(LCUI_Widget w, pd_paint_context_t* paint,
-			     LCUI_WidgetActualStyle style)
+static void TextView_OnPaint(ui_widget_t* w, pd_paint_context_t *paint,
+			     ui_widget_actual_style_t* style)
 {
 	pd_pos_t pos;
 	pd_canvas_t canvas;
@@ -303,10 +301,10 @@ static void TextView_OnPaint(LCUI_Widget w, pd_paint_context_t* paint,
 	TextLayer_RenderTo(txt->layer, rect, pos, &canvas);
 }
 
-int TextView_SetTextW(LCUI_Widget w, const wchar_t *text)
+int TextView_SetTextW(ui_widget_t* w, const wchar_t *text)
 {
 	LCUI_TextView txt = GetData(w);
-	wchar_t *newtext = malloc(wcssize(text));
+	wchar_t *newtext = wcsdup2(text);
 
 	if (!newtext) {
 		return -ENOMEM;
@@ -314,7 +312,7 @@ int TextView_SetTextW(LCUI_Widget w, const wchar_t *text)
 	if (txt->content) {
 		free(txt->content);
 	}
-	txt->content = malloc(wcssize(text));
+	txt->content = wcsdup2(text);
 	if (!txt->content) {
 		free(newtext);
 		return -ENOMEM;
@@ -337,11 +335,11 @@ int TextView_SetTextW(LCUI_Widget w, const wchar_t *text)
 	}
 	txt->task.update_content = TRUE;
 	txt->task.content = newtext;
-	Widget_AddTask(w, LCUI_WTASK_USER);
+	ui_widget_add_task(w, UI_TASK_USER);
 	return 0;
 }
 
-int TextView_SetText(LCUI_Widget w, const char *utf8_text)
+int TextView_SetText(ui_widget_t* w, const char *utf8_text)
 {
 	int ret;
 	wchar_t *wstr;
@@ -356,22 +354,22 @@ int TextView_SetText(LCUI_Widget w, const char *utf8_text)
 	return ret;
 }
 
-void TextView_SetLineHeight(LCUI_Widget w, int height)
+void TextView_SetLineHeight(ui_widget_t* w, int height)
 {
 	Widget_SetFontStyle(w, key_line_height, (float)height, px);
 }
 
-void TextView_SetTextAlign(LCUI_Widget w, int align)
+void TextView_SetTextAlign(ui_widget_t* w, int align)
 {
 	Widget_SetFontStyle(w, key_text_align, align, style);
 }
 
-void TextView_SetColor(LCUI_Widget w, pd_color_t color)
+void TextView_SetColor(ui_widget_t* w, pd_color_t color)
 {
 	Widget_SetFontStyle(w, key_color, color, color);
 }
 
-void TextView_SetAutoWrap(LCUI_Widget w, LCUI_BOOL enable)
+void TextView_SetAutoWrap(ui_widget_t* w, LCUI_BOOL enable)
 {
 	if (enable) {
 		Widget_SetFontStyle(w, key_white_space, SV_AUTO, style);
@@ -380,31 +378,30 @@ void TextView_SetAutoWrap(LCUI_Widget w, LCUI_BOOL enable)
 	}
 }
 
-void TextView_SetMulitiline(LCUI_Widget w, LCUI_BOOL enable)
+
+
+void ui_textview_set_multiline(ui_widget_t* w, LCUI_BOOL enable)
 {
 	LCUI_TextView txt = GetData(w);
 
 	TextLayer_SetMultiline(txt->layer, enable);
-	Widget_AddTask(w, LCUI_WTASK_USER);
+	ui_widget_add_task(w, UI_TASK_USER);
 }
 
-size_t LCUIWidget_RefreshTextView(void)
+static void textview_on_font_face_load(ui_widget_t *w, ui_event_t *e, void *arg)
 {
-	size_t count = 0;
 	LCUI_TextView txt;
 	list_node_t *node;
 
 	for (list_each(node, &self.list)) {
 		txt = node->data;
-		if (txt->widget->state != LCUI_WSTATE_DELETED) {
-			Widget_UpdateStyle(txt->widget, TRUE);
+		if (txt->widget->state != UI_WIDGET_STATE_DELETED) {
+			ui_widget_refresh_style(txt->widget);
 		}
-		count += 1;
 	}
-	return count;
 }
 
-static void TextVIew_OnTask(LCUI_Widget w, int task)
+static void TextVIew_OnTask(ui_widget_t* w, int task)
 {
 	LCUI_TextView txt;
 
@@ -416,13 +413,13 @@ static void TextVIew_OnTask(LCUI_Widget w, int task)
 		txt->task.content = NULL;
 		txt->task.update_content = FALSE;
 	}
-	if (task != LCUI_WTASK_RESIZE ||
-	    w->computed_style.width_sizing != LCUI_SIZING_RULE_FIT_CONTENT) {
+	if (task != UI_TASK_RESIZE ||
+	    w->computed_style.width_sizing != UI_SIZING_RULE_FIT_CONTENT) {
 		return;
 	}
 	if (w->parent && w->parent->box.content.width != txt->available_width) {
 		txt->available_width = w->parent->box.content.width;
-		Widget_AddTask(w, LCUI_WTASK_REFLOW);
+		ui_widget_add_task(w, UI_TASK_REFLOW);
 	}
 }
 
@@ -431,7 +428,7 @@ void LCUIWidget_AddTextView(void)
 	LCUI_CSSPropertyParserRec parser = { 0, "word-break",
 					     OnParseWordBreak };
 	self.key_word_break = LCUI_AddCSSPropertyName("word-break");
-	self.prototype = LCUIWidget_NewPrototype("textview", NULL);
+	self.prototype = ui_create_widget_prototype("textview", NULL);
 	self.prototype->init = TextView_OnInit;
 	self.prototype->paint = TextView_OnPaint;
 	self.prototype->destroy = TextView_OnDestroy;
@@ -443,9 +440,11 @@ void LCUIWidget_AddTextView(void)
 	self.prototype->runtask = TextVIew_OnTask;
 	LCUI_AddCSSPropertyParser(&parser);
 	list_create(&self.list);
+	ui_on_event("font_face_load", textview_on_font_face_load, NULL, NULL);
 }
 
 void LCUIWidget_FreeTextView(void)
 {
 	list_destroy_without_node(&self.list, NULL);
+	ui_off_event("font_face_load", textview_on_font_face_load);
 }
