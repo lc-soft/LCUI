@@ -133,54 +133,27 @@ lcui run
 
 ### 手动编译安装
 
-#### Windows
-
-1. 打开命令行窗口，在 LCUI 的源码目录中使用以下命令安装依赖库：
-
-    ```bash
-    lcpkg install
-    # 如果你需要编译 x64 版本的话
-    lcpkg install --arch x64
-    # 如果你需要编译适用于 Windows 通用应用平台 (UWP) 版本的话
-    lcpkg install --platform uwp
-    lcpkg install --arch x64 --platform uwp
-    ```
-
-1. 重命名 include 目录中的 `config.win32.h.in` 文件为 `config.h`。
-1. 使用 [Visual Studio](https://visualstudio.microsoft.com/) 打开 `build/windows/LCUI.sln` 文件，然后编译生成 LCUI。
-
-#### Ubuntu
+先安装 [XMake](https://xmake.io/#/zh-cn/)，然后执行以下命令：
 
 ```bash
-# 安装依赖库
-sudo apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev
-
 # 克隆代码库
 git clone https://github.com/lc-soft/LCUI.git
 
 # 进入源码目录
 cd LCUI
 
-# 生成配置脚本
-./autogen.sh
+# 构建项目
+xmake
 
-# 配置环境及构建工具
-./configure
+# 打包已构建的文件
+xmake package
 
-# 构建
-make
+# 构建 test 目录内的 hellowrld 程序
+xmake -P test helloworld
 
-# 如果需要安装的话
-sudo make install
-
-# 进入测试程序目录
-cd test
-
-#  运行 helloworld 程序
-./helloworld
+# 运行 helloworld 程序
+xmake run -P test helloworld
 ```
-
-> **提示：** 如果需要自定义编译器、编译参数、安装位置等配置，请查阅 [INSTALL](INSTALL) 文件。
 
 ## 文档
 
