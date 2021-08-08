@@ -10,7 +10,7 @@ if has_config("with-fontconfig") then
 end
 
 target("lcui-font")
-    set_kind("shared")
+    set_kind("static")
     add_files("src/**.c")
     set_configdir("src")
     add_configfiles("src/config.h.in")

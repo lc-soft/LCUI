@@ -1,5 +1,5 @@
 target("lcui-ui-anchor")
-    set_kind("shared")
+    set_kind("static")
     add_files("src/**.c")
     if is_plat("windows") then
         add_options("uwp")
