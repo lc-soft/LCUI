@@ -195,17 +195,3 @@ src/
 **API 设计风格：**
 
 与基础库的 API 设计风格相同，为了减少 LCUI 应用程序升级到 LCUI 3.0 时的改动量，我们会提供驼峰命名风格的 API。
-
-## 问题解决记录
-
-**libui、libplatform、libapp 互相依赖，如何解耦？**
-
-解决方案：
-
-- libui:
-  - 提供一个函数用于被动处理事件，不再主动调用 libapp 的事件绑定方法。
-  - 将 textview、button、anchor、scrollbar 等基础组件拆分为独立库。
-- libplatform:
-- libapp:
-
-**全局 settings 数据如何解耦？**

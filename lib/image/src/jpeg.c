@@ -31,7 +31,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <LCUI_Build.h>
+#include <LCUI/header.h>
 #include "config.h"
 #include <LCUI/types.h>
 #include <yutil.h>

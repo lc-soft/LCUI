@@ -30,15 +30,14 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI.h>
+#include <LCUI/ui.h>
 #include <LCUI/font.h>
-#include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/widget/button.h>
 #include <LCUI/gui/css_parser.h>
 
-static LCUI_WidgetPrototype prototype = NULL;
+static ui_widget_prototype_t *prototype = NULL;
 
 /** 按钮的 css 样式 */
 static const char *button_css = CodeToString(
@@ -67,25 +66,25 @@ button:disabled {
 
 );
 
-static void Button_OnInit(LCUI_Widget w)
+static void Button_OnInit(ui_widget_t* w)
 {
 	prototype->proto->init(w);
 	w->computed_style.focusable = TRUE;
 }
 
-void Button_SetTextW(LCUI_Widget w, const wchar_t *wstr)
+void Button_SetTextW(ui_widget_t* w, const wchar_t *wstr)
 {
 	TextView_SetTextW(w, wstr);
 }
 
-void Button_SetText(LCUI_Widget w, const char *str)
+void Button_SetText(ui_widget_t* w, const char *str)
 {
 	TextView_SetText(w, str);
 }
 
 void LCUIWidget_AddButton(void)
 {
-	prototype = LCUIWidget_NewPrototype("button", "textview");
+	prototype = ui_create_widget_prototype("button", "textview");
 	prototype->init = Button_OnInit;
-	LCUI_LoadCSSString(button_css, __FILE__);
+	ui_load_css_string(button_css, __FILE__);
 }

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <LCUI.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/builder.h>
@@ -12,23 +12,22 @@
 #define CHILD_OPACITY 0.5f
 
 static struct {
-	LCUI_Widget parent;
-	LCUI_Widget child;
-	LCUI_Widget text;
+	ui_widget_t* parent;
+	ui_widget_t* child;
+	ui_widget_t* text;
 } self;
 
 static void build(void)
 {
-	LCUI_Widget pack, root;
+	ui_widget_t *pack, *root;
 
 	pack = LCUIBuilder_LoadFile("test_widget_opacity.xml");
-	root = LCUIWidget_GetRoot();
-	Widget_Append(root, pack);
-	Widget_Unwrap(pack);
-
-	self.parent = LCUIWidget_GetById("parent");
-	self.child = LCUIWidget_GetById("child");
-	self.text = LCUIWidget_GetById("current-opacity");
+	root = ui_root();
+	ui_widget_append(root, pack);
+	ui_widget_unwrap(pack);
+	self.parent = ui_get_widget("parent");
+	self.child = ui_get_widget("child");
+	self.text = ui_get_widget("current-opacity");
 }
 
 static int check_color(pd_color_t a, pd_color_t b)
@@ -60,15 +59,15 @@ static void check_widget_opactiy(void)
 	paint.rect.x = paint.rect.y = 0;
 	pd_canvas_quote(&paint.canvas, &canvas, &rect);
 
-	Widget_SetOpacity(self.parent, 0.8f);
-	Widget_Resize(self.parent, 512, 256);
-	Widget_UpdateStyle(self.child, TRUE);
-	Widget_UpdateStyle(self.parent, TRUE);
-	Widget_Update(self.child);
-	Widget_Update(self.parent);
-	Widget_Update(self.parent);
+	ui_widget_set_opacity(self.parent, 0.8f);
+	ui_widget_resize(self.parent, 512, 256);
+	ui_widget_refresh_style(self.child);
+	ui_widget_refresh_style(self.parent);
+	ui_widget_update(self.child);
+	ui_widget_update(self.parent);
+	ui_widget_update(self.parent);
 
-	Widget_Render(self.parent, &paint);
+	ui_widget_render(self.parent, &paint);
 
 	expected_color = bgcolor;
 	pd_canvas_get_pixel(&canvas, 10, 10, color);
@@ -116,9 +115,9 @@ static void check_widget_opactiy(void)
 
 void test_widget_opacity(void)
 {
-	LCUI_Init();
+	lcui_init();
 
 	build();
 	describe("check widget opacity", check_widget_opactiy);
-	LCUI_Destroy();
+	lcui_destroy();
 }

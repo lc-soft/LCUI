@@ -29,10 +29,9 @@
  */
 
 #include <errno.h>
-#include <LCUI.h>
 #include <LCUI/thread.h>
 
-#ifdef LCUI_BUILD_IN_WIN32
+#ifdef LCUI_PLATFORM_WIN32
 
 /** 初始化一个条件变量 */
 int LCUICond_Init(LCUI_Cond *cond)

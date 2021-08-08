@@ -30,6 +30,9 @@
 #ifndef LCUI_GRAPH_H
 #define LCUI_GRAPH_H
 
+#include <LCUI/header.h>
+#include <LCUI/types.h>
+
 LCUI_BEGIN_HEADER
 
 /* 解除RGB宏 */

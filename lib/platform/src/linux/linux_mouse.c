@@ -1,5 +1,5 @@
 /*
- * linux_mouse.c -- Mouse support for linux.
+ * linux_linux_mouse.c -- Mouse support for linux.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
@@ -28,9 +28,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include <LCUI_Build.h>
-#ifdef LCUI_BUILD_IN_LINUX
+#include "../internal.h"
+
+#ifdef LCUI_PLATFORM_LINUX
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -40,17 +40,9 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-
-#include <LCUI/LCUI.h>
 #include <LCUI/thread.h>
-#include <LCUI/platform.h>
-#include <LCUI/display.h>
-#include LCUI_EVENTS_H
-#include LCUI_MOUSE_H
 
-enum MouseButtonId { MOUSE_BUTTON_LEFT = 1, MOUSE_BUTTON_RIGHT = 1 << 1 };
-
-static struct LCUI_LinuxMouseDriver {
+static struct linux_mouse_t {
 	int x;
 	int y;
 	int button_state[2];
@@ -60,134 +52,95 @@ static struct LCUI_LinuxMouseDriver {
 
 	LCUI_Thread tid;
 	LCUI_BOOL active;
-} mouse;
+} linux_mouse;
 
-static void DispathMouseButtonEvent(int button, int state)
+static void linux_dispatch_mouse_button_event(int button, int state)
 {
-	LCUI_SysEventRec ev = { 0 };
-	if (mouse.button_state[button - 1]) {
+	app_event_t ev = { 0 };
+	if (linux_mouse.button_state[button - 1]) {
 		if (!(state & button)) {
-			ev.type = LCUI_MOUSEUP;
-			ev.button.x = mouse.x;
-			ev.button.y = mouse.y;
-			ev.button.button = button;
-			mouse.button_state[button - 1] = 0;
-			LCUI_TriggerEvent(&ev, NULL);
-			LCUI_DestroyEvent(&ev);
+			ev.type = APP_EVENT_MOUSEUP;
+			ev.mouse.x = linux_mouse.x;
+			ev.mouse.y = linux_mouse.y;
+			ev.mouse.button = button;
+			linux_mouse.button_state[button - 1] = 0;
+			app_post_event(&ev);
+			app_event_destroy(&ev);
 		}
 	} else if (state & button) {
-		ev.type = LCUI_MOUSEDOWN;
-		ev.button.x = mouse.x;
-		ev.button.y = mouse.y;
-		ev.button.button = button;
-		mouse.button_state[button - 1] = 1;
-		LCUI_TriggerEvent(&ev, NULL);
-		LCUI_DestroyEvent(&ev);
+		ev.type = APP_EVENT_MOUSEDOWN;
+		ev.mouse.x = linux_mouse.x;
+		ev.mouse.y = linux_mouse.y;
+		ev.mouse.button = button;
+		linux_mouse.button_state[button - 1] = 1;
+		app_post_event(&ev);
+		app_event_destroy(&ev);
 	}
 }
 
-static void DispatchMouseEvent(void *arg1, void *arg2)
-{
-	char *buf = arg1;
-	int state = buf[0] & 0x07;
-	LCUI_SysEventRec ev = { 0 };
-
-	mouse.x += buf[1];
-	mouse.y -= buf[2];
-	mouse.x = y_max(0, mouse.x);
-	mouse.y = y_max(0, mouse.y);
-	mouse.x = y_min(LCUIDisplay_GetWidth(), mouse.x);
-	mouse.y = y_min(LCUIDisplay_GetHeight(), mouse.y);
-	ev.type = LCUI_MOUSEMOVE;
-	ev.motion.x = mouse.x;
-	ev.motion.y = mouse.y;
-	ev.motion.xrel = buf[1];
-	ev.motion.yrel = -buf[2];
-	LCUI_TriggerEvent(&ev, NULL);
-	LCUI_DestroyEvent(&ev);
-	DispathMouseButtonEvent(MOUSE_BUTTON_LEFT, state);
-	DispathMouseButtonEvent(MOUSE_BUTTON_RIGHT, state);
-}
-
-static void LinuxMouseThread(void *arg)
+static void linux_mouse_thread(void *arg)
 {
 	char buf[6];
+	int state;
 	fd_set readfds;
 	struct timeval tv;
-	LCUI_TaskRec task = { 0 };
+	app_event_t ev = { 0 };
 
-	mouse.active = TRUE;
-	task.func = DispatchMouseEvent;
-	task.destroy_arg[0] = free;
-	while (mouse.active) {
+	while (linux_mouse.active) {
 		tv.tv_sec = 0;
 		tv.tv_usec = 500000;
-
 		FD_ZERO(&readfds);
-		FD_SET(mouse.dev_fd, &readfds);
-		select(mouse.dev_fd + 1, &readfds, NULL, NULL, &tv);
-		if (FD_ISSET(mouse.dev_fd, &readfds)) {
-			if (read(mouse.dev_fd, buf, 6) <= 0) {
-				continue;
-			}
-			task.arg[0] = malloc(sizeof(char) * 6);
-			if (!task.arg[0]) {
-				perror("[input] mouse driver");
-				continue;
-			}
-			memcpy(task.arg[0], buf, sizeof(char) * 6);
-			LCUI_PostTask(&task);
+		FD_SET(linux_mouse.dev_fd, &readfds);
+		select(linux_mouse.dev_fd + 1, &readfds, NULL, NULL, &tv);
+		if (!FD_ISSET(linux_mouse.dev_fd, &readfds)) {
+			continue;
 		}
+		if (read(linux_mouse.dev_fd, buf, 6) <= 0) {
+			continue;
+		}
+		state = buf[0] & 0x07;
+		linux_mouse.x += buf[1];
+		linux_mouse.y -= buf[2];
+		linux_mouse.x = y_max(0, linux_mouse.x);
+		linux_mouse.y = y_max(0, linux_mouse.y);
+		linux_mouse.x = y_min(app_get_screen_width(), linux_mouse.x);
+		linux_mouse.y = y_min(app_get_screen_height(), linux_mouse.y);
+		ev.type = APP_EVENT_MOUSEMOVE;
+		ev.mouse.x = linux_mouse.x;
+		ev.mouse.y = linux_mouse.y;
+		app_post_event(&ev);
+		app_event_destroy(&ev);
+		linux_dispatch_mouse_button_event(MOUSE_BUTTON_LEFT, state);
+		linux_dispatch_mouse_button_event(MOUSE_BUTTON_RIGHT, state);
 	}
 }
 
-static int InitLinuxMouse(void)
+int linux_mouse_init(void)
 {
-	mouse.x = LCUIDisplay_GetWidth() / 2;
-	mouse.y = LCUIDisplay_GetHeight() / 2;
-	mouse.dev_path = getenv("LCUI_MOUSE_DEVICE");
-	if (!mouse.dev_path) {
-		mouse.dev_path = "/dev/input/mice";
+	linux_mouse.x = app_get_screen_width() / 2;
+	linux_mouse.y = app_get_screen_height() / 2;
+	linux_mouse.dev_path = getenv("LCUI_MOUSE_DEVICE");
+	if (!linux_mouse.dev_path) {
+		linux_mouse.dev_path = "/dev/input/mice";
 	}
-	logger_debug("[input] open mouse device: %s\n", mouse.dev_path);
-	if ((mouse.dev_fd = open(mouse.dev_path, O_RDONLY)) < 0) {
+	logger_debug("[input] open mouse device: %s\n", linux_mouse.dev_path);
+	if ((linux_mouse.dev_fd = open(linux_mouse.dev_path, O_RDONLY)) < 0) {
 		logger_error("[input] open mouse device failed\n");
 		return -1;
 	}
-	LCUIThread_Create(&mouse.tid, LinuxMouseThread, NULL);
-	logger_debug("[input] mouse driver thread: %lld\n", mouse.tid);
+	LCUIThread_Create(&linux_mouse.tid, linux_mouse_thread, NULL);
+	logger_debug("[input] mouse driver thread: %lld\n", linux_mouse.tid);
 	return 0;
 }
 
-static void FreeLinuxMouse(void)
+int linux_mouse_destroy(void)
 {
-	if (mouse.active) {
-		mouse.active = FALSE;
-		LCUIThread_Join(mouse.tid, NULL);
-		close(mouse.dev_fd);
+	if (linux_mouse.active) {
+		linux_mouse.active = FALSE;
+		LCUIThread_Join(linux_mouse.tid, NULL);
+		close(linux_mouse.dev_fd);
 	}
-}
-
-void LCUI_InitLinuxMouse(void)
-{
-#ifdef USE_LIBX11
-	if (LCUI_GetAppId() == LCUI_APP_LINUX_X11) {
-		LCUI_InitLinuxX11Mouse();
-		return;
-	}
-#endif
-	InitLinuxMouse();
-}
-
-void LCUI_FreeLinuxMouse(void)
-{
-#ifdef USE_LIBX11
-	if (LCUI_GetAppId() == LCUI_APP_LINUX_X11) {
-		LCUI_FreeLinuxX11Mouse();
-		return;
-	}
-#endif
-	FreeLinuxMouse();
+	return 0;
 }
 
 #endif

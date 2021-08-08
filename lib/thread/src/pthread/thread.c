@@ -90,7 +90,7 @@ int LCUIThread_Create(LCUI_Thread *thread, void (*func)(void *), void *arg)
 		LCUIMutex_Init(&self.mutex);
 		self.is_inited = TRUE;
 	}
-	ctx = NEW(LCUI_ThreadContextRec, 1);
+	ctx = malloc(sizeof(LCUI_ThreadContextRec));
 	if (!ctx) {
 		return -ENOMEM;
 	}

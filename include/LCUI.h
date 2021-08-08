@@ -1,2 +1,4 @@
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI/timer.h>
+#include <LCUI/platform.h>
+#include <LCUI/ui.h>
+#include <LCUI/app.h>

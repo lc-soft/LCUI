@@ -32,7 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <LCUI_Build.h>
+#include <LCUI/header.h>
 #include <LCUI/types.h>
 #include <LCUI/util.h>
 #include <LCUI/graph.h>
@@ -785,6 +785,9 @@ int pd_canvas_create(pd_canvas_t *canvas, unsigned width, unsigned height)
 
 pd_bool pd_canvas_is_valid(const pd_canvas_t *canvas)
 {
+	if (!canvas) {
+		return FALSE;
+	}
 	if (canvas->quote.is_valid) {
 		return canvas->quote.source && canvas->quote.source->width > 0 &&
 		       canvas->quote.source->height > 0;
@@ -835,7 +838,7 @@ int pd_canvas_quote_read_only(pd_canvas_t *self, const pd_canvas_t *source,
 	} else {
 		quote_rect = *rect;
 	}
-	pd_rect_validate_area(&quote_rect, source->width, source->height);
+	LCUIRect_ValidateArea(&quote_rect, source->width, source->height);
 	/* 如果引用源本身已经引用了另一个源 */
 	if (source->quote.is_valid) {
 		quote_rect.x += source->quote.left;
@@ -1133,7 +1136,7 @@ int pd_canvas_cut(const pd_canvas_t *canvas, pd_rect_t rect, pd_canvas_t *buff)
 	if (!pd_canvas_is_valid(canvas)) {
 		return -2;
 	}
-	pd_rect_validate_area(&rect, canvas->width, canvas->height);
+	LCUIRect_ValidateArea(&rect, canvas->width, canvas->height);
 	if (rect.width <= 0 || rect.height <= 0) {
 		return -3;
 	}

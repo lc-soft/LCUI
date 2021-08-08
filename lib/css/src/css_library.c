@@ -32,16 +32,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <LCUI_Build.h>
+#include <LCUI/header.h>
 #include <LCUI/types.h>
 #include <LCUI/util.h>
 #include <LCUI/gui/css_library.h>
 #include <LCUI/gui/css_parser.h>
 
-/* clang-format off */
-
-#define MAX_NAME_LEN	256
-#define LEN(A)		sizeof(A) / sizeof(*A)
+#define MAX_NAME_LEN 256
+#define LEN(A) sizeof(A) / sizeof(*A)
 
 enum SelectorRank {
 	GENERAL_RANK = 0,
@@ -64,54 +62,54 @@ enum SelectorFinderLevel {
 
 /* 样式表查找器的上下文数据结构 */
 typedef struct NamesFinderRec_ {
-	int level;			/**< 当前选择器层级 */
-	int class_i;			/**< 当前处理到第几个类名 */
-	int status_i;			/**< 当前处理到第几个状态名（伪类名） */
-	int name_i;			/**< 选择器名称从第几个字符开始 */
-	char name[MAX_NAME_LEN];	/**< 选择器名称缓存 */
-	LCUI_SelectorNode node;		/**< 针对的选择器结点 */
+	int level;    /**< 当前选择器层级 */
+	int class_i;  /**< 当前处理到第几个类名 */
+	int status_i; /**< 当前处理到第几个状态名（伪类名） */
+	int name_i;   /**< 选择器名称从第几个字符开始 */
+	char name[MAX_NAME_LEN]; /**< 选择器名称缓存 */
+	LCUI_SelectorNode node;  /**< 针对的选择器结点 */
 } NamesFinderRec, *NamesFinder;
 
 /** 样式链接记录组 */
 typedef struct StyleLinkGroupRec_ {
-	dict_t *links;             /**< 样式链接表 */
+	dict_t *links;           /**< 样式链接表 */
 	char *name;              /**< 选择器名称 */
 	LCUI_SelectorNode snode; /**< 选择器结点 */
 } StyleLinkGroupRec, *StyleLinkGroup;
 
 /** 样式结点记录 */
 typedef struct StyleNodeRec_ {
-	int rank;		/**< 权值，决定优先级 */
-	int batch_num;		/**< 批次号 */
-	char *space;		/**< 所属的空间 */
-	char *selector;		/**< 选择器 */
-	LCUI_StyleList list;	/**< 样式表 */
-	list_node_t node;	/**< 在链表中的结点 */
+	int rank;            /**< 权值，决定优先级 */
+	int batch_num;       /**< 批次号 */
+	char *space;         /**< 所属的空间 */
+	char *selector;      /**< 选择器 */
+	LCUI_StyleList list; /**< 样式表 */
+	list_node_t node;    /**< 在链表中的结点 */
 } StyleNodeRec, *StyleNode;
 
 /** 样式链接记录 */
 typedef struct StyleLinkRec_ {
-	char *selector;		/**< 选择器 */
-	StyleLinkGroup group;	/**< 所属组 */
-	list_t styles;	/**< 作用于当前选择器的样式 */
-	dict_t *parents;		/**< 父级节点 */
+	char *selector;       /**< 选择器 */
+	StyleLinkGroup group; /**< 所属组 */
+	list_t styles;        /**< 作用于当前选择器的样式 */
+	dict_t *parents;      /**< 父级节点 */
 } StyleLinkRec, *StyleLink;
 
 static struct {
 	LCUI_BOOL active;
-	list_t groups;		/**< 样式组列表 */
-	dict_t *cache;			/**< 样式表缓存，以选择器的 hash 值索引 */
-	dict_t *names;			/**< 样式属性名称表，以值的名称索引 */
-	dict_t *value_keys;		/**< 样式属性值表，以值的名称索引 */
-	dict_t *value_names;		/**< 样式属性值名称表，以值索引 */
-	dict_type_t names_dict;		/**< 样式属性名称表的类型 */
-	dict_type_t value_keys_dict;	/**< 样式属性值表的类型 */
-	dict_type_t value_names_dict;	/**< 样式属性值名称表的类型 */
-	dict_type_t style_link_dict;	/**< 样式链接表的类型 */
-	dict_type_t style_group_dict;	/**< 样式组的类型 */
-	dict_type_t cache_dict;		/**< 样式表缓存的类型 */
-	strpool_t *strpool;		/**< 字符串池 */
-	int count;			/**< 当前记录的属性数量 */
+	list_t groups; /**< 样式组列表 */
+	dict_t *cache; /**< 样式表缓存，以选择器的 hash 值索引 */
+	dict_t *names; /**< 样式属性名称表，以值的名称索引 */
+	dict_t *value_keys;  /**< 样式属性值表，以值的名称索引 */
+	dict_t *value_names; /**< 样式属性值名称表，以值索引 */
+	dict_type_t names_dict;       /**< 样式属性名称表的类型 */
+	dict_type_t value_keys_dict;  /**< 样式属性值表的类型 */
+	dict_type_t value_names_dict; /**< 样式属性值名称表的类型 */
+	dict_type_t style_link_dict;  /**< 样式链接表的类型 */
+	dict_type_t style_group_dict; /**< 样式组的类型 */
+	dict_type_t cache_dict;       /**< 样式表缓存的类型 */
+	strpool_t *strpool;           /**< 字符串池 */
+	int count;                    /**< 当前记录的属性数量 */
 } library;
 
 /** 样式字符串值与标识码 */
@@ -241,10 +239,10 @@ static KeyNameGroupRec style_value_map[] = {
 
 static int LCUI_DirectAddStyleName(int key, const char *name)
 {
-	if(!library.names->type->val_dup){
+	if (!library.names->type->val_dup) {
 		return -2;
 	}
-	return dict_add(library.names, &key, name);
+	return dict_add(library.names, &key, (void*)name);
 }
 
 int LCUI_SetStyleName(int key, const char *name)
@@ -510,12 +508,12 @@ LCUI_StyleSheet StyleSheet(void)
 {
 	LCUI_StyleSheet ss;
 
-	ss = NEW(LCUI_StyleSheetRec, 1);
+	ss = calloc(sizeof(LCUI_StyleSheetRec), 1);
 	if (!ss) {
 		return ss;
 	}
 	ss->length = LCUI_GetStyleTotal();
-	ss->sheet = NEW(LCUI_StyleRec, ss->length + 1);
+	ss->sheet = calloc(sizeof(LCUI_StyleRec), ss->length + 1);
 	return ss;
 }
 
@@ -1010,10 +1008,10 @@ LCUI_Selector Selector(const char *selector)
 	char type = 0, name[MAX_NAME_LEN];
 	LCUI_BOOL is_saving = FALSE;
 	LCUI_SelectorNode node = NULL;
-	LCUI_Selector s = NEW(LCUI_SelectorRec, 1);
+	LCUI_Selector s = calloc(sizeof(LCUI_SelectorRec), 1);
 
 	s->batch_num = ++batch_num;
-	s->nodes = NEW(LCUI_SelectorNode, MAX_SELECTOR_DEPTH);
+	s->nodes = calloc(sizeof(LCUI_SelectorNode), MAX_SELECTOR_DEPTH);
 	if (!selector) {
 		s->length = 0;
 		s->nodes[0] = NULL;
@@ -1021,7 +1019,7 @@ LCUI_Selector Selector(const char *selector)
 	}
 	for (ni = 0, si = 0, p = selector; *p; ++p) {
 		if (!node && is_saving) {
-			node = NEW(LCUI_SelectorNodeRec, 1);
+			node = calloc(sizeof(LCUI_SelectorNodeRec), 1);
 			if (si >= MAX_SELECTOR_DEPTH) {
 				logger_warning(
 				    "%s: selector node list is too long.\n",
@@ -1099,7 +1097,7 @@ LCUI_Selector Selector(const char *selector)
 	}
 	if (is_saving) {
 		if (!node) {
-			node = NEW(LCUI_SelectorNodeRec, 1);
+			node = calloc(sizeof(LCUI_SelectorNodeRec), 1);
 			if (si >= MAX_SELECTOR_DEPTH) {
 				logger_warning(
 				    "%s: selector node list is too long.\n",
@@ -1130,7 +1128,7 @@ LCUI_Selector Selector_Copy(LCUI_Selector selector)
 
 	s = Selector(NULL);
 	for (i = 0; i < selector->length; ++i) {
-		s->nodes[i] = NEW(LCUI_SelectorNodeRec, 1);
+		s->nodes[i] = calloc(sizeof(LCUI_SelectorNodeRec), 1);
 		SelectorNode_Copy(s->nodes[i], selector->nodes[i]);
 	}
 	s->nodes[selector->length] = NULL;
@@ -1158,7 +1156,7 @@ static void DeleteStyleNode(StyleNode node)
 
 static StyleLink CreateStyleLink(void)
 {
-	StyleLink link = NEW(StyleLinkRec, 1);
+	StyleLink link = calloc(sizeof(StyleLinkRec), 1);
 	static dict_type_t t;
 
 	dict_init_string_copy_key_type(&t);
@@ -1181,8 +1179,8 @@ static void DeleteStyleLink(StyleLink link)
 
 static StyleLinkGroup CreateStyleLinkGroup(LCUI_SelectorNode snode)
 {
-	StyleLinkGroup group = NEW(StyleLinkGroupRec, 1);
-	group->snode = NEW(LCUI_SelectorNodeRec, 1);
+	StyleLinkGroup group = calloc(sizeof(StyleLinkGroupRec), 1);
+	group->snode = calloc(sizeof(LCUI_SelectorNodeRec), 1);
 	SelectorNode_Copy(group->snode, snode);
 	group->name = group->snode->fullname;
 	group->links = dict_create(&library.style_link_dict, NULL);
@@ -1279,7 +1277,7 @@ static LCUI_StyleList LCUI_SelectStyleList(LCUI_Selector selector,
 	if (!link) {
 		return NULL;
 	}
-	snode = NEW(StyleNodeRec, 1);
+	snode = calloc(sizeof(StyleNodeRec), 1);
 	if (space) {
 		snode->space = strpool_alloc_str(library.strpool, space);
 		strcpy(snode->space, space);
@@ -1646,7 +1644,7 @@ static void StyleNameDestructor(void *privdata, void *val)
 	free(val);
 }
 
-static unsigned int IntKeyDict_HashFunction(const void *key)
+static uint64_t IntKeyDict_HashFunction(const void *key)
 {
 	return (*(unsigned int *)key);
 }

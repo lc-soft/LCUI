@@ -31,8 +31,6 @@
 #ifndef LCUI_UTIL_TASK_H
 #define LCUI_UTIL_TASK_H
 
-typedef void(*LCUI_TaskFunc)(void*, void*);
-
 typedef struct LCUI_TaskRec_ {
 	LCUI_TaskFunc func;		/**< 任务处理函数 */
 	void *arg[2];			/**< 两个参数 */

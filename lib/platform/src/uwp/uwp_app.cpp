@@ -32,7 +32,6 @@
 #include "pch.h"
 #include "uwp_app.h"
 #include <LCUI/platform.h>
-#include <LCUI/cursor.h>
 #include <LCUI/ime.h>
 #include LCUI_APP_H
 
@@ -222,12 +221,12 @@ void App::Load(Platform::String^ entryPoint)
 	m_displayDriver->update = UWPDisplay_Update;
 	m_displayDriver->present = UWPDisplay_Present;
 
-	LCUI_InitBase();
+	lcui_init_base();
 	LCUI_InitApp(m_appDriver);
 	LCUI_InitDisplay(m_displayDriver);
-	LCUI_InitIME();
-	LCUI_InitCursor();
-	LCUICursor_Hide();
+	app_init_ime();
+	ui_cursor_init();
+	ui_cursor_hide();
 	m_inputDriver->RegisterIME();
 	m_inputDriver->SelectIME();
 	UWPApp.app->Load(entryPoint);
@@ -252,7 +251,7 @@ void App::Update()
 void App::ProcessEvents()
 {
 	if (m_windowClosed) {
-		LCUI_Quit();
+		lcui_quit();
 		return;
 	}
 	auto dispathcer = CoreWindow::GetForCurrentThread()->Dispatcher;
@@ -367,7 +366,7 @@ void LCUI::Application::Load(Platform::String^ entryPoint)
 
 void LCUI::Application::Run()
 {
-	LCUI_Main();
+	lcui_main();
 }
 
 void LCUI::Run(LCUI::Application &app)

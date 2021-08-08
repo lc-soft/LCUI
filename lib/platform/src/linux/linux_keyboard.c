@@ -1,5 +1,5 @@
 /*
- * linux_keyboard.c -- Keyboard support for linux.
+ * linux_linux_keyboard.c -- Keyboard support for linux.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
@@ -28,9 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include <LCUI_Build.h>
-#ifdef LCUI_BUILD_IN_LINUX
+#include "../internal.h"
+#ifdef LCUI_PLATFORM_LINUX
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,15 +41,9 @@
 #include <signal.h>
 #include <termios.h>
 #endif
-#include <LCUI/LCUI.h>
 #include <LCUI/thread.h>
-#include <LCUI/platform.h>
-#include <LCUI/input.h>
-#include <LCUI/ime.h>
-#include LCUI_EVENTS_H
-#include LCUI_KEYBOARD_H
 
-static struct LCUI_LinuxKeyboardDriver {
+static struct linux_keyboard_t {
 #ifdef USE_LINUX_INPUT_EVENT
 	int dev_fd;
 	char *dev_path;
@@ -60,19 +53,19 @@ static struct LCUI_LinuxKeyboardDriver {
 #endif
 	LCUI_Thread tid;
 	LCUI_BOOL active;
-} keyboard;
+} linux_keyboard;
 
 /* FIXME: this driver does not working, so we won't use it for now */
 #ifdef USE_LINUX_INPUT_EVENT
-static void LinuxKeybnoardThread(void *arg)
+static void linux_keyboard_thread(void *arg)
 {
 	size_t bytes;
 	struct input_event data;
 
-	keyboard.active = TRUE;
-	logger_debug("[input] keyboard driver thread: %lld\n", keyboard.tid);
-	while (keyboard.active) {
-		bytes = read(keyboard.dev_fd, &data, sizeof(data));
+	linux_keyboard.active = TRUE;
+	logger_debug("[input] keyboard driver thread: %lld\n", linux_keyboard.tid);
+	while (linux_keyboard.active) {
+		bytes = read(linux_keyboard.dev_fd, &data, sizeof(data));
 		if (bytes > 0 && data.type == EV_KEY) {
 			_DEBUG_MSG("Keypress value=%x, type=%x, code=%x\n",
 				   data.value, data.type, data.code);
@@ -80,103 +73,103 @@ static void LinuxKeybnoardThread(void *arg)
 	}
 }
 
-static int InitLinuxKeybord(void)
+int linux_keyboard_init(void)
 {
-	keyboard.dev_path = getenv("LCUI_KEYBOARD_DEVICE");
-	if (!keyboard.dev_path) {
-		keyboard.dev_path = "/dev/input/event0";
+	linux_keyboard.dev_path = getenv("LCUI_KEYBOARD_DEVICE");
+	if (!linux_keyboard.dev_path) {
+		linux_keyboard.dev_path = "/dev/input/event0";
 	}
-	if ((keyboard.dev_fd = open(keyboard.dev_path, O_RDONLY | O_NONBLOCK)) <
+	if ((linux_keyboard.dev_fd = open(linux_keyboard.dev_path, O_RDONLY | O_NONBLOCK)) <
 	    0) {
 		logger_error("[input] open keyboard device failed");
 		return -1;
 	}
-	LCUIThread_Create(&keyboard.tid, LinuxKeybnoardThread, NULL);
+	LCUIThread_Create(&linux_keyboard.tid, linux_keyboard_thread, NULL);
 	return 0;
 }
 
-static int FreeLinuxKeyboard(void)
+int linux_keyboard_destroy(void)
 {
-	if (!keyboard.active) {
+	if (!linux_keyboard.active) {
 		return -1;
 	}
-	keyboard.active = FALSE;
-	LCUIThread_Join(keyboard.tid, NULL);
-	close(keyboard.dev_fd);
+	linux_keyboard.active = FALSE;
+	LCUIThread_Join(linux_keyboard.tid, NULL);
+	close(linux_keyboard.dev_fd);
 	return 0;
 }
 
 #else
 
-static void DispatchKeyboardEvent(void *arg1, void *arg2)
+static void linux_keyboard_dispatch_event(int key)
 {
 	wchar_t str[2];
-	LCUI_SysEventRec ev = { 0 };
+	app_event_t ev = { 0 };
 
-	ev.key.code = *((int *)arg1);
+	ev.key.code = key;
 	switch (ev.key.code) {
 	case 183:
-		ev.key.code = LCUI_KEY_UP;
+		ev.key.code = KEY_UP;
 		break;
 	case 184:
-		ev.key.code = LCUI_KEY_DOWN;
+		ev.key.code = KEY_DOWN;
 		break;
 	case 185:
-		ev.key.code = LCUI_KEY_RIGHT;
+		ev.key.code = KEY_RIGHT;
 		break;
 	case 186:
-		ev.key.code = LCUI_KEY_LEFT;
+		ev.key.code = KEY_LEFT;
 		break;
 	case 127:
-		ev.key.code = LCUI_KEY_BACKSPACE;
+		ev.key.code = KEY_BACKSPACE;
 		break;
 	case 293:
-		ev.key.code = LCUI_KEY_HOME;
+		ev.key.code = KEY_HOME;
 		break;
 	case 295:
-		ev.key.code = LCUI_KEY_DELETE;
+		ev.key.code = KEY_DELETE;
 		break;
 	case 296:
-		ev.key.code = LCUI_KEY_END;
+		ev.key.code = KEY_END;
 		break;
 	case 297:
-		ev.key.code = LCUI_KEY_PAGEUP;
+		ev.key.code = KEY_PAGEUP;
 		break;
 	case 298:
-		ev.key.code = LCUI_KEY_PAGEDOWN;
+		ev.key.code = KEY_PAGEDOWN;
 	default:
 		break;
 	}
 	DEBUG_MSG("%c, %d\n", ev.key.code, ev.key.code);
-	ev.type = LCUI_KEYDOWN;
-	LCUI_TriggerEvent(&ev, NULL);
-	LCUI_DestroyEvent(&ev);
+	ev.type = APP_EVENT_KEYDOWN;
+	app_post_event(&ev);
+	app_event_destroy(&ev);
 	/* FIXME: this driver is not yet possible to get the key state directly,
 	 * the following is a temporary solution.
 	 */
-	ev.type = LCUI_KEYUP;
-	LCUI_TriggerEvent(&ev, NULL);
-	LCUI_DestroyEvent(&ev);
+	ev.type = APP_EVENT_KEYUP;
+	app_post_event(&ev);
+	app_event_destroy(&ev);
 	if (ev.key.code >= ' ' && ev.key.code <= '~') {
 		str[0] = ev.key.code;
-		ev.type = LCUI_KEYPRESS;
-		LCUI_TriggerEvent(&ev, NULL);
-		LCUI_DestroyEvent(&ev);
-		LCUIIME_Commit(str, 1);
+		ev.type = APP_EVENT_KEYPRESS;
+		app_post_event(&ev);
+		app_event_destroy(&ev);
+		ime_commit(str, 1);
 	}
 }
 
-LCUI_BOOL kbhit(void)
+static LCUI_BOOL kbhit(void)
 {
 	int ch, flags;
 	struct termios tm;
 
-	tcgetattr(keyboard.fd, &tm);
-	flags = fcntl(keyboard.fd, F_GETFL, 0);
-	fcntl(keyboard.fd, F_SETFL, flags | O_NONBLOCK);
+	tcgetattr(linux_keyboard.fd, &tm);
+	flags = fcntl(linux_keyboard.fd, F_GETFL, 0);
+	fcntl(linux_keyboard.fd, F_SETFL, flags | O_NONBLOCK);
 	ch = getchar();
-	tcsetattr(keyboard.fd, TCSANOW, &tm);
-	fcntl(keyboard.fd, F_SETFL, flags);
+	tcsetattr(linux_keyboard.fd, TCSANOW, &tm);
+	fcntl(linux_keyboard.fd, F_SETFL, flags);
 	if (ch != EOF) {
 		ungetc(ch, stdin);
 		return TRUE;
@@ -184,39 +177,35 @@ LCUI_BOOL kbhit(void)
 	return FALSE;
 }
 
-int getch(void)
+static int getch(void)
 {
 	int c = EOF;
 	struct termios tm;
 
-	tm = keyboard.tm;
+	tm = linux_keyboard.tm;
 
 	/* canonical input and echo modes */
 	tm.c_lflag &= ~(ICANON | ECHO);
 	tm.c_cc[VMIN] = 0;
 	tm.c_cc[VTIME] = 1;
-	tcsetattr(keyboard.fd, TCSANOW, &tm);
+	tcsetattr(linux_keyboard.fd, TCSANOW, &tm);
 	/* get char from modified stdin */
 	c = getchar();
 	/* reset stdin to previous state */
-	tcsetattr(keyboard.fd, TCSANOW, &keyboard.tm);
+	tcsetattr(linux_keyboard.fd, TCSANOW, &linux_keyboard.tm);
 	return c;
 }
 
 static void on_signal(int signal)
 {
-	tcsetattr(keyboard.fd, TCSANOW, &keyboard.tm);
+	tcsetattr(linux_keyboard.fd, TCSANOW, &linux_keyboard.tm);
 	exit(1);
 }
 
-static void LinuxKeybnoardThread(void *arg)
+static void linux_keyboard_thread(void *arg)
 {
 	int key;
-	LCUI_TaskRec task = { 0 };
-
-	task.func = DispatchKeyboardEvent;
-	task.destroy_arg[0] = free;
-	while (keyboard.active) {
+	while (linux_keyboard.active) {
 		key = getch();
 		if (key == EOF) {
 			continue;
@@ -224,70 +213,42 @@ static void LinuxKeybnoardThread(void *arg)
 		while (kbhit()) {
 			key += getch();
 		}
-		task.arg[0] = malloc(sizeof(int));
-		if (!task.arg[0]) {
-			perror("[input] keyboard driver");
-			continue;
-		}
-		memcpy(task.arg[0], &key, sizeof(int));
-		LCUI_PostTask(&task);
+		linux_keyboard_dispatch_event(key);
 	}
 }
 
-static int InitLinuxKeybord(void)
+int linux_keyboard_init(void)
 {
 	int i = 0;
 	int signals[] = { SIGABRT, SIGINT, SIGKILL, SIGQUIT, SIGSTOP, SIGTERM };
 	int len = sizeof(signals) / sizeof(signals[0]);
 
-	keyboard.fd = STDIN_FILENO;
-	if (tcgetattr(keyboard.fd, &keyboard.tm) < 0) {
+	linux_keyboard.fd = STDIN_FILENO;
+	if (tcgetattr(linux_keyboard.fd, &linux_keyboard.tm) < 0) {
 		return -1;
 	}
 	for (; i < len; ++i) {
 		signal(signals[i], on_signal);
 	}
-	keyboard.active = TRUE;
-	LCUIThread_Create(&keyboard.tid, LinuxKeybnoardThread, NULL);
-	logger_debug("[input] keyboard driver thread: %lld\n", keyboard.tid);
+	linux_keyboard.active = TRUE;
+	LCUIThread_Create(&linux_keyboard.tid, linux_keyboard_thread, NULL);
+	logger_debug("[input] keyboard driver thread: %lld\n", linux_keyboard.tid);
 	return 0;
 }
 
-static int FreeLinuxKeyboard(void)
+int linux_keyboard_destroy(void)
 {
-	if (!keyboard.active) {
+	if (!linux_keyboard.active) {
 		return 0;
 	}
-	keyboard.active = FALSE;
-	LCUIThread_Join(keyboard.tid, NULL);
-	if (tcsetattr(keyboard.fd, TCSANOW, &keyboard.tm) < 0) {
+	linux_keyboard.active = FALSE;
+	LCUIThread_Join(linux_keyboard.tid, NULL);
+	if (tcsetattr(linux_keyboard.fd, TCSANOW, &linux_keyboard.tm) < 0) {
 		return -1;
 	}
 	return 0;
 }
 
 #endif
-
-void LCUI_InitLinuxKeyboard(void)
-{
-#ifdef USE_LIBX11
-	if (LCUI_GetAppId() == LCUI_APP_LINUX_X11) {
-		LCUI_InitLinuxX11Keyboard();
-		return;
-	}
-#endif
-	InitLinuxKeybord();
-}
-
-void LCUI_FreeLinuxKeyboard(void)
-{
-#ifdef USE_LIBX11
-	if (LCUI_GetAppId() == LCUI_APP_LINUX_X11) {
-		LCUI_FreeLinuxX11Keyboard();
-		return;
-	}
-#endif
-	FreeLinuxKeyboard();
-}
 
 #endif

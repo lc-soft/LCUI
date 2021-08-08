@@ -31,6 +31,8 @@
 #ifndef LCUI_WORKER_H
 #define LCUI_WORKER_H
 
+LCUI_BEGIN_HEADER
+
 #ifdef LCUI_WORKER_C
 typedef struct LCUI_WorkerRec_ *LCUI_Worker;
 #else
@@ -48,5 +50,7 @@ LCUI_API LCUI_BOOL LCUIWorker_RunTask(LCUI_Worker worker);
 LCUI_API int LCUIWorker_RunAsync(LCUI_Worker worker);
 
 LCUI_API void LCUIWorker_Destroy(LCUI_Worker worker);
+
+LCUI_END_HEADER
 
 #endif

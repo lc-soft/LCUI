@@ -30,9 +30,9 @@
 
 #include "config.h"
 
-#ifndef LCUI_BUILD_IN_WIN32
+#ifndef LCUI_PLATFORM_WIN32
 
-#include <LCUI_Build.h>
+#include <LCUI/header.h>
 #include <stdlib.h>
 #include <string.h>
 #include <LCUI/font/fontconfig.h>

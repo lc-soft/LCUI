@@ -41,7 +41,7 @@ struct LCUI_CanvasRenderingContextRec_ {
 	LCUI_BOOL available;
 	pd_color_t fill_color;
 	pd_canvas_t buffer;
-	LCUI_Widget canvas;
+	ui_widget_t* canvas;
 	list_node_t node;
 
 	float scale;
@@ -53,7 +53,7 @@ struct LCUI_CanvasRenderingContextRec_ {
 	void (*release)(LCUI_CanvasContext);
 };
 
-LCUI_API LCUI_CanvasContext Canvas_GetContext(LCUI_Widget w);
+LCUI_API LCUI_CanvasContext Canvas_GetContext(ui_widget_t* w);
 
 void LCUIWidget_AddCanvas(void);
 

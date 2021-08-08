@@ -30,6 +30,7 @@
 #ifndef LCUI_TYPES_H
 #define LCUI_TYPES_H
 
+#include <LCUI/header.h>
 #include <wchar.h>
 #include <stdint.h>
 
@@ -43,11 +44,6 @@
 
 #include <time.h>
 
-#define LCUI_MAX_FRAMES_PER_SEC 120
-#define LCUI_MAX_FRAME_MSEC ((int)(1000.0 / LCUI_MAX_FRAMES_PER_SEC + 0.5))
-#define ASSIGN(NAME, TYPE) TYPE NAME = (TYPE)malloc(sizeof(TYPE##Rec))
-#define ZEROSET(NAME, TYPE) memset(NAME, 0, sizeof(TYPE##Rec))
-#define NEW(TYPE, COUNT) (TYPE *)calloc(COUNT, sizeof(TYPE))
 #define CodeToString(...) "" #__VA_ARGS__ ""
 
 LCUI_BEGIN_HEADER
@@ -128,7 +124,7 @@ typedef struct pd_rectf_t_ {
 
 typedef struct LCUI_Rect2F_ {
 	float left, top, right, bottom;
-} LCUI_Rect2F;
+} pd_rect_t2F;
 
 /* FIXME: remove LCUI_StyleValue
  * These values do not need to put in LCUI_StyleValue, because they are not
@@ -218,13 +214,6 @@ typedef enum LCUI_StyleType {
 #define LCUI_STYPE_0 LCUI_STYPE_NONE
 #define LCUI_STYPE_none LCUI_STYPE_NONE
 
-typedef struct pd_boxshadow_style_t_ {
-	float x, y;
-	float blur;
-	float spread;
-	pd_color_t color;
-} pd_boxshadow_style_t;
-
 typedef struct pd_boxshadow_t_ {
 	int x, y;
 	int blur;
@@ -235,18 +224,6 @@ typedef struct pd_boxshadow_t_ {
 	int bottom_left_radius;
 	int bottom_right_radius;
 } pd_boxshadow_t;
-
-typedef struct pd_border_style_t_ {
-	struct {
-		int style;
-		float width;
-		pd_color_t color;
-	} top, right, bottom, left;
-	float top_left_radius;
-	float top_right_radius;
-	float bottom_left_radius;
-	float bottom_right_radius;
-} pd_border_style_t;
 
 typedef struct pd_border_line_t {
 	int style;
@@ -325,100 +302,6 @@ typedef struct LCUI_StyleRec_ {
 	};
 } LCUI_StyleRec, *LCUI_Style;
 
-typedef enum LCUI_SizingRule_ {
-	LCUI_SIZING_RULE_NONE,
-	LCUI_SIZING_RULE_FIXED,
-	LCUI_SIZING_RULE_FILL,
-	LCUI_SIZING_RULE_PERCENT,
-	LCUI_SIZING_RULE_FIT_CONTENT
-} LCUI_SizingRule;
-
-typedef enum LCUI_LayoutRule_ {
-	LCUI_LAYOUT_RULE_AUTO,
-	LCUI_LAYOUT_RULE_MAX_CONTENT,
-	LCUI_LAYOUT_RULE_FIXED_WIDTH,
-	LCUI_LAYOUT_RULE_FIXED_HEIGHT,
-	LCUI_LAYOUT_RULE_FIXED
-} LCUI_LayoutRule;
-
-typedef struct LCUI_FlexLayoutStyle {
-	/**
-	 * The flex shrink factor of a flex item
-	 * See more:
-	 * https://developer.mozilla.org/en-US/docs/Web/CSS/flex-shrink
-	 */
-	float shrink;
-
-	/* the flex grow factor of a flex item main size
-	 * See more: https://developer.mozilla.org/en-US/docs/Web/CSS/flex-grow
-	 */
-	float grow;
-
-	/**
-	 * The initial main size of a flex item
-	 * See more: https://developer.mozilla.org/en-US/docs/Web/CSS/flex-basis
-	 */
-	float basis;
-
-	LCUI_StyleValue wrap : 8;
-	LCUI_StyleValue direction : 8;
-
-	/**
-	 * Sets the align-self value on all direct children as a group
-	 * See more:
-	 * https://developer.mozilla.org/en-US/docs/Web/CSS/align-items
-	 */
-	LCUI_StyleValue align_items : 8;
-
-	/**
-	 * Sets the distribution of space between and around content items along
-	 * a flexbox's cross-axis
-	 * See more: https://developer.mozilla.org/en-US/docs/Web/CSS/align-content
-	 */
-	LCUI_StyleValue align_content : 8;
-
-	/**
-	 * Defines how the browser distributes space between and around content
-	 * items along the main-axis of a flex container See more:
-	 * https://developer.mozilla.org/en-US/docs/Web/CSS/justify-content
-	 */
-	LCUI_StyleValue justify_content : 8;
-} LCUI_FlexBoxLayoutStyle;
-
-typedef struct LCUI_BoundBoxRec {
-	LCUI_StyleRec top, right, bottom, left;
-} LCUI_BoundBox;
-
-typedef struct LCUI_BackgroundPosition {
-	LCUI_BOOL using_value;
-	union {
-		struct {
-			LCUI_StyleRec x, y;
-		};
-		int value;
-	};
-} LCUI_BackgroundPosition;
-
-typedef struct LCUI_BackgroundSize {
-	LCUI_BOOL using_value;
-	union {
-		struct {
-			LCUI_StyleRec width, height;
-		};
-		int value;
-	};
-} LCUI_BackgroundSize;
-
-typedef struct LCUI_BackgroundStyle {
-	pd_canvas_t image; /**< 背景图 */
-	pd_color_t color; /**< 背景色 */
-	struct {
-		LCUI_BOOL x, y;
-	} repeat;                         /**< 背景图是否重复 */
-	LCUI_BackgroundPosition position; /**< 定位方式 */
-	LCUI_BackgroundSize size;         /**< 尺寸 */
-} LCUI_BackgroundStyle;
-
 typedef struct pd_background_t {
 	pd_canvas_t *image; /**< 背景图 */
 	pd_color_t color;  /**< 背景色 */
@@ -441,37 +324,7 @@ typedef struct pd_paint_context_t_ {
 } pd_paint_context_t;
 
 typedef void (*FuncPtr)(void *);
-
-typedef struct LCUI_WidgetTasksRec_ {
-	clock_t time;
-	size_t update_count;
-	size_t refresh_count;
-	size_t layout_count;
-	size_t user_task_count;
-	size_t destroy_count;
-	size_t destroy_time;
-} LCUI_WidgetTasksProfileRec, *LCUI_WidgetTasksProfile;
-
-typedef struct LCUI_FrameProfileRec_ {
-	size_t timers_count;
-	clock_t timers_time;
-
-	size_t events_count;
-	clock_t events_time;
-
-	size_t render_count;
-	clock_t render_time;
-	clock_t present_time;
-
-	LCUI_WidgetTasksProfileRec widget_tasks;
-} LCUI_FrameProfileRec, *LCUI_FrameProfile;
-
-typedef struct LCUI_ProfileRec_ {
-	clock_t start_time;
-	clock_t end_time;
-	unsigned frames_count;
-	LCUI_FrameProfileRec frames[LCUI_MAX_FRAMES_PER_SEC];
-} LCUI_ProfileRec, *LCUI_Profile;
+typedef void(*LCUI_TaskFunc)(void*, void*);
 
 LCUI_END_HEADER
 

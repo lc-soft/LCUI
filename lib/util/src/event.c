@@ -30,8 +30,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI/header.h>
+#include <LCUI/types.h>
+#include <LCUI/util.h>
 
 /** 事件绑定记录 */
 typedef struct LCUI_EventRecordRec_ {
@@ -99,7 +100,7 @@ static void EventTrigger_RemoveHandler(LCUI_EventTrigger trigger,
 
 LCUI_EventTrigger EventTrigger(void)
 {
-	LCUI_EventTrigger trigger = NEW(LCUI_EventTriggerRec, 1);
+	LCUI_EventTrigger trigger = malloc(sizeof(LCUI_EventTriggerRec));
 	trigger->handler_base_id = 1;
 	rbtree_init(&trigger->handlers);
 	rbtree_init(&trigger->events);
@@ -122,14 +123,14 @@ int EventTrigger_Bind(LCUI_EventTrigger trigger, int event_id,
 	LCUI_EventHandler handler;
 	record = rbtree_get_data_by_key(&trigger->events, event_id);
 	if (!record) {
-		record = NEW(LCUI_EventRecordRec, 1);
+		record = malloc(sizeof(LCUI_EventRecordRec));
 		record->id = event_id;
 		record->blocked = FALSE;
 		list_create(&record->trash);
 		list_create(&record->handlers);
 		rbtree_insert_by_key(&trigger->events, event_id, record);
 	}
-	handler = NEW(LCUI_EventHandlerRec, 1);
+	handler = malloc(sizeof(LCUI_EventHandlerRec));
 	handler->id = trigger->handler_base_id++;
 	handler->destroy_data = destroy_data;
 	handler->data = data;

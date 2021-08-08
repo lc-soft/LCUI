@@ -33,7 +33,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <LCUI_Build.h>
+#include <LCUI/header.h>
 #include <LCUI/types.h>
 #include <LCUI/util.h>
 #include <LCUI/graph.h>
@@ -168,7 +168,9 @@ LCUI_FontWeight LCUIFont_DetectWeight(const char *str)
 {
 	char *buf;
 	LCUI_FontWeight weight = FONT_WEIGHT_NORMAL;
-	if (!(buf = malloc(strsize(str)))) {
+
+	buf = strdup2(str);
+	if (!buf) {
 		return weight;
 	}
 	strtolower(buf, str);
@@ -196,7 +198,8 @@ LCUI_FontStyle LCUIFont_DetectStyle(const char *str)
 	char *buf;
 	LCUI_FontStyle style = FONT_STYLE_NORMAL;
 
-	if (!(buf = malloc(strsize(str)))) {
+	buf = strdup2(str);
+	if (!buf) {
 		return style;
 	}
 	strtolower(buf, str);
@@ -211,7 +214,9 @@ LCUI_FontStyle LCUIFont_DetectStyle(const char *str)
 
 LCUI_Font Font(const char *family_name, const char *style_name)
 {
-	ASSIGN(font, LCUI_Font);
+	LCUI_Font font;
+
+	font = malloc(sizeof(LCUI_FontRec));
 	font->id = 0;
 	font->data = NULL;
 	font->engine = NULL;
@@ -260,9 +265,10 @@ int LCUIFont_Add(LCUI_Font font)
 	LCUI_Font exists_font;
 	LCUI_FontFamilyNode node;
 	LCUI_FontStyleNode snode;
+
 	node = SelectFontFamliy(font->family_name);
 	if (!node) {
-		node = NEW(LCUI_FontFamilyNodeRec, 1);
+		node = malloc(sizeof(LCUI_FontFamilyNodeRec));
 		node->family_name = strdup2(font->family_name);
 		memset(node->styles, 0, sizeof(node->styles));
 		dict_add(fontlib.font_families, node->family_name, node);
@@ -388,7 +394,7 @@ size_t LCUIFont_GetIdByNames(int **font_ids, LCUI_FontStyle style,
 	if (p - names == 0) {
 		return 0;
 	}
-	ids = NEW(int, count + 1);
+	ids = malloc(sizeof(int) * (count + 1));
 	if (!ids) {
 		return 0;
 	}
@@ -528,7 +534,7 @@ LCUI_FontBitmap *LCUIFont_AddBitmap(wchar_t ch, int font_id, int size,
 	/* 获取字符的字体信息集 */
 	tree_font = SelectChar(ch);
 	if (!tree_font) {
-		tree_font = NEW(rbtree_t, 1);
+		tree_font = malloc(sizeof(rbtree_t));
 		if (!tree_font) {
 			return NULL;
 		}
@@ -543,7 +549,7 @@ LCUI_FontBitmap *LCUIFont_AddBitmap(wchar_t ch, int font_id, int size,
 	/* 获取相应字体样式标识号的字体位图库 */
 	tree_bmp = SelectFont(tree_font, font_id);
 	if (!tree_bmp) {
-		tree_bmp = NEW(rbtree_t, 1);
+		tree_bmp = malloc(sizeof(rbtree_t));
 		if (!tree_bmp) {
 			return NULL;
 		}
@@ -554,7 +560,7 @@ LCUI_FontBitmap *LCUIFont_AddBitmap(wchar_t ch, int font_id, int size,
 	/* 在字体位图库中获取指定像素大小的字体位图 */
 	bmp_cache = SelectBitmap(tree_bmp, size);
 	if (!bmp_cache) {
-		bmp_cache = NEW(LCUI_FontBitmap, 1);
+		bmp_cache = malloc(sizeof(LCUI_FontBitmap));
 		if (!bmp_cache) {
 			return NULL;
 		}
@@ -827,7 +833,7 @@ static void LCUIFont_InitBase(void)
 {
 	fontlib.count = 0;
 	fontlib.font_cache_num = 1;
-	fontlib.font_cache = NEW(LCUI_FontCache, 1);
+	fontlib.font_cache = malloc(sizeof(LCUI_FontCacheRec));
 	fontlib.font_cache[0] = FontCache();
 	rbtree_init(&fontlib.bitmap_cache);
 	dict_init_string_key_type(&fontlib.font_families_type);
@@ -885,7 +891,7 @@ static void LCUIFont_FreeEngine(void)
 #endif
 }
 
-#ifdef LCUI_BUILD_IN_WIN32
+#ifdef LCUI_PLATFORM_WIN32
 static void LCUIFont_LoadFontsForWindows(void)
 {
 	size_t i;
@@ -970,7 +976,7 @@ static void LCUIFont_LoadFontsForLinux(void)
 
 static void LCUIFont_LoadDefaultFonts(void)
 {
-#ifdef LCUI_BUILD_IN_WIN32
+#ifdef LCUI_PLATFORM_WIN32
 	LCUIFont_LoadFontsForWindows();
 #elif defined(USE_FONTCONFIG)
 	logger_debug("[font] fontconfig enabled\n");

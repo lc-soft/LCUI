@@ -1,7 +1,7 @@
 ﻿#ifndef TEST_UTIL_H
 #define TEST_UTIL_H
 
-#include <LCUI_Build.h>
+#include <LCUI/header.h>
 #include <LCUI/types.h>
 
 void describe(const char *name, void (*func)());

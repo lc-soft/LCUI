@@ -1,21 +1,19 @@
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI.h>
 #include <LCUI/gui/builder.h>
+#include <LCUI/main.h>
 
 int main(void)
 {
 	int ret = 0;
-	LCUI_Widget root, box;
+	ui_widget_t *box;
 
-	LCUI_Init();
+	lcui_init();
 	box = LCUIBuilder_LoadFile("test_box_shadow.xml");
 	if (!box) {
-		LCUI_Destroy();
+		lcui_destroy();
 		return ret;
 	}
-	root = LCUIWidget_GetRoot();
-	Widget_Append(root, box);
-	Widget_Unwrap(box);
-	return LCUI_Main();
+	ui_root_append(box);
+	ui_widget_unwrap(box);
+	return lcui_main();
 }

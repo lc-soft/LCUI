@@ -1,64 +1,59 @@
 #include <stdlib.h>
 #include <LCUI.h>
-#include <LCUI/gui/widget.h>
-
 #include <LCUI/gui/widget/textedit.h>
 #include <LCUI/timer.h>
-#include <LCUI/input.h>
-#include <LCUI/clipboard.h>
 #include "ctest.h"
 
-static void CopyText(void *arg)
+static void copy_text(void *arg)
 {
-	LCUI_Widget w = arg;
-	LCUIWidget_SetFocus(w);
-	LCUI_SysEventRec ev;
+	ui_widget_t *w = arg;
+	app_event_t ev = { 0 };
 
-	ev.type = LCUI_KEYDOWN;
-	ev.key.code = (int)LCUI_KEY_V;
+	ev.type = APP_EVENT_KEYDOWN;
+	ev.key.code = KEY_V;
 	ev.key.ctrl_key = TRUE;
-	ev.key.shift_key = FALSE;
-	LCUI_TriggerEvent(&ev, NULL);
+	ui_set_focus(w);
+	app_process_event(&ev);
 }
 
-static void OnText1Focused(void *arg)
+static void on_text1_focused(void *arg)
 {
-	LCUI_Widget w = arg;
-	LCUI_SysEventRec ev;
-	ev.type = LCUI_KEYDOWN;
-	ev.key.code = (int)LCUI_KEY_C;
-	ev.key.ctrl_key = TRUE;
-	ev.key.shift_key = FALSE;
+	ui_widget_t *w = arg;
+	app_event_t ev = { 0 };
 
-	LCUI_TriggerEvent(&ev, NULL);
+	ev.type = APP_EVENT_KEYDOWN;
+	ev.key.code = KEY_C;
+	ev.key.ctrl_key = TRUE;
+	app_process_event(&ev);
 }
 
-static void OnCheckText(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
+static void on_check_text(ui_widget_t *w, ui_event_t *e, void *arg)
 {
-	LCUI_Clipboard clipboard = arg;
+	clipboard_t *clipboard = arg;
+
 	it_b("check the pasted text",
-	     clipboard != NULL && wcscmp(clipboard->text, L"helloworld") == 0, TRUE);
-	LCUI_Quit();
+	     clipboard != NULL && wcscmp(clipboard->text, L"helloworld") == 0,
+	     TRUE);
+	lcui_quit();
 }
 
 void test_clipboard(void)
 {
-	LCUI_Widget root, text1, text2;
+	ui_widget_t *text1, *text2;
 
-	LCUI_Init();
-	//
-	text1 = LCUIWidget_New("textedit");
-	text2 = LCUIWidget_New("textedit");
-	root = LCUIWidget_GetRoot();
-	Widget_Append(root, text1);
-	Widget_Append(root, text2);
+	lcui_init();
+
+	text1 = ui_create_widget("textedit");
+	text2 = ui_create_widget("textedit");
+	ui_root_append(text1);
+	ui_root_append(text2);
 
 	TextEdit_SetTextW(text1, L"helloworld");
-	LCUIWidget_SetFocus(text1);
-		
-	lcui_set_timeout(50, OnText1Focused, text1);
-	lcui_set_timeout(100, CopyText, text2);
-	Widget_BindEvent(text2, "paste", OnCheckText, NULL, NULL);
+	ui_set_focus(text1);
 
-	LCUI_Main();
+	lcui_set_timeout(50, on_text1_focused, text1);
+	lcui_set_timeout(100, copy_text, text2);
+	ui_widget_on(text2, "paste", on_check_text, NULL, NULL);
+
+	lcui_main();
 }

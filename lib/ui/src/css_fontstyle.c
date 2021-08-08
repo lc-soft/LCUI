@@ -30,11 +30,11 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <LCUI_Build.h>
+#include <LCUI/header.h>
 #include <LCUI/types.h>
 #include <LCUI/util.h>
 #include <LCUI/font.h>
-#include <LCUI/gui/metrics.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/css_library.h>
 #include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/css_fontstyle.h>
@@ -48,7 +48,6 @@
 
 /* clang-format on */
 
-#define ComputeActual LCUIMetrics_ComputeActual
 #define GetFontStyleKey(CTX) self.keys[(CTX)->parser->key]
 #define SetFontStyleProperty(CTX, S) \
 	CSSStyleParser_SetCSSProperty(CTX, GetFontStyleKey(CTX), S);
@@ -230,10 +229,10 @@ static void OnComputeFontSize(LCUI_CSSFontStyle fs, LCUI_Style s)
 {
 	if (s->is_valid) {
 		fs->font_size =
-		    ComputeActual(y_max(MIN_FONT_SIZE, s->value), s->type);
+		    ui_compute_actual(y_max(MIN_FONT_SIZE, s->value), s->type);
 		return;
 	}
-	fs->font_size = ComputeActual(DEFAULT_FONT_SIZE, LCUI_STYPE_PX);
+	fs->font_size = ui_compute_actual(DEFAULT_FONT_SIZE, LCUI_STYPE_PX);
 }
 
 static void OnComputeColor(LCUI_CSSFontStyle fs, LCUI_Style s)
@@ -299,7 +298,7 @@ static void OnComputeLineHeight(LCUI_CSSFontStyle fs, LCUI_Style s)
 		} else if (s->type == LCUI_STYPE_SCALE) {
 			h = y_iround(fs->font_size * s->val_scale);
 		} else {
-			h = ComputeActual(s->value, s->type);
+			h = ui_compute_actual(s->value, s->type);
 		}
 	} else {
 		h = y_iround(fs->font_size * LINE_HEIGHT_SCALE);
@@ -389,8 +388,7 @@ LCUI_BOOL CSSFontStyle_IsEquals(const LCUI_CSSFontStyle a,
 	    a->text_align != b->text_align ||
 	    a->white_space != b->white_space ||
 	    a->font_style != b->font_style ||
-	    a->font_weight != b->font_weight ||
-	    a->font_size != b->font_size) {
+	    a->font_weight != b->font_weight || a->font_size != b->font_size) {
 		return FALSE;
 	}
 	if (a->font_family && b->font_family) {

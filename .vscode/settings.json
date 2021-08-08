@@ -27,12 +27,5 @@
   "[css]": {
     "editor.tabSize": 2,
     "editor.insertSpaces": true
-  },
-  "files.associations": {
-    "unistd.h": "c",
-    "errno.h": "c",
-    "fcntl.h": "c",
-    "metrics.h": "c",
-    "painter.h": "c"
   }
 }

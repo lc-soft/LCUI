@@ -31,11 +31,11 @@
 #include <wrl.h>
 #include <wrl/client.h>
 #include <stdlib.h>
-#include <LCUI_Build.h>
+#include <LCUI/header.h>
 #include <LCUI/util/uri.h>
 #include <yutil.h>
 
-#if defined(LCUI_BUILD_IN_WIN32) && defined(WINAPI_PARTITION_APP)
+#if defined(LCUI_PLATFORM_WIN32) && defined(WINAPI_PARTITION_APP)
 int OpenUri(const char *uristr)
 {
 	size_t len;
