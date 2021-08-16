@@ -6,18 +6,20 @@
 
 - 命名不规范
 - 依赖事件循环的函数
-- 优化
 
-待改进：
+待办：
 
 - 背景、边框和阴影的实际样式可改为在重绘时计算，以节省 widget 实例的内存占用
 - 一些内部使用的函数没必要公开在头文件中
 - 背景图的异步加载功能可以改为独立的图片加载模块，基于异步任务接口实现
+- 移除 LCUI_StyleValue
+- 样式和样式属性值的操作函数命名不严谨，有待重命名
 
 改动：
 
 - `LCUI_PaintContext` -> `ui_painter_t`
 - `InvalidArea` -> `InvalidRect`
+- 将一些简单函数改为内联函数并移动到头文件中
 
 ## 接口设计
 
@@ -57,6 +59,10 @@ void ui_destroy_widget(ui_widget_t *w);
 void ui_widget_empty(ui_widget_t *w);
 void ui_widget_offset(ui_widget_t *w, ui_widget_t *parent, float *offset_x, float *offset_y);
 void ui_widget_set_title(ui_widget_t *w, const wchar_t *title);
+void ui_widget_get_closest(ui_widget_t *w, const char *type);
+Dict *ui_widget_collect_references(ui_widget_t *w);
+
+#define ui_widget_collect_refs ui_widget_collect_references
 
 // Widget attribute
 
@@ -127,11 +133,21 @@ void ui_widget_set_border_width(ui_widget_t *w, float width);
 void ui_widget_set_border_style(ui_widget_t *w, ui_border_style_t style);
 void ui_widget_set_border_style(ui_widget_t *w, float width, ui_border_style_t style, LCUI_Color color);
 void ui_widget_set_box_shadow(ui_widget_t *w, float x, float y, float blur, LCUI_Color color);
-void ui_widget_set_position(ui_widget_t *w, float y, float y);
-void ui_widget_set_size(ui_widget_t *w, float width, float height);
+void ui_widget_move(ui_widget_t *w, float y, float y);
+void ui_widget_resize(ui_widget_t *w, float width, float height);
 
-#define ui_widget_move ui_widget_set_position
-#define ui_widget_resize ui_widget_set_size
+ui_style_t *ui_widget_get_style(ui_widget_t *w, css_key_t key);
+int ui_widget_unset_style(ui_widget_t *w, css_key_t key);
+
+void ui_widget_set_visibility(ui_widget_t *w, const char *value);
+void ui_widget_set_hidden(ui_widget_t *w);
+void ui_widget_set_visible(ui_widget_t *w);
+void ui_widget_show(ui_widget_t *w);
+void ui_widget_hide(ui_widget_t *w);
+void ui_widget_set_position(ui_widget_t *w, LCUI_StyleValue position);
+void ui_widget_set_opacity(ui_widget_t *w, float opacity);
+void ui_widget_set_box_sizing(ui_widget_t *w, LCUI_StyleValue sizing);
+
 
 // Widget status
 
