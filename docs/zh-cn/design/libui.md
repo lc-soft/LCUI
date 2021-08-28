@@ -55,7 +55,9 @@ static inline float ui_compute_length(float value, ui_length_unit_t unit);
 
 ui_widget_t *ui_create_widget(const char *type);
 ui_widget_t *ui_get_widget(const char *id);
-void ui_destroy_widget(ui_widget_t *w);
+void ui_delete_widget(ui_widget_t *w);
+void ui_widget_remove(ui_widget_t *w);
+void ui_widget_destroy(ui_widget_t *w);
 void ui_widget_empty(ui_widget_t *w);
 void ui_widget_offset(ui_widget_t *w, ui_widget_t *parent, float *offset_x, float *offset_y);
 void ui_widget_set_title(ui_widget_t *w, const wchar_t *title);
