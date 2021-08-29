@@ -1,42 +1,9 @@
-﻿/*
- * widget_boarder.c -- widget border style processing module.
- *
- * Copyright (c) 2018-2020, Liu chao <lc-soft@live.cn> All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *   * Neither the name of LCUI nor the names of its contributors may be used
- *     to endorse or promote products derived from this software without
- *     specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
+﻿#include <LCUI.h>
+#include <LCUI/gui/css_library.h>
+#include "../include/ui.h"
+#include "private.h"
 
-#include <math.h>
-#include <string.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
-#include <LCUI/gui/metrics.h>
-#include <LCUI/gui/widget.h>
-#include "widget_border.h"
-
-static float ComputeXMetric(LCUI_Widget w, LCUI_Style s)
+static float ComputeXMetric(ui_widget_t* w, LCUI_Style s)
 {
 	if (s->type == LCUI_STYPE_SCALE) {
 		return w->width * s->scale;
@@ -44,7 +11,7 @@ static float ComputeXMetric(LCUI_Widget w, LCUI_Style s)
 	return LCUIMetrics_Compute(s->value, s->type);
 }
 
-static float ComputeYMetric(LCUI_Widget w, LCUI_Style s)
+static float ComputeYMetric(ui_widget_t* w, LCUI_Style s)
 {
 	if (s->type == LCUI_STYPE_SCALE) {
 		return w->height * s->scale;
@@ -52,11 +19,22 @@ static float ComputeYMetric(LCUI_Widget w, LCUI_Style s)
 	return LCUIMetrics_Compute(s->value, s->type);
 }
 
-void Widget_ComputeBorderStyle(LCUI_Widget w)
+static unsigned int ComputeActual(float width)
+{
+	unsigned int w;
+
+	w = LCUIMetrics_ComputeActual(width, LCUI_STYPE_PX);
+	if (width > 0 && w < 1) {
+		return 1;
+	}
+	return w;
+}
+
+void ui_widget_compute_border_style(ui_widget_t* w)
 {
 	int key;
 	LCUI_Style s;
-	LCUI_BorderStyle *b;
+	LCUI_BorderStyle* b;
 	b = &w->computed_style.border;
 	memset(b, 0, sizeof(LCUI_BorderStyle));
 	for (key = key_border_start; key <= key_border_end; ++key) {
@@ -119,21 +97,10 @@ void Widget_ComputeBorderStyle(LCUI_Widget w)
 	}
 }
 
-static unsigned int ComputeActual(float width)
-{
-	unsigned int w;
-
-	w = LCUIMetrics_ComputeActual(width, LCUI_STYPE_PX);
-	if (width > 0 && w < 1) {
-		return 1;
-	}
-	return w;
-}
-
 /** 计算部件边框样式的实际值 */
-void Widget_ComputeBorder(LCUI_Widget w, LCUI_Border *b)
+void ui_widget_compute_border(ui_widget_t* w, LCUI_Border* b)
 {
-	LCUI_BorderStyle *s;
+	LCUI_BorderStyle* s;
 	float r = min(w->width, w->height) / 2.0f;
 
 	s = &w->computed_style.border;
@@ -155,8 +122,8 @@ void Widget_ComputeBorder(LCUI_Widget w, LCUI_Border *b)
 	b->bottom_right_radius = ComputeActual(min(s->bottom_right_radius, r));
 }
 
-void Widget_PaintBorder(LCUI_Widget w, LCUI_PaintContext paint,
-			LCUI_WidgetActualStyle style)
+void ui_widget_paint_border(ui_widget_t* w, LCUI_PaintContext paint,
+			    ui_widget_actual_style_t* style)
 {
 	LCUI_Rect box;
 
@@ -167,8 +134,8 @@ void Widget_PaintBorder(LCUI_Widget w, LCUI_PaintContext paint,
 	Border_Paint(&style->border, &box, paint);
 }
 
-void Widget_CropContent(LCUI_Widget w, LCUI_PaintContext paint,
-			LCUI_WidgetActualStyle style)
+void ui_widget_crop_content(ui_widget_t* w, LCUI_PaintContext paint,
+			    ui_widget_actual_style_t* style)
 {
 	LCUI_Rect box;
 

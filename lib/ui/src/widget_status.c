@@ -36,20 +36,20 @@
 #include <LCUI/gui/widget_task.h>
 #include <LCUI/gui/widget_tree.h>
 
-static void Widget_MarkChildrenRefreshByStatus(LCUI_Widget w)
+static void Widget_MarkChildrenRefreshByStatus(ui_widget_t* w)
 {
 	LinkedListNode *node;
 
 	if (w->rules && w->rules->ignore_status_change) {
 		return;
 	}
-	Widget_AddTask(w, LCUI_WTASK_REFRESH_STYLE);
+	Widget_AddTask(w, UI_WIDGET_TASK_REFRESH_STYLE);
 	for (LinkedList_Each(node, &w->children)) {
 		Widget_MarkChildrenRefreshByStatus(node->data);
 	}
 }
 
-static int Widget_HandleStatusChange(LCUI_Widget w, const char *name)
+static int Widget_HandleStatusChange(ui_widget_t* w, const char *name)
 {
 	Widget_UpdateStyle(w, TRUE);
 	if (w->state < LCUI_WSTATE_READY || w->state == LCUI_WSTATE_DELETED) {
@@ -58,14 +58,14 @@ static int Widget_HandleStatusChange(LCUI_Widget w, const char *name)
 	if (w->rules && w->rules->ignore_status_change) {
 		return 0;
 	}
-	if (Widget_GetChildrenStyleChanges(w, 1, name) > 0) {
+	if (ui_widget_get_children_style_changes(w, 1, name) > 0) {
 		Widget_MarkChildrenRefreshByStatus(w);
 		return 1;
 	}
 	return 0;
 }
 
-int Widget_AddStatus(LCUI_Widget w, const char *status_name)
+int Widget_AddStatus(ui_widget_t* w, const char *status_name)
 {
 	if (strlist_has(w->status, status_name)) {
 		return 0;
@@ -76,7 +76,7 @@ int Widget_AddStatus(LCUI_Widget w, const char *status_name)
 	return Widget_HandleStatusChange(w, status_name);
 }
 
-LCUI_BOOL Widget_HasStatus(LCUI_Widget w, const char *status_name)
+LCUI_BOOL Widget_HasStatus(ui_widget_t* w, const char *status_name)
 {
 	if (strlist_has(w->status, status_name)) {
 		return TRUE;
@@ -84,7 +84,7 @@ LCUI_BOOL Widget_HasStatus(LCUI_Widget w, const char *status_name)
 	return FALSE;
 }
 
-int Widget_RemoveStatus(LCUI_Widget w, const char *status_name)
+int Widget_RemoveStatus(ui_widget_t* w, const char *status_name)
 {
 	if (strlist_has(w->status, status_name)) {
 		Widget_HandleStatusChange(w, status_name);
@@ -94,30 +94,30 @@ int Widget_RemoveStatus(LCUI_Widget w, const char *status_name)
 	return 0;
 }
 
-void Widget_UpdateStatus(LCUI_Widget widget)
+void Widget_UpdateStatus(ui_widget_t* widget)
 {
-	LCUI_Widget child;
+	ui_widget_t* child;
 
 	if (!widget->parent) {
 		return;
 	}
 	if (widget->index == widget->parent->children.length - 1) {
 		Widget_AddStatus(widget, "last-child");
-		child = Widget_GetPrev(widget);
+		child = ui_widget_prev(widget);
 		if (child) {
 			Widget_RemoveStatus(child, "last-child");
 		}
 	}
 	if (widget->index == 0) {
 		Widget_AddStatus(widget, "first-child");
-		child = Widget_GetNext(widget);
+		child = ui_widget_next(widget);
 		if (child) {
 			Widget_RemoveStatus(child, "first-child");
 		}
 	}
 }
 
-void Widget_SetDisabled(LCUI_Widget w, LCUI_BOOL disabled)
+void Widget_SetDisabled(ui_widget_t* w, LCUI_BOOL disabled)
 {
 	w->disabled = disabled;
 	if (w->disabled) {
@@ -127,7 +127,7 @@ void Widget_SetDisabled(LCUI_Widget w, LCUI_BOOL disabled)
 	}
 }
 
-void Widget_DestroyStatus(LCUI_Widget w)
+void ui_widget_deleteStatus(ui_widget_t* w)
 {
 	if (w->status) {
 		strlist_free(w->status);

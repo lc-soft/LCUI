@@ -35,7 +35,7 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
 
-void Widget_SetPadding(LCUI_Widget w, float top, float right, float bottom,
+void Widget_SetPadding(ui_widget_t* w, float top, float right, float bottom,
 		       float left)
 {
 	Widget_SetStyle(w, key_padding_top, top, px);
@@ -45,7 +45,7 @@ void Widget_SetPadding(LCUI_Widget w, float top, float right, float bottom,
 	Widget_UpdateStyle(w, FALSE);
 }
 
-void Widget_SetMargin(LCUI_Widget w, float top, float right, float bottom,
+void Widget_SetMargin(ui_widget_t* w, float top, float right, float bottom,
 		      float left)
 {
 	Widget_SetStyle(w, key_margin_top, top, px);
@@ -55,7 +55,7 @@ void Widget_SetMargin(LCUI_Widget w, float top, float right, float bottom,
 	Widget_UpdateStyle(w, FALSE);
 }
 
-void Widget_SetBorderColor(LCUI_Widget w, LCUI_Color color)
+void Widget_SetBorderColor(ui_widget_t* w, LCUI_Color color)
 {
 	Widget_SetStyle(w, key_border_top_color, color, color);
 	Widget_SetStyle(w, key_border_right_color, color, color);
@@ -64,7 +64,7 @@ void Widget_SetBorderColor(LCUI_Widget w, LCUI_Color color)
 	Widget_UpdateStyle(w, FALSE);
 }
 
-void Widget_SetBorderWidth(LCUI_Widget w, float width)
+void Widget_SetBorderWidth(ui_widget_t* w, float width)
 {
 	Widget_SetStyle(w, key_border_top_width, width, px);
 	Widget_SetStyle(w, key_border_right_width, width, px);
@@ -73,7 +73,7 @@ void Widget_SetBorderWidth(LCUI_Widget w, float width)
 	Widget_UpdateStyle(w, FALSE);
 }
 
-void Widget_SetBorderStyle(LCUI_Widget w, int style)
+void Widget_SetBorderStyle(ui_widget_t* w, int style)
 {
 	Widget_SetStyle(w, key_border_top_style, style, style);
 	Widget_SetStyle(w, key_border_right_style, style, style);
@@ -81,14 +81,14 @@ void Widget_SetBorderStyle(LCUI_Widget w, int style)
 	Widget_SetStyle(w, key_border_left_style, style, style);
 }
 
-void Widget_SetBorder(LCUI_Widget w, float width, int style, LCUI_Color color)
+void Widget_SetBorder(ui_widget_t* w, float width, int style, LCUI_Color color)
 {
 	Widget_SetBorderColor(w, color);
 	Widget_SetBorderWidth(w, width);
 	Widget_SetBorderStyle(w, style);
 }
 
-void Widget_SetBoxShadow(LCUI_Widget w, float x, float y, float blur,
+void Widget_SetBoxShadow(ui_widget_t* w, float x, float y, float blur,
 			 LCUI_Color color)
 {
 	Widget_SetStyle(w, key_box_shadow_x, x, px);
@@ -98,21 +98,21 @@ void Widget_SetBoxShadow(LCUI_Widget w, float x, float y, float blur,
 	Widget_UpdateStyle(w, FALSE);
 }
 
-void Widget_Move(LCUI_Widget w, float left, float top)
+void Widget_Move(ui_widget_t* w, float left, float top)
 {
 	Widget_SetStyle(w, key_top, top, px);
 	Widget_SetStyle(w, key_left, left, px);
 	Widget_UpdateStyle(w, FALSE);
 }
 
-void Widget_Resize(LCUI_Widget w, float width, float height)
+void Widget_Resize(ui_widget_t* w, float width, float height)
 {
 	Widget_SetStyle(w, key_width, width, px);
 	Widget_SetStyle(w, key_height, height, px);
 	Widget_UpdateStyle(w, FALSE);
 }
 
-LCUI_Style Widget_GetStyle(LCUI_Widget w, int key)
+LCUI_Style Widget_GetStyle(ui_widget_t* w, int key)
 {
 	LCUI_StyleListNode node;
 
@@ -128,7 +128,7 @@ LCUI_Style Widget_GetStyle(LCUI_Widget w, int key)
 	return &node->style;
 }
 
-int Widget_UnsetStyle(LCUI_Widget w, int key)
+int Widget_UnsetStyle(ui_widget_t* w, int key)
 {
 	if (!w->custom_style) {
 		return -1;
@@ -137,7 +137,7 @@ int Widget_UnsetStyle(LCUI_Widget w, int key)
 	return StyleList_RemoveNode(w->custom_style, key);
 }
 
-LCUI_Style Widget_GetInheritedStyle(LCUI_Widget w, int key)
+LCUI_Style Widget_GetInheritedStyle(ui_widget_t* w, int key)
 {
 	LCUI_Selector selector;
 
@@ -150,20 +150,7 @@ LCUI_Style Widget_GetInheritedStyle(LCUI_Widget w, int key)
 	return &w->inherited_style->sheet[key];
 }
 
-LCUI_BOOL Widget_CheckStyleBooleanValue(LCUI_Widget w, int key, LCUI_BOOL value)
-{
-	LCUI_Style s = &w->style->sheet[key_focusable];
-
-	return s->is_valid && s->type == LCUI_STYPE_BOOL &&
-	       s->val_bool == value;
-}
-
-LCUI_BOOL Widget_CheckStyleValid(LCUI_Widget w, int key)
-{
-	return w->style && w->style->sheet[key].is_valid;
-}
-
-void Widget_SetVisibility(LCUI_Widget w, const char *value)
+void Widget_SetVisibility(ui_widget_t* w, const char *value)
 {
 	LCUI_Style s = Widget_GetStyle(w, key_visibility);
 	if (s->is_valid && s->type == LCUI_STYPE_STRING) {
@@ -174,17 +161,17 @@ void Widget_SetVisibility(LCUI_Widget w, const char *value)
 	Widget_UpdateStyle(w, FALSE);
 }
 
-void Widget_SetVisible(LCUI_Widget w)
+void Widget_SetVisible(ui_widget_t* w)
 {
 	Widget_SetVisibility(w, "visible");
 }
 
-void Widget_SetHidden(LCUI_Widget w)
+void Widget_SetHidden(ui_widget_t* w)
 {
 	Widget_SetVisibility(w, "hidden");
 }
 
-void Widget_Show(LCUI_Widget w)
+void Widget_Show(ui_widget_t* w)
 {
 	LCUI_Style s = Widget_GetStyle(w, key_display);
 
@@ -203,58 +190,58 @@ void Widget_Show(LCUI_Widget w)
 	Widget_UpdateStyle(w, FALSE);
 }
 
-void Widget_Hide(LCUI_Widget w)
+void Widget_Hide(ui_widget_t* w)
 {
 	Widget_SetStyle(w, key_display, SV_NONE, style);
 	Widget_UpdateStyle(w, FALSE);
 }
 
-void Widget_SetPosition(LCUI_Widget w, LCUI_StyleValue position)
+void Widget_SetPosition(ui_widget_t* w, LCUI_StyleValue position)
 {
 	Widget_SetStyle(w, key_position, position, style);
 	Widget_UpdateStyle(w, FALSE);
 }
 
-void Widget_SetOpacity(LCUI_Widget w, float opacity)
+void Widget_SetOpacity(ui_widget_t* w, float opacity)
 {
 	Widget_SetStyle(w, key_opacity, opacity, scale);
 	Widget_UpdateStyle(w, FALSE);
 }
 
-void Widget_SetBoxSizing(LCUI_Widget w, LCUI_StyleValue sizing)
+void Widget_SetBoxSizing(ui_widget_t* w, LCUI_StyleValue sizing)
 {
 	Widget_SetStyle(w, key_box_sizing, sizing, style);
 	Widget_UpdateStyle(w, FALSE);
 }
 
-LCUI_Widget Widget_GetClosest(LCUI_Widget w, const char *type)
+ui_widget_t* Widget_GetClosest(ui_widget_t* w, const char *type)
 {
-	LCUI_Widget target;
+	ui_widget_t* target;
 
 	for (target = w; target; target = target->parent) {
-		if (Widget_CheckType(target, type)) {
+		if (ui_check_widget_type(target, type)) {
 			return target;
 		}
 	}
 	return NULL;
 }
 
-static void Widget_CollectReference(LCUI_Widget w, void *arg)
+static void Widget_CollectReference(ui_widget_t* w, void *arg)
 {
-	const char *ref = Widget_GetAttribute(w, "ref");
+	const char *ref = ui_widget_get_attribute_value(w, "ref");
 
 	if (ref) {
 		Dict_Add(arg, (void*)ref, w);
 	}
 }
 
-Dict *Widget_CollectReferences(LCUI_Widget w)
+Dict *Widget_CollectReferences(ui_widget_t* w)
 {
 	Dict *dict;
 	static DictType t;
 
 	Dict_InitStringKeyType(&t);
 	dict = Dict_Create(&t, NULL);
-	Widget_Each(w, Widget_CollectReference, dict);
+	ui_widget_each(w, Widget_CollectReference, dict);
 	return dict;
 }

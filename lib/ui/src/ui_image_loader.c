@@ -1,11 +1,9 @@
+#include <stdlib.h>
 #include <LCUI.h>
 #include <LCUI/image.h>
 #include <LCUI/worker.h>
-
-#define ui_image_on_event ui_image_add_event_listener
-#define ui_image_off_event ui_image_remove_event_listener
-
-typedef void (*ui_image_event_handler_t)(ui_image_t*, void *);
+#include "../include/ui.h"
+#include "private.h"
 
 typedef struct ui_image_event_listener_t {
 	LinkedListNode node;
@@ -14,14 +12,14 @@ typedef struct ui_image_event_listener_t {
 	ui_image_event_handler_t handler;
 } ui_image_event_listener_t;
 
-typedef struct ui_image_t {
+struct ui_image_t {
 	LCUI_Graph data;
 	LCUI_BOOL loaded;
 	char *path;
 	size_t refs_count;
 	/** LinkedList<ui_image_event_listener_t> */
 	LinkedList listeners;
-} ui_image_t;
+};
 
 typedef struct ui_image_event_t {
 	LinkedListNode node;

@@ -45,13 +45,13 @@
 void LCUI_InitWidget(void)
 {
 	LCUIWidget_InitTasks();
-	LCUIWidget_InitEvent();
-	LCUIWidget_InitPrototype();
+	ui_init_events();
+	ui_init_widget_prototype();
 	LCUIWidget_InitStyle();
 	LCUIWidget_InitRenderer();
-	LCUIWidget_InitImageLoader();
+	ui_init_image_loader();
 	LCUIWidget_InitBase();
-	LCUIWidget_InitIdLibrary();
+	ui_init_widget_id();
 }
 
 void LCUI_FreeWidget(void)
@@ -59,11 +59,11 @@ void LCUI_FreeWidget(void)
 	LCUIWidget_FreeTextView();
 	LCUIWidget_FreeTasks();
 	LCUIWidget_FreeRoot();
-	LCUIWidget_FreeEvent();
+	ui_destroy_events();
 	LCUIWidget_FreeStyle();
-	LCUIWidget_FreePrototype();
+	ui_destroy_widget_prototype();
 	LCUIWidget_FreeRenderer();
-	LCUIWidget_FreeImageLoader();
-	LCUIWidget_FreeIdLibrary();
+	ui_destroy_image_loader();
+	ui_destroy_widget_id();
 	LCUIWidget_FreeBase();
 }
