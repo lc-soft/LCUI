@@ -21,7 +21,7 @@ void ui_widget_reflow(ui_widget_t* w, ui_layout_rule_t rule)
 	}
 	ev.cancel_bubble = TRUE;
 	ev.type = UI_EVENT_AFTERLAYOUT;
-	ui_widget_trigger_event(w, &ev, NULL);
+	ui_widget_emit_event(w, &ev, NULL);
 	DEBUG_MSG("id: %s, type: %s, size: (%g, %g)\n", w->id, w->type,
 		  w->width, w->height);
 }

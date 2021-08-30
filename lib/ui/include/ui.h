@@ -191,6 +191,7 @@ typedef struct ui_widget_style_t {
 } ui_widget_style_t;
 
 typedef struct ui_widget_t ui_widget_t;
+typedef LinkedList ui_widget_listeners_t;
 
 typedef void(*ui_widget_function_t)(ui_widget_t*);
 typedef void(*ui_widget_task_handler_t)(ui_widget_t*, int);
@@ -390,7 +391,7 @@ struct ui_widget_t {
 	/** Update task context */
 	ui_widget_task_t task;
 	ui_widget_rules_t *rules;
-	LCUI_EventTrigger trigger;
+	ui_widget_listeners_t *listeners;
 
 	/** Invalid area (Dirty Rectangle) */
 	LCUI_RectF invalid_area;
@@ -528,25 +529,23 @@ INLINE ui_widget_block_event(ui_widget_t* w, LCUI_BOOL block)
 }
 
 /** 触发事件，让事件处理器在主循环中调用 */
-LCUI_API LCUI_BOOL ui_widget_post_event(ui_widget_t* widget,
-					ui_event_t* ev, void* data,
-					void (*destroy_data)(void*));
+LCUI_API int ui_widget_post_event(ui_widget_t* w, ui_event_t e, void* arg,
+				  void (*destroy_data)(void*));
 
 /** 触发事件，直接调用事件处理器 */
-LCUI_API int ui_widget_trigger_event(ui_widget_t* widget, ui_event_t* e,
-				     void* data);
+LCUI_API int ui_widget_emit_event(ui_widget_t* w, ui_event_t e, void* arg);
 
 /** 自动分配一个可用的事件标识号 */
-LCUI_API int ui_alloc_widget_event_id(void);
+LCUI_API int ui_alloc_event_id(void);
 
 /** 设置与事件标识号对应的名称 */
-LCUI_API int ui_set_widget_event_id(int event_id, const char* event_name);
+LCUI_API int ui_set_event_id(int event_id, const char* event_name);
 
 /** 获取与事件标识号对应的名称 */
-LCUI_API const char* ui_get_widget_event_name(int event_id);
+LCUI_API const char* ui_get_event_name(int event_id);
 
 /** 获取与事件名称对应的标识号 */
-LCUI_API int ui_get_widget_event_id(const char* event_name);
+LCUI_API int ui_get_event_id(const char* event_name);
 
 LCUI_API void ui_event_init(ui_event_t* e, const char* name);
 
@@ -645,7 +644,7 @@ LCUI_API int ui_widget_set_touch_capture(ui_widget_t* w, int point_id);
  */
 LCUI_API int ui_widget_release_touch_capture(ui_widget_t* w, int point_id);
 
-LCUI_API void ui_widget_destroy_event_trigger(ui_widget_t* w);
+LCUI_API void ui_widget_destroy_listeners(ui_widget_t* w);
 
 // Image Loader
 

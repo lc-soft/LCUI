@@ -21,7 +21,7 @@ int ui_widget_append(ui_widget_t* parent, ui_widget_t* widget)
 	ev.type = UI_EVENT_LINK;
 	Widget_UpdateStyle(widget, TRUE);
 	Widget_UpdateChildrenStyle(widget, TRUE);
-	ui_widget_trigger_event(widget, &ev, NULL);
+	ui_widget_emit_event(widget, &ev, NULL);
 	ui_widget_post_surface_event(widget, UI_EVENT_LINK, TRUE);
 	Widget_UpdateTaskStatus(widget);
 	Widget_UpdateStatus(widget);
@@ -57,7 +57,7 @@ int ui_widget_prepend(ui_widget_t* parent, ui_widget_t* widget)
 	}
 	ev.cancel_bubble = TRUE;
 	ev.type = UI_EVENT_LINK;
-	ui_widget_trigger_event(widget, &ev, NULL);
+	ui_widget_emit_event(widget, &ev, NULL);
 	ui_widget_post_surface_event(widget, UI_EVENT_LINK, TRUE);
 	Widget_AddTaskForChildren(widget, UI_WIDGET_TASK_REFRESH_STYLE);
 	Widget_UpdateTaskStatus(widget);
@@ -95,12 +95,12 @@ int ui_widget_unwrap(ui_widget_t* widget)
 		prev = node->prev;
 		child = node->data;
 		ev.type = UI_EVENT_UNLINK;
-		ui_widget_trigger_event(child, &ev, NULL);
+		ui_widget_emit_event(child, &ev, NULL);
 		LinkedList_Unlink(&widget->children, node);
 		LinkedList_Link(children, target, node);
 		child->parent = widget->parent;
 		ev.type = UI_EVENT_LINK;
-		ui_widget_trigger_event(child, &ev, NULL);
+		ui_widget_emit_event(child, &ev, NULL);
 		Widget_AddTaskForChildren(child, UI_WIDGET_TASK_REFRESH_STYLE);
 		Widget_UpdateTaskStatus(child);
 		node = prev;
@@ -151,7 +151,7 @@ int ui_widget_unlink(ui_widget_t* w)
 	node = &w->node;
 	ev.cancel_bubble = TRUE;
 	ev.type = UI_EVENT_UNLINK;
-	ui_widget_trigger_event(w, &ev, NULL);
+	ui_widget_emit_event(w, &ev, NULL);
 	LinkedList_Unlink(&w->parent->children, node);
 	LinkedList_Unlink(&w->parent->children_show, &w->node_show);
 	ui_widget_post_surface_event(w, UI_EVENT_UNLINK, TRUE);

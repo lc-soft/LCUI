@@ -26,7 +26,7 @@ void ui_widget_destroy(ui_widget_t* w)
 		ui_widget_unlink(w);
 	}
 	ui_widget_destroy_background(w);
-	ui_widget_destroy_event_trigger(w);
+	ui_widget_destroy_listeners(w);
 	ui_widget_destroy_children(w);
 	ui_widget_destroy_prototype(w);
 	if (w->title) {
@@ -102,7 +102,7 @@ void ui_widget_add_state(ui_widget_t* w, ui_widget_state_t state)
 			ui_event_t e = { 0 };
 			e.type = UI_EVENT_READY;
 			e.cancel_bubble = TRUE;
-			ui_widget_trigger_event(w, &e, NULL);
+			ui_widget_emit_event(w, &e, NULL);
 			w->state = LCUI_WSTATE_NORMAL;
 		}
 	}
@@ -158,7 +158,7 @@ void ui_widget_empty(ui_widget_t* w)
 	ui_event_init(&ev, "unlink");
 	for (LinkedList_Each(node, &w->children)) {
 		child = node->data;
-		ui_widget_trigger_event(child, &ev, NULL);
+		ui_widget_emit_event(child, &ev, NULL);
 		if (child->parent == root) {
 			ui_widget_post_surface_event(child, UI_EVENT_UNLINK,
 						TRUE);

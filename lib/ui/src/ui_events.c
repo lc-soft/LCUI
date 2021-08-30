@@ -14,12 +14,15 @@ typedef struct ui_touch_capturer_t {
 } ui_touch_capturer_t;
 
 typedef struct ui_event_listener_t {
-	ui_event_handler_t func;
+	LinkedListNode node;
+	int event_id;
+	ui_event_handler_t handler;
 	void *data;
 	void(*destroy_data)(void *);
 } ui_event_listener_t;
 
 typedef struct ui_event_pack_t {
+	LinkedListNode node;
 	void *data;
 	void(*destroy_data)(void *);
 	ui_widget_t* widget;
@@ -27,15 +30,11 @@ typedef struct ui_event_pack_t {
 } ui_event_pack_t;
 
 enum ui_widget_status_type_t {
-	UI_WIDGET_STATUS_HOVER, UI_WIDGET_STATUS_ACTIVE, UI_WIDGET_STATUS_FOCUS, UI_WIDGET_STATUS_TOTAL
+	UI_WIDGET_STATUS_HOVER,
+	UI_WIDGET_STATUS_ACTIVE,
+	UI_WIDGET_STATUS_FOCUS,
+	UI_WIDGET_STATUS_TOTAL
 };
-
-typedef struct ui_event_record_t {
-	ui_widget_t* widget;
-
-	/**< LinkedList<ui_event_pack_t> */
-	LinkedList records;
-} ui_event_record_t;
 
 typedef struct ui_event_mapping_t {
 	int id;
@@ -52,12 +51,15 @@ typedef struct ui_widget_click_record_t {
 
 /** 当前功能模块的相关数据 */
 static struct ui_events_t {
-	ui_widget_t* mouse_capturer;     /**< 占用鼠标的部件 */
-	LinkedList touch_capturers;     /**< 触点占用记录 */
-	ui_widget_t* targets[UI_WIDGET_STATUS_TOTAL]; /**< 相关的部件 */
-	LinkedList events;              /**< 已绑定的事件 */
-	LinkedList event_mappings;	/**< 事件标识号和名称映射记录列表  */
-	RBTree event_records;		/**< 当前正执行的事件的记录 */
+	ui_widget_t* mouse_capturer;
+	LinkedList touch_capturers;
+	ui_widget_t* targets[UI_WIDGET_STATUS_TOTAL];
+
+	/** LinkedList<ui_event_pack_t> */
+	LinkedList queue;
+
+	/** LinkedList<event_mapping_t> */
+	LinkedList event_mappings;
 
 	/** RBTree<int, event_mapping_t> */
 	RBTree event_names;
@@ -65,6 +67,7 @@ static struct ui_events_t {
 	/** Dict<string, event_mapping_t> */
 	Dict *event_ids;
 	DictType event_ids_type;
+
 	int base_event_id;
 	ui_widget_click_record_t click;
 	LCUI_Mutex mutex;
@@ -72,21 +75,59 @@ static struct ui_events_t {
 
 /* clang-format on */
 
-static void ui_event_mapping_destroy(void* data)
-{
-	ui_event_mapping_t* mapping = data;
-	free(mapping->name);
-	free(mapping);
-}
-
 static int ui_use_widget_event_id(const char* event_name)
 {
-	int id = ui_get_widget_event_id(event_name);
+	int id = ui_get_event_id(event_name);
 	if (id < 0) {
-		id = ui_alloc_widget_event_id();
-		ui_set_widget_event_id(id, event_name);
+		id = ui_alloc_event_id();
+		ui_set_event_id(id, event_name);
 	}
 	return id;
+}
+
+int ui_set_event_id(int event_id, const char* event_name)
+{
+	int ret;
+	ui_event_mapping_t* mapping;
+	LCUIMutex_Lock(&ui_events.mutex);
+	if (Dict_FetchValue(ui_events.event_ids, event_name)) {
+		LCUIMutex_Unlock(&ui_events.mutex);
+		return -1;
+	}
+	mapping = malloc(sizeof(ui_event_mapping_t));
+	if (!mapping) {
+		return -2;
+	}
+	mapping->name = strdup2(event_name);
+	mapping->id = event_id;
+	LinkedList_Append(&ui_events.event_mappings, mapping);
+	RBTree_Insert(&ui_events.event_names, event_id, mapping);
+	ret = Dict_Add(ui_events.event_ids, mapping->name, mapping);
+	LCUIMutex_Unlock(&ui_events.mutex);
+	return ret;
+}
+
+int ui_alloc_event_id(void)
+{
+	return ui_events.base_event_id++;
+}
+
+const char* ui_get_event_name(int event_id)
+{
+	ui_event_mapping_t* mapping;
+	LCUIMutex_Lock(&ui_events.mutex);
+	mapping = RBTree_GetData(&ui_events.event_names, event_id);
+	LCUIMutex_Unlock(&ui_events.mutex);
+	return mapping ? mapping->name : NULL;
+}
+
+int ui_get_event_id(const char* event_name)
+{
+	ui_event_mapping_t* mapping;
+	LCUIMutex_Lock(&ui_events.mutex);
+	mapping = Dict_FetchValue(ui_events.event_ids, event_name);
+	LCUIMutex_Unlock(&ui_events.mutex);
+	return mapping ? mapping->id : -1;
 }
 
 void ui_event_init(ui_event_t* e, const char* name)
@@ -117,119 +158,8 @@ void ui_event_destroy(ui_event_t* e)
 	}
 }
 
-static void ui_event_pack_destroy(void* data)
-{
-	ui_event_pack_t* pack = data;
-	if (pack->data && pack->destroy_data) {
-		pack->destroy_data(pack->data);
-	}
-	ui_event_destroy(&pack->event);
-	pack->data = NULL;
-	free(pack);
-}
-
-static void ui_event_record_destroy(void* data)
-{
-	ui_event_record_t* record = data;
-	LinkedList_Clear(&record->records, ui_event_pack_destroy);
-	free(record);
-}
-
-static int ui_event_record_compare(void* data, const void* keydata)
-{
-	ui_event_record_t* record = data;
-	if (record->widget == (ui_widget_t*)keydata) {
-		return 0;
-	} else if (record->widget < (ui_widget_t*)keydata) {
-		return -1;
-	} else {
-		return 1;
-	}
-}
-
-static void ui_event_listener_destroy(void* arg)
-{
-	ui_event_listener_t* handler = arg;
-	if (handler->data && handler->destroy_data) {
-		handler->destroy_data(handler->data);
-	}
-	handler->data = NULL;
-	free(handler);
-}
-
-/**
- * 添加事件记录
- * 记录当前待处理的事件和目标部件，方便在部件被销毁时清除待处理的事件
- */
-static void Widget_AddEventRecord(ui_widget_t* widget, ui_event_pack_t* pack)
-{
-	ui_event_record_t* record;
-
-	LCUIMutex_Lock(&ui_events.mutex);
-	record = RBTree_CustomGetData(&ui_events.event_records, widget);
-	if (!record) {
-		record = malloc(sizeof(ui_event_record_t));
-		if (!record) {
-			return;
-		}
-		LinkedList_Init(&record->records);
-		record->widget = widget;
-		RBTree_CustomInsert(&ui_events.event_records, widget, record);
-	}
-	LinkedList_Append(&record->records, pack);
-	LCUIMutex_Unlock(&ui_events.mutex);
-}
-
-/** 删除事件记录 */
-static int ui_widget_destroy_event_record(ui_widget_t* widget,
-					  ui_event_pack_t* pack)
-{
-	int ret = 0;
-	ui_event_record_t* record;
-	LinkedListNode *node, *prev;
-
-	LCUIMutex_Lock(&ui_events.mutex);
-	record = RBTree_CustomGetData(&ui_events.event_records, widget);
-	if (!record) {
-		LCUIMutex_Unlock(&ui_events.mutex);
-		return -1;
-	}
-	for (LinkedList_Each(node, &record->records)) {
-		prev = node->prev;
-		if (node->data == pack) {
-			LinkedList_DeleteNode(&record->records, node);
-			node = prev;
-			ret = 1;
-		}
-	}
-	LCUIMutex_Unlock(&ui_events.mutex);
-	return ret;
-}
-
-/** 将原始事件转换成部件事件 */
-static void WidgetEventTranslator(LCUI_Event e, ui_event_pack_t* pack)
-{
-	ui_event_listener_t* handler = e->data;
-	ui_widget_t* w = pack->widget;
-
-	if (!w) {
-		return;
-	}
-	pack->event.type = e->type;
-	pack->event.data = handler->data;
-	handler->func(w, &pack->event, pack->data);
-	while (!pack->event.cancel_bubble && w->parent) {
-		w = w->parent;
-		if (w->trigger) {
-			pack->widget = w;
-			/** 向父级部件冒泡传递事件 */
-			EventTrigger_Trigger(w->trigger, e->type, pack);
-		}
-	}
-}
-
 /** 复制部件事件 */
-static int ui_copy_widget_event(ui_event_t* dst, const ui_event_t* src)
+static int ui_event_copy(const ui_event_t* src, ui_event_t* dst)
 {
 	int n;
 	size_t size;
@@ -263,13 +193,30 @@ static int ui_copy_widget_event(ui_event_t* dst, const ui_event_t* src)
 	return 0;
 }
 
-static void ui_event_pack_delete(void* arg)
+static void ui_event_mapping_destroy(void* data)
 {
-	ui_event_pack_t* pack = arg;
-	/* 如果删除成功则说明有记录，需要销毁数据 */
-	if (ui_widget_destroy_event_record(pack->event.target, pack) == 1) {
-		ui_event_pack_destroy(pack);
+	ui_event_mapping_t* mapping = data;
+	free(mapping->name);
+	free(mapping);
+}
+
+static void ui_event_pack_destroy(ui_event_pack_t* pack)
+{
+	if (pack->data && pack->destroy_data) {
+		pack->destroy_data(pack->data);
 	}
+	ui_event_destroy(&pack->event);
+	pack->data = NULL;
+	free(pack);
+}
+
+static void ui_event_listener_destroy(ui_event_listener_t* listener)
+{
+	if (listener->data && listener->destroy_data) {
+		listener->destroy_data(listener->data);
+	}
+	listener->data = NULL;
+	free(listener);
 }
 
 static void ui_touch_capturer_destroy(void* arg)
@@ -364,91 +311,68 @@ static int ui_remove_touch_capturer(LinkedList* list, ui_widget_t* w,
 	return 0;
 }
 
-int ui_set_widget_event_id(int event_id, const char* event_name)
-{
-	int ret;
-	ui_event_mapping_t* mapping;
-	LCUIMutex_Lock(&ui_events.mutex);
-	if (Dict_FetchValue(ui_events.event_ids, event_name)) {
-		LCUIMutex_Unlock(&ui_events.mutex);
-		return -1;
-	}
-	mapping = malloc(sizeof(ui_event_mapping_t));
-	if (!mapping) {
-		return -2;
-	}
-	mapping->name = strdup2(event_name);
-	mapping->id = event_id;
-	LinkedList_Append(&ui_events.event_mappings, mapping);
-	RBTree_Insert(&ui_events.event_names, event_id, mapping);
-	ret = Dict_Add(ui_events.event_ids, mapping->name, mapping);
-	LCUIMutex_Unlock(&ui_events.mutex);
-	return ret;
-}
-
-int ui_alloc_widget_event_id(void)
-{
-	return ui_events.base_event_id++;
-}
-
-const char* ui_get_widget_event_name(int event_id)
-{
-	ui_event_mapping_t* mapping;
-	LCUIMutex_Lock(&ui_events.mutex);
-	mapping = RBTree_GetData(&ui_events.event_names, event_id);
-	LCUIMutex_Unlock(&ui_events.mutex);
-	return mapping ? mapping->name : NULL;
-}
-
-int ui_get_widget_event_id(const char* event_name)
-{
-	ui_event_mapping_t* mapping;
-	LCUIMutex_Lock(&ui_events.mutex);
-	mapping = Dict_FetchValue(ui_events.event_ids, event_name);
-	LCUIMutex_Unlock(&ui_events.mutex);
-	return mapping ? mapping->id : -1;
-}
-
-int ui_widget_add_event_listener(ui_widget_t* widget, int event_id,
-				 ui_event_handler_t func, void* data,
+int ui_widget_add_event_listener(ui_widget_t* w, int event_id,
+				 ui_event_handler_t handler, void* data,
 				 void (*destroy_data)(void*))
 {
 	ui_event_listener_t* listener;
+
 	listener = malloc(sizeof(ui_event_listener_t));
 	if (!listener) {
-		return -1;
+		return -ENOMEM;
 	}
-	listener->func = func;
+	listener->handler = handler;
 	listener->data = data;
+	listener->event_id = event_id;
 	listener->destroy_data = destroy_data;
-	if (!widget->trigger) {
-		widget->trigger = EventTrigger();
+	if (!w->listeners) {
+		w->listeners = malloc(sizeof(ui_widget_listeners_t));
+		if (!w->listeners) {
+			return -ENOMEM;
+		}
 	}
-	return EventTrigger_Bind(widget->trigger, event_id,
-				 (LCUI_EventFunc)WidgetEventTranslator,
-				 listener, ui_event_listener_destroy);
+	LinkedList_AppendNode(w->listeners, &listener->node);
+	return 0;
 }
 
-int ui_widget_on(ui_widget_t* widget, const char* event_name,
+int ui_widget_on(ui_widget_t* w, const char* event_name,
 		 ui_event_handler_t handler, void* data,
 		 void (*destroy_data)(void*))
 {
-	return ui_widget_add_event_listener(widget,
-					    ui_use_widget_event_id(event_name),
-					    handler, data, destroy_data);
+	int id = ui_use_widget_event_id(event_name);
+	return ui_widget_add_event_listener(w, id, handler, data, destroy_data);
 }
 
 int ui_widget_remove_event_listener(ui_widget_t* w, int event_id,
 				    ui_event_handler_t handler)
 {
-	return EventTrigger_Unbind(w->trigger, event_id, handler);
+	int count = 0;
+	LinkedListNode *node, *prev;
+	ui_event_listener_t* listener;
+
+	if (!w->listeners) {
+		return 0;
+	}
+	for (LinkedList_Each(node, w->listeners)) {
+		listener = node->data;
+		if (listener->event_id != event_id ||
+		    (handler && handler != listener->handler)) {
+			continue;
+		}
+		prev = node->prev;
+		LinkedList_Unlink(w->listeners, node);
+		ui_event_listener_destroy(listener);
+		node = prev;
+		count++;
+	}
+	return count;
 }
 
 int ui_widget_off(ui_widget_t* w, const char* event_name,
 		  ui_event_handler_t handler)
 {
-	return EventTrigger_Unbind(w->trigger,
-				   ui_use_widget_event_id(event_name), handler);
+	int id = ui_use_widget_event_id(event_name);
+	return ui_widget_remove_event_listener(w, id, handler);
 }
 
 static ui_widget_t* ui_widget_get_next_at(ui_widget_t* widget, int x, int y)
@@ -474,55 +398,98 @@ static ui_widget_t* ui_widget_get_next_at(ui_widget_t* widget, int x, int y)
 	return NULL;
 }
 
-static int ui_widget_trigger_event_ex(ui_widget_t* widget,
-				      ui_event_pack_t* pack)
+static int ui_widget_call_listeners(ui_widget_t* w, const ui_event_t e,
+				    void* arg)
 {
-	ui_event_t* e = &pack->event;
+	int count = 0;
+	LinkedListNode* node;
+	ui_event_listener_t* listener;
 
-	pack->widget = widget;
-	switch (e->type) {
+	if (!w->listeners) {
+		return count;
+	}
+	for (LinkedList_Each(node, w->listeners)) {
+		listener = node->data;
+		if (listener->event_id != e.type) {
+			continue;
+		}
+		listener->handler(w, &e, arg);
+		if (!e.cancel_bubble && w->parent) {
+			ui_widget_call_listeners(w->parent, e, arg);
+		}
+		count++;
+	}
+	return count;
+}
+
+int ui_widget_post_event(ui_widget_t* w, const ui_event_t* e, void* data,
+			 void (*destroy_data)(void*))
+{
+	ui_event_pack_t* pack;
+
+	if (w->state == LCUI_WSTATE_DELETED) {
+		return -EPERM;
+	}
+	pack = malloc(sizeof(ui_event_pack_t));
+	if (!pack) {
+		return -ENOMEM;
+	}
+	ui_event_copy(e, &pack->event);
+	if (!pack->event.target) {
+		pack->event.target = w;
+	}
+	pack->widget = w;
+	pack->data = data;
+	pack->destroy_data = destroy_data;
+	LinkedList_AppendNode(&ui_events.queue, &pack->node);
+	return 0;
+}
+
+static int ui_widget_emit_event(ui_widget_t* w, ui_event_t e, void* arg)
+{
+	if (!e.target) {
+		e.target = w;
+	}
+	switch (e.type) {
 	case UI_EVENT_CLICK:
 	case UI_EVENT_MOUSEDOWN:
 	case UI_EVENT_MOUSEUP:
 	case UI_EVENT_MOUSEMOVE:
 	case UI_EVENT_MOUSEOVER:
 	case UI_EVENT_MOUSEOUT:
-		if (widget->computed_style.pointer_events == SV_NONE) {
+		if (w->computed_style.pointer_events == SV_NONE) {
 			break;
 		}
 	default:
-		if (widget->trigger &&
-		    0 < EventTrigger_Trigger(widget->trigger, e->type, pack)) {
+		if (ui_widget_call_listeners(w, e, NULL) > 0) {
 			return 0;
 		}
-		if (!widget->parent || e->cancel_bubble) {
+		if (!w->parent || e.cancel_bubble) {
 			return -1;
 		}
-		/* 如果事件投递失败，则向父级部件冒泡 */
-		return ui_widget_trigger_event_ex(widget->parent, pack);
+		return ui_widget_emit_event(w->parent, e, arg);
 	}
-	if (!widget->parent || e->cancel_bubble) {
+	if (!w->parent || e.cancel_bubble) {
 		return -1;
 	}
-	while (widget->trigger &&
-	       widget->computed_style.pointer_events == SV_NONE) {
+	while (w->listeners && w->computed_style.pointer_events == SV_NONE) {
 		ui_widget_t* w;
 		LCUI_BOOL is_pointer_event = TRUE;
 		int pointer_x, pointer_y;
 		float x, y;
 
-		switch (e->type) {
+		switch (e.type) {
 		case UI_EVENT_CLICK:
 		case UI_EVENT_MOUSEDOWN:
 		case UI_EVENT_MOUSEUP:
-			pointer_x = e->button.x;
-			pointer_y = e->button.y;
+			pointer_x = e.button.x;
+			pointer_y = e.button.y;
 			break;
 		case UI_EVENT_MOUSEMOVE:
 		case UI_EVENT_MOUSEOVER:
 		case UI_EVENT_MOUSEOUT:
-			pointer_x = e->motion.x;
-			pointer_y = e->motion.y;
+			pointer_x = e.motion.x;
+			pointer_y = e.motion.y;
 			break;
 		default:
 			is_pointer_event = FALSE;
@@ -531,99 +498,18 @@ static int ui_widget_trigger_event_ex(ui_widget_t* widget,
 		if (!is_pointer_event) {
 			break;
 		}
-		ui_widget_get_offset(widget->parent, NULL, &x, &y);
+		ui_widget_get_offset(w->parent, NULL, &x, &y);
 		/* 转换成相对于父级部件内容框的坐标 */
 		x = pointer_x - x;
 		y = pointer_y - y;
 		/* 从当前部件后面找到当前坐标点命中的兄弟部件 */
-		w = ui_widget_get_next_at(widget, iround(x), iround(y));
+		w = ui_widget_get_next_at(w, iround(x), iround(y));
 		if (!w) {
 			break;
 		}
-		return EventTrigger_Trigger(w->trigger, e->type, pack);
+		return ui_widget_call_listeners(w, e, arg);
 	}
-	return ui_widget_trigger_event_ex(widget->parent, pack);
-}
-
-static void ui_widget_on_event(LCUI_Event e, ui_event_pack_t* pack)
-{
-	if (pack->widget) {
-		ui_widget_trigger_event_ex(pack->widget, pack);
-	}
-}
-
-LCUI_BOOL ui_widget_post_event(ui_widget_t* widget, ui_event_t* e, void* data,
-			       void (*destroy_data)(void*))
-{
-	LCUI_Event e;
-	LCUI_TaskRec task;
-	ui_event_pack_t* pack;
-
-	if (widget->state == LCUI_WSTATE_DELETED) {
-		return FALSE;
-	}
-	if (!e->target) {
-		e->target = widget;
-	}
-	/* 准备任务 */
-	task.func = (LCUI_TaskFunc)ui_widget_on_event;
-	task.arg[0] = malloc(sizeof(LCUI_EventRec));
-	task.arg[1] = malloc(sizeof(ui_event_pack_t));
-	/* 这两个参数都需要在任务执行完后释放 */
-	task.destroy_arg[1] = ui_event_pack_delete;
-	task.destroy_arg[0] = free;
-	e = task.arg[0];
-	pack = task.arg[1];
-	e->data = pack;
-	e->type = e->type;
-	pack->data = data;
-	pack->widget = widget;
-	pack->destroy_data = destroy_data;
-	ui_copy_widget_event(&pack->event, e);
-	Widget_AddEventRecord(widget, pack);
-	/* 把任务扔给当前跑主循环的线程 */
-	if (!LCUI_PostTask(&task)) {
-		LCUITask_Destroy(&task);
-		return FALSE;
-	}
-	return TRUE;
-}
-
-int ui_widget_trigger_event(ui_widget_t* widget, ui_event_t* e, void* data)
-{
-	ui_event_pack_t pack;
-
-	if (!e->target) {
-		e->target = widget;
-	}
-	pack.event = *e;
-	pack.data = data;
-	pack.widget = widget;
-	pack.destroy_data = NULL;
-	return ui_widget_trigger_event_ex(widget, &pack);
-}
-
-int ui_widget_stop_event_propagation(ui_widget_t* widget)
-{
-	LinkedListNode* node;
-	ui_event_record_t* record;
-	ui_event_pack_t* pack;
-
-	if (ui_events.event_records.total_node <= 1) {
-		return 0;
-	}
-	LCUIMutex_Lock(&ui_events.mutex);
-	record = RBTree_CustomGetData(&ui_events.event_records, widget);
-	if (!record) {
-		LCUIMutex_Unlock(&ui_events.mutex);
-		return -1;
-	}
-	for (LinkedList_Each(node, &record->records)) {
-		pack = node->data;
-		pack->event.cancel_bubble = TRUE;
-	}
-	LCUIMutex_Unlock(&ui_events.mutex);
-	return 0;
+	return ui_widget_emit_event(w->parent, e, arg);
 }
 
 static ui_widget_t* ui_get_same_parent(ui_widget_t* a, ui_widget_t* b)
@@ -701,7 +587,7 @@ static void ui_widget_trigger_mouseover_event(ui_widget_t* widget,
 	for (w = widget; w && w != parent; w = w->parent) {
 		e.target = w;
 		Widget_AddStatus(w, "hover");
-		ui_widget_trigger_event(w, &e, NULL);
+		ui_widget_emit_event(w, e, NULL);
 	}
 }
 
@@ -716,7 +602,7 @@ static void ui_widget_trigger_mouseout_event(ui_widget_t* widget,
 	for (w = widget; w && w != parent; w = w->parent) {
 		e.target = w;
 		Widget_RemoveStatus(w, "hover");
-		ui_widget_trigger_event(w, &e, NULL);
+		ui_widget_emit_event(w, e, NULL);
 	}
 }
 
@@ -805,28 +691,24 @@ static void ui_clear_focus_target(ui_widget_t* target)
 	}
 }
 
-void ui_clear_event_target(ui_widget_t* widget)
+void ui_clear_event_target(ui_widget_t* w)
 {
-	LinkedListNode* node;
-	ui_event_record_t* record;
+	LinkedListNode *node, *prev;
 	ui_event_pack_t* pack;
 
-	if (ui_events.event_records.total_node <= 1) {
-		return;
-	}
 	LCUIMutex_Lock(&ui_events.mutex);
-	record = RBTree_CustomGetData(&ui_events.event_records, widget);
-	if (record) {
-		for (LinkedList_Each(node, &record->records)) {
-			pack = node->data;
-			pack->widget = NULL;
-			pack->event.cancel_bubble = TRUE;
+	for (LinkedList_Each(node, &ui_events.queue)) {
+		prev = node->prev;
+		pack = node->data;
+		if (pack->widget == w) {
+			LinkedList_Unlink(&ui_events.queue, node);
+			ui_event_pack_destroy(pack);
 		}
 	}
 	LCUIMutex_Unlock(&ui_events.mutex);
-	ui_clear_mouseover_target(widget);
-	ui_clear_mousedown_target(widget);
-	ui_clear_focus_target(widget);
+	ui_clear_mouseover_target(w);
+	ui_clear_mousedown_target(w);
+	ui_clear_focus_target(w);
 }
 
 INLINE LCUI_BOOL ui_widget_check_focusable(ui_widget_t* w)
@@ -909,7 +791,7 @@ static int ui_on_mouse_event(ui_event_t* origin_event)
 		e.type = UI_EVENT_MOUSEDOWN;
 		e.button.x = pos.x;
 		e.button.y = pos.y;
-		ui_widget_trigger_event(e.target, &e, NULL);
+		ui_widget_emit_event(e.target, e, NULL);
 		ui_events.click.interval = DBLCLICK_INTERVAL;
 		if (e.button.button == LCUI_KEY_LEFTBUTTON &&
 		    ui_events.click.widget == e.target) {
@@ -931,7 +813,7 @@ static int ui_on_mouse_event(ui_event_t* origin_event)
 		e.button.x = pos.x;
 		e.button.y = pos.y;
 		e.button.button = e->button.button;
-		ui_widget_trigger_event(target, &e, NULL);
+		ui_widget_emit_event(target, e, NULL);
 		if (ui_events.targets[UI_WIDGET_STATUS_ACTIVE] != target ||
 		    e.button.button != LCUI_KEY_LEFTBUTTON) {
 			ui_events.click.x = 0;
@@ -942,7 +824,7 @@ static int ui_on_mouse_event(ui_event_t* origin_event)
 			break;
 		}
 		e.type = UI_EVENT_CLICK;
-		ui_widget_trigger_event(target, &e, NULL);
+		ui_widget_emit_event(target, e, NULL);
 		ui_clear_mousedown_target(NULL);
 		if (ui_events.click.widget != target) {
 			ui_events.click.x = 0;
@@ -957,7 +839,7 @@ static int ui_on_mouse_event(ui_event_t* origin_event)
 			ui_events.click.y = 0;
 			ui_events.click.time = 0;
 			ui_events.click.widget = NULL;
-			ui_widget_trigger_event(target, &e, NULL);
+			ui_widget_emit_event(target, e, NULL);
 		}
 		ui_clear_mousedown_target(NULL);
 		break;
@@ -967,10 +849,10 @@ static int ui_on_mouse_event(ui_event_t* origin_event)
 			ui_events.click.time = 0;
 			ui_events.click.widget = NULL;
 		}
-		ui_widget_trigger_event(target, &e, NULL);
+		ui_widget_emit_event(target, e, NULL);
 		break;
 	case LCUI_MOUSEWHEEL:
-		ui_widget_trigger_event(target, &e, NULL);
+		ui_widget_emit_event(target, e, NULL);
 	default:
 		return;
 	}
@@ -986,7 +868,7 @@ static int ui_on_keyboard_event(ui_event_t* origin_event)
 		return -1;
 	}
 	e.cancel_bubble = FALSE;
-	ui_widget_trigger_event(e.target, &e, NULL);
+	ui_widget_emit_event(e.target, e, NULL);
 	return 0;
 }
 
@@ -999,7 +881,7 @@ static int ui_on_text_input(ui_event_t* origin_event)
 		return -1;
 	}
 	e.cancel_bubble = FALSE;
-	ui_widget_trigger_event(e.target, &e, NULL);
+	ui_widget_emit_event(e.target, e, NULL);
 	return 0;
 }
 
@@ -1174,18 +1056,19 @@ int ui_widget_post_surface_event(ui_widget_t* w, int event_type,
 	return ui_widget_post_event(root, &e, data, free);
 }
 
-void ui_widget_destroy_event_trigger(ui_widget_t* w)
+void ui_widget_destroy_listeners(ui_widget_t* w)
 {
 	ui_event_t e = { UI_EVENT_DESTROY, 0 };
 
-	ui_widget_trigger_event(w, &e, NULL);
+	ui_widget_emit_event(w, e, NULL);
 	ui_widget_release_mouse_capture(w);
 	ui_widget_release_touch_capture(w, -1);
 	ui_widget_stop_event_propagation(w);
 	ui_clear_event_target(w);
-	if (w->trigger) {
-		EventTrigger_Destroy(w->trigger);
-		w->trigger = NULL;
+	if (w->listeners) {
+		LinkedList_ClearData(w->listeners, ui_event_listener_destroy);
+		free(w->listeners);
+		w->listeners = NULL;
 	}
 }
 
@@ -1226,8 +1109,6 @@ void ui_init_events(void)
 
 	LCUIMutex_Init(&ui_events.mutex);
 	RBTree_Init(&ui_events.event_names);
-	RBTree_Init(&ui_events.event_records);
-	LinkedList_Init(&ui_events.events);
 	LinkedList_Init(&ui_events.event_mappings);
 	ui_events.targets[UI_WIDGET_STATUS_ACTIVE] = NULL;
 	ui_events.targets[UI_WIDGET_STATUS_HOVER] = NULL;
@@ -1243,28 +1124,26 @@ void ui_init_events(void)
 	ui_events.event_ids = Dict_Create(&ui_events.event_ids_type, NULL);
 	n = sizeof(mappings) / sizeof(mappings[0]);
 	for (i = 0; i < n; ++i) {
-		ui_set_widget_event_id(mappings[i].id, mappings[i].name);
+		ui_set_event_id(mappings[i].id, mappings[i].name);
 	}
-	RBTree_OnCompare(&ui_events.event_records, ui_event_record_compare);
-	RBTree_OnDestroy(&ui_events.event_records, ui_event_record_destroy);
 	LinkedList_Init(&ui_events.touch_capturers);
 }
 
 int ui_dispatch_event(ui_event_t* e)
 {
 	switch (e->type) {
-	case LCUI_MOUSEWHEEL:
-	case LCUI_MOUSEDOWN:
-	case LCUI_MOUSEMOVE:
-	case LCUI_MOUSEUP:
+	case UI_EVENT_MOUSEWHEEL:
+	case UI_EVENT_MOUSEDOWN:
+	case UI_EVENT_MOUSEMOVE:
+	case UI_EVENT_MOUSEUP:
 		return ui_on_mouse_event(e);
-	case LCUI_KEYPRESS:
-	case LCUI_KEYDOWN:
-	case LCUI_KEYUP:
+	case UI_EVENT_KEYPRESS:
+	case UI_EVENT_KEYDOWN:
+	case UI_EVENT_KEYUP:
 		return ui_on_keyboard_event(e);
-	case LCUI_TOUCH:
+	case UI_EVENT_TOUCH:
 		return ui_on_touch_event(e);
-	case LCUI_TEXTINPUT:
+	case UI_EVENT_TEXTINPUT:
 		return ui_on_text_input(e);
 	default:
 		break;
@@ -1274,21 +1153,29 @@ int ui_dispatch_event(ui_event_t* e)
 
 void ui_process_events(void)
 {
+	LinkedList queue;
+	LinkedListNode* node;
+	ui_event_pack_t* pack;
+
+	LinkedList_Init(&queue);
+	LinkedList_Concat(&queue, &ui_events.queue);
+	for (LinkedList_Each(node, &queue)) {
+		pack = node->data;
+		if (pack->widget) {
+			ui_widget_emit_event(pack->widget, pack->event,
+					     pack->data);
+		}
+	}
+	LinkedList_ClearData(&queue, ui_event_pack_destroy);
 }
 
 void ui_destroy_events(void)
 {
-	LinkedListNode* node;
 	LCUIMutex_Lock(&ui_events.mutex);
-	for (LinkedList_Each(node, &ui_events.events)) {
-		int* id = node->data;
-		LCUI_UnbindEvent(*id);
-	}
 	RBTree_Destroy(&ui_events.event_names);
-	RBTree_Destroy(&ui_events.event_records);
 	Dict_Release(ui_events.event_ids);
 	ui_clear_touch_capturers(&ui_events.touch_capturers);
-	LinkedList_Clear(&ui_events.events, free);
+	LinkedList_ClearData(&ui_events.queue, ui_event_pack_destroy);
 	LinkedList_Clear(&ui_events.event_mappings, ui_event_mapping_destroy);
 	LCUIMutex_Unlock(&ui_events.mutex);
 	LCUIMutex_Destroy(&ui_events.mutex);
