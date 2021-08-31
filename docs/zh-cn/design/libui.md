@@ -23,6 +23,8 @@
 
 ## 接口设计
 
+示例：
+
 ```c
 typedef struct ui_event_t ui_event_t;
 typedef struct ui_widget_t ui_widget_t;
@@ -33,10 +35,12 @@ void ui_free(void);
 
 void ui_update(rect_t **dirty_rects);
 
-// Event
+// Events
 
-void ui_event_init(ui_event_t *e);
-void ui_process_event(ui_event_t *e);
+void ui_init_events(void);
+void ui_process_events(void);
+void ui_destroy_events(void);
+void ui_dispatch_event(ui_event_t *e);
 
 // Metrics
 
@@ -204,7 +208,7 @@ void ui_widget_release_Touch_capture(ui_widget_t *w);
 void ui_widget_destroy_event_emitter(ui_widget_t *w);
 void ui_set_focus(ui_widget_t *w);
 void ui_get_focus(ui_widget_t *w);
-void ui_init_widget_event(ui_event_t *e, const char *name);
+void ui_init_event(ui_event_t *e, const char *name);
 void ui_init_events(void);
 void ui_destroy_events(void);
 
@@ -214,9 +218,9 @@ void ui_widget_init_style_diff(ui_widget_t *w, ui_widget_style_diff_t *diff);
 void ui_widget_begin_style_diff(ui_widget_t *w, ui_widget_style_diff_t *diff);
 void ui_widget_end_style_diff(ui_widget_t *w, ui_widget_style_diff_t *diff);
 
-void ui_widget_init_layout_diff(ui_widget_t *w, ui_widget_layout_diff_t *diff);
-void ui_widget_begin_layout_diff(ui_widget_t *w, ui_widget_layout_diff_t *diff);
-void ui_widget_end_layout_diff(ui_widget_t *w, ui_widget_layout_diff_t *diff);
+void ui_widget_init_layout_diff(ui_widget_t *w, ui_widget_layout_diff_t* *diff);
+void ui_widget_begin_layout_diff(ui_widget_t *w, ui_widget_layout_diff_t* *diff);
+void ui_widget_end_layout_diff(ui_widget_t *w, ui_widget_layout_diff_t* *diff);
 
 // widget Prototype
 
@@ -255,7 +259,5 @@ void ui_widget_crop_content(ui_widget_t *w, ui_painter_t painter, ui_widget_actu
 void ui_widget_compute_box_shadow_style(ui_widget_t *w);
 void ui_widget_compute_box_shadow(ui_widget_t *w, ui_box_shadow_t *shadow);
 void ui_widget_paint_box_shadow(ui_widget_t *w, ui_painter_t painter, ui_widget_actual_style_t style);
-
-// Widget box model
 
 ```
