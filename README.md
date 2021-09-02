@@ -168,7 +168,7 @@ cd LCUI
 # Build
 make
 
-# If you wnat install LCUI
+# If you want to install LCUI
 sudo make install
 
 # Go into test directory
