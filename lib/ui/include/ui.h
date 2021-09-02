@@ -3,10 +3,25 @@
 
 #include <LCUI/util/strlist.h>
 #include <LCUI/gui/css_library.h>
+#include <LCUI/gui/css_parser.h>
 
 // Types
 
 /* clang-format off */
+
+typedef struct ui_metrics_t {
+	float dpi;
+	float density;
+	float scaled_density;
+	float scale;
+} ui_metrics_t;
+
+typedef enum ui_density_Level_t {
+	UI_DENSITY_LEVEL_SMALL,
+	UI_DENSITY_LEVEL_NORMAL,
+	UI_DENSITY_LEVEL_LARGE,
+	UI_DENSITY_LEVEL_BIG
+} ui_density_Level_t;
 
 typedef enum ui_sizing_rule_t {
 	UI_SIZING_RULE_NONE,
@@ -308,6 +323,7 @@ typedef enum ui_event_type_t {
 	UI_EVENT_TOUCHMOVE,		/**< 触点移动 */
 
 	UI_EVENT_TITLE,
+	UI_EVENT_FONT_FACE_LOAD,
 	UI_EVENT_SURFACE,
 	UI_EVENT_USER
 } ui_event_type_t;
@@ -375,7 +391,7 @@ struct ui_widget_t {
 
 	LCUI_StyleSheet style;
 	LCUI_StyleList custom_style;
-	LCUI_CachedStyleSheet inherited_style;
+	LCUI_CachedStyleSheet matched_style;
 	ui_widget_style_t computed_style;
 
 	/** Some data bound to the prototype */
@@ -424,6 +440,58 @@ struct ui_widget_t {
 };
 
 /* clang-format on */
+
+// Metrics
+
+/** 转换成单位为 px 的度量值 */
+LCUI_API float ui_compute(float value, LCUI_StyleType type);
+
+/** 将矩形中的度量值的单位转换为 px */
+LCUI_API void ui_compute_rect_actual(LCUI_Rect* dst, const LCUI_RectF* src);
+
+/** 转换成单位为 px 的实际度量值 */
+LCUI_API int ui_compute_actual(float value, LCUI_StyleType type);
+
+/** 设置密度 */
+LCUI_API void ui_set_density(float density);
+
+/** 设置缩放密度 */
+LCUI_API void ui_set_scaled_density(float density);
+
+/** 设置密度等级 */
+LCUI_API void ui_set_density_level(ui_density_Level_t level);
+
+/** 设置缩放密度等级 */
+LCUI_API void ui_set_scaled_density_level(ui_density_Level_t level);
+
+/** 设置 DPI */
+LCUI_API void ui_set_dpi(float dpi);
+
+/** 设置全局缩放比例 */
+LCUI_API void ui_set_scale(float scale);
+
+LCUI_API void ui_init_metrics(void);
+
+LCUI_API const ui_metrics_t* ui_get_metrics(void);
+
+/** 获取当前的全局缩放比例 */
+INLINE float ui_get_scale(void)
+{
+	return ui_get_metrics()->scale;
+}
+
+INLINE int ui_compute_actual(float value, LCUI_StyleType type)
+{
+	return iround(ui_compute(value, type) * ui_get_scale());
+}
+
+INLINE void ui_compute_rect_actual(LCUI_Rect* dst, const LCUI_RectF* src)
+{
+	dst->x = iround(src->x * ui_get_scale());
+	dst->y = iround(src->y * ui_get_scale());
+	dst->width = iround(src->width * ui_get_scale());
+	dst->height = iround(src->height * ui_get_scale());
+}
 
 // Root
 
@@ -492,6 +560,16 @@ LCUI_API void ui_widget_print_tree(ui_widget_t* w);
 
 #define ui_widget_check_style_type(W, K, T) CheckStyleType((W)->style, K, T)
 
+#define ui_widget_set_style(W, K, VAL, TYPE)    \
+	do {                                    \
+		LCUI_Style _s;                  \
+		_s = ui_widget_get_style(W, K); \
+		_s->is_valid = TRUE;            \
+		_s->type = LCUI_STYPE_##TYPE;   \
+		_s->val_##TYPE = VAL;           \
+		Widget_AddTaskByStyle(W, K);    \
+	} while (0)
+
 LCUI_BOOL ui_widget_check_style_valid(ui_widget_t* w, int key)
 {
 	return w->style && w->style->sheet[key].is_valid;
@@ -511,12 +589,6 @@ LCUI_API size_t ui_widget_export_hash(ui_widget_t* w, unsigned* hash_list,
 				      size_t len);
 LCUI_API size_t ui_widget_import_hash(ui_widget_t* w, unsigned* hash_list,
 				      size_t maxlen);
-
-// Layout
-
-// Block Layout
-
-void ui_widget_update_block_layout(ui_widget_t* w, ui_layout_rule_t rule);
 
 // Task
 
@@ -556,50 +628,75 @@ LCUI_API void ui_event_init(ui_event_t* e, const char* name);
  * @param[in] handler 事件处理函数
  * @param[in] data 事件处理函数的附加数据
  * @param[in] destroy_data 数据的销毁函数
- * @return 成功则返回事件处理器的标识号，失败则返回负数
+ * @return 成功则返回 0，失败返回负数
  */
 LCUI_API int ui_widget_add_event_listener(ui_widget_t* widget, int event_id,
 					  ui_event_handler_t handler,
 					  void* data,
 					  void (*destroy_data)(void*));
 
+LCUI_API int ui_widget_remove_event_listener(ui_widget_t* w, int event_id,
+					     ui_event_handler_t handler);
 /**
  * 添加部件事件绑定
  * @param[in] widget 目标部件
  * @param[in] event_name 事件名称
- * @param[in] func 事件处理函数
+ * @param[in] handler 事件处理函数
  * @param[in] data 事件处理函数的附加数据
  * @param[in] destroy_data 数据的销毁函数
- * @return 成功则返回事件处理器的标识号，失败则返回负数
+ * @return 返回已移除的事件监听器数量
  */
 LCUI_API int ui_widget_on(ui_widget_t* widget, const char* event_name,
-			  ui_event_handler_t func, void* data,
+			  ui_event_handler_t handler, void* data,
 			  void (*destroy_data)(void*));
 
 /**
  * 解除部件事件绑定
  * @param[in] widget 目标部件
- * @param[in] event_id 事件标识号
- * @param[in] func 与事件绑定的函数
- */
-LCUI_API int ui_widget_offById(ui_widget_t* widget, int event_id,
-			       ui_event_handler_t func);
-
-/**
- * 解除部件事件绑定
- * @param[in] widget 目标部件
- * @param[in] handler_id 事件处理器标识号
- */
-LCUI_API int ui_widget_offByHandlerId(ui_widget_t* widget, int handler_id);
-
-/**
- * 解除部件事件绑定
- * @param[in] widget 目标部件
  * @param[in] event_name 事件名称
- * @param[in] func 与事件绑定的函数
+ * @param[in] handler 与事件绑定的函数
+ * @return 成功则返回 0，失败返回负数
  */
 LCUI_API int ui_widget_off(ui_widget_t* widget, const char* event_name,
-			   ui_event_handler_t func);
+			   ui_event_handler_t handler);
+
+INLINE int ui_emit_event(ui_event_t e, void* arg)
+{
+	return ui_widget_emit_event(ui_root(), e, arg);
+}
+
+INLINE int ui_post_event(ui_event_t e, void* data,
+				  void (*destroy_data)(void*))
+{
+	return ui_widget_post_event(ui_root(), e, data, destroy_data);
+}
+
+INLINE int ui_add_event_listener(ui_widget_t* widget, int event_id,
+				 ui_event_handler_t handler, void* data,
+				 void (*destroy_data)(void*))
+{
+	return ui_widget_add_event_listener(ui_root(), event_id, handler, data,
+					    destroy_data);
+}
+
+INLINE int ui_remove_event_listener(ui_widget_t* w, int event_id,
+				    ui_event_handler_t handler)
+{
+	return ui_widget_remove_event_listener(ui_root(), event_id, handler);
+}
+
+INLINE int ui_on_event(const char* event_name, ui_event_handler_t handler,
+		       void* data, void (*destroy_data)(void*))
+{
+	return ui_widget_on_event(ui_root(), event_name, handler, data,
+				  destroy_data);
+}
+
+INLINE int ui_off_event(const char* event_name, ui_event_handler_t handler)
+{
+	return ui_widget_on_event(ui_root(), event_name, handler);
+}
+
 /**
  * 投递表面（surface）事件
  * 表面是与顶层部件绑定在一起的，只有当部件为顶层部件时，才能投递表面事件。

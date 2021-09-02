@@ -445,7 +445,7 @@ int ui_widget_post_event(ui_widget_t* w, const ui_event_t* e, void* data,
 	return 0;
 }
 
-static int ui_widget_emit_event(ui_widget_t* w, ui_event_t e, void* arg)
+int ui_widget_emit_event(ui_widget_t* w, ui_event_t e, void* arg)
 {
 	if (!e.target) {
 		e.target = w;
@@ -586,7 +586,7 @@ static void ui_widget_trigger_mouseover_event(ui_widget_t* widget,
 	e.type = UI_EVENT_MOUSEOVER;
 	for (w = widget; w && w != parent; w = w->parent) {
 		e.target = w;
-		Widget_AddStatus(w, "hover");
+		ui_widget_add_status(w, "hover");
 		ui_widget_emit_event(w, e, NULL);
 	}
 }
@@ -601,7 +601,7 @@ static void ui_widget_trigger_mouseout_event(ui_widget_t* widget,
 	e.type = UI_EVENT_MOUSEOUT;
 	for (w = widget; w && w != parent; w = w->parent) {
 		e.target = w;
-		Widget_RemoveStatus(w, "hover");
+		ui_widget_remove_status(w, "hover");
 		ui_widget_emit_event(w, e, NULL);
 	}
 }
@@ -635,10 +635,10 @@ static void ui_clear_mousedown_target(ui_widget_t* widget)
 	}
 	parent = ui_get_same_parent(widget, w);
 	for (; w && w != parent; w = w->parent) {
-		Widget_RemoveStatus(w, "active");
+		ui_widget_remove_status(w, "active");
 	}
 	for (w = widget; w && w != parent; w = w->parent) {
-		Widget_AddStatus(w, "active");
+		ui_widget_add_status(w, "active");
 	}
 	ui_events.targets[UI_WIDGET_STATUS_ACTIVE] = widget;
 }
@@ -738,7 +738,7 @@ int ui_set_focus(ui_widget_t* widget)
 	if (ui_events.targets[UI_WIDGET_STATUS_FOCUS]) {
 		e.type = UI_EVENT_BLUR;
 		e.target = ui_events.targets[UI_WIDGET_STATUS_FOCUS];
-		Widget_RemoveStatus(e.target, "focus");
+		ui_widget_remove_status(e.target, "focus");
 		ui_widget_post_event(e.target, &e, NULL, NULL);
 		ui_events.targets[UI_WIDGET_STATUS_FOCUS] = NULL;
 	}
@@ -749,7 +749,7 @@ int ui_set_focus(ui_widget_t* widget)
 	e.type = UI_EVENT_FOCUS;
 	e.cancel_bubble = FALSE;
 	ui_events.targets[UI_WIDGET_STATUS_FOCUS] = w;
-	Widget_AddStatus(e.target, "focus");
+	ui_widget_add_status(e.target, "focus");
 	ui_widget_post_event(e.target, &e, NULL, NULL);
 	return 0;
 }
@@ -901,7 +901,7 @@ static void ui_convert_touch_point(LCUI_TouchPoint point)
 	default:
 		break;
 	}
-	scale = LCUIMetrics_GetScale();
+	scale = ui_get_scale();
 	point->x = iround(point->x / scale);
 	point->y = iround(point->y / scale);
 }
@@ -917,7 +917,7 @@ static int ui_dispatch_touch_event(LinkedList* capturers,
 	LinkedListNode *node, *ptnode;
 
 	root = ui_root();
-	scale = LCUIMetrics_GetScale();
+	scale = ui_get_scale();
 	e.type = UI_EVENT_TOUCH;
 	e.cancel_bubble = FALSE;
 	e.touch.points = NEW(LCUI_TouchPointRec, n_points);
@@ -1105,7 +1105,8 @@ void ui_init_events(void)
 			 { UI_EVENT_SHOW, "show" },
 			 { UI_EVENT_HIDE, "hide" },
 			 { UI_EVENT_SURFACE, "surface" },
-			 { UI_EVENT_TITLE, "title" } };
+			 { UI_EVENT_TITLE, "title" },
+			 { UI_EVENT_FONT_FACE_LOAD, "font_face_load" } };
 
 	LCUIMutex_Init(&ui_events.mutex);
 	RBTree_Init(&ui_events.event_names);
