@@ -217,7 +217,7 @@ typedef struct ui_flexbox_layout_style_t {
 	LCUI_StyleValue justify_content : 8;
 } ui_flexbox_layout_style_t;
 
-typedef struct ui_widget_task_profile_t {
+typedef struct ui_profile_t {
 	clock_t time;
 	size_t update_count;
 	size_t refresh_count;
@@ -225,7 +225,7 @@ typedef struct ui_widget_task_profile_t {
 	size_t user_task_count;
 	size_t destroy_count;
 	size_t destroy_time;
-} ui_widget_task_profile_t;
+} ui_profile_t;
 
 typedef struct ui_widget_style_t {
 	LCUI_BOOL visible;
