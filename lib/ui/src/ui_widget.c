@@ -34,10 +34,10 @@ void ui_widget_destroy(ui_widget_t* w)
 		w->title = NULL;
 	}
 	ui_widget_destroy_id(w);
-	ui_widget_deleteStyleSheets(w);
+	ui_widget_destroy_style(w);
 	ui_widget_destroy_attributes(w);
 	ui_widget_destroy_classes(w);
-	ui_widget_deleteStatus(w);
+	ui_widget_destroy_status(w);
 	Widget_SetRules(w, NULL);
 	free(w);
 }
@@ -169,7 +169,7 @@ void ui_widget_empty(ui_widget_t* w)
 	LinkedList_ClearData(&w->children_show, NULL);
 	LinkedList_Concat(&LCUIWidget.trash, &w->children);
 	Widget_InvalidateArea(w, NULL, SV_GRAPH_BOX);
-	Widget_UpdateStyle(w, TRUE);
+	ui_widget_update_style(w, TRUE);
 }
 
 void ui_widget_get_offset(ui_widget_t* w, ui_widget_t* parent, float* offset_x,

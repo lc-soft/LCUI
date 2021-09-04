@@ -2,6 +2,25 @@
 #include "../include/ui.h"
 #include "private.h"
 
+const char *ui_default_css = CodeToString(
+
+* {
+	width: auto;
+	height:	auto;
+	background-color: transparent;
+	border: 0px solid transparent;
+	display: block;
+	position: static;
+	padding: 0;
+	margin: 0;
+}
+
+root {
+	box-sizing: border-box;
+}
+
+);
+
 /** 载入CSS代码块，用于实现CSS代码的分块载入 */
 static size_t ui_load_css_block(LCUI_CSSParserContext ctx, const char *str)
 {
@@ -63,4 +82,19 @@ size_t ui_load_css_string(const char *str, const char *space)
 	CSSParser_End(ctx);
 	DEBUG_MSG("parse end\n");
 	return 0;
+}
+
+void ui_init_css(void)
+{
+	LCUI_InitCSSLibrary();
+	LCUI_InitCSSParser();
+	LCUI_InitCSSFontStyle();
+	ui_load_css_string(ui_default_css, __FILE__);
+}
+
+void ui_destroy_css(void)
+{
+	LCUI_FreeCSSFontStyle();
+	LCUI_FreeCSSParser();
+	LCUI_FreeCSSLibrary();
 }

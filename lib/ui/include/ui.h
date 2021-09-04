@@ -79,30 +79,76 @@ typedef struct ui_widget_actual_style_t_ {
 	LCUI_Background background;
 } ui_widget_actual_style_t;
 
-typedef enum ui_widget_task_type_t {
-	UI_WIDGET_TASK_REFRESH_STYLE,
-	UI_WIDGET_TASK_UPDATE_STYLE,
-	UI_WIDGET_TASK_TITLE,
-	UI_WIDGET_TASK_PROPS,
-	UI_WIDGET_TASK_BOX_SIZING,
-	UI_WIDGET_TASK_PADDING,
-	UI_WIDGET_TASK_MARGIN,
-	UI_WIDGET_TASK_VISIBLE,
-	UI_WIDGET_TASK_DISPLAY,
-	UI_WIDGET_TASK_FLEX,
-	UI_WIDGET_TASK_SHADOW,
-	UI_WIDGET_TASK_BORDER,
-	UI_WIDGET_TASK_BACKGROUND,
-	UI_WIDGET_TASK_POSITION,
-	UI_WIDGET_TASK_RESIZE,
-	UI_WIDGET_TASK_ZINDEX,
-	UI_WIDGET_TASK_OPACITY,
-	UI_WIDGET_TASK_REFLOW,
-	UI_WIDGET_TASK_USER,
-	UI_WIDGET_TASK_TOTAL_NUM
-} ui_widget_task_type_t;
+typedef enum ui_task_type_t {
+	UI_TASK_REFRESH_STYLE,
+	UI_TASK_UPDATE_STYLE,
+	UI_TASK_TITLE,
+	UI_TASK_PROPS,
+	UI_TASK_BOX_SIZING,
+	UI_TASK_PADDING,
+	UI_TASK_MARGIN,
+	UI_TASK_VISIBLE,
+	UI_TASK_DISPLAY,
+	UI_TASK_FLEX,
+	UI_TASK_SHADOW,
+	UI_TASK_BORDER,
+	UI_TASK_BACKGROUND,
+	UI_TASK_POSITION,
+	UI_TASK_RESIZE,
+	UI_TASK_ZINDEX,
+	UI_TASK_OPACITY,
+	UI_TASK_REFLOW,
+	UI_TASK_USER,
+	UI_TASK_TOTAL_NUM
+} ui_task_type_t;
 
-typedef struct ui_widget_task_t {
+typedef struct ui_widget_update_rules_t {
+	/**
+	 * Suspend update if the current widget is not visible or is
+	 * completely covered by other widgets
+	 */
+	LCUI_BOOL only_on_visible;
+
+	/**
+	 * First update the children in the visible area
+	 * If your widget has a lot of children and you want to see the
+	 * children who are currently seeing the priority update, we recommend
+	 * enabling this rule.
+	 */
+	LCUI_BOOL first_update_visible_children;
+
+	/**
+	 * Cache the stylesheets of children to improve the query speed of
+	 * the stylesheet.
+	 * If this rule is enabled, we recommend that you manually call
+	 * ui_widget_generate_hash() to generate a hash value for the children
+	 * of the widget.
+	 */
+	LCUI_BOOL cache_children_style;
+
+	/** Refresh the style of all child widgets if the status has changed */
+	LCUI_BOOL ignore_status_change;
+
+	/** Refresh the style of all child widgets if the classes has changed */
+	LCUI_BOOL ignore_classes_change;
+
+	/**
+	 * Maximum number of children updated at each update
+	 * values:
+	 * -1 - Update all children at once
+	 * 0  - Automatically calculates the appropriate maximum number
+	 * N  - Custom maximum number
+	 */
+	int max_update_children_count;
+
+	/** Limit the number of children rendered  */
+	unsigned max_render_children_count;
+
+	/** A callback function on update progress */
+	void (*on_update_progress)(ui_widget_t*, size_t);
+} ui_widget_update_rules_t;
+
+typedef struct ui_widget_update_t {
 	/** Should update for self? */
 	LCUI_BOOL for_self;
 
@@ -113,8 +159,10 @@ typedef struct ui_widget_task_t {
 	LCUI_BOOL skip_surface_props_sync;
 
 	/** States of tasks */
-	LCUI_BOOL states[UI_WIDGET_TASK_TOTAL_NUM];
-} ui_widget_task_t;
+	LCUI_BOOL states[UI_TASK_TOTAL_NUM];
+
+	ui_widget_update_rules_t *rules;
+} ui_widget_update_t;
 
 /** See more: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model */
 typedef struct ui_widget_box_model_t {
@@ -217,52 +265,6 @@ typedef void(*ui_widget_text_setter_t)(ui_widget_t*, const char*);
 typedef void(*ui_widget_prop_binder_t)(ui_widget_t*, const char*, LCUI_Object);
 typedef void(*ui_widget_painter_t)(ui_widget_t*, LCUI_PaintContext,
 				  ui_widget_actual_style_t*);
-
-typedef struct ui_widget_rules_t {
-	/**
-	 * Suspend update if the current widget is not visible or is
-	 * completely covered by other widgets
-	 */
-	LCUI_BOOL only_on_visible;
-
-	/**
-	 * First update the children in the visible area
-	 * If your widget has a lot of children and you want to see the
-	 * children who are currently seeing the priority update, we recommend
-	 * enabling this rule.
-	 */
-	LCUI_BOOL first_update_visible_children;
-
-	/**
-	 * Cache the stylesheets of children to improve the query speed of
-	 * the stylesheet.
-	 * If this rule is enabled, we recommend that you manually call
-	 * ui_widget_generate_hash() to generate a hash value for the children
-	 * of the widget.
-	 */
-	LCUI_BOOL cache_children_style;
-
-	/** Refresh the style of all child widgets if the status has changed */
-	LCUI_BOOL ignore_status_change;
-
-	/** Refresh the style of all child widgets if the classes has changed */
-	LCUI_BOOL ignore_classes_change;
-
-	/**
-	 * Maximum number of children updated at each update
-	 * values:
-	 * -1 - Update all children at once
-	 * 0  - Automatically calculates the appropriate maximum number
-	 * N  - Custom maximum number
-	 */
-	int max_update_children_count;
-
-	/** Limit the number of children rendered  */
-	unsigned max_render_children_count;
-
-	/** A callback function on update progress */
-	void (*on_update_progress)(ui_widget_t*, size_t);
-} ui_widget_rules_t;
 
 typedef struct ui_widget_prototype_t {
 	char *name;
@@ -404,9 +406,7 @@ struct ui_widget_t {
 	 */
 	const ui_widget_prototype_t* proto;
 
-	/** Update task context */
-	ui_widget_task_t task;
-	ui_widget_rules_t *rules;
+	ui_widget_update_t update;
 	ui_widget_listeners_t *listeners;
 
 	/** Invalid area (Dirty Rectangle) */
@@ -556,21 +556,22 @@ LCUI_API size_t ui_widget_each(ui_widget_t* w,
 LCUI_API ui_widget_t* ui_widget_at(ui_widget_t* widget, int ix, int iy);
 LCUI_API void ui_widget_print_tree(ui_widget_t* w);
 
+
 // Style
 
 #define ui_widget_check_style_type(W, K, T) CheckStyleType((W)->style, K, T)
 
-#define ui_widget_set_style(W, K, VAL, TYPE)    \
-	do {                                    \
-		LCUI_Style _s;                  \
-		_s = ui_widget_get_style(W, K); \
-		_s->is_valid = TRUE;            \
-		_s->type = LCUI_STYPE_##TYPE;   \
-		_s->val_##TYPE = VAL;           \
-		Widget_AddTaskByStyle(W, K);    \
+#define ui_widget_set_style(W, K, VAL, TYPE)       \
+	do {                                       \
+		LCUI_Style _s;                     \
+		_s = ui_widget_get_style(W, K);    \
+		_s->is_valid = TRUE;               \
+		_s->type = LCUI_STYPE_##TYPE;      \
+		_s->val_##TYPE = VAL;              \
+		ui_widget_add_task_by_style(W, K); \
 	} while (0)
 
-LCUI_BOOL ui_widget_check_style_valid(ui_widget_t* w, int key)
+INLINE LCUI_BOOL ui_widget_check_style_valid(ui_widget_t* w, int key)
 {
 	return w->style && w->style->sheet[key].is_valid;
 }
@@ -580,6 +581,21 @@ INLINE LCUI_BOOL ui_widget_has_auto_style(ui_widget_t* w, int key)
 	return !ui_widget_check_style_valid(w, key) ||
 	       ui_widget_check_style_type(w, key, AUTO);
 }
+
+LCUI_API LCUI_SelectorNode ui_widget_create_selector_node(ui_widget_t* w);
+LCUI_API LCUI_Selector ui_widget_create_selector(ui_widget_t* w);
+LCUI_API size_t ui_widget_get_children_style_changes(ui_widget_t* w, int type,
+						     const char* name);
+LCUI_API void ui_widget_print_stylesheet(ui_widget_t* w);
+LCUI_API size_t ui_widget_get_children_style_changes(ui_widget_t* w, int type,
+						     const char* name);
+LCUI_API void ui_widget_update_children_style(ui_widget_t* w);
+LCUI_API void ui_widget_refresh_children_style(ui_widget_t* w);
+LCUI_API void ui_widget_set_style_string(ui_widget_t* w, const char* name,
+					 const char* value);
+LCUI_API void ui_widget_add_task_by_style(ui_widget_t* w, int key);
+LCUI_API void ui_widget_force_update_style(ui_widget_t* w);
+LCUI_API void ui_widget_force_refresh_style(ui_widget_t* w);
 
 // Hash
 
@@ -665,8 +681,7 @@ INLINE int ui_emit_event(ui_event_t e, void* arg)
 	return ui_widget_emit_event(ui_root(), e, arg);
 }
 
-INLINE int ui_post_event(ui_event_t e, void* data,
-				  void (*destroy_data)(void*))
+INLINE int ui_post_event(ui_event_t e, void* data, void (*destroy_data)(void*))
 {
 	return ui_widget_post_event(ui_root(), e, data, destroy_data);
 }
@@ -742,6 +757,18 @@ LCUI_API int ui_widget_set_touch_capture(ui_widget_t* w, int point_id);
 LCUI_API int ui_widget_release_touch_capture(ui_widget_t* w, int point_id);
 
 LCUI_API void ui_widget_destroy_listeners(ui_widget_t* w);
+
+// Update
+
+INLINE void ui_widget_update_style(ui_widget_t* w)
+{
+	ui_widget_add_task(w, UI_TASK_UPDATE_STYLE);
+}
+
+// CSS
+
+LCUI_API int ui_load_css_file(const char* filepath);
+LCUI_API size_t ui_load_css_string(const char* str, const char* space);
 
 // Image Loader
 
