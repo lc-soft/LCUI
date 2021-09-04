@@ -199,7 +199,7 @@ void LCUI_RunFrameWithProfile(LCUI_FrameProfile profile)
 	profile->events_time = clock() - profile->events_time;
 
 	LCUICursor_Update();
-	LCUIWidget_UpdateWithProfile(&profile->widget_tasks);
+	ui_update_with_profile(&profile->widget_tasks);
 
 	profile->render_time = clock();
 	LCUIDisplay_Update();
@@ -216,7 +216,7 @@ void LCUI_RunFrame(void)
 	LCUI_ProcessTimers();
 	LCUI_ProcessEvents();
 	LCUICursor_Update();
-	LCUIWidget_Update();
+	ui_update();
 	LCUIDisplay_Update();
 	LCUIDisplay_Render();
 	LCUIDisplay_Present();
@@ -635,6 +635,46 @@ static void Win32Logger_LogW(const wchar_t *wcs)
 	OutputDebugStringW(wcs);
 }
 
+static void lcui_convert_ui_event()
+{
+	LCUICursor_GetPos(&pos);
+	scale = ui_get_scale();
+	pos.x = iround(pos.x / scale);
+	pos.y = iround(pos.y / scale);
+	// keyboard
+	switch (e->type) {
+	case LCUI_KEYDOWN:
+		e.type = UI_EVENT_KEYDOWN;
+		break;
+	case LCUI_KEYUP:
+		e.type = UI_EVENT_KEYUP;
+		break;
+	case LCUI_KEYPRESS:
+		e.type = UI_EVENT_KEYPRESS;
+		break;
+	default:
+		return;
+	}
+	// textinput
+	e.type = UI_EVENT_TEXTINPUT;
+	e.text.length = e->text.length;
+	e.text.text = NEW(wchar_t, e->text.length + 1);
+	if (!e.text.text) {
+		return;
+	}
+	wcsncpy(e.text.text, e->text.text, e->text.length + 1);
+	ui_widget_emit_event(e.target, &e, NULL);
+	free(e.text.text);
+	e.text.text = NULL;
+	e.text.length = 0;
+	ui_event_destroy(&e);
+}
+
+static void lcui_init_ui()
+{
+
+}
+
 #endif
 
 void LCUI_InitBase(void)
@@ -655,15 +695,7 @@ void LCUI_InitBase(void)
 	LCUI_InitTimer();
 	LCUI_InitCursor();
 	LCUI_InitWidget();
-	LCUI_InitMetrics();
-	LCUIWidget_AddTextView();
-	LCUIWidget_AddCanvas();
-	LCUIWidget_AddAnchor();
-	LCUIWidget_AddButton();
-	LCUIWidget_AddSideBar();
-	LCUIWidget_AddTScrollBar();
-	LCUIWidget_AddTextCaret();
-	LCUIWidget_AddTextEdit();
+	ui_init_metrics();
 }
 
 void LCUI_Init(void)

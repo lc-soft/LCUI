@@ -162,10 +162,10 @@ static void ui_block_layout_update_item_size(ui_widget_t* w,
 	ui_widget_layout_diff_t diff;
 
 	ui_widget_begin_layout_diff(w, &diff);
-	Widget_ComputeWidthLimitStyle(w, UI_LAYOUT_RULE_FIXED);
-	Widget_ComputeHeightLimitStyle(w, UI_LAYOUT_RULE_FIXED);
-	Widget_ComputeWidthStyle(w);
-	Widget_ComputeHeightStyle(w);
+	ui_widget_compute_widget_limit_style(w, UI_LAYOUT_RULE_FIXED);
+	ui_widget_compute_height_limit_style(w, UI_LAYOUT_RULE_FIXED);
+	ui_widget_compute_width_style(w);
+	ui_widget_compute_height_style(w);
 	ui_widget_update_box_size(w);
 	if (content_width == w->box.content.width &&
 	    content_height == w->box.content.height) {
@@ -173,7 +173,7 @@ static void ui_block_layout_update_item_size(ui_widget_t* w,
 	}
 	ui_widget_reflow(w, rule);
 	ui_widget_end_layout_diff(w, &diff);
-	w->task.states[UI_WIDGET_TASK_REFLOW] = FALSE;
+	w->task.states[UI_TASK_REFLOW] = FALSE;
 }
 
 static void ui_block_layout_load(ui_block_layout_context_t* ctx)

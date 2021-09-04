@@ -156,7 +156,7 @@ void LCUI_FreeCursor(void)
 void LCUICursor_GetRect(LCUI_Rect *rect)
 {
 	float scale;
-	scale = LCUIMetrics_GetScale();
+	scale = ui_get_scale();
 	rect->x = iround(cursor.pos.x / scale);
 	rect->y = iround(cursor.pos.y / scale);
 	rect->width = iround(cursor.graph.width / scale);

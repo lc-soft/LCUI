@@ -10,6 +10,11 @@ void ui_widget_destroy_prototype(ui_widget_t* widget);
 void ui_root_init(void);
 void ui_root_delete(void);
 
+// Trash
+
+size_t ui_trash_clear(void);
+void ui_trash_add(ui_widget_t *w);
+
 // Id
 
 int ui_widget_destroy_id(ui_widget_t* w);
@@ -52,6 +57,26 @@ void ui_widget_paint_box_shadow(ui_widget_t* w, LCUI_PaintContext paint,
 void ui_widget_compute_box_shadow(ui_widget_t* w, LCUI_BoxShadow* out);
 void ui_widget_compute_box_shadow_style(ui_widget_t* w);
 
+
+// Box
+
+void ui_widget_update_box_position(ui_widget_t* w);
+float ui_widget_get_canvas_box_width(ui_widget_t* widget);
+float ui_widget_get_canvas_box_height(ui_widget_t* widget);
+void ui_widget_update_canvas_box(ui_widget_t* w);
+void ui_widget_update_box_size(ui_widget_t* w);
+float ui_widget_get_box_shadow_offset_x(ui_widget_t* w);
+float ui_widget_get_box_shadow_offset_y(ui_widget_t* w);
+void ui_widget_compute_border_box_actual(ui_widget_t* w,
+					 ui_widget_actual_style_t* s);
+void ui_widget_compute_canvas_box_actual(ui_widget_t* w,
+					 ui_widget_actual_style_t* s);
+void ui_widget_compute_padding_box_actual(ui_widget_t* w,
+					  ui_widget_actual_style_t* s);
+void ui_widget_compute_content_box_actual(ui_widget_t* w,
+					  ui_widget_actual_style_t* s);
+
+
 // Diff
 
 /** for check widget difference */
@@ -74,11 +99,11 @@ typedef struct ui_widget_style_diff_t_ {
 	LCUI_BackgroundStyle background;
 	ui_widget_box_model_t box;
 	ui_flexbox_layout_style_t flex;
-	LCUI_BOOL should_add_invalid_area;
+	LCUI_BOOL should_add_dirty_rect;
 } ui_widget_style_diff_t, *ui_widget_style_diff_t;
 
 typedef struct ui_widget_layout_diff_t_ {
-	LCUI_BOOL should_add_invalid_area;
+	LCUI_BOOL should_add_dirty_rect;
 	ui_widget_box_model_t box;
 } ui_widget_layout_diff_t, *ui_widget_layout_diff_t;
 

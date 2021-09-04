@@ -33,7 +33,7 @@ LCUI_BOOL ui_widget_auto_reflow(ui_widget_t* w, ui_layout_rule_t rule)
 	ui_widget_layout_diff_t diff;
 
 	ui_widget_begin_layout_diff(w, &diff);
-	Widget_ComputeSizeStyle(w);
+	ui_widget_compute_size_style(w);
 	ui_widget_update_box_size(w);
 	ui_widget_update_box_position(w);
 	ui_widget_add_state(w, LCUI_WSTATE_LAYOUTED);
@@ -43,6 +43,6 @@ LCUI_BOOL ui_widget_auto_reflow(ui_widget_t* w, ui_layout_rule_t rule)
 	}
 	ui_widget_reflow(w, rule);
 	ui_widget_end_layout_diff(w, &diff);
-	w->task.states[UI_WIDGET_TASK_REFLOW] = FALSE;
+	w->update.states[UI_TASK_REFLOW] = FALSE;
 	return TRUE;
 }

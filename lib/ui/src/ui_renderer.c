@@ -1,47 +1,8 @@
-﻿/*
- * widget_paint.c -- LCUI widget paint module.
- *
- * Copyright (c) 2018-2020, Liu chao <lc-soft@live.cn> All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *   * Neither the name of LCUI nor the names of its contributors may be used
- *     to endorse or promote products derived from this software without
- *     specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
-
-//#define DEBUG
-#include <stdio.h>
-#include <stdlib.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
-#include <LCUI/gui/widget.h>
-#include <LCUI/display.h>
-#include "widget_border.h"
-#include "widget_background.h"
-#include "widget_shadow.h"
+﻿#include <LCUI.h>
+#include "../include/ui.h"
+#include "private.h"
 
 //#define DEBUG_FRAME_RENDER
-#define ComputeActualPX(VAL) LCUIMetrics_ComputeActual(VAL, LCUI_STYPE_PX)
-
 #define MAX_VISIBLE_WIDTH 20000
 #define MAX_VISIBLE_HEIGHT 20000
 
@@ -49,12 +10,7 @@
 #include <LCUI/image.h>
 #endif
 
-typedef struct LCUI_RectGroupRec_ {
-	ui_widget_t* widget;
-	LinkedList rects;
-} LCUI_RectGroupRec, *LCUI_RectGroup;
-
-typedef struct ui_widget_t*RendererRec_ {
+typedef struct ui_renderer_t {
 	/* target widget position, it relative to root canvas */
 	float x, y;
 
@@ -65,10 +21,10 @@ typedef struct ui_widget_t*RendererRec_ {
 	float content_left;
 
 	/* target widget */
-	ui_widget_t* target;
+	ui_widget_t *target;
 
 	/* computed actual style */
-	ui_widget_actual_style_t* style;
+	ui_widget_actual_style_t *style;
 
 	/* current target widget paint context */
 	LCUI_PaintContext paint;
@@ -103,17 +59,10 @@ typedef struct ui_widget_t*RendererRec_ {
 	LCUI_BOOL has_layer_graph;
 	LCUI_BOOL can_render_self;
 	LCUI_BOOL can_render_centent;
-} ui_widget_t*RendererRec, *ui_widget_t*Renderer;
-
-static struct ui_widget_t*RenderModule {
-	LCUI_BOOL active;
-	ui_widget_prototype_t default_proto;
-	RBTree groups;
-	LinkedList rects;
-} self = { 0 };
+} ui_renderer_t;
 
 /** 判断部件是否有可绘制内容 */
-static LCUI_BOOL Widget_IsPaintable(ui_widget_t* w)
+static LCUI_BOOL ui_widget_is_paintable(ui_widget_t *w)
 {
 	const ui_widget_style_t *s = &w->computed_style;
 	if (s->background.color.alpha > 0 ||
@@ -123,10 +72,10 @@ static LCUI_BOOL Widget_IsPaintable(ui_widget_t* w)
 	    s->shadow.spread > 0) {
 		return TRUE;
 	}
-	return w->proto != self.default_proto;
+	return w->proto != ui_get_widget_prototype(NULL);
 }
 
-static LCUI_BOOL Widget_HasRoundBorder(ui_widget_t* w)
+static LCUI_BOOL ui_widget_has_round_border(ui_widget_t *w)
 {
 	const LCUI_BorderStyle *s = &w->computed_style.border;
 
@@ -134,20 +83,8 @@ static LCUI_BOOL Widget_HasRoundBorder(ui_widget_t* w)
 	       s->bottom_left_radius || s->bottom_right_radius;
 }
 
-void RectFToInvalidArea(const LCUI_RectF *rect, LCUI_Rect *area)
-{
-	LCUIMetrics_ComputeRectActual(area, rect);
-}
-
-void RectToInvalidArea(const LCUI_Rect *rect, LCUI_Rect *area)
-{
-	LCUI_RectF rectf;
-	LCUIRect_ToRectF(rect, &rectf, 1.0f);
-	LCUIMetrics_ComputeRectActual(area, &rectf);
-}
-
-LCUI_BOOL Widget_InvalidateArea(ui_widget_t* w, LCUI_RectF *in_rect,
-				int box_type)
+LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, LCUI_RectF *in_rect,
+				    int box_type)
 {
 	LCUI_RectF rect;
 	ui_dirty_rect_type_t type;
@@ -169,12 +106,12 @@ LCUI_BOOL Widget_InvalidateArea(ui_widget_t* w, LCUI_RectF *in_rect,
 			type = UI_DIRTY_RECT_TYPE_PADDING_BOX;
 			break;
 		}
-		if (w->invalid_area_type >= type) {
+		if (w->dirty_rect_type >= type) {
 			return FALSE;
 		}
-		w->invalid_area_type = type;
+		w->dirty_rect_type = type;
 		while (w->parent) {
-			w->parent->has_child_invalid_area = TRUE;
+			w->parent->has_child_dirty_rect = TRUE;
 			w = w->parent;
 		}
 		return TRUE;
@@ -183,14 +120,14 @@ LCUI_BOOL Widget_InvalidateArea(ui_widget_t* w, LCUI_RectF *in_rect,
 	rect = *in_rect;
 	switch (box_type) {
 	case SV_GRAPH_BOX:
-		if (w->invalid_area_type == UI_DIRTY_RECT_TYPE_CANVAS_BOX) {
+		if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_CANVAS_BOX) {
 			return FALSE;
 		}
 		LCUIRectF_ValidateArea(&rect, w->box.canvas.width,
 				       w->box.canvas.height);
 		break;
 	case SV_BORDER_BOX:
-		if (w->invalid_area_type == UI_DIRTY_RECT_TYPE_BORDER_BOX) {
+		if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_BORDER_BOX) {
 			return FALSE;
 		}
 		LCUIRectF_ValidateArea(&rect, w->box.border.width,
@@ -199,7 +136,7 @@ LCUI_BOOL Widget_InvalidateArea(ui_widget_t* w, LCUI_RectF *in_rect,
 		rect.y += w->box.border.y - w->box.canvas.y;
 		break;
 	case SV_PADDING_BOX:
-		if (w->invalid_area_type == UI_DIRTY_RECT_TYPE_PADDING_BOX) {
+		if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_PADDING_BOX) {
 			return FALSE;
 		}
 		LCUIRectF_ValidateArea(&rect, w->box.padding.width,
@@ -217,43 +154,44 @@ LCUI_BOOL Widget_InvalidateArea(ui_widget_t* w, LCUI_RectF *in_rect,
 	}
 	rect.x += w->box.canvas.x;
 	rect.y += w->box.canvas.y;
-	if (w->invalid_area_type > UI_DIRTY_RECT_TYPE_NONE) {
-		LCUIRectF_MergeRect(&w->invalid_area, &rect, &w->invalid_area);
+	if (w->dirty_rect_type > UI_DIRTY_RECT_TYPE_NONE) {
+		LCUIRectF_MergeRect(&w->dirty_rect, &rect, &w->dirty_rect);
 	} else {
-		w->invalid_area = rect;
-		w->invalid_area_type = UI_DIRTY_RECT_TYPE_CUSTOM;
+		w->dirty_rect = rect;
+		w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CUSTOM;
 		while (w->parent) {
-			w->parent->has_child_invalid_area = TRUE;
+			w->parent->has_child_dirty_rect = TRUE;
 			w = w->parent;
 		}
 	}
 	return TRUE;
 }
 
-#define AddInvalidArea()                                               \
+#define add_dirty_rect()                                               \
 	do {                                                           \
 		rect.x += x;                                           \
 		rect.y += y;                                           \
 		LCUIRectF_GetOverlayRect(&rect, &visible_area, &rect); \
 		if (rect.width > 0 && rect.height > 0) {               \
 			actual_rect = malloc(sizeof(LCUI_Rect));       \
-			RectFToInvalidArea(&rect, actual_rect);        \
+			ui_compute_rect_actual(&rect, actual_rect);    \
 			LinkedList_Append(rects, actual_rect);         \
 		}                                                      \
 	} while (0)
 
-static void Widget_CollectInvalidArea(ui_widget_t* w, LinkedList *rects, float x,
-				      float y, LCUI_RectF visible_area)
+static void ui_widget_collect_dirty_rect(ui_widget_t *w, LinkedList *rects,
+					 float x, float y,
+					 LCUI_RectF visible_area)
 {
 	LCUI_RectF rect;
 	LCUI_Rect *actual_rect;
 	LinkedListNode *node;
 
-	if (w->parent && w->parent->invalid_area_type >=
-			     UI_DIRTY_RECT_TYPE_PADDING_BOX) {
-		w->invalid_area_type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
-	} else if (w->invalid_area_type >= UI_DIRTY_RECT_TYPE_PADDING_BOX) {
-		switch (w->invalid_area_type) {
+	if (w->parent &&
+	    w->parent->dirty_rect_type >= UI_DIRTY_RECT_TYPE_PADDING_BOX) {
+		w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
+	} else if (w->dirty_rect_type >= UI_DIRTY_RECT_TYPE_PADDING_BOX) {
+		switch (w->dirty_rect_type) {
 		case UI_DIRTY_RECT_TYPE_PADDING_BOX:
 			rect = w->box.padding;
 			break;
@@ -264,45 +202,45 @@ static void Widget_CollectInvalidArea(ui_widget_t* w, LinkedList *rects, float x
 			rect = w->box.canvas;
 			break;
 		}
-		if (!LCUIRectF_IsCoverRect(&rect, &w->invalid_area)) {
-			AddInvalidArea();
-			rect = w->invalid_area;
-			AddInvalidArea();
+		if (!LCUIRectF_IsCoverRect(&rect, &w->dirty_rect)) {
+			add_dirty_rect();
+			rect = w->dirty_rect;
+			add_dirty_rect();
 		} else {
-			LCUIRectF_MergeRect(&rect, &rect, &w->invalid_area);
-			AddInvalidArea();
+			LCUIRectF_MergeRect(&rect, &rect, &w->dirty_rect);
+			add_dirty_rect();
 		}
-	} else if (w->invalid_area_type == UI_DIRTY_RECT_TYPE_CUSTOM) {
-		rect = w->invalid_area;
-		AddInvalidArea();
+	} else if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_CUSTOM) {
+		rect = w->dirty_rect;
+		add_dirty_rect();
 	}
-	if (w->has_child_invalid_area) {
+	if (w->has_child_dirty_rect) {
 		visible_area.x -= x;
 		visible_area.y -= y;
 		LCUIRectF_GetOverlayRect(&visible_area, &w->box.padding,
 					 &visible_area);
 		visible_area.x += x;
 		visible_area.y += y;
-		for (LinkedList_Each(node, &w->children_show)) {
-			Widget_CollectInvalidArea(
+		for (LinkedList_Each(node, &w->stacking_context)) {
+			ui_widget_collect_dirty_rect(
 			    node->data, rects, x + w->box.padding.x,
 			    y + w->box.padding.y, visible_area);
 		}
 	}
-	w->invalid_area_type = UI_DIRTY_RECT_TYPE_NONE;
-	w->has_child_invalid_area = FALSE;
+	w->dirty_rect_type = UI_DIRTY_RECT_TYPE_NONE;
+	w->has_child_dirty_rect = FALSE;
 }
 
-size_t Widget_GetInvalidArea(ui_widget_t* w, LinkedList *rects)
+size_t ui_widget_get_dirty_rects(ui_widget_t *w, LinkedList *rects)
 {
 	LCUI_Rect *rect;
 	LinkedListNode *node;
 
-	float scale = LCUIMetrics_GetScale();
+	float scale = ui_get_scale();
 	int x = iround(w->box.padding.x * scale);
 	int y = iround(w->box.padding.y * scale);
 
-	Widget_CollectInvalidArea(w, rects, 0, 0, w->box.padding);
+	ui_widget_collect_dirty_rect(w, rects, 0, 0, w->box.padding);
 	for (LinkedList_Each(node, rects)) {
 		rect = node->data;
 		rect->x -= x;
@@ -311,39 +249,9 @@ size_t Widget_GetInvalidArea(ui_widget_t* w, LinkedList *rects)
 	return rects->length;
 }
 
-static int OnCompareGroup(void *data, const void *keydata)
-{
-	LCUI_RectGroup group = data;
-	return (int)((char *)group->widget - (char *)keydata);
-}
-
-static void OnDestroyGroup(void *data)
-{
-	LCUI_RectGroup group = data;
-	RectList_Clear(&group->rects);
-	group->widget = NULL;
-}
-
-void LCUIWidget_InitRenderer(void)
-{
-	RBTree_Init(&self.groups);
-	RBTree_OnCompare(&self.groups, OnCompareGroup);
-	RBTree_OnDestroy(&self.groups, OnDestroyGroup);
-	LinkedList_Init(&self.rects);
-	self.default_proto = ui_get_widget_prototype(NULL);
-	self.active = TRUE;
-}
-
-void LCUIWidget_FreeRenderer(void)
-{
-	self.active = FALSE;
-	RectList_Clear(&self.rects);
-	RBTree_Destroy(&self.groups);
-}
-
 /** 当前部件的绘制函数 */
-static void Widget_OnPaint(ui_widget_t* w, LCUI_PaintContext paint,
-			   ui_widget_actual_style_t* style)
+static void ui_widget_on_paint(ui_widget_t *w, LCUI_PaintContext paint,
+			       ui_widget_actual_style_t *style)
 {
 	ui_widget_paint_background(w, paint, style);
 	ui_widget_paint_border(w, paint, style);
@@ -353,65 +261,16 @@ static void Widget_OnPaint(ui_widget_t* w, LCUI_PaintContext paint,
 	}
 }
 
-int Widget_ConvertArea(ui_widget_t* w, LCUI_Rect *in_rect, LCUI_Rect *out_rect,
-		       int box_type)
+static ui_renderer_t *ui_renderer_create(ui_widget_t *w,
+					 LCUI_PaintContext paint,
+					 ui_widget_actual_style_t *style,
+					 ui_renderer_t *parent)
 {
-	LCUI_RectF rect;
-	if (!in_rect) {
-		return -1;
-	}
-	switch (box_type) {
-	case SV_CONTENT_BOX:
-		rect = w->box.content;
-		break;
-	case SV_PADDING_BOX:
-		rect = w->box.content;
-		rect.x -= w->padding.left;
-		rect.y -= w->padding.top;
-		rect.width += w->padding.left;
-		rect.width += w->padding.right;
-		rect.height += w->padding.top;
-		rect.height += w->padding.bottom;
-		break;
-	case SV_BORDER_BOX:
-		rect = w->box.border;
-		break;
-	case SV_GRAPH_BOX:
-	default:
-		return -2;
-	}
-	/* 转换成相对坐标 */
-	rect.x -= w->box.canvas.x;
-	rect.y -= w->box.canvas.y;
-	out_rect->x = in_rect->x - (int)rect.x;
-	out_rect->y = in_rect->y - (int)rect.y;
-	out_rect->width = in_rect->width;
-	out_rect->height = in_rect->height;
-	/* 裁剪掉超出范围的区域 */
-	if (out_rect->x < 0) {
-		out_rect->width += out_rect->x;
-		out_rect->x = 0;
-	}
-	if (out_rect->y < 0) {
-		out_rect->height += out_rect->y;
-		out_rect->y = 0;
-	}
-	if (out_rect->x + out_rect->width > (int)rect.width) {
-		out_rect->width = (int)rect.width - out_rect->x;
-	}
-	if (out_rect->y + out_rect->height > (int)rect.height) {
-		out_rect->height = (int)rect.height - out_rect->y;
-	}
-	return 0;
-}
+	ui_renderer_t *that = malloc(sizeof(ui_renderer_t));
 
-static ui_widget_t*Renderer WidgetRenderer(ui_widget_t* w,
-					  LCUI_PaintContext paint,
-					  ui_widget_actual_style_t* style,
-					  ui_widget_t*Renderer parent)
-{
-	ASSIGN(that, ui_widget_t*Renderer);
-
+	if (!that) {
+		return NULL;
+	}
 	that->target = w;
 	that->style = style;
 	that->paint = paint;
@@ -430,14 +289,14 @@ static ui_widget_t*Renderer WidgetRenderer(ui_widget_t* w,
 		that->has_self_graph = TRUE;
 		that->has_content_graph = TRUE;
 		that->has_layer_graph = TRUE;
-	} else if (Widget_HasRoundBorder(w)) {
+	} else if (ui_widget_has_round_border(w)) {
 		that->has_content_graph = TRUE;
 	}
 	Graph_Init(&that->self_graph);
 	Graph_Init(&that->layer_graph);
 	Graph_Init(&that->content_graph);
 	that->layer_graph.color_type = LCUI_COLOR_TYPE_ARGB;
-	that->can_render_self = Widget_IsPaintable(w);
+	that->can_render_self = ui_widget_is_paintable(w);
 	if (that->can_render_self) {
 		that->self_graph.color_type = LCUI_COLOR_TYPE_ARGB;
 		Graph_Create(&that->self_graph, that->paint->rect.width,
@@ -463,7 +322,7 @@ static ui_widget_t*Renderer WidgetRenderer(ui_widget_t* w,
 	    &that->actual_content_rect);
 	;
 	LCUIRect_ToRectF(&that->actual_content_rect, &that->content_rect,
-			 1.0f / LCUIMetrics_GetScale());
+			 1.0f / ui_get_scale());
 	DEBUG_MSG("[%s] content_rect: (%d, %d, %d, %d)\n", w->id,
 		  that->actual_content_rect.x, that->actual_content_rect.y,
 		  that->actual_content_rect.width,
@@ -477,7 +336,7 @@ static ui_widget_t*Renderer WidgetRenderer(ui_widget_t* w,
 	DEBUG_MSG(
 	    "[%s][%d/%d] content_rect: (%d,%d,%d,%d), "
 	    "canvas_rect: (%d,%d,%d,%d)\n",
-	    w->id, w->index, w->parent ? w->parent->children_show.length : 1,
+	    w->id, w->index, w->parent ? w->parent->stacking_context.length : 1,
 	    that->actual_content_rect.x, that->actual_content_rect.y,
 	    that->actual_content_rect.width, that->actual_content_rect.height,
 	    that->paint->canvas.quote.left, that->paint->canvas.quote.top,
@@ -494,7 +353,7 @@ static ui_widget_t*Renderer WidgetRenderer(ui_widget_t* w,
 	return that;
 }
 
-static void WidgetRenderer_Delete(ui_widget_t*Renderer renderer)
+static void ui_renderer_destroy(ui_renderer_t *renderer)
 {
 	Graph_Free(&renderer->layer_graph);
 	Graph_Free(&renderer->self_graph);
@@ -502,63 +361,21 @@ static void WidgetRenderer_Delete(ui_widget_t*Renderer renderer)
 	free(renderer);
 }
 
-static size_t WidgetRenderer_Render(ui_widget_t*Renderer renderer);
+static size_t ui_renderer_render(ui_renderer_t *renderer);
 
-static void Widget_ComputeActualBorderBox(ui_widget_t* w,
-					  ui_widget_actual_style_t* s)
-{
-	LCUI_RectF rect;
-	rect.x = s->x + w->box.border.x;
-	rect.y = s->y + w->box.border.y;
-	rect.width = w->box.border.width;
-	rect.height = w->box.border.height;
-	ui_widget_compute_border(w, &s->border);
-	LCUIMetrics_ComputeRectActual(&s->border_box, &rect);
-}
-
-static void Widget_ComputeActualCanvasBox(ui_widget_t* w,
-					  ui_widget_actual_style_t* s)
-{
-	ui_widget_compute_box_shadow(w, &s->shadow);
-	BoxShadow_GetCanvasRect(&s->shadow, &s->border_box, &s->canvas_box);
-}
-
-static void Widget_ComputeActualPaddingBox(ui_widget_t* w,
-					   ui_widget_actual_style_t* s)
-{
-	ui_widget_compute_background(w, &s->background);
-	s->padding_box.x = s->border_box.x + s->border.left.width;
-	s->padding_box.y = s->border_box.y + s->border.top.width;
-	s->padding_box.width = s->border_box.width - s->border.left.width;
-	s->padding_box.width -= s->border.right.width;
-	s->padding_box.height = s->border_box.height - s->border.top.width;
-	s->padding_box.height -= s->border.bottom.width;
-}
-
-static void Widget_ComputeActualContentBox(ui_widget_t* w,
-					   ui_widget_actual_style_t* s)
-{
-	LCUI_RectF rect;
-	rect.x = s->x + w->box.content.x;
-	rect.y = s->y + w->box.content.y;
-	rect.width = w->box.content.width;
-	rect.height = w->box.content.height;
-	LCUIMetrics_ComputeRectActual(&s->content_box, &rect);
-}
-
-static size_t WidgetRenderer_RenderChildren(ui_widget_t*Renderer that)
+static size_t ui_renderer_render_children(ui_renderer_t *that)
 {
 	size_t total = 0, count = 0;
-	ui_widget_t* child;
+	ui_widget_t *child;
 	LCUI_Rect paint_rect;
 	LCUI_RectF child_rect;
 	LinkedListNode *node;
 	LCUI_PaintContextRec child_paint;
-	ui_widget_t*Renderer renderer;
+	ui_renderer_t *renderer;
 	ui_widget_actual_style_t style;
 
 	/* Render the child widgets from bottom to top in stack order */
-	for (LinkedList_EachReverse(node, &that->target->children_show)) {
+	for (LinkedList_EachReverse(node, &that->target->stacking_context)) {
 		child = node->data;
 		if (!child->computed_style.visible ||
 		    child->state != LCUI_WSTATE_NORMAL) {
@@ -584,8 +401,8 @@ static size_t WidgetRenderer_RenderChildren(ui_widget_t*Renderer that)
 					      &child_rect)) {
 			continue;
 		}
-		Widget_ComputeActualBorderBox(child, &style);
-		Widget_ComputeActualCanvasBox(child, &style);
+		ui_widget_compute_border_box_actual(child, &style);
+		ui_widget_compute_canvas_box_actual(child, &style);
 		DEBUG_MSG("content: %g, %g\n", that->content_left,
 			  that->content_top);
 		DEBUG_MSG("content rect: (%d, %d, %d, %d)\n",
@@ -601,8 +418,8 @@ static size_t WidgetRenderer_RenderChildren(ui_widget_t*Renderer that)
 			continue;
 		}
 		++count;
-		Widget_ComputeActualPaddingBox(child, &style);
-		Widget_ComputeActualContentBox(child, &style);
+		ui_widget_compute_padding_box_actual(child, &style);
+		ui_widget_compute_content_box_actual(child, &style);
 		child_paint.rect = paint_rect;
 		child_paint.rect.x -= style.canvas_box.x;
 		child_paint.rect.y -= style.canvas_box.y;
@@ -621,18 +438,19 @@ static size_t WidgetRenderer_RenderChildren(ui_widget_t*Renderer that)
 		}
 		DEBUG_MSG("child paint rect: (%d, %d, %d, %d)\n", paint_rect.x,
 			  paint_rect.y, paint_rect.width, paint_rect.height);
-		renderer = WidgetRenderer(child, &child_paint, &style, that);
-		total += WidgetRenderer_Render(renderer);
-		WidgetRenderer_Delete(renderer);
+		renderer =
+		    ui_renderer_create(child, &child_paint, &style, that);
+		total += ui_renderer_render(renderer);
+		ui_renderer_destroy(renderer);
 	}
 	return total;
 }
 
-static size_t WidgetRenderer_Render(ui_widget_t*Renderer renderer)
+static size_t ui_renderer_render(ui_renderer_t *renderer)
 {
 	size_t count = 0;
 	LCUI_PaintContextRec self_paint;
-	ui_widget_t*Renderer that = renderer;
+	ui_renderer_t *that = renderer;
 
 	int content_x = that->actual_content_rect.x - that->actual_paint_rect.x;
 	int content_y = that->actual_content_rect.y - that->actual_paint_rect.y;
@@ -649,7 +467,7 @@ static size_t WidgetRenderer_Render(ui_widget_t*Renderer renderer)
 		self_paint = *that->paint;
 		self_paint.with_alpha = TRUE;
 		self_paint.canvas = that->self_graph;
-		Widget_OnPaint(that->target, &self_paint, that->style);
+		ui_widget_on_paint(that->target, &self_paint, that->style);
 #ifdef DEBUG_FRAME_RENDER
 		sprintf(filename,
 			"frame-%lu-L%d-%s-self-paint-(%d,%d,%d,%d).png",
@@ -671,9 +489,10 @@ static size_t WidgetRenderer_Render(ui_widget_t*Renderer renderer)
 		}
 	}
 	if (that->can_render_centent) {
-		count += WidgetRenderer_RenderChildren(that);
+		count += ui_renderer_render_children(that);
 	}
-	if (that->has_content_graph && Widget_HasRoundBorder(that->target)) {
+	if (that->has_content_graph &&
+	    ui_widget_has_round_border(that->target)) {
 		self_paint.rect = that->actual_content_rect;
 		self_paint.rect.x -= that->style->canvas_box.x;
 		self_paint.rect.y -= that->style->canvas_box.y;
@@ -735,29 +554,29 @@ static size_t WidgetRenderer_Render(ui_widget_t*Renderer renderer)
 	return count;
 }
 
-size_t Widget_Render(ui_widget_t* w, LCUI_PaintContext paint)
+size_t ui_widget_render(ui_widget_t *w, LCUI_PaintContext paint)
 {
 	size_t count;
-	ui_widget_t*Renderer renderer;
+	ui_renderer_t *ctx;
 	ui_widget_actual_style_t style;
 
 	/* compute actual canvas box */
 	style.x = style.y = 0;
-	Widget_ComputeActualBorderBox(w, &style);
-	Widget_ComputeActualCanvasBox(w, &style);
+	ui_widget_compute_border_box_actual(w, &style);
+	ui_widget_compute_canvas_box_actual(w, &style);
 	/* reset widget position to relative paint rect */
 	style.x = (float)-style.canvas_box.x;
 	style.y = (float)-style.canvas_box.y;
-	Widget_ComputeActualBorderBox(w, &style);
-	Widget_ComputeActualCanvasBox(w, &style);
-	Widget_ComputeActualPaddingBox(w, &style);
-	Widget_ComputeActualContentBox(w, &style);
-	renderer = WidgetRenderer(w, paint, &style, NULL);
-	DEBUG_MSG("[%d] %s: start render\n", renderer->target->index,
-		  renderer->target->type);
-	count = WidgetRenderer_Render(renderer);
-	DEBUG_MSG("[%d] %s: end render, count: %lu\n", renderer->target->index,
-		  renderer->target->type, count);
-	WidgetRenderer_Delete(renderer);
+	ui_widget_compute_border_box_actual(w, &style);
+	ui_widget_compute_canvas_box_actual(w, &style);
+	ui_widget_compute_padding_box_actual(w, &style);
+	ui_widget_compute_content_box_actual(w, &style);
+	ctx = ui_renderer_create(w, paint, &style, NULL);
+	DEBUG_MSG("[%d] %s: start render\n", ctx->target->index,
+		  ctx->target->type);
+	count = ui_renderer_render(ctx);
+	DEBUG_MSG("[%d] %s: end render, count: %lu\n", ctx->target->index,
+		  ctx->target->type, count);
+	ui_renderer_destroy(ctx);
 	return count;
 }

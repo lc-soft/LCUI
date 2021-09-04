@@ -136,10 +136,10 @@ static void TextView_Update(ui_widget_t* w)
 	TextLayer_ClearInvalidRect(txt->layer);
 	for (LinkedList_Each(node, &rects)) {
 		LCUIRect_ToRectF(node->data, &rect, 1.0f / scale);
-		Widget_InvalidateArea(w, &rect, SV_CONTENT_BOX);
+		ui_widget_mark_dirty_rect(w, &rect, SV_CONTENT_BOX);
 	}
 	RectList_Clear(&rects);
-	Widget_AddTask(w, UI_WIDGET_TASK_REFLOW);
+	ui_widget_add_task(w, UI_TASK_REFLOW);
 }
 
 static void TextView_UpdateStyle(ui_widget_t* w)
@@ -270,7 +270,7 @@ static void TextView_OnResize(ui_widget_t* w, float width, float height)
 	TextLayer_ClearInvalidRect(txt->layer);
 	for (LinkedList_Each(node, &rects)) {
 		LCUIRect_ToRectF(node->data, &rect, 1.0f / scale);
-		Widget_InvalidateArea(w, &rect, SV_CONTENT_BOX);
+		ui_widget_mark_dirty_rect(w, &rect, SV_CONTENT_BOX);
 	}
 	RectList_Clear(&rects);
 }
@@ -335,7 +335,7 @@ int TextView_SetTextW(ui_widget_t* w, const wchar_t *text)
 	}
 	txt->task.update_content = TRUE;
 	txt->task.content = newtext;
-	Widget_AddTask(w, UI_WIDGET_TASK_USER);
+	ui_widget_add_task(w, UI_TASK_USER);
 	return 0;
 }
 
@@ -385,7 +385,7 @@ void ui_textview_set_multiline(ui_widget_t* w, LCUI_BOOL enable)
 	LCUI_TextView txt = GetData(w);
 
 	TextLayer_SetMultiline(txt->layer, enable);
-	Widget_AddTask(w, UI_WIDGET_TASK_USER);
+	ui_widget_add_task(w, UI_TASK_USER);
 }
 
 static void textview_on_font_face_load(ui_widget_t *w, ui_event_t *e, void *arg)
@@ -397,7 +397,7 @@ static void textview_on_font_face_load(ui_widget_t *w, ui_event_t *e, void *arg)
 	for (LinkedList_Each(node, &self.list)) {
 		txt = node->data;
 		if (txt->widget->state != LCUI_WSTATE_DELETED) {
-			Widget_UpdateStyle(txt->widget, TRUE);
+			ui_widget_update_style(txt->widget, TRUE);
 		}
 		count += 1;
 	}
@@ -416,13 +416,13 @@ static void TextVIew_OnTask(ui_widget_t* w, int task)
 		txt->task.content = NULL;
 		txt->task.update_content = FALSE;
 	}
-	if (task != UI_WIDGET_TASK_RESIZE ||
+	if (task != UI_TASK_RESIZE ||
 	    w->computed_style.width_sizing != UI_SIZING_RULE_FIT_CONTENT) {
 		return;
 	}
 	if (w->parent && w->parent->box.content.width != txt->available_width) {
 		txt->available_width = w->parent->box.content.width;
-		Widget_AddTask(w, UI_WIDGET_TASK_REFLOW);
+		ui_widget_add_task(w, UI_TASK_REFLOW);
 	}
 }
 

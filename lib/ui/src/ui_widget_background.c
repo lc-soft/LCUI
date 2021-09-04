@@ -17,7 +17,7 @@ void ui_widget_init_background(ui_widget_t *w)
 
 void ui_widget_destroy_background(ui_widget_t *w)
 {
-	Widget_UnsetStyle(w, key_background_image);
+	ui_widget_unset_style(w, key_background_image);
 	Graph_Init(&w->computed_style.background.image);
 	if (ui_widget_check_style_type(w, key_background_image, string)) {
 		ui_image_remove_ref(
@@ -28,7 +28,7 @@ void ui_widget_destroy_background(ui_widget_t *w)
 static void ui_widget_on_background_image_load(ui_image_t *image,
 					       ui_widget_t *w)
 {
-	Widget_InvalidateArea(w, NULL, SV_BORDER_BOX);
+	ui_widget_mark_dirty_rect(w, NULL, SV_BORDER_BOX);
 }
 
 void ui_widget_compute_background_style(ui_widget_t *widget)

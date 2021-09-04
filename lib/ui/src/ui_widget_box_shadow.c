@@ -3,14 +3,14 @@
 #include "../include/ui.h"
 #include "private.h"
 
-#define ComputeActual(X) LCUIMetrics_ComputeActual(X, LCUI_STYPE_PX)
+#define ComputeActual(X) ui_compute_actual(X, LCUI_STYPE_PX)
 
 static float ComputeXMetric(ui_widget_t* w, LCUI_Style s)
 {
 	if (s->type == LCUI_STYPE_SCALE) {
 		return w->width * s->scale;
 	}
-	return LCUIMetrics_Compute(s->value, s->type);
+	return ui_compute(s->value, s->type);
 }
 
 static float ComputeYMetric(ui_widget_t* w, LCUI_Style s)
@@ -18,7 +18,7 @@ static float ComputeYMetric(ui_widget_t* w, LCUI_Style s)
 	if (s->type == LCUI_STYPE_SCALE) {
 		return w->height * s->scale;
 	}
-	return LCUIMetrics_Compute(s->value, s->type);
+	return ui_compute(s->value, s->type);
 }
 
 void ui_widget_compute_box_shadow_style(ui_widget_t* w)
@@ -42,10 +42,10 @@ void ui_widget_compute_box_shadow_style(ui_widget_t* w)
 			sd->y = ComputeYMetric(w, s);
 			break;
 		case key_box_shadow_spread:
-			sd->spread = LCUIMetrics_Compute(s->value, s->type);
+			sd->spread = ui_compute(s->value, s->type);
 			break;
 		case key_box_shadow_blur:
-			sd->blur = LCUIMetrics_Compute(s->value, s->type);
+			sd->blur = ui_compute(s->value, s->type);
 			break;
 		case key_box_shadow_color:
 			sd->color = s->color;

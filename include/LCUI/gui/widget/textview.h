@@ -34,19 +34,19 @@
 LCUI_BEGIN_HEADER
 
 /** 设定与标签关联的文本内容 */
-LCUI_API int TextView_SetTextW(LCUI_Widget w, const wchar_t *text);
+LCUI_API int TextView_SetTextW(ui_widget_t* w, const wchar_t *text);
 
-LCUI_API int TextView_SetText(LCUI_Widget w, const char *utf8_text);
+LCUI_API int TextView_SetText(ui_widget_t* w, const char *utf8_text);
 
-LCUI_API void TextView_SetLineHeight(LCUI_Widget w, int height);
+LCUI_API void TextView_SetLineHeight(ui_widget_t* w, int height);
 
-LCUI_API void TextView_SetTextAlign(LCUI_Widget w, int align);
+LCUI_API void TextView_SetTextAlign(ui_widget_t* w, int align);
 
-LCUI_API void TextView_SetColor(LCUI_Widget w, LCUI_Color color);
+LCUI_API void TextView_SetColor(ui_widget_t* w, LCUI_Color color);
 
-LCUI_API void TextView_SetAutoWrap(LCUI_Widget w, LCUI_BOOL enable);
+LCUI_API void TextView_SetAutoWrap(ui_widget_t* w, LCUI_BOOL enable);
 
-LCUI_API void TextView_SetMulitiline(LCUI_Widget w, LCUI_BOOL enable);
+LCUI_API void ui_textview_set_multiline(ui_widget_t* w, LCUI_BOOL enable);
 
 LCUI_API size_t LCUIWidget_RefreshTextView(void);
 

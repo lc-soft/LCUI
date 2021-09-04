@@ -131,7 +131,7 @@ LCUI_API int LCUIDisplay_GetHeight(void);
 LCUI_API void LCUIDisplay_InvalidateArea(LCUI_Rect *rect);
 
 /** 获取当前部件所属的 surface */
-LCUI_API LCUI_Surface LCUIDisplay_GetSurfaceOwner(LCUI_Widget w);
+LCUI_API LCUI_Surface LCUIDisplay_GetSurfaceOwner(ui_widget_t* w);
 
 /** 根据 handle 获取 surface */
 LCUI_Surface LCUIDisplay_GetSurfaceByHandle(void *handle);

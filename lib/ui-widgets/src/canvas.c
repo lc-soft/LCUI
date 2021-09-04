@@ -41,15 +41,15 @@ typedef struct CanvasRec_ {
 } CanvasRec, *Canvas;
 
 static struct {
-	LCUI_WidgetPrototype proto;
+	ui_widget_prototype_t proto;
 } self;
 
-static void Canvas_OnResize(LCUI_Widget w, float width, float height)
+static void Canvas_OnResize(ui_widget_t* w, float width, float height)
 {
-	float scale = LCUIMetrics_GetScale();
+	float scale = ui_get_scale();
 
 	LCUI_Graph buffer;
-	Canvas canvas = Widget_GetData(w, self.proto);
+	Canvas canvas = ui_widget_get_data(w, self.proto);
 
 	Graph_Init(&buffer);
 	buffer.color_type = LCUI_COLOR_TYPE_ARGB;
@@ -60,19 +60,19 @@ static void Canvas_OnResize(LCUI_Widget w, float width, float height)
 	canvas->buffer = buffer;
 }
 
-static void Canvas_OnInit(LCUI_Widget w)
+static void Canvas_OnInit(ui_widget_t* w)
 {
-	Canvas canvas = Widget_AddData(w, self.proto, sizeof(CanvasRec));
+	Canvas canvas = ui_widget_add_data(w, self.proto, sizeof(CanvasRec));
 
 	Graph_Init(&canvas->buffer);
 	LinkedList_Init(&canvas->contexts);
 }
 
-static void Canvas_OnDestroy(LCUI_Widget w)
+static void Canvas_OnDestroy(ui_widget_t* w)
 {
 	LinkedListNode *node;
 	LCUI_CanvasContext ctx;
-	Canvas canvas = Widget_AddData(w, self.proto, sizeof(CanvasRec));
+	Canvas canvas = ui_widget_add_data(w, self.proto, sizeof(CanvasRec));
 
 	for (LinkedList_Each(node, &canvas->contexts)) {
 		ctx = node->data;
@@ -82,19 +82,19 @@ static void Canvas_OnDestroy(LCUI_Widget w)
 	Graph_Free(&canvas->buffer);
 }
 
-static void Canvas_OnAutoSize(LCUI_Widget w, float *width, float *height,
-			      LCUI_LayoutRule rule)
+static void Canvas_OnAutoSize(ui_widget_t* w, float *width, float *height,
+			      ui_layout_rule_t rule)
 {
 	*width = 300;
 	*height = 150;
 }
 
-static void Canvas_OnPaint(LCUI_Widget w, LCUI_PaintContext paint,
-			   LCUI_WidgetActualStyle style)
+static void Canvas_OnPaint(ui_widget_t* w, LCUI_PaintContext paint,
+			   ui_widget_actual_style_t* style)
 {
 	LCUI_Graph src, dest;
 	LCUI_Rect content_rect, rect;
-	Canvas canvas = Widget_GetData(w, self.proto);
+	Canvas canvas = ui_widget_get_data(w, self.proto);
 
 	content_rect.width = style->content_box.width;
 	content_rect.height = style->content_box.height;
@@ -143,16 +143,16 @@ static void CanvasContext_Release(LCUI_CanvasContext ctx)
 	Canvas canvas;
 
 	if (ctx->available) {
-		canvas = Widget_GetData(ctx->canvas, self.proto);
+		canvas = ui_widget_get_data(ctx->canvas, self.proto);
 		LinkedList_Unlink(&canvas->contexts, &ctx->node);
 	}
 	free(ctx);
 }
 
-LCUI_CanvasContext Canvas_GetContext(LCUI_Widget w)
+LCUI_CanvasContext Canvas_GetContext(ui_widget_t* w)
 {
 	ASSIGN(ctx, LCUI_CanvasRenderingContext);
-	Canvas canvas = Widget_GetData(w, self.proto);
+	Canvas canvas = ui_widget_get_data(w, self.proto);
 
 	ctx->canvas = w;
 	ctx->available = TRUE;
@@ -160,7 +160,7 @@ LCUI_CanvasContext Canvas_GetContext(LCUI_Widget w)
 	ctx->width = ctx->buffer.width;
 	ctx->height = ctx->buffer.height;
 	ctx->fill_color = RGB(0, 0, 0);
-	ctx->scale = LCUIMetrics_GetScale();
+	ctx->scale = ui_get_scale();
 	ctx->clearRect = CanvasContext_ClearRect;
 	ctx->fillRect = CanvasContext_FillRect;
 	ctx->release = CanvasContext_Release;
@@ -172,7 +172,7 @@ LCUI_CanvasContext Canvas_GetContext(LCUI_Widget w)
 
 void LCUIWidget_AddCanvas(void)
 {
-	self.proto = LCUIWidget_NewPrototype("canvas", NULL);
+	self.proto = ui_create_widget_prototype("canvas", NULL);
 	self.proto->init = Canvas_OnInit;
 	self.proto->destroy = Canvas_OnDestroy;
 	self.proto->paint = Canvas_OnPaint;

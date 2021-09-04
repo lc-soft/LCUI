@@ -31,12 +31,12 @@
 #ifndef LCUI_TEXTCARET_H
 #define LCUI_TEXTCARET_H
 
-LCUI_API void TextCaret_Refresh(LCUI_Widget widget);
+LCUI_API void TextCaret_Refresh(ui_widget_t* widget);
 
-LCUI_API void TextCaret_SetVisible(LCUI_Widget widget, LCUI_BOOL visible);
+LCUI_API void TextCaret_SetVisible(ui_widget_t* widget, LCUI_BOOL visible);
 
 /** 设置闪烁的时间间隔 */
-LCUI_API void TextCaret_SetBlinkTime(LCUI_Widget widget, unsigned int n_ms);
+LCUI_API void TextCaret_SetBlinkTime(ui_widget_t* widget, unsigned int n_ms);
 
 LCUI_API void LCUIWidget_AddTextCaret(void);
 

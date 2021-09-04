@@ -58,9 +58,9 @@ int ui_widget_set_attribute(ui_widget_t* w, const char *name, const char *value)
 		}
 		if (strcmp(name, "disabled") == 0) {
 			if (!value || strcmp(value, "false") != 0) {
-				Widget_SetDisabled(w, TRUE);
+				ui_widget_set_disabled(w, TRUE);
 			} else {
-				Widget_SetDisabled(w, FALSE);
+				ui_widget_set_disabled(w, FALSE);
 			}
 		}
 		ret = ui_widget_set_attribute_ex(w, name, value_str,

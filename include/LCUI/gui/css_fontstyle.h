@@ -66,7 +66,7 @@ typedef struct LCUI_CSSFontStyleRec_ {
 #define Widget_SetFontStyle(W, K, V, T)            \
 	do {                                       \
 		int key = LCUI_GetFontStyleKey(K); \
-		Widget_SetStyle(W, key, V, T);     \
+		ui_widget_set_style(W, key, V, T);     \
 	} while (0)
 
 /* clang-format off */

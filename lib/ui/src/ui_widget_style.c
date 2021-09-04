@@ -584,7 +584,7 @@ void ui_widget_print_stylesheet(ui_widget_t* w)
 void ui_widget_update_children_style(ui_widget_t* w)
 {
 	LinkedListNode* node;
-	w->task.for_children = TRUE;
+	w->update.for_children = TRUE;
 	for (LinkedList_Each(node, &w->children)) {
 		ui_widget_update_style(node->data);
 		ui_widget_update_children_style(node->data);
@@ -594,7 +594,7 @@ void ui_widget_update_children_style(ui_widget_t* w)
 void ui_widget_refresh_children_style(ui_widget_t* w)
 {
 	LinkedListNode* node;
-	w->task.for_children = TRUE;
+	w->update.for_children = TRUE;
 	for (LinkedList_Each(node, &w->children)) {
 		ui_widget_refresh_style(node->data);
 		ui_widget_refresh_children_style(node->data);

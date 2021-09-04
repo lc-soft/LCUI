@@ -44,7 +44,7 @@
 
 void LCUI_InitWidget(void)
 {
-	LCUIWidget_InitTasks();
+	ui_init_updater();
 	ui_init_events();
 	ui_init_widget_prototype();
 	LCUIWidget_InitStyle();
@@ -57,7 +57,7 @@ void LCUI_InitWidget(void)
 void LCUI_FreeWidget(void)
 {
 	LCUIWidget_FreeTextView();
-	LCUIWidget_FreeTasks();
+	ui_destroy_updater();
 	LCUIWidget_FreeRoot();
 	ui_destroy_events();
 	LCUIWidget_FreeStyle();

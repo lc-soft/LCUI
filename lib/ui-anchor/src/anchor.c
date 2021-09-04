@@ -42,16 +42,16 @@ typedef struct LCUI_XMLLoaderRec_ {
 	char *key;		/**< 键，作为在视图加载完后传给事件处理器的额外参数 */
 	char *filepath;		/**< 视图文件路径 */
 	char *target_id;	/**< 目标容器部件的标识 */
-	LCUI_Widget pack;	/**< 已经加载的视图内容包 */
-	LCUI_Widget widget;	/**< 触发视图加载器的部件 */
+	ui_widget_t* pack;	/**< 已经加载的视图内容包 */
+	ui_widget_t* widget;	/**< 触发视图加载器的部件 */
 } LCUI_XMLLoaderRec, *LCUI_XMLLoader;
 
 static struct LCUI_Anchor {
 	int event_id;
-	LCUI_WidgetPrototype proto;
+	ui_widget_prototype_t proto;
 } self;
 
-static void Loader_OnClearWidget(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
+static void Loader_OnClearWidget(ui_widget_t* w, ui_event_t* e, void *arg)
 {
 	LCUI_XMLLoader loader = e->data;
 	loader->widget = NULL;
@@ -60,7 +60,7 @@ static void Loader_OnClearWidget(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 static void XMLLoader_Destroy(LCUI_XMLLoader loader)
 {
 	if (loader->widget) {
-		Widget_UnbindEvent(loader->widget, "destroy",
+		ui_widget_off(loader->widget, "destroy",
 				   Loader_OnClearWidget);
 	}
 	if (loader->key) {
@@ -74,18 +74,18 @@ static void XMLLoader_Destroy(LCUI_XMLLoader loader)
 	free(loader);
 }
 
-static LCUI_XMLLoader XMLLoader_New(LCUI_Widget w)
+static LCUI_XMLLoader XMLLoader_New(ui_widget_t* w)
 {
 	LCUI_XMLLoader loader;
-	const char *key = Widget_GetAttribute(w, "key");
+	const char *key = ui_widget_get_attribute_value(w, "key");
 	loader = malloc(sizeof(LCUI_XMLLoaderRec));
 	if (!loader) {
 		return NULL;
 	}
 	loader->widget = w;
-	loader->filepath = strdup2(Widget_GetAttribute(w, "href"));
-	loader->target_id = strdup2(Widget_GetAttribute(w, "target"));
-	Widget_BindEvent(w, "destroy", Loader_OnClearWidget, loader, NULL);
+	loader->filepath = strdup2(ui_widget_get_attribute_value(w, "href"));
+	loader->target_id = strdup2(ui_widget_get_attribute_value(w, "target"));
+	ui_widget_on(w, "destroy", Loader_OnClearWidget, loader, NULL);
 	if (key) {
 		loader->key = strdup2(key);
 	} else {
@@ -96,27 +96,27 @@ static LCUI_XMLLoader XMLLoader_New(LCUI_Widget w)
 
 static void XMLLoader_AppendToTarget(LCUI_XMLLoader loader)
 {
-	LCUI_Widget target, root;
-	LCUI_WidgetEventRec ev = { 0 };
+	ui_widget_t* target, root;
+	ui_event_t ev = { 0 };
 
-	target = LCUIWidget_GetById(loader->target_id);
+	target = ui_get_widget(loader->target_id);
 	if (!target) {
 		XMLLoader_Destroy(loader);
 		return;
 	}
-	root = LCUIWidget_GetRoot();
-	Widget_Append(target, loader->pack);
-	Widget_Unwrap(loader->pack);
+	root = ui_root();
+	ui_widget_append(target, loader->pack);
+	ui_widget_unwrap(loader->pack);
 	ev.type = self.event_id;
 	ev.cancel_bubble = TRUE;
 	ev.target = loader->widget;
-	Widget_TriggerEvent(root, &ev, loader->key);
+	ui_widget_emit_event(root, &ev, loader->key);
 	XMLLoader_Destroy(loader);
 }
 
 static void XMLLoader_Load(LCUI_XMLLoader loader)
 {
-	LCUI_Widget pack;
+	ui_widget_t* pack;
 	char *path, dirname[] = "assets/views/";
 
 	if (loader->filepath[0] != '/') {
@@ -149,24 +149,24 @@ static void XMLLoader_Load(LCUI_XMLLoader loader)
 
 static void XMLLoader_StartLoad(LCUI_XMLLoader loader)
 {
-	LCUI_Widget target;
+	ui_widget_t* target;
 	LCUI_TaskRec task = { 0 };
-	target = LCUIWidget_GetById(loader->target_id);
+	target = ui_get_widget(loader->target_id);
 	if (!target) {
 		Logger_Error("[anchor] target (%s): not found\n",
 			     loader->target_id);
 		return;
 	}
-	Widget_Empty(target);
+	ui_widget_empty(target);
 	task.arg[0] = loader;
 	task.func = (LCUI_TaskFunc)XMLLoader_Load;
 	LCUI_PostAsyncTask(&task);
 }
 
-void Anchor_Open(LCUI_Widget w)
+void Anchor_Open(ui_widget_t* w)
 {
 	LCUI_XMLLoader loader;
-	const char *attr_href = Widget_GetAttribute(w, "href");
+	const char *attr_href = ui_widget_get_attribute_value(w, "href");
 
 	if (!attr_href) {
 		Logger_Error("[anchor] href are required\n");
@@ -189,7 +189,7 @@ void Anchor_Open(LCUI_Widget w)
 	LCUI_PostSimpleTask(XMLLoader_StartLoad, loader, NULL);
 }
 
-static void Anchor_OnClick(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
+static void Anchor_OnClick(ui_widget_t* w, ui_event_t* e, void *arg)
 {
 	LCUI_TaskRec task = { 0 };
 	task.func = (LCUI_TaskFunc)Anchor_Open;
@@ -197,16 +197,16 @@ static void Anchor_OnClick(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 	LCUI_PostAsyncTask(&task);
 }
 
-static void Anchor_OnInit(LCUI_Widget w)
+static void Anchor_OnInit(ui_widget_t* w)
 {
-	Widget_BindEvent(w, "click", Anchor_OnClick, NULL, NULL);
+	ui_widget_on(w, "click", Anchor_OnClick, NULL, NULL);
 	self.proto->proto->init(w);
 }
 
 void LCUIWidget_AddAnchor(void)
 {
-	self.proto = LCUIWidget_NewPrototype("a", "textview");
+	self.proto = ui_create_widget_prototype("a", "textview");
 	self.proto->init = Anchor_OnInit;
-	self.event_id = LCUIWidget_AllocEventId();
-	LCUIWidget_SetEventName(self.event_id, "loaded.anchor");
+	self.event_id = ui_alloc_event_id();
+	ui_set_event_id(self.event_id, "loaded.anchor");
 }

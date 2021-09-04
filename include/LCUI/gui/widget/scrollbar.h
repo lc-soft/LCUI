@@ -43,18 +43,18 @@ typedef enum LCUI_ScrollBarDirection {
 #define SBD_HORIZONTAL LCUI_SCROLLBAR_HORIZONTAL
 #define SBD_VERTICAL LCUI_SCROLLBAR_VERTICAL
 
-LCUI_API void ScrollBar_BindBox(LCUI_Widget w, LCUI_Widget box);
+LCUI_API void ScrollBar_BindBox(ui_widget_t* w, ui_widget_t* box);
 
-LCUI_API void ScrollBar_BindTarget(LCUI_Widget w, LCUI_Widget layer);
+LCUI_API void ScrollBar_BindTarget(ui_widget_t* w, ui_widget_t* layer);
 
 /** 获取滚动条的位置 */
-LCUI_API int ScrollBar_GetPosition(LCUI_Widget w);
+LCUI_API int ScrollBar_GetPosition(ui_widget_t* w);
 
 /** 将与滚动条绑定的内容滚动至指定位置 */
-LCUI_API int ScrollBar_SetPosition(LCUI_Widget w, int pos);
+LCUI_API int ScrollBar_SetPosition(ui_widget_t* w, int pos);
 
 /** 设置滚动条的方向 */
-LCUI_API void ScrollBar_SetDirection(LCUI_Widget w,
+LCUI_API void ScrollBar_SetDirection(ui_widget_t* w,
 				     LCUI_ScrollBarDirection direction);
 
 LCUI_API void LCUIWidget_AddTScrollBar(void);

@@ -188,7 +188,7 @@ static void FlexBoxLayout_LoadRows(ui_flexbox_layout_context_t* ctx)
 			child->margin.right = 0;
 			ui_widget_update_box_size(child);
 		}
-		Widget_ComputeFlexBasisStyle(child);
+		ui_widget_compute_flex_basis_style(child);
 		basis = Widget_MarginX(child) + child->computed_style.flex.basis;
 		DEBUG_MSG("[line %lu][%lu] main_size: %g, basis: %g\n",
 			  ctx->lines.length, child->index, ctx->line->main_size,
@@ -243,7 +243,7 @@ static void FlexBoxLayout_LoadColumns(ui_flexbox_layout_context_t* ctx)
 			LinkedList_Append(&ctx->free_elements, child);
 			continue;
 		}
-		Widget_ComputeFlexBasisStyle(child);
+		ui_widget_compute_flex_basis_style(child);
 		basis = Widget_MarginY(child) + child->computed_style.flex.basis;
 		DEBUG_MSG("[column %lu][%lu] main_size: %g, basis: %g\n",
 			  ctx->lines.length, child->index, ctx->line->main_size,
@@ -332,8 +332,8 @@ static void UpdateFlexItemSize(ui_widget_t* w, ui_layout_rule_t rule)
 	 * layout engine, so here we only need to calculate its width and
 	 * height limits.
 	 */
-	Widget_ComputeWidthLimitStyle(w, UI_LAYOUT_RULE_FIXED);
-	Widget_ComputeHeightLimitStyle(w, UI_LAYOUT_RULE_FIXED);
+	ui_widget_compute_widget_limit_style(w, UI_LAYOUT_RULE_FIXED);
+	ui_widget_compute_height_limit_style(w, UI_LAYOUT_RULE_FIXED);
 	ui_widget_update_box_size(w);
 	if (content_width == w->box.padding.width &&
 	    content_height == w->box.padding.height) {
@@ -345,7 +345,7 @@ static void UpdateFlexItemSize(ui_widget_t* w, ui_layout_rule_t rule)
 	}
 	ui_widget_reflow(w, rule);
 	ui_widget_end_layout_diff(w, &diff);
-	w->task.states[UI_WIDGET_TASK_REFLOW] = FALSE;
+	w->task.states[UI_TASK_REFLOW] = FALSE;
 }
 
 static void FlexBoxLayout_ReflowRow(ui_flexbox_layout_context_t* ctx)
@@ -374,7 +374,7 @@ static void FlexBoxLayout_ReflowRow(ui_flexbox_layout_context_t* ctx)
 		w = node->data;
 		flex = &w->computed_style.flex;
 		if (w->computed_style.height_sizing != UI_SIZING_RULE_FIXED) {
-			Widget_ComputeHeightStyle(w);
+			ui_widget_compute_height_style(w);
 		}
 		if (free_space >= 0) {
 			if (flex->grow > 0) {
@@ -457,7 +457,7 @@ static void FlexBoxLayout_ReflowColumn(ui_flexbox_layout_context_t* ctx)
 		w = node->data;
 		flex = &w->computed_style.flex;
 		if (w->computed_style.width_sizing != UI_SIZING_RULE_FIXED) {
-			Widget_ComputeWidthStyle(w);
+			ui_widget_compute_width_style(w);
 		}
 		if (free_space >= 0) {
 			if (flex->grow > 0) {

@@ -322,70 +322,6 @@ typedef struct LCUI_StyleRec_ {
 	};
 } LCUI_StyleRec, *LCUI_Style;
 
-typedef enum LCUI_SizingRule_ {
-	LCUI_SIZING_RULE_NONE,
-	LCUI_SIZING_RULE_FIXED,
-	LCUI_SIZING_RULE_FILL,
-	LCUI_SIZING_RULE_PERCENT,
-	LCUI_SIZING_RULE_FIT_CONTENT
-} LCUI_SizingRule;
-
-typedef enum LCUI_LayoutRule_ {
-	LCUI_LAYOUT_RULE_AUTO,
-	LCUI_LAYOUT_RULE_MAX_CONTENT,
-	LCUI_LAYOUT_RULE_FIXED_WIDTH,
-	LCUI_LAYOUT_RULE_FIXED_HEIGHT,
-	LCUI_LAYOUT_RULE_FIXED
-} LCUI_LayoutRule;
-
-typedef struct LCUI_FlexLayoutStyle {
-	/**
-	 * The flex shrink factor of a flex item
-	 * See more:
-	 * https://developer.mozilla.org/en-US/docs/Web/CSS/flex-shrink
-	 */
-	float shrink;
-
-	/* the flex grow factor of a flex item main size
-	 * See more: https://developer.mozilla.org/en-US/docs/Web/CSS/flex-grow
-	 */
-	float grow;
-
-	/**
-	 * The initial main size of a flex item
-	 * See more: https://developer.mozilla.org/en-US/docs/Web/CSS/flex-basis
-	 */
-	float basis;
-
-	LCUI_StyleValue wrap : 8;
-	LCUI_StyleValue direction : 8;
-
-	/**
-	 * Sets the align-self value on all direct children as a group
-	 * See more:
-	 * https://developer.mozilla.org/en-US/docs/Web/CSS/align-items
-	 */
-	LCUI_StyleValue align_items : 8;
-
-	/**
-	 * Sets the distribution of space between and around content items along
-	 * a flexbox's cross-axis
-	 * See more: https://developer.mozilla.org/en-US/docs/Web/CSS/align-content
-	 */
-	LCUI_StyleValue align_content : 8;
-
-	/**
-	 * Defines how the browser distributes space between and around content
-	 * items along the main-axis of a flex container See more:
-	 * https://developer.mozilla.org/en-US/docs/Web/CSS/justify-content
-	 */
-	LCUI_StyleValue justify_content : 8;
-} LCUI_FlexBoxLayoutStyle;
-
-typedef struct LCUI_BoundBoxRec {
-	LCUI_StyleRec top, right, bottom, left;
-} LCUI_BoundBox;
-
 typedef struct LCUI_BackgroundPosition {
 	LCUI_BOOL using_value;
 	union {
@@ -407,7 +343,7 @@ typedef struct LCUI_BackgroundSize {
 } LCUI_BackgroundSize;
 
 typedef struct LCUI_BackgroundStyle {
-	LCUI_Graph image; /**< 背景图 */
+	LCUI_Graph *image; /**< 背景图 */
 	LCUI_Color color; /**< 背景色 */
 	struct {
 		LCUI_BOOL x, y;
@@ -439,16 +375,6 @@ typedef struct LCUI_PaintContextRec_ {
 
 typedef void (*FuncPtr)(void *);
 
-typedef struct LCUI_WidgetTasksRec_ {
-	clock_t time;
-	size_t update_count;
-	size_t refresh_count;
-	size_t layout_count;
-	size_t user_task_count;
-	size_t destroy_count;
-	size_t destroy_time;
-} LCUI_WidgetTasksProfileRec, *LCUI_WidgetTasksProfile;
-
 typedef struct LCUI_FrameProfileRec_ {
 	size_t timers_count;
 	clock_t timers_time;
@@ -460,7 +386,7 @@ typedef struct LCUI_FrameProfileRec_ {
 	clock_t render_time;
 	clock_t present_time;
 
-	LCUI_WidgetTasksProfileRec widget_tasks;
+	ui_profile_t ui_profile;
 } LCUI_FrameProfileRec, *LCUI_FrameProfile;
 
 typedef struct LCUI_ProfileRec_ {

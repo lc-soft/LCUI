@@ -48,7 +48,7 @@
 
 /* clang-format on */
 
-#define ComputeActual LCUIMetrics_ComputeActual
+#define ComputeActual ui_compute_actual
 #define GetFontStyleKey(CTX) self.keys[(CTX)->parser->key]
 #define SetFontStyleProperty(CTX, S) \
 	CSSStyleParser_SetCSSProperty(CTX, GetFontStyleKey(CTX), S);

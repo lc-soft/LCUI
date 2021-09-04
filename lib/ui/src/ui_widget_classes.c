@@ -9,7 +9,7 @@ static void ui_widget_refresh_children_by_classes(ui_widget_t* w)
 	if (w->rules && w->rules->ignore_classes_change) {
 		return;
 	}
-	Widget_AddTask(w, UI_WIDGET_TASK_REFRESH_STYLE);
+	ui_widget_add_task(w, UI_TASK_REFRESH_STYLE);
 	for (LinkedList_Each(node, &w->children)) {
 		ui_widget_refresh_children_by_classes(node->data);
 	}
@@ -17,7 +17,7 @@ static void ui_widget_refresh_children_by_classes(ui_widget_t* w)
 
 static int ui_widget_handle_classes_change(ui_widget_t* w, const char *name)
 {
-	Widget_UpdateStyle(w, TRUE);
+	ui_widget_update_style(w, TRUE);
 	if (w->rules && w->rules->ignore_classes_change) {
 		return 0;
 	}

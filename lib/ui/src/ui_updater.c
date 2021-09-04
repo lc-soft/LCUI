@@ -3,7 +3,7 @@
 #include "private.h"
 
 typedef struct ui_updater_rules_data_t {
-	ui_widget_update_rules_t rules;
+	ui_widget_rules_t rules;
 	Dict* style_cache;
 	size_t default_max_update_count;
 	size_t progress;
@@ -163,15 +163,15 @@ LCUI_BOOL ui_widget_in_viewport(ui_widget_t* w)
 }
 
 int ui_widget_set_update_rules(ui_widget_t* w,
-			       const ui_widget_update_rules_t* rules)
+			       const ui_widget_rules_t* rules)
 {
 	ui_updater_rules_data_t* data;
 
-	data = (ui_updater_rules_data_t*)w->update.rules;
+	data = (ui_updater_rules_data_t*)w->rules;
 	if (data) {
 		Dict_Release(data->style_cache);
 		free(data);
-		w->update.rules = NULL;
+		w->rules = NULL;
 	}
 	if (!rules) {
 		return 0;
@@ -184,18 +184,18 @@ int ui_widget_set_update_rules(ui_widget_t* w,
 	data->progress = 0;
 	data->style_cache = NULL;
 	data->default_max_update_count = 2048;
-	w->update.rules = (ui_widget_update_rules_t*)data;
+	w->rules = (ui_widget_rules_t*)data;
 	return 0;
 }
 
-void Widget_SortChildrenShow(ui_widget_t* w)
+void ui_widget_update_stacking_context(ui_widget_t* w)
 {
 	ui_widget_t *child, *target;
 	ui_widget_style_t *s, *ts;
 	LinkedListNode *node, *target_node;
 	LinkedList* list;
 
-	list = &w->children_show;
+	list = &w->stacking_context;
 	LinkedList_ClearData(list, NULL);
 	for (LinkedList_Each(node, &w->children)) {
 		child = node->data;
@@ -296,9 +296,9 @@ static ui_updater_profile_t* ui_widget_begin_update(
 	if (w->hash && w->update.states[UI_TASK_REFRESH_STYLE]) {
 		ui_widget_generate_self_hash(w);
 	}
-	if (!self_ctx->style_cache && w->update.rules &&
-	    w->update.rules->cache_children_style) {
-		data = (ui_updater_rules_data_t*)w->update.rules;
+	if (!self_ctx->style_cache && w->rules &&
+	    w->rules->cache_children_style) {
+		data = (ui_updater_rules_data_t*)w->rules;
 		if (!data->style_cache) {
 			data->style_cache =
 			    Dict_Create(&ui_updater.style_cache_dict, NULL);
@@ -405,7 +405,7 @@ static size_t ui_widget_update_children(ui_widget_t* w,
 	if (!w->update.for_children) {
 		return 0;
 	}
-	data = (ui_updater_rules_data_t*)w->update.rules;
+	data = (ui_updater_rules_data_t*)w->rules;
 	node = w->children.head.next;
 	if (data) {
 		msec = clock();
@@ -442,7 +442,7 @@ static size_t ui_widget_update_children(ui_widget_t* w,
 		}
 		if (count > 0) {
 			data->progress = max(child->index, data->progress);
-			if (data->progress > w->children_show.length) {
+			if (data->progress > w->stacking_context.length) {
 				data->progress = child->index;
 			}
 			update_count += 1;
@@ -475,7 +475,7 @@ static size_t ui_widget_update_children(ui_widget_t* w,
 	}
 	if (data) {
 		if (!w->update.for_children) {
-			data->progress = w->children_show.length;
+			data->progress = w->stacking_context.length;
 		}
 		if (data->rules.on_update_progress) {
 			data->rules.on_update_progress(w, data->progress);
@@ -520,7 +520,7 @@ static size_t ui_widget_update_with_context(ui_widget_t* w,
 		return 0;
 	}
 	if (ui_updater.refresh_all) {
-		w->invalid_area_type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
+		w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
 	}
 	self_ctx = ui_widget_begin_update(w, ctx);
 	ui_widget_begin_layout_diff(w, &self_ctx->layout_diff);
@@ -545,7 +545,7 @@ static size_t ui_widget_update_with_context(ui_widget_t* w,
 	}
 	ui_widget_end_layout_diff(w, &self_ctx->layout_diff);
 	ui_widget_end_update(self_ctx);
-	Widget_SortChildrenShow(w);
+	ui_widget_update_stacking_context(w);
 	return count;
 }
 
@@ -576,9 +576,9 @@ size_t ui_update(void)
 	root = ui_root();
 	count = ui_widget_update(root);
 	root->state = LCUI_WSTATE_NORMAL;
-	ui_trash_clear();
 	ui_updater.metrics = *metrics;
 	ui_updater.refresh_all = FALSE;
+	ui_trash_clear();
 	return count;
 }
 

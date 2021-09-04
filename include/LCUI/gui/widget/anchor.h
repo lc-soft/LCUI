@@ -32,7 +32,7 @@
 #ifndef LCUI_WIDGET_ANCHOR_H
 #define LCUI_WIDGET_ANCHOR_H
 
-LCUI_API void Anchor_Open(LCUI_Widget w);
+LCUI_API void Anchor_Open(ui_widget_t* w);
 
 LCUI_API void LCUIWidget_AddAnchor(void);
 

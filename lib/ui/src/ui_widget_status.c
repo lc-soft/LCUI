@@ -9,7 +9,7 @@ static void ui_widget_refresh_children_by_status(ui_widget_t* w)
 	if (w->rules && w->rules->ignore_status_change) {
 		return;
 	}
-	Widget_AddTask(w, UI_WIDGET_TASK_REFRESH_STYLE);
+	ui_widget_add_task(w, UI_TASK_REFRESH_STYLE);
 	for (LinkedList_Each(node, &w->children)) {
 		ui_widget_refresh_children_by_status(node->data);
 	}
@@ -17,7 +17,7 @@ static void ui_widget_refresh_children_by_status(ui_widget_t* w)
 
 static int ui_wdiget_handle_status_change(ui_widget_t* w, const char *name)
 {
-	Widget_UpdateStyle(w, TRUE);
+	ui_widget_update_style(w, TRUE);
 	if (w->state < LCUI_WSTATE_READY || w->state == LCUI_WSTATE_DELETED) {
 		return 1;
 	}

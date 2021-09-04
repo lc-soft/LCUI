@@ -102,7 +102,7 @@ typedef enum ui_task_type_t {
 	UI_TASK_TOTAL_NUM
 } ui_task_type_t;
 
-typedef struct ui_widget_update_rules_t {
+typedef struct ui_widget_rules_t {
 	/**
 	 * Suspend update if the current widget is not visible or is
 	 * completely covered by other widgets
@@ -146,7 +146,7 @@ typedef struct ui_widget_update_rules_t {
 
 	/** A callback function on update progress */
 	void (*on_update_progress)(ui_widget_t*, size_t);
-} ui_widget_update_rules_t;
+} ui_widget_rules_t;
 
 typedef struct ui_widget_update_t {
 	/** Should update for self? */
@@ -160,8 +160,6 @@ typedef struct ui_widget_update_t {
 
 	/** States of tasks */
 	LCUI_BOOL states[UI_TASK_TOTAL_NUM];
-
-	ui_widget_update_rules_t *rules;
 } ui_widget_update_t;
 
 /** See more: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model */
@@ -407,12 +405,12 @@ struct ui_widget_t {
 	const ui_widget_prototype_t* proto;
 
 	ui_widget_update_t update;
+	ui_widget_rules_t *rules;
 	ui_widget_listeners_t *listeners;
 
-	/** Invalid area (Dirty Rectangle) */
-	LCUI_RectF invalid_area;
-	ui_dirty_rect_type_t invalid_area_type;
-	LCUI_BOOL has_child_invalid_area;
+	LCUI_RectF dirty_rect;
+	ui_dirty_rect_type_t dirty_rect_type;
+	LCUI_BOOL has_child_dirty_rect;
 
 	/** Parent widget */
 	ui_widget_t* parent;
@@ -420,8 +418,11 @@ struct ui_widget_t {
 	/** List of child widgets */
 	LinkedList children;
 
-	/** List of child widgets in descending order by z-index */
-	LinkedList children_show;
+	/**
+	 * List of child widgets in descending order by z-index
+	 * @see https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context
+	 **/
+	LinkedList stacking_context;
 
 	/**
 	 * Position in the parent->children
@@ -519,11 +520,6 @@ LCUI_API void* ui_widget_add_data(ui_widget_t* widget,
 				  ui_widget_prototype_t proto,
 				  size_t data_size);
 
-// Box
-
-LCUI_API void ui_widget_update_box_size(ui_widget_t* w);
-LCUI_API void ui_widget_update_canvas_box(ui_widget_t* w);
-LCUI_API void ui_widget_update_box_position(ui_widget_t* w);
 
 // Attributes
 
@@ -606,7 +602,14 @@ LCUI_API size_t ui_widget_export_hash(ui_widget_t* w, unsigned* hash_list,
 LCUI_API size_t ui_widget_import_hash(ui_widget_t* w, unsigned* hash_list,
 				      size_t maxlen);
 
-// Task
+
+// Renderer
+
+LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, LCUI_RectF *in_rect,
+				    int box_type);
+size_t ui_widget_get_dirty_rects(ui_widget_t *w, LinkedList *rects);
+size_t ui_widget_render(ui_widget_t *w, LCUI_PaintContext paint);
+
 
 // Events
 

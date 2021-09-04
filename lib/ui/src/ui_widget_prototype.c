@@ -108,18 +108,6 @@ ui_widget_prototype_t *ui_get_widget_prototype(const char *name)
 	return proto;
 }
 
-ui_widget_t* ui_create_widget_with_prototype(const ui_widget_prototype_t* proto)
-{
-	ui_widget_t* widget = malloc(sizeof(ui_widget_t*Rec));
-
-	Widget_Init(widget);
-	widget->proto = proto;
-	widget->type = widget->proto->name;
-	widget->proto->init(widget);
-	Widget_AddTask(widget, UI_WIDGET_TASK_REFRESH_STYLE);
-	return widget;
-}
-
 LCUI_BOOL ui_check_widget_type(ui_widget_t* w, const char *type)
 {
 	const ui_widget_prototype_t* proto;

@@ -16,16 +16,16 @@ int ui_widget_append(ui_widget_t* parent, ui_widget_t* widget)
 	widget->parent = parent;
 	widget->state = LCUI_WSTATE_CREATED;
 	widget->index = parent->children.length;
+	widget->parent->update.for_children = TRUE;
 	LinkedList_AppendNode(&parent->children, &widget->node);
 	ev.cancel_bubble = TRUE;
 	ev.type = UI_EVENT_LINK;
-	Widget_UpdateStyle(widget, TRUE);
-	Widget_UpdateChildrenStyle(widget, TRUE);
+	ui_widget_update_style(widget, TRUE);
+	ui_widget_update_children_style(widget, TRUE);
 	ui_widget_emit_event(widget, &ev, NULL);
 	ui_widget_post_surface_event(widget, UI_EVENT_LINK, TRUE);
-	Widget_UpdateTaskStatus(widget);
-	Widget_UpdateStatus(widget);
-	Widget_AddTask(parent, UI_WIDGET_TASK_REFLOW);
+	ui_widget_update_status(widget);
+	ui_widget_add_task(parent, UI_TASK_REFLOW);
 	return 0;
 }
 
@@ -46,6 +46,7 @@ int ui_widget_prepend(ui_widget_t* parent, ui_widget_t* widget)
 	widget->index = 0;
 	widget->parent = parent;
 	widget->state = LCUI_WSTATE_CREATED;
+	widget->parent->update.for_children = TRUE;
 	node = &widget->node;
 	LinkedList_InsertNode(&parent->children, 0, node);
 	/** 修改它后面的部件的 index 值 */
@@ -59,10 +60,9 @@ int ui_widget_prepend(ui_widget_t* parent, ui_widget_t* widget)
 	ev.type = UI_EVENT_LINK;
 	ui_widget_emit_event(widget, &ev, NULL);
 	ui_widget_post_surface_event(widget, UI_EVENT_LINK, TRUE);
-	Widget_AddTaskForChildren(widget, UI_WIDGET_TASK_REFRESH_STYLE);
-	Widget_UpdateTaskStatus(widget);
-	Widget_UpdateStatus(widget);
-	Widget_AddTask(parent, UI_WIDGET_TASK_REFLOW);
+	ui_widget_add_task_for_children(widget, UI_TASK_REFRESH_STYLE);
+	ui_widget_update_status(widget);
+	ui_widget_add_task(parent, UI_TASK_REFLOW);
 	return 0;
 }
 
@@ -81,9 +81,9 @@ int ui_widget_unwrap(ui_widget_t* widget)
 	len = widget->children.length;
 	if (len > 0) {
 		node = LinkedList_GetNode(&widget->children, 0);
-		Widget_RemoveStatus(node->data, "first-child");
+		ui_widget_remove_status(node->data, "first-child");
 		node = LinkedList_GetNodeAtTail(&widget->children, 0);
-		Widget_RemoveStatus(node->data, "last-child");
+		ui_widget_remove_status(node->data, "last-child");
 	}
 	node = &widget->node;
 	target = node->prev;
@@ -101,17 +101,17 @@ int ui_widget_unwrap(ui_widget_t* widget)
 		child->parent = widget->parent;
 		ev.type = UI_EVENT_LINK;
 		ui_widget_emit_event(child, &ev, NULL);
-		Widget_AddTaskForChildren(child, UI_WIDGET_TASK_REFRESH_STYLE);
-		Widget_UpdateTaskStatus(child);
+		ui_widget_add_task_for_children(child, UI_TASK_REFRESH_STYLE);
 		node = prev;
 		--len;
 	}
+	widget->parent->update.for_children;
 	if (widget->index == 0) {
-		Widget_AddStatus(target->next->data, "first-child");
+		ui_widget_add_status(target->next->data, "first-child");
 	}
 	if (widget->index == children->length - 1) {
 		node = LinkedList_GetNodeAtTail(children, 0);
-		Widget_AddStatus(node->data, "last-child");
+		ui_widget_add_status(node->data, "last-child");
 	}
 	ui_widget_remove(widget);
 	return 0;
@@ -128,17 +128,17 @@ int ui_widget_unlink(ui_widget_t* w)
 	}
 	node = &w->node;
 	if (w->index == w->parent->children.length - 1) {
-		Widget_RemoveStatus(w, "last-child");
+		ui_widget_remove_status(w, "last-child");
 		child = ui_widget_prev(w);
 		if (child) {
-			Widget_AddStatus(child, "last-child");
+			ui_widget_add_status(child, "last-child");
 		}
 	}
 	if (w->index == 0) {
-		Widget_RemoveStatus(w, "first-child");
+		ui_widget_remove_status(w, "first-child");
 		child = ui_widget_next(w);
 		if (child) {
-			Widget_AddStatus(child, "first-child");
+			ui_widget_add_status(child, "first-child");
 		}
 	}
 	/** 修改它后面的部件的 index 值 */
@@ -153,9 +153,9 @@ int ui_widget_unlink(ui_widget_t* w)
 	ev.type = UI_EVENT_UNLINK;
 	ui_widget_emit_event(w, &ev, NULL);
 	LinkedList_Unlink(&w->parent->children, node);
-	LinkedList_Unlink(&w->parent->children_show, &w->node_show);
+	LinkedList_Unlink(&w->parent->stacking_context, &w->node_show);
 	ui_widget_post_surface_event(w, UI_EVENT_UNLINK, TRUE);
-	Widget_AddTask(w->parent, UI_WIDGET_TASK_REFLOW);
+	ui_widget_add_task(w->parent, UI_TASK_REFLOW);
 	w->parent = NULL;
 	return 0;
 }
@@ -222,7 +222,7 @@ ui_widget_t* ui_widget_at(ui_widget_t* widget, int ix, int iy)
 	y = 1.0f * iy;
 	do {
 		is_hit = FALSE;
-		for (LinkedList_Each(node, &target->children_show)) {
+		for (LinkedList_Each(node, &target->stacking_context)) {
 			c = node->data;
 			if (!c->computed_style.visible) {
 				continue;
@@ -264,7 +264,7 @@ static void _ui_widget_print_tree(ui_widget_t* w, int depth, const char *prefix)
 		} else {
 			strcat(str, "┬");
 		}
-		snode = Widget_GetSelectorNode(child);
+		snode = ui_widget_create_selector_node(child);
 		Logger_Error(
 		    "%s%s %s, xy:(%g,%g), size:(%g,%g), "
 		    "visible: %s, display: %d, padding: (%g,%g,%g,%g), margin: "
@@ -285,7 +285,7 @@ void ui_widget_print_tree(ui_widget_t* w)
 {
 	LCUI_SelectorNode node;
 	w = w ? w : ui_root();
-	node = Widget_GetSelectorNode(w);
+	node = ui_widget_create_selector_node(w);
 	Logger_Error("%s, xy:(%g,%g), size:(%g,%g), visible: %s\n",
 		     node->fullname, w->x, w->y, w->width, w->height,
 		     w->computed_style.visible ? "true" : "false");
@@ -297,6 +297,6 @@ void ui_widget_destroy_children(ui_widget_t* w)
 {
 	/* 先释放显示列表，后销毁部件列表，因为部件在这两个链表中的节点是和它共用
 	 * 一块内存空间的，销毁部件列表会把部件释放掉，所以把这个操作放在后面 */
-	LinkedList_ClearData(&w->children_show, NULL);
+	LinkedList_ClearData(&w->stacking_context, NULL);
 	LinkedList_ClearData(&w->children, ui_widget_destroy);
 }

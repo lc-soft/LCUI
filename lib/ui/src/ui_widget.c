@@ -1,6 +1,39 @@
+#include <string.h>
+#include <LCUI.h>
+#include "../include/ui.h"
+#include "private.h"
+
+static LinkedList ui_trash;
+
+size_t ui_trash_clear(void)
+{
+	size_t count;
+	LinkedListNode *node;
+
+	node = ui_trash.head.next;
+	count = ui_trash.length;
+	while (node) {
+		LinkedListNode *next = node->next;
+		LinkedList_Unlink(&ui_trash, node);
+		ui_widget_destroy(node->data);
+		node = next;
+	}
+	return count;
+}
+
+static void ui_trash_add(ui_widget_t *w)
+{
+	w->state = LCUI_WSTATE_DELETED;
+	if (ui_widget_unlink(w) != 0) {
+		return;
+	}
+	LinkedList_AppendNode(&ui_trash, &w->node);
+	ui_widget_post_surface_event(w, UI_EVENT_UNLINK, TRUE);
+}
+
 void ui_widget_init(ui_widget_t* w)
 {
-	ZEROSET(widget, ui_widget_t*);
+	memset(w, 0, sizeof(ui_widget_t));
 	w->state = LCUI_WSTATE_CREATED;
 	w->style = StyleSheet();
 	w->computed_style.opacity = 1.0;
@@ -11,7 +44,7 @@ void ui_widget_init(ui_widget_t* w)
 	w->computed_style.pointer_events = SV_INHERIT;
 	w->computed_style.box_sizing = SV_CONTENT_BOX;
 	LinkedList_Init(&w->children);
-	LinkedList_Init(&w->children_show);
+	LinkedList_Init(&w->stacking_context);
 	w->node.data = w;
 	w->node_show.data = w;
 	w->node.next = w->node.prev = NULL;
@@ -22,7 +55,7 @@ void ui_widget_init(ui_widget_t* w)
 void ui_widget_destroy(ui_widget_t* w)
 {
 	if (w->parent) {
-		Widget_AddTask(w->parent, UI_WIDGET_TASK_REFLOW);
+		ui_widget_add_task(w->parent, UI_TASK_REFLOW);
 		ui_widget_unlink(w);
 	}
 	ui_widget_destroy_background(w);
@@ -38,7 +71,7 @@ void ui_widget_destroy(ui_widget_t* w)
 	ui_widget_destroy_attributes(w);
 	ui_widget_destroy_classes(w);
 	ui_widget_destroy_status(w);
-	Widget_SetRules(w, NULL);
+	ui_widget_set_update_rules(w, NULL);
 	free(w);
 }
 
@@ -54,7 +87,19 @@ ui_widget_t* ui_create_widget(const char* type)
 		widget->type = strdup2(type);
 	}
 	widget->proto->init(widget);
-	Widget_AddTask(widget, UI_WIDGET_TASK_REFRESH_STYLE);
+	ui_widget_add_task(widget, UI_TASK_REFRESH_STYLE);
+	return widget;
+}
+
+ui_widget_t* ui_create_widget_with_prototype(const ui_widget_prototype_t* proto)
+{
+	ui_widget_t* widget = malloc(sizeof(ui_widget_t));
+
+	Widget_Init(widget);
+	widget->proto = proto;
+	widget->type = widget->proto->name;
+	widget->proto->init(widget);
+	ui_widget_add_task(widget, UI_TASK_REFRESH_STYLE);
 	return widget;
 }
 
@@ -84,9 +129,9 @@ void ui_widget_remove(ui_widget_t* w)
 			node = node->next;
 		}
 		if (w->computed_style.position != SV_ABSOLUTE) {
-			Widget_AddTask(w->parent, UI_WIDGET_TASK_REFLOW);
+			ui_widget_add_task(w->parent, UI_TASK_REFLOW);
 		}
-		Widget_InvalidateArea(w->parent, &w->box.canvas,
+		ui_widget_mark_dirty_rect(w->parent, &w->box.canvas,
 				      SV_CONTENT_BOX);
 		ui_trash_add(w);
 	}
@@ -102,7 +147,7 @@ void ui_widget_add_state(ui_widget_t* w, ui_widget_state_t state)
 			ui_event_t e = { 0 };
 			e.type = UI_EVENT_READY;
 			e.cancel_bubble = TRUE;
-			ui_widget_emit_event(w, &e, NULL);
+			ui_widget_emit_event(w, e, NULL);
 			w->state = LCUI_WSTATE_NORMAL;
 		}
 	}
@@ -124,7 +169,7 @@ void ui_widget_set_title(ui_widget_t* w, const wchar_t* title)
 	if (old_title) {
 		free(old_title);
 	}
-	Widget_AddTask(w, UI_WIDGET_TASK_TITLE);
+	ui_widget_add_task(w, UI_TASK_TITLE);
 }
 
 void ui_widget_set_text(ui_widget_t* w, const char *text)
@@ -151,14 +196,14 @@ void ui_widget_empty(ui_widget_t* w)
 	while (root->parent) {
 		root = root->parent;
 	}
-	if (root != LCUIWidget.root) {
+	if (root != ui_root()) {
 		ui_widget_destroy_children(w);
 		return;
 	}
 	ui_event_init(&ev, "unlink");
 	for (LinkedList_Each(node, &w->children)) {
 		child = node->data;
-		ui_widget_emit_event(child, &ev, NULL);
+		ui_widget_emit_event(child, ev, NULL);
 		if (child->parent == root) {
 			ui_widget_post_surface_event(child, UI_EVENT_UNLINK,
 						TRUE);
@@ -166,9 +211,9 @@ void ui_widget_empty(ui_widget_t* w)
 		child->state = LCUI_WSTATE_DELETED;
 		child->parent = NULL;
 	}
-	LinkedList_ClearData(&w->children_show, NULL);
-	LinkedList_Concat(&LCUIWidget.trash, &w->children);
-	Widget_InvalidateArea(w, NULL, SV_GRAPH_BOX);
+	LinkedList_ClearData(&w->stacking_context, NULL);
+	LinkedList_Concat(&ui_trash, &w->children);
+	ui_widget_mark_dirty_rect(w, NULL, SV_GRAPH_BOX);
 	ui_widget_update_style(w, TRUE);
 }
 

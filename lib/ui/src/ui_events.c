@@ -552,7 +552,7 @@ static ui_widget_t* ui_widget_get_event_target(ui_widget_t* widget, float x,
 	ui_widget_t* target = NULL;
 	LinkedListNode* node;
 
-	for (LinkedList_Each(node, &widget->children_show)) {
+	for (LinkedList_Each(node, &widget->stacking_context)) {
 		child = node->data;
 		if (!child->computed_style.visible ||
 		    child->state != LCUI_WSTATE_NORMAL ||

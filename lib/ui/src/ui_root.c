@@ -10,7 +10,7 @@ ui_widget_t *ui_root(void)
 
 int ui_root_append(ui_widget_t *w)
 {
-	return ui_widget_append(ui_root_widget, w)l
+	return ui_widget_append(ui_root_widget, w);
 }
 
 void ui_root_init(void)
