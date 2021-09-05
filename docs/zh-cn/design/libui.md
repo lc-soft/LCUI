@@ -14,12 +14,15 @@
 - 背景图的异步加载功能可以改为独立的图片加载模块，基于异步任务接口实现
 - 移除 LCUI_StyleValue
 - 样式和样式属性值的操作函数命名不严谨，有待重命名
+- 合并性能记录代码
 
 改动：
 
 - `LCUI_PaintContext` -> `ui_painter_t`
 - `InvalidArea` -> `InvalidRect`
 - 将一些简单函数改为内联函数并移动到头文件中
+- 为每个组件任务定义内联函数以简化调用代码，例如：`ui_widget_add_task(w, UI_TASK_REFRESH_STYLE)` 可以简化成 `ui_widget_refresh_style(w)`
+- 所有组件任务的执行函数命名由 `ui_widget_exec_*` 改为 `ui_widget_force_*`
 
 ## 接口设计
 
@@ -33,7 +36,7 @@ typedef struct ui_widget_t ui_widget_t;
 void ui_init(void);
 void ui_free(void);
 
-void ui_update(rect_t **dirty_rects);
+void ui_widget_update_with_profile(rect_t **dirty_rects);
 
 // Events
 
@@ -94,15 +97,15 @@ size_t ui_widget_each(ui_widget w, void (*callback)(ui_widget*, void *));
 
 void ui_refresh_style(void);
 
-size_t ui_widget_update(ui_widget_t *w);
+size_t ui_widget_update_with_profile(ui_widget_t *w);
 
-size_t ui_widget_add_task(ui_widget_t *w, ui_widget_task_t task);
+size_t ui_widget_add_task(ui_widget_t *w, ui_widget_update_t task);
 
-size_t ui_widget_add_task_to_children(ui_widget_t *w, ui_widget_task_t task);
+size_t ui_widget_add_task_to_children(ui_widget_t *w, ui_widget_update_t task);
 
 size_t ui_widget_update_task_status(ui_widget_t *w);
 
-size_t ui_update(void);
+size_t ui_widget_update_with_profile(void);
 
 // Widget style
 
