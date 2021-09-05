@@ -2,7 +2,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/display.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/builder.h>
 
 static void test_flex_layout_with_content_width(float width)

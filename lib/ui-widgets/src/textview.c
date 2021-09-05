@@ -33,7 +33,7 @@
 #include <string.h>
 #include <errno.h>
 #include <LCUI.h>
-#include "../../ui/include/ui.h"
+#include <LCUI/ui.h>
 #include <LCUI/font.h>
 #include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/css_fontstyle.h>
@@ -61,7 +61,7 @@ typedef struct LCUI_TextViewRec_ {
 static struct LCUI_TextViewModule {
 	int key_word_break;
 	LinkedList list;
-	ui_widget_prototype_t prototype;
+	ui_widget_prototype_t *prototype;
 } self;
 
 static LCUI_BOOL ParseBoolean(const char *str)
@@ -219,8 +219,8 @@ static void TextView_OnAutoSize(ui_widget_t* w, float *width, float *height,
 	if (w->parent &&
 	    w->parent->computed_style.width_sizing == UI_SIZING_RULE_FIXED) {
 		txt->available_width = w->parent->box.content.width;
-		max_width = (int)(scale * txt->available_width - Widget_PaddingX(w) -
-				  Widget_BorderX(w));
+		max_width = (int)(scale * txt->available_width - Widget_padding_x(w) -
+				  Widget_border_x(w));
 	} else {
 		txt->available_width = 0;
 		max_width = 0;

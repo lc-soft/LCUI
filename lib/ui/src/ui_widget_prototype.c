@@ -154,7 +154,7 @@ void *ui_widget_get_data(ui_widget_t* widget, ui_widget_prototype_t proto)
 	return NULL;
 }
 
-void *ui_widget_add_data(ui_widget_t* widget, ui_widget_prototype_t proto,
+void *ui_widget_add_data(ui_widget_t* widget, ui_widget_prototype_t *proto,
 		     size_t data_size)
 {
 	void *data;

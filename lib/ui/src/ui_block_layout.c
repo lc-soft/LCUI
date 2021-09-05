@@ -1,4 +1,4 @@
-
+﻿
 #include <LCUI.h>
 #include "../include/ui.h"
 #include "private.h"
@@ -62,9 +62,9 @@ static void ui_block_layout_update_free_element_position(
 	ui_widget_update_box_position(w);
 }
 
-static ui_block_layout_row_t *ui_block_layout_row_create(void)
+static ui_block_layout_row_t* ui_block_layout_row_create(void)
 {
-	ui_block_layout_row_t *row;
+	ui_block_layout_row_t* row;
 
 	row = malloc(sizeof(ui_block_layout_row_t));
 	row->width = 0;
@@ -75,7 +75,7 @@ static ui_block_layout_row_t *ui_block_layout_row_create(void)
 
 static void ui_block_layout_row_destroy(void* arg)
 {
-	ui_block_layout_row_t *row = arg;
+	ui_block_layout_row_t* row = arg;
 
 	LinkedList_Clear(&row->elements, NULL);
 	free(row);
@@ -97,9 +97,13 @@ static void ui_block_layout_next_row(ui_block_layout_context_t* ctx)
 static ui_block_layout_context_t* ui_block_layout_begin(ui_widget_t* w,
 							ui_layout_rule_t rule)
 {
-	ui_widget_style_t* style = &w->computed_style;
-	ASSIGN(ctx, ui_block_layout_context_t*);
+	ui_widget_style_t *style = &w->computed_style;
+	ui_block_layout_context_t *ctx;
 
+	ctx = malloc(sizeof(ui_block_layout_context_t));
+	if (!ctx) {
+		return NULL;
+	}
 	if (rule == UI_LAYOUT_RULE_AUTO) {
 		ctx->is_initiative = TRUE;
 		if (style->width_sizing == UI_SIZING_RULE_FIXED) {
@@ -173,7 +177,7 @@ static void ui_block_layout_update_item_size(ui_widget_t* w,
 	}
 	ui_widget_reflow(w, rule);
 	ui_widget_end_layout_diff(w, &diff);
-	w->task.states[UI_TASK_REFLOW] = FALSE;
+	w->update.states[UI_TASK_REFLOW] = FALSE;
 }
 
 static void ui_block_layout_load(ui_block_layout_context_t* ctx)
@@ -190,7 +194,7 @@ static void ui_block_layout_load(ui_block_layout_context_t* ctx)
 	} else {
 		if (w->computed_style.max_width != -1) {
 			max_row_width = w->computed_style.max_width -
-					Widget_PaddingX(w) - Widget_BorderX(w);
+					Widget_padding_x(w) - Widget_border_x(w);
 		}
 	}
 	DEBUG_MSG("%s, start\n", ctx->widget->id);
@@ -358,8 +362,8 @@ static void ui_block_layout_apply_size(ui_block_layout_context_t* ctx)
 		height = w->box.content.height;
 		break;
 	}
-	w->width = ToBorderBoxWidth(w, width);
-	w->height = ToBorderBoxHeight(w, height);
+	w->width = to_border_box_width(w, width);
+	w->height = to_border_box_height(w, height);
 	ui_widget_update_box_size(w);
 	if (ctx->is_initiative) {
 		w->max_content_width = w->box.content.width;

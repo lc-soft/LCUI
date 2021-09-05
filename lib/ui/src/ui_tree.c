@@ -1,4 +1,4 @@
-
+﻿#include <LCUI.h>
 #include "../include/ui.h"
 #include "private.h"
 
@@ -20,9 +20,9 @@ int ui_widget_append(ui_widget_t* parent, ui_widget_t* widget)
 	LinkedList_AppendNode(&parent->children, &widget->node);
 	ev.cancel_bubble = TRUE;
 	ev.type = UI_EVENT_LINK;
-	ui_widget_update_style(widget, TRUE);
+	ui_widget_refresh_style(widget);
 	ui_widget_update_children_style(widget, TRUE);
-	ui_widget_emit_event(widget, &ev, NULL);
+	ui_widget_emit_event(widget, ev, NULL);
 	ui_widget_post_surface_event(widget, UI_EVENT_LINK, TRUE);
 	ui_widget_update_status(widget);
 	ui_widget_add_task(parent, UI_TASK_REFLOW);
@@ -58,7 +58,7 @@ int ui_widget_prepend(ui_widget_t* parent, ui_widget_t* widget)
 	}
 	ev.cancel_bubble = TRUE;
 	ev.type = UI_EVENT_LINK;
-	ui_widget_emit_event(widget, &ev, NULL);
+	ui_widget_emit_event(widget, ev, NULL);
 	ui_widget_post_surface_event(widget, UI_EVENT_LINK, TRUE);
 	ui_widget_add_task_for_children(widget, UI_TASK_REFRESH_STYLE);
 	ui_widget_update_status(widget);
@@ -95,12 +95,12 @@ int ui_widget_unwrap(ui_widget_t* widget)
 		prev = node->prev;
 		child = node->data;
 		ev.type = UI_EVENT_UNLINK;
-		ui_widget_emit_event(child, &ev, NULL);
+		ui_widget_emit_event(child, ev, NULL);
 		LinkedList_Unlink(&widget->children, node);
 		LinkedList_Link(children, target, node);
 		child->parent = widget->parent;
 		ev.type = UI_EVENT_LINK;
-		ui_widget_emit_event(child, &ev, NULL);
+		ui_widget_emit_event(child, ev, NULL);
 		ui_widget_add_task_for_children(child, UI_TASK_REFRESH_STYLE);
 		node = prev;
 		--len;
@@ -151,7 +151,7 @@ int ui_widget_unlink(ui_widget_t* w)
 	node = &w->node;
 	ev.cancel_bubble = TRUE;
 	ev.type = UI_EVENT_UNLINK;
-	ui_widget_emit_event(w, &ev, NULL);
+	ui_widget_emit_event(w, ev, NULL);
 	LinkedList_Unlink(&w->parent->children, node);
 	LinkedList_Unlink(&w->parent->stacking_context, &w->node_show);
 	ui_widget_post_surface_event(w, UI_EVENT_UNLINK, TRUE);
@@ -213,7 +213,7 @@ ui_widget_t* ui_widget_at(ui_widget_t* widget, int ix, int iy)
 	float x, y;
 	LCUI_BOOL is_hit;
 	LinkedListNode *node;
-	ui_widget_t* target = widget, c = NULL;
+	ui_widget_t* target = widget, *c = NULL;
 
 	if (!widget) {
 		return NULL;
@@ -291,12 +291,4 @@ void ui_widget_print_tree(ui_widget_t* w)
 		     w->computed_style.visible ? "true" : "false");
 	SelectorNode_Delete(node);
 	_ui_widget_print_tree(w, 0, "  ");
-}
-
-void ui_widget_destroy_children(ui_widget_t* w)
-{
-	/* 先释放显示列表，后销毁部件列表，因为部件在这两个链表中的节点是和它共用
-	 * 一块内存空间的，销毁部件列表会把部件释放掉，所以把这个操作放在后面 */
-	LinkedList_ClearData(&w->stacking_context, NULL);
-	LinkedList_ClearData(&w->children, ui_widget_destroy);
 }

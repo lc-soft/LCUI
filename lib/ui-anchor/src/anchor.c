@@ -32,9 +32,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/widget/anchor.h>
 #include <LCUI/gui/builder.h>
 
@@ -48,7 +47,7 @@ typedef struct LCUI_XMLLoaderRec_ {
 
 static struct LCUI_Anchor {
 	int event_id;
-	ui_widget_prototype_t proto;
+	ui_widget_prototype_t *proto;
 } self;
 
 static void Loader_OnClearWidget(ui_widget_t* w, ui_event_t* e, void *arg)
@@ -96,7 +95,7 @@ static LCUI_XMLLoader XMLLoader_New(ui_widget_t* w)
 
 static void XMLLoader_AppendToTarget(LCUI_XMLLoader loader)
 {
-	ui_widget_t* target, root;
+	ui_widget_t* target, *root;
 	ui_event_t ev = { 0 };
 
 	target = ui_get_widget(loader->target_id);
@@ -110,7 +109,7 @@ static void XMLLoader_AppendToTarget(LCUI_XMLLoader loader)
 	ev.type = self.event_id;
 	ev.cancel_bubble = TRUE;
 	ev.target = loader->widget;
-	ui_widget_emit_event(root, &ev, loader->key);
+	ui_widget_emit_event(root, ev, loader->key);
 	XMLLoader_Destroy(loader);
 }
 

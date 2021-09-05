@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <LCUI.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/builder.h>

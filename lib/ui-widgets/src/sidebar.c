@@ -29,9 +29,8 @@
  */
 
 #include <stdlib.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/widget/sidebar.h>
 #include <LCUI/gui/css_parser.h>
@@ -49,9 +48,9 @@ typedef struct SideBarRec_ {
 } SideBarRec, *SideBar;
 
 static struct SideBarModule {
-	ui_widget_prototype_t sidebar;
-	ui_widget_prototype_t item;
-	ui_widget_prototype_t toggle;
+	ui_widget_prototype_t *sidebar;
+	ui_widget_prototype_t *item;
+	ui_widget_prototype_t *toggle;
 } self;
 
 static const char sidebar_css[] = CodeToString(

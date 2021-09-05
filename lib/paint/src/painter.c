@@ -31,7 +31,6 @@
 #include <LCUI_Build.h>
 #include <LCUI/types.h>
 #include <LCUI/graph.h>
-#include <LCUI/gui/metrics.h>
 #include <LCUI/painter.h>
 
 LCUI_PaintContext LCUIPainter_Begin(LCUI_Graph *canvas, LCUI_Rect *rect)

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <LCUI.h>
 #include <LCUI/input.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI/ui.h>
 #include "test.h"
 
 void test_widget_mouse_event(void)

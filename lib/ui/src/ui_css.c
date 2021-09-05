@@ -1,4 +1,7 @@
+﻿#include <stdio.h>
 #include <LCUI.h>
+#include <LCUI/font.h>
+#include <LCUI/gui/css_fontstyle.h>
 #include "../include/ui.h"
 #include "private.h"
 
@@ -40,7 +43,7 @@ static void ui_on_parsed_font_face(LCUI_CSSFontFace face)
 	ui_event_t e;
 	ui_event_init(&e, "font_face_load");
 	LCUIFont_LoadFile(face->src);
-	ui_post_event(e, face, NULL);
+	ui_post_event(&e, face, NULL);
 }
 
 int ui_load_css_file(const char *filepath)

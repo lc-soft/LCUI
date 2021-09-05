@@ -1,7 +1,7 @@
 ﻿#include "test.h"
 #include <LCUI.h>
 #include <LCUI/display.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/builder.h>
 #include <LCUI/gui/widget/textview.h>
 

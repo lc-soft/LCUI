@@ -1,6 +1,6 @@
 #include <LCUI.h>
 #include <LCUI/timer.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/css_parser.h>
 #include "test.h"

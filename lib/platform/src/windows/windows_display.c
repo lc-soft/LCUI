@@ -35,6 +35,7 @@
 #pragma comment(lib, "User32")
 #pragma comment(lib, "Gdi32")
 #include <LCUI/LCUI.h>
+#include <LCUI/graph.h>
 #include <LCUI/display.h>
 #include <LCUI/painter.h>
 #include <LCUI/platform.h>

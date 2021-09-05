@@ -33,8 +33,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI.h>
 #include <LCUI/thread.h>
 #include <LCUI/worker.h>
 #include <LCUI/timer.h>
@@ -60,6 +59,27 @@
 
 #define STATE_ACTIVE 1
 #define STATE_KILLED 0
+
+typedef struct LCUI_FrameProfileRec_ {
+	size_t timers_count;
+	clock_t timers_time;
+
+	size_t events_count;
+	clock_t events_time;
+
+	size_t render_count;
+	clock_t render_time;
+	clock_t present_time;
+
+	ui_profile_t ui_profile;
+} LCUI_FrameProfileRec, *LCUI_FrameProfile;
+
+typedef struct LCUI_ProfileRec_ {
+	clock_t start_time;
+	clock_t end_time;
+	unsigned frames_count;
+	LCUI_FrameProfileRec frames[LCUI_MAX_FRAMES_PER_SEC];
+} LCUI_ProfileRec, *LCUI_Profile;
 
 typedef struct LCUI_MainLoopRec_ {
 	int state;       /**< 主循环的状态 */
@@ -137,20 +157,20 @@ static void LCUIProfile_Print(LCUI_Profile profile)
 			     frame->timers_count, frame->timers_time);
 		Logger_Debug("events.count: %zu\nevents.time: %ldms\n",
 			     frame->events_count, frame->events_time);
-		Logger_Debug("widget_tasks.time: %ldms\n"
-			     "widget_tasks.update_count: %u\n"
-			     "widget_tasks.refresh_count: %u\n"
-			     "widget_tasks.layout_count: %u\n"
-			     "widget_tasks.user_task_count: %u\n"
-			     "widget_tasks.destroy_count: %u\n"
-			     "widget_tasks.destroy_time: %ldms\n",
-			     frame->widget_tasks.time,
-			     frame->widget_tasks.update_count,
-			     frame->widget_tasks.refresh_count,
-			     frame->widget_tasks.layout_count,
-			     frame->widget_tasks.user_task_count,
-			     frame->widget_tasks.destroy_count,
-			     frame->widget_tasks.destroy_time);
+		Logger_Debug("ui_profile.time: %ldms\n"
+			     "ui_profile.update_count: %u\n"
+			     "ui_profile.refresh_count: %u\n"
+			     "ui_profile.layout_count: %u\n"
+			     "ui_profile.user_task_count: %u\n"
+			     "ui_profile.destroy_count: %u\n"
+			     "ui_profile.destroy_time: %ldms\n",
+			     frame->ui_profile.time,
+			     frame->ui_profile.update_count,
+			     frame->ui_profile.refresh_count,
+			     frame->ui_profile.layout_count,
+			     frame->ui_profile.user_task_count,
+			     frame->ui_profile.destroy_count,
+			     frame->ui_profile.destroy_time);
 		Logger_Debug("render: %zu, %ldms, %ldms\n", frame->render_count,
 			     frame->render_time, frame->present_time);
 	}
@@ -188,6 +208,44 @@ static void OnSettingsChangeEvent(LCUI_SysEvent e, void *arg)
 	StepTimer_SetFrameLimit(MainApp.timer, MainApp.settings.frame_rate_cap);
 }
 
+/* TODO: refactor event loop
+
+static void lcui_convert_ui_event()
+{
+	LCUICursor_GetPos(&pos);
+	scale = ui_get_scale();
+	pos.x = iround(pos.x / scale);
+	pos.y = iround(pos.y / scale);
+	// keyboard
+	switch (e->type) {
+	case LCUI_KEYDOWN:
+		e.type = UI_EVENT_KEYDOWN;
+		break;
+	case LCUI_KEYUP:
+		e.type = UI_EVENT_KEYUP;
+		break;
+	case LCUI_KEYPRESS:
+		e.type = UI_EVENT_KEYPRESS;
+		break;
+	default:
+		return;
+	}
+	// textinput
+	e.type = UI_EVENT_TEXTINPUT;
+	e.text.length = e->text.length;
+	e.text.text = NEW(wchar_t, e->text.length + 1);
+	if (!e.text.text) {
+		return;
+	}
+	wcsncpy(e.text.text, e->text.text, e->text.length + 1);
+	ui_widget_emit_event(e.target, &e, NULL);
+	free(e.text.text);
+	e.text.text = NULL;
+	e.text.length = 0;
+	ui_event_destroy(&e);
+}
+*/
+
 void LCUI_RunFrameWithProfile(LCUI_FrameProfile profile)
 {
 	profile->timers_time = clock();
@@ -199,7 +257,7 @@ void LCUI_RunFrameWithProfile(LCUI_FrameProfile profile)
 	profile->events_time = clock() - profile->events_time;
 
 	LCUICursor_Update();
-	ui_update_with_profile(&profile->widget_tasks);
+	ui_update_with_profile(&profile->ui_profile);
 
 	profile->render_time = clock();
 	LCUIDisplay_Update();
@@ -635,46 +693,6 @@ static void Win32Logger_LogW(const wchar_t *wcs)
 	OutputDebugStringW(wcs);
 }
 
-static void lcui_convert_ui_event()
-{
-	LCUICursor_GetPos(&pos);
-	scale = ui_get_scale();
-	pos.x = iround(pos.x / scale);
-	pos.y = iround(pos.y / scale);
-	// keyboard
-	switch (e->type) {
-	case LCUI_KEYDOWN:
-		e.type = UI_EVENT_KEYDOWN;
-		break;
-	case LCUI_KEYUP:
-		e.type = UI_EVENT_KEYUP;
-		break;
-	case LCUI_KEYPRESS:
-		e.type = UI_EVENT_KEYPRESS;
-		break;
-	default:
-		return;
-	}
-	// textinput
-	e.type = UI_EVENT_TEXTINPUT;
-	e.text.length = e->text.length;
-	e.text.text = NEW(wchar_t, e->text.length + 1);
-	if (!e.text.text) {
-		return;
-	}
-	wcsncpy(e.text.text, e->text.text, e->text.length + 1);
-	ui_widget_emit_event(e.target, &e, NULL);
-	free(e.text.text);
-	e.text.text = NULL;
-	e.text.length = 0;
-	ui_event_destroy(&e);
-}
-
-static void lcui_init_ui()
-{
-
-}
-
 #endif
 
 void LCUI_InitBase(void)
@@ -694,8 +712,7 @@ void LCUI_InitBase(void)
 	LCUI_InitFontLibrary();
 	LCUI_InitTimer();
 	LCUI_InitCursor();
-	LCUI_InitWidget();
-	ui_init_metrics();
+	ui_init();
 }
 
 void LCUI_Init(void)
@@ -736,7 +753,7 @@ int LCUI_Destroy(void)
 	LCUI_FreeApp();
 	LCUI_FreeIME();
 	LCUI_FreeKeyboard();
-	LCUI_FreeWidget();
+	ui_destroy();
 	LCUI_FreeCursor();
 	LCUI_FreeFontLibrary();
 	LCUI_FreeTimer();

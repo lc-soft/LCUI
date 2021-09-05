@@ -3,7 +3,7 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/timer.h>
 #include <LCUI/display.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/builder.h>
 
 enum { TYPE_DENSITY, TYPE_SCALED_DENSITY, TYPE_SCALE };

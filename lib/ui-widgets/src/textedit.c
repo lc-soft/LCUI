@@ -31,12 +31,12 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI.h>
+#include <LCUI/graph.h>
 #include <LCUI/font.h>
 #include <LCUI/input.h>
-#include <LCUI/gui/widget.h>
-#include <LCUI/gui/metrics.h>
+#include <LCUI/thread.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/css_fontstyle.h>
 #include <LCUI/gui/widget/textedit.h>
@@ -99,7 +99,7 @@ typedef struct LCUI_TextBlockRec_ {
 } LCUI_TextBlockRec, *LCUI_TextBlock;
 
 static struct LCUI_TextEditModule {
-	ui_widget_prototype_t prototype;
+	ui_widget_prototype_t *prototype;
 } self;
 
 static const char *textedit_css = CodeToString(
@@ -387,7 +387,7 @@ static void TextEdit_OnTask(ui_widget_t* widget, int task)
 		}
 		TextBlocks_Clear(&blocks);
 		ui_event_init(&ev, "change");
-		ui_widget_emit_event(widget, &ev, NULL);
+		ui_widget_emit_event(widget, ev, NULL);
 		edit->tasks[TASK_SET_TEXT] = FALSE;
 		edit->tasks[TASK_UPDATE] = TRUE;
 	}
@@ -692,7 +692,7 @@ static void TextEdit_TextBackspace(ui_widget_t* widget, int n_ch)
 	ui_widget_add_task(widget, UI_TASK_USER);
 	LCUIMutex_Unlock(&edit->mutex);
 	ui_event_init(&ev, "change");
-	ui_widget_emit_event(widget, &ev, NULL);
+	ui_widget_emit_event(widget, ev, NULL);
 }
 
 static void TextEdit_TextDelete(ui_widget_t* widget, int n_ch)
@@ -711,7 +711,7 @@ static void TextEdit_TextDelete(ui_widget_t* widget, int n_ch)
 	ui_widget_add_task(widget, UI_TASK_USER);
 	LCUIMutex_Unlock(&edit->mutex);
 	ui_event_init(&ev, "change");
-	ui_widget_emit_event(widget, &ev, NULL);
+	ui_widget_emit_event(widget, ev, NULL);
 }
 
 /** 处理按键事件 */

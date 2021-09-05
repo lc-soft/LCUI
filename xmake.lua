@@ -1,7 +1,7 @@
 set_project("lcui")
 set_version("2.2.1")
 add_rules("mode.debug", "mode.release", "c++.openmp", "mode.coverage")
-add_includedirs("include")
+add_includedirs("include", "lib/ui/include")
 add_rpathdirs("@loader_path/lib", "@loader_path")
 add_defines("LCUI_EXPORTS", "_UNICODE")
 includes("lib/**/xmake.lua")
@@ -41,6 +41,12 @@ target("lcui")
         "lcui-timer",
         "lcui-worker"
     )
+    before_build(function (target)
+        if os.isdir("$(projectdir)/include/LCUI") then
+            os.mkdir("$(projectdir)/include/LCUI")
+        end
+        os.cp("$(projectdir)/lib/*/include/*.h", "$(projectdir)/include/lcui")
+    end)
 
 target("run-tests")
     set_kind("binary")

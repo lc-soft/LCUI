@@ -25,11 +25,6 @@ float ui_compute(float value, LCUI_StyleType type)
 	return value;
 }
 
-float ui_get_scale(void)
-{
-	return ui_metrics.scale;
-}
-
 static float ui_compute_density_by_level(ui_density_Level_t level)
 {
 	float density = ui_metrics.dpi / 96.0f;

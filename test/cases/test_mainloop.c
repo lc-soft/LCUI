@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <LCUI.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/widget/button.h>
 #include <LCUI/timer.h>
 #include <LCUI/input.h>

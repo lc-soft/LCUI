@@ -1,6 +1,6 @@
 ﻿#include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/builder.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/widget/textedit.h>

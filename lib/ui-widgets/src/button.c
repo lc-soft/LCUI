@@ -30,15 +30,14 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI.h>
+#include <LCUI/ui.h>
 #include <LCUI/font.h>
-#include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/widget/button.h>
 #include <LCUI/gui/css_parser.h>
 
-static ui_widget_prototype_t prototype = NULL;
+static ui_widget_prototype_t *prototype = NULL;
 
 /** 按钮的 css 样式 */
 static const char *button_css = CodeToString(

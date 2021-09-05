@@ -36,8 +36,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI.h>
+#include <LCUI/graph.h>
 #include <LCUI/input.h>
 #include <LCUI/timer.h>
 #include <LCUI/cursor.h>
@@ -815,8 +815,7 @@ void Surface_Present(LCUI_Surface surface)
 /** 响应顶级部件的各种事件 */
 static void OnSurfaceEvent(ui_widget_t* w, ui_event_t* e, void *arg)
 {
-	ui_widget_t* root;
-	LCUI_RectF *rect;
+	ui_widget_t *root;
 	LCUI_Surface surface;
 	int *data, event_type, sync_props;
 
@@ -836,7 +835,6 @@ static void OnSurfaceEvent(ui_widget_t* w, ui_event_t* e, void *arg)
 	} else {
 		return;
 	}
-	rect = &e->target->box.canvas;
 	switch (event_type) {
 	case UI_EVENT_LINK:
 		LCUIDisplay_BindSurface(e->target);
@@ -853,7 +851,7 @@ static void OnSurfaceEvent(ui_widget_t* w, ui_event_t* e, void *arg)
 		break;
 	case UI_EVENT_RESIZE: {
 		LCUI_Rect area;
-		ui_compute_rect_actual(rect, &area);
+		ui_compute_rect_actual(&area, &e->target->box.canvas);
 		if (sync_props) {
 			Surface_Resize(surface, area.width, area.height);
 		}
@@ -896,7 +894,7 @@ static void OnResize(LCUI_Event e, void *arg)
 	widget = LCUIDisplay_GetBindWidget(dpy_ev->surface);
 	if (widget) {
 		ui_widget_resize(widget, width, height);
-		widget->task.skip_surface_props_sync = TRUE;
+		widget->update.skip_surface_props_sync = TRUE;
 	}
 	LCUI_RunFrame();
 }
@@ -929,7 +927,7 @@ static void OnMinMaxInfo(LCUI_Event e, void *arg)
 	}
 	if (resizable) {
 		LCUI_Rect area;
-		ui_compute_rect_actual(&widget->box.canvas, &area);
+		ui_compute_rect_actual(&area, &widget->box.canvas);
 		Surface_Resize(s, area.width, area.height);
 	}
 }

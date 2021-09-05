@@ -29,10 +29,9 @@
  */
 
 #include <stdlib.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
-#include <LCUI/gui/widget.h>
-#include <LCUI/gui/metrics.h>
+#include <LCUI.h>
+#include <LCUI/graph.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/widget/canvas.h>
 
 typedef struct CanvasRec_ {
@@ -41,7 +40,7 @@ typedef struct CanvasRec_ {
 } CanvasRec, *Canvas;
 
 static struct {
-	ui_widget_prototype_t proto;
+	ui_widget_prototype_t *proto;
 } self;
 
 static void Canvas_OnResize(ui_widget_t* w, float width, float height)

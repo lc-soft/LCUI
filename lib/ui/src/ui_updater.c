@@ -9,14 +9,15 @@ typedef struct ui_updater_rules_data_t {
 	size_t progress;
 } ui_updater_rules_data_t;
 
-typedef struct ui_updater_profile_t {
+typedef struct ui_updater_profile_t ui_updater_profile_t;
+struct ui_updater_profile_t {
 	unsigned style_hash;
 	Dict* style_cache;
 	ui_widget_style_diff_t style_diff;
 	ui_widget_layout_diff_t layout_diff;
 	ui_updater_profile_t* parent;
 	ui_profile_t* profile;
-} ui_updater_profile_t;
+};
 
 static struct ui_updater_t {
 	DictType style_cache_dict;
@@ -77,7 +78,7 @@ static void ui_widget_on_set_title(ui_widget_t* w)
 	ui_widget_post_surface_event(w, UI_EVENT_TITLE, TRUE);
 }
 
-void ui_widget_add_task_for_children(ui_widget_t* widget, int task)
+void ui_widget_add_task_for_children(ui_widget_t* widget, ui_task_type_t task)
 {
 	ui_widget_t* child;
 	LinkedListNode* node;

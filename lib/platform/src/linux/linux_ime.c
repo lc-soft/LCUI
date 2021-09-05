@@ -38,7 +38,7 @@
 #include <stdlib.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/input.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI/ui.h>
 #include <LCUI/ime.h>
 #include <LCUI/platform.h>
 #include LCUI_EVENTS_H

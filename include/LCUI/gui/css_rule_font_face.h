@@ -1,7 +1,7 @@
-﻿/*
- * widget.h -- GUI widget APIs.
+/*
+ * css_rule_font_face.h -- CSS @font-face rule parser module
  *
- * Copyright (c) 2018-2020, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,29 +28,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_WIDGET_BUILD_H
-#define LCUI_WIDGET_BUILD_H
+#ifndef LCUI_CSS_RULE_FONT_FACE_PARSER_H
+#define LCUI_CSS_RULE_FONT_FACE_PARSER_H
 
-#include <LCUI/graph.h>
-#include <LCUI/thread.h>
-#include <LCUI/gui/widget_base.h>
-#include <LCUI/gui/widget_attribute.h>
-#include <LCUI/gui/widget_id.h>
-#include <LCUI/gui/widget_hash.h>
-#include <LCUI/gui/widget_class.h>
-#include <LCUI/gui/widget_status.h>
-#include <LCUI/gui/widget_helper.h>
-#include <LCUI/gui/widget_tree.h>
-#include <LCUI/gui/widget_layout.h>
-#include <LCUI/gui/widget_task.h>
-#include <LCUI/gui/widget_paint.h>
-#include <LCUI/gui/widget_prototype.h>
-#include <LCUI/gui/widget_event.h>
-#include <LCUI/gui/widget_style.h>
-#include <LCUI/gui/widget_util.h>
+typedef struct LCUI_CSSFontFaceRec_ {
+	char *font_family;
+	LCUI_FontStyle font_style;
+	LCUI_FontWeight font_weight;
+	char *src;
+} LCUI_CSSFontFaceRec, *LCUI_CSSFontFace;
 
-LCUI_API void LCUI_InitWidget(void);
+LCUI_API void CSSParser_OnFontFaceRule(LCUI_CSSParserContext ctx,
+				       void(*func)(const LCUI_CSSFontFace));
 
-LCUI_API void LCUI_FreeWidget(void);
+LCUI_API int CSSParser_InitFontFaceRuleParser(LCUI_CSSParserContext ctx);
+
+LCUI_API void CSSParser_FreeFontFaceRuleParser(LCUI_CSSParserContext ctx);
 
 #endif

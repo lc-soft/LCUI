@@ -374,27 +374,92 @@ typedef struct LCUI_PaintContextRec_ {
 } LCUI_PaintContextRec, *LCUI_PaintContext;
 
 typedef void (*FuncPtr)(void *);
+typedef void(*LCUI_TaskFunc)(void*, void*);
 
-typedef struct LCUI_FrameProfileRec_ {
-	size_t timers_count;
-	clock_t timers_time;
+enum LCUI_SysEventType {
+	LCUI_NONE,
+	LCUI_KEYDOWN, /**< 键盘触发的按键按下事件 */
+	LCUI_KEYPRESS, /**< 按键输入事件，仅字母、数字等ANSI字符键可触发 */
+	LCUI_KEYUP,      /**< 键盘触发的按键释放事件 */
+	LCUI_MOUSE,      /**< 鼠标事件 */
+	LCUI_MOUSEMOVE,  /**< 鼠标触发的鼠标移动事件 */
+	LCUI_MOUSEDOWN,  /**< 鼠标触发的按钮按下事件 */
+	LCUI_MOUSEUP,    /**< 鼠标触发的按钮释放事件 */
+	LCUI_MOUSEWHEEL, /**< 鼠标触发的滚轮滚动事件 */
+	LCUI_TEXTINPUT,  /**< 输入法触发的文本输入事件 */
+	LCUI_TOUCH,
+	LCUI_TOUCHMOVE,
+	LCUI_TOUCHDOWN,
+	LCUI_TOUCHUP,
+	LCUI_PAINT,
+	LCUI_WIDGET,
+	LCUI_QUIT, /**< 在 LCUI 退出前触发的事件 */
+	LCUI_SETTINGS_CHANGE,
+	LCUI_USER = 100 /**< 用户事件，可以把这个当成系统事件与用户事件的分界 */
+};
 
-	size_t events_count;
-	clock_t events_time;
+typedef struct LCUI_TouchPointRec_ {
+	int x;
+	int y;
+	int id;
+	int state;
+	LCUI_BOOL is_primary;
+} LCUI_TouchPointRec, *LCUI_TouchPoint;
 
-	size_t render_count;
-	clock_t render_time;
-	clock_t present_time;
+typedef struct LCUI_PaintEvent_ {
+	LCUI_Rect rect;
+} LCUI_PaintEvent;
 
-	ui_profile_t ui_profile;
-} LCUI_FrameProfileRec, *LCUI_FrameProfile;
+/** The event structure to describe a user interaction with the keyboard */
+typedef struct LCUI_KeyboardEvent_ {
+	/** The virtual-key code of the nonsystem key */
+	int code;
 
-typedef struct LCUI_ProfileRec_ {
-	clock_t start_time;
-	clock_t end_time;
-	unsigned frames_count;
-	LCUI_FrameProfileRec frames[LCUI_MAX_FRAMES_PER_SEC];
-} LCUI_ProfileRec, *LCUI_Profile;
+	/** whether the Ctrl key was active when the key event was generated */
+	LCUI_BOOL ctrl_key;
+
+	/** whether the Shift key was active when the key event was generated */
+	LCUI_BOOL shift_key;
+} LCUI_KeyboardEvent;
+
+typedef struct LCUI_MouseMotionEvent_ {
+	int x, y;
+	int xrel, yrel;
+} LCUI_MouseMotionEvent;
+
+typedef struct LCUI_MouseButtonEvent_ {
+	int x, y;
+	int button;
+} LCUI_MouseButtonEvent;
+
+typedef struct LCUI_MouseWheelEvent_ {
+	int x, y;
+	int delta;
+} LCUI_MouseWheelEvent;
+
+typedef struct LCUI_TouchEvent_ {
+	int n_points;
+	LCUI_TouchPoint points;
+} LCUI_TouchEvent;
+
+typedef struct LCUI_TextInputEvent_ {
+	wchar_t *text;
+	size_t length;
+} LCUI_TextInputEvent;
+
+typedef struct LCUI_SysEventRec_ {
+	uint32_t type;
+	void *data;
+	union {
+		LCUI_MouseMotionEvent motion;
+		LCUI_MouseButtonEvent button;
+		LCUI_MouseWheelEvent wheel;
+		LCUI_TextInputEvent text;
+		LCUI_KeyboardEvent key;
+		LCUI_TouchEvent touch;
+		LCUI_PaintEvent paint;
+	};
+} LCUI_SysEventRec, *LCUI_SysEvent;
 
 LCUI_END_HEADER
 

@@ -108,8 +108,8 @@ void ui_widget_update_canvas_box(ui_widget_t* w)
 
 void ui_widget_update_box_size(ui_widget_t* w)
 {
-	w->width = Widget_GetLimitedWidth(w, w->width);
-	w->height = Widget_GetLimitedHeight(w, w->height);
+	w->width = ui_widget_get_limited_width(w, w->width);
+	w->height = ui_widget_get_limited_height(w, w->height);
 	if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_NONE &&
 	    (w->width != w->box.border.width ||
 	     w->height != w->box.border.height)) {
@@ -124,12 +124,12 @@ void ui_widget_update_box_size(ui_widget_t* w)
 	}
 	w->box.border.width = w->width;
 	w->box.border.height = w->height;
-	w->box.padding.width = w->box.border.width - Widget_BorderX(w);
-	w->box.padding.height = w->box.border.height - Widget_BorderY(w);
-	w->box.content.width = w->box.padding.width - Widget_PaddingX(w);
-	w->box.content.height = w->box.padding.height - Widget_PaddingY(w);
-	w->box.outer.width = w->box.border.width + Widget_MarginX(w);
-	w->box.outer.height = w->box.border.height + Widget_MarginY(w);
+	w->box.padding.width = w->box.border.width - Widget_border_x(w);
+	w->box.padding.height = w->box.border.height - Widget_border_y(w);
+	w->box.content.width = w->box.padding.width - Widget_padding_x(w);
+	w->box.content.height = w->box.padding.height - Widget_padding_y(w);
+	w->box.outer.width = w->box.border.width + Widget_margin_x(w);
+	w->box.outer.height = w->box.border.height + Widget_margin_y(w);
 	w->box.canvas.width = ui_widget_get_canvas_box_width(w);
 	w->box.canvas.height = ui_widget_get_canvas_box_height(w);
 }

@@ -1,6 +1,6 @@
 #include <LCUI.h>
 #include <LCUI/font.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/widget/textedit.h>
 #include "test.h"
 
@@ -11,7 +11,7 @@ void test_textedit(void)
 	wchar_t wcs[64];
 
 	LCUI_InitFontLibrary();
-	LCUI_InitWidget();
+	ui_init();
 
 	w = ui_create_widget("textedit");
 
@@ -84,6 +84,6 @@ void test_textedit(void)
 	ui_widget_remove(w);
 	Object_Delete(value);
 
-	LCUI_FreeWidget();
+	ui_destroy();
 	LCUI_FreeFontLibrary();
 }

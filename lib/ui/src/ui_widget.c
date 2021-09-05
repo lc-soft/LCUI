@@ -1,9 +1,61 @@
-#include <string.h>
+﻿#include <string.h>
 #include <LCUI.h>
 #include "../include/ui.h"
 #include "private.h"
 
 static LinkedList ui_trash;
+
+static void ui_widget_init(ui_widget_t* w)
+{
+	memset(w, 0, sizeof(ui_widget_t));
+	w->state = LCUI_WSTATE_CREATED;
+	w->style = StyleSheet();
+	w->computed_style.opacity = 1.0;
+	w->computed_style.visible = TRUE;
+	w->computed_style.focusable = FALSE;
+	w->computed_style.display = SV_BLOCK;
+	w->computed_style.position = SV_STATIC;
+	w->computed_style.pointer_events = SV_INHERIT;
+	w->computed_style.box_sizing = SV_CONTENT_BOX;
+	LinkedList_Init(&w->children);
+	LinkedList_Init(&w->stacking_context);
+	w->node.data = w;
+	w->node_show.data = w;
+	w->node.next = w->node.prev = NULL;
+	w->node_show.next = w->node_show.prev = NULL;
+	ui_widget_background_init(w);
+}
+
+static void ui_widget_destroy_children(ui_widget_t* w)
+{
+	/* 先释放显示列表，后销毁部件列表，因为部件在这两个链表中的节点是和它共用
+	 * 一块内存空间的，销毁部件列表会把部件释放掉，所以把这个操作放在后面 */
+	LinkedList_ClearData(&w->stacking_context, NULL);
+	LinkedList_ClearData(&w->children, ui_widget_destroy);
+}
+
+static void ui_widget_destroy(ui_widget_t* w)
+{
+	if (w->parent) {
+		ui_widget_add_task(w->parent, UI_TASK_REFLOW);
+		ui_widget_unlink(w);
+	}
+	ui_widget_destroy_background(w);
+	ui_widget_destroy_listeners(w);
+	ui_widget_destroy_children(w);
+	ui_widget_destroy_prototype(w);
+	if (w->title) {
+		free(w->title);
+		w->title = NULL;
+	}
+	ui_widget_destroy_id(w);
+	ui_widget_destroy_style(w);
+	ui_widget_destroy_attributes(w);
+	ui_widget_destroy_classes(w);
+	ui_widget_destroy_status(w);
+	ui_widget_set_update_rules(w, NULL);
+	free(w);
+}
 
 size_t ui_trash_clear(void)
 {
@@ -29,50 +81,6 @@ static void ui_trash_add(ui_widget_t *w)
 	}
 	LinkedList_AppendNode(&ui_trash, &w->node);
 	ui_widget_post_surface_event(w, UI_EVENT_UNLINK, TRUE);
-}
-
-void ui_widget_init(ui_widget_t* w)
-{
-	memset(w, 0, sizeof(ui_widget_t));
-	w->state = LCUI_WSTATE_CREATED;
-	w->style = StyleSheet();
-	w->computed_style.opacity = 1.0;
-	w->computed_style.visible = TRUE;
-	w->computed_style.focusable = FALSE;
-	w->computed_style.display = SV_BLOCK;
-	w->computed_style.position = SV_STATIC;
-	w->computed_style.pointer_events = SV_INHERIT;
-	w->computed_style.box_sizing = SV_CONTENT_BOX;
-	LinkedList_Init(&w->children);
-	LinkedList_Init(&w->stacking_context);
-	w->node.data = w;
-	w->node_show.data = w;
-	w->node.next = w->node.prev = NULL;
-	w->node_show.next = w->node_show.prev = NULL;
-	ui_widget_background_init(w);
-}
-
-void ui_widget_destroy(ui_widget_t* w)
-{
-	if (w->parent) {
-		ui_widget_add_task(w->parent, UI_TASK_REFLOW);
-		ui_widget_unlink(w);
-	}
-	ui_widget_destroy_background(w);
-	ui_widget_destroy_listeners(w);
-	ui_widget_destroy_children(w);
-	ui_widget_destroy_prototype(w);
-	if (w->title) {
-		free(w->title);
-		w->title = NULL;
-	}
-	ui_widget_destroy_id(w);
-	ui_widget_destroy_style(w);
-	ui_widget_destroy_attributes(w);
-	ui_widget_destroy_classes(w);
-	ui_widget_destroy_status(w);
-	ui_widget_set_update_rules(w, NULL);
-	free(w);
 }
 
 ui_widget_t* ui_create_widget(const char* type)

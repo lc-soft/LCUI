@@ -1,7 +1,7 @@
 #include <LCUI.h>
 #include <LCUI/display.h>
 #include <LCUI/input.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/widget/scrollbar.h>
 #include <LCUI/gui/builder.h>
 #include <LCUI/gui/css_parser.h>

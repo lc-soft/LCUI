@@ -31,12 +31,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI.h>
 #include <LCUI/font.h>
 #include <LCUI/cursor.h>
 #include <LCUI/timer.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/widget/scrollbar.h>
 #include <LCUI/gui/css_parser.h>
 
@@ -76,7 +75,7 @@ typedef struct LCUI_ScrollBarRec_ {
 	InertialScrollingRec effect;		/**< 用于实现惯性滚动效果的相关数据 */
 } LCUI_ScrollBarRec, *LCUI_ScrollBar;
 
-static ui_widget_prototype_t scrollbar_prototype;
+static ui_widget_prototype_t *scrollbar_prototype;
 
 static const char *scrollbar_css = CodeToString(
 
@@ -262,28 +261,28 @@ static void ScrollBarThumb_OnMouseMove(ui_widget_t* thumb, ui_event_t* e,
 		x = scrollbar->thumb_x + e->motion.x - scrollbar->mouse_x;
 		x = max(0, min(x, size));
 		y = 0;
-		layer_pos = (scrollbar->target->box.outer.width -
+		layer_pos = (float)((scrollbar->target->box.outer.width -
 			     box->box.content.width) *
-			    max(0, min(x / size, 1.0));
+			    max(0, min(x / size, 1.0)));
 		ui_widget_set_style(target, key_left, -layer_pos, px);
 	} else {
 		size = thumb->parent->box.content.height - thumb->height;
 		x = 0;
 		y = scrollbar->thumb_y + e->motion.y - scrollbar->mouse_y;
 		y = max(0, min(y, size));
-		layer_pos = (scrollbar->target->box.outer.height -
+		layer_pos = (float)((scrollbar->target->box.outer.height -
 			     box->box.content.height) *
-			    max(0, min(y / size, 1.0));
+			    max(0, min(y / size, 1.0)));
 		ui_widget_set_style(target, key_top, -layer_pos, px);
 	}
 	if (scrollbar->pos != iround(layer_pos)) {
 		ui_event_t e;
 		ui_event_init(&e, "scroll");
 		e.cancel_bubble = TRUE;
-		ui_widget_emit_event(target, &e, &layer_pos);
+		ui_widget_emit_event(target, e, &layer_pos);
 	}
 	scrollbar->pos = iround(layer_pos);
-	ui_widget_update_style(target, FALSE);
+	ui_widget_update_style(target);
 	ui_widget_move(thumb, x, y);
 }
 
@@ -403,7 +402,7 @@ static void ScrollBar_UpdateSize(ui_widget_t* w)
 		ui_widget_set_style(thumb, key_height, n, scale);
 	}
 	ScrollBar_SetPosition(w, scrollbar->pos);
-	ui_widget_update_style(thumb, FALSE);
+	ui_widget_update_style(thumb);
 	if (n < 1.0) {
 		ui_widget_show(w);
 		if (scrollbar->direction == LCUI_SCROLLBAR_HORIZONTAL) {
@@ -672,11 +671,11 @@ int ScrollBar_SetPosition(ui_widget_t* w, int pos)
 		ui_event_t e;
 		ui_event_init(&e, "scroll");
 		e.cancel_bubble = TRUE;
-		ui_widget_emit_event(target, &e, &new_pos);
+		ui_widget_emit_event(target, e, &new_pos);
 	}
 	scrollbar->pos = pos;
-	ui_widget_update_style(thumb, FALSE);
-	ui_widget_update_style(target, FALSE);
+	ui_widget_update_style(thumb);
+	ui_widget_update_style(target);
 	return pos;
 }
 

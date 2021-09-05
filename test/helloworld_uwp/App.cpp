@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include <LCUI.h>
 #include <LCUI/platform.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/widget/textedit.h>
 #include <LCUI/gui/builder.h>

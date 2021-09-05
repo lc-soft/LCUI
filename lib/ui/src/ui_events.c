@@ -1,4 +1,5 @@
 ﻿#include <LCUI.h>
+#include <LCUI/input.h>
 #include <LCUI/thread.h>
 #include "../include/ui.h"
 #include "private.h"
@@ -398,7 +399,7 @@ static ui_widget_t* ui_widget_get_next_at(ui_widget_t* widget, int x, int y)
 	return NULL;
 }
 
-static int ui_widget_call_listeners(ui_widget_t* w, const ui_event_t e,
+static int ui_widget_call_listeners(ui_widget_t* w, ui_event_t e,
 				    void* arg)
 {
 	int count = 0;
@@ -625,7 +626,7 @@ static void ui_widget_on_mouseover_event(ui_widget_t* widget)
 	ui_events.targets[UI_WIDGET_STATUS_HOVER] = widget;
 }
 
-static void ui_clear_mousedown_target(ui_widget_t* widget)
+static void ui_widget_on_mousedown_event(ui_widget_t* widget)
 {
 	ui_widget_t* parent;
 	ui_widget_t* w = ui_events.targets[UI_WIDGET_STATUS_ACTIVE];
@@ -664,12 +665,12 @@ static void ui_clear_mousedown_target(ui_widget_t* target)
 	ui_widget_t* w;
 
 	if (!target) {
-		ui_clear_mousedown_target(NULL);
+		ui_widget_on_mousedown_event(NULL);
 		return;
 	}
 	for (w = ui_events.targets[UI_WIDGET_STATUS_ACTIVE]; w; w = w->parent) {
 		if (w == target) {
-			ui_clear_mousedown_target(NULL);
+			ui_widget_on_mousedown_event(NULL);
 			break;
 		}
 	}
@@ -754,8 +755,12 @@ int ui_set_focus(ui_widget_t* widget)
 	return 0;
 }
 
-static ui_widget_t* ui_resolve_event_target(float x, float y)
+static ui_widget_t* ui_resolve_event_target(int ix, int iy)
 {
+	float scale = ui_get_scale();
+	float x = iround(ix / scale);
+	float y = iround(iy / scale);
+
 	ui_widget_t* w;
 	ui_widget_t* root;
 	ui_widget_t* target;
@@ -777,20 +782,22 @@ static ui_widget_t* ui_resolve_event_target(float x, float y)
 	return target;
 }
 
+// TODO: Convert LCUI Event to UI Event
+
 static int ui_on_mouse_event(ui_event_t* origin_event)
 {
 	float scale;
-	LCUI_Pos pos;
 	ui_widget_t *target, *w;
 	ui_event_t e = *origin_event;
 
 	e.cancel_bubble = FALSE;
 	switch (e.type) {
 	case LCUI_MOUSEDOWN:
-		e.target = ui_resolve_event_target(e.button.x, e.button.y);
 		e.type = UI_EVENT_MOUSEDOWN;
-		e.button.x = pos.x;
-		e.button.y = pos.y;
+		e.target = ui_resolve_event_target(e.button.x, e.button.y);
+		if (!e.target) {
+			return -1;
+		}
 		ui_widget_emit_event(e.target, e, NULL);
 		ui_events.click.interval = DBLCLICK_INTERVAL;
 		if (e.button.button == LCUI_KEY_LEFTBUTTON &&
@@ -800,8 +807,8 @@ static int ui_on_mouse_event(ui_event_t* origin_event)
 			ui_events.click.interval = delta;
 		} else if (e.button.button == LCUI_KEY_LEFTBUTTON &&
 			   ui_events.click.widget != target) {
-			ui_events.click.x = pos.x;
-			ui_events.click.y = pos.y;
+			ui_events.click.x = e.button.x;
+			ui_events.click.y = e.button.y;
 		}
 		ui_events.click.time = LCUI_GetTime();
 		ui_events.click.widget = target;
@@ -810,9 +817,10 @@ static int ui_on_mouse_event(ui_event_t* origin_event)
 		break;
 	case LCUI_MOUSEUP:
 		e.type = UI_EVENT_MOUSEUP;
-		e.button.x = pos.x;
-		e.button.y = pos.y;
-		e.button.button = e->button.button;
+		e.target = ui_resolve_event_target(e.button.x, e.button.y);
+		if (!e.target) {
+			return -1;
+		}
 		ui_widget_emit_event(target, e, NULL);
 		if (ui_events.targets[UI_WIDGET_STATUS_ACTIVE] != target ||
 		    e.button.button != LCUI_KEY_LEFTBUTTON) {
@@ -844,19 +852,28 @@ static int ui_on_mouse_event(ui_event_t* origin_event)
 		ui_clear_mousedown_target(NULL);
 		break;
 	case LCUI_MOUSEMOVE:
-		if (abs(ui_events.click.x - pos.x) >= 8 ||
-		    abs(ui_events.click.y - pos.y) >= 8) {
+		e.target = ui_resolve_event_target(e.motion.x, e.motion.y);
+		if (!e.target) {
+			return -1;
+		}
+		if (abs(ui_events.click.x - e.motion.x) >= 8 ||
+		    abs(ui_events.click.y - e.motion.y) >= 8) {
 			ui_events.click.time = 0;
 			ui_events.click.widget = NULL;
 		}
 		ui_widget_emit_event(target, e, NULL);
 		break;
 	case LCUI_MOUSEWHEEL:
+		e.target = ui_resolve_event_target(e.wheel.x, e.wheel.y);
+		if (!e.target) {
+			return -1;
+		}
 		ui_widget_emit_event(target, e, NULL);
 	default:
-		return;
+		return -1;
 	}
 	ui_widget_on_mouseover_event(target);
+	return 0;
 }
 
 static int ui_on_keyboard_event(ui_event_t* origin_event)

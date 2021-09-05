@@ -29,10 +29,9 @@
  */
 
 #include <stdlib.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI.h>
 #include <LCUI/timer.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/widget/textcaret.h>
 #include <LCUI/gui/css_parser.h>
 #include <LCUI/ime.h>
@@ -50,7 +49,7 @@ typedef struct LCUI_TextCaretRec_ {
 	LCUI_TextCaretTask task;
 } LCUI_TextCaretRec, *LCUI_TextCaret;
 
-static ui_widget_prototype_t prototype = NULL;
+static ui_widget_prototype_t *prototype = NULL;
 
 static const char *textcaret_css = CodeToString(
 

@@ -5,7 +5,7 @@
 #include <LCUI.h>
 #include <LCUI/graph.h>
 #include <LCUI/display.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI/ui.h>
 
 /** 触点绑定记录 */
 typedef struct TouchPointBindingRec_ {

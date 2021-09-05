@@ -34,7 +34,7 @@
 #include "config.h"
 #include <LCUI/LCUI.h>
 #include <LCUI/font.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/builder.h>
 #include <LCUI/gui/css_parser.h>
 
@@ -181,7 +181,7 @@ static int ParseWidget(XMLParserContext ctx, xmlNodePtr node)
 {
 	xmlAttrPtr prop;
 	char *prop_val = NULL, *prop_name, *type = NULL;
-	ui_widget_t* w = NULL, parent = ctx->widget;
+	ui_widget_t* w = NULL, *parent = ctx->widget;
 
 	if (ctx->parent_parser && ctx->parent_parser->id != ID_UI &&
 	    ctx->parent_parser->id != ID_WIDGET) {
@@ -273,7 +273,7 @@ static void ParseNode(XMLParserContext ctx, xmlNodePtr node)
 {
 	ParserPtr p;
 	XMLParserContextRec cur_ctx;
-	ui_widget_prototype_t proto;
+	ui_widget_prototype_t *proto;
 
 	for (; node; node = node->next) {
 		proto = NULL;

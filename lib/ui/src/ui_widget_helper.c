@@ -128,16 +128,6 @@ void ui_widget_set_visibility(ui_widget_t* w, const char *value)
 	ui_widget_update_style(w, FALSE);
 }
 
-void ui_widget_set_visible(ui_widget_t* w)
-{
-	ui_widget_set_visibility(w, "visible");
-}
-
-void ui_widget_set_hidden(ui_widget_t* w)
-{
-	ui_widget_set_visibility(w, "hidden");
-}
-
 void ui_widget_show(ui_widget_t* w)
 {
 	LCUI_Style s = ui_widget_get_style(w, key_display);

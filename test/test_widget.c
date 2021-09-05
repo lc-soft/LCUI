@@ -2,7 +2,7 @@
 #include <time.h>
 #include <LCUI.h>
 #include <LCUI/font.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/util/logger.h>
 
@@ -15,7 +15,7 @@ int main(void)
 	ui_widget_t* box, w;
 
 	LCUI_InitFontLibrary();
-	LCUI_InitWidget();
+	ui_init();
 	box = ui_create_widget(NULL);
 
 	c = clock();
@@ -52,7 +52,7 @@ int main(void)
 	Logger_Debug("%zu widgets have been destroyed, which took %gs\n", n, sec);
 	Logger_Debug("it should take less than 1s\n");
 
-	LCUI_FreeWidget();
+	ui_destroy();
 	LCUI_FreeFontLibrary();
 	return 0;
 }

@@ -3,7 +3,7 @@
 #include <LCUI/graph.h>
 #include <LCUI/image.h>
 #include <LCUI/draw/border.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/builder.h>
 
 int main(void)

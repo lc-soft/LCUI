@@ -89,8 +89,12 @@ static ui_flexbox_layout_context_t* FlexBoxLayout_Begin(ui_widget_t* w,
 						     ui_layout_rule_t rule)
 {
 	ui_widget_style_t *style = &w->computed_style;
-	ASSIGN(ctx, ui_flexbox_layout_context_t*);
+	ui_flexbox_layout_context_t *ctx;
 
+	ctx = malloc(sizeof(ui_flexbox_layout_context_t));
+	if (!ctx) {
+		return NULL;
+	}
 	if (rule == UI_LAYOUT_RULE_AUTO) {
 		ctx->is_initiative = TRUE;
 		if (style->flex.direction == SV_COLUMN) {
@@ -189,7 +193,7 @@ static void FlexBoxLayout_LoadRows(ui_flexbox_layout_context_t* ctx)
 			ui_widget_update_box_size(child);
 		}
 		ui_widget_compute_flex_basis_style(child);
-		basis = Widget_MarginX(child) + child->computed_style.flex.basis;
+		basis = Widget_margin_x(child) + child->computed_style.flex.basis;
 		DEBUG_MSG("[line %lu][%lu] main_size: %g, basis: %g\n",
 			  ctx->lines.length, child->index, ctx->line->main_size,
 			  basis);
@@ -244,7 +248,7 @@ static void FlexBoxLayout_LoadColumns(ui_flexbox_layout_context_t* ctx)
 			continue;
 		}
 		ui_widget_compute_flex_basis_style(child);
-		basis = Widget_MarginY(child) + child->computed_style.flex.basis;
+		basis = Widget_margin_y(child) + child->computed_style.flex.basis;
 		DEBUG_MSG("[column %lu][%lu] main_size: %g, basis: %g\n",
 			  ctx->lines.length, child->index, ctx->line->main_size,
 			  basis);
@@ -345,7 +349,7 @@ static void UpdateFlexItemSize(ui_widget_t* w, ui_layout_rule_t rule)
 	}
 	ui_widget_reflow(w, rule);
 	ui_widget_end_layout_diff(w, &diff);
-	w->task.states[UI_TASK_REFLOW] = FALSE;
+	w->update.states[UI_TASK_REFLOW] = FALSE;
 }
 
 static void FlexBoxLayout_ReflowRow(ui_flexbox_layout_context_t* ctx)
@@ -552,7 +556,7 @@ static void FlexBoxLayout_AlignItemsStretch(ui_flexbox_layout_context_t* ctx,
 			child->layout_x = base_cross_axis;
 			if (ui_widget_has_auto_style(child, key_width)) {
 				child->width =
-				    ctx->line->cross_size - Widget_MarginX(child);
+				    ctx->line->cross_size - Widget_margin_x(child);
 				UpdateFlexItemSize(child,
 						   UI_LAYOUT_RULE_FIXED);
 			}
@@ -564,7 +568,7 @@ static void FlexBoxLayout_AlignItemsStretch(ui_flexbox_layout_context_t* ctx,
 		child = node->data;
 		child->layout_y = base_cross_axis;
 		if (ui_widget_has_auto_style(child, key_height)) {
-			child->height = ctx->line->cross_size - Widget_MarginY(child);
+			child->height = ctx->line->cross_size - Widget_margin_y(child);
 			UpdateFlexItemSize(child, UI_LAYOUT_RULE_FIXED);
 		}
 		ui_widget_update_box_position(child);
@@ -720,8 +724,8 @@ static void FlexBoxLayout_ApplySize(ui_flexbox_layout_context_t* ctx)
 			width = max(width, ctx->cross_size);
 			break;
 		}
-		w->width = ToBorderBoxWidth(w, width);
-		w->height = ToBorderBoxHeight(w, height);
+		w->width = to_border_box_width(w, width);
+		w->height = to_border_box_height(w, height);
 		ui_widget_update_box_size(w);
 		if (ctx->is_initiative) {
 			w->max_content_width = w->box.content.width;
@@ -754,8 +758,8 @@ static void FlexBoxLayout_ApplySize(ui_flexbox_layout_context_t* ctx)
 		height = max(height, ctx->cross_size);
 		break;
 	}
-	w->width = ToBorderBoxWidth(w, width);
-	w->height = ToBorderBoxHeight(w, height);
+	w->width = to_border_box_width(w, width);
+	w->height = to_border_box_height(w, height);
 	ui_widget_update_box_size(w);
 	if (ctx->is_initiative) {
 		w->max_content_width = w->box.content.width;

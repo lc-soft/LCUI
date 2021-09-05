@@ -34,7 +34,7 @@
 #include <LCUI/types.h>
 #include <LCUI/util.h>
 #include <LCUI/font.h>
-#include <LCUI/gui/metrics.h>
+#include <LCUI/ui.h>
 #include <LCUI/gui/css_library.h>
 #include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/css_fontstyle.h>

@@ -1,6 +1,7 @@
-#ifndef LIB_UI_H
+﻿#ifndef LIB_UI_H
 #define LIB_UI_H
 
+#include <LCUI/types.h>
 #include <LCUI/util/strlist.h>
 #include <LCUI/gui/css_library.h>
 #include <LCUI/gui/css_parser.h>
@@ -101,6 +102,20 @@ typedef enum ui_task_type_t {
 	UI_TASK_USER,
 	UI_TASK_TOTAL_NUM
 } ui_task_type_t;
+
+typedef struct ui_widget_t ui_widget_t;
+typedef LinkedList ui_widget_listeners_t;
+
+typedef void(*ui_widget_function_t)(ui_widget_t*);
+typedef void(*ui_widget_task_handler_t)(ui_widget_t*, int);
+typedef void(*ui_widget_size_getter_t)(ui_widget_t*, float*, float*, ui_layout_rule_t);
+typedef void(*ui_widget_size_setter_t)(ui_widget_t*, float, float);
+typedef void(*ui_widget_attr_setter_t)(ui_widget_t*, const char*, const char*);
+typedef void(*ui_widget_text_setter_t)(ui_widget_t*, const char*);
+typedef void(*ui_widget_prop_binder_t)(ui_widget_t*, const char*, LCUI_Object);
+typedef void(*ui_widget_painter_t)(ui_widget_t*, LCUI_PaintContext,
+				  ui_widget_actual_style_t*);
+typedef struct ui_widget_prototype_t ui_widget_prototype_t;
 
 typedef struct ui_widget_rules_t {
 	/**
@@ -251,20 +266,7 @@ typedef struct ui_widget_style_t {
 	int pointer_events;
 } ui_widget_style_t;
 
-typedef struct ui_widget_t ui_widget_t;
-typedef LinkedList ui_widget_listeners_t;
-
-typedef void(*ui_widget_function_t)(ui_widget_t*);
-typedef void(*ui_widget_task_handler_t)(ui_widget_t*, int);
-typedef void(*ui_widget_size_getter_t)(ui_widget_t*, float*, float*, ui_layout_rule_t);
-typedef void(*ui_widget_size_setter_t)(ui_widget_t*, float, float);
-typedef void(*ui_widget_attr_setter_t)(ui_widget_t*, const char*, const char*);
-typedef void(*ui_widget_text_setter_t)(ui_widget_t*, const char*);
-typedef void(*ui_widget_prop_binder_t)(ui_widget_t*, const char*, LCUI_Object);
-typedef void(*ui_widget_painter_t)(ui_widget_t*, LCUI_PaintContext,
-				  ui_widget_actual_style_t*);
-
-typedef struct ui_widget_prototype_t {
+struct ui_widget_prototype_t {
 	char *name;
 	ui_widget_function_t init;
 	ui_widget_function_t refresh;
@@ -278,7 +280,7 @@ typedef struct ui_widget_prototype_t {
 	ui_widget_size_setter_t resize;
 	ui_widget_painter_t paint;
 	ui_widget_prototype_t *proto;
-} ui_widget_prototype_t;
+};
 
 typedef struct ui_widget_data_entry_t {
 	void *data;
@@ -338,8 +340,7 @@ typedef LCUI_TouchEvent ui_widget_touch_event_t;
 typedef struct ui_event_t ui_event_t;
 typedef void(*ui_event_handler_t)(ui_widget_t*, ui_event_t*, void*);
 
-/** 面向部件级的事件内容结构 */
-typedef struct ui_event_t {
+struct ui_event_t {
 	uint32_t type;			/**< 事件类型标识号 */
 	void *data;			/**< 附加数据 */
 	ui_widget_t* target;		/**< 触发事件的部件 */
@@ -442,6 +443,9 @@ struct ui_widget_t {
 
 /* clang-format on */
 
+LCUI_API void ui_init(void);
+LCUI_API void ui_destroy(void);
+
 // Metrics
 
 /** 转换成单位为 px 的度量值 */
@@ -494,32 +498,45 @@ INLINE void ui_compute_rect_actual(LCUI_Rect* dst, const LCUI_RectF* src)
 	dst->height = iround(src->height * ui_get_scale());
 }
 
+// Base
+
+LCUI_API ui_widget_t* ui_create_widget(const char* type);
+LCUI_API ui_widget_t* ui_create_widget_with_prototype(
+    const ui_widget_prototype_t* proto);
+LCUI_API void ui_widget_remove(ui_widget_t* w);
+LCUI_API void ui_widget_set_title(ui_widget_t* w, const wchar_t* title);
+LCUI_API void ui_widget_set_text(ui_widget_t* w, const char* text);
+LCUI_API void ui_widget_bind_property(ui_widget_t* w, const char* name,
+				      LCUI_Object value);
+LCUI_API void ui_widget_empty(ui_widget_t* w);
+LCUI_API void ui_widget_get_offset(ui_widget_t* w, ui_widget_t* parent,
+				   float* offset_x, float* offset_y);
+
 // Root
 
 LCUI_API ui_widget_t* ui_root(void);
 LCUI_API int ui_root_append(ui_widget_t* w);
+
 
 // Id
 
 LCUI_API ui_widget_t* ui_get_widget(const char* id);
 LCUI_API int ui_widget_set_id(ui_widget_t* w, const char* idstr);
 
+
 // Prototype
 
 LCUI_API ui_widget_prototype_t* ui_create_widget_prototype(
     const char* name, const char* parent_name);
 LCUI_API ui_widget_prototype_t* ui_get_widget_prototype(const char* name);
-LCUI_API ui_widget_t* ui_create_widget_with_prototype(
-    const ui_widget_prototype_t* proto);
 LCUI_API LCUI_BOOL ui_check_widget_type(ui_widget_t* w, const char* type);
 LCUI_API LCUI_BOOL
 ui_check_widget_prototype(ui_widget_t* w, const ui_widget_prototype_t* proto);
 LCUI_API void* ui_widget_get_data(ui_widget_t* widget,
-				  ui_widget_prototype_t proto);
+				  ui_widget_prototype_t* proto);
 LCUI_API void* ui_widget_add_data(ui_widget_t* widget,
-				  ui_widget_prototype_t proto,
+				  ui_widget_prototype_t* proto,
 				  size_t data_size);
-
 
 // Attributes
 
@@ -537,6 +554,17 @@ LCUI_API int ui_widget_add_class(ui_widget_t* w, const char* class_name);
 LCUI_API LCUI_BOOL ui_widget_has_class(ui_widget_t* w, const char* class_name);
 LCUI_API int ui_widget_remove_class(ui_widget_t* w, const char* class_name);
 
+
+
+// Status
+
+LCUI_API int ui_widget_add_status(ui_widget_t* w, const char *status_name);
+LCUI_API LCUI_BOOL ui_widget_has_status(ui_widget_t* w, const char *status_name);
+LCUI_API int ui_widget_remove_status(ui_widget_t* w, const char *status_name);
+LCUI_API void ui_widget_update_status(ui_widget_t* widget);
+LCUI_API void ui_widget_set_disabled(ui_widget_t* w, LCUI_BOOL disabled);
+
+
 // Tree
 
 LCUI_API int ui_widget_append(ui_widget_t* parent, ui_widget_t* widget);
@@ -551,7 +579,6 @@ LCUI_API size_t ui_widget_each(ui_widget_t* w,
 			       void* arg);
 LCUI_API ui_widget_t* ui_widget_at(ui_widget_t* widget, int ix, int iy);
 LCUI_API void ui_widget_print_tree(ui_widget_t* w);
-
 
 // Style
 
@@ -593,6 +620,44 @@ LCUI_API void ui_widget_add_task_by_style(ui_widget_t* w, int key);
 LCUI_API void ui_widget_force_update_style(ui_widget_t* w);
 LCUI_API void ui_widget_force_refresh_style(ui_widget_t* w);
 
+// Helper
+
+LCUI_API void ui_widget_set_padding(ui_widget_t* w, float top, float right,
+				    float bottom, float left);
+LCUI_API void ui_widget_set_margin(ui_widget_t* w, float top, float right,
+				   float bottom, float left);
+LCUI_API void ui_widget_set_border_color(ui_widget_t* w, LCUI_Color color);
+LCUI_API void ui_widget_set_border_width(ui_widget_t* w, float width);
+LCUI_API void ui_widget_set_border_style(ui_widget_t* w, int style);
+LCUI_API void ui_widget_set_border(ui_widget_t* w, float width, int style,
+				   LCUI_Color color);
+LCUI_API void ui_widget_set_box_shadow(ui_widget_t* w, float x, float y,
+				       float blur, LCUI_Color color);
+LCUI_API void ui_widget_move(ui_widget_t* w, float left, float top);
+LCUI_API void ui_widget_resize(ui_widget_t* w, float width, float height);
+LCUI_API LCUI_Style ui_widget_get_style(ui_widget_t* w, int key);
+LCUI_API int ui_widget_unset_style(ui_widget_t* w, int key);
+LCUI_API LCUI_Style ui_widget_get_matched_style(ui_widget_t* w, int key);
+LCUI_API void ui_widget_set_visibility(ui_widget_t* w, const char* value);
+
+INLINE void ui_widget_set_visible(ui_widget_t* w)
+{
+	ui_widget_set_visibility(w, "visible");
+}
+
+INLINE void ui_widget_set_hidden(ui_widget_t* w)
+{
+	ui_widget_set_visibility(w, "hidden");
+}
+
+LCUI_API void ui_widget_show(ui_widget_t* w);
+LCUI_API void ui_widget_hide(ui_widget_t* w);
+LCUI_API void ui_widget_set_position(ui_widget_t* w, LCUI_StyleValue position);
+LCUI_API void ui_widget_set_opacity(ui_widget_t* w, float opacity);
+LCUI_API void ui_widget_set_box_sizing(ui_widget_t* w, LCUI_StyleValue sizing);
+LCUI_API ui_widget_t* ui_widget_get_closest(ui_widget_t* w, const char* type);
+LCUI_API Dict* ui_widget_collect_references(ui_widget_t* w);
+
 // Hash
 
 LCUI_API void ui_widget_generate_self_hash(ui_widget_t* widget);
@@ -602,14 +667,23 @@ LCUI_API size_t ui_widget_export_hash(ui_widget_t* w, unsigned* hash_list,
 LCUI_API size_t ui_widget_import_hash(ui_widget_t* w, unsigned* hash_list,
 				      size_t maxlen);
 
+// Layout
+
+LCUI_API void ui_widget_reflow(ui_widget_t* w, ui_layout_rule_t rule);
+LCUI_API LCUI_BOOL ui_widget_auto_reflow(ui_widget_t* w, ui_layout_rule_t rule);
 
 // Renderer
 
-LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, LCUI_RectF *in_rect,
-				    int box_type);
-size_t ui_widget_get_dirty_rects(ui_widget_t *w, LinkedList *rects);
-size_t ui_widget_render(ui_widget_t *w, LCUI_PaintContext paint);
+LCUI_API LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t* w,
+					     LCUI_RectF* in_rect, int box_type);
+LCUI_API size_t ui_widget_get_dirty_rects(ui_widget_t* w, LinkedList* rects);
+LCUI_API size_t ui_widget_render(ui_widget_t* w, LCUI_PaintContext paint);
 
+// Updater
+
+LCUI_API void ui_widget_add_task_for_children(ui_widget_t* widget,
+					      ui_task_type_t task);
+LCUI_API void ui_widget_add_task(ui_widget_t* widget, int task);
 
 // Events
 
@@ -620,7 +694,7 @@ INLINE ui_widget_block_event(ui_widget_t* w, LCUI_BOOL block)
 }
 
 /** 触发事件，让事件处理器在主循环中调用 */
-LCUI_API int ui_widget_post_event(ui_widget_t* w, ui_event_t e, void* arg,
+LCUI_API int ui_widget_post_event(ui_widget_t* w, const ui_event_t *e, void* arg,
 				  void (*destroy_data)(void*));
 
 /** 触发事件，直接调用事件处理器 */
@@ -684,7 +758,7 @@ INLINE int ui_emit_event(ui_event_t e, void* arg)
 	return ui_widget_emit_event(ui_root(), e, arg);
 }
 
-INLINE int ui_post_event(ui_event_t e, void* data, void (*destroy_data)(void*))
+INLINE int ui_post_event(const ui_event_t *e, void* data, void (*destroy_data)(void*))
 {
 	return ui_widget_post_event(ui_root(), e, data, destroy_data);
 }
@@ -706,13 +780,12 @@ INLINE int ui_remove_event_listener(ui_widget_t* w, int event_id,
 INLINE int ui_on_event(const char* event_name, ui_event_handler_t handler,
 		       void* data, void (*destroy_data)(void*))
 {
-	return ui_widget_on_event(ui_root(), event_name, handler, data,
-				  destroy_data);
+	return ui_widget_on(ui_root(), event_name, handler, data, destroy_data);
 }
 
 INLINE int ui_off_event(const char* event_name, ui_event_handler_t handler)
 {
-	return ui_widget_on_event(ui_root(), event_name, handler);
+	return ui_widget_off(ui_root(), event_name, handler);
 }
 
 /**

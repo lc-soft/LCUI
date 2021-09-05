@@ -130,7 +130,7 @@ void ui_widget_compute_widget_limit_style(ui_widget_t* w, ui_layout_rule_t rule)
 		style->max_width = ui_widget_compute_metric_x(w, key_max_width);
 		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
 			style->max_width +=
-			    Widget_BorderX(w) + Widget_PaddingX(w);
+			    Widget_border_x(w) + Widget_padding_x(w);
 		}
 		break;
 	}
@@ -142,7 +142,7 @@ void ui_widget_compute_widget_limit_style(ui_widget_t* w, ui_layout_rule_t rule)
 		style->min_width = ui_widget_compute_metric_x(w, key_min_width);
 		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
 			style->min_width +=
-			    Widget_BorderX(w) + Widget_PaddingX(w);
+			    Widget_border_x(w) + Widget_padding_x(w);
 		}
 		break;
 	}
@@ -163,7 +163,7 @@ void ui_widget_compute_height_limit_style(ui_widget_t* w, ui_layout_rule_t rule)
 		    ui_widget_compute_metric_y(w, key_max_height);
 		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
 			style->max_height +=
-			    Widget_BorderY(w) + Widget_PaddingY(w);
+			    Widget_border_y(w) + Widget_padding_y(w);
 		}
 		break;
 	}
@@ -176,7 +176,7 @@ void ui_widget_compute_height_limit_style(ui_widget_t* w, ui_layout_rule_t rule)
 		    ui_widget_compute_metric_y(w, key_min_height);
 		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
 			style->min_height +=
-			    Widget_BorderY(w) + Widget_PaddingY(w);
+			    Widget_border_y(w) + Widget_padding_y(w);
 		}
 		break;
 	}
@@ -206,7 +206,7 @@ void ui_widget_compute_width_style(ui_widget_t* w)
 				style->width_sizing = UI_SIZING_RULE_FIXED;
 			}
 			w->width =
-			    w->parent->box.content.width - Widget_MarginX(w);
+			    w->parent->box.content.width - Widget_margin_x(w);
 			break;
 		}
 		if (ui_widget_check_style_type(w, key_width, scale)) {
@@ -226,10 +226,10 @@ void ui_widget_compute_width_style(ui_widget_t* w)
 			style->width_sizing = UI_SIZING_RULE_FIXED;
 		}
 		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
-			w->width += Widget_BorderX(w) + Widget_PaddingX(w);
+			w->width += Widget_border_x(w) + Widget_padding_x(w);
 		}
 	} while (0);
-	w->width = Widget_GetLimitedWidth(w, w->width);
+	w->width = ui_widget_get_limited_width(w, w->width);
 }
 
 void ui_widget_compute_height_style(ui_widget_t* w)
@@ -259,10 +259,10 @@ void ui_widget_compute_height_style(ui_widget_t* w)
 			style->height_sizing = UI_SIZING_RULE_FIXED;
 		}
 		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
-			w->height += Widget_BorderY(w) + Widget_PaddingY(w);
+			w->height += Widget_border_y(w) + Widget_padding_y(w);
 		}
 	} while (0);
-	w->height = Widget_GetLimitedHeight(w, w->height);
+	w->height = ui_widget_get_limited_height(w, w->height);
 }
 
 void ui_widget_compute_size_style(ui_widget_t* w)
@@ -284,17 +284,17 @@ void ui_widget_compute_flex_basis_style(ui_widget_t* w)
 		if (!ui_widget_has_auto_style(w, key_flex_basis)) {
 			flex->basis =
 			    ui_widget_compute_metric_y(w, key_flex_basis);
-			flex->basis = Widget_GetLimitedHeight(w, flex->basis);
+			flex->basis = ui_widget_get_limited_height(w, flex->basis);
 			return;
 		}
 		if (w->computed_style.height_sizing == UI_SIZING_RULE_FIXED) {
 			flex->basis = ui_widget_compute_metric_y(w, key_height);
 			if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
-				flex->basis = ToBorderBoxHeight(w, flex->basis);
+				flex->basis = to_border_box_height(w, flex->basis);
 			}
 		} else {
 			flex->basis = w->max_content_height;
-			flex->basis = ToBorderBoxHeight(w, flex->basis);
+			flex->basis = to_border_box_height(w, flex->basis);
 		}
 		return;
 	}
@@ -302,19 +302,19 @@ void ui_widget_compute_flex_basis_style(ui_widget_t* w)
 		if (w->computed_style.width_sizing == UI_SIZING_RULE_FIXED) {
 			flex->basis = ui_widget_compute_metric_x(w, key_width);
 			if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
-				flex->basis = ToBorderBoxWidth(w, flex->basis);
+				flex->basis = to_border_box_width(w, flex->basis);
 			}
 		} else {
 			flex->basis = w->max_content_width;
-			flex->basis = ToBorderBoxWidth(w, flex->basis);
+			flex->basis = to_border_box_width(w, flex->basis);
 		}
 	} else {
 		flex->basis = ui_widget_compute_metric_x(w, key_flex_basis);
 		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
-			flex->basis = ToBorderBoxWidth(w, flex->basis);
+			flex->basis = to_border_box_width(w, flex->basis);
 		}
 	}
-	flex->basis = Widget_GetLimitedWidth(w, flex->basis);
+	flex->basis = ui_widget_get_limited_width(w, flex->basis);
 }
 
 void ui_widget_compute_visibility_style(ui_widget_t* w)
