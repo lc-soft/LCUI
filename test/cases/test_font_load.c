@@ -140,7 +140,7 @@ void test_font_load(void)
 	LCUI_InitCSSParser();
 	/* 测试是否能够根据 CSS 文件中定义的 @font-face 规则来载入字体 */
 	it_i("check LCUIFont_LoadCSSFile success",
-	     LCUI_LoadCSSFile("test_font_load.css"), 0);
+	     ui_load_css_file("test_font_load.css"), 0);
 	it_b("check LCUIFont_GetId success",
 	     LCUIFont_GetId("icomoon", 0, 0) > 0, TRUE);
 	LCUI_FreeCSSParser();

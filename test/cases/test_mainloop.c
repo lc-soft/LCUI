@@ -17,7 +17,7 @@ static void OnQuit(void *arg)
 	LCUI_Quit();
 }
 
-static void OnBtnClick(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
+static void OnBtnClick(ui_widget_t* w, ui_event_t* e, void *arg)
 {
 	LCUI_MainLoop loop;
 
@@ -60,15 +60,15 @@ static void ObserverThread(void *arg)
 void test_mainloop(void)
 {
 	LCUI_Thread tid;
-	LCUI_Widget root, btn;
+	ui_widget_t* root, btn;
 	LCUI_BOOL exited = FALSE;
 
 	LCUI_Init();
-	btn = LCUIWidget_New("button");
-	root = LCUIWidget_GetRoot();
+	btn = ui_create_widget("button");
+	root = ui_root();
 	Button_SetText(btn, "button");
-	Widget_BindEvent(btn, "click", OnBtnClick, NULL, NULL);
-	Widget_Append(root, btn);
+	ui_widget_on(btn, "click", OnBtnClick, NULL, NULL);
+	ui_widget_append(root, btn);
 	/* Observe whether the main loop has exited in a new thread */
 	LCUIThread_Create(&tid, ObserverThread, &exited);
 	/* Trigger the click event after the first frame is updated */

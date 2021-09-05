@@ -9,7 +9,7 @@
 int main(void)
 {
 	int ret = 0;
-	LCUI_Widget root, box;
+	ui_widget_t* root, box;
 
 	LCUI_Init();
 	box = LCUIBuilder_LoadFile("test_border.xml");
@@ -17,8 +17,8 @@ int main(void)
 		LCUI_Destroy();
 		return ret;
 	}
-	root = LCUIWidget_GetRoot();
-	Widget_Append(root, box);
-	Widget_Unwrap(box);
+	root = ui_root();
+	ui_widget_append(root, box);
+	ui_widget_unwrap(box);
 	return LCUI_Main();
 }

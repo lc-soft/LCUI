@@ -7,10 +7,10 @@
 
 static void test_dropdown(void)
 {
-	LCUI_Widget w;
+	ui_widget_t* w;
 	int width, height;
 
-	w = LCUIWidget_GetById("test-dropdown-menu");
+	w = ui_get_widget("test-dropdown-menu");
 	it_b("$('#test-dropdown-menu')[0].box.border.height < 200",
 	     w->width < 200, TRUE);
 	it_b("$('#test-dropdown-menu')[0].box.border.width > 100",
@@ -18,23 +18,23 @@ static void test_dropdown(void)
 	it_i("$('#test-dropdown-menu')[0].box.border.height", (int)w->height,
 	     142);
 
-	w = Widget_GetChild(w, 0);
+	w = ui_widget_get_child(w, 0);
 	width = (int)w->width;
 	height = (int)w->height;
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	it_i("$('#test-dropdown-menu .dropdown-item')[1].box.border.width",
 	     (int)w->width, width);
 	it_i("$('#test-dropdown-menu .dropdown-item')[1].box.border.height",
 	     (int)w->height, height);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	it_i("$('#test-dropdown-menu .dropdown-item')[2].box.border.width",
 	     (int)w->width, width);
 	it_i("$('#test-dropdown-menu .dropdown-item')[2].box.border.height",
 	     (int)w->height, height);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	it_i("$('#test-dropdown-menu .dropdown-item')[3].box.border.width",
 	     (int)w->width, width);
 	it_i("$('#test-dropdown-menu .dropdown-item')[3].box.border.height",
@@ -43,16 +43,16 @@ static void test_dropdown(void)
 
 static void test_auto_size(void)
 {
-	LCUI_Widget w;
-	LCUI_Widget example;
+	ui_widget_t* w;
+	ui_widget_t* example;
 	LCUI_RectF rect;
 
 	// Update #test-text-auto-height content
 
-	w = LCUIWidget_GetById("test-text-auto-height");
+	w = ui_get_widget("test-text-auto-height");
 	example = w->parent->parent;
 	TextView_SetTextW(w, L"long long long long long long text");
-	LCUIWidget_Update();
+	ui_update();
 	rect.x = 5;
 	rect.y = 5;
 	rect.width = 200;
@@ -60,10 +60,10 @@ static void test_auto_size(void)
 	it_rectf("$('#test-text-auto-height')[0].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	it_i("$('#test-text-auto-size')[0].box.border.y", (int)w->y, 5 + 50);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	it_i("$('#test-text-block-auto-height')[0].box.border.y", (int)w->y,
 	     5 + 50 + 31);
 
@@ -71,12 +71,12 @@ static void test_auto_size(void)
 
 	// Update #test-text-auto-size content
 
-	w = LCUIWidget_GetById("test-text-auto-size");
+	w = ui_get_widget("test-text-auto-size");
 	TextView_SetTextW(
 	    w, L"long long long long long long long long long long long long "
 	       L"long long long long long long long long long long long long "
 	       L"long long text");
-	LCUIWidget_Update();
+	ui_update();
 	it_i("$('#test-text-auto-size')[0].box.border.x", (int)w->box.border.x,
 	     5);
 	it_i("$('#test-text-auto-size')[0].box.border.y", (int)w->box.border.y,
@@ -86,7 +86,7 @@ static void test_auto_size(void)
 	it_i("$('#test-text-auto-size')[0].box.border.height",
 	     (int)w->box.border.height, 50);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	it_i("$('#test-text-block-auto-height')[0].box.border.y", (int)w->y,
 	     5 + 50 + 50);
 
@@ -94,12 +94,12 @@ static void test_auto_size(void)
 
 	// Update test-text-block-auto-height content
 
-	w = LCUIWidget_GetById("test-text-block-auto-height");
+	w = ui_get_widget("test-text-block-auto-height");
 	TextView_SetTextW(
 	    w, L"long long long long long long long long long long long long "
 	       L"long long long long long long long long long long long long "
 	       L"long long text");
-	LCUIWidget_Update();
+	ui_update();
 	rect.x = 5;
 	rect.y = 5 + 50 + 50;
 	rect.width = 758;
@@ -110,18 +110,18 @@ static void test_auto_size(void)
 
 static void test_inline_block_nesting(void)
 {
-	LCUI_Widget w;
+	ui_widget_t* w;
 	LCUI_RectF rect;
 
-	w = LCUIWidget_GetById("example-inline-block-nesting__block-1");
+	w = ui_get_widget("example-inline-block-nesting__block-1");
 	rect.x = 5;
 	rect.y = 5;
-	rect.width = Widget_GetChild(w, 0)->width * 2;
+	rect.width = ui_widget_get_child(w, 0)->width * 2;
 	rect.height = 31 * 3;
 	it_rectf("$('#example-inline-block-nesting__block-1')[0].box.border",
 		 &w->box.border, &rect);
 
-	w = Widget_GetChild(w, 1);
+	w = ui_widget_get_child(w, 1);
 	rect.width /= 2.f;
 	rect.height = 31;
 	rect.x = rect.width;
@@ -130,7 +130,7 @@ static void test_inline_block_nesting(void)
 	    "$('#example-inline-block-nesting__block-1 .box')[1].box.border",
 	    &w->box.border, &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.width = rect.width * 2;
 	rect.x = 0;
 	rect.y = 31;
@@ -138,14 +138,14 @@ static void test_inline_block_nesting(void)
 	    "$('#example-inline-block-nesting__block-1 .box')[2].box.border",
 	    &w->box.border, &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.y = 31 * 2;
 	it_rectf(
 	    "$('#example-inline-block-nesting__block-1 .box')[3].box.border",
 	    &w->box.border, &rect);
 
-	w = LCUIWidget_GetById("example-inline-block-nesting__block-2");
-	rect.width = Widget_GetChild(w, 0)->width * 2;
+	w = ui_get_widget("example-inline-block-nesting__block-2");
+	rect.width = ui_widget_get_child(w, 0)->width * 2;
 	rect.height = 31 * 3;
 	rect.x = w->parent->padding.left;
 	rect.x += w->parent->box.content.width - rect.width;
@@ -156,70 +156,70 @@ static void test_inline_block_nesting(void)
 
 static void test_absolutely_positioned_progress_bar(void)
 {
-	LCUI_Widget w;
+	ui_widget_t* w;
 
-	w = LCUIWidget_GetById("example-progress-bar__bar");
+	w = ui_get_widget("example-progress-bar__bar");
 	it_i("It should have the correct width", (int)w->width, (int)(w->parent->box.content.width * 0.5));
 }
 
 static void test_block_layout_1280(void)
 {
-	LCUI_Widget w;
-	LCUI_Widget content;
-	LCUI_Widget example;
-	LCUI_Widget container;
+	ui_widget_t* w;
+	ui_widget_t* content;
+	ui_widget_t* example;
+	ui_widget_t* container;
 	LCUI_RectF rect;
 
-	container = Widget_GetChild(LCUIWidget_GetById("main"), 0);
+	container = ui_widget_get_child(ui_get_widget("main"), 0);
 	LCUIDisplay_SetSize(1280, 800);
-	LCUIWidget_Update();
+	ui_update();
 
 	rect.x = 10;
 	rect.y = 10;
 	rect.width = 780;
 	rect.height = 404;
-	w = Widget_GetChild(container, 0);
+	w = ui_widget_get_child(container, 0);
 	it_rectf("$('.example')[0].box.border", &w->box.border, &rect);
 
 	rect.y += rect.height + 10;
 	rect.height = 304;
-	w = Widget_GetChild(container, 1);
+	w = ui_widget_get_child(container, 1);
 	it_rectf("$('.example')[1].box.border", &w->box.border, &rect);
 
 	rect.y += rect.height + 10;
 	rect.height = 147;
-	w = Widget_GetChild(container, 2);
+	w = ui_widget_get_child(container, 2);
 	it_rectf("$('.example')[2].box.border", &w->box.border, &rect);
 
 	rect.y += rect.height + 10;
 	rect.height = 550;
-	w = Widget_GetChild(container, 3);
+	w = ui_widget_get_child(container, 3);
 	it_rectf("$('.example')[3].box.border", &w->box.border, &rect);
 
 	rect.y += rect.height + 10;
 	rect.height = 354;
-	w = Widget_GetChild(container, 4);
+	w = ui_widget_get_child(container, 4);
 	it_rectf("$('.example')[4].box.border", &w->box.border, &rect);
 
 	rect.y += rect.height + 10;
 	rect.height = 254;
-	w = Widget_GetChild(container, 5);
+	w = ui_widget_get_child(container, 5);
 	it_rectf("$('.example')[5].box.border", &w->box.border, &rect);
 
 	rect.y += rect.height + 10;
 	rect.height = 354;
-	w = Widget_GetChild(container, 6);
+	w = ui_widget_get_child(container, 6);
 	it_rectf("$('.example')[6].box.border", &w->box.border, &rect);
 
-	w = LCUIWidget_GetById("example-inline-block-nesting");
+	w = ui_get_widget("example-inline-block-nesting");
 	rect.y += rect.height + 10;
 	rect.height = 157;
 	it_rectf("$('#example-inline-block-nesting')[5].box.border",
 		 &w->box.border, &rect);
 
-	example = Widget_GetChild(container, 0);
-	content = Widget_GetChild(example, 1);
-	w = Widget_GetChild(content, 13);
+	example = ui_widget_get_child(container, 0);
+	content = ui_widget_get_child(example, 1);
+	w = ui_widget_get_child(content, 13);
 	rect.width = 150;
 	rect.height = 50;
 	rect.x = content->padding.left;
@@ -227,23 +227,23 @@ static void test_block_layout_1280(void)
 	it_rectf("$('.example:eq(0) .box')[13].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.x = content->box.content.width - 150.f;
 	rect.x += content->padding.left;
 	rect.y += 50;
 	it_rectf("$('.example:eq(0) .box.ml-auto')[0].box.border",
 		 &w->box.border, &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.x = (content->box.content.width - 150.f) / 2.f;
 	rect.x += content->padding.left;
 	rect.y += 50;
 	it_rectf("$('.example:eq(0) .box.ml-auto.mr-auto')[0].box.border",
 		 &w->box.border, &rect);
 
-	example = Widget_GetChild(container, 1);
-	content = Widget_GetChild(example, 1);
-	w = Widget_GetChild(content, 0);
+	example = ui_widget_get_child(container, 1);
+	content = ui_widget_get_child(example, 1);
+	w = ui_widget_get_child(content, 0);
 	rect.x = content->padding.left;
 	rect.y = content->padding.top;
 	rect.width = content->box.content.width * 0.5f;
@@ -251,53 +251,53 @@ static void test_block_layout_1280(void)
 	it_rectf("$('.example:eq(1) .box')[0].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.y += 50;
 	it_rectf("$('.example:eq(1) .box')[1].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.y += 50;
 	rect.width = content->box.content.width;
 	it_rectf("$('.example:eq(1) .box')[2].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.y += 50;
 	rect.width = content->box.content.width * 0.5f;
 	it_rectf("$('.example:eq(1) .box')[3].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.x += rect.width;
 	it_rectf("$('.example:eq(1) .box')[4].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.y += 50;
 	rect.x = content->padding.left;
 	rect.width = content->box.content.width * 0.25f;
 	it_rectf("$('.example:eq(1) .box')[5].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.x += rect.width;
 	it_rectf("$('.example:eq(1) .box')[6].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.x += rect.width;
 	it_rectf("$('.example:eq(1) .box')[7].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.x += rect.width;
 	it_rectf("$('.example:eq(1) .box')[8].box.border", &w->box.border,
 		 &rect);
 
-	example = Widget_GetChild(container, 3);
-	content = Widget_GetChild(Widget_GetChild(example, 1), 0);
-	w = Widget_GetChild(content, 0);
+	example = ui_widget_get_child(container, 3);
+	content = ui_widget_get_child(ui_widget_get_child(example, 1), 0);
+	w = ui_widget_get_child(content, 0);
 	rect.x = content->padding.left + w->margin.left;
 	rect.y = content->padding.top + w->margin.top;
 	rect.width = content->box.content.width;
@@ -306,7 +306,7 @@ static void test_block_layout_1280(void)
 	it_rectf("$('.example:eq(3) .box')[0].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetChild(content, 5);
+	w = ui_widget_get_child(content, 5);
 	rect.x = content->padding.left + 264.f;
 	rect.y = content->padding.top + rect.height + 32;
 	rect.width = 50;
@@ -314,21 +314,21 @@ static void test_block_layout_1280(void)
 	it_rectf("$('.example:eq(3) .box')[5].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.x += rect.width - 8;
 	rect.y += 8;
 	rect.width = 150;
 	it_rectf("$('.example:eq(3) .box')[6].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.x += rect.width + w->margin.left + 8;
 	rect.y -= 8;
 	rect.width = 100;
 	it_rectf("$('.example:eq(3 .box')[7].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.x = content->padding.left - 16;
 	rect.y = content->padding.top + (16 + 50 + 16) + (8 + 50 + 8) - 16;
 	rect.width = content->box.content.width + 32;
@@ -336,8 +336,8 @@ static void test_block_layout_1280(void)
 	it_rectf("$('.example:eq(3) .box')[8].box.border", &w->box.border,
 		 &rect);
 
-	content = Widget_GetChild(Widget_GetChild(example, 1), 1);
-	w = Widget_GetChild(content, 0);
+	content = ui_widget_get_child(ui_widget_get_child(example, 1), 1);
+	w = ui_widget_get_child(content, 0);
 	rect.x = content->padding.left;
 	rect.y = content->padding.top;
 	rect.width = content->box.content.width;
@@ -345,35 +345,35 @@ static void test_block_layout_1280(void)
 	it_rectf("$('.example:eq(3) .box')[9].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.x += w->margin.left;
 	rect.y += 50;
 	rect.width -= w->margin.left;
 	it_rectf("$('.example:eq(3) .box')[10].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.y += 50;
 	rect.width = content->box.content.width + 16;
 	it_rectf("$('.example:eq(3) .box.ml--1.mr--1')[0].box.border",
 		 &w->box.border, &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.y += 50;
 	rect.width = 200;
 	it_rectf("$('.example:eq(3) .box.ml--1.mr--1')[1].box.border",
 		 &w->box.border, &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.y += 50;
 	rect.width = content->box.content.width;
 	it_rectf("$('.example:eq(3) .box.ml--1.mr--1')[2].box.border",
 		 &w->box.border, &rect);
 
-	example = Widget_GetChild(container, 5);
-	content = Widget_GetChild(example, 1);
+	example = ui_widget_get_child(container, 5);
+	content = ui_widget_get_child(example, 1);
 
-	w = LCUIWidget_GetById("box-absolute-top-left");
+	w = ui_get_widget("box-absolute-top-left");
 	rect.x = 0;
 	rect.y = 0;
 	rect.width = 100;
@@ -381,31 +381,31 @@ static void test_block_layout_1280(void)
 	it_rectf("$('#box-absolute-top-left')[0].box.border", &w->box.border,
 		 &rect);
 
-	w = LCUIWidget_GetById("box-absolute-top-right");
+	w = ui_get_widget("box-absolute-top-right");
 	rect.x = content->box.padding.width - rect.width;
 	it_rectf("$('#box-absolute-top-right')[0].box.border", &w->box.border,
 		 &rect);
 
-	w = LCUIWidget_GetById("box-absolute-center");
+	w = ui_get_widget("box-absolute-center");
 	rect.x = (content->box.padding.width - rect.width) * 0.5f;
 	rect.y = (content->box.padding.height - rect.height) * 0.5f;
 	it_rectf("$('#box-absolute-center')[0].box.border", &w->box.border,
 		 &rect);
 
-	w = LCUIWidget_GetById("box-absolute-bottom-left");
+	w = ui_get_widget("box-absolute-bottom-left");
 	rect.x = 0;
 	rect.y = content->box.padding.height - rect.height;
 	it_rectf("$('#box-absolute-bottom-left')[0].box.border", &w->box.border,
 		 &rect);
 
-	w = LCUIWidget_GetById("box-absolute-bottom-right");
+	w = ui_get_widget("box-absolute-bottom-right");
 	rect.x = content->box.padding.width - rect.width;
 	it_rectf("$('#box-absolute-bottom-right')[0].box.border",
 		 &w->box.border, &rect);
 
 	// (2) Auto size
 
-	w = LCUIWidget_GetById("test-text-auto-height");
+	w = ui_get_widget("test-text-auto-height");
 	rect.x = 5;
 	rect.y = 5;
 	rect.width = 200;
@@ -413,12 +413,12 @@ static void test_block_layout_1280(void)
 	it_rectf("$('#test-text-auto-height')[0].box.border", &w->box.border,
 		 &rect);
 
-	w = LCUIWidget_GetById("test-text-auto-size");
+	w = ui_get_widget("test-text-auto-size");
 	it_b("$('#test-text-auto-size')[0].width < 140px", w->width < 170,
 	     TRUE);
 	it_i("$('#test-text-auto-size')[0].height", (int)w->height, 31);
 
-	w = LCUIWidget_GetById("test-text-block-auto-height");
+	w = ui_get_widget("test-text-block-auto-height");
 	it_i("$('#test-text-block-auto-height')[0].width", (int)w->width, 758);
 	it_i("$('#test-text-block-auto-height')[0].height", (int)w->height, 31);
 
@@ -431,51 +431,51 @@ static void test_block_layout_1280(void)
 
 static void test_block_layout_600(void)
 {
-	LCUI_Widget w;
-	LCUI_Widget content;
-	LCUI_Widget example;
-	LCUI_Widget container;
+	ui_widget_t* w;
+	ui_widget_t* content;
+	ui_widget_t* example;
+	ui_widget_t* container;
 	LCUI_RectF rect;
 
-	container = Widget_GetChild(LCUIWidget_GetById("main"), 0);
+	container = ui_widget_get_child(ui_get_widget("main"), 0);
 	LCUIDisplay_SetSize(600, 400);
-	LCUIWidget_Update();
+	ui_update();
 
 	rect.x = 10;
 	rect.y = 10;
 	rect.width = 600 - 20 - 14;
 	rect.height = 504;
-	w = Widget_GetChild(container, 0);
+	w = ui_widget_get_child(container, 0);
 	it_rectf("$('.example')[0].box.border", &w->box.border, &rect);
 
 	rect.y += rect.height + 10;
 	rect.height = 304;
-	w = Widget_GetChild(container, 1);
+	w = ui_widget_get_child(container, 1);
 	it_rectf("$('.example')[1].box.border", &w->box.border, &rect);
 
 	rect.y += rect.height + 10;
 	rect.height = 204;
-	w = Widget_GetChild(container, 2);
+	w = ui_widget_get_child(container, 2);
 	it_rectf("$('.example')[2].box.border", &w->box.border, &rect);
 
 	rect.y += rect.height + 10;
 	rect.height = 600;
-	w = Widget_GetChild(container, 3);
+	w = ui_widget_get_child(container, 3);
 	it_rectf("$('.example')[3].box.border", &w->box.border, &rect);
 
 	rect.y += rect.height + 10;
 	rect.height = 354;
-	w = Widget_GetChild(container, 4);
+	w = ui_widget_get_child(container, 4);
 	it_rectf("$('.example')[4].box.border", &w->box.border, &rect);
 
 	rect.y += rect.height + 10;
 	rect.height = 254;
-	w = Widget_GetChild(container, 5);
+	w = ui_widget_get_child(container, 5);
 	it_rectf("$('.example')[5].box.border", &w->box.border, &rect);
 
-	example = Widget_GetChild(container, 0);
-	content = Widget_GetChild(example, 1);
-	w = Widget_GetChild(content, 11);
+	example = ui_widget_get_child(container, 0);
+	content = ui_widget_get_child(example, 1);
+	w = ui_widget_get_child(content, 11);
 	rect.width = 50;
 	rect.height = 50;
 	rect.x = content->padding.left;
@@ -483,7 +483,7 @@ static void test_block_layout_600(void)
 	it_rectf("$('.example:eq(0) .box')[11].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetChild(content, 14);
+	w = ui_widget_get_child(content, 14);
 	rect.width = 150;
 	rect.x = content->padding.left;
 	rect.x += content->box.content.width - rect.width;
@@ -491,14 +491,14 @@ static void test_block_layout_600(void)
 	it_rectf("$('.example:eq(0) .box')[14].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.x = content->padding.left;
 	rect.x += (content->box.content.width - rect.width) / 2.f;
 	rect.y += 50;
 	it_rectf("$('.example:eq(0) .box')[15].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetChild(content, 26);
+	w = ui_widget_get_child(content, 26);
 	rect.x = content->padding.left;
 	rect.y = content->padding.top + 400;
 	rect.width = 50;
@@ -506,9 +506,9 @@ static void test_block_layout_600(void)
 	it_rectf("$('.example:eq(0) .box')[26].box.border", &w->box.border,
 		 &rect);
 
-	example = Widget_GetChild(container, 1);
-	content = Widget_GetChild(example, 1);
-	w = Widget_GetChild(content, 0);
+	example = ui_widget_get_child(container, 1);
+	content = ui_widget_get_child(example, 1);
+	w = ui_widget_get_child(content, 0);
 	rect.x = content->padding.left;
 	rect.y = content->padding.top;
 	rect.width = content->box.content.width * 0.5f;
@@ -516,53 +516,53 @@ static void test_block_layout_600(void)
 	it_rectf("$('.example:eq(1) .box')[0].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.y += 50;
 	it_rectf("$('.example:eq(1) .box')[1].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.y += 50;
 	rect.width = content->box.content.width;
 	it_rectf("$('.example:eq(1) .box')[2].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.y += 50;
 	rect.width = content->box.content.width * 0.5f;
 	it_rectf("$('.example:eq(1) .box')[3].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.x += rect.width;
 	it_rectf("$('.example:eq(1) .box')[4].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.y += 50;
 	rect.x = content->padding.left;
 	rect.width = content->box.content.width * 0.25f;
 	it_rectf("$('.example:eq(1) .box')[5].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.x += rect.width;
 	it_rectf("$('.example:eq(1) .box')[6].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.x += rect.width;
 	it_rectf("$('.example:eq(1) .box')[7].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.x += rect.width;
 	it_rectf("$('.example:eq(1) .box')[8].box.border", &w->box.border,
 		 &rect);
 
-	example = Widget_GetChild(container, 3);
-	content = Widget_GetChild(Widget_GetChild(example, 1), 0);
-	w = Widget_GetChild(content, 7);
+	example = ui_widget_get_child(container, 3);
+	content = ui_widget_get_child(ui_widget_get_child(example, 1), 0);
+	w = ui_widget_get_child(content, 7);
 
 	rect.x = content->padding.left - 16;
 	rect.y = content->padding.top + (16 + 50 + 16) + (8 + 50 + 8);
@@ -571,8 +571,8 @@ static void test_block_layout_600(void)
 	it_rectf("$('.example:eq(3) .box')[7].box.border", &w->box.border,
 		 &rect);
 
-	content = Widget_GetChild(Widget_GetChild(example, 1), 1);
-	w = Widget_GetChild(content, 4);
+	content = ui_widget_get_child(ui_widget_get_child(example, 1), 1);
+	w = ui_widget_get_child(content, 4);
 	rect.x = content->padding.left - 8;
 	rect.y = content->padding.top + 200;
 	rect.width = content->box.content.width;
@@ -580,10 +580,10 @@ static void test_block_layout_600(void)
 	it_rectf("$('.example:eq(3) .box')[13].box.border", &w->box.border,
 		 &rect);
 
-	example = Widget_GetChild(container, 5);
-	content = Widget_GetChild(example, 1);
+	example = ui_widget_get_child(container, 5);
+	content = ui_widget_get_child(example, 1);
 
-	w = LCUIWidget_GetById("box-absolute-top-left");
+	w = ui_get_widget("box-absolute-top-left");
 	rect.x = 0;
 	rect.y = 0;
 	rect.width = 100;
@@ -591,24 +591,24 @@ static void test_block_layout_600(void)
 	it_rectf("$('#box-absolute-top-left')[0].box.border", &w->box.border,
 		 &rect);
 
-	w = LCUIWidget_GetById("box-absolute-top-right");
+	w = ui_get_widget("box-absolute-top-right");
 	rect.x = content->box.padding.width - rect.width;
 	it_rectf("$('#box-absolute-top-right')[0].box.border", &w->box.border,
 		 &rect);
 
-	w = LCUIWidget_GetById("box-absolute-center");
+	w = ui_get_widget("box-absolute-center");
 	rect.x = (content->box.padding.width - rect.width) * 0.5f;
 	rect.y = (content->box.padding.height - rect.height) * 0.5f;
 	it_rectf("$('#box-absolute-center')[0].box.border", &w->box.border,
 		 &rect);
 
-	w = LCUIWidget_GetById("box-absolute-bottom-left");
+	w = ui_get_widget("box-absolute-bottom-left");
 	rect.x = 0;
 	rect.y = content->box.padding.height - rect.height;
 	it_rectf("$('#box-absolute-bottom-left')[0].box.border", &w->box.border,
 		 &rect);
 
-	w = LCUIWidget_GetById("box-absolute-bottom-right");
+	w = ui_get_widget("box-absolute-bottom-right");
 	rect.x = content->box.padding.width - rect.width;
 	it_rectf("$('#box-absolute-bottom-right')[0].box.border",
 		 &w->box.border, &rect);
@@ -616,52 +616,52 @@ static void test_block_layout_600(void)
 
 static void test_block_layout_320(void)
 {
-	LCUI_Widget w;
-	LCUI_Widget content;
-	LCUI_Widget example;
-	LCUI_Widget container;
+	ui_widget_t* w;
+	ui_widget_t* content;
+	ui_widget_t* example;
+	ui_widget_t* container;
 	LCUI_RectF rect;
 
-	container = Widget_GetChild(LCUIWidget_GetById("main"), 0);
+	container = ui_widget_get_child(ui_get_widget("main"), 0);
 	LCUIDisplay_SetSize(320, 240);
-	LCUIWidget_Update();
+	ui_update();
 
 	rect.x = 10;
 	rect.y = 10;
 	rect.width = 320 - 20 - 14;
 	rect.height = 604;
-	w = Widget_GetChild(container, 0);
+	w = ui_widget_get_child(container, 0);
 	it_rectf("$('.example')[0].box.border", &w->box.border, &rect);
 
 	rect.y += rect.height + 10;
 	rect.height = 304;
-	w = Widget_GetChild(container, 1);
+	w = ui_widget_get_child(container, 1);
 	it_rectf("$('.example')[1].box.border", &w->box.border, &rect);
 
 	rect.y += rect.height + 10;
 	rect.height = 280;
-	w = Widget_GetChild(container, 2);
+	w = ui_widget_get_child(container, 2);
 	it_rectf("$('.example')[2].box.border", &w->box.border, &rect);
 
 	rect.y += rect.height + 10;
 	rect.height = 732;
-	w = Widget_GetChild(container, 3);
+	w = ui_widget_get_child(container, 3);
 	it_rectf("$('.example')[3].box.border", &w->box.border, &rect);
 
 	rect.y += rect.height + 10;
 	rect.height = 504;
-	w = Widget_GetChild(container, 4);
+	w = ui_widget_get_child(container, 4);
 	it_rectf("$('.example')[4].box.border", &w->box.border, &rect);
 
 	rect.y += rect.height + 10;
 	rect.height = 254;
-	w = Widget_GetChild(container, 5);
+	w = ui_widget_get_child(container, 5);
 	it_rectf("$('.example')[5].box.border", &w->box.border, &rect);
 
-	example = Widget_GetChild(container, 0);
-	content = Widget_GetChild(example, 1);
+	example = ui_widget_get_child(container, 0);
+	content = ui_widget_get_child(example, 1);
 
-	w = Widget_GetChild(content, 11);
+	w = ui_widget_get_child(content, 11);
 	rect.x = content->padding.left;
 	rect.y = content->padding.top + 150;
 	rect.width = 50;
@@ -669,7 +669,7 @@ static void test_block_layout_320(void)
 	it_rectf("$('.example:eq(0) .box')[11].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetChild(content, 14);
+	w = ui_widget_get_child(content, 14);
 	rect.width = 150;
 	rect.x = content->padding.left;
 	rect.x += content->box.content.width - rect.width;
@@ -677,14 +677,14 @@ static void test_block_layout_320(void)
 	it_rectf("$('.example:eq(0) .box')[14].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetNext(w);
+	w = ui_widget_next(w);
 	rect.x = content->padding.left;
 	rect.x += (content->box.content.width - rect.width) / 2.f;
 	rect.y += 50;
 	it_rectf("$('.example:eq(0) .box')[15].box.border", &w->box.border,
 		 &rect);
 
-	w = Widget_GetChild(content, 26);
+	w = ui_widget_get_child(content, 26);
 	rect.x = content->padding.left;
 	rect.y = content->padding.top + 500;
 	rect.width = 50;
@@ -692,9 +692,9 @@ static void test_block_layout_320(void)
 	it_rectf("$('.example:eq(0) .box')[26].box.border", &w->box.border,
 		 &rect);
 
-	example = Widget_GetChild(container, 3);
-	content = Widget_GetChild(Widget_GetChild(example, 1), 0);
-	w = Widget_GetChild(content, 7);
+	example = ui_widget_get_child(container, 3);
+	content = ui_widget_get_child(ui_widget_get_child(example, 1), 0);
+	w = ui_widget_get_child(content, 7);
 	rect.x = content->padding.left - 16;
 	rect.y = content->padding.top + (16 + 50 + 16) + 3 * (8 + 50 + 8);
 	rect.width = 100;
@@ -702,10 +702,10 @@ static void test_block_layout_320(void)
 	it_rectf("$('.example:eq(3) .box')[7].box.border", &w->box.border,
 		 &rect);
 
-	example = Widget_GetChild(container, 5);
-	content = Widget_GetChild(example, 1);
+	example = ui_widget_get_child(container, 5);
+	content = ui_widget_get_child(example, 1);
 
-	w = LCUIWidget_GetById("box-absolute-top-left");
+	w = ui_get_widget("box-absolute-top-left");
 	rect.x = 0;
 	rect.y = 0;
 	rect.width = 100;
@@ -713,24 +713,24 @@ static void test_block_layout_320(void)
 	it_rectf("$('#box-absolute-top-left')[0].box.border", &w->box.border,
 		 &rect);
 
-	w = LCUIWidget_GetById("box-absolute-top-right");
+	w = ui_get_widget("box-absolute-top-right");
 	rect.x = content->box.padding.width - rect.width;
 	it_rectf("$('#box-absolute-top-right')[0].box.border", &w->box.border,
 		 &rect);
 
-	w = LCUIWidget_GetById("box-absolute-center");
+	w = ui_get_widget("box-absolute-center");
 	rect.x = (content->box.padding.width - rect.width) * 0.5f;
 	rect.y = (content->box.padding.height - rect.height) * 0.5f;
 	it_rectf("$('#box-absolute-center')[0].box.border", &w->box.border,
 		 &rect);
 
-	w = LCUIWidget_GetById("box-absolute-bottom-left");
+	w = ui_get_widget("box-absolute-bottom-left");
 	rect.x = 0;
 	rect.y = content->box.padding.height - rect.height;
 	it_rectf("$('#box-absolute-bottom-left')[0].box.border", &w->box.border,
 		 &rect);
 
-	w = LCUIWidget_GetById("box-absolute-bottom-right");
+	w = ui_get_widget("box-absolute-bottom-right");
 	rect.x = content->box.padding.width - rect.width;
 	it_rectf("$('#box-absolute-bottom-right')[0].box.border",
 		 &w->box.border, &rect);
@@ -738,15 +738,15 @@ static void test_block_layout_320(void)
 
 void test_block_layout(void)
 {
-	LCUI_Widget root;
-	LCUI_Widget wrapper;
+	ui_widget_t* root;
+	ui_widget_t* wrapper;
 
 	LCUI_Init();
 	wrapper = LCUIBuilder_LoadFile("test_block_layout.xml");
-	root = LCUIWidget_GetRoot();
-	Widget_Append(root, wrapper);
-	Widget_Unwrap(wrapper);
-	LCUIWidget_Update();
+	root = ui_root();
+	ui_widget_append(root, wrapper);
+	ui_widget_unwrap(wrapper);
+	ui_update();
 
 	describe("root width 1280px", test_block_layout_1280);
 	describe("root width 600px", test_block_layout_600);

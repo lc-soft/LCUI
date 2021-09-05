@@ -64,35 +64,35 @@ const char *test_content = "\n\
 /* Build content view with native C code */
 void BuildContentView(void)
 {
-	LCUI_Widget root = LCUIWidget_GetRoot();
-	LCUI_Widget container = LCUIWidget_New(NULL);
-	LCUI_Widget content = LCUIWidget_New("textview");
-	LCUI_Widget vscrollbar = LCUIWidget_New("scrollbar");
-	LCUI_Widget hscrollbar = LCUIWidget_New("scrollbar");
+	ui_widget_t* root = ui_root();
+	ui_widget_t* container = ui_create_widget(NULL);
+	ui_widget_t* content = ui_create_widget("textview");
+	ui_widget_t* vscrollbar = ui_create_widget("scrollbar");
+	ui_widget_t* hscrollbar = ui_create_widget("scrollbar");
 
-	Widget_SetId(content, "license_content");
+	ui_widget_set_id(content, "license_content");
 	TextView_SetText(content, test_content);
 	ScrollBar_SetDirection(hscrollbar, LCUI_SCROLLBAR_HORIZONTAL);
 	ScrollBar_BindTarget(vscrollbar, content);
 	ScrollBar_BindTarget(hscrollbar, content);
-	Widget_AddClass(container, "container");
-	Widget_Append(container, content);
-	Widget_Append(container, vscrollbar);
-	Widget_Append(container, hscrollbar);
-	Widget_Append(root, container);
+	ui_widget_add_class(container, "container");
+	ui_widget_append(container, content);
+	ui_widget_append(container, vscrollbar);
+	ui_widget_append(container, hscrollbar);
+	ui_widget_append(root, container);
 }
 
 /* Build content view with the XML code in test_scrollbar.xml */
 int BuildContentViewFromXML(void)
 {
-	LCUI_Widget root = LCUIWidget_GetRoot();
-	LCUI_Widget pack = LCUIBuilder_LoadFile("test_scrollbar.xml");
+	ui_widget_t* root = ui_root();
+	ui_widget_t* pack = LCUIBuilder_LoadFile("test_scrollbar.xml");
 
 	if (!pack) {
 		return -1;
 	}
-	Widget_Append(root, pack);
-	Widget_Unwrap(pack);
+	ui_widget_append(root, pack);
+	ui_widget_unwrap(pack);
 	return 0;
 }
 
@@ -100,15 +100,15 @@ void test_scrollbar(void)
 {
 	float left, top;
 	LCUI_SysEventRec e = { 0 };
-	LCUI_Widget content;
+	ui_widget_t* content;
 
 	LCUI_Init();
 	LCUIDisplay_SetSize(800, 640);
-	LCUI_LoadCSSString(test_css, __FILE__);
+	ui_load_css_string(test_css, __FILE__);
 	BuildContentView();
 	LCUI_RunFrame();
 
-	content = LCUIWidget_GetById("license_content");
+	content = ui_get_widget("license_content");
 	left = content->computed_style.left;
 	top = content->computed_style.top;
 

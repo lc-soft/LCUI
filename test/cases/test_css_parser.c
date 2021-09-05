@@ -9,7 +9,7 @@ static void test_btn_text_style(void)
 {
 	LCUI_Style s;
 
-	s = LCUIWidget_GetById("test-textview")->style->sheet;
+	s = ui_get_widget("test-textview")->style->sheet;
 	it_i("width", (int)s[key_width].val_px, 100);
 	it_i("height", (int)s[key_height].val_px, 60);
 	it_i("position", s[key_position].val_style, SV_ABSOLUTE);
@@ -21,7 +21,7 @@ static void test_btn_hover_text_style(void)
 {
 	LCUI_Style s;
 
-	s = LCUIWidget_GetById("test-textview")->style->sheet;
+	s = ui_get_widget("test-textview")->style->sheet;
 	it_i("background-color", s[key_background_color].val_color.value,
 	     0xffff0000);
 	it_i("background-size", s[key_background_size].val_style, SV_CONTAIN);
@@ -31,7 +31,7 @@ static void test_flex_box(void)
 {
 	LCUI_Style s;
 
-	s = LCUIWidget_GetById("test-flex-box")->style->sheet;
+	s = ui_get_widget("test-flex-box")->style->sheet;
 	it_i("flex-grow", s[key_flex_grow].val_int, 0);
 	it_i("flex-shrink", s[key_flex_shrink].val_int, 0);
 	it_i("flex-basis", s[key_flex_basis].val_style, SV_AUTO);
@@ -46,7 +46,7 @@ static void test_parse_flex_initial(void)
 {
 	LCUI_Style s;
 
-	s = LCUIWidget_GetById("test-flex-initial")->style->sheet;
+	s = ui_get_widget("test-flex-initial")->style->sheet;
 	it_i("<flex-grow>", s[key_flex_grow].val_int, 0);
 	it_i("<flex-shrink>", s[key_flex_shrink].val_int, 1);
 	it_i("<flex-basis>", s[key_flex_basis].val_style, SV_AUTO);
@@ -55,7 +55,7 @@ static void test_parse_flex_auto(void)
 {
 	LCUI_Style s;
 
-	s = LCUIWidget_GetById("test-flex-auto")->style->sheet;
+	s = ui_get_widget("test-flex-auto")->style->sheet;
 	it_i("<flex-grow>", s[key_flex_grow].val_int, 1);
 	it_i("<flex-shrink>", s[key_flex_shrink].val_int, 1);
 	it_i("<flex-basis>", s[key_flex_basis].val_style, SV_AUTO);
@@ -65,7 +65,7 @@ static void test_parse_flex_none(void)
 {
 	LCUI_Style s;
 
-	s = LCUIWidget_GetById("test-flex-none")->style->sheet;
+	s = ui_get_widget("test-flex-none")->style->sheet;
 	it_i("<flex-grow>", s[key_flex_grow].val_int, 0);
 	it_i("<flex-shrink>", s[key_flex_shrink].val_int, 0);
 	it_i("<flex-basis>", s[key_flex_basis].val_style, SV_AUTO);
@@ -75,7 +75,7 @@ static void test_parse_flex_1(void)
 {
 	LCUI_Style s;
 
-	s = LCUIWidget_GetById("test-flex-1")->style->sheet;
+	s = ui_get_widget("test-flex-1")->style->sheet;
 	it_i("<flex-grow>", s[key_flex_grow].val_int, 1);
 	it_b("<flex-shrink>.isValid?", s[key_flex_shrink].is_valid, FALSE);
 	it_b("<flex-basis>.isValid?", s[key_flex_basis].is_valid, FALSE);
@@ -85,7 +85,7 @@ static void test_parse_flex_100px(void)
 {
 	LCUI_Style s;
 
-	s = LCUIWidget_GetById("test-flex-100px")->style->sheet;
+	s = ui_get_widget("test-flex-100px")->style->sheet;
 	it_b("<flex-grow>.isValid?", s[key_flex_grow].is_valid, FALSE);
 	it_b("<flex-shrink>.isValid?", s[key_flex_shrink].is_valid, FALSE);
 	it_i("<flex-basis>", (int)s[key_flex_basis].val_px, 100);
@@ -95,7 +95,7 @@ static void test_parse_flex_1_100px(void)
 {
 	LCUI_Style s;
 
-	s = LCUIWidget_GetById("test-flex-1-100px")->style->sheet;
+	s = ui_get_widget("test-flex-1-100px")->style->sheet;
 	it_b("<flex-grow>.isValid?", s[key_flex_grow].is_valid, FALSE);
 	it_i("<flex-shrink>", s[key_flex_shrink].val_int, 1);
 	it_i("<flex-basis>", (int)s[key_flex_basis].val_px, 100);
@@ -104,7 +104,7 @@ static void test_parse_flex_0_0_100px(void)
 {
 	LCUI_Style s;
 
-	s = LCUIWidget_GetById("test-flex-0-0-100px")->style->sheet;
+	s = ui_get_widget("test-flex-0-0-100px")->style->sheet;
 	it_i("<flex-grow>", s[key_flex_grow].val_int, 0);
 	it_i("<flex-shrink>", s[key_flex_shrink].val_int, 0);
 	it_i("<flex-basis>", (int)s[key_flex_basis].val_px, 100);
@@ -112,7 +112,7 @@ static void test_parse_flex_0_0_100px(void)
 
 void test_css_parser(void)
 {
-	LCUI_Widget root, box, btn;
+	ui_widget_t* root, box, btn;
 
 	LCUI_Init();
 	box = LCUIBuilder_LoadFile("test_css_parser.xml");
@@ -121,15 +121,15 @@ void test_css_parser(void)
 		LCUI_Destroy();
 		return;
 	}
-	root = LCUIWidget_GetRoot();
-	Widget_Append(root, box);
-	Widget_Unwrap(box);
-	LCUIWidget_Update();
+	root = ui_root();
+	ui_widget_append(root, box);
+	ui_widget_unwrap(box);
+	ui_update();
 
-	btn = LCUIWidget_GetById("test-btn");
+	btn = ui_get_widget("test-btn");
 	describe(".btn .text", test_btn_text_style);
-	Widget_AddStatus(btn, "hover");
-	LCUIWidget_Update();
+	ui_widget_add_status(btn, "hover");
+	ui_update();
 
 	describe(".btn:hover .text", test_btn_hover_text_style);
 	describe("#test-flex-box", test_flex_box);

@@ -8,7 +8,7 @@ int main(void)
 {
 	int ret;
 	LCUI_Graph canvas;
-	LCUI_Widget root, box, txt;
+	ui_widget_t* root, box, txt;
 	LCUI_PaintContextRec paint;
 	LCUI_Rect area = { 40, 40, 320, 240 };
 	LCUI_Color bgcolor = RGB(242, 249, 252);
@@ -16,9 +16,9 @@ int main(void)
 
 	LCUI_Init();
 
-	root = LCUIWidget_New(NULL);
-	box = LCUIWidget_New(NULL);
-	txt = LCUIWidget_New("textview");
+	root = ui_create_widget(NULL);
+	box = ui_create_widget(NULL);
+	txt = ui_create_widget("textview");
 
 	/* 创建一块灰色的画板 */
 	Graph_Init(&canvas);
@@ -33,23 +33,23 @@ int main(void)
 	Graph_Quote(&paint.canvas, &canvas, &area);
 
 	/* 设定基本的样式和内容 */
-	Widget_SetPadding(box, 20, 20, 20, 20);
-	Widget_SetBorder(box, 1, SV_SOLID, bdcolor);
-	Widget_SetStyle(box, key_background_color, bgcolor, color);
+	ui_widget_set_padding(box, 20, 20, 20, 20);
+	ui_widget_set_border(box, 1, SV_SOLID, bdcolor);
+	ui_widget_set_style(box, key_background_color, bgcolor, color);
 	TextView_SetTextW(txt, L"[size=24px]这是一段测试文本[/size]");
-	Widget_Append(box, txt);
-	Widget_Append(root, box);
+	ui_widget_append(box, txt);
+	ui_widget_append(root, box);
 	/* 标记需要更新样式 */
-	Widget_UpdateStyle(txt, TRUE);
-	Widget_UpdateStyle(box, TRUE);
-	Widget_UpdateStyle(root, TRUE);
+	ui_widget_update_style(txt, TRUE);
+	ui_widget_update_style(box, TRUE);
+	ui_widget_update_style(root, TRUE);
 	/* 更新部件，此处的更新顺序必须是父级到子级 */
-	Widget_Update(root);
-	Widget_Update(box);
-	Widget_Update(txt);
+	ui_widget_update(root);
+	ui_widget_update(box);
+	ui_widget_update(txt);
 
 	/* 渲染部件 */
-	Widget_Render(box, &paint);
+	ui_widget_render(box, &paint);
 	ret = LCUI_WritePNGFile("test_widget_render.png", &canvas);
 	Graph_Free(&canvas);
 

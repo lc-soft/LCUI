@@ -8,8 +8,8 @@
 /* clang-format off */
 
 static struct {
-	LCUI_Widget block;
-	LCUI_Widget inline_block;
+	ui_widget_t* block;
+	ui_widget_t* inline_block;
 } self;
 
 static const char *css = CodeToString(
@@ -43,23 +43,23 @@ static const char *css = CodeToString(
 
 static void build(void)
 {
-	LCUI_Widget root;
+	ui_widget_t* root;
 
-	LCUI_LoadCSSString(css, __FILE__);
+	ui_load_css_string(css, __FILE__);
 
-	self.block = LCUIWidget_New("textview");
-	self.inline_block = LCUIWidget_New("textview");
+	self.block = ui_create_widget("textview");
+	self.inline_block = ui_create_widget("textview");
 
-	Widget_SetId(self.block, "debug-block");
-	Widget_SetId(self.inline_block, "debug-inline-block");
+	ui_widget_set_id(self.block, "debug-block");
+	ui_widget_set_id(self.inline_block, "debug-inline-block");
 	TextView_SetTextW(self.block, L"block");
 	TextView_SetTextW(self.inline_block, L"inline block");
-	Widget_AddClass(self.block, "block");
-	Widget_AddClass(self.inline_block, "inline-block");
+	ui_widget_add_class(self.block, "block");
+	ui_widget_add_class(self.inline_block, "inline-block");
 
-	root = LCUIWidget_GetRoot();
-	Widget_Append(root, self.block);
-	Widget_Append(root, self.inline_block);
+	root = ui_root();
+	ui_widget_append(root, self.block);
+	ui_widget_append(root, self.inline_block);
 }
 
 static void test_textview_set_text(void *arg)
@@ -77,7 +77,7 @@ static void test_textview_set_text(void *arg)
 
 static void check_textview_set_text(void)
 {
-	LCUIWidget_Update();
+	ui_update();
 
 	it_b("check block width", self.block->width == 122.0f, TRUE);
 	it_b("check block height", self.block->height > 140.0f, TRUE);
@@ -90,13 +90,13 @@ static void check_textview_set_text(void)
 static void test_textview_set_short_content_css(void *arg)
 {
 	_DEBUG_MSG("set text\n");
-	Widget_AddClass(self.block, "short-content");
-	Widget_AddClass(self.inline_block, "short-content");
+	ui_widget_add_class(self.block, "short-content");
+	ui_widget_add_class(self.inline_block, "short-content");
 }
 
 static void check_textview_set_short_content_css(void)
 {
-	LCUIWidget_Update();
+	ui_update();
 
 	it_b("check block width", self.block->width == 122.0f, TRUE);
 	it_b("check block height", self.block->height < 45.0f, TRUE);
@@ -109,15 +109,15 @@ static void check_textview_set_short_content_css(void)
 static void test_textview_set_long_content_css(void *arg)
 {
 	_DEBUG_MSG("set text\n");
-	Widget_RemoveClass(self.block, "short-content");
-	Widget_RemoveClass(self.inline_block, "short-content");
-	Widget_AddClass(self.block, "long-content");
-	Widget_AddClass(self.inline_block, "long-content");
+	ui_widget_remove_class(self.block, "short-content");
+	ui_widget_remove_class(self.inline_block, "short-content");
+	ui_widget_add_class(self.block, "long-content");
+	ui_widget_add_class(self.inline_block, "long-content");
 }
 
 static void check_textview_set_long_content_css(void)
 {
-	LCUIWidget_Update();
+	ui_update();
 
 	it_b("check block width", self.block->width == 122.0f, TRUE);
 	it_b("check block height", self.block->height > 60.0f, TRUE);

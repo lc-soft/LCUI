@@ -8,49 +8,49 @@
 
 enum { TYPE_DENSITY, TYPE_SCALED_DENSITY, TYPE_SCALE };
 
-static void OnButtonClick(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
+static void OnButtonClick(ui_widget_t* w, ui_event_t* e, void *arg)
 {
 	int *data = e->data;
 	switch (data[0]) {
 	case TYPE_DENSITY:
-		LCUIMetrics_SetDensityLevel(data[1]);
+		ui_set_density_level(data[1]);
 		break;
 	case TYPE_SCALED_DENSITY:
-		LCUIMetrics_SetScaledDensityLevel(data[1]);
+		ui_set_scaled_density_level(data[1]);
 		break;
 	case TYPE_SCALE:
-		LCUIMetrics_SetScale(data[1] / 100.0f);
+		ui_set_scale(data[1] / 100.0f);
 		break;
 	}
-	LCUIWidget_RefreshStyle();
+	ui_refresh_style();
 	LCUIDisplay_InvalidateArea(NULL);
 }
 
 static void SetButton(const char *id, int type, int level)
 {
 	int *data;
-	LCUI_Widget btn;
+	ui_widget_t* btn;
 	data = malloc(sizeof(int) * 2);
 	data[0] = type;
 	data[1] = level;
-	btn = LCUIWidget_GetById(id);
-	Widget_BindEvent(btn, "click", OnButtonClick, data, free);
+	btn = ui_get_widget(id);
+	ui_widget_on(btn, "click", OnButtonClick, data, free);
 }
 
 static void InitButtons(void)
 {
-	SetButton("btn-density-small", TYPE_DENSITY, DENSITY_LEVEL_SMALL);
-	SetButton("btn-density-normal", TYPE_DENSITY, DENSITY_LEVEL_NORMAL);
-	SetButton("btn-density-large", TYPE_DENSITY, DENSITY_LEVEL_LARGE);
-	SetButton("btn-density-big", TYPE_DENSITY, DENSITY_LEVEL_BIG);
+	SetButton("btn-density-small", TYPE_DENSITY, UI_DENSITY_LEVEL_SMALL);
+	SetButton("btn-density-normal", TYPE_DENSITY, UI_DENSITY_LEVEL_NORMAL);
+	SetButton("btn-density-large", TYPE_DENSITY, UI_DENSITY_LEVEL_LARGE);
+	SetButton("btn-density-big", TYPE_DENSITY, UI_DENSITY_LEVEL_BIG);
 	SetButton("btn-scaled-density-small", TYPE_SCALED_DENSITY,
-		  DENSITY_LEVEL_SMALL);
+		  UI_DENSITY_LEVEL_SMALL);
 	SetButton("btn-scaled-density-normal", TYPE_SCALED_DENSITY,
-		  DENSITY_LEVEL_NORMAL);
+		  UI_DENSITY_LEVEL_NORMAL);
 	SetButton("btn-scaled-density-large", TYPE_SCALED_DENSITY,
-		  DENSITY_LEVEL_LARGE);
+		  UI_DENSITY_LEVEL_LARGE);
 	SetButton("btn-scaled-density-big", TYPE_SCALED_DENSITY,
-		  DENSITY_LEVEL_BIG);
+		  UI_DENSITY_LEVEL_BIG);
 	SetButton("btn-scale-small", TYPE_SCALE, 75);
 	SetButton("btn-scale-normal", TYPE_SCALE, 100);
 	SetButton("btn-scale-large", TYPE_SCALE, 150);
@@ -59,17 +59,17 @@ static void InitButtons(void)
 
 int main(int argc, char **argv)
 {
-	LCUI_Widget root, pack;
+	ui_widget_t* root, pack;
 
 	LCUI_Init();
-	root = LCUIWidget_GetRoot();
+	root = ui_root();
 	pack = LCUIBuilder_LoadFile("test_scaling_support.xml");
 	if (!pack) {
 		return -1;
 	}
-	Widget_UpdateStyle(root, TRUE);
-	Widget_Append(root, pack);
-	Widget_Unwrap(pack);
+	ui_widget_update_style(root, TRUE);
+	ui_widget_append(root, pack);
+	ui_widget_unwrap(pack);
 	InitButtons();
 	return LCUI_Main();
 }

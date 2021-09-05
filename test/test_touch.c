@@ -10,7 +10,7 @@
 /** 触点绑定记录 */
 typedef struct TouchPointBindingRec_ {
 	int point_id;        /**< 触点 ID */
-	LCUI_Widget widget;  /**< 部件 */
+	ui_widget_t* widget;  /**< 部件 */
 	LinkedListNode node; /**< 在链表中的结点 */
 	LCUI_BOOL is_valid;  /**< 是否有效 */
 } TouchPointBindingRec, *TouchPointBinding;
@@ -18,7 +18,7 @@ typedef struct TouchPointBindingRec_ {
 /** 触点绑定记录列表 */
 static LinkedList touch_bindings;
 
-static void OnTouchWidget(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
+static void OnTouchWidget(ui_widget_t* w, ui_event_t* e, void *arg)
 {
 	LCUI_TouchPoint point;
 	TouchPointBinding binding;
@@ -29,21 +29,21 @@ static void OnTouchWidget(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 	binding = e->data;
 	point = &e->touch.points[0];
 	switch (point->state) {
-	case LCUI_WEVENT_TOUCHMOVE:
-		Widget_Move(w, point->x - 32.0f, point->y - 32.0f);
+	case UI_EVENT_TOUCHMOVE:
+		ui_widget_move(w, point->x - 32.0f, point->y - 32.0f);
 		break;
-	case LCUI_WEVENT_TOUCHUP:
+	case UI_EVENT_TOUCHUP:
 		if (!binding->is_valid) {
 			break;
 		}
 		/* 当触点释放后销毁部件及绑定记录 */
-		Widget_ReleaseTouchCapture(w, -1);
+		ui_widget_release_touch_capture(w, -1);
 		LinkedList_Unlink(&touch_bindings, &binding->node);
 		binding->is_valid = FALSE;
-		Widget_Destroy(w);
+		ui_widget_remove(w);
 		free(binding);
 		break;
-	case LCUI_WEVENT_TOUCHDOWN:
+	case UI_EVENT_TOUCHDOWN:
 	default:
 		break;
 	}
@@ -52,7 +52,7 @@ static void OnTouchWidget(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 static void OnTouch(LCUI_SysEvent e, void *arg)
 {
 	int i;
-	LCUI_Widget w;
+	ui_widget_t* w;
 	LinkedListNode *node;
 	LCUI_TouchPoint point;
 	LCUI_Color bgcolor = RGB(255, 0, 0);
@@ -72,22 +72,22 @@ static void OnTouch(LCUI_SysEvent e, void *arg)
 		if (is_existed) {
 			continue;
 		}
-		w = LCUIWidget_New(NULL);
+		w = ui_create_widget(NULL);
 		/* 新建绑定记录 */
 		binding = NEW(TouchPointBindingRec, 1);
 		binding->point_id = point->id;
 		binding->node.data = binding;
 		binding->is_valid = TRUE;
 		binding->widget = w;
-		Widget_Resize(w, 64, 64);
-		Widget_Move(w, point->x - 32.0f, point->y - 32.0f);
+		ui_widget_resize(w, 64, 64);
+		ui_widget_move(w, point->x - 32.0f, point->y - 32.0f);
 		/* 设置让该部件捕获当前触点 */
-		Widget_SetTouchCapture(w, binding->point_id);
-		Widget_BindEvent(w, "touch", OnTouchWidget, binding, NULL);
-		Widget_SetStyle(w, key_position, SV_ABSOLUTE, style);
-		Widget_SetStyle(w, key_background_color, bgcolor, color);
+		ui_widget_set_touch_capture(w, binding->point_id);
+		ui_widget_on(w, "touch", OnTouchWidget, binding, NULL);
+		ui_widget_set_style(w, key_position, SV_ABSOLUTE, style);
+		ui_widget_set_style(w, key_background_color, bgcolor, color);
 		LinkedList_AppendNode(&touch_bindings, &binding->node);
-		Widget_Top(w);
+		ui_root_append(w);
 	}
 }
 

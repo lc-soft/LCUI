@@ -11,23 +11,23 @@
 #define CHILD_OPACITY 0.5f
 
 static struct {
-	LCUI_Widget parent;
-	LCUI_Widget child;
-	LCUI_Widget text;
+	ui_widget_t* parent;
+	ui_widget_t* child;
+	ui_widget_t* text;
 } self;
 
 static void build(void)
 {
-	LCUI_Widget pack, root;
+	ui_widget_t* pack, root;
 
 	pack = LCUIBuilder_LoadFile("test_widget_opacity.xml");
-	root = LCUIWidget_GetRoot();
-	Widget_Append(root, pack);
-	Widget_Unwrap(pack);
+	root = ui_root();
+	ui_widget_append(root, pack);
+	ui_widget_unwrap(pack);
 
-	self.parent = LCUIWidget_GetById("parent");
-	self.child = LCUIWidget_GetById("child");
-	self.text = LCUIWidget_GetById("current-opacity");
+	self.parent = ui_get_widget("parent");
+	self.child = ui_get_widget("child");
+	self.text = ui_get_widget("current-opacity");
 }
 
 static int check_color(LCUI_Color a, LCUI_Color b)
@@ -59,15 +59,15 @@ static void check_widget_opactiy(void)
 	paint.rect.x = paint.rect.y = 0;
 	Graph_Quote(&paint.canvas, &canvas, &rect);
 
-	Widget_SetOpacity(self.parent, 0.8f);
-	Widget_Resize(self.parent, 512, 256);
-	Widget_UpdateStyle(self.child, TRUE);
-	Widget_UpdateStyle(self.parent, TRUE);
-	Widget_Update(self.child);
-	Widget_Update(self.parent);
-	Widget_Update(self.parent);
+	ui_widget_set_opacity(self.parent, 0.8f);
+	ui_widget_resize(self.parent, 512, 256);
+	ui_widget_update_style(self.child, TRUE);
+	ui_widget_update_style(self.parent, TRUE);
+	ui_widget_update(self.child);
+	ui_widget_update(self.parent);
+	ui_widget_update(self.parent);
 
-	Widget_Render(self.parent, &paint);
+	ui_widget_render(self.parent, &paint);
 
 	expected_color = bgcolor;
 	Graph_GetPixel(&canvas, 10, 10, color);

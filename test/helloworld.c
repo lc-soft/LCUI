@@ -5,11 +5,11 @@
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/widget/textedit.h>
 
-static void OnBtnClick(LCUI_Widget self, LCUI_WidgetEvent e, void *arg)
+static void OnBtnClick(ui_widget_t* self, ui_event_t* e, void *arg)
 {
 	wchar_t str[256];
-	LCUI_Widget edit = LCUIWidget_GetById("edit");
-	LCUI_Widget txt = LCUIWidget_GetById("text-hello");
+	ui_widget_t* edit = ui_get_widget("edit");
+	ui_widget_t* txt = ui_get_widget("text-hello");
 
 	TextEdit_GetTextW(edit, 0, 255, str);
 	TextView_SetTextW(txt, str);
@@ -17,17 +17,17 @@ static void OnBtnClick(LCUI_Widget self, LCUI_WidgetEvent e, void *arg)
 
 int main(int argc, char **argv)
 {
-	LCUI_Widget root, pack, btn;
+	ui_widget_t* root, pack, btn;
 
 	LCUI_Init();
-	root = LCUIWidget_GetRoot();
+	root = ui_root();
 	pack = LCUIBuilder_LoadFile("helloworld.xml");
 	if (!pack) {
 		return -1;
 	}
-	Widget_Append(root, pack);
-	Widget_Unwrap(pack);
-	btn = LCUIWidget_GetById("btn");
-	Widget_BindEvent(btn, "click", OnBtnClick, NULL, NULL);
+	ui_widget_append(root, pack);
+	ui_widget_unwrap(pack);
+	btn = ui_get_widget("btn");
+	ui_widget_on(btn, "click", OnBtnClick, NULL, NULL);
 	return LCUI_Main();
 }

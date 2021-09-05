@@ -12,27 +12,27 @@ class App : public LCUI::Application
 	void Load(Platform::String ^ entryPoint);
 };
 
-static void OnBtnClick(LCUI_Widget self, LCUI_WidgetEvent e, void *arg)
+static void OnBtnClick(ui_widget_t* self, ui_event_t* e, void *arg)
 {
 	wchar_t str[256];
-	LCUI_Widget edit = LCUIWidget_GetById("edit");
-	LCUI_Widget txt = LCUIWidget_GetById("text-hello");
+	ui_widget_t* edit = ui_get_widget("edit");
+	ui_widget_t* txt = ui_get_widget("text-hello");
 	TextEdit_GetTextW(edit, 0, 255, str);
 	TextView_SetTextW(txt, str);
 }
 
 void App::Load(Platform::String ^ entryPoint)
 {
-	LCUI_Widget btn, root, pack;
-	root = LCUIWidget_GetRoot();
+	ui_widget_t* btn, root, pack;
+	root = ui_root();
 	pack = LCUIBuilder_LoadFile("helloworld.xml");
 	if (!pack) {
 		return;
 	}
-	Widget_Append(root, pack);
-	Widget_Unwrap(pack);
-	btn = LCUIWidget_GetById("btn");
-	Widget_BindEvent(btn, "click", OnBtnClick, NULL, NULL);
+	ui_widget_append(root, pack);
+	ui_widget_unwrap(pack);
+	btn = ui_get_widget("btn");
+	ui_widget_on(btn, "click", OnBtnClick, NULL, NULL);
 }
 
 [Platform::MTAThread] int main(Platform::Array<Platform::String ^> ^) {
