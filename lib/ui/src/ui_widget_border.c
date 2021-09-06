@@ -3,7 +3,7 @@
 #include "../include/ui.h"
 #include "private.h"
 
-static float ComputeXMetric(ui_widget_t* w, LCUI_Style s)
+static float compute_metric_x(ui_widget_t* w, LCUI_Style s)
 {
 	if (s->type == LCUI_STYPE_SCALE) {
 		return w->width * s->scale;
@@ -11,7 +11,7 @@ static float ComputeXMetric(ui_widget_t* w, LCUI_Style s)
 	return ui_compute(s->value, s->type);
 }
 
-static float ComputeYMetric(ui_widget_t* w, LCUI_Style s)
+static float compute_metric_y(ui_widget_t* w, LCUI_Style s)
 {
 	if (s->type == LCUI_STYPE_SCALE) {
 		return w->height * s->scale;
@@ -19,7 +19,7 @@ static float ComputeYMetric(ui_widget_t* w, LCUI_Style s)
 	return ui_compute(s->value, s->type);
 }
 
-static unsigned int ComputeActual(float width)
+static unsigned int compute_actual(float width)
 {
 	unsigned int w;
 
@@ -56,16 +56,16 @@ void ui_widget_compute_border_style(ui_widget_t* w)
 			b->left.color = s->color;
 			break;
 		case key_border_top_width:
-			b->top.width = ComputeXMetric(w, s);
+			b->top.width = compute_metric_x(w, s);
 			break;
 		case key_border_right_width:
-			b->right.width = ComputeYMetric(w, s);
+			b->right.width = compute_metric_y(w, s);
 			break;
 		case key_border_bottom_width:
-			b->bottom.width = ComputeXMetric(w, s);
+			b->bottom.width = compute_metric_x(w, s);
 			break;
 		case key_border_left_width:
-			b->left.width = ComputeYMetric(w, s);
+			b->left.width = compute_metric_y(w, s);
 			break;
 		case key_border_top_style:
 			b->top.style = s->val_style;
@@ -80,16 +80,16 @@ void ui_widget_compute_border_style(ui_widget_t* w)
 			b->left.style = s->val_style;
 			break;
 		case key_border_top_left_radius:
-			b->top_left_radius = ComputeXMetric(w, s);
+			b->top_left_radius = compute_metric_x(w, s);
 			break;
 		case key_border_top_right_radius:
-			b->top_right_radius = ComputeXMetric(w, s);
+			b->top_right_radius = compute_metric_x(w, s);
 			break;
 		case key_border_bottom_left_radius:
-			b->bottom_left_radius = ComputeXMetric(w, s);
+			b->bottom_left_radius = compute_metric_x(w, s);
 			break;
 		case key_border_bottom_right_radius:
-			b->bottom_right_radius = ComputeXMetric(w, s);
+			b->bottom_right_radius = compute_metric_x(w, s);
 			break;
 		default:
 			break;
@@ -112,14 +112,14 @@ void ui_widget_compute_border(ui_widget_t* w, LCUI_Border* b)
 	b->left.style = s->left.style;
 	b->right.style = s->right.style;
 	b->bottom.style = s->bottom.style;
-	b->top.width = ComputeActual(s->top.width);
-	b->left.width = ComputeActual(s->left.width);
-	b->right.width = ComputeActual(s->right.width);
-	b->bottom.width = ComputeActual(s->bottom.width);
-	b->top_left_radius = ComputeActual(min(s->top_left_radius, r));
-	b->top_right_radius = ComputeActual(min(s->top_right_radius, r));
-	b->bottom_left_radius = ComputeActual(min(s->bottom_left_radius, r));
-	b->bottom_right_radius = ComputeActual(min(s->bottom_right_radius, r));
+	b->top.width = compute_actual(s->top.width);
+	b->left.width = compute_actual(s->left.width);
+	b->right.width = compute_actual(s->right.width);
+	b->bottom.width = compute_actual(s->bottom.width);
+	b->top_left_radius = compute_actual(min(s->top_left_radius, r));
+	b->top_right_radius = compute_actual(min(s->top_right_radius, r));
+	b->bottom_left_radius = compute_actual(min(s->bottom_left_radius, r));
+	b->bottom_right_radius = compute_actual(min(s->bottom_right_radius, r));
 }
 
 void ui_widget_paint_border(ui_widget_t* w, LCUI_PaintContext paint,

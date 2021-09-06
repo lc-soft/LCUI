@@ -1,11 +1,12 @@
 ﻿#include <LCUI.h>
+#include <LCUI/graph.h>
 #include <LCUI/gui/css_library.h>
 #include "../include/ui.h"
 #include "private.h"
 
-#define ComputeActual(X) ui_compute_actual(X, LCUI_STYPE_PX)
+#define compute_actual(X) ui_compute_actual(X, LCUI_STYPE_PX)
 
-static float ComputeXMetric(ui_widget_t* w, LCUI_Style s)
+static float compute_metric_x(ui_widget_t* w, LCUI_Style s)
 {
 	if (s->type == LCUI_STYPE_SCALE) {
 		return w->width * s->scale;
@@ -13,7 +14,7 @@ static float ComputeXMetric(ui_widget_t* w, LCUI_Style s)
 	return ui_compute(s->value, s->type);
 }
 
-static float ComputeYMetric(ui_widget_t* w, LCUI_Style s)
+static float compute_metric_y(ui_widget_t* w, LCUI_Style s)
 {
 	if (s->type == LCUI_STYPE_SCALE) {
 		return w->height * s->scale;
@@ -36,10 +37,10 @@ void ui_widget_compute_box_shadow_style(ui_widget_t* w)
 		}
 		switch (key) {
 		case key_box_shadow_x:
-			sd->x = ComputeXMetric(w, s);
+			sd->x = compute_metric_x(w, s);
 			break;
 		case key_box_shadow_y:
-			sd->y = ComputeYMetric(w, s);
+			sd->y = compute_metric_y(w, s);
 			break;
 		case key_box_shadow_spread:
 			sd->spread = ui_compute(s->value, s->type);
@@ -63,15 +64,15 @@ void ui_widget_compute_box_shadow(ui_widget_t* w, LCUI_BoxShadow* out)
 
 	b = &w->computed_style.border;
 	s = &w->computed_style.shadow;
-	out->x = ComputeActual(s->x);
-	out->y = ComputeActual(s->y);
-	out->blur = ComputeActual(s->blur);
-	out->spread = ComputeActual(s->spread);
+	out->x = compute_actual(s->x);
+	out->y = compute_actual(s->y);
+	out->blur = compute_actual(s->blur);
+	out->spread = compute_actual(s->spread);
 	out->color = s->color;
-	out->top_left_radius = ComputeActual(b->top_left_radius);
-	out->top_right_radius = ComputeActual(b->top_right_radius);
-	out->bottom_left_radius = ComputeActual(b->bottom_left_radius);
-	out->bottom_right_radius = ComputeActual(b->bottom_right_radius);
+	out->top_left_radius = compute_actual(b->top_left_radius);
+	out->top_right_radius = compute_actual(b->top_right_radius);
+	out->bottom_left_radius = compute_actual(b->bottom_left_radius);
+	out->bottom_right_radius = compute_actual(b->bottom_right_radius);
 }
 
 void ui_widget_paint_box_shadow(ui_widget_t* w, LCUI_PaintContext paint,

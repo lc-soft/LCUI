@@ -1,9 +1,12 @@
 ﻿#include <string.h>
+#include <assert.h>
 #include <LCUI.h>
 #include "../include/ui.h"
 #include "private.h"
 
 static LinkedList ui_trash;
+
+static void ui_widget_destroy_children(ui_widget_t* w);
 
 static void ui_widget_init(ui_widget_t* w)
 {
@@ -23,15 +26,7 @@ static void ui_widget_init(ui_widget_t* w)
 	w->node_show.data = w;
 	w->node.next = w->node.prev = NULL;
 	w->node_show.next = w->node_show.prev = NULL;
-	ui_widget_background_init(w);
-}
-
-static void ui_widget_destroy_children(ui_widget_t* w)
-{
-	/* 先释放显示列表，后销毁部件列表，因为部件在这两个链表中的节点是和它共用
-	 * 一块内存空间的，销毁部件列表会把部件释放掉，所以把这个操作放在后面 */
-	LinkedList_ClearData(&w->stacking_context, NULL);
-	LinkedList_ClearData(&w->children, ui_widget_destroy);
+	ui_widget_init_background(w);
 }
 
 static void ui_widget_destroy(ui_widget_t* w)
@@ -53,8 +48,16 @@ static void ui_widget_destroy(ui_widget_t* w)
 	ui_widget_destroy_attributes(w);
 	ui_widget_destroy_classes(w);
 	ui_widget_destroy_status(w);
-	ui_widget_set_update_rules(w, NULL);
+	ui_widget_set_rules(w, NULL);
 	free(w);
+}
+
+static void ui_widget_destroy_children(ui_widget_t* w)
+{
+	/* 先释放显示列表，后销毁部件列表，因为部件在这两个链表中的节点是和它共用
+	 * 一块内存空间的，销毁部件列表会把部件释放掉，所以把这个操作放在后面 */
+	LinkedList_ClearData(&w->stacking_context, NULL);
+	LinkedList_ClearData(&w->children, ui_widget_destroy);
 }
 
 size_t ui_trash_clear(void)
@@ -103,7 +106,7 @@ ui_widget_t* ui_create_widget_with_prototype(const ui_widget_prototype_t* proto)
 {
 	ui_widget_t* widget = malloc(sizeof(ui_widget_t));
 
-	Widget_Init(widget);
+	ui_widget_init(widget);
 	widget->proto = proto;
 	widget->type = widget->proto->name;
 	widget->proto->init(widget);
@@ -222,7 +225,7 @@ void ui_widget_empty(ui_widget_t* w)
 	LinkedList_ClearData(&w->stacking_context, NULL);
 	LinkedList_Concat(&ui_trash, &w->children);
 	ui_widget_mark_dirty_rect(w, NULL, SV_GRAPH_BOX);
-	ui_widget_update_style(w, TRUE);
+	ui_widget_refresh_style(w);
 }
 
 void ui_widget_get_offset(ui_widget_t* w, ui_widget_t* parent, float* offset_x,
@@ -242,4 +245,60 @@ void ui_widget_get_offset(ui_widget_t* w, ui_widget_t* parent, float* offset_x,
 	}
 	*offset_x = x;
 	*offset_y = y;
+}
+
+LCUI_BOOL ui_widget_in_viewport(ui_widget_t* w)
+{
+	LinkedListNode* node;
+	LCUI_RectF rect;
+	ui_widget_t *self, *parent, *child;
+	ui_widget_style_t* style;
+
+	rect = w->box.padding;
+	/* If the size of the widget is not fixed, then set the maximum size to
+	 * avoid it being judged invisible all the time. */
+	if (rect.width < 1 && ui_widget_has_auto_style(w, key_width)) {
+		rect.width = w->parent->box.padding.width;
+	}
+	if (rect.height < 1 && ui_widget_has_auto_style(w, key_height)) {
+		rect.height = w->parent->box.padding.height;
+	}
+	for (self = w, parent = w->parent; parent;
+	     self = parent, parent = parent->parent) {
+		if (!ui_widget_is_visible(parent)) {
+			return FALSE;
+		}
+		for (node = self->node_show.prev; node && node->prev;
+		     node = node->prev) {
+			child = node->data;
+			style = &child->computed_style;
+			if (child->state < LCUI_WSTATE_LAYOUTED ||
+			    child == self || !ui_widget_is_visible(child)) {
+				continue;
+			}
+			DEBUG_MSG("rect: (%g,%g,%g,%g), child rect: "
+				  "(%g,%g,%g,%g), child: %s %s\n",
+				  rect.x, rect.y, rect.width, rect.height,
+				  child->box.border.x, child->box.border.y,
+				  child->box.border.width,
+				  child->box.border.height, child->type,
+				  child->id);
+			if (!LCUIRectF_IsIncludeRect(&child->box.border,
+						     &rect)) {
+				continue;
+			}
+			if (style->opacity == 1.0f &&
+			    style->background.color.alpha == 255) {
+				return FALSE;
+			}
+		}
+		rect.x += parent->box.padding.x;
+		rect.y += parent->box.padding.y;
+		LCUIRectF_ValidateArea(&rect, parent->box.padding.width,
+				       parent->box.padding.height);
+		if (rect.width < 1 || rect.height < 1) {
+			return FALSE;
+		}
+	}
+	return TRUE;
 }

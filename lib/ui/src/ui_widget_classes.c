@@ -17,7 +17,7 @@ static void ui_widget_refresh_children_by_classes(ui_widget_t* w)
 
 static int ui_widget_handle_classes_change(ui_widget_t* w, const char *name)
 {
-	ui_widget_update_style(w, TRUE);
+	ui_widget_refresh_style(w);
 	if (w->rules && w->rules->ignore_classes_change) {
 		return 0;
 	}

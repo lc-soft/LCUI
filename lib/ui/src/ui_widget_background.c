@@ -1,4 +1,5 @@
 #include <LCUI.h>
+#include <LCUI/graph.h>
 #include <LCUI/gui/css_library.h>
 #include "../include/ui.h"
 #include "private.h"
@@ -155,10 +156,10 @@ void ui_widget_compute_background(ui_widget_t *w, LCUI_Background *out)
 			height = (float)bg->image->height;
 			break;
 		}
-		out->position.x = ComputeActual(x, LCUI_STYPE_PX);
-		out->position.y = ComputeActual(y, LCUI_STYPE_PX);
-		out->size.width = ComputeActual(width, LCUI_STYPE_PX);
-		out->size.height = ComputeActual(height, LCUI_STYPE_PX);
+		out->position.x = ui_compute_actual(x, LCUI_STYPE_PX);
+		out->position.y = ui_compute_actual(y, LCUI_STYPE_PX);
+		out->size.width = ui_compute_actual(width, LCUI_STYPE_PX);
+		out->size.height = ui_compute_actual(height, LCUI_STYPE_PX);
 	} else {
 		type = LCUI_STYPE_PX;
 		switch (bg->size.width.type) {
@@ -174,7 +175,7 @@ void ui_widget_compute_background(ui_widget_t *w, LCUI_Background *out)
 			type = bg->size.width.type;
 			break;
 		}
-		out->size.width = ComputeActual(width, type);
+		out->size.width = ui_compute_actual(width, type);
 		type = LCUI_STYPE_PX;
 		switch (bg->size.height.type) {
 		case LCUI_STYPE_SCALE:
@@ -188,7 +189,7 @@ void ui_widget_compute_background(ui_widget_t *w, LCUI_Background *out)
 			height = (float)bg->size.height.value;
 			break;
 		}
-		out->size.height = ComputeActual(height, type);
+		out->size.height = ui_compute_actual(height, type);
 	}
 	/* 计算背景图的像素坐标 */
 	if (bg->position.using_value) {
@@ -231,8 +232,8 @@ void ui_widget_compute_background(ui_widget_t *w, LCUI_Background *out)
 		default:
 			break;
 		}
-		out->position.x = ComputeActual(x, LCUI_STYPE_PX);
-		out->position.y = ComputeActual(y, LCUI_STYPE_PX);
+		out->position.x = ui_compute_actual(x, LCUI_STYPE_PX);
+		out->position.y = ui_compute_actual(y, LCUI_STYPE_PX);
 	} else {
 		type = LCUI_STYPE_PX;
 		switch (bg->position.x.type) {
@@ -248,7 +249,7 @@ void ui_widget_compute_background(ui_widget_t *w, LCUI_Background *out)
 			type = bg->position.x.type;
 			break;
 		}
-		out->position.x = ComputeActual(x, type);
+		out->position.x = ui_compute_actual(x, type);
 		type = LCUI_STYPE_PX;
 		switch (bg->position.y.type) {
 		case LCUI_STYPE_SCALE:
@@ -263,7 +264,7 @@ void ui_widget_compute_background(ui_widget_t *w, LCUI_Background *out)
 			type = bg->position.y.type;
 			break;
 		}
-		out->position.y = ComputeActual(y, type);
+		out->position.y = ui_compute_actual(y, type);
 	}
 	out->color = bg->color;
 	out->image = &bg->image;

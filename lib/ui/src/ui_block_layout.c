@@ -194,7 +194,7 @@ static void ui_block_layout_load(ui_block_layout_context_t* ctx)
 	} else {
 		if (w->computed_style.max_width != -1) {
 			max_row_width = w->computed_style.max_width -
-					Widget_padding_x(w) - Widget_border_x(w);
+					padding_x(w) - border_x(w);
 		}
 	}
 	DEBUG_MSG("%s, start\n", ctx->widget->id);
@@ -202,7 +202,7 @@ static void ui_block_layout_load(ui_block_layout_context_t* ctx)
 	for (LinkedList_Each(node, &w->children)) {
 		child = node->data;
 
-		if (Widget_HasAbsolutePosition(child)) {
+		if (ui_widget_has_absolute_position(child)) {
 			LinkedList_Append(&ctx->free_elements, child);
 			continue;
 		}
@@ -282,7 +282,7 @@ static void ui_block_layout_update_element_margin(
 	w->margin.left -= w->margin.right;
 }
 
-static void ui_widget_update_block_layout_row(ui_block_layout_context_t* ctx,
+static void ui_block_layout_reflow_row(ui_block_layout_context_t* ctx,
 					      float row_y)
 {
 	float x = ctx->widget->padding.left;
@@ -308,7 +308,7 @@ static void ui_block_layout_update_free_elements(ui_block_layout_context_t* ctx)
 	}
 }
 
-static void BlockLayout_Reflow(ui_block_layout_context_t* ctx)
+static void ui_block_layout_update(ui_block_layout_context_t* ctx)
 {
 	float y;
 	ui_widget_t* w = ctx->widget;
@@ -320,7 +320,7 @@ static void BlockLayout_Reflow(ui_block_layout_context_t* ctx)
 	}
 	for (LinkedList_Each(node, &ctx->rows)) {
 		ctx->row = node->data;
-		ui_widget_update_block_layout_row(ctx, y);
+		ui_block_layout_reflow_row(ctx, y);
 		y += ctx->row->height;
 	}
 	ctx->content_height = y - w->padding.top;
@@ -372,7 +372,7 @@ static void ui_block_layout_apply_size(ui_block_layout_context_t* ctx)
 	w->proto->resize(w, w->box.content.width, w->box.content.height);
 }
 
-void ui_widget_update_block_layout(ui_widget_t* w, ui_layout_rule_t rule)
+void ui_block_layout_reflow(ui_widget_t* w, ui_layout_rule_t rule)
 {
 	ui_block_layout_context_t* ctx;
 

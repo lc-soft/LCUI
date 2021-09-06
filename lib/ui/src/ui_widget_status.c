@@ -17,7 +17,7 @@ static void ui_widget_refresh_children_by_status(ui_widget_t* w)
 
 static int ui_wdiget_handle_status_change(ui_widget_t* w, const char *name)
 {
-	ui_widget_update_style(w, TRUE);
+	ui_widget_refresh_style(w);
 	if (w->state < LCUI_WSTATE_READY || w->state == LCUI_WSTATE_DELETED) {
 		return 1;
 	}

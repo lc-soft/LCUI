@@ -511,6 +511,8 @@ LCUI_API void ui_widget_bind_property(ui_widget_t* w, const char* name,
 LCUI_API void ui_widget_empty(ui_widget_t* w);
 LCUI_API void ui_widget_get_offset(ui_widget_t* w, ui_widget_t* parent,
 				   float* offset_x, float* offset_y);
+LCUI_API LCUI_BOOL ui_widget_in_viewport(ui_widget_t* w);
+
 
 // Root
 
@@ -594,6 +596,11 @@ LCUI_API void ui_widget_print_tree(ui_widget_t* w);
 		ui_widget_add_task_by_style(W, K); \
 	} while (0)
 
+INLINE LCUI_BOOL ui_widget_is_visible(ui_widget_t *w)
+{
+	return w->computed_style.visible;
+}
+
 INLINE LCUI_BOOL ui_widget_check_style_valid(ui_widget_t* w, int key)
 {
 	return w->style && w->style->sheet[key].is_valid;
@@ -619,8 +626,14 @@ LCUI_API void ui_widget_set_style_string(ui_widget_t* w, const char* name,
 LCUI_API void ui_widget_add_task_by_style(ui_widget_t* w, int key);
 LCUI_API void ui_widget_force_update_style(ui_widget_t* w);
 LCUI_API void ui_widget_force_refresh_style(ui_widget_t* w);
+LCUI_API void ui_refresh_style(void);
 
 // Helper
+
+INLINE LCUI_BOOL Widget_IsVisible(ui_widget_t *w)
+{
+	return w->computed_style.visible;
+}
 
 LCUI_API void ui_widget_set_padding(ui_widget_t* w, float top, float right,
 				    float bottom, float left);
@@ -672,6 +685,7 @@ LCUI_API size_t ui_widget_import_hash(ui_widget_t* w, unsigned* hash_list,
 LCUI_API void ui_widget_reflow(ui_widget_t* w, ui_layout_rule_t rule);
 LCUI_API LCUI_BOOL ui_widget_auto_reflow(ui_widget_t* w, ui_layout_rule_t rule);
 
+
 // Renderer
 
 LCUI_API LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t* w,
@@ -679,11 +693,24 @@ LCUI_API LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t* w,
 LCUI_API size_t ui_widget_get_dirty_rects(ui_widget_t* w, LinkedList* rects);
 LCUI_API size_t ui_widget_render(ui_widget_t* w, LCUI_PaintContext paint);
 
+
 // Updater
 
+LCUI_API int ui_widget_set_rules(ui_widget_t* w, const ui_widget_rules_t* rules);
 LCUI_API void ui_widget_add_task_for_children(ui_widget_t* widget,
 					      ui_task_type_t task);
 LCUI_API void ui_widget_add_task(ui_widget_t* widget, int task);
+
+INLINE void ui_widget_refresh_style(ui_widget_t *w)
+{
+	ui_widget_add_task(w, UI_TASK_REFRESH_STYLE);
+}
+
+INLINE void ui_widget_update_style(ui_widget_t *w)
+{
+	ui_widget_add_task(w, UI_TASK_UPDATE_STYLE);
+}
+
 
 // Events
 
@@ -834,12 +861,6 @@ LCUI_API int ui_widget_release_touch_capture(ui_widget_t* w, int point_id);
 
 LCUI_API void ui_widget_destroy_listeners(ui_widget_t* w);
 
-// Update
-
-INLINE void ui_widget_update_style(ui_widget_t* w)
-{
-	ui_widget_add_task(w, UI_TASK_UPDATE_STYLE);
-}
 
 // CSS
 

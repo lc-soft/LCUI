@@ -40,7 +40,6 @@
 #include <LCUI/gui/widget/textview.h>
 
 #define GetData(W) ui_widget_get_data(W, self.prototype)
-#define ComputeActual ui_compute_actual
 
 typedef struct LCUI_TextViewTaskRec_ {
 	wchar_t *content;
@@ -219,8 +218,8 @@ static void TextView_OnAutoSize(ui_widget_t* w, float *width, float *height,
 	if (w->parent &&
 	    w->parent->computed_style.width_sizing == UI_SIZING_RULE_FIXED) {
 		txt->available_width = w->parent->box.content.width;
-		max_width = (int)(scale * txt->available_width - Widget_padding_x(w) -
-				  Widget_border_x(w));
+		max_width = (int)(scale * txt->available_width - padding_x(w) -
+				  border_x(w));
 	} else {
 		txt->available_width = 0;
 		max_width = 0;

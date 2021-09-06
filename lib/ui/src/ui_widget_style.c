@@ -22,7 +22,7 @@ static float ui_widget_compute_metric_x(ui_widget_t* w, int key)
 		if (!w->parent) {
 			return 0;
 		}
-		if (Widget_HasAbsolutePosition(w)) {
+		if (ui_widget_has_absolute_position(w)) {
 			return w->parent->box.padding.width * s->scale;
 		}
 		return w->parent->box.content.width * s->scale;
@@ -38,7 +38,7 @@ static float ui_widget_compute_metric_y(ui_widget_t* w, int key)
 		if (!w->parent) {
 			return 0;
 		}
-		if (Widget_HasAbsolutePosition(w)) {
+		if (ui_widget_has_absolute_position(w)) {
 			return w->parent->box.padding.height * s->scale;
 		}
 		return w->parent->box.content.height * s->scale;
@@ -130,7 +130,7 @@ void ui_widget_compute_widget_limit_style(ui_widget_t* w, ui_layout_rule_t rule)
 		style->max_width = ui_widget_compute_metric_x(w, key_max_width);
 		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
 			style->max_width +=
-			    Widget_border_x(w) + Widget_padding_x(w);
+			    border_x(w) + padding_x(w);
 		}
 		break;
 	}
@@ -142,7 +142,7 @@ void ui_widget_compute_widget_limit_style(ui_widget_t* w, ui_layout_rule_t rule)
 		style->min_width = ui_widget_compute_metric_x(w, key_min_width);
 		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
 			style->min_width +=
-			    Widget_border_x(w) + Widget_padding_x(w);
+			    border_x(w) + padding_x(w);
 		}
 		break;
 	}
@@ -163,7 +163,7 @@ void ui_widget_compute_height_limit_style(ui_widget_t* w, ui_layout_rule_t rule)
 		    ui_widget_compute_metric_y(w, key_max_height);
 		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
 			style->max_height +=
-			    Widget_border_y(w) + Widget_padding_y(w);
+			    border_y(w) + padding_y(w);
 		}
 		break;
 	}
@@ -176,7 +176,7 @@ void ui_widget_compute_height_limit_style(ui_widget_t* w, ui_layout_rule_t rule)
 		    ui_widget_compute_metric_y(w, key_min_height);
 		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
 			style->min_height +=
-			    Widget_border_y(w) + Widget_padding_y(w);
+			    border_y(w) + padding_y(w);
 		}
 		break;
 	}
@@ -191,7 +191,7 @@ void ui_widget_compute_width_style(ui_widget_t* w)
 		if (ui_widget_has_auto_style(w, key_width)) {
 			if (!w->parent ||
 			    w->computed_style.display == SV_INLINE_BLOCK ||
-			    Widget_HasAbsolutePosition(w)) {
+			    ui_widget_has_absolute_position(w)) {
 				style->width_sizing =
 				    UI_SIZING_RULE_FIT_CONTENT;
 				break;
@@ -206,7 +206,7 @@ void ui_widget_compute_width_style(ui_widget_t* w)
 				style->width_sizing = UI_SIZING_RULE_FIXED;
 			}
 			w->width =
-			    w->parent->box.content.width - Widget_margin_x(w);
+			    w->parent->box.content.width - margin_x(w);
 			break;
 		}
 		if (ui_widget_check_style_type(w, key_width, scale)) {
@@ -226,7 +226,7 @@ void ui_widget_compute_width_style(ui_widget_t* w)
 			style->width_sizing = UI_SIZING_RULE_FIXED;
 		}
 		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
-			w->width += Widget_border_x(w) + Widget_padding_x(w);
+			w->width += border_x(w) + padding_x(w);
 		}
 	} while (0);
 	w->width = ui_widget_get_limited_width(w, w->width);
@@ -259,7 +259,7 @@ void ui_widget_compute_height_style(ui_widget_t* w)
 			style->height_sizing = UI_SIZING_RULE_FIXED;
 		}
 		if (w->computed_style.box_sizing == SV_CONTENT_BOX) {
-			w->height += Widget_border_y(w) + Widget_padding_y(w);
+			w->height += border_y(w) + padding_y(w);
 		}
 	} while (0);
 	w->height = ui_widget_get_limited_height(w, w->height);
@@ -405,7 +405,7 @@ void ui_widget_compute_flex_style(ui_widget_t* w)
 	LCUI_Style s = w->style->sheet;
 	ui_flexbox_layout_style_t* flex = &w->computed_style.flex;
 
-	if (!Widget_IsFlexLayoutStyleWorks(w)) {
+	if (!ui_widget_has_valid_flexbox_style(w)) {
 		return;
 	}
 
@@ -624,7 +624,7 @@ void ui_widget_set_style_string(ui_widget_t* w, const char* name,
 	ctx.style_handler_arg = w;
 	ctx.parser = LCUI_GetCSSPropertyParser(name);
 	ctx.parser->parse(&ctx, value);
-	ui_widget_update_style(w, FALSE);
+	ui_widget_update_style(w);
 }
 
 void ui_widget_add_task_by_style(ui_widget_t* w, int key)

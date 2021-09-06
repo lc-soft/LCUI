@@ -1,4 +1,5 @@
 #include <LCUI.h>
+#include <LCUI/graph.h>
 #include "../include/ui.h"
 #include "private.h"
 
@@ -124,12 +125,12 @@ void ui_widget_update_box_size(ui_widget_t* w)
 	}
 	w->box.border.width = w->width;
 	w->box.border.height = w->height;
-	w->box.padding.width = w->box.border.width - Widget_border_x(w);
-	w->box.padding.height = w->box.border.height - Widget_border_y(w);
-	w->box.content.width = w->box.padding.width - Widget_padding_x(w);
-	w->box.content.height = w->box.padding.height - Widget_padding_y(w);
-	w->box.outer.width = w->box.border.width + Widget_margin_x(w);
-	w->box.outer.height = w->box.border.height + Widget_margin_y(w);
+	w->box.padding.width = w->box.border.width - border_x(w);
+	w->box.padding.height = w->box.border.height - border_y(w);
+	w->box.content.width = w->box.padding.width - padding_x(w);
+	w->box.content.height = w->box.padding.height - padding_y(w);
+	w->box.outer.width = w->box.border.width + margin_x(w);
+	w->box.outer.height = w->box.border.height + margin_y(w);
 	w->box.canvas.width = ui_widget_get_canvas_box_width(w);
 	w->box.canvas.height = ui_widget_get_canvas_box_height(w);
 }

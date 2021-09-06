@@ -1,4 +1,5 @@
-﻿#include <LCUI.h>
+﻿#include <assert.h>
+#include <LCUI.h>
 #include "../include/ui.h"
 #include "private.h"
 

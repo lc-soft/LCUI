@@ -1080,7 +1080,6 @@ void ui_widget_destroy_listeners(ui_widget_t* w)
 	ui_widget_emit_event(w, e, NULL);
 	ui_widget_release_mouse_capture(w);
 	ui_widget_release_touch_capture(w, -1);
-	ui_widget_stop_event_propagation(w);
 	ui_clear_event_target(w);
 	if (w->listeners) {
 		LinkedList_ClearData(w->listeners, ui_event_listener_destroy);

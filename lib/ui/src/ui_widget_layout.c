@@ -10,10 +10,10 @@ void ui_widget_reflow(ui_widget_t* w, ui_layout_rule_t rule)
 	switch (w->computed_style.display) {
 	case SV_BLOCK:
 	case SV_INLINE_BLOCK:
-		ui_widget_update_block_layout(w, rule);
+		ui_block_layout_reflow(w, rule);
 		break;
 	case SV_FLEX:
-		LCUIFlexBoxLayout_Reflow(w, rule);
+		ui_flexbox_layout_reflow(w, rule);
 		break;
 	case SV_NONE:
 	default:
@@ -21,7 +21,7 @@ void ui_widget_reflow(ui_widget_t* w, ui_layout_rule_t rule)
 	}
 	ev.cancel_bubble = TRUE;
 	ev.type = UI_EVENT_AFTERLAYOUT;
-	ui_widget_emit_event(w, &ev, NULL);
+	ui_widget_emit_event(w, ev, NULL);
 	DEBUG_MSG("id: %s, type: %s, size: (%g, %g)\n", w->id, w->type,
 		  w->width, w->height);
 }

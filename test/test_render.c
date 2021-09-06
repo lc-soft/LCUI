@@ -29,7 +29,7 @@ void UpdateWidgetStyle(ui_widget_t* w, void *arg)
 	color.blue = 0;
 	color.alpha = 255;
 	ui_widget_set_style(w, key_background_color, color, color);
-	ui_widget_update_style(w, FALSE);
+	ui_widget_update_style(w);
 }
 
 void UpdateFrame(void *arg)
@@ -107,7 +107,7 @@ void InitBackground(void)
 	rules.max_update_children_count = -1;
 	rules.max_render_children_count = 0;
 	ui_widget_generate_hash(self.box);
-	ui_widget_set_update_rules(self.box, &rules);
+	ui_widget_set_rules(self.box, &rules);
 	ui_widget_append(root, self.box);
 }
 

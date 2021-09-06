@@ -52,7 +52,7 @@ void ui_widget_begin_style_diff(ui_widget_t* w, ui_widget_style_diff_t* diff)
 INLINE void ui_widget_add_reflow_task(ui_widget_t* w)
 {
 	if (w) {
-		if (w->parent && Widget_IsFlexLayoutStyleWorks(w)) {
+		if (w->parent && ui_widget_has_valid_flexbox_style(w)) {
 			ui_widget_add_task(w->parent, UI_TASK_REFLOW);
 		}
 		ui_widget_add_task(w, UI_TASK_REFLOW);
@@ -95,7 +95,7 @@ int ui_widget_end_style_diff(ui_widget_t* w, ui_widget_style_diff_t* diff)
 	} else if (MEMCMP(&diff->box.canvas, &w->box.canvas)) {
 		w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
 	}
-	if (Widget_IsFlexLayoutStyleWorks(w)) {
+	if (ui_widget_has_valid_flexbox_style(w)) {
 		if (diff->flex.wrap != style->flex.wrap ||
 		    diff->flex.direction != style->flex.direction ||
 		    diff->flex.justify_content != style->flex.justify_content ||
@@ -179,8 +179,8 @@ int ui_widget_end_layout_diff(ui_widget_t* w, ui_widget_layout_diff_t* diff)
 	    diff->box.outer.y != w->box.outer.y) {
 		w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
 		ui_widget_post_surface_event(w, UI_EVENT_MOVE,
-					!w->task.skip_surface_props_sync);
-		w->task.skip_surface_props_sync = TRUE;
+					!w->update.skip_surface_props_sync);
+		w->update.skip_surface_props_sync = TRUE;
 		ui_widget_add_reflow_task_to_parent(w);
 	}
 	if (diff->box.outer.width != w->box.outer.width ||
@@ -192,8 +192,8 @@ int ui_widget_end_layout_diff(ui_widget_t* w, ui_widget_layout_diff_t* diff)
 		e.cancel_bubble = TRUE;
 		ui_widget_post_event(w, &e, NULL, NULL);
 		ui_widget_post_surface_event(w, UI_EVENT_RESIZE,
-					!w->task.skip_surface_props_sync);
-		w->task.skip_surface_props_sync = TRUE;
+					!w->update.skip_surface_props_sync);
+		w->update.skip_surface_props_sync = TRUE;
 		ui_widget_add_reflow_task_to_parent(w);
 	}
 	if (!diff->should_add_dirty_rect) {

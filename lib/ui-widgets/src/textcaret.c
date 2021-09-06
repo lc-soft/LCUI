@@ -90,7 +90,7 @@ static void TextCaret_OnBlink(void *arg)
 		return;
 	}
 	caret = ui_widget_get_data(task->widget, prototype);
-	if (!caret->visible || Widget_IsVisible(task->widget)) {
+	if (!caret->visible || ui_widget_is_visible(task->widget)) {
 		ui_widget_hide(task->widget);
 	} else {
 		ui_widget_show(task->widget);

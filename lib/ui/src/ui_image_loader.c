@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <assert.h>
 #include <LCUI.h>
 #include <LCUI/image.h>
 #include <LCUI/worker.h>

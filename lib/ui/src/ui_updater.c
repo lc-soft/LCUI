@@ -35,7 +35,7 @@ static unsigned int ui_style_dict_hash(const void* key)
 }
 
 static int ui_style_dict_key_compare(void* privdata, const void* key1,
-				 const void* key2)
+				     const void* key2)
 {
 	return *(unsigned int*)key1 == *(unsigned int*)key2;
 }
@@ -107,64 +107,7 @@ void ui_widget_add_task(ui_widget_t* widget, int task)
 	}
 }
 
-LCUI_BOOL ui_widget_in_viewport(ui_widget_t* w)
-{
-	LinkedListNode* node;
-	LCUI_RectF rect;
-	ui_widget_t *self, *parent, *child;
-	ui_widget_style_t* style;
-
-	rect = w->box.padding;
-	/* If the size of the widget is not fixed, then set the maximum size to
-	 * avoid it being judged invisible all the time. */
-	if (rect.width < 1 && ui_widget_has_auto_style(w, key_width)) {
-		rect.width = w->parent->box.padding.width;
-	}
-	if (rect.height < 1 && ui_widget_has_auto_style(w, key_height)) {
-		rect.height = w->parent->box.padding.height;
-	}
-	for (self = w, parent = w->parent; parent;
-	     self = parent, parent = parent->parent) {
-		if (!Widget_IsVisible(parent)) {
-			return FALSE;
-		}
-		for (node = self->node_show.prev; node && node->prev;
-		     node = node->prev) {
-			child = node->data;
-			style = &child->computed_style;
-			if (child->state < LCUI_WSTATE_LAYOUTED ||
-			    child == self || !Widget_IsVisible(child)) {
-				continue;
-			}
-			DEBUG_MSG("rect: (%g,%g,%g,%g), child rect: "
-				  "(%g,%g,%g,%g), child: %s %s\n",
-				  rect.x, rect.y, rect.width, rect.height,
-				  child->box.border.x, child->box.border.y,
-				  child->box.border.width,
-				  child->box.border.height, child->type,
-				  child->id);
-			if (!LCUIRectF_IsIncludeRect(&child->box.border,
-						     &rect)) {
-				continue;
-			}
-			if (style->opacity == 1.0f &&
-			    style->background.color.alpha == 255) {
-				return FALSE;
-			}
-		}
-		rect.x += parent->box.padding.x;
-		rect.y += parent->box.padding.y;
-		LCUIRectF_ValidateArea(&rect, parent->box.padding.width,
-				       parent->box.padding.height);
-		if (rect.width < 1 || rect.height < 1) {
-			return FALSE;
-		}
-	}
-	return TRUE;
-}
-
-int ui_widget_set_update_rules(ui_widget_t* w,
-			       const ui_widget_rules_t* rules)
+int ui_widget_set_rules(ui_widget_t* w, const ui_widget_rules_t* rules)
 {
 	ui_updater_rules_data_t* data;
 
@@ -265,8 +208,8 @@ void ui_destroy_updater(void)
 {
 }
 
-static ui_updater_profile_t* ui_widget_begin_update(
-    ui_widget_t* w, ui_updater_profile_t* ctx)
+static ui_updater_profile_t* ui_widget_begin_update(ui_widget_t* w,
+						    ui_updater_profile_t* ctx)
 {
 	unsigned hash;
 	LCUI_Selector selector;
@@ -339,8 +282,8 @@ static void ui_widget_end_update(ui_updater_profile_t* ctx)
 	free(ctx);
 }
 
-static size_t ui_widget_update_visible_children(
-    ui_widget_t* w, ui_updater_profile_t* ctx)
+static size_t ui_widget_update_visible_children(ui_widget_t* w,
+						ui_updater_profile_t* ctx)
 {
 	size_t total = 0, count;
 	LCUI_BOOL found = FALSE;
@@ -485,8 +428,7 @@ static size_t ui_widget_update_children(ui_widget_t* w,
 	return total;
 }
 
-static void ui_widget_update_self(ui_widget_t* w,
-				  ui_updater_profile_t* ctx)
+static void ui_widget_update_self(ui_widget_t* w, ui_updater_profile_t* ctx)
 {
 	int i;
 	LCUI_BOOL* states;
@@ -621,6 +563,6 @@ void ui_update_with_profile(ui_profile_t* profile)
 void ui_refresh_style(void)
 {
 	ui_widget_t* root = ui_root();
-	ui_widget_update_style(root, TRUE);
+	ui_widget_refresh_style(root);
 	ui_widget_add_task_for_children(root, UI_TASK_REFRESH_STYLE);
 }
