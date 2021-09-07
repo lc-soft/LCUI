@@ -7,7 +7,6 @@ add_includedirs("../lib/test/include/")
 
 target("helloworld")
     add_files("helloworld.c")
-    add_packages("test")
 
 target("test_block_layout")
     add_files("test_block_layout.c")
