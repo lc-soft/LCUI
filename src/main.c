@@ -656,6 +656,14 @@ void LCUI_InitBase(void)
 	LCUI_InitCursor();
 	LCUI_InitWidget();
 	LCUI_InitMetrics();
+	LCUIWidget_AddTextView();
+	LCUIWidget_AddCanvas();
+	LCUIWidget_AddAnchor();
+	LCUIWidget_AddButton();
+	LCUIWidget_AddSideBar();
+	LCUIWidget_AddTScrollBar();
+	LCUIWidget_AddTextCaret();
+	LCUIWidget_AddTextEdit();
 }
 
 void LCUI_Init(void)
