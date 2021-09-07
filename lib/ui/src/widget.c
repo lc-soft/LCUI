@@ -50,14 +50,6 @@ void LCUI_InitWidget(void)
 	LCUIWidget_InitStyle();
 	LCUIWidget_InitRenderer();
 	LCUIWidget_InitImageLoader();
-	LCUIWidget_AddTextView();
-	LCUIWidget_AddCanvas();
-	LCUIWidget_AddAnchor();
-	LCUIWidget_AddButton();
-	LCUIWidget_AddSideBar();
-	LCUIWidget_AddTScrollBar();
-	LCUIWidget_AddTextCaret();
-	LCUIWidget_AddTextEdit();
 	LCUIWidget_InitBase();
 	LCUIWidget_InitIdLibrary();
 }
