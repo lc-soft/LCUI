@@ -1,12 +1,10 @@
-﻿#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+﻿#include <stdio.h>
+#include <time.h>
+#include <LCUI.h>
 #include <LCUI/font.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/util/logger.h>
-#include <stdio.h>
-#include <time.h>
-#include "test.h"
 
 int main(void)
 {

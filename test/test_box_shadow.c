@@ -2,7 +2,6 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/builder.h>
-#include "test.h"
 
 int main(void)
 {
