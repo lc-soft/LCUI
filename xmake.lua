@@ -17,10 +17,6 @@ else
     end
 end
 
-if is_mode("release") then
-    set_symbols("none")
-end
-
 target("lcui")
     set_kind("shared")
     add_files("src/*.c")

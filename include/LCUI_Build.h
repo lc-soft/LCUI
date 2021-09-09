@@ -32,7 +32,7 @@
 #define LCUI_BUILD_H
 
 #if defined(__GNUC__)
-#define LCUI_API extern
+#define LCUI_API extern __attribute__((visibility("default")))
 #else
 #ifdef LCUI_EXPORTS
 #define LCUI_API __declspec(dllexport)
