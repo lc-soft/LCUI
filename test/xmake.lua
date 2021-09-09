@@ -3,7 +3,6 @@ set_rundir("$(projectdir)")
 add_repositories("local-repo ../build")
 add_requires("lcui", "test")
 add_packages("lcui")
-add_includedirs("../lib/test/include/")
 
 target("helloworld")
     add_files("helloworld.c")
@@ -24,6 +23,7 @@ target("test_char_render")
 
 target("test_fill_rect")
     add_files("test_fill_rect.c")
+    add_packages("test")
 
 target("test_fill_rect_with_rgba")
     add_files("test_fill_rect_with_rgba.c")
