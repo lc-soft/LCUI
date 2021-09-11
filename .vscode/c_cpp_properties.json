@@ -2,7 +2,6 @@
     "configurations": [
         {
             "name": "Linux",
-            "intelliSenseMode": "clang-x64",
             "includePath": [
                 "${workspaceRoot}/include",
                 "/usr/include/x86_64-linux-gnu",
@@ -18,7 +17,6 @@
                     "/usr/local/include"
                 ]
             },
-            "compilerPath": "/usr/bin/clang",
             "cStandard": "c11",
             "cppStandard": "c++17"
         }
