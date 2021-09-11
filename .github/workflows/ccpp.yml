@@ -16,8 +16,7 @@ jobs:
 
       - name: Build
         run: |
-          xmake config --mode=coverage -y
-          xmake config -v
+          xmake config -m coverage -y -v
           xmake -v
 
       - name: Run tests
@@ -31,12 +30,14 @@ jobs:
       - name: Package
         run: |
           xmake clean
-          xmake config -m release -y
+          xmake config -m release -y -c -v
           xmake -v
           xmake package
 
       - name: Build test programs
         run: |
+          xmake config --clean -P test
+          xmake clean -P test
           xmake -v -P test
 
       - uses: actions/upload-artifact@master
@@ -61,8 +62,7 @@ jobs:
       - uses: xmake-io/github-action-setup-xmake@v1
       - name: Build
         run: |
-          xmake config -y
-          xmake config -v
+          xmake config -y -v
           xmake -v
 
       - name: "Run tests"
@@ -74,12 +74,14 @@ jobs:
       - name: Package
         run: |
           xmake clean
-          xmake config -m release -y
+          xmake config -m release -y -c -v
           xmake -v
           xmake package
 
       - name: Build test programs
         run: |
+          xmake config --clean -P test
+          xmake clean -P test
           xmake -v -P test
 
       - uses: actions/upload-artifact@master
