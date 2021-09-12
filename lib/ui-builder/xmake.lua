@@ -5,7 +5,7 @@ option("with-libxml2")
 option_end()
 
 if has_config("with-libxml2") then
-    add_requires("libxml2", {optional = true})
+    add_requires("libxml2", {optional = true, system = false})
 end
 
 target("lcui-ui-builder")
