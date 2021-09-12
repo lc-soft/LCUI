@@ -69,7 +69,7 @@ static void OnKeyPress(LCUI_SysEvent e, void *arg)
 
 static LCUI_BOOL X11IME_Open(void)
 {
-	self.handler_id = LCUI_BindEvent(LCUI_KEYPRESS, OnKeyPress, NULL, NULL);
+	self.handler_id = LCUI_BindEvent(APP_EVENT_KEYPRESS, OnKeyPress, NULL, NULL);
 	return TRUE;
 }
 

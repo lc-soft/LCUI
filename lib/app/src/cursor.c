@@ -142,7 +142,7 @@ void LCUI_InitCursor(void)
 	LCUICursor_LoadDefualtGraph(&pic);
 	cursor.new_pos.x = LCUIDisplay_GetWidth() / 2;
 	cursor.new_pos.y = LCUIDisplay_GetHeight() / 2;
-	LCUI_BindEvent(LCUI_MOUSEMOVE, OnMouseMoveEvent, NULL, NULL);
+	LCUI_BindEvent(APP_EVENT_MOUSEMOVE, OnMouseMoveEvent, NULL, NULL);
 	LCUICursor_SetGraph(&pic);
 	LCUICursor_Show();
 	Graph_Free(&pic);

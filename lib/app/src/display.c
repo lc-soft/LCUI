@@ -323,7 +323,7 @@ static size_t LCUIDisplay_RenderSurface(SurfaceRecord record)
 		LCUI_SysEventRec ev;
 
 		rect_array[i] = node->data;
-		ev.type = LCUI_PAINT;
+		ev.type = APP_EVENT_PAINT;
 		ev.paint.rect = *rect_array[i];
 		LCUI_TriggerEvent(&ev, NULL);
 		dirty += rect_array[i]->width * rect_array[i]->height;

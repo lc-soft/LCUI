@@ -45,7 +45,7 @@ static void OnMotionNotify(LCUI_Event e, void *arg)
 	XEvent *ev = arg;
 	LCUI_SysEventRec sys_ev;
 	static LCUI_Pos mouse_pos = { 0, 0 };
-	sys_ev.type = LCUI_MOUSEMOVE;
+	sys_ev.type = APP_EVENT_MOUSEMOVE;
 	sys_ev.motion.x = ev->xmotion.x;
 	sys_ev.motion.y = ev->xmotion.y;
 	sys_ev.motion.xrel = ev->xmotion.x - mouse_pos.x;
@@ -62,17 +62,17 @@ static void OnButtonPress(LCUI_Event e, void *arg)
 	LCUI_SysEventRec sys_ev;
 
 	if (ev->xbutton.button == Button4) {
-		sys_ev.type = LCUI_MOUSEWHEEL;
+		sys_ev.type = APP_EVENT_MOUSEWHEEL;
 		sys_ev.wheel.x = ev->xbutton.x;
 		sys_ev.wheel.y = ev->xbutton.y;
 		sys_ev.wheel.delta = MOUSE_WHEEL_DELTA;
 	} else if (ev->xbutton.button == Button5) {
-		sys_ev.type = LCUI_MOUSEWHEEL;
+		sys_ev.type = APP_EVENT_MOUSEWHEEL;
 		sys_ev.wheel.x = ev->xbutton.x;
 		sys_ev.wheel.y = ev->xbutton.y;
 		sys_ev.wheel.delta = -MOUSE_WHEEL_DELTA;
 	} else {
-		sys_ev.type = LCUI_MOUSEDOWN;
+		sys_ev.type = APP_EVENT_MOUSEDOWN;
 		sys_ev.button.x = ev->xbutton.x;
 		sys_ev.button.y = ev->xbutton.y;
 		sys_ev.button.button = ev->xbutton.button;
@@ -85,7 +85,7 @@ static void OnButtonRelease(LCUI_Event e, void *arg)
 {
 	XEvent *ev = arg;
 	LCUI_SysEventRec sys_ev;
-	sys_ev.type = LCUI_MOUSEUP;
+	sys_ev.type = APP_EVENT_MOUSEUP;
 	sys_ev.button.x = ev->xbutton.x;
 	sys_ev.button.y = ev->xbutton.y;
 	sys_ev.button.button = ev->xbutton.button;

@@ -55,7 +55,7 @@ static LCUI_TouchPoint AddTouchPoint(LinkedList *points,
 		tp = NULL;
 	}
 	if (!tp) {
-		tp = NEW(LCUI_TouchPointRec, 1);
+		tp = NEW(touch_point_t, 1);
 		tp->id = point->PointerId;
 		/* 将第一个触点作为主触点 */
 		tp->is_primary = points->length == 0;
@@ -75,7 +75,7 @@ static void ClearInvalidTouchPoints(LinkedList *points)
 	while (node) {
 		next = node->next;
 		tp = (LCUI_TouchPoint)node->data;
-		if (tp->state == LCUI_TOUCHUP) {
+		if (tp->state == APP_EVENT_TOUCHUP) {
 			LinkedList_DeleteNode(points, node);
 		}
 		node = next;
@@ -87,7 +87,7 @@ static int CreateTouchEvent(LCUI_SysEvent e, LinkedList *points)
 	int i = 0;
 	LinkedListNode *node;
 	LCUI_TouchPoint list;
-	list = NEW(LCUI_TouchPointRec, points->length);
+	list = NEW(touch_point_t, points->length);
 	for (LinkedList_Each(node, points)) {
 		list[i++] = *(LCUI_TouchPoint)node->data;
 	}
@@ -122,8 +122,8 @@ void InputDriver::OnPointerPressed(CoreWindow^ sender,
 		}
 		break;
 	case PointerDeviceType::Touch:
-		ev.type = LCUI_TOUCH;
-		tp = AddTouchPoint(&m_touch.points, point, LCUI_TOUCHDOWN);
+		ev.type = APP_EVENT_TOUCH;
+		tp = AddTouchPoint(&m_touch.points, point, APP_EVENT_TOUCHDOWN);
 		CreateTouchEvent(&ev, &m_touch.points);
 		LCUI_TriggerEvent(&ev, NULL);
 		LCUI_DestroyEvent(&ev);
@@ -140,7 +140,7 @@ void InputDriver::OnPointerPressed(CoreWindow^ sender,
 		m_mouse.actived = true;
 		m_mouse.position = position;
 	}
-	ev.type = LCUI_MOUSEDOWN;
+	ev.type = APP_EVENT_MOUSEDOWN;
 	pos.x = iround(position.X);
 	pos.y = iround(position.Y);
 	ev.button.x = pos.x;
@@ -161,8 +161,8 @@ void InputDriver::OnPointerMoved(CoreWindow^ sender, PointerEventArgs^ args)
 	case PointerDeviceType::Mouse:
 		break;
 	case PointerDeviceType::Touch:
-		ev.type = LCUI_TOUCH;
-		tp = AddTouchPoint(&m_touch.points, point, LCUI_TOUCHMOVE);
+		ev.type = APP_EVENT_TOUCH;
+		tp = AddTouchPoint(&m_touch.points, point, APP_EVENT_TOUCHMOVE);
 		CreateTouchEvent(&ev, &m_touch.points);
 		ClearInvalidTouchPoints(&m_touch.points);
 		LCUI_TriggerEvent(&ev, NULL);
@@ -178,7 +178,7 @@ void InputDriver::OnPointerMoved(CoreWindow^ sender, PointerEventArgs^ args)
 	}
 	pos.x = iround(position.X);
 	pos.y = iround(position.Y);
-	ev.type = LCUI_MOUSEMOVE;
+	ev.type = APP_EVENT_MOUSEMOVE;
 	ev.motion.x = pos.x;
 	ev.motion.y = pos.y;
 	ev.motion.xrel = iround(position.X - m_mouse.position.Y);
@@ -211,8 +211,8 @@ void InputDriver::OnPointerReleased(CoreWindow^ sender, PointerEventArgs^ args)
 		}
 		break;
 	case PointerDeviceType::Touch:
-		ev.type = LCUI_TOUCH;
-		tp = AddTouchPoint(&m_touch.points, point, LCUI_TOUCHUP);
+		ev.type = APP_EVENT_TOUCH;
+		tp = AddTouchPoint(&m_touch.points, point, APP_EVENT_TOUCHUP);
 		CreateTouchEvent(&ev, &m_touch.points);
 		ClearInvalidTouchPoints(&m_touch.points);
 		LCUI_TriggerEvent(&ev, NULL);
@@ -224,7 +224,7 @@ void InputDriver::OnPointerReleased(CoreWindow^ sender, PointerEventArgs^ args)
 		break;
 	default:return;
 	}
-	ev.type = LCUI_MOUSEUP;
+	ev.type = APP_EVENT_MOUSEUP;
 	pos.x = iround(position.X);
 	pos.y = iround(position.Y);
 	ev.button.x = pos.x;
@@ -241,7 +241,7 @@ void InputDriver::OnPointerWheelChanged(CoreWindow^ sender, PointerEventArgs^ ar
 	PointerPointProperties^ pointProps = point->Properties;
 	Point position = point->Position;
 
-	ev.type = LCUI_MOUSEWHEEL;
+	ev.type = APP_EVENT_MOUSEWHEEL;
 	ev.wheel.x = (int)(position.X + 0.5);
 	ev.wheel.y = (int)(position.Y + 0.5);
 	ev.wheel.delta = pointProps->MouseWheelDelta;;
@@ -252,7 +252,7 @@ void InputDriver::OnPointerWheelChanged(CoreWindow^ sender, PointerEventArgs^ ar
 void InputDriver::OnKeyDown(CoreWindow^ sender, KeyEventArgs^ args)
 {
 	LCUI_SysEventRec ev;
-	ev.type = LCUI_KEYDOWN;
+	ev.type = APP_EVENT_KEYDOWN;
 	ev.key.ctrl_key = FALSE;
 	ev.key.shift_key = FALSE;
 	ev.key.code = static_cast<int>(args->VirtualKey);
@@ -263,7 +263,7 @@ void InputDriver::OnKeyDown(CoreWindow^ sender, KeyEventArgs^ args)
 void InputDriver::OnKeyUp(CoreWindow^ sender, KeyEventArgs^ args)
 {
 	LCUI_SysEventRec ev;
-	ev.type = LCUI_KEYUP;
+	ev.type = APP_EVENT_KEYUP;
 	ev.key.ctrl_key = FALSE;
 	ev.key.shift_key = FALSE;
 	ev.key.code = static_cast<int>(args->VirtualKey);

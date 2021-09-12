@@ -207,7 +207,7 @@ LCUI_BOOL LCUIIME_ProcessKey(LCUI_SysEvent e)
 {
 	int key_state;
 	/* 根据事件类型判定按键状态 */
-	if (e->type == LCUI_KEYUP) {
+	if (e->type == APP_EVENT_KEYUP) {
 		key_state = LCUI_KSTATE_RELEASE;
 		/* 如果是 caps lock 按键被释放 */
 		if (e->key.code == LCUI_KEY_CAPITAL) {
@@ -233,7 +233,7 @@ int LCUIIME_Commit(const wchar_t *str, size_t len)
 	if (len == 0) {
 		len = wcslen(str);
 	}
-	sys_ev.type = LCUI_TEXTINPUT;
+	sys_ev.type = APP_EVENT_COMPOSITION;
 	sys_ev.text.length = len;
 	sys_ev.text.text = NEW(wchar_t, len + 1);
 	if (!sys_ev.text.text) {
@@ -258,7 +258,7 @@ void LCUI_InitIME(void)
 {
 	LinkedList_Init(&self.list);
 	self.active = TRUE;
-	LCUI_BindEvent(LCUI_KEYDOWN, LCUIIME_OnKeyDown, NULL, NULL);
+	LCUI_BindEvent(APP_EVENT_KEYDOWN, LCUIIME_OnKeyDown, NULL, NULL);
 #ifdef WINAPI_FAMILY_APP
 	return;
 #else

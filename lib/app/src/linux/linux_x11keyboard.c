@@ -121,10 +121,10 @@ static void OnKeyboardMessage(LCUI_Event ev, void *arg)
 	LCUI_SysEventRec sys_ev;
 	switch (x_ev->type) {
 	case KeyPress:
-		sys_ev.type = LCUI_KEYDOWN;
+		sys_ev.type = APP_EVENT_KEYDOWN;
 		break;
 	case KeyRelease:
-		sys_ev.type = LCUI_KEYUP;
+		sys_ev.type = APP_EVENT_KEYUP;
 		break;
 	default:
 		return;
@@ -142,8 +142,8 @@ static void OnKeyboardMessage(LCUI_Event ev, void *arg)
 		   sys_ev.key.ctrl_key);
 	LCUI_TriggerEvent(&sys_ev, NULL);
 	if (keysym >= XK_space && keysym <= XK_asciitilde &&
-	    sys_ev.type == LCUI_KEYDOWN) {
-		sys_ev.type = LCUI_KEYPRESS;
+	    sys_ev.type == APP_EVENT_KEYDOWN) {
+		sys_ev.type = APP_EVENT_KEYPRESS;
 		sys_ev.key.code = ConvertKeyCodeToChar(x11, x_ev);
 		_DEBUG_MSG("char: %c\n", sys_ev.key.code);
 		LCUI_TriggerEvent(&sys_ev, NULL);

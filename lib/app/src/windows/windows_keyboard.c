@@ -42,10 +42,10 @@ static void OnKeyboardMessage(LCUI_Event ev, void *arg)
 
 	switch (msg->message) {
 	case WM_KEYDOWN:
-		sys_ev.type = LCUI_KEYDOWN;
+		sys_ev.type = APP_EVENT_KEYDOWN;
 		break;
 	case WM_KEYUP:
-		sys_ev.type = LCUI_KEYUP;
+		sys_ev.type = APP_EVENT_KEYUP;
 		break;
 	default: return;
 	}

@@ -38,7 +38,7 @@ target("lcui")
         "lcui-ui-widgets",
         "lcui-ui-anchor",
         "lcui-ui-builder",
-        "lcui-platform",
+        "lcui-app",
         "lcui-text",
         "lcui-timer",
         "lcui-worker"

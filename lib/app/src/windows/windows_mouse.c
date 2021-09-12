@@ -42,7 +42,7 @@ static void OnMouseMessage(LCUI_Event ev, void *arg)
 	MSG *msg = arg;
 	LCUI_SysEventRec sys_ev;
 	static POINT mouse_pos = { 0, 0 };
-	sys_ev.type = LCUI_NONE;
+	sys_ev.type = APP_EVENT_NONE;
 	switch (msg->message) {
 	case WM_MOUSEMOVE:
 	{
@@ -55,39 +55,39 @@ static void OnMouseMessage(LCUI_Event ev, void *arg)
 		sys_ev.motion.yrel = new_pos.y - mouse_pos.y;
 		mouse_pos.x = new_pos.x;
 		mouse_pos.y = new_pos.y;
-		sys_ev.type = LCUI_MOUSEMOVE;
+		sys_ev.type = APP_EVENT_MOUSEMOVE;
 		break;
 	}
 	case WM_LBUTTONDOWN:
-		sys_ev.type = LCUI_MOUSEDOWN;
+		sys_ev.type = APP_EVENT_MOUSEDOWN;
 		sys_ev.button.button = LCUI_KEY_LEFTBUTTON;
 		sys_ev.button.x = mouse_pos.x;
 		sys_ev.button.y = mouse_pos.y;
 		SetCapture(msg->hwnd);
 		break;
 	case WM_LBUTTONUP:
-		sys_ev.type = LCUI_MOUSEUP;
+		sys_ev.type = APP_EVENT_MOUSEUP;
 		sys_ev.button.button = LCUI_KEY_LEFTBUTTON;
 		sys_ev.button.x = mouse_pos.x;
 		sys_ev.button.y = mouse_pos.y;
 		ReleaseCapture();
 		break;
 	case WM_RBUTTONDOWN:
-		sys_ev.type = LCUI_MOUSEDOWN;
+		sys_ev.type = APP_EVENT_MOUSEDOWN;
 		sys_ev.button.button = LCUI_KEY_RIGHTBUTTON;
 		sys_ev.button.x = mouse_pos.x;
 		sys_ev.button.y = mouse_pos.y;
 		SetCapture(msg->hwnd);
 		break;
 	case WM_RBUTTONUP:
-		sys_ev.type = LCUI_MOUSEUP;
+		sys_ev.type = APP_EVENT_MOUSEUP;
 		sys_ev.button.button = LCUI_KEY_RIGHTBUTTON;
 		sys_ev.button.x = mouse_pos.x;
 		sys_ev.button.y = mouse_pos.y;
 		ReleaseCapture();
 		break;
 	case WM_MOUSEWHEEL:
-		sys_ev.type = LCUI_MOUSEWHEEL;
+		sys_ev.type = APP_EVENT_MOUSEWHEEL;
 		sys_ev.wheel.x = mouse_pos.x;
 		sys_ev.wheel.y = mouse_pos.y;
 		sys_ev.wheel.delta = GET_WHEEL_DELTA_WPARAM(msg->wParam);
@@ -101,9 +101,9 @@ static void OnMouseMessage(LCUI_Event ev, void *arg)
 		if (inputs == NULL) {
 			break;
 		}
-		sys_ev.type = LCUI_TOUCH;
+		sys_ev.type = APP_EVENT_TOUCH;
 		sys_ev.touch.n_points = n;
-		sys_ev.touch.points = NEW(LCUI_TouchPointRec, n);
+		sys_ev.touch.points = NEW(touch_point_t, n);
 		if (sys_ev.touch.points == NULL) {
 			free(inputs);
 			break;
@@ -127,11 +127,11 @@ static void OnMouseMessage(LCUI_Event ev, void *arg)
 				sys_ev.touch.points[i].is_primary = FALSE;
 			}
 			if (inputs[i].dwFlags & TOUCHEVENTF_DOWN) {
-				sys_ev.touch.points[i].state = LCUI_TOUCHDOWN;
+				sys_ev.touch.points[i].state = APP_EVENT_TOUCHDOWN;
 			} else if (inputs[i].dwFlags & TOUCHEVENTF_UP) {
-				sys_ev.touch.points[i].state = LCUI_TOUCHUP;
+				sys_ev.touch.points[i].state = APP_EVENT_TOUCHUP;
 			} else if (inputs[i].dwFlags & TOUCHEVENTF_MOVE) {
-				sys_ev.touch.points[i].state = LCUI_TOUCHMOVE;
+				sys_ev.touch.points[i].state = APP_EVENT_TOUCHMOVE;
 			}
 		}
 		free(inputs);
@@ -143,7 +143,7 @@ static void OnMouseMessage(LCUI_Event ev, void *arg)
 #endif
 	default: break;
 	}
-	if (sys_ev.type != LCUI_NONE) {
+	if (sys_ev.type != APP_EVENT_NONE) {
 		LCUI_TriggerEvent(&sys_ev, NULL);
 		LCUI_DestroyEvent(&sys_ev);
 	}

@@ -128,9 +128,9 @@ void LCUIKeyboard_ReleaseKey(int key_code)
 
 static void OnKeyboardEvent(LCUI_SysEvent e, void *arg)
 {
-	if (e->type == LCUI_KEYDOWN) {
+	if (e->type == APP_EVENT_KEYDOWN) {
 		LCUIKeyboard_HitKey(e->key.code);
-	} else if (e->type == LCUI_KEYUP) {
+	} else if (e->type == APP_EVENT_KEYUP) {
 		LCUIKeyboard_ReleaseKey(e->key.code);
 	}
 }
@@ -140,8 +140,8 @@ void LCUI_InitKeyboard(void)
 	LCUIMutex_Init(&self.mutex);
 	RBTree_Init(&self.state_tree);
 	RBTree_OnDestroy(&self.state_tree, free);
-	LCUI_BindEvent(LCUI_KEYDOWN, OnKeyboardEvent, NULL, NULL);
-	LCUI_BindEvent(LCUI_KEYUP, OnKeyboardEvent, NULL, NULL);
+	LCUI_BindEvent(APP_EVENT_KEYDOWN, OnKeyboardEvent, NULL, NULL);
+	LCUI_BindEvent(APP_EVENT_KEYUP, OnKeyboardEvent, NULL, NULL);
 }
 
 void LCUI_FreeKeyboard(void)

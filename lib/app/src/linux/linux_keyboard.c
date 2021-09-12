@@ -148,18 +148,18 @@ static void DispatchKeyboardEvent(void *arg1, void *arg2)
 		break;
 	}
 	DEBUG_MSG("%c, %d\n", ev.key.code, ev.key.code);
-	ev.type = LCUI_KEYDOWN;
+	ev.type = APP_EVENT_KEYDOWN;
 	LCUI_TriggerEvent(&ev, NULL);
 	LCUI_DestroyEvent(&ev);
 	/* FIXME: this driver is not yet possible to get the key state directly,
 	 * the following is a temporary solution.
 	 */
-	ev.type = LCUI_KEYUP;
+	ev.type = APP_EVENT_KEYUP;
 	LCUI_TriggerEvent(&ev, NULL);
 	LCUI_DestroyEvent(&ev);
 	if (ev.key.code >= ' ' && ev.key.code <= '~') {
 		str[0] = ev.key.code;
-		ev.type = LCUI_KEYPRESS;
+		ev.type = APP_EVENT_KEYPRESS;
 		LCUI_TriggerEvent(&ev, NULL);
 		LCUI_DestroyEvent(&ev);
 		LCUIIME_Commit(str, 1);
