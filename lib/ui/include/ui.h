@@ -475,8 +475,6 @@ LCUI_API void ui_set_dpi(float dpi);
 /** 设置全局缩放比例 */
 LCUI_API void ui_set_scale(float scale);
 
-LCUI_API void ui_init_metrics(void);
-
 LCUI_API const ui_metrics_t* ui_get_metrics(void);
 
 /** 获取当前的全局缩放比例 */

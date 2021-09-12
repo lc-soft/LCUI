@@ -1,4 +1,8 @@
-﻿
+﻿// Metrics
+
+void ui_init_metrics(void);
+
+
 // Prototype
 
 void ui_init_widget_prototype(void);
