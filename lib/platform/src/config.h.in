@@ -1,1 +1,1 @@
-${define USE_X11}
+${define USE_LIBX11}

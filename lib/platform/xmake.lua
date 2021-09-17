@@ -1,5 +1,7 @@
 add_requires("libomp", {optional = true})
 add_includedirs("src")
+set_configdir("src")
+add_configfiles("src/config.h.in")
 option("with-libx11", {showmenu = true, default = true})
 option("enable-openmp", {showmenu = true, default = true})
 option("uwp", {showmenu = true, default = false})
@@ -38,6 +40,7 @@ target("lcui-linux")
     else
         set_default(false)
     end
+    add_packages("libx11")
     if has_package("libx11") then
         set_configvar("USE_LIBX11", 1)
     end
@@ -47,8 +50,6 @@ target("lcui-linux")
 target("lcui-platform")
     set_kind("static")
     add_rules("c.openmp", "c++.openmp")
-    set_configdir("src")
-    add_configfiles("src/config.h.in")
     add_packages("libomp")
     add_files("src/*.c")
     if has_package("libomp") then

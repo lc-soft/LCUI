@@ -48,6 +48,7 @@ LCUI_DisplayDriver LCUI_CreateLinuxDisplayDriver(void)
 	LCUI_DisplayDriver driver = NULL;
 #ifdef USE_LIBX11
 	driver_type = X11;
+	Logger_Debug("[display] init x11 display driver ...\n");
 	driver = LCUI_CreateLinuxX11DisplayDriver();
 #endif
 #ifdef LCUI_VIDEO_DRIVER_FRAMEBUFFER
