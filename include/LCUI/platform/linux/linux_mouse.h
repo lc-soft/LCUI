@@ -31,7 +31,7 @@
 #ifndef LCUI_LINUX_MOUSE_H
 #define LCUI_LINUX_MOUSE_H
 
-#ifdef LCUI_VIDEO_DRIVER_X11
+#ifdef USE_LIBX11
 #include <LCUI/platform/linux/linux_x11mouse.h>
 #endif
 

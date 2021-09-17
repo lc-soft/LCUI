@@ -31,7 +31,7 @@
 #ifndef LCUI_LINUX_EVENTS_H
 #define LCUI_LINUX_EVENTS_H
 
-#ifdef LCUI_VIDEO_DRIVER_X11
+#ifdef USE_LIBX11
 #include <LCUI/platform/linux/linux_x11events.h>
 #endif
 
