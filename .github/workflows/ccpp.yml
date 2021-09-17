@@ -34,12 +34,6 @@ jobs:
           xmake -v
           xmake package
 
-      - name: Build test programs
-        run: |
-          xmake config --clean -P test
-          xmake clean -P test
-          xmake -v -P test
-
       - uses: actions/upload-artifact@master
         with:
           name: ubuntu-pacakges
@@ -77,12 +71,6 @@ jobs:
           xmake config -m release -y -c -v
           xmake -v
           xmake package
-
-      - name: Build test programs
-        run: |
-          xmake config --clean -P test
-          xmake clean -P test
-          xmake -v -P test
 
       - uses: actions/upload-artifact@master
         with:
