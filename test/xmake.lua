@@ -1,19 +1,17 @@
-add_rules("mode.debug", "mode.release")
-set_rundir("$(projectdir)")
-add_repositories("local-repo ../build")
-add_requires("lcui", "test")
-add_packages("lcui")
+includes("lib/test/xmake.lua")
+add_deps("lcui")
+add_includedirs("$(projectdir)/test/lib/test/include/")
 
 target("helloworld")
     add_files("helloworld.c")
 
 target("test_block_layout")
     add_files("test_block_layout.c")
-    add_packages("test")
+    add_deps("test")
 
 target("test_border")
     add_files("test_border.c")
-    add_packages("test")
+    add_deps("test")
 
 target("test_box_shadow")
     add_files("test_box_shadow.c")
@@ -23,14 +21,14 @@ target("test_char_render")
 
 target("test_fill_rect")
     add_files("test_fill_rect.c")
-    add_packages("test")
+    add_deps("test")
 
 target("test_fill_rect_with_rgba")
     add_files("test_fill_rect_with_rgba.c")
 
 target("test_flex_layout")
     add_files("test_flex_layout.c")
-    add_packages("test")
+    add_deps("test")
 
 target("test_image_scaling_bench")
     add_files("test_image_scaling_bench.c")
@@ -58,14 +56,14 @@ target("test_scaling_support")
 
 target("test_scrollbar")
     add_files("test_scrollbar.c")
-    add_packages("test")
+    add_deps("test")
 
 target("test_string_render")
     add_files("test_string_render.c")
 
 target("test_textview_resize")
     add_files("test_textview_resize.c")
-    add_packages("test")
+    add_deps("test")
 
 target("test_touch")
     add_files("test_touch.c")
@@ -75,7 +73,7 @@ target("test_widget")
 
 target("test_widget_opacity")
     add_files("test_widget_opacity.c")
-    add_packages("test")
+    add_deps("test")
 
 target("test_widget_render")
     add_files("test_widget_render.c")

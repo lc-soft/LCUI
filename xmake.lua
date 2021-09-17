@@ -1,11 +1,13 @@
 set_project("lcui")
 set_version("2.2.1")
 add_rules("mode.debug", "mode.release", "c++.openmp", "mode.coverage")
-add_includedirs("include")
+add_includedirs("include", "include/LCUI")
 add_rpathdirs("@loader_path/lib", "@loader_path")
 add_defines("LCUI_EXPORTS", "_UNICODE")
 includes("lib/**/xmake.lua")
+includes("test/xmake.lua")
 set_warnings("all")
+set_rundir("$(projectdir)/test")
 
 if is_plat("windows") then
     add_defines("_CRT_SECURE_NO_WARNINGS")
@@ -41,11 +43,13 @@ target("lcui")
         "lcui-timer",
         "lcui-worker"
     )
+    before_build(function (target)
+        os.cp("$(projectdir)/lib/*/include/*.h", "$(projectdir)/include/LCUI")
+    end)
 
 target("run-tests")
     set_kind("binary")
-    set_rundir("$(projectdir)/test")
-    add_includedirs("$(projectdir)/lib/test/include/")
+    add_includedirs("$(projectdir)/test/lib/test/include/")
     set_default(false)
     if is_plat("linux") and is_mode("coverage") then
         on_run(function (target)
