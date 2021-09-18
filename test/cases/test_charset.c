@@ -3,7 +3,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/util/logger.h>
 #include <LCUI/util/charset.h>
-#include "test.h"
+#include "ctest.h"
 
 void test_charset(void)
 {

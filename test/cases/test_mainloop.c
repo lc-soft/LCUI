@@ -5,7 +5,7 @@
 #include <LCUI/timer.h>
 #include <LCUI/input.h>
 #include <LCUI/display.h>
-#include "test.h"
+#include "ctest.h"
 
 static void OnRefreshScreen(void *arg)
 {

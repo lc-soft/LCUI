@@ -1,7 +1,7 @@
 add_rules("mode.debug", "mode.release")
 add_includedirs("include")
 
-target("test")
+target("ctest")
     set_kind("static")
     add_files("src/*.c")
-    add_headerfiles("include/test.h")
+    add_headerfiles("include/ctest.h")

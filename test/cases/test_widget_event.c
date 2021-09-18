@@ -2,7 +2,7 @@
 #include <LCUI.h>
 #include <LCUI/input.h>
 #include <LCUI/gui/widget.h>
-#include "test.h"
+#include "ctest.h"
 
 void test_widget_mouse_event(void)
 {

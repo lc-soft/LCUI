@@ -3,7 +3,7 @@
 #include <LCUI/graph.h>
 #include <LCUI/image.h>
 #include <LCUI/util/logger.h>
-#include "test.h"
+#include "ctest.h"
 
 void test_image_reader(void)
 {
