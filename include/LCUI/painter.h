@@ -28,8 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_PAINTER_H
-#define LCUI_PAINTER_H
+#ifndef APP_EVENT_PAINTER_H
+#define APP_EVENT_PAINTER_H
 
 LCUI_API LCUI_PaintContext LCUIPainter_Begin(LCUI_Graph *canvas, LCUI_Rect *rect);
 

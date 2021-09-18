@@ -112,7 +112,7 @@ void test_scrollbar(void)
 	left = content->computed_style.left;
 	top = content->computed_style.top;
 
-	e.type = LCUI_MOUSEMOVE;
+	e.type = APP_EVENT_MOUSEMOVE;
 	e.motion.x = 300;
 	e.motion.y = 275;
 	e.motion.xrel = 0;
@@ -120,14 +120,14 @@ void test_scrollbar(void)
 	LCUI_TriggerEvent(&e, NULL);
 	LCUI_RunFrame();
 
-	e.type = LCUI_MOUSEDOWN;
+	e.type = APP_EVENT_MOUSEDOWN;
 	e.button.button = LCUI_KEY_LEFTBUTTON;
 	e.button.x = 300;
 	e.button.y = 275;
 	LCUI_TriggerEvent(&e, NULL);
 	LCUI_RunFrame();
 
-	e.type = LCUI_MOUSEMOVE;
+	e.type = APP_EVENT_MOUSEMOVE;
 	e.motion.x = 600;
 	e.motion.y = 275;
 	e.motion.xrel = 0;
@@ -143,13 +143,13 @@ void test_scrollbar(void)
 	left = content->computed_style.left;
 	top = content->computed_style.top;
 
-	e.type = LCUI_MOUSEMOVE;
+	e.type = APP_EVENT_MOUSEMOVE;
 	e.motion.x = 400;
 	e.motion.y = 275;
 	e.motion.xrel = 0;
 	e.motion.yrel = 0;
 	LCUI_TriggerEvent(&e, NULL);
-	e.type = LCUI_MOUSEUP;
+	e.type = APP_EVENT_MOUSEUP;
 	e.button.button = LCUI_KEY_LEFTBUTTON;
 	e.button.x = 400;
 	e.button.y = 275;
@@ -164,7 +164,7 @@ void test_scrollbar(void)
 	left = content->computed_style.left;
 	top = content->computed_style.top;
 
-	e.type = LCUI_MOUSEMOVE;
+	e.type = APP_EVENT_MOUSEMOVE;
 	e.motion.x = 555;
 	e.motion.y = 45;
 	e.motion.xrel = 0;
@@ -172,14 +172,14 @@ void test_scrollbar(void)
 	LCUI_TriggerEvent(&e, NULL);
 	LCUI_RunFrame();
 
-	e.type = LCUI_MOUSEDOWN;
+	e.type = APP_EVENT_MOUSEDOWN;
 	e.button.button = LCUI_KEY_LEFTBUTTON;
 	e.button.x = 555;
 	e.button.y = 45;
 	LCUI_TriggerEvent(&e, NULL);
 	LCUI_RunFrame();
 
-	e.type = LCUI_MOUSEMOVE;
+	e.type = APP_EVENT_MOUSEMOVE;
 	e.motion.x = 555;
 	e.motion.y = 200;
 	e.motion.xrel = 0;
@@ -195,13 +195,13 @@ void test_scrollbar(void)
 	left = content->computed_style.left;
 	top = content->computed_style.top;
 
-	e.type = LCUI_MOUSEMOVE;
+	e.type = APP_EVENT_MOUSEMOVE;
 	e.motion.x = 555;
 	e.motion.y = 100;
 	e.motion.xrel = 0;
 	e.motion.yrel = 0;
 	LCUI_TriggerEvent(&e, NULL);
-	e.type = LCUI_MOUSEUP;
+	e.type = APP_EVENT_MOUSEUP;
 	e.button.button = LCUI_KEY_LEFTBUTTON;
 	e.button.x = 555;
 	e.button.y = 100;

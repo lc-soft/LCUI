@@ -31,13 +31,13 @@ static void OnTriggerBtnClick(void *arg)
 {
 	LCUI_SysEventRec e;
 
-	e.type = LCUI_MOUSEDOWN;
+	e.type = APP_EVENT_MOUSEDOWN;
 	e.button.button = LCUI_KEY_LEFTBUTTON;
 	e.button.x = 5;
 	e.button.y = 5;
 	LCUI_TriggerEvent(&e, NULL);
 
-	e.type = LCUI_MOUSEUP;
+	e.type = APP_EVENT_MOUSEUP;
 	LCUI_TriggerEvent(&e, NULL);
 }
 

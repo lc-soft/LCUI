@@ -302,9 +302,9 @@ int LCUI_TriggerEvent(LCUI_SysEvent e, void *arg)
 
 int LCUI_CreateTouchEvent(LCUI_SysEvent e, LCUI_TouchPoint points, int n_points)
 {
-	e->type = LCUI_TOUCH;
+	e->type = APP_EVENT_TOUCH;
 	e->touch.n_points = n_points;
-	e->touch.points = NEW(LCUI_TouchPointRec, n_points);
+	e->touch.points = NEW(touch_point_t, n_points);
 	if (!e->touch.points) {
 		return -ENOMEM;
 	}
@@ -317,14 +317,14 @@ int LCUI_CreateTouchEvent(LCUI_SysEvent e, LCUI_TouchPoint points, int n_points)
 void LCUI_DestroyEvent(LCUI_SysEvent e)
 {
 	switch (e->type) {
-	case LCUI_TOUCH:
+	case APP_EVENT_TOUCH:
 		if (e->touch.points) {
 			free(e->touch.points);
 		}
 		e->touch.points = NULL;
 		e->touch.n_points = 0;
 		break;
-	case LCUI_TEXTINPUT:
+	case APP_EVENT_COMPOSITION:
 		if (e->text.text) {
 			free(e->text.text);
 		}
@@ -332,7 +332,7 @@ void LCUI_DestroyEvent(LCUI_SysEvent e)
 		e->text.length = 0;
 		break;
 	}
-	e->type = LCUI_NONE;
+	e->type = APP_EVENT_NONE;
 }
 
 size_t LCUI_ProcessEvents(void)
@@ -700,7 +700,7 @@ const char *LCUI_GetVersion(void)
 int LCUI_Destroy(void)
 {
 	LCUI_SysEventRec e;
-	e.type = LCUI_QUIT;
+	e.type = APP_EVENT_QUIT;
 	LCUI_TriggerEvent(&e, NULL);
 	System.state = STATE_KILLED;
 	LCUI_FreeDisplay();

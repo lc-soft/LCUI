@@ -73,10 +73,10 @@ typedef enum LCUI_WidgetEventType {
 /* 部件的事件数据结构和系统事件一样 */
 typedef LCUI_MouseMotionEvent LCUI_WidgetMouseMotionEvent;
 typedef LCUI_MouseButtonEvent LCUI_WidgetMouseButtonEvent;
-typedef LCUI_MouseWheelEvent LCUI_WidgetMouseWheelEvent;
-typedef LCUI_TextInputEvent LCUI_WidgetTextInputEvent;
-typedef LCUI_KeyboardEvent LCUI_WidgetKeyboardEvent;
-typedef LCUI_TouchEvent LCUI_WidgetTouchEvent;
+typedef app_wheel_event_t LCUI_WidgetMouseWheelEvent;
+typedef app_textinput_event_t LCUI_WidgetTextInputEvent;
+typedef app_keyboard_event_t LCUI_WidgetKeyboardEvent;
+typedef app_touch_event_t LCUI_WidgetTouchEvent;
 
 /** 面向部件级的事件内容结构 */
 typedef struct LCUI_WidgetEventRec_ {

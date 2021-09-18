@@ -32,7 +32,7 @@ void test_widget_rect(void)
 	Widget_GetInvalidArea(root, &rects);
 	LinkedList_Clear(&rects, free);
 
-	ev.type = LCUI_MOUSEMOVE;
+	ev.type = APP_EVENT_MOUSEMOVE;
 	ev.motion.x = 150;
 	ev.motion.y = 150;
 	ev.motion.xrel = 0;
@@ -70,7 +70,7 @@ void test_widget_rect(void)
 	     "root.getInvalidArea().length == 0",
 	     rects.length == 0, TRUE);
 
-	ev.type = LCUI_MOUSEDOWN;
+	ev.type = APP_EVENT_MOUSEDOWN;
 	ev.button.x = 40;
 	ev.button.y = 40;
 	ev.button.button = LCUI_KEY_LEFTBUTTON;
@@ -86,7 +86,7 @@ void test_widget_rect(void)
 	}
 	LinkedList_Clear(&rects, free);
 
-	ev.type = LCUI_MOUSEUP;
+	ev.type = APP_EVENT_MOUSEUP;
 	LCUI_TriggerEvent(&ev, NULL);
 	LCUIWidget_Update();
 	Widget_GetInvalidArea(root, &rects);
@@ -99,7 +99,7 @@ void test_widget_rect(void)
 	}
 	LinkedList_Clear(&rects, free);
 
-	ev.type = LCUI_MOUSEMOVE;
+	ev.type = APP_EVENT_MOUSEMOVE;
 	ev.motion.x = 80;
 	ev.motion.y = 80;
 	LCUI_TriggerEvent(&ev, NULL);

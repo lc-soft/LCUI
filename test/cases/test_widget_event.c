@@ -22,7 +22,7 @@ void test_widget_mouse_event(void)
 	Widget_Append(root, parent);
 	LCUIWidget_Update();
 
-	ev.type = LCUI_MOUSEMOVE;
+	ev.type = APP_EVENT_MOUSEMOVE;
 	ev.motion.x = 150;
 	ev.motion.y = 150;
 	ev.motion.xrel = 0;
@@ -55,7 +55,7 @@ void test_widget_mouse_event(void)
 	it_b("mousemove(40, 40): child.hasStatus('hover') == true",
 	     Widget_HasStatus(child, "hover"), TRUE);
 
-	ev.type = LCUI_MOUSEDOWN;
+	ev.type = APP_EVENT_MOUSEDOWN;
 	ev.button.x = 40;
 	ev.button.y = 40;
 	ev.button.button = LCUI_KEY_LEFTBUTTON;
@@ -67,7 +67,7 @@ void test_widget_mouse_event(void)
 	it_b("mousedown(40, 40): child.hasStatus('active') == true",
 	     Widget_HasStatus(child, "active"), TRUE);
 
-	ev.type = LCUI_MOUSEUP;
+	ev.type = APP_EVENT_MOUSEUP;
 	LCUI_TriggerEvent(&ev, NULL);
 	it_b("mouseup(40, 40): root.hasStatus('active') == false",
 	     Widget_HasStatus(root, "active"), FALSE);
@@ -76,7 +76,7 @@ void test_widget_mouse_event(void)
 	it_b("mouseup(40, 40): child.hasStatus('active') == false",
 	     Widget_HasStatus(child, "active"), FALSE);
 
-	ev.type = LCUI_MOUSEMOVE;
+	ev.type = APP_EVENT_MOUSEMOVE;
 	ev.motion.x = 80;
 	ev.motion.y = 80;
 	LCUI_TriggerEvent(&ev, NULL);

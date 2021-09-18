@@ -95,6 +95,6 @@ int main(int argc, char **argv)
 {
 	LCUI_Init();
 	LinkedList_Init(&touch_bindings);
-	LCUI_BindEvent(LCUI_TOUCH, OnTouch, NULL, NULL);
+	LCUI_BindEvent(APP_EVENT_TOUCH, OnTouch, NULL, NULL);
 	return LCUI_Main();
 }

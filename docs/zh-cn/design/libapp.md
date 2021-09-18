@@ -6,6 +6,7 @@
 
 - https://docs.microsoft.com/zh-cn/uwp/api/windows.applicationmodel.core.iframeworkview?view=winrt-20348
 - https://wiki.libsdl.org/CategoryEvents
+- https://developer.mozilla.org/en-US/docs/Web/API/Event
 
 ## 对象
 
