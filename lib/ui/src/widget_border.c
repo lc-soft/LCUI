@@ -34,6 +34,10 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/metrics.h>
 #include <LCUI/gui/widget.h>
+
+#include <PandaGL.h>
+#include <PandaGL/draw/border.h>
+#include <PandaGL/canvas.h>
 #include "widget_border.h"
 
 static float ComputeXMetric(LCUI_Widget w, LCUI_Style s)
@@ -164,7 +168,50 @@ void Widget_PaintBorder(LCUI_Widget w, LCUI_PaintContext paint,
 	box.y = style->border_box.y - style->canvas_box.y;
 	box.width = style->border_box.width;
 	box.height = style->border_box.height;
-	Border_Paint(&style->border, &box, paint);
+
+	pd_border_t border;
+	pd_rect_t rect;
+	pd_context_t context;
+	pd_canvas_t canvas;
+
+	pd_context_init(&context);
+	pd_canvas_init(&canvas);
+
+	border.top.width = style->border.top.width;
+	border.right.width = style->border.right.width;
+	border.bottom.width = style->border.bottom.width;
+	border.left.width = style->border.left.width;
+	border.top.color.value = style->border.top.color.value;
+	border.right.color.value = style->border.right.color.value;
+	border.bottom.color.value = style->border.bottom.color.value;
+	border.left.color.value = style->border.left.color.value;
+	border.top_left_radius = style->border.top_left_radius;
+	border.top_right_radius = style->border.top_right_radius;
+	border.bottom_left_radius = style->border.bottom_left_radius;
+	border.bottom_right_radius = style->border.bottom_right_radius;
+
+	rect.x = style->border_box.x - style->canvas_box.x;
+	rect.y = style->border_box.y - style->canvas_box.y;
+	rect.width = style->border_box.width;
+	rect.height = style->border_box.height;
+
+	context.rect.height = paint->rect.height;
+	context.rect.width = paint->rect.width;
+	context.rect.x = paint->rect.x;
+	context.rect.y = paint->rect.y;
+	context.with_alpha = paint->with_alpha;
+	canvas.width = paint->canvas.width;
+	canvas.height = paint->canvas.height;
+	canvas.bytes = paint->canvas.bytes;
+	canvas.argb = paint->canvas.argb;
+	canvas.bytes_per_pixel = paint->canvas.bytes_per_pixel;
+	canvas.bytes_per_row = paint->canvas.bytes_per_row;
+	canvas.opacity = paint->canvas.opacity;
+	canvas.mem_size = paint->canvas.mem_size;
+	canvas.palette = paint->canvas.palette;
+	context.source = &canvas;
+	pd_border_paint(&border, &rect, &context);
+	// Border_Paint(&style->border, &box, paint);
 }
 
 void Widget_CropContent(LCUI_Widget w, LCUI_PaintContext paint,

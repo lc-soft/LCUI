@@ -1,0 +1,6 @@
+add_includedirs("src")
+target("PandaGL")
+    set_kind("static")
+    add_files("src/util/*.c")
+    add_files("src/draw/*.c")
+    add_files("src/*.c")

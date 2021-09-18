@@ -1,0 +1,346 @@
+﻿// Copyright to be defined
+
+#include <PandaGL/util/rect.h>
+#include <PandaGL/util/linkedlist.h>
+#include <math.h>
+#include <stdlib.h>
+
+pd_rect_t pd_rect(int x, int y, int w, int h)
+{
+    pd_rect_t r;
+    r.x = x;
+    r.y = y;
+    r.width = w;
+    r.height = h;
+    return r;
+}
+
+/* FIXME: need new shorter name */
+void pd_rect_get_cut_area(int box_w, int box_h, pd_rect_t rect, pd_rect_t *cut)
+{
+    cut->x = 0;
+    cut->y = 0;
+    cut->width = rect.width;
+    cut->height = rect.height;
+    if (rect.x < 0) {
+        cut->width += rect.x;
+        cut->x = 0 - rect.x;
+    }
+    if (rect.x + rect.width > box_w) {
+        cut->width -= (rect.x + rect.width - box_w);
+    }
+
+    if (rect.y < 0) {
+        cut->height += rect.y;
+        cut->y = 0 - rect.y;
+    }
+    if (rect.y + rect.height > box_h) {
+        cut->height -= (rect.y + rect.height - box_h);
+    }
+}
+
+/* FIXME: need new shorter name */
+pd_bool_t pd_rect_validate_area(pd_rect_t *rect, int box_w, int box_h)
+{
+    pd_bool_t overflow = FALSE;
+
+    if (rect->x < 0) {
+        overflow = TRUE;
+        rect->width += rect->x;
+        rect->x = 0;
+    }
+    if (rect->y < 0) {
+        overflow = TRUE;
+        rect->height += rect->y;
+        rect->y = 0;
+    }
+
+    if (rect->x + rect->width > box_w) {
+        overflow = TRUE;
+        if (rect->x < box_w) {
+            rect->width = box_w - rect->x;
+        } else {
+            rect->width = 0;
+        }
+    }
+    if (rect->y + rect->height > box_h) {
+        overflow = TRUE;
+        if (rect->y < box_h) {
+            rect->height = box_h - rect->y;
+        } else {
+            rect->height = 0;
+        }
+    }
+    return overflow;
+}
+
+/* FIXME: need new shorter name */
+pd_bool_t pd_rect_is_cover_rect(const pd_rect_t *a, const pd_rect_t *b)
+{
+    if (a->x > b->x) {
+        if (b->x + b->width <= a->x) {
+            return FALSE;
+        }
+    } else {
+        if (a->x + a->width <= b->x) {
+            return FALSE;
+        }
+    }
+    if (a->y > b->y) {
+        if (b->y + b->height <= a->y) {
+            return FALSE;
+        }
+    } else {
+        if (a->y + a->height <= b->y) {
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+
+/* FIXME: need new shorter name */
+pd_bool_t pd_rect_get_overlay_rect(const pd_rect_t *a, const pd_rect_t *b,
+                  pd_rect_t *out)
+{
+    if (a->x > b->x) {
+        if (b->x + b->width > a->x + a->width) {
+            out->width = a->width;
+        } else {
+            out->width = b->x + b->width - a->x;
+        }
+        out->x = a->x;
+    } else {
+        if (a->x + a->width > b->x + b->width) {
+            out->width = b->width;
+        } else {
+            out->width = a->x + a->width - b->x;
+        }
+        out->x = b->x;
+    }
+    if (a->y > b->y) {
+        if (b->y + b->height > a->y + a->height) {
+            out->height = a->height;
+        } else {
+            out->height = b->y + b->height - a->y;
+        }
+        out->y = a->y;
+    } else {
+        if (a->y + a->height > b->y + b->height) {
+            out->height = b->height;
+        } else {
+            out->height = a->y + a->height - b->y;
+        }
+        out->y = b->y;
+    }
+    if (out->width <= 0 || out->height <= 0) {
+        return FALSE;
+    }
+    return TRUE;
+}
+
+
+void pd_rect_merge(pd_rect_t *big, const pd_rect_t *a, const pd_rect_t *b)
+{
+	if (a->x + a->width < b->x + b->width) {
+		big->width = b->x + b->width;
+	} else {
+		big->width = a->x + a->width;
+	}
+	if (a->y + a->height < b->y + b->height) {
+		big->height = b->y + b->height;
+	} else {
+		big->height = a->y + a->height;
+	}
+	big->x = min(a->x, b->x);
+	big->y = min(a->y, b->y);
+	big->width -= big->x;
+	big->height -= big->y;
+}
+
+
+/* FIXME: need new shorter name */
+void pd_rect_cut_four_rect(pd_rect_t *rect1, pd_rect_t *rect2,
+              pd_rect_t rects[4])
+{
+    rects[0].x = rect2->x;
+    rects[0].y = rect2->y;
+    rects[0].width = rect1->x - rect2->x;
+    rects[0].height = rect1->y + rect1->height - rect2->y;
+
+    rects[1].x = rect2->x;
+    rects[1].y = rect1->y + rect1->height;
+    rects[1].width = rect1->x + rect1->width - rect2->x;
+    rects[1].height = rect2->y + rect2->height - rects[1].y;
+
+    rects[2].x = rect1->x + rect1->width;
+    rects[2].y = rect1->y;
+    rects[2].width = rect2->width - rects[1].width;
+    rects[2].height = rect2->y + rect2->height - rects[2].y;
+
+    rects[3].x = rect1->x;
+    rects[3].y = rect2->y;
+    rects[3].width = rect2->x + rect2->width - rects[3].x;
+    rects[3].height = rect1->y - rect2->y;
+}
+
+void pd_rect_split(pd_rect_t *base, pd_rect_t *target, pd_rect_t rects[4])
+{
+    if (pd_rect_is_include_rect(target, base)) {
+        pd_rect_cut_four_rect(base, target, rects);
+        return;
+    }
+    /* Right */
+    if (target->x >= base->x) {
+        /* Top */
+        if (target->y < base->y) {
+            rects[0].x = target->x;
+            rects[0].y = target->y;
+            rects[0].width = target->width;
+            rects[0].height = base->y - target->y;
+            rects[1].x = base->x + base->width;
+            rects[1].y = base->y;
+            rects[1].width =
+                target->x + target->width - base->x - base->width;
+            rects[1].height = target->y + target->height - base->y;
+        } else {
+            /* Bottom */
+            rects[0].x = base->x + base->width;
+            rects[0].y = target->y;
+            rects[0].width =
+                target->x + target->width - base->x - base->width;
+            rects[0].height = target->height;
+            rects[1].x = target->x;
+            rects[1].y = base->y + base->height;
+            rects[1].width = base->x + base->width - target->x;
+            rects[1].height =
+                target->y + target->height - base->y - base->height;
+        }
+    } else {
+        /* Top */
+        if (target->y < base->y) {
+            rects[0].x = target->x;
+            rects[0].y = target->y;
+            rects[0].width = target->width;
+            rects[0].height = base->y - target->y;
+            rects[1].x = target->x;
+            rects[1].y = base->y;
+            rects[1].width = base->x - target->x;
+            rects[1].height = target->y + target->height - base->y;
+        } else {
+            /* Bottom */
+            rects[0].x = target->x;
+            rects[0].y = target->y;
+            rects[0].width = base->x - target->x;
+            rects[0].height = target->height;
+            rects[1].x = base->x;
+            rects[1].y = base->y + base->height;
+            rects[1].width = target->x + target->width - base->x;
+            rects[1].height =
+                target->y + target->height - base->y - base->height;
+        }
+    }
+    rects[2].x = 0;
+    rects[2].y = 0;
+    rects[2].width = 0;
+    rects[2].height = 0;
+    rects[3].x = 0;
+    rects[3].y = 0;
+    rects[3].width = 0;
+    rects[3].height = 0;
+}
+
+int pd_rectlist_addex(pd_linked_list_t *list, pd_rect_t *rect, pd_bool_t auto_merge)
+{
+	int x_distance, y_distance;
+
+	pd_rect_t *p, union_rect;
+	pd_linked_list_node_t *node, *prev;
+
+	if (rect->width <= 0 || rect->height <= 0) {
+		return -1;
+	}
+	for (LinkedList_Each(node, list)) {
+		p = node->data;
+		/* 如果被现有的矩形包含 */
+		if (pd_rect_is_cover_rect(p, rect)) {
+			return -2;
+		}
+		/* 如果包含现有的矩形 */
+		if (pd_rect_is_cover_rect(rect, p)) {
+			prev = node->prev;
+			free(node->data);
+			pd_linked_list_delete_node(list, node);
+			node = prev;
+			continue;
+		}
+		if (!auto_merge) {
+			continue;
+		}
+		x_distance = p->x + p->width - rect->x - rect->width;
+		y_distance = p->y + p->height - rect->y - rect->height;
+		if ((x_distance <= 10 && x_distance >= -10) &&
+		    (y_distance <= 10 && y_distance >= -10)) {
+			pd_rect_merge(&union_rect, p, rect);
+			free(node->data);
+			pd_linked_list_delete_node(list, node);
+			return pd_rectlist_add(list, &union_rect);
+		}
+	}
+	p = NEW(pd_rect_t, 1);
+	*p = *rect;
+	pd_linked_list_append(list, p);
+	return 0;
+}
+
+int pd_rectlist_add(pd_linked_list_t *list, pd_rect_t *rect)
+{
+	return pd_rectlist_addex(list, rect, TRUE);
+}
+
+int pd_rectlist_delete(pd_linked_list_t *list, pd_rect_t *rect)
+{
+	int i;
+
+	pd_bool_t deletable;
+	pd_rect_t *p, child_rects[4];
+
+	pd_linked_list_t extra_list;
+	pd_linked_list_node_t *prev, *node;
+
+	if (rect->width <= 0 || rect->height <= 0) {
+		return -1;
+	}
+	pd_linked_list_init(&extra_list);
+	for (LinkedList_Each(node, list)) {
+		p = node->data;
+		/* 如果包含现有的矩形 */
+		if (pd_rect_is_cover_rect(rect, p)) {
+			prev = node->prev;
+			free(node->data);
+			pd_linked_list_delete_node(list, node);
+			node = prev;
+			continue;
+		}
+		if (!pd_rect_is_cover_rect(p, rect)) {
+			continue;
+		}
+		deletable = TRUE;
+		pd_rect_split(rect, p, child_rects);
+		for (i = 0; i < 4; ++i) {
+			if (child_rects[i].width <= 0 ||
+			    child_rects[i].height <= 0) {
+				continue;
+			}
+			if (deletable) {
+				prev = node->prev;
+				free(node->data);
+				pd_linked_list_delete_node(list, node);
+				node = prev;
+				deletable = FALSE;
+			}
+			pd_rectlist_addex(&extra_list, &child_rects[i], FALSE);
+		}
+	}
+	pd_linked_list_concat(list, &extra_list);
+	return 1;
+}

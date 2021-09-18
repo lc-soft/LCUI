@@ -1,7 +1,7 @@
 set_project("lcui")
 set_version("2.2.1")
 add_rules("mode.debug", "mode.release", "c++.openmp", "mode.coverage")
-add_includedirs("include", "include/LCUI")
+add_includedirs("include", "include/LCUI", "include/PandaGL")
 add_rpathdirs("@loader_path/lib", "@loader_path")
 add_defines("LCUI_EXPORTS", "_UNICODE")
 includes("lib/**/xmake.lua")
@@ -27,6 +27,9 @@ target("lcui")
     add_headerfiles("include/LCUI.h")
     add_headerfiles("include/LCUI_Build.h")
     add_headerfiles("include/(LCUI/**.h)")
+    add_headerfiles("include/PandaGL.h")
+    add_headerfiles("include/PandaGL/PandaGL/*.h")
+    add_headerfiles("include/PandaGL/PandaGL/**/*.h")
     add_deps(
         "lcui-util",
         "lcui-thread",
@@ -41,7 +44,8 @@ target("lcui")
         "lcui-platform",
         "lcui-text",
         "lcui-timer",
-        "lcui-worker"
+        "lcui-worker",
+        "PandaGL"
     )
     before_build(function (target)
         os.cp("$(projectdir)/lib/*/include/*.h", "$(projectdir)/include/LCUI")
