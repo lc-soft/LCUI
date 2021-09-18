@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <LCUI.h>
-#include "test.h"
+#include "ctest.h"
 
 void test_linkedlist(void)
 {

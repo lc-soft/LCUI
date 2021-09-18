@@ -46,25 +46,3 @@ target("lcui")
     before_build(function (target)
         os.cp("$(projectdir)/lib/*/include/*.h", "$(projectdir)/include/LCUI")
     end)
-
-target("run-tests")
-    set_kind("binary")
-    add_includedirs("$(projectdir)/test/lib/test/include/")
-    set_default(false)
-    if is_plat("linux") and is_mode("coverage") then
-        on_run(function (target)
-            import("core.base.option")
-            local argv = {}
-            local options = {{nil, "memcheck",  "k",  nil, "enable memory check."}}
-            local args = option.raw_parse(option.get("arguments") or {}, options)
-            if args.memcheck then
-                table.insert(argv, "--leak-check=full")
-                table.insert(argv, "--error-exitcode=42")
-            end
-            table.insert(argv, val("projectdir").."/"..target:targetfile())
-            os.cd("$(projectdir)/test")
-            os.execv("valgrind", argv)
-        end)
-    end
-    add_files("./test/run_tests.c", "test/cases/*.c")
-    add_deps("test", "lcui")

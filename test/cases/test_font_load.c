@@ -3,7 +3,7 @@
 #include <LCUI/font.h>
 #include <LCUI/gui/css_library.h>
 #include <LCUI/gui/css_parser.h>
-#include "test.h"
+#include "ctest.h"
 #include <stdio.h>
 
 #define GetSegoeUIFont(S, W) LCUIFont_GetId("Segoe UI", S, W)

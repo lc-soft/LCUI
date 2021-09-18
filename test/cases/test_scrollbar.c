@@ -6,7 +6,7 @@
 #include <LCUI/gui/builder.h>
 #include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/widget/textview.h>
-#include "test.h"
+#include "ctest.h"
 
 /* clang-format off */
 

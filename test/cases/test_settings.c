@@ -3,7 +3,7 @@
 #include <LCUI/settings.h>
 #include <LCUI/main.h>
 #include <LCUI/timer.h>
-#include "test.h"
+#include "ctest.h"
 
 static int settings_change_count = 0;
 

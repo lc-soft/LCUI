@@ -5,7 +5,7 @@
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/builder.h>
-#include "test.h"
+#include "ctest.h"
 
 #define PARENT_OPACITY 0.8f
 #define CHILD_OPACITY 0.5f

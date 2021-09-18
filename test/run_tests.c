@@ -1,7 +1,7 @@
 ﻿#include <stdio.h>
 #include <wchar.h>
 #include <LCUI.h>
-#include "../lib/test/include/test.h"
+#include "ctest.h"
 #include "run_tests.h"
 
 int tests_count = 0;

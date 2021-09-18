@@ -3,7 +3,7 @@
 #include <LCUI.h>
 #include <LCUI/thread.h>
 #include <LCUI/util/logger.h>
-#include "test.h"
+#include "ctest.h"
 
 typedef struct TestWorkerRec_ {
 	char data[32];

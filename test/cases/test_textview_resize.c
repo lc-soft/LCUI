@@ -3,7 +3,7 @@
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/css_parser.h>
-#include "test.h"
+#include "ctest.h"
 
 /* clang-format off */
 
