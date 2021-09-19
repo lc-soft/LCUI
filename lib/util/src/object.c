@@ -230,14 +230,14 @@ static LCUI_Object String_Operator(LCUI_Object a, const char *operator_str,
 
 	switch (operator_str[0]) {
 	case '=':
-		assert(String_Realloc(a, size) == 0);
+		String_Realloc(a, size);
 		strcpy(a->value.string, b->value.string);
 		Object_Notify(a);
 		break;
 	case '+':
 		size += strlen(a->value.string) * sizeof(char);
 		if (operator_str[1] == '=') {
-			assert(String_Realloc(a, size) == 0);
+			String_Realloc(a, size);
 			strcat(a->value.string, b->value.string);
 			Object_Notify(a);
 			break;
@@ -247,7 +247,7 @@ static LCUI_Object String_Operator(LCUI_Object a, const char *operator_str,
 		}
 		str = Object_Duplicate(a);
 		assert(str != NULL);
-		assert(String_Realloc(str, size) == 0);
+		String_Realloc(str, size);
 		strcpy(str->value.string, a->value.string);
 		strcat(str->value.string, b->value.string);
 		return str;
@@ -263,7 +263,7 @@ static void WString_Destructor(LCUI_Object object)
 
 static void String_Duplicator(LCUI_Object dest, const LCUI_ObjectRec *src)
 {
-	assert(String_Realloc(dest, src->size) == 0);
+	String_Realloc(dest, src->size);
 	strcpy(dest->value.string, src->value.string);
 }
 
@@ -273,10 +273,10 @@ void String_SetValue(LCUI_Object str, const char *value)
 
 	if (value) {
 		size = sizeof(char) * (strlen(value) + 1);
-		assert(String_Realloc(str, size) == 0);
+		String_Realloc(str, size);
 		strcpy(str->value.string, value);
 	} else {
-		assert(String_Realloc(str, size) == 0);
+		String_Realloc(str, size);
 		str->value.string[0] = 0;
 	}
 	Object_Notify(str);
@@ -331,14 +331,14 @@ static LCUI_Object WString_Operator(LCUI_Object a, const char *operator_str,
 
 	switch (operator_str[0]) {
 	case '=':
-		assert(WString_Realloc(a, b->size) == 0);
+		WString_Realloc(a, b->size);
 		wcscpy(a->value.wstring, b->value.wstring);
 		Object_Notify(a);
 		break;
 	case '+':
 		size += wcslen(b->value.wstring) * sizeof(wchar_t);
 		if (operator_str[1] == '=') {
-			assert(WString_Realloc(a, size) == 0);
+			WString_Realloc(a, size);
 			wcscat(a->value.wstring, b->value.wstring);
 			Object_Notify(a);
 			break;
@@ -348,7 +348,7 @@ static LCUI_Object WString_Operator(LCUI_Object a, const char *operator_str,
 		}
 		str = Object_Duplicate(a);
 		assert(str != NULL);
-		assert(WString_Realloc(str, size) == 0);
+		WString_Realloc(str, size);
 		wcscpy(str->value.wstring, a->value.wstring);
 		wcscat(str->value.wstring, b->value.wstring);
 		return str;
@@ -358,7 +358,7 @@ static LCUI_Object WString_Operator(LCUI_Object a, const char *operator_str,
 
 static void WString_Duplicator(LCUI_Object dest, const LCUI_ObjectRec *src)
 {
-	assert(WString_Realloc(dest, src->size) == 0);
+	WString_Realloc(dest, src->size);
 	wcscpy(dest->value.wstring, src->value.wstring);
 }
 
@@ -368,10 +368,10 @@ void WString_SetValue(LCUI_Object str, const wchar_t *value)
 
 	if (value) {
 		size = sizeof(wchar_t) * (wcslen(value) + 1);
-		assert(WString_Realloc(str, size) == 0);
+		WString_Realloc(str, size);
 		wcscpy(str->value.wstring, value);
 	} else {
-		assert(WString_Realloc(str, size) == 0);
+		WString_Realloc(str, size);
 		str->value.wstring[0] = 0;
 	}
 	Object_Notify(str);
