@@ -21,7 +21,6 @@ jobs:
 
       - name: Run tests
         run: |
-          xmake build -v run-tests
           xmake run run-tests --memcheck
 
       - name: Upload reports to Codecov
@@ -60,9 +59,7 @@ jobs:
           xmake -v
 
       - name: "Run tests"
-        continue-on-error: true
         run: |
-          xmake build -v run-tests
           xmake run run-tests
 
       - name: Package
