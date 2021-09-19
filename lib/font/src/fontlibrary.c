@@ -174,10 +174,10 @@ LCUI_FontWeight LCUIFont_DetectWeight(const char *str)
 	strtolower(buf, str);
 	if (strstr(buf, "thin")) {
 		weight = FONT_WEIGHT_THIN;
-	} else if (strstr(buf, "light")) {
-		weight = FONT_WEIGHT_EXTRA_LIGHT;
 	} else if (strstr(buf, "semilight")) {
 		weight = FONT_WEIGHT_LIGHT;
+	} else if (strstr(buf, "light")) {
+		weight = FONT_WEIGHT_EXTRA_LIGHT;
 	} else if (strstr(buf, "medium")) {
 		weight = FONT_WEIGHT_MEDIUM;
 	} else if (strstr(buf, "semibold")) {
@@ -431,6 +431,7 @@ static LCUI_FontWeight FindBolderWeight(LCUI_FontStyleNode snode,
 static LCUI_FontWeight FindLighterWeight(LCUI_FontStyleNode snode,
 					 LCUI_FontWeight weight)
 {
+	int i;
 	for (weight -= 100; weight >= FONT_WEIGHT_THIN; weight -= 100) {
 		if (SelectFontWeight(snode, weight)) {
 			return weight;
@@ -630,8 +631,8 @@ static int LCUIFont_LoadFileEx(LCUI_FontEngine *engine, const char *file)
 	for (i = 0; i < num_fonts; ++i) {
 		fonts[i]->engine = engine;
 		id = LCUIFont_Add(fonts[i]);
-		Logger_Debug("[font] add family: %s, style name: %s, id: %d\n",
-			    fonts[i]->family_name, fonts[i]->style_name, id);
+		Logger_Debug("[font] add font: %d, family: %s, style name: %s, weight: %d\n",
+			    id, fonts[i]->family_name, fonts[i]->style_name, fonts[i]->weight);
 	}
 	free(fonts);
 	return 0;
