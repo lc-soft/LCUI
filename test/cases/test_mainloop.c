@@ -46,10 +46,10 @@ static void ObserverThread(void *arg)
 	int i;
 	LCUI_BOOL *exited = arg;
 
-	for (i = 0; i < 10 && !*exited; ++i) {
+	for (i = 0; i < 20 && !*exited; ++i) {
 		LCUI_MSleep(100);
 	}
-	it_b("main loop should exit within 1000ms", *exited, TRUE);
+	it_b("main loop should exit within 2000ms", *exited, TRUE);
 	if (!*exited) {
 		exit(-print_test_result());
 		return;
