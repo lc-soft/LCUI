@@ -10,8 +10,7 @@ void test_textedit(void)
 	LCUI_Object value;
 	wchar_t wcs[64];
 
-	LCUI_InitFontLibrary();
-	LCUI_InitWidget();
+	LCUI_Init();
 
 	w = LCUIWidget_New("textedit");
 
@@ -84,6 +83,5 @@ void test_textedit(void)
 	Widget_Destroy(w);
 	Object_Delete(value);
 
-	LCUI_FreeWidget();
-	LCUI_FreeFontLibrary();
+	LCUI_Destroy();
 }
