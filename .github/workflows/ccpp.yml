@@ -67,8 +67,6 @@ jobs:
 
       - name: Package
         run: |
-          xmake clean
-          xmake config -m release -y -c -v
           xmake -v
           xmake package
 
