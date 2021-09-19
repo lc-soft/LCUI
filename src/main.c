@@ -637,6 +637,18 @@ static void Win32Logger_LogW(const wchar_t *wcs)
 
 #endif
 
+void LCUI_InitPresetWidgets(void)
+{
+	LCUIWidget_AddTextView();
+	LCUIWidget_AddCanvas();
+	LCUIWidget_AddAnchor();
+	LCUIWidget_AddButton();
+	LCUIWidget_AddSideBar();
+	LCUIWidget_AddTScrollBar();
+	LCUIWidget_AddTextCaret();
+	LCUIWidget_AddTextEdit();
+}
+
 void LCUI_InitBase(void)
 {
 	if (System.state == STATE_ACTIVE) {
@@ -656,14 +668,7 @@ void LCUI_InitBase(void)
 	LCUI_InitCursor();
 	LCUI_InitWidget();
 	LCUI_InitMetrics();
-	LCUIWidget_AddTextView();
-	LCUIWidget_AddCanvas();
-	LCUIWidget_AddAnchor();
-	LCUIWidget_AddButton();
-	LCUIWidget_AddSideBar();
-	LCUIWidget_AddTScrollBar();
-	LCUIWidget_AddTextCaret();
-	LCUIWidget_AddTextEdit();
+	LCUI_InitPresetWidgets();
 }
 
 void LCUI_Init(void)
