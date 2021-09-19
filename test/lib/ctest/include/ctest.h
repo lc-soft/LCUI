@@ -6,6 +6,8 @@
 
 void describe(const char *name, void (*func)());
 
+int test_msg(const char *fmt, ...);
+
 void it_i(const char *name, int actual, int expected);
 
 void it_b(const char *name, int actual, int expected);

@@ -21,7 +21,7 @@ static size_t tests_total = 0;
 static int test_msg_indent = 0;
 static int64_t test_start_time = 0;
 
-static int test_msg(const char *fmt, ...)
+int test_msg(const char *fmt, ...)
 {
 	int ret;
 	char str[1024];

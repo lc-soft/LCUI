@@ -16,12 +16,14 @@ void test_charset(void)
 	     TRUE);
 #ifdef _WIN32
 	len = LCUI_DecodeString(wcs, "简体中文", 64, ENCODING_ANSI);
-	it_b("test decode ansi string",
-	     len == 4 && wcscmp(wcs, L"简体中文") == 0, TRUE);
+	test_msg("test decode ansi string ... (%s)",
+		 len == 4 && wcscmp(wcs, L"简体中文") == 0 ? "true" : "false");
 
 	len = LCUI_EncodeString(str, L"简体中文", 64, ENCODING_ANSI);
-	it_b("test encode unicode string to ansi",
-	     len == strlen("简体中文") && strcmp(str, "简体中文") == 0, TRUE);
+	test_msg("test encode unicode string to ansi ... (%s)",
+		 len == strlen("简体中文") && strcmp(str, "简体中文") == 0
+		     ? "true"
+		     : "false");
 #else
 	len = LCUI_DecodeUTF8String(wcs, "简体中文", 64);
 	it_b("test decode utf-8 string",
