@@ -34,6 +34,7 @@
 #include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/util/object.h>
+#include <LCUI/util/keywords.h>
 #include <LCUI/util/string.h>
 #include <LCUI/util/charset.h>
 

@@ -34,8 +34,9 @@
 #include <LCUI_Build.h>
 #include <LCUI/types.h>
 #include <LCUI/util/task.h>
+#include <LCUI/util/keywords.h>
 #include <LCUI/util/logger.h>
-#include <LCUI/util/linkedlist.h>
+#include <LCUI/util/list.h>
 #include <LCUI/thread.h>
 #include <LCUI/worker.h>
 

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <LCUI.h>
 #include <LCUI/thread.h>
+#include <LCUI/util/keywords.h>
 #include <LCUI/util/logger.h>
 #include "ctest.h"
 

@@ -33,9 +33,10 @@
 #include <errno.h>
 #include <LCUI_Build.h>
 #include <LCUI/types.h>
+#include <LCUI/util/keywords.h>
 #include <LCUI/util/math.h>
 #include <LCUI/util/parse.h>
-#include <LCUI/util/linkedlist.h>
+#include <LCUI/util/list.h>
 #include <LCUI/font.h>
 
 typedef enum LCUI_TextStyleTagType_ {

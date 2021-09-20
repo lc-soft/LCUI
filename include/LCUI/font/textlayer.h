@@ -102,8 +102,8 @@ typedef struct LCUI_TextLayerRec_ {
 	LCUI_BOOL enable_mulitiline;   /**< 是否启用多行文本模式 */
 	LCUI_BOOL enable_autowrap;     /**< 是否启用自动换行模式 */
 	LCUI_BOOL enable_style_tag;    /**< 是否使用文本样式标签 */
-	LinkedList dirty_rects;               /**< 脏矩形记录 */
-	LinkedList text_styles;               /**< 样式缓存 */
+	list_t dirty_rects;               /**< 脏矩形记录 */
+	list_t text_styles;               /**< 样式缓存 */
 	LCUI_TextStyleRec text_default_style; /**< 文本全局样式 */
 	LCUI_TextRowListRec text_rows;        /**< 文本行列表 */
 	struct {
@@ -162,7 +162,7 @@ LCUI_API void TextLayer_ClearText(LCUI_TextLayer layer);
 
 /** 插入文本内容（宽字符版） */
 LCUI_API int TextLayer_InsertTextW(LCUI_TextLayer layer, const wchar_t *wstr,
-				   LinkedList *tag_stack);
+				   list_t *tag_stack);
 
 /** 插入文本内容 */
 LCUI_API int TextLayer_InsertTextA(LCUI_TextLayer layer, const char *str);
@@ -172,7 +172,7 @@ LCUI_API int TextLayer_InsertText(LCUI_TextLayer layer, const char *utf8_str);
 
 /** 追加文本内容（宽字符版） */
 LCUI_API int TextLayer_AppendTextW(LCUI_TextLayer layer, const wchar_t *wstr,
-				   LinkedList *tag_stack);
+				   list_t *tag_stack);
 
 /** 追加文本内容 */
 LCUI_API int TextLayer_AppendTextA(LCUI_TextLayer layer,
@@ -183,7 +183,7 @@ LCUI_API int TextLayer_AppendText(LCUI_TextLayer layer, const char *utf8_text);
 
 /** 设置文本内容（宽字符版） */
 LCUI_API int TextLayer_SetTextW(LCUI_TextLayer layer, const wchar_t *wstr,
-				LinkedList *tag_stack);
+				list_t *tag_stack);
 
 /** 设置文本内容 */
 LCUI_API int TextLayer_SetTextA(LCUI_TextLayer layer, const char *ascii_text);
@@ -231,7 +231,7 @@ LCUI_API void TextLayer_EnableStyleTag(LCUI_TextLayer layer, LCUI_BOOL enabled);
 LCUI_API void TextLayer_ReloadCharBitmap(LCUI_TextLayer layer);
 
 /** 更新数据 */
-LCUI_API void TextLayer_Update(LCUI_TextLayer layer, LinkedList *rects);
+LCUI_API void TextLayer_Update(LCUI_TextLayer layer, list_t *rects);
 
 /**
  * 将文本图层中的指定区域的内容绘制至目标图像中

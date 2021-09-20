@@ -34,6 +34,7 @@
 #include <LCUI_Build.h>
 #include "config.h"
 #include <LCUI/types.h>
+#include <LCUI/util/keywords.h>
 #include <LCUI/util/logger.h>
 #include <LCUI/graph.h>
 #include <LCUI/image.h>

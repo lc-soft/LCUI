@@ -32,8 +32,9 @@
 #include <wctype.h>
 #include <LCUI_Build.h>
 #include <LCUI/types.h>
+#include <LCUI/util/keywords.h>
 #include <LCUI/util/math.h>
-#include <LCUI/util/linkedlist.h>
+#include <LCUI/util/list.h>
 #include <LCUI/util/rect.h>
 #include <LCUI/graph.h>
 #include <LCUI/font.h>

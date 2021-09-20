@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/util/uri.h>
+#include <LCUI/util/keywords.h>
 #include <LCUI/util/charset.h>
 
 #if defined(LCUI_BUILD_IN_WIN32) && defined(WINAPI_PARTITION_APP)

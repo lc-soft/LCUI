@@ -31,7 +31,8 @@
 #define LCUI_OBJECT_H
 
 #include <wchar.h>
-#include <LCUI/util/linkedlist.h>
+#include <LCUI/util/keywords.h>
+#include <LCUI/util/list.h>
 
 LCUI_BEGIN_HEADER
 
@@ -62,7 +63,7 @@ typedef struct LCUI_ObjectRec_ {
 		void *data;
 	} value;
 	size_t size;
-	LinkedList *watchers;
+	list_t *watchers;
 } LCUI_ObjectRec;
 
 LCUI_API LCUI_ObjectType ObjectType_New(const char *name);

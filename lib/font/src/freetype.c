@@ -32,7 +32,8 @@
 #include <LCUI_Build.h>
 #ifdef USE_FREETYPE
 #include <LCUI/types.h>
-#include <LCUI/util/linkedlist.h>
+#include <LCUI/util/keywords.h>
+#include <LCUI/util/list.h>
 #include <LCUI/font.h>
 #include <stdlib.h>
 #include <errno.h>

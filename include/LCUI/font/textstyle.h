@@ -85,7 +85,7 @@ int TextStyle_SetDefaultFont(LCUI_TextStyle ts);
 
 /*-------------------------- StyleTag --------------------------------*/
 
-#define StyleTags_Init LinkedList_Init
+#define StyleTags_Init list_init
 
 /** 从字符串中获取样式标签的名字及样式属性 */
 LCUI_API const wchar_t *ScanStyleTag(const wchar_t *wstr, wchar_t *name,
@@ -94,16 +94,16 @@ LCUI_API const wchar_t *ScanStyleTag(const wchar_t *wstr, wchar_t *name,
 /** 在字符串中获取样式的结束标签，输出的是标签名 */
 LCUI_API const wchar_t *ScanStyleEndingTag(const wchar_t *wstr, wchar_t *name);
 
-LCUI_API void StyleTags_Clear(LinkedList *tags);
+LCUI_API void StyleTags_Clear(list_t *tags);
 
-LCUI_API LCUI_TextStyle StyleTags_GetTextStyle(LinkedList *tags);
+LCUI_API LCUI_TextStyle StyleTags_GetTextStyle(list_t *tags);
 
 /** 处理样式标签 */
-LCUI_API const wchar_t* StyleTags_GetStart(LinkedList *tags,
+LCUI_API const wchar_t* StyleTags_GetStart(list_t *tags,
 					   const wchar_t *str);
 
 /** 处理样式结束标签 */
-LCUI_API const wchar_t* StyleTags_GetEnd(LinkedList *tags,
+LCUI_API const wchar_t* StyleTags_GetEnd(list_t *tags,
 					 const wchar_t *str);
 
 /*------------------------- End StyleTag -----------------------------*/

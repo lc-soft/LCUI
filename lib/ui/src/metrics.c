@@ -31,6 +31,7 @@
 
 #include <LCUI_Build.h>
 #include <LCUI/types.h>
+#include <LCUI/util/keywords.h>
 #include <LCUI/util/math.h>
 #include <LCUI/gui/metrics.h>
 
