@@ -180,7 +180,16 @@ struct app_event_t {
 		app_touch_event_t touch;
 		app_paint_event_t paint;
 	};
-	LinkedListNode node;
 };
+
+
+// App events
+
+
+void app_init_events(void);
+void app_destroy_events(void);
+int app_post_event(app_event_t *e);
+int app_poll_event(app_event_t *e);
+
 
 #endif
