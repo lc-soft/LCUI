@@ -30,11 +30,13 @@
 
 #ifndef LCUI_UTIL_H
 #define LCUI_UTIL_H
+#include <LCUI/util/keywords.h>
 #include <LCUI/util/math.h>
 #include <LCUI/util/time.h>
 #include <LCUI/util/dirent.h>
 #include <LCUI/util/rbtree.h>
-#include <LCUI/util/linkedlist.h>
+#include <LCUI/util/list.h>
+#include <LCUI/util/list_entry.h>
 #include <LCUI/util/dict.h>
 #include <LCUI/util/object.h>
 #include <LCUI/util/rect.h>

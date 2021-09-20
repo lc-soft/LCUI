@@ -28,6 +28,7 @@ target("lcui")
     add_headerfiles("include/LCUI_Build.h")
     add_headerfiles("include/(LCUI/**.h)")
     add_deps(
+        "yutil",
         "lcui-util",
         "lcui-thread",
         "lcui-css",
@@ -45,6 +46,7 @@ target("lcui")
     )
     before_build(function (target)
         -- Copy the header file of the internal library to the LCUI header file directory
+        os.cp("$(projectdir)/lib/yutil/include/**.h", "$(projectdir)/include/LCUI/util")
         os.cp("$(projectdir)/lib/util/include/*.h", "$(projectdir)/include/LCUI/util")
         os.cp("$(projectdir)/lib/thread/include/*.h", "$(projectdir)/include/LCUI/thread")
         os.cp("$(projectdir)/lib/css/include/*.h", "$(projectdir)/include/LCUI/css")
