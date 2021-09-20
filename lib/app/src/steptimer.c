@@ -1,151 +1,90 @@
-﻿/* steptimer.c -- Step timer, Mainly used to control the count of frames per
- * second for the rendering loop.
- *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *   * Neither the name of LCUI nor the names of its contributors may be used
- *     to endorse or promote products derived from this software without
- *     specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+﻿/**
+ * @see https://github.com/Microsoft/DirectXTK/wiki/StepTimer
  */
 
-#define LCUI_UTIL_STEPTIMER_C
-
 #include <stdlib.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
-#include <LCUI/thread.h>
+#include <LCUI.h>
+#include "app.h"
 
-enum StepTimerState {
-	STATE_RUN,
-	STATE_PAUSE,
-	STATE_QUIT
-};
-
-typedef struct StepTimerRec_ {
-	int state;
-	LCUI_Cond cond;
-	LCUI_Mutex mutex;
-	unsigned int temp_fps;
-	unsigned int current_fps;
-	unsigned int one_frame_remain_time;
-	unsigned int pause_time;
-	int64_t prev_frame_start_time;
-	int64_t prev_fps_update_time;
-} StepTimerRec;
-
-StepTimer StepTimer_Create(void)
+void step_timer_init(step_timer_t *timer)
 {
-	StepTimer timer;
-	timer = NEW(StepTimerRec, 1);
-	timer->temp_fps = 0;
-	timer->current_fps = 0;
-	timer->pause_time = 0;
-	timer->one_frame_remain_time = 10;
-	timer->prev_frame_start_time = LCUI_GetTime();
-	timer->prev_fps_update_time = LCUI_GetTime();
-	LCUICond_Init(&timer->cond);
-	LCUIMutex_Init(&timer->mutex);
-	return timer;
+	timer->fixed_time_step = FALSE;
+	timer->elapsed_time = 0;
+        timer->total_time = 0;
+        timer->left_over_time = 0;
+        timer->frame_count = 0;
+        timer->frames_per_second = 0;
+        timer->frames_this_second = 0;
+        timer->second_counter = 0;
+        timer->is_fixed_time_step = false;
+        timer->target_elapsed_time = 1000 / 60;
+        timer->maxDelta = 1000;
 }
 
-void StepTimer_Destroy(StepTimer timer)
+void step_timer_tick(step_timer_t *timer, step_timer_handler_t handler,
+		     void *data)
 {
-	LCUICond_Destroy(&timer->cond);
-	LCUIMutex_Destroy(&timer->mutex);
-	free(timer);
-}
+	// Query the current time.
+	uint64_t current_time = LCUI_GetTime();
+	uint64_t time_delta = current_time - timer->last_time;
 
-void StepTimer_SetFrameLimit(StepTimer timer, unsigned int max)
-{
-	timer->one_frame_remain_time = (int)(1000.0 / max);
-}
+	timer->last_time = current_time;
+	timer->second_counter += time_delta;
 
-int StepTimer_GetFrameCount(StepTimer timer)
-{
-	return timer->current_fps;
-}
+	// Clamp excessively large time deltas (e.g. after paused in the
+	// debugger).
+	if (time_delta > timer->max_delta) {
+		time_delta = timer->max_delta;
+	}
 
-void StepTimer_Remain(StepTimer timer)
-{
-	int64_t current_time;
-	unsigned int n_ms, lost_ms;
+	uint32_t last_frame_count = timer->frame_count;
 
-	if (timer->state == STATE_QUIT) {
-		return;
-	}
-	lost_ms = 0;
-	current_time = LCUI_GetTime();
-	LCUIMutex_Lock(&timer->mutex);
-	n_ms = (unsigned int)(current_time - timer->prev_frame_start_time);
-	if (n_ms > timer->one_frame_remain_time) {
-		goto normal_exit;
-	}
-	n_ms = timer->one_frame_remain_time - n_ms;
-	if (n_ms < 1) {
-		goto normal_exit;
-	}
-	/* 睡眠一段时间 */
-	while (lost_ms < n_ms && timer->state == STATE_RUN) {
-		LCUICond_TimedWait(&timer->cond, &timer->mutex, n_ms - lost_ms);
-		lost_ms = (unsigned int)LCUI_GetTimeDelta(current_time);
-	}
-	/* 睡眠结束后，如果当前状态为 PAUSE，则说明睡眠是因为要暂停而终止的 */
-	if (timer->state == STATE_PAUSE) {
-		current_time = LCUI_GetTime();
-		/* 等待状态改为“继续” */
-		while (timer->state == STATE_PAUSE) {
-			LCUICond_Wait(&timer->cond, &timer->mutex);
+	if (timer->is_fixed_time_step) {
+		// Fixed timestep update logic
+
+		// If the app is running very close to the target elapsed time
+		// (within 1/4 of a millisecond) just clamp the clock to exactly
+		// match the target value. This prevents tiny and irrelevant
+		// errors from accumulating over time. Without this clamping, a
+		// game that requested a 60 fps fixed update, running with vsync
+		// enabled on a 59.94 NTSC display, would eventually accumulate
+		// enough tiny errors that it would drop a frame. It is better
+		// to just round small deviations down to zero to leave things
+		// running smoothly.
+
+		if (abs((int64_t)(time_delta - timer->target_elapsed_ticks))) <
+		    ticks_per_second / 4000) {
+			time_delta = timer->target_elapsed_ticks;
 		}
-		lost_ms = (unsigned int)LCUI_GetTimeDelta(current_time);
-		timer->pause_time = lost_ms;
-		timer->prev_frame_start_time += lost_ms;
-		LCUIMutex_Unlock(&timer->mutex);
-		return;
+
+		timer->left_over_time += time_delta;
+
+		while (timer->left_over_time >= timer->target_elapsed_ticks) {
+			timer->elapsed_time = timer->target_elapsed_ticks;
+			timer->total_time += timer->target_elapsed_ticks;
+			timer->left_over_time -= timer->target_elapsed_ticks;
+			timer->frame_count++;
+
+		update(timer, data);
+		}
+	} else {
+		// Variable timestep update logic.
+		timer->elapsed_time = time_delta;
+		timer->total_time += time_delta;
+		timer->left_over_time = 0;
+		timer->frame_count++;
+
+		update(timer, data);
 	}
 
-normal_exit:;
-	current_time = LCUI_GetTime();
-	if (current_time - timer->prev_fps_update_time >= 1000) {
-		timer->current_fps = timer->temp_fps;
-		timer->prev_fps_update_time = current_time;
-		timer->temp_fps = 0;
+	// Track the current framerate.
+	if (timer->frame_count != last_frame_count) {
+		timer->frames_this_second++;
 	}
-	timer->prev_frame_start_time = current_time;
-	++timer->temp_fps;
-	LCUIMutex_Unlock(&timer->mutex);
-}
 
-void StepTimer_Pause(StepTimer timer, LCUI_BOOL need_pause)
-{
-	if (timer->state == STATE_RUN && need_pause) {
-		LCUIMutex_Lock(&timer->mutex);
-		timer->state = STATE_PAUSE;
-		LCUICond_Signal(&timer->cond);
-		LCUIMutex_Unlock(&timer->mutex);
-	} else if (timer->state == STATE_PAUSE && !need_pause) {
-		LCUIMutex_Lock(&timer->mutex);
-		timer->state = STATE_RUN;
-		LCUICond_Signal(&timer->cond);
-		LCUIMutex_Unlock(&timer->mutex);
+	if (timer->second_counter >= 1000) {
+		timer->frame_per_second = timer->frames_this_second;
+		timer->frames_this_second = 0;
+		timer->second_counter %= 1000;
 	}
 }
