@@ -33,7 +33,7 @@
 
 LCUI_BEGIN_HEADER
 
-typedef void (*TimerCallback)(void *);
+typedef void (*timer_callback)(void *);
 
 /**
  * 设置定时器
@@ -48,15 +48,12 @@ typedef void (*TimerCallback)(void *);
  * @return
  *	该定时器的标识符
  **/
-LCUI_API int LCUITimer_Set(long int n_ms, TimerCallback callback,
-			   void *arg, LCUI_BOOL reuse);
-
 /** repeatedly calls a function, with a fixed time delay between each call. */
-LCUI_API int LCUI_SetTimeout(long int n_ms, TimerCallback callback,
+LCUI_API int lcui_add_timeout(long int n_ms, timer_callback callback,
 			     void *arg);
 
 /** set a timer which execute a function once after the timer expires. */
-LCUI_API int LCUI_SetInterval(long int n_ms, TimerCallback callback,
+LCUI_API int lcui_add_interval(long int n_ms, timer_callback callback,
 			      void *arg);
 
 /**
@@ -68,7 +65,7 @@ LCUI_API int LCUI_SetInterval(long int n_ms, TimerCallback callback,
  * @return
  *	正常返回0，指定ID的定时器不存在则返回-1.
  */
-LCUI_API int LCUITimer_Free(int timer_id);
+LCUI_API int lcui_timer_destroy(int timer_id);
 
 /**
  * 暂停定时器的倒计时
@@ -78,7 +75,7 @@ LCUI_API int LCUITimer_Free(int timer_id);
  * @return
  *	正常返回0，指定ID的定时器不存在则返回-1.
  * */
-LCUI_API int LCUITimer_Pause(int timer_id);
+LCUI_API int lcui_timer_pause(int timer_id);
 
 /**
  * 继续定时器的倒计时
@@ -87,7 +84,7 @@ LCUI_API int LCUITimer_Pause(int timer_id);
  * @return
  *	正常返回0，指定ID的定时器不存在则返回-1.
  * */
-LCUI_API int LCUITimer_Continue(int timer_id);
+LCUI_API int lcui_timer_continue(int timer_id);
 
 /**
  * 重设定时器的等待时间
@@ -98,17 +95,16 @@ LCUI_API int LCUITimer_Continue(int timer_id);
  * @return
  *	正常返回0，指定ID的定时器不存在则返回-1.
  * */
-LCUI_API int LCUITimer_Reset(int timer_id, long int n_ms);
+LCUI_API int lcui_timer_reset(int timer_id, long int n_ms);
 
 /* Process all active timers */
-LCUI_API size_t LCUI_ProcessTimers(void);
+LCUI_API size_t lcui_timer_list_process();
 
 /* Init the timer module */
-LCUI_API void LCUI_InitTimer(void);
+LCUI_API void lcui_timer_list_create();
 
 /* Free the timer module */
-LCUI_API void LCUI_FreeTimer(void);
-
+LCUI_API void lcui_timer_list_destroy();
 LCUI_END_HEADER
 
 #endif
