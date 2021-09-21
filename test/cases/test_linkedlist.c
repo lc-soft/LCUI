@@ -2,33 +2,33 @@
 #include <LCUI.h>
 #include "ctest.h"
 
-void test_linkedlist(void)
+void test_list(void)
 {
 	int arr[] = { 8, 4, 64, 16, 32, 1024 };
 
 	size_t i;
 	size_t n = sizeof(arr) / sizeof(int);
 
-	LinkedList list;
-	LinkedListNode *node;
+	list_t list;
+	list_node_t *node;
 
-	LinkedList_Init(&list);
+	list_init(&list);
 	for (i = 0; i < n; ++i) {
-		LinkedList_Append(&list, arr + i);
+		list_append(&list, arr + i);
 	}
-	it_i("LinkedList_Append() should work", (int)list.length, (int)n);
+	it_i("list_append() should work", (int)list.length, (int)n);
 	i = 0;
-	for (LinkedList_Each(node, &list)) {
+	for (list_each(node, &list)) {
 		if (node->data != arr + i) {
 			break;
 		}
 		++i;
 	}
-	it_b("LinkedList_Each() should work",
+	it_b("list_each() should work",
 	     node == NULL && i == sizeof(arr) / sizeof(int), TRUE);
 
 	i = n - 1;
-	for (LinkedList_EachReverse(node, &list)) {
+	for (list_each_reverse(node, &list)) {
 		if (node->data != arr + i) {
 			break;
 		}
@@ -38,9 +38,9 @@ void test_linkedlist(void)
 		}
 		--i;
 	}
-	it_i("LinkedList_EachReverse() should work", (int)i, (int)n);
+	it_i("list_each_reverse() should work", (int)i, (int)n);
 
-	LinkedList_Clear(&list, NULL);
-	it_b("LinkedList_ClearData() should work",
+	list_clear(&list, NULL);
+	it_b("list_clear() should work",
 	     list.length == 0 && !list.head.next && !list.tail.prev, TRUE);
 }
