@@ -1198,7 +1198,7 @@ int LCUI_AddCSSPropertyParser(LCUI_CSSPropertyParser sp)
 	return 0;
 }
 
-static void DestroyStyleParser(void *priv_data, void *val)
+static void DestroyStyleParser(void *privdata, void *val)
 {
 	LCUI_CSSPropertyParser sp = val;
 	free(sp->name);

@@ -174,7 +174,7 @@ LCUI_FontWeight LCUIFont_DetectWeight(const char *str)
 	strtolower(buf, str);
 	if (strstr(buf, "thin")) {
 		weight = FONT_WEIGHT_THIN;
-		} else if (strstr(buf, "semilight")) {
+	} else if (strstr(buf, "semilight")) {
 		weight = FONT_WEIGHT_LIGHT;
 	} else if (strstr(buf, "light")) {
 		weight = FONT_WEIGHT_EXTRA_LIGHT;
@@ -630,8 +630,8 @@ static int LCUIFont_LoadFileEx(LCUI_FontEngine *engine, const char *file)
 	for (i = 0; i < num_fonts; ++i) {
 		fonts[i]->engine = engine;
 		id = LCUIFont_Add(fonts[i]);
-		logger_debug("[font] add family: %s, style name: %s, id: %d\n",
-			    fonts[i]->family_name, fonts[i]->style_name, id);
+		logger_debug("[font] add font: %d, family: %s, style name: %s, weight: %d\n",
+			    id, fonts[i]->family_name, fonts[i]->style_name, fonts[i]->weight);
 	}
 	free(fonts);
 	return 0;

@@ -293,7 +293,7 @@ static void DestroyKeyNameGroup(void *data)
 	free(group);
 }
 
-static void KeyNameGroupDestructor(void *priv_data, void *data)
+static void KeyNameGroupDestructor(void *privdata, void *data)
 {
 	DestroyKeyNameGroup(data);
 }
@@ -1199,7 +1199,7 @@ static void DeleteStyleLinkGroup(StyleLinkGroup group)
 	free(group);
 }
 
-static void StyleLinkGroupDestructor(void *priv_data, void *data)
+static void StyleLinkGroupDestructor(void *privdata, void *data)
 {
 	DeleteStyleLinkGroup(data);
 }
@@ -1631,17 +1631,17 @@ void LCUI_PrintStyleSheetsBySelector(LCUI_Selector s)
 	logger_debug("selector(%u) stylesheets end\n", s->hash);
 }
 
-static void StyleSheetCacheDestructor(void *priv_data, void *val)
+static void StyleSheetCacheDestructor(void *privdata, void *val)
 {
 	StyleSheet_Delete(val);
 }
 
-static void *DupStyleName(void *priv_data, const void *val)
+static void *DupStyleName(void *privdata, const void *val)
 {
 	return strdup2(val);
 }
 
-static void StyleNameDestructor(void *priv_data, void *val)
+static void StyleNameDestructor(void *privdata, void *val)
 {
 	free(val);
 }
@@ -1651,18 +1651,18 @@ static unsigned int IntKeyDict_HashFunction(const void *key)
 	return (*(unsigned int *)key);
 }
 
-static int IntKeyDict_KeyCompare(void *priv_data, const void *key1,
+static int IntKeyDict_KeyCompare(void *privdata, const void *key1,
 				 const void *key2)
 {
 	return *(unsigned int *)key1 == *(unsigned int *)key2;
 }
 
-static void IntKeyDict_KeyDestructor(void *priv_data, void *key)
+static void IntKeyDict_KeyDestructor(void *privdata, void *key)
 {
 	free(key);
 }
 
-static void *IntKeyDict_KeyDup(void *priv_data, const void *key)
+static void *IntKeyDict_KeyDup(void *privdata, const void *key)
 {
 	unsigned int *newkey = malloc(sizeof(unsigned int));
 	*newkey = *(unsigned int *)key;
@@ -1689,7 +1689,7 @@ static void DestroyStylesheetCache(void)
 	library.cache = NULL;
 }
 
-static void StyleLinkDestructor(void *priv_data, void *data)
+static void StyleLinkDestructor(void *privdata, void *data)
 {
 	DeleteStyleLink(data);
 }

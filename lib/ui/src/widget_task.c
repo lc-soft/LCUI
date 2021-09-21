@@ -67,25 +67,25 @@ static unsigned int IntKeyDict_HashFunction(const void *key)
 	return (*(unsigned int *)key);
 }
 
-static int IntKeyDict_KeyCompare(void *priv_data, const void *key1,
+static int IntKeyDict_KeyCompare(void *privdata, const void *key1,
 				 const void *key2)
 {
 	return *(unsigned int *)key1 == *(unsigned int *)key2;
 }
 
-static void IntKeyDict_KeyDestructor(void *priv_data, void *key)
+static void IntKeyDict_KeyDestructor(void *privdata, void *key)
 {
 	free(key);
 }
 
-static void *IntKeyDict_KeyDup(void *priv_data, const void *key)
+static void *IntKeyDict_KeyDup(void *privdata, const void *key)
 {
 	unsigned int *newkey = malloc(sizeof(unsigned int));
 	*newkey = *(unsigned int *)key;
 	return newkey;
 }
 
-static void StyleSheetCacheDestructor(void *priv_data, void *val)
+static void StyleSheetCacheDestructor(void *privdata, void *val)
 {
 	StyleSheet_Delete(val);
 }

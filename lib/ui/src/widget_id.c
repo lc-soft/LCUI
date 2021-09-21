@@ -131,7 +131,7 @@ LCUI_Widget LCUIWidget_GetById(const char *id)
 	return w;
 }
 
-static void OnClearWidgetList(void *priv_data, void *data)
+static void OnClearWidgetList(void *privdata, void *data)
 {
 	list_t *list = data;
 	list_clear(list, NULL);

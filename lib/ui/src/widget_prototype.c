@@ -76,7 +76,7 @@ static void Widget_DefaultPainter(LCUI_Widget w, LCUI_PaintContext paint,
 {
 }
 
-static void DeletePrototype(void *priv_data, void *data)
+static void DeletePrototype(void *privdata, void *data)
 {
 	LCUI_WidgetPrototype proto = data;
 

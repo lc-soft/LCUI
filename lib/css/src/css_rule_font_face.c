@@ -242,8 +242,8 @@ static int FontFaceParser_ParseValue(LCUI_CSSParserContext ctx)
 		FontFace_ParseFontWeight(data->face, ctx->buffer);
 		break;
 	case KEY_SRC:
-		FontFace_ParseSrc(data->face, ctx->buffer, 
-		ctx->style.dirname);
+		FontFace_ParseSrc(data->face, ctx->buffer,
+				  ctx->style.dirname);
 		break;
 	default: break;
 	}

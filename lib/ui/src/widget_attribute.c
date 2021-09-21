@@ -43,7 +43,7 @@ static struct LCUI_WidgetAttribleModule {
 	LCUI_BOOL available;
 } self;
 
-static void OnClearWidgetAttribute(void *priv_data, void *data)
+static void OnClearWidgetAttribute(void *privdata, void *data)
 {
 	LCUI_WidgetAttribute attr = data;
 	if (attr->value.destructor) {
