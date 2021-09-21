@@ -55,7 +55,7 @@ static void OnTouch(LCUI_SysEvent e, void *arg)
 	LCUI_Widget w;
 	list_node_t *node;
 	LCUI_TouchPoint point;
-	LCUI_Color bgcolor = RGB(255, 0, 0);
+	LCUI_Color bgcolor = YUTIL_TEST_RGB(255, 0, 0);
 
 	for (i = 0; i < e->touch.n_points; ++i) {
 		TouchPointBinding binding;

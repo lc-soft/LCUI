@@ -11,8 +11,8 @@ int main(void)
 	LCUI_Widget root, box, txt;
 	LCUI_PaintContextRec paint;
 	LCUI_Rect area = { 40, 40, 320, 240 };
-	LCUI_Color bgcolor = RGB(242, 249, 252);
-	LCUI_Color bdcolor = RGB(201, 230, 242);
+	LCUI_Color bgcolor = YUTIL_TEST_RGB(242, 249, 252);
+	LCUI_Color bdcolor = YUTIL_TEST_RGB(201, 230, 242);
 
 	LCUI_Init();
 
@@ -23,7 +23,7 @@ int main(void)
 	/* 创建一块灰色的画板 */
 	Graph_Init(&canvas);
 	Graph_Create(&canvas, 320, 240);
-	Graph_FillRect(&canvas, RGB(240, 240, 240), NULL, FALSE);
+	Graph_FillRect(&canvas, YUTIL_TEST_RGB(240, 240, 240), NULL, FALSE);
 
 	/* 初始化一个绘制实例，绘制区域为整个画板 */
 	paint.with_alpha = FALSE;

@@ -6,7 +6,7 @@
 int paint_background(LCUI_PaintContext paint, LCUI_Rect *box)
 {
 	LCUI_Graph image;
-	LCUI_Color green = RGB(102, 204, 0);
+	LCUI_Color green = YUTIL_TEST_RGB(102, 204, 0);
 	LCUI_Background bg = { 0 };
 
 	Graph_Init(&image);
@@ -32,7 +32,7 @@ int paint_background(LCUI_PaintContext paint, LCUI_Rect *box)
 void paint_border(LCUI_PaintContext paint, LCUI_Rect *box)
 {
 	LCUI_Border border = { 0 };
-	LCUI_Color black = RGB(0, 0, 0);
+	LCUI_Color black = YUTIL_TEST_RGB(0, 0, 0);
 
 	border.top.color = black;
 	border.top.style = SV_SOLID;
@@ -59,7 +59,7 @@ int main(void)
 
 	LCUI_Graph canvas;
 	LCUI_Graph layer;
-	LCUI_Color gray = RGB(240, 240, 240);
+	LCUI_Color gray = YUTIL_TEST_RGB(240, 240, 240);
 	LCUI_Rect border_box = { 0, 0, 400, 300 };
 	LCUI_Rect bg_box = { border_box.x + border_size,
 			     border_box.y + border_size,

@@ -311,12 +311,12 @@ static void X11Surface_SetCaptionW(LCUI_Surface surface, const wchar_t *wstr)
 	task = &surface->tasks[TASK_SET_CAPTION];
 	X11Surface_ReleaseTask(surface, TASK_SET_CAPTION);
 	if (wstr) {
-		len = LCUI_EncodeString(NULL, wstr, 0, ENCODING_UTF8) + 1;
+		len = encode_string(NULL, wstr, 0, ENCODING_UTF8) + 1;
 		caption = malloc(sizeof(char) * len);
 		if (!caption) {
 			return;
 		}
-		len = LCUI_EncodeString(caption, wstr, len, ENCODING_UTF8);
+		len = encode_string(caption, wstr, len, ENCODING_UTF8);
 		task->caption = caption;
 		task->caption[len] = 0;
 		task->caption_len = len;
@@ -348,7 +348,7 @@ static LCUI_PaintContext X11Surface_BeginPaint(LCUI_Surface surface,
 	LCUIMutex_Lock(&surface->mutex);
 	LCUIRect_ValidateArea(&paint->rect, surface->width, surface->height);
 	Graph_Quote(&paint->canvas, &surface->fb, &paint->rect);
-	Graph_FillRect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
+	Graph_FillRect(&paint->canvas, YUTIL_TEST_RGB(255, 255, 255), NULL, TRUE);
 	return paint;
 }
 

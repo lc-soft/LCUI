@@ -19,13 +19,13 @@ int main(void)
 	rect.y = 0;
 	rect.width = 160;
 	rect.height = 40;
-	Graph_FillRect(&canvas, RGB(255, 221, 0), &rect, FALSE);
+	Graph_FillRect(&canvas, YUTIL_TEST_RGB(255, 221, 0), &rect, FALSE);
 	rect.y += 40;
-	Graph_FillRect(&canvas, RGB(102, 204, 0), &rect, FALSE);
+	Graph_FillRect(&canvas, YUTIL_TEST_RGB(102, 204, 0), &rect, FALSE);
 	rect.y += 40;
-	Graph_FillRect(&canvas, RGB(0, 153, 255), &rect, FALSE);
+	Graph_FillRect(&canvas, YUTIL_TEST_RGB(0, 153, 255), &rect, FALSE);
 	rect.y += 40;
-	Graph_FillRect(&canvas, RGB(255, 51, 0), &rect, FALSE);
+	Graph_FillRect(&canvas, YUTIL_TEST_RGB(255, 51, 0), &rect, FALSE);
 	color.red = 255;
 	color.green = 255;
 	color.blue = 255;

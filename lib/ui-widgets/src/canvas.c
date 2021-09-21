@@ -159,7 +159,7 @@ LCUI_CanvasContext Canvas_GetContext(LCUI_Widget w)
 	ctx->buffer = canvas->buffer;
 	ctx->width = ctx->buffer.width;
 	ctx->height = ctx->buffer.height;
-	ctx->fill_color = RGB(0, 0, 0);
+	ctx->fill_color = YUTIL_TEST_RGB(0, 0, 0);
 	ctx->scale = LCUIMetrics_GetScale();
 	ctx->clearRect = CanvasContext_ClearRect;
 	ctx->fillRect = CanvasContext_FillRect;

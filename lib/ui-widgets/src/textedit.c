@@ -45,7 +45,7 @@
 
 #define TEXT_BLOCK_SIZE 512
 #define DEFAULT_WIDTH 176.0f
-#define PLACEHOLDER_COLOR RGB(140, 140, 140)
+#define PLACEHOLDER_COLOR YUTIL_TEST_RGB(140, 140, 140)
 #define GetData(W) Widget_GetData(W, self.prototype)
 #define AddData(W) Widget_AddData(W, self.prototype, sizeof(LCUI_TextEditRec))
 #define TextBlocks_Clear(blocks) list_clear(blocks, TextBlock_OnDestroy)

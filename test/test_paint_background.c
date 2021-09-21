@@ -6,8 +6,8 @@
 int test_paint_background_color(void)
 {
         LCUI_Graph canvas;
-        LCUI_Color gray = RGB(240, 240, 240);
-        LCUI_Color green = RGB(102, 204, 0);
+        LCUI_Color gray = YUTIL_TEST_RGB(240, 240, 240);
+        LCUI_Color green = YUTIL_TEST_RGB(102, 204, 0);
         LCUI_Rect rect = { 200, 100, 400, 300 };
         LCUI_Background bg = { 0 };
         LCUI_PaintContext paint;
@@ -31,8 +31,8 @@ int test_paint_background_image(void)
 {
         LCUI_Graph canvas;
         LCUI_Graph image;
-        LCUI_Color gray = RGB(240, 240, 240);
-        LCUI_Color green = RGB(102, 204, 0);
+        LCUI_Color gray = YUTIL_TEST_RGB(240, 240, 240);
+        LCUI_Color green = YUTIL_TEST_RGB(102, 204, 0);
         LCUI_Rect rect = { 200, 100, 400, 300 };
         LCUI_Background bg = { 0 };
         LCUI_PaintContext paint;
@@ -66,8 +66,8 @@ int test_paint_background_image_with_size(void)
 {
         LCUI_Graph canvas;
         LCUI_Graph image;
-        LCUI_Color gray = RGB(240, 240, 240);
-        LCUI_Color green = RGB(102, 204, 0);
+        LCUI_Color gray = YUTIL_TEST_RGB(240, 240, 240);
+        LCUI_Color green = YUTIL_TEST_RGB(102, 204, 0);
         LCUI_Rect rect = { 200, 100, 400, 300 };
         LCUI_Background bg = { 0 };
         LCUI_PaintContext paint;
@@ -102,8 +102,8 @@ int test_paint_background_image_with_position(void)
 {
         LCUI_Graph canvas;
         LCUI_Graph image;
-        LCUI_Color gray = RGB(240, 240, 240);
-        LCUI_Color green = RGB(102, 204, 0);
+        LCUI_Color gray = YUTIL_TEST_RGB(240, 240, 240);
+        LCUI_Color green = YUTIL_TEST_RGB(102, 204, 0);
         LCUI_Rect rect = { 200, 100, 400, 300 };
         LCUI_Background bg = { 0 };
         LCUI_PaintContext paint;

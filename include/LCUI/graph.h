@@ -33,8 +33,8 @@
 LCUI_BEGIN_HEADER
 
 /* 解除RGB宏 */
-#ifdef RGB
-#undef RGB
+#ifdef YUTIL_TEST_RGB
+#undef YUTIL_TEST_RGB
 #endif
 
 /* 将两个像素点的颜色值进行alpha混合 */
@@ -187,7 +187,7 @@ LCUI_API void Graph_PrintInfo(LCUI_Graph *graph);
 
 LCUI_API void Graph_Init(LCUI_Graph *graph);
 
-LCUI_API LCUI_Color RGB(uchar_t r, uchar_t g, uchar_t b);
+LCUI_API LCUI_Color YUTIL_TEST_RGB(uchar_t r, uchar_t g, uchar_t b);
 
 LCUI_API LCUI_Color ARGB(uchar_t a, uchar_t r, uchar_t g, uchar_t b);
 

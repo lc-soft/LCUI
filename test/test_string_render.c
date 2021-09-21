@@ -17,7 +17,7 @@ int main(void)
 	/* 创建一个图像，并使用灰色填充 */
 	Graph_Init(&img);
 	Graph_Create(&img, 320, 240);
-	Graph_FillRect(&img, RGB(240, 240, 240), NULL, FALSE);
+	Graph_FillRect(&img, YUTIL_TEST_RGB(240, 240, 240), NULL, FALSE);
 
 	/* 设置文本的字体大小 */
 	TextStyle_Init(&txtstyle);

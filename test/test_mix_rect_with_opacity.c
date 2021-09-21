@@ -17,14 +17,14 @@ int main(void)
 	rect.y = 0;
 	rect.width = 75;
 	rect.height = 75;
-	Graph_FillRect(&canvas, RGB(255, 221, 0), &rect, FALSE);
+	Graph_FillRect(&canvas, YUTIL_TEST_RGB(255, 221, 0), &rect, FALSE);
 	rect.x = 75;
-	Graph_FillRect(&canvas, RGB(102, 204, 0), &rect, FALSE);
+	Graph_FillRect(&canvas, YUTIL_TEST_RGB(102, 204, 0), &rect, FALSE);
 	rect.x = 0;
 	rect.y = 75;
-	Graph_FillRect(&canvas, RGB(0, 153, 255), &rect, FALSE);
+	Graph_FillRect(&canvas, YUTIL_TEST_RGB(0, 153, 255), &rect, FALSE);
 	rect.x = 75;
-	Graph_FillRect(&canvas, RGB(255, 51, 0), &rect, FALSE);
+	Graph_FillRect(&canvas, YUTIL_TEST_RGB(255, 51, 0), &rect, FALSE);
 	// 设置前景的 opacity 值
 	fore_canvas.opacity = 0.2f;
 	// 仅当色彩模式为 ARGB 时 opacity 属性才会生效
@@ -34,7 +34,7 @@ int main(void)
 		// 使用新尺寸重新创建前景图
 		Graph_Create(&fore_canvas, size, size);
 		// 重新填充颜色
-		Graph_FillRect(&fore_canvas, RGB(255, 255, 255), NULL, TRUE);
+		Graph_FillRect(&fore_canvas, YUTIL_TEST_RGB(255, 255, 255), NULL, TRUE);
 		// 将前景图混合到背景图中
 		Graph_Mix(&canvas, &fore_canvas, 75 - size / 2, 75 - size / 2,
 			  FALSE);
