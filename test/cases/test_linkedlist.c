@@ -2,7 +2,7 @@
 #include <LCUI.h>
 #include "ctest.h"
 
-void test_list(void)
+void test_linkedlist(void)
 {
 	int arr[] = { 8, 4, 64, 16, 32, 1024 };
 

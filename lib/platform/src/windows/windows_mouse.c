@@ -31,6 +31,7 @@
 #include "config.h"
 #include <LCUI_Build.h>
 #ifdef LCUI_BUILD_IN_WIN32
+#include <windows.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/input.h>
 #include <LCUI/platform.h>

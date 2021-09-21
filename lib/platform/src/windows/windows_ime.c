@@ -36,6 +36,7 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/input.h>
 #include <LCUI/ime.h>
+#include <windows.h>
 #include <LCUI/platform.h>
 #include LCUI_EVENTS_H
 
