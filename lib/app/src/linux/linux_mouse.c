@@ -73,7 +73,7 @@ static void DispathMouseButtonEvent(int button, int state)
 			ev.button.button = button;
 			mouse.button_state[button - 1] = 0;
 			LCUI_TriggerEvent(&ev, NULL);
-			LCUI_DestroyEvent(&ev);
+			app_event_destroy(&ev);
 		}
 	} else if (state & button) {
 		ev.type = APP_EVENT_MOUSEDOWN;
@@ -82,7 +82,7 @@ static void DispathMouseButtonEvent(int button, int state)
 		ev.button.button = button;
 		mouse.button_state[button - 1] = 1;
 		LCUI_TriggerEvent(&ev, NULL);
-		LCUI_DestroyEvent(&ev);
+		app_event_destroy(&ev);
 	}
 }
 
@@ -104,7 +104,7 @@ static void DispatchMouseEvent(void *arg1, void *arg2)
 	ev.motion.xrel = buf[1];
 	ev.motion.yrel = -buf[2];
 	LCUI_TriggerEvent(&ev, NULL);
-	LCUI_DestroyEvent(&ev);
+	app_event_destroy(&ev);
 	DispathMouseButtonEvent(MOUSE_BUTTON_LEFT, state);
 	DispathMouseButtonEvent(MOUSE_BUTTON_RIGHT, state);
 }

@@ -126,7 +126,7 @@ void LCUIKeyboard_ReleaseKey(int key_code)
 	LCUIMutex_Unlock(&self.mutex);
 }
 
-static void OnKeyboardEvent(LCUI_SysEvent e, void *arg)
+static void OnKeyboardEvent(app_event_t *e, void *arg)
 {
 	if (e->type == APP_EVENT_KEYDOWN) {
 		LCUIKeyboard_HitKey(e->key.code);

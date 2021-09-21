@@ -116,53 +116,53 @@ static void DispatchKeyboardEvent(void *arg1, void *arg2)
 	ev.key.code = *((int *)arg1);
 	switch (ev.key.code) {
 	case 183:
-		ev.key.code = LCUI_KEY_UP;
+		ev.key.code = KEY_UP;
 		break;
 	case 184:
-		ev.key.code = LCUI_KEY_DOWN;
+		ev.key.code = KEY_DOWN;
 		break;
 	case 185:
-		ev.key.code = LCUI_KEY_RIGHT;
+		ev.key.code = KEY_RIGHT;
 		break;
 	case 186:
-		ev.key.code = LCUI_KEY_LEFT;
+		ev.key.code = KEY_LEFT;
 		break;
 	case 127:
-		ev.key.code = LCUI_KEY_BACKSPACE;
+		ev.key.code = KEY_BACKSPACE;
 		break;
 	case 293:
-		ev.key.code = LCUI_KEY_HOME;
+		ev.key.code = KEY_HOME;
 		break;
 	case 295:
-		ev.key.code = LCUI_KEY_DELETE;
+		ev.key.code = KEY_DELETE;
 		break;
 	case 296:
-		ev.key.code = LCUI_KEY_END;
+		ev.key.code = KEY_END;
 		break;
 	case 297:
-		ev.key.code = LCUI_KEY_PAGEUP;
+		ev.key.code = KEY_PAGEUP;
 		break;
 	case 298:
-		ev.key.code = LCUI_KEY_PAGEDOWN;
+		ev.key.code = KEY_PAGEDOWN;
 	default:
 		break;
 	}
 	DEBUG_MSG("%c, %d\n", ev.key.code, ev.key.code);
 	ev.type = APP_EVENT_KEYDOWN;
 	LCUI_TriggerEvent(&ev, NULL);
-	LCUI_DestroyEvent(&ev);
+	app_event_destroy(&ev);
 	/* FIXME: this driver is not yet possible to get the key state directly,
 	 * the following is a temporary solution.
 	 */
 	ev.type = APP_EVENT_KEYUP;
 	LCUI_TriggerEvent(&ev, NULL);
-	LCUI_DestroyEvent(&ev);
+	app_event_destroy(&ev);
 	if (ev.key.code >= ' ' && ev.key.code <= '~') {
 		str[0] = ev.key.code;
 		ev.type = APP_EVENT_KEYPRESS;
 		LCUI_TriggerEvent(&ev, NULL);
-		LCUI_DestroyEvent(&ev);
-		LCUIIME_Commit(str, 1);
+		app_event_destroy(&ev);
+		ime_commit(str, 1);
 	}
 }
 

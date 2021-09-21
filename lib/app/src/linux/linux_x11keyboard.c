@@ -43,64 +43,64 @@ static int ConvertKeyCode(KeySym keysym)
 {
 	switch (keysym) {
 	case XK_Tab:
-		return LCUI_KEY_TAB;
+		return KEY_TAB;
 	case XK_Escape:
-		return LCUI_KEY_ESCAPE;
+		return KEY_ESCAPE;
 	case XK_Return:
-		return LCUI_KEY_ENTER;
+		return KEY_ENTER;
 	case XK_Delete:
-		return LCUI_KEY_DELETE;
+		return KEY_DELETE;
 	case XK_BackSpace:
-		return LCUI_KEY_BACKSPACE;
+		return KEY_BACKSPACE;
 	case XK_Home:
-		return LCUI_KEY_HOME;
+		return KEY_HOME;
 	case XK_Left:
-		return LCUI_KEY_LEFT;
+		return KEY_LEFT;
 	case XK_Up:
-		return LCUI_KEY_UP;
+		return KEY_UP;
 	case XK_Right:
-		return LCUI_KEY_RIGHT;
+		return KEY_RIGHT;
 	case XK_Down:
-		return LCUI_KEY_DOWN;
+		return KEY_DOWN;
 	case XK_Page_Up:
-		return LCUI_KEY_PAGEUP;
+		return KEY_PAGEUP;
 	case XK_Page_Down:
-		return LCUI_KEY_PAGEDOWN;
+		return KEY_PAGEDOWN;
 	case XK_End:
-		return LCUI_KEY_END;
+		return KEY_END;
 	case XK_Control_R:
 	case XK_Control_L:
-		return LCUI_KEY_CONTROL;
+		return KEY_CONTROL;
 	case XK_Shift_R:
 	case XK_Shift_L:
-		return LCUI_KEY_SHIFT;
+		return KEY_SHIFT;
 	case XK_Alt_L:
 	case XK_Alt_R:
-		return LCUI_KEY_ALT;
+		return KEY_ALT;
 	case XK_Caps_Lock:
-		return LCUI_KEY_CAPITAL;
+		return KEY_CAPITAL;
 	case XK_comma:
-		return LCUI_KEY_COMMA;
+		return KEY_COMMA;
 	case XK_period:
-		return LCUI_KEY_PERIOD;
+		return KEY_PERIOD;
 	case XK_minus:
-		return LCUI_KEY_MINUS;
+		return KEY_MINUS;
 	case XK_slash:
-		return LCUI_KEY_SLASH;
+		return KEY_SLASH;
 	case XK_semicolon:
-		return LCUI_KEY_SEMICOLON;
+		return KEY_SEMICOLON;
 	case XK_equal:
-		return LCUI_KEY_EQUAL;
+		return KEY_EQUAL;
 	case XK_bracketleft:
-		return LCUI_KEY_BRACKETLEFT;
+		return KEY_BRACKETLEFT;
 	case XK_bracketright:
-		return LCUI_KEY_BRACKETRIGHT;
+		return KEY_BRACKETRIGHT;
 	case XK_backslash:
-		return LCUI_KEY_BACKSLASH;
+		return KEY_BACKSLASH;
 	case XK_apostrophe:
-		return LCUI_KEY_APOSTROPHE;
+		return KEY_APOSTROPHE;
 	case XK_grave:
-		return LCUI_KEY_GRAVE;
+		return KEY_GRAVE;
 	default:
 		break;
 	}

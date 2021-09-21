@@ -1,6 +1,6 @@
 ﻿/* ime.c -- Input Method Engine
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2021, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -36,32 +36,30 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
-#include <LCUI/input.h>
-#include <LCUI/ime.h>
+#include <app.h>
 
-typedef struct LCUI_IMERec_ {
+typedef struct ime_t_ {
 	int id;
 	char *name;
-	LCUI_IMEHandlerRec handler;
+	ime_handler_t handler;
 	LinkedListNode node;
-} LCUI_IMERec, *LCUI_IME;
+} ime_t;
 
-static struct LCUI_InputMethodEngine {
+static struct app_ime_t {
 	int id_count;
 	LinkedList list;
 
-	LCUI_IME ime;
+	ime_t *ime;
 	LCUI_BOOL enable_caps_lock;
 	LCUI_BOOL active;
-} self;
+} app_ime;
 
-static LCUI_IME LCUIIME_Find(int ime_id)
+static ime_t *ime_get(int ime_id)
 {
 	LinkedListNode *node;
-	for (LinkedList_Each(node, &self.list)) {
-		LCUI_IME ime = node->data;
+
+	for (LinkedList_Each(node, &app_ime.list)) {
+		ime_t *ime = node->data;
 		if (ime->id == ime_id) {
 			return ime;
 		}
@@ -69,11 +67,11 @@ static LCUI_IME LCUIIME_Find(int ime_id)
 	return NULL;
 }
 
-static LCUI_IME LCUIIME_FindByName(const char *name)
+static ime_t *ime_get_by_name(const char *name)
 {
 	LinkedListNode *node;
-	for (LinkedList_Each(node, &self.list)) {
-		LCUI_IME ime = node->data;
+	for (LinkedList_Each(node, &app_ime.list)) {
+		ime_t *ime = node->data;
 		if (strcmp(ime->name, name) == 0) {
 			return ime;
 		}
@@ -81,17 +79,17 @@ static LCUI_IME LCUIIME_FindByName(const char *name)
 	return NULL;
 }
 
-int LCUIIME_Register(const char *name, LCUI_IMEHandler handler)
+int ime_add(const char *name, ime_handler_t *handler)
 {
 	size_t len;
-	LCUI_IME ime;
-	if (!self.active) {
+	ime_t *ime;
+	if (!app_ime.active) {
 		return -1;
 	}
-	if (LCUIIME_FindByName(name)) {
+	if (ime_get_by_name(name)) {
 		return -2;
 	}
-	ime = NEW(LCUI_IMERec, 1);
+	ime = NEW(ime_t, 1);
 	if (!ime) {
 		return -ENOMEM;
 	}
@@ -100,16 +98,16 @@ int LCUIIME_Register(const char *name, LCUI_IMEHandler handler)
 	if (!ime->name) {
 		return -ENOMEM;
 	}
-	self.id_count += 1;
-	ime->id = self.id_count;
+	app_ime.id_count += 1;
+	ime->id = app_ime.id_count;
 	ime->node.data = ime;
 	strncpy(ime->name, name, len);
-	memcpy(&ime->handler, handler, sizeof(LCUI_IMEHandlerRec));
-	LinkedList_AppendNode(&self.list, &ime->node);
+	memcpy(&ime->handler, handler, sizeof(ime_handler_t));
+	LinkedList_AppendNode(&app_ime.list, &ime->node);
 	return ime->id;
 }
 
-static LCUI_BOOL LCUIIME_Open(LCUI_IME ime)
+static LCUI_BOOL ime_open(ime_t *ime)
 {
 	if (ime && ime->handler.open) {
 		return ime->handler.open();
@@ -117,7 +115,7 @@ static LCUI_BOOL LCUIIME_Open(LCUI_IME ime)
 	return FALSE;
 }
 
-static LCUI_BOOL LCUIIME_Close(LCUI_IME ime)
+static LCUI_BOOL ime_close(ime_t *ime)
 {
 	if (ime && ime->handler.close) {
 		Logger_Debug("[ime] close engine: %s\n", ime->name);
@@ -126,71 +124,71 @@ static LCUI_BOOL LCUIIME_Close(LCUI_IME ime)
 	return FALSE;
 }
 
-LCUI_BOOL LCUIIME_Select(int ime_id)
+LCUI_BOOL ime_select(int ime_id)
 {
-	LCUI_IME ime = LCUIIME_Find(ime_id);
+	ime_t *ime = ime_get(ime_id);
 	if (ime) {
-		LCUIIME_Close(self.ime);
+		ime_close(app_ime.ime);
 		Logger_Debug("[ime] select engine: %s\n", ime->name);
-		self.ime = ime;
-		LCUIIME_Open(self.ime);
+		app_ime.ime = ime;
+		ime_open(app_ime.ime);
 		return TRUE;
 	}
 	return FALSE;
 }
 
-LCUI_BOOL LCUIIME_SelectByName(const char *name)
+LCUI_BOOL ime_select_by_name(const char *name)
 {
-	LCUI_IME ime = LCUIIME_FindByName(name);
+	ime_t *ime = ime_get_by_name(name);
 	if (ime) {
-		LCUIIME_Close(self.ime);
-		self.ime = ime;
-		LCUIIME_Open(self.ime);
+		ime_close(app_ime.ime);
+		app_ime.ime = ime;
+		ime_open(app_ime.ime);
 		return TRUE;
 	}
 	return FALSE;
 }
 
-void LCUIIME_Switch(void)
+void ime_switch(void)
 {
-	LCUI_IME ime;
-	if (self.ime && self.ime->node.next) {
-		ime = self.ime->node.next->data;
-		LCUIIME_Close(self.ime);
-		self.ime = ime;
-		LCUIIME_Open(self.ime);
+	ime_t *ime;
+	if (app_ime.ime && app_ime.ime->node.next) {
+		ime = app_ime.ime->node.next->data;
+		ime_close(app_ime.ime);
+		app_ime.ime = ime;
+		ime_open(app_ime.ime);
 	}
 }
 
-static void LCUIIME_OnDestroy(void *arg)
+static void ime_on_destroy(void *arg)
 {
-	LCUI_IME ime = arg;
-	if (self.ime == ime) {
-		self.ime = NULL;
+	ime_t *ime = arg;
+	if (app_ime.ime == ime) {
+		app_ime.ime = NULL;
 	}
 	free(ime->name);
 	free(ime);
 }
 
-LCUI_BOOL LCUIIME_CheckCharKey(int key)
+LCUI_BOOL ime_check_char_key(int key)
 {
 	switch (key) {
-	case LCUI_KEY_TAB:
-	case LCUI_KEY_ENTER:
-	case LCUI_KEY_SPACE:
-	case LCUI_KEY_SEMICOLON:
-	case LCUI_KEY_MINUS:
-	case LCUI_KEY_EQUAL:
-	case LCUI_KEY_COMMA:
-	case LCUI_KEY_PERIOD:
-	case LCUI_KEY_SLASH:
-	case LCUI_KEY_BRACKETLEFT:
-	case LCUI_KEY_BACKSLASH:
-	case LCUI_KEY_BRACKETRIGHT:
-	case LCUI_KEY_APOSTROPHE:
+	case KEY_TAB:
+	case KEY_ENTER:
+	case KEY_SPACE:
+	case KEY_SEMICOLON:
+	case KEY_MINUS:
+	case KEY_EQUAL:
+	case KEY_COMMA:
+	case KEY_PERIOD:
+	case KEY_SLASH:
+	case KEY_BRACKETLEFT:
+	case KEY_BACKSLASH:
+	case KEY_BRACKETRIGHT:
+	case KEY_APOSTROPHE:
 		return TRUE;
 	default:
-		if (key >= LCUI_KEY_0 && key <= LCUI_KEY_Z) {
+		if (key >= KEY_0 && key <= KEY_Z) {
 			return TRUE;
 		}
 		break;
@@ -198,88 +196,78 @@ LCUI_BOOL LCUIIME_CheckCharKey(int key)
 	return FALSE;
 }
 
-static void LCUIIME_ToText(LCUI_SysEvent e)
+static void ime_to_text(app_event_t *e)
 {
-	self.ime->handler.totext(e->key.code);
+	app_ime.ime->handler.totext(e->key.code);
 }
 
-LCUI_BOOL LCUIIME_ProcessKey(LCUI_SysEvent e)
+LCUI_BOOL ime_process_key(app_event_t *e)
 {
-	int key_state;
+	LCUI_BOOL is_presed = FALSE;
+
 	/* 根据事件类型判定按键状态 */
 	if (e->type == APP_EVENT_KEYUP) {
-		key_state = LCUI_KSTATE_RELEASE;
 		/* 如果是 caps lock 按键被释放 */
-		if (e->key.code == LCUI_KEY_CAPITAL) {
-			self.enable_caps_lock = !self.enable_caps_lock;
+		if (e->key.code == KEY_CAPITAL) {
+			app_ime.enable_caps_lock = !app_ime.enable_caps_lock;
 			return FALSE;
 		}
 	} else {
-		key_state = LCUI_KSTATE_PRESSED;
+		is_presed = TRUE;
 		/* 如果按下的是 shift 键，但没释放，则直接退出 */
-		if (e->key.code == LCUI_KEY_SHIFT) {
+		if (e->key.code == KEY_SHIFT) {
 			return FALSE;
 		}
 	}
-	if (self.ime && self.ime->handler.prockey) {
-		return self.ime->handler.prockey(e->key.code, key_state);
+	if (app_ime.ime && app_ime.ime->handler.prockey) {
+		return app_ime.ime->handler.prockey(e->key.code, is_presed);
 	}
 	return FALSE;
 }
 
-int LCUIIME_Commit(const wchar_t *str, size_t len)
+int ime_commit(const wchar_t *str, size_t len)
 {
-	LCUI_SysEventRec sys_ev;
-	if (len == 0) {
-		len = wcslen(str);
-	}
-	sys_ev.type = APP_EVENT_COMPOSITION;
-	sys_ev.text.length = len;
-	sys_ev.text.text = NEW(wchar_t, len + 1);
-	if (!sys_ev.text.text) {
-		return -ENOMEM;
-	}
-	wcsncpy(sys_ev.text.text, str, len + 1);
-	LCUI_TriggerEvent(&sys_ev, NULL);
-	free(sys_ev.text.text);
-	sys_ev.text.text = NULL;
-	sys_ev.text.length = 0;
+	app_event_t e;
+
+	app_composition_event_init(&e, str, len);
+	app_process_event(&e);
+	app_event_destroy(&e);
 	return 0;
 }
 
-static void LCUIIME_OnKeyDown(LCUI_SysEvent e, void *arg)
+static void ime_on_keydown(app_event_t *e, void *arg)
 {
-	if (LCUIIME_ProcessKey(e)) {
-		LCUIIME_ToText(e);
+	if (ime_process_key(e)) {
+		ime_to_text(e);
 	}
 }
 
-void LCUI_InitIME(void)
+void app_init_ime(void)
 {
-	LinkedList_Init(&self.list);
-	self.active = TRUE;
-	LCUI_BindEvent(APP_EVENT_KEYDOWN, LCUIIME_OnKeyDown, NULL, NULL);
-#ifdef WINAPI_FAMILY_APP
+	LinkedList_Init(&app_ime.list);
+	app_ime.active = TRUE;
+	LCUI_BindEvent(APP_EVENT_KEYDOWN, ime_on_keydown, NULL, NULL);
+#ifdef APP_PLATFORM_UWP
 	return;
 #else
-#ifdef LCUI_BUILD_IN_WIN32
-	LCUIIME_Select(LCUI_RegisterWin32IME());
+#ifdef APP_PLATFORM_WIN_DESKTUP
+	ime_select(ime_add_win32());
 #else
-	LCUIIME_Select(LCUI_RegisterLinuxIME());
+	ime_select(ime_add_linux());
 #endif
 #endif
 }
 
-void LCUIIME_SetCaret(int x, int y)
+void ime_set_caret(int x, int y)
 {
-	if (self.ime && self.ime->handler.setcaret) {
-		self.ime->handler.setcaret(x, y);
+	if (app_ime.ime && app_ime.ime->handler.setcaret) {
+		app_ime.ime->handler.setcaret(x, y);
 	}
 }
 
-void LCUI_FreeIME(void)
+void app_destroy_ime(void)
 {
-	self.active = FALSE;
-	LCUIIME_Close(self.ime);
-	LinkedList_ClearData(&self.list, LCUIIME_OnDestroy);
+	app_ime.active = FALSE;
+	ime_close(app_ime.ime);
+	LinkedList_ClearData(&app_ime.list, ime_on_destroy);
 }

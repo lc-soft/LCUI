@@ -225,7 +225,7 @@ void App::Load(Platform::String^ entryPoint)
 	LCUI_InitBase();
 	LCUI_InitApp(m_appDriver);
 	LCUI_InitDisplay(m_displayDriver);
-	LCUI_InitIME();
+	app_init_ime();
 	LCUI_InitCursor();
 	LCUICursor_Hide();
 	m_inputDriver->RegisterIME();

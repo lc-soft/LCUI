@@ -57,14 +57,14 @@ static LCUI_BOOL X11IME_ProcessKey(int key, int key_state)
 static void X11IME_ToText(int ch)
 {
 	wchar_t text[2] = { ch, 0 };
-	LCUIIME_Commit(text, 2);
+	ime_commit(text, 2);
 }
 
-static void OnKeyPress(LCUI_SysEvent e, void *arg)
+static void OnKeyPress(app_event_t *e, void *arg)
 {
 	wchar_t text[2] = { e->key.code, 0 };
 	_DEBUG_MSG("char: %c\n", e->key.code);
-	LCUIIME_Commit(text, 2);
+	ime_commit(text, 2);
 }
 
 static LCUI_BOOL X11IME_Open(void)
@@ -83,14 +83,14 @@ static LCUI_BOOL X11IME_Close(void)
 int LCUI_RegisterLinuxIME(void)
 {
 #ifdef USE_LIBX11
-	LCUI_IMEHandlerRec handler;
+	ime_handler_t handler;
 	if (LCUI_GetAppId() == LCUI_APP_LINUX_X11) {
 		handler.prockey = X11IME_ProcessKey;
 		handler.totext = X11IME_ToText;
 		handler.close = X11IME_Close;
 		handler.open = X11IME_Open;
 		handler.setcaret = NULL;
-		return LCUIIME_Register("LCUI X11 Input Method", &handler);
+		return ime_add("LCUI X11 Input Method", &handler);
 	}
 #endif
 	return -1;

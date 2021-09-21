@@ -106,7 +106,7 @@ static void OnDestroySurfaceRecord(void *data)
 	free(record);
 }
 
-static void OnSettingsChangeEvent(LCUI_SysEvent e, void *arg)
+static void OnSettingsChangeEvent(app_event_t *e, void *arg)
 {
 	Settings_Init(&display.settings);
 }

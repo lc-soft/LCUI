@@ -347,6 +347,49 @@ int app_post_event(app_event_t *e);
 int app_process_event(app_event_t *e);
 int app_poll_event(app_event_t *e);
 
+
+// Input method engine
+
+
+typedef struct ime_handler_t {
+	LCUI_BOOL (*prockey)(int, LCUI_BOOL);
+	void (*totext)(int);
+	LCUI_BOOL (*open)(void);
+	LCUI_BOOL (*close)(void);
+	void (*setcaret)(int, int);
+} ime_handler_t;
+
+LCUI_API int ime_add(const char *ime_name, ime_handler_t *handler);
+
+/** 选定输入法 */
+LCUI_API LCUI_BOOL ime_select(int ime_id);
+
+LCUI_API LCUI_BOOL ime_select_by_name(const char *name);
+
+/** 检测键值是否为字符键值 */
+LCUI_API LCUI_BOOL ime_check_char_key(int key);
+
+/** 切换至下一个输入法 */
+LCUI_API void ime_switch(void);
+
+/** 检测输入法是否要处理按键事件 */
+LCUI_API LCUI_BOOL ime_process_key(app_event_t *e);
+
+/** 提交输入法输入的内容至目标 */
+LCUI_API int ime_commit(const wchar_t *str, size_t len);
+
+/* 初始化LCUI输入法模块 */
+LCUI_API void app_init_ime(void);
+
+/* 停用LCUI输入法模块 */
+LCUI_API void app_destroy_ime(void);
+
+LCUI_API void ime_set_caret(int x, int y);
+
+
+// Base
+
+void app_set_instance(void *instance);
 int app_init(const wchar_t *name);
 void app_quit(void);
 void app_destroy(void);

@@ -127,7 +127,7 @@ static int LCUICursor_LoadDefualtGraph(LCUI_Graph *buff)
 	return 0;
 }
 
-static void OnMouseMoveEvent(LCUI_SysEvent e, void *arg)
+static void OnMouseMoveEvent(app_event_t *e, void *arg)
 {
 	cursor.new_pos.x = e->motion.x;
 	cursor.new_pos.y = e->motion.y;

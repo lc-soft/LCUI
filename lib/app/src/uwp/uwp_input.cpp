@@ -42,11 +42,11 @@ using namespace Windows::Devices::Input;
 using namespace Windows::Foundation;
 using namespace Windows::System;
 
-static LCUI_TouchPoint AddTouchPoint(LinkedList *points,
+static touch_point_t *AddTouchPoint(LinkedList *points,
 				     PointerPoint^ point, int state)
 {
 	LinkedListNode *node;
-	LCUI_TouchPoint tp = NULL;
+	touch_point_t *tp = NULL;
 	for (LinkedList_Each(node, points)) {
 		tp = (LCUI_TouchPoint)node->data;
 		if (tp->id == point->PointerId) {
@@ -69,7 +69,7 @@ static LCUI_TouchPoint AddTouchPoint(LinkedList *points,
 
 static void ClearInvalidTouchPoints(LinkedList *points)
 {
-	LCUI_TouchPoint tp;
+	touch_point_t *tp;
 	LinkedListNode *node, *next;
 	node = points->head.next;
 	while (node) {
@@ -82,16 +82,16 @@ static void ClearInvalidTouchPoints(LinkedList *points)
 	}
 }
 
-static int CreateTouchEvent(LCUI_SysEvent e, LinkedList *points)
+static int CreateTouchEvent(app_event_t *e, LinkedList *points)
 {
 	int i = 0;
 	LinkedListNode *node;
-	LCUI_TouchPoint list;
+	touch_point_t *list;
 	list = NEW(touch_point_t, points->length);
 	for (LinkedList_Each(node, points)) {
 		list[i++] = *(LCUI_TouchPoint)node->data;
 	}
-	return LCUI_CreateTouchEvent(e, list, (int)points->length);
+	return app_touch_event_init(e, list, (int)points->length);
 }
 
 InputDriver::InputDriver()
@@ -106,7 +106,7 @@ void InputDriver::OnPointerPressed(CoreWindow^ sender,
 				   PointerEventArgs^ args)
 {
 	LCUI_Pos pos;
-	LCUI_TouchPoint tp;
+	touch_point_t *tp;
 	LCUI_SysEventRec ev;
 	PointerPoint^ point = args->CurrentPoint;
 	PointerPointProperties^ pointProps = point->Properties;
@@ -114,10 +114,10 @@ void InputDriver::OnPointerPressed(CoreWindow^ sender,
 	switch (point->PointerDevice->PointerDeviceType) {
 	case PointerDeviceType::Mouse:
 		if (pointProps->IsLeftButtonPressed) {
-			ev.button.button = LCUI_KEY_LEFTBUTTON;
+			ev.button.button = KEY_LEFTBUTTON;
 			m_mouse.leftButtonPressed = true;
 		} else if (pointProps->IsRightButtonPressed) {
-			ev.button.button = LCUI_KEY_RIGHTBUTTON;
+			ev.button.button = KEY_RIGHTBUTTON;
 			m_mouse.rightButtonPressed = true;
 		}
 		break;
@@ -126,11 +126,11 @@ void InputDriver::OnPointerPressed(CoreWindow^ sender,
 		tp = AddTouchPoint(&m_touch.points, point, APP_EVENT_TOUCHDOWN);
 		CreateTouchEvent(&ev, &m_touch.points);
 		LCUI_TriggerEvent(&ev, NULL);
-		LCUI_DestroyEvent(&ev);
+		app_event_destroy(&ev);
 		ClearInvalidTouchPoints(&m_touch.points);
 		/* 如果该触点是主触点，则顺便触发鼠标事件 */
 		if (tp->is_primary) {
-			ev.button.button = LCUI_KEY_LEFTBUTTON;
+			ev.button.button = KEY_LEFTBUTTON;
 			m_mouse.leftButtonPressed = true;
 			break;
 		}
@@ -153,7 +153,7 @@ void InputDriver::OnPointerMoved(CoreWindow^ sender, PointerEventArgs^ args)
 {
 	Point position;
 	LCUI_Pos pos;
-	LCUI_TouchPoint tp;
+	touch_point_t *tp;
 	LCUI_SysEventRec ev;
 	PointerPoint^ point = args->CurrentPoint;
 	position = args->CurrentPoint->Position;
@@ -166,7 +166,7 @@ void InputDriver::OnPointerMoved(CoreWindow^ sender, PointerEventArgs^ args)
 		CreateTouchEvent(&ev, &m_touch.points);
 		ClearInvalidTouchPoints(&m_touch.points);
 		LCUI_TriggerEvent(&ev, NULL);
-		LCUI_DestroyEvent(&ev);
+		app_event_destroy(&ev);
 		if (tp->is_primary) {
 			break;
 		}
@@ -185,14 +185,14 @@ void InputDriver::OnPointerMoved(CoreWindow^ sender, PointerEventArgs^ args)
 	ev.motion.yrel = iround(position.Y - m_mouse.position.Y);
 	m_mouse.position = position;
 	LCUI_TriggerEvent(&ev, NULL);
-	LCUI_DestroyEvent(&ev);
+	app_event_destroy(&ev);
 	LCUICursor_SetPos(pos);
 }
 
 void InputDriver::OnPointerReleased(CoreWindow^ sender, PointerEventArgs^ args)
 {
 	LCUI_Pos pos;
-	LCUI_TouchPoint tp;
+	touch_point_t *tp;
 	LCUI_SysEventRec ev;
 	PointerPoint^ point = args->CurrentPoint;
 	PointerPointProperties^ pointProps = point->Properties;
@@ -202,12 +202,12 @@ void InputDriver::OnPointerReleased(CoreWindow^ sender, PointerEventArgs^ args)
 		if (!pointProps->IsLeftButtonPressed &&
 		    m_mouse.leftButtonPressed) {
 			m_mouse.leftButtonPressed = false;
-			ev.button.button = LCUI_KEY_LEFTBUTTON;
+			ev.button.button = KEY_LEFTBUTTON;
 		}
 		if (pointProps->IsRightButtonPressed &&
 		    m_mouse.rightButtonPressed) {
 			m_mouse.rightButtonPressed = false;
-			ev.button.button = LCUI_KEY_RIGHTBUTTON;
+			ev.button.button = KEY_RIGHTBUTTON;
 		}
 		break;
 	case PointerDeviceType::Touch:
@@ -216,10 +216,10 @@ void InputDriver::OnPointerReleased(CoreWindow^ sender, PointerEventArgs^ args)
 		CreateTouchEvent(&ev, &m_touch.points);
 		ClearInvalidTouchPoints(&m_touch.points);
 		LCUI_TriggerEvent(&ev, NULL);
-		LCUI_DestroyEvent(&ev);
+		app_event_destroy(&ev);
 		if (tp->is_primary) {
 			m_mouse.leftButtonPressed = false;
-			ev.button.button = LCUI_KEY_LEFTBUTTON;
+			ev.button.button = KEY_LEFTBUTTON;
 		}
 		break;
 	default:return;
@@ -230,7 +230,7 @@ void InputDriver::OnPointerReleased(CoreWindow^ sender, PointerEventArgs^ args)
 	ev.button.x = pos.x;
 	ev.button.y = pos.y;
 	LCUI_TriggerEvent(&ev, NULL);
-	LCUI_DestroyEvent(&ev);
+	app_event_destroy(&ev);
 	LCUICursor_SetPos(pos);
 }
 
@@ -246,7 +246,7 @@ void InputDriver::OnPointerWheelChanged(CoreWindow^ sender, PointerEventArgs^ ar
 	ev.wheel.y = (int)(position.Y + 0.5);
 	ev.wheel.delta = pointProps->MouseWheelDelta;;
 	LCUI_TriggerEvent(&ev, NULL);
-	LCUI_DestroyEvent(&ev);
+	app_event_destroy(&ev);
 }
 
 void InputDriver::OnKeyDown(CoreWindow^ sender, KeyEventArgs^ args)
@@ -257,7 +257,7 @@ void InputDriver::OnKeyDown(CoreWindow^ sender, KeyEventArgs^ args)
 	ev.key.shift_key = FALSE;
 	ev.key.code = static_cast<int>(args->VirtualKey);
 	LCUI_TriggerEvent(&ev, NULL);
-	LCUI_DestroyEvent(&ev);
+	app_event_destroy(&ev);
 }
 
 void InputDriver::OnKeyUp(CoreWindow^ sender, KeyEventArgs^ args)
@@ -268,18 +268,18 @@ void InputDriver::OnKeyUp(CoreWindow^ sender, KeyEventArgs^ args)
 	ev.key.shift_key = FALSE;
 	ev.key.code = static_cast<int>(args->VirtualKey);
 	LCUI_TriggerEvent(&ev, NULL);
-	LCUI_DestroyEvent(&ev);
+	app_event_destroy(&ev);
 }
 
 static LCUI_BOOL IME_ProcessKey(int key, int key_state)
 {
-	return LCUIIME_CheckCharKey(key);
+	return ime_check_char_key(key);
 }
 
 static void IME_ToText(int ch)
 {
 	wchar_t text[2] = { (wchar_t)ch, 0 };
-	LCUIIME_Commit(text, 2);
+	ime_commit(text, 2);
 }
 
 static LCUI_BOOL IME_Open(void)
@@ -294,15 +294,15 @@ static LCUI_BOOL IME_Close(void)
 
 void InputDriver::RegisterIME(void)
 {
-	LCUI_IMEHandlerRec handler;
+	ime_handler_t handler;
 	handler.prockey = IME_ProcessKey;
 	handler.totext = IME_ToText;
 	handler.close = IME_Close;
 	handler.open = IME_Open;
-	m_ime = LCUIIME_Register("UWP Input Method", &handler);
+	m_ime = ime_add("UWP Input Method", &handler);
 }
 
 void InputDriver::SelectIME(void)
 {
-	LCUIIME_Select(m_ime);
+	ime_select(m_ime);
 }

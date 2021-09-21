@@ -53,7 +53,7 @@ static void OnMotionNotify(LCUI_Event e, void *arg)
 	mouse_pos.x = ev->xmotion.x;
 	mouse_pos.y = ev->xmotion.y;
 	LCUI_TriggerEvent(&sys_ev, NULL);
-	LCUI_DestroyEvent(&sys_ev);
+	app_event_destroy(&sys_ev);
 }
 
 static void OnButtonPress(LCUI_Event e, void *arg)
@@ -78,7 +78,7 @@ static void OnButtonPress(LCUI_Event e, void *arg)
 		sys_ev.button.button = ev->xbutton.button;
 	}
 	LCUI_TriggerEvent(&sys_ev, NULL);
-	LCUI_DestroyEvent(&sys_ev);
+	app_event_destroy(&sys_ev);
 }
 
 static void OnButtonRelease(LCUI_Event e, void *arg)
@@ -90,7 +90,7 @@ static void OnButtonRelease(LCUI_Event e, void *arg)
 	sys_ev.button.y = ev->xbutton.y;
 	sys_ev.button.button = ev->xbutton.button;
 	LCUI_TriggerEvent(&sys_ev, NULL);
-	LCUI_DestroyEvent(&sys_ev);
+	app_event_destroy(&sys_ev);
 }
 
 void LCUI_InitLinuxX11Mouse(void)
