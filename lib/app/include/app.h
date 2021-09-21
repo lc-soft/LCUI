@@ -39,16 +39,18 @@ typedef enum app_event_type_t {
 	LCUI_USER = 100
 } app_event_type_t;
 
+#define APP_EVENT_TEXTINPUT APP_EVENT_COMPOSITION
+
 typedef struct app_event_t app_event_t;
 typedef struct app_window_t app_window_t;
 
 typedef void (*app_event_handler_t)(app_event_t *, void *);
 
-struct app_event_listener_t {
+typedef struct app_event_listener_t {
 	app_event_type_t type;
 	app_event_handler_t handler;
 	void *data;
-};
+} app_event_listener_t;
 
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode
@@ -212,7 +214,6 @@ typedef struct app_minmaxinfo_event_t {
 
 struct app_event_t {
 	app_event_type_t type;
-	app_event_handler_t handler;
 	app_window_t *window;
 	void *data;
 
@@ -220,6 +221,7 @@ struct app_event_t {
 		app_mouse_event_t mouse;
 		app_wheel_event_t wheel;
 		app_textinput_event_t composition;
+		app_textinput_event_t text;
 		app_keyboard_event_t key;
 		app_touch_event_t touch;
 		app_paint_event_t paint;
@@ -312,6 +314,9 @@ app_window_paint_t *app_window_begin_paint(app_window_t *wnd, LCUI_Rect *rect);
 void app_window_end_paint(app_window_t *wnd, app_window_paint_t *paint);
 void app_window_present(app_window_t *wnd);
 
+
+// Native events
+
 int app_add_native_event_listener(int event_type, app_event_handler_t handler,
 				   void *data);
 int app_remove_native_event_listener(int event_type,
@@ -327,6 +332,20 @@ INLINE int app_off_native_event(int event_type, app_event_handler_t handler)
 {
 	return app_remove_native_event_listener(event_type, handler);
 }
+
+
+// Events
+
+int app_touch_event_init(app_event_t *e, touch_point_t *points, int n_points);
+int app_composition_event_init(app_event_t *e, const wchar_t *text, size_t len);
+int app_event_copy(app_event_t *dest, app_event_t *src);
+void app_event_destroy(app_event_t *e);
+int app_touch_event_init(app_event_t *e, touch_point_t *points, int n_points);
+void app_init_events(void);
+void app_destroy_events(void);
+int app_post_event(app_event_t *e);
+int app_process_event(app_event_t *e);
+int app_poll_event(app_event_t *e);
 
 int app_init(const wchar_t *name);
 void app_quit(void);
