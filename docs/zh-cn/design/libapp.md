@@ -80,9 +80,9 @@ void app_stop(void);
 void app_free(void);
 
 // 事件功能的内部方法
-static void app_dispatcher_new(app_dispatcher_t **dispathcer);
-static void app_dispatcher_get_event(app_dispatcher_t *dispathcer);
-static void app_dispatcher_post_event(app_dispatcher_t *dispathcer,
+static void app_dispatcher_new(app_dispatcher_t **dispatcher);
+static void app_dispatcher_get_event(app_dispatcher_t *dispatcher);
+static void app_dispatcher_post_event(app_dispatcher_t *dispatcher,
                                       app_event_t *e);
 
 // 事件操作
@@ -152,7 +152,7 @@ int main(void)
         while (app_get_event(app, &e)) {
             ui_process_event(&e);
             switch (e.type) {
-            case APP_EVENT_WINDOW_CLSOED:
+            case APP_EVENT_WINDOW_CLOSED:
                 // ...
                 break;
             default: break;

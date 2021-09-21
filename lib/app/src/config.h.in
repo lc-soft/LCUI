@@ -1,1 +1,2 @@
 ${define USE_LIBX11}
+${define ENABLE_TOUCH}
