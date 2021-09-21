@@ -50,7 +50,7 @@ int Widget_Append(LCUI_Widget parent, LCUI_Widget widget)
 	widget->parent = parent;
 	widget->state = LCUI_WSTATE_CREATED;
 	widget->index = parent->children.length;
-	LinkedList_AppendNode(&parent->children, &widget->node);
+	list_append_node(&parent->children, &widget->node);
 	ev.cancel_bubble = TRUE;
 	ev.type = LCUI_WEVENT_LINK;
 	Widget_UpdateStyle(widget, TRUE);
@@ -67,7 +67,7 @@ int Widget_Prepend(LCUI_Widget parent, LCUI_Widget widget)
 {
 	LCUI_Widget child;
 	LCUI_WidgetEventRec ev = { 0 };
-	LinkedListNode *node;
+	list_node_t *node;
 
 	if (!parent || !widget) {
 		return -1;
@@ -81,7 +81,7 @@ int Widget_Prepend(LCUI_Widget parent, LCUI_Widget widget)
 	widget->parent = parent;
 	widget->state = LCUI_WSTATE_CREATED;
 	node = &widget->node;
-	LinkedList_InsertNode(&parent->children, 0, node);
+	list_insert_node(&parent->children, 0, node);
 	/** 修改它后面的部件的 index 值 */
 	node = node->next;
 	while (node) {
@@ -105,8 +105,8 @@ int Widget_Unwrap(LCUI_Widget widget)
 	size_t len;
 	LCUI_Widget child;
 	LCUI_WidgetEventRec ev = { 0 };
-	LinkedList *children;
-	LinkedListNode *target, *node, *prev;
+	list_t *children;
+	list_node_t *target, *node, *prev;
 
 	if (!widget->parent) {
 		return -1;
@@ -114,9 +114,9 @@ int Widget_Unwrap(LCUI_Widget widget)
 	children = &widget->parent->children;
 	len = widget->children.length;
 	if (len > 0) {
-		node = LinkedList_GetNode(&widget->children, 0);
+		node = list_get_node_by_pos(&widget->children, 0);
 		Widget_RemoveStatus(node->data, "first-child");
-		node = LinkedList_GetNodeAtTail(&widget->children, 0);
+		node = list_get_last_node(&widget->children);
 		Widget_RemoveStatus(node->data, "last-child");
 	}
 	node = &widget->node;
@@ -130,8 +130,8 @@ int Widget_Unwrap(LCUI_Widget widget)
 		child = node->data;
 		ev.type = LCUI_WEVENT_UNLINK;
 		Widget_TriggerEvent(child, &ev, NULL);
-		LinkedList_Unlink(&widget->children, node);
-		LinkedList_Link(children, target, node);
+		list_unlink(&widget->children, node);
+		list_link(children, target, node);
 		child->parent = widget->parent;
 		ev.type = LCUI_WEVENT_LINK;
 		Widget_TriggerEvent(child, &ev, NULL);
@@ -144,7 +144,7 @@ int Widget_Unwrap(LCUI_Widget widget)
 		Widget_AddStatus(target->next->data, "first-child");
 	}
 	if (widget->index == children->length - 1) {
-		node = LinkedList_GetNodeAtTail(children, 0);
+		node = list_get_last_node(children);
 		Widget_AddStatus(node->data, "last-child");
 	}
 	Widget_Destroy(widget);
@@ -155,7 +155,7 @@ int Widget_Unlink(LCUI_Widget w)
 {
 	LCUI_Widget child;
 	LCUI_WidgetEventRec ev = { 0 };
-	LinkedListNode *node;
+	list_node_t *node;
 
 	if (!w->parent) {
 		return -1;
@@ -186,8 +186,8 @@ int Widget_Unlink(LCUI_Widget w)
 	ev.cancel_bubble = TRUE;
 	ev.type = LCUI_WEVENT_UNLINK;
 	Widget_TriggerEvent(w, &ev, NULL);
-	LinkedList_Unlink(&w->parent->children, node);
-	LinkedList_Unlink(&w->parent->children_show, &w->node_show);
+	list_unlink(&w->parent->children, node);
+	list_unlink(&w->parent->children_show, &w->node_show);
 	Widget_PostSurfaceEvent(w, LCUI_WEVENT_UNLINK, TRUE);
 	Widget_AddTask(w->parent, LCUI_WTASK_REFLOW);
 	w->parent = NULL;
@@ -196,7 +196,7 @@ int Widget_Unlink(LCUI_Widget w)
 
 LCUI_Widget Widget_GetPrev(LCUI_Widget w)
 {
-	LinkedListNode *node = &w->node;
+	list_node_t *node = &w->node;
 	if (node->prev && node != w->parent->children.head.next) {
 		return node->prev->data;
 	}
@@ -205,7 +205,7 @@ LCUI_Widget Widget_GetPrev(LCUI_Widget w)
 
 LCUI_Widget Widget_GetNext(LCUI_Widget w)
 {
-	LinkedListNode *node = &w->node;
+	list_node_t *node = &w->node;
 	if (node->next) {
 		return node->next->data;
 	}
@@ -214,7 +214,7 @@ LCUI_Widget Widget_GetNext(LCUI_Widget w)
 
 LCUI_Widget Widget_GetChild(LCUI_Widget w, size_t index)
 {
-	LinkedListNode *node = LinkedList_GetNode(&w->children, index);
+	list_node_t *node = list_get_node_by_pos(&w->children, index);
 	if (node) {
 		return node->data;
 	}
@@ -230,21 +230,21 @@ void Widget_DestroyChildren(LCUI_Widget w)
 {
 	/* 先释放显示列表，后销毁部件列表，因为部件在这两个链表中的节点是和它共用
 	 * 一块内存空间的，销毁部件列表会把部件释放掉，所以把这个操作放在后面 */
-	LinkedList_ClearData(&w->children_show, NULL);
-	LinkedList_ClearData(&w->children, Widget_OnDestroy);
+	list_clear_data(&w->children_show, NULL);
+	list_clear_data(&w->children, Widget_OnDestroy);
 }
 
 static void _LCUIWidget_PrintTree(LCUI_Widget w, int depth, const char *prefix)
 {
 	size_t len;
 	LCUI_Widget child;
-	LinkedListNode *node;
+	list_node_t *node;
 	LCUI_SelectorNode snode;
 	char str[16], child_prefix[512];
 
 	len = strlen(prefix);
 	strcpy(child_prefix, prefix);
-	for (LinkedList_Each(node, &w->children)) {
+	for (list_each(node, &w->children)) {
 		if (node == w->children.tail.prev) {
 			strcpy(str, "└");
 			strcpy(&child_prefix[len], "    ");
@@ -260,7 +260,7 @@ static void _LCUIWidget_PrintTree(LCUI_Widget w, int depth, const char *prefix)
 			strcat(str, "┬");
 		}
 		snode = Widget_GetSelectorNode(child);
-		Logger_Error(
+		logger_error(
 		    "%s%s %s, xy:(%g,%g), size:(%g,%g), "
 		    "visible: %s, display: %d, padding: (%g,%g,%g,%g), margin: "
 		    "(%g,%g,%g,%g)\n",
@@ -281,7 +281,7 @@ void Widget_PrintTree(LCUI_Widget w)
 	LCUI_SelectorNode node;
 	w = w ? w : LCUIWidget_GetRoot();
 	node = Widget_GetSelectorNode(w);
-	Logger_Error("%s, xy:(%g,%g), size:(%g,%g), visible: %s\n",
+	logger_error("%s, xy:(%g,%g), size:(%g,%g), visible: %s\n",
 		     node->fullname, w->x, w->y, w->width, w->height,
 		     w->computed_style.visible ? "true" : "false");
 	SelectorNode_Delete(node);
@@ -294,12 +294,12 @@ size_t Widget_Each(LCUI_Widget w, void (*callback)(LCUI_Widget, void *),
 	size_t count = 0;
 
 	LCUI_Widget next;
-	LCUI_Widget child = LinkedList_Get(&w->children, 0);
+	LCUI_Widget child = list_get(&w->children, 0);
 
 	while (child && child != w) {
 		callback(child, arg);
 		++count;
-		next = LinkedList_Get(&child->children, 0);
+		next = list_get(&child->children, 0);
 		while (!next && child != w) {
 			next = Widget_GetNext(child);
 			child = child->parent;
@@ -313,7 +313,7 @@ LCUI_Widget Widget_At(LCUI_Widget widget, int ix, int iy)
 {
 	float x, y;
 	LCUI_BOOL is_hit;
-	LinkedListNode *node;
+	list_node_t *node;
 	LCUI_Widget target = widget, c = NULL;
 
 	if (!widget) {
@@ -323,7 +323,7 @@ LCUI_Widget Widget_At(LCUI_Widget widget, int ix, int iy)
 	y = 1.0f * iy;
 	do {
 		is_hit = FALSE;
-		for (LinkedList_Each(node, &target->children_show)) {
+		for (list_each(node, &target->children_show)) {
 			c = node->data;
 			if (!c->computed_style.visible) {
 				continue;

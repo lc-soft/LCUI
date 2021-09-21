@@ -230,7 +230,7 @@ static void OnComputeFontSize(LCUI_CSSFontStyle fs, LCUI_Style s)
 {
 	if (s->is_valid) {
 		fs->font_size =
-		    ComputeActual(max(MIN_FONT_SIZE, s->value), s->type);
+		    ComputeActual(y_max(MIN_FONT_SIZE, s->value), s->type);
 		return;
 	}
 	fs->font_size = ComputeActual(DEFAULT_FONT_SIZE, LCUI_STYPE_PX);
@@ -295,14 +295,14 @@ static void OnComputeLineHeight(LCUI_CSSFontStyle fs, LCUI_Style s)
 	int h;
 	if (s->is_valid) {
 		if (s->type == LCUI_STYPE_INT) {
-			h = iround(fs->font_size * s->val_int);
+			h = y_round(fs->font_size * s->val_int);
 		} else if (s->type == LCUI_STYPE_SCALE) {
-			h = iround(fs->font_size * s->val_scale);
+			h = y_round(fs->font_size * s->val_scale);
 		} else {
 			h = ComputeActual(s->value, s->type);
 		}
 	} else {
-		h = iround(fs->font_size * LINE_HEIGHT_SCALE);
+		h = y_round(fs->font_size * LINE_HEIGHT_SCALE);
 	}
 	fs->line_height = h;
 }
@@ -321,9 +321,9 @@ static void OnComputeContent(LCUI_CSSFontStyle fs, LCUI_Style s)
 		return;
 	}
 
-	len = LCUI_DecodeUTF8String(NULL, s->val_string, 0);
+	len = decode_utf8(NULL, s->val_string, 0);
 	content = malloc((len + 1) * sizeof(wchar_t));
-	len = LCUI_DecodeUTF8String(content, s->val_string, len);
+	len = decode_utf8(content, s->val_string, len);
 	content[len] = 0;
 	if (content[0] == '"') {
 		for (i = 0; content[i + 1]; ++i) {

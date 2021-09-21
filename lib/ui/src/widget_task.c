@@ -45,7 +45,7 @@ typedef struct LCUI_WidgetTaskContextRec_ *LCUI_WidgetTaskContext;
 
 typedef struct LCUI_WidgetTaskContextRec_ {
 	unsigned style_hash;
-	Dict *style_cache;
+	dict_t *style_cache;
 	LCUI_WidgetStyleDiffRec style_diff;
 	LCUI_WidgetLayoutDiffRec layout_diff;
 	LCUI_WidgetTaskContext parent;
@@ -53,7 +53,7 @@ typedef struct LCUI_WidgetTaskContextRec_ {
 } LCUI_WidgetTaskContextRec;
 
 static struct WidgetTaskModule {
-	DictType style_cache_dict;
+	dict_type_t style_cache_dict;
 	LCUI_MetricsRec metrics;
 	LCUI_BOOL refresh_all;
 	LCUI_WidgetFunction handlers[LCUI_WTASK_TOTAL_NUM];
@@ -64,43 +64,43 @@ static size_t Widget_UpdateWithContext(LCUI_Widget w,
 
 static unsigned int IntKeyDict_HashFunction(const void *key)
 {
-	return Dict_IdentityHashFunction(*(unsigned int *)key);
+	return (*(unsigned int *)key);
 }
 
-static int IntKeyDict_KeyCompare(void *privdata, const void *key1,
+static int IntKeyDict_KeyCompare(void *priv_data, const void *key1,
 				 const void *key2)
 {
 	return *(unsigned int *)key1 == *(unsigned int *)key2;
 }
 
-static void IntKeyDict_KeyDestructor(void *privdata, void *key)
+static void IntKeyDict_KeyDestructor(void *priv_data, void *key)
 {
 	free(key);
 }
 
-static void *IntKeyDict_KeyDup(void *privdata, const void *key)
+static void *IntKeyDict_KeyDup(void *priv_data, const void *key)
 {
 	unsigned int *newkey = malloc(sizeof(unsigned int));
 	*newkey = *(unsigned int *)key;
 	return newkey;
 }
 
-static void StyleSheetCacheDestructor(void *privdata, void *val)
+static void StyleSheetCacheDestructor(void *priv_data, void *val)
 {
 	StyleSheet_Delete(val);
 }
 
 static void InitStylesheetCacheDict(void)
 {
-	DictType *dt = &self.style_cache_dict;
+	dict_type_t *dt = &self.style_cache_dict;
 
-	dt->valDup = NULL;
-	dt->keyDup = IntKeyDict_KeyDup;
-	dt->keyCompare = IntKeyDict_KeyCompare;
-	dt->hashFunction = IntKeyDict_HashFunction;
-	dt->keyDestructor = IntKeyDict_KeyDestructor;
-	dt->valDestructor = StyleSheetCacheDestructor;
-	dt->keyDestructor = IntKeyDict_KeyDestructor;
+	dt->val_dup = NULL;
+	dt->key_dup = IntKeyDict_KeyDup;
+	dt->key_compare = IntKeyDict_KeyCompare;
+	dt->hash_function = IntKeyDict_HashFunction;
+	dt->key_destructor = IntKeyDict_KeyDestructor;
+	dt->val_destructor = StyleSheetCacheDestructor;
+	dt->key_destructor = IntKeyDict_KeyDestructor;
 }
 
 static void Widget_OnRefreshStyle(LCUI_Widget w)
@@ -146,10 +146,10 @@ void Widget_UpdateTaskStatus(LCUI_Widget widget)
 void Widget_AddTaskForChildren(LCUI_Widget widget, int task)
 {
 	LCUI_Widget child;
-	LinkedListNode *node;
+	list_node_t *node;
 
 	widget->task.for_children = TRUE;
-	for (LinkedList_Each(node, &widget->children)) {
+	for (list_each(node, &widget->children)) {
 		child = node->data;
 		Widget_AddTask(child, task);
 		Widget_AddTaskForChildren(child, task);
@@ -238,7 +238,7 @@ LCUI_WidgetTaskContext Widget_BeginUpdate(LCUI_Widget w,
 		data = (LCUI_WidgetRulesData)w->rules;
 		if (!data->style_cache) {
 			data->style_cache =
-			    Dict_Create(&self.style_cache_dict, NULL);
+			    dict_create(&self.style_cache_dict, NULL);
 		}
 		Widget_GenerateSelfHash(w);
 		self_ctx->style_hash = w->hash;
@@ -248,12 +248,12 @@ LCUI_WidgetTaskContext Widget_BeginUpdate(LCUI_Widget w,
 	if (self_ctx->style_cache && w->hash) {
 		hash = self_ctx->style_hash;
 		hash = ((hash << 5) + hash) + w->hash;
-		style = Dict_FetchValue(self_ctx->style_cache, &hash);
+		style = dict_fetch_value(self_ctx->style_cache, &hash);
 		if (!style) {
 			style = StyleSheet();
 			selector = Widget_GetSelector(w);
 			LCUI_GetStyleSheet(selector, style);
-			Dict_Add(self_ctx->style_cache, &hash, style);
+			dict_add(self_ctx->style_cache, &hash, style);
 			Selector_Delete(selector);
 		}
 		w->inherited_style = style;
@@ -282,7 +282,7 @@ static size_t Widget_UpdateVisibleChildren(LCUI_Widget w,
 	LCUI_BOOL found = FALSE;
 	LCUI_RectF rect, visible_rect;
 	LCUI_Widget child, parent;
-	LinkedListNode *node, *next;
+	list_node_t *node, *next;
 
 	rect = w->box.padding;
 	if (rect.width < 1 && Widget_HasAutoStyle(w, key_width)) {
@@ -335,7 +335,7 @@ static size_t Widget_UpdateChildren(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 	clock_t msec = 0;
 	LCUI_Widget child;
 	LCUI_WidgetRulesData data;
-	LinkedListNode *node, *next;
+	list_node_t *node, *next;
 	size_t total = 0, update_count = 0, count;
 
 	if (!w->task.for_children) {
@@ -377,7 +377,7 @@ static size_t Widget_UpdateChildren(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 			continue;
 		}
 		if (count > 0) {
-			data->progress = max(child->index, data->progress);
+			data->progress = y_max(child->index, data->progress);
 			if (data->progress > w->children_show.length) {
 				data->progress = child->index;
 			}

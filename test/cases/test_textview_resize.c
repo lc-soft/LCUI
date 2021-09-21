@@ -1,5 +1,5 @@
 #include <LCUI.h>
-#include <LCUI/timer.h>
+#include <LCUI/util.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/css_parser.h>

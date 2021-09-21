@@ -9,7 +9,7 @@ int tests_count = 0;
 int main(void)
 {
 	int ret = 0;
-	Logger_SetLevel(LOGGER_LEVEL_OFF);
+	logger_set_level(LOGGER_LEVEL_OFF);
 	describe("test charset", test_charset);
 	describe("test linkedlist", test_linkedlist);
 	describe("test string", test_string);

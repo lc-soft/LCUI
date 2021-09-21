@@ -42,7 +42,7 @@
 
 typedef struct LCUI_WorkerRec_ {
 	LCUI_BOOL active;		/**< 是否处于活动状态 */
-	LinkedList tasks;		/**< 任务队列 */
+	list_t tasks;		/**< 任务队列 */
 	LCUI_Mutex mutex;		/**< 互斥锁 */
 	LCUI_Cond cond;			/**< 条件变量 */
 	LCUI_Thread thread;		/**< 所在的线程 */
@@ -53,7 +53,7 @@ LCUI_Worker LCUIWorker_New(void)
 	LCUI_Worker worker = NEW(LCUI_WorkerRec, 1);
 	LCUIMutex_Init(&worker->mutex);
 	LCUICond_Init(&worker->cond);
-	LinkedList_Init(&worker->tasks);
+	list_init(&worker->tasks);
 	worker->active = FALSE;
 	worker->thread = 0;
 	return worker;
@@ -65,7 +65,7 @@ void LCUIWorker_PostTask(LCUI_Worker worker, LCUI_Task task)
 	newtask = NEW(LCUI_TaskRec, 1);
 	*newtask = *task;
 	LCUIMutex_Lock(&worker->mutex);
-	LinkedList_Append(&worker->tasks, newtask);
+	list_append(&worker->tasks, newtask);
 	LCUICond_Signal(&worker->cond);
 	LCUIMutex_Unlock(&worker->mutex);
 }
@@ -73,14 +73,14 @@ void LCUIWorker_PostTask(LCUI_Worker worker, LCUI_Task task)
 LCUI_Task LCUIWorker_GetTask(LCUI_Worker worker)
 {
 	LCUI_Task task;
-	LinkedListNode *node;
+	list_node_t *node;
 
-	node = LinkedList_GetNode(&worker->tasks, 0);
+	node = list_get_node_by_pos(&worker->tasks, 0);
 	if (!node) {
 		return NULL;
 	}
 	task = node->data;
-	LinkedList_Unlink(&worker->tasks, node);
+	list_unlink(&worker->tasks, node);
 	free(node);
 	return task;
 }
@@ -109,7 +109,7 @@ static void OnDeleteTask(void *arg)
 
 static void LCUIWorker_ExecDestroy(LCUI_Worker worker)
 {
-	LinkedList_Clear(&worker->tasks, OnDeleteTask);
+	list_clear(&worker->tasks, OnDeleteTask);
 	LCUIMutex_Unlock(&worker->mutex);
 	LCUIMutex_Destroy(&worker->mutex);
 	LCUICond_Destroy(&worker->cond);
@@ -147,7 +147,7 @@ int LCUIWorker_RunAsync(LCUI_Worker worker)
 	}
 	worker->active = TRUE;
 	LCUIThread_Create(&worker->thread, LCUIWorker_Thread, worker);
-	Logger_Debug("[worker] worker %u is running\n", worker->thread);
+	logger_debug("[worker] worker %u is running\n", worker->thread);
 	return 0;
 }
 
@@ -156,13 +156,13 @@ void LCUIWorker_Destroy(LCUI_Worker worker)
 	LCUI_Thread thread = worker->thread;
 
 	if (worker->active) {
-		Logger_Debug("[worker] worker %u is stopping...\n", thread);
+		logger_debug("[worker] worker %u is stopping...\n", thread);
 		LCUIMutex_Lock(&worker->mutex);
 		worker->active = FALSE;
 		LCUICond_Signal(&worker->cond);
 		LCUIMutex_Unlock(&worker->mutex);
 		LCUIThread_Join(thread, NULL);
-		Logger_Debug("[worker] worker %u has stopped\n", thread);
+		logger_debug("[worker] worker %u has stopped\n", thread);
 		return;
 	}
 	LCUIWorker_ExecDestroy(worker);

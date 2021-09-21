@@ -128,7 +128,7 @@ void InitRenderStatus(void)
 	TextView_SetColor(status, white);
 	Widget_Append(root, status);
 	UpdateRenderStatus(status);
-	LCUI_SetInterval(1000, UpdateRenderStatus, status);
+	lcui_add_interval(1000, UpdateRenderStatus, status);
 }
 
 int main(void)
@@ -136,7 +136,7 @@ int main(void)
 	size_t i;
 	int64_t t;
 
-	Logger_SetLevel(LOGGER_LEVEL_WARNING);
+	logger_set_level(LOGGER_LEVEL_WARNING);
 	LCUI_Init();
 	LCUIDisplay_SetSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	InitBackground();
@@ -144,11 +144,11 @@ int main(void)
 	InitRenderStatus();
 	printf("running rendering performance test\n");
 	LCUI_RunFrame();
-	t = LCUI_GetTime();
+	t = get_time_ms();
 	self.color_index = 0;
 	for (i = 0; i < 600; ++i) {
 		UpdateFrame(self.box);
-		LCUI_ProcessTimers();
+		lcui_timer_list_process();
 		LCUI_ProcessEvents();
 		LCUIWidget_Update();
 		LCUIDisplay_Update();
@@ -157,8 +157,8 @@ int main(void)
 		++self.fps;
 		++self.color_index;
 	}
-	t = LCUI_GetTimeDelta(t);
-	Logger_Warning(
+	t = get_time_delta(t);
+	logger_warning(
 	    "rendered %zu frames in %.2lfs, rendering speed is %.2lf fps\n", i,
 	    t / 1000.f, i * 1000.f / t);
 	return 0;

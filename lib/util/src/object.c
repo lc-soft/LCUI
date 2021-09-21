@@ -42,7 +42,7 @@ typedef struct LCUI_ObjectWatcherRec_ {
 	void *data;
 	LCUI_ObjectWatcherFunc func;
 	LCUI_Object target;
-	LinkedListNode node;
+	list_node_t node;
 } LCUI_ObjectWatcherRec;
 
 LCUI_ObjectType ObjectType_New(const char *name)
@@ -83,7 +83,7 @@ void Object_Destroy(LCUI_Object object)
 		object->type->destroy(object);
 	}
 	if (object->watchers) {
-		LinkedList_ClearData(object->watchers, free);
+		list_clear_data(object->watchers, free);
 		free(object->watchers);
 	}
 }
@@ -155,11 +155,11 @@ LCUI_ObjectWatcher Object_Watch(LCUI_Object object, LCUI_ObjectWatcherFunc func,
 	LCUI_ObjectWatcher watcher;
 
 	if (!object->watchers) {
-		object->watchers = malloc(sizeof(LinkedList));
+		object->watchers = malloc(sizeof(list_t));
 		if (!object->watchers) {
 			return NULL;
 		}
-		LinkedList_Init(object->watchers);
+		list_init(object->watchers);
 	}
 	watcher = malloc(sizeof(LCUI_ObjectWatcherRec));
 	if (!watcher) {
@@ -169,20 +169,20 @@ LCUI_ObjectWatcher Object_Watch(LCUI_Object object, LCUI_ObjectWatcherFunc func,
 	watcher->func = func;
 	watcher->data = data;
 	watcher->node.data = watcher;
-	LinkedList_AppendNode(object->watchers, &watcher->node);
+	list_append_node(object->watchers, &watcher->node);
 	return watcher;
 }
 
 size_t Object_Notify(LCUI_Object object)
 {
 	size_t count = 0;
-	LinkedListNode *node;
+	list_node_t *node;
 	LCUI_ObjectWatcher watcher;
 
 	if (!object->watchers) {
 		return 0;
 	}
-	for (LinkedList_Each(node, object->watchers)) {
+	for (list_each(node, object->watchers)) {
 		watcher = node->data;
 		watcher->func(object, watcher->data);
 		++count;
@@ -192,7 +192,7 @@ size_t Object_Notify(LCUI_Object object)
 
 void ObjectWatcher_Delete(LCUI_ObjectWatcher watcher)
 {
-	LinkedList_Unlink(watcher->target->watchers, &watcher->node);
+	list_unlink(watcher->target->watchers, &watcher->node);
 	free(watcher);
 }
 
@@ -395,10 +395,10 @@ LCUI_Object WString_New(const wchar_t *value)
 
 static void WString_ToString(LCUI_Object str, LCUI_Object newstr)
 {
-	const size_t len = LCUI_EncodeUTF8String(NULL, str->value.wstring, 0) + 1;
+	const size_t len = encode_utf8(NULL, str->value.wstring, 0) + 1;
 
 	String_Realloc(newstr, len);
-	LCUI_EncodeUTF8String(newstr->value.string, str->value.wstring, len);
+	encode_utf8(newstr->value.string, str->value.wstring, len);
 }
 
 void Number_Init(LCUI_Object object, double value)

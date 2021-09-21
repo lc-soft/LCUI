@@ -134,7 +134,7 @@ static unsigned int ComputeActual(float width)
 void Widget_ComputeBorder(LCUI_Widget w, LCUI_Border *b)
 {
 	LCUI_BorderStyle *s;
-	float r = min(w->width, w->height) / 2.0f;
+	float r = y_min(w->width, w->height) / 2.0f;
 
 	s = &w->computed_style.border;
 	b->top.color = s->top.color;
@@ -149,10 +149,10 @@ void Widget_ComputeBorder(LCUI_Widget w, LCUI_Border *b)
 	b->left.width = ComputeActual(s->left.width);
 	b->right.width = ComputeActual(s->right.width);
 	b->bottom.width = ComputeActual(s->bottom.width);
-	b->top_left_radius = ComputeActual(min(s->top_left_radius, r));
-	b->top_right_radius = ComputeActual(min(s->top_right_radius, r));
-	b->bottom_left_radius = ComputeActual(min(s->bottom_left_radius, r));
-	b->bottom_right_radius = ComputeActual(min(s->bottom_right_radius, r));
+	b->top_left_radius = ComputeActual(y_min(s->top_left_radius, r));
+	b->top_right_radius = ComputeActual(y_min(s->top_right_radius, r));
+	b->bottom_left_radius = ComputeActual(y_min(s->bottom_left_radius, r));
+	b->bottom_right_radius = ComputeActual(y_min(s->bottom_right_radius, r));
 }
 
 void Widget_PaintBorder(LCUI_Widget w, LCUI_PaintContext paint,

@@ -42,12 +42,12 @@ using namespace Windows::Devices::Input;
 using namespace Windows::Foundation;
 using namespace Windows::System;
 
-static LCUI_TouchPoint AddTouchPoint(LinkedList *points,
+static LCUI_TouchPoint AddTouchPoint(list_t *points,
 				     PointerPoint^ point, int state)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 	LCUI_TouchPoint tp = NULL;
-	for (LinkedList_Each(node, points)) {
+	for (list_each(node, points)) {
 		tp = (LCUI_TouchPoint)node->data;
 		if (tp->id == point->PointerId) {
 			break;
@@ -59,36 +59,36 @@ static LCUI_TouchPoint AddTouchPoint(LinkedList *points,
 		tp->id = point->PointerId;
 		/* 将第一个触点作为主触点 */
 		tp->is_primary = points->length == 0;
-		LinkedList_Append(points, tp);
+		list_append(points, tp);
 	}
 	tp->state = state;
-	tp->x = iround(point->Position.X);
-	tp->y = iround(point->Position.Y);
+	tp->x = y_round(point->Position.X);
+	tp->y = y_round(point->Position.Y);
 	return tp;
 }
 
-static void ClearInvalidTouchPoints(LinkedList *points)
+static void ClearInvalidTouchPoints(list_t *points)
 {
 	LCUI_TouchPoint tp;
-	LinkedListNode *node, *next;
+	list_node_t *node, *next;
 	node = points->head.next;
 	while (node) {
 		next = node->next;
 		tp = (LCUI_TouchPoint)node->data;
 		if (tp->state == LCUI_TOUCHUP) {
-			LinkedList_DeleteNode(points, node);
+			list_delete_node(points, node);
 		}
 		node = next;
 	}
 }
 
-static int CreateTouchEvent(LCUI_SysEvent e, LinkedList *points)
+static int CreateTouchEvent(LCUI_SysEvent e, list_t *points)
 {
 	int i = 0;
-	LinkedListNode *node;
+	list_node_t *node;
 	LCUI_TouchPoint list;
 	list = NEW(LCUI_TouchPointRec, points->length);
-	for (LinkedList_Each(node, points)) {
+	for (list_each(node, points)) {
 		list[i++] = *(LCUI_TouchPoint)node->data;
 	}
 	return LCUI_CreateTouchEvent(e, list, (int)points->length);
@@ -99,7 +99,7 @@ InputDriver::InputDriver()
 	m_mouse.actived = false;
 	m_mouse.leftButtonPressed = false;
 	m_mouse.rightButtonPressed = false;
-	LinkedList_Init(&m_touch.points);
+	list_init(&m_touch.points);
 }
 
 void InputDriver::OnPointerPressed(CoreWindow^ sender,
@@ -141,8 +141,8 @@ void InputDriver::OnPointerPressed(CoreWindow^ sender,
 		m_mouse.position = position;
 	}
 	ev.type = LCUI_MOUSEDOWN;
-	pos.x = iround(position.X);
-	pos.y = iround(position.Y);
+	pos.x = y_round(position.X);
+	pos.y = y_round(position.Y);
 	ev.button.x = pos.x;
 	ev.button.y = pos.y;
 	LCUICursor_SetPos(pos);
@@ -176,13 +176,13 @@ void InputDriver::OnPointerMoved(CoreWindow^ sender, PointerEventArgs^ args)
 		m_mouse.actived = true;
 		m_mouse.position = position;
 	}
-	pos.x = iround(position.X);
-	pos.y = iround(position.Y);
+	pos.x = y_round(position.X);
+	pos.y = y_round(position.Y);
 	ev.type = LCUI_MOUSEMOVE;
 	ev.motion.x = pos.x;
 	ev.motion.y = pos.y;
-	ev.motion.xrel = iround(position.X - m_mouse.position.Y);
-	ev.motion.yrel = iround(position.Y - m_mouse.position.Y);
+	ev.motion.xrel = y_round(position.X - m_mouse.position.Y);
+	ev.motion.yrel = y_round(position.Y - m_mouse.position.Y);
 	m_mouse.position = position;
 	LCUI_TriggerEvent(&ev, NULL);
 	LCUI_DestroyEvent(&ev);
@@ -225,8 +225,8 @@ void InputDriver::OnPointerReleased(CoreWindow^ sender, PointerEventArgs^ args)
 	default:return;
 	}
 	ev.type = LCUI_MOUSEUP;
-	pos.x = iround(position.X);
-	pos.y = iround(position.Y);
+	pos.x = y_round(position.X);
+	pos.y = y_round(position.Y);
 	ev.button.x = pos.x;
 	ev.button.y = pos.y;
 	LCUI_TriggerEvent(&ev, NULL);

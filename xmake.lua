@@ -28,7 +28,6 @@ target("lcui")
     add_headerfiles("include/LCUI_Build.h")
     add_headerfiles("include/(LCUI/**.h)")
     add_deps(
-        "yutil",
         "lcui-util",
         "lcui-thread",
         "lcui-css",

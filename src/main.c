@@ -102,7 +102,7 @@ static struct LCUI_App {
 	LCUI_Mutex loop_mutex;			/**< 互斥锁，确保一次只允许一个线程跑主循环 */
 	LCUI_Cond loop_changed;			/**< 条件变量，用于指示当前运行的主循环是否改变 */
 	LCUI_MainLoop loop;			/**< 当前运行的主循环 */
-	LinkedList loops;			/**< 主循环列表 */
+	list_t loops;			/**< 主循环列表 */
 	StepTimer timer;			/**< 渲染循环计数器 */
 	LCUI_AppDriver driver;			/**< 程序事件驱动支持 */
 	LCUI_BOOL driver_ready;			/**< 事件驱动支持是否已经准备就绪 */
@@ -127,17 +127,17 @@ static void LCUIProfile_Print(LCUI_Profile profile)
 	unsigned i;
 	LCUI_FrameProfile frame;
 
-	Logger_Debug("\nframes_count: %zu, time: %ld\n", profile->frames_count,
+	logger_debug("\nframes_count: %zu, time: %ld\n", profile->frames_count,
 		     profile->end_time - profile->start_time);
 	for (i = 0; i < profile->frames_count; ++i) {
 		frame = &profile->frames[i];
-		Logger_Debug("=== frame [%u/%u] ===\n", i + 1,
+		logger_debug("=== frame [%u/%u] ===\n", i + 1,
 			     profile->frames_count);
-		Logger_Debug("timers.count: %zu\ntimers.time: %ldms\n",
+		logger_debug("timers.count: %zu\ntimers.time: %ldms\n",
 			     frame->timers_count, frame->timers_time);
-		Logger_Debug("events.count: %zu\nevents.time: %ldms\n",
+		logger_debug("events.count: %zu\nevents.time: %ldms\n",
 			     frame->events_count, frame->events_time);
-		Logger_Debug("widget_tasks.time: %ldms\n"
+		logger_debug("widget_tasks.time: %ldms\n"
 			     "widget_tasks.update_count: %u\n"
 			     "widget_tasks.refresh_count: %u\n"
 			     "widget_tasks.layout_count: %u\n"
@@ -151,7 +151,7 @@ static void LCUIProfile_Print(LCUI_Profile profile)
 			     frame->widget_tasks.user_task_count,
 			     frame->widget_tasks.destroy_count,
 			     frame->widget_tasks.destroy_time);
-		Logger_Debug("render: %zu, %ldms, %ldms\n", frame->render_count,
+		logger_debug("render: %zu, %ldms, %ldms\n", frame->render_count,
 			     frame->render_time, frame->present_time);
 	}
 }
@@ -191,7 +191,7 @@ static void OnSettingsChangeEvent(LCUI_SysEvent e, void *arg)
 void LCUI_RunFrameWithProfile(LCUI_FrameProfile profile)
 {
 	profile->timers_time = clock();
-	profile->timers_count = LCUI_ProcessTimers();
+	profile->timers_count = lcui_timer_list_process();
 	profile->timers_time = clock() - profile->timers_time;
 
 	profile->events_time = clock();
@@ -213,7 +213,7 @@ void LCUI_RunFrameWithProfile(LCUI_FrameProfile profile)
 
 void LCUI_RunFrame(void)
 {
-	LCUI_ProcessTimers();
+	lcui_timer_list_process();
 	LCUI_ProcessEvents();
 	LCUICursor_Update();
 	LCUIWidget_Update();
@@ -409,10 +409,10 @@ int LCUIMainLoop_Run(LCUI_MainLoop loop)
 	DEBUG_MSG("at_same_thread: %d\n", at_same_thread);
 	if (!at_same_thread) {
 		LCUIMutex_Lock(&MainApp.loop_mutex);
-		LinkedList_Insert(&MainApp.loops, 0, loop);
+		list_insert(&MainApp.loops, 0, loop);
 		LCUIMutex_Unlock(&MainApp.loop_mutex);
 	} else {
-		LinkedList_Insert(&MainApp.loops, 0, loop);
+		list_insert(&MainApp.loops, 0, loop);
 	}
 	DEBUG_MSG("loop: %p, enter\n", loop);
 	MainApp.loop = loop;
@@ -438,9 +438,9 @@ int LCUIMainLoop_Run(LCUI_MainLoop loop)
 	loop->state = STATE_EXITED;
 	DEBUG_MSG("loop: %p, exit\n", loop);
 	LCUIMainLoop_Destroy(loop);
-	LinkedList_Delete(&MainApp.loops, 0);
+	list_delete_by_pos(&MainApp.loops, 0);
 	/* 获取处于列表表头的主循环 */
-	loop = LinkedList_Get(&MainApp.loops, 0);
+	loop = list_get(&MainApp.loops, 0);
 	/* 改变当前运行的主循环 */
 	MainApp.loop = loop;
 	LCUICond_Broadcast(&MainApp.loop_changed);
@@ -472,7 +472,7 @@ void LCUI_InitApp(LCUI_AppDriver app)
 	MainApp.timer = StepTimer_Create();
 	LCUICond_Init(&MainApp.loop_changed);
 	LCUIMutex_Init(&MainApp.loop_mutex);
-	LinkedList_Init(&MainApp.loops);
+	list_init(&MainApp.loops);
 	LCUIProfile_Init(&MainApp.profile);
 	LCUI_ResetSettings();
 	MainApp.settings_change_handler_id = LCUI_BindEvent(
@@ -512,11 +512,11 @@ static void LCUI_FreeApp(void)
 {
 	int i;
 	LCUI_MainLoop loop;
-	LinkedListNode *node;
+	list_node_t *node;
 	MainApp.active = FALSE;
 	LCUI_UnbindEvent(MainApp.settings_change_handler_id);
 	MainApp.settings_change_handler_id = -1;
-	for (LinkedList_Each(node, &MainApp.loops)) {
+	for (list_each(node, &MainApp.loops)) {
 		loop = node->data;
 		LCUIMainLoop_Quit(loop);
 		LCUIThread_Join(loop->tid, NULL);
@@ -524,7 +524,7 @@ static void LCUI_FreeApp(void)
 	StepTimer_Destroy(MainApp.timer);
 	LCUIMutex_Destroy(&MainApp.loop_mutex);
 	LCUICond_Destroy(&MainApp.loop_changed);
-	LinkedList_Clear(&MainApp.loops, OnDeleteMainLoop);
+	list_clear(&MainApp.loops, OnDeleteMainLoop);
 	if (MainApp.driver_ready) {
 		LCUI_DestroyAppDriver(MainApp.driver);
 	}
@@ -566,8 +566,8 @@ void *LCUI_GetAppData(void)
 static void LCUIApp_QuitAllMainLoop(void)
 {
 	LCUI_MainLoop loop;
-	LinkedListNode *node;
-	for (LinkedList_Each(node, &MainApp.loops)) {
+	list_node_t *node;
+	for (list_each(node, &MainApp.loops)) {
 		loop = node->data;
 		if (loop) {
 			loop->state = STATE_EXITED;
@@ -577,7 +577,7 @@ static void LCUIApp_QuitAllMainLoop(void)
 
 static void LCUI_ShowCopyrightText(void)
 {
-	Logger_Log(LOGGER_LEVEL_INFO,
+	logger_log(LOGGER_LEVEL_INFO,
 		   "LCUI (LC's UI) version " PACKAGE_VERSION "\n"
 #ifdef _MSC_VER
 		   "Build tool: "
@@ -655,8 +655,8 @@ void LCUI_InitBase(void)
 		return;
 	}
 #ifdef LCUI_BUILD_IN_WIN32
-	Logger_SetHandler(Win32Logger_LogA);
-	Logger_SetHandlerW(Win32Logger_LogW);
+	logger_set_handler(Win32Logger_LogA);
+	logger_set_handler_w(Win32Logger_LogW);
 #endif
 	System.exit_code = 0;
 	System.state = STATE_ACTIVE;
@@ -664,7 +664,7 @@ void LCUI_InitBase(void)
 	LCUI_ShowCopyrightText();
 	LCUI_InitEvent();
 	LCUI_InitFontLibrary();
-	LCUI_InitTimer();
+	lcui_timer_list_create();
 	LCUI_InitCursor();
 	LCUI_InitWidget();
 	LCUI_InitMetrics();
@@ -712,7 +712,7 @@ int LCUI_Destroy(void)
 	LCUI_FreeWidget();
 	LCUI_FreeCursor();
 	LCUI_FreeFontLibrary();
-	LCUI_FreeTimer();
+	lcui_timer_list_destroy();
 	LCUI_FreeEvent();
 	return System.exit_code;
 }

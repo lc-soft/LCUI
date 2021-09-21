@@ -16,14 +16,14 @@ void test_image_reader(void)
 		width = height = 0;
 		Graph_Init(&img);
 		snprintf(file, 255, "test_image_reader.%s", formats[i]);
-		Logger_Debug("image file: %s\n", file);
+		logger_debug("image file: %s\n", file);
 		it_i("check LCUI_ReadImageFile", LCUI_ReadImageFile(file, &img),
 		     0);
 		it_i("check image width with ReadImageFile", img.width, 91);
 		it_i("check image height with ReadImageFile", img.height, 69);
 		it_i("check LCUI_GetImageSize",
 		     LCUI_GetImageSize(file, &width, &height), 0);
-		Logger_Debug("image size: (%d, %d)\n", width, height);
+		logger_debug("image size: (%d, %d)\n", width, height);
 		it_i("check image width with GetImageSize", width, 91);
 		it_i("check image height with GetImageSize", height, 69);
 		Graph_Free(&img);

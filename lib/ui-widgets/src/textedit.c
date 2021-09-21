@@ -48,7 +48,7 @@
 #define PLACEHOLDER_COLOR RGB(140, 140, 140)
 #define GetData(W) Widget_GetData(W, self.prototype)
 #define AddData(W) Widget_AddData(W, self.prototype, sizeof(LCUI_TextEditRec))
-#define TextBlocks_Clear(blocks) LinkedList_Clear(blocks, TextBlock_OnDestroy)
+#define TextBlocks_Clear(blocks) list_clear(blocks, TextBlock_OnDestroy)
 
 enum TaskType { TASK_SET_TEXT, TASK_UPDATE, TASK_TOTAL };
 
@@ -67,8 +67,8 @@ typedef struct LCUI_TextEditRec_ {
 	wchar_t *allow_input_char;      /**< 允许输入的字符 */
 	wchar_t password_char;          /**< 屏蔽符的副本 */
 	size_t text_block_size;         /**< 块大小 */
-	LinkedList text_blocks;         /**< 文本块缓冲区 */
-	LinkedList text_tags;           /**< 当前处理的标签列表 */
+	list_t text_blocks;         /**< 文本块缓冲区 */
+	list_t text_tags;           /**< 当前处理的标签列表 */
 	LCUI_BOOL tasks[TASK_TOTAL];    /**< 待处理的任务 */
 	LCUI_Mutex mutex;               /**< 互斥锁 */
 } LCUI_TextEditRec, *LCUI_TextEdit;
@@ -152,8 +152,8 @@ static void TextEdit_UpdateCaret(LCUI_Widget widget)
 		caret_x = pos.x / scale;
 		caret_y = pos.y / scale;
 	}
-	offset_x = iround(edit->layer->offset_x / scale);
-	offset_y = iround(edit->layer->offset_y / scale);
+	offset_x = y_round(edit->layer->offset_x / scale);
+	offset_y = y_round(edit->layer->offset_y / scale);
 	x = caret_x + offset_x;
 	y = caret_y + offset_y;
 	width = edit->layer->width / scale;
@@ -180,8 +180,8 @@ static void TextEdit_UpdateCaret(LCUI_Widget widget)
 		x = caret_x + widget->box.content.width -
 		    (edit->layer->width / scale);
 	}
-	offset_x = iround((x - caret_x) * scale);
-	offset_y = iround((y - caret_y) * scale);
+	offset_x = y_round((x - caret_x) * scale);
+	offset_y = y_round((y - caret_y) * scale);
 	if (TextLayer_SetOffset(edit->layer, offset_x, offset_y)) {
 		edit->tasks[TASK_UPDATE] = TRUE;
 		Widget_AddTask(widget, LCUI_WTASK_USER);
@@ -255,7 +255,7 @@ static int TextEdit_AddTextBlock(LCUI_Widget widget, const wchar_t *wtext,
 			--i;
 			block->text[j] = 0;
 			block->length = j;
-			LinkedList_Append(&edit->text_blocks, block);
+			list_append(&edit->text_blocks, block);
 			continue;
 		}
 		for (j = 0; i < len && j < size - 1; ++j, ++i) {
@@ -287,7 +287,7 @@ static int TextEdit_AddTextBlock(LCUI_Widget widget, const wchar_t *wtext,
 		block->text[j] = 0;
 		block->length = j;
 		/* 添加文本块至缓冲区 */
-		LinkedList_Append(&edit->text_blocks, block);
+		list_append(&edit->text_blocks, block);
 	}
 	edit->tasks[TASK_SET_TEXT] = TRUE;
 	Widget_AddTask(widget, LCUI_WTASK_USER);
@@ -297,7 +297,7 @@ static int TextEdit_AddTextBlock(LCUI_Widget widget, const wchar_t *wtext,
 /** 更新文本框内的字体位图 */
 static void TextEdit_ProcTextBlock(LCUI_Widget widget, LCUI_TextBlock txtblk)
 {
-	LinkedList *tags;
+	list_t *tags;
 	LCUI_TextEdit edit;
 	LCUI_TextLayer layer;
 
@@ -343,13 +343,13 @@ static void TextEdit_ProcTextBlock(LCUI_Widget widget, LCUI_TextBlock txtblk)
 static void TextEdit_UpdateTextLayer(LCUI_Widget w)
 {
 	float scale;
-	LinkedList rects;
+	list_t rects;
 	LCUI_RectF rect;
 	LCUI_TextEdit edit;
 	LCUI_TextStyleRec style;
-	LinkedListNode *node;
+	list_node_t *node;
 
-	LinkedList_Init(&rects);
+	list_init(&rects);
 	scale = LCUIMetrics_GetScale();
 	edit = Widget_GetData(w, self.prototype);
 	TextStyle_Copy(&style, &edit->layer_source->text_default_style);
@@ -361,7 +361,7 @@ static void TextEdit_UpdateTextLayer(LCUI_Widget w)
 	TextLayer_SetTextStyle(edit->layer_placeholder, &style);
 	TextStyle_Destroy(&style);
 	TextLayer_Update(edit->layer, &rects);
-	for (LinkedList_Each(node, &rects)) {
+	for (list_each(node, &rects)) {
 		LCUIRect_ToRectF(node->data, &rect, 1.0f / scale);
 		Widget_InvalidateArea(w, &rect, SV_CONTENT_BOX);
 	}
@@ -374,15 +374,15 @@ static void TextEdit_OnTask(LCUI_Widget widget, int task)
 	LCUI_TextEdit edit = Widget_GetData(widget, self.prototype);
 
 	if (edit->tasks[TASK_SET_TEXT]) {
-		LinkedList blocks;
-		LinkedListNode *node;
+		list_t blocks;
+		list_node_t *node;
 		LCUI_WidgetEventRec ev;
 
-		LinkedList_Init(&blocks);
+		list_init(&blocks);
 		LCUIMutex_Lock(&edit->mutex);
-		LinkedList_Concat(&blocks, &edit->text_blocks);
+		list_concat(&blocks, &edit->text_blocks);
 		LCUIMutex_Unlock(&edit->mutex);
-		for (LinkedList_Each(node, &blocks)) {
+		for (list_each(node, &blocks)) {
 			TextEdit_ProcTextBlock(widget, node->data);
 		}
 		TextBlocks_Clear(&blocks);
@@ -415,18 +415,18 @@ static void TextEdit_OnResize(LCUI_Widget w, float width, float height)
 {
 	float scale = LCUIMetrics_GetScale();
 
-	LinkedList rects;
-	LinkedListNode *node;
+	list_t rects;
+	list_node_t *node;
 
 	LCUI_RectF rect;
 	LCUI_TextEdit edit = GetData(w);
 
-	LinkedList_Init(&rects);
+	list_init(&rects);
 	TextLayer_SetFixedSize(edit->layer, (int)(width * scale), (int)(width * scale));
 	TextLayer_SetMaxSize(edit->layer, (int)(height * scale), (int)(height * scale));
 	TextLayer_Update(edit->layer, &rects);
 	TextLayer_ClearInvalidRect(edit->layer);
-	for (LinkedList_Each(node, &rects)) {
+	for (list_each(node, &rects)) {
 		LCUIRect_ToRectF(node->data, &rect, 1.0f / scale);
 		Widget_InvalidateArea(w, &rect, SV_CONTENT_BOX);
 	}
@@ -446,7 +446,7 @@ static void TextEdit_OnAutoSize(LCUI_Widget w, float *width, float *height,
 	case LCUI_LAYOUT_RULE_FIXED_WIDTH:
 		max_width = (int)(scale * w->box.content.width);
 		if (edit->is_multiline_mode) {
-			n = max(TextLayer_GetRowTotal(edit->layer), 6);
+			n = y_max(TextLayer_GetRowTotal(edit->layer), 6);
 			for (max_height = 0, i = 0; i < n; ++i) {
 				max_height +=
 				    TextLayer_GetRowHeight(edit->layer, i);
@@ -466,7 +466,7 @@ static void TextEdit_OnAutoSize(LCUI_Widget w, float *width, float *height,
 	default:
 		max_width = (int)(scale * DEFAULT_WIDTH);
 		if (edit->is_multiline_mode) {
-			n = max(TextLayer_GetRowTotal(edit->layer), 6);
+			n = y_max(TextLayer_GetRowTotal(edit->layer), 6);
 			for (max_height = 0, i = 0; i < n; ++i) {
 				max_height +=
 				    TextLayer_GetRowHeight(edit->layer, i);
@@ -504,16 +504,16 @@ void TextEdit_ClearText(LCUI_Widget widget)
 {
 	LCUI_TextEdit edit;
 	LCUI_TextBlock block;
-	LinkedListNode *node, *prev;
+	list_node_t *node, *prev;
 
 	edit = Widget_GetData(widget, self.prototype);
 	LCUIMutex_Lock(&edit->mutex);
-	for (LinkedList_Each(node, &edit->text_blocks)) {
+	for (list_each(node, &edit->text_blocks)) {
 		block = node->data;
 		prev = node->prev;
 		if (block->owner == TEXT_BLOCK_OWNER_SOURCE) {
 			TextBlock_OnDestroy(block);
-			LinkedList_DeleteNode(&edit->text_blocks, node);
+			list_delete_node(&edit->text_blocks, node);
 			node = prev;
 		}
 	}
@@ -570,7 +570,7 @@ int TextEdit_SetText(LCUI_Widget widget, const char *utf8_str)
 	if (!wstr) {
 		return -ENOMEM;
 	}
-	len = LCUI_DecodeString(wstr, utf8_str, len, ENCODING_UTF8);
+	len = decode_utf8(wstr, utf8_str, len);
 	wstr[len] = 0;
 	ret = TextEdit_SetTextW(widget, wstr);
 	free(wstr);
@@ -634,7 +634,7 @@ int TextEdit_SetPlaceHolder(LCUI_Widget w, const char *str)
 	if (!wstr) {
 		return -ENOMEM;
 	}
-	len = LCUI_DecodeString(wstr, str, len, ENCODING_UTF8);
+	len = decode_utf8(wstr, str, len);
 	wstr[len] = 0;
 	ret = TextEdit_SetPlaceHolderW(w, wstr);
 	free(wstr);
@@ -837,8 +837,8 @@ static void TextEdit_OnMouseMove(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 	}
 	scale = LCUIMetrics_GetScale();
 	Widget_GetOffset(w, NULL, &offset_x, &offset_y);
-	x = iround((e->motion.x - offset_x - w->padding.left) * scale);
-	y = iround((e->motion.y - offset_y - w->padding.top) * scale);
+	x = y_round((e->motion.x - offset_x - w->padding.left) * scale);
+	y = y_round((e->motion.y - offset_y - w->padding.top) * scale);
 	TextLayer_SetCaretPosByPixelPos(edit->layer, x, y);
 	TextEdit_UpdateCaret(w);
 }
@@ -857,8 +857,8 @@ static void TextEdit_OnMouseDown(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 	LCUI_TextEdit edit = GetData(w);
 
 	Widget_GetOffset(w, NULL, &offset_x, &offset_y);
-	x = iround((e->motion.x - offset_x - w->padding.left) * scale);
-	y = iround((e->motion.y - offset_y - w->padding.top) * scale);
+	x = y_round((e->motion.x - offset_x - w->padding.left) * scale);
+	y = y_round((e->motion.y - offset_y - w->padding.top) * scale);
 	TextLayer_SetCaretPosByPixelPos(edit->layer, x, y);
 	TextEdit_UpdateCaret(w);
 	Widget_SetMouseCapture(w);
@@ -895,7 +895,7 @@ static void TextEdit_OnInit(LCUI_Widget w)
 	edit->caret = LCUIWidget_New("textcaret");
 	w->computed_style.focusable = TRUE;
 	memset(edit->tasks, 0, sizeof(edit->tasks));
-	LinkedList_Init(&edit->text_blocks);
+	list_init(&edit->text_blocks);
 	StyleTags_Init(&edit->text_tags);
 	TextEdit_EnableMultiline(w, FALSE);
 	TextLayer_SetAutoWrap(edit->layer, TRUE);

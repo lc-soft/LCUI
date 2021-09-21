@@ -45,7 +45,7 @@ typedef enum { TEXT_ACTION_INSERT, TEXT_ACTION_APPEND } TextAction;
 	TextRowList_InsertNewRow(ROWLIST, (ROWLIST)->length)
 #define TextLayer_GetRow(layer, n) \
 	(n >= layer->text_rows.length) ? NULL : layer->text_rows.rows[n]
-#define GetDefaultLineHeight(H) iround(H * 1.42857143)
+#define GetDefaultLineHeight(H) y_round(H * 1.42857143)
 #define ISALPHA(CH) (CH >= 'a' && CH <= 'z') || (CH >= 'A' && CH <= 'Z')
 
 /* 根据对齐方式，计算文本行的起始X轴位置 */
@@ -300,12 +300,12 @@ LCUI_TextLayer TextLayer_New(void)
 	layer->enable_style_tag = FALSE;
 	layer->word_break = LCUI_WORD_BREAK_NORMAL;
 	TextStyle_Init(&layer->text_default_style);
-	LinkedList_Init(&layer->text_styles);
+	list_init(&layer->text_styles);
 	layer->task.typeset_start_row = 0;
 	layer->task.update_typeset = 0;
 	layer->task.update_bitmap = 0;
 	layer->task.redraw_all = 0;
-	LinkedList_Init(&layer->dirty_rects);
+	list_init(&layer->dirty_rects);
 	TextRowList_InsertNewRow(&layer->text_rows, 0);
 	return layer;
 }
@@ -333,7 +333,7 @@ static void OnDestroyTextStyle(void *data)
 
 static void TextLayer_DestroyStyleCache(LCUI_TextLayer layer)
 {
-	LinkedList_Clear(&layer->text_styles, OnDestroyTextStyle);
+	list_clear(&layer->text_styles, OnDestroyTextStyle);
 }
 
 /** 销毁TextLayer */
@@ -665,7 +665,7 @@ static void TextLayer_TextTypeset(LCUI_TextLayer layer, int start_row)
 
 static const wchar_t *TextLayer_ProcessStyleTag(LCUI_TextLayer layer,
 						const wchar_t *p,
-						LinkedList *tags,
+						list_t *tags,
 						LCUI_TextStyle *style)
 {
 	LCUI_TextStyle s;
@@ -675,7 +675,7 @@ static const wchar_t *TextLayer_ProcessStyleTag(LCUI_TextLayer layer,
 		s = StyleTags_GetTextStyle(tags);
 		if (s) {
 			TextStyle_Merge(s, &layer->text_default_style);
-			LinkedList_Append(&layer->text_styles, s);
+			list_append(&layer->text_styles, s);
 		}
 		*style = s;
 		return pp;
@@ -685,7 +685,7 @@ static const wchar_t *TextLayer_ProcessStyleTag(LCUI_TextLayer layer,
 		s = StyleTags_GetTextStyle(tags);
 		if (s) {
 			TextStyle_Merge(s, &layer->text_default_style);
-			LinkedList_Append(&layer->text_styles, s);
+			list_append(&layer->text_styles, s);
 		}
 		*style = s;
 		return pp;
@@ -695,12 +695,12 @@ static const wchar_t *TextLayer_ProcessStyleTag(LCUI_TextLayer layer,
 
 /** 对文本进行预处理 */
 static int TextLayer_ProcessText(LCUI_TextLayer layer, const wchar_t *wstr,
-				 TextAction action, LinkedList *tags)
+				 TextAction action, list_t *tags)
 {
 	LCUI_EOLChar eol;
 	LCUI_TextRow txtrow;
 	LCUI_TextCharRec txtchar;
-	LinkedList tmp_tags;
+	list_t tmp_tags;
 	const wchar_t *p;
 	int cur_col, cur_row, start_row, ins_x, ins_y;
 	LCUI_BOOL need_typeset, rect_has_added;
@@ -766,7 +766,7 @@ static int TextLayer_ProcessText(LCUI_TextLayer layer, const wchar_t *wstr,
 			}
 			/* 将当前行中的插入点为截点，进行断行 */
 			TextLayer_BreakTextRow(layer, ins_y, ins_x, eol);
-			layer->width = max(layer->width, txtrow->width);
+			layer->width = y_max(layer->width, txtrow->width);
 			need_typeset = TRUE;
 			++layer->length;
 			ins_x = 0;
@@ -783,7 +783,7 @@ static int TextLayer_ProcessText(LCUI_TextLayer layer, const wchar_t *wstr,
 	}
 	/* 更新当前行的尺寸 */
 	TextLayer_UpdateRowSize(layer, txtrow);
-	layer->width = max(layer->width, txtrow->width);
+	layer->width = y_max(layer->width, txtrow->width);
 	if (action == TEXT_ACTION_INSERT) {
 		layer->insert_x = ins_x;
 		layer->insert_y = ins_y;
@@ -805,7 +805,7 @@ static int TextLayer_ProcessText(LCUI_TextLayer layer, const wchar_t *wstr,
 
 /** 插入文本内容（宽字符版） */
 int TextLayer_InsertTextW(LCUI_TextLayer layer, const wchar_t *wstr,
-			  LinkedList *tags)
+			  list_t *tags)
 {
 	return TextLayer_ProcessText(layer, wstr, TEXT_ACTION_INSERT, tags);
 }
@@ -824,7 +824,7 @@ int TextLayer_InsertText(LCUI_TextLayer layer, const char *utf8_str)
 
 /** 追加文本内容（宽字符版） */
 int TextLayer_AppendTextW(LCUI_TextLayer layer, const wchar_t *wstr,
-			  LinkedList *tag_stack)
+			  list_t *tag_stack)
 {
 	return TextLayer_ProcessText(layer, wstr, TEXT_ACTION_APPEND,
 				     tag_stack);
@@ -844,7 +844,7 @@ int TextLayer_AppendText(LCUI_TextLayer layer, const char *utf8_text)
 
 /** 设置文本内容（宽字符版） */
 int TextLayer_SetTextW(LCUI_TextLayer layer, const wchar_t *wstr,
-		       LinkedList *tag_stack)
+		       list_t *tag_stack)
 {
 	TextLayer_ClearText(layer);
 	return TextLayer_AppendTextW(layer, wstr, tag_stack);
@@ -1167,12 +1167,12 @@ void TextLayer_EnableStyleTag(LCUI_TextLayer layer, LCUI_BOOL enable)
 
 static void TextLayer_UpdateTextStyleCache(LCUI_TextLayer layer)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 	if (!layer->text_default_style.has_family) {
 		TextStyle_SetDefaultFont(&layer->text_default_style);
 	}
 	/* 替换缺省字体，确保能够正确应用字体设置 */
-	for (LinkedList_Each(node, &layer->text_styles)) {
+	for (list_each(node, &layer->text_styles)) {
 		TextStyle_Merge(node->data, &layer->text_default_style);
 	}
 }
@@ -1193,7 +1193,7 @@ void TextLayer_ReloadCharBitmap(LCUI_TextLayer layer)
 	}
 }
 
-void TextLayer_Update(LCUI_TextLayer layer, LinkedList *rects)
+void TextLayer_Update(LCUI_TextLayer layer, list_t *rects)
 {
 	if (layer->task.update_bitmap) {
 		TextLayer_InvalidateRowsRect(layer, 0, -1);
@@ -1218,7 +1218,7 @@ void TextLayer_Update(LCUI_TextLayer layer, LinkedList *rects)
 		layer->task.redraw_all = TRUE;
 	}
 	if (rects) {
-		LinkedList_Concat(rects, &layer->dirty_rects);
+		list_concat(rects, &layer->dirty_rects);
 	}
 }
 

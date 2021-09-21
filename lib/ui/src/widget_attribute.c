@@ -39,11 +39,11 @@
 #include <LCUI/gui/widget_status.h>
 
 static struct LCUI_WidgetAttribleModule {
-	DictType dt_attributes;
+	dict_type_t dt_attributes;
 	LCUI_BOOL available;
 } self;
 
-static void OnClearWidgetAttribute(void *privdata, void *data)
+static void OnClearWidgetAttribute(void *priv_data, void *data)
 {
 	LCUI_WidgetAttribute attr = data;
 	if (attr->value.destructor) {
@@ -61,14 +61,14 @@ int Widget_SetAttributeEx(LCUI_Widget w, const char *name, void *value,
 	LCUI_WidgetAttribute attr;
 
 	if (!self.available) {
-		Dict_InitStringKeyType(&self.dt_attributes);
-		self.dt_attributes.valDestructor = OnClearWidgetAttribute;
+		dict_init_string_key_type(&self.dt_attributes);
+		self.dt_attributes.val_destructor = OnClearWidgetAttribute;
 		self.available = TRUE;
 	}
 	if (!w->attributes) {
-		w->attributes = Dict_Create(&self.dt_attributes, NULL);
+		w->attributes = dict_create(&self.dt_attributes, NULL);
 	}
-	attr = Dict_FetchValue(w->attributes, name);
+	attr = dict_fetch_value(w->attributes, name);
 	if (attr) {
 		if (attr->value.destructor) {
 			attr->value.destructor(attr->value.data);
@@ -76,7 +76,7 @@ int Widget_SetAttributeEx(LCUI_Widget w, const char *name, void *value,
 	} else {
 		attr = NEW(LCUI_WidgetAttributeRec, 1);
 		attr->name = strdup2(name);
-		Dict_Add(w->attributes, attr->name, attr);
+		dict_add(w->attributes, attr->name, attr);
 	}
 	attr->value.data = value;
 	attr->value.type = value_type;
@@ -119,7 +119,7 @@ const char *Widget_GetAttribute(LCUI_Widget w, const char *name)
 	if (!w->attributes) {
 		return NULL;
 	}
-	attr = Dict_FetchValue(w->attributes, name);
+	attr = dict_fetch_value(w->attributes, name);
 	if (attr) {
 		return attr->value.string;
 	}
@@ -129,7 +129,7 @@ const char *Widget_GetAttribute(LCUI_Widget w, const char *name)
 void Widget_DestroyAttributes(LCUI_Widget w)
 {
 	if (w->attributes) {
-		Dict_Release(w->attributes);
+		dict_destroy(w->attributes);
 	}
 	w->attributes = NULL;
 }

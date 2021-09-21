@@ -44,7 +44,7 @@ typedef struct SideBarItemRec_ {
 } SideBarItemRec, *SideBarItem;
 
 typedef struct SideBarRec_ {
-	LinkedList items;
+	list_t items;
 	LCUI_Style line_height;
 } SideBarRec, *SideBar;
 
@@ -119,7 +119,7 @@ LCUI_Widget SideBar_AppendItem(LCUI_Widget sidebar, const wchar_t *id,
 	Widget_Show(w);
 	Widget_Show(sbi->icon);
 	Widget_Show(sbi->text);
-	LinkedList_Append(&sb->items, sbi);
+	list_append(&sb->items, sbi);
 	return w;
 }
 
@@ -141,7 +141,7 @@ static void SideBar_OnInit(LCUI_Widget w)
 {
 	const size_t data_size = sizeof(SideBarRec);
 	SideBar sb = Widget_AddData(w, self.sidebar, data_size);
-	LinkedList_Init(&sb->items);
+	list_init(&sb->items);
 }
 
 static void OnToggle(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)

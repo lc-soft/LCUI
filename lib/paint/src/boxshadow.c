@@ -150,12 +150,12 @@ void BoxShadow_GetCanvasRect(const LCUI_BoxShadow *shadow,
 	shadow_rect.y = content_rect->y - SHADOW_WIDTH(shadow) + shadow->y;
 	shadow_rect.width = BoxShadow_GetWidth(shadow, content_rect->width);
 	shadow_rect.height = BoxShadow_GetHeight(shadow, content_rect->height);
-	canvas_rect->x = min(content_rect->x, shadow_rect.x);
-	canvas_rect->y = min(content_rect->y, shadow_rect.y);
-	canvas_rect->width = max(shadow_rect.x + shadow_rect.width,
+	canvas_rect->x = y_min(content_rect->x, shadow_rect.x);
+	canvas_rect->y = y_min(content_rect->y, shadow_rect.y);
+	canvas_rect->width = y_max(shadow_rect.x + shadow_rect.width,
 				 content_rect->x + content_rect->width) -
 			     canvas_rect->x;
-	canvas_rect->height = max(shadow_rect.y + shadow_rect.height,
+	canvas_rect->height = y_max(shadow_rect.y + shadow_rect.height,
 				  content_rect->y + content_rect->height) -
 			      canvas_rect->y;
 }
@@ -334,9 +334,9 @@ static LCUI_BOOL BoxShadow_PaintCircleBlur(BoxShadowRenderingContext ctx,
 {
 	double d;
 	double y2;
-	double r = max(0, CIRCLE_R(radius));
+	double r = y_max(0, CIRCLE_R(radius));
 	double outer_r2 = POW2(r);
-	double inner_r = max(0, r - BLUR_WIDTH(ctx->shadow));
+	double inner_r = y_max(0, r - BLUR_WIDTH(ctx->shadow));
 	double inner_smooth_r2 = POW2(inner_r + 1.0);
 
 	int x, y;
@@ -403,7 +403,7 @@ static LCUI_BOOL BoxShadow_PaintTopLeftBlur(BoxShadowRenderingContext ctx)
 	LCUI_Rect rect;
 
 	radius = FULL_SHADOW_WIDTH(ctx) + ctx->shadow->top_left_radius;
-	radius = min(ctx->max_radius, radius);
+	radius = y_min(ctx->max_radius, radius);
 	rect.width = radius;
 	rect.height = rect.width;
 	rect.x = ctx->shadow_box.x;
@@ -418,7 +418,7 @@ static LCUI_BOOL BoxShadow_PaintTopRightBlur(BoxShadowRenderingContext ctx)
 	LCUI_Rect rect;
 
 	radius = FULL_SHADOW_WIDTH(ctx) + ctx->shadow->top_right_radius;
-	radius = min(ctx->max_radius, radius);
+	radius = y_min(ctx->max_radius, radius);
 	rect.width = radius;
 	rect.height = rect.width;
 	rect.x = ctx->shadow_box.x + ctx->shadow_box.width - rect.width;
@@ -432,7 +432,7 @@ static LCUI_BOOL BoxShadow_PaintBottomLeftBlur(BoxShadowRenderingContext ctx)
 	LCUI_Rect rect;
 
 	radius = FULL_SHADOW_WIDTH(ctx) + ctx->shadow->bottom_left_radius;
-	radius = min(ctx->max_radius, radius);
+	radius = y_min(ctx->max_radius, radius);
 	rect.width = radius;
 	rect.height = rect.width;
 	rect.x = ctx->shadow_box.x;
@@ -446,7 +446,7 @@ static LCUI_BOOL BoxShadow_PaintBottomRightBlur(BoxShadowRenderingContext ctx)
 	LCUI_Rect rect;
 
 	radius = FULL_SHADOW_WIDTH(ctx) + ctx->shadow->bottom_right_radius;
-	radius = min(ctx->max_radius, radius);
+	radius = y_min(ctx->max_radius, radius);
 	rect.width = radius;
 	rect.height = rect.width;
 	rect.x = ctx->shadow_box.x + ctx->shadow_box.width - rect.width;
@@ -514,12 +514,12 @@ static void BoxShadow_ClearContentRect(BoxShadowRenderingContext ctx)
 	LCUI_Rect rect;
 	LCUI_Rect bound;
 	LCUI_Graph canvas;
-	LinkedList rects;
-	LinkedListNode *node;
+	list_t rects;
+	list_node_t *node;
 
 	/* Initialize a queue for recording the area after the split content
 	 * area */
-	LinkedList_Init(&rects);
+	list_init(&rects);
 	RectList_Add(&rects, &ctx->content_box);
 
 	r = ctx->shadow->top_left_radius;
@@ -587,7 +587,7 @@ static void BoxShadow_ClearContentRect(BoxShadowRenderingContext ctx)
 	}
 
 	/* Clear pixels in the remaining areas of the content area */
-	for (LinkedList_Each(node, &rects)) {
+	for (list_each(node, &rects)) {
 		if (LCUIRect_GetOverlayRect(&ctx->paint->rect, node->data,
 					    &rect)) {
 			rect.x -= ctx->paint->rect.x;
@@ -619,7 +619,7 @@ int BoxShadow_Paint(const LCUI_BoxShadow *shadow, const LCUI_Rect *box,
 	ctx.box = box;
 	ctx.shadow = shadow;
 	ctx.max_radius =
-	    min(content_width, content_height) / 2 + SHADOW_WIDTH(shadow);
+	    y_min(content_width, content_height) / 2 + SHADOW_WIDTH(shadow);
 	ctx.shadow_box.x = BoxShadow_GetX(shadow);
 	ctx.shadow_box.y = BoxShadow_GetY(shadow);
 	ctx.shadow_box.width = BoxShadow_GetWidth(shadow, content_width);

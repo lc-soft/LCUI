@@ -214,16 +214,16 @@ int TextStyle_SetDefaultFont(LCUI_TextStyle ts)
 
 /*-------------------------- StyleTag --------------------------------*/
 
-void StyleTags_Clear(LinkedList *tags)
+void StyleTags_Clear(list_t *tags)
 {
-	LinkedList_Clear(tags, free);
+	list_clear(tags, free);
 }
 
 /** 获取当前的文本样式 */
-LCUI_TextStyle StyleTags_GetTextStyle(LinkedList *tags)
+LCUI_TextStyle StyleTags_GetTextStyle(list_t *tags)
 {
 	int count = 0;
-	LinkedListNode *node;
+	list_node_t *node;
 	LCUI_TextStyleTag *tag;
 	LCUI_TextStyle style;
 	LCUI_BOOL found_tags[TEXT_STYLE_TOTAL_NUM] = { 0 };
@@ -234,7 +234,7 @@ LCUI_TextStyle StyleTags_GetTextStyle(LinkedList *tags)
 	style = malloc(sizeof(LCUI_TextStyleRec));
 	TextStyle_Init(style);
 	/* 根据已经记录的各种样式，生成当前应有的文本样式 */
-	for (LinkedList_EachReverse(node, tags)) {
+	for (list_each_reverse(node, tags)) {
 		tag = node->data;
 		switch (tag->id) {
 		case TEXT_STYLE_COLOR:
@@ -276,7 +276,7 @@ LCUI_TextStyle StyleTags_GetTextStyle(LinkedList *tags)
 				break;
 			}
 			style->has_pixel_size = TRUE;
-			style->pixel_size = iround(tag->style.px);
+			style->pixel_size = y_round(tag->style.px);
 			found_tags[tag->id] = TRUE;
 			++count;
 			break;
@@ -294,19 +294,19 @@ LCUI_TextStyle StyleTags_GetTextStyle(LinkedList *tags)
 }
 
 /** 将指定标签的样式数据从队列中删除，只删除队列尾部第一个匹配的标签 */
-static void StyleTags_Delete(LinkedList *tags, int id)
+static void StyleTags_Delete(list_t *tags, int id)
 {
 	LCUI_TextStyleTag *tag;
-	LinkedListNode *node;
+	list_node_t *node;
 	DEBUG_MSG("delete start, total tag: %d\n", total);
 	if (tags->length <= 0) {
 		return;
 	}
-	for (LinkedList_Each(node, tags)) {
+	for (list_each(node, tags)) {
 		tag = node->data;
 		if (tag->id == id) {
 			free(tag);
-			LinkedList_DeleteNode(tags, node);
+			list_delete_node(tags, node);
 			break;
 		}
 	}
@@ -524,14 +524,14 @@ static const wchar_t *ScanStyleTagData(const wchar_t *wstr,
 }
 
 /** 处理样式标签 */
-const wchar_t *StyleTags_GetStart(LinkedList *tags, const wchar_t *str)
+const wchar_t *StyleTags_GetStart(list_t *tags, const wchar_t *str)
 {
 	const wchar_t *q;
 	LCUI_TextStyleTag *tag = NEW(LCUI_TextStyleTag, 1);
 	q = ScanStyleTagData(str, tag);
 	if (q) {
 		/* 将标签样式数据加入队列 */
-		LinkedList_Insert(tags, 0, tag);
+		list_insert(tags, 0, tag);
 	} else {
 		free(tag);
 	}
@@ -539,7 +539,7 @@ const wchar_t *StyleTags_GetStart(LinkedList *tags, const wchar_t *str)
 }
 
 /** 处理样式结束标签 */
-const wchar_t* StyleTags_GetEnd(LinkedList *tags, const wchar_t *str)
+const wchar_t* StyleTags_GetEnd(list_t *tags, const wchar_t *str)
 {
 	const wchar_t *p;
 	wchar_t tagname[256];

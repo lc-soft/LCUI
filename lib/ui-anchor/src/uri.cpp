@@ -42,7 +42,7 @@ int OpenUri(const char *uristr)
 	size_t len;
 	wchar_t *wuri;
 
-	len = LCUI_DecodeString(NULL, uristr, 0, ENCODING_ANSI);
+	len = decode_string(NULL, uristr, 0, ENCODING_ANSI);
 	if (len < 1) {
 		return -1;
 	}
@@ -50,7 +50,7 @@ int OpenUri(const char *uristr)
 	if (!wuri) {
 		return -2;
 	}
-	LCUI_DecodeString(wuri, uristr, len, ENCODING_ANSI);
+	decode_string(wuri, uristr, len, ENCODING_ANSI);
 	wuri[len] = 0;
 
 	auto str = ref new Platform::String(wuri);

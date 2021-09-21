@@ -39,7 +39,7 @@
 typedef struct LCUI_BlockLayoutRowRec_ {
 	float width;
 	float height;
-	LinkedList elements;
+	list_t elements;
 } LCUI_BlockLayoutRowRec, *LCUI_BlockLayoutRow;
 
 typedef struct LCUI_BlockLayoutContextRec_ {
@@ -55,17 +55,17 @@ typedef struct LCUI_BlockLayoutContextRec_ {
 	int prev_display;
 
 	/*
-	 * LinkedList<LCUI_BlockLayoutRow> rows
+	 * list_t<LCUI_BlockLayoutRow> rows
 	 * Element rows in the static layout flow
 	 */
-	LinkedList rows;
+	list_t rows;
 	LCUI_BlockLayoutRow row;
 
 	/*
-	 * LinkedList<LCUI_Widget> free_elements
+	 * list_t<LCUI_Widget> free_elements
 	 * A list of elements that do not exist in the static layout flow
 	 */
-	LinkedList free_elements;
+	list_t free_elements;
 } LCUI_BlockLayoutContextRec, *LCUI_BlockLayoutContext;
 
 static void BlockLayout_UpdateElementPosition(LCUI_BlockLayoutContext ctx,
@@ -102,7 +102,7 @@ static LCUI_BlockLayoutRow BlockLayoutRow_Create(void)
 	row = malloc(sizeof(LCUI_BlockLayoutRowRec));
 	row->width = 0;
 	row->height = 0;
-	LinkedList_Init(&row->elements);
+	list_init(&row->elements);
 	return row;
 }
 
@@ -110,21 +110,21 @@ static void BlockLayoutRow_Destroy(void *arg)
 {
 	LCUI_BlockLayoutRow row = arg;
 
-	LinkedList_Clear(&row->elements, NULL);
+	list_clear(&row->elements, NULL);
 	free(row);
 }
 
 static void BlockLayout_NextRow(LCUI_BlockLayoutContext ctx)
 {
 	if (ctx->row) {
-		ctx->content_width = max(ctx->content_width, ctx->row->width);
+		ctx->content_width = y_max(ctx->content_width, ctx->row->width);
 		ctx->content_height += ctx->row->height;
 		ctx->y += ctx->row->height;
 	}
 	ctx->prev_display = 0;
 	ctx->x = ctx->widget->padding.left;
 	ctx->row = BlockLayoutRow_Create();
-	LinkedList_Append(&ctx->rows, ctx->row);
+	list_append(&ctx->rows, ctx->row);
 }
 
 static LCUI_BlockLayoutContext BlockLayout_Begin(LCUI_Widget w,
@@ -181,8 +181,8 @@ static LCUI_BlockLayoutContext BlockLayout_Begin(LCUI_Widget w,
 	ctx->content_height = 0;
 	ctx->prev_display = 0;
 	ctx->prev = NULL;
-	LinkedList_Init(&ctx->free_elements);
-	LinkedList_Init(&ctx->rows);
+	list_init(&ctx->free_elements);
+	list_init(&ctx->rows);
 	BlockLayout_NextRow(ctx);
 	return ctx;
 }
@@ -214,7 +214,7 @@ static void BlockLayout_Load(LCUI_BlockLayoutContext ctx)
 
 	LCUI_Widget child;
 	LCUI_Widget w = ctx->widget;
-	LinkedListNode *node;
+	list_node_t *node;
 
 	if (ctx->rule == LCUI_LAYOUT_RULE_FIXED_WIDTH ||
 	    ctx->rule == LCUI_LAYOUT_RULE_FIXED) {
@@ -227,11 +227,11 @@ static void BlockLayout_Load(LCUI_BlockLayoutContext ctx)
 	}
 	DEBUG_MSG("%s, start\n", ctx->widget->id);
 	DEBUG_MSG("%s, max_row_width: %g\n", ctx->widget->id, max_row_width);
-	for (LinkedList_Each(node, &w->children)) {
+	for (list_each(node, &w->children)) {
 		child = node->data;
 
 		if (Widget_HasAbsolutePosition(child)) {
-			LinkedList_Append(&ctx->free_elements, child);
+			list_append(&ctx->free_elements, child);
 			continue;
 		}
 		/*
@@ -281,11 +281,11 @@ static void BlockLayout_Load(LCUI_BlockLayoutContext ctx)
 		if (child->box.outer.height > ctx->row->height) {
 			ctx->row->height = child->box.outer.height;
 		}
-		LinkedList_Append(&ctx->row->elements, child);
+		list_append(&ctx->row->elements, child);
 		ctx->prev_display = child->computed_style.display;
 		ctx->prev = child;
 	}
-	ctx->content_width = max(ctx->content_width, ctx->row->width);
+	ctx->content_width = y_max(ctx->content_width, ctx->row->width);
 	ctx->content_height += ctx->row->height;
 	DEBUG_MSG("content_size: %g, %g\n", ctx->content_width,
 		  ctx->content_height);
@@ -315,9 +315,9 @@ static void BlockLayout_ReflowRow(LCUI_BlockLayoutContext ctx, float row_y)
 	float x = ctx->widget->padding.left;
 
 	LCUI_Widget w;
-	LinkedListNode *node;
+	list_node_t *node;
 
-	for (LinkedList_Each(node, &ctx->row->elements)) {
+	for (list_each(node, &ctx->row->elements)) {
 		w = node->data;
 		UpdateBlockItemSize(w, LCUI_LAYOUT_RULE_FIXED);
 		BlockLayout_UpdateElementMargin(ctx, w);
@@ -329,8 +329,8 @@ static void BlockLayout_ReflowRow(LCUI_BlockLayoutContext ctx, float row_y)
 
 static void BlockLayout_ReflowFreeElements(LCUI_BlockLayoutContext ctx)
 {
-	LinkedListNode *node;
-	for (LinkedList_Each(node, &ctx->free_elements)) {
+	list_node_t *node;
+	for (list_each(node, &ctx->free_elements)) {
 		Widget_AutoReflow(node->data, LCUI_LAYOUT_RULE_FIXED);
 	}
 }
@@ -339,13 +339,13 @@ static void BlockLayout_Reflow(LCUI_BlockLayoutContext ctx)
 {
 	float y;
 	LCUI_Widget w = ctx->widget;
-	LinkedListNode *node;
+	list_node_t *node;
 
 	y = w->padding.top;
 	if (w->computed_style.display != SV_INLINE_BLOCK) {
 		ctx->content_width = w->box.content.width;
 	}
-	for (LinkedList_Each(node, &ctx->rows)) {
+	for (list_each(node, &ctx->rows)) {
 		ctx->row = node->data;
 		BlockLayout_ReflowRow(ctx, y);
 		y += ctx->row->height;
@@ -355,8 +355,8 @@ static void BlockLayout_Reflow(LCUI_BlockLayoutContext ctx)
 
 static void BlockLayout_End(LCUI_BlockLayoutContext ctx)
 {
-	LinkedList_Clear(&ctx->rows, BlockLayoutRow_Destroy);
-	LinkedList_Clear(&ctx->free_elements, NULL);
+	list_clear(&ctx->rows, BlockLayoutRow_Destroy);
+	list_clear(&ctx->free_elements, NULL);
 	free(ctx);
 }
 
@@ -371,18 +371,18 @@ static void BlockLayout_ApplySize(LCUI_BlockLayoutContext ctx)
 		width = w->box.content.width;
 		w->proto->autosize(w, &width, &height, ctx->rule);
 		width = w->box.content.width;
-		height = max(height, ctx->content_height);
+		height = y_max(height, ctx->content_height);
 		break;
 	case LCUI_LAYOUT_RULE_FIXED_HEIGHT:
 		height = w->box.content.height;
 		w->proto->autosize(w, &width, &height, ctx->rule);
-		width = max(width, ctx->content_width);
+		width = y_max(width, ctx->content_width);
 		height = w->box.content.height;
 		break;
 	case LCUI_LAYOUT_RULE_MAX_CONTENT:
 		w->proto->autosize(w, &width, &height, ctx->rule);
-		width = max(width, ctx->content_width);
-		height = max(height, ctx->content_height);
+		width = y_max(width, ctx->content_width);
+		height = y_max(height, ctx->content_height);
 		break;
 	default:
 		width = w->box.content.width;

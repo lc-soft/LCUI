@@ -157,10 +157,10 @@ void LCUICursor_GetRect(LCUI_Rect *rect)
 {
 	float scale;
 	scale = LCUIMetrics_GetScale();
-	rect->x = iround(cursor.pos.x / scale);
-	rect->y = iround(cursor.pos.y / scale);
-	rect->width = iround(cursor.graph.width / scale);
-	rect->height = iround(cursor.graph.height / scale);
+	rect->x = y_round(cursor.pos.x / scale);
+	rect->y = y_round(cursor.pos.y / scale);
+	rect->width = y_round(cursor.graph.width / scale);
+	rect->height = y_round(cursor.graph.height / scale);
 }
 
 void LCUICursor_Refresh(void)
