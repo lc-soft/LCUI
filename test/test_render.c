@@ -57,7 +57,7 @@ void InitModal(void)
 	Widget_SetStyleString(dialog, "margin", "100px auto");
 	Widget_SetStyleString(dialog, "border-radius", "6px");
 	Widget_SetStyleString(dialog, "opacity", "0.9");
-	Widget_SetBoxShadow(dialog, 0, 4, 8, pd_color(100, 0, 0, 0));
+	Widget_SetBoxShadow(dialog, 0, 4, 8, ARGB(100, 0, 0, 0));
 	Widget_SetStyleString(dialog, "background-color", "#fff");
 
 	Widget_SetStyle(dimmer, key_top, 0, px);

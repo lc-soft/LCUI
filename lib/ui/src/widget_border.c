@@ -164,7 +164,7 @@ void Widget_PaintBorder(LCUI_Widget w, LCUI_PaintContext paint,
 	box.y = style->border_box.y - style->canvas_box.y;
 	box.width = style->border_box.width;
 	box.height = style->border_box.height;
-	pd_border_paint(&style->border, &box, paint);
+	Border_Paint(&style->border, &box, paint);
 }
 
 void Widget_CropContent(LCUI_Widget w, LCUI_PaintContext paint,
@@ -176,5 +176,5 @@ void Widget_CropContent(LCUI_Widget w, LCUI_PaintContext paint,
 	box.y = style->border_box.y - style->canvas_box.y;
 	box.width = style->border_box.width;
 	box.height = style->border_box.height;
-	pd_graph_crop_content(&style->border, &box, paint);
+	Border_CropContent(&style->border, &box, paint);
 }

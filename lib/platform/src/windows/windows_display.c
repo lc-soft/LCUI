@@ -139,7 +139,7 @@ static void WinSurface_ExecDestroy(LCUI_Surface surface)
 	surface->hdc_fb = NULL;
 	surface->hdc_client = NULL;
 	surface->is_ready = FALSE;
-	pd_graph_free(&surface->fb);
+	Graph_Free(&surface->fb);
 	WinSurface_ClearTasks(surface);
 	free(surface);
 }
@@ -199,7 +199,7 @@ static LCUI_Surface WinSurface_New(void)
 	surface->fb_bmp = NULL;
 	surface->is_ready = FALSE;
 	surface->node.data = surface;
-	pd_graph_init(&surface->fb);
+	Graph_Init(&surface->fb);
 	surface->fb.color_type = LCUI_COLOR_TYPE_ARGB;
 	for (i = 0; i < TASK_TOTAL_NUM; ++i) {
 		surface->tasks[i].is_valid = FALSE;
@@ -239,7 +239,7 @@ static void WinSurface_ExecResizeFrameBuffer(LCUI_Surface surface, int w, int h)
 	if (surface->width == w && surface->height == h) {
 		return;
 	}
-	pd_graph_create(&surface->fb, w, h);
+	Graph_Create(&surface->fb, w, h);
 	surface->fb_bmp = CreateCompatibleBitmap(surface->hdc_client, w, h);
 	old_bmp = (HBITMAP)SelectObject(surface->hdc_fb, surface->fb_bmp);
 	if (old_bmp) {
@@ -349,8 +349,8 @@ static void WinSurface_SetRenderMode(LCUI_Surface surface, int mode)
 static LCUI_PaintContext WinSurface_BeginPaint(LCUI_Surface surface,
 					       LCUI_Rect *rect)
 {
-	LCUI_PaintContext paint = pd_painter_begin(&surface->fb, rect);
-	pd_graph_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
+	LCUI_PaintContext paint = LCUIPainter_Begin(&surface->fb, rect);
+	Graph_FillRect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
 	return paint;
 }
 
@@ -361,7 +361,7 @@ static LCUI_PaintContext WinSurface_BeginPaint(LCUI_Surface surface,
  */
 static void WinSurface_EndPaint(LCUI_Surface surface, LCUI_PaintContext paint)
 {
-	pd_painter_end(paint);
+	LCUIPainter_End(paint);
 }
 
 /** 将帧缓存中的数据呈现至Surface的窗口内 */

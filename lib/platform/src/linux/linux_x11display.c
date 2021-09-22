@@ -136,7 +136,7 @@ static void X11Surface_OnResize(LCUI_Surface s, int width, int height)
 		XFreeGC(x11.app->display, s->gc);
 		s->gc = NULL;
 	}
-	pd_graph_init(&s->fb);
+	Graph_Init(&s->fb);
 	s->width = width;
 	s->height = height;
 	depth = DefaultDepth(x11.app->display, x11.app->screen);
@@ -149,12 +149,12 @@ static void X11Surface_OnResize(LCUI_Surface s, int width, int height)
 		Logger_Error("[x11display] unsupport depth: %d.\n", depth);
 		break;
 	}
-	pd_graph_create(&s->fb, width, height);
+	Graph_Create(&s->fb, width, height);
 	visual = DefaultVisual(x11.app->display, x11.app->screen);
 	s->ximage = XCreateImage(x11.app->display, visual, depth, ZPixmap, 0,
 				 (char *)(s->fb.bytes), width, height, 32, 0);
 	if (!s->ximage) {
-		pd_graph_free(&s->fb);
+		Graph_Free(&s->fb);
 		Logger_Error("[x11display] create XImage faild.\n");
 		return;
 	}
@@ -273,7 +273,7 @@ static LCUI_Surface X11Surface_New(void)
 	surface->node.data = surface;
 	surface->width = MIN_WIDTH;
 	surface->height = MIN_HEIGHT;
-	pd_graph_init(&surface->fb);
+	Graph_Init(&surface->fb);
 	LCUIMutex_Init(&surface->mutex);
 	LinkedList_Init(&surface->rects);
 	surface->fb.color_type = LCUI_COLOR_TYPE_ARGB;
@@ -344,11 +344,11 @@ static LCUI_PaintContext X11Surface_BeginPaint(LCUI_Surface surface,
 	paint = malloc(sizeof(LCUI_PaintContextRec));
 	paint->rect = *rect;
 	paint->with_alpha = FALSE;
-	pd_graph_init(&paint->canvas);
+	Graph_Init(&paint->canvas);
 	LCUIMutex_Lock(&surface->mutex);
 	LCUIRect_ValidateArea(&paint->rect, surface->width, surface->height);
-	pd_graph_quote(&paint->canvas, &surface->fb, &paint->rect);
-	pd_graph_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
+	Graph_Quote(&paint->canvas, &surface->fb, &paint->rect);
+	Graph_FillRect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
 	return paint;
 }
 

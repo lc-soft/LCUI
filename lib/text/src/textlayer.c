@@ -1294,7 +1294,7 @@ static void TextLayer_DrawTextRow(LCUI_TextLayer layer, LCUI_Rect *area,
 			rect.y = ch_pos.y;
 			rect.height = txtrow->height;
 			rect.width = txtchar->bitmap->advance.x;
-			pd_graph_fill_rect(graph, txtchar->style->back_color, &rect,
+			Graph_FillRect(graph, txtchar->style->back_color, &rect,
 				       TRUE);
 		}
 		ch_pos.x += txtchar->bitmap->left;

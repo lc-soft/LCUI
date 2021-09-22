@@ -21,16 +21,16 @@ int main(void)
 	txt = LCUIWidget_New("textview");
 
 	/* 创建一块灰色的画板 */
-	pd_graph_init(&canvas);
-	pd_graph_create(&canvas, 320, 240);
-	pd_graph_fill_rect(&canvas, RGB(240, 240, 240), NULL, FALSE);
+	Graph_Init(&canvas);
+	Graph_Create(&canvas, 320, 240);
+	Graph_FillRect(&canvas, RGB(240, 240, 240), NULL, FALSE);
 
 	/* 初始化一个绘制实例，绘制区域为整个画板 */
 	paint.with_alpha = FALSE;
 	paint.rect.width = 320;
 	paint.rect.height = 320;
 	paint.rect.x = paint.rect.y = 0;
-	pd_graph_quote(&paint.canvas, &canvas, &area);
+	Graph_Quote(&paint.canvas, &canvas, &area);
 
 	/* 设定基本的样式和内容 */
 	Widget_SetPadding(box, 20, 20, 20, 20);
@@ -51,7 +51,7 @@ int main(void)
 	/* 渲染部件 */
 	Widget_Render(box, &paint);
 	ret = LCUI_WritePNGFile("test_widget_render.png", &canvas);
-	pd_graph_free(&canvas);
+	Graph_Free(&canvas);
 
 	LCUI_Destroy();
 	return ret;

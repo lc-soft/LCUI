@@ -134,22 +134,22 @@ static size_t LCUIDisplay_RenderFlashRect(SurfaceRecord record,
 		Surface_EndPaint(record->surface, paint);
 		return count;
 	}
-	pd_graph_init(&mask);
+	Graph_Init(&mask);
 	mask.color_type = LCUI_COLOR_TYPE_ARGB;
-	pd_graph_create(&mask, flash_rect->rect.width, flash_rect->rect.height);
-	pd_graph_fill_rect(&mask, pd_color(125, 124, 179, 5), NULL, TRUE);
+	Graph_Create(&mask, flash_rect->rect.width, flash_rect->rect.height);
+	Graph_FillRect(&mask, ARGB(125, 124, 179, 5), NULL, TRUE);
 	mask.opacity = 0.6f * (duraion - (float)period) / duraion;
 	pos.x = pos.y = 0;
 	color = RGB(124, 179, 5);
-	pd_graph_draw_horizontal(&mask, color, 1, pos, mask.width - 1);
-	pd_graph_draw_vertical(&mask, color, 1, pos, mask.height - 1);
+	Graph_DrawHorizLine(&mask, color, 1, pos, mask.width - 1);
+	Graph_DrawVertiLine(&mask, color, 1, pos, mask.height - 1);
 	pos.x = mask.width - 1;
-	pd_graph_draw_vertical(&mask, color, 1, pos, mask.height - 1);
+	Graph_DrawVertiLine(&mask, color, 1, pos, mask.height - 1);
 	pos.x = 0;
 	pos.y = mask.height - 1;
-	pd_graph_draw_horizontal(&mask, color, 1, pos, mask.width - 1);
-	pd_graph_mix(&paint->canvas, &mask, 0, 0, TRUE);
-	pd_graph_free(&mask);
+	Graph_DrawHorizLine(&mask, color, 1, pos, mask.width - 1);
+	Graph_Mix(&paint->canvas, &mask, 0, 0, TRUE);
+	Graph_Free(&mask);
 	Surface_EndPaint(record->surface, paint);
 	return count;
 }

@@ -131,9 +131,9 @@ void Renderer::CreateWindowSizeDependentResources()
 		0 };
 	m_frameSwapable = true;
 	m_frameSize = { (UINT32)outputSize.Width, (UINT32)outputSize.Height };
-	pd_graph_create(&display.frame, (int)m_frameSize.width,
+	Graph_Create(&display.frame, (int)m_frameSize.width,
 		(int)m_frameSize.height);
-	pd_graph_fill_rect(&display.frame, RGB(255, 255, 255), NULL, TRUE);
+	Graph_FillRect(&display.frame, RGB(255, 255, 255), NULL, TRUE);
 	context->CreateBitmap(m_frameSize, nullptr, 0, &props, &m_bmp);
 	context->CreateBitmap(m_frameSize, nullptr, 0, &props, &m_backBmp);
 	UpdateSurfaceSize();
@@ -237,12 +237,12 @@ static LCUI_PaintContext UWPSurface_BeginPaint(LCUI_Surface surface,
 	ASSIGN(paint, LCUI_PaintContext);
 	paint->rect = *rect;
 	paint->with_alpha = FALSE;
-	pd_graph_init(&paint->canvas);
+	Graph_Init(&paint->canvas);
 	LCUIRect_MergeRect(&display.rect, &display.rect, rect);
 	LCUIRect_ValidateArea(&paint->rect, UWPDisplay_GetWidth(),
 			      UWPDisplay_GetHeight());
-	pd_graph_quote(&paint->canvas, &display.frame, &paint->rect);
-	pd_graph_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
+	Graph_Quote(&paint->canvas, &display.frame, &paint->rect);
+	Graph_FillRect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
 	return paint;
 }
 
@@ -273,7 +273,7 @@ LCUI_DisplayDriver LCUI_CreateUWPDisplay(void)
 	driver->beginPaint = UWPSurface_BeginPaint;
 	driver->endPaint = UWPSurface_EndPaint;
 	driver->bindEvent = UWPDisplay_BindEvent;
-	pd_graph_init(&display.frame);
+	Graph_Init(&display.frame);
 	display.frame.color_type = LCUI_COLOR_TYPE_ARGB;
 	display.surface = NULL;
 	display.trigger = EventTrigger();

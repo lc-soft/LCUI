@@ -186,7 +186,7 @@ int LCUI_ReadPNG(LCUI_ImageReader reader, LCUI_Graph *graph)
 	switch (header->color_type) {
 	case LCUI_COLOR_TYPE_ARGB:
 		graph->color_type = LCUI_COLOR_TYPE_ARGB;
-		ret = pd_graph_create(graph, header->width, header->height);
+		ret = Graph_Create(graph, header->width, header->height);
 		if (ret != 0) {
 			ret = -ENOMEM;
 			break;
@@ -194,7 +194,7 @@ int LCUI_ReadPNG(LCUI_ImageReader reader, LCUI_Graph *graph)
 		break;
 	case LCUI_COLOR_TYPE_RGB:
 		graph->color_type = LCUI_COLOR_TYPE_RGB;
-		ret = pd_graph_create(graph, header->width, header->height);
+		ret = Graph_Create(graph, header->width, header->height);
 		if (ret != 0) {
 			ret = -ENOMEM;
 			break;
@@ -237,7 +237,7 @@ int LCUI_WritePNGFile(const char *file_name, const LCUI_Graph *graph)
 	size_t x, row_size;
 	int y;
 
-	if (!pd_graph_is_valid(graph)) {
+	if (!Graph_IsValid(graph)) {
 		Logger_Error("graph is not valid\n");
 		return -1;
 	}
@@ -270,7 +270,7 @@ int LCUI_WritePNGFile(const char *file_name, const LCUI_Graph *graph)
 		return -1;
 	}
 	png_init_io(png_ptr, fp);
-	if (pd_graph_has_alpha(graph)) {
+	if (Graph_HasAlpha(graph)) {
 		color_type = PNG_COLOR_TYPE_RGB_ALPHA;
 	} else {
 		color_type = PNG_COLOR_TYPE_RGB;
@@ -283,8 +283,8 @@ int LCUI_WritePNGFile(const char *file_name, const LCUI_Graph *graph)
 	png_write_info(png_ptr, info_ptr);
 	/* write bytes */
 
-	pd_graph_get_valid_rect(graph, &rect);
-	graph = pd_graph_get_quote(graph);
+	Graph_GetValidRect(graph, &rect);
+	graph = Graph_GetQuote(graph);
 	if (graph->color_type == LCUI_COLOR_TYPE_ARGB) {
 		LCUI_ARGB *px_ptr, *px_row_ptr;
 

@@ -167,6 +167,6 @@ void Widget_PaintBoxShadow(LCUI_Widget w, LCUI_PaintContext paint,
 	box.x = box.y = 0;
 	box.width = style->canvas_box.width;
 	box.height = style->canvas_box.height;
-	pd_boxshadow_paint(&style->shadow, &box, style->border_box.width,
+	BoxShadow_Paint(&style->shadow, &box, style->border_box.width,
 			style->border_box.height, paint);
 }

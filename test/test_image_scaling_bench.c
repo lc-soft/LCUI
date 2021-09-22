@@ -20,31 +20,31 @@ int main(int argc, char **argv)
 	LCUI_Graph g_src, g_dst;
 	LCUI_Color t_color;
 
-	pd_graph_init(&g_src);
+	Graph_Init(&g_src);
 	g_src.color_type = LCUI_COLOR_TYPE_ARGB;
-	if (pd_graph_create(&g_src, 960, 540) < 0) {
+	if (Graph_Create(&g_src, 960, 540) < 0) {
 		return -2;
 	}
 	t_color.value = 0xffaa5500;
-	pd_graph_fill_rect(&g_src, t_color, NULL, false);
-	Logger_Info("%-20s%-20s%s\n", "image size\\method", "pd_graph_zoom()",
-		    "pd_graph_zoom_bilinear()");
+	Graph_FillRect(&g_src, t_color, NULL, false);
+	Logger_Info("%-20s%-20s%s\n", "image size\\method", "Graph_Zoom()",
+		    "Graph_ZoomBilinear()");
 	for (i = 0; i < sizeof(resx) / sizeof(int); i++) {
 		resy = resx[i] * 9 / 16;
 		t0 = LCUI_GetTime();
-		pd_graph_init(&g_dst);
-		pd_graph_zoom(&g_src, &g_dst, false, resx[i], resy);
-		pd_graph_free(&g_dst);
+		Graph_Init(&g_dst);
+		Graph_Zoom(&g_src, &g_dst, false, resx[i], resy);
+		Graph_Free(&g_dst);
 		t1 = LCUI_GetTime();
-		pd_graph_init(&g_dst);
-		pd_graph_zoom_bilinear(&g_src, &g_dst, false, resx[i], resy);
-		pd_graph_free(&g_dst);
+		Graph_Init(&g_dst);
+		Graph_ZoomBilinear(&g_src, &g_dst, false, resx[i], resy);
+		Graph_Free(&g_dst);
 		t2 = LCUI_GetTime();
 		sprintf(s_res, "%dx%d", resx[i], resy);
 		sprintf(s_t0, "%ldms", t1 - t0);
 		sprintf(s_t1, "%ldms", t2 - t1);
 		Logger_Info("%-20s%-20s%-20s\n", s_res, s_t0, s_t1);
 	}
-	pd_graph_free(&g_src);
+	Graph_Free(&g_src);
 	return 0;
 }

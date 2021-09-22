@@ -112,18 +112,18 @@ static uchar_t cursor_img_rgba[4][12 * 19] = {
 
 static int LCUICursor_LoadDefualtGraph(LCUI_Graph *buff)
 {
-	if (pd_graph_is_valid(buff)) {
-		pd_graph_free(buff);
+	if (Graph_IsValid(buff)) {
+		Graph_Free(buff);
 	}
-	pd_graph_init(buff);
+	Graph_Init(buff);
 	buff->color_type = LCUI_COLOR_TYPE_ARGB;
-	if (pd_graph_create(buff, 12, 19) != 0) {
+	if (Graph_Create(buff, 12, 19) != 0) {
 		return -1;
 	}
-	pd_graph_set_red_bits(buff, cursor_img_rgba[0], 12 * 19);
-	pd_graph_set_green_bits(buff, cursor_img_rgba[1], 12 * 19);
-	pd_graph_set_blue_bits(buff, cursor_img_rgba[2], 12 * 19);
-	pd_graph_set_alpha_bits(buff, cursor_img_rgba[3], 12 * 19);
+	Graph_SetRedBits(buff, cursor_img_rgba[0], 12 * 19);
+	Graph_SetGreenBits(buff, cursor_img_rgba[1], 12 * 19);
+	Graph_SetBlueBits(buff, cursor_img_rgba[2], 12 * 19);
+	Graph_SetAlphaBits(buff, cursor_img_rgba[3], 12 * 19);
 	return 0;
 }
 
@@ -136,8 +136,8 @@ static void OnMouseMoveEvent(LCUI_SysEvent e, void *arg)
 void LCUI_InitCursor(void)
 {
 	LCUI_Graph pic;
-	pd_graph_init(&pic);
-	pd_graph_init(&cursor.graph);
+	Graph_Init(&pic);
+	Graph_Init(&cursor.graph);
 	/* 载入自带的游标的图形数据 */
 	LCUICursor_LoadDefualtGraph(&pic);
 	cursor.new_pos.x = LCUIDisplay_GetWidth() / 2;
@@ -145,12 +145,12 @@ void LCUI_InitCursor(void)
 	LCUI_BindEvent(LCUI_MOUSEMOVE, OnMouseMoveEvent, NULL, NULL);
 	LCUICursor_SetGraph(&pic);
 	LCUICursor_Show();
-	pd_graph_free(&pic);
+	Graph_Free(&pic);
 }
 
 void LCUI_FreeCursor(void)
 {
-	pd_graph_free(&cursor.graph);
+	Graph_Free(&cursor.graph);
 }
 
 void LCUICursor_GetRect(LCUI_Rect *rect)
@@ -210,12 +210,12 @@ void LCUICursor_SetPos(LCUI_Pos pos)
 /** 设置游标的图形 */
 int LCUICursor_SetGraph(LCUI_Graph *graph)
 {
-	if (pd_graph_is_valid(graph)) {
+	if (Graph_IsValid(graph)) {
 		LCUICursor_Refresh();
-		if (pd_graph_is_valid(&cursor.graph)) {
-			pd_graph_free(&cursor.graph);
+		if (Graph_IsValid(&cursor.graph)) {
+			Graph_Free(&cursor.graph);
 		}
-		pd_graph_copy(&cursor.graph, graph);
+		Graph_Copy(&cursor.graph, graph);
 		LCUICursor_Refresh();
 		return 0;
 	}
@@ -236,5 +236,5 @@ int LCUICursor_Paint(LCUI_PaintContext paint)
 	}
 	x = cursor.pos.x - paint->rect.x;
 	y = cursor.pos.y - paint->rect.y;
-	return pd_graph_mix(&paint->canvas, &cursor.graph, x, y, FALSE);
+	return Graph_Mix(&paint->canvas, &cursor.graph, x, y, FALSE);
 }

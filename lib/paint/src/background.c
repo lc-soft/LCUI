@@ -32,7 +32,7 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
 
-void pd_background_paint(const LCUI_Background *bg,
+void Background_Paint(const LCUI_Background *bg,
 		      const LCUI_Rect *box,
 		      LCUI_PaintContext paint)
 {
@@ -46,9 +46,9 @@ void pd_background_paint(const LCUI_Background *bg,
 	}
 	rect.x -= paint->rect.x;
 	rect.y -= paint->rect.y;
-	pd_graph_init(&buffer);
-	pd_graph_quote(&graph, &paint->canvas, &rect);
-	pd_graph_fill_rect(&graph, bg->color, NULL, TRUE);
+	Graph_Init(&buffer);
+	Graph_Quote(&graph, &paint->canvas, &rect);
+	Graph_FillRect(&graph, bg->color, NULL, TRUE);
 	/* 将坐标转换为相对于背景内容框 */
 	rect.x += paint->rect.x - box->x;
 	rect.y += paint->rect.y - box->y;
@@ -67,7 +67,7 @@ void pd_background_paint(const LCUI_Background *bg,
 	/* 如果尺寸没有变化则直接引用 */
 	if (bg->size.width == bg->image->width &&
 	    bg->size.height == bg->image->height) {
-		pd_graph_quote_read_only(&graph, bg->image, &read_rect);
+		Graph_QuoteReadOnly(&graph, bg->image, &read_rect);
 	} else {
 		rect = read_rect;
 		/* 根据宽高的缩放比例，计算实际需要引用的区域 */
@@ -82,16 +82,16 @@ void pd_background_paint(const LCUI_Background *bg,
 			rect.height = iround(rect.height * scale);
 		}
 		/* 引用源背景图像的一块区域 */
-		pd_graph_quote_read_only(&graph, bg->image, &rect);
+		Graph_QuoteReadOnly(&graph, bg->image, &rect);
 		width = read_rect.width;
 		height = read_rect.height;
 		/* 按比例进行缩放 */
-		pd_graph_zoom(&graph, &buffer, FALSE, width, height);
-		pd_graph_quote_read_only(&graph, &buffer, NULL);
+		Graph_Zoom(&graph, &buffer, FALSE, width, height);
+		Graph_QuoteReadOnly(&graph, &buffer, NULL);
 	}
 	/* 计算相对于绘制区域的坐标 */
 	x += read_rect.x + box->x - paint->rect.x;
 	y += read_rect.y + box->y - paint->rect.y;
-	pd_graph_mix(&paint->canvas, &graph, x, y, bg->color.alpha < 255);
-	pd_graph_free(&buffer);
+	Graph_Mix(&paint->canvas, &graph, x, y, bg->color.alpha < 255);
+	Graph_Free(&buffer);
 }

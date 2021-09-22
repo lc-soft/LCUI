@@ -12,18 +12,18 @@ int test_paint_background_color(void)
         LCUI_Background bg = { 0 };
         LCUI_PaintContext paint;
 
-        pd_graph_init(&canvas);
-        pd_graph_create(&canvas, 800, 600);
-        pd_graph_fill_rect(&canvas, gray, NULL, FALSE);
+        Graph_Init(&canvas);
+        Graph_Create(&canvas, 800, 600);
+        Graph_FillRect(&canvas, gray, NULL, FALSE);
         // 设置背景色
         bg.color = green;
         // 创建绘制上下文
-        paint = pd_painter_begin(&canvas, &rect);
+        paint = LCUIPainter_Begin(&canvas, &rect);
         // 绘制背景
-        pd_background_paint(&bg, &rect, paint);
+        Background_Paint(&bg, &rect, paint);
         LCUI_WritePNGFile("test_paint_background_color.png", &canvas);
-        pd_painter_end(paint);
-        pd_graph_free(&canvas);
+        LCUIPainter_End(paint);
+        Graph_Free(&canvas);
         return 0;
 }
 
@@ -37,10 +37,10 @@ int test_paint_background_image(void)
         LCUI_Background bg = { 0 };
         LCUI_PaintContext paint;
 
-        pd_graph_init(&canvas);
-        pd_graph_init(&image);
-        pd_graph_create(&canvas, 800, 600);
-        pd_graph_fill_rect(&canvas, gray, NULL, FALSE);
+        Graph_Init(&canvas);
+        Graph_Init(&image);
+        Graph_Create(&canvas, 800, 600);
+        Graph_FillRect(&canvas, gray, NULL, FALSE);
         // 读取背景图片
         if (LCUI_ReadImageFile("test_image_reader.png", &image) != 0) {
                 return -1;
@@ -52,13 +52,13 @@ int test_paint_background_image(void)
         bg.size.width = image.width;
         bg.size.height = image.height;
         // 创建绘制上下文
-        paint = pd_painter_begin(&canvas, &rect);
+        paint = LCUIPainter_Begin(&canvas, &rect);
         // 绘制背景
-        pd_background_paint(&bg, &rect, paint);
+        Background_Paint(&bg, &rect, paint);
         LCUI_WritePNGFile("test_paint_background_image.png", &canvas);
-        pd_painter_end(paint);
-        pd_graph_free(&image);
-        pd_graph_free(&canvas);
+        LCUIPainter_End(paint);
+        Graph_Free(&image);
+        Graph_Free(&canvas);
         return 0;
 }
 
@@ -72,10 +72,10 @@ int test_paint_background_image_with_size(void)
         LCUI_Background bg = { 0 };
         LCUI_PaintContext paint;
 
-        pd_graph_init(&canvas);
-        pd_graph_init(&image);
-        pd_graph_create(&canvas, 800, 600);
-        pd_graph_fill_rect(&canvas, gray, NULL, FALSE);
+        Graph_Init(&canvas);
+        Graph_Init(&image);
+        Graph_Create(&canvas, 800, 600);
+        Graph_FillRect(&canvas, gray, NULL, FALSE);
         // 读取背景图片
         if (LCUI_ReadImageFile("test_image_reader.png", &image) != 0) {
                 return -1;
@@ -88,13 +88,13 @@ int test_paint_background_image_with_size(void)
         bg.size.width = rect.width;
         bg.size.height = rect.height;
         // 创建绘制上下文
-        paint = pd_painter_begin(&canvas, &rect);
+        paint = LCUIPainter_Begin(&canvas, &rect);
         // 绘制背景
-        pd_background_paint(&bg, &rect, paint);
+        Background_Paint(&bg, &rect, paint);
         LCUI_WritePNGFile("test_paint_background_image_with_size.png", &canvas);
-        pd_painter_end(paint);
-        pd_graph_free(&image);
-        pd_graph_free(&canvas);
+        LCUIPainter_End(paint);
+        Graph_Free(&image);
+        Graph_Free(&canvas);
         return 0;
 }
 
@@ -108,10 +108,10 @@ int test_paint_background_image_with_position(void)
         LCUI_Background bg = { 0 };
         LCUI_PaintContext paint;
 
-        pd_graph_init(&canvas);
-        pd_graph_init(&image);
-        pd_graph_create(&canvas, 800, 600);
-        pd_graph_fill_rect(&canvas, gray, NULL, FALSE);
+        Graph_Init(&canvas);
+        Graph_Init(&image);
+        Graph_Create(&canvas, 800, 600);
+        Graph_FillRect(&canvas, gray, NULL, FALSE);
         // 读取背景图片
         if (LCUI_ReadImageFile("test_image_reader.png", &image) != 0) {
                 return -1;
@@ -126,14 +126,14 @@ int test_paint_background_image_with_position(void)
         bg.position.x = (rect.width - image.width) / 2;
         bg.position.y = (rect.height - image.height) / 2;
         // 创建绘制上下文
-        paint = pd_painter_begin(&canvas, &rect);
+        paint = LCUIPainter_Begin(&canvas, &rect);
         // 绘制背景
-        pd_background_paint(&bg, &rect, paint);
+        Background_Paint(&bg, &rect, paint);
         LCUI_WritePNGFile("test_paint_background_image_with_position.png",
                           &canvas);
-        pd_painter_end(paint);
-        pd_graph_free(&image);
-        pd_graph_free(&canvas);
+        LCUIPainter_End(paint);
+        Graph_Free(&image);
+        Graph_Free(&canvas);
         return 0;
 }
 

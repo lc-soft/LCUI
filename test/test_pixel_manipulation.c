@@ -8,10 +8,10 @@
 								 \
 	for (y = rect.y; y < rect.y + rect.height; ++y) {        \
 		for (x = rect.x; x < rect.x + rect.width; ++x) { \
-			pd_graph_get_pixel(graph, x, y, pixel);
+			Graph_GetPixel(graph, x, y, pixel);
 
 #define PixelManipulationEnd                \
-	pd_graph_set_pixel(graph, x, y, pixel); \
+	Graph_SetPixel(graph, x, y, pixel); \
 	}                                   \
 	}
 

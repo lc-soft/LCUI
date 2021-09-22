@@ -42,8 +42,8 @@
 /*  Convert screen X coordinate to geometric X coordinate */
 #define ToGeoX(X, CENTER_X) (X - (CENTER_X))
 
-#define smooth_left_pixel(PX, X) (uchar_t)((PX)->a * (1.0 - (X - 1.0 * (int)X)))
-#define smooth_right_pixel(PX, X) (uchar_t)((PX)->a * (X - 1.0 * (int)X))
+#define SmoothLeftPixel(PX, X) (uchar_t)((PX)->a * (1.0 - (X - 1.0 * (int)X)))
+#define SmoothRightPixel(PX, X) (uchar_t)((PX)->a * (X - 1.0 * (int)X))
 
 #define BorderRenderContext()                             \
 	int x, y;                                         \
@@ -83,7 +83,7 @@ static double ellipse_x(double radius_x, double radius_y, double y)
  */
 
 /** Draw border top left corner */
-static int pd_draw_border_top_left(LCUI_Graph *dst, int bound_left, int bound_top,
+static int DrawBorderTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 			     const LCUI_BorderLine *xline,
 			     const LCUI_BorderLine *yline, unsigned int radius)
 {
@@ -97,9 +97,9 @@ static int pd_draw_border_top_left(LCUI_Graph *dst, int bound_left, int bound_to
 	int inner_ellipse_top = (int)split_center_y;
 
 	/* Get the actual rectangle that can be drawn */
-	pd_graph_get_valid_rect(dst, &rect);
-	dst = pd_graph_get_quote(dst);
-	if (!pd_graph_is_valid(dst)) {
+	Graph_GetValidRect(dst, &rect);
+	dst = Graph_GetQuote(dst);
+	if (!Graph_IsValid(dst)) {
 		return -1;
 	}
 	right = min(rect.width, bound_left + width);
@@ -126,7 +126,7 @@ static int pd_draw_border_top_left(LCUI_Graph *dst, int bound_left, int bound_to
 		inner_x = max(0, min(right, inner_x));
 		outer_xi = max(0, (int)outer_x - (int)radius / 2);
 		inner_xi = min(right, (int)inner_x + (int)radius / 2);
-		p = pd_graph_get_pixel_pointer(dst, rect.x, rect.y + y);
+		p = Graph_GetPixelPointer(dst, rect.x, rect.y + y);
 		/* Clear the outer pixels */
 		for (x = 0; x < outer_xi; ++x, ++p) {
 			p->alpha = 0;
@@ -162,12 +162,12 @@ static int pd_draw_border_top_left(LCUI_Graph *dst, int bound_left, int bound_to
 				if (inner_d - outer_d >= 0.5) {
 					*p = color;
 				}
-				p->a = smooth_left_pixel(p, outer_d);
+				p->a = SmoothLeftPixel(p, outer_d);
 			} else if (inner_d >= 1.0) {
-				pd_over_pixel(p, &color);
+				LCUI_OverPixel(p, &color);
 			} else if (inner_d >= 0) {
-				color.a = smooth_right_pixel(&color, inner_d);
-				pd_over_pixel(p, &color);
+				color.a = SmoothRightPixel(&color, inner_d);
+				LCUI_OverPixel(p, &color);
 			} else {
 				break;
 			}
@@ -176,7 +176,7 @@ static int pd_draw_border_top_left(LCUI_Graph *dst, int bound_left, int bound_to
 	return 0;
 }
 
-static int pd_draw_border_top_right(LCUI_Graph *dst, int bound_left, int bound_top,
+static int DrawBorderTopRight(LCUI_Graph *dst, int bound_left, int bound_top,
 			      const LCUI_BorderLine *xline,
 			      const LCUI_BorderLine *yline, unsigned int radius)
 {
@@ -190,9 +190,9 @@ static int pd_draw_border_top_right(LCUI_Graph *dst, int bound_left, int bound_t
 	double inner_ellipse_top = split_center_y;
 
 	/* Get the actual rectangle that can be drawn */
-	pd_graph_get_valid_rect(dst, &rect);
-	dst = pd_graph_get_quote(dst);
-	if (!pd_graph_is_valid(dst)) {
+	Graph_GetValidRect(dst, &rect);
+	dst = Graph_GetQuote(dst);
+	if (!Graph_IsValid(dst)) {
 		return -1;
 	}
 	right = min(rect.width, bound_left + width);
@@ -220,7 +220,7 @@ static int pd_draw_border_top_right(LCUI_Graph *dst, int bound_left, int bound_t
 		inner_x = max(-1.0, min(outer_x, inner_x));
 		inner_xi = max(0, (int)inner_x - (int)radius / 2);
 		outer_xi = min(right, (int)outer_x + (int)radius / 2);
-		p = pd_graph_get_pixel_pointer(dst, rect.x + inner_xi, rect.y + y);
+		p = Graph_GetPixelPointer(dst, rect.x + inner_xi, rect.y + y);
 		for (x = inner_xi; x < outer_xi; ++x, ++p) {
 			outer_d = -1.0;
 			inner_d = x - inner_x;
@@ -245,12 +245,12 @@ static int pd_draw_border_top_right(LCUI_Graph *dst, int bound_left, int bound_t
 				if (inner_d - outer_d >= 0.5) {
 					*p = color;
 				}
-				p->a = smooth_left_pixel(p, outer_d);
+				p->a = SmoothLeftPixel(p, outer_d);
 			} else if (inner_d >= 0.5) {
-				pd_over_pixel(p, &color);
+				LCUI_OverPixel(p, &color);
 			} else if (inner_d >= 0) {
-				color.a = smooth_right_pixel(&color, inner_d);
-				pd_over_pixel(p, &color);
+				color.a = SmoothRightPixel(&color, inner_d);
+				LCUI_OverPixel(p, &color);
 			}
 		}
 		/* Clear the outer pixels */
@@ -261,7 +261,7 @@ static int pd_draw_border_top_right(LCUI_Graph *dst, int bound_left, int bound_t
 	return 0;
 }
 
-static int pd_draw_border_bottom_left(LCUI_Graph *dst, int bound_left, int bound_top,
+static int DrawBorderBottomLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 				const LCUI_BorderLine *xline,
 				const LCUI_BorderLine *yline,
 				unsigned int radius)
@@ -277,9 +277,9 @@ static int pd_draw_border_bottom_left(LCUI_Graph *dst, int bound_left, int bound
 	double inner_ellipse_bottom = circle_center_y + radius_y;
 
 	/* Get the actual rectangle that can be drawn */
-	pd_graph_get_valid_rect(dst, &rect);
-	dst = pd_graph_get_quote(dst);
-	if (!pd_graph_is_valid(dst)) {
+	Graph_GetValidRect(dst, &rect);
+	dst = Graph_GetQuote(dst);
+	if (!Graph_IsValid(dst)) {
 		return -1;
 	}
 	right = min(rect.width, bound_left + width);
@@ -306,7 +306,7 @@ static int pd_draw_border_bottom_left(LCUI_Graph *dst, int bound_left, int bound
 		inner_x = max(0, min(right, inner_x));
 		outer_xi = max(0, (int)outer_x - (int)radius / 2);
 		inner_xi = min(right, (int)inner_x + (int)radius / 2);
-		p = pd_graph_get_pixel_pointer(dst, rect.x, rect.y + y);
+		p = Graph_GetPixelPointer(dst, rect.x, rect.y + y);
 		for (x = 0; x < outer_xi; ++x, ++p) {
 			p->alpha = 0;
 		}
@@ -335,12 +335,12 @@ static int pd_draw_border_bottom_left(LCUI_Graph *dst, int bound_left, int bound
 				if (inner_d - outer_d >= 0.5) {
 					*p = color;
 				}
-				p->a = smooth_left_pixel(p, outer_d);
+				p->a = SmoothLeftPixel(p, outer_d);
 			} else if (inner_d >= 1.0) {
-				pd_over_pixel(p, &color);
+				LCUI_OverPixel(p, &color);
 			} else if (inner_d >= 0) {
-				color.a = smooth_right_pixel(&color, inner_d);
-				pd_over_pixel(p, &color);
+				color.a = SmoothRightPixel(&color, inner_d);
+				LCUI_OverPixel(p, &color);
 			} else {
 				break;
 			}
@@ -349,7 +349,7 @@ static int pd_draw_border_bottom_left(LCUI_Graph *dst, int bound_left, int bound
 	return 0;
 }
 
-static int pd_draw_border_bottom_right(LCUI_Graph *dst, int bound_left, int bound_top,
+static int DrawBorderBottomRight(LCUI_Graph *dst, int bound_left, int bound_top,
 				 const LCUI_BorderLine *xline,
 				 const LCUI_BorderLine *yline,
 				 unsigned int radius)
@@ -365,9 +365,9 @@ static int pd_draw_border_bottom_right(LCUI_Graph *dst, int bound_left, int boun
 	double inner_ellipse_bottom = circle_center_y + radius_y;
 
 	/* Get the actual rectangle that can be drawn */
-	pd_graph_get_valid_rect(dst, &rect);
-	dst = pd_graph_get_quote(dst);
-	if (!pd_graph_is_valid(dst)) {
+	Graph_GetValidRect(dst, &rect);
+	dst = Graph_GetQuote(dst);
+	if (!Graph_IsValid(dst)) {
 		return -1;
 	}
 	right = min(rect.width, bound_left + width);
@@ -395,7 +395,7 @@ static int pd_draw_border_bottom_right(LCUI_Graph *dst, int bound_left, int boun
 		inner_x = max(-1.0, min(outer_x, inner_x));
 		inner_xi = max(0, (int)inner_x - (int)radius / 2);
 		outer_xi = min(right, (int)outer_x + (int)radius / 2);
-		p = pd_graph_get_pixel_pointer(dst, rect.x + inner_xi, rect.y + y);
+		p = Graph_GetPixelPointer(dst, rect.x + inner_xi, rect.y + y);
 		for (x = inner_xi; x < outer_xi; ++x, ++p) {
 			outer_d = -1.0;
 			inner_d = 1.0 * x - inner_x;
@@ -420,12 +420,12 @@ static int pd_draw_border_bottom_right(LCUI_Graph *dst, int bound_left, int boun
 				if (inner_d - outer_d >= 0.5) {
 					*p = color;
 				}
-				p->a = smooth_left_pixel(p, outer_d);
+				p->a = SmoothLeftPixel(p, outer_d);
 			} else if (inner_d >= 0.5) {
-				pd_over_pixel(p, &color);
+				LCUI_OverPixel(p, &color);
 			} else if (inner_d >= 0) {
-				color.a = smooth_right_pixel(&color, inner_d);
-				pd_over_pixel(p, &color);
+				color.a = SmoothRightPixel(&color, inner_d);
+				LCUI_OverPixel(p, &color);
 			}
 		}
 		/* Clear the outer pixels */
@@ -443,7 +443,7 @@ static int pd_draw_border_bottom_right(LCUI_Graph *dst, int bound_left, int boun
  */
 
 /** Crop the top left corner of the content area */
-static int pd_crop_border_top_left(LCUI_Graph *dst, int bound_left, int bound_top,
+static int CropContentTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 			      double radius_x, double radius_y)
 {
 	int xi, yi;
@@ -459,9 +459,9 @@ static int pd_crop_border_top_left(LCUI_Graph *dst, int bound_left, int bound_to
 	radius_y -= 0.5;
 	center_x = bound_left + radius_x;
 	center_y = bound_top + radius_y;
-	pd_graph_get_valid_rect(dst, &rect);
-	dst = pd_graph_get_quote(dst);
-	if (!pd_graph_is_valid(dst)) {
+	Graph_GetValidRect(dst, &rect);
+	dst = Graph_GetQuote(dst);
+	if (!Graph_IsValid(dst)) {
 		return -1;
 	}
 	for (yi = 0; yi < rect.height; ++yi) {
@@ -469,7 +469,7 @@ static int pd_crop_border_top_left(LCUI_Graph *dst, int bound_left, int bound_to
 		x = ellipse_x(radius_x + 1.0, radius_y + 1.0, y);
 		outer_xi = (int)(center_x - x);
 		outer_xi = max(0, min(outer_xi, rect.width));
-		p = pd_graph_get_pixel_pointer(dst, rect.x, rect.y + yi);
+		p = Graph_GetPixelPointer(dst, rect.x, rect.y + yi);
 		for (xi = 0; xi < outer_xi; ++xi, ++p) {
 			p->alpha = 0;
 		}
@@ -481,7 +481,7 @@ static int pd_crop_border_top_left(LCUI_Graph *dst, int bound_left, int bound_to
 				if (d >= 1.0) {
 					p->alpha = 0;
 				} else if (d >= 0) {
-					p->alpha = smooth_left_pixel(p, d);
+					p->alpha = SmoothLeftPixel(p, d);
 				} else {
 					break;
 				}
@@ -495,7 +495,7 @@ static int pd_crop_border_top_left(LCUI_Graph *dst, int bound_left, int bound_to
 				if (d >= 1.0) {
 					p->alpha = 0;
 				} else if (d >= 0) {
-					p->alpha = smooth_left_pixel(p, d);
+					p->alpha = SmoothLeftPixel(p, d);
 				} else {
 					break;
 				}
@@ -505,7 +505,7 @@ static int pd_crop_border_top_left(LCUI_Graph *dst, int bound_left, int bound_to
 	return 0;
 }
 
-static int pd_crop_border_top_right(LCUI_Graph *dst, int bound_left, int bound_top,
+static int CropContentTopRight(LCUI_Graph *dst, int bound_left, int bound_top,
 			       double radius_x, double radius_y)
 {
 	int xi, yi;
@@ -521,9 +521,9 @@ static int pd_crop_border_top_right(LCUI_Graph *dst, int bound_left, int bound_t
 	radius_y -= 0.5;
 	center_x = bound_left;
 	center_y = bound_top + radius_y;
-	pd_graph_get_valid_rect(dst, &rect);
-	dst = pd_graph_get_quote(dst);
-	if (!pd_graph_is_valid(dst)) {
+	Graph_GetValidRect(dst, &rect);
+	dst = Graph_GetQuote(dst);
+	if (!Graph_IsValid(dst)) {
 		return -1;
 	}
 	for (yi = 0; yi < rect.height; ++yi) {
@@ -531,7 +531,7 @@ static int pd_crop_border_top_right(LCUI_Graph *dst, int bound_left, int bound_t
 		x = ellipse_x(max(0, radius_x - 1), max(0, radius_y - 1), y);
 		outer_xi = (int)(center_x + x);
 		outer_xi = max(0, outer_xi);
-		p = pd_graph_get_pixel_pointer(dst, rect.x + outer_xi, rect.y + yi);
+		p = Graph_GetPixelPointer(dst, rect.x + outer_xi, rect.y + yi);
 		if (radius_x == radius_y) {
 			for (xi = outer_xi; xi < rect.width; ++xi, ++p) {
 				x = ToGeoX(xi, center_x);
@@ -540,7 +540,7 @@ static int pd_crop_border_top_right(LCUI_Graph *dst, int bound_left, int bound_t
 					break;
 				}
 				if (d >= 0) {
-					p->alpha = smooth_left_pixel(p, d);
+					p->alpha = SmoothLeftPixel(p, d);
 				}
 			}
 		} else {
@@ -553,7 +553,7 @@ static int pd_crop_border_top_right(LCUI_Graph *dst, int bound_left, int bound_t
 					break;
 				}
 				if (d >= 0) {
-					p->alpha = smooth_left_pixel(p, d);
+					p->alpha = SmoothLeftPixel(p, d);
 				}
 			}
 		}
@@ -564,7 +564,7 @@ static int pd_crop_border_top_right(LCUI_Graph *dst, int bound_left, int bound_t
 	return 0;
 }
 
-static int pd_crop_border_bottom_left(LCUI_Graph *dst, int bound_left, int bound_top,
+static int CropContentBottomLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 				 double radius_x, double radius_y)
 {
 	int xi, yi;
@@ -580,9 +580,9 @@ static int pd_crop_border_bottom_left(LCUI_Graph *dst, int bound_left, int bound
 	radius_y -= 0.5;
 	center_x = bound_left + radius_x;
 	center_y = bound_top;
-	pd_graph_get_valid_rect(dst, &rect);
-	dst = pd_graph_get_quote(dst);
-	if (!pd_graph_is_valid(dst)) {
+	Graph_GetValidRect(dst, &rect);
+	dst = Graph_GetQuote(dst);
+	if (!Graph_IsValid(dst)) {
 		return -1;
 	}
 	for (yi = 0; yi < rect.height; ++yi) {
@@ -590,7 +590,7 @@ static int pd_crop_border_bottom_left(LCUI_Graph *dst, int bound_left, int bound
 		x = ellipse_x(radius_x + 1.0, radius_y + 1.0, y);
 		outer_xi = (int)(center_x - x);
 		outer_xi = max(0, min(outer_xi, rect.width));
-		p = pd_graph_get_pixel_pointer(dst, rect.x, rect.y + yi);
+		p = Graph_GetPixelPointer(dst, rect.x, rect.y + yi);
 		for (xi = 0; xi < outer_xi; ++xi, ++p) {
 			p->alpha = 0;
 		}
@@ -601,7 +601,7 @@ static int pd_crop_border_bottom_left(LCUI_Graph *dst, int bound_left, int bound
 				if (d >= 1.0) {
 					p->alpha = 0;
 				} else if (d >= 0) {
-					p->alpha = smooth_left_pixel(p, d);
+					p->alpha = SmoothLeftPixel(p, d);
 				} else {
 					break;
 				}
@@ -615,7 +615,7 @@ static int pd_crop_border_bottom_left(LCUI_Graph *dst, int bound_left, int bound
 				if (d >= 1.0) {
 					p->alpha = 0;
 				} else if (d >= 0) {
-					p->alpha = smooth_left_pixel(p, d);
+					p->alpha = SmoothLeftPixel(p, d);
 				} else {
 					break;
 				}
@@ -625,7 +625,7 @@ static int pd_crop_border_bottom_left(LCUI_Graph *dst, int bound_left, int bound
 	return 0;
 }
 
-static int pd_crop_border_bottom_right(LCUI_Graph *dst, int bound_left,
+static int CropContentBottomRight(LCUI_Graph *dst, int bound_left,
 				  int bound_top, double radius_x,
 				  double radius_y)
 {
@@ -642,9 +642,9 @@ static int pd_crop_border_bottom_right(LCUI_Graph *dst, int bound_left,
 	radius_y -= 0.5;
 	center_x = bound_left;
 	center_y = bound_top;
-	pd_graph_get_valid_rect(dst, &rect);
-	dst = pd_graph_get_quote(dst);
-	if (!pd_graph_is_valid(dst)) {
+	Graph_GetValidRect(dst, &rect);
+	dst = Graph_GetQuote(dst);
+	if (!Graph_IsValid(dst)) {
 		return -1;
 	}
 	for (yi = 0; yi < rect.height; ++yi) {
@@ -652,7 +652,7 @@ static int pd_crop_border_bottom_right(LCUI_Graph *dst, int bound_left,
 		x = ellipse_x(max(0, radius_x - 1), max(0, radius_y - 1), y);
 		outer_xi = (int)(center_x + x);
 		outer_xi = max(0, outer_xi);
-		p = pd_graph_get_pixel_pointer(dst, rect.x + outer_xi, rect.y + yi);
+		p = Graph_GetPixelPointer(dst, rect.x + outer_xi, rect.y + yi);
 		if (radius_x == radius_y) {
 			for (xi = outer_xi; xi < rect.width; ++xi, ++p) {
 				x = ToGeoX(xi, center_x);
@@ -661,7 +661,7 @@ static int pd_crop_border_bottom_right(LCUI_Graph *dst, int bound_left,
 					break;
 				}
 				if (d >= 0) {
-					p->alpha = smooth_left_pixel(p, d);
+					p->alpha = SmoothLeftPixel(p, d);
 				}
 			}
 		} else {
@@ -674,7 +674,7 @@ static int pd_crop_border_bottom_right(LCUI_Graph *dst, int bound_left,
 					break;
 				}
 				if (d >= 0) {
-					p->alpha = smooth_left_pixel(p, d);
+					p->alpha = SmoothLeftPixel(p, d);
 				}
 			}
 		}
@@ -685,7 +685,7 @@ static int pd_crop_border_bottom_right(LCUI_Graph *dst, int bound_left,
 	return 0;
 }
 
-int pd_graph_crop_content(const LCUI_Border *border, const LCUI_Rect *box,
+int Border_CropContent(const LCUI_Border *border, const LCUI_Rect *box,
 		       LCUI_PaintContext paint)
 {
 	LCUI_Graph canvas;
@@ -705,8 +705,8 @@ int pd_graph_crop_content(const LCUI_Border *border, const LCUI_Rect *box,
 		bound_top = bound.y - rect.y;
 		rect.x -= paint->rect.x;
 		rect.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &rect);
-		pd_crop_border_top_left(&canvas, bound_left, bound_top, bound.width,
+		Graph_Quote(&canvas, &paint->canvas, &rect);
+		CropContentTopLeft(&canvas, bound_left, bound_top, bound.width,
 				   bound.height);
 	}
 
@@ -721,8 +721,8 @@ int pd_graph_crop_content(const LCUI_Border *border, const LCUI_Rect *box,
 		bound_top = bound.y - rect.y;
 		rect.x -= paint->rect.x;
 		rect.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &rect);
-		pd_crop_border_top_right(&canvas, bound_left, bound_top, bound.width,
+		Graph_Quote(&canvas, &paint->canvas, &rect);
+		CropContentTopRight(&canvas, bound_left, bound_top, bound.width,
 				    bound.height);
 	}
 
@@ -737,8 +737,8 @@ int pd_graph_crop_content(const LCUI_Border *border, const LCUI_Rect *box,
 		bound_top = bound.y - rect.y;
 		rect.x -= paint->rect.x;
 		rect.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &rect);
-		pd_crop_border_bottom_left(&canvas, bound_left, bound_top,
+		Graph_Quote(&canvas, &paint->canvas, &rect);
+		CropContentBottomLeft(&canvas, bound_left, bound_top,
 				      bound.width, bound.height);
 	}
 
@@ -754,14 +754,14 @@ int pd_graph_crop_content(const LCUI_Border *border, const LCUI_Rect *box,
 		bound_top = bound.y - rect.y;
 		rect.x -= paint->rect.x;
 		rect.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &rect);
-		pd_crop_border_bottom_right(&canvas, bound_left, bound_top,
+		Graph_Quote(&canvas, &paint->canvas, &rect);
+		CropContentBottomRight(&canvas, bound_left, bound_top,
 				       bound.width, bound.height);
 	}
 	return 0;
 }
 
-int pd_border_paint(const LCUI_Border *border, const LCUI_Rect *box,
+int Border_Paint(const LCUI_Border *border, const LCUI_Rect *box,
 		 LCUI_PaintContext paint)
 {
 	LCUI_Graph canvas;
@@ -777,7 +777,7 @@ int pd_border_paint(const LCUI_Border *border, const LCUI_Rect *box,
 	int br_width = max(border->bottom_right_radius, border->right.width);
 	int br_height = max(border->bottom_right_radius, border->bottom.width);
 
-	if (!pd_graph_is_valid(&paint->canvas)) {
+	if (!Graph_IsValid(&paint->canvas)) {
 		return -1;
 	}
 	/* Draw border top left angle */
@@ -790,8 +790,8 @@ int pd_border_paint(const LCUI_Border *border, const LCUI_Rect *box,
 		bound_top = bound.y - rect.y;
 		rect.x -= paint->rect.x;
 		rect.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &rect);
-		pd_draw_border_top_left(&canvas, bound_left, bound_top, &border->top,
+		Graph_Quote(&canvas, &paint->canvas, &rect);
+		DrawBorderTopLeft(&canvas, bound_left, bound_top, &border->top,
 				  &border->left, border->top_left_radius);
 	}
 	/* Draw border top right angle */
@@ -804,8 +804,8 @@ int pd_border_paint(const LCUI_Border *border, const LCUI_Rect *box,
 		bound_top = bound.y - rect.y;
 		rect.x -= paint->rect.x;
 		rect.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &rect);
-		pd_draw_border_top_right(&canvas, bound_left, bound_top, &border->top,
+		Graph_Quote(&canvas, &paint->canvas, &rect);
+		DrawBorderTopRight(&canvas, bound_left, bound_top, &border->top,
 				   &border->right, border->top_right_radius);
 	}
 	/* Draw border bottom left angle */
@@ -818,8 +818,8 @@ int pd_border_paint(const LCUI_Border *border, const LCUI_Rect *box,
 		bound_top = bound.y - rect.y;
 		rect.x -= paint->rect.x;
 		rect.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &rect);
-		pd_draw_border_bottom_left(&canvas, bound_left, bound_top,
+		Graph_Quote(&canvas, &paint->canvas, &rect);
+		DrawBorderBottomLeft(&canvas, bound_left, bound_top,
 				     &border->bottom, &border->left,
 				     border->bottom_left_radius);
 	}
@@ -833,8 +833,8 @@ int pd_border_paint(const LCUI_Border *border, const LCUI_Rect *box,
 		bound_top = bound.y - rect.y;
 		rect.x -= paint->rect.x;
 		rect.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &rect);
-		pd_draw_border_bottom_right(&canvas, bound_left, bound_top,
+		Graph_Quote(&canvas, &paint->canvas, &rect);
+		DrawBorderBottomRight(&canvas, bound_left, bound_top,
 				      &border->bottom, &border->right,
 				      border->bottom_right_radius);
 	}
@@ -846,8 +846,8 @@ int pd_border_paint(const LCUI_Border *border, const LCUI_Rect *box,
 	if (LCUIRect_GetOverlayRect(&bound, &paint->rect, &bound)) {
 		bound.x -= paint->rect.x;
 		bound.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &bound);
-		pd_graph_fill_rect(&canvas, border->top.color, NULL, TRUE);
+		Graph_Quote(&canvas, &paint->canvas, &bound);
+		Graph_FillRect(&canvas, border->top.color, NULL, TRUE);
 	}
 	/* Draw bottom border line */
 	bound.x = box->x + bl_width;
@@ -857,8 +857,8 @@ int pd_border_paint(const LCUI_Border *border, const LCUI_Rect *box,
 	if (LCUIRect_GetOverlayRect(&bound, &paint->rect, &bound)) {
 		bound.x -= paint->rect.x;
 		bound.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &bound);
-		pd_graph_fill_rect(&canvas, border->bottom.color, NULL, TRUE);
+		Graph_Quote(&canvas, &paint->canvas, &bound);
+		Graph_FillRect(&canvas, border->bottom.color, NULL, TRUE);
 	}
 	/* Draw left border line */
 	bound.y = box->y + tl_height;
@@ -868,8 +868,8 @@ int pd_border_paint(const LCUI_Border *border, const LCUI_Rect *box,
 	if (LCUIRect_GetOverlayRect(&bound, &paint->rect, &bound)) {
 		bound.x -= paint->rect.x;
 		bound.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &bound);
-		pd_graph_fill_rect(&canvas, border->left.color, NULL, TRUE);
+		Graph_Quote(&canvas, &paint->canvas, &bound);
+		Graph_FillRect(&canvas, border->left.color, NULL, TRUE);
 	}
 	/* Draw right border line */
 	bound.x = box->x + box->width - border->right.width;
@@ -879,8 +879,8 @@ int pd_border_paint(const LCUI_Border *border, const LCUI_Rect *box,
 	if (LCUIRect_GetOverlayRect(&bound, &paint->rect, &bound)) {
 		bound.x -= paint->rect.x;
 		bound.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &bound);
-		pd_graph_fill_rect(&canvas, border->right.color, NULL, TRUE);
+		Graph_Quote(&canvas, &paint->canvas, &bound);
+		Graph_FillRect(&canvas, border->right.color, NULL, TRUE);
 	}
 	return 0;
 }
