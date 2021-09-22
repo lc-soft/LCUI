@@ -213,7 +213,7 @@ void Widget_InitBackground(LCUI_Widget w)
 {
 	LCUI_BackgroundStyle *bg;
 	bg = &w->computed_style.background;
-	bg->color = YUTIL_TEST_RGB(255, 255, 255);
+	bg->color = RGB(255, 255, 255);
 	Graph_Init(&bg->image);
 	bg->size.using_value = TRUE;
 	bg->size.value = SV_AUTO;

@@ -48,7 +48,7 @@ void Graph_PrintInfo(LCUI_Graph *graph)
 	printf("height:%d, ", graph->height);
 	printf("opacity:%.2f, ", graph->opacity);
 	printf("%s\n",
-	       graph->color_type == LCUI_COLOR_TYPE_ARGB ? "RGBA" : "YUTIL_TEST_RGB");
+	       graph->color_type == LCUI_COLOR_TYPE_ARGB ? "RGBA" : "RGB");
 	if (graph->quote.is_valid) {
 		printf("graph src:");
 		Graph_PrintInfo(Graph_GetQuote(graph));
@@ -72,7 +72,7 @@ void Graph_Init(LCUI_Graph *graph)
 	graph->bytes_per_row = 0;
 }
 
-LCUI_Color YUTIL_TEST_RGB(uchar_t r, uchar_t g, uchar_t b)
+LCUI_Color RGB(uchar_t r, uchar_t g, uchar_t b)
 {
 	LCUI_Color color;
 	color.red = r;
@@ -112,7 +112,7 @@ static unsigned get_pixel_size(int color_type)
 	return 4;
 }
 
-/*----------------------------------- YUTIL_TEST_RGB ----------------------------------*/
+/*----------------------------------- RGB ----------------------------------*/
 
 static void PixelsFormatRGB(const uchar_t *in_pixels, uchar_t *out_pixels,
 			    size_t pixel_count)

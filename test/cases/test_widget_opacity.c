@@ -41,11 +41,11 @@ static void check_widget_opactiy(void)
 	LCUI_Color color;
 	LCUI_Color tmp;
 	LCUI_Color expected_color;
-	LCUI_Color child_bgcolor = YUTIL_TEST_RGB(0, 255, 0);
-	LCUI_Color child_footer_bgcolor = YUTIL_TEST_RGB(255, 255, 255);
-	LCUI_Color parent_bgcolor = YUTIL_TEST_RGB(255, 0, 0);
-	LCUI_Color parent_bcolor = YUTIL_TEST_RGB(0, 0, 0);
-	LCUI_Color bgcolor = YUTIL_TEST_RGB(255, 255, 255);
+	LCUI_Color child_bgcolor = RGB(0, 255, 0);
+	LCUI_Color child_footer_bgcolor = RGB(255, 255, 255);
+	LCUI_Color parent_bgcolor = RGB(255, 0, 0);
+	LCUI_Color parent_bcolor = RGB(0, 0, 0);
+	LCUI_Color bgcolor = RGB(255, 255, 255);
 	LCUI_Rect rect = { 0, 0, 400, 256 };
 	LCUI_PaintContextRec paint;
 

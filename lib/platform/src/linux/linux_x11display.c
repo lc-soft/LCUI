@@ -348,7 +348,7 @@ static LCUI_PaintContext X11Surface_BeginPaint(LCUI_Surface surface,
 	LCUIMutex_Lock(&surface->mutex);
 	LCUIRect_ValidateArea(&paint->rect, surface->width, surface->height);
 	Graph_Quote(&paint->canvas, &surface->fb, &paint->rect);
-	Graph_FillRect(&paint->canvas, YUTIL_TEST_RGB(255, 255, 255), NULL, TRUE);
+	Graph_FillRect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
 	return paint;
 }
 

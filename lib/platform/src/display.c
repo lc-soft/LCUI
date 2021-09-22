@@ -140,7 +140,7 @@ static size_t LCUIDisplay_RenderFlashRect(SurfaceRecord record,
 	Graph_FillRect(&mask, ARGB(125, 124, 179, 5), NULL, TRUE);
 	mask.opacity = 0.6f * (duraion - (float)period) / duraion;
 	pos.x = pos.y = 0;
-	color = YUTIL_TEST_RGB(124, 179, 5);
+	color = RGB(124, 179, 5);
 	Graph_DrawHorizLine(&mask, color, 1, pos, mask.width - 1);
 	Graph_DrawVertiLine(&mask, color, 1, pos, mask.height - 1);
 	pos.x = mask.width - 1;

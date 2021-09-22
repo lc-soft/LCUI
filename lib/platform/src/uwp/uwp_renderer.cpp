@@ -133,7 +133,7 @@ void Renderer::CreateWindowSizeDependentResources()
 	m_frameSize = { (UINT32)outputSize.Width, (UINT32)outputSize.Height };
 	Graph_Create(&display.frame, (int)m_frameSize.width,
 		(int)m_frameSize.height);
-	Graph_FillRect(&display.frame, YUTIL_TEST_RGB(255, 255, 255), NULL, TRUE);
+	Graph_FillRect(&display.frame, RGB(255, 255, 255), NULL, TRUE);
 	context->CreateBitmap(m_frameSize, nullptr, 0, &props, &m_bmp);
 	context->CreateBitmap(m_frameSize, nullptr, 0, &props, &m_backBmp);
 	UpdateSurfaceSize();
@@ -242,7 +242,7 @@ static LCUI_PaintContext UWPSurface_BeginPaint(LCUI_Surface surface,
 	LCUIRect_ValidateArea(&paint->rect, UWPDisplay_GetWidth(),
 			      UWPDisplay_GetHeight());
 	Graph_Quote(&paint->canvas, &display.frame, &paint->rect);
-	Graph_FillRect(&paint->canvas, YUTIL_TEST_RGB(255, 255, 255), NULL, TRUE);
+	Graph_FillRect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
 	return paint;
 }
 

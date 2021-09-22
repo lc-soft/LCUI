@@ -8,8 +8,8 @@ int main(void)
 	LCUI_Graph img;
 	LCUI_FontBitmap bmp;
 	LCUI_Pos pos = { 25, 25 };
-	LCUI_Color bg = YUTIL_TEST_RGB(240, 240, 240);
-	LCUI_Color color = YUTIL_TEST_RGB(255, 0, 0);
+	LCUI_Color bg = RGB(240, 240, 240);
+	LCUI_Color color = RGB(255, 0, 0);
 
 	/* 初始化字体处理功能 */
 	LCUI_InitFontLibrary();

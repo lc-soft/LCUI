@@ -197,7 +197,7 @@ static LCUI_PaintContext FBSurface_BeginPaint(LCUI_Surface surface,
 	actual_rect.x -= surface->rect.x;
 	actual_rect.y -= surface->rect.y;
 	paint = LCUIPainter_Begin(&surface->canvas, &actual_rect);
-	Graph_FillRect(&paint->canvas, YUTIL_TEST_RGB(255, 255, 255), NULL, TRUE);
+	Graph_FillRect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
 	RectList_Add(&surface->rects, rect);
 	return paint;
 }

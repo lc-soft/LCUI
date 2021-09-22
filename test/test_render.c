@@ -115,8 +115,8 @@ void InitRenderStatus(void)
 {
 	LCUI_Widget root;
 	LCUI_Widget status;
-	LCUI_Color white = YUTIL_TEST_RGB(255, 255, 255);
-	LCUI_Color black = YUTIL_TEST_RGB(0, 0, 0);
+	LCUI_Color white = RGB(255, 255, 255);
+	LCUI_Color black = RGB(0, 0, 0);
 
 	root = LCUIWidget_GetRoot();
 	status = LCUIWidget_New("textview");

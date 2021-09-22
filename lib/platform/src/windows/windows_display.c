@@ -350,7 +350,7 @@ static LCUI_PaintContext WinSurface_BeginPaint(LCUI_Surface surface,
 					       LCUI_Rect *rect)
 {
 	LCUI_PaintContext paint = LCUIPainter_Begin(&surface->fb, rect);
-	Graph_FillRect(&paint->canvas, YUTIL_TEST_RGB(255, 255, 255), NULL, TRUE);
+	Graph_FillRect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
 	return paint;
 }
 
