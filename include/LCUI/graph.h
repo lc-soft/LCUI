@@ -91,9 +91,9 @@ LCUI_BEGIN_HEADER
 		pixel = (r << 16) | (g << 8) | b; \
 	}
 
-#define Graph_GetQuote(g) ((g)->quote.is_valid ? (g)->quote.source : (g))
+#define pd_graph_get_quote(g) ((g)->quote.is_valid ? (g)->quote.source : (g))
 
-#define Graph_SetPixel(G, X, Y, C)                                        \
+#define pd_graph_set_pixel(G, X, Y, C)                                        \
 	if ((G)->color_type == LCUI_COLOR_TYPE_ARGB) {                    \
 		(G)->argb[(G)->width * (Y) + (X)] = (C);                  \
 	} else {                                                          \
@@ -102,10 +102,10 @@ LCUI_BEGIN_HEADER
 		(G)->bytes[(G)->bytes_per_row * (Y) + (X)*3 + 2] = (C).r; \
 	}
 
-#define Graph_SetPixelAlpha(G, X, Y, A) \
+#define pd_graph_set_pixel_alpha(G, X, Y, A) \
 	(G)->argb[(G)->width * (Y) + (X)].alpha = (A)
 
-#define Graph_GetPixel(G, X, Y, C)                                            \
+#define pd_graph_get_pixel(G, X, Y, C)                                            \
 	if ((G)->color_type == LCUI_COLOR_TYPE_ARGB) {                        \
 		(C) = (G)->argb[(G)->width * ((Y) % (G)->height) +            \
 				((X) % (G)->width)];                          \
@@ -123,23 +123,23 @@ LCUI_BEGIN_HEADER
 		    0xff << 24;                                               \
 	}
 
-#define Graph_GetPixelPointer(G, X, Y) ((G)->argb + (G)->width * (Y) + (X))
+#define pd_graph_get_pixel_pointer(G, X, Y) ((G)->argb + (G)->width * (Y) + (X))
 
 /** 判断图像是否有Alpha通道 */
-#define Graph_HasAlpha(G)                                              \
+#define pd_graph_has_alpha(G)                                              \
 	((G)->quote.is_valid                                           \
 	     ? ((G)->quote.source->color_type == LCUI_COLOR_TYPE_ARGB) \
 	     : ((G)->color_type == LCUI_COLOR_TYPE_ARGB))
 
-#define Graph_IsWritable(G)  \
-	(Graph_IsValid(G) && \
+#define pd_graph_is_writable(G)  \
+	(pd_graph_is_valid(G) && \
 	 ((G)->quote.is_valid ? (G)->quote.is_writable : TRUE))
 
 /*
  * Pixel over operator with alpha channel
  * See more: https://en.wikipedia.org/wiki/Alpha_compositing
  */
-INLINE void LCUI_OverPixel(LCUI_ARGB *dst, const LCUI_ARGB *src)
+INLINE void pd_over_pixel(LCUI_ARGB *dst, const LCUI_ARGB *src)
 {
 	/*
 	 * Original formula:
@@ -185,24 +185,24 @@ INLINE void LCUI_OverPixel(LCUI_ARGB *dst, const LCUI_ARGB *src)
 
 LCUI_API void Graph_PrintInfo(LCUI_Graph *graph);
 
-LCUI_API void Graph_Init(LCUI_Graph *graph);
+LCUI_API void pd_graph_init(LCUI_Graph *graph);
 
 LCUI_API LCUI_Color RGB(uchar_t r, uchar_t g, uchar_t b);
 
-LCUI_API LCUI_Color ARGB(uchar_t a, uchar_t r, uchar_t g, uchar_t b);
+LCUI_API LCUI_Color pd_color(uchar_t a, uchar_t r, uchar_t g, uchar_t b);
 
-LCUI_API void PixelsFormat(const uchar_t *in_pixels, int in_color_type,
+LCUI_API void pixels_format(const uchar_t *in_pixels, int in_color_type,
 			   uchar_t *out_pixels, int out_color_type,
 			   size_t pixel_count);
 
 /** 改变色彩类型 */
 LCUI_API int Graph_SetColorType(LCUI_Graph *graph, int color_type);
 
-LCUI_API int Graph_Create(LCUI_Graph *graph, unsigned width, unsigned height);
+LCUI_API int pd_graph_create(LCUI_Graph *graph, unsigned width, unsigned height);
 
-LCUI_API void Graph_Copy(LCUI_Graph *des, const LCUI_Graph *src);
+LCUI_API void pd_graph_copy(LCUI_Graph *des, const LCUI_Graph *src);
 
-LCUI_API void Graph_Free(LCUI_Graph *graph);
+LCUI_API void pd_graph_free(LCUI_Graph *graph);
 
 /**
  * 为图像创建一个引用
@@ -210,7 +210,7 @@ LCUI_API void Graph_Free(LCUI_Graph *graph);
  * @param source 引用的源图像
  * &param rect 引用的区域，若为NULL，则引用整个图像
  */
-LCUI_API int Graph_Quote(LCUI_Graph *self, LCUI_Graph *source,
+LCUI_API int pd_graph_quote(LCUI_Graph *self, LCUI_Graph *source,
 			 const LCUI_Rect *rect);
 
 /**
@@ -219,33 +219,33 @@ LCUI_API int Graph_Quote(LCUI_Graph *self, LCUI_Graph *source,
  * @param source 引用的源图像
  * &param rect 引用的区域，若为NULL，则引用整个图像
  */
-LCUI_API int Graph_QuoteReadOnly(LCUI_Graph *self, const LCUI_Graph *source,
+LCUI_API int pd_graph_quote_read_only(LCUI_Graph *self, const LCUI_Graph *source,
 				 const LCUI_Rect *rect);
 
-LCUI_API LCUI_BOOL Graph_IsValid(const LCUI_Graph *graph);
+LCUI_API LCUI_BOOL pd_graph_is_valid(const LCUI_Graph *graph);
 
-LCUI_API void Graph_GetValidRect(const LCUI_Graph *graph, LCUI_Rect *rect);
+LCUI_API void pd_graph_get_valid_rect(const LCUI_Graph *graph, LCUI_Rect *rect);
 
-LCUI_API int Graph_SetAlphaBits(LCUI_Graph *graph, uchar_t *a, size_t size);
+LCUI_API int pd_graph_set_alpha_bits(LCUI_Graph *graph, uchar_t *a, size_t size);
 
-LCUI_API int Graph_SetRedBits(LCUI_Graph *graph, uchar_t *r, size_t size);
+LCUI_API int pd_graph_set_red_bits(LCUI_Graph *graph, uchar_t *r, size_t size);
 
-LCUI_API int Graph_SetGreenBits(LCUI_Graph *graph, uchar_t *g, size_t size);
+LCUI_API int pd_graph_set_green_bits(LCUI_Graph *graph, uchar_t *g, size_t size);
 
-LCUI_API int Graph_SetBlueBits(LCUI_Graph *graph, uchar_t *b, size_t size);
+LCUI_API int pd_graph_set_blue_bits(LCUI_Graph *graph, uchar_t *b, size_t size);
 
-LCUI_API int Graph_Zoom(const LCUI_Graph *graph, LCUI_Graph *buff,
+LCUI_API int pd_graph_zoom(const LCUI_Graph *graph, LCUI_Graph *buff,
 			LCUI_BOOL keep_scale, int width, int height);
 
-LCUI_API int Graph_ZoomBilinear(const LCUI_Graph *graph, LCUI_Graph *buff,
+LCUI_API int pd_graph_zoom_bilinear(const LCUI_Graph *graph, LCUI_Graph *buff,
 				LCUI_BOOL keep_scale, int width, int height);
 
-LCUI_API int Graph_Cut(const LCUI_Graph *graph, LCUI_Rect rect,
+LCUI_API int pd_graph_cut(const LCUI_Graph *graph, LCUI_Rect rect,
 		       LCUI_Graph *buff);
 
-LCUI_API int Graph_HorizFlip(const LCUI_Graph *graph, LCUI_Graph *buff);
+LCUI_API int pd_graph_horiz_flip(const LCUI_Graph *graph, LCUI_Graph *buff);
 
-LCUI_API int Graph_VertiFlip(const LCUI_Graph *graph, LCUI_Graph *buff);
+LCUI_API int pd_graph_verti_flip(const LCUI_Graph *graph, LCUI_Graph *buff);
 
 /**
  * 用颜色填充一块区域
@@ -254,12 +254,12 @@ LCUI_API int Graph_VertiFlip(const LCUI_Graph *graph, LCUI_Graph *buff);
  * @param[in] rect 区域，若值为 NULL，则填充整个图层
  * @param[in] with_alpha 是否需要处理alpha通道
  */
-LCUI_API int Graph_FillRect(LCUI_Graph *graph, LCUI_Color color,
+LCUI_API int pd_graph_fill_rect(LCUI_Graph *graph, LCUI_Color color,
 			    LCUI_Rect *rect, LCUI_BOOL with_alpha);
 
-LCUI_API int Graph_FillAlpha(LCUI_Graph *graph, uchar_t alpha);
+LCUI_API int pd_graph_fill_alpha(LCUI_Graph *graph, uchar_t alpha);
 
-LCUI_API int Graph_Tile(LCUI_Graph *buff, const LCUI_Graph *graph,
+LCUI_API int pd_graph_tile(LCUI_Graph *buff, const LCUI_Graph *graph,
 			LCUI_BOOL replace, LCUI_BOOL with_alpha);
 
 /**
@@ -271,10 +271,10 @@ LCUI_API int Graph_Tile(LCUI_Graph *buff, const LCUI_Graph *graph,
  * @param[in] top 前景图层的上边距
  * @param[in] with_alpha 是否需要处理alpha通道
  */
-LCUI_API int Graph_Mix(LCUI_Graph *back, const LCUI_Graph *fore, int left,
+LCUI_API int pd_graph_mix(LCUI_Graph *back, const LCUI_Graph *fore, int left,
 		       int top, LCUI_BOOL with_alpha);
 
-LCUI_API int Graph_Replace(LCUI_Graph *back, const LCUI_Graph *fore, int left,
+LCUI_API int pd_graph_replace(LCUI_Graph *back, const LCUI_Graph *fore, int left,
 			   int top);
 
 LCUI_END_HEADER

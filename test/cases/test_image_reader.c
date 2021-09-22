@@ -13,7 +13,7 @@ void test_image_reader(void)
 
 	for (i = 0; i < 3; ++i) {
 		width = height = 0;
-		Graph_Init(&img);
+		pd_graph_init(&img);
 		snprintf(file, 255, "test_image_reader.%s", formats[i]);
 		Logger_Debug("image file: %s\n", file);
 		it_i("check LCUI_ReadImageFile", LCUI_ReadImageFile(file, &img),
@@ -25,6 +25,6 @@ void test_image_reader(void)
 		Logger_Debug("image size: (%d, %d)\n", width, height);
 		it_i("check image width with GetImageSize", width, 91);
 		it_i("check image height with GetImageSize", height, 69);
-		Graph_Free(&img);
+		pd_graph_free(&img);
 	}
 }

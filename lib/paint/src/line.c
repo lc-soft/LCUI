@@ -2,15 +2,15 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
 
-void Graph_DrawHorizLine(LCUI_Graph *graph, LCUI_Color color, int size,
+void pd_graph_draw_horizontal(LCUI_Graph *graph, LCUI_Color color, int size,
 			 LCUI_Pos start, int len)
 {
 	int y, x;
 	LCUI_Rect area;
 	LCUI_Graph *des;
 
-	des = Graph_GetQuote(graph);
-	Graph_GetValidRect(graph, &area);
+	des = pd_graph_get_quote(graph);
+	pd_graph_get_valid_rect(graph, &area);
 	start.x = area.x + start.x;
 	start.y = area.y + start.y;
 
@@ -57,15 +57,15 @@ void Graph_DrawHorizLine(LCUI_Graph *graph, LCUI_Color color, int size,
 	}
 }
 
-LCUI_API void Graph_DrawVertiLine(LCUI_Graph *graph, LCUI_Color color,
+void pd_graph_draw_vertical(LCUI_Graph *graph, LCUI_Color color,
 				  int size, LCUI_Pos start, int len)
 {
 	int y, x;
 	LCUI_Rect area;
 	LCUI_Graph *des;
 
-	des = Graph_GetQuote(graph);
-	Graph_GetValidRect(graph, &area);
+	des = pd_graph_get_quote(graph);
+	pd_graph_get_valid_rect(graph, &area);
 	start.x = area.x + start.x;
 	start.y = area.y + start.y;
 

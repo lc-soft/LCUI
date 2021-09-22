@@ -296,7 +296,7 @@ static void TextView_OnPaint(LCUI_Widget w, LCUI_PaintContext paint,
 	pos.y = content_rect.y - rect.y;
 	rect.x -= paint->rect.x;
 	rect.y -= paint->rect.y;
-	Graph_Quote(&canvas, &paint->canvas, &rect);
+	pd_graph_quote(&canvas, &paint->canvas, &rect);
 	rect = paint->rect;
 	rect.x -= content_rect.x;
 	rect.y -= content_rect.y;

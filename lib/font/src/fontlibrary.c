@@ -733,7 +733,7 @@ static void FontBitmap_MixARGB(LCUI_Graph *graph, LCUI_Rect *write_rect,
 		for (x = 0; x < read_rect->width; ++x, ++byte_ptr, ++px) {
 			c = color;
 			c.alpha = (uchar_t)(*byte_ptr * color.alpha / 255.0);
-			LCUI_OverPixel(px, &c);
+			pd_over_pixel(px, &c);
 		}
 		px_row_des += graph->width;
 		byte_row_ptr += bmp->width;
@@ -786,10 +786,10 @@ int FontBitmap_Mix(LCUI_Graph *graph, LCUI_Pos pos, const LCUI_FontBitmap *bmp,
 	w_rect.y += r_rect.y;
 	w_rect.width = r_rect.width;
 	w_rect.height = r_rect.height;
-	Graph_Quote(&write_slot, graph, &w_rect);
-	Graph_GetValidRect(&write_slot, &w_rect);
+	pd_graph_quote(&write_slot, graph, &w_rect);
+	pd_graph_get_valid_rect(&write_slot, &w_rect);
 	/* 获取背景图引用的源图形 */
-	graph = Graph_GetQuote(graph);
+	graph = pd_graph_get_quote(graph);
 	if (graph->color_type == LCUI_COLOR_TYPE_ARGB) {
 		FontBitmap_MixARGB(graph, &w_rect, bmp, color, &r_rect);
 	} else {

@@ -260,7 +260,7 @@ int LCUI_ReadJPEG(LCUI_ImageReader reader, LCUI_Graph *graph)
 	}
 	graph->color_type = LCUI_COLOR_TYPE_RGB;
 	if (0 !=
-	    Graph_Create(graph, cinfo->output_width, cinfo->output_height)) {
+	    pd_graph_create(graph, cinfo->output_width, cinfo->output_height)) {
 		return -ENOMEM;
 	}
 	row_stride = cinfo->output_width * cinfo->output_components;
