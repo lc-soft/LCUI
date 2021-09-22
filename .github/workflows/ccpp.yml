@@ -29,6 +29,7 @@ jobs:
 
       - name: Package
         run: |
+          git submodule update --init
           xmake clean
           xmake config -m release -y -c -v
           xmake -v
@@ -66,6 +67,7 @@ jobs:
 
       - name: Package
         run: |
+          git submodule update --init
           xmake -v
           xmake package
 
