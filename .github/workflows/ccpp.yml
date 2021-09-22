@@ -14,9 +14,12 @@ jobs:
       - name: install tools
         run: sudo apt install debhelper lcov valgrind -yy
 
-      - name: Build
+      - name: Update git submodule
         run: |
           git submodule update --init
+
+      - name: Build
+        run: |
           xmake config -m coverage -y -v
           xmake -v
 
@@ -29,7 +32,6 @@ jobs:
 
       - name: Package
         run: |
-          git submodule update --init
           xmake clean
           xmake config -m release -y -c -v
           xmake -v
@@ -55,9 +57,13 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - uses: xmake-io/github-action-setup-xmake@v1
-      - name: Build
+
+      - name: Update git submodule
         run: |
           git submodule update --init
+
+      - name: Build
+        run: |
           xmake config -y -v
           xmake -v
 
@@ -67,7 +73,6 @@ jobs:
 
       - name: Package
         run: |
-          git submodule update --init
           xmake -v
           xmake package
 
