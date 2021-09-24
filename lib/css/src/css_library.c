@@ -502,7 +502,7 @@ static void DeleteStyleListNode(LCUI_StyleListNode node)
 
 void StyleList_Delete(LCUI_StyleList list)
 {
-	list_clear_data(list, (FuncPtr)DeleteStyleListNode);
+	list_destroy_without_node(list, (FuncPtr)DeleteStyleListNode);
 	free(list);
 }
 
@@ -1171,7 +1171,7 @@ static StyleLink CreateStyleLink(void)
 static void DeleteStyleLink(StyleLink link)
 {
 	dict_destroy(link->parents);
-	list_clear_data(&link->styles, (FuncPtr)DeleteStyleNode);
+	list_destroy_without_node(&link->styles, (FuncPtr)DeleteStyleNode);
 	free(link->selector);
 	link->selector = NULL;
 	link->parents = NULL;

@@ -207,7 +207,7 @@ void Widget_Empty(LCUI_Widget w)
 		child->state = LCUI_WSTATE_DELETED;
 		child->parent = NULL;
 	}
-	list_clear_data(&w->children_show, NULL);
+	list_destroy_without_node(&w->children_show, NULL);
 	list_concat(&LCUIWidget.trash, &w->children);
 	Widget_InvalidateArea(w, NULL, SV_GRAPH_BOX);
 	Widget_UpdateStyle(w, TRUE);
@@ -394,7 +394,7 @@ void Widget_SortChildrenShow(LCUI_Widget w)
 	list_t *list;
 
 	list = &w->children_show;
-	list_clear_data(list, NULL);
+	list_destroy_without_node(list, NULL);
 	for (list_each(node, &w->children)) {
 		child = node->data;
 		s = &child->computed_style;

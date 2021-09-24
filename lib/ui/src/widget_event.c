@@ -314,7 +314,7 @@ static void DestroyTouchCapturer(void *arg)
 
 #define TouchCapturers_Clear(LIST) \
                                    \
-	list_clear_data(LIST, DestroyTouchCapturer)
+	list_destroy_without_node(LIST, DestroyTouchCapturer)
 
 static int TouchCapturers_Add(list_t *list, LCUI_Widget w, int point_id)
 {

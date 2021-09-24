@@ -31,8 +31,7 @@
 #ifndef LCUI_WIDGET_BASE_H
 #define LCUI_WIDGET_BASE_H
 
-#include <LCUI/util/keywords.h>
-#include <LCUI/util/strlist.h>
+#include "yutil.h"
 #include <LCUI/gui/css_library.h>
 
 LCUI_BEGIN_HEADER

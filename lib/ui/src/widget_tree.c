@@ -230,8 +230,8 @@ void Widget_DestroyChildren(LCUI_Widget w)
 {
 	/* 先释放显示列表，后销毁部件列表，因为部件在这两个链表中的节点是和它共用
 	 * 一块内存空间的，销毁部件列表会把部件释放掉，所以把这个操作放在后面 */
-	list_clear_data(&w->children_show, NULL);
-	list_clear_data(&w->children, Widget_OnDestroy);
+	list_destroy_without_node(&w->children_show, NULL);
+	list_destroy_without_node(&w->children, Widget_OnDestroy);
 }
 
 static void _LCUIWidget_PrintTree(LCUI_Widget w, int depth, const char *prefix)

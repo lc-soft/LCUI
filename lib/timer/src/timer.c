@@ -33,9 +33,7 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/thread.h>
 #include <LCUI/timer.h>
-#include <LCUI/util/keywords.h>
-#include <LCUI/util/timer.h>
-
+#include <yutil.h>
 
 /*----------------------------- Timer --------------------------------*/
 

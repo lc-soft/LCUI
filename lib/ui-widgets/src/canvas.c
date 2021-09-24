@@ -78,7 +78,7 @@ static void Canvas_OnDestroy(LCUI_Widget w)
 		ctx = node->data;
 		ctx->available = FALSE;
 	}
-	list_clear_data(&canvas->contexts, NULL);
+	list_destroy_without_node(&canvas->contexts, NULL);
 	Graph_Free(&canvas->buffer);
 }
 

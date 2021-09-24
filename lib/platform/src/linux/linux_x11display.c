@@ -501,7 +501,7 @@ LCUI_DisplayDriver LCUI_CreateLinuxX11DisplayDriver(void)
 void LCUI_DestroyLinuxX11DisplayDriver(LCUI_DisplayDriver driver)
 {
 	EventTrigger_Destroy(x11.trigger);
-	list_clear_data(&x11.surfaces, OnDestroySurface);
+	list_destroy_without_node(&x11.surfaces, OnDestroySurface);
 	LCUI_UnbindSysEvent(ConfigureNotify, OnConfigureNotify);
 	LCUI_UnbindSysEvent(Expose, OnExpose);
 	x11.trigger = NULL;

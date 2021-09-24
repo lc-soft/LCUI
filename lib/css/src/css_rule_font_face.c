@@ -35,9 +35,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/types.h>
 #include <LCUI/util/parse.h>
-#include <LCUI/util/keywords.h>
-#include <LCUI/util/string.h>
-#include <LCUI/util/list.h>
+#include <yutil.h>
 #include <LCUI/gui/css_library.h>
 #include <LCUI/gui/css_parser.h>
 

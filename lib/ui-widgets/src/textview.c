@@ -447,5 +447,5 @@ void LCUIWidget_AddTextView(void)
 
 void LCUIWidget_FreeTextView(void)
 {
-	list_clear_data(&self.list, NULL);
+	list_destroy_without_node(&self.list, NULL);
 }

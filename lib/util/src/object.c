@@ -34,9 +34,7 @@
 #include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/util/object.h>
-#include <LCUI/util/keywords.h>
-#include <LCUI/util/string.h>
-#include <LCUI/util/charset.h>
+#include <yutil.h>
 
 typedef struct LCUI_ObjectWatcherRec_ {
 	void *data;
@@ -83,7 +81,7 @@ void Object_Destroy(LCUI_Object object)
 		object->type->destroy(object);
 	}
 	if (object->watchers) {
-		list_clear_data(object->watchers, free);
+		list_destroy_without_node(object->watchers, free);
 		free(object->watchers);
 	}
 }

@@ -30,25 +30,13 @@
 
 #ifndef LCUI_UTIL_H
 #define LCUI_UTIL_H
-#include <LCUI/util/keywords.h>
-#include <LCUI/util/math.h>
-#include <LCUI/util/time.h>
-#include <LCUI/util/dirent.h>
-#include <LCUI/util/rbtree.h>
-#include <LCUI/util/list.h>
-#include <LCUI/util/list_entry.h>
-#include <LCUI/util/dict.h>
+#include "yutil.h"
 #include <LCUI/util/object.h>
 #include <LCUI/util/rect.h>
 #include <LCUI/util/steptimer.h>
-#include <LCUI/util/string.h>
-#include <LCUI/util/strpool.h>
-#include <LCUI/util/strlist.h>
 #include <LCUI/util/parse.h>
 #include <LCUI/util/event.h>
-#include <LCUI/util/logger.h>
 #include <LCUI/util/task.h>
 #include <LCUI/util/uri.h>
-#include <LCUI/util/charset.h>
 
 #endif

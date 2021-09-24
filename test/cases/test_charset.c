@@ -1,9 +1,7 @@
 ﻿#include <wchar.h>
 #include <string.h>
 #include <LCUI_Build.h>
-#include <LCUI/util/keywords.h>
-#include <LCUI/util/logger.h>
-#include <LCUI/util/charset.h>
+#include <yutil.h>
 #include "ctest.h"
 
 void test_charset(void)

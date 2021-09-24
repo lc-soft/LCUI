@@ -577,7 +577,7 @@ void LCUI_DestroyWinDisplay(LCUI_DisplayDriver driver)
 	LCUI_UnbindSysEvent(WM_SIZE, OnWMSize);
 	LCUI_UnbindSysEvent(WM_PAINT, OnWMPaint);
 	LCUI_UnbindSysEvent(WM_GETMINMAXINFO, OnWMGetMinMaxInfo);
-	list_clear_data(&win.surfaces, WinSurface_OnDestroy);
+	list_destroy_without_node(&win.surfaces, WinSurface_OnDestroy);
 	EventTrigger_Destroy(win.trigger);
 	free(driver);
 }

@@ -4,8 +4,7 @@
 #include <LCUI/font.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/textview.h>
-#include <LCUI/util/keywords.h>
-#include <LCUI/util/logger.h>
+#include <yutil.h>
 
 int main(void)
 {

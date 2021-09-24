@@ -31,8 +31,7 @@
 #ifndef LCUI_CSS_LIBRARY_H
 #define LCUI_CSS_LIBRARY_H
 
-#include <LCUI/util/keywords.h>
-#include <LCUI/util/list.h>
+#include "yutil.h"
 
 LCUI_BEGIN_HEADER
 

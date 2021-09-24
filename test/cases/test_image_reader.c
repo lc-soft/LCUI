@@ -2,8 +2,7 @@
 #include <LCUI.h>
 #include <LCUI/graph.h>
 #include <LCUI/image.h>
-#include <LCUI/util/keywords.h>
-#include <LCUI/util/logger.h>
+#include <yutil.h>
 #include "ctest.h"
 
 void test_image_reader(void)

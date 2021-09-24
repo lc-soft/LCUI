@@ -281,5 +281,5 @@ void LCUI_FreeIME(void)
 {
 	self.active = FALSE;
 	LCUIIME_Close(self.ime);
-	list_clear_data(&self.list, LCUIIME_OnDestroy);
+	list_destroy_without_node(&self.list, LCUIIME_OnDestroy);
 }
