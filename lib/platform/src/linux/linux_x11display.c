@@ -111,7 +111,7 @@ static void X11Surface_ReleaseTask(LCUI_Surface surface, int type)
 static LCUI_Surface GetSurfaceByWindow(Window win)
 {
 	list_node_t *node;
-	list_for_each(node, &x11.surfaces)
+	for(list_each(node, &x11.surfaces))
 	{
 		if (((LCUI_Surface)node->data)->window == win) {
 			return node->data;
