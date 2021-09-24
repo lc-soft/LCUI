@@ -240,7 +240,7 @@ static void OnDestroySurface(void *data)
 	LCUI_Surface s = data;
 
 	X11Surface_ClearTasks(s);
-	list_clear(&s->rects, free);
+	list_destroy(&s->rects, free);
 	if (s->ximage) {
 		XDestroyImage(s->ximage);
 	}
@@ -275,7 +275,7 @@ static LCUI_Surface X11Surface_New(void)
 	surface->height = MIN_HEIGHT;
 	Graph_Init(&surface->fb);
 	LCUIMutex_Init(&surface->mutex);
-	list_init(&surface->rects);
+	list_create(&surface->rects);
 	surface->fb.color_type = LCUI_COLOR_TYPE_ARGB;
 	list_append_node(&x11.surfaces, &surface->node);
 	LCUI_PostSimpleTask(X11Surface_OnCreate, surface, NULL);
@@ -373,7 +373,7 @@ static void X11Surface_Present(LCUI_Surface surface)
 			  surface->ximage, rect->x, rect->y, rect->x, rect->y,
 			  rect->width, rect->height);
 	}
-	list_clear(&surface->rects, free);
+	list_destroy(&surface->rects, free);
 	LCUIMutex_Unlock(&surface->mutex);
 }
 
@@ -490,7 +490,7 @@ LCUI_DisplayDriver LCUI_CreateLinuxX11DisplayDriver(void)
 	driver->bindEvent = X11Display_BindEvent;
 	driver->getSurfaceWidth = X11Surface_GetWidth;
 	driver->getSurfaceHeight = X11Surface_GetHeight;
-	list_init(&x11.surfaces);
+	list_create(&x11.surfaces);
 	LCUI_BindSysEvent(Expose, OnExpose, NULL, NULL);
 	LCUI_BindSysEvent(ConfigureNotify, OnConfigureNotify, NULL, NULL);
 	x11.trigger = EventTrigger();

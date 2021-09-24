@@ -93,7 +93,7 @@ int Widget_SetId(LCUI_Widget w, const char *idstr)
 		if (!list) {
 			goto error_exit;
 		}
-		list_init(list);
+		list_create(list);
 		if (dict_add(self.ids, w->id, list) != 0) {
 			free(list);
 			goto error_exit;
@@ -134,7 +134,7 @@ LCUI_Widget LCUIWidget_GetById(const char *id)
 static void OnClearWidgetList(void *privdata, void *data)
 {
 	list_t *list = data;
-	list_clear(list, NULL);
+	list_destroy(list, NULL);
 	free(list);
 }
 

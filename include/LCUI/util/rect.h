@@ -134,7 +134,7 @@ LCUI_API int RectList_Add(list_t *list, LCUI_Rect *rect);
 /** 删除脏矩形 */
 LCUI_API int RectList_Delete(list_t *list, LCUI_Rect *rect);
 
-#define RectList_Clear(LIST) list_clear(LIST, free)
+#define RectList_Clear(LIST) list_destroy(LIST, free)
 
 LCUI_END_HEADER
 

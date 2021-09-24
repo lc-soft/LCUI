@@ -62,7 +62,7 @@ int LCUIThread_Create(LCUI_Thread *tid, void(*func)(void*), void *arg)
 	LCUI_ThreadContext ctx;
 
 	if (!self.active) {
-		list_init(&self.threads);
+		list_create(&self.threads);
 		LCUIMutex_Init(&self.mutex);
 		self.active = TRUE;
 	}

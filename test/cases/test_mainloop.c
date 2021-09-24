@@ -22,8 +22,8 @@ static void OnBtnClick(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 	LCUI_MainLoop loop;
 
 	loop = LCUIMainLoop_New();
-	lcui_add_timeout(10, OnRefreshScreen, NULL);
-	lcui_add_timeout(50, OnQuit, NULL);
+	lcui_timer_set_timeout(10, OnRefreshScreen, NULL);
+	lcui_timer_set_timeout(50, OnQuit, NULL);
 	LCUIMainLoop_Run(loop);
 }
 
@@ -72,7 +72,7 @@ void test_mainloop(void)
 	/* Observe whether the main loop has exited in a new thread */
 	LCUIThread_Create(&tid, ObserverThread, &exited);
 	/* Trigger the click event after the first frame is updated */
-	lcui_add_timeout(50, OnTriggerBtnClick, btn);
+	lcui_timer_set_timeout(50, OnTriggerBtnClick, btn);
 	LCUI_Main();
 	exited = TRUE;
 	LCUIThread_Join(tid, NULL);

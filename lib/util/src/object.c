@@ -159,7 +159,7 @@ LCUI_ObjectWatcher Object_Watch(LCUI_Object object, LCUI_ObjectWatcherFunc func,
 		if (!object->watchers) {
 			return NULL;
 		}
-		list_init(object->watchers);
+		list_create(object->watchers);
 	}
 	watcher = malloc(sizeof(LCUI_ObjectWatcherRec));
 	if (!watcher) {

@@ -51,18 +51,18 @@ void LCUIRect_ToRectF(const LCUI_Rect *rect, LCUI_RectF *rectf, float scale)
 
 void LCUIRect_Scale(const LCUI_Rect *src, LCUI_Rect *dst, float scale)
 {
-	dst->x = y_round(src->x * scale);
-	dst->y = y_round(src->y * scale);
-	dst->width = y_round(src->width * scale);
-	dst->height = y_round(src->height * scale);
+	dst->x = y_iround(src->x * scale);
+	dst->y = y_iround(src->y * scale);
+	dst->width = y_iround(src->width * scale);
+	dst->height = y_iround(src->height * scale);
 }
 
 void LCUIRectF_ToRect(const LCUI_RectF *rectf, LCUI_Rect *rect, float scale)
 {
-	rect->x = y_round(rectf->x * scale);
-	rect->y = y_round(rectf->y * scale);
-	rect->width = y_round(rectf->width * scale);
-	rect->height = y_round(rectf->height * scale);
+	rect->x = y_iround(rectf->x * scale);
+	rect->y = y_iround(rectf->y * scale);
+	rect->width = y_iround(rectf->width * scale);
+	rect->height = y_iround(rectf->height * scale);
 }
 
 /* FIXME: need new shorter name */
@@ -472,7 +472,7 @@ int RectList_Delete(list_t *list, LCUI_Rect *rect)
 	if (rect->width <= 0 || rect->height <= 0) {
 		return -1;
 	}
-	list_init(&extra_list);
+	list_create(&extra_list);
 	for (list_each(node, list)) {
 		p = node->data;
 		/* 如果包含现有的矩形 */

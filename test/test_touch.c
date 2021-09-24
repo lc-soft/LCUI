@@ -94,7 +94,7 @@ static void OnTouch(LCUI_SysEvent e, void *arg)
 int main(int argc, char **argv)
 {
 	LCUI_Init();
-	list_init(&touch_bindings);
+	list_create(&touch_bindings);
 	LCUI_BindEvent(LCUI_TOUCH, OnTouch, NULL, NULL);
 	return LCUI_Main();
 }

@@ -53,7 +53,7 @@ LCUI_Worker LCUIWorker_New(void)
 	LCUI_Worker worker = NEW(LCUI_WorkerRec, 1);
 	LCUIMutex_Init(&worker->mutex);
 	LCUICond_Init(&worker->cond);
-	list_init(&worker->tasks);
+	list_create(&worker->tasks);
 	worker->active = FALSE;
 	worker->thread = 0;
 	return worker;
@@ -75,7 +75,7 @@ LCUI_Task LCUIWorker_GetTask(LCUI_Worker worker)
 	LCUI_Task task;
 	list_node_t *node;
 
-	node = list_get_node_by_pos(&worker->tasks, 0);
+	node = list_get_node(&worker->tasks, 0);
 	if (!node) {
 		return NULL;
 	}
@@ -109,7 +109,7 @@ static void OnDeleteTask(void *arg)
 
 static void LCUIWorker_ExecDestroy(LCUI_Worker worker)
 {
-	list_clear(&worker->tasks, OnDeleteTask);
+	list_destroy(&worker->tasks, OnDeleteTask);
 	LCUIMutex_Unlock(&worker->mutex);
 	LCUIMutex_Destroy(&worker->mutex);
 	LCUICond_Destroy(&worker->cond);

@@ -256,7 +256,7 @@ static void LCUIIME_OnKeyDown(LCUI_SysEvent e, void *arg)
 
 void LCUI_InitIME(void)
 {
-	list_init(&self.list);
+	list_create(&self.list);
 	self.active = TRUE;
 	LCUI_BindEvent(LCUI_KEYDOWN, LCUIIME_OnKeyDown, NULL, NULL);
 #ifdef WINAPI_FAMILY_APP

@@ -295,14 +295,14 @@ static void OnComputeLineHeight(LCUI_CSSFontStyle fs, LCUI_Style s)
 	int h;
 	if (s->is_valid) {
 		if (s->type == LCUI_STYPE_INT) {
-			h = y_round(fs->font_size * s->val_int);
+			h = y_iround(fs->font_size * s->val_int);
 		} else if (s->type == LCUI_STYPE_SCALE) {
-			h = y_round(fs->font_size * s->val_scale);
+			h = y_iround(fs->font_size * s->val_scale);
 		} else {
 			h = ComputeActual(s->value, s->type);
 		}
 	} else {
-		h = y_round(fs->font_size * LINE_HEIGHT_SCALE);
+		h = y_iround(fs->font_size * LINE_HEIGHT_SCALE);
 	}
 	fs->line_height = h;
 }

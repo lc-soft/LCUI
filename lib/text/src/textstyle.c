@@ -216,7 +216,7 @@ int TextStyle_SetDefaultFont(LCUI_TextStyle ts)
 
 void StyleTags_Clear(list_t *tags)
 {
-	list_clear(tags, free);
+	list_destroy(tags, free);
 }
 
 /** 获取当前的文本样式 */
@@ -276,7 +276,7 @@ LCUI_TextStyle StyleTags_GetTextStyle(list_t *tags)
 				break;
 			}
 			style->has_pixel_size = TRUE;
-			style->pixel_size = y_round(tag->style.px);
+			style->pixel_size = y_iround(tag->style.px);
 			found_tags[tag->id] = TRUE;
 			++count;
 			break;

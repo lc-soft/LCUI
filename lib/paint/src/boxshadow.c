@@ -519,7 +519,7 @@ static void BoxShadow_ClearContentRect(BoxShadowRenderingContext ctx)
 
 	/* Initialize a queue for recording the area after the split content
 	 * area */
-	list_init(&rects);
+	list_create(&rects);
 	RectList_Add(&rects, &ctx->content_box);
 
 	r = ctx->shadow->top_left_radius;

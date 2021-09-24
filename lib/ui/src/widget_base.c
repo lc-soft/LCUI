@@ -88,8 +88,8 @@ static void Widget_Init(LCUI_Widget widget)
 	widget->computed_style.position = SV_STATIC;
 	widget->computed_style.pointer_events = SV_INHERIT;
 	widget->computed_style.box_sizing = SV_CONTENT_BOX;
-	list_init(&widget->children);
-	list_init(&widget->children_show);
+	list_create(&widget->children);
+	list_create(&widget->children_show);
 	widget->node.data = widget;
 	widget->node_show.data = widget;
 	widget->node.next = widget->node.prev = NULL;
@@ -547,7 +547,7 @@ void Widget_UpdateBoxSize(LCUI_Widget w)
 
 void LCUIWidget_InitBase(void)
 {
-	list_init(&LCUIWidget.trash);
+	list_create(&LCUIWidget.trash);
 	LCUIWidget.root = LCUIWidget_New("root");
 	Widget_SetTitleW(LCUIWidget.root, L"LCUI Display");
 }

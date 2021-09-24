@@ -500,7 +500,7 @@ LCUI_Selector Widget_GetSelector(LCUI_Widget w)
 	list_node_t *node;
 
 	s = Selector(NULL);
-	list_init(&list);
+	list_create(&list);
 	for (parent = w; parent; parent = parent->parent) {
 		if (parent->id || parent->type || parent->classes ||
 		    parent->status) {
@@ -508,7 +508,7 @@ LCUI_Selector Widget_GetSelector(LCUI_Widget w)
 		}
 	}
 	if (list.length >= MAX_SELECTOR_DEPTH) {
-		list_clear(&list, NULL);
+		list_destroy(&list, NULL);
 		Selector_Delete(s);
 		return NULL;
 	}
@@ -518,7 +518,7 @@ LCUI_Selector Widget_GetSelector(LCUI_Widget w)
 		s->rank += s->nodes[i]->rank;
 		i += 1;
 	}
-	list_clear(&list, NULL);
+	list_destroy(&list, NULL);
 	s->nodes[i] = NULL;
 	s->length = i;
 	Selector_Update(s);
@@ -545,7 +545,7 @@ size_t Widget_GetChildrenStyleChanges(LCUI_Widget w, int type, const char *name)
 	default:
 		return 0;
 	}
-	list_init(&snames);
+	list_create(&snames);
 	s = Widget_GetSelector(w);
 	n = strsplit(name, " ", &names);
 	/* 为分割出来的字符串加上前缀 */
@@ -582,7 +582,7 @@ size_t Widget_GetChildrenStyleChanges(LCUI_Widget w, int type, const char *name)
 		}
 	}
 	Selector_Delete(s);
-	list_clear(&snames, free);
+	list_destroy(&snames, free);
 	for (i = 0; names[i]; ++i) {
 		free(names[i]);
 	}

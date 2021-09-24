@@ -141,7 +141,7 @@ static void SideBar_OnInit(LCUI_Widget w)
 {
 	const size_t data_size = sizeof(SideBarRec);
 	SideBar sb = Widget_AddData(w, self.sidebar, data_size);
-	list_init(&sb->items);
+	list_create(&sb->items);
 }
 
 static void OnToggle(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)

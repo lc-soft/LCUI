@@ -45,7 +45,7 @@ typedef enum { TEXT_ACTION_INSERT, TEXT_ACTION_APPEND } TextAction;
 	TextRowList_InsertNewRow(ROWLIST, (ROWLIST)->length)
 #define TextLayer_GetRow(layer, n) \
 	(n >= layer->text_rows.length) ? NULL : layer->text_rows.rows[n]
-#define GetDefaultLineHeight(H) y_round(H * 1.42857143)
+#define GetDefaultLineHeight(H) y_iround(H * 1.42857143)
 #define ISALPHA(CH) (CH >= 'a' && CH <= 'z') || (CH >= 'A' && CH <= 'Z')
 
 /* 根据对齐方式，计算文本行的起始X轴位置 */
@@ -300,12 +300,12 @@ LCUI_TextLayer TextLayer_New(void)
 	layer->enable_style_tag = FALSE;
 	layer->word_break = LCUI_WORD_BREAK_NORMAL;
 	TextStyle_Init(&layer->text_default_style);
-	list_init(&layer->text_styles);
+	list_create(&layer->text_styles);
 	layer->task.typeset_start_row = 0;
 	layer->task.update_typeset = 0;
 	layer->task.update_bitmap = 0;
 	layer->task.redraw_all = 0;
-	list_init(&layer->dirty_rects);
+	list_create(&layer->dirty_rects);
 	TextRowList_InsertNewRow(&layer->text_rows, 0);
 	return layer;
 }
@@ -333,7 +333,7 @@ static void OnDestroyTextStyle(void *data)
 
 static void TextLayer_DestroyStyleCache(LCUI_TextLayer layer)
 {
-	list_clear(&layer->text_styles, OnDestroyTextStyle);
+	list_destroy(&layer->text_styles, OnDestroyTextStyle);
 }
 
 /** 销毁TextLayer */

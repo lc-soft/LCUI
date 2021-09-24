@@ -167,7 +167,7 @@ static void OnInertialScrolling(void *arg)
 	effect = &scrollbar->effect;
 	time = (double)get_time_delta(effect->timestamp) / 1000;
 	distance = (effect->speed + 0.5 * effect->speed_delta * time) * time;
-	pos = effect->end_pos + y_round(distance);
+	pos = effect->end_pos + y_iround(distance);
 	DEBUG_MSG("distance: %g, pos: %d, speed_delta: %g, speed: %g\n",
 		  distance, pos, effect->speed_delta,
 		  effect->speed + effect->speed_delta * time);
@@ -235,7 +235,7 @@ static void StartInertialScrolling(LCUI_Widget w)
 		lcui_timer_destroy(effect->timer);
 	}
 	effect->timer =
-	    lcui_add_interval(effect->interval, OnInertialScrolling, w);
+	    lcui_timer_set_interval(effect->interval, OnInertialScrolling, w);
 	DEBUG_MSG("start_pos: %d, end_pos: %d\n", effect->start_pos,
 		  effect->end_pos);
 	DEBUG_MSG("effect->speed: %g, distance: %d, time: %d\n", effect->speed,
@@ -276,13 +276,13 @@ static void ScrollBarThumb_OnMouseMove(LCUI_Widget thumb, LCUI_WidgetEvent e,
 			    y_max(0, y_min(y / size, 1.0));
 		Widget_SetStyle(target, key_top, -layer_pos, px);
 	}
-	if (scrollbar->pos != y_round(layer_pos)) {
+	if (scrollbar->pos != y_iround(layer_pos)) {
 		LCUI_WidgetEventRec e;
 		LCUI_InitWidgetEvent(&e, "scroll");
 		e.cancel_bubble = TRUE;
 		Widget_TriggerEvent(target, &e, &layer_pos);
 	}
-	scrollbar->pos = y_round(layer_pos);
+	scrollbar->pos = y_iround(layer_pos);
 	Widget_UpdateStyle(target, FALSE);
 	Widget_Move(thumb, x, y);
 }
@@ -667,7 +667,7 @@ int ScrollBar_SetPosition(LCUI_Widget w, int pos)
 		Widget_SetStyle(thumb, key_top, thumb_pos, px);
 		Widget_SetStyle(target, key_top, -new_pos, px);
 	}
-	pos = y_round(new_pos);
+	pos = y_iround(new_pos);
 	if (scrollbar->pos != pos) {
 		LCUI_WidgetEventRec e;
 		LCUI_InitWidgetEvent(&e, "scroll");

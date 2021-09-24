@@ -77,15 +77,15 @@ float LCUIMetrics_ComputeStyle(LCUI_Style style)
 
 int LCUIMetrics_ComputeActual(float value, LCUI_StyleType type)
 {
-	return y_round(LCUIMetrics_Compute(value, type) * metrics.scale);
+	return y_iround(LCUIMetrics_Compute(value, type) * metrics.scale);
 }
 
 void LCUIMetrics_ComputeRectActual(LCUI_Rect *dst, const LCUI_RectF *src)
 {
-	dst->x = y_round(src->x * metrics.scale);
-	dst->y = y_round(src->y * metrics.scale);
-	dst->width = y_round(src->width * metrics.scale);
-	dst->height = y_round(src->height * metrics.scale);
+	dst->x = y_iround(src->x * metrics.scale);
+	dst->y = y_iround(src->y * metrics.scale);
+	dst->width = y_iround(src->width * metrics.scale);
+	dst->height = y_iround(src->height * metrics.scale);
 }
 
 float LCUIMetrics_GetScale(void)

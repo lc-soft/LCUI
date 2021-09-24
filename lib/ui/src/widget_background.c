@@ -61,7 +61,7 @@ static struct LCUI_WidgetBackgroundModule {
 static void DestroyImageCache(ImageCache cache)
 {
 	list_node_t *node;
-	while ((node = list_get_node_by_pos(&cache->refs, 0))) {
+	while ((node = list_get_node(&cache->refs, 0))) {
 		LCUI_Widget w = node->data;
 		rbtree_delete_by_keydata(&self.refs, node->data);
 		Widget_UnsetStyle(w, key_background_image);
@@ -134,7 +134,7 @@ static void ExecLoadImage(void *arg1, void *arg2)
 	cache = NEW(ImageCacheRec, 1);
 	cache->image = image;
 	cache->path = strdup2(path);
-	list_init(&cache->refs);
+	list_create(&cache->refs);
 	if (dict_add(self.images, cache->path, cache) == 0) {
 		AddImageRef(w, cache);
 	} else {

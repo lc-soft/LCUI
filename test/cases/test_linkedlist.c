@@ -12,7 +12,7 @@ void test_linkedlist(void)
 	list_t list;
 	list_node_t *node;
 
-	list_init(&list);
+	list_create(&list);
 	for (i = 0; i < n; ++i) {
 		list_append(&list, arr + i);
 	}
@@ -40,7 +40,7 @@ void test_linkedlist(void)
 	}
 	it_i("list_each_reverse() should work", (int)i, (int)n);
 
-	list_clear(&list, NULL);
-	it_b("list_clear() should work",
+	list_destroy(&list, NULL);
+	it_b("list_destroy() should work",
 	     list.length == 0 && !list.head.next && !list.tail.prev, TRUE);
 }

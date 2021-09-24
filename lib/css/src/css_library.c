@@ -452,7 +452,7 @@ LCUI_StyleList StyleList(void)
 	LCUI_StyleList list;
 
 	list = malloc(sizeof(LCUI_StyleListRec));
-	list_init(list);
+	list_create(list);
 	return list;
 }
 
@@ -1163,7 +1163,7 @@ static StyleLink CreateStyleLink(void)
 
 	dict_init_string_copy_key_type(&t);
 	link->group = NULL;
-	list_init(&link->styles);
+	list_create(&link->styles);
 	link->parents = dict_create(&t, NULL);
 	return link;
 }
@@ -1355,7 +1355,7 @@ static size_t LCUI_FindStyleSheetFromLink(StyleLink link, LCUI_Selector s,
 	list_node_t *node;
 	LCUI_SelectorNode sn;
 
-	list_init(&names);
+	list_create(&names);
 	count += StyleLink_GetStyleSheets(link, list);
 	while (--i >= 0) {
 		sn = s->nodes[i];
@@ -1368,7 +1368,7 @@ static size_t LCUI_FindStyleSheetFromLink(StyleLink link, LCUI_Selector s,
 			count +=
 			    LCUI_FindStyleSheetFromLink(parent, s, i, list);
 		}
-		list_clear(&names, free);
+		list_destroy(&names, free);
 	}
 	return count;
 }
@@ -1389,7 +1389,7 @@ int LCUI_FindStyleSheetFromGroup(int group, const char *name, LCUI_Selector s,
 	}
 	count = 0;
 	i = s->length - 1;
-	list_init(&names);
+	list_create(&names);
 	if (name) {
 		list_append(&names, strdup2(name));
 	} else {
@@ -1411,7 +1411,7 @@ int LCUI_FindStyleSheetFromGroup(int group, const char *name, LCUI_Selector s,
 		}
 		dict_destroy_iterator(iter);
 	}
-	list_clear(&names, free);
+	list_destroy(&names, free);
 	return (int)count;
 }
 
@@ -1581,7 +1581,7 @@ LCUI_CachedStyleSheet LCUI_GetCachedStyleSheet(LCUI_Selector s)
 	list_node_t *node;
 	LCUI_StyleSheet ss;
 
-	list_init(&list);
+	list_create(&list);
 	ss = dict_fetch_value(library.cache, &s->hash);
 	if (ss) {
 		return ss;
@@ -1592,7 +1592,7 @@ LCUI_CachedStyleSheet LCUI_GetCachedStyleSheet(LCUI_Selector s)
 		StyleNode sn = node->data;
 		StyleSheet_MergeList(ss, sn->list);
 	}
-	list_clear(&list, NULL);
+	list_destroy(&list, NULL);
 	dict_add(library.cache, &s->hash, ss);
 	return ss;
 }
@@ -1611,7 +1611,7 @@ void LCUI_PrintStyleSheetsBySelector(LCUI_Selector s)
 	list_t list;
 	list_node_t *node;
 	LCUI_StyleSheet ss;
-	list_init(&list);
+	list_create(&list);
 	ss = StyleSheet();
 	LCUI_FindStyleSheet(s, &list);
 	logger_debug("selector(%u) stylesheets begin\n", s->hash);
@@ -1623,7 +1623,7 @@ void LCUI_PrintStyleSheetsBySelector(LCUI_Selector s)
 		logger_debug("}\n");
 		StyleSheet_MergeList(ss, sn->list);
 	}
-	list_clear(&list, NULL);
+	list_destroy(&list, NULL);
 	logger_debug("[selector(%u) final stylesheet] {\n", s->hash);
 	LCUI_PrintStyleSheet(ss);
 	logger_debug("}\n");
@@ -1753,7 +1753,7 @@ void LCUI_InitCSSLibrary(void)
 	InitStylesheetCache();
 	InitStyleNameLibrary();
 	InitStyleValueLibrary();
-	list_init(&library.groups);
+	list_create(&library.groups);
 	skn_end = style_name_map + LEN(style_name_map);
 	for (skn = style_name_map; skn < skn_end; ++skn) {
 		LCUI_DirectAddStyleName(skn->key, skn->name);
@@ -1772,6 +1772,6 @@ void LCUI_FreeCSSLibrary(void)
 	DestroyStylesheetCache();
 	DestroyStyleNameLibrary();
 	DestroyStyleValueLibrary();
-	list_clear(&library.groups, (FuncPtr)DeleteStyleGroup);
+	list_destroy(&library.groups, (FuncPtr)DeleteStyleGroup);
 	strpool_destroy(library.strpool);
 }

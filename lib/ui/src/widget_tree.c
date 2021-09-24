@@ -114,7 +114,7 @@ int Widget_Unwrap(LCUI_Widget widget)
 	children = &widget->parent->children;
 	len = widget->children.length;
 	if (len > 0) {
-		node = list_get_node_by_pos(&widget->children, 0);
+		node = list_get_node(&widget->children, 0);
 		Widget_RemoveStatus(node->data, "first-child");
 		node = list_get_last_node(&widget->children);
 		Widget_RemoveStatus(node->data, "last-child");
@@ -214,7 +214,7 @@ LCUI_Widget Widget_GetNext(LCUI_Widget w)
 
 LCUI_Widget Widget_GetChild(LCUI_Widget w, size_t index)
 {
-	list_node_t *node = list_get_node_by_pos(&w->children, index);
+	list_node_t *node = list_get_node(&w->children, index);
 	if (node) {
 		return node->data;
 	}

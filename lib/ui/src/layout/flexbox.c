@@ -78,7 +78,7 @@ static LCUI_FlexBoxLine FlexBoxLine_Create(void)
 	line->sum_of_grow_value = 0;
 	line->sum_of_shrink_value = 0;
 	line->count_of_auto_margin_items = 0;
-	list_init(&line->elements);
+	list_create(&line->elements);
 	return line;
 }
 
@@ -86,7 +86,7 @@ static void FlexBoxLine_Destroy(void *arg)
 {
 	LCUI_FlexBoxLine line = arg;
 
-	list_clear(&line->elements, NULL);
+	list_destroy(&line->elements, NULL);
 	free(line);
 }
 
@@ -174,16 +174,16 @@ static LCUI_FlexBoxLayoutContext FlexBoxLayout_Begin(LCUI_Widget w,
 	}
 	ctx->main_size = 0;
 	ctx->cross_size = 0;
-	list_init(&ctx->free_elements);
-	list_init(&ctx->lines);
+	list_create(&ctx->free_elements);
+	list_create(&ctx->lines);
 	FlexBoxLayout_NextLine(ctx);
 	return ctx;
 }
 
 static void FlexBoxLayout_End(LCUI_FlexBoxLayoutContext ctx)
 {
-	list_clear(&ctx->lines, FlexBoxLine_Destroy);
-	list_clear(&ctx->free_elements, NULL);
+	list_destroy(&ctx->lines, FlexBoxLine_Destroy);
+	list_destroy(&ctx->free_elements, NULL);
 	free(ctx);
 }
 

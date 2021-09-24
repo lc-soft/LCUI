@@ -299,8 +299,8 @@ size_t Widget_GetInvalidArea(LCUI_Widget w, list_t *rects)
 	list_node_t *node;
 
 	float scale = LCUIMetrics_GetScale();
-	int x = y_round(w->box.padding.x * scale);
-	int y = y_round(w->box.padding.y * scale);
+	int x = y_iround(w->box.padding.x * scale);
+	int y = y_iround(w->box.padding.y * scale);
 
 	Widget_CollectInvalidArea(w, rects, 0, 0, w->box.padding);
 	for (list_each(node, rects)) {
@@ -329,7 +329,7 @@ void LCUIWidget_InitRenderer(void)
 	rbtree_init(&self.groups);
 	rbtree_set_compare_func(&self.groups, OnCompareGroup);
 	rbtree_set_destroy_func(&self.groups, OnDestroyGroup);
-	list_init(&self.rects);
+	list_create(&self.rects);
 	self.default_proto = LCUIWidget_GetPrototype(NULL);
 	self.active = TRUE;
 }

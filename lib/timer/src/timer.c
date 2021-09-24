@@ -80,14 +80,14 @@ int lcui_timer_reset(int timer_id, long int n_ms)
 	return ret;
 }
 
-int lcui_add_timeout(long int n_ms, void(*callback)(void *), void *arg)
+int lcui_timer_set_timeout(long int n_ms, void(*callback)(void *), void *arg)
 {
-	return timer_list_add_timeout(n_ms, callback, arg, main_timer_list);
+	return timer_list_set_timeout(n_ms, callback, arg, main_timer_list);
 }
 
-int lcui_add_interval(long int n_ms, void(*callback)(void *), void *arg)
+int lcui_timer_set_interval(long int n_ms, void(*callback)(void *), void *arg)
 {
-	return timer_list_add_interval(n_ms, callback, arg, main_timer_list);
+	return timer_list_set_interval(n_ms, callback, arg, main_timer_list);
 }
 
 size_t lcui_timer_list_process()

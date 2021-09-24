@@ -62,8 +62,8 @@ static LCUI_TouchPoint AddTouchPoint(list_t *points,
 		list_append(points, tp);
 	}
 	tp->state = state;
-	tp->x = y_round(point->Position.X);
-	tp->y = y_round(point->Position.Y);
+	tp->x = y_iround(point->Position.X);
+	tp->y = y_iround(point->Position.Y);
 	return tp;
 }
 
@@ -99,7 +99,7 @@ InputDriver::InputDriver()
 	m_mouse.actived = false;
 	m_mouse.leftButtonPressed = false;
 	m_mouse.rightButtonPressed = false;
-	list_init(&m_touch.points);
+	list_create(&m_touch.points);
 }
 
 void InputDriver::OnPointerPressed(CoreWindow^ sender,
@@ -141,8 +141,8 @@ void InputDriver::OnPointerPressed(CoreWindow^ sender,
 		m_mouse.position = position;
 	}
 	ev.type = LCUI_MOUSEDOWN;
-	pos.x = y_round(position.X);
-	pos.y = y_round(position.Y);
+	pos.x = y_iround(position.X);
+	pos.y = y_iround(position.Y);
 	ev.button.x = pos.x;
 	ev.button.y = pos.y;
 	LCUICursor_SetPos(pos);
@@ -176,13 +176,13 @@ void InputDriver::OnPointerMoved(CoreWindow^ sender, PointerEventArgs^ args)
 		m_mouse.actived = true;
 		m_mouse.position = position;
 	}
-	pos.x = y_round(position.X);
-	pos.y = y_round(position.Y);
+	pos.x = y_iround(position.X);
+	pos.y = y_iround(position.Y);
 	ev.type = LCUI_MOUSEMOVE;
 	ev.motion.x = pos.x;
 	ev.motion.y = pos.y;
-	ev.motion.xrel = y_round(position.X - m_mouse.position.Y);
-	ev.motion.yrel = y_round(position.Y - m_mouse.position.Y);
+	ev.motion.xrel = y_iround(position.X - m_mouse.position.Y);
+	ev.motion.yrel = y_iround(position.Y - m_mouse.position.Y);
 	m_mouse.position = position;
 	LCUI_TriggerEvent(&ev, NULL);
 	LCUI_DestroyEvent(&ev);
@@ -225,8 +225,8 @@ void InputDriver::OnPointerReleased(CoreWindow^ sender, PointerEventArgs^ args)
 	default:return;
 	}
 	ev.type = LCUI_MOUSEUP;
-	pos.x = y_round(position.X);
-	pos.y = y_round(position.Y);
+	pos.x = y_iround(position.X);
+	pos.y = y_iround(position.Y);
 	ev.button.x = pos.x;
 	ev.button.y = pos.y;
 	LCUI_TriggerEvent(&ev, NULL);

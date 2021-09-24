@@ -73,13 +73,13 @@ void Background_Paint(const LCUI_Background *bg,
 		/* 根据宽高的缩放比例，计算实际需要引用的区域 */
 		if (width != bg->image->width) {
 			scale = 1.0 * bg->image->width / width;
-			rect.x = y_round(rect.x * scale);
-			rect.width = y_round(rect.width * scale);
+			rect.x = y_iround(rect.x * scale);
+			rect.width = y_iround(rect.width * scale);
 		}
 		if (height != bg->image->height) {
 			scale = 1.0 * bg->image->height / height;
-			rect.y = y_round(rect.y * scale);
-			rect.height = y_round(rect.height * scale);
+			rect.y = y_iround(rect.y * scale);
+			rect.height = y_iround(rect.height * scale);
 		}
 		/* 引用源背景图像的一块区域 */
 		Graph_QuoteReadOnly(&graph, bg->image, &rect);

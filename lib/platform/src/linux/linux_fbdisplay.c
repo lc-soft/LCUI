@@ -329,7 +329,7 @@ static void FBSurface_Present(LCUI_Surface surface)
 	for (list_each(node, &surface->rects)) {
 		FBDisplay_SyncRect(surface, node->data);
 	}
-	list_clear(&surface->rects, free);
+	list_destroy(&surface->rects, free);
 	LCUIMutex_Unlock(&surface->mutex);
 }
 
@@ -467,7 +467,7 @@ static void FBDisplay_InitSurface(void)
 
 	Graph_Init(&surface->canvas);
 	LCUIMutex_Init(&surface->mutex);
-	list_init(&surface->rects);
+	list_create(&surface->rects);
 	display.surface_count = 0;
 	surface->canvas.color_type = LCUI_COLOR_TYPE_ARGB;
 	FBSurface_Resize(surface, display.width, display.height);

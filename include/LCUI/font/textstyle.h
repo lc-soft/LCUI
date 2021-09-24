@@ -85,7 +85,7 @@ int TextStyle_SetDefaultFont(LCUI_TextStyle ts);
 
 /*-------------------------- StyleTag --------------------------------*/
 
-#define StyleTags_Init list_init
+#define StyleTags_Init list_create
 
 /** 从字符串中获取样式标签的名字及样式属性 */
 LCUI_API const wchar_t *ScanStyleTag(const wchar_t *wstr, wchar_t *name,

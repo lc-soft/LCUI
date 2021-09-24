@@ -102,7 +102,7 @@ static LCUI_BlockLayoutRow BlockLayoutRow_Create(void)
 	row = malloc(sizeof(LCUI_BlockLayoutRowRec));
 	row->width = 0;
 	row->height = 0;
-	list_init(&row->elements);
+	list_create(&row->elements);
 	return row;
 }
 
@@ -110,7 +110,7 @@ static void BlockLayoutRow_Destroy(void *arg)
 {
 	LCUI_BlockLayoutRow row = arg;
 
-	list_clear(&row->elements, NULL);
+	list_destroy(&row->elements, NULL);
 	free(row);
 }
 
@@ -181,8 +181,8 @@ static LCUI_BlockLayoutContext BlockLayout_Begin(LCUI_Widget w,
 	ctx->content_height = 0;
 	ctx->prev_display = 0;
 	ctx->prev = NULL;
-	list_init(&ctx->free_elements);
-	list_init(&ctx->rows);
+	list_create(&ctx->free_elements);
+	list_create(&ctx->rows);
 	BlockLayout_NextRow(ctx);
 	return ctx;
 }
@@ -355,8 +355,8 @@ static void BlockLayout_Reflow(LCUI_BlockLayoutContext ctx)
 
 static void BlockLayout_End(LCUI_BlockLayoutContext ctx)
 {
-	list_clear(&ctx->rows, BlockLayoutRow_Destroy);
-	list_clear(&ctx->free_elements, NULL);
+	list_destroy(&ctx->rows, BlockLayoutRow_Destroy);
+	list_destroy(&ctx->free_elements, NULL);
 	free(ctx);
 }
 

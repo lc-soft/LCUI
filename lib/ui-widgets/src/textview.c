@@ -133,7 +133,7 @@ static void TextView_Update(LCUI_Widget w)
 	list_t rects;
 	list_node_t *node;
 
-	list_init(&rects);
+	list_create(&rects);
 	TextLayer_Update(txt->layer, &rects);
 	TextLayer_ClearInvalidRect(txt->layer);
 	for (list_each(node, &rects)) {
@@ -243,7 +243,7 @@ static void TextView_OnAutoSize(LCUI_Widget w, float *width, float *height,
 		max_height = 0;
 		break;
 	}
-	list_init(&rects);
+	list_create(&rects);
 	TextLayer_SetFixedSize(txt->layer, 0, 0);
 	TextLayer_SetMaxSize(txt->layer, max_width, max_height);
 	TextLayer_Update(txt->layer, &rects);
@@ -265,7 +265,7 @@ static void TextView_OnResize(LCUI_Widget w, float width, float height)
 	list_t rects;
 	list_node_t *node;
 
-	list_init(&rects);
+	list_create(&rects);
 	TextLayer_SetFixedSize(txt->layer, fixed_width, fixed_height);
 	TextLayer_SetMaxSize(txt->layer, fixed_width, fixed_height);
 	TextLayer_Update(txt->layer, &rects);
@@ -442,7 +442,7 @@ void LCUIWidget_AddTextView(void)
 	self.prototype->setattr = TextView_OnParseAttr;
 	self.prototype->runtask = TextVIew_OnTask;
 	LCUI_AddCSSPropertyParser(&parser);
-	list_init(&self.list);
+	list_create(&self.list);
 }
 
 void LCUIWidget_FreeTextView(void)

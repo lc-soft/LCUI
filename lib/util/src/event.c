@@ -67,12 +67,12 @@ static void DestroyEventRecord(void *data)
 	list_node_t *node;
 	LCUI_EventRecord record = data;
 	while (record->handlers.length > 0) {
-		node = list_get_node_by_pos(&record->handlers, 0);
+		node = list_get_node(&record->handlers, 0);
 		if (node) {
 			DestroyEventHandler(node->data);
 		}
 	}
-	list_clear(&record->trash, NULL);
+	list_destroy(&record->trash, NULL);
 	free(record);
 }
 
@@ -125,8 +125,8 @@ int EventTrigger_Bind(LCUI_EventTrigger trigger, int event_id,
 		record = NEW(LCUI_EventRecordRec, 1);
 		record->id = event_id;
 		record->blocked = FALSE;
-		list_init(&record->trash);
-		list_init(&record->handlers);
+		list_create(&record->trash);
+		list_create(&record->handlers);
 		rbtree_insert_by_key(&trigger->events, event_id, record);
 	}
 	handler = NEW(LCUI_EventHandlerRec, 1);

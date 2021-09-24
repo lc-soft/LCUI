@@ -88,7 +88,7 @@ static struct LCUI_DisplayModule {
 /* clang-format on */
 
 #define LCUIDisplay_CleanSurfaces() \
-	list_clear(&display.surfaces, OnDestroySurfaceRecord)
+	list_destroy(&display.surfaces, OnDestroySurfaceRecord)
 
 INLINE int is_rect_equals(const LCUI_Rect *a, const LCUI_Rect *b)
 {
@@ -101,8 +101,8 @@ static void OnDestroySurfaceRecord(void *data)
 	SurfaceRecord record = data;
 
 	Surface_Close(record->surface);
-	list_clear(&record->rects, free);
-	list_clear(&record->flash_rects, free);
+	list_destroy(&record->rects, free);
+	list_destroy(&record->flash_rects, free);
 	free(record);
 }
 
@@ -234,7 +234,7 @@ static void SurfaceRecord_DumpRects(SurfaceRecord record, list_t *rects)
 		layer->rect.x = 0;
 		layer->rect.width = layer_width;
 		layer->rect.height = layer_height;
-		list_init(&layer->rects);
+		list_create(&layer->rects);
 	}
 	sub_rect = malloc(sizeof(LCUI_Rect));
 	for (list_each(node, &record->rects)) {
@@ -312,7 +312,7 @@ static size_t LCUIDisplay_RenderSurface(SurfaceRecord record)
 	list_t rects;
 	list_node_t *node;
 
-	list_init(&rects);
+	list_create(&rects);
 	GetRenderingLayerSize(&layer_width, &layer_height);
 	SurfaceRecord_DumpRects(record, &rects);
 	if (rects.length < 1) {
@@ -496,7 +496,7 @@ static void LCUIDisplay_BindSurface(LCUI_Widget widget)
 	record->surface = Surface_New();
 	record->widget = widget;
 	record->rendered = FALSE;
-	list_init(&record->flash_rects);
+	list_create(&record->flash_rects);
 	LCUIMetrics_ComputeRectActual(&rect, &widget->box.canvas);
 	if (Widget_CheckStyleValid(widget, key_top) &&
 	    Widget_CheckStyleValid(widget, key_left)) {
@@ -657,7 +657,7 @@ int LCUIDisplay_GetWidth(void)
 	}
 	if (display.mode == LCUI_DMODE_WINDOWED ||
 	    display.mode == LCUI_DMODE_FULLSCREEN) {
-		return y_round(LCUIWidget_GetRoot()->width);
+		return y_iround(LCUIWidget_GetRoot()->width);
 	}
 	return display.driver->getWidth();
 }
@@ -669,7 +669,7 @@ int LCUIDisplay_GetHeight(void)
 	}
 	if (display.mode == LCUI_DMODE_WINDOWED ||
 	    display.mode == LCUI_DMODE_FULLSCREEN) {
-		return y_round(LCUIWidget_GetRoot()->height);
+		return y_iround(LCUIWidget_GetRoot()->height);
 	}
 	return display.driver->getHeight();
 }
@@ -910,19 +910,19 @@ static void OnMinMaxInfo(LCUI_Event e, void *arg)
 	int height = Surface_GetHeight(s);
 
 	if (style->min_width >= 0) {
-		dpy_ev->minmaxinfo.min_width = y_round(style->min_width);
+		dpy_ev->minmaxinfo.min_width = y_iround(style->min_width);
 		resizable = resizable || width < style->min_width;
 	}
 	if (style->max_width >= 0) {
-		dpy_ev->minmaxinfo.max_width = y_round(style->max_width);
+		dpy_ev->minmaxinfo.max_width = y_iround(style->max_width);
 		resizable = resizable || width > style->max_width;
 	}
 	if (style->min_height >= 0) {
-		dpy_ev->minmaxinfo.min_height = y_round(style->min_height);
+		dpy_ev->minmaxinfo.min_height = y_iround(style->min_height);
 		resizable = resizable || height < style->min_height;
 	}
 	if (style->max_height >= 0) {
-		dpy_ev->minmaxinfo.max_height = y_round(style->max_height);
+		dpy_ev->minmaxinfo.max_height = y_iround(style->max_height);
 		resizable = resizable || height > style->max_height;
 	}
 	if (resizable) {
@@ -958,8 +958,8 @@ int LCUI_InitDisplay(LCUI_DisplayDriver driver)
 	display.settings_change_handler_id = LCUI_BindEvent(
 	    LCUI_SETTINGS_CHANGE, OnSettingsChangeEvent, NULL, NULL);
 
-	list_init(&display.rects);
-	list_init(&display.surfaces);
+	list_create(&display.rects);
+	list_create(&display.surfaces);
 	if (!display.driver) {
 		display.driver = LCUI_CreateDisplayDriver();
 	}

@@ -65,7 +65,7 @@ static void Canvas_OnInit(LCUI_Widget w)
 	Canvas canvas = Widget_AddData(w, self.proto, sizeof(CanvasRec));
 
 	Graph_Init(&canvas->buffer);
-	list_init(&canvas->contexts);
+	list_create(&canvas->contexts);
 }
 
 static void Canvas_OnDestroy(LCUI_Widget w)

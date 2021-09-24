@@ -438,7 +438,7 @@ int LCUIMainLoop_Run(LCUI_MainLoop loop)
 	loop->state = STATE_EXITED;
 	DEBUG_MSG("loop: %p, exit\n", loop);
 	LCUIMainLoop_Destroy(loop);
-	list_delete_by_pos(&MainApp.loops, 0);
+	list_delete(&MainApp.loops, 0);
 	/* 获取处于列表表头的主循环 */
 	loop = list_get(&MainApp.loops, 0);
 	/* 改变当前运行的主循环 */
@@ -472,7 +472,7 @@ void LCUI_InitApp(LCUI_AppDriver app)
 	MainApp.timer = StepTimer_Create();
 	LCUICond_Init(&MainApp.loop_changed);
 	LCUIMutex_Init(&MainApp.loop_mutex);
-	list_init(&MainApp.loops);
+	list_create(&MainApp.loops);
 	LCUIProfile_Init(&MainApp.profile);
 	LCUI_ResetSettings();
 	MainApp.settings_change_handler_id = LCUI_BindEvent(
@@ -524,7 +524,7 @@ static void LCUI_FreeApp(void)
 	StepTimer_Destroy(MainApp.timer);
 	LCUIMutex_Destroy(&MainApp.loop_mutex);
 	LCUICond_Destroy(&MainApp.loop_changed);
-	list_clear(&MainApp.loops, OnDeleteMainLoop);
+	list_destroy(&MainApp.loops, OnDeleteMainLoop);
 	if (MainApp.driver_ready) {
 		LCUI_DestroyAppDriver(MainApp.driver);
 	}

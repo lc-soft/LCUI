@@ -361,7 +361,7 @@ LCUI_BOOL ParseFontWeight(const char *str, int *weight)
 		*weight = FONT_WEIGHT_THIN;
 		return TRUE;
 	}
-	*weight = y_round(value / 100.0) * 100;
+	*weight = y_iround(value / 100.0) * 100;
 	return TRUE;
 }
 

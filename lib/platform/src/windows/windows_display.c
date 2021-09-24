@@ -565,7 +565,7 @@ LCUI_DisplayDriver LCUI_CreateWinDisplay(void)
 	LCUI_BindSysEvent(WM_SIZE, OnWMSize, NULL, NULL);
 	LCUI_BindSysEvent(WM_PAINT, OnWMPaint, NULL, NULL);
 	LCUI_BindSysEvent(WM_GETMINMAXINFO, OnWMGetMinMaxInfo, NULL, NULL);
-	list_init(&win.surfaces);
+	list_create(&win.surfaces);
 	win.trigger = EventTrigger();
 	win.active = TRUE;
 	return driver;

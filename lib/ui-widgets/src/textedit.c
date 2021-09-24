@@ -48,7 +48,7 @@
 #define PLACEHOLDER_COLOR RGB(140, 140, 140)
 #define GetData(W) Widget_GetData(W, self.prototype)
 #define AddData(W) Widget_AddData(W, self.prototype, sizeof(LCUI_TextEditRec))
-#define TextBlocks_Clear(blocks) list_clear(blocks, TextBlock_OnDestroy)
+#define TextBlocks_Clear(blocks) list_destroy(blocks, TextBlock_OnDestroy)
 
 enum TaskType { TASK_SET_TEXT, TASK_UPDATE, TASK_TOTAL };
 
@@ -152,8 +152,8 @@ static void TextEdit_UpdateCaret(LCUI_Widget widget)
 		caret_x = pos.x / scale;
 		caret_y = pos.y / scale;
 	}
-	offset_x = y_round(edit->layer->offset_x / scale);
-	offset_y = y_round(edit->layer->offset_y / scale);
+	offset_x = y_iround(edit->layer->offset_x / scale);
+	offset_y = y_iround(edit->layer->offset_y / scale);
 	x = caret_x + offset_x;
 	y = caret_y + offset_y;
 	width = edit->layer->width / scale;
@@ -180,8 +180,8 @@ static void TextEdit_UpdateCaret(LCUI_Widget widget)
 		x = caret_x + widget->box.content.width -
 		    (edit->layer->width / scale);
 	}
-	offset_x = y_round((x - caret_x) * scale);
-	offset_y = y_round((y - caret_y) * scale);
+	offset_x = y_iround((x - caret_x) * scale);
+	offset_y = y_iround((y - caret_y) * scale);
 	if (TextLayer_SetOffset(edit->layer, offset_x, offset_y)) {
 		edit->tasks[TASK_UPDATE] = TRUE;
 		Widget_AddTask(widget, LCUI_WTASK_USER);
@@ -349,7 +349,7 @@ static void TextEdit_UpdateTextLayer(LCUI_Widget w)
 	LCUI_TextStyleRec style;
 	list_node_t *node;
 
-	list_init(&rects);
+	list_create(&rects);
 	scale = LCUIMetrics_GetScale();
 	edit = Widget_GetData(w, self.prototype);
 	TextStyle_Copy(&style, &edit->layer_source->text_default_style);
@@ -378,7 +378,7 @@ static void TextEdit_OnTask(LCUI_Widget widget, int task)
 		list_node_t *node;
 		LCUI_WidgetEventRec ev;
 
-		list_init(&blocks);
+		list_create(&blocks);
 		LCUIMutex_Lock(&edit->mutex);
 		list_concat(&blocks, &edit->text_blocks);
 		LCUIMutex_Unlock(&edit->mutex);
@@ -421,7 +421,7 @@ static void TextEdit_OnResize(LCUI_Widget w, float width, float height)
 	LCUI_RectF rect;
 	LCUI_TextEdit edit = GetData(w);
 
-	list_init(&rects);
+	list_create(&rects);
 	TextLayer_SetFixedSize(edit->layer, (int)(width * scale), (int)(width * scale));
 	TextLayer_SetMaxSize(edit->layer, (int)(height * scale), (int)(height * scale));
 	TextLayer_Update(edit->layer, &rects);
@@ -837,8 +837,8 @@ static void TextEdit_OnMouseMove(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 	}
 	scale = LCUIMetrics_GetScale();
 	Widget_GetOffset(w, NULL, &offset_x, &offset_y);
-	x = y_round((e->motion.x - offset_x - w->padding.left) * scale);
-	y = y_round((e->motion.y - offset_y - w->padding.top) * scale);
+	x = y_iround((e->motion.x - offset_x - w->padding.left) * scale);
+	y = y_iround((e->motion.y - offset_y - w->padding.top) * scale);
 	TextLayer_SetCaretPosByPixelPos(edit->layer, x, y);
 	TextEdit_UpdateCaret(w);
 }
@@ -857,8 +857,8 @@ static void TextEdit_OnMouseDown(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 	LCUI_TextEdit edit = GetData(w);
 
 	Widget_GetOffset(w, NULL, &offset_x, &offset_y);
-	x = y_round((e->motion.x - offset_x - w->padding.left) * scale);
-	y = y_round((e->motion.y - offset_y - w->padding.top) * scale);
+	x = y_iround((e->motion.x - offset_x - w->padding.left) * scale);
+	y = y_iround((e->motion.y - offset_y - w->padding.top) * scale);
 	TextLayer_SetCaretPosByPixelPos(edit->layer, x, y);
 	TextEdit_UpdateCaret(w);
 	Widget_SetMouseCapture(w);
@@ -895,7 +895,7 @@ static void TextEdit_OnInit(LCUI_Widget w)
 	edit->caret = LCUIWidget_New("textcaret");
 	w->computed_style.focusable = TRUE;
 	memset(edit->tasks, 0, sizeof(edit->tasks));
-	list_init(&edit->text_blocks);
+	list_create(&edit->text_blocks);
 	StyleTags_Init(&edit->text_tags);
 	TextEdit_EnableMultiline(w, FALSE);
 	TextLayer_SetAutoWrap(edit->layer, TRUE);
