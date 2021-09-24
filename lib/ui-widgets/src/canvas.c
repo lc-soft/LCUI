@@ -34,6 +34,7 @@
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/metrics.h>
 #include <LCUI/gui/widget/canvas.h>
+#include <LCUI/graph.h>
 
 typedef struct CanvasRec_ {
 	LCUI_Graph buffer;

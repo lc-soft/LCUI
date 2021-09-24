@@ -42,6 +42,7 @@
 #include <LCUI/gui/widget/textedit.h>
 #include <LCUI/gui/widget/textcaret.h>
 #include <LCUI/ime.h>
+#include <LCUI/graph.h>
 
 #define TEXT_BLOCK_SIZE 512
 #define DEFAULT_WIDTH 176.0f

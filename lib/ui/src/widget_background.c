@@ -37,6 +37,7 @@
 #include <LCUI/gui/metrics.h>
 #include <LCUI/gui/widget.h>
 #include "widget_background.h"
+#include <LCUI/graph.h>
 
 #define ComputeActual LCUIMetrics_ComputeActual
 

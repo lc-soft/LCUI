@@ -45,6 +45,7 @@
 #include <LCUI/display.h>
 #include <LCUI/platform.h>
 #include <LCUI/settings.h>
+#include <LCUI/graph.h>
 #include <LCUI/main.h>
 #ifdef LCUI_DISPLAY_H
 #include LCUI_DISPLAY_H
