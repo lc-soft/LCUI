@@ -30,7 +30,7 @@
 
 #ifndef LCUI_UTIL_H
 #define LCUI_UTIL_H
-#include "yutil.h"
+#include <yutil.h>
 #include <LCUI/util/object.h>
 #include <LCUI/util/rect.h>
 #include <LCUI/util/steptimer.h>
