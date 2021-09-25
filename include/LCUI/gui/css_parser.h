@@ -112,7 +112,7 @@ struct LCUI_CSSParserStyleContextRec_ {
 	char *dirname;     /**< 当前所在的目录 */
 	const char *space; /**< 样式记录所属的空间 */
 
-	void (*style_handler)(int, LCUI_Style, void *);
+	void (*style_handler)(int, pd_style, void *);
 	void *style_handler_arg;
 
 	LinkedList selectors;          /**< 当前匹配到的选择器列表 */
@@ -121,7 +121,7 @@ struct LCUI_CSSParserStyleContextRec_ {
 };
 
 struct LCUI_CSSParserCommentContextRec_ {
-	LCUI_BOOL is_line_comment; /**< 是否为单行注释 */
+	pd_bool_t is_line_comment; /**< 是否为单行注释 */
 	LCUI_CSSParserTarget
 	    prev_target; /**< 保存的上一个目标，解析完注释后将还原成该目标 */
 };
@@ -158,7 +158,7 @@ LCUI_API const char *LCUI_GetStyleName(int key);
 LCUI_API void LCUI_InitCSSParser(void);
 
 LCUI_API void CSSStyleParser_SetCSSProperty(LCUI_CSSParserStyleContext ctx,
-					    int key, LCUI_Style s);
+					    int key, pd_style s);
 
 LCUI_API LCUI_CSSPropertyParser LCUI_GetCSSPropertyParser(const char *name);
 

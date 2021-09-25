@@ -54,7 +54,7 @@ typedef struct LCUI_FlexBoxLineRec_ {
 typedef struct LCUI_FlexBoxLayoutContextRec_ {
 	LCUI_Widget widget;
 	LCUI_LayoutRule rule;
-	LCUI_BOOL is_initiative;
+	pd_bool_t is_initiative;
 
 	float main_axis;
 	float cross_axis;

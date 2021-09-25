@@ -56,7 +56,7 @@ LCUI_API int StepTimer_GetFrameCount(StepTimer timer);
 LCUI_API void StepTimer_Remain(StepTimer timer);
 
 /** 暂停数据帧的更新 */
-LCUI_API void StepTimer_Pause(StepTimer timer, LCUI_BOOL need_pause);
+LCUI_API void StepTimer_Pause(StepTimer timer, pd_bool_t need_pause);
 
 LCUI_END_HEADER
 

@@ -135,8 +135,8 @@ LCUI_API int FontBitmap_Create(LCUI_FontBitmap *bitmap, int width, int rows);
 LCUI_API int FontBitmap_Print(LCUI_FontBitmap *fontbmp);
 
 /** 将字体位图绘制到目标图像上 */
-LCUI_API int FontBitmap_Mix(LCUI_Graph *graph, LCUI_Pos pos,
-			    const LCUI_FontBitmap *bmp, LCUI_Color color);
+LCUI_API int FontBitmap_Mix(pd_canvas_t *graph, LCUI_Pos pos,
+			    const LCUI_FontBitmap *bmp, pd_color_t color);
 
 /** 载入字体位图 */
 LCUI_API int LCUIFont_RenderBitmap(LCUI_FontBitmap *buff, wchar_t ch,

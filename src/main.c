@@ -98,14 +98,14 @@ static struct LCUI_System {
 
 /** LCUI 应用程序数据 */
 static struct LCUI_App {
-	LCUI_BOOL active;			/**< 是否已经初始化并处于活动状态 */
+	pd_bool_t active;			/**< 是否已经初始化并处于活动状态 */
 	LCUI_Mutex loop_mutex;			/**< 互斥锁，确保一次只允许一个线程跑主循环 */
 	LCUI_Cond loop_changed;			/**< 条件变量，用于指示当前运行的主循环是否改变 */
 	LCUI_MainLoop loop;			/**< 当前运行的主循环 */
 	LinkedList loops;			/**< 主循环列表 */
 	StepTimer timer;			/**< 渲染循环计数器 */
 	LCUI_AppDriver driver;			/**< 程序事件驱动支持 */
-	LCUI_BOOL driver_ready;			/**< 事件驱动支持是否已经准备就绪 */
+	pd_bool_t driver_ready;			/**< 事件驱动支持是否已经准备就绪 */
 	LCUI_Worker main_worker;		/**< 主工作线程 */
 	LCUI_Worker workers[LCUI_WORKER_NUM];	/**< 普通工作线程 */
 	int worker_next;			/**< 下一个工作线程编号 */
@@ -348,7 +348,7 @@ size_t LCUI_ProcessEvents(void)
 	return count;
 }
 
-LCUI_BOOL LCUI_PostTask(LCUI_Task task)
+pd_bool_t LCUI_PostTask(LCUI_Task task)
 {
 	if (!MainApp.main_worker) {
 		return FALSE;
@@ -396,7 +396,7 @@ LCUI_MainLoop LCUIMainLoop_New(void)
 /** 运行目标主循环 */
 int LCUIMainLoop_Run(LCUI_MainLoop loop)
 {
-	LCUI_BOOL at_same_thread = FALSE;
+	pd_bool_t at_same_thread = FALSE;
 	if (loop->state == STATE_RUNNING) {
 		DEBUG_MSG("error: main-loop already running.\n");
 		return -1;
@@ -607,7 +607,7 @@ static void LCUI_ShowCopyrightText(void)
 		   "To learn more, visit http://www.lcui.org.\n\n");
 }
 
-LCUI_BOOL LCUI_IsActive(void)
+pd_bool_t LCUI_IsActive(void)
 {
 	if (System.state == STATE_ACTIVE) {
 		return TRUE;
@@ -615,7 +615,7 @@ LCUI_BOOL LCUI_IsActive(void)
 	return FALSE;
 }
 
-LCUI_BOOL LCUI_IsOnMainLoop(void)
+pd_bool_t LCUI_IsOnMainLoop(void)
 {
 	if (!MainApp.loop) {
 		return FALSE;

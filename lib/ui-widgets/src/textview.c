@@ -46,13 +46,13 @@
 
 typedef struct LCUI_TextViewTaskRec_ {
 	wchar_t *content;
-	LCUI_BOOL update_content;
+	pd_bool_t update_content;
 } LCUI_TextViewTaskRec, *LCUI_TextViewTask;
 
 typedef struct LCUI_TextViewRec_ {
 	float available_width;
 	wchar_t *content;
-	LCUI_BOOL trimming;
+	pd_bool_t trimming;
 	LCUI_Widget widget;
 	LCUI_TextLayer layer;
 	LCUI_CSSFontStyleRec style;
@@ -66,7 +66,7 @@ static struct LCUI_TextViewModule {
 	LCUI_WidgetPrototype prototype;
 } self;
 
-static LCUI_BOOL ParseBoolean(const char *str)
+static pd_bool_t ParseBoolean(const char *str)
 {
 	if (strcmp(str, "on") == 0 && strcmp(str, "true") == 0 &&
 	    strcmp(str, "yes") == 0 && strcmp(str, "1") == 0) {
@@ -78,7 +78,7 @@ static LCUI_BOOL ParseBoolean(const char *str)
 static int OnParseWordBreak(LCUI_CSSParserStyleContext ctx, const char *value)
 {
 	char *str = strdup2(value);
-	LCUI_Style s = &ctx->sheet->sheet[self.key_word_break];
+	pd_style s = &ctx->sheet->sheet[self.key_word_break];
 	if (s->is_valid && s->string) {
 		free(s->string);
 	}
@@ -90,7 +90,7 @@ static int OnParseWordBreak(LCUI_CSSParserStyleContext ctx, const char *value)
 
 static LCUI_WordBreakMode ComputeWordBreakMode(LCUI_StyleSheet sheet)
 {
-	LCUI_Style s = &sheet->sheet[self.key_word_break];
+	pd_style s = &sheet->sheet[self.key_word_break];
 	if (s->is_valid && s->type == LCUI_STYPE_STRING && s->string) {
 		if (strcmp(s->string, "break-all") == 0) {
 			return LCUI_WORD_BREAK_BREAK_ALL;
@@ -111,7 +111,7 @@ static void TextView_OnParseAttr(LCUI_Widget w, const char *name,
 		return;
 	}
 	if (strcmp(name, "multiline") == 0) {
-		LCUI_BOOL enable = ParseBoolean(value);
+		pd_bool_t enable = ParseBoolean(value);
 		if (enable != txt->layer->enable_mulitiline) {
 			TextView_SetMulitiline(w, enable);
 		}
@@ -127,7 +127,7 @@ static void TextView_Update(LCUI_Widget w)
 {
 	float scale = LCUIMetrics_GetScale();
 
-	LCUI_RectF rect;
+	pd_rectf_t rect;
 	LCUI_TextView txt = GetData(w);
 
 	LinkedList rects;
@@ -259,7 +259,7 @@ static void TextView_OnResize(LCUI_Widget w, float width, float height)
 	int fixed_width = (int)(width * scale);
 	int fixed_height = (int)(height * scale);
 
-	LCUI_RectF rect;
+	pd_rectf_t rect;
 	LCUI_TextView txt = GetData(w);
 
 	LinkedList rects;
@@ -277,26 +277,26 @@ static void TextView_OnResize(LCUI_Widget w, float width, float height)
 	RectList_Clear(&rects);
 }
 
-static void TextView_OnPaint(LCUI_Widget w, LCUI_PaintContext paint,
+static void TextView_OnPaint(LCUI_Widget w, pd_paint_context paint,
 			     LCUI_WidgetActualStyle style)
 {
 	LCUI_Pos pos;
-	LCUI_Graph canvas;
-	LCUI_Rect content_rect, rect;
+	pd_canvas_t canvas;
+	pd_rect_t content_rect, rect;
 	LCUI_TextView txt = GetData(w);
 
 	content_rect.width = style->content_box.width;
 	content_rect.height = style->content_box.height;
 	content_rect.x = style->content_box.x - style->canvas_box.x;
 	content_rect.y = style->content_box.y - style->canvas_box.y;
-	if (!LCUIRect_GetOverlayRect(&content_rect, &paint->rect, &rect)) {
+	if (!pd_rect_get_overlay_rect(&content_rect, &paint->rect, &rect)) {
 		return;
 	}
 	pos.x = content_rect.x - rect.x;
 	pos.y = content_rect.y - rect.y;
 	rect.x -= paint->rect.x;
 	rect.y -= paint->rect.y;
-	Graph_Quote(&canvas, &paint->canvas, &rect);
+	pd_graph_quote(&canvas, &paint->canvas, &rect);
 	rect = paint->rect;
 	rect.x -= content_rect.x;
 	rect.y -= content_rect.y;
@@ -366,12 +366,12 @@ void TextView_SetTextAlign(LCUI_Widget w, int align)
 	Widget_SetFontStyle(w, key_text_align, align, style);
 }
 
-void TextView_SetColor(LCUI_Widget w, LCUI_Color color)
+void TextView_SetColor(LCUI_Widget w, pd_color_t color)
 {
 	Widget_SetFontStyle(w, key_color, color, color);
 }
 
-void TextView_SetAutoWrap(LCUI_Widget w, LCUI_BOOL enable)
+void TextView_SetAutoWrap(LCUI_Widget w, pd_bool_t enable)
 {
 	if (enable) {
 		Widget_SetFontStyle(w, key_white_space, SV_AUTO, style);
@@ -380,7 +380,7 @@ void TextView_SetAutoWrap(LCUI_Widget w, LCUI_BOOL enable)
 	}
 }
 
-void TextView_SetMulitiline(LCUI_Widget w, LCUI_BOOL enable)
+void TextView_SetMulitiline(LCUI_Widget w, pd_bool_t enable)
 {
 	LCUI_TextView txt = GetData(w);
 

@@ -42,7 +42,7 @@
 typedef struct TimerRec_ {
 	int state;			/**< 状态 */
 	long int id;			/**< 定时器ID */
-	LCUI_BOOL reuse;		/**< 是否重复使用该定时器 */
+	pd_bool_t reuse;		/**< 是否重复使用该定时器 */
 
 	int64_t start_time;		/**< 定时器启动时的时间 */
 	int64_t pause_time;		/**< 定时器暂停时的时间 */
@@ -57,7 +57,7 @@ typedef struct TimerRec_ {
 
 static struct TimerModule {
 	int id_count;         /**< 定时器ID计数 */
-	LCUI_BOOL active;     /**< 定时器线程是否正在运行 */
+	pd_bool_t active;     /**< 定时器线程是否正在运行 */
 	LCUI_Mutex mutex;     /**< 定时器记录操作互斥锁 */
 	LinkedList timers;    /**< 定时器数据记录 */
 } self;
@@ -100,7 +100,7 @@ static Timer FindTimer(int timer_id)
 }
 
 int LCUITimer_Set(long int n_ms, void(*func)(void *), void *arg,
-		  LCUI_BOOL reuse)
+		  pd_bool_t reuse)
 {
 	Timer timer;
 	if (!self.active) {

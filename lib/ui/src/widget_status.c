@@ -76,7 +76,7 @@ int Widget_AddStatus(LCUI_Widget w, const char *status_name)
 	return Widget_HandleStatusChange(w, status_name);
 }
 
-LCUI_BOOL Widget_HasStatus(LCUI_Widget w, const char *status_name)
+pd_bool_t Widget_HasStatus(LCUI_Widget w, const char *status_name)
 {
 	if (strlist_has(w->status, status_name)) {
 		return TRUE;
@@ -117,7 +117,7 @@ void Widget_UpdateStatus(LCUI_Widget widget)
 	}
 }
 
-void Widget_SetDisabled(LCUI_Widget w, LCUI_BOOL disabled)
+void Widget_SetDisabled(LCUI_Widget w, pd_bool_t disabled)
 {
 	w->disabled = disabled;
 	if (w->disabled) {

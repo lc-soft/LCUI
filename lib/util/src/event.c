@@ -36,7 +36,7 @@
 /** 事件绑定记录 */
 typedef struct LCUI_EventRecordRec_ {
 	int id;				/**< 事件标识号 */
-	LCUI_BOOL blocked;		/**< 是否已经锁定 */
+	pd_bool_t blocked;		/**< 是否已经锁定 */
 	LinkedList handlers;		/**< 事件处理器列表 */
 	LinkedList trash;		/**< 待移除的处理器列表 */
 } LCUI_EventRecordRec, *LCUI_EventRecord;

@@ -98,7 +98,7 @@ typedef struct StyleLinkRec_ {
 } StyleLinkRec, *StyleLink;
 
 static struct {
-	LCUI_BOOL active;
+	pd_bool_t active;
 	LinkedList groups;		/**< 样式组列表 */
 	Dict *cache;			/**< 样式表缓存，以选择器的 hash 值索引 */
 	Dict *names;			/**< 样式属性名称表，以值的名称索引 */
@@ -334,7 +334,7 @@ int LCUI_GetStyleTotal(void)
 	return library.count;
 }
 
-LCUI_BOOL SelectorNode_Match(LCUI_SelectorNode sn1, LCUI_SelectorNode sn2)
+pd_bool_t SelectorNode_Match(LCUI_SelectorNode sn1, LCUI_SelectorNode sn2)
 {
 	int i, j;
 	if (sn2->id) {
@@ -453,7 +453,7 @@ LCUI_StyleList StyleList(void)
 	return list;
 }
 
-void DestroyStyle(LCUI_Style s)
+void DestroyStyle(pd_style s)
 {
 	switch (s->type) {
 	case LCUI_STYPE_STRING:
@@ -474,7 +474,7 @@ void DestroyStyle(LCUI_Style s)
 	s->is_valid = FALSE;
 }
 
-void MergeStyle(LCUI_Style dst, LCUI_Style src)
+void MergeStyle(pd_style dst, pd_style src)
 {
 	switch (src->type) {
 	case LCUI_STYPE_STRING:
@@ -512,7 +512,7 @@ LCUI_StyleSheet StyleSheet(void)
 		return ss;
 	}
 	ss->length = LCUI_GetStyleTotal();
-	ss->sheet = NEW(LCUI_StyleRec, ss->length + 1);
+	ss->sheet = NEW(pd_style_t, ss->length + 1);
 	return ss;
 }
 
@@ -596,10 +596,10 @@ int StyleSheet_Merge(LCUI_StyleSheet dest, const LCUI_StyleSheetRec *src)
 {
 	int i;
 	size_t size;
-	LCUI_Style s;
+	pd_style s;
 
 	if (src->length > dest->length) {
-		size = sizeof(LCUI_StyleRec) * src->length;
+		size = sizeof(pd_style_t) * src->length;
 		s = realloc(dest->sheet, size);
 		if (!s) {
 			return -1;
@@ -620,7 +620,7 @@ int StyleSheet_Merge(LCUI_StyleSheet dest, const LCUI_StyleSheetRec *src)
 
 int StyleSheet_MergeList(LCUI_StyleSheet ss, LCUI_StyleList list)
 {
-	LCUI_Style s;
+	pd_style s;
 	LCUI_StyleListNode snode;
 	LinkedListNode *node;
 	size_t size;
@@ -629,7 +629,7 @@ int StyleSheet_MergeList(LCUI_StyleSheet ss, LCUI_StyleList list)
 	for (LinkedList_Each(node, list)) {
 		snode = node->data;
 		if (snode->key > ss->length) {
-			size = sizeof(LCUI_StyleRec) * (snode->key + 1);
+			size = sizeof(pd_style_t) * (snode->key + 1);
 			s = realloc(ss->sheet, size);
 			if (!s) {
 				return -1;
@@ -651,11 +651,11 @@ int StyleSheet_MergeList(LCUI_StyleSheet ss, LCUI_StyleList list)
 int StyleSheet_Replace(LCUI_StyleSheet dest, const LCUI_StyleSheetRec *src)
 {
 	int i;
-	LCUI_Style s;
+	pd_style s;
 	size_t count, size;
 
 	if (src->length > dest->length) {
-		size = sizeof(LCUI_StyleRec) * src->length;
+		size = sizeof(pd_style_t) * src->length;
 		s = realloc(dest->sheet, size);
 		if (!s) {
 			return -1;
@@ -1005,7 +1005,7 @@ LCUI_Selector Selector(const char *selector)
 	int ni, si, rank;
 	static int batch_num = 0;
 	char type = 0, name[MAX_NAME_LEN];
-	LCUI_BOOL is_saving = FALSE;
+	pd_bool_t is_saving = FALSE;
 	LCUI_SelectorNode node = NULL;
 	LCUI_Selector s = NEW(LCUI_SelectorRec, 1);
 
@@ -1307,7 +1307,7 @@ int LCUI_PutStyleSheet(LCUI_Selector selector, LCUI_StyleSheet in_ss,
 static size_t StyleLink_GetStyleSheets(StyleLink link, LinkedList *outlist)
 {
 	size_t i;
-	LCUI_BOOL found;
+	pd_bool_t found;
 	StyleNode snode, out_snode;
 	LinkedListNode *node, *out_node;
 
@@ -1425,7 +1425,7 @@ static void PrintStyleName(int key)
 	Logger_Debug("%s: ", key > STYLE_KEY_TOTAL ? " (+)" : "");
 }
 
-static void PrintStyleValue(LCUI_Style s)
+static void PrintStyleValue(pd_style s)
 {
 	switch (s->type) {
 	case LCUI_STYPE_AUTO:
@@ -1435,7 +1435,7 @@ static void PrintStyleValue(LCUI_Style s)
 		Logger_Debug("%s", s->val_bool ? "true" : "false");
 		break;
 	case LCUI_STYPE_COLOR: {
-		LCUI_Color *clr = &s->val_color;
+		pd_color_t *clr = &s->val_color;
 		if (clr->alpha < 255) {
 			Logger_Debug("rgba(%d,%d,%d,%g)", clr->r, clr->g, clr->b,
 				clr->a / 255.0);
@@ -1492,7 +1492,7 @@ void LCUI_PrintStyleList(LCUI_StyleList list)
 void LCUI_PrintStyleSheet(LCUI_StyleSheet ss)
 {
 	int key;
-	LCUI_Style s;
+	pd_style s;
 
 	for (key = 0; key < ss->length; ++key) {
 		s = &ss->sheet[key];

@@ -76,7 +76,7 @@ struct XMLParserContextRec_ {
 };
 
 static struct ModuleContext {
-	LCUI_BOOL active;
+	pd_bool_t active;
 	RBTree parsers;
 } self;
 

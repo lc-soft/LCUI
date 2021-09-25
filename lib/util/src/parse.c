@@ -36,12 +36,12 @@
 #include <LCUI/util/parse.h>
 #include <LCUI/font/fontlibrary.h>
 
-LCUI_BOOL ParseNumber(LCUI_Style s, const char *str)
+pd_bool_t ParseNumber(pd_style s, const char *str)
 {
 	int n = 0;
 	const char *p;
 	char num_str[32];
-	LCUI_BOOL has_point = FALSE;
+	pd_bool_t has_point = FALSE;
 
 	if (str == NULL) {
 		return FALSE;
@@ -135,7 +135,7 @@ LCUI_BOOL ParseNumber(LCUI_Style s, const char *str)
 	return TRUE;
 }
 
-LCUI_BOOL ParseRGBA(LCUI_Style var, const char *str)
+pd_bool_t ParseRGBA(pd_style var, const char *str)
 {
 	float data[4];
 	char buf[16];
@@ -175,7 +175,7 @@ LCUI_BOOL ParseRGBA(LCUI_Style var, const char *str)
 	return TRUE;
 }
 
-LCUI_BOOL ParseRGB(LCUI_Style var, const char *str)
+pd_bool_t ParseRGB(pd_style var, const char *str)
 {
 	float data[3];
 	char buf[16];
@@ -215,7 +215,7 @@ LCUI_BOOL ParseRGB(LCUI_Style var, const char *str)
 	return TRUE;
 }
 
-LCUI_BOOL ParseColor(LCUI_Style var, const char *str)
+pd_bool_t ParseColor(pd_style var, const char *str)
 {
 	const char *p;
 	int len = 0, status = 0, r, g, b;
@@ -277,7 +277,7 @@ LCUI_BOOL ParseColor(LCUI_Style var, const char *str)
 	return FALSE;
 }
 
-static LCUI_BOOL IsAbsolutePath(const char *path)
+static pd_bool_t IsAbsolutePath(const char *path)
 {
 	if (path[0] == '/') {
 		return TRUE;
@@ -288,7 +288,7 @@ static LCUI_BOOL IsAbsolutePath(const char *path)
 	return FALSE;
 }
 
-LCUI_BOOL ParseUrl(LCUI_Style s, const char *str, const char *dirname)
+pd_bool_t ParseUrl(pd_style s, const char *str, const char *dirname)
 {
 	size_t n, dirname_len;
 	const char *p, *head, *tail;
@@ -342,7 +342,7 @@ LCUI_BOOL ParseUrl(LCUI_Style s, const char *str, const char *dirname)
 	return TRUE;
 }
 
-LCUI_BOOL ParseFontWeight(const char *str, int *weight)
+pd_bool_t ParseFontWeight(const char *str, int *weight)
 {
 	int value;
 	if (strcmp(str, "normal") == 0) {
@@ -365,7 +365,7 @@ LCUI_BOOL ParseFontWeight(const char *str, int *weight)
 	return TRUE;
 }
 
-LCUI_BOOL ParseFontStyle(const char *str, int *style)
+pd_bool_t ParseFontStyle(const char *str, int *style)
 {
 	char value[64] = "";
 	strtrim(value, str, NULL);

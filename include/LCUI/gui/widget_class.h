@@ -35,7 +35,7 @@ LCUI_BEGIN_HEADER
 
 LCUI_API int Widget_AddClass(LCUI_Widget w, const char *class_name);
 
-LCUI_API LCUI_BOOL Widget_HasClass(LCUI_Widget w, const char *class_name);
+LCUI_API pd_bool_t Widget_HasClass(LCUI_Widget w, const char *class_name);
 
 LCUI_API int Widget_RemoveClass(LCUI_Widget w, const char *class_name);
 

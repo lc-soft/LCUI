@@ -50,7 +50,7 @@ typedef enum LCUI_TextStyleTagType_ {
 
 typedef struct LCUI_StyleTag {
 	LCUI_TextStyleTagType id;
-	LCUI_StyleRec style;
+	pd_style_t style;
 } LCUI_TextStyleTag;
 
 void TextStyle_Init(LCUI_TextStyle data)
@@ -139,13 +139,13 @@ void TextStyle_SetSize(LCUI_TextStyle ts, int pixel_size)
 	ts->has_pixel_size = TRUE;
 }
 
-void TextStyle_SetForeColor(LCUI_TextStyle ts, LCUI_Color color)
+void TextStyle_SetForeColor(LCUI_TextStyle ts, pd_color_t color)
 {
 	ts->fore_color = color;
 	ts->has_fore_color = TRUE;
 }
 
-void TextStyle_SetBackColor(LCUI_TextStyle ts, LCUI_Color color)
+void TextStyle_SetBackColor(LCUI_TextStyle ts, pd_color_t color)
 {
 	ts->back_color = color;
 	ts->has_back_color = TRUE;
@@ -225,7 +225,7 @@ LCUI_TextStyle StyleTags_GetTextStyle(LinkedList *tags)
 	LinkedListNode *node;
 	LCUI_TextStyleTag *tag;
 	LCUI_TextStyle style;
-	LCUI_BOOL found_tags[TEXT_STYLE_TOTAL_NUM] = { 0 };
+	pd_bool_t found_tags[TEXT_STYLE_TOTAL_NUM] = { 0 };
 
 	if (tags->length <= 0) {
 		return NULL;
@@ -364,7 +364,7 @@ const wchar_t *ScanStyleTag(const wchar_t *wstr, wchar_t *name,
 			    int max_name_len, wchar_t *data)
 {
 	size_t i, j, len;
-	LCUI_BOOL end_name = FALSE;
+	pd_bool_t end_name = FALSE;
 
 	len = wcslen(wstr);
 	if (wstr[0] != '<') {

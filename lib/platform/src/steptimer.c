@@ -135,7 +135,7 @@ normal_exit:;
 	LCUIMutex_Unlock(&timer->mutex);
 }
 
-void StepTimer_Pause(StepTimer timer, LCUI_BOOL need_pause)
+void StepTimer_Pause(StepTimer timer, pd_bool_t need_pause)
 {
 	if (timer->state == STATE_RUN && need_pause) {
 		LCUIMutex_Lock(&timer->mutex);

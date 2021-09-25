@@ -38,12 +38,12 @@ typedef struct _LCUI_ThreadContextRec_ {
 	void(*func)(void*);
 	void *arg;
 	void *retval;
-	LCUI_BOOL has_waiter;
+	pd_bool_t has_waiter;
 	LinkedListNode node;
 } LCUI_ThreadContextRec, *LCUI_ThreadContext;
 
 static struct LCUIThreadModule {
-	LCUI_BOOL active;
+	pd_bool_t active;
 	LCUI_Mutex mutex;
 	LinkedList threads;
 } self;

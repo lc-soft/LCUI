@@ -34,10 +34,10 @@
 LCUI_BEGIN_HEADER
 
 typedef struct LCUI_IMEHandlerRec_ {
-	LCUI_BOOL (*prockey)(int, int);
+	pd_bool_t (*prockey)(int, int);
 	void (*totext)(int);
-	LCUI_BOOL (*open)(void);
-	LCUI_BOOL (*close)(void);
+	pd_bool_t (*open)(void);
+	pd_bool_t (*close)(void);
 	void (*setcaret)(int, int);
 } LCUI_IMEHandlerRec, *LCUI_IMEHandler;
 
@@ -45,18 +45,18 @@ typedef struct LCUI_IMEHandlerRec_ {
 LCUI_API int LCUIIME_Register(const char *ime_name, LCUI_IMEHandler handler);
 
 /** 选定输入法 */
-LCUI_API LCUI_BOOL LCUIIME_Select(int ime_id);
+LCUI_API pd_bool_t LCUIIME_Select(int ime_id);
 
-LCUI_API LCUI_BOOL LCUIIME_SelectByName(const char *name);
+LCUI_API pd_bool_t LCUIIME_SelectByName(const char *name);
 
 /** 检测键值是否为字符键值 */
-LCUI_API LCUI_BOOL LCUIIME_CheckCharKey(int key);
+LCUI_API pd_bool_t LCUIIME_CheckCharKey(int key);
 
 /** 切换至下一个输入法 */
 LCUI_API void LCUIIME_Switch(void);
 
 /** 检测输入法是否要处理按键事件 */
-LCUI_API LCUI_BOOL LCUIIME_ProcessKey(LCUI_SysEvent e);
+LCUI_API pd_bool_t LCUIIME_ProcessKey(LCUI_SysEvent e);
 
 /** 提交输入法输入的内容至目标 */
 LCUI_API int LCUIIME_Commit(const wchar_t *str, size_t len);

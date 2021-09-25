@@ -53,7 +53,7 @@ typedef struct InertialScrollingRec_ {
 	double speed;		/**< 滚动速度 */
 	double speed_delta;	/**< 速度差（加速度） */
 	int64_t timestamp;	/**< 开始时间 */
-	LCUI_BOOL is_running;	/**< 当前效果是否正在运行 */
+	pd_bool_t is_running;	/**< 当前效果是否正在运行 */
 } InertialScrollingRec, *InertialScrolling;
 
 /** 滚动条的相关数据 */
@@ -62,8 +62,8 @@ typedef struct LCUI_ScrollBarRec_ {
 	LCUI_Widget box;
 	LCUI_Widget target;			/**< scroll target */
 	LCUI_Widget thumb;			/**< thumb of scrollbar */
-	LCUI_BOOL is_dragging;			/**< whether the target is dragged */
-	LCUI_BOOL is_draggable;			/**< whether the target can be dragged */
+	pd_bool_t is_dragging;			/**< whether the target is dragged */
+	pd_bool_t is_draggable;			/**< whether the target can be dragged */
 	LCUI_ScrollBarDirection direction;	/**< 滚动条的方向（垂直或水平） */
 	float thumb_x, thumb_y;			/**< 拖拽开始时的滑块位置 */
 	int mouse_x, mouse_y;			/**< 拖拽开始时的鼠标坐标 */

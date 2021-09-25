@@ -53,8 +53,8 @@ static struct LCUI_InputMethodEngine {
 	LinkedList list;
 
 	LCUI_IME ime;
-	LCUI_BOOL enable_caps_lock;
-	LCUI_BOOL active;
+	pd_bool_t enable_caps_lock;
+	pd_bool_t active;
 } self;
 
 static LCUI_IME LCUIIME_Find(int ime_id)
@@ -109,7 +109,7 @@ int LCUIIME_Register(const char *name, LCUI_IMEHandler handler)
 	return ime->id;
 }
 
-static LCUI_BOOL LCUIIME_Open(LCUI_IME ime)
+static pd_bool_t LCUIIME_Open(LCUI_IME ime)
 {
 	if (ime && ime->handler.open) {
 		return ime->handler.open();
@@ -117,7 +117,7 @@ static LCUI_BOOL LCUIIME_Open(LCUI_IME ime)
 	return FALSE;
 }
 
-static LCUI_BOOL LCUIIME_Close(LCUI_IME ime)
+static pd_bool_t LCUIIME_Close(LCUI_IME ime)
 {
 	if (ime && ime->handler.close) {
 		Logger_Debug("[ime] close engine: %s\n", ime->name);
@@ -126,7 +126,7 @@ static LCUI_BOOL LCUIIME_Close(LCUI_IME ime)
 	return FALSE;
 }
 
-LCUI_BOOL LCUIIME_Select(int ime_id)
+pd_bool_t LCUIIME_Select(int ime_id)
 {
 	LCUI_IME ime = LCUIIME_Find(ime_id);
 	if (ime) {
@@ -139,7 +139,7 @@ LCUI_BOOL LCUIIME_Select(int ime_id)
 	return FALSE;
 }
 
-LCUI_BOOL LCUIIME_SelectByName(const char *name)
+pd_bool_t LCUIIME_SelectByName(const char *name)
 {
 	LCUI_IME ime = LCUIIME_FindByName(name);
 	if (ime) {
@@ -172,7 +172,7 @@ static void LCUIIME_OnDestroy(void *arg)
 	free(ime);
 }
 
-LCUI_BOOL LCUIIME_CheckCharKey(int key)
+pd_bool_t LCUIIME_CheckCharKey(int key)
 {
 	switch (key) {
 	case LCUI_KEY_TAB:
@@ -203,7 +203,7 @@ static void LCUIIME_ToText(LCUI_SysEvent e)
 	self.ime->handler.totext(e->key.code);
 }
 
-LCUI_BOOL LCUIIME_ProcessKey(LCUI_SysEvent e)
+pd_bool_t LCUIIME_ProcessKey(LCUI_SysEvent e)
 {
 	int key_state;
 	/* 根据事件类型判定按键状态 */

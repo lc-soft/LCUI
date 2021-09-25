@@ -34,19 +34,19 @@
 LCUI_BEGIN_HEADER
 
 typedef struct LCUI_TextStyleRec_ {
-	LCUI_BOOL has_family:1;
-	LCUI_BOOL has_style:1;
-	LCUI_BOOL has_weight:1;
-	LCUI_BOOL has_back_color:1;
-	LCUI_BOOL has_fore_color:1;
-	LCUI_BOOL has_pixel_size:1;
+	pd_bool_t has_family:1;
+	pd_bool_t has_style:1;
+	pd_bool_t has_weight:1;
+	pd_bool_t has_back_color:1;
+	pd_bool_t has_fore_color:1;
+	pd_bool_t has_pixel_size:1;
 
 	int style;
 	int weight;
 	int *font_ids;
 
-	LCUI_Color fore_color;
-	LCUI_Color back_color;
+	pd_color_t fore_color;
+	pd_color_t back_color;
 
 	int pixel_size;
 } LCUI_TextStyleRec, *LCUI_TextStyle;
@@ -76,9 +76,9 @@ LCUI_API int TextStyle_SetFont(LCUI_TextStyle ts, const char *str);
 
 LCUI_API void TextStyle_SetSize(LCUI_TextStyle ts, int pixel_size);
 
-LCUI_API void TextStyle_SetForeColor(LCUI_TextStyle ts, LCUI_Color color);
+LCUI_API void TextStyle_SetForeColor(LCUI_TextStyle ts, pd_color_t color);
 
-LCUI_API void TextStyle_SetBackColor(LCUI_TextStyle ts, LCUI_Color color);
+LCUI_API void TextStyle_SetBackColor(LCUI_TextStyle ts, pd_color_t color);
 
 /** 设置使用默认的字体 */
 int TextStyle_SetDefaultFont(LCUI_TextStyle ts);

@@ -99,18 +99,18 @@ typedef struct LCUI_TextLayerRec_ {
 	int line_height;               /**< 全局文本行高度 */
 	int text_align;                /**< 文本的对齐方式 */
 	LCUI_WordBreakMode word_break; /**< 单词内断行模式 */
-	LCUI_BOOL enable_mulitiline;   /**< 是否启用多行文本模式 */
-	LCUI_BOOL enable_autowrap;     /**< 是否启用自动换行模式 */
-	LCUI_BOOL enable_style_tag;    /**< 是否使用文本样式标签 */
+	pd_bool_t enable_mulitiline;   /**< 是否启用多行文本模式 */
+	pd_bool_t enable_autowrap;     /**< 是否启用自动换行模式 */
+	pd_bool_t enable_style_tag;    /**< 是否使用文本样式标签 */
 	LinkedList dirty_rects;               /**< 脏矩形记录 */
 	LinkedList text_styles;               /**< 样式缓存 */
 	LCUI_TextStyleRec text_default_style; /**< 文本全局样式 */
 	LCUI_TextRowListRec text_rows;        /**< 文本行列表 */
 	struct {
-		LCUI_BOOL update_bitmap;  /**< 更新文本的字体位图 */
-		LCUI_BOOL update_typeset; /**< 重新对文本进行排版 */
+		pd_bool_t update_bitmap;  /**< 更新文本的字体位图 */
+		pd_bool_t update_typeset; /**< 重新对文本进行排版 */
 		int typeset_start_row;    /**< 排版处理的起始行 */
-		LCUI_BOOL redraw_all;     /**< 重绘所有字体位图 */
+		pd_bool_t redraw_all;     /**< 重绘所有字体位图 */
 	} task;                           /**< 待处理的任务 */
 } LCUI_TextLayerRec, *LCUI_TextLayer;
 
@@ -130,7 +130,7 @@ LCUI_API void TextLayer_AddUpdateTypeset(LCUI_TextLayer layer, int start_row);
 LCUI_API void TextLayer_SetTextAlign(LCUI_TextLayer layer, int align);
 
 /** 设置坐标偏移量 */
-LCUI_API LCUI_BOOL TextLayer_SetOffset(LCUI_TextLayer layer, int offset_x,
+LCUI_API pd_bool_t TextLayer_SetOffset(LCUI_TextLayer layer, int offset_x,
 				       int offset_y);
 
 LCUI_API LCUI_TextLayer TextLayer_New(void);
@@ -209,7 +209,7 @@ LCUI_API int TextLayer_SetFixedSize(LCUI_TextLayer layer, int width,
 LCUI_API int TextLayer_SetMaxSize(LCUI_TextLayer layer, int width, int height);
 
 /** 设置是否启用多行文本模式 */
-LCUI_API void TextLayer_SetMultiline(LCUI_TextLayer layer, LCUI_BOOL enabled);
+LCUI_API void TextLayer_SetMultiline(LCUI_TextLayer layer, pd_bool_t enabled);
 
 /** 删除文本光标的当前坐标右边的文本 */
 LCUI_API int TextLayer_TextDelete(LCUI_TextLayer layer, int n_char);
@@ -218,14 +218,14 @@ LCUI_API int TextLayer_TextDelete(LCUI_TextLayer layer, int n_char);
 LCUI_API int TextLayer_TextBackspace(LCUI_TextLayer layer, int n_char);
 
 /** 设置是否启用自动换行模式 */
-LCUI_API void TextLayer_SetAutoWrap(LCUI_TextLayer layer, LCUI_BOOL autowrap);
+LCUI_API void TextLayer_SetAutoWrap(LCUI_TextLayer layer, pd_bool_t autowrap);
 
 /** 设置单词内断行模式 */
 LCUI_API void TextLayer_SetWordBreak(LCUI_TextLayer layer,
 				     LCUI_WordBreakMode mode);
 
 /** 设置是否使用样式标签 */
-LCUI_API void TextLayer_EnableStyleTag(LCUI_TextLayer layer, LCUI_BOOL enabled);
+LCUI_API void TextLayer_EnableStyleTag(LCUI_TextLayer layer, pd_bool_t enabled);
 
 /** 重新载入各个文字的字体位图 */
 LCUI_API void TextLayer_ReloadCharBitmap(LCUI_TextLayer layer);
@@ -240,8 +240,8 @@ LCUI_API void TextLayer_Update(LCUI_TextLayer layer, LinkedList *rects);
  * @param layer_pos 文本图层在目标图像中的位置
  * @param cavans 目标画布
  */
-LCUI_API int TextLayer_RenderTo(LCUI_TextLayer layer, LCUI_Rect area,
-				LCUI_Pos layer_pos, LCUI_Graph *canvas);
+LCUI_API int TextLayer_RenderTo(LCUI_TextLayer layer, pd_rect_t area,
+				LCUI_Pos layer_pos, pd_canvas_t *canvas);
 
 /** 清除已记录的无效矩形 */
 LCUI_API void TextLayer_ClearInvalidRect(LCUI_TextLayer layer);

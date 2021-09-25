@@ -62,11 +62,11 @@ typedef struct LCUI_TouchPointRec_ {
 	int y;
 	int id;
 	int state;
-	LCUI_BOOL is_primary;
+	pd_bool_t is_primary;
 } LCUI_TouchPointRec, *LCUI_TouchPoint;
 
 typedef struct LCUI_PaintEvent_ {
-	LCUI_Rect rect;
+	pd_rect_t rect;
 } LCUI_PaintEvent;
 
 /** The event structure to describe a user interaction with the keyboard */
@@ -75,10 +75,10 @@ typedef struct LCUI_KeyboardEvent_ {
 	int code;
 
 	/** whether the Ctrl key was active when the key event was generated */
-	LCUI_BOOL ctrl_key;
+	pd_bool_t ctrl_key;
 
 	/** whether the Shift key was active when the key event was generated */
-	LCUI_BOOL shift_key;
+	pd_bool_t shift_key;
 } LCUI_KeyboardEvent;
 
 typedef struct LCUI_MouseMotionEvent_ {
@@ -174,7 +174,7 @@ LCUI_API size_t LCUI_ProcessEvents(void);
  * 添加任务
  * 该任务将会添加至主线程中执行
  */
-LCUI_API LCUI_BOOL LCUI_PostTask(LCUI_Task task);
+LCUI_API pd_bool_t LCUI_PostTask(LCUI_Task task);
 
 /**
  * 添加异步任务
@@ -216,7 +216,7 @@ LCUI_API void LCUIMainLoop_Quit(LCUI_MainLoop loop);
 LCUI_API void LCUIMainLoop_Destroy(LCUI_MainLoop loop);
 
 /* 检测LCUI是否活动 */
-LCUI_API LCUI_BOOL LCUI_IsActive(void);
+LCUI_API pd_bool_t LCUI_IsActive(void);
 
 /** 获取当前帧数 */
 LCUI_API int LCUI_GetFrameCount(void);
@@ -248,7 +248,7 @@ LCUI_API void LCUI_Quit(void);
 LCUI_API void LCUI_Exit(int code);
 
 /** 检测当前是否在主线程上 */
-LCUI_API LCUI_BOOL LCUI_IsOnMainLoop(void);
+LCUI_API pd_bool_t LCUI_IsOnMainLoop(void);
 
 LCUI_END_HEADER
 

@@ -36,7 +36,7 @@
 
 static LCUI_MetricsRec metrics;
 
-float LCUIMetrics_Compute(float value, LCUI_StyleType type)
+float LCUIMetrics_Compute(float value, pd_style_type type)
 {
 	switch (type) {
 	case LCUI_STYPE_PX:
@@ -57,7 +57,7 @@ float LCUIMetrics_Compute(float value, LCUI_StyleType type)
 	return value;
 }
 
-float LCUIMetrics_ComputeStyle(LCUI_Style style)
+float LCUIMetrics_ComputeStyle(pd_style style)
 {
 	switch (style->type) {
 	case LCUI_STYPE_PX:
@@ -74,12 +74,12 @@ float LCUIMetrics_ComputeStyle(LCUI_Style style)
 	return 0;
 }
 
-int LCUIMetrics_ComputeActual(float value, LCUI_StyleType type)
+int LCUIMetrics_ComputeActual(float value, pd_style_type type)
 {
 	return iround(LCUIMetrics_Compute(value, type) * metrics.scale);
 }
 
-void LCUIMetrics_ComputeRectActual(LCUI_Rect *dst, const LCUI_RectF *src)
+void LCUIMetrics_ComputeRectActual(pd_rect_t *dst, const pd_rectf_t *src)
 {
 	dst->x = iround(src->x * metrics.scale);
 	dst->y = iround(src->y * metrics.scale);

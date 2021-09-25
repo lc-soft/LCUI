@@ -44,7 +44,7 @@
 typedef struct LCUI_TaskCacheStatus {
 	int start, end;
 	LCUI_WidgetTaskType task;
-	LCUI_BOOL is_valid;
+	pd_bool_t is_valid;
 } LCUI_TaskStatus;
 
 /* clang-format off */
@@ -115,7 +115,7 @@ void Widget_ComputeMarginStyle(LCUI_Widget w)
 
 void Widget_ComputeProperties(LCUI_Widget w)
 {
-	LCUI_Style s;
+	pd_style s;
 	LCUI_WidgetStyle *style = &w->computed_style;
 
 	s = &w->style->sheet[key_focusable];
@@ -128,7 +128,7 @@ void Widget_ComputeProperties(LCUI_Widget w)
 	}
 }
 
-INLINE LCUI_BOOL Widget_HasFixedWidth(LCUI_Widget w, LCUI_LayoutRule rule)
+INLINE pd_bool_t Widget_HasFixedWidth(LCUI_Widget w, LCUI_LayoutRule rule)
 {
 	return rule == LCUI_LAYOUT_RULE_FIXED ||
 	       rule == LCUI_LAYOUT_RULE_FIXED_WIDTH ||
@@ -136,7 +136,7 @@ INLINE LCUI_BOOL Widget_HasFixedWidth(LCUI_Widget w, LCUI_LayoutRule rule)
 				 LCUI_SIZING_RULE_FIXED);
 }
 
-INLINE LCUI_BOOL Widget_HasFixedHeight(LCUI_Widget w, LCUI_LayoutRule rule)
+INLINE pd_bool_t Widget_HasFixedHeight(LCUI_Widget w, LCUI_LayoutRule rule)
 {
 	return rule == LCUI_LAYOUT_RULE_FIXED ||
 	       rule == LCUI_LAYOUT_RULE_FIXED_HEIGHT ||
@@ -338,7 +338,7 @@ void Widget_ComputeFlexBasisStyle(LCUI_Widget w)
 
 void Widget_ComputeVisibilityStyle(LCUI_Widget w)
 {
-	LCUI_Style s = &w->style->sheet[key_visibility];
+	pd_style s = &w->style->sheet[key_visibility];
 
 	if (w->computed_style.display == SV_NONE) {
 		w->computed_style.visible = FALSE;
@@ -352,7 +352,7 @@ void Widget_ComputeVisibilityStyle(LCUI_Widget w)
 
 void Widget_ComputeDisplayStyle(LCUI_Widget w)
 {
-	LCUI_Style s = &w->style->sheet[key_display];
+	pd_style s = &w->style->sheet[key_display];
 	LCUI_WidgetStyle *style = &w->computed_style;
 
 	if (s->is_valid && s->type == LCUI_STYPE_STYLE) {
@@ -369,7 +369,7 @@ void Widget_ComputeDisplayStyle(LCUI_Widget w)
 void Widget_ComputeOpacityStyle(LCUI_Widget w)
 {
 	float opacity = 1.0;
-	LCUI_Style s = &w->style->sheet[key_opacity];
+	pd_style s = &w->style->sheet[key_opacity];
 
 	if (s->is_valid) {
 		switch (s->type) {
@@ -394,7 +394,7 @@ void Widget_ComputeOpacityStyle(LCUI_Widget w)
 
 void Widget_ComputeZIndexStyle(LCUI_Widget w)
 {
-	LCUI_Style s = &w->style->sheet[key_z_index];
+	pd_style s = &w->style->sheet[key_z_index];
 
 	if (s->is_valid && s->type == LCUI_STYPE_INT) {
 		w->computed_style.z_index = s->val_int;
@@ -419,7 +419,7 @@ void Widget_ComputePositionStyle(LCUI_Widget w)
 
 void Widget_ComputeFlexBoxStyle(LCUI_Widget w)
 {
-	LCUI_Style s = w->style->sheet;
+	pd_style s = w->style->sheet;
 	LCUI_FlexBoxLayoutStyle *flex = &w->computed_style.flex;
 
 	if (!Widget_IsFlexLayoutStyleWorks(w)) {
@@ -597,7 +597,7 @@ void Widget_PrintStyleSheets(LCUI_Widget w)
 	Selector_Delete(s);
 }
 
-void Widget_UpdateStyle(LCUI_Widget w, LCUI_BOOL is_refresh_all)
+void Widget_UpdateStyle(LCUI_Widget w, pd_bool_t is_refresh_all)
 {
 	if (is_refresh_all) {
 		Widget_AddTask(w, LCUI_WTASK_REFRESH_STYLE);
@@ -606,7 +606,7 @@ void Widget_UpdateStyle(LCUI_Widget w, LCUI_BOOL is_refresh_all)
 	}
 }
 
-void Widget_UpdateChildrenStyle(LCUI_Widget w, LCUI_BOOL is_refresh_all)
+void Widget_UpdateChildrenStyle(LCUI_Widget w, pd_bool_t is_refresh_all)
 {
 	LinkedListNode *node;
 	w->task.for_children = TRUE;
@@ -616,10 +616,10 @@ void Widget_UpdateChildrenStyle(LCUI_Widget w, LCUI_BOOL is_refresh_all)
 	}
 }
 
-static void OnSetStyle(int key, LCUI_Style style, void *arg)
+static void OnSetStyle(int key, pd_style style, void *arg)
 {
 	LCUI_Widget w = arg;
-	LCUI_Style s = Widget_GetStyle(w, key);
+	pd_style s = Widget_GetStyle(w, key);
 
 	if (style->is_valid) {
 		DestroyStyle(s);
@@ -679,7 +679,7 @@ void Widget_AddTaskByStyle(LCUI_Widget w, int key)
 	}
 }
 
-void Widget_ExecUpdateStyle(LCUI_Widget w, LCUI_BOOL is_update_all)
+void Widget_ExecUpdateStyle(LCUI_Widget w, pd_bool_t is_update_all)
 {
 	StyleSheet_Clear(w->style);
 	if (is_update_all) {

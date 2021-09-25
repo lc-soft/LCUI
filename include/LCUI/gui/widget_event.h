@@ -83,7 +83,7 @@ typedef struct LCUI_WidgetEventRec_ {
 	uint32_t type;			/**< 事件类型标识号 */
 	void *data;			/**< 附加数据 */
 	LCUI_Widget target;		/**< 触发事件的部件 */
-	LCUI_BOOL cancel_bubble;	/**< 是否取消事件冒泡 */
+	pd_bool_t cancel_bubble;	/**< 是否取消事件冒泡 */
 	union {
 		LCUI_WidgetMouseMotionEvent motion;
 		LCUI_WidgetMouseButtonEvent button;
@@ -100,7 +100,7 @@ typedef void(*LCUI_WidgetEventFunc)(LCUI_Widget, LCUI_WidgetEvent, void*);
 #define Widget_BlockEvent(WIDGET, FLAG) (WIDGET)->event_blocked = FLAG
 
 /** 触发事件，让事件处理器在主循环中调用 */
-LCUI_API LCUI_BOOL Widget_PostEvent(LCUI_Widget widget, LCUI_WidgetEvent ev,
+LCUI_API pd_bool_t Widget_PostEvent(LCUI_Widget widget, LCUI_WidgetEvent ev,
 				    void *data, void(*destroy_data)(void*));
 
 /** 触发事件，直接调用事件处理器 */
@@ -180,7 +180,7 @@ LCUI_API int Widget_UnbindEvent(LCUI_Widget widget, const char *event_name,
  * @param @sync_props 是否将部件的属性同步给表面
  */
 LCUI_API int Widget_PostSurfaceEvent(LCUI_Widget w, int event_type,
-				     LCUI_BOOL sync_props);
+				     pd_bool_t sync_props);
 
 /** 清除事件对象，通常在部件销毁时调用该函数，以避免部件销毁后还有事件发送给它 */
 LCUI_API void LCUIWidget_ClearEventTarget(LCUI_Widget widget);

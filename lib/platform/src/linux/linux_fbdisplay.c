@@ -56,7 +56,7 @@
 enum SurfaceTaskType { TASK_RESIZE, TASK_DELETE, TASK_TOTAL_NUM };
 
 typedef struct LCUI_SurfaceTaskRec_ {
-	LCUI_BOOL is_valid;
+	pd_bool_t is_valid;
 	struct {
 		int width, height;
 	};
@@ -69,10 +69,10 @@ typedef struct LCUI_SurfaceRec_ {
 	int y;
 	unsigned width;
 	unsigned height;
-	LCUI_Rect rect;
-	LCUI_Rect actual_rect;
+	pd_rect_t rect;
+	pd_rect_t actual_rect;
 	LCUI_Mutex mutex;
-	LCUI_Graph canvas;
+	pd_canvas_t canvas;
 	LinkedList rects;
 	LCUI_SurfaceTasks tasks;
 } LCUI_SurfaceRec;
@@ -96,8 +96,8 @@ static struct LCUI_DisplayModule {
 	LCUI_SurfaceRec surface;
 	unsigned surface_count;
 
-	LCUI_BOOL active;
-	LCUI_Graph canvas;
+	pd_bool_t active;
+	pd_canvas_t canvas;
 	LCUI_EventTrigger trigger;
 } display;
 
@@ -112,8 +112,8 @@ static void FBSurface_OnResize(LCUI_Surface s, int width, int height)
 	s->rect.width = s->width;
 	s->rect.height = s->height;
 	s->actual_rect = s->rect;
-	LCUIRect_ValidateArea(&s->actual_rect, display.width, display.height);
-	Graph_Create(&s->canvas, width, height);
+	pd_rect_validate_area(&s->actual_rect, display.width, display.height);
+	pd_graph_create(&s->canvas, width, height);
 }
 
 static void FBSurface_RunTask(LCUI_Surface surface, int type)
@@ -156,7 +156,7 @@ static LCUI_Surface FBSurface_New(void)
 	return &display.surface;
 }
 
-static LCUI_BOOL FBSurface_IsReady(LCUI_Surface surface)
+static pd_bool_t FBSurface_IsReady(LCUI_Surface surface)
 {
 	return TRUE;
 }
@@ -184,37 +184,37 @@ static void FBSurface_SetRenderMode(LCUI_Surface surface, int mode)
 {
 }
 
-static LCUI_PaintContext FBSurface_BeginPaint(LCUI_Surface surface,
-					      LCUI_Rect *rect)
+static pd_paint_context FBSurface_BeginPaint(LCUI_Surface surface,
+					      pd_rect_t *rect)
 {
-	LCUI_PaintContext paint;
-	LCUI_Rect actual_rect = *rect;
-	LCUIRect_ValidateArea(&actual_rect, surface->width, surface->height);
+	pd_paint_context paint;
+	pd_rect_t actual_rect = *rect;
+	pd_rect_validate_area(&actual_rect, surface->width, surface->height);
 	actual_rect.x += surface->rect.x;
 	actual_rect.y += surface->rect.y;
-	LCUIRect_GetOverlayRect(&actual_rect, &surface->actual_rect,
+	pd_rect_get_overlay_rect(&actual_rect, &surface->actual_rect,
 				&actual_rect);
 	actual_rect.x -= surface->rect.x;
 	actual_rect.y -= surface->rect.y;
-	paint = LCUIPainter_Begin(&surface->canvas, &actual_rect);
-	Graph_FillRect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
+	paint = pd_painter_begin(&surface->canvas, &actual_rect);
+	pd_graph_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
 	RectList_Add(&surface->rects, rect);
 	return paint;
 }
 
-static void FBSurface_EndPaint(LCUI_Surface surface, LCUI_PaintContext paint)
+static void FBSurface_EndPaint(LCUI_Surface surface, pd_paint_context paint)
 {
-	LCUIPainter_End(paint);
+	pd_painter_end(paint);
 }
 
-static void FBDisplay_SyncRect16(LCUI_Graph *canvas, int x, int y)
+static void FBDisplay_SyncRect16(pd_canvas_t *canvas, int x, int y)
 {
 	uint32_t iy, ix;
-	LCUI_Rect rect;
-	LCUI_ARGB *pixel, *pixel_row;
+	pd_rect_t rect;
+	pd_color_t *pixel, *pixel_row;
 	unsigned char *dst, *dst_row;
 
-	Graph_GetValidRect(canvas, &rect);
+	pd_graph_get_valid_rect(canvas, &rect);
 	pixel_row = canvas->argb + rect.y * canvas->width + rect.x;
 	dst_row = display.fb.mem + y * display.canvas.bytes_per_row + x * 2;
 	for (iy = 0; iy < rect.width; ++iy) {
@@ -229,11 +229,11 @@ static void FBDisplay_SyncRect16(LCUI_Graph *canvas, int x, int y)
 	}
 }
 
-static void FBDisplay_SyncRect8(LCUI_Graph *canvas, int x, int y)
+static void FBDisplay_SyncRect8(pd_canvas_t *canvas, int x, int y)
 {
 	uint32_t ix, iy;
-	LCUI_Rect rect;
-	LCUI_ARGB *pixel, *pixel_row;
+	pd_rect_t rect;
+	pd_color_t *pixel, *pixel_row;
 	unsigned char *dst, *dst_row;
 	unsigned int r, g, b, i;
 	struct fb_cmap cmap;
@@ -246,7 +246,7 @@ static void FBDisplay_SyncRect8(LCUI_Graph *canvas, int x, int y)
 	cmap.green = cmap_buf + 256;
 	cmap.blue = cmap_buf + 512;
 
-	Graph_GetValidRect(canvas, &rect);
+	pd_graph_get_valid_rect(canvas, &rect);
 	pixel_row = canvas->argb + rect.y * canvas->width + rect.x;
 	dst_row = display.fb.mem + y * display.canvas.bytes_per_row + x;
 	for (iy = 0; iy < rect.height; ++iy) {
@@ -272,37 +272,37 @@ static void FBDisplay_SyncRect8(LCUI_Graph *canvas, int x, int y)
 	ioctl(display.fb.dev_fd, FBIOPUTCMAP, &cmap);
 }
 
-static void FBDisplay_SyncRect24(LCUI_Graph *canvas, int x, int y)
+static void FBDisplay_SyncRect24(pd_canvas_t *canvas, int x, int y)
 {
-	Graph_Replace(&display.canvas, canvas, x, y);
+	pd_graph_replace(&display.canvas, canvas, x, y);
 }
 
 #include <LCUI/image.h>
 
-static void FBDisplay_SyncRect32(LCUI_Graph *canvas, int x, int y)
+static void FBDisplay_SyncRect32(pd_canvas_t *canvas, int x, int y)
 {
-	Graph_Replace(&display.canvas, canvas, x, y);
+	pd_graph_replace(&display.canvas, canvas, x, y);
 }
 
-static void FBDisplay_SyncRect(LCUI_Surface surface, LCUI_Rect *rect)
+static void FBDisplay_SyncRect(LCUI_Surface surface, pd_rect_t *rect)
 {
 	int x, y;
-	LCUI_Graph canvas;
-	LCUI_Rect actual_rect;
+	pd_canvas_t canvas;
+	pd_rect_t actual_rect;
 	/* Get actual write rectangle */
 	actual_rect.x = rect->x + surface->x;
 	actual_rect.y = rect->y + surface->y;
 	actual_rect.width = rect->width;
 	actual_rect.height = rect->height;
-	LCUIRect_ValidateArea(&actual_rect, display.width, display.height);
+	pd_rect_validate_area(&actual_rect, display.width, display.height);
 	/* Convert this rectangle to surface canvas related rectangle */
 	x = actual_rect.x;
 	y = actual_rect.y;
 	actual_rect.x -= surface->x;
 	actual_rect.y -= surface->y;
-	Graph_Init(&canvas);
+	pd_graph_init(&canvas);
 	/* Use this rectangle as a canvas rectangle to write pixels */
-	Graph_Quote(&canvas, &surface->canvas, &actual_rect);
+	pd_graph_quote(&canvas, &surface->canvas, &actual_rect);
 	/* Write pixels to the framebuffer by pixel format */
 	switch (display.fb.var_info.bits_per_pixel) {
 	case 32:
@@ -465,7 +465,7 @@ static void FBDisplay_InitSurface(void)
 {
 	LCUI_Surface surface = &display.surface;
 
-	Graph_Init(&surface->canvas);
+	pd_graph_init(&surface->canvas);
 	LCUIMutex_Init(&surface->mutex);
 	LinkedList_Init(&surface->rects);
 	display.surface_count = 0;
@@ -542,7 +542,7 @@ void LCUI_DestroyLinuxFBDisplayDriver(LCUI_DisplayDriver driver)
 	case 8:
 		ioctl(display.fb.dev_fd, FBIOPUTCMAP, &display.fb.cmap);
 	default:
-		Graph_Free(&display.surface.canvas);
+		pd_graph_free(&display.surface.canvas);
 		break;
 	}
 	EventTrigger_Destroy(display.trigger);

@@ -40,7 +40,7 @@
 #include <LCUI/worker.h>
 
 typedef struct LCUI_WorkerRec_ {
-	LCUI_BOOL active;		/**< 是否处于活动状态 */
+	pd_bool_t active;		/**< 是否处于活动状态 */
 	LinkedList tasks;		/**< 任务队列 */
 	LCUI_Mutex mutex;		/**< 互斥锁 */
 	LCUI_Cond cond;			/**< 条件变量 */
@@ -84,7 +84,7 @@ LCUI_Task LCUIWorker_GetTask(LCUI_Worker worker)
 	return task;
 }
 
-LCUI_BOOL LCUIWorker_RunTask(LCUI_Worker worker)
+pd_bool_t LCUIWorker_RunTask(LCUI_Worker worker)
 {
 	LCUI_Task task;
 

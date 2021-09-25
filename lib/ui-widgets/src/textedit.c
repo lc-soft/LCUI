@@ -61,15 +61,15 @@ typedef struct LCUI_TextEditRec_ {
 	LCUI_ObjectWatcher value_watcher;
 	LCUI_Widget scrollbars[2];      /**< 两个滚动条 */
 	LCUI_Widget caret;              /**< 文本插入符 */
-	LCUI_BOOL is_read_only;         /**< 是否只读 */
-	LCUI_BOOL is_multiline_mode;    /**< 是否为多行模式 */
-	LCUI_BOOL is_placeholder_shown; /**< 是否已经显示占位符 */
+	pd_bool_t is_read_only;         /**< 是否只读 */
+	pd_bool_t is_multiline_mode;    /**< 是否为多行模式 */
+	pd_bool_t is_placeholder_shown; /**< 是否已经显示占位符 */
 	wchar_t *allow_input_char;      /**< 允许输入的字符 */
 	wchar_t password_char;          /**< 屏蔽符的副本 */
 	size_t text_block_size;         /**< 块大小 */
 	LinkedList text_blocks;         /**< 文本块缓冲区 */
 	LinkedList text_tags;           /**< 当前处理的标签列表 */
-	LCUI_BOOL tasks[TASK_TOTAL];    /**< 待处理的任务 */
+	pd_bool_t tasks[TASK_TOTAL];    /**< 待处理的任务 */
 	LCUI_Mutex mutex;               /**< 互斥锁 */
 } LCUI_TextEditRec, *LCUI_TextEdit;
 
@@ -344,7 +344,7 @@ static void TextEdit_UpdateTextLayer(LCUI_Widget w)
 {
 	float scale;
 	LinkedList rects;
-	LCUI_RectF rect;
+	pd_rectf_t rect;
 	LCUI_TextEdit edit;
 	LCUI_TextStyleRec style;
 	LinkedListNode *node;
@@ -392,7 +392,7 @@ static void TextEdit_OnTask(LCUI_Widget widget, int task)
 		edit->tasks[TASK_UPDATE] = TRUE;
 	}
 	if (edit->tasks[TASK_UPDATE]) {
-		LCUI_BOOL is_shown;
+		pd_bool_t is_shown;
 		is_shown = edit->layer_source->length == 0;
 		if (is_shown) {
 			edit->layer = edit->layer_placeholder;
@@ -418,7 +418,7 @@ static void TextEdit_OnResize(LCUI_Widget w, float width, float height)
 	LinkedList rects;
 	LinkedListNode *node;
 
-	LCUI_RectF rect;
+	pd_rectf_t rect;
 	LCUI_TextEdit edit = GetData(w);
 
 	LinkedList_Init(&rects);
@@ -480,7 +480,7 @@ static void TextEdit_OnAutoSize(LCUI_Widget w, float *width, float *height,
 	*width = max_width / scale;
 }
 
-void TextEdit_EnableStyleTag(LCUI_Widget widget, LCUI_BOOL enable)
+void TextEdit_EnableStyleTag(LCUI_Widget widget, pd_bool_t enable)
 {
 	LCUI_TextEdit edit = Widget_GetData(widget, self.prototype);
 	TextLayer_EnableStyleTag(edit->layer, enable);
@@ -491,7 +491,7 @@ void TextEdit_EnableStyleTag(LCUI_Widget widget, LCUI_BOOL enable)
  * tested, it may have many problems.
  */
 
-void TextEdit_EnableMultiline(LCUI_Widget w, LCUI_BOOL enable)
+void TextEdit_EnableMultiline(LCUI_Widget w, pd_bool_t enable)
 {
 	if (enable) {
 		Widget_SetFontStyle(w, key_white_space, SV_AUTO, style);
@@ -641,7 +641,7 @@ int TextEdit_SetPlaceHolder(LCUI_Widget w, const char *str)
 	return ret;
 }
 
-void TextEdit_SetCaretBlink(LCUI_Widget w, LCUI_BOOL visible, int time)
+void TextEdit_SetCaretBlink(LCUI_Widget w, pd_bool_t visible, int time)
 {
 	LCUI_TextEdit edit = GetData(w);
 	TextCaret_SetVisible(edit->caret, visible);
@@ -930,26 +930,26 @@ static void TextEdit_OnDestroy(LCUI_Widget widget)
 	}
 }
 
-static void TextEdit_OnPaint(LCUI_Widget w, LCUI_PaintContext paint,
+static void TextEdit_OnPaint(LCUI_Widget w, pd_paint_context paint,
 			     LCUI_WidgetActualStyle style)
 {
 	LCUI_Pos pos;
-	LCUI_Graph canvas;
-	LCUI_Rect content_rect, rect;
+	pd_canvas_t canvas;
+	pd_rect_t content_rect, rect;
 	LCUI_TextEdit edit = GetData(w);
 
 	content_rect.width = style->content_box.width;
 	content_rect.height = style->content_box.height;
 	content_rect.x = style->content_box.x - style->canvas_box.x;
 	content_rect.y = style->content_box.y - style->canvas_box.y;
-	if (!LCUIRect_GetOverlayRect(&content_rect, &paint->rect, &rect)) {
+	if (!pd_rect_get_overlay_rect(&content_rect, &paint->rect, &rect)) {
 		return;
 	}
 	pos.x = content_rect.x - rect.x;
 	pos.y = content_rect.y - rect.y;
 	rect.x -= paint->rect.x;
 	rect.y -= paint->rect.y;
-	Graph_Quote(&canvas, &paint->canvas, &rect);
+	pd_graph_quote(&canvas, &paint->canvas, &rect);
 	rect = paint->rect;
 	rect.x -= content_rect.x;
 	rect.y -= content_rect.y;

@@ -158,7 +158,7 @@ int LCUI_ReadPNGHeader(LCUI_ImageReader reader)
 #endif
 }
 
-int LCUI_ReadPNG(LCUI_ImageReader reader, LCUI_Graph *graph)
+int LCUI_ReadPNG(LCUI_ImageReader reader, pd_canvas_t *graph)
 {
 #ifdef USE_LIBPNG
 	png_uint_32 i;
@@ -186,7 +186,7 @@ int LCUI_ReadPNG(LCUI_ImageReader reader, LCUI_Graph *graph)
 	switch (header->color_type) {
 	case LCUI_COLOR_TYPE_ARGB:
 		graph->color_type = LCUI_COLOR_TYPE_ARGB;
-		ret = Graph_Create(graph, header->width, header->height);
+		ret = pd_graph_create(graph, header->width, header->height);
 		if (ret != 0) {
 			ret = -ENOMEM;
 			break;
@@ -194,7 +194,7 @@ int LCUI_ReadPNG(LCUI_ImageReader reader, LCUI_Graph *graph)
 		break;
 	case LCUI_COLOR_TYPE_RGB:
 		graph->color_type = LCUI_COLOR_TYPE_RGB;
-		ret = Graph_Create(graph, header->width, header->height);
+		ret = pd_graph_create(graph, header->width, header->height);
 		if (ret != 0) {
 			ret = -ENOMEM;
 			break;
@@ -225,11 +225,11 @@ int LCUI_ReadPNG(LCUI_ImageReader reader, LCUI_Graph *graph)
 #endif
 }
 
-int LCUI_WritePNGFile(const char *file_name, const LCUI_Graph *graph)
+int LCUI_WritePNGFile(const char *file_name, const pd_canvas_t *graph)
 {
 #ifdef USE_LIBPNG
 	FILE *fp;
-	LCUI_Rect rect;
+	pd_rect_t rect;
 	png_byte color_type;
 	png_structp png_ptr;
 	png_infop info_ptr;
@@ -237,7 +237,7 @@ int LCUI_WritePNGFile(const char *file_name, const LCUI_Graph *graph)
 	size_t x, row_size;
 	int y;
 
-	if (!Graph_IsValid(graph)) {
+	if (!pd_graph_is_valid(graph)) {
 		Logger_Error("graph is not valid\n");
 		return -1;
 	}
@@ -283,10 +283,10 @@ int LCUI_WritePNGFile(const char *file_name, const LCUI_Graph *graph)
 	png_write_info(png_ptr, info_ptr);
 	/* write bytes */
 
-	Graph_GetValidRect(graph, &rect);
-	graph = Graph_GetQuote(graph);
+	pd_graph_get_valid_rect(graph, &rect);
+	graph = pd_graph_get_quote(graph);
 	if (graph->color_type == LCUI_COLOR_TYPE_ARGB) {
-		LCUI_ARGB *px_ptr, *px_row_ptr;
+		pd_color_t *px_ptr, *px_row_ptr;
 
 		row_size = png_get_rowbytes(png_ptr, info_ptr);
 		px_row_ptr = graph->argb + rect.y * graph->width + rect.x;

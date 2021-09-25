@@ -347,7 +347,7 @@ void TextLayer_Destroy(LCUI_TextLayer layer)
 
 /** 获取指定文本行中的文本段的矩形区域 */
 static int TextLayer_GetRowRect(LCUI_TextLayer layer, int i_row, int start_col,
-				int end_col, LCUI_Rect *rect)
+				int end_col, pd_rect_t *rect)
 {
 	int i;
 	LCUI_TextRow txtrow;
@@ -394,7 +394,7 @@ static int TextLayer_GetRowRect(LCUI_TextLayer layer, int i_row, int start_col,
 static void TextLayer_InvalidateRowRect(LCUI_TextLayer layer, int row,
 					int start, int end)
 {
-	LCUI_Rect rect;
+	pd_rect_t rect;
 	if (TextLayer_GetRowRect(layer, row, start, end, &rect) == 0) {
 		RectList_Add(&layer->dirty_rects, &rect);
 	}
@@ -405,7 +405,7 @@ void TextLayer_InvalidateRowsRect(LCUI_TextLayer layer, int start_row,
 				  int end_row)
 {
 	int i, y;
-	LCUI_Rect rect;
+	pd_rect_t rect;
 
 	if (end_row < 0 || end_row >= layer->text_rows.length) {
 		end_row = layer->text_rows.length - 1;
@@ -606,7 +606,7 @@ static void TextLayer_TextRowTypeset(LCUI_TextLayer layer, int row)
 
 	LCUI_TextChar txtchar;
 	LCUI_TextRow txtrow = layer->text_rows.rows[row];
-	LCUI_BOOL autowrap =
+	pd_bool_t autowrap =
 	    max_width > 0 && layer->enable_autowrap && layer->enable_mulitiline;
 
 	for (col = 0; col < txtrow->length; ++col) {
@@ -702,7 +702,7 @@ static int TextLayer_ProcessText(LCUI_TextLayer layer, const wchar_t *wstr,
 	LinkedList tmp_tags;
 	const wchar_t *p;
 	int cur_col, cur_row, start_row, ins_x, ins_y;
-	LCUI_BOOL need_typeset, rect_has_added;
+	pd_bool_t need_typeset, rect_has_added;
 	LCUI_TextStyle style = NULL;
 
 	if (!wstr) {
@@ -952,7 +952,7 @@ int TextLayer_SetMaxSize(LCUI_TextLayer layer, int width, int height)
 }
 
 /** 设置是否启用多行文本模式 */
-void TextLayer_SetMultiline(LCUI_TextLayer layer, LCUI_BOOL enabled)
+void TextLayer_SetMultiline(LCUI_TextLayer layer, pd_bool_t enabled)
 {
 	if (layer->enable_mulitiline != enabled) {
 		layer->enable_mulitiline = enabled;
@@ -1142,7 +1142,7 @@ int TextLayer_TextBackspace(LCUI_TextLayer layer, int n_char)
 	return 0;
 }
 
-void TextLayer_SetAutoWrap(LCUI_TextLayer layer, LCUI_BOOL autowrap)
+void TextLayer_SetAutoWrap(LCUI_TextLayer layer, pd_bool_t autowrap)
 {
 	if (layer->enable_autowrap != autowrap) {
 		layer->enable_autowrap = autowrap;
@@ -1159,7 +1159,7 @@ void TextLayer_SetWordBreak(LCUI_TextLayer layer, LCUI_WordBreakMode mode)
 }
 
 /** 设置是否使用样式标签 */
-void TextLayer_EnableStyleTag(LCUI_TextLayer layer, LCUI_BOOL enable)
+void TextLayer_EnableStyleTag(LCUI_TextLayer layer, pd_bool_t enable)
 {
 	layer->enable_style_tag = enable;
 }
@@ -1221,7 +1221,7 @@ void TextLayer_Update(LCUI_TextLayer layer, LinkedList *rects)
 	}
 }
 
-static void TextLayer_ValidateArea(LCUI_TextLayer layer, LCUI_Rect *area)
+static void TextLayer_ValidateArea(LCUI_TextLayer layer, pd_rect_t *area)
 {
 	int width, height;
 	if (layer->fixed_width > 0) {
@@ -1236,11 +1236,11 @@ static void TextLayer_ValidateArea(LCUI_TextLayer layer, LCUI_Rect *area)
 	} else {
 		height = TextLayer_GetHeight(layer);
 	}
-	LCUIRect_ValidateArea(area, width, height);
+	pd_rect_validate_area(area, width, height);
 }
 
 static void TextLayer_DrawChar(LCUI_TextLayer layer, LCUI_TextChar ch,
-			       LCUI_Graph *graph, LCUI_Pos ch_pos)
+			       pd_canvas_t *graph, LCUI_Pos ch_pos)
 {
 	/* 判断文字使用的前景颜色，再进行绘制 */
 	if (ch->style && ch->style->has_fore_color) {
@@ -1252,8 +1252,8 @@ static void TextLayer_DrawChar(LCUI_TextLayer layer, LCUI_TextChar ch,
 	}
 }
 
-static void TextLayer_DrawTextRow(LCUI_TextLayer layer, LCUI_Rect *area,
-				  LCUI_Graph *graph, LCUI_Pos layer_pos,
+static void TextLayer_DrawTextRow(LCUI_TextLayer layer, pd_rect_t *area,
+				  pd_canvas_t *graph, LCUI_Pos layer_pos,
 				  LCUI_TextRow txtrow, int y)
 {
 	LCUI_TextChar txtchar;
@@ -1289,12 +1289,12 @@ static void TextLayer_DrawTextRow(LCUI_TextLayer layer, LCUI_Rect *area,
 		ch_pos.x = layer_pos.x + x;
 		ch_pos.y = layer_pos.y + y;
 		if (txtchar->style && txtchar->style->has_back_color) {
-			LCUI_Rect rect;
+			pd_rect_t rect;
 			rect.x = ch_pos.x;
 			rect.y = ch_pos.y;
 			rect.height = txtrow->height;
 			rect.width = txtchar->bitmap->advance.x;
-			Graph_FillRect(graph, txtchar->style->back_color, &rect,
+			pd_graph_fill_rect(graph, txtchar->style->back_color, &rect,
 				       TRUE);
 		}
 		ch_pos.x += txtchar->bitmap->left;
@@ -1310,8 +1310,8 @@ static void TextLayer_DrawTextRow(LCUI_TextLayer layer, LCUI_Rect *area,
 	}
 }
 
-int TextLayer_RenderTo(LCUI_TextLayer layer, LCUI_Rect area, LCUI_Pos layer_pos,
-		       LCUI_Graph *canvas)
+int TextLayer_RenderTo(LCUI_TextLayer layer, pd_rect_t area, LCUI_Pos layer_pos,
+		       pd_canvas_t *canvas)
 {
 	int y, row;
 	LCUI_TextRow txtrow;
@@ -1374,7 +1374,7 @@ void TextLayer_SetLineHeight(LCUI_TextLayer layer, int height)
 	layer->task.typeset_start_row = 0;
 }
 
-LCUI_BOOL TextLayer_SetOffset(LCUI_TextLayer layer, int offset_x, int offset_y)
+pd_bool_t TextLayer_SetOffset(LCUI_TextLayer layer, int offset_x, int offset_y)
 {
 	if (layer->new_offset_x != offset_x ||
 	    layer->new_offset_y != offset_y) {

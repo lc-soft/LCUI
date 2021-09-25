@@ -55,7 +55,7 @@ void Widget_SetMargin(LCUI_Widget w, float top, float right, float bottom,
 	Widget_UpdateStyle(w, FALSE);
 }
 
-void Widget_SetBorderColor(LCUI_Widget w, LCUI_Color color)
+void Widget_SetBorderColor(LCUI_Widget w, pd_color_t color)
 {
 	Widget_SetStyle(w, key_border_top_color, color, color);
 	Widget_SetStyle(w, key_border_right_color, color, color);
@@ -81,7 +81,7 @@ void Widget_SetBorderStyle(LCUI_Widget w, int style)
 	Widget_SetStyle(w, key_border_left_style, style, style);
 }
 
-void Widget_SetBorder(LCUI_Widget w, float width, int style, LCUI_Color color)
+void Widget_SetBorder(LCUI_Widget w, float width, int style, pd_color_t color)
 {
 	Widget_SetBorderColor(w, color);
 	Widget_SetBorderWidth(w, width);
@@ -89,7 +89,7 @@ void Widget_SetBorder(LCUI_Widget w, float width, int style, LCUI_Color color)
 }
 
 void Widget_SetBoxShadow(LCUI_Widget w, float x, float y, float blur,
-			 LCUI_Color color)
+			 pd_color_t color)
 {
 	Widget_SetStyle(w, key_box_shadow_x, x, px);
 	Widget_SetStyle(w, key_box_shadow_y, y, px);
@@ -112,7 +112,7 @@ void Widget_Resize(LCUI_Widget w, float width, float height)
 	Widget_UpdateStyle(w, FALSE);
 }
 
-LCUI_Style Widget_GetStyle(LCUI_Widget w, int key)
+pd_style Widget_GetStyle(LCUI_Widget w, int key)
 {
 	LCUI_StyleListNode node;
 
@@ -137,7 +137,7 @@ int Widget_UnsetStyle(LCUI_Widget w, int key)
 	return StyleList_RemoveNode(w->custom_style, key);
 }
 
-LCUI_Style Widget_GetInheritedStyle(LCUI_Widget w, int key)
+pd_style Widget_GetInheritedStyle(LCUI_Widget w, int key)
 {
 	LCUI_Selector selector;
 
@@ -150,22 +150,22 @@ LCUI_Style Widget_GetInheritedStyle(LCUI_Widget w, int key)
 	return &w->inherited_style->sheet[key];
 }
 
-LCUI_BOOL Widget_CheckStyleBooleanValue(LCUI_Widget w, int key, LCUI_BOOL value)
+pd_bool_t Widget_CheckStyleBooleanValue(LCUI_Widget w, int key, pd_bool_t value)
 {
-	LCUI_Style s = &w->style->sheet[key_focusable];
+	pd_style s = &w->style->sheet[key_focusable];
 
 	return s->is_valid && s->type == LCUI_STYPE_BOOL &&
 	       s->val_bool == value;
 }
 
-LCUI_BOOL Widget_CheckStyleValid(LCUI_Widget w, int key)
+pd_bool_t Widget_CheckStyleValid(LCUI_Widget w, int key)
 {
 	return w->style && w->style->sheet[key].is_valid;
 }
 
 void Widget_SetVisibility(LCUI_Widget w, const char *value)
 {
-	LCUI_Style s = Widget_GetStyle(w, key_visibility);
+	pd_style s = Widget_GetStyle(w, key_visibility);
 	if (s->is_valid && s->type == LCUI_STYPE_STRING) {
 		free(s->val_string);
 		s->val_string = NULL;
@@ -186,7 +186,7 @@ void Widget_SetHidden(LCUI_Widget w)
 
 void Widget_Show(LCUI_Widget w)
 {
-	LCUI_Style s = Widget_GetStyle(w, key_display);
+	pd_style s = Widget_GetStyle(w, key_display);
 
 	if (s->is_valid && s->type == LCUI_STYPE_STYLE &&
 	    s->val_style == SV_NONE) {
@@ -209,7 +209,7 @@ void Widget_Hide(LCUI_Widget w)
 	Widget_UpdateStyle(w, FALSE);
 }
 
-void Widget_SetPosition(LCUI_Widget w, LCUI_StyleValue position)
+void Widget_SetPosition(LCUI_Widget w, pd_style_value position)
 {
 	Widget_SetStyle(w, key_position, position, style);
 	Widget_UpdateStyle(w, FALSE);
@@ -221,7 +221,7 @@ void Widget_SetOpacity(LCUI_Widget w, float opacity)
 	Widget_UpdateStyle(w, FALSE);
 }
 
-void Widget_SetBoxSizing(LCUI_Widget w, LCUI_StyleValue sizing)
+void Widget_SetBoxSizing(LCUI_Widget w, pd_style_value sizing)
 {
 	Widget_SetStyle(w, key_box_sizing, sizing, style);
 	Widget_UpdateStyle(w, FALSE);

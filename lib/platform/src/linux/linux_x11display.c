@@ -53,7 +53,7 @@ enum SurfaceTaskType {
 };
 
 typedef struct LCUI_SurfaceTaskRec_ {
-	LCUI_BOOL is_valid;
+	pd_bool_t is_valid;
 	union {
 		struct {
 			int x, y;
@@ -61,7 +61,7 @@ typedef struct LCUI_SurfaceTaskRec_ {
 		struct {
 			int width, height;
 		};
-		LCUI_BOOL show;
+		pd_bool_t show;
 		struct {
 			char *caption;
 			size_t caption_len;
@@ -77,8 +77,8 @@ typedef struct LCUI_SurfaceRec_ {
 	GC gc;          /**< 图形操作上下文 */
 	Window window;  /**< 对应的 X11 窗口 */
 	XImage *ximage; /**< 适用于 X11 的图像数据 */
-	LCUI_BOOL is_ready; /**< 标志，标识当前的表面是否已经准备好 */
-	LCUI_Graph fb; /**< 帧缓存，它里面的数据会映射到窗口中 */
+	pd_bool_t is_ready; /**< 标志，标识当前的表面是否已经准备好 */
+	pd_canvas_t fb; /**< 帧缓存，它里面的数据会映射到窗口中 */
 	LCUI_Mutex mutex; /**< 互斥锁 */
 	LCUI_SurfaceTasks tasks;
 	LinkedList rects;    /**< 列表，记录当前需要重绘的区域 */
@@ -86,7 +86,7 @@ typedef struct LCUI_SurfaceRec_ {
 } LCUI_SurfaceRec;
 
 static struct X11_Display {
-	LCUI_BOOL is_inited; /**< 标记，标识当前模块是否已经初始化 */
+	pd_bool_t is_inited; /**< 标记，标识当前模块是否已经初始化 */
 	LinkedList surfaces;       /**< 表面列表 */
 	LCUI_X11AppDriver app;     /**< X11 应用驱动 */
 	LCUI_EventTrigger trigger; /**< 事件触发器 */
@@ -136,7 +136,7 @@ static void X11Surface_OnResize(LCUI_Surface s, int width, int height)
 		XFreeGC(x11.app->display, s->gc);
 		s->gc = NULL;
 	}
-	Graph_Init(&s->fb);
+	pd_graph_init(&s->fb);
 	s->width = width;
 	s->height = height;
 	depth = DefaultDepth(x11.app->display, x11.app->screen);
@@ -149,12 +149,12 @@ static void X11Surface_OnResize(LCUI_Surface s, int width, int height)
 		Logger_Error("[x11display] unsupport depth: %d.\n", depth);
 		break;
 	}
-	Graph_Create(&s->fb, width, height);
+	pd_graph_create(&s->fb, width, height);
 	visual = DefaultVisual(x11.app->display, x11.app->screen);
 	s->ximage = XCreateImage(x11.app->display, visual, depth, ZPixmap, 0,
 				 (char *)(s->fb.bytes), width, height, 32, 0);
 	if (!s->ximage) {
-		Graph_Free(&s->fb);
+		pd_graph_free(&s->fb);
 		Logger_Error("[x11display] create XImage faild.\n");
 		return;
 	}
@@ -273,7 +273,7 @@ static LCUI_Surface X11Surface_New(void)
 	surface->node.data = surface;
 	surface->width = MIN_WIDTH;
 	surface->height = MIN_HEIGHT;
-	Graph_Init(&surface->fb);
+	pd_graph_init(&surface->fb);
 	LCUIMutex_Init(&surface->mutex);
 	LinkedList_Init(&surface->rects);
 	surface->fb.color_type = LCUI_COLOR_TYPE_ARGB;
@@ -282,7 +282,7 @@ static LCUI_Surface X11Surface_New(void)
 	return surface;
 }
 
-static LCUI_BOOL X11Surface_IsReady(LCUI_Surface surface)
+static pd_bool_t X11Surface_IsReady(LCUI_Surface surface)
 {
 	return surface->is_ready;
 }
@@ -337,25 +337,25 @@ static void X11Surface_SetRenderMode(LCUI_Surface surface, int mode)
 	surface->mode = mode;
 }
 
-static LCUI_PaintContext X11Surface_BeginPaint(LCUI_Surface surface,
-					       LCUI_Rect *rect)
+static pd_paint_context X11Surface_BeginPaint(LCUI_Surface surface,
+					       pd_rect_t *rect)
 {
-	LCUI_PaintContext paint;
-	paint = malloc(sizeof(LCUI_PaintContextRec));
+	pd_paint_context paint;
+	paint = malloc(sizeof(pd_paint_context_t));
 	paint->rect = *rect;
 	paint->with_alpha = FALSE;
-	Graph_Init(&paint->canvas);
+	pd_graph_init(&paint->canvas);
 	LCUIMutex_Lock(&surface->mutex);
-	LCUIRect_ValidateArea(&paint->rect, surface->width, surface->height);
-	Graph_Quote(&paint->canvas, &surface->fb, &paint->rect);
-	Graph_FillRect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
+	pd_rect_validate_area(&paint->rect, surface->width, surface->height);
+	pd_graph_quote(&paint->canvas, &surface->fb, &paint->rect);
+	pd_graph_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
 	return paint;
 }
 
-static void X11Surface_EndPaint(LCUI_Surface surface, LCUI_PaintContext paint)
+static void X11Surface_EndPaint(LCUI_Surface surface, pd_paint_context paint)
 {
-	LCUI_Rect *r;
-	r = NEW(LCUI_Rect, 1);
+	pd_rect_t *r;
+	r = NEW(pd_rect_t, 1);
 	*r = paint->rect;
 	LinkedList_Append(&surface->rects, r);
 	free(paint);
@@ -368,7 +368,7 @@ static void X11Surface_Present(LCUI_Surface surface)
 	LinkedListNode *node;
 	LCUIMutex_Lock(&surface->mutex);
 	for (LinkedList_Each(node, &surface->rects)) {
-		LCUI_Rect *rect = node->data;
+		pd_rect_t *rect = node->data;
 		XPutImage(x11.app->display, surface->window, surface->gc,
 			  surface->ximage, rect->x, rect->y, rect->x, rect->y,
 			  rect->width, rect->height);
@@ -425,7 +425,7 @@ static int X11Display_GetHeight(void)
 
 static void OnExpose(LCUI_Event e, void *arg)
 {
-	LCUI_Rect rect;
+	pd_rect_t rect;
 	XEvent *ev = arg;
 	LCUI_Surface surface;
 	LCUI_DisplayEventRec dpy_ev;

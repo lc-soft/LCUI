@@ -59,7 +59,7 @@ static struct LCUI_LinuxMouseDriver {
 	const char *dev_path;
 
 	LCUI_Thread tid;
-	LCUI_BOOL active;
+	pd_bool_t active;
 } mouse;
 
 static void DispathMouseButtonEvent(int button, int state)

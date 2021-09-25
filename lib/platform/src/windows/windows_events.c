@@ -41,7 +41,7 @@
 #define WM_LCUI_TASK (WM_USER+20)
 
 static struct WindowsDriver {
-	LCUI_BOOL active;
+	pd_bool_t active;
 	HWND main_hwnd;
 	HINSTANCE main_instance;	/**< 主程序的资源句柄 */
 	HINSTANCE dll_instance;		/**< 动态库中的资源句柄 */

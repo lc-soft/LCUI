@@ -312,7 +312,7 @@ size_t Widget_Each(LCUI_Widget w, void (*callback)(LCUI_Widget, void *),
 LCUI_Widget Widget_At(LCUI_Widget widget, int ix, int iy)
 {
 	float x, y;
-	LCUI_BOOL is_hit;
+	pd_bool_t is_hit;
 	LinkedListNode *node;
 	LCUI_Widget target = widget, c = NULL;
 

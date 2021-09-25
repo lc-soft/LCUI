@@ -72,7 +72,7 @@ typedef struct LCUI_FontFamilyNodeRec_ {
 static struct LCUI_FontLibraryModule {
 	int count;			/**< 计数器，主要用于为字体信息生成标识号 */
 	int font_cache_num;		/**< 字体信息缓存区的数量 */
-	LCUI_BOOL active;		/**< 标记，指示数据库是否初始化 */
+	pd_bool_t active;		/**< 标记，指示数据库是否初始化 */
 	Dict *font_families;		/**< 字族信息库，以字族名称索引字体信息 */
 	DictType font_families_type;	/**< 字族信息库的字典类型数据 */
 	RBTree bitmap_cache;		/**< 字体位图缓存区 */
@@ -714,13 +714,13 @@ int FontBitmap_Print(LCUI_FontBitmap *fontbmp)
 	return 0;
 }
 
-static void FontBitmap_MixARGB(LCUI_Graph *graph, LCUI_Rect *write_rect,
-			       const LCUI_FontBitmap *bmp, LCUI_Color color,
-			       LCUI_Rect *read_rect)
+static void FontBitmap_MixARGB(pd_canvas_t *graph, pd_rect_t *write_rect,
+			       const LCUI_FontBitmap *bmp, pd_color_t color,
+			       pd_rect_t *read_rect)
 {
 	int x, y;
-	LCUI_Color c;
-	LCUI_ARGB *px, *px_row_des;
+	pd_color_t c;
+	pd_color_t *px, *px_row_des;
 	uchar_t *byte_ptr, *byte_row_ptr;
 
 	byte_row_ptr = bmp->buffer + read_rect->y * bmp->width;
@@ -733,16 +733,16 @@ static void FontBitmap_MixARGB(LCUI_Graph *graph, LCUI_Rect *write_rect,
 		for (x = 0; x < read_rect->width; ++x, ++byte_ptr, ++px) {
 			c = color;
 			c.alpha = (uchar_t)(*byte_ptr * color.alpha / 255.0);
-			LCUI_OverPixel(px, &c);
+			pd_over_pixel(px, &c);
 		}
 		px_row_des += graph->width;
 		byte_row_ptr += bmp->width;
 	}
 }
 
-static void FontBitmap_MixRGB(LCUI_Graph *graph, LCUI_Rect *write_rect,
-			      const LCUI_FontBitmap *bmp, LCUI_Color color,
-			      LCUI_Rect *read_rect)
+static void FontBitmap_MixRGB(pd_canvas_t *graph, pd_rect_t *write_rect,
+			      const LCUI_FontBitmap *bmp, pd_color_t color,
+			      pd_rect_t *read_rect)
 {
 	int x, y;
 	uchar_t *byte_src, *byte_row_src, *byte_row_des, *byte_des, alpha;
@@ -767,11 +767,11 @@ static void FontBitmap_MixRGB(LCUI_Graph *graph, LCUI_Rect *write_rect,
 	}
 }
 
-int FontBitmap_Mix(LCUI_Graph *graph, LCUI_Pos pos, const LCUI_FontBitmap *bmp,
-		   LCUI_Color color)
+int FontBitmap_Mix(pd_canvas_t *graph, LCUI_Pos pos, const LCUI_FontBitmap *bmp,
+		   pd_color_t color)
 {
-	LCUI_Graph write_slot;
-	LCUI_Rect r_rect, w_rect;
+	pd_canvas_t write_slot;
+	pd_rect_t r_rect, w_rect;
 	if (pos.x > (int)graph->width || pos.y > (int)graph->height) {
 		return -2;
 	}
@@ -781,15 +781,15 @@ int FontBitmap_Mix(LCUI_Graph *graph, LCUI_Pos pos, const LCUI_FontBitmap *bmp,
 	w_rect.width = bmp->width;
 	w_rect.height = bmp->rows;
 	/* 获取需要裁剪的区域 */
-	LCUIRect_GetCutArea(graph->width, graph->height, w_rect, &r_rect);
+	pd_rect_get_cut_area(graph->width, graph->height, w_rect, &r_rect);
 	w_rect.x += r_rect.x;
 	w_rect.y += r_rect.y;
 	w_rect.width = r_rect.width;
 	w_rect.height = r_rect.height;
-	Graph_Quote(&write_slot, graph, &w_rect);
-	Graph_GetValidRect(&write_slot, &w_rect);
+	pd_graph_quote(&write_slot, graph, &w_rect);
+	pd_graph_get_valid_rect(&write_slot, &w_rect);
 	/* 获取背景图引用的源图形 */
-	graph = Graph_GetQuote(graph);
+	graph = pd_graph_get_quote(graph);
 	if (graph->color_type == LCUI_COLOR_TYPE_ARGB) {
 		FontBitmap_MixARGB(graph, &w_rect, bmp, color, &r_rect);
 	} else {

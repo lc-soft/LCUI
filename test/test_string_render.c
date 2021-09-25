@@ -5,9 +5,9 @@
 int main(void)
 {
 	int ret;
-	LCUI_Graph img;
+	pd_canvas_t img;
 	LCUI_Pos pos = { 0, 80 };
-	LCUI_Rect area = { 0, 0, 320, 240 };
+	pd_rect_t area = { 0, 0, 320, 240 };
 	LCUI_TextLayer txt = TextLayer_New();
 	LCUI_TextStyleRec txtstyle;
 
@@ -15,9 +15,9 @@ int main(void)
 	LCUI_InitFontLibrary();
 
 	/* 创建一个图像，并使用灰色填充 */
-	Graph_Init(&img);
-	Graph_Create(&img, 320, 240);
-	Graph_FillRect(&img, RGB(240, 240, 240), NULL, FALSE);
+	pd_graph_init(&img);
+	pd_graph_create(&img, 320, 240);
+	pd_graph_fill_rect(&img, RGB(240, 240, 240), NULL, FALSE);
 
 	/* 设置文本的字体大小 */
 	TextStyle_Init(&txtstyle);
@@ -34,7 +34,7 @@ int main(void)
 	/* 将文本图层绘制到图像中，然后将图像写入至 png 文件中 */
 	TextLayer_RenderTo(txt, area, pos, &img);
 	ret = LCUI_WritePNGFile("test_string_render.png", &img);
-	Graph_Free(&img);
+	pd_graph_free(&img);
 
 	/* 释放字体处理功能相关资源 */
 	LCUI_FreeFontLibrary();

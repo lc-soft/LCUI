@@ -12,7 +12,7 @@ typedef struct TouchPointBindingRec_ {
 	int point_id;        /**< 触点 ID */
 	LCUI_Widget widget;  /**< 部件 */
 	LinkedListNode node; /**< 在链表中的结点 */
-	LCUI_BOOL is_valid;  /**< 是否有效 */
+	pd_bool_t is_valid;  /**< 是否有效 */
 } TouchPointBindingRec, *TouchPointBinding;
 
 /** 触点绑定记录列表 */
@@ -55,11 +55,11 @@ static void OnTouch(LCUI_SysEvent e, void *arg)
 	LCUI_Widget w;
 	LinkedListNode *node;
 	LCUI_TouchPoint point;
-	LCUI_Color bgcolor = RGB(255, 0, 0);
+	pd_color_t bgcolor = RGB(255, 0, 0);
 
 	for (i = 0; i < e->touch.n_points; ++i) {
 		TouchPointBinding binding;
-		LCUI_BOOL is_existed = FALSE;
+		pd_bool_t is_existed = FALSE;
 		point = &e->touch.points[i];
 		_DEBUG_MSG("point: %d\n", point->id);
 		/* 检查该触点是否已经被绑定 */

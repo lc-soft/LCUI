@@ -36,7 +36,7 @@
 #include <LCUI/gui/widget/canvas.h>
 
 typedef struct CanvasRec_ {
-	LCUI_Graph buffer;
+	pd_canvas_t buffer;
 	LinkedList contexts;
 } CanvasRec, *Canvas;
 
@@ -48,15 +48,15 @@ static void Canvas_OnResize(LCUI_Widget w, float width, float height)
 {
 	float scale = LCUIMetrics_GetScale();
 
-	LCUI_Graph buffer;
+	pd_canvas_t buffer;
 	Canvas canvas = Widget_GetData(w, self.proto);
 
-	Graph_Init(&buffer);
+	pd_graph_init(&buffer);
 	buffer.color_type = LCUI_COLOR_TYPE_ARGB;
-	Graph_Create(&buffer, (unsigned)(width * scale),
+	pd_graph_create(&buffer, (unsigned)(width * scale),
 		     (unsigned)(height * scale));
-	Graph_Replace(&buffer, &canvas->buffer, 0, 0);
-	Graph_Free(&canvas->buffer);
+	pd_graph_replace(&buffer, &canvas->buffer, 0, 0);
+	pd_graph_free(&canvas->buffer);
 	canvas->buffer = buffer;
 }
 
@@ -64,7 +64,7 @@ static void Canvas_OnInit(LCUI_Widget w)
 {
 	Canvas canvas = Widget_AddData(w, self.proto, sizeof(CanvasRec));
 
-	Graph_Init(&canvas->buffer);
+	pd_graph_init(&canvas->buffer);
 	LinkedList_Init(&canvas->contexts);
 }
 
@@ -79,7 +79,7 @@ static void Canvas_OnDestroy(LCUI_Widget w)
 		ctx->available = FALSE;
 	}
 	LinkedList_ClearData(&canvas->contexts, NULL);
-	Graph_Free(&canvas->buffer);
+	pd_graph_free(&canvas->buffer);
 }
 
 static void Canvas_OnAutoSize(LCUI_Widget w, float *width, float *height,
@@ -89,18 +89,18 @@ static void Canvas_OnAutoSize(LCUI_Widget w, float *width, float *height,
 	*height = 150;
 }
 
-static void Canvas_OnPaint(LCUI_Widget w, LCUI_PaintContext paint,
+static void Canvas_OnPaint(LCUI_Widget w, pd_paint_context paint,
 			   LCUI_WidgetActualStyle style)
 {
-	LCUI_Graph src, dest;
-	LCUI_Rect content_rect, rect;
+	pd_canvas_t src, dest;
+	pd_rect_t content_rect, rect;
 	Canvas canvas = Widget_GetData(w, self.proto);
 
 	content_rect.width = style->content_box.width;
 	content_rect.height = style->content_box.height;
 	content_rect.x = style->content_box.x - style->canvas_box.x;
 	content_rect.y = style->content_box.y - style->canvas_box.y;
-	if (!LCUIRect_GetOverlayRect(&content_rect, &paint->rect, &rect)) {
+	if (!pd_rect_get_overlay_rect(&content_rect, &paint->rect, &rect)) {
 		return;
 	}
 	content_rect.x = rect.x - content_rect.x;
@@ -109,33 +109,33 @@ static void Canvas_OnPaint(LCUI_Widget w, LCUI_PaintContext paint,
 	content_rect.height = rect.height;
 	rect.x -= paint->rect.x;
 	rect.y -= paint->rect.y;
-	Graph_Quote(&dest, &paint->canvas, &rect);
-	Graph_Quote(&src, &canvas->buffer, &content_rect);
-	Graph_Replace(&dest, &src, 0, 0);
+	pd_graph_quote(&dest, &paint->canvas, &rect);
+	pd_graph_quote(&src, &canvas->buffer, &content_rect);
+	pd_graph_replace(&dest, &src, 0, 0);
 }
 
 static void CanvasContext_ClearRect(LCUI_CanvasContext ctx, int x, int y,
 				    int width, int height)
 {
-	LCUI_Rect rect;
+	pd_rect_t rect;
 
 	rect.x = x;
 	rect.y = y;
 	rect.width = width;
 	rect.height = height;
-	Graph_FillRect(&ctx->buffer, ARGB(0, 0, 0, 0), &rect, TRUE);
+	pd_graph_fill_rect(&ctx->buffer, ARGB(0, 0, 0, 0), &rect, TRUE);
 }
 
 static void CanvasContext_FillRect(LCUI_CanvasContext ctx, int x, int y,
 				   int width, int height)
 {
-	LCUI_Rect rect;
+	pd_rect_t rect;
 
 	rect.x = x;
 	rect.y = y;
 	rect.width = width;
 	rect.height = height;
-	Graph_FillRect(&ctx->buffer, ctx->fill_color, &rect, TRUE);
+	pd_graph_fill_rect(&ctx->buffer, ctx->fill_color, &rect, TRUE);
 }
 
 static void CanvasContext_Release(LCUI_CanvasContext ctx)

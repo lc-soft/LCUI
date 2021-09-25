@@ -545,7 +545,7 @@ static int Widget_TriggerEventEx(LCUI_Widget widget, LCUI_WidgetEventPack pack)
 	while (widget->trigger &&
 	       widget->computed_style.pointer_events == SV_NONE) {
 		LCUI_Widget w;
-		LCUI_BOOL is_pointer_event = TRUE;
+		pd_bool_t is_pointer_event = TRUE;
 		int pointer_x, pointer_y;
 		float x, y;
 
@@ -590,7 +590,7 @@ static void OnWidgetEvent(LCUI_Event e, LCUI_WidgetEventPack pack)
 	}
 }
 
-LCUI_BOOL Widget_PostEvent(LCUI_Widget widget, LCUI_WidgetEvent ev, void *data,
+pd_bool_t Widget_PostEvent(LCUI_Widget widget, LCUI_WidgetEvent ev, void *data,
 			   void (*destroy_data)(void *))
 {
 	LCUI_Event sys_ev;
@@ -862,7 +862,7 @@ void LCUIWidget_ClearEventTarget(LCUI_Widget widget)
 	ClearFocusTarget(widget);
 }
 
-static LCUI_BOOL Widget_Focusable(LCUI_Widget w)
+static pd_bool_t Widget_Focusable(LCUI_Widget w)
 {
 	return w && w->computed_style.pointer_events != SV_NONE &&
 	       w->computed_style.focusable && !w->disabled;
@@ -1213,7 +1213,7 @@ int Widget_ReleaseTouchCapture(LCUI_Widget w, int point_id)
 	return ret;
 }
 
-int Widget_PostSurfaceEvent(LCUI_Widget w, int event_type, LCUI_BOOL sync_props)
+int Widget_PostSurfaceEvent(LCUI_Widget w, int event_type, pd_bool_t sync_props)
 {
 	int *data;
 	LCUI_WidgetEventRec e = { 0 };

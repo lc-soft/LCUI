@@ -39,20 +39,20 @@ typedef struct LCUI_WidgetStyleDiffRec_ {
 	float width;
 	float height;
 	float opacity;
-	LCUI_BOOL visible;
+	pd_bool_t visible;
 	LCUI_Rect2F margin;
 	LCUI_Rect2F padding;
-	LCUI_StyleValue position;
-	LCUI_BorderStyle border;
-	LCUI_BoxShadowStyle shadow;
-	LCUI_BackgroundStyle background;
+	pd_style_value position;
+	pd_border_style_t border;
+	pd_boxshadow_style_t shadow;
+	pd_background_style_t background;
 	LCUI_WidgetBoxModelRec box;
 	LCUI_FlexBoxLayoutStyle flex;
-	LCUI_BOOL should_add_invalid_area;
+	pd_bool_t should_add_invalid_area;
 } LCUI_WidgetStyleDiffRec, *LCUI_WidgetStyleDiff;
 
 typedef struct LCUI_WidgetLayoutDiffRec_ {
-	LCUI_BOOL should_add_invalid_area;
+	pd_bool_t should_add_invalid_area;
 	LCUI_WidgetBoxModelRec box;
 } LCUI_WidgetLayoutDiffRec, *LCUI_WidgetLayoutDiff;
 

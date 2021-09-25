@@ -40,7 +40,7 @@ typedef struct LCUI_ThreadContextRec {
 } LCUI_ThreadContextRec, *LCUI_ThreadContext;
 
 static struct LCUIThreadModule {
-	LCUI_BOOL is_inited;
+	pd_bool_t is_inited;
 	LCUI_Mutex mutex;
 	LinkedList threads;
 } self;

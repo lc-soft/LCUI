@@ -49,7 +49,7 @@ typedef void (*TimerCallback)(void *);
  *	该定时器的标识符
  **/
 LCUI_API int LCUITimer_Set(long int n_ms, TimerCallback callback,
-			   void *arg, LCUI_BOOL reuse);
+			   void *arg, pd_bool_t reuse);
 
 /** repeatedly calls a function, with a fixed time delay between each call. */
 LCUI_API int LCUI_SetTimeout(long int n_ms, TimerCallback callback,

@@ -40,8 +40,8 @@ LCUI_BEGIN_HEADER
 
 /** 部件样式 */
 typedef struct LCUI_WidgetStyle {
-	LCUI_BOOL visible;
-	LCUI_BOOL focusable;
+	pd_bool_t visible;
+	pd_bool_t focusable;
 	LCUI_SizingRule width_sizing;
 	LCUI_SizingRule height_sizing;
 	float min_width;
@@ -54,26 +54,26 @@ typedef struct LCUI_WidgetStyle {
 	float bottom;
 	int z_index;
 	float opacity;
-	LCUI_StyleValue position;
-	LCUI_StyleValue display;
-	LCUI_StyleValue box_sizing;
-	LCUI_StyleValue vertical_align;
-	LCUI_BorderStyle border;
-	LCUI_BoxShadowStyle shadow;
-	LCUI_BackgroundStyle background;
+	pd_style_value position;
+	pd_style_value display;
+	pd_style_value box_sizing;
+	pd_style_value vertical_align;
+	pd_border_style_t border;
+	pd_boxshadow_style_t shadow;
+	pd_background_style_t background;
 	LCUI_FlexBoxLayoutStyle flex;
 	int pointer_events;
 } LCUI_WidgetStyle;
 
 typedef struct LCUI_WidgetActualStyleRec_ {
 	float x, y;
-	LCUI_Rect canvas_box;
-	LCUI_Rect border_box;
-	LCUI_Rect padding_box;
-	LCUI_Rect content_box;
-	LCUI_Border border;
-	LCUI_BoxShadow shadow;
-	LCUI_Background background;
+	pd_rect_t canvas_box;
+	pd_rect_t border_box;
+	pd_rect_t padding_box;
+	pd_rect_t content_box;
+	pd_border_t border;
+	pd_boxshadow_t shadow;
+	pd_background_t background;
 } LCUI_WidgetActualStyleRec, *LCUI_WidgetActualStyle;
 
 /** 部件任务类型，按照任务的依赖顺序排列 */
@@ -102,25 +102,25 @@ typedef enum LCUI_WidgetTaskType {
 
 /** See more: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model */
 typedef struct LCUI_WidgetBoxModelRec_ {
-	LCUI_RectF content;
-	LCUI_RectF padding;
-	LCUI_RectF border;
-	LCUI_RectF canvas;
-	LCUI_RectF outer;
+	pd_rectf_t content;
+	pd_rectf_t padding;
+	pd_rectf_t border;
+	pd_rectf_t canvas;
+	pd_rectf_t outer;
 } LCUI_WidgetBoxModelRec, *LCUI_WidgetBoxModel;
 
 typedef struct LCUI_WidgetTaskRec_ {
 	/** Should update for self? */
-	LCUI_BOOL for_self;
+	pd_bool_t for_self;
 
 	/** Should update for children? */
-	LCUI_BOOL for_children;
+	pd_bool_t for_children;
 
 	/** Should skip the property sync of bound surface? */
-	LCUI_BOOL skip_surface_props_sync;
+	pd_bool_t skip_surface_props_sync;
 
 	/** States of tasks */
-	LCUI_BOOL states[LCUI_WTASK_TOTAL_NUM];
+	pd_bool_t states[LCUI_WTASK_TOTAL_NUM];
 } LCUI_WidgetTaskRec;
 
 /** 部件状态 */
@@ -144,7 +144,7 @@ typedef void(*LCUI_WidgetSizeSetter)(LCUI_Widget, float, float);
 typedef void(*LCUI_WidgetAttrSetter)(LCUI_Widget, const char*, const char*);
 typedef void(*LCUI_WidgetTextSetter)(LCUI_Widget, const char*);
 typedef void(*LCUI_WidgetPropertyBinder)(LCUI_Widget, const char*, LCUI_Object);
-typedef void(*LCUI_WidgetPainter)(LCUI_Widget, LCUI_PaintContext,
+typedef void(*LCUI_WidgetPainter)(LCUI_Widget, pd_paint_context,
 				  LCUI_WidgetActualStyle);
 
 typedef struct LCUI_WidgetPrototypeRec_ {
@@ -180,7 +180,7 @@ typedef struct LCUI_WidgetRulesRec_ {
 	 * Suspend update if the current widget is not visible or is
 	 * completely covered by other widgets
 	 */
-	LCUI_BOOL only_on_visible;
+	pd_bool_t only_on_visible;
 
 	/**
 	 * First update the children in the visible area
@@ -188,7 +188,7 @@ typedef struct LCUI_WidgetRulesRec_ {
 	 * children who are currently seeing the priority update, we recommend
 	 * enabling this rule.
 	 */
-	LCUI_BOOL first_update_visible_children;
+	pd_bool_t first_update_visible_children;
 
 	/**
 	 * Cache the stylesheets of children to improve the query speed of
@@ -197,13 +197,13 @@ typedef struct LCUI_WidgetRulesRec_ {
 	 * Widget_GenerateHash() to generate a hash value for the children
 	 * of the widget.
 	 */
-	LCUI_BOOL cache_children_style;
+	pd_bool_t cache_children_style;
 
 	/** Refresh the style of all child widgets if the status has changed */
-	LCUI_BOOL ignore_status_change;
+	pd_bool_t ignore_status_change;
 
 	/** Refresh the style of all child widgets if the classes has changed */
-	LCUI_BOOL ignore_classes_change;
+	pd_bool_t ignore_classes_change;
 
 	/**
 	 * Maximum number of children updated at each update
@@ -260,8 +260,8 @@ typedef struct LCUI_WidgetRec_ {
 	strlist_t status;
 	wchar_t *title;
 	Dict *attributes;
-	LCUI_BOOL disabled;
-	LCUI_BOOL event_blocked;
+	pd_bool_t disabled;
+	pd_bool_t event_blocked;
 	
 	/**
 	 * Coordinates calculated by the layout system
@@ -306,9 +306,9 @@ typedef struct LCUI_WidgetRec_ {
 	LCUI_EventTrigger trigger;
 
 	/** Invalid area (Dirty Rectangle) */
-	LCUI_RectF invalid_area;
+	pd_rectf_t invalid_area;
 	LCUI_InvalidAreaType invalid_area_type;
-	LCUI_BOOL has_child_invalid_area;
+	pd_bool_t has_child_invalid_area;
 	
 	/** Parent widget */
 	LCUI_Widget parent;
@@ -339,7 +339,7 @@ typedef struct LCUI_WidgetRec_ {
 
 #define Widget_SetStyle(W, K, VAL, TYPE)      \
 	do {                                  \
-		LCUI_Style _s;                \
+		pd_style _s;                \
 		_s = Widget_GetStyle(W, K);   \
 		_s->is_valid = TRUE;          \
 		_s->type = LCUI_STYPE_##TYPE; \
@@ -367,7 +367,7 @@ typedef struct LCUI_WidgetRec_ {
 	(Widget_CheckStyleType(W, key_width, SCALE) || \
 	 Widget_CheckStyleType(W, key_height, SCALE))
 
-INLINE LCUI_BOOL Widget_IsFlexLayoutStyleWorks(LCUI_Widget w)
+INLINE pd_bool_t Widget_IsFlexLayoutStyleWorks(LCUI_Widget w)
 {
 	return Widget_HasFlexDisplay(w) ||
 	       (!Widget_HasAbsolutePosition(w) && w->parent &&
@@ -378,7 +378,7 @@ LCUI_API float Widget_ComputeXMetric(LCUI_Widget w, int key);
 
 LCUI_API float Widget_ComputeYMetric(LCUI_Widget w, int key);
 
-LCUI_API LCUI_BOOL Widget_HasAutoStyle(LCUI_Widget w, int key);
+LCUI_API pd_bool_t Widget_HasAutoStyle(LCUI_Widget w, int key);
 
 LCUI_API LCUI_Widget LCUIWidget_GetRoot(void);
 
@@ -408,7 +408,7 @@ LCUI_API void Widget_SetTitleW(LCUI_Widget w, const wchar_t *title);
 LCUI_API void Widget_AddState(LCUI_Widget w, LCUI_WidgetState state);
 
 /** Check whether the widget is in the visible area */
-LCUI_API LCUI_BOOL Widget_InVisibleArea(LCUI_Widget w);
+LCUI_API pd_bool_t Widget_InVisibleArea(LCUI_Widget w);
 
 /** Set widget updating rules */
 LCUI_API int Widget_SetRules(LCUI_Widget w, const LCUI_WidgetRulesRec *rules);

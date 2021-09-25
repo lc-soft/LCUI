@@ -8,8 +8,8 @@
 typedef struct TestWorkerRec_ {
 	char data[32];
 	int data_count;
-	LCUI_BOOL cancel;
-	LCUI_BOOL active;
+	pd_bool_t cancel;
+	pd_bool_t active;
 	LCUI_Cond cond;
 	LCUI_Mutex mutex;
 	LCUI_Thread thread;

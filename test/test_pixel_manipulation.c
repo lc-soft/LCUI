@@ -4,18 +4,18 @@
 
 #define PixelManipulationBegin                                   \
 	int x, y;                                                \
-	LCUI_Color pixel;                                        \
+	pd_color_t pixel;                                        \
 								 \
 	for (y = rect.y; y < rect.y + rect.height; ++y) {        \
 		for (x = rect.x; x < rect.x + rect.width; ++x) { \
-			Graph_GetPixel(graph, x, y, pixel);
+			graph_get_pixel(graph, x, y, pixel);
 
 #define PixelManipulationEnd                \
-	Graph_SetPixel(graph, x, y, pixel); \
+	graph_set_pixel(graph, x, y, pixel); \
 	}                                   \
 	}
 
-void invert(LCUI_Graph *graph, LCUI_Rect rect)
+void invert(pd_canvas_t *graph, pd_rect_t rect)
 {
 	PixelManipulationBegin;
 	pixel.red = (unsigned char)(255 - pixel.red);
@@ -24,7 +24,7 @@ void invert(LCUI_Graph *graph, LCUI_Rect rect)
 	PixelManipulationEnd;
 }
 
-void grayscale(LCUI_Graph *graph, LCUI_Rect rect)
+void grayscale(pd_canvas_t *graph, pd_rect_t rect)
 {
 	unsigned char avg;
 
@@ -36,7 +36,7 @@ void grayscale(LCUI_Graph *graph, LCUI_Rect rect)
 	PixelManipulationEnd;
 }
 
-void sepia(LCUI_Graph *graph, LCUI_Rect rect)
+void sepia(pd_canvas_t *graph, pd_rect_t rect)
 {
 	PixelManipulationBegin;
 	pixel.red = (unsigned char)min(
@@ -54,8 +54,8 @@ void sepia(LCUI_Graph *graph, LCUI_Rect rect)
 int main(void)
 {
 	int i;
-	LCUI_Graph graph = { 0 };
-	LCUI_Rect rects[4];
+	pd_canvas_t graph = { 0 };
+	pd_rect_t rects[4];
 
 	if (LCUI_ReadImageFile("dog.jpg", &graph) != 0) {
 		return -1;

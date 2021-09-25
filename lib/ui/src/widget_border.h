@@ -28,12 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-void Widget_ComputeBorder(LCUI_Widget w, LCUI_Border *out);
+void Widget_ComputeBorder(LCUI_Widget w, pd_border_t *out);
 
 void Widget_ComputeBorderStyle(LCUI_Widget w);
 
-void Widget_PaintBorder(LCUI_Widget w, LCUI_PaintContext paint,
+void Widget_PaintBorder(LCUI_Widget w, pd_paint_context paint,
 				 LCUI_WidgetActualStyle style);
 
-void Widget_CropContent(LCUI_Widget w, LCUI_PaintContext paint,
+void Widget_CropContent(LCUI_Widget w, pd_paint_context paint,
 				 LCUI_WidgetActualStyle style);

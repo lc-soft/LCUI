@@ -51,7 +51,7 @@ LCUI_API void Surface_Destroy(LCUI_Surface surface);
 /** 新建一个 Surface */
 LCUI_API LCUI_Surface Surface_New(void);
 
-LCUI_API LCUI_BOOL Surface_IsReady(LCUI_Surface surface);
+LCUI_API pd_bool_t Surface_IsReady(LCUI_Surface surface);
 
 LCUI_API void Surface_Move(LCUI_Surface surface, int x, int y);
 
@@ -81,14 +81,14 @@ LCUI_API void Surface_Update(LCUI_Surface surface);
  * @param[in] rect	需进行绘制的区域，若为NULL，则绘制整个 surface
  * @return		返回绘制上下文句柄
  */
-LCUI_API LCUI_PaintContext Surface_BeginPaint(LCUI_Surface surface, LCUI_Rect *rect);
+LCUI_API pd_paint_context Surface_BeginPaint(LCUI_Surface surface, pd_rect_t *rect);
 
 /**
  * 结束对 Surface 的绘制操作
  * @param[in] surface	目标 surface
  * @param[in] paint_ctx	绘制上下文句柄
  */
-LCUI_API void Surface_EndPaint(LCUI_Surface surface, LCUI_PaintContext paint);
+LCUI_API void Surface_EndPaint(LCUI_Surface surface, pd_paint_context paint);
 
 /** 将帧缓存中的数据呈现至Surface的窗口内 */
 LCUI_API void Surface_Present(LCUI_Surface surface);

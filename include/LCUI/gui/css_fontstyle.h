@@ -56,11 +56,11 @@ typedef struct LCUI_CSSFontStyleRec_ {
 	int *font_ids;
 	char *font_family;
 	wchar_t *content;
-	LCUI_Color color;
+	pd_color_t color;
 	LCUI_FontStyle font_style;
 	LCUI_FontWeight font_weight;
-	LCUI_StyleValue text_align;
-	LCUI_StyleValue white_space;
+	pd_style_value text_align;
+	pd_style_value white_space;
 } LCUI_CSSFontStyleRec, *LCUI_CSSFontStyle;
 
 #define Widget_SetFontStyle(W, K, V, T)            \
@@ -77,7 +77,7 @@ LCUI_API void CSSFontStyle_Init(LCUI_CSSFontStyle fs);
 
 LCUI_API void CSSFontStyle_Destroy(LCUI_CSSFontStyle fs);
 
-LCUI_API LCUI_BOOL CSSFontStyle_IsEquals(const LCUI_CSSFontStyle a,
+LCUI_API pd_bool_t CSSFontStyle_IsEquals(const LCUI_CSSFontStyle a,
 					 const LCUI_CSSFontStyle b);
 
 LCUI_API void CSSFontStyle_Compute(LCUI_CSSFontStyle fs, LCUI_StyleSheet ss);

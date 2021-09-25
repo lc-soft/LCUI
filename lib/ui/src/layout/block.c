@@ -45,7 +45,7 @@ typedef struct LCUI_BlockLayoutRowRec_ {
 typedef struct LCUI_BlockLayoutContextRec_ {
 	LCUI_Widget widget;
 	LCUI_LayoutRule rule;
-	LCUI_BOOL is_initiative;
+	pd_bool_t is_initiative;
 
 	float x, y;
 	float content_width;

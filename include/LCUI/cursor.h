@@ -39,13 +39,13 @@ LCUI_API void LCUI_InitCursor(void);
 LCUI_API void LCUI_FreeCursor(void);
 
 /* 获取鼠标游标的区域范围 */
-LCUI_API void LCUICursor_GetRect(LCUI_Rect *rect);
+LCUI_API void LCUICursor_GetRect(pd_rect_t *rect);
 
 /* 刷新鼠标游标在屏幕上显示的图形 */
 LCUI_API void LCUICursor_Refresh(void);
 
 /* 检测鼠标游标是否可见 */
-LCUI_API LCUI_BOOL LCUICursor_IsVisible(void);
+LCUI_API pd_bool_t LCUICursor_IsVisible(void);
 
 /* 显示鼠标游标 */
 LCUI_API void LCUICursor_Show(void);
@@ -60,12 +60,12 @@ LCUI_API void LCUICursor_Update(void);
 LCUI_API void LCUICursor_SetPos(LCUI_Pos pos);
 
 /** 设置游标的图形 */
-LCUI_API int LCUICursor_SetGraph(LCUI_Graph *graph);
+LCUI_API int LCUICursor_SetGraph(pd_canvas_t *graph);
 
 /* 获取鼠标指针当前的坐标 */
 LCUI_API void LCUICursor_GetPos(LCUI_Pos *pos);
 
-LCUI_API int LCUICursor_Paint(LCUI_PaintContext paint);
+LCUI_API int LCUICursor_Paint(pd_paint_context paint);
 
 LCUI_END_HEADER
 

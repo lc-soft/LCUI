@@ -3,13 +3,13 @@
 #include <LCUI/image.h>
 #include <LCUI/painter.h>
 
-int paint_background(LCUI_PaintContext paint, LCUI_Rect *box)
+int paint_background(pd_paint_context paint, pd_rect_t *box)
 {
-	LCUI_Graph image;
-	LCUI_Color green = RGB(102, 204, 0);
-	LCUI_Background bg = { 0 };
+	pd_canvas_t image;
+	pd_color_t green = RGB(102, 204, 0);
+	pd_background_t bg = { 0 };
 
-	Graph_Init(&image);
+	pd_graph_init(&image);
 	// 读取背景图片
 	if (LCUI_ReadImageFile("test_image_reader.png", &image) != 0) {
 		return -1;
@@ -24,15 +24,15 @@ int paint_background(LCUI_PaintContext paint, LCUI_Rect *box)
 	bg.position.x = (box->width - image.width) / 2;
 	bg.position.y = (box->height - image.height) / 2;
 	// 绘制背景
-	Background_Paint(&bg, box, paint);
-	Graph_Free(&image);
+	pd_background_paint(&bg, box, paint);
+	pd_graph_free(&image);
 	return 0;
 }
 
-void paint_border(LCUI_PaintContext paint, LCUI_Rect *box, int size, int radius)
+void paint_border(pd_paint_context paint, pd_rect_t *box, int size, int radius)
 {
-	LCUI_Border border = { 0 };
-	LCUI_Color black = RGB(0, 0, 0);
+	pd_border_t border = { 0 };
+	pd_color_t black = RGB(0, 0, 0);
 
 	border.top.color = black;
 	border.top.style = SV_SOLID;
@@ -50,7 +50,7 @@ void paint_border(LCUI_PaintContext paint, LCUI_Rect *box, int size, int radius)
 	border.top_right_radius = radius;
 	border.bottom_left_radius = radius;
 	border.bottom_right_radius = radius;
-	Border_Paint(&border, box, paint);
+	pd_border_paint(&border, box, paint);
 }
 
 int main(void)
@@ -60,10 +60,10 @@ int main(void)
 	int width = 800;
 	int height = 600;
 
-	LCUI_Graph canvas;
-	LCUI_Graph layer;
-	LCUI_Color gray = RGB(240, 240, 240);
-	LCUI_BoxShadow shadow = { .x = 0,
+	pd_canvas_t canvas;
+	pd_canvas_t layer;
+	pd_color_t gray = RGB(240, 240, 240);
+	pd_boxshadow_t shadow = { .x = 0,
 				  .y = 0,
 				  .blur = 40,
 				  .spread = 0,
@@ -72,15 +72,15 @@ int main(void)
 				  .top_right_radius = border_radius,
 				  .bottom_left_radius = border_radius,
 				  .bottom_right_radius = border_radius };
-	LCUI_Rect shadow_box;
-	LCUI_Rect border_box;
-	LCUI_Rect bg_box;
-	LCUI_Rect layer_rect;
-	LCUI_PaintContext paint;
+	pd_rect_t shadow_box;
+	pd_rect_t border_box;
+	pd_rect_t bg_box;
+	pd_rect_t layer_rect;
+	pd_paint_context paint;
 
-	Graph_Init(&canvas);
-	Graph_Create(&canvas, width, height);
-	Graph_FillRect(&canvas, gray, NULL, FALSE);
+	pd_graph_init(&canvas);
+	pd_graph_create(&canvas, width, height);
+	pd_graph_fill_rect(&canvas, gray, NULL, FALSE);
 
 	// 设置居中的背景区域
 	bg_box.width = 400;
@@ -93,19 +93,19 @@ int main(void)
 	border_box.width = bg_box.width + border_size * 2;
 	border_box.height = bg_box.height + border_size * 2;
 	// 基于边框区域，计算阴影区域
-	BoxShadow_GetCanvasRect(&shadow, &border_box, &shadow_box);
+	pd_boxshadow_get_canvas_rect(&shadow, &border_box, &shadow_box);
 
 	// 创建一个临时绘制层
-	Graph_Init(&layer);
+	pd_graph_init(&layer);
 	layer_rect.x = 0;
 	layer_rect.y = 0;
 	layer_rect.width = shadow_box.width;
 	layer_rect.height = shadow_box.height;
 	layer.color_type = LCUI_COLOR_TYPE_ARGB;
-	Graph_Create(&layer, layer_rect.width, layer_rect.height);
+	pd_graph_create(&layer, layer_rect.width, layer_rect.height);
 
 	// 基于临时绘制层创建绘制上下文
-	paint = LCUIPainter_Begin(&layer, &layer_rect);
+	paint = pd_painter_begin(&layer, &layer_rect);
 	paint->with_alpha = TRUE;
 	// 将背景区域和边框区域的坐标转换成相对于阴影区域
 	bg_box.x -= shadow_box.x;
@@ -114,12 +114,12 @@ int main(void)
 	border_box.y -= shadow_box.y;
 	paint_background(paint, &bg_box);
 	paint_border(paint, &border_box, border_size, border_radius);
-	BoxShadow_Paint(&shadow, &layer_rect, border_box.width,
+	pd_boxshadow_paint(&shadow, &layer_rect, border_box.width,
 			border_box.height, paint);
 
 	// 将临时绘制层混合到画布中
-	Graph_Mix(&canvas, &layer, shadow_box.x, shadow_box.y, FALSE);
+	pd_graph_mix(&canvas, &layer, shadow_box.x, shadow_box.y, FALSE);
 	LCUI_WritePNGFile("test_paint_boxshadow.png", &canvas);
-	Graph_Free(&canvas);
+	pd_graph_free(&canvas);
 	return 0;
 }

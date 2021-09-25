@@ -5,19 +5,19 @@
 int main(void)
 {
 	int ret, fid;
-	LCUI_Graph img;
+	pd_canvas_t img;
 	LCUI_FontBitmap bmp;
 	LCUI_Pos pos = { 25, 25 };
-	LCUI_Color bg = RGB(240, 240, 240);
-	LCUI_Color color = RGB(255, 0, 0);
+	pd_color_t bg = RGB(240, 240, 240);
+	pd_color_t color = RGB(255, 0, 0);
 
 	/* 初始化字体处理功能 */
 	LCUI_InitFontLibrary();
 
 	/* 创建一个画布，并填充背景为灰色 */
-	Graph_Init(&img);
-	Graph_Create(&img, 100, 100);
-	Graph_FillRect(&img, bg, NULL, FALSE);
+	pd_graph_init(&img);
+	pd_graph_create(&img, 100, 100);
+	pd_graph_fill_rect(&img, bg, NULL, FALSE);
 
 	/* 载入字体文件 */
 	ret = LCUIFont_LoadFile("C:/Windows/fonts/simsun.ttc");
@@ -37,7 +37,7 @@ int main(void)
 		LCUI_WritePNGFile("test_char_render.png", &img);
 		/* 释放内存资源 */
 		FontBitmap_Free(&bmp);
-		Graph_Free(&img);
+		pd_graph_free(&img);
 		break;
 	}
 

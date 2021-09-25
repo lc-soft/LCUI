@@ -41,7 +41,7 @@
 
 #pragma comment(lib, "Imm32.lib")
 
-static LCUI_BOOL IME_ProcessKey(int key, int key_state)
+static pd_bool_t IME_ProcessKey(int key, int key_state)
 {
 	return FALSE;
 }
@@ -75,13 +75,13 @@ static void IME_SetCaret(int x, int y)
 	}
 }
 
-static LCUI_BOOL IME_Open(void)
+static pd_bool_t IME_Open(void)
 {
 	LCUI_BindSysEvent(WM_CHAR, WinIME_OnChar, NULL, NULL);
 	return TRUE;
 }
 
-static LCUI_BOOL IME_Close(void)
+static pd_bool_t IME_Close(void)
 {
 	LCUI_UnbindSysEvent(WM_CHAR, WinIME_OnChar);
 	return TRUE;

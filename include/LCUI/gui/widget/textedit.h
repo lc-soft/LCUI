@@ -36,9 +36,9 @@ LCUI_BEGIN_HEADER
 #define TextEdit_New() Widget_New("textedit")
 
 /** Enable style tag parser  */
-LCUI_API void TextEdit_EnableStyleTag(LCUI_Widget widget, LCUI_BOOL enable);
+LCUI_API void TextEdit_EnableStyleTag(LCUI_Widget widget, pd_bool_t enable);
 
-LCUI_API void TextEdit_EnableMultiline(LCUI_Widget widget, LCUI_BOOL enable);
+LCUI_API void TextEdit_EnableMultiline(LCUI_Widget widget, pd_bool_t enable);
 
 LCUI_API void TextEdit_MoveCaret(LCUI_Widget widget, int row, int col);
 
@@ -53,7 +53,7 @@ LCUI_API size_t TextEdit_GetTextW(LCUI_Widget w, size_t start,
 LCUI_API size_t TextEdit_GetTextLength(LCUI_Widget w);
 
 /** 设置文本编辑框内的光标，指定是否闪烁、闪烁时间间隔 */
-LCUI_API void TextEdit_SetCaretBlink(LCUI_Widget w, LCUI_BOOL visible, int time);
+LCUI_API void TextEdit_SetCaretBlink(LCUI_Widget w, pd_bool_t visible, int time);
 
 LCUI_API LCUI_Object TextEdit_GetProperty(LCUI_Widget w, const char *name);
 

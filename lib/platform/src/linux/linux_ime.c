@@ -49,7 +49,7 @@ static struct LCUI_LinuxIMEModule {
 	int handler_id;
 } self;
 
-static LCUI_BOOL X11IME_ProcessKey(int key, int key_state)
+static pd_bool_t X11IME_ProcessKey(int key, int key_state)
 {
 	return FALSE;
 }
@@ -67,13 +67,13 @@ static void OnKeyPress(LCUI_SysEvent e, void *arg)
 	LCUIIME_Commit(text, 2);
 }
 
-static LCUI_BOOL X11IME_Open(void)
+static pd_bool_t X11IME_Open(void)
 {
 	self.handler_id = LCUI_BindEvent(LCUI_KEYPRESS, OnKeyPress, NULL, NULL);
 	return TRUE;
 }
 
-static LCUI_BOOL X11IME_Close(void)
+static pd_bool_t X11IME_Close(void)
 {
 	LCUI_UnbindEvent(self.handler_id);
 	return TRUE;

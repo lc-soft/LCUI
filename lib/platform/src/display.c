@@ -57,12 +57,12 @@
 
 typedef struct FlashRectRec_ {
 	int64_t paint_time;
-	LCUI_Rect rect;
+	pd_rect_t rect;
 } FlashRectRec, *FlashRect;
 
 typedef struct SurfaceRecordRec_ {
 	/** whether new content has been rendered */
-	LCUI_BOOL rendered;
+	pd_bool_t rendered;
 
 	/** dirty rectangles for rendering */
 	LinkedList rects;
@@ -76,7 +76,7 @@ typedef struct SurfaceRecordRec_ {
 
 static struct LCUI_DisplayModule {
 	unsigned width, height;
-	LCUI_BOOL active;
+	pd_bool_t active;
 	LCUI_DisplayMode mode;
 	LinkedList surfaces;
 	LinkedList rects;
@@ -90,7 +90,7 @@ static struct LCUI_DisplayModule {
 #define LCUIDisplay_CleanSurfaces() \
 	LinkedList_Clear(&display.surfaces, OnDestroySurfaceRecord)
 
-INLINE int is_rect_equals(const LCUI_Rect *a, const LCUI_Rect *b)
+INLINE int is_rect_equals(const pd_rect_t *a, const pd_rect_t *b)
 {
 	return a->x == b->x && a->y == b->y && a->width == b->width &&
 	       a->height == b->height;
@@ -119,9 +119,9 @@ static size_t LCUIDisplay_RenderFlashRect(SurfaceRecord record,
 	float duraion = 1000;
 
 	LCUI_Pos pos;
-	LCUI_Color color;
-	LCUI_Graph mask;
-	LCUI_PaintContext paint;
+	pd_color_t color;
+	pd_canvas_t mask;
+	pd_paint_context paint;
 
 	paint = Surface_BeginPaint(record->surface, &flash_rect->rect);
 	if (!paint) {
@@ -134,22 +134,22 @@ static size_t LCUIDisplay_RenderFlashRect(SurfaceRecord record,
 		Surface_EndPaint(record->surface, paint);
 		return count;
 	}
-	Graph_Init(&mask);
+	pd_graph_init(&mask);
 	mask.color_type = LCUI_COLOR_TYPE_ARGB;
-	Graph_Create(&mask, flash_rect->rect.width, flash_rect->rect.height);
-	Graph_FillRect(&mask, ARGB(125, 124, 179, 5), NULL, TRUE);
+	pd_graph_create(&mask, flash_rect->rect.width, flash_rect->rect.height);
+	pd_graph_fill_rect(&mask, ARGB(125, 124, 179, 5), NULL, TRUE);
 	mask.opacity = 0.6f * (duraion - (float)period) / duraion;
 	pos.x = pos.y = 0;
 	color = RGB(124, 179, 5);
-	Graph_DrawHorizLine(&mask, color, 1, pos, mask.width - 1);
-	Graph_DrawVertiLine(&mask, color, 1, pos, mask.height - 1);
+	pd_graph_draw_horiz_line(&mask, color, 1, pos, mask.width - 1);
+	pd_graph_draw_verti_line(&mask, color, 1, pos, mask.height - 1);
 	pos.x = mask.width - 1;
-	Graph_DrawVertiLine(&mask, color, 1, pos, mask.height - 1);
+	pd_graph_draw_verti_line(&mask, color, 1, pos, mask.height - 1);
 	pos.x = 0;
 	pos.y = mask.height - 1;
-	Graph_DrawHorizLine(&mask, color, 1, pos, mask.width - 1);
-	Graph_Mix(&paint->canvas, &mask, 0, 0, TRUE);
-	Graph_Free(&mask);
+	pd_graph_draw_horiz_line(&mask, color, 1, pos, mask.width - 1);
+	pd_graph_mix(&paint->canvas, &mask, 0, 0, TRUE);
+	pd_graph_free(&mask);
 	Surface_EndPaint(record->surface, paint);
 	return count;
 }
@@ -175,7 +175,7 @@ static size_t LCUIDisplay_UpdateFlashRects(SurfaceRecord record)
 	return count;
 }
 
-static void LCUIDisplay_AppendFlashRects(SurfaceRecord record, LCUI_Rect *rect)
+static void LCUIDisplay_AppendFlashRects(SurfaceRecord record, pd_rect_t *rect)
 {
 	LinkedListNode *node;
 	FlashRect flash_rect;
@@ -208,7 +208,7 @@ static void SurfaceRecord_DumpRects(SurfaceRecord record, LinkedList *rects)
 {
 	typedef struct DirtyLayerRec {
 		LinkedList rects;
-		LCUI_Rect rect;
+		pd_rect_t rect;
 		int diry;
 	} DirtyLayerRec, *DirtyLayer;
 
@@ -217,8 +217,8 @@ static void SurfaceRecord_DumpRects(SurfaceRecord record, LinkedList *rects)
 	int layer_width;
 	int layer_height;
 
-	LCUI_Rect rect;
-	LCUI_Rect *sub_rect;
+	pd_rect_t rect;
+	pd_rect_t *sub_rect;
 	DirtyLayer layer;
 	DirtyLayerRec *layers;
 	LinkedListNode *node;
@@ -236,16 +236,16 @@ static void SurfaceRecord_DumpRects(SurfaceRecord record, LinkedList *rects)
 		layer->rect.height = layer_height;
 		LinkedList_Init(&layer->rects);
 	}
-	sub_rect = malloc(sizeof(LCUI_Rect));
+	sub_rect = malloc(sizeof(pd_rect_t));
 	for (LinkedList_Each(node, &record->rects)) {
-		rect = *(LCUI_Rect *)node->data;
+		rect = *(pd_rect_t *)node->data;
 		for (i = 0; i < display.settings.parallel_rendering_threads;
 		     ++i) {
 			layer = &layers[i];
 			if (layer->diry >= max_dirty) {
 				continue;
 			}
-			if (!LCUIRect_GetOverlayRect(&layer->rect, &rect,
+			if (!pd_rect_get_overlay_rect(&layer->rect, &rect,
 						     sub_rect)) {
 				continue;
 			}
@@ -253,7 +253,7 @@ static void SurfaceRecord_DumpRects(SurfaceRecord record, LinkedList *rects)
 			rect.y += sub_rect->height;
 			rect.height -= sub_rect->height;
 			layer->diry += sub_rect->width * sub_rect->height;
-			sub_rect = malloc(sizeof(LCUI_Rect));
+			sub_rect = malloc(sizeof(pd_rect_t));
 			if (rect.height < 1) {
 				break;
 			}
@@ -274,10 +274,10 @@ static void SurfaceRecord_DumpRects(SurfaceRecord record, LinkedList *rects)
 }
 
 static size_t LCUIDisplay_RenderSurfaceRect(SurfaceRecord record,
-					    LCUI_Rect *rect)
+					    pd_rect_t *rect)
 {
 	size_t count;
-	LCUI_PaintContext paint;
+	pd_paint_context paint;
 
 	if (!record->widget || !record->surface ||
 	    !Surface_IsReady(record->surface)) {
@@ -308,7 +308,7 @@ static size_t LCUIDisplay_RenderSurface(SurfaceRecord record)
 	int layer_width;
 	int layer_height;
 	size_t count = 0;
-	LCUI_Rect **rect_array;
+	pd_rect_t **rect_array;
 	LinkedList rects;
 	LinkedListNode *node;
 
@@ -318,7 +318,7 @@ static size_t LCUIDisplay_RenderSurface(SurfaceRecord record)
 	if (rects.length < 1) {
 		return 0;
 	}
-	rect_array = (LCUI_Rect **)malloc(sizeof(LCUI_Rect *) * rects.length);
+	rect_array = (pd_rect_t **)malloc(sizeof(pd_rect_t *) * rects.length);
 	for (LinkedList_Each(node, &rects)) {
 		LCUI_SysEventRec ev;
 
@@ -412,9 +412,9 @@ void LCUIDisplay_Present(void)
 	}
 }
 
-void LCUIDisplay_InvalidateArea(LCUI_Rect *rect)
+void LCUIDisplay_InvalidateArea(pd_rect_t *rect)
 {
-	LCUI_Rect area;
+	pd_rect_t area;
 
 	if (!display.active) {
 		return;
@@ -486,7 +486,7 @@ LCUI_Surface LCUIDisplay_GetSurfaceByHandle(void *handle)
 /** 将 widget 与 sruface 进行绑定 */
 static void LCUIDisplay_BindSurface(LCUI_Widget widget)
 {
-	LCUI_Rect rect;
+	pd_rect_t rect;
 	SurfaceRecord record;
 
 	if (LCUIDisplay_GetBindSurface(widget)) {
@@ -625,7 +625,7 @@ int LCUIDisplay_GetMode(void)
 	return display.mode;
 }
 
-void LCUIDisplay_EnablePaintFlashing(LCUI_BOOL enable)
+void LCUIDisplay_EnablePaintFlashing(pd_bool_t enable)
 {
 	LCUI_SettingsRec settings;
 	Settings_Init(&settings);
@@ -707,7 +707,7 @@ LCUI_Surface Surface_New(void)
 	return NULL;
 }
 
-LCUI_BOOL Surface_IsReady(LCUI_Surface surface)
+pd_bool_t Surface_IsReady(LCUI_Surface surface)
 {
 	if (display.driver) {
 		return display.driver->isReady(surface);
@@ -788,7 +788,7 @@ void Surface_Update(LCUI_Surface surface)
 	}
 }
 
-LCUI_PaintContext Surface_BeginPaint(LCUI_Surface surface, LCUI_Rect *rect)
+pd_paint_context Surface_BeginPaint(LCUI_Surface surface, pd_rect_t *rect)
 {
 	if (display.driver) {
 		return display.driver->beginPaint(surface, rect);
@@ -796,7 +796,7 @@ LCUI_PaintContext Surface_BeginPaint(LCUI_Surface surface, LCUI_Rect *rect)
 	return NULL;
 }
 
-void Surface_EndPaint(LCUI_Surface surface, LCUI_PaintContext paint)
+void Surface_EndPaint(LCUI_Surface surface, pd_paint_context paint)
 {
 	if (display.driver) {
 		display.driver->endPaint(surface, paint);
@@ -814,7 +814,7 @@ void Surface_Present(LCUI_Surface surface)
 static void OnSurfaceEvent(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 {
 	LCUI_Widget root;
-	LCUI_RectF *rect;
+	pd_rectf_t *rect;
 	LCUI_Surface surface;
 	int *data, event_type, sync_props;
 
@@ -850,7 +850,7 @@ static void OnSurfaceEvent(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 		Surface_Hide(surface);
 		break;
 	case LCUI_WEVENT_RESIZE: {
-		LCUI_Rect area;
+		pd_rect_t area;
 		RectFToInvalidArea(rect, &area);
 		if (sync_props) {
 			Surface_Resize(surface, area.width, area.height);
@@ -868,7 +868,7 @@ static void OnSurfaceEvent(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 /** 在 surface 主动产生无效区域并需要绘制的时候 */
 static void OnPaint(LCUI_Event e, void *arg)
 {
-	LCUI_RectF rect;
+	pd_rectf_t rect;
 	LinkedListNode *node;
 	SurfaceRecord record;
 	LCUI_DisplayEvent dpy_ev = arg;
@@ -901,7 +901,7 @@ static void OnResize(LCUI_Event e, void *arg)
 
 static void OnMinMaxInfo(LCUI_Event e, void *arg)
 {
-	LCUI_BOOL resizable = FALSE;
+	pd_bool_t resizable = FALSE;
 	LCUI_DisplayEvent dpy_ev = arg;
 	LCUI_Surface s = dpy_ev->surface;
 	LCUI_Widget widget = LCUIDisplay_GetBindWidget(s);
@@ -926,7 +926,7 @@ static void OnMinMaxInfo(LCUI_Event e, void *arg)
 		resizable = resizable || height > style->max_height;
 	}
 	if (resizable) {
-		LCUI_Rect area;
+		pd_rect_t area;
 		RectFToInvalidArea(&widget->box.canvas, &area);
 		Surface_Resize(s, area.width, area.height);
 	}

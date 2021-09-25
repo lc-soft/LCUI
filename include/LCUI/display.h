@@ -65,7 +65,7 @@ typedef struct LCUI_DisplayEventRec_ {
 	int type;
 	union {
 		struct {
-			LCUI_Rect rect;
+			pd_rect_t rect;
 		} paint;
 		struct {
 			int width, height;
@@ -89,9 +89,9 @@ typedef struct LCUI_DisplayDriverRec_ {
 	void (*hide)(LCUI_Surface);
 	void (*update)(LCUI_Surface);
 	void (*present)(LCUI_Surface);
-	LCUI_BOOL (*isReady)(LCUI_Surface);
-	LCUI_PaintContext (*beginPaint)(LCUI_Surface, LCUI_Rect *);
-	void (*endPaint)(LCUI_Surface, LCUI_PaintContext);
+	pd_bool_t (*isReady)(LCUI_Surface);
+	pd_paint_context (*beginPaint)(LCUI_Surface, pd_rect_t *);
+	void (*endPaint)(LCUI_Surface, pd_paint_context);
 	void (*setCaptionW)(LCUI_Surface, const wchar_t *);
 	void (*setRenderMode)(LCUI_Surface, int);
 	void *(*getHandle)(LCUI_Surface);
@@ -116,7 +116,7 @@ LCUI_API size_t LCUIDisplay_Render(void);
 /** 呈现渲染后的内容 */
 LCUI_API void LCUIDisplay_Present(void);
 
-LCUI_API void LCUIDisplay_EnablePaintFlashing(LCUI_BOOL enable);
+LCUI_API void LCUIDisplay_EnablePaintFlashing(pd_bool_t enable);
 
 /** 设置显示区域的尺寸，仅在窗口化、全屏模式下有效 */
 LCUI_API void LCUIDisplay_SetSize(int width, int height);
@@ -128,7 +128,7 @@ LCUI_API int LCUIDisplay_GetWidth(void);
 LCUI_API int LCUIDisplay_GetHeight(void);
 
 /** 添加无效区域 */
-LCUI_API void LCUIDisplay_InvalidateArea(LCUI_Rect *rect);
+LCUI_API void LCUIDisplay_InvalidateArea(pd_rect_t *rect);
 
 /** 获取当前部件所属的 surface */
 LCUI_API LCUI_Surface LCUIDisplay_GetSurfaceOwner(LCUI_Widget w);

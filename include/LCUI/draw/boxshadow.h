@@ -33,12 +33,12 @@
 
 #define SHADOW_WIDTH(sd) (sd->blur + sd->spread)
 
-LCUI_API void BoxShadow_GetCanvasRect(const LCUI_BoxShadow *shadow,
-				      const LCUI_Rect *box_rect,
-				      LCUI_Rect *canvas_rect);
+LCUI_API void pd_boxshadow_get_canvas_rect(const pd_boxshadow_t *shadow,
+				      const pd_rect_t *box_rect,
+				      pd_rect_t *canvas_rect);
 
-LCUI_API int BoxShadow_Paint(const LCUI_BoxShadow *shadow, const LCUI_Rect *box,
+LCUI_API int pd_boxshadow_paint(const pd_boxshadow_t *shadow, const pd_rect_t *box,
 			     int centent_width, int content_height,
-			     LCUI_PaintContext paint);
+			     pd_paint_context paint);
 
 #endif

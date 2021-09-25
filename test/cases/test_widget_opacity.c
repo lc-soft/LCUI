@@ -30,34 +30,34 @@ static void build(void)
 	self.text = LCUIWidget_GetById("current-opacity");
 }
 
-static int check_color(LCUI_Color a, LCUI_Color b)
+static int check_color(pd_color_t a, pd_color_t b)
 {
 	return abs(a.r - b.r) < 2 && abs(a.g - b.g) < 2 && abs(a.b - b.b) < 2;
 }
 
 static void check_widget_opactiy(void)
 {
-	LCUI_Graph canvas;
-	LCUI_Color color;
-	LCUI_Color tmp;
-	LCUI_Color expected_color;
-	LCUI_Color child_bgcolor = RGB(0, 255, 0);
-	LCUI_Color child_footer_bgcolor = RGB(255, 255, 255);
-	LCUI_Color parent_bgcolor = RGB(255, 0, 0);
-	LCUI_Color parent_bcolor = RGB(0, 0, 0);
-	LCUI_Color bgcolor = RGB(255, 255, 255);
-	LCUI_Rect rect = { 0, 0, 400, 256 };
-	LCUI_PaintContextRec paint;
+	pd_canvas_t canvas;
+	pd_color_t color;
+	pd_color_t tmp;
+	pd_color_t expected_color;
+	pd_color_t child_bgcolor = RGB(0, 255, 0);
+	pd_color_t child_footer_bgcolor = RGB(255, 255, 255);
+	pd_color_t parent_bgcolor = RGB(255, 0, 0);
+	pd_color_t parent_bcolor = RGB(0, 0, 0);
+	pd_color_t bgcolor = RGB(255, 255, 255);
+	pd_rect_t rect = { 0, 0, 400, 256 };
+	pd_paint_context_t paint;
 
-	Graph_Init(&canvas);
-	Graph_Create(&canvas, rect.width, rect.height);
-	Graph_FillRect(&canvas, bgcolor, NULL, FALSE);
+	pd_graph_init(&canvas);
+	pd_graph_create(&canvas, rect.width, rect.height);
+	pd_graph_fill_rect(&canvas, bgcolor, NULL, FALSE);
 
 	paint.with_alpha = FALSE;
 	paint.rect.width = 400;
 	paint.rect.height = 256;
 	paint.rect.x = paint.rect.y = 0;
-	Graph_Quote(&paint.canvas, &canvas, &rect);
+	pd_graph_quote(&paint.canvas, &canvas, &rect);
 
 	Widget_SetOpacity(self.parent, 0.8f);
 	Widget_Resize(self.parent, 512, 256);
@@ -70,14 +70,14 @@ static void check_widget_opactiy(void)
 	Widget_Render(self.parent, &paint);
 
 	expected_color = bgcolor;
-	Graph_GetPixel(&canvas, 10, 10, color);
+	graph_get_pixel(&canvas, 10, 10, color);
 	PIXEL_BLEND(&expected_color, &parent_bcolor,
 		    (int)(PARENT_OPACITY * 255));
 	it_b("check parent border color", check_color(expected_color, color),
 	     TRUE);
 
 	expected_color = bgcolor;
-	Graph_GetPixel(&canvas, 30, 30, color);
+	graph_get_pixel(&canvas, 30, 30, color);
 	PIXEL_BLEND(&expected_color, &parent_bgcolor,
 		    (int)(PARENT_OPACITY * 255));
 	it_b("check parent background color",
@@ -85,7 +85,7 @@ static void check_widget_opactiy(void)
 
 	tmp = parent_bgcolor;
 	expected_color = bgcolor;
-	Graph_GetPixel(&canvas, 60, 90, color);
+	graph_get_pixel(&canvas, 60, 90, color);
 	PIXEL_BLEND(&tmp, &child_bgcolor, (int)(CHILD_OPACITY * 255));
 	PIXEL_BLEND(&expected_color, &tmp, (int)(PARENT_OPACITY * 255));
 	it_b("check child 1 background color",
@@ -93,24 +93,24 @@ static void check_widget_opactiy(void)
 
 	tmp = parent_bgcolor;
 	expected_color = bgcolor;
-	Graph_GetPixel(&canvas, 60, 120, color);
+	graph_get_pixel(&canvas, 60, 120, color);
 	PIXEL_BLEND(&tmp, &child_footer_bgcolor, (int)(CHILD_OPACITY * 255));
 	PIXEL_BLEND(&expected_color, &tmp, (int)(PARENT_OPACITY * 255));
 	it_b("check child 1 footer background color",
 	     check_color(expected_color, color), TRUE);
 
 	expected_color = bgcolor;
-	Graph_GetPixel(&canvas, 220, 90, color);
+	graph_get_pixel(&canvas, 220, 90, color);
 	PIXEL_BLEND(&expected_color, &child_bgcolor,
 		    (int)(PARENT_OPACITY * 255));
 	it_b("check child 2 background color",
 	     check_color(expected_color, color), TRUE);
 	expected_color = child_footer_bgcolor;
-	Graph_GetPixel(&canvas, 220, 120, color);
+	graph_get_pixel(&canvas, 220, 120, color);
 	it_b("check child 2 footer background color",
 	     check_color(expected_color, color), TRUE);
 
-	Graph_Free(&canvas);
+	pd_graph_free(&canvas);
 }
 
 void test_widget_opacity(void)

@@ -43,7 +43,7 @@ LCUI_API void Widget_SetPadding(LCUI_Widget w, float top, float right,
 LCUI_API void Widget_SetMargin(LCUI_Widget w, float top, float right,
 			       float bottom, float left);
 
-LCUI_API void Widget_SetBorderColor(LCUI_Widget w, LCUI_Color color);
+LCUI_API void Widget_SetBorderColor(LCUI_Widget w, pd_color_t color);
 
 LCUI_API void Widget_SetBorderWidth(LCUI_Widget w, float width);
 
@@ -51,11 +51,11 @@ LCUI_API void Widget_SetBorderStyle(LCUI_Widget w, int style);
 
 /** 设置边框样式 */
 LCUI_API void Widget_SetBorder(LCUI_Widget w, float width, int style,
-			       LCUI_Color clr);
+			       pd_color_t clr);
 
 /** 设置阴影样式 */
 LCUI_API void Widget_SetBoxShadow(LCUI_Widget w, float x, float y, float blur,
-				  LCUI_Color color);
+				  pd_color_t color);
 
 /** 移动部件位置 */
 LCUI_API void Widget_Move(LCUI_Widget w, float left, float top);
@@ -63,16 +63,16 @@ LCUI_API void Widget_Move(LCUI_Widget w, float left, float top);
 /** 调整部件尺寸 */
 LCUI_API void Widget_Resize(LCUI_Widget w, float width, float height);
 
-LCUI_API LCUI_Style Widget_GetStyle(LCUI_Widget w, int key);
+LCUI_API pd_style Widget_GetStyle(LCUI_Widget w, int key);
 
 LCUI_API int Widget_UnsetStyle(LCUI_Widget w, int key);
 
-LCUI_API LCUI_Style Widget_GetInheritedStyle(LCUI_Widget w, int key);
+LCUI_API pd_style Widget_GetInheritedStyle(LCUI_Widget w, int key);
 
-LCUI_API LCUI_BOOL Widget_CheckStyleBooleanValue(LCUI_Widget w, int key,
-						 LCUI_BOOL value);
+LCUI_API pd_bool_t Widget_CheckStyleBooleanValue(LCUI_Widget w, int key,
+						 pd_bool_t value);
 
-LCUI_API LCUI_BOOL Widget_CheckStyleValid(LCUI_Widget w, int key) ;
+LCUI_API pd_bool_t Widget_CheckStyleValid(LCUI_Widget w, int key) ;
 
 LCUI_API void Widget_SetVisibility(LCUI_Widget w, const char *value);
 
@@ -84,11 +84,11 @@ LCUI_API void Widget_Show(LCUI_Widget w);
 
 LCUI_API void Widget_Hide(LCUI_Widget w);
 
-LCUI_API void Widget_SetPosition(LCUI_Widget w, LCUI_StyleValue position);
+LCUI_API void Widget_SetPosition(LCUI_Widget w, pd_style_value position);
 
 LCUI_API void Widget_SetOpacity(LCUI_Widget w, float opacity);
 
-LCUI_API void Widget_SetBoxSizing(LCUI_Widget w, LCUI_StyleValue sizing);
+LCUI_API void Widget_SetBoxSizing(LCUI_Widget w, pd_style_value sizing);
 
 /** Collect all child widget that have a ref attribute specified */
 LCUI_API Dict *Widget_CollectReferences(LCUI_Widget w);

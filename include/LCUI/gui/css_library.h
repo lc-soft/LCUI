@@ -155,7 +155,7 @@ enum LCUI_StyleKeyName {
 #define key_box_shadow_end	key_box_shadow_color
 
 typedef struct LCUI_StyleSheetRec_ {
-	LCUI_Style sheet;
+	pd_style sheet;
 	int length;
 } LCUI_StyleSheetRec, *LCUI_StyleSheet;
 
@@ -166,7 +166,7 @@ typedef LinkedList* LCUI_StyleList;
 
 typedef struct LCUI_StyleListNodeRec_ {
 	int key;
-	LCUI_StyleRec style;
+	pd_style_t style;
 	LinkedListNode node;
 } LCUI_StyleListNodeRec, *LCUI_StyleListNode;
 
@@ -207,9 +207,9 @@ typedef struct LCUI_SelectorRec_ {
 
 #define StyleSheet_GetStyle(S, K) &((S)->sheet[K])
 
-LCUI_API void DestroyStyle(LCUI_Style s);
+LCUI_API void DestroyStyle(pd_style s);
 
-LCUI_API void MergeStyle(LCUI_Style dst, LCUI_Style src);
+LCUI_API void MergeStyle(pd_style dst, pd_style src);
 
 LCUI_API LCUI_StyleList StyleList(void);
 
@@ -256,7 +256,7 @@ LCUI_API void SelectorNode_Delete(LCUI_SelectorNode node);
  * 匹配选择器节点
  * 左边的选择器必须包含右边的选择器的所有属性。
  */
-LCUI_API LCUI_BOOL SelectorNode_Match(LCUI_SelectorNode sn1,
+LCUI_API pd_bool_t SelectorNode_Match(LCUI_SelectorNode sn1,
 				      LCUI_SelectorNode sn2);
 
 LCUI_API int LCUI_PutStyleSheet(LCUI_Selector selector, LCUI_StyleSheet in_ss,
