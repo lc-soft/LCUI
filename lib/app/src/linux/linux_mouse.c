@@ -136,7 +136,7 @@ static void LinuxMouseThread(void *arg)
 				continue;
 			}
 			memcpy(task.arg[0], buf, sizeof(char) * 6);
-			LCUI_PostTask(&task);
+			lcui_post_task(&task);
 		}
 	}
 }

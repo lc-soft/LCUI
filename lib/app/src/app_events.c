@@ -44,7 +44,7 @@ int app_event_copy(app_event_t *dest, app_event_t *src)
 	case APP_EVENT_TOUCH:
 		return app_touch_event_init(dest, src->touch.points, src->touch.n_points);
 	case APP_EVENT_TEXTINPUT:
-		return app_composition_event_init(dest, src->text.text);
+		return app_composition_event_init(dest, src->text.text, 0);
 	default:
 		*dest = *src;
 		break;

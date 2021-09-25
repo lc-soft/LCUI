@@ -620,7 +620,7 @@ LCUI_BOOL Widget_PostEvent(LCUI_Widget widget, LCUI_WidgetEvent ev, void *data,
 	CopyWidgetEvent(&pack->event, ev);
 	Widget_AddEventRecord(widget, pack);
 	/* 把任务扔给当前跑主循环的线程 */
-	if (!LCUI_PostTask(&task)) {
+	if (!lcui_post_task(&task)) {
 		LCUITask_Destroy(&task);
 		return FALSE;
 	}
@@ -906,7 +906,7 @@ int LCUIWidget_SetFocus(LCUI_Widget widget)
 }
 
 /** 响应系统的鼠标移动事件，向目标部件投递相关鼠标事件 */
-static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
+static void OnMouseEvent(app_event_t *sys_ev, void *arg)
 {
 	float scale;
 	LCUI_Pos pos;
@@ -943,12 +943,12 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 		ev.button.button = sys_ev->button.button;
 		Widget_TriggerEvent(target, &ev, NULL);
 		self.click.interval = DBLCLICK_INTERVAL;
-		if (ev.button.button == LCUI_KEY_LEFTBUTTON &&
+		if (ev.button.button == KEY_LEFTBUTTON &&
 		    self.click.widget == target) {
 			int delta;
 			delta = (int)LCUI_GetTimeDelta(self.click.time);
 			self.click.interval = delta;
-		} else if (ev.button.button == LCUI_KEY_LEFTBUTTON &&
+		} else if (ev.button.button == KEY_LEFTBUTTON &&
 			   self.click.widget != target) {
 			self.click.x = pos.x;
 			self.click.y = pos.y;
@@ -965,7 +965,7 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 		ev.button.button = sys_ev->button.button;
 		Widget_TriggerEvent(target, &ev, NULL);
 		if (self.targets[WST_ACTIVE] != target ||
-		    ev.button.button != LCUI_KEY_LEFTBUTTON) {
+		    ev.button.button != KEY_LEFTBUTTON) {
 			self.click.x = 0;
 			self.click.y = 0;
 			self.click.time = 0;
@@ -1016,7 +1016,7 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 	Widget_OnMouseOverEvent(target);
 }
 
-static void OnKeyboardEvent(LCUI_SysEvent e, void *arg)
+static void OnKeyboardEvent(app_event_t *e, void *arg)
 {
 	LCUI_WidgetEventRec ev = { 0 };
 	if (!self.targets[WST_FOCUS]) {
@@ -1042,7 +1042,7 @@ static void OnKeyboardEvent(LCUI_SysEvent e, void *arg)
 }
 
 /** 响应输入法的输入 */
-static void OnTextInput(LCUI_SysEvent e, void *arg)
+static void OnTextInput(app_event_t *e, void *arg)
 {
 	LCUI_WidgetEventRec ev = { 0 };
 	LCUI_Widget target = self.targets[WST_FOCUS];
@@ -1064,7 +1064,7 @@ static void OnTextInput(LCUI_SysEvent e, void *arg)
 	ev.text.length = 0;
 }
 
-static void ConvertTouchPoint(LCUI_TouchPoint point)
+static void ConvertTouchPoint(touch_point_t *point)
 {
 	float scale;
 	switch (point->state) {
@@ -1086,7 +1086,7 @@ static void ConvertTouchPoint(LCUI_TouchPoint point)
 }
 
 /** 分发触控事件给对应的部件 */
-static int DispatchTouchEvent(LinkedList *capturers, LCUI_TouchPoint points,
+static int DispatchTouchEvent(LinkedList *capturers, touch_point_t *points,
 			      int n_points)
 {
 	int i, count;
@@ -1124,7 +1124,7 @@ static int DispatchTouchEvent(LinkedList *capturers, LCUI_TouchPoint points,
 		TouchCapturer tc = node->data;
 		for (i = 0; i < n_points; ++i) {
 			for (LinkedList_Each(ptnode, &tc->points)) {
-				LCUI_TouchPoint point;
+				touch_point_t *point;
 				if (points[i].id != *(int *)ptnode->data) {
 					continue;
 				}
@@ -1146,11 +1146,11 @@ static int DispatchTouchEvent(LinkedList *capturers, LCUI_TouchPoint points,
 }
 
 /** 响应系统触控事件 */
-static void OnTouch(LCUI_SysEvent sys_ev, void *arg)
+static void OnTouch(app_event_t *sys_ev, void *arg)
 {
 	int i, n;
 	LinkedList capturers;
-	LCUI_TouchPoint points;
+	touch_point_t *points;
 	LinkedListNode *node, *ptnode;
 
 	n = sys_ev->touch.n_points;

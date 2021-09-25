@@ -77,7 +77,7 @@ void TextCaret_Refresh(LCUI_Widget widget)
 	}
 	LCUITimer_Reset(caret->timer_id, caret->blink_interval);
 	Widget_GetOffset(widget, LCUIWidget_GetRoot(), &x, &y);
-	LCUIIME_SetCaret((int)x, (int)y);
+	ime_set_caret((int)x, (int)y);
 	Widget_Show(widget);
 }
 

@@ -16,6 +16,16 @@
 
 typedef LCUI_PaintContextRec app_window_paint_t;
 
+typedef enum app_id_t {
+	APP_ID_UNKNOWN,
+	APP_ID_LINUX,
+	APP_ID_LINUX_X11,
+	APP_ID_WIN_DESKTOP,
+	APP_ID_UWP
+} app_id_t;
+
+#define APP_ID_WIN32 APP_ID_WIN_DESKTOP
+
 typedef enum app_event_type_t {
 	APP_EVENT_NONE,
 	APP_EVENT_KEYDOWN,
@@ -25,7 +35,7 @@ typedef enum app_event_type_t {
 	APP_EVENT_MOUSEMOVE,
 	APP_EVENT_MOUSEDOWN,
 	APP_EVENT_MOUSEUP,
-	APP_EVENT_MOUSEWHEEL,
+	APP_EVENT_WHEEL,
 	APP_EVENT_COMPOSITION,
 	APP_EVENT_TOUCH,
 	APP_EVENT_TOUCHMOVE,
@@ -51,6 +61,39 @@ typedef struct app_event_listener_t {
 	app_event_handler_t handler;
 	void *data;
 } app_event_listener_t;
+
+typedef struct app_window_driver_t {
+	void (*hide)(app_window_t*);
+	void (*show)(app_window_t*);
+	void (*activate)(app_window_t*);
+	void (*close)(app_window_t*);
+	void (*set_title)(app_window_t*, const wchar_t*);
+	void (*set_size)(app_window_t*, int, int);
+	void (*set_position)(app_window_t*, int, int);
+	void *(*get_handle)(app_window_t*);
+	int (*get_width)(app_window_t*);
+	int (*get_height)(app_window_t*);
+	void (*set_min_width)(app_window_t*, int);
+	void (*set_min_height)(app_window_t*, int);
+	void (*set_max_width)(app_window_t*, int);
+	void (*set_max_height)(app_window_t*, int);
+	app_window_paint_t *(*begin_paint)(app_window_t*, LCUI_Rect*);
+	void (*end_paint)(app_window_t*, app_window_paint_t*);
+	void (*present)(app_window_t*);
+} app_window_driver_t;
+
+typedef struct app_driver_t {
+	int (*init)(const wchar_t*);
+	void (*destroy)(void);
+	LCUI_BOOL (*wait_event)(void);
+	LCUI_BOOL (*process_events)(void);
+	int (*get_screen_width)(void);
+	int (*get_screen_height)(void);
+	app_window_t *(*create_window)(const wchar_t *title, int x, int y,
+				       int width, int height,
+				       app_window_t *parent);
+	void (*present)(void);
+} app_driver_t;
 
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode
@@ -231,7 +274,7 @@ struct app_event_t {
 };
 
 typedef void app_native_event_t;
-typedef void (*app_native_event_handler_t)(app_native_event_t*, void *);
+typedef void (*app_native_event_handler_t)(app_native_event_t *, void *);
 
 typedef struct app_native_event_listener_t {
 	int type;
@@ -314,16 +357,15 @@ app_window_paint_t *app_window_begin_paint(app_window_t *wnd, LCUI_Rect *rect);
 void app_window_end_paint(app_window_t *wnd, app_window_paint_t *paint);
 void app_window_present(app_window_t *wnd);
 
-
 // Native events
 
 int app_add_native_event_listener(int event_type, app_event_handler_t handler,
-				   void *data);
+				  void *data);
 int app_remove_native_event_listener(int event_type,
-				      app_event_handler_t handler);
+				     app_event_handler_t handler);
 
 INLINE int app_on_native_event(int event_type, app_event_handler_t handler,
-			   void *data)
+			       void *data)
 {
 	return app_add_native_event_listener(event_type, handler, data);
 }
@@ -332,7 +374,6 @@ INLINE int app_off_native_event(int event_type, app_event_handler_t handler)
 {
 	return app_remove_native_event_listener(event_type, handler);
 }
-
 
 // Events
 
@@ -347,9 +388,15 @@ int app_post_event(app_event_t *e);
 int app_process_event(app_event_t *e);
 int app_poll_event(app_event_t *e);
 
+// Base
+
+void app_set_instance(void *instance);
+app_id_t app_get_id(void);
+int app_init(const wchar_t *name);
+void app_quit(void);
+void app_destroy(void);
 
 // Input method engine
-
 
 typedef struct ime_handler_t {
 	LCUI_BOOL (*prockey)(int, LCUI_BOOL);
@@ -385,13 +432,5 @@ LCUI_API void app_init_ime(void);
 LCUI_API void app_destroy_ime(void);
 
 LCUI_API void ime_set_caret(int x, int y);
-
-
-// Base
-
-void app_set_instance(void *instance);
-int app_init(const wchar_t *name);
-void app_quit(void);
-void app_destroy(void);
 
 #endif

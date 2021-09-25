@@ -222,7 +222,7 @@ void App::Load(Platform::String^ entryPoint)
 	m_displayDriver->update = UWPDisplay_Update;
 	m_displayDriver->present = UWPDisplay_Present;
 
-	LCUI_InitBase();
+	lcui_init_base();
 	LCUI_InitApp(m_appDriver);
 	LCUI_InitDisplay(m_displayDriver);
 	app_init_ime();
@@ -252,7 +252,7 @@ void App::Update()
 void App::ProcessEvents()
 {
 	if (m_windowClosed) {
-		LCUI_Quit();
+		lcui_quit();
 		return;
 	}
 	auto dispathcer = CoreWindow::GetForCurrentThread()->Dispatcher;
@@ -367,7 +367,7 @@ void LCUI::Application::Load(Platform::String^ entryPoint)
 
 void LCUI::Application::Run()
 {
-	LCUI_Main();
+	lcui_main();
 }
 
 void LCUI::Run(LCUI::Application &app)

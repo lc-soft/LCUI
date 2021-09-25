@@ -230,7 +230,7 @@ static void LinuxKeybnoardThread(void *arg)
 			continue;
 		}
 		memcpy(task.arg[0], &key, sizeof(int));
-		LCUI_PostTask(&task);
+		lcui_post_task(&task);
 	}
 }
 

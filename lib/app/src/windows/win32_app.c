@@ -39,7 +39,7 @@ static struct app_t {
 
 	/** LinkedList<app_native_event_listener_t> */
 	LinkedList native_listeners;
-} app_win32;
+} win32_app;
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID unused)
 {
@@ -50,7 +50,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID unused)
 	case DLL_PROCESS_DETACH:
 		break;
 	}
-	app_win32.dll_instance = hModule;
+	win32_app.dll_instance = hModule;
 	return TRUE;
 }
 
@@ -63,7 +63,7 @@ void app_process_native_events(void)
 	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
-		for (LinkedList_Each(node, &app_win32.native_listeners)) {
+		for (LinkedList_Each(node, &win32_app.native_listeners)) {
 			listener = node->data;
 			if (listener->type == msg.message) {
 				listener->handler(&msg, listener->data);
@@ -84,7 +84,7 @@ int app_add_native_event_listener(int event_type, app_event_handler_t handler,
 	listener->handler = handler;
 	listener->data = data;
 	listener->type = event_type;
-	LinkedList_Append(&app_win32.native_listeners, listener);
+	LinkedList_Append(&win32_app.native_listeners, listener);
 	return 0;
 }
 
@@ -93,11 +93,11 @@ int app_remove_native_event_listener(int event_type, app_event_handler_t handler
 	LinkedListNode *node, *prev;
 	app_native_event_listener_t *listener;
 
-	for (LinkedList_Each(node, &app_win32.native_listeners)) {
+	for (LinkedList_Each(node, &win32_app.native_listeners)) {
 		prev = node->prev;
 		listener = node->data;
 		if (listener->handler == handler && listener->type == event_type) {
-			LinkedList_DeleteNode(&app_win32.native_listeners, node);
+			LinkedList_DeleteNode(&win32_app.native_listeners, node);
 			free(listener);
 			node = prev;
 			return 0;
@@ -124,7 +124,7 @@ void *app_window_get_handle(app_window_t *wnd)
 app_window_t *app_get_window_by_handle(void *handle)
 {
 	LinkedListNode *node;
-	for (LinkedList_Each(node, &app_win32.windows)) {
+	for (LinkedList_Each(node, &win32_app.windows)) {
 		if (((app_window_t *)node->data)->hwnd == handle) {
 			return node->data;
 		}
@@ -192,7 +192,7 @@ static LRESULT CALLBACK app_window_process(HWND hwnd, UINT msg, WPARAM arg1,
 		break;
 	}
 	case WM_DESTROY:
-		LinkedList_Unlink(&app_win32.windows, &wnd->node);
+		LinkedList_Unlink(&win32_app.windows, &wnd->node);
 		app_window_destroy(wnd);
 		return 0;
 	case WM_KEYDOWN:
@@ -245,7 +245,7 @@ static LRESULT CALLBACK app_window_process(HWND hwnd, UINT msg, WPARAM arg1,
 		ReleaseCapture();
 		break;
 	case WM_MOUSEWHEEL:
-		e.type = APP_EVENT_MOUSEWHEEL;
+		e.type = APP_EVENT_WHEEL;
 		e.wheel.delta_y = GET_WHEEL_DELTA_WPARAM(arg1);
 		e.wheel.delta_mode = APP_WHEEL_DELTA_LINE;
 		break;
@@ -300,10 +300,10 @@ static LRESULT CALLBACK app_window_process(HWND hwnd, UINT msg, WPARAM arg1,
 	default:
 		return DefWindowProc(hwnd, msg, arg1, arg2);
 	}
-	app_post_event(&e);
+	app_process_event(&e);
 }
 
-app_window_t *app_window_create(const wchar_t *title, int x, int y, int width,
+app_window_t *app_create_window(const wchar_t *title, int x, int y, int width,
 				int height, app_window_t *parent)
 {
 	app_window_t *wnd;
@@ -336,15 +336,15 @@ app_window_t *app_window_create(const wchar_t *title, int x, int y, int width,
 	Graph_Init(&wnd->fb);
 	wnd->fb.color_type = LCUI_COLOR_TYPE_ARGB;
 	wnd->hwnd =
-	    CreateWindowW(app_win32.class_name, title, WIN32_WINDOW_STYLE, x, y,
+	    CreateWindowW(win32_app.class_name, title, WIN32_WINDOW_STYLE, x, y,
 			  width, height, parent ? parent->hwnd : NULL, NULL,
-			  app_win32.main_instance, NULL);
+			  win32_app.main_instance, NULL);
 #ifdef ENABLE_TOUCH
 	RegisterTouchWindow(wnd->hwnd, 0);
 #endif
 	wnd->hdc_client = GetDC(wnd->hwnd);
 	wnd->hdc_fb = CreateCompatibleDC(wnd->hdc_client);
-	LinkedList_AppendNode(&app_win32.windows, &wnd->node);
+	LinkedList_AppendNode(&win32_app.windows, &wnd->node);
 	return wnd;
 }
 
@@ -506,34 +506,39 @@ void app_window_present(app_window_t *wnd)
 
 void app_set_instance(void *instance)
 {
-	app_win32.main_instance = instance;
+	win32_app.main_instance = instance;
+}
+
+app_id_t app_get_id(void)
+{
+	return APP_ID_WIN32;
 }
 
 int app_init(const wchar_t *name)
 {
 	WNDCLASSW wndclass;
 
-	app_win32.class_name = name;
+	win32_app.class_name = name;
 	wndclass.cbClsExtra = 0;
 	wndclass.cbWndExtra = 0;
 	wndclass.hbrBackground = NULL;
 	wndclass.lpszMenuName = NULL;
 	wndclass.lpfnWndProc = app_window_process;
-	wndclass.lpszClassName = app_win32.class_name;
-	wndclass.hInstance = app_win32.main_instance;
+	wndclass.lpszClassName = win32_app.class_name;
+	wndclass.hInstance = win32_app.main_instance;
 	wndclass.style = CS_HREDRAW | CS_VREDRAW;
 	wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wndclass.hIcon =
-	    LoadIcon(app_win32.dll_instance, MAKEINTRESOURCE(IDI_LCUI_ICON));
+	    LoadIcon(win32_app.dll_instance, MAKEINTRESOURCE(IDI_LCUI_ICON));
 	if (!RegisterClassW(&wndclass)) {
 		wchar_t str[256];
 		swprintf(str, 255, __FUNCTIONW__ L": error code: %d\n",
 			 GetLastError());
-		MessageBoxW(NULL, str, app_win32.class_name, MB_ICONERROR);
+		MessageBoxW(NULL, str, win32_app.class_name, MB_ICONERROR);
 		return -1;
 	}
-	LinkedList_Init(&app_win32.windows);
-	LinkedList_Init(&app_win32.native_listeners);
+	LinkedList_Init(&win32_app.windows);
+	LinkedList_Init(&win32_app.native_listeners);
 	return 0;
 }
 
@@ -541,15 +546,15 @@ void app_quit(void)
 {
 	LinkedListNode *node;
 
-	for (LinkedList_Each(node, &app_win32.windows)) {
+	for (LinkedList_Each(node, &win32_app.windows)) {
 		app_window_close(node->data);
 	}
 }
 
 void app_destroy(void)
 {
-	UnregisterClassW(app_win32.class_name, app_win32.main_instance);
-	LinkedList_ClearData(&app_win32.windows, app_window_destroy);
+	UnregisterClassW(win32_app.class_name, win32_app.main_instance);
+	LinkedList_ClearData(&win32_app.windows, app_window_destroy);
 }
 
 #endif

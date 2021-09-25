@@ -1,5 +1,5 @@
 add_requires("libomp", {optional = true})
-add_includedirs("src")
+add_includedirs("src", "include")
 set_configdir("src")
 add_configfiles("src/config.h.in")
 option("with-libx11", {showmenu = true, default = true})

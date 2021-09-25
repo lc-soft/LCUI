@@ -241,7 +241,7 @@ void InputDriver::OnPointerWheelChanged(CoreWindow^ sender, PointerEventArgs^ ar
 	PointerPointProperties^ pointProps = point->Properties;
 	Point position = point->Position;
 
-	ev.type = APP_EVENT_MOUSEWHEEL;
+	ev.type = APP_EVENT_WHEEL;
 	ev.wheel.x = (int)(position.X + 0.5);
 	ev.wheel.y = (int)(position.Y + 0.5);
 	ev.wheel.delta = pointProps->MouseWheelDelta;;

@@ -30,7 +30,6 @@
 
 #include "config.h"
 #include <LCUI_Build.h>
-#ifdef LCUI_BUILD_IN_LINUX
 #include <LCUI/LCUI.h>
 #include <LCUI/display.h>
 #include <LCUI/platform.h>
@@ -95,5 +94,3 @@ void LCUI_DestroyLinuxAppDriver(LCUI_AppDriver driver)
 	}
 #endif
 }
-
-#endif

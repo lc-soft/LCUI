@@ -728,13 +728,13 @@ static void TextEdit_OnKeyDown(LCUI_Widget widget, LCUI_WidgetEvent e,
 	cols = TextLayer_GetRowTextLength(edit->layer, cur_row);
 	e->cancel_bubble = TRUE;
 	switch (e->key.code) {
-	case LCUI_KEY_HOME:
+	case KEY_HOME:
 		cur_col = 0;
 		break;
-	case LCUI_KEY_END:
+	case KEY_END:
 		cur_col = cols;
 		break;
-	case LCUI_KEY_LEFT:
+	case KEY_LEFT:
 		if (cur_col > 0) {
 			--cur_col;
 		} else if (cur_row > 0) {
@@ -743,7 +743,7 @@ static void TextEdit_OnKeyDown(LCUI_Widget widget, LCUI_WidgetEvent e,
 			    TextLayer_GetRowTextLength(edit->layer, cur_row);
 		}
 		break;
-	case LCUI_KEY_RIGHT:
+	case KEY_RIGHT:
 		if (cur_col < cols) {
 			++cur_col;
 		} else if (cur_row < rows - 1) {
@@ -751,20 +751,20 @@ static void TextEdit_OnKeyDown(LCUI_Widget widget, LCUI_WidgetEvent e,
 			cur_col = 0;
 		}
 		break;
-	case LCUI_KEY_UP:
+	case KEY_UP:
 		if (cur_row > 0) {
 			--cur_row;
 		}
 		break;
-	case LCUI_KEY_DOWN:
+	case KEY_DOWN:
 		if (cur_row < rows - 1) {
 			++cur_row;
 		}
 		break;
-	case LCUI_KEY_BACKSPACE:
+	case KEY_BACKSPACE:
 		TextEdit_TextBackspace(widget, 1);
 		return;
-	case LCUI_KEY_DELETE:
+	case KEY_DELETE:
 		TextEdit_TextDelete(widget, 1);
 		return;
 	default:

@@ -458,7 +458,7 @@ static void ScrollBox_OnTouch(LCUI_Widget box, LCUI_WidgetEvent e, void *arg)
 
 	LCUI_Widget w = e->data;
 	LCUI_ScrollBar scrollbar;
-	LCUI_TouchPoint point;
+	touch_point_t *point;
 
 	if (e->touch.n_points < 1) {
 		return;
