@@ -1,6 +1,5 @@
 #define PREVIEW_MODE
 #include "./cases/test_widget_opacity.c"
-#include <LCUI/graph.h>
 
 static void OnOpacityPlus(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 {

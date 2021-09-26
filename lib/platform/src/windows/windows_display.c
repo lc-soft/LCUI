@@ -38,7 +38,6 @@
 #include <LCUI/display.h>
 #include <LCUI/painter.h>
 #include <LCUI/platform.h>
-#include <LCUI/graph.h>
 #include LCUI_DISPLAY_H
 #include LCUI_EVENTS_H
 

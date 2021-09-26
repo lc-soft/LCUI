@@ -33,7 +33,6 @@
 #include "uwp_renderer.h"
 #include "Common/DirectXHelper.h"
 #include <string.h>
-#include <LCUI/graph.h>
 
 using namespace LCUICore;
 using namespace Microsoft::WRL;
