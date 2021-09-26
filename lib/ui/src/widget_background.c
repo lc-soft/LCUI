@@ -33,9 +33,9 @@
 #include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/image.h>
 #include <LCUI/gui/metrics.h>
 #include <LCUI/gui/widget.h>
+#include <LCUI/image.h>
 #include "widget_background.h"
 
 #define ComputeActual LCUIMetrics_ComputeActual

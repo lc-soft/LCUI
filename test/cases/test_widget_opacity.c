@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <LCUI.h>
 #include <LCUI/gui/widget.h>
-#include <LCUI/graph.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/builder.h>
+#include <LCUI/graph.h>
 #include "ctest.h"
 
 #define PARENT_OPACITY 0.8f

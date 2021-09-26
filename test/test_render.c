@@ -1,8 +1,8 @@
 #include <LCUI.h>
-#include <LCUI/graph.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/display.h>
+#include <LCUI/graph.h>
 #include <LCUI/timer.h>
 #include <time.h>
 #include <stdlib.h>
