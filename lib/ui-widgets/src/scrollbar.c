@@ -235,7 +235,7 @@ static void StartInertialScrolling(LCUI_Widget w)
 		lcui_timer_destroy(effect->timer);
 	}
 	effect->timer =
-	    lcui_timer_set_interval(effect->interval, OnInertialScrolling, w);
+	    lcui_set_interval(effect->interval, OnInertialScrolling, w);
 	DEBUG_MSG("start_pos: %d, end_pos: %d\n", effect->start_pos,
 		  effect->end_pos);
 	DEBUG_MSG("effect->speed: %g, distance: %d, time: %d\n", effect->speed,

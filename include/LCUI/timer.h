@@ -49,11 +49,11 @@ typedef void (*timer_callback)(void *);
  *	该定时器的标识符
  **/
 /** repeatedly calls a function, with a fixed time delay between each call. */
-LCUI_API int lcui_timer_set_timeout(long int n_ms, timer_callback callback,
+LCUI_API int lcui_set_timeout(long int n_ms, timer_callback callback,
 			     void *arg);
 
 /** set a timer which execute a function once after the timer expires. */
-LCUI_API int lcui_timer_set_interval(long int n_ms, timer_callback callback,
+LCUI_API int lcui_set_interval(long int n_ms, timer_callback callback,
 			      void *arg);
 
 /**

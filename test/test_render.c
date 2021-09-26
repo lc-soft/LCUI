@@ -129,7 +129,7 @@ void InitRenderStatus(void)
 	TextView_SetColor(status, white);
 	Widget_Append(root, status);
 	UpdateRenderStatus(status);
-	lcui_timer_set_interval(1000, UpdateRenderStatus, status);
+	lcui_set_interval(1000, UpdateRenderStatus, status);
 }
 
 int main(void)

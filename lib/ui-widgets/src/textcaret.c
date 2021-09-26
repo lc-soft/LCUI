@@ -122,7 +122,7 @@ static void TextCaret_OnInit(LCUI_Widget widget)
 	caret->task->widget = widget;
 	caret->blink_interval = 500;
 	caret->visible = FALSE;
-	caret->timer_id = lcui_timer_set_interval(caret->blink_interval,
+	caret->timer_id = lcui_set_interval(caret->blink_interval,
 		TextCaret_OnBlink, caret->task);
 }
 

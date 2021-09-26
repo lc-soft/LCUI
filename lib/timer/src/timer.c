@@ -46,7 +46,7 @@ int lcui_timer_destroy(int timer_id)
 {
 	int ret;
 	LCUIMutex_Lock(&mutex);
-	ret = timer_destroy(timer_id, main_timer_list);
+	ret = timer_destroy(main_timer_list, timer_id);
 	LCUIMutex_Unlock(&mutex);
 	return ret;
 }
@@ -55,7 +55,7 @@ int lcui_timer_pause(int timer_id)
 {
 	int ret;
 	LCUIMutex_Lock(&mutex);
-	ret = timer_pause(timer_id, main_timer_list);
+	ret = timer_pause(main_timer_list, timer_id);
 	LCUIMutex_Unlock(&mutex);
 	return ret;
 }
@@ -64,7 +64,7 @@ int lcui_timer_continue(int timer_id)
 {
 	int ret;
 	LCUIMutex_Lock(&mutex);
-	ret = timer_continue(timer_id, main_timer_list);
+	ret = timer_continue(main_timer_list, timer_id);
 	LCUIMutex_Unlock(&mutex);
 	return ret;
 }
@@ -73,19 +73,19 @@ int lcui_timer_reset(int timer_id, long int n_ms)
 {
 	int ret;
 	LCUIMutex_Lock(&mutex);
-	ret = timer_reset(timer_id, n_ms, main_timer_list);
+	ret = timer_reset(main_timer_list, timer_id, n_ms);
 	LCUIMutex_Unlock(&mutex);
 	return ret;
 }
 
-int lcui_timer_set_timeout(long int n_ms, void(*callback)(void *), void *arg)
+int lcui_set_timeout(long int n_ms, void(*callback)(void *), void *arg)
 {
-	return timer_list_set_timeout(n_ms, callback, arg, main_timer_list);
+	return timer_list_add_timeout(main_timer_list, n_ms, callback, arg);
 }
 
-int lcui_timer_set_interval(long int n_ms, void(*callback)(void *), void *arg)
+int lcui_set_interval(long int n_ms, void(*callback)(void *), void *arg)
 {
-	return timer_list_set_interval(n_ms, callback, arg, main_timer_list);
+	return timer_list_add_interval(main_timer_list, n_ms, callback, arg);
 }
 
 size_t lcui_timer_list_process()
