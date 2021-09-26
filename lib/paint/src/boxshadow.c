@@ -634,7 +634,7 @@ int pd_boxshadow_paint(const pd_boxshadow_t *shadow, const pd_rect_t *box,
 	pd_graph_init(&shadow_paint.canvas);
 	shadow_paint.rect = paint->rect;
 	shadow_paint.with_alpha = TRUE;
-	shadow_paint.canvas.color_type = LCUI_COLOR_TYPE_ARGB;
+	shadow_paint.canvas.color_type = PD_COLOR_TYPE_ARGB;
 	pd_graph_create(&ctx.paint->canvas, paint->rect.width, paint->rect.height);
 
 	/* Render box shadow */

@@ -101,7 +101,7 @@ int main(void)
 	layer_rect.y = 0;
 	layer_rect.width = shadow_box.width;
 	layer_rect.height = shadow_box.height;
-	layer.color_type = LCUI_COLOR_TYPE_ARGB;
+	layer.color_type = PD_COLOR_TYPE_ARGB;
 	pd_graph_create(&layer, layer_rect.width, layer_rect.height);
 
 	// 基于临时绘制层创建绘制上下文

@@ -33,8 +33,8 @@
 #include <LCUI/display.h>
 
 static struct LCUICursorModule {
-	LCUI_Pos pos;      /* 当前帧的坐标 */
-	LCUI_Pos new_pos;  /* 下一帧将要更新的坐标 */
+	pd_pos_t pos;      /* 当前帧的坐标 */
+	pd_pos_t new_pos;  /* 下一帧将要更新的坐标 */
 	pd_bool_t visible; /* 是否可见 */
 	pd_canvas_t graph;  /* 游标的图形 */
 } cursor;
@@ -116,7 +116,7 @@ static int LCUICursor_LoadDefualtGraph(pd_canvas_t *buff)
 		pd_graph_free(buff);
 	}
 	pd_graph_init(buff);
-	buff->color_type = LCUI_COLOR_TYPE_ARGB;
+	buff->color_type = PD_COLOR_TYPE_ARGB;
 	if (pd_graph_create(buff, 12, 19) != 0) {
 		return -1;
 	}
@@ -202,7 +202,7 @@ void LCUICursor_Update(void)
 }
 
 /* 设定游标的位置 */
-void LCUICursor_SetPos(LCUI_Pos pos)
+void LCUICursor_SetPos(pd_pos_t pos)
 {
 	cursor.new_pos = pos;
 }
@@ -223,7 +223,7 @@ int LCUICursor_SetGraph(pd_canvas_t *graph)
 }
 
 /* 获取鼠标指针当前的坐标 */
-void LCUICursor_GetPos(LCUI_Pos *pos)
+void LCUICursor_GetPos(pd_pos_t *pos)
 {
 	*pos = cursor.new_pos;
 }

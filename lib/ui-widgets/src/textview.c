@@ -82,7 +82,7 @@ static int OnParseWordBreak(LCUI_CSSParserStyleContext ctx, const char *value)
 	if (s->is_valid && s->string) {
 		free(s->string);
 	}
-	s->type = LCUI_STYPE_STRING;
+	s->type = PD_STYPE_STRING;
 	s->is_valid = TRUE;
 	s->string = str;
 	return 0;
@@ -91,7 +91,7 @@ static int OnParseWordBreak(LCUI_CSSParserStyleContext ctx, const char *value)
 static LCUI_WordBreakMode ComputeWordBreakMode(LCUI_StyleSheet sheet)
 {
 	pd_style s = &sheet->sheet[self.key_word_break];
-	if (s->is_valid && s->type == LCUI_STYPE_STRING && s->string) {
+	if (s->is_valid && s->type == PD_STYPE_STRING && s->string) {
 		if (strcmp(s->string, "break-all") == 0) {
 			return LCUI_WORD_BREAK_BREAK_ALL;
 		}
@@ -280,7 +280,7 @@ static void TextView_OnResize(LCUI_Widget w, float width, float height)
 static void TextView_OnPaint(LCUI_Widget w, pd_paint_context paint,
 			     LCUI_WidgetActualStyle style)
 {
-	LCUI_Pos pos;
+	pd_pos_t pos;
 	pd_canvas_t canvas;
 	pd_rect_t content_rect, rect;
 	LCUI_TextView txt = GetData(w);

@@ -6,7 +6,7 @@ int main(void)
 {
 	int ret;
 	pd_canvas_t img;
-	LCUI_Pos pos = { 0, 80 };
+	pd_pos_t pos = { 0, 80 };
 	pd_rect_t area = { 0, 0, 320, 240 };
 	LCUI_TextLayer txt = TextLayer_New();
 	LCUI_TextStyleRec txtstyle;

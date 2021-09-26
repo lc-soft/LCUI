@@ -499,7 +499,7 @@ int TextLayer_SetCaretPosByPixelPos(LCUI_TextLayer layer, int x, int y)
 
 /** 获取指定行列的文字的像素坐标 */
 int TextLayer_GetCharPixelPos(LCUI_TextLayer layer, int row, int col,
-			      LCUI_Pos *pixel_pos)
+			      pd_pos_t *pixel_pos)
 {
 	LCUI_TextRow txtrow;
 	int i, pixel_x = 0, pixel_y = 0;
@@ -530,7 +530,7 @@ int TextLayer_GetCharPixelPos(LCUI_TextLayer layer, int row, int col,
 }
 
 /** 获取文本光标的像素坐标 */
-int TextLayer_GetCaretPixelPos(LCUI_TextLayer layer, LCUI_Pos *pixel_pos)
+int TextLayer_GetCaretPixelPos(LCUI_TextLayer layer, pd_pos_t *pixel_pos)
 {
 	return TextLayer_GetCharPixelPos(layer, layer->insert_y,
 					 layer->insert_x, pixel_pos);
@@ -1240,7 +1240,7 @@ static void TextLayer_ValidateArea(LCUI_TextLayer layer, pd_rect_t *area)
 }
 
 static void TextLayer_DrawChar(LCUI_TextLayer layer, LCUI_TextChar ch,
-			       pd_canvas_t *graph, LCUI_Pos ch_pos)
+			       pd_canvas_t *graph, pd_pos_t ch_pos)
 {
 	/* 判断文字使用的前景颜色，再进行绘制 */
 	if (ch->style && ch->style->has_fore_color) {
@@ -1253,11 +1253,11 @@ static void TextLayer_DrawChar(LCUI_TextLayer layer, LCUI_TextChar ch,
 }
 
 static void TextLayer_DrawTextRow(LCUI_TextLayer layer, pd_rect_t *area,
-				  pd_canvas_t *graph, LCUI_Pos layer_pos,
+				  pd_canvas_t *graph, pd_pos_t layer_pos,
 				  LCUI_TextRow txtrow, int y)
 {
 	LCUI_TextChar txtchar;
-	LCUI_Pos ch_pos;
+	pd_pos_t ch_pos;
 	int baseline, col, x;
 	baseline = txtrow->text_height * 4 / 5;
 	x = TextLayer_GetRowStartX(layer, txtrow) + layer->offset_x;
@@ -1310,7 +1310,7 @@ static void TextLayer_DrawTextRow(LCUI_TextLayer layer, pd_rect_t *area,
 	}
 }
 
-int TextLayer_RenderTo(LCUI_TextLayer layer, pd_rect_t area, LCUI_Pos layer_pos,
+int TextLayer_RenderTo(LCUI_TextLayer layer, pd_rect_t area, pd_pos_t layer_pos,
 		       pd_canvas_t *canvas)
 {
 	int y, row;

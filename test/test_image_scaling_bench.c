@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 	pd_color_t t_color;
 
 	pd_graph_init(&g_src);
-	g_src.color_type = LCUI_COLOR_TYPE_ARGB;
+	g_src.color_type = PD_COLOR_TYPE_ARGB;
 	if (pd_graph_create(&g_src, 960, 540) < 0) {
 		return -2;
 	}

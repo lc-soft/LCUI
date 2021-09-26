@@ -7,7 +7,7 @@ int main(void)
 	int ret, fid;
 	pd_canvas_t img;
 	LCUI_FontBitmap bmp;
-	LCUI_Pos pos = { 25, 25 };
+	pd_pos_t pos = { 25, 25 };
 	pd_color_t bg = RGB(240, 240, 240);
 	pd_color_t color = RGB(255, 0, 0);
 

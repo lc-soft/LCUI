@@ -105,7 +105,7 @@ InputDriver::InputDriver()
 void InputDriver::OnPointerPressed(CoreWindow^ sender,
 				   PointerEventArgs^ args)
 {
-	LCUI_Pos pos;
+	pd_pos_t pos;
 	LCUI_TouchPoint tp;
 	LCUI_SysEventRec ev;
 	PointerPoint^ point = args->CurrentPoint;
@@ -152,7 +152,7 @@ void InputDriver::OnPointerPressed(CoreWindow^ sender,
 void InputDriver::OnPointerMoved(CoreWindow^ sender, PointerEventArgs^ args)
 {
 	Point position;
-	LCUI_Pos pos;
+	pd_pos_t pos;
 	LCUI_TouchPoint tp;
 	LCUI_SysEventRec ev;
 	PointerPoint^ point = args->CurrentPoint;
@@ -191,7 +191,7 @@ void InputDriver::OnPointerMoved(CoreWindow^ sender, PointerEventArgs^ args)
 
 void InputDriver::OnPointerReleased(CoreWindow^ sender, PointerEventArgs^ args)
 {
-	LCUI_Pos pos;
+	pd_pos_t pos;
 	LCUI_TouchPoint tp;
 	LCUI_SysEventRec ev;
 	PointerPoint^ point = args->CurrentPoint;

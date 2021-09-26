@@ -40,7 +40,7 @@
 #include "widget_shadow.h"
 
 //#define DEBUG_FRAME_RENDER
-#define ComputeActualPX(VAL) LCUIMetrics_ComputeActual(VAL, LCUI_STYPE_PX)
+#define ComputeActualPX(VAL) LCUIMetrics_ComputeActual(VAL, PD_STYPE_PX)
 
 #define MAX_VISIBLE_WIDTH 20000
 #define MAX_VISIBLE_HEIGHT 20000
@@ -436,10 +436,10 @@ static LCUI_WidgetRenderer WidgetRenderer(LCUI_Widget w,
 	pd_graph_init(&that->self_graph);
 	pd_graph_init(&that->layer_graph);
 	pd_graph_init(&that->content_graph);
-	that->layer_graph.color_type = LCUI_COLOR_TYPE_ARGB;
+	that->layer_graph.color_type = PD_COLOR_TYPE_ARGB;
 	that->can_render_self = Widget_IsPaintable(w);
 	if (that->can_render_self) {
-		that->self_graph.color_type = LCUI_COLOR_TYPE_ARGB;
+		that->self_graph.color_type = PD_COLOR_TYPE_ARGB;
 		pd_graph_create(&that->self_graph, that->paint->rect.width,
 			     that->paint->rect.height);
 	}
@@ -486,7 +486,7 @@ static LCUI_WidgetRenderer WidgetRenderer(LCUI_Widget w,
 		return that;
 	}
 	if (that->has_content_graph) {
-		that->content_graph.color_type = LCUI_COLOR_TYPE_ARGB;
+		that->content_graph.color_type = PD_COLOR_TYPE_ARGB;
 		pd_graph_create(&that->content_graph,
 			     that->actual_content_rect.width,
 			     that->actual_content_rect.height);

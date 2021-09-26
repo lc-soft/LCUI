@@ -3,7 +3,7 @@
 #include <LCUI/graph.h>
 
 void pd_graph_draw_horiz_line(pd_canvas_t *graph, pd_color_t color, int size,
-			 LCUI_Pos start, int len)
+			 pd_pos_t start, int len)
 {
 	int y, x;
 	pd_rect_t area;
@@ -28,7 +28,7 @@ void pd_graph_draw_horiz_line(pd_canvas_t *graph, pd_color_t color, int size,
 	if (start.y + size > area.y + area.height) {
 		size = area.y + area.height - start.y;
 	}
-	if (des->color_type == LCUI_COLOR_TYPE_ARGB) {
+	if (des->color_type == PD_COLOR_TYPE_ARGB) {
 		pd_color_t *pPixel, *pRowPixel;
 		pRowPixel = des->argb + start.y*des->width + start.x;
 		for (y = 0; y < size; ++y) {
@@ -58,7 +58,7 @@ void pd_graph_draw_horiz_line(pd_canvas_t *graph, pd_color_t color, int size,
 }
 
 void pd_graph_draw_verti_line(pd_canvas_t *graph, pd_color_t color,
-				  int size, LCUI_Pos start, int len)
+				  int size, pd_pos_t start, int len)
 {
 	int y, x;
 	pd_rect_t area;
@@ -85,7 +85,7 @@ void pd_graph_draw_verti_line(pd_canvas_t *graph, pd_color_t color,
 		len = area.y + area.height - start.y;
 	}
 
-	if (des->color_type == LCUI_COLOR_TYPE_ARGB) {
+	if (des->color_type == PD_COLOR_TYPE_ARGB) {
 		pd_color_t *pPixel, *pRowPixel;
 		pRowPixel = des->argb + start.y*des->width + start.x;
 		for (y = 0; y < len; ++y) {

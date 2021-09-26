@@ -118,7 +118,7 @@ static size_t LCUIDisplay_RenderFlashRect(SurfaceRecord record,
 	int64_t period;
 	float duraion = 1000;
 
-	LCUI_Pos pos;
+	pd_pos_t pos;
 	pd_color_t color;
 	pd_canvas_t mask;
 	pd_paint_context paint;
@@ -135,7 +135,7 @@ static size_t LCUIDisplay_RenderFlashRect(SurfaceRecord record,
 		return count;
 	}
 	pd_graph_init(&mask);
-	mask.color_type = LCUI_COLOR_TYPE_ARGB;
+	mask.color_type = PD_COLOR_TYPE_ARGB;
 	pd_graph_create(&mask, flash_rect->rect.width, flash_rect->rect.height);
 	pd_graph_fill_rect(&mask, ARGB(125, 124, 179, 5), NULL, TRUE);
 	mask.opacity = 0.6f * (duraion - (float)period) / duraion;

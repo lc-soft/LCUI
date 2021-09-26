@@ -73,7 +73,7 @@ int main(void)
 	pd_graph_fill_rect(&canvas, gray, NULL, FALSE);
 
 	pd_graph_init(&layer);
-	layer.color_type = LCUI_COLOR_TYPE_ARGB;
+	layer.color_type = PD_COLOR_TYPE_ARGB;
 	pd_graph_create(&layer, layer_rect.width, layer_rect.height);
 
 	// 创建绘制上下文

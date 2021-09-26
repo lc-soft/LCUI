@@ -342,7 +342,7 @@ typedef struct LCUI_WidgetRec_ {
 		pd_style _s;                \
 		_s = Widget_GetStyle(W, K);   \
 		_s->is_valid = TRUE;          \
-		_s->type = LCUI_STYPE_##TYPE; \
+		_s->type = PD_STYPE_##TYPE; \
 		_s->val_##TYPE = VAL;         \
 		Widget_AddTaskByStyle(W, K);  \
 	} while (0)

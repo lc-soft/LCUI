@@ -38,7 +38,7 @@
 
 static float ComputeXMetric(LCUI_Widget w, pd_style s)
 {
-	if (s->type == LCUI_STYPE_SCALE) {
+	if (s->type == PD_STYPE_SCALE) {
 		return w->width * s->scale;
 	}
 	return LCUIMetrics_Compute(s->value, s->type);
@@ -46,7 +46,7 @@ static float ComputeXMetric(LCUI_Widget w, pd_style s)
 
 static float ComputeYMetric(LCUI_Widget w, pd_style s)
 {
-	if (s->type == LCUI_STYPE_SCALE) {
+	if (s->type == PD_STYPE_SCALE) {
 		return w->height * s->scale;
 	}
 	return LCUIMetrics_Compute(s->value, s->type);
@@ -139,7 +139,7 @@ float Widget_GetCanvasHeight(LCUI_Widget widget)
 	return height + SHADOW_WIDTH(shadow) * 2;
 }
 
-#define ComputeActual(X) LCUIMetrics_ComputeActual(X, LCUI_STYPE_PX)
+#define ComputeActual(X) LCUIMetrics_ComputeActual(X, PD_STYPE_PX)
 
 void Widget_ComputeBoxShadow(LCUI_Widget w, pd_boxshadow_t *out)
 {

@@ -64,7 +64,7 @@ typedef struct LCUI_FontBitmap_ {
 	uchar_t *buffer;	/**< 字体位图数据 */
 	short num_grays;
 	char pixel_mode;
-	LCUI_Pos advance;	/**< XY轴的跨距 */
+	pd_pos_t advance;	/**< XY轴的跨距 */
 } LCUI_FontBitmap;
 
 typedef struct LCUI_FontEngine LCUI_FontEngine;
@@ -135,7 +135,7 @@ LCUI_API int FontBitmap_Create(LCUI_FontBitmap *bitmap, int width, int rows);
 LCUI_API int FontBitmap_Print(LCUI_FontBitmap *fontbmp);
 
 /** 将字体位图绘制到目标图像上 */
-LCUI_API int FontBitmap_Mix(pd_canvas_t *graph, LCUI_Pos pos,
+LCUI_API int FontBitmap_Mix(pd_canvas_t *graph, pd_pos_t pos,
 			    const LCUI_FontBitmap *bmp, pd_color_t color);
 
 /** 载入字体位图 */

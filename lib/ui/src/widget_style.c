@@ -74,7 +74,7 @@ root {
 INLINE int ComputeStyleOption(LCUI_Widget w, int key, int default_value)
 {
 	if (!w->style->sheet[key].is_valid ||
-	    w->style->sheet[key].type != LCUI_STYPE_STYLE) {
+	    w->style->sheet[key].type != PD_STYPE_STYLE) {
 		return default_value;
 	}
 	return w->style->sheet[key].style;
@@ -121,7 +121,7 @@ void Widget_ComputeProperties(LCUI_Widget w)
 	s = &w->style->sheet[key_focusable];
 	style->pointer_events =
 	    ComputeStyleOption(w, key_pointer_events, SV_INHERIT);
-	if (s->is_valid && s->type == LCUI_STYPE_BOOL && s->val_bool == 0) {
+	if (s->is_valid && s->type == PD_STYPE_BOOL && s->val_bool == 0) {
 		style->focusable = FALSE;
 	} else {
 		style->focusable = TRUE;
@@ -342,7 +342,7 @@ void Widget_ComputeVisibilityStyle(LCUI_Widget w)
 
 	if (w->computed_style.display == SV_NONE) {
 		w->computed_style.visible = FALSE;
-	} else if (s->is_valid && s->type == LCUI_STYPE_STRING &&
+	} else if (s->is_valid && s->type == PD_STYPE_STRING &&
 		   strcmp(s->val_string, "hidden") == 0) {
 		w->computed_style.visible = FALSE;
 	} else {
@@ -355,7 +355,7 @@ void Widget_ComputeDisplayStyle(LCUI_Widget w)
 	pd_style s = &w->style->sheet[key_display];
 	LCUI_WidgetStyle *style = &w->computed_style;
 
-	if (s->is_valid && s->type == LCUI_STYPE_STYLE) {
+	if (s->is_valid && s->type == PD_STYPE_STYLE) {
 		style->display = s->style;
 		if (style->display == SV_NONE) {
 			w->computed_style.visible = FALSE;
@@ -373,10 +373,10 @@ void Widget_ComputeOpacityStyle(LCUI_Widget w)
 
 	if (s->is_valid) {
 		switch (s->type) {
-		case LCUI_STYPE_INT:
+		case PD_STYPE_INT:
 			opacity = 1.0f * s->val_int;
 			break;
-		case LCUI_STYPE_SCALE:
+		case PD_STYPE_SCALE:
 			opacity = s->val_scale;
 			break;
 		default:
@@ -396,7 +396,7 @@ void Widget_ComputeZIndexStyle(LCUI_Widget w)
 {
 	pd_style s = &w->style->sheet[key_z_index];
 
-	if (s->is_valid && s->type == LCUI_STYPE_INT) {
+	if (s->is_valid && s->type == PD_STYPE_INT) {
 		w->computed_style.z_index = s->val_int;
 	} else {
 		w->computed_style.z_index = 0;
@@ -439,31 +439,31 @@ void Widget_ComputeFlexBoxStyle(LCUI_Widget w)
 	/* Compute style */
 
 	if (s[key_flex_grow].is_valid &&
-	    s[key_flex_grow].type == LCUI_STYPE_INT) {
+	    s[key_flex_grow].type == PD_STYPE_INT) {
 		flex->grow = 1.f * s[key_flex_grow].val_int;
 	}
 	if (s[key_flex_shrink].is_valid &&
-	    s[key_flex_shrink].type == LCUI_STYPE_INT) {
+	    s[key_flex_shrink].type == PD_STYPE_INT) {
 		flex->shrink = 1.f * s[key_flex_shrink].val_int;
 	}
 	if (s[key_flex_wrap].is_valid &&
-	    s[key_flex_wrap].type == LCUI_STYPE_STYLE) {
+	    s[key_flex_wrap].type == PD_STYPE_STYLE) {
 		flex->wrap = s[key_flex_wrap].val_style;
 	}
 	if (s[key_flex_direction].is_valid &&
-	    s[key_flex_direction].type == LCUI_STYPE_STYLE) {
+	    s[key_flex_direction].type == PD_STYPE_STYLE) {
 		flex->direction = s[key_flex_direction].val_style;
 	}
 	if (s[key_justify_content].is_valid &&
-	    s[key_justify_content].type == LCUI_STYPE_STYLE) {
+	    s[key_justify_content].type == PD_STYPE_STYLE) {
 		flex->justify_content = s[key_justify_content].val_style;
 	}
 	if (s[key_align_content].is_valid &&
-	    s[key_align_content].type == LCUI_STYPE_STYLE) {
+	    s[key_align_content].type == PD_STYPE_STYLE) {
 		flex->align_content = s[key_align_content].val_style;
 	}
 	if (s[key_align_items].is_valid &&
-	    s[key_align_items].type == LCUI_STYPE_STYLE) {
+	    s[key_align_items].type == PD_STYPE_STYLE) {
 		flex->align_items = s[key_align_items].val_style;
 	}
 	Widget_ComputeFlexBasisStyle(w);

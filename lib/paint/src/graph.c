@@ -48,7 +48,7 @@ void pd_graph_print_info(pd_canvas_t *graph)
 	printf("height:%d, ", graph->height);
 	printf("opacity:%.2f, ", graph->opacity);
 	printf("%s\n",
-	       graph->color_type == LCUI_COLOR_TYPE_ARGB ? "RGBA" : "RGB");
+	       graph->color_type == PD_COLOR_TYPE_ARGB ? "RGBA" : "RGB");
 	if (graph->quote.is_valid) {
 		printf("graph src:");
 		pd_graph_print_info(pd_graph_get_quote(graph));
@@ -62,7 +62,7 @@ void pd_graph_init(pd_canvas_t *graph)
 	graph->quote.top = 0;
 	graph->quote.left = 0;
 	graph->palette = NULL;
-	graph->color_type = LCUI_COLOR_TYPE_RGB;
+	graph->color_type = PD_COLOR_TYPE_RGB;
 	graph->bytes = NULL;
 	graph->opacity = 1.0;
 	graph->mem_size = 0;
@@ -95,17 +95,17 @@ pd_color_t ARGB(uchar_t a, uchar_t r, uchar_t g, uchar_t b)
 static unsigned get_pixel_size(int color_type)
 {
 	switch (color_type) {
-	case LCUI_COLOR_TYPE_INDEX8:
-	case LCUI_COLOR_TYPE_GRAY8:
-	case LCUI_COLOR_TYPE_RGB323:
-	case LCUI_COLOR_TYPE_ARGB2222:
+	case PD_COLOR_TYPE_INDEX8:
+	case PD_COLOR_TYPE_GRAY8:
+	case PD_COLOR_TYPE_RGB323:
+	case PD_COLOR_TYPE_ARGB2222:
 		return 1;
-	case LCUI_COLOR_TYPE_RGB555:
-	case LCUI_COLOR_TYPE_RGB565:
+	case PD_COLOR_TYPE_RGB555:
+	case PD_COLOR_TYPE_RGB565:
 		return 2;
-	case LCUI_COLOR_TYPE_RGB888:
+	case PD_COLOR_TYPE_RGB888:
 		return 3;
-	case LCUI_COLOR_TYPE_ARGB8888:
+	case PD_COLOR_TYPE_ARGB8888:
 	default:
 		break;
 	}
@@ -160,14 +160,14 @@ void pd_pixels_formmat(const uchar_t *in_pixels, int in_color_type,
 		  uchar_t *out_pixels, int out_color_type, size_t pixel_count)
 {
 	switch (in_color_type) {
-	case LCUI_COLOR_TYPE_ARGB8888:
-		if (out_color_type == LCUI_COLOR_TYPE_ARGB8888) {
+	case PD_COLOR_TYPE_ARGB8888:
+		if (out_color_type == PD_COLOR_TYPE_ARGB8888) {
 			return;
 		}
 		pixels_format_rgb(in_pixels, out_pixels, pixel_count);
 		break;
-	case LCUI_COLOR_TYPE_RGB888:
-		if (out_color_type == LCUI_COLOR_TYPE_RGB888) {
+	case PD_COLOR_TYPE_RGB888:
+		if (out_color_type == PD_COLOR_TYPE_RGB888) {
 			return;
 		}
 		pixels_format_argb(in_pixels, out_pixels, pixel_count);
@@ -205,7 +205,7 @@ static int graph_rgb_to_argb(pd_canvas_t *graph)
 	}
 	free(graph->argb);
 	graph->argb = buffer;
-	graph->color_type = LCUI_COLOR_TYPE_ARGB8888;
+	graph->color_type = PD_COLOR_TYPE_ARGB8888;
 	return 0;
 }
 
@@ -400,7 +400,7 @@ static int graph_argb_to_rgb(pd_canvas_t *graph)
 	}
 	free(graph->argb);
 	graph->bytes = buffer;
-	graph->color_type = LCUI_COLOR_TYPE_RGB888;
+	graph->color_type = PD_COLOR_TYPE_RGB888;
 	graph->bytes_per_pixel = 3;
 	return 0;
 }
@@ -725,17 +725,17 @@ int pd_graph_set_color_type(pd_canvas_t *graph, int color_type)
 		return -1;
 	}
 	switch (graph->color_type) {
-	case LCUI_COLOR_TYPE_ARGB8888:
+	case PD_COLOR_TYPE_ARGB8888:
 		switch (color_type) {
-		case LCUI_COLOR_TYPE_RGB888:
+		case PD_COLOR_TYPE_RGB888:
 			return graph_argb_to_rgb(graph);
 		default:
 			break;
 		}
 		break;
-	case LCUI_COLOR_TYPE_RGB888:
+	case PD_COLOR_TYPE_RGB888:
 		switch (color_type) {
-		case LCUI_COLOR_TYPE_ARGB8888:
+		case PD_COLOR_TYPE_ARGB8888:
 			return graph_rgb_to_argb(graph);
 		default:
 			break;
@@ -895,7 +895,7 @@ int pd_graph_set_alpha_bits(pd_canvas_t *graph, uchar_t *a, size_t size)
 	if (size > (size_t)(graph->width * graph->height)) {
 		size = (size_t)(graph->width * graph->height);
 	}
-	if (graph->color_type != LCUI_COLOR_TYPE_ARGB) {
+	if (graph->color_type != PD_COLOR_TYPE_ARGB) {
 		return -2;
 	}
 	for (i = 0; i < size; ++i) {
@@ -912,7 +912,7 @@ int pd_graph_set_red_bits(pd_canvas_t *graph, uchar_t *r, size_t size)
 	if (size > (size_t)(graph->width * graph->height)) {
 		size = (size_t)(graph->width * graph->height);
 	}
-	if (graph->color_type == LCUI_COLOR_TYPE_ARGB) {
+	if (graph->color_type == PD_COLOR_TYPE_ARGB) {
 		for (i = 0; i < size; ++i) {
 			graph->argb[i].r = r[i];
 		}
@@ -934,7 +934,7 @@ int pd_graph_set_green_bits(pd_canvas_t *graph, uchar_t *g, size_t size)
 	if (size > (size_t)(graph->width * graph->height)) {
 		size = (size_t)(graph->width * graph->height);
 	}
-	if (graph->color_type == LCUI_COLOR_TYPE_ARGB) {
+	if (graph->color_type == PD_COLOR_TYPE_ARGB) {
 		for (i = 0; i < size; ++i) {
 			graph->argb[i].g = g[i];
 		}
@@ -956,7 +956,7 @@ int pd_graph_set_blue_bits(pd_canvas_t *graph, uchar_t *b, size_t size)
 	if (size > (size_t)(graph->width * graph->height)) {
 		size = (size_t)(graph->width * graph->height);
 	}
-	if (graph->color_type == LCUI_COLOR_TYPE_ARGB) {
+	if (graph->color_type == PD_COLOR_TYPE_ARGB) {
 		for (i = 0; i < size; ++i) {
 			graph->argb[i].b = b[i];
 		}
@@ -1008,7 +1008,7 @@ int pd_graph_zoom(const pd_canvas_t *graph, pd_canvas_t *buff, pd_bool_t keep_sc
 	if (pd_graph_create(buff, width, height) < 0) {
 		return -2;
 	}
-	if (graph->color_type == LCUI_COLOR_TYPE_ARGB) {
+	if (graph->color_type == PD_COLOR_TYPE_ARGB) {
 		pd_color_t *px_src, *px_des, *px_row_src;
 		for (y = 0; y < height; ++y) {
 			src_y = (int)(y * scale_y);
@@ -1052,8 +1052,8 @@ int pd_graph_zoom_bilinear(const pd_canvas_t *graph, pd_canvas_t *buff,
 	float x_diff, y_diff;
 	double scale_x = 0.0, scale_y = 0.0;
 
-	if (graph->color_type != LCUI_COLOR_TYPE_RGB &&
-	    graph->color_type != LCUI_COLOR_TYPE_ARGB) {
+	if (graph->color_type != PD_COLOR_TYPE_RGB &&
+	    graph->color_type != PD_COLOR_TYPE_ARGB) {
 		/* fall back to nearest scaling */
 		Logger_Debug("[graph] unable to perform bilinear scaling, "
 			     "fallback...\n");
@@ -1138,9 +1138,9 @@ int pd_graph_cut(const pd_canvas_t *graph, pd_rect_t rect, pd_canvas_t *buff)
 		return -3;
 	}
 	switch (graph->color_type) {
-	case LCUI_COLOR_TYPE_ARGB8888:
+	case PD_COLOR_TYPE_ARGB8888:
 		return graph_cut_argb(graph, rect, buff);
-	case LCUI_COLOR_TYPE_RGB888:
+	case PD_COLOR_TYPE_RGB888:
 		return graph_cut_rgb(graph, rect, buff);
 	default:
 		break;
@@ -1151,9 +1151,9 @@ int pd_graph_cut(const pd_canvas_t *graph, pd_rect_t rect, pd_canvas_t *buff)
 int pd_graph_horzi_flip(const pd_canvas_t *graph, pd_canvas_t *buff)
 {
 	switch (graph->color_type) {
-	case LCUI_COLOR_TYPE_RGB888:
+	case PD_COLOR_TYPE_RGB888:
 		return graph_horiz_flip_rgb(graph, buff);
-	case LCUI_COLOR_TYPE_ARGB8888:
+	case PD_COLOR_TYPE_ARGB8888:
 		return graph_horiz_flip_argb(graph, buff);
 	default:
 		break;
@@ -1164,9 +1164,9 @@ int pd_graph_horzi_flip(const pd_canvas_t *graph, pd_canvas_t *buff)
 int pd_graph_verti_flip(const pd_canvas_t *graph, pd_canvas_t *buff)
 {
 	switch (graph->color_type) {
-	case LCUI_COLOR_TYPE_RGB888:
+	case PD_COLOR_TYPE_RGB888:
 		return graph_verti_flip_rgb(graph, buff);
-	case LCUI_COLOR_TYPE_ARGB8888:
+	case PD_COLOR_TYPE_ARGB8888:
 		return graph_veri_flip_argb(graph, buff);
 	default:
 		break;
@@ -1186,9 +1186,9 @@ int pd_graph_fill_rect(pd_canvas_t *graph, pd_color_t color, pd_rect_t *rect,
 		rect2.height = graph->height;
 	}
 	switch (graph->color_type) {
-	case LCUI_COLOR_TYPE_RGB888:
+	case PD_COLOR_TYPE_RGB888:
 		return graph_fill_rect_rgb(graph, color, rect2);
-	case LCUI_COLOR_TYPE_ARGB8888:
+	case PD_COLOR_TYPE_ARGB8888:
 		return graph_fill_rect_argb(graph, color, rect2, with_alpha);
 	default:
 		break;
@@ -1278,15 +1278,15 @@ int pd_graph_mix(pd_canvas_t *back, const pd_canvas_t *fore, int left, int top,
 	fore = pd_graph_get_quote(fore);
 	back = pd_graph_get_quote(back);
 	switch (fore->color_type) {
-	case LCUI_COLOR_TYPE_RGB888:
-		if (back->color_type == LCUI_COLOR_TYPE_RGB888) {
+	case PD_COLOR_TYPE_RGB888:
+		if (back->color_type == PD_COLOR_TYPE_RGB888) {
 			mixer = graph_replace_rgb;
 		} else {
 			mixer = graph_replace_to_argb;
 		}
 		break;
-	case LCUI_COLOR_TYPE_ARGB8888:
-		if (back->color_type == LCUI_COLOR_TYPE_RGB888) {
+	case PD_COLOR_TYPE_ARGB8888:
+		if (back->color_type == PD_COLOR_TYPE_RGB888) {
 			mixer = graph_mix_argb_to_rgb;
 		} else {
 			if (with_alpha) {
@@ -1329,10 +1329,10 @@ int pd_graph_replace(pd_canvas_t *back, const pd_canvas_t *fore, int left, int t
 	fore = pd_graph_get_quote(fore);
 	back = pd_graph_get_quote(back);
 	switch (fore->color_type) {
-	case LCUI_COLOR_TYPE_RGB888:
+	case PD_COLOR_TYPE_RGB888:
 		graph_replace_rgb(back, write_rect, fore, left, top);
 		break;
-	case LCUI_COLOR_TYPE_ARGB8888:
+	case PD_COLOR_TYPE_ARGB8888:
 		graph_replace_argb(back, write_rect, fore, left, top);
 	default:
 		break;

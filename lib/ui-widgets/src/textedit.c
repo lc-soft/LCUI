@@ -145,7 +145,7 @@ static void TextEdit_UpdateCaret(LCUI_Widget widget)
 	float x, y, caret_x = 0, caret_y = 0;
 
 	if (!edit->is_placeholder_shown) {
-		LCUI_Pos pos;
+		pd_pos_t pos;
 		if (TextLayer_GetCaretPixelPos(edit->layer, &pos) != 0) {
 			return;
 		}
@@ -933,7 +933,7 @@ static void TextEdit_OnDestroy(LCUI_Widget widget)
 static void TextEdit_OnPaint(LCUI_Widget w, pd_paint_context paint,
 			     LCUI_WidgetActualStyle style)
 {
-	LCUI_Pos pos;
+	pd_pos_t pos;
 	pd_canvas_t canvas;
 	pd_rect_t content_rect, rect;
 	LCUI_TextEdit edit = GetData(w);

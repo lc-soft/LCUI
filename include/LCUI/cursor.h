@@ -57,13 +57,13 @@ LCUI_API void LCUICursor_Hide(void);
 LCUI_API void LCUICursor_Update(void);
 
 /* 设定游标的位置 */
-LCUI_API void LCUICursor_SetPos(LCUI_Pos pos);
+LCUI_API void LCUICursor_SetPos(pd_pos_t pos);
 
 /** 设置游标的图形 */
 LCUI_API int LCUICursor_SetGraph(pd_canvas_t *graph);
 
 /* 获取鼠标指针当前的坐标 */
-LCUI_API void LCUICursor_GetPos(LCUI_Pos *pos);
+LCUI_API void LCUICursor_GetPos(pd_pos_t *pos);
 
 LCUI_API int LCUICursor_Paint(pd_paint_context paint);
 

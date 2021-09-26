@@ -29,7 +29,7 @@ int main(void)
 	color.red = 255;
 	color.green = 255;
 	color.blue = 255;
-	fore_canvas.color_type = LCUI_COLOR_TYPE_ARGB;
+	fore_canvas.color_type = PD_COLOR_TYPE_ARGB;
 	pd_graph_create(&fore_canvas, 15, 30);
 	// 画半透明矩形
 	for (i = 0; i < 10; ++i) {

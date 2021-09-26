@@ -72,18 +72,18 @@ pd_bool_t ParseNumber(pd_style s, const char *str)
 	switch (*p) {
 	case 'd':
 	case 'D':
-		s->type = LCUI_STYPE_NONE;
+		s->type = PD_STYPE_NONE;
 		if (!p[1]) {
 			break;
 		}
 		if (p[1] == 'p' || p[1] == 'P') {
-			s->type = LCUI_STYPE_DIP;
+			s->type = PD_STYPE_DIP;
 			sscanf(num_str, "%f", &s->dip);
 			break;
 		}
 		if (p[1] == 'i' || p[1] == 'I') {
 			if (p[2] == 'p' || p[2] == 'P') {
-				s->type = LCUI_STYPE_DIP;
+				s->type = PD_STYPE_DIP;
 				sscanf(num_str, "%f", &s->dip);
 				break;
 			}
@@ -92,22 +92,22 @@ pd_bool_t ParseNumber(pd_style s, const char *str)
 	case 's':
 	case 'S':
 		if (p[1] == 'p' || p[1] == 'P') {
-			s->type = LCUI_STYPE_SP;
+			s->type = PD_STYPE_SP;
 			sscanf(num_str, "%f", &s->sp);
 		} else {
-			s->type = LCUI_STYPE_NONE;
+			s->type = PD_STYPE_NONE;
 		}
 		break;
 	case 'P':
 	case 'p':
 		if (p[1] == 'x' || p[1] == 'X') {
-			s->type = LCUI_STYPE_PX;
+			s->type = PD_STYPE_PX;
 			sscanf(num_str, "%f", &s->px);
 		} else if (p[1] == 't' || p[1] == 'T') {
-			s->type = LCUI_STYPE_PT;
+			s->type = PD_STYPE_PT;
 			sscanf(num_str, "%f", &s->pt);
 		} else {
-			s->type = LCUI_STYPE_NONE;
+			s->type = PD_STYPE_NONE;
 		}
 		break;
 	case '%':
@@ -115,19 +115,19 @@ pd_bool_t ParseNumber(pd_style s, const char *str)
 			return FALSE;
 		}
 		s->scale /= 100.0;
-		s->type = LCUI_STYPE_SCALE;
+		s->type = PD_STYPE_SCALE;
 		break;
 	case 0:
 		if (has_point && 1 == sscanf(num_str, "%f", &s->scale)) {
-			s->type = LCUI_STYPE_SCALE;
+			s->type = PD_STYPE_SCALE;
 			break;
 		}
 		if (1 == sscanf(num_str, "%d", &s->val_int)) {
-			s->type = LCUI_STYPE_INT;
+			s->type = PD_STYPE_INT;
 			break;
 		}
 	default:
-		s->type = LCUI_STYPE_NONE;
+		s->type = PD_STYPE_NONE;
 		s->is_valid = FALSE;
 		return FALSE;
 	}
@@ -166,7 +166,7 @@ pd_bool_t ParseRGBA(pd_style var, const char *str)
 	if (*p) {
 		return FALSE;
 	}
-	var->type = LCUI_STYPE_COLOR;
+	var->type = PD_STYPE_COLOR;
 	var->color.a = (uchar_t)(255.0 * data[3]);
 	var->color.r = (uchar_t)data[0];
 	var->color.g = (uchar_t)data[1];
@@ -206,7 +206,7 @@ pd_bool_t ParseRGB(pd_style var, const char *str)
 	if (*p) {
 		return FALSE;
 	}
-	var->type = LCUI_STYPE_COLOR;
+	var->type = PD_STYPE_COLOR;
 	var->color.a = 255;
 	var->color.r = (uchar_t)data[0];
 	var->color.g = (uchar_t)data[1];
@@ -257,7 +257,7 @@ pd_bool_t ParseColor(pd_style var, const char *str)
 	default:break;
 	}
 	if (status == 3) {
-		var->type = LCUI_STYPE_COLOR;
+		var->type = PD_STYPE_COLOR;
 		var->color.a = 255;
 		var->color.r = r;
 		var->color.g = g;
@@ -271,7 +271,7 @@ pd_bool_t ParseColor(pd_style var, const char *str)
 		var->color.red = 255;
 		var->color.green = 255;
 		var->color.blue = 255;
-		var->type = LCUI_STYPE_COLOR;
+		var->type = PD_STYPE_COLOR;
 		return TRUE;
 	}
 	return FALSE;
@@ -310,7 +310,7 @@ pd_bool_t ParseUrl(pd_style s, const char *str, const char *dirname)
 		++head;
 	}
 	n = tail - head;
-	s->type = LCUI_STYPE_STRING;
+	s->type = PD_STYPE_STRING;
 	if (dirname && !IsAbsolutePath(head)) {
 		n += (dirname_len = strlen(dirname));
 		s->val_string = malloc((n + 2) * sizeof(char));

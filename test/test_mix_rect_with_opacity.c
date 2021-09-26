@@ -28,7 +28,7 @@ int main(void)
 	// 设置前景的 opacity 值
 	fore_canvas.opacity = 0.2f;
 	// 仅当色彩模式为 ARGB 时 opacity 属性才会生效
-	fore_canvas.color_type = LCUI_COLOR_TYPE_ARGB;
+	fore_canvas.color_type = PD_COLOR_TYPE_ARGB;
 	for (i = 0; i < 7; ++i) {
 		size = 2 * (10 + 10 * i);
 		// 使用新尺寸重新创建前景图

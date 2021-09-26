@@ -62,18 +62,18 @@ typedef void (*CallBackFunc)(void *, void *);
 
 /** 色彩模式 */
 typedef enum pd_color_type {
-	LCUI_COLOR_TYPE_INDEX8,   /**< 8位索引 */
-	LCUI_COLOR_TYPE_GRAY8,    /**< 8位灰度 */
-	LCUI_COLOR_TYPE_RGB323,   /**< RGB323 */
-	LCUI_COLOR_TYPE_ARGB2222, /**< ARGB2222 */
-	LCUI_COLOR_TYPE_RGB555,   /**< RGB555 */
-	LCUI_COLOR_TYPE_RGB565,   /**< RGB565 */
-	LCUI_COLOR_TYPE_RGB888,   /**< RGB888 */
-	LCUI_COLOR_TYPE_ARGB8888  /**< RGB8888 */
+	PD_COLOR_TYPE_INDEX8,   /**< 8位索引 */
+	PD_COLOR_TYPE_GRAY8,    /**< 8位灰度 */
+	PD_COLOR_TYPE_RGB323,   /**< RGB323 */
+	PD_COLOR_TYPE_ARGB2222, /**< ARGB2222 */
+	PD_COLOR_TYPE_RGB555,   /**< RGB555 */
+	PD_COLOR_TYPE_RGB565,   /**< RGB565 */
+	PD_COLOR_TYPE_RGB888,   /**< RGB888 */
+	PD_COLOR_TYPE_ARGB8888  /**< RGB8888 */
 } pd_color_type;
 
-#define LCUI_COLOR_TYPE_RGB LCUI_COLOR_TYPE_RGB888
-#define LCUI_COLOR_TYPE_ARGB LCUI_COLOR_TYPE_ARGB8888
+#define PD_COLOR_TYPE_RGB PD_COLOR_TYPE_RGB888
+#define PD_COLOR_TYPE_ARGB PD_COLOR_TYPE_ARGB8888
 
 typedef union LCUI_RGB565_ {
 	short unsigned int value;
@@ -106,9 +106,9 @@ typedef union pd_color_t_ {
 } pd_color_t;
 
 /** Position in plane coordinate system */
-typedef struct LCUI_Pos_ {
+typedef struct pd_pos_t_ {
 	int x, y;
-} LCUI_Pos;
+} pd_pos_t;
 
 typedef struct LCUI_Size_ {
 	int width, height;
@@ -186,37 +186,37 @@ typedef enum pd_style_value {
 
 /** 样式变量类型 */
 typedef enum pd_style_type {
-	LCUI_STYPE_NONE,
-	LCUI_STYPE_AUTO,
-	LCUI_STYPE_SCALE,
-	LCUI_STYPE_PX,
-	LCUI_STYPE_PT,
-	LCUI_STYPE_DIP,
-	LCUI_STYPE_SP,
-	LCUI_STYPE_COLOR,
-	LCUI_STYPE_IMAGE,
-	LCUI_STYPE_STYLE,
-	LCUI_STYPE_INT,
-	LCUI_STYPE_BOOL,
-	LCUI_STYPE_STRING,
-	LCUI_STYPE_WSTRING
+	PD_STYPE_NONE,
+	PD_STYPE_AUTO,
+	PD_STYPE_SCALE,
+	PD_STYPE_PX,
+	PD_STYPE_PT,
+	PD_STYPE_DIP,
+	PD_STYPE_SP,
+	PD_STYPE_COLOR,
+	PD_STYPE_IMAGE,
+	PD_STYPE_STYLE,
+	PD_STYPE_INT,
+	PD_STYPE_BOOL,
+	PD_STYPE_STRING,
+	PD_STYPE_WSTRING
 } pd_style_type;
 
-#define LCUI_STYPE_px LCUI_STYPE_PX
-#define LCUI_STYPE_pt LCUI_STYPE_PT
-#define LCUI_STYPE_int LCUI_STYPE_INT
-#define LCUI_STYPE_color LCUI_STYPE_COLOR
-#define LCUI_STYPE_scale LCUI_STYPE_SCALE
-#define LCUI_STYPE_style LCUI_STYPE_STYLE
-#define LCUI_STYPE_bool LCUI_STYPE_BOOL
-#define LCUI_STYPE_image LCUI_STYPE_IMAGE
-#define LCUI_STYPE_string LCUI_STYPE_STRING
-#define LCUI_STYPE_wstring LCUI_STYPE_WSTRING
-#define LCUI_STYPE_sp LCUI_STYPE_SP
-#define LCUI_STYPE_dp LCUI_STYPE_DIP
-#define LCUI_STYPE_dip LCUI_STYPE_DIP
-#define LCUI_STYPE_0 LCUI_STYPE_NONE
-#define LCUI_STYPE_none LCUI_STYPE_NONE
+#define PD_STYPE_px PD_STYPE_PX
+#define PD_STYPE_pt PD_STYPE_PT
+#define PD_STYPE_int PD_STYPE_INT
+#define PD_STYPE_color PD_STYPE_COLOR
+#define PD_STYPE_scale PD_STYPE_SCALE
+#define PD_STYPE_style PD_STYPE_STYLE
+#define PD_STYPE_bool PD_STYPE_BOOL
+#define PD_STYPE_image PD_STYPE_IMAGE
+#define PD_STYPE_string PD_STYPE_STRING
+#define PD_STYPE_wstring PD_STYPE_WSTRING
+#define PD_STYPE_sp PD_STYPE_SP
+#define PD_STYPE_dp PD_STYPE_DIP
+#define PD_STYPE_dip PD_STYPE_DIP
+#define PD_STYPE_0 PD_STYPE_NONE
+#define PD_STYPE_none PD_STYPE_NONE
 
 typedef struct pd_boxshadow_style_t_ {
 	float x, y;

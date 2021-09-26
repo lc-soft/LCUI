@@ -154,7 +154,7 @@ pd_bool_t Widget_CheckStyleBooleanValue(LCUI_Widget w, int key, pd_bool_t value)
 {
 	pd_style s = &w->style->sheet[key_focusable];
 
-	return s->is_valid && s->type == LCUI_STYPE_BOOL &&
+	return s->is_valid && s->type == PD_STYPE_BOOL &&
 	       s->val_bool == value;
 }
 
@@ -166,7 +166,7 @@ pd_bool_t Widget_CheckStyleValid(LCUI_Widget w, int key)
 void Widget_SetVisibility(LCUI_Widget w, const char *value)
 {
 	pd_style s = Widget_GetStyle(w, key_visibility);
-	if (s->is_valid && s->type == LCUI_STYPE_STRING) {
+	if (s->is_valid && s->type == PD_STYPE_STRING) {
 		free(s->val_string);
 		s->val_string = NULL;
 	}
@@ -188,12 +188,12 @@ void Widget_Show(LCUI_Widget w)
 {
 	pd_style s = Widget_GetStyle(w, key_display);
 
-	if (s->is_valid && s->type == LCUI_STYPE_STYLE &&
+	if (s->is_valid && s->type == PD_STYPE_STYLE &&
 	    s->val_style == SV_NONE) {
 		Widget_UnsetStyle(w, key_display);
 	} else if (!w->computed_style.visible) {
 		s = Widget_GetInheritedStyle(w, key_display);
-		if (s->is_valid && s->type == LCUI_STYPE_STYLE &&
+		if (s->is_valid && s->type == PD_STYPE_STYLE &&
 		    s->val_style != SV_NONE) {
 			Widget_SetStyle(w, key_display, s->val_style, style);
 		} else {

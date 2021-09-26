@@ -52,7 +52,7 @@ static void Canvas_OnResize(LCUI_Widget w, float width, float height)
 	Canvas canvas = Widget_GetData(w, self.proto);
 
 	pd_graph_init(&buffer);
-	buffer.color_type = LCUI_COLOR_TYPE_ARGB;
+	buffer.color_type = PD_COLOR_TYPE_ARGB;
 	pd_graph_create(&buffer, (unsigned)(width * scale),
 		     (unsigned)(height * scale));
 	pd_graph_replace(&buffer, &canvas->buffer, 0, 0);

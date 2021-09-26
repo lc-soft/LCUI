@@ -94,7 +94,7 @@ LCUI_BEGIN_HEADER
 #define pd_graph_get_quote(g) ((g)->quote.is_valid ? (g)->quote.source : (g))
 
 #define graph_set_pixel(G, X, Y, C)                                        \
-	if ((G)->color_type == LCUI_COLOR_TYPE_ARGB) {                    \
+	if ((G)->color_type == PD_COLOR_TYPE_ARGB) {                    \
 		(G)->argb[(G)->width * (Y) + (X)] = (C);                  \
 	} else {                                                          \
 		(G)->bytes[(G)->bytes_per_row * (Y) + (X)*3] = (C).b;     \
@@ -106,7 +106,7 @@ LCUI_BEGIN_HEADER
 	(G)->argb[(G)->width * (Y) + (X)].alpha = (A)
 
 #define graph_get_pixel(G, X, Y, C)                                            \
-	if ((G)->color_type == LCUI_COLOR_TYPE_ARGB) {                        \
+	if ((G)->color_type == PD_COLOR_TYPE_ARGB) {                        \
 		(C) = (G)->argb[(G)->width * ((Y) % (G)->height) +            \
 				((X) % (G)->width)];                          \
 	} else {                                                              \
@@ -128,8 +128,8 @@ LCUI_BEGIN_HEADER
 /** 判断图像是否有Alpha通道 */
 #define Graph_HasAlpha(G)                                              \
 	((G)->quote.is_valid                                           \
-	     ? ((G)->quote.source->color_type == LCUI_COLOR_TYPE_ARGB) \
-	     : ((G)->color_type == LCUI_COLOR_TYPE_ARGB))
+	     ? ((G)->quote.source->color_type == PD_COLOR_TYPE_ARGB) \
+	     : ((G)->color_type == PD_COLOR_TYPE_ARGB))
 
 #define Graph_IsWritable(G)  \
 	(pd_graph_is_valid(G) && \

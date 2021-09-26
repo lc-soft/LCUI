@@ -200,7 +200,7 @@ static LCUI_Surface WinSurface_New(void)
 	surface->is_ready = FALSE;
 	surface->node.data = surface;
 	pd_graph_init(&surface->fb);
-	surface->fb.color_type = LCUI_COLOR_TYPE_ARGB;
+	surface->fb.color_type = PD_COLOR_TYPE_ARGB;
 	for (i = 0; i < TASK_TOTAL_NUM; ++i) {
 		surface->tasks[i].is_valid = FALSE;
 	}

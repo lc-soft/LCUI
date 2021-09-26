@@ -767,7 +767,7 @@ static void FontBitmap_MixRGB(pd_canvas_t *graph, pd_rect_t *write_rect,
 	}
 }
 
-int FontBitmap_Mix(pd_canvas_t *graph, LCUI_Pos pos, const LCUI_FontBitmap *bmp,
+int FontBitmap_Mix(pd_canvas_t *graph, pd_pos_t pos, const LCUI_FontBitmap *bmp,
 		   pd_color_t color)
 {
 	pd_canvas_t write_slot;
@@ -790,7 +790,7 @@ int FontBitmap_Mix(pd_canvas_t *graph, LCUI_Pos pos, const LCUI_FontBitmap *bmp,
 	pd_graph_get_valid_rect(&write_slot, &w_rect);
 	/* 获取背景图引用的源图形 */
 	graph = pd_graph_get_quote(graph);
-	if (graph->color_type == LCUI_COLOR_TYPE_ARGB) {
+	if (graph->color_type == PD_COLOR_TYPE_ARGB) {
 		FontBitmap_MixARGB(graph, &w_rect, bmp, color, &r_rect);
 	} else {
 		FontBitmap_MixRGB(graph, &w_rect, bmp, color, &r_rect);
