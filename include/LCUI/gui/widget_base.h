@@ -144,7 +144,7 @@ typedef void(*LCUI_WidgetSizeSetter)(LCUI_Widget, float, float);
 typedef void(*LCUI_WidgetAttrSetter)(LCUI_Widget, const char*, const char*);
 typedef void(*LCUI_WidgetTextSetter)(LCUI_Widget, const char*);
 typedef void(*LCUI_WidgetPropertyBinder)(LCUI_Widget, const char*, LCUI_Object);
-typedef void(*LCUI_WidgetPainter)(LCUI_Widget, pd_paint_context,
+typedef void(*LCUI_WidgetPainter)(LCUI_Widget, pd_paint_context_t*,
 				  LCUI_WidgetActualStyle);
 
 typedef struct LCUI_WidgetPrototypeRec_ {

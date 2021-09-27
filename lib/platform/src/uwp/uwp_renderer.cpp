@@ -231,10 +231,10 @@ static void UWPSurface_SetRenderMode(LCUI_Surface surface, int mode)
 {
 }
 
-static pd_paint_context UWPSurface_BeginPaint(LCUI_Surface surface,
+static pd_paint_context_t* UWPSurface_BeginPaint(LCUI_Surface surface,
 					       pd_rect_t *rect)
 {
-	ASSIGN(paint, pd_paint_context);
+	ASSIGN(paint, pd_paint_context_t*);
 	paint->rect = *rect;
 	paint->with_alpha = FALSE;
 	pd_canvas_init(&paint->canvas);
@@ -246,7 +246,7 @@ static pd_paint_context UWPSurface_BeginPaint(LCUI_Surface surface,
 	return paint;
 }
 
-static void UWPSurface_EndPaint(LCUI_Surface surface, pd_paint_context paint)
+static void UWPSurface_EndPaint(LCUI_Surface surface, pd_paint_context_t* paint)
 {
 	free(paint);
 }

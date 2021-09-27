@@ -686,7 +686,7 @@ static int crop_content_bottom_right(pd_canvas_t *dst, int bound_left,
 }
 
 int pd_border_crop_content(const pd_border_t *border, const pd_rect_t *box,
-		       pd_paint_context paint)
+		       pd_paint_context_t* paint)
 {
 	pd_canvas_t canvas;
 	pd_rect_t bound, rect;
@@ -762,7 +762,7 @@ int pd_border_crop_content(const pd_border_t *border, const pd_rect_t *box,
 }
 
 int pd_border_paint(const pd_border_t *border, const pd_rect_t *box,
-		 pd_paint_context paint)
+		 pd_paint_context_t* paint)
 {
 	pd_canvas_t canvas;
 	pd_rect_t bound, rect;

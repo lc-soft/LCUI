@@ -469,7 +469,7 @@ void Widget_ComputeBackground(LCUI_Widget w, LCUI_Background *out)
 	out->repeat.y = bg->repeat.y;
 }
 
-void Widget_PaintBakcground(LCUI_Widget w, pd_paint_context paint,
+void Widget_PaintBakcground(LCUI_Widget w, pd_paint_context_t* paint,
 			    LCUI_WidgetActualStyle style)
 {
 	pd_rect_t box;

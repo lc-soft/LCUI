@@ -121,7 +121,7 @@ static size_t LCUIDisplay_RenderFlashRect(SurfaceRecord record,
 	pd_pos_t pos;
 	pd_color_t color;
 	pd_canvas_t mask;
-	pd_paint_context paint;
+	pd_paint_context_t* paint;
 
 	paint = Surface_BeginPaint(record->surface, &flash_rect->rect);
 	if (!paint) {
@@ -277,7 +277,7 @@ static size_t LCUIDisplay_RenderSurfaceRect(SurfaceRecord record,
 					    pd_rect_t *rect)
 {
 	size_t count;
-	pd_paint_context paint;
+	pd_paint_context_t* paint;
 
 	if (!record->widget || !record->surface ||
 	    !Surface_IsReady(record->surface)) {
@@ -788,7 +788,7 @@ void Surface_Update(LCUI_Surface surface)
 	}
 }
 
-pd_paint_context Surface_BeginPaint(LCUI_Surface surface, pd_rect_t *rect)
+pd_paint_context_t* Surface_BeginPaint(LCUI_Surface surface, pd_rect_t *rect)
 {
 	if (display.driver) {
 		return display.driver->beginPaint(surface, rect);
@@ -796,7 +796,7 @@ pd_paint_context Surface_BeginPaint(LCUI_Surface surface, pd_rect_t *rect)
 	return NULL;
 }
 
-void Surface_EndPaint(LCUI_Surface surface, pd_paint_context paint)
+void Surface_EndPaint(LCUI_Surface surface, pd_paint_context_t* paint)
 {
 	if (display.driver) {
 		display.driver->endPaint(surface, paint);

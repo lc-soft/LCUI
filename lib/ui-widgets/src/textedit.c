@@ -930,7 +930,7 @@ static void TextEdit_OnDestroy(LCUI_Widget widget)
 	}
 }
 
-static void TextEdit_OnPaint(LCUI_Widget w, pd_paint_context paint,
+static void TextEdit_OnPaint(LCUI_Widget w, pd_paint_context_t* paint,
 			     LCUI_WidgetActualStyle style)
 {
 	pd_pos_t pos;

@@ -39,6 +39,6 @@ LCUI_API void pd_boxshadow_get_canvas_rect(const pd_boxshadow_t *shadow,
 
 LCUI_API int pd_boxshadow_paint(const pd_boxshadow_t *shadow, const pd_rect_t *box,
 			     int centent_width, int content_height,
-			     pd_paint_context paint);
+			     pd_paint_context_t* paint);
 
 #endif

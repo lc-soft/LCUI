@@ -41,7 +41,7 @@ LCUI_BEGIN_HEADER
 */
 LCUI_API void pd_background_paint(const LCUI_Background *bg,
 			       const pd_rect_t *box,
-			       pd_paint_context paint);
+			       pd_paint_context_t* paint);
 
 LCUI_END_HEADER
 

@@ -184,10 +184,10 @@ static void FBSurface_SetRenderMode(LCUI_Surface surface, int mode)
 {
 }
 
-static pd_paint_context FBSurface_BeginPaint(LCUI_Surface surface,
+static pd_paint_context_t* FBSurface_BeginPaint(LCUI_Surface surface,
 					      pd_rect_t *rect)
 {
-	pd_paint_context paint;
+	pd_paint_context_t* paint;
 	pd_rect_t actual_rect = *rect;
 	pd_rect_validate_area(&actual_rect, surface->width, surface->height);
 	actual_rect.x += surface->rect.x;
@@ -202,7 +202,7 @@ static pd_paint_context FBSurface_BeginPaint(LCUI_Surface surface,
 	return paint;
 }
 
-static void FBSurface_EndPaint(LCUI_Surface surface, pd_paint_context paint)
+static void FBSurface_EndPaint(LCUI_Surface surface, pd_paint_context_t* paint)
 {
 	pd_painter_end(paint);
 }

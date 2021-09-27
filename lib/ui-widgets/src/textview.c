@@ -277,7 +277,7 @@ static void TextView_OnResize(LCUI_Widget w, float width, float height)
 	RectList_Clear(&rects);
 }
 
-static void TextView_OnPaint(LCUI_Widget w, pd_paint_context paint,
+static void TextView_OnPaint(LCUI_Widget w, pd_paint_context_t* paint,
 			     LCUI_WidgetActualStyle style)
 {
 	pd_pos_t pos;

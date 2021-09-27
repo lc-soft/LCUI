@@ -32,8 +32,8 @@ void Widget_ComputeBorder(LCUI_Widget w, pd_border_t *out);
 
 void Widget_ComputeBorderStyle(LCUI_Widget w);
 
-void Widget_PaintBorder(LCUI_Widget w, pd_paint_context paint,
+void Widget_PaintBorder(LCUI_Widget w, pd_paint_context_t* paint,
 				 LCUI_WidgetActualStyle style);
 
-void Widget_CropContent(LCUI_Widget w, pd_paint_context paint,
+void Widget_CropContent(LCUI_Widget w, pd_paint_context_t* paint,
 				 LCUI_WidgetActualStyle style);

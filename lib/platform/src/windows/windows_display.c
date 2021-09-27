@@ -346,10 +346,10 @@ static void WinSurface_SetRenderMode(LCUI_Surface surface, int mode)
  * @param[in] rect	需进行绘制的区域，若为NULL，则绘制整个 surface
  * @return		返回绘制上下文句柄
  */
-static pd_paint_context WinSurface_BeginPaint(LCUI_Surface surface,
+static pd_paint_context_t* WinSurface_BeginPaint(LCUI_Surface surface,
 					       pd_rect_t *rect)
 {
-	pd_paint_context paint = pd_painter_begin(&surface->fb, rect);
+	pd_paint_context_t* paint = pd_painter_begin(&surface->fb, rect);
 	pd_canvas_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
 	return paint;
 }
@@ -359,7 +359,7 @@ static pd_paint_context WinSurface_BeginPaint(LCUI_Surface surface,
  * @param[in] surface	目标 surface
  * @param[in] paint_ctx	绘制上下文句柄
  */
-static void WinSurface_EndPaint(LCUI_Surface surface, pd_paint_context paint)
+static void WinSurface_EndPaint(LCUI_Surface surface, pd_paint_context_t* paint)
 {
 	pd_painter_end(paint);
 }

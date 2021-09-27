@@ -89,7 +89,7 @@ static void Canvas_OnAutoSize(LCUI_Widget w, float *width, float *height,
 	*height = 150;
 }
 
-static void Canvas_OnPaint(LCUI_Widget w, pd_paint_context paint,
+static void Canvas_OnPaint(LCUI_Widget w, pd_paint_context_t* paint,
 			   LCUI_WidgetActualStyle style)
 {
 	pd_canvas_t src, dest;

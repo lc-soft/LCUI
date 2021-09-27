@@ -51,7 +51,7 @@
 #define CodeToString(...) "" #__VA_ARGS__ ""
 
 
-#define PDASSIGN(NAME, TYPE) TYPE NAME = (TYPE)malloc(sizeof(TYPE##_t))
+#define PDASSIGN(NAME, TYPE) TYPE* NAME = (TYPE*)malloc(sizeof(TYPE))
 
 LCUI_BEGIN_HEADER
 
@@ -441,7 +441,7 @@ typedef struct pd_paint_context_t_ {
 	pd_rect_t rect;    /**< 需要绘制的区域 */
 	pd_canvas_t canvas; /**< 绘制后的位图缓存（可称为：画布） */
 	pd_bool with_alpha; /**< 绘制时是否需要处理 alpha 通道 */
-} pd_paint_context_t, *pd_paint_context;
+} pd_paint_context_t;
 
 typedef void (*FuncPtr)(void *);
 

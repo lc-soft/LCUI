@@ -65,7 +65,7 @@ LCUI_API int LCUICursor_SetGraph(pd_canvas_t *graph);
 /* 获取鼠标指针当前的坐标 */
 LCUI_API void LCUICursor_GetPos(pd_pos_t *pos);
 
-LCUI_API int LCUICursor_Paint(pd_paint_context paint);
+LCUI_API int LCUICursor_Paint(pd_paint_context_t* paint);
 
 LCUI_END_HEADER
 

@@ -3,7 +3,7 @@
 #include <LCUI/image.h>
 #include <LCUI/painter.h>
 
-int paint_background(pd_paint_context paint, pd_rect_t *box)
+int paint_background(pd_paint_context_t* paint, pd_rect_t *box)
 {
 	pd_canvas_t image;
 	pd_color_t green = RGB(102, 204, 0);
@@ -29,7 +29,7 @@ int paint_background(pd_paint_context paint, pd_rect_t *box)
 	return 0;
 }
 
-void paint_border(pd_paint_context paint, pd_rect_t *box)
+void paint_border(pd_paint_context_t* paint, pd_rect_t *box)
 {
 	pd_border_t border = { 0 };
 	pd_color_t black = RGB(0, 0, 0);
@@ -66,7 +66,7 @@ int main(void)
 			     border_box.width - border_size * 2,
 			     border_box.height - border_size * 2 };
 	pd_rect_t layer_rect = { 0, 0, border_box.width, border_box.height };
-	pd_paint_context paint;
+	pd_paint_context_t* paint;
 
 	pd_canvas_init(&canvas);
 	pd_canvas_create(&canvas, 800, 600);

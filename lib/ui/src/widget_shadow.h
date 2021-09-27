@@ -40,5 +40,5 @@ void Widget_ComputeBoxShadow(LCUI_Widget w, pd_boxshadow_t *out);
 
 void Widget_ComputeBoxShadowStyle(LCUI_Widget w);
 
-void Widget_PaintBoxShadow(LCUI_Widget w, pd_paint_context paint,
+void Widget_PaintBoxShadow(LCUI_Widget w, pd_paint_context_t* paint,
 				    LCUI_WidgetActualStyle style);

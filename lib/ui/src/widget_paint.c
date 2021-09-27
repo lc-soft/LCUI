@@ -71,10 +71,10 @@ typedef struct LCUI_WidgetRendererRec_ {
 	LCUI_WidgetActualStyle style;
 
 	/* current target widget paint context */
-	pd_paint_context paint;
+	pd_paint_context_t* paint;
 
 	/* root paint context */
-	pd_paint_context root_paint;
+	pd_paint_context_t* root_paint;
 
 	/* content canvas */
 	pd_canvas_t content_graph;
@@ -342,7 +342,7 @@ void LCUIWidget_FreeRenderer(void)
 }
 
 /** 当前部件的绘制函数 */
-static void Widget_OnPaint(LCUI_Widget w, pd_paint_context paint,
+static void Widget_OnPaint(LCUI_Widget w, pd_paint_context_t* paint,
 			   LCUI_WidgetActualStyle style)
 {
 	Widget_PaintBakcground(w, paint, style);
@@ -406,7 +406,7 @@ int Widget_ConvertArea(LCUI_Widget w, pd_rect_t *in_rect, pd_rect_t *out_rect,
 }
 
 static LCUI_WidgetRenderer WidgetRenderer(LCUI_Widget w,
-					  pd_paint_context paint,
+					  pd_paint_context_t* paint,
 					  LCUI_WidgetActualStyle style,
 					  LCUI_WidgetRenderer parent)
 {
@@ -735,7 +735,7 @@ static size_t WidgetRenderer_Render(LCUI_WidgetRenderer renderer)
 	return count;
 }
 
-size_t Widget_Render(LCUI_Widget w, pd_paint_context paint)
+size_t Widget_Render(LCUI_Widget w, pd_paint_context_t* paint)
 {
 	size_t count;
 	LCUI_WidgetRenderer renderer;

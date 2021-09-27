@@ -337,10 +337,10 @@ static void X11Surface_SetRenderMode(LCUI_Surface surface, int mode)
 	surface->mode = mode;
 }
 
-static pd_paint_context X11Surface_BeginPaint(LCUI_Surface surface,
+static pd_paint_context_t* X11Surface_BeginPaint(LCUI_Surface surface,
 					       pd_rect_t *rect)
 {
-	pd_paint_context paint;
+	pd_paint_context_t* paint;
 	paint = malloc(sizeof(pd_paint_context_t));
 	paint->rect = *rect;
 	paint->with_alpha = FALSE;
@@ -352,7 +352,7 @@ static pd_paint_context X11Surface_BeginPaint(LCUI_Surface surface,
 	return paint;
 }
 
-static void X11Surface_EndPaint(LCUI_Surface surface, pd_paint_context paint)
+static void X11Surface_EndPaint(LCUI_Surface surface, pd_paint_context_t* paint)
 {
 	pd_rect_t *r;
 	r = NEW(pd_rect_t, 1);

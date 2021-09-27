@@ -63,7 +63,7 @@ typedef struct boxshadow_rendering_context_rec_t {
 	const pd_rect_t *box;
 	pd_rect_t shadow_box;
 	pd_rect_t content_box;
-	pd_paint_context paint;
+	pd_paint_context_t* paint;
 } boxshadow_rendering_context_rec_t, *boxshadow_rendering_context;
 
 typedef struct gradient {
@@ -601,7 +601,7 @@ static void boxshadow_clear_content_rect(boxshadow_rendering_context ctx)
 
 int pd_boxshadow_paint(const pd_boxshadow_t *shadow, const pd_rect_t *box,
 		    int content_width, int content_height,
-		    pd_paint_context paint)
+		    pd_paint_context_t* paint)
 {
 	pd_paint_context_t shadow_paint;
 	boxshadow_rendering_context_rec_t ctx;

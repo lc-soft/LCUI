@@ -34,9 +34,9 @@
 #include <LCUI/gui/metrics.h>
 #include <LCUI/painter.h>
 
-pd_paint_context pd_painter_begin(pd_canvas_t *canvas, pd_rect_t *rect)
+pd_paint_context_t* pd_painter_begin(pd_canvas_t *canvas, pd_rect_t *rect)
 {
-	PDASSIGN(paint, pd_paint_context);
+	PDASSIGN(paint, pd_paint_context_t);
 	paint->rect = *rect;
 	paint->with_alpha = FALSE;
 	pd_canvas_init(&paint->canvas);
@@ -44,7 +44,7 @@ pd_paint_context pd_painter_begin(pd_canvas_t *canvas, pd_rect_t *rect)
 	return paint;
 }
 
-void pd_painter_end(pd_paint_context paint)
+void pd_painter_end(pd_paint_context_t* paint)
 {
 	free(paint);
 }

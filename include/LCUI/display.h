@@ -90,8 +90,8 @@ typedef struct LCUI_DisplayDriverRec_ {
 	void (*update)(LCUI_Surface);
 	void (*present)(LCUI_Surface);
 	LCUI_BOOL (*isReady)(LCUI_Surface);
-	pd_paint_context (*beginPaint)(LCUI_Surface, pd_rect_t *);
-	void (*endPaint)(LCUI_Surface, pd_paint_context);
+	pd_paint_context_t* (*beginPaint)(LCUI_Surface, pd_rect_t *);
+	void (*endPaint)(LCUI_Surface, pd_paint_context_t*);
 	void (*setCaptionW)(LCUI_Surface, const wchar_t *);
 	void (*setRenderMode)(LCUI_Surface, int);
 	void *(*getHandle)(LCUI_Surface);

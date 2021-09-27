@@ -155,7 +155,7 @@ void Widget_ComputeBorder(LCUI_Widget w, pd_border_t *b)
 	b->bottom_right_radius = ComputeActual(min(s->bottom_right_radius, r));
 }
 
-void Widget_PaintBorder(LCUI_Widget w, pd_paint_context paint,
+void Widget_PaintBorder(LCUI_Widget w, pd_paint_context_t* paint,
 			LCUI_WidgetActualStyle style)
 {
 	pd_rect_t box;
@@ -167,7 +167,7 @@ void Widget_PaintBorder(LCUI_Widget w, pd_paint_context paint,
 	pd_border_paint(&style->border, &box, paint);
 }
 
-void Widget_CropContent(LCUI_Widget w, pd_paint_context paint,
+void Widget_CropContent(LCUI_Widget w, pd_paint_context_t* paint,
 			LCUI_WidgetActualStyle style)
 {
 	pd_rect_t box;

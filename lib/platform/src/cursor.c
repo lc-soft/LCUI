@@ -228,7 +228,7 @@ void LCUICursor_GetPos(pd_pos_t *pos)
 	*pos = cursor.new_pos;
 }
 
-int LCUICursor_Paint(pd_paint_context paint)
+int LCUICursor_Paint(pd_paint_context_t* paint)
 {
 	int x, y;
 	if (!cursor.visible) {
