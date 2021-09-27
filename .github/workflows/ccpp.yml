@@ -27,6 +27,11 @@ jobs:
         run: |
           xmake run run-tests --memcheck
 
+      - name: "Run tests yutil"
+        run: |
+          xmake build yutil_test
+          xmake run yutil_test --memcheck
+
       - name: Upload reports to Codecov
         run: bash <(curl -s https://codecov.io/bash);
 
@@ -70,6 +75,11 @@ jobs:
       - name: "Run tests"
         run: |
           xmake run run-tests
+      
+      - name: "Run tests yutil"
+        run: |
+          xmake build yutil_test
+          xmake run yutil_test
 
       - name: Package
         run: |

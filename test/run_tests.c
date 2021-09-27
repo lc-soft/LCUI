@@ -10,10 +10,6 @@ int main(void)
 {
 	int ret = 0;
 	logger_set_level(LOGGER_LEVEL_OFF);
-	describe("test charset", test_charset);
-	describe("test linkedlist", test_linkedlist);
-	describe("test string", test_string);
-	describe("test strpool", test_strpool);
 	describe("test settings", test_settings);
 	describe("test object", test_object);
 	describe("test thread", test_thread);
