@@ -149,7 +149,7 @@ int main(void)
 	self.color_index = 0;
 	for (i = 0; i < 600; ++i) {
 		UpdateFrame(self.box);
-		lcui_timer_list_process();
+		lcui_process_timers();
 		LCUI_ProcessEvents();
 		LCUIWidget_Update();
 		LCUIDisplay_Update();

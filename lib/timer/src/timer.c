@@ -42,7 +42,7 @@ static LCUI_Mutex mutex;     /**< 定时器记录操作互斥锁 */
 
 /*----------------------------- Private ------------------------------*/
 
-int lcui_timer_destroy(int timer_id)
+int lcui_destroy_timer(int timer_id)
 {
 	int ret;
 	LCUIMutex_Lock(&mutex);
@@ -51,7 +51,7 @@ int lcui_timer_destroy(int timer_id)
 	return ret;
 }
 
-int lcui_timer_pause(int timer_id)
+int lcui_pause_timer(int timer_id)
 {
 	int ret;
 	LCUIMutex_Lock(&mutex);
@@ -60,7 +60,7 @@ int lcui_timer_pause(int timer_id)
 	return ret;
 }
 
-int lcui_timer_continue(int timer_id)
+int lcui_continue_timer(int timer_id)
 {
 	int ret;
 	LCUIMutex_Lock(&mutex);
@@ -69,7 +69,7 @@ int lcui_timer_continue(int timer_id)
 	return ret;
 }
 
-int lcui_timer_reset(int timer_id, long int n_ms)
+int lcui_reset_timer(int timer_id, long int n_ms)
 {
 	int ret;
 	LCUIMutex_Lock(&mutex);
@@ -88,7 +88,7 @@ int lcui_set_interval(long int n_ms, void(*callback)(void *), void *arg)
 	return timer_list_add_interval(main_timer_list, n_ms, callback, arg);
 }
 
-size_t lcui_timer_list_process()
+size_t lcui_process_timers()
 {
 	size_t count = 0;
 	LCUIMutex_Lock(&mutex);
@@ -97,13 +97,13 @@ size_t lcui_timer_list_process()
 	return count;
 }
 
-void lcui_timer_list_create(void)
+void lcui_init_timers(void)
 {
 	LCUIMutex_Init(&mutex);
 	main_timer_list = timer_list_create();
 }
 
-void lcui_timer_list_destroy()
+void lcui_destroy_timers()
 {
 	if(!main_timer_list){
 		return;

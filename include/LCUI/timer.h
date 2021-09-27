@@ -65,7 +65,7 @@ LCUI_API int lcui_set_interval(long int n_ms, timer_callback callback,
  * @return
  *	正常返回0，指定ID的定时器不存在则返回-1.
  */
-LCUI_API int lcui_timer_destroy(int timer_id);
+LCUI_API int lcui_destroy_timer(int timer_id);
 
 /**
  * 暂停定时器的倒计时
@@ -75,7 +75,7 @@ LCUI_API int lcui_timer_destroy(int timer_id);
  * @return
  *	正常返回0，指定ID的定时器不存在则返回-1.
  * */
-LCUI_API int lcui_timer_pause(int timer_id);
+LCUI_API int lcui_pause_timer(int timer_id);
 
 /**
  * 继续定时器的倒计时
@@ -84,7 +84,7 @@ LCUI_API int lcui_timer_pause(int timer_id);
  * @return
  *	正常返回0，指定ID的定时器不存在则返回-1.
  * */
-LCUI_API int lcui_timer_continue(int timer_id);
+LCUI_API int lcui_continue_timer(int timer_id);
 
 /**
  * 重设定时器的等待时间
@@ -95,16 +95,17 @@ LCUI_API int lcui_timer_continue(int timer_id);
  * @return
  *	正常返回0，指定ID的定时器不存在则返回-1.
  * */
-LCUI_API int lcui_timer_reset(int timer_id, long int n_ms);
+LCUI_API int lcui_reset_timer(int timer_id, long int n_ms);
 
 /* Process all active timers */
-LCUI_API size_t lcui_timer_list_process();
+LCUI_API size_t lcui_process_timers();
 
 /* Init the timer module */
-LCUI_API void lcui_timer_list_create();
+LCUI_API void lcui_init_timers();
 
 /* Free the timer module */
-LCUI_API void lcui_timer_list_destroy();
+LCUI_API void lcui_destroy_timers();
+
 LCUI_END_HEADER
 
 #endif

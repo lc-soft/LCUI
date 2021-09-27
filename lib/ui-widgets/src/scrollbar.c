@@ -180,7 +180,7 @@ static void OnInertialScrolling(void *arg)
 		ScrollBar_SetPosition(w, pos);
 		return;
 	}
-	lcui_timer_destroy(effect->timer);
+	lcui_destroy_timer(effect->timer);
 	effect->is_running = FALSE;
 	effect->timer = -1;
 }
@@ -232,7 +232,7 @@ static void StartInertialScrolling(LCUI_Widget w)
 	}
 	effect->is_running = TRUE;
 	if (effect->timer > 0) {
-		lcui_timer_destroy(effect->timer);
+		lcui_destroy_timer(effect->timer);
 	}
 	effect->timer =
 	    lcui_set_interval(effect->interval, OnInertialScrolling, w);

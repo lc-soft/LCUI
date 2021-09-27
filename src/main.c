@@ -191,7 +191,7 @@ static void OnSettingsChangeEvent(LCUI_SysEvent e, void *arg)
 void LCUI_RunFrameWithProfile(LCUI_FrameProfile profile)
 {
 	profile->timers_time = clock();
-	profile->timers_count = lcui_timer_list_process();
+	profile->timers_count = lcui_process_timers();
 	profile->timers_time = clock() - profile->timers_time;
 
 	profile->events_time = clock();
@@ -213,7 +213,7 @@ void LCUI_RunFrameWithProfile(LCUI_FrameProfile profile)
 
 void LCUI_RunFrame(void)
 {
-	lcui_timer_list_process();
+	lcui_process_timers();
 	LCUI_ProcessEvents();
 	LCUICursor_Update();
 	LCUIWidget_Update();
@@ -664,7 +664,7 @@ void LCUI_InitBase(void)
 	LCUI_ShowCopyrightText();
 	LCUI_InitEvent();
 	LCUI_InitFontLibrary();
-	lcui_timer_list_create();
+	lcui_init_timers();
 	LCUI_InitCursor();
 	LCUI_InitWidget();
 	LCUI_InitMetrics();
@@ -712,7 +712,7 @@ int LCUI_Destroy(void)
 	LCUI_FreeWidget();
 	LCUI_FreeCursor();
 	LCUI_FreeFontLibrary();
-	lcui_timer_list_destroy();
+	lcui_destroy_timers();
 	LCUI_FreeEvent();
 	return System.exit_code;
 }
