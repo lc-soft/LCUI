@@ -36,12 +36,12 @@
 #include <LCUI/util/parse.h>
 #include <LCUI/font/fontlibrary.h>
 
-pd_bool_t ParseNumber(pd_style s, const char *str)
+LCUI_BOOL ParseNumber(pd_style s, const char *str)
 {
 	int n = 0;
 	const char *p;
 	char num_str[32];
-	pd_bool_t has_point = FALSE;
+	LCUI_BOOL has_point = FALSE;
 
 	if (str == NULL) {
 		return FALSE;
@@ -135,7 +135,7 @@ pd_bool_t ParseNumber(pd_style s, const char *str)
 	return TRUE;
 }
 
-pd_bool_t ParseRGBA(pd_style var, const char *str)
+LCUI_BOOL ParseRGBA(pd_style var, const char *str)
 {
 	float data[4];
 	char buf[16];
@@ -175,7 +175,7 @@ pd_bool_t ParseRGBA(pd_style var, const char *str)
 	return TRUE;
 }
 
-pd_bool_t ParseRGB(pd_style var, const char *str)
+LCUI_BOOL ParseRGB(pd_style var, const char *str)
 {
 	float data[3];
 	char buf[16];
@@ -215,7 +215,7 @@ pd_bool_t ParseRGB(pd_style var, const char *str)
 	return TRUE;
 }
 
-pd_bool_t ParseColor(pd_style var, const char *str)
+LCUI_BOOL ParseColor(pd_style var, const char *str)
 {
 	const char *p;
 	int len = 0, status = 0, r, g, b;
@@ -277,7 +277,7 @@ pd_bool_t ParseColor(pd_style var, const char *str)
 	return FALSE;
 }
 
-static pd_bool_t IsAbsolutePath(const char *path)
+static LCUI_BOOL IsAbsolutePath(const char *path)
 {
 	if (path[0] == '/') {
 		return TRUE;
@@ -288,7 +288,7 @@ static pd_bool_t IsAbsolutePath(const char *path)
 	return FALSE;
 }
 
-pd_bool_t ParseUrl(pd_style s, const char *str, const char *dirname)
+LCUI_BOOL ParseUrl(pd_style s, const char *str, const char *dirname)
 {
 	size_t n, dirname_len;
 	const char *p, *head, *tail;
@@ -342,7 +342,7 @@ pd_bool_t ParseUrl(pd_style s, const char *str, const char *dirname)
 	return TRUE;
 }
 
-pd_bool_t ParseFontWeight(const char *str, int *weight)
+LCUI_BOOL ParseFontWeight(const char *str, int *weight)
 {
 	int value;
 	if (strcmp(str, "normal") == 0) {
@@ -365,7 +365,7 @@ pd_bool_t ParseFontWeight(const char *str, int *weight)
 	return TRUE;
 }
 
-pd_bool_t ParseFontStyle(const char *str, int *style)
+LCUI_BOOL ParseFontStyle(const char *str, int *style)
 {
 	char value[64] = "";
 	strtrim(value, str, NULL);

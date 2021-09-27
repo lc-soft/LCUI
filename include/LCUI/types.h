@@ -56,9 +56,12 @@
 LCUI_BEGIN_HEADER
 
 typedef unsigned int uint_t;
-typedef unsigned char pd_bool_t;
+typedef unsigned char LCUI_BOOL;
 typedef unsigned char uchar_t;
 typedef void (*CallBackFunc)(void *, void *);
+
+// used for PandaGL
+typedef unsigned char pd_bool;
 
 /** 色彩模式 */
 typedef enum pd_color_type {
@@ -267,8 +270,8 @@ typedef struct pd_canvas_t_ pd_canvas_t;
 typedef struct pd_graph_quote_t_ {
 	int top;
 	int left;
-	pd_bool_t is_valid;
-	pd_bool_t is_writable;
+	LCUI_BOOL is_valid;
+	LCUI_BOOL is_writable;
 	union {
 		pd_canvas_t *source;
 		const pd_canvas_t *source_ro;
@@ -292,7 +295,7 @@ struct pd_canvas_t_ {
 };
 
 typedef struct pd_style_t_ {
-	pd_bool_t is_valid : 2;
+	LCUI_BOOL is_valid : 2;
 	pd_style_type type : 6;
 	union {
 		int val_int;
@@ -321,7 +324,7 @@ typedef struct pd_style_t_ {
 		pd_color_t val_color;
 		pd_canvas_t *image;
 		pd_canvas_t *val_image;
-		pd_bool_t val_bool;
+		LCUI_BOOL val_bool;
 	};
 } pd_style_t, *pd_style;
 
@@ -390,7 +393,7 @@ typedef struct LCUI_BoundBoxRec {
 } LCUI_BoundBox;
 
 typedef struct pd_background_position_t_ {
-	pd_bool_t using_value;
+	LCUI_BOOL using_value;
 	union {
 		struct {
 			pd_style_t x, y;
@@ -400,7 +403,7 @@ typedef struct pd_background_position_t_ {
 } pd_background_position_t;
 
 typedef struct pd_background_size_t_ {
-	pd_bool_t using_value;
+	LCUI_BOOL using_value;
 	union {
 		struct {
 			pd_style_t width, height;
@@ -413,7 +416,7 @@ typedef struct pd_background_style_t_ {
 	pd_canvas_t image; /**< 背景图 */
 	pd_color_t color; /**< 背景色 */
 	struct {
-		pd_bool_t x, y;
+		LCUI_BOOL x, y;
 	} repeat;                         /**< 背景图是否重复 */
 	pd_background_position_t position; /**< 定位方式 */
 	pd_background_size_t size;         /**< 尺寸 */
@@ -423,7 +426,7 @@ typedef struct pd_background_t_ {
 	pd_canvas_t *image; /**< 背景图 */
 	pd_color_t color;  /**< 背景色 */
 	struct {
-		pd_bool_t x, y;
+		LCUI_BOOL x, y;
 	} repeat; /**< 背景图是否重复 */
 	struct {
 		int x, y;
@@ -437,7 +440,7 @@ typedef struct pd_background_t_ {
 typedef struct pd_paint_context_t_ {
 	pd_rect_t rect;    /**< 需要绘制的区域 */
 	pd_canvas_t canvas; /**< 绘制后的位图缓存（可称为：画布） */
-	pd_bool_t with_alpha; /**< 绘制时是否需要处理 alpha 通道 */
+	LCUI_BOOL with_alpha; /**< 绘制时是否需要处理 alpha 通道 */
 } pd_paint_context_t, *pd_paint_context;
 
 typedef void (*FuncPtr)(void *);

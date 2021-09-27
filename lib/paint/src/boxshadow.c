@@ -160,7 +160,7 @@ void pd_boxshadow_get_canvas_rect(const pd_boxshadow_t *shadow,
 			      canvas_rect->y;
 }
 
-static pd_bool_t boxshadow_paint_left_blur(boxshadow_rendering_context ctx)
+static pd_bool boxshadow_paint_left_blur(boxshadow_rendering_context ctx)
 {
 	int x, y;
 	int right;
@@ -187,11 +187,11 @@ static pd_bool_t boxshadow_paint_left_blur(boxshadow_rendering_context ctx)
 	paint_rect.height = rect.height;
 	paint_rect.x = rect.x - ctx->paint->rect.x;
 	paint_rect.y = rect.y - ctx->paint->rect.y;
-	pd_graph_quote(&ref, &ctx->paint->canvas, &paint_rect);
-	pd_graph_get_valid_rect(&ref, &paint_rect);
-	canvas = pd_graph_get_quote(&ref);
+	pd_canvas_quote(&ref, &ctx->paint->canvas, &paint_rect);
+	pd_canvas_get_valid_rect(&ref, &paint_rect);
+	canvas = pd_canvas_get_quote(&ref);
 	for (y = 0; y < paint_rect.height; ++y) {
-		p = pd_graph_get_pixel_pointer(canvas, paint_rect.x,
+		p = pd_canvas_get_pixel_pointer(canvas, paint_rect.x,
 					  paint_rect.y + y);
 		for (x = 0; x < paint_rect.width; ++x, ++p) {
 			color.alpha = gradient_compute(&g, right - x,
@@ -202,7 +202,7 @@ static pd_bool_t boxshadow_paint_left_blur(boxshadow_rendering_context ctx)
 	return TRUE;
 }
 
-static pd_bool_t boxshadow_paint_right_blur(boxshadow_rendering_context ctx)
+static pd_bool boxshadow_paint_right_blur(boxshadow_rendering_context ctx)
 {
 	int x, y;
 	int left;
@@ -229,11 +229,11 @@ static pd_bool_t boxshadow_paint_right_blur(boxshadow_rendering_context ctx)
 	paint_rect.height = rect.height;
 	paint_rect.x = rect.x - ctx->paint->rect.x;
 	paint_rect.y = rect.y - ctx->paint->rect.y;
-	pd_graph_quote(&ref, &ctx->paint->canvas, &paint_rect);
-	pd_graph_get_valid_rect(&ref, &paint_rect);
-	canvas = pd_graph_get_quote(&ref);
+	pd_canvas_quote(&ref, &ctx->paint->canvas, &paint_rect);
+	pd_canvas_get_valid_rect(&ref, &paint_rect);
+	canvas = pd_canvas_get_quote(&ref);
 	for (y = 0; y < paint_rect.height; ++y) {
-		p = pd_graph_get_pixel_pointer(canvas, paint_rect.x,
+		p = pd_canvas_get_pixel_pointer(canvas, paint_rect.x,
 					  paint_rect.y + y);
 		for (x = 0; x < paint_rect.width; ++x, ++p) {
 			color.alpha = gradient_compute(&g, x - left,
@@ -244,7 +244,7 @@ static pd_bool_t boxshadow_paint_right_blur(boxshadow_rendering_context ctx)
 	return TRUE;
 }
 
-static pd_bool_t boxshadow_paint_top_blur(boxshadow_rendering_context ctx)
+static pd_bool boxshadow_paint_top_blur(boxshadow_rendering_context ctx)
 {
 	int x, y;
 	int bottom;
@@ -271,11 +271,11 @@ static pd_bool_t boxshadow_paint_top_blur(boxshadow_rendering_context ctx)
 	paint_rect.height = rect.height;
 	paint_rect.x = rect.x - ctx->paint->rect.x;
 	paint_rect.y = rect.y - ctx->paint->rect.y;
-	pd_graph_quote(&ref, &ctx->paint->canvas, &paint_rect);
-	pd_graph_get_valid_rect(&ref, &paint_rect);
-	canvas = pd_graph_get_quote(&ref);
+	pd_canvas_quote(&ref, &ctx->paint->canvas, &paint_rect);
+	pd_canvas_get_valid_rect(&ref, &paint_rect);
+	canvas = pd_canvas_get_quote(&ref);
 	for (y = 0; y < paint_rect.height; ++y) {
-		p = pd_graph_get_pixel_pointer(canvas, paint_rect.x,
+		p = pd_canvas_get_pixel_pointer(canvas, paint_rect.x,
 					  paint_rect.y + y);
 		color.alpha =
 		    gradient_compute(&g, bottom - y, ctx->shadow->color.a);
@@ -286,7 +286,7 @@ static pd_bool_t boxshadow_paint_top_blur(boxshadow_rendering_context ctx)
 	return TRUE;
 }
 
-static pd_bool_t boxshadow_paint_bottom_blur(boxshadow_rendering_context ctx)
+static pd_bool boxshadow_paint_bottom_blur(boxshadow_rendering_context ctx)
 {
 	int x, y;
 	int top;
@@ -313,11 +313,11 @@ static pd_bool_t boxshadow_paint_bottom_blur(boxshadow_rendering_context ctx)
 	paint_rect.height = rect.height;
 	paint_rect.x = rect.x - ctx->paint->rect.x;
 	paint_rect.y = rect.y - ctx->paint->rect.y;
-	pd_graph_quote(&ref, &ctx->paint->canvas, &paint_rect);
-	pd_graph_get_valid_rect(&ref, &paint_rect);
-	canvas = pd_graph_get_quote(&ref);
+	pd_canvas_quote(&ref, &ctx->paint->canvas, &paint_rect);
+	pd_canvas_get_valid_rect(&ref, &paint_rect);
+	canvas = pd_canvas_get_quote(&ref);
 	for (y = 0; y < paint_rect.height; ++y) {
-		p = pd_graph_get_pixel_pointer(canvas, paint_rect.x,
+		p = pd_canvas_get_pixel_pointer(canvas, paint_rect.x,
 					  paint_rect.y + y);
 		color.a = gradient_compute(&g, y - top, ctx->shadow->color.a);
 		for (x = 0; x < paint_rect.width; ++x, ++p) {
@@ -327,7 +327,7 @@ static pd_bool_t boxshadow_paint_bottom_blur(boxshadow_rendering_context ctx)
 	return TRUE;
 }
 
-static pd_bool_t boxshadow_paint_circle_blur(boxshadow_rendering_context ctx,
+static pd_bool boxshadow_paint_circle_blur(boxshadow_rendering_context ctx,
 					   const pd_rect_t *circle_rect,
 					   double center_x, double center_y,
 					   int radius)
@@ -358,13 +358,13 @@ static pd_bool_t boxshadow_paint_circle_blur(boxshadow_rendering_context ctx,
 	center_y = center_y + circle_rect->y - rect.y - 0.5;
 	rect.x -= ctx->paint->rect.x;
 	rect.y -= ctx->paint->rect.y;
-	pd_graph_quote(&ref, &ctx->paint->canvas, &rect);
-	pd_graph_get_valid_rect(&ref, &rect);
-	canvas = pd_graph_get_quote(&ref);
+	pd_canvas_quote(&ref, &ctx->paint->canvas, &rect);
+	pd_canvas_get_valid_rect(&ref, &rect);
+	canvas = pd_canvas_get_quote(&ref);
 	gradient_init(&g, BLUR_WIDTH(ctx->shadow));
 	for (y = 0; y < rect.height; ++y) {
 		y2 = POW2(ToGeoY(y, center_y));
-		p = pd_graph_get_pixel_pointer(canvas, rect.x, rect.y + y);
+		p = pd_canvas_get_pixel_pointer(canvas, rect.x, rect.y + y);
 		for (x = 0; x < rect.width; ++x, ++p) {
 			d = y2 + POW2(ToGeoX(x, center_x));
 			if (r - inner_r < 0.1) {
@@ -397,7 +397,7 @@ static pd_bool_t boxshadow_paint_circle_blur(boxshadow_rendering_context ctx,
 	return TRUE;
 }
 
-static pd_bool_t boxshadow_paint_top_left_blur(boxshadow_rendering_context ctx)
+static pd_bool boxshadow_paint_top_left_blur(boxshadow_rendering_context ctx)
 {
 	int radius;
 	pd_rect_t rect;
@@ -412,7 +412,7 @@ static pd_bool_t boxshadow_paint_top_left_blur(boxshadow_rendering_context ctx)
 					 radius);
 }
 
-static pd_bool_t boxshadow_paint_top_right_blur(boxshadow_rendering_context ctx)
+static pd_bool boxshadow_paint_top_right_blur(boxshadow_rendering_context ctx)
 {
 	int radius;
 	pd_rect_t rect;
@@ -426,7 +426,7 @@ static pd_bool_t boxshadow_paint_top_right_blur(boxshadow_rendering_context ctx)
 	return boxshadow_paint_circle_blur(ctx, &rect, 0, rect.height, radius);
 }
 
-static pd_bool_t boxshadow_paint_bottom_left_blur(boxshadow_rendering_context ctx)
+static pd_bool boxshadow_paint_bottom_left_blur(boxshadow_rendering_context ctx)
 {
 	int radius;
 	pd_rect_t rect;
@@ -440,7 +440,7 @@ static pd_bool_t boxshadow_paint_bottom_left_blur(boxshadow_rendering_context ct
 	return boxshadow_paint_circle_blur(ctx, &rect, rect.width, 0, radius);
 }
 
-static pd_bool_t boxshadow_paint_bottom_right_blur(boxshadow_rendering_context ctx)
+static pd_bool boxshadow_paint_bottom_right_blur(boxshadow_rendering_context ctx)
 {
 	int radius;
 	pd_rect_t rect;
@@ -467,16 +467,16 @@ static int clear_pixels_of_circle(pd_canvas_t *canvas, double center_x,
 	pd_rect_t rect;
 	pd_color_t *p;
 
-	pd_graph_get_valid_rect(canvas, &rect);
-	canvas = pd_graph_get_quote(canvas);
-	if (!pd_graph_is_valid(canvas)) {
+	pd_canvas_get_valid_rect(canvas, &rect);
+	canvas = pd_canvas_get_quote(canvas);
+	if (!pd_canvas_is_valid(canvas)) {
 		return -1;
 	}
 	center_x -= 0.5;
 	center_y -= 0.5;
 	for (yi = 0; yi < rect.height; ++yi) {
 		y2 = POW2(ToGeoY(yi, center_y));
-		p = pd_graph_get_pixel_pointer(canvas, rect.x, rect.y + yi);
+		p = pd_canvas_get_pixel_pointer(canvas, rect.x, rect.y + yi);
 		for (xi = 0; xi < rect.width; ++xi, ++p) {
 			d = y2 + POW2(ToGeoX(xi, center_x));
 			if (d >= outer_r2) {
@@ -501,7 +501,7 @@ static void boxshadow_fill_rect(boxshadow_rendering_context ctx)
 	if (pd_rect_get_overlay_rect(&rect, &ctx->paint->rect, &rect)) {
 		rect.x -= ctx->paint->rect.x;
 		rect.y -= ctx->paint->rect.y;
-		pd_graph_fill_rect(&ctx->paint->canvas, ctx->shadow->color, &rect,
+		pd_canvas_fill_rect(&ctx->paint->canvas, ctx->shadow->color, &rect,
 			       TRUE);
 	}
 }
@@ -534,7 +534,7 @@ static void boxshadow_clear_content_rect(boxshadow_rendering_context ctx)
 		center_y = bound.y - rect.y + r;
 		rect.x -= ctx->paint->rect.x;
 		rect.y -= ctx->paint->rect.y;
-		pd_graph_quote(&canvas, &ctx->paint->canvas, &rect);
+		pd_canvas_quote(&canvas, &ctx->paint->canvas, &rect);
 		clear_pixels_of_circle(&canvas, center_x, center_y, r);
 	}
 
@@ -550,7 +550,7 @@ static void boxshadow_clear_content_rect(boxshadow_rendering_context ctx)
 		center_y = bound.y - rect.y + r;
 		rect.x -= ctx->paint->rect.x;
 		rect.y -= ctx->paint->rect.y;
-		pd_graph_quote(&canvas, &ctx->paint->canvas, &rect);
+		pd_canvas_quote(&canvas, &ctx->paint->canvas, &rect);
 		clear_pixels_of_circle(&canvas, center_x, center_y, r);
 	}
 
@@ -566,7 +566,7 @@ static void boxshadow_clear_content_rect(boxshadow_rendering_context ctx)
 		center_y = bound.y - rect.y;
 		rect.x -= ctx->paint->rect.x;
 		rect.y -= ctx->paint->rect.y;
-		pd_graph_quote(&canvas, &ctx->paint->canvas, &rect);
+		pd_canvas_quote(&canvas, &ctx->paint->canvas, &rect);
 		clear_pixels_of_circle(&canvas, center_x, center_y, r);
 	}
 
@@ -582,7 +582,7 @@ static void boxshadow_clear_content_rect(boxshadow_rendering_context ctx)
 		center_y = bound.y - rect.y;
 		rect.x -= ctx->paint->rect.x;
 		rect.y -= ctx->paint->rect.y;
-		pd_graph_quote(&canvas, &ctx->paint->canvas, &rect);
+		pd_canvas_quote(&canvas, &ctx->paint->canvas, &rect);
 		clear_pixels_of_circle(&canvas, center_x, center_y, r);
 	}
 
@@ -592,7 +592,7 @@ static void boxshadow_clear_content_rect(boxshadow_rendering_context ctx)
 					    &rect)) {
 			rect.x -= ctx->paint->rect.x;
 			rect.y -= ctx->paint->rect.y;
-			pd_graph_fill_rect(&ctx->paint->canvas, ARGB(0, 0, 0, 0),
+			pd_canvas_fill_rect(&ctx->paint->canvas, ARGB(0, 0, 0, 0),
 				       &rect, TRUE);
 		}
 	}
@@ -631,11 +631,11 @@ int pd_boxshadow_paint(const pd_boxshadow_t *shadow, const pd_rect_t *box,
 
 	/* Create a paint context for render shadow */
 	ctx.paint = &shadow_paint;
-	pd_graph_init(&shadow_paint.canvas);
+	pd_canvas_init(&shadow_paint.canvas);
 	shadow_paint.rect = paint->rect;
 	shadow_paint.with_alpha = TRUE;
 	shadow_paint.canvas.color_type = PD_COLOR_TYPE_ARGB;
-	pd_graph_create(&ctx.paint->canvas, paint->rect.width, paint->rect.height);
+	pd_canvas_create(&ctx.paint->canvas, paint->rect.width, paint->rect.height);
 
 	/* Render box shadow */
 	boxshadow_fill_rect(&ctx);
@@ -651,7 +651,7 @@ int pd_boxshadow_paint(const pd_boxshadow_t *shadow, const pd_rect_t *box,
 	boxshadow_clear_content_rect(&ctx);
 
 	/* Render the rendered shadow bitmap to the canvas */
-	pd_graph_mix(&paint->canvas, &ctx.paint->canvas, 0, 0, paint->with_alpha);
-	pd_graph_free(&ctx.paint->canvas);
+	pd_canvas_mix(&paint->canvas, &ctx.paint->canvas, 0, 0, paint->with_alpha);
+	pd_canvas_free(&ctx.paint->canvas);
 	return 0;
 }

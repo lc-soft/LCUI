@@ -257,7 +257,7 @@ void Widget_SetTitleW(LCUI_Widget w, const wchar_t *title)
 	Widget_AddTask(w, LCUI_WTASK_TITLE);
 }
 
-pd_bool_t Widget_InVisibleArea(LCUI_Widget w)
+LCUI_BOOL Widget_InVisibleArea(LCUI_Widget w)
 {
 	LinkedListNode *node;
 	pd_rectf_t rect;
@@ -425,7 +425,7 @@ void Widget_SortChildrenShow(LCUI_Widget w)
 	}
 }
 
-pd_bool_t Widget_HasAutoStyle(LCUI_Widget w, int key)
+LCUI_BOOL Widget_HasAutoStyle(LCUI_Widget w, int key)
 {
 	return !Widget_CheckStyleValid(w, key) ||
 	       Widget_CheckStyleType(w, key, AUTO);

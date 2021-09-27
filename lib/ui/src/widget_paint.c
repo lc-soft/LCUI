@@ -98,26 +98,26 @@ typedef struct LCUI_WidgetRendererRec_ {
 	 * root canvas */
 	pd_rectf_t content_rect;
 
-	pd_bool_t has_content_graph;
-	pd_bool_t has_self_graph;
-	pd_bool_t has_layer_graph;
-	pd_bool_t can_render_self;
-	pd_bool_t can_render_centent;
+	LCUI_BOOL has_content_graph;
+	LCUI_BOOL has_self_graph;
+	LCUI_BOOL has_layer_graph;
+	LCUI_BOOL can_render_self;
+	LCUI_BOOL can_render_centent;
 } LCUI_WidgetRendererRec, *LCUI_WidgetRenderer;
 
 static struct LCUI_WidgetRenderModule {
-	pd_bool_t active;
+	LCUI_BOOL active;
 	LCUI_WidgetPrototype default_proto;
 	RBTree groups;
 	LinkedList rects;
 } self = { 0 };
 
 /** 判断部件是否有可绘制内容 */
-static pd_bool_t Widget_IsPaintable(LCUI_Widget w)
+static LCUI_BOOL Widget_IsPaintable(LCUI_Widget w)
 {
 	const LCUI_WidgetStyle *s = &w->computed_style;
 	if (s->background.color.alpha > 0 ||
-	    pd_graph_is_valid(&s->background.image) || s->border.top.width > 0 ||
+	    pd_canvas_is_valid(&s->background.image) || s->border.top.width > 0 ||
 	    s->border.right.width > 0 || s->border.bottom.width > 0 ||
 	    s->border.left.width > 0 || s->shadow.blur > 0 ||
 	    s->shadow.spread > 0) {
@@ -126,7 +126,7 @@ static pd_bool_t Widget_IsPaintable(LCUI_Widget w)
 	return w->proto != self.default_proto;
 }
 
-static pd_bool_t Widget_HasRoundBorder(LCUI_Widget w)
+static LCUI_BOOL Widget_HasRoundBorder(LCUI_Widget w)
 {
 	const pd_border_style_t *s = &w->computed_style.border;
 
@@ -146,7 +146,7 @@ void RectToInvalidArea(const pd_rect_t *rect, pd_rect_t *area)
 	LCUIMetrics_ComputeRectActual(area, &rectf);
 }
 
-pd_bool_t Widget_InvalidateArea(LCUI_Widget w, pd_rectf_t *in_rect,
+LCUI_BOOL Widget_InvalidateArea(LCUI_Widget w, pd_rectf_t *in_rect,
 				int box_type)
 {
 	pd_rectf_t rect;
@@ -433,14 +433,14 @@ static LCUI_WidgetRenderer WidgetRenderer(LCUI_Widget w,
 	} else if (Widget_HasRoundBorder(w)) {
 		that->has_content_graph = TRUE;
 	}
-	pd_graph_init(&that->self_graph);
-	pd_graph_init(&that->layer_graph);
-	pd_graph_init(&that->content_graph);
+	pd_canvas_init(&that->self_graph);
+	pd_canvas_init(&that->layer_graph);
+	pd_canvas_init(&that->content_graph);
 	that->layer_graph.color_type = PD_COLOR_TYPE_ARGB;
 	that->can_render_self = Widget_IsPaintable(w);
 	if (that->can_render_self) {
 		that->self_graph.color_type = PD_COLOR_TYPE_ARGB;
-		pd_graph_create(&that->self_graph, that->paint->rect.width,
+		pd_canvas_create(&that->self_graph, that->paint->rect.width,
 			     that->paint->rect.height);
 	}
 	/* get content rectangle left spacing and top */
@@ -487,7 +487,7 @@ static LCUI_WidgetRenderer WidgetRenderer(LCUI_Widget w,
 	}
 	if (that->has_content_graph) {
 		that->content_graph.color_type = PD_COLOR_TYPE_ARGB;
-		pd_graph_create(&that->content_graph,
+		pd_canvas_create(&that->content_graph,
 			     that->actual_content_rect.width,
 			     that->actual_content_rect.height);
 	}
@@ -496,9 +496,9 @@ static LCUI_WidgetRenderer WidgetRenderer(LCUI_Widget w,
 
 static void WidgetRenderer_Delete(LCUI_WidgetRenderer renderer)
 {
-	pd_graph_free(&renderer->layer_graph);
-	pd_graph_free(&renderer->self_graph);
-	pd_graph_free(&renderer->content_graph);
+	pd_canvas_free(&renderer->layer_graph);
+	pd_canvas_free(&renderer->self_graph);
+	pd_canvas_free(&renderer->content_graph);
 	free(renderer);
 }
 
@@ -610,13 +610,13 @@ static size_t WidgetRenderer_RenderChildren(LCUI_WidgetRenderer that)
 			child_paint.with_alpha = TRUE;
 			paint_rect.x -= that->actual_content_rect.x;
 			paint_rect.y -= that->actual_content_rect.y;
-			pd_graph_quote(&child_paint.canvas, &that->content_graph,
+			pd_canvas_quote(&child_paint.canvas, &that->content_graph,
 				    &paint_rect);
 		} else {
 			child_paint.with_alpha = that->paint->with_alpha;
 			paint_rect.x -= that->actual_paint_rect.x;
 			paint_rect.y -= that->actual_paint_rect.y;
-			pd_graph_quote(&child_paint.canvas, &that->paint->canvas,
+			pd_canvas_quote(&child_paint.canvas, &that->paint->canvas,
 				    &paint_rect);
 		}
 		DEBUG_MSG("child paint rect: (%d, %d, %d, %d)\n", paint_rect.x,
@@ -660,10 +660,10 @@ static size_t WidgetRenderer_Render(LCUI_WidgetRenderer renderer)
 #endif
 		/* 若不需要缓存自身位图则直接绘制到画布上 */
 		if (!that->has_self_graph) {
-			pd_graph_mix(&that->paint->canvas, &that->self_graph, 0, 0,
+			pd_canvas_mix(&that->paint->canvas, &that->self_graph, 0, 0,
 				  that->paint->with_alpha);
 #ifdef DEBUG_FRAME_RENDER
-			pd_graph_print_info(&that->paint->canvas);
+			pd_canvas_print_info(&that->paint->canvas);
 			sprintf(filename, "frame-%lu-L%d-%s-root-canvas.png",
 				frame++, __LINE__, renderer->target->id);
 			LCUI_WritePNGFile(filename, &that->root_paint->canvas);
@@ -682,7 +682,7 @@ static size_t WidgetRenderer_Render(LCUI_WidgetRenderer renderer)
 	}
 	if (!that->has_layer_graph) {
 		if (that->has_content_graph) {
-			pd_graph_mix(&that->paint->canvas, &that->content_graph,
+			pd_canvas_mix(&that->paint->canvas, &that->content_graph,
 				  content_x, content_y, TRUE);
 		}
 #ifdef DEBUG_FRAME_RENDER
@@ -701,8 +701,8 @@ static size_t WidgetRenderer_Render(LCUI_WidgetRenderer renderer)
 	 * 前部件的图层，然后将该图层混合到输出的位图中
 	 */
 	if (that->can_render_self) {
-		pd_graph_copy(&that->layer_graph, &that->self_graph);
-		pd_graph_mix(&that->layer_graph, &that->content_graph, content_x,
+		pd_canvas_copy(&that->layer_graph, &that->self_graph);
+		pd_canvas_mix(&that->layer_graph, &that->content_graph, content_x,
 			  content_y, TRUE);
 #ifdef DEBUG_FRAME_RENDER
 		sprintf(filename, "frame-%lu-L%d-%s-content-grpah-%d-%d.png",
@@ -714,13 +714,13 @@ static size_t WidgetRenderer_Render(LCUI_WidgetRenderer renderer)
 		LCUI_WritePNGFile(filename, &that->layer_graph);
 #endif
 	} else {
-		pd_graph_create(&that->layer_graph, that->paint->rect.width,
+		pd_canvas_create(&that->layer_graph, that->paint->rect.width,
 			     that->paint->rect.height);
-		pd_graph_replace(&that->layer_graph, &that->content_graph,
+		pd_canvas_replace(&that->layer_graph, &that->content_graph,
 			      content_x, content_y);
 	}
 	that->layer_graph.opacity = that->target->computed_style.opacity;
-	pd_graph_mix(&that->paint->canvas, &that->layer_graph, 0, 0,
+	pd_canvas_mix(&that->paint->canvas, &that->layer_graph, 0, 0,
 		  that->paint->with_alpha);
 #ifdef DEBUG_FRAME_RENDER
 	sprintf(filename, "frame-%lu-%s-layer.png", frame++,

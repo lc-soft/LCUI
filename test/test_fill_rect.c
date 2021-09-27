@@ -9,8 +9,8 @@ int main(void)
 	pd_color_t color;
 	pd_rect_t rect;
 
-	pd_graph_init(&canvas);
-	pd_graph_create(&canvas, 150, 150);
+	pd_canvas_init(&canvas);
+	pd_canvas_create(&canvas, 150, 150);
 	for (i = 0; i < 6; ++i) {
 		for (j = 0; j < 6; ++j) {
 			color.red = (unsigned char)(255 - 42.5 * i);
@@ -20,10 +20,10 @@ int main(void)
 			rect.y = i * 25;
 			rect.width = 25;
 			rect.height = 25;
-			pd_graph_fill_rect(&canvas, color, &rect, FALSE);
+			pd_canvas_fill_rect(&canvas, color, &rect, FALSE);
 		}
 	}
 	LCUI_WritePNGFile("test_fill_rect.png", &canvas);
-	pd_graph_free(&canvas);
+	pd_canvas_free(&canvas);
 	return 0;
 }

@@ -36,9 +36,9 @@ LCUI_BEGIN_HEADER
 typedef struct LCUI_SettingsRec_ {
 	int frame_rate_cap;
 	int parallel_rendering_threads;
-	pd_bool_t record_profile;
-	pd_bool_t fps_meter;
-	pd_bool_t paint_flashing;
+	LCUI_BOOL record_profile;
+	LCUI_BOOL fps_meter;
+	LCUI_BOOL paint_flashing;
 } LCUI_SettingsRec, *LCUI_Settings;
 
 /* Initialize settings with the current global settings. */

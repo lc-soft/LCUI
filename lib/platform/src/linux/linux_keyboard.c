@@ -59,7 +59,7 @@ static struct LCUI_LinuxKeyboardDriver {
 	struct termios tm;
 #endif
 	LCUI_Thread tid;
-	pd_bool_t active;
+	LCUI_BOOL active;
 } keyboard;
 
 /* FIXME: this driver does not working, so we won't use it for now */
@@ -166,7 +166,7 @@ static void DispatchKeyboardEvent(void *arg1, void *arg2)
 	}
 }
 
-pd_bool_t kbhit(void)
+LCUI_BOOL kbhit(void)
 {
 	int ch, flags;
 	struct termios tm;

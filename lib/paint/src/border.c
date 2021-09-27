@@ -97,9 +97,9 @@ static int draw_border_top_left(pd_canvas_t *dst, int bound_left, int bound_top,
 	int inner_ellipse_top = (int)split_center_y;
 
 	/* Get the actual rectangle that can be drawn */
-	pd_graph_get_valid_rect(dst, &rect);
-	dst = pd_graph_get_quote(dst);
-	if (!pd_graph_is_valid(dst)) {
+	pd_canvas_get_valid_rect(dst, &rect);
+	dst = pd_canvas_get_quote(dst);
+	if (!pd_canvas_is_valid(dst)) {
 		return -1;
 	}
 	right = min(rect.width, bound_left + width);
@@ -126,7 +126,7 @@ static int draw_border_top_left(pd_canvas_t *dst, int bound_left, int bound_top,
 		inner_x = max(0, min(right, inner_x));
 		outer_xi = max(0, (int)outer_x - (int)radius / 2);
 		inner_xi = min(right, (int)inner_x + (int)radius / 2);
-		p = pd_graph_get_pixel_pointer(dst, rect.x, rect.y + y);
+		p = pd_canvas_get_pixel_pointer(dst, rect.x, rect.y + y);
 		/* Clear the outer pixels */
 		for (x = 0; x < outer_xi; ++x, ++p) {
 			p->alpha = 0;
@@ -190,9 +190,9 @@ static int draw_border_top_right(pd_canvas_t *dst, int bound_left, int bound_top
 	double inner_ellipse_top = split_center_y;
 
 	/* Get the actual rectangle that can be drawn */
-	pd_graph_get_valid_rect(dst, &rect);
-	dst = pd_graph_get_quote(dst);
-	if (!pd_graph_is_valid(dst)) {
+	pd_canvas_get_valid_rect(dst, &rect);
+	dst = pd_canvas_get_quote(dst);
+	if (!pd_canvas_is_valid(dst)) {
 		return -1;
 	}
 	right = min(rect.width, bound_left + width);
@@ -220,7 +220,7 @@ static int draw_border_top_right(pd_canvas_t *dst, int bound_left, int bound_top
 		inner_x = max(-1.0, min(outer_x, inner_x));
 		inner_xi = max(0, (int)inner_x - (int)radius / 2);
 		outer_xi = min(right, (int)outer_x + (int)radius / 2);
-		p = pd_graph_get_pixel_pointer(dst, rect.x + inner_xi, rect.y + y);
+		p = pd_canvas_get_pixel_pointer(dst, rect.x + inner_xi, rect.y + y);
 		for (x = inner_xi; x < outer_xi; ++x, ++p) {
 			outer_d = -1.0;
 			inner_d = x - inner_x;
@@ -277,9 +277,9 @@ static int draw_border_bottom_left(pd_canvas_t *dst, int bound_left, int bound_t
 	double inner_ellipse_bottom = circle_center_y + radius_y;
 
 	/* Get the actual rectangle that can be drawn */
-	pd_graph_get_valid_rect(dst, &rect);
-	dst = pd_graph_get_quote(dst);
-	if (!pd_graph_is_valid(dst)) {
+	pd_canvas_get_valid_rect(dst, &rect);
+	dst = pd_canvas_get_quote(dst);
+	if (!pd_canvas_is_valid(dst)) {
 		return -1;
 	}
 	right = min(rect.width, bound_left + width);
@@ -306,7 +306,7 @@ static int draw_border_bottom_left(pd_canvas_t *dst, int bound_left, int bound_t
 		inner_x = max(0, min(right, inner_x));
 		outer_xi = max(0, (int)outer_x - (int)radius / 2);
 		inner_xi = min(right, (int)inner_x + (int)radius / 2);
-		p = pd_graph_get_pixel_pointer(dst, rect.x, rect.y + y);
+		p = pd_canvas_get_pixel_pointer(dst, rect.x, rect.y + y);
 		for (x = 0; x < outer_xi; ++x, ++p) {
 			p->alpha = 0;
 		}
@@ -365,9 +365,9 @@ static int draw_border_bottom_right(pd_canvas_t *dst, int bound_left, int bound_
 	double inner_ellipse_bottom = circle_center_y + radius_y;
 
 	/* Get the actual rectangle that can be drawn */
-	pd_graph_get_valid_rect(dst, &rect);
-	dst = pd_graph_get_quote(dst);
-	if (!pd_graph_is_valid(dst)) {
+	pd_canvas_get_valid_rect(dst, &rect);
+	dst = pd_canvas_get_quote(dst);
+	if (!pd_canvas_is_valid(dst)) {
 		return -1;
 	}
 	right = min(rect.width, bound_left + width);
@@ -395,7 +395,7 @@ static int draw_border_bottom_right(pd_canvas_t *dst, int bound_left, int bound_
 		inner_x = max(-1.0, min(outer_x, inner_x));
 		inner_xi = max(0, (int)inner_x - (int)radius / 2);
 		outer_xi = min(right, (int)outer_x + (int)radius / 2);
-		p = pd_graph_get_pixel_pointer(dst, rect.x + inner_xi, rect.y + y);
+		p = pd_canvas_get_pixel_pointer(dst, rect.x + inner_xi, rect.y + y);
 		for (x = inner_xi; x < outer_xi; ++x, ++p) {
 			outer_d = -1.0;
 			inner_d = 1.0 * x - inner_x;
@@ -459,9 +459,9 @@ static int crop_content_top_left(pd_canvas_t *dst, int bound_left, int bound_top
 	radius_y -= 0.5;
 	center_x = bound_left + radius_x;
 	center_y = bound_top + radius_y;
-	pd_graph_get_valid_rect(dst, &rect);
-	dst = pd_graph_get_quote(dst);
-	if (!pd_graph_is_valid(dst)) {
+	pd_canvas_get_valid_rect(dst, &rect);
+	dst = pd_canvas_get_quote(dst);
+	if (!pd_canvas_is_valid(dst)) {
 		return -1;
 	}
 	for (yi = 0; yi < rect.height; ++yi) {
@@ -469,7 +469,7 @@ static int crop_content_top_left(pd_canvas_t *dst, int bound_left, int bound_top
 		x = ellipse_x(radius_x + 1.0, radius_y + 1.0, y);
 		outer_xi = (int)(center_x - x);
 		outer_xi = max(0, min(outer_xi, rect.width));
-		p = pd_graph_get_pixel_pointer(dst, rect.x, rect.y + yi);
+		p = pd_canvas_get_pixel_pointer(dst, rect.x, rect.y + yi);
 		for (xi = 0; xi < outer_xi; ++xi, ++p) {
 			p->alpha = 0;
 		}
@@ -521,9 +521,9 @@ static int crop_content_top_right(pd_canvas_t *dst, int bound_left, int bound_to
 	radius_y -= 0.5;
 	center_x = bound_left;
 	center_y = bound_top + radius_y;
-	pd_graph_get_valid_rect(dst, &rect);
-	dst = pd_graph_get_quote(dst);
-	if (!pd_graph_is_valid(dst)) {
+	pd_canvas_get_valid_rect(dst, &rect);
+	dst = pd_canvas_get_quote(dst);
+	if (!pd_canvas_is_valid(dst)) {
 		return -1;
 	}
 	for (yi = 0; yi < rect.height; ++yi) {
@@ -531,7 +531,7 @@ static int crop_content_top_right(pd_canvas_t *dst, int bound_left, int bound_to
 		x = ellipse_x(max(0, radius_x - 1), max(0, radius_y - 1), y);
 		outer_xi = (int)(center_x + x);
 		outer_xi = max(0, outer_xi);
-		p = pd_graph_get_pixel_pointer(dst, rect.x + outer_xi, rect.y + yi);
+		p = pd_canvas_get_pixel_pointer(dst, rect.x + outer_xi, rect.y + yi);
 		if (radius_x == radius_y) {
 			for (xi = outer_xi; xi < rect.width; ++xi, ++p) {
 				x = ToGeoX(xi, center_x);
@@ -580,9 +580,9 @@ static int crop_content_bottom_left(pd_canvas_t *dst, int bound_left, int bound_
 	radius_y -= 0.5;
 	center_x = bound_left + radius_x;
 	center_y = bound_top;
-	pd_graph_get_valid_rect(dst, &rect);
-	dst = pd_graph_get_quote(dst);
-	if (!pd_graph_is_valid(dst)) {
+	pd_canvas_get_valid_rect(dst, &rect);
+	dst = pd_canvas_get_quote(dst);
+	if (!pd_canvas_is_valid(dst)) {
 		return -1;
 	}
 	for (yi = 0; yi < rect.height; ++yi) {
@@ -590,7 +590,7 @@ static int crop_content_bottom_left(pd_canvas_t *dst, int bound_left, int bound_
 		x = ellipse_x(radius_x + 1.0, radius_y + 1.0, y);
 		outer_xi = (int)(center_x - x);
 		outer_xi = max(0, min(outer_xi, rect.width));
-		p = pd_graph_get_pixel_pointer(dst, rect.x, rect.y + yi);
+		p = pd_canvas_get_pixel_pointer(dst, rect.x, rect.y + yi);
 		for (xi = 0; xi < outer_xi; ++xi, ++p) {
 			p->alpha = 0;
 		}
@@ -642,9 +642,9 @@ static int crop_content_bottom_right(pd_canvas_t *dst, int bound_left,
 	radius_y -= 0.5;
 	center_x = bound_left;
 	center_y = bound_top;
-	pd_graph_get_valid_rect(dst, &rect);
-	dst = pd_graph_get_quote(dst);
-	if (!pd_graph_is_valid(dst)) {
+	pd_canvas_get_valid_rect(dst, &rect);
+	dst = pd_canvas_get_quote(dst);
+	if (!pd_canvas_is_valid(dst)) {
 		return -1;
 	}
 	for (yi = 0; yi < rect.height; ++yi) {
@@ -652,7 +652,7 @@ static int crop_content_bottom_right(pd_canvas_t *dst, int bound_left,
 		x = ellipse_x(max(0, radius_x - 1), max(0, radius_y - 1), y);
 		outer_xi = (int)(center_x + x);
 		outer_xi = max(0, outer_xi);
-		p = pd_graph_get_pixel_pointer(dst, rect.x + outer_xi, rect.y + yi);
+		p = pd_canvas_get_pixel_pointer(dst, rect.x + outer_xi, rect.y + yi);
 		if (radius_x == radius_y) {
 			for (xi = outer_xi; xi < rect.width; ++xi, ++p) {
 				x = ToGeoX(xi, center_x);
@@ -705,7 +705,7 @@ int pd_border_crop_content(const pd_border_t *border, const pd_rect_t *box,
 		bound_top = bound.y - rect.y;
 		rect.x -= paint->rect.x;
 		rect.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &rect);
+		pd_canvas_quote(&canvas, &paint->canvas, &rect);
 		crop_content_top_left(&canvas, bound_left, bound_top, bound.width,
 				   bound.height);
 	}
@@ -721,7 +721,7 @@ int pd_border_crop_content(const pd_border_t *border, const pd_rect_t *box,
 		bound_top = bound.y - rect.y;
 		rect.x -= paint->rect.x;
 		rect.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &rect);
+		pd_canvas_quote(&canvas, &paint->canvas, &rect);
 		crop_content_top_right(&canvas, bound_left, bound_top, bound.width,
 				    bound.height);
 	}
@@ -737,7 +737,7 @@ int pd_border_crop_content(const pd_border_t *border, const pd_rect_t *box,
 		bound_top = bound.y - rect.y;
 		rect.x -= paint->rect.x;
 		rect.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &rect);
+		pd_canvas_quote(&canvas, &paint->canvas, &rect);
 		crop_content_bottom_left(&canvas, bound_left, bound_top,
 				      bound.width, bound.height);
 	}
@@ -754,7 +754,7 @@ int pd_border_crop_content(const pd_border_t *border, const pd_rect_t *box,
 		bound_top = bound.y - rect.y;
 		rect.x -= paint->rect.x;
 		rect.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &rect);
+		pd_canvas_quote(&canvas, &paint->canvas, &rect);
 		crop_content_bottom_right(&canvas, bound_left, bound_top,
 				       bound.width, bound.height);
 	}
@@ -777,7 +777,7 @@ int pd_border_paint(const pd_border_t *border, const pd_rect_t *box,
 	int br_width = max(border->bottom_right_radius, border->right.width);
 	int br_height = max(border->bottom_right_radius, border->bottom.width);
 
-	if (!pd_graph_is_valid(&paint->canvas)) {
+	if (!pd_canvas_is_valid(&paint->canvas)) {
 		return -1;
 	}
 	/* Draw border top left angle */
@@ -790,7 +790,7 @@ int pd_border_paint(const pd_border_t *border, const pd_rect_t *box,
 		bound_top = bound.y - rect.y;
 		rect.x -= paint->rect.x;
 		rect.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &rect);
+		pd_canvas_quote(&canvas, &paint->canvas, &rect);
 		draw_border_top_left(&canvas, bound_left, bound_top, &border->top,
 				  &border->left, border->top_left_radius);
 	}
@@ -804,7 +804,7 @@ int pd_border_paint(const pd_border_t *border, const pd_rect_t *box,
 		bound_top = bound.y - rect.y;
 		rect.x -= paint->rect.x;
 		rect.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &rect);
+		pd_canvas_quote(&canvas, &paint->canvas, &rect);
 		draw_border_top_right(&canvas, bound_left, bound_top, &border->top,
 				   &border->right, border->top_right_radius);
 	}
@@ -818,7 +818,7 @@ int pd_border_paint(const pd_border_t *border, const pd_rect_t *box,
 		bound_top = bound.y - rect.y;
 		rect.x -= paint->rect.x;
 		rect.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &rect);
+		pd_canvas_quote(&canvas, &paint->canvas, &rect);
 		draw_border_bottom_left(&canvas, bound_left, bound_top,
 				     &border->bottom, &border->left,
 				     border->bottom_left_radius);
@@ -833,7 +833,7 @@ int pd_border_paint(const pd_border_t *border, const pd_rect_t *box,
 		bound_top = bound.y - rect.y;
 		rect.x -= paint->rect.x;
 		rect.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &rect);
+		pd_canvas_quote(&canvas, &paint->canvas, &rect);
 		draw_border_bottom_right(&canvas, bound_left, bound_top,
 				      &border->bottom, &border->right,
 				      border->bottom_right_radius);
@@ -846,8 +846,8 @@ int pd_border_paint(const pd_border_t *border, const pd_rect_t *box,
 	if (pd_rect_get_overlay_rect(&bound, &paint->rect, &bound)) {
 		bound.x -= paint->rect.x;
 		bound.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &bound);
-		pd_graph_fill_rect(&canvas, border->top.color, NULL, TRUE);
+		pd_canvas_quote(&canvas, &paint->canvas, &bound);
+		pd_canvas_fill_rect(&canvas, border->top.color, NULL, TRUE);
 	}
 	/* Draw bottom border line */
 	bound.x = box->x + bl_width;
@@ -857,8 +857,8 @@ int pd_border_paint(const pd_border_t *border, const pd_rect_t *box,
 	if (pd_rect_get_overlay_rect(&bound, &paint->rect, &bound)) {
 		bound.x -= paint->rect.x;
 		bound.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &bound);
-		pd_graph_fill_rect(&canvas, border->bottom.color, NULL, TRUE);
+		pd_canvas_quote(&canvas, &paint->canvas, &bound);
+		pd_canvas_fill_rect(&canvas, border->bottom.color, NULL, TRUE);
 	}
 	/* Draw left border line */
 	bound.y = box->y + tl_height;
@@ -868,8 +868,8 @@ int pd_border_paint(const pd_border_t *border, const pd_rect_t *box,
 	if (pd_rect_get_overlay_rect(&bound, &paint->rect, &bound)) {
 		bound.x -= paint->rect.x;
 		bound.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &bound);
-		pd_graph_fill_rect(&canvas, border->left.color, NULL, TRUE);
+		pd_canvas_quote(&canvas, &paint->canvas, &bound);
+		pd_canvas_fill_rect(&canvas, border->left.color, NULL, TRUE);
 	}
 	/* Draw right border line */
 	bound.x = box->x + box->width - border->right.width;
@@ -879,8 +879,8 @@ int pd_border_paint(const pd_border_t *border, const pd_rect_t *box,
 	if (pd_rect_get_overlay_rect(&bound, &paint->rect, &bound)) {
 		bound.x -= paint->rect.x;
 		bound.y -= paint->rect.y;
-		pd_graph_quote(&canvas, &paint->canvas, &bound);
-		pd_graph_fill_rect(&canvas, border->right.color, NULL, TRUE);
+		pd_canvas_quote(&canvas, &paint->canvas, &bound);
+		pd_canvas_fill_rect(&canvas, border->right.color, NULL, TRUE);
 	}
 	return 0;
 }

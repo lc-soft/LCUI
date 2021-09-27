@@ -57,7 +57,7 @@ enum SurfaceTaskType {
 };
 
 typedef struct LCUI_SurfaceTask {
-	pd_bool_t is_valid;
+	LCUI_BOOL is_valid;
 	union {
 		struct {
 			int x, y;
@@ -65,7 +65,7 @@ typedef struct LCUI_SurfaceTask {
 		struct {
 			int width, height;
 		};
-		pd_bool_t show;
+		LCUI_BOOL show;
 		wchar_t *caption;
 	};
 } LCUI_SurfaceTask;
@@ -78,7 +78,7 @@ struct LCUI_SurfaceRec_ {
 	HDC hdc_fb;				/**< 帧缓存的设备上下文 */
 	HDC hdc_client;				/**< 窗口的设备上下文 */
 	HBITMAP fb_bmp;				/**< 帧缓存 */
-	pd_bool_t is_ready;			/**< 是否已经准备好 */
+	LCUI_BOOL is_ready;			/**< 是否已经准备好 */
 	pd_canvas_t fb;				/**< 帧缓存，保存当前窗口内呈现的图像内容 */
 	LCUI_SurfaceTask tasks[TASK_TOTAL_NUM]; /**< 任务缓存 */
 	LinkedListNode node;                    /**< 在链表中的结点 */
@@ -86,7 +86,7 @@ struct LCUI_SurfaceRec_ {
 
 /** windows 下图形显示功能所需的数据 */
 static struct WIN_Display {
-	pd_bool_t active;		/**< 是否已经初始化 */
+	LCUI_BOOL active;		/**< 是否已经初始化 */
 	LinkedList surfaces;		/**< surface 记录 */
 	LCUI_EventTrigger trigger;	/**< 事件触发器 */
 } win;
@@ -139,7 +139,7 @@ static void WinSurface_ExecDestroy(LCUI_Surface surface)
 	surface->hdc_fb = NULL;
 	surface->hdc_client = NULL;
 	surface->is_ready = FALSE;
-	pd_graph_free(&surface->fb);
+	pd_canvas_free(&surface->fb);
 	WinSurface_ClearTasks(surface);
 	free(surface);
 }
@@ -199,7 +199,7 @@ static LCUI_Surface WinSurface_New(void)
 	surface->fb_bmp = NULL;
 	surface->is_ready = FALSE;
 	surface->node.data = surface;
-	pd_graph_init(&surface->fb);
+	pd_canvas_init(&surface->fb);
 	surface->fb.color_type = PD_COLOR_TYPE_ARGB;
 	for (i = 0; i < TASK_TOTAL_NUM; ++i) {
 		surface->tasks[i].is_valid = FALSE;
@@ -209,7 +209,7 @@ static LCUI_Surface WinSurface_New(void)
 	return surface;
 }
 
-static pd_bool_t WinSurface_IsReady(LCUI_Surface surface)
+static LCUI_BOOL WinSurface_IsReady(LCUI_Surface surface)
 {
 	return surface->is_ready;
 }
@@ -239,7 +239,7 @@ static void WinSurface_ExecResizeFrameBuffer(LCUI_Surface surface, int w, int h)
 	if (surface->width == w && surface->height == h) {
 		return;
 	}
-	pd_graph_create(&surface->fb, w, h);
+	pd_canvas_create(&surface->fb, w, h);
 	surface->fb_bmp = CreateCompatibleBitmap(surface->hdc_client, w, h);
 	old_bmp = (HBITMAP)SelectObject(surface->hdc_fb, surface->fb_bmp);
 	if (old_bmp) {
@@ -350,7 +350,7 @@ static pd_paint_context WinSurface_BeginPaint(LCUI_Surface surface,
 					       pd_rect_t *rect)
 {
 	pd_paint_context paint = pd_painter_begin(&surface->fb, rect);
-	pd_graph_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
+	pd_canvas_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
 	return paint;
 }
 

@@ -98,7 +98,7 @@ typedef struct StyleLinkRec_ {
 } StyleLinkRec, *StyleLink;
 
 static struct {
-	pd_bool_t active;
+	LCUI_BOOL active;
 	LinkedList groups;		/**< 样式组列表 */
 	Dict *cache;			/**< 样式表缓存，以选择器的 hash 值索引 */
 	Dict *names;			/**< 样式属性名称表，以值的名称索引 */
@@ -334,7 +334,7 @@ int LCUI_GetStyleTotal(void)
 	return library.count;
 }
 
-pd_bool_t SelectorNode_Match(LCUI_SelectorNode sn1, LCUI_SelectorNode sn2)
+LCUI_BOOL SelectorNode_Match(LCUI_SelectorNode sn1, LCUI_SelectorNode sn2)
 {
 	int i, j;
 	if (sn2->id) {
@@ -1005,7 +1005,7 @@ LCUI_Selector Selector(const char *selector)
 	int ni, si, rank;
 	static int batch_num = 0;
 	char type = 0, name[MAX_NAME_LEN];
-	pd_bool_t is_saving = FALSE;
+	LCUI_BOOL is_saving = FALSE;
 	LCUI_SelectorNode node = NULL;
 	LCUI_Selector s = NEW(LCUI_SelectorRec, 1);
 
@@ -1307,7 +1307,7 @@ int LCUI_PutStyleSheet(LCUI_Selector selector, LCUI_StyleSheet in_ss,
 static size_t StyleLink_GetStyleSheets(StyleLink link, LinkedList *outlist)
 {
 	size_t i;
-	pd_bool_t found;
+	LCUI_BOOL found;
 	StyleNode snode, out_snode;
 	LinkedListNode *node, *out_node;
 

@@ -39,8 +39,8 @@ pd_paint_context pd_painter_begin(pd_canvas_t *canvas, pd_rect_t *rect)
 	PDASSIGN(paint, pd_paint_context);
 	paint->rect = *rect;
 	paint->with_alpha = FALSE;
-	pd_graph_init(&paint->canvas);
-	pd_graph_quote(&paint->canvas, canvas, &paint->rect);
+	pd_canvas_init(&paint->canvas);
+	pd_canvas_quote(&paint->canvas, canvas, &paint->rect);
 	return paint;
 }
 

@@ -271,7 +271,7 @@ void InputDriver::OnKeyUp(CoreWindow^ sender, KeyEventArgs^ args)
 	LCUI_DestroyEvent(&ev);
 }
 
-static pd_bool_t IME_ProcessKey(int key, int key_state)
+static LCUI_BOOL IME_ProcessKey(int key, int key_state)
 {
 	return LCUIIME_CheckCharKey(key);
 }
@@ -282,12 +282,12 @@ static void IME_ToText(int ch)
 	LCUIIME_Commit(text, 2);
 }
 
-static pd_bool_t IME_Open(void)
+static LCUI_BOOL IME_Open(void)
 {
 	return TRUE;
 }
 
-static pd_bool_t IME_Close(void)
+static LCUI_BOOL IME_Close(void)
 {
 	return TRUE;
 }

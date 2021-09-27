@@ -108,14 +108,14 @@
 LCUI_BEGIN_HEADER
 
 /** 检测指定键值的按键是否处于按下状态 */
-LCUI_API pd_bool_t LCUIKeyboard_IsHit(int key_code);
+LCUI_API LCUI_BOOL LCUIKeyboard_IsHit(int key_code);
 
 /**
  * 检测指定键值的按键是否按了两次
  * @param key_code 要检测的按键的键值
  * @param interval_time 该按键倒数第二次按下时的时间与当前时间的最大间隔
  */
-LCUI_API pd_bool_t LCUIKeyboard_IsDoubleHit(int key_code, int interval_time);
+LCUI_API LCUI_BOOL LCUIKeyboard_IsDoubleHit(int key_code, int interval_time);
 
 /** 添加已被按下的按键 */
 LCUI_API void LCUIKeyboard_HitKey(int key_code);

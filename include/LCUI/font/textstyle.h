@@ -34,12 +34,12 @@
 LCUI_BEGIN_HEADER
 
 typedef struct LCUI_TextStyleRec_ {
-	pd_bool_t has_family:1;
-	pd_bool_t has_style:1;
-	pd_bool_t has_weight:1;
-	pd_bool_t has_back_color:1;
-	pd_bool_t has_fore_color:1;
-	pd_bool_t has_pixel_size:1;
+	LCUI_BOOL has_family:1;
+	LCUI_BOOL has_style:1;
+	LCUI_BOOL has_weight:1;
+	LCUI_BOOL has_back_color:1;
+	LCUI_BOOL has_fore_color:1;
+	LCUI_BOOL has_pixel_size:1;
 
 	int style;
 	int weight;

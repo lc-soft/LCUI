@@ -37,39 +37,39 @@
 #include <LCUI/util.h>
 #include <LCUI/graph.h>
 
-void pd_graph_print_info(pd_canvas_t *graph)
+void pd_canvas_print_info(pd_canvas_t *canvas)
 {
-	printf("address:%p\n", graph);
-	if (!graph) {
+	printf("address:%p\n", canvas);
+	if (!canvas) {
 		return;
 	}
 
-	printf("width:%d, ", graph->width);
-	printf("height:%d, ", graph->height);
-	printf("opacity:%.2f, ", graph->opacity);
+	printf("width:%d, ", canvas->width);
+	printf("height:%d, ", canvas->height);
+	printf("opacity:%.2f, ", canvas->opacity);
 	printf("%s\n",
-	       graph->color_type == PD_COLOR_TYPE_ARGB ? "RGBA" : "RGB");
-	if (graph->quote.is_valid) {
-		printf("graph src:");
-		pd_graph_print_info(pd_graph_get_quote(graph));
+	       canvas->color_type == PD_COLOR_TYPE_ARGB ? "RGBA" : "RGB");
+	if (canvas->quote.is_valid) {
+		printf("canvas src:");
+		pd_canvas_print_info(pd_canvas_get_quote(canvas));
 	}
 }
 
-void pd_graph_init(pd_canvas_t *graph)
+void pd_canvas_init(pd_canvas_t *canvas)
 {
-	graph->quote.is_valid = FALSE;
-	graph->quote.source = NULL;
-	graph->quote.top = 0;
-	graph->quote.left = 0;
-	graph->palette = NULL;
-	graph->color_type = PD_COLOR_TYPE_RGB;
-	graph->bytes = NULL;
-	graph->opacity = 1.0;
-	graph->mem_size = 0;
-	graph->width = 0;
-	graph->height = 0;
-	graph->bytes_per_pixel = 3;
-	graph->bytes_per_row = 0;
+	canvas->quote.is_valid = FALSE;
+	canvas->quote.source = NULL;
+	canvas->quote.top = 0;
+	canvas->quote.left = 0;
+	canvas->palette = NULL;
+	canvas->color_type = PD_COLOR_TYPE_RGB;
+	canvas->bytes = NULL;
+	canvas->opacity = 1.0;
+	canvas->mem_size = 0;
+	canvas->width = 0;
+	canvas->height = 0;
+	canvas->bytes_per_pixel = 3;
+	canvas->bytes_per_row = 0;
 }
 
 pd_color_t RGB(uchar_t r, uchar_t g, uchar_t b)
@@ -177,61 +177,61 @@ void pd_pixels_formmat(const uchar_t *in_pixels, int in_color_type,
 	}
 }
 
-static int graph_rgb_to_argb(pd_canvas_t *graph)
+static int canvas_rgb_to_argb(pd_canvas_t *canvas)
 {
 	size_t x, y;
 	pd_color_t *px_des, *px_row_des, *buffer;
 	uchar_t *byte_row_src, *byte_src;
 
-	graph->mem_size = sizeof(pd_color_t) * graph->width * graph->height;
-	buffer = malloc(graph->mem_size);
+	canvas->mem_size = sizeof(pd_color_t) * canvas->width * canvas->height;
+	buffer = malloc(canvas->mem_size);
 	if (!buffer) {
 		return -ENOMEM;
 	}
 	px_row_des = buffer;
-	byte_row_src = graph->bytes;
-	for (y = 0; y < graph->height; ++y) {
+	byte_row_src = canvas->bytes;
+	for (y = 0; y < canvas->height; ++y) {
 		px_des = px_row_des;
 		byte_src = byte_row_src;
-		for (x = 0; x < graph->width; ++x) {
+		for (x = 0; x < canvas->width; ++x) {
 			px_des->b = *byte_src++;
 			px_des->g = *byte_src++;
 			px_des->r = *byte_src++;
 			px_des->a = 255;
 			++px_des;
 		}
-		byte_row_src += graph->bytes_per_row;
-		px_row_des += graph->width;
+		byte_row_src += canvas->bytes_per_row;
+		px_row_des += canvas->width;
 	}
-	free(graph->argb);
-	graph->argb = buffer;
-	graph->color_type = PD_COLOR_TYPE_ARGB8888;
+	free(canvas->argb);
+	canvas->argb = buffer;
+	canvas->color_type = PD_COLOR_TYPE_ARGB8888;
 	return 0;
 }
 
-static int graph_cut_rgb(const pd_canvas_t *graph, pd_rect_t rect,
+static int canvas_cut_rgb(const pd_canvas_t *canvas, pd_rect_t rect,
 			pd_canvas_t *buff)
 {
 	int y;
 	uchar_t *byte_src_row, *byte_des_row;
 
-	buff->color_type = graph->color_type;
-	if (0 != pd_graph_create(buff, rect.width, rect.height)) {
+	buff->color_type = canvas->color_type;
+	if (0 != pd_canvas_create(buff, rect.width, rect.height)) {
 		return -1;
 	}
-	buff->opacity = graph->opacity;
+	buff->opacity = canvas->opacity;
 	byte_des_row = buff->bytes;
-	byte_src_row = graph->bytes + rect.y * graph->bytes_per_row;
-	byte_src_row += rect.x * graph->bytes_per_pixel;
+	byte_src_row = canvas->bytes + rect.y * canvas->bytes_per_row;
+	byte_src_row += rect.x * canvas->bytes_per_pixel;
 	for (y = 0; y < rect.height; ++y) {
 		memcpy(byte_des_row, byte_src_row, buff->bytes_per_row);
 		byte_des_row += buff->bytes_per_row;
-		byte_src_row += graph->bytes_per_row;
+		byte_src_row += canvas->bytes_per_row;
 	}
 	return 0;
 }
 
-static void graph_replace_to_argb(pd_canvas_t *des, pd_rect_t des_rect,
+static void canvas_replace_to_argb(pd_canvas_t *des, pd_rect_t des_rect,
 				const pd_canvas_t *src, int src_x, int src_y)
 {
 	int y;
@@ -250,7 +250,7 @@ static void graph_replace_to_argb(pd_canvas_t *des, pd_rect_t des_rect,
 	}
 }
 
-static void graph_replace_rgb(pd_canvas_t *des, pd_rect_t des_rect,
+static void canvas_replace_rgb(pd_canvas_t *des, pd_rect_t des_rect,
 			     const pd_canvas_t *src, int src_x, int src_y)
 {
 	int y;
@@ -266,28 +266,28 @@ static void graph_replace_rgb(pd_canvas_t *des, pd_rect_t des_rect,
 	}
 }
 
-#define graph_mix_rgb graph_replace_rgb
+#define canvas_mix_rgb canvas_replace_rgb
 
-static int graph_horiz_flip_rgb(const pd_canvas_t *graph, pd_canvas_t *buff)
+static int canvas_horiz_flip_rgb(const pd_canvas_t *canvas, pd_canvas_t *buff)
 {
 	int x, y;
 	size_t n_bytes;
 	pd_rect_t rect;
 	uchar_t *byte_src, *byte_des;
 
-	if (!pd_graph_is_valid(graph)) {
+	if (!pd_canvas_is_valid(canvas)) {
 		return -1;
 	}
-	pd_graph_get_valid_rect(graph, &rect);
-	graph = pd_graph_get_quote(graph);
-	buff->color_type = graph->color_type;
-	if (0 != pd_graph_create(buff, rect.width, rect.height)) {
+	pd_canvas_get_valid_rect(canvas, &rect);
+	canvas = pd_canvas_get_quote(canvas);
+	buff->color_type = canvas->color_type;
+	if (0 != pd_canvas_create(buff, rect.width, rect.height)) {
 		return -2;
 	}
 
 	for (y = 0; y < rect.height; ++y) {
 		byte_des = buff->bytes + y * buff->bytes_per_row;
-		n_bytes = (rect.y + y) * graph->bytes_per_row;
+		n_bytes = (rect.y + y) * canvas->bytes_per_row;
 		n_bytes += (rect.x + rect.width - 1) * 3;
 		byte_src = buff->bytes + n_bytes;
 		for (x = 0; x < rect.width; ++x) {
@@ -299,31 +299,31 @@ static int graph_horiz_flip_rgb(const pd_canvas_t *graph, pd_canvas_t *buff)
 	return 0;
 }
 
-static int graph_verti_flip_rgb(const pd_canvas_t *graph, pd_canvas_t *buff)
+static int canvas_verti_flip_rgb(const pd_canvas_t *canvas, pd_canvas_t *buff)
 {
 	int y;
 	pd_rect_t rect;
 	uchar_t *byte_src, *byte_des;
 
-	if (!pd_graph_is_valid(graph)) {
+	if (!pd_canvas_is_valid(canvas)) {
 		return -1;
 	}
-	pd_graph_get_valid_rect(graph, &rect);
-	graph = pd_graph_get_quote(graph);
-	buff->opacity = graph->opacity;
-	buff->color_type = graph->color_type;
-	if (0 != pd_graph_create(buff, rect.width, rect.height)) {
+	pd_canvas_get_valid_rect(canvas, &rect);
+	canvas = pd_canvas_get_quote(canvas);
+	buff->opacity = canvas->opacity;
+	buff->color_type = canvas->color_type;
+	if (0 != pd_canvas_create(buff, rect.width, rect.height)) {
 		return -2;
 	}
 	/* 引用最后一行像素 */
-	byte_src = graph->bytes;
-	byte_src += (rect.y + rect.height - 1) * graph->bytes_per_row;
-	byte_src += rect.x * graph->bytes_per_pixel;
+	byte_src = canvas->bytes;
+	byte_src += (rect.y + rect.height - 1) * canvas->bytes_per_row;
+	byte_src += rect.x * canvas->bytes_per_pixel;
 	byte_des = buff->bytes;
 	/* 交换上下每行像素 */
 	for (y = 0; y < rect.height; ++y) {
 		memcpy(byte_des, byte_src, buff->bytes_per_row);
-		byte_src -= graph->bytes_per_row;
+		byte_src -= canvas->bytes_per_row;
 		byte_des += buff->bytes_per_row;
 	}
 	return 0;
@@ -331,9 +331,9 @@ static int graph_verti_flip_rgb(const pd_canvas_t *graph, pd_canvas_t *buff)
 
 typedef struct pd_context_t {  
     pd_rect_t rect;       /**< 允许绘制的区域 */
-    pd_bool_t is_valid;
-    pd_bool_t is_writable;
-    pd_bool_t with_alpha; /**< 绘制时是否需要处理 alpha 通道 */
+    pd_bool is_valid;
+    pd_bool is_writable;
+    pd_bool with_alpha; /**< 绘制时是否需要处理 alpha 通道 */
     union {
         pd_canvas_t *source;
         const pd_canvas_t *source_ro;
@@ -341,21 +341,21 @@ typedef struct pd_context_t {
 } pd_context_t;
 
 
-static int graph_fill_rect_rgb(pd_canvas_t *graph, pd_color_t color,
+static int canvas_fill_rect_rgb(pd_canvas_t *canvas, pd_color_t color,
 			     pd_rect_t rect)
 {
 	int x, y;
-	pd_canvas_t canvas;
+	pd_canvas_t canvas_buff;
 	uchar_t *rowbytep, *bytep;
 
-	if (!pd_graph_is_valid(graph)) {
+	if (!pd_canvas_is_valid(canvas)) {
 		return -1;
 	}
-	pd_graph_quote(&canvas, graph, &rect);
-	pd_graph_get_valid_rect(&canvas, &rect);
-	graph = pd_graph_get_quote(&canvas);
-	rowbytep = graph->bytes + rect.y * graph->bytes_per_row;
-	rowbytep += rect.x * graph->bytes_per_pixel;
+	pd_canvas_quote(&canvas_buff, canvas, &rect);
+	pd_canvas_get_valid_rect(&canvas_buff, &rect);
+	canvas = pd_canvas_get_quote(&canvas_buff);
+	rowbytep = canvas->bytes + rect.y * canvas->bytes_per_row;
+	rowbytep += rect.x * canvas->bytes_per_pixel;
 	for (y = 0; y < rect.height; ++y) {
 		bytep = rowbytep;
 		for (x = 0; x < rect.width; ++x) {
@@ -363,7 +363,7 @@ static int graph_fill_rect_rgb(pd_canvas_t *graph, pd_color_t color,
 			*bytep++ = color.green;
 			*bytep++ = color.red;
 		}
-		rowbytep += graph->bytes_per_row;
+		rowbytep += canvas->bytes_per_row;
 	}
 	return 0;
 }
@@ -372,55 +372,55 @@ static int graph_fill_rect_rgb(pd_canvas_t *graph, pd_color_t color,
 
 /*---------------------------------- ARGB ----------------------------------*/
 
-static int graph_argb_to_rgb(pd_canvas_t *graph)
+static int canvas_argb_to_rgb(pd_canvas_t *canvas)
 {
 	size_t x, y;
 	pd_color_t *px_src, *px_row_src;
 	uchar_t *buffer, *byte_row_des, *byte_des;
 
-	graph->mem_size = sizeof(uchar_t) * graph->width * graph->height * 3;
-	buffer = malloc(graph->mem_size);
+	canvas->mem_size = sizeof(uchar_t) * canvas->width * canvas->height * 3;
+	buffer = malloc(canvas->mem_size);
 	if (!buffer) {
 		return -1;
 	}
 	byte_row_des = buffer;
-	px_row_src = graph->argb;
-	for (y = 0; y < graph->height; ++y) {
+	px_row_src = canvas->argb;
+	for (y = 0; y < canvas->height; ++y) {
 		px_src = px_row_src;
 		byte_des = byte_row_des;
-		for (x = 0; x < graph->width; ++x) {
+		for (x = 0; x < canvas->width; ++x) {
 			px_src->b = *byte_des++;
 			px_src->g = *byte_des++;
 			px_src->r = *byte_des++;
 			px_src->a = 255;
 			++px_src;
 		}
-		byte_row_des += graph->bytes_per_row;
-		px_row_src += graph->width;
+		byte_row_des += canvas->bytes_per_row;
+		px_row_src += canvas->width;
 	}
-	free(graph->argb);
-	graph->bytes = buffer;
-	graph->color_type = PD_COLOR_TYPE_RGB888;
-	graph->bytes_per_pixel = 3;
+	free(canvas->argb);
+	canvas->bytes = buffer;
+	canvas->color_type = PD_COLOR_TYPE_RGB888;
+	canvas->bytes_per_pixel = 3;
 	return 0;
 }
 
-static int graph_cut_argb(const pd_canvas_t *graph, pd_rect_t rect,
+static int canvas_cut_argb(const pd_canvas_t *canvas, pd_rect_t rect,
 			 pd_canvas_t *buff)
 {
 	int x, y;
 	pd_color_t *pixel_src, *pixel_des;
 
-	buff->color_type = graph->color_type;
-	if (0 != pd_graph_create(buff, rect.width, rect.height)) {
+	buff->color_type = canvas->color_type;
+	if (0 != pd_canvas_create(buff, rect.width, rect.height)) {
 		return -1;
 	}
 
-	buff->opacity = graph->opacity;
+	buff->opacity = canvas->opacity;
 	for (y = 0; y < rect.height; ++y) {
 		pixel_des = buff->argb + y * buff->width;
-		pixel_src = graph->argb;
-		pixel_src += (rect.y + y) * graph->width + rect.x;
+		pixel_src = canvas->argb;
+		pixel_src += (rect.y + y) * canvas->width + rect.x;
 		for (x = 0; x < rect.width; ++x) {
 			*pixel_des++ = *pixel_src++;
 		}
@@ -432,7 +432,7 @@ static int graph_cut_argb(const pd_canvas_t *graph, pd_rect_t rect,
  * Existing alpha blending methods are inefficient and need to be optimized
  */
 
-static void graph_mix_argb_with_alpha(pd_canvas_t *dst, pd_rect_t des_rect,
+static void canvas_mix_argb_with_alpha(pd_canvas_t *dst, pd_rect_t des_rect,
 				   const pd_canvas_t *src, int src_x, int src_y)
 {
 	int x, y;
@@ -499,7 +499,7 @@ mix_with_opacity:
 	}
 }
 
-static void graph_mix_argb(pd_canvas_t *dest, pd_rect_t des_rect,
+static void canvas_mix_argb(pd_canvas_t *dest, pd_rect_t des_rect,
 			  const pd_canvas_t *src, int src_x, int src_y)
 {
 	int x, y;
@@ -515,7 +515,7 @@ static void graph_mix_argb(pd_canvas_t *dest, pd_rect_t des_rect,
 		px_src = px_row_src;
 		px_dest = px_row_des;
 		for (x = 0; x < des_rect.width; ++x) {
-			PIXEL_BLEND(px_dest, px_src, px_src->a);
+			pd_pixel_blend(px_dest, px_src, px_src->a);
 			++px_src;
 			++px_dest;
 		}
@@ -530,7 +530,7 @@ mix_with_opacity:
 		px_dest = px_row_des;
 		for (x = 0; x < des_rect.width; ++x) {
 			a = (uchar_t)(px_src->a * src->opacity);
-			PIXEL_BLEND(px_dest, px_src, a);
+			pd_pixel_blend(px_dest, px_src, a);
 			++px_src;
 			++px_dest;
 		}
@@ -539,7 +539,7 @@ mix_with_opacity:
 	}
 }
 
-static void graph_mix_argb_to_rgb(pd_canvas_t *des, pd_rect_t des_rect,
+static void canvas_mix_argb_to_rgb(pd_canvas_t *des, pd_rect_t des_rect,
 			       const pd_canvas_t *src, int src_x, int src_y)
 {
 	int x, y;
@@ -558,11 +558,11 @@ static void graph_mix_argb_to_rgb(pd_canvas_t *des, pd_rect_t des_rect,
 		px = px_row;
 		bytep = rowbytep;
 		for (x = 0; x < des_rect.width; ++x, ++px) {
-			*bytep = _ALPHA_BLEND(*bytep, px->b, px->a);
+			*bytep = _pd_alpha_blend(*bytep, px->b, px->a);
 			++bytep;
-			*bytep = _ALPHA_BLEND(*bytep, px->g, px->a);
+			*bytep = _pd_alpha_blend(*bytep, px->g, px->a);
 			++bytep;
-			*bytep = _ALPHA_BLEND(*bytep, px->r, px->a);
+			*bytep = _pd_alpha_blend(*bytep, px->r, px->a);
 			++bytep;
 		}
 		rowbytep += des->bytes_per_row;
@@ -576,11 +576,11 @@ mix_with_opacity:
 		bytep = rowbytep;
 		for (x = 0; x < des_rect.width; ++x, ++px) {
 			a = (uchar_t)(px->a * src->opacity);
-			*bytep = _ALPHA_BLEND(*bytep, px->b, a);
+			*bytep = _pd_alpha_blend(*bytep, px->b, a);
 			++bytep;
-			*bytep = _ALPHA_BLEND(*bytep, px->g, a);
+			*bytep = _pd_alpha_blend(*bytep, px->g, a);
 			++bytep;
-			*bytep = _ALPHA_BLEND(*bytep, px->r, a);
+			*bytep = _pd_alpha_blend(*bytep, px->r, a);
 			++bytep;
 		}
 		rowbytep += des->bytes_per_row;
@@ -588,7 +588,7 @@ mix_with_opacity:
 	}
 }
 
-static int graph_replace_argb(pd_canvas_t *des, pd_rect_t des_rect,
+static int canvas_replace_argb(pd_canvas_t *des, pd_rect_t des_rect,
 			     const pd_canvas_t *src, int src_x, int src_y)
 {
 	int x, y, row_size;
@@ -619,26 +619,26 @@ static int graph_replace_argb(pd_canvas_t *des, pd_rect_t des_rect,
 	return 0;
 }
 
-static int graph_horiz_flip_argb(const pd_canvas_t *graph, pd_canvas_t *buff)
+static int canvas_horiz_flip_argb(const pd_canvas_t *canvas, pd_canvas_t *buff)
 {
 	int x, y;
 	pd_rect_t rect;
 	pd_color_t *pixel_src, *pixel_des;
 
-	if (!pd_graph_is_valid(graph)) {
+	if (!pd_canvas_is_valid(canvas)) {
 		return -1;
 	}
-	pd_graph_get_valid_rect(graph, &rect);
-	graph = pd_graph_get_quote(graph);
-	buff->opacity = graph->opacity;
-	buff->color_type = graph->color_type;
-	if (0 != pd_graph_create(buff, rect.width, rect.height)) {
+	pd_canvas_get_valid_rect(canvas, &rect);
+	canvas = pd_canvas_get_quote(canvas);
+	buff->opacity = canvas->opacity;
+	buff->color_type = canvas->color_type;
+	if (0 != pd_canvas_create(buff, rect.width, rect.height)) {
 		return -2;
 	}
 
 	for (y = 0; y < rect.height; ++y) {
 		pixel_des = buff->argb + y * buff->width;
-		pixel_src = graph->argb + (rect.y + y) * graph->width;
+		pixel_src = canvas->argb + (rect.y + y) * canvas->width;
 		pixel_src += rect.x + rect.width - 1;
 		for (x = 0; x < rect.width; ++x) {
 			*pixel_des++ = *pixel_src--;
@@ -647,55 +647,55 @@ static int graph_horiz_flip_argb(const pd_canvas_t *graph, pd_canvas_t *buff)
 	return 0;
 }
 
-static int graph_veri_flip_argb(const pd_canvas_t *graph, pd_canvas_t *buff)
+static int canvas_veri_flip_argb(const pd_canvas_t *canvas, pd_canvas_t *buff)
 {
 	int y;
 	pd_rect_t rect;
 	uchar_t *byte_src, *byte_des;
 
-	if (!pd_graph_is_valid(graph)) {
+	if (!pd_canvas_is_valid(canvas)) {
 		return -1;
 	}
-	pd_graph_get_valid_rect(graph, &rect);
-	graph = pd_graph_get_quote(graph);
-	buff->opacity = graph->opacity;
-	buff->color_type = graph->color_type;
-	if (0 != pd_graph_create(buff, rect.width, rect.height)) {
+	pd_canvas_get_valid_rect(canvas, &rect);
+	canvas = pd_canvas_get_quote(canvas);
+	buff->opacity = canvas->opacity;
+	buff->color_type = canvas->color_type;
+	if (0 != pd_canvas_create(buff, rect.width, rect.height)) {
 		return -2;
 	}
-	byte_src = graph->bytes;
-	byte_src += (rect.y + rect.height - 1) * graph->bytes_per_row;
-	byte_src += rect.x * graph->bytes_per_pixel;
+	byte_src = canvas->bytes;
+	byte_src += (rect.y + rect.height - 1) * canvas->bytes_per_row;
+	byte_src += rect.x * canvas->bytes_per_pixel;
 	byte_des = buff->bytes;
 	for (y = 0; y < rect.height; ++y) {
 		memcpy(byte_des, byte_src, buff->bytes_per_row);
-		byte_src -= graph->bytes_per_row;
+		byte_src -= canvas->bytes_per_row;
 		byte_des += buff->bytes_per_row;
 	}
 	return 0;
 }
 
-static int graph_fill_rect_argb(pd_canvas_t *graph, pd_color_t color,
-			      pd_rect_t rect, pd_bool_t with_alpha)
+static int canvas_fill_rect_argb(pd_canvas_t *canvas, pd_color_t color,
+			      pd_rect_t rect, pd_bool with_alpha)
 {
 	int x, y;
-	pd_canvas_t canvas;
+	pd_canvas_t canvas_buff;
 	pd_color_t *pixel, *pixel_row;
 
-	if (!pd_graph_is_valid(graph)) {
+	if (!pd_canvas_is_valid(canvas)) {
 		return -1;
 	}
-	pd_graph_quote(&canvas, graph, &rect);
-	pd_graph_get_valid_rect(&canvas, &rect);
-	graph = pd_graph_get_quote(&canvas);
-	pixel_row = graph->argb + rect.y * graph->width + rect.x;
+	pd_canvas_quote(&canvas_buff, canvas, &rect);
+	pd_canvas_get_valid_rect(&canvas_buff, &rect);
+	canvas = pd_canvas_get_quote(&canvas_buff);
+	pixel_row = canvas->argb + rect.y * canvas->width + rect.x;
 	if (with_alpha) {
 		for (y = 0; y < rect.height; ++y) {
 			pixel = pixel_row;
 			for (x = 0; x < rect.width; ++x) {
 				*pixel++ = color;
 			}
-			pixel_row += graph->width;
+			pixel_row += canvas->width;
 		}
 	} else {
 		for (y = 0; y < rect.height; ++y) {
@@ -704,13 +704,13 @@ static int graph_fill_rect_argb(pd_canvas_t *graph, pd_color_t color,
 				color.alpha = pixel->alpha;
 				*pixel++ = color;
 			}
-			pixel_row += graph->width;
+			pixel_row += canvas->width;
 		}
 	}
 	return 0;
 }
 
-static uchar_t graph_bilinear_resampling_core(uchar_t a, uchar_t b, uchar_t c,
+static uchar_t canvas_bilinear_resampling_core(uchar_t a, uchar_t b, uchar_t c,
 					    uchar_t d, float dx, float dy)
 {
 	return (uchar_t)(a * (1 - dx) * (1 - dy) + b * (dx) * (1 - dy) +
@@ -719,16 +719,16 @@ static uchar_t graph_bilinear_resampling_core(uchar_t a, uchar_t b, uchar_t c,
 
 /*-------------------------------- End ARGB --------------------------------*/
 
-int pd_graph_set_color_type(pd_canvas_t *graph, int color_type)
+int pd_canvas_set_color_type(pd_canvas_t *canvas, int color_type)
 {
-	if (graph->color_type == color_type) {
+	if (canvas->color_type == color_type) {
 		return -1;
 	}
-	switch (graph->color_type) {
+	switch (canvas->color_type) {
 	case PD_COLOR_TYPE_ARGB8888:
 		switch (color_type) {
 		case PD_COLOR_TYPE_RGB888:
-			return graph_argb_to_rgb(graph);
+			return canvas_argb_to_rgb(canvas);
 		default:
 			break;
 		}
@@ -736,7 +736,7 @@ int pd_graph_set_color_type(pd_canvas_t *graph, int color_type)
 	case PD_COLOR_TYPE_RGB888:
 		switch (color_type) {
 		case PD_COLOR_TYPE_ARGB8888:
-			return graph_rgb_to_argb(graph);
+			return canvas_rgb_to_argb(canvas);
 		default:
 			break;
 		}
@@ -747,83 +747,83 @@ int pd_graph_set_color_type(pd_canvas_t *graph, int color_type)
 	return -2;
 }
 
-int pd_graph_create(pd_canvas_t *graph, unsigned width, unsigned height)
+int pd_canvas_create(pd_canvas_t *canvas, unsigned width, unsigned height)
 {
 	size_t size;
 	if (width > 10000 || height > 10000) {
-		Logger_Error("graph size is too large!");
+		Logger_Error("canvas size is too large!");
 		abort();
 	}
 	if (width < 1 || height < 1) {
-		pd_graph_free(graph);
+		pd_canvas_free(canvas);
 		return -1;
 	}
-	graph->bytes_per_pixel = get_pixel_size(graph->color_type);
-	graph->bytes_per_row = graph->bytes_per_pixel * width;
-	size = graph->bytes_per_row * height;
-	if (pd_graph_is_valid(graph)) {
+	canvas->bytes_per_pixel = get_pixel_size(canvas->color_type);
+	canvas->bytes_per_row = canvas->bytes_per_pixel * width;
+	size = canvas->bytes_per_row * height;
+	if (pd_canvas_is_valid(canvas)) {
 		/* 如果现有图形尺寸大于要创建的图形的尺寸，直接改尺寸即可 */
-		if (graph->mem_size >= size) {
-			memset(graph->bytes, 0, graph->mem_size);
-			graph->width = width;
-			graph->height = height;
+		if (canvas->mem_size >= size) {
+			memset(canvas->bytes, 0, canvas->mem_size);
+			canvas->width = width;
+			canvas->height = height;
 			return 0;
 		}
-		pd_graph_free(graph);
+		pd_canvas_free(canvas);
 	}
-	graph->mem_size = size;
-	graph->bytes = calloc(1, size);
-	if (!graph->bytes) {
-		graph->width = 0;
-		graph->height = 0;
+	canvas->mem_size = size;
+	canvas->bytes = calloc(1, size);
+	if (!canvas->bytes) {
+		canvas->width = 0;
+		canvas->height = 0;
 		return -2;
 	}
-	graph->width = width;
-	graph->height = height;
+	canvas->width = width;
+	canvas->height = height;
 	return 0;
 }
 
-pd_bool_t pd_graph_is_valid(const pd_canvas_t *graph)
+pd_bool pd_canvas_is_valid(const pd_canvas_t *canvas)
 {
-	if (graph->quote.is_valid) {
-		return graph->quote.source && graph->quote.source->width > 0 &&
-		       graph->quote.source->height > 0;
+	if (canvas->quote.is_valid) {
+		return canvas->quote.source && canvas->quote.source->width > 0 &&
+		       canvas->quote.source->height > 0;
 	}
-	return graph->bytes && graph->height > 0 && graph->width > 0;
+	return canvas->bytes && canvas->height > 0 && canvas->width > 0;
 }
 
-void pd_graph_copy(pd_canvas_t *des, const pd_canvas_t *src)
+void pd_canvas_copy(pd_canvas_t *des, const pd_canvas_t *src)
 {
-	const pd_canvas_t *graph;
-	if (!des || !pd_graph_is_valid(src)) {
+	const pd_canvas_t *canvas;
+	if (!des || !pd_canvas_is_valid(src)) {
 		return;
 	}
-	graph = pd_graph_get_quote(src);
-	des->color_type = graph->color_type;
+	canvas = pd_canvas_get_quote(src);
+	des->color_type = canvas->color_type;
 	/* 创建合适尺寸的Graph */
-	pd_graph_create(des, src->width, src->height);
-	pd_graph_replace(des, src, 0, 0);
+	pd_canvas_create(des, src->width, src->height);
+	pd_canvas_replace(des, src, 0, 0);
 	des->opacity = src->opacity;
 }
 
-void pd_graph_free(pd_canvas_t *graph)
+void pd_canvas_free(pd_canvas_t *canvas)
 {
 	/* 解除引用 */
-	if (graph && graph->quote.is_valid) {
-		graph->quote.source = NULL;
-		graph->quote.is_valid = FALSE;
+	if (canvas && canvas->quote.is_valid) {
+		canvas->quote.source = NULL;
+		canvas->quote.is_valid = FALSE;
 		return;
 	}
-	if (graph->bytes) {
-		free(graph->bytes);
-		graph->bytes = NULL;
+	if (canvas->bytes) {
+		free(canvas->bytes);
+		canvas->bytes = NULL;
 	}
-	graph->width = 0;
-	graph->height = 0;
-	graph->mem_size = 0;
+	canvas->width = 0;
+	canvas->height = 0;
+	canvas->mem_size = 0;
 }
 
-int pd_graph_quote_read_only(pd_canvas_t *self, const pd_canvas_t *source,
+int pd_canvas_quote_read_only(pd_canvas_t *self, const pd_canvas_t *source,
 			const pd_rect_t *rect)
 {
 	pd_rect_t quote_rect;
@@ -869,55 +869,55 @@ int pd_graph_quote_read_only(pd_canvas_t *self, const pd_canvas_t *source,
 	return 0;
 }
 
-int pd_graph_quote(pd_canvas_t *self, pd_canvas_t *source, const pd_rect_t *rect)
+int pd_canvas_quote(pd_canvas_t *self, pd_canvas_t *source, const pd_rect_t *rect)
 {
-	int ret = pd_graph_quote_read_only(self, source, rect);
+	int ret = pd_canvas_quote_read_only(self, source, rect);
 	self->quote.is_writable = TRUE;
 	return ret;
 }
 
-void pd_graph_get_valid_rect(const pd_canvas_t *graph, pd_rect_t *rect)
+void pd_canvas_get_valid_rect(const pd_canvas_t *canvas, pd_rect_t *rect)
 {
-	if (graph->quote.is_valid) {
-		rect->x = graph->quote.left;
-		rect->y = graph->quote.top;
+	if (canvas->quote.is_valid) {
+		rect->x = canvas->quote.left;
+		rect->y = canvas->quote.top;
 	} else {
 		rect->x = 0;
 		rect->y = 0;
 	}
-	rect->width = graph->width;
-	rect->height = graph->height;
+	rect->width = canvas->width;
+	rect->height = canvas->height;
 }
 
-int pd_graph_set_alpha_bits(pd_canvas_t *graph, uchar_t *a, size_t size)
+int pd_canvas_set_alpha_bits(pd_canvas_t *canvas, uchar_t *a, size_t size)
 {
 	size_t i;
-	if (size > (size_t)(graph->width * graph->height)) {
-		size = (size_t)(graph->width * graph->height);
+	if (size > (size_t)(canvas->width * canvas->height)) {
+		size = (size_t)(canvas->width * canvas->height);
 	}
-	if (graph->color_type != PD_COLOR_TYPE_ARGB) {
+	if (canvas->color_type != PD_COLOR_TYPE_ARGB) {
 		return -2;
 	}
 	for (i = 0; i < size; ++i) {
-		graph->argb[i].a = a[i];
+		canvas->argb[i].a = a[i];
 	}
 	return 0;
 }
 
-int pd_graph_set_red_bits(pd_canvas_t *graph, uchar_t *r, size_t size)
+int pd_canvas_set_red_bits(pd_canvas_t *canvas, uchar_t *r, size_t size)
 {
 	size_t i;
 	uchar_t *pByte;
 
-	if (size > (size_t)(graph->width * graph->height)) {
-		size = (size_t)(graph->width * graph->height);
+	if (size > (size_t)(canvas->width * canvas->height)) {
+		size = (size_t)(canvas->width * canvas->height);
 	}
-	if (graph->color_type == PD_COLOR_TYPE_ARGB) {
+	if (canvas->color_type == PD_COLOR_TYPE_ARGB) {
 		for (i = 0; i < size; ++i) {
-			graph->argb[i].r = r[i];
+			canvas->argb[i].r = r[i];
 		}
 	} else {
-		pByte = graph->bytes + 2;
+		pByte = canvas->bytes + 2;
 		for (i = 0; i < size; ++i) {
 			*pByte = r[i];
 			pByte += 3;
@@ -926,20 +926,20 @@ int pd_graph_set_red_bits(pd_canvas_t *graph, uchar_t *r, size_t size)
 	return 0;
 }
 
-int pd_graph_set_green_bits(pd_canvas_t *graph, uchar_t *g, size_t size)
+int pd_canvas_set_green_bits(pd_canvas_t *canvas, uchar_t *g, size_t size)
 {
 	size_t i;
 	uchar_t *pByte;
 
-	if (size > (size_t)(graph->width * graph->height)) {
-		size = (size_t)(graph->width * graph->height);
+	if (size > (size_t)(canvas->width * canvas->height)) {
+		size = (size_t)(canvas->width * canvas->height);
 	}
-	if (graph->color_type == PD_COLOR_TYPE_ARGB) {
+	if (canvas->color_type == PD_COLOR_TYPE_ARGB) {
 		for (i = 0; i < size; ++i) {
-			graph->argb[i].g = g[i];
+			canvas->argb[i].g = g[i];
 		}
 	} else {
-		pByte = graph->bytes + 1;
+		pByte = canvas->bytes + 1;
 		for (i = 0; i < size; ++i) {
 			*pByte = g[i];
 			pByte += 3;
@@ -948,20 +948,20 @@ int pd_graph_set_green_bits(pd_canvas_t *graph, uchar_t *g, size_t size)
 	return 0;
 }
 
-int pd_graph_set_blue_bits(pd_canvas_t *graph, uchar_t *b, size_t size)
+int pd_canvas_set_blue_bits(pd_canvas_t *canvas, uchar_t *b, size_t size)
 {
 	size_t i;
 	uchar_t *pByte;
 
-	if (size > (size_t)(graph->width * graph->height)) {
-		size = (size_t)(graph->width * graph->height);
+	if (size > (size_t)(canvas->width * canvas->height)) {
+		size = (size_t)(canvas->width * canvas->height);
 	}
-	if (graph->color_type == PD_COLOR_TYPE_ARGB) {
+	if (canvas->color_type == PD_COLOR_TYPE_ARGB) {
 		for (i = 0; i < size; ++i) {
-			graph->argb[i].b = b[i];
+			canvas->argb[i].b = b[i];
 		}
 	} else {
-		pByte = graph->bytes;
+		pByte = canvas->bytes;
 		for (i = 0; i < size; ++i) {
 			*pByte = b[i];
 			pByte += 3;
@@ -970,18 +970,18 @@ int pd_graph_set_blue_bits(pd_canvas_t *graph, uchar_t *b, size_t size)
 	return 0;
 }
 
-int pd_graph_zoom(const pd_canvas_t *graph, pd_canvas_t *buff, pd_bool_t keep_scale,
+int pd_canvas_zoom(const pd_canvas_t *canvas, pd_canvas_t *buff, pd_bool keep_scale,
 	       int width, int height)
 {
 	pd_rect_t rect;
 	int x, y, src_x, src_y;
 	double scale_x = 0.0, scale_y = 0.0;
-	if (!pd_graph_is_valid(graph) || (width <= 0 && height <= 0)) {
+	if (!pd_canvas_is_valid(canvas) || (width <= 0 && height <= 0)) {
 		return -1;
 	}
 	/* 获取引用的有效区域，以及指向引用的对象的指针 */
-	pd_graph_get_valid_rect(graph, &rect);
-	graph = pd_graph_get_quote(graph);
+	pd_canvas_get_valid_rect(canvas, &rect);
+	canvas = pd_canvas_get_quote(canvas);
 	if (width > 0) {
 		scale_x = 1.0 * rect.width / width;
 	}
@@ -990,11 +990,11 @@ int pd_graph_zoom(const pd_canvas_t *graph, pd_canvas_t *buff, pd_bool_t keep_sc
 	}
 	if (width <= 0) {
 		scale_x = scale_y;
-		width = (int)(0.5 + 1.0 * graph->width / scale_x);
+		width = (int)(0.5 + 1.0 * canvas->width / scale_x);
 	}
 	if (height <= 0) {
 		scale_y = scale_x;
-		height = (int)(0.5 + 1.0 * graph->height / scale_y);
+		height = (int)(0.5 + 1.0 * canvas->height / scale_y);
 	}
 	/* 如果保持宽高比 */
 	if (keep_scale) {
@@ -1004,16 +1004,16 @@ int pd_graph_zoom(const pd_canvas_t *graph, pd_canvas_t *buff, pd_bool_t keep_sc
 			scale_x = scale_y;
 		}
 	}
-	buff->color_type = graph->color_type;
-	if (pd_graph_create(buff, width, height) < 0) {
+	buff->color_type = canvas->color_type;
+	if (pd_canvas_create(buff, width, height) < 0) {
 		return -2;
 	}
-	if (graph->color_type == PD_COLOR_TYPE_ARGB) {
+	if (canvas->color_type == PD_COLOR_TYPE_ARGB) {
 		pd_color_t *px_src, *px_des, *px_row_src;
 		for (y = 0; y < height; ++y) {
 			src_y = (int)(y * scale_y);
-			px_row_src = graph->argb;
-			px_row_src += (src_y + rect.y) * graph->width + rect.x;
+			px_row_src = canvas->argb;
+			px_row_src += (src_y + rect.y) * canvas->width + rect.x;
 			px_des = buff->argb + y * width;
 			for (x = 0; x < width; ++x) {
 				src_x = (int)(x * scale_x);
@@ -1025,13 +1025,13 @@ int pd_graph_zoom(const pd_canvas_t *graph, pd_canvas_t *buff, pd_bool_t keep_sc
 		uchar_t *byte_src, *byte_des, *byte_row_src;
 		for (y = 0; y < height; ++y) {
 			src_y = (int)(y * scale_y);
-			byte_row_src = graph->bytes;
-			byte_row_src += (src_y + rect.y) * graph->bytes_per_row;
-			byte_row_src += rect.x * graph->bytes_per_pixel;
+			byte_row_src = canvas->bytes;
+			byte_row_src += (src_y + rect.y) * canvas->bytes_per_row;
+			byte_row_src += rect.x * canvas->bytes_per_pixel;
 			byte_des = buff->bytes + y * buff->bytes_per_row;
 			for (x = 0; x < width; ++x) {
 				src_x = (int)(x * scale_x);
-				src_x *= graph->bytes_per_pixel;
+				src_x *= canvas->bytes_per_pixel;
 				byte_src = byte_row_src + src_x;
 				*byte_des++ = *byte_src++;
 				*byte_des++ = *byte_src++;
@@ -1042,8 +1042,8 @@ int pd_graph_zoom(const pd_canvas_t *graph, pd_canvas_t *buff, pd_bool_t keep_sc
 	return 0;
 }
 
-int pd_graph_zoom_bilinear(const pd_canvas_t *graph, pd_canvas_t *buff,
-		       pd_bool_t keep_scale, int width, int height)
+int pd_canvas_zoom_bilinear(const pd_canvas_t *canvas, pd_canvas_t *buff,
+		       pd_bool keep_scale, int width, int height)
 {
 	pd_rect_t rect;
 	pd_color_t a, b, c, d, t_color;
@@ -1052,19 +1052,19 @@ int pd_graph_zoom_bilinear(const pd_canvas_t *graph, pd_canvas_t *buff,
 	float x_diff, y_diff;
 	double scale_x = 0.0, scale_y = 0.0;
 
-	if (graph->color_type != PD_COLOR_TYPE_RGB &&
-	    graph->color_type != PD_COLOR_TYPE_ARGB) {
+	if (canvas->color_type != PD_COLOR_TYPE_RGB &&
+	    canvas->color_type != PD_COLOR_TYPE_ARGB) {
 		/* fall back to nearest scaling */
-		Logger_Debug("[graph] unable to perform bilinear scaling, "
+		Logger_Debug("[canvas] unable to perform bilinear scaling, "
 			     "fallback...\n");
-		return pd_graph_zoom(graph, buff, keep_scale, width, height);
+		return pd_canvas_zoom(canvas, buff, keep_scale, width, height);
 	}
-	if (!pd_graph_is_valid(graph) || (width <= 0 && height <= 0)) {
+	if (!pd_canvas_is_valid(canvas) || (width <= 0 && height <= 0)) {
 		return -1;
 	}
 	/* 获取引用的有效区域，以及指向引用的对象的指针 */
-	pd_graph_get_valid_rect(graph, &rect);
-	graph = pd_graph_get_quote(graph);
+	pd_canvas_get_valid_rect(canvas, &rect);
+	canvas = pd_canvas_get_quote(canvas);
 	if (width > 0) {
 		scale_x = 1.0 * rect.width / width;
 	}
@@ -1073,11 +1073,11 @@ int pd_graph_zoom_bilinear(const pd_canvas_t *graph, pd_canvas_t *buff,
 	}
 	if (width <= 0) {
 		scale_x = scale_y;
-		width = (int)(0.5 + 1.0 * graph->width / scale_x);
+		width = (int)(0.5 + 1.0 * canvas->width / scale_x);
 	}
 	if (height <= 0) {
 		scale_y = scale_x;
-		height = (int)(0.5 + 1.0 * graph->height / scale_y);
+		height = (int)(0.5 + 1.0 * canvas->height / scale_y);
 	}
 	/* 如果保持宽高比 */
 	if (keep_scale) {
@@ -1087,8 +1087,8 @@ int pd_graph_zoom_bilinear(const pd_canvas_t *graph, pd_canvas_t *buff,
 			scale_x = scale_y;
 		}
 	}
-	buff->color_type = graph->color_type;
-	if (pd_graph_create(buff, width, height) < 0) {
+	buff->color_type = canvas->color_type;
+	if (pd_canvas_create(buff, width, height) < 0) {
 		return -2;
 	}
 	for (i = 0; i < height; i++) {
@@ -1106,138 +1106,138 @@ int pd_graph_zoom_bilinear(const pd_canvas_t *graph, pd_canvas_t *buff,
 			y = (int)(scale_y * i);
 			x_diff = (float)((scale_x * j) - x);
 			y_diff = (float)((scale_y * i) - y);
-			graph_get_pixel(graph, x + rect.x + 0, y + rect.y + 0,
+			pd_canvas_get_pixel(canvas, x + rect.x + 0, y + rect.y + 0,
 				       a);
-			graph_get_pixel(graph, x + rect.x + 1, y + rect.y + 0,
+			pd_canvas_get_pixel(canvas, x + rect.x + 1, y + rect.y + 0,
 				       b);
-			graph_get_pixel(graph, x + rect.x + 0, y + rect.y + 1,
+			pd_canvas_get_pixel(canvas, x + rect.x + 0, y + rect.y + 1,
 				       c);
-			graph_get_pixel(graph, x + rect.x + 1, y + rect.y + 1,
+			pd_canvas_get_pixel(canvas, x + rect.x + 1, y + rect.y + 1,
 				       d);
-			t_color.b = graph_bilinear_resampling_core(
+			t_color.b = canvas_bilinear_resampling_core(
 			    a.b, b.b, c.b, d.b, x_diff, y_diff);
-			t_color.g = graph_bilinear_resampling_core(
+			t_color.g = canvas_bilinear_resampling_core(
 			    a.g, b.g, c.g, d.g, x_diff, y_diff);
-			t_color.r = graph_bilinear_resampling_core(
+			t_color.r = canvas_bilinear_resampling_core(
 			    a.r, b.r, c.r, d.r, x_diff, y_diff);
-			t_color.a = graph_bilinear_resampling_core(
+			t_color.a = canvas_bilinear_resampling_core(
 			    a.a, b.a, c.a, d.a, x_diff, y_diff);
-			graph_set_pixel(buff, j, i, t_color);
+			pd_canvas_set_pixel(buff, j, i, t_color);
 		}
 	}
 	return 0;
 }
 
-int pd_graph_cut(const pd_canvas_t *graph, pd_rect_t rect, pd_canvas_t *buff)
+int pd_canvas_cut(const pd_canvas_t *canvas, pd_rect_t rect, pd_canvas_t *buff)
 {
-	if (!pd_graph_is_valid(graph)) {
+	if (!pd_canvas_is_valid(canvas)) {
 		return -2;
 	}
-	pd_rect_validate_area(&rect, graph->width, graph->height);
+	pd_rect_validate_area(&rect, canvas->width, canvas->height);
 	if (rect.width <= 0 || rect.height <= 0) {
 		return -3;
 	}
-	switch (graph->color_type) {
+	switch (canvas->color_type) {
 	case PD_COLOR_TYPE_ARGB8888:
-		return graph_cut_argb(graph, rect, buff);
+		return canvas_cut_argb(canvas, rect, buff);
 	case PD_COLOR_TYPE_RGB888:
-		return graph_cut_rgb(graph, rect, buff);
+		return canvas_cut_rgb(canvas, rect, buff);
 	default:
 		break;
 	}
 	return -4;
 }
 
-int pd_graph_horzi_flip(const pd_canvas_t *graph, pd_canvas_t *buff)
+int pd_canvas_horzi_flip(const pd_canvas_t *canvas, pd_canvas_t *buff)
 {
-	switch (graph->color_type) {
+	switch (canvas->color_type) {
 	case PD_COLOR_TYPE_RGB888:
-		return graph_horiz_flip_rgb(graph, buff);
+		return canvas_horiz_flip_rgb(canvas, buff);
 	case PD_COLOR_TYPE_ARGB8888:
-		return graph_horiz_flip_argb(graph, buff);
+		return canvas_horiz_flip_argb(canvas, buff);
 	default:
 		break;
 	}
 	return -1;
 }
 
-int pd_graph_verti_flip(const pd_canvas_t *graph, pd_canvas_t *buff)
+int pd_canvas_verti_flip(const pd_canvas_t *canvas, pd_canvas_t *buff)
 {
-	switch (graph->color_type) {
+	switch (canvas->color_type) {
 	case PD_COLOR_TYPE_RGB888:
-		return graph_verti_flip_rgb(graph, buff);
+		return canvas_verti_flip_rgb(canvas, buff);
 	case PD_COLOR_TYPE_ARGB8888:
-		return graph_veri_flip_argb(graph, buff);
+		return canvas_veri_flip_argb(canvas, buff);
 	default:
 		break;
 	}
 	return -1;
 }
 
-int pd_graph_fill_rect(pd_canvas_t *graph, pd_color_t color, pd_rect_t *rect,
-		   pd_bool_t with_alpha)
+int pd_canvas_fill_rect(pd_canvas_t *canvas, pd_color_t color, pd_rect_t *rect,
+		   pd_bool with_alpha)
 {
 	pd_rect_t rect2;
 	if (rect) {
 		rect2 = *rect;
 	} else {
 		rect2.x = rect2.y = 0;
-		rect2.width = graph->width;
-		rect2.height = graph->height;
+		rect2.width = canvas->width;
+		rect2.height = canvas->height;
 	}
-	switch (graph->color_type) {
+	switch (canvas->color_type) {
 	case PD_COLOR_TYPE_RGB888:
-		return graph_fill_rect_rgb(graph, color, rect2);
+		return canvas_fill_rect_rgb(canvas, color, rect2);
 	case PD_COLOR_TYPE_ARGB8888:
-		return graph_fill_rect_argb(graph, color, rect2, with_alpha);
+		return canvas_fill_rect_argb(canvas, color, rect2, with_alpha);
 	default:
 		break;
 	}
 	return -1;
 }
 
-int pd_graph_fill_alpha(pd_canvas_t *graph, uchar_t alpha)
+int pd_canvas_fill_alpha(pd_canvas_t *canvas, uchar_t alpha)
 {
 	int x, y;
 	pd_rect_t rect;
 	pd_color_t *pixel, *pixel_row;
 
-	pd_graph_get_valid_rect(graph, &rect);
-	graph = pd_graph_get_quote(graph);
-	if (!pd_graph_is_valid(graph)) {
+	pd_canvas_get_valid_rect(canvas, &rect);
+	canvas = pd_canvas_get_quote(canvas);
+	if (!pd_canvas_is_valid(canvas)) {
 		return -1;
 	}
-	if (!Graph_HasAlpha(graph)) {
+	if (!Graph_HasAlpha(canvas)) {
 		return -2;
 	}
-	pixel_row = graph->argb + rect.y * graph->width + rect.x;
+	pixel_row = canvas->argb + rect.y * canvas->width + rect.x;
 	for (y = 0; y < rect.height; ++y) {
 		pixel = pixel_row;
 		for (x = 0; x < rect.width; ++x) {
 			pixel->alpha = alpha;
 			++pixel;
 		}
-		pixel_row += graph->width;
+		pixel_row += canvas->width;
 	}
 	return 0;
 }
 
-int pd_graph_tile(pd_canvas_t *buff, const pd_canvas_t *graph, pd_bool_t replace,
-	       pd_bool_t with_alpha)
+int pd_canvas_tile(pd_canvas_t *buff, const pd_canvas_t *canvas, pd_bool replace,
+	       pd_bool with_alpha)
 {
 	int ret = 0;
 	unsigned x, y;
 
-	if (!pd_graph_is_valid(graph) || !pd_graph_is_valid(buff)) {
+	if (!pd_canvas_is_valid(canvas) || !pd_canvas_is_valid(buff)) {
 		return -1;
 	}
-	for (y = 0; y < buff->height; y += graph->height) {
-		for (x = 0; x < buff->width; x += graph->width) {
+	for (y = 0; y < buff->height; y += canvas->height) {
+		for (x = 0; x < buff->width; x += canvas->width) {
 			if (replace) {
-				ret += pd_graph_replace(buff, graph, y, x);
+				ret += pd_canvas_replace(buff, canvas, y, x);
 				continue;
 			}
-			ret += pd_graph_mix(buff, graph, y, x, with_alpha);
+			ret += pd_canvas_mix(buff, canvas, y, x, with_alpha);
 		}
 	}
 	return ret;
@@ -1245,14 +1245,14 @@ int pd_graph_tile(pd_canvas_t *buff, const pd_canvas_t *graph, pd_bool_t replace
 
 typedef void (*MixerPtr)(pd_canvas_t *, pd_rect_t, const pd_canvas_t *, int, int);
 
-int pd_graph_mix(pd_canvas_t *back, const pd_canvas_t *fore, int left, int top,
-	      pd_bool_t with_alpha)
+int pd_canvas_mix(pd_canvas_t *back, const pd_canvas_t *fore, int left, int top,
+	      pd_bool with_alpha)
 {
 	pd_canvas_t w_slot;
 	pd_rect_t r_rect, w_rect;
 	MixerPtr mixer = NULL;
 
-	if (!Graph_IsWritable(back) || !pd_graph_is_valid(fore)) {
+	if (!pd_canvas_is_writable(back) || !pd_canvas_is_valid(fore)) {
 		return -1;
 	}
 	w_rect.x = left;
@@ -1264,10 +1264,10 @@ int pd_graph_mix(pd_canvas_t *back, const pd_canvas_t *fore, int left, int top,
 	w_rect.y += r_rect.y;
 	w_rect.width = r_rect.width;
 	w_rect.height = r_rect.height;
-	pd_graph_quote(&w_slot, back, &w_rect);
+	pd_canvas_quote(&w_slot, back, &w_rect);
 	/* 获取实际操作区域 */
-	pd_graph_get_valid_rect(&w_slot, &w_rect);
-	pd_graph_get_valid_rect(fore, &r_rect);
+	pd_canvas_get_valid_rect(&w_slot, &w_rect);
+	pd_canvas_get_valid_rect(fore, &r_rect);
 	if (w_rect.width <= 0 || w_rect.height <= 0 || r_rect.width <= 0 ||
 	    r_rect.height <= 0) {
 		return -2;
@@ -1275,24 +1275,24 @@ int pd_graph_mix(pd_canvas_t *back, const pd_canvas_t *fore, int left, int top,
 	top = r_rect.y;
 	left = r_rect.x;
 	/* 获取引用的源图像 */
-	fore = pd_graph_get_quote(fore);
-	back = pd_graph_get_quote(back);
+	fore = pd_canvas_get_quote(fore);
+	back = pd_canvas_get_quote(back);
 	switch (fore->color_type) {
 	case PD_COLOR_TYPE_RGB888:
 		if (back->color_type == PD_COLOR_TYPE_RGB888) {
-			mixer = graph_replace_rgb;
+			mixer = canvas_replace_rgb;
 		} else {
-			mixer = graph_replace_to_argb;
+			mixer = canvas_replace_to_argb;
 		}
 		break;
 	case PD_COLOR_TYPE_ARGB8888:
 		if (back->color_type == PD_COLOR_TYPE_RGB888) {
-			mixer = graph_mix_argb_to_rgb;
+			mixer = canvas_mix_argb_to_rgb;
 		} else {
 			if (with_alpha) {
-				mixer = graph_mix_argb_with_alpha;
+				mixer = canvas_mix_argb_with_alpha;
 			} else {
-				mixer = graph_mix_argb;
+				mixer = canvas_mix_argb;
 			}
 		}
 	default:
@@ -1305,35 +1305,35 @@ int pd_graph_mix(pd_canvas_t *back, const pd_canvas_t *fore, int left, int top,
 	return -3;
 }
 
-int pd_graph_replace(pd_canvas_t *back, const pd_canvas_t *fore, int left, int top)
+int pd_canvas_replace(pd_canvas_t *back, const pd_canvas_t *fore, int left, int top)
 {
 	pd_canvas_t write_slot;
 	pd_rect_t read_rect, write_rect;
 
-	if (!Graph_IsWritable(back) || !pd_graph_is_valid(fore)) {
+	if (!pd_canvas_is_writable(back) || !pd_canvas_is_valid(fore)) {
 		return -1;
 	}
 	write_rect.x = left;
 	write_rect.y = top;
 	write_rect.width = fore->width;
 	write_rect.height = fore->height;
-	pd_graph_quote(&write_slot, back, &write_rect);
-	pd_graph_get_valid_rect(&write_slot, &write_rect);
-	pd_graph_get_valid_rect(fore, &read_rect);
+	pd_canvas_quote(&write_slot, back, &write_rect);
+	pd_canvas_get_valid_rect(&write_slot, &write_rect);
+	pd_canvas_get_valid_rect(fore, &read_rect);
 	if (write_rect.width <= 0 || write_rect.height <= 0 ||
 	    read_rect.width <= 0 || read_rect.height <= 0) {
 		return -2;
 	}
 	left = read_rect.x;
 	top = read_rect.y;
-	fore = pd_graph_get_quote(fore);
-	back = pd_graph_get_quote(back);
+	fore = pd_canvas_get_quote(fore);
+	back = pd_canvas_get_quote(back);
 	switch (fore->color_type) {
 	case PD_COLOR_TYPE_RGB888:
-		graph_replace_rgb(back, write_rect, fore, left, top);
+		canvas_replace_rgb(back, write_rect, fore, left, top);
 		break;
 	case PD_COLOR_TYPE_ARGB8888:
-		graph_replace_argb(back, write_rect, fore, left, top);
+		canvas_replace_argb(back, write_rect, fore, left, top);
 	default:
 		break;
 	}

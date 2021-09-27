@@ -15,9 +15,9 @@ int main(void)
 	LCUI_InitFontLibrary();
 
 	/* 创建一个画布，并填充背景为灰色 */
-	pd_graph_init(&img);
-	pd_graph_create(&img, 100, 100);
-	pd_graph_fill_rect(&img, bg, NULL, FALSE);
+	pd_canvas_init(&img);
+	pd_canvas_create(&img, 100, 100);
+	pd_canvas_fill_rect(&img, bg, NULL, FALSE);
 
 	/* 载入字体文件 */
 	ret = LCUIFont_LoadFile("C:/Windows/fonts/simsun.ttc");
@@ -37,7 +37,7 @@ int main(void)
 		LCUI_WritePNGFile("test_char_render.png", &img);
 		/* 释放内存资源 */
 		FontBitmap_Free(&bmp);
-		pd_graph_free(&img);
+		pd_canvas_free(&img);
 		break;
 	}
 

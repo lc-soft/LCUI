@@ -53,7 +53,7 @@ void LCUI_SetLinuxX11MainWindow(Window win)
 	XFlush(x11.display);
 }
 
-static pd_bool_t X11_WaitEvent(void)
+static LCUI_BOOL X11_WaitEvent(void)
 {
 	int fd;
 	fd_set fdset;
@@ -73,7 +73,7 @@ static pd_bool_t X11_WaitEvent(void)
 	return FALSE;
 }
 
-static pd_bool_t X11_DispatchEvent(void)
+static LCUI_BOOL X11_DispatchEvent(void)
 {
 	XEvent xevent;
 	if (!XEventsQueued(x11.display, QueuedAlready)) {

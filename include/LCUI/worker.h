@@ -43,7 +43,7 @@ LCUI_API void LCUIWorker_PostTask(LCUI_Worker worker, LCUI_Task task);
 
 LCUI_API LCUI_Task LCUIWorker_GetTask(LCUI_Worker worker);
 
-LCUI_API pd_bool_t LCUIWorker_RunTask(LCUI_Worker worker);
+LCUI_API LCUI_BOOL LCUIWorker_RunTask(LCUI_Worker worker);
 
 LCUI_API int LCUIWorker_RunAsync(LCUI_Worker worker);
 

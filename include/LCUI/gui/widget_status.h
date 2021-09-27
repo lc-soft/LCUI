@@ -35,14 +35,14 @@ LCUI_BEGIN_HEADER
 
 LCUI_API int Widget_AddStatus(LCUI_Widget w, const char *status_name);
 
-LCUI_API pd_bool_t Widget_HasStatus(LCUI_Widget w, const char *status_name);
+LCUI_API LCUI_BOOL Widget_HasStatus(LCUI_Widget w, const char *status_name);
 
 LCUI_API int Widget_RemoveStatus(LCUI_Widget w, const char *status_name);
 
 LCUI_API void Widget_UpdateStatus(LCUI_Widget widget);
 
 /** 设置部件是否禁用 */
-LCUI_API void Widget_SetDisabled(LCUI_Widget w, pd_bool_t disabled);
+LCUI_API void Widget_SetDisabled(LCUI_Widget w, LCUI_BOOL disabled);
 
 LCUI_API void Widget_DestroyStatus(LCUI_Widget w);
 

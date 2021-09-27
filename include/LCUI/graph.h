@@ -1,5 +1,5 @@
 ﻿/*
- * graph.h -- The base graphics handling module for LCUI
+ * canvas.h -- The base graphics handling module for LCUI
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
@@ -38,19 +38,19 @@ LCUI_BEGIN_HEADER
 #endif
 
 /* 将两个像素点的颜色值进行alpha混合 */
-#define _ALPHA_BLEND(__back__, __fore__, __alpha__) \
+#define _pd_alpha_blend(__back__, __fore__, __alpha__) \
 	((((__fore__ - __back__) * (__alpha__)) >> 8) + __back__)
 
-#define ALPHA_BLEND(__back__, __fore__, __alpha__)                      \
+#define pd_alpha_blend(__back__, __fore__, __alpha__)                      \
 	{                                                               \
-		__back__ = _ALPHA_BLEND(__back__, __fore__, __alpha__); \
+		__back__ = _pd_alpha_blend(__back__, __fore__, __alpha__); \
 	}
 
-#define PIXEL_BLEND(px1, px2, a)                    \
+#define pd_pixel_blend(px1, px2, a)                    \
 	{                                           \
-		ALPHA_BLEND((px1)->r, (px2)->r, a); \
-		ALPHA_BLEND((px1)->g, (px2)->g, a); \
-		ALPHA_BLEND((px1)->b, (px2)->b, a); \
+		pd_alpha_blend((px1)->r, (px2)->r, a); \
+		pd_alpha_blend((px1)->g, (px2)->g, a); \
+		pd_alpha_blend((px1)->b, (px2)->b, a); \
 	}
 
 /* 获取像素的RGB值 */
@@ -91,9 +91,9 @@ LCUI_BEGIN_HEADER
 		pixel = (r << 16) | (g << 8) | b; \
 	}
 
-#define pd_graph_get_quote(g) ((g)->quote.is_valid ? (g)->quote.source : (g))
+#define pd_canvas_get_quote(g) ((g)->quote.is_valid ? (g)->quote.source : (g))
 
-#define graph_set_pixel(G, X, Y, C)                                        \
+#define pd_canvas_set_pixel(G, X, Y, C)                                        \
 	if ((G)->color_type == PD_COLOR_TYPE_ARGB) {                    \
 		(G)->argb[(G)->width * (Y) + (X)] = (C);                  \
 	} else {                                                          \
@@ -102,10 +102,10 @@ LCUI_BEGIN_HEADER
 		(G)->bytes[(G)->bytes_per_row * (Y) + (X)*3 + 2] = (C).r; \
 	}
 
-#define Graph_SetPixelAlpha(G, X, Y, A) \
+#define pd_canvas_set_pixel_alpha(G, X, Y, A) \
 	(G)->argb[(G)->width * (Y) + (X)].alpha = (A)
 
-#define graph_get_pixel(G, X, Y, C)                                            \
+#define pd_canvas_get_pixel(G, X, Y, C)                                            \
 	if ((G)->color_type == PD_COLOR_TYPE_ARGB) {                        \
 		(C) = (G)->argb[(G)->width * ((Y) % (G)->height) +            \
 				((X) % (G)->width)];                          \
@@ -123,7 +123,7 @@ LCUI_BEGIN_HEADER
 		    0xff << 24;                                               \
 	}
 
-#define pd_graph_get_pixel_pointer(G, X, Y) ((G)->argb + (G)->width * (Y) + (X))
+#define pd_canvas_get_pixel_pointer(G, X, Y) ((G)->argb + (G)->width * (Y) + (X))
 
 /** 判断图像是否有Alpha通道 */
 #define Graph_HasAlpha(G)                                              \
@@ -131,8 +131,8 @@ LCUI_BEGIN_HEADER
 	     ? ((G)->quote.source->color_type == PD_COLOR_TYPE_ARGB) \
 	     : ((G)->color_type == PD_COLOR_TYPE_ARGB))
 
-#define Graph_IsWritable(G)  \
-	(pd_graph_is_valid(G) && \
+#define pd_canvas_is_writable(G)  \
+	(pd_canvas_is_valid(G) && \
 	 ((G)->quote.is_valid ? (G)->quote.is_writable : TRUE))
 
 /*
@@ -183,9 +183,9 @@ INLINE void pd_over_pixel(pd_color_t *dst, const pd_color_t *src)
 	*/
 }
 
-LCUI_API void pd_graph_print_info(pd_canvas_t *graph);
+LCUI_API void pd_canvas_print_info(pd_canvas_t *canvas);
 
-LCUI_API void pd_graph_init(pd_canvas_t *graph);
+LCUI_API void pd_canvas_init(pd_canvas_t *canvas);
 
 LCUI_API pd_color_t RGB(uchar_t r, uchar_t g, uchar_t b);
 
@@ -196,13 +196,13 @@ LCUI_API void pd_pixels_formmat(const uchar_t *in_pixels, int in_color_type,
 			   size_t pixel_count);
 
 /** 改变色彩类型 */
-LCUI_API int pd_graph_set_color_type(pd_canvas_t *graph, int color_type);
+LCUI_API int pd_canvas_set_color_type(pd_canvas_t *canvas, int color_type);
 
-LCUI_API int pd_graph_create(pd_canvas_t *graph, unsigned width, unsigned height);
+LCUI_API int pd_canvas_create(pd_canvas_t *canvas, unsigned width, unsigned height);
 
-LCUI_API void pd_graph_copy(pd_canvas_t *des, const pd_canvas_t *src);
+LCUI_API void pd_canvas_copy(pd_canvas_t *des, const pd_canvas_t *src);
 
-LCUI_API void pd_graph_free(pd_canvas_t *graph);
+LCUI_API void pd_canvas_free(pd_canvas_t *canvas);
 
 /**
  * 为图像创建一个引用
@@ -210,7 +210,7 @@ LCUI_API void pd_graph_free(pd_canvas_t *graph);
  * @param source 引用的源图像
  * &param rect 引用的区域，若为NULL，则引用整个图像
  */
-LCUI_API int pd_graph_quote(pd_canvas_t *self, pd_canvas_t *source,
+LCUI_API int pd_canvas_quote(pd_canvas_t *self, pd_canvas_t *source,
 			 const pd_rect_t *rect);
 
 /**
@@ -219,48 +219,48 @@ LCUI_API int pd_graph_quote(pd_canvas_t *self, pd_canvas_t *source,
  * @param source 引用的源图像
  * &param rect 引用的区域，若为NULL，则引用整个图像
  */
-LCUI_API int pd_graph_quote_read_only(pd_canvas_t *self, const pd_canvas_t *source,
+LCUI_API int pd_canvas_quote_read_only(pd_canvas_t *self, const pd_canvas_t *source,
 				 const pd_rect_t *rect);
 
-LCUI_API pd_bool_t pd_graph_is_valid(const pd_canvas_t *graph);
+LCUI_API pd_bool pd_canvas_is_valid(const pd_canvas_t *canvas);
 
-LCUI_API void pd_graph_get_valid_rect(const pd_canvas_t *graph, pd_rect_t *rect);
+LCUI_API void pd_canvas_get_valid_rect(const pd_canvas_t *canvas, pd_rect_t *rect);
 
-LCUI_API int pd_graph_set_alpha_bits(pd_canvas_t *graph, uchar_t *a, size_t size);
+LCUI_API int pd_canvas_set_alpha_bits(pd_canvas_t *canvas, uchar_t *a, size_t size);
 
-LCUI_API int pd_graph_set_red_bits(pd_canvas_t *graph, uchar_t *r, size_t size);
+LCUI_API int pd_canvas_set_red_bits(pd_canvas_t *canvas, uchar_t *r, size_t size);
 
-LCUI_API int pd_graph_set_green_bits(pd_canvas_t *graph, uchar_t *g, size_t size);
+LCUI_API int pd_canvas_set_green_bits(pd_canvas_t *canvas, uchar_t *g, size_t size);
 
-LCUI_API int pd_graph_set_blue_bits(pd_canvas_t *graph, uchar_t *b, size_t size);
+LCUI_API int pd_canvas_set_blue_bits(pd_canvas_t *canvas, uchar_t *b, size_t size);
 
-LCUI_API int pd_graph_zoom(const pd_canvas_t *graph, pd_canvas_t *buff,
-			pd_bool_t keep_scale, int width, int height);
+LCUI_API int pd_canvas_zoom(const pd_canvas_t *canvas, pd_canvas_t *buff,
+			pd_bool keep_scale, int width, int height);
 
-LCUI_API int pd_graph_zoom_bilinear(const pd_canvas_t *graph, pd_canvas_t *buff,
-				pd_bool_t keep_scale, int width, int height);
+LCUI_API int pd_canvas_zoom_bilinear(const pd_canvas_t *canvas, pd_canvas_t *buff,
+				pd_bool keep_scale, int width, int height);
 
-LCUI_API int pd_graph_cut(const pd_canvas_t *graph, pd_rect_t rect,
+LCUI_API int pd_canvas_cut(const pd_canvas_t *canvas, pd_rect_t rect,
 		       pd_canvas_t *buff);
 
-LCUI_API int pd_graph_horzi_flip(const pd_canvas_t *graph, pd_canvas_t *buff);
+LCUI_API int pd_canvas_horzi_flip(const pd_canvas_t *canvas, pd_canvas_t *buff);
 
-LCUI_API int pd_graph_verti_flip(const pd_canvas_t *graph, pd_canvas_t *buff);
+LCUI_API int pd_canvas_verti_flip(const pd_canvas_t *canvas, pd_canvas_t *buff);
 
 /**
  * 用颜色填充一块区域
- * @param[in][out] graph 需要填充的图层
+ * @param[in][out] canvas 需要填充的图层
  * @param[in] color 颜色
  * @param[in] rect 区域，若值为 NULL，则填充整个图层
  * @param[in] with_alpha 是否需要处理alpha通道
  */
-LCUI_API int pd_graph_fill_rect(pd_canvas_t *graph, pd_color_t color,
-			    pd_rect_t *rect, pd_bool_t with_alpha);
+LCUI_API int pd_canvas_fill_rect(pd_canvas_t *canvas, pd_color_t color,
+			    pd_rect_t *rect, pd_bool with_alpha);
 
-LCUI_API int pd_graph_fill_alpha(pd_canvas_t *graph, uchar_t alpha);
+LCUI_API int pd_canvas_fill_alpha(pd_canvas_t *canvas, uchar_t alpha);
 
-LCUI_API int pd_graph_tile(pd_canvas_t *buff, const pd_canvas_t *graph,
-			pd_bool_t replace, pd_bool_t with_alpha);
+LCUI_API int pd_canvas_tile(pd_canvas_t *buff, const pd_canvas_t *canvas,
+			pd_bool replace, pd_bool with_alpha);
 
 /**
  * 混合两张图层
@@ -271,10 +271,10 @@ LCUI_API int pd_graph_tile(pd_canvas_t *buff, const pd_canvas_t *graph,
  * @param[in] top 前景图层的上边距
  * @param[in] with_alpha 是否需要处理alpha通道
  */
-LCUI_API int pd_graph_mix(pd_canvas_t *back, const pd_canvas_t *fore, int left,
-		       int top, pd_bool_t with_alpha);
+LCUI_API int pd_canvas_mix(pd_canvas_t *back, const pd_canvas_t *fore, int left,
+		       int top, pd_bool with_alpha);
 
-LCUI_API int pd_graph_replace(pd_canvas_t *back, const pd_canvas_t *fore, int left,
+LCUI_API int pd_canvas_replace(pd_canvas_t *back, const pd_canvas_t *fore, int left,
 			   int top);
 
 LCUI_END_HEADER

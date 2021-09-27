@@ -72,7 +72,7 @@ typedef struct LCUI_FontFamilyNodeRec_ {
 static struct LCUI_FontLibraryModule {
 	int count;			/**< 计数器，主要用于为字体信息生成标识号 */
 	int font_cache_num;		/**< 字体信息缓存区的数量 */
-	pd_bool_t active;		/**< 标记，指示数据库是否初始化 */
+	LCUI_BOOL active;		/**< 标记，指示数据库是否初始化 */
 	Dict *font_families;		/**< 字族信息库，以字族名称索引字体信息 */
 	DictType font_families_type;	/**< 字族信息库的字典类型数据 */
 	RBTree bitmap_cache;		/**< 字体位图缓存区 */
@@ -754,11 +754,11 @@ static void FontBitmap_MixRGB(pd_canvas_t *graph, pd_rect_t *write_rect,
 		byte_des = byte_row_des;
 		for (x = 0; x < read_rect->width; ++x) {
 			alpha = (uchar_t)(*byte_src * color.alpha / 255);
-			ALPHA_BLEND(*byte_des, color.b, alpha);
+			pd_alpha_blend(*byte_des, color.b, alpha);
 			++byte_des;
-			ALPHA_BLEND(*byte_des, color.g, alpha);
+			pd_alpha_blend(*byte_des, color.g, alpha);
 			++byte_des;
-			ALPHA_BLEND(*byte_des, color.r, alpha);
+			pd_alpha_blend(*byte_des, color.r, alpha);
 			++byte_des;
 			++byte_src;
 		}
@@ -786,10 +786,10 @@ int FontBitmap_Mix(pd_canvas_t *graph, pd_pos_t pos, const LCUI_FontBitmap *bmp,
 	w_rect.y += r_rect.y;
 	w_rect.width = r_rect.width;
 	w_rect.height = r_rect.height;
-	pd_graph_quote(&write_slot, graph, &w_rect);
-	pd_graph_get_valid_rect(&write_slot, &w_rect);
+	pd_canvas_quote(&write_slot, graph, &w_rect);
+	pd_canvas_get_valid_rect(&write_slot, &w_rect);
 	/* 获取背景图引用的源图形 */
-	graph = pd_graph_get_quote(graph);
+	graph = pd_canvas_get_quote(graph);
 	if (graph->color_type == PD_COLOR_TYPE_ARGB) {
 		FontBitmap_MixARGB(graph, &w_rect, bmp, color, &r_rect);
 	} else {

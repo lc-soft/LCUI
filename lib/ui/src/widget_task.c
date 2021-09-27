@@ -55,7 +55,7 @@ typedef struct LCUI_WidgetTaskContextRec_ {
 static struct WidgetTaskModule {
 	DictType style_cache_dict;
 	LCUI_MetricsRec metrics;
-	pd_bool_t refresh_all;
+	LCUI_BOOL refresh_all;
 	LCUI_WidgetFunction handlers[LCUI_WTASK_TOTAL_NUM];
 } self;
 
@@ -279,7 +279,7 @@ static size_t Widget_UpdateVisibleChildren(LCUI_Widget w,
 					   LCUI_WidgetTaskContext ctx)
 {
 	size_t total = 0, count;
-	pd_bool_t found = FALSE;
+	LCUI_BOOL found = FALSE;
 	pd_rectf_t rect, visible_rect;
 	LCUI_Widget child, parent;
 	LinkedListNode *node, *next;
@@ -423,7 +423,7 @@ static size_t Widget_UpdateChildren(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 static void Widget_UpdateSelf(LCUI_Widget w, LCUI_WidgetTaskContext ctx)
 {
 	int i;
-	pd_bool_t *states;
+	LCUI_BOOL *states;
 
 	states = w->task.states;
 	w->task.for_self = FALSE;

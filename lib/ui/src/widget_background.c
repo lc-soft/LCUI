@@ -52,7 +52,7 @@ typedef struct ImageRefRec_ {
 } ImageRefRec, *ImageRef;
 
 static struct LCUI_WidgetBackgroundModule {
-	pd_bool_t active;
+	LCUI_BOOL active;
 	DictType dtype;
 	Dict *images;
 	RBTree refs;
@@ -65,10 +65,10 @@ static void DestroyImageCache(ImageCache cache)
 		LCUI_Widget w = node->data;
 		RBTree_CustomErase(&self.refs, node->data);
 		Widget_UnsetStyle(w, key_background_image);
-		pd_graph_init(&w->computed_style.background.image);
+		pd_canvas_init(&w->computed_style.background.image);
 		LinkedList_DeleteNode(&cache->refs, node);
 	}
-	pd_graph_free(&cache->image);
+	pd_canvas_free(&cache->image);
 	free(cache->path);
 	cache->path = NULL;
 	free(cache);
@@ -110,7 +110,7 @@ static void DeleteImageRef(LCUI_Widget widget)
 		}
 		RBTree_CustomErase(&self.refs, node->data);
 		Widget_UnsetStyle(w, key_background_image);
-		pd_graph_init(&w->computed_style.background.image);
+		pd_canvas_init(&w->computed_style.background.image);
 		LinkedList_DeleteNode(&cache->refs, node);
 		break;
 	}
@@ -127,7 +127,7 @@ static void ExecLoadImage(void *arg1, void *arg2)
 	LCUI_Widget w = arg1;
 	ImageCache cache;
 
-	pd_graph_init(&image);
+	pd_canvas_init(&image);
 	if (LCUI_ReadImageFile(path, &image) != 0) {
 		return;
 	}
@@ -140,7 +140,7 @@ static void ExecLoadImage(void *arg1, void *arg2)
 	} else {
 		DestroyImageCache(cache);
 	}
-	pd_graph_quote(&w->computed_style.background.image, &cache->image, NULL);
+	pd_canvas_quote(&w->computed_style.background.image, &cache->image, NULL);
 	Widget_InvalidateArea(w, NULL, SV_BORDER_BOX);
 }
 
@@ -178,7 +178,7 @@ static void AsyncLoadImage(LCUI_Widget widget, const char *path)
 	cache = Dict_FetchValue(self.images, path);
 	if (cache) {
 		AddImageRef(widget, cache);
-		pd_graph_quote(&widget->computed_style.background.image,
+		pd_canvas_quote(&widget->computed_style.background.image,
 			    &cache->image, NULL);
 		Widget_InvalidateArea(widget, NULL, SV_BORDER_BOX);
 		return;
@@ -214,7 +214,7 @@ void Widget_InitBackground(LCUI_Widget w)
 	pd_background_style_t *bg;
 	bg = &w->computed_style.background;
 	bg->color = RGB(255, 255, 255);
-	pd_graph_init(&bg->image);
+	pd_canvas_init(&bg->image);
 	bg->size.using_value = TRUE;
 	bg->size.value = SV_AUTO;
 	bg->position.using_value = TRUE;
@@ -224,7 +224,7 @@ void Widget_InitBackground(LCUI_Widget w)
 void Widget_DestroyBackground(LCUI_Widget w)
 {
 	Widget_UnsetStyle(w, key_background_image);
-	pd_graph_init(&w->computed_style.background.image);
+	pd_canvas_init(&w->computed_style.background.image);
 	if (Widget_CheckStyleType(w, key_background_image, string)) {
 		DeleteImageRef(w);
 	}
@@ -249,7 +249,7 @@ void Widget_ComputeBackgroundStyle(LCUI_Widget widget)
 			break;
 		case key_background_image:
 			if (!s->is_valid) {
-				pd_graph_init(&bg->image);
+				pd_canvas_init(&bg->image);
 				break;
 			}
 			switch (s->type) {
@@ -258,10 +258,10 @@ void Widget_ComputeBackgroundStyle(LCUI_Widget widget)
 				break;
 			case PD_STYPE_IMAGE:
 				if (!s->image) {
-					pd_graph_init(&bg->image);
+					pd_canvas_init(&bg->image);
 					break;
 				}
-				pd_graph_quote(&bg->image, s->image, NULL);
+				pd_canvas_quote(&bg->image, s->image, NULL);
 				DeleteImageRef(widget);
 			default:
 				break;

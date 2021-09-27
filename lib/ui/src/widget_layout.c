@@ -61,7 +61,7 @@ void Widget_Reflow(LCUI_Widget w, LCUI_LayoutRule rule)
 		  w->width, w->height);
 }
 
-pd_bool_t Widget_AutoReflow(LCUI_Widget w, LCUI_LayoutRule rule)
+LCUI_BOOL Widget_AutoReflow(LCUI_Widget w, LCUI_LayoutRule rule)
 {
 	float content_width = w->box.padding.width;
 	float content_height = w->box.padding.height;

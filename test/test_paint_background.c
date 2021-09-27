@@ -12,9 +12,9 @@ int test_paint_background_color(void)
         pd_background_t bg = { 0 };
         pd_paint_context paint;
 
-        pd_graph_init(&canvas);
-        pd_graph_create(&canvas, 800, 600);
-        pd_graph_fill_rect(&canvas, gray, NULL, FALSE);
+        pd_canvas_init(&canvas);
+        pd_canvas_create(&canvas, 800, 600);
+        pd_canvas_fill_rect(&canvas, gray, NULL, FALSE);
         // 设置背景色
         bg.color = green;
         // 创建绘制上下文
@@ -23,7 +23,7 @@ int test_paint_background_color(void)
         pd_background_paint(&bg, &rect, paint);
         LCUI_WritePNGFile("test_paint_background_color.png", &canvas);
         pd_painter_end(paint);
-        pd_graph_free(&canvas);
+        pd_canvas_free(&canvas);
         return 0;
 }
 
@@ -37,10 +37,10 @@ int test_paint_background_image(void)
         pd_background_t bg = { 0 };
         pd_paint_context paint;
 
-        pd_graph_init(&canvas);
-        pd_graph_init(&image);
-        pd_graph_create(&canvas, 800, 600);
-        pd_graph_fill_rect(&canvas, gray, NULL, FALSE);
+        pd_canvas_init(&canvas);
+        pd_canvas_init(&image);
+        pd_canvas_create(&canvas, 800, 600);
+        pd_canvas_fill_rect(&canvas, gray, NULL, FALSE);
         // 读取背景图片
         if (LCUI_ReadImageFile("test_image_reader.png", &image) != 0) {
                 return -1;
@@ -57,8 +57,8 @@ int test_paint_background_image(void)
         pd_background_paint(&bg, &rect, paint);
         LCUI_WritePNGFile("test_paint_background_image.png", &canvas);
         pd_painter_end(paint);
-        pd_graph_free(&image);
-        pd_graph_free(&canvas);
+        pd_canvas_free(&image);
+        pd_canvas_free(&canvas);
         return 0;
 }
 
@@ -72,10 +72,10 @@ int test_paint_background_image_with_size(void)
         pd_background_t bg = { 0 };
         pd_paint_context paint;
 
-        pd_graph_init(&canvas);
-        pd_graph_init(&image);
-        pd_graph_create(&canvas, 800, 600);
-        pd_graph_fill_rect(&canvas, gray, NULL, FALSE);
+        pd_canvas_init(&canvas);
+        pd_canvas_init(&image);
+        pd_canvas_create(&canvas, 800, 600);
+        pd_canvas_fill_rect(&canvas, gray, NULL, FALSE);
         // 读取背景图片
         if (LCUI_ReadImageFile("test_image_reader.png", &image) != 0) {
                 return -1;
@@ -93,8 +93,8 @@ int test_paint_background_image_with_size(void)
         pd_background_paint(&bg, &rect, paint);
         LCUI_WritePNGFile("test_paint_background_image_with_size.png", &canvas);
         pd_painter_end(paint);
-        pd_graph_free(&image);
-        pd_graph_free(&canvas);
+        pd_canvas_free(&image);
+        pd_canvas_free(&canvas);
         return 0;
 }
 
@@ -108,10 +108,10 @@ int test_paint_background_image_with_position(void)
         pd_background_t bg = { 0 };
         pd_paint_context paint;
 
-        pd_graph_init(&canvas);
-        pd_graph_init(&image);
-        pd_graph_create(&canvas, 800, 600);
-        pd_graph_fill_rect(&canvas, gray, NULL, FALSE);
+        pd_canvas_init(&canvas);
+        pd_canvas_init(&image);
+        pd_canvas_create(&canvas, 800, 600);
+        pd_canvas_fill_rect(&canvas, gray, NULL, FALSE);
         // 读取背景图片
         if (LCUI_ReadImageFile("test_image_reader.png", &image) != 0) {
                 return -1;
@@ -132,8 +132,8 @@ int test_paint_background_image_with_position(void)
         LCUI_WritePNGFile("test_paint_background_image_with_position.png",
                           &canvas);
         pd_painter_end(paint);
-        pd_graph_free(&image);
-        pd_graph_free(&canvas);
+        pd_canvas_free(&image);
+        pd_canvas_free(&canvas);
         return 0;
 }
 

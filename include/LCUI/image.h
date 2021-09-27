@@ -66,7 +66,7 @@ typedef struct LCUI_ImageHeaderRec_ {
 /** 图像读取器 */
 typedef struct LCUI_ImageReaderRec_ {
 	void *stream_data;			/**< 自定义的输入流数据 */
-	pd_bool_t has_error;			/**< 是否有错误 */
+	LCUI_BOOL has_error;			/**< 是否有错误 */
 	LCUI_ImageHeaderRec header;		/**< 图像头部信息 */
 	LCUI_ImageFunc fn_begin;		/**< 在开始读取前调用的函数 */
 	LCUI_ImageFunc fn_end;			/**< 在结束读取时调用的函数 */

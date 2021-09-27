@@ -56,7 +56,7 @@ typedef struct LCUI_JPEGErrorRec_ {
 typedef struct LCUI_JPEGReaderRec_ {
 	struct jpeg_source_mgr src;        /**< JPEG 资源管理接口 */
 	LCUI_JPEGErrorRec err;             /**< JPEG 的错误处理接口 */
-	pd_bool_t start_of_file;           /**< 是否刚开始读文件 */
+	LCUI_BOOL start_of_file;           /**< 是否刚开始读文件 */
 	LCUI_ImageReader base;             /**< 所属的图片读取器 */
 	unsigned char buffer[BUFFER_SIZE]; /**< 数据缓存 */
 } LCUI_JPEGReaderRec, *LCUI_JPEGReader;
@@ -260,7 +260,7 @@ int LCUI_ReadJPEG(LCUI_ImageReader reader, pd_canvas_t *graph)
 	}
 	graph->color_type = PD_COLOR_TYPE_RGB;
 	if (0 !=
-	    pd_graph_create(graph, cinfo->output_width, cinfo->output_height)) {
+	    pd_canvas_create(graph, cinfo->output_width, cinfo->output_height)) {
 		return -ENOMEM;
 	}
 	row_stride = cinfo->output_width * cinfo->output_components;

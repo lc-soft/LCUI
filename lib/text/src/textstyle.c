@@ -225,7 +225,7 @@ LCUI_TextStyle StyleTags_GetTextStyle(LinkedList *tags)
 	LinkedListNode *node;
 	LCUI_TextStyleTag *tag;
 	LCUI_TextStyle style;
-	pd_bool_t found_tags[TEXT_STYLE_TOTAL_NUM] = { 0 };
+	LCUI_BOOL found_tags[TEXT_STYLE_TOTAL_NUM] = { 0 };
 
 	if (tags->length <= 0) {
 		return NULL;
@@ -364,7 +364,7 @@ const wchar_t *ScanStyleTag(const wchar_t *wstr, wchar_t *name,
 			    int max_name_len, wchar_t *data)
 {
 	size_t i, j, len;
-	pd_bool_t end_name = FALSE;
+	LCUI_BOOL end_name = FALSE;
 
 	len = wcslen(wstr);
 	if (wstr[0] != '<') {

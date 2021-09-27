@@ -36,7 +36,7 @@
 #include <LCUI/LCUI.h>
 
 #define STRTRIM_CODE(TYPE, OUTSTR, INSTR, CHARLIST, DCHARLIST)     \
-	pd_bool_t clear, clear_left = TRUE;                        \
+	LCUI_BOOL clear, clear_left = TRUE;                        \
 	TYPE *op = OUTSTR, *last_blank = NULL;                     \
 	const TYPE *default_charlist = DCHARLIST, *ip = INSTR, *c; \
                                                                    \

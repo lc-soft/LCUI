@@ -9,7 +9,7 @@ int paint_background(pd_paint_context paint, pd_rect_t *box)
 	pd_color_t green = RGB(102, 204, 0);
 	pd_background_t bg = { 0 };
 
-	pd_graph_init(&image);
+	pd_canvas_init(&image);
 	// 读取背景图片
 	if (LCUI_ReadImageFile("test_image_reader.png", &image) != 0) {
 		return -1;
@@ -25,7 +25,7 @@ int paint_background(pd_paint_context paint, pd_rect_t *box)
 	bg.position.y = (box->height - image.height) / 2;
 	// 绘制背景
 	pd_background_paint(&bg, box, paint);
-	pd_graph_free(&image);
+	pd_canvas_free(&image);
 	return 0;
 }
 
@@ -78,9 +78,9 @@ int main(void)
 	pd_rect_t layer_rect;
 	pd_paint_context paint;
 
-	pd_graph_init(&canvas);
-	pd_graph_create(&canvas, width, height);
-	pd_graph_fill_rect(&canvas, gray, NULL, FALSE);
+	pd_canvas_init(&canvas);
+	pd_canvas_create(&canvas, width, height);
+	pd_canvas_fill_rect(&canvas, gray, NULL, FALSE);
 
 	// 设置居中的背景区域
 	bg_box.width = 400;
@@ -96,13 +96,13 @@ int main(void)
 	pd_boxshadow_get_canvas_rect(&shadow, &border_box, &shadow_box);
 
 	// 创建一个临时绘制层
-	pd_graph_init(&layer);
+	pd_canvas_init(&layer);
 	layer_rect.x = 0;
 	layer_rect.y = 0;
 	layer_rect.width = shadow_box.width;
 	layer_rect.height = shadow_box.height;
 	layer.color_type = PD_COLOR_TYPE_ARGB;
-	pd_graph_create(&layer, layer_rect.width, layer_rect.height);
+	pd_canvas_create(&layer, layer_rect.width, layer_rect.height);
 
 	// 基于临时绘制层创建绘制上下文
 	paint = pd_painter_begin(&layer, &layer_rect);
@@ -118,8 +118,8 @@ int main(void)
 			border_box.height, paint);
 
 	// 将临时绘制层混合到画布中
-	pd_graph_mix(&canvas, &layer, shadow_box.x, shadow_box.y, FALSE);
+	pd_canvas_mix(&canvas, &layer, shadow_box.x, shadow_box.y, FALSE);
 	LCUI_WritePNGFile("test_paint_boxshadow.png", &canvas);
-	pd_graph_free(&canvas);
+	pd_canvas_free(&canvas);
 	return 0;
 }

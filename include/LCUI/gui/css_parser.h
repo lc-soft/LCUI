@@ -121,7 +121,7 @@ struct LCUI_CSSParserStyleContextRec_ {
 };
 
 struct LCUI_CSSParserCommentContextRec_ {
-	pd_bool_t is_line_comment; /**< 是否为单行注释 */
+	LCUI_BOOL is_line_comment; /**< 是否为单行注释 */
 	LCUI_CSSParserTarget
 	    prev_target; /**< 保存的上一个目标，解析完注释后将还原成该目标 */
 };

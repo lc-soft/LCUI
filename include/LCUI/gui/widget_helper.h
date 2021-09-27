@@ -69,10 +69,10 @@ LCUI_API int Widget_UnsetStyle(LCUI_Widget w, int key);
 
 LCUI_API pd_style Widget_GetInheritedStyle(LCUI_Widget w, int key);
 
-LCUI_API pd_bool_t Widget_CheckStyleBooleanValue(LCUI_Widget w, int key,
-						 pd_bool_t value);
+LCUI_API LCUI_BOOL Widget_CheckStyleBooleanValue(LCUI_Widget w, int key,
+						 LCUI_BOOL value);
 
-LCUI_API pd_bool_t Widget_CheckStyleValid(LCUI_Widget w, int key) ;
+LCUI_API LCUI_BOOL Widget_CheckStyleValid(LCUI_Widget w, int key) ;
 
 LCUI_API void Widget_SetVisibility(LCUI_Widget w, const char *value);
 

@@ -606,7 +606,7 @@ static void TextLayer_TextRowTypeset(LCUI_TextLayer layer, int row)
 
 	LCUI_TextChar txtchar;
 	LCUI_TextRow txtrow = layer->text_rows.rows[row];
-	pd_bool_t autowrap =
+	LCUI_BOOL autowrap =
 	    max_width > 0 && layer->enable_autowrap && layer->enable_mulitiline;
 
 	for (col = 0; col < txtrow->length; ++col) {
@@ -702,7 +702,7 @@ static int TextLayer_ProcessText(LCUI_TextLayer layer, const wchar_t *wstr,
 	LinkedList tmp_tags;
 	const wchar_t *p;
 	int cur_col, cur_row, start_row, ins_x, ins_y;
-	pd_bool_t need_typeset, rect_has_added;
+	LCUI_BOOL need_typeset, rect_has_added;
 	LCUI_TextStyle style = NULL;
 
 	if (!wstr) {
@@ -952,7 +952,7 @@ int TextLayer_SetMaxSize(LCUI_TextLayer layer, int width, int height)
 }
 
 /** 设置是否启用多行文本模式 */
-void TextLayer_SetMultiline(LCUI_TextLayer layer, pd_bool_t enabled)
+void TextLayer_SetMultiline(LCUI_TextLayer layer, LCUI_BOOL enabled)
 {
 	if (layer->enable_mulitiline != enabled) {
 		layer->enable_mulitiline = enabled;
@@ -1142,7 +1142,7 @@ int TextLayer_TextBackspace(LCUI_TextLayer layer, int n_char)
 	return 0;
 }
 
-void TextLayer_SetAutoWrap(LCUI_TextLayer layer, pd_bool_t autowrap)
+void TextLayer_SetAutoWrap(LCUI_TextLayer layer, LCUI_BOOL autowrap)
 {
 	if (layer->enable_autowrap != autowrap) {
 		layer->enable_autowrap = autowrap;
@@ -1159,7 +1159,7 @@ void TextLayer_SetWordBreak(LCUI_TextLayer layer, LCUI_WordBreakMode mode)
 }
 
 /** 设置是否使用样式标签 */
-void TextLayer_EnableStyleTag(LCUI_TextLayer layer, pd_bool_t enable)
+void TextLayer_EnableStyleTag(LCUI_TextLayer layer, LCUI_BOOL enable)
 {
 	layer->enable_style_tag = enable;
 }
@@ -1294,7 +1294,7 @@ static void TextLayer_DrawTextRow(LCUI_TextLayer layer, pd_rect_t *area,
 			rect.y = ch_pos.y;
 			rect.height = txtrow->height;
 			rect.width = txtchar->bitmap->advance.x;
-			pd_graph_fill_rect(graph, txtchar->style->back_color, &rect,
+			pd_canvas_fill_rect(graph, txtchar->style->back_color, &rect,
 				       TRUE);
 		}
 		ch_pos.x += txtchar->bitmap->left;
@@ -1374,7 +1374,7 @@ void TextLayer_SetLineHeight(LCUI_TextLayer layer, int height)
 	layer->task.typeset_start_row = 0;
 }
 
-pd_bool_t TextLayer_SetOffset(LCUI_TextLayer layer, int offset_x, int offset_y)
+LCUI_BOOL TextLayer_SetOffset(LCUI_TextLayer layer, int offset_x, int offset_y)
 {
 	if (layer->new_offset_x != offset_x ||
 	    layer->new_offset_y != offset_y) {

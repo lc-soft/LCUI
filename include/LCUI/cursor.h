@@ -45,7 +45,7 @@ LCUI_API void LCUICursor_GetRect(pd_rect_t *rect);
 LCUI_API void LCUICursor_Refresh(void);
 
 /* 检测鼠标游标是否可见 */
-LCUI_API pd_bool_t LCUICursor_IsVisible(void);
+LCUI_API LCUI_BOOL LCUICursor_IsVisible(void);
 
 /* 显示鼠标游标 */
 LCUI_API void LCUICursor_Show(void);

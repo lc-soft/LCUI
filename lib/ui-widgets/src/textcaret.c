@@ -38,7 +38,7 @@
 #include <LCUI/ime.h>
 
 typedef struct LCUI_TextCaretTaskRec_ {
-	pd_bool_t active;
+	LCUI_BOOL active;
 	LCUI_Widget widget;
 } LCUI_TextCaretTaskRec, *LCUI_TextCaretTask;
 
@@ -46,7 +46,7 @@ typedef struct LCUI_TextCaretTaskRec_ {
 typedef struct LCUI_TextCaretRec_ {
 	int timer_id;
 	int blink_interval;
-	pd_bool_t visible;
+	LCUI_BOOL visible;
 	LCUI_TextCaretTask task;
 } LCUI_TextCaretRec, *LCUI_TextCaret;
 
@@ -98,7 +98,7 @@ static void TextCaret_OnBlink(void *arg)
 	}
 }
 
-void TextCaret_SetVisible(LCUI_Widget widget, pd_bool_t visible)
+void TextCaret_SetVisible(LCUI_Widget widget, LCUI_BOOL visible)
 {
 	LCUI_TextCaret caret;
 

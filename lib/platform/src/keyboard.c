@@ -46,7 +46,7 @@ static struct LCUIKeyboardModule {
 } self;
 
 /** 检测指定键值的按键是否处于按下状态 */
-pd_bool_t LCUIKeyboard_IsHit(int key_code)
+LCUI_BOOL LCUIKeyboard_IsHit(int key_code)
 {
 	KeyStateNode node;
 	LCUIMutex_Lock(&self.mutex);
@@ -63,7 +63,7 @@ pd_bool_t LCUIKeyboard_IsHit(int key_code)
  * @param key_code 要检测的按键的键值
  * @param interval_time 该按键倒数第二次按下时的时间与当前时间的最大间隔
  */
-pd_bool_t LCUIKeyboard_IsDoubleHit(int key_code, int interval_time)
+LCUI_BOOL LCUIKeyboard_IsDoubleHit(int key_code, int interval_time)
 {
 	clock_t ct;
 	KeyStateNode node;

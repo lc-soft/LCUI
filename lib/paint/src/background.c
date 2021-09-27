@@ -1,5 +1,5 @@
 ﻿/*
- * background.c -- graph background image draw support.
+ * background.c -- canvas background image draw support.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
@@ -37,7 +37,7 @@ void pd_background_paint(const pd_background_t *bg,
 		      pd_paint_context paint)
 {
 	double scale;
-	pd_canvas_t graph, buffer;
+	pd_canvas_t canvas, buffer;
 	pd_rect_t rect, read_rect;
 	int x, y, width, height;
 	/* 获取当前绘制区域与背景内容框的重叠区域 */
@@ -46,9 +46,9 @@ void pd_background_paint(const pd_background_t *bg,
 	}
 	rect.x -= paint->rect.x;
 	rect.y -= paint->rect.y;
-	pd_graph_init(&buffer);
-	pd_graph_quote(&graph, &paint->canvas, &rect);
-	pd_graph_fill_rect(&graph, bg->color, NULL, TRUE);
+	pd_canvas_init(&buffer);
+	pd_canvas_quote(&canvas, &paint->canvas, &rect);
+	pd_canvas_fill_rect(&canvas, bg->color, NULL, TRUE);
 	/* 将坐标转换为相对于背景内容框 */
 	rect.x += paint->rect.x - box->x;
 	rect.y += paint->rect.y - box->y;
@@ -67,7 +67,7 @@ void pd_background_paint(const pd_background_t *bg,
 	/* 如果尺寸没有变化则直接引用 */
 	if (bg->size.width == bg->image->width &&
 	    bg->size.height == bg->image->height) {
-		pd_graph_quote_read_only(&graph, bg->image, &read_rect);
+		pd_canvas_quote_read_only(&canvas, bg->image, &read_rect);
 	} else {
 		rect = read_rect;
 		/* 根据宽高的缩放比例，计算实际需要引用的区域 */
@@ -82,16 +82,16 @@ void pd_background_paint(const pd_background_t *bg,
 			rect.height = iround(rect.height * scale);
 		}
 		/* 引用源背景图像的一块区域 */
-		pd_graph_quote_read_only(&graph, bg->image, &rect);
+		pd_canvas_quote_read_only(&canvas, bg->image, &rect);
 		width = read_rect.width;
 		height = read_rect.height;
 		/* 按比例进行缩放 */
-		pd_graph_zoom(&graph, &buffer, FALSE, width, height);
-		pd_graph_quote_read_only(&graph, &buffer, NULL);
+		pd_canvas_zoom(&canvas, &buffer, FALSE, width, height);
+		pd_canvas_quote_read_only(&canvas, &buffer, NULL);
 	}
 	/* 计算相对于绘制区域的坐标 */
 	x += read_rect.x + box->x - paint->rect.x;
 	y += read_rect.y + box->y - paint->rect.y;
-	pd_graph_mix(&paint->canvas, &graph, x, y, bg->color.alpha < 255);
-	pd_graph_free(&buffer);
+	pd_canvas_mix(&paint->canvas, &canvas, x, y, bg->color.alpha < 255);
+	pd_canvas_free(&buffer);
 }

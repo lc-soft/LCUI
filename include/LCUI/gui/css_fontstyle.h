@@ -77,7 +77,7 @@ LCUI_API void CSSFontStyle_Init(LCUI_CSSFontStyle fs);
 
 LCUI_API void CSSFontStyle_Destroy(LCUI_CSSFontStyle fs);
 
-LCUI_API pd_bool_t CSSFontStyle_IsEquals(const LCUI_CSSFontStyle a,
+LCUI_API LCUI_BOOL CSSFontStyle_IsEquals(const LCUI_CSSFontStyle a,
 					 const LCUI_CSSFontStyle b);
 
 LCUI_API void CSSFontStyle_Compute(LCUI_CSSFontStyle fs, LCUI_StyleSheet ss);

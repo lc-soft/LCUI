@@ -15,9 +15,9 @@ int main(void)
 	LCUI_InitFontLibrary();
 
 	/* 创建一个图像，并使用灰色填充 */
-	pd_graph_init(&img);
-	pd_graph_create(&img, 320, 240);
-	pd_graph_fill_rect(&img, RGB(240, 240, 240), NULL, FALSE);
+	pd_canvas_init(&img);
+	pd_canvas_create(&img, 320, 240);
+	pd_canvas_fill_rect(&img, RGB(240, 240, 240), NULL, FALSE);
 
 	/* 设置文本的字体大小 */
 	TextStyle_Init(&txtstyle);
@@ -34,7 +34,7 @@ int main(void)
 	/* 将文本图层绘制到图像中，然后将图像写入至 png 文件中 */
 	TextLayer_RenderTo(txt, area, pos, &img);
 	ret = LCUI_WritePNGFile("test_string_render.png", &img);
-	pd_graph_free(&img);
+	pd_canvas_free(&img);
 
 	/* 释放字体处理功能相关资源 */
 	LCUI_FreeFontLibrary();

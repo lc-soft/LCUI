@@ -40,7 +40,7 @@ LCUI_BEGIN_HEADER
  * @param[in] box_type	区域相对于何种框进行定位
  * @returns 标记成功返回 TRUE，如果该区域处于屏幕可见区域外则标记失败，返回FALSE
  */
-LCUI_API pd_bool_t Widget_InvalidateArea(LCUI_Widget widget,
+LCUI_API LCUI_BOOL Widget_InvalidateArea(LCUI_Widget widget,
 					 pd_rectf_t *in_rect, int box_type);
 
 /**

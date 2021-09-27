@@ -39,7 +39,7 @@ using namespace Microsoft::WRL;
 using namespace Windows::Foundation;
 
 static struct UWPDisplay {
-	pd_bool_t is_inited;
+	LCUI_BOOL is_inited;
 	Renderer *renderer;
 	LCUI_EventTrigger trigger;
 	LCUI_Surface surface;
@@ -49,7 +49,7 @@ static struct UWPDisplay {
 
 typedef struct LCUI_SurfaceRec_ {
 	UWPDisplay *display;
-	pd_bool_t is_updated;
+	LCUI_BOOL is_updated;
 } LCUI_SurfaceRec;
 
 void UpdateSurfaceSize(void);
@@ -131,9 +131,9 @@ void Renderer::CreateWindowSizeDependentResources()
 		0 };
 	m_frameSwapable = true;
 	m_frameSize = { (UINT32)outputSize.Width, (UINT32)outputSize.Height };
-	pd_graph_create(&display.frame, (int)m_frameSize.width,
+	pd_canvas_create(&display.frame, (int)m_frameSize.width,
 		(int)m_frameSize.height);
-	pd_graph_fill_rect(&display.frame, RGB(255, 255, 255), NULL, TRUE);
+	pd_canvas_fill_rect(&display.frame, RGB(255, 255, 255), NULL, TRUE);
 	context->CreateBitmap(m_frameSize, nullptr, 0, &props, &m_bmp);
 	context->CreateBitmap(m_frameSize, nullptr, 0, &props, &m_backBmp);
 	UpdateSurfaceSize();
@@ -189,7 +189,7 @@ static void UWPSurface_Delete(LCUI_Surface surface)
 	free(surface);
 }
 
-static pd_bool_t UWPSurface_IsReady(LCUI_Surface surface)
+static LCUI_BOOL UWPSurface_IsReady(LCUI_Surface surface)
 {
 	return TRUE;
 }
@@ -237,12 +237,12 @@ static pd_paint_context UWPSurface_BeginPaint(LCUI_Surface surface,
 	ASSIGN(paint, pd_paint_context);
 	paint->rect = *rect;
 	paint->with_alpha = FALSE;
-	pd_graph_init(&paint->canvas);
+	pd_canvas_init(&paint->canvas);
 	LCUIRect_MergeRect(&display.rect, &display.rect, rect);
 	pd_rect_validate_area(&paint->rect, UWPDisplay_GetWidth(),
 			      UWPDisplay_GetHeight());
-	pd_graph_quote(&paint->canvas, &display.frame, &paint->rect);
-	pd_graph_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
+	pd_canvas_quote(&paint->canvas, &display.frame, &paint->rect);
+	pd_canvas_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
 	return paint;
 }
 
@@ -273,7 +273,7 @@ LCUI_DisplayDriver LCUI_CreateUWPDisplay(void)
 	driver->beginPaint = UWPSurface_BeginPaint;
 	driver->endPaint = UWPSurface_EndPaint;
 	driver->bindEvent = UWPDisplay_BindEvent;
-	pd_graph_init(&display.frame);
+	pd_canvas_init(&display.frame);
 	display.frame.color_type = PD_COLOR_TYPE_ARGB;
 	display.surface = NULL;
 	display.trigger = EventTrigger();

@@ -43,10 +43,10 @@ LCUI_API LCUI_WidgetPrototype LCUIWidget_NewPrototype(const char *name,
 						      const char *parent_name);
 
 /** 判断部件类型 */
-LCUI_API pd_bool_t Widget_CheckType(LCUI_Widget w, const char *type);
+LCUI_API LCUI_BOOL Widget_CheckType(LCUI_Widget w, const char *type);
 
 /** 判断部件原型 */
-LCUI_API pd_bool_t Widget_CheckPrototype(LCUI_Widget w,
+LCUI_API LCUI_BOOL Widget_CheckPrototype(LCUI_Widget w,
 					 LCUI_WidgetPrototypeC proto);
 
 LCUI_API void *Widget_GetData(LCUI_Widget widget, LCUI_WidgetPrototype proto);

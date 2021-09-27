@@ -89,7 +89,7 @@ typedef struct LCUI_DisplayDriverRec_ {
 	void (*hide)(LCUI_Surface);
 	void (*update)(LCUI_Surface);
 	void (*present)(LCUI_Surface);
-	pd_bool_t (*isReady)(LCUI_Surface);
+	LCUI_BOOL (*isReady)(LCUI_Surface);
 	pd_paint_context (*beginPaint)(LCUI_Surface, pd_rect_t *);
 	void (*endPaint)(LCUI_Surface, pd_paint_context);
 	void (*setCaptionW)(LCUI_Surface, const wchar_t *);
@@ -116,7 +116,7 @@ LCUI_API size_t LCUIDisplay_Render(void);
 /** 呈现渲染后的内容 */
 LCUI_API void LCUIDisplay_Present(void);
 
-LCUI_API void LCUIDisplay_EnablePaintFlashing(pd_bool_t enable);
+LCUI_API void LCUIDisplay_EnablePaintFlashing(LCUI_BOOL enable);
 
 /** 设置显示区域的尺寸，仅在窗口化、全屏模式下有效 */
 LCUI_API void LCUIDisplay_SetSize(int width, int height);

@@ -83,16 +83,16 @@ LCUI_API void Widget_ComputeFlexBoxStyle(LCUI_Widget w);
 LCUI_API void Widget_ComputeFlexBasisStyle(LCUI_Widget w);
 
 /** 更新当前部件的样式 */
-LCUI_API void Widget_UpdateStyle(LCUI_Widget w, pd_bool_t is_refresh_all);
+LCUI_API void Widget_UpdateStyle(LCUI_Widget w, LCUI_BOOL is_refresh_all);
 
 /** 更新当前部件的子级部件样式 */
 LCUI_API void Widget_UpdateChildrenStyle(LCUI_Widget w,
-					 pd_bool_t is_refresh_all);
+					 LCUI_BOOL is_refresh_all);
 
 LCUI_API void Widget_AddTaskByStyle(LCUI_Widget w, int key);
 
 /** 直接更新当前部件的样式 */
-LCUI_API void Widget_ExecUpdateStyle(LCUI_Widget w, pd_bool_t is_update_all);
+LCUI_API void Widget_ExecUpdateStyle(LCUI_Widget w, LCUI_BOOL is_update_all);
 
 LCUI_API void Widget_DestroyStyleSheets(LCUI_Widget w);
 

@@ -256,7 +256,7 @@ LCUI_API void SelectorNode_Delete(LCUI_SelectorNode node);
  * 匹配选择器节点
  * 左边的选择器必须包含右边的选择器的所有属性。
  */
-LCUI_API pd_bool_t SelectorNode_Match(LCUI_SelectorNode sn1,
+LCUI_API LCUI_BOOL SelectorNode_Match(LCUI_SelectorNode sn1,
 				      LCUI_SelectorNode sn2);
 
 LCUI_API int LCUI_PutStyleSheet(LCUI_Selector selector, LCUI_StyleSheet in_ss,

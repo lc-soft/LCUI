@@ -46,13 +46,13 @@
 
 typedef struct LCUI_TextViewTaskRec_ {
 	wchar_t *content;
-	pd_bool_t update_content;
+	LCUI_BOOL update_content;
 } LCUI_TextViewTaskRec, *LCUI_TextViewTask;
 
 typedef struct LCUI_TextViewRec_ {
 	float available_width;
 	wchar_t *content;
-	pd_bool_t trimming;
+	LCUI_BOOL trimming;
 	LCUI_Widget widget;
 	LCUI_TextLayer layer;
 	LCUI_CSSFontStyleRec style;
@@ -66,7 +66,7 @@ static struct LCUI_TextViewModule {
 	LCUI_WidgetPrototype prototype;
 } self;
 
-static pd_bool_t ParseBoolean(const char *str)
+static LCUI_BOOL ParseBoolean(const char *str)
 {
 	if (strcmp(str, "on") == 0 && strcmp(str, "true") == 0 &&
 	    strcmp(str, "yes") == 0 && strcmp(str, "1") == 0) {
@@ -111,7 +111,7 @@ static void TextView_OnParseAttr(LCUI_Widget w, const char *name,
 		return;
 	}
 	if (strcmp(name, "multiline") == 0) {
-		pd_bool_t enable = ParseBoolean(value);
+		LCUI_BOOL enable = ParseBoolean(value);
 		if (enable != txt->layer->enable_mulitiline) {
 			TextView_SetMulitiline(w, enable);
 		}
@@ -296,7 +296,7 @@ static void TextView_OnPaint(LCUI_Widget w, pd_paint_context paint,
 	pos.y = content_rect.y - rect.y;
 	rect.x -= paint->rect.x;
 	rect.y -= paint->rect.y;
-	pd_graph_quote(&canvas, &paint->canvas, &rect);
+	pd_canvas_quote(&canvas, &paint->canvas, &rect);
 	rect = paint->rect;
 	rect.x -= content_rect.x;
 	rect.y -= content_rect.y;
@@ -371,7 +371,7 @@ void TextView_SetColor(LCUI_Widget w, pd_color_t color)
 	Widget_SetFontStyle(w, key_color, color, color);
 }
 
-void TextView_SetAutoWrap(LCUI_Widget w, pd_bool_t enable)
+void TextView_SetAutoWrap(LCUI_Widget w, LCUI_BOOL enable)
 {
 	if (enable) {
 		Widget_SetFontStyle(w, key_white_space, SV_AUTO, style);
@@ -380,7 +380,7 @@ void TextView_SetAutoWrap(LCUI_Widget w, pd_bool_t enable)
 	}
 }
 
-void TextView_SetMulitiline(LCUI_Widget w, pd_bool_t enable)
+void TextView_SetMulitiline(LCUI_Widget w, LCUI_BOOL enable)
 {
 	LCUI_TextView txt = GetData(w);
 

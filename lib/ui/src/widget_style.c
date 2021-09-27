@@ -44,7 +44,7 @@
 typedef struct LCUI_TaskCacheStatus {
 	int start, end;
 	LCUI_WidgetTaskType task;
-	pd_bool_t is_valid;
+	LCUI_BOOL is_valid;
 } LCUI_TaskStatus;
 
 /* clang-format off */
@@ -128,7 +128,7 @@ void Widget_ComputeProperties(LCUI_Widget w)
 	}
 }
 
-INLINE pd_bool_t Widget_HasFixedWidth(LCUI_Widget w, LCUI_LayoutRule rule)
+INLINE LCUI_BOOL Widget_HasFixedWidth(LCUI_Widget w, LCUI_LayoutRule rule)
 {
 	return rule == LCUI_LAYOUT_RULE_FIXED ||
 	       rule == LCUI_LAYOUT_RULE_FIXED_WIDTH ||
@@ -136,7 +136,7 @@ INLINE pd_bool_t Widget_HasFixedWidth(LCUI_Widget w, LCUI_LayoutRule rule)
 				 LCUI_SIZING_RULE_FIXED);
 }
 
-INLINE pd_bool_t Widget_HasFixedHeight(LCUI_Widget w, LCUI_LayoutRule rule)
+INLINE LCUI_BOOL Widget_HasFixedHeight(LCUI_Widget w, LCUI_LayoutRule rule)
 {
 	return rule == LCUI_LAYOUT_RULE_FIXED ||
 	       rule == LCUI_LAYOUT_RULE_FIXED_HEIGHT ||
@@ -597,7 +597,7 @@ void Widget_PrintStyleSheets(LCUI_Widget w)
 	Selector_Delete(s);
 }
 
-void Widget_UpdateStyle(LCUI_Widget w, pd_bool_t is_refresh_all)
+void Widget_UpdateStyle(LCUI_Widget w, LCUI_BOOL is_refresh_all)
 {
 	if (is_refresh_all) {
 		Widget_AddTask(w, LCUI_WTASK_REFRESH_STYLE);
@@ -606,7 +606,7 @@ void Widget_UpdateStyle(LCUI_Widget w, pd_bool_t is_refresh_all)
 	}
 }
 
-void Widget_UpdateChildrenStyle(LCUI_Widget w, pd_bool_t is_refresh_all)
+void Widget_UpdateChildrenStyle(LCUI_Widget w, LCUI_BOOL is_refresh_all)
 {
 	LinkedListNode *node;
 	w->task.for_children = TRUE;
@@ -679,7 +679,7 @@ void Widget_AddTaskByStyle(LCUI_Widget w, int key)
 	}
 }
 
-void Widget_ExecUpdateStyle(LCUI_Widget w, pd_bool_t is_update_all)
+void Widget_ExecUpdateStyle(LCUI_Widget w, LCUI_BOOL is_update_all)
 {
 	StyleSheet_Clear(w->style);
 	if (is_update_all) {

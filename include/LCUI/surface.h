@@ -51,7 +51,7 @@ LCUI_API void Surface_Destroy(LCUI_Surface surface);
 /** 新建一个 Surface */
 LCUI_API LCUI_Surface Surface_New(void);
 
-LCUI_API pd_bool_t Surface_IsReady(LCUI_Surface surface);
+LCUI_API LCUI_BOOL Surface_IsReady(LCUI_Surface surface);
 
 LCUI_API void Surface_Move(LCUI_Surface surface, int x, int y);
 

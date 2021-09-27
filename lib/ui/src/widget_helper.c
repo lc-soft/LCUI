@@ -150,7 +150,7 @@ pd_style Widget_GetInheritedStyle(LCUI_Widget w, int key)
 	return &w->inherited_style->sheet[key];
 }
 
-pd_bool_t Widget_CheckStyleBooleanValue(LCUI_Widget w, int key, pd_bool_t value)
+LCUI_BOOL Widget_CheckStyleBooleanValue(LCUI_Widget w, int key, LCUI_BOOL value)
 {
 	pd_style s = &w->style->sheet[key_focusable];
 
@@ -158,7 +158,7 @@ pd_bool_t Widget_CheckStyleBooleanValue(LCUI_Widget w, int key, pd_bool_t value)
 	       s->val_bool == value;
 }
 
-pd_bool_t Widget_CheckStyleValid(LCUI_Widget w, int key)
+LCUI_BOOL Widget_CheckStyleValid(LCUI_Widget w, int key)
 {
 	return w->style && w->style->sheet[key].is_valid;
 }

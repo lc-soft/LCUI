@@ -152,7 +152,7 @@ LCUI_WidgetPrototype LCUIWidget_NewPrototype(const char *name,
 	return NULL;
 }
 
-pd_bool_t Widget_CheckType(LCUI_Widget w, const char *type)
+LCUI_BOOL Widget_CheckType(LCUI_Widget w, const char *type)
 {
 	LCUI_WidgetPrototypeC proto;
 
@@ -173,7 +173,7 @@ pd_bool_t Widget_CheckType(LCUI_Widget w, const char *type)
 	return FALSE;
 }
 
-pd_bool_t Widget_CheckPrototype(LCUI_Widget w, LCUI_WidgetPrototypeC proto)
+LCUI_BOOL Widget_CheckPrototype(LCUI_Widget w, LCUI_WidgetPrototypeC proto)
 {
 	LCUI_WidgetPrototypeC p;
 	for (p = w->proto; p; p = p->proto) {

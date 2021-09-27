@@ -2,15 +2,15 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
 
-void pd_graph_draw_horiz_line(pd_canvas_t *graph, pd_color_t color, int size,
+void pd_graph_draw_horiz_line(pd_canvas_t *canvas, pd_color_t color, int size,
 			 pd_pos_t start, int len)
 {
 	int y, x;
 	pd_rect_t area;
 	pd_canvas_t *des;
 
-	des = pd_graph_get_quote(graph);
-	pd_graph_get_valid_rect(graph, &area);
+	des = pd_canvas_get_quote(canvas);
+	pd_canvas_get_valid_rect(canvas, &area);
 	start.x = area.x + start.x;
 	start.y = area.y + start.y;
 
@@ -57,15 +57,15 @@ void pd_graph_draw_horiz_line(pd_canvas_t *graph, pd_color_t color, int size,
 	}
 }
 
-void pd_graph_draw_verti_line(pd_canvas_t *graph, pd_color_t color,
+void pd_graph_draw_verti_line(pd_canvas_t *canvas, pd_color_t color,
 				  int size, pd_pos_t start, int len)
 {
 	int y, x;
 	pd_rect_t area;
 	pd_canvas_t *des;
 
-	des = pd_graph_get_quote(graph);
-	pd_graph_get_valid_rect(graph, &area);
+	des = pd_canvas_get_quote(canvas);
+	pd_canvas_get_valid_rect(canvas, &area);
 	start.x = area.x + start.x;
 	start.y = area.y + start.y;
 

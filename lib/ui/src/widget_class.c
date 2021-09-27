@@ -77,7 +77,7 @@ int Widget_AddClass(LCUI_Widget w, const char *class_name)
 	return Widget_HandleClassesChange(w, class_name);
 }
 
-pd_bool_t Widget_HasClass(LCUI_Widget w, const char *class_name)
+LCUI_BOOL Widget_HasClass(LCUI_Widget w, const char *class_name)
 {
 	if (strlist_has(w->classes, class_name)) {
 		return TRUE;

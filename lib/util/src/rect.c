@@ -90,9 +90,9 @@ void pd_rect_get_cut_area(int box_w, int box_h, pd_rect_t rect, pd_rect_t *cut)
 }
 
 /* FIXME: need new shorter name */
-pd_bool_t pd_rect_validate_area(pd_rect_t *rect, int box_w, int box_h)
+LCUI_BOOL pd_rect_validate_area(pd_rect_t *rect, int box_w, int box_h)
 {
-	pd_bool_t overflow = FALSE;
+	LCUI_BOOL overflow = FALSE;
 
 	if (rect->x < 0) {
 		overflow = TRUE;
@@ -124,9 +124,9 @@ pd_bool_t pd_rect_validate_area(pd_rect_t *rect, int box_w, int box_h)
 	return overflow;
 }
 
-pd_bool_t LCUIRectF_ValidateArea(pd_rectf_t *rect, float box_w, float box_h)
+LCUI_BOOL LCUIRectF_ValidateArea(pd_rectf_t *rect, float box_w, float box_h)
 {
-	pd_bool_t overflow = FALSE;
+	LCUI_BOOL overflow = FALSE;
 
 	if (rect->x < 0) {
 		overflow = TRUE;
@@ -159,7 +159,7 @@ pd_bool_t LCUIRectF_ValidateArea(pd_rectf_t *rect, float box_w, float box_h)
 }
 
 /* FIXME: need new shorter name */
-pd_bool_t LCUIRect_IsCoverRect(const pd_rect_t *a, const pd_rect_t *b)
+LCUI_BOOL LCUIRect_IsCoverRect(const pd_rect_t *a, const pd_rect_t *b)
 {
 	if (a->x > b->x) {
 		if (b->x + b->width <= a->x) {
@@ -182,7 +182,7 @@ pd_bool_t LCUIRect_IsCoverRect(const pd_rect_t *a, const pd_rect_t *b)
 	return TRUE;
 }
 
-pd_bool_t LCUIRectF_IsCoverRect(const pd_rectf_t *a, const pd_rectf_t *b)
+LCUI_BOOL LCUIRectF_IsCoverRect(const pd_rectf_t *a, const pd_rectf_t *b)
 {
 	if (a->x > b->x) {
 		if (b->x + b->width <= a->x) {
@@ -206,7 +206,7 @@ pd_bool_t LCUIRectF_IsCoverRect(const pd_rectf_t *a, const pd_rectf_t *b)
 }
 
 /* FIXME: need new shorter name */
-pd_bool_t pd_rect_get_overlay_rect(const pd_rect_t *a, const pd_rect_t *b,
+LCUI_BOOL pd_rect_get_overlay_rect(const pd_rect_t *a, const pd_rect_t *b,
 				  pd_rect_t *out)
 {
 	if (a->x > b->x) {
@@ -245,7 +245,7 @@ pd_bool_t pd_rect_get_overlay_rect(const pd_rect_t *a, const pd_rect_t *b,
 	return TRUE;
 }
 
-pd_bool_t LCUIRectF_GetOverlayRect(const pd_rectf_t *a, const pd_rectf_t *b,
+LCUI_BOOL LCUIRectF_GetOverlayRect(const pd_rectf_t *a, const pd_rectf_t *b,
 				   pd_rectf_t *out)
 {
 	if (a->x > b->x) {
@@ -411,7 +411,7 @@ void LCUIRect_Split(pd_rect_t *base, pd_rect_t *target, pd_rect_t rects[4])
 	rects[3].height = 0;
 }
 
-int RectList_AddEx(LinkedList *list, pd_rect_t *rect, pd_bool_t auto_merge)
+int RectList_AddEx(LinkedList *list, pd_rect_t *rect, LCUI_BOOL auto_merge)
 {
 	int x_distance, y_distance;
 
@@ -463,7 +463,7 @@ int RectList_Delete(LinkedList *list, pd_rect_t *rect)
 {
 	int i;
 
-	pd_bool_t deletable;
+	LCUI_BOOL deletable;
 	pd_rect_t *p, child_rects[4];
 
 	LinkedList extra_list;

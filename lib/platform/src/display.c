@@ -62,7 +62,7 @@ typedef struct FlashRectRec_ {
 
 typedef struct SurfaceRecordRec_ {
 	/** whether new content has been rendered */
-	pd_bool_t rendered;
+	LCUI_BOOL rendered;
 
 	/** dirty rectangles for rendering */
 	LinkedList rects;
@@ -76,7 +76,7 @@ typedef struct SurfaceRecordRec_ {
 
 static struct LCUI_DisplayModule {
 	unsigned width, height;
-	pd_bool_t active;
+	LCUI_BOOL active;
 	LCUI_DisplayMode mode;
 	LinkedList surfaces;
 	LinkedList rects;
@@ -134,10 +134,10 @@ static size_t LCUIDisplay_RenderFlashRect(SurfaceRecord record,
 		Surface_EndPaint(record->surface, paint);
 		return count;
 	}
-	pd_graph_init(&mask);
+	pd_canvas_init(&mask);
 	mask.color_type = PD_COLOR_TYPE_ARGB;
-	pd_graph_create(&mask, flash_rect->rect.width, flash_rect->rect.height);
-	pd_graph_fill_rect(&mask, ARGB(125, 124, 179, 5), NULL, TRUE);
+	pd_canvas_create(&mask, flash_rect->rect.width, flash_rect->rect.height);
+	pd_canvas_fill_rect(&mask, ARGB(125, 124, 179, 5), NULL, TRUE);
 	mask.opacity = 0.6f * (duraion - (float)period) / duraion;
 	pos.x = pos.y = 0;
 	color = RGB(124, 179, 5);
@@ -148,8 +148,8 @@ static size_t LCUIDisplay_RenderFlashRect(SurfaceRecord record,
 	pos.x = 0;
 	pos.y = mask.height - 1;
 	pd_graph_draw_horiz_line(&mask, color, 1, pos, mask.width - 1);
-	pd_graph_mix(&paint->canvas, &mask, 0, 0, TRUE);
-	pd_graph_free(&mask);
+	pd_canvas_mix(&paint->canvas, &mask, 0, 0, TRUE);
+	pd_canvas_free(&mask);
 	Surface_EndPaint(record->surface, paint);
 	return count;
 }
@@ -625,7 +625,7 @@ int LCUIDisplay_GetMode(void)
 	return display.mode;
 }
 
-void LCUIDisplay_EnablePaintFlashing(pd_bool_t enable)
+void LCUIDisplay_EnablePaintFlashing(LCUI_BOOL enable)
 {
 	LCUI_SettingsRec settings;
 	Settings_Init(&settings);
@@ -707,7 +707,7 @@ LCUI_Surface Surface_New(void)
 	return NULL;
 }
 
-pd_bool_t Surface_IsReady(LCUI_Surface surface)
+LCUI_BOOL Surface_IsReady(LCUI_Surface surface)
 {
 	if (display.driver) {
 		return display.driver->isReady(surface);
@@ -901,7 +901,7 @@ static void OnResize(LCUI_Event e, void *arg)
 
 static void OnMinMaxInfo(LCUI_Event e, void *arg)
 {
-	pd_bool_t resizable = FALSE;
+	LCUI_BOOL resizable = FALSE;
 	LCUI_DisplayEvent dpy_ev = arg;
 	LCUI_Surface s = dpy_ev->surface;
 	LCUI_Widget widget = LCUIDisplay_GetBindWidget(s);

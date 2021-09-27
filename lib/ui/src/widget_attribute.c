@@ -40,7 +40,7 @@
 
 static struct LCUI_WidgetAttribleModule {
 	DictType dt_attributes;
-	pd_bool_t available;
+	LCUI_BOOL available;
 } self;
 
 static void OnClearWidgetAttribute(void *privdata, void *data)

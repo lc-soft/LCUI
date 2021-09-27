@@ -51,9 +51,9 @@ LCUI_API void pd_rect_get_cut_area(int box_w, int box_h, pd_rect_t rect,
 	 Y < (rect)->y + (rect)->height)
 
 /** 将矩形区域范围调整在容器有效范围内 */
-LCUI_API pd_bool_t pd_rect_validate_area(pd_rect_t *rect, int box_w, int box_h);
+LCUI_API LCUI_BOOL pd_rect_validate_area(pd_rect_t *rect, int box_w, int box_h);
 
-LCUI_API pd_bool_t LCUIRectF_ValidateArea(pd_rectf_t *rect, float box_w,
+LCUI_API LCUI_BOOL LCUIRectF_ValidateArea(pd_rectf_t *rect, float box_w,
 					  float box_h);
 
 LCUI_API void LCUIRect_ToRectF(const pd_rect_t *rect, pd_rectf_t *rectf,
@@ -65,9 +65,9 @@ LCUI_API void LCUIRectF_ToRect(const pd_rectf_t *rectf, pd_rect_t *rect,
 			       float scale);
 
 /** 检测矩形是否遮盖另一个矩形 */
-LCUI_API pd_bool_t LCUIRect_IsCoverRect(const pd_rect_t *a, const pd_rect_t *b);
+LCUI_API LCUI_BOOL LCUIRect_IsCoverRect(const pd_rect_t *a, const pd_rect_t *b);
 
-LCUI_API pd_bool_t LCUIRectF_IsCoverRect(const pd_rectf_t *a,
+LCUI_API LCUI_BOOL LCUIRectF_IsCoverRect(const pd_rectf_t *a,
 					 const pd_rectf_t *b);
 
 /**
@@ -77,10 +77,10 @@ LCUI_API pd_bool_t LCUIRectF_IsCoverRect(const pd_rectf_t *a,
  * @param[out] out	矩形A和B重叠处的矩形
  * @returns 如果两个矩形重叠，则返回TRUE，否则返回FALSE
  */
-LCUI_API pd_bool_t pd_rect_get_overlay_rect(const pd_rect_t *a,
+LCUI_API LCUI_BOOL pd_rect_get_overlay_rect(const pd_rect_t *a,
 					   const pd_rect_t *b, pd_rect_t *out);
 
-LCUI_API pd_bool_t LCUIRectF_GetOverlayRect(const pd_rectf_t *a,
+LCUI_API LCUI_BOOL LCUIRectF_GetOverlayRect(const pd_rectf_t *a,
 					    const pd_rectf_t *b,
 					    pd_rectf_t *out);
 
@@ -111,7 +111,7 @@ LCUI_API void LCUIRect_CutFourRect(pd_rect_t *rect1, pd_rect_t *rect2,
 LCUI_API void LCUIRect_Split(pd_rect_t *base, pd_rect_t *target,
 			     pd_rect_t rects[4]);
 
-INLINE pd_bool_t LCUIRectF_IsEquals(const pd_rectf_t *a, const pd_rectf_t *b)
+INLINE LCUI_BOOL LCUIRectF_IsEquals(const pd_rectf_t *a, const pd_rectf_t *b)
 {
 	return (int)(100 * (a->x - b->x)) == 0 &&
 	       (int)(100 * (a->y - b->y)) == 0 &&
@@ -119,14 +119,14 @@ INLINE pd_bool_t LCUIRectF_IsEquals(const pd_rectf_t *a, const pd_rectf_t *b)
 	       (int)(100 * (a->height - b->height)) == 0;
 }
 
-INLINE pd_bool_t LCUIRect_IsEquals(const pd_rect_t *a, const pd_rect_t *b)
+INLINE LCUI_BOOL LCUIRect_IsEquals(const pd_rect_t *a, const pd_rect_t *b)
 {
 	return a->x == b->x && a->y == b->y && a->width == b->width &&
 	       a->height == b->height;
 }
 
 LCUI_API int RectList_AddEx(LinkedList *list, pd_rect_t *rect,
-			    pd_bool_t auto_merge);
+			    LCUI_BOOL auto_merge);
 
 /** 添加一个脏矩形记录 */
 LCUI_API int RectList_Add(LinkedList *list, pd_rect_t *rect);

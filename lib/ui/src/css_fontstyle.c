@@ -379,7 +379,7 @@ int LCUI_GetFontStyleKey(int key)
 	return self.keys[key];
 }
 
-pd_bool_t CSSFontStyle_IsEquals(const LCUI_CSSFontStyle a,
+LCUI_BOOL CSSFontStyle_IsEquals(const LCUI_CSSFontStyle a,
 				const LCUI_CSSFontStyle b)
 {
 	int i;
