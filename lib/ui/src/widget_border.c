@@ -38,7 +38,7 @@
 
 static float ComputeXMetric(LCUI_Widget w, pd_style s)
 {
-	if (s->type == PD_STYPE_SCALE) {
+	if (s->type == LCUI_STYPE_SCALE) {
 		return w->width * s->scale;
 	}
 	return LCUIMetrics_Compute(s->value, s->type);
@@ -46,7 +46,7 @@ static float ComputeXMetric(LCUI_Widget w, pd_style s)
 
 static float ComputeYMetric(LCUI_Widget w, pd_style s)
 {
-	if (s->type == PD_STYPE_SCALE) {
+	if (s->type == LCUI_STYPE_SCALE) {
 		return w->height * s->scale;
 	}
 	return LCUIMetrics_Compute(s->value, s->type);
@@ -123,7 +123,7 @@ static unsigned int ComputeActual(float width)
 {
 	unsigned int w;
 
-	w = LCUIMetrics_ComputeActual(width, PD_STYPE_PX);
+	w = LCUIMetrics_ComputeActual(width, LCUI_STYPE_PX);
 	if (width > 0 && w < 1) {
 		return 1;
 	}

@@ -59,8 +59,8 @@ typedef struct LCUI_CSSFontStyleRec_ {
 	pd_color_t color;
 	LCUI_FontStyle font_style;
 	LCUI_FontWeight font_weight;
-	pd_style_value text_align;
-	pd_style_value white_space;
+	LCUI_StyleValue text_align;
+	LCUI_StyleValue white_space;
 } LCUI_CSSFontStyleRec, *LCUI_CSSFontStyle;
 
 #define Widget_SetFontStyle(W, K, V, T)            \

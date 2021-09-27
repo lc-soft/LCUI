@@ -358,7 +358,7 @@ float Widget_ComputeXMetric(LCUI_Widget w, int key)
 {
 	pd_style s = &w->style->sheet[key];
 
-	if (s->type == PD_STYPE_SCALE) {
+	if (s->type == LCUI_STYPE_SCALE) {
 		if (!w->parent) {
 			return 0;
 		}
@@ -374,7 +374,7 @@ float Widget_ComputeYMetric(LCUI_Widget w, int key)
 {
 	pd_style s = &w->style->sheet[key];
 
-	if (s->type == PD_STYPE_SCALE) {
+	if (s->type == LCUI_STYPE_SCALE) {
 		if (!w->parent) {
 			return 0;
 		}

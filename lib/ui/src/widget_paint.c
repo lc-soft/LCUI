@@ -40,7 +40,7 @@
 #include "widget_shadow.h"
 
 //#define DEBUG_FRAME_RENDER
-#define ComputeActualPX(VAL) LCUIMetrics_ComputeActual(VAL, PD_STYPE_PX)
+#define ComputeActualPX(VAL) LCUIMetrics_ComputeActual(VAL, LCUI_STYPE_PX)
 
 #define MAX_VISIBLE_WIDTH 20000
 #define MAX_VISIBLE_HEIGHT 20000

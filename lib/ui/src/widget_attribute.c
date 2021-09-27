@@ -102,9 +102,9 @@ int Widget_SetAttribute(LCUI_Widget w, const char *name, const char *value)
 			}
 		}
 		ret = Widget_SetAttributeEx(w, name, value_str,
-					    PD_STYPE_STRING, free);
+					    LCUI_STYPE_STRING, free);
 	} else {
-		ret = Widget_SetAttributeEx(w, name, NULL, PD_STYPE_NONE,
+		ret = Widget_SetAttributeEx(w, name, NULL, LCUI_STYPE_NONE,
 					    NULL);
 	}
 	if (w->proto && w->proto->setattr) {

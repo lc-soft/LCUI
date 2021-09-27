@@ -84,11 +84,11 @@ LCUI_API void Widget_Show(LCUI_Widget w);
 
 LCUI_API void Widget_Hide(LCUI_Widget w);
 
-LCUI_API void Widget_SetPosition(LCUI_Widget w, pd_style_value position);
+LCUI_API void Widget_SetPosition(LCUI_Widget w, LCUI_StyleValue position);
 
 LCUI_API void Widget_SetOpacity(LCUI_Widget w, float opacity);
 
-LCUI_API void Widget_SetBoxSizing(LCUI_Widget w, pd_style_value sizing);
+LCUI_API void Widget_SetBoxSizing(LCUI_Widget w, LCUI_StyleValue sizing);
 
 /** Collect all child widget that have a ref attribute specified */
 LCUI_API Dict *Widget_CollectReferences(LCUI_Widget w);

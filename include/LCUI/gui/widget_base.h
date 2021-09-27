@@ -54,10 +54,10 @@ typedef struct LCUI_WidgetStyle {
 	float bottom;
 	int z_index;
 	float opacity;
-	pd_style_value position;
-	pd_style_value display;
-	pd_style_value box_sizing;
-	pd_style_value vertical_align;
+	LCUI_StyleValue position;
+	LCUI_StyleValue display;
+	LCUI_StyleValue box_sizing;
+	LCUI_StyleValue vertical_align;
 	pd_border_style_t border;
 	pd_boxshadow_style_t shadow;
 	pd_background_style_t background;
@@ -342,7 +342,7 @@ typedef struct LCUI_WidgetRec_ {
 		pd_style _s;                \
 		_s = Widget_GetStyle(W, K);   \
 		_s->is_valid = TRUE;          \
-		_s->type = PD_STYPE_##TYPE; \
+		_s->type = LCUI_STYPE_##TYPE; \
 		_s->val_##TYPE = VAL;         \
 		Widget_AddTaskByStyle(W, K);  \
 	} while (0)

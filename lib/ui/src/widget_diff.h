@@ -42,7 +42,7 @@ typedef struct LCUI_WidgetStyleDiffRec_ {
 	LCUI_BOOL visible;
 	LCUI_Rect2F margin;
 	LCUI_Rect2F padding;
-	pd_style_value position;
+	LCUI_StyleValue position;
 	pd_border_style_t border;
 	pd_boxshadow_style_t shadow;
 	pd_background_style_t background;

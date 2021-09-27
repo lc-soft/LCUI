@@ -105,7 +105,7 @@ static int OnParseContent(LCUI_CSSParserStyleContext ctx, const char *str)
 		return -1;
 	}
 	s.is_valid = TRUE;
-	s.type = PD_STYPE_STRING;
+	s.type = LCUI_STYPE_STRING;
 	s.val_string = malloc(sizeof(char) * (len + 1));
 	if (!s.val_string) {
 		return -1;
@@ -142,7 +142,7 @@ static int OnParseFontFamily(LCUI_CSSParserStyleContext ctx, const char *str)
 	pd_style_t s;
 
 	s.is_valid = TRUE;
-	s.type = PD_STYPE_STRING;
+	s.type = LCUI_STYPE_STRING;
 	s.val_string = strdup2(str);
 	SetFontStyleProperty(ctx, &s);
 	return 0;
@@ -154,7 +154,7 @@ static int OnParseFontStyle(LCUI_CSSParserStyleContext ctx, const char *str)
 
 	if (ParseFontStyle(str, &s.val_int)) {
 		s.is_valid = TRUE;
-		s.type = PD_STYPE_INT;
+		s.type = LCUI_STYPE_INT;
 		SetFontStyleProperty(ctx, &s);
 		return 0;
 	}
@@ -167,7 +167,7 @@ static int OnParseFontWeight(LCUI_CSSParserStyleContext ctx, const char *str)
 
 	if (ParseFontWeight(str, &s.val_int)) {
 		s.is_valid = TRUE;
-		s.type = PD_STYPE_INT;
+		s.type = LCUI_STYPE_INT;
 		SetFontStyleProperty(ctx, &s);
 		return 0;
 	}
@@ -179,7 +179,7 @@ static int OnParseTextAlign(LCUI_CSSParserStyleContext ctx, const char *str)
 	pd_style_t s;
 
 	s.is_valid = TRUE;
-	s.type = PD_STYPE_STYLE;
+	s.type = LCUI_STYPE_STYLE;
 	s.val_style = LCUI_GetStyleValue(str);
 
 	if (s.val_style < 0) {
@@ -205,7 +205,7 @@ static int OnParseStyleOption(LCUI_CSSParserStyleContext ctx, const char *str)
 	pd_style_t s;
 
 	s.is_valid = TRUE;
-	s.type = PD_STYPE_STYLE;
+	s.type = LCUI_STYPE_STYLE;
 	s.val_style = LCUI_GetStyleValue(str);
 	if (s.val_style < 0) {
 		return -1;
@@ -233,7 +233,7 @@ static void OnComputeFontSize(LCUI_CSSFontStyle fs, pd_style s)
 		    ComputeActual(max(MIN_FONT_SIZE, s->value), s->type);
 		return;
 	}
-	fs->font_size = ComputeActual(DEFAULT_FONT_SIZE, PD_STYPE_PX);
+	fs->font_size = ComputeActual(DEFAULT_FONT_SIZE, LCUI_STYPE_PX);
 }
 
 static void OnComputeColor(LCUI_CSSFontStyle fs, pd_style s)
@@ -294,9 +294,9 @@ static void OnComputeLineHeight(LCUI_CSSFontStyle fs, pd_style s)
 {
 	int h;
 	if (s->is_valid) {
-		if (s->type == PD_STYPE_INT) {
+		if (s->type == LCUI_STYPE_INT) {
 			h = iround(fs->font_size * s->val_int);
-		} else if (s->type == PD_STYPE_SCALE) {
+		} else if (s->type == LCUI_STYPE_SCALE) {
 			h = iround(fs->font_size * s->val_scale);
 		} else {
 			h = ComputeActual(s->value, s->type);
@@ -341,7 +341,7 @@ static void OnComputeContent(LCUI_CSSFontStyle fs, pd_style s)
 
 static void OnComputeWhiteSpace(LCUI_CSSFontStyle fs, pd_style s)
 {
-	if (s->is_valid && s->type == PD_STYPE_STYLE) {
+	if (s->is_valid && s->type == LCUI_STYPE_STYLE) {
 		fs->white_space = s->val_style;
 	} else {
 		fs->white_space = SV_AUTO;

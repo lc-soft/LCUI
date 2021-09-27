@@ -138,7 +138,7 @@ typedef struct LCUI_Rect2F_ {
  * strongly related and should be defined separately where they are needed.
  */
 
-typedef enum pd_style_value {
+typedef enum LCUI_StyleValue {
 	SV_NONE,
 	SV_AUTO,
 	SV_NORMAL,
@@ -185,41 +185,41 @@ typedef enum pd_style_value {
 	SV_NOWRAP,
 	SV_ROW,
 	SV_COLUMN
-} pd_style_value;
+} LCUI_StyleValue;
 
 /** 样式变量类型 */
-typedef enum pd_style_type {
-	PD_STYPE_NONE,
-	PD_STYPE_AUTO,
-	PD_STYPE_SCALE,
-	PD_STYPE_PX,
-	PD_STYPE_PT,
-	PD_STYPE_DIP,
-	PD_STYPE_SP,
-	PD_STYPE_COLOR,
-	PD_STYPE_IMAGE,
-	PD_STYPE_STYLE,
-	PD_STYPE_INT,
-	PD_STYPE_BOOL,
-	PD_STYPE_STRING,
-	PD_STYPE_WSTRING
-} pd_style_type;
+typedef enum LCUI_StyleType {
+	LCUI_STYPE_NONE,
+	LCUI_STYPE_AUTO,
+	LCUI_STYPE_SCALE,
+	LCUI_STYPE_PX,
+	LCUI_STYPE_PT,
+	LCUI_STYPE_DIP,
+	LCUI_STYPE_SP,
+	LCUI_STYPE_COLOR,
+	LCUI_STYPE_IMAGE,
+	LCUI_STYPE_STYLE,
+	LCUI_STYPE_INT,
+	LCUI_STYPE_BOOL,
+	LCUI_STYPE_STRING,
+	LCUI_STYPE_WSTRING
+} LCUI_StyleType;
 
-#define PD_STYPE_px PD_STYPE_PX
-#define PD_STYPE_pt PD_STYPE_PT
-#define PD_STYPE_int PD_STYPE_INT
-#define PD_STYPE_color PD_STYPE_COLOR
-#define PD_STYPE_scale PD_STYPE_SCALE
-#define PD_STYPE_style PD_STYPE_STYLE
-#define PD_STYPE_bool PD_STYPE_BOOL
-#define PD_STYPE_image PD_STYPE_IMAGE
-#define PD_STYPE_string PD_STYPE_STRING
-#define PD_STYPE_wstring PD_STYPE_WSTRING
-#define PD_STYPE_sp PD_STYPE_SP
-#define PD_STYPE_dp PD_STYPE_DIP
-#define PD_STYPE_dip PD_STYPE_DIP
-#define PD_STYPE_0 PD_STYPE_NONE
-#define PD_STYPE_none PD_STYPE_NONE
+#define LCUI_STYPE_px LCUI_STYPE_PX
+#define LCUI_STYPE_pt LCUI_STYPE_PT
+#define LCUI_STYPE_int LCUI_STYPE_INT
+#define LCUI_STYPE_color LCUI_STYPE_COLOR
+#define LCUI_STYPE_scale LCUI_STYPE_SCALE
+#define LCUI_STYPE_style LCUI_STYPE_STYLE
+#define LCUI_STYPE_bool LCUI_STYPE_BOOL
+#define LCUI_STYPE_image LCUI_STYPE_IMAGE
+#define LCUI_STYPE_string LCUI_STYPE_STRING
+#define LCUI_STYPE_wstring LCUI_STYPE_WSTRING
+#define LCUI_STYPE_sp LCUI_STYPE_SP
+#define LCUI_STYPE_dp LCUI_STYPE_DIP
+#define LCUI_STYPE_dip LCUI_STYPE_DIP
+#define LCUI_STYPE_0 LCUI_STYPE_NONE
+#define LCUI_STYPE_none LCUI_STYPE_NONE
 
 typedef struct pd_boxshadow_style_t_ {
 	float x, y;
@@ -296,7 +296,7 @@ struct pd_canvas_t_ {
 
 typedef struct pd_style_t_ {
 	LCUI_BOOL is_valid : 2;
-	pd_style_type type : 6;
+	LCUI_StyleType type : 6;
 	union {
 		int val_int;
 		int val_0;
@@ -312,8 +312,8 @@ typedef struct pd_style_t_ {
 		float val_dip;
 		float sp;
 		float val_sp;
-		pd_style_value style;
-		pd_style_value val_style;
+		LCUI_StyleValue style;
+		LCUI_StyleValue val_style;
 		float scale;
 		float val_scale;
 		char *string;
@@ -363,29 +363,29 @@ typedef struct LCUI_FlexLayoutStyle {
 	 */
 	float basis;
 
-	pd_style_value wrap : 8;
-	pd_style_value direction : 8;
+	LCUI_StyleValue wrap : 8;
+	LCUI_StyleValue direction : 8;
 
 	/**
 	 * Sets the align-self value on all direct children as a group
 	 * See more:
 	 * https://developer.mozilla.org/en-US/docs/Web/CSS/align-items
 	 */
-	pd_style_value align_items : 8;
+	LCUI_StyleValue align_items : 8;
 
 	/**
 	 * Sets the distribution of space between and around content items along
 	 * a flexbox's cross-axis
 	 * See more: https://developer.mozilla.org/en-US/docs/Web/CSS/align-content
 	 */
-	pd_style_value align_content : 8;
+	LCUI_StyleValue align_content : 8;
 
 	/**
 	 * Defines how the browser distributes space between and around content
 	 * items along the main-axis of a flex container See more:
 	 * https://developer.mozilla.org/en-US/docs/Web/CSS/justify-content
 	 */
-	pd_style_value justify_content : 8;
+	LCUI_StyleValue justify_content : 8;
 } LCUI_FlexBoxLayoutStyle;
 
 typedef struct LCUI_BoundBoxRec {

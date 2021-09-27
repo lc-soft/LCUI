@@ -253,10 +253,10 @@ void Widget_ComputeBackgroundStyle(LCUI_Widget widget)
 				break;
 			}
 			switch (s->type) {
-			case PD_STYPE_STRING:
+			case LCUI_STYPE_STRING:
 				AsyncLoadImage(widget, s->string);
 				break;
-			case PD_STYPE_IMAGE:
+			case LCUI_STYPE_IMAGE:
 				if (!s->image) {
 					pd_canvas_init(&bg->image);
 					break;
@@ -268,7 +268,7 @@ void Widget_ComputeBackgroundStyle(LCUI_Widget widget)
 			}
 			break;
 		case key_background_position:
-			if (s->is_valid && s->type != PD_STYPE_NONE) {
+			if (s->is_valid && s->type != LCUI_STYPE_NONE) {
 				bg->position.using_value = TRUE;
 				bg->position.value = s->val_style;
 			} else {
@@ -277,19 +277,19 @@ void Widget_ComputeBackgroundStyle(LCUI_Widget widget)
 			}
 			break;
 		case key_background_position_x:
-			if (s->is_valid && s->type != PD_STYPE_NONE) {
+			if (s->is_valid && s->type != LCUI_STYPE_NONE) {
 				bg->position.using_value = FALSE;
 				bg->position.x = *s;
 			}
 			break;
 		case key_background_position_y:
-			if (s->is_valid && s->type != PD_STYPE_NONE) {
+			if (s->is_valid && s->type != LCUI_STYPE_NONE) {
 				bg->position.using_value = FALSE;
 				bg->position.y = *s;
 			}
 			break;
 		case key_background_size:
-			if (s->is_valid && s->type != PD_STYPE_NONE) {
+			if (s->is_valid && s->type != LCUI_STYPE_NONE) {
 				bg->size.using_value = TRUE;
 				bg->size.value = s->val_style;
 			} else {
@@ -298,13 +298,13 @@ void Widget_ComputeBackgroundStyle(LCUI_Widget widget)
 			}
 			break;
 		case key_background_size_width:
-			if (s->is_valid && s->type != PD_STYPE_NONE) {
+			if (s->is_valid && s->type != LCUI_STYPE_NONE) {
 				bg->size.using_value = FALSE;
 				bg->size.width = *s;
 			}
 			break;
 		case key_background_size_height:
-			if (s->is_valid && s->type != PD_STYPE_NONE) {
+			if (s->is_valid && s->type != LCUI_STYPE_NONE) {
 				bg->size.using_value = FALSE;
 				bg->size.height = *s;
 			}
@@ -317,7 +317,7 @@ void Widget_ComputeBackgroundStyle(LCUI_Widget widget)
 
 void Widget_ComputeBackground(LCUI_Widget w, pd_background_t *out)
 {
-	pd_style_type type;
+	LCUI_StyleType type;
 	pd_rectf_t *box = &w->box.border;
 	pd_background_style_t *bg = &w->computed_style.background;
 	float scale, x = 0, y = 0, width, height;
@@ -353,18 +353,18 @@ void Widget_ComputeBackground(LCUI_Widget w, pd_background_t *out)
 			height = (float)bg->image.height;
 			break;
 		}
-		out->position.x = ComputeActual(x, PD_STYPE_PX);
-		out->position.y = ComputeActual(y, PD_STYPE_PX);
-		out->size.width = ComputeActual(width, PD_STYPE_PX);
-		out->size.height = ComputeActual(height, PD_STYPE_PX);
+		out->position.x = ComputeActual(x, LCUI_STYPE_PX);
+		out->position.y = ComputeActual(y, LCUI_STYPE_PX);
+		out->size.width = ComputeActual(width, LCUI_STYPE_PX);
+		out->size.height = ComputeActual(height, LCUI_STYPE_PX);
 	} else {
-		type = PD_STYPE_PX;
+		type = LCUI_STYPE_PX;
 		switch (bg->size.width.type) {
-		case PD_STYPE_SCALE:
+		case LCUI_STYPE_SCALE:
 			width = box->width * bg->size.width.scale;
 			break;
-		case PD_STYPE_NONE:
-		case PD_STYPE_AUTO:
+		case LCUI_STYPE_NONE:
+		case LCUI_STYPE_AUTO:
 			width = (float)bg->image.width;
 			break;
 		default:
@@ -373,13 +373,13 @@ void Widget_ComputeBackground(LCUI_Widget w, pd_background_t *out)
 			break;
 		}
 		out->size.width = ComputeActual(width, type);
-		type = PD_STYPE_PX;
+		type = LCUI_STYPE_PX;
 		switch (bg->size.height.type) {
-		case PD_STYPE_SCALE:
+		case LCUI_STYPE_SCALE:
 			height = box->height * bg->size.height.scale;
 			break;
-		case PD_STYPE_NONE:
-		case PD_STYPE_AUTO:
+		case LCUI_STYPE_NONE:
+		case LCUI_STYPE_AUTO:
 			height = (float)bg->image.height;
 			break;
 		default:
@@ -429,17 +429,17 @@ void Widget_ComputeBackground(LCUI_Widget w, pd_background_t *out)
 		default:
 			break;
 		}
-		out->position.x = ComputeActual(x, PD_STYPE_PX);
-		out->position.y = ComputeActual(y, PD_STYPE_PX);
+		out->position.x = ComputeActual(x, LCUI_STYPE_PX);
+		out->position.y = ComputeActual(y, LCUI_STYPE_PX);
 	} else {
-		type = PD_STYPE_PX;
+		type = LCUI_STYPE_PX;
 		switch (bg->position.x.type) {
-		case PD_STYPE_SCALE:
+		case LCUI_STYPE_SCALE:
 			x = box->width - width;
 			x = x * bg->position.x.scale;
 			break;
-		case PD_STYPE_NONE:
-		case PD_STYPE_AUTO:
+		case LCUI_STYPE_NONE:
+		case LCUI_STYPE_AUTO:
 			break;
 		default:
 			x = bg->position.x.value;
@@ -447,14 +447,14 @@ void Widget_ComputeBackground(LCUI_Widget w, pd_background_t *out)
 			break;
 		}
 		out->position.x = ComputeActual(x, type);
-		type = PD_STYPE_PX;
+		type = LCUI_STYPE_PX;
 		switch (bg->position.y.type) {
-		case PD_STYPE_SCALE:
+		case LCUI_STYPE_SCALE:
 			y = box->height - height;
 			y = y * bg->position.y.scale;
 			break;
-		case PD_STYPE_NONE:
-		case PD_STYPE_AUTO:
+		case LCUI_STYPE_NONE:
+		case LCUI_STYPE_AUTO:
 			break;
 		default:
 			y = bg->position.y.value;

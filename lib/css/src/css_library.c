@@ -456,13 +456,13 @@ LCUI_StyleList StyleList(void)
 void DestroyStyle(pd_style s)
 {
 	switch (s->type) {
-	case PD_STYPE_STRING:
+	case LCUI_STYPE_STRING:
 		if (s->is_valid && s->string) {
 			free(s->string);
 		}
 		s->string = NULL;
 		break;
-	case PD_STYPE_WSTRING:
+	case LCUI_STYPE_WSTRING:
 		if (s->is_valid && s->string) {
 			free(s->wstring);
 		}
@@ -477,10 +477,10 @@ void DestroyStyle(pd_style s)
 void MergeStyle(pd_style dst, pd_style src)
 {
 	switch (src->type) {
-	case PD_STYPE_STRING:
+	case LCUI_STYPE_STRING:
 		dst->string = strdup2(src->string);
 		break;
-	case PD_STYPE_WSTRING:
+	case LCUI_STYPE_WSTRING:
 		dst->wstring = wcsdup2(src->wstring);
 		break;
 	default:
@@ -570,7 +570,7 @@ LCUI_StyleListNode StyleList_AddNode(LCUI_StyleList list, int key)
 	node = malloc(sizeof(LCUI_StyleListNodeRec));
 	node->key = key;
 	node->style.is_valid = FALSE;
-	node->style.type = PD_STYPE_NONE;
+	node->style.type = LCUI_STYPE_NONE;
 	node->node.data = node;
 	LinkedList_AppendNode(list, &node->node);
 	return node;
@@ -1428,13 +1428,13 @@ static void PrintStyleName(int key)
 static void PrintStyleValue(pd_style s)
 {
 	switch (s->type) {
-	case PD_STYPE_AUTO:
+	case LCUI_STYPE_AUTO:
 		Logger_Debug("auto");
 		break;
-	case PD_STYPE_BOOL:
+	case LCUI_STYPE_BOOL:
 		Logger_Debug("%s", s->val_bool ? "true" : "false");
 		break;
-	case PD_STYPE_COLOR: {
+	case LCUI_STYPE_COLOR: {
 		pd_color_t *clr = &s->val_color;
 		if (clr->alpha < 255) {
 			Logger_Debug("rgba(%d,%d,%d,%g)", clr->r, clr->g, clr->b,
@@ -1444,28 +1444,28 @@ static void PrintStyleValue(pd_style s)
 		}
 		break;
 	}
-	case PD_STYPE_PX:
+	case LCUI_STYPE_PX:
 		Logger_Debug("%gpx", s->val_px);
 		break;
-	case PD_STYPE_DIP:
+	case LCUI_STYPE_DIP:
 		Logger_Debug("%gdip", s->val_dip);
 		break;
-	case PD_STYPE_SP:
+	case LCUI_STYPE_SP:
 		Logger_Debug("%gsp", s->val_sp);
 		break;
-	case PD_STYPE_STRING:
+	case LCUI_STYPE_STRING:
 		Logger_Debug("%s", s->val_string);
 		break;
-	case PD_STYPE_WSTRING:
+	case LCUI_STYPE_WSTRING:
 		Logger_Debug("%S", s->val_wstring);
 		break;
-	case PD_STYPE_SCALE:
+	case LCUI_STYPE_SCALE:
 		Logger_Debug("%g%%", s->val_scale * 100);
 		break;
-	case PD_STYPE_STYLE:
+	case LCUI_STYPE_STYLE:
 		Logger_Debug("%s", LCUI_GetStyleValueName(s->val_style));
 		break;
-	case PD_STYPE_INT:
+	case LCUI_STYPE_INT:
 		Logger_Debug("%d", s->val_int);
 		break;
 	default:
