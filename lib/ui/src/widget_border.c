@@ -36,7 +36,7 @@
 #include <LCUI/gui/widget.h>
 #include "widget_border.h"
 
-static float ComputeXMetric(LCUI_Widget w, pd_style s)
+static float ComputeXMetric(LCUI_Widget w, LCUI_Style s)
 {
 	if (s->type == LCUI_STYPE_SCALE) {
 		return w->width * s->scale;
@@ -44,7 +44,7 @@ static float ComputeXMetric(LCUI_Widget w, pd_style s)
 	return LCUIMetrics_Compute(s->value, s->type);
 }
 
-static float ComputeYMetric(LCUI_Widget w, pd_style s)
+static float ComputeYMetric(LCUI_Widget w, LCUI_Style s)
 {
 	if (s->type == LCUI_STYPE_SCALE) {
 		return w->height * s->scale;
@@ -55,7 +55,7 @@ static float ComputeYMetric(LCUI_Widget w, pd_style s)
 void Widget_ComputeBorderStyle(LCUI_Widget w)
 {
 	int key;
-	pd_style s;
+	LCUI_Style s;
 	pd_border_style_t *b;
 	b = &w->computed_style.border;
 	memset(b, 0, sizeof(pd_border_style_t));

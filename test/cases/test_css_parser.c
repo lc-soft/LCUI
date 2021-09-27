@@ -7,7 +7,7 @@
 
 static void test_btn_text_style(void)
 {
-	pd_style s;
+	LCUI_Style s;
 
 	s = LCUIWidget_GetById("test-textview")->style->sheet;
 	it_i("width", (int)s[key_width].val_px, 100);
@@ -19,7 +19,7 @@ static void test_btn_text_style(void)
 
 static void test_btn_hover_text_style(void)
 {
-	pd_style s;
+	LCUI_Style s;
 
 	s = LCUIWidget_GetById("test-textview")->style->sheet;
 	it_i("background-color", s[key_background_color].val_color.value,
@@ -29,7 +29,7 @@ static void test_btn_hover_text_style(void)
 
 static void test_flex_box(void)
 {
-	pd_style s;
+	LCUI_Style s;
 
 	s = LCUIWidget_GetById("test-flex-box")->style->sheet;
 	it_i("flex-grow", s[key_flex_grow].val_int, 0);
@@ -44,7 +44,7 @@ static void test_flex_box(void)
 
 static void test_parse_flex_initial(void)
 {
-	pd_style s;
+	LCUI_Style s;
 
 	s = LCUIWidget_GetById("test-flex-initial")->style->sheet;
 	it_i("<flex-grow>", s[key_flex_grow].val_int, 0);
@@ -53,7 +53,7 @@ static void test_parse_flex_initial(void)
 }
 static void test_parse_flex_auto(void)
 {
-	pd_style s;
+	LCUI_Style s;
 
 	s = LCUIWidget_GetById("test-flex-auto")->style->sheet;
 	it_i("<flex-grow>", s[key_flex_grow].val_int, 1);
@@ -63,7 +63,7 @@ static void test_parse_flex_auto(void)
 
 static void test_parse_flex_none(void)
 {
-	pd_style s;
+	LCUI_Style s;
 
 	s = LCUIWidget_GetById("test-flex-none")->style->sheet;
 	it_i("<flex-grow>", s[key_flex_grow].val_int, 0);
@@ -73,7 +73,7 @@ static void test_parse_flex_none(void)
 
 static void test_parse_flex_1(void)
 {
-	pd_style s;
+	LCUI_Style s;
 
 	s = LCUIWidget_GetById("test-flex-1")->style->sheet;
 	it_i("<flex-grow>", s[key_flex_grow].val_int, 1);
@@ -83,7 +83,7 @@ static void test_parse_flex_1(void)
 
 static void test_parse_flex_100px(void)
 {
-	pd_style s;
+	LCUI_Style s;
 
 	s = LCUIWidget_GetById("test-flex-100px")->style->sheet;
 	it_b("<flex-grow>.isValid?", s[key_flex_grow].is_valid, FALSE);
@@ -93,7 +93,7 @@ static void test_parse_flex_100px(void)
 
 static void test_parse_flex_1_100px(void)
 {
-	pd_style s;
+	LCUI_Style s;
 
 	s = LCUIWidget_GetById("test-flex-1-100px")->style->sheet;
 	it_b("<flex-grow>.isValid?", s[key_flex_grow].is_valid, FALSE);
@@ -102,7 +102,7 @@ static void test_parse_flex_1_100px(void)
 }
 static void test_parse_flex_0_0_100px(void)
 {
-	pd_style s;
+	LCUI_Style s;
 
 	s = LCUIWidget_GetById("test-flex-0-0-100px")->style->sheet;
 	it_i("<flex-grow>", s[key_flex_grow].val_int, 0);

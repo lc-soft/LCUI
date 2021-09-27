@@ -60,7 +60,7 @@ typedef struct LCUI_WidgetStyle {
 	LCUI_StyleValue vertical_align;
 	pd_border_style_t border;
 	pd_boxshadow_style_t shadow;
-	pd_background_style_t background;
+	LCUI_BackgroundStyle background;
 	LCUI_FlexBoxLayoutStyle flex;
 	int pointer_events;
 } LCUI_WidgetStyle;
@@ -73,7 +73,7 @@ typedef struct LCUI_WidgetActualStyleRec_ {
 	pd_rect_t content_box;
 	pd_border_t border;
 	pd_boxshadow_t shadow;
-	pd_background_t background;
+	LCUI_Background background;
 } LCUI_WidgetActualStyleRec, *LCUI_WidgetActualStyle;
 
 /** 部件任务类型，按照任务的依赖顺序排列 */
@@ -339,7 +339,7 @@ typedef struct LCUI_WidgetRec_ {
 
 #define Widget_SetStyle(W, K, VAL, TYPE)      \
 	do {                                  \
-		pd_style _s;                \
+		LCUI_Style _s;                \
 		_s = Widget_GetStyle(W, K);   \
 		_s->is_valid = TRUE;          \
 		_s->type = LCUI_STYPE_##TYPE; \

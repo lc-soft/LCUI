@@ -453,7 +453,7 @@ LCUI_StyleList StyleList(void)
 	return list;
 }
 
-void DestroyStyle(pd_style s)
+void DestroyStyle(LCUI_Style s)
 {
 	switch (s->type) {
 	case LCUI_STYPE_STRING:
@@ -474,7 +474,7 @@ void DestroyStyle(pd_style s)
 	s->is_valid = FALSE;
 }
 
-void MergeStyle(pd_style dst, pd_style src)
+void MergeStyle(LCUI_Style dst, LCUI_Style src)
 {
 	switch (src->type) {
 	case LCUI_STYPE_STRING:
@@ -512,7 +512,7 @@ LCUI_StyleSheet StyleSheet(void)
 		return ss;
 	}
 	ss->length = LCUI_GetStyleTotal();
-	ss->sheet = NEW(pd_style_t, ss->length + 1);
+	ss->sheet = NEW(LCUI_StyleRec, ss->length + 1);
 	return ss;
 }
 
@@ -596,10 +596,10 @@ int StyleSheet_Merge(LCUI_StyleSheet dest, const LCUI_StyleSheetRec *src)
 {
 	int i;
 	size_t size;
-	pd_style s;
+	LCUI_Style s;
 
 	if (src->length > dest->length) {
-		size = sizeof(pd_style_t) * src->length;
+		size = sizeof(LCUI_StyleRec) * src->length;
 		s = realloc(dest->sheet, size);
 		if (!s) {
 			return -1;
@@ -620,7 +620,7 @@ int StyleSheet_Merge(LCUI_StyleSheet dest, const LCUI_StyleSheetRec *src)
 
 int StyleSheet_MergeList(LCUI_StyleSheet ss, LCUI_StyleList list)
 {
-	pd_style s;
+	LCUI_Style s;
 	LCUI_StyleListNode snode;
 	LinkedListNode *node;
 	size_t size;
@@ -629,7 +629,7 @@ int StyleSheet_MergeList(LCUI_StyleSheet ss, LCUI_StyleList list)
 	for (LinkedList_Each(node, list)) {
 		snode = node->data;
 		if (snode->key > ss->length) {
-			size = sizeof(pd_style_t) * (snode->key + 1);
+			size = sizeof(LCUI_StyleRec) * (snode->key + 1);
 			s = realloc(ss->sheet, size);
 			if (!s) {
 				return -1;
@@ -651,11 +651,11 @@ int StyleSheet_MergeList(LCUI_StyleSheet ss, LCUI_StyleList list)
 int StyleSheet_Replace(LCUI_StyleSheet dest, const LCUI_StyleSheetRec *src)
 {
 	int i;
-	pd_style s;
+	LCUI_Style s;
 	size_t count, size;
 
 	if (src->length > dest->length) {
-		size = sizeof(pd_style_t) * src->length;
+		size = sizeof(LCUI_StyleRec) * src->length;
 		s = realloc(dest->sheet, size);
 		if (!s) {
 			return -1;
@@ -1425,7 +1425,7 @@ static void PrintStyleName(int key)
 	Logger_Debug("%s: ", key > STYLE_KEY_TOTAL ? " (+)" : "");
 }
 
-static void PrintStyleValue(pd_style s)
+static void PrintStyleValue(LCUI_Style s)
 {
 	switch (s->type) {
 	case LCUI_STYPE_AUTO:
@@ -1492,7 +1492,7 @@ void LCUI_PrintStyleList(LCUI_StyleList list)
 void LCUI_PrintStyleSheet(LCUI_StyleSheet ss)
 {
 	int key;
-	pd_style s;
+	LCUI_Style s;
 
 	for (key = 0; key < ss->length; ++key) {
 		s = &ss->sheet[key];

@@ -57,7 +57,7 @@ float LCUIMetrics_Compute(float value, LCUI_StyleType type)
 	return value;
 }
 
-float LCUIMetrics_ComputeStyle(pd_style style)
+float LCUIMetrics_ComputeStyle(LCUI_Style style)
 {
 	switch (style->type) {
 	case LCUI_STYPE_PX:

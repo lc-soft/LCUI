@@ -155,7 +155,7 @@ enum LCUI_StyleKeyName {
 #define key_box_shadow_end	key_box_shadow_color
 
 typedef struct LCUI_StyleSheetRec_ {
-	pd_style sheet;
+	LCUI_Style sheet;
 	int length;
 } LCUI_StyleSheetRec, *LCUI_StyleSheet;
 
@@ -166,7 +166,7 @@ typedef LinkedList* LCUI_StyleList;
 
 typedef struct LCUI_StyleListNodeRec_ {
 	int key;
-	pd_style_t style;
+	LCUI_StyleRec style;
 	LinkedListNode node;
 } LCUI_StyleListNodeRec, *LCUI_StyleListNode;
 
@@ -207,9 +207,9 @@ typedef struct LCUI_SelectorRec_ {
 
 #define StyleSheet_GetStyle(S, K) &((S)->sheet[K])
 
-LCUI_API void DestroyStyle(pd_style s);
+LCUI_API void DestroyStyle(LCUI_Style s);
 
-LCUI_API void MergeStyle(pd_style dst, pd_style src);
+LCUI_API void MergeStyle(LCUI_Style dst, LCUI_Style src);
 
 LCUI_API LCUI_StyleList StyleList(void);
 

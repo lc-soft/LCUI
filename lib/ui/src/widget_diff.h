@@ -45,7 +45,7 @@ typedef struct LCUI_WidgetStyleDiffRec_ {
 	LCUI_StyleValue position;
 	pd_border_style_t border;
 	pd_boxshadow_style_t shadow;
-	pd_background_style_t background;
+	LCUI_BackgroundStyle background;
 	LCUI_WidgetBoxModelRec box;
 	LCUI_FlexBoxLayoutStyle flex;
 	LCUI_BOOL should_add_invalid_area;

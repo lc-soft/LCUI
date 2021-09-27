@@ -34,17 +34,17 @@
 LCUI_BEGIN_HEADER
 
 /** 从字符串中解析出数字，支持的单位：点(pt)、像素(px)、百分比(%) */
-LCUI_API LCUI_BOOL ParseNumber(pd_style var, const char *str);
+LCUI_API LCUI_BOOL ParseNumber(LCUI_Style var, const char *str);
 
-LCUI_API LCUI_BOOL ParseRGB(pd_style var, const char *str);
+LCUI_API LCUI_BOOL ParseRGB(LCUI_Style var, const char *str);
 
-LCUI_API LCUI_BOOL ParseRGBA(pd_style var, const char *str);
+LCUI_API LCUI_BOOL ParseRGBA(LCUI_Style var, const char *str);
 
 /** 从字符串中解析出色彩值，支持格式：#fff、#ffffff, rgba(R,G,B,A)、rgb(R,G,B) */
-LCUI_API LCUI_BOOL ParseColor(pd_style var, const char *str);
+LCUI_API LCUI_BOOL ParseColor(LCUI_Style var, const char *str);
 
 /** 解析资源路径 */
-LCUI_API LCUI_BOOL ParseUrl(pd_style s, const char *str, const char *dirname);
+LCUI_API LCUI_BOOL ParseUrl(LCUI_Style s, const char *str, const char *dirname);
 
 LCUI_API LCUI_BOOL ParseFontWeight(const char *str, int *weight);
 

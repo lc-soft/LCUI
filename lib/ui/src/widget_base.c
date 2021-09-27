@@ -356,7 +356,7 @@ void Widget_AddState(LCUI_Widget w, LCUI_WidgetState state)
 
 float Widget_ComputeXMetric(LCUI_Widget w, int key)
 {
-	pd_style s = &w->style->sheet[key];
+	LCUI_Style s = &w->style->sheet[key];
 
 	if (s->type == LCUI_STYPE_SCALE) {
 		if (!w->parent) {
@@ -372,7 +372,7 @@ float Widget_ComputeXMetric(LCUI_Widget w, int key)
 
 float Widget_ComputeYMetric(LCUI_Widget w, int key)
 {
-	pd_style s = &w->style->sheet[key];
+	LCUI_Style s = &w->style->sheet[key];
 
 	if (s->type == LCUI_STYPE_SCALE) {
 		if (!w->parent) {

@@ -270,8 +270,8 @@ typedef struct pd_canvas_t_ pd_canvas_t;
 typedef struct pd_graph_quote_t_ {
 	int top;
 	int left;
-	LCUI_BOOL is_valid;
-	LCUI_BOOL is_writable;
+	pd_bool is_valid;
+	pd_bool is_writable;
 	union {
 		pd_canvas_t *source;
 		const pd_canvas_t *source_ro;
@@ -294,7 +294,7 @@ struct pd_canvas_t_ {
 	uchar_t *palette;
 };
 
-typedef struct pd_style_t_ {
+typedef struct LCUI_StyleRec_ {
 	LCUI_BOOL is_valid : 2;
 	LCUI_StyleType type : 6;
 	union {
@@ -326,7 +326,7 @@ typedef struct pd_style_t_ {
 		pd_canvas_t *val_image;
 		LCUI_BOOL val_bool;
 	};
-} pd_style_t, *pd_style;
+} LCUI_StyleRec, *LCUI_Style;
 
 typedef enum LCUI_SizingRule_ {
 	LCUI_SIZING_RULE_NONE,
@@ -389,40 +389,40 @@ typedef struct LCUI_FlexLayoutStyle {
 } LCUI_FlexBoxLayoutStyle;
 
 typedef struct LCUI_BoundBoxRec {
-	pd_style_t top, right, bottom, left;
+	LCUI_StyleRec top, right, bottom, left;
 } LCUI_BoundBox;
 
-typedef struct pd_background_position_t_ {
+typedef struct LCUI_BackgroundPosition {
 	LCUI_BOOL using_value;
 	union {
 		struct {
-			pd_style_t x, y;
+			LCUI_StyleRec x, y;
 		};
 		int value;
 	};
-} pd_background_position_t;
+} LCUI_BackgroundPosition;
 
-typedef struct pd_background_size_t_ {
+typedef struct LCUI_BackgroundSize {
 	LCUI_BOOL using_value;
 	union {
 		struct {
-			pd_style_t width, height;
+			LCUI_StyleRec width, height;
 		};
 		int value;
 	};
-} pd_background_size_t;
+} LCUI_BackgroundSize;
 
-typedef struct pd_background_style_t_ {
+typedef struct LCUI_BackgroundStyle {
 	pd_canvas_t image; /**< 背景图 */
 	pd_color_t color; /**< 背景色 */
 	struct {
 		LCUI_BOOL x, y;
 	} repeat;                         /**< 背景图是否重复 */
-	pd_background_position_t position; /**< 定位方式 */
-	pd_background_size_t size;         /**< 尺寸 */
-} pd_background_style_t;
+	LCUI_BackgroundPosition position; /**< 定位方式 */
+	LCUI_BackgroundSize size;         /**< 尺寸 */
+} LCUI_BackgroundStyle;
 
-typedef struct pd_background_t_ {
+typedef struct LCUI_Background {
 	pd_canvas_t *image; /**< 背景图 */
 	pd_color_t color;  /**< 背景色 */
 	struct {
@@ -434,13 +434,13 @@ typedef struct pd_background_t_ {
 	struct {
 		int width, height;
 	} size;
-} pd_background_t;
+} LCUI_Background;
 
 /** 进行绘制时所需的上下文 */
 typedef struct pd_paint_context_t_ {
 	pd_rect_t rect;    /**< 需要绘制的区域 */
 	pd_canvas_t canvas; /**< 绘制后的位图缓存（可称为：画布） */
-	LCUI_BOOL with_alpha; /**< 绘制时是否需要处理 alpha 通道 */
+	pd_bool with_alpha; /**< 绘制时是否需要处理 alpha 通道 */
 } pd_paint_context_t, *pd_paint_context;
 
 typedef void (*FuncPtr)(void *);

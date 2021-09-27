@@ -36,7 +36,7 @@
 #include <LCUI/draw/boxshadow.h>
 #include "widget_shadow.h"
 
-static float ComputeXMetric(LCUI_Widget w, pd_style s)
+static float ComputeXMetric(LCUI_Widget w, LCUI_Style s)
 {
 	if (s->type == LCUI_STYPE_SCALE) {
 		return w->width * s->scale;
@@ -44,7 +44,7 @@ static float ComputeXMetric(LCUI_Widget w, pd_style s)
 	return LCUIMetrics_Compute(s->value, s->type);
 }
 
-static float ComputeYMetric(LCUI_Widget w, pd_style s)
+static float ComputeYMetric(LCUI_Widget w, LCUI_Style s)
 {
 	if (s->type == LCUI_STYPE_SCALE) {
 		return w->height * s->scale;
@@ -55,7 +55,7 @@ static float ComputeYMetric(LCUI_Widget w, pd_style s)
 void Widget_ComputeBoxShadowStyle(LCUI_Widget w)
 {
 	int key;
-	pd_style s;
+	LCUI_Style s;
 	pd_boxshadow_style_t *sd;
 
 	sd = &w->computed_style.shadow;

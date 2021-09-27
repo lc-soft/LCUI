@@ -51,7 +51,7 @@ static struct CSSParserModule {
 } self;
 
 void CSSStyleParser_SetCSSProperty(LCUI_CSSParserStyleContext ctx, int key,
-				   pd_style s)
+				   LCUI_Style s)
 {
 	if (ctx->style_handler) {
 		ctx->style_handler(key, s, ctx->style_handler_arg);
@@ -60,13 +60,13 @@ void CSSStyleParser_SetCSSProperty(LCUI_CSSParserStyleContext ctx, int key,
 	}
 }
 
-static int SplitValues(const char *str, pd_style slist, int max_len, int mode)
+static int SplitValues(const char *str, LCUI_Style slist, int max_len, int mode)
 {
 	char **values;
 	const char *p;
 	int val, vi = 0, vj = 0, n_quotes = 0;
 
-	memset(slist, 0, sizeof(pd_style_t) * max_len);
+	memset(slist, 0, sizeof(LCUI_StyleRec) * max_len);
 	values = (char **)calloc(max_len, sizeof(char *));
 	values[0] = (char *)malloc(sizeof(char) * 64);
 	for (p = str; *p; ++p) {
@@ -138,7 +138,7 @@ clean:
 
 static int OnParseValue(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t s;
+	LCUI_StyleRec s;
 
 	if (sscanf(str, "%d", &s.val_int) == 1) {
 		s.is_valid = TRUE;
@@ -151,7 +151,7 @@ static int OnParseValue(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseNumber(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t s;
+	LCUI_StyleRec s;
 
 	if (ParseNumber(&s, str)) {
 		SetCSSProperty(ctx, ctx->parser->key, &s);
@@ -169,7 +169,7 @@ static int OnParseNumber(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBoolean(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t s = { 0 };
+	LCUI_StyleRec s = { 0 };
 
 	if (strcmp(str, "true") == 0) {
 		s.is_valid = TRUE;
@@ -197,7 +197,7 @@ static int OnParseBoolean(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseColor(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t s;
+	LCUI_StyleRec s;
 
 	if (ParseColor(&s, str)) {
 		SetCSSProperty(ctx, ctx->parser->key, &s);
@@ -208,7 +208,7 @@ static int OnParseColor(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseImage(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t s;
+	LCUI_StyleRec s;
 
 	if (ParseUrl(&s, str, ctx->dirname)) {
 		SetCSSProperty(ctx, ctx->parser->key, &s);
@@ -219,7 +219,7 @@ static int OnParseImage(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseStyleOption(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t s;
+	LCUI_StyleRec s;
 	int v = LCUI_GetStyleValue(str);
 
 	if (v < 0) {
@@ -234,7 +234,7 @@ static int OnParseStyleOption(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBorder(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t slist[3];
+	LCUI_StyleRec slist[3];
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
 
 	if (SplitValues(str, slist, 3, mode) < 1) {
@@ -273,7 +273,7 @@ static int OnParseBorder(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBorderRadius(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t s;
+	LCUI_StyleRec s;
 
 	if (!ParseNumber(&s, str)) {
 		return -1;
@@ -287,7 +287,7 @@ static int OnParseBorderRadius(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBorderLeft(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t slist[3];
+	LCUI_StyleRec slist[3];
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
 
 	if (SplitValues(str, slist, 3, mode) < 1) {
@@ -314,7 +314,7 @@ static int OnParseBorderLeft(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBorderTop(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t slist[3];
+	LCUI_StyleRec slist[3];
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
 
 	if (SplitValues(str, slist, 3, mode) < 1) {
@@ -341,7 +341,7 @@ static int OnParseBorderTop(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBorderRight(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t slist[3];
+	LCUI_StyleRec slist[3];
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
 
 	if (SplitValues(str, slist, 3, mode) < 1) {
@@ -368,7 +368,7 @@ static int OnParseBorderRight(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBorderBottom(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t slist[3];
+	LCUI_StyleRec slist[3];
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
 
 	if (SplitValues(str, slist, 3, mode) < 1) {
@@ -395,7 +395,7 @@ static int OnParseBorderBottom(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBorderColor(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t s;
+	LCUI_StyleRec s;
 
 	// TODO: support parsing multiple values
 	// border-color: #eee transparent;
@@ -413,7 +413,7 @@ static int OnParseBorderColor(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBorderWidth(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t s;
+	LCUI_StyleRec s;
 
 	// TODO: support parsing multiple values
 	// border-width: 4px 0;
@@ -431,7 +431,7 @@ static int OnParseBorderWidth(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBorderStyle(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t s;
+	LCUI_StyleRec s;
 
 	s.is_valid = TRUE;
 	s.val_style = LCUI_GetStyleValue(str);
@@ -447,7 +447,7 @@ static int OnParseBorderStyle(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParsePadding(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t s[4];
+	LCUI_StyleRec s[4];
 
 	switch (SplitValues(str, s, 4, SPLIT_NUMBER)) {
 	case 1:
@@ -481,7 +481,7 @@ static int OnParsePadding(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseMargin(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t s[4];
+	LCUI_StyleRec s[4];
 
 	switch (SplitValues(str, s, 4, SPLIT_NUMBER)) {
 	case 1:
@@ -515,7 +515,7 @@ static int OnParseMargin(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBoxShadow(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t s[5];
+	LCUI_StyleRec s[5];
 
 	if (strcmp(str, "none") == 0) {
 		s[0].val_int = 0;
@@ -560,7 +560,7 @@ static int OnParseBackground(LCUI_CSSParserStyleContext ctx, const char *str)
 static int OnParseBackgroundPosition(LCUI_CSSParserStyleContext ctx,
 				     const char *str)
 {
-	pd_style_t slist[2];
+	LCUI_StyleRec slist[2];
 	int ret = OnParseStyleOption(ctx, str);
 
 	if (ret == 0) {
@@ -577,8 +577,8 @@ static int OnParseBackgroundPosition(LCUI_CSSParserStyleContext ctx,
 static int OnParseBackgroundSize(LCUI_CSSParserStyleContext ctx,
 				 const char *str)
 {
-	pd_style_t none;
-	pd_style_t slist[2];
+	LCUI_StyleRec none;
+	LCUI_StyleRec slist[2];
 	int ret = OnParseStyleOption(ctx, str);
 
 	none.is_valid = TRUE;
@@ -607,7 +607,7 @@ static int OnParseBackgroundRepeat(LCUI_CSSParserStyleContext ctx,
 
 static int OnParseVisibility(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t s;
+	LCUI_StyleRec s;
 
 	if (strcmp(str, "visible") == 0 || strcmp(str, "hidden") == 0) {
 		s.is_valid = TRUE;
@@ -623,8 +623,8 @@ static int OnParseVisibility(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseFlex(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t s;
-	pd_style_t slist[3];
+	LCUI_StyleRec s;
+	LCUI_StyleRec slist[3];
 	int i, mode = SPLIT_NUMBER | SPLIT_STYLE;
 
 	if (strcmp("initial", str) == 0) {
@@ -697,8 +697,8 @@ static int OnParseFlex(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseFlexFlow(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t s;
-	pd_style_t slist[2];
+	LCUI_StyleRec s;
+	LCUI_StyleRec slist[2];
 
 	if (strcmp(str, "wrap") == 0) {
 		s.is_valid = TRUE;
@@ -754,7 +754,7 @@ static int OnParseFlexFlow(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseFlexBasis(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t s;
+	LCUI_StyleRec s;
 
 	if (OnParseStyleOption(ctx, str) == 0) {
 		return 0;
@@ -768,7 +768,7 @@ static int OnParseFlexBasis(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseFlexGrow(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t s;
+	LCUI_StyleRec s;
 
 	if (ParseNumber(&s, str)) {
 		SetCSSProperty(ctx, key_flex_grow, &s);
@@ -779,7 +779,7 @@ static int OnParseFlexGrow(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseFlexShrink(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	pd_style_t s;
+	LCUI_StyleRec s;
 
 	if (ParseNumber(&s, str)) {
 		SetCSSProperty(ctx, key_flex_grow, &s);

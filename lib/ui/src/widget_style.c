@@ -115,7 +115,7 @@ void Widget_ComputeMarginStyle(LCUI_Widget w)
 
 void Widget_ComputeProperties(LCUI_Widget w)
 {
-	pd_style s;
+	LCUI_Style s;
 	LCUI_WidgetStyle *style = &w->computed_style;
 
 	s = &w->style->sheet[key_focusable];
@@ -338,7 +338,7 @@ void Widget_ComputeFlexBasisStyle(LCUI_Widget w)
 
 void Widget_ComputeVisibilityStyle(LCUI_Widget w)
 {
-	pd_style s = &w->style->sheet[key_visibility];
+	LCUI_Style s = &w->style->sheet[key_visibility];
 
 	if (w->computed_style.display == SV_NONE) {
 		w->computed_style.visible = FALSE;
@@ -352,7 +352,7 @@ void Widget_ComputeVisibilityStyle(LCUI_Widget w)
 
 void Widget_ComputeDisplayStyle(LCUI_Widget w)
 {
-	pd_style s = &w->style->sheet[key_display];
+	LCUI_Style s = &w->style->sheet[key_display];
 	LCUI_WidgetStyle *style = &w->computed_style;
 
 	if (s->is_valid && s->type == LCUI_STYPE_STYLE) {
@@ -369,7 +369,7 @@ void Widget_ComputeDisplayStyle(LCUI_Widget w)
 void Widget_ComputeOpacityStyle(LCUI_Widget w)
 {
 	float opacity = 1.0;
-	pd_style s = &w->style->sheet[key_opacity];
+	LCUI_Style s = &w->style->sheet[key_opacity];
 
 	if (s->is_valid) {
 		switch (s->type) {
@@ -394,7 +394,7 @@ void Widget_ComputeOpacityStyle(LCUI_Widget w)
 
 void Widget_ComputeZIndexStyle(LCUI_Widget w)
 {
-	pd_style s = &w->style->sheet[key_z_index];
+	LCUI_Style s = &w->style->sheet[key_z_index];
 
 	if (s->is_valid && s->type == LCUI_STYPE_INT) {
 		w->computed_style.z_index = s->val_int;
@@ -419,7 +419,7 @@ void Widget_ComputePositionStyle(LCUI_Widget w)
 
 void Widget_ComputeFlexBoxStyle(LCUI_Widget w)
 {
-	pd_style s = w->style->sheet;
+	LCUI_Style s = w->style->sheet;
 	LCUI_FlexBoxLayoutStyle *flex = &w->computed_style.flex;
 
 	if (!Widget_IsFlexLayoutStyleWorks(w)) {
@@ -616,10 +616,10 @@ void Widget_UpdateChildrenStyle(LCUI_Widget w, LCUI_BOOL is_refresh_all)
 	}
 }
 
-static void OnSetStyle(int key, pd_style style, void *arg)
+static void OnSetStyle(int key, LCUI_Style style, void *arg)
 {
 	LCUI_Widget w = arg;
-	pd_style s = Widget_GetStyle(w, key);
+	LCUI_Style s = Widget_GetStyle(w, key);
 
 	if (style->is_valid) {
 		DestroyStyle(s);

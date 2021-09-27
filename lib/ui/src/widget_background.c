@@ -161,7 +161,7 @@ static void AsyncLoadImage(LCUI_Widget widget, const char *path)
 	ImageRef ref;
 	ImageCache cache;
 	LCUI_TaskRec task = { 0 };
-	pd_style s = &widget->style->sheet[key_background_image];
+	LCUI_Style s = &widget->style->sheet[key_background_image];
 
 	if (!self.active) {
 		return;
@@ -211,7 +211,7 @@ void LCUIWidget_FreeImageLoader(void)
 
 void Widget_InitBackground(LCUI_Widget w)
 {
-	pd_background_style_t *bg;
+	LCUI_BackgroundStyle *bg;
 	bg = &w->computed_style.background;
 	bg->color = RGB(255, 255, 255);
 	pd_canvas_init(&bg->image);
@@ -232,9 +232,9 @@ void Widget_DestroyBackground(LCUI_Widget w)
 
 void Widget_ComputeBackgroundStyle(LCUI_Widget widget)
 {
-	pd_style s;
+	LCUI_Style s;
 	LCUI_StyleSheet ss = widget->style;
-	pd_background_style_t *bg = &widget->computed_style.background;
+	LCUI_BackgroundStyle *bg = &widget->computed_style.background;
 	int key = key_background_start;
 
 	for (; key <= key_background_end; ++key) {
@@ -315,11 +315,11 @@ void Widget_ComputeBackgroundStyle(LCUI_Widget widget)
 	}
 }
 
-void Widget_ComputeBackground(LCUI_Widget w, pd_background_t *out)
+void Widget_ComputeBackground(LCUI_Widget w, LCUI_Background *out)
 {
 	LCUI_StyleType type;
 	pd_rectf_t *box = &w->box.border;
-	pd_background_style_t *bg = &w->computed_style.background;
+	LCUI_BackgroundStyle *bg = &w->computed_style.background;
 	float scale, x = 0, y = 0, width, height;
 
 	/* 计算背景图应有的尺寸 */

@@ -198,7 +198,7 @@ static int FontFace_ParseFontStyle(LCUI_CSSFontFace face, const char *str)
 static int FontFace_ParseSrc(LCUI_CSSFontFace face, const char *str,
 			     const char *dirname)
 {
-	pd_style_t style;
+	LCUI_StyleRec style;
 	if (face->src) {
 		free(face->src);
 	}

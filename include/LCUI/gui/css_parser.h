@@ -112,7 +112,7 @@ struct LCUI_CSSParserStyleContextRec_ {
 	char *dirname;     /**< 当前所在的目录 */
 	const char *space; /**< 样式记录所属的空间 */
 
-	void (*style_handler)(int, pd_style, void *);
+	void (*style_handler)(int, LCUI_Style, void *);
 	void *style_handler_arg;
 
 	LinkedList selectors;          /**< 当前匹配到的选择器列表 */
@@ -158,7 +158,7 @@ LCUI_API const char *LCUI_GetStyleName(int key);
 LCUI_API void LCUI_InitCSSParser(void);
 
 LCUI_API void CSSStyleParser_SetCSSProperty(LCUI_CSSParserStyleContext ctx,
-					    int key, pd_style s);
+					    int key, LCUI_Style s);
 
 LCUI_API LCUI_CSSPropertyParser LCUI_GetCSSPropertyParser(const char *name);
 

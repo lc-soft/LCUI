@@ -112,7 +112,7 @@ void Widget_Resize(LCUI_Widget w, float width, float height)
 	Widget_UpdateStyle(w, FALSE);
 }
 
-pd_style Widget_GetStyle(LCUI_Widget w, int key)
+LCUI_Style Widget_GetStyle(LCUI_Widget w, int key)
 {
 	LCUI_StyleListNode node;
 
@@ -137,7 +137,7 @@ int Widget_UnsetStyle(LCUI_Widget w, int key)
 	return StyleList_RemoveNode(w->custom_style, key);
 }
 
-pd_style Widget_GetInheritedStyle(LCUI_Widget w, int key)
+LCUI_Style Widget_GetInheritedStyle(LCUI_Widget w, int key)
 {
 	LCUI_Selector selector;
 
@@ -152,7 +152,7 @@ pd_style Widget_GetInheritedStyle(LCUI_Widget w, int key)
 
 LCUI_BOOL Widget_CheckStyleBooleanValue(LCUI_Widget w, int key, LCUI_BOOL value)
 {
-	pd_style s = &w->style->sheet[key_focusable];
+	LCUI_Style s = &w->style->sheet[key_focusable];
 
 	return s->is_valid && s->type == LCUI_STYPE_BOOL &&
 	       s->val_bool == value;
@@ -165,7 +165,7 @@ LCUI_BOOL Widget_CheckStyleValid(LCUI_Widget w, int key)
 
 void Widget_SetVisibility(LCUI_Widget w, const char *value)
 {
-	pd_style s = Widget_GetStyle(w, key_visibility);
+	LCUI_Style s = Widget_GetStyle(w, key_visibility);
 	if (s->is_valid && s->type == LCUI_STYPE_STRING) {
 		free(s->val_string);
 		s->val_string = NULL;
@@ -186,7 +186,7 @@ void Widget_SetHidden(LCUI_Widget w)
 
 void Widget_Show(LCUI_Widget w)
 {
-	pd_style s = Widget_GetStyle(w, key_display);
+	LCUI_Style s = Widget_GetStyle(w, key_display);
 
 	if (s->is_valid && s->type == LCUI_STYPE_STYLE &&
 	    s->val_style == SV_NONE) {

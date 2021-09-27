@@ -50,7 +50,7 @@ typedef enum LCUI_TextStyleTagType_ {
 
 typedef struct LCUI_StyleTag {
 	LCUI_TextStyleTagType id;
-	pd_style_t style;
+	LCUI_StyleRec style;
 } LCUI_TextStyleTag;
 
 void TextStyle_Init(LCUI_TextStyle data)

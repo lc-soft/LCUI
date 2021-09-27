@@ -41,4 +41,4 @@ void Widget_ComputeBackgroundStyle(LCUI_Widget widget);
 void Widget_PaintBakcground(LCUI_Widget w, pd_paint_context paint,
 				     LCUI_WidgetActualStyle style);
 
-void Widget_ComputeBackground(LCUI_Widget w, pd_background_t *out);
+void Widget_ComputeBackground(LCUI_Widget w, LCUI_Background *out);

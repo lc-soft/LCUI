@@ -78,7 +78,7 @@ static LCUI_BOOL ParseBoolean(const char *str)
 static int OnParseWordBreak(LCUI_CSSParserStyleContext ctx, const char *value)
 {
 	char *str = strdup2(value);
-	pd_style s = &ctx->sheet->sheet[self.key_word_break];
+	LCUI_Style s = &ctx->sheet->sheet[self.key_word_break];
 	if (s->is_valid && s->string) {
 		free(s->string);
 	}
@@ -90,7 +90,7 @@ static int OnParseWordBreak(LCUI_CSSParserStyleContext ctx, const char *value)
 
 static LCUI_WordBreakMode ComputeWordBreakMode(LCUI_StyleSheet sheet)
 {
-	pd_style s = &sheet->sheet[self.key_word_break];
+	LCUI_Style s = &sheet->sheet[self.key_word_break];
 	if (s->is_valid && s->type == LCUI_STYPE_STRING && s->string) {
 		if (strcmp(s->string, "break-all") == 0) {
 			return LCUI_WORD_BREAK_BREAK_ALL;

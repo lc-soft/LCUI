@@ -36,7 +36,7 @@
 #include <LCUI/util/parse.h>
 #include <LCUI/font/fontlibrary.h>
 
-LCUI_BOOL ParseNumber(pd_style s, const char *str)
+LCUI_BOOL ParseNumber(LCUI_Style s, const char *str)
 {
 	int n = 0;
 	const char *p;
@@ -135,7 +135,7 @@ LCUI_BOOL ParseNumber(pd_style s, const char *str)
 	return TRUE;
 }
 
-LCUI_BOOL ParseRGBA(pd_style var, const char *str)
+LCUI_BOOL ParseRGBA(LCUI_Style var, const char *str)
 {
 	float data[4];
 	char buf[16];
@@ -175,7 +175,7 @@ LCUI_BOOL ParseRGBA(pd_style var, const char *str)
 	return TRUE;
 }
 
-LCUI_BOOL ParseRGB(pd_style var, const char *str)
+LCUI_BOOL ParseRGB(LCUI_Style var, const char *str)
 {
 	float data[3];
 	char buf[16];
@@ -215,7 +215,7 @@ LCUI_BOOL ParseRGB(pd_style var, const char *str)
 	return TRUE;
 }
 
-LCUI_BOOL ParseColor(pd_style var, const char *str)
+LCUI_BOOL ParseColor(LCUI_Style var, const char *str)
 {
 	const char *p;
 	int len = 0, status = 0, r, g, b;
@@ -288,7 +288,7 @@ static LCUI_BOOL IsAbsolutePath(const char *path)
 	return FALSE;
 }
 
-LCUI_BOOL ParseUrl(pd_style s, const char *str, const char *dirname)
+LCUI_BOOL ParseUrl(LCUI_Style s, const char *str, const char *dirname)
 {
 	size_t n, dirname_len;
 	const char *p, *head, *tail;
