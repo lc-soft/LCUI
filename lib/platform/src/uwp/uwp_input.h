@@ -54,7 +54,7 @@ namespace LCUICore {
 			Windows::Foundation::Point position;
 		} m_mouse;
 		struct {
-			LinkedList points;
+			list_t points;
 		} m_touch;
 	};
 }

@@ -1,6 +1,7 @@
 ﻿#include <LCUI.h>
 #include <LCUI/image.h>
 #include <LCUI/font.h>
+#include <LCUI/graph.h>
 
 int main(void)
 {

@@ -57,12 +57,12 @@ typedef struct LCUI_TextViewRec_ {
 	LCUI_TextLayer layer;
 	LCUI_CSSFontStyleRec style;
 	LCUI_TextViewTaskRec task;
-	LinkedListNode node;
+	list_node_t node;
 } LCUI_TextViewRec, *LCUI_TextView;
 
 static struct LCUI_TextViewModule {
 	int key_word_break;
-	LinkedList list;
+	list_t list;
 	LCUI_WidgetPrototype prototype;
 } self;
 
@@ -130,13 +130,13 @@ static void TextView_Update(LCUI_Widget w)
 	pd_rectf_t rect;
 	LCUI_TextView txt = GetData(w);
 
-	LinkedList rects;
-	LinkedListNode *node;
+	list_t rects;
+	list_node_t *node;
 
-	LinkedList_Init(&rects);
+	list_create(&rects);
 	TextLayer_Update(txt->layer, &rects);
 	TextLayer_ClearInvalidRect(txt->layer);
-	for (LinkedList_Each(node, &rects)) {
+	for (list_each(node, &rects)) {
 		LCUIRect_ToRectF(node->data, &rect, 1.0f / scale);
 		Widget_InvalidateArea(w, &rect, SV_CONTENT_BOX);
 	}
@@ -191,14 +191,14 @@ static void TextView_OnInit(LCUI_Widget w)
 	CSSFontStyle_Init(&txt->style);
 	txt->node.data = txt;
 	txt->node.prev = txt->node.next = NULL;
-	LinkedList_AppendNode(&self.list, &txt->node);
+	list_append_node(&self.list, &txt->node);
 }
 
 static void TextView_OnDestroy(LCUI_Widget w)
 {
 	LCUI_TextView txt = GetData(w);
 
-	LinkedList_Unlink(&self.list, &txt->node);
+	list_unlink(&self.list, &txt->node);
 	CSSFontStyle_Destroy(&txt->style);
 	TextLayer_Destroy(txt->layer);
 	free(txt->content);
@@ -216,7 +216,7 @@ static void TextView_OnAutoSize(LCUI_Widget w, float *width, float *height,
 
 	LCUI_TextView txt = GetData(w);
 
-	LinkedList rects;
+	list_t rects;
 
 	if (w->parent &&
 	    w->parent->computed_style.width_sizing == LCUI_SIZING_RULE_FIXED) {
@@ -243,7 +243,7 @@ static void TextView_OnAutoSize(LCUI_Widget w, float *width, float *height,
 		max_height = 0;
 		break;
 	}
-	LinkedList_Init(&rects);
+	list_create(&rects);
 	TextLayer_SetFixedSize(txt->layer, 0, 0);
 	TextLayer_SetMaxSize(txt->layer, max_width, max_height);
 	TextLayer_Update(txt->layer, &rects);
@@ -262,15 +262,15 @@ static void TextView_OnResize(LCUI_Widget w, float width, float height)
 	pd_rectf_t rect;
 	LCUI_TextView txt = GetData(w);
 
-	LinkedList rects;
-	LinkedListNode *node;
+	list_t rects;
+	list_node_t *node;
 
-	LinkedList_Init(&rects);
+	list_create(&rects);
 	TextLayer_SetFixedSize(txt->layer, fixed_width, fixed_height);
 	TextLayer_SetMaxSize(txt->layer, fixed_width, fixed_height);
 	TextLayer_Update(txt->layer, &rects);
 	TextLayer_ClearInvalidRect(txt->layer);
-	for (LinkedList_Each(node, &rects)) {
+	for (list_each(node, &rects)) {
 		LCUIRect_ToRectF(node->data, &rect, 1.0f / scale);
 		Widget_InvalidateArea(w, &rect, SV_CONTENT_BOX);
 	}
@@ -348,7 +348,7 @@ int TextView_SetText(LCUI_Widget w, const char *utf8_text)
 	size_t len = strlen(utf8_text) + 1;
 
 	wstr = malloc(sizeof(wchar_t) * len);
-	LCUI_DecodeString(wstr, utf8_text, len, ENCODING_UTF8);
+	decode_utf8(wstr, utf8_text, len);
 	ret = TextView_SetTextW(w, wstr);
 	if (wstr) {
 		free(wstr);
@@ -392,9 +392,9 @@ size_t LCUIWidget_RefreshTextView(void)
 {
 	size_t count = 0;
 	LCUI_TextView txt;
-	LinkedListNode *node;
+	list_node_t *node;
 
-	for (LinkedList_Each(node, &self.list)) {
+	for (list_each(node, &self.list)) {
 		txt = node->data;
 		if (txt->widget->state != LCUI_WSTATE_DELETED) {
 			Widget_UpdateStyle(txt->widget, TRUE);
@@ -442,10 +442,10 @@ void LCUIWidget_AddTextView(void)
 	self.prototype->setattr = TextView_OnParseAttr;
 	self.prototype->runtask = TextVIew_OnTask;
 	LCUI_AddCSSPropertyParser(&parser);
-	LinkedList_Init(&self.list);
+	list_create(&self.list);
 }
 
 void LCUIWidget_FreeTextView(void)
 {
-	LinkedList_ClearData(&self.list, NULL);
+	list_destroy_without_node(&self.list, NULL);
 }

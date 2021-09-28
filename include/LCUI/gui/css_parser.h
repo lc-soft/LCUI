@@ -115,7 +115,7 @@ struct LCUI_CSSParserStyleContextRec_ {
 	void (*style_handler)(int, LCUI_Style, void *);
 	void *style_handler_arg;
 
-	LinkedList selectors;          /**< 当前匹配到的选择器列表 */
+	list_t selectors;          /**< 当前匹配到的选择器列表 */
 	LCUI_StyleSheet sheet;         /**< 当前缓存的样式表 */
 	LCUI_CSSPropertyParser parser; /**< 当前找到的样式属性解析器 */
 };

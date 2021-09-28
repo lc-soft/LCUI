@@ -51,9 +51,9 @@ void Settings_Init(LCUI_Settings settings)
 void LCUI_ApplySettings(LCUI_Settings settings)
 {
 	self = *settings;
-	self.frame_rate_cap = max(self.frame_rate_cap, 1);
+	self.frame_rate_cap = y_max(self.frame_rate_cap, 1);
 	self.parallel_rendering_threads =
-	    max(self.parallel_rendering_threads, 1);
+	    y_max(self.parallel_rendering_threads, 1);
 	TriggerSettingsChangedEvent();
 }
 

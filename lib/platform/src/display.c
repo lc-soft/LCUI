@@ -65,10 +65,10 @@ typedef struct SurfaceRecordRec_ {
 	LCUI_BOOL rendered;
 
 	/** dirty rectangles for rendering */
-	LinkedList rects;
+	list_t rects;
 
 	/** flashing rect list */
-	LinkedList flash_rects;
+	list_t flash_rects;
 
 	LCUI_Surface surface;
 	LCUI_Widget widget;
@@ -78,8 +78,8 @@ static struct LCUI_DisplayModule {
 	unsigned width, height;
 	LCUI_BOOL active;
 	LCUI_DisplayMode mode;
-	LinkedList surfaces;
-	LinkedList rects;
+	list_t surfaces;
+	list_t rects;
 	LCUI_DisplayDriver driver;
 	LCUI_SettingsRec settings;
 	int settings_change_handler_id;
@@ -88,7 +88,7 @@ static struct LCUI_DisplayModule {
 /* clang-format on */
 
 #define LCUIDisplay_CleanSurfaces() \
-	LinkedList_Clear(&display.surfaces, OnDestroySurfaceRecord)
+	list_destroy(&display.surfaces, OnDestroySurfaceRecord)
 
 INLINE int is_rect_equals(const pd_rect_t *a, const pd_rect_t *b)
 {
@@ -101,8 +101,8 @@ static void OnDestroySurfaceRecord(void *data)
 	SurfaceRecord record = data;
 
 	Surface_Close(record->surface);
-	LinkedList_Clear(&record->rects, free);
-	LinkedList_Clear(&record->flash_rects, free);
+	list_destroy(&record->rects, free);
+	list_destroy(&record->flash_rects, free);
 	free(record);
 }
 
@@ -127,7 +127,7 @@ static size_t LCUIDisplay_RenderFlashRect(SurfaceRecord record,
 	if (!paint) {
 		return 0;
 	}
-	period = LCUI_GetTimeDelta(flash_rect->paint_time);
+	period = get_time_delta(flash_rect->paint_time);
 	count = Widget_Render(record->widget, paint);
 	if (period >= duraion) {
 		flash_rect->paint_time = 0;
@@ -158,14 +158,14 @@ static size_t LCUIDisplay_UpdateFlashRects(SurfaceRecord record)
 {
 	size_t count = 0;
 	FlashRect flash_rect;
-	LinkedListNode *node, *prev;
+	list_node_t *node, *prev;
 
-	for (LinkedList_Each(node, &record->flash_rects)) {
+	for (list_each(node, &record->flash_rects)) {
 		flash_rect = node->data;
 		if (flash_rect->paint_time == 0) {
 			prev = node->prev;
 			free(node->data);
-			LinkedList_DeleteNode(&record->flash_rects, node);
+			list_delete_node(&record->flash_rects, node);
 			node = prev;
 			continue;
 		}
@@ -177,21 +177,21 @@ static size_t LCUIDisplay_UpdateFlashRects(SurfaceRecord record)
 
 static void LCUIDisplay_AppendFlashRects(SurfaceRecord record, pd_rect_t *rect)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 	FlashRect flash_rect;
 
-	for (LinkedList_Each(node, &record->flash_rects)) {
+	for (list_each(node, &record->flash_rects)) {
 		flash_rect = node->data;
 		if (is_rect_equals(&flash_rect->rect, rect)) {
-			flash_rect->paint_time = LCUI_GetTime();
+			flash_rect->paint_time = get_time_ms();
 			return;
 		}
 	}
 
 	flash_rect = NEW(FlashRectRec, 1);
 	flash_rect->rect = *rect;
-	flash_rect->paint_time = LCUI_GetTime();
-	LinkedList_Append(&record->flash_rects, flash_rect);
+	flash_rect->paint_time = get_time_ms();
+	list_append(&record->flash_rects, flash_rect);
 }
 
 static void GetRenderingLayerSize(int *width, int *height)
@@ -201,13 +201,13 @@ static void GetRenderingLayerSize(int *width, int *height)
 	*width = (int)(LCUIDisplay_GetWidth() * scale);
 	*height = (int)(LCUIDisplay_GetHeight() * scale);
 	*height =
-	    max(200, *height / display.settings.parallel_rendering_threads + 1);
+	    y_max(200, *height / display.settings.parallel_rendering_threads + 1);
 }
 
-static void SurfaceRecord_DumpRects(SurfaceRecord record, LinkedList *rects)
+static void SurfaceRecord_DumpRects(SurfaceRecord record, list_t *rects)
 {
 	typedef struct DirtyLayerRec {
-		LinkedList rects;
+		list_t rects;
 		pd_rect_t rect;
 		int diry;
 	} DirtyLayerRec, *DirtyLayer;
@@ -221,7 +221,7 @@ static void SurfaceRecord_DumpRects(SurfaceRecord record, LinkedList *rects)
 	pd_rect_t *sub_rect;
 	DirtyLayer layer;
 	DirtyLayerRec *layers;
-	LinkedListNode *node;
+	list_node_t *node;
 
 	GetRenderingLayerSize(&layer_width, &layer_height);
 	max_dirty = (int)(0.8 * layer_width * layer_height);
@@ -234,10 +234,10 @@ static void SurfaceRecord_DumpRects(SurfaceRecord record, LinkedList *rects)
 		layer->rect.x = 0;
 		layer->rect.width = layer_width;
 		layer->rect.height = layer_height;
-		LinkedList_Init(&layer->rects);
+		list_create(&layer->rects);
 	}
 	sub_rect = malloc(sizeof(pd_rect_t));
-	for (LinkedList_Each(node, &record->rects)) {
+	for (list_each(node, &record->rects)) {
 		rect = *(pd_rect_t *)node->data;
 		for (i = 0; i < display.settings.parallel_rendering_threads;
 		     ++i) {
@@ -249,7 +249,7 @@ static void SurfaceRecord_DumpRects(SurfaceRecord record, LinkedList *rects)
 						     sub_rect)) {
 				continue;
 			}
-			LinkedList_Append(&layer->rects, sub_rect);
+			list_append(&layer->rects, sub_rect);
 			rect.y += sub_rect->height;
 			rect.height -= sub_rect->height;
 			layer->diry += sub_rect->width * sub_rect->height;
@@ -265,7 +265,7 @@ static void SurfaceRecord_DumpRects(SurfaceRecord record, LinkedList *rects)
 			RectList_AddEx(rects, &layer->rect, FALSE);
 			RectList_Clear(&layer->rects);
 		} else {
-			LinkedList_Concat(rects, &layer->rects);
+			list_concat(rects, &layer->rects);
 		}
 	}
 	RectList_Clear(&record->rects);
@@ -309,17 +309,17 @@ static size_t LCUIDisplay_RenderSurface(SurfaceRecord record)
 	int layer_height;
 	size_t count = 0;
 	pd_rect_t **rect_array;
-	LinkedList rects;
-	LinkedListNode *node;
+	list_t rects;
+	list_node_t *node;
 
-	LinkedList_Init(&rects);
+	list_create(&rects);
 	GetRenderingLayerSize(&layer_width, &layer_height);
 	SurfaceRecord_DumpRects(record, &rects);
 	if (rects.length < 1) {
 		return 0;
 	}
 	rect_array = (pd_rect_t **)malloc(sizeof(pd_rect_t *) * rects.length);
-	for (LinkedList_Each(node, &rects)) {
+	for (list_each(node, &rects)) {
 		LCUI_SysEventRec ev;
 
 		rect_array[i] = node->data;
@@ -358,13 +358,13 @@ static size_t LCUIDisplay_RenderSurface(SurfaceRecord record)
 void LCUIDisplay_Update(void)
 {
 	LCUI_Surface surface;
-	LinkedListNode *node;
+	list_node_t *node;
 	SurfaceRecord record = NULL;
 
 	if (!display.active) {
 		return;
 	}
-	for (LinkedList_Each(node, &display.surfaces)) {
+	for (list_each(node, &display.surfaces)) {
 		record = node->data;
 		surface = record->surface;
 		if (record->widget && surface && Surface_IsReady(surface)) {
@@ -375,18 +375,18 @@ void LCUIDisplay_Update(void)
 	if (display.mode == LCUI_DMODE_SEAMLESS || !record) {
 		return;
 	}
-	LinkedList_Concat(&record->rects, &display.rects);
+	list_concat(&record->rects, &display.rects);
 }
 
 size_t LCUIDisplay_Render(void)
 {
 	size_t count = 0;
-	LinkedListNode *node;
+	list_node_t *node;
 
 	if (!display.active) {
 		return 0;
 	}
-	for (LinkedList_Each(node, &display.surfaces)) {
+	for (list_each(node, &display.surfaces)) {
 		count += LCUIDisplay_RenderSurface(node->data);
 		count += LCUIDisplay_UpdateFlashRects(node->data);
 	}
@@ -395,12 +395,12 @@ size_t LCUIDisplay_Render(void)
 
 void LCUIDisplay_Present(void)
 {
-	LinkedListNode *sn;
+	list_node_t *sn;
 
 	if (!display.active) {
 		return;
 	}
-	for (LinkedList_Each(sn, &display.surfaces)) {
+	for (list_each(sn, &display.surfaces)) {
 		SurfaceRecord record = sn->data;
 		LCUI_Surface surface = record->surface;
 		if (!surface || !Surface_IsReady(surface)) {
@@ -433,9 +433,9 @@ void LCUIDisplay_InvalidateArea(pd_rect_t *rect)
 static LCUI_Widget LCUIDisplay_GetBindWidget(LCUI_Surface surface)
 {
 	SurfaceRecord record;
-	LinkedListNode *node;
+	list_node_t *node;
 
-	for (LinkedList_Each(node, &display.surfaces)) {
+	for (list_each(node, &display.surfaces)) {
 		record = node->data;
 		if (record && record->surface == surface) {
 			return record->widget;
@@ -447,9 +447,9 @@ static LCUI_Widget LCUIDisplay_GetBindWidget(LCUI_Surface surface)
 static LCUI_Surface LCUIDisplay_GetBindSurface(LCUI_Widget widget)
 {
 	SurfaceRecord record;
-	LinkedListNode *node;
+	list_node_t *node;
 
-	for (LinkedList_Each(node, &display.surfaces)) {
+	for (list_each(node, &display.surfaces)) {
 		record = node->data;
 		if (record && record->widget == widget) {
 			return record->surface;
@@ -472,9 +472,9 @@ LCUI_Surface LCUIDisplay_GetSurfaceOwner(LCUI_Widget w)
 
 LCUI_Surface LCUIDisplay_GetSurfaceByHandle(void *handle)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 
-	for (LinkedList_Each(node, &display.surfaces)) {
+	for (list_each(node, &display.surfaces)) {
 		SurfaceRecord record = node->data;
 		if (Surface_GetHandle(record->surface) == handle) {
 			return record->surface;
@@ -496,7 +496,7 @@ static void LCUIDisplay_BindSurface(LCUI_Widget widget)
 	record->surface = Surface_New();
 	record->widget = widget;
 	record->rendered = FALSE;
-	LinkedList_Init(&record->flash_rects);
+	list_create(&record->flash_rects);
 	LCUIMetrics_ComputeRectActual(&rect, &widget->box.canvas);
 	if (Widget_CheckStyleValid(widget, key_top) &&
 	    Widget_CheckStyleValid(widget, key_left)) {
@@ -510,20 +510,20 @@ static void LCUIDisplay_BindSurface(LCUI_Widget widget)
 		Surface_Hide(record->surface);
 	}
 	Widget_InvalidateArea(widget, NULL, SV_GRAPH_BOX);
-	LinkedList_Append(&display.surfaces, record);
+	list_append(&display.surfaces, record);
 }
 
 /** 解除 widget 与 sruface 的绑定 */
 static void LCUIDisplay_UnbindSurface(LCUI_Widget widget)
 {
 	SurfaceRecord record;
-	LinkedListNode *node;
+	list_node_t *node;
 
-	for (LinkedList_Each(node, &display.surfaces)) {
+	for (list_each(node, &display.surfaces)) {
 		record = node->data;
 		if (record && record->widget == widget) {
 			Surface_Close(record->surface);
-			LinkedList_DeleteNode(&display.surfaces, node);
+			list_delete_node(&display.surfaces, node);
 			break;
 		}
 	}
@@ -580,7 +580,7 @@ static int LCUIDisplay_FullScreen(void)
 
 static int LCUIDisplay_Seamless(void)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 	LCUI_Widget root = LCUIWidget_GetRoot();
 
 	switch (display.mode) {
@@ -592,7 +592,7 @@ static int LCUIDisplay_Seamless(void)
 		LCUIDisplay_CleanSurfaces();
 		break;
 	}
-	for (LinkedList_Each(node, &root->children)) {
+	for (list_each(node, &root->children)) {
 		LCUIDisplay_BindSurface(node->data);
 	}
 	display.mode = LCUI_DMODE_SEAMLESS;
@@ -657,7 +657,7 @@ int LCUIDisplay_GetWidth(void)
 	}
 	if (display.mode == LCUI_DMODE_WINDOWED ||
 	    display.mode == LCUI_DMODE_FULLSCREEN) {
-		return iround(LCUIWidget_GetRoot()->width);
+		return y_iround(LCUIWidget_GetRoot()->width);
 	}
 	return display.driver->getWidth();
 }
@@ -669,7 +669,7 @@ int LCUIDisplay_GetHeight(void)
 	}
 	if (display.mode == LCUI_DMODE_WINDOWED ||
 	    display.mode == LCUI_DMODE_FULLSCREEN) {
-		return iround(LCUIWidget_GetRoot()->height);
+		return y_iround(LCUIWidget_GetRoot()->height);
 	}
 	return display.driver->getHeight();
 }
@@ -683,15 +683,15 @@ void Surface_Close(LCUI_Surface surface)
 
 void Surface_Destroy(LCUI_Surface surface)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 
 	if (!display.active) {
 		return;
 	}
-	for (LinkedList_Each(node, &display.surfaces)) {
+	for (list_each(node, &display.surfaces)) {
 		SurfaceRecord record = node->data;
 		if (record && record->surface == surface) {
-			LinkedList_DeleteNode(&display.surfaces, node);
+			list_delete_node(&display.surfaces, node);
 			display.driver->destroy(surface);
 			free(record);
 			break;
@@ -869,11 +869,11 @@ static void OnSurfaceEvent(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 static void OnPaint(LCUI_Event e, void *arg)
 {
 	pd_rectf_t rect;
-	LinkedListNode *node;
+	list_node_t *node;
 	SurfaceRecord record;
 	LCUI_DisplayEvent dpy_ev = arg;
 
-	for (LinkedList_Each(node, &display.surfaces)) {
+	for (list_each(node, &display.surfaces)) {
 		record = node->data;
 		if (record && record->surface != dpy_ev->surface) {
 			continue;
@@ -910,19 +910,19 @@ static void OnMinMaxInfo(LCUI_Event e, void *arg)
 	int height = Surface_GetHeight(s);
 
 	if (style->min_width >= 0) {
-		dpy_ev->minmaxinfo.min_width = iround(style->min_width);
+		dpy_ev->minmaxinfo.min_width = y_iround(style->min_width);
 		resizable = resizable || width < style->min_width;
 	}
 	if (style->max_width >= 0) {
-		dpy_ev->minmaxinfo.max_width = iround(style->max_width);
+		dpy_ev->minmaxinfo.max_width = y_iround(style->max_width);
 		resizable = resizable || width > style->max_width;
 	}
 	if (style->min_height >= 0) {
-		dpy_ev->minmaxinfo.min_height = iround(style->min_height);
+		dpy_ev->minmaxinfo.min_height = y_iround(style->min_height);
 		resizable = resizable || height < style->min_height;
 	}
 	if (style->max_height >= 0) {
-		dpy_ev->minmaxinfo.max_height = iround(style->max_height);
+		dpy_ev->minmaxinfo.max_height = y_iround(style->max_height);
 		resizable = resizable || height > style->max_height;
 	}
 	if (resizable) {
@@ -948,7 +948,7 @@ int LCUI_InitDisplay(LCUI_DisplayDriver driver)
 	if (display.active) {
 		return -1;
 	}
-	Logger_Debug("[display] init ...\n");
+	logger_debug("[display] init ...\n");
 	display.mode = 0;
 	display.driver = driver;
 	display.active = TRUE;
@@ -958,13 +958,13 @@ int LCUI_InitDisplay(LCUI_DisplayDriver driver)
 	display.settings_change_handler_id = LCUI_BindEvent(
 	    LCUI_SETTINGS_CHANGE, OnSettingsChangeEvent, NULL, NULL);
 
-	LinkedList_Init(&display.rects);
-	LinkedList_Init(&display.surfaces);
+	list_create(&display.rects);
+	list_create(&display.surfaces);
 	if (!display.driver) {
 		display.driver = LCUI_CreateDisplayDriver();
 	}
 	if (!display.driver) {
-		Logger_Warning("[display] init failed\n");
+		logger_warning("[display] init failed\n");
 		LCUIDisplay_SetMode(LCUI_DMODE_DEFAULT);
 		LCUIDisplay_Update();
 		return -2;
@@ -977,7 +977,7 @@ int LCUI_InitDisplay(LCUI_DisplayDriver driver)
 	Widget_BindEvent(root, "surface", OnSurfaceEvent, NULL, NULL);
 	LCUIDisplay_SetMode(LCUI_DMODE_DEFAULT);
 	LCUIDisplay_Update();
-	Logger_Debug("[display] init ok, driver name: %s\n",
+	logger_debug("[display] init ok, driver name: %s\n",
 		     display.driver->name);
 	return 0;
 }

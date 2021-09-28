@@ -34,7 +34,7 @@
 #include <LCUI_Build.h>
 #include "config.h"
 #include <LCUI/types.h>
-#include <LCUI/util/logger.h>
+#include <yutil.h>
 #include <LCUI/graph.h>
 #include <LCUI/image.h>
 
@@ -73,7 +73,7 @@ METHODDEF(void) JPEGReader_OnErrorExit(j_common_ptr cinfo)
 	char msg[JMSG_LENGTH_MAX];
 	LCUI_JPEGError err = (LCUI_JPEGError)cinfo->err;
 	cinfo->err->format_message(cinfo, msg);
-	Logger_Error("%s\n", msg);
+	logger_error("%s\n", msg);
 	longjmp(*err->reader->env, 1);
 }
 
@@ -230,7 +230,7 @@ int LCUI_InitJPEGReader(LCUI_ImageReader reader)
 	jpeg_reader->err.reader = reader;
 	return 0;
 #else
-	Logger_Warning("warning: not JPEG support!");
+	logger_warning("warning: not JPEG support!");
 #endif
 	return -1;
 }
@@ -284,7 +284,7 @@ int LCUI_ReadJPEG(LCUI_ImageReader reader, pd_canvas_t *graph)
 	}
 	return 0;
 #else
-	Logger_Warning("warning: not JPEG support!");
+	logger_warning("warning: not JPEG support!");
 #endif
 	return -ENOSYS;
 }

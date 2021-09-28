@@ -27,23 +27,23 @@ int main(int argc, char **argv)
 	}
 	t_color.value = 0xffaa5500;
 	pd_canvas_fill_rect(&g_src, t_color, NULL, false);
-	Logger_Info("%-20s%-20s%s\n", "image size\\method", "pd_canvas_zoom()",
-		    "pd_canvas_zoom_bilinear()");
+	logger_info("%-20s%-20s%s\n", "image size\\method", "Graph_Zoom()",
+		    "Graph_ZoomBilinear()");
 	for (i = 0; i < sizeof(resx) / sizeof(int); i++) {
 		resy = resx[i] * 9 / 16;
-		t0 = LCUI_GetTime();
+		t0 = get_time_ms();
 		pd_canvas_init(&g_dst);
 		pd_canvas_zoom(&g_src, &g_dst, false, resx[i], resy);
 		pd_canvas_free(&g_dst);
-		t1 = LCUI_GetTime();
+		t1 = get_time_ms();
 		pd_canvas_init(&g_dst);
 		pd_canvas_zoom_bilinear(&g_src, &g_dst, false, resx[i], resy);
 		pd_canvas_free(&g_dst);
-		t2 = LCUI_GetTime();
+		t2 = get_time_ms();
 		sprintf(s_res, "%dx%d", resx[i], resy);
 		sprintf(s_t0, "%ldms", t1 - t0);
 		sprintf(s_t1, "%ldms", t2 - t1);
-		Logger_Info("%-20s%-20s%-20s\n", s_res, s_t0, s_t1);
+		logger_info("%-20s%-20s%-20s\n", s_res, s_t0, s_t1);
 	}
 	pd_canvas_free(&g_src);
 	return 0;

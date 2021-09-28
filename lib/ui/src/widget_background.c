@@ -33,9 +33,9 @@
 #include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/image.h>
 #include <LCUI/gui/metrics.h>
 #include <LCUI/gui/widget.h>
+#include <LCUI/image.h>
 #include "widget_background.h"
 
 #define ComputeActual LCUIMetrics_ComputeActual
@@ -43,7 +43,7 @@
 typedef struct ImageCacheRec_ {
 	char *path;
 	pd_canvas_t image;
-	LinkedList refs;
+	list_t refs;
 } ImageCacheRec, *ImageCache;
 
 typedef struct ImageRefRec_ {
@@ -53,20 +53,20 @@ typedef struct ImageRefRec_ {
 
 static struct LCUI_WidgetBackgroundModule {
 	LCUI_BOOL active;
-	DictType dtype;
-	Dict *images;
-	RBTree refs;
+	dict_type_t dtype;
+	dict_t *images;
+	rbtree_t refs;
 } self;
 
 static void DestroyImageCache(ImageCache cache)
 {
-	LinkedListNode *node;
-	while ((node = LinkedList_GetNode(&cache->refs, 0))) {
+	list_node_t *node;
+	while ((node = list_get_node(&cache->refs, 0))) {
 		LCUI_Widget w = node->data;
-		RBTree_CustomErase(&self.refs, node->data);
+		rbtree_delete_by_keydata(&self.refs, node->data);
 		Widget_UnsetStyle(w, key_background_image);
 		pd_canvas_init(&w->computed_style.background.image);
-		LinkedList_DeleteNode(&cache->refs, node);
+		list_delete_node(&cache->refs, node);
 	}
 	pd_canvas_free(&cache->image);
 	free(cache->path);
@@ -84,39 +84,39 @@ static void AddImageRef(LCUI_Widget widget, ImageCache cache)
 	ASSIGN(ref, ImageRef);
 	ref->cache = cache;
 	ref->widget = widget;
-	RBTree_CustomInsert(&self.refs, widget, ref);
-	LinkedList_Append(&cache->refs, widget);
+	rbtree_insert_by_keydata(&self.refs, widget, ref);
+	list_append(&cache->refs, widget);
 }
 
 static ImageRef GetImageRef(LCUI_Widget widget)
 {
-	return RBTree_CustomGetData(&self.refs, widget);
+	return rbtree_get_data_by_keydata(&self.refs, widget);
 }
 
 static void DeleteImageRef(LCUI_Widget widget)
 {
 	ImageRef ref;
 	ImageCache cache;
-	LinkedListNode *node;
+	list_node_t *node;
 	ref = GetImageRef(widget);
 	if (!ref) {
 		return;
 	}
 	cache = ref->cache;
-	for (LinkedList_Each(node, &cache->refs)) {
+	for (list_each(node, &cache->refs)) {
 		LCUI_Widget w = node->data;
 		if (w != widget) {
 			continue;
 		}
-		RBTree_CustomErase(&self.refs, node->data);
+		rbtree_delete_by_keydata(&self.refs, node->data);
 		Widget_UnsetStyle(w, key_background_image);
 		pd_canvas_init(&w->computed_style.background.image);
-		LinkedList_DeleteNode(&cache->refs, node);
+		list_delete_node(&cache->refs, node);
 		break;
 	}
-	RBTree_CustomErase(&self.refs, widget);
+	rbtree_delete_by_keydata(&self.refs, widget);
 	if (cache->refs.length < 1) {
-		Dict_Delete(self.images, cache->path);
+		dict_delete(self.images, cache->path);
 	}
 }
 
@@ -134,8 +134,8 @@ static void ExecLoadImage(void *arg1, void *arg2)
 	cache = NEW(ImageCacheRec, 1);
 	cache->image = image;
 	cache->path = strdup2(path);
-	LinkedList_Init(&cache->refs);
-	if (Dict_Add(self.images, cache->path, cache) == 0) {
+	list_create(&cache->refs);
+	if (dict_add(self.images, cache->path, cache) == 0) {
 		AddImageRef(w, cache);
 	} else {
 		DestroyImageCache(cache);
@@ -175,7 +175,7 @@ static void AsyncLoadImage(LCUI_Widget widget, const char *path)
 			DeleteImageRef(widget);
 		}
 	}
-	cache = Dict_FetchValue(self.images, path);
+	cache = dict_fetch_value(self.images, path);
 	if (cache) {
 		AddImageRef(widget, cache);
 		pd_canvas_quote(&widget->computed_style.background.image,
@@ -192,19 +192,19 @@ static void AsyncLoadImage(LCUI_Widget widget, const char *path)
 
 void LCUIWidget_InitImageLoader(void)
 {
-	RBTree_Init(&self.refs);
-	Dict_InitStringKeyType(&self.dtype);
-	self.dtype.valDestructor = ImageCacheDestructor;
-	self.images = Dict_Create(&self.dtype, NULL);
-	RBTree_OnCompare(&self.refs, OnCompareWidget);
-	RBTree_OnDestroy(&self.refs, free);
+	rbtree_init(&self.refs);
+	dict_init_string_key_type(&self.dtype);
+	self.dtype.val_destructor = ImageCacheDestructor;
+	self.images = dict_create(&self.dtype, NULL);
+	rbtree_set_compare_func(&self.refs, OnCompareWidget);
+	rbtree_set_destroy_func(&self.refs, free);
 	self.active = TRUE;
 }
 
 void LCUIWidget_FreeImageLoader(void)
 {
-	Dict_Release(self.images);
-	RBTree_Destroy(&self.refs);
+	dict_destroy(self.images);
+	rbtree_destroy(&self.refs);
 	self.images = NULL;
 	self.active = FALSE;
 }

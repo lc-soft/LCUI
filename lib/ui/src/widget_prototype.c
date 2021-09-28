@@ -35,8 +35,8 @@
 #include <LCUI/gui/widget.h>
 
 static struct LCUI_WidgetPrototypeModule {
-	Dict *prototypes;
-	DictType dicttype;
+	dict_t *prototypes;
+	dict_type_t dicttype;
 	LCUI_WidgetPrototypeRec default_prototype;
 } self = { 0 };
 
@@ -86,9 +86,9 @@ static void DeletePrototype(void *privdata, void *data)
 
 void LCUIWidget_InitPrototype(void)
 {
-	Dict_InitStringKeyType(&self.dicttype);
-	self.dicttype.valDestructor = DeletePrototype;
-	self.prototypes = Dict_Create(&self.dicttype, NULL);
+	dict_init_string_key_type(&self.dicttype);
+	self.dicttype.val_destructor = DeletePrototype;
+	self.prototypes = dict_create(&self.dicttype, NULL);
 	self.default_prototype.name = NULL;
 	self.default_prototype.init = Widget_DefaultMethod;
 	self.default_prototype.refresh = Widget_DefaultMethod;
@@ -105,7 +105,7 @@ void LCUIWidget_InitPrototype(void)
 
 void LCUIWidget_FreePrototype(void)
 {
-	Dict_Release(self.prototypes);
+	dict_destroy(self.prototypes);
 }
 
 LCUI_WidgetPrototype LCUIWidget_GetPrototype(const char *name)
@@ -115,7 +115,7 @@ LCUI_WidgetPrototype LCUIWidget_GetPrototype(const char *name)
 	if (!name) {
 		return &self.default_prototype;
 	}
-	proto = Dict_FetchValue(self.prototypes, name);
+	proto = dict_fetch_value(self.prototypes, name);
 	if (!proto) {
 		return &self.default_prototype;
 	}
@@ -127,13 +127,13 @@ LCUI_WidgetPrototype LCUIWidget_NewPrototype(const char *name,
 {
 	LCUI_WidgetPrototype proto;
 
-	if (Dict_FetchValue(self.prototypes, name)) {
+	if (dict_fetch_value(self.prototypes, name)) {
 		return NULL;
 	}
 	proto = NEW(LCUI_WidgetPrototypeRec, 1);
 	if (parent_name) {
 		LCUI_WidgetPrototype parent;
-		parent = Dict_FetchValue(self.prototypes, parent_name);
+		parent = dict_fetch_value(self.prototypes, parent_name);
 		if (parent) {
 			*proto = *parent;
 			proto->proto = parent;
@@ -144,7 +144,7 @@ LCUI_WidgetPrototype LCUIWidget_NewPrototype(const char *name,
 		*proto = self.default_prototype;
 	}
 	proto->name = strdup2(name);
-	if (Dict_Add(self.prototypes, proto->name, proto) == 0) {
+	if (dict_add(self.prototypes, proto->name, proto) == 0) {
 		return proto;
 	}
 	free(proto->name);

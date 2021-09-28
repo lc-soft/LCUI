@@ -13,7 +13,7 @@ void test_widget_rect(void)
 	LCUI_SysEventRec ev;
 	pd_rect_t *rect;
 	pd_rect_t expected_rect;
-	LinkedList rects;
+	list_t rects;
 
 	LCUI_Init();
 	root = LCUIWidget_GetRoot();
@@ -28,9 +28,9 @@ void test_widget_rect(void)
 	Widget_Append(root, parent);
 	LCUIWidget_Update();
 
-	LinkedList_Init(&rects);
+	list_create(&rects);
 	Widget_GetInvalidArea(root, &rects);
-	LinkedList_Clear(&rects, free);
+	list_destroy(&rects, free);
 
 	ev.type = LCUI_MOUSEMOVE;
 	ev.motion.x = 150;
@@ -59,7 +59,7 @@ void test_widget_rect(void)
 	expected_rect.width = 100;
 	expected_rect.height = 100;
 	it_rect("root.getInvalidArea()[0]", rect, &expected_rect);
-	LinkedList_Clear(&rects, free);
+	list_destroy(&rects, free);
 
 	ev.motion.x = 40;
 	ev.motion.y = 40;
@@ -84,7 +84,7 @@ void test_widget_rect(void)
 		rect = rects.head.next->data;
 		it_rect("root.getInvalidArea()[0]", rect, &expected_rect);
 	}
-	LinkedList_Clear(&rects, free);
+	list_destroy(&rects, free);
 
 	ev.type = LCUI_MOUSEUP;
 	LCUI_TriggerEvent(&ev, NULL);
@@ -97,7 +97,7 @@ void test_widget_rect(void)
 		rect = rects.head.next->data;
 		it_rect("root.getInvalidArea()[0]", rect, &expected_rect);
 	}
-	LinkedList_Clear(&rects, free);
+	list_destroy(&rects, free);
 
 	ev.type = LCUI_MOUSEMOVE;
 	ev.motion.x = 80;
@@ -124,7 +124,7 @@ void test_widget_rect(void)
 		rect = rects.head.next->data;
 		it_rect("root.getInvalidArea()[0]", rect, &expected_rect);
 	}
-	LinkedList_Clear(&rects, free);
+	list_destroy(&rects, free);
 
 	expected_rect.x = 21;
 	expected_rect.y = 11;
@@ -139,7 +139,7 @@ void test_widget_rect(void)
 		rect = rects.head.next->data;
 		it_rect("root.getInvalidArea()[0]", rect, &expected_rect);
 	}
-	LinkedList_Clear(&rects, free);
+	list_destroy(&rects, free);
 
 	expected_rect.x = 0;
 	expected_rect.y = 0;
@@ -154,7 +154,7 @@ void test_widget_rect(void)
 		rect = rects.head.next->data;
 		it_rect("root.getInvalidArea()[0]", rect, &expected_rect);
 	}
-	LinkedList_Clear(&rects, free);
+	list_destroy(&rects, free);
 
 	LCUI_Destroy();
 }

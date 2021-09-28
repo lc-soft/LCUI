@@ -34,14 +34,13 @@
 #include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/util/object.h>
-#include <LCUI/util/string.h>
-#include <LCUI/util/charset.h>
+#include <yutil.h>
 
 typedef struct LCUI_ObjectWatcherRec_ {
 	void *data;
 	LCUI_ObjectWatcherFunc func;
 	LCUI_Object target;
-	LinkedListNode node;
+	list_node_t node;
 } LCUI_ObjectWatcherRec;
 
 LCUI_ObjectType ObjectType_New(const char *name)
@@ -82,7 +81,7 @@ void Object_Destroy(LCUI_Object object)
 		object->type->destroy(object);
 	}
 	if (object->watchers) {
-		LinkedList_ClearData(object->watchers, free);
+		list_destroy_without_node(object->watchers, free);
 		free(object->watchers);
 	}
 }
@@ -154,11 +153,11 @@ LCUI_ObjectWatcher Object_Watch(LCUI_Object object, LCUI_ObjectWatcherFunc func,
 	LCUI_ObjectWatcher watcher;
 
 	if (!object->watchers) {
-		object->watchers = malloc(sizeof(LinkedList));
+		object->watchers = malloc(sizeof(list_t));
 		if (!object->watchers) {
 			return NULL;
 		}
-		LinkedList_Init(object->watchers);
+		list_create(object->watchers);
 	}
 	watcher = malloc(sizeof(LCUI_ObjectWatcherRec));
 	if (!watcher) {
@@ -168,20 +167,20 @@ LCUI_ObjectWatcher Object_Watch(LCUI_Object object, LCUI_ObjectWatcherFunc func,
 	watcher->func = func;
 	watcher->data = data;
 	watcher->node.data = watcher;
-	LinkedList_AppendNode(object->watchers, &watcher->node);
+	list_append_node(object->watchers, &watcher->node);
 	return watcher;
 }
 
 size_t Object_Notify(LCUI_Object object)
 {
 	size_t count = 0;
-	LinkedListNode *node;
+	list_node_t *node;
 	LCUI_ObjectWatcher watcher;
 
 	if (!object->watchers) {
 		return 0;
 	}
-	for (LinkedList_Each(node, object->watchers)) {
+	for (list_each(node, object->watchers)) {
 		watcher = node->data;
 		watcher->func(object, watcher->data);
 		++count;
@@ -191,7 +190,7 @@ size_t Object_Notify(LCUI_Object object)
 
 void ObjectWatcher_Delete(LCUI_ObjectWatcher watcher)
 {
-	LinkedList_Unlink(watcher->target->watchers, &watcher->node);
+	list_unlink(watcher->target->watchers, &watcher->node);
 	free(watcher);
 }
 
@@ -230,14 +229,14 @@ static LCUI_Object String_Operator(LCUI_Object a, const char *operator_str,
 
 	switch (operator_str[0]) {
 	case '=':
-		assert(String_Realloc(a, size) == 0);
+		String_Realloc(a, size);
 		strcpy(a->value.string, b->value.string);
 		Object_Notify(a);
 		break;
 	case '+':
 		size += strlen(a->value.string) * sizeof(char);
 		if (operator_str[1] == '=') {
-			assert(String_Realloc(a, size) == 0);
+			String_Realloc(a, size);
 			strcat(a->value.string, b->value.string);
 			Object_Notify(a);
 			break;
@@ -247,7 +246,7 @@ static LCUI_Object String_Operator(LCUI_Object a, const char *operator_str,
 		}
 		str = Object_Duplicate(a);
 		assert(str != NULL);
-		assert(String_Realloc(str, size) == 0);
+		String_Realloc(str, size);
 		strcpy(str->value.string, a->value.string);
 		strcat(str->value.string, b->value.string);
 		return str;
@@ -263,7 +262,7 @@ static void WString_Destructor(LCUI_Object object)
 
 static void String_Duplicator(LCUI_Object dest, const LCUI_ObjectRec *src)
 {
-	assert(String_Realloc(dest, src->size) == 0);
+	String_Realloc(dest, src->size);
 	strcpy(dest->value.string, src->value.string);
 }
 
@@ -273,10 +272,10 @@ void String_SetValue(LCUI_Object str, const char *value)
 
 	if (value) {
 		size = sizeof(char) * (strlen(value) + 1);
-		assert(String_Realloc(str, size) == 0);
+		String_Realloc(str, size);
 		strcpy(str->value.string, value);
 	} else {
-		assert(String_Realloc(str, size) == 0);
+		String_Realloc(str, size);
 		str->value.string[0] = 0;
 	}
 	Object_Notify(str);
@@ -331,14 +330,14 @@ static LCUI_Object WString_Operator(LCUI_Object a, const char *operator_str,
 
 	switch (operator_str[0]) {
 	case '=':
-		assert(WString_Realloc(a, b->size) == 0);
+		WString_Realloc(a, b->size);
 		wcscpy(a->value.wstring, b->value.wstring);
 		Object_Notify(a);
 		break;
 	case '+':
 		size += wcslen(b->value.wstring) * sizeof(wchar_t);
 		if (operator_str[1] == '=') {
-			assert(WString_Realloc(a, size) == 0);
+			WString_Realloc(a, size);
 			wcscat(a->value.wstring, b->value.wstring);
 			Object_Notify(a);
 			break;
@@ -348,7 +347,7 @@ static LCUI_Object WString_Operator(LCUI_Object a, const char *operator_str,
 		}
 		str = Object_Duplicate(a);
 		assert(str != NULL);
-		assert(WString_Realloc(str, size) == 0);
+		WString_Realloc(str, size);
 		wcscpy(str->value.wstring, a->value.wstring);
 		wcscat(str->value.wstring, b->value.wstring);
 		return str;
@@ -358,7 +357,7 @@ static LCUI_Object WString_Operator(LCUI_Object a, const char *operator_str,
 
 static void WString_Duplicator(LCUI_Object dest, const LCUI_ObjectRec *src)
 {
-	assert(WString_Realloc(dest, src->size) == 0);
+	WString_Realloc(dest, src->size);
 	wcscpy(dest->value.wstring, src->value.wstring);
 }
 
@@ -368,10 +367,10 @@ void WString_SetValue(LCUI_Object str, const wchar_t *value)
 
 	if (value) {
 		size = sizeof(wchar_t) * (wcslen(value) + 1);
-		assert(WString_Realloc(str, size) == 0);
+		WString_Realloc(str, size);
 		wcscpy(str->value.wstring, value);
 	} else {
-		assert(WString_Realloc(str, size) == 0);
+		WString_Realloc(str, size);
 		str->value.wstring[0] = 0;
 	}
 	Object_Notify(str);
@@ -394,10 +393,10 @@ LCUI_Object WString_New(const wchar_t *value)
 
 static void WString_ToString(LCUI_Object str, LCUI_Object newstr)
 {
-	const size_t len = LCUI_EncodeUTF8String(NULL, str->value.wstring, 0) + 1;
+	const size_t len = encode_utf8(NULL, str->value.wstring, 0) + 1;
 
 	String_Realloc(newstr, len);
-	LCUI_EncodeUTF8String(newstr->value.string, str->value.wstring, len);
+	encode_utf8(newstr->value.string, str->value.wstring, len);
 }
 
 void Number_Init(LCUI_Object object, double value)

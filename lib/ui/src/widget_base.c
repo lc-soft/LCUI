@@ -41,7 +41,7 @@
 
 static struct LCUI_WidgetModule {
 	LCUI_Widget root; /**< 根级部件 */
-	LinkedList trash; /**< 待删除的部件列表 */
+	list_t trash; /**< 待删除的部件列表 */
 } LCUIWidget;
 
 LCUI_Widget LCUIWidget_GetRoot(void)
@@ -52,13 +52,13 @@ LCUI_Widget LCUIWidget_GetRoot(void)
 size_t LCUIWidget_ClearTrash(void)
 {
 	size_t count;
-	LinkedListNode *node;
+	list_node_t *node;
 
 	node = LCUIWidget.trash.head.next;
 	count = LCUIWidget.trash.length;
 	while (node) {
-		LinkedListNode *next = node->next;
-		LinkedList_Unlink(&LCUIWidget.trash, node);
+		list_node_t *next = node->next;
+		list_unlink(&LCUIWidget.trash, node);
 		Widget_ExecDestroy(node->data);
 		node = next;
 	}
@@ -71,7 +71,7 @@ static void Widget_AddToTrash(LCUI_Widget w)
 	if (Widget_Unlink(w) != 0) {
 		return;
 	}
-	LinkedList_AppendNode(&LCUIWidget.trash, &w->node);
+	list_append_node(&LCUIWidget.trash, &w->node);
 	Widget_PostSurfaceEvent(w, LCUI_WEVENT_UNLINK, TRUE);
 }
 
@@ -88,8 +88,8 @@ static void Widget_Init(LCUI_Widget widget)
 	widget->computed_style.position = SV_STATIC;
 	widget->computed_style.pointer_events = SV_INHERIT;
 	widget->computed_style.box_sizing = SV_CONTENT_BOX;
-	LinkedList_Init(&widget->children);
-	LinkedList_Init(&widget->children_show);
+	list_create(&widget->children);
+	list_create(&widget->children_show);
 	widget->node.data = widget;
 	widget->node_show.data = widget;
 	widget->node.next = widget->node.prev = NULL;
@@ -164,7 +164,7 @@ void Widget_Destroy(LCUI_Widget w)
 	}
 	if (w->parent) {
 		LCUI_Widget child;
-		LinkedListNode *node;
+		list_node_t *node;
 
 		/* Update the index of the siblings behind it */
 		node = w->node.next;
@@ -186,7 +186,7 @@ void Widget_Empty(LCUI_Widget w)
 {
 	LCUI_Widget root = w;
 	LCUI_Widget child;
-	LinkedListNode *node;
+	list_node_t *node;
 	LCUI_WidgetEventRec ev;
 
 	while (root->parent) {
@@ -197,7 +197,7 @@ void Widget_Empty(LCUI_Widget w)
 		return;
 	}
 	LCUI_InitWidgetEvent(&ev, "unlink");
-	for (LinkedList_Each(node, &w->children)) {
+	for (list_each(node, &w->children)) {
 		child = node->data;
 		Widget_TriggerEvent(child, &ev, NULL);
 		if (child->parent == root) {
@@ -207,8 +207,8 @@ void Widget_Empty(LCUI_Widget w)
 		child->state = LCUI_WSTATE_DELETED;
 		child->parent = NULL;
 	}
-	LinkedList_ClearData(&w->children_show, NULL);
-	LinkedList_Concat(&LCUIWidget.trash, &w->children);
+	list_destroy_without_node(&w->children_show, NULL);
+	list_concat(&LCUIWidget.trash, &w->children);
 	Widget_InvalidateArea(w, NULL, SV_GRAPH_BOX);
 	Widget_UpdateStyle(w, TRUE);
 }
@@ -259,7 +259,7 @@ void Widget_SetTitleW(LCUI_Widget w, const wchar_t *title)
 
 LCUI_BOOL Widget_InVisibleArea(LCUI_Widget w)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 	pd_rectf_t rect;
 	LCUI_Widget self, parent, child;
 	LCUI_WidgetStyle *style;
@@ -319,7 +319,7 @@ int Widget_SetRules(LCUI_Widget w, const LCUI_WidgetRulesRec *rules)
 
 	data = (LCUI_WidgetRulesData)w->rules;
 	if (data) {
-		Dict_Release(data->style_cache);
+		dict_destroy(data->style_cache);
 		free(data);
 		w->rules = NULL;
 	}
@@ -390,18 +390,18 @@ void Widget_SortChildrenShow(LCUI_Widget w)
 {
 	LCUI_Widget child, target;
 	LCUI_WidgetStyle *s, *ts;
-	LinkedListNode *node, *target_node;
-	LinkedList *list;
+	list_node_t *node, *target_node;
+	list_t *list;
 
 	list = &w->children_show;
-	LinkedList_ClearData(list, NULL);
-	for (LinkedList_Each(node, &w->children)) {
+	list_destroy_without_node(list, NULL);
+	for (list_each(node, &w->children)) {
 		child = node->data;
 		s = &child->computed_style;
 		if (child->state < LCUI_WSTATE_READY) {
 			continue;
 		}
-		for (LinkedList_Each(target_node, list)) {
+		for (list_each(target_node, list)) {
 			target = target_node->data;
 			ts = &target->computed_style;
 			if (s->z_index == ts->z_index) {
@@ -415,12 +415,12 @@ void Widget_SortChildrenShow(LCUI_Widget w)
 			} else if (s->z_index < ts->z_index) {
 				continue;
 			}
-			LinkedList_Link(list, target_node->prev,
+			list_link(list, target_node->prev,
 					&child->node_show);
 			break;
 		}
 		if (!target_node) {
-			LinkedList_AppendNode(list, &child->node_show);
+			list_append_node(list, &child->node_show);
 		}
 	}
 }
@@ -547,7 +547,7 @@ void Widget_UpdateBoxSize(LCUI_Widget w)
 
 void LCUIWidget_InitBase(void)
 {
-	LinkedList_Init(&LCUIWidget.trash);
+	list_create(&LCUIWidget.trash);
 	LCUIWidget.root = LCUIWidget_New("root");
 	Widget_SetTitleW(LCUIWidget.root, L"LCUI Display");
 }

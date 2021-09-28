@@ -39,13 +39,13 @@ typedef struct _LCUI_ThreadContextRec_ {
 	void *arg;
 	void *retval;
 	LCUI_BOOL has_waiter;
-	LinkedListNode node;
+	list_node_t node;
 } LCUI_ThreadContextRec, *LCUI_ThreadContext;
 
 static struct LCUIThreadModule {
 	LCUI_BOOL active;
 	LCUI_Mutex mutex;
-	LinkedList threads;
+	list_t threads;
 } self;
 
 static unsigned __stdcall run_thread(void *arg)
@@ -62,7 +62,7 @@ int LCUIThread_Create(LCUI_Thread *tid, void(*func)(void*), void *arg)
 	LCUI_ThreadContext ctx;
 
 	if (!self.active) {
-		LinkedList_Init(&self.threads);
+		list_create(&self.threads);
 		LCUIMutex_Init(&self.mutex);
 		self.active = TRUE;
 	}
@@ -81,7 +81,7 @@ int LCUIThread_Create(LCUI_Thread *tid, void(*func)(void*), void *arg)
 		return -1;
 	}
 	LCUIMutex_Lock(&self.mutex);
-	LinkedList_AppendNode(&self.threads, &ctx->node);
+	list_append_node(&self.threads, &ctx->node);
 	LCUIMutex_Unlock(&self.mutex);
 	*tid = ctx->tid;
 	return 0;
@@ -89,10 +89,10 @@ int LCUIThread_Create(LCUI_Thread *tid, void(*func)(void*), void *arg)
 
 static LCUI_ThreadContext LCUIThread_Find(LCUI_Thread tid)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 	LCUI_ThreadContext ctx;
 
-	for (LinkedList_Each(node, &self.threads)) {
+	for (list_each(node, &self.threads)) {
 		ctx = node->data;
 		if (ctx && ctx->tid == tid) {
 			return ctx;
@@ -108,7 +108,7 @@ static LCUI_ThreadContext LCUIThread_Get(LCUI_Thread tid)
 	LCUIMutex_Lock(&self.mutex);
 	ctx = LCUIThread_Find(tid);
 	if (ctx) {
-		LinkedList_Unlink(&self.threads, &ctx->node);
+		list_unlink(&self.threads, &ctx->node);
 	}
 	LCUIMutex_Unlock(&self.mutex);
 	return ctx;

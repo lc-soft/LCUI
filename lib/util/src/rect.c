@@ -51,18 +51,18 @@ void LCUIRect_ToRectF(const pd_rect_t *rect, pd_rectf_t *rectf, float scale)
 
 void LCUIRect_Scale(const pd_rect_t *src, pd_rect_t *dst, float scale)
 {
-	dst->x = iround(src->x * scale);
-	dst->y = iround(src->y * scale);
-	dst->width = iround(src->width * scale);
-	dst->height = iround(src->height * scale);
+	dst->x = y_iround(src->x * scale);
+	dst->y = y_iround(src->y * scale);
+	dst->width = y_iround(src->width * scale);
+	dst->height = y_iround(src->height * scale);
 }
 
 void LCUIRectF_ToRect(const pd_rectf_t *rectf, pd_rect_t *rect, float scale)
 {
-	rect->x = iround(rectf->x * scale);
-	rect->y = iround(rectf->y * scale);
-	rect->width = iround(rectf->width * scale);
-	rect->height = iround(rectf->height * scale);
+	rect->x = y_iround(rectf->x * scale);
+	rect->y = y_iround(rectf->y * scale);
+	rect->width = y_iround(rectf->width * scale);
+	rect->height = y_iround(rectf->height * scale);
 }
 
 /* FIXME: need new shorter name */
@@ -296,8 +296,8 @@ void LCUIRect_MergeRect(pd_rect_t *big, const pd_rect_t *a, const pd_rect_t *b)
 	} else {
 		big->height = a->y + a->height;
 	}
-	big->x = min(a->x, b->x);
-	big->y = min(a->y, b->y);
+	big->x = y_min(a->x, b->x);
+	big->y = y_min(a->y, b->y);
 	big->width -= big->x;
 	big->height -= big->y;
 }
@@ -314,8 +314,8 @@ void LCUIRectF_MergeRect(pd_rectf_t *big, const pd_rectf_t *a, const pd_rectf_t 
 	} else {
 		big->height = a->y + a->height;
 	}
-	big->x = min(a->x, b->x);
-	big->y = min(a->y, b->y);
+	big->x = y_min(a->x, b->x);
+	big->y = y_min(a->y, b->y);
 	big->width -= big->x;
 	big->height -= big->y;
 }
@@ -411,17 +411,17 @@ void LCUIRect_Split(pd_rect_t *base, pd_rect_t *target, pd_rect_t rects[4])
 	rects[3].height = 0;
 }
 
-int RectList_AddEx(LinkedList *list, pd_rect_t *rect, LCUI_BOOL auto_merge)
+int RectList_AddEx(list_t *list, pd_rect_t *rect, LCUI_BOOL auto_merge)
 {
 	int x_distance, y_distance;
 
 	pd_rect_t *p, union_rect;
-	LinkedListNode *node, *prev;
+	list_node_t *node, *prev;
 
 	if (rect->width <= 0 || rect->height <= 0) {
 		return -1;
 	}
-	for (LinkedList_Each(node, list)) {
+	for (list_each(node, list)) {
 		p = node->data;
 		/* 如果被现有的矩形包含 */
 		if (LCUIRect_IsIncludeRect(p, rect)) {
@@ -431,7 +431,7 @@ int RectList_AddEx(LinkedList *list, pd_rect_t *rect, LCUI_BOOL auto_merge)
 		if (LCUIRect_IsIncludeRect(rect, p)) {
 			prev = node->prev;
 			free(node->data);
-			LinkedList_DeleteNode(list, node);
+			list_delete_node(list, node);
 			node = prev;
 			continue;
 		}
@@ -444,42 +444,43 @@ int RectList_AddEx(LinkedList *list, pd_rect_t *rect, LCUI_BOOL auto_merge)
 		    (y_distance <= 10 && y_distance >= -10)) {
 			LCUIRect_MergeRect(&union_rect, p, rect);
 			free(node->data);
-			LinkedList_DeleteNode(list, node);
+			list_delete_node(list, node);
 			return RectList_Add(list, &union_rect);
 		}
 	}
 	p = NEW(pd_rect_t, 1);
 	*p = *rect;
-	LinkedList_Append(list, p);
+	list_append(list, p);
 	return 0;
 }
 
-int RectList_Add(LinkedList *list, pd_rect_t *rect)
+
+int RectList_Add(list_t *list, pd_rect_t *rect)
 {
 	return RectList_AddEx(list, rect, TRUE);
 }
 
-int RectList_Delete(LinkedList *list, pd_rect_t *rect)
+int RectList_Delete(list_t *list, pd_rect_t *rect)
 {
 	int i;
 
 	LCUI_BOOL deletable;
 	pd_rect_t *p, child_rects[4];
 
-	LinkedList extra_list;
-	LinkedListNode *prev, *node;
+	list_t extra_list;
+	list_node_t *prev, *node;
 
 	if (rect->width <= 0 || rect->height <= 0) {
 		return -1;
 	}
-	LinkedList_Init(&extra_list);
-	for (LinkedList_Each(node, list)) {
+	list_create(&extra_list);
+	for (list_each(node, list)) {
 		p = node->data;
 		/* 如果包含现有的矩形 */
 		if (LCUIRect_IsIncludeRect(rect, p)) {
 			prev = node->prev;
 			free(node->data);
-			LinkedList_DeleteNode(list, node);
+			list_delete_node(list, node);
 			node = prev;
 			continue;
 		}
@@ -496,13 +497,13 @@ int RectList_Delete(LinkedList *list, pd_rect_t *rect)
 			if (deletable) {
 				prev = node->prev;
 				free(node->data);
-				LinkedList_DeleteNode(list, node);
+				list_delete_node(list, node);
 				node = prev;
 				deletable = FALSE;
 			}
 			RectList_AddEx(&extra_list, &child_rects[i], FALSE);
 		}
 	}
-	LinkedList_Concat(list, &extra_list);
+	list_concat(list, &extra_list);
 	return 1;
 }

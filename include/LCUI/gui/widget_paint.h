@@ -49,7 +49,7 @@ LCUI_API LCUI_BOOL Widget_InvalidateArea(LCUI_Widget widget,
  * @param[out] rects	输出的区域列表
  * @return 无效区域的数量
  */
-LCUI_API size_t Widget_GetInvalidArea(LCUI_Widget w, LinkedList *rects);
+LCUI_API size_t Widget_GetInvalidArea(LCUI_Widget w, list_t *rects);
 
 /**
  * 将部件中的矩形区域转换成指定范围框内有效的矩形区域

@@ -2,7 +2,7 @@
 #include <math.h>
 #include <string.h>
 #include <LCUI_Build.h>
-#include <LCUI/util/logger.h>
+#include <yutil.h>
 #include <LCUI/util/object.h>
 #include "ctest.h"
 

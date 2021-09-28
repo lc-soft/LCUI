@@ -1,8 +1,8 @@
 ﻿#include <LCUI.h>
-#include <LCUI/graph.h>
-#include <LCUI/image.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/textview.h>
+#include <LCUI/graph.h>
+#include <LCUI/image.h>
 
 int main(void)
 {

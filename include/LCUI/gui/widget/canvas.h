@@ -42,7 +42,7 @@ struct LCUI_CanvasRenderingContextRec_ {
 	pd_color_t fill_color;
 	pd_canvas_t buffer;
 	LCUI_Widget canvas;
-	LinkedListNode node;
+	list_node_t node;
 
 	float scale;
 	int width;

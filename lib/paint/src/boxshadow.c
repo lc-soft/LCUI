@@ -150,12 +150,12 @@ void pd_boxshadow_get_canvas_rect(const pd_boxshadow_t *shadow,
 	shadow_rect.y = content_rect->y - SHADOW_WIDTH(shadow) + shadow->y;
 	shadow_rect.width = boxshadow_get_width(shadow, content_rect->width);
 	shadow_rect.height = boxshadow_get_height(shadow, content_rect->height);
-	canvas_rect->x = min(content_rect->x, shadow_rect.x);
-	canvas_rect->y = min(content_rect->y, shadow_rect.y);
-	canvas_rect->width = max(shadow_rect.x + shadow_rect.width,
+	canvas_rect->x = y_min(content_rect->x, shadow_rect.x);
+	canvas_rect->y = y_min(content_rect->y, shadow_rect.y);
+	canvas_rect->width = y_max(shadow_rect.x + shadow_rect.width,
 				 content_rect->x + content_rect->width) -
 			     canvas_rect->x;
-	canvas_rect->height = max(shadow_rect.y + shadow_rect.height,
+	canvas_rect->height = y_max(shadow_rect.y + shadow_rect.height,
 				  content_rect->y + content_rect->height) -
 			      canvas_rect->y;
 }
@@ -334,9 +334,9 @@ static pd_bool boxshadow_paint_circle_blur(boxshadow_rendering_context ctx,
 {
 	double d;
 	double y2;
-	double r = max(0, CIRCLE_R(radius));
+	double r = y_max(0, CIRCLE_R(radius));
 	double outer_r2 = POW2(r);
-	double inner_r = max(0, r - BLUR_WIDTH(ctx->shadow));
+	double inner_r = y_max(0, r - BLUR_WIDTH(ctx->shadow));
 	double inner_smooth_r2 = POW2(inner_r + 1.0);
 
 	int x, y;
@@ -403,7 +403,7 @@ static pd_bool boxshadow_paint_top_left_blur(boxshadow_rendering_context ctx)
 	pd_rect_t rect;
 
 	radius = FULL_SHADOW_WIDTH(ctx) + ctx->shadow->top_left_radius;
-	radius = min(ctx->max_radius, radius);
+	radius = y_min(ctx->max_radius, radius);
 	rect.width = radius;
 	rect.height = rect.width;
 	rect.x = ctx->shadow_box.x;
@@ -418,7 +418,7 @@ static pd_bool boxshadow_paint_top_right_blur(boxshadow_rendering_context ctx)
 	pd_rect_t rect;
 
 	radius = FULL_SHADOW_WIDTH(ctx) + ctx->shadow->top_right_radius;
-	radius = min(ctx->max_radius, radius);
+	radius = y_min(ctx->max_radius, radius);
 	rect.width = radius;
 	rect.height = rect.width;
 	rect.x = ctx->shadow_box.x + ctx->shadow_box.width - rect.width;
@@ -432,7 +432,7 @@ static pd_bool boxshadow_paint_bottom_left_blur(boxshadow_rendering_context ctx)
 	pd_rect_t rect;
 
 	radius = FULL_SHADOW_WIDTH(ctx) + ctx->shadow->bottom_left_radius;
-	radius = min(ctx->max_radius, radius);
+	radius = y_min(ctx->max_radius, radius);
 	rect.width = radius;
 	rect.height = rect.width;
 	rect.x = ctx->shadow_box.x;
@@ -446,7 +446,7 @@ static pd_bool boxshadow_paint_bottom_right_blur(boxshadow_rendering_context ctx
 	pd_rect_t rect;
 
 	radius = FULL_SHADOW_WIDTH(ctx) + ctx->shadow->bottom_right_radius;
-	radius = min(ctx->max_radius, radius);
+	radius = y_min(ctx->max_radius, radius);
 	rect.width = radius;
 	rect.height = rect.width;
 	rect.x = ctx->shadow_box.x + ctx->shadow_box.width - rect.width;
@@ -514,12 +514,12 @@ static void boxshadow_clear_content_rect(boxshadow_rendering_context ctx)
 	pd_rect_t rect;
 	pd_rect_t bound;
 	pd_canvas_t canvas;
-	LinkedList rects;
-	LinkedListNode *node;
+	list_t rects;
+	list_node_t *node;
 
 	/* Initialize a queue for recording the area after the split content
 	 * area */
-	LinkedList_Init(&rects);
+	list_create(&rects);
 	RectList_Add(&rects, &ctx->content_box);
 
 	r = ctx->shadow->top_left_radius;
@@ -587,7 +587,7 @@ static void boxshadow_clear_content_rect(boxshadow_rendering_context ctx)
 	}
 
 	/* Clear pixels in the remaining areas of the content area */
-	for (LinkedList_Each(node, &rects)) {
+	for (list_each(node, &rects)) {
 		if (pd_rect_get_overlay_rect(&ctx->paint->rect, node->data,
 					    &rect)) {
 			rect.x -= ctx->paint->rect.x;
@@ -619,7 +619,7 @@ int pd_boxshadow_paint(const pd_boxshadow_t *shadow, const pd_rect_t *box,
 	ctx.box = box;
 	ctx.shadow = shadow;
 	ctx.max_radius =
-	    min(content_width, content_height) / 2 + SHADOW_WIDTH(shadow);
+	    y_min(content_width, content_height) / 2 + SHADOW_WIDTH(shadow);
 	ctx.shadow_box.x = boxshadow_get_x(shadow);
 	ctx.shadow_box.y = boxshadow_get_y(shadow);
 	ctx.shadow_box.width = boxshadow_get_width(shadow, content_width);

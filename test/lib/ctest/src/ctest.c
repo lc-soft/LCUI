@@ -21,7 +21,7 @@ static size_t tests_total = 0;
 static int test_msg_indent = 0;
 static int64_t test_start_time = 0;
 
-static int test_msg(const char *fmt, ...)
+int test_msg(const char *fmt, ...)
 {
 	int ret;
 	char str[1024];
@@ -37,8 +37,7 @@ static int test_msg(const char *fmt, ...)
 void test_begin(void)
 {
 	if (test_start_time == 0) {
-		LCUITime_Init();
-		test_start_time = LCUI_GetTime();
+		test_start_time = get_time_ms();
 	}
 	test_msg_indent++;
 }
@@ -59,7 +58,7 @@ int test_result(void)
 int print_test_result(void)
 {
 	printf(GREEN("  %zu passing") " (%ums)\n", tests_passed,
-	       (unsigned)LCUI_GetTimeDelta(test_start_time));
+	       (unsigned)get_time_delta(test_start_time));
 	if (tests_total > tests_passed) {
 		printf(RED("  %zu faling\n\n"), tests_total - tests_passed);
 		return (int)(tests_total - tests_passed);

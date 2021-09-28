@@ -60,12 +60,12 @@ void test_segoe_ui_font_load(void)
 		it_i("check font style", font->style, FONT_STYLE_NORMAL);
 		it_i("check font weight", font->weight, FONT_WEIGHT_LIGHT);
 	}
-	it_b("check get font (style: italic, weight: light)",
-	     id = GetSegoeUIFont(FONT_STYLE_ITALIC, FONT_WEIGHT_LIGHT), TRUE);
+	it_b("check get font (style: italic, weight: extra light)",
+	     id = GetSegoeUIFont(FONT_STYLE_ITALIC, FONT_WEIGHT_EXTRA_LIGHT), TRUE);
 	if (id > 0) {
 		font = LCUIFont_GetById(id);
 		it_i("check font style", font->style, FONT_STYLE_ITALIC);
-		it_i("check font weight", font->weight, FONT_WEIGHT_LIGHT);
+		it_i("check font weight", font->weight, FONT_WEIGHT_EXTRA_LIGHT);
 	}
 }
 

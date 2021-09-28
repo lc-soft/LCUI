@@ -77,7 +77,7 @@ struct XMLParserContextRec_ {
 
 static struct ModuleContext {
 	LCUI_BOOL active;
-	RBTree parsers;
+	rbtree_t parsers;
 } self;
 
 #define EXIT(CODE)   \
@@ -86,7 +86,7 @@ static struct ModuleContext {
 
 static void xmlPrintErrorMessage(xmlErrorPtr err)
 {
-	Logger_Error("[builder] %s (%d): error %d: %s\n",
+	logger_error("[builder] %s (%d): error %d: %s\n",
 		     err->file ? err->file : "(memory)", err->line, err->code,
 		     err->message);
 }
@@ -258,12 +258,12 @@ static void LCUIBuilder_Init(void)
 	int i, len;
 	Parser *p;
 
-	RBTree_Init(&self.parsers);
-	RBTree_OnCompare(&self.parsers, CompareName);
+	rbtree_init(&self.parsers);
+	rbtree_set_compare_func(&self.parsers, CompareName);
 	len = sizeof(parser_list) / sizeof(parser_list[0]);
 	for (i = 0; i < len; ++i) {
 		p = &parser_list[i];
-		RBTree_CustomInsert(&self.parsers, p->name, p);
+		rbtree_insert_by_keydata(&self.parsers, p->name, p);
 	}
 	self.active = TRUE;
 }
@@ -281,7 +281,7 @@ static void ParseNode(XMLParserContext ctx, xmlNodePtr node)
 			continue;
 		}
 		if (node->type == XML_ELEMENT_NODE) {
-			p = RBTree_CustomGetData(&self.parsers, node->name);
+			p = rbtree_get_data_by_keydata(&self.parsers, node->name);
 			if (!p) {
 				proto =
 				    LCUIWidget_GetPrototype((char *)node->name);
@@ -312,12 +312,12 @@ static void ParseNode(XMLParserContext ctx, xmlNodePtr node)
 		case PB_NEXT:
 			break;
 		case PB_WARNING:
-			Logger_Warning("[builder] %s (%d): warning: %s node.\n",
+			logger_warning("[builder] %s (%d): warning: %s node.\n",
 				       node->doc->name, node->line, node->name);
 			break;
 		case PB_ERROR:
 		default:
-			Logger_Error("[builder] %s (%d): error: %s node.\n",
+			logger_error("[builder] %s (%d): error: %s node.\n",
 				     node->doc->name, node->line, node->name);
 			break;
 		}
@@ -331,7 +331,7 @@ static void ParseNode(XMLParserContext ctx, xmlNodePtr node)
 LCUI_Widget LCUIBuilder_LoadString(const char *str, int size)
 {
 #ifndef USE_LIBXML2
-	Logger_Warning(WARN_TXT);
+	logger_warning(WARN_TXT);
 #else
 	xmlDocPtr doc;
 	xmlNodePtr cur;
@@ -341,12 +341,12 @@ LCUI_Widget LCUIBuilder_LoadString(const char *str, int size)
 	doc = xmlParseMemory(str, size);
 	if (!doc) {
 		xmlPrintErrorMessage(xmlGetLastError());
-		Logger_Error("[builder] failed to parse xml form memory\n");
+		logger_error("[builder] failed to parse xml form memory\n");
 		goto FAILED;
 	}
 	cur = xmlDocGetRootElement(doc);
 	if (xmlStrcasecmp(cur->name, BAD_CAST "lcui-app")) {
-		Logger_Error("[builder] error root node name: %s\n", cur->name);
+		logger_error("[builder] error root node name: %s\n", cur->name);
 		goto FAILED;
 	}
 	if (!self.active) {
@@ -365,7 +365,7 @@ FAILED:
 LCUI_Widget LCUIBuilder_LoadFile(const char *filepath)
 {
 #ifndef USE_LIBXML2
-	Logger_Warning(WARN_TXT);
+	logger_warning(WARN_TXT);
 #else
 	xmlDocPtr doc;
 	xmlNodePtr cur;
@@ -376,12 +376,12 @@ LCUI_Widget LCUIBuilder_LoadFile(const char *filepath)
 	doc = xmlParseFile(filepath);
 	if (!doc) {
 		xmlPrintErrorMessage(xmlGetLastError());
-		Logger_Error("[builder] failed to parse xml form file\n");
+		logger_error("[builder] failed to parse xml form file\n");
 		goto FAILED;
 	}
 	cur = xmlDocGetRootElement(doc);
 	if (xmlStrcasecmp(cur->name, BAD_CAST "lcui-app")) {
-		Logger_Error("[builder] error root node name: %s\n", cur->name);
+		logger_error("[builder] error root node name: %s\n", cur->name);
 		goto FAILED;
 	}
 	if (!self.active) {

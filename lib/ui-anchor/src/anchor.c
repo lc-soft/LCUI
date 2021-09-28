@@ -122,7 +122,7 @@ static void XMLLoader_Load(LCUI_XMLLoader loader)
 	if (loader->filepath[0] != '/') {
 		path = malloc(strsize(loader->filepath) + sizeof(dirname));
 		if (!path) {
-			Logger_Error("[anchor] out of memory\n");
+			logger_error("[anchor] out of memory\n");
 			return;
 		}
 		strcpy(path, dirname);
@@ -142,7 +142,7 @@ static void XMLLoader_Load(LCUI_XMLLoader loader)
 		LCUI_PostSimpleTask(XMLLoader_AppendToTarget, loader, NULL);
 		return;
 	}
-	Logger_Error("[anchor] href (%s): cannot load xml resource\n",
+	logger_error("[anchor] href (%s): cannot load xml resource\n",
 	    loader->filepath);
 	XMLLoader_Destroy(loader);
 }
@@ -153,7 +153,7 @@ static void XMLLoader_StartLoad(LCUI_XMLLoader loader)
 	LCUI_TaskRec task = { 0 };
 	target = LCUIWidget_GetById(loader->target_id);
 	if (!target) {
-		Logger_Error("[anchor] target (%s): not found\n",
+		logger_error("[anchor] target (%s): not found\n",
 			     loader->target_id);
 		return;
 	}
@@ -169,7 +169,7 @@ void Anchor_Open(LCUI_Widget w)
 	const char *attr_href = Widget_GetAttribute(w, "href");
 
 	if (!attr_href) {
-		Logger_Error("[anchor] href are required\n");
+		logger_error("[anchor] href are required\n");
 		return;
 	}
 	if (strstr(attr_href, "file:") == attr_href) {
@@ -183,7 +183,7 @@ void Anchor_Open(LCUI_Widget w)
 	}
 	loader = XMLLoader_New(w);
 	if (!loader) {
-		Logger_Error("[anchor] out of memory\n");
+		logger_error("[anchor] out of memory\n");
 		return;
 	}
 	LCUI_PostSimpleTask(XMLLoader_StartLoad, loader, NULL);

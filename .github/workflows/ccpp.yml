@@ -14,6 +14,10 @@ jobs:
       - name: install tools
         run: sudo apt install debhelper lcov valgrind -yy
 
+      - name: Update git submodule
+        run: |
+          git submodule update --init
+
       - name: Build
         run: |
           xmake config -m coverage -y -v
@@ -21,8 +25,12 @@ jobs:
 
       - name: Run tests
         run: |
-          xmake build -v run-tests
           xmake run run-tests --memcheck
+
+      - name: "Run tests yutil"
+        run: |
+          xmake build yutil_test
+          xmake run yutil_test --memcheck
 
       - name: Upload reports to Codecov
         run: bash <(curl -s https://codecov.io/bash);
@@ -54,21 +62,27 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - uses: xmake-io/github-action-setup-xmake@v1
+
+      - name: Update git submodule
+        run: |
+          git submodule update --init
+
       - name: Build
         run: |
           xmake config -y -v
           xmake -v
 
       - name: "Run tests"
-        continue-on-error: true
         run: |
-          xmake build -v run-tests
           xmake run run-tests
+      
+      - name: "Run tests yutil"
+        run: |
+          xmake build yutil_test
+          xmake run yutil_test
 
       - name: Package
         run: |
-          xmake clean
-          xmake config -m release -y -c -v
           xmake -v
           xmake package
 

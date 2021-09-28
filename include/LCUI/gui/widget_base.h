@@ -31,7 +31,7 @@
 #ifndef LCUI_WIDGET_BASE_H
 #define LCUI_WIDGET_BASE_H
 
-#include <LCUI/util/strlist.h>
+#include <yutil.h>
 #include <LCUI/gui/css_library.h>
 
 LCUI_BEGIN_HEADER
@@ -225,7 +225,7 @@ typedef struct LCUI_WidgetRulesRec_ {
 
 typedef struct LCUI_WidgetRulesDataRec_ {
 	LCUI_WidgetRulesRec rules;
-	Dict *style_cache;
+	dict_t *style_cache;
 	size_t default_max_update_count;
 	size_t progress;
 } LCUI_WidgetRulesDataRec, *LCUI_WidgetRulesData;
@@ -259,7 +259,7 @@ typedef struct LCUI_WidgetRec_ {
 	strlist_t classes;
 	strlist_t status;
 	wchar_t *title;
-	Dict *attributes;
+	dict_t *attributes;
 	LCUI_BOOL disabled;
 	LCUI_BOOL event_blocked;
 	
@@ -314,25 +314,25 @@ typedef struct LCUI_WidgetRec_ {
 	LCUI_Widget parent;
 
 	/** List of child widgets */
-	LinkedList children;
+	list_t children;
 
 	/** List of child widgets in descending order by z-index */
-	LinkedList children_show;
+	list_t children_show;
 	
 	/**
 	 * Position in the parent->children
-	 * this == LinkedList_Get(&this->parent->children, this.index)
+	 * this == list_get(&this->parent->children, this.index)
 	 */
 	size_t index;
 
 	/**
 	 * Node in the parent->children
-	 * &this->node == LinkedList_GetNode(&this->parent->children, this.index)
+	 * &this->node == list_get_node_by_pos(&this->parent->children, this.index)
 	 */
-	LinkedListNode node;
+	list_node_t node;
 	
 	/** Node in the parent->children_shoa */
-	LinkedListNode node_show;
+	list_node_t node_show;
 } LCUI_WidgetRec;
 
 /* clang-format on */

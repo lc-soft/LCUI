@@ -125,16 +125,16 @@ INLINE LCUI_BOOL LCUIRect_IsEquals(const pd_rect_t *a, const pd_rect_t *b)
 	       a->height == b->height;
 }
 
-LCUI_API int RectList_AddEx(LinkedList *list, pd_rect_t *rect,
+LCUI_API int RectList_AddEx(list_t *list, pd_rect_t *rect,
 			    LCUI_BOOL auto_merge);
 
 /** 添加一个脏矩形记录 */
-LCUI_API int RectList_Add(LinkedList *list, pd_rect_t *rect);
+LCUI_API int RectList_Add(list_t *list, pd_rect_t *rect);
 
 /** 删除脏矩形 */
-LCUI_API int RectList_Delete(LinkedList *list, pd_rect_t *rect);
+LCUI_API int RectList_Delete(list_t *list, pd_rect_t *rect);
 
-#define RectList_Clear(LIST) LinkedList_Clear(LIST, free)
+#define RectList_Clear(LIST) list_destroy(LIST, free)
 
 LCUI_END_HEADER
 
