@@ -482,10 +482,10 @@ LCUI_SelectorNode Widget_GetSelectorNode(LCUI_Widget w)
 		sn->type = strdup2(w->type);
 	}
 	for (i = 0; w->classes && w->classes[i]; ++i) {
-		sortedstrlist_add(&sn->classes, w->classes[i]);
+		strlist_sorted_add(&sn->classes, w->classes[i]);
 	}
 	for (i = 0; w->status && w->status[i]; ++i) {
-		sortedstrlist_add(&sn->status, w->status[i]);
+		strlist_sorted_add(&sn->status, w->status[i]);
 	}
 	SelectorNode_Update(sn);
 	return sn;
@@ -494,31 +494,31 @@ LCUI_SelectorNode Widget_GetSelectorNode(LCUI_Widget w)
 LCUI_Selector Widget_GetSelector(LCUI_Widget w)
 {
 	int i = 0;
-	LinkedList list;
+	list_t list;
 	LCUI_Selector s;
 	LCUI_Widget parent;
-	LinkedListNode *node;
+	list_node_t *node;
 
 	s = Selector(NULL);
-	LinkedList_Init(&list);
+	list_create(&list);
 	for (parent = w; parent; parent = parent->parent) {
 		if (parent->id || parent->type || parent->classes ||
 		    parent->status) {
-			LinkedList_Append(&list, parent);
+			list_append(&list, parent);
 		}
 	}
 	if (list.length >= MAX_SELECTOR_DEPTH) {
-		LinkedList_Clear(&list, NULL);
+		list_destroy(&list, NULL);
 		Selector_Delete(s);
 		return NULL;
 	}
-	for (LinkedList_EachReverse(node, &list)) {
+	for (list_each_reverse(node, &list)) {
 		parent = node->data;
 		s->nodes[i] = Widget_GetSelectorNode(parent);
 		s->rank += s->nodes[i]->rank;
 		i += 1;
 	}
-	LinkedList_Clear(&list, NULL);
+	list_destroy(&list, NULL);
 	s->nodes[i] = NULL;
 	s->length = i;
 	Selector_Update(s);
@@ -528,8 +528,8 @@ LCUI_Selector Widget_GetSelector(LCUI_Widget w)
 size_t Widget_GetChildrenStyleChanges(LCUI_Widget w, int type, const char *name)
 {
 	LCUI_Selector s;
-	LinkedList snames;
-	LinkedListNode *node;
+	list_t snames;
+	list_node_t *node;
 
 	size_t i, n, len;
 	size_t count = 0;
@@ -545,7 +545,7 @@ size_t Widget_GetChildrenStyleChanges(LCUI_Widget w, int type, const char *name)
 	default:
 		return 0;
 	}
-	LinkedList_Init(&snames);
+	list_create(&snames);
 	s = Widget_GetSelector(w);
 	n = strsplit(name, " ", &names);
 	/* 为分割出来的字符串加上前缀 */
@@ -558,7 +558,7 @@ size_t Widget_GetChildrenStyleChanges(LCUI_Widget w, int type, const char *name)
 		names[i] = str;
 	}
 	SelectorNode_GetNames(s->nodes[s->length - 1], &snames);
-	for (LinkedList_Each(node, &snames)) {
+	for (list_each(node, &snames)) {
 		char *sname = node->data;
 		/* 过滤掉不包含 name 中存在的名称 */
 		for (i = 0; i < n; ++i) {
@@ -582,7 +582,7 @@ size_t Widget_GetChildrenStyleChanges(LCUI_Widget w, int type, const char *name)
 		}
 	}
 	Selector_Delete(s);
-	LinkedList_Clear(&snames, free);
+	list_destroy(&snames, free);
 	for (i = 0; names[i]; ++i) {
 		free(names[i]);
 	}
@@ -608,9 +608,9 @@ void Widget_UpdateStyle(LCUI_Widget w, LCUI_BOOL is_refresh_all)
 
 void Widget_UpdateChildrenStyle(LCUI_Widget w, LCUI_BOOL is_refresh_all)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 	w->task.for_children = TRUE;
-	for (LinkedList_Each(node, &w->children)) {
+	for (list_each(node, &w->children)) {
 		Widget_UpdateStyle(node->data, is_refresh_all);
 		Widget_UpdateChildrenStyle(node->data, is_refresh_all);
 	}

@@ -47,8 +47,8 @@ typedef struct LCUI_FlexBoxLineRec_ {
 	float sum_of_shrink_value;
 	size_t count_of_auto_margin_items;
 
-	/** LinkedList<LCUI_Widget> elements */
-	LinkedList elements;
+	/** list_t<LCUI_Widget> elements */
+	list_t elements;
 } LCUI_FlexBoxLineRec, *LCUI_FlexBoxLine;
 
 typedef struct LCUI_FlexBoxLayoutContextRec_ {
@@ -61,11 +61,11 @@ typedef struct LCUI_FlexBoxLayoutContextRec_ {
 	float main_size;
 	float cross_size;
 
-	/** LinkedList<LCUI_FlexBoxLine> lines */
-	LinkedList lines;
+	/** list_t<LCUI_FlexBoxLine> lines */
+	list_t lines;
 	LCUI_FlexBoxLine line;
 
-	LinkedList free_elements;
+	list_t free_elements;
 } LCUI_FlexBoxLayoutContextRec, *LCUI_FlexBoxLayoutContext;
 
 static LCUI_FlexBoxLine FlexBoxLine_Create(void)
@@ -78,7 +78,7 @@ static LCUI_FlexBoxLine FlexBoxLine_Create(void)
 	line->sum_of_grow_value = 0;
 	line->sum_of_shrink_value = 0;
 	line->count_of_auto_margin_items = 0;
-	LinkedList_Init(&line->elements);
+	list_create(&line->elements);
 	return line;
 }
 
@@ -86,7 +86,7 @@ static void FlexBoxLine_Destroy(void *arg)
 {
 	LCUI_FlexBoxLine line = arg;
 
-	LinkedList_Clear(&line->elements, NULL);
+	list_destroy(&line->elements, NULL);
 	free(line);
 }
 
@@ -98,13 +98,13 @@ static void FlexBoxLine_LoadElement(LCUI_FlexBoxLine line, LCUI_Widget w)
 	if (w->computed_style.flex.shrink > 0) {
 		line->sum_of_shrink_value += w->computed_style.flex.shrink;
 	}
-	LinkedList_Append(&line->elements, w);
+	list_append(&line->elements, w);
 }
 
 static void FlexBoxLayout_NextLine(LCUI_FlexBoxLayoutContext ctx)
 {
 	if (ctx->line) {
-		ctx->main_size = max(ctx->main_size, ctx->line->main_size);
+		ctx->main_size = y_max(ctx->main_size, ctx->line->main_size);
 		ctx->cross_axis += ctx->line->cross_size;
 		ctx->cross_size = ctx->cross_axis;
 		if (ctx->widget->computed_style.flex.direction == SV_COLUMN) {
@@ -115,7 +115,7 @@ static void FlexBoxLayout_NextLine(LCUI_FlexBoxLayoutContext ctx)
 	}
 	ctx->main_axis = ctx->widget->padding.left;
 	ctx->line = FlexBoxLine_Create();
-	LinkedList_Append(&ctx->lines, ctx->line);
+	list_append(&ctx->lines, ctx->line);
 }
 
 static LCUI_FlexBoxLayoutContext FlexBoxLayout_Begin(LCUI_Widget w,
@@ -174,16 +174,16 @@ static LCUI_FlexBoxLayoutContext FlexBoxLayout_Begin(LCUI_Widget w,
 	}
 	ctx->main_size = 0;
 	ctx->cross_size = 0;
-	LinkedList_Init(&ctx->free_elements);
-	LinkedList_Init(&ctx->lines);
+	list_create(&ctx->free_elements);
+	list_create(&ctx->lines);
 	FlexBoxLayout_NextLine(ctx);
 	return ctx;
 }
 
 static void FlexBoxLayout_End(LCUI_FlexBoxLayoutContext ctx)
 {
-	LinkedList_Clear(&ctx->lines, FlexBoxLine_Destroy);
-	LinkedList_Clear(&ctx->free_elements, NULL);
+	list_destroy(&ctx->lines, FlexBoxLine_Destroy);
+	list_destroy(&ctx->free_elements, NULL);
 	free(ctx);
 }
 
@@ -191,7 +191,7 @@ static void FlexBoxLayout_LoadRows(LCUI_FlexBoxLayoutContext ctx)
 {
 	LCUI_Widget child;
 	LCUI_FlexBoxLayoutStyle *flex = &ctx->widget->computed_style.flex;
-	LinkedListNode *node;
+	list_node_t *node;
 
 	float basis;
 	float max_main_size = -1;
@@ -201,13 +201,13 @@ static void FlexBoxLayout_LoadRows(LCUI_FlexBoxLayoutContext ctx)
 		max_main_size = ctx->widget->box.content.width;
 	}
 	DEBUG_MSG("%s, max_main_size: %g\n", ctx->widget->id, max_main_size);
-	for (LinkedList_Each(node, &ctx->widget->children)) {
+	for (list_each(node, &ctx->widget->children)) {
 		child = node->data;
 		if (child->computed_style.display == SV_NONE) {
 			continue;
 		}
 		if (Widget_HasAbsolutePosition(child)) {
-			LinkedList_Append(&ctx->free_elements, child);
+			list_append(&ctx->free_elements, child);
 			continue;
 		}
 		/* Clears the auto margin calculated on the last layout */
@@ -246,7 +246,7 @@ static void FlexBoxLayout_LoadRows(LCUI_FlexBoxLayoutContext ctx)
 		ctx->line->main_size += basis;
 		FlexBoxLine_LoadElement(ctx->line, child);
 	}
-	ctx->main_size = max(ctx->main_size, ctx->line->main_size);
+	ctx->main_size = y_max(ctx->main_size, ctx->line->main_size);
 	ctx->cross_size += ctx->line->cross_size;
 	DEBUG_MSG("%s,end load, size: (%g, %g)\n", ctx->widget->id,
 		  ctx->main_size, ctx->cross_size);
@@ -256,7 +256,7 @@ static void FlexBoxLayout_LoadColumns(LCUI_FlexBoxLayoutContext ctx)
 {
 	LCUI_Widget child;
 	LCUI_FlexBoxLayoutStyle *flex = &ctx->widget->computed_style.flex;
-	LinkedListNode *node;
+	list_node_t *node;
 
 	float basis;
 	float max_main_size = -1;
@@ -266,14 +266,14 @@ static void FlexBoxLayout_LoadColumns(LCUI_FlexBoxLayoutContext ctx)
 		max_main_size = ctx->widget->box.content.height;
 	}
 	DEBUG_MSG("max_main_size: %g\n", max_main_size);
-	for (LinkedList_Each(node, &ctx->widget->children)) {
+	for (list_each(node, &ctx->widget->children)) {
 		child = node->data;
 
 		if (child->computed_style.display == SV_NONE) {
 			continue;
 		}
 		if (Widget_HasAbsolutePosition(child)) {
-			LinkedList_Append(&ctx->free_elements, child);
+			list_append(&ctx->free_elements, child);
 			continue;
 		}
 		Widget_ComputeFlexBasisStyle(child);
@@ -300,7 +300,7 @@ static void FlexBoxLayout_LoadColumns(LCUI_FlexBoxLayoutContext ctx)
 		ctx->line->main_size += basis;
 		FlexBoxLine_LoadElement(ctx->line, child);
 	}
-	ctx->main_size = max(ctx->main_size, ctx->line->main_size);
+	ctx->main_size = y_max(ctx->main_size, ctx->line->main_size);
 	ctx->cross_size += ctx->line->cross_size;
 	DEBUG_MSG("main_size: %g\n", ctx->main_size);
 }
@@ -390,7 +390,7 @@ static void FlexBoxLayout_ReflowRow(LCUI_FlexBoxLayoutContext ctx)
 
 	LCUI_Widget w;
 	LCUI_FlexBoxLayoutStyle *flex;
-	LinkedListNode *node;
+	list_node_t *node;
 
 	free_space = ctx->widget->box.content.width - ctx->line->main_size;
 	if (free_space >= 0) {
@@ -403,7 +403,7 @@ static void FlexBoxLayout_ReflowRow(LCUI_FlexBoxLayoutContext ctx)
 
 	/* flex-grow and flex-shrink */
 	DEBUG_MSG("%s, free_space: %g\n", ctx->widget->id, free_space);
-	for (LinkedList_Each(node, &ctx->line->elements)) {
+	for (list_each(node, &ctx->line->elements)) {
 		w = node->data;
 		flex = &w->computed_style.flex;
 		if (w->computed_style.height_sizing != LCUI_SIZING_RULE_FIXED) {
@@ -436,7 +436,7 @@ static void FlexBoxLayout_ReflowRow(LCUI_FlexBoxLayoutContext ctx)
 	if (free_space > 0 && ctx->line->count_of_auto_margin_items > 0) {
 		main_axis = 0;
 		k = free_space / ctx->line->count_of_auto_margin_items;
-		for (LinkedList_Each(node, &ctx->line->elements)) {
+		for (list_each(node, &ctx->line->elements)) {
 			w = node->data;
 			if (Widget_HasAutoStyle(w, key_margin_left)) {
 				w->margin.left = k;
@@ -456,7 +456,7 @@ static void FlexBoxLayout_ReflowRow(LCUI_FlexBoxLayoutContext ctx)
 
 	main_axis = ctx->widget->padding.left;
 	FlexBoxLayout_ComputeJustifyContent(ctx, &main_axis, &space);
-	for (LinkedList_Each(node, &ctx->line->elements)) {
+	for (list_each(node, &ctx->line->elements)) {
 		w = node->data;
 		main_axis += space;
 		w->layout_x = main_axis;
@@ -475,7 +475,7 @@ static void FlexBoxLayout_ReflowColumn(LCUI_FlexBoxLayoutContext ctx)
 
 	LCUI_Widget w;
 	LCUI_FlexBoxLayoutStyle *flex;
-	LinkedListNode *node;
+	list_node_t *node;
 
 	free_space = ctx->widget->box.content.height - ctx->line->main_size;
 	if (free_space >= 0) {
@@ -486,7 +486,7 @@ static void FlexBoxLayout_ReflowColumn(LCUI_FlexBoxLayoutContext ctx)
 
 	/* flex-grow and flex-shrink */
 
-	for (LinkedList_Each(node, &ctx->line->elements)) {
+	for (list_each(node, &ctx->line->elements)) {
 		w = node->data;
 		flex = &w->computed_style.flex;
 		if (w->computed_style.width_sizing != LCUI_SIZING_RULE_FIXED) {
@@ -518,7 +518,7 @@ static void FlexBoxLayout_ReflowColumn(LCUI_FlexBoxLayoutContext ctx)
 	if (free_space > 0 && ctx->line->count_of_auto_margin_items > 0) {
 		main_axis = 0;
 		k = free_space / ctx->line->count_of_auto_margin_items;
-		for (LinkedList_Each(node, &ctx->line->elements)) {
+		for (list_each(node, &ctx->line->elements)) {
 			w = node->data;
 			if (Widget_HasAutoStyle(w, key_margin_top)) {
 				w->margin.top = k;
@@ -537,7 +537,7 @@ static void FlexBoxLayout_ReflowColumn(LCUI_FlexBoxLayoutContext ctx)
 
 	main_axis = ctx->widget->padding.top;
 	FlexBoxLayout_ComputeJustifyContent(ctx, &main_axis, &space);
-	for (LinkedList_Each(node, &ctx->line->elements)) {
+	for (list_each(node, &ctx->line->elements)) {
 		w = node->data;
 		main_axis += space;
 		w->layout_y = main_axis;
@@ -550,11 +550,11 @@ static void FlexBoxLayout_ReflowColumn(LCUI_FlexBoxLayoutContext ctx)
 static void FlexBoxLayout_AlignItemsCenter(LCUI_FlexBoxLayoutContext ctx,
 					   float base_cross_axis)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 	LCUI_Widget child;
 
 	if (ctx->widget->computed_style.flex.direction == SV_COLUMN) {
-		for (LinkedList_Each(node, &ctx->line->elements)) {
+		for (list_each(node, &ctx->line->elements)) {
 			child = node->data;
 			child->layout_x =
 			    base_cross_axis +
@@ -564,7 +564,7 @@ static void FlexBoxLayout_AlignItemsCenter(LCUI_FlexBoxLayoutContext ctx,
 		}
 		return;
 	}
-	for (LinkedList_Each(node, &ctx->line->elements)) {
+	for (list_each(node, &ctx->line->elements)) {
 		child = node->data;
 		child->layout_y =
 		    base_cross_axis +
@@ -576,11 +576,11 @@ static void FlexBoxLayout_AlignItemsCenter(LCUI_FlexBoxLayoutContext ctx,
 static void FlexBoxLayout_AlignItemsStretch(LCUI_FlexBoxLayoutContext ctx,
 					    float base_cross_axis)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 	LCUI_Widget child;
 
 	if (ctx->widget->computed_style.flex.direction == SV_COLUMN) {
-		for (LinkedList_Each(node, &ctx->line->elements)) {
+		for (list_each(node, &ctx->line->elements)) {
 			child = node->data;
 			child->layout_x = base_cross_axis;
 			if (Widget_HasAutoStyle(child, key_width)) {
@@ -593,7 +593,7 @@ static void FlexBoxLayout_AlignItemsStretch(LCUI_FlexBoxLayoutContext ctx,
 		}
 		return;
 	}
-	for (LinkedList_Each(node, &ctx->line->elements)) {
+	for (list_each(node, &ctx->line->elements)) {
 		child = node->data;
 		child->layout_y = base_cross_axis;
 		if (Widget_HasAutoStyle(child, key_height)) {
@@ -607,18 +607,18 @@ static void FlexBoxLayout_AlignItemsStretch(LCUI_FlexBoxLayoutContext ctx,
 static void FlexBoxLayout_AlignItemsStart(LCUI_FlexBoxLayoutContext ctx,
 					  float base_cross_axis)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 	LCUI_Widget child;
 
 	if (ctx->widget->computed_style.flex.direction == SV_COLUMN) {
-		for (LinkedList_Each(node, &ctx->line->elements)) {
+		for (list_each(node, &ctx->line->elements)) {
 			child = node->data;
 			child->layout_x = base_cross_axis;
 			Widget_UpdateBoxPosition(child);
 		}
 		return;
 	}
-	for (LinkedList_Each(node, &ctx->line->elements)) {
+	for (list_each(node, &ctx->line->elements)) {
 		child = node->data;
 		child->layout_y = base_cross_axis;
 		Widget_UpdateBoxPosition(child);
@@ -628,11 +628,11 @@ static void FlexBoxLayout_AlignItemsStart(LCUI_FlexBoxLayoutContext ctx,
 static void FlexBoxLayout_AlignItemsEnd(LCUI_FlexBoxLayoutContext ctx,
 					float base_cross_axis)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 	LCUI_Widget child;
 
 	if (ctx->widget->computed_style.flex.direction == SV_COLUMN) {
-		for (LinkedList_Each(node, &ctx->line->elements)) {
+		for (list_each(node, &ctx->line->elements)) {
 			child = node->data;
 			child->layout_x = base_cross_axis +
 					  ctx->line->cross_size -
@@ -641,7 +641,7 @@ static void FlexBoxLayout_AlignItemsEnd(LCUI_FlexBoxLayoutContext ctx,
 		}
 		return;
 	}
-	for (LinkedList_Each(node, &ctx->line->elements)) {
+	for (list_each(node, &ctx->line->elements)) {
 		child = node->data;
 		child->layout_y = base_cross_axis + ctx->line->cross_size -
 				  child->box.outer.height;
@@ -655,7 +655,7 @@ static void FlexBoxLayout_AlignItems(LCUI_FlexBoxLayoutContext ctx)
 	float free_space = 0;
 
 	LCUI_Widget w = ctx->widget;
-	LinkedListNode *node;
+	list_node_t *node;
 
 	if (w->computed_style.flex.direction == SV_COLUMN) {
 		cross_axis = w->padding.left;
@@ -667,7 +667,7 @@ static void FlexBoxLayout_AlignItems(LCUI_FlexBoxLayoutContext ctx)
 	if (free_space < 0) {
 		free_space = 0;
 	}
-	for (LinkedList_Each(node, &ctx->lines)) {
+	for (list_each(node, &ctx->lines)) {
 		ctx->line = node->data;
 		ctx->line->cross_size += free_space / ctx->lines.length;
 		switch (w->computed_style.flex.align_items) {
@@ -698,10 +698,10 @@ static void FlexBoxLayout_AlignItems(LCUI_FlexBoxLayoutContext ctx)
 static void FlexBoxLayout_Reflow(LCUI_FlexBoxLayoutContext ctx)
 {
 	LCUI_Widget w = ctx->widget;
-	LinkedListNode *node;
+	list_node_t *node;
 
 	DEBUG_MSG("widget: %s, start\n", w->id);
-	for (LinkedList_Each(node, &ctx->lines)) {
+	for (list_each(node, &ctx->lines)) {
 		ctx->line = node->data;
 		if (w->computed_style.flex.direction == SV_COLUMN) {
 			FlexBoxLayout_ReflowColumn(ctx);
@@ -715,8 +715,8 @@ static void FlexBoxLayout_Reflow(LCUI_FlexBoxLayoutContext ctx)
 
 static void FlexBoxLayout_ReflowFreeElements(LCUI_FlexBoxLayoutContext ctx)
 {
-	LinkedListNode *node;
-	for (LinkedList_Each(node, &ctx->free_elements)) {
+	list_node_t *node;
+	for (list_each(node, &ctx->free_elements)) {
 		Widget_AutoReflow(node->data, LCUI_LAYOUT_RULE_FIXED);
 	}
 }
@@ -739,18 +739,18 @@ static void FlexBoxLayout_ApplySize(LCUI_FlexBoxLayoutContext ctx)
 			width = w->box.content.width;
 			w->proto->autosize(w, &width, &height, ctx->rule);
 			width = w->box.content.width;
-			height = max(height, ctx->main_size);
+			height = y_max(height, ctx->main_size);
 			break;
 		case LCUI_LAYOUT_RULE_FIXED_HEIGHT:
 			height = w->box.content.height;
 			w->proto->autosize(w, &width, &height, ctx->rule);
 			height = w->box.content.height;
-			width = max(width, ctx->cross_size);
+			width = y_max(width, ctx->cross_size);
 			break;
 		default:
 			w->proto->autosize(w, &width, &height, ctx->rule);
-			height = max(height, ctx->main_size);
-			width = max(width, ctx->cross_size);
+			height = y_max(height, ctx->main_size);
+			width = y_max(width, ctx->cross_size);
 			break;
 		}
 		w->width = ToBorderBoxWidth(w, width);
@@ -773,18 +773,18 @@ static void FlexBoxLayout_ApplySize(LCUI_FlexBoxLayoutContext ctx)
 		width = w->box.content.width;
 		w->proto->autosize(w, &width, &height, ctx->rule);
 		width = w->box.content.width;
-		height = max(height, ctx->cross_size);
+		height = y_max(height, ctx->cross_size);
 		break;
 	case LCUI_LAYOUT_RULE_FIXED_HEIGHT:
 		height = w->box.content.height;
 		w->proto->autosize(w, &width, &height, ctx->rule);
-		width = max(width, ctx->main_size);
+		width = y_max(width, ctx->main_size);
 		height = w->box.content.height;
 		break;
 	default:
 		w->proto->autosize(w, &width, &height, ctx->rule);
-		width = max(width, ctx->main_size);
-		height = max(height, ctx->cross_size);
+		width = y_max(width, ctx->main_size);
+		height = y_max(height, ctx->cross_size);
 		break;
 	}
 	w->width = ToBorderBoxWidth(w, width);

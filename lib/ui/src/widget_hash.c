@@ -73,10 +73,10 @@ void Widget_GenerateSelfHash(LCUI_Widget widget)
 
 void Widget_GenerateHash(LCUI_Widget w)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 
 	Widget_GenerateSelfHash(w);
-	for (LinkedList_Each(node, &w->children)) {
+	for (list_each(node, &w->children)) {
 		Widget_GenerateHash(node->data);
 	}
 }

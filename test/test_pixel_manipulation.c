@@ -39,13 +39,13 @@ void grayscale(LCUI_Graph *graph, LCUI_Rect rect)
 void sepia(LCUI_Graph *graph, LCUI_Rect rect)
 {
 	PixelManipulationBegin;
-	pixel.red = (unsigned char)min(
+	pixel.red = (unsigned char)y_min(
 	    round(0.393 * pixel.red + 0.769 * pixel.green + 0.189 * pixel.blue),
 	    255);
-	pixel.green = (unsigned char)min(
+	pixel.green = (unsigned char)y_min(
 	    round(0.349 * pixel.red + 0.686 * pixel.green + 0.168 * pixel.blue),
 	    255);
-	pixel.blue = (unsigned char)min(
+	pixel.blue = (unsigned char)y_min(
 	    round(0.272 * pixel.red + 0.534 * pixel.green + 0.131 * pixel.blue),
 	    255);
 	PixelManipulationEnd;

@@ -38,13 +38,13 @@
 
 static void Widget_MarkChildrenRefreshByStatus(LCUI_Widget w)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 
 	if (w->rules && w->rules->ignore_status_change) {
 		return;
 	}
 	Widget_AddTask(w, LCUI_WTASK_REFRESH_STYLE);
-	for (LinkedList_Each(node, &w->children)) {
+	for (list_each(node, &w->children)) {
 		Widget_MarkChildrenRefreshByStatus(node->data);
 	}
 }

@@ -33,7 +33,7 @@
 #include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/types.h>
-#include <LCUI/util/linkedlist.h>
+#include <yutil.h>
 #include <LCUI/font.h>
 
 enum in_core_font_type {

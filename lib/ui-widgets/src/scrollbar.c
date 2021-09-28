@@ -165,9 +165,9 @@ static void OnInertialScrolling(void *arg)
 
 	scrollbar = Widget_GetData(w, scrollbar_prototype);
 	effect = &scrollbar->effect;
-	time = (double)LCUI_GetTimeDelta(effect->timestamp) / 1000;
+	time = (double)get_time_delta(effect->timestamp) / 1000;
 	distance = (effect->speed + 0.5 * effect->speed_delta * time) * time;
-	pos = effect->end_pos + iround(distance);
+	pos = effect->end_pos + y_iround(distance);
 	DEBUG_MSG("distance: %g, pos: %d, speed_delta: %g, speed: %g\n",
 		  distance, pos, effect->speed_delta,
 		  effect->speed + effect->speed_delta * time);
@@ -180,7 +180,7 @@ static void OnInertialScrolling(void *arg)
 		ScrollBar_SetPosition(w, pos);
 		return;
 	}
-	LCUITimer_Free(effect->timer);
+	lcui_destroy_timer(effect->timer);
 	effect->is_running = FALSE;
 	effect->timer = -1;
 }
@@ -202,7 +202,7 @@ static void UpdateInertialScrolling(InertialScrolling effect, int pos)
 	effect->speed = 0;
 	effect->is_running = FALSE;
 	effect->start_pos = pos;
-	effect->timestamp = LCUI_GetTime();
+	effect->timestamp = get_time_ms();
 }
 
 static void StartInertialScrolling(LCUI_Widget w)
@@ -217,7 +217,7 @@ static void StartInertialScrolling(LCUI_Widget w)
 	effect = &scrollbar->effect;
 	effect->end_pos = scrollbar->pos;
 	distance = effect->end_pos - effect->start_pos;
-	time_delta = LCUI_GetTimeDelta(effect->timestamp);
+	time_delta = get_time_delta(effect->timestamp);
 	/* 根据距离计算当前移动速度 */
 	if (time_delta > 0) {
 		effect->speed = 1000.0 * distance / time_delta;
@@ -226,16 +226,16 @@ static void StartInertialScrolling(LCUI_Widget w)
 		return;
 	}
 	effect->speed_delta = -effect->speed;
-	effect->timestamp = LCUI_GetTime();
+	effect->timestamp = get_time_ms();
 	if (effect->is_running) {
 		return;
 	}
 	effect->is_running = TRUE;
 	if (effect->timer > 0) {
-		LCUITimer_Free(effect->timer);
+		lcui_destroy_timer(effect->timer);
 	}
 	effect->timer =
-	    LCUITimer_Set(effect->interval, OnInertialScrolling, w, TRUE);
+	    lcui_set_interval(effect->interval, OnInertialScrolling, w);
 	DEBUG_MSG("start_pos: %d, end_pos: %d\n", effect->start_pos,
 		  effect->end_pos);
 	DEBUG_MSG("effect->speed: %g, distance: %d, time: %d\n", effect->speed,
@@ -260,29 +260,29 @@ static void ScrollBarThumb_OnMouseMove(LCUI_Widget thumb, LCUI_WidgetEvent e,
 	if (scrollbar->direction == LCUI_SCROLLBAR_HORIZONTAL) {
 		size = thumb->parent->box.content.width - thumb->width;
 		x = scrollbar->thumb_x + e->motion.x - scrollbar->mouse_x;
-		x = max(0, min(x, size));
+		x = y_max(0, y_min(x, size));
 		y = 0;
 		layer_pos = (scrollbar->target->box.outer.width -
 			     box->box.content.width) *
-			    max(0, min(x / size, 1.0));
+			    y_max(0, y_min(x / size, 1.0));
 		Widget_SetStyle(target, key_left, -layer_pos, px);
 	} else {
 		size = thumb->parent->box.content.height - thumb->height;
 		x = 0;
 		y = scrollbar->thumb_y + e->motion.y - scrollbar->mouse_y;
-		y = max(0, min(y, size));
+		y = y_max(0, y_min(y, size));
 		layer_pos = (scrollbar->target->box.outer.height -
 			     box->box.content.height) *
-			    max(0, min(y / size, 1.0));
+			    y_max(0, y_min(y / size, 1.0));
 		Widget_SetStyle(target, key_top, -layer_pos, px);
 	}
-	if (scrollbar->pos != iround(layer_pos)) {
+	if (scrollbar->pos != y_iround(layer_pos)) {
 		LCUI_WidgetEventRec e;
 		LCUI_InitWidgetEvent(&e, "scroll");
 		e.cancel_bubble = TRUE;
 		Widget_TriggerEvent(target, &e, &layer_pos);
 	}
-	scrollbar->pos = iround(layer_pos);
+	scrollbar->pos = y_iround(layer_pos);
 	Widget_UpdateStyle(target, FALSE);
 	Widget_Move(thumb, x, y);
 }
@@ -498,7 +498,7 @@ static void ScrollBox_OnTouch(LCUI_Widget box, LCUI_WidgetEvent e, void *arg)
 		break;
 	case LCUI_WEVENT_TOUCHUP:
 		Widget_ReleaseTouchCapture(box, -1);
-		time_delta = (uint_t)LCUI_GetTimeDelta(scrollbar->timestamp);
+		time_delta = (uint_t)get_time_delta(scrollbar->timestamp);
 		if (scrollbar->is_dragging && time_delta < 50) {
 			StartInertialScrolling(w);
 		}
@@ -527,7 +527,7 @@ static void ScrollBox_OnTouch(LCUI_Widget box, LCUI_WidgetEvent e, void *arg)
 						scrollbar->pos);
 		}
 		scrollbar->distance = distance;
-		scrollbar->timestamp = LCUI_GetTime();
+		scrollbar->timestamp = get_time_ms();
 		ScrollBar_SetPosition(w, pos);
 		if (scrollbar->is_dragging) {
 			break;
@@ -667,7 +667,7 @@ int ScrollBar_SetPosition(LCUI_Widget w, int pos)
 		Widget_SetStyle(thumb, key_top, thumb_pos, px);
 		Widget_SetStyle(target, key_top, -new_pos, px);
 	}
-	pos = iround(new_pos);
+	pos = y_iround(new_pos);
 	if (scrollbar->pos != pos) {
 		LCUI_WidgetEventRec e;
 		LCUI_InitWidgetEvent(&e, "scroll");

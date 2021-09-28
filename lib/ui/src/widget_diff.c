@@ -100,7 +100,7 @@ INLINE void Widget_AddReflowTaskToParent(LCUI_Widget w)
 
 int Widget_EndStyleDiff(LCUI_Widget w, LCUI_WidgetStyleDiff diff)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 	const LCUI_WidgetStyle *style = &w->computed_style;
 
 	if (style->visible != diff->visible) {
@@ -118,7 +118,7 @@ int Widget_EndStyleDiff(LCUI_Widget w, LCUI_WidgetStyleDiff diff)
 	Widget_UpdateBoxPosition(w);
 	if (MEMCMP(&diff->box.padding, &w->box.padding)) {
 		w->invalid_area_type = LCUI_INVALID_AREA_TYPE_CANVAS_BOX;
-		for (LinkedList_Each(node, &w->children)) {
+		for (list_each(node, &w->children)) {
 			Widget_AddTask(node->data, LCUI_WTASK_POSITION);
 			Widget_AddTask(node->data, LCUI_WTASK_RESIZE);
 		}

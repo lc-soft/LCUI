@@ -28,7 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,8 +35,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/types.h>
 #include <LCUI/util/parse.h>
-#include <LCUI/util/string.h>
-#include <LCUI/util/linkedlist.h>
+#include <yutil.h>
 #include <LCUI/gui/css_library.h>
 #include <LCUI/gui/css_parser.h>
 

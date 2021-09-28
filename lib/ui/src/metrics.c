@@ -31,7 +31,7 @@
 
 #include <LCUI_Build.h>
 #include <LCUI/types.h>
-#include <LCUI/util/math.h>
+#include <yutil.h>
 #include <LCUI/gui/metrics.h>
 
 static LCUI_MetricsRec metrics;
@@ -76,15 +76,15 @@ float LCUIMetrics_ComputeStyle(LCUI_Style style)
 
 int LCUIMetrics_ComputeActual(float value, LCUI_StyleType type)
 {
-	return iround(LCUIMetrics_Compute(value, type) * metrics.scale);
+	return y_iround(LCUIMetrics_Compute(value, type) * metrics.scale);
 }
 
 void LCUIMetrics_ComputeRectActual(LCUI_Rect *dst, const LCUI_RectF *src)
 {
-	dst->x = iround(src->x * metrics.scale);
-	dst->y = iround(src->y * metrics.scale);
-	dst->width = iround(src->width * metrics.scale);
-	dst->height = iround(src->height * metrics.scale);
+	dst->x = y_iround(src->x * metrics.scale);
+	dst->y = y_iround(src->y * metrics.scale);
+	dst->width = y_iround(src->width * metrics.scale);
+	dst->height = y_iround(src->height * metrics.scale);
 }
 
 float LCUIMetrics_GetScale(void)
@@ -134,8 +134,8 @@ void LCUIMetrics_SetDpi(float dpi)
 
 void LCUIMetrics_SetScale(float scale)
 {
-	scale = max(0.5f, scale);
-	scale = min(5.0f, scale);
+	scale = y_max(0.5f, scale);
+	scale = y_min(5.0f, scale);
 	metrics.scale = scale;
 }
 

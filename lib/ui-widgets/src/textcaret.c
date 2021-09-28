@@ -75,7 +75,7 @@ void TextCaret_Refresh(LCUI_Widget widget)
 	if (!caret->visible) {
 		return;
 	}
-	LCUITimer_Reset(caret->timer_id, caret->blink_interval);
+	lcui_reset_timer(caret->timer_id, caret->blink_interval);
 	Widget_GetOffset(widget, LCUIWidget_GetRoot(), &x, &y);
 	LCUIIME_SetCaret((int)x, (int)y);
 	Widget_Show(widget);
@@ -107,7 +107,7 @@ void TextCaret_SetVisible(LCUI_Widget widget, LCUI_BOOL visible)
 	if (visible) {
 		TextCaret_Refresh(widget);
 	} else {
-		LCUITimer_Reset(caret->timer_id, caret->blink_interval);
+		lcui_reset_timer(caret->timer_id, caret->blink_interval);
 		Widget_Hide(widget);
 	}
 }
@@ -122,7 +122,7 @@ static void TextCaret_OnInit(LCUI_Widget widget)
 	caret->task->widget = widget;
 	caret->blink_interval = 500;
 	caret->visible = FALSE;
-	caret->timer_id = LCUI_SetInterval(caret->blink_interval,
+	caret->timer_id = lcui_set_interval(caret->blink_interval,
 		TextCaret_OnBlink, caret->task);
 }
 
@@ -132,7 +132,7 @@ void TextCaret_SetBlinkTime(LCUI_Widget widget, unsigned int n_ms)
 
 	caret = Widget_GetData(widget, prototype);
 	caret->blink_interval = n_ms;
-	LCUITimer_Reset(caret->timer_id, caret->blink_interval);
+	lcui_reset_timer(caret->timer_id, caret->blink_interval);
 }
 
 static void TextCaret_OnDestroy(LCUI_Widget widget)
@@ -141,7 +141,7 @@ static void TextCaret_OnDestroy(LCUI_Widget widget)
 
 	caret = Widget_GetData(widget, prototype);
 	caret->task->active = FALSE;
-	if (LCUITimer_Free(caret->timer_id) != -1) {
+	if (lcui_destroy_timer(caret->timer_id) != -1) {
 		free(caret->task);
 		caret->task = NULL;
 	}

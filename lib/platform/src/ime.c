@@ -45,12 +45,12 @@ typedef struct LCUI_IMERec_ {
 	int id;
 	char *name;
 	LCUI_IMEHandlerRec handler;
-	LinkedListNode node;
+	list_node_t node;
 } LCUI_IMERec, *LCUI_IME;
 
 static struct LCUI_InputMethodEngine {
 	int id_count;
-	LinkedList list;
+	list_t list;
 
 	LCUI_IME ime;
 	LCUI_BOOL enable_caps_lock;
@@ -59,8 +59,8 @@ static struct LCUI_InputMethodEngine {
 
 static LCUI_IME LCUIIME_Find(int ime_id)
 {
-	LinkedListNode *node;
-	for (LinkedList_Each(node, &self.list)) {
+	list_node_t *node;
+	for (list_each(node, &self.list)) {
 		LCUI_IME ime = node->data;
 		if (ime->id == ime_id) {
 			return ime;
@@ -71,8 +71,8 @@ static LCUI_IME LCUIIME_Find(int ime_id)
 
 static LCUI_IME LCUIIME_FindByName(const char *name)
 {
-	LinkedListNode *node;
-	for (LinkedList_Each(node, &self.list)) {
+	list_node_t *node;
+	for (list_each(node, &self.list)) {
 		LCUI_IME ime = node->data;
 		if (strcmp(ime->name, name) == 0) {
 			return ime;
@@ -105,7 +105,7 @@ int LCUIIME_Register(const char *name, LCUI_IMEHandler handler)
 	ime->node.data = ime;
 	strncpy(ime->name, name, len);
 	memcpy(&ime->handler, handler, sizeof(LCUI_IMEHandlerRec));
-	LinkedList_AppendNode(&self.list, &ime->node);
+	list_append_node(&self.list, &ime->node);
 	return ime->id;
 }
 
@@ -120,7 +120,7 @@ static LCUI_BOOL LCUIIME_Open(LCUI_IME ime)
 static LCUI_BOOL LCUIIME_Close(LCUI_IME ime)
 {
 	if (ime && ime->handler.close) {
-		Logger_Debug("[ime] close engine: %s\n", ime->name);
+		logger_debug("[ime] close engine: %s\n", ime->name);
 		return ime->handler.close();
 	}
 	return FALSE;
@@ -131,7 +131,7 @@ LCUI_BOOL LCUIIME_Select(int ime_id)
 	LCUI_IME ime = LCUIIME_Find(ime_id);
 	if (ime) {
 		LCUIIME_Close(self.ime);
-		Logger_Debug("[ime] select engine: %s\n", ime->name);
+		logger_debug("[ime] select engine: %s\n", ime->name);
 		self.ime = ime;
 		LCUIIME_Open(self.ime);
 		return TRUE;
@@ -256,7 +256,7 @@ static void LCUIIME_OnKeyDown(LCUI_SysEvent e, void *arg)
 
 void LCUI_InitIME(void)
 {
-	LinkedList_Init(&self.list);
+	list_create(&self.list);
 	self.active = TRUE;
 	LCUI_BindEvent(LCUI_KEYDOWN, LCUIIME_OnKeyDown, NULL, NULL);
 #ifdef WINAPI_FAMILY_APP
@@ -281,5 +281,5 @@ void LCUI_FreeIME(void)
 {
 	self.active = FALSE;
 	LCUIIME_Close(self.ime);
-	LinkedList_ClearData(&self.list, LCUIIME_OnDestroy);
+	list_destroy_without_node(&self.list, LCUIIME_OnDestroy);
 }

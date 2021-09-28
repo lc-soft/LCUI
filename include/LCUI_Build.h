@@ -60,7 +60,7 @@
 #endif
 
 #define _DEBUG_MSG(format, ...)                                       \
-	Logger_Log(LOGGER_LEVEL_DEBUG, __FILE__ " %d: %s(): " format, \
+	logger_log(LOGGER_LEVEL_DEBUG, __FILE__ " %d: %s(): " format, \
 		   __LINE__, __FUNCTION__, ##__VA_ARGS__)
 
 #ifdef __cplusplus

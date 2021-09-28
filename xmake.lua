@@ -1,7 +1,7 @@
 set_project("lcui")
 set_version("2.2.1")
 add_rules("mode.debug", "mode.release", "c++.openmp", "mode.coverage")
-add_includedirs("include", "include/LCUI")
+add_includedirs("include", "include/LCUI", "lib/yutil/include")
 add_rpathdirs("@loader_path/lib", "@loader_path")
 add_defines("LCUI_EXPORTS", "UNICODE")
 includes("lib/**/xmake.lua")

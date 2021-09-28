@@ -54,9 +54,9 @@
 	double outer_d, inner_d;                          \
                                                           \
 	const double r = CIRCLE_R(radius);                \
-	const double radius_x = max(0, r - yline->width); \
-	const double radius_y = max(0, r - xline->width); \
-	const int width = max(radius, yline->width);      \
+	const double radius_x = y_max(0, r - yline->width); \
+	const double radius_y = y_max(0, r - xline->width); \
+	const int width = y_max(radius, yline->width);      \
                                                           \
 	LCUI_Rect rect;                                   \
 	LCUI_ARGB *p;                                     \
@@ -102,7 +102,7 @@ static int DrawBorderTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 	if (!Graph_IsValid(dst)) {
 		return -1;
 	}
-	right = min(rect.width, bound_left + width);
+	right = y_min(rect.width, bound_left + width);
 	for (y = 0; y < rect.height; ++y) {
 		outer_x = 0;
 		split_x = 0;
@@ -122,10 +122,10 @@ static int DrawBorderTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 		outer_x = bound_left + outer_x;
 		inner_x = bound_left + inner_x;
 		/* Limit coordinates into the current drawing region */
-		outer_x = max(0, min(right, outer_x));
-		inner_x = max(0, min(right, inner_x));
-		outer_xi = max(0, (int)outer_x - (int)radius / 2);
-		inner_xi = min(right, (int)inner_x + (int)radius / 2);
+		outer_x = y_max(0, y_min(right, outer_x));
+		inner_x = y_max(0, y_min(right, inner_x));
+		outer_xi = y_max(0, (int)outer_x - (int)radius / 2);
+		inner_xi = y_min(right, (int)inner_x + (int)radius / 2);
 		p = Graph_GetPixelPointer(dst, rect.x, rect.y + y);
 		/* Clear the outer pixels */
 		for (x = 0; x < outer_xi; ++x, ++p) {
@@ -195,7 +195,7 @@ static int DrawBorderTopRight(LCUI_Graph *dst, int bound_left, int bound_top,
 	if (!Graph_IsValid(dst)) {
 		return -1;
 	}
-	right = min(rect.width, bound_left + width);
+	right = y_min(rect.width, bound_left + width);
 	for (y = 0; y < rect.height; ++y) {
 		outer_x = width;
 		split_x = 0;
@@ -216,10 +216,10 @@ static int DrawBorderTopRight(LCUI_Graph *dst, int bound_left, int bound_top,
 		outer_x = bound_left + outer_x;
 		inner_x = bound_left + inner_x;
 		/* Limit coordinates into the current drawing region */
-		outer_x = max(0, min(right, outer_x));
-		inner_x = max(-1.0, min(outer_x, inner_x));
-		inner_xi = max(0, (int)inner_x - (int)radius / 2);
-		outer_xi = min(right, (int)outer_x + (int)radius / 2);
+		outer_x = y_max(0, y_min(right, outer_x));
+		inner_x = y_max(-1.0, y_min(outer_x, inner_x));
+		inner_xi = y_max(0, (int)inner_x - (int)radius / 2);
+		outer_xi = y_min(right, (int)outer_x + (int)radius / 2);
 		p = Graph_GetPixelPointer(dst, rect.x + inner_xi, rect.y + y);
 		for (x = inner_xi; x < outer_xi; ++x, ++p) {
 			outer_d = -1.0;
@@ -268,7 +268,7 @@ static int DrawBorderBottomLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 {
 	BorderRenderContext();
 
-	int height = max(radius, xline->width);
+	int height = y_max(radius, xline->width);
 	double cirlce_center_x = bound_left + r;
 	double circle_center_y = bound_top + height - 1.0 * radius - 0.5;
 	double split_k = 1.0 * yline->width / xline->width;
@@ -282,7 +282,7 @@ static int DrawBorderBottomLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 	if (!Graph_IsValid(dst)) {
 		return -1;
 	}
-	right = min(rect.width, bound_left + width);
+	right = y_min(rect.width, bound_left + width);
 	for (y = 0; y < rect.height; ++y) {
 		outer_x = 0;
 		split_x = 0;
@@ -302,10 +302,10 @@ static int DrawBorderBottomLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 		outer_x = bound_left + outer_x;
 		inner_x = bound_left + inner_x;
 		/* Limit coordinates into the current drawing region */
-		outer_x = max(0, min(right, outer_x));
-		inner_x = max(0, min(right, inner_x));
-		outer_xi = max(0, (int)outer_x - (int)radius / 2);
-		inner_xi = min(right, (int)inner_x + (int)radius / 2);
+		outer_x = y_max(0, y_min(right, outer_x));
+		inner_x = y_max(0, y_min(right, inner_x));
+		outer_xi = y_max(0, (int)outer_x - (int)radius / 2);
+		inner_xi = y_min(right, (int)inner_x + (int)radius / 2);
 		p = Graph_GetPixelPointer(dst, rect.x, rect.y + y);
 		for (x = 0; x < outer_xi; ++x, ++p) {
 			p->alpha = 0;
@@ -356,7 +356,7 @@ static int DrawBorderBottomRight(LCUI_Graph *dst, int bound_left, int bound_top,
 {
 	BorderRenderContext();
 
-	int height = max(radius, xline->width);
+	int height = y_max(radius, xline->width);
 	double circle_center_y = bound_top + height - 1.0 * radius - 0.5;
 	double circle_center_x = bound_left + width - 1.0 * radius - 0.5;
 	double split_k = 1.0 * yline->width / xline->width;
@@ -370,7 +370,7 @@ static int DrawBorderBottomRight(LCUI_Graph *dst, int bound_left, int bound_top,
 	if (!Graph_IsValid(dst)) {
 		return -1;
 	}
-	right = min(rect.width, bound_left + width);
+	right = y_min(rect.width, bound_left + width);
 	for (y = 0; y < rect.height; ++y) {
 		outer_x = width;
 		split_x = 0;
@@ -391,10 +391,10 @@ static int DrawBorderBottomRight(LCUI_Graph *dst, int bound_left, int bound_top,
 		}
 		outer_x = bound_left + outer_x;
 		inner_x = bound_left + inner_x;
-		outer_x = max(0, min(right, outer_x));
-		inner_x = max(-1.0, min(outer_x, inner_x));
-		inner_xi = max(0, (int)inner_x - (int)radius / 2);
-		outer_xi = min(right, (int)outer_x + (int)radius / 2);
+		outer_x = y_max(0, y_min(right, outer_x));
+		inner_x = y_max(-1.0, y_min(outer_x, inner_x));
+		inner_xi = y_max(0, (int)inner_x - (int)radius / 2);
+		outer_xi = y_min(right, (int)outer_x + (int)radius / 2);
 		p = Graph_GetPixelPointer(dst, rect.x + inner_xi, rect.y + y);
 		for (x = inner_xi; x < outer_xi; ++x, ++p) {
 			outer_d = -1.0;
@@ -468,7 +468,7 @@ static int CropContentTopLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 		y = ToGeoY(yi, center_y);
 		x = ellipse_x(radius_x + 1.0, radius_y + 1.0, y);
 		outer_xi = (int)(center_x - x);
-		outer_xi = max(0, min(outer_xi, rect.width));
+		outer_xi = y_max(0, y_min(outer_xi, rect.width));
 		p = Graph_GetPixelPointer(dst, rect.x, rect.y + yi);
 		for (xi = 0; xi < outer_xi; ++xi, ++p) {
 			p->alpha = 0;
@@ -528,9 +528,9 @@ static int CropContentTopRight(LCUI_Graph *dst, int bound_left, int bound_top,
 	}
 	for (yi = 0; yi < rect.height; ++yi) {
 		y = ToGeoY(yi, center_y);
-		x = ellipse_x(max(0, radius_x - 1), max(0, radius_y - 1), y);
+		x = ellipse_x(y_max(0, radius_x - 1), y_max(0, radius_y - 1), y);
 		outer_xi = (int)(center_x + x);
-		outer_xi = max(0, outer_xi);
+		outer_xi = y_max(0, outer_xi);
 		p = Graph_GetPixelPointer(dst, rect.x + outer_xi, rect.y + yi);
 		if (radius_x == radius_y) {
 			for (xi = outer_xi; xi < rect.width; ++xi, ++p) {
@@ -589,7 +589,7 @@ static int CropContentBottomLeft(LCUI_Graph *dst, int bound_left, int bound_top,
 		y = ToGeoY(yi, center_y);
 		x = ellipse_x(radius_x + 1.0, radius_y + 1.0, y);
 		outer_xi = (int)(center_x - x);
-		outer_xi = max(0, min(outer_xi, rect.width));
+		outer_xi = y_max(0, y_min(outer_xi, rect.width));
 		p = Graph_GetPixelPointer(dst, rect.x, rect.y + yi);
 		for (xi = 0; xi < outer_xi; ++xi, ++p) {
 			p->alpha = 0;
@@ -649,9 +649,9 @@ static int CropContentBottomRight(LCUI_Graph *dst, int bound_left,
 	}
 	for (yi = 0; yi < rect.height; ++yi) {
 		y = ToGeoY(yi, center_y);
-		x = ellipse_x(max(0, radius_x - 1), max(0, radius_y - 1), y);
+		x = ellipse_x(y_max(0, radius_x - 1), y_max(0, radius_y - 1), y);
 		outer_xi = (int)(center_x + x);
-		outer_xi = max(0, outer_xi);
+		outer_xi = y_max(0, outer_xi);
 		p = Graph_GetPixelPointer(dst, rect.x + outer_xi, rect.y + yi);
 		if (radius_x == radius_y) {
 			for (xi = outer_xi; xi < rect.width; ++xi, ++p) {
@@ -768,14 +768,14 @@ int Border_Paint(const LCUI_Border *border, const LCUI_Rect *box,
 	LCUI_Rect bound, rect;
 
 	int bound_top, bound_left;
-	int tl_width = max(border->top_left_radius, border->left.width);
-	int tl_height = max(border->top_left_radius, border->top.width);
-	int tr_width = max(border->top_right_radius, border->right.width);
-	int tr_height = max(border->top_right_radius, border->top.width);
-	int bl_width = max(border->bottom_left_radius, border->left.width);
-	int bl_height = max(border->bottom_left_radius, border->bottom.width);
-	int br_width = max(border->bottom_right_radius, border->right.width);
-	int br_height = max(border->bottom_right_radius, border->bottom.width);
+	int tl_width = y_max(border->top_left_radius, border->left.width);
+	int tl_height = y_max(border->top_left_radius, border->top.width);
+	int tr_width = y_max(border->top_right_radius, border->right.width);
+	int tr_height = y_max(border->top_right_radius, border->top.width);
+	int bl_width = y_max(border->bottom_left_radius, border->left.width);
+	int bl_height = y_max(border->bottom_left_radius, border->bottom.width);
+	int br_width = y_max(border->bottom_right_radius, border->right.width);
+	int br_height = y_max(border->bottom_right_radius, border->bottom.width);
 
 	if (!Graph_IsValid(&paint->canvas)) {
 		return -1;

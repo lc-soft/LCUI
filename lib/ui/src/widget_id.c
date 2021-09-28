@@ -36,29 +36,29 @@
 #include <LCUI/gui/widget_id.h>
 
 static struct LCUI_WidgetIdLibraryModule {
-	Dict *ids;
-	DictType dt_ids;
+	dict_t *ids;
+	dict_type_t dt_ids;
 	LCUI_Mutex mutex;
 } self;
 
 static int Widget_FreeId(LCUI_Widget w)
 {
-	LinkedList *list;
-	LinkedListNode *node;
+	list_t *list;
+	list_node_t *node;
 
 	if (!w->id) {
 		return -1;
 	}
-	list = Dict_FetchValue(self.ids, w->id);
+	list = dict_fetch_value(self.ids, w->id);
 	if (!list) {
 		return -2;
 	}
-	for (LinkedList_Each(node, list)) {
+	for (list_each(node, list)) {
 		if (node->data == w) {
 			free(w->id);
 			w->id = NULL;
-			LinkedList_Unlink(list, node);
-			LinkedListNode_Delete(node);
+			list_unlink(list, node);
+			list_node_free(node);
 			return 0;
 		}
 	}
@@ -76,7 +76,7 @@ int Widget_DestroyId(LCUI_Widget w)
 
 int Widget_SetId(LCUI_Widget w, const char *idstr)
 {
-	LinkedList *list;
+	list_t *list;
 
 	Widget_DestroyId(w);
 	if (!idstr) {
@@ -87,19 +87,19 @@ int Widget_SetId(LCUI_Widget w, const char *idstr)
 	if (!w->id) {
 		goto error_exit;
 	}
-	list = Dict_FetchValue(self.ids, w->id);
+	list = dict_fetch_value(self.ids, w->id);
 	if (!list) {
-		list = malloc(sizeof(LinkedList));
+		list = malloc(sizeof(list_t));
 		if (!list) {
 			goto error_exit;
 		}
-		LinkedList_Init(list);
-		if (Dict_Add(self.ids, w->id, list) != 0) {
+		list_create(list);
+		if (dict_add(self.ids, w->id, list) != 0) {
 			free(list);
 			goto error_exit;
 		}
 	}
-	if (!LinkedList_Append(list, w)) {
+	if (!list_append(list, w)) {
 		goto error_exit;
 	}
 	LCUIMutex_Unlock(&self.mutex);
@@ -116,16 +116,16 @@ error_exit:
 
 LCUI_Widget LCUIWidget_GetById(const char *id)
 {
-	LinkedList *list;
+	list_t *list;
 	LCUI_Widget w = NULL;
 
 	if (!id) {
 		return NULL;
 	}
 	LCUIMutex_Lock(&self.mutex);
-	list = Dict_FetchValue(self.ids, id);
+	list = dict_fetch_value(self.ids, id);
 	if (list) {
-		w = LinkedList_Get(list, 0);
+		w = list_get(list, 0);
 	}
 	LCUIMutex_Unlock(&self.mutex);
 	return w;
@@ -133,22 +133,22 @@ LCUI_Widget LCUIWidget_GetById(const char *id)
 
 static void OnClearWidgetList(void *privdata, void *data)
 {
-	LinkedList *list = data;
-	LinkedList_Clear(list, NULL);
+	list_t *list = data;
+	list_destroy(list, NULL);
 	free(list);
 }
 
 void LCUIWidget_InitIdLibrary(void)
 {
 	LCUIMutex_Init(&self.mutex);
-	Dict_InitStringCopyKeyType(&self.dt_ids);
-	self.dt_ids.valDestructor = OnClearWidgetList;
-	self.ids = Dict_Create(&self.dt_ids, NULL);
+	dict_init_string_copy_key_type(&self.dt_ids);
+	self.dt_ids.val_destructor = OnClearWidgetList;
+	self.ids = dict_create(&self.dt_ids, NULL);
 }
 
 void LCUIWidget_FreeIdLibrary(void)
 {
-	Dict_Release(self.ids);
+	dict_destroy(self.ids);
 	LCUIMutex_Destroy(&self.mutex);
 	self.ids = NULL;
 }
