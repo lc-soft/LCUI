@@ -31,6 +31,7 @@
 #include <LCUI_Build.h>
 #ifdef LCUI_BUILD_IN_WIN32
 #include <LCUI/LCUI.h>
+#include <windows.h>
 #include <LCUI/platform.h>
 #include LCUI_EVENTS_H
 #include LCUI_KEYBOARD_H

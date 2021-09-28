@@ -31,7 +31,7 @@
 #ifndef LCUI_CSS_LIBRARY_H
 #define LCUI_CSS_LIBRARY_H
 
-#include <LCUI/util/linkedlist.h>
+#include <yutil.h>
 
 LCUI_BEGIN_HEADER
 
@@ -161,13 +161,13 @@ typedef struct LCUI_StyleSheetRec_ {
 
 typedef const LCUI_StyleSheetRec *LCUI_CachedStyleSheet;
 
-typedef LinkedList LCUI_StyleListRec;
-typedef LinkedList* LCUI_StyleList;
+typedef list_t LCUI_StyleListRec;
+typedef list_t* LCUI_StyleList;
 
 typedef struct LCUI_StyleListNodeRec_ {
 	int key;
 	LCUI_StyleRec style;
-	LinkedListNode node;
+	list_node_t node;
 } LCUI_StyleListNodeRec, *LCUI_StyleListNode;
 
 /** 选择器结点结构 */
@@ -246,7 +246,7 @@ LCUI_API void Selector_Update(LCUI_Selector s);
 
 LCUI_API void Selector_Delete(LCUI_Selector s);
 
-LCUI_API int SelectorNode_GetNames(LCUI_SelectorNode sn, LinkedList *names);
+LCUI_API int SelectorNode_GetNames(LCUI_SelectorNode sn, list_t *names);
 
 LCUI_API int SelectorNode_Update(LCUI_SelectorNode node);
 
@@ -270,7 +270,7 @@ LCUI_API int LCUI_PutStyleSheet(LCUI_Selector selector, LCUI_StyleSheet in_ss,
  * @param[out] list 找到的样式表列表
  */
 LCUI_API int LCUI_FindStyleSheetFromGroup(int group, const char *name,
-					  LCUI_Selector s, LinkedList *list);
+					  LCUI_Selector s, list_t *list);
 
 LCUI_API LCUI_CachedStyleSheet LCUI_GetCachedStyleSheet(LCUI_Selector s);
 

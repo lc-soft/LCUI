@@ -73,7 +73,7 @@ typedef struct LCUI_SurfaceRec_ {
 	LCUI_Rect actual_rect;
 	LCUI_Mutex mutex;
 	LCUI_Graph canvas;
-	LinkedList rects;
+	list_t rects;
 	LCUI_SurfaceTasks tasks;
 } LCUI_SurfaceRec;
 
@@ -122,8 +122,8 @@ static void FBSurface_RunTask(LCUI_Surface surface, int type)
 	switch (type) {
 	case TASK_RESIZE:
 		LCUIMutex_Lock(&surface->mutex);
-		task->width = max(task->width, MIN_WIDTH);
-		task->height = max(task->height, MIN_HEIGHT);
+		task->width = y_max(task->width, MIN_WIDTH);
+		task->height = y_max(task->height, MIN_HEIGHT);
 		FBSurface_OnResize(surface, task->width, task->height);
 		LCUIMutex_Unlock(&surface->mutex);
 		break;
@@ -324,12 +324,12 @@ static void FBDisplay_SyncRect(LCUI_Surface surface, LCUI_Rect *rect)
 
 static void FBSurface_Present(LCUI_Surface surface)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 	LCUIMutex_Lock(&surface->mutex);
-	for (LinkedList_Each(node, &surface->rects)) {
+	for (list_each(node, &surface->rects)) {
 		FBDisplay_SyncRect(surface, node->data);
 	}
-	LinkedList_Clear(&surface->rects, free);
+	list_destroy(&surface->rects, free);
 	LCUIMutex_Unlock(&surface->mutex);
 }
 
@@ -467,7 +467,7 @@ static void FBDisplay_InitSurface(void)
 
 	Graph_Init(&surface->canvas);
 	LCUIMutex_Init(&surface->mutex);
-	LinkedList_Init(&surface->rects);
+	list_create(&surface->rects);
 	display.surface_count = 0;
 	surface->canvas.color_type = LCUI_COLOR_TYPE_ARGB;
 	FBSurface_Resize(surface, display.width, display.height);
@@ -479,10 +479,10 @@ static int FBDisplay_Init(void)
 	if (!display.fb.dev_path) {
 		display.fb.dev_path = "/dev/fb0";
 	}
-	Logger_Debug("[display] open framebuffer device: %s\n", display.fb.dev_path);
+	logger_debug("[display] open framebuffer device: %s\n", display.fb.dev_path);
 	display.fb.dev_fd = open(display.fb.dev_path, O_RDWR);
 	if (display.fb.dev_fd == -1) {
-		Logger_Error("[display] open framebuffer device failed\n");
+		logger_error("[display] open framebuffer device failed\n");
 		return -1;
 	}
 	ioctl(display.fb.dev_fd, FBIOGET_VSCREENINFO, &display.fb.var_info);
@@ -493,7 +493,7 @@ static int FBDisplay_Init(void)
 	display.fb.mem = mmap(NULL, display.fb.mem_len, PROT_READ | PROT_WRITE,
 			      MAP_SHARED, display.fb.dev_fd, 0);
 	if ((void *)-1 == display.fb.mem) {
-		Logger_Error("[display] framebuffer mmap failed\n");
+		logger_error("[display] framebuffer mmap failed\n");
 		return -1;
 	}
 	FBDisplay_PrintInfo();

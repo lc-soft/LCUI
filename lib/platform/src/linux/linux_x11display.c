@@ -81,13 +81,13 @@ typedef struct LCUI_SurfaceRec_ {
 	LCUI_Graph fb; /**< 帧缓存，它里面的数据会映射到窗口中 */
 	LCUI_Mutex mutex; /**< 互斥锁 */
 	LCUI_SurfaceTasks tasks;
-	LinkedList rects;    /**< 列表，记录当前需要重绘的区域 */
-	LinkedListNode node; /**< 在表面列表中的结点 */
+	list_t rects;    /**< 列表，记录当前需要重绘的区域 */
+	list_node_t node; /**< 在表面列表中的结点 */
 } LCUI_SurfaceRec;
 
 static struct X11_Display {
 	LCUI_BOOL is_inited; /**< 标记，标识当前模块是否已经初始化 */
-	LinkedList surfaces;       /**< 表面列表 */
+	list_t surfaces;       /**< 表面列表 */
 	LCUI_X11AppDriver app;     /**< X11 应用驱动 */
 	LCUI_EventTrigger trigger; /**< 事件触发器 */
 } x11 = { 0 };
@@ -110,8 +110,8 @@ static void X11Surface_ReleaseTask(LCUI_Surface surface, int type)
 
 static LCUI_Surface GetSurfaceByWindow(Window win)
 {
-	LinkedListNode *node;
-	LinkedList_ForEach(node, &x11.surfaces)
+	list_node_t *node;
+	for(list_each(node, &x11.surfaces))
 	{
 		if (((LCUI_Surface)node->data)->window == win) {
 			return node->data;
@@ -146,7 +146,7 @@ static void X11Surface_OnResize(LCUI_Surface s, int width, int height)
 		s->fb.color_type = LCUI_COLOR_TYPE_ARGB;
 		break;
 	default:
-		Logger_Error("[x11display] unsupport depth: %d.\n", depth);
+		logger_error("[x11display] unsupport depth: %d.\n", depth);
 		break;
 	}
 	Graph_Create(&s->fb, width, height);
@@ -155,14 +155,14 @@ static void X11Surface_OnResize(LCUI_Surface s, int width, int height)
 				 (char *)(s->fb.bytes), width, height, 32, 0);
 	if (!s->ximage) {
 		Graph_Free(&s->fb);
-		Logger_Error("[x11display] create XImage faild.\n");
+		logger_error("[x11display] create XImage faild.\n");
 		return;
 	}
 	gcv.graphics_exposures = False;
 	s->gc =
 	    XCreateGC(x11.app->display, s->window, GCGraphicsExposures, &gcv);
 	if (!s->gc) {
-		Logger_Error("[x11display] create graphics context faild.\n");
+		logger_error("[x11display] create graphics context faild.\n");
 		return;
 	}
 }
@@ -204,7 +204,7 @@ static void X11Surface_RunTask(LCUI_Surface surface, int type)
 		break;
 	}
 	case TASK_DELETE:
-		LinkedList_Unlink(&x11.surfaces, &surface->node);
+		list_unlink(&x11.surfaces, &surface->node);
 	default:
 		break;
 	}
@@ -240,7 +240,7 @@ static void OnDestroySurface(void *data)
 	LCUI_Surface s = data;
 
 	X11Surface_ClearTasks(s);
-	LinkedList_Clear(&s->rects, free);
+	list_destroy(&s->rects, free);
 	if (s->ximage) {
 		XDestroyImage(s->ximage);
 	}
@@ -275,9 +275,9 @@ static LCUI_Surface X11Surface_New(void)
 	surface->height = MIN_HEIGHT;
 	Graph_Init(&surface->fb);
 	LCUIMutex_Init(&surface->mutex);
-	LinkedList_Init(&surface->rects);
+	list_create(&surface->rects);
 	surface->fb.color_type = LCUI_COLOR_TYPE_ARGB;
-	LinkedList_AppendNode(&x11.surfaces, &surface->node);
+	list_append_node(&x11.surfaces, &surface->node);
 	LCUI_PostSimpleTask(X11Surface_OnCreate, surface, NULL);
 	return surface;
 }
@@ -311,12 +311,12 @@ static void X11Surface_SetCaptionW(LCUI_Surface surface, const wchar_t *wstr)
 	task = &surface->tasks[TASK_SET_CAPTION];
 	X11Surface_ReleaseTask(surface, TASK_SET_CAPTION);
 	if (wstr) {
-		len = LCUI_EncodeString(NULL, wstr, 0, ENCODING_UTF8) + 1;
+		len = encode_string(NULL, wstr, 0, ENCODING_UTF8) + 1;
 		caption = malloc(sizeof(char) * len);
 		if (!caption) {
 			return;
 		}
-		len = LCUI_EncodeString(caption, wstr, len, ENCODING_UTF8);
+		len = encode_string(caption, wstr, len, ENCODING_UTF8);
 		task->caption = caption;
 		task->caption[len] = 0;
 		task->caption_len = len;
@@ -357,7 +357,7 @@ static void X11Surface_EndPaint(LCUI_Surface surface, LCUI_PaintContext paint)
 	LCUI_Rect *r;
 	r = NEW(LCUI_Rect, 1);
 	*r = paint->rect;
-	LinkedList_Append(&surface->rects, r);
+	list_append(&surface->rects, r);
 	free(paint);
 	LCUIMutex_Unlock(&surface->mutex);
 }
@@ -365,15 +365,15 @@ static void X11Surface_EndPaint(LCUI_Surface surface, LCUI_PaintContext paint)
 /** 将帧缓存中的数据呈现至Surface的窗口内 */
 static void X11Surface_Present(LCUI_Surface surface)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 	LCUIMutex_Lock(&surface->mutex);
-	for (LinkedList_Each(node, &surface->rects)) {
+	for (list_each(node, &surface->rects)) {
 		LCUI_Rect *rect = node->data;
 		XPutImage(x11.app->display, surface->window, surface->gc,
 			  surface->ximage, rect->x, rect->y, rect->x, rect->y,
 			  rect->width, rect->height);
 	}
-	LinkedList_Clear(&surface->rects, free);
+	list_destroy(&surface->rects, free);
 	LCUIMutex_Unlock(&surface->mutex);
 }
 
@@ -490,7 +490,7 @@ LCUI_DisplayDriver LCUI_CreateLinuxX11DisplayDriver(void)
 	driver->bindEvent = X11Display_BindEvent;
 	driver->getSurfaceWidth = X11Surface_GetWidth;
 	driver->getSurfaceHeight = X11Surface_GetHeight;
-	LinkedList_Init(&x11.surfaces);
+	list_create(&x11.surfaces);
 	LCUI_BindSysEvent(Expose, OnExpose, NULL, NULL);
 	LCUI_BindSysEvent(ConfigureNotify, OnConfigureNotify, NULL, NULL);
 	x11.trigger = EventTrigger();
@@ -501,7 +501,7 @@ LCUI_DisplayDriver LCUI_CreateLinuxX11DisplayDriver(void)
 void LCUI_DestroyLinuxX11DisplayDriver(LCUI_DisplayDriver driver)
 {
 	EventTrigger_Destroy(x11.trigger);
-	LinkedList_ClearData(&x11.surfaces, OnDestroySurface);
+	list_destroy_without_node(&x11.surfaces, OnDestroySurface);
 	LCUI_UnbindSysEvent(ConfigureNotify, OnConfigureNotify);
 	LCUI_UnbindSysEvent(Expose, OnExpose);
 	x11.trigger = NULL;

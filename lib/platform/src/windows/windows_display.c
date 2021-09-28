@@ -81,13 +81,13 @@ struct LCUI_SurfaceRec_ {
 	LCUI_BOOL is_ready;			/**< 是否已经准备好 */
 	LCUI_Graph fb;				/**< 帧缓存，保存当前窗口内呈现的图像内容 */
 	LCUI_SurfaceTask tasks[TASK_TOTAL_NUM]; /**< 任务缓存 */
-	LinkedListNode node;                    /**< 在链表中的结点 */
+	list_node_t node;                    /**< 在链表中的结点 */
 };
 
 /** windows 下图形显示功能所需的数据 */
 static struct WIN_Display {
 	LCUI_BOOL active;		/**< 是否已经初始化 */
-	LinkedList surfaces;		/**< surface 记录 */
+	list_t surfaces;		/**< surface 记录 */
 	LCUI_EventTrigger trigger;	/**< 事件触发器 */
 } win;
 
@@ -96,8 +96,8 @@ static struct WIN_Display {
 /** 根据 hwnd 获取 Surface */
 static LCUI_Surface GetSurfaceByHWND(HWND hwnd)
 {
-	LinkedListNode *node;
-	for (LinkedList_Each(node, &win.surfaces)) {
+	list_node_t *node;
+	for (list_each(node, &win.surfaces)) {
 		if (((LCUI_Surface)node->data)->hwnd == hwnd) {
 			return node->data;
 		}
@@ -146,7 +146,7 @@ static void WinSurface_ExecDestroy(LCUI_Surface surface)
 
 static void WinSurface_Destroy(LCUI_Surface surface)
 {
-	LinkedList_Unlink(&win.surfaces, &surface->node);
+	list_unlink(&win.surfaces, &surface->node);
 	WinSurface_ExecDestroy(surface);
 }
 
@@ -204,7 +204,7 @@ static LCUI_Surface WinSurface_New(void)
 	for (i = 0; i < TASK_TOTAL_NUM; ++i) {
 		surface->tasks[i].is_valid = FALSE;
 	}
-	LinkedList_AppendNode(&win.surfaces, &surface->node);
+	list_append_node(&win.surfaces, &surface->node);
 	LCUI_PostSimpleTask(OnCreateSurface, surface, NULL);
 	return surface;
 }
@@ -565,7 +565,7 @@ LCUI_DisplayDriver LCUI_CreateWinDisplay(void)
 	LCUI_BindSysEvent(WM_SIZE, OnWMSize, NULL, NULL);
 	LCUI_BindSysEvent(WM_PAINT, OnWMPaint, NULL, NULL);
 	LCUI_BindSysEvent(WM_GETMINMAXINFO, OnWMGetMinMaxInfo, NULL, NULL);
-	LinkedList_Init(&win.surfaces);
+	list_create(&win.surfaces);
 	win.trigger = EventTrigger();
 	win.active = TRUE;
 	return driver;
@@ -577,7 +577,7 @@ void LCUI_DestroyWinDisplay(LCUI_DisplayDriver driver)
 	LCUI_UnbindSysEvent(WM_SIZE, OnWMSize);
 	LCUI_UnbindSysEvent(WM_PAINT, OnWMPaint);
 	LCUI_UnbindSysEvent(WM_GETMINMAXINFO, OnWMGetMinMaxInfo);
-	LinkedList_ClearData(&win.surfaces, WinSurface_OnDestroy);
+	list_destroy_without_node(&win.surfaces, WinSurface_OnDestroy);
 	EventTrigger_Destroy(win.trigger);
 	free(driver);
 }

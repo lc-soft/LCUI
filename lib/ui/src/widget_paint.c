@@ -51,7 +51,7 @@
 
 typedef struct LCUI_RectGroupRec_ {
 	LCUI_Widget widget;
-	LinkedList rects;
+	list_t rects;
 } LCUI_RectGroupRec, *LCUI_RectGroup;
 
 typedef struct LCUI_WidgetRendererRec_ {
@@ -108,8 +108,8 @@ typedef struct LCUI_WidgetRendererRec_ {
 static struct LCUI_WidgetRenderModule {
 	LCUI_BOOL active;
 	LCUI_WidgetPrototype default_proto;
-	RBTree groups;
-	LinkedList rects;
+	rbtree_t groups;
+	list_t rects;
 } self = { 0 };
 
 /** 判断部件是否有可绘制内容 */
@@ -238,16 +238,16 @@ LCUI_BOOL Widget_InvalidateArea(LCUI_Widget w, LCUI_RectF *in_rect,
 		if (rect.width > 0 && rect.height > 0) {               \
 			actual_rect = malloc(sizeof(LCUI_Rect));       \
 			RectFToInvalidArea(&rect, actual_rect);        \
-			LinkedList_Append(rects, actual_rect);         \
+			list_append(rects, actual_rect);         \
 		}                                                      \
 	} while (0)
 
-static void Widget_CollectInvalidArea(LCUI_Widget w, LinkedList *rects, float x,
+static void Widget_CollectInvalidArea(LCUI_Widget w, list_t *rects, float x,
 				      float y, LCUI_RectF visible_area)
 {
 	LCUI_RectF rect;
 	LCUI_Rect *actual_rect;
-	LinkedListNode *node;
+	list_node_t *node;
 
 	if (w->parent && w->parent->invalid_area_type >=
 			     LCUI_INVALID_AREA_TYPE_PADDING_BOX) {
@@ -283,7 +283,7 @@ static void Widget_CollectInvalidArea(LCUI_Widget w, LinkedList *rects, float x,
 					 &visible_area);
 		visible_area.x += x;
 		visible_area.y += y;
-		for (LinkedList_Each(node, &w->children_show)) {
+		for (list_each(node, &w->children_show)) {
 			Widget_CollectInvalidArea(
 			    node->data, rects, x + w->box.padding.x,
 			    y + w->box.padding.y, visible_area);
@@ -293,17 +293,17 @@ static void Widget_CollectInvalidArea(LCUI_Widget w, LinkedList *rects, float x,
 	w->has_child_invalid_area = FALSE;
 }
 
-size_t Widget_GetInvalidArea(LCUI_Widget w, LinkedList *rects)
+size_t Widget_GetInvalidArea(LCUI_Widget w, list_t *rects)
 {
 	LCUI_Rect *rect;
-	LinkedListNode *node;
+	list_node_t *node;
 
 	float scale = LCUIMetrics_GetScale();
-	int x = iround(w->box.padding.x * scale);
-	int y = iround(w->box.padding.y * scale);
+	int x = y_iround(w->box.padding.x * scale);
+	int y = y_iround(w->box.padding.y * scale);
 
 	Widget_CollectInvalidArea(w, rects, 0, 0, w->box.padding);
-	for (LinkedList_Each(node, rects)) {
+	for (list_each(node, rects)) {
 		rect = node->data;
 		rect->x -= x;
 		rect->y -= y;
@@ -326,10 +326,10 @@ static void OnDestroyGroup(void *data)
 
 void LCUIWidget_InitRenderer(void)
 {
-	RBTree_Init(&self.groups);
-	RBTree_OnCompare(&self.groups, OnCompareGroup);
-	RBTree_OnDestroy(&self.groups, OnDestroyGroup);
-	LinkedList_Init(&self.rects);
+	rbtree_init(&self.groups);
+	rbtree_set_compare_func(&self.groups, OnCompareGroup);
+	rbtree_set_destroy_func(&self.groups, OnDestroyGroup);
+	list_create(&self.rects);
 	self.default_proto = LCUIWidget_GetPrototype(NULL);
 	self.active = TRUE;
 }
@@ -338,7 +338,7 @@ void LCUIWidget_FreeRenderer(void)
 {
 	self.active = FALSE;
 	RectList_Clear(&self.rects);
-	RBTree_Destroy(&self.groups);
+	rbtree_destroy(&self.groups);
 }
 
 /** 当前部件的绘制函数 */
@@ -552,13 +552,13 @@ static size_t WidgetRenderer_RenderChildren(LCUI_WidgetRenderer that)
 	LCUI_Widget child;
 	LCUI_Rect paint_rect;
 	LCUI_RectF child_rect;
-	LinkedListNode *node;
+	list_node_t *node;
 	LCUI_PaintContextRec child_paint;
 	LCUI_WidgetRenderer renderer;
 	LCUI_WidgetActualStyleRec style;
 
 	/* Render the child widgets from bottom to top in stack order */
-	for (LinkedList_EachReverse(node, &that->target->children_show)) {
+	for (list_each_reverse(node, &that->target->children_show)) {
 		child = node->data;
 		if (!child->computed_style.visible ||
 		    child->state != LCUI_WSTATE_NORMAL) {

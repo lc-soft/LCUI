@@ -31,8 +31,8 @@
 #ifndef LCUI_WIDGET_BUILD_H
 #define LCUI_WIDGET_BUILD_H
 
-#include <LCUI/graph.h>
 #include <LCUI/thread.h>
+#include <LCUI/graph.h>
 #include <LCUI/gui/widget_base.h>
 #include <LCUI/gui/widget_attribute.h>
 #include <LCUI/gui/widget_id.h>

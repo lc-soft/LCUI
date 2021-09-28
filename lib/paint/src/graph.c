@@ -739,7 +739,7 @@ int Graph_Create(LCUI_Graph *graph, unsigned width, unsigned height)
 {
 	size_t size;
 	if (width > 10000 || height > 10000) {
-		Logger_Error("graph size is too large!");
+		logger_error("graph size is too large!");
 		abort();
 	}
 	if (width < 1 || height < 1) {
@@ -1043,7 +1043,7 @@ int Graph_ZoomBilinear(const LCUI_Graph *graph, LCUI_Graph *buff,
 	if (graph->color_type != LCUI_COLOR_TYPE_RGB &&
 	    graph->color_type != LCUI_COLOR_TYPE_ARGB) {
 		/* fall back to nearest scaling */
-		Logger_Debug("[graph] unable to perform bilinear scaling, "
+		logger_debug("[graph] unable to perform bilinear scaling, "
 			     "fallback...\n");
 		return Graph_Zoom(graph, buff, keep_scale, width, height);
 	}

@@ -46,9 +46,9 @@
 #define DBLCLICK_INTERVAL 500
 
 typedef struct TouchCapturerRec_ {
-	LinkedList points;
+	list_t points;
 	LCUI_Widget widget;
-	LinkedListNode node;
+	list_node_t node;
 } TouchCapturerRec, *TouchCapturer;
 
 typedef struct WidgetEventHandlerRec_ {
@@ -71,7 +71,7 @@ enum WidgetStatusType {
 /** 部件事件记录结点 */
 typedef struct WidgetEventRecordRec_ {
 	LCUI_Widget widget; /**< 所属部件 */
-	LinkedList records; /**< 事件记录列表 */
+	list_t records; /**< 事件记录列表 */
 } WidgetEventRecordRec, *WidgetEventRecord;
 
 /** 事件标识号与名称的映射记录 */
@@ -91,14 +91,14 @@ typedef struct ClickRecord_ {
 /** 当前功能模块的相关数据 */
 static struct LCUIWidgetEvnetModule {
 	LCUI_Widget mouse_capturer;     /**< 占用鼠标的部件 */
-	LinkedList touch_capturers;     /**< 触点占用记录 */
+	list_t touch_capturers;     /**< 触点占用记录 */
 	LCUI_Widget targets[WST_TOTAL]; /**< 相关的部件 */
-	LinkedList events;              /**< 已绑定的事件 */
-	LinkedList event_mappings;	/**< 事件标识号和名称映射记录列表  */
-	RBTree event_records;		/**< 当前正执行的事件的记录 */
-	RBTree event_names;		/**< 事件名称表，以标识号作为索引 */
-	DictType event_ids_type;
-	Dict *event_ids;		/**< 事件标识号表，以事件名称作为索引 */
+	list_t events;              /**< 已绑定的事件 */
+	list_t event_mappings;	/**< 事件标识号和名称映射记录列表  */
+	rbtree_t event_records;		/**< 当前正执行的事件的记录 */
+	rbtree_t event_names;		/**< 事件名称表，以标识号作为索引 */
+	dict_type_t event_ids_type;
+	dict_t *event_ids;		/**< 事件标识号表，以事件名称作为索引 */
 	int base_event_id;		/**< 事件标识号计数器 */
 	ClickRecord click;		/**< 上次鼠标点击记录 */
 	LCUI_Mutex mutex;		/**< 互斥锁 */
@@ -147,7 +147,7 @@ static void DirectDestroyWidgetEventPack(void *data)
 static void DestoryWidgetEventRecord(void *data)
 {
 	WidgetEventRecord record = data;
-	LinkedList_Clear(&record->records, DirectDestroyWidgetEventPack);
+	list_destroy(&record->records, DirectDestroyWidgetEventPack);
 	free(record);
 }
 
@@ -200,14 +200,14 @@ static void Widget_AddEventRecord(LCUI_Widget widget, LCUI_WidgetEventPack pack)
 	WidgetEventRecord record;
 
 	LCUIMutex_Lock(&self.mutex);
-	record = RBTree_CustomGetData(&self.event_records, widget);
+	record = rbtree_get_data_by_keydata(&self.event_records, widget);
 	if (!record) {
 		record = NEW(WidgetEventRecordRec, 1);
-		LinkedList_Init(&record->records);
+		list_create(&record->records);
 		record->widget = widget;
-		RBTree_CustomInsert(&self.event_records, widget, record);
+		rbtree_insert_by_keydata(&self.event_records, widget, record);
 	}
-	LinkedList_Append(&record->records, pack);
+	list_append(&record->records, pack);
 	LCUIMutex_Unlock(&self.mutex);
 }
 
@@ -217,18 +217,18 @@ static int Widget_DeleteEventRecord(LCUI_Widget widget,
 {
 	int ret = 0;
 	WidgetEventRecord record;
-	LinkedListNode *node, *prev;
+	list_node_t *node, *prev;
 
 	LCUIMutex_Lock(&self.mutex);
-	record = RBTree_CustomGetData(&self.event_records, widget);
+	record = rbtree_get_data_by_keydata(&self.event_records, widget);
 	if (!record) {
 		LCUIMutex_Unlock(&self.mutex);
 		return -1;
 	}
-	for (LinkedList_Each(node, &record->records)) {
+	for (list_each(node, &record->records)) {
 		prev = node->prev;
 		if (node->data == pack) {
-			LinkedList_DeleteNode(&record->records, node);
+			list_delete_node(&record->records, node);
 			node = prev;
 			ret = 1;
 		}
@@ -307,33 +307,33 @@ static void DestroyWidgetEventPack(void *arg)
 static void DestroyTouchCapturer(void *arg)
 {
 	TouchCapturer tc = arg;
-	LinkedList_Clear(&tc->points, free);
+	list_destroy(&tc->points, free);
 	tc->widget = NULL;
 	free(tc);
 }
 
 #define TouchCapturers_Clear(LIST) \
                                    \
-	LinkedList_ClearData(LIST, DestroyTouchCapturer)
+	list_destroy_without_node(LIST, DestroyTouchCapturer)
 
-static int TouchCapturers_Add(LinkedList *list, LCUI_Widget w, int point_id)
+static int TouchCapturers_Add(list_t *list, LCUI_Widget w, int point_id)
 {
 	int *data;
 	TouchCapturer tc = NULL;
-	LinkedListNode *node, *ptnode;
+	list_node_t *node, *ptnode;
 	if (point_id < 0) {
 		tc = NEW(TouchCapturerRec, 1);
 		tc->widget = w;
-		LinkedList_Init(&tc->points);
+		list_create(&tc->points);
 		TouchCapturers_Clear(list);
-		LinkedList_Append(list, tc);
+		list_append(list, tc);
 		return 0;
 	}
 	/* 获取该部件的触点捕捉记录 */
-	for (LinkedList_Each(node, list)) {
+	for (list_each(node, list)) {
 		tc = node->data;
 		/* 清除与该触点绑定的其它捕捉记录 */
-		for (LinkedList_Each(ptnode, &tc->points)) {
+		for (list_each(ptnode, &tc->points)) {
 			if (point_id == *(int *)ptnode->data) {
 				if (tc->widget == w) {
 					return 0;
@@ -350,21 +350,21 @@ static int TouchCapturers_Add(LinkedList *list, LCUI_Widget w, int point_id)
 		tc = NEW(TouchCapturerRec, 1);
 		tc->widget = w;
 		tc->node.data = tc;
-		LinkedList_Init(&tc->points);
-		LinkedList_AppendNode(list, &tc->node);
+		list_create(&tc->points);
+		list_append_node(list, &tc->node);
 	}
 	/* 追加触点捕捉记录 */
 	data = NEW(int, 1);
 	*data = point_id;
-	LinkedList_Append(&tc->points, data);
+	list_append(&tc->points, data);
 	return 0;
 }
 
-static int TouchCapturers_Delete(LinkedList *list, LCUI_Widget w, int point_id)
+static int TouchCapturers_Delete(list_t *list, LCUI_Widget w, int point_id)
 {
 	TouchCapturer tc = NULL;
-	LinkedListNode *node, *ptnode;
-	for (LinkedList_Each(node, list)) {
+	list_node_t *node, *ptnode;
+	for (list_each(node, list)) {
 		tc = node->data;
 		if (tc->widget == w) {
 			break;
@@ -374,17 +374,17 @@ static int TouchCapturers_Delete(LinkedList *list, LCUI_Widget w, int point_id)
 		return -1;
 	}
 	if (point_id < 0) {
-		LinkedList_Clear(&tc->points, free);
+		list_destroy(&tc->points, free);
 	} else {
-		for (LinkedList_Each(ptnode, &tc->points)) {
+		for (list_each(ptnode, &tc->points)) {
 			if (*(int *)ptnode->data == point_id) {
 				free(node->data);
-				LinkedList_DeleteNode(&tc->points, ptnode);
+				list_delete_node(&tc->points, ptnode);
 			}
 		}
 	}
 	if (tc->points.length == 0) {
-		LinkedList_Unlink(&self.touch_capturers, &tc->node);
+		list_unlink(&self.touch_capturers, &tc->node);
 		free(tc);
 	}
 	return 0;
@@ -395,16 +395,16 @@ int LCUIWidget_SetEventName(int event_id, const char *event_name)
 	int ret;
 	EventMapping mapping;
 	LCUIMutex_Lock(&self.mutex);
-	if (Dict_FetchValue(self.event_ids, event_name)) {
+	if (dict_fetch_value(self.event_ids, event_name)) {
 		LCUIMutex_Unlock(&self.mutex);
 		return -1;
 	}
 	mapping = malloc(sizeof(EventMappingRec));
 	mapping->name = strdup2(event_name);
 	mapping->id = event_id;
-	LinkedList_Append(&self.event_mappings, mapping);
-	RBTree_Insert(&self.event_names, event_id, mapping);
-	ret = Dict_Add(self.event_ids, mapping->name, mapping);
+	list_append(&self.event_mappings, mapping);
+	rbtree_insert_by_key(&self.event_names, event_id, mapping);
+	ret = dict_add(self.event_ids, mapping->name, mapping);
 	LCUIMutex_Unlock(&self.mutex);
 	return ret;
 }
@@ -418,7 +418,7 @@ const char *LCUIWidget_GetEventName(int event_id)
 {
 	EventMapping mapping;
 	LCUIMutex_Lock(&self.mutex);
-	mapping = RBTree_GetData(&self.event_names, event_id);
+	mapping = rbtree_get_data_by_key(&self.event_names, event_id);
 	LCUIMutex_Unlock(&self.mutex);
 	return mapping ? mapping->name : NULL;
 }
@@ -427,7 +427,7 @@ int LCUIWidget_GetEventId(const char *event_name)
 {
 	EventMapping mapping;
 	LCUIMutex_Lock(&self.mutex);
-	mapping = Dict_FetchValue(self.event_ids, event_name);
+	mapping = dict_fetch_value(self.event_ids, event_name);
 	LCUIMutex_Unlock(&self.mutex);
 	return mapping ? mapping->id : -1;
 }
@@ -493,7 +493,7 @@ int Widget_UnbindEvent(LCUI_Widget widget, const char *event_name,
 static LCUI_Widget Widget_GetNextAt(LCUI_Widget widget, int x, int y)
 {
 	LCUI_Widget w;
-	LinkedListNode *node;
+	list_node_t *node;
 
 	node = &widget->node;
 	for (node = node->next; node; node = node->next) {
@@ -574,7 +574,7 @@ static int Widget_TriggerEventEx(LCUI_Widget widget, LCUI_WidgetEventPack pack)
 		x = pointer_x - x;
 		y = pointer_y - y;
 		/* 从当前部件后面找到当前坐标点命中的兄弟部件 */
-		w = Widget_GetNextAt(widget, iround(x), iround(y));
+		w = Widget_GetNextAt(widget, y_iround(x), y_iround(y));
 		if (!w) {
 			break;
 		}
@@ -643,7 +643,7 @@ int Widget_TriggerEvent(LCUI_Widget widget, LCUI_WidgetEvent e, void *data)
 
 int Widget_StopEventPropagation(LCUI_Widget widget)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 	WidgetEventRecord record;
 	LCUI_WidgetEventPack pack;
 
@@ -651,12 +651,12 @@ int Widget_StopEventPropagation(LCUI_Widget widget)
 		return 0;
 	}
 	LCUIMutex_Lock(&self.mutex);
-	record = RBTree_CustomGetData(&self.event_records, widget);
+	record = rbtree_get_data_by_keydata(&self.event_records, widget);
 	if (!record) {
 		LCUIMutex_Unlock(&self.mutex);
 		return -1;
 	}
-	for (LinkedList_Each(node, &record->records)) {
+	for (list_each(node, &record->records)) {
 		pack = node->data;
 		pack->event.cancel_bubble = TRUE;
 	}
@@ -701,9 +701,9 @@ static LCUI_Widget Widget_GetEventTarget(LCUI_Widget widget, float x, float y,
 
 	LCUI_Widget child;
 	LCUI_Widget target = NULL;
-	LinkedListNode *node;
+	list_node_t *node;
 
-	for (LinkedList_Each(node, &widget->children_show)) {
+	for (list_each(node, &widget->children_show)) {
 		child = node->data;
 		if (!child->computed_style.visible ||
 		    child->state != LCUI_WSTATE_NORMAL ||
@@ -840,7 +840,7 @@ static void ClearFocusTarget(LCUI_Widget target)
 
 void LCUIWidget_ClearEventTarget(LCUI_Widget widget)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 	WidgetEventRecord record;
 	LCUI_WidgetEventPack pack;
 
@@ -848,9 +848,9 @@ void LCUIWidget_ClearEventTarget(LCUI_Widget widget)
 		return;
 	}
 	LCUIMutex_Lock(&self.mutex);
-	record = RBTree_CustomGetData(&self.event_records, widget);
+	record = rbtree_get_data_by_keydata(&self.event_records, widget);
 	if (record) {
-		for (LinkedList_Each(node, &record->records)) {
+		for (list_each(node, &record->records)) {
 			pack = node->data;
 			pack->widget = NULL;
 			pack->event.cancel_bubble = TRUE;
@@ -917,8 +917,8 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 	root = LCUIWidget_GetRoot();
 	LCUICursor_GetPos(&pos);
 	scale = LCUIMetrics_GetScale();
-	pos.x = iround(pos.x / scale);
-	pos.y = iround(pos.y / scale);
+	pos.x = y_iround(pos.x / scale);
+	pos.y = y_iround(pos.y / scale);
 	if (self.mouse_capturer) {
 		target = self.mouse_capturer;
 	} else {
@@ -946,14 +946,14 @@ static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 		if (ev.button.button == LCUI_KEY_LEFTBUTTON &&
 		    self.click.widget == target) {
 			int delta;
-			delta = (int)LCUI_GetTimeDelta(self.click.time);
+			delta = (int)get_time_delta(self.click.time);
 			self.click.interval = delta;
 		} else if (ev.button.button == LCUI_KEY_LEFTBUTTON &&
 			   self.click.widget != target) {
 			self.click.x = pos.x;
 			self.click.y = pos.y;
 		}
-		self.click.time = LCUI_GetTime();
+		self.click.time = get_time_ms();
 		self.click.widget = target;
 		Widget_OnMouseDownEvent(target);
 		LCUIWidget_SetFocus(target);
@@ -1081,19 +1081,19 @@ static void ConvertTouchPoint(LCUI_TouchPoint point)
 		break;
 	}
 	scale = LCUIMetrics_GetScale();
-	point->x = iround(point->x / scale);
-	point->y = iround(point->y / scale);
+	point->x = y_iround(point->x / scale);
+	point->y = y_iround(point->y / scale);
 }
 
 /** 分发触控事件给对应的部件 */
-static int DispatchTouchEvent(LinkedList *capturers, LCUI_TouchPoint points,
+static int DispatchTouchEvent(list_t *capturers, LCUI_TouchPoint points,
 			      int n_points)
 {
 	int i, count;
 	float scale;
 	LCUI_WidgetEventRec ev = { 0 };
 	LCUI_Widget target, root, w;
-	LinkedListNode *node, *ptnode;
+	list_node_t *node, *ptnode;
 
 	root = LCUIWidget_GetRoot();
 	scale = LCUIMetrics_GetScale();
@@ -1102,8 +1102,8 @@ static int DispatchTouchEvent(LinkedList *capturers, LCUI_TouchPoint points,
 	ev.touch.points = NEW(LCUI_TouchPointRec, n_points);
 	/* 先将各个触点按命中的部件进行分组 */
 	for (i = 0; i < n_points; ++i) {
-		target = Widget_At(root, iround(points[i].x / scale),
-				   iround(points[i].y / scale));
+		target = Widget_At(root, y_iround(points[i].x / scale),
+				   y_iround(points[i].y / scale));
 		if (!target) {
 			continue;
 		}
@@ -1120,10 +1120,10 @@ static int DispatchTouchEvent(LinkedList *capturers, LCUI_TouchPoint points,
 	count = 0;
 	ev.touch.n_points = 0;
 	/* 然后向命中的部件发送触控事件 */
-	for (LinkedList_Each(node, capturers)) {
+	for (list_each(node, capturers)) {
 		TouchCapturer tc = node->data;
 		for (i = 0; i < n_points; ++i) {
-			for (LinkedList_Each(ptnode, &tc->points)) {
+			for (list_each(ptnode, &tc->points)) {
 				LCUI_TouchPoint point;
 				if (points[i].id != *(int *)ptnode->data) {
 					continue;
@@ -1149,16 +1149,16 @@ static int DispatchTouchEvent(LinkedList *capturers, LCUI_TouchPoint points,
 static void OnTouch(LCUI_SysEvent sys_ev, void *arg)
 {
 	int i, n;
-	LinkedList capturers;
+	list_t capturers;
 	LCUI_TouchPoint points;
-	LinkedListNode *node, *ptnode;
+	list_node_t *node, *ptnode;
 
 	n = sys_ev->touch.n_points;
 	points = sys_ev->touch.points;
-	LinkedList_Init(&capturers);
+	list_create(&capturers);
 	LCUIMutex_Lock(&self.mutex);
 	/* 合并现有的触点捕捉记录 */
-	for (LinkedList_Each(node, &self.touch_capturers)) {
+	for (list_each(node, &self.touch_capturers)) {
 		TouchCapturer tc = node->data;
 		for (i = 0; i < n; ++i) {
 			/* 如果没有触点记录，则说明是捕获全部触点 */
@@ -1167,7 +1167,7 @@ static void OnTouch(LCUI_SysEvent sys_ev, void *arg)
 						   points[i].id);
 				continue;
 			}
-			for (LinkedList_Each(ptnode, &tc->points)) {
+			for (list_each(ptnode, &tc->points)) {
 				if (points[i].id != *(int *)ptnode->data) {
 					continue;
 				}
@@ -1253,7 +1253,7 @@ static void BindSysEvent(int e, LCUI_SysEventFunc func)
 {
 	int *id = malloc(sizeof(int));
 	*id = LCUI_BindEvent(e, func, NULL, NULL);
-	LinkedList_Append(&self.events, id);
+	list_append(&self.events, id);
 }
 
 void LCUIWidget_InitEvent(void)
@@ -1292,10 +1292,10 @@ void LCUIWidget_InitEvent(void)
 			 { LCUI_WEVENT_TITLE, "title" } };
 
 	LCUIMutex_Init(&self.mutex);
-	RBTree_Init(&self.event_names);
-	RBTree_Init(&self.event_records);
-	LinkedList_Init(&self.events);
-	LinkedList_Init(&self.event_mappings);
+	rbtree_init(&self.event_names);
+	rbtree_init(&self.event_records);
+	list_create(&self.events);
+	list_create(&self.event_mappings);
 	self.targets[WST_ACTIVE] = NULL;
 	self.targets[WST_HOVER] = NULL;
 	self.targets[WST_FOCUS] = NULL;
@@ -1306,8 +1306,8 @@ void LCUIWidget_InitEvent(void)
 	self.click.widget = NULL;
 	self.click.interval = DBLCLICK_INTERVAL;
 	self.base_event_id = LCUI_WEVENT_USER + 1000;
-	Dict_InitStringKeyType(&self.event_ids_type);
-	self.event_ids = Dict_Create(&self.event_ids_type, NULL);
+	dict_init_string_key_type(&self.event_ids_type);
+	self.event_ids = dict_create(&self.event_ids_type, NULL);
 	n = sizeof(mappings) / sizeof(mappings[0]);
 	for (i = 0; i < n; ++i) {
 		LCUIWidget_SetEventName(mappings[i].id, mappings[i].name);
@@ -1321,25 +1321,25 @@ void LCUIWidget_InitEvent(void)
 	BindSysEvent(LCUI_KEYUP, OnKeyboardEvent);
 	BindSysEvent(LCUI_TOUCH, OnTouch);
 	BindSysEvent(LCUI_TEXTINPUT, OnTextInput);
-	RBTree_OnCompare(&self.event_records, CompareWidgetEventRecord);
-	RBTree_OnDestroy(&self.event_records, DestoryWidgetEventRecord);
-	LinkedList_Init(&self.touch_capturers);
+	rbtree_set_compare_func(&self.event_records, CompareWidgetEventRecord);
+	rbtree_set_destroy_func(&self.event_records, DestoryWidgetEventRecord);
+	list_create(&self.touch_capturers);
 }
 
 void LCUIWidget_FreeEvent(void)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 	LCUIMutex_Lock(&self.mutex);
-	for (LinkedList_Each(node, &self.events)) {
+	for (list_each(node, &self.events)) {
 		int *id = node->data;
 		LCUI_UnbindEvent(*id);
 	}
-	RBTree_Destroy(&self.event_names);
-	RBTree_Destroy(&self.event_records);
-	Dict_Release(self.event_ids);
+	rbtree_destroy(&self.event_names);
+	rbtree_destroy(&self.event_records);
+	dict_destroy(self.event_ids);
 	TouchCapturers_Clear(&self.touch_capturers);
-	LinkedList_Clear(&self.events, free);
-	LinkedList_Clear(&self.event_mappings, DestroyEventMapping);
+	list_destroy(&self.events, free);
+	list_destroy(&self.event_mappings, DestroyEventMapping);
 	LCUIMutex_Unlock(&self.mutex);
 	LCUIMutex_Destroy(&self.mutex);
 	self.event_ids = NULL;

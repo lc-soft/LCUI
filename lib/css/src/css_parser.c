@@ -46,8 +46,8 @@
 
 static struct CSSParserModule {
 	int count;
-	DictType dicttype; /**< 解析器表的字典类型数据 */
-	Dict *parsers;     /**< 解析器表，以名称进行索引 */
+	dict_type_t dicttype; /**< 解析器表的字典类型数据 */
+	dict_t *parsers;     /**< 解析器表，以名称进行索引 */
 } self;
 
 void CSSStyleParser_SetCSSProperty(LCUI_CSSParserStyleContext ctx, int key,
@@ -901,12 +901,12 @@ int CSSParser_BeginParseComment(LCUI_CSSParserContext ctx)
 
 static void CSSParser_EndParseSheet(LCUI_CSSParserContext ctx)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 	/* 将记录的样式表添加至匹配到的选择器中 */
-	for (LinkedList_Each(node, &ctx->style.selectors)) {
+	for (list_each(node, &ctx->style.selectors)) {
 		LCUI_PutStyleSheet(node->data, ctx->style.sheet, ctx->space);
 	}
-	LinkedList_Clear(&ctx->style.selectors, (FuncPtr)Selector_Delete);
+	list_destroy(&ctx->style.selectors, (FuncPtr)Selector_Delete);
 	StyleSheet_Delete(ctx->style.sheet);
 }
 
@@ -927,7 +927,7 @@ static int CSSParser_ParseSelector(LCUI_CSSParserContext ctx)
 		if (!s) {
 			return -1;
 		}
-		LinkedList_Append(&ctx->style.selectors, s);
+		list_append(&ctx->style.selectors, s);
 		break;
 	default:
 		CSSParser_GetChar(ctx);
@@ -1155,7 +1155,7 @@ LCUI_CSSParserContext CSSParser_Begin(size_t buffer_size, const char *space)
 	ctx->parsers[CSS_TARGET_VALUE].parse = CSSParser_ParseStyleValue;
 	ctx->parsers[CSS_TARGET_COMMENT].parse = CSSParser_ParseComment;
 	ctx->comment.prev_target = CSS_TARGET_NONE;
-	LinkedList_Init(&ctx->style.selectors);
+	list_create(&ctx->style.selectors);
 	memset(&ctx->rule, 0, sizeof(ctx->rule));
 	CSSParser_InitFontFaceRuleParser(ctx);
 	return ctx;
@@ -1163,7 +1163,7 @@ LCUI_CSSParserContext CSSParser_Begin(size_t buffer_size, const char *space)
 
 void CSSParser_End(LCUI_CSSParserContext ctx)
 {
-	LinkedList_Clear(&ctx->style.selectors, (FuncPtr)Selector_Delete);
+	list_destroy(&ctx->style.selectors, (FuncPtr)Selector_Delete);
 	CSSParser_FreeFontFaceRuleParser(ctx);
 	if (ctx->space) {
 		free(ctx->space);
@@ -1177,7 +1177,7 @@ void CSSParser_End(LCUI_CSSParserContext ctx)
 
 LCUI_CSSPropertyParser LCUI_GetCSSPropertyParser(const char *name)
 {
-	return Dict_FetchValue(self.parsers, name);
+	return dict_fetch_value(self.parsers, name);
 }
 
 int LCUI_AddCSSPropertyParser(LCUI_CSSPropertyParser sp)
@@ -1186,7 +1186,7 @@ int LCUI_AddCSSPropertyParser(LCUI_CSSPropertyParser sp)
 	if (!sp->name || strlen(sp->name) < 1) {
 		return -1;
 	}
-	if (Dict_FetchValue(self.parsers, sp->name)) {
+	if (dict_fetch_value(self.parsers, sp->name)) {
 		return -2;
 	}
 	self.count += 1;
@@ -1194,7 +1194,7 @@ int LCUI_AddCSSPropertyParser(LCUI_CSSPropertyParser sp)
 	new_sp->key = sp->key;
 	new_sp->parse = sp->parse;
 	new_sp->name = strdup2(sp->name);
-	Dict_Add(self.parsers, new_sp->name, new_sp);
+	dict_add(self.parsers, new_sp->name, new_sp);
 	return 0;
 }
 
@@ -1210,9 +1210,9 @@ void LCUI_InitCSSParser(void)
 	LCUI_CSSPropertyParser new_sp, sp, sp_end;
 
 	self.count = 0;
-	Dict_InitStringKeyType(&self.dicttype);
-	self.dicttype.valDestructor = DestroyStyleParser;
-	self.parsers = Dict_Create(&self.dicttype, NULL);
+	dict_init_string_key_type(&self.dicttype);
+	self.dicttype.val_destructor = DestroyStyleParser;
+	self.parsers = dict_create(&self.dicttype, NULL);
 	sp_end = style_parser_map + LEN(style_parser_map);
 	for (sp = style_parser_map; sp < sp_end; ++sp) {
 		new_sp = malloc(sizeof(LCUI_CSSPropertyParserRec));
@@ -1228,11 +1228,11 @@ void LCUI_InitCSSParser(void)
 		} else {
 			new_sp->name = strdup2(sp->name);
 		}
-		Dict_Add(self.parsers, new_sp->name, new_sp);
+		dict_add(self.parsers, new_sp->name, new_sp);
 	}
 }
 
 void LCUI_FreeCSSParser(void)
 {
-	Dict_Release(self.parsers);
+	dict_destroy(self.parsers);
 }

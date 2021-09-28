@@ -37,13 +37,13 @@
 
 static void Widget_MarkChildrenRefreshByClasses(LCUI_Widget w)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 
 	if (w->rules && w->rules->ignore_classes_change) {
 		return;
 	}
 	Widget_AddTask(w, LCUI_WTASK_REFRESH_STYLE);
-	for (LinkedList_Each(node, &w->children)) {
+	for (list_each(node, &w->children)) {
 		Widget_MarkChildrenRefreshByClasses(node->data);
 	}
 }

@@ -37,7 +37,7 @@
 
 typedef struct CanvasRec_ {
 	LCUI_Graph buffer;
-	LinkedList contexts;
+	list_t contexts;
 } CanvasRec, *Canvas;
 
 static struct {
@@ -65,20 +65,20 @@ static void Canvas_OnInit(LCUI_Widget w)
 	Canvas canvas = Widget_AddData(w, self.proto, sizeof(CanvasRec));
 
 	Graph_Init(&canvas->buffer);
-	LinkedList_Init(&canvas->contexts);
+	list_create(&canvas->contexts);
 }
 
 static void Canvas_OnDestroy(LCUI_Widget w)
 {
-	LinkedListNode *node;
+	list_node_t *node;
 	LCUI_CanvasContext ctx;
 	Canvas canvas = Widget_AddData(w, self.proto, sizeof(CanvasRec));
 
-	for (LinkedList_Each(node, &canvas->contexts)) {
+	for (list_each(node, &canvas->contexts)) {
 		ctx = node->data;
 		ctx->available = FALSE;
 	}
-	LinkedList_ClearData(&canvas->contexts, NULL);
+	list_destroy_without_node(&canvas->contexts, NULL);
 	Graph_Free(&canvas->buffer);
 }
 
@@ -144,7 +144,7 @@ static void CanvasContext_Release(LCUI_CanvasContext ctx)
 
 	if (ctx->available) {
 		canvas = Widget_GetData(ctx->canvas, self.proto);
-		LinkedList_Unlink(&canvas->contexts, &ctx->node);
+		list_unlink(&canvas->contexts, &ctx->node);
 	}
 	free(ctx);
 }
@@ -166,7 +166,7 @@ LCUI_CanvasContext Canvas_GetContext(LCUI_Widget w)
 	ctx->release = CanvasContext_Release;
 	ctx->node.data = ctx;
 	ctx->node.next = ctx->node.prev = NULL;
-	LinkedList_AppendNode(&canvas->contexts, &ctx->node);
+	list_append_node(&canvas->contexts, &ctx->node);
 	return ctx;
 }
 

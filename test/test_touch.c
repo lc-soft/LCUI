@@ -3,20 +3,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <LCUI.h>
-#include <LCUI/graph.h>
 #include <LCUI/display.h>
 #include <LCUI/gui/widget.h>
+#include <LCUI/graph.h>
 
 /** 触点绑定记录 */
 typedef struct TouchPointBindingRec_ {
 	int point_id;        /**< 触点 ID */
 	LCUI_Widget widget;  /**< 部件 */
-	LinkedListNode node; /**< 在链表中的结点 */
+	list_node_t node; /**< 在链表中的结点 */
 	LCUI_BOOL is_valid;  /**< 是否有效 */
 } TouchPointBindingRec, *TouchPointBinding;
 
 /** 触点绑定记录列表 */
-static LinkedList touch_bindings;
+static list_t touch_bindings;
 
 static void OnTouchWidget(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 {
@@ -38,7 +38,7 @@ static void OnTouchWidget(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 		}
 		/* 当触点释放后销毁部件及绑定记录 */
 		Widget_ReleaseTouchCapture(w, -1);
-		LinkedList_Unlink(&touch_bindings, &binding->node);
+		list_unlink(&touch_bindings, &binding->node);
 		binding->is_valid = FALSE;
 		Widget_Destroy(w);
 		free(binding);
@@ -53,7 +53,7 @@ static void OnTouch(LCUI_SysEvent e, void *arg)
 {
 	int i;
 	LCUI_Widget w;
-	LinkedListNode *node;
+	list_node_t *node;
 	LCUI_TouchPoint point;
 	LCUI_Color bgcolor = RGB(255, 0, 0);
 
@@ -63,7 +63,7 @@ static void OnTouch(LCUI_SysEvent e, void *arg)
 		point = &e->touch.points[i];
 		_DEBUG_MSG("point: %d\n", point->id);
 		/* 检查该触点是否已经被绑定 */
-		for (LinkedList_Each(node, &touch_bindings)) {
+		for (list_each(node, &touch_bindings)) {
 			binding = node->data;
 			if (binding->point_id == point->id) {
 				is_existed = TRUE;
@@ -86,7 +86,7 @@ static void OnTouch(LCUI_SysEvent e, void *arg)
 		Widget_BindEvent(w, "touch", OnTouchWidget, binding, NULL);
 		Widget_SetStyle(w, key_position, SV_ABSOLUTE, style);
 		Widget_SetStyle(w, key_background_color, bgcolor, color);
-		LinkedList_AppendNode(&touch_bindings, &binding->node);
+		list_append_node(&touch_bindings, &binding->node);
 		Widget_Top(w);
 	}
 }
@@ -94,7 +94,7 @@ static void OnTouch(LCUI_SysEvent e, void *arg)
 int main(int argc, char **argv)
 {
 	LCUI_Init();
-	LinkedList_Init(&touch_bindings);
+	list_create(&touch_bindings);
 	LCUI_BindEvent(LCUI_TOUCH, OnTouch, NULL, NULL);
 	return LCUI_Main();
 }

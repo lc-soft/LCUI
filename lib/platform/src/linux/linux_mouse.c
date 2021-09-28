@@ -94,10 +94,10 @@ static void DispatchMouseEvent(void *arg1, void *arg2)
 
 	mouse.x += buf[1];
 	mouse.y -= buf[2];
-	mouse.x = max(0, mouse.x);
-	mouse.y = max(0, mouse.y);
-	mouse.x = min(LCUIDisplay_GetWidth(), mouse.x);
-	mouse.y = min(LCUIDisplay_GetHeight(), mouse.y);
+	mouse.x = y_max(0, mouse.x);
+	mouse.y = y_max(0, mouse.y);
+	mouse.x = y_min(LCUIDisplay_GetWidth(), mouse.x);
+	mouse.y = y_min(LCUIDisplay_GetHeight(), mouse.y);
 	ev.type = LCUI_MOUSEMOVE;
 	ev.motion.x = mouse.x;
 	ev.motion.y = mouse.y;
@@ -149,13 +149,13 @@ static int InitLinuxMouse(void)
 	if (!mouse.dev_path) {
 		mouse.dev_path = "/dev/input/mice";
 	}
-	Logger_Debug("[input] open mouse device: %s\n", mouse.dev_path);
+	logger_debug("[input] open mouse device: %s\n", mouse.dev_path);
 	if ((mouse.dev_fd = open(mouse.dev_path, O_RDONLY)) < 0) {
-		Logger_Error("[input] open mouse device failed\n");
+		logger_error("[input] open mouse device failed\n");
 		return -1;
 	}
 	LCUIThread_Create(&mouse.tid, LinuxMouseThread, NULL);
-	Logger_Debug("[input] mouse driver thread: %lld\n", mouse.tid);
+	logger_debug("[input] mouse driver thread: %lld\n", mouse.tid);
 	return 0;
 }
 

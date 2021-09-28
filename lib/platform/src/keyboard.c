@@ -42,7 +42,7 @@ typedef struct KeyStateNodeRec_ {
 
 static struct LCUIKeyboardModule {
 	LCUI_Mutex mutex;
-	RBTree state_tree;
+	rbtree_t state_tree;
 } self;
 
 /** 检测指定键值的按键是否处于按下状态 */
@@ -50,7 +50,7 @@ LCUI_BOOL LCUIKeyboard_IsHit(int key_code)
 {
 	KeyStateNode node;
 	LCUIMutex_Lock(&self.mutex);
-	node = RBTree_GetData(&self.state_tree, key_code);
+	node = rbtree_get_data_by_key(&self.state_tree, key_code);
 	LCUIMutex_Unlock(&self.mutex);
 	if (node && node->state == LCUI_KSTATE_PRESSED) {
 		return TRUE;
@@ -70,7 +70,7 @@ LCUI_BOOL LCUIKeyboard_IsDoubleHit(int key_code, int interval_time)
 	/* 计算当前时间（单位：毫秒） */
 	ct = clock() * 1000 / CLOCKS_PER_SEC;
 	LCUIMutex_Lock(&self.mutex);
-	node = RBTree_GetData(&self.state_tree, key_code);
+	node = rbtree_get_data_by_key(&self.state_tree, key_code);
 	LCUIMutex_Unlock(&self.mutex);
 	if (!node) {
 		return FALSE;
@@ -94,13 +94,13 @@ void LCUIKeyboard_HitKey(int key_code)
 	KeyStateNode node;
 	LCUIMutex_Lock(&self.mutex);
 	ct = clock() * 1000 / CLOCKS_PER_SEC;
-	node = RBTree_GetData(&self.state_tree, key_code);
+	node = rbtree_get_data_by_key(&self.state_tree, key_code);
 	if (!node) {
 		node = NEW(KeyStateNodeRec, 1);
 		node->interval_time = -1;
 		node->hit_time = ct;
 		node->state = LCUI_KSTATE_PRESSED;
-		RBTree_Insert(&self.state_tree, key_code, node);
+		rbtree_insert_by_key(&self.state_tree, key_code, node);
 		LCUIMutex_Unlock(&self.mutex);
 		return;
 	}
@@ -119,7 +119,7 @@ void LCUIKeyboard_ReleaseKey(int key_code)
 {
 	KeyStateNode node;
 	LCUIMutex_Lock(&self.mutex);
-	node = RBTree_GetData(&self.state_tree, key_code);
+	node = rbtree_get_data_by_key(&self.state_tree, key_code);
 	if (node) {
 		node->state = LCUI_KSTATE_RELEASE;
 	}
@@ -138,14 +138,14 @@ static void OnKeyboardEvent(LCUI_SysEvent e, void *arg)
 void LCUI_InitKeyboard(void)
 {
 	LCUIMutex_Init(&self.mutex);
-	RBTree_Init(&self.state_tree);
-	RBTree_OnDestroy(&self.state_tree, free);
+	rbtree_init(&self.state_tree);
+	rbtree_set_destroy_func(&self.state_tree, free);
 	LCUI_BindEvent(LCUI_KEYDOWN, OnKeyboardEvent, NULL, NULL);
 	LCUI_BindEvent(LCUI_KEYUP, OnKeyboardEvent, NULL, NULL);
 }
 
 void LCUI_FreeKeyboard(void)
 {
-	RBTree_Destroy(&self.state_tree);
+	rbtree_destroy(&self.state_tree);
 	LCUIMutex_Destroy(&self.mutex);
 }

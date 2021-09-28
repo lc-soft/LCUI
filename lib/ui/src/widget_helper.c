@@ -244,17 +244,17 @@ static void Widget_CollectReference(LCUI_Widget w, void *arg)
 	const char *ref = Widget_GetAttribute(w, "ref");
 
 	if (ref) {
-		Dict_Add(arg, (void*)ref, w);
+		dict_add(arg, (void*)ref, w);
 	}
 }
 
-Dict *Widget_CollectReferences(LCUI_Widget w)
+dict_t *Widget_CollectReferences(LCUI_Widget w)
 {
-	Dict *dict;
-	static DictType t;
+	dict_t *dict;
+	static dict_type_t t;
 
-	Dict_InitStringKeyType(&t);
-	dict = Dict_Create(&t, NULL);
+	dict_init_string_key_type(&t);
+	dict = dict_create(&t, NULL);
 	Widget_Each(w, Widget_CollectReference, dict);
 	return dict;
 }
