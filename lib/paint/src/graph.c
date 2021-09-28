@@ -1055,7 +1055,7 @@ int pd_canvas_zoom_bilinear(const pd_canvas_t *canvas, pd_canvas_t *buff,
 	if (canvas->color_type != PD_COLOR_TYPE_RGB &&
 	    canvas->color_type != PD_COLOR_TYPE_ARGB) {
 		/* fall back to nearest scaling */
-		Logger_Debug("[canvas] unable to perform bilinear scaling, "
+		logger_debug("[canvas] unable to perform bilinear scaling, "
 			     "fallback...\n");
 		return pd_canvas_zoom(canvas, buff, keep_scale, width, height);
 	}
