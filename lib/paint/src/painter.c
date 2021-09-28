@@ -36,7 +36,7 @@
 
 pd_paint_context_t* pd_painter_begin(pd_canvas_t *canvas, pd_rect_t *rect)
 {
-	PDASSIGN(paint, pd_paint_context_t);
+	pd_paint_context_t* paint = (pd_paint_context_t*)malloc(sizeof(pd_paint_context_t));
 	paint->rect = *rect;
 	paint->with_alpha = FALSE;
 	pd_canvas_init(&paint->canvas);

@@ -50,9 +50,6 @@
 #define NEW(TYPE, COUNT) (TYPE *)calloc(COUNT, sizeof(TYPE))
 #define CodeToString(...) "" #__VA_ARGS__ ""
 
-
-#define PDASSIGN(NAME, TYPE) TYPE* NAME = (TYPE*)malloc(sizeof(TYPE))
-
 LCUI_BEGIN_HEADER
 
 typedef unsigned int uint_t;
