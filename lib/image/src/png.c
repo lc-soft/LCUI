@@ -238,7 +238,7 @@ int LCUI_WritePNGFile(const char *file_name, const pd_canvas_t *graph)
 	int y;
 
 	if (!pd_canvas_is_valid(graph)) {
-		Logger_Error("canvas is not valid\n");
+		logger_error("canvas is not valid\n");
 		return -1;
 	}
 	/* create file */

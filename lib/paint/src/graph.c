@@ -751,7 +751,7 @@ int pd_canvas_create(pd_canvas_t *canvas, unsigned width, unsigned height)
 {
 	size_t size;
 	if (width > 10000 || height > 10000) {
-		Logger_Error("canvas size is too large!");
+		logger_error("canvas size is too large!");
 		abort();
 	}
 	if (width < 1 || height < 1) {
