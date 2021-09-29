@@ -419,7 +419,7 @@ typedef struct LCUI_BackgroundStyle {
 	LCUI_BackgroundSize size;         /**< 尺寸 */
 } LCUI_BackgroundStyle;
 
-typedef struct LCUI_Background {
+typedef struct pd_background_t {
 	pd_canvas_t *image; /**< 背景图 */
 	pd_color_t color;  /**< 背景色 */
 	struct {
@@ -431,7 +431,7 @@ typedef struct LCUI_Background {
 	struct {
 		int width, height;
 	} size;
-} LCUI_Background;
+} pd_background_t;
 
 /** 进行绘制时所需的上下文 */
 typedef struct pd_paint_context_t_ {

@@ -73,7 +73,7 @@ typedef struct LCUI_WidgetActualStyleRec_ {
 	pd_rect_t content_box;
 	pd_border_t border;
 	pd_boxshadow_t shadow;
-	LCUI_Background background;
+	pd_background_t background;
 } LCUI_WidgetActualStyleRec, *LCUI_WidgetActualStyle;
 
 /** 部件任务类型，按照任务的依赖顺序排列 */

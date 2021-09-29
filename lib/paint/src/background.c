@@ -32,7 +32,7 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
 
-void pd_background_paint(const LCUI_Background *bg,
+void pd_background_paint(const pd_background_t *bg,
 		      const pd_rect_t *box,
 		      pd_paint_context_t* paint)
 {
