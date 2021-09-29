@@ -7,7 +7,7 @@ int paint_background(pd_paint_context_t* paint, pd_rect_t *box)
 {
 	pd_canvas_t image;
 	pd_color_t green = RGB(102, 204, 0);
-	LCUI_Background bg = { 0 };
+	pd_background_t bg = { 0 };
 
 	pd_canvas_init(&image);
 	// 读取背景图片

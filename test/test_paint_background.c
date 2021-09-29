@@ -9,7 +9,7 @@ int test_paint_background_color(void)
         pd_color_t gray = RGB(240, 240, 240);
         pd_color_t green = RGB(102, 204, 0);
         pd_rect_t rect = { 200, 100, 400, 300 };
-        LCUI_Background bg = { 0 };
+        pd_background_t bg = { 0 };
         pd_paint_context_t* paint;
 
         pd_canvas_init(&canvas);
@@ -34,7 +34,7 @@ int test_paint_background_image(void)
         pd_color_t gray = RGB(240, 240, 240);
         pd_color_t green = RGB(102, 204, 0);
         pd_rect_t rect = { 200, 100, 400, 300 };
-        LCUI_Background bg = { 0 };
+        pd_background_t bg = { 0 };
         pd_paint_context_t* paint;
 
         pd_canvas_init(&canvas);
@@ -69,7 +69,7 @@ int test_paint_background_image_with_size(void)
         pd_color_t gray = RGB(240, 240, 240);
         pd_color_t green = RGB(102, 204, 0);
         pd_rect_t rect = { 200, 100, 400, 300 };
-        LCUI_Background bg = { 0 };
+        pd_background_t bg = { 0 };
         pd_paint_context_t* paint;
 
         pd_canvas_init(&canvas);
@@ -105,7 +105,7 @@ int test_paint_background_image_with_position(void)
         pd_color_t gray = RGB(240, 240, 240);
         pd_color_t green = RGB(102, 204, 0);
         pd_rect_t rect = { 200, 100, 400, 300 };
-        LCUI_Background bg = { 0 };
+        pd_background_t bg = { 0 };
         pd_paint_context_t* paint;
 
         pd_canvas_init(&canvas);
