@@ -58,8 +58,8 @@ typedef struct LCUI_WidgetStyle {
 	LCUI_StyleValue display;
 	LCUI_StyleValue box_sizing;
 	LCUI_StyleValue vertical_align;
-	LCUI_BorderStyle border;
-	LCUI_BoxShadowStyle shadow;
+	pd_border_style_t border;
+	pd_boxshadow_style_t shadow;
 	LCUI_BackgroundStyle background;
 	LCUI_FlexBoxLayoutStyle flex;
 	int pointer_events;
@@ -67,12 +67,12 @@ typedef struct LCUI_WidgetStyle {
 
 typedef struct LCUI_WidgetActualStyleRec_ {
 	float x, y;
-	LCUI_Rect canvas_box;
-	LCUI_Rect border_box;
-	LCUI_Rect padding_box;
-	LCUI_Rect content_box;
-	LCUI_Border border;
-	LCUI_BoxShadow shadow;
+	pd_rect_t canvas_box;
+	pd_rect_t border_box;
+	pd_rect_t padding_box;
+	pd_rect_t content_box;
+	pd_border_t border;
+	pd_boxshadow_t shadow;
 	LCUI_Background background;
 } LCUI_WidgetActualStyleRec, *LCUI_WidgetActualStyle;
 
@@ -102,11 +102,11 @@ typedef enum LCUI_WidgetTaskType {
 
 /** See more: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model */
 typedef struct LCUI_WidgetBoxModelRec_ {
-	LCUI_RectF content;
-	LCUI_RectF padding;
-	LCUI_RectF border;
-	LCUI_RectF canvas;
-	LCUI_RectF outer;
+	pd_rectf_t content;
+	pd_rectf_t padding;
+	pd_rectf_t border;
+	pd_rectf_t canvas;
+	pd_rectf_t outer;
 } LCUI_WidgetBoxModelRec, *LCUI_WidgetBoxModel;
 
 typedef struct LCUI_WidgetTaskRec_ {
@@ -144,7 +144,7 @@ typedef void(*LCUI_WidgetSizeSetter)(LCUI_Widget, float, float);
 typedef void(*LCUI_WidgetAttrSetter)(LCUI_Widget, const char*, const char*);
 typedef void(*LCUI_WidgetTextSetter)(LCUI_Widget, const char*);
 typedef void(*LCUI_WidgetPropertyBinder)(LCUI_Widget, const char*, LCUI_Object);
-typedef void(*LCUI_WidgetPainter)(LCUI_Widget, LCUI_PaintContext,
+typedef void(*LCUI_WidgetPainter)(LCUI_Widget, pd_paint_context_t*,
 				  LCUI_WidgetActualStyle);
 
 typedef struct LCUI_WidgetPrototypeRec_ {
@@ -306,7 +306,7 @@ typedef struct LCUI_WidgetRec_ {
 	LCUI_EventTrigger trigger;
 
 	/** Invalid area (Dirty Rectangle) */
-	LCUI_RectF invalid_area;
+	pd_rectf_t invalid_area;
 	LCUI_InvalidAreaType invalid_area_type;
 	LCUI_BOOL has_child_invalid_area;
 	

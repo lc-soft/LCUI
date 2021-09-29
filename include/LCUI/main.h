@@ -66,7 +66,7 @@ typedef struct LCUI_TouchPointRec_ {
 } LCUI_TouchPointRec, *LCUI_TouchPoint;
 
 typedef struct LCUI_PaintEvent_ {
-	LCUI_Rect rect;
+	pd_rect_t rect;
 } LCUI_PaintEvent;
 
 /** The event structure to describe a user interaction with the keyboard */

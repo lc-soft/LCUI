@@ -31,8 +31,8 @@
 #ifndef LCUI_PAINTER_H
 #define LCUI_PAINTER_H
 
-LCUI_API LCUI_PaintContext LCUIPainter_Begin(LCUI_Graph *canvas, LCUI_Rect *rect);
+LCUI_API pd_paint_context_t* pd_painter_begin(pd_canvas_t *canvas, pd_rect_t *rect);
 
-LCUI_API void LCUIPainter_End(LCUI_PaintContext paint);
+LCUI_API void pd_painter_end(pd_paint_context_t* paint);
 
 #endif

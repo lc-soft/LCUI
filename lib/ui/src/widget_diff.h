@@ -43,8 +43,8 @@ typedef struct LCUI_WidgetStyleDiffRec_ {
 	LCUI_Rect2F margin;
 	LCUI_Rect2F padding;
 	LCUI_StyleValue position;
-	LCUI_BorderStyle border;
-	LCUI_BoxShadowStyle shadow;
+	pd_border_style_t border;
+	pd_boxshadow_style_t shadow;
 	LCUI_BackgroundStyle background;
 	LCUI_WidgetBoxModelRec box;
 	LCUI_FlexBoxLayoutStyle flex;

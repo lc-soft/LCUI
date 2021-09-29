@@ -42,7 +42,7 @@
 
 typedef struct ImageCacheRec_ {
 	char *path;
-	LCUI_Graph image;
+	pd_canvas_t image;
 	list_t refs;
 } ImageCacheRec, *ImageCache;
 
@@ -65,10 +65,10 @@ static void DestroyImageCache(ImageCache cache)
 		LCUI_Widget w = node->data;
 		rbtree_delete_by_keydata(&self.refs, node->data);
 		Widget_UnsetStyle(w, key_background_image);
-		Graph_Init(&w->computed_style.background.image);
+		pd_canvas_init(&w->computed_style.background.image);
 		list_delete_node(&cache->refs, node);
 	}
-	Graph_Free(&cache->image);
+	pd_canvas_free(&cache->image);
 	free(cache->path);
 	cache->path = NULL;
 	free(cache);
@@ -110,7 +110,7 @@ static void DeleteImageRef(LCUI_Widget widget)
 		}
 		rbtree_delete_by_keydata(&self.refs, node->data);
 		Widget_UnsetStyle(w, key_background_image);
-		Graph_Init(&w->computed_style.background.image);
+		pd_canvas_init(&w->computed_style.background.image);
 		list_delete_node(&cache->refs, node);
 		break;
 	}
@@ -123,11 +123,11 @@ static void DeleteImageRef(LCUI_Widget widget)
 static void ExecLoadImage(void *arg1, void *arg2)
 {
 	char *path = arg2;
-	LCUI_Graph image;
+	pd_canvas_t image;
 	LCUI_Widget w = arg1;
 	ImageCache cache;
 
-	Graph_Init(&image);
+	pd_canvas_init(&image);
 	if (LCUI_ReadImageFile(path, &image) != 0) {
 		return;
 	}
@@ -140,7 +140,7 @@ static void ExecLoadImage(void *arg1, void *arg2)
 	} else {
 		DestroyImageCache(cache);
 	}
-	Graph_Quote(&w->computed_style.background.image, &cache->image, NULL);
+	pd_canvas_quote(&w->computed_style.background.image, &cache->image, NULL);
 	Widget_InvalidateArea(w, NULL, SV_BORDER_BOX);
 }
 
@@ -178,7 +178,7 @@ static void AsyncLoadImage(LCUI_Widget widget, const char *path)
 	cache = dict_fetch_value(self.images, path);
 	if (cache) {
 		AddImageRef(widget, cache);
-		Graph_Quote(&widget->computed_style.background.image,
+		pd_canvas_quote(&widget->computed_style.background.image,
 			    &cache->image, NULL);
 		Widget_InvalidateArea(widget, NULL, SV_BORDER_BOX);
 		return;
@@ -214,7 +214,7 @@ void Widget_InitBackground(LCUI_Widget w)
 	LCUI_BackgroundStyle *bg;
 	bg = &w->computed_style.background;
 	bg->color = RGB(255, 255, 255);
-	Graph_Init(&bg->image);
+	pd_canvas_init(&bg->image);
 	bg->size.using_value = TRUE;
 	bg->size.value = SV_AUTO;
 	bg->position.using_value = TRUE;
@@ -224,7 +224,7 @@ void Widget_InitBackground(LCUI_Widget w)
 void Widget_DestroyBackground(LCUI_Widget w)
 {
 	Widget_UnsetStyle(w, key_background_image);
-	Graph_Init(&w->computed_style.background.image);
+	pd_canvas_init(&w->computed_style.background.image);
 	if (Widget_CheckStyleType(w, key_background_image, string)) {
 		DeleteImageRef(w);
 	}
@@ -249,7 +249,7 @@ void Widget_ComputeBackgroundStyle(LCUI_Widget widget)
 			break;
 		case key_background_image:
 			if (!s->is_valid) {
-				Graph_Init(&bg->image);
+				pd_canvas_init(&bg->image);
 				break;
 			}
 			switch (s->type) {
@@ -258,10 +258,10 @@ void Widget_ComputeBackgroundStyle(LCUI_Widget widget)
 				break;
 			case LCUI_STYPE_IMAGE:
 				if (!s->image) {
-					Graph_Init(&bg->image);
+					pd_canvas_init(&bg->image);
 					break;
 				}
-				Graph_Quote(&bg->image, s->image, NULL);
+				pd_canvas_quote(&bg->image, s->image, NULL);
 				DeleteImageRef(widget);
 			default:
 				break;
@@ -318,7 +318,7 @@ void Widget_ComputeBackgroundStyle(LCUI_Widget widget)
 void Widget_ComputeBackground(LCUI_Widget w, LCUI_Background *out)
 {
 	LCUI_StyleType type;
-	LCUI_RectF *box = &w->box.border;
+	pd_rectf_t *box = &w->box.border;
 	LCUI_BackgroundStyle *bg = &w->computed_style.background;
 	float scale, x = 0, y = 0, width, height;
 
@@ -469,13 +469,13 @@ void Widget_ComputeBackground(LCUI_Widget w, LCUI_Background *out)
 	out->repeat.y = bg->repeat.y;
 }
 
-void Widget_PaintBakcground(LCUI_Widget w, LCUI_PaintContext paint,
+void Widget_PaintBakcground(LCUI_Widget w, pd_paint_context_t* paint,
 			    LCUI_WidgetActualStyle style)
 {
-	LCUI_Rect box;
+	pd_rect_t box;
 	box.x = style->padding_box.x - style->canvas_box.x;
 	box.y = style->padding_box.y - style->canvas_box.y;
 	box.width = style->padding_box.width;
 	box.height = style->padding_box.height;
-	Background_Paint(&style->background, &box, paint);
+	pd_background_paint(&style->background, &box, paint);
 }

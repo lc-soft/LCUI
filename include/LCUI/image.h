@@ -108,19 +108,19 @@ LCUI_API int LCUI_ReadBMPHeader(LCUI_ImageReader reader);
 
 LCUI_API int LCUI_ReadImageHeader(LCUI_ImageReader reader);
 
-LCUI_API int LCUI_ReadPNG(LCUI_ImageReader reader, LCUI_Graph *graph);
+LCUI_API int LCUI_ReadPNG(LCUI_ImageReader reader, pd_canvas_t *graph);
 
-LCUI_API int LCUI_ReadJPEG(LCUI_ImageReader reader, LCUI_Graph *graph);
+LCUI_API int LCUI_ReadJPEG(LCUI_ImageReader reader, pd_canvas_t *graph);
 
-LCUI_API int LCUI_ReadBMP(LCUI_ImageReader reader, LCUI_Graph *graph);
+LCUI_API int LCUI_ReadBMP(LCUI_ImageReader reader, pd_canvas_t *graph);
 
-LCUI_API int LCUI_ReadImage(LCUI_ImageReader reader, LCUI_Graph *graph);
+LCUI_API int LCUI_ReadImage(LCUI_ImageReader reader, pd_canvas_t *graph);
 
 /** 将图像数据写入至png文件 */
-LCUI_API int LCUI_WritePNGFile(const char *file_name, const LCUI_Graph *graph);
+LCUI_API int LCUI_WritePNGFile(const char *file_name, const pd_canvas_t *graph);
 
 /** 载入指定图片文件的图像数据 */
-LCUI_API int LCUI_ReadImageFile(const char *filepath, LCUI_Graph *out);
+LCUI_API int LCUI_ReadImageFile(const char *filepath, pd_canvas_t *out);
 
 /** 从文件中获取图像尺寸 */
 LCUI_API int LCUI_GetImageSize(const char *filepath, int *width, int *height);

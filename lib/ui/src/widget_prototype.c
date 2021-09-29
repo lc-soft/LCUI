@@ -71,7 +71,7 @@ static void Widget_DefaultTaskHandler(LCUI_Widget w, int task)
 {
 }
 
-static void Widget_DefaultPainter(LCUI_Widget w, LCUI_PaintContext paint,
+static void Widget_DefaultPainter(LCUI_Widget w, pd_paint_context_t* paint,
 				  LCUI_WidgetActualStyle style)
 {
 }

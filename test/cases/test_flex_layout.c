@@ -13,7 +13,7 @@ static void test_flex_layout_with_content_width(float width)
 	LCUI_Widget content;
 	LCUI_Widget example;
 	LCUI_Widget container;
-	LCUI_RectF rect;
+	pd_rectf_t rect;
 
 	container = Widget_GetChild(LCUIWidget_GetById("main"), 0);
 	LCUIWidget_Update();
@@ -431,7 +431,7 @@ static void test_flex_layout_with_content_width(float width)
 static void test_browser_layout(void)
 {
 	LCUI_Widget w;
-	LCUI_RectF rect;
+	pd_rectf_t rect;
 
 	w = LCUIWidget_GetById("browser-tabbar");
 	w = Widget_GetChild(w, 0);
@@ -481,7 +481,7 @@ static void test_flex_layout_320(void)
 	LCUI_Widget content;
 	LCUI_Widget example;
 	LCUI_Widget container;
-	LCUI_RectF rect;
+	pd_rectf_t rect;
 
 	container = Widget_GetChild(LCUIWidget_GetById("main"), 0);
 	LCUIDisplay_SetSize(320, 240);

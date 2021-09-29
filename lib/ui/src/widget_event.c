@@ -909,7 +909,7 @@ int LCUIWidget_SetFocus(LCUI_Widget widget)
 static void OnMouseEvent(LCUI_SysEvent sys_ev, void *arg)
 {
 	float scale;
-	LCUI_Pos pos;
+	pd_pos_t pos;
 	LCUI_Widget root;
 	LCUI_Widget target, w;
 	LCUI_WidgetEventRec ev = { 0 };

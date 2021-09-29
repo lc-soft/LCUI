@@ -43,8 +43,8 @@ static struct UWPDisplay {
 	Renderer *renderer;
 	LCUI_EventTrigger trigger;
 	LCUI_Surface surface;
-	LCUI_Graph frame;
-	LCUI_Rect rect;
+	pd_canvas_t frame;
+	pd_rect_t rect;
 } display = { 0 };
 
 typedef struct LCUI_SurfaceRec_ {
@@ -131,9 +131,9 @@ void Renderer::CreateWindowSizeDependentResources()
 		0 };
 	m_frameSwapable = true;
 	m_frameSize = { (UINT32)outputSize.Width, (UINT32)outputSize.Height };
-	Graph_Create(&display.frame, (int)m_frameSize.width,
+	pd_canvas_create(&display.frame, (int)m_frameSize.width,
 		(int)m_frameSize.height);
-	Graph_FillRect(&display.frame, RGB(255, 255, 255), NULL, TRUE);
+	pd_canvas_fill_rect(&display.frame, RGB(255, 255, 255), NULL, TRUE);
 	context->CreateBitmap(m_frameSize, nullptr, 0, &props, &m_bmp);
 	context->CreateBitmap(m_frameSize, nullptr, 0, &props, &m_backBmp);
 	UpdateSurfaceSize();
@@ -231,22 +231,22 @@ static void UWPSurface_SetRenderMode(LCUI_Surface surface, int mode)
 {
 }
 
-static LCUI_PaintContext UWPSurface_BeginPaint(LCUI_Surface surface,
-					       LCUI_Rect *rect)
+static pd_paint_context_t* UWPSurface_BeginPaint(LCUI_Surface surface,
+					       pd_rect_t *rect)
 {
-	ASSIGN(paint, LCUI_PaintContext);
+	ASSIGN(paint, pd_paint_context_t*);
 	paint->rect = *rect;
 	paint->with_alpha = FALSE;
-	Graph_Init(&paint->canvas);
+	pd_canvas_init(&paint->canvas);
 	LCUIRect_MergeRect(&display.rect, &display.rect, rect);
-	LCUIRect_ValidateArea(&paint->rect, UWPDisplay_GetWidth(),
+	pd_rect_validate_area(&paint->rect, UWPDisplay_GetWidth(),
 			      UWPDisplay_GetHeight());
-	Graph_Quote(&paint->canvas, &display.frame, &paint->rect);
-	Graph_FillRect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
+	pd_canvas_quote(&paint->canvas, &display.frame, &paint->rect);
+	pd_canvas_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
 	return paint;
 }
 
-static void UWPSurface_EndPaint(LCUI_Surface surface, LCUI_PaintContext paint)
+static void UWPSurface_EndPaint(LCUI_Surface surface, pd_paint_context_t* paint)
 {
 	free(paint);
 }
@@ -273,8 +273,8 @@ LCUI_DisplayDriver LCUI_CreateUWPDisplay(void)
 	driver->beginPaint = UWPSurface_BeginPaint;
 	driver->endPaint = UWPSurface_EndPaint;
 	driver->bindEvent = UWPDisplay_BindEvent;
-	Graph_Init(&display.frame);
-	display.frame.color_type = LCUI_COLOR_TYPE_ARGB;
+	pd_canvas_init(&display.frame);
+	display.frame.color_type = PD_COLOR_TYPE_ARGB;
 	display.surface = NULL;
 	display.trigger = EventTrigger();
 	display.is_inited = TRUE;

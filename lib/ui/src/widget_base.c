@@ -260,7 +260,7 @@ void Widget_SetTitleW(LCUI_Widget w, const wchar_t *title)
 LCUI_BOOL Widget_InVisibleArea(LCUI_Widget w)
 {
 	list_node_t *node;
-	LCUI_RectF rect;
+	pd_rectf_t rect;
 	LCUI_Widget self, parent, child;
 	LCUI_WidgetStyle *style;
 

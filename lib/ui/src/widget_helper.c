@@ -55,7 +55,7 @@ void Widget_SetMargin(LCUI_Widget w, float top, float right, float bottom,
 	Widget_UpdateStyle(w, FALSE);
 }
 
-void Widget_SetBorderColor(LCUI_Widget w, LCUI_Color color)
+void Widget_SetBorderColor(LCUI_Widget w, pd_color_t color)
 {
 	Widget_SetStyle(w, key_border_top_color, color, color);
 	Widget_SetStyle(w, key_border_right_color, color, color);
@@ -81,7 +81,7 @@ void Widget_SetBorderStyle(LCUI_Widget w, int style)
 	Widget_SetStyle(w, key_border_left_style, style, style);
 }
 
-void Widget_SetBorder(LCUI_Widget w, float width, int style, LCUI_Color color)
+void Widget_SetBorder(LCUI_Widget w, float width, int style, pd_color_t color)
 {
 	Widget_SetBorderColor(w, color);
 	Widget_SetBorderWidth(w, width);
@@ -89,7 +89,7 @@ void Widget_SetBorder(LCUI_Widget w, float width, int style, LCUI_Color color)
 }
 
 void Widget_SetBoxShadow(LCUI_Widget w, float x, float y, float blur,
-			 LCUI_Color color)
+			 pd_color_t color)
 {
 	Widget_SetStyle(w, key_box_shadow_x, x, px);
 	Widget_SetStyle(w, key_box_shadow_y, y, px);

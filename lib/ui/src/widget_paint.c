@@ -71,32 +71,32 @@ typedef struct LCUI_WidgetRendererRec_ {
 	LCUI_WidgetActualStyle style;
 
 	/* current target widget paint context */
-	LCUI_PaintContext paint;
+	pd_paint_context_t* paint;
 
 	/* root paint context */
-	LCUI_PaintContext root_paint;
+	pd_paint_context_t* root_paint;
 
 	/* content canvas */
-	LCUI_Graph content_graph;
+	pd_canvas_t content_graph;
 
 	/* target widget canvas */
-	LCUI_Graph self_graph;
+	pd_canvas_t self_graph;
 
 	/* layer canvas, used to mix content and self canvas with widget
 	 * opacity */
-	LCUI_Graph layer_graph;
+	pd_canvas_t layer_graph;
 
 	/* actual paint rectangle in widget canvas rectangle, it relative to
 	 * root canvas */
-	LCUI_Rect actual_paint_rect;
+	pd_rect_t actual_paint_rect;
 
 	/* actual paint rectangle in widget content rectangle, it relative to
 	 * root canvas */
-	LCUI_Rect actual_content_rect;
+	pd_rect_t actual_content_rect;
 
 	/* Paint rectangle in widget content rectangle, it relative to
 	 * root canvas */
-	LCUI_RectF content_rect;
+	pd_rectf_t content_rect;
 
 	LCUI_BOOL has_content_graph;
 	LCUI_BOOL has_self_graph;
@@ -117,7 +117,7 @@ static LCUI_BOOL Widget_IsPaintable(LCUI_Widget w)
 {
 	const LCUI_WidgetStyle *s = &w->computed_style;
 	if (s->background.color.alpha > 0 ||
-	    Graph_IsValid(&s->background.image) || s->border.top.width > 0 ||
+	    pd_canvas_is_valid(&s->background.image) || s->border.top.width > 0 ||
 	    s->border.right.width > 0 || s->border.bottom.width > 0 ||
 	    s->border.left.width > 0 || s->shadow.blur > 0 ||
 	    s->shadow.spread > 0) {
@@ -128,28 +128,28 @@ static LCUI_BOOL Widget_IsPaintable(LCUI_Widget w)
 
 static LCUI_BOOL Widget_HasRoundBorder(LCUI_Widget w)
 {
-	const LCUI_BorderStyle *s = &w->computed_style.border;
+	const pd_border_style_t *s = &w->computed_style.border;
 
 	return s->top_left_radius || s->top_right_radius ||
 	       s->bottom_left_radius || s->bottom_right_radius;
 }
 
-void RectFToInvalidArea(const LCUI_RectF *rect, LCUI_Rect *area)
+void RectFToInvalidArea(const pd_rectf_t *rect, pd_rect_t *area)
 {
 	LCUIMetrics_ComputeRectActual(area, rect);
 }
 
-void RectToInvalidArea(const LCUI_Rect *rect, LCUI_Rect *area)
+void RectToInvalidArea(const pd_rect_t *rect, pd_rect_t *area)
 {
-	LCUI_RectF rectf;
+	pd_rectf_t rectf;
 	LCUIRect_ToRectF(rect, &rectf, 1.0f);
 	LCUIMetrics_ComputeRectActual(area, &rectf);
 }
 
-LCUI_BOOL Widget_InvalidateArea(LCUI_Widget w, LCUI_RectF *in_rect,
+LCUI_BOOL Widget_InvalidateArea(LCUI_Widget w, pd_rectf_t *in_rect,
 				int box_type)
 {
-	LCUI_RectF rect;
+	pd_rectf_t rect;
 	LCUI_InvalidAreaType type;
 
 	if (!w->computed_style.visible) {
@@ -236,17 +236,17 @@ LCUI_BOOL Widget_InvalidateArea(LCUI_Widget w, LCUI_RectF *in_rect,
 		rect.y += y;                                           \
 		LCUIRectF_GetOverlayRect(&rect, &visible_area, &rect); \
 		if (rect.width > 0 && rect.height > 0) {               \
-			actual_rect = malloc(sizeof(LCUI_Rect));       \
+			actual_rect = malloc(sizeof(pd_rect_t));       \
 			RectFToInvalidArea(&rect, actual_rect);        \
 			list_append(rects, actual_rect);         \
 		}                                                      \
 	} while (0)
 
 static void Widget_CollectInvalidArea(LCUI_Widget w, list_t *rects, float x,
-				      float y, LCUI_RectF visible_area)
+				      float y, pd_rectf_t visible_area)
 {
-	LCUI_RectF rect;
-	LCUI_Rect *actual_rect;
+	pd_rectf_t rect;
+	pd_rect_t *actual_rect;
 	list_node_t *node;
 
 	if (w->parent && w->parent->invalid_area_type >=
@@ -295,7 +295,7 @@ static void Widget_CollectInvalidArea(LCUI_Widget w, list_t *rects, float x,
 
 size_t Widget_GetInvalidArea(LCUI_Widget w, list_t *rects)
 {
-	LCUI_Rect *rect;
+	pd_rect_t *rect;
 	list_node_t *node;
 
 	float scale = LCUIMetrics_GetScale();
@@ -342,7 +342,7 @@ void LCUIWidget_FreeRenderer(void)
 }
 
 /** 当前部件的绘制函数 */
-static void Widget_OnPaint(LCUI_Widget w, LCUI_PaintContext paint,
+static void Widget_OnPaint(LCUI_Widget w, pd_paint_context_t* paint,
 			   LCUI_WidgetActualStyle style)
 {
 	Widget_PaintBakcground(w, paint, style);
@@ -353,10 +353,10 @@ static void Widget_OnPaint(LCUI_Widget w, LCUI_PaintContext paint,
 	}
 }
 
-int Widget_ConvertArea(LCUI_Widget w, LCUI_Rect *in_rect, LCUI_Rect *out_rect,
+int Widget_ConvertArea(LCUI_Widget w, pd_rect_t *in_rect, pd_rect_t *out_rect,
 		       int box_type)
 {
-	LCUI_RectF rect;
+	pd_rectf_t rect;
 	if (!in_rect) {
 		return -1;
 	}
@@ -406,7 +406,7 @@ int Widget_ConvertArea(LCUI_Widget w, LCUI_Rect *in_rect, LCUI_Rect *out_rect,
 }
 
 static LCUI_WidgetRenderer WidgetRenderer(LCUI_Widget w,
-					  LCUI_PaintContext paint,
+					  pd_paint_context_t* paint,
 					  LCUI_WidgetActualStyle style,
 					  LCUI_WidgetRenderer parent)
 {
@@ -433,14 +433,14 @@ static LCUI_WidgetRenderer WidgetRenderer(LCUI_Widget w,
 	} else if (Widget_HasRoundBorder(w)) {
 		that->has_content_graph = TRUE;
 	}
-	Graph_Init(&that->self_graph);
-	Graph_Init(&that->layer_graph);
-	Graph_Init(&that->content_graph);
-	that->layer_graph.color_type = LCUI_COLOR_TYPE_ARGB;
+	pd_canvas_init(&that->self_graph);
+	pd_canvas_init(&that->layer_graph);
+	pd_canvas_init(&that->content_graph);
+	that->layer_graph.color_type = PD_COLOR_TYPE_ARGB;
 	that->can_render_self = Widget_IsPaintable(w);
 	if (that->can_render_self) {
-		that->self_graph.color_type = LCUI_COLOR_TYPE_ARGB;
-		Graph_Create(&that->self_graph, that->paint->rect.width,
+		that->self_graph.color_type = PD_COLOR_TYPE_ARGB;
+		pd_canvas_create(&that->self_graph, that->paint->rect.width,
 			     that->paint->rect.height);
 	}
 	/* get content rectangle left spacing and top */
@@ -458,7 +458,7 @@ static LCUI_WidgetRenderer WidgetRenderer(LCUI_Widget w,
 		  that->actual_paint_rect.width,
 		  that->actual_paint_rect.height);
 	/* get actual paint rectangle in widget content rectangle */
-	that->can_render_centent = LCUIRect_GetOverlayRect(
+	that->can_render_centent = pd_rect_get_overlay_rect(
 	    &that->style->padding_box, &that->actual_paint_rect,
 	    &that->actual_content_rect);
 	;
@@ -486,8 +486,8 @@ static LCUI_WidgetRenderer WidgetRenderer(LCUI_Widget w,
 		return that;
 	}
 	if (that->has_content_graph) {
-		that->content_graph.color_type = LCUI_COLOR_TYPE_ARGB;
-		Graph_Create(&that->content_graph,
+		that->content_graph.color_type = PD_COLOR_TYPE_ARGB;
+		pd_canvas_create(&that->content_graph,
 			     that->actual_content_rect.width,
 			     that->actual_content_rect.height);
 	}
@@ -496,9 +496,9 @@ static LCUI_WidgetRenderer WidgetRenderer(LCUI_Widget w,
 
 static void WidgetRenderer_Delete(LCUI_WidgetRenderer renderer)
 {
-	Graph_Free(&renderer->layer_graph);
-	Graph_Free(&renderer->self_graph);
-	Graph_Free(&renderer->content_graph);
+	pd_canvas_free(&renderer->layer_graph);
+	pd_canvas_free(&renderer->self_graph);
+	pd_canvas_free(&renderer->content_graph);
 	free(renderer);
 }
 
@@ -507,7 +507,7 @@ static size_t WidgetRenderer_Render(LCUI_WidgetRenderer renderer);
 static void Widget_ComputeActualBorderBox(LCUI_Widget w,
 					  LCUI_WidgetActualStyle s)
 {
-	LCUI_RectF rect;
+	pd_rectf_t rect;
 	rect.x = s->x + w->box.border.x;
 	rect.y = s->y + w->box.border.y;
 	rect.width = w->box.border.width;
@@ -520,7 +520,7 @@ static void Widget_ComputeActualCanvasBox(LCUI_Widget w,
 					  LCUI_WidgetActualStyle s)
 {
 	Widget_ComputeBoxShadow(w, &s->shadow);
-	BoxShadow_GetCanvasRect(&s->shadow, &s->border_box, &s->canvas_box);
+	pd_boxshadow_get_canvas_rect(&s->shadow, &s->border_box, &s->canvas_box);
 }
 
 static void Widget_ComputeActualPaddingBox(LCUI_Widget w,
@@ -538,7 +538,7 @@ static void Widget_ComputeActualPaddingBox(LCUI_Widget w,
 static void Widget_ComputeActualContentBox(LCUI_Widget w,
 					   LCUI_WidgetActualStyle s)
 {
-	LCUI_RectF rect;
+	pd_rectf_t rect;
 	rect.x = s->x + w->box.content.x;
 	rect.y = s->y + w->box.content.y;
 	rect.width = w->box.content.width;
@@ -550,10 +550,10 @@ static size_t WidgetRenderer_RenderChildren(LCUI_WidgetRenderer that)
 {
 	size_t total = 0, count = 0;
 	LCUI_Widget child;
-	LCUI_Rect paint_rect;
-	LCUI_RectF child_rect;
+	pd_rect_t paint_rect;
+	pd_rectf_t child_rect;
 	list_node_t *node;
-	LCUI_PaintContextRec child_paint;
+	pd_paint_context_t child_paint;
 	LCUI_WidgetRenderer renderer;
 	LCUI_WidgetActualStyleRec style;
 
@@ -596,7 +596,7 @@ static size_t WidgetRenderer_RenderChildren(LCUI_WidgetRenderer that)
 		DEBUG_MSG("child canvas rect: (%d, %d, %d, %d)\n",
 			  style.canvas_box.x, style.canvas_box.y,
 			  style.canvas_box.width, style.canvas_box.height);
-		if (!LCUIRect_GetOverlayRect(&that->actual_content_rect,
+		if (!pd_rect_get_overlay_rect(&that->actual_content_rect,
 					     &style.canvas_box, &paint_rect)) {
 			continue;
 		}
@@ -610,13 +610,13 @@ static size_t WidgetRenderer_RenderChildren(LCUI_WidgetRenderer that)
 			child_paint.with_alpha = TRUE;
 			paint_rect.x -= that->actual_content_rect.x;
 			paint_rect.y -= that->actual_content_rect.y;
-			Graph_Quote(&child_paint.canvas, &that->content_graph,
+			pd_canvas_quote(&child_paint.canvas, &that->content_graph,
 				    &paint_rect);
 		} else {
 			child_paint.with_alpha = that->paint->with_alpha;
 			paint_rect.x -= that->actual_paint_rect.x;
 			paint_rect.y -= that->actual_paint_rect.y;
-			Graph_Quote(&child_paint.canvas, &that->paint->canvas,
+			pd_canvas_quote(&child_paint.canvas, &that->paint->canvas,
 				    &paint_rect);
 		}
 		DEBUG_MSG("child paint rect: (%d, %d, %d, %d)\n", paint_rect.x,
@@ -631,7 +631,7 @@ static size_t WidgetRenderer_RenderChildren(LCUI_WidgetRenderer that)
 static size_t WidgetRenderer_Render(LCUI_WidgetRenderer renderer)
 {
 	size_t count = 0;
-	LCUI_PaintContextRec self_paint;
+	pd_paint_context_t self_paint;
 	LCUI_WidgetRenderer that = renderer;
 
 	int content_x = that->actual_content_rect.x - that->actual_paint_rect.x;
@@ -660,10 +660,10 @@ static size_t WidgetRenderer_Render(LCUI_WidgetRenderer renderer)
 #endif
 		/* 若不需要缓存自身位图则直接绘制到画布上 */
 		if (!that->has_self_graph) {
-			Graph_Mix(&that->paint->canvas, &that->self_graph, 0, 0,
+			pd_canvas_mix(&that->paint->canvas, &that->self_graph, 0, 0,
 				  that->paint->with_alpha);
 #ifdef DEBUG_FRAME_RENDER
-			Graph_PrintInfo(&that->paint->canvas);
+			pd_canvas_print_info(&that->paint->canvas);
 			sprintf(filename, "frame-%lu-L%d-%s-root-canvas.png",
 				frame++, __LINE__, renderer->target->id);
 			LCUI_WritePNGFile(filename, &that->root_paint->canvas);
@@ -682,7 +682,7 @@ static size_t WidgetRenderer_Render(LCUI_WidgetRenderer renderer)
 	}
 	if (!that->has_layer_graph) {
 		if (that->has_content_graph) {
-			Graph_Mix(&that->paint->canvas, &that->content_graph,
+			pd_canvas_mix(&that->paint->canvas, &that->content_graph,
 				  content_x, content_y, TRUE);
 		}
 #ifdef DEBUG_FRAME_RENDER
@@ -701,8 +701,8 @@ static size_t WidgetRenderer_Render(LCUI_WidgetRenderer renderer)
 	 * 前部件的图层，然后将该图层混合到输出的位图中
 	 */
 	if (that->can_render_self) {
-		Graph_Copy(&that->layer_graph, &that->self_graph);
-		Graph_Mix(&that->layer_graph, &that->content_graph, content_x,
+		pd_canvas_copy(&that->layer_graph, &that->self_graph);
+		pd_canvas_mix(&that->layer_graph, &that->content_graph, content_x,
 			  content_y, TRUE);
 #ifdef DEBUG_FRAME_RENDER
 		sprintf(filename, "frame-%lu-L%d-%s-content-grpah-%d-%d.png",
@@ -714,13 +714,13 @@ static size_t WidgetRenderer_Render(LCUI_WidgetRenderer renderer)
 		LCUI_WritePNGFile(filename, &that->layer_graph);
 #endif
 	} else {
-		Graph_Create(&that->layer_graph, that->paint->rect.width,
+		pd_canvas_create(&that->layer_graph, that->paint->rect.width,
 			     that->paint->rect.height);
-		Graph_Replace(&that->layer_graph, &that->content_graph,
+		pd_canvas_replace(&that->layer_graph, &that->content_graph,
 			      content_x, content_y);
 	}
 	that->layer_graph.opacity = that->target->computed_style.opacity;
-	Graph_Mix(&that->paint->canvas, &that->layer_graph, 0, 0,
+	pd_canvas_mix(&that->paint->canvas, &that->layer_graph, 0, 0,
 		  that->paint->with_alpha);
 #ifdef DEBUG_FRAME_RENDER
 	sprintf(filename, "frame-%lu-%s-layer.png", frame++,
@@ -735,7 +735,7 @@ static size_t WidgetRenderer_Render(LCUI_WidgetRenderer renderer)
 	return count;
 }
 
-size_t Widget_Render(LCUI_Widget w, LCUI_PaintContext paint)
+size_t Widget_Render(LCUI_Widget w, pd_paint_context_t* paint)
 {
 	size_t count;
 	LCUI_WidgetRenderer renderer;

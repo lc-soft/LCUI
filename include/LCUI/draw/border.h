@@ -33,12 +33,12 @@
 
 LCUI_BEGIN_HEADER
 
-LCUI_API int Border_CropContent(const LCUI_Border *border, const LCUI_Rect *box,
-				LCUI_PaintContext paint);
+LCUI_API int pd_border_crop_content(const pd_border_t *border, const pd_rect_t *box,
+				pd_paint_context_t* paint);
 
-LCUI_API int Border_Paint(const LCUI_Border *border,
-			  const LCUI_Rect *box,
-			  LCUI_PaintContext paint);
+LCUI_API int pd_border_paint(const pd_border_t *border,
+			  const pd_rect_t *box,
+			  pd_paint_context_t* paint);
 
 LCUI_END_HEADER
 

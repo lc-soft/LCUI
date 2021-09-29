@@ -39,9 +39,9 @@ LCUI_BEGIN_HEADER
 * @param[in] box 背景区域
 * @param[in] bg 背景样式参数
 */
-LCUI_API void Background_Paint(const LCUI_Background *bg,
-			       const LCUI_Rect *box,
-			       LCUI_PaintContext paint);
+LCUI_API void pd_background_paint(const LCUI_Background *bg,
+			       const pd_rect_t *box,
+			       pd_paint_context_t* paint);
 
 LCUI_END_HEADER
 

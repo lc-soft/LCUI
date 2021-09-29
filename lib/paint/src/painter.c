@@ -34,17 +34,17 @@
 #include <LCUI/gui/metrics.h>
 #include <LCUI/painter.h>
 
-LCUI_PaintContext LCUIPainter_Begin(LCUI_Graph *canvas, LCUI_Rect *rect)
+pd_paint_context_t* pd_painter_begin(pd_canvas_t *canvas, pd_rect_t *rect)
 {
-	ASSIGN(paint, LCUI_PaintContext);
+	pd_paint_context_t* paint = (pd_paint_context_t*)malloc(sizeof(pd_paint_context_t));
 	paint->rect = *rect;
 	paint->with_alpha = FALSE;
-	Graph_Init(&paint->canvas);
-	Graph_Quote(&paint->canvas, canvas, &paint->rect);
+	pd_canvas_init(&paint->canvas);
+	pd_canvas_quote(&paint->canvas, canvas, &paint->rect);
 	return paint;
 }
 
-void LCUIPainter_End(LCUI_PaintContext paint)
+void pd_painter_end(pd_paint_context_t* paint)
 {
 	free(paint);
 }

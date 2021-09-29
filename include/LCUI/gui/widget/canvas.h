@@ -39,8 +39,8 @@ typedef LCUI_CanvasRenderingContext LCUI_CanvasContext;
 
 struct LCUI_CanvasRenderingContextRec_ {
 	LCUI_BOOL available;
-	LCUI_Color fill_color;
-	LCUI_Graph buffer;
+	pd_color_t fill_color;
+	pd_canvas_t buffer;
 	LCUI_Widget canvas;
 	list_node_t node;
 

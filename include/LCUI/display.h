@@ -65,7 +65,7 @@ typedef struct LCUI_DisplayEventRec_ {
 	int type;
 	union {
 		struct {
-			LCUI_Rect rect;
+			pd_rect_t rect;
 		} paint;
 		struct {
 			int width, height;
@@ -90,8 +90,8 @@ typedef struct LCUI_DisplayDriverRec_ {
 	void (*update)(LCUI_Surface);
 	void (*present)(LCUI_Surface);
 	LCUI_BOOL (*isReady)(LCUI_Surface);
-	LCUI_PaintContext (*beginPaint)(LCUI_Surface, LCUI_Rect *);
-	void (*endPaint)(LCUI_Surface, LCUI_PaintContext);
+	pd_paint_context_t* (*beginPaint)(LCUI_Surface, pd_rect_t *);
+	void (*endPaint)(LCUI_Surface, pd_paint_context_t*);
 	void (*setCaptionW)(LCUI_Surface, const wchar_t *);
 	void (*setRenderMode)(LCUI_Surface, int);
 	void *(*getHandle)(LCUI_Surface);
@@ -128,7 +128,7 @@ LCUI_API int LCUIDisplay_GetWidth(void);
 LCUI_API int LCUIDisplay_GetHeight(void);
 
 /** 添加无效区域 */
-LCUI_API void LCUIDisplay_InvalidateArea(LCUI_Rect *rect);
+LCUI_API void LCUIDisplay_InvalidateArea(pd_rect_t *rect);
 
 /** 获取当前部件所属的 surface */
 LCUI_API LCUI_Surface LCUIDisplay_GetSurfaceOwner(LCUI_Widget w);

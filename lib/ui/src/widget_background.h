@@ -38,7 +38,7 @@ void Widget_DestroyBackground(LCUI_Widget w);
 
 void Widget_ComputeBackgroundStyle(LCUI_Widget widget);
 
-void Widget_PaintBakcground(LCUI_Widget w, LCUI_PaintContext paint,
+void Widget_PaintBakcground(LCUI_Widget w, pd_paint_context_t* paint,
 				     LCUI_WidgetActualStyle style);
 
 void Widget_ComputeBackground(LCUI_Widget w, LCUI_Background *out);

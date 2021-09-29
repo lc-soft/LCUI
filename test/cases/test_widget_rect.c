@@ -11,8 +11,8 @@ void test_widget_rect(void)
 	LCUI_Widget root;
 	LCUI_Widget parent, child;
 	LCUI_SysEventRec ev;
-	LCUI_Rect *rect;
-	LCUI_Rect expected_rect;
+	pd_rect_t *rect;
+	pd_rect_t expected_rect;
 	list_t rects;
 
 	LCUI_Init();

@@ -346,7 +346,7 @@ void TextLayer_Destroy(LCUI_TextLayer layer)
 
 /** 获取指定文本行中的文本段的矩形区域 */
 static int TextLayer_GetRowRect(LCUI_TextLayer layer, int i_row, int start_col,
-				int end_col, LCUI_Rect *rect)
+				int end_col, pd_rect_t *rect)
 {
 	int i;
 	LCUI_TextRow txtrow;
@@ -393,7 +393,7 @@ static int TextLayer_GetRowRect(LCUI_TextLayer layer, int i_row, int start_col,
 static void TextLayer_InvalidateRowRect(LCUI_TextLayer layer, int row,
 					int start, int end)
 {
-	LCUI_Rect rect;
+	pd_rect_t rect;
 	if (TextLayer_GetRowRect(layer, row, start, end, &rect) == 0) {
 		RectList_Add(&layer->dirty_rects, &rect);
 	}
@@ -404,7 +404,7 @@ void TextLayer_InvalidateRowsRect(LCUI_TextLayer layer, int start_row,
 				  int end_row)
 {
 	int i, y;
-	LCUI_Rect rect;
+	pd_rect_t rect;
 
 	if (end_row < 0 || end_row >= layer->text_rows.length) {
 		end_row = layer->text_rows.length - 1;
@@ -498,7 +498,7 @@ int TextLayer_SetCaretPosByPixelPos(LCUI_TextLayer layer, int x, int y)
 
 /** 获取指定行列的文字的像素坐标 */
 int TextLayer_GetCharPixelPos(LCUI_TextLayer layer, int row, int col,
-			      LCUI_Pos *pixel_pos)
+			      pd_pos_t *pixel_pos)
 {
 	LCUI_TextRow txtrow;
 	int i, pixel_x = 0, pixel_y = 0;
@@ -529,7 +529,7 @@ int TextLayer_GetCharPixelPos(LCUI_TextLayer layer, int row, int col,
 }
 
 /** 获取文本光标的像素坐标 */
-int TextLayer_GetCaretPixelPos(LCUI_TextLayer layer, LCUI_Pos *pixel_pos)
+int TextLayer_GetCaretPixelPos(LCUI_TextLayer layer, pd_pos_t *pixel_pos)
 {
 	return TextLayer_GetCharPixelPos(layer, layer->insert_y,
 					 layer->insert_x, pixel_pos);
@@ -1220,7 +1220,7 @@ void TextLayer_Update(LCUI_TextLayer layer, list_t *rects)
 	}
 }
 
-static void TextLayer_ValidateArea(LCUI_TextLayer layer, LCUI_Rect *area)
+static void TextLayer_ValidateArea(LCUI_TextLayer layer, pd_rect_t *area)
 {
 	int width, height;
 	if (layer->fixed_width > 0) {
@@ -1235,11 +1235,11 @@ static void TextLayer_ValidateArea(LCUI_TextLayer layer, LCUI_Rect *area)
 	} else {
 		height = TextLayer_GetHeight(layer);
 	}
-	LCUIRect_ValidateArea(area, width, height);
+	pd_rect_validate_area(area, width, height);
 }
 
 static void TextLayer_DrawChar(LCUI_TextLayer layer, LCUI_TextChar ch,
-			       LCUI_Graph *graph, LCUI_Pos ch_pos)
+			       pd_canvas_t *graph, pd_pos_t ch_pos)
 {
 	/* 判断文字使用的前景颜色，再进行绘制 */
 	if (ch->style && ch->style->has_fore_color) {
@@ -1251,12 +1251,12 @@ static void TextLayer_DrawChar(LCUI_TextLayer layer, LCUI_TextChar ch,
 	}
 }
 
-static void TextLayer_DrawTextRow(LCUI_TextLayer layer, LCUI_Rect *area,
-				  LCUI_Graph *graph, LCUI_Pos layer_pos,
+static void TextLayer_DrawTextRow(LCUI_TextLayer layer, pd_rect_t *area,
+				  pd_canvas_t *graph, pd_pos_t layer_pos,
 				  LCUI_TextRow txtrow, int y)
 {
 	LCUI_TextChar txtchar;
-	LCUI_Pos ch_pos;
+	pd_pos_t ch_pos;
 	int baseline, col, x;
 	baseline = txtrow->text_height * 4 / 5;
 	x = TextLayer_GetRowStartX(layer, txtrow) + layer->offset_x;
@@ -1288,12 +1288,12 @@ static void TextLayer_DrawTextRow(LCUI_TextLayer layer, LCUI_Rect *area,
 		ch_pos.x = layer_pos.x + x;
 		ch_pos.y = layer_pos.y + y;
 		if (txtchar->style && txtchar->style->has_back_color) {
-			LCUI_Rect rect;
+			pd_rect_t rect;
 			rect.x = ch_pos.x;
 			rect.y = ch_pos.y;
 			rect.height = txtrow->height;
 			rect.width = txtchar->bitmap->advance.x;
-			Graph_FillRect(graph, txtchar->style->back_color, &rect,
+			pd_canvas_fill_rect(graph, txtchar->style->back_color, &rect,
 				       TRUE);
 		}
 		ch_pos.x += txtchar->bitmap->left;
@@ -1309,8 +1309,8 @@ static void TextLayer_DrawTextRow(LCUI_TextLayer layer, LCUI_Rect *area,
 	}
 }
 
-int TextLayer_RenderTo(LCUI_TextLayer layer, LCUI_Rect area, LCUI_Pos layer_pos,
-		       LCUI_Graph *canvas)
+int TextLayer_RenderTo(LCUI_TextLayer layer, pd_rect_t area, pd_pos_t layer_pos,
+		       pd_canvas_t *canvas)
 {
 	int y, row;
 	LCUI_TextRow txtrow;
