@@ -43,7 +43,7 @@ LCUI_API void Widget_SetPadding(LCUI_Widget w, float top, float right,
 LCUI_API void Widget_SetMargin(LCUI_Widget w, float top, float right,
 			       float bottom, float left);
 
-LCUI_API void Widget_SetBorderColor(LCUI_Widget w, LCUI_Color color);
+LCUI_API void Widget_SetBorderColor(LCUI_Widget w, pd_color_t color);
 
 LCUI_API void Widget_SetBorderWidth(LCUI_Widget w, float width);
 
@@ -51,11 +51,11 @@ LCUI_API void Widget_SetBorderStyle(LCUI_Widget w, int style);
 
 /** 设置边框样式 */
 LCUI_API void Widget_SetBorder(LCUI_Widget w, float width, int style,
-			       LCUI_Color clr);
+			       pd_color_t clr);
 
 /** 设置阴影样式 */
 LCUI_API void Widget_SetBoxShadow(LCUI_Widget w, float x, float y, float blur,
-				  LCUI_Color color);
+				  pd_color_t color);
 
 /** 移动部件位置 */
 LCUI_API void Widget_Move(LCUI_Widget w, float left, float top);

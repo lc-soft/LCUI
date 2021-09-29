@@ -45,7 +45,7 @@ static void test_auto_size(void)
 {
 	LCUI_Widget w;
 	LCUI_Widget example;
-	LCUI_RectF rect;
+	pd_rectf_t rect;
 
 	// Update #test-text-auto-height content
 
@@ -111,7 +111,7 @@ static void test_auto_size(void)
 static void test_inline_block_nesting(void)
 {
 	LCUI_Widget w;
-	LCUI_RectF rect;
+	pd_rectf_t rect;
 
 	w = LCUIWidget_GetById("example-inline-block-nesting__block-1");
 	rect.x = 5;
@@ -168,7 +168,7 @@ static void test_block_layout_1280(void)
 	LCUI_Widget content;
 	LCUI_Widget example;
 	LCUI_Widget container;
-	LCUI_RectF rect;
+	pd_rectf_t rect;
 
 	container = Widget_GetChild(LCUIWidget_GetById("main"), 0);
 	LCUIDisplay_SetSize(1280, 800);
@@ -435,7 +435,7 @@ static void test_block_layout_600(void)
 	LCUI_Widget content;
 	LCUI_Widget example;
 	LCUI_Widget container;
-	LCUI_RectF rect;
+	pd_rectf_t rect;
 
 	container = Widget_GetChild(LCUIWidget_GetById("main"), 0);
 	LCUIDisplay_SetSize(600, 400);
@@ -620,7 +620,7 @@ static void test_block_layout_320(void)
 	LCUI_Widget content;
 	LCUI_Widget example;
 	LCUI_Widget container;
-	LCUI_RectF rect;
+	pd_rectf_t rect;
 
 	container = Widget_GetChild(LCUIWidget_GetById("main"), 0);
 	LCUIDisplay_SetSize(320, 240);

@@ -44,7 +44,7 @@ static void OnMotionNotify(LCUI_Event e, void *arg)
 {
 	XEvent *ev = arg;
 	LCUI_SysEventRec sys_ev;
-	static LCUI_Pos mouse_pos = { 0, 0 };
+	static pd_pos_t mouse_pos = { 0, 0 };
 	sys_ev.type = LCUI_MOUSEMOVE;
 	sys_ev.motion.x = ev->xmotion.x;
 	sys_ev.motion.y = ev->xmotion.y;

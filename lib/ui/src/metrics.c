@@ -79,7 +79,7 @@ int LCUIMetrics_ComputeActual(float value, LCUI_StyleType type)
 	return y_iround(LCUIMetrics_Compute(value, type) * metrics.scale);
 }
 
-void LCUIMetrics_ComputeRectActual(LCUI_Rect *dst, const LCUI_RectF *src)
+void LCUIMetrics_ComputeRectActual(pd_rect_t *dst, const pd_rectf_t *src)
 {
 	dst->x = y_iround(src->x * metrics.scale);
 	dst->y = y_iround(src->y * metrics.scale);

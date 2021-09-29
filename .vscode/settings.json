@@ -32,6 +32,7 @@
     "unistd.h": "c",
     "errno.h": "c",
     "fcntl.h": "c",
-    "metrics.h": "c"
+    "metrics.h": "c",
+    "painter.h": "c"
   }
 }

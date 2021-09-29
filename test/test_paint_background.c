@@ -5,42 +5,42 @@
 
 int test_paint_background_color(void)
 {
-        LCUI_Graph canvas;
-        LCUI_Color gray = RGB(240, 240, 240);
-        LCUI_Color green = RGB(102, 204, 0);
-        LCUI_Rect rect = { 200, 100, 400, 300 };
+        pd_canvas_t canvas;
+        pd_color_t gray = RGB(240, 240, 240);
+        pd_color_t green = RGB(102, 204, 0);
+        pd_rect_t rect = { 200, 100, 400, 300 };
         LCUI_Background bg = { 0 };
-        LCUI_PaintContext paint;
+        pd_paint_context_t* paint;
 
-        Graph_Init(&canvas);
-        Graph_Create(&canvas, 800, 600);
-        Graph_FillRect(&canvas, gray, NULL, FALSE);
+        pd_canvas_init(&canvas);
+        pd_canvas_create(&canvas, 800, 600);
+        pd_canvas_fill_rect(&canvas, gray, NULL, FALSE);
         // 设置背景色
         bg.color = green;
         // 创建绘制上下文
-        paint = LCUIPainter_Begin(&canvas, &rect);
+        paint = pd_painter_begin(&canvas, &rect);
         // 绘制背景
-        Background_Paint(&bg, &rect, paint);
+        pd_background_paint(&bg, &rect, paint);
         LCUI_WritePNGFile("test_paint_background_color.png", &canvas);
-        LCUIPainter_End(paint);
-        Graph_Free(&canvas);
+        pd_painter_end(paint);
+        pd_canvas_free(&canvas);
         return 0;
 }
 
 int test_paint_background_image(void)
 {
-        LCUI_Graph canvas;
-        LCUI_Graph image;
-        LCUI_Color gray = RGB(240, 240, 240);
-        LCUI_Color green = RGB(102, 204, 0);
-        LCUI_Rect rect = { 200, 100, 400, 300 };
+        pd_canvas_t canvas;
+        pd_canvas_t image;
+        pd_color_t gray = RGB(240, 240, 240);
+        pd_color_t green = RGB(102, 204, 0);
+        pd_rect_t rect = { 200, 100, 400, 300 };
         LCUI_Background bg = { 0 };
-        LCUI_PaintContext paint;
+        pd_paint_context_t* paint;
 
-        Graph_Init(&canvas);
-        Graph_Init(&image);
-        Graph_Create(&canvas, 800, 600);
-        Graph_FillRect(&canvas, gray, NULL, FALSE);
+        pd_canvas_init(&canvas);
+        pd_canvas_init(&image);
+        pd_canvas_create(&canvas, 800, 600);
+        pd_canvas_fill_rect(&canvas, gray, NULL, FALSE);
         // 读取背景图片
         if (LCUI_ReadImageFile("test_image_reader.png", &image) != 0) {
                 return -1;
@@ -52,30 +52,30 @@ int test_paint_background_image(void)
         bg.size.width = image.width;
         bg.size.height = image.height;
         // 创建绘制上下文
-        paint = LCUIPainter_Begin(&canvas, &rect);
+        paint = pd_painter_begin(&canvas, &rect);
         // 绘制背景
-        Background_Paint(&bg, &rect, paint);
+        pd_background_paint(&bg, &rect, paint);
         LCUI_WritePNGFile("test_paint_background_image.png", &canvas);
-        LCUIPainter_End(paint);
-        Graph_Free(&image);
-        Graph_Free(&canvas);
+        pd_painter_end(paint);
+        pd_canvas_free(&image);
+        pd_canvas_free(&canvas);
         return 0;
 }
 
 int test_paint_background_image_with_size(void)
 {
-        LCUI_Graph canvas;
-        LCUI_Graph image;
-        LCUI_Color gray = RGB(240, 240, 240);
-        LCUI_Color green = RGB(102, 204, 0);
-        LCUI_Rect rect = { 200, 100, 400, 300 };
+        pd_canvas_t canvas;
+        pd_canvas_t image;
+        pd_color_t gray = RGB(240, 240, 240);
+        pd_color_t green = RGB(102, 204, 0);
+        pd_rect_t rect = { 200, 100, 400, 300 };
         LCUI_Background bg = { 0 };
-        LCUI_PaintContext paint;
+        pd_paint_context_t* paint;
 
-        Graph_Init(&canvas);
-        Graph_Init(&image);
-        Graph_Create(&canvas, 800, 600);
-        Graph_FillRect(&canvas, gray, NULL, FALSE);
+        pd_canvas_init(&canvas);
+        pd_canvas_init(&image);
+        pd_canvas_create(&canvas, 800, 600);
+        pd_canvas_fill_rect(&canvas, gray, NULL, FALSE);
         // 读取背景图片
         if (LCUI_ReadImageFile("test_image_reader.png", &image) != 0) {
                 return -1;
@@ -88,30 +88,30 @@ int test_paint_background_image_with_size(void)
         bg.size.width = rect.width;
         bg.size.height = rect.height;
         // 创建绘制上下文
-        paint = LCUIPainter_Begin(&canvas, &rect);
+        paint = pd_painter_begin(&canvas, &rect);
         // 绘制背景
-        Background_Paint(&bg, &rect, paint);
+        pd_background_paint(&bg, &rect, paint);
         LCUI_WritePNGFile("test_paint_background_image_with_size.png", &canvas);
-        LCUIPainter_End(paint);
-        Graph_Free(&image);
-        Graph_Free(&canvas);
+        pd_painter_end(paint);
+        pd_canvas_free(&image);
+        pd_canvas_free(&canvas);
         return 0;
 }
 
 int test_paint_background_image_with_position(void)
 {
-        LCUI_Graph canvas;
-        LCUI_Graph image;
-        LCUI_Color gray = RGB(240, 240, 240);
-        LCUI_Color green = RGB(102, 204, 0);
-        LCUI_Rect rect = { 200, 100, 400, 300 };
+        pd_canvas_t canvas;
+        pd_canvas_t image;
+        pd_color_t gray = RGB(240, 240, 240);
+        pd_color_t green = RGB(102, 204, 0);
+        pd_rect_t rect = { 200, 100, 400, 300 };
         LCUI_Background bg = { 0 };
-        LCUI_PaintContext paint;
+        pd_paint_context_t* paint;
 
-        Graph_Init(&canvas);
-        Graph_Init(&image);
-        Graph_Create(&canvas, 800, 600);
-        Graph_FillRect(&canvas, gray, NULL, FALSE);
+        pd_canvas_init(&canvas);
+        pd_canvas_init(&image);
+        pd_canvas_create(&canvas, 800, 600);
+        pd_canvas_fill_rect(&canvas, gray, NULL, FALSE);
         // 读取背景图片
         if (LCUI_ReadImageFile("test_image_reader.png", &image) != 0) {
                 return -1;
@@ -126,14 +126,14 @@ int test_paint_background_image_with_position(void)
         bg.position.x = (rect.width - image.width) / 2;
         bg.position.y = (rect.height - image.height) / 2;
         // 创建绘制上下文
-        paint = LCUIPainter_Begin(&canvas, &rect);
+        paint = pd_painter_begin(&canvas, &rect);
         // 绘制背景
-        Background_Paint(&bg, &rect, paint);
+        pd_background_paint(&bg, &rect, paint);
         LCUI_WritePNGFile("test_paint_background_image_with_position.png",
                           &canvas);
-        LCUIPainter_End(paint);
-        Graph_Free(&image);
-        Graph_Free(&canvas);
+        pd_painter_end(paint);
+        pd_canvas_free(&image);
+        pd_canvas_free(&canvas);
         return 0;
 }
 

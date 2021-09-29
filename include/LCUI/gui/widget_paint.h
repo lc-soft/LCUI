@@ -41,7 +41,7 @@ LCUI_BEGIN_HEADER
  * @returns 标记成功返回 TRUE，如果该区域处于屏幕可见区域外则标记失败，返回FALSE
  */
 LCUI_API LCUI_BOOL Widget_InvalidateArea(LCUI_Widget widget,
-					 LCUI_RectF *in_rect, int box_type);
+					 pd_rectf_t *in_rect, int box_type);
 
 /**
  * 取出部件中的无效区域
@@ -58,14 +58,14 @@ LCUI_API size_t Widget_GetInvalidArea(LCUI_Widget w, list_t *rects);
  * @param[out]	out_rect	转换后的区域
  * @param[in]	box_type	转换后的区域所处的范围框
  */
-LCUI_API int Widget_ConvertArea(LCUI_Widget w, LCUI_Rect *in_rect,
-				LCUI_Rect *out_rect, int box_type);
+LCUI_API int Widget_ConvertArea(LCUI_Widget w, pd_rect_t *in_rect,
+				pd_rect_t *out_rect, int box_type);
 
-/** 将 LCUI_RectF 类型数据转换为无效区域 */
-LCUI_API void RectFToInvalidArea(const LCUI_RectF *rect, LCUI_Rect *area);
+/** 将 pd_rectf_t 类型数据转换为无效区域 */
+LCUI_API void RectFToInvalidArea(const pd_rectf_t *rect, pd_rect_t *area);
 
-/** 将 LCUI_Rect 类型数据转换为无效区域 */
-LCUI_API void RectToInvalidArea(const LCUI_Rect *rect, LCUI_Rect *area);
+/** 将 pd_rect_t 类型数据转换为无效区域 */
+LCUI_API void RectToInvalidArea(const pd_rect_t *rect, pd_rect_t *area);
 
 /**
  * 渲染指定部件呈现的图形内容
@@ -73,7 +73,7 @@ LCUI_API void RectToInvalidArea(const LCUI_Rect *rect, LCUI_Rect *area);
  * @param[in] paint 	进行绘制时所需的上下文
  * @return		返回实际渲染的部件的数量
  */
-LCUI_API size_t Widget_Render(LCUI_Widget w, LCUI_PaintContext paint);
+LCUI_API size_t Widget_Render(LCUI_Widget w, pd_paint_context_t* paint);
 
 LCUI_API void LCUIWidget_InitRenderer(void);
 

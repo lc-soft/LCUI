@@ -79,7 +79,7 @@ struct LCUI_SurfaceRec_ {
 	HDC hdc_client;				/**< 窗口的设备上下文 */
 	HBITMAP fb_bmp;				/**< 帧缓存 */
 	LCUI_BOOL is_ready;			/**< 是否已经准备好 */
-	LCUI_Graph fb;				/**< 帧缓存，保存当前窗口内呈现的图像内容 */
+	pd_canvas_t fb;				/**< 帧缓存，保存当前窗口内呈现的图像内容 */
 	LCUI_SurfaceTask tasks[TASK_TOTAL_NUM]; /**< 任务缓存 */
 	list_node_t node;                    /**< 在链表中的结点 */
 };
@@ -139,7 +139,7 @@ static void WinSurface_ExecDestroy(LCUI_Surface surface)
 	surface->hdc_fb = NULL;
 	surface->hdc_client = NULL;
 	surface->is_ready = FALSE;
-	Graph_Free(&surface->fb);
+	pd_canvas_free(&surface->fb);
 	WinSurface_ClearTasks(surface);
 	free(surface);
 }
@@ -199,8 +199,8 @@ static LCUI_Surface WinSurface_New(void)
 	surface->fb_bmp = NULL;
 	surface->is_ready = FALSE;
 	surface->node.data = surface;
-	Graph_Init(&surface->fb);
-	surface->fb.color_type = LCUI_COLOR_TYPE_ARGB;
+	pd_canvas_init(&surface->fb);
+	surface->fb.color_type = PD_COLOR_TYPE_ARGB;
 	for (i = 0; i < TASK_TOTAL_NUM; ++i) {
 		surface->tasks[i].is_valid = FALSE;
 	}
@@ -234,12 +234,12 @@ static void WinSurface_Move(LCUI_Surface surface, int x, int y)
 static void WinSurface_ExecResizeFrameBuffer(LCUI_Surface surface, int w, int h)
 {
 	HBITMAP old_bmp;
-	LCUI_Rect rect;
+	pd_rect_t rect;
 
 	if (surface->width == w && surface->height == h) {
 		return;
 	}
-	Graph_Create(&surface->fb, w, h);
+	pd_canvas_create(&surface->fb, w, h);
 	surface->fb_bmp = CreateCompatibleBitmap(surface->hdc_client, w, h);
 	old_bmp = (HBITMAP)SelectObject(surface->hdc_fb, surface->fb_bmp);
 	if (old_bmp) {
@@ -346,11 +346,11 @@ static void WinSurface_SetRenderMode(LCUI_Surface surface, int mode)
  * @param[in] rect	需进行绘制的区域，若为NULL，则绘制整个 surface
  * @return		返回绘制上下文句柄
  */
-static LCUI_PaintContext WinSurface_BeginPaint(LCUI_Surface surface,
-					       LCUI_Rect *rect)
+static pd_paint_context_t* WinSurface_BeginPaint(LCUI_Surface surface,
+					       pd_rect_t *rect)
 {
-	LCUI_PaintContext paint = LCUIPainter_Begin(&surface->fb, rect);
-	Graph_FillRect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
+	pd_paint_context_t* paint = pd_painter_begin(&surface->fb, rect);
+	pd_canvas_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
 	return paint;
 }
 
@@ -359,9 +359,9 @@ static LCUI_PaintContext WinSurface_BeginPaint(LCUI_Surface surface,
  * @param[in] surface	目标 surface
  * @param[in] paint_ctx	绘制上下文句柄
  */
-static void WinSurface_EndPaint(LCUI_Surface surface, LCUI_PaintContext paint)
+static void WinSurface_EndPaint(LCUI_Surface surface, pd_paint_context_t* paint)
 {
-	LCUIPainter_End(paint);
+	pd_painter_end(paint);
 }
 
 /** 将帧缓存中的数据呈现至Surface的窗口内 */
@@ -435,7 +435,7 @@ static void OnWMPaint(LCUI_Event e, void *arg)
 {
 	MSG *msg = arg;
 	PAINTSTRUCT ps;
-	LCUI_Rect area;
+	pd_rect_t area;
 	LCUI_Surface surface;
 	LCUI_DisplayEventRec dpy_ev;
 	BeginPaint(msg->hwnd, &ps);

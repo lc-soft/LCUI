@@ -3,13 +3,13 @@
 #include <LCUI/image.h>
 #include <LCUI/painter.h>
 
-int paint_background(LCUI_PaintContext paint, LCUI_Rect *box)
+int paint_background(pd_paint_context_t* paint, pd_rect_t *box)
 {
-	LCUI_Graph image;
-	LCUI_Color green = RGB(102, 204, 0);
+	pd_canvas_t image;
+	pd_color_t green = RGB(102, 204, 0);
 	LCUI_Background bg = { 0 };
 
-	Graph_Init(&image);
+	pd_canvas_init(&image);
 	// 读取背景图片
 	if (LCUI_ReadImageFile("test_image_reader.png", &image) != 0) {
 		return -1;
@@ -24,15 +24,15 @@ int paint_background(LCUI_PaintContext paint, LCUI_Rect *box)
 	bg.position.x = (box->width - image.width) / 2;
 	bg.position.y = (box->height - image.height) / 2;
 	// 绘制背景
-	Background_Paint(&bg, box, paint);
-	Graph_Free(&image);
+	pd_background_paint(&bg, box, paint);
+	pd_canvas_free(&image);
 	return 0;
 }
 
-void paint_border(LCUI_PaintContext paint, LCUI_Rect *box)
+void paint_border(pd_paint_context_t* paint, pd_rect_t *box)
 {
-	LCUI_Border border = { 0 };
-	LCUI_Color black = RGB(0, 0, 0);
+	pd_border_t border = { 0 };
+	pd_color_t black = RGB(0, 0, 0);
 
 	border.top.color = black;
 	border.top.style = SV_SOLID;
@@ -50,40 +50,40 @@ void paint_border(LCUI_PaintContext paint, LCUI_Rect *box)
 	border.top_right_radius = 32;
 	border.bottom_left_radius = 32;
 	border.bottom_right_radius = 32;
-	Border_Paint(&border, box, paint);
+	pd_border_paint(&border, box, paint);
 }
 
 int main(void)
 {
 	int border_size = 4;
 
-	LCUI_Graph canvas;
-	LCUI_Graph layer;
-	LCUI_Color gray = RGB(240, 240, 240);
-	LCUI_Rect border_box = { 0, 0, 400, 300 };
-	LCUI_Rect bg_box = { border_box.x + border_size,
+	pd_canvas_t canvas;
+	pd_canvas_t layer;
+	pd_color_t gray = RGB(240, 240, 240);
+	pd_rect_t border_box = { 0, 0, 400, 300 };
+	pd_rect_t bg_box = { border_box.x + border_size,
 			     border_box.y + border_size,
 			     border_box.width - border_size * 2,
 			     border_box.height - border_size * 2 };
-	LCUI_Rect layer_rect = { 0, 0, border_box.width, border_box.height };
-	LCUI_PaintContext paint;
+	pd_rect_t layer_rect = { 0, 0, border_box.width, border_box.height };
+	pd_paint_context_t* paint;
 
-	Graph_Init(&canvas);
-	Graph_Create(&canvas, 800, 600);
-	Graph_FillRect(&canvas, gray, NULL, FALSE);
+	pd_canvas_init(&canvas);
+	pd_canvas_create(&canvas, 800, 600);
+	pd_canvas_fill_rect(&canvas, gray, NULL, FALSE);
 
-	Graph_Init(&layer);
-	layer.color_type = LCUI_COLOR_TYPE_ARGB;
-	Graph_Create(&layer, layer_rect.width, layer_rect.height);
+	pd_canvas_init(&layer);
+	layer.color_type = PD_COLOR_TYPE_ARGB;
+	pd_canvas_create(&layer, layer_rect.width, layer_rect.height);
 
 	// 创建绘制上下文
-	paint = LCUIPainter_Begin(&layer, &layer_rect);
+	paint = pd_painter_begin(&layer, &layer_rect);
 	paint->with_alpha = TRUE;
 	paint_background(paint, &bg_box);
 	paint_border(paint, &border_box);
-	Graph_Mix(&canvas, &layer, (canvas.width - layer_rect.width) / 2,
+	pd_canvas_mix(&canvas, &layer, (canvas.width - layer_rect.width) / 2,
 		  (canvas.height - layer_rect.height) / 2, FALSE);
 	LCUI_WritePNGFile("test_paint_border.png", &canvas);
-	Graph_Free(&canvas);
+	pd_canvas_free(&canvas);
 	return 0;
 }

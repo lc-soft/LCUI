@@ -1438,7 +1438,7 @@ static void PrintStyleValue(LCUI_Style s)
 		logger_debug("%s", s->val_bool ? "true" : "false");
 		break;
 	case LCUI_STYPE_COLOR: {
-		LCUI_Color *clr = &s->val_color;
+		pd_color_t *clr = &s->val_color;
 		if (clr->alpha < 255) {
 			logger_debug("rgba(%d,%d,%d,%g)", clr->r, clr->g, clr->b,
 				clr->a / 255.0);

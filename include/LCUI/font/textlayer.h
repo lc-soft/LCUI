@@ -151,11 +151,11 @@ LCUI_API int TextLayer_SetCaretPosByPixelPos(LCUI_TextLayer layer, int x,
 
 /** 获取指定行列的文字的像素坐标 */
 LCUI_API int TextLayer_GetCharPixelPos(LCUI_TextLayer layer, int row, int col,
-				       LCUI_Pos *pixel_pos);
+				       pd_pos_t *pixel_pos);
 
 /** 获取文本光标的像素坐标 */
 LCUI_API int TextLayer_GetCaretPixelPos(LCUI_TextLayer layer,
-					LCUI_Pos *pixel_pos);
+					pd_pos_t *pixel_pos);
 
 /** 清空文本 */
 LCUI_API void TextLayer_ClearText(LCUI_TextLayer layer);
@@ -240,8 +240,8 @@ LCUI_API void TextLayer_Update(LCUI_TextLayer layer, list_t *rects);
  * @param layer_pos 文本图层在目标图像中的位置
  * @param cavans 目标画布
  */
-LCUI_API int TextLayer_RenderTo(LCUI_TextLayer layer, LCUI_Rect area,
-				LCUI_Pos layer_pos, LCUI_Graph *canvas);
+LCUI_API int TextLayer_RenderTo(LCUI_TextLayer layer, pd_rect_t area,
+				pd_pos_t layer_pos, pd_canvas_t *canvas);
 
 /** 清除已记录的无效矩形 */
 LCUI_API void TextLayer_ClearInvalidRect(LCUI_TextLayer layer);

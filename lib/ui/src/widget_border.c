@@ -56,9 +56,9 @@ void Widget_ComputeBorderStyle(LCUI_Widget w)
 {
 	int key;
 	LCUI_Style s;
-	LCUI_BorderStyle *b;
+	pd_border_style_t *b;
 	b = &w->computed_style.border;
-	memset(b, 0, sizeof(LCUI_BorderStyle));
+	memset(b, 0, sizeof(pd_border_style_t));
 	for (key = key_border_start; key <= key_border_end; ++key) {
 		s = &w->style->sheet[key];
 		if (!s->is_valid) {
@@ -131,9 +131,9 @@ static unsigned int ComputeActual(float width)
 }
 
 /** 计算部件边框样式的实际值 */
-void Widget_ComputeBorder(LCUI_Widget w, LCUI_Border *b)
+void Widget_ComputeBorder(LCUI_Widget w, pd_border_t *b)
 {
-	LCUI_BorderStyle *s;
+	pd_border_style_t *s;
 	float r = y_min(w->width, w->height) / 2.0f;
 
 	s = &w->computed_style.border;
@@ -155,26 +155,26 @@ void Widget_ComputeBorder(LCUI_Widget w, LCUI_Border *b)
 	b->bottom_right_radius = ComputeActual(y_min(s->bottom_right_radius, r));
 }
 
-void Widget_PaintBorder(LCUI_Widget w, LCUI_PaintContext paint,
+void Widget_PaintBorder(LCUI_Widget w, pd_paint_context_t* paint,
 			LCUI_WidgetActualStyle style)
 {
-	LCUI_Rect box;
+	pd_rect_t box;
 
 	box.x = style->border_box.x - style->canvas_box.x;
 	box.y = style->border_box.y - style->canvas_box.y;
 	box.width = style->border_box.width;
 	box.height = style->border_box.height;
-	Border_Paint(&style->border, &box, paint);
+	pd_border_paint(&style->border, &box, paint);
 }
 
-void Widget_CropContent(LCUI_Widget w, LCUI_PaintContext paint,
+void Widget_CropContent(LCUI_Widget w, pd_paint_context_t* paint,
 			LCUI_WidgetActualStyle style)
 {
-	LCUI_Rect box;
+	pd_rect_t box;
 
 	box.x = style->border_box.x - style->canvas_box.x;
 	box.y = style->border_box.y - style->canvas_box.y;
 	box.width = style->border_box.width;
 	box.height = style->border_box.height;
-	Border_CropContent(&style->border, &box, paint);
+	pd_border_crop_content(&style->border, &box, paint);
 }

@@ -57,20 +57,23 @@ typedef unsigned char LCUI_BOOL;
 typedef unsigned char uchar_t;
 typedef void (*CallBackFunc)(void *, void *);
 
-/** 色彩模式 */
-typedef enum LCUI_ColorType {
-	LCUI_COLOR_TYPE_INDEX8,   /**< 8位索引 */
-	LCUI_COLOR_TYPE_GRAY8,    /**< 8位灰度 */
-	LCUI_COLOR_TYPE_RGB323,   /**< RGB323 */
-	LCUI_COLOR_TYPE_ARGB2222, /**< ARGB2222 */
-	LCUI_COLOR_TYPE_RGB555,   /**< RGB555 */
-	LCUI_COLOR_TYPE_RGB565,   /**< RGB565 */
-	LCUI_COLOR_TYPE_RGB888,   /**< RGB888 */
-	LCUI_COLOR_TYPE_ARGB8888  /**< RGB8888 */
-} LCUI_ColorType;
+// used for PandaGL
+typedef unsigned char pd_bool;
 
-#define LCUI_COLOR_TYPE_RGB LCUI_COLOR_TYPE_RGB888
-#define LCUI_COLOR_TYPE_ARGB LCUI_COLOR_TYPE_ARGB8888
+/** 色彩模式 */
+typedef enum pd_color_type {
+	PD_COLOR_TYPE_INDEX8,   /**< 8位索引 */
+	PD_COLOR_TYPE_GRAY8,    /**< 8位灰度 */
+	PD_COLOR_TYPE_RGB323,   /**< RGB323 */
+	PD_COLOR_TYPE_ARGB2222, /**< ARGB2222 */
+	PD_COLOR_TYPE_RGB555,   /**< RGB555 */
+	PD_COLOR_TYPE_RGB565,   /**< RGB565 */
+	PD_COLOR_TYPE_RGB888,   /**< RGB888 */
+	PD_COLOR_TYPE_ARGB8888  /**< RGB8888 */
+} pd_color_type;
+
+#define PD_COLOR_TYPE_RGB PD_COLOR_TYPE_RGB888
+#define PD_COLOR_TYPE_ARGB PD_COLOR_TYPE_ARGB8888
 
 typedef union LCUI_RGB565_ {
 	short unsigned int value;
@@ -86,7 +89,7 @@ typedef union LCUI_RGB565_ {
 	};
 } LCUI_RGB565;
 
-typedef union LCUI_ARGB8888_ {
+typedef union pd_color_t_ {
 	int32_t value;
 	struct {
 		uchar_t b;
@@ -100,28 +103,28 @@ typedef union LCUI_ARGB8888_ {
 		uchar_t red;
 		uchar_t alpha;
 	};
-} LCUI_ARGB, LCUI_ARGB8888, LCUI_Color;
+} pd_color_t;
 
 /** Position in plane coordinate system */
-typedef struct LCUI_Pos_ {
+typedef struct pd_pos_t_ {
 	int x, y;
-} LCUI_Pos;
+} pd_pos_t;
 
 typedef struct LCUI_Size_ {
 	int width, height;
 } LCUI_Size;
 
-typedef struct LCUI_Rect_ {
+typedef struct pd_rect_t_ {
 	int x, y, width, height;
-} LCUI_Rect;
+} pd_rect_t;
 
 typedef struct LCUI_Rect2_ {
 	int left, top, right, bottom;
 } LCUI_Rect2;
 
-typedef struct LCUI_RectF_ {
+typedef struct pd_rectf_t_ {
 	float x, y, width, height;
-} LCUI_RectF;
+} pd_rectf_t;
 
 typedef struct LCUI_Rect2F_ {
 	float left, top, right, bottom;
@@ -215,72 +218,72 @@ typedef enum LCUI_StyleType {
 #define LCUI_STYPE_0 LCUI_STYPE_NONE
 #define LCUI_STYPE_none LCUI_STYPE_NONE
 
-typedef struct LCUI_BoxShadowStyle {
+typedef struct pd_boxshadow_style_t_ {
 	float x, y;
 	float blur;
 	float spread;
-	LCUI_Color color;
-} LCUI_BoxShadowStyle;
+	pd_color_t color;
+} pd_boxshadow_style_t;
 
-typedef struct LCUI_BoxShadow {
+typedef struct pd_boxshadow_t_ {
 	int x, y;
 	int blur;
 	int spread;
-	LCUI_Color color;
+	pd_color_t color;
 	int top_left_radius;
 	int top_right_radius;
 	int bottom_left_radius;
 	int bottom_right_radius;
-} LCUI_BoxShadow;
+} pd_boxshadow_t;
 
-typedef struct LCUI_BorderStyle {
+typedef struct pd_border_style_t_ {
 	struct {
 		int style;
 		float width;
-		LCUI_Color color;
+		pd_color_t color;
 	} top, right, bottom, left;
 	float top_left_radius;
 	float top_right_radius;
 	float bottom_left_radius;
 	float bottom_right_radius;
-} LCUI_BorderStyle;
+} pd_border_style_t;
 
-typedef struct LCUI_BorderLine {
+typedef struct pd_border_line_t {
 	int style;
 	unsigned int width;
-	LCUI_Color color;
-} LCUI_BorderLine;
+	pd_color_t color;
+} pd_border_line_t;
 
-typedef struct LCUI_Border {
-	LCUI_BorderLine top, right, bottom, left;
+typedef struct pd_border_t {
+	pd_border_line_t top, right, bottom, left;
 	unsigned int top_left_radius;
 	unsigned int top_right_radius;
 	unsigned int bottom_left_radius;
 	unsigned int bottom_right_radius;
-} LCUI_Border;
+} pd_border_t;
 
-typedef struct LCUI_Graph_ LCUI_Graph;
+typedef struct pd_canvas_t_ pd_canvas_t;
 
-typedef struct LCUI_GraphQuote_ {
+typedef struct pd_graph_quote_t_ {
 	int top;
 	int left;
-	LCUI_BOOL is_valid;
-	LCUI_BOOL is_writable;
+	pd_bool is_valid;
+	pd_bool is_writable;
 	union {
-		LCUI_Graph *source;
-		const LCUI_Graph *source_ro;
+		pd_canvas_t *source;
+		const pd_canvas_t *source_ro;
 	};
-} LCUI_GraphQuote;
+} pd_canvas_quote_t;
 
-struct LCUI_Graph_ {
+struct pd_canvas_t_ {
 	unsigned width;
 	unsigned height;
-	LCUI_GraphQuote quote;
+	pd_canvas_quote_t quote;
 	union {
 		uchar_t *bytes;
-		LCUI_ARGB *argb;
+		pd_color_t *argb;
 	};
-	LCUI_ColorType color_type;
+	pd_color_type color_type;
 	unsigned bytes_per_pixel;
 	unsigned bytes_per_row;
 	float opacity;
@@ -314,10 +317,10 @@ typedef struct LCUI_StyleRec_ {
 		char *val_string;
 		wchar_t *wstring;
 		wchar_t *val_wstring;
-		LCUI_Color color;
-		LCUI_Color val_color;
-		LCUI_Graph *image;
-		LCUI_Graph *val_image;
+		pd_color_t color;
+		pd_color_t val_color;
+		pd_canvas_t *image;
+		pd_canvas_t *val_image;
 		LCUI_BOOL val_bool;
 	};
 } LCUI_StyleRec, *LCUI_Style;
@@ -407,8 +410,8 @@ typedef struct LCUI_BackgroundSize {
 } LCUI_BackgroundSize;
 
 typedef struct LCUI_BackgroundStyle {
-	LCUI_Graph image; /**< 背景图 */
-	LCUI_Color color; /**< 背景色 */
+	pd_canvas_t image; /**< 背景图 */
+	pd_color_t color; /**< 背景色 */
 	struct {
 		LCUI_BOOL x, y;
 	} repeat;                         /**< 背景图是否重复 */
@@ -417,8 +420,8 @@ typedef struct LCUI_BackgroundStyle {
 } LCUI_BackgroundStyle;
 
 typedef struct LCUI_Background {
-	LCUI_Graph *image; /**< 背景图 */
-	LCUI_Color color;  /**< 背景色 */
+	pd_canvas_t *image; /**< 背景图 */
+	pd_color_t color;  /**< 背景色 */
 	struct {
 		LCUI_BOOL x, y;
 	} repeat; /**< 背景图是否重复 */
@@ -431,11 +434,11 @@ typedef struct LCUI_Background {
 } LCUI_Background;
 
 /** 进行绘制时所需的上下文 */
-typedef struct LCUI_PaintContextRec_ {
-	LCUI_Rect rect;    /**< 需要绘制的区域 */
-	LCUI_Graph canvas; /**< 绘制后的位图缓存（可称为：画布） */
-	LCUI_BOOL with_alpha; /**< 绘制时是否需要处理 alpha 通道 */
-} LCUI_PaintContextRec, *LCUI_PaintContext;
+typedef struct pd_paint_context_t_ {
+	pd_rect_t rect;    /**< 需要绘制的区域 */
+	pd_canvas_t canvas; /**< 绘制后的位图缓存（可称为：画布） */
+	pd_bool with_alpha; /**< 绘制时是否需要处理 alpha 通道 */
+} pd_paint_context_t;
 
 typedef void (*FuncPtr)(void *);
 

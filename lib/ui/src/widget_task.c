@@ -280,7 +280,7 @@ static size_t Widget_UpdateVisibleChildren(LCUI_Widget w,
 {
 	size_t total = 0, count;
 	LCUI_BOOL found = FALSE;
-	LCUI_RectF rect, visible_rect;
+	pd_rectf_t rect, visible_rect;
 	LCUI_Widget child, parent;
 	list_node_t *node, *next;
 

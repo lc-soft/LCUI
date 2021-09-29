@@ -21,7 +21,7 @@ static struct TestStatus {
 void UpdateWidgetStyle(LCUI_Widget w, void *arg)
 {
 	size_t index;
-	LCUI_Color color;
+	pd_color_t color;
 
 	index = w->index % BLOCK_COUNT + w->index / BLOCK_COUNT;
 	index = ((index + self.color_index) * 256 / BLOCK_COUNT) % 512;
@@ -79,7 +79,7 @@ void InitBackground(void)
 	size_t n = BLOCK_COUNT;
 	LCUI_Widget w;
 	LCUI_Widget root;
-	LCUI_Color color;
+	pd_color_t color;
 	LCUI_WidgetRulesRec rules = { 0 };
 	const float width = SCREEN_WIDTH * 1.0f / n;
 	const float height = SCREEN_HEIGHT * 1.0f / n;
@@ -116,8 +116,8 @@ void InitRenderStatus(void)
 {
 	LCUI_Widget root;
 	LCUI_Widget status;
-	LCUI_Color white = RGB(255, 255, 255);
-	LCUI_Color black = RGB(0, 0, 0);
+	pd_color_t white = RGB(255, 255, 255);
+	pd_color_t black = RGB(0, 0, 0);
 
 	root = LCUIWidget_GetRoot();
 	status = LCUIWidget_New("textview");

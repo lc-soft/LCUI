@@ -145,7 +145,7 @@ static void TextEdit_UpdateCaret(LCUI_Widget widget)
 	float x, y, caret_x = 0, caret_y = 0;
 
 	if (!edit->is_placeholder_shown) {
-		LCUI_Pos pos;
+		pd_pos_t pos;
 		if (TextLayer_GetCaretPixelPos(edit->layer, &pos) != 0) {
 			return;
 		}
@@ -344,7 +344,7 @@ static void TextEdit_UpdateTextLayer(LCUI_Widget w)
 {
 	float scale;
 	list_t rects;
-	LCUI_RectF rect;
+	pd_rectf_t rect;
 	LCUI_TextEdit edit;
 	LCUI_TextStyleRec style;
 	list_node_t *node;
@@ -418,7 +418,7 @@ static void TextEdit_OnResize(LCUI_Widget w, float width, float height)
 	list_t rects;
 	list_node_t *node;
 
-	LCUI_RectF rect;
+	pd_rectf_t rect;
 	LCUI_TextEdit edit = GetData(w);
 
 	list_create(&rects);
@@ -930,26 +930,26 @@ static void TextEdit_OnDestroy(LCUI_Widget widget)
 	}
 }
 
-static void TextEdit_OnPaint(LCUI_Widget w, LCUI_PaintContext paint,
+static void TextEdit_OnPaint(LCUI_Widget w, pd_paint_context_t* paint,
 			     LCUI_WidgetActualStyle style)
 {
-	LCUI_Pos pos;
-	LCUI_Graph canvas;
-	LCUI_Rect content_rect, rect;
+	pd_pos_t pos;
+	pd_canvas_t canvas;
+	pd_rect_t content_rect, rect;
 	LCUI_TextEdit edit = GetData(w);
 
 	content_rect.width = style->content_box.width;
 	content_rect.height = style->content_box.height;
 	content_rect.x = style->content_box.x - style->canvas_box.x;
 	content_rect.y = style->content_box.y - style->canvas_box.y;
-	if (!LCUIRect_GetOverlayRect(&content_rect, &paint->rect, &rect)) {
+	if (!pd_rect_get_overlay_rect(&content_rect, &paint->rect, &rect)) {
 		return;
 	}
 	pos.x = content_rect.x - rect.x;
 	pos.y = content_rect.y - rect.y;
 	rect.x -= paint->rect.x;
 	rect.y -= paint->rect.y;
-	Graph_Quote(&canvas, &paint->canvas, &rect);
+	pd_canvas_quote(&canvas, &paint->canvas, &rect);
 	rect = paint->rect;
 	rect.x -= content_rect.x;
 	rect.y -= content_rect.y;

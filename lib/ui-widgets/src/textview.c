@@ -127,7 +127,7 @@ static void TextView_Update(LCUI_Widget w)
 {
 	float scale = LCUIMetrics_GetScale();
 
-	LCUI_RectF rect;
+	pd_rectf_t rect;
 	LCUI_TextView txt = GetData(w);
 
 	list_t rects;
@@ -259,7 +259,7 @@ static void TextView_OnResize(LCUI_Widget w, float width, float height)
 	int fixed_width = (int)(width * scale);
 	int fixed_height = (int)(height * scale);
 
-	LCUI_RectF rect;
+	pd_rectf_t rect;
 	LCUI_TextView txt = GetData(w);
 
 	list_t rects;
@@ -277,26 +277,26 @@ static void TextView_OnResize(LCUI_Widget w, float width, float height)
 	RectList_Clear(&rects);
 }
 
-static void TextView_OnPaint(LCUI_Widget w, LCUI_PaintContext paint,
+static void TextView_OnPaint(LCUI_Widget w, pd_paint_context_t* paint,
 			     LCUI_WidgetActualStyle style)
 {
-	LCUI_Pos pos;
-	LCUI_Graph canvas;
-	LCUI_Rect content_rect, rect;
+	pd_pos_t pos;
+	pd_canvas_t canvas;
+	pd_rect_t content_rect, rect;
 	LCUI_TextView txt = GetData(w);
 
 	content_rect.width = style->content_box.width;
 	content_rect.height = style->content_box.height;
 	content_rect.x = style->content_box.x - style->canvas_box.x;
 	content_rect.y = style->content_box.y - style->canvas_box.y;
-	if (!LCUIRect_GetOverlayRect(&content_rect, &paint->rect, &rect)) {
+	if (!pd_rect_get_overlay_rect(&content_rect, &paint->rect, &rect)) {
 		return;
 	}
 	pos.x = content_rect.x - rect.x;
 	pos.y = content_rect.y - rect.y;
 	rect.x -= paint->rect.x;
 	rect.y -= paint->rect.y;
-	Graph_Quote(&canvas, &paint->canvas, &rect);
+	pd_canvas_quote(&canvas, &paint->canvas, &rect);
 	rect = paint->rect;
 	rect.x -= content_rect.x;
 	rect.y -= content_rect.y;
@@ -366,7 +366,7 @@ void TextView_SetTextAlign(LCUI_Widget w, int align)
 	Widget_SetFontStyle(w, key_text_align, align, style);
 }
 
-void TextView_SetColor(LCUI_Widget w, LCUI_Color color)
+void TextView_SetColor(LCUI_Widget w, pd_color_t color)
 {
 	Widget_SetFontStyle(w, key_color, color, color);
 }

@@ -142,10 +142,10 @@ int LCUI_ReadPNGHeader(LCUI_ImageReader reader)
 	reader->header.type = LCUI_PNG_IMAGE;
 	switch (reader->header.color_type) {
 	case PNG_COLOR_TYPE_RGB_ALPHA:
-		reader->header.color_type = LCUI_COLOR_TYPE_ARGB;
+		reader->header.color_type = PD_COLOR_TYPE_ARGB;
 		break;
 	case PNG_COLOR_TYPE_RGB:
-		reader->header.color_type = LCUI_COLOR_TYPE_RGB;
+		reader->header.color_type = PD_COLOR_TYPE_RGB;
 		break;
 	default:
 		reader->header.color_type = 0;
@@ -158,7 +158,7 @@ int LCUI_ReadPNGHeader(LCUI_ImageReader reader)
 #endif
 }
 
-int LCUI_ReadPNG(LCUI_ImageReader reader, LCUI_Graph *graph)
+int LCUI_ReadPNG(LCUI_ImageReader reader, pd_canvas_t *graph)
 {
 #ifdef USE_LIBPNG
 	png_uint_32 i;
@@ -184,17 +184,17 @@ int LCUI_ReadPNG(LCUI_ImageReader reader, LCUI_Graph *graph)
 	}
 	/* 根据不同的色彩类型进行相应处理 */
 	switch (header->color_type) {
-	case LCUI_COLOR_TYPE_ARGB:
-		graph->color_type = LCUI_COLOR_TYPE_ARGB;
-		ret = Graph_Create(graph, header->width, header->height);
+	case PD_COLOR_TYPE_ARGB:
+		graph->color_type = PD_COLOR_TYPE_ARGB;
+		ret = pd_canvas_create(graph, header->width, header->height);
 		if (ret != 0) {
 			ret = -ENOMEM;
 			break;
 		}
 		break;
-	case LCUI_COLOR_TYPE_RGB:
-		graph->color_type = LCUI_COLOR_TYPE_RGB;
-		ret = Graph_Create(graph, header->width, header->height);
+	case PD_COLOR_TYPE_RGB:
+		graph->color_type = PD_COLOR_TYPE_RGB;
+		ret = pd_canvas_create(graph, header->width, header->height);
 		if (ret != 0) {
 			ret = -ENOMEM;
 			break;
@@ -225,11 +225,11 @@ int LCUI_ReadPNG(LCUI_ImageReader reader, LCUI_Graph *graph)
 #endif
 }
 
-int LCUI_WritePNGFile(const char *file_name, const LCUI_Graph *graph)
+int LCUI_WritePNGFile(const char *file_name, const pd_canvas_t *graph)
 {
 #ifdef USE_LIBPNG
 	FILE *fp;
-	LCUI_Rect rect;
+	pd_rect_t rect;
 	png_byte color_type;
 	png_structp png_ptr;
 	png_infop info_ptr;
@@ -237,8 +237,8 @@ int LCUI_WritePNGFile(const char *file_name, const LCUI_Graph *graph)
 	size_t x, row_size;
 	int y;
 
-	if (!Graph_IsValid(graph)) {
-		logger_error("graph is not valid\n");
+	if (!pd_canvas_is_valid(graph)) {
+		logger_error("canvas is not valid\n");
 		return -1;
 	}
 	/* create file */
@@ -283,10 +283,10 @@ int LCUI_WritePNGFile(const char *file_name, const LCUI_Graph *graph)
 	png_write_info(png_ptr, info_ptr);
 	/* write bytes */
 
-	Graph_GetValidRect(graph, &rect);
-	graph = Graph_GetQuote(graph);
-	if (graph->color_type == LCUI_COLOR_TYPE_ARGB) {
-		LCUI_ARGB *px_ptr, *px_row_ptr;
+	pd_canvas_get_valid_rect(graph, &rect);
+	graph = pd_canvas_get_quote(graph);
+	if (graph->color_type == PD_COLOR_TYPE_ARGB) {
+		pd_color_t *px_ptr, *px_row_ptr;
 
 		row_size = png_get_rowbytes(png_ptr, info_ptr);
 		px_row_ptr = graph->argb + rect.y * graph->width + rect.x;

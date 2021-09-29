@@ -40,35 +40,35 @@
 LCUI_BEGIN_HEADER
 
 /* 将数值转换成LCUI_Rect型结构体 */
-LCUI_API LCUI_Rect Rect(int x, int y, int w, int h);
+LCUI_API pd_rect_t Rect(int x, int y, int w, int h);
 
 /** 根据容器尺寸，获取指定区域中需要裁剪的区域 */
-LCUI_API void LCUIRect_GetCutArea(int box_w, int box_h, LCUI_Rect rect,
-				  LCUI_Rect *cut);
+LCUI_API void pd_rect_get_cut_area(int box_w, int box_h, pd_rect_t rect,
+				  pd_rect_t *cut);
 
 #define LCUIRect_HasPoint(rect, X, Y)                                         \
 	(X >= (rect)->x && Y >= (rect)->y && X < (rect)->x + (rect)->width && \
 	 Y < (rect)->y + (rect)->height)
 
 /** 将矩形区域范围调整在容器有效范围内 */
-LCUI_API LCUI_BOOL LCUIRect_ValidateArea(LCUI_Rect *rect, int box_w, int box_h);
+LCUI_API LCUI_BOOL pd_rect_validate_area(pd_rect_t *rect, int box_w, int box_h);
 
-LCUI_API LCUI_BOOL LCUIRectF_ValidateArea(LCUI_RectF *rect, float box_w,
+LCUI_API LCUI_BOOL LCUIRectF_ValidateArea(pd_rectf_t *rect, float box_w,
 					  float box_h);
 
-LCUI_API void LCUIRect_ToRectF(const LCUI_Rect *rect, LCUI_RectF *rectf,
+LCUI_API void LCUIRect_ToRectF(const pd_rect_t *rect, pd_rectf_t *rectf,
 			       float scale);
 
-LCUI_API void LCUIRect_Scale(const LCUI_Rect *src, LCUI_Rect *dst, float scale);
+LCUI_API void LCUIRect_Scale(const pd_rect_t *src, pd_rect_t *dst, float scale);
 
-LCUI_API void LCUIRectF_ToRect(const LCUI_RectF *rectf, LCUI_Rect *rect,
+LCUI_API void LCUIRectF_ToRect(const pd_rectf_t *rectf, pd_rect_t *rect,
 			       float scale);
 
 /** 检测矩形是否遮盖另一个矩形 */
-LCUI_API LCUI_BOOL LCUIRect_IsCoverRect(const LCUI_Rect *a, const LCUI_Rect *b);
+LCUI_API LCUI_BOOL LCUIRect_IsCoverRect(const pd_rect_t *a, const pd_rect_t *b);
 
-LCUI_API LCUI_BOOL LCUIRectF_IsCoverRect(const LCUI_RectF *a,
-					 const LCUI_RectF *b);
+LCUI_API LCUI_BOOL LCUIRectF_IsCoverRect(const pd_rectf_t *a,
+					 const pd_rectf_t *b);
 
 /**
  * 获取两个矩形中的重叠矩形
@@ -77,19 +77,19 @@ LCUI_API LCUI_BOOL LCUIRectF_IsCoverRect(const LCUI_RectF *a,
  * @param[out] out	矩形A和B重叠处的矩形
  * @returns 如果两个矩形重叠，则返回TRUE，否则返回FALSE
  */
-LCUI_API LCUI_BOOL LCUIRect_GetOverlayRect(const LCUI_Rect *a,
-					   const LCUI_Rect *b, LCUI_Rect *out);
+LCUI_API LCUI_BOOL pd_rect_get_overlay_rect(const pd_rect_t *a,
+					   const pd_rect_t *b, pd_rect_t *out);
 
-LCUI_API LCUI_BOOL LCUIRectF_GetOverlayRect(const LCUI_RectF *a,
-					    const LCUI_RectF *b,
-					    LCUI_RectF *out);
+LCUI_API LCUI_BOOL LCUIRectF_GetOverlayRect(const pd_rectf_t *a,
+					    const pd_rectf_t *b,
+					    pd_rectf_t *out);
 
 /** 合并两个矩形 */
-LCUI_API void LCUIRect_MergeRect(LCUI_Rect *big, const LCUI_Rect *a,
-				 const LCUI_Rect *b);
+LCUI_API void LCUIRect_MergeRect(pd_rect_t *big, const pd_rect_t *a,
+				 const pd_rect_t *b);
 
-LCUI_API void LCUIRectF_MergeRect(LCUI_RectF *big, const LCUI_RectF *a,
-				  const LCUI_RectF *b);
+LCUI_API void LCUIRectF_MergeRect(pd_rectf_t *big, const pd_rectf_t *a,
+				  const pd_rectf_t *b);
 
 /**
  * 根据重叠矩形 rect1，将矩形 rect2 分割成四个矩形
@@ -105,13 +105,13 @@ LCUI_API void LCUIRectF_MergeRect(LCUI_RectF *big, const LCUI_RectF *a,
  *
  * rect2 必须被 rect1 完全包含
  */
-LCUI_API void LCUIRect_CutFourRect(LCUI_Rect *rect1, LCUI_Rect *rect2,
-				   LCUI_Rect rects[4]);
+LCUI_API void LCUIRect_CutFourRect(pd_rect_t *rect1, pd_rect_t *rect2,
+				   pd_rect_t rects[4]);
 
-LCUI_API void LCUIRect_Split(LCUI_Rect *base, LCUI_Rect *target,
-			     LCUI_Rect rects[4]);
+LCUI_API void LCUIRect_Split(pd_rect_t *base, pd_rect_t *target,
+			     pd_rect_t rects[4]);
 
-INLINE LCUI_BOOL LCUIRectF_IsEquals(const LCUI_RectF *a, const LCUI_RectF *b)
+INLINE LCUI_BOOL LCUIRectF_IsEquals(const pd_rectf_t *a, const pd_rectf_t *b)
 {
 	return (int)(100 * (a->x - b->x)) == 0 &&
 	       (int)(100 * (a->y - b->y)) == 0 &&
@@ -119,20 +119,20 @@ INLINE LCUI_BOOL LCUIRectF_IsEquals(const LCUI_RectF *a, const LCUI_RectF *b)
 	       (int)(100 * (a->height - b->height)) == 0;
 }
 
-INLINE LCUI_BOOL LCUIRect_IsEquals(const LCUI_Rect *a, const LCUI_Rect *b)
+INLINE LCUI_BOOL LCUIRect_IsEquals(const pd_rect_t *a, const pd_rect_t *b)
 {
 	return a->x == b->x && a->y == b->y && a->width == b->width &&
 	       a->height == b->height;
 }
 
-LCUI_API int RectList_AddEx(list_t *list, LCUI_Rect *rect,
+LCUI_API int RectList_AddEx(list_t *list, pd_rect_t *rect,
 			    LCUI_BOOL auto_merge);
 
 /** 添加一个脏矩形记录 */
-LCUI_API int RectList_Add(list_t *list, LCUI_Rect *rect);
+LCUI_API int RectList_Add(list_t *list, pd_rect_t *rect);
 
 /** 删除脏矩形 */
-LCUI_API int RectList_Delete(list_t *list, LCUI_Rect *rect);
+LCUI_API int RectList_Delete(list_t *list, pd_rect_t *rect);
 
 #define RectList_Clear(LIST) list_destroy(LIST, free)
 

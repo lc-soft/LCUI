@@ -2,15 +2,15 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
 
-void Graph_DrawHorizLine(LCUI_Graph *graph, LCUI_Color color, int size,
-			 LCUI_Pos start, int len)
+void pd_graph_draw_horiz_line(pd_canvas_t *canvas, pd_color_t color, int size,
+			 pd_pos_t start, int len)
 {
 	int y, x;
-	LCUI_Rect area;
-	LCUI_Graph *des;
+	pd_rect_t area;
+	pd_canvas_t *des;
 
-	des = Graph_GetQuote(graph);
-	Graph_GetValidRect(graph, &area);
+	des = pd_canvas_get_quote(canvas);
+	pd_canvas_get_valid_rect(canvas, &area);
 	start.x = area.x + start.x;
 	start.y = area.y + start.y;
 
@@ -28,8 +28,8 @@ void Graph_DrawHorizLine(LCUI_Graph *graph, LCUI_Color color, int size,
 	if (start.y + size > area.y + area.height) {
 		size = area.y + area.height - start.y;
 	}
-	if (des->color_type == LCUI_COLOR_TYPE_ARGB) {
-		LCUI_ARGB *pPixel, *pRowPixel;
+	if (des->color_type == PD_COLOR_TYPE_ARGB) {
+		pd_color_t *pPixel, *pRowPixel;
 		pRowPixel = des->argb + start.y*des->width + start.x;
 		for (y = 0; y < size; ++y) {
 			pPixel = pRowPixel;
@@ -57,15 +57,15 @@ void Graph_DrawHorizLine(LCUI_Graph *graph, LCUI_Color color, int size,
 	}
 }
 
-LCUI_API void Graph_DrawVertiLine(LCUI_Graph *graph, LCUI_Color color,
-				  int size, LCUI_Pos start, int len)
+void pd_graph_draw_verti_line(pd_canvas_t *canvas, pd_color_t color,
+				  int size, pd_pos_t start, int len)
 {
 	int y, x;
-	LCUI_Rect area;
-	LCUI_Graph *des;
+	pd_rect_t area;
+	pd_canvas_t *des;
 
-	des = Graph_GetQuote(graph);
-	Graph_GetValidRect(graph, &area);
+	des = pd_canvas_get_quote(canvas);
+	pd_canvas_get_valid_rect(canvas, &area);
 	start.x = area.x + start.x;
 	start.y = area.y + start.y;
 
@@ -85,8 +85,8 @@ LCUI_API void Graph_DrawVertiLine(LCUI_Graph *graph, LCUI_Color color,
 		len = area.y + area.height - start.y;
 	}
 
-	if (des->color_type == LCUI_COLOR_TYPE_ARGB) {
-		LCUI_ARGB *pPixel, *pRowPixel;
+	if (des->color_type == PD_COLOR_TYPE_ARGB) {
+		pd_color_t *pPixel, *pRowPixel;
 		pRowPixel = des->argb + start.y*des->width + start.x;
 		for (y = 0; y < len; ++y) {
 			pPixel = pRowPixel;

@@ -118,13 +118,13 @@ int LCUI_ReadBMPHeader(LCUI_ImageReader reader)
 	reader->header.height = info->height;
 	reader->header.type = LCUI_BMP_IMAGE;
 	if (info->bits == 24) {
-		reader->header.color_type = LCUI_COLOR_TYPE_RGB;
+		reader->header.color_type = PD_COLOR_TYPE_RGB;
 		reader->header.bit_depth = 24;
 	}
 	return 0;
 }
 
-int LCUI_ReadBMP(LCUI_ImageReader reader, LCUI_Graph *graph)
+int LCUI_ReadBMP(LCUI_ImageReader reader, pd_canvas_t *graph)
 {
 	long offset;
 	unsigned char *buffer, *dest;
@@ -143,7 +143,7 @@ int LCUI_ReadBMP(LCUI_ImageReader reader, LCUI_Graph *graph)
 	/* 信息头中的偏移位置是相对于起始处，需要减去当前已经偏移的位置 */
 	offset = bmp_reader->header.offset - bmp_reader->info.size - 14;
 	reader->fn_skip(reader->stream_data, offset);
-	if (0 != Graph_Create(graph, info->width, info->height)) {
+	if (0 != pd_canvas_create(graph, info->width, info->height)) {
 		return -ENOMEM;
 	}
 	/* 暂时不实现其它色彩类型处理 */

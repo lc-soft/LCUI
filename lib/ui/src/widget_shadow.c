@@ -56,10 +56,10 @@ void Widget_ComputeBoxShadowStyle(LCUI_Widget w)
 {
 	int key;
 	LCUI_Style s;
-	LCUI_BoxShadowStyle *sd;
+	pd_boxshadow_style_t *sd;
 
 	sd = &w->computed_style.shadow;
-	memset(sd, 0, sizeof(LCUI_BoxShadowStyle));
+	memset(sd, 0, sizeof(pd_boxshadow_style_t));
 	for (key = key_box_shadow_start; key <= key_box_shadow_end; ++key) {
 		s = &w->style->sheet[key];
 		if (!s->is_valid) {
@@ -89,7 +89,7 @@ void Widget_ComputeBoxShadowStyle(LCUI_Widget w)
 
 float Widget_GetBoxShadowOffsetX(LCUI_Widget w)
 {
-	const LCUI_BoxShadowStyle *shadow;
+	const pd_boxshadow_style_t *shadow;
 
 	shadow = &w->computed_style.shadow;
 	if (shadow->x >= SHADOW_WIDTH(shadow)) {
@@ -100,7 +100,7 @@ float Widget_GetBoxShadowOffsetX(LCUI_Widget w)
 
 float Widget_GetBoxShadowOffsetY(LCUI_Widget w)
 {
-	const LCUI_BoxShadowStyle *shadow;
+	const pd_boxshadow_style_t *shadow;
 
 	shadow = &w->computed_style.shadow;
 	if (shadow->y >= SHADOW_WIDTH(shadow)) {
@@ -112,7 +112,7 @@ float Widget_GetBoxShadowOffsetY(LCUI_Widget w)
 float Widget_GetCanvasWidth(LCUI_Widget widget)
 {
 	float width;
-	const LCUI_BoxShadowStyle *shadow;
+	const pd_boxshadow_style_t *shadow;
 
 	width = widget->box.border.width;
 	shadow = &widget->computed_style.shadow;
@@ -127,7 +127,7 @@ float Widget_GetCanvasWidth(LCUI_Widget widget)
 float Widget_GetCanvasHeight(LCUI_Widget widget)
 {
 	float height;
-	const LCUI_BoxShadowStyle *shadow;
+	const pd_boxshadow_style_t *shadow;
 
 	height = widget->box.border.height;
 	shadow = &widget->computed_style.shadow;
@@ -141,10 +141,10 @@ float Widget_GetCanvasHeight(LCUI_Widget widget)
 
 #define ComputeActual(X) LCUIMetrics_ComputeActual(X, LCUI_STYPE_PX)
 
-void Widget_ComputeBoxShadow(LCUI_Widget w, LCUI_BoxShadow *out)
+void Widget_ComputeBoxShadow(LCUI_Widget w, pd_boxshadow_t *out)
 {
-	LCUI_BoxShadowStyle *s;
-	LCUI_BorderStyle *b;
+	pd_boxshadow_style_t *s;
+	pd_border_style_t *b;
 
 	b = &w->computed_style.border;
 	s = &w->computed_style.shadow;
@@ -159,14 +159,14 @@ void Widget_ComputeBoxShadow(LCUI_Widget w, LCUI_BoxShadow *out)
 	out->bottom_right_radius = ComputeActual(b->bottom_right_radius);
 }
 
-void Widget_PaintBoxShadow(LCUI_Widget w, LCUI_PaintContext paint,
+void Widget_PaintBoxShadow(LCUI_Widget w, pd_paint_context_t* paint,
 			   LCUI_WidgetActualStyle style)
 {
-	LCUI_Rect box;
+	pd_rect_t box;
 
 	box.x = box.y = 0;
 	box.width = style->canvas_box.width;
 	box.height = style->canvas_box.height;
-	BoxShadow_Paint(&style->shadow, &box, style->border_box.width,
+	pd_boxshadow_paint(&style->shadow, &box, style->border_box.width,
 			style->border_box.height, paint);
 }

@@ -138,13 +138,13 @@ void TextStyle_SetSize(LCUI_TextStyle ts, int pixel_size)
 	ts->has_pixel_size = TRUE;
 }
 
-void TextStyle_SetForeColor(LCUI_TextStyle ts, LCUI_Color color)
+void TextStyle_SetForeColor(LCUI_TextStyle ts, pd_color_t color)
 {
 	ts->fore_color = color;
 	ts->has_fore_color = TRUE;
 }
 
-void TextStyle_SetBackColor(LCUI_TextStyle ts, LCUI_Color color)
+void TextStyle_SetBackColor(LCUI_TextStyle ts, pd_color_t color)
 {
 	ts->back_color = color;
 	ts->has_back_color = TRUE;

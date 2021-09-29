@@ -56,7 +56,7 @@ typedef struct LCUI_CSSFontStyleRec_ {
 	int *font_ids;
 	char *font_family;
 	wchar_t *content;
-	LCUI_Color color;
+	pd_color_t color;
 	LCUI_FontStyle font_style;
 	LCUI_FontWeight font_weight;
 	LCUI_StyleValue text_align;

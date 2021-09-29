@@ -42,7 +42,7 @@ typedef struct LCUI_ImageInterfaceRec_ {
 	const char *suffix;
 	int (*init)(LCUI_ImageReader);
 	int (*read_header)(LCUI_ImageReader);
-	int (*read)(LCUI_ImageReader, LCUI_Graph *);
+	int (*read)(LCUI_ImageReader, pd_canvas_t *);
 } LCUI_ImageInterfaceRec, *LCUI_ImageInterface;
 
 static const LCUI_ImageInterfaceRec interfaces[] = {
@@ -154,7 +154,7 @@ int LCUI_ReadImageHeader(LCUI_ImageReader reader)
 	return -2;
 }
 
-int LCUI_ReadImage(LCUI_ImageReader reader, LCUI_Graph *out)
+int LCUI_ReadImage(LCUI_ImageReader reader, pd_canvas_t *out)
 {
 	int i = reader->type - 1;
 	if (i < n_interfaces && i >= 0) {
@@ -163,7 +163,7 @@ int LCUI_ReadImage(LCUI_ImageReader reader, LCUI_Graph *out)
 	return -2;
 }
 
-int LCUI_ReadImageFile(const char *filepath, LCUI_Graph *out)
+int LCUI_ReadImageFile(const char *filepath, pd_canvas_t *out)
 {
 	int ret;
 	FILE *fp;
