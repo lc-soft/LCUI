@@ -141,8 +141,11 @@ static void OnKeyboardMessage(LCUI_Event ev, void *arg)
 	_DEBUG_MSG("shift: %d, ctrl: %d\n", sys_ev.key.shift_key,
 		   sys_ev.key.ctrl_key);
 	LCUI_TriggerEvent(&sys_ev, NULL);
-	if (keysym >= XK_space && keysym <= XK_asciitilde &&
-	    sys_ev.type == LCUI_KEYDOWN) {
+	 
+	int min_keycode;
+	int max_keycode;
+        XDisplayKeycodes(x11->display, &min_keycode, &max_keycode);
+	if (keysym >= min_keycode && keysym <= max_keycode && sys_ev.type == LCUI_KEYDOWN) {
 		sys_ev.type = LCUI_KEYPRESS;
 		sys_ev.key.code = ConvertKeyCodeToChar(x11, x_ev);
 		_DEBUG_MSG("char: %c\n", sys_ev.key.code);
