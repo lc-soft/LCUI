@@ -119,6 +119,9 @@ static void OnKeyboardMessage(LCUI_Event ev, void *arg)
 	XEvent *x_ev = arg;
 	LCUI_X11AppDriver x11;
 	LCUI_SysEventRec sys_ev;
+	int min_keycode;
+	int max_keycode;
+
 	switch (x_ev->type) {
 	case KeyPress:
 		sys_ev.type = LCUI_KEYDOWN;
@@ -141,11 +144,10 @@ static void OnKeyboardMessage(LCUI_Event ev, void *arg)
 	_DEBUG_MSG("shift: %d, ctrl: %d\n", sys_ev.key.shift_key,
 		   sys_ev.key.ctrl_key);
 	LCUI_TriggerEvent(&sys_ev, NULL);
-	 
-	int min_keycode;
-	int max_keycode;
-        XDisplayKeycodes(x11->display, &min_keycode, &max_keycode);
-	if (keysym >= min_keycode && keysym <= max_keycode && sys_ev.type == LCUI_KEYDOWN) {
+
+	XDisplayKeycodes(x11->display, &min_keycode, &max_keycode);
+	if (keysym >= min_keycode && keysym <= max_keycode &&
+	    sys_ev.type == LCUI_KEYDOWN) {
 		sys_ev.type = LCUI_KEYPRESS;
 		sys_ev.key.code = ConvertKeyCodeToChar(x11, x_ev);
 		_DEBUG_MSG("char: %c\n", sys_ev.key.code);
