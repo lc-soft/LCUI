@@ -1,5 +1,13 @@
 /*
- * linux_x11keyboard.c -- keyboard support for linux xwindow.
+ * linux_x11clipboard.c -- keyboard support for linux xwindow
+ *
+ * References:
+ * - https://github.com/exebook/x11clipboard/blob/master/x11paste.c
+ * - https://github.com/libsdl-org/SDL/blob/515b7e93b5af3dc552a7974ed7245a0e0456ae2a/src/video/x11/SDL_x11events.c
+ * - https://github.com/libsdl-org/SDL/blob/main/src/video/x11/SDL_x11clipboard.c
+ * - https://github.com/GNOME/gtk/blob/b539c92312d449f41710e6930aaf086454d667d2/gdk/x11/gdkclipboard-x11.c
+ * - https://github.com/godotengine/godot/blob/a7011fa29488f5356949667eb8e2b296cbbd9923/platform/linuxbsd/display_server_x11.cpp
+ *
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
@@ -37,7 +45,13 @@
 #include <LCUI/platform.h>
 #include LCUI_EVENTS_H
 #include LCUI_CLIPBOARD_H
-#include <X11/XKBlib.h>
+#include <X11/Xatom.h>
+
+#ifdef X_HAVE_UTF8_STRING
+#define TEXT_FORMAT XInternAtom(display, "UTF8_STRING", FALSE)
+#else
+#define TEXT_FORMAT XA_STRING
+#endif
 
 typedef struct LCUI_ClipboardCallbackRec_ {
 	void *widget;
@@ -50,18 +64,60 @@ static struct LCUI_LinuxClipboardDriver {
 	LCUI_ClipboardCallback callback;
 } clipboard;
 
+
+void ExecuteCallback(void)
+{
+	LCUI_ClipboardCallback callback = clipboard.callback;
+	if (!callback->running) {
+		// @WhoAteDaCake
+		// TODO: some sort of error ?
+		return;
+	}
+	callback->action(callback->widget, clipboard.text);
+	// Reset properties, so if something goes wrongly, we crash
+	// instead of having undefined behaviour
+	callback->widget = NULL;
+	callback->action = NULL;
+	callback->running = FALSE;
+}
+
+void RequestClipboard(void)
+{
+	LCUI_X11AppDriver x11 = LCUI_GetAppData();
+	Display *display = x11->display;
+	// @WhoAteDaCake
+	// Not sure which window should be used root or main
+	Window window = x11->win_root;
+	Atom CLIPBOARD = XInternAtom(display, "CLIPBOARD", 0);
+	Window clipboard_owner = XGetSelectionOwner(display, CLIPBOARD);
+	// No need to continue, we should have stored text already
+	// when copy was done
+	if (clipboard_owner == window) {
+		ExecuteCallback();
+		return;
+	}
+	// @WhoAteDaCake
+	// TODO: needs error handling if we can't access the clipboard?
+	// TODO: check who the owner is, if it's us, we can call the callback
+	// directly with text stored in clipboard.text
+	Atom format = TEXT_FORMAT;
+	Atom XSEL_DATA = XInternAtom(display, "XSEL_DATA", 0);
+	XConvertSelection(display, CLIPBOARD, format, XSEL_DATA, window, CurrentTime);
+}
+
 void LCUI_LinuxX11UseClipboard(void *widget, void *action) {
 	// TODO: maybe run a warning if it's already running
 	LCUI_ClipboardCallback callback = clipboard.callback;
 	callback->widget = widget;
 	callback->action = action;
 	callback->running = TRUE;
-	// Handle 
-	printf("handling keyboard\n");
+	// Request paste event
+	RequestClipboard();
 }
 
 static void OnPasteReady(LCUI_Event ev, void *arg)
 {
+	printf("Print ready!\n");
 	// KeySym keysym;
 	// XEvent *x_ev = arg;
 	// LCUI_X11AppDriver x11;
