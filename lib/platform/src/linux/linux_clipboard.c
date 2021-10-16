@@ -50,7 +50,7 @@
 #include LCUI_EVENTS_H
 #include LCUI_CLIPBOARD_H
 
-static void LCUI_LinuxUseClipboard(void *widget, void *action)
+void LCUI_LinuxUseClipboard(void *widget, void *action)
 {
 #ifdef USE_LIBX11
 	if (LCUI_GetAppId() == LCUI_APP_LINUX_X11) {
