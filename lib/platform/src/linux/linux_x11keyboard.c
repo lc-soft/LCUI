@@ -143,7 +143,6 @@ static void OnKeyboardMessage(LCUI_Event ev, void *arg)
 	sys_ev.key.ctrl_key = x_ev->xkey.state & ControlMask ? TRUE : FALSE;
 	_DEBUG_MSG("shift: %d, ctrl: %d\n", sys_ev.key.shift_key,
 		   sys_ev.key.ctrl_key);
-	LCUI_TriggerEvent(&sys_ev, NULL);
 
 	XDisplayKeycodes(x11->display, &min_keycode, &max_keycode);
 	if (keysym >= min_keycode && keysym <= max_keycode &&
@@ -151,8 +150,8 @@ static void OnKeyboardMessage(LCUI_Event ev, void *arg)
 		sys_ev.type = LCUI_KEYPRESS;
 		sys_ev.key.code = ConvertKeyCodeToChar(x11, x_ev);
 		_DEBUG_MSG("char: %c\n", sys_ev.key.code);
-		LCUI_TriggerEvent(&sys_ev, NULL);
 	}
+	LCUI_TriggerEvent(&sys_ev, NULL);
 }
 
 void LCUI_InitLinuxX11Keyboard(void)
