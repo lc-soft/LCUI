@@ -714,6 +714,12 @@ static void TextEdit_TextDelete(LCUI_Widget widget, int n_ch)
 	Widget_TriggerEvent(widget, &ev, NULL);
 }
 
+static void TextEdit_OnClipboardReady(LCUI_Widget widged, void* arg)
+{
+	printf("Clipboard ready\n");
+}
+
+
 /** 处理按键事件 */
 static void TextEdit_OnKeyDown(LCUI_Widget widget, LCUI_WidgetEvent e,
 			       void *arg)
@@ -771,6 +777,10 @@ static void TextEdit_OnKeyDown(LCUI_Widget widget, LCUI_WidgetEvent e,
 		break;
 	}
 	TextEdit_MoveCaret(widget, cur_row, cur_col);
+	// CTRL+V
+	if (e->key.code == 86 && e->key.ctrl_key) {
+		LCUI_UseClipboard(widget, TextEdit_OnClipboardReady);
+	}
 }
 
 /** 处理输入法对文本框输入的内容 */
