@@ -714,9 +714,10 @@ static void TextEdit_TextDelete(LCUI_Widget widget, int n_ch)
 	Widget_TriggerEvent(widget, &ev, NULL);
 }
 
-static void TextEdit_OnClipboardReady(LCUI_Widget widged, void* arg)
+static void TextEdit_OnClipboardReady(LCUI_Widget widget, void* arg)
 {
-	printf("Clipboard ready\n");
+	char *text = arg;
+	printf("Received: %s\n", text);
 }
 
 

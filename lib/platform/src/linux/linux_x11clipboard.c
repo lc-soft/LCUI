@@ -7,6 +7,7 @@
  * - https://github.com/libsdl-org/SDL/blob/main/src/video/x11/SDL_x11clipboard.c
  * - https://github.com/GNOME/gtk/blob/b539c92312d449f41710e6930aaf086454d667d2/gdk/x11/gdkclipboard-x11.c
  * - https://github.com/godotengine/godot/blob/a7011fa29488f5356949667eb8e2b296cbbd9923/platform/linuxbsd/display_server_x11.cpp
+ * - https://www.jwz.org/doc/x-cut-and-paste.html
  *
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
@@ -59,6 +60,9 @@ typedef struct LCUI_ClipboardCallbackRec_ {
 	LCUI_BOOL running;
 } LCUI_ClipboardCallbackRec, *LCUI_ClipboardCallback;
 
+// @WhoAteDaCake
+// TODO: do we need a mutex here? As the action is unlikely to happen
+// often, safety seems to be a bigger priority than speed
 static struct LCUI_LinuxClipboardDriver {
 	char* text;
 	LCUI_ClipboardCallback callback;
@@ -81,43 +85,77 @@ void ExecuteCallback(void)
 	callback->running = FALSE;
 }
 
-void RequestClipboard(void)
+void RequestClipboardContent(void)
 {
 	LCUI_X11AppDriver x11 = LCUI_GetAppData();
 	Display *display = x11->display;
-	// @WhoAteDaCake
-	// Not sure which window should be used root or main
-	Window window = x11->win_root;
-	Atom CLIPBOARD = XInternAtom(display, "CLIPBOARD", 0);
+	Window window = x11->win_main;
+	Atom CLIPBOARD = XInternAtom(display, "CLIPBOARD", FALSE);
 	Window clipboard_owner = XGetSelectionOwner(display, CLIPBOARD);
 	// No need to continue, we should have stored text already
 	// when copy was done
 	if (clipboard_owner == window) {
+		_DEBUG_MSG("Clipboard owned by self\n");
 		ExecuteCallback();
+		return;
+	}
+	if (clipboard_owner == None) {
+		_DEBUG_MSG("Clipboard owned not found\n");
 		return;
 	}
 	// @WhoAteDaCake
 	// TODO: needs error handling if we can't access the clipboard?
-	// TODO: check who the owner is, if it's us, we can call the callback
-	// directly with text stored in clipboard.text
-	Atom format = TEXT_FORMAT;
-	Atom XSEL_DATA = XInternAtom(display, "XSEL_DATA", 0);
-	XConvertSelection(display, CLIPBOARD, format, XSEL_DATA, window, CurrentTime);
+	Atom XSEL_DATA = XInternAtom(display, "XSEL_DATA", FALSE);
+	XConvertSelection(display, CLIPBOARD, TEXT_FORMAT, XSEL_DATA, window, CurrentTime);
+	_DEBUG_MSG("Clipboard content requested, expect SelectionNotify\n");
 }
 
 void LCUI_LinuxX11UseClipboard(void *widget, void *action) {
-	// TODO: maybe run a warning if it's already running
 	LCUI_ClipboardCallback callback = clipboard.callback;
+	if (callback->running) {
+		_DEBUG_MSG("Tried to paste, while a paste was in progress\n");
+		return;
+	}
 	callback->widget = widget;
 	callback->action = action;
 	callback->running = TRUE;
-	// Request paste event
-	RequestClipboard();
+	RequestClipboardContent();
 }
 
-static void OnPasteReady(LCUI_Event ev, void *arg)
+static void OnSelectionNotify(LCUI_Event ev, void *arg)
 {
-	printf("Print ready!\n");
+	LCUI_ClipboardCallback callback = clipboard.callback;
+	if (!callback->running) {
+		_DEBUG_MSG("SelectionNotify received, with no callback\n");
+		return;
+	}
+	_DEBUG_MSG("SelectionNotify received\n");
+	XEvent *x_ev = arg;
+	LCUI_X11AppDriver x11 = LCUI_GetAppData();
+	Display *display = x11->display;
+	Atom CLIPBOARD = XInternAtom(display, "CLIPBOARD", FALSE);
+
+	switch(x_ev->type) {
+		// @WhoAteDaCake
+		// TODO: handle other event variations
+		case SelectionNotify:
+		if (x_ev->xselection.selection == CLIPBOARD) {
+			_DEBUG_MSG("Received Clipboard event\n");
+			unsigned long N, size;
+			char * data;
+			Atom target;
+			int format;
+			XGetWindowProperty(x_ev->xselection.display, x_ev->xselection.requestor,
+				x_ev->xselection.property, 0L,(~0L), 0, AnyPropertyType, &target,
+				&format, &size, &N,(unsigned char**)&data);
+			if(target == TEXT_FORMAT || target == XA_STRING) {
+				clipboard.text = strndup(data, size);
+				XFree(data);
+			}
+			XDeleteProperty(x_ev->xselection.display, x_ev->xselection.requestor, x_ev->xselection.property);
+			ExecuteCallback();
+		}
+	}
 	// KeySym keysym;
 	// XEvent *x_ev = arg;
 	// LCUI_X11AppDriver x11;
@@ -160,19 +198,19 @@ static void OnPasteReady(LCUI_Event ev, void *arg)
 
 void LCUI_InitLinuxX11Clipboard(void)
 {
-	// Allocate clipboard once
+	// Allocate callback once
 	LCUI_ClipboardCallback callback;
 	callback = NEW(LCUI_ClipboardCallbackRec, 1);
 	callback->running = FALSE;
 	clipboard.callback = callback;
 
-	LCUI_BindSysEvent(SelectionNotify, OnPasteReady, NULL, NULL);
+	LCUI_BindSysEvent(SelectionNotify, OnSelectionNotify, NULL, NULL);
 }
 
 void LCUI_FreeLinuxX11Clipboard(void)
 {	
 	free(clipboard.callback);
-	LCUI_UnbindSysEvent(SelectionNotify, OnPasteReady);
+	LCUI_UnbindSysEvent(SelectionNotify, OnSelectionNotify);
 }
 
 #endif
