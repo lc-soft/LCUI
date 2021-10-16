@@ -31,6 +31,10 @@
 #ifndef LCUI_LINUX_CLIPBOARD_H
 #define LCUI_LINUX_CLIPBOARD_H
 
+#ifdef USE_LIBX11
+#include <LCUI/platform/linux/linux_x11clipboard.h>
+#endif
+
 void LCUI_LinuxUseClipboard(void *widget, void *action);
 
 void LCUI_InitLinuxClipboard(void);

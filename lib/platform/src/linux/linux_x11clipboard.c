@@ -36,41 +36,31 @@
 #include <LCUI/input.h>
 #include <LCUI/platform.h>
 #include LCUI_EVENTS_H
-// #include LCUI_KEYBOARD_H
+#include LCUI_CLIPBOARD_H
 #include <X11/XKBlib.h>
 
-// static struct LCUI_LinuxKeyboardDriver {
-// #ifdef USE_LINUX_INPUT_EVENT
-// 	int dev_fd;
-// 	char *dev_path;
-// #else
-// 	int fd;
-// 	struct termios tm;
-// #endif
-// 	LCUI_Thread tid;
-// 	LCUI_BOOL active;
-// } keyboard;
-
-typedef struct LCUI_ClipboardCallback {
+typedef struct LCUI_ClipboardCallbackRec_ {
 	void *widget;
-	void *(action)(void *widget, char *text);
-} LCUI_ClipboardCallback;
+	void (*action)(void *widget, char *text);
+	LCUI_BOOL running;
+} LCUI_ClipboardCallbackRec, *LCUI_ClipboardCallback;
 
 static struct LCUI_LinuxClipboardDriver {
 	char* text;
 	LCUI_ClipboardCallback callback;
 } clipboard;
 
-static void LCUI_LinuxX11UseClipboard(void *widget, void *action) {
+void LCUI_LinuxX11UseClipboard(void *widget, void *action) {
 	// TODO: maybe run a warning if it's already running
-	LCUI_ClipboardCallback callback = {0};
-	callback.widget = widget;
-	callback.action = action;
-	clipboard.callback = callback;
-	
+	LCUI_ClipboardCallback callback = clipboard.callback;
+	callback->widget = widget;
+	callback->action = action;
+	callback->running = TRUE;
+	// Handle 
+	printf("handling keyboard\n");
 }
 
-static void OnClipboardMessage(LCUI_Event ev, void *arg)
+static void OnPasteReady(LCUI_Event ev, void *arg)
 {
 	// KeySym keysym;
 	// XEvent *x_ev = arg;
@@ -114,15 +104,19 @@ static void OnClipboardMessage(LCUI_Event ev, void *arg)
 
 void LCUI_InitLinuxX11Clipboard(void)
 {
-	LCUI_BindSysEvent(SelectionNotify, OnClipboardMessage);
-	// LCUI_BindSysEvent(KeyPress, OnKeyboardMessage, NULL, NULL);
-	// LCUI_BindSysEvent(KeyRelease, OnKeyboardMessage, NULL, NULL);
+	// Allocate clipboard once
+	LCUI_ClipboardCallback callback;
+	callback = NEW(LCUI_ClipboardCallbackRec, 1);
+	callback->running = FALSE;
+	clipboard.callback = callback;
+
+	LCUI_BindSysEvent(SelectionNotify, OnPasteReady, NULL, NULL);
 }
 
 void LCUI_FreeLinuxX11Clipboard(void)
-{
-	LCUI_UnbindSysEvent(SelectionNotify, OnClipboardMessage);
-	// LCUI_UnbindSysEvent(KeyRelease, OnKeyboardMessage);
+{	
+	free(clipboard.callback);
+	LCUI_UnbindSysEvent(SelectionNotify, OnPasteReady);
 }
 
 #endif
