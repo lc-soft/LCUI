@@ -53,6 +53,9 @@
 #ifdef LCUI_KEYBOARD_H
 #include LCUI_KEYBOARD_H
 #endif
+#ifdef LCUI_CLIPBOARD_H
+#include LCUI_CLIPBOARD_H
+#endif
 #ifdef LCUI_DISPLAY_H
 #include LCUI_DISPLAY_H
 #endif
@@ -678,6 +681,7 @@ void LCUI_Init(void)
 	LCUI_InitDisplay(NULL);
 	LCUI_InitMouseDriver();
 	LCUI_InitKeyboardDriver();
+	LCUI_InitClipboardDriver();
 	LCUI_InitKeyboard();
 	LCUI_InitIME();
 
@@ -706,6 +710,7 @@ int LCUI_Destroy(void)
 	LCUI_FreeDisplay();
 	LCUI_FreeMouseDriver();
 	LCUI_FreeKeyboardDriver();
+	LCUI_FreeClipboardDriver();
 	LCUI_FreeApp();
 	LCUI_FreeIME();
 	LCUI_FreeKeyboard();
