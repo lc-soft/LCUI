@@ -714,10 +714,32 @@ static void TextEdit_TextDelete(LCUI_Widget widget, int n_ch)
 	Widget_TriggerEvent(widget, &ev, NULL);
 }
 
+static void TextEdit_OnPaste(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
+{
+	char *utf8_text = arg;
+	if (utf8_text != NULL) {
+		// @WhoAteDaCake
+		// TODO: is there a point in extracting this to a shared library code?
+		// Since this is done within TextView_SetText as well
+		int ret;
+		wchar_t *wstr;
+		size_t len = strlen(utf8_text) + 1;
+
+		wstr = malloc(sizeof(wchar_t) * len);
+		decode_utf8(wstr, utf8_text, len);
+		TextEdit_InsertTextW(w, wstr);
+		if (wstr) {
+			free(wstr);
+		}
+	}
+}
+
 static void TextEdit_OnClipboardReady(LCUI_Widget widget, void* arg)
 {
-	char *text = arg;
-	printf("Received: %s\n", text);
+	LCUI_WidgetEventRec e = { 0 };
+
+	LCUI_InitWidgetEvent(&e, "paste");
+	Widget_TriggerEvent(widget, &e, arg);
 }
 
 
@@ -919,6 +941,7 @@ static void TextEdit_OnInit(LCUI_Widget w)
 	Widget_BindEvent(w, "focus", TextEdit_OnFocus, NULL, NULL);
 	Widget_BindEvent(w, "blur", TextEdit_OnBlur, NULL, NULL);
 	Widget_BindEvent(w, "ready", TextEdit_OnReady, NULL, NULL);
+	Widget_BindEvent(w, "paste", TextEdit_OnPaste, NULL, NULL);
 	Widget_Append(w, edit->caret);
 	Widget_Hide(edit->caret);
 	LCUIMutex_Init(&edit->mutex);
