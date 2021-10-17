@@ -72,8 +72,10 @@
 	#define LCUI_InitClipboardDriver LCUI_InitLinuxClipboard
 	#define LCUI_FreeClipboardDriver LCUI_FreeLinuxClipboard
 	// @WhoAteDaCake
-	// Is the best way to direct, which implementation should be used?
+	// TODO: Is the best way to define which implementation should be used?
+	// Or should we use #ifdef within function implementation
 	#define LCUI_UseClipboardImpl LCUI_LinuxUseClipboard
+	#define LCUI_CopyToClipboardImpl LCUI_LinuxCopyToClipboard
 	#define LCUI_EVENTS_H <LCUI/platform/linux/linux_events.h>
 	#define LCUI_MOUSE_H <LCUI/platform/linux/linux_mouse.h>
 	#define LCUI_KEYBOARD_H <LCUI/platform/linux/linux_keyboard.h>

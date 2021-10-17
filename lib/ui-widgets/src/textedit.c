@@ -805,6 +805,14 @@ static void TextEdit_OnKeyDown(LCUI_Widget widget, LCUI_WidgetEvent e,
 	if (e->key.code == 86 && e->key.ctrl_key) {
 		LCUI_UseClipboard(widget, TextEdit_OnClipboardReady);
 	}
+	if (e->key.code == 67 && e->key.ctrl_key) {
+		// @WhoAteDaCake
+		// TODO: consume from actual widget text
+		// TODO: is there a need for mutex lock to make sure
+		// 	 that the consumed text is not being modified
+		char* demo_text = "Hello";
+		LCUI_CopyToClipboard(demo_text);
+	}
 }
 
 /** 处理输入法对文本框输入的内容 */

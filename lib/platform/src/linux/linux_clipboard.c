@@ -60,6 +60,16 @@ void LCUI_LinuxUseClipboard(void *widget, void *action)
 #endif
 }
 
+void LCUI_LinuxCopyToClipboard(void *text)
+{
+#ifdef USE_LIBX11
+	if (LCUI_GetAppId() == LCUI_APP_LINUX_X11) {
+		LCUI_LinuxX11CopyToClipboard(text);
+		return;
+	}
+#endif
+}
+
 void LCUI_InitLinuxClipboard(void)
 {
 #ifdef USE_LIBX11

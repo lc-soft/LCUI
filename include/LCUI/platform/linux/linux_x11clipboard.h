@@ -33,6 +33,8 @@
 
 void LCUI_LinuxX11UseClipboard(void *widget, void *action);
 
+void LCUI_LinuxX11CopyToClipboard(void *text);
+
 void LCUI_InitLinuxX11Clipboard(void);
 
 void LCUI_FreeLinuxX11Clipboard(void);

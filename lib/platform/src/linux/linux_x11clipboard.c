@@ -117,6 +117,10 @@ void RequestClipboardContent(void)
 	_DEBUG_MSG("Clipboard content requested, expect SelectionNotify\n");
 }
 
+void LCUI_LinuxX11CopyToClipboard(void *text) {
+	printf("Copying %s\n", (char *)(text));
+}
+
 void LCUI_LinuxX11UseClipboard(void *widget, void *action)
 {
 	LCUI_ClipboardCallback callback = clipboard.callback;

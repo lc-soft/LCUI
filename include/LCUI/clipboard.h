@@ -39,6 +39,8 @@ LCUI_BEGIN_HEADER
 
 LCUI_API void LCUI_UseClipboard(void *widget, void *action);
 
+LCUI_API void LCUI_CopyToClipboard(void *text);
+
 LCUI_END_HEADER
 
 #endif /* LCUI_INPUT_H */

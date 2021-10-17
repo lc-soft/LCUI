@@ -37,6 +37,8 @@
 
 void LCUI_LinuxUseClipboard(void *widget, void *action);
 
+void LCUI_LinuxCopyToClipboard(void *text);
+
 void LCUI_InitLinuxClipboard(void);
 
 void LCUI_FreeLinuxClipboard(void);
