@@ -67,8 +67,8 @@ typedef struct LCUI_TextEditRec_ {
 	wchar_t *allow_input_char;      /**< 允许输入的字符 */
 	wchar_t password_char;          /**< 屏蔽符的副本 */
 	size_t text_block_size;         /**< 块大小 */
-	list_t text_blocks;         /**< 文本块缓冲区 */
-	list_t text_tags;           /**< 当前处理的标签列表 */
+	list_t text_blocks;             /**< 文本块缓冲区 */
+	list_t text_tags;               /**< 当前处理的标签列表 */
 	LCUI_BOOL tasks[TASK_TOTAL];    /**< 待处理的任务 */
 	LCUI_Mutex mutex;               /**< 互斥锁 */
 } LCUI_TextEditRec, *LCUI_TextEdit;
@@ -422,8 +422,10 @@ static void TextEdit_OnResize(LCUI_Widget w, float width, float height)
 	LCUI_TextEdit edit = GetData(w);
 
 	list_create(&rects);
-	TextLayer_SetFixedSize(edit->layer, (int)(width * scale), (int)(width * scale));
-	TextLayer_SetMaxSize(edit->layer, (int)(height * scale), (int)(height * scale));
+	TextLayer_SetFixedSize(edit->layer, (int)(width * scale),
+			       (int)(width * scale));
+	TextLayer_SetMaxSize(edit->layer, (int)(height * scale),
+			     (int)(height * scale));
 	TextLayer_Update(edit->layer, &rects);
 	TextLayer_ClearInvalidRect(edit->layer);
 	for (list_each(node, &rects)) {
@@ -719,8 +721,8 @@ static void TextEdit_OnPaste(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 	char *utf8_text = arg;
 	if (utf8_text != NULL) {
 		// @WhoAteDaCake
-		// TODO: is there a point in extracting this to a shared library code?
-		// Since this is done within TextView_SetText as well
+		// TODO: is there a point in extracting this to a shared library
+		// code? Since this is done within TextView_SetText as well
 		int ret;
 		wchar_t *wstr;
 		size_t len = strlen(utf8_text) + 1;
@@ -734,14 +736,13 @@ static void TextEdit_OnPaste(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 	}
 }
 
-static void TextEdit_OnClipboardReady(LCUI_Widget widget, void* arg)
+static void TextEdit_OnClipboardReady(LCUI_Widget widget, void *arg)
 {
 	LCUI_WidgetEventRec e = { 0 };
 
 	LCUI_InitWidgetEvent(&e, "paste");
 	Widget_TriggerEvent(widget, &e, arg);
 }
-
 
 /** 处理按键事件 */
 static void TextEdit_OnKeyDown(LCUI_Widget widget, LCUI_WidgetEvent e,
@@ -967,7 +968,7 @@ static void TextEdit_OnDestroy(LCUI_Widget widget)
 	}
 }
 
-static void TextEdit_OnPaint(LCUI_Widget w, pd_paint_context_t* paint,
+static void TextEdit_OnPaint(LCUI_Widget w, pd_paint_context_t *paint,
 			     LCUI_WidgetActualStyle style)
 {
 	pd_pos_t pos;
