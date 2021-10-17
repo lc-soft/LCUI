@@ -3,10 +3,14 @@
  *
  * References:
  * - https://github.com/exebook/x11clipboard/blob/master/x11paste.c
- * - https://github.com/libsdl-org/SDL/blob/515b7e93b5af3dc552a7974ed7245a0e0456ae2a/src/video/x11/SDL_x11events.c
- * - https://github.com/libsdl-org/SDL/blob/main/src/video/x11/SDL_x11clipboard.c
- * - https://github.com/GNOME/gtk/blob/b539c92312d449f41710e6930aaf086454d667d2/gdk/x11/gdkclipboard-x11.c
- * - https://github.com/godotengine/godot/blob/a7011fa29488f5356949667eb8e2b296cbbd9923/platform/linuxbsd/display_server_x11.cpp
+ * -
+ * https://github.com/libsdl-org/SDL/blob/515b7e93b5af3dc552a7974ed7245a0e0456ae2a/src/video/x11/SDL_x11events.c
+ * -
+ * https://github.com/libsdl-org/SDL/blob/main/src/video/x11/SDL_x11clipboard.c
+ * -
+ * https://github.com/GNOME/gtk/blob/b539c92312d449f41710e6930aaf086454d667d2/gdk/x11/gdkclipboard-x11.c
+ * -
+ * https://github.com/godotengine/godot/blob/a7011fa29488f5356949667eb8e2b296cbbd9923/platform/linuxbsd/display_server_x11.cpp
  * - https://www.jwz.org/doc/x-cut-and-paste.html
  *
  *
@@ -64,17 +68,15 @@ typedef struct LCUI_ClipboardCallbackRec_ {
 // TODO: do we need a mutex here? As the action is unlikely to happen
 // often, safety seems to be a bigger priority than speed
 static struct LCUI_LinuxClipboardDriver {
-	char* text;
+	char *text;
 	LCUI_ClipboardCallback callback;
 } clipboard;
-
 
 void ExecuteCallback(void)
 {
 	LCUI_ClipboardCallback callback = clipboard.callback;
 	if (!callback->running) {
-		// @WhoAteDaCake
-		// TODO: some sort of error ?
+		_DEBUG_MSG("Tried to ExecuteCallback before copying started\n");
 		return;
 	}
 	callback->action(callback->widget, clipboard.text);
@@ -94,23 +96,29 @@ void RequestClipboardContent(void)
 	Window clipboard_owner = XGetSelectionOwner(display, CLIPBOARD);
 	// No need to continue, we should have stored text already
 	// when copy was done
+	// This branch will only get executed once we implement copy event
 	if (clipboard_owner == window) {
 		_DEBUG_MSG("Clipboard owned by self\n");
 		ExecuteCallback();
 		return;
 	}
 	if (clipboard_owner == None) {
-		_DEBUG_MSG("Clipboard owned not found\n");
+		_DEBUG_MSG("Clipboard owner not found\n");
 		return;
 	}
 	// @WhoAteDaCake
 	// TODO: needs error handling if we can't access the clipboard?
+	// TODO: some other implementations will try XA_STRING if no text was retrieved
+	// from UTF8_STRING, however, our implementation is not synchronous, so not sure
+	// how it would work, it needs further investigation
 	Atom XSEL_DATA = XInternAtom(display, "XSEL_DATA", FALSE);
-	XConvertSelection(display, CLIPBOARD, TEXT_FORMAT, XSEL_DATA, window, CurrentTime);
+	XConvertSelection(display, CLIPBOARD, TEXT_FORMAT, XSEL_DATA, window,
+			  CurrentTime);
 	_DEBUG_MSG("Clipboard content requested, expect SelectionNotify\n");
 }
 
-void LCUI_LinuxX11UseClipboard(void *widget, void *action) {
+void LCUI_LinuxX11UseClipboard(void *widget, void *action)
+{
 	LCUI_ClipboardCallback callback = clipboard.callback;
 	if (callback->running) {
 		_DEBUG_MSG("Tried to paste, while a paste was in progress\n");
@@ -135,65 +143,31 @@ static void OnSelectionNotify(LCUI_Event ev, void *arg)
 	Display *display = x11->display;
 	Atom CLIPBOARD = XInternAtom(display, "CLIPBOARD", FALSE);
 
-	switch(x_ev->type) {
-		// @WhoAteDaCake
-		// TODO: handle other event variations
-		case SelectionNotify:
+	switch (x_ev->type) {
+	// @WhoAteDaCake
+	// TODO: handle other event variations once we implement copy event
+	case SelectionNotify:
 		if (x_ev->xselection.selection == CLIPBOARD) {
 			_DEBUG_MSG("Received Clipboard event\n");
 			unsigned long N, size;
-			char * data;
+			char *data;
 			Atom target;
 			int format;
-			XGetWindowProperty(x_ev->xselection.display, x_ev->xselection.requestor,
-				x_ev->xselection.property, 0L,(~0L), 0, AnyPropertyType, &target,
-				&format, &size, &N,(unsigned char**)&data);
-			if(target == TEXT_FORMAT || target == XA_STRING) {
+			XGetWindowProperty(x_ev->xselection.display,
+					   x_ev->xselection.requestor,
+					   x_ev->xselection.property, 0L, (~0L),
+					   0, AnyPropertyType, &target, &format,
+					   &size, &N, (unsigned char **)&data);
+			if (target == TEXT_FORMAT || target == XA_STRING) {
 				clipboard.text = strndup(data, size);
 				XFree(data);
 			}
-			XDeleteProperty(x_ev->xselection.display, x_ev->xselection.requestor, x_ev->xselection.property);
+			XDeleteProperty(x_ev->xselection.display,
+					x_ev->xselection.requestor,
+					x_ev->xselection.property);
 			ExecuteCallback();
 		}
 	}
-	// KeySym keysym;
-	// XEvent *x_ev = arg;
-	// LCUI_X11AppDriver x11;
-	// LCUI_SysEventRec sys_ev;
-	// int min_keycode;
-	// int max_keycode;
-
-	// switch (x_ev->type) {
-	// case KeyPress:
-	// 	sys_ev.type = LCUI_KEYDOWN;
-	// 	break;
-	// case KeyRelease:
-	// 	sys_ev.type = LCUI_KEYUP;
-	// 	break;
-	// default:
-	// 	return;
-	// }
-	// x11 = LCUI_GetAppData();
-	// XAutoRepeatOn(x11->display);
-	// keysym = XkbKeycodeToKeysym(x11->display, x_ev->xkey.keycode, 0, 1);
-	// _DEBUG_MSG("keyname: %s\n", XKeysymToString(keysym));
-	// _DEBUG_MSG("keycode: %d, keyscancode: %u, keysym: %lu\n", keysym,
-	// 	   x_ev->xkey.keycode, keysym);
-	// sys_ev.key.code = ConvertKeyCode(keysym);
-	// sys_ev.key.shift_key = x_ev->xkey.state & ShiftMask ? TRUE : FALSE;
-	// sys_ev.key.ctrl_key = x_ev->xkey.state & ControlMask ? TRUE : FALSE;
-	// _DEBUG_MSG("shift: %d, ctrl: %d\n", sys_ev.key.shift_key,
-	// 	   sys_ev.key.ctrl_key);
-	// LCUI_TriggerEvent(&sys_ev, NULL);
-
-	// XDisplayKeycodes(x11->display, &min_keycode, &max_keycode);
-	// if (keysym >= min_keycode && keysym <= max_keycode &&
-	//     sys_ev.type == LCUI_KEYDOWN) {
-	// 	sys_ev.type = LCUI_KEYPRESS;
-	// 	sys_ev.key.code = ConvertKeyCodeToChar(x11, x_ev);
-	// 	_DEBUG_MSG("char: %c\n", sys_ev.key.code);
-	// 	LCUI_TriggerEvent(&sys_ev, NULL);
-	// }
 }
 
 void LCUI_InitLinuxX11Clipboard(void)
@@ -208,7 +182,7 @@ void LCUI_InitLinuxX11Clipboard(void)
 }
 
 void LCUI_FreeLinuxX11Clipboard(void)
-{	
+{
 	free(clipboard.callback);
 	LCUI_UnbindSysEvent(SelectionNotify, OnSelectionNotify);
 }
