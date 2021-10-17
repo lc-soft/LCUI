@@ -147,30 +147,25 @@ static void OnSelectionNotify(LCUI_Event ev, void *arg)
 	Display *display = x11->display;
 	Atom CLIPBOARD = XInternAtom(display, "CLIPBOARD", FALSE);
 
-	switch (x_ev->type) {
-	// @WhoAteDaCake
-	// TODO: handle other event variations once we implement copy event
-	case SelectionNotify:
-		if (x_ev->xselection.selection == CLIPBOARD) {
-			_DEBUG_MSG("Received Clipboard event\n");
-			unsigned long N, size;
-			char *data;
-			Atom target;
-			int format;
-			XGetWindowProperty(x_ev->xselection.display,
-					   x_ev->xselection.requestor,
-					   x_ev->xselection.property, 0L, (~0L),
-					   0, AnyPropertyType, &target, &format,
-					   &size, &N, (unsigned char **)&data);
-			if (target == TEXT_FORMAT || target == XA_STRING) {
-				clipboard.text = strndup(data, size);
-				XFree(data);
-			}
-			XDeleteProperty(x_ev->xselection.display,
+	if (x_ev->xselection.selection == CLIPBOARD) {
+		_DEBUG_MSG("Received Clipboard event\n");
+		unsigned long N, size;
+		char *data;
+		Atom target;
+		int format;
+		XGetWindowProperty(x_ev->xselection.display,
 					x_ev->xselection.requestor,
-					x_ev->xselection.property);
-			ExecuteCallback();
+					x_ev->xselection.property, 0L, (~0L),
+					0, AnyPropertyType, &target, &format,
+					&size, &N, (unsigned char **)&data);
+		if (target == TEXT_FORMAT || target == XA_STRING) {
+			clipboard.text = strndup(data, size);
+			XFree(data);
 		}
+		XDeleteProperty(x_ev->xselection.display,
+				x_ev->xselection.requestor,
+				x_ev->xselection.property);
+		ExecuteCallback();
 	}
 }
 
