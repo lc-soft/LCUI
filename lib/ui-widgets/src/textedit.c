@@ -813,7 +813,10 @@ static void TextEdit_OnTextInput(LCUI_Widget widget, LCUI_WidgetEvent e,
 	uint_t i, j, k;
 	wchar_t ch, *text, excludes[8] = L"\b\r\t\x1b";
 	LCUI_TextEdit edit = Widget_GetData(widget, self.prototype);
-
+	/* We don't need to insert text if control key is held */
+	if (e->key.ctrl_key) {
+		return;
+	}
 	/* 如果不是多行文本编辑模式则删除换行符 */
 	if (!edit->is_multiline_mode) {
 		wcscat(excludes, L"\n");
