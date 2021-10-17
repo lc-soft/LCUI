@@ -805,13 +805,28 @@ static void TextEdit_OnKeyDown(LCUI_Widget widget, LCUI_WidgetEvent e,
 	if (e->key.code == 86 && e->key.ctrl_key) {
 		LCUI_UseClipboard(widget, TextEdit_OnClipboardReady);
 	}
+	// CTRL+C
 	if (e->key.code == 67 && e->key.ctrl_key) {
 		// @WhoAteDaCake
-		// TODO: consume from actual widget text
+		// Currently copies internal widget text
+		// once selection is implemented, it would copy that instead
 		// TODO: is there a need for mutex lock to make sure
 		// 	 that the consumed text is not being modified
-		char* demo_text = "Hello";
-		LCUI_CopyToClipboard(demo_text);
+		size_t len = TextEdit_GetTextLength(widget);
+		// TODO: what is len + 1 for?
+		wchar_t *wcs = malloc((len + 1) * sizeof(wchar_t));
+		TextEdit_GetTextW(widget, 0, len, wcs);
+		// X11 doesn't support wchar_t, so we need to send it regular char
+		char* raw_text = malloc((len + 1) * sizeof(char));
+		// @WhoAteDaCake
+		// Should we also pass raw_len to LCUI_CopyToClipboard 
+		int raw_len = wcstombs(raw_text, wcs, len);
+		free(wcs);
+		if (raw_len == -1) {
+			// Something failed here, should probably add debug message
+			return;	
+		}
+		LCUI_CopyToClipboard(raw_text);
 	}
 }
 
