@@ -51,7 +51,7 @@ void LCUI_SetClipboardText(wchar_t *text, size_t len)
 {
 #ifdef USE_LIBX11
 	if (LCUI_GetAppId() == LCUI_APP_LINUX_X11) {
-		LCUI_LinuxX11CopyToClipboard(text, len);
+		LCUI_LinuxX11SetClipboardText(text, len);
 		return;
 	}
 #endif

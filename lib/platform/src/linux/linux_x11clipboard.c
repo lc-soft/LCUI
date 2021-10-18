@@ -123,7 +123,7 @@ void RequestClipboardContent(void)
 /**
  * This function assumes that text pointer is only owned by clipboard
  */
-void LCUI_LinuxX11CopyToClipboard(wchar_t *text, size_t len)
+void LCUI_LinuxX11SetClipboardText(wchar_t *text, size_t len)
 {
 	// X11 doesn't support wchar_t, so we need to send it regular char
 	char* raw_text = malloc((len + 1) * sizeof(char));
