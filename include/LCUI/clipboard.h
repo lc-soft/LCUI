@@ -27,12 +27,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
-// @WhoAteDaCake
-// TODO: Can this just be LCUI_CLIPBOARD_H or would it clash with the headers?
-#ifndef LCUI_CLIPBOARD_API_H
-#define LCUI_CLIPBOARD_API_H
-
 /* clang-format on */
 
 LCUI_BEGIN_HEADER
@@ -42,5 +36,3 @@ LCUI_API void LCUI_UseClipboard(void *widget, void *action);
 LCUI_API void LCUI_CopyToClipboard(void *text);
 
 LCUI_END_HEADER
-
-#endif /* LCUI_INPUT_H */

@@ -35,7 +35,7 @@
 #include <LCUI/platform/linux/linux_x11clipboard.h>
 #endif
 
-void LCUI_LinuxUseClipboard(void *widget, void *action);
+void LCUI_UseLinuxClipboard(void *widget, void *action);
 
 void LCUI_LinuxCopyToClipboard(void *text);
 

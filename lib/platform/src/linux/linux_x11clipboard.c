@@ -145,7 +145,7 @@ void LCUI_LinuxX11CopyToClipboard(void *text)
 	_DEBUG_MSG("Taken ownership of the clipboard\n");
 }
 
-void LCUI_LinuxX11UseClipboard(void *widget, void *action)
+void LCUI_UseLinuxX11Clipboard(void *widget, void *action)
 {
 	LCUI_ClipboardCallback callback = clipboard.callback;
 	if (callback->running) {

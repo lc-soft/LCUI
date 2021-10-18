@@ -74,7 +74,7 @@
 	// @WhoAteDaCake
 	// TODO: Is the best way to define which implementation should be used?
 	// Or should we use #ifdef within function implementation
-	#define LCUI_UseClipboardImpl LCUI_LinuxUseClipboard
+	#define LCUI_UseClipboardImpl LCUI_UseLinuxClipboard
 	#define LCUI_CopyToClipboardImpl LCUI_LinuxCopyToClipboard
 	#define LCUI_EVENTS_H <LCUI/platform/linux/linux_events.h>
 	#define LCUI_MOUSE_H <LCUI/platform/linux/linux_mouse.h>
