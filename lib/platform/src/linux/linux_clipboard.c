@@ -47,11 +47,11 @@ void LCUI_UseClipboard(void *widget, LCUI_ClipboardAction action)
 #endif
 }
 
-void LCUI_SetClipboardText(void *text)
+void LCUI_SetClipboardText(wchar_t *text, size_t len)
 {
 #ifdef USE_LIBX11
 	if (LCUI_GetAppId() == LCUI_APP_LINUX_X11) {
-		LCUI_LinuxX11CopyToClipboard(text);
+		LCUI_LinuxX11CopyToClipboard(text, len);
 		return;
 	}
 #endif

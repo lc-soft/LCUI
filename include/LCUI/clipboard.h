@@ -36,7 +36,7 @@ typedef void (*LCUI_ClipboardAction)(void*, void*);
 
 LCUI_API void LCUI_UseClipboard(void *widget, LCUI_ClipboardAction action);
 
-LCUI_API void LCUI_SetClipboardText(void *text);
+LCUI_API void LCUI_SetClipboardText(wchar_t *text, size_t len);
 
 LCUI_END_HEADER
 

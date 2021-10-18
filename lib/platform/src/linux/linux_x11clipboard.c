@@ -123,8 +123,18 @@ void RequestClipboardContent(void)
 /**
  * This function assumes that text pointer is only owned by clipboard
  */
-void LCUI_LinuxX11CopyToClipboard(void *text)
+void LCUI_LinuxX11CopyToClipboard(wchar_t *text, size_t len)
 {
+	// X11 doesn't support wchar_t, so we need to send it regular char
+	char* raw_text = malloc((len + 1) * sizeof(char));
+	int raw_len = wcstombs(raw_text, text, len);
+	free(text);
+	if (raw_len == -1) {
+		_DEBUG_MSG("Failed converting wchar_t* to char*\n");
+		// Something failed here, should probably add debug message
+		return;	
+	}
+
 	LCUI_X11AppDriver x11 = LCUI_GetAppData();
 	Display *display = x11->display;
 	Window window = x11->win_main;
@@ -132,7 +142,7 @@ void LCUI_LinuxX11CopyToClipboard(void *text)
 	if (clipboard.text) {
 		free(clipboard.text);
 	}
-	clipboard.text = text;
+	clipboard.text = raw_text;
 	Window clipboard_owner =
 	    XGetSelectionOwner(display, clipboard.xclipboard);
 	if (clipboard_owner == window) {

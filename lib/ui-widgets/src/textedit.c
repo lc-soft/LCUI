@@ -816,17 +816,7 @@ static void TextEdit_OnKeyDown(LCUI_Widget widget, LCUI_WidgetEvent e,
 		// TODO: what is len + 1 for?
 		wchar_t *wcs = malloc((len + 1) * sizeof(wchar_t));
 		TextEdit_GetTextW(widget, 0, len, wcs);
-		// X11 doesn't support wchar_t, so we need to send it regular char
-		char* raw_text = malloc((len + 1) * sizeof(char));
-		// @WhoAteDaCake
-		// Should we also pass raw_len to LCUI_SetClipboardText 
-		int raw_len = wcstombs(raw_text, wcs, len);
-		free(wcs);
-		if (raw_len == -1) {
-			// Something failed here, should probably add debug message
-			return;	
-		}
-		LCUI_SetClipboardText(raw_text);
+		LCUI_SetClipboardText(wcs, len);
 	}
 }
 
