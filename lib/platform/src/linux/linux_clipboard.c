@@ -1,5 +1,5 @@
 /*
- * linux_keyboard.c -- Keyboard support for linux.
+ * linux_clipboard.c -- Clipboard support for linux.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
@@ -31,26 +31,13 @@
 #include "config.h"
 #include <LCUI_Build.h>
 #ifdef LCUI_BUILD_IN_LINUX
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <fcntl.h>
-#ifdef USE_LINUX_INPUT_EVENT
-#include <linux/input.h>
-#else
-#include <signal.h>
-#include <termios.h>
-#endif
 #include <LCUI/LCUI.h>
-#include <LCUI/thread.h>
 #include <LCUI/platform.h>
-#include <LCUI/input.h>
-#include <LCUI/ime.h>
 #include <LCUI/clipboard.h>
 #include LCUI_EVENTS_H
 
-void LCUI_UseClipboard(void *widget, void *action)
+void LCUI_UseClipboard(void *widget, LCUI_ClipboardAction action)
 {
 #ifdef USE_LIBX11
 	if (LCUI_GetAppId() == LCUI_APP_LINUX_X11) {
@@ -60,7 +47,7 @@ void LCUI_UseClipboard(void *widget, void *action)
 #endif
 }
 
-void LCUI_CopyToClipboard(void *text)
+void LCUI_SetClipboardText(void *text)
 {
 #ifdef USE_LIBX11
 	if (LCUI_GetAppId() == LCUI_APP_LINUX_X11) {

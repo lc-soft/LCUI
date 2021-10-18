@@ -27,12 +27,17 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-/* clang-format on */
+#ifndef LCUI_CLIPBOARD_H
+#define LCUI_CLIPBOARD_H
 
 LCUI_BEGIN_HEADER
 
-LCUI_API void LCUI_UseClipboard(void *widget, void *action);
+typedef void (*LCUI_ClipboardAction)(void*, void*);
 
-LCUI_API void LCUI_CopyToClipboard(void *text);
+LCUI_API void LCUI_UseClipboard(void *widget, LCUI_ClipboardAction action);
+
+LCUI_API void LCUI_SetClipboardText(void *text);
 
 LCUI_END_HEADER
+
+#endif /* LCUI_CLIPBOARD_H */

@@ -1,5 +1,5 @@
 /*
- * linux_x11clipboard.c -- keyboard support for linux xwindow
+ * linux_x11clipboard.c -- clipboard support for linux x11
  *
  * References:
  * - https://github.com/exebook/x11clipboard/blob/master/x11paste.c
@@ -47,14 +47,14 @@
 #include <LCUI_Build.h>
 #if defined(LCUI_BUILD_IN_LINUX) && defined(USE_LIBX11)
 #include <LCUI/LCUI.h>
-#include <LCUI/input.h>
 #include <LCUI/platform.h>
+#include <LCUI/clipboard.h>
 #include LCUI_EVENTS_H
 #include <X11/Xatom.h>
 
 typedef struct LCUI_ClipboardCallbackRec_ {
 	void *widget;
-	void (*action)(void *widget, char *text);
+	LCUI_ClipboardAction action;
 	LCUI_BOOL running;
 } LCUI_ClipboardCallbackRec, *LCUI_ClipboardCallback;
 
