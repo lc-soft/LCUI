@@ -47,10 +47,10 @@
 #include <LCUI/platform.h>
 #include <LCUI/input.h>
 #include <LCUI/ime.h>
+#include <LCUI/clipboard.h>
 #include LCUI_EVENTS_H
-#include LCUI_CLIPBOARD_H
 
-void LCUI_UseLinuxClipboard(void *widget, void *action)
+void LCUI_UseClipboard(void *widget, void *action)
 {
 #ifdef USE_LIBX11
 	if (LCUI_GetAppId() == LCUI_APP_LINUX_X11) {
@@ -60,7 +60,7 @@ void LCUI_UseLinuxClipboard(void *widget, void *action)
 #endif
 }
 
-void LCUI_LinuxCopyToClipboard(void *text)
+void LCUI_CopyToClipboard(void *text)
 {
 #ifdef USE_LIBX11
 	if (LCUI_GetAppId() == LCUI_APP_LINUX_X11) {
@@ -70,7 +70,7 @@ void LCUI_LinuxCopyToClipboard(void *text)
 #endif
 }
 
-void LCUI_InitLinuxClipboard(void)
+void LCUI_InitClipboardDriver(void)
 {
 #ifdef USE_LIBX11
 	if (LCUI_GetAppId() == LCUI_APP_LINUX_X11) {
@@ -80,7 +80,7 @@ void LCUI_InitLinuxClipboard(void)
 #endif
 }
 
-void LCUI_FreeLinuxClipboard(void)
+void LCUI_FreeClipboardDriver(void)
 {
 #ifdef USE_LIBX11
 	if (LCUI_GetAppId() == LCUI_APP_LINUX_X11) {

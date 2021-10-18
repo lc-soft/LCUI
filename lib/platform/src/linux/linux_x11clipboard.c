@@ -50,7 +50,6 @@
 #include <LCUI/input.h>
 #include <LCUI/platform.h>
 #include LCUI_EVENTS_H
-#include LCUI_CLIPBOARD_H
 #include <X11/Xatom.h>
 
 typedef struct LCUI_ClipboardCallbackRec_ {

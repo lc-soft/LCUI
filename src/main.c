@@ -44,6 +44,7 @@
 #include <LCUI/platform.h>
 #include <LCUI/display.h>
 #include <LCUI/settings.h>
+#include <LCUI/clipboard.h>
 #ifdef LCUI_EVENTS_H
 #include LCUI_EVENTS_H
 #endif
@@ -52,9 +53,6 @@
 #endif
 #ifdef LCUI_KEYBOARD_H
 #include LCUI_KEYBOARD_H
-#endif
-#ifdef LCUI_CLIPBOARD_H
-#include LCUI_CLIPBOARD_H
 #endif
 #ifdef LCUI_DISPLAY_H
 #include LCUI_DISPLAY_H
