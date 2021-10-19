@@ -35,6 +35,7 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/font.h>
 #include <LCUI/input.h>
+#include <LCUI/clipboard.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/metrics.h>
 #include <LCUI/gui/css_parser.h>
@@ -718,30 +719,17 @@ static void TextEdit_TextDelete(LCUI_Widget widget, int n_ch)
 
 static void TextEdit_OnPaste(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 {
-	char *utf8_text = arg;
-	if (utf8_text != NULL) {
-		// @WhoAteDaCake
-		// TODO: is there a point in extracting this to a shared library
-		// code? Since this is done within TextView_SetText as well
-		int ret;
-		wchar_t *wstr;
-		size_t len = strlen(utf8_text) + 1;
-
-		wstr = malloc(sizeof(wchar_t) * len);
-		decode_utf8(wstr, utf8_text, len);
-		TextEdit_InsertTextW(w, wstr);
-		if (wstr) {
-			free(wstr);
-		}
-	}
+	LCUI_ClipboardText text = arg;
+	TextEdit_InsertTextW(w, text->text);
 }
 
-static void TextEdit_OnClipboardReady(LCUI_Widget widget, void *arg)
+static void TextEdit_OnClipboardReady(void *arg, LCUI_Widget widget)
 {
+	LCUI_ClipboardText text = arg;
 	LCUI_WidgetEventRec e = { 0 };
 
 	LCUI_InitWidgetEvent(&e, "paste");
-	Widget_TriggerEvent(widget, &e, arg);
+	Widget_TriggerEvent(widget, &e, text);
 }
 
 /** 处理按键事件 */
@@ -803,7 +791,7 @@ static void TextEdit_OnKeyDown(LCUI_Widget widget, LCUI_WidgetEvent e,
 	TextEdit_MoveCaret(widget, cur_row, cur_col);
 	// CTRL+V
 	if (e->key.code == 86 && e->key.ctrl_key) {
-		LCUI_UseClipboard(widget, TextEdit_OnClipboardReady);
+		LCUI_UseClipboard(TextEdit_OnClipboardReady, widget);
 	}
 	// CTRL+C
 	if (e->key.code == 67 && e->key.ctrl_key) {

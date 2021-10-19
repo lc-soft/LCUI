@@ -37,11 +37,11 @@
 #include <LCUI/clipboard.h>
 #include LCUI_EVENTS_H
 
-void LCUI_UseClipboard(void *widget, LCUI_ClipboardAction action)
+void LCUI_UseClipboard(LCUI_ClipboardAction action, void *arg)
 {
 #ifdef USE_LIBX11
 	if (LCUI_GetAppId() == LCUI_APP_LINUX_X11) {
-		LCUI_UseLinuxX11Clipboard(widget, action);
+		LCUI_UseLinuxX11Clipboard(action, arg);
 		return;
 	}
 #endif

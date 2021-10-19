@@ -53,7 +53,7 @@
 #include <X11/Xatom.h>
 
 typedef struct LCUI_ClipboardCallbackRec_ {
-	void *widget;
+	void *arg;
 	LCUI_ClipboardAction action;
 	LCUI_BOOL running;
 } LCUI_ClipboardCallbackRec, *LCUI_ClipboardCallback;
@@ -63,6 +63,7 @@ typedef struct LCUI_ClipboardCallbackRec_ {
 // often, safety seems to be a bigger priority than speed
 static struct LCUI_LinuxClipboardDriver {
 	char *text;
+	size_t text_len;
 	LCUI_ClipboardCallback callback;
 	//
 	Atom xclipboard;
@@ -80,10 +81,17 @@ void ExecuteCallback(void)
 		_DEBUG_MSG("Tried to ExecuteCallback before copying started\n");
 		return;
 	}
-	callback->action(callback->widget, clipboard.text);
+	size_t len = clipboard.text_len;
+	wchar_t *wstr = malloc(sizeof(wchar_t) * len);
+	decode_utf8(wstr, clipboard.text, len);
+	wstr[len + 1] = 0;
+	LCUI_ClipboardTextRec clipboard_text = {0};
+	clipboard_text.text = wstr;
+	clipboard_text.len = len;
+	callback->action(&clipboard_text, callback->arg);
 	// Reset properties, so if something goes wrongly, we crash
 	// instead of having undefined behaviour
-	callback->widget = NULL;
+	callback->arg = NULL;
 	callback->action = NULL;
 	callback->running = FALSE;
 }
@@ -143,6 +151,7 @@ void LCUI_LinuxX11SetClipboardText(wchar_t *text, size_t len)
 		free(clipboard.text);
 	}
 	clipboard.text = raw_text;
+	clipboard.text_len = len;
 	Window clipboard_owner =
 	    XGetSelectionOwner(display, clipboard.xclipboard);
 	if (clipboard_owner == window) {
@@ -154,14 +163,14 @@ void LCUI_LinuxX11SetClipboardText(wchar_t *text, size_t len)
 	_DEBUG_MSG("Taken ownership of the clipboard\n");
 }
 
-void LCUI_UseLinuxX11Clipboard(void *widget, void *action)
+void LCUI_UseLinuxX11Clipboard(LCUI_ClipboardAction action, void *arg)
 {
 	LCUI_ClipboardCallback callback = clipboard.callback;
 	if (callback->running) {
 		_DEBUG_MSG("Tried to paste, while a paste was in progress\n");
 		return;
 	}
-	callback->widget = widget;
+	callback->arg = arg;
 	callback->action = action;
 	callback->running = TRUE;
 	RequestClipboardContent();
@@ -192,6 +201,7 @@ static void OnSelectionNotify(LCUI_Event ev, void *arg)
 		if (target == clipboard.xutf8_string ||
 		    target == clipboard.xa_string) {
 			clipboard.text = strndup(data, size);
+			clipboard.text_len = size;
 			XFree(data);
 		}
 		XDeleteProperty(x_ev->xselection.display,
@@ -256,7 +266,7 @@ static void OnSelectionRequest(LCUI_Event ev, void *arg)
 			    x_ev->xselectionrequest.requestor,
 			    reply.xselection.property, reply.xselection.target,
 			    8, PropModeReplace, (unsigned char *)clipboard.text,
-			    strlen(clipboard.text));
+			    clipboard.text_len);
 		}
 	}
 	XSendEvent(x_ev->xselection.display, x_ev->xselectionrequest.requestor,
