@@ -32,12 +32,13 @@
 
 LCUI_BEGIN_HEADER
 
-typedef struct LCUI_ClipboardTextRec_ {
+typedef struct LCUI_ClipboardRec_ {
+	LCUI_Graph image;
 	wchar_t *text;
 	size_t len;
-} LCUI_ClipboardTextRec, *LCUI_ClipboardText;  
+} LCUI_ClipboardRec, *LCUI_Clipboard;
 
-typedef void (*LCUI_ClipboardAction)(LCUI_ClipboardText, void*);
+typedef void (*LCUI_ClipboardAction)(LCUI_Clipboard, void *);
 
 LCUI_API void LCUI_UseClipboard(LCUI_ClipboardAction action, void *arg);
 

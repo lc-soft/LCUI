@@ -719,13 +719,13 @@ static void TextEdit_TextDelete(LCUI_Widget widget, int n_ch)
 
 static void TextEdit_OnPaste(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 {
-	LCUI_ClipboardText text = arg;
+	LCUI_Clipboard text = arg;
 	TextEdit_InsertTextW(w, text->text);
 }
 
 static void TextEdit_OnClipboardReady(void *arg, LCUI_Widget widget)
 {
-	LCUI_ClipboardText text = arg;
+	LCUI_Clipboard text = arg;
 	LCUI_WidgetEventRec e = { 0 };
 
 	LCUI_InitWidgetEvent(&e, "paste");

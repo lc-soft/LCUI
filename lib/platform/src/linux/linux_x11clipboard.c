@@ -85,7 +85,7 @@ void ExecuteCallback(void)
 	wchar_t *wstr = malloc(sizeof(wchar_t) * len);
 	decode_utf8(wstr, clipboard.text, len);
 	wstr[len + 1] = 0;
-	LCUI_ClipboardTextRec clipboard_text = {0};
+	LCUI_ClipboardRec clipboard_text = {0};
 	clipboard_text.text = wstr;
 	clipboard_text.len = len;
 	callback->action(&clipboard_text, callback->arg);
