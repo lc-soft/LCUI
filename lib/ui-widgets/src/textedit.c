@@ -789,12 +789,14 @@ static void TextEdit_OnKeyDown(LCUI_Widget widget, LCUI_WidgetEvent e,
 		break;
 	}
 	TextEdit_MoveCaret(widget, cur_row, cur_col);
+	
+	char key = e->key.code;
 	// CTRL+V
-	if (e->key.code == 86 && e->key.ctrl_key) {
+	if (key == LCUI_KEY_V && e->key.ctrl_key) {
 		LCUI_UseClipboard(TextEdit_OnClipboardReady, widget);
 	}
 	// CTRL+C
-	if (e->key.code == 67 && e->key.ctrl_key) {
+	if (key == LCUI_KEY_C && e->key.ctrl_key) {
 		// @WhoAteDaCake
 		// Currently copies internal widget text
 		// once selection is implemented, it would copy that instead
