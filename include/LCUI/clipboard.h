@@ -33,7 +33,7 @@
 LCUI_BEGIN_HEADER
 
 typedef struct LCUI_ClipboardRec_ {
-	LCUI_Graph image;
+	pd_canvas_t *image;
 	wchar_t *text;
 	size_t len;
 } LCUI_ClipboardRec, *LCUI_Clipboard;
