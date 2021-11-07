@@ -82,7 +82,7 @@ void ExecuteCallback(void)
 		return;
 	}
 	size_t len = clipboard.text_len;
-	wchar_t *wstr = malloc(sizeof(wchar_t) * len);
+	wchar_t *wstr = malloc(sizeof(wchar_t) * (len + 1));
 	decode_utf8(wstr, clipboard.text, len);
 	wstr[len + 1] = 0;
 	LCUI_Clipboard clipboard_data = malloc(sizeof(LCUI_ClipboardRec));
@@ -135,13 +135,13 @@ void RequestClipboardContent(void)
 void LCUI_LinuxX11SetClipboardText(wchar_t *text, size_t len)
 {
 	// X11 doesn't support wchar_t, so we need to send it regular char
-	char* raw_text = malloc((len + 1) * sizeof(char));
+	char *raw_text = malloc((len + 1) * sizeof(char));
 	int raw_len = wcstombs(raw_text, text, len);
 	free(text);
 	if (raw_len == -1) {
 		_DEBUG_MSG("Failed converting wchar_t* to char*\n");
 		// Something failed here, should probably add debug message
-		return;	
+		return;
 	}
 
 	LCUI_X11AppDriver x11 = LCUI_GetAppData();
@@ -260,7 +260,8 @@ static void OnSelectionRequest(LCUI_Event ev, void *arg)
 			_DEBUG_MSG("SelectionRequest received with no text\n");
 		} else {
 			_DEBUG_MSG("Requested for clipboard text\n");
-			reply.xselection.property = x_ev->xselectionrequest.property;
+			reply.xselection.property =
+			    x_ev->xselectionrequest.property;
 			XChangeProperty(
 			    x_ev->xselection.display,
 			    x_ev->xselectionrequest.requestor,
