@@ -85,10 +85,11 @@ void ExecuteCallback(void)
 	wchar_t *wstr = malloc(sizeof(wchar_t) * len);
 	decode_utf8(wstr, clipboard.text, len);
 	wstr[len + 1] = 0;
-	LCUI_ClipboardRec clipboard_text = {0};
-	clipboard_text.text = wstr;
-	clipboard_text.len = len;
-	callback->action(&clipboard_text, callback->arg);
+	LCUI_Clipboard clipboard_data = malloc(sizeof(LCUI_ClipboardRec));
+	clipboard_data->text = wstr;
+	clipboard_data->len = len;
+	clipboard_data->image = NULL;
+	callback->action(clipboard_data, callback->arg);
 	// Reset properties, so if something goes wrongly, we crash
 	// instead of having undefined behaviour
 	callback->arg = NULL;
@@ -186,7 +187,6 @@ static void OnSelectionNotify(LCUI_Event ev, void *arg)
 	_DEBUG_MSG("SelectionNotify received\n");
 	XEvent *x_ev = arg;
 	LCUI_X11AppDriver x11 = LCUI_GetAppData();
-	Display *display = x11->display;
 
 	if (x_ev->xselection.selection == clipboard.xclipboard) {
 		_DEBUG_MSG("Received Clipboard event\n");
