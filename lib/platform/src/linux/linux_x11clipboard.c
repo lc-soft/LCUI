@@ -136,7 +136,7 @@ void RequestClipboardContent(void)
 void LCUI_LinuxX11SetClipboardText(wchar_t *text, size_t len)
 {
 	// X11 doesn't support wchar_t, so we need to send it regular char
-	char *raw_text = malloc(len * sizeof(char));
+	char *raw_text = malloc((len + 1) * sizeof(char));
 	size_t raw_len = wcstombs(raw_text, text, len);
 	raw_text[raw_len] = '\0';
 	free(text);
