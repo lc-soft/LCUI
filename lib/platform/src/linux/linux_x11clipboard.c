@@ -81,10 +81,11 @@ void ExecuteCallback(void)
 		_DEBUG_MSG("Tried to ExecuteCallback before copying started\n");
 		return;
 	}
-	size_t len = clipboard.text_len;
-	wchar_t *wstr = malloc(sizeof(wchar_t) * (len + 1));
-	decode_utf8(wstr, clipboard.text, len);
-	wstr[len + 1] = 0;
+
+	size_t len = clipboard.text_len + 1;
+	wchar_t *wstr = malloc(sizeof(wchar_t) * len);
+	len = decode_utf8(wstr, clipboard.text, len);
+	wstr[len] = 0;
 	LCUI_Clipboard clipboard_data = malloc(sizeof(LCUI_ClipboardRec));
 	clipboard_data->text = wstr;
 	clipboard_data->len = len;
@@ -135,8 +136,9 @@ void RequestClipboardContent(void)
 void LCUI_LinuxX11SetClipboardText(wchar_t *text, size_t len)
 {
 	// X11 doesn't support wchar_t, so we need to send it regular char
-	char *raw_text = malloc((len + 1) * sizeof(char));
-	int raw_len = wcstombs(raw_text, text, len);
+	char *raw_text = malloc(len * sizeof(char));
+	size_t raw_len = wcstombs(raw_text, text, len);
+	raw_text[raw_len] = '\0';
 	free(text);
 	if (raw_len == -1) {
 		_DEBUG_MSG("Failed converting wchar_t* to char*\n");
@@ -152,7 +154,7 @@ void LCUI_LinuxX11SetClipboardText(wchar_t *text, size_t len)
 		free(clipboard.text);
 	}
 	clipboard.text = raw_text;
-	clipboard.text_len = len;
+	clipboard.text_len = raw_len;
 	Window clipboard_owner =
 	    XGetSelectionOwner(display, clipboard.xclipboard);
 	if (clipboard_owner == window) {
