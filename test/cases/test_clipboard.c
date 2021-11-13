@@ -1,77 +1,68 @@
 #include <stdlib.h>
 #include <LCUI.h>
 #include <LCUI/gui/widget.h>
-#include <LCUI/gui/widget/button.h>
+
+#include <LCUI/gui/widget/textedit.h>
 #include <LCUI/timer.h>
 #include <LCUI/input.h>
 #include <LCUI/display.h>
 #include "ctest.h"
 
-// static void OnRefreshScreen(void *arg)
-// {
-// 	LCUIDisplay_InvalidateArea(NULL);
-// }
-
-// static void OnQuit(void *arg)
-// {
-// 	LCUI_Quit();
-// }
-
-// static void OnBtnClick(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
-// {
-// 	LCUI_MainLoop loop;
-
-// 	loop = LCUIMainLoop_New();
-// 	lcui_set_timeout(10, OnRefreshScreen, NULL);
-// 	lcui_set_timeout(50, OnQuit, NULL);
-// 	LCUIMainLoop_Run(loop);
-// }
-
-// static void OnTriggerBtnClick(void *arg)
-// {
-// 	LCUI_SysEventRec e;
-
-// 	e.type = LCUI_MOUSEDOWN;
-// 	e.button.button = LCUI_KEY_LEFTBUTTON;
-// 	e.button.x = 5;
-// 	e.button.y = 5;
-// 	LCUI_TriggerEvent(&e, NULL);
-
-// 	e.type = LCUI_MOUSEUP;
-// 	LCUI_TriggerEvent(&e, NULL);
-// }
-
-// static void ObserverThread(void *arg)
-// {
-// 	int i;
-// 	LCUI_BOOL *exited = arg;
-
-// 	for (i = 0; i < 20 && !*exited; ++i) {
-// 		sleep_ms(100);
-// 	}
-// 	it_b("main loop should exit within 2000ms", *exited, TRUE);
-// 	if (!*exited) {
-// 		exit(-print_test_result());
-// 		return;
-// 	}
-// 	LCUIThread_Exit(NULL);
-// }
-
-static void OnCopyText()
+static void ObserverThread(void *arg)
 {
-	LCUI_SysEventRec copy_ev;
-	copy_ev.type = LCUI_KEY_DOWN;
-	copy_ev.key.code = (int) LCUI_KEY_C;
-	copy_ev.key.ctrl_key = TRUE;
+	int i;
+	LCUI_BOOL *exited = arg;
 
-	LCUI_TriggerEvent(&copy_ev, NULL);
+	for (i = 0; i < 10 && !*exited; ++i) {
+		sleep_ms(100);
+	}
+	it_b("main loop should exit within 1000ms", *exited, TRUE);
+	if (!*exited) {
+		exit(-print_test_result());
+		return;
+	}
+	LCUIThread_Exit(NULL);
+}
+
+static void CopyText(void *arg)
+{
+	LCUI_Widget w = arg;
+	LCUIWidget_SetFocus(w);
+	LCUI_SysEventRec ev;
+
+	ev.type = LCUI_KEYDOWN;
+	ev.key.code = (int)LCUI_KEY_V;
+	ev.key.ctrl_key = TRUE;
+	ev.key.shift_key = FALSE;
+	LCUI_TriggerEvent(&ev, NULL);
+}
+
+static void OnText1Focused(void *arg)
+{
+	LCUI_Widget w = arg;
+	LCUI_SysEventRec ev;
+	ev.type = LCUI_KEYDOWN;
+	ev.key.code = (int)LCUI_KEY_C;
+	ev.key.ctrl_key = TRUE;
+	ev.key.shift_key = FALSE;
+
+	LCUI_TriggerEvent(&ev, NULL);
+}
+
+static void OnCheckText(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
+{
+	wchar_t wcs[64];
+	size_t len = TextEdit_GetTextW(w, 0, 64, wcs);
+	it_b("check TextEdit_GetTextW after paste",
+	     len == wcslen(L"helloworld"), TRUE);
+	LCUI_Quit();
 }
 
 void test_clipboard(void)
 {
 	LCUI_Thread tid;
 	LCUI_Widget root, text1, text2;
-	wchar_t wstr = L"helloworld";
+	LCUI_BOOL exited = FALSE;
 
 	LCUI_Init();
 	//
@@ -81,11 +72,15 @@ void test_clipboard(void)
 	Widget_Append(root, text1);
 	Widget_Append(root, text2);
 
-	TextEdit_SetTextW(text1, wstr);
+	TextEdit_SetTextW(text1, L"helloworld");
 	LCUIWidget_SetFocus(text1);
 
-	lcui_set_timeout(200, OnCopyText, text1);
-	
+	LCUIThread_Create(&tid, ObserverThread, &exited);
+	lcui_set_timeout(50, OnText1Focused, text1);
+	lcui_set_timeout(100, CopyText, text2);
+	Widget_BindEvent(text2, "change", OnCheckText, NULL, NULL);
+
 	LCUI_Main();
-	// LCUIThread_Join(tid, NULL);
+	exited = TRUE;
+	LCUIThread_Join(tid, NULL);
 }
