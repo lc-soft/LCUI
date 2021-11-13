@@ -19,3 +19,4 @@ void test_mainloop(void);
 void test_block_layout(void);
 void test_flex_layout(void);
 void test_widget_rect(void);
+void test_clipboard(void);
