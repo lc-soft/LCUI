@@ -5,7 +5,6 @@
 #include <LCUI/gui/widget/textedit.h>
 #include <LCUI/timer.h>
 #include <LCUI/input.h>
-#include <LCUI/display.h>
 #include "ctest.h"
 
 static void CopyText(void *arg)
