@@ -8,22 +8,6 @@
 #include <LCUI/display.h>
 #include "ctest.h"
 
-static void ObserverThread(void *arg)
-{
-	int i;
-	LCUI_BOOL *exited = arg;
-
-	for (i = 0; i < 10 && !*exited; ++i) {
-		sleep_ms(100);
-	}
-	it_b("main loop should exit within 1000ms", *exited, TRUE);
-	if (!*exited) {
-		exit(-print_test_result());
-		return;
-	}
-	LCUIThread_Exit(NULL);
-}
-
 static void CopyText(void *arg)
 {
 	LCUI_Widget w = arg;
@@ -60,9 +44,7 @@ static void OnCheckText(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 
 void test_clipboard(void)
 {
-	LCUI_Thread tid;
 	LCUI_Widget root, text1, text2;
-	LCUI_BOOL exited = FALSE;
 
 	LCUI_Init();
 	//
@@ -75,12 +57,9 @@ void test_clipboard(void)
 	TextEdit_SetTextW(text1, L"helloworld");
 	LCUIWidget_SetFocus(text1);
 
-	LCUIThread_Create(&tid, ObserverThread, &exited);
 	lcui_set_timeout(50, OnText1Focused, text1);
 	lcui_set_timeout(100, CopyText, text2);
 	Widget_BindEvent(text2, "change", OnCheckText, NULL, NULL);
 
 	LCUI_Main();
-	exited = TRUE;
-	LCUIThread_Join(tid, NULL);
 }
