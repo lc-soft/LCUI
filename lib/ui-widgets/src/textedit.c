@@ -800,10 +800,7 @@ static void TextEdit_OnKeyDown(LCUI_Widget widget, LCUI_WidgetEvent e,
 		// @WhoAteDaCake
 		// Currently copies internal widget text
 		// once selection is implemented, it would copy that instead
-		// TODO: is there a need for mutex lock to make sure
-		// 	 that the consumed text is not being modified
 		size_t len = TextEdit_GetTextLength(widget);
-		// TODO: what is len + 1 for?
 		wchar_t *wcs = malloc((len + 1) * sizeof(wchar_t));
 		TextEdit_GetTextW(widget, 0, len, wcs);
 		LCUI_SetClipboardText(wcs, len);
