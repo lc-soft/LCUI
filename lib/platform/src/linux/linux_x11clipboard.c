@@ -49,8 +49,11 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/platform.h>
 #include <LCUI/clipboard.h>
+#include <LCUI/thread.h>
 #include LCUI_EVENTS_H
 #include <X11/Xatom.h>
+
+#define CLIPBOARD_TIMEOUT 1000
 
 typedef struct LCUI_ClipboardCallbackRec_ {
 	void *arg;
@@ -72,30 +75,52 @@ static struct LCUI_LinuxClipboardDriver {
 	Atom xa_string;
 	Atom xa_targets;
 	Atom xa_text;
+	// Observer thread
+	LCUI_Thread observer_thread;
 } clipboard;
 
-void ExecuteCallback(void)
+void ExecuteCallback(LCUI_BOOL timed_out)
 {
+	if (!timed_out) {
+		_DEBUG_MSG("Didn't time out canceling observer thread\n");
+		LCUIThread_Cancel(clipboard.observer_thread);
+	}
 	LCUI_ClipboardCallback callback = clipboard.callback;
+	LCUI_Clipboard clipboard_data;
+
 	if (!callback->running) {
 		_DEBUG_MSG("Tried to ExecuteCallback before copying started\n");
 		return;
 	}
-
-	size_t len = clipboard.text_len + 1;
-	wchar_t *wstr = malloc(sizeof(wchar_t) * len);
-	len = decode_utf8(wstr, clipboard.text, len);
-	wstr[len] = 0;
-	LCUI_Clipboard clipboard_data = malloc(sizeof(LCUI_ClipboardRec));
-	clipboard_data->text = wstr;
-	clipboard_data->len = len;
-	clipboard_data->image = NULL;
+	if (timed_out) {
+		_DEBUG_MSG("Callback timed out\n");
+		clipboard_data = NULL;
+	} else {
+		size_t len = clipboard.text_len + 1;
+		wchar_t *wstr = malloc(sizeof(wchar_t) * len);
+		len = decode_utf8(wstr, clipboard.text, len);
+		wstr[len] = 0;
+		// Assign the data
+		clipboard_data = malloc(sizeof(LCUI_ClipboardRec));
+		clipboard_data->text = wstr;
+		clipboard_data->len = len;
+		clipboard_data->image = NULL;
+	}
 	callback->action(clipboard_data, callback->arg);
 	// Reset properties, so if something goes wrongly, we crash
 	// instead of having undefined behaviour
 	callback->arg = NULL;
 	callback->action = NULL;
 	callback->running = FALSE;
+}
+
+void ClipboardRequestTimeout(void *arg)
+{
+	LCUI_ClipboardCallback callback = clipboard.callback;
+	sleep_ms(CLIPBOARD_TIMEOUT);
+	if (callback->running) {
+		ExecuteCallback(TRUE);
+	}
 }
 
 void RequestClipboardContent(void)
@@ -111,7 +136,7 @@ void RequestClipboardContent(void)
 	// This branch will only get executed once we implement copy event
 	if (clipboard_owner == window) {
 		_DEBUG_MSG("Clipboard owned by self\n");
-		ExecuteCallback();
+		ExecuteCallback(FALSE);
 		return;
 	}
 	if (clipboard_owner == None) {
@@ -124,6 +149,7 @@ void RequestClipboardContent(void)
 	// retrieved from UTF8_STRING, however, our implementation is not
 	// synchronous, so not sure how it would work, it needs further
 	// investigation
+	LCUIThread_Create(&clipboard.observer_thread, ClipboardRequestTimeout, NULL);
 	Atom XSEL_DATA = XInternAtom(display, "XSEL_DATA", FALSE);
 	XConvertSelection(display, clipboard.xclipboard, clipboard.xutf8_string,
 			  XSEL_DATA, window, CurrentTime);
@@ -209,7 +235,7 @@ static void OnSelectionNotify(LCUI_Event ev, void *arg)
 		XDeleteProperty(x_ev->xselection.display,
 				x_ev->xselection.requestor,
 				x_ev->xselection.property);
-		ExecuteCallback();
+		ExecuteCallback(FALSE);
 	}
 }
 
