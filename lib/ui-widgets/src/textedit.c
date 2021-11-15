@@ -726,10 +726,12 @@ static void TextEdit_OnPaste(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 static void TextEdit_OnClipboardReady(void *arg, LCUI_Widget widget)
 {
 	LCUI_Clipboard text = arg;
-	LCUI_WidgetEventRec e = { 0 };
+	if (text != NULL) {
+		LCUI_WidgetEventRec e = { 0 };
 
-	LCUI_InitWidgetEvent(&e, "paste");
-	Widget_TriggerEvent(widget, &e, text);
+		LCUI_InitWidgetEvent(&e, "paste");
+		Widget_TriggerEvent(widget, &e, text);
+	}
 }
 
 /** 处理按键事件 */
