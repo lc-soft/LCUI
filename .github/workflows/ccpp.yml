@@ -69,7 +69,7 @@ jobs:
 
       - name: Build
         run: |
-          xmake config -y -v
+          xmake config -y -v --ci-env=y
           xmake -v
 
       - name: "Run tests"
