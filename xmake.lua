@@ -9,6 +9,12 @@ includes("test/lib/ctest/xmake.lua")
 set_warnings("all")
 set_rundir("$(projectdir)/test")
 
+option("ci-env", {showmenu = true, default = false})
+
+if has_config("ci-env") then
+    add_defines("CI_ENV")
+end
+
 if is_plat("windows") then
     add_defines("_CRT_SECURE_NO_WARNINGS")
 else
