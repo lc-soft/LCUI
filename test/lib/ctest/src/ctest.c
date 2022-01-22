@@ -16,6 +16,12 @@
 #define RED(TEXT) COLOR_RED TEXT COLOR_NONE
 #define GREEN(TEXT) COLOR_GREEN TEXT COLOR_NONE
 
+#ifdef CI_ENV
+#define CHECK_MARK GREEN("* ")
+#else
+#define CHECK_MARK GREEN("√ ")
+#endif
+
 static size_t tests_passed = 0;
 static size_t tests_total = 0;
 static int test_msg_indent = 0;
@@ -80,7 +86,7 @@ void it_i(const char *name, int actual, int expected)
 {
 	tests_total++;
 	if (actual == expected) {
-		test_msg(GREEN("√ ") "%s == %d\n", name, expected);
+		test_msg(CHECK_MARK "%s == %d\n", name, expected);
 		tests_passed++;
 		return;
 	}
@@ -98,7 +104,7 @@ void it_b(const char *name, int actual, int expected)
 
 	tests_total++;
 	if (!actual == !expected) {
-		test_msg(GREEN("√ ") "%s\n", name);
+		test_msg(CHECK_MARK "%s\n", name);
 		tests_passed++;
 		return;
 	}
@@ -114,7 +120,7 @@ void it_s(const char *name, const char *actual, const char *expected)
 	tests_total++;
 	if ((actual && expected && strcmp(actual, expected) == 0) ||
 	    actual == expected) {
-		test_msg(GREEN("√ ") "%s == '%s'\n", name, expected);
+		test_msg(CHECK_MARK "%s == '%s'\n", name, expected);
 		tests_passed++;
 		return;
 	}
@@ -135,7 +141,7 @@ void it_rectf(const char *name, const pd_rectf_t *actual,
 {
 	tests_total++;
 	if (LCUIRectF_IsEquals(actual, expected)) {
-		test_msg(GREEN("√ ") "%s == (%g, %g, %g, %g)\n", name,
+		test_msg(CHECK_MARK "%s == (%g, %g, %g, %g)\n", name,
 			 expected->x, expected->y, expected->width,
 			 expected->height);
 		tests_passed++;
@@ -159,7 +165,7 @@ void it_rect(const char *name, const pd_rect_t *actual,
 {
 	tests_total++;
 	if (LCUIRect_IsEquals(actual, expected)) {
-		test_msg(GREEN("√ ") "%s == (%d, %d, %d, %d)\n", name,
+		test_msg(CHECK_MARK "%s == (%d, %d, %d, %d)\n", name,
 			 expected->x, expected->y, expected->width,
 			 expected->height);
 		tests_passed++;
