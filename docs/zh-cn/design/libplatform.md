@@ -22,6 +22,10 @@
 - 重新设计主循环
 - 将 settings 相关逻辑从主循环中分离
 
+## 功能设计
+
+暴露的公开操作函数只负责调用系统窗口函数，等消息循环处理到相关消息时才更新窗口数据。
+
 ## 接口设计
 
 ```c
@@ -180,7 +184,7 @@ int main(void)
 
   应用程序创建多个 app 对象没有意义，app 应该作为全局存在的单例对象。
 
-## v.0.3.0
+## v0.3.0
 
 ```c
 int main()
@@ -201,5 +205,24 @@ int main()
         }
     }
     app_free();
+}
+```
+
+## v0.4.0
+
+```c
+// https://docs.microsoft.com/en-us/uwp/api/Windows.UI.Core.CoreProcessEventsOption?view=winrt-22000
+
+int main()
+{
+    app_event_t e;
+
+    app_init_engine();
+    app_process_events();
+    // or
+    app_process_all_events();
+    // or
+    app_process_events_until_quit();
+    app_destroy_engine();
 }
 ```
