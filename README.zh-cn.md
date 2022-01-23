@@ -25,13 +25,10 @@
 - [介绍](#%E4%BB%8B%E7%BB%8D)
     - [主要特性](#%E4%B8%BB%E8%A6%81%E7%89%B9%E6%80%A7)
     - [效果图](#%E6%95%88%E6%9E%9C%E5%9B%BE)
-    - [相关项目](#%E7%9B%B8%E5%85%B3%E9%A1%B9%E7%9B%AE)
+    - [架构](#%E6%9E%B6%E6%9E%84)
     - [设计参考](#%E8%AE%BE%E8%AE%A1%E5%8F%82%E8%80%83)
-- [快速上手](#%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B)
-    - [使用 LCUI CLI](#%E4%BD%BF%E7%94%A8-lcui-cli)
-    - [手动编译安装](#%E6%89%8B%E5%8A%A8%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85)
-        - [Windows](#windows)
-        - [Ubuntu](#ubuntu)
+- [编译](#%E7%BC%96%E8%AF%91)
+- [安装](#%E5%AE%89%E8%A3%85)
 - [文档](#%E6%96%87%E6%A1%A3)
 - [路线图](#%E8%B7%AF%E7%BA%BF%E5%9B%BE)
 - [贡献](#%E8%B4%A1%E7%8C%AE)
@@ -84,18 +81,42 @@ LCUI 是一个用 C 语言编写的桌面端图形界面开发库。
   </tbody>
 </table>
 
-### 相关项目
+### 架构
 
-想要了解 LCUI 具体能做什么？你可以查看以下项目：
+LCUI 建立在各种库的基础之上，如下所示：
 
-- [LCUI CLI](https://github.com/lc-ui/lcui-cli) - 用于开发 LCUI 应用程序的命令行工具。
-- [LCUI Router](https://github.com/lc-soft/lcui-router) - LCUI 的路由管理器，用于解决 LCUI 应用内多视图的切换和状态管理问题，代码设计参考自 [Vue Router](https://github.com/vuejs/vue-router)。
-- [LC Design](https://github.com/lc-ui/lc-design) — 专为 LCUI 开发的组件库，包含了一些通用组件和 CSS 样式，组件设计参考自 Bootstrap、ElementUI、AntDesign。
-- [LC Finder](https://github.com/lc-soft/LC-Finder) — 图片管理器，LCUI 的旗舰级应用程序，你可以将它作为参考对象，以此评估 LCUI 的性能、界面效果和开发复杂度是否符合你的需求。
-- [Trad](https://github.com/lc-soft/trad) — 基于 JavaScript 语法且可编译为 C 的语言，预置 LCUI 绑定，提供类似于 [React](https://reactjs.org/) 的声明式 UI 开发体验。
-- [LCUI Quick Start](https://github.com/lc-ui/lcui-quick-start) - LCUI 应用程序模板。
-- [LCUI Router App](https://blog.lc-soft.io/posts/build-a-browser-like-app.html) - LCUI Router 的应用程序模板，实现了和浏览器一样的图形界面、多标签页、路由导航等功能。
-- [LC Design App](https://github.com/lc-ui/lc-design-app) - LC Design 组件库的应用程序模板，展示了 LC Design 的一些组件的简单用法和效果。
+```text
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                                                               ┃
+┃                        LCUI Application                       ┃
+┃                                                               ┃
+┃        ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓        ┃
+┃        ┃                    LCUI 3                   ┃        ┃
+┃      ┏━┻━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━┻━┓      ┃
+┃      ┃ ui-server ┃ ui-widgets ┃ ui-builder ┃ ui-anchor ┃      ┃
+┃    ┏━┻━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━┻━┓    ┃
+┃    ┃ platform ┃    ui    ┃  worker  ┃  timer  ┃  cursor  ┃    ┃
+┣━━━━┻━━━━━━━━━━┻━━━━━━━━━━┻━━━━━━━━━━┻━━━━━━━━━┻━━━━━━━━━━┻━━━━┫
+┃ thread ┃ yutil  ┃ image  ┃   css   ┃ paint  ┃  font  ┃  text  ┃
+┗━━━━━━━━┻━━━━━━━━┻━━━━━━━━┻━━━━━━━━━┻━━━━━━━━┻━━━━━━━━┻━━━━━━━━┛
+```
+
+- [lib/css](./lib/css): CSS 解析器和选择引擎，提供 CSS 解析和选择能力。
+- [lib/font](./lib/font): 字体渲染库，提供字体文件加载和渲染能力。
+- [lib/image](./lib/image): 图像文件操作库，提供 BMP、JPG、PNG 图像文件读取能力和 PNG 写能力。
+- [lib/paint](./lib/paint): 图形绘制库，提供线段、矩形、圆形和阴影的绘制能力。
+- [lib/platform](./lib/platform): 平台库，提供跨平台统一的系统相关 API，包括消息循环、窗口管理、输入法等。
+- [lib/text](./lib/text): 文本排版库，提供文本排版能力。
+- [lib/thread](./lib/thread): 线程库，提供跨平台的多线程能力。
+- [lib/timer](./ui/timer): 定时器库，提供定时执行操作的能力。
+- [lib/ui](./lib/ui): 图形界面核心库，提供 UI 组件管理、事件队列、样式计算、绘制等 UI 必要能力。
+- [lib/ui-anchor](./lib/anchor): 锚点组件，提供类似于超链接的能力。
+- [lib/ui-builder](./lib/anchor): 构建器，提供从 XML 文件内容创建 UI 的能力。
+- [lib/ui-cursor](./lib/ui-cursor): 光标，提供光标绘制能力。
+- [lib/ui-server](./lib/ui-server): 服务器，提供将 UI 组件映射至系统窗口的能力。
+- [lib/ui-widgets](./lib//ui/widgets): 组件库，提供文本、按钮、滚动条等一些基础的 UI 组件。
+- [lib/worker](./lib/worker): 工作线程库，提供简单的工作线程通信和管理能力。
+- [lib/yutil](./lib/yutil): 实用工具库，提供链表、哈希表、红黑树、字符串等相关常用函数。
 
 ### 设计参考
 
@@ -105,33 +126,7 @@ LCUI 是一个用 C 语言编写的桌面端图形界面开发库。
 - [jQuery](https://jquery.com/) — 部件操作接口的命名风格参考
 - [MDN](https://developer.mozilla.org/zh-CN/docs/Web/CSS) — CSS 标准参考
 
-## 快速上手
-
-### 使用 LCUI CLI
-
-LCUI CLI 是一个命令行工具，在使用它之前需要安装 [Node.js](https://nodejs.org/) ，之后再运行以下命令即可快速体验：
-
-```bash
-# 安装 lcui-cli 和 lcpkg
-npm install -g @lcui/cli lcpkg
-
-# 创建一个名为 myapp 的 LCUI 项目
-lcui create myapp
-
-# 进入项目目录
-cd myapp
-
-# 设置开发环境
-lcui setup
-
-# 构建项目
-lcui build
-
-# 运行项目
-lcui run
-```
-
-### 手动编译安装
+## 编译
 
 先安装 [XMake](https://xmake.io/#/zh-cn/)，然后执行以下命令：
 
@@ -142,17 +137,33 @@ git clone https://github.com/lc-soft/LCUI.git
 # 进入源码目录
 cd LCUI
 
-# 构建项目
+# 构建
 xmake
+```
 
-# 打包已构建的文件
+如果你想体验测试程序的运行效果的话：
+
+```bash
+# 打包已构建的文件以供构建测试程序
 xmake package
 
-# 构建 test 目录内的 hellowrld 程序
-xmake -P test helloworld
+# 进入测试程序目录
+cd test
 
-# 运行 helloworld 程序
-xmake run -P test helloworld
+# 编译测试程序
+xmake -P .
+
+# 运行测试程序
+xmake run -P . -w . helloworld
+```
+
+## 安装
+
+```bash
+xmake install
+
+# 或者安装到自定义目录下
+xmake install -o /path/to/your/custom/installdir
 ```
 
 ## 文档
@@ -173,6 +184,7 @@ xmake run -P test helloworld
 
 有很多方式可以为此项目的发展做贡献：
 
+- 完善 lib 目录中各个库的自述文档，内容包括但不仅限于补充示例代码、相关功能讲解、运行效果图等
 - [反馈问题](https://github.com/lc-soft/LCUI/issues)并在问题关闭时帮助我们验证它们是否已经修复
 - 在源码中[搜索 FIXME 注释](https://github.com/lc-soft/LCUI/search?l=C&q=FIXME)，然后尝试解决它们
 - 在 [IssueHunt](https://issuehunt.io/r/lc-soft/LCUI) 上为感兴趣的 issue 设置悬赏，吸引其他开发者参与开发
@@ -203,7 +215,7 @@ xmake run -P test helloworld
 
 1. **我为什么要用 LCUI，而不是 Electron？**
 
-    除了技术研究与交流，以及为开源社区发展做贡献外，你没有理由用 LCUI。相较于功能完备的 Electron 而言，文件体积小和内存占用低并没有什么用，毕竟现在机器配置都很高，即便 APP 的界面卡到爆，占用上百 MB 的内存和近 1 GB 的存储空间，只要能正常运作就够了。
+    除了技术研究与交流，以及为开源社区发展做贡献外，你没有理由 LCUI。相较于功能完备的 Electron 而言，文件体积小和内存占用低并没有什么用，毕竟现在机器配置都很高，即便 APP 的界面卡到爆，占用上百 MB 的内存和近 1 GB 的存储空间，只要能正常运作就够了。
 
 1. **假如我要用它的话，需要注意什么？**
 
