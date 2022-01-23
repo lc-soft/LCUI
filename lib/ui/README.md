@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 
 ### UI::MutationObserver
 
-提供了监听 Widget 的属性、位置、尺寸、子树等变化的能力。
+提供监听 Widget 的属性、位置、尺寸、子树等变化的能力。
 
 设计参考自：[MutationObserver - Web API 接口参考 | MDN](https://developer.mozilla.org/zh-CN/docs/Web/API/MutationObserver)
 
