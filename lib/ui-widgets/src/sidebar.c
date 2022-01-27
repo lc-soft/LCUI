@@ -44,7 +44,7 @@ typedef struct SideBarItemRec_ {
 
 typedef struct SideBarRec_ {
 	list_t items;
-	LCUI_Style line_height;
+	css_unit_value_t *line_height;
 } SideBarRec, *SideBar;
 
 static struct SideBarModule {

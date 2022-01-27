@@ -274,7 +274,7 @@ void InputDriver::OnKeyUp(CoreWindow^ sender, KeyEventArgs^ args)
 	app_event_destroy(&ev);
 }
 
-static LCUI_BOOL IME_ProcessKey(int key, int key_state)
+static LCUI_BOOL IME_ProcessKey(int key, int css_key_state)
 {
 	return ime_check_char_key(key);
 }

@@ -39,15 +39,15 @@ LCUI_BEGIN_HEADER
 /* clang-format on */
 
 enum LCUI_CSSFontStyleKey {
-	key_color,
-	key_font_size,
-	key_font_style,
-	key_font_weight,
-	key_font_family,
-	key_line_height,
-	key_text_align,
-	key_content,
-	key_white_space,
+	css_key_color,
+	css_key_font_size,
+	css_key_font_style,
+	css_key_font_weight,
+	css_key_font_family,
+	css_key_line_height,
+	css_key_text_align,
+	css_key_content,
+	css_key_white_space,
 	TOTAL_FONT_STYLE_KEY
 };
 
@@ -60,8 +60,8 @@ typedef struct LCUI_CSSFontStyleRec_ {
 	pd_color_t color;
 	LCUI_FontStyle font_style;
 	LCUI_FontWeight font_weight;
-	LCUI_StyleValue text_align;
-	LCUI_StyleValue white_space;
+	css_keyword_value_t text_align;
+	css_keyword_value_t white_space;
 } LCUI_CSSFontStyleRec, *LCUI_CSSFontStyle;
 
 #define Widget_SetFontStyle(W, K, V, T)            \
@@ -81,7 +81,7 @@ LCUI_API void CSSFontStyle_Destroy(LCUI_CSSFontStyle fs);
 LCUI_API LCUI_BOOL CSSFontStyle_IsEquals(const LCUI_CSSFontStyle a,
 					 const LCUI_CSSFontStyle b);
 
-LCUI_API void CSSFontStyle_Compute(LCUI_CSSFontStyle fs, LCUI_StyleSheet ss);
+LCUI_API void CSSFontStyle_Compute(LCUI_CSSFontStyle fs, css_style_decl_t *ss);
 
 LCUI_API void CSSFontStyle_GetTextStyle(LCUI_CSSFontStyle fs, LCUI_TextStyle ts);
 

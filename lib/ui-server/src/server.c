@@ -165,7 +165,7 @@ static void ui_server_on_window_paint(app_event_t *e, void *arg)
 			continue;
 		}
 		LCUIRect_ToRectF(&e->paint.rect, &rect, ui_get_scale());
-		ui_widget_mark_dirty_rect(conn->widget, &rect, SV_GRAPH_BOX);
+		ui_widget_mark_dirty_rect(conn->widget, &rect, CSS_KEYWORD_GRAPH_BOX);
 	}
 }
 
@@ -191,7 +191,7 @@ static void ui_server_on_window_resize(app_event_t *e, void *arg)
 			return;
 		}
 	}
-	ui_widget_mark_dirty_rect(conn->widget, NULL, SV_GRAPH_BOX);
+	ui_widget_mark_dirty_rect(conn->widget, NULL, CSS_KEYWORD_GRAPH_BOX);
 	ui_widget_resize(conn->widget, width, height);
 	logger_debug("[ui-server] on_window_resize, widget: (%p, %s), size "
 		     "(%g, %g), window: %p\n",
@@ -257,14 +257,14 @@ static void ui_server_refresh_window(ui_connection_t *conn)
 {
 	pd_rect_t rect;
 
-	ui_widget_mark_dirty_rect(conn->widget, NULL, SV_GRAPH_BOX);
+	ui_widget_mark_dirty_rect(conn->widget, NULL, CSS_KEYWORD_GRAPH_BOX);
 	ui_compute_rect_actual(&rect, &conn->widget->box.canvas);
 	app_window_set_title(conn->window, conn->widget->title);
 	app_window_set_size(conn->window, rect.width, rect.height);
-	if (ui_widget_has_auto_style(conn->widget, key_top)) {
+	if (ui_widget_has_auto_style(conn->widget, css_key_top)) {
 		rect.y = (app_get_screen_height() - rect.height) / 2;
 	}
-	if (ui_widget_has_auto_style(conn->widget, key_left)) {
+	if (ui_widget_has_auto_style(conn->widget, css_key_left)) {
 		rect.x = (app_get_screen_width() - rect.width) / 2;
 	}
 	app_window_set_position(conn->window, rect.x, rect.y);
@@ -604,10 +604,10 @@ static int window_mutation_list_add(list_t *list,
 	wcsncpy(wnd_mutation->title, widget->title ? widget->title : L"\0",
 		TITLE_MAX_SIZE);
 	wnd_mutation->visible = widget->computed_style.visible;
-	wnd_mutation->x = ui_compute_actual(widget->x, LCUI_STYPE_PX);
-	wnd_mutation->y = ui_compute_actual(widget->y, LCUI_STYPE_PX);
-	wnd_mutation->width = ui_compute_actual(widget->width, LCUI_STYPE_PX);
-	wnd_mutation->height = ui_compute_actual(widget->height, LCUI_STYPE_PX);
+	wnd_mutation->x = ui_compute_actual(widget->x, CSS_UNIT_PX);
+	wnd_mutation->y = ui_compute_actual(widget->y, CSS_UNIT_PX);
+	wnd_mutation->width = ui_compute_actual(widget->width, CSS_UNIT_PX);
+	wnd_mutation->height = ui_compute_actual(widget->height, CSS_UNIT_PX);
 	return 0;
 }
 

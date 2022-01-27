@@ -1,7 +1,7 @@
 ﻿/*
  * css_library.h -- CSS library operation module.
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2022, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,239 +28,253 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_CSS_LIBRARY_H
-#define LCUI_CSS_LIBRARY_H
+#ifndef LIBCSS_INCLUDE_APP_H
+#define LIBCSS_INCLUDE_APP_H
 
+#include <LCUI/header.h>
 #include <LCUI/util.h>
 
 LCUI_BEGIN_HEADER
 
 /* clang-format off */
 
-#define MAX_SELECTOR_LEN	1024
-#define MAX_SELECTOR_DEPTH	32
+#define CSS_SELECTOR_MAX_LEN	1024
+#define CSS_SELECTOR_MAX_DEPTH	32
 
  /** 样式属性名 */
-typedef enum LCUI_StyleKeyName {
+typedef enum css_property_key_t {
 	// position start
-	key_left,
-	key_right,
-	key_top,
-	key_bottom,
-	key_position,
+	css_key_left,
+	css_key_right,
+	css_key_top,
+	css_key_bottom,
+	css_key_position,
 	// position end
 
 	// display start
-	key_visibility,
-	key_display,
+	css_key_visibility,
+	css_key_display,
 	// display end
 
-	key_z_index,
-	key_opacity,
-	key_box_sizing,
-	key_width,
-	key_height,
-	key_min_width,
-	key_min_height,
-	key_max_width,
-	key_max_height,
+	css_key_z_index,
+	css_key_opacity,
+	css_key_box_sizing,
+	css_key_width,
+	css_key_height,
+	css_key_min_width,
+	css_key_min_height,
+	css_key_max_width,
+	css_key_max_height,
 
 	// margin start
-	key_margin_top,
-	key_margin_right,
-	key_margin_bottom,
-	key_margin_left,
+	css_key_margin_top,
+	css_key_margin_right,
+	css_key_margin_bottom,
+	css_key_margin_left,
 	// margin end
 
 	// padding start
-	key_padding_top,
-	key_padding_right,
-	key_padding_bottom,
-	key_padding_left,
+	css_key_padding_top,
+	css_key_padding_right,
+	css_key_padding_bottom,
+	css_key_padding_left,
 	// padding end
 
-	key_vertical_align,
+	css_key_vertical_align,
 
 	// border start
-	key_border_top_width,
-	key_border_top_style,
-	key_border_top_color,
-	key_border_right_width,
-	key_border_right_style,
-	key_border_right_color,
-	key_border_bottom_width,
-	key_border_bottom_style,
-	key_border_bottom_color,
-	key_border_left_width,
-	key_border_left_style,
-	key_border_left_color,
-	key_border_top_left_radius,
-	key_border_top_right_radius,
-	key_border_bottom_left_radius,
-	key_border_bottom_right_radius,
+	css_key_border_top_width,
+	css_key_border_top_style,
+	css_key_border_top_color,
+	css_key_border_right_width,
+	css_key_border_right_style,
+	css_key_border_right_color,
+	css_key_border_bottom_width,
+	css_key_border_bottom_style,
+	css_key_border_bottom_color,
+	css_key_border_left_width,
+	css_key_border_left_style,
+	css_key_border_left_color,
+	css_key_border_top_left_radius,
+	css_key_border_top_right_radius,
+	css_key_border_bottom_left_radius,
+	css_key_border_bottom_right_radius,
 	// border end
 
 	// background start
-	key_background_color,
-	key_background_image,
-	key_background_size,
-	key_background_size_width,
-	key_background_size_height,
-	key_background_repeat,
-	key_background_repeat_x,
-	key_background_repeat_y,
-	key_background_position,
-	key_background_position_x,
-	key_background_position_y,
-	key_background_origin,
+	css_key_background_color,
+	css_key_background_image,
+	css_key_background_size,
+	css_key_background_size_width,
+	css_key_background_size_height,
+	css_key_background_repeat,
+	css_key_background_repeat_x,
+	css_key_background_repeat_y,
+	css_key_background_position,
+	css_key_background_position_x,
+	css_key_background_position_y,
+	css_key_background_origin,
 	// background end
 
 	// box shadow start
-	key_box_shadow_x,
-	key_box_shadow_y,
-	key_box_shadow_spread,
-	key_box_shadow_blur,
-	key_box_shadow_color,
+	css_key_box_shadow_x,
+	css_key_box_shadow_y,
+	css_key_box_shadow_spread,
+	css_key_box_shadow_blur,
+	css_key_box_shadow_color,
 	// box shadow end
 
 	// flex style start
-	key_flex_basis,
-	key_flex_grow,
-	key_flex_shrink,
-	key_flex_direction,
-	key_flex_wrap,
-	key_justify_content,
-	key_align_content,
-	key_align_items,
+	css_key_flex_basis,
+	css_key_flex_grow,
+	css_key_flex_shrink,
+	css_key_flex_direction,
+	css_key_flex_wrap,
+	css_key_justify_content,
+	css_key_align_content,
+	css_key_align_items,
 	// flex style end
 
-	key_pointer_events,
-	key_focusable,
+	css_key_pointer_events,
+	css_key_focusable,
 	STYLE_KEY_TOTAL
-} LCUI_StyleKeyName;
+} css_property_key_t;
 
-#define key_flex_style_start	key_flex_basis
-#define key_flex_style_end	key_align_content
-#define key_position_start	key_left
-#define key_position_end	key_position
-#define key_margin_start	key_margin_top
-#define key_margin_end		key_margin_left
-#define key_padding_start	key_padding_top
-#define key_padding_end		key_padding_left
-#define key_border_start	key_border_top_width
-#define key_border_end		key_border_bottom_right_radius
-#define key_background_start	key_background_color
-#define key_background_end	key_background_origin
-#define key_box_shadow_start	key_box_shadow_x
-#define key_box_shadow_end	key_box_shadow_color
+#define css_key_flex_style_start	css_key_flex_basis
+#define css_key_flex_style_end		css_key_align_content
+#define css_key_position_start		css_key_left
+#define css_key_position_end		css_key_position
+#define css_key_margin_start		css_key_margin_top
+#define css_key_margin_end		css_key_margin_left
+#define css_key_padding_start		css_key_padding_top
+#define css_key_padding_end		css_key_padding_left
+#define css_key_border_start		css_key_border_top_width
+#define css_key_border_end		css_key_border_bottom_right_radius
+#define css_key_background_start	css_key_background_color
+#define css_key_background_end		css_key_background_origin
+#define css_key_box_shadow_start	css_key_box_shadow_x
+#define css_key_box_shadow_end		css_key_box_shadow_color
 
-typedef struct LCUI_StyleSheetRec_ {
-	LCUI_Style sheet;
-	int length;
-} LCUI_StyleSheetRec, *LCUI_StyleSheet;
+struct css_style_declaration_t {
+	css_unit_value_t *sheet;
+	size_t length;
+};
 
-typedef const LCUI_StyleSheetRec *LCUI_CachedStyleSheet;
+typedef struct css_style_declaration_t css_style_declaration_t;
+typedef list_t css_style_properties_t;
 
-typedef list_t LCUI_StyleListRec;
-typedef list_t* LCUI_StyleList;
+typedef css_style_properties_t css_style_props_t;
+typedef css_style_declaration_t css_style_decl_t;
 
-typedef struct LCUI_StyleListNodeRec_ {
-	LCUI_StyleKeyName key;
-	LCUI_StyleRec style;
+typedef struct css_style_property_t {
+	css_property_key_t key;
+	css_unit_value_t style;
 	list_node_t node;
-} LCUI_StyleListNodeRec, *LCUI_StyleListNode;
+} css_style_property_t;
 
 /** 选择器结点结构 */
-typedef struct LCUI_SelectorNodeRec_ {
+typedef struct css_selector_node_t {
 	char *id;			/**< ID */
 	char *type;			/**< 类型名称 */
 	char **classes;			/**< 样式类列表 */
 	char **status;			/**< 状态列表 */
 	char *fullname;			/**< 全名，由 id、type、classes、status 组合而成 */
 	int rank;			/**< 权值 */
-} LCUI_SelectorNodeRec, *LCUI_SelectorNode;
+} css_selector_node_t;
 
 /** 选择器结构 */
-typedef struct LCUI_SelectorRec_ {
+typedef struct css_selector_t {
 	int rank;			/**< 权值，决定优先级 */
 	int batch_num;			/**< 批次号 */
 	int length;			/**< 选择器结点长度 */
 	unsigned hash;			/**< 哈希值 */
-	LCUI_SelectorNode *nodes;	/**< 选择器结点列表 */
-} LCUI_SelectorRec, *LCUI_Selector;
+	css_selector_node_t **nodes;	/**< 选择器结点列表 */
+} css_selector_t;
 
 /* clang-format on */
 
-#define CheckStyleType(S, K, T) \
-	(S->sheet[K].is_valid && S->sheet[K].type == LCUI_STYPE_##T)
+#define css_check_style_prop(S, K, T) \
+	css_style_declaration_check_property(S, K, CSS_UNIT_##T)
 
-#define SetStyle(S, NAME, VAL, TYPE)             \
-	S->sheet[NAME].is_valid = TRUE,          \
-	S->sheet[NAME].type = LCUI_STYPE_##TYPE, \
-	S->sheet[NAME].val_##TYPE = VAL
+#define css_set_style_prop(S, KEY, VAL, UNIT)         \
+	do {                                          \
+		S->sheet[KEY].is_valid = TRUE;        \
+		S->sheet[KEY].UNIT = CSS_UNIT_##UNIT; \
+		S->sheet[KEY].val_##UNIT = VAL;       \
+	} while (0);
 
-#define UnsetStyle(S, NAME)              \
-	S->sheet[NAME].is_valid = FALSE, \
-	S->sheet[NAME].type = LCUI_STYPE_NONE, S->sheet[NAME].val_int = 0
+#define css_unset_style_prop(S, KEY)                \
+	do {                                        \
+		S->sheet[KEY].is_valid = FALSE;     \
+		S->sheet[KEY].type = CSS_UNIT_NONE; \
+		S->sheet[KEY].val_int = 0;          \
+	} while (0);
 
-#define LCUI_FindStyleSheet(S, L) LCUI_FindStyleSheetFromGroup(0, NULL, S, L)
+LCUI_API void css_unit_value_destroy(css_unit_value_t *s);
 
-#define StyleSheet_GetStyle(S, K) &((S)->sheet[K])
+LCUI_API void css_unit_value_merge(css_unit_value_t *dst,
+				   css_unit_value_t *src);
 
-LCUI_API void DestroyStyle(LCUI_Style s);
+LCUI_API css_style_props_t *css_style_properties_create(void);
 
-LCUI_API void MergeStyle(LCUI_Style dst, LCUI_Style src);
+LCUI_API css_style_property_t *css_style_properties_find(
+    css_style_props_t *list, int key);
 
-LCUI_API LCUI_StyleList StyleList(void);
+LCUI_API int css_style_properties_remove(css_style_props_t *list, int key);
 
-LCUI_API LCUI_StyleListNode StyleList_GetNode(LCUI_StyleList list, int key);
+LCUI_API css_style_property_t *css_style_properties_add(css_style_props_t *list,
+							int key);
 
-LCUI_API int StyleList_RemoveNode(LCUI_StyleList list, int key);
+LCUI_API void css_style_properties_destroy(css_style_props_t *list);
 
-LCUI_API LCUI_StyleListNode StyleList_AddNode(LCUI_StyleList list, int key);
+LCUI_API css_style_decl_t *css_style_declaration_create(void);
 
-LCUI_API void StyleList_Delete(LCUI_StyleList list);
+INLINE LCUI_BOOL css_style_declaration_check_property(
+    css_style_decl_t *style, css_property_key_t key, css_unit_t unit)
+{
+	return style->sheet[key].is_valid && style->sheet[key].type == unit;
+}
 
-LCUI_API LCUI_StyleSheet StyleSheet(void);
+LCUI_API void css_style_declaration_clear(css_style_decl_t *ss);
 
-LCUI_API void StyleSheet_Clear(LCUI_StyleSheet ss);
+LCUI_API void css_style_declaration_destroy(css_style_decl_t *ss);
 
-LCUI_API void StyleSheet_Delete(LCUI_StyleSheet ss);
+LCUI_API int css_style_declaration_merge(css_style_decl_t *dest,
+					 const css_style_decl_t *src);
 
-LCUI_API int StyleSheet_Merge(LCUI_StyleSheet dest,
-			      const LCUI_StyleSheetRec *src);
+LCUI_API int css_style_declaration_merge_properties(css_style_decl_t *ss,
+						    css_style_props_t *list);
 
-LCUI_API int StyleSheet_MergeList(LCUI_StyleSheet ss, LCUI_StyleList list);
+LCUI_API int css_style_declaration_replace(css_style_decl_t *dest,
+					   const css_style_decl_t *src);
 
-LCUI_API int StyleSheet_Replace(LCUI_StyleSheet dest,
-				const LCUI_StyleSheetRec *src);
+LCUI_API css_selector_t *css_selector_create(const char *selector);
 
-LCUI_API LCUI_Selector Selector(const char *selector);
+LCUI_API css_selector_t *css_selector_duplicate(css_selector_t *selector);
 
-LCUI_API LCUI_Selector Selector_Copy(LCUI_Selector selector);
+LCUI_API int css_selector_append(css_selector_t *selector,
+				 css_selector_node_t *node);
 
-LCUI_API int Selector_AppendNode(LCUI_Selector selector,
-				 LCUI_SelectorNode node);
+LCUI_API void css_selector_update(css_selector_t *s);
 
-LCUI_API void Selector_Update(LCUI_Selector s);
+LCUI_API void css_selector_destroy(css_selector_t *s);
 
-LCUI_API void Selector_Delete(LCUI_Selector s);
+LCUI_API int css_selector_node_get_name_list(css_selector_node_t *sn,
+					     list_t *names);
 
-LCUI_API int SelectorNode_GetNames(LCUI_SelectorNode sn, list_t *names);
+LCUI_API int css_selector_node_update(css_selector_node_t *node);
 
-LCUI_API int SelectorNode_Update(LCUI_SelectorNode node);
-
-LCUI_API void SelectorNode_Delete(LCUI_SelectorNode node);
+LCUI_API void css_selector_node_destroy(css_selector_node_t *node);
 
 /**
  * 匹配选择器节点
  * 左边的选择器必须包含右边的选择器的所有属性。
  */
-LCUI_API LCUI_BOOL SelectorNode_Match(LCUI_SelectorNode sn1,
-				      LCUI_SelectorNode sn2);
+LCUI_API LCUI_BOOL css_selector_node_match(css_selector_node_t *sn1,
+					   css_selector_node_t *sn2);
 
-LCUI_API int LCUI_PutStyleSheet(LCUI_Selector selector, LCUI_StyleSheet in_ss,
-				const char *space);
+LCUI_API int css_add_style_sheet(css_selector_t *selector,
+				css_style_decl_t *in_ss, const char *space);
 
 /**
  * 从指定组中查找样式表
@@ -269,38 +283,41 @@ LCUI_API int LCUI_PutStyleSheet(LCUI_Selector selector, LCUI_StyleSheet in_ss,
  * @param[in] s 选择器
  * @param[out] list 找到的样式表列表
  */
-LCUI_API int LCUI_FindStyleSheetFromGroup(int group, const char *name,
-					  LCUI_Selector s, list_t *list);
+LCUI_API int css_query_selector_from_group(int group, const char *name,
+					     css_selector_t *s, list_t *list);
 
-LCUI_API LCUI_CachedStyleSheet LCUI_GetCachedStyleSheet(LCUI_Selector s);
+INLINE int css_query_selector(css_selector_t *s, list_t *list)
+{
+	return css_query_selector_from_group(0, NULL, s, list);
+}
 
-LCUI_API void LCUI_GetStyleSheet(LCUI_Selector s, LCUI_StyleSheet out_ss);
+LCUI_API const css_style_decl_t *css_get_computed_style_with_cache(css_selector_t *s);
 
-LCUI_API void LCUI_PrintStyleSheetsBySelector(LCUI_Selector s);
+LCUI_API void css_get_computed_style(css_selector_t *s, css_style_decl_t *out_ss);
 
-LCUI_API int LCUI_SetStyleName(int key, const char *name);
+LCUI_API void css_print_style_rules_by_selector(css_selector_t *s);
 
-LCUI_API int LCUI_AddCSSPropertyName(const char *name);
+LCUI_API int css_register_property_name(const char *name);
 
-LCUI_API int LCUI_AddStyleValue(int key, const char *name);
+LCUI_API int css_register_keyword(int key, const char *name);
 
-LCUI_API int LCUI_GetStyleValue(const char *str);
+LCUI_API int css_get_keyword_key(const char *str);
 
-LCUI_API const char *LCUI_GetStyleValueName(int val);
+LCUI_API const char *css_get_keyword_name(int val);
 
-LCUI_API const char *LCUI_GetStyleName(int key);
+LCUI_API const char *css_get_property_name(int key);
 
-LCUI_API int LCUI_GetStyleTotal(void);
+LCUI_API int css_get_property_count(void);
 
-LCUI_API void LCUI_PrintStyleSheet(LCUI_StyleSheet ss);
+LCUI_API void css_style_declartation_print(css_style_decl_t *ss);
 
-LCUI_API void LCUI_PrintSelector(LCUI_Selector selector);
+LCUI_API void css_selector_print(css_selector_t *selector);
 
-LCUI_API void LCUI_PrintCSSLibrary(void);
+LCUI_API void css_print_all(void);
 
-LCUI_API void LCUI_InitCSSLibrary(void);
+LCUI_API void css_init(void);
 
-LCUI_API void LCUI_FreeCSSLibrary(void);
+LCUI_API void css_destroy(void);
 
 LCUI_END_HEADER
 

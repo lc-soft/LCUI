@@ -38,21 +38,21 @@ typedef struct ui_block_layout_context_t {
 static void ui_block_layout_update_free_element_position(
     ui_block_layout_context_t* ctx, ui_widget_t* w, float x, float y)
 {
-	if (w->computed_style.position != SV_ABSOLUTE &&
-	    w->computed_style.display == SV_INLINE_BLOCK) {
+	if (w->computed_style.position != CSS_KEYWORD_ABSOLUTE &&
+	    w->computed_style.display == CSS_KEYWORD_INLINE_BLOCK) {
 		switch (w->computed_style.vertical_align) {
-		case SV_MIDDLE:
+		case CSS_KEYWORD_MIDDLE:
 			if (!w->parent) {
 				break;
 			}
 			y += (ctx->row->height - w->height) / 2.f;
 			break;
-		case SV_BOTTOM:
+		case CSS_KEYWORD_BOTTOM:
 			if (!w->parent) {
 				break;
 			}
 			y += ctx->row->height - w->height;
-		case SV_TOP:
+		case CSS_KEYWORD_TOP:
 		default:
 			break;
 		}
@@ -120,7 +120,7 @@ static ui_block_layout_context_t* ui_block_layout_begin(ui_widget_t* w,
 	} else {
 		ctx->is_initiative = FALSE;
 	}
-	if (style->position == SV_ABSOLUTE) {
+	if (style->position == CSS_KEYWORD_ABSOLUTE) {
 		if (rule == UI_LAYOUT_RULE_FIXED_HEIGHT &&
 		    style->width_sizing == UI_SIZING_RULE_PERCENT) {
 			rule = UI_LAYOUT_RULE_FIXED;
@@ -224,9 +224,9 @@ static void ui_block_layout_load(ui_block_layout_context_t* ctx)
 		    ctx->rows.length, child->index, child->box.outer.width,
 		    child->box.outer.height, child->computed_style.display);
 		switch (child->computed_style.display) {
-		case SV_INLINE_BLOCK:
+		case CSS_KEYWORD_INLINE_BLOCK:
 			if (ctx->prev_display &&
-			    ctx->prev_display != SV_INLINE_BLOCK) {
+			    ctx->prev_display != CSS_KEYWORD_INLINE_BLOCK) {
 				DEBUG_MSG("next row\n");
 				ui_block_layout_next_row(ctx);
 			}
@@ -239,11 +239,11 @@ static void ui_block_layout_load(ui_block_layout_context_t* ctx)
 				ui_block_layout_next_row(ctx);
 			}
 			break;
-		case SV_FLEX:
-		case SV_BLOCK:
+		case CSS_KEYWORD_FLEX:
+		case CSS_KEYWORD_BLOCK:
 			ui_block_layout_next_row(ctx);
 			break;
-		case SV_NONE:
+		case CSS_KEYWORD_NONE:
 		default:
 			continue;
 		}
@@ -267,13 +267,13 @@ static void ui_block_layout_load(ui_block_layout_context_t* ctx)
 static void ui_block_layout_update_element_margin(
     ui_block_layout_context_t* ctx, ui_widget_t* w)
 {
-	if (w->computed_style.display != SV_BLOCK) {
+	if (w->computed_style.display != CSS_KEYWORD_BLOCK) {
 		return;
 	}
-	if (!ui_widget_has_auto_style(w, key_margin_left)) {
+	if (!ui_widget_has_auto_style(w, css_key_margin_left)) {
 		return;
 	}
-	if (ui_widget_has_auto_style(w, key_margin_right)) {
+	if (ui_widget_has_auto_style(w, css_key_margin_right)) {
 		w->margin.left = (ctx->content_width - w->width) / 2.f;
 		w->margin.right = w->margin.left;
 		return;
@@ -315,7 +315,7 @@ static void ui_block_layout_update(ui_block_layout_context_t* ctx)
 	list_node_t* node;
 
 	y = w->padding.top;
-	if (w->computed_style.display != SV_INLINE_BLOCK) {
+	if (w->computed_style.display != CSS_KEYWORD_INLINE_BLOCK) {
 		ctx->content_width = w->box.content.width;
 	}
 	for (list_each(node, &ctx->rows)) {

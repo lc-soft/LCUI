@@ -10,14 +10,14 @@ static void ui_widget_init(ui_widget_t* w)
 {
 	memset(w, 0, sizeof(ui_widget_t));
 	w->state = UI_WIDGET_STATE_CREATED;
-	w->style = StyleSheet();
+	w->style = css_style_declaration_create();
 	w->computed_style.opacity = 1.0;
 	w->computed_style.visible = TRUE;
 	w->computed_style.focusable = FALSE;
-	w->computed_style.display = SV_BLOCK;
-	w->computed_style.position = SV_STATIC;
-	w->computed_style.pointer_events = SV_INHERIT;
-	w->computed_style.box_sizing = SV_CONTENT_BOX;
+	w->computed_style.display = CSS_KEYWORD_BLOCK;
+	w->computed_style.position = CSS_KEYWORD_STATIC;
+	w->computed_style.pointer_events = CSS_KEYWORD_INHERIT;
+	w->computed_style.box_sizing = CSS_KEYWORD_CONTENT_BOX;
 	list_create(&w->children);
 	list_create(&w->stacking_context);
 	w->node.data = w;
@@ -179,10 +179,10 @@ LCUI_BOOL ui_widget_in_viewport(ui_widget_t* w)
 	rect = w->box.padding;
 	/* If the size of the widget is not fixed, then set the maximum size to
 	 * avoid it being judged invisible all the time. */
-	if (rect.width < 1 && ui_widget_has_auto_style(w, key_width)) {
+	if (rect.width < 1 && ui_widget_has_auto_style(w, css_key_width)) {
 		rect.width = w->parent->box.padding.width;
 	}
-	if (rect.height < 1 && ui_widget_has_auto_style(w, key_height)) {
+	if (rect.height < 1 && ui_widget_has_auto_style(w, css_key_height)) {
 		rect.height = w->parent->box.padding.height;
 	}
 	for (self = w, parent = w->parent; parent;

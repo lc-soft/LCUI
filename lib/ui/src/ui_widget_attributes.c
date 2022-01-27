@@ -66,9 +66,9 @@ int ui_widget_set_attribute(ui_widget_t* w, const char *name, const char *value)
 			}
 		}
 		ret = ui_widget_set_attribute_ex(w, name, value_str,
-					    LCUI_STYPE_STRING, free);
+					    CSS_UNIT_STRING, free);
 	} else {
-		ret = ui_widget_set_attribute_ex(w, name, NULL, LCUI_STYPE_NONE,
+		ret = ui_widget_set_attribute_ex(w, name, NULL, CSS_UNIT_NONE,
 					    NULL);
 	}
 	if (w->proto && w->proto->setattr) {

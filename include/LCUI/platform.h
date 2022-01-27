@@ -1,5 +1,5 @@
-﻿#ifndef LIBAPP_INCLUDE_APP_H
-#define LIBAPP_INCLUDE_APP_H
+﻿#ifndef LIBPLATFORM_INCLUDE_PLATFORM_H
+#define LIBPLATFORM_INCLUDE_PLATFORM_H
 
 #include <LCUI/header.h>
 #include <LCUI/types.h>

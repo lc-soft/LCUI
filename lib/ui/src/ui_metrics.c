@@ -4,18 +4,18 @@
 
 static ui_metrics_t ui_metrics;
 
-float ui_compute(float value, LCUI_StyleType type)
+float ui_compute(float value, css_unit_t type)
 {
 	switch (type) {
-	case LCUI_STYPE_PX:
+	case CSS_UNIT_PX:
 		break;
-	case LCUI_STYPE_DIP:
+	case CSS_UNIT_DIP:
 		value = value * ui_metrics.density;
 		break;
-	case LCUI_STYPE_SP:
+	case CSS_UNIT_SP:
 		value = value * ui_metrics.scaled_density;
 		break;
-	case LCUI_STYPE_PT:
+	case CSS_UNIT_PT:
 		value = value * ui_metrics.dpi / 72.0f;
 		break;
 	default:
