@@ -60,7 +60,7 @@ INLINE void ui_widget_add_reflow_task(ui_widget_t* w)
 
 INLINE void ui_widget_add_reflow_task_to_parent(ui_widget_t* w)
 {
-	if (w->computed_style.position == SV_ABSOLUTE) {
+	if (w->computed_style.position == CSS_KEYWORD_ABSOLUTE) {
 		return;
 	}
 	ui_widget_add_reflow_task(w->parent);
@@ -115,13 +115,13 @@ int ui_widget_end_style_diff(ui_widget_t* w, ui_widget_style_diff_t* diff)
 	if (diff->display != style->display) {
 		w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
 		ui_widget_add_reflow_task_to_parent(w);
-		if (style->display != SV_NONE) {
+		if (style->display != CSS_KEYWORD_NONE) {
 			ui_widget_add_reflow_task(w);
 		}
 	} else if (diff->position != style->position) {
 		w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
-		if (diff->position == SV_ABSOLUTE ||
-		    style->position == SV_ABSOLUTE) {
+		if (diff->position == CSS_KEYWORD_ABSOLUTE ||
+		    style->position == CSS_KEYWORD_ABSOLUTE) {
 			ui_widget_add_reflow_task(w);
 		}
 		ui_widget_add_reflow_task_to_parent(w);
@@ -136,7 +136,7 @@ int ui_widget_end_style_diff(ui_widget_t* w, ui_widget_style_diff_t* diff)
 		w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
 	} else if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_CANVAS_BOX) {
 	} else if (diff->z_index != style->z_index &&
-		   style->position != SV_STATIC) {
+		   style->position != CSS_KEYWORD_STATIC) {
 		w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
 	} else if (MEMCMP(&diff->shadow, &style->shadow)) {
 		w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;

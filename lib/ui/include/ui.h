@@ -81,7 +81,7 @@ typedef struct ui_background_position_t {
 	LCUI_BOOL using_value;
 	union {
 		struct {
-			LCUI_StyleRec x, y;
+			css_unit_value_t x, y;
 		};
 		int value;
 	};
@@ -91,7 +91,7 @@ typedef struct ui_background_size_t {
 	LCUI_BOOL using_value;
 	union {
 		struct {
-			LCUI_StyleRec width, height;
+			css_unit_value_t width, height;
 		};
 		int value;
 	};
@@ -255,29 +255,29 @@ typedef struct ui_flexbox_layout_style_t {
 	 */
 	float basis;
 
-	LCUI_StyleValue wrap : 8;
-	LCUI_StyleValue direction : 8;
+	css_keyword_value_t wrap : 8;
+	css_keyword_value_t direction : 8;
 
 	/**
 	 * Sets the align-self value on all direct children as a group
 	 * See more:
 	 * https://developer.mozilla.org/en-US/docs/Web/CSS/align-items
 	 */
-	LCUI_StyleValue align_items : 8;
+	css_keyword_value_t align_items : 8;
 
 	/**
 	 * Sets the distribution of space between and around content items along
 	 * a flexbox's cross-axis
 	 * See more: https://developer.mozilla.org/en-US/docs/Web/CSS/align-content
 	 */
-	LCUI_StyleValue align_content : 8;
+	css_keyword_value_t align_content : 8;
 
 	/**
 	 * Defines how the browser distributes space between and around content
 	 * items along the main-axis of a flex container See more:
 	 * https://developer.mozilla.org/en-US/docs/Web/CSS/justify-content
 	 */
-	LCUI_StyleValue justify_content : 8;
+	css_keyword_value_t justify_content : 8;
 } ui_flexbox_layout_style_t;
 
 typedef struct ui_profile_t {
@@ -305,10 +305,10 @@ typedef struct ui_widget_style_t {
 	float bottom;
 	int z_index;
 	float opacity;
-	LCUI_StyleValue position;
-	LCUI_StyleValue display;
-	LCUI_StyleValue box_sizing;
-	LCUI_StyleValue vertical_align;
+	css_keyword_value_t position;
+	css_keyword_value_t display;
+	css_keyword_value_t box_sizing;
+	css_keyword_value_t vertical_align;
 	ui_border_style_t border;
 	ui_boxshadow_style_t shadow;
 	ui_background_style_t background;
@@ -564,9 +564,9 @@ struct ui_widget_t {
 	pd_rect_t2F margin;
 	ui_widget_box_model_t box;
 
-	LCUI_StyleSheet style;
-	LCUI_StyleList custom_style;
-	LCUI_CachedStyleSheet matched_style;
+	css_style_decl_t *style;
+	css_style_props_t *custom_style;
+	const css_style_decl_t *matched_style;
 	ui_widget_style_t computed_style;
 
 	/** Some data bound to the prototype */
@@ -629,7 +629,7 @@ LCUI_API void ui_trash_add(ui_widget_t* w);
 // Metrics
 
 /** 转换成单位为 px 的度量值 */
-LCUI_API float ui_compute(float value, LCUI_StyleType type);
+LCUI_API float ui_compute(float value, css_unit_t type);
 
 /** 设置密度 */
 LCUI_API void ui_set_density(float density);
@@ -657,7 +657,7 @@ INLINE float ui_get_scale(void)
 	return ui_get_metrics()->scale;
 }
 
-INLINE int ui_compute_actual(float value, LCUI_StyleType type)
+INLINE int ui_compute_actual(float value, css_unit_t type)
 {
 	return y_iround(ui_compute(value, type) * ui_get_scale());
 }
@@ -761,14 +761,14 @@ LCUI_API void ui_print_tree(ui_widget_t* w);
 
 // Style
 
-#define ui_widget_check_style_type(W, K, T) CheckStyleType((W)->style, K, T)
+#define ui_widget_check_style_type(W, K, T) css_check_style_prop((W)->style, K, T)
 
 #define ui_widget_set_style(W, K, VAL, TYPE)       \
 	do {                                       \
-		LCUI_Style _s;                     \
+		css_unit_value_t *_s;                     \
 		_s = ui_widget_get_style(W, K);    \
 		_s->is_valid = TRUE;               \
-		_s->type = LCUI_STYPE_##TYPE;      \
+		_s->type = CSS_UNIT_##TYPE;      \
 		_s->val_##TYPE = VAL;              \
 		ui_widget_add_task_by_style(W, K); \
 	} while (0)
@@ -789,8 +789,8 @@ INLINE LCUI_BOOL ui_widget_has_auto_style(ui_widget_t* w, int key)
 	       ui_widget_check_style_type(w, key, AUTO);
 }
 
-LCUI_API LCUI_SelectorNode ui_widget_create_selector_node(ui_widget_t* w);
-LCUI_API LCUI_Selector ui_widget_create_selector(ui_widget_t* w);
+LCUI_API css_selector_node_t *ui_widget_create_selector_node(ui_widget_t* w);
+LCUI_API css_selector_t *ui_widget_create_selector(ui_widget_t* w);
 LCUI_API size_t ui_widget_get_children_style_changes(ui_widget_t* w, int type,
 						     const char* name);
 LCUI_API void ui_widget_print_stylesheet(ui_widget_t* w);
@@ -893,9 +893,9 @@ LCUI_API void ui_widget_set_box_shadow(ui_widget_t* w, float x, float y,
 				       float blur, pd_color_t color);
 LCUI_API void ui_widget_move(ui_widget_t* w, float left, float top);
 LCUI_API void ui_widget_resize(ui_widget_t* w, float width, float height);
-LCUI_API LCUI_Style ui_widget_get_style(ui_widget_t* w, int key);
+LCUI_API css_unit_value_t *ui_widget_get_style(ui_widget_t* w, int key);
 LCUI_API int ui_widget_unset_style(ui_widget_t* w, int key);
-LCUI_API LCUI_Style ui_widget_get_matched_style(ui_widget_t* w, int key);
+LCUI_API css_unit_value_t *ui_widget_get_matched_style(ui_widget_t* w, int key);
 LCUI_API void ui_widget_set_visibility(ui_widget_t* w, const char* value);
 
 INLINE void ui_widget_set_visible(ui_widget_t* w)
@@ -910,9 +910,9 @@ INLINE void ui_widget_set_hidden(ui_widget_t* w)
 
 LCUI_API void ui_widget_show(ui_widget_t* w);
 LCUI_API void ui_widget_hide(ui_widget_t* w);
-LCUI_API void ui_widget_set_position(ui_widget_t* w, LCUI_StyleValue position);
+LCUI_API void ui_widget_set_position(ui_widget_t* w, css_keyword_value_t position);
 LCUI_API void ui_widget_set_opacity(ui_widget_t* w, float opacity);
-LCUI_API void ui_widget_set_box_sizing(ui_widget_t* w, LCUI_StyleValue sizing);
+LCUI_API void ui_widget_set_box_sizing(ui_widget_t* w, css_keyword_value_t sizing);
 LCUI_API ui_widget_t* ui_widget_get_closest(ui_widget_t* w, const char* type);
 LCUI_API dict_t* ui_widget_collect_references(ui_widget_t* w);
 

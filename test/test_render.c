@@ -27,7 +27,7 @@ void UpdateWidgetStyle(ui_widget_t* w, void *arg)
 	color.green = (unsigned char)(index > 255 ? 511 - index : index);
 	color.blue = 0;
 	color.alpha = 255;
-	ui_widget_set_style(w, key_background_color, color, color);
+	ui_widget_set_style(w, css_key_background_color, color, color);
 	ui_widget_update_style(w);
 }
 
@@ -59,11 +59,11 @@ void InitModal(void)
 	ui_widget_set_box_shadow(dialog, 0, 4, 8, ARGB(100, 0, 0, 0));
 	ui_widget_set_style_string(dialog, "background-color", "#fff");
 
-	ui_widget_set_style(dimmer, key_top, 0, px);
-	ui_widget_set_style(dimmer, key_left, 0, px);
-	ui_widget_set_style(dimmer, key_width, 1.0f, scale);
-	ui_widget_set_style(dimmer, key_height, 1.0f, scale);
-	ui_widget_set_style(dimmer, key_position, SV_ABSOLUTE, style);
+	ui_widget_set_style(dimmer, css_key_top, 0, px);
+	ui_widget_set_style(dimmer, css_key_left, 0, px);
+	ui_widget_set_style(dimmer, css_key_width, 1.0f, scale);
+	ui_widget_set_style(dimmer, css_key_height, 1.0f, scale);
+	ui_widget_set_style(dimmer, css_key_position, CSS_KEYWORD_ABSOLUTE, style);
 	ui_widget_set_style_string(dimmer, "background-color", "rgba(0,0,0,0.5)");
 
 	ui_widget_append(dimmer, dialog);
@@ -96,8 +96,8 @@ void InitBackground(void)
 		c = ((i % n + i / n) * 256 / n) % 512;
 		color.green = (unsigned char)(c > 255 ? 511 - c : c);
 		ui_widget_resize(w, width, height);
-		ui_widget_set_style(w, key_display, SV_INLINE_BLOCK, style);
-		ui_widget_set_style(w, key_background_color, color, color);
+		ui_widget_set_style(w, css_key_display, CSS_KEYWORD_INLINE_BLOCK, style);
+		ui_widget_set_style(w, css_key_background_color, color, color);
 		ui_widget_append(self.box, w);
 	}
 	rules.cache_children_style = TRUE;
@@ -119,10 +119,10 @@ void InitRenderStatus(void)
 
 	root = ui_root();
 	status = ui_create_widget("textview");
-	ui_widget_set_style(status, key_top, 10, px);
-	ui_widget_set_style(status, key_right, 10, px);
-	ui_widget_set_style(status, key_position, SV_ABSOLUTE, style);
-	ui_widget_set_style(status, key_background_color, black, color);
+	ui_widget_set_style(status, css_key_top, 10, px);
+	ui_widget_set_style(status, css_key_right, 10, px);
+	ui_widget_set_style(status, css_key_position, CSS_KEYWORD_ABSOLUTE, style);
+	ui_widget_set_style(status, css_key_background_color, black, color);
 	ui_widget_set_padding(status, 10, 15, 10, 15);
 	TextView_SetColor(status, white);
 	ui_widget_append(root, status);

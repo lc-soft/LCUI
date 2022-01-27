@@ -6,107 +6,107 @@
 
 static void test_btn_text_style(void)
 {
-	LCUI_Style s;
+	css_unit_value_t *s;
 
 	s = ui_get_widget("test-textview")->style->sheet;
-	it_i("width", (int)s[key_width].val_px, 100);
-	it_i("height", (int)s[key_height].val_px, 60);
-	it_i("position", s[key_position].val_style, SV_ABSOLUTE);
-	it_i("top", (int)s[key_top].val_px, 12);
-	it_i("left", (int)s[key_left].val_px, 20);
+	it_i("width", (int)s[css_key_width].val_px, 100);
+	it_i("height", (int)s[css_key_height].val_px, 60);
+	it_i("position", s[css_key_position].val_style, CSS_KEYWORD_ABSOLUTE);
+	it_i("top", (int)s[css_key_top].val_px, 12);
+	it_i("left", (int)s[css_key_left].val_px, 20);
 }
 
 static void test_btn_hover_text_style(void)
 {
-	LCUI_Style s;
+	css_unit_value_t *s;
 
 	s = ui_get_widget("test-textview")->style->sheet;
-	it_i("background-color", s[key_background_color].val_color.value,
+	it_i("background-color", s[css_key_background_color].val_color.value,
 	     0xffff0000);
-	it_i("background-size", s[key_background_size].val_style, SV_CONTAIN);
+	it_i("background-size", s[css_key_background_size].val_style, CSS_KEYWORD_CONTAIN);
 }
 
 static void test_flex_box(void)
 {
-	LCUI_Style s;
+	css_unit_value_t *s;
 
 	s = ui_get_widget("test-flex-box")->style->sheet;
-	it_i("flex-grow", s[key_flex_grow].val_int, 0);
-	it_i("flex-shrink", s[key_flex_shrink].val_int, 0);
-	it_i("flex-basis", s[key_flex_basis].val_style, SV_AUTO);
-	it_i("flex-direction", s[key_flex_direction].val_style, SV_COLUMN);
-	it_i("flex-wrap", s[key_flex_wrap].val_style, SV_NOWRAP);
-	it_i("justify-content", s[key_justify_content].val_style, SV_CENTER);
-	it_i("align-items", s[key_align_items].val_style, SV_FLEX_END);
-	it_i("align-content", s[key_align_content].val_style, SV_FLEX_END);
+	it_i("flex-grow", s[css_key_flex_grow].val_int, 0);
+	it_i("flex-shrink", s[css_key_flex_shrink].val_int, 0);
+	it_i("flex-basis", s[css_key_flex_basis].val_style, CSS_KEYWORD_AUTO);
+	it_i("flex-direction", s[css_key_flex_direction].val_style, CSS_KEYWORD_COLUMN);
+	it_i("flex-wrap", s[css_key_flex_wrap].val_style, CSS_KEYWORD_NOWRAP);
+	it_i("justify-content", s[css_key_justify_content].val_style, CSS_KEYWORD_CENTER);
+	it_i("align-items", s[css_key_align_items].val_style, CSS_KEYWORD_FLEX_END);
+	it_i("align-content", s[css_key_align_content].val_style, CSS_KEYWORD_FLEX_END);
 }
 
 static void test_parse_flex_initial(void)
 {
-	LCUI_Style s;
+	css_unit_value_t *s;
 
 	s = ui_get_widget("test-flex-initial")->style->sheet;
-	it_i("<flex-grow>", s[key_flex_grow].val_int, 0);
-	it_i("<flex-shrink>", s[key_flex_shrink].val_int, 1);
-	it_i("<flex-basis>", s[key_flex_basis].val_style, SV_AUTO);
+	it_i("<flex-grow>", s[css_key_flex_grow].val_int, 0);
+	it_i("<flex-shrink>", s[css_key_flex_shrink].val_int, 1);
+	it_i("<flex-basis>", s[css_key_flex_basis].val_style, CSS_KEYWORD_AUTO);
 }
 static void test_parse_flex_auto(void)
 {
-	LCUI_Style s;
+	css_unit_value_t *s;
 
 	s = ui_get_widget("test-flex-auto")->style->sheet;
-	it_i("<flex-grow>", s[key_flex_grow].val_int, 1);
-	it_i("<flex-shrink>", s[key_flex_shrink].val_int, 1);
-	it_i("<flex-basis>", s[key_flex_basis].val_style, SV_AUTO);
+	it_i("<flex-grow>", s[css_key_flex_grow].val_int, 1);
+	it_i("<flex-shrink>", s[css_key_flex_shrink].val_int, 1);
+	it_i("<flex-basis>", s[css_key_flex_basis].val_style, CSS_KEYWORD_AUTO);
 }
 
 static void test_parse_flex_none(void)
 {
-	LCUI_Style s;
+	css_unit_value_t *s;
 
 	s = ui_get_widget("test-flex-none")->style->sheet;
-	it_i("<flex-grow>", s[key_flex_grow].val_int, 0);
-	it_i("<flex-shrink>", s[key_flex_shrink].val_int, 0);
-	it_i("<flex-basis>", s[key_flex_basis].val_style, SV_AUTO);
+	it_i("<flex-grow>", s[css_key_flex_grow].val_int, 0);
+	it_i("<flex-shrink>", s[css_key_flex_shrink].val_int, 0);
+	it_i("<flex-basis>", s[css_key_flex_basis].val_style, CSS_KEYWORD_AUTO);
 }
 
 static void test_parse_flex_1(void)
 {
-	LCUI_Style s;
+	css_unit_value_t *s;
 
 	s = ui_get_widget("test-flex-1")->style->sheet;
-	it_i("<flex-grow>", s[key_flex_grow].val_int, 1);
-	it_b("<flex-shrink>.isValid?", s[key_flex_shrink].is_valid, FALSE);
-	it_b("<flex-basis>.isValid?", s[key_flex_basis].is_valid, FALSE);
+	it_i("<flex-grow>", s[css_key_flex_grow].val_int, 1);
+	it_b("<flex-shrink>.isValid?", s[css_key_flex_shrink].is_valid, FALSE);
+	it_b("<flex-basis>.isValid?", s[css_key_flex_basis].is_valid, FALSE);
 }
 
 static void test_parse_flex_100px(void)
 {
-	LCUI_Style s;
+	css_unit_value_t *s;
 
 	s = ui_get_widget("test-flex-100px")->style->sheet;
-	it_b("<flex-grow>.isValid?", s[key_flex_grow].is_valid, FALSE);
-	it_b("<flex-shrink>.isValid?", s[key_flex_shrink].is_valid, FALSE);
-	it_i("<flex-basis>", (int)s[key_flex_basis].val_px, 100);
+	it_b("<flex-grow>.isValid?", s[css_key_flex_grow].is_valid, FALSE);
+	it_b("<flex-shrink>.isValid?", s[css_key_flex_shrink].is_valid, FALSE);
+	it_i("<flex-basis>", (int)s[css_key_flex_basis].val_px, 100);
 }
 
 static void test_parse_flex_1_100px(void)
 {
-	LCUI_Style s;
+	css_unit_value_t *s;
 
 	s = ui_get_widget("test-flex-1-100px")->style->sheet;
-	it_b("<flex-grow>.isValid?", s[key_flex_grow].is_valid, FALSE);
-	it_i("<flex-shrink>", s[key_flex_shrink].val_int, 1);
-	it_i("<flex-basis>", (int)s[key_flex_basis].val_px, 100);
+	it_b("<flex-grow>.isValid?", s[css_key_flex_grow].is_valid, FALSE);
+	it_i("<flex-shrink>", s[css_key_flex_shrink].val_int, 1);
+	it_i("<flex-basis>", (int)s[css_key_flex_basis].val_px, 100);
 }
 static void test_parse_flex_0_0_100px(void)
 {
-	LCUI_Style s;
+	css_unit_value_t *s;
 
 	s = ui_get_widget("test-flex-0-0-100px")->style->sheet;
-	it_i("<flex-grow>", s[key_flex_grow].val_int, 0);
-	it_i("<flex-shrink>", s[key_flex_shrink].val_int, 0);
-	it_i("<flex-basis>", (int)s[key_flex_basis].val_px, 100);
+	it_i("<flex-grow>", s[css_key_flex_grow].val_int, 0);
+	it_i("<flex-shrink>", s[css_key_flex_shrink].val_int, 0);
+	it_i("<flex-basis>", (int)s[css_key_flex_basis].val_px, 100);
 }
 
 void test_css_parser(void)

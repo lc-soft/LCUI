@@ -35,16 +35,16 @@ void paint_border(pd_paint_context_t* paint, pd_rect_t *box)
 	pd_color_t black = RGB(0, 0, 0);
 
 	border.top.color = black;
-	border.top.style = SV_SOLID;
+	border.top.style = CSS_KEYWORD_SOLID;
 	border.top.width = 4;
 	border.right.color = black;
-	border.right.style = SV_SOLID;
+	border.right.style = CSS_KEYWORD_SOLID;
 	border.right.width = 4;
 	border.bottom.color = black;
-	border.bottom.style = SV_SOLID;
+	border.bottom.style = CSS_KEYWORD_SOLID;
 	border.bottom.width = 4;
 	border.left.color = black;
-	border.left.style = SV_SOLID;
+	border.left.style = CSS_KEYWORD_SOLID;
 	border.left.width = 4;
 	border.top_left_radius = 32;
 	border.top_right_radius = 32;

@@ -28,18 +28,18 @@ static uint64_t ui_style_dict_hash(const void* key)
 	return (*(unsigned int *)key);
 }
 
-static int ui_style_dict_key_compare(void* privdata, const void* key1,
+static int ui_style_dict_string_key_compare(void* privdata, const void* key1,
 				     const void* key2)
 {
 	return *(unsigned int*)key1 == *(unsigned int*)key2;
 }
 
-static void ui_style_dict_key_free(void* privdata, void* key)
+static void ui_style_dict_string_key_free(void* privdata, void* key)
 {
 	free(key);
 }
 
-static void* ui_style_dict_key_dup(void* privdata, const void* key)
+static void* ui_style_dict_string_key_dup(void* privdata, const void* key)
 {
 	unsigned int* newkey = malloc(sizeof(unsigned int));
 	*newkey = *(unsigned int*)key;
@@ -48,7 +48,7 @@ static void* ui_style_dict_key_dup(void* privdata, const void* key)
 
 static void ui_style_dict_val_free(void* privdata, void* val)
 {
-	StyleSheet_Delete(val);
+	css_style_declaration_destroy(val);
 }
 
 static void ui_widget_on_refresh_style(ui_widget_t* w)
@@ -171,10 +171,10 @@ void ui_init_updater(void)
 	dict_type_t* dt = &ui_updater.style_cache_dict;
 
 	dt->val_dup = NULL;
-	dt->key_dup = ui_style_dict_key_dup;
-	dt->key_compare = ui_style_dict_key_compare;
+	dt->key_dup = ui_style_dict_string_key_dup;
+	dt->key_compare = ui_style_dict_string_key_compare;
 	dt->hash_function = ui_style_dict_hash;
-	dt->key_destructor = ui_style_dict_key_free;
+	dt->key_destructor = ui_style_dict_string_key_free;
 	dt->val_destructor = ui_style_dict_val_free;
 	set_task_handler(VISIBLE, ui_widget_compute_visibility_style);
 	set_task_handler(POSITION, ui_widget_compute_position_style);
@@ -200,9 +200,9 @@ static ui_updater_profile_t* ui_widget_begin_update(ui_widget_t* w,
 						    ui_updater_profile_t* ctx)
 {
 	unsigned hash;
-	LCUI_Selector selector;
-	LCUI_StyleSheet style;
-	LCUI_CachedStyleSheet matched_style;
+	css_selector_t *selector;
+	css_style_decl_t *style;
+	const css_style_decl_t *matched_style;
 	ui_updater_profile_t* self_ctx;
 	ui_updater_profile_t* parent_ctx;
 
@@ -243,17 +243,17 @@ static ui_updater_profile_t* ui_widget_begin_update(ui_widget_t* w,
 		hash = ((hash << 5) + hash) + w->hash;
 		style = dict_fetch_value(self_ctx->style_cache, &hash);
 		if (!style) {
-			style = StyleSheet();
+			style = css_style_declaration_create();
 			selector = ui_widget_create_selector(w);
-			LCUI_GetStyleSheet(selector, style);
+			css_get_computed_style(selector, style);
 			dict_add(self_ctx->style_cache, &hash, style);
-			Selector_Delete(selector);
+			css_selector_destroy(selector);
 		}
 		w->matched_style = style;
 	} else {
 		selector = ui_widget_create_selector(w);
-		w->matched_style = LCUI_GetCachedStyleSheet(selector);
-		Selector_Delete(selector);
+		w->matched_style = css_get_computed_style_with_cache(selector);
+		css_selector_destroy(selector);
 	}
 	if (w->matched_style != matched_style) {
 		ui_widget_add_task(w, UI_TASK_REFRESH_STYLE);
@@ -278,10 +278,10 @@ static size_t ui_widget_update_visible_children(ui_widget_t* w,
 	list_node_t *node, *next;
 
 	rect = w->box.padding;
-	if (rect.width < 1 && ui_widget_has_auto_style(w, key_width)) {
+	if (rect.width < 1 && ui_widget_has_auto_style(w, css_key_width)) {
 		rect.width = w->parent->box.padding.width;
 	}
-	if (rect.height < 1 && ui_widget_has_auto_style(w, key_height)) {
+	if (rect.height < 1 && ui_widget_has_auto_style(w, css_key_height)) {
 		rect.height = w->parent->box.padding.height;
 	}
 	for (child = w, parent = w->parent; parent;

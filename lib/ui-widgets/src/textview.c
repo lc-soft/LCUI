@@ -59,7 +59,7 @@ typedef struct LCUI_TextViewRec_ {
 } LCUI_TextViewRec, *LCUI_TextView;
 
 static struct LCUI_TextViewModule {
-	int key_word_break;
+	int css_key_word_break;
 	list_t list;
 	ui_widget_prototype_t *prototype;
 } self;
@@ -76,20 +76,20 @@ static LCUI_BOOL ParseBoolean(const char *str)
 static int OnParseWordBreak(LCUI_CSSParserStyleContext ctx, const char *value)
 {
 	char *str = strdup2(value);
-	LCUI_Style s = &ctx->sheet->sheet[self.key_word_break];
+	css_unit_value_t *s = &ctx->sheet->sheet[self.css_key_word_break];
 	if (s->is_valid && s->string) {
 		free(s->string);
 	}
-	s->type = LCUI_STYPE_STRING;
+	s->type = CSS_UNIT_STRING;
 	s->is_valid = TRUE;
 	s->string = str;
 	return 0;
 }
 
-static LCUI_WordBreakMode ComputeWordBreakMode(LCUI_StyleSheet sheet)
+static LCUI_WordBreakMode ComputeWordBreakMode(css_style_decl_t *sheet)
 {
-	LCUI_Style s = &sheet->sheet[self.key_word_break];
-	if (s->is_valid && s->type == LCUI_STYPE_STRING && s->string) {
+	css_unit_value_t *s = &sheet->sheet[self.css_key_word_break];
+	if (s->is_valid && s->type == CSS_UNIT_STRING && s->string) {
 		if (strcmp(s->string, "break-all") == 0) {
 			return LCUI_WORD_BREAK_BREAK_ALL;
 		}
@@ -136,7 +136,7 @@ static void TextView_Update(ui_widget_t* w)
 	TextLayer_ClearInvalidRect(txt->layer);
 	for (list_each(node, &rects)) {
 		LCUIRect_ToRectF(node->data, &rect, 1.0f / scale);
-		ui_widget_mark_dirty_rect(w, &rect, SV_CONTENT_BOX);
+		ui_widget_mark_dirty_rect(w, &rect, CSS_KEYWORD_CONTENT_BOX);
 	}
 	RectList_Clear(&rects);
 	ui_widget_add_task(w, UI_TASK_REFLOW);
@@ -157,7 +157,7 @@ static void TextView_UpdateStyle(ui_widget_t* w)
 	CSSFontStyle_GetTextStyle(&style, &text_style);
 	TextLayer_SetTextAlign(txt->layer, style.text_align);
 	TextLayer_SetLineHeight(txt->layer, style.line_height);
-	TextLayer_SetAutoWrap(txt->layer, style.white_space != SV_NOWRAP);
+	TextLayer_SetAutoWrap(txt->layer, style.white_space != CSS_KEYWORD_NOWRAP);
 	TextLayer_SetWordBreak(txt->layer, ComputeWordBreakMode(w->style));
 	TextLayer_SetTextStyle(txt->layer, &text_style);
 	if (style.content) {
@@ -270,7 +270,7 @@ static void TextView_OnResize(ui_widget_t* w, float width, float height)
 	TextLayer_ClearInvalidRect(txt->layer);
 	for (list_each(node, &rects)) {
 		LCUIRect_ToRectF(node->data, &rect, 1.0f / scale);
-		ui_widget_mark_dirty_rect(w, &rect, SV_CONTENT_BOX);
+		ui_widget_mark_dirty_rect(w, &rect, CSS_KEYWORD_CONTENT_BOX);
 	}
 	RectList_Clear(&rects);
 }
@@ -356,25 +356,25 @@ int TextView_SetText(ui_widget_t* w, const char *utf8_text)
 
 void TextView_SetLineHeight(ui_widget_t* w, int height)
 {
-	Widget_SetFontStyle(w, key_line_height, (float)height, px);
+	Widget_SetFontStyle(w, css_key_line_height, (float)height, px);
 }
 
 void TextView_SetTextAlign(ui_widget_t* w, int align)
 {
-	Widget_SetFontStyle(w, key_text_align, align, style);
+	Widget_SetFontStyle(w, css_key_text_align, align, style);
 }
 
 void TextView_SetColor(ui_widget_t* w, pd_color_t color)
 {
-	Widget_SetFontStyle(w, key_color, color, color);
+	Widget_SetFontStyle(w, css_key_color, color, color);
 }
 
 void TextView_SetAutoWrap(ui_widget_t* w, LCUI_BOOL enable)
 {
 	if (enable) {
-		Widget_SetFontStyle(w, key_white_space, SV_AUTO, style);
+		Widget_SetFontStyle(w, css_key_white_space, CSS_KEYWORD_AUTO, style);
 	} else {
-		Widget_SetFontStyle(w, key_white_space, SV_NOWRAP, style);
+		Widget_SetFontStyle(w, css_key_white_space, CSS_KEYWORD_NOWRAP, style);
 	}
 }
 
@@ -427,7 +427,7 @@ void LCUIWidget_AddTextView(void)
 {
 	LCUI_CSSPropertyParserRec parser = { 0, "word-break",
 					     OnParseWordBreak };
-	self.key_word_break = LCUI_AddCSSPropertyName("word-break");
+	self.css_key_word_break = LCUI_AddCSSPropertyName("word-break");
 	self.prototype = ui_create_widget_prototype("textview", NULL);
 	self.prototype->init = TextView_OnInit;
 	self.prototype->paint = TextView_OnPaint;

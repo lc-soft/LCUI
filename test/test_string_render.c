@@ -28,7 +28,7 @@ int main(void)
 	/* 设置文本图层的固定尺寸、文本样式、文本内容、对齐方式 */
 	TextLayer_SetFixedSize(txt, 320, 240);
 	TextLayer_SetTextStyle(txt, &txtstyle);
-	TextLayer_SetTextAlign(txt, SV_CENTER);
+	TextLayer_SetTextAlign(txt, CSS_KEYWORD_CENTER);
 	TextLayer_SetTextW(txt, L"这是一段测试文本\nHello, World!", NULL);
 	TextLayer_Update(txt, NULL);
 

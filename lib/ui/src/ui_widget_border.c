@@ -6,17 +6,17 @@
 #include "../include/ui.h"
 #include "internal.h"
 
-static float compute_metric_x(ui_widget_t* w, LCUI_Style s)
+static float compute_metric_x(ui_widget_t* w, css_unit_value_t *s)
 {
-	if (s->type == LCUI_STYPE_SCALE) {
+	if (s->type == CSS_UNIT_SCALE) {
 		return w->width * s->scale;
 	}
 	return ui_compute(s->value, s->type);
 }
 
-static float compute_metric_y(ui_widget_t* w, LCUI_Style s)
+static float compute_metric_y(ui_widget_t* w, css_unit_value_t *s)
 {
-	if (s->type == LCUI_STYPE_SCALE) {
+	if (s->type == CSS_UNIT_SCALE) {
 		return w->height * s->scale;
 	}
 	return ui_compute(s->value, s->type);
@@ -26,7 +26,7 @@ static unsigned int compute_actual(float width)
 {
 	unsigned int w;
 
-	w = ui_compute_actual(width, LCUI_STYPE_PX);
+	w = ui_compute_actual(width, CSS_UNIT_PX);
 	if (width > 0 && w < 1) {
 		return 1;
 	}
@@ -36,62 +36,63 @@ static unsigned int compute_actual(float width)
 void ui_widget_compute_border_style(ui_widget_t* w)
 {
 	int key;
-	LCUI_Style s;
+	css_unit_value_t *s;
 	ui_border_style_t* b;
+
 	b = &w->computed_style.border;
 	memset(b, 0, sizeof(ui_border_style_t));
-	for (key = key_border_start; key <= key_border_end; ++key) {
+	for (key = css_key_border_start; key <= css_key_border_end; ++key) {
 		s = &w->style->sheet[key];
 		if (!s->is_valid) {
 			continue;
 		}
 		switch (key) {
-		case key_border_top_color:
+		case css_key_border_top_color:
 			b->top.color = s->color;
 			break;
-		case key_border_right_color:
+		case css_key_border_right_color:
 			b->right.color = s->color;
 			break;
-		case key_border_bottom_color:
+		case css_key_border_bottom_color:
 			b->bottom.color = s->color;
 			break;
-		case key_border_left_color:
+		case css_key_border_left_color:
 			b->left.color = s->color;
 			break;
-		case key_border_top_width:
+		case css_key_border_top_width:
 			b->top.width = compute_metric_x(w, s);
 			break;
-		case key_border_right_width:
+		case css_key_border_right_width:
 			b->right.width = compute_metric_y(w, s);
 			break;
-		case key_border_bottom_width:
+		case css_key_border_bottom_width:
 			b->bottom.width = compute_metric_x(w, s);
 			break;
-		case key_border_left_width:
+		case css_key_border_left_width:
 			b->left.width = compute_metric_y(w, s);
 			break;
-		case key_border_top_style:
+		case css_key_border_top_style:
 			b->top.style = s->val_style;
 			break;
-		case key_border_right_style:
+		case css_key_border_right_style:
 			b->right.style = s->val_style;
 			break;
-		case key_border_bottom_style:
+		case css_key_border_bottom_style:
 			b->bottom.style = s->val_style;
 			break;
-		case key_border_left_style:
+		case css_key_border_left_style:
 			b->left.style = s->val_style;
 			break;
-		case key_border_top_left_radius:
+		case css_key_border_top_left_radius:
 			b->top_left_radius = compute_metric_x(w, s);
 			break;
-		case key_border_top_right_radius:
+		case css_key_border_top_right_radius:
 			b->top_right_radius = compute_metric_x(w, s);
 			break;
-		case key_border_bottom_left_radius:
+		case css_key_border_bottom_left_radius:
 			b->bottom_left_radius = compute_metric_x(w, s);
 			break;
-		case key_border_bottom_right_radius:
+		case css_key_border_bottom_right_radius:
 			b->bottom_right_radius = compute_metric_x(w, s);
 			break;
 		default:

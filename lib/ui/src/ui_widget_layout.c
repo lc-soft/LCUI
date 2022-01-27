@@ -8,14 +8,14 @@ void ui_widget_reflow(ui_widget_t* w, ui_layout_rule_t rule)
 	ui_event_t ev = { 0 };
 
 	switch (w->computed_style.display) {
-	case SV_BLOCK:
-	case SV_INLINE_BLOCK:
+	case CSS_KEYWORD_BLOCK:
+	case CSS_KEYWORD_INLINE_BLOCK:
 		ui_block_layout_reflow(w, rule);
 		break;
-	case SV_FLEX:
+	case CSS_KEYWORD_FLEX:
 		ui_flexbox_layout_reflow(w, rule);
 		break;
-	case SV_NONE:
+	case CSS_KEYWORD_NONE:
 	default:
 		break;
 	}

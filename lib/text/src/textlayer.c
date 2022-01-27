@@ -56,11 +56,11 @@ static int TextLayer_GetRowStartX(LCUI_TextLayer layer, LCUI_TextRow txtrow)
 		width = layer->width;
 	}
 	switch (layer->text_align) {
-	case SV_CENTER:
+	case CSS_KEYWORD_CENTER:
 		return (width - txtrow->width) / 2;
-	case SV_RIGHT:
+	case CSS_KEYWORD_RIGHT:
 		return width - txtrow->width;
-	case SV_LEFT:
+	case CSS_KEYWORD_LEFT:
 	default:
 		break;
 	}
@@ -292,7 +292,7 @@ LCUI_TextLayer TextLayer_New(void)
 	layer->line_height = -1;
 	layer->text_rows.length = 0;
 	layer->text_rows.rows = NULL;
-	layer->text_align = SV_LEFT;
+	layer->text_align = CSS_KEYWORD_LEFT;
 	layer->enable_autowrap = FALSE;
 	layer->enable_mulitiline = FALSE;
 	layer->enable_style_tag = FALSE;

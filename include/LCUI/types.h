@@ -126,93 +126,93 @@ typedef struct LCUI_Rect2F_ {
 	float left, top, right, bottom;
 } pd_rect_t2F;
 
-/* FIXME: remove LCUI_StyleValue
- * These values do not need to put in LCUI_StyleValue, because they are not
+/* FIXME: remove css_keyword_value_t
+ * These values do not need to put in css_keyword_value_t, because they are not
  * strongly related and should be defined separately where they are needed.
  */
 
-typedef enum LCUI_StyleValue {
-	SV_NONE,
-	SV_AUTO,
-	SV_NORMAL,
-	SV_INHERIT,
-	SV_INITIAL,
-	SV_CONTAIN,
-	SV_COVER,
-	SV_LEFT,
-	SV_CENTER,
-	SV_RIGHT,
-	SV_TOP,
-	SV_TOP_LEFT,
-	SV_TOP_CENTER,
-	SV_TOP_RIGHT,
-	SV_MIDDLE,
-	SV_CENTER_LEFT,
-	SV_CENTER_CENTER,
-	SV_CENTER_RIGHT,
-	SV_BOTTOM,
-	SV_BOTTOM_LEFT,
-	SV_BOTTOM_CENTER,
-	SV_BOTTOM_RIGHT,
-	SV_SOLID,
-	SV_DOTTED,
-	SV_DOUBLE,
-	SV_DASHED,
-	SV_CONTENT_BOX,
-	SV_PADDING_BOX,
-	SV_BORDER_BOX,
-	SV_GRAPH_BOX,
-	SV_STATIC,
-	SV_RELATIVE,
-	SV_ABSOLUTE,
-	SV_BLOCK,
-	SV_INLINE_BLOCK,
-	SV_FLEX,
-	SV_FLEX_START,
-	SV_FLEX_END,
-	SV_STRETCH,
-	SV_SPACE_BETWEEN,
-	SV_SPACE_AROUND,
-	SV_SPACE_EVENLY,
-	SV_WRAP,
-	SV_NOWRAP,
-	SV_ROW,
-	SV_COLUMN
-} LCUI_StyleValue;
+typedef enum css_keyword_value_t {
+	CSS_KEYWORD_NONE,
+	CSS_KEYWORD_AUTO,
+	CSS_KEYWORD_NORMAL,
+	CSS_KEYWORD_INHERIT,
+	CSS_KEYWORD_INITIAL,
+	CSS_KEYWORD_CONTAIN,
+	CSS_KEYWORD_COVER,
+	CSS_KEYWORD_LEFT,
+	CSS_KEYWORD_CENTER,
+	CSS_KEYWORD_RIGHT,
+	CSS_KEYWORD_TOP,
+	CSS_KEYWORD_TOP_LEFT,
+	CSS_KEYWORD_TOP_CENTER,
+	CSS_KEYWORD_TOP_RIGHT,
+	CSS_KEYWORD_MIDDLE,
+	CSS_KEYWORD_CENTER_LEFT,
+	CSS_KEYWORD_CENTER_CENTER,
+	CSS_KEYWORD_CENTER_RIGHT,
+	CSS_KEYWORD_BOTTOM,
+	CSS_KEYWORD_BOTTOM_LEFT,
+	CSS_KEYWORD_BOTTOM_CENTER,
+	CSS_KEYWORD_BOTTOM_RIGHT,
+	CSS_KEYWORD_SOLID,
+	CSS_KEYWORD_DOTTED,
+	CSS_KEYWORD_DOUBLE,
+	CSS_KEYWORD_DASHED,
+	CSS_KEYWORD_CONTENT_BOX,
+	CSS_KEYWORD_PADDING_BOX,
+	CSS_KEYWORD_BORDER_BOX,
+	CSS_KEYWORD_GRAPH_BOX,
+	CSS_KEYWORD_STATIC,
+	CSS_KEYWORD_RELATIVE,
+	CSS_KEYWORD_ABSOLUTE,
+	CSS_KEYWORD_BLOCK,
+	CSS_KEYWORD_INLINE_BLOCK,
+	CSS_KEYWORD_FLEX,
+	CSS_KEYWORD_FLEX_START,
+	CSS_KEYWORD_FLEX_END,
+	CSS_KEYWORD_STRETCH,
+	CSS_KEYWORD_SPACE_BETWEEN,
+	CSS_KEYWORD_SPACE_AROUND,
+	CSS_KEYWORD_SPACE_EVENLY,
+	CSS_KEYWORD_WRAP,
+	CSS_KEYWORD_NOWRAP,
+	CSS_KEYWORD_ROW,
+	CSS_KEYWORD_COLUMN
+} css_keyword_value_t;
 
 /** 样式变量类型 */
-typedef enum LCUI_StyleType {
-	LCUI_STYPE_NONE,
-	LCUI_STYPE_AUTO,
-	LCUI_STYPE_SCALE,
-	LCUI_STYPE_PX,
-	LCUI_STYPE_PT,
-	LCUI_STYPE_DIP,
-	LCUI_STYPE_SP,
-	LCUI_STYPE_COLOR,
-	LCUI_STYPE_IMAGE,
-	LCUI_STYPE_STYLE,
-	LCUI_STYPE_INT,
-	LCUI_STYPE_BOOL,
-	LCUI_STYPE_STRING,
-	LCUI_STYPE_WSTRING
-} LCUI_StyleType;
+typedef enum css_unit_t {
+	CSS_UNIT_NONE,
+	CSS_UNIT_AUTO,
+	CSS_UNIT_SCALE,
+	CSS_UNIT_PX,
+	CSS_UNIT_PT,
+	CSS_UNIT_DIP,
+	CSS_UNIT_SP,
+	CSS_UNIT_COLOR,
+	CSS_UNIT_IMAGE,
+	CSS_UNIT_STYLE,
+	CSS_UNIT_INT,
+	CSS_UNIT_BOOL,
+	CSS_UNIT_STRING,
+	CSS_UNIT_WSTRING
+} css_unit_t;
 
-#define LCUI_STYPE_px LCUI_STYPE_PX
-#define LCUI_STYPE_pt LCUI_STYPE_PT
-#define LCUI_STYPE_int LCUI_STYPE_INT
-#define LCUI_STYPE_color LCUI_STYPE_COLOR
-#define LCUI_STYPE_scale LCUI_STYPE_SCALE
-#define LCUI_STYPE_style LCUI_STYPE_STYLE
-#define LCUI_STYPE_bool LCUI_STYPE_BOOL
-#define LCUI_STYPE_image LCUI_STYPE_IMAGE
-#define LCUI_STYPE_string LCUI_STYPE_STRING
-#define LCUI_STYPE_wstring LCUI_STYPE_WSTRING
-#define LCUI_STYPE_sp LCUI_STYPE_SP
-#define LCUI_STYPE_dp LCUI_STYPE_DIP
-#define LCUI_STYPE_dip LCUI_STYPE_DIP
-#define LCUI_STYPE_0 LCUI_STYPE_NONE
-#define LCUI_STYPE_none LCUI_STYPE_NONE
+#define CSS_UNIT_px CSS_UNIT_PX
+#define CSS_UNIT_pt CSS_UNIT_PT
+#define CSS_UNIT_int CSS_UNIT_INT
+#define CSS_UNIT_color CSS_UNIT_COLOR
+#define CSS_UNIT_scale CSS_UNIT_SCALE
+#define CSS_UNIT_style CSS_UNIT_STYLE
+#define CSS_UNIT_bool CSS_UNIT_BOOL
+#define CSS_UNIT_image CSS_UNIT_IMAGE
+#define CSS_UNIT_string CSS_UNIT_STRING
+#define CSS_UNIT_wstring CSS_UNIT_WSTRING
+#define CSS_UNIT_sp CSS_UNIT_SP
+#define CSS_UNIT_dp CSS_UNIT_DIP
+#define CSS_UNIT_dip CSS_UNIT_DIP
+#define CSS_UNIT_0 CSS_UNIT_NONE
+#define CSS_UNIT_none CSS_UNIT_NONE
 
 typedef struct pd_boxshadow_t_ {
 	int x, y;
@@ -268,9 +268,9 @@ struct pd_canvas_t_ {
 	uchar_t *palette;
 };
 
-typedef struct LCUI_StyleRec_ {
+typedef struct css_unit_value_t {
 	LCUI_BOOL is_valid : 2;
-	LCUI_StyleType type : 6;
+	css_unit_t type : 6;
 	union {
 		int val_int;
 		int val_0;
@@ -286,8 +286,8 @@ typedef struct LCUI_StyleRec_ {
 		float val_dip;
 		float sp;
 		float val_sp;
-		LCUI_StyleValue style;
-		LCUI_StyleValue val_style;
+		css_keyword_value_t style;
+		css_keyword_value_t val_style;
 		float scale;
 		float val_scale;
 		char *string;
@@ -300,7 +300,7 @@ typedef struct LCUI_StyleRec_ {
 		pd_canvas_t *val_image;
 		LCUI_BOOL val_bool;
 	};
-} LCUI_StyleRec, *LCUI_Style;
+} css_unit_value_t;
 
 typedef struct pd_background_t {
 	pd_canvas_t *image; /**< 背景图 */

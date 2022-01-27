@@ -89,7 +89,7 @@ size_t ui_load_css_string(const char *str, const char *space)
 
 void ui_init_css(void)
 {
-	LCUI_InitCSSLibrary();
+	css_init();
 	LCUI_InitCSSParser();
 	LCUI_InitCSSFontStyle();
 	ui_load_css_string(ui_default_css, __FILE__);
@@ -99,5 +99,5 @@ void ui_destroy_css(void)
 {
 	LCUI_FreeCSSFontStyle();
 	LCUI_FreeCSSParser();
-	LCUI_FreeCSSLibrary();
+	css_destroy();
 }

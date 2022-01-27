@@ -221,7 +221,7 @@ void ui_widget_empty(ui_widget_t* w)
 		ui_trash_add(child);
 	}
 	list_destroy_without_node(&w->stacking_context, NULL);
-	ui_widget_mark_dirty_rect(w, NULL, SV_GRAPH_BOX);
+	ui_widget_mark_dirty_rect(w, NULL, CSS_KEYWORD_GRAPH_BOX);
 	ui_widget_refresh_style(w);
 }
 
@@ -242,10 +242,10 @@ void ui_widget_remove(ui_widget_t* w)
 		child->index -= 1;
 		node = node->next;
 	}
-	if (w->computed_style.position != SV_ABSOLUTE) {
+	if (w->computed_style.position != CSS_KEYWORD_ABSOLUTE) {
 		ui_widget_add_task(w->parent, UI_TASK_REFLOW);
 	}
-	ui_widget_mark_dirty_rect(w->parent, &w->box.canvas, SV_CONTENT_BOX);
+	ui_widget_mark_dirty_rect(w->parent, &w->box.canvas, CSS_KEYWORD_CONTENT_BOX);
 	ui_widget_unlink(w);
 	ui_trash_add(w);
 }
@@ -334,7 +334,7 @@ static void _ui_print_tree(ui_widget_t* w, int depth, const char* prefix)
 	size_t len;
 	ui_widget_t* child;
 	list_node_t* node;
-	LCUI_SelectorNode snode;
+	css_selector_node_t *snode;
 	char str[16], child_prefix[512];
 
 	len = strlen(prefix);
@@ -366,19 +366,19 @@ static void _ui_print_tree(ui_widget_t* w, int depth, const char* prefix)
 		    child->padding.right, child->padding.bottom,
 		    child->padding.left, child->margin.top, child->margin.right,
 		    child->margin.bottom, child->margin.left);
-		SelectorNode_Delete(snode);
+		css_selector_node_destroy(snode);
 		_ui_print_tree(child, depth + 1, child_prefix);
 	}
 }
 
 void ui_print_tree(ui_widget_t* w)
 {
-	LCUI_SelectorNode node;
+	css_selector_node_t *node;
 	w = w ? w : ui_root();
 	node = ui_widget_create_selector_node(w);
 	logger_error("%s, xy:(%g,%g), size:(%g,%g), visible: %s\n",
 		     node->fullname, w->x, w->y, w->width, w->height,
 		     w->computed_style.visible ? "true" : "false");
-	SelectorNode_Delete(node);
+	css_selector_node_destroy(node);
 	_ui_print_tree(w, 0, "  ");
 }

@@ -82,8 +82,8 @@ static void OnTouch(app_event_t *e, void *arg)
 		/* 设置让该部件捕获当前触点 */
 		ui_widget_set_touch_capture(w, binding->point_id);
 		ui_widget_on(w, "touch", OnTouchWidget, binding, NULL);
-		ui_widget_set_style(w, key_position, SV_ABSOLUTE, style);
-		ui_widget_set_style(w, key_background_color, bgcolor, color);
+		ui_widget_set_style(w, css_key_position, CSS_KEYWORD_ABSOLUTE, style);
+		ui_widget_set_style(w, css_key_background_color, bgcolor, color);
 		list_append_node(&touch_bindings, &binding->node);
 		ui_root_append(w);
 	}

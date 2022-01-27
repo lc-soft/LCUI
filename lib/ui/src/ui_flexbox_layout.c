@@ -74,7 +74,7 @@ static void ui_flexbox_layout_next_line(ui_flexbox_layout_context_t* ctx)
 		ctx->main_size = y_max(ctx->main_size, ctx->line->main_size);
 		ctx->cross_axis += ctx->line->cross_size;
 		ctx->cross_size = ctx->cross_axis;
-		if (ctx->widget->computed_style.flex.direction == SV_COLUMN) {
+		if (ctx->widget->computed_style.flex.direction == CSS_KEYWORD_COLUMN) {
 			ctx->cross_size -= ctx->widget->padding.left;
 		} else {
 			ctx->cross_size -= ctx->widget->padding.top;
@@ -97,7 +97,7 @@ static ui_flexbox_layout_context_t* ui_flexbox_layout_begin(ui_widget_t* w,
 	}
 	if (rule == UI_LAYOUT_RULE_AUTO) {
 		ctx->is_initiative = TRUE;
-		if (style->flex.direction == SV_COLUMN) {
+		if (style->flex.direction == CSS_KEYWORD_COLUMN) {
 			if (style->height_sizing == UI_SIZING_RULE_FIXED) {
 				rule = UI_LAYOUT_RULE_FIXED_HEIGHT;
 			} else {
@@ -113,7 +113,7 @@ static ui_flexbox_layout_context_t* ui_flexbox_layout_begin(ui_widget_t* w,
 	} else {
 		ctx->is_initiative = FALSE;
 	}
-	if (style->position == SV_ABSOLUTE) {
+	if (style->position == CSS_KEYWORD_ABSOLUTE) {
 		if (rule == UI_LAYOUT_RULE_FIXED_HEIGHT &&
 		    style->width_sizing == UI_SIZING_RULE_PERCENT) {
 			rule = UI_LAYOUT_RULE_FIXED;
@@ -136,7 +136,7 @@ static ui_flexbox_layout_context_t* ui_flexbox_layout_begin(ui_widget_t* w,
 	ctx->rule = rule;
 	ctx->line = NULL;
 	ctx->widget = w;
-	if (style->flex.direction == SV_COLUMN) {
+	if (style->flex.direction == CSS_KEYWORD_COLUMN) {
 		ctx->main_axis = w->padding.left;
 		ctx->cross_axis = w->padding.top;
 	} else {
@@ -174,7 +174,7 @@ static void ui_flexbox_layout_load_rows(ui_flexbox_layout_context_t* ctx)
 	DEBUG_MSG("%s, max_main_size: %g\n", ctx->widget->id, max_main_size);
 	for (list_each(node, &ctx->widget->children)) {
 		child = node->data;
-		if (child->computed_style.display == SV_NONE) {
+		if (child->computed_style.display == CSS_KEYWORD_NONE) {
 			continue;
 		}
 		if (ui_widget_has_absolute_position(child)) {
@@ -182,13 +182,13 @@ static void ui_flexbox_layout_load_rows(ui_flexbox_layout_context_t* ctx)
 			continue;
 		}
 		/* Clears the auto margin calculated on the last layout */
-		if (ui_widget_has_auto_style(child, key_margin_left)) {
+		if (ui_widget_has_auto_style(child, css_key_margin_left)) {
 			child->margin.left = 0;
-			if (ui_widget_has_auto_style(child, key_margin_right)) {
+			if (ui_widget_has_auto_style(child, css_key_margin_right)) {
 				child->margin.right = 0;
 			}
 			ui_widget_update_box_size(child);
-		} else if (ui_widget_has_auto_style(child, key_margin_right)) {
+		} else if (ui_widget_has_auto_style(child, css_key_margin_right)) {
 			child->margin.right = 0;
 			ui_widget_update_box_size(child);
 		}
@@ -198,7 +198,7 @@ static void ui_flexbox_layout_load_rows(ui_flexbox_layout_context_t* ctx)
 			  ctx->lines.length, child->index, ctx->line->main_size,
 			  basis);
 		/* Check line wrap */
-		if (flex->wrap == SV_WRAP && ctx->line->elements.length > 0 &&
+		if (flex->wrap == CSS_KEYWORD_WRAP && ctx->line->elements.length > 0 &&
 		    max_main_size != -1) {
 			if (ctx->line->main_size + basis - max_main_size >
 			    0.4f) {
@@ -208,10 +208,10 @@ static void ui_flexbox_layout_load_rows(ui_flexbox_layout_context_t* ctx)
 		if (child->box.outer.height > ctx->line->cross_size) {
 			ctx->line->cross_size = child->box.outer.height;
 		}
-		if (ui_widget_has_auto_style(child, key_margin_left)) {
+		if (ui_widget_has_auto_style(child, css_key_margin_left)) {
 			ctx->line->count_of_auto_margin_items++;
 		}
-		if (ui_widget_has_auto_style(child, key_margin_right)) {
+		if (ui_widget_has_auto_style(child, css_key_margin_right)) {
 			ctx->line->count_of_auto_margin_items++;
 		}
 		ctx->line->main_size += basis;
@@ -240,7 +240,7 @@ static void ui_flexbox_layout_load_columns(ui_flexbox_layout_context_t* ctx)
 	for (list_each(node, &ctx->widget->children)) {
 		child = node->data;
 
-		if (child->computed_style.display == SV_NONE) {
+		if (child->computed_style.display == CSS_KEYWORD_NONE) {
 			continue;
 		}
 		if (ui_widget_has_absolute_position(child)) {
@@ -252,7 +252,7 @@ static void ui_flexbox_layout_load_columns(ui_flexbox_layout_context_t* ctx)
 		DEBUG_MSG("[column %lu][%lu] main_size: %g, basis: %g\n",
 			  ctx->lines.length, child->index, ctx->line->main_size,
 			  basis);
-		if (flex->wrap == SV_WRAP && ctx->line->elements.length > 0 &&
+		if (flex->wrap == CSS_KEYWORD_WRAP && ctx->line->elements.length > 0 &&
 		    max_main_size != -1) {
 			if (ctx->line->main_size + basis - max_main_size >
 			    0.4f) {
@@ -262,10 +262,10 @@ static void ui_flexbox_layout_load_columns(ui_flexbox_layout_context_t* ctx)
 		if (child->box.outer.width > ctx->line->cross_size) {
 			ctx->line->cross_size = child->box.outer.width;
 		}
-		if (ui_widget_has_auto_style(child, key_margin_top)) {
+		if (ui_widget_has_auto_style(child, css_key_margin_top)) {
 			ctx->line->count_of_auto_margin_items++;
 		}
-		if (ui_widget_has_auto_style(child, key_margin_top)) {
+		if (ui_widget_has_auto_style(child, css_key_margin_top)) {
 			ctx->line->count_of_auto_margin_items++;
 		}
 		ctx->line->main_size += basis;
@@ -278,7 +278,7 @@ static void ui_flexbox_layout_load_columns(ui_flexbox_layout_context_t* ctx)
 
 static void ui_flexbox_layout_load(ui_flexbox_layout_context_t* ctx)
 {
-	if (ctx->widget->computed_style.flex.direction == SV_COLUMN) {
+	if (ctx->widget->computed_style.flex.direction == CSS_KEYWORD_COLUMN) {
 		ui_flexbox_layout_load_columns(ctx);
 	} else {
 		ui_flexbox_layout_load_rows(ctx);
@@ -290,35 +290,35 @@ static void ui_flexbox_layout_compute_justify_content(ui_flexbox_layout_context_
 {
 	float free_space;
 
-	if (ctx->widget->computed_style.flex.direction == SV_COLUMN) {
+	if (ctx->widget->computed_style.flex.direction == CSS_KEYWORD_COLUMN) {
 		free_space = ctx->widget->box.content.height;
 	} else {
 		free_space = ctx->widget->box.content.width;
 	}
 	free_space -= ctx->line->main_size;
 	switch (ctx->widget->computed_style.flex.justify_content) {
-	case SV_SPACE_BETWEEN:
+	case CSS_KEYWORD_SPACE_BETWEEN:
 		if (ctx->line->elements.length > 1) {
 			*space = free_space / (ctx->line->elements.length - 1);
 		}
 		*start_axis -= *space;
 		break;
-	case SV_SPACE_AROUND:
+	case CSS_KEYWORD_SPACE_AROUND:
 		*space = free_space / ctx->line->elements.length;
 		*start_axis -= *space * 0.5f;
 		break;
-	case SV_SPACE_EVENLY:
+	case CSS_KEYWORD_SPACE_EVENLY:
 		*space = free_space / (ctx->line->elements.length + 1);
 		*start_axis += *space;
 		break;
-	case SV_RIGHT:
-	case SV_FLEX_END:
+	case CSS_KEYWORD_RIGHT:
+	case CSS_KEYWORD_FLEX_END:
 		*start_axis += free_space;
 		break;
-	case SV_CENTER:
+	case CSS_KEYWORD_CENTER:
 		*start_axis += free_space * 0.5f;
 		break;
-	case SV_LEFT:
+	case CSS_KEYWORD_LEFT:
 	default:
 		break;
 	}
@@ -409,11 +409,11 @@ static void ui_flexbox_layout_update_row(ui_flexbox_layout_context_t* ctx)
 		k = free_space / ctx->line->count_of_auto_margin_items;
 		for (list_each(node, &ctx->line->elements)) {
 			w = node->data;
-			if (ui_widget_has_auto_style(w, key_margin_left)) {
+			if (ui_widget_has_auto_style(w, css_key_margin_left)) {
 				w->margin.left = k;
 				ui_widget_update_box_size(w);
 			}
-			if (ui_widget_has_auto_style(w, key_margin_right)) {
+			if (ui_widget_has_auto_style(w, css_key_margin_right)) {
 				w->margin.right = k;
 				ui_widget_update_box_size(w);
 			}
@@ -491,11 +491,11 @@ static void ui_flexbox_layout_update_column(ui_flexbox_layout_context_t* ctx)
 		k = free_space / ctx->line->count_of_auto_margin_items;
 		for (list_each(node, &ctx->line->elements)) {
 			w = node->data;
-			if (ui_widget_has_auto_style(w, key_margin_top)) {
+			if (ui_widget_has_auto_style(w, css_key_margin_top)) {
 				w->margin.top = k;
 				ui_widget_update_box_size(w);
 			}
-			if (ui_widget_has_auto_style(w, key_margin_bottom)) {
+			if (ui_widget_has_auto_style(w, css_key_margin_bottom)) {
 				w->margin.bottom = k;
 				ui_widget_update_box_size(w);
 			}
@@ -524,7 +524,7 @@ static void ui_flexbox_layout_align_items_center(ui_flexbox_layout_context_t* ct
 	list_node_t *node;
 	ui_widget_t* child;
 
-	if (ctx->widget->computed_style.flex.direction == SV_COLUMN) {
+	if (ctx->widget->computed_style.flex.direction == CSS_KEYWORD_COLUMN) {
 		for (list_each(node, &ctx->line->elements)) {
 			child = node->data;
 			child->layout_x =
@@ -550,11 +550,11 @@ static void ui_flexbox_layout_align_items_stretch(ui_flexbox_layout_context_t* c
 	list_node_t *node;
 	ui_widget_t* child;
 
-	if (ctx->widget->computed_style.flex.direction == SV_COLUMN) {
+	if (ctx->widget->computed_style.flex.direction == CSS_KEYWORD_COLUMN) {
 		for (list_each(node, &ctx->line->elements)) {
 			child = node->data;
 			child->layout_x = base_cross_axis;
-			if (ui_widget_has_auto_style(child, key_width)) {
+			if (ui_widget_has_auto_style(child, css_key_width)) {
 				child->width =
 				    ctx->line->cross_size - margin_x(child);
 				update_flex_item_size(child,
@@ -567,7 +567,7 @@ static void ui_flexbox_layout_align_items_stretch(ui_flexbox_layout_context_t* c
 	for (list_each(node, &ctx->line->elements)) {
 		child = node->data;
 		child->layout_y = base_cross_axis;
-		if (ui_widget_has_auto_style(child, key_height)) {
+		if (ui_widget_has_auto_style(child, css_key_height)) {
 			child->height = ctx->line->cross_size - margin_y(child);
 			update_flex_item_size(child, UI_LAYOUT_RULE_FIXED);
 		}
@@ -581,7 +581,7 @@ static void ui_flexbox_layout_align_items_start(ui_flexbox_layout_context_t* ctx
 	list_node_t *node;
 	ui_widget_t* child;
 
-	if (ctx->widget->computed_style.flex.direction == SV_COLUMN) {
+	if (ctx->widget->computed_style.flex.direction == CSS_KEYWORD_COLUMN) {
 		for (list_each(node, &ctx->line->elements)) {
 			child = node->data;
 			child->layout_x = base_cross_axis;
@@ -602,7 +602,7 @@ static void ui_flexbox_layout_align_items_end(ui_flexbox_layout_context_t* ctx,
 	list_node_t *node;
 	ui_widget_t* child;
 
-	if (ctx->widget->computed_style.flex.direction == SV_COLUMN) {
+	if (ctx->widget->computed_style.flex.direction == CSS_KEYWORD_COLUMN) {
 		for (list_each(node, &ctx->line->elements)) {
 			child = node->data;
 			child->layout_x = base_cross_axis +
@@ -628,7 +628,7 @@ static void ui_flexbox_layout_align_items(ui_flexbox_layout_context_t* ctx)
 	ui_widget_t* w = ctx->widget;
 	list_node_t *node;
 
-	if (w->computed_style.flex.direction == SV_COLUMN) {
+	if (w->computed_style.flex.direction == CSS_KEYWORD_COLUMN) {
 		cross_axis = w->padding.left;
 		free_space = w->box.content.width - ctx->cross_size;
 	} else {
@@ -642,24 +642,24 @@ static void ui_flexbox_layout_align_items(ui_flexbox_layout_context_t* ctx)
 		ctx->line = node->data;
 		ctx->line->cross_size += free_space / ctx->lines.length;
 		switch (w->computed_style.flex.align_items) {
-		case SV_CENTER:
+		case CSS_KEYWORD_CENTER:
 			ui_flexbox_layout_align_items_center(ctx, cross_axis);
 			break;
-		case SV_FLEX_START:
+		case CSS_KEYWORD_FLEX_START:
 			ui_flexbox_layout_align_items_start(ctx, cross_axis);
 			break;
-		case SV_FLEX_END:
+		case CSS_KEYWORD_FLEX_END:
 			ui_flexbox_layout_align_items_end(ctx, cross_axis);
 			break;
-		case SV_NORMAL:
-		case SV_STRETCH:
+		case CSS_KEYWORD_NORMAL:
+		case CSS_KEYWORD_STRETCH:
 		default:
 			ui_flexbox_layout_align_items_stretch(ctx, cross_axis);
 			break;
 		}
 		cross_axis += ctx->line->cross_size;
 	}
-	if (w->computed_style.flex.direction == SV_COLUMN) {
+	if (w->computed_style.flex.direction == CSS_KEYWORD_COLUMN) {
 		ctx->cross_size = cross_axis - w->padding.left;
 	} else {
 		ctx->cross_size = cross_axis - w->padding.top;
@@ -674,7 +674,7 @@ static void ui_flexbox_layout_update(ui_flexbox_layout_context_t* ctx)
 	DEBUG_MSG("widget: %s, start\n", w->id);
 	for (list_each(node, &ctx->lines)) {
 		ctx->line = node->data;
-		if (w->computed_style.flex.direction == SV_COLUMN) {
+		if (w->computed_style.flex.direction == CSS_KEYWORD_COLUMN) {
 			ui_flexbox_layout_update_column(ctx);
 		} else {
 			ui_flexbox_layout_update_row(ctx);
@@ -700,7 +700,7 @@ static void ui_flexbox_layout_apply_size(ui_flexbox_layout_context_t* ctx)
 
 	DEBUG_MSG("widget: %s, main_size: %g, cross_size: %g\n", w->id,
 		  ctx->main_size, ctx->cross_size);
-	if (w->computed_style.flex.direction == SV_COLUMN) {
+	if (w->computed_style.flex.direction == CSS_KEYWORD_COLUMN) {
 		switch (ctx->rule) {
 		case UI_LAYOUT_RULE_FIXED:
 			width = w->box.content.width;
