@@ -195,6 +195,7 @@ void ui_cursor_init(void)
 	ui_cursor_load_default_image(&image);
 	ui_cursor.x = app_get_screen_width() / 2;
 	ui_cursor.y = app_get_screen_height() / 2;
+	// TODO: 移除 app 依赖
 	app_on_event(APP_EVENT_MOUSEMOVE, ui_cursor_on_mouse_event, NULL);
 	ui_cursor_set_image(&image);
 	pd_canvas_free(&image);

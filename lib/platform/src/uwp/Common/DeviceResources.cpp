@@ -388,7 +388,7 @@ void DX::DeviceResources::CreateWindowSizeDependentResources()
 		)
 	);
 
-	CD3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc(D3D11_DSV_DIMENSION_TEXTURE2D);
+	CD3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc(D3D11_DCSS_KEYWORD_DIMENSION_TEXTURE2D);
 	DX::ThrowIfFailed(
 		m_d3dDevice->CreateDepthStencilView(
 			depthStencil.Get(),

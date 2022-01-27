@@ -9,36 +9,36 @@ void ui_widget_update_box_position(ui_widget_t* w)
 	float y = w->layout_y;
 
 	switch (w->computed_style.position) {
-	case SV_ABSOLUTE:
-		if (!ui_widget_has_auto_style(w, key_left)) {
+	case CSS_KEYWORD_ABSOLUTE:
+		if (!ui_widget_has_auto_style(w, css_key_left)) {
 			x = w->computed_style.left;
-		} else if (!ui_widget_has_auto_style(w, key_right)) {
+		} else if (!ui_widget_has_auto_style(w, css_key_right)) {
 			if (w->parent) {
 				x = w->parent->box.border.width - w->width;
 			}
 			x -= w->computed_style.right;
 		}
-		if (!ui_widget_has_auto_style(w, key_top)) {
+		if (!ui_widget_has_auto_style(w, css_key_top)) {
 			y = w->computed_style.top;
-		} else if (!ui_widget_has_auto_style(w, key_bottom)) {
+		} else if (!ui_widget_has_auto_style(w, css_key_bottom)) {
 			if (w->parent) {
 				y = w->parent->box.border.height - w->height;
 			}
 			y -= w->computed_style.bottom;
 		}
 		break;
-	case SV_RELATIVE:
-		if (!ui_widget_has_auto_style(w, key_left)) {
+	case CSS_KEYWORD_RELATIVE:
+		if (!ui_widget_has_auto_style(w, css_key_left)) {
 			x += w->computed_style.left;
-		} else if (!ui_widget_has_auto_style(w, key_right)) {
+		} else if (!ui_widget_has_auto_style(w, css_key_right)) {
 			x -= w->computed_style.right;
 		}
-		if (!ui_widget_has_auto_style(w, key_top)) {
+		if (!ui_widget_has_auto_style(w, css_key_top)) {
 			y += w->computed_style.top;
-		} else if (!ui_widget_has_auto_style(w, key_bottom)) {
+		} else if (!ui_widget_has_auto_style(w, css_key_bottom)) {
 			y -= w->computed_style.bottom;
 		}
-	case SV_STATIC:
+	case CSS_KEYWORD_STATIC:
 	default:
 		break;
 	}

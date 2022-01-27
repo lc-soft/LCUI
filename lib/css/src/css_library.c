@@ -41,7 +41,7 @@
 #define MAX_NAME_LEN 256
 #define LEN(A) sizeof(A) / sizeof(*A)
 
-enum SelectorRank {
+enum css_selector_rank {
 	GENERAL_RANK = 0,
 	TYPE_RANK = 1,
 	CLASS_RANK = 10,
@@ -49,7 +49,7 @@ enum SelectorRank {
 	ID_RANK = 100
 };
 
-enum SelectorFinderLevel {
+enum css_selector_name_finder_level {
 	LEVEL_NONE,
 	LEVEL_TYPE,
 	LEVEL_ID,
@@ -60,282 +60,292 @@ enum SelectorFinderLevel {
 	LEVEL_TOTAL_NUM
 };
 
+/** dict_t<string, css_style_link_group_t*> */
+typedef dict_t css_style_group_t;
+
 /* 样式表查找器的上下文数据结构 */
-typedef struct NamesFinderRec_ {
+typedef struct css_selector_name_collector_t {
 	int level;    /**< 当前选择器层级 */
 	int class_i;  /**< 当前处理到第几个类名 */
 	int status_i; /**< 当前处理到第几个状态名（伪类名） */
 	int name_i;   /**< 选择器名称从第几个字符开始 */
-	char name[MAX_NAME_LEN]; /**< 选择器名称缓存 */
-	LCUI_SelectorNode node;  /**< 针对的选择器结点 */
-} NamesFinderRec, *NamesFinder;
+	char name[MAX_NAME_LEN];   /**< 选择器名称缓存 */
+	css_selector_node_t *node; /**< 针对的选择器结点 */
+} css_selector_name_collector_t;
 
 /** 样式链接记录组 */
-typedef struct StyleLinkGroupRec_ {
-	dict_t *links;           /**< 样式链接表 */
-	char *name;              /**< 选择器名称 */
-	LCUI_SelectorNode snode; /**< 选择器结点 */
-} StyleLinkGroupRec, *StyleLinkGroup;
+typedef struct css_style_link_group_t {
+	dict_t *links;              /**< 样式链接表 */
+	char *name;                 /**< 选择器名称 */
+	css_selector_node_t *snode; /**< 选择器结点 */
+} css_style_link_group_t;
 
 /** 样式结点记录 */
-typedef struct StyleNodeRec_ {
-	int rank;            /**< 权值，决定优先级 */
-	int batch_num;       /**< 批次号 */
-	char *space;         /**< 所属的空间 */
-	char *selector;      /**< 选择器 */
-	LCUI_StyleList list; /**< 样式表 */
-	list_node_t node;    /**< 在链表中的结点 */
-} StyleNodeRec, *StyleNode;
+typedef struct css_style_rule_t {
+	int rank;                /**< 权值，决定优先级 */
+	int batch_num;           /**< 批次号 */
+	char *space;             /**< 所属的空间 */
+	char *selector;          /**< 选择器 */
+	css_style_props_t *list; /**< 样式表 */
+	list_node_t node;        /**< 在链表中的结点 */
+} css_style_rule_t;
 
 /** 样式链接记录 */
-typedef struct StyleLinkRec_ {
-	char *selector;       /**< 选择器 */
-	StyleLinkGroup group; /**< 所属组 */
-	list_t styles;        /**< 作用于当前选择器的样式 */
-	dict_t *parents;      /**< 父级节点 */
-} StyleLinkRec, *StyleLink;
+typedef struct css_style_link_t {
+	char *selector;                /**< 选择器 */
+	css_style_link_group_t *group; /**< 所属组 */
+	list_t styles;                 /**< 作用于当前选择器的样式 */
+	dict_t *parents;               /**< 父级节点 */
+} css_style_link_t;
 
-static struct {
-	LCUI_BOOL active;
-	list_t groups; /**< 样式组列表 */
-	dict_t *cache; /**< 样式表缓存，以选择器的 hash 值索引 */
-	dict_t *names; /**< 样式属性名称表，以值的名称索引 */
-	dict_t *value_keys;  /**< 样式属性值表，以值的名称索引 */
-	dict_t *value_names; /**< 样式属性值名称表，以值索引 */
-	dict_type_t names_dict;       /**< 样式属性名称表的类型 */
-	dict_type_t value_keys_dict;  /**< 样式属性值表的类型 */
-	dict_type_t value_names_dict; /**< 样式属性值名称表的类型 */
-	dict_type_t style_link_dict;  /**< 样式链接表的类型 */
-	dict_type_t style_group_dict; /**< 样式组的类型 */
-	dict_type_t cache_dict;       /**< 样式表缓存的类型 */
-	strpool_t *strpool;           /**< 字符串池 */
-	int count;                    /**< 当前记录的属性数量 */
-} library;
+static struct css_module_t {
+	 /**
+	  * 样式组列表
+	  * list_t<css_style_group_t*>
+	  */
+	list_t groups;
+
+	/**
+	 * 样式表缓存，以选择器的 hash 值索引
+	 * dict_t<css_selector_hash_t, css_style_props_t*>
+	 */
+	dict_t *cache;
+
+ 	/**
+	  * 样式属性名称表，以值的名称索引
+	  * dict_t<int, string>
+	  */
+	dict_t *properties;
+
+	/**
+	 * 样式属性值表，以值的名称索引
+	 * dict_t<int, css_keyword_t*>
+	 */
+	dict_t *keywords;
+
+	/**
+	 * 样式属性值名称表，以值索引
+	 * dict_t<string, css_keyword_t*>
+	 */
+	dict_t *keyword_names;
+
+	/** 字符串池 */
+	strpool_t *strpool;
+
+	/** 当前记录的属性数量 */
+	int count;
+} css;
 
 /** 样式字符串值与标识码 */
-typedef struct KeyNameGroupRec_ {
+typedef struct css_keyword_t {
 	int key;
 	char *name;
-} KeyNameGroupRec, *KeyNameGroup;
+} css_keyword_t;
 
 /* clang-format off */
 
-static KeyNameGroupRec style_name_map[] = {
-	{ key_visibility, "visibility" },
-	{ key_width, "width" },
-	{ key_height, "height" },
-	{ key_min_width, "min-width" },
-	{ key_min_height, "min-height" },
-	{ key_max_width, "max-width" },
-	{ key_max_height, "max-height" },
-	{ key_display, "display" },
-	{ key_z_index, "z-index" },
-	{ key_top, "top" },
-	{ key_right, "right" },
-	{ key_left, "left" },
-	{ key_bottom, "bottom" },
-	{ key_position, "position" },
-	{ key_opacity, "opacity" },
-	{ key_vertical_align, "vertical-align" },
-	{ key_background_color, "background-color" },
-	{ key_background_position, "background-position" },
-	{ key_background_size, "background-size" },
-	{ key_background_image, "background-image" },
-	{ key_padding_left, "padding-left" },
-	{ key_padding_right, "padding-right" },
-	{ key_padding_top, "padding-top" },
-	{ key_padding_bottom, "padding-bottom" },
-	{ key_margin_left, "margin-left" },
-	{ key_margin_right, "margin-right" },
-	{ key_margin_top, "margin-top" },
-	{ key_margin_bottom, "margin-bottom" },
-	{ key_border_top_color, "border-top-color" },
-	{ key_border_right_color, "border-right-color" },
-	{ key_border_bottom_color, "border-bottom-color" },
-	{ key_border_left_color, "border-left-color" },
-	{ key_border_top_width, "border-top-width" },
-	{ key_border_right_width, "border-right-width" },
-	{ key_border_bottom_width, "border-bottom-width" },
-	{ key_border_left_width, "border-left-width" },
-	{ key_border_top_width, "border-top-width" },
-	{ key_border_right_width, "border-right-width" },
-	{ key_border_bottom_width, "border-bottom-width" },
-	{ key_border_left_width, "border-left-width" },
-	{ key_border_top_style, "border-top-style" },
-	{ key_border_right_style, "border-right-style" },
-	{ key_border_bottom_style, "border-bottom-style" },
-	{ key_border_left_style, "border-left-style" },
-	{ key_border_top_left_radius, "border-top-left-radius" },
-	{ key_border_top_right_radius, "border-top-right-radius" },
-	{ key_border_bottom_left_radius, "border-bottom-left-radius" },
-	{ key_border_bottom_right_radius, "border-bottom-right-radius" },
-	{ key_box_shadow_x, "box-shadow-x" },
-	{ key_box_shadow_y, "box-shadow-y" },
-	{ key_box_shadow_blur, "box-shadow-blur" },
-	{ key_box_shadow_spread, "box-shadow-spread" },
-	{ key_box_shadow_color, "box-shadow-color" },
-	{ key_pointer_events, "pointer-events" },
-	{ key_focusable, "focusable" },
-	{ key_box_sizing, "box-sizing" },
-	{ key_flex_basis, "flex-basis" },
-	{ key_flex_direction, "flex-direction" },
-	{ key_flex_grow, "flex-grow" },
-	{ key_flex_shrink, "flex-shrink" },
-	{ key_flex_wrap, "flex-wrap" },
-	{ key_justify_content, "justify-content" },
-	{ key_align_content, "align-content" },
-	{ key_align_items, "align-items" }
+static css_keyword_t css_style_prop_name_map[] = {
+	{ css_key_visibility, "visibility" },
+	{ css_key_width, "width" },
+	{ css_key_height, "height" },
+	{ css_key_min_width, "min-width" },
+	{ css_key_min_height, "min-height" },
+	{ css_key_max_width, "max-width" },
+	{ css_key_max_height, "max-height" },
+	{ css_key_display, "display" },
+	{ css_key_z_index, "z-index" },
+	{ css_key_top, "top" },
+	{ css_key_right, "right" },
+	{ css_key_left, "left" },
+	{ css_key_bottom, "bottom" },
+	{ css_key_position, "position" },
+	{ css_key_opacity, "opacity" },
+	{ css_key_vertical_align, "vertical-align" },
+	{ css_key_background_color, "background-color" },
+	{ css_key_background_position, "background-position" },
+	{ css_key_background_size, "background-size" },
+	{ css_key_background_image, "background-image" },
+	{ css_key_padding_left, "padding-left" },
+	{ css_key_padding_right, "padding-right" },
+	{ css_key_padding_top, "padding-top" },
+	{ css_key_padding_bottom, "padding-bottom" },
+	{ css_key_margin_left, "margin-left" },
+	{ css_key_margin_right, "margin-right" },
+	{ css_key_margin_top, "margin-top" },
+	{ css_key_margin_bottom, "margin-bottom" },
+	{ css_key_border_top_color, "border-top-color" },
+	{ css_key_border_right_color, "border-right-color" },
+	{ css_key_border_bottom_color, "border-bottom-color" },
+	{ css_key_border_left_color, "border-left-color" },
+	{ css_key_border_top_width, "border-top-width" },
+	{ css_key_border_right_width, "border-right-width" },
+	{ css_key_border_bottom_width, "border-bottom-width" },
+	{ css_key_border_left_width, "border-left-width" },
+	{ css_key_border_top_width, "border-top-width" },
+	{ css_key_border_right_width, "border-right-width" },
+	{ css_key_border_bottom_width, "border-bottom-width" },
+	{ css_key_border_left_width, "border-left-width" },
+	{ css_key_border_top_style, "border-top-style" },
+	{ css_key_border_right_style, "border-right-style" },
+	{ css_key_border_bottom_style, "border-bottom-style" },
+	{ css_key_border_left_style, "border-left-style" },
+	{ css_key_border_top_left_radius, "border-top-left-radius" },
+	{ css_key_border_top_right_radius, "border-top-right-radius" },
+	{ css_key_border_bottom_left_radius, "border-bottom-left-radius" },
+	{ css_key_border_bottom_right_radius, "border-bottom-right-radius" },
+	{ css_key_box_shadow_x, "box-shadow-x" },
+	{ css_key_box_shadow_y, "box-shadow-y" },
+	{ css_key_box_shadow_blur, "box-shadow-blur" },
+	{ css_key_box_shadow_spread, "box-shadow-spread" },
+	{ css_key_box_shadow_color, "box-shadow-color" },
+	{ css_key_pointer_events, "pointer-events" },
+	{ css_key_focusable, "focusable" },
+	{ css_key_box_sizing, "box-sizing" },
+	{ css_key_flex_basis, "flex-basis" },
+	{ css_key_flex_direction, "flex-direction" },
+	{ css_key_flex_grow, "flex-grow" },
+	{ css_key_flex_shrink, "flex-shrink" },
+	{ css_key_flex_wrap, "flex-wrap" },
+	{ css_key_justify_content, "justify-content" },
+	{ css_key_align_content, "align-content" },
+	{ css_key_align_items, "align-items" }
 };
 
 /** 样式字符串与标识码的映射表 */
-static KeyNameGroupRec style_value_map[] = {
-	{ SV_NONE, "none" },
-	{ SV_AUTO, "auto" },
-	{ SV_INHERIT, "inherit" },
-	{ SV_INITIAL, "initial" },
-	{ SV_CONTAIN, "contain" },
-	{ SV_COVER, "cover" },
-	{ SV_LEFT, "left" },
-	{ SV_CENTER, "center" },
-	{ SV_RIGHT, "right" },
-	{ SV_TOP, "top" },
-	{ SV_TOP_LEFT, "top left" },
-	{ SV_TOP_CENTER, "top center" },
-	{ SV_TOP_RIGHT, "top right" },
-	{ SV_MIDDLE, "middle" },
-	{ SV_CENTER_LEFT, "center left" },
-	{ SV_CENTER_CENTER, "center center" },
-	{ SV_CENTER_RIGHT, "center right" },
-	{ SV_BOTTOM, "bottom" },
-	{ SV_BOTTOM_LEFT, "bottom left" },
-	{ SV_BOTTOM_CENTER, "bottom center" },
-	{ SV_BOTTOM_RIGHT, "bottom right" },
-	{ SV_SOLID, "solid" },
-	{ SV_DOTTED, "dotted" },
-	{ SV_DOUBLE, "double" },
-	{ SV_DASHED, "dashed" },
-	{ SV_CONTENT_BOX, "content-box" },
-	{ SV_PADDING_BOX, "padding-box" },
-	{ SV_BORDER_BOX, "border-box" },
-	{ SV_GRAPH_BOX, "graph-box" },
-	{ SV_STATIC, "static" },
-	{ SV_RELATIVE, "relative" },
-	{ SV_ABSOLUTE, "absolute" },
-	{ SV_BLOCK, "block" },
-	{ SV_INLINE_BLOCK, "inline-block" },
-	{ SV_FLEX, "flex" },
-	{ SV_NORMAL, "normal" },
-	{ SV_FLEX_START, "flex-start" },
-	{ SV_FLEX_END, "flex-end" },
-	{ SV_STRETCH, "stretch" },
-	{ SV_SPACE_BETWEEN, "space-between" },
-	{ SV_SPACE_AROUND, "space-around" },
-	{ SV_SPACE_EVENLY, "space-evenly" },
-	{ SV_NOWRAP, "nowrap" },
-	{ SV_WRAP, "wrap" },
-	{ SV_ROW, "row" },
-	{ SV_COLUMN, "column" }
+static css_keyword_t css_keyword_map[] = {
+	{ CSS_KEYWORD_NONE, "none" },
+	{ CSS_KEYWORD_AUTO, "auto" },
+	{ CSS_KEYWORD_INHERIT, "inherit" },
+	{ CSS_KEYWORD_INITIAL, "initial" },
+	{ CSS_KEYWORD_CONTAIN, "contain" },
+	{ CSS_KEYWORD_COVER, "cover" },
+	{ CSS_KEYWORD_LEFT, "left" },
+	{ CSS_KEYWORD_CENTER, "center" },
+	{ CSS_KEYWORD_RIGHT, "right" },
+	{ CSS_KEYWORD_TOP, "top" },
+	{ CSS_KEYWORD_TOP_LEFT, "top left" },
+	{ CSS_KEYWORD_TOP_CENTER, "top center" },
+	{ CSS_KEYWORD_TOP_RIGHT, "top right" },
+	{ CSS_KEYWORD_MIDDLE, "middle" },
+	{ CSS_KEYWORD_CENTER_LEFT, "center left" },
+	{ CSS_KEYWORD_CENTER_CENTER, "center center" },
+	{ CSS_KEYWORD_CENTER_RIGHT, "center right" },
+	{ CSS_KEYWORD_BOTTOM, "bottom" },
+	{ CSS_KEYWORD_BOTTOM_LEFT, "bottom left" },
+	{ CSS_KEYWORD_BOTTOM_CENTER, "bottom center" },
+	{ CSS_KEYWORD_BOTTOM_RIGHT, "bottom right" },
+	{ CSS_KEYWORD_SOLID, "solid" },
+	{ CSS_KEYWORD_DOTTED, "dotted" },
+	{ CSS_KEYWORD_DOUBLE, "double" },
+	{ CSS_KEYWORD_DASHED, "dashed" },
+	{ CSS_KEYWORD_CONTENT_BOX, "content-box" },
+	{ CSS_KEYWORD_PADDING_BOX, "padding-box" },
+	{ CSS_KEYWORD_BORDER_BOX, "border-box" },
+	{ CSS_KEYWORD_GRAPH_BOX, "graph-box" },
+	{ CSS_KEYWORD_STATIC, "static" },
+	{ CSS_KEYWORD_RELATIVE, "relative" },
+	{ CSS_KEYWORD_ABSOLUTE, "absolute" },
+	{ CSS_KEYWORD_BLOCK, "block" },
+	{ CSS_KEYWORD_INLINE_BLOCK, "inline-block" },
+	{ CSS_KEYWORD_FLEX, "flex" },
+	{ CSS_KEYWORD_NORMAL, "normal" },
+	{ CSS_KEYWORD_FLEX_START, "flex-start" },
+	{ CSS_KEYWORD_FLEX_END, "flex-end" },
+	{ CSS_KEYWORD_STRETCH, "stretch" },
+	{ CSS_KEYWORD_SPACE_BETWEEN, "space-between" },
+	{ CSS_KEYWORD_SPACE_AROUND, "space-around" },
+	{ CSS_KEYWORD_SPACE_EVENLY, "space-evenly" },
+	{ CSS_KEYWORD_NOWRAP, "nowrap" },
+	{ CSS_KEYWORD_WRAP, "wrap" },
+	{ CSS_KEYWORD_ROW, "row" },
+	{ CSS_KEYWORD_COLUMN, "column" }
 };
 
-static int LCUI_DirectAddStyleName(int key, const char *name)
+static int css_register_property(int key, const char *name)
 {
-	if (!library.names->type->val_dup) {
+	if (!css.properties->type->val_dup) {
 		return -2;
 	}
-	return dict_add(library.names, &key, (void*)name);
+	return dict_add(css.properties, &key, (void*)name);
 }
 
-int LCUI_SetStyleName(int key, const char *name)
-{
-	char *newname;
-	dict_entry_t *entry;
-	entry = dict_find(library.names, &key);
-	if (entry) {
-		newname = strdup2(name);
-		free(entry->v.val);
-		entry->v.val = newname;
-		return 0;
-	}
-	return -1;
-}
-
-int LCUI_AddCSSPropertyName(const char *name)
+int css_register_property_name(const char *name)
 {
 	int key;
-	key = library.count++;
-	if (LCUI_DirectAddStyleName(key, name) != 0) {
-		--library.count;
+	key = css.count++;
+	if (css_register_property(key, name) != 0) {
+		--css.count;
 		return -1;
 	}
 	return key;
 }
 
-const char *LCUI_GetStyleName(int key)
+const char *css_get_property_name(int key)
 {
-	return dict_fetch_value(library.names, &key);
+	return dict_fetch_value(css.properties, &key);
 }
 
-static KeyNameGroup CreateKeyNameGroup(int key, const char *name)
+static css_keyword_t *keyword_create(int key, const char *name)
 {
-	KeyNameGroup group;
-	group = malloc(sizeof(KeyNameGroupRec));
-	group->name = strdup2(name);
-	group->key = key;
-	return group;
+	css_keyword_t *kw;
+	kw = malloc(sizeof(css_keyword_t));
+	kw->name = strdup2(name);
+	kw->key = key;
+	return kw;
 }
 
-static void DestroyKeyNameGroup(void *data)
+static void keyword_destroy(void *data)
 {
-	KeyNameGroup group = data;
-	free(group->name);
-	free(group);
+	css_keyword_t *kw = data;
+	free(kw->name);
+	free(kw);
 }
 
-static void KeyNameGroupDestructor(void *privdata, void *data)
+static void keyword_destructor(void *privdata, void *data)
 {
-	DestroyKeyNameGroup(data);
+	keyword_destroy(data);
 }
 
-int LCUI_AddStyleValue(int key, const char *name)
+int css_register_keyword(int key, const char *name)
 {
-	KeyNameGroup group = CreateKeyNameGroup(key, name);
-	if (dict_add(library.value_keys, group->name, group)) {
-		DestroyKeyNameGroup(group);
+	css_keyword_t *kw = keyword_create(key, name);
+	if (dict_add(css.keywords, kw->name, kw)) {
+		keyword_destroy(kw);
 		return -1;
 	}
-	if (dict_add(library.value_names, &group->key, group)) {
-		DestroyKeyNameGroup(group);
+	if (dict_add(css.keyword_names, &kw->key, kw)) {
+		keyword_destroy(kw);
 		return -2;
 	}
 	return 0;
 }
 
-int LCUI_GetStyleValue(const char *str)
+int css_get_keyword_key(const char *str)
 {
-	KeyNameGroup group;
-	group = dict_fetch_value(library.value_keys, str);
-	if (group) {
-		return group->key;
+	css_keyword_t *kw;
+	kw = dict_fetch_value(css.keywords, str);
+	if (kw) {
+		return kw->key;
 	}
 	return -1;
 }
 
-const char *LCUI_GetStyleValueName(int val)
+const char *css_get_keyword_name(int val)
 {
-	KeyNameGroup group;
-	group = dict_fetch_value(library.value_names, &val);
-	if (group) {
-		return group->name;
+	css_keyword_t *kw;
+	kw = dict_fetch_value(css.keyword_names, &val);
+	if (kw) {
+		return kw->name;
 	}
 	return NULL;
 }
 
-int LCUI_GetStyleTotal(void)
+int css_get_property_count(void)
 {
-	return library.count;
+	return css.count;
 }
 
-LCUI_BOOL SelectorNode_Match(LCUI_SelectorNode sn1, LCUI_SelectorNode sn2)
+LCUI_BOOL css_selector_node_match(css_selector_node_t *sn1, css_selector_node_t *sn2)
 {
 	int i, j;
 	if (sn2->id) {
@@ -385,7 +395,7 @@ LCUI_BOOL SelectorNode_Match(LCUI_SelectorNode sn1, LCUI_SelectorNode sn2)
 	return TRUE;
 }
 
-static void SelectorNode_Copy(LCUI_SelectorNode dst, LCUI_SelectorNode src)
+static void css_selector_node_copy(css_selector_node_t *dst, css_selector_node_t *src)
 {
 	int i;
 	dst->id = src->id ? strdup2(src->id) : NULL;
@@ -403,7 +413,7 @@ static void SelectorNode_Copy(LCUI_SelectorNode dst, LCUI_SelectorNode src)
 	}
 }
 
-void SelectorNode_Delete(LCUI_SelectorNode node)
+void css_selector_node_destroy(css_selector_node_t *node)
 {
 	if (node->type) {
 		free(node->type);
@@ -428,14 +438,14 @@ void SelectorNode_Delete(LCUI_SelectorNode node)
 	free(node);
 }
 
-void Selector_Delete(LCUI_Selector s)
+void css_selector_destroy(css_selector_t *s)
 {
 	int i;
-	for (i = 0; i < MAX_SELECTOR_DEPTH; ++i) {
+	for (i = 0; i < CSS_SELECTOR_MAX_DEPTH; ++i) {
 		if (!s->nodes[i]) {
 			break;
 		}
-		SelectorNode_Delete(s->nodes[i]);
+		css_selector_node_destroy(s->nodes[i]);
 		s->nodes[i] = NULL;
 	}
 	s->rank = 0;
@@ -445,25 +455,25 @@ void Selector_Delete(LCUI_Selector s)
 	free(s);
 }
 
-LCUI_StyleList StyleList(void)
+css_style_props_t *css_style_properties_create(void)
 {
-	LCUI_StyleList list;
+	css_style_props_t *list;
 
-	list = malloc(sizeof(LCUI_StyleListRec));
+	list = malloc(sizeof(css_style_props_t));
 	list_create(list);
 	return list;
 }
 
-void DestroyStyle(LCUI_Style s)
+void css_unit_value_destroy(css_unit_value_t *s)
 {
 	switch (s->type) {
-	case LCUI_STYPE_STRING:
+	case CSS_UNIT_STRING:
 		if (s->is_valid && s->string) {
 			free(s->string);
 		}
 		s->string = NULL;
 		break;
-	case LCUI_STYPE_WSTRING:
+	case CSS_UNIT_WSTRING:
 		if (s->is_valid && s->string) {
 			free(s->wstring);
 		}
@@ -475,13 +485,13 @@ void DestroyStyle(LCUI_Style s)
 	s->is_valid = FALSE;
 }
 
-void MergeStyle(LCUI_Style dst, LCUI_Style src)
+void css_unit_value_merge(css_unit_value_t *dst, css_unit_value_t *src)
 {
 	switch (src->type) {
-	case LCUI_STYPE_STRING:
+	case CSS_UNIT_STRING:
 		dst->string = strdup2(src->string);
 		break;
-	case LCUI_STYPE_WSTRING:
+	case CSS_UNIT_WSTRING:
 		dst->wstring = wcsdup2(src->wstring);
 		break;
 	default:
@@ -492,51 +502,51 @@ void MergeStyle(LCUI_Style dst, LCUI_Style src)
 	dst->type = src->type;
 }
 
-static void DeleteStyleListNode(LCUI_StyleListNode node)
+static void css_style_property_destroy(css_style_property_t *node)
 {
-	DestroyStyle(&node->style);
+	css_unit_value_destroy(&node->style);
 	free(node);
 }
 
-void StyleList_Delete(LCUI_StyleList list)
+void css_style_properties_destroy(css_style_props_t *list)
 {
-	list_destroy_without_node(list, (list_item_destructor_t)DeleteStyleListNode);
+	list_destroy_without_node(list, (list_item_destructor_t)css_style_property_destroy);
 	free(list);
 }
 
-LCUI_StyleSheet StyleSheet(void)
+css_style_decl_t *css_style_declaration_create(void)
 {
-	LCUI_StyleSheet ss;
+	css_style_decl_t *ss;
 
-	ss = calloc(sizeof(LCUI_StyleSheetRec), 1);
+	ss = calloc(sizeof(css_style_decl_t), 1);
 	if (!ss) {
 		return ss;
 	}
-	ss->length = LCUI_GetStyleTotal();
-	ss->sheet = calloc(sizeof(LCUI_StyleRec), ss->length + 1);
+	ss->length = css_get_property_count();
+	ss->sheet = calloc(sizeof(css_unit_value_t), ss->length + 1);
 	return ss;
 }
 
-void StyleSheet_Clear(LCUI_StyleSheet ss)
+void css_style_declaration_clear(css_style_decl_t *ss)
 {
 	int i;
 
 	for (i = 0; i < ss->length; ++i) {
-		DestroyStyle(&ss->sheet[i]);
+		css_unit_value_destroy(&ss->sheet[i]);
 	}
 }
 
-void StyleSheet_Delete(LCUI_StyleSheet ss)
+void css_style_declaration_destroy(css_style_decl_t *ss)
 {
-	StyleSheet_Clear(ss);
+	css_style_declaration_clear(ss);
 	free(ss->sheet);
 	free(ss);
 }
 
-LCUI_StyleListNode StyleList_GetNode(LCUI_StyleList list, int key)
+css_style_property_t *css_style_properties_find(css_style_props_t *list, int key)
 {
 	list_node_t *node;
-	LCUI_StyleListNode snode;
+	css_style_property_t *snode;
 
 	for (list_each(node, list)) {
 		snode = node->data;
@@ -547,16 +557,16 @@ LCUI_StyleListNode StyleList_GetNode(LCUI_StyleList list, int key)
 	return NULL;
 }
 
-int StyleList_RemoveNode(LCUI_StyleList list, int key)
+int css_style_properties_remove(css_style_props_t *list, int key)
 {
 	list_node_t *node;
-	LCUI_StyleListNode snode;
+	css_style_property_t *snode;
 
 	for (list_each(node, list)) {
 		snode = node->data;
 		if (snode->key == key) {
 			list_unlink(list, node);
-			DestroyStyle(&snode->style);
+			css_unit_value_destroy(&snode->style);
 			free(snode);
 			return 0;
 		}
@@ -564,43 +574,43 @@ int StyleList_RemoveNode(LCUI_StyleList list, int key)
 	return -1;
 }
 
-LCUI_StyleListNode StyleList_AddNode(LCUI_StyleList list, int key)
+css_style_property_t *css_style_properties_add(css_style_props_t *list, int key)
 {
-	LCUI_StyleListNode node;
+	css_style_property_t *node;
 
-	node = malloc(sizeof(LCUI_StyleListNodeRec));
+	node = malloc(sizeof(css_style_property_t));
 	node->key = key;
 	node->style.is_valid = FALSE;
-	node->style.type = LCUI_STYPE_NONE;
+	node->style.type = CSS_UNIT_NONE;
 	node->node.data = node;
 	list_append_node(list, &node->node);
 	return node;
 }
 
-static unsigned StyleList_Merge(LCUI_StyleList list, const LCUI_StyleSheetRec *sheet)
+static unsigned css_style_properties_merge(css_style_props_t *list, const css_style_decl_t *sheet)
 {
 	int i, count;
-	LCUI_StyleListNode node;
+	css_style_property_t *node;
 
 	for (count = 0, i = 0; i < sheet->length; ++i) {
 		if (!sheet->sheet[i].is_valid) {
 			continue;
 		}
-		node = StyleList_AddNode(list, i);
-		MergeStyle(&node->style, &sheet->sheet[i]);
+		node = css_style_properties_add(list, i);
+		css_unit_value_merge(&node->style, &sheet->sheet[i]);
 		count += 1;
 	}
 	return count;
 }
 
-int StyleSheet_Merge(LCUI_StyleSheet dest, const LCUI_StyleSheetRec *src)
+int css_style_declaration_merge(css_style_decl_t *dest, const css_style_decl_t *src)
 {
-	int i;
+	size_t i;
 	size_t size;
-	LCUI_Style s;
+	css_unit_value_t *s;
 
 	if (src->length > dest->length) {
-		size = sizeof(LCUI_StyleRec) * src->length;
+		size = sizeof(css_unit_value_t) * src->length;
 		s = realloc(dest->sheet, size);
 		if (!s) {
 			return -1;
@@ -613,24 +623,24 @@ int StyleSheet_Merge(LCUI_StyleSheet dest, const LCUI_StyleSheetRec *src)
 	}
 	for (i = 0; i < src->length; ++i) {
 		if (src->sheet[i].is_valid && !dest->sheet[i].is_valid) {
-			MergeStyle(&dest->sheet[i], &src->sheet[i]);
+			css_unit_value_merge(&dest->sheet[i], &src->sheet[i]);
 		}
 	}
 	return 0;
 }
 
-int StyleSheet_MergeList(LCUI_StyleSheet ss, LCUI_StyleList list)
+int css_style_declaration_merge_properties(css_style_decl_t *ss, css_style_props_t *list)
 {
-	LCUI_Style s;
-	LCUI_StyleListNode snode;
+	css_unit_value_t *s;
+	css_style_property_t *snode;
 	list_node_t *node;
 	size_t size;
-	int i = 0, count = 0;
+	size_t i = 0, count = 0;
 
 	for (list_each(node, list)) {
 		snode = node->data;
 		if (snode->key > ss->length) {
-			size = sizeof(LCUI_StyleRec) * (snode->key + 1);
+			size = sizeof(css_unit_value_t) * (snode->key + 1);
 			s = realloc(ss->sheet, size);
 			if (!s) {
 				return -1;
@@ -642,21 +652,21 @@ int StyleSheet_MergeList(LCUI_StyleSheet ss, LCUI_StyleList list)
 			ss->length = snode->key + 1;
 		}
 		if (!ss->sheet[snode->key].is_valid && snode->style.is_valid) {
-			MergeStyle(&ss->sheet[snode->key], &snode->style);
+			css_unit_value_merge(&ss->sheet[snode->key], &snode->style);
 			++count;
 		}
 	}
 	return (int)count;
 }
 
-int StyleSheet_Replace(LCUI_StyleSheet dest, const LCUI_StyleSheetRec *src)
+int css_style_declaration_replace(css_style_decl_t *dest, const css_style_decl_t *src)
 {
-	int i;
-	LCUI_Style s;
+	size_t i;
+	css_unit_value_t *s;
 	size_t count, size;
 
 	if (src->length > dest->length) {
-		size = sizeof(LCUI_StyleRec) * src->length;
+		size = sizeof(css_unit_value_t) * src->length;
 		s = realloc(dest->sheet, size);
 		if (!s) {
 			return -1;
@@ -671,15 +681,14 @@ int StyleSheet_Replace(LCUI_StyleSheet dest, const LCUI_StyleSheetRec *src)
 		if (!src->sheet[i].is_valid) {
 			continue;
 		}
-		DestroyStyle(&dest->sheet[i]);
-		MergeStyle(&dest->sheet[i], &src->sheet[i]);
+		css_unit_value_destroy(&dest->sheet[i]);
+		css_unit_value_merge(&dest->sheet[i], &src->sheet[i]);
 		++count;
 	}
 	return (int)count;
 }
 
-/** 初始化样式表查找器 */
-static void NamesFinder_Init(NamesFinder sfinder, LCUI_SelectorNode snode)
+static void css_selector_init_name_collector(css_selector_name_collector_t *sfinder, css_selector_node_t *snode)
 {
 	sfinder->level = 0;
 	sfinder->class_i = 0;
@@ -689,8 +698,7 @@ static void NamesFinder_Init(NamesFinder sfinder, LCUI_SelectorNode snode)
 	sfinder->node = snode;
 }
 
-/** 销毁样式表查找器 */
-static void NamesFinder_Destroy(NamesFinder sfinder)
+static void css_selector_destroy_name_collector(css_selector_name_collector_t *sfinder)
 {
 	sfinder->name_i = 0;
 	sfinder->name[0] = 0;
@@ -701,7 +709,7 @@ static void NamesFinder_Destroy(NamesFinder sfinder)
 }
 
 /* 生成选择器全名列表 */
-static int NamesFinder_Find(NamesFinder sfinder, list_t *list)
+static int css_selector_collect_name(css_selector_name_collector_t *sfinder, list_t *list)
 {
 	size_t len, old_len;
 	int i, old_level, count = 0;
@@ -747,7 +755,7 @@ static int NamesFinder_Find(NamesFinder sfinder, list_t *list)
 			list_append(list, strdup2(fullname));
 			/* 将当前选择器名与其它层级的选择器名组合 */
 			while (sfinder->level < LEVEL_TOTAL_NUM) {
-				count += NamesFinder_Find(sfinder, list);
+				count += css_selector_collect_name(sfinder, list);
 				sfinder->level += 1;
 			}
 			sfinder->level = LEVEL_CLASS;
@@ -774,14 +782,14 @@ static int NamesFinder_Find(NamesFinder sfinder, list_t *list)
 			strcpy(fullname + len, sfinder->node->classes[i]);
 			list_append(list, strdup2(fullname));
 			sfinder->class_i = i;
-			count += NamesFinder_Find(sfinder, list);
+			count += css_selector_collect_name(sfinder, list);
 			sfinder->class_i = 0;
 			sfinder->level = LEVEL_STATUS;
 			/**
 			 * 递归拼接伪类名，例如：
 			 * textview#main-btn-text:active
 			 */
-			count += NamesFinder_Find(sfinder, list);
+			count += css_selector_collect_name(sfinder, list);
 			sfinder->level = LEVEL_CLASS_2;
 		}
 		fullname[old_len] = 0;
@@ -813,7 +821,7 @@ static int NamesFinder_Find(NamesFinder sfinder, list_t *list)
 			 * 递归调用，以一层层拼接出像下面这样的选择器：
 			 * textview#main-btn-text:active:focus:hover
 			 */
-			count += NamesFinder_Find(sfinder, list);
+			count += css_selector_collect_name(sfinder, list);
 		}
 		sfinder->level = LEVEL_STATUS;
 		fullname[old_len] = 0;
@@ -832,7 +840,7 @@ static int NamesFinder_Find(NamesFinder sfinder, list_t *list)
 			strcpy(fullname + len + 1, sfinder->node->status[i]);
 			list_append(list, strdup2(fullname));
 			sfinder->status_i = i;
-			count += NamesFinder_Find(sfinder, list);
+			count += css_selector_collect_name(sfinder, list);
 			sfinder->status_i = 0;
 		}
 		fullname[old_len] = 0;
@@ -845,14 +853,14 @@ static int NamesFinder_Find(NamesFinder sfinder, list_t *list)
 			continue;
 		}
 		sfinder->level = i;
-		count += NamesFinder_Find(sfinder, list);
+		count += css_selector_collect_name(sfinder, list);
 	}
 	fullname[old_len] = 0;
 	sfinder->level = old_level;
 	return count;
 }
 
-static int SelectorNode_Save(LCUI_SelectorNode node, const char *name, int len,
+static int SelectorNode_Save(css_selector_node_t *node, const char *name, int len,
 			     char type)
 {
 	char *str;
@@ -894,17 +902,17 @@ static int SelectorNode_Save(LCUI_SelectorNode node, const char *name, int len,
 	return 0;
 }
 
-int SelectorNode_GetNames(LCUI_SelectorNode sn, list_t *names)
+int css_selector_node_get_name_list(css_selector_node_t *sn, list_t *names)
 {
 	int count;
-	NamesFinderRec sfinder;
-	NamesFinder_Init(&sfinder, sn);
-	count = NamesFinder_Find(&sfinder, names);
-	NamesFinder_Destroy(&sfinder);
+	css_selector_name_collector_t sfinder;
+	css_selector_init_name_collector(&sfinder, sn);
+	count = css_selector_collect_name(&sfinder, names);
+	css_selector_destroy_name_collector(&sfinder);
 	return count;
 }
 
-int SelectorNode_Update(LCUI_SelectorNode node)
+int css_selector_node_update(css_selector_node_t *node)
 {
 	size_t i, len = 0;
 	char *fullname;
@@ -967,7 +975,7 @@ int SelectorNode_Update(LCUI_SelectorNode node)
 	return 0;
 }
 
-void Selector_Update(LCUI_Selector s)
+void css_selector_update(css_selector_t *s)
 {
 	int i;
 	const unsigned char *p;
@@ -981,14 +989,14 @@ void Selector_Update(LCUI_Selector s)
 	s->hash = hash;
 }
 
-int Selector_AppendNode(LCUI_Selector selector, LCUI_SelectorNode node)
+int css_selector_append(css_selector_t *selector, css_selector_node_t *node)
 {
 	const unsigned char *p;
 
-	if (selector->length >= MAX_SELECTOR_DEPTH) {
+	if (selector->length >= CSS_SELECTOR_MAX_DEPTH) {
 		logger_warning("[css] warning: the number of nodes in the "
 			       "selector has exceeded the %d limit\n",
-			       MAX_SELECTOR_DEPTH);
+			       CSS_SELECTOR_MAX_DEPTH);
 		return -1;
 	}
 	selector->nodes[selector->length++] = node;
@@ -1000,18 +1008,18 @@ int Selector_AppendNode(LCUI_Selector selector, LCUI_SelectorNode node)
 	return 0;
 }
 
-LCUI_Selector Selector(const char *selector)
+css_selector_t *css_selector_create(const char *selector)
 {
 	const char *p;
 	int ni, si, rank;
 	static int batch_num = 0;
 	char type = 0, name[MAX_NAME_LEN];
 	LCUI_BOOL is_saving = FALSE;
-	LCUI_SelectorNode node = NULL;
-	LCUI_Selector s = calloc(sizeof(LCUI_SelectorRec), 1);
+	css_selector_node_t *node = NULL;
+	css_selector_t *s = calloc(sizeof(css_selector_t), 1);
 
 	s->batch_num = ++batch_num;
-	s->nodes = calloc(sizeof(LCUI_SelectorNode), MAX_SELECTOR_DEPTH);
+	s->nodes = calloc(sizeof(css_selector_node_t), CSS_SELECTOR_MAX_DEPTH);
 	if (!selector) {
 		s->length = 0;
 		s->nodes[0] = NULL;
@@ -1019,8 +1027,8 @@ LCUI_Selector Selector(const char *selector)
 	}
 	for (ni = 0, si = 0, p = selector; *p; ++p) {
 		if (!node && is_saving) {
-			node = calloc(sizeof(LCUI_SelectorNodeRec), 1);
-			if (si >= MAX_SELECTOR_DEPTH) {
+			node = calloc(sizeof(css_selector_node_t), 1);
+			if (si >= CSS_SELECTOR_MAX_DEPTH) {
 				logger_warning(
 				    "%s: selector node list is too long.\n",
 				    selector);
@@ -1048,7 +1056,7 @@ LCUI_Selector Selector(const char *selector)
 			}
 			logger_error("%s: invalid selector node at %ld.\n",
 				     selector, p - selector - ni);
-			SelectorNode_Delete(node);
+			css_selector_node_destroy(node);
 			node = NULL;
 			ni = 0;
 			continue;
@@ -1064,7 +1072,7 @@ LCUI_Selector Selector(const char *selector)
 			is_saving = FALSE;
 			rank = SelectorNode_Save(node, name, ni, type);
 			if (rank > 0) {
-				SelectorNode_Update(node);
+				css_selector_node_update(node);
 				s->rank += rank;
 				node = NULL;
 				ni = 0;
@@ -1073,7 +1081,7 @@ LCUI_Selector Selector(const char *selector)
 			}
 			logger_error("%s: invalid selector node at %ld.\n",
 				     selector, p - selector - ni);
-			SelectorNode_Delete(node);
+			css_selector_node_destroy(node);
 			node = NULL;
 			ni = 0;
 			continue;
@@ -1097,8 +1105,8 @@ LCUI_Selector Selector(const char *selector)
 	}
 	if (is_saving) {
 		if (!node) {
-			node = calloc(sizeof(LCUI_SelectorNodeRec), 1);
-			if (si >= MAX_SELECTOR_DEPTH) {
+			node = calloc(sizeof(css_selector_node_t), 1);
+			if (si >= CSS_SELECTOR_MAX_DEPTH) {
 				logger_warning(
 				    "%s: selector node list is too long.\n",
 				    selector);
@@ -1108,28 +1116,28 @@ LCUI_Selector Selector(const char *selector)
 		}
 		rank = SelectorNode_Save(s->nodes[si], name, ni, type);
 		if (rank > 0) {
-			SelectorNode_Update(s->nodes[si]);
+			css_selector_node_update(s->nodes[si]);
 			s->rank += rank;
 			si++;
 		} else {
-			SelectorNode_Delete(s->nodes[si]);
+			css_selector_node_destroy(s->nodes[si]);
 		}
 	}
 	s->nodes[si] = NULL;
 	s->length = si;
-	Selector_Update(s);
+	css_selector_update(s);
 	return s;
 }
 
-LCUI_Selector Selector_Copy(LCUI_Selector selector)
+css_selector_t *css_selector_duplicate(css_selector_t *selector)
 {
 	int i;
-	LCUI_Selector s;
+	css_selector_t *s;
 
-	s = Selector(NULL);
+	s = css_selector_create(NULL);
 	for (i = 0; i < selector->length; ++i) {
-		s->nodes[i] = calloc(sizeof(LCUI_SelectorNodeRec), 1);
-		SelectorNode_Copy(s->nodes[i], selector->nodes[i]);
+		s->nodes[i] = calloc(sizeof(css_selector_node_t), 1);
+		css_selector_node_copy(s->nodes[i], selector->nodes[i]);
 	}
 	s->nodes[selector->length] = NULL;
 	s->length = selector->length;
@@ -1139,7 +1147,7 @@ LCUI_Selector Selector_Copy(LCUI_Selector selector)
 	return s;
 }
 
-static void DeleteStyleNode(StyleNode node)
+static void css_style_rule_destroy(css_style_rule_t *node)
 {
 	if (node->space) {
 		strpool_free_str(node->space);
@@ -1149,14 +1157,14 @@ static void DeleteStyleNode(StyleNode node)
 		free(node->selector);
 		node->selector = NULL;
 	}
-	StyleList_Delete(node->list);
+	css_style_properties_destroy(node->list);
 	node->list = NULL;
 	free(node);
 }
 
-static StyleLink CreateStyleLink(void)
+static css_style_link_t *css_style_link_create(void)
 {
-	StyleLink link = calloc(sizeof(StyleLinkRec), 1);
+	css_style_link_t *link = calloc(sizeof(css_style_link_t), 1);
 	static dict_type_t t;
 
 	dict_init_string_copy_key_type(&t);
@@ -1166,10 +1174,10 @@ static StyleLink CreateStyleLink(void)
 	return link;
 }
 
-static void DeleteStyleLink(StyleLink link)
+static void css_style_link_destroy(css_style_link_t *link)
 {
 	dict_destroy(link->parents);
-	list_destroy_without_node(&link->styles, (list_item_destructor_t)DeleteStyleNode);
+	list_destroy_without_node(&link->styles, (list_item_destructor_t)css_style_rule_destroy);
 	free(link->selector);
 	link->selector = NULL;
 	link->parents = NULL;
@@ -1177,74 +1185,72 @@ static void DeleteStyleLink(StyleLink link)
 	free(link);
 }
 
-static StyleLinkGroup CreateStyleLinkGroup(LCUI_SelectorNode snode)
+static css_style_link_group_t *css_style_link_group_create(css_selector_node_t *snode)
 {
-	StyleLinkGroup group = calloc(sizeof(StyleLinkGroupRec), 1);
-	group->snode = calloc(sizeof(LCUI_SelectorNodeRec), 1);
-	SelectorNode_Copy(group->snode, snode);
+	static dict_type_t dt = { 0 };
+	css_style_link_group_t *group;
+
+	dict_init_string_copy_key_type(&dt);
+	dt.val_destructor = css_style_link_destructor;
+	group  = calloc(sizeof(css_style_link_group_t), 1);
+	group->snode = calloc(sizeof(css_selector_node_t), 1);
+	group->links = dict_create(&dt, NULL);
+	css_selector_node_copy(group->snode, snode);
 	group->name = group->snode->fullname;
-	group->links = dict_create(&library.style_link_dict, NULL);
 	return group;
 }
 
-static void DeleteStyleLinkGroup(StyleLinkGroup group)
+static void css_style_link_group_destroy(css_style_link_group_t *group)
 {
 	dict_type_t *dtype;
 	dtype = group->links->priv_data;
-	SelectorNode_Delete(group->snode);
+	css_selector_node_destroy(group->snode);
 	dict_destroy(group->links);
 	free(dtype);
 	free(group);
 }
 
-static void StyleLinkGroupDestructor(void *privdata, void *data)
+static void css_style_link_group_destructor(void *privdata, void *data)
 {
-	DeleteStyleLinkGroup(data);
+	css_style_link_group_destroy(data);
 }
 
-static void InitStyleGroupDict(void)
+static css_style_group_t *css_style_group_create(void)
 {
-	dict_type_t *dt = &library.style_group_dict;
+	static dict_type_t type = { 0 };
 
-	dict_init_string_copy_key_type(dt);
-	dt->val_destructor = StyleLinkGroupDestructor;
-}
-
-static dict_t *CreateStyleGroup(void)
-{
-	return dict_create(&library.style_group_dict, NULL);
-}
-
-static void DeleteStyleGroup(dict_t *dict)
-{
-	dict_destroy(dict);
+	dict_init_string_copy_key_type(&type);
+	type.val_destructor = css_style_link_group_destructor;
+	return dict_create(&type, NULL);
 }
 
 /** 根据选择器，选中匹配的样式表 */
-static LCUI_StyleList LCUI_SelectStyleList(LCUI_Selector selector,
+static css_style_props_t *css_select_style_properties(css_selector_t *selector,
 					   const char *space)
 {
 	int i, right;
-	StyleLink link;
-	StyleNode snode;
-	StyleLinkGroup slg;
-	LCUI_SelectorNode sn;
-	dict_t *group, *parents;
-	char buf[MAX_SELECTOR_LEN];
-	char fullname[MAX_SELECTOR_LEN];
+	css_style_link_t *link;
+	css_style_rule_t *snode;
+	css_style_link_group_t *slg;
+	css_selector_node_t *sn;
+	css_style_group_t *group;
+	dict_t *parents;
+
+	char buf[CSS_SELECTOR_MAX_LEN];
+	char fullname[CSS_SELECTOR_MAX_LEN];
 
 	link = NULL;
 	parents = NULL;
 	for (i = 0, right = selector->length - 1; right >= 0; --right, ++i) {
-		group = list_get(&library.groups, i);
+		group = list_get(&css.groups, i);
 		if (!group) {
-			group = CreateStyleGroup();
-			list_append(&library.groups, group);
+			group = css_style_group_create();
+			list_append(&css.groups, group);
 		}
 		sn = selector->nodes[right];
 		slg = dict_fetch_value(group, sn->fullname);
 		if (!slg) {
-			slg = CreateStyleLinkGroup(sn);
+			slg = css_style_link_group_create(sn);
 			dict_add(group, sn->fullname, slg);
 		}
 		if (i == 0) {
@@ -1254,7 +1260,7 @@ static LCUI_StyleList LCUI_SelectStyleList(LCUI_Selector selector,
 		}
 		link = dict_fetch_value(slg->links, fullname);
 		if (!link) {
-			link = CreateStyleLink();
+			link = css_style_link_create();
 			link->group = slg;
 			link->selector = strdup2(fullname);
 			dict_add(slg->links, fullname, link);
@@ -1277,15 +1283,15 @@ static LCUI_StyleList LCUI_SelectStyleList(LCUI_Selector selector,
 	if (!link) {
 		return NULL;
 	}
-	snode = calloc(sizeof(StyleNodeRec), 1);
+	snode = calloc(sizeof(css_style_rule_t), 1);
 	if (space) {
-		snode->space = strpool_alloc_str(library.strpool, space);
+		snode->space = strpool_alloc_str(css.strpool, space);
 		strcpy(snode->space, space);
 	} else {
 		snode->space = NULL;
 	}
 	snode->node.data = snode;
-	snode->list = StyleList();
+	snode->list = css_style_properties_create();
 	snode->rank = selector->rank;
 	snode->selector = strdup2(fullname);
 	snode->batch_num = selector->batch_num;
@@ -1293,23 +1299,23 @@ static LCUI_StyleList LCUI_SelectStyleList(LCUI_Selector selector,
 	return snode->list;
 }
 
-int LCUI_PutStyleSheet(LCUI_Selector selector, LCUI_StyleSheet in_ss,
+int css_add_style_sheet(css_selector_t *selector, css_style_decl_t *style,
 		       const char *space)
 {
-	LCUI_StyleList list;
-	dict_empty(library.cache, NULL);
-	list = LCUI_SelectStyleList(selector, space);
+	css_style_props_t *list;
+	dict_empty(css.cache, NULL);
+	list = css_select_style_properties(selector, space);
 	if (list) {
-		StyleList_Merge(list, in_ss);
+		css_style_properties_merge(list, style);
 	}
 	return 0;
 }
 
-static size_t StyleLink_GetStyleSheets(StyleLink link, list_t *outlist)
+static size_t StyleLink_GetStyleSheets(css_style_link_t *link, list_t *outlist)
 {
 	size_t i;
 	LCUI_BOOL found;
-	StyleNode snode, out_snode;
+	css_style_rule_t *snode, *out_snode;
 	list_node_t *node, *out_node;
 
 	if (!outlist) {
@@ -1344,44 +1350,44 @@ static size_t StyleLink_GetStyleSheets(StyleLink link, list_t *outlist)
 	return link->styles.length;
 }
 
-static size_t LCUI_FindStyleSheetFromLink(StyleLink link, LCUI_Selector s,
+static size_t css_query_selector_from_link(css_style_link_t *link, css_selector_t *s,
 					  int i, list_t *list)
 {
 	size_t count = 0;
-	StyleLink parent;
+	css_style_link_t *parent;
 	list_t names;
 	list_node_t *node;
-	LCUI_SelectorNode sn;
+	css_selector_node_t *sn;
 
 	list_create(&names);
 	count += StyleLink_GetStyleSheets(link, list);
 	while (--i >= 0) {
 		sn = s->nodes[i];
-		SelectorNode_GetNames(sn, &names);
+		css_selector_node_get_name_list(sn, &names);
 		for (list_each(node, &names)) {
 			parent = dict_fetch_value(link->parents, node->data);
 			if (!parent) {
 				continue;
 			}
 			count +=
-			    LCUI_FindStyleSheetFromLink(parent, s, i, list);
+			    css_query_selector_from_link(parent, s, i, list);
 		}
 		list_destroy(&names, free);
 	}
 	return count;
 }
 
-int LCUI_FindStyleSheetFromGroup(int group, const char *name, LCUI_Selector s,
+int css_query_selector_from_group(int group, const char *name, css_selector_t *s,
 				 list_t *list)
 {
 	int i;
 	size_t count;
 	dict_t *groups;
-	StyleLinkGroup slg;
+	css_style_link_group_t *slg;
 	list_node_t *node;
 	list_t names;
 
-	groups = list_get(&library.groups, group);
+	groups = list_get(&css.groups, group);
 	if (!groups || s->length < 1) {
 		return 0;
 	}
@@ -1391,7 +1397,7 @@ int LCUI_FindStyleSheetFromGroup(int group, const char *name, LCUI_Selector s,
 	if (name) {
 		list_append(&names, strdup2(name));
 	} else {
-		SelectorNode_GetNames(s->nodes[i], &names);
+		css_selector_node_get_name_list(s->nodes[i], &names);
 		list_append(&names, strdup2("*"));
 	}
 	for (list_each(node, &names)) {
@@ -1404,8 +1410,8 @@ int LCUI_FindStyleSheetFromGroup(int group, const char *name, LCUI_Selector s,
 		}
 		iter = dict_get_iterator(slg->links);
 		while ((entry = dict_next(iter))) {
-			StyleLink link = dict_get_val(entry);
-			count += LCUI_FindStyleSheetFromLink(link, s, i, list);
+			css_style_link_t *link = dict_get_val(entry);
+			count += css_query_selector_from_link(link, s, i, list);
 		}
 		dict_destroy_iterator(iter);
 	}
@@ -1413,11 +1419,11 @@ int LCUI_FindStyleSheetFromGroup(int group, const char *name, LCUI_Selector s,
 	return (int)count;
 }
 
-static void PrintStyleName(int key)
+static void css_print_property_name(int key)
 {
 	const char *name;
 
-	name = LCUI_GetStyleName(key);
+	name = css_get_property_name(key);
 	if (name) {
 		logger_debug("\t%s", name);
 	} else {
@@ -1426,16 +1432,16 @@ static void PrintStyleName(int key)
 	logger_debug("%s: ", key > STYLE_KEY_TOTAL ? " (+)" : "");
 }
 
-static void PrintStyleValue(LCUI_Style s)
+static void css_unit_value_print(css_unit_value_t *s)
 {
 	switch (s->type) {
-	case LCUI_STYPE_AUTO:
+	case CSS_UNIT_AUTO:
 		logger_debug("auto");
 		break;
-	case LCUI_STYPE_BOOL:
+	case CSS_UNIT_BOOL:
 		logger_debug("%s", s->val_bool ? "true" : "false");
 		break;
-	case LCUI_STYPE_COLOR: {
+	case CSS_UNIT_COLOR: {
 		pd_color_t *clr = &s->val_color;
 		if (clr->alpha < 255) {
 			logger_debug("rgba(%d,%d,%d,%g)", clr->r, clr->g, clr->b,
@@ -1445,28 +1451,28 @@ static void PrintStyleValue(LCUI_Style s)
 		}
 		break;
 	}
-	case LCUI_STYPE_PX:
+	case CSS_UNIT_PX:
 		logger_debug("%gpx", s->val_px);
 		break;
-	case LCUI_STYPE_DIP:
+	case CSS_UNIT_DIP:
 		logger_debug("%gdip", s->val_dip);
 		break;
-	case LCUI_STYPE_SP:
+	case CSS_UNIT_SP:
 		logger_debug("%gsp", s->val_sp);
 		break;
-	case LCUI_STYPE_STRING:
+	case CSS_UNIT_STRING:
 		logger_debug("%s", s->val_string);
 		break;
-	case LCUI_STYPE_WSTRING:
+	case CSS_UNIT_WSTRING:
 		logger_debug("%S", s->val_wstring);
 		break;
-	case LCUI_STYPE_SCALE:
+	case CSS_UNIT_SCALE:
 		logger_debug("%g%%", s->val_scale * 100);
 		break;
-	case LCUI_STYPE_STYLE:
-		logger_debug("%s", LCUI_GetStyleValueName(s->val_style));
+	case CSS_UNIT_STYLE:
+		logger_debug("%s", css_get_keyword_name(s->val_style));
 		break;
-	case LCUI_STYPE_INT:
+	case CSS_UNIT_INT:
 		logger_debug("%d", s->val_int);
 		break;
 	default:
@@ -1476,38 +1482,38 @@ static void PrintStyleValue(LCUI_Style s)
 	logger_debug(";\n");
 }
 
-void LCUI_PrintStyleList(LCUI_StyleList list)
+void css_style_properties_print(css_style_props_t *list)
 {
 	list_node_t *node;
-	LCUI_StyleListNode snode;
+	css_style_property_t *snode;
 
 	for (list_each(node, list)) {
 		snode = node->data;
 		if (snode->style.is_valid) {
-			PrintStyleName(snode->key);
-			PrintStyleValue(&snode->style);
+			css_print_property_name(snode->key);
+			css_unit_value_print(&snode->style);
 		}
 	}
 }
 
-void LCUI_PrintStyleSheet(LCUI_StyleSheet ss)
+void css_style_declartation_print(css_style_decl_t *ss)
 {
 	int key;
-	LCUI_Style s;
+	css_unit_value_t *s;
 
 	for (key = 0; key < ss->length; ++key) {
 		s = &ss->sheet[key];
 		if (s->is_valid) {
-			PrintStyleName(key);
-			PrintStyleValue(s);
+			css_print_property_name(key);
+			css_unit_value_print(s);
 		}
 	}
 }
 
-void LCUI_PrintSelector(LCUI_Selector selector)
+void css_selector_print(css_selector_t *selector)
 {
-	char path[MAX_SELECTOR_LEN];
-	LCUI_SelectorNode *sn;
+	char path[CSS_SELECTOR_MAX_LEN];
+	css_selector_node_t **sn;
 
 	path[0] = 0;
 	for (sn = selector->nodes; *sn; ++sn) {
@@ -1518,12 +1524,12 @@ void LCUI_PrintSelector(LCUI_Selector selector)
 		     selector->rank, selector->batch_num);
 }
 
-static void LCUI_PrintStyleLink(StyleLink link, const char *selector)
+static void css_style_link_print(css_style_link_t *link, const char *selector)
 {
 	dict_entry_t *entry;
 	dict_iterator_t *iter;
 	list_node_t *node;
-	char fullname[MAX_SELECTOR_LEN];
+	char fullname[CSS_SELECTOR_MAX_LEN];
 
 	if (selector) {
 		sprintf(fullname, "%s %s", link->group->name, selector);
@@ -1531,31 +1537,31 @@ static void LCUI_PrintStyleLink(StyleLink link, const char *selector)
 		strcpy(fullname, link->group->name);
 	}
 	for (list_each(node, &link->styles)) {
-		StyleNode snode = node->data;
+		css_style_rule_t *snode = node->data;
 		logger_debug("\n[%s]", snode->space ? snode->space : "<none>");
 		logger_debug("[rank: %d]\n%s {\n", snode->rank, fullname);
-		LCUI_PrintStyleList(snode->list);
+		css_style_properties_print(snode->list);
 		logger_debug("}\n");
 	}
 	iter = dict_get_iterator(link->parents);
 	while ((entry = dict_next(iter))) {
-		StyleLink parent = dict_get_val(entry);
-		LCUI_PrintStyleLink(parent, fullname);
+		css_style_link_t *parent = dict_get_val(entry);
+		css_style_link_print(parent, fullname);
 	}
 	dict_destroy_iterator(iter);
 }
 
-void LCUI_PrintCSSLibrary(void)
+void css_print_all(void)
 {
 	dict_t *group;
-	StyleLink link;
-	StyleLinkGroup slg;
+	css_style_link_t *link;
+	css_style_link_group_t *slg;
 	dict_iterator_t *iter;
 	dict_entry_t *entry;
 
 	link = NULL;
 	logger_debug("style library begin\n");
-	group = list_get(&library.groups, 0);
+	group = list_get(&css.groups, 0);
 	iter = dict_get_iterator(group);
 	while ((entry = dict_next(iter))) {
 		dict_entry_t *entry_slg;
@@ -1565,7 +1571,7 @@ void LCUI_PrintCSSLibrary(void)
 		iter_slg = dict_get_iterator(slg->links);
 		while ((entry_slg = dict_next(iter_slg))) {
 			link = dict_get_val(entry_slg);
-			LCUI_PrintStyleLink(link, NULL);
+			css_style_link_print(link, NULL);
 		}
 		dict_destroy_iterator(iter_slg);
 	}
@@ -1573,203 +1579,190 @@ void LCUI_PrintCSSLibrary(void)
 	logger_debug("style library end\n");
 }
 
-LCUI_CachedStyleSheet LCUI_GetCachedStyleSheet(LCUI_Selector s)
+const css_style_decl_t *css_get_computed_style_with_cache(css_selector_t *s)
 {
 	list_t list;
 	list_node_t *node;
-	LCUI_StyleSheet ss;
+	css_style_decl_t *ss;
 
 	list_create(&list);
-	ss = dict_fetch_value(library.cache, &s->hash);
+	ss = dict_fetch_value(css.cache, &s->hash);
 	if (ss) {
 		return ss;
 	}
-	ss = StyleSheet();
-	LCUI_FindStyleSheet(s, &list);
+	ss = css_style_declaration_create();
+	css_query_selector(s, &list);
 	for (list_each(node, &list)) {
-		StyleNode sn = node->data;
-		StyleSheet_MergeList(ss, sn->list);
+		css_style_rule_t *sn = node->data;
+		css_style_declaration_merge_properties(ss, sn->list);
 	}
 	list_destroy(&list, NULL);
-	dict_add(library.cache, &s->hash, ss);
+	dict_add(css.cache, &s->hash, ss);
 	return ss;
 }
 
-void LCUI_GetStyleSheet(LCUI_Selector s, LCUI_StyleSheet out_ss)
+void css_get_computed_style(css_selector_t *s, css_style_decl_t *out_ss)
 {
-	const LCUI_StyleSheetRec *ss;
+	const css_style_decl_t *ss;
 
-	ss = LCUI_GetCachedStyleSheet(s);
-	StyleSheet_Clear(out_ss);
-	StyleSheet_Replace(out_ss, ss);
+	ss = css_get_computed_style_with_cache(s);
+	css_style_declaration_clear(out_ss);
+	css_style_declaration_replace(out_ss, ss);
 }
 
-void LCUI_PrintStyleSheetsBySelector(LCUI_Selector s)
+void css_print_style_rules_by_selector(css_selector_t *s)
 {
 	list_t list;
 	list_node_t *node;
-	LCUI_StyleSheet ss;
+	css_style_decl_t *ss;
 	list_create(&list);
-	ss = StyleSheet();
-	LCUI_FindStyleSheet(s, &list);
+	ss = css_style_declaration_create();
+	css_query_selector(s, &list);
 	logger_debug("selector(%u) stylesheets begin\n", s->hash);
 	for (list_each(node, &list)) {
-		StyleNode sn = node->data;
+		css_style_rule_t *sn = node->data;
 		logger_debug("\n[%s]", sn->space ? sn->space : "<none>");
 		logger_debug("[rank: %d]\n%s {\n", sn->rank, sn->selector);
-		LCUI_PrintStyleList(sn->list);
+		css_style_properties_print(sn->list);
 		logger_debug("}\n");
-		StyleSheet_MergeList(ss, sn->list);
+		css_style_declaration_merge_properties(ss, sn->list);
 	}
 	list_destroy(&list, NULL);
 	logger_debug("[selector(%u) final stylesheet] {\n", s->hash);
-	LCUI_PrintStyleSheet(ss);
+	css_style_declartation_print(ss);
 	logger_debug("}\n");
-	StyleSheet_Delete(ss);
+	css_style_declaration_destroy(ss);
 	logger_debug("selector(%u) stylesheets end\n", s->hash);
 }
 
-static void StyleSheetCacheDestructor(void *privdata, void *val)
+static void css_style_cache_destructor(void *privdata, void *val)
 {
-	StyleSheet_Delete(val);
+	css_style_declaration_destroy(val);
 }
 
-static void *DupStyleName(void *privdata, const void *val)
+static void *names_dict_value_dup(void *privdata, const void *val)
 {
 	return strdup2(val);
 }
 
-static void StyleNameDestructor(void *privdata, void *val)
+static void names_dict_value_destructor(void *privdata, void *val)
 {
 	free(val);
 }
 
-static uint64_t IntKeyDict_HashFunction(const void *key)
+static uint64_t ikey_dict_hash(const void *key)
 {
 	return (*(unsigned int *)key);
 }
 
-static int IntKeyDict_KeyCompare(void *privdata, const void *key1,
+static int ikey_dict_key_compare(void *privdata, const void *key1,
 				 const void *key2)
 {
 	return *(unsigned int *)key1 == *(unsigned int *)key2;
 }
 
-static void IntKeyDict_KeyDestructor(void *privdata, void *key)
+static void ikey_dict_key_destructor(void *privdata, void *key)
 {
 	free(key);
 }
 
-static void *IntKeyDict_KeyDup(void *privdata, const void *key)
+static void *ikey_dict_key_dup(void *privdata, const void *key)
 {
 	unsigned int *newkey = malloc(sizeof(unsigned int));
 	*newkey = *(unsigned int *)key;
 	return newkey;
 }
 
-static void InitStylesheetCache(void)
+static void css_init_cache(void)
 {
-	dict_type_t *dt = &library.cache_dict;
+	static dict_type_t dt = { 0 };
 
-	dt->val_dup = NULL;
-	dt->key_dup = IntKeyDict_KeyDup;
-	dt->key_compare = IntKeyDict_KeyCompare;
-	dt->hash_function = IntKeyDict_HashFunction;
-	dt->key_destructor = IntKeyDict_KeyDestructor;
-	dt->val_destructor = StyleSheetCacheDestructor;
-	dt->key_destructor = IntKeyDict_KeyDestructor;
-	library.cache = dict_create(dt, NULL);
+	dt.val_dup = NULL;
+	dt.key_dup = ikey_dict_key_dup;
+	dt.key_compare = ikey_dict_key_compare;
+	dt.hash_function = ikey_dict_hash;
+	dt.key_destructor = ikey_dict_key_destructor;
+	dt.val_destructor = css_style_cache_destructor;
+	dt.key_destructor = ikey_dict_key_destructor;
+	css.cache = dict_create(&dt, NULL);
 }
 
-static void DestroyStylesheetCache(void)
+static void css_destroy_cache(void)
 {
-	dict_destroy(library.cache);
-	library.cache = NULL;
+	dict_destroy(css.cache);
+	css.cache = NULL;
 }
 
-static void StyleLinkDestructor(void *privdata, void *data)
+static void css_style_link_destructor(void *privdata, void *data)
 {
-	DeleteStyleLink(data);
+	css_style_link_destroy(data);
 }
 
-static void InitStyleLinkDict(void)
+static void css_init_properties(void)
 {
-	dict_init_string_copy_key_type(&library.style_link_dict);
-	library.style_link_dict.val_destructor = StyleLinkDestructor;
+	static dict_type_t dt = { 0 };
+
+	dt.val_dup = names_dict_value_dup;
+	dt.key_dup = ikey_dict_key_dup;
+	dt.key_compare = ikey_dict_key_compare;
+	dt.val_destructor = names_dict_value_destructor;
+	dt.hash_function = ikey_dict_hash;
+	dt.key_destructor = ikey_dict_key_destructor;
+	css.properties = dict_create(dt, NULL);
 }
 
-static void InitStyleNameLibrary(void)
+static void css_destroy_properties(void)
 {
-	dict_type_t *dt = &library.names_dict;
-
-	dt->val_dup = DupStyleName;
-	dt->key_dup = IntKeyDict_KeyDup;
-	dt->key_compare = IntKeyDict_KeyCompare;
-	dt->val_destructor = StyleNameDestructor;
-	dt->hash_function = IntKeyDict_HashFunction;
-	dt->key_destructor = IntKeyDict_KeyDestructor;
-	library.names = dict_create(dt, NULL);
+	dict_destroy(css.properties);
+	css.properties = NULL;
 }
 
-static void DestroyStyleNameLibrary(void)
+static void css_init_keywords(void)
 {
-	dict_destroy(library.names);
-	library.names = NULL;
+	static dict_type_t keys_dt = { 0 };
+	static dict_type_t names_dt = { 0 };
+
+	names_dt.key_compare = ikey_dict_key_compare;
+	names_dt.hash_function = ikey_dict_hash;
+	dict_init_string_key_type(&keys_dt);
+	keys_dt.val_destructor = keyword_destructor;
+	css.keywords = dict_create(&keys_dt, NULL);
+	css.keyword_names = dict_create(&names_dt, NULL);
 }
 
-static void InitStyleValueLibrary(void)
+static void css_destroy_keywords(void)
 {
-	dict_type_t *keys_dt = &library.value_keys_dict;
-	dict_type_t *names_dt = &library.value_names_dict;
-
-	memset(names_dt, 0, sizeof(dict_type_t));
-	names_dt->key_compare = IntKeyDict_KeyCompare;
-	names_dt->hash_function = IntKeyDict_HashFunction;
-	dict_init_string_key_type(keys_dt);
-	keys_dt->val_destructor = KeyNameGroupDestructor;
-	/* value_keys 表用于存放 key 和 name 数据 */
-	library.value_keys = dict_create(keys_dt, NULL);
-	/* value_names 表仅引用 value_keys 里的数据  */
-	library.value_names = dict_create(names_dt, NULL);
+	dict_destroy(css.keyword_names);
+	dict_destroy(css.keywords);
+	css.keywords = NULL;
+	css.keyword_names = NULL;
 }
 
-static void DestroyStyleValueLibrary(void)
+void css_init(void)
 {
-	dict_destroy(library.value_names);
-	dict_destroy(library.value_keys);
-	library.value_keys = NULL;
-	library.value_names = NULL;
-}
+	css_keyword_t *skn, *skn_end;
 
-void LCUI_InitCSSLibrary(void)
-{
-	KeyNameGroup skn, skn_end;
-
-	library.strpool = strpool_create();
-	InitStyleLinkDict();
-	InitStyleGroupDict();
-	InitStylesheetCache();
-	InitStyleNameLibrary();
-	InitStyleValueLibrary();
-	list_create(&library.groups);
-	skn_end = style_name_map + LEN(style_name_map);
-	for (skn = style_name_map; skn < skn_end; ++skn) {
-		LCUI_DirectAddStyleName(skn->key, skn->name);
+	css.strpool = strpool_create();
+	css_init_cache();
+	css_init_properties();
+	css_init_keywords();
+	list_create(&css.groups);
+	skn_end = css_style_prop_name_map + LEN(css_style_prop_name_map);
+	for (skn = css_style_prop_name_map; skn < skn_end; ++skn) {
+		css_register_property(skn->key, skn->name);
 	}
-	skn_end = style_value_map + LEN(style_value_map);
-	for (skn = style_value_map; skn < skn_end; ++skn) {
-		LCUI_AddStyleValue(skn->key, skn->name);
+	skn_end = css_keyword_map + LEN(css_keyword_map);
+	for (skn = css_keyword_map; skn < skn_end; ++skn) {
+		css_register_keyword(skn->key, skn->name);
 	}
-	library.count = STYLE_KEY_TOTAL;
-	library.active = TRUE;
+	css.count = STYLE_KEY_TOTAL;
 }
 
-void LCUI_FreeCSSLibrary(void)
+void css_destroy(void)
 {
-	library.active = FALSE;
-	DestroyStylesheetCache();
-	DestroyStyleNameLibrary();
-	DestroyStyleValueLibrary();
-	list_destroy(&library.groups, (list_item_destructor_t)DeleteStyleGroup);
-	strpool_destroy(library.strpool);
+	css_destroy_cache();
+	css_destroy_properties();
+	css_destroy_keywords();
+	list_destroy(&css.groups, (list_item_destructor_t)dict_destroy);
+	strpool_destroy(css.strpool);
 }

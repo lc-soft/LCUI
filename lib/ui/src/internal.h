@@ -100,7 +100,7 @@ typedef struct ui_widget_style_diff_t_ {
 	LCUI_BOOL visible;
 	pd_rect_t2F margin;
 	pd_rect_t2F padding;
-	LCUI_StyleValue position;
+	css_keyword_value_t position;
 	ui_border_style_t border;
 	ui_boxshadow_style_t shadow;
 	ui_background_style_t background;
@@ -142,22 +142,22 @@ void ui_destroy_events(void);
 
 INLINE LCUI_BOOL ui_widget_has_absolute_position(ui_widget_t* w)
 {
-	return w->computed_style.position == SV_ABSOLUTE;
+	return w->computed_style.position == CSS_KEYWORD_ABSOLUTE;
 }
 
 INLINE LCUI_BOOL ui_widget_has_block_display(ui_widget_t* w)
 {
-	return w->computed_style.display == SV_BLOCK;
+	return w->computed_style.display == CSS_KEYWORD_BLOCK;
 }
 
 INLINE LCUI_BOOL ui_widget_has_flex_display(ui_widget_t* w)
 {
-	return w->computed_style.display == SV_FLEX;
+	return w->computed_style.display == CSS_KEYWORD_FLEX;
 }
 
 INLINE LCUI_BOOL ui_widget_has_inline_block_display(ui_widget_t* w)
 {
-	return w->computed_style.display == SV_INLINE_BLOCK;
+	return w->computed_style.display == CSS_KEYWORD_INLINE_BLOCK;
 }
 
 INLINE LCUI_BOOL ui_widget_has_fill_available_width(ui_widget_t* w)
@@ -169,8 +169,8 @@ INLINE LCUI_BOOL ui_widget_has_fill_available_width(ui_widget_t* w)
 
 INLINE LCUI_BOOL ui_widget_has_scale_size(ui_widget_t* w)
 {
-	return ui_widget_check_style_type(w, key_width, SCALE) ||
-	       ui_widget_check_style_type(w, key_height, SCALE);
+	return ui_widget_check_style_type(w, css_key_width, SCALE) ||
+	       ui_widget_check_style_type(w, css_key_height, SCALE);
 }
 
 INLINE LCUI_BOOL ui_widget_has_valid_flexbox_style(ui_widget_t* w)

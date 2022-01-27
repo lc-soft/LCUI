@@ -157,7 +157,7 @@ static void TextEdit_UpdateCaret(ui_widget_t* widget)
 	y = caret_y + offset_y;
 	width = edit->layer->width / scale;
 	height = TextLayer_GetRowHeight(edit->layer, row) / scale;
-	ui_widget_set_style(edit->caret, key_height, height, px);
+	ui_widget_set_style(edit->caret, css_key_height, height, px);
 	/* Keep the caret in the visible area */
 	if (x < 0) {
 		x = 0;
@@ -362,7 +362,7 @@ static void TextEdit_UpdateTextLayer(ui_widget_t* w)
 	TextLayer_Update(edit->layer, &rects);
 	for (list_each(node, &rects)) {
 		LCUIRect_ToRectF(node->data, &rect, 1.0f / scale);
-		ui_widget_mark_dirty_rect(w, &rect, SV_CONTENT_BOX);
+		ui_widget_mark_dirty_rect(w, &rect, CSS_KEYWORD_CONTENT_BOX);
 	}
 	TextLayer_ClearInvalidRect(edit->layer);
 	RectList_Clear(&rects);
@@ -402,7 +402,7 @@ static void TextEdit_OnTask(ui_widget_t* widget, int task)
 		}
 		TextEdit_UpdateTextLayer(widget);
 		if (edit->is_placeholder_shown != is_shown) {
-			ui_widget_mark_dirty_rect(widget, NULL, SV_PADDING_BOX);
+			ui_widget_mark_dirty_rect(widget, NULL, CSS_KEYWORD_PADDING_BOX);
 		}
 		edit->is_placeholder_shown = is_shown;
 		edit->tasks[TASK_UPDATE] = FALSE;
@@ -429,7 +429,7 @@ static void TextEdit_OnResize(ui_widget_t* w, float width, float height)
 	TextLayer_ClearInvalidRect(edit->layer);
 	for (list_each(node, &rects)) {
 		LCUIRect_ToRectF(node->data, &rect, 1.0f / scale);
-		ui_widget_mark_dirty_rect(w, &rect, SV_CONTENT_BOX);
+		ui_widget_mark_dirty_rect(w, &rect, CSS_KEYWORD_CONTENT_BOX);
 	}
 	RectList_Clear(&rects);
 }
@@ -495,9 +495,9 @@ void TextEdit_EnableStyleTag(ui_widget_t* widget, LCUI_BOOL enable)
 void TextEdit_EnableMultiline(ui_widget_t* w, LCUI_BOOL enable)
 {
 	if (enable) {
-		Widget_SetFontStyle(w, key_white_space, SV_AUTO, style);
+		Widget_SetFontStyle(w, css_key_white_space, CSS_KEYWORD_AUTO, style);
 	} else {
-		Widget_SetFontStyle(w, key_white_space, SV_NOWRAP, style);
+		Widget_SetFontStyle(w, css_key_white_space, CSS_KEYWORD_NOWRAP, style);
 	}
 }
 
@@ -523,7 +523,7 @@ void TextEdit_ClearText(ui_widget_t* widget)
 	edit->tasks[TASK_UPDATE] = TRUE;
 	ui_widget_add_task(widget, UI_TASK_USER);
 	LCUIMutex_Unlock(&edit->mutex);
-	ui_widget_mark_dirty_rect(widget, NULL, SV_PADDING_BOX);
+	ui_widget_mark_dirty_rect(widget, NULL, CSS_KEYWORD_PADDING_BOX);
 }
 
 size_t TextEdit_GetTextW(ui_widget_t* w, size_t start, size_t max_len,
@@ -620,7 +620,7 @@ int TextEdit_SetPlaceHolderW(ui_widget_t* w, const wchar_t* wstr)
 	TextLayer_ClearText(edit->layer_placeholder);
 	LCUIMutex_Unlock(&edit->mutex);
 	if (edit->is_placeholder_shown) {
-		ui_widget_mark_dirty_rect(w, NULL, SV_PADDING_BOX);
+		ui_widget_mark_dirty_rect(w, NULL, CSS_KEYWORD_PADDING_BOX);
 	}
 	return TextEdit_AddTextBlock(w, wstr, TEXT_BLOCK_ACTION_INSERT,
 				     TEXT_BLOCK_OWNER_PLACEHOLDER);
@@ -1011,7 +1011,7 @@ static void TextEdit_OnUpdateStyle(ui_widget_t* w)
 		TextLayer_SetTextAlign(layers[i], style.text_align);
 		TextLayer_SetLineHeight(layers[i], style.line_height);
 		TextLayer_SetAutoWrap(layers[i],
-				      style.white_space != SV_NOWRAP);
+				      style.white_space != CSS_KEYWORD_NOWRAP);
 		TextLayer_SetTextStyle(layers[i], &text_style);
 	}
 	CSSFontStyle_Destroy(&edit->style);

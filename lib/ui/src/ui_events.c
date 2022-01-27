@@ -390,7 +390,7 @@ static ui_widget_t *ui_widget_get_next_at(ui_widget_t *widget, float x, float y)
 	for (node = node->next; node; node = node->next) {
 		w = node->data;
 		/* 如果忽略事件处理，则向它底层的兄弟部件传播事件 */
-		if (w->computed_style.pointer_events == SV_NONE) {
+		if (w->computed_style.pointer_events == CSS_KEYWORD_NONE) {
 			continue;
 		}
 		if (!w->computed_style.visible) {
@@ -482,7 +482,7 @@ int ui_widget_emit_event(ui_widget_t *w, ui_event_t e, void* arg)
 		pointer_x = e.mouse.x;
 		pointer_y = e.mouse.y;
 		is_pointer_event = TRUE;
-		if (w->computed_style.pointer_events == SV_NONE) {
+		if (w->computed_style.pointer_events == CSS_KEYWORD_NONE) {
 			break;
 		}
 	default:
@@ -493,7 +493,7 @@ int ui_widget_emit_event(ui_widget_t *w, ui_event_t e, void* arg)
 	if (!w->parent || e.cancel_bubble) {
 		return -1;
 	}
-	if (!w->extra || w->computed_style.pointer_events != SV_NONE) {
+	if (!w->extra || w->computed_style.pointer_events != CSS_KEYWORD_NONE) {
 		return ui_widget_emit_event(w->parent, e, arg);
 	}
 	if (is_pointer_event) {
@@ -558,7 +558,7 @@ static ui_widget_t *ui_widget_get_event_target(ui_widget_t *widget, float x,
 			continue;
 		}
 		pointer_events = child->computed_style.pointer_events;
-		if (pointer_events == SV_INHERIT) {
+		if (pointer_events == CSS_KEYWORD_INHERIT) {
 			pointer_events = inherited_pointer_events;
 		}
 		target = ui_widget_get_event_target(
@@ -567,7 +567,7 @@ static ui_widget_t *ui_widget_get_event_target(ui_widget_t *widget, float x,
 		if (target) {
 			return target;
 		}
-		if (pointer_events == SV_AUTO) {
+		if (pointer_events == CSS_KEYWORD_AUTO) {
 			return child;
 		}
 	}
@@ -712,7 +712,7 @@ void ui_clear_event_target(ui_widget_t *w)
 
 INLINE LCUI_BOOL ui_widget_check_focusable(ui_widget_t *w)
 {
-	return w && w->computed_style.pointer_events != SV_NONE &&
+	return w && w->computed_style.pointer_events != CSS_KEYWORD_NONE &&
 	       w->computed_style.focusable && !w->disabled;
 }
 
@@ -763,7 +763,7 @@ static ui_widget_t *ui_resolve_event_target(float x, float y)
 	if (ui_events.mouse_capturer) {
 		target = ui_events.mouse_capturer;
 	} else {
-		target = ui_widget_get_event_target(root, x, y, SV_AUTO);
+		target = ui_widget_get_event_target(root, x, y, CSS_KEYWORD_AUTO);
 	}
 	for (w = target; w; w = w->parent) {
 		if (w->event_blocked) {

@@ -33,8 +33,8 @@ int main(void)
 
 	/* 设定基本的样式和内容 */
 	ui_widget_set_padding(box, 20, 20, 20, 20);
-	ui_widget_set_border(box, 1, SV_SOLID, bdcolor);
-	ui_widget_set_style(box, key_background_color, bgcolor, color);
+	ui_widget_set_border(box, 1, CSS_KEYWORD_SOLID, bdcolor);
+	ui_widget_set_style(box, css_key_background_color, bgcolor, color);
 	TextView_SetTextW(txt, L"[size=24px]这是一段测试文本[/size]");
 	ui_widget_append(box, txt);
 	ui_widget_append(root, box);

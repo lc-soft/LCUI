@@ -47,11 +47,11 @@
 static struct CSSParserModule {
 	int count;
 	dict_type_t dicttype; /**< 解析器表的字典类型数据 */
-	dict_t *parsers;     /**< 解析器表，以名称进行索引 */
+	dict_t *parsers;      /**< 解析器表，以名称进行索引 */
 } self;
 
 void CSSStyleParser_SetCSSProperty(LCUI_CSSParserStyleContext ctx, int key,
-				   LCUI_Style s)
+				   css_unit_value_t *s)
 {
 	if (ctx->style_handler) {
 		ctx->style_handler(key, s, ctx->style_handler_arg);
@@ -60,13 +60,14 @@ void CSSStyleParser_SetCSSProperty(LCUI_CSSParserStyleContext ctx, int key,
 	}
 }
 
-static int SplitValues(const char *str, LCUI_Style slist, int max_len, int mode)
+static int SplitValues(const char *str, css_unit_value_t *slist, int max_len,
+		       int mode)
 {
 	char **values;
 	const char *p;
 	int val, vi = 0, vj = 0, n_quotes = 0;
 
-	memset(slist, 0, sizeof(LCUI_StyleRec) * max_len);
+	memset(slist, 0, sizeof(css_unit_value_t) * max_len);
 	values = (char **)calloc(max_len, sizeof(char *));
 	values[0] = (char *)malloc(sizeof(char) * 64);
 	for (p = str; *p; ++p) {
@@ -97,8 +98,8 @@ static int SplitValues(const char *str, LCUI_Style slist, int max_len, int mode)
 	for (vj = 0; vj < vi; ++vj) {
 		DEBUG_MSG("[%d] %s\n", vj, values[vj]);
 		if (strcmp(values[vj], "auto") == 0) {
-			slist[vj].type = LCUI_STYPE_AUTO;
-			slist[vj].val_style = SV_AUTO;
+			slist[vj].type = CSS_UNIT_AUTO;
+			slist[vj].val_style = CSS_KEYWORD_AUTO;
 			slist[vj].is_valid = TRUE;
 			continue;
 		}
@@ -118,7 +119,7 @@ static int SplitValues(const char *str, LCUI_Style slist, int max_len, int mode)
 			val = LCUI_GetStyleValue(values[vj]);
 			if (val > 0) {
 				slist[vj].style = val;
-				slist[vj].type = LCUI_STYPE_style;
+				slist[vj].type = CSS_UNIT_style;
 				slist[vj].is_valid = TRUE;
 				DEBUG_MSG("[%d]:parse ok\n", vj);
 				continue;
@@ -138,11 +139,11 @@ clean:
 
 static int OnParseValue(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec s;
+	css_unit_value_t s;
 
 	if (sscanf(str, "%d", &s.val_int) == 1) {
 		s.is_valid = TRUE;
-		s.type = LCUI_STYPE_INT;
+		s.type = CSS_UNIT_INT;
 		SetCSSProperty(ctx, ctx->parser->key, &s);
 		return 0;
 	}
@@ -151,7 +152,7 @@ static int OnParseValue(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseNumber(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec s;
+	css_unit_value_t s;
 
 	if (ParseNumber(&s, str)) {
 		SetCSSProperty(ctx, ctx->parser->key, &s);
@@ -159,8 +160,8 @@ static int OnParseNumber(LCUI_CSSParserStyleContext ctx, const char *str)
 	}
 	if (strcmp("auto", str) == 0) {
 		s.is_valid = TRUE;
-		s.type = LCUI_STYPE_AUTO;
-		s.style = SV_AUTO;
+		s.type = CSS_UNIT_AUTO;
+		s.style = CSS_KEYWORD_AUTO;
 		SetCSSProperty(ctx, ctx->parser->key, &s);
 		return 0;
 	}
@@ -169,26 +170,26 @@ static int OnParseNumber(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBoolean(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec s = { 0 };
+	css_unit_value_t s = { 0 };
 
 	if (strcmp(str, "true") == 0) {
 		s.is_valid = TRUE;
-		s.type = LCUI_STYPE_BOOL;
+		s.type = CSS_UNIT_BOOL;
 		s.val_bool = TRUE;
 		SetCSSProperty(ctx, ctx->parser->key, &s);
 		return 0;
 	}
 	if (strcmp(str, "false") == 0) {
 		s.is_valid = TRUE;
-		s.type = LCUI_STYPE_BOOL;
+		s.type = CSS_UNIT_BOOL;
 		s.val_bool = FALSE;
 		SetCSSProperty(ctx, ctx->parser->key, &s);
 		return 0;
 	}
 	if (strcmp("auto", str) == 0) {
 		s.is_valid = TRUE;
-		s.type = LCUI_STYPE_AUTO;
-		s.style = SV_AUTO;
+		s.type = CSS_UNIT_AUTO;
+		s.style = CSS_KEYWORD_AUTO;
 		SetCSSProperty(ctx, ctx->parser->key, &s);
 		return 0;
 	}
@@ -197,7 +198,7 @@ static int OnParseBoolean(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseColor(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec s;
+	css_unit_value_t s;
 
 	if (ParseColor(&s, str)) {
 		SetCSSProperty(ctx, ctx->parser->key, &s);
@@ -208,7 +209,7 @@ static int OnParseColor(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseImage(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec s;
+	css_unit_value_t s;
 
 	if (ParseUrl(&s, str, ctx->dirname)) {
 		SetCSSProperty(ctx, ctx->parser->key, &s);
@@ -219,14 +220,14 @@ static int OnParseImage(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseStyleOption(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec s;
+	css_unit_value_t s;
 	int v = LCUI_GetStyleValue(str);
 
 	if (v < 0) {
 		return -1;
 	}
 	s.style = v;
-	s.type = LCUI_STYPE_STYLE;
+	s.type = CSS_UNIT_STYLE;
 	s.is_valid = TRUE;
 	SetCSSProperty(ctx, ctx->parser->key, &s);
 	return 0;
@@ -234,7 +235,7 @@ static int OnParseStyleOption(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBorder(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec slist[3];
+	css_unit_value_t slist[3];
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
 
 	if (SplitValues(str, slist, 3, mode) < 1) {
@@ -245,24 +246,36 @@ static int OnParseBorder(LCUI_CSSParserStyleContext ctx, const char *str)
 			break;
 		}
 		switch (slist[i].type) {
-		case LCUI_STYPE_COLOR:
-			SetCSSProperty(ctx, key_border_top_color, &slist[i]);
-			SetCSSProperty(ctx, key_border_right_color, &slist[i]);
-			SetCSSProperty(ctx, key_border_bottom_color, &slist[i]);
-			SetCSSProperty(ctx, key_border_left_color, &slist[i]);
+		case CSS_UNIT_COLOR:
+			SetCSSProperty(ctx, css_key_border_top_color,
+				       &slist[i]);
+			SetCSSProperty(ctx, css_key_border_right_color,
+				       &slist[i]);
+			SetCSSProperty(ctx, css_key_border_bottom_color,
+				       &slist[i]);
+			SetCSSProperty(ctx, css_key_border_left_color,
+				       &slist[i]);
 			break;
-		case LCUI_STYPE_PX:
-		case LCUI_STYPE_INT:
-			SetCSSProperty(ctx, key_border_top_width, &slist[i]);
-			SetCSSProperty(ctx, key_border_right_width, &slist[i]);
-			SetCSSProperty(ctx, key_border_bottom_width, &slist[i]);
-			SetCSSProperty(ctx, key_border_left_width, &slist[i]);
+		case CSS_UNIT_PX:
+		case CSS_UNIT_INT:
+			SetCSSProperty(ctx, css_key_border_top_width,
+				       &slist[i]);
+			SetCSSProperty(ctx, css_key_border_right_width,
+				       &slist[i]);
+			SetCSSProperty(ctx, css_key_border_bottom_width,
+				       &slist[i]);
+			SetCSSProperty(ctx, css_key_border_left_width,
+				       &slist[i]);
 			break;
-		case LCUI_STYPE_STYLE:
-			SetCSSProperty(ctx, key_border_top_style, &slist[i]);
-			SetCSSProperty(ctx, key_border_right_style, &slist[i]);
-			SetCSSProperty(ctx, key_border_bottom_style, &slist[i]);
-			SetCSSProperty(ctx, key_border_left_style, &slist[i]);
+		case CSS_UNIT_STYLE:
+			SetCSSProperty(ctx, css_key_border_top_style,
+				       &slist[i]);
+			SetCSSProperty(ctx, css_key_border_right_style,
+				       &slist[i]);
+			SetCSSProperty(ctx, css_key_border_bottom_style,
+				       &slist[i]);
+			SetCSSProperty(ctx, css_key_border_left_style,
+				       &slist[i]);
 			break;
 		default:
 			return -1;
@@ -273,21 +286,21 @@ static int OnParseBorder(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBorderRadius(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec s;
+	css_unit_value_t s;
 
 	if (!ParseNumber(&s, str)) {
 		return -1;
 	}
-	SetCSSProperty(ctx, key_border_top_left_radius, &s);
-	SetCSSProperty(ctx, key_border_top_right_radius, &s);
-	SetCSSProperty(ctx, key_border_bottom_left_radius, &s);
-	SetCSSProperty(ctx, key_border_bottom_right_radius, &s);
+	SetCSSProperty(ctx, css_key_border_top_left_radius, &s);
+	SetCSSProperty(ctx, css_key_border_top_right_radius, &s);
+	SetCSSProperty(ctx, css_key_border_bottom_left_radius, &s);
+	SetCSSProperty(ctx, css_key_border_bottom_right_radius, &s);
 	return 0;
 }
 
 static int OnParseBorderLeft(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec slist[3];
+	css_unit_value_t slist[3];
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
 
 	if (SplitValues(str, slist, 3, mode) < 1) {
@@ -295,15 +308,18 @@ static int OnParseBorderLeft(LCUI_CSSParserStyleContext ctx, const char *str)
 	}
 	for (i = 0; i < 3; ++i) {
 		switch (slist[i].type) {
-		case LCUI_STYPE_COLOR:
-			SetCSSProperty(ctx, key_border_left_color, &slist[i]);
+		case CSS_UNIT_COLOR:
+			SetCSSProperty(ctx, css_key_border_left_color,
+				       &slist[i]);
 			break;
-		case LCUI_STYPE_PX:
-		case LCUI_STYPE_INT:
-			SetCSSProperty(ctx, key_border_left_width, &slist[i]);
+		case CSS_UNIT_PX:
+		case CSS_UNIT_INT:
+			SetCSSProperty(ctx, css_key_border_left_width,
+				       &slist[i]);
 			break;
-		case LCUI_STYPE_style:
-			SetCSSProperty(ctx, key_border_left_style, &slist[i]);
+		case CSS_UNIT_style:
+			SetCSSProperty(ctx, css_key_border_left_style,
+				       &slist[i]);
 			break;
 		default:
 			return -1;
@@ -314,7 +330,7 @@ static int OnParseBorderLeft(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBorderTop(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec slist[3];
+	css_unit_value_t slist[3];
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
 
 	if (SplitValues(str, slist, 3, mode) < 1) {
@@ -322,15 +338,18 @@ static int OnParseBorderTop(LCUI_CSSParserStyleContext ctx, const char *str)
 	}
 	for (i = 0; i < 3; ++i) {
 		switch (slist[i].type) {
-		case LCUI_STYPE_COLOR:
-			SetCSSProperty(ctx, key_border_top_color, &slist[i]);
+		case CSS_UNIT_COLOR:
+			SetCSSProperty(ctx, css_key_border_top_color,
+				       &slist[i]);
 			break;
-		case LCUI_STYPE_PX:
-		case LCUI_STYPE_INT:
-			SetCSSProperty(ctx, key_border_top_width, &slist[i]);
+		case CSS_UNIT_PX:
+		case CSS_UNIT_INT:
+			SetCSSProperty(ctx, css_key_border_top_width,
+				       &slist[i]);
 			break;
-		case LCUI_STYPE_style:
-			SetCSSProperty(ctx, key_border_top_style, &slist[i]);
+		case CSS_UNIT_style:
+			SetCSSProperty(ctx, css_key_border_top_style,
+				       &slist[i]);
 			break;
 		default:
 			return -1;
@@ -341,7 +360,7 @@ static int OnParseBorderTop(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBorderRight(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec slist[3];
+	css_unit_value_t slist[3];
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
 
 	if (SplitValues(str, slist, 3, mode) < 1) {
@@ -349,15 +368,18 @@ static int OnParseBorderRight(LCUI_CSSParserStyleContext ctx, const char *str)
 	}
 	for (i = 0; i < 3; ++i) {
 		switch (slist[i].type) {
-		case LCUI_STYPE_COLOR:
-			SetCSSProperty(ctx, key_border_right_color, &slist[i]);
+		case CSS_UNIT_COLOR:
+			SetCSSProperty(ctx, css_key_border_right_color,
+				       &slist[i]);
 			break;
-		case LCUI_STYPE_PX:
-		case LCUI_STYPE_INT:
-			SetCSSProperty(ctx, key_border_right_width, &slist[i]);
+		case CSS_UNIT_PX:
+		case CSS_UNIT_INT:
+			SetCSSProperty(ctx, css_key_border_right_width,
+				       &slist[i]);
 			break;
-		case LCUI_STYPE_style:
-			SetCSSProperty(ctx, key_border_right_style, &slist[i]);
+		case CSS_UNIT_style:
+			SetCSSProperty(ctx, css_key_border_right_style,
+				       &slist[i]);
 			break;
 		default:
 			return -1;
@@ -368,7 +390,7 @@ static int OnParseBorderRight(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBorderBottom(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec slist[3];
+	css_unit_value_t slist[3];
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
 
 	if (SplitValues(str, slist, 3, mode) < 1) {
@@ -376,15 +398,18 @@ static int OnParseBorderBottom(LCUI_CSSParserStyleContext ctx, const char *str)
 	}
 	for (i = 0; i < 3; ++i) {
 		switch (slist[i].type) {
-		case LCUI_STYPE_COLOR:
-			SetCSSProperty(ctx, key_border_bottom_color, &slist[i]);
+		case CSS_UNIT_COLOR:
+			SetCSSProperty(ctx, css_key_border_bottom_color,
+				       &slist[i]);
 			break;
-		case LCUI_STYPE_PX:
-		case LCUI_STYPE_INT:
-			SetCSSProperty(ctx, key_border_bottom_width, &slist[i]);
+		case CSS_UNIT_PX:
+		case CSS_UNIT_INT:
+			SetCSSProperty(ctx, css_key_border_bottom_width,
+				       &slist[i]);
 			break;
-		case LCUI_STYPE_style:
-			SetCSSProperty(ctx, key_border_bottom_style, &slist[i]);
+		case CSS_UNIT_style:
+			SetCSSProperty(ctx, css_key_border_bottom_style,
+				       &slist[i]);
 			break;
 		default:
 			return -1;
@@ -395,7 +420,7 @@ static int OnParseBorderBottom(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBorderColor(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec s;
+	css_unit_value_t s;
 
 	// TODO: support parsing multiple values
 	// border-color: #eee transparent;
@@ -404,16 +429,16 @@ static int OnParseBorderColor(LCUI_CSSParserStyleContext ctx, const char *str)
 	if (!ParseColor(&s, str)) {
 		return -1;
 	}
-	SetCSSProperty(ctx, key_border_top_color, &s);
-	SetCSSProperty(ctx, key_border_right_color, &s);
-	SetCSSProperty(ctx, key_border_bottom_color, &s);
-	SetCSSProperty(ctx, key_border_left_color, &s);
+	SetCSSProperty(ctx, css_key_border_top_color, &s);
+	SetCSSProperty(ctx, css_key_border_right_color, &s);
+	SetCSSProperty(ctx, css_key_border_bottom_color, &s);
+	SetCSSProperty(ctx, css_key_border_left_color, &s);
 	return 0;
 }
 
 static int OnParseBorderWidth(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec s;
+	css_unit_value_t s;
 
 	// TODO: support parsing multiple values
 	// border-width: 4px 0;
@@ -422,57 +447,57 @@ static int OnParseBorderWidth(LCUI_CSSParserStyleContext ctx, const char *str)
 	if (!ParseNumber(&s, str)) {
 		return -1;
 	}
-	SetCSSProperty(ctx, key_border_top_width, &s);
-	SetCSSProperty(ctx, key_border_right_width, &s);
-	SetCSSProperty(ctx, key_border_bottom_width, &s);
-	SetCSSProperty(ctx, key_border_left_width, &s);
+	SetCSSProperty(ctx, css_key_border_top_width, &s);
+	SetCSSProperty(ctx, css_key_border_right_width, &s);
+	SetCSSProperty(ctx, css_key_border_bottom_width, &s);
+	SetCSSProperty(ctx, css_key_border_left_width, &s);
 	return 0;
 }
 
 static int OnParseBorderStyle(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec s;
+	css_unit_value_t s;
 
 	s.is_valid = TRUE;
 	s.val_style = LCUI_GetStyleValue(str);
 	if (s.val_style < 0) {
 		return -1;
 	}
-	SetCSSProperty(ctx, key_border_top_style, &s);
-	SetCSSProperty(ctx, key_border_right_style, &s);
-	SetCSSProperty(ctx, key_border_bottom_style, &s);
-	SetCSSProperty(ctx, key_border_left_style, &s);
+	SetCSSProperty(ctx, css_key_border_top_style, &s);
+	SetCSSProperty(ctx, css_key_border_right_style, &s);
+	SetCSSProperty(ctx, css_key_border_bottom_style, &s);
+	SetCSSProperty(ctx, css_key_border_left_style, &s);
 	return 0;
 }
 
 static int OnParsePadding(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec s[4];
+	css_unit_value_t s[4];
 
 	switch (SplitValues(str, s, 4, SPLIT_NUMBER)) {
 	case 1:
-		SetCSSProperty(ctx, key_padding_top, &s[0]);
-		SetCSSProperty(ctx, key_padding_right, &s[0]);
-		SetCSSProperty(ctx, key_padding_bottom, &s[0]);
-		SetCSSProperty(ctx, key_padding_left, &s[0]);
+		SetCSSProperty(ctx, css_key_padding_top, &s[0]);
+		SetCSSProperty(ctx, css_key_padding_right, &s[0]);
+		SetCSSProperty(ctx, css_key_padding_bottom, &s[0]);
+		SetCSSProperty(ctx, css_key_padding_left, &s[0]);
 		break;
 	case 2:
-		SetCSSProperty(ctx, key_padding_top, &s[0]);
-		SetCSSProperty(ctx, key_padding_bottom, &s[0]);
-		SetCSSProperty(ctx, key_padding_left, &s[1]);
-		SetCSSProperty(ctx, key_padding_right, &s[1]);
+		SetCSSProperty(ctx, css_key_padding_top, &s[0]);
+		SetCSSProperty(ctx, css_key_padding_bottom, &s[0]);
+		SetCSSProperty(ctx, css_key_padding_left, &s[1]);
+		SetCSSProperty(ctx, css_key_padding_right, &s[1]);
 		break;
 	case 3:
-		SetCSSProperty(ctx, key_padding_top, &s[0]);
-		SetCSSProperty(ctx, key_padding_left, &s[1]);
-		SetCSSProperty(ctx, key_padding_right, &s[1]);
-		SetCSSProperty(ctx, key_padding_bottom, &s[2]);
+		SetCSSProperty(ctx, css_key_padding_top, &s[0]);
+		SetCSSProperty(ctx, css_key_padding_left, &s[1]);
+		SetCSSProperty(ctx, css_key_padding_right, &s[1]);
+		SetCSSProperty(ctx, css_key_padding_bottom, &s[2]);
 		break;
 	case 4:
-		SetCSSProperty(ctx, key_padding_top, &s[0]);
-		SetCSSProperty(ctx, key_padding_right, &s[1]);
-		SetCSSProperty(ctx, key_padding_bottom, &s[2]);
-		SetCSSProperty(ctx, key_padding_left, &s[3]);
+		SetCSSProperty(ctx, css_key_padding_top, &s[0]);
+		SetCSSProperty(ctx, css_key_padding_right, &s[1]);
+		SetCSSProperty(ctx, css_key_padding_bottom, &s[2]);
+		SetCSSProperty(ctx, css_key_padding_left, &s[3]);
 	default:
 		break;
 	}
@@ -481,32 +506,32 @@ static int OnParsePadding(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseMargin(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec s[4];
+	css_unit_value_t s[4];
 
 	switch (SplitValues(str, s, 4, SPLIT_NUMBER)) {
 	case 1:
-		SetCSSProperty(ctx, key_margin_top, &s[0]);
-		SetCSSProperty(ctx, key_margin_right, &s[0]);
-		SetCSSProperty(ctx, key_margin_bottom, &s[0]);
-		SetCSSProperty(ctx, key_margin_left, &s[0]);
+		SetCSSProperty(ctx, css_key_margin_top, &s[0]);
+		SetCSSProperty(ctx, css_key_margin_right, &s[0]);
+		SetCSSProperty(ctx, css_key_margin_bottom, &s[0]);
+		SetCSSProperty(ctx, css_key_margin_left, &s[0]);
 		break;
 	case 2:
-		SetCSSProperty(ctx, key_margin_top, &s[0]);
-		SetCSSProperty(ctx, key_margin_bottom, &s[0]);
-		SetCSSProperty(ctx, key_margin_left, &s[1]);
-		SetCSSProperty(ctx, key_margin_right, &s[1]);
+		SetCSSProperty(ctx, css_key_margin_top, &s[0]);
+		SetCSSProperty(ctx, css_key_margin_bottom, &s[0]);
+		SetCSSProperty(ctx, css_key_margin_left, &s[1]);
+		SetCSSProperty(ctx, css_key_margin_right, &s[1]);
 		break;
 	case 3:
-		SetCSSProperty(ctx, key_margin_top, &s[0]);
-		SetCSSProperty(ctx, key_margin_left, &s[1]);
-		SetCSSProperty(ctx, key_margin_right, &s[1]);
-		SetCSSProperty(ctx, key_margin_bottom, &s[2]);
+		SetCSSProperty(ctx, css_key_margin_top, &s[0]);
+		SetCSSProperty(ctx, css_key_margin_left, &s[1]);
+		SetCSSProperty(ctx, css_key_margin_right, &s[1]);
+		SetCSSProperty(ctx, css_key_margin_bottom, &s[2]);
 		break;
 	case 4:
-		SetCSSProperty(ctx, key_margin_top, &s[0]);
-		SetCSSProperty(ctx, key_margin_right, &s[1]);
-		SetCSSProperty(ctx, key_margin_bottom, &s[2]);
-		SetCSSProperty(ctx, key_margin_left, &s[3]);
+		SetCSSProperty(ctx, css_key_margin_top, &s[0]);
+		SetCSSProperty(ctx, css_key_margin_right, &s[1]);
+		SetCSSProperty(ctx, css_key_margin_bottom, &s[2]);
+		SetCSSProperty(ctx, css_key_margin_left, &s[3]);
 	default:
 		break;
 	}
@@ -515,32 +540,32 @@ static int OnParseMargin(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseBoxShadow(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec s[5];
+	css_unit_value_t s[5];
 
 	if (strcmp(str, "none") == 0) {
 		s[0].val_int = 0;
 		s[0].is_valid = TRUE;
-		s[0].type = LCUI_STYPE_NONE;
-		SetCSSProperty(ctx, key_box_shadow_x, &s[0]);
-		SetCSSProperty(ctx, key_box_shadow_y, &s[0]);
-		SetCSSProperty(ctx, key_box_shadow_blur, &s[0]);
-		SetCSSProperty(ctx, key_box_shadow_spread, &s[0]);
-		SetCSSProperty(ctx, key_box_shadow_color, &s[0]);
+		s[0].type = CSS_UNIT_NONE;
+		SetCSSProperty(ctx, css_key_box_shadow_x, &s[0]);
+		SetCSSProperty(ctx, css_key_box_shadow_y, &s[0]);
+		SetCSSProperty(ctx, css_key_box_shadow_blur, &s[0]);
+		SetCSSProperty(ctx, css_key_box_shadow_spread, &s[0]);
+		SetCSSProperty(ctx, css_key_box_shadow_color, &s[0]);
 		return 0;
 	}
 	switch (SplitValues(str, s, 5, SPLIT_NUMBER | SPLIT_COLOR)) {
 	case 5:
-		SetCSSProperty(ctx, key_box_shadow_x, &s[0]);
-		SetCSSProperty(ctx, key_box_shadow_y, &s[1]);
-		SetCSSProperty(ctx, key_box_shadow_blur, &s[2]);
-		SetCSSProperty(ctx, key_box_shadow_spread, &s[3]);
-		SetCSSProperty(ctx, key_box_shadow_color, &s[4]);
+		SetCSSProperty(ctx, css_key_box_shadow_x, &s[0]);
+		SetCSSProperty(ctx, css_key_box_shadow_y, &s[1]);
+		SetCSSProperty(ctx, css_key_box_shadow_blur, &s[2]);
+		SetCSSProperty(ctx, css_key_box_shadow_spread, &s[3]);
+		SetCSSProperty(ctx, css_key_box_shadow_color, &s[4]);
 		break;
 	case 4:
-		SetCSSProperty(ctx, key_box_shadow_x, &s[0]);
-		SetCSSProperty(ctx, key_box_shadow_y, &s[1]);
-		SetCSSProperty(ctx, key_box_shadow_blur, &s[2]);
-		SetCSSProperty(ctx, key_box_shadow_color, &s[3]);
+		SetCSSProperty(ctx, css_key_box_shadow_x, &s[0]);
+		SetCSSProperty(ctx, css_key_box_shadow_y, &s[1]);
+		SetCSSProperty(ctx, css_key_box_shadow_blur, &s[2]);
+		SetCSSProperty(ctx, css_key_box_shadow_color, &s[3]);
 		break;
 	default:
 		return -1;
@@ -560,15 +585,15 @@ static int OnParseBackground(LCUI_CSSParserStyleContext ctx, const char *str)
 static int OnParseBackgroundPosition(LCUI_CSSParserStyleContext ctx,
 				     const char *str)
 {
-	LCUI_StyleRec slist[2];
+	css_unit_value_t slist[2];
 	int ret = OnParseStyleOption(ctx, str);
 
 	if (ret == 0) {
 		return 0;
 	}
 	if (SplitValues(str, slist, 2, SPLIT_NUMBER) == 2) {
-		SetCSSProperty(ctx, key_background_position_x, &slist[0]);
-		SetCSSProperty(ctx, key_background_position_y, &slist[1]);
+		SetCSSProperty(ctx, css_key_background_position_x, &slist[0]);
+		SetCSSProperty(ctx, css_key_background_position_y, &slist[1]);
 		return 0;
 	}
 	return -2;
@@ -577,25 +602,25 @@ static int OnParseBackgroundPosition(LCUI_CSSParserStyleContext ctx,
 static int OnParseBackgroundSize(LCUI_CSSParserStyleContext ctx,
 				 const char *str)
 {
-	LCUI_StyleRec none;
-	LCUI_StyleRec slist[2];
+	css_unit_value_t none;
+	css_unit_value_t slist[2];
 	int ret = OnParseStyleOption(ctx, str);
 
 	none.is_valid = TRUE;
 	none.val_none = 0;
-	none.type = LCUI_STYPE_NONE;
+	none.type = CSS_UNIT_NONE;
 	if (ret == 0) {
-		SetCSSProperty(ctx, key_background_size_width, &none);
-		SetCSSProperty(ctx, key_background_size_height, &none);
+		SetCSSProperty(ctx, css_key_background_size_width, &none);
+		SetCSSProperty(ctx, css_key_background_size_height, &none);
 		return 0;
 	}
 	ret = SplitValues(str, slist, 2, SPLIT_NUMBER | SPLIT_STYLE);
 	if (ret != 2) {
 		return -1;
 	}
-	SetCSSProperty(ctx, key_background_size, &none);
-	SetCSSProperty(ctx, key_background_size_width, &slist[0]);
-	SetCSSProperty(ctx, key_background_size_height, &slist[1]);
+	SetCSSProperty(ctx, css_key_background_size, &none);
+	SetCSSProperty(ctx, css_key_background_size_width, &slist[0]);
+	SetCSSProperty(ctx, css_key_background_size_height, &slist[1]);
 	return 0;
 }
 
@@ -607,11 +632,11 @@ static int OnParseBackgroundRepeat(LCUI_CSSParserStyleContext ctx,
 
 static int OnParseVisibility(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec s;
+	css_unit_value_t s;
 
 	if (strcmp(str, "visible") == 0 || strcmp(str, "hidden") == 0) {
 		s.is_valid = TRUE;
-		s.type = LCUI_STYPE_STRING;
+		s.type = CSS_UNIT_STRING;
 		s.val_string = strdup2(str);
 		SetCSSProperty(ctx, ctx->parser->key, &s);
 		return 0;
@@ -623,71 +648,71 @@ static int OnParseVisibility(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseFlex(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec s;
-	LCUI_StyleRec slist[3];
+	css_unit_value_t s;
+	css_unit_value_t slist[3];
 	int i, mode = SPLIT_NUMBER | SPLIT_STYLE;
 
 	if (strcmp("initial", str) == 0) {
-		s.type = LCUI_STYPE_INT;
+		s.type = CSS_UNIT_INT;
 		s.is_valid = TRUE;
 		s.val_int = 0;
-		SetCSSProperty(ctx, key_flex_grow, &s);
+		SetCSSProperty(ctx, css_key_flex_grow, &s);
 
 		s.val_int = 1;
-		SetCSSProperty(ctx, key_flex_shrink, &s);
+		SetCSSProperty(ctx, css_key_flex_shrink, &s);
 
-		s.type = LCUI_STYPE_AUTO;
-		s.val_style = SV_AUTO;
-		SetCSSProperty(ctx, key_flex_basis, &s);
+		s.type = CSS_UNIT_AUTO;
+		s.val_style = CSS_KEYWORD_AUTO;
+		SetCSSProperty(ctx, css_key_flex_basis, &s);
 		return 0;
 	}
 	if (strcmp("auto", str) == 0) {
-		s.type = LCUI_STYPE_INT;
+		s.type = CSS_UNIT_INT;
 		s.is_valid = TRUE;
 		s.val_int = 1;
-		SetCSSProperty(ctx, key_flex_grow, &s);
+		SetCSSProperty(ctx, css_key_flex_grow, &s);
 
 		s.val_int = 1;
-		SetCSSProperty(ctx, key_flex_shrink, &s);
+		SetCSSProperty(ctx, css_key_flex_shrink, &s);
 
-		s.type = LCUI_STYPE_AUTO;
-		s.val_style = SV_AUTO;
-		SetCSSProperty(ctx, key_flex_basis, &s);
+		s.type = CSS_UNIT_AUTO;
+		s.val_style = CSS_KEYWORD_AUTO;
+		SetCSSProperty(ctx, css_key_flex_basis, &s);
 		return 0;
 	}
 	if (strcmp("none", str) == 0) {
-		s.type = LCUI_STYPE_INT;
+		s.type = CSS_UNIT_INT;
 		s.is_valid = TRUE;
 		s.val_int = 0;
-		SetCSSProperty(ctx, key_flex_grow, &s);
+		SetCSSProperty(ctx, css_key_flex_grow, &s);
 
 		s.val_int = 0;
-		SetCSSProperty(ctx, key_flex_shrink, &s);
+		SetCSSProperty(ctx, css_key_flex_shrink, &s);
 
-		s.type = LCUI_STYPE_AUTO;
-		s.val_style = SV_AUTO;
-		SetCSSProperty(ctx, key_flex_basis, &s);
+		s.type = CSS_UNIT_AUTO;
+		s.val_style = CSS_KEYWORD_AUTO;
+		SetCSSProperty(ctx, css_key_flex_basis, &s);
 		return 0;
 	}
 
 	i = SplitValues(str, slist, 3, mode);
 	if (i == 3) {
-		SetCSSProperty(ctx, key_flex_grow, &slist[0]);
-		SetCSSProperty(ctx, key_flex_shrink, &slist[1]);
-		SetCSSProperty(ctx, key_flex_basis, &slist[2]);
+		SetCSSProperty(ctx, css_key_flex_grow, &slist[0]);
+		SetCSSProperty(ctx, css_key_flex_shrink, &slist[1]);
+		SetCSSProperty(ctx, css_key_flex_basis, &slist[2]);
 		return 0;
 	}
 	if (i == 2) {
-		SetCSSProperty(ctx, key_flex_shrink, &slist[0]);
-		SetCSSProperty(ctx, key_flex_basis, &slist[1]);
+		SetCSSProperty(ctx, css_key_flex_shrink, &slist[0]);
+		SetCSSProperty(ctx, css_key_flex_basis, &slist[1]);
 		return 0;
 	}
 	if (i == 1) {
-		if (slist[0].type == LCUI_STYPE_INT) {
-			SetCSSProperty(ctx, key_flex_grow, &slist[0]);
+		if (slist[0].type == CSS_UNIT_INT) {
+			SetCSSProperty(ctx, css_key_flex_grow, &slist[0]);
 			return 0;
 		}
-		SetCSSProperty(ctx, key_flex_basis, &slist[0]);
+		SetCSSProperty(ctx, css_key_flex_basis, &slist[0]);
 		return 0;
 	}
 	return -1;
@@ -697,56 +722,56 @@ static int OnParseFlex(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseFlexFlow(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec s;
-	LCUI_StyleRec slist[2];
+	css_unit_value_t s;
+	css_unit_value_t slist[2];
 
 	if (strcmp(str, "wrap") == 0) {
 		s.is_valid = TRUE;
-		s.type = LCUI_STYPE_STYLE;
-		s.val_style = SV_WRAP;
-		SetCSSProperty(ctx, key_flex_wrap, &s);
+		s.type = CSS_UNIT_STYLE;
+		s.val_style = CSS_KEYWORD_WRAP;
+		SetCSSProperty(ctx, css_key_flex_wrap, &s);
 
-		s.type = LCUI_STYPE_STYLE;
-		s.val_style = SV_INITIAL;
-		SetCSSProperty(ctx, key_flex_direction, &s);
+		s.type = CSS_UNIT_STYLE;
+		s.val_style = CSS_KEYWORD_INITIAL;
+		SetCSSProperty(ctx, css_key_flex_direction, &s);
 		return 0;
 	}
 	if (strcmp(str, "nowrap") == 0) {
 		s.is_valid = TRUE;
-		s.type = LCUI_STYPE_STYLE;
-		s.val_style = SV_NOWRAP;
-		SetCSSProperty(ctx, key_flex_wrap, &s);
+		s.type = CSS_UNIT_STYLE;
+		s.val_style = CSS_KEYWORD_NOWRAP;
+		SetCSSProperty(ctx, css_key_flex_wrap, &s);
 
-		s.type = LCUI_STYPE_STYLE;
-		s.val_style = SV_INITIAL;
-		SetCSSProperty(ctx, key_flex_direction, &s);
+		s.type = CSS_UNIT_STYLE;
+		s.val_style = CSS_KEYWORD_INITIAL;
+		SetCSSProperty(ctx, css_key_flex_direction, &s);
 		return 0;
 	}
 	if (strcmp(str, "row") == 0) {
 		s.is_valid = TRUE;
-		s.type = LCUI_STYPE_STYLE;
-		s.val_style = SV_ROW;
-		SetCSSProperty(ctx, key_flex_direction, &s);
+		s.type = CSS_UNIT_STYLE;
+		s.val_style = CSS_KEYWORD_ROW;
+		SetCSSProperty(ctx, css_key_flex_direction, &s);
 
-		s.type = LCUI_STYPE_STYLE;
-		s.val_style = SV_INITIAL;
-		SetCSSProperty(ctx, key_flex_wrap, &s);
+		s.type = CSS_UNIT_STYLE;
+		s.val_style = CSS_KEYWORD_INITIAL;
+		SetCSSProperty(ctx, css_key_flex_wrap, &s);
 		return 0;
 	}
 	if (strcmp(str, "column") == 0) {
 		s.is_valid = TRUE;
-		s.type = LCUI_STYPE_STYLE;
-		s.val_style = SV_COLUMN;
-		SetCSSProperty(ctx, key_flex_direction, &s);
+		s.type = CSS_UNIT_STYLE;
+		s.val_style = CSS_KEYWORD_COLUMN;
+		SetCSSProperty(ctx, css_key_flex_direction, &s);
 
-		s.type = LCUI_STYPE_STYLE;
-		s.val_style = SV_INITIAL;
-		SetCSSProperty(ctx, key_flex_wrap, &s);
+		s.type = CSS_UNIT_STYLE;
+		s.val_style = CSS_KEYWORD_INITIAL;
+		SetCSSProperty(ctx, css_key_flex_wrap, &s);
 		return 0;
 	}
 	if (SplitValues(str, slist, 2, SPLIT_STYLE) == 2) {
-		SetCSSProperty(ctx, key_flex_direction, &slist[0]);
-		SetCSSProperty(ctx, key_flex_wrap, &slist[1]);
+		SetCSSProperty(ctx, css_key_flex_direction, &slist[0]);
+		SetCSSProperty(ctx, css_key_flex_wrap, &slist[1]);
 		return 0;
 	}
 	return -1;
@@ -754,13 +779,13 @@ static int OnParseFlexFlow(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseFlexBasis(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec s;
+	css_unit_value_t s;
 
 	if (OnParseStyleOption(ctx, str) == 0) {
 		return 0;
 	}
 	if (ParseNumber(&s, str)) {
-		SetCSSProperty(ctx, key_flex_basis, &s);
+		SetCSSProperty(ctx, css_key_flex_basis, &s);
 		return 0;
 	}
 	return -1;
@@ -768,10 +793,10 @@ static int OnParseFlexBasis(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseFlexGrow(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec s;
+	css_unit_value_t s;
 
 	if (ParseNumber(&s, str)) {
-		SetCSSProperty(ctx, key_flex_grow, &s);
+		SetCSSProperty(ctx, css_key_flex_grow, &s);
 		return 0;
 	}
 	return -1;
@@ -779,10 +804,10 @@ static int OnParseFlexGrow(LCUI_CSSParserStyleContext ctx, const char *str)
 
 static int OnParseFlexShrink(LCUI_CSSParserStyleContext ctx, const char *str)
 {
-	LCUI_StyleRec s;
+	css_unit_value_t s;
 
 	if (ParseNumber(&s, str)) {
-		SetCSSProperty(ctx, key_flex_grow, &s);
+		SetCSSProperty(ctx, css_key_flex_grow, &s);
 		return 0;
 	}
 	return -1;
@@ -790,63 +815,63 @@ static int OnParseFlexShrink(LCUI_CSSParserStyleContext ctx, const char *str)
 
 /** 各个样式的解析器映射表 */
 static LCUI_CSSPropertyParserRec style_parser_map[] = {
-	{ key_width, NULL, OnParseNumber },
-	{ key_height, NULL, OnParseNumber },
-	{ key_min_width, NULL, OnParseNumber },
-	{ key_min_height, NULL, OnParseNumber },
-	{ key_max_width, NULL, OnParseNumber },
-	{ key_max_height, NULL, OnParseNumber },
-	{ key_top, NULL, OnParseNumber },
-	{ key_right, NULL, OnParseNumber },
-	{ key_bottom, NULL, OnParseNumber },
-	{ key_left, NULL, OnParseNumber },
-	{ key_z_index, NULL, OnParseValue },
-	{ key_opacity, NULL, OnParseNumber },
-	{ key_position, NULL, OnParseStyleOption },
-	{ key_visibility, NULL, OnParseVisibility },
-	{ key_vertical_align, NULL, OnParseStyleOption },
-	{ key_display, NULL, OnParseStyleOption },
-	{ key_background_color, NULL, OnParseColor },
-	{ key_background_image, NULL, OnParseImage },
-	{ key_background_position, NULL, OnParseBackgroundPosition },
-	{ key_background_size, NULL, OnParseBackgroundSize },
-	{ key_background_repeat, NULL, OnParseBackgroundRepeat },
-	{ key_border_top_color, NULL, OnParseColor },
-	{ key_border_right_color, NULL, OnParseColor },
-	{ key_border_bottom_color, NULL, OnParseColor },
-	{ key_border_left_color, NULL, OnParseColor },
-	{ key_border_top_width, NULL, OnParseNumber },
-	{ key_border_right_width, NULL, OnParseNumber },
-	{ key_border_bottom_width, NULL, OnParseNumber },
-	{ key_border_left_width, NULL, OnParseNumber },
-	{ key_border_top_style, NULL, OnParseStyleOption },
-	{ key_border_right_style, NULL, OnParseStyleOption },
-	{ key_border_bottom_style, NULL, OnParseStyleOption },
-	{ key_border_left_style, NULL, OnParseStyleOption },
-	{ key_border_top_left_radius, NULL, OnParseNumber },
-	{ key_border_top_right_radius, NULL, OnParseNumber },
-	{ key_border_bottom_left_radius, NULL, OnParseNumber },
-	{ key_border_bottom_right_radius, NULL, OnParseNumber },
-	{ key_padding_top, NULL, OnParseNumber },
-	{ key_padding_right, NULL, OnParseNumber },
-	{ key_padding_bottom, NULL, OnParseNumber },
-	{ key_padding_left, NULL, OnParseNumber },
-	{ key_margin_top, NULL, OnParseNumber },
-	{ key_margin_right, NULL, OnParseNumber },
-	{ key_margin_bottom, NULL, OnParseNumber },
-	{ key_margin_left, NULL, OnParseNumber },
-	{ key_focusable, NULL, OnParseBoolean },
-	{ key_pointer_events, NULL, OnParseStyleOption },
-	{ key_box_sizing, NULL, OnParseStyleOption },
+	{ css_key_width, NULL, OnParseNumber },
+	{ css_key_height, NULL, OnParseNumber },
+	{ css_key_min_width, NULL, OnParseNumber },
+	{ css_key_min_height, NULL, OnParseNumber },
+	{ css_key_max_width, NULL, OnParseNumber },
+	{ css_key_max_height, NULL, OnParseNumber },
+	{ css_key_top, NULL, OnParseNumber },
+	{ css_key_right, NULL, OnParseNumber },
+	{ css_key_bottom, NULL, OnParseNumber },
+	{ css_key_left, NULL, OnParseNumber },
+	{ css_key_z_index, NULL, OnParseValue },
+	{ css_key_opacity, NULL, OnParseNumber },
+	{ css_key_position, NULL, OnParseStyleOption },
+	{ css_key_visibility, NULL, OnParseVisibility },
+	{ css_key_vertical_align, NULL, OnParseStyleOption },
+	{ css_key_display, NULL, OnParseStyleOption },
+	{ css_key_background_color, NULL, OnParseColor },
+	{ css_key_background_image, NULL, OnParseImage },
+	{ css_key_background_position, NULL, OnParseBackgroundPosition },
+	{ css_key_background_size, NULL, OnParseBackgroundSize },
+	{ css_key_background_repeat, NULL, OnParseBackgroundRepeat },
+	{ css_key_border_top_color, NULL, OnParseColor },
+	{ css_key_border_right_color, NULL, OnParseColor },
+	{ css_key_border_bottom_color, NULL, OnParseColor },
+	{ css_key_border_left_color, NULL, OnParseColor },
+	{ css_key_border_top_width, NULL, OnParseNumber },
+	{ css_key_border_right_width, NULL, OnParseNumber },
+	{ css_key_border_bottom_width, NULL, OnParseNumber },
+	{ css_key_border_left_width, NULL, OnParseNumber },
+	{ css_key_border_top_style, NULL, OnParseStyleOption },
+	{ css_key_border_right_style, NULL, OnParseStyleOption },
+	{ css_key_border_bottom_style, NULL, OnParseStyleOption },
+	{ css_key_border_left_style, NULL, OnParseStyleOption },
+	{ css_key_border_top_left_radius, NULL, OnParseNumber },
+	{ css_key_border_top_right_radius, NULL, OnParseNumber },
+	{ css_key_border_bottom_left_radius, NULL, OnParseNumber },
+	{ css_key_border_bottom_right_radius, NULL, OnParseNumber },
+	{ css_key_padding_top, NULL, OnParseNumber },
+	{ css_key_padding_right, NULL, OnParseNumber },
+	{ css_key_padding_bottom, NULL, OnParseNumber },
+	{ css_key_padding_left, NULL, OnParseNumber },
+	{ css_key_margin_top, NULL, OnParseNumber },
+	{ css_key_margin_right, NULL, OnParseNumber },
+	{ css_key_margin_bottom, NULL, OnParseNumber },
+	{ css_key_margin_left, NULL, OnParseNumber },
+	{ css_key_focusable, NULL, OnParseBoolean },
+	{ css_key_pointer_events, NULL, OnParseStyleOption },
+	{ css_key_box_sizing, NULL, OnParseStyleOption },
 
-	{ key_flex_basis, NULL, OnParseFlexBasis },
-	{ key_flex_grow, NULL, OnParseFlexGrow },
-	{ key_flex_shrink, NULL, OnParseFlexShrink },
-	{ key_flex_direction, NULL, OnParseStyleOption },
-	{ key_flex_wrap, NULL, OnParseStyleOption },
-	{ key_justify_content, NULL, OnParseStyleOption },
-	{ key_align_content, NULL, OnParseStyleOption },
-	{ key_align_items, NULL, OnParseStyleOption },
+	{ css_key_flex_basis, NULL, OnParseFlexBasis },
+	{ css_key_flex_grow, NULL, OnParseFlexGrow },
+	{ css_key_flex_shrink, NULL, OnParseFlexShrink },
+	{ css_key_flex_direction, NULL, OnParseStyleOption },
+	{ css_key_flex_wrap, NULL, OnParseStyleOption },
+	{ css_key_justify_content, NULL, OnParseStyleOption },
+	{ css_key_align_content, NULL, OnParseStyleOption },
+	{ css_key_align_items, NULL, OnParseStyleOption },
 
 	{ -1, "border", OnParseBorder },
 	{ -1, "border-left", OnParseBorderLeft },
@@ -904,26 +929,27 @@ static void CSSParser_EndParseSheet(LCUI_CSSParserContext ctx)
 	list_node_t *node;
 	/* 将记录的样式表添加至匹配到的选择器中 */
 	for (list_each(node, &ctx->style.selectors)) {
-		LCUI_PutStyleSheet(node->data, ctx->style.sheet, ctx->space);
+		css_add_style_sheet(node->data, ctx->style.sheet, ctx->space);
 	}
-	list_destroy(&ctx->style.selectors, (list_item_destructor_t)Selector_Delete);
-	StyleSheet_Delete(ctx->style.sheet);
+	list_destroy(&ctx->style.selectors,
+		     (list_item_destructor_t)css_selector_destroy);
+	css_style_declaration_destroy(ctx->style.sheet);
 }
 
 static int CSSParser_ParseSelector(LCUI_CSSParserContext ctx)
 {
-	LCUI_Selector s;
+	css_selector_t *s;
 
 	switch (*ctx->cur) {
 	case '/':
 		return CSSParser_BeginParseComment(ctx);
 	case '{':
 		ctx->target = CSS_TARGET_KEY;
-		ctx->style.sheet = StyleSheet();
+		ctx->style.sheet = css_style_declaration_create();
 	case ',':
 		CSSParser_EndBuffer(ctx);
 		DEBUG_MSG("selector: %s\n", ctx->buffer);
-		s = Selector(ctx->buffer);
+		s = css_selector_create(ctx->buffer);
 		if (!s) {
 			return -1;
 		}
@@ -1165,7 +1191,8 @@ LCUI_CSSParserContext CSSParser_Begin(size_t buffer_size, const char *space)
 
 void CSSParser_End(LCUI_CSSParserContext ctx)
 {
-	list_destroy(&ctx->style.selectors, (list_item_destructor_t)Selector_Delete);
+	list_destroy(&ctx->style.selectors,
+		     (list_item_destructor_t)css_selector_destroy);
 	CSSParser_FreeFontFaceRuleParser(ctx);
 	if (ctx->space) {
 		free(ctx->space);

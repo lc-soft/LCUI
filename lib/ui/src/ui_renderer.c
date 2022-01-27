@@ -95,14 +95,14 @@ LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, pd_rectf_t *in_rect,
 	}
 	if (!in_rect) {
 		switch (box_type) {
-		case SV_BORDER_BOX:
+		case CSS_KEYWORD_BORDER_BOX:
 			type = UI_DIRTY_RECT_TYPE_BORDER_BOX;
 			break;
-		case SV_GRAPH_BOX:
+		case CSS_KEYWORD_GRAPH_BOX:
 			type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
 			break;
-		case SV_PADDING_BOX:
-		case SV_CONTENT_BOX:
+		case CSS_KEYWORD_PADDING_BOX:
+		case CSS_KEYWORD_CONTENT_BOX:
 		default:
 			type = UI_DIRTY_RECT_TYPE_PADDING_BOX;
 			break;
@@ -120,14 +120,14 @@ LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, pd_rectf_t *in_rect,
 
 	rect = *in_rect;
 	switch (box_type) {
-	case SV_GRAPH_BOX:
+	case CSS_KEYWORD_GRAPH_BOX:
 		if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_CANVAS_BOX) {
 			return FALSE;
 		}
 		LCUIRectF_ValidateArea(&rect, w->box.canvas.width,
 				       w->box.canvas.height);
 		break;
-	case SV_BORDER_BOX:
+	case CSS_KEYWORD_BORDER_BOX:
 		if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_BORDER_BOX) {
 			return FALSE;
 		}
@@ -136,7 +136,7 @@ LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, pd_rectf_t *in_rect,
 		rect.x += w->box.border.x - w->box.canvas.x;
 		rect.y += w->box.border.y - w->box.canvas.y;
 		break;
-	case SV_PADDING_BOX:
+	case CSS_KEYWORD_PADDING_BOX:
 		if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_PADDING_BOX) {
 			return FALSE;
 		}
@@ -145,7 +145,7 @@ LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, pd_rectf_t *in_rect,
 		rect.x += w->box.padding.x - w->box.canvas.x;
 		rect.y += w->box.padding.y - w->box.canvas.y;
 		break;
-	case SV_CONTENT_BOX:
+	case CSS_KEYWORD_CONTENT_BOX:
 	default:
 		LCUIRectF_ValidateArea(&rect, w->box.content.width,
 				       w->box.content.height);
