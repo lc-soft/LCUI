@@ -37,6 +37,11 @@
 #include <LCUI/clipboard.h>
 #include LCUI_EVENTS_H
 
+static struct LCUI_LinuxClipboardDriver {
+	char *text;
+	size_t text_len;
+} clipboard;
+
 void LCUI_UseClipboard(LCUI_ClipboardAction action, void *arg)
 {
 #ifdef USE_LIBX11
@@ -45,7 +50,16 @@ void LCUI_UseClipboard(LCUI_ClipboardAction action, void *arg)
 		return;
 	}
 #else
-	action(NULL, arg);
+	size_t len = clipboard.text_len + 1;
+	wchar_t *wstr = malloc(sizeof(wchar_t) * len);
+	len = decode_utf8(wstr, clipboard.text, len);
+	wstr[len] = 0;
+	// Assign the data
+	LCUI_Clipboard clipboard_data = malloc(sizeof(LCUI_ClipboardRec));
+	clipboard_data->text = wstr;
+	clipboard_data->len = len;
+	clipboard_data->image = NULL;
+	action(clipboard_data, arg);
 #endif
 }
 
@@ -56,6 +70,13 @@ void LCUI_SetClipboardText(const wchar_t *text, size_t len)
 		LCUI_LinuxX11SetClipboardText(text, len);
 		return;
 	}
+#else
+	// X11 doesn't support wchar_t, so we need to send it regular char
+	char *raw_text = malloc((len + 1) * sizeof(char));
+	size_t raw_len = wcstombs(raw_text, text, len);
+	raw_text[raw_len] = '\0';
+	clipboard.text = raw_text;
+	clipboard.text_len = raw_len;
 #endif
 }
 
