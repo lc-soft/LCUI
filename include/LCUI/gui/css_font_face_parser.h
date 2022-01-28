@@ -1,7 +1,7 @@
 /*
  * css_rule_font_face.h -- CSS @font-face rule parser module
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2022, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,23 +28,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_CSS_RULE_FONT_FACE_PARSER_H
-#define LCUI_CSS_RULE_FONT_FACE_PARSER_H
+#ifndef LIBCSS_INCLUDE_CSS_FONT_FACE_PARSER_H
+#define LIBCSS_INCLUDE_CSS_FONT_FACE_PARSER_H
 
 #include <LCUI/font/fontlibrary.h>
 
-typedef struct LCUI_CSSFontFaceRec_ {
+typedef struct css_font_face_t {
 	char *font_family;
 	LCUI_FontStyle font_style;
 	LCUI_FontWeight font_weight;
 	char *src;
-} LCUI_CSSFontFaceRec, *LCUI_CSSFontFace;
+} css_font_face_t;
 
-LCUI_API void CSSParser_OnFontFaceRule(LCUI_CSSParserContext ctx,
-				       void(*func)(const LCUI_CSSFontFace));
+LCUI_API void css_font_face_parser_on_load(css_parser_t *ctx,
+				       void(*func)(const css_font_face_t *));
 
-LCUI_API int CSSParser_InitFontFaceRuleParser(LCUI_CSSParserContext ctx);
+LCUI_API int css_font_face_parser_init(css_parser_t *ctx);
 
-LCUI_API void CSSParser_FreeFontFaceRuleParser(LCUI_CSSParserContext ctx);
+LCUI_API void css_font_face_parser_destroy(css_parser_t *ctx);
 
 #endif
