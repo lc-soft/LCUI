@@ -806,6 +806,7 @@ static void TextEdit_OnKeyDown(LCUI_Widget widget, LCUI_WidgetEvent e,
 		wchar_t *wcs = malloc((len + 1) * sizeof(wchar_t));
 		TextEdit_GetTextW(widget, 0, len, wcs);
 		LCUI_SetClipboardText(wcs, len);
+		free(wcs);
 	}
 }
 

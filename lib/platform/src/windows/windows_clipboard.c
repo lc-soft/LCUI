@@ -37,7 +37,7 @@ void LCUI_UseClipboard(LCUI_ClipboardAction action, void *arg)
 {
 }
 
-void LCUI_SetClipboardText(wchar_t *text, size_t len)
+void LCUI_SetClipboardText(const wchar_t *text, size_t len)
 {
 }
 

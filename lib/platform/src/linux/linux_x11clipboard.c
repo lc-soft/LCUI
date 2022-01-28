@@ -159,13 +159,12 @@ void RequestClipboardContent(void)
 /**
  * This function assumes that text pointer is only owned by clipboard
  */
-void LCUI_LinuxX11SetClipboardText(wchar_t *text, size_t len)
+void LCUI_LinuxX11SetClipboardText(const wchar_t *text, size_t len)
 {
 	// X11 doesn't support wchar_t, so we need to send it regular char
 	char *raw_text = malloc((len + 1) * sizeof(char));
 	size_t raw_len = wcstombs(raw_text, text, len);
 	raw_text[raw_len] = '\0';
-	free(text);
 	if (raw_len == -1) {
 		_DEBUG_MSG("Failed converting wchar_t* to char*\n");
 		// Something failed here, should probably add debug message
