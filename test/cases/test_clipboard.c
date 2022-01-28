@@ -5,6 +5,7 @@
 #include <LCUI/gui/widget/textedit.h>
 #include <LCUI/timer.h>
 #include <LCUI/input.h>
+#include <LCUI/clipboard.h>
 #include "ctest.h"
 
 static void CopyText(void *arg)
@@ -34,10 +35,9 @@ static void OnText1Focused(void *arg)
 
 static void OnCheckText(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 {
-	wchar_t wcs[64];
-	size_t len = TextEdit_GetTextW(w, 0, 64, wcs);
-	it_b("check TextEdit_GetTextW after paste",
-	     len == wcslen(L"helloworld"), TRUE);
+	LCUI_Clipboard clipboard = arg;
+	it_b("check the pasted text",
+	     clipboard != NULL && wcscmp(clipboard->text, L"helloworld") == 0, TRUE);
 	LCUI_Quit();
 }
 
@@ -55,10 +55,10 @@ void test_clipboard(void)
 
 	TextEdit_SetTextW(text1, L"helloworld");
 	LCUIWidget_SetFocus(text1);
-
+		
 	lcui_set_timeout(50, OnText1Focused, text1);
 	lcui_set_timeout(100, CopyText, text2);
-	Widget_BindEvent(text2, "change", OnCheckText, NULL, NULL);
+	Widget_BindEvent(text2, "paste", OnCheckText, NULL, NULL);
 
 	LCUI_Main();
 }
