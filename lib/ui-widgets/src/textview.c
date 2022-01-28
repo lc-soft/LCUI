@@ -51,7 +51,7 @@ typedef struct LCUI_TextViewRec_ {
 	float available_width;
 	wchar_t *content;
 	LCUI_BOOL trimming;
-	ui_widget_t* widget;
+	ui_widget_t *widget;
 	LCUI_TextLayer layer;
 	LCUI_CSSFontStyleRec style;
 	LCUI_TextViewTaskRec task;
@@ -73,10 +73,10 @@ static LCUI_BOOL ParseBoolean(const char *str)
 	return FALSE;
 }
 
-static int OnParseWordBreak(LCUI_CSSParserStyleContext ctx, const char *value)
+static int OnParseWordBreak(css_style_parser_t *ctx, const char *value)
 {
 	char *str = strdup2(value);
-	css_unit_value_t *s = &ctx->sheet->sheet[self.css_key_word_break];
+	css_unit_value_t *s = &ctx->style->sheet[self.css_key_word_break];
 	if (s->is_valid && s->string) {
 		free(s->string);
 	}
@@ -86,9 +86,9 @@ static int OnParseWordBreak(LCUI_CSSParserStyleContext ctx, const char *value)
 	return 0;
 }
 
-static LCUI_WordBreakMode ComputeWordBreakMode(css_style_decl_t *sheet)
+static LCUI_WordBreakMode ComputeWordBreakMode(css_style_decl_t *style)
 {
-	css_unit_value_t *s = &sheet->sheet[self.css_key_word_break];
+	css_unit_value_t *s = &style->sheet[self.css_key_word_break];
 	if (s->is_valid && s->type == CSS_UNIT_STRING && s->string) {
 		if (strcmp(s->string, "break-all") == 0) {
 			return LCUI_WORD_BREAK_BREAK_ALL;
@@ -97,7 +97,7 @@ static LCUI_WordBreakMode ComputeWordBreakMode(css_style_decl_t *sheet)
 	return LCUI_WORD_BREAK_NORMAL;
 }
 
-static void TextView_OnParseAttr(ui_widget_t* w, const char *name,
+static void TextView_OnParseAttr(ui_widget_t *w, const char *name,
 				 const char *value)
 {
 	LCUI_TextView txt = GetData(w);
@@ -116,12 +116,12 @@ static void TextView_OnParseAttr(ui_widget_t* w, const char *name,
 	}
 }
 
-static void TextView_OnParseText(ui_widget_t* w, const char *text)
+static void TextView_OnParseText(ui_widget_t *w, const char *text)
 {
 	TextView_SetText(w, text);
 }
 
-static void TextView_Update(ui_widget_t* w)
+static void TextView_Update(ui_widget_t *w)
 {
 	float scale = ui_get_scale();
 
@@ -142,7 +142,7 @@ static void TextView_Update(ui_widget_t* w)
 	ui_widget_add_task(w, UI_TASK_REFLOW);
 }
 
-static void TextView_UpdateStyle(ui_widget_t* w)
+static void TextView_UpdateStyle(ui_widget_t *w)
 {
 	LCUI_CSSFontStyleRec style;
 	LCUI_TextStyleRec text_style;
@@ -157,7 +157,8 @@ static void TextView_UpdateStyle(ui_widget_t* w)
 	CSSFontStyle_GetTextStyle(&style, &text_style);
 	TextLayer_SetTextAlign(txt->layer, style.text_align);
 	TextLayer_SetLineHeight(txt->layer, style.line_height);
-	TextLayer_SetAutoWrap(txt->layer, style.white_space != CSS_KEYWORD_NOWRAP);
+	TextLayer_SetAutoWrap(txt->layer,
+			      style.white_space != CSS_KEYWORD_NOWRAP);
 	TextLayer_SetWordBreak(txt->layer, ComputeWordBreakMode(w->style));
 	TextLayer_SetTextStyle(txt->layer, &text_style);
 	if (style.content) {
@@ -171,7 +172,7 @@ static void TextView_UpdateStyle(ui_widget_t* w)
 	TextView_Update(w);
 }
 
-static void TextView_OnInit(ui_widget_t* w)
+static void TextView_OnInit(ui_widget_t *w)
 {
 	LCUI_TextView txt;
 
@@ -192,7 +193,7 @@ static void TextView_OnInit(ui_widget_t* w)
 	list_append_node(&self.list, &txt->node);
 }
 
-static void TextView_OnDestroy(ui_widget_t* w)
+static void TextView_OnDestroy(ui_widget_t *w)
 {
 	LCUI_TextView txt = GetData(w);
 
@@ -206,7 +207,7 @@ static void TextView_OnDestroy(ui_widget_t* w)
 	}
 }
 
-static void TextView_OnAutoSize(ui_widget_t* w, float *width, float *height,
+static void TextView_OnAutoSize(ui_widget_t *w, float *width, float *height,
 				ui_layout_rule_t rule)
 {
 	int max_width, max_height;
@@ -251,7 +252,7 @@ static void TextView_OnAutoSize(ui_widget_t* w, float *width, float *height,
 	RectList_Clear(&rects);
 }
 
-static void TextView_OnResize(ui_widget_t* w, float width, float height)
+static void TextView_OnResize(ui_widget_t *w, float width, float height)
 {
 	float scale = ui_get_scale();
 	int fixed_width = (int)(width * scale);
@@ -275,8 +276,8 @@ static void TextView_OnResize(ui_widget_t* w, float width, float height)
 	RectList_Clear(&rects);
 }
 
-static void TextView_OnPaint(ui_widget_t* w, pd_paint_context_t *paint,
-			     ui_widget_actual_style_t* style)
+static void TextView_OnPaint(ui_widget_t *w, pd_paint_context_t *paint,
+			     ui_widget_actual_style_t *style)
 {
 	pd_pos_t pos;
 	pd_canvas_t canvas;
@@ -301,7 +302,7 @@ static void TextView_OnPaint(ui_widget_t* w, pd_paint_context_t *paint,
 	TextLayer_RenderTo(txt->layer, rect, pos, &canvas);
 }
 
-int TextView_SetTextW(ui_widget_t* w, const wchar_t *text)
+int TextView_SetTextW(ui_widget_t *w, const wchar_t *text)
 {
 	LCUI_TextView txt = GetData(w);
 	wchar_t *newtext = wcsdup2(text);
@@ -339,7 +340,7 @@ int TextView_SetTextW(ui_widget_t* w, const wchar_t *text)
 	return 0;
 }
 
-int TextView_SetText(ui_widget_t* w, const char *utf8_text)
+int TextView_SetText(ui_widget_t *w, const char *utf8_text)
 {
 	int ret;
 	wchar_t *wstr;
@@ -354,33 +355,33 @@ int TextView_SetText(ui_widget_t* w, const char *utf8_text)
 	return ret;
 }
 
-void TextView_SetLineHeight(ui_widget_t* w, int height)
+void TextView_SetLineHeight(ui_widget_t *w, int height)
 {
 	Widget_SetFontStyle(w, css_key_line_height, (float)height, px);
 }
 
-void TextView_SetTextAlign(ui_widget_t* w, int align)
+void TextView_SetTextAlign(ui_widget_t *w, int align)
 {
 	Widget_SetFontStyle(w, css_key_text_align, align, style);
 }
 
-void TextView_SetColor(ui_widget_t* w, pd_color_t color)
+void TextView_SetColor(ui_widget_t *w, pd_color_t color)
 {
 	Widget_SetFontStyle(w, css_key_color, color, color);
 }
 
-void TextView_SetAutoWrap(ui_widget_t* w, LCUI_BOOL enable)
+void TextView_SetAutoWrap(ui_widget_t *w, LCUI_BOOL enable)
 {
 	if (enable) {
-		Widget_SetFontStyle(w, css_key_white_space, CSS_KEYWORD_AUTO, style);
+		Widget_SetFontStyle(w, css_key_white_space, CSS_KEYWORD_AUTO,
+				    style);
 	} else {
-		Widget_SetFontStyle(w, css_key_white_space, CSS_KEYWORD_NOWRAP, style);
+		Widget_SetFontStyle(w, css_key_white_space, CSS_KEYWORD_NOWRAP,
+				    style);
 	}
 }
 
-
-
-void ui_textview_set_multiline(ui_widget_t* w, LCUI_BOOL enable)
+void ui_textview_set_multiline(ui_widget_t *w, LCUI_BOOL enable)
 {
 	LCUI_TextView txt = GetData(w);
 
@@ -401,7 +402,7 @@ static void textview_on_font_face_load(ui_widget_t *w, ui_event_t *e, void *arg)
 	}
 }
 
-static void TextVIew_OnTask(ui_widget_t* w, int task)
+static void TextVIew_OnTask(ui_widget_t *w, int task)
 {
 	LCUI_TextView txt;
 
@@ -425,9 +426,7 @@ static void TextVIew_OnTask(ui_widget_t* w, int task)
 
 void LCUIWidget_AddTextView(void)
 {
-	LCUI_CSSPropertyParserRec parser = { 0, "word-break",
-					     OnParseWordBreak };
-	self.css_key_word_break = LCUI_AddCSSPropertyName("word-break");
+	self.css_key_word_break = css_register_property_name("word-break");
 	self.prototype = ui_create_widget_prototype("textview", NULL);
 	self.prototype->init = TextView_OnInit;
 	self.prototype->paint = TextView_OnPaint;
@@ -438,9 +437,10 @@ void LCUIWidget_AddTextView(void)
 	self.prototype->settext = TextView_OnParseText;
 	self.prototype->setattr = TextView_OnParseAttr;
 	self.prototype->runtask = TextVIew_OnTask;
-	LCUI_AddCSSPropertyParser(&parser);
 	list_create(&self.list);
 	ui_on_event("font_face_load", textview_on_font_face_load, NULL, NULL);
+	css_register_property_parser(self.css_key_word_break, "word-break",
+				     OnParseWordBreak);
 }
 
 void LCUIWidget_FreeTextView(void)

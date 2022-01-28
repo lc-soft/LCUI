@@ -620,12 +620,15 @@ static void ui_widget_on_set_style(int key, css_unit_value_t *style, void* arg)
 void ui_widget_set_style_string(ui_widget_t* w, const char* name,
 				const char* value)
 {
-	LCUI_CSSParserStyleContextRec ctx = { 0 };
+	css_style_parser_t parser;
+	css_property_parser_t *prop_parser;
 
-	ctx.style_handler = ui_widget_on_set_style;
-	ctx.style_handler_arg = w;
-	ctx.parser = LCUI_GetCSSPropertyParser(name);
-	ctx.parser->parse(&ctx, value);
+	css_style_parser_init(&parser, NULL);
+	parser.style_handler = ui_widget_on_set_style;
+	parser.style_handler_arg = w;
+	prop_parser = css_get_property_parser(name);
+	prop_parser->parse(&parser, value);
+	css_style_parser_destroy(&parser);
 	ui_widget_update_style(w);
 }
 
