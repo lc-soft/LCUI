@@ -719,19 +719,19 @@ static void TextEdit_TextDelete(LCUI_Widget widget, int n_ch)
 
 static void TextEdit_OnPaste(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
 {
-	LCUI_Clipboard text = arg;
-	TextEdit_InsertTextW(w, text->text);
+	LCUI_Clipboard clipboard = arg;
+	if (clipboard) {
+		TextEdit_InsertTextW(w, clipboard->text);
+	}
 }
 
 static void TextEdit_OnClipboardReady(void *arg, LCUI_Widget widget)
 {
-	LCUI_Clipboard text = arg;
-	if (text != NULL) {
-		LCUI_WidgetEventRec e = { 0 };
+	LCUI_Clipboard clipboard = arg;
+	LCUI_WidgetEventRec e = { 0 };
 
-		LCUI_InitWidgetEvent(&e, "paste");
-		Widget_TriggerEvent(widget, &e, text);
-	}
+	LCUI_InitWidgetEvent(&e, "paste");
+	Widget_TriggerEvent(widget, &e, clipboard);
 }
 
 /** 处理按键事件 */
