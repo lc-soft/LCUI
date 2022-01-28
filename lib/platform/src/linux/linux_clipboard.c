@@ -44,6 +44,8 @@ void LCUI_UseClipboard(LCUI_ClipboardAction action, void *arg)
 		LCUI_UseLinuxX11Clipboard(action, arg);
 		return;
 	}
+#else
+	action(NULL, arg);
 #endif
 }
 
