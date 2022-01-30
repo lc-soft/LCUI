@@ -37,7 +37,7 @@
 #include <LCUI/font.h>
 #include <LCUI/graph.h>
 #include <LCUI/css.h>
-#include <LCUI/gui/css_fontstyle.h>
+#include <LCUI/gui/ui_font_style.h>
 #include <LCUI/gui/widget/textview.h>
 
 #define GetData(W) ui_widget_get_data(W, self.prototype)
@@ -155,7 +155,18 @@ static void TextView_UpdateStyle(ui_widget_t *w)
 		return;
 	}
 	CSSFontStyle_GetTextStyle(&style, &text_style);
-	TextLayer_SetTextAlign(txt->layer, style.text_align);
+	switch (style.text_align) {
+	case CSS_KEYWORD_CENTER:
+		TextLayer_SetTextAlign(txt->layer, LCUI_TEXT_CENTER);
+		break;
+	case CSS_KEYWORD_RIGHT:
+		TextLayer_SetTextAlign(txt->layer, LCUI_TEXT_RIGHT);
+		break;
+	case CSS_KEYWORD_LEFT:
+	default:
+		TextLayer_SetTextAlign(txt->layer, LCUI_TEXT_LEFT);
+		break;
+	}
 	TextLayer_SetLineHeight(txt->layer, style.line_height);
 	TextLayer_SetAutoWrap(txt->layer,
 			      style.white_space != CSS_KEYWORD_NOWRAP);
@@ -357,26 +368,26 @@ int TextView_SetText(ui_widget_t *w, const char *utf8_text)
 
 void TextView_SetLineHeight(ui_widget_t *w, int height)
 {
-	Widget_SetFontStyle(w, css_key_line_height, (float)height, px);
+	ui_widget_set_style(w, css_key_line_height, (float)height, px);
 }
 
 void TextView_SetTextAlign(ui_widget_t *w, int align)
 {
-	Widget_SetFontStyle(w, css_key_text_align, align, style);
+	ui_widget_set_style(w, css_key_text_align, align, style);
 }
 
 void TextView_SetColor(ui_widget_t *w, pd_color_t color)
 {
-	Widget_SetFontStyle(w, css_key_color, color, color);
+	ui_widget_set_style(w, css_key_color, color, color);
 }
 
 void TextView_SetAutoWrap(ui_widget_t *w, LCUI_BOOL enable)
 {
 	if (enable) {
-		Widget_SetFontStyle(w, css_key_white_space, CSS_KEYWORD_AUTO,
+		ui_widget_set_style(w, css_key_white_space, CSS_KEYWORD_AUTO,
 				    style);
 	} else {
-		Widget_SetFontStyle(w, css_key_white_space, CSS_KEYWORD_NOWRAP,
+		ui_widget_set_style(w, css_key_white_space, CSS_KEYWORD_NOWRAP,
 				    style);
 	}
 }

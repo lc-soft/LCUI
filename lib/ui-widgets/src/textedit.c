@@ -37,7 +37,7 @@
 #include <LCUI/font.h>
 #include <LCUI/ui.h>
 #include <LCUI/css.h>
-#include <LCUI/gui/css_fontstyle.h>
+#include <LCUI/gui/ui_font_style.h>
 #include <LCUI/gui/widget/textedit.h>
 #include <LCUI/gui/widget/textcaret.h>
 
@@ -402,7 +402,8 @@ static void TextEdit_OnTask(ui_widget_t* widget, int task)
 		}
 		TextEdit_UpdateTextLayer(widget);
 		if (edit->is_placeholder_shown != is_shown) {
-			ui_widget_mark_dirty_rect(widget, NULL, CSS_KEYWORD_PADDING_BOX);
+			ui_widget_mark_dirty_rect(widget, NULL,
+						  CSS_KEYWORD_PADDING_BOX);
 		}
 		edit->is_placeholder_shown = is_shown;
 		edit->tasks[TASK_UPDATE] = FALSE;
@@ -495,9 +496,11 @@ void TextEdit_EnableStyleTag(ui_widget_t* widget, LCUI_BOOL enable)
 void TextEdit_EnableMultiline(ui_widget_t* w, LCUI_BOOL enable)
 {
 	if (enable) {
-		Widget_SetFontStyle(w, css_key_white_space, CSS_KEYWORD_AUTO, style);
+		ui_widget_set_style(w, css_key_white_space, CSS_KEYWORD_AUTO,
+				    style);
 	} else {
-		Widget_SetFontStyle(w, css_key_white_space, CSS_KEYWORD_NOWRAP, style);
+		ui_widget_set_style(w, css_key_white_space, CSS_KEYWORD_NOWRAP,
+				    style);
 	}
 }
 
