@@ -32,9 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <LCUI.h>
-#include <LCUI/gui/css_library.h>
-#include <LCUI/gui/css_parser.h>
+#include "../include/css.h"
 
 css_parser_t *css_parser_create(size_t buffer_size, const char *space)
 {
@@ -222,7 +220,7 @@ static int css_parser_parse_style_property_value(css_parser_t *parser)
 	DEBUG_MSG("parse style value: %s\n", parser->buffer);
 	if (*parser->cur == '}') {
 		parser->target = CSS_PARSER_TARGET_NONE;
-		css_style_parser_commit(parser);
+		css_style_parser_commit(&parser->style_parser);
 	}
 	return 0;
 }

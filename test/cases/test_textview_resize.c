@@ -1,6 +1,6 @@
 #include <LCUI.h>
 #include <LCUI/gui/widget/textview.h>
-#include <LCUI/gui/css_parser.h>
+#include <LCUI/css.h>
 #include "ctest.h"
 
 /* clang-format off */

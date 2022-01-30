@@ -36,7 +36,7 @@
 #include <LCUI/ui.h>
 #include <LCUI/font.h>
 #include <LCUI/graph.h>
-#include <LCUI/gui/css_parser.h>
+#include <LCUI/css.h>
 #include <LCUI/gui/css_fontstyle.h>
 #include <LCUI/gui/widget/textview.h>
 

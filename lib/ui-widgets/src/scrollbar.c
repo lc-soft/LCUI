@@ -36,7 +36,7 @@
 #include <LCUI/timer.h>
 #include <LCUI/ui.h>
 #include <LCUI/gui/widget/scrollbar.h>
-#include <LCUI/gui/css_parser.h>
+#include <LCUI/css.h>
 
 /* clang-format off */
 

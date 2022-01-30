@@ -4,8 +4,8 @@
 #include <LCUI/header.h>
 #include <LCUI/types.h>
 #include <LCUI/util.h>
-#include <LCUI/gui/css_library.h>
-#include <LCUI/gui/css_parser.h>
+#include <LCUI/css/def.h>
+#include <LCUI/css/library.h>
 
 LCUI_BEGIN_HEADER
 

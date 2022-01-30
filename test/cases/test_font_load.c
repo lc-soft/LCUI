@@ -1,8 +1,7 @@
 ﻿#include <LCUI.h>
 #include <LCUI/font.h>
 #include <LCUI/ui.h>
-#include <LCUI/gui/css_library.h>
-#include <LCUI/gui/css_parser.h>
+#include <LCUI/css.h>
 #include "ctest.h"
 #include <stdio.h>
 

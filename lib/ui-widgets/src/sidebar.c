@@ -33,7 +33,7 @@
 #include <LCUI/ui.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/widget/sidebar.h>
-#include <LCUI/gui/css_parser.h>
+#include <LCUI/css.h>
 
 typedef struct SideBarItemRec_ {
 	wchar_t *id;

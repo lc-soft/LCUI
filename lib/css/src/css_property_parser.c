@@ -1,5 +1,8 @@
-#include <LCUI/gui/css_library.h>
-#include <LCUI/gui/css_parser.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "../include/css.h"
 
 #define SPLIT_NUMBER 1
 #define SPLIT_COLOR (1 << 1)
@@ -7,7 +10,6 @@
 
 static struct css_property_parser_module_t {
 	dict_t *dict;
-	dict_type_t dicttype;
 	size_t count;
 } css_property_parser;
 
@@ -61,13 +63,13 @@ static int split_values(const char *str, css_unit_value_t *slist, int max_len,
 			continue;
 		}
 		if (mode & SPLIT_NUMBER) {
-			if (ParseNumber(&slist[vj], values[vj])) {
+			if (css_parse_number(&slist[vj], values[vj])) {
 				DEBUG_MSG("[%d]:parse ok\n", vj);
 				continue;
 			}
 		}
 		if (mode & SPLIT_COLOR) {
-			if (ParseColor(&slist[vj], values[vj])) {
+			if (css_parse_color(&slist[vj], values[vj])) {
 				DEBUG_MSG("[%d]:parse ok\n", vj);
 				continue;
 			}
@@ -111,7 +113,7 @@ static int css_parse_number_value(css_style_parser_t *parser, const char *str)
 {
 	css_unit_value_t s;
 
-	if (ParseNumber(&s, str)) {
+	if (css_parse_number(&s, str)) {
 		set_current_property(&s);
 		return 0;
 	}
@@ -157,7 +159,7 @@ static int css_parse_color_value(css_style_parser_t *parser, const char *str)
 {
 	css_unit_value_t s;
 
-	if (ParseColor(&s, str)) {
+	if (css_parse_color(&s, str)) {
 		set_current_property(&s);
 		return 0;
 	}
@@ -168,7 +170,7 @@ static int css_parse_image_value(css_style_parser_t *parser, const char *str)
 {
 	css_unit_value_t s;
 
-	if (ParseUrl(&s, str, parser->dirname)) {
+	if (css_parse_url(&s, str, parser->dirname)) {
 		set_current_property(&s);
 		return 0;
 	}
@@ -247,7 +249,7 @@ static int css_parse_border_radius_property(css_style_parser_t *parser,
 {
 	css_unit_value_t s;
 
-	if (!ParseNumber(&s, str)) {
+	if (!css_parse_number(&s, str)) {
 		return -1;
 	}
 	set_property(css_key_border_top_left_radius, &s);
@@ -390,7 +392,7 @@ static int css_parse_border_color_property(css_style_parser_t *parser,
 	// border-color: #eee transparent;
 	// border-color: #f00 #0f0 transparent;
 	// border-color: #0f0 #f00 #f00 #0f0;
-	if (!ParseColor(&s, str)) {
+	if (!css_parse_color(&s, str)) {
 		return -1;
 	}
 	set_property(css_key_border_top_color, &s);
@@ -409,7 +411,7 @@ static int css_parse_border_width_property(css_style_parser_t *parser,
 	// border-width: 4px 0;
 	// border-width: 4px 8px 0;
 	// border-width: 4px 0 0 4px;
-	if (!ParseNumber(&s, str)) {
+	if (!css_parse_number(&s, str)) {
 		return -1;
 	}
 	set_property(css_key_border_top_width, &s);
@@ -757,7 +759,7 @@ static int css_parse_flex_basis_property(css_style_parser_t *parser,
 	if (css_parse_keyword_value(parser, str) == 0) {
 		return 0;
 	}
-	if (ParseNumber(&s, str)) {
+	if (css_parse_number(&s, str)) {
 		set_property(css_key_flex_basis, &s);
 		return 0;
 	}
@@ -769,7 +771,7 @@ static int css_parse_flex_grow_property(css_style_parser_t *parser,
 {
 	css_unit_value_t s;
 
-	if (ParseNumber(&s, str)) {
+	if (css_parse_number(&s, str)) {
 		set_property(css_key_flex_grow, &s);
 		return 0;
 	}
@@ -781,7 +783,7 @@ static int css_parse_flex_shrink_property(css_style_parser_t *parser,
 {
 	css_unit_value_t s;
 
-	if (ParseNumber(&s, str)) {
+	if (css_parse_number(&s, str)) {
 		set_property(css_key_flex_grow, &s);
 		return 0;
 	}
@@ -793,7 +795,7 @@ css_property_parser_t *css_get_property_parser(const char *name)
 	return dict_fetch_value(css_property_parser.dict, name);
 }
 
-static void DestroyStyleParser(void *privdata, void *val)
+static void css_prop_parser_dict_val_destructor(void *privdata, void *val)
 {
 	css_property_parser_t *sp = val;
 	free(sp->name);
@@ -801,7 +803,7 @@ static void DestroyStyleParser(void *privdata, void *val)
 }
 
 int css_register_property_parser(int key, const char *name,
-				 css_parser_method_t parse)
+				 css_property_parser_method_t parse)
 {
 	css_property_parser_t *parser;
 
@@ -830,11 +832,11 @@ int css_register_property_parser(int key, const char *name,
 
 void css_init_preset_property_parsers(void)
 {
-	static dict_type_t type = { 9 };
+	static dict_type_t dt;
 
-	dict_init_string_key_type(&type);
-	css_property_parser.dicttype.val_destructor = DestroyStyleParser;
-	css_property_parser.dict = dict_create(&type, NULL);
+	dict_init_string_key_type(&dt);
+	dt.val_destructor = css_prop_parser_dict_val_destructor;
+	css_property_parser.dict = dict_create(&dt, NULL);
 	css_property_parser.count = 0;
 
 	register_parser(css_key_width, NULL, css_parse_number_value);

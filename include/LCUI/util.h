@@ -47,7 +47,6 @@
 #include <LCUI/util/timer.h>
 #include <LCUI/util/object.h>
 #include <LCUI/util/rect.h>
-#include <LCUI/util/parse.h>
 #include <LCUI/util/event.h>
 #include <LCUI/util/task.h>
 #include <LCUI/util/uri.h>

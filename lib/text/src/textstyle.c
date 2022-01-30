@@ -31,11 +31,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <LCUI/header.h>
-#include <LCUI/types.h>
-#include <yutil.h>
-#include <LCUI/util/parse.h>
+#include <LCUI/util.h>
 #include <LCUI/font.h>
+#include <LCUI/css/utils.h>
 
 typedef enum LCUI_TextStyleTagType_ {
 	TEXT_STYLE_STYLE,
@@ -490,21 +488,21 @@ static const wchar_t *ScanStyleTagData(const wchar_t *wstr,
 
 	p = wstr;
 	if ((q = ScanStyleTagByName(p, L"color", tag_data))) {
-		if (!ParseColor(&tag->style, tag_data)) {
+		if (!css_parse_color(&tag->style, tag_data)) {
 			return NULL;
 		}
 		tag->id = TEXT_STYLE_COLOR;
 		return q;
 	}
 	if ((q = ScanStyleTagByName(p, L"bgcolor", tag_data))) {
-		if (!ParseColor(&tag->style, tag_data)) {
+		if (!css_parse_color(&tag->style, tag_data)) {
 			return NULL;
 		}
 		tag->id = TEXT_STYLE_BG_COLOR;
 		return q;
 	}
 	if ((q = ScanStyleTagByName(p, L"size", tag_data))) {
-		if (!ParseNumber(&tag->style, tag_data)) {
+		if (!css_parse_number(&tag->style, tag_data)) {
 			return NULL;
 		}
 		tag->id = TEXT_STYLE_SIZE;
