@@ -7,7 +7,10 @@
                 "/usr/include/x86_64-linux-gnu",
                 "/usr/include/linux",
                 "/usr/local/include",
-                "${workspaceFolder}/lib/app/include"
+                "${workspaceFolder}/include/",
+                "${workspaceFolder}/include/LCUI",
+                "${workspaceFolder}/lib/yutil/include/",
+                "${workspaceFolder}/test/lib/ctest/include"
             ],
             "browse": {
                 "path": [
