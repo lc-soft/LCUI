@@ -500,7 +500,7 @@ static void DeleteStyleListNode(LCUI_StyleListNode node)
 
 void StyleList_Delete(LCUI_StyleList list)
 {
-	list_destroy_without_node(list, (FuncPtr)DeleteStyleListNode);
+	list_destroy_without_node(list, (list_item_destructor_t)DeleteStyleListNode);
 	free(list);
 }
 
@@ -1169,7 +1169,7 @@ static StyleLink CreateStyleLink(void)
 static void DeleteStyleLink(StyleLink link)
 {
 	dict_destroy(link->parents);
-	list_destroy_without_node(&link->styles, (FuncPtr)DeleteStyleNode);
+	list_destroy_without_node(&link->styles, (list_item_destructor_t)DeleteStyleNode);
 	free(link->selector);
 	link->selector = NULL;
 	link->parents = NULL;
@@ -1770,6 +1770,6 @@ void LCUI_FreeCSSLibrary(void)
 	DestroyStylesheetCache();
 	DestroyStyleNameLibrary();
 	DestroyStyleValueLibrary();
-	list_destroy(&library.groups, (FuncPtr)DeleteStyleGroup);
+	list_destroy(&library.groups, (list_item_destructor_t)DeleteStyleGroup);
 	strpool_destroy(library.strpool);
 }

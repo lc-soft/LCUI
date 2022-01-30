@@ -323,7 +323,6 @@ typedef struct pd_paint_context_t_ {
 	pd_bool with_alpha; /**< 绘制时是否需要处理 alpha 通道 */
 } pd_paint_context_t;
 
-typedef void (*FuncPtr)(void *);
 typedef void(*LCUI_TaskFunc)(void*, void*);
 
 LCUI_END_HEADER
