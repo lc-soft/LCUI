@@ -172,7 +172,7 @@ void LCUI_LinuxX11SetClipboardText(const wchar_t *text, size_t len)
 	}
 	// Make sure to free old text
 	if (clipboard.text) {
-		free(clipboard.text)
+		free(clipboard.text);
 	}
 
 	LCUI_X11AppDriver x11 = LCUI_GetAppData();
@@ -217,7 +217,6 @@ static void OnSelectionNotify(LCUI_Event ev, void *arg)
 	}
 	_DEBUG_MSG("SelectionNotify received\n");
 	XEvent *x_ev = arg;
-	LCUI_X11AppDriver x11 = LCUI_GetAppData();
 
 	if (x_ev->xselection.selection == clipboard.xclipboard) {
 		_DEBUG_MSG("Received Clipboard event\n");
