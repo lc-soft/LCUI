@@ -170,6 +170,10 @@ void LCUI_LinuxX11SetClipboardText(const wchar_t *text, size_t len)
 		// Something failed here, should probably add debug message
 		return;
 	}
+	// Make sure to free old text
+	if (clipboard.text) {
+		free(clipboard.text)
+	}
 
 	LCUI_X11AppDriver x11 = LCUI_GetAppData();
 	Display *display = x11->display;
