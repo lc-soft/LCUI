@@ -35,7 +35,7 @@
 #include <LCUI/font.h>
 #include <LCUI/ui.h>
 #include <LCUI/gui/builder.h>
-#include <LCUI/gui/css_parser.h>
+#include <LCUI/css.h>
 
 #define WARN_TXT "[builder] warning: this module is not enabled before build.\n"
 

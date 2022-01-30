@@ -3,7 +3,7 @@
 #include <LCUI.h>
 #include <LCUI/ui.h>
 #include <LCUI/gui/widget/textview.h>
-#include <LCUI/gui/css_parser.h>
+#include <LCUI/css.h>
 #include <LCUI/gui/builder.h>
 #include <LCUI/graph.h>
 #include "ctest.h"

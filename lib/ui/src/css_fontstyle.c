@@ -30,13 +30,10 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <LCUI/header.h>
-#include <LCUI/types.h>
 #include <LCUI/util.h>
 #include <LCUI/font.h>
+#include <LCUI/css.h>
 #include <LCUI/ui.h>
-#include <LCUI/gui/css_library.h>
-#include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/css_fontstyle.h>
 
 /* clang-format off */
@@ -118,7 +115,7 @@ static int css_parse_color_value(css_style_parser_t *ctx, const char *str)
 {
 	css_unit_value_t s;
 
-	if (ParseColor(&s, str)) {
+	if (css_parse_color(&s, str)) {
 		SetFontStyleProperty(ctx, &s);
 		return 0;
 	}
@@ -129,7 +126,7 @@ static int OnParseFontSize(css_style_parser_t *ctx, const char *str)
 {
 	css_unit_value_t s;
 
-	if (ParseNumber(&s, str)) {
+	if (css_parse_number(&s, str)) {
 		SetFontStyleProperty(ctx, &s);
 		return 0;
 	}
@@ -151,7 +148,7 @@ static int OnParseFontStyle(css_style_parser_t *ctx, const char *str)
 {
 	css_unit_value_t s;
 
-	if (ParseFontStyle(str, &s.val_int)) {
+	if (css_parse_font_style(str, &s.val_int)) {
 		s.is_valid = TRUE;
 		s.type = CSS_UNIT_INT;
 		SetFontStyleProperty(ctx, &s);
@@ -164,7 +161,7 @@ static int OnParseFontWeight(css_style_parser_t *ctx, const char *str)
 {
 	css_unit_value_t s;
 
-	if (ParseFontWeight(str, &s.val_int)) {
+	if (css_parse_font_weight(str, &s.val_int)) {
 		s.is_valid = TRUE;
 		s.type = CSS_UNIT_INT;
 		SetFontStyleProperty(ctx, &s);
@@ -192,7 +189,7 @@ static int OnParseLineHeight(css_style_parser_t *ctx, const char *str)
 {
 	css_unit_value_t s;
 
-	if (!ParseNumber(&s, str)) {
+	if (!css_parse_number(&s, str)) {
 		return -1;
 	}
 	SetFontStyleProperty(ctx, &s);

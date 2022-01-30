@@ -35,7 +35,7 @@
 #include <LCUI/font.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/widget/button.h>
-#include <LCUI/gui/css_parser.h>
+#include <LCUI/css.h>
 
 static ui_widget_prototype_t *prototype = NULL;
 

@@ -1,6 +1,8 @@
-
-#include <LCUI/gui/css_library.h>
-#include <LCUI/gui/css_parser.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "../include/css.h"
 
 static char *getdirname(const char *path)
 {

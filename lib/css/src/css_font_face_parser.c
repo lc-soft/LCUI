@@ -32,12 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <LCUI/header.h>
-#include <LCUI/types.h>
-#include <LCUI/util/parse.h>
-#include <yutil.h>
-#include <LCUI/gui/css_library.h>
-#include <LCUI/gui/css_parser.h>
+#include "../include/css.h"
 
 enum FontFaceParserState { STATE_HEAD, STATE_KEY, STATE_KEY_END, STATE_VALUE };
 
@@ -175,7 +170,7 @@ static int css_font_face_parser_parse_font_weight(css_font_face_t *face,
 						  const char *str)
 {
 	int weight;
-	if (ParseFontWeight(str, &weight)) {
+	if (css_parse_font_weight(str, &weight)) {
 		face->font_weight = weight;
 		return 0;
 	}
@@ -186,7 +181,7 @@ static int css_font_face_parser_parse_font_style(css_font_face_t *face,
 						 const char *str)
 {
 	int style;
-	if (ParseFontStyle(str, &style)) {
+	if (css_parse_font_style(str, &style)) {
 		face->font_style = style;
 		return 0;
 	}
@@ -200,7 +195,7 @@ static int css_font_face_parser_parse_src(css_font_face_t *face,
 	if (face->src) {
 		free(face->src);
 	}
-	if (ParseUrl(&style, str, dirname)) {
+	if (css_parse_url(&style, str, dirname)) {
 		face->src = style.val_string;
 		return 0;
 	}
@@ -296,8 +291,8 @@ int css_font_face_parser_init(css_parser_t *parser)
 	}
 	data->face->src = NULL;
 	data->face->font_family = NULL;
-	data->face->font_style = FONT_STYLE_NORMAL;
-	data->face->font_weight = FONT_WEIGHT_NORMAL;
+	data->face->font_style = CSS_FONT_STYLE_NORMAL;
+	data->face->font_weight = CSS_FONT_WEIGHT_NORMAL;
 	rule_parser = &parser->rule_parsers[CSS_RULE_FONT_FACE];
 	rule_parser->data = data;
 	rule_parser->parse = css_parser_parse_font_face;

@@ -31,12 +31,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <LCUI/header.h>
-#include <LCUI/types.h>
-#include <LCUI/util.h>
-#include <LCUI/font/fontlibrary.h>
+#include "../include/css/utils.h"
 
-LCUI_BOOL ParseNumber(css_unit_value_t *s, const char *str)
+LCUI_BOOL css_parse_number(css_unit_value_t *s, const char *str)
 {
 	int n = 0;
 	const char *p;
@@ -135,7 +132,7 @@ LCUI_BOOL ParseNumber(css_unit_value_t *s, const char *str)
 	return TRUE;
 }
 
-LCUI_BOOL ParseRGBA(css_unit_value_t *var, const char *str)
+LCUI_BOOL css_parse_rgba(css_unit_value_t *var, const char *str)
 {
 	float data[4];
 	char buf[16];
@@ -175,7 +172,7 @@ LCUI_BOOL ParseRGBA(css_unit_value_t *var, const char *str)
 	return TRUE;
 }
 
-LCUI_BOOL ParseRGB(css_unit_value_t *var, const char *str)
+LCUI_BOOL css_parse_rgb(css_unit_value_t *var, const char *str)
 {
 	float data[3];
 	char buf[16];
@@ -215,7 +212,7 @@ LCUI_BOOL ParseRGB(css_unit_value_t *var, const char *str)
 	return TRUE;
 }
 
-LCUI_BOOL ParseColor(css_unit_value_t *var, const char *str)
+LCUI_BOOL css_parse_color(css_unit_value_t *var, const char *str)
 {
 	const char *p;
 	int len = 0, status = 0, r, g, b;
@@ -252,8 +249,8 @@ LCUI_BOOL ParseColor(css_unit_value_t *var, const char *str)
 			status = sscanf(str, "#%2X%2X%2X", &r, &g, &b);
 		}
 		break;
-	case 4: return ParseRGB(var, str);
-	case 8: return ParseRGBA(var, str);
+	case 4: return css_parse_rgb(var, str);
+	case 8: return css_parse_rgba(var, str);
 	default:break;
 	}
 	if (status == 3) {
@@ -277,7 +274,7 @@ LCUI_BOOL ParseColor(css_unit_value_t *var, const char *str)
 	return FALSE;
 }
 
-static LCUI_BOOL IsAbsolutePath(const char *path)
+static LCUI_BOOL css_check_absolute_path(const char *path)
 {
 	if (path[0] == '/') {
 		return TRUE;
@@ -288,7 +285,7 @@ static LCUI_BOOL IsAbsolutePath(const char *path)
 	return FALSE;
 }
 
-LCUI_BOOL ParseUrl(css_unit_value_t *s, const char *str, const char *dirname)
+LCUI_BOOL css_parse_url(css_unit_value_t *s, const char *str, const char *dirname)
 {
 	size_t n, dirname_len;
 	const char *p, *head, *tail;
@@ -311,7 +308,7 @@ LCUI_BOOL ParseUrl(css_unit_value_t *s, const char *str, const char *dirname)
 	}
 	n = tail - head;
 	s->type = CSS_UNIT_STRING;
-	if (dirname && !IsAbsolutePath(head)) {
+	if (dirname && !css_check_absolute_path(head)) {
 		n += (dirname_len = strlen(dirname));
 		s->val_string = malloc((n + 2) * sizeof(char));
 		if (!s->val_string) {
@@ -342,39 +339,39 @@ LCUI_BOOL ParseUrl(css_unit_value_t *s, const char *str, const char *dirname)
 	return TRUE;
 }
 
-LCUI_BOOL ParseFontWeight(const char *str, int *weight)
+LCUI_BOOL css_parse_font_weight(const char *str, int *weight)
 {
 	int value;
 	if (strcmp(str, "normal") == 0) {
-		*weight = FONT_WEIGHT_NORMAL;
+		*weight = CSS_FONT_WEIGHT_NORMAL;
 		return TRUE;
 	}
 	if (strcmp(str, "bold") == 0) {
-		*weight = FONT_WEIGHT_BOLD;
+		*weight = CSS_FONT_WEIGHT_BOLD;
 		return TRUE;
 	}
 	if (sscanf(str, "%d", &value) != 1) {
-		*weight = FONT_WEIGHT_NORMAL;
+		*weight = CSS_FONT_WEIGHT_NORMAL;
 		return FALSE;
 	}
 	if (value < 100) {
-		*weight = FONT_WEIGHT_THIN;
+		*weight = CSS_FONT_WEIGHT_THIN;
 		return TRUE;
 	}
 	*weight = y_iround(value / 100.0) * 100;
 	return TRUE;
 }
 
-LCUI_BOOL ParseFontStyle(const char *str, int *style)
+LCUI_BOOL css_parse_font_style(const char *str, int *style)
 {
 	char value[64] = "";
 	strtrim(value, str, NULL);
 	if (strcmp(value, "normal") == 0) {
-		*style = FONT_STYLE_NORMAL;
+		*style = CSS_FONT_STYLE_NORMAL;
 	} else if (strcmp(value, "italic") == 0) {
-		*style = FONT_STYLE_ITALIC;
+		*style = CSS_FONT_STYLE_ITALIC;
 	} else if (strcmp(value, "oblique") == 0) {
-		*style = FONT_STYLE_OBLIQUE;
+		*style = CSS_FONT_STYLE_OBLIQUE;
 	} else {
 		return FALSE;
 	}

@@ -1,6 +1,7 @@
 ﻿#include <stdio.h>
 #include <LCUI.h>
 #include <LCUI/font.h>
+#include <LCUI/css.h>
 #include <LCUI/gui/css_fontstyle.h>
 #include "../include/ui.h"
 #include "internal.h"
