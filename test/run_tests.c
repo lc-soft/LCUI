@@ -26,6 +26,6 @@ int main(void)
 	describe("test block layout", test_block_layout);
 	describe("test flex layout", test_flex_layout);
 	describe("test widget rect", test_widget_rect);
-	// describe("test clipboard", test_clipboard);
+	describe("test clipboard", test_clipboard);
 	return ret - print_test_result();
 }
