@@ -204,7 +204,15 @@ static css_keyword_t css_style_prop_name_map[] = {
 	{ css_key_flex_wrap, "flex-wrap" },
 	{ css_key_justify_content, "justify-content" },
 	{ css_key_align_content, "align-content" },
-	{ css_key_align_items, "align-items" }
+	{ css_key_align_items, "align-items" },
+	{ css_key_color, "color" },
+	{ css_key_font_family, "font-family" },
+	{ css_key_font_size, "font-size" },
+	{ css_key_font_style, "font-style" },
+	{ css_key_text_align, "text-align" },
+	{ css_key_line_height, "line-height" },
+	{ css_key_content, "content" },
+	{ css_key_white_space, "white-space" }
 };
 
 /** 样式字符串与标识码的映射表 */
