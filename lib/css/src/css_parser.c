@@ -906,7 +906,7 @@ static void CSSParser_EndParseSheet(LCUI_CSSParserContext ctx)
 	for (list_each(node, &ctx->style.selectors)) {
 		LCUI_PutStyleSheet(node->data, ctx->style.sheet, ctx->space);
 	}
-	list_destroy(&ctx->style.selectors, (FuncPtr)Selector_Delete);
+	list_destroy(&ctx->style.selectors, (list_item_destructor_t)Selector_Delete);
 	StyleSheet_Delete(ctx->style.sheet);
 }
 
@@ -1165,7 +1165,7 @@ LCUI_CSSParserContext CSSParser_Begin(size_t buffer_size, const char *space)
 
 void CSSParser_End(LCUI_CSSParserContext ctx)
 {
-	list_destroy(&ctx->style.selectors, (FuncPtr)Selector_Delete);
+	list_destroy(&ctx->style.selectors, (list_item_destructor_t)Selector_Delete);
 	CSSParser_FreeFontFaceRuleParser(ctx);
 	if (ctx->space) {
 		free(ctx->space);
