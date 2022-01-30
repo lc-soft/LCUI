@@ -1,5 +1,6 @@
 ﻿#include <string.h>
 #include <LCUI/util.h>
+#include <LCUI/css/parser.h>
 #include "../include/ui.h"
 #include "internal.h"
 

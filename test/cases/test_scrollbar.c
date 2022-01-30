@@ -2,7 +2,7 @@
 #include <LCUI/ui.h>
 #include <LCUI/gui/widget/scrollbar.h>
 #include <LCUI/gui/builder.h>
-#include <LCUI/gui/css_parser.h>
+#include <LCUI/css.h>
 #include <LCUI/gui/widget/textview.h>
 #include "ctest.h"
 

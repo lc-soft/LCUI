@@ -32,7 +32,6 @@
 #define LCUI_CSS_FONT_STYLE_H
 
 #include <LCUI/font/textstyle.h>
-#include <LCUI/gui/css_library.h>
 
 LCUI_BEGIN_HEADER
 

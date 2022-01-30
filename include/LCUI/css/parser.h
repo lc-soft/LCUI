@@ -28,10 +28,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LIBCSS_INCLUDE_PARSER_H
-#define LIBCSS_INCLUDE_PARSER_H
+#ifndef LIBCSS_INCLUDE_CSS_PARSER_H
+#define LIBCSS_INCLUDE_CSS_PARSER_H
 
 #include <LCUI/header.h>
+#include "def.h"
 
 LCUI_BEGIN_HEADER
 
@@ -63,6 +64,7 @@ typedef enum css_rule_type_t {
 typedef struct css_parser_t css_parser_t;
 typedef struct css_style_parser_t css_style_parser_t;
 typedef int (*css_parser_method_t)(css_parser_t *);
+typedef int (*css_property_parser_method_t)(css_style_parser_t *, const char *);
 
 typedef struct css_rule_parser_t {
 	char name[32];
@@ -74,7 +76,7 @@ typedef struct css_rule_parser_t {
 typedef struct css_property_parser_t {
 	int key; /**< 标识，在解析数据时可以使用它访问样式表中的自定义属性 */
 	char *name; /**< 名称，对应 CSS 样式属性名称 */
-	int (*parse)(css_style_parser_t *, const char *);
+	css_property_parser_method_t parse;
 } css_property_parser_t;
 
 typedef struct css_style_parser_t {
@@ -113,6 +115,8 @@ struct css_parser_t {
 	css_rule_parser_t rule_parsers[CSS_RULE_TOTAL_NUM];
 };
 
+// css parser
+
 INLINE void css_parser_get_char(css_parser_t *parser)
 {
 	parser->buffer[parser->pos++] = *(parser->cur);
@@ -133,7 +137,10 @@ LCUI_API size_t css_parser_parse(css_parser_t *parser, const char *str);
 LCUI_API int css_parser_begin_parse_comment(css_parser_t *parser);
 
 LCUI_API int css_register_property_parser(int key, const char *name,
-					  css_parser_method_t parse);
+					  css_property_parser_method_t parse);
+
+
+// css style parser
 
 LCUI_API void css_style_parser_init(css_style_parser_t *parser,
 				    const char *space);
@@ -145,11 +152,23 @@ LCUI_API void css_style_parser_set_property(css_style_parser_t *ctx, int key,
 
 LCUI_API void css_style_parser_commit(css_style_parser_t *parser);
 
+
+// css property parser
+
 LCUI_API void css_init_preset_property_parsers(void);
 
 LCUI_API void css_destroy_preset_property_parsers(void);
 
-#include <LCUI/gui/css_font_face_parser.h>
+
+// css font face parser
+
+LCUI_API void css_font_face_parser_on_load(css_parser_t *ctx,
+				       void(*func)(const css_font_face_t *));
+
+LCUI_API int css_font_face_parser_init(css_parser_t *ctx);
+
+LCUI_API void css_font_face_parser_destroy(css_parser_t *ctx);
+
 
 LCUI_END_HEADER
 

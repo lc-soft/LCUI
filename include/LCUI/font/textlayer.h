@@ -35,6 +35,12 @@
 
 LCUI_BEGIN_HEADER
 
+typedef enum LCUI_TextAlgin {
+	LCUI_TEXT_LEFT,
+	LCUI_TEXT_RIGHT,
+	LCUI_TEXT_CENTER
+} LCUI_TextAlgin;
+
 typedef struct LCUI_TextCharRec_ {
 	wchar_t code;                  /**< 字符码 */
 	LCUI_TextStyle style;          /**< 该字符使用的样式数据 */

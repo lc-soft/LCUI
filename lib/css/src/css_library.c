@@ -32,11 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <LCUI/header.h>
-#include <LCUI/types.h>
-#include <LCUI/util.h>
-#include <LCUI/gui/css_library.h>
-#include <LCUI/gui/css_parser.h>
+#include "../include/css/library.h"
 
 #define MAX_NAME_LEN 256
 #define LEN(A) sizeof(A) / sizeof(*A)
@@ -1185,6 +1181,11 @@ static void css_style_link_destroy(css_style_link_t *link)
 	free(link);
 }
 
+static void css_style_link_destructor(void *privdata, void *data)
+{
+	css_style_link_destroy(data);
+}
+
 static css_style_link_group_t *css_style_link_group_create(css_selector_node_t *snode)
 {
 	static dict_type_t dt = { 0 };
@@ -1693,11 +1694,6 @@ static void css_destroy_cache(void)
 	css.cache = NULL;
 }
 
-static void css_style_link_destructor(void *privdata, void *data)
-{
-	css_style_link_destroy(data);
-}
-
 static void css_init_properties(void)
 {
 	static dict_type_t dt = { 0 };
@@ -1708,7 +1704,7 @@ static void css_init_properties(void)
 	dt.val_destructor = names_dict_value_destructor;
 	dt.hash_function = ikey_dict_hash;
 	dt.key_destructor = ikey_dict_key_destructor;
-	css.properties = dict_create(dt, NULL);
+	css.properties = dict_create(&dt, NULL);
 }
 
 static void css_destroy_properties(void)
