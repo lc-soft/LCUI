@@ -100,6 +100,16 @@ typedef enum css_property_key_t {
 	css_key_align_items,
 	// flex style end
 
+	css_key_color,
+	css_key_font_size,
+	css_key_font_style,
+	css_key_font_weight,
+	css_key_font_family,
+	css_key_line_height,
+	css_key_text_align,
+	css_key_content,
+	css_key_white_space,
+
 	css_key_pointer_events,
 	css_key_focusable,
 	STYLE_KEY_TOTAL

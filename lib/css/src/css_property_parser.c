@@ -127,6 +127,17 @@ static int css_parse_number_value(css_style_parser_t *parser, const char *str)
 	return -1;
 }
 
+static int css_parse_string_value(css_style_parser_t *parser, const char *str)
+{
+	css_unit_value_t s;
+
+	s.is_valid = TRUE;
+	s.type = CSS_UNIT_STRING;
+	s.val_string = strdup2(str);
+	set_current_property(&s);
+	return 0;
+}
+
 static int css_parse_boolean_value(css_style_parser_t *parser, const char *str)
 {
 	css_unit_value_t s = { 0 };
@@ -790,6 +801,52 @@ static int css_parse_flex_shrink_property(css_style_parser_t *parser,
 	return -1;
 }
 
+static int css_parse_font_style_property(css_style_parser_t *parser, const char *str)
+{
+	css_unit_value_t s;
+
+	if (css_parse_font_style(str, &s.val_int)) {
+		s.is_valid = TRUE;
+		s.type = CSS_UNIT_INT;
+		set_current_property(&s);
+		return 0;
+	}
+	return -1;
+}
+
+static int css_parse_font_weight_property(css_style_parser_t *parser, const char *str)
+{
+	css_unit_value_t s;
+
+	if (css_parse_font_weight(str, &s.val_int)) {
+		s.is_valid = TRUE;
+		s.type = CSS_UNIT_INT;
+		set_current_property(&s);
+		return 0;
+	}
+	return -1;
+}
+
+static int css_parse_text_value(css_style_parser_t *parser, const char *str)
+{
+	size_t len;
+	css_unit_value_t s;
+
+	len = strlen(str);
+	if (len < 1 || (str[0] == '"' && str[len - 1] != '"')) {
+		return -1;
+	}
+	s.is_valid = TRUE;
+	s.type = CSS_UNIT_STRING;
+	s.val_string = malloc(sizeof(char) * (len + 1));
+	if (!s.val_string) {
+		return -1;
+	}
+	strcpy(s.val_string, str);
+	set_current_property(&s);
+	return 0;
+}
+
 css_property_parser_t *css_get_property_parser(const char *name)
 {
 	return dict_fetch_value(css_property_parser.dict, name);
@@ -915,6 +972,16 @@ void css_init_preset_property_parsers(void)
 	register_parser(css_key_justify_content, NULL, css_parse_keyword_value);
 	register_parser(css_key_align_content, NULL, css_parse_keyword_value);
 	register_parser(css_key_align_items, NULL, css_parse_keyword_value);
+
+	// css properties for text rendering
+	register_parser(css_key_color, NULL, css_parse_color_value);
+	register_parser(css_key_font_family, NULL, css_parse_string_value);
+	register_parser(css_key_font_size, NULL, css_parse_number_value);
+	register_parser(css_key_font_style, NULL, css_parse_font_style_property);
+	register_parser(css_key_text_align, NULL, css_parse_keyword_value);
+	register_parser(css_key_line_height, NULL, css_parse_number_value);
+	register_parser(css_key_content, NULL, css_parse_text_value);
+	register_parser(css_key_white_space, NULL, css_parse_keyword_value);
 
 	register_parser(-1, "border", css_parse_border_property);
 	register_parser(-1, "border-left", css_parse_border_left_property);

@@ -2,7 +2,7 @@
 #include <LCUI.h>
 #include <LCUI/font.h>
 #include <LCUI/css.h>
-#include <LCUI/gui/css_fontstyle.h>
+#include <LCUI/gui/ui_font_style.h>
 #include "../include/ui.h"
 #include "internal.h"
 
@@ -79,13 +79,11 @@ void ui_init_css(void)
 {
 	css_init();
 	css_init_preset_property_parsers();
-	LCUI_InitCSSFontStyle();
 	ui_load_css_string(ui_default_css, __FILE__);
 }
 
 void ui_destroy_css(void)
 {
-	LCUI_FreeCSSFontStyle();
 	css_destroy_preset_property_parsers();
 	css_destroy();
 }
