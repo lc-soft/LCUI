@@ -86,7 +86,8 @@ void ExecuteCallback(LCUI_BOOL timed_out)
 		LCUIThread_Cancel(clipboard.observer_thread);
 	}
 	LCUI_ClipboardCallback callback = clipboard.callback;
-	LCUI_Clipboard clipboard_data;
+	LCUI_ClipboardRec clipboard_data = { 0 };
+	wchar_t *wstr = NULL;
 
 	if (!callback->running) {
 		_DEBUG_MSG("Tried to ExecuteCallback before copying started\n");
@@ -94,19 +95,20 @@ void ExecuteCallback(LCUI_BOOL timed_out)
 	}
 	if (timed_out) {
 		_DEBUG_MSG("Callback timed out\n");
-		clipboard_data = NULL;
 	} else {
 		size_t len = clipboard.text_len + 1;
-		wchar_t *wstr = malloc(sizeof(wchar_t) * len);
+		wstr = malloc(sizeof(wchar_t) * len);
 		len = decode_utf8(wstr, clipboard.text, len);
 		wstr[len] = 0;
 		// Assign the data
-		clipboard_data = malloc(sizeof(LCUI_ClipboardRec));
-		clipboard_data->text = wstr;
-		clipboard_data->len = len;
-		clipboard_data->image = NULL;
+		clipboard_data.text = wstr;
+		clipboard_data.len = len;
+		clipboard_data.image = NULL;
 	}
-	callback->action(clipboard_data, callback->arg);
+	callback->action(&clipboard_data, callback->arg);
+	if (wstr != NULL) {
+		free(wstr);
+	}
 	// Reset properties, so if something goes wrongly, we crash
 	// instead of having undefined behaviour
 	callback->arg = NULL;
@@ -149,7 +151,8 @@ void RequestClipboardContent(void)
 	// retrieved from UTF8_STRING, however, our implementation is not
 	// synchronous, so not sure how it would work, it needs further
 	// investigation
-	LCUIThread_Create(&clipboard.observer_thread, ClipboardRequestTimeout, NULL);
+	LCUIThread_Create(&clipboard.observer_thread, ClipboardRequestTimeout,
+			  NULL);
 	Atom XSEL_DATA = XInternAtom(display, "XSEL_DATA", FALSE);
 	XConvertSelection(display, clipboard.xclipboard, clipboard.xutf8_string,
 			  XSEL_DATA, window, CurrentTime);
