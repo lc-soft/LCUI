@@ -194,7 +194,7 @@ typedef enum css_unit_t {
 	CSS_UNIT_SP,
 	CSS_UNIT_COLOR,
 	CSS_UNIT_IMAGE,
-	CSS_UNIT_STYLE,
+	CSS_UNIT_KEYWORD,
 	CSS_UNIT_INT,
 	CSS_UNIT_BOOL,
 	CSS_UNIT_STRING,
@@ -206,7 +206,7 @@ typedef enum css_unit_t {
 #define CSS_UNIT_int CSS_UNIT_INT
 #define CSS_UNIT_color CSS_UNIT_COLOR
 #define CSS_UNIT_scale CSS_UNIT_SCALE
-#define CSS_UNIT_style CSS_UNIT_STYLE
+#define CSS_UNIT_keyword CSS_UNIT_KEYWORD
 #define CSS_UNIT_bool CSS_UNIT_BOOL
 #define CSS_UNIT_image CSS_UNIT_IMAGE
 #define CSS_UNIT_string CSS_UNIT_STRING
@@ -219,7 +219,7 @@ typedef enum css_unit_t {
 
 typedef struct css_unit_value_t {
 	LCUI_BOOL is_valid : 2;
-	css_unit_t type : 6;
+	css_unit_t unit : 6;
 	union {
 		int val_int;
 		int val_0;
@@ -235,8 +235,8 @@ typedef struct css_unit_value_t {
 		float val_dip;
 		float sp;
 		float val_sp;
-		css_keyword_value_t style;
-		css_keyword_value_t val_style;
+		css_keyword_value_t keyword;
+		css_keyword_value_t val_keyword;
 		float scale;
 		float val_scale;
 		char *string;

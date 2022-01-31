@@ -69,18 +69,18 @@ LCUI_BOOL css_parse_number(css_unit_value_t *s, const char *str)
 	switch (*p) {
 	case 'd':
 	case 'D':
-		s->type = CSS_UNIT_NONE;
+		s->unit = CSS_UNIT_NONE;
 		if (!p[1]) {
 			break;
 		}
 		if (p[1] == 'p' || p[1] == 'P') {
-			s->type = CSS_UNIT_DIP;
+			s->unit = CSS_UNIT_DIP;
 			sscanf(num_str, "%f", &s->dip);
 			break;
 		}
 		if (p[1] == 'i' || p[1] == 'I') {
 			if (p[2] == 'p' || p[2] == 'P') {
-				s->type = CSS_UNIT_DIP;
+				s->unit = CSS_UNIT_DIP;
 				sscanf(num_str, "%f", &s->dip);
 				break;
 			}
@@ -89,22 +89,22 @@ LCUI_BOOL css_parse_number(css_unit_value_t *s, const char *str)
 	case 's':
 	case 'S':
 		if (p[1] == 'p' || p[1] == 'P') {
-			s->type = CSS_UNIT_SP;
+			s->unit = CSS_UNIT_SP;
 			sscanf(num_str, "%f", &s->sp);
 		} else {
-			s->type = CSS_UNIT_NONE;
+			s->unit = CSS_UNIT_NONE;
 		}
 		break;
 	case 'P':
 	case 'p':
 		if (p[1] == 'x' || p[1] == 'X') {
-			s->type = CSS_UNIT_PX;
+			s->unit = CSS_UNIT_PX;
 			sscanf(num_str, "%f", &s->px);
 		} else if (p[1] == 't' || p[1] == 'T') {
-			s->type = CSS_UNIT_PT;
+			s->unit = CSS_UNIT_PT;
 			sscanf(num_str, "%f", &s->pt);
 		} else {
-			s->type = CSS_UNIT_NONE;
+			s->unit = CSS_UNIT_NONE;
 		}
 		break;
 	case '%':
@@ -112,19 +112,19 @@ LCUI_BOOL css_parse_number(css_unit_value_t *s, const char *str)
 			return FALSE;
 		}
 		s->scale /= 100.0;
-		s->type = CSS_UNIT_SCALE;
+		s->unit = CSS_UNIT_SCALE;
 		break;
 	case 0:
 		if (has_point && 1 == sscanf(num_str, "%f", &s->scale)) {
-			s->type = CSS_UNIT_SCALE;
+			s->unit = CSS_UNIT_SCALE;
 			break;
 		}
 		if (1 == sscanf(num_str, "%d", &s->val_int)) {
-			s->type = CSS_UNIT_INT;
+			s->unit = CSS_UNIT_INT;
 			break;
 		}
 	default:
-		s->type = CSS_UNIT_NONE;
+		s->unit = CSS_UNIT_NONE;
 		s->is_valid = FALSE;
 		return FALSE;
 	}
@@ -163,7 +163,7 @@ LCUI_BOOL css_parse_rgba(css_unit_value_t *var, const char *str)
 	if (*p) {
 		return FALSE;
 	}
-	var->type = CSS_UNIT_COLOR;
+	var->unit = CSS_UNIT_COLOR;
 	var->color.a = (uchar_t)(255.0 * data[3]);
 	var->color.r = (uchar_t)data[0];
 	var->color.g = (uchar_t)data[1];
@@ -203,7 +203,7 @@ LCUI_BOOL css_parse_rgb(css_unit_value_t *var, const char *str)
 	if (*p) {
 		return FALSE;
 	}
-	var->type = CSS_UNIT_COLOR;
+	var->unit = CSS_UNIT_COLOR;
 	var->color.a = 255;
 	var->color.r = (uchar_t)data[0];
 	var->color.g = (uchar_t)data[1];
@@ -254,7 +254,7 @@ LCUI_BOOL css_parse_color(css_unit_value_t *var, const char *str)
 	default:break;
 	}
 	if (status == 3) {
-		var->type = CSS_UNIT_COLOR;
+		var->unit = CSS_UNIT_COLOR;
 		var->color.a = 255;
 		var->color.r = r;
 		var->color.g = g;
@@ -268,7 +268,7 @@ LCUI_BOOL css_parse_color(css_unit_value_t *var, const char *str)
 		var->color.red = 255;
 		var->color.green = 255;
 		var->color.blue = 255;
-		var->type = CSS_UNIT_COLOR;
+		var->unit = CSS_UNIT_COLOR;
 		return TRUE;
 	}
 	return FALSE;
@@ -307,7 +307,7 @@ LCUI_BOOL css_parse_url(css_unit_value_t *s, const char *str, const char *dirnam
 		++head;
 	}
 	n = tail - head;
-	s->type = CSS_UNIT_STRING;
+	s->unit = CSS_UNIT_STRING;
 	if (dirname && !css_check_absolute_path(head)) {
 		n += (dirname_len = strlen(dirname));
 		s->val_string = malloc((n + 2) * sizeof(char));

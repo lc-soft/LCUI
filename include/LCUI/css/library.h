@@ -77,7 +77,7 @@ LCUI_API css_style_decl_t *css_style_declaration_create(void);
 INLINE LCUI_BOOL css_style_declaration_check_property(
     css_style_decl_t *style, css_property_key_t key, css_unit_t unit)
 {
-	return style->sheet[key].is_valid && style->sheet[key].type == unit;
+	return style->sheet[key].is_valid && style->sheet[key].unit == unit;
 }
 
 LCUI_API void css_style_declaration_clear(css_style_decl_t *ss);

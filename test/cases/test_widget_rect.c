@@ -19,7 +19,8 @@ void test_widget_rect(void)
 	parent = ui_create_widget("button");
 	child = ui_create_widget("textview");
 
-	ui_widget_set_style(parent, css_key_box_sizing, CSS_KEYWORD_BORDER_BOX, style);
+	ui_widget_set_style(parent, css_key_box_sizing, CSS_KEYWORD_BORDER_BOX,
+			    keyword);
 	ui_widget_resize(root, 200, 200);
 	ui_widget_resize(parent, 100, 100);
 	ui_widget_resize(child, 50, 50);

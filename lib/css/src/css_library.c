@@ -470,7 +470,7 @@ css_style_props_t *css_style_properties_create(void)
 
 void css_unit_value_destroy(css_unit_value_t *s)
 {
-	switch (s->type) {
+	switch (s->unit) {
 	case CSS_UNIT_STRING:
 		if (s->is_valid && s->string) {
 			free(s->string);
@@ -491,7 +491,7 @@ void css_unit_value_destroy(css_unit_value_t *s)
 
 void css_unit_value_merge(css_unit_value_t *dst, css_unit_value_t *src)
 {
-	switch (src->type) {
+	switch (src->unit) {
 	case CSS_UNIT_STRING:
 		dst->string = strdup2(src->string);
 		break;
@@ -503,7 +503,7 @@ void css_unit_value_merge(css_unit_value_t *dst, css_unit_value_t *src)
 		break;
 	}
 	dst->is_valid = TRUE;
-	dst->type = src->type;
+	dst->unit = src->unit;
 }
 
 static void css_style_property_destroy(css_style_property_t *node)
@@ -585,7 +585,7 @@ css_style_property_t *css_style_properties_add(css_style_props_t *list, int key)
 	node = malloc(sizeof(css_style_property_t));
 	node->key = key;
 	node->style.is_valid = FALSE;
-	node->style.type = CSS_UNIT_NONE;
+	node->style.unit = CSS_UNIT_NONE;
 	node->node.data = node;
 	list_append_node(list, &node->node);
 	return node;
@@ -1443,7 +1443,7 @@ static void css_print_property_name(int key)
 
 static void css_unit_value_print(css_unit_value_t *s)
 {
-	switch (s->type) {
+	switch (s->unit) {
 	case CSS_UNIT_AUTO:
 		logger_debug("auto");
 		break;
@@ -1478,8 +1478,8 @@ static void css_unit_value_print(css_unit_value_t *s)
 	case CSS_UNIT_SCALE:
 		logger_debug("%g%%", s->val_scale * 100);
 		break;
-	case CSS_UNIT_STYLE:
-		logger_debug("%s", css_get_keyword_name(s->val_style));
+	case CSS_UNIT_KEYWORD:
+		logger_debug("%s", css_get_keyword_name(s->val_keyword));
 		break;
 	case CSS_UNIT_INT:
 		logger_debug("%d", s->val_int);
