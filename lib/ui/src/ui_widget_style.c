@@ -10,17 +10,17 @@ INLINE int ui_widget_compute_style_option(ui_widget_t* w, int key,
 					  int default_value)
 {
 	if (!w->style->sheet[key].is_valid ||
-	    w->style->sheet[key].type != CSS_UNIT_STYLE) {
+	    w->style->sheet[key].unit != CSS_UNIT_KEYWORD) {
 		return default_value;
 	}
-	return w->style->sheet[key].style;
+	return w->style->sheet[key].val_keyword;
 }
 
 static float ui_widget_compute_metric_x(ui_widget_t* w, int key)
 {
 	css_unit_value_t *s = &w->style->sheet[key];
 
-	if (s->type == CSS_UNIT_SCALE) {
+	if (s->unit == CSS_UNIT_SCALE) {
 		if (!w->parent) {
 			return 0;
 		}
@@ -29,14 +29,14 @@ static float ui_widget_compute_metric_x(ui_widget_t* w, int key)
 		}
 		return w->parent->box.content.width * s->scale;
 	}
-	return ui_compute(s->value, s->type);
+	return ui_compute(s->value, s->unit);
 }
 
 static float ui_widget_compute_metric_y(ui_widget_t* w, int key)
 {
 	css_unit_value_t *s = &w->style->sheet[key];
 
-	if (s->type == CSS_UNIT_SCALE) {
+	if (s->unit == CSS_UNIT_SCALE) {
 		if (!w->parent) {
 			return 0;
 		}
@@ -45,7 +45,7 @@ static float ui_widget_compute_metric_y(ui_widget_t* w, int key)
 		}
 		return w->parent->box.content.height * s->scale;
 	}
-	return ui_compute(s->value, s->type);
+	return ui_compute(s->value, s->unit);
 }
 
 void ui_widget_compute_padding_style(ui_widget_t* w)
@@ -93,7 +93,7 @@ void ui_widget_compute_properties(ui_widget_t* w)
 	s = &w->style->sheet[css_key_focusable];
 	style->pointer_events =
 	    ui_widget_compute_style_option(w, css_key_pointer_events, CSS_KEYWORD_INHERIT);
-	if (s->is_valid && s->type == CSS_UNIT_BOOL && s->val_bool == 0) {
+	if (s->is_valid && s->unit == CSS_UNIT_BOOL && s->val_bool == 0) {
 		style->focusable = FALSE;
 	} else {
 		style->focusable = TRUE;
@@ -325,7 +325,7 @@ void ui_widget_compute_visibility_style(ui_widget_t* w)
 
 	if (w->computed_style.display == CSS_KEYWORD_NONE) {
 		w->computed_style.visible = FALSE;
-	} else if (s->is_valid && s->type == CSS_UNIT_STRING &&
+	} else if (s->is_valid && s->unit == CSS_UNIT_STRING &&
 		   strcmp(s->val_string, "hidden") == 0) {
 		w->computed_style.visible = FALSE;
 	} else {
@@ -338,8 +338,8 @@ void ui_widget_compute_display_style(ui_widget_t* w)
 	css_unit_value_t *s = &w->style->sheet[css_key_display];
 	ui_widget_style_t* style = &w->computed_style;
 
-	if (s->is_valid && s->type == CSS_UNIT_STYLE) {
-		style->display = s->style;
+	if (s->is_valid && s->unit == CSS_UNIT_KEYWORD) {
+		style->display = s->keyword;
 		if (style->display == CSS_KEYWORD_NONE) {
 			w->computed_style.visible = FALSE;
 		}
@@ -355,7 +355,7 @@ void ui_widget_compute_opacity_style(ui_widget_t* w)
 	css_unit_value_t *s = &w->style->sheet[css_key_opacity];
 
 	if (s->is_valid) {
-		switch (s->type) {
+		switch (s->unit) {
 		case CSS_UNIT_INT:
 			opacity = 1.0f * s->val_int;
 			break;
@@ -379,7 +379,7 @@ void ui_widget_compute_zindex_style(ui_widget_t* w)
 {
 	css_unit_value_t *s = &w->style->sheet[css_key_z_index];
 
-	if (s->is_valid && s->type == CSS_UNIT_INT) {
+	if (s->is_valid && s->unit == CSS_UNIT_INT) {
 		w->computed_style.z_index = s->val_int;
 	} else {
 		w->computed_style.z_index = 0;
@@ -424,32 +424,32 @@ void ui_widget_compute_flex_style(ui_widget_t* w)
 	/* Compute style */
 
 	if (s[css_key_flex_grow].is_valid &&
-	    s[css_key_flex_grow].type == CSS_UNIT_INT) {
+	    s[css_key_flex_grow].unit == CSS_UNIT_INT) {
 		flex->grow = 1.f * s[css_key_flex_grow].val_int;
 	}
 	if (s[css_key_flex_shrink].is_valid &&
-	    s[css_key_flex_shrink].type == CSS_UNIT_INT) {
+	    s[css_key_flex_shrink].unit == CSS_UNIT_INT) {
 		flex->shrink = 1.f * s[css_key_flex_shrink].val_int;
 	}
 	if (s[css_key_flex_wrap].is_valid &&
-	    s[css_key_flex_wrap].type == CSS_UNIT_STYLE) {
-		flex->wrap = s[css_key_flex_wrap].val_style;
+	    s[css_key_flex_wrap].unit == CSS_UNIT_KEYWORD) {
+		flex->wrap = s[css_key_flex_wrap].val_keyword;
 	}
 	if (s[css_key_flex_direction].is_valid &&
-	    s[css_key_flex_direction].type == CSS_UNIT_STYLE) {
-		flex->direction = s[css_key_flex_direction].val_style;
+	    s[css_key_flex_direction].unit == CSS_UNIT_KEYWORD) {
+		flex->direction = s[css_key_flex_direction].val_keyword;
 	}
 	if (s[css_key_justify_content].is_valid &&
-	    s[css_key_justify_content].type == CSS_UNIT_STYLE) {
-		flex->justify_content = s[css_key_justify_content].val_style;
+	    s[css_key_justify_content].unit == CSS_UNIT_KEYWORD) {
+		flex->justify_content = s[css_key_justify_content].val_keyword;
 	}
 	if (s[css_key_align_content].is_valid &&
-	    s[css_key_align_content].type == CSS_UNIT_STYLE) {
-		flex->align_content = s[css_key_align_content].val_style;
+	    s[css_key_align_content].unit == CSS_UNIT_KEYWORD) {
+		flex->align_content = s[css_key_align_content].val_keyword;
 	}
 	if (s[css_key_align_items].is_valid &&
-	    s[css_key_align_items].type == CSS_UNIT_STYLE) {
-		flex->align_items = s[css_key_align_items].val_style;
+	    s[css_key_align_items].unit == CSS_UNIT_KEYWORD) {
+		flex->align_items = s[css_key_align_items].val_keyword;
 	}
 	ui_widget_compute_flex_basis_style(w);
 }

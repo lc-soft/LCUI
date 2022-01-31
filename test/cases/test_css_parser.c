@@ -11,7 +11,7 @@ static void test_btn_text_style(void)
 	s = ui_get_widget("test-textview")->style->sheet;
 	it_i("width", (int)s[css_key_width].val_px, 100);
 	it_i("height", (int)s[css_key_height].val_px, 60);
-	it_i("position", s[css_key_position].val_style, CSS_KEYWORD_ABSOLUTE);
+	it_i("position", s[css_key_position].val_keyword, CSS_KEYWORD_ABSOLUTE);
 	it_i("top", (int)s[css_key_top].val_px, 12);
 	it_i("left", (int)s[css_key_left].val_px, 20);
 }
@@ -23,7 +23,7 @@ static void test_btn_hover_text_style(void)
 	s = ui_get_widget("test-textview")->style->sheet;
 	it_i("background-color", s[css_key_background_color].val_color.value,
 	     0xffff0000);
-	it_i("background-size", s[css_key_background_size].val_style, CSS_KEYWORD_CONTAIN);
+	it_i("background-size", s[css_key_background_size].val_keyword, CSS_KEYWORD_CONTAIN);
 }
 
 static void test_flex_box(void)
@@ -33,12 +33,12 @@ static void test_flex_box(void)
 	s = ui_get_widget("test-flex-box")->style->sheet;
 	it_i("flex-grow", s[css_key_flex_grow].val_int, 0);
 	it_i("flex-shrink", s[css_key_flex_shrink].val_int, 0);
-	it_i("flex-basis", s[css_key_flex_basis].val_style, CSS_KEYWORD_AUTO);
-	it_i("flex-direction", s[css_key_flex_direction].val_style, CSS_KEYWORD_COLUMN);
-	it_i("flex-wrap", s[css_key_flex_wrap].val_style, CSS_KEYWORD_NOWRAP);
-	it_i("justify-content", s[css_key_justify_content].val_style, CSS_KEYWORD_CENTER);
-	it_i("align-items", s[css_key_align_items].val_style, CSS_KEYWORD_FLEX_END);
-	it_i("align-content", s[css_key_align_content].val_style, CSS_KEYWORD_FLEX_END);
+	it_i("flex-basis", s[css_key_flex_basis].val_keyword, CSS_KEYWORD_AUTO);
+	it_i("flex-direction", s[css_key_flex_direction].val_keyword, CSS_KEYWORD_COLUMN);
+	it_i("flex-wrap", s[css_key_flex_wrap].val_keyword, CSS_KEYWORD_NOWRAP);
+	it_i("justify-content", s[css_key_justify_content].val_keyword, CSS_KEYWORD_CENTER);
+	it_i("align-items", s[css_key_align_items].val_keyword, CSS_KEYWORD_FLEX_END);
+	it_i("align-content", s[css_key_align_content].val_keyword, CSS_KEYWORD_FLEX_END);
 }
 
 static void test_parse_flex_initial(void)
@@ -48,7 +48,7 @@ static void test_parse_flex_initial(void)
 	s = ui_get_widget("test-flex-initial")->style->sheet;
 	it_i("<flex-grow>", s[css_key_flex_grow].val_int, 0);
 	it_i("<flex-shrink>", s[css_key_flex_shrink].val_int, 1);
-	it_i("<flex-basis>", s[css_key_flex_basis].val_style, CSS_KEYWORD_AUTO);
+	it_i("<flex-basis>", s[css_key_flex_basis].val_keyword, CSS_KEYWORD_AUTO);
 }
 static void test_parse_flex_auto(void)
 {
@@ -57,7 +57,7 @@ static void test_parse_flex_auto(void)
 	s = ui_get_widget("test-flex-auto")->style->sheet;
 	it_i("<flex-grow>", s[css_key_flex_grow].val_int, 1);
 	it_i("<flex-shrink>", s[css_key_flex_shrink].val_int, 1);
-	it_i("<flex-basis>", s[css_key_flex_basis].val_style, CSS_KEYWORD_AUTO);
+	it_i("<flex-basis>", s[css_key_flex_basis].val_keyword, CSS_KEYWORD_AUTO);
 }
 
 static void test_parse_flex_none(void)
@@ -67,7 +67,7 @@ static void test_parse_flex_none(void)
 	s = ui_get_widget("test-flex-none")->style->sheet;
 	it_i("<flex-grow>", s[css_key_flex_grow].val_int, 0);
 	it_i("<flex-shrink>", s[css_key_flex_shrink].val_int, 0);
-	it_i("<flex-basis>", s[css_key_flex_basis].val_style, CSS_KEYWORD_AUTO);
+	it_i("<flex-basis>", s[css_key_flex_basis].val_keyword, CSS_KEYWORD_AUTO);
 }
 
 static void test_parse_flex_1(void)

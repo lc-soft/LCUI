@@ -4,7 +4,7 @@
 #include "internal.h"
 
 void ui_widget_set_padding(ui_widget_t* w, float top, float right, float bottom,
-		       float left)
+			   float left)
 {
 	ui_widget_set_style(w, css_key_padding_top, top, px);
 	ui_widget_set_style(w, css_key_padding_right, right, px);
@@ -14,7 +14,7 @@ void ui_widget_set_padding(ui_widget_t* w, float top, float right, float bottom,
 }
 
 void ui_widget_set_margin(ui_widget_t* w, float top, float right, float bottom,
-		      float left)
+			  float left)
 {
 	ui_widget_set_style(w, css_key_margin_top, top, px);
 	ui_widget_set_style(w, css_key_margin_right, right, px);
@@ -43,13 +43,14 @@ void ui_widget_set_border_width(ui_widget_t* w, float width)
 
 void ui_widget_set_border_style(ui_widget_t* w, int style)
 {
-	ui_widget_set_style(w, css_key_border_top_style, style, style);
-	ui_widget_set_style(w, css_key_border_right_style, style, style);
-	ui_widget_set_style(w, css_key_border_bottom_style, style, style);
-	ui_widget_set_style(w, css_key_border_left_style, style, style);
+	ui_widget_set_style(w, css_key_border_top_style, style, keyword);
+	ui_widget_set_style(w, css_key_border_right_style, style, keyword);
+	ui_widget_set_style(w, css_key_border_bottom_style, style, keyword);
+	ui_widget_set_style(w, css_key_border_left_style, style, keyword);
 }
 
-void ui_widget_set_border(ui_widget_t* w, float width, int style, pd_color_t color)
+void ui_widget_set_border(ui_widget_t* w, float width, int style,
+			  pd_color_t color)
 {
 	ui_widget_set_border_color(w, color);
 	ui_widget_set_border_width(w, width);
@@ -57,7 +58,7 @@ void ui_widget_set_border(ui_widget_t* w, float width, int style, pd_color_t col
 }
 
 void ui_widget_set_box_shadow(ui_widget_t* w, float x, float y, float blur,
-			 pd_color_t color)
+			      pd_color_t color)
 {
 	ui_widget_set_style(w, css_key_box_shadow_x, x, px);
 	ui_widget_set_style(w, css_key_box_shadow_y, y, px);
@@ -80,9 +81,9 @@ void ui_widget_resize(ui_widget_t* w, float width, float height)
 	ui_widget_update_style(w);
 }
 
-css_unit_value_t *ui_widget_get_style(ui_widget_t* w, int key)
+css_unit_value_t* ui_widget_get_style(ui_widget_t* w, int key)
 {
-	css_style_property_t *node;
+	css_style_property_t* node;
 
 	if (w->custom_style) {
 		node = css_style_properties_find(w->custom_style, key);
@@ -105,9 +106,9 @@ int ui_widget_unset_style(ui_widget_t* w, int key)
 	return css_style_properties_remove(w->custom_style, key);
 }
 
-css_unit_value_t *ui_widget_get_matched_style(ui_widget_t* w, int key)
+css_unit_value_t* ui_widget_get_matched_style(ui_widget_t* w, int key)
 {
-	css_selector_t *selector;
+	css_selector_t* selector;
 
 	if (!w->matched_style) {
 		selector = ui_widget_create_selector(w);
@@ -118,10 +119,10 @@ css_unit_value_t *ui_widget_get_matched_style(ui_widget_t* w, int key)
 	return &w->matched_style->sheet[key];
 }
 
-void ui_widget_set_visibility(ui_widget_t* w, const char *value)
+void ui_widget_set_visibility(ui_widget_t* w, const char* value)
 {
-	css_unit_value_t *s = ui_widget_get_style(w, css_key_visibility);
-	if (s->is_valid && s->type == CSS_UNIT_STRING) {
+	css_unit_value_t* s = ui_widget_get_style(w, css_key_visibility);
+	if (s->is_valid && s->unit == CSS_UNIT_STRING) {
 		free(s->val_string);
 		s->val_string = NULL;
 	}
@@ -131,18 +132,20 @@ void ui_widget_set_visibility(ui_widget_t* w, const char *value)
 
 void ui_widget_show(ui_widget_t* w)
 {
-	css_unit_value_t *s = ui_widget_get_style(w, css_key_display);
+	css_unit_value_t* s = ui_widget_get_style(w, css_key_display);
 
-	if (s->is_valid && s->type == CSS_UNIT_STYLE &&
-	    s->val_style == CSS_KEYWORD_NONE) {
+	if (s->is_valid && s->unit == CSS_UNIT_KEYWORD &&
+	    s->val_keyword == CSS_KEYWORD_NONE) {
 		ui_widget_unset_style(w, css_key_display);
 	} else if (!w->computed_style.visible) {
 		s = ui_widget_get_matched_style(w, css_key_display);
-		if (s->is_valid && s->type == CSS_UNIT_STYLE &&
-		    s->val_style != CSS_KEYWORD_NONE) {
-			ui_widget_set_style(w, css_key_display, s->val_style, style);
+		if (s->is_valid && s->unit == CSS_UNIT_KEYWORD &&
+		    s->val_keyword != CSS_KEYWORD_NONE) {
+			ui_widget_set_style(w, css_key_display, s->val_keyword,
+					    keyword);
 		} else {
-			ui_widget_set_style(w, css_key_display, CSS_KEYWORD_BLOCK, style);
+			ui_widget_set_style(w, css_key_display,
+					    CSS_KEYWORD_BLOCK, keyword);
 		}
 	}
 	ui_widget_update_style(w);
@@ -150,13 +153,13 @@ void ui_widget_show(ui_widget_t* w)
 
 void ui_widget_hide(ui_widget_t* w)
 {
-	ui_widget_set_style(w, css_key_display, CSS_KEYWORD_NONE, style);
+	ui_widget_set_style(w, css_key_display, CSS_KEYWORD_NONE, keyword);
 	ui_widget_update_style(w);
 }
 
 void ui_widget_set_position(ui_widget_t* w, css_keyword_value_t position)
 {
-	ui_widget_set_style(w, css_key_position, position, style);
+	ui_widget_set_style(w, css_key_position, position, keyword);
 	ui_widget_update_style(w);
 }
 
@@ -168,11 +171,11 @@ void ui_widget_set_opacity(ui_widget_t* w, float opacity)
 
 void ui_widget_set_box_sizing(ui_widget_t* w, css_keyword_value_t sizing)
 {
-	ui_widget_set_style(w, css_key_box_sizing, sizing, style);
+	ui_widget_set_style(w, css_key_box_sizing, sizing, keyword);
 	ui_widget_update_style(w);
 }
 
-ui_widget_t* ui_widget_get_closest(ui_widget_t* w, const char *type)
+ui_widget_t* ui_widget_get_closest(ui_widget_t* w, const char* type)
 {
 	ui_widget_t* target;
 
@@ -184,18 +187,18 @@ ui_widget_t* ui_widget_get_closest(ui_widget_t* w, const char *type)
 	return NULL;
 }
 
-static void ui_widget_collect_reference(ui_widget_t* w, void *arg)
+static void ui_widget_collect_reference(ui_widget_t* w, void* arg)
 {
-	const char *ref = ui_widget_get_attribute_value(w, "ref");
+	const char* ref = ui_widget_get_attribute_value(w, "ref");
 
 	if (ref) {
 		dict_add(arg, (void*)ref, w);
 	}
 }
 
-dict_t *ui_widget_collect_references(ui_widget_t* w)
+dict_t* ui_widget_collect_references(ui_widget_t* w)
 {
-	dict_t *dict;
+	dict_t* dict;
 	static dict_type_t t;
 
 	dict_init_string_key_type(&t);

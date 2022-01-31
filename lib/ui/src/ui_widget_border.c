@@ -8,18 +8,18 @@
 
 static float compute_metric_x(ui_widget_t* w, css_unit_value_t *s)
 {
-	if (s->type == CSS_UNIT_SCALE) {
+	if (s->unit == CSS_UNIT_SCALE) {
 		return w->width * s->scale;
 	}
-	return ui_compute(s->value, s->type);
+	return ui_compute(s->value, s->unit);
 }
 
 static float compute_metric_y(ui_widget_t* w, css_unit_value_t *s)
 {
-	if (s->type == CSS_UNIT_SCALE) {
+	if (s->unit == CSS_UNIT_SCALE) {
 		return w->height * s->scale;
 	}
-	return ui_compute(s->value, s->type);
+	return ui_compute(s->value, s->unit);
 }
 
 static unsigned int compute_actual(float width)
@@ -72,16 +72,16 @@ void ui_widget_compute_border_style(ui_widget_t* w)
 			b->left.width = compute_metric_y(w, s);
 			break;
 		case css_key_border_top_style:
-			b->top.style = s->val_style;
+			b->top.style = s->val_keyword;
 			break;
 		case css_key_border_right_style:
-			b->right.style = s->val_style;
+			b->right.style = s->val_keyword;
 			break;
 		case css_key_border_bottom_style:
-			b->bottom.style = s->val_style;
+			b->bottom.style = s->val_keyword;
 			break;
 		case css_key_border_left_style:
-			b->left.style = s->val_style;
+			b->left.style = s->val_keyword;
 			break;
 		case css_key_border_top_left_radius:
 			b->top_left_radius = compute_metric_x(w, s);
