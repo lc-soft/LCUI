@@ -54,12 +54,25 @@ void LCUI_UseClipboard(LCUI_ClipboardAction action, void *arg)
 		len = decode_utf8(wstr, clipboard.text, len);
 		wstr[len] = 0;
 		// Assign the data
-		LCUI_Clipboard clipboard_data = malloc(sizeof(LCUI_ClipboardRec));
-		clipboard_data->text = wstr;
-		clipboard_data->len = len;
-		clipboard_data->image = NULL;
-		action(clipboard_data, arg);
+		LCUI_ClipboardRec clipboard_data = { 0 };
+		clipboard_data.text = wstr;
+		clipboard_data.len = len;
+		clipboard_data.image = NULL;
+		action(&clipboard_data, arg);
+		free(wstr);
 	}
+#else
+	size_t len = clipboard.text_len + 1;
+	wchar_t *wstr = malloc(sizeof(wchar_t) * len);
+	len = decode_utf8(wstr, clipboard.text, len);
+	wstr[len] = 0;
+	// Assign the data
+	LCUI_ClipboardRec clipboard_data = { 0 };
+	clipboard_data.text = wstr;
+	clipboard_data.len = len;
+	clipboard_data.image = NULL;
+	action(&clipboard_data, arg);
+	free(wstr);
 #endif
 }
 
@@ -72,13 +85,22 @@ void LCUI_SetClipboardText(const wchar_t *text, size_t len)
 	} else {
 		if (clipboard.text) {
 			free(clipboard.text);
-		} 
+		}
 		char *raw_text = malloc((len + 1) * sizeof(char));
 		size_t raw_len = wcstombs(raw_text, text, len);
 		raw_text[raw_len] = '\0';
 		clipboard.text = raw_text;
 		clipboard.text_len = raw_len;
 	}
+#else
+	if (clipboard.text) {
+		free(clipboard.text);
+	}
+	char *raw_text = malloc((len + 1) * sizeof(char));
+	size_t raw_len = wcstombs(raw_text, text, len);
+	raw_text[raw_len] = '\0';
+	clipboard.text = raw_text;
+	clipboard.text_len = raw_len;
 #endif
 }
 
@@ -102,6 +124,10 @@ void LCUI_FreeClipboardDriver(void)
 		if (clipboard.text) {
 			free(clipboard.text);
 		}
+	}
+#else
+	if (clipboard.text) {
+		free(clipboard.text);
 	}
 #endif
 }
