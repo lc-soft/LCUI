@@ -81,7 +81,7 @@ static void OnComputeFontSize(LCUI_CSSFontStyle fs, css_unit_value_t *s)
 {
 	if (s->is_valid) {
 		fs->font_size =
-		    ui_compute_actual(y_max(MIN_FONT_SIZE, s->value), s->type);
+		    ui_compute_actual(y_max(MIN_FONT_SIZE, s->value), s->unit);
 		return;
 	}
 	fs->font_size = ui_compute_actual(DEFAULT_FONT_SIZE, CSS_UNIT_PX);
@@ -135,7 +135,7 @@ static void OnComputeFontWeight(LCUI_CSSFontStyle fs, css_unit_value_t *s)
 static void OnComputeTextAlign(LCUI_CSSFontStyle fs, css_unit_value_t *s)
 {
 	if (s->is_valid) {
-		fs->text_align = s->val_style;
+		fs->text_align = s->val_keyword;
 	} else {
 		fs->text_align = CSS_KEYWORD_LEFT;
 	}
@@ -145,12 +145,12 @@ static void OnComputeLineHeight(LCUI_CSSFontStyle fs, css_unit_value_t *s)
 {
 	int h;
 	if (s->is_valid) {
-		if (s->type == CSS_UNIT_INT) {
+		if (s->unit == CSS_UNIT_INT) {
 			h = y_iround(fs->font_size * s->val_int);
-		} else if (s->type == CSS_UNIT_SCALE) {
+		} else if (s->unit == CSS_UNIT_SCALE) {
 			h = y_iround(fs->font_size * s->val_scale);
 		} else {
-			h = ui_compute_actual(s->value, s->type);
+			h = ui_compute_actual(s->value, s->unit);
 		}
 	} else {
 		h = y_iround(fs->font_size * LINE_HEIGHT_SCALE);
@@ -192,8 +192,8 @@ static void OnComputeContent(LCUI_CSSFontStyle fs, css_unit_value_t *s)
 
 static void OnComputeWhiteSpace(LCUI_CSSFontStyle fs, css_unit_value_t *s)
 {
-	if (s->is_valid && s->type == CSS_UNIT_STYLE) {
-		fs->white_space = s->val_style;
+	if (s->is_valid && s->unit == CSS_UNIT_KEYWORD) {
+		fs->white_space = s->val_keyword;
 	} else {
 		fs->white_space = CSS_KEYWORD_AUTO;
 	}

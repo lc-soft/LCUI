@@ -54,7 +54,7 @@ void ui_widget_compute_background_style(ui_widget_t *widget)
 				bg->image = NULL;
 				break;
 			}
-			switch (s->type) {
+			switch (s->unit) {
 			case CSS_UNIT_STRING:
 				bg->image = (pd_canvas_t*)ui_load_image(s->string);
 				ui_image_on_event(
@@ -71,43 +71,43 @@ void ui_widget_compute_background_style(ui_widget_t *widget)
 			}
 			break;
 		case css_key_background_position:
-			if (s->is_valid && s->type != CSS_UNIT_NONE) {
+			if (s->is_valid && s->unit != CSS_UNIT_NONE) {
 				bg->position.using_value = TRUE;
-				bg->position.value = s->val_style;
+				bg->position.value = s->val_keyword;
 			} else {
 				bg->position.using_value = FALSE;
 				bg->position.value = 0;
 			}
 			break;
 		case css_key_background_position_x:
-			if (s->is_valid && s->type != CSS_UNIT_NONE) {
+			if (s->is_valid && s->unit != CSS_UNIT_NONE) {
 				bg->position.using_value = FALSE;
 				bg->position.x = *s;
 			}
 			break;
 		case css_key_background_position_y:
-			if (s->is_valid && s->type != CSS_UNIT_NONE) {
+			if (s->is_valid && s->unit != CSS_UNIT_NONE) {
 				bg->position.using_value = FALSE;
 				bg->position.y = *s;
 			}
 			break;
 		case css_key_background_size:
-			if (s->is_valid && s->type != CSS_UNIT_NONE) {
+			if (s->is_valid && s->unit != CSS_UNIT_NONE) {
 				bg->size.using_value = TRUE;
-				bg->size.value = s->val_style;
+				bg->size.value = s->val_keyword;
 			} else {
 				bg->size.using_value = FALSE;
 				bg->size.value = 0;
 			}
 			break;
 		case css_key_background_size_width:
-			if (s->is_valid && s->type != CSS_UNIT_NONE) {
+			if (s->is_valid && s->unit != CSS_UNIT_NONE) {
 				bg->size.using_value = FALSE;
 				bg->size.width = *s;
 			}
 			break;
 		case css_key_background_size_height:
-			if (s->is_valid && s->type != CSS_UNIT_NONE) {
+			if (s->is_valid && s->unit != CSS_UNIT_NONE) {
 				bg->size.using_value = FALSE;
 				bg->size.height = *s;
 			}
@@ -173,7 +173,7 @@ void ui_widget_compute_background(ui_widget_t *w, pd_background_t *out)
 		out->size.height = ui_compute_actual(height, CSS_UNIT_PX);
 	} else {
 		type = CSS_UNIT_PX;
-		switch (bg->size.width.type) {
+		switch (bg->size.width.unit) {
 		case CSS_UNIT_SCALE:
 			width = box->width * bg->size.width.scale;
 			break;
@@ -183,12 +183,12 @@ void ui_widget_compute_background(ui_widget_t *w, pd_background_t *out)
 			break;
 		default:
 			width = bg->size.width.value;
-			type = bg->size.width.type;
+			type = bg->size.width.unit;
 			break;
 		}
 		out->size.width = ui_compute_actual(width, type);
 		type = CSS_UNIT_PX;
-		switch (bg->size.height.type) {
+		switch (bg->size.height.unit) {
 		case CSS_UNIT_SCALE:
 			height = box->height * bg->size.height.scale;
 			break;
@@ -247,7 +247,7 @@ void ui_widget_compute_background(ui_widget_t *w, pd_background_t *out)
 		out->position.y = ui_compute_actual(y, CSS_UNIT_PX);
 	} else {
 		type = CSS_UNIT_PX;
-		switch (bg->position.x.type) {
+		switch (bg->position.x.unit) {
 		case CSS_UNIT_SCALE:
 			x = box->width - width;
 			x = x * bg->position.x.scale;
@@ -257,12 +257,12 @@ void ui_widget_compute_background(ui_widget_t *w, pd_background_t *out)
 			break;
 		default:
 			x = bg->position.x.value;
-			type = bg->position.x.type;
+			type = bg->position.x.unit;
 			break;
 		}
 		out->position.x = ui_compute_actual(x, type);
 		type = CSS_UNIT_PX;
-		switch (bg->position.y.type) {
+		switch (bg->position.y.unit) {
 		case CSS_UNIT_SCALE:
 			y = box->height - height;
 			y = y * bg->position.y.scale;
@@ -272,7 +272,7 @@ void ui_widget_compute_background(ui_widget_t *w, pd_background_t *out)
 			break;
 		default:
 			y = bg->position.y.value;
-			type = bg->position.y.type;
+			type = bg->position.y.unit;
 			break;
 		}
 		out->position.y = ui_compute_actual(y, type);

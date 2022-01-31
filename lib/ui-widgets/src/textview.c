@@ -80,7 +80,7 @@ static int OnParseWordBreak(css_style_parser_t *ctx, const char *value)
 	if (s->is_valid && s->string) {
 		free(s->string);
 	}
-	s->type = CSS_UNIT_STRING;
+	s->unit = CSS_UNIT_STRING;
 	s->is_valid = TRUE;
 	s->string = str;
 	return 0;
@@ -89,7 +89,7 @@ static int OnParseWordBreak(css_style_parser_t *ctx, const char *value)
 static LCUI_WordBreakMode ComputeWordBreakMode(css_style_decl_t *style)
 {
 	css_unit_value_t *s = &style->sheet[self.css_key_word_break];
-	if (s->is_valid && s->type == CSS_UNIT_STRING && s->string) {
+	if (s->is_valid && s->unit == CSS_UNIT_STRING && s->string) {
 		if (strcmp(s->string, "break-all") == 0) {
 			return LCUI_WORD_BREAK_BREAK_ALL;
 		}
@@ -373,7 +373,7 @@ void TextView_SetLineHeight(ui_widget_t *w, int height)
 
 void TextView_SetTextAlign(ui_widget_t *w, int align)
 {
-	ui_widget_set_style(w, css_key_text_align, align, style);
+	ui_widget_set_style(w, css_key_text_align, align, keyword);
 }
 
 void TextView_SetColor(ui_widget_t *w, pd_color_t color)
@@ -385,10 +385,10 @@ void TextView_SetAutoWrap(ui_widget_t *w, LCUI_BOOL enable)
 {
 	if (enable) {
 		ui_widget_set_style(w, css_key_white_space, CSS_KEYWORD_AUTO,
-				    style);
+				    keyword);
 	} else {
 		ui_widget_set_style(w, css_key_white_space, CSS_KEYWORD_NOWRAP,
-				    style);
+				    keyword);
 	}
 }
 

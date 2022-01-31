@@ -497,10 +497,10 @@ void TextEdit_EnableMultiline(ui_widget_t* w, LCUI_BOOL enable)
 {
 	if (enable) {
 		ui_widget_set_style(w, css_key_white_space, CSS_KEYWORD_AUTO,
-				    style);
+				    keyword);
 	} else {
 		ui_widget_set_style(w, css_key_white_space, CSS_KEYWORD_NOWRAP,
-				    style);
+				    keyword);
 	}
 }
 

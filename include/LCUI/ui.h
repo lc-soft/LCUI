@@ -768,7 +768,7 @@ LCUI_API void ui_print_tree(ui_widget_t* w);
 		css_unit_value_t *_s;                     \
 		_s = ui_widget_get_style(W, K);    \
 		_s->is_valid = TRUE;               \
-		_s->type = CSS_UNIT_##TYPE;      \
+		_s->unit = CSS_UNIT_##TYPE;      \
 		_s->val_##TYPE = VAL;              \
 		ui_widget_add_task_by_style(W, K); \
 	} while (0)

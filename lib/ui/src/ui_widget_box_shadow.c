@@ -9,18 +9,18 @@
 
 static float compute_metric_x(ui_widget_t* w, css_unit_value_t* s)
 {
-	if (s->type == CSS_UNIT_SCALE) {
+	if (s->unit == CSS_UNIT_SCALE) {
 		return w->width * s->scale;
 	}
-	return ui_compute(s->value, s->type);
+	return ui_compute(s->value, s->unit);
 }
 
 static float compute_metric_y(ui_widget_t* w, css_unit_value_t* s)
 {
-	if (s->type == CSS_UNIT_SCALE) {
+	if (s->unit == CSS_UNIT_SCALE) {
 		return w->height * s->scale;
 	}
-	return ui_compute(s->value, s->type);
+	return ui_compute(s->value, s->unit);
 }
 
 void ui_widget_compute_box_shadow_style(ui_widget_t* w)
@@ -45,10 +45,10 @@ void ui_widget_compute_box_shadow_style(ui_widget_t* w)
 			sd->y = compute_metric_y(w, s);
 			break;
 		case css_key_box_shadow_spread:
-			sd->spread = ui_compute(s->value, s->type);
+			sd->spread = ui_compute(s->value, s->unit);
 			break;
 		case css_key_box_shadow_blur:
-			sd->blur = ui_compute(s->value, s->type);
+			sd->blur = ui_compute(s->value, s->unit);
 			break;
 		case css_key_box_shadow_color:
 			sd->color = s->color;
