@@ -44,6 +44,7 @@
 #include <LCUI/platform.h>
 #include <LCUI/display.h>
 #include <LCUI/settings.h>
+#include <LCUI/clipboard.h>
 #ifdef LCUI_EVENTS_H
 #include LCUI_EVENTS_H
 #endif
@@ -678,6 +679,7 @@ void LCUI_Init(void)
 	LCUI_InitDisplay(NULL);
 	LCUI_InitMouseDriver();
 	LCUI_InitKeyboardDriver();
+	LCUI_InitClipboardDriver();
 	LCUI_InitKeyboard();
 	LCUI_InitIME();
 
@@ -706,6 +708,7 @@ int LCUI_Destroy(void)
 	LCUI_FreeDisplay();
 	LCUI_FreeMouseDriver();
 	LCUI_FreeKeyboardDriver();
+	LCUI_FreeClipboardDriver();
 	LCUI_FreeApp();
 	LCUI_FreeIME();
 	LCUI_FreeKeyboard();
