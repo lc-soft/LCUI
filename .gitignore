@@ -70,5 +70,4 @@ config.h
 test/build
 lcpkg/*
 !lcpkg/ports
-include/LCUI
 vsxmake*

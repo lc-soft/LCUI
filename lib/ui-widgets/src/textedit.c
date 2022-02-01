@@ -35,6 +35,7 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/font.h>
 #include <LCUI/input.h>
+#include <LCUI/clipboard.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/metrics.h>
 #include <LCUI/gui/css_parser.h>
@@ -67,8 +68,8 @@ typedef struct LCUI_TextEditRec_ {
 	wchar_t *allow_input_char;      /**< 允许输入的字符 */
 	wchar_t password_char;          /**< 屏蔽符的副本 */
 	size_t text_block_size;         /**< 块大小 */
-	list_t text_blocks;         /**< 文本块缓冲区 */
-	list_t text_tags;           /**< 当前处理的标签列表 */
+	list_t text_blocks;             /**< 文本块缓冲区 */
+	list_t text_tags;               /**< 当前处理的标签列表 */
 	LCUI_BOOL tasks[TASK_TOTAL];    /**< 待处理的任务 */
 	LCUI_Mutex mutex;               /**< 互斥锁 */
 } LCUI_TextEditRec, *LCUI_TextEdit;
@@ -422,8 +423,10 @@ static void TextEdit_OnResize(LCUI_Widget w, float width, float height)
 	LCUI_TextEdit edit = GetData(w);
 
 	list_create(&rects);
-	TextLayer_SetFixedSize(edit->layer, (int)(width * scale), (int)(width * scale));
-	TextLayer_SetMaxSize(edit->layer, (int)(height * scale), (int)(height * scale));
+	TextLayer_SetFixedSize(edit->layer, (int)(width * scale),
+			       (int)(width * scale));
+	TextLayer_SetMaxSize(edit->layer, (int)(height * scale),
+			     (int)(height * scale));
 	TextLayer_Update(edit->layer, &rects);
 	TextLayer_ClearInvalidRect(edit->layer);
 	for (list_each(node, &rects)) {
@@ -714,6 +717,23 @@ static void TextEdit_TextDelete(LCUI_Widget widget, int n_ch)
 	Widget_TriggerEvent(widget, &ev, NULL);
 }
 
+static void TextEdit_OnPaste(LCUI_Widget w, LCUI_WidgetEvent e, void *arg)
+{
+	LCUI_Clipboard clipboard = arg;
+	if (clipboard) {
+		TextEdit_InsertTextW(w, clipboard->text);
+	}
+}
+
+static void TextEdit_OnClipboardReady(void *arg, LCUI_Widget widget)
+{
+	LCUI_Clipboard clipboard = arg;
+	LCUI_WidgetEventRec e = { 0 };
+
+	LCUI_InitWidgetEvent(&e, "paste");
+	Widget_TriggerEvent(widget, &e, clipboard);
+}
+
 /** 处理按键事件 */
 static void TextEdit_OnKeyDown(LCUI_Widget widget, LCUI_WidgetEvent e,
 			       void *arg)
@@ -771,6 +791,23 @@ static void TextEdit_OnKeyDown(LCUI_Widget widget, LCUI_WidgetEvent e,
 		break;
 	}
 	TextEdit_MoveCaret(widget, cur_row, cur_col);
+	
+	char key = e->key.code;
+	// CTRL+V
+	if (key == LCUI_KEY_V && e->key.ctrl_key) {
+		LCUI_UseClipboard(TextEdit_OnClipboardReady, widget);
+	}
+	// CTRL+C
+	if (key == LCUI_KEY_C && e->key.ctrl_key) {
+		// @WhoAteDaCake
+		// Currently copies internal widget text
+		// once selection is implemented, it would copy that instead
+		size_t len = TextEdit_GetTextLength(widget);
+		wchar_t *wcs = malloc((len + 1) * sizeof(wchar_t));
+		TextEdit_GetTextW(widget, 0, len, wcs);
+		LCUI_SetClipboardText(wcs, len);
+		free(wcs);
+	}
 }
 
 /** 处理输入法对文本框输入的内容 */
@@ -780,7 +817,6 @@ static void TextEdit_OnTextInput(LCUI_Widget widget, LCUI_WidgetEvent e,
 	uint_t i, j, k;
 	wchar_t ch, *text, excludes[8] = L"\b\r\t\x1b";
 	LCUI_TextEdit edit = Widget_GetData(widget, self.prototype);
-
 	/* 如果不是多行文本编辑模式则删除换行符 */
 	if (!edit->is_multiline_mode) {
 		wcscat(excludes, L"\n");
@@ -908,6 +944,7 @@ static void TextEdit_OnInit(LCUI_Widget w)
 	Widget_BindEvent(w, "focus", TextEdit_OnFocus, NULL, NULL);
 	Widget_BindEvent(w, "blur", TextEdit_OnBlur, NULL, NULL);
 	Widget_BindEvent(w, "ready", TextEdit_OnReady, NULL, NULL);
+	Widget_BindEvent(w, "paste", TextEdit_OnPaste, NULL, NULL);
 	Widget_Append(w, edit->caret);
 	Widget_Hide(edit->caret);
 	LCUIMutex_Init(&edit->mutex);
@@ -930,7 +967,7 @@ static void TextEdit_OnDestroy(LCUI_Widget widget)
 	}
 }
 
-static void TextEdit_OnPaint(LCUI_Widget w, pd_paint_context_t* paint,
+static void TextEdit_OnPaint(LCUI_Widget w, pd_paint_context_t *paint,
 			     LCUI_WidgetActualStyle style)
 {
 	pd_pos_t pos;

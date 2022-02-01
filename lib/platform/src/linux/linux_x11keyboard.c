@@ -143,11 +143,15 @@ static void OnKeyboardMessage(LCUI_Event ev, void *arg)
 	sys_ev.key.ctrl_key = x_ev->xkey.state & ControlMask ? TRUE : FALSE;
 	_DEBUG_MSG("shift: %d, ctrl: %d\n", sys_ev.key.shift_key,
 		   sys_ev.key.ctrl_key);
+	// @WhoAteDaCake
+	// TODO: this triggers and line 155 causes event to trigger twice?
+	// I tried to remove the one in if statement and put it to the end of the function
+	// but it doesn't seem to work properly then? Needs investigation
 	LCUI_TriggerEvent(&sys_ev, NULL);
 
 	XDisplayKeycodes(x11->display, &min_keycode, &max_keycode);
 	if (keysym >= min_keycode && keysym <= max_keycode &&
-	    sys_ev.type == LCUI_KEYDOWN) {
+	    sys_ev.type == LCUI_KEYDOWN && !sys_ev.key.ctrl_key) {
 		sys_ev.type = LCUI_KEYPRESS;
 		sys_ev.key.code = ConvertKeyCodeToChar(x11, x_ev);
 		_DEBUG_MSG("char: %c\n", sys_ev.key.code);

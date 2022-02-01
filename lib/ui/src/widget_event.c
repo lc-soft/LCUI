@@ -1037,6 +1037,8 @@ static void OnKeyboardEvent(LCUI_SysEvent e, void *arg)
 	}
 	ev.target = self.targets[WST_FOCUS];
 	ev.key.code = e->key.code;
+	ev.key.ctrl_key = e->key.ctrl_key;
+	ev.key.shift_key = e->key.shift_key;
 	ev.cancel_bubble = FALSE;
 	Widget_TriggerEvent(ev.target, &ev, NULL);
 }
