@@ -4,7 +4,7 @@
 #include <LCUI.h>
 #include <LCUI/timer.h>
 #include <LCUI/ui.h>
-#include <LCUI/gui/builder.h>
+#include <LCUI/ui/builder.h>
 #include <LCUI/graph.h>
 #include <LCUI/image.h>
 

@@ -1,7 +1,7 @@
 #include <LCUI.h>
 #include <LCUI/ui.h>
 #include <LCUI/gui/widget/scrollbar.h>
-#include <LCUI/gui/builder.h>
+#include <LCUI/ui/builder.h>
 #include <LCUI/css.h>
 #include <LCUI/gui/widget/textview.h>
 #include "ctest.h"
@@ -83,7 +83,7 @@ void BuildContentView(void)
 int BuildContentViewFromXML(void)
 {
 	ui_widget_t* root = ui_root();
-	ui_widget_t* pack = LCUIBuilder_LoadFile("test_scrollbar.xml");
+	ui_widget_t* pack = ui_load_xml("test_scrollbar.xml");
 
 	if (!pack) {
 		return -1;

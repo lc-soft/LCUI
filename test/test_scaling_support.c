@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <LCUI.h>
-#include <LCUI/gui/builder.h>
+#include <LCUI/ui/builder.h>
 #include <LCUI/main.h>
 
 enum { TYPE_DENSITY, TYPE_SCALED_DENSITY, TYPE_SCALE };
@@ -58,7 +58,7 @@ int main(int argc, char **argv)
 	ui_widget_t *pack;
 
 	lcui_init();
-	pack = LCUIBuilder_LoadFile("test_scaling_support.xml");
+	pack = ui_load_xml("test_scaling_support.xml");
 	if (!pack) {
 		return -1;
 	}
