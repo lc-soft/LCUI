@@ -1,7 +1,7 @@
 ﻿#include <stdio.h>
 #include <LCUI.h>
 #include <LCUI/ui.h>
-#include <LCUI/gui/builder.h>
+#include <LCUI/ui/builder.h>
 #include "ctest.h"
 
 static void test_btn_text_style(void)
@@ -114,7 +114,7 @@ void test_css_parser(void)
 	ui_widget_t *root, *box, *btn;
 
 	lcui_init();
-	box = LCUIBuilder_LoadFile("test_css_parser.xml");
+	box = ui_load_xml("test_css_parser.xml");
 	it_b("should successfully load test_css_parser.xml", !!box, TRUE);
 	if (!box) {
 		lcui_destroy();

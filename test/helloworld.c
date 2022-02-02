@@ -1,6 +1,6 @@
 ﻿#include <LCUI.h>
 #include <LCUI/main.h>
-#include <LCUI/gui/builder.h>
+#include <LCUI/ui/builder.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/widget/textedit.h>
 
@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 	ui_widget_t *pack, *btn;
 
 	lcui_init();
-	pack = LCUIBuilder_LoadFile("helloworld.xml");
+	pack = ui_load_xml("helloworld.xml");
 	if (!pack) {
 		return -1;
 	}

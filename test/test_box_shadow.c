@@ -1,5 +1,5 @@
 #include <LCUI.h>
-#include <LCUI/gui/builder.h>
+#include <LCUI/ui/builder.h>
 #include <LCUI/main.h>
 
 int main(void)
@@ -8,7 +8,7 @@ int main(void)
 	ui_widget_t *box;
 
 	lcui_init();
-	box = LCUIBuilder_LoadFile("test_box_shadow.xml");
+	box = ui_load_xml("test_box_shadow.xml");
 	if (!box) {
 		lcui_destroy();
 		return ret;

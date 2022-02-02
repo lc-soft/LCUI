@@ -1,6 +1,6 @@
 ﻿#include <LCUI.h>
 #include <LCUI/ui.h>
-#include <LCUI/gui/builder.h>
+#include <LCUI/ui/builder.h>
 #include "ctest.h"
 
 static void check_widget_attribute(void)
@@ -37,7 +37,7 @@ void test_xml_parser(void)
 
 	lcui_init();
 	it_b("load XML file",
-	     (pack = LCUIBuilder_LoadFile("test_xml_parser.xml")) != NULL,
+	     (pack = ui_load_xml("test_xml_parser.xml")) != NULL,
 	     TRUE);
 	if (!pack) {
 		lcui_destroy();

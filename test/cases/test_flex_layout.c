@@ -1,7 +1,7 @@
 #include "ctest.h"
 #include <LCUI.h>
 #include <LCUI/ui.h>
-#include <LCUI/gui/builder.h>
+#include <LCUI/ui/builder.h>
 
 static void test_flex_layout_with_content_width(float width)
 {
@@ -712,7 +712,7 @@ void test_flex_layout(void)
 	ui_widget_t* wrapper;
 
 	lcui_init();
-	wrapper = LCUIBuilder_LoadFile("test_flex_layout.xml");
+	wrapper = ui_load_xml("test_flex_layout.xml");
 	root = ui_root();
 	ui_widget_set_title(root, L"test flex layout");
 	ui_widget_append(root, wrapper);
