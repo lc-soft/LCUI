@@ -16,10 +16,12 @@
 #define RED(TEXT) COLOR_RED TEXT COLOR_NONE
 #define GREEN(TEXT) COLOR_GREEN TEXT COLOR_NONE
 
-#ifdef CI_ENV
+#if defined(CI_ENV) || defined(_WIN32)
 #define CHECK_MARK GREEN("* ")
+#define ERROR_MARK "x "
 #else
 #define CHECK_MARK GREEN("√ ")
+#define ERROR_MARK "× "
 #endif
 
 static size_t tests_passed = 0;
@@ -90,7 +92,7 @@ void it_i(const char *name, int actual, int expected)
 		tests_passed++;
 		return;
 	}
-	test_msg(RED("× %s == %d\n"), name, expected);
+	test_msg(RED(ERROR_MARK "%s == %d\n"), name, expected);
 	test_msg(RED("  AssertionError: %d == %d\n"), actual, expected);
 	test_msg(GREEN("  + expected ") RED("- actual\n\n"));
 	test_msg(RED("  - %d\n"), actual);
@@ -108,7 +110,7 @@ void it_b(const char *name, int actual, int expected)
 		tests_passed++;
 		return;
 	}
-	test_msg(RED("× %s\n"), name);
+	test_msg(RED(ERROR_MARK "%s\n"), name);
 	test_msg(RED("  AssertionError: %s == %s\n"), actual_str, expected_str);
 	test_msg(GREEN("  + expected ") RED("- actual\n\n"));
 	test_msg(RED("  - %s\n"), actual_str);
@@ -124,7 +126,7 @@ void it_s(const char *name, const char *actual, const char *expected)
 		tests_passed++;
 		return;
 	}
-	test_msg(RED("× %s == '%s'\n"), name, expected);
+	test_msg(RED(ERROR_MARK "%s == '%s'\n"), name, expected);
 	if (expected) {
 		test_msg(RED("  AssertionError: '%s' == '%s'\n"), actual,
 			 expected);
@@ -147,7 +149,7 @@ void it_rectf(const char *name, const pd_rectf_t *actual,
 		tests_passed++;
 		return;
 	}
-	test_msg(RED("× %s == (%g, %g, %g, %g)\n"), name, expected->x,
+	test_msg(RED(ERROR_MARK "%s == (%g, %g, %g, %g)\n"), name, expected->x,
 		 expected->y, expected->width, expected->height);
 	test_msg(
 	    RED("  AssertionError: (%g, %g, %g, %g) == (%g, %g, %g, %g)\n"),
@@ -171,7 +173,7 @@ void it_rect(const char *name, const pd_rect_t *actual,
 		tests_passed++;
 		return;
 	}
-	test_msg(RED("× %s == (%d, %d, %d, %d)\n"), name, expected->x,
+	test_msg(RED(ERROR_MARK "%s == (%d, %d, %d, %d)\n"), name, expected->x,
 		 expected->y, expected->width, expected->height);
 	test_msg(
 	    RED("  AssertionError: (%d, %g, %d, %d) == (%d, %d, %d, %d)\n"),
