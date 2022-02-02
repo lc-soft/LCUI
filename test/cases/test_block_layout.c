@@ -1,6 +1,6 @@
 ﻿#include "ctest.h"
 #include <LCUI.h>
-#include <LCUI/gui/builder.h>
+#include <LCUI/ui/builder.h>
 #include <LCUI/gui/widget/textview.h>
 
 static void test_dropdown(void)
@@ -740,7 +740,7 @@ void test_block_layout(void)
 	ui_widget_t* wrapper;
 
 	lcui_init();
-	wrapper = LCUIBuilder_LoadFile("test_block_layout.xml");
+	wrapper = ui_load_xml("test_block_layout.xml");
 	root = ui_root();
 	ui_widget_append(root, wrapper);
 	ui_widget_unwrap(wrapper);

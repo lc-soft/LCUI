@@ -35,7 +35,7 @@
 #include <LCUI/ui.h>
 #include <LCUI/app.h>
 #include <LCUI/gui/widget/anchor.h>
-#include <LCUI/gui/builder.h>
+#include <LCUI/ui/builder.h>
 
 typedef struct LCUI_XMLLoaderRec_ {
 	char* key; /**< 键，作为在视图加载完后传给事件处理器的额外参数 */
@@ -126,7 +126,7 @@ static void XMLLoader_Load(LCUI_XMLLoader loader)
 		}
 		strcpy(path, dirname);
 		strcat(path, loader->filepath);
-		pack = LCUIBuilder_LoadFile(path);
+		pack = ui_load_xml(path);
 		free(path);
 		if (pack) {
 			loader->pack = pack;
@@ -135,7 +135,7 @@ static void XMLLoader_Load(LCUI_XMLLoader loader)
 			return;
 		}
 	}
-	pack = LCUIBuilder_LoadFile(loader->filepath);
+	pack = ui_load_xml(loader->filepath);
 	if (pack) {
 		loader->pack = pack;
 		lcui_post_simple_task(XMLLoader_AppendToTarget, loader, NULL);

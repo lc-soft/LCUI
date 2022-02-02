@@ -4,7 +4,7 @@
 #include <LCUI/ui.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/widget/textedit.h>
-#include <LCUI/gui/builder.h>
+#include <LCUI/ui/builder.h>
 #include LCUI_APP_H
 
 class App : public LCUI::Application
@@ -25,7 +25,7 @@ void App::Load(Platform::String ^ entryPoint)
 {
 	ui_widget_t* btn, root, pack;
 	root = ui_root();
-	pack = LCUIBuilder_LoadFile("helloworld.xml");
+	pack = ui_load_xml("helloworld.xml");
 	if (!pack) {
 		return;
 	}

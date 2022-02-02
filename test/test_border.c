@@ -2,7 +2,7 @@
 #include <LCUI/graph.h>
 #include <LCUI/image.h>
 #include <LCUI/draw/border.h>
-#include <LCUI/gui/builder.h>
+#include <LCUI/ui/builder.h>
 #include <LCUI/main.h>
 
 int main(void)
@@ -11,7 +11,7 @@ int main(void)
 	ui_widget_t *root, *box;
 
 	lcui_init();
-	box = LCUIBuilder_LoadFile("test_border.xml");
+	box = ui_load_xml("test_border.xml");
 	if (!box) {
 		lcui_destroy();
 		return ret;

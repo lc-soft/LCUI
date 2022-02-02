@@ -4,7 +4,7 @@
 #include <LCUI/ui.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/css.h>
-#include <LCUI/gui/builder.h>
+#include <LCUI/ui/builder.h>
 #include <LCUI/graph.h>
 #include "ctest.h"
 
@@ -21,7 +21,7 @@ static void build(void)
 {
 	ui_widget_t *pack, *root;
 
-	pack = LCUIBuilder_LoadFile("test_widget_opacity.xml");
+	pack = ui_load_xml("test_widget_opacity.xml");
 	root = ui_root();
 	ui_widget_append(root, pack);
 	ui_widget_unwrap(pack);
