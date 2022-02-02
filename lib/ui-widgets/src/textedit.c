@@ -34,10 +34,8 @@
 #include <LCUI/thread.h>
 #include <LCUI/platform.h>
 #include <LCUI/graph.h>
-#include <LCUI/font.h>
-#include <LCUI/ui.h>
 #include <LCUI/css.h>
-#include <LCUI/gui/ui_font_style.h>
+#include "./internal.h"
 #include <LCUI/gui/widget/textedit.h>
 #include <LCUI/gui/widget/textcaret.h>
 
@@ -52,7 +50,7 @@
 enum TaskType { TASK_SET_TEXT, TASK_UPDATE, TASK_TOTAL };
 
 typedef struct LCUI_TextEditRec_ {
-	LCUI_CSSFontStyleRec style;       /**< 字体样式 */
+	ui_font_style_t style;       /**< 字体样式 */
 	LCUI_TextLayer layer_source;      /**< 实际文本层 */
 	LCUI_TextLayer layer_mask;        /**< 屏蔽后的文本层 */
 	LCUI_TextLayer layer_placeholder; /**< 占位符的文本层 */
@@ -948,7 +946,7 @@ static void TextEdit_OnInit(ui_widget_t* w)
 	ui_widget_append(w, edit->caret);
 	ui_widget_hide(edit->caret);
 	LCUIMutex_Init(&edit->mutex);
-	CSSFontStyle_Init(&edit->style);
+	ui_font_style_init(&edit->style);
 }
 
 static void TextEdit_OnDestroy(ui_widget_t* widget)
@@ -959,7 +957,7 @@ static void TextEdit_OnDestroy(ui_widget_t* widget)
 	TextLayer_Destroy(edit->layer_source);
 	TextLayer_Destroy(edit->layer_placeholder);
 	TextLayer_Destroy(edit->layer_mask);
-	CSSFontStyle_Destroy(&edit->style);
+	ui_font_style_destroy(&edit->style);
 	TextBlocks_Clear(&edit->text_blocks);
 	if (edit->value_watcher) {
 		ObjectWatcher_Delete(edit->value_watcher);
@@ -999,17 +997,17 @@ static void TextEdit_OnUpdateStyle(ui_widget_t* w)
 
 	LCUI_TextEdit edit = GetData(w);
 	LCUI_TextStyleRec text_style;
-	LCUI_CSSFontStyleRec style;
+	ui_font_style_t style;
 	LCUI_TextLayer layers[3] = { edit->layer_mask, edit->layer_placeholder,
 				     edit->layer_source };
 
-	CSSFontStyle_Init(&style);
-	CSSFontStyle_Compute(&style, w->style);
-	if (CSSFontStyle_IsEquals(&style, &edit->style)) {
-		CSSFontStyle_Destroy(&style);
+	ui_font_style_init(&style);
+	ui_font_style_compute(&style, w->style);
+	if (ui_font_style_is_equal(&style, &edit->style)) {
+		ui_font_style_destroy(&style);
 		return;
 	}
-	CSSFontStyle_GetTextStyle(&style, &text_style);
+	convert_font_style_to_text_style(&style, &text_style);
 	for (i = 0; i < 3; ++i) {
 		TextLayer_SetTextAlign(layers[i], style.text_align);
 		TextLayer_SetLineHeight(layers[i], style.line_height);
@@ -1017,7 +1015,7 @@ static void TextEdit_OnUpdateStyle(ui_widget_t* w)
 				      style.white_space != CSS_KEYWORD_NOWRAP);
 		TextLayer_SetTextStyle(layers[i], &text_style);
 	}
-	CSSFontStyle_Destroy(&edit->style);
+	ui_font_style_destroy(&edit->style);
 	TextStyle_Destroy(&text_style);
 	edit->style = style;
 	edit->tasks[TASK_UPDATE] = TRUE;

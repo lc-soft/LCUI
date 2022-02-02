@@ -33,11 +33,9 @@
 #include <string.h>
 #include <errno.h>
 #include <LCUI.h>
-#include <LCUI/ui.h>
-#include <LCUI/font.h>
 #include <LCUI/graph.h>
 #include <LCUI/css.h>
-#include <LCUI/gui/ui_font_style.h>
+#include "./internal.h"
 #include <LCUI/gui/widget/textview.h>
 
 #define GetData(W) ui_widget_get_data(W, self.prototype)
@@ -53,7 +51,7 @@ typedef struct LCUI_TextViewRec_ {
 	LCUI_BOOL trimming;
 	ui_widget_t *widget;
 	LCUI_TextLayer layer;
-	LCUI_CSSFontStyleRec style;
+	ui_font_style_t style;
 	LCUI_TextViewTaskRec task;
 	list_node_t node;
 } LCUI_TextViewRec, *LCUI_TextView;
@@ -144,17 +142,17 @@ static void TextView_Update(ui_widget_t *w)
 
 static void TextView_UpdateStyle(ui_widget_t *w)
 {
-	LCUI_CSSFontStyleRec style;
+	ui_font_style_t style;
 	LCUI_TextStyleRec text_style;
 	LCUI_TextView txt = GetData(w);
 
-	CSSFontStyle_Init(&style);
-	CSSFontStyle_Compute(&style, w->style);
-	if (CSSFontStyle_IsEquals(&style, &txt->style)) {
-		CSSFontStyle_Destroy(&style);
+	ui_font_style_init(&style);
+	ui_font_style_compute(&style, w->style);
+	if (ui_font_style_is_equal(&style, &txt->style)) {
+		ui_font_style_destroy(&style);
 		return;
 	}
-	CSSFontStyle_GetTextStyle(&style, &text_style);
+	convert_font_style_to_text_style(&style, &text_style);
 	switch (style.text_align) {
 	case CSS_KEYWORD_CENTER:
 		TextLayer_SetTextAlign(txt->layer, LCUI_TEXT_CENTER);
@@ -177,7 +175,7 @@ static void TextView_UpdateStyle(ui_widget_t *w)
 	} else if (txt->style.content) {
 		TextView_SetTextW(w, NULL);
 	}
-	CSSFontStyle_Destroy(&txt->style);
+	ui_font_style_destroy(&txt->style);
 	TextStyle_Destroy(&text_style);
 	txt->style = style;
 	TextView_Update(w);
@@ -198,7 +196,7 @@ static void TextView_OnInit(ui_widget_t *w)
 	TextLayer_SetAutoWrap(txt->layer, TRUE);
 	TextLayer_SetMultiline(txt->layer, TRUE);
 	TextLayer_EnableStyleTag(txt->layer, TRUE);
-	CSSFontStyle_Init(&txt->style);
+	ui_font_style_init(&txt->style);
 	txt->node.data = txt;
 	txt->node.prev = txt->node.next = NULL;
 	list_append_node(&self.list, &txt->node);
@@ -209,7 +207,7 @@ static void TextView_OnDestroy(ui_widget_t *w)
 	LCUI_TextView txt = GetData(w);
 
 	list_unlink(&self.list, &txt->node);
-	CSSFontStyle_Destroy(&txt->style);
+	ui_font_style_destroy(&txt->style);
 	TextLayer_Destroy(txt->layer);
 	free(txt->content);
 	if (txt->task.content) {
