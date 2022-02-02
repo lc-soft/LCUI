@@ -1138,6 +1138,35 @@ LCUI_API int ui_image_remove_event_listener(ui_image_t* image,
 					    ui_image_event_handler_t handler,
 					    void* data);
 
+// CSS Font Style
+
+#define UI_DEFAULT_FONT_SIZE 14
+#define UI_DEFAULT_FONT_COLOR 0xff333333
+#define UI_MIN_FONT_SIZE 12
+#define UI_LINE_HEIGHT_SCALE 1.42857143
+
+typedef struct ui_font_style_t {
+	int font_size;
+	int line_height;
+	int *font_ids;
+	char *font_family;
+	wchar_t *content;
+	pd_color_t color;
+	css_font_style_t font_style;
+	css_font_weight_t font_weight;
+	css_keyword_value_t text_align;
+	css_keyword_value_t white_space;
+} ui_font_style_t;
+
+LCUI_API void ui_font_style_init(ui_font_style_t *fs);
+
+LCUI_API void ui_font_style_destroy(ui_font_style_t *fs);
+
+LCUI_API LCUI_BOOL ui_font_style_is_equal(const ui_font_style_t *a,
+					  const ui_font_style_t *b);
+
+LCUI_API void ui_font_style_compute(ui_font_style_t *fs, css_style_decl_t *ss);
+
 LCUI_END_HEADER
 
 #endif
