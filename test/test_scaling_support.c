@@ -58,7 +58,7 @@ int main(int argc, char **argv)
 	ui_widget_t *pack;
 
 	lcui_init();
-	pack = ui_load_xml("test_scaling_support.xml");
+	pack = ui_load_xml_file("test_scaling_support.xml");
 	if (!pack) {
 		return -1;
 	}

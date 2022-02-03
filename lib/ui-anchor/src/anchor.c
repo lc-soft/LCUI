@@ -126,7 +126,7 @@ static void XMLLoader_Load(LCUI_XMLLoader loader)
 		}
 		strcpy(path, dirname);
 		strcat(path, loader->filepath);
-		pack = ui_load_xml(path);
+		pack = ui_load_xml_file(path);
 		free(path);
 		if (pack) {
 			loader->pack = pack;
@@ -135,7 +135,7 @@ static void XMLLoader_Load(LCUI_XMLLoader loader)
 			return;
 		}
 	}
-	pack = ui_load_xml(loader->filepath);
+	pack = ui_load_xml_file(loader->filepath);
 	if (pack) {
 		loader->pack = pack;
 		lcui_post_simple_task(XMLLoader_AppendToTarget, loader, NULL);

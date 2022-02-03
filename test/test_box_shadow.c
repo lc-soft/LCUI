@@ -8,7 +8,7 @@ int main(void)
 	ui_widget_t *box;
 
 	lcui_init();
-	box = ui_load_xml("test_box_shadow.xml");
+	box = ui_load_xml_file("test_box_shadow.xml");
 	if (!box) {
 		lcui_destroy();
 		return ret;

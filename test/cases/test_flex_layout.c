@@ -712,7 +712,7 @@ void test_flex_layout(void)
 	ui_widget_t* wrapper;
 
 	lcui_init();
-	wrapper = ui_load_xml("test_flex_layout.xml");
+	wrapper = ui_load_xml_file("test_flex_layout.xml");
 	root = ui_root();
 	ui_widget_set_title(root, L"test flex layout");
 	ui_widget_append(root, wrapper);

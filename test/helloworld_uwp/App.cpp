@@ -25,7 +25,7 @@ void App::Load(Platform::String ^ entryPoint)
 {
 	ui_widget_t* btn, root, pack;
 	root = ui_root();
-	pack = ui_load_xml("helloworld.xml");
+	pack = ui_load_xml_file("helloworld.xml");
 	if (!pack) {
 		return;
 	}

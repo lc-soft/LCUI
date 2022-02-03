@@ -740,7 +740,7 @@ void test_block_layout(void)
 	ui_widget_t* wrapper;
 
 	lcui_init();
-	wrapper = ui_load_xml("test_block_layout.xml");
+	wrapper = ui_load_xml_file("test_block_layout.xml");
 	root = ui_root();
 	ui_widget_append(root, wrapper);
 	ui_widget_unwrap(wrapper);

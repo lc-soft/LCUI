@@ -48,7 +48,7 @@ LCUI_API ui_widget_t* ui_load_xml_string(const char *str, int size);
  * @param[in] filepath 文件路径
  * @return 正常解析会返回一个部件，出现错误则返回 NULL
  */
-LCUI_API ui_widget_t* ui_load_xml(const char *filepath);
+LCUI_API ui_widget_t* ui_load_xml_file(const char *filepath);
 
 LCUI_END_HEADER
 

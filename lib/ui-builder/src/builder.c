@@ -134,7 +134,7 @@ static int ui_builder_parse_resource_node(xml_parser_t *parser, xmlNodePtr node)
 		if (!src) {
 			EXIT(PB_WARNING);
 		}
-		pack = ui_load_xml(src);
+		pack = ui_load_xml_file(src);
 		if (!pack) {
 			EXIT(PB_WARNING);
 		}
@@ -348,7 +348,7 @@ FAILED:
 	return NULL;
 }
 
-ui_widget_t *ui_load_xml(const char *filepath)
+ui_widget_t *ui_load_xml_file(const char *filepath)
 {
 #ifndef USE_LIBXML2
 	logger_warning(WARN_TXT);

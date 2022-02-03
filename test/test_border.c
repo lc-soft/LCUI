@@ -11,7 +11,7 @@ int main(void)
 	ui_widget_t *root, *box;
 
 	lcui_init();
-	box = ui_load_xml("test_border.xml");
+	box = ui_load_xml_file("test_border.xml");
 	if (!box) {
 		lcui_destroy();
 		return ret;
