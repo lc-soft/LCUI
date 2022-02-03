@@ -83,7 +83,7 @@ void BuildContentView(void)
 int BuildContentViewFromXML(void)
 {
 	ui_widget_t* root = ui_root();
-	ui_widget_t* pack = ui_load_xml("test_scrollbar.xml");
+	ui_widget_t* pack = ui_load_xml_file("test_scrollbar.xml");
 
 	if (!pack) {
 		return -1;

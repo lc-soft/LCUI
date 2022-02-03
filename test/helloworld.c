@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 	ui_widget_t *pack, *btn;
 
 	lcui_init();
-	pack = ui_load_xml("helloworld.xml");
+	pack = ui_load_xml_file("helloworld.xml");
 	if (!pack) {
 		return -1;
 	}

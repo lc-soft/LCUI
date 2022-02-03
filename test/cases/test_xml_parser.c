@@ -37,7 +37,7 @@ void test_xml_parser(void)
 
 	lcui_init();
 	it_b("load XML file",
-	     (pack = ui_load_xml("test_xml_parser.xml")) != NULL,
+	     (pack = ui_load_xml_file("test_xml_parser.xml")) != NULL,
 	     TRUE);
 	if (!pack) {
 		lcui_destroy();

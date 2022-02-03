@@ -21,7 +21,7 @@ static void build(void)
 {
 	ui_widget_t *pack, *root;
 
-	pack = ui_load_xml("test_widget_opacity.xml");
+	pack = ui_load_xml_file("test_widget_opacity.xml");
 	root = ui_root();
 	ui_widget_append(root, pack);
 	ui_widget_unwrap(pack);
