@@ -67,7 +67,7 @@ typedef struct LCUI_TextEditRec_ {
 	list_t text_blocks;             /**< 文本块缓冲区 */
 	list_t text_tags;               /**< 当前处理的标签列表 */
 	LCUI_BOOL tasks[TASK_TOTAL];    /**< 待处理的任务 */
-	LCUI_Mutex mutex;               /**< 互斥锁 */
+	thread_mutex_t mutex;               /**< 互斥锁 */
 } LCUI_TextEditRec, *LCUI_TextEdit;
 
 typedef enum {
@@ -376,9 +376,9 @@ static void TextEdit_OnTask(ui_widget_t* widget, int task)
 		ui_event_t ev;
 
 		list_create(&blocks);
-		LCUIMutex_Lock(&edit->mutex);
+		thread_mutex_lock(&edit->mutex);
 		list_concat(&blocks, &edit->text_blocks);
-		LCUIMutex_Unlock(&edit->mutex);
+		thread_mutex_unlock(&edit->mutex);
 		for (list_each(node, &blocks)) {
 			TextEdit_ProcTextBlock(widget, node->data);
 		}
@@ -509,7 +509,7 @@ void TextEdit_ClearText(ui_widget_t* widget)
 	list_node_t *node, *prev;
 
 	edit = ui_widget_get_data(widget, self.prototype);
-	LCUIMutex_Lock(&edit->mutex);
+	thread_mutex_lock(&edit->mutex);
 	for (list_each(node, &edit->text_blocks)) {
 		block = node->data;
 		prev = node->prev;
@@ -523,7 +523,7 @@ void TextEdit_ClearText(ui_widget_t* widget)
 	StyleTags_Clear(&edit->text_tags);
 	edit->tasks[TASK_UPDATE] = TRUE;
 	ui_widget_add_task(widget, UI_TASK_USER);
-	LCUIMutex_Unlock(&edit->mutex);
+	thread_mutex_unlock(&edit->mutex);
 	ui_widget_mark_dirty_rect(widget, NULL, CSS_KEYWORD_PADDING_BOX);
 }
 
@@ -617,9 +617,9 @@ int TextEdit_InsertTextW(ui_widget_t* w, const wchar_t* wstr)
 int TextEdit_SetPlaceHolderW(ui_widget_t* w, const wchar_t* wstr)
 {
 	LCUI_TextEdit edit = GetData(w);
-	LCUIMutex_Lock(&edit->mutex);
+	thread_mutex_lock(&edit->mutex);
 	TextLayer_ClearText(edit->layer_placeholder);
-	LCUIMutex_Unlock(&edit->mutex);
+	thread_mutex_unlock(&edit->mutex);
 	if (edit->is_placeholder_shown) {
 		ui_widget_mark_dirty_rect(w, NULL, CSS_KEYWORD_PADDING_BOX);
 	}
@@ -684,7 +684,7 @@ static void TextEdit_TextBackspace(ui_widget_t* widget, int n_ch)
 	ui_event_t ev;
 
 	edit = ui_widget_get_data(widget, self.prototype);
-	LCUIMutex_Lock(&edit->mutex);
+	thread_mutex_lock(&edit->mutex);
 	TextLayer_TextBackspace(edit->layer_source, n_ch);
 	if (edit->password_char) {
 		TextLayer_TextBackspace(edit->layer_mask, n_ch);
@@ -692,7 +692,7 @@ static void TextEdit_TextBackspace(ui_widget_t* widget, int n_ch)
 	TextCaret_Refresh(edit->caret);
 	edit->tasks[TASK_UPDATE] = TRUE;
 	ui_widget_add_task(widget, UI_TASK_USER);
-	LCUIMutex_Unlock(&edit->mutex);
+	thread_mutex_unlock(&edit->mutex);
 	ui_event_init(&ev, "change");
 	ui_widget_emit_event(widget, ev, NULL);
 }
@@ -703,7 +703,7 @@ static void TextEdit_TextDelete(ui_widget_t* widget, int n_ch)
 	ui_event_t ev;
 
 	edit = ui_widget_get_data(widget, self.prototype);
-	LCUIMutex_Lock(&edit->mutex);
+	thread_mutex_lock(&edit->mutex);
 	TextLayer_TextDelete(edit->layer_source, n_ch);
 	if (edit->password_char) {
 		TextLayer_TextDelete(edit->layer_mask, n_ch);
@@ -711,7 +711,7 @@ static void TextEdit_TextDelete(ui_widget_t* widget, int n_ch)
 	TextCaret_Refresh(edit->caret);
 	edit->tasks[TASK_UPDATE] = TRUE;
 	ui_widget_add_task(widget, UI_TASK_USER);
-	LCUIMutex_Unlock(&edit->mutex);
+	thread_mutex_unlock(&edit->mutex);
 	ui_event_init(&ev, "change");
 	ui_widget_emit_event(widget, ev, NULL);
 }
@@ -945,7 +945,7 @@ static void TextEdit_OnInit(ui_widget_t* w)
 	ui_widget_on(w, "paste", TextEdit_OnPaste, NULL, NULL);
 	ui_widget_append(w, edit->caret);
 	ui_widget_hide(edit->caret);
-	LCUIMutex_Init(&edit->mutex);
+	thread_mutex_init(&edit->mutex);
 	ui_font_style_init(&edit->style);
 }
 
@@ -958,6 +958,7 @@ static void TextEdit_OnDestroy(ui_widget_t* widget)
 	TextLayer_Destroy(edit->layer_placeholder);
 	TextLayer_Destroy(edit->layer_mask);
 	ui_font_style_destroy(&edit->style);
+	thread_mutex_destroy(&edit->mutex);
 	TextBlocks_Clear(&edit->text_blocks);
 	if (edit->value_watcher) {
 		ObjectWatcher_Delete(edit->value_watcher);

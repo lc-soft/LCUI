@@ -10,9 +10,9 @@ typedef struct TestWorkerRec_ {
 	int data_count;
 	LCUI_BOOL cancel;
 	LCUI_BOOL active;
-	LCUI_Cond cond;
-	LCUI_Mutex mutex;
-	LCUI_Thread thread;
+	thread_cond_t cond;
+	thread_mutex_t mutex;
+	thread_t thread;
 } TestWorkerRec, *TestWorker;
 
 static void TestWorker_Thread(void *arg)
@@ -22,42 +22,42 @@ static void TestWorker_Thread(void *arg)
 	worker->cancel = FALSE;
 	worker->active = TRUE;
 	worker->data_count = 0;
-	LCUIMutex_Lock(&worker->mutex);
+	thread_mutex_lock(&worker->mutex);
 	while (!worker->cancel && worker->data_count < 20) {
 		logger_debug("waiting...\n");
-		LCUICond_Wait(&worker->cond, &worker->mutex);
+		thread_cond_wait(&worker->cond, &worker->mutex);
 		logger_debug("get data: %s\n", worker->data);
 		worker->data_count += 1;
 	}
-	LCUIMutex_Unlock(&worker->mutex);
+	thread_mutex_unlock(&worker->mutex);
 	logger_debug("count: %d\n", worker->data_count);
 	worker->active = FALSE;
-	LCUIThread_Exit(NULL);
+	thread_exit(NULL);
 }
 
 static void TestWorker_Send(TestWorker worker, const char *data)
 {
-	LCUIMutex_Lock(&worker->mutex);
+	thread_mutex_lock(&worker->mutex);
 	strcpy(worker->data, data);
-	LCUICond_Signal(&worker->cond);
-	LCUIMutex_Unlock(&worker->mutex);
+	thread_cond_signal(&worker->cond);
+	thread_mutex_unlock(&worker->mutex);
 }
 
 static void TestWorker_Init(TestWorker worker)
 {
-	LCUIMutex_Init(&worker->mutex);
-	LCUICond_Init(&worker->cond);
+	thread_mutex_init(&worker->mutex);
+	thread_cond_init(&worker->cond);
 }
 
 static void TestWorker_Destroy(TestWorker worker)
 {
-	LCUIMutex_Lock(&worker->mutex);
+	thread_mutex_lock(&worker->mutex);
 	worker->cancel = TRUE;
-	LCUICond_Signal(&worker->cond);
-	LCUIMutex_Unlock(&worker->mutex);
-	LCUIThread_Join(worker->thread, NULL);
-	LCUIMutex_Destroy(&worker->mutex);
-	LCUICond_Destroy(&worker->cond);
+	thread_cond_signal(&worker->cond);
+	thread_mutex_unlock(&worker->mutex);
+	thread_join(worker->thread, NULL);
+	thread_mutex_destroy(&worker->mutex);
+	thread_cond_destroy(&worker->cond);
 }
 
 void test_thread(void)
@@ -65,7 +65,7 @@ void test_thread(void)
 	TestWorkerRec worker;
 
 	TestWorker_Init(&worker);
-	LCUIThread_Create(&worker.thread, TestWorker_Thread, &worker);
+	thread_create(&worker.thread, TestWorker_Thread, &worker);
 	sleep_ms(100);
 	TestWorker_Send(&worker, "hello");
 	sleep_ms(20);

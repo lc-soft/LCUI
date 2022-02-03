@@ -41,16 +41,16 @@
 typedef struct LCUI_WorkerRec_ {
 	LCUI_BOOL active;		/**< 是否处于活动状态 */
 	list_t tasks;		/**< 任务队列 */
-	LCUI_Mutex mutex;		/**< 互斥锁 */
-	LCUI_Cond cond;			/**< 条件变量 */
-	LCUI_Thread thread;		/**< 所在的线程 */
+	thread_mutex_t mutex;		/**< 互斥锁 */
+	thread_cond_t cond;			/**< 条件变量 */
+	thread_t thread;		/**< 所在的线程 */
 } LCUI_WorkerRec;
 
 LCUI_Worker LCUIWorker_New(void)
 {
 	LCUI_Worker worker = malloc(sizeof(LCUI_WorkerRec));
-	LCUIMutex_Init(&worker->mutex);
-	LCUICond_Init(&worker->cond);
+	thread_mutex_init(&worker->mutex);
+	thread_cond_init(&worker->cond);
 	list_create(&worker->tasks);
 	worker->active = FALSE;
 	worker->thread = 0;
@@ -62,10 +62,10 @@ void LCUIWorker_PostTask(LCUI_Worker worker, LCUI_Task task)
 	LCUI_Task newtask;
 	newtask = malloc(sizeof(LCUI_TaskRec));
 	*newtask = *task;
-	LCUIMutex_Lock(&worker->mutex);
+	thread_mutex_lock(&worker->mutex);
 	list_append(&worker->tasks, newtask);
-	LCUICond_Signal(&worker->cond);
-	LCUIMutex_Unlock(&worker->mutex);
+	thread_cond_signal(&worker->cond);
+	thread_mutex_unlock(&worker->mutex);
 }
 
 LCUI_Task LCUIWorker_GetTask(LCUI_Worker worker)
@@ -87,9 +87,9 @@ LCUI_BOOL LCUIWorker_RunTask(LCUI_Worker worker)
 {
 	LCUI_Task task;
 
-	LCUIMutex_Lock(&worker->mutex);
+	thread_mutex_lock(&worker->mutex);
 	task = LCUIWorker_GetTask(worker);
-	LCUIMutex_Unlock(&worker->mutex);
+	thread_mutex_unlock(&worker->mutex);
 	if (!task) {
 		return FALSE;
 	}
@@ -108,9 +108,9 @@ static void OnDeleteTask(void *arg)
 static void LCUIWorker_ExecDestroy(LCUI_Worker worker)
 {
 	list_destroy(&worker->tasks, OnDeleteTask);
-	LCUIMutex_Unlock(&worker->mutex);
-	LCUIMutex_Destroy(&worker->mutex);
-	LCUICond_Destroy(&worker->cond);
+	thread_mutex_unlock(&worker->mutex);
+	thread_mutex_destroy(&worker->mutex);
+	thread_cond_destroy(&worker->cond);
 	free(worker);
 }
 
@@ -119,23 +119,23 @@ static void LCUIWorker_Thread(void *arg)
 	LCUI_Task task;
 	LCUI_Worker worker = arg;
 
-	LCUIMutex_Lock(&worker->mutex);
+	thread_mutex_lock(&worker->mutex);
 	while (worker->active) {
 		task = LCUIWorker_GetTask(worker);
 		if (task) {
-			LCUIMutex_Unlock(&worker->mutex);
+			thread_mutex_unlock(&worker->mutex);
 			LCUITask_Run(task);
 			LCUITask_Destroy(task);
 			free(task);
-			LCUIMutex_Lock(&worker->mutex);
+			thread_mutex_lock(&worker->mutex);
 			continue;
 		}
 		if (worker->active) {
-			LCUICond_Wait(&worker->cond, &worker->mutex);
+			thread_cond_wait(&worker->cond, &worker->mutex);
 		}
 	}
 	LCUIWorker_ExecDestroy(worker);
-	LCUIThread_Exit(NULL);
+	thread_exit(NULL);
 }
 
 int LCUIWorker_RunAsync(LCUI_Worker worker)
@@ -144,22 +144,22 @@ int LCUIWorker_RunAsync(LCUI_Worker worker)
 		return -EEXIST;
 	}
 	worker->active = TRUE;
-	LCUIThread_Create(&worker->thread, LCUIWorker_Thread, worker);
+	thread_create(&worker->thread, LCUIWorker_Thread, worker);
 	logger_debug("[worker] worker %u is running\n", worker->thread);
 	return 0;
 }
 
 void LCUIWorker_Destroy(LCUI_Worker worker)
 {
-	LCUI_Thread thread = worker->thread;
+	thread_t thread = worker->thread;
 
 	if (worker->active) {
 		logger_debug("[worker] worker %u is stopping...\n", thread);
-		LCUIMutex_Lock(&worker->mutex);
+		thread_mutex_lock(&worker->mutex);
 		worker->active = FALSE;
-		LCUICond_Signal(&worker->cond);
-		LCUIMutex_Unlock(&worker->mutex);
-		LCUIThread_Join(thread, NULL);
+		thread_cond_signal(&worker->cond);
+		thread_mutex_unlock(&worker->mutex);
+		thread_join(thread, NULL);
 		logger_debug("[worker] worker %u has stopped\n", thread);
 		return;
 	}

@@ -22,20 +22,6 @@ static struct lcui_app_t {
 	int worker_next;
 } lcui_app;
 
-#ifdef LCUI_PLATFORM_WIN_DESKTOP
-
-static void win32_logger_log_a(const char *str)
-{
-	OutputDebugStringA(str);
-}
-
-static void win32_logger_log_w(const wchar_t *wcs)
-{
-	OutputDebugStringW(wcs);
-}
-
-#endif
-
 const char *lcui_get_version(void)
 {
 	return PACKAGE_VERSION;
@@ -162,10 +148,6 @@ int lcui_process_events(app_process_events_option_t option)
 
 void lcui_init_base(void)
 {
-#ifdef LCUI_PLATFORM_WIN_DESKTOP
-	logger_set_handler(win32_logger_log_a);
-	logger_set_handler_w(win32_logger_log_w);
-#endif
 	lcui_init_timers();
 	lcui_reset_settings();
 }

@@ -52,12 +52,12 @@ static void ObserverThread(void *arg)
 		exit(-print_test_result());
 		return;
 	}
-	LCUIThread_Exit(NULL);
+	thread_exit(NULL);
 }
 
 void test_mainloop(void)
 {
-	LCUI_Thread tid;
+	thread_t tid;
 	ui_widget_t *btn;
 	LCUI_BOOL exited = FALSE;
 
@@ -67,10 +67,10 @@ void test_mainloop(void)
 	ui_widget_on(btn, "click", OnBtnClick, NULL, NULL);
 	ui_root_append(btn);
 	/* Observe whether the main loop has exited in a new thread */
-	LCUIThread_Create(&tid, ObserverThread, &exited);
+	thread_create(&tid, ObserverThread, &exited);
 	/* Trigger the click event after the first frame is updated */
 	lcui_set_timeout(50, OnTriggerBtnClick, btn);
 	lcui_main();
 	exited = TRUE;
-	LCUIThread_Join(tid, NULL);
+	thread_join(tid, NULL);
 }

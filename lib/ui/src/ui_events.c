@@ -75,7 +75,7 @@ static struct ui_events_t {
 
 	int base_event_id;
 	ui_widget_click_record_t click;
-	LCUI_Mutex mutex;
+	thread_mutex_t mutex;
 } ui_events;
 
 /* clang-format on */
@@ -94,9 +94,9 @@ int ui_set_event_id(int event_id, const char* event_name)
 {
 	int ret;
 	ui_event_mapping_t* mapping;
-	LCUIMutex_Lock(&ui_events.mutex);
+	thread_mutex_lock(&ui_events.mutex);
 	if (dict_fetch_value(ui_events.event_ids, event_name)) {
-		LCUIMutex_Unlock(&ui_events.mutex);
+		thread_mutex_unlock(&ui_events.mutex);
 		return -1;
 	}
 	mapping = malloc(sizeof(ui_event_mapping_t));
@@ -108,7 +108,7 @@ int ui_set_event_id(int event_id, const char* event_name)
 	list_append(&ui_events.event_mappings, mapping);
 	rbtree_insert_by_key(&ui_events.event_names, event_id, mapping);
 	ret = dict_add(ui_events.event_ids, mapping->name, mapping);
-	LCUIMutex_Unlock(&ui_events.mutex);
+	thread_mutex_unlock(&ui_events.mutex);
 	return ret;
 }
 
@@ -120,18 +120,18 @@ int ui_alloc_event_id(void)
 const char* ui_get_event_name(int event_id)
 {
 	ui_event_mapping_t* mapping;
-	LCUIMutex_Lock(&ui_events.mutex);
+	thread_mutex_lock(&ui_events.mutex);
 	mapping = rbtree_get_data_by_key(&ui_events.event_names, event_id);
-	LCUIMutex_Unlock(&ui_events.mutex);
+	thread_mutex_unlock(&ui_events.mutex);
 	return mapping ? mapping->name : NULL;
 }
 
 int ui_get_event_id(const char* event_name)
 {
 	ui_event_mapping_t* mapping;
-	LCUIMutex_Lock(&ui_events.mutex);
+	thread_mutex_lock(&ui_events.mutex);
 	mapping = dict_fetch_value(ui_events.event_ids, event_name);
-	LCUIMutex_Unlock(&ui_events.mutex);
+	thread_mutex_unlock(&ui_events.mutex);
 	return mapping ? mapping->id : -1;
 }
 
@@ -694,7 +694,7 @@ void ui_clear_event_target(ui_widget_t *w)
 	list_node_t *node, *prev;
 	ui_event_pack_t* pack;
 
-	LCUIMutex_Lock(&ui_events.mutex);
+	thread_mutex_lock(&ui_events.mutex);
 	for (list_each(node, &ui_events.queue)) {
 		prev = node->prev;
 		pack = node->data;
@@ -704,7 +704,7 @@ void ui_clear_event_target(ui_widget_t *w)
 			node = prev;
 		}
 	}
-	LCUIMutex_Unlock(&ui_events.mutex);
+	thread_mutex_unlock(&ui_events.mutex);
 	ui_clear_mouseover_target(w);
 	ui_clear_mousedown_target(w);
 	ui_clear_focus_target(w);
@@ -965,7 +965,7 @@ static int ui_on_touch_event(ui_event_t* e)
 	n = e->touch.n_points;
 	points = e->touch.points;
 	list_create(&capturers);
-	LCUIMutex_Lock(&ui_events.mutex);
+	thread_mutex_lock(&ui_events.mutex);
 	/* 合并现有的触点捕捉记录 */
 	for (list_each(node, &ui_events.touch_capturers)) {
 		ui_touch_capturer_t* tc = node->data;
@@ -987,7 +987,7 @@ static int ui_on_touch_event(ui_event_t* e)
 	}
 	ui_dispatch_touch_event(&capturers, points, n);
 	ui_clear_touch_capturers(&capturers);
-	LCUIMutex_Unlock(&ui_events.mutex);
+	thread_mutex_unlock(&ui_events.mutex);
 	return 0;
 }
 
@@ -1004,9 +1004,9 @@ void ui_widget_release_mouse_capture(ui_widget_t *w)
 int ui_widget_set_touch_capture(ui_widget_t *w, int point_id)
 {
 	int ret;
-	LCUIMutex_Lock(&ui_events.mutex);
+	thread_mutex_lock(&ui_events.mutex);
 	ret = ui_add_touch_capturer(&ui_events.touch_capturers, w, point_id);
-	LCUIMutex_Unlock(&ui_events.mutex);
+	thread_mutex_unlock(&ui_events.mutex);
 	return ret;
 }
 
@@ -1017,9 +1017,9 @@ int ui_widget_release_touch_capture(ui_widget_t *w, int point_id)
 	if (ui_events.touch_capturers.length <= 1) {
 		return 0;
 	}
-	LCUIMutex_Lock(&ui_events.mutex);
+	thread_mutex_lock(&ui_events.mutex);
 	ret = ui_remove_touch_capturer(&ui_events.touch_capturers, w, point_id);
-	LCUIMutex_Unlock(&ui_events.mutex);
+	thread_mutex_unlock(&ui_events.mutex);
 	return ret;
 }
 
@@ -1077,7 +1077,7 @@ void ui_init_events(void)
 			 { UI_EVENT_PASTE, "paste" },
 			 { UI_EVENT_FONT_FACE_LOAD, "font_face_load" } };
 
-	LCUIMutex_Init(&ui_events.mutex);
+	thread_mutex_init(&ui_events.mutex);
 	rbtree_init(&ui_events.event_names);
 	list_create(&ui_events.event_mappings);
 	list_create(&ui_events.touch_capturers);
@@ -1148,13 +1148,13 @@ void ui_process_events(void)
 
 void ui_destroy_events(void)
 {
-	LCUIMutex_Lock(&ui_events.mutex);
+	thread_mutex_lock(&ui_events.mutex);
 	rbtree_destroy(&ui_events.event_names);
 	dict_destroy(ui_events.event_ids);
 	ui_clear_touch_capturers(&ui_events.touch_capturers);
 	list_destroy_without_node(&ui_events.queue, ui_on_destroy_event_pack);
 	list_destroy(&ui_events.event_mappings, ui_event_mapping_destroy);
-	LCUIMutex_Unlock(&ui_events.mutex);
-	LCUIMutex_Destroy(&ui_events.mutex);
+	thread_mutex_unlock(&ui_events.mutex);
+	thread_mutex_destroy(&ui_events.mutex);
 	ui_events.event_ids = NULL;
 }
