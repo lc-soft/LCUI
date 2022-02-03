@@ -1,7 +1,8 @@
-/* mutex.c -- The pthread edition mutex lock
+﻿/*
+ * thread.h -- basic thread management
  *
- * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
- * 
+ * Copyright (c) 2018-2022, Liu chao <lc-soft@live.cn> All rights reserved.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -27,38 +28,38 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <LCUI.h>
-#include <LCUI/thread.h>
+#ifndef LCUI_THREAD_H
+#define LCUI_THREAD_H
 
-/* init the mutex */
-int LCUIMutex_Init( LCUI_Mutex *mutex )
-{
-	pthread_mutexattr_t attr;
-	pthread_mutexattr_init( &attr );
-	pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_RECURSIVE );
-	return pthread_mutex_init( mutex, &attr );
-}
+#include <LCUI/header.h>
 
-/* Free the mutex */
-void LCUIMutex_Destroy( LCUI_Mutex *mutex )
-{
-	pthread_mutex_destroy( mutex );
-}
+typedef unsigned long thread_t;
+typedef union thread_mutex_record_t *thread_mutex_t;
+typedef union thread_cond_record_t *thread_cond_t;
 
-/* Try lock the mutex */
-int LCUIMutex_TryLock( LCUI_Mutex *mutex )
-{
-	return pthread_mutex_trylock( mutex );
-}
+LCUI_BEGIN_HEADER
 
-/* Lock the mutex */
-int LCUIMutex_Lock( LCUI_Mutex *mutex )
-{
-	return pthread_mutex_lock( mutex );
-}
+LCUI_API int thread_mutex_init(thread_mutex_t *mutex);
+LCUI_API void thread_mutex_destroy(thread_mutex_t *mutex);
+LCUI_API int thread_mutex_trylock(thread_mutex_t *mutex);
+LCUI_API int thread_mutex_lock(thread_mutex_t *mutex);
+LCUI_API int thread_mutex_unlock(thread_mutex_t *mutex);
 
-/* Unlock the mutex */
-int LCUIMutex_Unlock( LCUI_Mutex *mutex )
-{
-	return pthread_mutex_unlock( mutex );
-}
+LCUI_API int thread_cond_init(thread_cond_t *cond);
+LCUI_API int thread_cond_destroy(thread_cond_t *cond);
+LCUI_API int thread_cond_wait(thread_cond_t *cond, thread_mutex_t *mutex);
+LCUI_API int thread_cond_timedwait(thread_cond_t *cond, thread_mutex_t *mutex,
+				   unsigned int ms);
+LCUI_API int thread_cond_signal(thread_cond_t *cond);
+LCUI_API int thread_cond_broadcast(thread_cond_t *cond);
+
+LCUI_API thread_t thread_self(void);
+LCUI_API int thread_create(thread_t *tidp, void (*start_rtn)(void *),
+			   void *arg);
+LCUI_API int thread_join(thread_t thread, void **retval);
+LCUI_API void thread_cancel(thread_t thread);
+LCUI_API void thread_exit(void *retval);
+
+LCUI_END_HEADER
+
+#endif

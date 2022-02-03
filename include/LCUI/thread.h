@@ -1,7 +1,7 @@
 ﻿/*
  * thread.h -- basic thread management
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2022, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,81 +33,33 @@
 
 #include <LCUI/header.h>
 
-#ifdef _WIN32
-#include <windows.h>
-typedef HANDLE LCUI_Mutex;
-typedef HANDLE LCUI_Cond;
-typedef unsigned int LCUI_Thread;
-#else
-#include <pthread.h>
-typedef pthread_t LCUI_Thread;
-typedef pthread_mutex_t LCUI_Mutex;
-typedef pthread_cond_t LCUI_Cond;
-#endif
+typedef unsigned long thread_t;
+typedef union thread_mutex_record_t *thread_mutex_t;
+typedef union thread_cond_record_t *thread_cond_t;
 
 LCUI_BEGIN_HEADER
 
-/*----------------------------- Mutex <START> -------------------------------*/
+LCUI_API int thread_mutex_init(thread_mutex_t *mutex);
+LCUI_API void thread_mutex_destroy(thread_mutex_t *mutex);
+LCUI_API int thread_mutex_trylock(thread_mutex_t *mutex);
+LCUI_API int thread_mutex_lock(thread_mutex_t *mutex);
+LCUI_API int thread_mutex_unlock(thread_mutex_t *mutex);
 
-/* init the mutex */
-LCUI_API int LCUIMutex_Init(LCUI_Mutex *mutex);
+LCUI_API int thread_cond_init(thread_cond_t *cond);
+LCUI_API int thread_cond_destroy(thread_cond_t *cond);
+LCUI_API int thread_cond_wait(thread_cond_t *cond, thread_mutex_t *mutex);
+LCUI_API int thread_cond_timedwait(thread_cond_t *cond, thread_mutex_t *mutex,
+				   unsigned int ms);
+LCUI_API int thread_cond_signal(thread_cond_t *cond);
+LCUI_API int thread_cond_broadcast(thread_cond_t *cond);
 
-/* Free the mutex */
-LCUI_API void LCUIMutex_Destroy(LCUI_Mutex *mutex);
-
-/* Try lock the mutex */
-LCUI_API int LCUIMutex_TryLock(LCUI_Mutex *mutex);
-
-/* Lock the mutex */
-LCUI_API int LCUIMutex_Lock(LCUI_Mutex *mutex);
-
-/* Unlock the mutex */
-LCUI_API int LCUIMutex_Unlock(LCUI_Mutex *mutex);
-
-/*------------------------------- Mutex <END> -------------------------------*/
-
-/*------------------------------ Cond <START> -------------------------------*/
-
-/** 初始化一个条件变量 */
-LCUI_API int LCUICond_Init(LCUI_Cond *cond);
-
-/** 销毁一个条件变量 */
-LCUI_API int LCUICond_Destroy(LCUI_Cond *cond);
-
-/** 阻塞当前线程，等待条件成立 */
-LCUI_API int LCUICond_Wait(LCUI_Cond *cond, LCUI_Mutex *mutex);
-
-/** 计时阻塞当前线程，等待条件成立 */
-LCUI_API int LCUICond_TimedWait(LCUI_Cond *cond, LCUI_Mutex *mutex, unsigned int ms);
-
-/** 唤醒一个阻塞等待条件成立的线程 */
-LCUI_API int LCUICond_Signal(LCUI_Cond *cond);
-
-/** 唤醒所有阻塞等待条件成立的线程 */
-LCUI_API int LCUICond_Broadcast(LCUI_Cond *cond);
-
-/*------------------------------- Cond <END> --------------------------------*/
-
-
-/*----------------------------- Thread <START> ------------------------------*/
-
-LCUI_API LCUI_Thread LCUIThread_SelfID(void);
-
-/* 创建并运行一个线程 */
-LCUI_API int LCUIThread_Create(LCUI_Thread *tidp, void(*start_rtn)(void*), void *arg);
-
-/* 等待一个线程的结束，并释放该线程的资源 */
-LCUI_API int LCUIThread_Join(LCUI_Thread thread, void **retval);
-
-/* 撤销一个线程 */
-LCUI_API void LCUIThread_Cancel(LCUI_Thread thread);
-
-/* 记录指针作为返回值，并退出线程 */
-LCUI_API void LCUIThread_Exit(void* retval);
-
-/*------------------------------ Thread <END> -------------------------------*/
+LCUI_API thread_t thread_self(void);
+LCUI_API int thread_create(thread_t *tidp, void (*start_rtn)(void *),
+			   void *arg);
+LCUI_API int thread_join(thread_t thread, void **retval);
+LCUI_API void thread_cancel(thread_t thread);
+LCUI_API void thread_exit(void *retval);
 
 LCUI_END_HEADER
 
 #endif
-

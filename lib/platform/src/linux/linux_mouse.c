@@ -50,7 +50,7 @@ static struct linux_mouse_t {
 	int dev_fd;
 	const char *dev_path;
 
-	LCUI_Thread tid;
+	thread_t tid;
 	LCUI_BOOL active;
 } linux_mouse;
 
@@ -128,7 +128,7 @@ int linux_mouse_init(void)
 		logger_error("[input] open mouse device failed\n");
 		return -1;
 	}
-	LCUIThread_Create(&linux_mouse.tid, linux_mouse_thread, NULL);
+	thread_create(&linux_mouse.tid, linux_mouse_thread, NULL);
 	logger_debug("[input] mouse driver thread: %lld\n", linux_mouse.tid);
 	return 0;
 }
@@ -137,7 +137,7 @@ int linux_mouse_destroy(void)
 {
 	if (linux_mouse.active) {
 		linux_mouse.active = FALSE;
-		LCUIThread_Join(linux_mouse.tid, NULL);
+		thread_join(linux_mouse.tid, NULL);
 		close(linux_mouse.dev_fd);
 	}
 	return 0;

@@ -51,7 +51,7 @@ static struct linux_keyboard_t {
 	int fd;
 	struct termios tm;
 #endif
-	LCUI_Thread tid;
+	thread_t tid;
 	LCUI_BOOL active;
 } linux_keyboard;
 
@@ -84,7 +84,7 @@ int linux_keyboard_init(void)
 		logger_error("[input] open keyboard device failed");
 		return -1;
 	}
-	LCUIThread_Create(&linux_keyboard.tid, linux_keyboard_thread, NULL);
+	thread_create(&linux_keyboard.tid, linux_keyboard_thread, NULL);
 	return 0;
 }
 
@@ -94,7 +94,7 @@ int linux_keyboard_destroy(void)
 		return -1;
 	}
 	linux_keyboard.active = FALSE;
-	LCUIThread_Join(linux_keyboard.tid, NULL);
+	thread_join(linux_keyboard.tid, NULL);
 	close(linux_keyboard.dev_fd);
 	return 0;
 }
@@ -231,7 +231,7 @@ int linux_keyboard_init(void)
 		signal(signals[i], on_signal);
 	}
 	linux_keyboard.active = TRUE;
-	LCUIThread_Create(&linux_keyboard.tid, linux_keyboard_thread, NULL);
+	thread_create(&linux_keyboard.tid, linux_keyboard_thread, NULL);
 	logger_debug("[input] keyboard driver thread: %lld\n", linux_keyboard.tid);
 	return 0;
 }
@@ -242,7 +242,7 @@ int linux_keyboard_destroy(void)
 		return 0;
 	}
 	linux_keyboard.active = FALSE;
-	LCUIThread_Join(linux_keyboard.tid, NULL);
+	thread_join(linux_keyboard.tid, NULL);
 	if (tcsetattr(linux_keyboard.fd, TCSANOW, &linux_keyboard.tm) < 0) {
 		return -1;
 	}
