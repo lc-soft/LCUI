@@ -69,7 +69,7 @@ static struct x11_clipboard_module_t {
 	Atom xa_targets;
 	Atom xa_text;
 	// Observer thread
-	LCUI_Thread observer_thread;
+	thread_t observer_thread;
 } x11_clipboard;
 
 void x11_clipboard_execute_action(LCUI_BOOL timed_out)
@@ -80,7 +80,7 @@ void x11_clipboard_execute_action(LCUI_BOOL timed_out)
 
 	if (!timed_out) {
 		_DEBUG_MSG("Didn't time out canceling observer thread\n");
-		LCUIThread_Cancel(x11_clipboard.observer_thread);
+		thread_cancel(x11_clipboard.observer_thread);
 	}
 
 	if (!action->running) {
@@ -196,7 +196,7 @@ int x11_clipboard_request_text(clipboard_callback_t callback, void *arg)
 	// retrieved from UTF8_STRING, however, our implementation is not
 	// synchronous, so not sure how it would work, it needs further
 	// investigation
-	LCUIThread_Create(&x11_clipboard.observer_thread,
+	thread_create(&x11_clipboard.observer_thread,
 			  x11_clipboard_request_timeout, NULL);
 	XConvertSelection(display, x11_clipboard.xclipboard,
 			  x11_clipboard.xutf8_string, XSEL_DATA, window,
