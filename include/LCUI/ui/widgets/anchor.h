@@ -1,5 +1,6 @@
 ﻿/*
- * uri.c -- uri processing for UWP
+ * anchor.c -- The anchor widget, used to link view resource, its function is
+ * similar to <a> element in HTML.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
@@ -28,34 +29,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <wrl.h>
-#include <wrl/client.h>
-#include <stdlib.h>
-#include <LCUI/header.h>
-#include <LCUI/util/uri.h>
-#include <yutil.h>
+#ifndef LIB_UI_WIDGETS_INCLUDE_ANCHOR_H
+#define LIB_UI_WIDGETS_INCLUDE_ANCHOR_H
 
-#if defined(LCUI_PLATFORM_WIN32) && defined(WINAPI_PARTITION_APP)
-int OpenUri(const char *uristr)
-{
-	size_t len;
-	wchar_t *wuri;
+#include <LCUI/ui.h>
 
-	len = decode_string(NULL, uristr, 0, ENCODING_ANSI);
-	if (len < 1) {
-		return -1;
-	}
-	wuri = (wchar_t*)malloc((len + 1) * sizeof(wchar_t));
-	if (!wuri) {
-		return -2;
-	}
-	decode_string(wuri, uristr, len, ENCODING_ANSI);
-	wuri[len] = 0;
+LCUI_API void ui_anchor_open(ui_widget_t* w);
 
-	auto str = ref new Platform::String(wuri);
-	auto uri = ref new Windows::Foundation::Uri(str);
-	Windows::System::Launcher::LaunchUriAsync(uri);
-	free(wuri);
-	return 0;
-}
+LCUI_API void ui_register_anchor(void);
+
+LCUI_API void ui_unregister_anchor(void);
+
 #endif

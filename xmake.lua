@@ -67,7 +67,6 @@ target("lcui")
         "lcui-image",
         "lcui-ui",
         "lcui-ui-widgets",
-        "lcui-ui-anchor",
         "lcui-ui-cursor",
         "lcui-ui-builder",
         "lcui-ui-server",
@@ -91,8 +90,7 @@ target("headers")
         os.cp("$(projectdir)/lib/paint/include/*.h", "$(projectdir)/include/LCUI/paint/")
         os.cp("$(projectdir)/lib/image/include/*.h", "$(projectdir)/include/LCUI/image/")
         os.cp("$(projectdir)/lib/ui/include/*.h", "$(projectdir)/include/LCUI/")
-        os.cp("$(projectdir)/lib/ui-widgets/include/*.h", "$(projectdir)/include/LCUI/ui/")
-        os.cp("$(projectdir)/lib/ui-anchor/include/*.h", "$(projectdir)/include/LCUI/ui/")
+        os.cp("$(projectdir)/lib/ui-widgets/include/*.h", "$(projectdir)/include/LCUI/ui/widgets/")
         os.cp("$(projectdir)/lib/ui-cursor/include/*.h", "$(projectdir)/include/LCUI/ui/")
         os.cp("$(projectdir)/lib/ui-builder/include/*.h", "$(projectdir)/include/LCUI/ui/")
         os.cp("$(projectdir)/lib/ui-server/include/*.h", "$(projectdir)/include/LCUI/ui/")

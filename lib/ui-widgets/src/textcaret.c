@@ -1,7 +1,7 @@
 ﻿/*
  * textcaret.c -- textcaret widget, used in textedit.
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2022, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,25 +32,25 @@
 #include <LCUI.h>
 #include <LCUI/timer.h>
 #include <LCUI/ui.h>
-#include <LCUI/gui/widget/textcaret.h>
 #include <LCUI/css.h>
+#include "../include/textedit.h"
 
-typedef struct LCUI_TextCaretTaskRec_ {
+typedef struct ui_textcaret_task_t {
 	LCUI_BOOL active;
 	ui_widget_t* widget;
-} LCUI_TextCaretTaskRec, *LCUI_TextCaretTask;
+} ui_textcaret_task_t;
 
 /** 文本插入符相关数据 */
-typedef struct LCUI_TextCaretRec_ {
+typedef struct ui_textcaret_t {
 	int timer_id;
 	int blink_interval;
 	LCUI_BOOL visible;
-	LCUI_TextCaretTask task;
-} LCUI_TextCaretRec, *LCUI_TextCaret;
+	ui_textcaret_task_t *task;
+} ui_textcaret_t;
 
-static ui_widget_prototype_t *prototype = NULL;
+static ui_widget_prototype_t *ui_textcaret_proto = NULL;
 
-static const char *textcaret_css = CodeToString(
+static const char *ui_textcaret_css = CodeToString(
 
 textcaret {
 	pointer-events: none;
@@ -63,13 +63,13 @@ textcaret {
 
 );
 
-void TextCaret_Refresh(ui_widget_t* widget)
+void ui_textcaret_refresh(ui_widget_t* widget)
 {
 	float x, y;
 
-	LCUI_TextCaret caret;
+	ui_textcaret_t *caret;
 
-	caret = ui_widget_get_data(widget, prototype);
+	caret = ui_widget_get_data(widget, ui_textcaret_proto);
 	if (!caret->visible) {
 		return;
 	}
@@ -79,16 +79,16 @@ void TextCaret_Refresh(ui_widget_t* widget)
 	ui_widget_show(widget);
 }
 
-static void TextCaret_OnBlink(void *arg)
+static void ui_textcaret_on_blink(void *arg)
 {
-	LCUI_TextCaret caret;
-	LCUI_TextCaretTask task = arg;
+	ui_textcaret_t *caret;
+	ui_textcaret_task_t *task = arg;
 
 	if (!task->active) {
 		free(task);
 		return;
 	}
-	caret = ui_widget_get_data(task->widget, prototype);
+	caret = ui_widget_get_data(task->widget, ui_textcaret_proto);
 	if (!caret->visible || ui_widget_is_visible(task->widget)) {
 		ui_widget_hide(task->widget);
 	} else {
@@ -96,48 +96,48 @@ static void TextCaret_OnBlink(void *arg)
 	}
 }
 
-void TextCaret_SetVisible(ui_widget_t* widget, LCUI_BOOL visible)
+void ui_textcaret_set_visible(ui_widget_t* widget, LCUI_BOOL visible)
 {
-	LCUI_TextCaret caret;
+	ui_textcaret_t *caret;
 
-	caret = ui_widget_get_data(widget, prototype);
+	caret = ui_widget_get_data(widget, ui_textcaret_proto);
 	caret->visible = visible;
 	if (visible) {
-		TextCaret_Refresh(widget);
+		ui_textcaret_refresh(widget);
 	} else {
 		lcui_reset_timer(caret->timer_id, caret->blink_interval);
 		ui_widget_hide(widget);
 	}
 }
 
-static void TextCaret_OnInit(ui_widget_t* widget)
+static void ui_textcaret_on_init(ui_widget_t* widget)
 {
-	LCUI_TextCaret caret;
+	ui_textcaret_t *caret;
 
-	caret = ui_widget_add_data(widget, prototype, sizeof(LCUI_TextCaretRec));
-	caret->task = malloc(sizeof(LCUI_TextCaretTaskRec));
+	caret = ui_widget_add_data(widget, ui_textcaret_proto, sizeof(ui_textcaret_t));
+	caret->task = malloc(sizeof(ui_textcaret_task_t));
 	caret->task->active = TRUE;
 	caret->task->widget = widget;
 	caret->blink_interval = 500;
 	caret->visible = FALSE;
 	caret->timer_id = lcui_set_interval(caret->blink_interval,
-		TextCaret_OnBlink, caret->task);
+		ui_textcaret_on_blink, caret->task);
 }
 
-void TextCaret_SetBlinkTime(ui_widget_t* widget, unsigned int n_ms)
+void ui_textcaret_set_blink_time(ui_widget_t* widget, unsigned int n_ms)
 {
-	LCUI_TextCaret caret;
+	ui_textcaret_t *caret;
 
-	caret = ui_widget_get_data(widget, prototype);
+	caret = ui_widget_get_data(widget, ui_textcaret_proto);
 	caret->blink_interval = n_ms;
 	lcui_reset_timer(caret->timer_id, caret->blink_interval);
 }
 
-static void TextCaret_OnDestroy(ui_widget_t* widget)
+static void ui_textcaret_on_destroy(ui_widget_t* widget)
 {
-	LCUI_TextCaret caret;
+	ui_textcaret_t *caret;
 
-	caret = ui_widget_get_data(widget, prototype);
+	caret = ui_widget_get_data(widget, ui_textcaret_proto);
 	caret->task->active = FALSE;
 	if (lcui_destroy_timer(caret->timer_id) != -1) {
 		free(caret->task);
@@ -146,10 +146,10 @@ static void TextCaret_OnDestroy(ui_widget_t* widget)
 	caret->timer_id = -1;
 }
 
-void LCUIWidget_AddTextCaret(void)
+void ui_register_textcaret(void)
 {
-	prototype = ui_create_widget_prototype("textcaret", NULL);
-	prototype->init = TextCaret_OnInit;
-	prototype->destroy = TextCaret_OnDestroy;
-	ui_load_css_string(textcaret_css, __FILE__);
+	ui_textcaret_proto = ui_create_widget_prototype("textcaret", NULL);
+	ui_textcaret_proto->init = ui_textcaret_on_init;
+	ui_textcaret_proto->destroy = ui_textcaret_on_destroy;
+	ui_load_css_string(ui_textcaret_css, __FILE__);
 }

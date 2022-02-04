@@ -442,6 +442,7 @@ typedef struct ui_wheel_event_t {
 
 typedef struct ui_event_t ui_event_t;
 typedef void(*ui_event_handler_t)(ui_widget_t*, ui_event_t*, void*);
+typedef void (*ui_event_arg_destructor_t)(void*);
 
 struct ui_event_t {
 	uint32_t type;			/**< 事件类型标识号 */
@@ -978,7 +979,7 @@ INLINE void ui_widget_block_event(ui_widget_t* w, LCUI_BOOL block)
 
 /** 触发事件，让事件处理器在主循环中调用 */
 LCUI_API int ui_widget_post_event(ui_widget_t* w, const ui_event_t* e,
-				  void* arg, void (*destroy_data)(void*));
+				  void* arg, ui_event_arg_destructor_t destroy_arg);
 
 /** 触发事件，直接调用事件处理器 */
 LCUI_API int ui_widget_emit_event(ui_widget_t* w, ui_event_t e, void* arg);
@@ -1005,13 +1006,13 @@ LCUI_API void ui_event_destroy(ui_event_t* e);
  * @param[in] event_id 事件标识号
  * @param[in] handler 事件处理函数
  * @param[in] data 事件处理函数的附加数据
- * @param[in] destroy_data 数据的销毁函数
+ * @param[in] destroy_arg 数据的销毁函数
  * @return 成功则返回 0，失败返回负数
  */
 LCUI_API int ui_widget_add_event_listener(ui_widget_t* widget, int event_id,
 					  ui_event_handler_t handler,
 					  void* data,
-					  void (*destroy_data)(void*));
+					  void (*destroy_arg)(void*));
 
 LCUI_API int ui_widget_remove_event_listener(ui_widget_t* w, int event_id,
 					     ui_event_handler_t handler);
@@ -1021,12 +1022,12 @@ LCUI_API int ui_widget_remove_event_listener(ui_widget_t* w, int event_id,
  * @param[in] event_name 事件名称
  * @param[in] handler 事件处理函数
  * @param[in] data 事件处理函数的附加数据
- * @param[in] destroy_data 数据的销毁函数
+ * @param[in] destroy_arg 数据的销毁函数
  * @return 返回已移除的事件监听器数量
  */
 LCUI_API int ui_widget_on(ui_widget_t* widget, const char* event_name,
 			  ui_event_handler_t handler, void* data,
-			  void (*destroy_data)(void*));
+			  void (*destroy_arg)(void*));
 
 /**
  * 解除部件事件绑定
@@ -1043,18 +1044,18 @@ INLINE int ui_emit_event(ui_event_t e, void* arg)
 	return ui_widget_emit_event(ui_root(), e, arg);
 }
 
-INLINE int ui_post_event(const ui_event_t* e, void* data,
-			 void (*destroy_data)(void*))
+INLINE int ui_post_event(const ui_event_t* e, void* arg,
+			 ui_event_arg_destructor_t destroy_arg)
 {
-	return ui_widget_post_event(ui_root(), e, data, destroy_data);
+	return ui_widget_post_event(ui_root(), e, arg, destroy_arg);
 }
 
 INLINE int ui_add_event_listener(ui_widget_t* widget, int event_id,
-				 ui_event_handler_t handler, void* data,
-				 void (*destroy_data)(void*))
+				 ui_event_handler_t handler, void* arg,
+				 ui_event_arg_destructor_t destroy_arg)
 {
-	return ui_widget_add_event_listener(ui_root(), event_id, handler, data,
-					    destroy_data);
+	return ui_widget_add_event_listener(ui_root(), event_id, handler, arg,
+					    destroy_arg);
 }
 
 INLINE int ui_remove_event_listener(ui_widget_t* w, int event_id,
@@ -1064,9 +1065,9 @@ INLINE int ui_remove_event_listener(ui_widget_t* w, int event_id,
 }
 
 INLINE int ui_on_event(const char* event_name, ui_event_handler_t handler,
-		       void* data, void (*destroy_data)(void*))
+		       void* data, void (*destroy_arg)(void*))
 {
-	return ui_widget_on(ui_root(), event_name, handler, data, destroy_data);
+	return ui_widget_on(ui_root(), event_name, handler, data, destroy_arg);
 }
 
 INLINE int ui_off_event(const char* event_name, ui_event_handler_t handler)

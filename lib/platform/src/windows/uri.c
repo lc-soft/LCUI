@@ -33,9 +33,21 @@
 #include <string.h>
 #include "../internal.h"
 
+#if defined(LCUI_PLATFORM_WIN32) && !defined(WINAPI_PARTITION_APP)
+#pragma warning(disable:4091)
+#include <Windows.h>
+#include <ShlObj.h>
+
 int open_uri(const char *uri)
 {
-	char cmd[512] = { 0 };
-	snprintf(cmd, 511, "xdg-open %s", uri);
-	return system(cmd);
+	ShellExecuteA(NULL, "open", uri, NULL, NULL, SW_SHOW);
+	return 0;
 }
+
+#else
+
+int open_uri(const char *uri)
+{
+	return -1;
+}
+#endif

@@ -32,37 +32,34 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <LCUI.h>
 #include <LCUI/graph.h>
 #include <LCUI/css.h>
 #include "./internal.h"
-#include <LCUI/gui/widget/textview.h>
+#include "../include/textview.h"
 
-#define GetData(W) ui_widget_get_data(W, self.prototype)
-
-typedef struct LCUI_TextViewTaskRec_ {
+typedef struct ui_textview_task_t {
 	wchar_t *content;
 	LCUI_BOOL update_content;
-} LCUI_TextViewTaskRec, *LCUI_TextViewTask;
+} ui_textview_task_t;
 
-typedef struct LCUI_TextViewRec_ {
+typedef struct ui_textview_t_ {
 	float available_width;
 	wchar_t *content;
 	LCUI_BOOL trimming;
 	ui_widget_t *widget;
 	LCUI_TextLayer layer;
 	ui_font_style_t style;
-	LCUI_TextViewTaskRec task;
+	ui_textview_task_t task;
 	list_node_t node;
-} LCUI_TextViewRec, *LCUI_TextView;
+} ui_textview_t;
 
-static struct LCUI_TextViewModule {
+static struct ui_textview_module_t {
 	int css_key_word_break;
 	list_t list;
 	ui_widget_prototype_t *prototype;
-} self;
+} ui_textview;
 
-static LCUI_BOOL ParseBoolean(const char *str)
+static LCUI_BOOL parse_boolean(const char *str)
 {
 	if (strcmp(str, "on") == 0 && strcmp(str, "true") == 0 &&
 	    strcmp(str, "yes") == 0 && strcmp(str, "1") == 0) {
@@ -71,10 +68,11 @@ static LCUI_BOOL ParseBoolean(const char *str)
 	return FALSE;
 }
 
-static int OnParseWordBreak(css_style_parser_t *ctx, const char *value)
+static int css_parse_word_break_property(css_style_parser_t *ctx, const char *value)
 {
 	char *str = strdup2(value);
-	css_unit_value_t *s = &ctx->style->sheet[self.css_key_word_break];
+	css_unit_value_t *s = &ctx->style->sheet[ui_textview.css_key_word_break];
+
 	if (s->is_valid && s->string) {
 		free(s->string);
 	}
@@ -84,9 +82,9 @@ static int OnParseWordBreak(css_style_parser_t *ctx, const char *value)
 	return 0;
 }
 
-static LCUI_WordBreakMode ComputeWordBreakMode(css_style_decl_t *style)
+static LCUI_WordBreakMode compute_word_break_mode(css_style_decl_t *style)
 {
-	css_unit_value_t *s = &style->sheet[self.css_key_word_break];
+	css_unit_value_t *s = &style->sheet[ui_textview.css_key_word_break];
 	if (s->is_valid && s->unit == CSS_UNIT_STRING && s->string) {
 		if (strcmp(s->string, "break-all") == 0) {
 			return LCUI_WORD_BREAK_BREAK_ALL;
@@ -95,36 +93,37 @@ static LCUI_WordBreakMode ComputeWordBreakMode(css_style_decl_t *style)
 	return LCUI_WORD_BREAK_NORMAL;
 }
 
-static void TextView_OnParseAttr(ui_widget_t *w, const char *name,
+static void ui_textview_on_parse_attr(ui_widget_t *w, const char *name,
 				 const char *value)
 {
-	LCUI_TextView txt = GetData(w);
+	ui_textview_t *txt = ui_widget_get_data(w, ui_textview.prototype);
+
 	if (strcmp(name, "trimming") == 0) {
-		if (ParseBoolean(value) != txt->trimming) {
+		if (parse_boolean(value) != txt->trimming) {
 			txt->trimming = !txt->trimming;
-			TextView_SetTextW(w, txt->content);
+			ui_textview_set_text_w(w, txt->content);
 		}
 		return;
 	}
 	if (strcmp(name, "multiline") == 0) {
-		LCUI_BOOL enable = ParseBoolean(value);
+		LCUI_BOOL enable = parse_boolean(value);
 		if (enable != txt->layer->enable_mulitiline) {
 			ui_textview_set_multiline(w, enable);
 		}
 	}
 }
 
-static void TextView_OnParseText(ui_widget_t *w, const char *text)
+static void ui_textview_on_parse_text(ui_widget_t *w, const char *text)
 {
-	TextView_SetText(w, text);
+	ui_textview_set_text(w, text);
 }
 
-static void TextView_Update(ui_widget_t *w)
+static void ui_textview_on_update(ui_widget_t *w)
 {
 	float scale = ui_get_scale();
 
 	pd_rectf_t rect;
-	LCUI_TextView txt = GetData(w);
+	ui_textview_t *txt = ui_widget_get_data(w, ui_textview.prototype);;
 
 	list_t rects;
 	list_node_t *node;
@@ -140,11 +139,11 @@ static void TextView_Update(ui_widget_t *w)
 	ui_widget_add_task(w, UI_TASK_REFLOW);
 }
 
-static void TextView_UpdateStyle(ui_widget_t *w)
+static void ui_textview_on_update_style(ui_widget_t *w)
 {
 	ui_font_style_t style;
 	LCUI_TextStyleRec text_style;
-	LCUI_TextView txt = GetData(w);
+	ui_textview_t *txt = ui_widget_get_data(w, ui_textview.prototype);;
 
 	ui_font_style_init(&style);
 	ui_font_style_compute(&style, w->style);
@@ -168,24 +167,24 @@ static void TextView_UpdateStyle(ui_widget_t *w)
 	TextLayer_SetLineHeight(txt->layer, style.line_height);
 	TextLayer_SetAutoWrap(txt->layer,
 			      style.white_space != CSS_KEYWORD_NOWRAP);
-	TextLayer_SetWordBreak(txt->layer, ComputeWordBreakMode(w->style));
+	TextLayer_SetWordBreak(txt->layer, compute_word_break_mode(w->style));
 	TextLayer_SetTextStyle(txt->layer, &text_style);
 	if (style.content) {
-		TextView_SetTextW(w, style.content);
+		ui_textview_set_text_w(w, style.content);
 	} else if (txt->style.content) {
-		TextView_SetTextW(w, NULL);
+		ui_textview_set_text_w(w, NULL);
 	}
 	ui_font_style_destroy(&txt->style);
 	TextStyle_Destroy(&text_style);
 	txt->style = style;
-	TextView_Update(w);
+	ui_textview_on_update(w);
 }
 
-static void TextView_OnInit(ui_widget_t *w)
+static void ui_textview_on_init(ui_widget_t *w)
 {
-	LCUI_TextView txt;
+	ui_textview_t *txt;
 
-	txt = ui_widget_add_data(w, self.prototype, sizeof(LCUI_TextViewRec));
+	txt = ui_widget_add_data(w, ui_textview.prototype, sizeof(ui_textview_t));
 	txt->widget = w;
 	txt->available_width = 0;
 	txt->task.update_content = FALSE;
@@ -199,14 +198,14 @@ static void TextView_OnInit(ui_widget_t *w)
 	ui_font_style_init(&txt->style);
 	txt->node.data = txt;
 	txt->node.prev = txt->node.next = NULL;
-	list_append_node(&self.list, &txt->node);
+	list_append_node(&ui_textview.list, &txt->node);
 }
 
-static void TextView_OnDestroy(ui_widget_t *w)
+static void ui_textview_on_destroy(ui_widget_t *w)
 {
-	LCUI_TextView txt = GetData(w);
+	ui_textview_t *txt = ui_widget_get_data(w, ui_textview.prototype);;
 
-	list_unlink(&self.list, &txt->node);
+	list_unlink(&ui_textview.list, &txt->node);
 	ui_font_style_destroy(&txt->style);
 	TextLayer_Destroy(txt->layer);
 	free(txt->content);
@@ -216,13 +215,13 @@ static void TextView_OnDestroy(ui_widget_t *w)
 	}
 }
 
-static void TextView_OnAutoSize(ui_widget_t *w, float *width, float *height,
+static void ui_textview_on_auto_size(ui_widget_t *w, float *width, float *height,
 				ui_layout_rule_t rule)
 {
 	int max_width, max_height;
 	float scale = ui_get_scale();
 
-	LCUI_TextView txt = GetData(w);
+	ui_textview_t *txt = ui_widget_get_data(w, ui_textview.prototype);;
 
 	list_t rects;
 
@@ -261,14 +260,14 @@ static void TextView_OnAutoSize(ui_widget_t *w, float *width, float *height,
 	RectList_Clear(&rects);
 }
 
-static void TextView_OnResize(ui_widget_t *w, float width, float height)
+static void ui_textview_on_resize(ui_widget_t *w, float width, float height)
 {
 	float scale = ui_get_scale();
 	int fixed_width = (int)(width * scale);
 	int fixed_height = (int)(height * scale);
 
 	pd_rectf_t rect;
-	LCUI_TextView txt = GetData(w);
+	ui_textview_t *txt = ui_widget_get_data(w, ui_textview.prototype);;
 
 	list_t rects;
 	list_node_t *node;
@@ -285,13 +284,13 @@ static void TextView_OnResize(ui_widget_t *w, float width, float height)
 	RectList_Clear(&rects);
 }
 
-static void TextView_OnPaint(ui_widget_t *w, pd_paint_context_t *paint,
+static void ui_textview_on_paint(ui_widget_t *w, pd_paint_context_t *paint,
 			     ui_widget_actual_style_t *style)
 {
 	pd_pos_t pos;
 	pd_canvas_t canvas;
 	pd_rect_t content_rect, rect;
-	LCUI_TextView txt = GetData(w);
+	ui_textview_t *txt = ui_widget_get_data(w, ui_textview.prototype);;
 
 	content_rect.width = style->content_box.width;
 	content_rect.height = style->content_box.height;
@@ -311,9 +310,9 @@ static void TextView_OnPaint(ui_widget_t *w, pd_paint_context_t *paint,
 	TextLayer_RenderTo(txt->layer, rect, pos, &canvas);
 }
 
-int TextView_SetTextW(ui_widget_t *w, const wchar_t *text)
+int ui_textview_set_text_w(ui_widget_t *w, const wchar_t *text)
 {
-	LCUI_TextView txt = GetData(w);
+	ui_textview_t *txt = ui_widget_get_data(w, ui_textview.prototype);;
 	wchar_t *newtext = wcsdup2(text);
 
 	if (!newtext) {
@@ -349,7 +348,7 @@ int TextView_SetTextW(ui_widget_t *w, const wchar_t *text)
 	return 0;
 }
 
-int TextView_SetText(ui_widget_t *w, const char *utf8_text)
+int ui_textview_set_text(ui_widget_t *w, const char *utf8_text)
 {
 	int ret;
 	wchar_t *wstr;
@@ -357,42 +356,16 @@ int TextView_SetText(ui_widget_t *w, const char *utf8_text)
 
 	wstr = malloc(sizeof(wchar_t) * len);
 	decode_utf8(wstr, utf8_text, len);
-	ret = TextView_SetTextW(w, wstr);
+	ret = ui_textview_set_text_w(w, wstr);
 	if (wstr) {
 		free(wstr);
 	}
 	return ret;
 }
 
-void TextView_SetLineHeight(ui_widget_t *w, int height)
-{
-	ui_widget_set_style(w, css_key_line_height, (float)height, px);
-}
-
-void TextView_SetTextAlign(ui_widget_t *w, int align)
-{
-	ui_widget_set_style(w, css_key_text_align, align, keyword);
-}
-
-void TextView_SetColor(ui_widget_t *w, pd_color_t color)
-{
-	ui_widget_set_style(w, css_key_color, color, color);
-}
-
-void TextView_SetAutoWrap(ui_widget_t *w, LCUI_BOOL enable)
-{
-	if (enable) {
-		ui_widget_set_style(w, css_key_white_space, CSS_KEYWORD_AUTO,
-				    keyword);
-	} else {
-		ui_widget_set_style(w, css_key_white_space, CSS_KEYWORD_NOWRAP,
-				    keyword);
-	}
-}
-
 void ui_textview_set_multiline(ui_widget_t *w, LCUI_BOOL enable)
 {
-	LCUI_TextView txt = GetData(w);
+	ui_textview_t *txt = ui_widget_get_data(w, ui_textview.prototype);;
 
 	TextLayer_SetMultiline(txt->layer, enable);
 	ui_widget_add_task(w, UI_TASK_USER);
@@ -400,10 +373,10 @@ void ui_textview_set_multiline(ui_widget_t *w, LCUI_BOOL enable)
 
 static void textview_on_font_face_load(ui_widget_t *w, ui_event_t *e, void *arg)
 {
-	LCUI_TextView txt;
+	ui_textview_t *txt;
 	list_node_t *node;
 
-	for (list_each(node, &self.list)) {
+	for (list_each(node, &ui_textview.list)) {
 		txt = node->data;
 		if (txt->widget->state != UI_WIDGET_STATE_DELETED) {
 			ui_widget_refresh_style(txt->widget);
@@ -411,14 +384,14 @@ static void textview_on_font_face_load(ui_widget_t *w, ui_event_t *e, void *arg)
 	}
 }
 
-static void TextVIew_OnTask(ui_widget_t *w, int task)
+static void ui_textview_on_run_rask(ui_widget_t *w, int task)
 {
-	LCUI_TextView txt;
+	ui_textview_t *txt;
 
-	txt = GetData(w);
+	txt = ui_widget_get_data(w, ui_textview.prototype);;
 	if (txt->task.update_content) {
 		TextLayer_SetTextW(txt->layer, txt->task.content, NULL);
-		TextView_Update(w);
+		ui_textview_on_update(w);
 		free(txt->task.content);
 		txt->task.content = NULL;
 		txt->task.update_content = FALSE;
@@ -433,27 +406,27 @@ static void TextVIew_OnTask(ui_widget_t *w, int task)
 	}
 }
 
-void LCUIWidget_AddTextView(void)
+void ui_register_textview(void)
 {
-	self.css_key_word_break = css_register_property_name("word-break");
-	self.prototype = ui_create_widget_prototype("textview", NULL);
-	self.prototype->init = TextView_OnInit;
-	self.prototype->paint = TextView_OnPaint;
-	self.prototype->destroy = TextView_OnDestroy;
-	self.prototype->autosize = TextView_OnAutoSize;
-	self.prototype->resize = TextView_OnResize;
-	self.prototype->update = TextView_UpdateStyle;
-	self.prototype->settext = TextView_OnParseText;
-	self.prototype->setattr = TextView_OnParseAttr;
-	self.prototype->runtask = TextVIew_OnTask;
-	list_create(&self.list);
+	ui_textview.css_key_word_break = css_register_property_name("word-break");
+	ui_textview.prototype = ui_create_widget_prototype("textview", NULL);
+	ui_textview.prototype->init = ui_textview_on_init;
+	ui_textview.prototype->paint = ui_textview_on_paint;
+	ui_textview.prototype->destroy = ui_textview_on_destroy;
+	ui_textview.prototype->autosize = ui_textview_on_auto_size;
+	ui_textview.prototype->resize = ui_textview_on_resize;
+	ui_textview.prototype->update = ui_textview_on_update_style;
+	ui_textview.prototype->settext = ui_textview_on_parse_text;
+	ui_textview.prototype->setattr = ui_textview_on_parse_attr;
+	ui_textview.prototype->runtask = ui_textview_on_run_rask;
+	list_create(&ui_textview.list);
 	ui_on_event("font_face_load", textview_on_font_face_load, NULL, NULL);
-	css_register_property_parser(self.css_key_word_break, "word-break",
-				     OnParseWordBreak);
+	css_register_property_parser(ui_textview.css_key_word_break, "word-break",
+				     css_parse_word_break_property);
 }
 
-void LCUIWidget_FreeTextView(void)
+void ui_unregister_textview(void)
 {
-	list_destroy_without_node(&self.list, NULL);
+	list_destroy_without_node(&ui_textview.list, NULL);
 	ui_off_event("font_face_load", textview_on_font_face_load);
 }

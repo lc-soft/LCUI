@@ -23,7 +23,7 @@ typedef struct ui_event_listener_t {
 	int event_id;
 	ui_event_handler_t handler;
 	void *data;
-	void(*destroy_data)(void *);
+	ui_event_arg_destructor_t destroy_data;
 } ui_event_listener_t;
 
 typedef struct ui_event_pack_t {
@@ -319,7 +319,7 @@ static int ui_remove_touch_capturer(list_t* list, ui_widget_t *w, int point_id)
 
 int ui_widget_add_event_listener(ui_widget_t *w, int event_id,
 				 ui_event_handler_t handler, void* data,
-				 void (*destroy_data)(void*))
+				 ui_event_arg_destructor_t destroy_data)
 {
 	ui_event_listener_t* listener;
 

@@ -2,7 +2,7 @@
 #include <LCUI.h>
 #include <LCUI/ui.h>
 #include <LCUI/thread.h>
-#include <LCUI/gui/widget/button.h>
+#include <LCUI/ui/widgets/button.h>
 #include <LCUI/timer.h>
 #include "ctest.h"
 
@@ -63,7 +63,7 @@ void test_mainloop(void)
 
 	lcui_init();
 	btn = ui_create_widget("button");
-	Button_SetText(btn, "button");
+	ui_button_set_text(btn, "button");
 	ui_widget_on(btn, "click", OnBtnClick, NULL, NULL);
 	ui_root_append(btn);
 	/* Observe whether the main loop has exited in a new thread */

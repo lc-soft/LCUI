@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <LCUI.h>
 #include <LCUI/ui.h>
-#include <LCUI/gui/widget/textview.h>
+#include <LCUI/ui/widgets/textview.h>
 #include <LCUI/css.h>
 #include <LCUI/ui/builder.h>
 #include <LCUI/graph.h>

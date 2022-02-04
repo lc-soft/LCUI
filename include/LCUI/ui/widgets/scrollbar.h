@@ -1,5 +1,5 @@
 ﻿/*
- * textcaret.h -- textcaret widget, used in textedit.
+ * scrollbar.c -- LCUI's scrollbar widget
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
@@ -28,16 +28,33 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_TEXTCARET_H
-#define LCUI_TEXTCARET_H
+#ifndef LIB_UI_WIDGETS_INCLUDE_SCROLLBAR_H
+#define LIB_UI_WIDGETS_INCLUDE_SCROLLBAR_H
 
-LCUI_API void TextCaret_Refresh(ui_widget_t* widget);
+LCUI_BEGIN_HEADER
 
-LCUI_API void TextCaret_SetVisible(ui_widget_t* widget, LCUI_BOOL visible);
+typedef enum ui_scrollbar_direction_t {
+	UI_SCROLLBAR_HORIZONTAL,
+	UI_SCROLLBAR_VERTICAL
+} ui_scrollbar_direction_t;
 
-/** 设置闪烁的时间间隔 */
-LCUI_API void TextCaret_SetBlinkTime(ui_widget_t* widget, unsigned int n_ms);
+LCUI_API void ui_scrollbar_bind_container(ui_widget_t* w,
+					  ui_widget_t* container);
 
-LCUI_API void LCUIWidget_AddTextCaret(void);
+LCUI_API void ui_scrollbar_bind_target(ui_widget_t* w, ui_widget_t* target);
+
+/** 获取滚动条的位置 */
+LCUI_API float ui_scrollbar_get_position(ui_widget_t* w);
+
+/** 将与滚动条绑定的内容滚动至指定位置 */
+LCUI_API float ui_scrollbar_set_position(ui_widget_t* w, float pos);
+
+/** 设置滚动条的方向 */
+LCUI_API void ui_scrollbar_set_direction(ui_widget_t* w,
+					 ui_scrollbar_direction_t direction);
+
+LCUI_API void ui_register_scrollbar(void);
+
+LCUI_END_HEADER
 
 #endif

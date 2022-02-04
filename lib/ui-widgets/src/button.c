@@ -1,7 +1,7 @@
 ﻿/*
- * button.c -- LCUI‘s Button widget
+ * button.c -- Button widget
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2022, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,17 +30,14 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <LCUI.h>
 #include <LCUI/ui.h>
-#include <LCUI/font.h>
-#include <LCUI/gui/widget/textview.h>
-#include <LCUI/gui/widget/button.h>
 #include <LCUI/css.h>
+#include "../include/button.h"
+#include "../include/textview.h"
 
-static ui_widget_prototype_t *prototype = NULL;
+static ui_widget_prototype_t *ui_button_prototype = NULL;
 
-/** 按钮的 css 样式 */
-static const char *button_css = CodeToString(
+static const char *ui_button_css = CodeToString(
 
 button {
 	padding: 5px 10px;
@@ -66,25 +63,25 @@ button:disabled {
 
 );
 
-static void Button_OnInit(ui_widget_t* w)
+static void ui_button_on_init(ui_widget_t* w)
 {
-	prototype->proto->init(w);
+	ui_button_prototype->proto->init(w);
 	w->computed_style.focusable = TRUE;
 }
 
-void Button_SetTextW(ui_widget_t* w, const wchar_t *wstr)
+void ui_button_set_text_w(ui_widget_t* w, const wchar_t *wstr)
 {
-	TextView_SetTextW(w, wstr);
+	ui_textview_set_text_w(w, wstr);
 }
 
-void Button_SetText(ui_widget_t* w, const char *str)
+void ui_button_set_text(ui_widget_t* w, const char *str)
 {
-	TextView_SetText(w, str);
+	ui_textview_set_text(w, str);
 }
 
-void LCUIWidget_AddButton(void)
+void ui_register_button(void)
 {
-	prototype = ui_create_widget_prototype("button", "textview");
-	prototype->init = Button_OnInit;
-	ui_load_css_string(button_css, __FILE__);
+	ui_button_prototype = ui_create_widget_prototype("button", "textview");
+	ui_button_prototype->init = ui_button_on_init;
+	ui_load_css_string(ui_button_css, __FILE__);
 }

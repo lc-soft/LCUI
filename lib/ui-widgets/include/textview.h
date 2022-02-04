@@ -1,8 +1,7 @@
 ﻿/*
- * anchor.c -- The anchor widget, used to link view resource, its function is
- * similar to <a> element in HTML.
+ * textview.h -- TextView widget for display text.
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2022, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,11 +28,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_WIDGET_ANCHOR_H
-#define LCUI_WIDGET_ANCHOR_H
+#ifndef LIB_UI_WIDGETS_INCLUDE_TEXTVIEW_H
+#define LIB_UI_WIDGETS_INCLUDE_TEXTVIEW_H
 
-LCUI_API void Anchor_Open(ui_widget_t* w);
+#include <LCUI/header.h>
+#include <LCUI/ui.h>
 
-LCUI_API void LCUIWidget_AddAnchor(void);
+LCUI_BEGIN_HEADER
+
+LCUI_API int ui_textview_set_text_w(ui_widget_t* w, const wchar_t *text);
+
+LCUI_API int ui_textview_set_text(ui_widget_t* w, const char *utf8_text);
+
+LCUI_API void ui_textview_set_multiline(ui_widget_t* w, LCUI_BOOL enable);
+
+LCUI_API void ui_register_textview(void);
+
+LCUI_API void ui_unregister_textview(void);
+
+LCUI_END_HEADER
 
 #endif

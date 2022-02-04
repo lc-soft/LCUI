@@ -1,7 +1,7 @@
 /*
  * canvas.c -- canvas, used to draw custom graphics
  *
- * Copyright (c) 2019, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2019-2022, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,50 +29,51 @@
  */
 
 #include <stdlib.h>
-#include <LCUI.h>
 #include <LCUI/graph.h>
 #include <LCUI/ui.h>
-#include <LCUI/gui/widget/canvas.h>
+#include "../include/canvas.h"
 
-typedef struct CanvasRec_ {
+typedef struct ui_canvas_t {
 	pd_canvas_t buffer;
 	list_t contexts;
-} CanvasRec, *Canvas;
+} ui_canvas_t;
 
 static struct {
 	ui_widget_prototype_t *proto;
-} self;
+} ui_canvas;
 
-static void Canvas_OnResize(ui_widget_t* w, float width, float height)
+static void ui_canvas_on_resize(ui_widget_t *w, float width, float height)
 {
 	float scale = ui_get_scale();
 
 	pd_canvas_t buffer;
-	Canvas canvas = ui_widget_get_data(w, self.proto);
+	ui_canvas_t *canvas = ui_widget_get_data(w, ui_canvas.proto);
 
 	pd_canvas_init(&buffer);
 	buffer.color_type = PD_COLOR_TYPE_ARGB;
 	pd_canvas_create(&buffer, (unsigned)(width * scale),
-		     (unsigned)(height * scale));
+			 (unsigned)(height * scale));
 	pd_canvas_replace(&buffer, &canvas->buffer, 0, 0);
 	pd_canvas_free(&canvas->buffer);
 	canvas->buffer = buffer;
 }
 
-static void Canvas_OnInit(ui_widget_t* w)
+static void ui_canvas_on_init(ui_widget_t *w)
 {
-	Canvas canvas = ui_widget_add_data(w, self.proto, sizeof(CanvasRec));
+	ui_canvas_t *canvas;
 
+	canvas = ui_widget_add_data(w, ui_canvas.proto, sizeof(ui_canvas_t));
 	pd_canvas_init(&canvas->buffer);
 	list_create(&canvas->contexts);
 }
 
-static void Canvas_OnDestroy(ui_widget_t* w)
+static void ui_canvas_on_destroy(ui_widget_t *w)
 {
 	list_node_t *node;
-	LCUI_CanvasContext ctx;
-	Canvas canvas = ui_widget_add_data(w, self.proto, sizeof(CanvasRec));
+	ui_canvas_context_t *ctx;
+	ui_canvas_t *canvas;
 
+	canvas = ui_widget_add_data(w, ui_canvas.proto, sizeof(ui_canvas_t));
 	for (list_each(node, &canvas->contexts)) {
 		ctx = node->data;
 		ctx->available = FALSE;
@@ -81,19 +82,19 @@ static void Canvas_OnDestroy(ui_widget_t* w)
 	pd_canvas_free(&canvas->buffer);
 }
 
-static void Canvas_OnAutoSize(ui_widget_t* w, float *width, float *height,
-			      ui_layout_rule_t rule)
+static void ui_canvas_on_auto_size(ui_widget_t *w, float *width, float *height,
+				   ui_layout_rule_t rule)
 {
-	*width = 300;
-	*height = 150;
+	*width = UI_CANVAS_DEFAULT_WIDTH;
+	*height = UI_CANVAS_DEFAULT_HEIGHT;
 }
 
-static void Canvas_OnPaint(ui_widget_t* w, pd_paint_context_t *paint,
-			   ui_widget_actual_style_t* style)
+static void ui_canvas_on_paint(ui_widget_t *w, pd_paint_context_t *paint,
+			       ui_widget_actual_style_t *style)
 {
 	pd_canvas_t src, dest;
 	pd_rect_t content_rect, rect;
-	Canvas canvas = ui_widget_get_data(w, self.proto);
+	ui_canvas_t *canvas = ui_widget_get_data(w, ui_canvas.proto);
 
 	content_rect.width = style->content_box.width;
 	content_rect.height = style->content_box.height;
@@ -113,8 +114,8 @@ static void Canvas_OnPaint(ui_widget_t* w, pd_paint_context_t *paint,
 	pd_canvas_replace(&dest, &src, 0, 0);
 }
 
-static void CanvasContext_ClearRect(LCUI_CanvasContext ctx, int x, int y,
-				    int width, int height)
+static void ui_canvas_context_clear_rect(ui_canvas_context_t *ctx, int x, int y,
+					 int width, int height)
 {
 	pd_rect_t rect;
 
@@ -125,8 +126,8 @@ static void CanvasContext_ClearRect(LCUI_CanvasContext ctx, int x, int y,
 	pd_canvas_fill_rect(&ctx->buffer, ARGB(0, 0, 0, 0), &rect, TRUE);
 }
 
-static void CanvasContext_FillRect(LCUI_CanvasContext ctx, int x, int y,
-				   int width, int height)
+static void ui_canvas_context_fill_rect(ui_canvas_context_t *ctx, int x, int y,
+					int width, int height)
 {
 	pd_rect_t rect;
 
@@ -137,23 +138,23 @@ static void CanvasContext_FillRect(LCUI_CanvasContext ctx, int x, int y,
 	pd_canvas_fill_rect(&ctx->buffer, ctx->fill_color, &rect, TRUE);
 }
 
-static void CanvasContext_Release(LCUI_CanvasContext ctx)
+static void ui_canvas_context_release(ui_canvas_context_t *ctx)
 {
-	Canvas canvas;
+	ui_canvas_t *canvas;
 
 	if (ctx->available) {
-		canvas = ui_widget_get_data(ctx->canvas, self.proto);
+		canvas = ui_widget_get_data(ctx->canvas, ui_canvas.proto);
 		list_unlink(&canvas->contexts, &ctx->node);
 	}
 	free(ctx);
 }
 
-LCUI_CanvasContext Canvas_GetContext(ui_widget_t* w)
+ui_canvas_context_t *ui_canvas_get_context(ui_widget_t *w)
 {
-	LCUI_CanvasRenderingContext ctx;
-	Canvas canvas = ui_widget_get_data(w, self.proto);
+	ui_canvas_context_t *ctx;
+	ui_canvas_t *canvas = ui_widget_get_data(w, ui_canvas.proto);
 
-	ctx = malloc(sizeof(LCUI_CanvasRenderingContextRec));
+	ctx = malloc(sizeof(ui_canvas_context_t));
 	ctx->canvas = w;
 	ctx->available = TRUE;
 	ctx->buffer = canvas->buffer;
@@ -161,21 +162,21 @@ LCUI_CanvasContext Canvas_GetContext(ui_widget_t* w)
 	ctx->height = ctx->buffer.height;
 	ctx->fill_color = RGB(0, 0, 0);
 	ctx->scale = ui_get_scale();
-	ctx->clearRect = CanvasContext_ClearRect;
-	ctx->fillRect = CanvasContext_FillRect;
-	ctx->release = CanvasContext_Release;
+	ctx->clear_rect = ui_canvas_context_clear_rect;
+	ctx->fill_rect = ui_canvas_context_fill_rect;
+	ctx->release = ui_canvas_context_release;
 	ctx->node.data = ctx;
 	ctx->node.next = ctx->node.prev = NULL;
 	list_append_node(&canvas->contexts, &ctx->node);
 	return ctx;
 }
 
-void LCUIWidget_AddCanvas(void)
+void ui_register_canvas(void)
 {
-	self.proto = ui_create_widget_prototype("canvas", NULL);
-	self.proto->init = Canvas_OnInit;
-	self.proto->destroy = Canvas_OnDestroy;
-	self.proto->paint = Canvas_OnPaint;
-	self.proto->autosize = Canvas_OnAutoSize;
-	self.proto->resize = Canvas_OnResize;
+	ui_canvas.proto = ui_create_widget_prototype("canvas", NULL);
+	ui_canvas.proto->init = ui_canvas_on_init;
+	ui_canvas.proto->destroy = ui_canvas_on_destroy;
+	ui_canvas.proto->paint = ui_canvas_on_paint;
+	ui_canvas.proto->autosize = ui_canvas_on_auto_size;
+	ui_canvas.proto->resize = ui_canvas_on_resize;
 }
