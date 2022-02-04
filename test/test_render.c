@@ -4,7 +4,7 @@
 #include <LCUI.h>
 #include <LCUI/main.h>
 #include <LCUI/graph.h>
-#include <LCUI/gui/widget/textview.h>
+#include <LCUI/ui/widgets/textview.h>
 
 #define SCREEN_WIDTH 1600
 #define SCREEN_HEIGHT 900
@@ -41,7 +41,7 @@ void UpdateRenderStatus(void *arg)
 	char str[32];
 
 	sprintf(str, "[size=24px]FPS: %d[/size]", self.fps);
-	TextView_SetText(arg, str);
+	ui_textview_set_text(arg, str);
 	self.fps = 0;
 }
 

@@ -1,7 +1,7 @@
 ﻿/*
- * uri.c -- uri processing
+ * textcaret.h -- textcaret widget, used in textedit.
  *
- * Copyright (c) 2018-2022, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,14 +28,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "../internal.h"
+#ifndef LIB_UI_WIDGETS_INCLUDE_TEXTCARET_H
+#define LIB_UI_WIDGETS_INCLUDE_TEXTCARET_H
 
-int open_uri(const char *uri)
-{
-	char cmd[512] = { 0 };
-	snprintf(cmd, 511, "xdg-open %s", uri);
-	return system(cmd);
-}
+#include <LCUI/header.h>
+#include <LCUI/ui.h>
+
+LCUI_API void ui_textcaret_refresh(ui_widget_t* widget);
+
+LCUI_API void ui_textcaret_set_visible(ui_widget_t* widget, LCUI_BOOL visible);
+
+/** 设置闪烁的时间间隔 */
+LCUI_API void ui_textcaret_set_blink_time(ui_widget_t* widget, unsigned int n_ms);
+
+LCUI_API void ui_register_textcaret(void);
+
+#endif

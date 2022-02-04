@@ -2,14 +2,13 @@
 #include <LCUI/util.h>
 #include <LCUI/ui/server.h>
 #include <LCUI/app.h>
-#include <LCUI/gui/widget/textview.h>
-#include <LCUI/gui/widget/button.h>
-#include <LCUI/gui/widget/anchor.h>
-#include <LCUI/gui/widget/canvas.h>
-#include <LCUI/gui/widget/sidebar.h>
-#include <LCUI/gui/widget/scrollbar.h>
-#include <LCUI/gui/widget/textedit.h>
-#include <LCUI/gui/widget/textcaret.h>
+#include <LCUI/ui/widgets/textview.h>
+#include <LCUI/ui/widgets/button.h>
+#include <LCUI/ui/widgets/anchor.h>
+#include <LCUI/ui/widgets/canvas.h>
+#include <LCUI/ui/widgets/scrollbar.h>
+#include <LCUI/ui/widgets/textedit.h>
+#include <LCUI/ui/widgets/textcaret.h>
 
 #define DEFAULT_WINDOW_WIDTH 800
 #define DEFAULT_WINDOW_HEIGHT 600
@@ -255,14 +254,19 @@ void lcui_set_ui_display_mode(lcui_display_mode_t mode)
 
 void lcui_init_ui_preset_widgets(void)
 {
-	LCUIWidget_AddTextView();
-	LCUIWidget_AddCanvas();
-	LCUIWidget_AddAnchor();
-	LCUIWidget_AddButton();
-	LCUIWidget_AddSideBar();
-	LCUIWidget_AddTScrollBar();
-	LCUIWidget_AddTextCaret();
-	LCUIWidget_AddTextEdit();
+	ui_register_textview();
+	ui_register_canvas();
+	ui_register_anchor();
+	ui_register_button();
+	ui_register_scrollbar();
+	ui_register_textcaret();
+	ui_register_textedit();
+}
+
+void lcui_destroy_ui_preset_widgets(void)
+{
+	ui_unregister_textview();
+	ui_unregister_anchor();
 }
 
 void lcui_init_ui(void)
@@ -279,6 +283,7 @@ void lcui_init_ui(void)
 
 void lcui_destroy_ui(void)
 {
+	lcui_destroy_ui_preset_widgets();
 	app_off_event(APP_EVENT_CLOSE, lcui_on_window_destroy);
 	list_destroy(&lcui_ui.windows, lcui_close_window);
 	if (lcui_ui.observer) {

@@ -1,9 +1,9 @@
 #include <LCUI.h>
-#include <LCUI/ui.h>
-#include <LCUI/gui/widget/scrollbar.h>
-#include <LCUI/ui/builder.h>
 #include <LCUI/css.h>
-#include <LCUI/gui/widget/textview.h>
+#include <LCUI/ui.h>
+#include <LCUI/ui/builder.h>
+#include <LCUI/ui/widgets/textview.h>
+#include <LCUI/ui/widgets/scrollbar.h>
 #include "ctest.h"
 
 /* clang-format off */
@@ -68,10 +68,10 @@ void BuildContentView(void)
 	ui_widget_t* hscrollbar = ui_create_widget("scrollbar");
 
 	ui_widget_set_id(content, "license_content");
-	TextView_SetText(content, test_content);
-	ScrollBar_SetDirection(hscrollbar, LCUI_SCROLLBAR_HORIZONTAL);
-	ScrollBar_BindTarget(vscrollbar, content);
-	ScrollBar_BindTarget(hscrollbar, content);
+	ui_textview_set_text(content, test_content);
+	ui_scrollbar_set_direction(hscrollbar, UI_SCROLLBAR_HORIZONTAL);
+	ui_scrollbar_bind_target(vscrollbar, content);
+	ui_scrollbar_bind_target(hscrollbar, content);
 	ui_widget_add_class(container, "container");
 	ui_widget_append(container, content);
 	ui_widget_append(container, vscrollbar);

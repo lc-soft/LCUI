@@ -12,7 +12,7 @@ static void OnOpacityPlus(ui_widget_t* w, ui_event_t* e, void *arg)
 	}
 	swprintf(str, 32, L"%.1f", opacity);
 	ui_widget_set_opacity(self.parent, opacity);
-	TextView_SetTextW(self.text, str);
+	ui_textview_set_text_w(self.text, str);
 }
 
 static void OnOpacityMinus(ui_widget_t* w, ui_event_t* e, void *arg)
@@ -25,7 +25,7 @@ static void OnOpacityMinus(ui_widget_t* w, ui_event_t* e, void *arg)
 	}
 	swprintf(str, 32, L"%.1f", opacity);
 	ui_widget_set_opacity(self.parent, opacity);
-	TextView_SetTextW(self.text, str);
+	ui_textview_set_text_w(self.text, str);
 }
 
 int main(void)

@@ -1,7 +1,7 @@
 ﻿/*
- * sidebar.h -- Sidebar widget
+ * textview.h -- TextView widget for display text.
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2022, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,17 +28,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_SIDEBAR_WIDGET_H
-#define LCUI_SIDEBAR_WIDGET_H
+#ifndef LIB_UI_WIDGETS_INCLUDE_TEXTVIEW_H
+#define LIB_UI_WIDGETS_INCLUDE_TEXTVIEW_H
+
+#include <LCUI/header.h>
+#include <LCUI/ui.h>
 
 LCUI_BEGIN_HEADER
 
-LCUI_API ui_widget_t* SideBar_AppendItem(ui_widget_t* sidebar,
-					const wchar_t *id,
-					const wchar_t *icon,
-					const wchar_t *text);
+LCUI_API int ui_textview_set_text_w(ui_widget_t* w, const wchar_t *text);
 
-LCUI_API void LCUIWidget_AddSideBar(void);
+LCUI_API int ui_textview_set_text(ui_widget_t* w, const char *utf8_text);
+
+LCUI_API void ui_textview_set_multiline(ui_widget_t* w, LCUI_BOOL enable);
+
+LCUI_API void ui_register_textview(void);
+
+LCUI_API void ui_unregister_textview(void);
 
 LCUI_END_HEADER
 

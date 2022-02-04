@@ -1,5 +1,5 @@
 ﻿/*
- * uri.c -- uri processing
+ * scrollbar.c -- LCUI's scrollbar widget
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
@@ -28,27 +28,33 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <LCUI/header.h>
-#include <LCUI/util/uri.h>
+#ifndef LIB_UI_WIDGETS_INCLUDE_SCROLLBAR_H
+#define LIB_UI_WIDGETS_INCLUDE_SCROLLBAR_H
 
-#if defined(LCUI_PLATFORM_WIN32) && !defined(WINAPI_PARTITION_APP)
-#pragma warning(disable:4091)
-#include <Windows.h>
-#include <ShlObj.h>
+LCUI_BEGIN_HEADER
 
-int OpenUri(const char *uri)
-{
-	ShellExecuteA(NULL, "open", uri, NULL, NULL, SW_SHOW);
-	return 0;
-}
+typedef enum ui_scrollbar_direction_t {
+	UI_SCROLLBAR_HORIZONTAL,
+	UI_SCROLLBAR_VERTICAL
+} ui_scrollbar_direction_t;
 
-#else
+LCUI_API void ui_scrollbar_bind_container(ui_widget_t* w,
+					  ui_widget_t* container);
 
-int OpenUri(const char *uri)
-{
-	return -1;
-}
+LCUI_API void ui_scrollbar_bind_target(ui_widget_t* w, ui_widget_t* target);
+
+/** 获取滚动条的位置 */
+LCUI_API float ui_scrollbar_get_position(ui_widget_t* w);
+
+/** 将与滚动条绑定的内容滚动至指定位置 */
+LCUI_API float ui_scrollbar_set_position(ui_widget_t* w, float pos);
+
+/** 设置滚动条的方向 */
+LCUI_API void ui_scrollbar_set_direction(ui_widget_t* w,
+					 ui_scrollbar_direction_t direction);
+
+LCUI_API void ui_register_scrollbar(void);
+
+LCUI_END_HEADER
+
 #endif

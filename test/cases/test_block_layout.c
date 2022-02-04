@@ -1,7 +1,7 @@
 ﻿#include "ctest.h"
 #include <LCUI.h>
 #include <LCUI/ui/builder.h>
-#include <LCUI/gui/widget/textview.h>
+#include <LCUI/ui/widgets/textview.h>
 
 static void test_dropdown(void)
 {
@@ -49,7 +49,7 @@ static void test_auto_size(void)
 
 	w = ui_get_widget("test-text-auto-height");
 	example = w->parent->parent;
-	TextView_SetTextW(w, L"long long long long long long text");
+	ui_textview_set_text_w(w, L"long long long long long long text");
 	ui_update();
 	rect.x = 5;
 	rect.y = 5;
@@ -70,7 +70,7 @@ static void test_auto_size(void)
 	// Update #test-text-auto-size content
 
 	w = ui_get_widget("test-text-auto-size");
-	TextView_SetTextW(
+	ui_textview_set_text_w(
 	    w, L"long long long long long long long long long long long long "
 	       L"long long long long long long long long long long long long "
 	       L"long long text");
@@ -93,7 +93,7 @@ static void test_auto_size(void)
 	// Update test-text-block-auto-height content
 
 	w = ui_get_widget("test-text-block-auto-height");
-	TextView_SetTextW(
+	ui_textview_set_text_w(
 	    w, L"long long long long long long long long long long long long "
 	       L"long long long long long long long long long long long long "
 	       L"long long text");

@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <LCUI.h>
-#include <LCUI/gui/widget/textedit.h>
+#include <LCUI/ui/widgets/textedit.h>
 #include <LCUI/timer.h>
 #include "ctest.h"
 
@@ -48,7 +48,7 @@ void test_clipboard(void)
 	ui_root_append(text1);
 	ui_root_append(text2);
 
-	TextEdit_SetTextW(text1, L"helloworld");
+	ui_textedit_set_text_w(text1, L"helloworld");
 	ui_set_focus(text1);
 
 	lcui_set_timeout(50, on_text1_focused, text1);
