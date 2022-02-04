@@ -1,7 +1,7 @@
 ﻿/*
- * uri.c -- uri processing
+ * button.h -- LCUI‘s Button widget
  *
- * Copyright (c) 2018-2022, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,14 +28,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "../internal.h"
+#ifndef LIB_UI_WIDGETS_INCLUDE_BUTTON_H
+#define LIB_UI_WIDGETS_INCLUDE_BUTTON_H
 
-int open_uri(const char *uri)
-{
-	char cmd[512] = { 0 };
-	snprintf(cmd, 511, "xdg-open %s", uri);
-	return system(cmd);
-}
+LCUI_BEGIN_HEADER
+
+LCUI_API void ui_button_set_text_w(ui_widget_t* w, const wchar_t *wstr);
+
+LCUI_API void ui_button_set_text(ui_widget_t* w, const char *str);
+
+LCUI_API void ui_register_button(void);
+
+LCUI_END_HEADER
+
+#endif

@@ -3,7 +3,7 @@
 #include <LCUI/util.h>
 #include <LCUI/font.h>
 #include <LCUI/ui.h>
-#include <LCUI/gui/widget/textview.h>
+#include <LCUI/ui/widgets/textview.h>
 
 int main(void)
 {
@@ -22,7 +22,7 @@ int main(void)
 	ui_widget_append(ui_root(), box);
 	for (i = 0; i < n; ++i) {
 		w = ui_create_widget("textview");
-		TextView_SetTextW(w, L"hello, test");
+		ui_textview_set_text_w(w, L"hello, test");
 		ui_widget_append(box, w);
 	}
 	sec = (clock() - c) * 1.0 / CLOCKS_PER_SEC;

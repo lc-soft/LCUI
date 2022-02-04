@@ -1,7 +1,7 @@
-/*
- * canvas.h -- canvas, used to draw custom graphics
+﻿/*
+ * uri.c -- uri processing for UWP
  *
- * Copyright (c) 2019, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,35 +28,32 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_CANVAS_H
-#define LCUI_CANVAS_H
+#include <wrl.h>
+#include <wrl/client.h>
+#include <stdlib.h>
+#include "../internal.h"
 
-LCUI_BEGIN_HEADER
+#if defined(LCUI_PLATFORM_WIN32) && defined(WINAPI_PARTITION_APP)
+int open_uri(const char *uristr)
+{
+	size_t len;
+	wchar_t *wuri;
 
-typedef struct LCUI_CanvasRenderingContextRec_ LCUI_CanvasRenderingContextRec;
-typedef struct LCUI_CanvasRenderingContextRec_ *LCUI_CanvasRenderingContext;
-typedef LCUI_CanvasRenderingContext LCUI_CanvasContext;
+	len = decode_string(NULL, uristr, 0, ENCODING_ANSI);
+	if (len < 1) {
+		return -1;
+	}
+	wuri = (wchar_t*)malloc((len + 1) * sizeof(wchar_t));
+	if (!wuri) {
+		return -2;
+	}
+	decode_string(wuri, uristr, len, ENCODING_ANSI);
+	wuri[len] = 0;
 
-struct LCUI_CanvasRenderingContextRec_ {
-	LCUI_BOOL available;
-	pd_color_t fill_color;
-	pd_canvas_t buffer;
-	ui_widget_t* canvas;
-	list_node_t node;
-
-	float scale;
-	int width;
-	int height;
-
-	void (*fillRect)(LCUI_CanvasContext, int, int, int, int);
-	void (*clearRect)(LCUI_CanvasContext, int, int, int, int);
-	void (*release)(LCUI_CanvasContext);
-};
-
-LCUI_API LCUI_CanvasContext Canvas_GetContext(ui_widget_t* w);
-
-void LCUIWidget_AddCanvas(void);
-
-LCUI_END_HEADER
-
+	auto str = ref new Platform::String(wuri);
+	auto uri = ref new Windows::Foundation::Uri(str);
+	Windows::System::Launcher::LaunchUriAsync(uri);
+	free(wuri);
+	return 0;
+}
 #endif

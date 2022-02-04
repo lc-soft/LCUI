@@ -1,5 +1,5 @@
 #include <LCUI.h>
-#include <LCUI/gui/widget/textview.h>
+#include <LCUI/ui/widgets/textview.h>
 #include <LCUI/css.h>
 #include "ctest.h"
 
@@ -50,8 +50,8 @@ static void build(void)
 
 	ui_widget_set_id(self.block, "debug-block");
 	ui_widget_set_id(self.inline_block, "debug-inline-block");
-	TextView_SetTextW(self.block, L"block");
-	TextView_SetTextW(self.inline_block, L"inline block");
+	ui_textview_set_text_w(self.block, L"block");
+	ui_textview_set_text_w(self.inline_block, L"inline block");
 	ui_widget_add_class(self.block, "block");
 	ui_widget_add_class(self.inline_block, "inline-block");
 
@@ -63,12 +63,12 @@ static void build(void)
 static void test_textview_set_text(void *arg)
 {
 	_DEBUG_MSG("set text\n");
-	TextView_SetText(self.inline_block,
+	ui_textview_set_text(self.inline_block,
 			 "long long long long long long long "
 			 "long long long long long long long "
 			 "long long long long long long long text");
 
-	TextView_SetText(self.block, "long long long long long long long "
+	ui_textview_set_text(self.block, "long long long long long long long "
 				     "long long long long long long long "
 				     "long long long long long long long text");
 }

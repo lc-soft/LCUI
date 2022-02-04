@@ -1,5 +1,6 @@
-/*
- * uri.c -- uri processing
+﻿/*
+ * anchor.c -- The anchor widget, used to link view resource, its function is
+ * similar to <a> element in HTML.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
@@ -28,13 +29,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_UTIL_URI_H
-#define LCUI_UTIL_URI_H
+#ifndef LIB_UI_WIDGETS_INCLUDE_ANCHOR_H
+#define LIB_UI_WIDGETS_INCLUDE_ANCHOR_H
 
-LCUI_BEGIN_HEADER
+#include <LCUI/ui.h>
 
-LCUI_API int OpenUri(const char *uri);
+LCUI_API void ui_anchor_open(ui_widget_t* w);
 
-LCUI_END_HEADER
+LCUI_API void ui_register_anchor(void);
+
+LCUI_API void ui_unregister_anchor(void);
 
 #endif

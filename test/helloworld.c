@@ -1,8 +1,8 @@
 ﻿#include <LCUI.h>
 #include <LCUI/main.h>
 #include <LCUI/ui/builder.h>
-#include <LCUI/gui/widget/textview.h>
-#include <LCUI/gui/widget/textedit.h>
+#include <LCUI/ui/widgets/textview.h>
+#include <LCUI/ui/widgets/textedit.h>
 
 static void OnBtnClick(ui_widget_t* self, ui_event_t* e, void *arg)
 {
@@ -10,8 +10,8 @@ static void OnBtnClick(ui_widget_t* self, ui_event_t* e, void *arg)
 	ui_widget_t* edit = ui_get_widget("edit");
 	ui_widget_t* txt = ui_get_widget("text-hello");
 
-	TextEdit_GetTextW(edit, 0, 255, str);
-	TextView_SetTextW(txt, str);
+	ui_textedit_get_text_w(edit, 0, 255, str);
+	ui_textview_set_text_w(txt, str);
 }
 
 int main(int argc, char **argv)

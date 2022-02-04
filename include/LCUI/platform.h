@@ -494,4 +494,6 @@ LCUI_API int clipboard_set_text(const wchar_t *text, size_t len);
 LCUI_API void clipboard_init(void);
 LCUI_API void clipboard_destroy(void);
 
+LCUI_API int open_uri(const char *uri);
+
 #endif
