@@ -31,59 +31,56 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <LCUI/header.h>
-#include <LCUI/types.h>
-#include <yutil.h>
-#include <LCUI/font.h>
+#include "internal.h"
 
 enum in_core_font_type {
 	FONT_INCONSOLATA
 };
 
-static int InCoreFont_Open(const char *filepath, LCUI_Font **outfonts)
+static int incore_font_engine_open(const char *filepath, font_t ***outfonts)
 {
 	int *code;
-	LCUI_Font *fonts, font;
+	font_t **fonts, *font;
 	if (strcmp(filepath, "in-core.inconsolata") != 0) {
 		return 0;
 	}
 	code = malloc(sizeof(int));
 	*code = FONT_INCONSOLATA;
-	font = Font("inconsolata", "Regular");
-	fonts = malloc(sizeof(LCUI_Font));
+	font = font_create("inconsolata", "Regular");
+	fonts = malloc(sizeof(font_t*));
 	font->data = code;
 	fonts[0] = font;
 	*outfonts = fonts;
 	return 1;
 }
 
-static void InCoreFont_Close(void *face)
+static void incore_font_engine_close(void *face)
 {
 	free(face);
 }
 
-static int InCoreFont_Render(LCUI_FontBitmap *bmp, wchar_t ch,
-			     int pixel_size, LCUI_Font font)
+static int incore_font_engine_render(font_bitmap_t *bmp, unsigned ch,
+			     int pixel_size, font_t *font)
 {
 	int *code = (int*)font->data;
 	switch (*code) {
 	case FONT_INCONSOLATA:
 	default:
-		return FontInconsolata_GetBitmap(bmp, ch, pixel_size);
+		return inconsolata_font_render_bitmap(bmp, ch, pixel_size);
 	}
 	return -1;
 }
 
-int LCUIFont_InitInCoreFont(LCUI_FontEngine *engine)
+int incore_font_engine_create(font_engine_t *engine)
 {
-	engine->render = InCoreFont_Render;
-	engine->close = InCoreFont_Close;
-	engine->open = InCoreFont_Open;
+	engine->render = incore_font_engine_render;
+	engine->close = incore_font_engine_close;
+	engine->open = incore_font_engine_open;
 	strcpy(engine->name, "in-core");
 	return 0;
 }
 
-int LCUIFont_ExitInCoreFont(void)
+int incore_font_engine_destroy(void)
 {
 	return 0;
 }

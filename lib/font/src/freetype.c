@@ -29,11 +29,8 @@
  */
 
 #include "config.h"
-#include <LCUI/header.h>
 #ifdef USE_FREETYPE
-#include <LCUI/types.h>
-#include <yutil.h>
-#include <LCUI/font.h>
+#include "internal.h"
 #include <stdlib.h>
 #include <errno.h>
 
@@ -50,10 +47,10 @@ static struct {
 	FT_Library library;
 } freetype;
 
-static int FreeType_Open(const char *filepath, LCUI_Font **outfonts)
+static int freetype_open(const char *filepath, font_t ***outfonts)
 {
 	FT_Face face;
-	LCUI_Font font, *fonts;
+	font_t *font, **fonts;
 	int i, err, num_faces;
 
 	err = FT_New_Face(freetype.library, filepath, -1, &face);
@@ -66,7 +63,7 @@ static int FreeType_Open(const char *filepath, LCUI_Font **outfonts)
 	if (num_faces < 1) {
 		return 0;
 	}
-	fonts = malloc(sizeof(LCUI_FontRec*) * num_faces);
+	fonts = malloc(sizeof(font_t*) * num_faces);
 	if (!fonts) {
 		return -ENOMEM;
 	}
@@ -77,7 +74,7 @@ static int FreeType_Open(const char *filepath, LCUI_Font **outfonts)
 			continue;
 		}
 		FT_Select_Charmap(face, FT_ENCODING_UNICODE);
-		font = Font(face->family_name, face->style_name);
+		font = font_create(face->family_name, face->style_name);
 		font->data = face;
 		fonts[i] = font;
 	}
@@ -85,13 +82,13 @@ static int FreeType_Open(const char *filepath, LCUI_Font **outfonts)
 	return num_faces;
 }
 
-static void FreeType_Close(void *face)
+static void freetype_close(void *face)
 {
 	FT_Done_Face(face);
 }
 
-/** 转换 FT_GlyphSlot 类型数据为 LCUI_FontBitmap */
-static size_t Convert_FTGlyph(LCUI_FontBitmap *bmp, FT_GlyphSlot slot, int mode)
+/** 转换 FT_GlyphSlot 类型数据为 font_bitmap_t */
+static size_t convert_glyph(font_bitmap_t *bmp, FT_GlyphSlot slot, int mode)
 {
 	int error;
 	size_t size;
@@ -176,8 +173,8 @@ static size_t Convert_FTGlyph(LCUI_FontBitmap *bmp, FT_GlyphSlot slot, int mode)
 	return size;
 }
 
-static int FreeType_Render(LCUI_FontBitmap *bmp, wchar_t ch,
-			   int pixel_size, LCUI_Font font)
+static int freetype_render(font_bitmap_t *bmp, wchar_t ch,
+			   int pixel_size, font_t *font)
 {
 	int ret = 0;
 	FT_UInt index;
@@ -193,23 +190,23 @@ static int FreeType_Render(LCUI_FontBitmap *bmp, wchar_t ch,
 	if (FT_Load_Glyph(ft_face, index, LCUI_FONT_LOAD_FALGS) != 0) {
 		return -2;
 	}
-	Convert_FTGlyph(bmp, ft_face->glyph, LCUI_FONT_RENDER_MODE);
+	convert_glyph(bmp, ft_face->glyph, LCUI_FONT_RENDER_MODE);
 	return ret;
 }
 
-int LCUIFont_InitFreeType(LCUI_FontEngine *engine)
+int freetype_engine_init(font_engine_t *engine)
 {
 	if (FT_Init_FreeType(&freetype.library)) {
 		return -1;
 	}
 	strcpy(engine->name, "FreeType");
-	engine->render = FreeType_Render;
-	engine->open = FreeType_Open;
-	engine->close = FreeType_Close;
+	engine->render = freetype_render;
+	engine->open = freetype_open;
+	engine->close = freetype_close;
 	return 0;
 }
 
-int LCUIFont_ExitFreeType(void)
+int freetype_engine_destroy(void)
 {
 	FT_Done_FreeType(freetype.library);
 	return 0;

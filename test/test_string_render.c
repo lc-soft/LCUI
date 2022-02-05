@@ -13,7 +13,7 @@ int main(void)
 	LCUI_TextStyleRec txtstyle;
 
 	/* 初始化字体处理功能 */
-	LCUI_InitFontLibrary();
+	fontlib_init();
 
 	/* 创建一个图像，并使用灰色填充 */
 	pd_canvas_init(&img);
@@ -38,6 +38,6 @@ int main(void)
 	pd_canvas_free(&img);
 
 	/* 释放字体处理功能相关资源 */
-	LCUI_FreeFontLibrary();
+	fontlib_destroy();
 	return ret;
 }

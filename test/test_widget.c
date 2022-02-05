@@ -13,7 +13,7 @@ int main(void)
 
 	ui_widget_t *box, *w;
 
-	LCUI_InitFontLibrary();
+	fontlib_init();
 	ui_init();
 	box = ui_create_widget(NULL);
 
@@ -53,6 +53,6 @@ int main(void)
 	logger_debug("it should take less than 1s\n");
 
 	ui_destroy();
-	LCUI_FreeFontLibrary();
+	fontlib_destroy();
 	return 0;
 }

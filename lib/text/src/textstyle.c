@@ -32,7 +32,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <LCUI/util.h>
-#include <LCUI/font.h>
+#include <LCUI/text/textstyle.h>
 #include <LCUI/css/utils.h>
 
 typedef enum LCUI_TextStyleTagType_ {
@@ -111,7 +111,7 @@ void TextStyle_Merge(LCUI_TextStyle base, LCUI_TextStyle target)
 		base->has_style = TRUE;
 		base->style = target->style;
 	}
-	if (LCUIFont_UpdateStyle(base->font_ids,
+	if (fontlib_update_font_style(base->font_ids,
 				 base->style,
 				 &font_ids) > 0) {
 		free(base->font_ids);
@@ -122,7 +122,7 @@ void TextStyle_Merge(LCUI_TextStyle base, LCUI_TextStyle target)
 		base->has_weight = TRUE;
 		base->weight = target->weight;
 	}
-	if (LCUIFont_UpdateWeight(base->font_ids,
+	if (fontlib_update_font_weight(base->font_ids,
 				  base->weight,
 				  &font_ids) > 0) {
 		free(base->font_ids);
@@ -148,12 +148,12 @@ void TextStyle_SetBackColor(LCUI_TextStyle ts, pd_color_t color)
 	ts->has_back_color = TRUE;
 }
 
-int TextStyle_SetWeight(LCUI_TextStyle ts, LCUI_FontWeight weight)
+int TextStyle_SetWeight(LCUI_TextStyle ts, font_weight_t weight)
 {
 	int *font_ids;
 	ts->weight = weight;
 	ts->has_weight = TRUE;
-	if (LCUIFont_UpdateWeight(ts->font_ids, weight, &font_ids) > 0) {
+	if (fontlib_update_font_weight(ts->font_ids, weight, &font_ids) > 0) {
 		free(ts->font_ids);
 		ts->font_ids = font_ids;
 		return 0;
@@ -161,12 +161,12 @@ int TextStyle_SetWeight(LCUI_TextStyle ts, LCUI_FontWeight weight)
 	return -1;
 }
 
-int TextStyle_SetStyle(LCUI_TextStyle ts, LCUI_FontStyle style)
+int TextStyle_SetStyle(LCUI_TextStyle ts, font_style_t style)
 {
 	int *font_ids;
 	ts->style = style;
 	ts->has_style = TRUE;
-	if (LCUIFont_UpdateStyle(ts->font_ids, style, &font_ids) > 0) {
+	if (fontlib_update_font_style(ts->font_ids, style, &font_ids) > 0) {
 		free(ts->font_ids);
 		ts->font_ids = font_ids;
 		return 0;
@@ -182,7 +182,7 @@ int TextStyle_SetFont(LCUI_TextStyle ts, const char *str)
 	}
 	ts->font_ids = NULL;
 	ts->has_family = FALSE;
-	count = LCUIFont_GetIdByNames(&ts->font_ids, ts->style,
+	count = fontlib_query(&ts->font_ids, ts->style,
 				      ts->weight, str);
 	if (count > 0) {
 		ts->has_family = TRUE;
@@ -203,7 +203,7 @@ int TextStyle_SetDefaultFont(LCUI_TextStyle ts)
 		return -ENOMEM;
 	}
 	ts->has_family = TRUE;
-	ts->font_ids[0] = LCUIFont_GetDefault();
+	ts->font_ids[0] = fontlib_get_default_font();
 	ts->font_ids[1] = 0;
 	return 0;
 }
