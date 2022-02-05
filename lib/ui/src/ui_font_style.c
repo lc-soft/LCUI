@@ -103,7 +103,7 @@ static void ui_font_style_compute_family(ui_font_style_t *fs,
 		return;
 	}
 	fs->font_family = strdup2(s->string);
-	LCUIFont_GetIdByNames(&fs->font_ids, fs->font_style, fs->font_weight,
+	fontlib_query(&fs->font_ids, fs->font_style, fs->font_weight,
 			      fs->font_family);
 }
 

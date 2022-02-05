@@ -36,6 +36,7 @@
 #include <LCUI/util/rect.h>
 #include <LCUI/graph.h>
 #include <LCUI/font.h>
+#include <LCUI/text/textlayer.h>
 
 typedef enum { TEXT_ACTION_INSERT, TEXT_ACTION_APPEND } TextAction;
 
@@ -262,14 +263,14 @@ static void TextChar_UpdateBitmap(LCUI_TextChar ch, LCUI_TextStyle style)
 		}
 	}
 	while (font_ids && font_ids[i] > 0) {
-		int ret = LCUIFont_GetBitmap(ch->code, font_ids[i], size,
+		int ret = fontlib_get_bitmap(ch->code, font_ids[i], size,
 					     &ch->bitmap);
 		if (ret == 0) {
 			return;
 		}
 		++i;
 	}
-	LCUIFont_GetBitmap(ch->code, -1, size, &ch->bitmap);
+	fontlib_get_bitmap(ch->code, -1, size, &ch->bitmap);
 }
 
 /** 新建文本图层 */
@@ -1243,10 +1244,10 @@ static void TextLayer_DrawChar(LCUI_TextLayer layer, LCUI_TextChar ch,
 {
 	/* 判断文字使用的前景颜色，再进行绘制 */
 	if (ch->style && ch->style->has_fore_color) {
-		FontBitmap_Mix(graph, ch_pos, ch->bitmap,
+		font_bitmap_mix(graph, ch_pos, ch->bitmap,
 			       ch->style->fore_color);
 	} else {
-		FontBitmap_Mix(graph, ch_pos, ch->bitmap,
+		font_bitmap_mix(graph, ch_pos, ch->bitmap,
 			       layer->text_default_style.fore_color);
 	}
 }

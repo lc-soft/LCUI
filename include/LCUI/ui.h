@@ -1139,7 +1139,7 @@ LCUI_API int ui_image_remove_event_listener(ui_image_t* image,
 					    ui_image_event_handler_t handler,
 					    void* data);
 
-// CSS Font Style
+// CSS font_create Style
 
 #define UI_DEFAULT_FONT_SIZE 14
 #define UI_DEFAULT_FONT_COLOR 0xff333333

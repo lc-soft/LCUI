@@ -1,7 +1,7 @@
 ﻿/*
  * font_inconsolata.c-- bitmap data of the inconsolata font.
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2022, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,8 +30,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <LCUI.h>
-#include <LCUI/font.h>
+#include "../internal.h"
 
 enum font_index {
 	SIZE_12_PX,
@@ -45,7 +44,7 @@ enum font_index {
 };
 
 /* inconsolata 字体数据索引 */
-static const LCUI_FontBitmap font_info_index[SIZE_TOTAL][95] = {
+static const font_bitmap_t font_info_index[SIZE_TOTAL][95] = {
 	{
 		{ 16, 0, 0, 0, 0, (uchar_t*)0x00000000, 8, 0, { 6, 12 } },
 		{ 11, 1, 3, 9, 9, (uchar_t*)0x00000000, 8, 0, { 6, 12 } },
@@ -7603,7 +7602,7 @@ static const unsigned char *font_bitmap[SIZE_TOTAL] = {
 	font_bitmap_18px_bytes
 };
 
-int FontInconsolata_GetBitmap(LCUI_FontBitmap *bmp, wchar_t ch, int size)
+int inconsolata_font_render_bitmap(font_bitmap_t *bmp, unsigned ch, int size)
 {
 	int i, j, *ptr;
 	const uchar_t *byte_ptr;

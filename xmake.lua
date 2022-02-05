@@ -83,10 +83,15 @@ target("headers")
         -- Copy the header file of the internal library to the LCUI header file directory
         os.cp("$(projectdir)/lib/util/include/*.h", "$(projectdir)/include/LCUI/util/")
         os.cp("$(projectdir)/lib/yutil/include/yutil/*.h", "$(projectdir)/include/LCUI/util/")
+
         os.cp("$(projectdir)/lib/thread/include/*.h", "$(projectdir)/include/LCUI/")
+
         os.cp("$(projectdir)/lib/css/include/*.h", "$(projectdir)/include/LCUI/")
         os.cp("$(projectdir)/lib/css/include/css/*.h", "$(projectdir)/include/LCUI/css/")
-        os.cp("$(projectdir)/lib/font/include/*.h", "$(projectdir)/include/LCUI/font/")
+
+        os.cp("$(projectdir)/lib/font/include/*.h", "$(projectdir)/include/LCUI/")
+        os.cp("$(projectdir)/lib/font/include/font/*.h", "$(projectdir)/include/LCUI/font/")
+
         os.cp("$(projectdir)/lib/paint/include/*.h", "$(projectdir)/include/LCUI/paint/")
         os.cp("$(projectdir)/lib/image/include/*.h", "$(projectdir)/include/LCUI/image/")
         os.cp("$(projectdir)/lib/ui/include/*.h", "$(projectdir)/include/LCUI/")
