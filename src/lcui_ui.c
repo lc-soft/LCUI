@@ -1,5 +1,6 @@
 #include <math.h>
 #include <LCUI/util.h>
+#include <LCUI/font.h>
 #include <LCUI/ui/server.h>
 #include <LCUI/app.h>
 #include <LCUI/ui/widgets/textview.h>
@@ -269,6 +270,102 @@ void lcui_destroy_ui_preset_widgets(void)
 	ui_unregister_anchor();
 }
 
+
+#ifdef LCUI_PLATFORM_WIN32
+static void lcui_load_fonts_for_windows(void)
+{
+	size_t i;
+	int *ids = NULL;
+	const char *names = "Consola, Simsun, Microsoft YaHei";
+	const char *fonts[] = { "C:/Windows/Fonts/consola.ttf",
+				"C:/Windows/Fonts/simsun.ttc",
+				"C:/Windows/Fonts/msyh.ttf",
+				"C:/Windows/Fonts/msyh.ttc" };
+
+	for (i = 0; i < sizeof(fonts) / sizeof(char *); ++i) {
+		fontlib_load_file(fonts[i]);
+	}
+	i = fontlib_query(&ids, FONT_STYLE_NORMAL, FONT_WEIGHT_NORMAL,
+				  names);
+	if (i > 0) {
+		fontlib_set_default_font(ids[i - 1]);
+	}
+	free(ids);
+}
+
+#else
+
+#ifdef USE_FONTCONFIG
+
+static void lcui_load_fonts_by_font_config(void)
+{
+	size_t i;
+	char *path;
+	int *ids = NULL;
+	const char *names = "Noto Sans CJK, Ubuntu, WenQuanYi Micro Hei";
+	const char *fonts[] = { "Ubuntu", "Noto Sans CJK SC",
+				"WenQuanYi Micro Hei" };
+
+	for (i = 0; i < sizeof(fonts) / sizeof(char *); ++i) {
+		path = fontlib_get_font_path(fonts[i]);
+		fontlib_load_file(path);
+		free(path);
+	}
+	i = fontlib_query(&ids, FONT_STYLE_NORMAL, FONT_WEIGHT_NORMAL,
+				  names);
+	if (i > 0) {
+		fontlib_set_default_font(ids[i - 1]);
+	}
+	free(ids);
+}
+
+#else
+
+static void lcui_load_fonts_for_linux(void)
+{
+	size_t i;
+	int *ids = NULL;
+	const char *names = "Noto Sans CJK SC, Ubuntu, WenQuanYi Micro Hei";
+	const char *fonts[] = {
+		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-R.ttf",
+		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-RI.ttf",
+		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-B.ttf",
+		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-BI.ttf",
+		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-M.ttf",
+		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-MI.ttf",
+		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-L.ttf",
+		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-LI.ttf",
+		"/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+		"/usr/share/fonts/opentype/noto/NotoSansCJK.ttc",
+		"/usr/share/fonts/truetype/wqy/wqy-microhei.ttc"
+	};
+
+	for (i = 0; i < sizeof(fonts) / sizeof(char *); ++i) {
+		fontlib_load_file(fonts[i]);
+	}
+	i = fontlib_query(&ids, FONT_STYLE_NORMAL, FONT_WEIGHT_NORMAL,
+				  names);
+	if (i > 0) {
+		fontlib_set_default_font(ids[i - 1]);
+	}
+	free(ids);
+}
+#endif
+
+#endif
+
+static void lcui_load_default_fonts(void)
+{
+#ifdef LCUI_PLATFORM_WIN32
+	lcui_load_fonts_for_windows();
+#elif defined(USE_FONTCONFIG)
+	logger_debug("[font] fontconfig enabled\n");
+	lcui_load_fonts_by_font_config();
+#else
+	lcui_load_fonts_for_linux();
+#endif
+}
+
 void lcui_init_ui(void)
 {
 	ui_init();
@@ -278,6 +375,7 @@ void lcui_init_ui(void)
 	list_create(&lcui_ui.windows);
 	lcui_set_ui_display_mode(LCUI_DISPLAY_MODE_DEFAULT);
 	lcui_init_ui_preset_widgets();
+	lcui_load_default_fonts();
 	app_on_event(APP_EVENT_CLOSE, lcui_on_window_destroy, NULL);
 }
 

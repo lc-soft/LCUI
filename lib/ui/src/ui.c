@@ -4,7 +4,7 @@
 
 void ui_init(void)
 {
-	LCUI_InitFontLibrary();
+	fontlib_init();
 	ui_init_metrics();
 	ui_init_widget_id();
 	ui_init_widget_prototype();
@@ -17,7 +17,7 @@ void ui_init(void)
 
 void ui_destroy(void)
 {
-	LCUI_FreeFontLibrary();
+	fontlib_destroy();
 	ui_trash_clear();
 	ui_destroy_root();
 	ui_destroy_events();

@@ -35,6 +35,7 @@
 #include <LCUI/platform.h>
 #include <LCUI/graph.h>
 #include <LCUI/css.h>
+#include <LCUI/text/textlayer.h>
 #include "./internal.h"
 #include "../include/textedit.h"
 #include "../include/textcaret.h"
