@@ -11,6 +11,14 @@ LCUI_BEGIN_HEADER
 
 // Types
 
+typedef struct ui_rect_t {
+	float x, y, width, height;
+} ui_rect_t;
+
+typedef struct ui_area_t {
+	float left, top, right, bottom;
+} ui_area_t;
+
 typedef struct ui_metrics_t {
 	float dpi;
 	float density;
@@ -229,11 +237,11 @@ typedef struct ui_widget_update_t {
 
 /** See more: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model */
 typedef struct ui_widget_box_model_t {
-	pd_rectf_t content;
-	pd_rectf_t padding;
-	pd_rectf_t border;
-	pd_rectf_t canvas;
-	pd_rectf_t outer;
+	ui_rect_t content;
+	ui_rect_t padding;
+	ui_rect_t border;
+	ui_rect_t canvas;
+	ui_rect_t outer;
 } ui_widget_box_model_t;
 
 typedef struct ui_flexbox_layout_style_t {
@@ -561,8 +569,8 @@ struct ui_widget_t {
 	 */
 	float max_content_width, max_content_height;
 
-	pd_rect_t2F padding;
-	pd_rect_t2F margin;
+	ui_area_t padding;
+	ui_area_t margin;
 	ui_widget_box_model_t box;
 
 	css_style_decl_t *style;
@@ -583,7 +591,7 @@ struct ui_widget_t {
 
 	ui_widget_update_t update;
 
-	pd_rectf_t dirty_rect;
+	ui_rect_t dirty_rect;
 	ui_dirty_rect_type_t dirty_rect_type;
 	LCUI_BOOL has_child_dirty_rect;
 
@@ -663,7 +671,7 @@ INLINE int ui_compute_actual(float value, css_unit_t type)
 	return y_iround(ui_compute(value, type) * ui_get_scale());
 }
 
-INLINE void ui_compute_rect_actual(pd_rect_t* dst, const pd_rectf_t* src)
+INLINE void ui_compute_rect_actual(pd_rect_t* dst, const ui_rect_t* src)
 {
 	dst->x = y_iround(src->x * ui_get_scale());
 	dst->y = y_iround(src->y * ui_get_scale());
@@ -934,7 +942,7 @@ LCUI_API LCUI_BOOL ui_widget_auto_reflow(ui_widget_t* w, ui_layout_rule_t rule);
 // Renderer
 
 LCUI_API LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t* w,
-					     pd_rectf_t* in_rect, int box_type);
+					     ui_rect_t* in_rect, int box_type);
 LCUI_API size_t ui_widget_get_dirty_rects(ui_widget_t* w, list_t* rects);
 LCUI_API size_t ui_widget_render(ui_widget_t* w, pd_paint_context_t* paint);
 

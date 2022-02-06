@@ -160,7 +160,7 @@ float ui_widget_get_box_shadow_offset_y(ui_widget_t* w)
 void ui_widget_compute_border_box_actual(ui_widget_t* w,
 					 ui_widget_actual_style_t* s)
 {
-	pd_rectf_t rect;
+	ui_rect_t rect;
 	rect.x = s->x + w->box.border.x;
 	rect.y = s->y + w->box.border.y;
 	rect.width = w->box.border.width;
@@ -191,7 +191,7 @@ void ui_widget_compute_padding_box_actual(ui_widget_t* w,
 void ui_widget_compute_content_box_actual(ui_widget_t* w,
 					  ui_widget_actual_style_t* s)
 {
-	pd_rectf_t rect;
+	ui_rect_t rect;
 	rect.x = s->x + w->box.content.x;
 	rect.y = s->y + w->box.content.y;
 	rect.width = w->box.content.width;

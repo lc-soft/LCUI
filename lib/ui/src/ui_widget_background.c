@@ -121,7 +121,7 @@ void ui_widget_compute_background_style(ui_widget_t *widget)
 void ui_widget_compute_background(ui_widget_t *w, pd_background_t *out)
 {
 	css_unit_t type;
-	pd_rectf_t *box = &w->box.border;
+	ui_rect_t *box = &w->box.border;
 	ui_background_style_t *bg = &w->computed_style.background;
 	float scale, x = 0, y = 0, width, height;
 

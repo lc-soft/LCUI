@@ -52,7 +52,7 @@ static void font_bitmap_mix_argb(pd_canvas_t *graph, pd_rect_t *write_rect,
 	uchar_t *byte_ptr, *byte_row_ptr;
 
 	byte_row_ptr = bmp->buffer + read_rect->y * bmp->width;
-	px_row_des = graph->argb + write_rect->y * graph->width;
+	px_row_des = graph->pixels + write_rect->y * graph->width;
 	byte_row_ptr += read_rect->x;
 	px_row_des += write_rect->x;
 	for (y = 0; y < read_rect->height; ++y) {

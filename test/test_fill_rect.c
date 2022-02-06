@@ -24,6 +24,6 @@ int main(void)
 		}
 	}
 	LCUI_WritePNGFile("test_fill_rect.png", &canvas);
-	pd_canvas_free(&canvas);
+	pd_canvas_destroy(&canvas);
 	return 0;
 }

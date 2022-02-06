@@ -54,7 +54,7 @@ static void ui_canvas_on_resize(ui_widget_t *w, float width, float height)
 	pd_canvas_create(&buffer, (unsigned)(width * scale),
 			 (unsigned)(height * scale));
 	pd_canvas_replace(&buffer, &canvas->buffer, 0, 0);
-	pd_canvas_free(&canvas->buffer);
+	pd_canvas_destroy(&canvas->buffer);
 	canvas->buffer = buffer;
 }
 
@@ -79,7 +79,7 @@ static void ui_canvas_on_destroy(ui_widget_t *w)
 		ctx->available = FALSE;
 	}
 	list_destroy_without_node(&canvas->contexts, NULL);
-	pd_canvas_free(&canvas->buffer);
+	pd_canvas_destroy(&canvas->buffer);
 }
 
 static void ui_canvas_on_auto_size(ui_widget_t *w, float *width, float *height,

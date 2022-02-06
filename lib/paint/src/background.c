@@ -96,5 +96,5 @@ void pd_background_paint(const pd_background_t *bg, const pd_rect_t *box,
 	x += read_rect.x + box->x - paint->rect.x;
 	y += read_rect.y + box->y - paint->rect.y;
 	pd_canvas_mix(&paint->canvas, &canvas, x, y, bg->color.alpha < 255);
-	pd_canvas_free(&buffer);
+	pd_canvas_destroy(&buffer);
 }

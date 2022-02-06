@@ -23,7 +23,7 @@ int test_paint_background_color(void)
         pd_background_paint(&bg, &rect, paint);
         LCUI_WritePNGFile("test_paint_background_color.png", &canvas);
         pd_painter_end(paint);
-        pd_canvas_free(&canvas);
+        pd_canvas_destroy(&canvas);
         return 0;
 }
 
@@ -57,8 +57,8 @@ int test_paint_background_image(void)
         pd_background_paint(&bg, &rect, paint);
         LCUI_WritePNGFile("test_paint_background_image.png", &canvas);
         pd_painter_end(paint);
-        pd_canvas_free(&image);
-        pd_canvas_free(&canvas);
+        pd_canvas_destroy(&image);
+        pd_canvas_destroy(&canvas);
         return 0;
 }
 
@@ -93,8 +93,8 @@ int test_paint_background_image_with_size(void)
         pd_background_paint(&bg, &rect, paint);
         LCUI_WritePNGFile("test_paint_background_image_with_size.png", &canvas);
         pd_painter_end(paint);
-        pd_canvas_free(&image);
-        pd_canvas_free(&canvas);
+        pd_canvas_destroy(&image);
+        pd_canvas_destroy(&canvas);
         return 0;
 }
 
@@ -132,8 +132,8 @@ int test_paint_background_image_with_position(void)
         LCUI_WritePNGFile("test_paint_background_image_with_position.png",
                           &canvas);
         pd_painter_end(paint);
-        pd_canvas_free(&image);
-        pd_canvas_free(&canvas);
+        pd_canvas_destroy(&image);
+        pd_canvas_destroy(&canvas);
         return 0;
 }
 

@@ -40,7 +40,7 @@ int main(void)
 			  FALSE);
 	}
 	LCUI_WritePNGFile("test_mix_rect_with_opacity.png", &canvas);
-	pd_canvas_free(&fore_canvas);
-	pd_canvas_free(&canvas);
+	pd_canvas_destroy(&fore_canvas);
+	pd_canvas_destroy(&canvas);
 	return 0;
 }

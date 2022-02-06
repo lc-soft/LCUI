@@ -98,8 +98,8 @@ typedef struct ui_widget_style_diff_t_ {
 	float height;
 	float opacity;
 	LCUI_BOOL visible;
-	pd_rect_t2F margin;
-	pd_rect_t2F padding;
+	ui_area_t margin;
+	ui_area_t padding;
 	css_keyword_value_t position;
 	ui_border_style_t border;
 	ui_boxshadow_style_t shadow;

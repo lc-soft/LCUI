@@ -155,7 +155,7 @@ static void ui_server_on_window_visibility_change(app_event_t *e, void *arg)
 
 static void ui_server_on_window_paint(app_event_t *e, void *arg)
 {
-	pd_rectf_t rect;
+	ui_rect_t rect;
 	list_node_t *node;
 	ui_connection_t *conn;
 
@@ -429,7 +429,7 @@ static size_t ui_server_render_flash_rect(ui_connection_t *conn,
 	pos.y = mask.height - 1;
 	pd_graph_draw_horiz_line(&mask, color, 1, pos, mask.width - 1);
 	pd_canvas_mix(&paint->canvas, &mask, 0, 0, TRUE);
-	pd_canvas_free(&mask);
+	pd_canvas_destroy(&mask);
 	app_window_end_paint(conn->window, paint);
 	return count;
 }

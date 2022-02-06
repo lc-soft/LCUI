@@ -30,7 +30,7 @@ void pd_graph_draw_horiz_line(pd_canvas_t *canvas, pd_color_t color, int size,
 	}
 	if (des->color_type == PD_COLOR_TYPE_ARGB) {
 		pd_color_t *pPixel, *pRowPixel;
-		pRowPixel = des->argb + start.y*des->width + start.x;
+		pRowPixel = des->pixels + start.y*des->width + start.x;
 		for (y = 0; y < size; ++y) {
 			pPixel = pRowPixel;
 			for (x = 0; x < len; ++x) {
@@ -87,7 +87,7 @@ void pd_graph_draw_verti_line(pd_canvas_t *canvas, pd_color_t color,
 
 	if (des->color_type == PD_COLOR_TYPE_ARGB) {
 		pd_color_t *pPixel, *pRowPixel;
-		pRowPixel = des->argb + start.y*des->width + start.x;
+		pRowPixel = des->pixels + start.y*des->width + start.x;
 		for (y = 0; y < len; ++y) {
 			pPixel = pRowPixel;
 			for (x = 0; x < size; ++x) {

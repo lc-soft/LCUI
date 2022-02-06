@@ -207,7 +207,7 @@ static void x11_app_window_on_size(app_window_t *wnd, int width, int height)
 	    XCreateImage(x11_app.display, visual, depth, ZPixmap, 0,
 			 (char *)(wnd->fb.bytes), width, height, 32, 0);
 	if (!wnd->ximage) {
-		pd_canvas_free(&wnd->fb);
+		pd_canvas_destroy(&wnd->fb);
 		logger_error("[x11_app] create XImage faild.\n");
 		return;
 	}

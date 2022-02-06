@@ -53,7 +53,7 @@ typedef struct ui_renderer_t {
 
 	/* Paint rectangle in widget content rectangle, it relative to
 	 * root canvas */
-	pd_rectf_t content_rect;
+	ui_rect_t content_rect;
 
 	LCUI_BOOL has_content_graph;
 	LCUI_BOOL has_self_graph;
@@ -84,10 +84,10 @@ static LCUI_BOOL ui_widget_has_round_border(ui_widget_t *w)
 	       s->bottom_left_radius || s->bottom_right_radius;
 }
 
-LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, pd_rectf_t *in_rect,
+LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
 				    int box_type)
 {
-	pd_rectf_t rect;
+	ui_rect_t rect;
 	ui_dirty_rect_type_t type;
 
 	if (!w->computed_style.visible) {
@@ -182,9 +182,9 @@ LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, pd_rectf_t *in_rect,
 
 static void ui_widget_collect_dirty_rect(ui_widget_t *w, list_t *rects,
 					 float x, float y,
-					 pd_rectf_t visible_area)
+					 ui_rect_t visible_area)
 {
-	pd_rectf_t rect;
+	ui_rect_t rect;
 	pd_rect_t *actual_rect;
 	list_node_t *node;
 
@@ -356,9 +356,9 @@ static ui_renderer_t *ui_renderer_create(ui_widget_t *w,
 
 static void ui_renderer_destroy(ui_renderer_t *renderer)
 {
-	pd_canvas_free(&renderer->layer_graph);
-	pd_canvas_free(&renderer->self_graph);
-	pd_canvas_free(&renderer->content_graph);
+	pd_canvas_destroy(&renderer->layer_graph);
+	pd_canvas_destroy(&renderer->self_graph);
+	pd_canvas_destroy(&renderer->content_graph);
 	free(renderer);
 }
 
@@ -369,7 +369,7 @@ static size_t ui_renderer_render_children(ui_renderer_t *that)
 	size_t total = 0, count = 0;
 	ui_widget_t *child;
 	pd_rect_t paint_rect;
-	pd_rectf_t child_rect;
+	ui_rect_t child_rect;
 	list_node_t *node;
 	pd_paint_context_t child_paint;
 	ui_renderer_t *renderer;

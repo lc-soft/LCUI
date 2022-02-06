@@ -25,7 +25,7 @@ int paint_background(pd_paint_context_t* paint, pd_rect_t *box)
 	bg.position.y = (box->height - image.height) / 2;
 	// 绘制背景
 	pd_background_paint(&bg, box, paint);
-	pd_canvas_free(&image);
+	pd_canvas_destroy(&image);
 	return 0;
 }
 
@@ -84,6 +84,6 @@ int main(void)
 	pd_canvas_mix(&canvas, &layer, (canvas.width - layer_rect.width) / 2,
 		  (canvas.height - layer_rect.height) / 2, FALSE);
 	LCUI_WritePNGFile("test_paint_border.png", &canvas);
-	pd_canvas_free(&canvas);
+	pd_canvas_destroy(&canvas);
 	return 0;
 }

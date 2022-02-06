@@ -94,11 +94,9 @@ LCUI_BEGIN_HEADER
 		pixel = (r << 16) | (g << 8) | b; \
 	}
 
-#define pd_canvas_get_quote(g) ((g)->quote.is_valid ? (g)->quote.source : (g))
-
 #define pd_canvas_set_pixel(G, X, Y, C)                                        \
 	if ((G)->color_type == PD_COLOR_TYPE_ARGB) {                    \
-		(G)->argb[(G)->width * (Y) + (X)] = (C);                  \
+		(G)->pixels[(G)->width * (Y) + (X)] = (C);                  \
 	} else {                                                          \
 		(G)->bytes[(G)->bytes_per_row * (Y) + (X)*3] = (C).b;     \
 		(G)->bytes[(G)->bytes_per_row * (Y) + (X)*3 + 1] = (C).g; \
@@ -106,37 +104,13 @@ LCUI_BEGIN_HEADER
 	}
 
 #define pd_canvas_set_pixel_alpha(G, X, Y, A) \
-	(G)->argb[(G)->width * (Y) + (X)].alpha = (A)
-
-#define pd_canvas_get_pixel(G, X, Y, C)                                            \
-	if ((G)->color_type == PD_COLOR_TYPE_ARGB) {                        \
-		(C) = (G)->argb[(G)->width * ((Y) % (G)->height) +            \
-				((X) % (G)->width)];                          \
-	} else {                                                              \
-		(C).value =                                                   \
-		    (G)->bytes[(G)->bytes_per_row * ((Y) % (G)->height) +     \
-			       ((X) % (G)->width) * (G)->bytes_per_pixel]     \
-			<< 0 |                                                \
-		    (G)->bytes[(G)->bytes_per_row * ((Y) % (G)->height) +     \
-			       ((X) % (G)->width) * (G)->bytes_per_pixel + 1] \
-			<< 8 |                                                \
-		    (G)->bytes[(G)->bytes_per_row * ((Y) % (G)->height) +     \
-			       ((X) % (G)->width) * (G)->bytes_per_pixel + 2] \
-			<< 16 |                                               \
-		    0xff << 24;                                               \
-	}
-
-#define pd_canvas_get_pixel_pointer(G, X, Y) ((G)->argb + (G)->width * (Y) + (X))
+	(G)->pixels[(G)->width * (Y) + (X)].alpha = (A)
 
 /** 判断图像是否有Alpha通道 */
 #define Graph_HasAlpha(G)                                              \
 	((G)->quote.is_valid                                           \
 	     ? ((G)->quote.source->color_type == PD_COLOR_TYPE_ARGB) \
 	     : ((G)->color_type == PD_COLOR_TYPE_ARGB))
-
-#define pd_canvas_is_writable(G)  \
-	(pd_canvas_is_valid(G) && \
-	 ((G)->quote.is_valid ? (G)->quote.is_writable : TRUE))
 
 /*
  * Pixel over operator with alpha channel
@@ -190,14 +164,6 @@ LCUI_API void pd_canvas_print_info(pd_canvas_t *canvas);
 
 LCUI_API void pd_canvas_init(pd_canvas_t *canvas);
 
-LCUI_API pd_color_t RGB(uchar_t r, uchar_t g, uchar_t b);
-
-LCUI_API pd_color_t ARGB(uchar_t a, uchar_t r, uchar_t g, uchar_t b);
-
-LCUI_API void pd_pixels_formmat(const uchar_t *in_pixels, int in_color_type,
-			   uchar_t *out_pixels, int out_color_type,
-			   size_t pixel_count);
-
 /** 改变色彩类型 */
 LCUI_API int pd_canvas_set_color_type(pd_canvas_t *canvas, int color_type);
 
@@ -205,7 +171,7 @@ LCUI_API int pd_canvas_create(pd_canvas_t *canvas, unsigned width, unsigned heig
 
 LCUI_API void pd_canvas_copy(pd_canvas_t *des, const pd_canvas_t *src);
 
-LCUI_API void pd_canvas_free(pd_canvas_t *canvas);
+LCUI_API void pd_canvas_destroy(pd_canvas_t *canvas);
 
 /**
  * 为图像创建一个引用
@@ -229,14 +195,6 @@ LCUI_API pd_bool pd_canvas_is_valid(const pd_canvas_t *canvas);
 
 LCUI_API void pd_canvas_get_valid_rect(const pd_canvas_t *canvas, pd_rect_t *rect);
 
-LCUI_API int pd_canvas_set_alpha_bits(pd_canvas_t *canvas, uchar_t *a, size_t size);
-
-LCUI_API int pd_canvas_set_red_bits(pd_canvas_t *canvas, uchar_t *r, size_t size);
-
-LCUI_API int pd_canvas_set_green_bits(pd_canvas_t *canvas, uchar_t *g, size_t size);
-
-LCUI_API int pd_canvas_set_blue_bits(pd_canvas_t *canvas, uchar_t *b, size_t size);
-
 LCUI_API int pd_canvas_zoom(const pd_canvas_t *canvas, pd_canvas_t *buff,
 			pd_bool keep_scale, int width, int height);
 
@@ -259,8 +217,6 @@ LCUI_API int pd_canvas_verti_flip(const pd_canvas_t *canvas, pd_canvas_t *buff);
  */
 LCUI_API int pd_canvas_fill_rect(pd_canvas_t *canvas, pd_color_t color,
 			    pd_rect_t *rect, pd_bool with_alpha);
-
-LCUI_API int pd_canvas_fill_alpha(pd_canvas_t *canvas, uchar_t alpha);
 
 LCUI_API int pd_canvas_tile(pd_canvas_t *buff, const pd_canvas_t *canvas,
 			pd_bool replace, pd_bool with_alpha);

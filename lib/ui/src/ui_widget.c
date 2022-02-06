@@ -172,7 +172,7 @@ void ui_widget_get_offset(ui_widget_t* w, ui_widget_t* parent, float* offset_x,
 LCUI_BOOL ui_widget_in_viewport(ui_widget_t* w)
 {
 	list_node_t* node;
-	pd_rectf_t rect;
+	ui_rect_t rect;
 	ui_widget_t *self, *parent, *child;
 	ui_widget_style_t* style;
 

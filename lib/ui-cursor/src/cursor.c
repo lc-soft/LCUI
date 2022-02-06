@@ -80,18 +80,28 @@ static uchar_t ui_cursor_image_data[4][12 * 19] = {
 
 static int ui_cursor_load_default_image(pd_canvas_t *buff)
 {
+	int x, y;
+	size_t i;
+	pd_pixel_t *p;
+
 	if (pd_canvas_is_valid(buff)) {
-		pd_canvas_free(buff);
+		pd_canvas_destroy(buff);
 	}
 	pd_canvas_init(buff);
 	buff->color_type = PD_COLOR_TYPE_ARGB;
 	if (pd_canvas_create(buff, 12, 19) != 0) {
 		return -1;
 	}
-	pd_canvas_set_red_bits(buff, ui_cursor_image_data[0], 12 * 19);
-	pd_canvas_set_green_bits(buff, ui_cursor_image_data[1], 12 * 19);
-	pd_canvas_set_blue_bits(buff, ui_cursor_image_data[2], 12 * 19);
-	pd_canvas_set_alpha_bits(buff, ui_cursor_image_data[3], 12 * 19);
+	for (y = 0; y < buff->height; ++y) {
+		i = y * buff->width;
+		p = buff->pixels + i;
+		for (x = 0; x < buff->width; ++x, ++i) {
+			p->r = ui_cursor_image_data[0][i];
+			p->g = ui_cursor_image_data[1][i];
+			p->b = ui_cursor_image_data[2][i];
+			p->a = ui_cursor_image_data[3][i];
+		}
+	}
 	return 0;
 }
 
@@ -158,7 +168,7 @@ int ui_cursor_set_image(pd_canvas_t *image)
 	if (pd_canvas_is_valid(image)) {
 		ui_cursor_refresh();
 		if (pd_canvas_is_valid(&ui_cursor.image)) {
-			pd_canvas_free(&ui_cursor.image);
+			pd_canvas_destroy(&ui_cursor.image);
 		}
 		pd_canvas_copy(&ui_cursor.image, image);
 		ui_cursor_refresh();
@@ -198,10 +208,10 @@ void ui_cursor_init(void)
 	// TODO: 移除 app 依赖
 	app_on_event(APP_EVENT_MOUSEMOVE, ui_cursor_on_mouse_event, NULL);
 	ui_cursor_set_image(&image);
-	pd_canvas_free(&image);
+	pd_canvas_destroy(&image);
 }
 
 void ui_cursor_destroy(void)
 {
-	pd_canvas_free(&ui_cursor.image);
+	pd_canvas_destroy(&ui_cursor.image);
 }

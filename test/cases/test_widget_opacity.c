@@ -110,7 +110,7 @@ static void check_widget_opactiy(void)
 	it_b("check child 2 footer background color",
 	     check_color(expected_color, color), TRUE);
 
-	pd_canvas_free(&canvas);
+	pd_canvas_destroy(&canvas);
 }
 
 void test_widget_opacity(void)

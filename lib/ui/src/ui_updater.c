@@ -273,7 +273,7 @@ static size_t ui_widget_update_visible_children(ui_widget_t* w,
 {
 	size_t total = 0, count;
 	LCUI_BOOL found = FALSE;
-	pd_rectf_t rect, visible_rect;
+	ui_rect_t rect, visible_rect;
 	ui_widget_t *child, *parent;
 	list_node_t *node, *next;
 

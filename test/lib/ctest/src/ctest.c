@@ -138,8 +138,8 @@ void it_s(const char *name, const char *actual, const char *expected)
 	test_msg(GREEN("  + %s\n\n"), expected);
 }
 
-void it_rectf(const char *name, const pd_rectf_t *actual,
-	      const pd_rectf_t *expected)
+void it_rectf(const char *name, const ui_rect_t *actual,
+	      const ui_rect_t *expected)
 {
 	tests_total++;
 	if (LCUIRectF_IsEquals(actual, expected)) {

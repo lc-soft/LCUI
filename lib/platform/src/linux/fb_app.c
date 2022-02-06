@@ -266,7 +266,7 @@ static void fb_app_window_sync_rect16(pd_canvas_t *canvas, int x, int y)
 	unsigned char *dst, *dst_row;
 
 	pd_canvas_get_valid_rect(canvas, &rect);
-	pixel_row = canvas->argb + rect.y * canvas->width + rect.x;
+	pixel_row = canvas->pixels + rect.y * canvas->width + rect.x;
 	dst_row = fbapp.fb.mem + y * fbapp.canvas.bytes_per_row + x * 2;
 	for (iy = 0; iy < rect.width; ++iy) {
 		dst = dst_row;
@@ -298,7 +298,7 @@ static void fb_app_window_sync_rect8(pd_canvas_t *canvas, int x, int y)
 	cmap.blue = cmap_buf + 512;
 
 	pd_canvas_get_valid_rect(canvas, &rect);
-	pixel_row = canvas->argb + rect.y * canvas->width + rect.x;
+	pixel_row = canvas->pixels + rect.y * canvas->width + rect.x;
 	dst_row = fbapp.fb.mem + y * fbapp.canvas.bytes_per_row + x;
 	for (iy = 0; iy < rect.height; ++iy) {
 		dst = dst_row;
@@ -466,7 +466,7 @@ static int fb_app_destroy(void)
 	case 8:
 		ioctl(fbapp.fb.dev_fd, FBIOPUTCMAP, &fbapp.fb.cmap);
 	default:
-		pd_canvas_free(&fbapp.window.canvas);
+		pd_canvas_destroy(&fbapp.window.canvas);
 		break;
 	}
 	close(fbapp.fb.dev_fd);

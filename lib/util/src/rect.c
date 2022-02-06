@@ -41,7 +41,7 @@ pd_rect_t Rect(int x, int y, int w, int h)
 	return r;
 }
 
-void LCUIRect_ToRectF(const pd_rect_t *rect, pd_rectf_t *rectf, float scale)
+void LCUIRect_ToRectF(const pd_rect_t *rect, ui_rect_t *rectf, float scale)
 {
 	rectf->x = rect->x * scale;
 	rectf->y = rect->y * scale;
@@ -57,7 +57,7 @@ void LCUIRect_Scale(const pd_rect_t *src, pd_rect_t *dst, float scale)
 	dst->height = y_iround(src->height * scale);
 }
 
-void LCUIRectF_ToRect(const pd_rectf_t *rectf, pd_rect_t *rect, float scale)
+void LCUIRectF_ToRect(const ui_rect_t *rectf, pd_rect_t *rect, float scale)
 {
 	rect->x = y_iround(rectf->x * scale);
 	rect->y = y_iround(rectf->y * scale);
@@ -124,7 +124,7 @@ LCUI_BOOL LCUIRect_ValidateArea(pd_rect_t *rect, int box_w, int box_h)
 	return overflow;
 }
 
-LCUI_BOOL LCUIRectF_ValidateArea(pd_rectf_t *rect, float box_w, float box_h)
+LCUI_BOOL LCUIRectF_ValidateArea(ui_rect_t *rect, float box_w, float box_h)
 {
 	LCUI_BOOL overflow = FALSE;
 
@@ -182,7 +182,7 @@ LCUI_BOOL LCUIRect_IsCoverRect(const pd_rect_t *a, const pd_rect_t *b)
 	return TRUE;
 }
 
-LCUI_BOOL LCUIRectF_IsCoverRect(const pd_rectf_t *a, const pd_rectf_t *b)
+LCUI_BOOL LCUIRectF_IsCoverRect(const ui_rect_t *a, const ui_rect_t *b)
 {
 	if (a->x > b->x) {
 		if (b->x + b->width <= a->x) {
@@ -245,8 +245,8 @@ LCUI_BOOL pd_rect_get_overlay_rect(const pd_rect_t *a, const pd_rect_t *b,
 	return TRUE;
 }
 
-LCUI_BOOL LCUIRectF_GetOverlayRect(const pd_rectf_t *a, const pd_rectf_t *b,
-				   pd_rectf_t *out)
+LCUI_BOOL LCUIRectF_GetOverlayRect(const ui_rect_t *a, const ui_rect_t *b,
+				   ui_rect_t *out)
 {
 	if (a->x > b->x) {
 		if (b->x + b->width > a->x + a->width) {
@@ -302,7 +302,7 @@ void LCUIRect_MergeRect(pd_rect_t *big, const pd_rect_t *a, const pd_rect_t *b)
 	big->height -= big->y;
 }
 
-void LCUIRectF_MergeRect(pd_rectf_t *big, const pd_rectf_t *a, const pd_rectf_t *b)
+void LCUIRectF_MergeRect(ui_rect_t *big, const ui_rect_t *a, const ui_rect_t *b)
 {
 	if (a->x + a->width < b->x + b->width) {
 		big->width = b->x + b->width;

@@ -46,7 +46,7 @@ int main(void)
 	/* 渲染部件 */
 	ui_widget_render(box, &paint);
 	ret = LCUI_WritePNGFile("test_widget_render.png", &canvas);
-	pd_canvas_free(&canvas);
+	pd_canvas_destroy(&canvas);
 
 	lcui_destroy();
 	return ret;

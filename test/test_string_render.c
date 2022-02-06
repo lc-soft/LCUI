@@ -35,7 +35,7 @@ int main(void)
 	/* 将文本图层绘制到图像中，然后将图像写入至 png 文件中 */
 	TextLayer_RenderTo(txt, area, pos, &img);
 	ret = LCUI_WritePNGFile("test_string_render.png", &img);
-	pd_canvas_free(&img);
+	pd_canvas_destroy(&img);
 
 	/* 释放字体处理功能相关资源 */
 	fontlib_destroy();

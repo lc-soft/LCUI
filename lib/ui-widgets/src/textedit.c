@@ -336,7 +336,7 @@ static void TextEdit_UpdateTextLayer(ui_widget_t* w)
 {
 	float scale;
 	list_t rects;
-	pd_rectf_t rect;
+	ui_rect_t rect;
 	ui_textedit_t* edit;
 	LCUI_TextStyleRec style;
 	list_node_t* node;
@@ -412,7 +412,7 @@ static void ui_textedit_on_resize(ui_widget_t* w, float width, float height)
 	list_t rects;
 	list_node_t* node;
 
-	pd_rectf_t rect;
+	ui_rect_t rect;
 	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
 
 	list_create(&rects);

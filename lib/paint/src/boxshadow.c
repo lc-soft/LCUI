@@ -651,6 +651,6 @@ int pd_boxshadow_paint(const pd_boxshadow_t *shadow, const pd_rect_t *box,
 
 	/* Render the rendered shadow bitmap to the canvas */
 	pd_canvas_mix(&paint->canvas, &ctx.paint->canvas, 0, 0, paint->with_alpha);
-	pd_canvas_free(&ctx.paint->canvas);
+	pd_canvas_destroy(&ctx.paint->canvas);
 	return 0;
 }

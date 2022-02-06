@@ -40,7 +40,7 @@ int main(void)
 		}
 	}
 	LCUI_WritePNGFile("test_fill_rect_with_rgba.png", &canvas);
-	pd_canvas_free(&fore_canvas);
-	pd_canvas_free(&canvas);
+	pd_canvas_destroy(&fore_canvas);
+	pd_canvas_destroy(&canvas);
 	return 0;
 }

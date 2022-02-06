@@ -291,7 +291,7 @@ int LCUI_WritePNGFile(const char *file_name, const pd_canvas_t *graph)
 		pd_color_t *px_ptr, *px_row_ptr;
 
 		row_size = png_get_rowbytes(png_ptr, info_ptr);
-		px_row_ptr = graph->argb + rect.y * graph->width + rect.x;
+		px_row_ptr = graph->pixels + rect.y * graph->width + rect.x;
 		row_pointers =
 		    (png_bytep *)malloc(rect.height * sizeof(png_bytep));
 		for (y = 0; y < rect.height; ++y) {

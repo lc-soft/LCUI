@@ -123,7 +123,7 @@ static void ui_textview_on_update(ui_widget_t *w)
 {
 	float scale = ui_get_scale();
 
-	pd_rectf_t rect;
+	ui_rect_t rect;
 	ui_textview_t *txt = ui_widget_get_data(w, ui_textview.prototype);;
 
 	list_t rects;
@@ -267,7 +267,7 @@ static void ui_textview_on_resize(ui_widget_t *w, float width, float height)
 	int fixed_width = (int)(width * scale);
 	int fixed_height = (int)(height * scale);
 
-	pd_rectf_t rect;
+	ui_rect_t rect;
 	ui_textview_t *txt = ui_widget_get_data(w, ui_textview.prototype);;
 
 	list_t rects;

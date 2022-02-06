@@ -518,7 +518,7 @@ void app_window_destroy(app_window_t *wnd)
 	wnd->fb_bmp = NULL;
 	wnd->hdc_fb = NULL;
 	wnd->hdc_client = NULL;
-	pd_canvas_free(&wnd->fb);
+	pd_canvas_destroy(&wnd->fb);
 	free(wnd);
 }
 

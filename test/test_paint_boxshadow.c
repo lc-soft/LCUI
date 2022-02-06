@@ -25,7 +25,7 @@ int paint_background(pd_paint_context_t* paint, pd_rect_t *box)
 	bg.position.y = (box->height - image.height) / 2;
 	// 绘制背景
 	pd_background_paint(&bg, box, paint);
-	pd_canvas_free(&image);
+	pd_canvas_destroy(&image);
 	return 0;
 }
 
@@ -120,6 +120,6 @@ int main(void)
 	// 将临时绘制层混合到画布中
 	pd_canvas_mix(&canvas, &layer, shadow_box.x, shadow_box.y, FALSE);
 	LCUI_WritePNGFile("test_paint_boxshadow.png", &canvas);
-	pd_canvas_free(&canvas);
+	pd_canvas_destroy(&canvas);
 	return 0;
 }

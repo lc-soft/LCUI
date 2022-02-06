@@ -44,7 +44,7 @@ static ui_image_loader_t ui_image_loader;
 static void ui_image_destroy(void *privdata, void *data)
 {
 	ui_image_t *image = data;
-	pd_canvas_free(&image->data);
+	pd_canvas_destroy(&image->data);
 	free(image->path);
 	image->refs_count = 0;
 	list_destroy_without_node(&image->listeners, free);

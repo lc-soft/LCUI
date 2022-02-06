@@ -54,7 +54,7 @@ INLINE LCUI_BOOL LCUIRect_HasPoint(pd_rect_t *rect, int x, int y)
 	return x >= rect->x && y >= rect->y && x < rect->x + rect->width &&
 	       y < rect->y + rect->height;
 }
-INLINE LCUI_BOOL LCUIRectF_HasPoint(pd_rectf_t *rect, float x, float y)
+INLINE LCUI_BOOL LCUIRectF_HasPoint(ui_rect_t *rect, float x, float y)
 {
 	return x >= rect->x && y >= rect->y && x < rect->x + rect->width &&
 	       y < rect->y + rect->height;
@@ -63,22 +63,22 @@ INLINE LCUI_BOOL LCUIRectF_HasPoint(pd_rectf_t *rect, float x, float y)
 /** 将矩形区域范围调整在容器有效范围内 */
 LCUI_API LCUI_BOOL LCUIRect_ValidateArea(pd_rect_t *rect, int box_w, int box_h);
 
-LCUI_API LCUI_BOOL LCUIRectF_ValidateArea(pd_rectf_t *rect, float box_w,
+LCUI_API LCUI_BOOL LCUIRectF_ValidateArea(ui_rect_t *rect, float box_w,
 					  float box_h);
 
-LCUI_API void LCUIRect_ToRectF(const pd_rect_t *rect, pd_rectf_t *rectf,
+LCUI_API void LCUIRect_ToRectF(const pd_rect_t *rect, ui_rect_t *rectf,
 			       float scale);
 
 LCUI_API void LCUIRect_Scale(const pd_rect_t *src, pd_rect_t *dst, float scale);
 
-LCUI_API void LCUIRectF_ToRect(const pd_rectf_t *rectf, pd_rect_t *rect,
+LCUI_API void LCUIRectF_ToRect(const ui_rect_t *rectf, pd_rect_t *rect,
 			       float scale);
 
 /** 检测矩形是否遮盖另一个矩形 */
 LCUI_API LCUI_BOOL LCUIRect_IsCoverRect(const pd_rect_t *a, const pd_rect_t *b);
 
-LCUI_API LCUI_BOOL LCUIRectF_IsCoverRect(const pd_rectf_t *a,
-					 const pd_rectf_t *b);
+LCUI_API LCUI_BOOL LCUIRectF_IsCoverRect(const ui_rect_t *a,
+					 const ui_rect_t *b);
 
 /**
  * 获取两个矩形中的重叠矩形
@@ -90,16 +90,16 @@ LCUI_API LCUI_BOOL LCUIRectF_IsCoverRect(const pd_rectf_t *a,
 LCUI_API LCUI_BOOL pd_rect_get_overlay_rect(const pd_rect_t *a,
 					    const pd_rect_t *b, pd_rect_t *out);
 
-LCUI_API LCUI_BOOL LCUIRectF_GetOverlayRect(const pd_rectf_t *a,
-					    const pd_rectf_t *b,
-					    pd_rectf_t *out);
+LCUI_API LCUI_BOOL LCUIRectF_GetOverlayRect(const ui_rect_t *a,
+					    const ui_rect_t *b,
+					    ui_rect_t *out);
 
 /** 合并两个矩形 */
 LCUI_API void LCUIRect_MergeRect(pd_rect_t *big, const pd_rect_t *a,
 				 const pd_rect_t *b);
 
-LCUI_API void LCUIRectF_MergeRect(pd_rectf_t *big, const pd_rectf_t *a,
-				  const pd_rectf_t *b);
+LCUI_API void LCUIRectF_MergeRect(ui_rect_t *big, const ui_rect_t *a,
+				  const ui_rect_t *b);
 
 /**
  * 根据重叠矩形 rect1，将矩形 rect2 分割成四个矩形
@@ -121,7 +121,7 @@ LCUI_API void LCUIRect_CutFourRect(pd_rect_t *rect1, pd_rect_t *rect2,
 LCUI_API void LCUIRect_Split(pd_rect_t *base, pd_rect_t *target,
 			     pd_rect_t rects[4]);
 
-INLINE LCUI_BOOL LCUIRectF_IsEquals(const pd_rectf_t *a, const pd_rectf_t *b)
+INLINE LCUI_BOOL LCUIRectF_IsEquals(const ui_rect_t *a, const ui_rect_t *b)
 {
 	return (int)(100 * (a->x - b->x)) == 0 &&
 	       (int)(100 * (a->y - b->y)) == 0 &&
