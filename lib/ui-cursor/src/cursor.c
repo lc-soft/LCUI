@@ -80,9 +80,9 @@ static uchar_t ui_cursor_image_data[4][12 * 19] = {
 
 static int ui_cursor_load_default_image(pd_canvas_t *buff)
 {
-	int x, y;
+	unsigned x, y;
 	size_t i;
-	pd_pixel_t *p;
+	pd_color_t *p;
 
 	if (pd_canvas_is_valid(buff)) {
 		pd_canvas_destroy(buff);
@@ -94,7 +94,7 @@ static int ui_cursor_load_default_image(pd_canvas_t *buff)
 	}
 	for (y = 0; y < buff->height; ++y) {
 		i = y * buff->width;
-		p = buff->pixels + i;
+		p = buff->argb + i;
 		for (x = 0; x < buff->width; ++x, ++i) {
 			p->r = ui_cursor_image_data[0][i];
 			p->g = ui_cursor_image_data[1][i];

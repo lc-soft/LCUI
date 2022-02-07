@@ -29,7 +29,7 @@
  */
 
 #include <stdlib.h>
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 #include <LCUI/ui.h>
 #include "../include/canvas.h"
 
@@ -100,7 +100,7 @@ static void ui_canvas_on_paint(ui_widget_t *w, pd_paint_context_t *paint,
 	content_rect.height = style->content_box.height;
 	content_rect.x = style->content_box.x - style->canvas_box.x;
 	content_rect.y = style->content_box.y - style->canvas_box.y;
-	if (!pd_rect_get_overlay_rect(&content_rect, &paint->rect, &rect)) {
+	if (!pd_rect_overlap(&content_rect, &paint->rect, &rect)) {
 		return;
 	}
 	content_rect.x = rect.x - content_rect.x;
@@ -123,7 +123,7 @@ static void ui_canvas_context_clear_rect(ui_canvas_context_t *ctx, int x, int y,
 	rect.y = y;
 	rect.width = width;
 	rect.height = height;
-	pd_canvas_fill_rect(&ctx->buffer, ARGB(0, 0, 0, 0), &rect, TRUE);
+	pd_canvas_fill_rect(&ctx->buffer, ARGB(0, 0, 0, 0), rect);
 }
 
 static void ui_canvas_context_fill_rect(ui_canvas_context_t *ctx, int x, int y,
@@ -135,7 +135,7 @@ static void ui_canvas_context_fill_rect(ui_canvas_context_t *ctx, int x, int y,
 	rect.y = y;
 	rect.width = width;
 	rect.height = height;
-	pd_canvas_fill_rect(&ctx->buffer, ctx->fill_color, &rect, TRUE);
+	pd_canvas_fill_rect(&ctx->buffer, ctx->fill_color, rect);
 }
 
 static void ui_canvas_context_release(ui_canvas_context_t *ctx)

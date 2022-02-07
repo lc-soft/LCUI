@@ -231,13 +231,14 @@ int LCUI_WritePNGFile(const char *file_name, const pd_canvas_t *graph)
 {
 #ifdef USE_LIBPNG
 	FILE *fp;
-	pd_rect_t rect;
 	png_byte color_type;
 	png_structp png_ptr;
 	png_infop info_ptr;
 	png_bytep *row_pointers;
 	size_t x, row_size;
 	int y;
+
+	PD_CANVAS_READING_CONTEXT(graph)
 
 	if (!pd_canvas_is_valid(graph)) {
 		logger_error("canvas is not valid\n");
@@ -247,7 +248,7 @@ int LCUI_WritePNGFile(const char *file_name, const pd_canvas_t *graph)
 	fp = fopen(file_name, "wb");
 	if (!fp) {
 		logger_error("file %s could not be opened for writing\n",
-			   file_name);
+			     file_name);
 		return -1;
 	}
 	/* initialize stuff */
@@ -272,7 +273,7 @@ int LCUI_WritePNGFile(const char *file_name, const pd_canvas_t *graph)
 		return -1;
 	}
 	png_init_io(png_ptr, fp);
-	if (Graph_HasAlpha(graph)) {
+	if (graph->color_type == PD_COLOR_TYPE_ARGB) {
 		color_type = PNG_COLOR_TYPE_RGB_ALPHA;
 	} else {
 		color_type = PNG_COLOR_TYPE_RGB;
@@ -283,50 +284,45 @@ int LCUI_WritePNGFile(const char *file_name, const pd_canvas_t *graph)
 		     PNG_FILTER_TYPE_BASE);
 
 	png_write_info(png_ptr, info_ptr);
+	row_size = png_get_rowbytes(png_ptr, info_ptr);
+
 	/* write bytes */
 
-	pd_canvas_get_valid_rect(graph, &rect);
-	graph = pd_canvas_get_quote(graph);
 	if (graph->color_type == PD_COLOR_TYPE_ARGB) {
-		pd_color_t *px_ptr, *px_row_ptr;
+		pd_color_t *px_ptr;
 
-		row_size = png_get_rowbytes(png_ptr, info_ptr);
-		px_row_ptr = graph->pixels + rect.y * graph->width + rect.x;
 		row_pointers =
-		    (png_bytep *)malloc(rect.height * sizeof(png_bytep));
-		for (y = 0; y < rect.height; ++y) {
-			row_pointers[y] = png_malloc(png_ptr, row_size);
-			px_ptr = px_row_ptr;
-			for (x = 0; x < row_size; ++px_ptr) {
-				row_pointers[y][x++] = px_ptr->red;
-				row_pointers[y][x++] = px_ptr->green;
-				row_pointers[y][x++] = px_ptr->blue;
-				row_pointers[y][x++] = px_ptr->alpha;
-			}
-			px_row_ptr += graph->width;
+		    (png_bytep *)malloc(graph_rect.height * sizeof(png_bytep));
+
+		PD_CANVAS_ROW_READING_BEGIN(graph)
+		row_pointers[y] = png_malloc(png_ptr, row_size);
+		px_ptr = (pd_color_t*)graph_row;
+		for (x = 0; x < row_size; ++px_ptr) {
+			row_pointers[y][x++] = px_ptr->red;
+			row_pointers[y][x++] = px_ptr->green;
+			row_pointers[y][x++] = px_ptr->blue;
+			row_pointers[y][x++] = px_ptr->alpha;
 		}
+		PD_CANVAS_ROW_READING_END(graph)
 	} else {
-		uchar_t *px_ptr, *px_row_ptr;
+		uchar_t *p;
 
-		row_size = png_get_rowbytes(png_ptr, info_ptr);
-		px_row_ptr = graph->bytes + rect.y * graph->bytes_per_row;
-		px_row_ptr += rect.x * graph->bytes_per_pixel;
 		row_pointers =
-		    (png_bytep *)malloc(rect.height * sizeof(png_bytep));
-		for (y = 0; y < rect.height; ++y) {
-			row_pointers[y] = (png_bytep)malloc(row_size);
-			px_ptr = px_row_ptr;
-			for (x = 0; x < row_size; x += 3) {
-				row_pointers[y][x + 2] = *px_ptr++;    // blue
-				row_pointers[y][x + 1] = *px_ptr++;    // green
-				row_pointers[y][x] = *px_ptr++;        // red
-			}
-			px_row_ptr += graph->bytes_per_row;
+		    (png_bytep *)malloc(graph_rect.height * sizeof(png_bytep));
+
+		PD_CANVAS_ROW_READING_BEGIN(graph)
+		row_pointers[y] = (png_bytep)malloc(row_size);
+		p = graph_row;
+		for (x = 0; x < row_size; x += 3) {
+			row_pointers[y][x + 2] = *p++;    // blue
+			row_pointers[y][x + 1] = *p++;    // green
+			row_pointers[y][x] = *p++;        // red
 		}
+		PD_CANVAS_ROW_READING_END(graph)
 	}
 	png_write_image(png_ptr, row_pointers);
 	/* cleanup heap allocation */
-	for (y = 0; y < rect.height; ++y) {
+	for (y = 0; y < graph_rect.height; ++y) {
 		free(row_pointers[y]);
 	}
 	free(row_pointers);

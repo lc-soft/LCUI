@@ -1,6 +1,6 @@
 ﻿#include <stdio.h>
 #include <LCUI.h>
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 #include <LCUI/image.h>
 #include <yutil.h>
 #include "ctest.h"

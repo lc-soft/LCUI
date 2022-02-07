@@ -1,16 +1,16 @@
 ﻿#include <LCUI/header.h>
 #include <LCUI/types.h>
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 
 void pd_graph_draw_horiz_line(pd_canvas_t *canvas, pd_color_t color, int size,
-			 pd_pos_t start, int len)
+			      pd_pos_t start, int len)
 {
 	int y, x;
 	pd_rect_t area;
 	pd_canvas_t *des;
 
-	des = pd_canvas_get_quote(canvas);
-	pd_canvas_get_valid_rect(canvas, &area);
+	des = pd_canvas_get_quote_source(canvas);
+	pd_canvas_get_quote_rect(canvas, &area);
 	start.x = area.x + start.x;
 	start.y = area.y + start.y;
 
@@ -30,7 +30,7 @@ void pd_graph_draw_horiz_line(pd_canvas_t *canvas, pd_color_t color, int size,
 	}
 	if (des->color_type == PD_COLOR_TYPE_ARGB) {
 		pd_color_t *pPixel, *pRowPixel;
-		pRowPixel = des->pixels + start.y*des->width + start.x;
+		pRowPixel = des->argb + start.y * des->width + start.x;
 		for (y = 0; y < size; ++y) {
 			pPixel = pRowPixel;
 			for (x = 0; x < len; ++x) {
@@ -44,7 +44,8 @@ void pd_graph_draw_horiz_line(pd_canvas_t *canvas, pd_color_t color, int size,
 		}
 	} else {
 		uchar_t *pByte, *pRowByte;
-		pRowByte = des->bytes + start.y*des->bytes_per_row + start.x * 3;
+		pRowByte =
+		    des->bytes + start.y * des->bytes_per_row + start.x * 3;
 		for (y = 0; y < size; ++y) {
 			pByte = pRowByte;
 			for (x = 0; x < len; ++x) {
@@ -57,15 +58,15 @@ void pd_graph_draw_horiz_line(pd_canvas_t *canvas, pd_color_t color, int size,
 	}
 }
 
-void pd_graph_draw_verti_line(pd_canvas_t *canvas, pd_color_t color,
-				  int size, pd_pos_t start, int len)
+void pd_graph_draw_verti_line(pd_canvas_t *canvas, pd_color_t color, int size,
+			      pd_pos_t start, int len)
 {
 	int y, x;
 	pd_rect_t area;
 	pd_canvas_t *des;
 
-	des = pd_canvas_get_quote(canvas);
-	pd_canvas_get_valid_rect(canvas, &area);
+	des = pd_canvas_get_quote_source(canvas);
+	pd_canvas_get_quote_rect(canvas, &area);
 	start.x = area.x + start.x;
 	start.y = area.y + start.y;
 
@@ -87,7 +88,7 @@ void pd_graph_draw_verti_line(pd_canvas_t *canvas, pd_color_t color,
 
 	if (des->color_type == PD_COLOR_TYPE_ARGB) {
 		pd_color_t *pPixel, *pRowPixel;
-		pRowPixel = des->pixels + start.y*des->width + start.x;
+		pRowPixel = des->argb + start.y * des->width + start.x;
 		for (y = 0; y < len; ++y) {
 			pPixel = pRowPixel;
 			for (x = 0; x < size; ++x) {
@@ -101,7 +102,8 @@ void pd_graph_draw_verti_line(pd_canvas_t *canvas, pd_color_t color,
 		}
 	} else {
 		uchar_t *pByte, *pRowByte;
-		pRowByte = des->bytes + start.y*des->bytes_per_row + start.x * 3;
+		pRowByte =
+		    des->bytes + start.y * des->bytes_per_row + start.x * 3;
 		for (y = 0; y < len; ++y) {
 			pByte = pRowByte;
 			for (x = 0; x < size; ++x) {

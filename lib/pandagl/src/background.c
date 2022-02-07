@@ -28,10 +28,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <LCUI/header.h>
 #include <LCUI/types.h>
-#include <LCUI/graph.h>
 #include <LCUI/util.h>
+#include "../include/pandagl.h"
 
 void pd_background_paint(const pd_background_t *bg, const pd_rect_t *box,
 			 pd_paint_context_t *paint)
@@ -41,14 +40,14 @@ void pd_background_paint(const pd_background_t *bg, const pd_rect_t *box,
 	pd_rect_t rect, read_rect;
 	int x, y, width, height;
 	/* 获取当前绘制区域与背景内容框的重叠区域 */
-	if (!pd_rect_get_overlay_rect(box, &paint->rect, &rect)) {
+	if (!pd_rect_overlap(box, &paint->rect, &rect)) {
 		return;
 	}
 	rect.x -= paint->rect.x;
 	rect.y -= paint->rect.y;
 	pd_canvas_init(&buffer);
 	pd_canvas_quote(&canvas, &paint->canvas, &rect);
-	pd_canvas_fill_rect(&canvas, bg->color, NULL, TRUE);
+	pd_canvas_fill(&canvas, bg->color);
 	if (!bg->image) {
 		return;
 	}
@@ -61,7 +60,7 @@ void pd_background_paint(const pd_background_t *bg, const pd_rect_t *box,
 	read_rect.width = width = bg->size.width;
 	read_rect.height = height = bg->size.height;
 	/* 获取当前绘制区域与背景图像的重叠区域 */
-	if (!pd_rect_get_overlay_rect(&read_rect, &rect, &read_rect)) {
+	if (!pd_rect_overlap(&read_rect, &rect, &read_rect)) {
 		return;
 	}
 	/* 转换成相对于图像的坐标 */
@@ -70,7 +69,7 @@ void pd_background_paint(const pd_background_t *bg, const pd_rect_t *box,
 	/* 如果尺寸没有变化则直接引用 */
 	if (bg->size.width == bg->image->width &&
 	    bg->size.height == bg->image->height) {
-		pd_canvas_quote_read_only(&canvas, bg->image, &read_rect);
+		pd_canvas_quote(&canvas, bg->image, &read_rect);
 	} else {
 		rect = read_rect;
 		/* 根据宽高的缩放比例，计算实际需要引用的区域 */
@@ -85,16 +84,16 @@ void pd_background_paint(const pd_background_t *bg, const pd_rect_t *box,
 			rect.height = y_iround(rect.height * scale);
 		}
 		/* 引用源背景图像的一块区域 */
-		pd_canvas_quote_read_only(&canvas, bg->image, &rect);
+		pd_canvas_quote(&canvas, bg->image, &rect);
 		width = read_rect.width;
 		height = read_rect.height;
 		/* 按比例进行缩放 */
 		pd_canvas_zoom(&canvas, &buffer, FALSE, width, height);
-		pd_canvas_quote_read_only(&canvas, &buffer, NULL);
+		pd_canvas_quote(&canvas, &buffer, NULL);
 	}
 	/* 计算相对于绘制区域的坐标 */
 	x += read_rect.x + box->x - paint->rect.x;
 	y += read_rect.y + box->y - paint->rect.y;
-	pd_canvas_mix(&paint->canvas, &canvas, x, y, bg->color.alpha < 255);
+	pd_canvas_mix(&paint->canvas, &canvas, x, y, bg->color.a < 255);
 	pd_canvas_destroy(&buffer);
 }

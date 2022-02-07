@@ -5,7 +5,7 @@
 #include <LCUI/timer.h>
 #include <LCUI/ui.h>
 #include <LCUI/ui/builder.h>
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 #include <LCUI/image.h>
 
 int main(int argc, char **argv)

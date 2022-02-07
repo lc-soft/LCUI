@@ -3,6 +3,7 @@
 
 #include <LCUI/header.h>
 #include <LCUI/types.h>
+#include <LCUI/pandagl/def.h>
 
 typedef pd_paint_context_t app_window_paint_t;
 

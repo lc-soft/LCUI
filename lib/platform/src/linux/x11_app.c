@@ -6,7 +6,7 @@
 #define MIN_WINDOW_WIDTH 100
 #define MIN_WINDOW_HEIGHT 40
 
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 
 struct app_window_t {
 	Window handle;
@@ -546,7 +546,7 @@ static app_window_paint_t *x11_app_window_begin_paint(app_window_t *wnd,
 	paint->rect = *rect;
 	paint->with_alpha = FALSE;
 	pd_canvas_init(&paint->canvas);
-	LCUIRect_ValidateArea(&paint->rect, wnd->width, wnd->height);
+	pd_rect_correct(&paint->rect, wnd->width, wnd->height);
 	pd_canvas_quote(&paint->canvas, &wnd->fb, &paint->rect);
 	pd_canvas_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
 	return paint;

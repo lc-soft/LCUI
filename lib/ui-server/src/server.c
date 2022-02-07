@@ -3,7 +3,7 @@
 #include <string.h>
 #include <errno.h>
 #include <LCUI/util.h>
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 #include <LCUI/ui/cursor.h>
 #include "config.h"
 #include "../include/server.h"
@@ -164,7 +164,7 @@ static void ui_server_on_window_paint(app_event_t *e, void *arg)
 		if (conn && conn->window != e->window) {
 			continue;
 		}
-		LCUIRect_ToRectF(&e->paint.rect, &rect, ui_get_scale());
+		ui_convert_rect(&e->paint.rect, &rect, ui_get_scale());
 		ui_widget_mark_dirty_rect(conn->widget, &rect, CSS_KEYWORD_GRAPH_BOX);
 	}
 }
@@ -361,7 +361,7 @@ static void ui_server_dump_rects(ui_connection_t *conn, list_t *out_rects)
 			if (layer->dirty >= max_dirty) {
 				continue;
 			}
-			if (!pd_rect_get_overlay_rect(&layer->rect, &rect,
+			if (!pd_rect_overlap(&layer->rect, &rect,
 						      sub_rect)) {
 				continue;
 			}
@@ -375,17 +375,19 @@ static void ui_server_dump_rects(ui_connection_t *conn, list_t *out_rects)
 			}
 		}
 	}
+	free(sub_rect);
 	for (i = 0; i < ui_server.num_rendering_threads; ++i) {
 		layer = &layers[i];
 		if (layer->dirty >= max_dirty) {
-			RectList_AddEx(out_rects, &layer->rect, FALSE);
-			RectList_Clear(&layer->rects);
+			sub_rect = malloc(sizeof(pd_rect_t));
+			*sub_rect = layer->rect;
+			list_append(out_rects, sub_rect);
+			list_destroy(&layer->rects, free);
 		} else {
 			list_concat(out_rects, &layer->rects);
 		}
 	}
-	RectList_Clear(&rects);
-	free(sub_rect);
+	list_destroy(&rects, free);
 	free(layers);
 }
 
@@ -417,7 +419,7 @@ static size_t ui_server_render_flash_rect(ui_connection_t *conn,
 	mask.color_type = PD_COLOR_TYPE_ARGB;
 	pd_canvas_create(&mask, flash_rect->rect.width,
 			 flash_rect->rect.height);
-	pd_canvas_fill_rect(&mask, ARGB(125, 124, 179, 5), NULL, TRUE);
+	pd_canvas_fill(&mask, ARGB(125, 124, 179, 5));
 	mask.opacity = 0.6f * (duration - (float)period) / duration;
 	pos.x = pos.y = 0;
 	color = RGB(124, 179, 5);
@@ -538,7 +540,7 @@ static size_t ui_server_render_window(ui_connection_t *conn)
 		}
 	}
 	free(rect_array);
-	RectList_Clear(&rects);
+	pd_rects_clear(&rects);
 	conn->rendered = count > 0;
 	count += ui_server_update_flash_rects(conn);
 	return count;

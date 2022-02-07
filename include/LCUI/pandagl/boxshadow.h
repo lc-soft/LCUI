@@ -1,6 +1,7 @@
-﻿/* types.h -- The common macros and types definition for LCUI
+﻿/*
+ * boxshadow.h -- Box shadow drawing
  *
- * Copyright (c) 2018-2022, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,28 +28,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_TYPES_H
-#define LCUI_TYPES_H
+#ifndef LIB_PANDAGL_INCLUDE_PANDAGL_BOXSHADOW_H
+#define LIB_PANDAGL_INCLUDE_PANDAGL_BOXSHADOW_H
 
 #include <LCUI/header.h>
-#include <wchar.h>
-#include <stdint.h>
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#define CodeToString(...) "" #__VA_ARGS__ ""
+#include <LCUI/types.h>
+#include "def.h"
 
 LCUI_BEGIN_HEADER
 
-typedef unsigned int uint_t;
-typedef unsigned char uchar_t;
-typedef unsigned char LCUI_BOOL;
+#define SHADOW_WIDTH(sd) (sd->blur + sd->spread)
+
+LCUI_API void pd_boxshadow_get_canvas_rect(const pd_boxshadow_t *shadow,
+				      const pd_rect_t *box_rect,
+				      pd_rect_t *canvas_rect);
+
+LCUI_API int pd_boxshadow_paint(const pd_boxshadow_t *shadow, const pd_rect_t *box,
+			     int centent_width, int content_height,
+			     pd_paint_context_t* paint);
 
 LCUI_END_HEADER
 

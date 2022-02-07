@@ -1,7 +1,7 @@
 ﻿/*
- * background.h -- Background image draw support.
+ * border.h -- Border drawing
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,20 +28,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_DRAW_BACKGROUND_H
-#define LCUI_DRAW_BACKGROUND_H
+#ifndef LIB_PANDAGL_INCLUDE_PANDAGL_BORDER_H
+#define LIB_PANDAGL_INCLUDE_PANDAGL_BORDER_H
+
+#include <LCUI/header.h>
+#include <LCUI/types.h>
+#include "def.h"
 
 LCUI_BEGIN_HEADER
 
-/**
-* 绘制背景
-* @param paint 绘制器的上下文句柄
-* @param[in] box 背景区域
-* @param[in] bg 背景样式参数
-*/
-LCUI_API void pd_background_paint(const pd_background_t *bg,
-			       const pd_rect_t *box,
-			       pd_paint_context_t* paint);
+LCUI_API int pd_border_crop_content(const pd_border_t *border, const pd_rect_t *box,
+				pd_paint_context_t* paint);
+
+LCUI_API int pd_border_paint(const pd_border_t *border,
+			  const pd_rect_t *box,
+			  pd_paint_context_t* paint);
 
 LCUI_END_HEADER
 

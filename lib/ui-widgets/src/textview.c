@@ -32,7 +32,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 #include <LCUI/css.h>
 #include <LCUI/text/textlayer.h>
 #include "./internal.h"
@@ -133,10 +133,10 @@ static void ui_textview_on_update(ui_widget_t *w)
 	TextLayer_Update(txt->layer, &rects);
 	TextLayer_ClearInvalidRect(txt->layer);
 	for (list_each(node, &rects)) {
-		LCUIRect_ToRectF(node->data, &rect, 1.0f / scale);
+		ui_convert_rect(node->data, &rect, 1.0f / scale);
 		ui_widget_mark_dirty_rect(w, &rect, CSS_KEYWORD_CONTENT_BOX);
 	}
-	RectList_Clear(&rects);
+	pd_rects_clear(&rects);
 	ui_widget_add_task(w, UI_TASK_REFLOW);
 }
 
@@ -258,7 +258,7 @@ static void ui_textview_on_auto_size(ui_widget_t *w, float *width, float *height
 	TextLayer_ClearInvalidRect(txt->layer);
 	*width = TextLayer_GetWidth(txt->layer) / scale;
 	*height = TextLayer_GetHeight(txt->layer) / scale;
-	RectList_Clear(&rects);
+	pd_rects_clear(&rects);
 }
 
 static void ui_textview_on_resize(ui_widget_t *w, float width, float height)
@@ -279,10 +279,10 @@ static void ui_textview_on_resize(ui_widget_t *w, float width, float height)
 	TextLayer_Update(txt->layer, &rects);
 	TextLayer_ClearInvalidRect(txt->layer);
 	for (list_each(node, &rects)) {
-		LCUIRect_ToRectF(node->data, &rect, 1.0f / scale);
+		ui_convert_rect(node->data, &rect, 1.0f / scale);
 		ui_widget_mark_dirty_rect(w, &rect, CSS_KEYWORD_CONTENT_BOX);
 	}
-	RectList_Clear(&rects);
+	pd_rects_clear(&rects);
 }
 
 static void ui_textview_on_paint(ui_widget_t *w, pd_paint_context_t *paint,
@@ -297,7 +297,7 @@ static void ui_textview_on_paint(ui_widget_t *w, pd_paint_context_t *paint,
 	content_rect.height = style->content_box.height;
 	content_rect.x = style->content_box.x - style->canvas_box.x;
 	content_rect.y = style->content_box.y - style->canvas_box.y;
-	if (!pd_rect_get_overlay_rect(&content_rect, &paint->rect, &rect)) {
+	if (!pd_rect_overlap(&content_rect, &paint->rect, &rect)) {
 		return;
 	}
 	pos.x = content_rect.x - rect.x;

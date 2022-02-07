@@ -1,5 +1,5 @@
 ﻿/*
- * draw.h -- The graphics draw module of LCUI.
+ * background.h -- Background image draw support.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
@@ -28,15 +28,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_DRAW_H
-#define LCUI_DRAW_H
+#ifndef LIB_PANDAGL_INCLUDE_PANDAGL_BACKGROUND_H
+#define LIB_PANDAGL_INCLUDE_PANDAGL_BACKGROUND_H
+
+#include <LCUI/header.h>
+#include <LCUI/types.h>
+#include "def.h"
 
 LCUI_BEGIN_HEADER
 
-#include <LCUI/draw/line.h>
-#include <LCUI/draw/border.h>
-#include <LCUI/draw/boxshadow.h>
-#include <LCUI/draw/background.h>
+/**
+ * 绘制背景
+ * @param paint 绘制器的上下文句柄
+ * @param[in] box 背景区域
+ * @param[in] bg 背景样式参数
+ */
+LCUI_API void pd_background_paint(const pd_background_t *bg,
+				  const pd_rect_t *box,
+				  pd_paint_context_t *paint);
 
 LCUI_END_HEADER
 

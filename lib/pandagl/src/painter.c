@@ -1,7 +1,6 @@
-﻿/*
- * boxshadow.h -- Box shadow drawing
+﻿/* painter.c -- The painter context operation set.
  *
- * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,17 +27,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_DRAW_BOXSHADOW_H
-#define LCUI_DRAW_BOXSHADOW_H
+#include <stdlib.h>
+#include <LCUI/header.h>
+#include <LCUI/types.h>
+#include <LCUI/pandagl.h>
+#include <LCUI/painter.h>
 
-#define SHADOW_WIDTH(sd) (sd->blur + sd->spread)
+pd_paint_context_t* pd_painter_begin(pd_canvas_t *canvas, pd_rect_t *rect)
+{
+	pd_paint_context_t* paint = (pd_paint_context_t*)malloc(sizeof(pd_paint_context_t));
+	paint->rect = *rect;
+	paint->with_alpha = FALSE;
+	pd_canvas_init(&paint->canvas);
+	pd_canvas_quote(&paint->canvas, canvas, &paint->rect);
+	return paint;
+}
 
-LCUI_API void pd_boxshadow_get_canvas_rect(const pd_boxshadow_t *shadow,
-				      const pd_rect_t *box_rect,
-				      pd_rect_t *canvas_rect);
-
-LCUI_API int pd_boxshadow_paint(const pd_boxshadow_t *shadow, const pd_rect_t *box,
-			     int centent_width, int content_height,
-			     pd_paint_context_t* paint);
-
-#endif
+void pd_painter_end(pd_paint_context_t* paint)
+{
+	free(paint);
+}

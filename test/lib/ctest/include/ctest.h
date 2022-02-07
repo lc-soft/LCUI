@@ -3,6 +3,9 @@
 
 #include <LCUI/header.h>
 #include <LCUI/types.h>
+#include <LCUI/pandagl/def.h>
+#include <LCUI/pandagl/rect.h>
+#include <LCUI/ui.h>
 
 void describe(const char *name, void (*func)());
 

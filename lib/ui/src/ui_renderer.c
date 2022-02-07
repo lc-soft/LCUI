@@ -1,5 +1,5 @@
 ﻿#include <LCUI.h>
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 #include "../include/ui.h"
 #include "internal.h"
 
@@ -124,14 +124,14 @@ LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
 		if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_CANVAS_BOX) {
 			return FALSE;
 		}
-		LCUIRectF_ValidateArea(&rect, w->box.canvas.width,
+		ui_rect_correct(&rect, w->box.canvas.width,
 				       w->box.canvas.height);
 		break;
 	case CSS_KEYWORD_BORDER_BOX:
 		if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_BORDER_BOX) {
 			return FALSE;
 		}
-		LCUIRectF_ValidateArea(&rect, w->box.border.width,
+		ui_rect_correct(&rect, w->box.border.width,
 				       w->box.border.height);
 		rect.x += w->box.border.x - w->box.canvas.x;
 		rect.y += w->box.border.y - w->box.canvas.y;
@@ -140,14 +140,14 @@ LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
 		if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_PADDING_BOX) {
 			return FALSE;
 		}
-		LCUIRectF_ValidateArea(&rect, w->box.padding.width,
+		ui_rect_correct(&rect, w->box.padding.width,
 				       w->box.padding.height);
 		rect.x += w->box.padding.x - w->box.canvas.x;
 		rect.y += w->box.padding.y - w->box.canvas.y;
 		break;
 	case CSS_KEYWORD_CONTENT_BOX:
 	default:
-		LCUIRectF_ValidateArea(&rect, w->box.content.width,
+		ui_rect_correct(&rect, w->box.content.width,
 				       w->box.content.height);
 		rect.x += w->box.content.x - w->box.canvas.x;
 		rect.y += w->box.content.y - w->box.canvas.y;
@@ -156,7 +156,7 @@ LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
 	rect.x += w->box.canvas.x;
 	rect.y += w->box.canvas.y;
 	if (w->dirty_rect_type > UI_DIRTY_RECT_TYPE_NONE) {
-		LCUIRectF_MergeRect(&w->dirty_rect, &rect, &w->dirty_rect);
+		ui_rect_merge(&w->dirty_rect, &rect, &w->dirty_rect);
 	} else {
 		w->dirty_rect = rect;
 		w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CUSTOM;
@@ -172,7 +172,7 @@ LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
 	do {                                                           \
 		rect.x += x;                                           \
 		rect.y += y;                                           \
-		LCUIRectF_GetOverlayRect(&rect, &visible_area, &rect); \
+		ui_rect_overlap(&rect, &visible_area, &rect); \
 		if (rect.width > 0 && rect.height > 0) {               \
 			actual_rect = malloc(sizeof(pd_rect_t));       \
 			ui_compute_rect_actual(actual_rect, &rect);    \
@@ -203,12 +203,12 @@ static void ui_widget_collect_dirty_rect(ui_widget_t *w, list_t *rects,
 			rect = w->box.canvas;
 			break;
 		}
-		if (!LCUIRectF_IsCoverRect(&rect, &w->dirty_rect)) {
+		if (!ui_rect_is_cover(&rect, &w->dirty_rect)) {
 			add_dirty_rect();
 			rect = w->dirty_rect;
 			add_dirty_rect();
 		} else {
-			LCUIRectF_MergeRect(&rect, &rect, &w->dirty_rect);
+			ui_rect_merge(&rect, &rect, &w->dirty_rect);
 			add_dirty_rect();
 		}
 	} else if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_CUSTOM) {
@@ -218,7 +218,7 @@ static void ui_widget_collect_dirty_rect(ui_widget_t *w, list_t *rects,
 	if (w->has_child_dirty_rect) {
 		visible_area.x -= x;
 		visible_area.y -= y;
-		LCUIRectF_GetOverlayRect(&visible_area, &w->box.padding,
+		ui_rect_overlap(&visible_area, &w->box.padding,
 					 &visible_area);
 		visible_area.x += x;
 		visible_area.y += y;
@@ -318,11 +318,11 @@ static ui_renderer_t *ui_renderer_create(ui_widget_t *w,
 		  that->actual_paint_rect.width,
 		  that->actual_paint_rect.height);
 	/* get actual paint rectangle in widget content rectangle */
-	that->can_render_centent = pd_rect_get_overlay_rect(
+	that->can_render_centent = pd_rect_overlap(
 	    &that->style->padding_box, &that->actual_paint_rect,
 	    &that->actual_content_rect);
 	;
-	LCUIRect_ToRectF(&that->actual_content_rect, &that->content_rect,
+	ui_convert_rect(&that->actual_content_rect, &that->content_rect,
 			 1.0f / ui_get_scale());
 	DEBUG_MSG("[%s] content_rect: (%d, %d, %d, %d)\n", w->id,
 		  that->actual_content_rect.x, that->actual_content_rect.y,
@@ -398,7 +398,7 @@ static size_t ui_renderer_render_children(ui_renderer_t *that)
 		child_rect.y = style.y + child->box.canvas.y;
 		child_rect.width = child->box.canvas.width;
 		child_rect.height = child->box.canvas.height;
-		if (!LCUIRectF_GetOverlayRect(&that->content_rect, &child_rect,
+		if (!ui_rect_overlap(&that->content_rect, &child_rect,
 					      &child_rect)) {
 			continue;
 		}
@@ -414,7 +414,7 @@ static size_t ui_renderer_render_children(ui_renderer_t *that)
 		DEBUG_MSG("child canvas rect: (%d, %d, %d, %d)\n",
 			  style.canvas_box.x, style.canvas_box.y,
 			  style.canvas_box.width, style.canvas_box.height);
-		if (!pd_rect_get_overlay_rect(&that->actual_content_rect,
+		if (!pd_rect_overlap(&that->actual_content_rect,
 					     &style.canvas_box, &paint_rect)) {
 			continue;
 		}

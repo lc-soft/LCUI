@@ -1,6 +1,7 @@
-﻿/* types.h -- The common macros and types definition for LCUI
+﻿/*
+ * background.h -- Background image draw support.
  *
- * Copyright (c) 2018-2022, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,28 +28,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_TYPES_H
-#define LCUI_TYPES_H
+#ifndef LIB_PANDAGL_INCLUDE_PANDAGL_BACKGROUND_H
+#define LIB_PANDAGL_INCLUDE_PANDAGL_BACKGROUND_H
 
 #include <LCUI/header.h>
-#include <wchar.h>
-#include <stdint.h>
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#define CodeToString(...) "" #__VA_ARGS__ ""
+#include <LCUI/types.h>
+#include "def.h"
 
 LCUI_BEGIN_HEADER
 
-typedef unsigned int uint_t;
-typedef unsigned char uchar_t;
-typedef unsigned char LCUI_BOOL;
+/**
+ * 绘制背景
+ * @param paint 绘制器的上下文句柄
+ * @param[in] box 背景区域
+ * @param[in] bg 背景样式参数
+ */
+LCUI_API void pd_background_paint(const pd_background_t *bg,
+				  const pd_rect_t *box,
+				  pd_paint_context_t *paint);
 
 LCUI_END_HEADER
 

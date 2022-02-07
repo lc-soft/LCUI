@@ -1,5 +1,5 @@
 #include <LCUI.h>
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 #include "../include/ui.h"
 #include "internal.h"
 

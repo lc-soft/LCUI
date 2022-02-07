@@ -35,7 +35,7 @@
 #include <LCUI/header.h>
 #include "config.h"
 #include <LCUI/types.h>
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 #include <LCUI/image.h>
 
 typedef struct LCUI_ImageInterfaceRec_ {

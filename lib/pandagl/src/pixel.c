@@ -1,4 +1,4 @@
-#include <math.h>
+﻿#include <math.h>
 #include "../include/pandagl/pixel.h"
 
 unsigned pd_get_pixel_size(pd_color_type_t color_type)
@@ -26,10 +26,10 @@ unsigned pd_get_pixel_row_size(pd_color_type_t color_type, size_t len)
 	return (unsigned)(ceil(pd_get_pixel_size(color_type) * len / 4.0)) * 4;
 }
 
-static void pd_format_pixels_argb2rgb(const pd_pixel_t *in_pixels,
+static void pd_format_pixels_argb2rgb(const pd_color_t *in_pixels,
 				      uchar_t *out_pixels, size_t count)
 {
-	const pd_pixel_t *p_px, *p_end_px;
+	const pd_color_t *p_px, *p_end_px;
 	uchar_t *p_out_byte;
 
 	p_px = in_pixels;
@@ -37,7 +37,7 @@ static void pd_format_pixels_argb2rgb(const pd_pixel_t *in_pixels,
 	/* 遍历到倒数第二个像素为止 */
 	p_end_px = p_px + count - 1;
 	for (; p_px < p_end_px; ++p_px) {
-		*((pd_pixel_t*)p_out_byte) = *p_px;
+		*((pd_color_t*)p_out_byte) = *p_px;
 		p_out_byte += 3;
 	}
 	/* 最后一个像素，以逐个字节的形式写数据 */
@@ -47,9 +47,9 @@ static void pd_format_pixels_argb2rgb(const pd_pixel_t *in_pixels,
 }
 
 static void pd_format_pixels_rgb2argb(const uchar_t *in_bytes,
-				      pd_pixel_t *out_pixels, size_t count)
+				      pd_color_t *out_pixels, size_t count)
 {
-	pd_pixel_t *p_px, *p_end_px;
+	pd_color_t *p_px, *p_end_px;
 	const uchar_t *p_in_byte;
 
 	p_in_byte = in_bytes;
@@ -75,13 +75,13 @@ int pd_format_pixels(const uchar_t *in_pixels, pd_color_type_t in_color_type,
 	switch (in_color_type) {
 	case PD_COLOR_TYPE_ARGB8888:
 		if (out_color_type == PD_COLOR_TYPE_RGB888) {
-			pd_format_pixels_argb2rgb(in_pixels, out_pixels, count);
+			pd_format_pixels_argb2rgb((pd_color_t*)in_pixels, out_pixels, count);
 			return 0;
 		}
 		break;
 	case PD_COLOR_TYPE_RGB888:
 		if (out_color_type == PD_COLOR_TYPE_ARGB8888) {
-			pd_format_pixels_rgb2argb(in_pixels, out_pixels, count);
+			pd_format_pixels_rgb2argb(in_pixels, (pd_color_t*)out_pixels, count);
 			return 0;
 		}
 		break;
