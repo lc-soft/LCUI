@@ -173,7 +173,7 @@ static size_t convert_glyph(font_bitmap_t *bmp, FT_GlyphSlot slot, int mode)
 	return size;
 }
 
-static int freetype_render(font_bitmap_t *bmp, wchar_t ch,
+static int freetype_render(font_bitmap_t *bmp, unsigned ch,
 			   int pixel_size, font_t *font)
 {
 	int ret = 0;
