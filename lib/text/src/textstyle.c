@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <LCUI/util.h>
+#include <LCUI/font.h>
 #include <LCUI/text/textstyle.h>
 #include <LCUI/css/utils.h>
 
