@@ -423,13 +423,13 @@ static size_t ui_server_render_flash_rect(ui_connection_t *conn,
 	mask.opacity = 0.6f * (duration - (float)period) / duration;
 	pos.x = pos.y = 0;
 	color = RGB(124, 179, 5);
-	pd_graph_draw_horiz_line(&mask, color, 1, pos, mask.width - 1);
-	pd_graph_draw_verti_line(&mask, color, 1, pos, mask.height - 1);
+	pd_canvas_draw_hline(&mask, color, 1, pos, mask.width - 1);
+	pd_canvas_draw_vline(&mask, color, 1, pos, mask.height - 1);
 	pos.x = mask.width - 1;
-	pd_graph_draw_verti_line(&mask, color, 1, pos, mask.height - 1);
+	pd_canvas_draw_vline(&mask, color, 1, pos, mask.height - 1);
 	pos.x = 0;
 	pos.y = mask.height - 1;
-	pd_graph_draw_horiz_line(&mask, color, 1, pos, mask.width - 1);
+	pd_canvas_draw_hline(&mask, color, 1, pos, mask.width - 1);
 	pd_canvas_mix(&paint->canvas, &mask, 0, 0, TRUE);
 	pd_canvas_destroy(&mask);
 	app_window_end_paint(conn->window, paint);

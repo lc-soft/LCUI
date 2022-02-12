@@ -45,7 +45,7 @@ typedef struct pd_rect_t_ {
 	int x, y, width, height;
 } pd_rect_t;
 
-typedef struct pd_canvas_t_ pd_canvas_t;
+typedef struct pd_canvas_t pd_canvas_t;
 
 typedef struct pd_canvas_quote_t {
 	int top;
@@ -54,7 +54,7 @@ typedef struct pd_canvas_quote_t {
 	pd_canvas_t *source;
 } pd_canvas_quote_t;
 
-struct pd_canvas_t_ {
+struct pd_canvas_t {
 	unsigned width;
 	unsigned height;
 	float opacity;
@@ -70,7 +70,7 @@ struct pd_canvas_t_ {
 };
 
 /** 进行绘制时所需的上下文 */
-typedef struct pd_paint_context_t_ {
+typedef struct pd_paint_context_t {
 	pd_rect_t rect;    /**< 需要绘制的区域 */
 	pd_canvas_t canvas; /**< 绘制后的位图缓存（可称为：画布） */
 	pd_bool with_alpha; /**< 绘制时是否需要处理 alpha 通道 */
@@ -90,7 +90,7 @@ typedef struct pd_background_t {
 	} size;
 } pd_background_t;
 
-typedef struct pd_boxshadow_t_ {
+typedef struct pd_boxshadow_t {
 	int x, y;
 	int blur;
 	int spread;
