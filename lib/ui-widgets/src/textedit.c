@@ -967,7 +967,7 @@ static void ui_textedit_on_destroy(ui_widget_t* widget)
 	}
 }
 
-static void ui_textedit_on_paint(ui_widget_t* w, pd_paint_context_t* paint,
+static void ui_textedit_on_paint(ui_widget_t* w, pd_context_t* paint,
 				 ui_widget_actual_style_t* style)
 {
 	pd_pos_t pos;

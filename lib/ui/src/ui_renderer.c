@@ -28,10 +28,10 @@ typedef struct ui_renderer_t {
 	ui_widget_actual_style_t *style;
 
 	/* current target widget paint context */
-	pd_paint_context_t* paint;
+	pd_context_t* paint;
 
 	/* root paint context */
-	pd_paint_context_t* root_paint;
+	pd_context_t* root_paint;
 
 	/* content canvas */
 	pd_canvas_t content_graph;
@@ -251,7 +251,7 @@ size_t ui_widget_get_dirty_rects(ui_widget_t *w, list_t *rects)
 }
 
 /** 当前部件的绘制函数 */
-static void ui_widget_on_paint(ui_widget_t *w, pd_paint_context_t *paint,
+static void ui_widget_on_paint(ui_widget_t *w, pd_context_t *paint,
 			       ui_widget_actual_style_t *style)
 {
 	ui_widget_paint_background(w, paint, style);
@@ -263,7 +263,7 @@ static void ui_widget_on_paint(ui_widget_t *w, pd_paint_context_t *paint,
 }
 
 static ui_renderer_t *ui_renderer_create(ui_widget_t *w,
-					 pd_paint_context_t *paint,
+					 pd_context_t *paint,
 					 ui_widget_actual_style_t *style,
 					 ui_renderer_t *parent)
 {
@@ -371,7 +371,7 @@ static size_t ui_renderer_render_children(ui_renderer_t *that)
 	pd_rect_t paint_rect;
 	ui_rect_t child_rect;
 	list_node_t *node;
-	pd_paint_context_t child_paint;
+	pd_context_t child_paint;
 	ui_renderer_t *renderer;
 	ui_widget_actual_style_t style;
 
@@ -450,7 +450,7 @@ static size_t ui_renderer_render_children(ui_renderer_t *that)
 static size_t ui_renderer_render(ui_renderer_t *renderer)
 {
 	size_t count = 0;
-	pd_paint_context_t self_paint;
+	pd_context_t self_paint;
 	ui_renderer_t *that = renderer;
 
 	int content_x = that->actual_content_rect.x - that->actual_paint_rect.x;
@@ -555,7 +555,7 @@ static size_t ui_renderer_render(ui_renderer_t *renderer)
 	return count;
 }
 
-size_t ui_widget_render(ui_widget_t *w, pd_paint_context_t *paint)
+size_t ui_widget_render(ui_widget_t *w, pd_context_t *paint)
 {
 	size_t count;
 	ui_renderer_t *ctx;

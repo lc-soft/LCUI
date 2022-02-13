@@ -16,8 +16,7 @@ int pd_canvas_veri_flip(const pd_canvas_t *canvas, pd_canvas_t *buff)
 	if (0 != pd_canvas_create(buff, rect.width, rect.height)) {
 		return -2;
 	}
-	byte_src = pd_canvas_pixel_at(canvas, rect.x,
-					       rect.y + rect.height - 1);
+	byte_src = pd_canvas_pixel_at(canvas, rect.x, rect.y + rect.height - 1);
 	byte_des = buff->bytes;
 	for (y = 0; y < rect.height; ++y) {
 		memcpy(byte_des, byte_src, buff->bytes_per_row);
@@ -46,7 +45,7 @@ static int canvas_horiz_flip(const pd_canvas_t *canvas, pd_canvas_t *buff)
 	for (y = 0; y < rect.height; ++y) {
 		dest = pd_canvas_pixel_at(buff, y, 0);
 		src = pd_canvas_pixel_at(canvas, rect.y + y,
-						  rect.x + rect.width - 1);
+					 rect.x + rect.width - 1);
 		if (canvas->color_type == PD_COLOR_TYPE_ARGB) {
 			for (x = 0; x < rect.width; ++x) {
 				*(pd_color_t *)dest = *(pd_color_t *)src;

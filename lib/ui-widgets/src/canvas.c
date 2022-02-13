@@ -89,7 +89,7 @@ static void ui_canvas_on_auto_size(ui_widget_t *w, float *width, float *height,
 	*height = UI_CANVAS_DEFAULT_HEIGHT;
 }
 
-static void ui_canvas_on_paint(ui_widget_t *w, pd_paint_context_t *paint,
+static void ui_canvas_on_paint(ui_widget_t *w, pd_context_t *paint,
 			       ui_widget_actual_style_t *style)
 {
 	pd_canvas_t src, dest;

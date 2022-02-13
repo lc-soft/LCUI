@@ -1,7 +1,7 @@
 ﻿/*
  * border.c -- Border drawing
  *
- * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2022, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -127,8 +127,7 @@ static int draw_border_top_left(pd_canvas_t *dst, int bound_left, int bound_top,
 		inner_x = y_max(0, y_min(right, inner_x));
 		outer_xi = y_max(0, (int)outer_x - (int)radius / 2);
 		inner_xi = y_min(right, (int)inner_x + (int)radius / 2);
-		p = pd_canvas_pixel_at(dst, rect.x,
-							      rect.y + y);
+		p = pd_canvas_pixel_at(dst, rect.x, rect.y + y);
 		/* Clear the outer pixels */
 		for (x = 0; x < outer_xi; ++x, ++p) {
 			p->alpha = 0;
@@ -223,8 +222,7 @@ static int draw_border_top_right(pd_canvas_t *dst, int bound_left,
 		inner_x = y_max(-1.0, y_min(outer_x, inner_x));
 		inner_xi = y_max(0, (int)inner_x - (int)radius / 2);
 		outer_xi = y_min(right, (int)outer_x + (int)radius / 2);
-		p = pd_canvas_pixel_at(
-		    dst, rect.x + inner_xi, rect.y + y);
+		p = pd_canvas_pixel_at(dst, rect.x + inner_xi, rect.y + y);
 		for (x = inner_xi; x < outer_xi; ++x, ++p) {
 			outer_d = -1.0;
 			inner_d = x - inner_x;
@@ -310,8 +308,7 @@ static int draw_border_bottom_left(pd_canvas_t *dst, int bound_left,
 		inner_x = y_max(0, y_min(right, inner_x));
 		outer_xi = y_max(0, (int)outer_x - (int)radius / 2);
 		inner_xi = y_min(right, (int)inner_x + (int)radius / 2);
-		p = pd_canvas_pixel_at(dst, rect.x,
-							      rect.y + y);
+		p = pd_canvas_pixel_at(dst, rect.x, rect.y + y);
 		for (x = 0; x < outer_xi; ++x, ++p) {
 			p->alpha = 0;
 		}
@@ -401,8 +398,7 @@ static int draw_border_bottom_right(pd_canvas_t *dst, int bound_left,
 		inner_x = y_max(-1.0, y_min(outer_x, inner_x));
 		inner_xi = y_max(0, (int)inner_x - (int)radius / 2);
 		outer_xi = y_min(right, (int)outer_x + (int)radius / 2);
-		p = pd_canvas_pixel_at(
-		    dst, rect.x + inner_xi, rect.y + y);
+		p = pd_canvas_pixel_at(dst, rect.x + inner_xi, rect.y + y);
 		for (x = inner_xi; x < outer_xi; ++x, ++p) {
 			outer_d = -1.0;
 			inner_d = 1.0 * x - inner_x;
@@ -477,8 +473,7 @@ static int crop_content_top_left(pd_canvas_t *dst, int bound_left,
 		x = ellipse_x(radius_x + 1.0, radius_y + 1.0, y);
 		outer_xi = (int)(center_x - x);
 		outer_xi = y_max(0, y_min(outer_xi, rect.width));
-		p = pd_canvas_pixel_at(dst, rect.x,
-							      rect.y + yi);
+		p = pd_canvas_pixel_at(dst, rect.x, rect.y + yi);
 		for (xi = 0; xi < outer_xi; ++xi, ++p) {
 			p->alpha = 0;
 		}
@@ -542,8 +537,7 @@ static int crop_content_top_right(pd_canvas_t *dst, int bound_left,
 			      y);
 		outer_xi = (int)(center_x + x);
 		outer_xi = y_max(0, outer_xi);
-		p = pd_canvas_pixel_at(
-		    dst, rect.x + outer_xi, rect.y + yi);
+		p = pd_canvas_pixel_at(dst, rect.x + outer_xi, rect.y + yi);
 		if (radius_x == radius_y) {
 			for (xi = outer_xi; xi < rect.width; ++xi, ++p) {
 				x = ToGeoX(xi, center_x);
@@ -603,8 +597,7 @@ static int crop_content_bottom_left(pd_canvas_t *dst, int bound_left,
 		x = ellipse_x(radius_x + 1.0, radius_y + 1.0, y);
 		outer_xi = (int)(center_x - x);
 		outer_xi = y_max(0, y_min(outer_xi, rect.width));
-		p = pd_canvas_pixel_at(dst, rect.x,
-							      rect.y + yi);
+		p = pd_canvas_pixel_at(dst, rect.x, rect.y + yi);
 		for (xi = 0; xi < outer_xi; ++xi, ++p) {
 			p->alpha = 0;
 		}
@@ -667,8 +660,7 @@ static int crop_content_bottom_right(pd_canvas_t *dst, int bound_left,
 			      y);
 		outer_xi = (int)(center_x + x);
 		outer_xi = y_max(0, outer_xi);
-		p = pd_canvas_pixel_at(
-		    dst, rect.x + outer_xi, rect.y + yi);
+		p = pd_canvas_pixel_at(dst, rect.x + outer_xi, rect.y + yi);
 		if (radius_x == radius_y) {
 			for (xi = outer_xi; xi < rect.width; ++xi, ++p) {
 				x = ToGeoX(xi, center_x);
@@ -701,8 +693,8 @@ static int crop_content_bottom_right(pd_canvas_t *dst, int bound_left,
 	return 0;
 }
 
-int pd_border_crop_content(const pd_border_t *border, const pd_rect_t *box,
-			   pd_paint_context_t *paint)
+int pd_crop_border_content(pd_context_t *ctx, const pd_border_t *border,
+			   const pd_rect_t *box)
 {
 	pd_canvas_t canvas;
 	pd_rect_t bound, rect;
@@ -716,12 +708,12 @@ int pd_border_crop_content(const pd_border_t *border, const pd_rect_t *box,
 	bound.width = radius - border->left.width;
 	bound.height = radius - border->top.width;
 	if (bound.width > 0 && bound.height > 0 &&
-	    pd_rect_overlap(&bound, &paint->rect, &rect)) {
+	    pd_rect_overlap(&bound, &ctx->rect, &rect)) {
 		bound_left = bound.x - rect.x;
 		bound_top = bound.y - rect.y;
-		rect.x -= paint->rect.x;
-		rect.y -= paint->rect.y;
-		pd_canvas_quote(&canvas, &paint->canvas, &rect);
+		rect.x -= ctx->rect.x;
+		rect.y -= ctx->rect.y;
+		pd_canvas_quote(&canvas, &ctx->canvas, &rect);
 		crop_content_top_left(&canvas, bound_left, bound_top,
 				      bound.width, bound.height);
 	}
@@ -732,12 +724,12 @@ int pd_border_crop_content(const pd_border_t *border, const pd_rect_t *box,
 	bound.width = radius - border->right.width;
 	bound.height = radius - border->top.width;
 	if (bound.width > 0 && bound.height > 0 &&
-	    pd_rect_overlap(&bound, &paint->rect, &rect)) {
+	    pd_rect_overlap(&bound, &ctx->rect, &rect)) {
 		bound_left = bound.x - rect.x;
 		bound_top = bound.y - rect.y;
-		rect.x -= paint->rect.x;
-		rect.y -= paint->rect.y;
-		pd_canvas_quote(&canvas, &paint->canvas, &rect);
+		rect.x -= ctx->rect.x;
+		rect.y -= ctx->rect.y;
+		pd_canvas_quote(&canvas, &ctx->canvas, &rect);
 		crop_content_top_right(&canvas, bound_left, bound_top,
 				       bound.width, bound.height);
 	}
@@ -748,12 +740,12 @@ int pd_border_crop_content(const pd_border_t *border, const pd_rect_t *box,
 	bound.width = radius - border->left.width;
 	bound.height = radius - border->bottom.width;
 	if (bound.width > 0 && bound.height > 0 &&
-	    pd_rect_overlap(&bound, &paint->rect, &rect)) {
+	    pd_rect_overlap(&bound, &ctx->rect, &rect)) {
 		bound_left = bound.x - rect.x;
 		bound_top = bound.y - rect.y;
-		rect.x -= paint->rect.x;
-		rect.y -= paint->rect.y;
-		pd_canvas_quote(&canvas, &paint->canvas, &rect);
+		rect.x -= ctx->rect.x;
+		rect.y -= ctx->rect.y;
+		pd_canvas_quote(&canvas, &ctx->canvas, &rect);
 		crop_content_bottom_left(&canvas, bound_left, bound_top,
 					 bound.width, bound.height);
 	}
@@ -765,20 +757,20 @@ int pd_border_crop_content(const pd_border_t *border, const pd_rect_t *box,
 	bound.width = radius - border->right.width;
 	bound.height = radius - border->bottom.width;
 	if (bound.width > 0 && bound.height > 0 &&
-	    pd_rect_overlap(&bound, &paint->rect, &rect)) {
+	    pd_rect_overlap(&bound, &ctx->rect, &rect)) {
 		bound_left = bound.x - rect.x;
 		bound_top = bound.y - rect.y;
-		rect.x -= paint->rect.x;
-		rect.y -= paint->rect.y;
-		pd_canvas_quote(&canvas, &paint->canvas, &rect);
+		rect.x -= ctx->rect.x;
+		rect.y -= ctx->rect.y;
+		pd_canvas_quote(&canvas, &ctx->canvas, &rect);
 		crop_content_bottom_right(&canvas, bound_left, bound_top,
 					  bound.width, bound.height);
 	}
 	return 0;
 }
 
-int pd_border_paint(const pd_border_t *border, const pd_rect_t *box,
-		    pd_paint_context_t *paint)
+int pd_paint_border(pd_context_t *ctx, const pd_border_t *border,
+		    const pd_rect_t *box)
 {
 	pd_canvas_t canvas;
 	pd_rect_t bound, rect;
@@ -794,7 +786,7 @@ int pd_border_paint(const pd_border_t *border, const pd_rect_t *box,
 	int br_height =
 	    y_max(border->bottom_right_radius, border->bottom.width);
 
-	if (!pd_canvas_is_valid(&paint->canvas)) {
+	if (!pd_canvas_is_valid(&ctx->canvas)) {
 		return -1;
 	}
 	/* Draw border top left angle */
@@ -802,12 +794,12 @@ int pd_border_paint(const pd_border_t *border, const pd_rect_t *box,
 	bound.y = box->y;
 	bound.width = tl_width;
 	bound.height = tl_height;
-	if (pd_rect_overlap(&bound, &paint->rect, &rect)) {
+	if (pd_rect_overlap(&bound, &ctx->rect, &rect)) {
 		bound_left = bound.x - rect.x;
 		bound_top = bound.y - rect.y;
-		rect.x -= paint->rect.x;
-		rect.y -= paint->rect.y;
-		pd_canvas_quote(&canvas, &paint->canvas, &rect);
+		rect.x -= ctx->rect.x;
+		rect.y -= ctx->rect.y;
+		pd_canvas_quote(&canvas, &ctx->canvas, &rect);
 		draw_border_top_left(&canvas, bound_left, bound_top,
 				     &border->top, &border->left,
 				     border->top_left_radius);
@@ -817,12 +809,12 @@ int pd_border_paint(const pd_border_t *border, const pd_rect_t *box,
 	bound.width = tr_width;
 	bound.height = tr_height;
 	bound.x = box->x + box->width - bound.width;
-	if (pd_rect_overlap(&bound, &paint->rect, &rect)) {
+	if (pd_rect_overlap(&bound, &ctx->rect, &rect)) {
 		bound_left = bound.x - rect.x;
 		bound_top = bound.y - rect.y;
-		rect.x -= paint->rect.x;
-		rect.y -= paint->rect.y;
-		pd_canvas_quote(&canvas, &paint->canvas, &rect);
+		rect.x -= ctx->rect.x;
+		rect.y -= ctx->rect.y;
+		pd_canvas_quote(&canvas, &ctx->canvas, &rect);
 		draw_border_top_right(&canvas, bound_left, bound_top,
 				      &border->top, &border->right,
 				      border->top_right_radius);
@@ -832,12 +824,12 @@ int pd_border_paint(const pd_border_t *border, const pd_rect_t *box,
 	bound.width = bl_width;
 	bound.height = bl_height;
 	bound.y = box->y + box->height - bound.height;
-	if (pd_rect_overlap(&bound, &paint->rect, &rect)) {
+	if (pd_rect_overlap(&bound, &ctx->rect, &rect)) {
 		bound_left = bound.x - rect.x;
 		bound_top = bound.y - rect.y;
-		rect.x -= paint->rect.x;
-		rect.y -= paint->rect.y;
-		pd_canvas_quote(&canvas, &paint->canvas, &rect);
+		rect.x -= ctx->rect.x;
+		rect.y -= ctx->rect.y;
+		pd_canvas_quote(&canvas, &ctx->canvas, &rect);
 		draw_border_bottom_left(&canvas, bound_left, bound_top,
 					&border->bottom, &border->left,
 					border->bottom_left_radius);
@@ -847,12 +839,12 @@ int pd_border_paint(const pd_border_t *border, const pd_rect_t *box,
 	bound.height = br_height;
 	bound.x = box->x + box->width - bound.width;
 	bound.y = box->y + box->height - bound.height;
-	if (pd_rect_overlap(&bound, &paint->rect, &rect)) {
+	if (pd_rect_overlap(&bound, &ctx->rect, &rect)) {
 		bound_left = bound.x - rect.x;
 		bound_top = bound.y - rect.y;
-		rect.x -= paint->rect.x;
-		rect.y -= paint->rect.y;
-		pd_canvas_quote(&canvas, &paint->canvas, &rect);
+		rect.x -= ctx->rect.x;
+		rect.y -= ctx->rect.y;
+		pd_canvas_quote(&canvas, &ctx->canvas, &rect);
 		draw_border_bottom_right(&canvas, bound_left, bound_top,
 					 &border->bottom, &border->right,
 					 border->bottom_right_radius);
@@ -862,10 +854,10 @@ int pd_border_paint(const pd_border_t *border, const pd_rect_t *box,
 	bound.y = box->y;
 	bound.width = box->width - tl_width - tr_width;
 	bound.height = border->top.width;
-	if (pd_rect_overlap(&bound, &paint->rect, &bound)) {
-		bound.x -= paint->rect.x;
-		bound.y -= paint->rect.y;
-		pd_canvas_quote(&canvas, &paint->canvas, &bound);
+	if (pd_rect_overlap(&bound, &ctx->rect, &bound)) {
+		bound.x -= ctx->rect.x;
+		bound.y -= ctx->rect.y;
+		pd_canvas_quote(&canvas, &ctx->canvas, &bound);
 		pd_canvas_fill(&canvas, border->top.color);
 	}
 	/* Draw bottom border line */
@@ -873,10 +865,10 @@ int pd_border_paint(const pd_border_t *border, const pd_rect_t *box,
 	bound.y = box->y + box->height - border->bottom.width;
 	bound.width = box->width - bl_width - br_width;
 	bound.height = border->bottom.width;
-	if (pd_rect_overlap(&bound, &paint->rect, &bound)) {
-		bound.x -= paint->rect.x;
-		bound.y -= paint->rect.y;
-		pd_canvas_quote(&canvas, &paint->canvas, &bound);
+	if (pd_rect_overlap(&bound, &ctx->rect, &bound)) {
+		bound.x -= ctx->rect.x;
+		bound.y -= ctx->rect.y;
+		pd_canvas_quote(&canvas, &ctx->canvas, &bound);
 		pd_canvas_fill(&canvas, border->bottom.color);
 	}
 	/* Draw left border line */
@@ -884,10 +876,10 @@ int pd_border_paint(const pd_border_t *border, const pd_rect_t *box,
 	bound.x = box->x;
 	bound.width = border->left.width;
 	bound.height = box->height - tl_height - bl_height;
-	if (pd_rect_overlap(&bound, &paint->rect, &bound)) {
-		bound.x -= paint->rect.x;
-		bound.y -= paint->rect.y;
-		pd_canvas_quote(&canvas, &paint->canvas, &bound);
+	if (pd_rect_overlap(&bound, &ctx->rect, &bound)) {
+		bound.x -= ctx->rect.x;
+		bound.y -= ctx->rect.y;
+		pd_canvas_quote(&canvas, &ctx->canvas, &bound);
 		pd_canvas_fill(&canvas, border->left.color);
 	}
 	/* Draw right border line */
@@ -895,10 +887,10 @@ int pd_border_paint(const pd_border_t *border, const pd_rect_t *box,
 	bound.y = box->y + tr_height;
 	bound.width = border->right.width;
 	bound.height = box->height - tr_height - br_height;
-	if (pd_rect_overlap(&bound, &paint->rect, &bound)) {
-		bound.x -= paint->rect.x;
-		bound.y -= paint->rect.y;
-		pd_canvas_quote(&canvas, &paint->canvas, &bound);
+	if (pd_rect_overlap(&bound, &ctx->rect, &bound)) {
+		bound.x -= ctx->rect.x;
+		bound.y -= ctx->rect.y;
+		pd_canvas_quote(&canvas, &ctx->canvas, &bound);
 		pd_canvas_fill(&canvas, border->right.color);
 	}
 	return 0;

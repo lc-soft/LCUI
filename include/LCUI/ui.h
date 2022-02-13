@@ -173,7 +173,7 @@ typedef void (*ui_widget_size_setter_t)(ui_widget_t*, float, float);
 typedef void (*ui_widget_attr_setter_t)(ui_widget_t*, const char*, const char*);
 typedef void (*ui_widget_text_setter_t)(ui_widget_t*, const char*);
 typedef void (*ui_widget_prop_binder_t)(ui_widget_t*, const char*, LCUI_Object);
-typedef void (*ui_widget_painter_t)(ui_widget_t*, pd_paint_context_t*,
+typedef void (*ui_widget_painter_t)(ui_widget_t*, pd_context_t*,
 				    ui_widget_actual_style_t*);
 typedef struct ui_widget_prototype_t ui_widget_prototype_t;
 
@@ -950,7 +950,7 @@ LCUI_API LCUI_BOOL ui_widget_auto_reflow(ui_widget_t* w, ui_layout_rule_t rule);
 LCUI_API LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t* w, ui_rect_t* in_rect,
 					     int box_type);
 LCUI_API size_t ui_widget_get_dirty_rects(ui_widget_t* w, list_t* rects);
-LCUI_API size_t ui_widget_render(ui_widget_t* w, pd_paint_context_t* paint);
+LCUI_API size_t ui_widget_render(ui_widget_t* w, pd_context_t* paint);
 
 // Updater
 

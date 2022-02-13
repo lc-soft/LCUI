@@ -47,7 +47,7 @@ static void check_widget_opactiy(void)
 	pd_color_t parent_bcolor = RGB(0, 0, 0);
 	pd_color_t bgcolor = RGB(255, 255, 255);
 	pd_rect_t rect = { 0, 0, 400, 256 };
-	pd_paint_context_t paint;
+	pd_context_t paint;
 
 	pd_canvas_init(&canvas);
 	pd_canvas_create(&canvas, rect.width, rect.height);

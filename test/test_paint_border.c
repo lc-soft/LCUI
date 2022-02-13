@@ -1,9 +1,8 @@
 ﻿#include <LCUI.h>
 #include <LCUI/pandagl.h>
 #include <LCUI/image.h>
-#include <LCUI/painter.h>
 
-int paint_background(pd_paint_context_t* paint, pd_rect_t *box)
+int paint_background(pd_context_t* ctx, pd_rect_t* box)
 {
 	pd_canvas_t image;
 	pd_color_t green = RGB(102, 204, 0);
@@ -24,12 +23,12 @@ int paint_background(pd_paint_context_t* paint, pd_rect_t *box)
 	bg.position.x = (box->width - image.width) / 2;
 	bg.position.y = (box->height - image.height) / 2;
 	// 绘制背景
-	pd_background_paint(&bg, box, paint);
+	pd_paint_background(ctx, &bg, box);
 	pd_canvas_destroy(&image);
 	return 0;
 }
 
-void paint_border(pd_paint_context_t* paint, pd_rect_t *box)
+void paint_border(pd_context_t* ctx, pd_rect_t* box)
 {
 	pd_border_t border = { 0 };
 	pd_color_t black = RGB(0, 0, 0);
@@ -50,7 +49,7 @@ void paint_border(pd_paint_context_t* paint, pd_rect_t *box)
 	border.top_right_radius = 32;
 	border.bottom_left_radius = 32;
 	border.bottom_right_radius = 32;
-	pd_border_paint(&border, box, paint);
+	pd_paint_border(ctx, &border, box);
 }
 
 int main(void)
@@ -66,7 +65,7 @@ int main(void)
 			     border_box.width - border_size * 2,
 			     border_box.height - border_size * 2 };
 	pd_rect_t layer_rect = { 0, 0, border_box.width, border_box.height };
-	pd_paint_context_t* paint;
+	pd_context_t* paint;
 
 	pd_canvas_init(&canvas);
 	pd_canvas_create(&canvas, 800, 600);
@@ -77,12 +76,12 @@ int main(void)
 	pd_canvas_create(&layer, layer_rect.width, layer_rect.height);
 
 	// 创建绘制上下文
-	paint = pd_painter_begin(&layer, &layer_rect);
+	paint = pd_context_create(&layer, &layer_rect);
 	paint->with_alpha = TRUE;
 	paint_background(paint, &bg_box);
 	paint_border(paint, &border_box);
 	pd_canvas_mix(&canvas, &layer, (canvas.width - layer_rect.width) / 2,
-		  (canvas.height - layer_rect.height) / 2, FALSE);
+		      (canvas.height - layer_rect.height) / 2, FALSE);
 	LCUI_WritePNGFile("test_paint_border.png", &canvas);
 	pd_canvas_destroy(&canvas);
 	return 0;

@@ -2,8 +2,8 @@
 #include <LCUI/types.h>
 #include <LCUI/pandagl.h>
 
-void pd_canvas_draw_horizontal_line(pd_canvas_t *canvas, pd_color_t color, int size,
-			      pd_pos_t start, int len)
+void pd_canvas_draw_horizontal_line(pd_canvas_t *canvas, pd_color_t color,
+				    int size, pd_pos_t start, int len)
 {
 	int y, x;
 	pd_rect_t area;
@@ -58,8 +58,8 @@ void pd_canvas_draw_horizontal_line(pd_canvas_t *canvas, pd_color_t color, int s
 	}
 }
 
-void pd_canvas_draw_vertical_line(pd_canvas_t *canvas, pd_color_t color, int size,
-			      pd_pos_t start, int len)
+void pd_canvas_draw_vertical_line(pd_canvas_t *canvas, pd_color_t color,
+				  int size, pd_pos_t start, int len)
 {
 	int y, x;
 	pd_rect_t area;

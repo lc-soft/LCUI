@@ -8,7 +8,7 @@ int main(void)
 	int ret;
 	pd_canvas_t canvas;
 	ui_widget_t *root, *box, *txt;
-	pd_paint_context_t paint;
+	pd_context_t paint;
 	pd_rect_t area = { 40, 40, 320, 240 };
 	pd_color_t bgcolor = RGB(242, 249, 252);
 	pd_color_t bdcolor = RGB(201, 230, 242);

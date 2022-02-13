@@ -3,6 +3,7 @@
 #include "pandagl/color.h"
 #include "pandagl/pixel.h"
 #include "pandagl/canvas.h"
+#include "pandagl/context.h"
 #include "pandagl/line.h"
 #include "pandagl/background.h"
 #include "pandagl/border.h"

@@ -401,7 +401,7 @@ static size_t ui_server_render_flash_rect(ui_connection_t *conn,
 	pd_pos_t pos;
 	pd_color_t color;
 	pd_canvas_t mask;
-	pd_paint_context_t *paint;
+	pd_context_t *paint;
 
 	paint = app_window_begin_paint(conn->window, &flash_rect->rect);
 	if (!paint) {
@@ -479,7 +479,7 @@ static void ui_server_add_flash_rect(ui_connection_t *conn, pd_rect_t *rect)
 static size_t ui_server_render_rect(ui_connection_t *conn, pd_rect_t *rect)
 {
 	size_t count;
-	pd_paint_context_t *paint;
+	pd_context_t *paint;
 
 	if (!conn->widget || !conn->window) {
 		return 0;

@@ -39,13 +39,12 @@ LCUI_BEGIN_HEADER
 
 /**
  * 绘制背景
- * @param paint 绘制器的上下文句柄
+ * @param ctx 绘制器的上下文句柄
  * @param[in] box 背景区域
  * @param[in] bg 背景样式参数
  */
-LCUI_API void pd_background_paint(const pd_background_t *bg,
-				  const pd_rect_t *box,
-				  pd_paint_context_t *paint);
+LCUI_API void pd_paint_background(pd_context_t *ctx, const pd_background_t *bg,
+				  const pd_rect_t *box);
 
 LCUI_END_HEADER
 

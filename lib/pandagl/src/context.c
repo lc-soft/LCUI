@@ -1,7 +1,6 @@
-﻿/*
- * painter.h -- The painter context operation set.
+﻿/* context.c -- The PandaGL drawing context
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2022, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,13 +27,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_PAINTER_H
-#define LCUI_PAINTER_H
+#include <stdlib.h>
+#include <LCUI/types.h>
+#include "../include/pandagl.h"
 
-#include <LCUI/header.h>
+pd_context_t* pd_context_create(pd_canvas_t *canvas, pd_rect_t *rect)
+{
+	pd_context_t* paint = (pd_context_t*)malloc(sizeof(pd_context_t));
+	paint->rect = *rect;
+	paint->with_alpha = FALSE;
+	pd_canvas_init(&paint->canvas);
+	pd_canvas_quote(&paint->canvas, canvas, &paint->rect);
+	return paint;
+}
 
-LCUI_API pd_paint_context_t* pd_painter_begin(pd_canvas_t *canvas, pd_rect_t *rect);
-
-LCUI_API void pd_painter_end(pd_paint_context_t* paint);
-
-#endif
+void pd_context_destroy(pd_context_t* paint)
+{
+	free(paint);
+}

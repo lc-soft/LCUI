@@ -173,7 +173,7 @@ void ui_widget_compute_canvas_box_actual(ui_widget_t* w,
 					 ui_widget_actual_style_t* s)
 {
 	ui_widget_compute_box_shadow(w, &s->shadow);
-	pd_boxshadow_get_canvas_rect(&s->shadow, &s->border_box, &s->canvas_box);
+	pd_get_boxshadow_canvas_rect(&s->shadow, &s->border_box, &s->canvas_box);
 }
 
 void ui_widget_compute_padding_box_actual(ui_widget_t* w,

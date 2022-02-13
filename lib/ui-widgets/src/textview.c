@@ -285,7 +285,7 @@ static void ui_textview_on_resize(ui_widget_t *w, float width, float height)
 	pd_rects_clear(&rects);
 }
 
-static void ui_textview_on_paint(ui_widget_t *w, pd_paint_context_t *paint,
+static void ui_textview_on_paint(ui_widget_t *w, pd_context_t *paint,
 			     ui_widget_actual_style_t *style)
 {
 	pd_pos_t pos;

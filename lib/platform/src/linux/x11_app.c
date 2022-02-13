@@ -540,9 +540,9 @@ static void x11_app_window_hide(app_window_t *wnd)
 static app_window_paint_t *x11_app_window_begin_paint(app_window_t *wnd,
 						      pd_rect_t *rect)
 {
-	pd_paint_context_t *paint;
+	pd_context_t *paint;
 
-	paint = malloc(sizeof(pd_paint_context_t));
+	paint = malloc(sizeof(pd_context_t));
 	paint->rect = *rect;
 	paint->with_alpha = FALSE;
 	pd_canvas_init(&paint->canvas);

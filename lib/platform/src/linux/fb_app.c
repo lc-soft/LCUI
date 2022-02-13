@@ -12,7 +12,6 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include <LCUI/pandagl.h>
-#include <LCUI/painter.h>
 
 #define MIN_WIDTH 320
 #define MIN_HEIGHT 240
@@ -384,7 +383,7 @@ static app_window_paint_t *fb_app_window_begin_paint(app_window_t *wnd,
 	pd_rect_overlap(&actual_rect, &wnd->actual_rect, &actual_rect);
 	actual_rect.x -= wnd->rect.x;
 	actual_rect.y -= wnd->rect.y;
-	paint = pd_painter_begin(&wnd->canvas, &actual_rect);
+	paint = pd_context_create(&wnd->canvas, &actual_rect);
 	pd_canvas_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
 	pd_rects_add(&wnd->rects, rect);
 	return paint;
@@ -393,7 +392,7 @@ static app_window_paint_t *fb_app_window_begin_paint(app_window_t *wnd,
 static void fb_app_window_end_paint(app_window_t *wnd,
 				    app_window_paint_t *paint)
 {
-	pd_painter_end(paint);
+	pd_context_destroy(paint);
 }
 
 static void fb_app_window_present(app_window_t *wnd)

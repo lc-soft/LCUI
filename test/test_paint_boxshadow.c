@@ -1,9 +1,8 @@
 ﻿#include <LCUI.h>
 #include <LCUI/pandagl.h>
 #include <LCUI/image.h>
-#include <LCUI/painter.h>
 
-int paint_background(pd_paint_context_t* paint, pd_rect_t *box)
+int paint_background(pd_context_t* ctx, pd_rect_t* box)
 {
 	pd_canvas_t image;
 	pd_color_t green = RGB(102, 204, 0);
@@ -24,12 +23,12 @@ int paint_background(pd_paint_context_t* paint, pd_rect_t *box)
 	bg.position.x = (box->width - image.width) / 2;
 	bg.position.y = (box->height - image.height) / 2;
 	// 绘制背景
-	pd_background_paint(&bg, box, paint);
+	pd_paint_background(ctx, &bg, box);
 	pd_canvas_destroy(&image);
 	return 0;
 }
 
-void paint_border(pd_paint_context_t* paint, pd_rect_t *box, int size, int radius)
+void paint_border(pd_context_t* ctx, pd_rect_t* box, int size, int radius)
 {
 	pd_border_t border = { 0 };
 	pd_color_t black = RGB(0, 0, 0);
@@ -50,7 +49,7 @@ void paint_border(pd_paint_context_t* paint, pd_rect_t *box, int size, int radiu
 	border.top_right_radius = radius;
 	border.bottom_left_radius = radius;
 	border.bottom_right_radius = radius;
-	pd_border_paint(&border, box, paint);
+	pd_paint_border(ctx, &border, box);
 }
 
 int main(void)
@@ -76,7 +75,7 @@ int main(void)
 	pd_rect_t border_box;
 	pd_rect_t bg_box;
 	pd_rect_t layer_rect;
-	pd_paint_context_t* paint;
+	pd_context_t* ctx;
 
 	pd_canvas_init(&canvas);
 	pd_canvas_create(&canvas, width, height);
@@ -93,7 +92,7 @@ int main(void)
 	border_box.width = bg_box.width + border_size * 2;
 	border_box.height = bg_box.height + border_size * 2;
 	// 基于边框区域，计算阴影区域
-	pd_boxshadow_get_canvas_rect(&shadow, &border_box, &shadow_box);
+	pd_get_boxshadow_canvas_rect(&shadow, &border_box, &shadow_box);
 
 	// 创建一个临时绘制层
 	pd_canvas_init(&layer);
@@ -105,17 +104,17 @@ int main(void)
 	pd_canvas_create(&layer, layer_rect.width, layer_rect.height);
 
 	// 基于临时绘制层创建绘制上下文
-	paint = pd_painter_begin(&layer, &layer_rect);
-	paint->with_alpha = TRUE;
+	ctx = pd_context_create(&layer, &layer_rect);
+	ctx->with_alpha = TRUE;
 	// 将背景区域和边框区域的坐标转换成相对于阴影区域
 	bg_box.x -= shadow_box.x;
 	bg_box.y -= shadow_box.y;
 	border_box.x -= shadow_box.x;
 	border_box.y -= shadow_box.y;
-	paint_background(paint, &bg_box);
-	paint_border(paint, &border_box, border_size, border_radius);
-	pd_boxshadow_paint(&shadow, &layer_rect, border_box.width,
-			border_box.height, paint);
+	paint_background(ctx, &bg_box);
+	paint_border(ctx, &border_box, border_size, border_radius);
+	pd_paint_boxshadow(ctx, &shadow, &layer_rect, border_box.width,
+			   border_box.height);
 
 	// 将临时绘制层混合到画布中
 	pd_canvas_mix(&canvas, &layer, shadow_box.x, shadow_box.y, FALSE);

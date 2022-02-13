@@ -279,13 +279,14 @@ void ui_widget_compute_background(ui_widget_t *w, pd_background_t *out)
 	}
 }
 
-void ui_widget_paint_background(ui_widget_t *w, pd_paint_context_t *paint,
+void ui_widget_paint_background(ui_widget_t *w, pd_context_t *ctx,
 				ui_widget_actual_style_t* style)
 {
 	pd_rect_t box;
+
 	box.x = style->padding_box.x - style->canvas_box.x;
 	box.y = style->padding_box.y - style->canvas_box.y;
 	box.width = style->padding_box.width;
 	box.height = style->padding_box.height;
-	pd_background_paint(&style->background, &box, paint);
+	pd_paint_background(ctx, &style->background, &box);
 }
