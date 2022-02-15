@@ -149,7 +149,7 @@ static void pd_canvas_direct_replace(pd_canvas_t *des, pd_rect_t des_rect,
 	uchar_t *byte_row_des, *byte_row_src;
 
 	byte_row_src = pd_canvas_pixel_at(src, src_x, src_y);
-	byte_row_des = pd_canvas_pixel_at(src, des_rect.x, des_rect.y);
+	byte_row_des = pd_canvas_pixel_at(des, des_rect.x, des_rect.y);
 	for (y = 0; y < des_rect.height; ++y) {
 		pd_format_pixels(byte_row_src, src->color_type, byte_row_des,
 				 des->color_type, des_rect.width);
@@ -279,20 +279,15 @@ static void pd_canvas_mix_argb_with_alpha(pd_canvas_t *des, pd_rect_t des_rect,
 {
 	int x, y;
 	pd_color_t *px_src, *px_des;
-	pd_color_t *px_row_src, *px_row_des;
 
-	px_row_src = pd_canvas_pixel_at(src, src_x, src_y);
-	px_row_des = pd_canvas_pixel_at(des, des_rect.x, des_rect.y);
 	for (y = 0; y < des_rect.height; ++y) {
-		px_src = px_row_src;
-		px_des = px_row_des;
+		px_src = pd_canvas_pixel_at(src, src_x, src_y + y);
+		px_des = pd_canvas_pixel_at(des, des_rect.x, des_rect.y + y);
 		for (x = 0; x < des_rect.width; ++x) {
 			pd_over_pixel(px_des, px_src, src->opacity);
 			++px_src;
 			++px_des;
 		}
-		px_row_des += des->width;
-		px_row_src += src->width;
 	}
 }
 
@@ -302,38 +297,24 @@ static void pd_canvas_mix_argb(pd_canvas_t *dest, pd_rect_t des_rect,
 	int x, y;
 	uchar_t a;
 	pd_color_t *px_src, *px_dest;
-	pd_color_t *px_row_src, *px_row_des;
 
-	px_row_src = pd_canvas_pixel_at(src, src_x, src_y);
-	px_row_des = pd_canvas_pixel_at(dest, des_rect.x, des_rect.y);
-	if (src->opacity < 1.0) {
-		goto mix_with_opacity;
-	}
 	for (y = 0; y < des_rect.height; ++y) {
-		px_src = px_row_src;
-		px_dest = px_row_des;
+		px_src = pd_canvas_pixel_at(src, src_x, src_y + y);
+		px_dest = pd_canvas_pixel_at(dest, des_rect.x, des_rect.y + y);
+		if (src->opacity < 1.0) {
+			for (x = 0; x < des_rect.width; ++x) {
+				a = (uchar_t)(px_src->a * src->opacity);
+				pd_blend_pixel(px_dest, px_src, a);
+				++px_src;
+				++px_dest;
+			}
+			continue;
+		}
 		for (x = 0; x < des_rect.width; ++x) {
 			pd_blend_pixel(px_dest, px_src, px_src->a);
 			++px_src;
 			++px_dest;
 		}
-		px_row_des += dest->width;
-		px_row_src += src->width;
-	}
-	return;
-
-mix_with_opacity:
-	for (y = 0; y < des_rect.height; ++y) {
-		px_src = px_row_src;
-		px_dest = px_row_des;
-		for (x = 0; x < des_rect.width; ++x) {
-			a = (uchar_t)(px_src->a * src->opacity);
-			pd_blend_pixel(px_dest, px_src, a);
-			++px_src;
-			++px_dest;
-		}
-		px_row_des += dest->width;
-		px_row_src += src->width;
 	}
 }
 

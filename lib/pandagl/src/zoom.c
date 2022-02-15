@@ -1,4 +1,4 @@
-#include "../include/pandagl.h"
+﻿#include "../include/pandagl.h"
 
 static uchar_t canvas_bilinear_resampling_core(uchar_t a, uchar_t b, uchar_t c,
 					       uchar_t d, float dx, float dy)

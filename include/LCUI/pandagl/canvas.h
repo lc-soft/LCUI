@@ -60,15 +60,15 @@ INLINE const pd_canvas_t *pd_canvas_get_quote_source_readonly(
 	pd_canvas_get_quote_rect(##CANVAS, &CANVAS##_rect); \
 	##CANVAS = pd_canvas_get_quote_source_readonly(##CANVAS);
 
-#define PD_CANVAS_ROW_READING_BEGIN(CANVAS)                                 \
-	int CANVAS##_y;                                                     \
-	unsigned char *CANVAS##_row;                                        \
-                                                                            \
-	CANVAS##_row =                                                      \
-	    pd_canvas_pixel_at(##CANVAS, CANVAS##_rect.x, CANVAS##_rect.y); \
+#define PD_CANVAS_ROW_READING_BEGIN(CANVAS)                               \
+	int CANVAS##_y;                                                   \
+	unsigned char *CANVAS##_row;                                      \
+                                                                          \
+	CANVAS##_row =                                                    \
+	    pd_canvas_pixel_at(CANVAS, CANVAS##_rect.x, CANVAS##_rect.y); \
 	for (CANVAS##_y = 0; CANVAS##_y < CANVAS##_rect.height; ++CANVAS##_y) {
-#define PD_CANVAS_ROW_READING_END(CANVAS)        \
-	CANVAS##_row += ##CANVAS->bytes_per_row; \
+#define PD_CANVAS_ROW_READING_END(CANVAS)      \
+	CANVAS##_row += CANVAS->bytes_per_row; \
 	}
 
 #define PD_CANVAS_ROW_WRITING_BEGIN(CANVAS, RECT)                        \
@@ -78,24 +78,24 @@ INLINE const pd_canvas_t *pd_canvas_get_quote_source_readonly(
 	CANVAS##_row = pd_canvas_pixel_at(##CANVAS, RECT##.x, RECT##.y); \
 	for (CANVAS##_y = 0; CANVAS##_y < RECT##.height; ++CANVAS##_y) {
 #define PD_CANVAS_ARGB_PIXEL_BEGIN(CANVAS, RECT, PIXEL)      \
-	if (canvas->color_type == PD_COLOR_TYPE_ARGB) {      \
+	if (CANVAS->color_type == PD_COLOR_TYPE_ARGB) {      \
 		int CANVAS##_x;                              \
 		for (CANVAS##_x = 0, ##PIXEL = CANVAS##_row; \
-		     CANVAS##_x < RECT##.width; ++CANVAS##_x, ##PIXEL += 4) {
+		     CANVAS##_x < RECT##.width; ++CANVAS##_x, PIXEL += 4) {
 #define PD_CANVAS_ARGB_PIXEL_END \
 	}                        \
 	}
-#define PD_CANVAS_RGB_PIXEL_BEGIN(CANVAS, RECT, PIXEL)       \
-	if (canvas->color_type == PD_COLOR_TYPE_RGB) {       \
-		int CANVAS##_x;                              \
-		for (CANVAS##_x = 0, ##PIXEL = CANVAS##_row; \
-		     CANVAS##_x < RECT##.width; ++CANVAS##_x, ##PIXEL += 3) {
+#define PD_CANVAS_RGB_PIXEL_BEGIN(CANVAS, RECT, PIXEL)     \
+	if (CANVAS->color_type == PD_COLOR_TYPE_RGB) {     \
+		int CANVAS##_x;                            \
+		for (CANVAS##_x = 0, PIXEL = CANVAS##_row; \
+		     CANVAS##_x < RECT##.width; ++CANVAS##_x, PIXEL += 3) {
 #define PD_CANVAS_RGB_PIXEL_END \
 	}                       \
 	}
 
-#define PD_CANVAS_ROW_WRITING_END(CANVAS)        \
-	CANVAS##_row += ##CANVAS->bytes_per_row; \
+#define PD_CANVAS_ROW_WRITING_END(CANVAS)      \
+	CANVAS##_row += CANVAS->bytes_per_row; \
 	}
 
 LCUI_API void pd_canvas_init(pd_canvas_t *canvas);

@@ -56,8 +56,8 @@ INLINE void pd_over_pixel(pd_color_t *dst, const pd_color_t *src, double opacity
 	 *   Co = (Ca * aa + Cb * ai) / (aa + ai)
 	 *   ao = aa + ai
 	 */
-	double src_a = src->a / 255.0;
-	double a = (1.0 - src_a) * dst->a / 255.0 * opacity;
+	double src_a = src->a * opacity / 255.0;
+	double a = (1.0 - src_a) * dst->a / 255.0;
 	double out_a = src_a + a;
 
 	if (out_a > 0) {
