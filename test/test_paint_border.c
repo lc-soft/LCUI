@@ -69,7 +69,7 @@ int main(void)
 
 	pd_canvas_init(&canvas);
 	pd_canvas_create(&canvas, 800, 600);
-	pd_canvas_fill_rect(&canvas, gray, NULL, FALSE);
+	pd_canvas_fill(&canvas, gray);
 
 	pd_canvas_init(&layer);
 	layer.color_type = PD_COLOR_TYPE_ARGB;

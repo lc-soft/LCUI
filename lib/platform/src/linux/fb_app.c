@@ -384,7 +384,7 @@ static app_window_paint_t *fb_app_window_begin_paint(app_window_t *wnd,
 	actual_rect.x -= wnd->rect.x;
 	actual_rect.y -= wnd->rect.y;
 	paint = pd_context_create(&wnd->canvas, &actual_rect);
-	pd_canvas_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
+	pd_canvas_fill(&paint->canvas, RGB(255, 255, 255));
 	pd_rects_add(&wnd->rects, rect);
 	return paint;
 }

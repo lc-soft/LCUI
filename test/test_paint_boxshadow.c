@@ -79,7 +79,7 @@ int main(void)
 
 	pd_canvas_init(&canvas);
 	pd_canvas_create(&canvas, width, height);
-	pd_canvas_fill_rect(&canvas, gray, NULL, FALSE);
+	pd_canvas_fill(&canvas, gray);
 
 	// 设置居中的背景区域
 	bg_box.width = 400;

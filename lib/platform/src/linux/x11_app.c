@@ -548,7 +548,7 @@ static app_window_paint_t *x11_app_window_begin_paint(app_window_t *wnd,
 	pd_canvas_init(&paint->canvas);
 	pd_rect_correct(&paint->rect, wnd->width, wnd->height);
 	pd_canvas_quote(&paint->canvas, &wnd->fb, &paint->rect);
-	pd_canvas_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
+	pd_canvas_fill(&paint->canvas, RGB(255, 255, 255));
 	return paint;
 }
 

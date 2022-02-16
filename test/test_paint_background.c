@@ -13,7 +13,7 @@ int test_paint_background_color(void)
 
 	pd_canvas_init(&canvas);
 	pd_canvas_create(&canvas, 800, 600);
-	pd_canvas_fill_rect(&canvas, gray, NULL, FALSE);
+	pd_canvas_fill(&canvas, gray);
 	// 设置背景色
 	bg.color = green;
 	// 创建绘制上下文
@@ -39,7 +39,7 @@ int test_paint_background_image(void)
 	pd_canvas_init(&canvas);
 	pd_canvas_init(&image);
 	pd_canvas_create(&canvas, 800, 600);
-	pd_canvas_fill_rect(&canvas, gray, NULL, FALSE);
+	pd_canvas_fill(&canvas, gray);
 	// 读取背景图片
 	if (LCUI_ReadImageFile("test_image_reader.png", &image) != 0) {
 		return -1;
@@ -74,7 +74,7 @@ int test_paint_background_image_with_size(void)
 	pd_canvas_init(&canvas);
 	pd_canvas_init(&image);
 	pd_canvas_create(&canvas, 800, 600);
-	pd_canvas_fill_rect(&canvas, gray, NULL, FALSE);
+	pd_canvas_fill(&canvas, gray);
 	// 读取背景图片
 	if (LCUI_ReadImageFile("test_image_reader.png", &image) != 0) {
 		return -1;
@@ -110,7 +110,7 @@ int test_paint_background_image_with_position(void)
 	pd_canvas_init(&canvas);
 	pd_canvas_init(&image);
 	pd_canvas_create(&canvas, 800, 600);
-	pd_canvas_fill_rect(&canvas, gray, NULL, FALSE);
+	pd_canvas_fill(&canvas, gray);
 	// 读取背景图片
 	if (LCUI_ReadImageFile("test_image_reader.png", &image) != 0) {
 		return -1;
