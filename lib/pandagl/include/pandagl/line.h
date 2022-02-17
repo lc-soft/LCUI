@@ -22,7 +22,7 @@ INLINE void pd_canvas_draw_hline(pd_canvas_t *canvas, pd_color_t color,
 	pd_canvas_draw_horizontal_line(canvas, color, size, start, end_x);
 }
 
-INLINE pd_canvas_draw_vline(pd_canvas_t *canvas, pd_color_t color, int size,
+INLINE void pd_canvas_draw_vline(pd_canvas_t *canvas, pd_color_t color, int size,
 			    pd_pos_t start, int end_y)
 {
 	pd_canvas_draw_vertical_line(canvas, color, size, start, end_y);

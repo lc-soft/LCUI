@@ -420,24 +420,25 @@ int pd_canvas_mix(pd_canvas_t *back, const pd_canvas_t *fore, int left, int top,
 
 int pd_canvas_fill_rect(pd_canvas_t *canvas, pd_color_t color, pd_rect_t rect)
 {
-	uchar_t *p;
+	int x, y;
+	unsigned char *p;
 
 	if (pd_canvas_begin_writing(&canvas, &rect) != 0) {
 		return -1;
 	}
-
-	PD_CANVAS_ROW_WRITING_BEGIN(canvas, rect)
-
-	PD_CANVAS_ARGB_PIXEL_BEGIN(canvas, rect, p)
-	*(pd_color_t *)p = color;
-	PD_CANVAS_ARGB_PIXEL_END
-
-	PD_CANVAS_RGB_PIXEL_BEGIN(canvas, rect, p)
-	p[0] = color.b;
-	p[1] = color.g;
-	p[2] = color.r;
-	PD_CANVAS_RGB_PIXEL_END
-
-	PD_CANVAS_ROW_WRITING_END(canvas)
+	for (y = 0; y < rect.height; ++y) {
+		p = pd_canvas_pixel_at(canvas, rect.x, rect.y + y);
+		if (canvas->color_type == PD_COLOR_TYPE_ARGB8888) {
+			for (x = 0; x < rect.width; ++x, p += 4) {
+				*(pd_color_t *)p = color;
+			}
+		} else {
+			for (x = 0; x < rect.width; ++x) {
+				*p++ = color.b;
+				*p++ = color.g;
+				*p++ = color.r;
+			}
+		}
+	}
 	return 0;
 }
