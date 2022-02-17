@@ -57,7 +57,7 @@ int pd_canvas_quote(pd_canvas_t *self, pd_canvas_t *source,
 		self->bytes = NULL;
 		self->quote.source = NULL;
 		self->quote.is_valid = FALSE;
-		return -EINVAL;
+		return -1;
 	}
 	self->opacity = 1.0;
 	self->bytes = NULL;
