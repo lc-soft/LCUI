@@ -43,7 +43,7 @@ static void test_auto_size(void)
 {
 	ui_widget_t* w;
 	ui_widget_t* example;
-	pd_rectf_t rect;
+	ui_rect_t rect;
 
 	// Update #test-text-auto-height content
 
@@ -109,7 +109,7 @@ static void test_auto_size(void)
 static void test_inline_block_nesting(void)
 {
 	ui_widget_t* w;
-	pd_rectf_t rect;
+	ui_rect_t rect;
 
 	w = ui_get_widget("example-inline-block-nesting__block-1");
 	rect.x = 5;
@@ -166,7 +166,7 @@ static void test_block_layout_1280(void)
 	ui_widget_t* content;
 	ui_widget_t* example;
 	ui_widget_t* container;
-	pd_rectf_t rect;
+	ui_rect_t rect;
 
 	container = ui_widget_get_child(ui_get_widget("main"), 0);
 	ui_widget_resize(ui_root(), 1280, 800);
@@ -433,7 +433,7 @@ static void test_block_layout_600(void)
 	ui_widget_t* content;
 	ui_widget_t* example;
 	ui_widget_t* container;
-	pd_rectf_t rect;
+	ui_rect_t rect;
 
 	container = ui_widget_get_child(ui_get_widget("main"), 0);
 	ui_widget_resize(ui_root(), 600, 400);
@@ -618,7 +618,7 @@ static void test_block_layout_320(void)
 	ui_widget_t* content;
 	ui_widget_t* example;
 	ui_widget_t* container;
-	pd_rectf_t rect;
+	ui_rect_t rect;
 
 	container = ui_widget_get_child(ui_get_widget("main"), 0);
 	ui_widget_resize(ui_root(), 320, 240);

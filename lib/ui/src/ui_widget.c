@@ -172,7 +172,7 @@ void ui_widget_get_offset(ui_widget_t* w, ui_widget_t* parent, float* offset_x,
 LCUI_BOOL ui_widget_in_viewport(ui_widget_t* w)
 {
 	list_node_t* node;
-	pd_rectf_t rect;
+	ui_rect_t rect;
 	ui_widget_t *self, *parent, *child;
 	ui_widget_style_t* style;
 
@@ -205,7 +205,7 @@ LCUI_BOOL ui_widget_in_viewport(ui_widget_t* w)
 				  child->box.border.width,
 				  child->box.border.height, child->type,
 				  child->id);
-			if (!LCUIRectF_IsIncludeRect(&child->box.border,
+			if (!ui_rect_is_include(&child->box.border,
 						     &rect)) {
 				continue;
 			}
@@ -216,7 +216,7 @@ LCUI_BOOL ui_widget_in_viewport(ui_widget_t* w)
 		}
 		rect.x += parent->box.padding.x;
 		rect.y += parent->box.padding.y;
-		LCUIRectF_ValidateArea(&rect, parent->box.padding.width,
+		ui_rect_correct(&rect, parent->box.padding.width,
 				       parent->box.padding.height);
 		if (rect.width < 1 || rect.height < 1) {
 			return FALSE;

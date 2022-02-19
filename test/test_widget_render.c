@@ -1,5 +1,5 @@
 ﻿#include <LCUI.h>
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 #include <LCUI/image.h>
 #include <LCUI/ui/widgets/textview.h>
 
@@ -8,7 +8,7 @@ int main(void)
 	int ret;
 	pd_canvas_t canvas;
 	ui_widget_t *root, *box, *txt;
-	pd_paint_context_t paint;
+	pd_context_t paint;
 	pd_rect_t area = { 40, 40, 320, 240 };
 	pd_color_t bgcolor = RGB(242, 249, 252);
 	pd_color_t bdcolor = RGB(201, 230, 242);
@@ -22,7 +22,7 @@ int main(void)
 	/* 创建一块灰色的画板 */
 	pd_canvas_init(&canvas);
 	pd_canvas_create(&canvas, 320, 240);
-	pd_canvas_fill_rect(&canvas, RGB(240, 240, 240), NULL, FALSE);
+	pd_canvas_fill(&canvas, RGB(240, 240, 240));
 
 	/* 初始化一个绘制实例，绘制区域为整个画板 */
 	paint.with_alpha = FALSE;
@@ -46,7 +46,7 @@ int main(void)
 	/* 渲染部件 */
 	ui_widget_render(box, &paint);
 	ret = LCUI_WritePNGFile("test_widget_render.png", &canvas);
-	pd_canvas_free(&canvas);
+	pd_canvas_destroy(&canvas);
 
 	lcui_destroy();
 	return ret;

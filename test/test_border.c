@@ -1,5 +1,5 @@
 #include <LCUI.h>
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 #include <LCUI/image.h>
 #include <LCUI/draw/border.h>
 #include <LCUI/ui/builder.h>

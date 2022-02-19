@@ -396,7 +396,7 @@ static ui_widget_t *ui_widget_get_next_at(ui_widget_t *widget, float x, float y)
 		if (!w->computed_style.visible) {
 			continue;
 		}
-		if (!LCUIRectF_HasPoint(&w->box.border, x, y)) {
+		if (!ui_rect_has_point(&w->box.border, x, y)) {
 			continue;
 		}
 		return w;
@@ -554,7 +554,7 @@ static ui_widget_t *ui_widget_get_event_target(ui_widget_t *widget, float x,
 		child = node->data;
 		if (!child->computed_style.visible ||
 		    child->state != UI_WIDGET_STATE_NORMAL ||
-		    !LCUIRectF_HasPoint(&child->box.border, x, y)) {
+		    !ui_rect_has_point(&child->box.border, x, y)) {
 			continue;
 		}
 		pointer_events = child->computed_style.pointer_events;

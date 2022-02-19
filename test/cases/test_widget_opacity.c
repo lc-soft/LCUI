@@ -5,7 +5,7 @@
 #include <LCUI/ui/widgets/textview.h>
 #include <LCUI/css.h>
 #include <LCUI/ui/builder.h>
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 #include "ctest.h"
 
 #define PARENT_OPACITY 0.8f
@@ -47,11 +47,11 @@ static void check_widget_opactiy(void)
 	pd_color_t parent_bcolor = RGB(0, 0, 0);
 	pd_color_t bgcolor = RGB(255, 255, 255);
 	pd_rect_t rect = { 0, 0, 400, 256 };
-	pd_paint_context_t paint;
+	pd_context_t paint;
 
 	pd_canvas_init(&canvas);
 	pd_canvas_create(&canvas, rect.width, rect.height);
-	pd_canvas_fill_rect(&canvas, bgcolor, NULL, FALSE);
+	pd_canvas_fill(&canvas, bgcolor);
 
 	paint.with_alpha = FALSE;
 	paint.rect.width = 400;
@@ -70,47 +70,47 @@ static void check_widget_opactiy(void)
 	ui_widget_render(self.parent, &paint);
 
 	expected_color = bgcolor;
-	pd_canvas_get_pixel(&canvas, 10, 10, color);
-	pd_pixel_blend(&expected_color, &parent_bcolor,
+	color = pd_canvas_get_pixel(&canvas, 10, 10);
+	pd_blend_pixel(&expected_color, &parent_bcolor,
 		    (int)(PARENT_OPACITY * 255));
 	it_b("check parent border color", check_color(expected_color, color),
 	     TRUE);
 
 	expected_color = bgcolor;
-	pd_canvas_get_pixel(&canvas, 30, 30, color);
-	pd_pixel_blend(&expected_color, &parent_bgcolor,
+	color = pd_canvas_get_pixel(&canvas, 30, 30);
+	pd_blend_pixel(&expected_color, &parent_bgcolor,
 		    (int)(PARENT_OPACITY * 255));
 	it_b("check parent background color",
 	     check_color(expected_color, color), TRUE);
 
 	tmp = parent_bgcolor;
 	expected_color = bgcolor;
-	pd_canvas_get_pixel(&canvas, 60, 90, color);
-	pd_pixel_blend(&tmp, &child_bgcolor, (int)(CHILD_OPACITY * 255));
-	pd_pixel_blend(&expected_color, &tmp, (int)(PARENT_OPACITY * 255));
+	color = pd_canvas_get_pixel(&canvas, 60, 90);
+	pd_blend_pixel(&tmp, &child_bgcolor, (int)(CHILD_OPACITY * 255));
+	pd_blend_pixel(&expected_color, &tmp, (int)(PARENT_OPACITY * 255));
 	it_b("check child 1 background color",
 	     check_color(expected_color, color), TRUE);
 
 	tmp = parent_bgcolor;
 	expected_color = bgcolor;
-	pd_canvas_get_pixel(&canvas, 60, 120, color);
-	pd_pixel_blend(&tmp, &child_footer_bgcolor, (int)(CHILD_OPACITY * 255));
-	pd_pixel_blend(&expected_color, &tmp, (int)(PARENT_OPACITY * 255));
+	color = pd_canvas_get_pixel(&canvas, 60, 120);
+	pd_blend_pixel(&tmp, &child_footer_bgcolor, (int)(CHILD_OPACITY * 255));
+	pd_blend_pixel(&expected_color, &tmp, (int)(PARENT_OPACITY * 255));
 	it_b("check child 1 footer background color",
 	     check_color(expected_color, color), TRUE);
 
 	expected_color = bgcolor;
-	pd_canvas_get_pixel(&canvas, 220, 90, color);
-	pd_pixel_blend(&expected_color, &child_bgcolor,
+	color = pd_canvas_get_pixel(&canvas, 220, 90);
+	pd_blend_pixel(&expected_color, &child_bgcolor,
 		    (int)(PARENT_OPACITY * 255));
 	it_b("check child 2 background color",
 	     check_color(expected_color, color), TRUE);
 	expected_color = child_footer_bgcolor;
-	pd_canvas_get_pixel(&canvas, 220, 120, color);
+	color = pd_canvas_get_pixel(&canvas, 220, 120);
 	it_b("check child 2 footer background color",
 	     check_color(expected_color, color), TRUE);
 
-	pd_canvas_free(&canvas);
+	pd_canvas_destroy(&canvas);
 }
 
 void test_widget_opacity(void)

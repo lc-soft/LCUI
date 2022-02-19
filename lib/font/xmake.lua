@@ -16,7 +16,7 @@ target("lcui-font")
     add_configfiles("src/config.h.in")
     add_options("with-freetype", "with-fontconfig")
     add_packages("freetype", "fontconfig")
-    add_deps("lcui-util", "lcui-paint")
+    add_deps("lcui-util", "pandagl")
     if has_package("fontconfig") then
         set_configvar("USE_FONTCONFIG", 1)
     end

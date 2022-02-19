@@ -1,6 +1,6 @@
 ﻿#include <string.h>
 #include <LCUI/util.h>
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 #include <LCUI/css/library.h>
 #include "../include/ui.h"
 #include "internal.h"
@@ -77,7 +77,7 @@ void ui_widget_compute_box_shadow(ui_widget_t* w, pd_boxshadow_t* out)
 	out->bottom_right_radius = compute_actual(b->bottom_right_radius);
 }
 
-void ui_widget_paint_box_shadow(ui_widget_t* w, pd_paint_context_t* paint,
+void ui_widget_paint_box_shadow(ui_widget_t* w, pd_context_t* ctx,
 				ui_widget_actual_style_t* style)
 {
 	pd_rect_t box;
@@ -85,6 +85,6 @@ void ui_widget_paint_box_shadow(ui_widget_t* w, pd_paint_context_t* paint,
 	box.x = box.y = 0;
 	box.width = style->canvas_box.width;
 	box.height = style->canvas_box.height;
-	pd_boxshadow_paint(&style->shadow, &box, style->border_box.width,
-			   style->border_box.height, paint);
+	pd_paint_boxshadow(ctx, &style->shadow, &box, style->border_box.width,
+			   style->border_box.height);
 }

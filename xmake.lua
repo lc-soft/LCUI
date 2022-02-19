@@ -4,8 +4,9 @@ add_rules("mode.debug", "mode.release", "mode.coverage")
 add_includedirs("include")
 add_rpathdirs("@loader_path/lib", "@loader_path")
 add_defines("LCUI_EXPORTS", "YUTIL_EXPORTS", "UNICODE")
-includes("lib/**/xmake.lua")
+add_includedirs("test/lib/ctest/include/")
 includes("test/lib/ctest/xmake.lua")
+includes("lib/**/xmake.lua")
 set_warnings("all")
 set_rundir("$(projectdir)/test")
 
@@ -63,7 +64,7 @@ target("lcui")
         "lcui-thread",
         "lcui-css",
         "lcui-font",
-        "lcui-paint",
+        "pandagl",
         "lcui-image",
         "lcui-ui",
         "lcui-ui-widgets",
@@ -92,7 +93,9 @@ target("headers")
         os.cp("$(projectdir)/lib/font/include/*.h", "$(projectdir)/include/LCUI/")
         os.cp("$(projectdir)/lib/font/include/font/*.h", "$(projectdir)/include/LCUI/font/")
 
-        os.cp("$(projectdir)/lib/paint/include/*.h", "$(projectdir)/include/LCUI/paint/")
+        os.cp("$(projectdir)/lib/pandagl/include/*.h", "$(projectdir)/include/LCUI/")
+        os.cp("$(projectdir)/lib/pandagl/include/pandagl/*.h", "$(projectdir)/include/LCUI/pandagl/")
+
         os.cp("$(projectdir)/lib/image/include/*.h", "$(projectdir)/include/LCUI/image/")
         os.cp("$(projectdir)/lib/ui/include/*.h", "$(projectdir)/include/LCUI/")
         os.cp("$(projectdir)/lib/ui-widgets/include/*.h", "$(projectdir)/include/LCUI/ui/widgets/")

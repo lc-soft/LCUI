@@ -1,7 +1,6 @@
-﻿/*
- * draw.h -- The graphics draw module of LCUI.
+﻿/* context.c -- The PandaGL drawing context
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2022, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,16 +27,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_DRAW_H
-#define LCUI_DRAW_H
+#include <stdlib.h>
+#include <LCUI/types.h>
+#include "../include/pandagl.h"
 
-LCUI_BEGIN_HEADER
+pd_context_t* pd_context_create(pd_canvas_t *canvas, pd_rect_t *rect)
+{
+	pd_context_t* paint = (pd_context_t*)malloc(sizeof(pd_context_t));
+	paint->rect = *rect;
+	paint->with_alpha = FALSE;
+	pd_canvas_init(&paint->canvas);
+	pd_canvas_quote(&paint->canvas, canvas, &paint->rect);
+	return paint;
+}
 
-#include <LCUI/draw/line.h>
-#include <LCUI/draw/border.h>
-#include <LCUI/draw/boxshadow.h>
-#include <LCUI/draw/background.h>
-
-LCUI_END_HEADER
-
-#endif
+void pd_context_destroy(pd_context_t* paint)
+{
+	free(paint);
+}

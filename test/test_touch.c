@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <LCUI.h>
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 
 /** 触点绑定记录 */
 typedef struct TouchPointBindingRec_ {

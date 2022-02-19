@@ -1,5 +1,6 @@
-﻿#include <LCUI.h>
-#include <LCUI/graph.h>
+﻿#include <stdio.h>
+#include <LCUI.h>
+#include <LCUI/pandagl.h>
 #include "../include/ui.h"
 #include "internal.h"
 
@@ -28,10 +29,10 @@ typedef struct ui_renderer_t {
 	ui_widget_actual_style_t *style;
 
 	/* current target widget paint context */
-	pd_paint_context_t* paint;
+	pd_context_t *paint;
 
 	/* root paint context */
-	pd_paint_context_t* root_paint;
+	pd_context_t *root_paint;
 
 	/* content canvas */
 	pd_canvas_t content_graph;
@@ -53,7 +54,7 @@ typedef struct ui_renderer_t {
 
 	/* Paint rectangle in widget content rectangle, it relative to
 	 * root canvas */
-	pd_rectf_t content_rect;
+	ui_rect_t content_rect;
 
 	LCUI_BOOL has_content_graph;
 	LCUI_BOOL has_self_graph;
@@ -67,10 +68,10 @@ static LCUI_BOOL ui_widget_is_paintable(ui_widget_t *w)
 {
 	const ui_widget_style_t *s = &w->computed_style;
 	if (s->background.color.alpha > 0 ||
-	    pd_canvas_is_valid(s->background.image) || s->border.top.width > 0 ||
-	    s->border.right.width > 0 || s->border.bottom.width > 0 ||
-	    s->border.left.width > 0 || s->shadow.blur > 0 ||
-	    s->shadow.spread > 0) {
+	    pd_canvas_is_valid(s->background.image) ||
+	    s->border.top.width > 0 || s->border.right.width > 0 ||
+	    s->border.bottom.width > 0 || s->border.left.width > 0 ||
+	    s->shadow.blur > 0 || s->shadow.spread > 0) {
 		return TRUE;
 	}
 	return w->proto != ui_get_widget_prototype(NULL);
@@ -84,10 +85,10 @@ static LCUI_BOOL ui_widget_has_round_border(ui_widget_t *w)
 	       s->bottom_left_radius || s->bottom_right_radius;
 }
 
-LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, pd_rectf_t *in_rect,
+LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
 				    int box_type)
 {
-	pd_rectf_t rect;
+	ui_rect_t rect;
 	ui_dirty_rect_type_t type;
 
 	if (!w->computed_style.visible) {
@@ -124,15 +125,15 @@ LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, pd_rectf_t *in_rect,
 		if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_CANVAS_BOX) {
 			return FALSE;
 		}
-		LCUIRectF_ValidateArea(&rect, w->box.canvas.width,
-				       w->box.canvas.height);
+		ui_rect_correct(&rect, w->box.canvas.width,
+				w->box.canvas.height);
 		break;
 	case CSS_KEYWORD_BORDER_BOX:
 		if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_BORDER_BOX) {
 			return FALSE;
 		}
-		LCUIRectF_ValidateArea(&rect, w->box.border.width,
-				       w->box.border.height);
+		ui_rect_correct(&rect, w->box.border.width,
+				w->box.border.height);
 		rect.x += w->box.border.x - w->box.canvas.x;
 		rect.y += w->box.border.y - w->box.canvas.y;
 		break;
@@ -140,15 +141,15 @@ LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, pd_rectf_t *in_rect,
 		if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_PADDING_BOX) {
 			return FALSE;
 		}
-		LCUIRectF_ValidateArea(&rect, w->box.padding.width,
-				       w->box.padding.height);
+		ui_rect_correct(&rect, w->box.padding.width,
+				w->box.padding.height);
 		rect.x += w->box.padding.x - w->box.canvas.x;
 		rect.y += w->box.padding.y - w->box.canvas.y;
 		break;
 	case CSS_KEYWORD_CONTENT_BOX:
 	default:
-		LCUIRectF_ValidateArea(&rect, w->box.content.width,
-				       w->box.content.height);
+		ui_rect_correct(&rect, w->box.content.width,
+				w->box.content.height);
 		rect.x += w->box.content.x - w->box.canvas.x;
 		rect.y += w->box.content.y - w->box.canvas.y;
 		break;
@@ -156,7 +157,7 @@ LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, pd_rectf_t *in_rect,
 	rect.x += w->box.canvas.x;
 	rect.y += w->box.canvas.y;
 	if (w->dirty_rect_type > UI_DIRTY_RECT_TYPE_NONE) {
-		LCUIRectF_MergeRect(&w->dirty_rect, &rect, &w->dirty_rect);
+		ui_rect_merge(&w->dirty_rect, &rect, &w->dirty_rect);
 	} else {
 		w->dirty_rect = rect;
 		w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CUSTOM;
@@ -168,23 +169,22 @@ LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, pd_rectf_t *in_rect,
 	return TRUE;
 }
 
-#define add_dirty_rect()                                               \
-	do {                                                           \
-		rect.x += x;                                           \
-		rect.y += y;                                           \
-		LCUIRectF_GetOverlayRect(&rect, &visible_area, &rect); \
-		if (rect.width > 0 && rect.height > 0) {               \
-			actual_rect = malloc(sizeof(pd_rect_t));       \
-			ui_compute_rect_actual(actual_rect, &rect);    \
-			list_append(rects, actual_rect);         \
-		}                                                      \
+#define add_dirty_rect()                                            \
+	do {                                                        \
+		rect.x += x;                                        \
+		rect.y += y;                                        \
+		ui_rect_overlap(&rect, &visible_area, &rect);       \
+		if (rect.width > 0 && rect.height > 0) {            \
+			actual_rect = malloc(sizeof(pd_rect_t));    \
+			ui_compute_rect_actual(actual_rect, &rect); \
+			list_append(rects, actual_rect);            \
+		}                                                   \
 	} while (0)
 
-static void ui_widget_collect_dirty_rect(ui_widget_t *w, list_t *rects,
-					 float x, float y,
-					 pd_rectf_t visible_area)
+static void ui_widget_collect_dirty_rect(ui_widget_t *w, list_t *rects, float x,
+					 float y, ui_rect_t visible_area)
 {
-	pd_rectf_t rect;
+	ui_rect_t rect;
 	pd_rect_t *actual_rect;
 	list_node_t *node;
 
@@ -203,12 +203,12 @@ static void ui_widget_collect_dirty_rect(ui_widget_t *w, list_t *rects,
 			rect = w->box.canvas;
 			break;
 		}
-		if (!LCUIRectF_IsCoverRect(&rect, &w->dirty_rect)) {
+		if (!ui_rect_is_cover(&rect, &w->dirty_rect)) {
 			add_dirty_rect();
 			rect = w->dirty_rect;
 			add_dirty_rect();
 		} else {
-			LCUIRectF_MergeRect(&rect, &rect, &w->dirty_rect);
+			ui_rect_merge(&rect, &rect, &w->dirty_rect);
 			add_dirty_rect();
 		}
 	} else if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_CUSTOM) {
@@ -218,8 +218,7 @@ static void ui_widget_collect_dirty_rect(ui_widget_t *w, list_t *rects,
 	if (w->has_child_dirty_rect) {
 		visible_area.x -= x;
 		visible_area.y -= y;
-		LCUIRectF_GetOverlayRect(&visible_area, &w->box.padding,
-					 &visible_area);
+		ui_rect_overlap(&visible_area, &w->box.padding, &visible_area);
 		visible_area.x += x;
 		visible_area.y += y;
 		for (list_each(node, &w->stacking_context)) {
@@ -251,7 +250,7 @@ size_t ui_widget_get_dirty_rects(ui_widget_t *w, list_t *rects)
 }
 
 /** 当前部件的绘制函数 */
-static void ui_widget_on_paint(ui_widget_t *w, pd_paint_context_t *paint,
+static void ui_widget_on_paint(ui_widget_t *w, pd_context_t *paint,
 			       ui_widget_actual_style_t *style)
 {
 	ui_widget_paint_background(w, paint, style);
@@ -262,8 +261,7 @@ static void ui_widget_on_paint(ui_widget_t *w, pd_paint_context_t *paint,
 	}
 }
 
-static ui_renderer_t *ui_renderer_create(ui_widget_t *w,
-					 pd_paint_context_t *paint,
+static ui_renderer_t *ui_renderer_create(ui_widget_t *w, pd_context_t *paint,
 					 ui_widget_actual_style_t *style,
 					 ui_renderer_t *parent)
 {
@@ -301,7 +299,7 @@ static ui_renderer_t *ui_renderer_create(ui_widget_t *w,
 	if (that->can_render_self) {
 		that->self_graph.color_type = PD_COLOR_TYPE_ARGB;
 		pd_canvas_create(&that->self_graph, that->paint->rect.width,
-			     that->paint->rect.height);
+				 that->paint->rect.height);
 	}
 	/* get content rectangle left spacing and top */
 	that->content_left = w->box.padding.x - w->box.canvas.x;
@@ -318,12 +316,12 @@ static ui_renderer_t *ui_renderer_create(ui_widget_t *w,
 		  that->actual_paint_rect.width,
 		  that->actual_paint_rect.height);
 	/* get actual paint rectangle in widget content rectangle */
-	that->can_render_centent = pd_rect_get_overlay_rect(
-	    &that->style->padding_box, &that->actual_paint_rect,
-	    &that->actual_content_rect);
+	that->can_render_centent =
+	    pd_rect_overlap(&that->style->padding_box, &that->actual_paint_rect,
+			    &that->actual_content_rect);
 	;
-	LCUIRect_ToRectF(&that->actual_content_rect, &that->content_rect,
-			 1.0f / ui_get_scale());
+	ui_convert_rect(&that->actual_content_rect, &that->content_rect,
+			1.0f / ui_get_scale());
 	DEBUG_MSG("[%s] content_rect: (%d, %d, %d, %d)\n", w->id,
 		  that->actual_content_rect.x, that->actual_content_rect.y,
 		  that->actual_content_rect.width,
@@ -348,17 +346,17 @@ static ui_renderer_t *ui_renderer_create(ui_widget_t *w,
 	if (that->has_content_graph) {
 		that->content_graph.color_type = PD_COLOR_TYPE_ARGB;
 		pd_canvas_create(&that->content_graph,
-			     that->actual_content_rect.width,
-			     that->actual_content_rect.height);
+				 that->actual_content_rect.width,
+				 that->actual_content_rect.height);
 	}
 	return that;
 }
 
 static void ui_renderer_destroy(ui_renderer_t *renderer)
 {
-	pd_canvas_free(&renderer->layer_graph);
-	pd_canvas_free(&renderer->self_graph);
-	pd_canvas_free(&renderer->content_graph);
+	pd_canvas_destroy(&renderer->layer_graph);
+	pd_canvas_destroy(&renderer->self_graph);
+	pd_canvas_destroy(&renderer->content_graph);
 	free(renderer);
 }
 
@@ -369,9 +367,9 @@ static size_t ui_renderer_render_children(ui_renderer_t *that)
 	size_t total = 0, count = 0;
 	ui_widget_t *child;
 	pd_rect_t paint_rect;
-	pd_rectf_t child_rect;
+	ui_rect_t child_rect;
 	list_node_t *node;
-	pd_paint_context_t child_paint;
+	pd_context_t child_paint;
 	ui_renderer_t *renderer;
 	ui_widget_actual_style_t style;
 
@@ -384,7 +382,8 @@ static size_t ui_renderer_render_children(ui_renderer_t *that)
 		}
 		if (that->target->extra &&
 		    that->target->extra->rules.max_render_children_count &&
-		    count > that->target->extra->rules.max_render_children_count) {
+		    count >
+			that->target->extra->rules.max_render_children_count) {
 			break;
 		}
 		/*
@@ -398,8 +397,8 @@ static size_t ui_renderer_render_children(ui_renderer_t *that)
 		child_rect.y = style.y + child->box.canvas.y;
 		child_rect.width = child->box.canvas.width;
 		child_rect.height = child->box.canvas.height;
-		if (!LCUIRectF_GetOverlayRect(&that->content_rect, &child_rect,
-					      &child_rect)) {
+		if (!ui_rect_overlap(&that->content_rect, &child_rect,
+				     &child_rect)) {
 			continue;
 		}
 		ui_widget_compute_border_box_actual(child, &style);
@@ -414,8 +413,8 @@ static size_t ui_renderer_render_children(ui_renderer_t *that)
 		DEBUG_MSG("child canvas rect: (%d, %d, %d, %d)\n",
 			  style.canvas_box.x, style.canvas_box.y,
 			  style.canvas_box.width, style.canvas_box.height);
-		if (!pd_rect_get_overlay_rect(&that->actual_content_rect,
-					     &style.canvas_box, &paint_rect)) {
+		if (!pd_rect_overlap(&that->actual_content_rect,
+				     &style.canvas_box, &paint_rect)) {
 			continue;
 		}
 		++count;
@@ -428,14 +427,14 @@ static size_t ui_renderer_render_children(ui_renderer_t *that)
 			child_paint.with_alpha = TRUE;
 			paint_rect.x -= that->actual_content_rect.x;
 			paint_rect.y -= that->actual_content_rect.y;
-			pd_canvas_quote(&child_paint.canvas, &that->content_graph,
-				    &paint_rect);
+			pd_canvas_quote(&child_paint.canvas,
+					&that->content_graph, &paint_rect);
 		} else {
 			child_paint.with_alpha = that->paint->with_alpha;
 			paint_rect.x -= that->actual_paint_rect.x;
 			paint_rect.y -= that->actual_paint_rect.y;
-			pd_canvas_quote(&child_paint.canvas, &that->paint->canvas,
-				    &paint_rect);
+			pd_canvas_quote(&child_paint.canvas,
+					&that->paint->canvas, &paint_rect);
 		}
 		DEBUG_MSG("child paint rect: (%d, %d, %d, %d)\n", paint_rect.x,
 			  paint_rect.y, paint_rect.width, paint_rect.height);
@@ -450,7 +449,7 @@ static size_t ui_renderer_render_children(ui_renderer_t *that)
 static size_t ui_renderer_render(ui_renderer_t *renderer)
 {
 	size_t count = 0;
-	pd_paint_context_t self_paint;
+	pd_context_t self_paint;
 	ui_renderer_t *that = renderer;
 
 	int content_x = that->actual_content_rect.x - that->actual_paint_rect.x;
@@ -471,7 +470,7 @@ static size_t ui_renderer_render(ui_renderer_t *renderer)
 		ui_widget_on_paint(that->target, &self_paint, that->style);
 #ifdef DEBUG_FRAME_RENDER
 		sprintf(filename,
-			"frame-%lu-L%d-%s-self-paint-(%d,%d,%d,%d).png",
+			"frame-%zd-L%d-%s-self-paint-(%d,%d,%d,%d).png",
 			frame++, __LINE__, renderer->target->id,
 			self_paint.rect.x, self_paint.rect.y,
 			self_paint.rect.width, self_paint.rect.height);
@@ -479,11 +478,10 @@ static size_t ui_renderer_render(ui_renderer_t *renderer)
 #endif
 		/* 若不需要缓存自身位图则直接绘制到画布上 */
 		if (!that->has_self_graph) {
-			pd_canvas_mix(&that->paint->canvas, &that->self_graph, 0, 0,
-				  that->paint->with_alpha);
+			pd_canvas_mix(&that->paint->canvas, &that->self_graph,
+				      0, 0, that->paint->with_alpha);
 #ifdef DEBUG_FRAME_RENDER
-			pd_canvas_print_info(&that->paint->canvas);
-			sprintf(filename, "frame-%lu-L%d-%s-root-canvas.png",
+			sprintf(filename, "frame-%zd-L%d-%s-root-canvas.png",
 				frame++, __LINE__, renderer->target->id);
 			LCUI_WritePNGFile(filename, &that->root_paint->canvas);
 #endif
@@ -502,14 +500,15 @@ static size_t ui_renderer_render(ui_renderer_t *renderer)
 	}
 	if (!that->has_layer_graph) {
 		if (that->has_content_graph) {
-			pd_canvas_mix(&that->paint->canvas, &that->content_graph,
-				  content_x, content_y, TRUE);
+			pd_canvas_mix(&that->paint->canvas,
+				      &that->content_graph, content_x,
+				      content_y, TRUE);
 		}
 #ifdef DEBUG_FRAME_RENDER
-		sprintf(filename, "frame-%lu-L%d-%s-canvas.png", frame++,
+		sprintf(filename, "frame-%zd-L%d-%s-canvas.png", frame++,
 			__LINE__, renderer->target->id);
 		LCUI_WritePNGFile(filename, &that->paint->canvas);
-		sprintf(filename, "frame-%lu-L%d-%s-root-canvas.png", frame++,
+		sprintf(filename, "frame-%zd-L%d-%s-root-canvas.png", frame++,
 			__LINE__, renderer->target->id);
 		LCUI_WritePNGFile(filename, &that->root_paint->canvas);
 #endif
@@ -522,31 +521,31 @@ static size_t ui_renderer_render(ui_renderer_t *renderer)
 	 */
 	if (that->can_render_self) {
 		pd_canvas_copy(&that->layer_graph, &that->self_graph);
-		pd_canvas_mix(&that->layer_graph, &that->content_graph, content_x,
-			  content_y, TRUE);
+		pd_canvas_mix(&that->layer_graph, &that->content_graph,
+			      content_x, content_y, TRUE);
 #ifdef DEBUG_FRAME_RENDER
-		sprintf(filename, "frame-%lu-L%d-%s-content-grpah-%d-%d.png",
+		sprintf(filename, "frame-%zd-L%d-%s-content-graph-%d-%d.png",
 			frame++, __LINE__, renderer->target->id, content_x,
 			content_y);
 		LCUI_WritePNGFile(filename, &that->content_graph);
-		sprintf(filename, "frame-%lu-L%d-%s-self-graph.png", frame++,
+		sprintf(filename, "frame-%zd-L%d-%s-self-graph.png", frame++,
 			__LINE__, renderer->target->id);
 		LCUI_WritePNGFile(filename, &that->layer_graph);
 #endif
 	} else {
 		pd_canvas_create(&that->layer_graph, that->paint->rect.width,
-			     that->paint->rect.height);
+				 that->paint->rect.height);
 		pd_canvas_replace(&that->layer_graph, &that->content_graph,
-			      content_x, content_y);
+				  content_x, content_y);
 	}
 	that->layer_graph.opacity = that->target->computed_style.opacity;
 	pd_canvas_mix(&that->paint->canvas, &that->layer_graph, 0, 0,
-		  that->paint->with_alpha);
+		      that->paint->with_alpha);
 #ifdef DEBUG_FRAME_RENDER
-	sprintf(filename, "frame-%lu-%s-layer.png", frame++,
+	sprintf(filename, "frame-%zd-%s-layer.png", frame++,
 		renderer->target->id);
 	LCUI_WritePNGFile(filename, &that->layer_graph);
-	sprintf(filename, "frame-%lu-L%d-%s-root-canvas.png", frame++, __LINE__,
+	sprintf(filename, "frame-%zd-L%d-%s-root-canvas.png", frame++, __LINE__,
 		renderer->target->id);
 	LCUI_WritePNGFile(filename, &that->root_paint->canvas);
 #endif
@@ -555,7 +554,7 @@ static size_t ui_renderer_render(ui_renderer_t *renderer)
 	return count;
 }
 
-size_t ui_widget_render(ui_widget_t *w, pd_paint_context_t *paint)
+size_t ui_widget_render(ui_widget_t *w, pd_context_t *paint)
 {
 	size_t count;
 	ui_renderer_t *ctx;

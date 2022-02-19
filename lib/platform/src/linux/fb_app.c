@@ -11,8 +11,7 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <unistd.h>
-#include <LCUI/graph.h>
-#include <LCUI/painter.h>
+#include <LCUI/pandagl.h>
 
 #define MIN_WIDTH 320
 #define MIN_HEIGHT 240
@@ -218,7 +217,7 @@ static void fb_app_window_set_size(app_window_t *wnd, int width, int height)
 	wnd->rect.width = wnd->width;
 	wnd->rect.height = wnd->height;
 	wnd->actual_rect = wnd->rect;
-	LCUIRect_ValidateArea(&wnd->actual_rect, fbapp.screen_width,
+	pd_rect_correct(&wnd->actual_rect, fbapp.screen_width,
 			      fbapp.screen_height);
 	pd_canvas_create(&wnd->canvas, wnd->width, wnd->height);
 }
@@ -265,7 +264,7 @@ static void fb_app_window_sync_rect16(pd_canvas_t *canvas, int x, int y)
 	pd_color_t *pixel, *pixel_row;
 	unsigned char *dst, *dst_row;
 
-	pd_canvas_get_valid_rect(canvas, &rect);
+	pd_canvas_get_quote_rect(canvas, &rect);
 	pixel_row = canvas->argb + rect.y * canvas->width + rect.x;
 	dst_row = fbapp.fb.mem + y * fbapp.canvas.bytes_per_row + x * 2;
 	for (iy = 0; iy < rect.width; ++iy) {
@@ -297,7 +296,7 @@ static void fb_app_window_sync_rect8(pd_canvas_t *canvas, int x, int y)
 	cmap.green = cmap_buf + 256;
 	cmap.blue = cmap_buf + 512;
 
-	pd_canvas_get_valid_rect(canvas, &rect);
+	pd_canvas_get_quote_rect(canvas, &rect);
 	pixel_row = canvas->argb + rect.y * canvas->width + rect.x;
 	dst_row = fbapp.fb.mem + y * fbapp.canvas.bytes_per_row + x;
 	for (iy = 0; iy < rect.height; ++iy) {
@@ -344,7 +343,7 @@ static void fb_app_window_sync_rect(app_window_t *wnd, pd_rect_t *rect)
 	actual_rect.y = rect->y + wnd->y;
 	actual_rect.width = rect->width;
 	actual_rect.height = rect->height;
-	LCUIRect_ValidateArea(&actual_rect, fbapp.screen_width,
+	pd_rect_correct(&actual_rect, fbapp.screen_width,
 			      fbapp.screen_height);
 	/* Convert this rectangle to surface canvas related rectangle */
 	x = actual_rect.x;
@@ -378,22 +377,22 @@ static app_window_paint_t *fb_app_window_begin_paint(app_window_t *wnd,
 {
 	app_window_paint_t *paint;
 	pd_rect_t actual_rect = *rect;
-	LCUIRect_ValidateArea(&actual_rect, wnd->width, wnd->height);
+	pd_rect_correct(&actual_rect, wnd->width, wnd->height);
 	actual_rect.x += wnd->rect.x;
 	actual_rect.y += wnd->rect.y;
-	pd_rect_get_overlay_rect(&actual_rect, &wnd->actual_rect, &actual_rect);
+	pd_rect_overlap(&actual_rect, &wnd->actual_rect, &actual_rect);
 	actual_rect.x -= wnd->rect.x;
 	actual_rect.y -= wnd->rect.y;
-	paint = pd_painter_begin(&wnd->canvas, &actual_rect);
-	pd_canvas_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
-	RectList_Add(&wnd->rects, rect);
+	paint = pd_context_create(&wnd->canvas, &actual_rect);
+	pd_canvas_fill(&paint->canvas, RGB(255, 255, 255));
+	pd_rects_add(&wnd->rects, rect);
 	return paint;
 }
 
 static void fb_app_window_end_paint(app_window_t *wnd,
 				    app_window_paint_t *paint)
 {
-	pd_painter_end(paint);
+	pd_context_destroy(paint);
 }
 
 static void fb_app_window_present(app_window_t *wnd)
@@ -466,7 +465,7 @@ static int fb_app_destroy(void)
 	case 8:
 		ioctl(fbapp.fb.dev_fd, FBIOPUTCMAP, &fbapp.fb.cmap);
 	default:
-		pd_canvas_free(&fbapp.window.canvas);
+		pd_canvas_destroy(&fbapp.window.canvas);
 		break;
 	}
 	close(fbapp.fb.dev_fd);

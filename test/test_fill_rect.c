@@ -1,5 +1,5 @@
 #include <LCUI.h>
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 #include <LCUI/image.h>
 
 int main(void)
@@ -24,6 +24,6 @@ int main(void)
 		}
 	}
 	LCUI_WritePNGFile("test_fill_rect.png", &canvas);
-	pd_canvas_free(&canvas);
+	pd_canvas_destroy(&canvas);
 	return 0;
 }

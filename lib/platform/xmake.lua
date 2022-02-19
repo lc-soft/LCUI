@@ -70,4 +70,4 @@ target("lcui-platform")
     else
         add_deps("lcui-platform-linux")
     end
-    add_deps("lcui-thread")
+    add_deps("lcui-thread", "pandagl")

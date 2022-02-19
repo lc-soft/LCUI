@@ -6,7 +6,7 @@
 #define MIN_WINDOW_WIDTH 100
 #define MIN_WINDOW_HEIGHT 40
 
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 
 struct app_window_t {
 	Window handle;
@@ -207,7 +207,7 @@ static void x11_app_window_on_size(app_window_t *wnd, int width, int height)
 	    XCreateImage(x11_app.display, visual, depth, ZPixmap, 0,
 			 (char *)(wnd->fb.bytes), width, height, 32, 0);
 	if (!wnd->ximage) {
-		pd_canvas_free(&wnd->fb);
+		pd_canvas_destroy(&wnd->fb);
 		logger_error("[x11_app] create XImage faild.\n");
 		return;
 	}
@@ -540,15 +540,15 @@ static void x11_app_window_hide(app_window_t *wnd)
 static app_window_paint_t *x11_app_window_begin_paint(app_window_t *wnd,
 						      pd_rect_t *rect)
 {
-	pd_paint_context_t *paint;
+	pd_context_t *paint;
 
-	paint = malloc(sizeof(pd_paint_context_t));
+	paint = malloc(sizeof(pd_context_t));
 	paint->rect = *rect;
 	paint->with_alpha = FALSE;
 	pd_canvas_init(&paint->canvas);
-	LCUIRect_ValidateArea(&paint->rect, wnd->width, wnd->height);
+	pd_rect_correct(&paint->rect, wnd->width, wnd->height);
 	pd_canvas_quote(&paint->canvas, &wnd->fb, &paint->rect);
-	pd_canvas_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
+	pd_canvas_fill(&paint->canvas, RGB(255, 255, 255));
 	return paint;
 }
 

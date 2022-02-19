@@ -1,12 +1,11 @@
 ﻿#include <string.h>
 #include <LCUI/util.h>
-#include <LCUI/graph.h>
-#include <LCUI/draw.h>
+#include <LCUI/pandagl.h>
 #include <LCUI/css/library.h>
 #include "../include/ui.h"
 #include "internal.h"
 
-static float compute_metric_x(ui_widget_t* w, css_unit_value_t *s)
+static float compute_metric_x(ui_widget_t* w, css_unit_value_t* s)
 {
 	if (s->unit == CSS_UNIT_SCALE) {
 		return w->width * s->scale;
@@ -14,7 +13,7 @@ static float compute_metric_x(ui_widget_t* w, css_unit_value_t *s)
 	return ui_compute(s->value, s->unit);
 }
 
-static float compute_metric_y(ui_widget_t* w, css_unit_value_t *s)
+static float compute_metric_y(ui_widget_t* w, css_unit_value_t* s)
 {
 	if (s->unit == CSS_UNIT_SCALE) {
 		return w->height * s->scale;
@@ -36,7 +35,7 @@ static unsigned int compute_actual(float width)
 void ui_widget_compute_border_style(ui_widget_t* w)
 {
 	int key;
-	css_unit_value_t *s;
+	css_unit_value_t* s;
 	ui_border_style_t* b;
 
 	b = &w->computed_style.border;
@@ -123,10 +122,11 @@ void ui_widget_compute_border(ui_widget_t* w, pd_border_t* b)
 	b->top_left_radius = compute_actual(y_min(s->top_left_radius, r));
 	b->top_right_radius = compute_actual(y_min(s->top_right_radius, r));
 	b->bottom_left_radius = compute_actual(y_min(s->bottom_left_radius, r));
-	b->bottom_right_radius = compute_actual(y_min(s->bottom_right_radius, r));
+	b->bottom_right_radius =
+	    compute_actual(y_min(s->bottom_right_radius, r));
 }
 
-void ui_widget_paint_border(ui_widget_t* w, pd_paint_context_t *paint,
+void ui_widget_paint_border(ui_widget_t* w, pd_context_t* ctx,
 			    ui_widget_actual_style_t* style)
 {
 	pd_rect_t box;
@@ -135,10 +135,10 @@ void ui_widget_paint_border(ui_widget_t* w, pd_paint_context_t *paint,
 	box.y = style->border_box.y - style->canvas_box.y;
 	box.width = style->border_box.width;
 	box.height = style->border_box.height;
-	pd_border_paint(&style->border, &box, paint);
+	pd_paint_border(ctx, &style->border, &box);
 }
 
-void ui_widget_crop_content(ui_widget_t* w, pd_paint_context_t *paint,
+void ui_widget_crop_content(ui_widget_t* w, pd_context_t* ctx,
 			    ui_widget_actual_style_t* style)
 {
 	pd_rect_t box;
@@ -147,5 +147,5 @@ void ui_widget_crop_content(ui_widget_t* w, pd_paint_context_t *paint,
 	box.y = style->border_box.y - style->canvas_box.y;
 	box.width = style->border_box.width;
 	box.height = style->border_box.height;
-	pd_border_crop_content(&style->border, &box, paint);
+	pd_crop_border_content(ctx, &style->border, &box);
 }

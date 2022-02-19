@@ -42,7 +42,7 @@ LCUI_API int lcui_set_interval(long int n_ms, void (*callback)(void *), void *ar
 
 // Tasks
 
-typedef LCUI_TaskFunc LCUI_AppTaskFunc;
+typedef void(*LCUI_AppTaskFunc)(void*, void*);
 
 /**
  * 添加任务

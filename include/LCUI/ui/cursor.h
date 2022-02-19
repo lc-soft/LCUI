@@ -2,7 +2,7 @@
 
 #include <LCUI/header.h>
 #include <LCUI/types.h>
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 #include <LCUI/platform.h>
 #include <LCUI/ui.h>
 
