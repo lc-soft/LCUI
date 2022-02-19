@@ -1,7 +1,7 @@
 ﻿#include <LCUI.h>
 #include <LCUI/image.h>
 #include <LCUI/font.h>
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 
 int main(void)
 {
@@ -38,7 +38,7 @@ int main(void)
 		LCUI_WritePNGFile("test_char_render.png", &img);
 		/* 释放内存资源 */
 		font_bitmap_destroy(&bmp);
-		pd_canvas_free(&img);
+		pd_canvas_destroy(&img);
 		break;
 	}
 

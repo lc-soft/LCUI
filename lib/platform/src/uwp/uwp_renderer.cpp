@@ -232,22 +232,22 @@ static void UWPSurface_SetRenderMode(LCUI_Surface surface, int mode)
 {
 }
 
-static pd_paint_context_t* UWPSurface_BeginPaint(LCUI_Surface surface,
+static pd_context_t* UWPSurface_BeginPaint(LCUI_Surface surface,
 					       pd_rect_t *rect)
 {
-	ASSIGN(paint, pd_paint_context_t*);
+	ASSIGN(paint, pd_context_t*);
 	paint->rect = *rect;
 	paint->with_alpha = FALSE;
 	pd_canvas_init(&paint->canvas);
-	LCUIRect_MergeRect(&display.rect, &display.rect, rect);
-	LCUIRect_ValidateArea(&paint->rect, UWPDisplay_GetWidth(),
+	pd_rect_merge(&display.rect, &display.rect, rect);
+	pd_rect_correct(&paint->rect, UWPDisplay_GetWidth(),
 			      UWPDisplay_GetHeight());
 	pd_canvas_quote(&paint->canvas, &display.frame, &paint->rect);
 	pd_canvas_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
 	return paint;
 }
 
-static void UWPSurface_EndPaint(LCUI_Surface surface, pd_paint_context_t* paint)
+static void UWPSurface_EndPaint(LCUI_Surface surface, pd_context_t* paint)
 {
 	free(paint);
 }

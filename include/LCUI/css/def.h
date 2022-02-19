@@ -3,6 +3,7 @@
 
 #include <LCUI/types.h>
 #include <LCUI/util.h>
+#include <LCUI/pandagl/def.h>
 
 #define CSS_SELECTOR_MAX_LEN 1024
 #define CSS_SELECTOR_MAX_DEPTH 32
@@ -243,6 +244,7 @@ typedef struct css_unit_value_t {
 		char *val_string;
 		wchar_t *wstring;
 		wchar_t *val_wstring;
+		// TODO: delete color and image
 		pd_color_t color;
 		pd_color_t val_color;
 		pd_canvas_t *image;

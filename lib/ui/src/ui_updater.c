@@ -1,4 +1,5 @@
 ﻿#include <string.h>
+#include <time.h>
 #include <LCUI/util.h>
 #include "../include/ui.h"
 #include "internal.h"
@@ -273,7 +274,7 @@ static size_t ui_widget_update_visible_children(ui_widget_t* w,
 {
 	size_t total = 0, count;
 	LCUI_BOOL found = FALSE;
-	pd_rectf_t rect, visible_rect;
+	ui_rect_t rect, visible_rect;
 	ui_widget_t *child, *parent;
 	list_node_t *node, *next;
 
@@ -291,13 +292,13 @@ static size_t ui_widget_update_visible_children(ui_widget_t* w,
 		}
 		rect.x += child->box.padding.x;
 		rect.y += child->box.padding.y;
-		LCUIRectF_ValidateArea(&rect, parent->box.padding.width,
+		ui_rect_correct(&rect, parent->box.padding.width,
 				       parent->box.padding.height);
 	}
 	visible_rect = rect;
 	rect = w->box.padding;
 	ui_widget_get_offset(w, NULL, &rect.x, &rect.y);
-	if (!LCUIRectF_GetOverlayRect(&visible_rect, &rect, &visible_rect)) {
+	if (!ui_rect_overlap(&visible_rect, &rect, &visible_rect)) {
 		return 0;
 	}
 	visible_rect.x -= w->box.padding.x;
@@ -305,7 +306,7 @@ static size_t ui_widget_update_visible_children(ui_widget_t* w,
 	for (node = w->children.head.next; node; node = next) {
 		child = node->data;
 		next = node->next;
-		if (!LCUIRectF_GetOverlayRect(&visible_rect, &child->box.border,
+		if (!ui_rect_overlap(&visible_rect, &child->box.border,
 					      &rect)) {
 			if (found) {
 				break;

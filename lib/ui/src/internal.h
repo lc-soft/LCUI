@@ -47,21 +47,21 @@ void ui_widget_init_background(ui_widget_t* w);
 void ui_widget_destroy_background(ui_widget_t* w);
 void ui_widget_compute_background_style(ui_widget_t* w);
 void ui_widget_compute_background(ui_widget_t* w, pd_background_t* out);
-void ui_widget_paint_background(ui_widget_t* w, pd_paint_context_t *paint,
+void ui_widget_paint_background(ui_widget_t* w, pd_context_t *paint,
 				ui_widget_actual_style_t* style);
 
 // Border
 
 void ui_widget_compute_border_style(ui_widget_t* w);
 void ui_widget_compute_border(ui_widget_t* w, pd_border_t* b);
-void ui_widget_paint_border(ui_widget_t* w, pd_paint_context_t *paint,
+void ui_widget_paint_border(ui_widget_t* w, pd_context_t *paint,
 			    ui_widget_actual_style_t* style);
-void ui_widget_crop_content(ui_widget_t* w, pd_paint_context_t *paint,
+void ui_widget_crop_content(ui_widget_t* w, pd_context_t *paint,
 			    ui_widget_actual_style_t* style);
 
 // Box Shadow
 
-void ui_widget_paint_box_shadow(ui_widget_t* w, pd_paint_context_t *paint,
+void ui_widget_paint_box_shadow(ui_widget_t* w, pd_context_t *paint,
 				ui_widget_actual_style_t* style);
 void ui_widget_compute_box_shadow(ui_widget_t* w, pd_boxshadow_t* out);
 void ui_widget_compute_box_shadow_style(ui_widget_t* w);
@@ -98,8 +98,8 @@ typedef struct ui_widget_style_diff_t_ {
 	float height;
 	float opacity;
 	LCUI_BOOL visible;
-	pd_rect_t2F margin;
-	pd_rect_t2F padding;
+	ui_area_t margin;
+	ui_area_t padding;
 	css_keyword_value_t position;
 	ui_border_style_t border;
 	ui_boxshadow_style_t shadow;

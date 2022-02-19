@@ -28,17 +28,25 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_DRAW_BOXSHADOW_H
-#define LCUI_DRAW_BOXSHADOW_H
+#ifndef LIB_PANDAGL_INCLUDE_PANDAGL_BOXSHADOW_H
+#define LIB_PANDAGL_INCLUDE_PANDAGL_BOXSHADOW_H
+
+#include <LCUI/header.h>
+#include <LCUI/types.h>
+#include "def.h"
+
+LCUI_BEGIN_HEADER
 
 #define SHADOW_WIDTH(sd) (sd->blur + sd->spread)
 
-LCUI_API void pd_boxshadow_get_canvas_rect(const pd_boxshadow_t *shadow,
-				      const pd_rect_t *box_rect,
-				      pd_rect_t *canvas_rect);
+LCUI_API void pd_get_boxshadow_canvas_rect(const pd_boxshadow_t *shadow,
+					   const pd_rect_t *box_rect,
+					   pd_rect_t *canvas_rect);
 
-LCUI_API int pd_boxshadow_paint(const pd_boxshadow_t *shadow, const pd_rect_t *box,
-			     int centent_width, int content_height,
-			     pd_paint_context_t* paint);
+LCUI_API int pd_paint_boxshadow(pd_context_t *ctx, const pd_boxshadow_t *shadow,
+				const pd_rect_t *box, int centent_width,
+				int content_height);
+
+LCUI_END_HEADER
 
 #endif

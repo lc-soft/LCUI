@@ -35,7 +35,7 @@
 #include "config.h"
 #include <LCUI/types.h>
 #include <yutil.h>
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 #include <LCUI/image.h>
 
 #ifdef USE_LIBJPEG

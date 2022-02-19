@@ -16,7 +16,7 @@ target("lcui-image")
     add_configfiles("src/config.h.in")
     add_options("with-libpng", "with-libjpeg")
     add_packages("libjpeg", "libpng")
-    add_deps("lcui-util", "lcui-paint")
+    add_deps("lcui-util", "pandagl")
     if has_package("libjpeg") then
         set_configvar("USE_LIBJPEG", 1)
     end

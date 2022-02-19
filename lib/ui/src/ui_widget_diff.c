@@ -178,7 +178,7 @@ int ui_widget_end_layout_diff(ui_widget_t* w, ui_widget_layout_diff_t* diff)
 		ui_widget_update_canvas_box(w);
 	}
 	if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_CANVAS_BOX) {
-	} else if (!LCUIRectF_IsEquals(&diff->box.canvas, &w->box.canvas)) {
+	} else if (!ui_rect_is_equal(&diff->box.canvas, &w->box.canvas)) {
 		w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
 	}
 	if (diff->box.outer.x != w->box.outer.x ||

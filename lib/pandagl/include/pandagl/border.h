@@ -1,7 +1,7 @@
 ﻿/*
- * painter.h -- The painter context operation set.
+ * border.h -- Border drawing
  *
- * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,13 +28,22 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_PAINTER_H
-#define LCUI_PAINTER_H
+#ifndef LIB_PANDAGL_INCLUDE_PANDAGL_BORDER_H
+#define LIB_PANDAGL_INCLUDE_PANDAGL_BORDER_H
 
 #include <LCUI/header.h>
+#include <LCUI/types.h>
+#include "def.h"
 
-LCUI_API pd_paint_context_t* pd_painter_begin(pd_canvas_t *canvas, pd_rect_t *rect);
+LCUI_BEGIN_HEADER
 
-LCUI_API void pd_painter_end(pd_paint_context_t* paint);
+LCUI_API int pd_crop_border_content(pd_context_t *ctx,
+				    const pd_border_t *border,
+				    const pd_rect_t *box);
+
+LCUI_API int pd_paint_border(pd_context_t *ctx, const pd_border_t *border,
+			     const pd_rect_t *box);
+
+LCUI_END_HEADER
 
 #endif

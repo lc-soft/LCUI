@@ -1,5 +1,5 @@
 #include <LCUI.h>
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 #include <LCUI/css/library.h>
 #include "../include/ui.h"
 #include "internal.h"
@@ -121,7 +121,7 @@ void ui_widget_compute_background_style(ui_widget_t *widget)
 void ui_widget_compute_background(ui_widget_t *w, pd_background_t *out)
 {
 	css_unit_t type;
-	pd_rectf_t *box = &w->box.border;
+	ui_rect_t *box = &w->box.border;
 	ui_background_style_t *bg = &w->computed_style.background;
 	float scale, x = 0, y = 0, width, height;
 
@@ -279,13 +279,14 @@ void ui_widget_compute_background(ui_widget_t *w, pd_background_t *out)
 	}
 }
 
-void ui_widget_paint_background(ui_widget_t *w, pd_paint_context_t *paint,
+void ui_widget_paint_background(ui_widget_t *w, pd_context_t *ctx,
 				ui_widget_actual_style_t* style)
 {
 	pd_rect_t box;
+
 	box.x = style->padding_box.x - style->canvas_box.x;
 	box.y = style->padding_box.y - style->canvas_box.y;
 	box.width = style->padding_box.width;
 	box.height = style->padding_box.height;
-	pd_background_paint(&style->background, &box, paint);
+	pd_paint_background(ctx, &style->background, &box);
 }

@@ -1,7 +1,7 @@
 ﻿#include <LCUI.h>
 #include <LCUI/image.h>
 #include <LCUI/font.h>
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 
 int main(void)
 {
@@ -18,7 +18,7 @@ int main(void)
 	/* 创建一个图像，并使用灰色填充 */
 	pd_canvas_init(&img);
 	pd_canvas_create(&img, 320, 240);
-	pd_canvas_fill_rect(&img, RGB(240, 240, 240), NULL, FALSE);
+	pd_canvas_fill(&img, RGB(240, 240, 240));
 
 	/* 设置文本的字体大小 */
 	TextStyle_Init(&txtstyle);
@@ -35,7 +35,7 @@ int main(void)
 	/* 将文本图层绘制到图像中，然后将图像写入至 png 文件中 */
 	TextLayer_RenderTo(txt, area, pos, &img);
 	ret = LCUI_WritePNGFile("test_string_render.png", &img);
-	pd_canvas_free(&img);
+	pd_canvas_destroy(&img);
 
 	/* 释放字体处理功能相关资源 */
 	fontlib_destroy();

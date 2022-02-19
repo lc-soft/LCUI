@@ -5,11 +5,20 @@
 #include <LCUI/types.h>
 #include <LCUI/util.h>
 #include <LCUI/css/def.h>
+#include <LCUI/pandagl/def.h>
 #include <LCUI/css/library.h>
 
 LCUI_BEGIN_HEADER
 
 // Types
+
+typedef struct ui_rect_t {
+	float x, y, width, height;
+} ui_rect_t;
+
+typedef struct ui_area_t {
+	float left, top, right, bottom;
+} ui_area_t;
 
 typedef struct ui_metrics_t {
 	float dpi;
@@ -98,7 +107,7 @@ typedef struct ui_background_size_t {
 } ui_background_size_t;
 
 typedef struct ui_background_style_t {
-	pd_canvas_t *image;
+	pd_canvas_t* image;
 	pd_color_t color;
 	struct {
 		LCUI_BOOL x, y;
@@ -108,13 +117,13 @@ typedef struct ui_background_style_t {
 } ui_background_style_t;
 
 typedef struct ui_widget_attribute_t_ {
-	char *name;
+	char* name;
 	struct {
 		int type;
-		void(*destructor)(void*);
+		void (*destructor)(void*);
 		union {
-			char *string;
-			void *data;
+			char* string;
+			void* data;
 		};
 	} value;
 } ui_widget_attribute_t;
@@ -156,15 +165,16 @@ typedef enum ui_task_type_t {
 typedef struct ui_widget_t ui_widget_t;
 typedef list_t ui_widget_listeners_t;
 
-typedef void(*ui_widget_function_t)(ui_widget_t*);
-typedef void(*ui_widget_task_handler_t)(ui_widget_t*, int);
-typedef void(*ui_widget_size_getter_t)(ui_widget_t*, float*, float*, ui_layout_rule_t);
-typedef void(*ui_widget_size_setter_t)(ui_widget_t*, float, float);
-typedef void(*ui_widget_attr_setter_t)(ui_widget_t*, const char*, const char*);
-typedef void(*ui_widget_text_setter_t)(ui_widget_t*, const char*);
-typedef void(*ui_widget_prop_binder_t)(ui_widget_t*, const char*, LCUI_Object);
-typedef void(*ui_widget_painter_t)(ui_widget_t*, pd_paint_context_t*,
-				  ui_widget_actual_style_t*);
+typedef void (*ui_widget_function_t)(ui_widget_t*);
+typedef void (*ui_widget_task_handler_t)(ui_widget_t*, int);
+typedef void (*ui_widget_size_getter_t)(ui_widget_t*, float*, float*,
+					ui_layout_rule_t);
+typedef void (*ui_widget_size_setter_t)(ui_widget_t*, float, float);
+typedef void (*ui_widget_attr_setter_t)(ui_widget_t*, const char*, const char*);
+typedef void (*ui_widget_text_setter_t)(ui_widget_t*, const char*);
+typedef void (*ui_widget_prop_binder_t)(ui_widget_t*, const char*, LCUI_Object);
+typedef void (*ui_widget_painter_t)(ui_widget_t*, pd_context_t*,
+				    ui_widget_actual_style_t*);
 typedef struct ui_widget_prototype_t ui_widget_prototype_t;
 
 typedef struct ui_widget_rules_t {
@@ -229,11 +239,11 @@ typedef struct ui_widget_update_t {
 
 /** See more: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model */
 typedef struct ui_widget_box_model_t {
-	pd_rectf_t content;
-	pd_rectf_t padding;
-	pd_rectf_t border;
-	pd_rectf_t canvas;
-	pd_rectf_t outer;
+	ui_rect_t content;
+	ui_rect_t padding;
+	ui_rect_t border;
+	ui_rect_t canvas;
+	ui_rect_t outer;
 } ui_widget_box_model_t;
 
 typedef struct ui_flexbox_layout_style_t {
@@ -268,7 +278,8 @@ typedef struct ui_flexbox_layout_style_t {
 	/**
 	 * Sets the distribution of space between and around content items along
 	 * a flexbox's cross-axis
-	 * See more: https://developer.mozilla.org/en-US/docs/Web/CSS/align-content
+	 * See more:
+	 * https://developer.mozilla.org/en-US/docs/Web/CSS/align-content
 	 */
 	css_keyword_value_t align_content : 8;
 
@@ -281,7 +292,7 @@ typedef struct ui_flexbox_layout_style_t {
 } ui_flexbox_layout_style_t;
 
 typedef struct ui_profile_t {
-	clock_t time;
+	long time;
 	size_t update_count;
 	size_t refresh_count;
 	size_t layout_count;
@@ -317,7 +328,7 @@ typedef struct ui_widget_style_t {
 } ui_widget_style_t;
 
 struct ui_widget_prototype_t {
-	char *name;
+	char* name;
 	ui_widget_function_t init;
 	ui_widget_function_t refresh;
 	ui_widget_function_t destroy;
@@ -329,19 +340,18 @@ struct ui_widget_prototype_t {
 	ui_widget_size_getter_t autosize;
 	ui_widget_size_setter_t resize;
 	ui_widget_painter_t paint;
-	ui_widget_prototype_t *proto;
+	ui_widget_prototype_t* proto;
 };
 
 typedef struct ui_widget_data_entry_t {
-	void *data;
-	ui_widget_prototype_t *proto;
+	void* data;
+	ui_widget_prototype_t* proto;
 } ui_widget_data_entry_t;
 
 typedef struct ui_widget_data_t {
 	unsigned length;
-	ui_widget_data_entry_t *list;
+	ui_widget_data_entry_t* list;
 } ui_widget_data_t;
-
 
 // Event begin
 
@@ -403,7 +413,7 @@ typedef struct ui_touch_point_t {
 
 typedef struct ui_touch_event_t {
 	unsigned n_points;
-	ui_touch_point_t *points;
+	ui_touch_point_t* points;
 } ui_touch_event_t;
 
 typedef struct ui_paint_event_t {
@@ -411,7 +421,7 @@ typedef struct ui_paint_event_t {
 } ui_paint_event_t;
 
 typedef struct ui_textinput_event_t {
-	wchar_t *text;
+	wchar_t* text;
 	size_t length;
 } ui_textinput_event_t;
 
@@ -441,14 +451,14 @@ typedef struct ui_wheel_event_t {
 } ui_wheel_event_t;
 
 typedef struct ui_event_t ui_event_t;
-typedef void(*ui_event_handler_t)(ui_widget_t*, ui_event_t*, void*);
+typedef void (*ui_event_handler_t)(ui_widget_t*, ui_event_t*, void*);
 typedef void (*ui_event_arg_destructor_t)(void*);
 
 struct ui_event_t {
-	uint32_t type;			/**< 事件类型标识号 */
-	void *data;			/**< 附加数据 */
-	ui_widget_t* target;		/**< 触发事件的部件 */
-	LCUI_BOOL cancel_bubble;	/**< 是否取消事件冒泡 */
+	uint32_t type;           /**< 事件类型标识号 */
+	void* data;              /**< 附加数据 */
+	ui_widget_t* target;     /**< 触发事件的部件 */
+	LCUI_BOOL cancel_bubble; /**< 是否取消事件冒泡 */
 	union {
 		ui_mouse_event_t mouse;
 		ui_wheel_event_t wheel;
@@ -459,7 +469,6 @@ struct ui_event_t {
 };
 
 // Event end
-
 
 // MutationObserver begin
 
@@ -475,15 +484,15 @@ typedef enum ui_mutation_record_type_t {
 
 typedef struct ui_mutation_record_t {
 	ui_mutation_record_type_t type;
-	ui_widget_t *target;
+	ui_widget_t* target;
 	list_t added_widgets;
 	list_t removed_widgets;
-	char *attribute_name;
-	char *property_name;
+	char* attribute_name;
+	char* property_name;
 } ui_mutation_record_t;
 
-typedef void (*ui_mutation_observer_callback_t)(ui_mutation_list_t *,
-					   ui_mutation_observer_t *, void *);
+typedef void (*ui_mutation_observer_callback_t)(ui_mutation_list_t*,
+						ui_mutation_observer_t*, void*);
 
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserverInit
@@ -495,51 +504,52 @@ typedef struct ui_mutation_observer_init_t {
 	LCUI_BOOL attributes;
 } ui_mutation_observer_init_t;
 
-LCUI_API ui_mutation_record_t *ui_mutation_record_create(ui_widget_t *widget,
-						ui_mutation_record_type_t type);
+LCUI_API ui_mutation_record_t* ui_mutation_record_create(
+    ui_widget_t* widget, ui_mutation_record_type_t type);
 
-LCUI_API ui_mutation_record_t *ui_mutation_record_duplicate(ui_mutation_record_t *source);
+LCUI_API ui_mutation_record_t* ui_mutation_record_duplicate(
+    ui_mutation_record_t* source);
 
-LCUI_API void ui_mutation_record_destroy(ui_mutation_record_t *mutation);
+LCUI_API void ui_mutation_record_destroy(ui_mutation_record_t* mutation);
 
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
  */
-LCUI_API ui_mutation_observer_t *ui_mutation_observer_create(
-    ui_mutation_observer_callback_t callback, void *callback_arg);
+LCUI_API ui_mutation_observer_t* ui_mutation_observer_create(
+    ui_mutation_observer_callback_t callback, void* callback_arg);
 
-LCUI_API int ui_mutation_observer_observe(ui_mutation_observer_t *observer,
-				 ui_widget_t *w,
-				 ui_mutation_observer_init_t options);
+LCUI_API int ui_mutation_observer_observe(ui_mutation_observer_t* observer,
+					  ui_widget_t* w,
+					  ui_mutation_observer_init_t options);
 
-LCUI_API void ui_mutation_observer_disconnect(ui_mutation_observer_t *observer);
-LCUI_API void ui_mutation_observer_destroy(ui_mutation_observer_t *observer);
+LCUI_API void ui_mutation_observer_disconnect(ui_mutation_observer_t* observer);
+LCUI_API void ui_mutation_observer_destroy(ui_mutation_observer_t* observer);
 LCUI_API void ui_process_mutation_observers(void);
-LCUI_API void ui_mutation_observer_add_record(ui_mutation_observer_t *observer, ui_mutation_record_t *record);
+LCUI_API void ui_mutation_observer_add_record(ui_mutation_observer_t* observer,
+					      ui_mutation_record_t* record);
 
 // MutationObserver end
 
-
 typedef struct ui_widget_extra_data_t {
 	ui_widget_listeners_t listeners;
-	ui_mutation_observer_t *observer;
+	ui_mutation_observer_t* observer;
 	ui_mutation_observer_init_t observer_options;
 	ui_widget_rules_t rules;
 	size_t default_max_update_count;
 	size_t update_progress;
-	dict_t *style_cache;
+	dict_t* style_cache;
 } ui_widget_extra_data_t;
 
 struct ui_widget_t {
 	unsigned hash;
 	ui_widget_state_t state;
 
-	char *id;
-	char *type;
+	char* id;
+	char* type;
 	strlist_t classes;
 	strlist_t status;
-	wchar_t *title;
-	dict_t *attributes;
+	wchar_t* title;
+	dict_t* attributes;
 	LCUI_BOOL disabled;
 	LCUI_BOOL event_blocked;
 
@@ -556,23 +566,23 @@ struct ui_widget_t {
 	float x, y, width, height;
 
 	/**
-	 * A box’s “ideal” size in a given axis when given infinite available space.
-	 * See more: https://drafts.csswg.org/css-sizing-3/#max-content
+	 * A box’s “ideal” size in a given axis when given infinite available
+	 * space. See more: https://drafts.csswg.org/css-sizing-3/#max-content
 	 */
 	float max_content_width, max_content_height;
 
-	pd_rect_t2F padding;
-	pd_rect_t2F margin;
+	ui_area_t padding;
+	ui_area_t margin;
 	ui_widget_box_model_t box;
 
-	css_style_decl_t *style;
-	css_style_props_t *custom_style;
-	const css_style_decl_t *matched_style;
+	css_style_decl_t* style;
+	css_style_props_t* custom_style;
+	const css_style_decl_t* matched_style;
 	ui_widget_style_t computed_style;
 
 	/** Some data bound to the prototype */
 	ui_widget_data_t data;
-	ui_widget_extra_data_t *extra;
+	ui_widget_extra_data_t* extra;
 
 	/**
 	 * Prototype chain
@@ -583,7 +593,7 @@ struct ui_widget_t {
 
 	ui_widget_update_t update;
 
-	pd_rectf_t dirty_rect;
+	ui_rect_t dirty_rect;
 	ui_dirty_rect_type_t dirty_rect_type;
 	LCUI_BOOL has_child_dirty_rect;
 
@@ -595,7 +605,8 @@ struct ui_widget_t {
 
 	/**
 	 * List of child widgets in descending order by z-index
-	 * @see https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context
+	 * @see
+	 *https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context
 	 **/
 	list_t stacking_context;
 
@@ -663,7 +674,7 @@ INLINE int ui_compute_actual(float value, css_unit_t type)
 	return y_iround(ui_compute(value, type) * ui_get_scale());
 }
 
-INLINE void ui_compute_rect_actual(pd_rect_t* dst, const pd_rectf_t* src)
+INLINE void ui_compute_rect_actual(pd_rect_t* dst, const ui_rect_t* src)
 {
 	dst->x = y_iround(src->x * ui_get_scale());
 	dst->y = y_iround(src->y * ui_get_scale());
@@ -762,14 +773,15 @@ LCUI_API void ui_print_tree(ui_widget_t* w);
 
 // Style
 
-#define ui_widget_check_style_type(W, K, T) css_check_style_prop((W)->style, K, T)
+#define ui_widget_check_style_type(W, K, T) \
+	css_check_style_prop((W)->style, K, T)
 
 #define ui_widget_set_style(W, K, VAL, TYPE)       \
 	do {                                       \
-		css_unit_value_t *_s;                     \
+		css_unit_value_t* _s;              \
 		_s = ui_widget_get_style(W, K);    \
 		_s->is_valid = TRUE;               \
-		_s->unit = CSS_UNIT_##TYPE;      \
+		_s->unit = CSS_UNIT_##TYPE;        \
 		_s->val_##TYPE = VAL;              \
 		ui_widget_add_task_by_style(W, K); \
 	} while (0)
@@ -790,8 +802,8 @@ INLINE LCUI_BOOL ui_widget_has_auto_style(ui_widget_t* w, int key)
 	       ui_widget_check_style_type(w, key, AUTO);
 }
 
-LCUI_API css_selector_node_t *ui_widget_create_selector_node(ui_widget_t* w);
-LCUI_API css_selector_t *ui_widget_create_selector(ui_widget_t* w);
+LCUI_API css_selector_node_t* ui_widget_create_selector_node(ui_widget_t* w);
+LCUI_API css_selector_t* ui_widget_create_selector(ui_widget_t* w);
 LCUI_API size_t ui_widget_get_children_style_changes(ui_widget_t* w, int type,
 						     const char* name);
 LCUI_API void ui_widget_print_stylesheet(ui_widget_t* w);
@@ -894,9 +906,9 @@ LCUI_API void ui_widget_set_box_shadow(ui_widget_t* w, float x, float y,
 				       float blur, pd_color_t color);
 LCUI_API void ui_widget_move(ui_widget_t* w, float left, float top);
 LCUI_API void ui_widget_resize(ui_widget_t* w, float width, float height);
-LCUI_API css_unit_value_t *ui_widget_get_style(ui_widget_t* w, int key);
+LCUI_API css_unit_value_t* ui_widget_get_style(ui_widget_t* w, int key);
 LCUI_API int ui_widget_unset_style(ui_widget_t* w, int key);
-LCUI_API css_unit_value_t *ui_widget_get_matched_style(ui_widget_t* w, int key);
+LCUI_API css_unit_value_t* ui_widget_get_matched_style(ui_widget_t* w, int key);
 LCUI_API void ui_widget_set_visibility(ui_widget_t* w, const char* value);
 
 INLINE void ui_widget_set_visible(ui_widget_t* w)
@@ -911,9 +923,11 @@ INLINE void ui_widget_set_hidden(ui_widget_t* w)
 
 LCUI_API void ui_widget_show(ui_widget_t* w);
 LCUI_API void ui_widget_hide(ui_widget_t* w);
-LCUI_API void ui_widget_set_position(ui_widget_t* w, css_keyword_value_t position);
+LCUI_API void ui_widget_set_position(ui_widget_t* w,
+				     css_keyword_value_t position);
 LCUI_API void ui_widget_set_opacity(ui_widget_t* w, float opacity);
-LCUI_API void ui_widget_set_box_sizing(ui_widget_t* w, css_keyword_value_t sizing);
+LCUI_API void ui_widget_set_box_sizing(ui_widget_t* w,
+				       css_keyword_value_t sizing);
 LCUI_API ui_widget_t* ui_widget_get_closest(ui_widget_t* w, const char* type);
 LCUI_API dict_t* ui_widget_collect_references(ui_widget_t* w);
 
@@ -933,10 +947,10 @@ LCUI_API LCUI_BOOL ui_widget_auto_reflow(ui_widget_t* w, ui_layout_rule_t rule);
 
 // Renderer
 
-LCUI_API LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t* w,
-					     pd_rectf_t* in_rect, int box_type);
+LCUI_API LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t* w, ui_rect_t* in_rect,
+					     int box_type);
 LCUI_API size_t ui_widget_get_dirty_rects(ui_widget_t* w, list_t* rects);
-LCUI_API size_t ui_widget_render(ui_widget_t* w, pd_paint_context_t* paint);
+LCUI_API size_t ui_widget_render(ui_widget_t* w, pd_context_t* paint);
 
 // Updater
 
@@ -965,7 +979,8 @@ LCUI_API int ui_widget_add_mutation_recrod(ui_widget_t* widget,
 
 // Logger
 
-LCUI_API int ui_logger_log(logger_level_e level, ui_widget_t *w, const char *fmt, ...);
+LCUI_API int ui_logger_log(logger_level_e level, ui_widget_t* w,
+			   const char* fmt, ...);
 
 #define ui_debug(W, ...) ui_logger_log(LOGGER_LEVEL_DEBUG, W, ##__VA_ARGS__)
 
@@ -979,7 +994,8 @@ INLINE void ui_widget_block_event(ui_widget_t* w, LCUI_BOOL block)
 
 /** 触发事件，让事件处理器在主循环中调用 */
 LCUI_API int ui_widget_post_event(ui_widget_t* w, const ui_event_t* e,
-				  void* arg, ui_event_arg_destructor_t destroy_arg);
+				  void* arg,
+				  ui_event_arg_destructor_t destroy_arg);
 
 /** 触发事件，直接调用事件处理器 */
 LCUI_API int ui_widget_emit_event(ui_widget_t* w, ui_event_t e, void* arg);
@@ -1149,9 +1165,9 @@ LCUI_API int ui_image_remove_event_listener(ui_image_t* image,
 typedef struct ui_font_style_t {
 	int font_size;
 	int line_height;
-	int *font_ids;
-	char *font_family;
-	wchar_t *content;
+	int* font_ids;
+	char* font_family;
+	wchar_t* content;
 	pd_color_t color;
 	css_font_style_t font_style;
 	css_font_weight_t font_weight;
@@ -1159,14 +1175,49 @@ typedef struct ui_font_style_t {
 	css_keyword_value_t white_space;
 } ui_font_style_t;
 
-LCUI_API void ui_font_style_init(ui_font_style_t *fs);
+LCUI_API void ui_font_style_init(ui_font_style_t* fs);
 
-LCUI_API void ui_font_style_destroy(ui_font_style_t *fs);
+LCUI_API void ui_font_style_destroy(ui_font_style_t* fs);
 
-LCUI_API LCUI_BOOL ui_font_style_is_equal(const ui_font_style_t *a,
-					  const ui_font_style_t *b);
+LCUI_API LCUI_BOOL ui_font_style_is_equal(const ui_font_style_t* a,
+					  const ui_font_style_t* b);
 
-LCUI_API void ui_font_style_compute(ui_font_style_t *fs, css_style_decl_t *ss);
+LCUI_API void ui_font_style_compute(ui_font_style_t* fs, css_style_decl_t* ss);
+
+// Rect
+
+LCUI_API void ui_convert_rect(const pd_rect_t* rect, ui_rect_t* rectf,
+			      float scale);
+
+LCUI_API LCUI_BOOL ui_rect_correct(ui_rect_t* rect, float container_width,
+				   float container_height);
+
+INLINE LCUI_BOOL ui_rect_has_point(ui_rect_t* rect, float x, float y)
+{
+	return x >= rect->x && y >= rect->y && x < rect->x + rect->width &&
+	       y < rect->y + rect->height;
+}
+
+INLINE LCUI_BOOL ui_rect_is_equal(const ui_rect_t* a, const ui_rect_t* b)
+{
+	return (int)(100 * (a->x - b->x)) == 0 &&
+	       (int)(100 * (a->y - b->y)) == 0 &&
+	       (int)(100 * (a->width - b->width)) == 0 &&
+	       (int)(100 * (a->height - b->height)) == 0;
+}
+
+LCUI_API LCUI_BOOL ui_rect_is_cover(const ui_rect_t* a, const ui_rect_t* b);
+
+INLINE LCUI_BOOL ui_rect_is_include(ui_rect_t* a, ui_rect_t* b)
+{
+	return (b->x >= a->x && b->x + b->width <= a->x + a->width &&
+		b->y >= a->y && b->y + b->height <= a->y + a->height);
+}
+
+LCUI_API LCUI_BOOL ui_rect_overlap(const ui_rect_t* a, const ui_rect_t* b,
+				   ui_rect_t* overlapping_rect);
+
+LCUI_API void ui_rect_merge(ui_rect_t *merged_rect, const ui_rect_t *a, const ui_rect_t *b);
 
 LCUI_END_HEADER
 

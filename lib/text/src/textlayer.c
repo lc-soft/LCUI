@@ -32,9 +32,8 @@
 #include <wctype.h>
 #include <LCUI/header.h>
 #include <LCUI/types.h>
-#include <yutil.h>
-#include <LCUI/util/rect.h>
-#include <LCUI/graph.h>
+#include <LCUI/util.h>
+#include <LCUI/pandagl.h>
 #include <LCUI/font.h>
 #include <LCUI/text/textlayer.h>
 
@@ -338,7 +337,7 @@ static void TextLayer_DestroyStyleCache(LCUI_TextLayer layer)
 /** 销毁TextLayer */
 void TextLayer_Destroy(LCUI_TextLayer layer)
 {
-	RectList_Clear(&layer->dirty_rects);
+	pd_rects_clear(&layer->dirty_rects);
 	TextStyle_Destroy(&layer->text_default_style);
 	TextRowList_Destroy(&layer->text_rows);
 	TextLayer_DestroyStyleCache(layer);
@@ -396,7 +395,7 @@ static void TextLayer_InvalidateRowRect(LCUI_TextLayer layer, int row,
 {
 	pd_rect_t rect;
 	if (TextLayer_GetRowRect(layer, row, start, end, &rect) == 0) {
-		RectList_Add(&layer->dirty_rects, &rect);
+		pd_rects_add(&layer->dirty_rects, &rect);
 	}
 }
 
@@ -421,7 +420,7 @@ void TextLayer_InvalidateRowsRect(LCUI_TextLayer layer, int start_row,
 	}
 	for (; i <= end_row; ++i) {
 		TextLayer_GetRowRect(layer, i, 0, -1, &rect);
-		RectList_Add(&layer->dirty_rects, &rect);
+		pd_rects_add(&layer->dirty_rects, &rect);
 		y += layer->text_rows.rows[i]->height;
 		if (y >= layer->max_height) {
 			break;
@@ -1236,7 +1235,7 @@ static void TextLayer_ValidateArea(LCUI_TextLayer layer, pd_rect_t *area)
 	} else {
 		height = TextLayer_GetHeight(layer);
 	}
-	LCUIRect_ValidateArea(area, width, height);
+	pd_rect_correct(area, width, height);
 }
 
 static void TextLayer_DrawChar(LCUI_TextLayer layer, LCUI_TextChar ch,
@@ -1294,8 +1293,7 @@ static void TextLayer_DrawTextRow(LCUI_TextLayer layer, pd_rect_t *area,
 			rect.y = ch_pos.y;
 			rect.height = txtrow->height;
 			rect.width = txtchar->bitmap->advance.x;
-			pd_canvas_fill_rect(graph, txtchar->style->back_color, &rect,
-				       TRUE);
+			pd_canvas_fill_rect(graph, txtchar->style->back_color, rect);
 		}
 		ch_pos.x += txtchar->bitmap->left;
 		ch_pos.y += baseline;
@@ -1347,7 +1345,7 @@ int TextLayer_RenderTo(LCUI_TextLayer layer, pd_rect_t area, pd_pos_t layer_pos,
 /** 清除已记录的无效矩形 */
 void TextLayer_ClearInvalidRect(LCUI_TextLayer layer)
 {
-	RectList_Clear(&layer->dirty_rects);
+	pd_rects_clear(&layer->dirty_rects);
 }
 
 /** 设置全局文本样式 */

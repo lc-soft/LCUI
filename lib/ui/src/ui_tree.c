@@ -317,7 +317,7 @@ ui_widget_t* ui_widget_at(ui_widget_t* widget, int ix, int iy)
 			if (!c->computed_style.visible) {
 				continue;
 			}
-			if (LCUIRectF_HasPoint(&c->box.border, x, y)) {
+			if (ui_rect_has_point(&c->box.border, x, y)) {
 				target = c;
 				x -= c->box.padding.x;
 				y -= c->box.padding.y;

@@ -4,6 +4,7 @@
 #include "def.h"
 #include <LCUI/header.h>
 #include <LCUI/types.h>
+#include <LCUI/pandagl/def.h>
 
 /** 打印字体位图的信息 */
 LCUI_API void FontBitmap_PrintInfo(font_bitmap_t *bitmap);

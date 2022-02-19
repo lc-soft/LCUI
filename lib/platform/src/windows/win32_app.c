@@ -8,8 +8,7 @@
 #include "resource.h"
 #include "../config.h"
 #include <LCUI/util.h>
-#include <LCUI/graph.h>
-#include <LCUI/painter.h>
+#include <LCUI/pandagl.h>
 
 #define MIN_WIDTH 320
 #define MIN_HEIGHT 240
@@ -518,7 +517,7 @@ void app_window_destroy(app_window_t *wnd)
 	wnd->fb_bmp = NULL;
 	wnd->hdc_fb = NULL;
 	wnd->hdc_client = NULL;
-	pd_canvas_free(&wnd->fb);
+	pd_canvas_destroy(&wnd->fb);
 	free(wnd);
 }
 
@@ -591,14 +590,14 @@ void app_window_set_max_height(app_window_t *wnd, int max_height)
 
 app_window_paint_t *app_window_begin_paint(app_window_t *wnd, pd_rect_t *rect)
 {
-	app_window_paint_t *paint = pd_painter_begin(&wnd->fb, rect);
-	pd_canvas_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
+	app_window_paint_t *paint = pd_context_create(&wnd->fb, rect);
+	pd_canvas_fill(&paint->canvas, RGB(255, 255, 255));
 	return paint;
 }
 
 void app_window_end_paint(app_window_t *wnd, app_window_paint_t *paint)
 {
-	pd_painter_end(paint);
+	pd_context_destroy(paint);
 }
 
 void app_window_present(app_window_t *wnd)

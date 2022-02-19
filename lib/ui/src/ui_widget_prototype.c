@@ -37,7 +37,7 @@ static void widget_default_task_handler(ui_widget_t* w, int task)
 {
 }
 
-static void widget_default_painter(ui_widget_t* w, pd_paint_context_t *paint,
+static void widget_default_painter(ui_widget_t* w, pd_context_t *paint,
 				  ui_widget_actual_style_t* style)
 {
 }

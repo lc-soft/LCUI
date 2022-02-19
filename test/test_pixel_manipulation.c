@@ -5,14 +5,14 @@
 #define PixelManipulationBegin                                   \
 	int x, y;                                                \
 	pd_color_t pixel;                                        \
-								 \
+                                                                 \
 	for (y = rect.y; y < rect.y + rect.height; ++y) {        \
 		for (x = rect.x; x < rect.x + rect.width; ++x) { \
-			pd_canvas_get_pixel(graph, x, y, pixel);
+			pixel = pd_canvas_get_pixel(graph, x, y, );
 
-#define PixelManipulationEnd                \
+#define PixelManipulationEnd                     \
 	pd_canvas_set_pixel(graph, x, y, pixel); \
-	}                                   \
+	}                                        \
 	}
 
 void invert(pd_canvas_t *graph, pd_rect_t rect)

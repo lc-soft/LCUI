@@ -11,7 +11,7 @@ static void test_flex_layout_with_content_width(float width)
 	ui_widget_t* content;
 	ui_widget_t* example;
 	ui_widget_t* container;
-	pd_rectf_t rect;
+	ui_rect_t rect;
 
 	container = ui_widget_get_child(ui_get_widget("main"), 0);
 	ui_update();
@@ -429,7 +429,7 @@ static void test_flex_layout_with_content_width(float width)
 static void test_browser_layout(void)
 {
 	ui_widget_t* w;
-	pd_rectf_t rect;
+	ui_rect_t rect;
 
 	w = ui_get_widget("browser-tabbar");
 	w = ui_widget_get_child(w, 0);
@@ -479,7 +479,7 @@ static void test_flex_layout_320(void)
 	ui_widget_t* content;
 	ui_widget_t* example;
 	ui_widget_t* container;
-	pd_rectf_t rect;
+	ui_rect_t rect;
 
 	container = ui_widget_get_child(ui_get_widget("main"), 0);
 	ui_widget_resize(ui_root(), 320, 240);

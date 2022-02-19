@@ -1,7 +1,7 @@
 ﻿/*
  * boxshadow.c -- Box shadow drawing
  *
- * Copyright (c) 2018-2019, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2022, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -35,8 +35,7 @@
 
 #include <math.h>
 #include <stdlib.h>
-#include <LCUI.h>
-#include <LCUI/graph.h>
+#include "../include/pandagl.h"
 
 #define BLUR_N 1.5
 #define BLUR_WIDTH(sd) (int)(sd->blur * BLUR_N)
@@ -56,14 +55,14 @@
 #define smooth_left_pixel(PX, X) (uchar_t)((PX)->a * (1.0 - (X - 1.0 * (int)X)))
 #define smooth_right_pixel(PX, X) (uchar_t)((PX)->a * (X - 1.0 * (int)X))
 
-typedef struct boxshadow_rendering_context_rec_t {
+typedef struct pd_boxshadow_context_t {
 	int max_radius;
 	const pd_boxshadow_t *shadow;
 	const pd_rect_t *box;
 	pd_rect_t shadow_box;
 	pd_rect_t content_box;
-	pd_paint_context_t* paint;
-} boxshadow_rendering_context_rec_t, *boxshadow_rendering_context;
+	pd_context_t *paint;
+} pd_boxshadow_context_t;
 
 typedef struct gradient {
 	int s;
@@ -90,76 +89,75 @@ static uchar_t gradient_compute(gradient_t *g, double t, int val)
 	return (uchar_t)(val >> 8);
 }
 
-INLINE int boxshadow_get_width(const pd_boxshadow_t *shadow, int content_width)
+INLINE int get_boxshadow_width(const pd_boxshadow_t *shadow, int content_width)
 {
 	return content_width + SHADOW_WIDTH(shadow) * 2;
 }
 
-INLINE int boxshadow_get_height(const pd_boxshadow_t *shadow, int content_height)
+INLINE int get_boxshadow_height(const pd_boxshadow_t *shadow,
+				int content_height)
 {
 	return content_height + SHADOW_WIDTH(shadow) * 2;
 }
 
-static int boxshadow_get_box_x(const pd_boxshadow_t *shadow)
+static int get_boxshadow_box_x(const pd_boxshadow_t *shadow)
 {
 	return shadow->x >= SHADOW_WIDTH(shadow)
 		   ? 0
 		   : SHADOW_WIDTH(shadow) - shadow->x;
 }
 
-static int boxshadow_get_box_y(const pd_boxshadow_t *shadow)
+static int get_boxshadow_box_y(const pd_boxshadow_t *shadow)
 {
 	return shadow->y >= SHADOW_WIDTH(shadow)
 		   ? 0
 		   : SHADOW_WIDTH(shadow) - shadow->y;
 }
 
-static int boxshadow_get_y(const pd_boxshadow_t *shadow)
+static int get_boxshadow_y(const pd_boxshadow_t *shadow)
 {
 	return shadow->y <= SHADOW_WIDTH(shadow)
 		   ? 0
 		   : shadow->y - SHADOW_WIDTH(shadow);
 }
 
-static int boxshadow_get_x(const pd_boxshadow_t *shadow)
+static int get_boxshadow_x(const pd_boxshadow_t *shadow)
 {
 	return shadow->x <= SHADOW_WIDTH(shadow)
 		   ? 0
 		   : shadow->x - SHADOW_WIDTH(shadow);
 }
 
-void boxshadow_init(pd_boxshadow_t *shadow)
+void pd_boxshadow_init(pd_boxshadow_t *shadow)
 {
-	shadow->color.r = 0;
-	shadow->color.g = 0;
-	shadow->color.b = 0;
+	shadow->color.value = 0;
 	shadow->blur = 0;
 	shadow->spread = 0;
 	shadow->x = 0;
 	shadow->y = 0;
 }
 
-void pd_boxshadow_get_canvas_rect(const pd_boxshadow_t *shadow,
-			     const pd_rect_t *content_rect,
-			     pd_rect_t *canvas_rect)
+void pd_get_boxshadow_canvas_rect(const pd_boxshadow_t *shadow,
+				  const pd_rect_t *content_rect,
+				  pd_rect_t *canvas_rect)
 {
 	pd_rect_t shadow_rect;
 
 	shadow_rect.x = content_rect->x - SHADOW_WIDTH(shadow) + shadow->x;
 	shadow_rect.y = content_rect->y - SHADOW_WIDTH(shadow) + shadow->y;
-	shadow_rect.width = boxshadow_get_width(shadow, content_rect->width);
-	shadow_rect.height = boxshadow_get_height(shadow, content_rect->height);
+	shadow_rect.width = get_boxshadow_width(shadow, content_rect->width);
+	shadow_rect.height = get_boxshadow_height(shadow, content_rect->height);
 	canvas_rect->x = y_min(content_rect->x, shadow_rect.x);
 	canvas_rect->y = y_min(content_rect->y, shadow_rect.y);
 	canvas_rect->width = y_max(shadow_rect.x + shadow_rect.width,
-				 content_rect->x + content_rect->width) -
+				   content_rect->x + content_rect->width) -
 			     canvas_rect->x;
 	canvas_rect->height = y_max(shadow_rect.y + shadow_rect.height,
-				  content_rect->y + content_rect->height) -
+				    content_rect->y + content_rect->height) -
 			      canvas_rect->y;
 }
 
-static pd_bool boxshadow_paint_left_blur(boxshadow_rendering_context ctx)
+static pd_bool pd_paint_boxshadow_left_blur(pd_boxshadow_context_t *ctx)
 {
 	int x, y;
 	int right;
@@ -178,7 +176,7 @@ static pd_bool boxshadow_paint_left_blur(boxshadow_rendering_context ctx)
 	rect.height = ctx->shadow_box.height;
 	right = rect.x + rect.width;
 	gradient_init(&g, BLUR_WIDTH(ctx->shadow));
-	if (!pd_rect_get_overlay_rect(&ctx->paint->rect, &rect, &rect)) {
+	if (!pd_rect_overlap(&ctx->paint->rect, &rect, &rect)) {
 		return FALSE;
 	}
 	right -= rect.x;
@@ -187,11 +185,10 @@ static pd_bool boxshadow_paint_left_blur(boxshadow_rendering_context ctx)
 	paint_rect.x = rect.x - ctx->paint->rect.x;
 	paint_rect.y = rect.y - ctx->paint->rect.y;
 	pd_canvas_quote(&ref, &ctx->paint->canvas, &paint_rect);
-	pd_canvas_get_valid_rect(&ref, &paint_rect);
-	canvas = pd_canvas_get_quote(&ref);
+	pd_canvas_get_quote_rect(&ref, &paint_rect);
+	canvas = pd_canvas_get_quote_source(&ref);
 	for (y = 0; y < paint_rect.height; ++y) {
-		p = pd_canvas_get_pixel_pointer(canvas, paint_rect.x,
-					  paint_rect.y + y);
+		p = pd_canvas_pixel_at(canvas, paint_rect.x, paint_rect.y + y);
 		for (x = 0; x < paint_rect.width; ++x, ++p) {
 			color.alpha = gradient_compute(&g, right - x,
 						       ctx->shadow->color.a);
@@ -201,7 +198,7 @@ static pd_bool boxshadow_paint_left_blur(boxshadow_rendering_context ctx)
 	return TRUE;
 }
 
-static pd_bool boxshadow_paint_right_blur(boxshadow_rendering_context ctx)
+static pd_bool pd_paint_boxshadow_right_blur(pd_boxshadow_context_t *ctx)
 {
 	int x, y;
 	int left;
@@ -220,7 +217,7 @@ static pd_bool boxshadow_paint_right_blur(boxshadow_rendering_context ctx)
 	rect.y = ctx->shadow_box.y;
 	left = rect.x;
 	gradient_init(&g, BLUR_WIDTH(ctx->shadow));
-	if (!pd_rect_get_overlay_rect(&ctx->paint->rect, &rect, &rect)) {
+	if (!pd_rect_overlap(&ctx->paint->rect, &rect, &rect)) {
 		return FALSE;
 	}
 	left -= rect.x + 1;
@@ -229,11 +226,10 @@ static pd_bool boxshadow_paint_right_blur(boxshadow_rendering_context ctx)
 	paint_rect.x = rect.x - ctx->paint->rect.x;
 	paint_rect.y = rect.y - ctx->paint->rect.y;
 	pd_canvas_quote(&ref, &ctx->paint->canvas, &paint_rect);
-	pd_canvas_get_valid_rect(&ref, &paint_rect);
-	canvas = pd_canvas_get_quote(&ref);
+	pd_canvas_get_quote_rect(&ref, &paint_rect);
+	canvas = pd_canvas_get_quote_source(&ref);
 	for (y = 0; y < paint_rect.height; ++y) {
-		p = pd_canvas_get_pixel_pointer(canvas, paint_rect.x,
-					  paint_rect.y + y);
+		p = pd_canvas_pixel_at(canvas, paint_rect.x, paint_rect.y + y);
 		for (x = 0; x < paint_rect.width; ++x, ++p) {
 			color.alpha = gradient_compute(&g, x - left,
 						       ctx->shadow->color.a);
@@ -243,7 +239,7 @@ static pd_bool boxshadow_paint_right_blur(boxshadow_rendering_context ctx)
 	return TRUE;
 }
 
-static pd_bool boxshadow_paint_top_blur(boxshadow_rendering_context ctx)
+static pd_bool pd_paint_boxshadow_top_blur(pd_boxshadow_context_t *ctx)
 {
 	int x, y;
 	int bottom;
@@ -262,7 +258,7 @@ static pd_bool boxshadow_paint_top_blur(boxshadow_rendering_context ctx)
 	rect.y = ctx->shadow_box.y;
 	bottom = rect.y + rect.height;
 	gradient_init(&g, BLUR_WIDTH(ctx->shadow));
-	if (!pd_rect_get_overlay_rect(&ctx->paint->rect, &rect, &rect)) {
+	if (!pd_rect_overlap(&ctx->paint->rect, &rect, &rect)) {
 		return FALSE;
 	}
 	bottom -= rect.y;
@@ -271,11 +267,10 @@ static pd_bool boxshadow_paint_top_blur(boxshadow_rendering_context ctx)
 	paint_rect.x = rect.x - ctx->paint->rect.x;
 	paint_rect.y = rect.y - ctx->paint->rect.y;
 	pd_canvas_quote(&ref, &ctx->paint->canvas, &paint_rect);
-	pd_canvas_get_valid_rect(&ref, &paint_rect);
-	canvas = pd_canvas_get_quote(&ref);
+	pd_canvas_get_quote_rect(&ref, &paint_rect);
+	canvas = pd_canvas_get_quote_source(&ref);
 	for (y = 0; y < paint_rect.height; ++y) {
-		p = pd_canvas_get_pixel_pointer(canvas, paint_rect.x,
-					  paint_rect.y + y);
+		p = pd_canvas_pixel_at(canvas, paint_rect.x, paint_rect.y + y);
 		color.alpha =
 		    gradient_compute(&g, bottom - y, ctx->shadow->color.a);
 		for (x = 0; x < paint_rect.width; ++x, ++p) {
@@ -285,7 +280,7 @@ static pd_bool boxshadow_paint_top_blur(boxshadow_rendering_context ctx)
 	return TRUE;
 }
 
-static pd_bool boxshadow_paint_bottom_blur(boxshadow_rendering_context ctx)
+static pd_bool pd_paint_boxshadow_bottom_blur(pd_boxshadow_context_t *ctx)
 {
 	int x, y;
 	int top;
@@ -304,7 +299,7 @@ static pd_bool boxshadow_paint_bottom_blur(boxshadow_rendering_context ctx)
 	rect.y = ctx->shadow_box.y + ctx->shadow_box.height - rect.height;
 	top = rect.y;
 	gradient_init(&g, BLUR_WIDTH(ctx->shadow));
-	if (!pd_rect_get_overlay_rect(&ctx->paint->rect, &rect, &rect)) {
+	if (!pd_rect_overlap(&ctx->paint->rect, &rect, &rect)) {
 		return FALSE;
 	}
 	top -= rect.y + 1;
@@ -313,11 +308,10 @@ static pd_bool boxshadow_paint_bottom_blur(boxshadow_rendering_context ctx)
 	paint_rect.x = rect.x - ctx->paint->rect.x;
 	paint_rect.y = rect.y - ctx->paint->rect.y;
 	pd_canvas_quote(&ref, &ctx->paint->canvas, &paint_rect);
-	pd_canvas_get_valid_rect(&ref, &paint_rect);
-	canvas = pd_canvas_get_quote(&ref);
+	pd_canvas_get_quote_rect(&ref, &paint_rect);
+	canvas = pd_canvas_get_quote_source(&ref);
 	for (y = 0; y < paint_rect.height; ++y) {
-		p = pd_canvas_get_pixel_pointer(canvas, paint_rect.x,
-					  paint_rect.y + y);
+		p = pd_canvas_pixel_at(canvas, paint_rect.x, paint_rect.y + y);
 		color.a = gradient_compute(&g, y - top, ctx->shadow->color.a);
 		for (x = 0; x < paint_rect.width; ++x, ++p) {
 			*p = color;
@@ -326,10 +320,10 @@ static pd_bool boxshadow_paint_bottom_blur(boxshadow_rendering_context ctx)
 	return TRUE;
 }
 
-static pd_bool boxshadow_paint_circle_blur(boxshadow_rendering_context ctx,
-					   const pd_rect_t *circle_rect,
-					   double center_x, double center_y,
-					   int radius)
+static pd_bool pd_paint_boxshadow_circle_blur(pd_boxshadow_context_t *ctx,
+					      const pd_rect_t *circle_rect,
+					      double center_x, double center_y,
+					      int radius)
 {
 	double d;
 	double y2;
@@ -349,7 +343,7 @@ static pd_bool boxshadow_paint_circle_blur(boxshadow_rendering_context ctx,
 	pd_canvas_t *canvas;
 	pd_color_t *p;
 
-	if (!pd_rect_get_overlay_rect(&ctx->paint->rect, circle_rect, &rect)) {
+	if (!pd_rect_overlap(&ctx->paint->rect, circle_rect, &rect)) {
 		return FALSE;
 	}
 	color = ctx->shadow->color;
@@ -358,12 +352,12 @@ static pd_bool boxshadow_paint_circle_blur(boxshadow_rendering_context ctx,
 	rect.x -= ctx->paint->rect.x;
 	rect.y -= ctx->paint->rect.y;
 	pd_canvas_quote(&ref, &ctx->paint->canvas, &rect);
-	pd_canvas_get_valid_rect(&ref, &rect);
-	canvas = pd_canvas_get_quote(&ref);
+	pd_canvas_get_quote_rect(&ref, &rect);
+	canvas = pd_canvas_get_quote_source(&ref);
 	gradient_init(&g, BLUR_WIDTH(ctx->shadow));
 	for (y = 0; y < rect.height; ++y) {
 		y2 = POW2(ToGeoY(y, center_y));
-		p = pd_canvas_get_pixel_pointer(canvas, rect.x, rect.y + y);
+		p = pd_canvas_pixel_at(canvas, rect.x, rect.y + y);
 		for (x = 0; x < rect.width; ++x, ++p) {
 			d = y2 + POW2(ToGeoX(x, center_x));
 			if (r - inner_r < 0.1) {
@@ -396,7 +390,7 @@ static pd_bool boxshadow_paint_circle_blur(boxshadow_rendering_context ctx,
 	return TRUE;
 }
 
-static pd_bool boxshadow_paint_top_left_blur(boxshadow_rendering_context ctx)
+static pd_bool pd_paint_boxshadow_top_left_blur(pd_boxshadow_context_t *ctx)
 {
 	int radius;
 	pd_rect_t rect;
@@ -407,11 +401,11 @@ static pd_bool boxshadow_paint_top_left_blur(boxshadow_rendering_context ctx)
 	rect.height = rect.width;
 	rect.x = ctx->shadow_box.x;
 	rect.y = ctx->shadow_box.y;
-	return boxshadow_paint_circle_blur(ctx, &rect, rect.width, rect.height,
-					 radius);
+	return pd_paint_boxshadow_circle_blur(ctx, &rect, rect.width,
+					      rect.height, radius);
 }
 
-static pd_bool boxshadow_paint_top_right_blur(boxshadow_rendering_context ctx)
+static pd_bool pd_paint_boxshadow_top_right_blur(pd_boxshadow_context_t *ctx)
 {
 	int radius;
 	pd_rect_t rect;
@@ -422,10 +416,11 @@ static pd_bool boxshadow_paint_top_right_blur(boxshadow_rendering_context ctx)
 	rect.height = rect.width;
 	rect.x = ctx->shadow_box.x + ctx->shadow_box.width - rect.width;
 	rect.y = ctx->shadow_box.y;
-	return boxshadow_paint_circle_blur(ctx, &rect, 0, rect.height, radius);
+	return pd_paint_boxshadow_circle_blur(ctx, &rect, 0, rect.height,
+					      radius);
 }
 
-static pd_bool boxshadow_paint_bottom_left_blur(boxshadow_rendering_context ctx)
+static pd_bool pd_paint_boxshadow_bottom_left_blur(pd_boxshadow_context_t *ctx)
 {
 	int radius;
 	pd_rect_t rect;
@@ -436,10 +431,11 @@ static pd_bool boxshadow_paint_bottom_left_blur(boxshadow_rendering_context ctx)
 	rect.height = rect.width;
 	rect.x = ctx->shadow_box.x;
 	rect.y = ctx->shadow_box.y + ctx->shadow_box.height - rect.height;
-	return boxshadow_paint_circle_blur(ctx, &rect, rect.width, 0, radius);
+	return pd_paint_boxshadow_circle_blur(ctx, &rect, rect.width, 0,
+					      radius);
 }
 
-static pd_bool boxshadow_paint_bottom_right_blur(boxshadow_rendering_context ctx)
+static pd_bool pd_paint_boxshadow_bottom_right_blur(pd_boxshadow_context_t *ctx)
 {
 	int radius;
 	pd_rect_t rect;
@@ -450,11 +446,11 @@ static pd_bool boxshadow_paint_bottom_right_blur(boxshadow_rendering_context ctx
 	rect.height = rect.width;
 	rect.x = ctx->shadow_box.x + ctx->shadow_box.width - rect.width;
 	rect.y = ctx->shadow_box.y + ctx->shadow_box.height - rect.height;
-	return boxshadow_paint_circle_blur(ctx, &rect, 0, 0, radius);
+	return pd_paint_boxshadow_circle_blur(ctx, &rect, 0, 0, radius);
 }
 
 static int clear_pixels_of_circle(pd_canvas_t *canvas, double center_x,
-			       double center_y, int radius)
+				  double center_y, int radius)
 {
 	double r = CIRCLE_R(radius);
 	double outer_r2 = POW2(r + 1.0);
@@ -466,8 +462,8 @@ static int clear_pixels_of_circle(pd_canvas_t *canvas, double center_x,
 	pd_rect_t rect;
 	pd_color_t *p;
 
-	pd_canvas_get_valid_rect(canvas, &rect);
-	canvas = pd_canvas_get_quote(canvas);
+	pd_canvas_get_quote_rect(canvas, &rect);
+	canvas = pd_canvas_get_quote_source(canvas);
 	if (!pd_canvas_is_valid(canvas)) {
 		return -1;
 	}
@@ -475,7 +471,7 @@ static int clear_pixels_of_circle(pd_canvas_t *canvas, double center_x,
 	center_y -= 0.5;
 	for (yi = 0; yi < rect.height; ++yi) {
 		y2 = POW2(ToGeoY(yi, center_y));
-		p = pd_canvas_get_pixel_pointer(canvas, rect.x, rect.y + yi);
+		p = pd_canvas_pixel_at(canvas, rect.x, rect.y + yi);
 		for (xi = 0; xi < rect.width; ++xi, ++p) {
 			d = y2 + POW2(ToGeoX(xi, center_x));
 			if (d >= outer_r2) {
@@ -492,20 +488,20 @@ static int clear_pixels_of_circle(pd_canvas_t *canvas, double center_x,
 	return 0;
 }
 
-static void boxshadow_fill_rect(boxshadow_rendering_context ctx)
+static void pd_fill_boxshadow_rect(pd_boxshadow_context_t *ctx)
 {
 	pd_rect_t rect;
 
 	rect = ctx->shadow_box;
-	if (pd_rect_get_overlay_rect(&rect, &ctx->paint->rect, &rect)) {
+	if (pd_rect_overlap(&rect, &ctx->paint->rect, &rect)) {
 		rect.x -= ctx->paint->rect.x;
 		rect.y -= ctx->paint->rect.y;
-		pd_canvas_fill_rect(&ctx->paint->canvas, ctx->shadow->color, &rect,
-			       TRUE);
+		pd_canvas_fill_rect(&ctx->paint->canvas, ctx->shadow->color,
+				    rect);
 	}
 }
 
-static void boxshadow_clear_content_rect(boxshadow_rendering_context ctx)
+static void pd_clear_boxshadow_content_rect(pd_boxshadow_context_t *ctx)
 {
 	int r;
 	double center_x, center_y;
@@ -519,7 +515,7 @@ static void boxshadow_clear_content_rect(boxshadow_rendering_context ctx)
 	/* Initialize a queue for recording the area after the split content
 	 * area */
 	list_create(&rects);
-	RectList_Add(&rects, &ctx->content_box);
+	pd_rects_add(&rects, &ctx->content_box);
 
 	r = ctx->shadow->top_left_radius;
 	bound.x = ctx->content_box.x;
@@ -527,8 +523,8 @@ static void boxshadow_clear_content_rect(boxshadow_rendering_context ctx)
 	bound.width = r;
 	bound.height = r;
 	/* Delete the top left corner of the content area */
-	RectList_Delete(&rects, &bound);
-	if (pd_rect_get_overlay_rect(&ctx->paint->rect, &bound, &rect)) {
+	pd_rects_remove(&rects, &bound);
+	if (pd_rect_overlap(&ctx->paint->rect, &bound, &rect)) {
 		center_x = bound.x - rect.x + r;
 		center_y = bound.y - rect.y + r;
 		rect.x -= ctx->paint->rect.x;
@@ -543,8 +539,8 @@ static void boxshadow_clear_content_rect(boxshadow_rendering_context ctx)
 	bound.width = r;
 	bound.height = r;
 	/* Delete the top right corner of the content area */
-	RectList_Delete(&rects, &bound);
-	if (pd_rect_get_overlay_rect(&ctx->paint->rect, &bound, &rect)) {
+	pd_rects_remove(&rects, &bound);
+	if (pd_rect_overlap(&ctx->paint->rect, &bound, &rect)) {
 		center_x = bound.x - rect.x;
 		center_y = bound.y - rect.y + r;
 		rect.x -= ctx->paint->rect.x;
@@ -559,8 +555,8 @@ static void boxshadow_clear_content_rect(boxshadow_rendering_context ctx)
 	bound.width = r;
 	bound.height = r;
 	/* Delete the bottom left corner of the content area */
-	RectList_Delete(&rects, &bound);
-	if (pd_rect_get_overlay_rect(&ctx->paint->rect, &bound, &rect)) {
+	pd_rects_remove(&rects, &bound);
+	if (pd_rect_overlap(&ctx->paint->rect, &bound, &rect)) {
 		center_x = bound.x - rect.x + r;
 		center_y = bound.y - rect.y;
 		rect.x -= ctx->paint->rect.x;
@@ -575,8 +571,8 @@ static void boxshadow_clear_content_rect(boxshadow_rendering_context ctx)
 	bound.width = r;
 	bound.height = r;
 	/* Delete the bottom right corner of the content area */
-	RectList_Delete(&rects, &bound);
-	if (pd_rect_get_overlay_rect(&ctx->paint->rect, &bound, &rect)) {
+	pd_rects_remove(&rects, &bound);
+	if (pd_rect_overlap(&ctx->paint->rect, &bound, &rect)) {
 		center_x = bound.x - rect.x;
 		center_y = bound.y - rect.y;
 		rect.x -= ctx->paint->rect.x;
@@ -587,27 +583,26 @@ static void boxshadow_clear_content_rect(boxshadow_rendering_context ctx)
 
 	/* Clear pixels in the remaining areas of the content area */
 	for (list_each(node, &rects)) {
-		if (pd_rect_get_overlay_rect(&ctx->paint->rect, node->data,
-					    &rect)) {
+		if (pd_rect_overlap(&ctx->paint->rect, node->data, &rect)) {
 			rect.x -= ctx->paint->rect.x;
 			rect.y -= ctx->paint->rect.y;
-			pd_canvas_fill_rect(&ctx->paint->canvas, ARGB(0, 0, 0, 0),
-				       &rect, TRUE);
+			pd_canvas_fill_rect(&ctx->paint->canvas,
+					    ARGB(0, 0, 0, 0), rect);
 		}
 	}
-	RectList_Clear(&rects);
+	pd_rects_clear(&rects);
 }
 
-int pd_boxshadow_paint(const pd_boxshadow_t *shadow, const pd_rect_t *box,
-		    int content_width, int content_height,
-		    pd_paint_context_t* paint)
+int pd_paint_boxshadow(pd_context_t *ctx, const pd_boxshadow_t *shadow,
+		       const pd_rect_t *box, int content_width,
+		       int content_height)
 {
-	pd_paint_context_t shadow_paint;
-	boxshadow_rendering_context_rec_t ctx;
+	pd_context_t tmp;
+	pd_boxshadow_context_t sd_ctx;
 
 	/* 判断容器尺寸是否低于阴影占用的最小尺寸 */
-	if (box->width < boxshadow_get_width(shadow, 0) ||
-	    box->height < boxshadow_get_height(shadow, 0)) {
+	if (box->width < get_boxshadow_width(shadow, 0) ||
+	    box->height < get_boxshadow_height(shadow, 0)) {
 		return -1;
 	}
 	if (SHADOW_WIDTH(shadow) == 0 && shadow->x == 0 && shadow->y == 0) {
@@ -615,42 +610,44 @@ int pd_boxshadow_paint(const pd_boxshadow_t *shadow, const pd_rect_t *box,
 	}
 
 	/* Initialize a rendering context for render shadow */
-	ctx.box = box;
-	ctx.shadow = shadow;
-	ctx.max_radius =
+	sd_ctx.box = box;
+	sd_ctx.shadow = shadow;
+	sd_ctx.max_radius =
 	    y_min(content_width, content_height) / 2 + SHADOW_WIDTH(shadow);
-	ctx.shadow_box.x = boxshadow_get_x(shadow);
-	ctx.shadow_box.y = boxshadow_get_y(shadow);
-	ctx.shadow_box.width = boxshadow_get_width(shadow, content_width);
-	ctx.shadow_box.height = boxshadow_get_width(shadow, content_height);
-	ctx.content_box.x = boxshadow_get_box_x(shadow);
-	ctx.content_box.y = boxshadow_get_box_y(shadow);
-	ctx.content_box.width = content_width;
-	ctx.content_box.height = content_height;
+	sd_ctx.shadow_box.x = get_boxshadow_x(shadow);
+	sd_ctx.shadow_box.y = get_boxshadow_y(shadow);
+	sd_ctx.shadow_box.width = get_boxshadow_width(shadow, content_width);
+	sd_ctx.shadow_box.height = get_boxshadow_width(shadow, content_height);
+	sd_ctx.content_box.x = get_boxshadow_box_x(shadow);
+	sd_ctx.content_box.y = get_boxshadow_box_y(shadow);
+	sd_ctx.content_box.width = content_width;
+	sd_ctx.content_box.height = content_height;
 
 	/* Create a paint context for render shadow */
-	ctx.paint = &shadow_paint;
-	pd_canvas_init(&shadow_paint.canvas);
-	shadow_paint.rect = paint->rect;
-	shadow_paint.with_alpha = TRUE;
-	shadow_paint.canvas.color_type = PD_COLOR_TYPE_ARGB;
-	pd_canvas_create(&ctx.paint->canvas, paint->rect.width, paint->rect.height);
+	sd_ctx.paint = &tmp;
+	pd_canvas_init(&tmp.canvas);
+	tmp.rect = ctx->rect;
+	tmp.with_alpha = TRUE;
+	tmp.canvas.color_type = PD_COLOR_TYPE_ARGB;
+	pd_canvas_create(&sd_ctx.paint->canvas, ctx->rect.width,
+			 ctx->rect.height);
 
 	/* Render box shadow */
-	boxshadow_fill_rect(&ctx);
-	boxshadow_paint_left_blur(&ctx);
-	boxshadow_paint_right_blur(&ctx);
-	boxshadow_paint_top_blur(&ctx);
-	boxshadow_paint_bottom_blur(&ctx);
-	boxshadow_paint_top_left_blur(&ctx);
-	boxshadow_paint_top_right_blur(&ctx);
-	boxshadow_paint_bottom_left_blur(&ctx);
-	boxshadow_paint_bottom_right_blur(&ctx);
+	pd_fill_boxshadow_rect(&sd_ctx);
+	pd_paint_boxshadow_left_blur(&sd_ctx);
+	pd_paint_boxshadow_right_blur(&sd_ctx);
+	pd_paint_boxshadow_top_blur(&sd_ctx);
+	pd_paint_boxshadow_bottom_blur(&sd_ctx);
+	pd_paint_boxshadow_top_left_blur(&sd_ctx);
+	pd_paint_boxshadow_top_right_blur(&sd_ctx);
+	pd_paint_boxshadow_bottom_left_blur(&sd_ctx);
+	pd_paint_boxshadow_bottom_right_blur(&sd_ctx);
 	/* Clear pixels that overlap the content area */
-	boxshadow_clear_content_rect(&ctx);
+	pd_clear_boxshadow_content_rect(&sd_ctx);
 
 	/* Render the rendered shadow bitmap to the canvas */
-	pd_canvas_mix(&paint->canvas, &ctx.paint->canvas, 0, 0, paint->with_alpha);
-	pd_canvas_free(&ctx.paint->canvas);
+	pd_canvas_mix(&ctx->canvas, &sd_ctx.paint->canvas, 0, 0,
+		      ctx->with_alpha);
+	pd_canvas_destroy(&sd_ctx.paint->canvas);
 	return 0;
 }

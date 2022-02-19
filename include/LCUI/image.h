@@ -33,7 +33,7 @@
 
 #include <setjmp.h>
 #include <LCUI/header.h>
-#include <LCUI/graph.h>
+#include <LCUI/pandagl.h>
 
 LCUI_BEGIN_HEADER
 
