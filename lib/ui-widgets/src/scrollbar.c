@@ -73,7 +73,7 @@ typedef struct ui_scrollbar_t_ {
 
 static ui_widget_prototype_t *ui_scrollbar_proto;
 
-static const char *ui_scrollbar_css = CodeToString(
+static const char *ui_scrollbar_css = css_string(
 
 scrollbar {
 	display: flex;
@@ -449,7 +449,7 @@ static void ui_scrollbar_on_container_wheel(ui_widget_t* container,
 static void ui_scrollbar_on_container_touch(ui_widget_t* container,
 					    ui_event_t* e, void* arg)
 {
-	uint_t time_delta;
+	unsigned time_delta;
 	float pos, distance;
 	unsigned i;
 
@@ -495,7 +495,7 @@ static void ui_scrollbar_on_container_touch(ui_widget_t* container,
 		break;
 	case UI_EVENT_TOUCHUP:
 		ui_widget_release_touch_capture(container, -1);
-		time_delta = (uint_t)get_time_delta(scrollbar->timestamp);
+		time_delta = (unsigned)get_time_delta(scrollbar->timestamp);
 		if (scrollbar->is_dragging && time_delta < 50) {
 			ui_scrollbar_start_scrolling(w);
 		}

@@ -31,8 +31,7 @@
 #ifndef LIB_PANDAGL_INCLUDE_PANDAGL_BORDER_H
 #define LIB_PANDAGL_INCLUDE_PANDAGL_BORDER_H
 
-#include <LCUI/header.h>
-#include <LCUI/types.h>
+#include <LCUI/def.h>
 #include "def.h"
 
 LCUI_BEGIN_HEADER

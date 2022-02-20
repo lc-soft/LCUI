@@ -94,7 +94,7 @@ typedef struct textblock_t {
 
 static ui_widget_prototype_t* ui_textedit_proto;
 
-static const char *ui_textedit_css = CodeToString(
+static const char *ui_textedit_css = css_string(
 
 textedit {
 	min-width: 124px;
@@ -809,7 +809,7 @@ static void ui_textedit_on_keydown(ui_widget_t* widget, ui_event_t* e,
 static void ui_textedit_on_textinput(ui_widget_t* widget, ui_event_t* e,
 				     void* arg)
 {
-	uint_t i, j, k;
+	unsigned i, j, k;
 	wchar_t ch, *text, excludes[8] = L"\b\r\t\x1b";
 	ui_textedit_t* edit = ui_widget_get_data(widget, ui_textedit_proto);
 

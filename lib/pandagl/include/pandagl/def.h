@@ -2,7 +2,8 @@
 #define LIB_PANDAGL_INCLUDE_PANDAGL_DEF_H
 
 #include <stdint.h>
-#include <LCUI/types.h>
+#include <stddef.h>
+#include <LCUI/def.h>
 
 typedef uchar_t pd_bool;
 

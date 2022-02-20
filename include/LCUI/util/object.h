@@ -31,7 +31,7 @@
 #define LCUI_OBJECT_H
 
 #include <wchar.h>
-#include <LCUI/header.h>
+#include <LCUI/def.h>
 #include <LCUI/util/keywords.h>
 #include <LCUI/util/list.h>
 

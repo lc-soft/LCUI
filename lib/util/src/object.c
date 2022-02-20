@@ -32,7 +32,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <LCUI/header.h>
+#include <LCUI/def.h>
 #include <LCUI/util/object.h>
 #include <yutil.h>
 

@@ -32,8 +32,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <LCUI/header.h>
-#include <LCUI/types.h>
 #include <LCUI/pandagl.h>
 #include <LCUI/image.h>
 

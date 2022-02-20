@@ -32,7 +32,6 @@
 #define LCUI_IMAGE_H
 
 #include <setjmp.h>
-#include <LCUI/header.h>
 #include <LCUI/pandagl.h>
 
 LCUI_BEGIN_HEADER

@@ -43,6 +43,7 @@
  */
 
 #include "../internal.h"
+
 #if defined(LCUI_PLATFORM_LINUX) && defined(USE_LIBX11)
 #include <LCUI/thread.h>
 

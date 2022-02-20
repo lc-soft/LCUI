@@ -30,8 +30,7 @@
 
 #include <stdlib.h>
 #include <wctype.h>
-#include <LCUI/header.h>
-#include <LCUI/types.h>
+#include <LCUI/def.h>
 #include <LCUI/util.h>
 #include <LCUI/pandagl.h>
 #include <LCUI/font.h>
