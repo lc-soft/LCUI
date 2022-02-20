@@ -78,17 +78,14 @@ typedef struct pd_context_t {
 } pd_context_t;
 
 typedef struct pd_background_t {
-	pd_canvas_t *image; /**< 背景图 */
-	pd_color_t color;  /**< 背景色 */
-	struct {
-		pd_bool x, y;
-	} repeat; /**< 背景图是否重复 */
-	struct {
-		int x, y;
-	} position;
-	struct {
-		int width, height;
-	} size;
+	pd_canvas_t *image;
+	pd_color_t color;
+	pd_bool repeat_x;
+	pd_bool repeat_y;
+	int x;
+	int y;
+	int width;
+	int height;
 } pd_background_t;
 
 typedef struct pd_boxshadow_t {

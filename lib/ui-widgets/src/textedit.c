@@ -47,12 +47,11 @@
 enum task_type_t { TASK_SET_TEXT, TASK_UPDATE, TASK_TOTAL };
 
 typedef struct ui_textedit_t {
-	ui_font_style_t style;            /**< 字体样式 */
+	ui_text_style_t style;            /**< 字体样式 */
 	LCUI_TextLayer layer_source;      /**< 实际文本层 */
 	LCUI_TextLayer layer_mask;        /**< 屏蔽后的文本层 */
 	LCUI_TextLayer layer_placeholder; /**< 占位符的文本层 */
 	LCUI_TextLayer layer;             /**< 当前使用的文本层 */
-	LCUI_ObjectWatcher value_watcher;
 	ui_widget_t* scrollbars[2];     /**< 两个滚动条 */
 	ui_widget_t* caret;             /**< 文本插入符 */
 	LCUI_BOOL is_read_only;         /**< 是否只读 */
@@ -102,7 +101,6 @@ textedit {
 	background-color: #fff;
 	border: 1px solid #eee;
 	padding: 5px 10px;
-	focusable: true;
 	display: inline-block;
 }
 textedit:focus {
@@ -133,7 +131,7 @@ static void ui_textedit_update_caret(ui_widget_t* widget)
 	int row = edit->layer->insert_y;
 	int offset_x, offset_y;
 	float height, width;
-	float scale = ui_get_scale();
+	float scale = ui_metrics.scale;
 	float x, y, caret_x = 0, caret_y = 0;
 
 	if (!edit->is_placeholder_shown) {
@@ -150,7 +148,8 @@ static void ui_textedit_update_caret(ui_widget_t* widget)
 	y = caret_y + offset_y;
 	width = edit->layer->width / scale;
 	height = TextLayer_GetRowHeight(edit->layer, row) / scale;
-	ui_widget_set_style(edit->caret, css_key_height, height, px);
+	ui_widget_set_style_unit_value(edit->caret, css_key_height, height,
+				       CSS_UNIT_PX);
 	/* Keep the caret in the visible area */
 	if (x < 0) {
 		x = 0;
@@ -158,18 +157,18 @@ static void ui_textedit_update_caret(ui_widget_t* widget)
 	if (y < 0) {
 		y = 0;
 	}
-	if (x + edit->caret->width > widget->box.content.width) {
-		x = widget->box.content.width - edit->caret->width;
+	if (x + edit->caret->border_box.width > widget->content_box.width) {
+		x = widget->content_box.width - edit->caret->border_box.width;
 	}
-	if (y + edit->caret->height > widget->box.content.height) {
-		y = widget->box.content.height - edit->caret->height;
+	if (y + edit->caret->border_box.height > widget->content_box.height) {
+		y = widget->content_box.height - edit->caret->border_box.height;
 	}
 	/* Keep current line text in the visible area */
-	if (width < widget->box.content.width) {
+	if (width < widget->content_box.width) {
 		x = caret_x;
-	} else if (edit->caret->width + offset_x + width <
-		   widget->box.content.width) {
-		x = caret_x + widget->box.content.width -
+	} else if (edit->caret->border_box.width + offset_x + width <
+		   widget->content_box.width) {
+		x = caret_x + widget->content_box.width -
 		    (edit->layer->width / scale);
 	}
 	offset_x = y_iround((x - caret_x) * scale);
@@ -178,8 +177,8 @@ static void ui_textedit_update_caret(ui_widget_t* widget)
 		edit->tasks[TASK_UPDATE] = TRUE;
 		ui_widget_add_task(widget, UI_TASK_USER);
 	}
-	x += widget->padding.left;
-	y += widget->padding.top;
+	x += widget->computed_style.padding_left;
+	y += widget->computed_style.padding_top;
 	ui_widget_move(edit->caret, x, y);
 	ui_textcaret_refresh(edit->caret);
 	if (edit->password_char) {
@@ -342,7 +341,7 @@ static void TextEdit_UpdateTextLayer(ui_widget_t* w)
 	list_node_t* node;
 
 	list_create(&rects);
-	scale = ui_get_scale();
+	scale = ui_metrics.scale;
 	edit = ui_widget_get_data(w, ui_textedit_proto);
 	TextStyle_Copy(&style, &edit->layer_source->text_default_style);
 	if (edit->password_char) {
@@ -407,7 +406,7 @@ static void ui_textedit_on_task(ui_widget_t* widget, int task)
 
 static void ui_textedit_on_resize(ui_widget_t* w, float width, float height)
 {
-	float scale = ui_get_scale();
+	float scale = ui_metrics.scale;
 
 	list_t rects;
 	list_node_t* node;
@@ -434,13 +433,13 @@ static void ui_textedit_on_auto_size(ui_widget_t* w, float* width,
 {
 	int i, n;
 	int max_width = 0, max_height = 0;
-	float scale = ui_get_scale();
+	float scale = ui_metrics.scale;
 
 	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
 
 	switch (rule) {
 	case UI_LAYOUT_RULE_FIXED_WIDTH:
-		max_width = (int)(scale * w->box.content.width);
+		max_width = ui_compute(w->content_box.width);
 		if (edit->is_multiline_mode) {
 			n = y_max(TextLayer_GetRowTotal(edit->layer), 6);
 			for (max_height = 0, i = 0; i < n; ++i) {
@@ -452,15 +451,15 @@ static void ui_textedit_on_auto_size(ui_widget_t* w, float* width,
 		}
 		break;
 	case UI_LAYOUT_RULE_FIXED_HEIGHT:
-		max_width = (int)(scale * DEFAULT_WIDTH);
-		max_height = (int)(scale * w->box.content.height);
+		max_width = ui_compute(DEFAULT_WIDTH);
+		max_height = ui_compute(w->content_box.height);
 		break;
 	case UI_LAYOUT_RULE_FIXED:
-		max_width = (int)(scale * w->box.content.width);
-		max_height = (int)(scale * w->box.content.height);
+		max_width = ui_compute(w->content_box.width);
+		max_height = ui_compute(w->content_box.height);
 		break;
 	default:
-		max_width = (int)(scale * DEFAULT_WIDTH);
+		max_width = ui_compute(DEFAULT_WIDTH);
 		if (edit->is_multiline_mode) {
 			n = y_max(TextLayer_GetRowTotal(edit->layer), 6);
 			for (max_height = 0, i = 0; i < n; ++i) {
@@ -490,11 +489,11 @@ void ui_textedit_enable_style_tag(ui_widget_t* widget, LCUI_BOOL enable)
 void ui_textedit_enable_multiline(ui_widget_t* w, LCUI_BOOL enable)
 {
 	if (enable) {
-		ui_widget_set_style(w, css_key_white_space, CSS_KEYWORD_AUTO,
-				    keyword);
+		ui_widget_set_style_keyword_value(w, css_key_white_space,
+						  CSS_KEYWORD_AUTO);
 	} else {
-		ui_widget_set_style(w, css_key_white_space, CSS_KEYWORD_NOWRAP,
-				    keyword);
+		ui_widget_set_style_keyword_value(w, css_key_white_space,
+						  CSS_KEYWORD_NOWRAP);
 	}
 }
 
@@ -534,22 +533,6 @@ size_t ui_textedit_get_text_length(ui_widget_t* w)
 {
 	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
 	return edit->layer_source->length;
-}
-
-LCUI_Object ui_textedit_get_property(ui_widget_t* w, const char* name)
-{
-	size_t len = ui_textedit_get_text_length(w);
-	size_t size = (len + 1) * sizeof(wchar_t);
-	wchar_t* wcs = malloc(size);
-	LCUI_Object prop;
-
-	if (strcmp(name, "value") != 0) {
-		return NULL;
-	}
-	ui_textedit_get_text_w(w, 0, len, wcs);
-	prop = WString_New(wcs);
-	free(wcs);
-	return prop;
 }
 
 int ui_textedit_set_text_w(ui_widget_t* w, const wchar_t* wstr)
@@ -790,7 +773,9 @@ static void ui_textedit_on_keydown(ui_widget_t* widget, ui_event_t* e,
 	char key = e->key.code;
 	// CTRL+V
 	if (key == KEY_V && e->key.ctrl_key) {
-		clipboard_request_text(ui_textedit_on_clipboard_ready, widget);
+		clipboard_request_text(
+		    (clipboard_callback_t)ui_textedit_on_clipboard_ready,
+		    widget);
 	}
 	// CTRL+C
 	if (key == KEY_C && e->key.ctrl_key) {
@@ -859,39 +844,37 @@ static void ui_textedit_on_textinput(ui_widget_t* widget, ui_event_t* e,
 
 static void ui_textedit_on_mousemove(ui_widget_t* w, ui_event_t* e, void* arg)
 {
-	int x, y;
-	float scale, offset_x, offset_y;
+	float offset_x, offset_y;
 	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
 
 	if (edit->is_placeholder_shown) {
 		ui_textedit_update_caret(w);
 		return;
 	}
-	scale = ui_get_scale();
 	ui_widget_get_offset(w, NULL, &offset_x, &offset_y);
-	x = y_iround((e->mouse.x - offset_x - w->padding.left) * scale);
-	y = y_iround((e->mouse.y - offset_y - w->padding.top) * scale);
-	TextLayer_SetCaretPosByPixelPos(edit->layer, x, y);
+	TextLayer_SetCaretPosByPixelPos(
+	    edit->layer,
+	    ui_compute(e->mouse.x - offset_x - w->computed_style.padding_left),
+	    ui_compute(e->mouse.y - offset_y - w->computed_style.padding_top));
 	ui_textedit_update_caret(w);
 }
 
 static void ui_textedit_on_mouseup(ui_widget_t* w, ui_event_t* e, void* arg)
 {
 	ui_widget_release_mouse_capture(w);
-	ui_widget_off(w, "mousemove", ui_textedit_on_mousemove);
+	ui_widget_off(w, "mousemove", ui_textedit_on_mousemove, w);
 }
 
 static void ui_textedit_on_mousedown(ui_widget_t* w, ui_event_t* e, void* arg)
 {
-	int x, y;
 	float offset_x, offset_y;
-	float scale = ui_get_scale();
 	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
 
 	ui_widget_get_offset(w, NULL, &offset_x, &offset_y);
-	x = y_iround((e->mouse.x - offset_x - w->padding.left) * scale);
-	y = y_iround((e->mouse.y - offset_y - w->padding.top) * scale);
-	TextLayer_SetCaretPosByPixelPos(edit->layer, x, y);
+	TextLayer_SetCaretPosByPixelPos(
+	    edit->layer,
+	    ui_compute(e->mouse.x - offset_x - w->computed_style.padding_left),
+	    ui_compute(e->mouse.y - offset_y - w->computed_style.padding_top));
 	ui_textedit_update_caret(w);
 	ui_widget_set_mouse_capture(w);
 	ui_widget_on(w, "mousemove", ui_textedit_on_mousemove, NULL, NULL);
@@ -924,10 +907,9 @@ static void ui_textedit_on_init(ui_widget_t* w)
 	edit->layer_source = TextLayer_New();
 	edit->layer_placeholder = TextLayer_New();
 	edit->layer = edit->layer_source;
-	edit->value_watcher = NULL;
 	edit->text_block_size = TEXTBLOCK_SIZE;
 	edit->caret = ui_create_widget("textcaret");
-	w->computed_style.focusable = TRUE;
+	w->tab_index = 0;
 	memset(edit->tasks, 0, sizeof(edit->tasks));
 	list_create(&edit->text_blocks);
 	StyleTags_Init(&edit->text_tags);
@@ -961,10 +943,6 @@ static void ui_textedit_on_destroy(ui_widget_t* widget)
 	thread_mutex_destroy(&edit->mutex);
 	list_destroy(&edit->text_blocks,
 		     (list_item_destructor_t)textblock_destroy);
-	if (edit->value_watcher) {
-		ObjectWatcher_Delete(edit->value_watcher);
-		edit->value_watcher = NULL;
-	}
 }
 
 static void ui_textedit_on_paint(ui_widget_t* w, pd_context_t* paint,
@@ -999,12 +977,12 @@ static void ui_textedit_on_update_style(ui_widget_t* w)
 
 	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
 	LCUI_TextStyleRec text_style;
-	ui_font_style_t style;
+	ui_text_style_t style;
 	LCUI_TextLayer layers[3] = { edit->layer_mask, edit->layer_placeholder,
 				     edit->layer_source };
 
 	ui_font_style_init(&style);
-	ui_font_style_compute(&style, w->style);
+	ui_compute_text_style(&style, &w->computed_style);
 	if (ui_font_style_is_equal(&style, &edit->style)) {
 		ui_font_style_destroy(&style);
 		return;
@@ -1013,8 +991,8 @@ static void ui_textedit_on_update_style(ui_widget_t* w)
 	for (i = 0; i < 3; ++i) {
 		TextLayer_SetTextAlign(layers[i], style.text_align);
 		TextLayer_SetLineHeight(layers[i], style.line_height);
-		TextLayer_SetAutoWrap(layers[i],
-				      style.white_space != CSS_KEYWORD_NOWRAP);
+		TextLayer_SetAutoWrap(
+		    layers[i], style.white_space != CSS_WHITE_SPACE_NOWRAP);
 		TextLayer_SetTextStyle(layers[i], &text_style);
 	}
 	ui_font_style_destroy(&edit->style);
@@ -1022,37 +1000,6 @@ static void ui_textedit_on_update_style(ui_widget_t* w)
 	edit->style = style;
 	edit->tasks[TASK_UPDATE] = TRUE;
 	ui_widget_add_task(w, UI_TASK_USER);
-}
-
-static void ui_textedit_on_value_changed(LCUI_Object value, void* arg)
-{
-	ui_widget_t* w = arg;
-
-	if (value->type == LCUI_StringObject) {
-		ui_textedit_set_text(w, value->value.string);
-	} else if (value->type == LCUI_WStringObject) {
-		ui_textedit_set_text_w(w, value->value.wstring);
-	}
-}
-
-void ui_textedit_on_bind_prop(ui_widget_t* w, const char* name,
-			      LCUI_Object value)
-{
-	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
-
-	if (strcmp(name, "value") == 0) {
-		if (edit->value_watcher) {
-			ObjectWatcher_Delete(edit->value_watcher);
-			edit->value_watcher = NULL;
-		}
-		if (value) {
-			edit->value_watcher = Object_Watch(
-			    value, ui_textedit_on_value_changed, w);
-			ui_textedit_on_value_changed(value, w);
-		} else {
-			ui_textedit_clear_text(w);
-		}
-	}
 }
 
 void ui_register_textedit(void)
@@ -1063,7 +1010,6 @@ void ui_register_textedit(void)
 	ui_textedit_proto->destroy = ui_textedit_on_destroy;
 	ui_textedit_proto->settext = ui_textedit_on_parse_text;
 	ui_textedit_proto->setattr = ui_textedit_on_set_attr;
-	ui_textedit_proto->bindprop = ui_textedit_on_bind_prop;
 	ui_textedit_proto->autosize = ui_textedit_on_auto_size;
 	ui_textedit_proto->resize = ui_textedit_on_resize;
 	ui_textedit_proto->runtask = ui_textedit_on_task;

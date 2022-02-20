@@ -1,0 +1,28 @@
+* {
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.container {
+  max-width: 800px;
+  margin: 24px auto;
+}
+
+.button {
+  padding: 4px 8px;
+  min-width: 80px;
+  text-align: center;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  background-color: #fff;
+  content: "submit";
+}
+
+.button:focus {
+  box-shadow: 0 0 0 2px rgba(0, 0, 200, 0.5);
+}
+
+.primary.button {
+  color: #fff;
+  background: #0050c9;
+}

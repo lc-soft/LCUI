@@ -36,7 +36,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef USE_LIBX11
+#ifdef HAVE_LIBX11
 
 static LCUI_BOOL x11_ime_process_key(int key, LCUI_BOOL pressed)
 {
@@ -70,7 +70,7 @@ static LCUI_BOOL x11_ime_close(void)
 
 int ime_add_linux(void)
 {
-#ifdef USE_LIBX11
+#ifdef HAVE_LIBX11
 	ime_handler_t handler;
 	if (app_get_id() == APP_ID_LINUX_X11) {
 		handler.prockey = x11_ime_process_key;

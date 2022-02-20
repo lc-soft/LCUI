@@ -77,7 +77,7 @@ LCUI_API int TextStyle_SetStyle(LCUI_TextStyle ts, font_style_t style);
  * @param[in][out] ts 字体样式数据
  * @param[in] str 字体名称，如果有多个名称则用逗号分隔
  */
-LCUI_API int TextStyle_SetFont(LCUI_TextStyle ts, const char *str);
+LCUI_API int TextStyle_SetFont(LCUI_TextStyle ts, const char *const *names);
 
 LCUI_API void TextStyle_SetSize(LCUI_TextStyle ts, int pixel_size);
 

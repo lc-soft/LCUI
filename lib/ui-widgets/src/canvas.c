@@ -44,7 +44,7 @@ static struct {
 
 static void ui_canvas_on_resize(ui_widget_t *w, float width, float height)
 {
-	float scale = ui_get_scale();
+	float scale = ui_metrics.scale;
 
 	pd_canvas_t buffer;
 	ui_canvas_t *canvas = ui_widget_get_data(w, ui_canvas.proto);
@@ -161,7 +161,7 @@ ui_canvas_context_t *ui_canvas_get_context(ui_widget_t *w)
 	ctx->width = ctx->buffer.width;
 	ctx->height = ctx->buffer.height;
 	ctx->fill_color = RGB(0, 0, 0);
-	ctx->scale = ui_get_scale();
+	ctx->scale = ui_metrics.scale;
 	ctx->clear_rect = ui_canvas_context_clear_rect;
 	ctx->fill_rect = ui_canvas_context_fill_rect;
 	ctx->release = ui_canvas_context_release;

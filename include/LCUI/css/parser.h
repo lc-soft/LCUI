@@ -36,12 +36,6 @@
 
 LCUI_BEGIN_HEADER
 
-#define CASE_WHITE_SPACE \
-	case ' ':        \
-	case '\n':       \
-	case '\r':       \
-	case '\t'
-
 typedef enum css_parser_target_t {
 	CSS_PARSER_TARGET_NONE,      /**< 无 */
 	CSS_PARSER_TARGET_RULE_NAME, /**< 规则名称 */
@@ -73,18 +67,12 @@ typedef struct css_rule_parser_t {
 	css_parser_method_t parse;
 } css_rule_parser_t;
 
-typedef struct css_property_parser_t {
-	int key; /**< 标识，在解析数据时可以使用它访问样式表中的自定义属性 */
-	char *name; /**< 名称，对应 CSS 样式属性名称 */
-	css_property_parser_method_t parse;
-} css_property_parser_t;
-
 typedef struct css_style_parser_t {
 	char *dirname; /**< 当前所在的目录 */
 	char *space;   /**< 样式记录所属的空间 */
-	int prop_key;
+	char *property;
 
-	void (*style_handler)(int, css_unit_value_t *, void *);
+	void (*style_handler)(int, css_style_value_t *, void *);
 	void *style_handler_arg;
 
 	list_t selectors;        /**< 当前匹配到的选择器列表 */
@@ -110,7 +98,6 @@ struct css_parser_t {
 	css_parser_target_t target;
 	css_comment_parser_t comment_parser;
 	css_style_parser_t style_parser;
-	css_property_parser_t *prop_parser;
 	css_rule_type_t rule;
 	css_rule_parser_t rule_parsers[CSS_RULE_TOTAL_NUM];
 };
@@ -121,8 +108,6 @@ INLINE void css_parser_get_char(css_parser_t *parser)
 {
 	parser->buffer[parser->pos++] = *(parser->cur);
 }
-
-LCUI_API css_property_parser_t *css_get_property_parser(const char *name);
 
 LCUI_API css_parser_t *css_parser_create(size_t buffer_size, const char *space);
 
@@ -136,10 +121,6 @@ LCUI_API size_t css_parser_parse(css_parser_t *parser, const char *str);
 
 LCUI_API int css_parser_begin_parse_comment(css_parser_t *parser);
 
-LCUI_API int css_register_property_parser(int key, const char *name,
-					  css_property_parser_method_t parse);
-
-
 // css style parser
 
 LCUI_API void css_style_parser_init(css_style_parser_t *parser,
@@ -147,11 +128,7 @@ LCUI_API void css_style_parser_init(css_style_parser_t *parser,
 
 LCUI_API void css_style_parser_destroy(css_style_parser_t *parser);
 
-LCUI_API void css_style_parser_set_property(css_style_parser_t *ctx, int key,
-					    css_unit_value_t *s);
-
 LCUI_API void css_style_parser_commit(css_style_parser_t *parser);
-
 
 // css property parser
 
@@ -159,16 +136,14 @@ LCUI_API void css_init_preset_property_parsers(void);
 
 LCUI_API void css_destroy_preset_property_parsers(void);
 
-
 // css font face parser
 
-LCUI_API void css_font_face_parser_on_load(css_parser_t *ctx,
-				       void(*func)(const css_font_face_t *));
+LCUI_API void css_font_face_parser_on_load(
+    css_parser_t *ctx, void (*func)(const css_font_face_t *));
 
 LCUI_API int css_font_face_parser_init(css_parser_t *ctx);
 
 LCUI_API void css_font_face_parser_destroy(css_parser_t *ctx);
-
 
 LCUI_END_HEADER
 

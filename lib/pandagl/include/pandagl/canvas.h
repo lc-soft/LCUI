@@ -96,6 +96,8 @@ LCUI_API int pd_canvas_tile(pd_canvas_t *buff, const pd_canvas_t *canvas,
 
 LCUI_API int pd_canvas_veri_flip(const pd_canvas_t *canvas, pd_canvas_t *buff);
 
+LCUI_API int canvas_horiz_flip(const pd_canvas_t *canvas, pd_canvas_t *buff);
+
 LCUI_API int pd_canvas_zoom(const pd_canvas_t *canvas, pd_canvas_t *buff,
 			    pd_bool keep_scale, int width, int height);
 

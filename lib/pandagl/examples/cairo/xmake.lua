@@ -1,11 +1,11 @@
 add_rules("mode.debug", "mode.release")
-add_repositories("local-repo build")
-add_requires("cairo", "pandagl", "yutil")
+add_requires("cairo")
 
 target("pandagl_cairo_example")
     set_kind("binary")
     add_files("src/*.c")
-    add_packages("cairo", "pandagl", "yutil")
+    add_packages("cairo")
+    add_deps("pandagl", "yutil")
 
 --
 -- If you want to known more usage about xmake, please see https://xmake.io

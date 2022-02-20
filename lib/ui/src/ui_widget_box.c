@@ -1,200 +1,206 @@
-#include <LCUI.h>
 #include <LCUI/pandagl.h>
-#include "../include/ui.h"
+#include <math.h>
 #include "internal.h"
 
-void ui_widget_update_box_position(ui_widget_t* w)
+#define SHADOW_WIDTH(s) (s->box_shadow_blur + s->box_shadow_spread)
+
+static void ui_widget_update_canvas_box_width(ui_widget_t *w)
+{
+	const css_computed_style_t *s = &w->computed_style;
+	const float x = fabsf(s->box_shadow_x);
+
+	w->canvas_box.width =
+	    w->border_box.width + SHADOW_WIDTH(s) + y_max(x, SHADOW_WIDTH(s));
+}
+
+static void ui_widget_update_canvas_box_height(ui_widget_t *w)
+{
+	const css_computed_style_t *s = &w->computed_style;
+	const float y = fabsf(s->box_shadow_x);
+
+	w->canvas_box.height =
+	    w->border_box.height + SHADOW_WIDTH(s) + y_max(y, SHADOW_WIDTH(s));
+}
+
+static void ui_widget_update_canvas_box_x(ui_widget_t *w)
+{
+	const css_computed_style_t *s = &w->computed_style;
+
+	w->canvas_box.x =
+	    w->border_box.x - y_max(0, SHADOW_WIDTH(s) - s->box_shadow_x);
+}
+
+static void ui_widget_update_canvas_box_y(ui_widget_t *w)
+{
+	const css_computed_style_t *s = &w->computed_style;
+
+	w->canvas_box.y =
+	    w->border_box.y - y_max(0, SHADOW_WIDTH(s) - s->box_shadow_y);
+}
+
+void ui_widget_update_box_position(ui_widget_t *w)
 {
 	float x = w->layout_x;
 	float y = w->layout_y;
+	const css_computed_style_t *s = &w->computed_style;
 
-	switch (w->computed_style.position) {
-	case CSS_KEYWORD_ABSOLUTE:
-		if (!ui_widget_has_auto_style(w, css_key_left)) {
-			x = w->computed_style.left;
-		} else if (!ui_widget_has_auto_style(w, css_key_right)) {
+	switch (w->computed_style.type_bits.position) {
+	case CSS_POSITION_ABSOLUTE:
+	case CSS_POSITION_FIXED:
+		if (IS_CSS_FIXED_LENGTH(s, left)) {
+			x = s->left;
+		} else if (IS_CSS_FIXED_LENGTH(s, right)) {
 			if (w->parent) {
-				x = w->parent->box.border.width - w->width;
+				x = w->parent->border_box.width -
+				    w->border_box.width;
 			}
 			x -= w->computed_style.right;
+		} else {
+			x = 0;
 		}
-		if (!ui_widget_has_auto_style(w, css_key_top)) {
+		if (IS_CSS_FIXED_LENGTH(s, top)) {
 			y = w->computed_style.top;
-		} else if (!ui_widget_has_auto_style(w, css_key_bottom)) {
+		} else if (IS_CSS_FIXED_LENGTH(s, bottom)) {
 			if (w->parent) {
-				y = w->parent->box.border.height - w->height;
+				y = w->parent->border_box.height -
+				    w->border_box.height;
 			}
 			y -= w->computed_style.bottom;
+		} else {
+			y = 0;
 		}
 		break;
-	case CSS_KEYWORD_RELATIVE:
-		if (!ui_widget_has_auto_style(w, css_key_left)) {
-			x += w->computed_style.left;
-		} else if (!ui_widget_has_auto_style(w, css_key_right)) {
-			x -= w->computed_style.right;
+	case CSS_POSITION_RELATIVE:
+		if (IS_CSS_FIXED_LENGTH(s, left)) {
+			x += s->left;
+		} else if (IS_CSS_FIXED_LENGTH(s, right)) {
+			x -= s->right;
 		}
-		if (!ui_widget_has_auto_style(w, css_key_top)) {
-			y += w->computed_style.top;
-		} else if (!ui_widget_has_auto_style(w, css_key_bottom)) {
-			y -= w->computed_style.bottom;
+		if (IS_CSS_FIXED_LENGTH(s, top)) {
+			y += s->top;
+		} else if (IS_CSS_FIXED_LENGTH(s, bottom)) {
+			y -= s->bottom;
 		}
-	case CSS_KEYWORD_STATIC:
+	case CSS_POSITION_STATIC:
 	default:
 		break;
 	}
-	w->box.outer.x = x;
-	w->box.outer.y = y;
-	w->x = x + w->margin.left;
-	w->y = y + w->margin.top;
+	w->outer_box.x = x;
+	w->outer_box.y = y;
 	if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_NONE &&
-	    (w->x != w->box.border.x || w->y != w->box.border.y)) {
-		ui_widget_t* parent = w->parent;
+	    (x + s->margin_left != w->border_box.x ||
+	     y + s->margin_top != w->border_box.y)) {
+		ui_widget_t *parent = w->parent;
 
-		w->dirty_rect = w->box.canvas;
+		w->dirty_rect = w->canvas_box;
 		w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
 		while (parent) {
 			parent->has_child_dirty_rect = TRUE;
 			parent = parent->parent;
 		}
 	}
-	w->box.border.x = w->x;
-	w->box.border.y = w->y;
-	w->box.padding.x = w->x + w->computed_style.border.left.width;
-	w->box.padding.y = w->y + w->computed_style.border.top.width;
-	w->box.content.x = w->box.padding.x + w->padding.left;
-	w->box.content.y = w->box.padding.y + w->padding.top;
-	w->box.canvas.x = w->x - ui_widget_get_box_shadow_offset_x(w);
-	w->box.canvas.y = w->y - ui_widget_get_box_shadow_offset_y(w);
+	w->border_box.x = x + s->margin_left;
+	w->border_box.y = y + s->margin_top;
+	w->padding_box.x = w->border_box.x + s->border_left_width;
+	w->padding_box.y = w->border_box.y + s->border_top_width;
+	w->content_box.x = w->padding_box.x + s->padding_left;
+	w->content_box.y = w->padding_box.y + s->padding_top;
+	ui_widget_update_canvas_box_x(w);
+	ui_widget_update_canvas_box_y(w);
 }
 
-float ui_widget_get_canvas_box_width(ui_widget_t* widget)
+void ui_widget_update_canvas_box(ui_widget_t *w)
 {
-	float width;
-	const ui_boxshadow_style_t* shadow;
+	ui_widget_update_canvas_box_x(w);
+	ui_widget_update_canvas_box_y(w);
+	ui_widget_update_canvas_box_width(w);
+	ui_widget_update_canvas_box_height(w);
+}
 
-	width = widget->box.border.width;
-	shadow = &widget->computed_style.shadow;
-	if (shadow->x >= SHADOW_WIDTH(shadow)) {
-		return width + SHADOW_WIDTH(shadow) + shadow->x;
-	} else if (shadow->x <= -SHADOW_WIDTH(shadow)) {
-		return width + SHADOW_WIDTH(shadow) - shadow->x;
+void ui_widget_update_box_size(ui_widget_t *w)
+{
+	css_computed_style_t *s = &w->computed_style;
+	css_numeric_value_t limit;
+	css_unit_t unit;
+
+	if (css_computed_min_width(s, &limit, &unit) == CSS_MIN_WIDTH_SET &&
+	    unit == CSS_UNIT_PX && s->width < limit) {
+		s->width = limit;
 	}
-	return width + SHADOW_WIDTH(shadow) * 2;
-}
-
-float ui_widget_get_canvas_box_height(ui_widget_t* widget)
-{
-	float height;
-	const ui_boxshadow_style_t* shadow;
-
-	height = widget->box.border.height;
-	shadow = &widget->computed_style.shadow;
-	if (shadow->y >= SHADOW_WIDTH(shadow)) {
-		return height + SHADOW_WIDTH(shadow) + shadow->y;
-	} else if (shadow->y <= -SHADOW_WIDTH(shadow)) {
-		return height + SHADOW_WIDTH(shadow) - shadow->y;
+	if (css_computed_max_width(s, &limit, &unit) == CSS_MAX_WIDTH_SET &&
+	    unit == CSS_UNIT_PX && s->width > limit) {
+		s->width = limit;
 	}
-	return height + SHADOW_WIDTH(shadow) * 2;
-}
+	if (css_computed_min_height(s, &limit, &unit) == CSS_MIN_HEIGHT_SET &&
+	    unit == CSS_UNIT_PX && s->height < limit) {
+		s->height = limit;
+	}
+	if (css_computed_max_height(s, &limit, &unit) == CSS_MAX_HEIGHT_SET &&
+	    unit == CSS_UNIT_PX && s->height > limit) {
+		s->height = limit;
+	}
+	if (css_computed_box_sizing(s) == CSS_BOX_SIZING_BORDER_BOX) {
+		if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_NONE &&
+		    (s->width != w->border_box.width ||
+		     s->height != w->border_box.height)) {
+			ui_widget_t *parent = w->parent;
 
-void ui_widget_update_canvas_box(ui_widget_t* w)
-{
-	w->box.canvas.x =
-	    w->box.border.x - ui_widget_get_box_shadow_offset_x(w);
-	w->box.canvas.y =
-	    w->box.border.y - ui_widget_get_box_shadow_offset_y(w);
-	w->box.canvas.width = ui_widget_get_canvas_box_width(w);
-	w->box.canvas.height = ui_widget_get_canvas_box_height(w);
-}
-
-void ui_widget_update_box_size(ui_widget_t* w)
-{
-	w->width = ui_widget_get_limited_width(w, w->width);
-	w->height = ui_widget_get_limited_height(w, w->height);
-	if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_NONE &&
-	    (w->width != w->box.border.width ||
-	     w->height != w->box.border.height)) {
-		ui_widget_t* parent = w->parent;
-
-		w->dirty_rect = w->box.canvas;
-		w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
-		while (parent) {
-			parent->has_child_dirty_rect = TRUE;
-			parent = parent->parent;
+			w->dirty_rect = w->canvas_box;
+			w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
+			while (parent) {
+				parent->has_child_dirty_rect = TRUE;
+				parent = parent->parent;
+			}
 		}
+		w->border_box.width = s->width;
+		w->border_box.height = s->height;
+		w->content_box.width =
+		    s->width - (s->padding_left + s->padding_right +
+				s->border_left_width + s->border_right_width);
+		w->content_box.height =
+		    s->height - (s->padding_top + s->padding_bottom +
+				 s->border_top_width + s->border_bottom_width);
+	} else {
+		if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_NONE &&
+		    (s->width != w->content_box.width ||
+		     s->height != w->content_box.height)) {
+			ui_widget_t *parent = w->parent;
+
+			w->dirty_rect = w->canvas_box;
+			w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
+			while (parent) {
+				parent->has_child_dirty_rect = TRUE;
+				parent = parent->parent;
+			}
+		}
+		w->content_box.width = s->width;
+		w->content_box.height = s->height;
+		w->border_box.width =
+		    s->width + (s->padding_left + s->padding_right +
+				s->border_left_width + s->border_right_width);
+		w->border_box.height =
+		    s->height + (s->padding_top + s->padding_bottom +
+				 s->border_top_width + s->border_bottom_width);
 	}
-	w->box.border.width = w->width;
-	w->box.border.height = w->height;
-	w->box.padding.width = w->box.border.width - border_x(w);
-	w->box.padding.height = w->box.border.height - border_y(w);
-	w->box.content.width = w->box.padding.width - padding_x(w);
-	w->box.content.height = w->box.padding.height - padding_y(w);
-	w->box.outer.width = w->box.border.width + margin_x(w);
-	w->box.outer.height = w->box.border.height + margin_y(w);
-	w->box.canvas.width = ui_widget_get_canvas_box_width(w);
-	w->box.canvas.height = ui_widget_get_canvas_box_height(w);
+	w->padding_box.width =
+	    w->content_box.width + s->padding_left + s->padding_right;
+	w->padding_box.height =
+	    w->content_box.height + s->padding_top + s->padding_bottom;
+	w->outer_box.width =
+	    w->border_box.width + s->margin_left + s->margin_right;
+	w->outer_box.height =
+	    w->border_box.height + s->margin_top + s->margin_bottom;
+	ui_widget_update_canvas_box_width(w);
+	ui_widget_update_canvas_box_height(w);
 }
 
-float ui_widget_get_box_shadow_offset_x(ui_widget_t* w)
+void ui_widget_set_content_box_size(ui_widget_t *w, float width, float height)
 {
-	const ui_boxshadow_style_t* shadow;
+	css_computed_style_t *s = &w->computed_style;
 
-	shadow = &w->computed_style.shadow;
-	if (shadow->x >= SHADOW_WIDTH(shadow)) {
-		return 0;
-	}
-	return SHADOW_WIDTH(shadow) - shadow->x;
-}
-
-float ui_widget_get_box_shadow_offset_y(ui_widget_t* w)
-{
-	const ui_boxshadow_style_t* shadow;
-
-	shadow = &w->computed_style.shadow;
-	if (shadow->y >= SHADOW_WIDTH(shadow)) {
-		return 0;
-	}
-	return SHADOW_WIDTH(shadow) - shadow->y;
-}
-
-void ui_widget_compute_border_box_actual(ui_widget_t* w,
-					 ui_widget_actual_style_t* s)
-{
-	ui_rect_t rect;
-	rect.x = s->x + w->box.border.x;
-	rect.y = s->y + w->box.border.y;
-	rect.width = w->box.border.width;
-	rect.height = w->box.border.height;
-	ui_widget_compute_border(w, &s->border);
-	ui_compute_rect_actual(&s->border_box, &rect);
-}
-
-void ui_widget_compute_canvas_box_actual(ui_widget_t* w,
-					 ui_widget_actual_style_t* s)
-{
-	ui_widget_compute_box_shadow(w, &s->shadow);
-	pd_get_boxshadow_canvas_rect(&s->shadow, &s->border_box, &s->canvas_box);
-}
-
-void ui_widget_compute_padding_box_actual(ui_widget_t* w,
-					  ui_widget_actual_style_t* s)
-{
-	ui_widget_compute_background(w, &s->background);
-	s->padding_box.x = s->border_box.x + s->border.left.width;
-	s->padding_box.y = s->border_box.y + s->border.top.width;
-	s->padding_box.width = s->border_box.width - s->border.left.width;
-	s->padding_box.width -= s->border.right.width;
-	s->padding_box.height = s->border_box.height - s->border.top.width;
-	s->padding_box.height -= s->border.bottom.width;
-}
-
-void ui_widget_compute_content_box_actual(ui_widget_t* w,
-					  ui_widget_actual_style_t* s)
-{
-	ui_rect_t rect;
-	rect.x = s->x + w->box.content.x;
-	rect.y = s->y + w->box.content.y;
-	rect.width = w->box.content.width;
-	rect.height = w->box.content.height;
-	ui_compute_rect_actual(&s->content_box, &rect);
+	CSS_SET_FIXED_LENGTH(s, width, css_convert_content_box_width(s, width));
+	CSS_SET_FIXED_LENGTH(s, height,
+			     css_convert_content_box_height(s, height));
+	ui_widget_update_box_size(w);
+	w->proto->resize(w, w->content_box.width, w->content_box.height);
 }

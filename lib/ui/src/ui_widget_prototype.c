@@ -6,39 +6,35 @@
 
 static dict_t *ui_widget_prototype_dict;
 
-static void widget_default_method(ui_widget_t* w)
+static void widget_default_method(ui_widget_t *w)
 {
 }
 
-static void widget_default_attr_setter(ui_widget_t* w, const char *name,
-				     const char *value)
+static void widget_default_attr_setter(ui_widget_t *w, const char *name,
+				       const char *value)
 {
 }
 
-static void widget_default_text_setter(ui_widget_t* w, const char *text)
+static void widget_default_text_setter(ui_widget_t *w, const char *text)
 {
 }
 
-static void widget_default_property_binder(ui_widget_t* w, const char *name,
-					 LCUI_Object prop)
+static void widget_default_size_getter(ui_widget_t *w, float *width,
+				       float *height, ui_layout_rule_t rule)
 {
 }
 
-static void widget_default_size_getter(ui_widget_t* w, float *width, float *height,
-				     ui_layout_rule_t rule)
+static void widget_default_size_setter(ui_widget_t *w, float width,
+				       float height)
 {
 }
 
-static void widget_default_size_setter(ui_widget_t* w, float width, float height)
+static void widget_default_task_handler(ui_widget_t *w, int task)
 {
 }
 
-static void widget_default_task_handler(ui_widget_t* w, int task)
-{
-}
-
-static void widget_default_painter(ui_widget_t* w, pd_context_t *paint,
-				  ui_widget_actual_style_t* style)
+static void widget_default_painter(ui_widget_t *w, pd_context_t *paint,
+				   ui_widget_actual_style_t *style)
 {
 }
 
@@ -51,7 +47,6 @@ static ui_widget_prototype_t ui_default_widget_prototype = {
 	.runtask = widget_default_task_handler,
 	.setattr = widget_default_attr_setter,
 	.settext = widget_default_text_setter,
-	.bindprop = widget_default_property_binder,
 	.autosize = widget_default_size_getter,
 	.resize = widget_default_size_setter,
 	.paint = widget_default_painter
@@ -65,7 +60,7 @@ static void ui_widget_prototype_dict_val_destructor(void *privdata, void *data)
 }
 
 ui_widget_prototype_t *ui_create_widget_prototype(const char *name,
-					     const char *parent_name)
+						  const char *parent_name)
 {
 	ui_widget_prototype_t *proto;
 	ui_widget_prototype_t *parent;
@@ -75,7 +70,8 @@ ui_widget_prototype_t *ui_create_widget_prototype(const char *name,
 	}
 	proto = malloc(sizeof(ui_widget_prototype_t));
 	if (parent_name) {
-		parent = dict_fetch_value(ui_widget_prototype_dict, parent_name);
+		parent =
+		    dict_fetch_value(ui_widget_prototype_dict, parent_name);
 		if (parent) {
 			*proto = *parent;
 			proto->proto = parent;
@@ -108,9 +104,9 @@ ui_widget_prototype_t *ui_get_widget_prototype(const char *name)
 	return proto;
 }
 
-LCUI_BOOL ui_check_widget_type(ui_widget_t* w, const char *type)
+LCUI_BOOL ui_check_widget_type(ui_widget_t *w, const char *type)
 {
-	const ui_widget_prototype_t* proto;
+	const ui_widget_prototype_t *proto;
 
 	if (!w || !w->type) {
 		return FALSE;
@@ -129,9 +125,10 @@ LCUI_BOOL ui_check_widget_type(ui_widget_t* w, const char *type)
 	return FALSE;
 }
 
-LCUI_BOOL ui_check_widget_prototype(ui_widget_t* w, const ui_widget_prototype_t* proto)
+LCUI_BOOL ui_check_widget_prototype(ui_widget_t *w,
+				    const ui_widget_prototype_t *proto)
 {
-	const ui_widget_prototype_t* p;
+	const ui_widget_prototype_t *p;
 	for (p = w->proto; p; p = p->proto) {
 		if (p == proto) {
 			return TRUE;
@@ -140,7 +137,7 @@ LCUI_BOOL ui_check_widget_prototype(ui_widget_t* w, const ui_widget_prototype_t*
 	return FALSE;
 }
 
-void *ui_widget_get_data(ui_widget_t* widget, ui_widget_prototype_t *proto)
+void *ui_widget_get_data(ui_widget_t *widget, ui_widget_prototype_t *proto)
 {
 	unsigned i;
 	if (!widget->data.list || !proto) {
@@ -154,8 +151,8 @@ void *ui_widget_get_data(ui_widget_t* widget, ui_widget_prototype_t *proto)
 	return NULL;
 }
 
-void *ui_widget_add_data(ui_widget_t* widget, ui_widget_prototype_t *proto,
-		     size_t data_size)
+void *ui_widget_add_data(ui_widget_t *widget, ui_widget_prototype_t *proto,
+			 size_t data_size)
 {
 	void *data;
 	ui_widget_data_entry_t *list;
@@ -173,7 +170,7 @@ void *ui_widget_add_data(ui_widget_t* widget, ui_widget_prototype_t *proto,
 	return data;
 }
 
-void ui_widget_destroy_prototype(ui_widget_t* widget)
+void ui_widget_destroy_prototype(ui_widget_t *widget)
 {
 	if (widget->proto && widget->proto->destroy) {
 		widget->proto->destroy(widget);

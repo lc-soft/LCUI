@@ -1,43 +1,45 @@
+﻿/**
+ * 弹性布局
+ *
+ * 布局算法参考 W3C 的文档：https://www.w3.org/TR/css-flexbox/#layout-algorithm
+ */
 
-#include <LCUI.h>
-#include "../include/ui.h"
+// #define UI_DEBUG_ENABLED
 #include "internal.h"
 
 typedef struct ui_flexbox_line_t {
-	/** The size of it on the main axis */
 	float main_size;
 
-	/** The size of it on the cross axis */
+	float cross_axis;
 	float cross_size;
+	float max_cross_size;
 
 	float sum_of_grow_value;
 	float sum_of_shrink_value;
 	size_t count_of_auto_margin_items;
 
-	/** list_t<ui_widget_t*> elements */
-	list_t elements;
+	/** list_t<ui_layout_item_t*> items */
+	list_t items;
 } ui_flexbox_line_t;
 
 typedef struct ui_flexbox_layout_context_t {
-	ui_widget_t* widget;
+	ui_widget_t *widget;
 	ui_layout_rule_t rule;
 	LCUI_BOOL is_initiative;
+	LCUI_BOOL direction_is_column;
 
-	float main_axis;
-	float cross_axis;
 	float main_size;
 	float cross_size;
 
 	/** list_t<ui_flexbox_line_t*> lines */
 	list_t lines;
-	ui_flexbox_line_t* line;
-
-	list_t free_elements;
+	ui_flexbox_line_t *line;
+	ui_layout_item_t *items;
 } ui_flexbox_layout_context_t;
 
-static ui_flexbox_line_t* ui_flexbox_line_create(void)
+static ui_flexbox_line_t *ui_flexbox_line_create(void)
 {
-	ui_flexbox_line_t* line;
+	ui_flexbox_line_t *line;
 
 	line = malloc(sizeof(ui_flexbox_line_t));
 	line->main_size = 0;
@@ -45,677 +47,581 @@ static ui_flexbox_line_t* ui_flexbox_line_create(void)
 	line->sum_of_grow_value = 0;
 	line->sum_of_shrink_value = 0;
 	line->count_of_auto_margin_items = 0;
-	list_create(&line->elements);
+	list_create(&line->items);
 	return line;
 }
 
 static void ui_flexbox_line_destroy(void *arg)
 {
-	ui_flexbox_line_t* line = arg;
+	ui_flexbox_line_t *line = arg;
 
-	list_destroy(&line->elements, NULL);
+	list_destroy(&line->items, NULL);
 	free(line);
 }
 
-static void ui_flexbox_line_load_element(ui_flexbox_line_t* line, ui_widget_t* w)
+static void ui_flexbox_line_load_item(ui_flexbox_line_t *line,
+				      ui_layout_item_t *item)
 {
-	if (w->computed_style.flex.grow > 0) {
-		line->sum_of_grow_value += w->computed_style.flex.grow;
+	if (item->widget->computed_style.flex_grow > 0) {
+		line->sum_of_grow_value +=
+		    item->widget->computed_style.flex_grow;
 	}
-	if (w->computed_style.flex.shrink > 0) {
-		line->sum_of_shrink_value += w->computed_style.flex.shrink;
+	if (item->widget->computed_style.flex_shrink > 0) {
+		line->sum_of_shrink_value +=
+		    item->widget->computed_style.flex_shrink;
 	}
-	list_append(&line->elements, w);
+	list_append(&line->items, item);
 }
 
-static void ui_flexbox_layout_next_line(ui_flexbox_layout_context_t* ctx)
+static void ui_flexbox_layout_next_line(ui_flexbox_layout_context_t *ctx)
 {
 	if (ctx->line) {
 		ctx->main_size = y_max(ctx->main_size, ctx->line->main_size);
-		ctx->cross_axis += ctx->line->cross_size;
-		ctx->cross_size = ctx->cross_axis;
-		if (ctx->widget->computed_style.flex.direction == CSS_KEYWORD_COLUMN) {
-			ctx->cross_size -= ctx->widget->padding.left;
-		} else {
-			ctx->cross_size -= ctx->widget->padding.top;
-		}
+		ctx->cross_size += ctx->line->cross_size;
 	}
-	ctx->main_axis = ctx->widget->padding.left;
 	ctx->line = ui_flexbox_line_create();
 	list_append(&ctx->lines, ctx->line);
 }
 
-static ui_flexbox_layout_context_t* ui_flexbox_layout_begin(ui_widget_t* w,
-						     ui_layout_rule_t rule)
+INLINE float ui_compute_row_item_main_size(css_computed_style_t *s)
 {
-	ui_widget_style_t *style = &w->computed_style;
-	ui_flexbox_layout_context_t *ctx;
-
-	ctx = malloc(sizeof(ui_flexbox_layout_context_t));
-	if (!ctx) {
-		return NULL;
+	if (css_computed_box_sizing(s) == CSS_BOX_SIZING_BORDER_BOX) {
+	    if (s->flex_basis < css_padding_x(s) + css_border_x(s)) {
+		return 0;
+	    }
+	    return s->flex_basis - css_padding_x(s) - css_border_x(s);
 	}
-	if (rule == UI_LAYOUT_RULE_AUTO) {
-		ctx->is_initiative = TRUE;
-		if (style->flex.direction == CSS_KEYWORD_COLUMN) {
-			if (style->height_sizing == UI_SIZING_RULE_FIXED) {
-				rule = UI_LAYOUT_RULE_FIXED_HEIGHT;
-			} else {
-				rule = UI_LAYOUT_RULE_MAX_CONTENT;
-			}
-		} else {
-			if (style->width_sizing == UI_SIZING_RULE_FIXED) {
-				rule = UI_LAYOUT_RULE_FIXED_WIDTH;
-			} else {
-				rule = UI_LAYOUT_RULE_MAX_CONTENT;
-			}
-		}
-	} else {
-		ctx->is_initiative = FALSE;
-	}
-	if (style->position == CSS_KEYWORD_ABSOLUTE) {
-		if (rule == UI_LAYOUT_RULE_FIXED_HEIGHT &&
-		    style->width_sizing == UI_SIZING_RULE_PERCENT) {
-			rule = UI_LAYOUT_RULE_FIXED;
-		} else if (rule == UI_LAYOUT_RULE_FIXED_WIDTH &&
-			   style->height_sizing == UI_SIZING_RULE_PERCENT) {
-			rule = UI_LAYOUT_RULE_FIXED;
-		}
-	}
-	if (rule == UI_LAYOUT_RULE_FIXED_WIDTH) {
-		if (style->height_sizing == UI_SIZING_RULE_FIXED) {
-			rule = UI_LAYOUT_RULE_FIXED;
-		}
-	} else if (rule == UI_LAYOUT_RULE_FIXED_HEIGHT) {
-		if (style->width_sizing == UI_SIZING_RULE_FIXED) {
-			rule = UI_LAYOUT_RULE_FIXED;
-		}
-	}
-	DEBUG_MSG("%s, rule: %d, is_initiative: %d\n", w->id, rule,
-		  ctx->is_initiative);
-	ctx->rule = rule;
-	ctx->line = NULL;
-	ctx->widget = w;
-	if (style->flex.direction == CSS_KEYWORD_COLUMN) {
-		ctx->main_axis = w->padding.left;
-		ctx->cross_axis = w->padding.top;
-	} else {
-		ctx->main_axis = w->padding.top;
-		ctx->cross_axis = w->padding.left;
-	}
-	ctx->main_size = 0;
-	ctx->cross_size = 0;
-	list_create(&ctx->free_elements);
-	list_create(&ctx->lines);
-	ui_flexbox_layout_next_line(ctx);
-	return ctx;
+	return s->flex_basis;
 }
 
-static void ui_flexbox_layout_end(ui_flexbox_layout_context_t* ctx)
+INLINE float ui_compute_column_item_main_size(css_computed_style_t *s)
 {
-	list_destroy(&ctx->lines, ui_flexbox_line_destroy);
-	list_destroy(&ctx->free_elements, NULL);
-	free(ctx);
+	if (css_computed_box_sizing(s) == CSS_BOX_SIZING_BORDER_BOX) {
+	    if (s->flex_basis < css_padding_y(s) + css_border_y(s)) {
+		return 0;
+	    }
+	    return s->flex_basis - css_padding_y(s) - css_border_y(s);
+	}
+	return s->flex_basis;
 }
 
-static void ui_flexbox_layout_load_rows(ui_flexbox_layout_context_t* ctx)
+static void ui_flexbox_layout_load_rows(ui_flexbox_layout_context_t *ctx)
 {
-	ui_widget_t* child;
-	ui_flexbox_layout_style_t *flex = &ctx->widget->computed_style.flex;
 	list_node_t *node;
+	ui_widget_t *child;
+	ui_layout_item_t *item;
+	css_computed_style_t *s = &ctx->widget->computed_style;
+	css_computed_style_t *cs;
 
-	float basis;
+	float main_size;
 	float max_main_size = -1;
 
 	if (ctx->rule == UI_LAYOUT_RULE_FIXED ||
 	    ctx->rule == UI_LAYOUT_RULE_FIXED_WIDTH) {
-		max_main_size = ctx->widget->box.content.width;
+		max_main_size = ctx->widget->content_box.width;
 	}
-	DEBUG_MSG("%s, max_main_size: %g\n", ctx->widget->id, max_main_size);
-	for (list_each(node, &ctx->widget->children)) {
+#ifdef UI_DEBUG_ENABLED
+	UI_DEBUG_MSG("max_main_size = %g", max_main_size);
+#endif
+	for (item = ctx->items, list_each(node, &ctx->widget->children),
+	    ++item) {
 		child = node->data;
-		if (child->computed_style.display == CSS_KEYWORD_NONE) {
+		item->widget = child;
+		cs = &child->computed_style;
+		ui_layout_diff_begin(&item->diff, child);
+		if (cs->type_bits.display == CSS_DISPLAY_NONE) {
 			continue;
 		}
-		if (ui_widget_has_absolute_position(child)) {
-			list_append(&ctx->free_elements, child);
+		ui_widget_prepare_reflow(child, ctx->rule);
+		if (!ui_widget_in_layout_flow(child)) {
 			continue;
 		}
-		/* Clears the auto margin calculated on the last layout */
-		if (ui_widget_has_auto_style(child, css_key_margin_left)) {
-			child->margin.left = 0;
-			if (ui_widget_has_auto_style(child, css_key_margin_right)) {
-				child->margin.right = 0;
-			}
-			ui_widget_update_box_size(child);
-		} else if (ui_widget_has_auto_style(child, css_key_margin_right)) {
-			child->margin.right = 0;
-			ui_widget_update_box_size(child);
+		ui_widget_compute_style(child);
+		ui_widget_update_box_size(child);
+		switch (cs->type_bits.flex_basis) {
+		case CSS_FLEX_BASIS_CONTENT:
+			CSS_SET_FIXED_LENGTH(cs, flex_basis,
+					     css_convert_content_box_width(
+						 cs, child->max_content_width));
+			break;
+		default:
+			break;
 		}
-		ui_widget_compute_flex_basis_style(child);
-		basis = margin_x(child) + child->computed_style.flex.basis;
-		DEBUG_MSG("[line %lu][%lu] main_size: %g, basis: %g\n",
-			  ctx->lines.length, child->index, ctx->line->main_size,
-			  basis);
+		main_size = ui_compute_row_item_main_size(cs) +
+			    css_margin_x(cs) + css_padding_x(cs) +
+			    css_border_x(cs);
+#ifdef UI_DEBUG_ENABLED
+		{
+			UI_WIDGET_STR(child, str);
+			UI_WIDGET_SIZE_STR(child, size_str);
+			UI_DEBUG_MSG("[%lu] %s: size = %s, cross_size = %g, "
+				     "main_size = %g, basis_type = %d, "
+				     "row[%lu].main_size = %g",
+				     item - ctx->items, str, size_str,
+				     child->outer_box.height, main_size,
+				     cs->type_bits.flex_basis,
+				     ctx->lines.length - 1,
+				     ctx->line->main_size);
+		}
+#endif
 		/* Check line wrap */
-		if (flex->wrap == CSS_KEYWORD_WRAP && ctx->line->elements.length > 0 &&
-		    max_main_size != -1) {
-			if (ctx->line->main_size + basis - max_main_size >
+		if (s->type_bits.flex_wrap == CSS_FLEX_WRAP_WRAP &&
+		    ctx->line->items.length > 0 && max_main_size != -1) {
+			if (ctx->line->main_size + main_size - max_main_size >
 			    0.4f) {
 				ui_flexbox_layout_next_line(ctx);
 			}
 		}
-		if (child->box.outer.height > ctx->line->cross_size) {
-			ctx->line->cross_size = child->box.outer.height;
+		if (child->outer_box.height > ctx->line->cross_size) {
+			ctx->line->cross_size = child->outer_box.height;
 		}
-		if (ui_widget_has_auto_style(child, css_key_margin_left)) {
+		if (cs->type_bits.margin_left == CSS_MARGIN_AUTO) {
 			ctx->line->count_of_auto_margin_items++;
 		}
-		if (ui_widget_has_auto_style(child, css_key_margin_right)) {
+		if (cs->type_bits.margin_right == CSS_MARGIN_AUTO) {
 			ctx->line->count_of_auto_margin_items++;
 		}
-		ctx->line->main_size += basis;
-		ui_flexbox_line_load_element(ctx->line, child);
+		ctx->line->main_size += main_size;
+		ui_flexbox_line_load_item(ctx->line, item);
 	}
 	ctx->main_size = y_max(ctx->main_size, ctx->line->main_size);
 	ctx->cross_size += ctx->line->cross_size;
-	DEBUG_MSG("%s,end load, size: (%g, %g)\n", ctx->widget->id,
-		  ctx->main_size, ctx->cross_size);
 }
 
-static void ui_flexbox_layout_load_columns(ui_flexbox_layout_context_t* ctx)
+static void ui_flexbox_layout_load_columns(ui_flexbox_layout_context_t *ctx)
 {
-	ui_widget_t* child;
-	ui_flexbox_layout_style_t *flex = &ctx->widget->computed_style.flex;
 	list_node_t *node;
+	ui_widget_t *child;
+	ui_layout_item_t *item;
+	css_computed_style_t *s = &ctx->widget->computed_style;
+	css_computed_style_t *cs;
 
-	float basis;
+	float main_size;
 	float max_main_size = -1;
 
-	if (ctx->rule == UI_LAYOUT_RULE_FIXED ||
-	    ctx->rule == UI_LAYOUT_RULE_FIXED_HEIGHT) {
-		max_main_size = ctx->widget->box.content.height;
+	if ((ctx->rule & UI_LAYOUT_RULE_FIXED_HEIGHT) ==
+	    UI_LAYOUT_RULE_FIXED_HEIGHT) {
+		max_main_size = ctx->widget->content_box.height;
 	}
-	DEBUG_MSG("max_main_size: %g\n", max_main_size);
-	for (list_each(node, &ctx->widget->children)) {
-		child = node->data;
 
-		if (child->computed_style.display == CSS_KEYWORD_NONE) {
+#ifdef UI_DEBUG_ENABLED
+	UI_DEBUG_MSG("max_main_size: %g", max_main_size);
+	UI_DEBUG_MSG("%s", "line start");
+	ui_debug_msg_indent++;
+#endif
+
+	for (item = ctx->items, list_each(node, &ctx->widget->children),
+	    ++item) {
+		child = node->data;
+		item->widget = child;
+		cs = &child->computed_style;
+		ui_layout_diff_begin(&item->diff, child);
+		if (cs->type_bits.display == CSS_DISPLAY_NONE) {
 			continue;
 		}
-		if (ui_widget_has_absolute_position(child)) {
-			list_append(&ctx->free_elements, child);
+		ui_widget_prepare_reflow(child, ctx->rule);
+		if (!ui_widget_in_layout_flow(child)) {
 			continue;
 		}
-		ui_widget_compute_flex_basis_style(child);
-		basis = margin_y(child) + child->computed_style.flex.basis;
-		DEBUG_MSG("[column %lu][%lu] main_size: %g, basis: %g\n",
-			  ctx->lines.length, child->index, ctx->line->main_size,
-			  basis);
-		if (flex->wrap == CSS_KEYWORD_WRAP && ctx->line->elements.length > 0 &&
-		    max_main_size != -1) {
-			if (ctx->line->main_size + basis - max_main_size >
+		ui_widget_compute_style(child);
+		ui_widget_update_box_size(child);
+		if (cs->type_bits.flex_basis == CSS_FLEX_BASIS_CONTENT) {
+			CSS_SET_FIXED_LENGTH(
+			    cs, flex_basis,
+			    css_convert_content_box_height(
+				cs, child->max_content_height));
+		}
+		main_size = ui_compute_column_item_main_size(cs) +
+			    css_margin_y(cs) + css_padding_y(cs) +
+			    css_border_y(cs);
+#ifdef UI_DEBUG_ENABLED
+		{
+			UI_WIDGET_STR(child, str);
+			UI_DEBUG_MSG("[%lu] %s: column[%lu].main_size = %g, "
+				     "main_size = %g",
+				     item - ctx->items, str,
+				     ctx->lines.length - 1,
+				     ctx->line->main_size, main_size);
+		}
+#endif
+		if (s->type_bits.flex_wrap == CSS_FLEX_WRAP_WRAP &&
+		    ctx->line->items.length > 0 && max_main_size != -1) {
+			if (ctx->line->main_size + main_size - max_main_size >
 			    0.4f) {
+#ifdef UI_DEBUG_ENABLED
+				ui_debug_msg_indent--;
+				UI_DEBUG_MSG("%s", "line end");
+#endif
 				ui_flexbox_layout_next_line(ctx);
+#ifdef UI_DEBUG_ENABLED
+				UI_DEBUG_MSG("%s", "line start");
+				ui_debug_msg_indent++;
+#endif
 			}
 		}
-		if (child->box.outer.width > ctx->line->cross_size) {
-			ctx->line->cross_size = child->box.outer.width;
+		if (child->outer_box.width > ctx->line->cross_size) {
+			ctx->line->cross_size = child->outer_box.width;
 		}
-		if (ui_widget_has_auto_style(child, css_key_margin_top)) {
+		if (cs->type_bits.margin_top == CSS_MARGIN_AUTO) {
 			ctx->line->count_of_auto_margin_items++;
 		}
-		if (ui_widget_has_auto_style(child, css_key_margin_top)) {
+		if (cs->type_bits.margin_bottom == CSS_MARGIN_AUTO) {
 			ctx->line->count_of_auto_margin_items++;
 		}
-		ctx->line->main_size += basis;
-		ui_flexbox_line_load_element(ctx->line, child);
+		ctx->line->main_size += main_size;
+		ui_flexbox_line_load_item(ctx->line, item);
 	}
+#ifdef UI_DEBUG_ENABLED
+	ui_debug_msg_indent--;
+	UI_DEBUG_MSG("%s", "line end");
+#endif
 	ctx->main_size = y_max(ctx->main_size, ctx->line->main_size);
 	ctx->cross_size += ctx->line->cross_size;
-	DEBUG_MSG("main_size: %g\n", ctx->main_size);
 }
 
-static void ui_flexbox_layout_load(ui_flexbox_layout_context_t* ctx)
+static void ui_flexbox_layout_load(ui_flexbox_layout_context_t *ctx)
 {
-	if (ctx->widget->computed_style.flex.direction == CSS_KEYWORD_COLUMN) {
+	if (ctx->direction_is_column) {
 		ui_flexbox_layout_load_columns(ctx);
 	} else {
 		ui_flexbox_layout_load_rows(ctx);
 	}
 }
 
-static void ui_flexbox_layout_compute_justify_content(ui_flexbox_layout_context_t* ctx,
-						float *start_axis, float *space)
+static void ui_flexbox_layout_compute_justify_content(
+    ui_flexbox_layout_context_t *ctx, float *start_axis, float *space)
 {
 	float free_space;
 
-	if (ctx->widget->computed_style.flex.direction == CSS_KEYWORD_COLUMN) {
-		free_space = ctx->widget->box.content.height;
+	if (ctx->direction_is_column) {
+		*start_axis = ctx->widget->computed_style.padding_top;
+		free_space = ctx->widget->content_box.height;
 	} else {
-		free_space = ctx->widget->box.content.width;
+		*start_axis = ctx->widget->computed_style.padding_left;
+		free_space = ctx->widget->content_box.width;
 	}
+	*space = 0;
 	free_space -= ctx->line->main_size;
-	switch (ctx->widget->computed_style.flex.justify_content) {
-	case CSS_KEYWORD_SPACE_BETWEEN:
-		if (ctx->line->elements.length > 1) {
-			*space = free_space / (ctx->line->elements.length - 1);
+	switch (ctx->widget->computed_style.type_bits.justify_content) {
+	case CSS_JUSTIFY_CONTENT_SPACE_BETWEEN:
+		if (ctx->line->items.length > 1) {
+			*space = free_space / (ctx->line->items.length - 1);
 		}
 		*start_axis -= *space;
 		break;
-	case CSS_KEYWORD_SPACE_AROUND:
-		*space = free_space / ctx->line->elements.length;
+	case CSS_JUSTIFY_CONTENT_SPACE_AROUND:
+		*space = free_space / ctx->line->items.length;
 		*start_axis -= *space * 0.5f;
 		break;
-	case CSS_KEYWORD_SPACE_EVENLY:
-		*space = free_space / (ctx->line->elements.length + 1);
+	case CSS_JUSTIFY_CONTENT_SPACE_EVENLY:
+		*space = free_space / (ctx->line->items.length + 1);
 		*start_axis += *space;
 		break;
-	case CSS_KEYWORD_RIGHT:
-	case CSS_KEYWORD_FLEX_END:
+	case CSS_JUSTIFY_CONTENT_FLEX_END:
 		*start_axis += free_space;
 		break;
-	case CSS_KEYWORD_CENTER:
+	case CSS_JUSTIFY_CONTENT_CENTER:
 		*start_axis += free_space * 0.5f;
 		break;
-	case CSS_KEYWORD_LEFT:
 	default:
 		break;
 	}
 }
 
-static void update_flex_item_size(ui_widget_t* w, ui_layout_rule_t rule)
+static void ui_flexbox_layout_update_row(ui_flexbox_layout_context_t *ctx)
 {
-	float content_width = w->box.padding.width;
-	float content_height = w->box.padding.height;
-	ui_widget_layout_diff_t diff;
+	ui_layout_item_t *item;
+	css_computed_style_t *s;
+	list_node_t *node;
 
-	ui_widget_begin_layout_diff(w, &diff);
-	/*
-	 * As a widget of a flex item, its size is calculated by the flexbox
-	 * layout engine, so here we only need to calculate its width and
-	 * height limits.
-	 */
-	ui_widget_compute_widget_limit_style(w, UI_LAYOUT_RULE_FIXED);
-	ui_widget_compute_height_limit_style(w, UI_LAYOUT_RULE_FIXED);
-	ui_widget_update_box_size(w);
-	if (content_width == w->box.padding.width &&
-	    content_height == w->box.padding.height) {
-		return;
-	}
-	if (rule == UI_LAYOUT_RULE_FIXED_WIDTH ||
-	    rule == UI_LAYOUT_RULE_FIXED_HEIGHT) {
-		rule = UI_LAYOUT_RULE_FIXED;
-	}
-	ui_widget_reflow(w, rule);
-	ui_widget_end_layout_diff(w, &diff);
-	w->update.states[UI_TASK_REFLOW] = FALSE;
-}
-
-static void ui_flexbox_layout_update_row(ui_flexbox_layout_context_t* ctx)
-{
 	float k = 0;
 	float main_axis = 0;
-	float space = 0;
-	float free_space;
+	float main_size;
+	uint8_t align_items = ctx->widget->computed_style.type_bits.align_items;
+	float space = ctx->widget->content_box.width - ctx->line->main_size;
 
-	ui_widget_t* w;
-	ui_flexbox_layout_style_t *flex;
-	list_node_t *node;
-
-	free_space = ctx->widget->box.content.width - ctx->line->main_size;
-	if (free_space >= 0) {
+	if (space >= 0) {
 		if (ctx->line->sum_of_grow_value > 0) {
-			k = free_space / ctx->line->sum_of_grow_value;
+			k = space / ctx->line->sum_of_grow_value;
 		}
 	} else if (ctx->line->sum_of_shrink_value > 0) {
-		k = free_space / ctx->line->sum_of_shrink_value;
+		k = space / ctx->line->sum_of_shrink_value;
 	}
 
-	/* flex-grow and flex-shrink */
-	DEBUG_MSG("%s, free_space: %g\n", ctx->widget->id, free_space);
-	for (list_each(node, &ctx->line->elements)) {
-		w = node->data;
-		flex = &w->computed_style.flex;
-		if (w->computed_style.height_sizing != UI_SIZING_RULE_FIXED) {
-			ui_widget_compute_height_style(w);
+#ifdef UI_DEBUG_ENABLED
+	{
+		UI_WIDGET_STR(ctx->widget, str);
+		UI_DEBUG_MSG("%s: cross_axis = %g, max_cross_size = %g, "
+			     "free_space = %g, alloc "
+			     "free space",
+			     str, ctx->line->cross_axis,
+			     ctx->line->max_cross_size, space);
+	}
+#endif
+
+	for (list_each(node, &ctx->line->items)) {
+		item = node->data;
+		s = &item->widget->computed_style;
+		ui_widget_compute_style(item->widget);
+		main_size = ui_compute_row_item_main_size(s);
+		if (css_computed_box_sizing(s) == CSS_BOX_SIZING_BORDER_BOX) {
+			main_size += css_border_x(s) + css_padding_x(s);
 		}
-		if (free_space >= 0) {
-			if (flex->grow > 0) {
-				w->width = flex->basis + k * flex->grow;
-				update_flex_item_size(
-				    w, UI_LAYOUT_RULE_FIXED_WIDTH);
-			} else {
-				update_flex_item_size(
-				    w, UI_LAYOUT_RULE_FIXED_WIDTH);
+		// 根据项目的 flex-grow 和 flex-shrink，调整它的宽度
+		if (space >= 0) {
+			if (s->type_bits.flex_grow > 0) {
+				CSS_SET_FIXED_LENGTH(
+				    s, width, main_size + k * s->flex_grow);
 			}
-		} else if (flex->shrink > 0) {
-			w->width = flex->basis + k * flex->shrink;
-			update_flex_item_size(w, UI_LAYOUT_RULE_FIXED_WIDTH);
-		} else {
-			update_flex_item_size(w, UI_LAYOUT_RULE_FIXED_WIDTH);
+		} else if (s->type_bits.flex_shrink > 0) {
+			CSS_SET_FIXED_LENGTH(s, width,
+					     main_size + k * s->flex_shrink);
 		}
-		ui_widget_add_state(w, UI_WIDGET_STATE_LAYOUTED);
-		main_axis += w->box.outer.width;
+		// 计算拉伸的高度
+		if (align_items == CSS_ALIGN_ITEMS_STRETCH &&
+		    s->type_bits.height == CSS_HEIGHT_AUTO) {
+			CSS_SET_FIXED_LENGTH(s, height,
+					     css_convert_border_box_height(
+						 s, ctx->line->max_cross_size -
+							css_margin_y(s)));
+		}
+		ui_widget_update_box_size(item->widget);
+		ui_layout_diff_auto_reflow(&item->diff, item->widget);
+		main_axis += item->widget->outer_box.width;
 	}
 	ctx->line->main_size = main_axis;
-	free_space = ctx->widget->box.content.width - main_axis;
+	space = ctx->widget->content_box.width - main_axis;
 
-	/* auto margin */
-	DEBUG_MSG("free_space: %g, auto margin items: %lu\n", free_space,
-		  ctx->line->count_of_auto_margin_items);
-	if (free_space > 0 && ctx->line->count_of_auto_margin_items > 0) {
+#ifdef UI_DEBUG_ENABLED
+	{
+		UI_WIDGET_STR(ctx->widget, str);
+		UI_DEBUG_MSG("%s: free_space = %g, auto_margin_items = %lu",
+			     str, space, ctx->line->count_of_auto_margin_items);
+	}
+#endif
+
+	// 计算 marign-left 和 margin-right
+	if (space > 0 && ctx->line->count_of_auto_margin_items > 0) {
 		main_axis = 0;
-		k = free_space / ctx->line->count_of_auto_margin_items;
-		for (list_each(node, &ctx->line->elements)) {
-			w = node->data;
-			if (ui_widget_has_auto_style(w, css_key_margin_left)) {
-				w->margin.left = k;
-				ui_widget_update_box_size(w);
+		k = space / ctx->line->count_of_auto_margin_items;
+		for (list_each(node, &ctx->line->items)) {
+			item = node->data;
+			s = &item->widget->computed_style;
+			if (s->type_bits.margin_left == CSS_MARGIN_AUTO) {
+				CSS_SET_FIXED_LENGTH(s, margin_left, k);
 			}
-			if (ui_widget_has_auto_style(w, css_key_margin_right)) {
-				w->margin.right = k;
-				ui_widget_update_box_size(w);
+			if (s->type_bits.margin_right == CSS_MARGIN_AUTO) {
+				CSS_SET_FIXED_LENGTH(s, margin_right, k);
 			}
-			DEBUG_MSG("basis: %g\n", w->box.outer.width);
-			main_axis += w->box.outer.width;
+			ui_widget_update_box_size(item->widget);
+			main_axis += item->widget->outer_box.width;
 		}
 		ctx->line->main_size = main_axis;
 	}
 
-	/* update the position of each child widget */
-
-	main_axis = ctx->widget->padding.left;
+	// 根据 justify-content 和 align-items，更新每个项目的位置和尺寸
 	ui_flexbox_layout_compute_justify_content(ctx, &main_axis, &space);
-	for (list_each(node, &ctx->line->elements)) {
-		w = node->data;
+	for (list_each(node, &ctx->line->items)) {
 		main_axis += space;
-		w->layout_x = main_axis;
-		ui_widget_update_box_position(w);
-		main_axis += w->box.outer.width;
-	}
-	ctx->line->main_size = ctx->main_size;
-}
-
-static void ui_flexbox_layout_update_column(ui_flexbox_layout_context_t* ctx)
-{
-	float k;
-	float main_axis = 0;
-	float space = 0;
-	float free_space;
-
-	ui_widget_t* w;
-	ui_flexbox_layout_style_t *flex;
-	list_node_t *node;
-
-	free_space = ctx->widget->box.content.height - ctx->line->main_size;
-	if (free_space >= 0) {
-		k = free_space / ctx->line->sum_of_grow_value;
-	} else {
-		k = free_space / ctx->line->sum_of_shrink_value;
-	}
-
-	/* flex-grow and flex-shrink */
-
-	for (list_each(node, &ctx->line->elements)) {
-		w = node->data;
-		flex = &w->computed_style.flex;
-		if (w->computed_style.width_sizing != UI_SIZING_RULE_FIXED) {
-			ui_widget_compute_width_style(w);
-		}
-		if (free_space >= 0) {
-			if (flex->grow > 0) {
-				w->height = flex->basis + k * flex->grow;
-				update_flex_item_size(
-				    w, UI_LAYOUT_RULE_FIXED_HEIGHT);
-			} else {
-				update_flex_item_size(
-				    w, UI_LAYOUT_RULE_FIXED_HEIGHT);
-			}
-		} else if (flex->shrink > 0) {
-			w->height = flex->basis + k * flex->shrink;
-			update_flex_item_size(w, UI_LAYOUT_RULE_FIXED_HEIGHT);
-		} else {
-			update_flex_item_size(w, UI_LAYOUT_RULE_FIXED_HEIGHT);
-		}
-		ui_widget_add_state(w, UI_WIDGET_STATE_LAYOUTED);
-		main_axis += w->box.outer.height;
-	}
-	free_space = ctx->widget->box.content.height - ctx->line->main_size;
-	free_space = main_axis - ctx->main_size;
-
-	/* auto margin */
-
-	if (free_space > 0 && ctx->line->count_of_auto_margin_items > 0) {
-		main_axis = 0;
-		k = free_space / ctx->line->count_of_auto_margin_items;
-		for (list_each(node, &ctx->line->elements)) {
-			w = node->data;
-			if (ui_widget_has_auto_style(w, css_key_margin_top)) {
-				w->margin.top = k;
-				ui_widget_update_box_size(w);
-			}
-			if (ui_widget_has_auto_style(w, css_key_margin_bottom)) {
-				w->margin.bottom = k;
-				ui_widget_update_box_size(w);
-			}
-			main_axis += w->box.outer.height;
-		}
-		ctx->line->main_size = main_axis;
-	}
-
-	/* justify-content */
-
-	main_axis = ctx->widget->padding.top;
-	ui_flexbox_layout_compute_justify_content(ctx, &main_axis, &space);
-	for (list_each(node, &ctx->line->elements)) {
-		w = node->data;
-		main_axis += space;
-		w->layout_y = main_axis;
-		ui_widget_update_box_position(w);
-		main_axis += w->box.outer.height;
-	}
-	ctx->line->main_size = ctx->main_size;
-}
-
-static void ui_flexbox_layout_align_items_center(ui_flexbox_layout_context_t* ctx,
-					   float base_cross_axis)
-{
-	list_node_t *node;
-	ui_widget_t* child;
-
-	if (ctx->widget->computed_style.flex.direction == CSS_KEYWORD_COLUMN) {
-		for (list_each(node, &ctx->line->elements)) {
-			child = node->data;
-			child->layout_x =
-			    base_cross_axis +
-			    (ctx->line->cross_size - child->box.outer.width) *
-				0.5f;
-			ui_widget_update_box_position(child);
-		}
-		return;
-	}
-	for (list_each(node, &ctx->line->elements)) {
-		child = node->data;
-		child->layout_y =
-		    base_cross_axis +
-		    (ctx->line->cross_size - child->box.outer.height) * 0.5f;
-		ui_widget_update_box_position(child);
-	}
-}
-
-static void ui_flexbox_layout_align_items_stretch(ui_flexbox_layout_context_t* ctx,
-					    float base_cross_axis)
-{
-	list_node_t *node;
-	ui_widget_t* child;
-
-	if (ctx->widget->computed_style.flex.direction == CSS_KEYWORD_COLUMN) {
-		for (list_each(node, &ctx->line->elements)) {
-			child = node->data;
-			child->layout_x = base_cross_axis;
-			if (ui_widget_has_auto_style(child, css_key_width)) {
-				child->width =
-				    ctx->line->cross_size - margin_x(child);
-				update_flex_item_size(child,
-						   UI_LAYOUT_RULE_FIXED);
-			}
-			ui_widget_update_box_position(child);
-		}
-		return;
-	}
-	for (list_each(node, &ctx->line->elements)) {
-		child = node->data;
-		child->layout_y = base_cross_axis;
-		if (ui_widget_has_auto_style(child, css_key_height)) {
-			child->height = ctx->line->cross_size - margin_y(child);
-			update_flex_item_size(child, UI_LAYOUT_RULE_FIXED);
-		}
-		ui_widget_update_box_position(child);
-	}
-}
-
-static void ui_flexbox_layout_align_items_start(ui_flexbox_layout_context_t* ctx,
-					  float base_cross_axis)
-{
-	list_node_t *node;
-	ui_widget_t* child;
-
-	if (ctx->widget->computed_style.flex.direction == CSS_KEYWORD_COLUMN) {
-		for (list_each(node, &ctx->line->elements)) {
-			child = node->data;
-			child->layout_x = base_cross_axis;
-			ui_widget_update_box_position(child);
-		}
-		return;
-	}
-	for (list_each(node, &ctx->line->elements)) {
-		child = node->data;
-		child->layout_y = base_cross_axis;
-		ui_widget_update_box_position(child);
-	}
-}
-
-static void ui_flexbox_layout_align_items_end(ui_flexbox_layout_context_t* ctx,
-					float base_cross_axis)
-{
-	list_node_t *node;
-	ui_widget_t* child;
-
-	if (ctx->widget->computed_style.flex.direction == CSS_KEYWORD_COLUMN) {
-		for (list_each(node, &ctx->line->elements)) {
-			child = node->data;
-			child->layout_x = base_cross_axis +
-					  ctx->line->cross_size -
-					  child->box.outer.width;
-			ui_widget_update_box_position(child);
-		}
-		return;
-	}
-	for (list_each(node, &ctx->line->elements)) {
-		child = node->data;
-		child->layout_y = base_cross_axis + ctx->line->cross_size -
-				  child->box.outer.height;
-		ui_widget_update_box_position(child);
-	}
-}
-
-static void ui_flexbox_layout_align_items(ui_flexbox_layout_context_t* ctx)
-{
-	float cross_axis;
-	float free_space = 0;
-
-	ui_widget_t* w = ctx->widget;
-	list_node_t *node;
-
-	if (w->computed_style.flex.direction == CSS_KEYWORD_COLUMN) {
-		cross_axis = w->padding.left;
-		free_space = w->box.content.width - ctx->cross_size;
-	} else {
-		cross_axis = w->padding.top;
-		free_space = w->box.content.height - ctx->cross_size;
-	}
-	if (free_space < 0) {
-		free_space = 0;
-	}
-	for (list_each(node, &ctx->lines)) {
-		ctx->line = node->data;
-		ctx->line->cross_size += free_space / ctx->lines.length;
-		switch (w->computed_style.flex.align_items) {
-		case CSS_KEYWORD_CENTER:
-			ui_flexbox_layout_align_items_center(ctx, cross_axis);
+		item = node->data;
+		item->widget->layout_x = main_axis;
+		item->widget->layout_y = ctx->line->cross_axis;
+		switch (align_items) {
+		case CSS_ALIGN_ITEMS_CENTER:
+			item->widget->layout_y +=
+			    (ctx->line->max_cross_size -
+			     item->widget->outer_box.height) *
+			    0.5f;
 			break;
-		case CSS_KEYWORD_FLEX_START:
-			ui_flexbox_layout_align_items_start(ctx, cross_axis);
+		case CSS_ALIGN_ITEMS_FLEX_END:
+			item->widget->layout_y +=
+			    ctx->line->max_cross_size -
+			    item->widget->outer_box.height;
 			break;
-		case CSS_KEYWORD_FLEX_END:
-			ui_flexbox_layout_align_items_end(ctx, cross_axis);
-			break;
-		case CSS_KEYWORD_NORMAL:
-		case CSS_KEYWORD_STRETCH:
 		default:
-			ui_flexbox_layout_align_items_stretch(ctx, cross_axis);
 			break;
 		}
-		cross_axis += ctx->line->cross_size;
-	}
-	if (w->computed_style.flex.direction == CSS_KEYWORD_COLUMN) {
-		ctx->cross_size = cross_axis - w->padding.left;
-	} else {
-		ctx->cross_size = cross_axis - w->padding.top;
+		ui_widget_update_box_position(item->widget);
+		main_axis += item->widget->outer_box.width;
 	}
 }
 
-static void ui_flexbox_layout_update(ui_flexbox_layout_context_t* ctx)
+static void ui_flexbox_layout_update_column(ui_flexbox_layout_context_t *ctx)
 {
-	ui_widget_t* w = ctx->widget;
+	ui_layout_item_t *item;
+	css_computed_style_t *s;
 	list_node_t *node;
 
-	DEBUG_MSG("widget: %s, start\n", w->id);
+	float k = 0;
+	float main_axis = 0;
+	float main_size;
+	uint8_t align_items = ctx->widget->computed_style.type_bits.align_items;
+	float space = ctx->widget->content_box.height - ctx->line->main_size;
+
+	if (space >= 0) {
+		if (ctx->line->sum_of_grow_value > 0) {
+			k = space / ctx->line->sum_of_grow_value;
+		}
+	} else if (ctx->line->sum_of_shrink_value > 0) {
+		k = space / ctx->line->sum_of_shrink_value;
+	}
+
+#ifdef UI_DEBUG_ENABLED
+	{
+		UI_WIDGET_STR(ctx->widget, str);
+		UI_DEBUG_MSG("%s: cross_axis = %g, max_cross_size = %g, "
+			     "free_space = %g, alloc "
+			     "free space",
+			     str, ctx->line->cross_axis,
+			     ctx->line->max_cross_size, space);
+	}
+#endif
+
+	for (list_each(node, &ctx->line->items)) {
+		item = node->data;
+		s = &item->widget->computed_style;
+		ui_widget_compute_style(item->widget);
+		main_size = ui_compute_column_item_main_size(s);
+		if (css_computed_box_sizing(s) == CSS_BOX_SIZING_BORDER_BOX) {
+			main_size += css_border_y(s) + css_padding_y(s);
+		}
+		// 根据项目的 flex-grow 和 flex-shrink，调整它的高度
+		if (space >= 0) {
+			if (s->type_bits.flex_grow > 0) {
+				CSS_SET_FIXED_LENGTH(
+				    s, height, main_size + k * s->flex_grow);
+			}
+		} else if (s->type_bits.flex_shrink > 0) {
+			CSS_SET_FIXED_LENGTH(s, height,
+					     main_size + k * s->flex_shrink);
+		}
+		// 计算拉伸的宽度
+		if (align_items == CSS_ALIGN_ITEMS_STRETCH &&
+		    s->type_bits.height == CSS_HEIGHT_AUTO) {
+			CSS_SET_FIXED_LENGTH(s, width,
+					     css_convert_border_box_height(
+						 s, ctx->line->max_cross_size -
+							css_margin_x(s)));
+		}
+		ui_widget_update_box_size(item->widget);
+		ui_layout_diff_auto_reflow(&item->diff, item->widget);
+		main_axis += item->widget->outer_box.height;
+	}
+	ctx->line->main_size = main_axis;
+	space = ctx->widget->content_box.height - main_axis;
+
+#ifdef UI_DEBUG_ENABLED
+	{
+		UI_WIDGET_STR(ctx->widget, str);
+		UI_DEBUG_MSG("%s: free_space = %g, auto_margin_items = %lu",
+			     str, space, ctx->line->count_of_auto_margin_items);
+	}
+#endif
+
+	// 计算 marign-top 和 margin-bottom
+	if (space > 0 && ctx->line->count_of_auto_margin_items > 0) {
+		main_axis = 0;
+		k = space / ctx->line->count_of_auto_margin_items;
+		for (list_each(node, &ctx->line->items)) {
+			item = node->data;
+			s = &item->widget->computed_style;
+			if (s->type_bits.margin_top == CSS_MARGIN_AUTO) {
+				CSS_SET_FIXED_LENGTH(s, margin_top, k);
+			}
+			if (s->type_bits.margin_bottom == CSS_MARGIN_AUTO) {
+				CSS_SET_FIXED_LENGTH(s, margin_bottom, k);
+			}
+			ui_widget_update_box_size(item->widget);
+			main_axis += item->widget->outer_box.height;
+		}
+		ctx->line->main_size = main_axis;
+	}
+
+	// 根据 justify-content 和 align-items，更新每个项目的位置和尺寸
+	ui_flexbox_layout_compute_justify_content(ctx, &main_axis, &space);
+	for (list_each(node, &ctx->line->items)) {
+		main_axis += space;
+		item = node->data;
+		item->widget->layout_y = main_axis;
+		item->widget->layout_x = ctx->line->cross_axis;
+		switch (align_items) {
+		case CSS_ALIGN_ITEMS_CENTER:
+			item->widget->layout_x +=
+			    (ctx->line->max_cross_size -
+			     item->widget->outer_box.width) *
+			    0.5f;
+			break;
+		case CSS_ALIGN_ITEMS_FLEX_END:
+			item->widget->layout_x += ctx->line->max_cross_size -
+						  item->widget->outer_box.width;
+			break;
+		default:
+			break;
+		}
+		ui_widget_update_box_position(item->widget);
+		main_axis += item->widget->outer_box.height;
+	}
+}
+
+static void ui_flexbox_layout_update(ui_flexbox_layout_context_t *ctx)
+{
+	list_node_t *node;
+	ui_layout_item_t *item;
+
+	float cross_axis;
+	float cross_space = 0;
+
+	if (ctx->direction_is_column) {
+		cross_axis = ctx->widget->computed_style.padding_left;
+		cross_space = ctx->widget->content_box.width;
+	} else {
+		cross_axis = ctx->widget->computed_style.padding_top;
+		cross_space = ctx->widget->content_box.height;
+	}
+	cross_space = (cross_space - ctx->cross_size) / ctx->lines.length;
 	for (list_each(node, &ctx->lines)) {
 		ctx->line = node->data;
-		if (w->computed_style.flex.direction == CSS_KEYWORD_COLUMN) {
+		ctx->line->cross_axis = cross_axis;
+		ctx->line->max_cross_size = ctx->line->cross_size + cross_space;
+		if (ctx->direction_is_column) {
 			ui_flexbox_layout_update_column(ctx);
 		} else {
 			ui_flexbox_layout_update_row(ctx);
 		}
+		cross_axis += ctx->line->max_cross_size;
 	}
-	DEBUG_MSG("widget: %s, end\n", w->id);
-	ui_flexbox_layout_align_items(ctx);
+	for (item = ctx->items; item->widget; ++item) {
+		if (!ui_widget_in_layout_flow(item->widget)) {
+			ui_widget_compute_style(item->widget);
+			ui_widget_update_box_size(item->widget);
+			ui_widget_update_box_position(item->widget);
+			ui_layout_diff_auto_reflow(&item->diff, item->widget);
+		}
+		ui_layout_diff_end(&item->diff, item->widget);
+	}
 }
 
-static void ui_flexbox_layout_update_free_elements(ui_flexbox_layout_context_t* ctx)
-{
-	list_node_t *node;
-	for (list_each(node, &ctx->free_elements)) {
-		ui_widget_auto_reflow(node->data, UI_LAYOUT_RULE_FIXED);
-	}
-}
-
-static void ui_flexbox_layout_apply_size(ui_flexbox_layout_context_t* ctx)
+static void ui_flexbox_layout_apply_size(ui_flexbox_layout_context_t *ctx)
 {
 	float width = 0, height = 0;
+	ui_widget_t *w = ctx->widget;
 
-	ui_widget_t* w = ctx->widget;
-
-	DEBUG_MSG("widget: %s, main_size: %g, cross_size: %g\n", w->id,
-		  ctx->main_size, ctx->cross_size);
-	if (w->computed_style.flex.direction == CSS_KEYWORD_COLUMN) {
+	if (ctx->direction_is_column) {
 		switch (ctx->rule) {
 		case UI_LAYOUT_RULE_FIXED:
-			width = w->box.content.width;
-			height = w->box.content.height;
+			width = w->content_box.width;
+			height = w->content_box.height;
 			break;
 		case UI_LAYOUT_RULE_FIXED_WIDTH:
-			width = w->box.content.width;
+			width = w->content_box.width;
 			w->proto->autosize(w, &width, &height, ctx->rule);
-			width = w->box.content.width;
+			width = w->content_box.width;
 			height = y_max(height, ctx->main_size);
 			break;
 		case UI_LAYOUT_RULE_FIXED_HEIGHT:
-			height = w->box.content.height;
+			height = w->content_box.height;
 			w->proto->autosize(w, &width, &height, ctx->rule);
-			height = w->box.content.height;
+			height = w->content_box.height;
 			width = y_max(width, ctx->cross_size);
 			break;
 		default:
@@ -724,58 +630,95 @@ static void ui_flexbox_layout_apply_size(ui_flexbox_layout_context_t* ctx)
 			width = y_max(width, ctx->cross_size);
 			break;
 		}
-		w->width = to_border_box_width(w, width);
-		w->height = to_border_box_height(w, height);
-		ui_widget_update_box_size(w);
-		if (ctx->is_initiative) {
-			w->max_content_width = w->box.content.width;
-			w->max_content_height = w->box.content.height;
+	} else {
+		switch (ctx->rule) {
+		case UI_LAYOUT_RULE_FIXED:
+			width = w->content_box.width;
+			height = w->content_box.height;
+			break;
+		case UI_LAYOUT_RULE_FIXED_WIDTH:
+			width = w->content_box.width;
+			w->proto->autosize(w, &width, &height, ctx->rule);
+			width = w->content_box.width;
+			height = y_max(height, ctx->cross_size);
+			break;
+		case UI_LAYOUT_RULE_FIXED_HEIGHT:
+			height = w->content_box.height;
+			w->proto->autosize(w, &width, &height, ctx->rule);
+			width = y_max(width, ctx->main_size);
+			height = w->content_box.height;
+			break;
+		default:
+			w->proto->autosize(w, &width, &height, ctx->rule);
+			width = y_max(width, ctx->main_size);
+			height = y_max(height, ctx->cross_size);
+			break;
 		}
-		w->proto->resize(w, w->box.content.width,
-				 w->box.content.height);
-		return;
 	}
-	switch (ctx->rule) {
-	case UI_LAYOUT_RULE_FIXED:
-		width = w->box.content.width;
-		height = w->box.content.height;
-		break;
-	case UI_LAYOUT_RULE_FIXED_WIDTH:
-		width = w->box.content.width;
-		w->proto->autosize(w, &width, &height, ctx->rule);
-		width = w->box.content.width;
-		height = y_max(height, ctx->cross_size);
-		break;
-	case UI_LAYOUT_RULE_FIXED_HEIGHT:
-		height = w->box.content.height;
-		w->proto->autosize(w, &width, &height, ctx->rule);
-		width = y_max(width, ctx->main_size);
-		height = w->box.content.height;
-		break;
-	default:
-		w->proto->autosize(w, &width, &height, ctx->rule);
-		width = y_max(width, ctx->main_size);
-		height = y_max(height, ctx->cross_size);
-		break;
-	}
-	w->width = to_border_box_width(w, width);
-	w->height = to_border_box_height(w, height);
-	ui_widget_update_box_size(w);
-	if (ctx->is_initiative) {
-		w->max_content_width = w->box.content.width;
-		w->max_content_height = w->box.content.height;
-	}
-	w->proto->resize(w, w->box.content.width, w->box.content.height);
+	ui_widget_set_content_box_size(w, width, height);
+	ctx->rule = UI_LAYOUT_RULE_FIXED;
 }
 
-void ui_flexbox_layout_reflow(ui_widget_t* w, ui_layout_rule_t rule)
+void ui_flexbox_layout_reflow(ui_widget_t *w, ui_layout_rule_t rule)
 {
-	ui_flexbox_layout_context_t* ctx;
+	css_computed_style_t *s = &w->computed_style;
+	ui_flexbox_layout_context_t ctx;
 
-	ctx = ui_flexbox_layout_begin(w, rule);
-	ui_flexbox_layout_load(ctx);
-	ui_flexbox_layout_apply_size(ctx);
-	ui_flexbox_layout_update(ctx);
-	ui_flexbox_layout_update_free_elements(ctx);
-	ui_flexbox_layout_end(ctx);
+#ifdef UI_DEBUG_ENABLED
+	{
+		UI_WIDGET_STR(w, str);
+		UI_WIDGET_SIZE_STR(w, size_str);
+		UI_DEBUG_MSG("%s: flexbox layout start, size = %s, rule = %d",
+			     str, size_str, rule);
+		ui_debug_msg_indent++;
+	}
+#endif
+
+	ctx.direction_is_column =
+	    s->type_bits.flex_direction == CSS_FLEX_DIRECTION_COLUMN;
+	ctx.rule = rule;
+	ctx.line = NULL;
+	ctx.widget = w;
+	ctx.main_size = 0;
+	ctx.cross_size = 0;
+	ctx.items = malloc(sizeof(ui_layout_item_t) * (w->children.length + 1));
+	ctx.items[w->children.length].widget = NULL;
+	list_create(&ctx.lines);
+
+	ui_flexbox_layout_next_line(&ctx);
+#ifdef UI_DEBUG_ENABLED
+	UI_DEBUG_MSG("%s", "start load");
+	ui_debug_msg_indent++;
+#endif
+	ui_flexbox_layout_load(&ctx);
+#ifdef UI_DEBUG_ENABLED
+	ui_debug_msg_indent--;
+	UI_DEBUG_MSG("end load, main_size: %g, cross_size: %g", ctx.main_size,
+		     ctx.cross_size);
+#endif
+	ui_flexbox_layout_apply_size(&ctx);
+#ifdef UI_DEBUG_ENABLED
+	{
+		UI_WIDGET_SIZE_STR(w, size_str);
+		UI_DEBUG_MSG("start update, size = %s", size_str);
+		ui_debug_msg_indent++;
+	}
+#endif
+	ui_flexbox_layout_update(&ctx);
+#ifdef UI_DEBUG_ENABLED
+	ui_debug_msg_indent--;
+	UI_DEBUG_MSG("%s", "end update");
+#endif
+	list_destroy(&ctx.lines, ui_flexbox_line_destroy);
+	free(ctx.items);
+
+#ifdef UI_DEBUG_ENABLED
+	{
+		ui_debug_msg_indent--;
+		UI_WIDGET_STR(w, str);
+		UI_WIDGET_SIZE_STR(w, size_str);
+		UI_DEBUG_MSG("%s: flexbox layout end, size = %s", str,
+			     size_str);
+	}
+#endif
 }

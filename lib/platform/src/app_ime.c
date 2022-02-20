@@ -2,8 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <yutil.h>
-#include "platform.h"
+#include <LCUI/util.h>
 #include "internal.h"
 
 typedef struct ime_t_ {

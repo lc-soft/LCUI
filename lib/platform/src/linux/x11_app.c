@@ -1,6 +1,6 @@
 #include "../internal.h"
 
-#if defined(LCUI_PLATFORM_LINUX) && defined(USE_LIBX11)
+#if defined(LCUI_PLATFORM_LINUX) && defined(HAVE_LIBX11)
 
 #define MOUSE_WHEEL_DELTA 20
 #define MIN_WINDOW_WIDTH 100
@@ -140,8 +140,9 @@ static app_window_t *x11_app_window_create(const wchar_t *title, int x, int y,
 	return wnd;
 }
 
-static void x11_app_window_destroy(app_window_t *wnd)
+static void x11_app_window_on_destroy(app_window_t *wnd)
 {
+	list_unlink(&x11_app.windows, &wnd->node);
 	list_destroy(&wnd->rects, free);
 	if (wnd->ximage) {
 		XDestroyImage(wnd->ximage);
@@ -151,8 +152,6 @@ static void x11_app_window_destroy(app_window_t *wnd)
 		XFreeGC(x11_app.display, wnd->gc);
 		wnd->gc = NULL;
 	}
-	XDestroyWindow(x11_app.display, wnd->handle);
-	list_unlink(&x11_app.windows, &wnd->node);
 	free(wnd);
 }
 
@@ -261,9 +260,10 @@ static int x11_app_process_native_event(void)
 		e.key.shift_key = xe.xkey.state & ShiftMask ? TRUE : FALSE;
 		e.key.ctrl_key = xe.xkey.state & ControlMask ? TRUE : FALSE;
 		// @WhoAteDaCake
-		// TODO: this triggers and line 155 causes event to trigger twice?
-		// I tried to remove the one in if statement and put it to the end of the function
-		// but it doesn't seem to work properly then? Needs investigation
+		// TODO: this triggers and line 155 causes event to trigger
+		// twice? I tried to remove the one in if statement and put it
+		// to the end of the function but it doesn't seem to work
+		// properly then? Needs investigation
 		app_process_event(&e);
 		XDisplayKeycodes(dsp, &min_keycode, &max_keycode);
 		if (keysym >= min_keycode && keysym <= max_keycode &&
@@ -304,20 +304,22 @@ static int x11_app_process_native_event(void)
 		e.mouse.button = xe.xbutton.button;
 		app_process_event(&e);
 		break;
+	/**
+	 * FIXME: 调用 XDestroyWindow() 后未接收到 DestroyNotify 事件
+	 */
+	// case DestroyNotify:
 	case ClientMessage:
 		if (xe.xclient.data.l[0] == x11_app.wm_delete) {
 			logger_debug("WM_DELETE_WINNDOW\n");
 			e.type = APP_EVENT_CLOSE;
 			app_process_event(&e);
-			x11_app_window_destroy(e.window);
+			x11_app_window_on_destroy(e.window);
 		} else if (xe.xclient.data.l[0] == x11_app.wm_exit) {
 			logger_debug("WM_EXIT\n");
 			e.type = APP_EVENT_QUIT;
 			app_process_event(&e);
 			return 0;
 		}
-		// TODO: If the main window is destroyed, we need to exit the
-		// event loop
 		break;
 	default:
 		break;
@@ -445,7 +447,13 @@ static void x11_app_window_close(app_window_t *wnd)
 	xe.xclient.send_event = 1;
 	xe.xclient.format = 32;
 	xe.xclient.window = wnd->handle;
-	XSendEvent(x11_app.display, x11_app.win_events, 0, NoEventMask, &xe);
+	XSendEvent(x11_app.display, x11_app.win_events, 0, NoEventMask,
+		       &xe);
+}
+
+static void x11_app_window_destroy(app_window_t *wnd)
+{
+	XDestroyWindow(x11_app.display, wnd->handle);
 }
 
 static void x11_app_window_set_title(app_window_t *wnd, const wchar_t *title)
@@ -613,18 +621,17 @@ static int x11_app_init(const wchar_t *name)
 
 static int x11_app_destroy(void)
 {
+	list_destroy_without_node(
+	    &x11_app.windows,
+	    (list_item_destructor_t)x11_app_window_on_destroy);
 	XCloseDisplay(x11_app.display);
 	return 0;
 }
 
 static void x11_app_exit(int exit_code)
 {
-	list_node_t *node;
 	XEvent xe = { 0 };
 
-	for (list_each(node, &x11_app.windows)) {
-		x11_app_window_close(node->data);
-	}
 	xe.xclient.type = ClientMessage;
 	xe.xclient.data.l[0] = x11_app.wm_exit;
 	xe.xclient.serial = 0;
@@ -664,6 +671,7 @@ void x11_app_window_driver_init(app_window_driver_t *driver)
 	driver->show = x11_app_window_show;
 	driver->hide = x11_app_window_hide;
 	driver->close = x11_app_window_close;
+	driver->destroy = x11_app_window_destroy;
 	driver->activate = x11_app_window_activate;
 	driver->set_title = x11_app_window_set_title;
 	driver->set_position = x11_app_window_set_position;

@@ -1,3 +1,0 @@
-${define USE_LIBX11}
-${define USE_LINUX_INPUT_EVENT}
-${define ENABLE_TOUCH}

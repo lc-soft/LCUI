@@ -36,8 +36,6 @@
 
 LCUI_BEGIN_HEADER
 
-#define SHADOW_WIDTH(sd) (sd->blur + sd->spread)
-
 LCUI_API void pd_get_boxshadow_canvas_rect(const pd_boxshadow_t *shadow,
 					   const pd_rect_t *box_rect,
 					   pd_rect_t *canvas_rect);

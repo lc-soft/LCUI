@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <LCUI/util.h>
-#include "../include/ui.h"
+#include <LCUI/css/selector.h>
 #include "internal.h"
 
 #define LOG_BUFFER_SIZE 1024

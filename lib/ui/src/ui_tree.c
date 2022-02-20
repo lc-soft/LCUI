@@ -1,7 +1,7 @@
 ﻿#include <assert.h>
 #include <string.h>
 #include <LCUI/util.h>
-#include "../include/ui.h"
+#include <LCUI/css/selector.h>
 #include "internal.h"
 
 #define TYPE_CHILD_LIST UI_MUTATION_RECORD_TYPE_CHILD_LIST
@@ -203,7 +203,7 @@ void ui_widget_empty(ui_widget_t* w)
 	ui_widget_t* child;
 	list_node_t* node;
 	ui_event_t ev = { 0 };
-	ui_mutation_record_t *record;
+	ui_mutation_record_t* record;
 
 	ui_event_init(&ev, "unlink");
 	if (ui_widget_has_observer(w, TYPE_CHILD_LIST)) {
@@ -242,10 +242,11 @@ void ui_widget_remove(ui_widget_t* w)
 		child->index -= 1;
 		node = node->next;
 	}
-	if (w->computed_style.position != CSS_KEYWORD_ABSOLUTE) {
+	if (w->computed_style.type_bits.position != CSS_POSITION_ABSOLUTE) {
 		ui_widget_add_task(w->parent, UI_TASK_REFLOW);
 	}
-	ui_widget_mark_dirty_rect(w->parent, &w->box.canvas, CSS_KEYWORD_CONTENT_BOX);
+	ui_widget_mark_dirty_rect(w->parent, &w->canvas_box,
+				  CSS_KEYWORD_CONTENT_BOX);
 	ui_widget_unlink(w);
 	ui_trash_add(w);
 }
@@ -314,13 +315,13 @@ ui_widget_t* ui_widget_at(ui_widget_t* widget, int ix, int iy)
 		is_hit = FALSE;
 		for (list_each(node, &target->stacking_context)) {
 			c = node->data;
-			if (!c->computed_style.visible) {
+			if (!ui_widget_is_visible(c)) {
 				continue;
 			}
-			if (ui_rect_has_point(&c->box.border, x, y)) {
+			if (ui_rect_has_point(&c->border_box, x, y)) {
 				target = c;
-				x -= c->box.padding.x;
-				y -= c->box.padding.y;
+				x -= c->padding_box.x;
+				y -= c->padding_box.y;
 				is_hit = TRUE;
 				break;
 			}
@@ -334,7 +335,7 @@ static void _ui_print_tree(ui_widget_t* w, int depth, const char* prefix)
 	size_t len;
 	ui_widget_t* child;
 	list_node_t* node;
-	css_selector_node_t *snode;
+	css_selector_node_t* snode;
 	char str[16], child_prefix[512];
 
 	len = strlen(prefix);
@@ -359,13 +360,19 @@ static void _ui_print_tree(ui_widget_t* w, int depth, const char* prefix)
 		    "%s%s %s, xy:(%g,%g), size:(%g,%g), "
 		    "visible: %s, display: %d, padding: (%g,%g,%g,%g), margin: "
 		    "(%g,%g,%g,%g)\n",
-		    prefix, str, snode->fullname, child->x, child->y,
-		    child->width, child->height,
-		    child->computed_style.visible ? "true" : "false",
-		    child->computed_style.display, child->padding.top,
-		    child->padding.right, child->padding.bottom,
-		    child->padding.left, child->margin.top, child->margin.right,
-		    child->margin.bottom, child->margin.left);
+		    prefix, str, snode->fullname, child->border_box.x,
+		    child->border_box.y, child->border_box.width,
+		    child->border_box.height,
+		    ui_widget_is_visible(child) ? "true" : "false",
+		    child->computed_style.type_bits.display,
+		    child->computed_style.padding_top,
+		    child->computed_style.padding_right,
+		    child->computed_style.padding_bottom,
+		    child->computed_style.padding_left,
+		    child->computed_style.margin_top,
+		    child->computed_style.margin_right,
+		    child->computed_style.margin_bottom,
+		    child->computed_style.margin_left);
 		css_selector_node_destroy(snode);
 		_ui_print_tree(child, depth + 1, child_prefix);
 	}
@@ -373,12 +380,13 @@ static void _ui_print_tree(ui_widget_t* w, int depth, const char* prefix)
 
 void ui_print_tree(ui_widget_t* w)
 {
-	css_selector_node_t *node;
+	css_selector_node_t* node;
 	w = w ? w : ui_root();
 	node = ui_widget_create_selector_node(w);
 	logger_error("%s, xy:(%g,%g), size:(%g,%g), visible: %s\n",
-		     node->fullname, w->x, w->y, w->width, w->height,
-		     w->computed_style.visible ? "true" : "false");
+		     node->fullname, w->border_box.x, w->border_box.y,
+		     w->border_box.width, w->border_box.height,
+		     ui_widget_is_visible(w) ? "true" : "false");
 	css_selector_node_destroy(node);
 	_ui_print_tree(w, 0, "  ");
 }

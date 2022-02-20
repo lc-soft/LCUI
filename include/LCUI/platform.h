@@ -262,6 +262,7 @@ typedef struct app_window_driver_t {
 	void (*show)(app_window_t *);
 	void (*activate)(app_window_t *);
 	void (*close)(app_window_t *);
+	void (*destroy)(app_window_t *);
 	void (*set_title)(app_window_t *, const wchar_t *);
 	void (*set_size)(app_window_t *, int, int);
 	void (*set_position)(app_window_t *, int, int);
