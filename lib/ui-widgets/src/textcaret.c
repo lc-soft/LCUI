@@ -50,7 +50,7 @@ typedef struct ui_textcaret_t {
 
 static ui_widget_prototype_t *ui_textcaret_proto = NULL;
 
-static const char *ui_textcaret_css = CodeToString(
+static const char *ui_textcaret_css = css_string(
 
 textcaret {
 	pointer-events: none;

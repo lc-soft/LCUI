@@ -28,7 +28,7 @@
  */
 
 #include <stdlib.h>
-#include <LCUI/types.h>
+#include <LCUI/def.h>
 #include "../include/pandagl.h"
 
 pd_context_t* pd_context_create(pd_canvas_t *canvas, pd_rect_t *rect)

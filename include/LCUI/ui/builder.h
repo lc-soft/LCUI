@@ -31,7 +31,7 @@
 #ifndef LIB_UI_BUILDER_INCLUDE_BUILDER_H
 #define LIB_UI_BUILDER_INCLUDE_BUILDER_H
 
-#include <LCUI/header.h>
+#include <LCUI/def.h>
 #include <LCUI/ui.h>
 
 LCUI_BEGIN_HEADER

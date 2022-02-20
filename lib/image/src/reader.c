@@ -32,9 +32,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <LCUI/header.h>
 #include "config.h"
-#include <LCUI/types.h>
 #include <LCUI/pandagl.h>
 #include <LCUI/image.h>
 

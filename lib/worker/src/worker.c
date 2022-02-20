@@ -31,8 +31,7 @@
 
 #include <errno.h>
 #include <stdlib.h>
-#include <LCUI/header.h>
-#include <LCUI/types.h>
+#include <LCUI/def.h>
 #include <LCUI/util/task.h>
 #include <yutil.h>
 #include <LCUI/thread.h>

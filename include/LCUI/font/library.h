@@ -1,7 +1,7 @@
 ﻿#ifndef LIB_FONT_INCLUDE_FONT_LIBRARY_H
 #define LIB_FONT_INCLUDE_FONT_LIBRARY_H
 
-#include <LCUI/header.h>
+#include <LCUI/def.h>
 #include "def.h"
 
 LCUI_BEGIN_HEADER

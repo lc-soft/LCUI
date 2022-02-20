@@ -1,6 +1,6 @@
 // TODO: Reduce dependence on lcui header files
 
-#include <LCUI/header.h>
+#include <LCUI/def.h>
 #include <LCUI/platform.h>
 #include <LCUI/ui.h>
 

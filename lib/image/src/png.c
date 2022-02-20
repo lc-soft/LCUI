@@ -31,9 +31,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <LCUI/header.h>
 #include "config.h"
-#include <LCUI/types.h>
+#include <LCUI/def.h>
 #include <LCUI/util.h>
 
 #ifdef ASSERT

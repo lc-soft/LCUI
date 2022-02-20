@@ -1,7 +1,7 @@
 ﻿#ifndef CSS_INCLUDE_CSS_UTILS_H
 #define CSS_INCLUDE_CSS_UTILS_H
 
-#include <LCUI/header.h>
+#include <LCUI/def.h>
 #include "def.h"
 
 LCUI_BEGIN_HEADER

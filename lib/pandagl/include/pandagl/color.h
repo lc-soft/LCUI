@@ -1,8 +1,7 @@
 #ifndef LIB_PANDAGL_INCLUDE_PANDAGL_COLOR_H
 #define LIB_PANDAGL_INCLUDE_PANDAGL_COLOR_H
 
-#include <LCUI/header.h>
-#include <LCUI/types.h>
+#include <LCUI/def.h>
 #include "def.h"
 
 INLINE pd_color_t pd_color(uchar_t a, uchar_t r, uchar_t g, uchar_t b)

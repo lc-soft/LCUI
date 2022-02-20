@@ -2,12 +2,13 @@
 #ifndef LIB_PANDAGL_INCLUDE_PANDAGL_RECT_H
 #define LIB_PANDAGL_INCLUDE_PANDAGL_RECT_H
 
-#include <LCUI/header.h>
-#include <LCUI/types.h>
-#include <LCUI/util.h>
+#include <LCUI/def.h>
+#include <yutil.h>
 #include "def.h"
 
 LCUI_BEGIN_HEADER
+
+LCUI_API pd_rect_t pd_rect(int x, int y, int width, int height);
 
 INLINE pd_bool pd_rect_is_include(pd_rect_t *a, pd_rect_t *b)
 {

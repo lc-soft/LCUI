@@ -31,7 +31,7 @@
 #ifndef LIB_UI_WIDGETS_INCLUDE_TEXTEDIT_H
 #define LIB_UI_WIDGETS_INCLUDE_TEXTEDIT_H
 
-#include <LCUI/header.h>
+#include <LCUI/def.h>
 #include <LCUI/ui.h>
 
 LCUI_BEGIN_HEADER

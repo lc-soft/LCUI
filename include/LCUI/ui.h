@@ -1,8 +1,7 @@
 ﻿#ifndef LIB_UI_INCLUDE_UI_H
 #define LIB_UI_INCLUDE_UI_H
 
-#include <LCUI/header.h>
-#include <LCUI/types.h>
+#include <LCUI/def.h>
 #include <LCUI/util.h>
 #include <LCUI/css/def.h>
 #include <LCUI/pandagl/def.h>

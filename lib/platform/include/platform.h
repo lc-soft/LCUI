@@ -1,8 +1,7 @@
 ﻿#ifndef LIBPLATFORM_INCLUDE_PLATFORM_H
 #define LIBPLATFORM_INCLUDE_PLATFORM_H
 
-#include <LCUI/header.h>
-#include <LCUI/types.h>
+#include <LCUI/def.h>
 #include <LCUI/pandagl/def.h>
 
 typedef pd_context_t app_window_paint_t;

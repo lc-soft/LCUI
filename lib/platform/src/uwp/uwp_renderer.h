@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include <LCUI/header.h>
+#include <LCUI/def.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/display.h>
 

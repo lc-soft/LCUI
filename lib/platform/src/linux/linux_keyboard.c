@@ -67,7 +67,7 @@ static void linux_keyboard_thread(void *arg)
 	while (linux_keyboard.active) {
 		bytes = read(linux_keyboard.dev_fd, &data, sizeof(data));
 		if (bytes > 0 && data.type == EV_KEY) {
-			_DEBUG_MSG("Keypress value=%x, type=%x, code=%x\n",
+			logger_debug("Keypress value=%x, type=%x, code=%x\n",
 				   data.value, data.type, data.code);
 		}
 	}
