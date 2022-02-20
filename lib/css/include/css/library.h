@@ -31,7 +31,7 @@
 #ifndef LIBCSS_INCLUDE_CSS_LIBRARY_H
 #define LIBCSS_INCLUDE_CSS_LIBRARY_H
 
-#include <LCUI/header.h>
+#include <LCUI/def.h>
 #include "def.h"
 
 LCUI_BEGIN_HEADER

@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <LCUI/types.h>
+#include <LCUI/def.h>
 #include <LCUI/util.h>
 #include "../include/pandagl.h"
 

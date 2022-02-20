@@ -31,7 +31,7 @@
 #ifndef LCUI_THREAD_H
 #define LCUI_THREAD_H
 
-#include <LCUI/header.h>
+#include <LCUI/def.h>
 
 typedef unsigned long thread_t;
 typedef union thread_mutex_record_t *thread_mutex_t;

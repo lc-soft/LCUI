@@ -142,7 +142,7 @@ LCUI_BOOL ui_check_widget_prototype(ui_widget_t* w, const ui_widget_prototype_t*
 
 void *ui_widget_get_data(ui_widget_t* widget, ui_widget_prototype_t *proto)
 {
-	uint_t i;
+	unsigned i;
 	if (!widget->data.list || !proto) {
 		return NULL;
 	}

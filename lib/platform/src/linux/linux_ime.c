@@ -52,7 +52,6 @@ static void x11_ime_to_text(int ch)
 static void on_key_press(app_event_t *e, void *arg)
 {
 	wchar_t text[2] = { e->key.code, 0 };
-	_DEBUG_MSG("char: %c\n", e->key.code);
 	ime_commit(text, 2);
 }
 

@@ -37,7 +37,7 @@
 
 static ui_widget_prototype_t *ui_button_prototype = NULL;
 
-static const char *ui_button_css = CodeToString(
+static const char *ui_button_css = css_string(
 
 button {
 	padding: 5px 10px;

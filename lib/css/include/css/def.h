@@ -1,12 +1,14 @@
 ﻿#ifndef LIBCSS_INCLUDE_CSS_DEF_H
 #define LIBCSS_INCLUDE_CSS_DEF_H
 
-#include <LCUI/types.h>
-#include <LCUI/util.h>
+#include <LCUI/def.h>
 #include <LCUI/pandagl/def.h>
+#include <LCUI/util.h>
 
 #define CSS_SELECTOR_MAX_LEN 1024
 #define CSS_SELECTOR_MAX_DEPTH 32
+
+#define css_string(...) "" #__VA_ARGS__ ""
 
 typedef enum css_property_key_t {
 	// position start

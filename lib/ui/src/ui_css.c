@@ -5,7 +5,7 @@
 #include "../include/ui.h"
 #include "internal.h"
 
-const char *ui_default_css = CodeToString(
+const char *ui_default_css = css_string(
 
 * {
 	width: auto;

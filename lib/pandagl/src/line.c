@@ -1,5 +1,4 @@
-﻿#include <LCUI/header.h>
-#include <LCUI/types.h>
+﻿#include <LCUI/def.h>
 #include <LCUI/pandagl.h>
 
 void pd_canvas_draw_horizontal_line(pd_canvas_t *canvas, pd_color_t color,

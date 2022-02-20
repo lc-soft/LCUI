@@ -1,12 +1,29 @@
 set_project("lcui")
-set_version("2.2.1")
+set_version("3.0.0")
 add_rules("mode.debug", "mode.release", "mode.coverage")
-add_includedirs("include")
+add_includedirs("include", "test/lib/ctest/include/", "lib/pandagl/include", "lib/yutil/include")
 add_rpathdirs("@loader_path/lib", "@loader_path")
-add_defines("LCUI_EXPORTS", "YUTIL_EXPORTS", "UNICODE")
-add_includedirs("test/lib/ctest/include/")
-includes("test/lib/ctest/xmake.lua")
-includes("lib/**/xmake.lua")
+add_defines("LCUI_EXPORTS", "LCUI_DLL", "YUTIL_EXPORTS", "UNICODE")
+includes(
+    "test/lib/ctest",
+    "lib/def",
+    "lib/css",
+    "lib/font",
+    "lib/image",
+    "lib/pandagl",
+    "lib/platform",
+    "lib/text",
+    "lib/thread",
+    "lib/timer",
+    "lib/ui",
+    "lib/ui-builder",
+    "lib/ui-cursor",
+    "lib/ui-server",
+    "lib/ui-widgets",
+    "lib/util",
+    "lib/worker",
+    "lib/yutil"
+)
 set_warnings("all")
 set_rundir("$(projectdir)/test")
 
@@ -29,7 +46,6 @@ end
 target("run-tests")
     set_kind("binary")
     add_files("$(projectdir)/test/run_tests.c", "$(projectdir)/test/cases/*.c")
-    add_includedirs("test/lib/ctest/include/")
     add_deps("ctest", "lcui")
     on_run(function (target)
         import("core.base.option")

@@ -1,8 +1,7 @@
 ﻿#ifndef TEST_UTIL_H
 #define TEST_UTIL_H
 
-#include <LCUI/header.h>
-#include <LCUI/types.h>
+#include <LCUI/def.h>
 #include <LCUI/pandagl/def.h>
 #include <LCUI/pandagl/rect.h>
 #include <LCUI/ui.h>

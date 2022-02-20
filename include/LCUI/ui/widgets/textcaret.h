@@ -31,7 +31,7 @@
 #ifndef LIB_UI_WIDGETS_INCLUDE_TEXTCARET_H
 #define LIB_UI_WIDGETS_INCLUDE_TEXTCARET_H
 
-#include <LCUI/header.h>
+#include <LCUI/def.h>
 #include <LCUI/ui.h>
 
 LCUI_API void ui_textcaret_refresh(ui_widget_t* widget);

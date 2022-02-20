@@ -10,7 +10,7 @@ static struct {
 	ui_widget_t* inline_block;
 } self;
 
-static const char *css = CodeToString(
+static const char *css = css_string(
 
 .block {
 	width: 100px;

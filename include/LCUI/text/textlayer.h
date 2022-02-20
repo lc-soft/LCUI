@@ -31,7 +31,7 @@
 #ifndef LCUI_TEXTLAYER_H
 #define LCUI_TEXTLAYER_H
 
-#include <LCUI/header.h>
+#include <LCUI/def.h>
 #include <LCUI/font/def.h>
 #include <LCUI/text/textstyle.h>
 

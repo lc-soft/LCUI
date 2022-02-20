@@ -8,7 +8,7 @@
 
 /* clang-format off */
 
-const char *test_css = CodeToString(
+const char *test_css = css_string(
 
 .container {
 	width: 300px;

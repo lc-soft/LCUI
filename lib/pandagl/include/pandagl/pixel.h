@@ -1,8 +1,7 @@
 #ifndef LIB_PANDAGL_INCLUDE_PANDAGL_PIXEL_H
 #define LIB_PANDAGL_INCLUDE_PANDAGL_PIXEL_H
 
-#include <LCUI/header.h>
-#include <LCUI/types.h>
+#include <LCUI/def.h>
 #include "def.h"
 
 #define _pd_alpha_blend(__back__, __fore__, __alpha__) \
