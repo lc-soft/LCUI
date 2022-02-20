@@ -15,7 +15,7 @@ void test_canvas_mix(void)
 	pd_color_t *pixel;
 	pd_color_t white = RGB(255, 255, 255);
 	pd_color_t red = RGB(255, 0, 0);
-	pd_color_t blue = ARGB(127, 0, 0, 255);
+	pd_color_t blue = ARGB(204, 0, 0, 255);
 	pd_canvas_t white_layer;
 	pd_canvas_t red_layer;
 	pd_canvas_t blue_layer;
@@ -39,7 +39,7 @@ void test_canvas_mix(void)
 	pd_canvas_mix(&red_layer, &blue_layer, 10, 10, TRUE);
 	pixel = pd_canvas_pixel_at(&red_layer, 15, 15);
 	color2str(rgba_str, pixel);
-	it_s("red_layer(15, 15)", rgba_str, "rgba(128, 0, 127, 1)");
+	it_s("red_layer(15, 15)", rgba_str, "rgba(50, 0, 204, 1)");
 
 	pd_canvas_mix(&white_layer, &red_layer, 10, 10, TRUE);
 	pixel = pd_canvas_pixel_at(&white_layer, 0, 0);
@@ -48,11 +48,11 @@ void test_canvas_mix(void)
 
 	pixel = pd_canvas_pixel_at(&white_layer, 15, 15);
 	color2str(rgba_str, pixel);
-	it_s("white_layer(15, 15)", rgba_str, "rgba(255, 128, 128, 1)");
+	it_s("white_layer(15, 15)", rgba_str, "rgba(255, 127, 127, 1)");
 
 	pixel = pd_canvas_pixel_at(&white_layer, 25, 25);
 	color2str(rgba_str, pixel);
-	it_s("white_layer(25, 25)", rgba_str, "rgba(192, 128, 191, 1)");
+	it_s("white_layer(25, 25)", rgba_str, "rgba(152, 127, 229, 1)");
 
 	pd_canvas_destroy(&white_layer);
 	pd_canvas_destroy(&red_layer);

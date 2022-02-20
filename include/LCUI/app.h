@@ -2,8 +2,10 @@
 #define LCUI_H
 
 #include <LCUI/def.h>
+#include <LCUI/def.h>
 #include <LCUI/util.h>
 #include <LCUI/platform.h>
+#include <LCUI/worker.h>
 
 #define LCUI_MAX_FRAMES_PER_SEC 120
 #define LCUI_MAX_FRAME_MSEC ((int)(1000.0 / LCUI_MAX_FRAMES_PER_SEC + 0.5))
@@ -35,13 +37,14 @@ LCUI_API int lcui_destroy_timer(int timer_id);
 LCUI_API int lcui_pause_timer(int timer_id);
 LCUI_API int lcui_continue_timer(int timer_id);
 LCUI_API int lcui_reset_timer(int timer_id, long int n_ms);
-LCUI_API int lcui_set_timeout(long int n_ms, void (*callback)(void *), void *arg);
-LCUI_API int lcui_set_interval(long int n_ms, void (*callback)(void *), void *arg);
-
+LCUI_API int lcui_set_timeout(long int n_ms, void (*callback)(void *),
+			      void *arg);
+LCUI_API int lcui_set_interval(long int n_ms, void (*callback)(void *),
+			       void *arg);
 
 // Tasks
 
-typedef void(*LCUI_AppTaskFunc)(void*, void*);
+typedef void (*LCUI_AppTaskFunc)(void *, void *);
 
 /**
  * 添加任务
@@ -58,15 +61,14 @@ LCUI_API LCUI_BOOL lcui_post_task(LCUI_Task task);
 LCUI_API void lcui_post_async_task(LCUI_Task task, int target_worker_id);
 
 /** lcui_post_task 的简化版本 */
-#define lcui_post_simple_task(FUNC, ARG1, ARG2)             \
+#define lcui_post_simple_task(FUNC, ARG1, ARG2)           \
 	do {                                              \
 		LCUI_TaskRec _ui_task = { 0 };            \
 		_ui_task.arg[0] = (void *)ARG1;           \
 		_ui_task.arg[1] = (void *)ARG2;           \
 		_ui_task.func = (LCUI_AppTaskFunc)(FUNC); \
-		lcui_post_task(&_ui_task);                 \
+		lcui_post_task(&_ui_task);                \
 	} while (0);
-
 
 // UI
 
@@ -86,7 +88,6 @@ LCUI_API void lcui_dispatch_ui_event(app_event_t *app_event);
 LCUI_API void lcui_set_ui_display_mode(lcui_display_mode_t mode);
 
 // Event
-
 
 LCUI_API int lcui_get_event(app_event_t *e);
 LCUI_API int lcui_process_event(app_event_t *e);

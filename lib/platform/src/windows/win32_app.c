@@ -1,12 +1,11 @@
-﻿
-#include "../../include/platform.h"
+﻿#include "../internal.h"
 
 #ifdef LCUI_PLATFORM_WIN_DESKTOP
 #pragma comment(lib, "User32")
 #pragma comment(lib, "Gdi32")
 #include <windows.h>
 #include "resource.h"
-#include "../config.h"
+#include <LCUI/config.h>
 #include <LCUI/util.h>
 #include <LCUI/pandagl.h>
 
@@ -56,12 +55,13 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID unused)
 {
 	switch (reason) {
 	case DLL_PROCESS_ATTACH:
+		win32_app.dll_instance = hModule;
+		break;
 	case DLL_THREAD_ATTACH:
 	case DLL_THREAD_DETACH:
 	case DLL_PROCESS_DETACH:
 		break;
 	}
-	win32_app.dll_instance = hModule;
 	return TRUE;
 }
 
@@ -291,10 +291,10 @@ static LRESULT CALLBACK app_window_process(HWND hwnd, UINT msg, WPARAM arg1,
 		MINMAXINFO *mminfo = (MINMAXINFO *)arg2;
 		app_minmaxinfo_event_t *info = &e.minmaxinfo;
 
-		e.type = APP_EVENT_MINMAXINFO;
 		if (!wnd) {
 			break;
 		}
+		e.type = APP_EVENT_MINMAXINFO;
 		style = GetWindowLong(hwnd, GWL_STYLE);
 		info->min_width = MIN_WIDTH;
 		info->min_height = MIN_HEIGHT;
@@ -330,13 +330,33 @@ static LRESULT CALLBACK app_window_process(HWND hwnd, UINT msg, WPARAM arg1,
 		EndPaint(hwnd, &ps);
 		break;
 	}
+	case WM_CLOSE:
+		e.type = APP_EVENT_CLOSE;
+		break;
 	case WM_DESTROY:
 		if (wnd) {
 			list_unlink(&win32_app.windows, &wnd->node);
-			app_window_destroy(wnd);
-		}
-		if (win32_app.windows.length < 1) {
-			PostQuitMessage(0);
+			wnd->width = 0;
+			wnd->height = 0;
+			if (wnd->fb_bmp) {
+				DeleteObject(wnd->fb_bmp);
+			}
+			if (wnd->hwnd) {
+				if (wnd->hdc_fb) {
+					/* DeleteDC only for CreateDC */
+					DeleteDC(wnd->hdc_fb);
+				}
+				if (wnd->hdc_client) {
+					/* ReleaseDC only for GetDC */
+					ReleaseDC(wnd->hwnd, wnd->hdc_client);
+				}
+			}
+			wnd->hwnd = NULL;
+			wnd->fb_bmp = NULL;
+			wnd->hdc_fb = NULL;
+			wnd->hdc_client = NULL;
+			pd_canvas_destroy(&wnd->fb);
+			free(wnd);
 		}
 		return 0;
 	case WM_KEYDOWN:
@@ -498,27 +518,7 @@ void app_window_close(app_window_t *wnd)
 
 void app_window_destroy(app_window_t *wnd)
 {
-	wnd->width = 0;
-	wnd->height = 0;
-	if (wnd->fb_bmp) {
-		DeleteObject(wnd->fb_bmp);
-	}
-	if (wnd->hwnd) {
-		if (wnd->hdc_fb) {
-			/* DeleteDC only for CreateDC */
-			DeleteDC(wnd->hdc_fb);
-		}
-		if (wnd->hdc_client) {
-			/* ReleaseDC only for GetDC */
-			ReleaseDC(wnd->hwnd, wnd->hdc_client);
-		}
-	}
-	wnd->hwnd = NULL;
-	wnd->fb_bmp = NULL;
-	wnd->hdc_fb = NULL;
-	wnd->hdc_client = NULL;
-	pd_canvas_destroy(&wnd->fb);
-	free(wnd);
+	DestroyWindow(wnd->hwnd);
 }
 
 void app_window_set_position(app_window_t *wnd, int x, int y)
@@ -665,6 +665,7 @@ int app_init_engine(const wchar_t *name)
 		format_error_message(err, msg, 256);
 		swprintf(str, 255, __FUNCTIONW__ L": error %d: %ls\n", err,
 			 msg);
+		logger_error("[win32-app] %ls\n", str);
 		MessageBoxW(NULL, str, win32_app.class_name, MB_ICONERROR);
 		return -1;
 	}
@@ -675,18 +676,38 @@ int app_init_engine(const wchar_t *name)
 
 void app_exit(int exit_code)
 {
-	list_node_t *node;
-
-	for (list_each(node, &win32_app.windows)) {
-		app_window_close(node->data);
-	}
 	PostQuitMessage(exit_code);
 }
 
 int app_destroy_engine(void)
 {
-	UnregisterClassW(win32_app.class_name, win32_app.main_instance);
-	list_destroy_without_node(&win32_app.windows, app_window_destroy);
+	MSG msg;
+	list_node_t *node;
+
+	// 销毁未关闭的窗口
+	if (win32_app.windows.length > 0) {
+		for (list_each(node, &win32_app.windows)) {
+			app_window_destroy(node->data);
+		}
+		PostQuitMessage(0);
+		while (GetMessage(&msg, NULL, 0, 0) != 0) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	}
+	assert(win32_app.windows.length == 0);
+	assert(FindWindowW(win32_app.class_name, NULL) == NULL);
+	if (!UnregisterClassW(win32_app.class_name, win32_app.main_instance)) {
+		wchar_t str[256];
+		wchar_t msg[256];
+		DWORD err;
+
+		err = GetLastError();
+		format_error_message(err, msg, 256);
+		swprintf(str, 255, __FUNCTIONW__ L": error %d: %ls\n", err,
+			 msg);
+		logger_error("[win32-app] %ls\n", str);
+	}
 	return 0;
 }
 

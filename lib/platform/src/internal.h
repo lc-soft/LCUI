@@ -1,4 +1,4 @@
-#include "config.h"
+#include <LCUI/config.h>
 #include <LCUI/util.h>
 #include "../include/platform.h"
 
@@ -10,7 +10,7 @@ int ime_add_win32(void);
 
 #ifdef LCUI_PLATFORM_LINUX
 
-#ifdef USE_LIBX11
+#ifdef HAVE_LIBX11
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xos.h>

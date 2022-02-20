@@ -56,8 +56,6 @@ LCUI_API size_t ui_textedit_get_text_length(ui_widget_t* w);
 /** 设置文本编辑框内的光标，指定是否闪烁、闪烁时间间隔 */
 LCUI_API void ui_textedit_set_caret_blink(ui_widget_t* w, LCUI_BOOL visible, int time);
 
-LCUI_API LCUI_Object ui_textedit_get_property(ui_widget_t* w, const char *name);
-
     /** 为文本框设置文本（宽字符版） */
 LCUI_API int ui_textedit_set_text_w(ui_widget_t* widget, const wchar_t *wstr);
 

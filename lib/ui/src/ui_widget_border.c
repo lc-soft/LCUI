@@ -1,151 +1,55 @@
-﻿#include <string.h>
-#include <LCUI/util.h>
-#include <LCUI/pandagl.h>
-#include <LCUI/css/library.h>
-#include "../include/ui.h"
+﻿#include <LCUI/pandagl.h>
 #include "internal.h"
 
-static float compute_metric_x(ui_widget_t* w, css_unit_value_t* s)
+static void ui_widget_compute_border(ui_widget_t* w, pd_border_t* b)
 {
-	if (s->unit == CSS_UNIT_SCALE) {
-		return w->width * s->scale;
-	}
-	return ui_compute(s->value, s->unit);
-}
+	css_computed_style_t* s = &w->computed_style;
+	float r = y_min(w->border_box.width, w->border_box.width) / 2.0f;
 
-static float compute_metric_y(ui_widget_t* w, css_unit_value_t* s)
-{
-	if (s->unit == CSS_UNIT_SCALE) {
-		return w->height * s->scale;
-	}
-	return ui_compute(s->value, s->unit);
-}
-
-static unsigned int compute_actual(float width)
-{
-	unsigned int w;
-
-	w = ui_compute_actual(width, CSS_UNIT_PX);
-	if (width > 0 && w < 1) {
-		return 1;
-	}
-	return w;
-}
-
-void ui_widget_compute_border_style(ui_widget_t* w)
-{
-	int key;
-	css_unit_value_t* s;
-	ui_border_style_t* b;
-
-	b = &w->computed_style.border;
-	memset(b, 0, sizeof(ui_border_style_t));
-	for (key = css_key_border_start; key <= css_key_border_end; ++key) {
-		s = &w->style->sheet[key];
-		if (!s->is_valid) {
-			continue;
-		}
-		switch (key) {
-		case css_key_border_top_color:
-			b->top.color = s->color;
-			break;
-		case css_key_border_right_color:
-			b->right.color = s->color;
-			break;
-		case css_key_border_bottom_color:
-			b->bottom.color = s->color;
-			break;
-		case css_key_border_left_color:
-			b->left.color = s->color;
-			break;
-		case css_key_border_top_width:
-			b->top.width = compute_metric_x(w, s);
-			break;
-		case css_key_border_right_width:
-			b->right.width = compute_metric_y(w, s);
-			break;
-		case css_key_border_bottom_width:
-			b->bottom.width = compute_metric_x(w, s);
-			break;
-		case css_key_border_left_width:
-			b->left.width = compute_metric_y(w, s);
-			break;
-		case css_key_border_top_style:
-			b->top.style = s->val_keyword;
-			break;
-		case css_key_border_right_style:
-			b->right.style = s->val_keyword;
-			break;
-		case css_key_border_bottom_style:
-			b->bottom.style = s->val_keyword;
-			break;
-		case css_key_border_left_style:
-			b->left.style = s->val_keyword;
-			break;
-		case css_key_border_top_left_radius:
-			b->top_left_radius = compute_metric_x(w, s);
-			break;
-		case css_key_border_top_right_radius:
-			b->top_right_radius = compute_metric_x(w, s);
-			break;
-		case css_key_border_bottom_left_radius:
-			b->bottom_left_radius = compute_metric_x(w, s);
-			break;
-		case css_key_border_bottom_right_radius:
-			b->bottom_right_radius = compute_metric_x(w, s);
-			break;
-		default:
-			break;
-		}
-	}
-}
-
-/** 计算部件边框样式的实际值 */
-void ui_widget_compute_border(ui_widget_t* w, pd_border_t* b)
-{
-	ui_border_style_t* s;
-	float r = y_min(w->width, w->height) / 2.0f;
-
-	s = &w->computed_style.border;
-	b->top.color = s->top.color;
-	b->left.color = s->left.color;
-	b->right.color = s->right.color;
-	b->bottom.color = s->bottom.color;
-	b->top.style = s->top.style;
-	b->left.style = s->left.style;
-	b->right.style = s->right.style;
-	b->bottom.style = s->bottom.style;
-	b->top.width = compute_actual(s->top.width);
-	b->left.width = compute_actual(s->left.width);
-	b->right.width = compute_actual(s->right.width);
-	b->bottom.width = compute_actual(s->bottom.width);
-	b->top_left_radius = compute_actual(y_min(s->top_left_radius, r));
-	b->top_right_radius = compute_actual(y_min(s->top_right_radius, r));
-	b->bottom_left_radius = compute_actual(y_min(s->bottom_left_radius, r));
+	b->top.color.value = s->border_top_color;
+	b->left.color.value = s->border_left_color;
+	b->right.color.value = s->border_right_color;
+	b->bottom.color.value = s->border_bottom_color;
+	b->top.style = s->type_bits.border_top_style;
+	b->left.style = s->type_bits.border_left_style;
+	b->right.style = s->type_bits.border_right_style;
+	b->bottom.style = s->type_bits.border_bottom_style;
+	b->top.width = ui_compute(s->border_top_width);
+	b->left.width = ui_compute(s->border_left_width);
+	b->right.width = ui_compute(s->border_right_width);
+	b->bottom.width = ui_compute(s->border_bottom_width);
+	b->top_left_radius = ui_compute(y_min(s->border_top_left_radius, r));
+	b->top_right_radius = ui_compute(y_min(s->border_top_right_radius, r));
+	b->bottom_left_radius =
+	    ui_compute(y_min(s->border_bottom_left_radius, r));
 	b->bottom_right_radius =
-	    compute_actual(y_min(s->bottom_right_radius, r));
+	    ui_compute(y_min(s->border_bottom_right_radius, r));
 }
 
 void ui_widget_paint_border(ui_widget_t* w, pd_context_t* ctx,
 			    ui_widget_actual_style_t* style)
 {
 	pd_rect_t box;
+	pd_border_t border;
 
 	box.x = style->border_box.x - style->canvas_box.x;
 	box.y = style->border_box.y - style->canvas_box.y;
 	box.width = style->border_box.width;
 	box.height = style->border_box.height;
-	pd_paint_border(ctx, &style->border, &box);
+	ui_widget_compute_border(w, &border);
+	pd_paint_border(ctx, &border, &box);
 }
 
 void ui_widget_crop_content(ui_widget_t* w, pd_context_t* ctx,
 			    ui_widget_actual_style_t* style)
 {
 	pd_rect_t box;
+	pd_border_t border;
 
 	box.x = style->border_box.x - style->canvas_box.x;
 	box.y = style->border_box.y - style->canvas_box.y;
 	box.width = style->border_box.width;
 	box.height = style->border_box.height;
-	pd_crop_border_content(ctx, &style->border, &box);
+	ui_widget_compute_border(w, &border);
+	pd_crop_border_content(ctx, &border, &box);
 }

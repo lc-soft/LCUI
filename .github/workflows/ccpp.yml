@@ -2,6 +2,7 @@ name: C/C++ CI
 on: [push, pull_request]
 jobs:
   ubuntu_build:
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
@@ -21,11 +22,14 @@ jobs:
       - name: Build
         run: |
           xmake config -m coverage -y -v
-          xmake -v
+          xmake build headers
+          xmake -w
 
       - name: Run tests
         run: |
-          xmake run run-tests --memcheck
+          xmake run pandagl_tests
+          xmake run libcss_tests --memcheck
+          xmake run lcui_tests --memcheck
 
       - name: "Run tests yutil"
         run: |
@@ -39,7 +43,7 @@ jobs:
         run: |
           xmake clean
           xmake config -m release -y -c -v
-          xmake -v
+          xmake -w
           xmake package
 
       - uses: actions/upload-artifact@master
@@ -49,12 +53,13 @@ jobs:
             build/packages
 
   windows_build:
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
-        os: ['windows-2016']
+        os: ['windows-latest']
         include:
-          - os: 'windows-2016'
+          - os: 'windows-latest'
             triplet: 'x64-windows'
     runs-on: ${{ matrix.os }}
     name: "Builds binaries on ${{ matrix.os }}"
@@ -70,12 +75,15 @@ jobs:
       - name: Build
         run: |
           xmake config -y -v --ci-env=y
-          xmake -v
+          xmake build headers
+          xmake -w
 
       - name: "Run tests"
         run: |
-          xmake run run-tests
-      
+          xmake run pandagl_tests
+          xmake run libcss_tests
+          xmake run lcui_tests
+
       - name: "Run tests yutil"
         run: |
           xmake build yutil_test

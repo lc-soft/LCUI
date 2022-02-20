@@ -1,4 +1,5 @@
-target("lcui-ui")
-    set_kind("static")
+target("libui")
+    set_default(false)
+    set_kind("$(kind)")
     add_files("src/**.c")
-    add_deps("lcui-util", "pandagl", "lcui-css", "lcui-thread")
+    add_deps("yutil", "pandagl", "libcss", "libfont", "libthread", "libworker", "libimage")

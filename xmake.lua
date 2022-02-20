@@ -1,33 +1,25 @@
 set_project("lcui")
-set_version("3.0.0")
-add_rules("mode.debug", "mode.release", "mode.coverage")
-add_includedirs("include", "test/lib/ctest/include/", "lib/pandagl/include", "lib/yutil/include")
-add_rpathdirs("@loader_path/lib", "@loader_path")
-add_defines("LCUI_EXPORTS", "LCUI_DLL", "YUTIL_EXPORTS", "UNICODE")
-includes(
-    "test/lib/ctest",
-    "lib/def",
-    "lib/css",
-    "lib/font",
-    "lib/image",
-    "lib/pandagl",
-    "lib/platform",
-    "lib/text",
-    "lib/thread",
-    "lib/timer",
-    "lib/ui",
-    "lib/ui-builder",
-    "lib/ui-cursor",
-    "lib/ui-server",
-    "lib/ui-widgets",
-    "lib/util",
-    "lib/worker",
-    "lib/yutil"
-)
+set_version("3.0.0-a")
 set_warnings("all")
-set_rundir("$(projectdir)/test")
+add_rules("mode.debug", "mode.release", "mode.coverage")
+add_requires("libomp", "libxml2", "libpng", "libjpeg", "libx11", "fontconfig", {optional = true})
+add_requires("freetype", {optional = true, configs = {shared = false}})
+add_rpathdirs("@loader_path/lib", "@loader_path")
+add_defines("LCUI_EXPORTS", "YUTIL_EXPORTS", "UNICODE", "_CRT_SECURE_NO_WARNINGS")
+add_includedirs("include", "tests/lib/ctest/include/", "lib/yutil/include/")
+includes("tests/lib/ctest/xmake.lua")
+includes("lib/*/xmake.lua")
+includes("examples/*/xmake.lua")
+includes("tests/xmake.lua")
 
 option("ci-env", {showmenu = true, default = false})
+
+option("enable-openmp", {showmenu = true, default = true})
+
+option("enable-touch")
+    set_showmenu(true)
+    set_default(true)
+    set_configvar("ENABLE_TOUCH", 1)
 
 if has_config("ci-env") then
     add_defines("CI_ENV")
@@ -43,25 +35,28 @@ else
     end
 end
 
-target("run-tests")
+target("lcui_tests")
     set_kind("binary")
-    add_files("$(projectdir)/test/run_tests.c", "$(projectdir)/test/cases/*.c")
+    set_rundir("tests")
+    add_files("tests/run_tests.c", "tests/cases/*.c")
+    add_includedirs("tests/lib/ctest/include/")
     add_deps("ctest", "lcui")
     on_run(function (target)
         import("core.base.option")
         local argv = {}
         local options = {{nil, "memcheck",  "k",  nil, "enable memory check."}}
         local args = option.raw_parse(option.get("arguments") or {}, options)
-        os.cd("$(projectdir)/test")
+        os.cd("$(projectdir)/tests")
         if args.memcheck then
             if is_plat("windows") then
                 table.insert(argv, target:targetfile())
                 os.execv("drmemory", argv)
             else
+                table.insert(argv, "valgrind")
                 table.insert(argv, "--leak-check=full")
                 table.insert(argv, "--error-exitcode=42")
                 table.insert(argv, target:targetfile())
-                os.execv("valgrind", argv)
+                os.execv("sudo", argv)
             end
         else
             os.execv(target:targetfile())
@@ -69,29 +64,49 @@ target("run-tests")
     end)
 
 target("lcui")
-    set_kind("shared")
-    add_files("src/*.c")
-    add_configfiles("src/config.h.in")
-    set_configdir("src")
+    set_kind("$(kind)")
+    add_files("src/*.c", "lib/*/src/**.c")
+    add_includedirs("lib/yutil/include")
+    add_configfiles("include/LCUI/config.h.in")
+    set_configdir("include/LCUI")
     add_headerfiles("include/LCUI.h")
     add_headerfiles("include/(LCUI/**.h)")
-    add_deps(
-        "lcui-util",
-        "lcui-thread",
-        "lcui-css",
-        "lcui-font",
-        "pandagl",
-        "lcui-image",
-        "lcui-ui",
-        "lcui-ui-widgets",
-        "lcui-ui-cursor",
-        "lcui-ui-builder",
-        "lcui-ui-server",
-        "lcui-platform",
-        "lcui-text",
-        "lcui-timer",
-        "lcui-worker"
-    )
+    add_packages("libomp", "libxml2", "libx11", "libpng", "libjpeg", "freetype", "fontconfig")
+    add_options("enable-openmp")
+
+    if has_package("libomp") and has_config("enable-openmp") then
+        set_configvar("ENABLE_OPENMP", 1)
+    end
+
+    if is_plat("windows") then
+        add_options("enable-touch")
+        add_files("lib/platform/src/windows/*.c")
+        add_links("Shell32")
+    else
+        add_files("lib/platform/src/linux/*.c")
+        add_packages("libx11")
+        if has_package("libx11") then
+            set_configvar("HAVE_LIBX11", 1)
+        end
+        add_syslinks("pthread", "dl")
+    end
+
+    if has_package("fontconfig") then
+        set_configvar("HAVE_FONTCONFIG", 1)
+    end
+    if has_package("freetype") then
+        set_configvar("HAVE_FREETYPE", 1)
+    end
+
+    if has_package("libjpeg") then
+        set_configvar("HAVE_LIBJPEG", 1)
+    end
+    if has_package("libpng") then
+        set_configvar("HAVE_LIBPNG", 1)
+    end
+    if has_package("libxml2") then
+        set_configvar("WITH_LIBXML2", 1)
+    end
 
 target("headers")
     set_kind("phony")

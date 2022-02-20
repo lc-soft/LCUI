@@ -16,7 +16,7 @@ typedef struct ui_touch_capturer_t {
 	list_node_t node;
 } ui_touch_capturer_t;
 
-typedef struct ui_event_listener_t {
+struct ui_event_listener_t {
 	list_node_t node;
 	size_t ref_count;
 	LCUI_BOOL active;
@@ -24,7 +24,7 @@ typedef struct ui_event_listener_t {
 	ui_event_handler_t handler;
 	void *data;
 	ui_event_arg_destructor_t destroy_data;
-} ui_event_listener_t;
+};
 
 typedef struct ui_event_pack_t {
 	list_node_t node;
@@ -80,7 +80,7 @@ static struct ui_events_t {
 
 /* clang-format on */
 
-static int ui_use_widget_event_id(const char* event_name)
+static int ui_use_widget_event_id(const char *event_name)
 {
 	int id = ui_get_event_id(event_name);
 	if (id < 0) {
@@ -90,10 +90,10 @@ static int ui_use_widget_event_id(const char* event_name)
 	return id;
 }
 
-int ui_set_event_id(int event_id, const char* event_name)
+int ui_set_event_id(int event_id, const char *event_name)
 {
 	int ret;
-	ui_event_mapping_t* mapping;
+	ui_event_mapping_t *mapping;
 	thread_mutex_lock(&ui_events.mutex);
 	if (dict_fetch_value(ui_events.event_ids, event_name)) {
 		thread_mutex_unlock(&ui_events.mutex);
@@ -117,25 +117,25 @@ int ui_alloc_event_id(void)
 	return ui_events.base_event_id++;
 }
 
-const char* ui_get_event_name(int event_id)
+const char *ui_get_event_name(int event_id)
 {
-	ui_event_mapping_t* mapping;
+	ui_event_mapping_t *mapping;
 	thread_mutex_lock(&ui_events.mutex);
 	mapping = rbtree_get_data_by_key(&ui_events.event_names, event_id);
 	thread_mutex_unlock(&ui_events.mutex);
 	return mapping ? mapping->name : NULL;
 }
 
-int ui_get_event_id(const char* event_name)
+int ui_get_event_id(const char *event_name)
 {
-	ui_event_mapping_t* mapping;
+	ui_event_mapping_t *mapping;
 	thread_mutex_lock(&ui_events.mutex);
 	mapping = dict_fetch_value(ui_events.event_ids, event_name);
 	thread_mutex_unlock(&ui_events.mutex);
 	return mapping ? mapping->id : -1;
 }
 
-void ui_event_init(ui_event_t* e, const char* name)
+void ui_event_init(ui_event_t *e, const char *name)
 {
 	e->target = NULL;
 	e->type = ui_use_widget_event_id(name);
@@ -143,7 +143,7 @@ void ui_event_init(ui_event_t* e, const char* name)
 	e->data = NULL;
 }
 
-void ui_event_destroy(ui_event_t* e)
+void ui_event_destroy(ui_event_t *e)
 {
 	switch (e->type) {
 	case UI_EVENT_TOUCH:
@@ -160,11 +160,12 @@ void ui_event_destroy(ui_event_t* e)
 		e->text.text = NULL;
 		e->text.length = 0;
 		break;
-	default: break;
+	default:
+		break;
 	}
 }
 
-static int ui_event_copy(const ui_event_t* src, ui_event_t* dst)
+static int ui_event_copy(const ui_event_t *src, ui_event_t *dst)
 {
 	int n;
 	size_t size;
@@ -187,7 +188,8 @@ static int ui_event_copy(const ui_event_t* src, ui_event_t* dst)
 		if (!dst->text.text) {
 			break;
 		}
-		dst->text.text = malloc(sizeof(wchar_t) * (dst->text.length + 1));
+		dst->text.text =
+		    malloc(sizeof(wchar_t) * (dst->text.length + 1));
 		if (!dst->text.text) {
 			return -ENOMEM;
 		}
@@ -198,14 +200,14 @@ static int ui_event_copy(const ui_event_t* src, ui_event_t* dst)
 	return 0;
 }
 
-static void ui_event_mapping_destroy(void* data)
+static void ui_event_mapping_destroy(void *data)
 {
-	ui_event_mapping_t* mapping = data;
+	ui_event_mapping_t *mapping = data;
 	free(mapping->name);
 	free(mapping);
 }
 
-static void ui_event_pack_destroy(ui_event_pack_t* pack)
+static void ui_event_pack_destroy(ui_event_pack_t *pack)
 {
 	if (pack->data && pack->destroy_data) {
 		pack->destroy_data(pack->data);
@@ -215,7 +217,7 @@ static void ui_event_pack_destroy(ui_event_pack_t* pack)
 	free(pack);
 }
 
-static void ui_event_listener_destroy(ui_event_listener_t* listener)
+static void ui_event_listener_destroy(ui_event_listener_t *listener)
 {
 	if (listener->data && listener->destroy_data) {
 		listener->destroy_data(listener->data);
@@ -226,23 +228,23 @@ static void ui_event_listener_destroy(ui_event_listener_t* listener)
 	free(listener);
 }
 
-static void ui_touch_capturer_destroy(void* arg)
+static void ui_touch_capturer_destroy(void *arg)
 {
-	ui_touch_capturer_t* tc = arg;
+	ui_touch_capturer_t *tc = arg;
 	list_destroy(&tc->points, free);
 	tc->widget = NULL;
 	free(tc);
 }
 
-INLINE void ui_clear_touch_capturers(list_t* list)
+INLINE void ui_clear_touch_capturers(list_t *list)
 {
 	list_destroy_without_node(list, ui_touch_capturer_destroy);
 }
 
-static int ui_add_touch_capturer(list_t* list, ui_widget_t *w, int point_id)
+static int ui_add_touch_capturer(list_t *list, ui_widget_t *w, int point_id)
 {
-	int* data;
-	ui_touch_capturer_t* tc = NULL;
+	int *data;
+	ui_touch_capturer_t *tc = NULL;
 	list_node_t *node, *ptnode;
 
 	if (point_id < 0) {
@@ -261,7 +263,7 @@ static int ui_add_touch_capturer(list_t* list, ui_widget_t *w, int point_id)
 		tc = node->data;
 		/* 清除与该触点绑定的其它捕捉记录 */
 		for (list_each(ptnode, &tc->points)) {
-			if (point_id == *(int*)ptnode->data) {
+			if (point_id == *(int *)ptnode->data) {
 				if (tc->widget == w) {
 					return 0;
 				}
@@ -287,9 +289,9 @@ static int ui_add_touch_capturer(list_t* list, ui_widget_t *w, int point_id)
 	return 0;
 }
 
-static int ui_remove_touch_capturer(list_t* list, ui_widget_t *w, int point_id)
+static int ui_remove_touch_capturer(list_t *list, ui_widget_t *w, int point_id)
 {
-	ui_touch_capturer_t* tc = NULL;
+	ui_touch_capturer_t *tc = NULL;
 	list_node_t *node, *ptnode;
 	for (list_each(node, list)) {
 		tc = node->data;
@@ -304,7 +306,7 @@ static int ui_remove_touch_capturer(list_t* list, ui_widget_t *w, int point_id)
 		list_destroy(&tc->points, free);
 	} else {
 		for (list_each(ptnode, &tc->points)) {
-			if (*(int*)ptnode->data == point_id) {
+			if (*(int *)ptnode->data == point_id) {
 				free(node->data);
 				list_delete_node(&tc->points, ptnode);
 			}
@@ -317,15 +319,15 @@ static int ui_remove_touch_capturer(list_t* list, ui_widget_t *w, int point_id)
 	return 0;
 }
 
-int ui_widget_add_event_listener(ui_widget_t *w, int event_id,
-				 ui_event_handler_t handler, void* data,
-				 ui_event_arg_destructor_t destroy_data)
+ui_event_listener_t *ui_widget_add_event_listener(
+    ui_widget_t *w, int event_id, ui_event_handler_t handler, void *data,
+    ui_event_arg_destructor_t destroy_data)
 {
-	ui_event_listener_t* listener;
+	ui_event_listener_t *listener;
 
 	listener = malloc(sizeof(ui_event_listener_t));
 	if (!listener) {
-		return -ENOMEM;
+		return NULL;
 	}
 	listener->ref_count = 0;
 	listener->active = TRUE;
@@ -334,24 +336,25 @@ int ui_widget_add_event_listener(ui_widget_t *w, int event_id,
 	listener->event_id = event_id;
 	listener->destroy_data = destroy_data;
 	listener->node.data = listener;
-	list_append_node(&ui_widget_use_extra_data(w)->listeners, &listener->node);
-	return 0;
+	list_append_node(&ui_widget_use_extra_data(w)->listeners,
+			 &listener->node);
+	return listener;
 }
 
-int ui_widget_on(ui_widget_t *w, const char* event_name,
-		 ui_event_handler_t handler, void* data,
-		 void (*destroy_data)(void*))
+ui_event_listener_t *ui_widget_on(ui_widget_t *w, const char *event_name,
+				  ui_event_handler_t handler, void *data,
+				  void (*destroy_data)(void *))
 {
 	int id = ui_use_widget_event_id(event_name);
 	return ui_widget_add_event_listener(w, id, handler, data, destroy_data);
 }
 
 int ui_widget_remove_event_listener(ui_widget_t *w, int event_id,
-				    ui_event_handler_t handler)
+				    ui_event_handler_t handler, void *data)
 {
 	int count = 0;
 	list_node_t *node, *prev;
-	ui_event_listener_t* listener;
+	ui_event_listener_t *listener;
 
 	if (!w->extra) {
 		return 0;
@@ -359,7 +362,8 @@ int ui_widget_remove_event_listener(ui_widget_t *w, int event_id,
 	for (list_each(node, &w->extra->listeners)) {
 		listener = node->data;
 		if (listener->event_id != event_id ||
-		    (handler && handler != listener->handler)) {
+		    (handler && handler != listener->handler) ||
+		    data != listener->data) {
 			continue;
 		}
 		listener->active = FALSE;
@@ -374,29 +378,30 @@ int ui_widget_remove_event_listener(ui_widget_t *w, int event_id,
 	return count;
 }
 
-int ui_widget_off(ui_widget_t *w, const char* event_name,
-		  ui_event_handler_t handler)
+int ui_widget_off(ui_widget_t *w, const char *event_name,
+		  ui_event_handler_t handler, void *data)
 {
 	int id = ui_use_widget_event_id(event_name);
-	return ui_widget_remove_event_listener(w, id, handler);
+	return ui_widget_remove_event_listener(w, id, handler, data);
 }
 
 static ui_widget_t *ui_widget_get_next_at(ui_widget_t *widget, float x, float y)
 {
 	ui_widget_t *w;
-	list_node_t* node;
+	list_node_t *node;
 
 	node = &widget->node;
 	for (node = node->next; node; node = node->next) {
 		w = node->data;
 		/* 如果忽略事件处理，则向它底层的兄弟部件传播事件 */
-		if (w->computed_style.pointer_events == CSS_KEYWORD_NONE) {
+		if (w->computed_style.type_bits.pointer_events ==
+		    CSS_POINTER_EVENTS_NONE) {
 			continue;
 		}
-		if (!w->computed_style.visible) {
+		if (!ui_widget_is_visible(w)) {
 			continue;
 		}
-		if (!ui_rect_has_point(&w->box.border, x, y)) {
+		if (!ui_rect_has_point(&w->border_box, x, y)) {
 			continue;
 		}
 		return w;
@@ -404,12 +409,12 @@ static ui_widget_t *ui_widget_get_next_at(ui_widget_t *widget, float x, float y)
 	return NULL;
 }
 
-static int ui_widget_call_listeners(ui_widget_t *w, ui_event_t e, void* arg)
+static int ui_widget_call_listeners(ui_widget_t *w, ui_event_t e, void *arg)
 {
 	int count = 0;
 	list_node_t *node;
 	list_node_t *prev;
-	ui_event_listener_t* listener;
+	ui_event_listener_t *listener;
 
 	if (!w->extra) {
 		return count;
@@ -437,10 +442,10 @@ static int ui_widget_call_listeners(ui_widget_t *w, ui_event_t e, void* arg)
 	return count;
 }
 
-int ui_widget_post_event(ui_widget_t *w, const ui_event_t* e, void* data,
-			 void (*destroy_data)(void*))
+int ui_widget_post_event(ui_widget_t *w, const ui_event_t *e, void *data,
+			 void (*destroy_data)(void *))
 {
-	ui_event_pack_t* pack;
+	ui_event_pack_t *pack;
 
 	if (w->state == UI_WIDGET_STATE_DELETED) {
 		return -EPERM;
@@ -461,7 +466,7 @@ int ui_widget_post_event(ui_widget_t *w, const ui_event_t* e, void* data,
 	return 0;
 }
 
-int ui_widget_emit_event(ui_widget_t *w, ui_event_t e, void* arg)
+int ui_widget_emit_event(ui_widget_t *w, ui_event_t e, void *arg)
 {
 	float x, y;
 	float pointer_x, pointer_y;
@@ -479,10 +484,12 @@ int ui_widget_emit_event(ui_widget_t *w, ui_event_t e, void* arg)
 	case UI_EVENT_MOUSEMOVE:
 	case UI_EVENT_MOUSEOVER:
 	case UI_EVENT_MOUSEOUT:
+	case UI_EVENT_WHEEL:
 		pointer_x = e.mouse.x;
 		pointer_y = e.mouse.y;
 		is_pointer_event = TRUE;
-		if (w->computed_style.pointer_events == CSS_KEYWORD_NONE) {
+		if (w->computed_style.type_bits.pointer_events ==
+		    CSS_POINTER_EVENTS_NONE) {
 			break;
 		}
 	default:
@@ -493,7 +500,8 @@ int ui_widget_emit_event(ui_widget_t *w, ui_event_t e, void* arg)
 	if (!w->parent || e.cancel_bubble) {
 		return -1;
 	}
-	if (!w->extra || w->computed_style.pointer_events != CSS_KEYWORD_NONE) {
+	if (!w->extra || w->computed_style.type_bits.pointer_events !=
+			     CSS_POINTER_EVENTS_NONE) {
 		return ui_widget_emit_event(w->parent, e, arg);
 	}
 	if (is_pointer_event) {
@@ -542,32 +550,32 @@ static ui_widget_t *ui_get_same_parent(ui_widget_t *a, ui_widget_t *b)
 
 static ui_widget_t *ui_widget_get_event_target(ui_widget_t *widget, float x,
 					       float y,
-					       int inherited_pointer_events)
+					       uint8_t inherited_pointer_events)
 {
-	int pointer_events;
+	uint8_t pointer_events;
 
 	ui_widget_t *child;
 	ui_widget_t *target = NULL;
-	list_node_t* node;
+	list_node_t *node;
 
 	for (list_each(node, &widget->stacking_context)) {
 		child = node->data;
-		if (!child->computed_style.visible ||
+		if (!ui_widget_is_visible(child) ||
 		    child->state != UI_WIDGET_STATE_NORMAL ||
-		    !ui_rect_has_point(&child->box.border, x, y)) {
+		    !ui_rect_has_point(&child->border_box, x, y)) {
 			continue;
 		}
-		pointer_events = child->computed_style.pointer_events;
-		if (pointer_events == CSS_KEYWORD_INHERIT) {
+		pointer_events = child->computed_style.type_bits.pointer_events;
+		if (pointer_events == CSS_POINTER_EVENTS_INHERT) {
 			pointer_events = inherited_pointer_events;
 		}
 		target = ui_widget_get_event_target(
-		    child, x - child->box.padding.x, y - child->box.padding.y,
+		    child, x - child->padding_box.x, y - child->padding_box.y,
 		    pointer_events);
 		if (target) {
 			return target;
 		}
-		if (pointer_events == CSS_KEYWORD_AUTO) {
+		if (pointer_events == CSS_POINTER_EVENTS_AUTO) {
 			return child;
 		}
 	}
@@ -692,7 +700,7 @@ static void ui_clear_focus_target(ui_widget_t *target)
 void ui_clear_event_target(ui_widget_t *w)
 {
 	list_node_t *node, *prev;
-	ui_event_pack_t* pack;
+	ui_event_pack_t *pack;
 
 	thread_mutex_lock(&ui_events.mutex);
 	for (list_each(node, &ui_events.queue)) {
@@ -710,10 +718,12 @@ void ui_clear_event_target(ui_widget_t *w)
 	ui_clear_focus_target(w);
 }
 
-INLINE LCUI_BOOL ui_widget_check_focusable(ui_widget_t *w)
+INLINE LCUI_BOOL ui_widget_is_focusable(ui_widget_t *w)
 {
-	return w && w->computed_style.pointer_events != CSS_KEYWORD_NONE &&
-	       w->computed_style.focusable && !w->disabled;
+	return w &&
+	       w->computed_style.type_bits.pointer_events !=
+		   CSS_POINTER_EVENTS_NONE &&
+	       w->tab_index >= 0 && !w->disabled;
 }
 
 ui_widget_t *ui_get_focus(void)
@@ -727,7 +737,7 @@ int ui_set_focus(ui_widget_t *widget)
 	ui_event_t e = { 0 };
 
 	for (w = widget; w; w = w->parent) {
-		if (ui_widget_check_focusable(w)) {
+		if (ui_widget_is_focusable(w)) {
 			break;
 		}
 	}
@@ -741,7 +751,7 @@ int ui_set_focus(ui_widget_t *widget)
 		ui_widget_post_event(e.target, &e, NULL, NULL);
 		ui_events.targets[UI_WIDGET_STATUS_FOCUS] = NULL;
 	}
-	if (!ui_widget_check_focusable(w)) {
+	if (!ui_widget_is_focusable(w)) {
 		return -1;
 	}
 	e.target = w;
@@ -763,7 +773,8 @@ static ui_widget_t *ui_resolve_event_target(float x, float y)
 	if (ui_events.mouse_capturer) {
 		target = ui_events.mouse_capturer;
 	} else {
-		target = ui_widget_get_event_target(root, x, y, CSS_KEYWORD_AUTO);
+		target =
+		    ui_widget_get_event_target(root, x, y, CSS_KEYWORD_AUTO);
 	}
 	for (w = target; w; w = w->parent) {
 		if (w->event_blocked) {
@@ -789,7 +800,7 @@ static int ui_on_wheel_event(ui_event_t *origin_event)
 	return 0;
 }
 
-static int ui_on_mouse_event(ui_event_t* origin_event)
+static int ui_on_mouse_event(ui_event_t *origin_event)
 {
 	ui_event_t e = *origin_event;
 
@@ -871,7 +882,7 @@ static int ui_on_mouse_event(ui_event_t* origin_event)
 	return 0;
 }
 
-static int ui_on_keyboard_event(ui_event_t* origin_event)
+static int ui_on_keyboard_event(ui_event_t *origin_event)
 {
 	ui_event_t e = *origin_event;
 
@@ -884,7 +895,7 @@ static int ui_on_keyboard_event(ui_event_t* origin_event)
 	return 0;
 }
 
-static int ui_on_text_input(ui_event_t* origin_event)
+static int ui_on_text_input(ui_event_t *origin_event)
 {
 	ui_event_t e = *origin_event;
 
@@ -898,7 +909,7 @@ static int ui_on_text_input(ui_event_t* origin_event)
 }
 
 /** 分发触控事件给对应的部件 */
-static int ui_dispatch_touch_event(list_t* capturers, ui_touch_point_t* points,
+static int ui_dispatch_touch_event(list_t *capturers, ui_touch_point_t *points,
 				   int n_points)
 {
 	int i, count;
@@ -906,10 +917,10 @@ static int ui_dispatch_touch_event(list_t* capturers, ui_touch_point_t* points,
 	list_node_t *node, *ptnode;
 	ui_event_t e = { 0 };
 	ui_widget_t *target, *root, *w;
-	ui_touch_capturer_t* tc;
+	ui_touch_capturer_t *tc;
 
 	root = ui_root();
-	scale = ui_get_scale();
+	scale = ui_metrics.scale;
 	e.type = UI_EVENT_TOUCH;
 	e.cancel_bubble = FALSE;
 	e.touch.points = malloc(sizeof(ui_touch_point_t) * n_points);
@@ -937,7 +948,7 @@ static int ui_dispatch_touch_event(list_t* capturers, ui_touch_point_t* points,
 		tc = node->data;
 		for (i = 0; i < n_points; ++i) {
 			for (list_each(ptnode, &tc->points)) {
-				if (points[i].id != *(int*)ptnode->data) {
+				if (points[i].id != *(int *)ptnode->data) {
 					continue;
 				}
 				e.touch.points[e.touch.n_points] = points[i];
@@ -955,12 +966,12 @@ static int ui_dispatch_touch_event(list_t* capturers, ui_touch_point_t* points,
 	return count;
 }
 
-static int ui_on_touch_event(ui_event_t* e)
+static int ui_on_touch_event(ui_event_t *e)
 {
 	int i, n;
 	list_t capturers;
 	list_node_t *node, *ptnode;
-	ui_touch_point_t* points;
+	ui_touch_point_t *points;
 
 	n = e->touch.n_points;
 	points = e->touch.points;
@@ -968,7 +979,7 @@ static int ui_on_touch_event(ui_event_t* e)
 	thread_mutex_lock(&ui_events.mutex);
 	/* 合并现有的触点捕捉记录 */
 	for (list_each(node, &ui_events.touch_capturers)) {
-		ui_touch_capturer_t* tc = node->data;
+		ui_touch_capturer_t *tc = node->data;
 		for (i = 0; i < n; ++i) {
 			/* 如果没有触点记录，则说明是捕获全部触点 */
 			if (tc->points.length == 0) {
@@ -977,7 +988,7 @@ static int ui_on_touch_event(ui_event_t* e)
 				continue;
 			}
 			for (list_each(ptnode, &tc->points)) {
-				if (points[i].id != *(int*)ptnode->data) {
+				if (points[i].id != *(int *)ptnode->data) {
 					continue;
 				}
 				ui_add_touch_capturer(&capturers, tc->widget,
@@ -1047,7 +1058,7 @@ void ui_init_events(void)
 	int i, n;
 	struct EventNameMapping {
 		int id;
-		const char* name;
+		const char *name;
 	} mappings[] = { { UI_EVENT_LINK, "link" },
 			 { UI_EVENT_UNLINK, "unlink" },
 			 { UI_EVENT_READY, "ready" },
@@ -1068,12 +1079,9 @@ void ui_init_events(void)
 			 { UI_EVENT_TOUCHDOWN, "touchdown" },
 			 { UI_EVENT_TOUCHMOVE, "touchmove" },
 			 { UI_EVENT_TOUCHUP, "touchup" },
-			 { UI_EVENT_RESIZE, "resize" },
 			 { UI_EVENT_AFTERLAYOUT, "afterlayout" },
 			 { UI_EVENT_FOCUS, "focus" },
 			 { UI_EVENT_BLUR, "blur" },
-			 { UI_EVENT_SHOW, "show" },
-			 { UI_EVENT_HIDE, "hide" },
 			 { UI_EVENT_PASTE, "paste" },
 			 { UI_EVENT_FONT_FACE_LOAD, "font_face_load" } };
 
@@ -1100,7 +1108,7 @@ void ui_init_events(void)
 	}
 }
 
-int ui_dispatch_event(ui_event_t* e)
+int ui_dispatch_event(ui_event_t *e)
 {
 	switch (e->type) {
 	case UI_EVENT_WHEEL:
@@ -1131,8 +1139,8 @@ static void ui_on_destroy_event_pack(void *arg)
 void ui_process_events(void)
 {
 	list_t queue;
-	list_node_t* node;
-	ui_event_pack_t* pack;
+	list_node_t *node;
+	ui_event_pack_t *pack;
 
 	list_create(&queue);
 	list_concat(&queue, &ui_events.queue);

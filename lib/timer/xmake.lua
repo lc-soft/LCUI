@@ -1,4 +1,5 @@
-target("lcui-timer")
-    set_kind("static")
+target("libtimer")
+    set_default(false)
+    set_kind("$(kind)")
     add_files("src/*.c")
-    add_deps("lcui-util", "lcui-thread")
+    add_deps("yutil", "libthread")

@@ -31,8 +31,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#include "config.h"
 #include <LCUI/def.h>
+#include <LCUI/config.h>
 #include <LCUI/util.h>
 
 #ifdef ASSERT
@@ -42,7 +42,7 @@
 	if (!(X)) \
 		goto error;
 
-#ifdef USE_LIBPNG
+#ifdef HAVE_LIBPNG
 #include <png.h>
 #include <LCUI/image.h>
 
@@ -85,7 +85,7 @@ static void PNGReader_OnRead(png_structp png_ptr, png_bytep buffer,
 
 int LCUI_InitPNGReader(LCUI_ImageReader reader)
 {
-#ifdef USE_LIBPNG
+#ifdef HAVE_LIBPNG
 	LCUI_PNGReader png_reader;
 
 	png_reader = malloc(sizeof(LCUI_PNGReaderRec));
@@ -113,7 +113,7 @@ error:
 
 int LCUI_ReadPNGHeader(LCUI_ImageReader reader)
 {
-#ifdef USE_LIBPNG
+#ifdef HAVE_LIBPNG
 	size_t n;
 	png_infop info_ptr;
 	png_structp png_ptr;
@@ -161,7 +161,7 @@ int LCUI_ReadPNGHeader(LCUI_ImageReader reader)
 
 int LCUI_ReadPNG(LCUI_ImageReader reader, pd_canvas_t *graph)
 {
-#ifdef USE_LIBPNG
+#ifdef HAVE_LIBPNG
 	png_uint_32 i;
 	png_bytep row;
 	png_infop info_ptr;
@@ -228,7 +228,7 @@ int LCUI_ReadPNG(LCUI_ImageReader reader, pd_canvas_t *graph)
 
 int LCUI_WritePNGFile(const char *file_name, const pd_canvas_t *graph)
 {
-#ifdef USE_LIBPNG
+#ifdef HAVE_LIBPNG
 
 	png_byte color_type;
 	png_structp png_ptr;
@@ -237,7 +237,8 @@ int LCUI_WritePNGFile(const char *file_name, const pd_canvas_t *graph)
 
 	FILE *fp;
 	unsigned char *p;
-	size_t y, x, row_size;
+	int y, x;
+	size_t row_size;
 	pd_rect_t rect;
 
 	if (!pd_canvas_is_valid(graph)) {

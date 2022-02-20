@@ -77,12 +77,10 @@ size_t ui_load_css_string(const char *str, const char *space)
 void ui_init_css(void)
 {
 	css_init();
-	css_init_preset_property_parsers();
 	ui_load_css_string(ui_default_css, __FILE__);
 }
 
 void ui_destroy_css(void)
 {
-	css_destroy_preset_property_parsers();
 	css_destroy();
 }

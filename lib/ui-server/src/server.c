@@ -5,7 +5,8 @@
 #include <LCUI/util.h>
 #include <LCUI/pandagl.h>
 #include <LCUI/ui/cursor.h>
-#include "config.h"
+#include <LCUI/config.h>
+#include <LCUI/css/computed.h>
 #include "../include/server.h"
 
 #ifdef ENABLE_OPENMP
@@ -107,7 +108,6 @@ static void ui_connection_destroy(void *arg)
 {
 	ui_connection_t *conn = arg;
 
-	app_window_close(conn->window);
 	list_destroy(&conn->flash_rects, free);
 	free(conn);
 }
@@ -116,26 +116,37 @@ int ui_server_disconnect(ui_widget_t *widget, app_window_t *window)
 {
 	int count = 0;
 	ui_connection_t *conn;
-	list_node_t *node, *prev;
+	list_node_t *node;
 
 	for (list_each(node, &ui_server.connections)) {
 		conn = node->data;
-		if ((widget && conn->widget != widget) ||
-		    (window && conn->window != window)) {
-			continue;
+		if ((widget && conn->widget == widget) ||
+		    (window && conn->window == window)) {
+			app_window_close(conn->window);
+			count++;
 		}
-		prev = node->prev;
-		ui_connection_destroy(node->data);
-		list_delete_node(&ui_server.connections, node);
-		node = prev;
-		count++;
 	}
 	return count;
 }
 
 static void ui_server_on_window_close(app_event_t *e, void *arg)
 {
-	ui_server_disconnect(NULL, e->window);
+	ui_connection_t *conn;
+	list_node_t *node;
+
+	logger_debug("ui server on close window %p\n", e->window);
+	for (list_each(node, &ui_server.connections)) {
+		conn = node->data;
+		if (conn->window == e->window) {
+			app_window_destroy(conn->window);
+			ui_connection_destroy(conn);
+			list_delete_node(&ui_server.connections, node);
+			break;
+		}
+	}
+	if (ui_server.connections.length < 1) {
+		app_exit(0);
+	}
 }
 
 static void ui_server_on_window_visibility_change(app_event_t *e, void *arg)
@@ -164,8 +175,9 @@ static void ui_server_on_window_paint(app_event_t *e, void *arg)
 		if (conn && conn->window != e->window) {
 			continue;
 		}
-		ui_convert_rect(&e->paint.rect, &rect, ui_get_scale());
-		ui_widget_mark_dirty_rect(conn->widget, &rect, CSS_KEYWORD_GRAPH_BOX);
+		ui_convert_rect(&e->paint.rect, &rect, ui_metrics.scale);
+		ui_widget_mark_dirty_rect(conn->widget, &rect,
+					  CSS_KEYWORD_GRAPH_BOX);
 	}
 }
 
@@ -173,7 +185,7 @@ static void ui_server_on_window_resize(app_event_t *e, void *arg)
 {
 	ui_connection_t *conn;
 	pd_rect_t rect;
-	float scale = ui_get_scale();
+	float scale = ui_metrics.scale;
 	float width = e->size.width / scale;
 	float height = e->size.height / scale;
 
@@ -182,7 +194,7 @@ static void ui_server_on_window_resize(app_event_t *e, void *arg)
 		return;
 	}
 	if (!conn->ready) {
-		ui_compute_rect_actual(&rect, &conn->widget->box.canvas);
+		ui_compute_rect(&rect, &conn->widget->canvas_box);
 		if (rect.width > 0 && rect.height > 0 &&
 		    rect.width == e->size.width &&
 		    rect.height == e->size.height) {
@@ -202,41 +214,43 @@ static void ui_server_on_window_resize(app_event_t *e, void *arg)
 static void ui_server_on_window_minmaxinfo(app_event_t *e, void *arg)
 {
 	LCUI_BOOL resizable = FALSE;
-	float scale = ui_get_scale();
 	int width, height;
 	ui_widget_t *widget;
-	ui_widget_style_t *style;
+	css_computed_style_t *style;
 
 	if (!e->window) {
 		return;
 	}
+	widget = ui_server_get_widget(e->window);
+	if (!widget) {
+		return;
+	}
 	width = app_window_get_width(e->window);
 	height = app_window_get_height(e->window);
-	widget = ui_server_get_widget(e->window);
 	style = &widget->computed_style;
-	if (style->min_width >= 0) {
-		e->minmaxinfo.min_width = y_iround(scale * style->min_width);
+	if (IS_CSS_FIXED_LENGTH(style, min_width)) {
+		e->minmaxinfo.min_width = ui_compute(style->min_width);
 		if (width < e->minmaxinfo.min_width) {
 			width = e->minmaxinfo.min_width;
 			resizable = TRUE;
 		}
 	}
-	if (style->max_width >= 0) {
-		e->minmaxinfo.max_width = y_iround(scale * style->max_width);
+	if (IS_CSS_FIXED_LENGTH(style, max_width)) {
+		e->minmaxinfo.max_width = ui_compute(style->max_width);
 		if (width > e->minmaxinfo.max_width) {
 			width = e->minmaxinfo.max_width;
 			resizable = TRUE;
 		}
 	}
-	if (style->min_height >= 0) {
-		e->minmaxinfo.min_height = y_iround(scale * style->min_height);
+	if (IS_CSS_FIXED_LENGTH(style, min_height)) {
+		e->minmaxinfo.min_height = ui_compute(style->min_height);
 		if (height < e->minmaxinfo.min_height) {
 			height = e->minmaxinfo.min_height;
 			resizable = TRUE;
 		}
 	}
-	if (style->max_height >= 0) {
-		e->minmaxinfo.max_height = y_iround(scale * style->max_height);
+	if (IS_CSS_FIXED_LENGTH(style, max_height)) {
+		e->minmaxinfo.max_height = ui_compute(style->max_height);
 		if (height > e->minmaxinfo.max_height) {
 			height = e->minmaxinfo.max_height;
 			resizable = TRUE;
@@ -258,13 +272,13 @@ static void ui_server_refresh_window(ui_connection_t *conn)
 	pd_rect_t rect;
 
 	ui_widget_mark_dirty_rect(conn->widget, NULL, CSS_KEYWORD_GRAPH_BOX);
-	ui_compute_rect_actual(&rect, &conn->widget->box.canvas);
+	ui_compute_rect(&rect, &conn->widget->canvas_box);
 	app_window_set_title(conn->window, conn->widget->title);
 	app_window_set_size(conn->window, rect.width, rect.height);
-	if (ui_widget_has_auto_style(conn->widget, css_key_top)) {
+	if (conn->widget->computed_style.type_bits.top == CSS_TOP_AUTO) {
 		rect.y = (app_get_screen_height() - rect.height) / 2;
 	}
-	if (ui_widget_has_auto_style(conn->widget, css_key_left)) {
+	if (conn->widget->computed_style.type_bits.left == CSS_LEFT_AUTO) {
 		rect.x = (app_get_screen_width() - rect.width) / 2;
 	}
 	app_window_set_position(conn->window, rect.x, rect.y);
@@ -317,7 +331,7 @@ void ui_server_connect(ui_widget_t *widget, app_window_t *window)
 
 static void get_rendering_layer_size(int *width, int *height)
 {
-	float scale = ui_get_scale();
+	float scale = ui_metrics.scale;
 
 	*width = (int)(app_get_screen_width() * scale);
 	*height = (int)(app_get_screen_height() * scale);
@@ -361,8 +375,7 @@ static void ui_server_dump_rects(ui_connection_t *conn, list_t *out_rects)
 			if (layer->dirty >= max_dirty) {
 				continue;
 			}
-			if (!pd_rect_overlap(&layer->rect, &rect,
-						      sub_rect)) {
+			if (!pd_rect_overlap(&layer->rect, &rect, sub_rect)) {
 				continue;
 			}
 			list_append(&layer->rects, sub_rect);
@@ -605,11 +618,11 @@ static int window_mutation_list_add(list_t *list,
 	    strcmp(mutation->property_name, "height") == 0;
 	wcsncpy(wnd_mutation->title, widget->title ? widget->title : L"\0",
 		TITLE_MAX_SIZE);
-	wnd_mutation->visible = widget->computed_style.visible;
-	wnd_mutation->x = ui_compute_actual(widget->x, CSS_UNIT_PX);
-	wnd_mutation->y = ui_compute_actual(widget->y, CSS_UNIT_PX);
-	wnd_mutation->width = ui_compute_actual(widget->width, CSS_UNIT_PX);
-	wnd_mutation->height = ui_compute_actual(widget->height, CSS_UNIT_PX);
+	wnd_mutation->visible = ui_widget_is_visible(widget);
+	wnd_mutation->x = ui_compute(widget->border_box.x);
+	wnd_mutation->y = ui_compute(widget->border_box.y);
+	wnd_mutation->width = ui_compute(widget->border_box.width);
+	wnd_mutation->height = ui_compute(widget->border_box.height);
 	return 0;
 }
 
@@ -716,4 +729,6 @@ void ui_server_destroy(void)
 	app_off_event(APP_EVENT_VISIBILITY_CHANGE,
 		      ui_server_on_window_visibility_change);
 	list_destroy(&ui_server.connections, ui_connection_destroy);
+	ui_mutation_observer_destroy(ui_server.observer);
+	ui_server.observer = NULL;
 }

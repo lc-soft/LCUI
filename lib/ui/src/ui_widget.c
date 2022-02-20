@@ -1,7 +1,6 @@
 ﻿#include <string.h>
 #include <assert.h>
-#include <LCUI.h>
-#include "../include/ui.h"
+#include <LCUI/css/style_value.h>
 #include "internal.h"
 
 static void ui_widget_destroy_children(ui_widget_t* w);
@@ -9,22 +8,14 @@ static void ui_widget_destroy_children(ui_widget_t* w);
 static void ui_widget_init(ui_widget_t* w)
 {
 	memset(w, 0, sizeof(ui_widget_t));
+	w->tab_index = -1;
 	w->state = UI_WIDGET_STATE_CREATED;
-	w->style = css_style_declaration_create();
-	w->computed_style.opacity = 1.0;
-	w->computed_style.visible = TRUE;
-	w->computed_style.focusable = FALSE;
-	w->computed_style.display = CSS_KEYWORD_BLOCK;
-	w->computed_style.position = CSS_KEYWORD_STATIC;
-	w->computed_style.pointer_events = CSS_KEYWORD_INHERIT;
-	w->computed_style.box_sizing = CSS_KEYWORD_CONTENT_BOX;
 	list_create(&w->children);
 	list_create(&w->stacking_context);
 	w->node.data = w;
 	w->node_show.data = w;
 	w->node.next = w->node.prev = NULL;
 	w->node_show.next = w->node_show.prev = NULL;
-	ui_widget_init_background(w);
 }
 
 void ui_widget_destroy(ui_widget_t* w)
@@ -33,7 +24,6 @@ void ui_widget_destroy(ui_widget_t* w)
 		ui_widget_add_task(w->parent, UI_TASK_REFLOW);
 		ui_widget_unlink(w);
 	}
-	ui_widget_destroy_background(w);
 	ui_widget_destroy_listeners(w);
 	ui_widget_destroy_children(w);
 	ui_widget_destroy_prototype(w);
@@ -50,7 +40,7 @@ void ui_widget_destroy(ui_widget_t* w)
 	free(w);
 }
 
-static void ui_widget_on_destroy_child(void *arg)
+static void ui_widget_on_destroy_child(void* arg)
 {
 	ui_widget_destroy(arg);
 }
@@ -111,6 +101,7 @@ void ui_widget_set_title(ui_widget_t* w, const wchar_t* title)
 {
 	size_t len;
 	wchar_t *new_title, *old_title;
+	ui_mutation_record_t* record;
 
 	len = wcslen(title) + 1;
 	new_title = (wchar_t*)malloc(sizeof(wchar_t) * len);
@@ -123,21 +114,19 @@ void ui_widget_set_title(ui_widget_t* w, const wchar_t* title)
 	if (old_title) {
 		free(old_title);
 	}
-	ui_widget_add_task(w, UI_TASK_TITLE);
+	if (ui_widget_has_observer(w, UI_MUTATION_RECORD_TYPE_PROPERTIES)) {
+		record = ui_mutation_record_create(
+		    w, UI_MUTATION_RECORD_TYPE_PROPERTIES);
+		record->property_name = strdup2("title");
+		ui_widget_add_mutation_recrod(w, record);
+		ui_mutation_record_destroy(record);
+	}
 }
 
 void ui_widget_set_text(ui_widget_t* w, const char* text)
 {
 	if (w->proto && w->proto->settext) {
 		w->proto->settext(w, text);
-	}
-}
-
-void ui_widget_bind_property(ui_widget_t* w, const char* name,
-			     LCUI_Object value)
-{
-	if (w->proto && w->proto->bindprop) {
-		w->proto->bindprop(w, name, value);
 	}
 }
 
@@ -155,12 +144,12 @@ void ui_widget_get_offset(ui_widget_t* w, ui_widget_t* parent, float* offset_x,
 {
 	float x = 0, y = 0;
 	while (w != parent) {
-		x += w->box.border.x;
-		y += w->box.border.y;
+		x += w->border_box.x;
+		y += w->border_box.y;
 		w = w->parent;
 		if (w) {
-			x += w->box.padding.x - w->box.border.x;
-			y += w->box.padding.y - w->box.border.y;
+			x += w->padding_box.x - w->border_box.x;
+			y += w->padding_box.y - w->border_box.y;
 		} else {
 			break;
 		}
@@ -174,16 +163,16 @@ LCUI_BOOL ui_widget_in_viewport(ui_widget_t* w)
 	list_node_t* node;
 	ui_rect_t rect;
 	ui_widget_t *self, *parent, *child;
-	ui_widget_style_t* style;
+	css_computed_style_t* style;
 
-	rect = w->box.padding;
+	rect = w->padding_box;
 	/* If the size of the widget is not fixed, then set the maximum size to
 	 * avoid it being judged invisible all the time. */
-	if (rect.width < 1 && ui_widget_has_auto_style(w, css_key_width)) {
-		rect.width = w->parent->box.padding.width;
+	if (rect.width < 1 && !IS_CSS_FIXED_LENGTH(&w->computed_style, width)) {
+		rect.width = w->parent->padding_box.width;
 	}
-	if (rect.height < 1 && ui_widget_has_auto_style(w, css_key_height)) {
-		rect.height = w->parent->box.padding.height;
+	if (rect.height < 1 && !IS_CSS_FIXED_LENGTH(&w->computed_style, height)) {
+		rect.height = w->parent->padding_box.height;
 	}
 	for (self = w, parent = w->parent; parent;
 	     self = parent, parent = parent->parent) {
@@ -201,23 +190,22 @@ LCUI_BOOL ui_widget_in_viewport(ui_widget_t* w)
 			DEBUG_MSG("rect: (%g,%g,%g,%g), child rect: "
 				  "(%g,%g,%g,%g), child: %s %s\n",
 				  rect.x, rect.y, rect.width, rect.height,
-				  child->box.border.x, child->box.border.y,
-				  child->box.border.width,
-				  child->box.border.height, child->type,
+				  child->border_box.x, child->border_box.y,
+				  child->border_box.width,
+				  child->border_box.height, child->type,
 				  child->id);
-			if (!ui_rect_is_include(&child->box.border,
-						     &rect)) {
+			if (!ui_rect_is_include(&child->border_box, &rect)) {
 				continue;
 			}
 			if (style->opacity == 1.0f &&
-			    style->background.color.alpha == 255) {
+			    css_color_alpha(style->background_color) == 255) {
 				return FALSE;
 			}
 		}
-		rect.x += parent->box.padding.x;
-		rect.y += parent->box.padding.y;
-		ui_rect_correct(&rect, parent->box.padding.width,
-				       parent->box.padding.height);
+		rect.x += parent->padding_box.x;
+		rect.y += parent->padding_box.y;
+		ui_rect_correct(&rect, parent->padding_box.width,
+				parent->padding_box.height);
 		if (rect.width < 1 || rect.height < 1) {
 			return FALSE;
 		}

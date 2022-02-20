@@ -45,8 +45,5 @@
 #include <LCUI/util/strpool.h>
 #include <LCUI/util/time.h>
 #include <LCUI/util/timer.h>
-#include <LCUI/util/object.h>
-#include <LCUI/util/event.h>
-#include <LCUI/util/task.h>
 
 #endif

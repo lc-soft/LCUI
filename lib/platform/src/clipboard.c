@@ -38,7 +38,7 @@ static struct clipboard_module_t {
 
 int clipboard_request_text(clipboard_callback_t callback, void *arg)
 {
-#ifdef USE_LIBX11
+#ifdef HAVE_LIBX11
 	if (app_get_id() == APP_ID_LINUX_X11) {
 		return x11_clipboard_request_text(callback, arg);
 	}
@@ -60,13 +60,14 @@ int clipboard_request_text(clipboard_callback_t callback, void *arg)
 
 int clipboard_set_text(const wchar_t *text, size_t len)
 {
-#ifdef USE_LIBX11
+#ifdef HAVE_LIBX11
 	if (app_get_id() == APP_ID_LINUX_X11) {
 		return x11_clipboard_set_text(text, len);
 	}
 #endif
-	char *raw_text = malloc((len + 1) * sizeof(char));
-	size_t raw_len = wcstombs(raw_text, text, len);
+	size_t raw_len = encode_utf8(NULL, text, 0);
+	char *raw_text = malloc((raw_len + 1) * sizeof(char));
+	raw_len = encode_utf8(raw_text, text, raw_len);
 
 	if (clipboard.text) {
 		free(clipboard.text);
@@ -79,7 +80,7 @@ int clipboard_set_text(const wchar_t *text, size_t len)
 
 void clipboard_init(void)
 {
-#ifdef USE_LIBX11
+#ifdef HAVE_LIBX11
 	if (app_get_id() == APP_ID_LINUX_X11) {
 		x11_clipboard_init();
 		return;
@@ -89,7 +90,7 @@ void clipboard_init(void)
 
 void clipboard_destroy(void)
 {
-#ifdef USE_LIBX11
+#ifdef HAVE_LIBX11
 	if (app_get_id() == APP_ID_LINUX_X11) {
 		x11_clipboard_destroy();
 		return;

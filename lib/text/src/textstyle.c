@@ -34,7 +34,7 @@
 #include <LCUI/util.h>
 #include <LCUI/font.h>
 #include <LCUI/text/textstyle.h>
-#include <LCUI/css/utils.h>
+#include <LCUI/css.h>
 
 typedef enum LCUI_TextStyleTagType_ {
 	TEXT_STYLE_STYLE,
@@ -48,7 +48,7 @@ typedef enum LCUI_TextStyleTagType_ {
 
 typedef struct LCUI_StyleTag {
 	LCUI_TextStyleTagType id;
-	css_unit_value_t style;
+	css_style_value_t style;
 } LCUI_TextStyleTag;
 
 void TextStyle_Init(LCUI_TextStyle data)
@@ -73,7 +73,8 @@ int TextStyle_CopyFamily(LCUI_TextStyle dst, LCUI_TextStyle src)
 	if (!src->has_family) {
 		return 0;
 	}
-	for (len = 0; src->font_ids[len]; ++len);
+	for (len = 0; src->font_ids[len]; ++len)
+		;
 	len += 1;
 	if (dst->font_ids) {
 		free(dst->font_ids);
@@ -112,9 +113,8 @@ void TextStyle_Merge(LCUI_TextStyle base, LCUI_TextStyle target)
 		base->has_style = TRUE;
 		base->style = target->style;
 	}
-	if (fontlib_update_font_style(base->font_ids,
-				 base->style,
-				 &font_ids) > 0) {
+	if (fontlib_update_font_style(base->font_ids, base->style, &font_ids) >
+	    0) {
 		free(base->font_ids);
 		base->font_ids = font_ids;
 	}
@@ -123,9 +123,8 @@ void TextStyle_Merge(LCUI_TextStyle base, LCUI_TextStyle target)
 		base->has_weight = TRUE;
 		base->weight = target->weight;
 	}
-	if (fontlib_update_font_weight(base->font_ids,
-				  base->weight,
-				  &font_ids) > 0) {
+	if (fontlib_update_font_weight(base->font_ids, base->weight,
+				       &font_ids) > 0) {
 		free(base->font_ids);
 		base->font_ids = font_ids;
 	}
@@ -175,16 +174,16 @@ int TextStyle_SetStyle(LCUI_TextStyle ts, font_style_t style)
 	return -1;
 }
 
-int TextStyle_SetFont(LCUI_TextStyle ts, const char *str)
+int TextStyle_SetFont(LCUI_TextStyle ts, const char *const *names)
 {
 	size_t count;
+
 	if (ts->has_family && ts->font_ids) {
 		free(ts->font_ids);
 	}
 	ts->font_ids = NULL;
 	ts->has_family = FALSE;
-	count = fontlib_query(&ts->font_ids, ts->style,
-				      ts->weight, str);
+	count = fontlib_query(&ts->font_ids, ts->style, ts->weight, names);
 	if (count > 0) {
 		ts->has_family = TRUE;
 		return 0;
@@ -239,7 +238,7 @@ LCUI_TextStyle StyleTags_GetTextStyle(list_t *tags)
 				break;
 			}
 			style->has_fore_color = TRUE;
-			style->fore_color = tag->style.color;
+			style->fore_color.value = tag->style.color_value;
 			found_tags[tag->id] = TRUE;
 			++count;
 			break;
@@ -248,7 +247,7 @@ LCUI_TextStyle StyleTags_GetTextStyle(list_t *tags)
 				break;
 			}
 			style->has_back_color = TRUE;
-			style->back_color = tag->style.color;
+			style->back_color.value = tag->style.color_value;
 			found_tags[tag->id] = TRUE;
 			++count;
 			break;
@@ -273,11 +272,12 @@ LCUI_TextStyle StyleTags_GetTextStyle(list_t *tags)
 				break;
 			}
 			style->has_pixel_size = TRUE;
-			style->pixel_size = y_iround(tag->style.px);
+			style->pixel_size = (int)tag->style.unit_value.value;
 			found_tags[tag->id] = TRUE;
 			++count;
 			break;
-		default: break;
+		default:
+			break;
 		}
 		if (count == 4) {
 			break;
@@ -336,8 +336,11 @@ const wchar_t *ScanStyleEndingTag(const wchar_t *wstr, wchar_t *name)
 	/* 匹配标签,获取标签名 */
 	for (j = 0, i = 2; i < len; ++i) {
 		switch (wstr[i]) {
-		case ' ': break;
-		case ']': ++i; goto end_tag_search;
+		case ' ':
+			break;
+		case ']':
+			++i;
+			goto end_tag_search;
 		default:
 			if (name) {
 				name[j] = wstr[i];
@@ -376,8 +379,8 @@ const wchar_t *ScanStyleTag(const wchar_t *wstr, wchar_t *name,
 				end_name = TRUE;
 			}
 			/* 标签名首部和尾部可包含空格 */
-			if (j == 0 || max_name_len == 0
-			    || (max_name_len > 0 && end_name)) {
+			if (j == 0 || max_name_len == 0 ||
+			    (max_name_len > 0 && end_name)) {
 				continue;
 			}
 			/* 标签名中间不能包含空格 */
@@ -428,8 +431,7 @@ const wchar_t *ScanStyleTag(const wchar_t *wstr, wchar_t *name,
 
 /** 在字符串中获取指定样式标签中的数据 */
 static const wchar_t *ScanStyleTagByName(const wchar_t *wstr,
-					 const wchar_t *name,
-					 char *data)
+					 const wchar_t *name, char *data)
 {
 	size_t i, j, len, tag_len;
 
@@ -489,21 +491,21 @@ static const wchar_t *ScanStyleTagData(const wchar_t *wstr,
 
 	p = wstr;
 	if ((q = ScanStyleTagByName(p, L"color", tag_data))) {
-		if (!css_parse_color(&tag->style, tag_data)) {
+		if (!css_parse_color_value(&tag->style, tag_data)) {
 			return NULL;
 		}
 		tag->id = TEXT_STYLE_COLOR;
 		return q;
 	}
 	if ((q = ScanStyleTagByName(p, L"bgcolor", tag_data))) {
-		if (!css_parse_color(&tag->style, tag_data)) {
+		if (!css_parse_color_value(&tag->style, tag_data)) {
 			return NULL;
 		}
 		tag->id = TEXT_STYLE_BG_COLOR;
 		return q;
 	}
 	if ((q = ScanStyleTagByName(p, L"size", tag_data))) {
-		if (!css_parse_number(&tag->style, tag_data)) {
+		if (!css_parse_unit_value(&tag->style, tag_data)) {
 			return NULL;
 		}
 		tag->id = TEXT_STYLE_SIZE;
@@ -538,7 +540,7 @@ const wchar_t *StyleTags_GetStart(list_t *tags, const wchar_t *str)
 }
 
 /** 处理样式结束标签 */
-const wchar_t* StyleTags_GetEnd(list_t *tags, const wchar_t *str)
+const wchar_t *StyleTags_GetEnd(list_t *tags, const wchar_t *str)
 {
 	const wchar_t *p;
 	wchar_t tagname[256];

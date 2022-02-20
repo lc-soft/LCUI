@@ -184,7 +184,7 @@ static void ui_on_destroy_mutation_record(void *arg)
 void ui_mutation_observer_destroy(ui_mutation_observer_t *observer)
 {
 	list_unlink(&ui_observers, &observer->node);
-	list_destroy_without_node(&observer->connections, free);
+	ui_mutation_observer_disconnect(observer);
 	list_destroy(&observer->records, ui_on_destroy_mutation_record);
 	free(observer);
 }

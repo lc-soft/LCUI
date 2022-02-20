@@ -54,9 +54,9 @@ typedef struct ui_scroll_effect_t {
 
 /** 滚动条的相关数据 */
 typedef struct ui_scrollbar_t_ {
-	ui_widget_t* container;
-	ui_widget_t* target;
-	ui_widget_t* thumb;			/**< thumb of scrollbar */
+	ui_widget_t *container;
+	ui_widget_t *target;
+	ui_widget_t *thumb;			/**< thumb of scrollbar */
 	LCUI_BOOL is_dragging;			/**< whether the content is dragged */
 	LCUI_BOOL is_draggable;			/**< whether the content can be dragged */
 	ui_scrollbar_direction_t direction;	/**< 滚动条的方向（垂直或水平） */
@@ -69,6 +69,7 @@ typedef struct ui_scrollbar_t_ {
 	float distance;				/**< 滚动距离 */
 	int64_t timestamp;			/**< 数据更新时间，主要针对触控拖动时的位置变化 */
 	ui_scroll_effect_t effect;		/**< 用于实现惯性滚动效果的相关数据 */
+	ui_mutation_observer_t *observer;
 } ui_scrollbar_t;
 
 static ui_widget_prototype_t *ui_scrollbar_proto;
@@ -150,12 +151,12 @@ scrollbar.horizontal {
 
 /* clang-format on */
 
-static void ui_scrollbar_on_scrolling(void* arg)
+static void ui_scrollbar_on_scrolling(void *arg)
 {
 	float pos, distance, time;
-	ui_scrollbar_t* scrollbar;
-	ui_scroll_effect_t* effect;
-	ui_widget_t* w = arg;
+	ui_scrollbar_t *scrollbar;
+	ui_scroll_effect_t *effect;
+	ui_widget_t *w = arg;
 
 	scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
 	effect = &scrollbar->effect;
@@ -178,7 +179,7 @@ static void ui_scrollbar_on_scrolling(void* arg)
 	effect->timer = -1;
 }
 
-static void ui_scroll_effect_init(ui_scroll_effect_t* effect)
+static void ui_scroll_effect_init(ui_scroll_effect_t *effect)
 {
 	effect->timer = -1;
 	effect->end_pos = 0;
@@ -190,7 +191,7 @@ static void ui_scroll_effect_init(ui_scroll_effect_t* effect)
 	effect->interval = 1000 / EFFECT_FRAMES;
 }
 
-static void ui_scroll_effect_update(ui_scroll_effect_t* effect, float pos)
+static void ui_scroll_effect_update(ui_scroll_effect_t *effect, float pos)
 {
 	effect->speed = 0;
 	effect->is_running = FALSE;
@@ -198,13 +199,13 @@ static void ui_scroll_effect_update(ui_scroll_effect_t* effect, float pos)
 	effect->timestamp = get_time_ms();
 }
 
-static void ui_scrollbar_start_scrolling(ui_widget_t* w)
+static void ui_scrollbar_start_scrolling(ui_widget_t *w)
 {
 	float distance;
 	int64_t time_delta;
 
-	ui_scrollbar_t* scrollbar;
-	ui_scroll_effect_t* effect;
+	ui_scrollbar_t *scrollbar;
+	ui_scroll_effect_t *effect;
 
 	scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
 	effect = &scrollbar->effect;
@@ -235,14 +236,14 @@ static void ui_scrollbar_start_scrolling(ui_widget_t* w)
 		  distance, (int)time_delta);
 }
 
-static void ui_scrollbar_thumb_on_mousemove(ui_widget_t* thumb, ui_event_t* e,
-					    void* arg)
+static void ui_scrollbar_thumb_on_mousemove(ui_widget_t *thumb, ui_event_t *e,
+					    void *arg)
 {
-	ui_widget_t* target;
-	ui_widget_t* container;
-	ui_widget_t* w = e->data;
-	ui_scrollbar_t* scrollbar;
-	float size, layer_pos, x, y;
+	ui_widget_t *target;
+	ui_widget_t *container;
+	ui_widget_t *w = e->data;
+	ui_scrollbar_t *scrollbar;
+	css_numeric_value_t size, layer_pos, x, y;
 
 	scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
 	container = scrollbar->container ? scrollbar->container : w->parent;
@@ -251,23 +252,27 @@ static void ui_scrollbar_thumb_on_mousemove(ui_widget_t* thumb, ui_event_t* e,
 	}
 	target = scrollbar->target;
 	if (scrollbar->direction == UI_SCROLLBAR_HORIZONTAL) {
-		size = thumb->parent->box.content.width - thumb->width;
+		size =
+		    thumb->parent->content_box.width - thumb->border_box.width;
 		x = scrollbar->thumb_x + e->mouse.x - scrollbar->mouse_x;
 		x = y_max(0, y_min(x, size));
 		y = 0;
-		layer_pos = (float)((scrollbar->target->box.outer.width -
-				     container->box.content.width) *
+		layer_pos = (float)((scrollbar->target->outer_box.width -
+				     container->content_box.width) *
 				    y_max(0, y_min(x / size, 1.0)));
-		ui_widget_set_style(target, css_key_left, -layer_pos, px);
+		ui_widget_set_style_unit_value(target, css_key_left, -layer_pos,
+					       CSS_UNIT_PX);
 	} else {
-		size = thumb->parent->box.content.height - thumb->height;
+		size = thumb->parent->content_box.height -
+		       thumb->border_box.height;
 		x = 0;
 		y = scrollbar->thumb_y + e->mouse.y - scrollbar->mouse_y;
 		y = y_max(0, y_min(y, size));
-		layer_pos = (float)((scrollbar->target->box.outer.height -
-				     container->box.content.height) *
+		layer_pos = (float)((scrollbar->target->outer_box.height -
+				     container->content_box.height) *
 				    y_max(0, y_min(y / size, 1.0)));
-		ui_widget_set_style(target, css_key_top, -layer_pos, px);
+		ui_widget_set_style_unit_value(target, css_key_top, -layer_pos,
+					       CSS_UNIT_PX);
 	}
 	if (scrollbar->pos != layer_pos) {
 		ui_event_t e;
@@ -280,29 +285,29 @@ static void ui_scrollbar_thumb_on_mousemove(ui_widget_t* thumb, ui_event_t* e,
 	ui_widget_move(thumb, x, y);
 }
 
-static void ui_scrollbar_thumb_on_mouseup(ui_widget_t* thumb, ui_event_t* e,
-					  void* arg)
+static void ui_scrollbar_thumb_on_mouseup(ui_widget_t *thumb, ui_event_t *e,
+					  void *arg)
 {
-	ui_widget_t* w = e->data;
-	ui_scrollbar_t* scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
+	ui_widget_t *w = e->data;
+	ui_scrollbar_t *scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
 
-	ui_widget_off(thumb, "mousemove", ui_scrollbar_thumb_on_mousemove);
-	ui_widget_off(thumb, "mouseup", ui_scrollbar_thumb_on_mouseup);
+	ui_widget_off(thumb, "mousemove", ui_scrollbar_thumb_on_mousemove, w);
+	ui_widget_off(thumb, "mouseup", ui_scrollbar_thumb_on_mouseup, w);
 	ui_widget_release_mouse_capture(thumb);
 	scrollbar->is_dragging = FALSE;
 }
 
-static void ScrollBarThumb_OnMouseDown(ui_widget_t* thumb, ui_event_t* e,
-				       void* arg)
+static void Ui_scrollbar_thumb_on_mousedown(ui_widget_t *thumb, ui_event_t *e,
+					    void *arg)
 {
-	ui_widget_t* w = e->data;
-	ui_scrollbar_t* scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
+	ui_widget_t *w = e->data;
+	ui_scrollbar_t *scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
 
 	if (scrollbar->is_dragging) {
 		return;
 	}
-	scrollbar->thumb_x = thumb->x;
-	scrollbar->thumb_y = thumb->y;
+	scrollbar->thumb_x = thumb->canvas_box.x;
+	scrollbar->thumb_y = thumb->canvas_box.y;
 	scrollbar->mouse_x = e->mouse.x;
 	scrollbar->mouse_y = e->mouse.y;
 	scrollbar->is_dragging = TRUE;
@@ -312,93 +317,64 @@ static void ScrollBarThumb_OnMouseDown(ui_widget_t* thumb, ui_event_t* e,
 	ui_widget_on(thumb, "mouseup", ui_scrollbar_thumb_on_mouseup, w, NULL);
 }
 
-static void ui_scrollbar_on_link(ui_widget_t* w, ui_event_t* e, void* arg)
+static void ui_scrollbar_on_link(ui_widget_t *w, ui_event_t *e, void *arg)
 {
-	ui_scrollbar_t* scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
+	ui_scrollbar_t *scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
 	if (!scrollbar->container) {
 		ui_scrollbar_bind_container(w, w->parent);
 	}
 }
 
-static void ui_scrollbar_on_container_destroy(ui_widget_t* container,
-					      ui_event_t* e, void* arg)
+static void ui_scrollbar_on_container_destroy(ui_widget_t *container,
+					      ui_event_t *e, void *arg)
 {
-	ui_widget_t* w = e->data;
-
-	ui_scrollbar_bind_container(e->data,
-				    container == w->parent ? NULL : w->parent);
+	ui_widget_t *w = e->data;
+	ui_scrollbar_bind_container(w, container == w->parent ? NULL: w->parent);
 }
 
-static void ui_scrollbar_on_init(ui_widget_t* w)
+static void ui_scrollbar_on_target_destroy(ui_widget_t *target,
+					   ui_event_t *e, void *arg)
 {
-	ui_widget_t* track;
-	ui_widget_t* corner;
-	ui_scrollbar_t* self;
-
-	self =
-	    ui_widget_add_data(w, ui_scrollbar_proto, sizeof(ui_scrollbar_t));
-	self->direction = UI_SCROLLBAR_VERTICAL;
-	self->is_dragging = FALSE;
-	self->is_draggable = FALSE;
-	self->scroll_step = 64;
-	self->target = NULL;
-	self->container = NULL;
-	self->old_pos = 0;
-	self->pos = 0;
-	self->touch_point_id = -1;
-	self->thumb = ui_create_widget(NULL);
-	track = ui_create_widget(NULL);
-	corner = ui_create_widget(NULL);
-
-	ui_widget_add_class(track, "scrollbar-track");
-	ui_widget_add_class(corner, "scrollbar-corner");
-	ui_widget_add_class(self->thumb, "scrollbar-thumb");
-	ui_widget_on(self->thumb, "mousedown", ScrollBarThumb_OnMouseDown, w,
-		     NULL);
-	ui_widget_on(w, "link", ui_scrollbar_on_link, NULL, NULL);
-	ui_widget_append(track, self->thumb);
-	ui_widget_append(w, track);
-	ui_widget_append(w, corner);
-
-	ui_scroll_effect_init(&self->effect);
-	ui_scrollbar_set_direction(w, UI_SCROLLBAR_VERTICAL);
+	ui_scrollbar_bind_target(e->data, NULL);
 }
 
-static void ui_scrollbar_update_size(ui_widget_t* w)
+static void ui_scrollbar_update_size(ui_widget_t *w)
 {
-	float n = 1.0, size, box_size;
-	ui_scrollbar_t* scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
-	ui_widget_t* thumb = scrollbar->thumb;
+	css_numeric_value_t n = 100.f, size, box_size;
+	ui_scrollbar_t *scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
+	ui_widget_t *thumb = scrollbar->thumb;
 
 	if (!scrollbar->container) {
 		return;
 	}
 	if (scrollbar->direction == UI_SCROLLBAR_HORIZONTAL) {
 		if (scrollbar->target) {
-			size = scrollbar->target->box.outer.width;
+			size = scrollbar->target->outer_box.width;
 		} else {
 			size = 0;
 		}
-		box_size = scrollbar->container->width;
+		box_size = scrollbar->container->border_box.width;
 		if (size > box_size && box_size > 0) {
-			n = box_size / size;
+			n = 100.f * box_size / size;
 		}
-		ui_widget_set_style(thumb, css_key_width, n, scale);
+		ui_widget_set_style_unit_value(thumb, css_key_width, n,
+					       CSS_UNIT_PERCENT);
 	} else {
 		if (scrollbar->target) {
-			size = scrollbar->target->box.outer.height;
+			size = scrollbar->target->outer_box.height;
 		} else {
 			size = 0;
 		}
-		box_size = scrollbar->container->height;
+		box_size = scrollbar->container->border_box.height;
 		if (size > box_size && box_size > 0) {
-			n = box_size / size;
+			n = 100.f * box_size / size;
 		}
-		ui_widget_set_style(thumb, css_key_height, n, scale);
+		ui_widget_set_style_unit_value(thumb, css_key_height, n,
+					       CSS_UNIT_PERCENT);
 	}
 	ui_scrollbar_set_position(w, scrollbar->pos);
 	ui_widget_update_style(thumb);
-	if (n < 1.0) {
+	if (n < 100.f) {
 		ui_widget_show(w);
 		if (scrollbar->direction == UI_SCROLLBAR_HORIZONTAL) {
 			ui_widget_add_class(scrollbar->container,
@@ -419,13 +395,13 @@ static void ui_scrollbar_update_size(ui_widget_t* w)
 	}
 }
 
-static void ui_scrollbar_on_container_wheel(ui_widget_t* container,
-					    ui_event_t* e, void* arg)
+static void ui_scrollbar_on_container_wheel(ui_widget_t *container,
+					    ui_event_t *e, void *arg)
 {
 	float pos, new_pos;
 
-	ui_widget_t* w = e->data;
-	ui_scrollbar_t* scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
+	ui_widget_t *w = e->data;
+	ui_scrollbar_t *scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
 
 	// TODO: Add support to handle horizontal scrolling
 	// https://docs.microsoft.com/en-us/windows/win32/controls/scroll-bars
@@ -446,16 +422,16 @@ static void ui_scrollbar_on_container_wheel(ui_widget_t* container,
 }
 
 /** 容器的触屏事件响应 */
-static void ui_scrollbar_on_container_touch(ui_widget_t* container,
-					    ui_event_t* e, void* arg)
+static void ui_scrollbar_on_container_touch(ui_widget_t *container,
+					    ui_event_t *e, void *arg)
 {
 	unsigned time_delta;
 	float pos, distance;
 	unsigned i;
 
-	ui_widget_t* w = e->data;
-	ui_scrollbar_t* scrollbar;
-	ui_touch_point_t* point;
+	ui_widget_t *w = e->data;
+	ui_scrollbar_t *scrollbar;
+	ui_touch_point_t *point;
 
 	if (e->touch.n_points < 1) {
 		return;
@@ -548,81 +524,112 @@ static void ui_scrollbar_on_container_touch(ui_widget_t* container,
 	}
 }
 
-static void ui_scrollbar_on_container_resize(ui_widget_t* container,
-					     ui_event_t* e, void* arg)
+static void ui_scrollbar_on_mutation(ui_mutation_list_t *mutation_list,
+				     ui_mutation_observer_t *observer,
+				     void *arg)
 {
-	ui_scrollbar_update_size(e->data);
+	list_node_t *node;
+	ui_mutation_record_t *mutation;
+
+	for (list_each(node, mutation_list)) {
+		mutation = node->data;
+		if (mutation->type == UI_MUTATION_RECORD_TYPE_PROPERTIES &&
+		    (strcmp(mutation->property_name, "width") == 0 ||
+		     strcmp(mutation->property_name, "height") == 0)) {
+			ui_scrollbar_update_size(arg);
+			break;
+		}
+	}
 }
 
-static void ui_scrollbar_on_container_set_scroll(ui_widget_t* container,
-						 ui_event_t* e, void* arg)
+static void ui_scrollbar_on_container_set_scroll(ui_widget_t *container,
+						 ui_event_t *e, void *arg)
 {
-	float* pos = arg;
+	float *pos = arg;
 	ui_scrollbar_set_position(e->data, *pos);
 	e->cancel_bubble = TRUE;
 }
 
-void ui_scrollbar_bind_container(ui_widget_t* w, ui_widget_t* container)
+static void ui_scrollbar_observe(ui_widget_t *w)
 {
-	ui_scrollbar_t* scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
+	ui_mutation_observer_init_t options = { .properties = TRUE };
+	ui_scrollbar_t *scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
 
 	if (scrollbar->container) {
-		ui_widget_off(scrollbar->container, "resize",
-			      ui_scrollbar_on_container_resize);
-		ui_widget_off(scrollbar->container, "setscroll",
-			      ui_scrollbar_on_container_set_scroll);
-		ui_widget_off(scrollbar->container, "mousewheel",
-			      ui_scrollbar_on_container_wheel);
-		ui_widget_off(scrollbar->container, "touch",
-			      ui_scrollbar_on_container_touch);
-		ui_widget_off(scrollbar->container, "destroy",
-			      ui_scrollbar_on_container_destroy);
-	}
-	scrollbar->container = container;
-	if (container) {
-		ui_widget_on(container, "resize",
-			     ui_scrollbar_on_container_resize, w, NULL);
-		ui_widget_on(container, "setscroll",
+		ui_mutation_observer_observe(scrollbar->observer,
+					     scrollbar->container, options);
+		ui_widget_on(scrollbar->container, "setscroll",
 			     ui_scrollbar_on_container_set_scroll, w, NULL);
-		ui_widget_on(container, "mousewheel",
+		ui_widget_on(scrollbar->container, "mousewheel",
 			     ui_scrollbar_on_container_wheel, w, NULL);
-		ui_widget_on(container, "touch",
+		ui_widget_on(scrollbar->container, "touch",
 			     ui_scrollbar_on_container_touch, w, NULL);
-		ui_widget_on(container, "destroy",
+		ui_widget_on(scrollbar->container, "destroy",
 			     ui_scrollbar_on_container_destroy, w, NULL);
 	}
+	if (scrollbar->target) {
+		ui_mutation_observer_observe(scrollbar->observer,
+					     scrollbar->target, options);
+		ui_widget_add_class(scrollbar->target, "scrollbar-target");
+		ui_widget_on(scrollbar->target, "destroy",
+			     ui_scrollbar_on_target_destroy, w, NULL);
+	}
 	ui_scrollbar_update_size(w);
 }
 
-void ui_scrollbar_bind_target(ui_widget_t* w, ui_widget_t* target)
+static void ui_scrollbar_disconnect(ui_widget_t *w)
 {
-	ui_scrollbar_t* scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
+	ui_scrollbar_t *scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
 
+	ui_mutation_observer_disconnect(scrollbar->observer);
+	if (scrollbar->container) {
+		ui_widget_off(scrollbar->container, "setscroll",
+			      ui_scrollbar_on_container_set_scroll, w);
+		ui_widget_off(scrollbar->container, "mousewheel",
+			      ui_scrollbar_on_container_wheel, w);
+		ui_widget_off(scrollbar->container, "touch",
+			      ui_scrollbar_on_container_touch, w);
+		ui_widget_off(scrollbar->container, "destroy",
+			      ui_scrollbar_on_container_destroy, w);
+	}
 	if (scrollbar->target) {
 		ui_widget_remove_class(scrollbar->target, "scrollbar-target");
-		ui_widget_off(scrollbar->target, "resize",
-			      ui_scrollbar_on_container_resize);
+		ui_widget_off(scrollbar->target, "destroy",
+			      ui_scrollbar_on_target_destroy, w);
 	}
-	scrollbar->target = target;
-	ui_widget_add_class(target, "scrollbar-target");
-	ui_widget_on(target, "resize", ui_scrollbar_on_container_resize, w,
-		     NULL);
-	ui_scrollbar_update_size(w);
 }
 
-float ui_scrollbar_get_position(ui_widget_t* w)
+void ui_scrollbar_bind_container(ui_widget_t *w, ui_widget_t *container)
 {
-	ui_scrollbar_t* scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
+	ui_scrollbar_t *scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
+
+	ui_scrollbar_disconnect(w);
+	scrollbar->container = container;
+	ui_scrollbar_observe(w);
+}
+
+void ui_scrollbar_bind_target(ui_widget_t *w, ui_widget_t *target)
+{
+	ui_scrollbar_t *scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
+
+	ui_scrollbar_disconnect(w);
+	scrollbar->target = target;
+	ui_scrollbar_observe(w);
+}
+
+float ui_scrollbar_get_position(ui_widget_t *w)
+{
+	ui_scrollbar_t *scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
 	return scrollbar->pos;
 }
 
-float ui_scrollbar_set_position(ui_widget_t* w, float pos)
+float ui_scrollbar_set_position(ui_widget_t *w, float pos)
 {
 	float new_pos, box_size, size, thumb_pos;
-	ui_scrollbar_t* scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
-	ui_widget_t* thumb = scrollbar->thumb;
-	ui_widget_t* content = scrollbar->target;
-	ui_event_t* e = { 0 };
+	ui_scrollbar_t *scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
+	ui_widget_t *thumb = scrollbar->thumb;
+	ui_widget_t *content = scrollbar->target;
+	ui_event_t *e = { 0 };
 
 	if (!content) {
 		return 0;
@@ -630,11 +637,11 @@ float ui_scrollbar_set_position(ui_widget_t* w, float pos)
 	new_pos = 1.0f * pos;
 	memset(&e, 0, sizeof(e));
 	if (scrollbar->direction == UI_SCROLLBAR_HORIZONTAL) {
-		size = scrollbar->target->box.outer.width;
+		size = scrollbar->target->outer_box.width;
 		if (scrollbar->container) {
-			box_size = scrollbar->container->box.content.width;
+			box_size = scrollbar->container->content_box.width;
 		} else {
-			box_size = w->parent->box.content.width;
+			box_size = w->parent->content_box.width;
 		}
 		if (new_pos + box_size > size) {
 			new_pos = size - box_size;
@@ -642,16 +649,18 @@ float ui_scrollbar_set_position(ui_widget_t* w, float pos)
 		if (new_pos < 0.0f) {
 			new_pos = 0.0f;
 		}
-		thumb_pos = w->box.content.width - thumb->width;
+		thumb_pos = w->content_box.width - thumb->border_box.width;
 		thumb_pos = thumb_pos * new_pos / (size - box_size);
-		ui_widget_set_style(thumb, css_key_left, thumb_pos, px);
-		ui_widget_set_style(content, css_key_left, -new_pos, px);
+		ui_widget_set_style_unit_value(thumb, css_key_left, thumb_pos,
+					       CSS_UNIT_PX);
+		ui_widget_set_style_unit_value(content, css_key_left, -new_pos,
+					       CSS_UNIT_PX);
 	} else {
-		size = scrollbar->target->box.outer.height;
+		size = scrollbar->target->outer_box.height;
 		if (scrollbar->container) {
-			box_size = scrollbar->container->box.content.height;
+			box_size = scrollbar->container->content_box.height;
 		} else {
-			box_size = w->parent->box.content.height;
+			box_size = w->parent->content_box.height;
 		}
 		if (new_pos + box_size > size) {
 			new_pos = size - box_size;
@@ -659,14 +668,16 @@ float ui_scrollbar_set_position(ui_widget_t* w, float pos)
 		if (new_pos < 0) {
 			new_pos = 0;
 		}
-		thumb_pos = w->box.content.height - thumb->height;
+		thumb_pos = w->content_box.height - thumb->border_box.height;
 		if (size == box_size) {
 			thumb_pos = 0;
 		} else {
 			thumb_pos = thumb_pos * new_pos / (size - box_size);
 		}
-		ui_widget_set_style(thumb, css_key_top, thumb_pos, px);
-		ui_widget_set_style(content, css_key_top, -new_pos, px);
+		ui_widget_set_style_unit_value(thumb, css_key_top, thumb_pos,
+					       CSS_UNIT_PX);
+		ui_widget_set_style_unit_value(content, css_key_top, -new_pos,
+					       CSS_UNIT_PX);
 	}
 	pos = new_pos;
 	if (scrollbar->pos != pos) {
@@ -681,10 +692,10 @@ float ui_scrollbar_set_position(ui_widget_t* w, float pos)
 	return pos;
 }
 
-void ui_scrollbar_set_direction(ui_widget_t* w,
+void ui_scrollbar_set_direction(ui_widget_t *w,
 				ui_scrollbar_direction_t direction)
 {
-	ui_scrollbar_t* scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
+	ui_scrollbar_t *scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
 
 	if (direction == UI_SCROLLBAR_HORIZONTAL) {
 		ui_widget_add_class(w, "horizontal");
@@ -696,10 +707,10 @@ void ui_scrollbar_set_direction(ui_widget_t* w,
 	scrollbar->direction = direction;
 }
 
-static void ui_scrollbar_on_set_attr(ui_widget_t* w, const char* name,
-				     const char* value)
+static void ui_scrollbar_on_set_attr(ui_widget_t *w, const char *name,
+				     const char *value)
 {
-	ui_widget_t* content;
+	ui_widget_t *content;
 
 	if (strcmp(name, "parent") == 0) {
 		content = ui_get_widget(value);
@@ -720,10 +731,56 @@ static void ui_scrollbar_on_set_attr(ui_widget_t* w, const char* name,
 	}
 }
 
+static void ui_scrollbar_on_init(ui_widget_t *w)
+{
+	ui_widget_t *track;
+	ui_widget_t *corner;
+	ui_scrollbar_t *self;
+
+	self =
+	    ui_widget_add_data(w, ui_scrollbar_proto, sizeof(ui_scrollbar_t));
+	self->direction = UI_SCROLLBAR_VERTICAL;
+	self->is_dragging = FALSE;
+	self->is_draggable = FALSE;
+	self->scroll_step = 64;
+	self->target = NULL;
+	self->container = NULL;
+	self->old_pos = 0;
+	self->pos = 0;
+	self->touch_point_id = -1;
+	self->thumb = ui_create_widget(NULL);
+	track = ui_create_widget(NULL);
+	corner = ui_create_widget(NULL);
+
+	ui_widget_add_class(track, "scrollbar-track");
+	ui_widget_add_class(corner, "scrollbar-corner");
+	ui_widget_add_class(self->thumb, "scrollbar-thumb");
+	ui_widget_on(self->thumb, "mousedown", Ui_scrollbar_thumb_on_mousedown,
+		     w, NULL);
+	ui_widget_on(w, "link", ui_scrollbar_on_link, NULL, NULL);
+	ui_widget_append(track, self->thumb);
+	ui_widget_append(w, track);
+	ui_widget_append(w, corner);
+
+	ui_scroll_effect_init(&self->effect);
+	ui_scrollbar_set_direction(w, UI_SCROLLBAR_VERTICAL);
+	self->observer =
+	    ui_mutation_observer_create(ui_scrollbar_on_mutation, w);
+}
+
+static void ui_scrollbar_on_destroy(ui_widget_t *w)
+{
+	ui_scrollbar_t *scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
+
+	ui_scrollbar_disconnect(w);
+	ui_mutation_observer_destroy(scrollbar->observer);
+}
+
 void ui_register_scrollbar(void)
 {
 	ui_scrollbar_proto = ui_create_widget_prototype("scrollbar", NULL);
 	ui_scrollbar_proto->init = ui_scrollbar_on_init;
 	ui_scrollbar_proto->setattr = ui_scrollbar_on_set_attr;
+	ui_scrollbar_proto->destroy = ui_scrollbar_on_destroy;
 	ui_load_css_string(ui_scrollbar_css, __FILE__);
 }

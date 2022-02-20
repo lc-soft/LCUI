@@ -32,7 +32,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "config.h"
+#include <LCUI/def.h>
+#include <LCUI/config.h>
 #include <LCUI/pandagl.h>
 #include <LCUI/image.h>
 
@@ -44,10 +45,10 @@ typedef struct LCUI_ImageInterfaceRec_ {
 } LCUI_ImageInterfaceRec, *LCUI_ImageInterface;
 
 static const LCUI_ImageInterfaceRec interfaces[] = {
-#ifdef USE_LIBPNG
+#ifdef HAVE_LIBPNG
 	{ ".png", LCUI_InitPNGReader, LCUI_ReadPNGHeader, LCUI_ReadPNG },
 #endif
-#ifdef USE_LIBJPEG
+#ifdef HAVE_LIBJPEG
 	{ ".jpeg .jpg", LCUI_InitJPEGReader, LCUI_ReadJPEGHeader,
 	  LCUI_ReadJPEG },
 #endif

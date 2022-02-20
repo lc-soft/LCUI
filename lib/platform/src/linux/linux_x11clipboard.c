@@ -43,8 +43,7 @@
  */
 
 #include "../internal.h"
-
-#if defined(LCUI_PLATFORM_LINUX) && defined(USE_LIBX11)
+#if defined(LCUI_PLATFORM_LINUX) && defined(HAVE_LIBX11)
 #include <LCUI/thread.h>
 
 #define CLIPBOARD_TIMEOUT 1000
@@ -131,9 +130,10 @@ int x11_clipboard_set_text(const wchar_t *text, size_t len)
 	    XGetSelectionOwner(display, x11_clipboard.xclipboard);
 
 	// X11 doesn't support wchar_t, so we need to send it regular char
-	char *raw_text = malloc((len + 1) * sizeof(char));
-	size_t raw_len = wcstombs(raw_text, text, len);
+	size_t raw_len = encode_utf8(NULL, text, 0);
+	char *raw_text = malloc((raw_len + 1)* sizeof(char));
 
+	raw_len = encode_utf8(raw_text, text, raw_len);
 	raw_text[raw_len] = '\0';
 	if (raw_len == -1) {
 		_DEBUG_MSG("Failed converting wchar_t* to char*\n");
@@ -256,7 +256,7 @@ static void x11_clipboard_on_clear(app_native_event_t *ev, void *arg)
 // text we copied in our clipboard
 static void x11_clipboard_on_request(app_native_event_t *ev, void *arg)
 {
-	XEvent *x_ev = arg;
+	XEvent *x_ev = ev;
 	XEvent reply;
 
 	_DEBUG_MSG("Received SelectionRequest\n");

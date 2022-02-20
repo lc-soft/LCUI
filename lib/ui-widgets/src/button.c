@@ -41,7 +41,6 @@ static const char *ui_button_css = css_string(
 
 button {
 	padding: 5px 10px;
-	focusable: true;
 	text-align: center;
 	display: inline-block;
 	background-color: #fff;
@@ -66,7 +65,7 @@ button:disabled {
 static void ui_button_on_init(ui_widget_t* w)
 {
 	ui_button_prototype->proto->init(w);
-	w->computed_style.focusable = TRUE;
+	w->tab_index = 0;
 }
 
 void ui_button_set_text_w(ui_widget_t* w, const wchar_t *wstr)

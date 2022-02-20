@@ -1,4 +1,5 @@
 ﻿#include <math.h>
+#include <memory.h>
 #include "../include/pandagl/pixel.h"
 
 unsigned pd_get_pixel_size(pd_color_type_t color_type)
