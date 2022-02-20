@@ -33,9 +33,13 @@
 #include <string.h>
 #include "../internal.h"
 
+#ifdef LCUI_PLATFORM_LINUX
+
 int open_uri(const char *uri)
 {
 	char cmd[512] = { 0 };
 	snprintf(cmd, 511, "xdg-open %s", uri);
 	return system(cmd);
 }
+
+#endif

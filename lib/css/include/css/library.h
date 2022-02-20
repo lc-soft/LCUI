@@ -36,90 +36,9 @@
 
 LCUI_BEGIN_HEADER
 
-/* clang-format off */
-
-#define css_check_style_prop(S, K, T) \
-	css_style_declaration_check_property(S, K, CSS_UNIT_##T)
-
-#define css_set_style_prop(S, KEY, VAL, UNIT)         \
-	do {                                          \
-		S->sheet[KEY].is_valid = TRUE;        \
-		S->sheet[KEY].UNIT = CSS_UNIT_##UNIT; \
-		S->sheet[KEY].val_##UNIT = VAL;       \
-	} while (0);
-
-#define css_unset_style_prop(S, KEY)                \
-	do {                                        \
-		S->sheet[KEY].is_valid = FALSE;     \
-		S->sheet[KEY].type = CSS_UNIT_NONE; \
-		S->sheet[KEY].val_int = 0;          \
-	} while (0);
-
-LCUI_API void css_unit_value_destroy(css_unit_value_t *s);
-
-LCUI_API void css_unit_value_merge(css_unit_value_t *dst,
-				   css_unit_value_t *src);
-
-LCUI_API css_style_props_t *css_style_properties_create(void);
-
-LCUI_API css_style_property_t *css_style_properties_find(
-    css_style_props_t *list, int key);
-
-LCUI_API int css_style_properties_remove(css_style_props_t *list, int key);
-
-LCUI_API css_style_property_t *css_style_properties_add(css_style_props_t *list,
-							int key);
-
-LCUI_API void css_style_properties_destroy(css_style_props_t *list);
-
-LCUI_API css_style_decl_t *css_style_declaration_create(void);
-
-INLINE LCUI_BOOL css_style_declaration_check_property(
-    css_style_decl_t *style, css_property_key_t key, css_unit_t unit)
-{
-	return style->sheet[key].is_valid && style->sheet[key].unit == unit;
-}
-
-LCUI_API void css_style_declaration_clear(css_style_decl_t *ss);
-
-LCUI_API void css_style_declaration_destroy(css_style_decl_t *ss);
-
-LCUI_API int css_style_declaration_merge(css_style_decl_t *dest,
-					 const css_style_decl_t *src);
-
-LCUI_API int css_style_declaration_merge_properties(css_style_decl_t *ss,
-						    css_style_props_t *list);
-
-LCUI_API int css_style_declaration_replace(css_style_decl_t *dest,
-					   const css_style_decl_t *src);
-
-LCUI_API css_selector_t *css_selector_create(const char *selector);
-
-LCUI_API css_selector_t *css_selector_duplicate(css_selector_t *selector);
-
-LCUI_API int css_selector_append(css_selector_t *selector,
-				 css_selector_node_t *node);
-
-LCUI_API void css_selector_update(css_selector_t *s);
-
-LCUI_API void css_selector_destroy(css_selector_t *s);
-
-LCUI_API int css_selector_node_get_name_list(css_selector_node_t *sn,
-					     list_t *names);
-
-LCUI_API int css_selector_node_update(css_selector_node_t *node);
-
-LCUI_API void css_selector_node_destroy(css_selector_node_t *node);
-
-/**
- * 匹配选择器节点
- * 左边的选择器必须包含右边的选择器的所有属性。
- */
-LCUI_API LCUI_BOOL css_selector_node_match(css_selector_node_t *sn1,
-					   css_selector_node_t *sn2);
-
-LCUI_API int css_add_style_sheet(css_selector_t *selector,
-				css_style_decl_t *in_ss, const char *space);
+LCUI_API int css_add_style_decl(css_selector_t *selector,
+				const css_style_decl_t *in_ss,
+				const char *space);
 
 /**
  * 从指定组中查找样式表
@@ -129,40 +48,29 @@ LCUI_API int css_add_style_sheet(css_selector_t *selector,
  * @param[out] list 找到的样式表列表
  */
 LCUI_API int css_query_selector_from_group(int group, const char *name,
-					     css_selector_t *s, list_t *list);
+					   const css_selector_t *s,
+					   list_t *list);
 
-INLINE int css_query_selector(css_selector_t *s, list_t *list)
+INLINE int css_query_selector(const css_selector_t *s, list_t *list)
 {
 	return css_query_selector_from_group(0, NULL, s, list);
 }
 
-LCUI_API const css_style_decl_t *css_get_computed_style_with_cache(css_selector_t *s);
+LCUI_API void css_each_style_rule(void (*callback)(css_style_rule_t *, const char *,
+					     void *),
+			    void *data);
 
-LCUI_API void css_get_computed_style(css_selector_t *s, css_style_decl_t *out_ss);
+LCUI_API css_style_decl_t *css_select_style(const css_selector_t *s);
 
-LCUI_API void css_print_style_rules_by_selector(css_selector_t *s);
+LCUI_API css_style_decl_t *css_select_style_with_cache(const css_selector_t *s);
 
-LCUI_API int css_register_property_name(const char *name);
+LCUI_API void css_init_library(void);
 
-LCUI_API int css_register_keyword(int key, const char *name);
+LCUI_API void css_destroy_library(void);
 
-LCUI_API int css_get_keyword_key(const char *str);
+LCUI_API size_t css_print_style_rules(void);
 
-LCUI_API const char *css_get_keyword_name(int val);
-
-LCUI_API const char *css_get_property_name(int key);
-
-LCUI_API int css_get_property_count(void);
-
-LCUI_API void css_style_declartation_print(css_style_decl_t *ss);
-
-LCUI_API void css_selector_print(css_selector_t *selector);
-
-LCUI_API void css_print_all(void);
-
-LCUI_API void css_init(void);
-
-LCUI_API void css_destroy(void);
+LCUI_API size_t css_style_rules_to_string(char *str, size_t max_len);
 
 LCUI_END_HEADER
 

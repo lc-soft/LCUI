@@ -35,71 +35,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
-#ifdef USE_LINUX_INPUT_EVENT
-#include <linux/input.h>
-#else
 #include <signal.h>
 #include <termios.h>
-#endif
 #include <LCUI/thread.h>
 
 static struct linux_keyboard_t {
-#ifdef USE_LINUX_INPUT_EVENT
-	int dev_fd;
-	char *dev_path;
-#else
 	int fd;
 	struct termios tm;
-#endif
 	thread_t tid;
 	LCUI_BOOL active;
 } linux_keyboard;
-
-/* FIXME: this driver does not working, so we won't use it for now */
-#ifdef USE_LINUX_INPUT_EVENT
-static void linux_keyboard_thread(void *arg)
-{
-	size_t bytes;
-	struct input_event data;
-
-	linux_keyboard.active = TRUE;
-	logger_debug("[input] keyboard driver thread: %lld\n", linux_keyboard.tid);
-	while (linux_keyboard.active) {
-		bytes = read(linux_keyboard.dev_fd, &data, sizeof(data));
-		if (bytes > 0 && data.type == EV_KEY) {
-			logger_debug("Keypress value=%x, type=%x, code=%x\n",
-				   data.value, data.type, data.code);
-		}
-	}
-}
-
-int linux_keyboard_init(void)
-{
-	linux_keyboard.dev_path = getenv("LCUI_KEYBOARD_DEVICE");
-	if (!linux_keyboard.dev_path) {
-		linux_keyboard.dev_path = "/dev/input/event0";
-	}
-	if ((linux_keyboard.dev_fd = open(linux_keyboard.dev_path, O_RDONLY | O_NONBLOCK)) <
-	    0) {
-		logger_error("[input] open keyboard device failed");
-		return -1;
-	}
-	thread_create(&linux_keyboard.tid, linux_keyboard_thread, NULL);
-	return 0;
-}
-
-int linux_keyboard_destroy(void)
-{
-	if (!linux_keyboard.active) {
-		return -1;
-	}
-	linux_keyboard.active = FALSE;
-	thread_join(linux_keyboard.tid, NULL);
-	close(linux_keyboard.dev_fd);
-	return 0;
-}
-
-#else
 
 static void linux_keyboard_dispatch_event(int key)
 {
@@ -248,7 +193,5 @@ int linux_keyboard_destroy(void)
 	}
 	return 0;
 }
-
-#endif
 
 #endif

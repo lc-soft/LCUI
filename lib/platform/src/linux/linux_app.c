@@ -45,6 +45,11 @@ void app_window_close(app_window_t *wnd)
 	return linux_app.window.close(wnd);
 }
 
+void app_window_destroy(app_window_t *wnd)
+{
+	return linux_app.window.destroy(wnd);
+}
+
 void app_window_activate(app_window_t *wnd)
 {
 	return linux_app.window.activate(wnd);
@@ -149,7 +154,7 @@ app_id_t app_get_id(void)
 int app_init_engine(const wchar_t *name)
 {
 	linux_app.id = APP_ID_LINUX;
-#ifdef USE_LIBX11
+#ifdef HAVE_LIBX11
 	x11_app_driver_init(&linux_app.app);
 	x11_app_window_driver_init(&linux_app.window);
 	if (linux_app.app.init(name) == 0) {
@@ -178,6 +183,7 @@ int app_destroy_engine(void)
 	if (!linux_app.active) {
 		return -1;
 	}
+	linux_app.active = FALSE;
 	if (linux_app.id != APP_ID_LINUX_X11) {
 		linux_mouse_destroy();
 		linux_keyboard_destroy();

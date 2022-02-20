@@ -56,20 +56,20 @@ void pd_paint_background(pd_context_t *ctx, const pd_background_t *bg,
 	rect.x += ctx->rect.x - box->x;
 	rect.y += ctx->rect.y - box->y;
 	/* 保存背景图像区域 */
-	read_rect.x = x = bg->position.x;
-	read_rect.y = y = bg->position.y;
-	read_rect.width = width = bg->size.width;
-	read_rect.height = height = bg->size.height;
+	read_rect.x = x = bg->x;
+	read_rect.y = y = bg->y;
+	read_rect.width = width = bg->width;
+	read_rect.height = height = bg->height;
 	/* 获取当前绘制区域与背景图像的重叠区域 */
 	if (!pd_rect_overlap(&read_rect, &rect, &read_rect)) {
 		return;
 	}
 	/* 转换成相对于图像的坐标 */
-	read_rect.x -= bg->position.x;
-	read_rect.y -= bg->position.y;
+	read_rect.x -= bg->x;
+	read_rect.y -= bg->y;
 	/* 如果尺寸没有变化则直接引用 */
-	if (bg->size.width == bg->image->width &&
-	    bg->size.height == bg->image->height) {
+	if (bg->width == bg->image->width &&
+	    bg->height == bg->image->height) {
 		pd_canvas_quote(&canvas, bg->image, &read_rect);
 	} else {
 		rect = read_rect;

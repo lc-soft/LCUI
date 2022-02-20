@@ -1,9 +1,9 @@
-﻿#include "config.h"
-#include <time.h>
+﻿#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <LCUI/config.h>
 #include <LCUI/app.h>
 #include <LCUI/platform.h>
 #include <LCUI/ui.h>
@@ -155,17 +155,19 @@ void lcui_init_base(void)
 void lcui_init(void)
 {
 	lcui_print_info();
-	app_init(L"LCUI Application");
-	app_set_event_dispatcher(lcui_dispatch_app_event);
 	lcui_init_base();
 	lcui_init_app();
+	if (app_init(L"LCUI Application") != 0) {
+		abort();
+	}
+	app_set_event_dispatcher(lcui_dispatch_app_event);
 	lcui_init_ui();
 }
 
 void lcui_destroy(void)
 {
-	lcui_destroy_app();
 	lcui_destroy_ui();
+	lcui_destroy_app();
 	lcui_destroy_timers();
 	app_destroy();
 }

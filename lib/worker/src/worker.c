@@ -32,18 +32,36 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <LCUI/def.h>
-#include <LCUI/util/task.h>
-#include <yutil.h>
+#include "../include/worker.h"
+#include <LCUI/util.h>
 #include <LCUI/thread.h>
-#include <LCUI/worker.h>
 
 typedef struct LCUI_WorkerRec_ {
 	LCUI_BOOL active;		/**< 是否处于活动状态 */
-	list_t tasks;		/**< 任务队列 */
+	list_t tasks;			/**< 任务队列 */
 	thread_mutex_t mutex;		/**< 互斥锁 */
-	thread_cond_t cond;			/**< 条件变量 */
+	thread_cond_t cond;		/**< 条件变量 */
 	thread_t thread;		/**< 所在的线程 */
 } LCUI_WorkerRec;
+
+void LCUITask_Destroy(LCUI_Task task)
+{
+	if (task->destroy_arg[0] && task->arg[0]) {
+		task->destroy_arg[0](task->arg[0]);
+	}
+	if (task->destroy_arg[1] && task->arg[1]) {
+		task->destroy_arg[1](task->arg[1]);
+	}
+}
+
+int LCUITask_Run(LCUI_Task task)
+{
+	if (task && task->func) {
+		task->func(task->arg[0], task->arg[1]);
+		return 0;
+	}
+	return -1;
+}
 
 LCUI_Worker LCUIWorker_New(void)
 {

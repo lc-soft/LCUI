@@ -30,7 +30,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "config.h"
+#include <LCUI/config.h>
 #include <LCUI.h>
 #include <LCUI/font.h>
 #include <LCUI/ui.h>
@@ -39,9 +39,9 @@
 
 #define WARN_TXT "[builder] warning: this module is not enabled before build.\n"
 
-#ifdef USE_LIBXML2
-#include <libxml/xmlmemory.h>
+#ifdef WITH_LIBXML2
 #include <libxml/parser.h>
+#include <libxml/xmlmemory.h>
 
 #define check_prop_name(PROP, NAME) \
 	(xmlStrcasecmp(PROP->name, (xmlChar *)NAME) == 0)
@@ -270,7 +270,7 @@ static void ui_builder_parse_node(xml_parser_t *parser, xmlNodePtr node)
 			continue;
 		}
 		if (node->type == XML_ELEMENT_NODE) {
-			p = ui_builder_get_node_parser(node->name);
+			p = ui_builder_get_node_parser((const char*)node->name);
 			if (!p) {
 				proto =
 				    ui_get_widget_prototype((char *)node->name);
@@ -319,7 +319,7 @@ static void ui_builder_parse_node(xml_parser_t *parser, xmlNodePtr node)
 
 ui_widget_t *ui_load_xml_string(const char *str, int size)
 {
-#ifndef USE_LIBXML2
+#ifndef WITH_LIBXML2
 	logger_warning(WARN_TXT);
 #else
 	xmlDocPtr doc;
@@ -350,7 +350,7 @@ FAILED:
 
 ui_widget_t *ui_load_xml_file(const char *filepath)
 {
-#ifndef USE_LIBXML2
+#ifndef WITH_LIBXML2
 	logger_warning(WARN_TXT);
 #else
 	xmlDocPtr doc;

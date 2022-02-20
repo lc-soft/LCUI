@@ -1,29 +1,6 @@
-﻿#include <LCUI.h>
-#include "../include/ui.h"
-#include "internal.h"
+﻿#include "internal.h"
 
-static ui_metrics_t ui_metrics;
-
-float ui_compute(float value, css_unit_t type)
-{
-	switch (type) {
-	case CSS_UNIT_PX:
-		break;
-	case CSS_UNIT_DIP:
-		value = value * ui_metrics.density;
-		break;
-	case CSS_UNIT_SP:
-		value = value * ui_metrics.scaled_density;
-		break;
-	case CSS_UNIT_PT:
-		value = value * ui_metrics.dpi / 72.0f;
-		break;
-	default:
-		value = 0;
-		break;
-	}
-	return value;
-}
+ui_metrics_t ui_metrics;
 
 static float ui_compute_density_by_level(ui_density_Level_t level)
 {
@@ -76,9 +53,4 @@ void ui_init_metrics(void)
 {
 	ui_metrics.scale = 1.0f;
 	ui_set_dpi(96.0f);
-}
-
-const ui_metrics_t *ui_get_metrics(void)
-{
-	return &ui_metrics;
 }

@@ -106,28 +106,28 @@ static void fb_app_print_info(void)
 		strcpy(type, "unkown");
 		break;
 	}
-	printf("============== screen info =============\n"
-	       "FB mem start  : 0x%08lX\n"
-	       "FB mem length : %d\n"
-	       "FB type       : %s\n"
-	       "FB visual     : %s\n"
-	       "accel         : %d\n"
-	       "geometry      : %d %d %d %d %d\n"
-	       "timings       : %d %d %d %d %d %d\n"
-	       "rgba          : %d/%d, %d/%d, %d/%d, %d/%d\n"
-	       "========================================\n",
-	       fbapp.fb.fix_info.smem_start, fbapp.fb.fix_info.smem_len, type,
-	       visual, fbapp.fb.fix_info.accel, fbapp.fb.var_info.xres,
-	       fbapp.fb.var_info.yres, fbapp.fb.var_info.xres_virtual,
-	       fbapp.fb.var_info.yres_virtual, fbapp.fb.var_info.bits_per_pixel,
-	       fbapp.fb.var_info.upper_margin, fbapp.fb.var_info.lower_margin,
-	       fbapp.fb.var_info.left_margin, fbapp.fb.var_info.right_margin,
-	       fbapp.fb.var_info.hsync_len, fbapp.fb.var_info.vsync_len,
-	       fbapp.fb.var_info.red.length, fbapp.fb.var_info.red.offset,
-	       fbapp.fb.var_info.green.length, fbapp.fb.var_info.green.offset,
-	       fbapp.fb.var_info.blue.length, fbapp.fb.var_info.blue.offset,
-	       fbapp.fb.var_info.transp.length,
-	       fbapp.fb.var_info.transp.offset);
+	logger_debug(
+	    "============== screen info =============\n"
+	    "FB mem start  : 0x%08lX\n"
+	    "FB mem length : %d\n"
+	    "FB type       : %s\n"
+	    "FB visual     : %s\n"
+	    "accel         : %d\n"
+	    "geometry      : %d %d %d %d %d\n"
+	    "timings       : %d %d %d %d %d %d\n"
+	    "rgba          : %d/%d, %d/%d, %d/%d, %d/%d\n"
+	    "========================================\n",
+	    fbapp.fb.fix_info.smem_start, fbapp.fb.fix_info.smem_len, type,
+	    visual, fbapp.fb.fix_info.accel, fbapp.fb.var_info.xres,
+	    fbapp.fb.var_info.yres, fbapp.fb.var_info.xres_virtual,
+	    fbapp.fb.var_info.yres_virtual, fbapp.fb.var_info.bits_per_pixel,
+	    fbapp.fb.var_info.upper_margin, fbapp.fb.var_info.lower_margin,
+	    fbapp.fb.var_info.left_margin, fbapp.fb.var_info.right_margin,
+	    fbapp.fb.var_info.hsync_len, fbapp.fb.var_info.vsync_len,
+	    fbapp.fb.var_info.red.length, fbapp.fb.var_info.red.offset,
+	    fbapp.fb.var_info.green.length, fbapp.fb.var_info.green.offset,
+	    fbapp.fb.var_info.blue.length, fbapp.fb.var_info.blue.offset,
+	    fbapp.fb.var_info.transp.length, fbapp.fb.var_info.transp.offset);
 }
 
 static void fb_app_init_root_window(void)
@@ -218,7 +218,7 @@ static void fb_app_window_set_size(app_window_t *wnd, int width, int height)
 	wnd->rect.height = wnd->height;
 	wnd->actual_rect = wnd->rect;
 	pd_rect_correct(&wnd->actual_rect, fbapp.screen_width,
-			      fbapp.screen_height);
+			fbapp.screen_height);
 	pd_canvas_create(&wnd->canvas, wnd->width, wnd->height);
 }
 
@@ -237,7 +237,16 @@ static void fb_app_window_set_title(app_window_t *wnd, const wchar_t *title)
 
 static void fb_app_window_close(app_window_t *wnd)
 {
+	app_event_t e = { 0 };
+
 	fbapp.window_count -= 1;
+	e.type = APP_EVENT_CLOSE;
+	e.window = wnd;
+	app_post_event(&e);
+}
+
+static void fb_app_window_destroy(app_window_t *wnd)
+{
 }
 
 static void fb_app_window_activate(app_window_t *wnd)
@@ -332,6 +341,7 @@ static void fb_app_window_sync_rect32(pd_canvas_t *canvas, int x, int y)
 	pd_canvas_replace(&fbapp.canvas, canvas, x, y);
 }
 
+/** FIXME: 屏幕上并未显示图形，可能是哪里中改错了 */
 static void fb_app_window_sync_rect(app_window_t *wnd, pd_rect_t *rect)
 {
 	int x, y;
@@ -343,8 +353,7 @@ static void fb_app_window_sync_rect(app_window_t *wnd, pd_rect_t *rect)
 	actual_rect.y = rect->y + wnd->y;
 	actual_rect.width = rect->width;
 	actual_rect.height = rect->height;
-	pd_rect_correct(&actual_rect, fbapp.screen_width,
-			      fbapp.screen_height);
+	pd_rect_correct(&actual_rect, fbapp.screen_width, fbapp.screen_height);
 	/* Convert this rectangle to surface canvas related rectangle */
 	x = actual_rect.x;
 	y = actual_rect.y;
@@ -428,11 +437,13 @@ static int fb_app_init(const wchar_t *name)
 	if (!fbapp.fb.dev_path) {
 		fbapp.fb.dev_path = "/dev/fb0";
 	}
-	logger_debug("[display] open framebuffer device: %s\n",
+	logger_debug("[fb-app] open framebuffer device: %s\n",
 		     fbapp.fb.dev_path);
 	fbapp.fb.dev_fd = open(fbapp.fb.dev_path, O_RDWR);
 	if (fbapp.fb.dev_fd == -1) {
-		logger_error("[display] open framebuffer device failed\n");
+		logger_error(
+		    "[fb-app] open framebuffer device failed, errno(%d): %s\n",
+		    errno, strerror(errno));
 		return -1;
 	}
 	ioctl(fbapp.fb.dev_fd, FBIOGET_VSCREENINFO, &fbapp.fb.var_info);
@@ -443,13 +454,14 @@ static int fb_app_init(const wchar_t *name)
 	fbapp.fb.mem = mmap(NULL, fbapp.fb.mem_len, PROT_READ | PROT_WRITE,
 			    MAP_SHARED, fbapp.fb.dev_fd, 0);
 	if ((void *)-1 == fbapp.fb.mem) {
-		logger_error("[display] framebuffer mmap failed\n");
+		logger_error("[fb-app] framebuffer mmap failed\n");
 		return -2;
 	}
 	fb_app_print_info();
 	fb_app_init_canvas();
 	fb_app_init_root_window();
 	fbapp.active = TRUE;
+	fbapp.loop_active = TRUE;
 	return 0;
 }
 
@@ -459,7 +471,7 @@ static int fb_app_destroy(void)
 		return -1;
 	}
 	if (munmap(fbapp.fb.mem, fbapp.fb.mem_len) != 0) {
-		perror("[display] framebuffer munmap failed");
+		perror("[fb-app] framebuffer munmap failed");
 	}
 	switch (fbapp.fb.var_info.bits_per_pixel) {
 	case 8:
@@ -475,7 +487,8 @@ static int fb_app_destroy(void)
 	return 0;
 }
 
-static int fb_app_on_event(int type, app_native_event_handler_t handler, void *data)
+static int fb_app_on_event(int type, app_native_event_handler_t handler,
+			   void *data)
 {
 	return -1;
 }
@@ -487,12 +500,15 @@ static int fb_app_off_event(int type, app_native_event_handler_t handler)
 
 static int fb_app_process_events(app_process_events_option_t option)
 {
+	app_event_t e = { .type = APP_EVENT_TICK };
+
 	fbapp.exit_code = 0;
-	fbapp.loop_active = TRUE;
 	while (fbapp.active && fbapp.loop_active) {
+		app_process_event(&e);
 		app_process_events();
 		sleep_ms(1);
 	}
+	fbapp.loop_active = TRUE;
 	return fbapp.exit_code;
 }
 
@@ -520,6 +536,7 @@ void fb_app_driver_init(app_driver_t *driver)
 void fb_app_window_driver_init(app_window_driver_t *driver)
 {
 	driver->close = fb_app_window_close;
+	driver->close = fb_app_window_destroy;
 	driver->show = fb_app_window_show;
 	driver->hide = fb_app_window_hide;
 	driver->activate = fb_app_window_activate;

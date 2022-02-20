@@ -31,12 +31,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#include "config.h"
-#include <yutil.h>
+#include <LCUI/def.h>
+#include <LCUI/config.h>
+#include <LCUI/util.h>
 #include <LCUI/pandagl.h>
 #include <LCUI/image.h>
 
-#ifdef USE_LIBJPEG
+#ifdef HAVE_LIBJPEG
 
 #undef TRUE
 #undef FALSE
@@ -203,7 +204,7 @@ int LCUI_ReadJPEGHeader(LCUI_ImageReader reader)
 
 int LCUI_InitJPEGReader(LCUI_ImageReader reader)
 {
-#ifdef USE_LIBJPEG
+#ifdef HAVE_LIBJPEG
 	j_decompress_ptr cinfo;
 	LCUI_JPEGReader jpeg_reader;
 	cinfo = malloc(sizeof(struct jpeg_decompress_struct));
@@ -235,7 +236,7 @@ int LCUI_InitJPEGReader(LCUI_ImageReader reader)
 
 int LCUI_ReadJPEG(LCUI_ImageReader reader, pd_canvas_t *graph)
 {
-#ifdef USE_LIBJPEG
+#ifdef HAVE_LIBJPEG
 	uchar_t *bytep;
 	JSAMPARRAY buffer;
 	j_decompress_ptr cinfo;

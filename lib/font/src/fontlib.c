@@ -28,11 +28,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <LCUI/config.h>
 #include <LCUI/util.h>
 #include "internal.h"
 
@@ -83,35 +83,35 @@ static struct font_library_module_t {
 
 /* clang-format on */
 
-#define select_char_cache(ch) \
-	(rbtree_t *)rbtree_get_data_by_key(&fontlib.bitmap_cache, ch)
-#define select_font_cache(ch, font_id) \
-	(rbtree_t *)rbtree_get_data_by_key(ch, font_id)
-#define select_bitmap_cache(font, size) \
-	(font_bitmap_t *)rbtree_get_data_by_key(font, size)
-#define select_font_family_cache(family_name)                         \
-	(font_family_node_t *)dict_fetch_value(fontlib.font_families, \
-					       family_name);
-#define select_font_style_cache(FNODE, S) (&(FNODE)->styles[S])
-#define select_font_weight_cache(SNODE, W) ((SNODE)->weights[W / 100 - 1])
-#define clear_font_weight_cache(SNODE, W)             \
-	do {                                          \
-		(SNODE)->weights[W / 100 - 1] = NULL; \
-	} while (0);
-#define set_font_weight_cache(SNODE, FONT)                         \
-	do {                                                       \
-		(SNODE)->weights[(FONT)->weight / 100 - 1] = FONT; \
-	} while (0);
+INLINE rbtree_t *select_char_cache(wchar_t ch)
+{
+	return rbtree_get_data_by_key(&fontlib.bitmap_cache, ch);
+}
+
+INLINE rbtree_t *select_font_cache(rbtree_t *font_cache, int font_id)
+{
+	return rbtree_get_data_by_key(font_cache, font_id);
+}
+
+INLINE font_bitmap_t *select_bitmap_cache(rbtree_t *bmp_cache, int size)
+{
+	return rbtree_get_data_by_key(bmp_cache, size);
+}
+
+INLINE font_family_node_t *select_font_family_cache(const char *family_name)
+{
+	return dict_fetch_value(fontlib.font_families, family_name);
+}
 
 #ifndef LCUI_PLATFORM_WIN32
 
-#ifdef USE_FONTCONFIG
+#ifdef HAVE_FONTCONFIG
 #include <fontconfig/fontconfig.h>
 #endif
 
 char *fontlib_get_font_path(const char *name)
 {
-#ifdef USE_FONTCONFIG
+#ifdef HAVE_FONTCONFIG
 	char *path = NULL;
 	size_t path_len;
 
@@ -412,20 +412,20 @@ int fontlib_add_font(font_t *font)
 		memset(node->styles, 0, sizeof(node->styles));
 		dict_add(fontlib.font_families, node->family_name, node);
 	}
-	style_node = select_font_style_cache(node, font->style);
-	exists_font = select_font_weight_cache(style_node, font->weight);
+	style_node = node->styles + font->style;
+	exists_font = style_node->weights[font->weight- 1];
 	if (exists_font) {
 		font->id = exists_font->id;
 		if (fontlib.default_font &&
 		    font->id == fontlib.default_font->id) {
 			fontlib.default_font = font;
 		}
-		clear_font_weight_cache(style_node, font->weight);
+		style_node->weights[font->weight - 1] = NULL;
 		font_destroy(exists_font);
 	} else {
 		font->id = ++fontlib.count;
 	}
-	set_font_weight_cache(style_node, font);
+	style_node->weights[font->weight - 1] = font;
 	fontlib_add_cached_font(font);
 	return font->id;
 }
@@ -444,8 +444,8 @@ font_t *fontlib_get_font(int id)
 static font_weight_t find_bolder_weight(font_style_node_t *snode,
 					font_weight_t weight)
 {
-	for (weight += 100; weight <= FONT_WEIGHT_BLACK; weight += 100) {
-		if (select_font_weight_cache(snode, weight)) {
+	for (weight += 1; weight <= FONT_WEIGHT_BLACK; weight += 1) {
+		if (snode->weights[weight]) {
 			return weight;
 		}
 	}
@@ -455,8 +455,8 @@ static font_weight_t find_bolder_weight(font_style_node_t *snode,
 static font_weight_t find_lighter_weight(font_style_node_t *snode,
 					 font_weight_t weight)
 {
-	for (weight -= 100; weight >= FONT_WEIGHT_THIN; weight -= 100) {
-		if (select_font_weight_cache(snode, weight)) {
+	for (weight -= 1; weight >= FONT_WEIGHT_THIN; weight -= 1) {
+		if (snode->weights[weight]) {
 			return weight;
 		}
 	}
@@ -477,11 +477,11 @@ static font_weight_t font_weight_fallback(font_style_node_t *snode,
 		return find_lighter_weight(snode, weight);
 	}
 	if (weight == FONT_WEIGHT_NORMAL) {
-		if (select_font_weight_cache(snode, FONT_WEIGHT_MEDIUM)) {
+		if (snode->weights[FONT_WEIGHT_MEDIUM - 1]) {
 			return FONT_WEIGHT_MEDIUM;
 		}
 	} else if (weight == FONT_WEIGHT_MEDIUM) {
-		if (select_font_weight_cache(snode, FONT_WEIGHT_NORMAL)) {
+		if (snode->weights[FONT_WEIGHT_NORMAL - 1]) {
 			return FONT_WEIGHT_NORMAL;
 		}
 	}
@@ -512,12 +512,12 @@ int fontlib_get_font_id(const char *family_name, font_style_t style,
 	}
 	for (style_num = style; style_num >= 0; --style_num) {
 		snode = &fnode->styles[style_num];
-		if (select_font_weight_cache(snode, weight)) {
-			return select_font_weight_cache(snode, weight)->id;
+		if (snode->weights[weight - 1]) {
+			return snode->weights[weight - 1]->id;
 		}
 		w = font_weight_fallback(snode, weight);
 		if (w) {
-			return select_font_weight_cache(snode, w)->id;
+			return snode->weights[w - 1]->id;
 		}
 	}
 	return -3;
@@ -597,53 +597,39 @@ size_t fontlib_update_font_style(const int *font_ids, font_style_t style,
 	return count;
 }
 
-size_t fontlib_query(int **font_ids, font_style_t style, font_weight_t weight,
-		     const char *names)
+unsigned fontlib_query(int **font_ids, font_style_t style, font_weight_t weight,
+		       const char *const *names)
 {
 	int *ids;
-	char name[256];
-	const char *p;
-	size_t count, i;
+	unsigned i, count, loaded_count;
 
 	*font_ids = NULL;
 	if (!names) {
 		return 0;
 	}
-	for (p = names, count = 1; *p; ++p) {
-		if (*p == ',') {
-			++count;
-		}
-	}
-	if (p - names == 0) {
+	for (count = 0; names[count]; ++count)
+		;
+	if (count < 1) {
 		return 0;
 	}
 	ids = malloc(sizeof(int) * (count + 1));
 	if (!ids) {
 		return 0;
 	}
-	for (p = names, count = 0, i = 0;; ++p) {
-		if (*p != ',' && *p) {
-			name[i++] = *p;
-			continue;
-		}
-		name[i] = 0;
-		strtrim(name, name, "'\"\n\r\t ");
-		ids[count] = fontlib_get_font_id(name, style, weight);
-		if (ids[count] > 0) {
-			++count;
-		}
-		i = 0;
-		if (!*p) {
-			break;
+	for (loaded_count = 0, i = 0; i < count; ++i) {
+		ids[loaded_count] =
+		    fontlib_get_font_id(names[i], style, weight);
+		if (ids[loaded_count] > 0) {
+			++loaded_count;
 		}
 	}
-	ids[count] = 0;
-	if (count < 1) {
+	ids[loaded_count] = 0;
+	if (loaded_count < 1) {
 		free(ids);
 		ids = NULL;
 	}
 	*font_ids = ids;
-	return count;
+	return loaded_count;
 }
 
 int fontlib_get_default_font(void)
@@ -739,7 +725,7 @@ static void fontlib_init_engine(void)
 	fontlib.incore_font = fontlib_get_font(fid);
 	fontlib.default_font = fontlib.incore_font;
 	/* 然后看情况启用其它字体引擎 */
-#ifdef USE_FREETYPE
+#ifdef HAVE_FREETYPE
 	if (freetype_engine_init(&fontlib.engines[1]) == 0) {
 		fontlib.engine = &fontlib.engines[1];
 	}
@@ -771,7 +757,7 @@ static void fontlib_destroy_base(void)
 static void fontlib_destroy_engine(void)
 {
 	incore_font_engine_destroy();
-#ifdef USE_FREETYPE
+#ifdef HAVE_FREETYPE
 	freetype_engine_destroy();
 #endif
 }

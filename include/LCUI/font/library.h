@@ -21,8 +21,8 @@ LCUI_API font_weight_t fontlib_detect_weight(const char *str);
 LCUI_API font_style_t fontlib_detect_style(const char *str);
 
 /** 载入字体位图 */
-LCUI_API int fontlib_render_bitmap(font_bitmap_t *buff, unsigned ch, int font_id,
-				   int pixel_size);
+LCUI_API int fontlib_render_bitmap(font_bitmap_t *buff, unsigned ch,
+				   int font_id, int pixel_size);
 
 /** 添加字体族，并返回该字族的ID */
 LCUI_API int fontlib_add_font(font_t *font);
@@ -64,8 +64,8 @@ LCUI_API size_t fontlib_update_font_style(const int *font_ids,
  * @param[in] names 字族名称，多个名字用逗号隔开
  * @return 获取到的字体 ID 的数量
  */
-LCUI_API size_t fontlib_query(int **font_ids, font_style_t style,
-			      font_weight_t weight, const char *names);
+LCUI_API unsigned fontlib_query(int **font_ids, font_style_t style,
+				font_weight_t weight, const char *const *names);
 
 /** 获取指定字体ID的字体信息 */
 LCUI_API font_t *fontlib_get_font(int id);

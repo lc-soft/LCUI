@@ -57,6 +57,10 @@ static struct linux_mouse_t {
 static void linux_dispatch_mouse_button_event(int button, int state)
 {
 	app_event_t ev = { 0 };
+
+	if (button < 1 || button > 2) {
+		return;
+	}
 	if (linux_mouse.button_state[button - 1]) {
 		if (!(state & button)) {
 			ev.type = APP_EVENT_MOUSEUP;
@@ -117,6 +121,7 @@ static void linux_mouse_thread(void *arg)
 
 int linux_mouse_init(void)
 {
+	linux_mouse.active = TRUE;
 	linux_mouse.x = app_get_screen_width() / 2;
 	linux_mouse.y = app_get_screen_height() / 2;
 	linux_mouse.dev_path = getenv("LCUI_MOUSE_DEVICE");

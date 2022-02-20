@@ -43,6 +43,8 @@
 	SHADOW_WIDTH((CTX)->shadow) + BLUR_WIDTH((CTX)->shadow) - \
 	    (CTX)->shadow->blur
 
+#define SHADOW_WIDTH(sd) (sd->blur + sd->spread)
+
 #define POW2(X) ((X) * (X))
 #define CIRCLE_R(R) (R - 0.5)
 

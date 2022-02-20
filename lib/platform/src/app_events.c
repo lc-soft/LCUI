@@ -1,6 +1,6 @@
 #include <errno.h>
 #include <LCUI/util.h>
-#include "../include/platform.h"
+#include "internal.h"
 
 static struct app_events_t {
 	/** list_t<app_event_t> */
@@ -140,7 +140,9 @@ int app_process_event(app_event_t *e)
 			++count;
 		}
 	}
-	app_events.dispatcher(e);
+	if (app_events.dispatcher) {
+		app_events.dispatcher(e);
+	}
 	return count;
 }
 
@@ -168,5 +170,6 @@ void app_init_events(void)
 
 void app_destroy_events(void)
 {
+	app_set_event_dispatcher(NULL);
 	list_destroy(&app_events.queue, free);
 }

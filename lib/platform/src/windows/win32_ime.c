@@ -1,7 +1,7 @@
 ﻿#include <errno.h>
 #include <string.h>
 #include <stdlib.h>
-#include "platform.h"
+#include "../internal.h"
 #ifdef LCUI_PLATFORM_WIN_DESKTOP
 #include <windows.h>
 #include <ime.h>

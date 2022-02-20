@@ -63,7 +63,7 @@ static void xml_loader_destroy(xml_loader_t* loader)
 {
 	if (loader->widget) {
 		ui_widget_off(loader->widget, "destroy",
-			      xml_loader_on_widget_destroy);
+			      xml_loader_on_widget_destroy, NULL);
 	}
 	if (loader->key) {
 		free(loader->key);

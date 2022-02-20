@@ -26,7 +26,7 @@ int pd_canvas_veri_flip(const pd_canvas_t *canvas, pd_canvas_t *buff)
 	return 0;
 }
 
-static int canvas_horiz_flip(const pd_canvas_t *canvas, pd_canvas_t *buff)
+int canvas_horiz_flip(const pd_canvas_t *canvas, pd_canvas_t *buff)
 {
 	int x, y;
 	pd_rect_t rect;

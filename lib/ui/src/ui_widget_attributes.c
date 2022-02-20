@@ -1,12 +1,13 @@
 #include <errno.h>
 #include <string.h>
+#include <stdio.h>
 #include <LCUI/util.h>
 #include "../include/ui.h"
 #include "internal.h"
 
 static void ui_widget_attribute_destructor(void *privdata, void *data)
 {
-	ui_widget_attribute_t* attr = data;
+	ui_widget_attribute_t *attr = data;
 
 	if (attr->value.destructor) {
 		attr->value.destructor(attr->value.data);
@@ -17,10 +18,10 @@ static void ui_widget_attribute_destructor(void *privdata, void *data)
 	free(attr);
 }
 
-int ui_widget_set_attribute_ex(ui_widget_t* w, const char *name, void *value,
-			  int value_type, void (*value_destructor)(void *))
+int ui_widget_set_attribute_ex(ui_widget_t *w, const char *name, void *value,
+			       int value_type, void (*value_destructor)(void *))
 {
-	ui_widget_attribute_t* attr;
+	ui_widget_attribute_t *attr;
 	static dict_type_t dict_type;
 	static LCUI_BOOL dict_type_available = FALSE;
 
@@ -48,7 +49,7 @@ int ui_widget_set_attribute_ex(ui_widget_t* w, const char *name, void *value,
 	return 0;
 }
 
-int ui_widget_set_attribute(ui_widget_t* w, const char *name, const char *value)
+int ui_widget_set_attribute(ui_widget_t *w, const char *name, const char *value)
 {
 	int ret;
 	char *value_str = NULL;
@@ -64,12 +65,16 @@ int ui_widget_set_attribute(ui_widget_t* w, const char *name, const char *value)
 			} else {
 				ui_widget_set_disabled(w, FALSE);
 			}
+		} else if (strcmp(name, "tabindex") == 0) {
+			if (value) {
+				sscanf(value, "%d", &w->tab_index);
+			}
 		}
 		ret = ui_widget_set_attribute_ex(w, name, value_str,
-					    CSS_UNIT_STRING, free);
+						 CSS_STRING_VALUE, free);
 	} else {
-		ret = ui_widget_set_attribute_ex(w, name, NULL, CSS_UNIT_NONE,
-					    NULL);
+		ret = ui_widget_set_attribute_ex(w, name, NULL, CSS_NO_VALUE,
+						 NULL);
 	}
 	if (w->proto && w->proto->setattr) {
 		w->proto->setattr(w, name, value_str);
@@ -77,9 +82,9 @@ int ui_widget_set_attribute(ui_widget_t* w, const char *name, const char *value)
 	return ret;
 }
 
-const char *ui_widget_get_attribute_value(ui_widget_t* w, const char *name)
+const char *ui_widget_get_attribute_value(ui_widget_t *w, const char *name)
 {
-	ui_widget_attribute_t* attr;
+	ui_widget_attribute_t *attr;
 	if (!w->attributes) {
 		return NULL;
 	}
@@ -90,7 +95,7 @@ const char *ui_widget_get_attribute_value(ui_widget_t* w, const char *name)
 	return NULL;
 }
 
-void ui_widget_destroy_attributes(ui_widget_t* w)
+void ui_widget_destroy_attributes(ui_widget_t *w)
 {
 	if (w->attributes) {
 		dict_destroy(w->attributes);

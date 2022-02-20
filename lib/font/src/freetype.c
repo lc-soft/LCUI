@@ -28,8 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#ifdef USE_FREETYPE
+#include <LCUI/config.h>
+#ifdef HAVE_FREETYPE
 #include "internal.h"
 #include <stdlib.h>
 #include <errno.h>

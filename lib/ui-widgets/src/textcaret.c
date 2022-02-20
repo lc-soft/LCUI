@@ -37,7 +37,7 @@
 
 typedef struct ui_textcaret_task_t {
 	LCUI_BOOL active;
-	ui_widget_t* widget;
+	ui_widget_t *widget;
 } ui_textcaret_task_t;
 
 /** 文本插入符相关数据 */
@@ -52,18 +52,20 @@ static ui_widget_prototype_t *ui_textcaret_proto = NULL;
 
 static const char *ui_textcaret_css = css_string(
 
-textcaret {
-	pointer-events: none;
-	focusable: false;
-	width: 1px;
-	height:14px;
-	position: absolute;
-	background-color: #000;
-}
+    textcaret {
+	    pointer - events : none;
+    width:
+	    1px;
+    height:
+	    14px;
+    position:
+	    absolute;
+	    background - color : #000;
+    }
 
 );
 
-void ui_textcaret_refresh(ui_widget_t* widget)
+void ui_textcaret_refresh(ui_widget_t *widget)
 {
 	float x, y;
 
@@ -96,7 +98,7 @@ static void ui_textcaret_on_blink(void *arg)
 	}
 }
 
-void ui_textcaret_set_visible(ui_widget_t* widget, LCUI_BOOL visible)
+void ui_textcaret_set_visible(ui_widget_t *widget, LCUI_BOOL visible)
 {
 	ui_textcaret_t *caret;
 
@@ -110,21 +112,22 @@ void ui_textcaret_set_visible(ui_widget_t* widget, LCUI_BOOL visible)
 	}
 }
 
-static void ui_textcaret_on_init(ui_widget_t* widget)
+static void ui_textcaret_on_init(ui_widget_t *widget)
 {
 	ui_textcaret_t *caret;
 
-	caret = ui_widget_add_data(widget, ui_textcaret_proto, sizeof(ui_textcaret_t));
+	caret = ui_widget_add_data(widget, ui_textcaret_proto,
+				   sizeof(ui_textcaret_t));
 	caret->task = malloc(sizeof(ui_textcaret_task_t));
 	caret->task->active = TRUE;
 	caret->task->widget = widget;
 	caret->blink_interval = 500;
 	caret->visible = FALSE;
 	caret->timer_id = lcui_set_interval(caret->blink_interval,
-		ui_textcaret_on_blink, caret->task);
+					    ui_textcaret_on_blink, caret->task);
 }
 
-void ui_textcaret_set_blink_time(ui_widget_t* widget, unsigned int n_ms)
+void ui_textcaret_set_blink_time(ui_widget_t *widget, unsigned int n_ms)
 {
 	ui_textcaret_t *caret;
 
@@ -133,7 +136,7 @@ void ui_textcaret_set_blink_time(ui_widget_t* widget, unsigned int n_ms)
 	lcui_reset_timer(caret->timer_id, caret->blink_interval);
 }
 
-static void ui_textcaret_on_destroy(ui_widget_t* widget)
+static void ui_textcaret_on_destroy(ui_widget_t *widget)
 {
 	ui_textcaret_t *caret;
 

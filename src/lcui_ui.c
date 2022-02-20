@@ -26,7 +26,7 @@ static void lcui_dispatch_ui_mouse_event(ui_event_type_t type,
 					 app_event_t *app_evt)
 {
 	ui_event_t e = { 0 };
-	float scale = ui_get_scale();
+	float scale = ui_metrics.scale;
 
 	e.type = type;
 	e.mouse.y = (float)round(app_evt->mouse.y / scale);
@@ -55,7 +55,7 @@ static void lcui_dispatch_ui_touch_event(app_touch_event_t *touch)
 	float scale;
 	ui_event_t e = { 0 };
 
-	scale = ui_get_scale();
+	scale = ui_metrics.scale;
 	e.type = UI_EVENT_TOUCH;
 	e.touch.n_points = touch->n_points;
 	e.touch.points = malloc(sizeof(ui_touch_point_t) * e.touch.n_points);
@@ -202,9 +202,6 @@ void lcui_set_ui_display_mode(lcui_display_mode_t mode)
 	if (mode == LCUI_DISPLAY_MODE_DEFAULT) {
 		mode = LCUI_DISPLAY_MODE_WINDOWED;
 	}
-	if (mode == lcui_ui.mode) {
-		return;
-	}
 	if (lcui_ui.observer) {
 		ui_mutation_observer_disconnect(lcui_ui.observer);
 		ui_mutation_observer_destroy(lcui_ui.observer);
@@ -225,7 +222,7 @@ void lcui_set_ui_display_mode(lcui_display_mode_t mode)
 	}
 	switch (mode) {
 	case LCUI_DISPLAY_MODE_FULLSCREEN:
-		scale = ui_get_scale();
+		scale = ui_metrics.scale;
 		// TODO: set window fullscreen style
 		wnd = app_window_create(NULL, 0, 0, 0, 0, NULL);
 		ui_widget_resize(ui_root(), app_get_screen_width() / scale,
@@ -270,13 +267,12 @@ void lcui_destroy_ui_preset_widgets(void)
 	ui_unregister_anchor();
 }
 
-
 #ifdef LCUI_PLATFORM_WIN32
 static void lcui_load_fonts_for_windows(void)
 {
 	size_t i;
 	int *ids = NULL;
-	const char *names = "Consola, Simsun, Microsoft YaHei";
+	const char *names[] = { "Consola", "Simsun", "Microsoft YaHei", NULL };
 	const char *fonts[] = { "C:/Windows/Fonts/consola.ttf",
 				"C:/Windows/Fonts/simsun.ttc",
 				"C:/Windows/Fonts/msyh.ttf",
@@ -285,8 +281,7 @@ static void lcui_load_fonts_for_windows(void)
 	for (i = 0; i < sizeof(fonts) / sizeof(char *); ++i) {
 		fontlib_load_file(fonts[i]);
 	}
-	i = fontlib_query(&ids, FONT_STYLE_NORMAL, FONT_WEIGHT_NORMAL,
-				  names);
+	i = fontlib_query(&ids, FONT_STYLE_NORMAL, FONT_WEIGHT_NORMAL, names);
 	if (i > 0) {
 		fontlib_set_default_font(ids[i - 1]);
 	}
@@ -295,14 +290,15 @@ static void lcui_load_fonts_for_windows(void)
 
 #else
 
-#ifdef USE_FONTCONFIG
+#ifdef HAVE_FONTCONFIG
 
 static void lcui_load_fonts_by_font_config(void)
 {
 	size_t i;
 	char *path;
 	int *ids = NULL;
-	const char *names = "Noto Sans CJK, Ubuntu, WenQuanYi Micro Hei";
+	const char *names[] = { "Noto Sans CJK", "Ubuntu",
+				"WenQuanYi Micro Hei", NULL };
 	const char *fonts[] = { "Ubuntu", "Noto Sans CJK SC",
 				"WenQuanYi Micro Hei" };
 
@@ -311,8 +307,7 @@ static void lcui_load_fonts_by_font_config(void)
 		fontlib_load_file(path);
 		free(path);
 	}
-	i = fontlib_query(&ids, FONT_STYLE_NORMAL, FONT_WEIGHT_NORMAL,
-				  names);
+	i = fontlib_query(&ids, FONT_STYLE_NORMAL, FONT_WEIGHT_NORMAL, names);
 	if (i > 0) {
 		fontlib_set_default_font(ids[i - 1]);
 	}
@@ -325,8 +320,22 @@ static void lcui_load_fonts_for_linux(void)
 {
 	size_t i;
 	int *ids = NULL;
-	const char *names = "Noto Sans CJK SC, Ubuntu, WenQuanYi Micro Hei";
+	const char *names[] = { "Noto Sans CJK SC", "Ubuntu", "Ubuntu Mono",
+				"WenQuanYi Micro Hei", NULL };
 	const char *fonts[] = {
+		"/usr/share/fonts/truetype/ubuntu/Ubuntu-BI.ttf",
+		"/usr/share/fonts/truetype/ubuntu/Ubuntu-B.ttf",
+		"/usr/share/fonts/truetype/ubuntu/Ubuntu-C.ttf",
+		"/usr/share/fonts/truetype/ubuntu/Ubuntu-LI.ttf",
+		"/usr/share/fonts/truetype/ubuntu/Ubuntu-L.ttf",
+		"/usr/share/fonts/truetype/ubuntu/Ubuntu-MI.ttf",
+		"/usr/share/fonts/truetype/ubuntu/UbuntuMono-BI.ttf",
+		"/usr/share/fonts/truetype/ubuntu/UbuntuMono-B.ttf",
+		"/usr/share/fonts/truetype/ubuntu/UbuntuMono-RI.ttf",
+		"/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf",
+		"/usr/share/fonts/truetype/ubuntu/Ubuntu-M.ttf",
+		"/usr/share/fonts/truetype/ubuntu/Ubuntu-RI.ttf",
+		"/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",
 		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-R.ttf",
 		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-RI.ttf",
 		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-B.ttf",
@@ -343,8 +352,7 @@ static void lcui_load_fonts_for_linux(void)
 	for (i = 0; i < sizeof(fonts) / sizeof(char *); ++i) {
 		fontlib_load_file(fonts[i]);
 	}
-	i = fontlib_query(&ids, FONT_STYLE_NORMAL, FONT_WEIGHT_NORMAL,
-				  names);
+	i = fontlib_query(&ids, FONT_STYLE_NORMAL, FONT_WEIGHT_NORMAL, names);
 	if (i > 0) {
 		fontlib_set_default_font(ids[i - 1]);
 	}
@@ -358,7 +366,7 @@ static void lcui_load_default_fonts(void)
 {
 #ifdef LCUI_PLATFORM_WIN32
 	lcui_load_fonts_for_windows();
-#elif defined(USE_FONTCONFIG)
+#elif defined(HAVE_FONTCONFIG)
 	logger_debug("[font] fontconfig enabled\n");
 	lcui_load_fonts_by_font_config();
 #else
