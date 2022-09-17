@@ -8,14 +8,8 @@
     "test": "test"
   },
   "scripts": {
-    "commitlint": "commitlint",
     "build-changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
     "update-changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
   },
   "repository": {
     "type": "git",
@@ -33,10 +27,8 @@
   },
   "homepage": "https://github.com/lc-soft/LCUI#readme",
   "devDependencies": {
-    "@commitlint/cli": "^8.3.5",
-    "@commitlint/config-conventional": "^8.3.4",
-    "commitlint": "^8.3.5",
-    "husky": "^3.1.0"
-  },
-  "dependencies": {}
+    "@commitlint/cli": "^8.3.6",
+    "@commitlint/config-conventional": "^8.3.6",
+    "husky": "^8.0.1"
+  }
 }
