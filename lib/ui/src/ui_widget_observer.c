@@ -35,7 +35,7 @@ int ui_widget_add_mutation_recrod(ui_widget_t *widget,
 	int count = 0;
 	ui_widget_t *parent;
 
-	for (parent = widget; parent; parent = widget->parent) {
+	for (parent = widget; parent; parent = parent->parent) {
 		if (!parent->extra || !parent->extra->observer) {
 			continue;
 		}
