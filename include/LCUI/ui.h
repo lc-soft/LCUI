@@ -531,8 +531,7 @@ LCUI_API void ui_mutation_observer_add_record(ui_mutation_observer_t* observer,
 
 typedef struct ui_widget_extra_data_t {
 	ui_widget_listeners_t listeners;
-	ui_mutation_observer_t* observer;
-	ui_mutation_observer_init_t observer_options;
+	list_t observer_connections;
 	ui_widget_rules_t rules;
 	size_t default_max_update_count;
 	size_t update_progress;
