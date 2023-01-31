@@ -1,11 +1,5 @@
 #include <errno.h>
-#include "../include/ui.h"
-
-typedef struct ui_mutation_connection_t {
-	ui_widget_t *widget;
-	ui_mutation_observer_init_t options;
-	list_node_t node;
-} ui_mutation_connection_t;
+#include "./internal.h"
 
 static list_t ui_observers = { 0 };
 
@@ -98,27 +92,41 @@ ui_mutation_observer_t *ui_mutation_observer_create(
 	return observer;
 }
 
-static void ui_mutation_observer_on_widget_destroy(ui_widget_t *w,
-						   ui_event_t *e, void *arg)
+static void ui_mutation_observer_disconnect_widget(
+    ui_mutation_observer_t *observer, ui_widget_t *w)
 {
 	list_node_t *node, *prev;
 	ui_mutation_connection_t *conn;
-	ui_mutation_observer_t *observer = e->data;
 
-	for (list_each(node, &observer->connections)) {
-		prev = node->prev;
+	for (list_each(node, &w->extra->observer_connections)) {
 		conn = node->data;
 		if (conn->widget == w) {
-			conn->widget->extra->observer = NULL;
-			conn->widget = NULL;
-			list_unlink(&observer->connections, node);
-			free(conn);
+			prev = node->prev;
+			list_delete_node(&w->extra->observer_connections, node);
 			node = prev;
 		}
 	}
 }
 
-void ui_mutation_observer_add_record(ui_mutation_observer_t *observer, ui_mutation_record_t *record)
+static void ui_mutation_observer_on_widget_destroy(ui_widget_t *w,
+						   ui_event_t *e, void *arg)
+{
+	list_t list;
+	list_node_t *node;
+	ui_mutation_connection_t *conn;
+
+	list_create(&list);
+	list_concat(&list, &w->extra->observer_connections);
+	for (list_each(node, &list)) {
+		conn = node->data;
+		ui_mutation_observer_disconnect_widget(conn->observer,
+						       conn->widget);
+	}
+	list_destroy(&list, NULL);
+}
+
+void ui_mutation_observer_add_record(ui_mutation_observer_t *observer,
+				     ui_mutation_record_t *record)
 {
 	list_append(&observer->records, ui_mutation_record_duplicate(record));
 }
@@ -134,25 +142,35 @@ int ui_mutation_observer_observe(ui_mutation_observer_t *observer,
 		return -ENOMEM;
 	}
 	conn->widget = w;
+	conn->observer = observer;
 	conn->options = options;
 	conn->node.data = conn;
 	list_append_node(&observer->connections, &conn->node);
-	ui_widget_use_extra_data(w)->observer = observer;
-	ui_widget_use_extra_data(w)->observer_options = options;
-	ui_widget_on(w, "destroy", ui_mutation_observer_on_widget_destroy,
-		     observer, NULL);
+	list_append(&ui_widget_use_extra_data(w)->observer_connections, conn);
+	ui_widget_on(w, "destroy", ui_mutation_observer_on_widget_destroy, NULL,
+		     NULL);
 	return 0;
 }
 
 void ui_mutation_observer_disconnect(ui_mutation_observer_t *observer)
 {
-	list_node_t *node;
+	list_t *list;
+	list_node_t *conn_node, *node, *prev;
 	ui_mutation_connection_t *conn;
 
-	for (list_each(node, &observer->connections)) {
-		conn = node->data;
-		if (conn->widget->extra) {
-			conn->widget->extra->observer = NULL;
+	for (list_each(conn_node, &observer->connections)) {
+		conn = conn_node->data;
+		if (!conn->widget->extra) {
+			continue;
+		}
+		list = &conn->widget->extra->observer_connections;
+		for (list_each(node, list)) {
+			if (((ui_mutation_connection_t *)node->data)
+				->observer == observer) {
+				prev = node->prev;
+				list_delete_node(list, node);
+				node = prev;
+			}
 		}
 	}
 	list_destroy_without_node(&observer->connections, free);

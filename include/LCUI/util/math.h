@@ -33,13 +33,13 @@
 
 Y_BEGIN_DECLS
 
-#define y_max(x, y) (((x) > (y)) ? (x) : (y))
+#define y_max(X, Y) (((X) > (Y)) ? (X) : (Y))
 
-#define y_min(x, y) ((((x) - (y)) < 0) ? (x) : (y))
+#define y_min(X, Y) (((X) > (Y)) ? (Y) : (X))
 
-#define y_iround(x) ((x) > 0 ? (int)((x) + 0.5) : (int)((x)-0.5))
+#define y_iround(X) ((X) > 0 ? (int)((X) + 0.5) : (int)((X)-0.5))
 
-#define y_pow2(x) ((x) * (x))
+#define y_pow2(X) ((X) * (X))
 
 Y_END_DECLS
 
