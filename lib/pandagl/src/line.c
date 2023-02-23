@@ -1,5 +1,4 @@
-﻿#include <LCUI/def.h>
-#include <LCUI/pandagl.h>
+﻿#include <pandagl.h>
 
 void pd_canvas_draw_horizontal_line(pd_canvas_t *canvas, pd_color_t color,
 				    int size, pd_pos_t start, int len)
@@ -42,7 +41,7 @@ void pd_canvas_draw_horizontal_line(pd_canvas_t *canvas, pd_color_t color,
 			pRowPixel += des->width;
 		}
 	} else {
-		uchar_t *pByte, *pRowByte;
+		uint8_t *pByte, *pRowByte;
 		pRowByte =
 		    des->bytes + start.y * des->bytes_per_row + start.x * 3;
 		for (y = 0; y < size; ++y) {
@@ -100,7 +99,7 @@ void pd_canvas_draw_vertical_line(pd_canvas_t *canvas, pd_color_t color,
 			pRowPixel += des->width;
 		}
 	} else {
-		uchar_t *pByte, *pRowByte;
+		uint8_t *pByte, *pRowByte;
 		pRowByte =
 		    des->bytes + start.y * des->bytes_per_row + start.x * 3;
 		for (y = 0; y < len; ++y) {

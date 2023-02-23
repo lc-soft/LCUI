@@ -1,11 +1,11 @@
 ﻿#ifndef LIB_UI_INCLUDE_UI_H
 #define LIB_UI_INCLUDE_UI_H
 
+#include <yutil.h>
 #include <LCUI/def.h>
-#include <LCUI/util.h>
 #include <LCUI/css/def.h>
-#include <LCUI/pandagl/def.h>
 #include <LCUI/css/library.h>
+#include <pandagl/types.h>
 
 LCUI_BEGIN_HEADER
 
@@ -489,7 +489,7 @@ LCUI_API void ui_process_events(void);
 
 // Metrics
 
-extern ui_metrics_t ui_metrics;
+LCUI_API ui_metrics_t ui_metrics;
 
 INLINE int ui_compute(float value)
 {
@@ -921,11 +921,11 @@ typedef struct ui_text_style_t {
 	uint8_t word_break;
 } ui_text_style_t;
 
-LCUI_API void ui_font_style_init(ui_text_style_t *fs);
+LCUI_API void ui_text_style_init(ui_text_style_t *fs);
 
-LCUI_API void ui_font_style_destroy(ui_text_style_t *fs);
+LCUI_API void ui_text_style_destroy(ui_text_style_t *fs);
 
-LCUI_API LCUI_BOOL ui_font_style_is_equal(const ui_text_style_t *a,
+LCUI_API LCUI_BOOL ui_text_style_is_equal(const ui_text_style_t *a,
 					  const ui_text_style_t *b);
 
 LCUI_API void ui_compute_text_style(ui_text_style_t *fs,

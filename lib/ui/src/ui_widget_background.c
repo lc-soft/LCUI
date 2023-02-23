@@ -1,4 +1,4 @@
-﻿#include <LCUI/pandagl.h>
+﻿#include <pandagl.h>
 #include <LCUI/css/style_value.h>
 #include "internal.h"
 

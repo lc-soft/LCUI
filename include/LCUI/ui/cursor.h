@@ -1,7 +1,7 @@
 // TODO: Reduce dependence on lcui header files
 
 #include <LCUI/def.h>
-#include <LCUI/pandagl.h>
+#include <pandagl.h>
 #include <LCUI/platform.h>
 #include <LCUI/ui.h>
 

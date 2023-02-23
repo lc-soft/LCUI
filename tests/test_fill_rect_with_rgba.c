@@ -1,6 +1,5 @@
 ﻿#include <LCUI.h>
-#include <LCUI/pandagl.h>
-#include <LCUI/image.h>
+#include <pandagl.h>
 #include <stdio.h>
 
 int main(void)
@@ -39,7 +38,7 @@ int main(void)
 			pd_canvas_mix(&canvas, &fore_canvas, 5 + i * 15, 5 + j * 40, TRUE);
 		}
 	}
-	LCUI_WritePNGFile("test_fill_rect_with_rgba.png", &canvas);
+	pd_write_png_file("test_fill_rect_with_rgba.png", &canvas);
 	pd_canvas_destroy(&fore_canvas);
 	pd_canvas_destroy(&canvas);
 	return 0;

@@ -1,6 +1,3 @@
-includes("lib/ctest/xmake.lua")
-add_rules("mode.debug", "mode.release")
-add_includedirs("lib/ctest/include/")
 add_deps("lcui")
 set_default(false)
 set_rundir("./")

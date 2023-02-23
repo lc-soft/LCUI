@@ -35,7 +35,7 @@
 
 #include <math.h>
 #include <stdlib.h>
-#include "../include/pandagl.h"
+#include <pandagl.h>
 
 #define BLUR_N 1.5
 #define BLUR_WIDTH(sd) (int)(sd->blur * BLUR_N)
@@ -54,8 +54,8 @@
 /*  Convert screen X coordinate to geometric X coordinate */
 #define ToGeoX(X, CENTER_X) (X - (CENTER_X))
 
-#define smooth_left_pixel(PX, X) (uchar_t)((PX)->a * (1.0 - (X - 1.0 * (int)X)))
-#define smooth_right_pixel(PX, X) (uchar_t)((PX)->a * (X - 1.0 * (int)X))
+#define smooth_left_pixel(PX, X) (uint8_t)((PX)->a * (1.0 - (X - 1.0 * (int)X)))
+#define smooth_right_pixel(PX, X) (uint8_t)((PX)->a * (X - 1.0 * (int)X))
 
 typedef struct pd_boxshadow_context_t {
 	int max_radius;
@@ -85,18 +85,18 @@ static void gradient_init(gradient_t *g, double t)
 }
 
 /** 计算渐变后的值 */
-static uchar_t gradient_compute(gradient_t *g, double t, int val)
+static uint8_t gradient_compute(gradient_t *g, double t, int val)
 {
 	val *= g->s - (int)(g->v * t - (g->a * t * t) / 2.0);
-	return (uchar_t)(val >> 8);
+	return (uint8_t)(val >> 8);
 }
 
-INLINE int get_boxshadow_width(const pd_boxshadow_t *shadow, int content_width)
+PD_INLINE int get_boxshadow_width(const pd_boxshadow_t *shadow, int content_width)
 {
 	return content_width + SHADOW_WIDTH(shadow) * 2;
 }
 
-INLINE int get_boxshadow_height(const pd_boxshadow_t *shadow,
+PD_INLINE int get_boxshadow_height(const pd_boxshadow_t *shadow,
 				int content_height)
 {
 	return content_height + SHADOW_WIDTH(shadow) * 2;
@@ -159,7 +159,7 @@ void pd_get_boxshadow_canvas_rect(const pd_boxshadow_t *shadow,
 			      canvas_rect->y;
 }
 
-static pd_bool pd_paint_boxshadow_left_blur(pd_boxshadow_context_t *ctx)
+static pd_bool_t pd_paint_boxshadow_left_blur(pd_boxshadow_context_t *ctx)
 {
 	int x, y;
 	int right;
@@ -179,7 +179,7 @@ static pd_bool pd_paint_boxshadow_left_blur(pd_boxshadow_context_t *ctx)
 	right = rect.x + rect.width;
 	gradient_init(&g, BLUR_WIDTH(ctx->shadow));
 	if (!pd_rect_overlap(&ctx->paint->rect, &rect, &rect)) {
-		return FALSE;
+		return PD_FALSE;
 	}
 	right -= rect.x;
 	paint_rect.width = rect.width;
@@ -197,10 +197,10 @@ static pd_bool pd_paint_boxshadow_left_blur(pd_boxshadow_context_t *ctx)
 			*p = color;
 		}
 	}
-	return TRUE;
+	return PD_TRUE;
 }
 
-static pd_bool pd_paint_boxshadow_right_blur(pd_boxshadow_context_t *ctx)
+static pd_bool_t pd_paint_boxshadow_right_blur(pd_boxshadow_context_t *ctx)
 {
 	int x, y;
 	int left;
@@ -220,7 +220,7 @@ static pd_bool pd_paint_boxshadow_right_blur(pd_boxshadow_context_t *ctx)
 	left = rect.x;
 	gradient_init(&g, BLUR_WIDTH(ctx->shadow));
 	if (!pd_rect_overlap(&ctx->paint->rect, &rect, &rect)) {
-		return FALSE;
+		return PD_FALSE;
 	}
 	left -= rect.x + 1;
 	paint_rect.width = rect.width;
@@ -238,10 +238,10 @@ static pd_bool pd_paint_boxshadow_right_blur(pd_boxshadow_context_t *ctx)
 			*p = color;
 		}
 	}
-	return TRUE;
+	return PD_TRUE;
 }
 
-static pd_bool pd_paint_boxshadow_top_blur(pd_boxshadow_context_t *ctx)
+static pd_bool_t pd_paint_boxshadow_top_blur(pd_boxshadow_context_t *ctx)
 {
 	int x, y;
 	int bottom;
@@ -261,7 +261,7 @@ static pd_bool pd_paint_boxshadow_top_blur(pd_boxshadow_context_t *ctx)
 	bottom = rect.y + rect.height;
 	gradient_init(&g, BLUR_WIDTH(ctx->shadow));
 	if (!pd_rect_overlap(&ctx->paint->rect, &rect, &rect)) {
-		return FALSE;
+		return PD_FALSE;
 	}
 	bottom -= rect.y;
 	paint_rect.width = rect.width;
@@ -279,10 +279,10 @@ static pd_bool pd_paint_boxshadow_top_blur(pd_boxshadow_context_t *ctx)
 			*p = color;
 		}
 	}
-	return TRUE;
+	return PD_TRUE;
 }
 
-static pd_bool pd_paint_boxshadow_bottom_blur(pd_boxshadow_context_t *ctx)
+static pd_bool_t pd_paint_boxshadow_bottom_blur(pd_boxshadow_context_t *ctx)
 {
 	int x, y;
 	int top;
@@ -302,7 +302,7 @@ static pd_bool pd_paint_boxshadow_bottom_blur(pd_boxshadow_context_t *ctx)
 	top = rect.y;
 	gradient_init(&g, BLUR_WIDTH(ctx->shadow));
 	if (!pd_rect_overlap(&ctx->paint->rect, &rect, &rect)) {
-		return FALSE;
+		return PD_FALSE;
 	}
 	top -= rect.y + 1;
 	paint_rect.width = rect.width;
@@ -319,10 +319,10 @@ static pd_bool pd_paint_boxshadow_bottom_blur(pd_boxshadow_context_t *ctx)
 			*p = color;
 		}
 	}
-	return TRUE;
+	return PD_TRUE;
 }
 
-static pd_bool pd_paint_boxshadow_circle_blur(pd_boxshadow_context_t *ctx,
+static pd_bool_t pd_paint_boxshadow_circle_blur(pd_boxshadow_context_t *ctx,
 					      const pd_rect_t *circle_rect,
 					      double center_x, double center_y,
 					      int radius)
@@ -346,7 +346,7 @@ static pd_bool pd_paint_boxshadow_circle_blur(pd_boxshadow_context_t *ctx,
 	pd_color_t *p;
 
 	if (!pd_rect_overlap(&ctx->paint->rect, circle_rect, &rect)) {
-		return FALSE;
+		return PD_FALSE;
 	}
 	color = ctx->shadow->color;
 	center_x = center_x + circle_rect->x - rect.x - 0.5;
@@ -389,10 +389,10 @@ static pd_bool pd_paint_boxshadow_circle_blur(pd_boxshadow_context_t *ctx,
 			*p = color;
 		}
 	}
-	return TRUE;
+	return PD_TRUE;
 }
 
-static pd_bool pd_paint_boxshadow_top_left_blur(pd_boxshadow_context_t *ctx)
+static pd_bool_t pd_paint_boxshadow_top_left_blur(pd_boxshadow_context_t *ctx)
 {
 	int radius;
 	pd_rect_t rect;
@@ -407,7 +407,7 @@ static pd_bool pd_paint_boxshadow_top_left_blur(pd_boxshadow_context_t *ctx)
 					      rect.height, radius);
 }
 
-static pd_bool pd_paint_boxshadow_top_right_blur(pd_boxshadow_context_t *ctx)
+static pd_bool_t pd_paint_boxshadow_top_right_blur(pd_boxshadow_context_t *ctx)
 {
 	int radius;
 	pd_rect_t rect;
@@ -422,7 +422,7 @@ static pd_bool pd_paint_boxshadow_top_right_blur(pd_boxshadow_context_t *ctx)
 					      radius);
 }
 
-static pd_bool pd_paint_boxshadow_bottom_left_blur(pd_boxshadow_context_t *ctx)
+static pd_bool_t pd_paint_boxshadow_bottom_left_blur(pd_boxshadow_context_t *ctx)
 {
 	int radius;
 	pd_rect_t rect;
@@ -437,7 +437,7 @@ static pd_bool pd_paint_boxshadow_bottom_left_blur(pd_boxshadow_context_t *ctx)
 					      radius);
 }
 
-static pd_bool pd_paint_boxshadow_bottom_right_blur(pd_boxshadow_context_t *ctx)
+static pd_bool_t pd_paint_boxshadow_bottom_right_blur(pd_boxshadow_context_t *ctx)
 {
 	int radius;
 	pd_rect_t rect;
@@ -629,7 +629,7 @@ int pd_paint_boxshadow(pd_context_t *ctx, const pd_boxshadow_t *shadow,
 	sd_ctx.paint = &tmp;
 	pd_canvas_init(&tmp.canvas);
 	tmp.rect = ctx->rect;
-	tmp.with_alpha = TRUE;
+	tmp.with_alpha = PD_TRUE;
 	tmp.canvas.color_type = PD_COLOR_TYPE_ARGB;
 	pd_canvas_create(&sd_ctx.paint->canvas, ctx->rect.width,
 			 ctx->rect.height);

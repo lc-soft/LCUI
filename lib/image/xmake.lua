@@ -1,5 +1,0 @@
-target("libimage")
-    set_kind("$(kind)")
-    add_files("src/*.c")
-    add_deps("yutil", "pandagl")
-    add_packages("libpng", "libjpeg")

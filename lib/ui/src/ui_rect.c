@@ -1,5 +1,5 @@
 #include "../include/ui.h"
-#include <LCUI/pandagl/rect.h>
+#include <pandagl/rect.h>
 
 void ui_convert_rect(const pd_rect_t *rect, ui_rect_t *ui_rect, float scale)
 {

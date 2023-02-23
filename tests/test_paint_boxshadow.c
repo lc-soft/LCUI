@@ -1,6 +1,5 @@
 ﻿#include <LCUI.h>
-#include <LCUI/pandagl.h>
-#include <LCUI/image.h>
+#include <pandagl.h>
 
 int paint_background(pd_context_t* ctx, pd_rect_t* box)
 {
@@ -10,7 +9,7 @@ int paint_background(pd_context_t* ctx, pd_rect_t* box)
 
 	pd_canvas_init(&image);
 	// 读取背景图片
-	if (LCUI_ReadImageFile("test_image_reader.png", &image) != 0) {
+	if (pd_read_image_from_file("test_image_reader.png", &image) != 0) {
 		return -1;
 	}
 	// 设置背景色
@@ -118,7 +117,7 @@ int main(void)
 
 	// 将临时绘制层混合到画布中
 	pd_canvas_mix(&canvas, &layer, shadow_box.x, shadow_box.y, FALSE);
-	LCUI_WritePNGFile("test_paint_boxshadow.png", &canvas);
+	pd_write_png_file("test_paint_boxshadow.png", &canvas);
 	pd_canvas_destroy(&canvas);
 	return 0;
 }

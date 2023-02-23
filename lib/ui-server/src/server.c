@@ -2,8 +2,8 @@
 
 #include <string.h>
 #include <errno.h>
-#include <LCUI/util.h>
-#include <LCUI/pandagl.h>
+#include <yutil.h>
+#include <pandagl.h>
 #include <LCUI/ui/cursor.h>
 #include <LCUI/config.h>
 #include <LCUI/css/computed.h>

@@ -31,18 +31,18 @@
 #ifndef LIB_PANDAGL_INCLUDE_PANDAGL_BORDER_H
 #define LIB_PANDAGL_INCLUDE_PANDAGL_BORDER_H
 
-#include <LCUI/def.h>
-#include "def.h"
+#include "common.h"
+#include "types.h"
 
-LCUI_BEGIN_HEADER
+PD_BEGIN_DECLS
 
-LCUI_API int pd_crop_border_content(pd_context_t *ctx,
+PD_PUBLIC int pd_crop_border_content(pd_context_t *ctx,
 				    const pd_border_t *border,
 				    const pd_rect_t *box);
 
-LCUI_API int pd_paint_border(pd_context_t *ctx, const pd_border_t *border,
+PD_PUBLIC int pd_paint_border(pd_context_t *ctx, const pd_border_t *border,
 			     const pd_rect_t *box);
 
-LCUI_END_HEADER
+PD_END_DECLS
 
 #endif

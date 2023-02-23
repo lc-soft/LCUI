@@ -1,6 +1,5 @@
 ﻿#include <math.h>
 #include <LCUI.h>
-#include <LCUI/image.h>
 
 #define PixelManipulationBegin                                   \
 	int x, y;                                                \
@@ -57,7 +56,7 @@ int main(void)
 	pd_canvas_t graph = { 0 };
 	pd_rect_t rects[4];
 
-	if (LCUI_ReadImageFile("dog.jpg", &graph) != 0) {
+	if (pd_read_image_from_file("dog.jpg", &graph) != 0) {
 		return -1;
 	}
 	for (i = 0; i < 4; ++i) {
@@ -69,6 +68,6 @@ int main(void)
 	sepia(&graph, rects[1]);
 	grayscale(&graph, rects[2]);
 	invert(&graph, rects[3]);
-	LCUI_WritePNGFile("test_pixel_manipulation.png", &graph);
+	pd_write_png_file("test_pixel_manipulation.png", &graph);
 	return 0;
 }

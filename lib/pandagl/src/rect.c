@@ -30,7 +30,7 @@
  */
 
 #include <stdlib.h>
-#include "../include/pandagl/rect.h"
+#include <pandagl/rect.h>
 
 pd_rect_t pd_rect(int x, int y, int width, int height)
 {
@@ -60,24 +60,24 @@ pd_rect_t pd_rect_crop(const pd_rect_t *rect, int container_width, int container
 	return cropped_rect;
 }
 
-pd_bool pd_rect_correct(pd_rect_t *rect, int container_width,
+pd_bool_t pd_rect_correct(pd_rect_t *rect, int container_width,
 			int container_height)
 {
-	pd_bool overflow = FALSE;
+	pd_bool_t overflow = PD_FALSE;
 
 	if (rect->x < 0) {
-		overflow = TRUE;
+		overflow = PD_TRUE;
 		rect->width += rect->x;
 		rect->x = 0;
 	}
 	if (rect->y < 0) {
-		overflow = TRUE;
+		overflow = PD_TRUE;
 		rect->height += rect->y;
 		rect->y = 0;
 	}
 
 	if (rect->x + rect->width > container_width) {
-		overflow = TRUE;
+		overflow = PD_TRUE;
 		if (rect->x < container_width) {
 			rect->width = container_width - rect->x;
 		} else {
@@ -85,7 +85,7 @@ pd_bool pd_rect_correct(pd_rect_t *rect, int container_width,
 		}
 	}
 	if (rect->y + rect->height > container_height) {
-		overflow = TRUE;
+		overflow = PD_TRUE;
 		if (rect->y < container_height) {
 			rect->height = container_height - rect->y;
 		} else {
@@ -95,30 +95,30 @@ pd_bool pd_rect_correct(pd_rect_t *rect, int container_width,
 	return overflow;
 }
 
-pd_bool pd_rect_is_cover(const pd_rect_t *a, const pd_rect_t *b)
+pd_bool_t pd_rect_is_cover(const pd_rect_t *a, const pd_rect_t *b)
 {
 	if (a->x > b->x) {
 		if (b->x + b->width <= a->x) {
-			return FALSE;
+			return PD_FALSE;
 		}
 	} else {
 		if (a->x + a->width <= b->x) {
-			return FALSE;
+			return PD_FALSE;
 		}
 	}
 	if (a->y > b->y) {
 		if (b->y + b->height <= a->y) {
-			return FALSE;
+			return PD_FALSE;
 		}
 	} else {
 		if (a->y + a->height <= b->y) {
-			return FALSE;
+			return PD_FALSE;
 		}
 	}
-	return TRUE;
+	return PD_TRUE;
 }
 
-pd_bool pd_rect_overlap(const pd_rect_t *a, const pd_rect_t *b,
+pd_bool_t pd_rect_overlap(const pd_rect_t *a, const pd_rect_t *b,
 			pd_rect_t *overlapping_rect)
 {
 	if (a->x > b->x) {
@@ -152,9 +152,9 @@ pd_bool pd_rect_overlap(const pd_rect_t *a, const pd_rect_t *b,
 		overlapping_rect->y = b->y;
 	}
 	if (overlapping_rect->width <= 0 || overlapping_rect->height <= 0) {
-		return FALSE;
+		return PD_FALSE;
 	}
-	return TRUE;
+	return PD_TRUE;
 }
 
 void pd_rect_merge(pd_rect_t *merged_rect, const pd_rect_t *a,
@@ -304,7 +304,7 @@ int pd_rects_remove(list_t *list, pd_rect_t *rect)
 {
 	int i;
 
-	pd_bool deletable;
+	pd_bool_t deletable;
 	pd_rect_t *p, child_rects[4];
 
 	list_t extra_list;
@@ -327,7 +327,7 @@ int pd_rects_remove(list_t *list, pd_rect_t *rect)
 		if (!pd_rect_is_cover(p, rect)) {
 			continue;
 		}
-		deletable = TRUE;
+		deletable = PD_TRUE;
 		pd_rect_split(rect, p, child_rects);
 		for (i = 0; i < 4; ++i) {
 			if (child_rects[i].width <= 0 ||
@@ -339,7 +339,7 @@ int pd_rects_remove(list_t *list, pd_rect_t *rect)
 				free(node->data);
 				list_delete_node(list, node);
 				node = prev;
-				deletable = FALSE;
+				deletable = PD_FALSE;
 			}
 			p = malloc(sizeof(pd_rect_t));
 			*p = child_rects[i];

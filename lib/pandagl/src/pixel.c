@@ -1,6 +1,6 @@
 ﻿#include <math.h>
 #include <memory.h>
-#include "../include/pandagl/pixel.h"
+#include <pandagl/pixel.h>
 
 unsigned pd_get_pixel_size(pd_color_type_t color_type)
 {
@@ -28,10 +28,10 @@ unsigned pd_get_pixel_row_size(pd_color_type_t color_type, size_t len)
 }
 
 static void pd_format_pixels_argb2rgb(const pd_color_t *in_pixels,
-				      uchar_t *out_pixels, size_t count)
+				      uint8_t *out_pixels, size_t count)
 {
 	const pd_color_t *p_px, *p_end_px;
-	uchar_t *p_out_byte;
+	uint8_t *p_out_byte;
 
 	p_px = in_pixels;
 	p_out_byte = out_pixels;
@@ -47,11 +47,11 @@ static void pd_format_pixels_argb2rgb(const pd_color_t *in_pixels,
 	*p_out_byte++ = p_px->red;
 }
 
-static void pd_format_pixels_rgb2argb(const uchar_t *in_bytes,
+static void pd_format_pixels_rgb2argb(const uint8_t *in_bytes,
 				      pd_color_t *out_pixels, size_t count)
 {
 	pd_color_t *p_px, *p_end_px;
-	const uchar_t *p_in_byte;
+	const uint8_t *p_in_byte;
 
 	p_in_byte = in_bytes;
 	p_px = (pd_color_t *)out_pixels;
@@ -65,8 +65,8 @@ static void pd_format_pixels_rgb2argb(const uchar_t *in_bytes,
 	}
 }
 
-int pd_format_pixels(const uchar_t *in_pixels, pd_color_type_t in_color_type,
-		     uchar_t *out_pixels, pd_color_type_t out_color_type,
+int pd_format_pixels(const uint8_t *in_pixels, pd_color_type_t in_color_type,
+		     uint8_t *out_pixels, pd_color_type_t out_color_type,
 		     size_t count)
 {
 	if (in_color_type == out_color_type) {
