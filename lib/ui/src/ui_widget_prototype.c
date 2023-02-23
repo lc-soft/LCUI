@@ -1,7 +1,5 @@
 
 #include <string.h>
-#include <LCUI/util.h>
-#include "../include/ui.h"
 #include "internal.h"
 
 static dict_t *ui_widget_prototype_dict;

@@ -1,14 +1,14 @@
-﻿#include "../include/pandagl.h"
+﻿#include <pandagl.h>
 
-static uchar_t canvas_bilinear_resampling_core(uchar_t a, uchar_t b, uchar_t c,
-					       uchar_t d, float dx, float dy)
+static uint8_t canvas_bilinear_resampling_core(uint8_t a, uint8_t b, uint8_t c,
+					       uint8_t d, float dx, float dy)
 {
-	return (uchar_t)(a * (1 - dx) * (1 - dy) + b * (dx) * (1 - dy) +
+	return (uint8_t)(a * (1 - dx) * (1 - dy) + b * (dx) * (1 - dy) +
 			 c * (dy) * (1 - dx) + d * (dx * dy));
 }
 
 int pd_canvas_zoom(const pd_canvas_t *canvas, pd_canvas_t *buff,
-		   pd_bool keep_scale, int width, int height)
+		   pd_bool_t keep_scale, int width, int height)
 {
 	pd_rect_t rect;
 	int x, y, src_x, src_y;
@@ -60,7 +60,7 @@ int pd_canvas_zoom(const pd_canvas_t *canvas, pd_canvas_t *buff,
 			}
 		}
 	} else {
-		uchar_t *byte_src, *byte_des, *byte_row_src;
+		uint8_t *byte_src, *byte_des, *byte_row_src;
 		for (y = 0; y < height; ++y) {
 			byte_row_src = pd_canvas_pixel_at(
 			    canvas, rect.x, (int)(y * scale_y) + rect.y);
@@ -79,7 +79,7 @@ int pd_canvas_zoom(const pd_canvas_t *canvas, pd_canvas_t *buff,
 }
 
 int pd_canvas_zoom_bilinear(const pd_canvas_t *canvas, pd_canvas_t *buff,
-			    pd_bool keep_scale, int width, int height)
+			    pd_bool_t keep_scale, int width, int height)
 {
 	pd_rect_t rect;
 	pd_color_t a, b, c, d, t_color;

@@ -1,7 +1,7 @@
 ﻿#include <stdio.h>
 #include <LCUI.h>
-#include <LCUI/font.h>
 #include <LCUI/css.h>
+#include <pandagl.h>
 #include "../include/ui.h"
 #include "internal.h"
 
@@ -29,7 +29,7 @@ static void ui_on_parsed_font_face(const css_font_face_t *face)
 	ui_event_t e;
 
 	ui_event_init(&e, "font_face_load");
-	fontlib_load_file(face->src);
+	pd_font_library_load_file(face->src);
 	ui_post_event(&e, (css_font_face_t*)face, NULL);
 }
 

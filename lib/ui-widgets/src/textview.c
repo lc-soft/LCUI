@@ -32,9 +32,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <LCUI/pandagl.h>
+#include <pandagl.h>
 #include <LCUI/css.h>
-#include <LCUI/text/textlayer.h>
 #include "./internal.h"
 #include "../include/textview.h"
 
@@ -47,7 +46,7 @@ typedef struct ui_textview_t_ {
 	wchar_t *content;
 	LCUI_BOOL trimming;
 	ui_widget_t *widget;
-	LCUI_TextLayer layer;
+	pd_text_t *layer;
 	ui_text_style_t style;
 	ui_textview_task_t task;
 	list_node_t node;
@@ -81,7 +80,7 @@ static void ui_textview_on_parse_attr(ui_widget_t *w, const char *name,
 	}
 	if (strcmp(name, "multiline") == 0) {
 		LCUI_BOOL enable = parse_boolean(value);
-		if (enable != txt->layer->enable_mulitiline) {
+		if (enable != txt->layer->mulitiline_enabled) {
 			ui_textview_set_multiline(w, enable);
 		}
 	}
@@ -103,8 +102,7 @@ static void ui_textview_on_update(ui_widget_t *w)
 	list_node_t *node;
 
 	list_create(&rects);
-	TextLayer_Update(txt->layer, &rects);
-	TextLayer_ClearInvalidRect(txt->layer);
+	pd_text_update(txt->layer, &rects);
 	for (list_each(node, &rects)) {
 		ui_convert_rect(node->data, &rect, 1.0f / scale);
 		ui_widget_mark_dirty_rect(w, &rect, CSS_KEYWORD_CONTENT_BOX);
@@ -116,32 +114,31 @@ static void ui_textview_on_update(ui_widget_t *w)
 static void ui_textview_on_update_style(ui_widget_t *w)
 {
 	ui_text_style_t style;
-	LCUI_TextStyleRec text_style;
+	pd_text_style_t text_style;
 	ui_textview_t *txt = ui_widget_get_data(w, ui_textview.prototype);
 
-	ui_font_style_init(&style);
+	ui_text_style_init(&style);
 	ui_compute_text_style(&style, &w->computed_style);
-	if (ui_font_style_is_equal(&style, &txt->style)) {
-		ui_font_style_destroy(&style);
+	if (ui_text_style_is_equal(&style, &txt->style)) {
+		ui_text_style_destroy(&style);
 		return;
 	}
 	convert_font_style_to_text_style(&style, &text_style);
-	TextLayer_SetTextAlign(txt->layer, style.text_align);
-	TextLayer_SetLineHeight(txt->layer, style.line_height);
-	TextLayer_SetAutoWrap(txt->layer,
-			      style.white_space != CSS_WHITE_SPACE_NOWRAP);
-	TextLayer_SetWordBreak(txt->layer,
-			       style.word_break == CSS_WORD_BREAK_BREAK_ALL
-				   ? LCUI_WORD_BREAK_BREAK_ALL
-				   : LCUI_WORD_BREAK_NORMAL);
-	TextLayer_SetTextStyle(txt->layer, &text_style);
+	pd_text_set_align(txt->layer, style.text_align);
+	pd_text_set_line_height(txt->layer, style.line_height);
+	pd_text_set_autowrap(txt->layer,
+			     style.white_space != CSS_WHITE_SPACE_NOWRAP);
+	pd_text_set_word_break(txt->layer, style.word_break == CSS_WORD_BREAK_BREAK_ALL
+				   ? PD_WORD_BREAK_BREAK_ALL
+				   : PD_WORD_BREAK_NORMAL);
+	pd_text_set_style(txt->layer, &text_style);
 	if (style.content) {
 		ui_textview_set_text_w(w, style.content);
 	} else if (txt->style.content) {
 		ui_textview_set_text_w(w, NULL);
 	}
-	ui_font_style_destroy(&txt->style);
-	TextStyle_Destroy(&text_style);
+	ui_text_style_destroy(&txt->style);
+	pd_text_style_destroy(&text_style);
 	txt->style = style;
 	ui_textview_on_update(w);
 }
@@ -157,11 +154,11 @@ static void ui_textview_on_init(ui_widget_t *w)
 	txt->task.content = NULL;
 	txt->content = NULL;
 	txt->trimming = TRUE;
-	txt->layer = TextLayer_New();
-	TextLayer_SetAutoWrap(txt->layer, TRUE);
-	TextLayer_SetMultiline(txt->layer, TRUE);
-	TextLayer_EnableStyleTag(txt->layer, TRUE);
-	ui_font_style_init(&txt->style);
+	txt->layer = pd_text_create();
+	pd_text_set_autowrap(txt->layer, TRUE);
+	pd_text_set_multiline(txt->layer, TRUE);
+	pd_text_set_style_tag(txt->layer, TRUE);
+	ui_text_style_init(&txt->style);
 	txt->node.data = txt;
 	txt->node.prev = txt->node.next = NULL;
 	list_append_node(&ui_textview.list, &txt->node);
@@ -170,11 +167,10 @@ static void ui_textview_on_init(ui_widget_t *w)
 static void ui_textview_on_destroy(ui_widget_t *w)
 {
 	ui_textview_t *txt = ui_widget_get_data(w, ui_textview.prototype);
-	;
 
 	list_unlink(&ui_textview.list, &txt->node);
-	ui_font_style_destroy(&txt->style);
-	TextLayer_Destroy(txt->layer);
+	ui_text_style_destroy(&txt->style);
+	pd_text_destroy(txt->layer);
 	free(txt->content);
 	if (txt->task.content) {
 		free(txt->task.content);
@@ -213,13 +209,12 @@ static void ui_textview_on_auto_size(ui_widget_t *w, float *width,
 		break;
 	}
 	list_create(&rects);
-	TextLayer_SetFixedSize(txt->layer, 0, 0);
-	TextLayer_SetMaxSize(txt->layer, ui_compute(max_width),
+	pd_text_set_fixed_size(txt->layer, 0, 0);
+	pd_text_set_max_size(txt->layer, ui_compute(max_width),
 			     ui_compute(max_height));
-	TextLayer_Update(txt->layer, &rects);
-	TextLayer_ClearInvalidRect(txt->layer);
-	*width = TextLayer_GetWidth(txt->layer) / ui_metrics.scale;
-	*height = TextLayer_GetHeight(txt->layer) / ui_metrics.scale;
+	pd_text_update(txt->layer, &rects);
+	*width = pd_text_get_width(txt->layer) / ui_metrics.scale;
+	*height = pd_text_get_height(txt->layer) / ui_metrics.scale;
 	pd_rects_clear(&rects);
 }
 
@@ -237,10 +232,9 @@ static void ui_textview_on_resize(ui_widget_t *w, float width, float height)
 	list_node_t *node;
 
 	list_create(&rects);
-	TextLayer_SetFixedSize(txt->layer, fixed_width, fixed_height);
-	TextLayer_SetMaxSize(txt->layer, fixed_width, fixed_height);
-	TextLayer_Update(txt->layer, &rects);
-	TextLayer_ClearInvalidRect(txt->layer);
+	pd_text_set_fixed_size(txt->layer, fixed_width, fixed_height);
+	pd_text_set_max_size(txt->layer, fixed_width, fixed_height);
+	pd_text_update(txt->layer, &rects);
 	for (list_each(node, &rects)) {
 		ui_convert_rect(node->data, &rect, 1.0f / scale);
 		ui_widget_mark_dirty_rect(w, &rect, CSS_KEYWORD_CONTENT_BOX);
@@ -272,7 +266,7 @@ static void ui_textview_on_paint(ui_widget_t *w, pd_context_t *paint,
 	rect = paint->rect;
 	rect.x -= content_rect.x;
 	rect.y -= content_rect.y;
-	TextLayer_RenderTo(txt->layer, rect, pos, &canvas);
+	pd_text_render_to(txt->layer, rect, pos, &canvas);
 }
 
 int ui_textview_set_text_w(ui_widget_t *w, const wchar_t *text)
@@ -332,7 +326,7 @@ void ui_textview_set_multiline(ui_widget_t *w, LCUI_BOOL enable)
 {
 	ui_textview_t *txt = ui_widget_get_data(w, ui_textview.prototype);
 
-	TextLayer_SetMultiline(txt->layer, enable);
+	pd_text_set_multiline(txt->layer, enable);
 	ui_widget_add_task(w, UI_TASK_USER);
 }
 
@@ -355,7 +349,7 @@ static void ui_textview_on_run_rask(ui_widget_t *w, int task)
 
 	txt = ui_widget_get_data(w, ui_textview.prototype);
 	if (txt->task.update_content) {
-		TextLayer_SetTextW(txt->layer, txt->task.content, NULL);
+		pd_text_write(txt->layer, txt->task.content, NULL);
 		ui_textview_on_update(w);
 		free(txt->task.content);
 		txt->task.content = NULL;

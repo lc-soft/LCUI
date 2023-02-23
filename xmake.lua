@@ -2,12 +2,15 @@ set_project("lcui")
 set_version("3.0.0-a")
 set_warnings("all")
 add_rules("mode.debug", "mode.release", "mode.coverage")
-add_requires("libomp", "libxml2", "libpng", "libjpeg", "libx11", "fontconfig", {optional = true})
-add_requires("freetype", {optional = true, configs = {shared = false}})
 add_rpathdirs("@loader_path/lib", "@loader_path")
+add_requires("libomp", "libxml2", "libx11", {optional = true})
 add_defines("LCUI_EXPORTS", "YUTIL_EXPORTS", "UNICODE", "_CRT_SECURE_NO_WARNINGS")
-add_includedirs("include", "tests/lib/ctest/include/", "lib/yutil/include/")
-includes("tests/lib/ctest/xmake.lua")
+add_includedirs(
+    "lib/ctest/include/",
+    "lib/yutil/include",
+    "lib/pandagl/include",
+    "include"
+)
 includes("lib/*/xmake.lua")
 includes("examples/*/xmake.lua")
 includes("tests/xmake.lua")
@@ -39,7 +42,6 @@ target("lcui_tests")
     set_kind("binary")
     set_rundir("tests")
     add_files("tests/run_tests.c", "tests/cases/*.c")
-    add_includedirs("tests/lib/ctest/include/")
     add_deps("ctest", "lcui")
     on_run(function (target)
         import("core.base.option")
@@ -65,14 +67,20 @@ target("lcui_tests")
 
 target("lcui")
     set_kind("$(kind)")
-    add_files("src/*.c", "lib/*/src/**.c")
-    add_includedirs("lib/yutil/include")
-    add_configfiles("include/LCUI/config.h.in")
+    add_files(
+        "src/*.c",
+        "lib/platform/src/**.c",
+        "lib/worker/src/**.c",
+        "lib/ui-builder/src/**.c",
+        "lib/ui-cursor/src/**.c",
+        "lib/ui-server/src/**.c",
+        "lib/ui-widgets/src/**.c"
+    )
+    add_configfiles("src/config.h.in")
     set_configdir("include/LCUI")
-    add_headerfiles("include/LCUI.h")
-    add_headerfiles("include/(LCUI/**.h)")
-    add_packages("libomp", "libxml2", "libx11", "libpng", "libjpeg", "freetype", "fontconfig")
+    add_packages("libomp", "libxml2", "libx11")
     add_options("enable-openmp")
+    add_deps("yutil", "pandagl", "libcss", "libui", "libthread", "libtimer")
 
     if has_package("libomp") and has_config("enable-openmp") then
         set_configvar("ENABLE_OPENMP", 1)
@@ -91,19 +99,6 @@ target("lcui")
         add_syslinks("pthread", "dl")
     end
 
-    if has_package("fontconfig") then
-        set_configvar("HAVE_FONTCONFIG", 1)
-    end
-    if has_package("freetype") then
-        set_configvar("HAVE_FREETYPE", 1)
-    end
-
-    if has_package("libjpeg") then
-        set_configvar("HAVE_LIBJPEG", 1)
-    end
-    if has_package("libpng") then
-        set_configvar("HAVE_LIBPNG", 1)
-    end
     if has_package("libxml2") then
         set_configvar("WITH_LIBXML2", 1)
     end
@@ -113,28 +108,15 @@ target("headers")
     set_default(false)
     before_build(function (target)
         -- Copy the header file of the internal library to the LCUI header file directory
-        os.cp("$(projectdir)/lib/util/include/*.h", "$(projectdir)/include/LCUI/util/")
-        os.cp("$(projectdir)/lib/yutil/include/yutil/*.h", "$(projectdir)/include/LCUI/util/")
-
         os.cp("$(projectdir)/lib/thread/include/*.h", "$(projectdir)/include/LCUI/")
-
         os.cp("$(projectdir)/lib/css/include/*.h", "$(projectdir)/include/LCUI/")
         os.cp("$(projectdir)/lib/css/include/css/*.h", "$(projectdir)/include/LCUI/css/")
-
-        os.cp("$(projectdir)/lib/font/include/*.h", "$(projectdir)/include/LCUI/")
-        os.cp("$(projectdir)/lib/font/include/font/*.h", "$(projectdir)/include/LCUI/font/")
-
-        os.cp("$(projectdir)/lib/pandagl/include/*.h", "$(projectdir)/include/LCUI/")
-        os.cp("$(projectdir)/lib/pandagl/include/pandagl/*.h", "$(projectdir)/include/LCUI/pandagl/")
-
-        os.cp("$(projectdir)/lib/image/include/*.h", "$(projectdir)/include/LCUI/image/")
         os.cp("$(projectdir)/lib/ui/include/*.h", "$(projectdir)/include/LCUI/")
         os.cp("$(projectdir)/lib/ui-widgets/include/*.h", "$(projectdir)/include/LCUI/ui/widgets/")
         os.cp("$(projectdir)/lib/ui-cursor/include/*.h", "$(projectdir)/include/LCUI/ui/")
         os.cp("$(projectdir)/lib/ui-builder/include/*.h", "$(projectdir)/include/LCUI/ui/")
         os.cp("$(projectdir)/lib/ui-server/include/*.h", "$(projectdir)/include/LCUI/ui/")
         os.cp("$(projectdir)/lib/platform/include/*.h", "$(projectdir)/include/LCUI/")
-        os.cp("$(projectdir)/lib/text/include/*.h", "$(projectdir)/include/LCUI/")
         os.cp("$(projectdir)/lib/timer/include/*.h", "$(projectdir)/include/LCUI/")
         os.cp("$(projectdir)/lib/worker/include/*.h", "$(projectdir)/include/LCUI/")
     end)

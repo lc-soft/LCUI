@@ -32,9 +32,9 @@
 #include <string.h>
 #include <LCUI/config.h>
 #include <LCUI.h>
-#include <LCUI/font.h>
 #include <LCUI/ui.h>
 #include <LCUI/css.h>
+#include <pandagl.h>
 #include "../include/builder.h"
 
 #define WARN_TXT "[builder] warning: this module is not enabled before build.\n"
@@ -113,7 +113,7 @@ static int ui_builder_parse_resource_node(xml_parser_t *parser, xmlNodePtr node)
 		return PB_WARNING;
 	}
 	if (strstr(type, "application/font-")) {
-		if (fontlib_load_file(src) < 1) {
+		if (pd_font_library_load_file(src) < 1) {
 			EXIT(PB_WARNING);
 		}
 	} else if (strcmp(type, "text/css") == 0) {

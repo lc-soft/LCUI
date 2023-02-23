@@ -1,7 +1,6 @@
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
-#include <LCUI/util.h>
 #include "../include/ui.h"
 #include "internal.h"
 

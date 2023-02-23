@@ -30,11 +30,9 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <LCUI/util.h>
-#include <LCUI/font.h>
-#include <LCUI/text/textlayer.h>
 #include <LCUI/css.h>
 #include <LCUI/ui.h>
+#include <pandagl.h>
 
 static size_t unescape(const wchar_t *instr, wchar_t *outstr)
 {
@@ -100,17 +98,17 @@ static void ui_compute_content(ui_text_style_t *fs, const char *str)
 	fs->content = content;
 }
 
-void ui_font_style_init(ui_text_style_t *fs)
+void ui_text_style_init(ui_text_style_t *fs)
 {
 	fs->color.value = 0;
 	fs->content = NULL;
 	fs->font_ids = NULL;
-	fs->font_style = FONT_STYLE_NORMAL;
-	fs->font_weight = FONT_WEIGHT_NORMAL;
-	fs->word_break = LCUI_WORD_BREAK_NORMAL;
+	fs->font_style = PD_FONT_STYLE_NORMAL;
+	fs->font_weight = PD_FONT_WEIGHT_NORMAL;
+	fs->word_break = PD_WORD_BREAK_NORMAL;
 }
 
-void ui_font_style_destroy(ui_text_style_t *fs)
+void ui_text_style_destroy(ui_text_style_t *fs)
 {
 	if (fs->font_ids) {
 		free(fs->font_ids);
@@ -122,7 +120,7 @@ void ui_font_style_destroy(ui_text_style_t *fs)
 	}
 }
 
-LCUI_BOOL ui_font_style_is_equal(const ui_text_style_t *a,
+LCUI_BOOL ui_text_style_is_equal(const ui_text_style_t *a,
 				 const ui_text_style_t *b)
 {
 	int i;
@@ -187,58 +185,58 @@ void ui_compute_text_style(ui_text_style_t *fs,
 
 	switch (style->type_bits.text_align) {
 	case CSS_TEXT_ALIGN_CENTER:
-		fs->text_align = LCUI_TEXT_CENTER;
+		fs->text_align = PD_TEXT_ALIGN_CENTER;
 		break;
 	case CSS_TEXT_ALIGN_RIGHT:
-		fs->text_align = LCUI_TEXT_RIGHT;
+		fs->text_align = PD_TEXT_ALIGN_RIGHT;
 		break;
 	default:
-		fs->text_align = LCUI_TEXT_LEFT;
+		fs->text_align = PD_TEXT_ALIGN_LEFT;
 		break;
 	}
 
 	switch (style->type_bits.font_style) {
 	case CSS_FONT_STYLE_ITALIC:
-		fs->font_style = FONT_STYLE_ITALIC;
+		fs->font_style = PD_FONT_STYLE_ITALIC;
 		break;
 	case CSS_FONT_STYLE_OBLIQUE:
-		fs->font_style = FONT_STYLE_OBLIQUE;
+		fs->font_style = PD_FONT_STYLE_OBLIQUE;
 		break;
 	default:
-		fs->font_style = FONT_STYLE_NORMAL;
+		fs->font_style = PD_FONT_STYLE_NORMAL;
 		break;
 	}
 
 	switch (style->type_bits.font_weight) {
 	case CSS_FONT_WEIGHT_100:
-		fs->font_weight = FONT_WEIGHT_THIN;
+		fs->font_weight = PD_FONT_WEIGHT_THIN;
 		break;
 	case CSS_FONT_WEIGHT_200:
-		fs->font_weight = FONT_WEIGHT_EXTRA_LIGHT;
+		fs->font_weight = PD_FONT_WEIGHT_EXTRA_LIGHT;
 		break;
 	case CSS_FONT_WEIGHT_300:
-		fs->font_weight = FONT_WEIGHT_LIGHT;
+		fs->font_weight = PD_FONT_WEIGHT_LIGHT;
 		break;
 	case CSS_FONT_WEIGHT_500:
-		fs->font_weight = FONT_WEIGHT_MEDIUM;
+		fs->font_weight = PD_FONT_WEIGHT_MEDIUM;
 		break;
 	case CSS_FONT_WEIGHT_600:
-		fs->font_weight = FONT_WEIGHT_SEMI_BOLD;
+		fs->font_weight = PD_FONT_WEIGHT_SEMI_BOLD;
 		break;
 	case CSS_FONT_WEIGHT_BOLD:
 	case CSS_FONT_WEIGHT_700:
-		fs->font_weight = FONT_WEIGHT_BOLD;
+		fs->font_weight = PD_FONT_WEIGHT_BOLD;
 		break;
 	case CSS_FONT_WEIGHT_800:
-		fs->font_weight = FONT_WEIGHT_EXTRA_BOLD;
+		fs->font_weight = PD_FONT_WEIGHT_EXTRA_BOLD;
 		break;
 	case CSS_FONT_WEIGHT_900:
-		fs->font_weight = FONT_WEIGHT_BLACK;
+		fs->font_weight = PD_FONT_WEIGHT_BLACK;
 		break;
 	case CSS_FONT_WEIGHT_NORMAL:
 	case CSS_FONT_WEIGHT_400:
 	default:
-		fs->font_weight = FONT_WEIGHT_NORMAL;
+		fs->font_weight = PD_FONT_WEIGHT_NORMAL;
 		break;
 	}
 	if (fs->font_ids) {
@@ -246,7 +244,7 @@ void ui_compute_text_style(ui_text_style_t *fs,
 		fs->font_ids = NULL;
 	}
 	if (style->font_family) {
-		fontlib_query(&fs->font_ids, fs->font_style, fs->font_weight,
+		pd_font_library_query(&fs->font_ids, fs->font_style, fs->font_weight,
 			      (const char *const *)style->font_family);
 	}
 }

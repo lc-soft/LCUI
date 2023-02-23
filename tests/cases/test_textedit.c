@@ -1,5 +1,4 @@
 #include <LCUI.h>
-#include <LCUI/font.h>
 #include <LCUI/ui.h>
 #include <LCUI/ui/widgets/textedit.h>
 #include "ctest.h"

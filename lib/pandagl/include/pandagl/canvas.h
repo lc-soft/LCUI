@@ -1,19 +1,19 @@
 #ifndef LIB_PANDAGL_INCLUDE_PANDAGL_CANVAS_H
 #define LIB_PANDAGL_INCLUDE_PANDAGL_CANVAS_H
 
-#include <LCUI/def.h>
-#include "def.h"
+#include "common.h"
+#include "types.h"
 
-LCUI_BEGIN_HEADER
+PD_BEGIN_DECLS
 
-INLINE void *pd_canvas_pixel_at(const pd_canvas_t *canvas, unsigned x,
+PD_INLINE void *pd_canvas_pixel_at(const pd_canvas_t *canvas, unsigned x,
 				unsigned y)
 {
 	return canvas->bytes + canvas->bytes_per_row * y +
 	       (x % canvas->width) * canvas->bytes_per_pixel;
 }
 
-INLINE pd_color_t pd_canvas_get_pixel(const pd_canvas_t *canvas, unsigned x,
+PD_INLINE pd_color_t pd_canvas_get_pixel(const pd_canvas_t *canvas, unsigned x,
 				      unsigned y)
 {
 	pd_color_t color;
@@ -29,7 +29,7 @@ INLINE pd_color_t pd_canvas_get_pixel(const pd_canvas_t *canvas, unsigned x,
 	return color;
 }
 
-INLINE void pd_canvas_set_pixel(pd_canvas_t *canvas, unsigned x, unsigned y,
+PD_INLINE void pd_canvas_set_pixel(pd_canvas_t *canvas, unsigned x, unsigned y,
 				pd_color_t pixel)
 {
 	unsigned char *p = pd_canvas_pixel_at(canvas, x, y);
@@ -43,68 +43,68 @@ INLINE void pd_canvas_set_pixel(pd_canvas_t *canvas, unsigned x, unsigned y,
 	}
 }
 
-INLINE pd_canvas_t *pd_canvas_get_quote_source(pd_canvas_t *canvas)
+PD_INLINE pd_canvas_t *pd_canvas_get_quote_source(pd_canvas_t *canvas)
 {
 	return canvas->quote.is_valid ? canvas->quote.source : canvas;
 }
 
-INLINE const pd_canvas_t *pd_canvas_get_quote_source_readonly(
+PD_INLINE const pd_canvas_t *pd_canvas_get_quote_source_readonly(
     const pd_canvas_t *canvas)
 {
 	return canvas->quote.is_valid ? canvas->quote.source : canvas;
 }
 
-LCUI_API void pd_canvas_init(pd_canvas_t *canvas);
+PD_PUBLIC void pd_canvas_init(pd_canvas_t *canvas);
 
-LCUI_API pd_bool pd_canvas_is_valid(const pd_canvas_t *canvas);
+PD_PUBLIC pd_bool_t pd_canvas_is_valid(const pd_canvas_t *canvas);
 
-LCUI_API int pd_canvas_quote(pd_canvas_t *self, pd_canvas_t *source,
+PD_PUBLIC int pd_canvas_quote(pd_canvas_t *self, pd_canvas_t *source,
 			     const pd_rect_t *rect);
 
-LCUI_API void pd_canvas_get_quote_rect(const pd_canvas_t *canvas,
+PD_PUBLIC void pd_canvas_get_quote_rect(const pd_canvas_t *canvas,
 				       pd_rect_t *rect);
 
-LCUI_API void pd_canvas_destroy(pd_canvas_t *canvas);
+PD_PUBLIC void pd_canvas_destroy(pd_canvas_t *canvas);
 
-LCUI_API int pd_canvas_create(pd_canvas_t *canvas, unsigned width,
+PD_PUBLIC int pd_canvas_create(pd_canvas_t *canvas, unsigned width,
 			      unsigned height);
 
-LCUI_API int pd_canvas_replace(pd_canvas_t *back, const pd_canvas_t *fore,
+PD_PUBLIC int pd_canvas_replace(pd_canvas_t *back, const pd_canvas_t *fore,
 			       int left, int top);
 
-LCUI_API int pd_canvas_set_color_type(pd_canvas_t *canvas, int color_type);
+PD_PUBLIC int pd_canvas_set_color_type(pd_canvas_t *canvas, int color_type);
 
-LCUI_API int pd_canvas_cut(const pd_canvas_t *canvas, pd_rect_t rect,
+PD_PUBLIC int pd_canvas_cut(const pd_canvas_t *canvas, pd_rect_t rect,
 			   pd_canvas_t *out_canvas);
 
-LCUI_API void pd_canvas_copy(pd_canvas_t *des, const pd_canvas_t *src);
+PD_PUBLIC void pd_canvas_copy(pd_canvas_t *des, const pd_canvas_t *src);
 
-LCUI_API int pd_canvas_mix(pd_canvas_t *back, const pd_canvas_t *fore, int left,
-			   int top, pd_bool with_alpha);
+PD_PUBLIC int pd_canvas_mix(pd_canvas_t *back, const pd_canvas_t *fore, int left,
+			   int top, pd_bool_t with_alpha);
 
-LCUI_API int pd_canvas_fill_rect(pd_canvas_t *canvas, pd_color_t color,
+PD_PUBLIC int pd_canvas_fill_rect(pd_canvas_t *canvas, pd_color_t color,
 				 pd_rect_t rect);
 
-INLINE int pd_canvas_fill(pd_canvas_t *canvas, pd_color_t color)
+PD_INLINE int pd_canvas_fill(pd_canvas_t *canvas, pd_color_t color)
 {
 	pd_rect_t rect = { 0, 0, canvas->width, canvas->height };
 	return pd_canvas_fill_rect(canvas, color, rect);
 }
 
-LCUI_API int pd_canvas_tile(pd_canvas_t *buff, const pd_canvas_t *canvas,
-			    pd_bool replace, pd_bool with_alpha);
+PD_PUBLIC int pd_canvas_tile(pd_canvas_t *buff, const pd_canvas_t *canvas,
+			    pd_bool_t replace, pd_bool_t with_alpha);
 
-LCUI_API int pd_canvas_veri_flip(const pd_canvas_t *canvas, pd_canvas_t *buff);
+PD_PUBLIC int pd_canvas_veri_flip(const pd_canvas_t *canvas, pd_canvas_t *buff);
 
-LCUI_API int canvas_horiz_flip(const pd_canvas_t *canvas, pd_canvas_t *buff);
+PD_PUBLIC int pd_canvas_horiz_flip(const pd_canvas_t *canvas, pd_canvas_t *buff);
 
-LCUI_API int pd_canvas_zoom(const pd_canvas_t *canvas, pd_canvas_t *buff,
-			    pd_bool keep_scale, int width, int height);
+PD_PUBLIC int pd_canvas_zoom(const pd_canvas_t *canvas, pd_canvas_t *buff,
+			    pd_bool_t keep_scale, int width, int height);
 
-LCUI_API int pd_canvas_zoom_bilinear(const pd_canvas_t *canvas,
-				     pd_canvas_t *buff, pd_bool keep_scale,
+PD_PUBLIC int pd_canvas_zoom_bilinear(const pd_canvas_t *canvas,
+				     pd_canvas_t *buff, pd_bool_t keep_scale,
 				     int width, int height);
 
-LCUI_END_HEADER
+PD_END_DECLS
 
 #endif

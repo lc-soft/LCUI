@@ -3,7 +3,7 @@
 #include <errno.h>
 #include <windows.h>
 #include <process.h>
-#include <LCUI/util.h>
+#include <yutil.h>
 #include "../include/thread.h"
 
 typedef union thread_mutex_record_t {

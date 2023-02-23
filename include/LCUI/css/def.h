@@ -2,8 +2,8 @@
 #define LIBCSS_INCLUDE_CSS_DEF_H
 
 #include <LCUI/def.h>
-#include <LCUI/pandagl/def.h>
-#include <LCUI/util.h>
+#include <yutil.h>
+#include <pandagl/types.h>
 
 #define CSS_SELECTOR_MAX_LEN 1024
 #define CSS_SELECTOR_MAX_DEPTH 32

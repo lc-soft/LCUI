@@ -1,7 +1,5 @@
 ﻿#include <stdio.h>
 #include <time.h>
-#include <LCUI/util.h>
-#include <LCUI/font.h>
 #include <LCUI/ui.h>
 #include <LCUI/ui/widgets/textview.h>
 
@@ -13,7 +11,7 @@ int main(void)
 
 	ui_widget_t *box, *w;
 
-	fontlib_init();
+	pd_font_library_init();
 	ui_init();
 	box = ui_create_widget(NULL);
 
@@ -53,6 +51,6 @@ int main(void)
 	logger_debug("it should take less than 1s\n");
 
 	ui_destroy();
-	fontlib_destroy();
+	pd_font_library_destroy();
 	return 0;
 }

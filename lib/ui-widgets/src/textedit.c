@@ -33,9 +33,8 @@
 #include <string.h>
 #include <LCUI/thread.h>
 #include <LCUI/platform.h>
-#include <LCUI/pandagl.h>
+#include <pandagl.h>
 #include <LCUI/css.h>
-#include <LCUI/text/textlayer.h>
 #include "./internal.h"
 #include "../include/textedit.h"
 #include "../include/textcaret.h"
@@ -47,11 +46,11 @@
 enum task_type_t { TASK_SET_TEXT, TASK_UPDATE, TASK_TOTAL };
 
 typedef struct ui_textedit_t {
-	ui_text_style_t style;            /**< 字体样式 */
-	LCUI_TextLayer layer_source;      /**< 实际文本层 */
-	LCUI_TextLayer layer_mask;        /**< 屏蔽后的文本层 */
-	LCUI_TextLayer layer_placeholder; /**< 占位符的文本层 */
-	LCUI_TextLayer layer;             /**< 当前使用的文本层 */
+	ui_text_style_t style;          /**< 字体样式 */
+	pd_text_t* layer_source;        /**< 实际文本层 */
+	pd_text_t* layer_mask;          /**< 屏蔽后的文本层 */
+	pd_text_t* layer_placeholder;   /**< 占位符的文本层 */
+	pd_text_t* layer;               /**< 当前使用的文本层 */
 	ui_widget_t* scrollbars[2];     /**< 两个滚动条 */
 	ui_widget_t* caret;             /**< 文本插入符 */
 	LCUI_BOOL is_read_only;         /**< 是否只读 */
@@ -136,7 +135,7 @@ static void ui_textedit_update_caret(ui_widget_t* widget)
 
 	if (!edit->is_placeholder_shown) {
 		pd_pos_t pos;
-		if (TextLayer_GetCaretPixelPos(edit->layer, &pos) != 0) {
+		if (pd_text_get_insert_pixel_position(edit->layer, &pos) != 0) {
 			return;
 		}
 		caret_x = pos.x / scale;
@@ -147,7 +146,7 @@ static void ui_textedit_update_caret(ui_widget_t* widget)
 	x = caret_x + offset_x;
 	y = caret_y + offset_y;
 	width = edit->layer->width / scale;
-	height = TextLayer_GetRowHeight(edit->layer, row) / scale;
+	height = pd_text_get_line_height(edit->layer, row) / scale;
 	ui_widget_set_style_unit_value(edit->caret, css_key_height, height,
 				       CSS_UNIT_PX);
 	/* Keep the caret in the visible area */
@@ -173,7 +172,7 @@ static void ui_textedit_update_caret(ui_widget_t* widget)
 	}
 	offset_x = y_iround((x - caret_x) * scale);
 	offset_y = y_iround((y - caret_y) * scale);
-	if (TextLayer_SetOffset(edit->layer, offset_x, offset_y)) {
+	if (pd_text_set_offset(edit->layer, offset_x, offset_y)) {
 		edit->tasks[TASK_UPDATE] = TRUE;
 		ui_widget_add_task(widget, UI_TASK_USER);
 	}
@@ -182,8 +181,9 @@ static void ui_textedit_update_caret(ui_widget_t* widget)
 	ui_widget_move(edit->caret, x, y);
 	ui_textcaret_refresh(edit->caret);
 	if (edit->password_char) {
-		TextLayer_SetCaretPos(edit->layer_source, edit->layer->insert_y,
-				      edit->layer->insert_x);
+		pd_text_set_insert_position(edit->layer_source,
+					    edit->layer->insert_y,
+					    edit->layer->insert_x);
 	}
 }
 
@@ -193,7 +193,7 @@ void ui_textedit_move_caret(ui_widget_t* widget, int row, int col)
 	if (edit->is_placeholder_shown) {
 		row = col = 0;
 	}
-	TextLayer_SetCaretPos(edit->layer, row, col);
+	pd_text_set_insert_position(edit->layer, row, col);
 	ui_textedit_update_caret(widget);
 }
 
@@ -239,7 +239,7 @@ static int ui_textedit_add_textblock(ui_widget_t* widget, const wchar_t* wtext,
 			return -ENOMEM;
 		}
 		/* 如果未启用样式标签功能 */
-		if (!edit->layer->enable_style_tag) {
+		if (!edit->layer->style_tag_enabled) {
 			for (j = 0; i < len && j < size - 1; ++j, ++i) {
 				block->text[j] = wtext[i];
 			}
@@ -253,9 +253,9 @@ static int ui_textedit_add_textblock(ui_widget_t* widget, const wchar_t* wtext,
 			wchar_t* text;
 			block->text[j] = wtext[i];
 			/* 检测是否有样式标签 */
-			p = ScanStyleTag(wtext + i, NULL, 0, NULL);
+			p = pd_scan_style_open_tag(wtext + i, NULL, 0, NULL);
 			if (!p) {
-				p = ScanStyleEndingTag(wtext + i, NULL);
+				p = pd_scan_style_close_tag(wtext + i, NULL);
 				if (!p) {
 					continue;
 				}
@@ -290,7 +290,7 @@ static void TextEdit_ProcTextBlock(ui_widget_t* widget, textblock_t* txtblk)
 {
 	list_t* tags;
 	ui_textedit_t* edit;
-	LCUI_TextLayer layer;
+	pd_text_t* layer;
 
 	edit = ui_widget_get_data(widget, ui_textedit_proto);
 	switch (txtblk->owner) {
@@ -308,11 +308,11 @@ static void TextEdit_ProcTextBlock(ui_widget_t* widget, textblock_t* txtblk)
 	switch (txtblk->action) {
 	case TEXTBLOCK_ACTION_APPEND:
 		/* 将此文本块追加至文本末尾 */
-		TextLayer_AppendTextW(layer, txtblk->text, tags);
+		pd_text_append(layer, txtblk->text, tags);
 		break;
 	case TEXTBLOCK_ACTION_INSERT:
 		/* 将此文本块插入至文本插入符所在处 */
-		TextLayer_InsertTextW(layer, txtblk->text, tags);
+		pd_text_insert(layer, txtblk->text, tags);
 	default:
 		break;
 	}
@@ -322,9 +322,9 @@ static void TextEdit_ProcTextBlock(ui_widget_t* widget, textblock_t* txtblk)
 		fillchar(text, edit->password_char);
 		layer = edit->layer_mask;
 		if (txtblk->action == TEXTBLOCK_ACTION_INSERT) {
-			TextLayer_InsertTextW(layer, text, NULL);
+			pd_text_insert(layer, text, NULL);
 		} else {
-			TextLayer_AppendTextW(layer, text, NULL);
+			pd_text_append(layer, text, NULL);
 		}
 		free(text);
 	}
@@ -337,26 +337,25 @@ static void TextEdit_UpdateTextLayer(ui_widget_t* w)
 	list_t rects;
 	ui_rect_t rect;
 	ui_textedit_t* edit;
-	LCUI_TextStyleRec style;
+	pd_text_style_t style;
 	list_node_t* node;
 
 	list_create(&rects);
 	scale = ui_metrics.scale;
 	edit = ui_widget_get_data(w, ui_textedit_proto);
-	TextStyle_Copy(&style, &edit->layer_source->text_default_style);
+	pd_text_style_copy(&style, &edit->layer_source->default_style);
 	if (edit->password_char) {
-		TextLayer_SetTextStyle(edit->layer_mask, &style);
+		pd_text_set_style(edit->layer_mask, &style);
 	}
 	style.has_fore_color = TRUE;
 	style.fore_color = PLACEHOLDER_COLOR;
-	TextLayer_SetTextStyle(edit->layer_placeholder, &style);
-	TextStyle_Destroy(&style);
-	TextLayer_Update(edit->layer, &rects);
+	pd_text_set_style(edit->layer_placeholder, &style);
+	pd_text_style_destroy(&style);
+	pd_text_update(edit->layer, &rects);
 	for (list_each(node, &rects)) {
 		ui_convert_rect(node->data, &rect, 1.0f / scale);
 		ui_widget_mark_dirty_rect(w, &rect, CSS_KEYWORD_CONTENT_BOX);
 	}
-	TextLayer_ClearInvalidRect(edit->layer);
 	pd_rects_clear(&rects);
 }
 
@@ -415,12 +414,11 @@ static void ui_textedit_on_resize(ui_widget_t* w, float width, float height)
 	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
 
 	list_create(&rects);
-	TextLayer_SetFixedSize(edit->layer, (int)(width * scale),
+	pd_text_set_fixed_size(edit->layer, (int)(width * scale),
 			       (int)(width * scale));
-	TextLayer_SetMaxSize(edit->layer, (int)(height * scale),
+	pd_text_set_max_size(edit->layer, (int)(height * scale),
 			     (int)(height * scale));
-	TextLayer_Update(edit->layer, &rects);
-	TextLayer_ClearInvalidRect(edit->layer);
+	pd_text_update(edit->layer, &rects);
 	for (list_each(node, &rects)) {
 		ui_convert_rect(node->data, &rect, 1.0f / scale);
 		ui_widget_mark_dirty_rect(w, &rect, CSS_KEYWORD_CONTENT_BOX);
@@ -441,13 +439,13 @@ static void ui_textedit_on_auto_size(ui_widget_t* w, float* width,
 	case UI_LAYOUT_RULE_FIXED_WIDTH:
 		max_width = ui_compute(w->content_box.width);
 		if (edit->is_multiline_mode) {
-			n = y_max(TextLayer_GetRowTotal(edit->layer), 6);
+			n = y_max(pd_text_get_lines_length(edit->layer), 6);
 			for (max_height = 0, i = 0; i < n; ++i) {
 				max_height +=
-				    TextLayer_GetRowHeight(edit->layer, i);
+				    pd_text_get_line_height(edit->layer, i);
 			}
 		} else {
-			max_height = TextLayer_GetHeight(edit->layer);
+			max_height = pd_text_get_height(edit->layer);
 		}
 		break;
 	case UI_LAYOUT_RULE_FIXED_HEIGHT:
@@ -461,13 +459,13 @@ static void ui_textedit_on_auto_size(ui_widget_t* w, float* width,
 	default:
 		max_width = ui_compute(DEFAULT_WIDTH);
 		if (edit->is_multiline_mode) {
-			n = y_max(TextLayer_GetRowTotal(edit->layer), 6);
+			n = y_max(pd_text_get_lines_length(edit->layer), 6);
 			for (max_height = 0, i = 0; i < n; ++i) {
 				max_height +=
-				    TextLayer_GetRowHeight(edit->layer, i);
+				    pd_text_get_line_height(edit->layer, i);
 			}
 		} else {
-			max_height = TextLayer_GetHeight(edit->layer);
+			max_height = pd_text_get_height(edit->layer);
 		}
 		break;
 	}
@@ -478,7 +476,7 @@ static void ui_textedit_on_auto_size(ui_widget_t* w, float* width,
 void ui_textedit_enable_style_tag(ui_widget_t* widget, LCUI_BOOL enable)
 {
 	ui_textedit_t* edit = ui_widget_get_data(widget, ui_textedit_proto);
-	TextLayer_EnableStyleTag(edit->layer, enable);
+	pd_text_set_style_tag(edit->layer, enable);
 }
 
 /* FIXME: improve multiline editing mode of the textedit widget
@@ -514,8 +512,8 @@ void ui_textedit_clear_text(ui_widget_t* widget)
 			node = prev;
 		}
 	}
-	TextLayer_ClearText(edit->layer_source);
-	StyleTags_Clear(&edit->text_tags);
+	pd_text_empty(edit->layer_source);
+	pd_style_tags_clear(&edit->text_tags);
 	edit->tasks[TASK_UPDATE] = TRUE;
 	ui_widget_add_task(widget, UI_TASK_USER);
 	thread_mutex_unlock(&edit->mutex);
@@ -526,7 +524,7 @@ size_t ui_textedit_get_text_w(ui_widget_t* w, size_t start, size_t max_len,
 			      wchar_t* buf)
 {
 	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
-	return TextLayer_GetTextW(edit->layer_source, start, max_len, buf);
+	return pd_text_dump(edit->layer_source, start, max_len, buf);
 }
 
 size_t ui_textedit_get_text_length(ui_widget_t* w)
@@ -567,7 +565,7 @@ void ui_textedit_set_passworld_char(ui_widget_t* w, wchar_t ch)
 	edit->password_char = ch;
 	edit->tasks[TASK_UPDATE] = TRUE;
 	ui_widget_add_task(w, UI_TASK_USER);
-	TextLayer_ClearText(edit->layer_mask);
+	pd_text_empty(edit->layer_mask);
 	if (!edit->password_char) {
 		edit->layer = edit->layer_source;
 		return;
@@ -577,7 +575,7 @@ void ui_textedit_set_passworld_char(ui_widget_t* w, wchar_t ch)
 	for (i = 0; i < len; i += 255) {
 		ui_textedit_get_text_w(w, i, 255, text);
 		fillchar(text, edit->password_char);
-		TextLayer_AppendTextW(edit->layer, text, NULL);
+		pd_text_append(edit->layer, text, NULL);
 	}
 }
 
@@ -597,7 +595,7 @@ int ui_textedit_set_placeholder_w(ui_widget_t* w, const wchar_t* wstr)
 {
 	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
 	thread_mutex_lock(&edit->mutex);
-	TextLayer_ClearText(edit->layer_placeholder);
+	pd_text_empty(edit->layer_placeholder);
 	thread_mutex_unlock(&edit->mutex);
 	if (edit->is_placeholder_shown) {
 		ui_widget_mark_dirty_rect(w, NULL, CSS_KEYWORD_PADDING_BOX);
@@ -664,9 +662,9 @@ static void ui_textedit_on_press_backspace_key(ui_widget_t* widget, int n_ch)
 
 	edit = ui_widget_get_data(widget, ui_textedit_proto);
 	thread_mutex_lock(&edit->mutex);
-	TextLayer_TextBackspace(edit->layer_source, n_ch);
+	pd_text_backspace(edit->layer_source, n_ch);
 	if (edit->password_char) {
-		TextLayer_TextBackspace(edit->layer_mask, n_ch);
+		pd_text_backspace(edit->layer_mask, n_ch);
 	}
 	ui_textcaret_refresh(edit->caret);
 	edit->tasks[TASK_UPDATE] = TRUE;
@@ -683,9 +681,9 @@ static void ui_textedit_on_press_delete_key(ui_widget_t* widget, int n_ch)
 
 	edit = ui_widget_get_data(widget, ui_textedit_proto);
 	thread_mutex_lock(&edit->mutex);
-	TextLayer_TextDelete(edit->layer_source, n_ch);
+	pd_text_delete(edit->layer_source, n_ch);
 	if (edit->password_char) {
-		TextLayer_TextDelete(edit->layer_mask, n_ch);
+		pd_text_delete(edit->layer_mask, n_ch);
 	}
 	ui_textcaret_refresh(edit->caret);
 	edit->tasks[TASK_UPDATE] = TRUE;
@@ -722,8 +720,8 @@ static void ui_textedit_on_keydown(ui_widget_t* widget, ui_event_t* e,
 
 	cur_row = edit->layer->insert_y;
 	cur_col = edit->layer->insert_x;
-	rows = TextLayer_GetRowTotal(edit->layer);
-	cols = TextLayer_GetRowTextLength(edit->layer, cur_row);
+	rows = pd_text_get_lines_length(edit->layer);
+	cols = pd_text_get_line_length(edit->layer, cur_row);
 	e->cancel_bubble = TRUE;
 	switch (e->key.code) {
 	case KEY_HOME:
@@ -737,8 +735,7 @@ static void ui_textedit_on_keydown(ui_widget_t* widget, ui_event_t* e,
 			--cur_col;
 		} else if (cur_row > 0) {
 			--cur_row;
-			cur_col =
-			    TextLayer_GetRowTextLength(edit->layer, cur_row);
+			cur_col = pd_text_get_line_length(edit->layer, cur_row);
 		}
 		break;
 	case KEY_RIGHT:
@@ -852,7 +849,7 @@ static void ui_textedit_on_mousemove(ui_widget_t* w, ui_event_t* e, void* arg)
 		return;
 	}
 	ui_widget_get_offset(w, NULL, &offset_x, &offset_y);
-	TextLayer_SetCaretPosByPixelPos(
+	pd_text_set_insert_pixel_position(
 	    edit->layer,
 	    ui_compute(e->mouse.x - offset_x - w->computed_style.padding_left),
 	    ui_compute(e->mouse.y - offset_y - w->computed_style.padding_top));
@@ -871,7 +868,7 @@ static void ui_textedit_on_mousedown(ui_widget_t* w, ui_event_t* e, void* arg)
 	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
 
 	ui_widget_get_offset(w, NULL, &offset_x, &offset_y);
-	TextLayer_SetCaretPosByPixelPos(
+	pd_text_set_insert_pixel_position(
 	    edit->layer,
 	    ui_compute(e->mouse.x - offset_x - w->computed_style.padding_left),
 	    ui_compute(e->mouse.y - offset_y - w->computed_style.padding_top));
@@ -903,20 +900,20 @@ static void ui_textedit_on_init(ui_widget_t* w)
 	edit->allow_input_char = NULL;
 	edit->is_placeholder_shown = FALSE;
 	edit->is_multiline_mode = FALSE;
-	edit->layer_mask = TextLayer_New();
-	edit->layer_source = TextLayer_New();
-	edit->layer_placeholder = TextLayer_New();
+	edit->layer_mask = pd_text_create();
+	edit->layer_source = pd_text_create();
+	edit->layer_placeholder = pd_text_create();
 	edit->layer = edit->layer_source;
 	edit->text_block_size = TEXTBLOCK_SIZE;
 	edit->caret = ui_create_widget("textcaret");
 	w->tab_index = 0;
 	memset(edit->tasks, 0, sizeof(edit->tasks));
 	list_create(&edit->text_blocks);
-	StyleTags_Init(&edit->text_tags);
+	list_create(&edit->text_tags);
 	ui_textedit_enable_multiline(w, FALSE);
-	TextLayer_SetAutoWrap(edit->layer, TRUE);
-	TextLayer_SetAutoWrap(edit->layer_mask, TRUE);
-	TextLayer_EnableStyleTag(edit->layer, FALSE);
+	pd_text_set_autowrap(edit->layer, TRUE);
+	pd_text_set_autowrap(edit->layer_mask, TRUE);
+	pd_text_set_style_tag(edit->layer, FALSE);
 	ui_widget_on(w, "textinput", ui_textedit_on_textinput, NULL, NULL);
 	ui_widget_on(w, "mousedown", ui_textedit_on_mousedown, NULL, NULL);
 	ui_widget_on(w, "mouseup", ui_textedit_on_mouseup, NULL, NULL);
@@ -928,7 +925,7 @@ static void ui_textedit_on_init(ui_widget_t* w)
 	ui_widget_append(w, edit->caret);
 	ui_widget_hide(edit->caret);
 	thread_mutex_init(&edit->mutex);
-	ui_font_style_init(&edit->style);
+	ui_text_style_init(&edit->style);
 }
 
 static void ui_textedit_on_destroy(ui_widget_t* widget)
@@ -936,10 +933,10 @@ static void ui_textedit_on_destroy(ui_widget_t* widget)
 	ui_textedit_t* edit = ui_widget_get_data(widget, ui_textedit_proto);
 
 	edit->layer = NULL;
-	TextLayer_Destroy(edit->layer_source);
-	TextLayer_Destroy(edit->layer_placeholder);
-	TextLayer_Destroy(edit->layer_mask);
-	ui_font_style_destroy(&edit->style);
+	pd_text_destroy(edit->layer_source);
+	pd_text_destroy(edit->layer_placeholder);
+	pd_text_destroy(edit->layer_mask);
+	ui_text_style_destroy(&edit->style);
 	thread_mutex_destroy(&edit->mutex);
 	list_destroy(&edit->text_blocks,
 		     (list_item_destructor_t)textblock_destroy);
@@ -968,7 +965,7 @@ static void ui_textedit_on_paint(ui_widget_t* w, pd_context_t* paint,
 	rect = paint->rect;
 	rect.x -= content_rect.x;
 	rect.y -= content_rect.y;
-	TextLayer_RenderTo(edit->layer, rect, pos, &canvas);
+	pd_text_render_to(edit->layer, rect, pos, &canvas);
 }
 
 static void ui_textedit_on_update_style(ui_widget_t* w)
@@ -976,27 +973,27 @@ static void ui_textedit_on_update_style(ui_widget_t* w)
 	int i;
 
 	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
-	LCUI_TextStyleRec text_style;
+	pd_text_style_t text_style;
 	ui_text_style_t style;
-	LCUI_TextLayer layers[3] = { edit->layer_mask, edit->layer_placeholder,
-				     edit->layer_source };
+	pd_text_t* layers[3] = { edit->layer_mask, edit->layer_placeholder,
+				 edit->layer_source };
 
-	ui_font_style_init(&style);
+	ui_text_style_init(&style);
 	ui_compute_text_style(&style, &w->computed_style);
-	if (ui_font_style_is_equal(&style, &edit->style)) {
-		ui_font_style_destroy(&style);
+	if (ui_text_style_is_equal(&style, &edit->style)) {
+		ui_text_style_destroy(&style);
 		return;
 	}
 	convert_font_style_to_text_style(&style, &text_style);
 	for (i = 0; i < 3; ++i) {
-		TextLayer_SetTextAlign(layers[i], style.text_align);
-		TextLayer_SetLineHeight(layers[i], style.line_height);
-		TextLayer_SetAutoWrap(
+		pd_text_set_align(layers[i], style.text_align);
+		pd_text_set_line_height(layers[i], style.line_height);
+		pd_text_set_autowrap(
 		    layers[i], style.white_space != CSS_WHITE_SPACE_NOWRAP);
-		TextLayer_SetTextStyle(layers[i], &text_style);
+		pd_text_set_style(layers[i], &text_style);
 	}
-	ui_font_style_destroy(&edit->style);
-	TextStyle_Destroy(&text_style);
+	ui_text_style_destroy(&edit->style);
+	pd_text_style_destroy(&text_style);
 	edit->style = style;
 	edit->tasks[TASK_UPDATE] = TRUE;
 	ui_widget_add_task(w, UI_TASK_USER);

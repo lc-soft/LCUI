@@ -31,10 +31,10 @@
 #ifndef LIB_PANDAGL_INCLUDE_PANDAGL_BACKGROUND_H
 #define LIB_PANDAGL_INCLUDE_PANDAGL_BACKGROUND_H
 
-#include <LCUI/def.h>
-#include "def.h"
+#include "common.h"
+#include "types.h"
 
-LCUI_BEGIN_HEADER
+PD_BEGIN_DECLS
 
 /**
  * 绘制背景
@@ -42,9 +42,9 @@ LCUI_BEGIN_HEADER
  * @param[in] box 背景区域
  * @param[in] bg 背景样式参数
  */
-LCUI_API void pd_paint_background(pd_context_t *ctx, const pd_background_t *bg,
+PD_PUBLIC void pd_paint_background(pd_context_t *ctx, const pd_background_t *bg,
 				  const pd_rect_t *box);
 
-LCUI_END_HEADER
+PD_END_DECLS
 
 #endif

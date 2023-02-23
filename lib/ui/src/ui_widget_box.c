@@ -1,4 +1,4 @@
-#include <LCUI/pandagl.h>
+#include <pandagl.h>
 #include <math.h>
 #include "internal.h"
 

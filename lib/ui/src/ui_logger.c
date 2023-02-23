@@ -1,7 +1,6 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
-#include <LCUI/util.h>
 #include <LCUI/css/selector.h>
 #include "internal.h"
 

@@ -1,6 +1,6 @@
 ﻿#include <stdio.h>
 #include <LCUI.h>
-#include <LCUI/pandagl.h>
+#include <pandagl.h>
 #include <LCUI/css/style_value.h>
 #include "internal.h"
 
@@ -9,7 +9,6 @@
 #define MAX_VISIBLE_HEIGHT 20000
 
 #ifdef DEBUG_FRAME_RENDER
-#include <LCUI/image.h>
 #endif
 
 typedef struct ui_renderer_t {
@@ -494,7 +493,7 @@ static size_t ui_renderer_render(ui_renderer_t *renderer)
 			frame++, __LINE__, renderer->target->id,
 			self_paint.rect.x, self_paint.rect.y,
 			self_paint.rect.width, self_paint.rect.height);
-		LCUI_WritePNGFile(filename, &self_paint.canvas);
+		pd_write_png_file(filename, &self_paint.canvas);
 #endif
 		/* 若不需要缓存自身位图则直接绘制到画布上 */
 		if (!that->has_self_graph) {
@@ -503,7 +502,7 @@ static size_t ui_renderer_render(ui_renderer_t *renderer)
 #ifdef DEBUG_FRAME_RENDER
 			sprintf(filename, "frame-%zd-L%d-%s-root-canvas.png",
 				frame++, __LINE__, renderer->target->id);
-			LCUI_WritePNGFile(filename, &that->root_paint->canvas);
+			pd_write_png_file(filename, &that->root_paint->canvas);
 #endif
 		}
 	}
@@ -527,10 +526,10 @@ static size_t ui_renderer_render(ui_renderer_t *renderer)
 #ifdef DEBUG_FRAME_RENDER
 		sprintf(filename, "frame-%zd-L%d-%s-canvas.png", frame++,
 			__LINE__, renderer->target->id);
-		LCUI_WritePNGFile(filename, &that->paint->canvas);
+		pd_write_png_file(filename, &that->paint->canvas);
 		sprintf(filename, "frame-%zd-L%d-%s-root-canvas.png", frame++,
 			__LINE__, renderer->target->id);
-		LCUI_WritePNGFile(filename, &that->root_paint->canvas);
+		pd_write_png_file(filename, &that->root_paint->canvas);
 #endif
 		DEBUG_MSG("[%d] %s: end render, count: %lu\n",
 			  that->target->index, that->target->type, count);
@@ -547,10 +546,10 @@ static size_t ui_renderer_render(ui_renderer_t *renderer)
 		sprintf(filename, "frame-%zd-L%d-%s-content-graph-%d-%d.png",
 			frame++, __LINE__, renderer->target->id, content_x,
 			content_y);
-		LCUI_WritePNGFile(filename, &that->content_graph);
+		pd_write_png_file(filename, &that->content_graph);
 		sprintf(filename, "frame-%zd-L%d-%s-self-graph.png", frame++,
 			__LINE__, renderer->target->id);
-		LCUI_WritePNGFile(filename, &that->layer_graph);
+		pd_write_png_file(filename, &that->layer_graph);
 #endif
 	} else {
 		pd_canvas_create(&that->layer_graph, that->paint->rect.width,
@@ -564,10 +563,10 @@ static size_t ui_renderer_render(ui_renderer_t *renderer)
 #ifdef DEBUG_FRAME_RENDER
 	sprintf(filename, "frame-%zd-%s-layer.png", frame++,
 		renderer->target->id);
-	LCUI_WritePNGFile(filename, &that->layer_graph);
+	pd_write_png_file(filename, &that->layer_graph);
 	sprintf(filename, "frame-%zd-L%d-%s-root-canvas.png", frame++, __LINE__,
 		renderer->target->id);
-	LCUI_WritePNGFile(filename, &that->root_paint->canvas);
+	pd_write_png_file(filename, &that->root_paint->canvas);
 #endif
 	DEBUG_MSG("[%d] %s: end render, count: %lu\n", that->target->index,
 		  that->target->type, count);

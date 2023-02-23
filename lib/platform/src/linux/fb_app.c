@@ -11,7 +11,7 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <unistd.h>
-#include <LCUI/pandagl.h>
+#include <pandagl.h>
 
 #define MIN_WIDTH 320
 #define MIN_HEIGHT 240

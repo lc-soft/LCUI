@@ -6,7 +6,7 @@
 #define MIN_WINDOW_WIDTH 100
 #define MIN_WINDOW_HEIGHT 40
 
-#include <LCUI/pandagl.h>
+#include <pandagl.h>
 
 struct app_window_t {
 	Window handle;

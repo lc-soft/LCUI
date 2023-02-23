@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <LCUI/util.h>
 #include "internal.h"
 
 typedef struct ime_t_ {

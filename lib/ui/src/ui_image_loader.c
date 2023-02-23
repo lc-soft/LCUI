@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <LCUI.h>
-#include <LCUI/image.h>
 #include <LCUI/worker.h>
+#include <pandagl.h>
 #include "../include/ui.h"
 #include "internal.h"
 
@@ -60,7 +60,7 @@ static void ui_image_loader_load(void *arg1, void *arg2)
 	ui_image_event_t *e;
 
 	if (!image->loaded) {
-		if (LCUI_ReadImageFile(image->path, &image->data) != 0) {
+		if (pd_read_image_from_file(image->path, &image->data) != 0) {
 			return;
 		}
 		image->loaded = TRUE;

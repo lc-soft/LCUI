@@ -44,7 +44,6 @@ static void test_auto_size(void)
 	ui_widget_t *w;
 	ui_widget_t *example;
 	ui_rect_t rect;
-	int box_height = 31;
 
 	// Update #test-text-auto-height content
 

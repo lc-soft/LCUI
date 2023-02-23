@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <LCUI.h>
 #include <LCUI/thread.h>
-#include <LCUI/util.h>
 #include "ctest.h"
 
 typedef struct TestWorkerRec_ {

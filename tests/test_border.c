@@ -1,6 +1,5 @@
 #include <LCUI.h>
-#include <LCUI/pandagl.h>
-#include <LCUI/image.h>
+#include <pandagl.h>
 #include <LCUI/ui/builder.h>
 #include <LCUI/main.h>
 

@@ -1,6 +1,5 @@
 #include <LCUI.h>
-#include <LCUI/pandagl.h>
-#include <LCUI/image.h>
+#include <pandagl.h>
 
 int main(void)
 {
@@ -23,7 +22,7 @@ int main(void)
 			pd_canvas_fill_rect(&canvas, color, rect);
 		}
 	}
-	LCUI_WritePNGFile("test_fill_rect.png", &canvas);
+	pd_write_png_file("test_fill_rect.png", &canvas);
 	pd_canvas_destroy(&canvas);
 	return 0;
 }

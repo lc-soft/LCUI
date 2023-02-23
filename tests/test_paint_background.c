@@ -1,6 +1,5 @@
 ﻿#include <LCUI.h>
-#include <LCUI/pandagl.h>
-#include <LCUI/image.h>
+#include <pandagl.h>
 
 int test_paint_background_color(void)
 {
@@ -20,7 +19,7 @@ int test_paint_background_color(void)
 	ctx = pd_context_create(&canvas, &rect);
 	// 绘制背景
 	pd_paint_background(ctx, &bg, &rect);
-	LCUI_WritePNGFile("test_paint_background_color.png", &canvas);
+	pd_write_png_file("test_paint_background_color.png", &canvas);
 	pd_context_destroy(ctx);
 	pd_canvas_destroy(&canvas);
 	return 0;
@@ -41,7 +40,7 @@ int test_paint_background_image(void)
 	pd_canvas_create(&canvas, 800, 600);
 	pd_canvas_fill(&canvas, gray);
 	// 读取背景图片
-	if (LCUI_ReadImageFile("test_image_reader.png", &image) != 0) {
+	if (pd_read_image_from_file("test_image_reader.png", &image) != 0) {
 		return -1;
 	}
 	// 设置背景色
@@ -54,7 +53,7 @@ int test_paint_background_image(void)
 	ctx = pd_context_create(&canvas, &rect);
 	// 绘制背景
 	pd_paint_background(ctx, &bg, &rect);
-	LCUI_WritePNGFile("test_paint_background_image.png", &canvas);
+	pd_write_png_file("test_paint_background_image.png", &canvas);
 	pd_context_destroy(ctx);
 	pd_canvas_destroy(&image);
 	pd_canvas_destroy(&canvas);
@@ -76,7 +75,7 @@ int test_paint_background_image_with_size(void)
 	pd_canvas_create(&canvas, 800, 600);
 	pd_canvas_fill(&canvas, gray);
 	// 读取背景图片
-	if (LCUI_ReadImageFile("test_image_reader.png", &image) != 0) {
+	if (pd_read_image_from_file("test_image_reader.png", &image) != 0) {
 		return -1;
 	}
 	// 设置背景色
@@ -90,7 +89,7 @@ int test_paint_background_image_with_size(void)
 	ctx = pd_context_create(&canvas, &rect);
 	// 绘制背景
 	pd_paint_background(ctx, &bg, &rect);
-	LCUI_WritePNGFile("test_paint_background_image_with_size.png", &canvas);
+	pd_write_png_file("test_paint_background_image_with_size.png", &canvas);
 	pd_context_destroy(ctx);
 	pd_canvas_destroy(&image);
 	pd_canvas_destroy(&canvas);
@@ -112,7 +111,7 @@ int test_paint_background_image_with_position(void)
 	pd_canvas_create(&canvas, 800, 600);
 	pd_canvas_fill(&canvas, gray);
 	// 读取背景图片
-	if (LCUI_ReadImageFile("test_image_reader.png", &image) != 0) {
+	if (pd_read_image_from_file("test_image_reader.png", &image) != 0) {
 		return -1;
 	}
 	// 设置背景色
@@ -128,7 +127,7 @@ int test_paint_background_image_with_position(void)
 	ctx = pd_context_create(&canvas, &rect);
 	// 绘制背景
 	pd_paint_background(ctx, &bg, &rect);
-	LCUI_WritePNGFile("test_paint_background_image_with_position.png",
+	pd_write_png_file("test_paint_background_image_with_position.png",
 			  &canvas);
 	pd_context_destroy(ctx);
 	pd_canvas_destroy(&image);

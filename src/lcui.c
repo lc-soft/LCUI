@@ -10,7 +10,6 @@
 #include <LCUI/thread.h>
 #include <LCUI/worker.h>
 #include <LCUI/timer.h>
-#include <LCUI/font.h>
 
 #define LCUI_WORKER_NUM 4
 

@@ -1,6 +1,5 @@
 ﻿#include <LCUI.h>
-#include <LCUI/pandagl.h>
-#include <LCUI/image.h>
+#include <pandagl.h>
 #include <LCUI/ui/widgets/textview.h>
 
 int main(void)
@@ -43,7 +42,7 @@ int main(void)
 
 	/* 渲染部件 */
 	ui_widget_render(box, &paint);
-	ret = LCUI_WritePNGFile("test_widget_render.png", &canvas);
+	ret = pd_write_png_file("test_widget_render.png", &canvas);
 	pd_canvas_destroy(&canvas);
 
 	lcui_destroy();
