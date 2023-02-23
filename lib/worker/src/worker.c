@@ -33,7 +33,7 @@
 #include <stdlib.h>
 #include <LCUI/def.h>
 #include "../include/worker.h"
-#include <LCUI/util.h>
+#include <yutil.h>
 #include <LCUI/thread.h>
 
 typedef struct LCUI_WorkerRec_ {

@@ -1,10 +1,10 @@
-#include "../include/pandagl.h"
+﻿#include <pandagl.h>
 
 int pd_canvas_veri_flip(const pd_canvas_t *canvas, pd_canvas_t *buff)
 {
 	int y;
 	pd_rect_t rect;
-	uchar_t *byte_src, *byte_des;
+	uint8_t *byte_src, *byte_des;
 
 	if (!pd_canvas_is_valid(canvas)) {
 		return -1;
@@ -26,11 +26,11 @@ int pd_canvas_veri_flip(const pd_canvas_t *canvas, pd_canvas_t *buff)
 	return 0;
 }
 
-int canvas_horiz_flip(const pd_canvas_t *canvas, pd_canvas_t *buff)
+int pd_canvas_horiz_flip(const pd_canvas_t *canvas, pd_canvas_t *buff)
 {
 	int x, y;
 	pd_rect_t rect;
-	uchar_t *src, *dest;
+	uint8_t *src, *dest;
 
 	if (!pd_canvas_is_valid(canvas)) {
 		return -1;

@@ -1,6 +1,5 @@
 #include <math.h>
-#include <LCUI/util.h>
-#include <LCUI/font.h>
+#include <yutil.h>
 #include <LCUI/ui/server.h>
 #include <LCUI/app.h>
 #include <LCUI/ui/widgets/textview.h>
@@ -10,6 +9,7 @@
 #include <LCUI/ui/widgets/scrollbar.h>
 #include <LCUI/ui/widgets/textedit.h>
 #include <LCUI/ui/widgets/textcaret.h>
+#include <pandagl.h>
 
 #define DEFAULT_WINDOW_WIDTH 800
 #define DEFAULT_WINDOW_HEIGHT 600
@@ -279,11 +279,11 @@ static void lcui_load_fonts_for_windows(void)
 				"C:/Windows/Fonts/msyh.ttc" };
 
 	for (i = 0; i < sizeof(fonts) / sizeof(char *); ++i) {
-		fontlib_load_file(fonts[i]);
+		pd_font_library_load_file(fonts[i]);
 	}
-	i = fontlib_query(&ids, FONT_STYLE_NORMAL, FONT_WEIGHT_NORMAL, names);
+	i = pd_font_library_query(&ids, PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_NORMAL, names);
 	if (i > 0) {
-		fontlib_set_default_font(ids[i - 1]);
+		pd_font_library_set_default_font(ids[i - 1]);
 	}
 	free(ids);
 }
@@ -303,13 +303,13 @@ static void lcui_load_fonts_by_font_config(void)
 				"WenQuanYi Micro Hei" };
 
 	for (i = 0; i < sizeof(fonts) / sizeof(char *); ++i) {
-		path = fontlib_get_font_path(fonts[i]);
-		fontlib_load_file(path);
+		path = pd_font_library_get_font_path(fonts[i]);
+		pd_font_library_load_file(path);
 		free(path);
 	}
-	i = fontlib_query(&ids, FONT_STYLE_NORMAL, FONT_WEIGHT_NORMAL, names);
+	i = pd_font_library_query(&ids, PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_NORMAL, names);
 	if (i > 0) {
-		fontlib_set_default_font(ids[i - 1]);
+		pd_font_library_set_default_font(ids[i - 1]);
 	}
 	free(ids);
 }
@@ -350,11 +350,11 @@ static void lcui_load_fonts_for_linux(void)
 	};
 
 	for (i = 0; i < sizeof(fonts) / sizeof(char *); ++i) {
-		fontlib_load_file(fonts[i]);
+		pd_font_library_load_file(fonts[i]);
 	}
-	i = fontlib_query(&ids, FONT_STYLE_NORMAL, FONT_WEIGHT_NORMAL, names);
+	i = pd_font_library_query(&ids, PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_NORMAL, names);
 	if (i > 0) {
-		fontlib_set_default_font(ids[i - 1]);
+		pd_font_library_set_default_font(ids[i - 1]);
 	}
 	free(ids);
 }

@@ -1,5 +1,4 @@
 ﻿#include <string.h>
-#include <LCUI/util.h>
 #include "internal.h"
 
 #define IS_PROP_TYPE_CHANGED(PROP_KEY) \

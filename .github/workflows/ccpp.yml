@@ -25,13 +25,16 @@ jobs:
           xmake build headers
           xmake -w
 
-      - name: Run tests
-        run: |
-          xmake run pandagl_tests
-          xmake run libcss_tests --memcheck
-          xmake run lcui_tests --memcheck
+      - name: Run PandaGL tests
+        run: xmake run pandagl_tests
 
-      - name: "Run tests yutil"
+      - name: Run LibCSS tests
+        run: xmake run libcss_tests --memcheck
+
+      - name: Run LCUI tests
+        run: xmake run lcui_tests --memcheck
+
+      - name: Run yutil tests
         run: |
           xmake build yutil_test
           xmake run yutil_test --memcheck
@@ -78,13 +81,16 @@ jobs:
           xmake build headers
           xmake -w
 
-      - name: "Run tests"
-        run: |
-          xmake run pandagl_tests
-          xmake run libcss_tests
-          xmake run lcui_tests
+      - name: Run PandaGL tests
+        run: xmake run pandagl_tests
 
-      - name: "Run tests yutil"
+      - name: Run LibCSS tests
+        run: xmake run libcss_tests
+
+      - name: Run LCUI tests
+        run: xmake run lcui_tests
+
+      - name: Run YUtil tests
         run: |
           xmake build yutil_test
           xmake run yutil_test

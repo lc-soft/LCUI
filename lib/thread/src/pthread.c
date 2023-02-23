@@ -4,7 +4,7 @@
 #include <errno.h>
 #include <sys/time.h>
 #include <pthread.h>
-#include <LCUI/util.h>
+#include <yutil.h>
 #include "../include/thread.h"
 
 typedef union thread_mutex_record_t {

@@ -29,7 +29,7 @@
  */
 
 #include <stdlib.h>
-#include <LCUI/pandagl.h>
+#include <pandagl.h>
 #include <LCUI/ui.h>
 #include "../include/canvas.h"
 

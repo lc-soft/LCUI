@@ -1,8 +1,8 @@
-﻿#include "../include/pandagl.h"
+﻿#include <pandagl.h>
 
 void pd_canvas_init(pd_canvas_t *canvas)
 {
-	canvas->quote.is_valid = FALSE;
+	canvas->quote.is_valid = PD_FALSE;
 	canvas->quote.source = NULL;
 	canvas->quote.top = 0;
 	canvas->quote.left = 0;
@@ -16,10 +16,10 @@ void pd_canvas_init(pd_canvas_t *canvas)
 	canvas->bytes_per_row = 0;
 }
 
-pd_bool pd_canvas_is_valid(const pd_canvas_t *canvas)
+pd_bool_t pd_canvas_is_valid(const pd_canvas_t *canvas)
 {
 	if (!canvas) {
-		return FALSE;
+		return PD_FALSE;
 	}
 	if (canvas->quote.is_valid) {
 		return canvas->quote.source &&
@@ -56,7 +56,7 @@ int pd_canvas_quote(pd_canvas_t *self, pd_canvas_t *source,
 		self->quote.top = 0;
 		self->bytes = NULL;
 		self->quote.source = NULL;
-		self->quote.is_valid = FALSE;
+		self->quote.is_valid = PD_FALSE;
 		return -1;
 	}
 	self->opacity = 1.0;
@@ -67,7 +67,7 @@ int pd_canvas_quote(pd_canvas_t *self, pd_canvas_t *source,
 	self->color_type = source->color_type;
 	self->bytes_per_pixel = source->bytes_per_pixel;
 	self->bytes_per_row = source->bytes_per_row;
-	self->quote.is_valid = TRUE;
+	self->quote.is_valid = PD_TRUE;
 	self->quote.source = source;
 	self->quote.left = quote_rect.x;
 	self->quote.top = quote_rect.y;
@@ -92,7 +92,7 @@ void pd_canvas_destroy(pd_canvas_t *canvas)
 	/* 解除引用 */
 	if (canvas && canvas->quote.is_valid) {
 		canvas->quote.source = NULL;
-		canvas->quote.is_valid = FALSE;
+		canvas->quote.is_valid = PD_FALSE;
 		return;
 	}
 	if (canvas->bytes) {
@@ -146,7 +146,7 @@ static void pd_canvas_direct_replace(pd_canvas_t *des, pd_rect_t des_rect,
 				     int src_y)
 {
 	int y;
-	uchar_t *byte_row_des, *byte_row_src;
+	uint8_t *byte_row_des, *byte_row_src;
 
 	byte_row_src = pd_canvas_pixel_at(src, src_x, src_y);
 	byte_row_des = pd_canvas_pixel_at(des, des_rect.x, des_rect.y);
@@ -229,7 +229,7 @@ int pd_canvas_cut(const pd_canvas_t *canvas, pd_rect_t rect,
 		  pd_canvas_t *out_canvas)
 {
 	int y;
-	uchar_t *src_row, *des_row;
+	uint8_t *src_row, *des_row;
 
 	if (!pd_canvas_is_valid(canvas)) {
 		return -2;
@@ -295,7 +295,7 @@ static void pd_canvas_mix_argb(pd_canvas_t *dest, pd_rect_t des_rect,
 			       const pd_canvas_t *src, int src_x, int src_y)
 {
 	int x, y;
-	uchar_t a;
+	uint8_t a;
 	pd_color_t *px_src, *px_dest;
 
 	for (y = 0; y < des_rect.height; ++y) {
@@ -303,7 +303,7 @@ static void pd_canvas_mix_argb(pd_canvas_t *dest, pd_rect_t des_rect,
 		px_dest = pd_canvas_pixel_at(dest, des_rect.x, des_rect.y + y);
 		if (src->opacity < 1.0) {
 			for (x = 0; x < des_rect.width; ++x) {
-				a = (uchar_t)(px_src->a * src->opacity);
+				a = (uint8_t)(px_src->a * src->opacity);
 				pd_blend_pixel(px_dest, px_src, a);
 				++px_src;
 				++px_dest;
@@ -322,9 +322,9 @@ static void pd_canvas_mix_argb2rgb(pd_canvas_t *des, pd_rect_t des_rect,
 				   const pd_canvas_t *src, int src_x, int src_y)
 {
 	int x, y;
-	uchar_t a;
+	uint8_t a;
 	pd_color_t *px, *px_row;
-	uchar_t *rowbytep, *bytep;
+	uint8_t *rowbytep, *bytep;
 
 	/* 计算并保存第一行的首个像素的位置 */
 	px_row = pd_canvas_pixel_at(src, src_x, src_y);
@@ -353,7 +353,7 @@ mix_with_opacity:
 		px = px_row;
 		bytep = rowbytep;
 		for (x = 0; x < des_rect.width; ++x, ++px) {
-			a = (uchar_t)(px->a * src->opacity);
+			a = (uint8_t)(px->a * src->opacity);
 			*bytep = _pd_alpha_blend(*bytep, px->b, a);
 			++bytep;
 			*bytep = _pd_alpha_blend(*bytep, px->g, a);
@@ -367,7 +367,7 @@ mix_with_opacity:
 }
 
 int pd_canvas_mix(pd_canvas_t *back, const pd_canvas_t *fore, int left, int top,
-		  pd_bool with_alpha)
+		  pd_bool_t with_alpha)
 {
 	pd_canvas_t w_slot;
 	pd_rect_t r_rect, w_rect;

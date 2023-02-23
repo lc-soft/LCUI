@@ -2,8 +2,6 @@
 #define LCUI_H
 
 #include <LCUI/def.h>
-#include <LCUI/def.h>
-#include <LCUI/util.h>
 #include <LCUI/platform.h>
 #include <LCUI/worker.h>
 

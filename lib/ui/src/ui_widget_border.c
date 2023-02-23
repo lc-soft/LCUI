@@ -1,4 +1,4 @@
-﻿#include <LCUI/pandagl.h>
+﻿#include <pandagl.h>
 #include "internal.h"
 
 static void ui_widget_compute_border(ui_widget_t* w, pd_border_t* b)

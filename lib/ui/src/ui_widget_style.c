@@ -1,5 +1,4 @@
 ﻿#include <string.h>
-#include <LCUI/util.h>
 #include <LCUI/css.h>
 #include "internal.h"
 

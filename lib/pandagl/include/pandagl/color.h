@@ -1,10 +1,10 @@
 #ifndef LIB_PANDAGL_INCLUDE_PANDAGL_COLOR_H
 #define LIB_PANDAGL_INCLUDE_PANDAGL_COLOR_H
 
-#include <LCUI/def.h>
-#include "def.h"
+#include "common.h"
+#include "types.h"
 
-INLINE pd_color_t pd_color(uchar_t a, uchar_t r, uchar_t g, uchar_t b)
+PD_INLINE pd_color_t pd_color(uint8_t a, uint8_t r, uint8_t g, uint8_t b)
 {
 	pd_color_t color = { .a = a, .r = r, .g = g, .b = b };
 	return color;

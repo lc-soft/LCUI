@@ -6,8 +6,8 @@
 #include <windows.h>
 #include "resource.h"
 #include <LCUI/config.h>
-#include <LCUI/util.h>
-#include <LCUI/pandagl.h>
+#include <yutil.h>
+#include <pandagl.h>
 
 #define MIN_WIDTH 320
 #define MIN_HEIGHT 240
@@ -686,9 +686,8 @@ int app_destroy_engine(void)
 
 	// 销毁未关闭的窗口
 	if (win32_app.windows.length > 0) {
-		for (list_each(node, &win32_app.windows)) {
-			app_window_destroy(node->data);
-		}
+		list_destroy_without_node(&win32_app.windows,
+					  app_window_destroy);
 		PostQuitMessage(0);
 		while (GetMessage(&msg, NULL, 0, 0) != 0) {
 			TranslateMessage(&msg);

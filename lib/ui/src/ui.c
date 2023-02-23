@@ -1,10 +1,10 @@
-﻿#include <LCUI/font.h>
+﻿#include <pandagl.h>
 #include "../include/ui.h"
 #include "internal.h"
 
 void ui_init(void)
 {
-	fontlib_init();
+	pd_font_library_init();
 	ui_init_metrics();
 	ui_init_widget_id();
 	ui_init_widget_prototype();
@@ -17,7 +17,7 @@ void ui_init(void)
 
 void ui_destroy(void)
 {
-	fontlib_destroy();
+	pd_font_library_destroy();
 	ui_trash_clear();
 	ui_destroy_root();
 	ui_destroy_events();

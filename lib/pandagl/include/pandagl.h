@@ -1,4 +1,5 @@
-#include "pandagl/def.h"
+#include "pandagl/common.h"
+#include "pandagl/types.h"
 #include "pandagl/rect.h"
 #include "pandagl/color.h"
 #include "pandagl/pixel.h"
@@ -8,3 +9,6 @@
 #include "pandagl/background.h"
 #include "pandagl/border.h"
 #include "pandagl/boxshadow.h"
+#include "pandagl/font.h"
+#include "pandagl/text.h"
+#include "pandagl/image.h"

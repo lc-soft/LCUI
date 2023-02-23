@@ -29,9 +29,8 @@
  */
 
 #include <math.h>
-#include <LCUI/def.h>
-#include <LCUI/util.h>
-#include "../include/pandagl.h"
+#include <yutil.h>
+#include <pandagl.h>
 
 #define POW2(X) ((X) * (X))
 #define CIRCLE_R(R) (R - 0.5)
@@ -42,8 +41,8 @@
 /*  Convert screen X coordinate to geometric X coordinate */
 #define ToGeoX(X, CENTER_X) (X - (CENTER_X))
 
-#define smooth_left_pixel(PX, X) (uchar_t)((PX)->a * (1.0 - (X - 1.0 * (int)X)))
-#define smooth_right_pixel(PX, X) (uchar_t)((PX)->a * (X - 1.0 * (int)X))
+#define smooth_left_pixel(PX, X) (uint8_t)((PX)->a * (1.0 - (X - 1.0 * (int)X)))
+#define smooth_right_pixel(PX, X) (uint8_t)((PX)->a * (X - 1.0 * (int)X))
 
 #define BorderRenderContext()                               \
 	int x, y;                                           \

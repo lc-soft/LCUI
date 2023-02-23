@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <LCUI/thread.h>
 #include <LCUI/timer.h>
-#include <LCUI/util.h>
+#include <yutil.h>
 
 static struct lcui_timers_t {
 	timer_list_t *list;

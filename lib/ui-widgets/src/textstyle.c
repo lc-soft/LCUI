@@ -1,6 +1,6 @@
 #include "./internal.h"
 
-void convert_font_style_to_text_style(ui_text_style_t *fs, LCUI_TextStyle ts)
+void convert_font_style_to_text_style(ui_text_style_t *fs, pd_text_style_t *ts)
 {
 	size_t len;
 	ts->font_ids = NULL;

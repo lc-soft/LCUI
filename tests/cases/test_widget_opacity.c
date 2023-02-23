@@ -5,7 +5,7 @@
 #include <LCUI/ui/widgets/textview.h>
 #include <LCUI/css.h>
 #include <LCUI/ui/builder.h>
-#include <LCUI/pandagl.h>
+#include <pandagl.h>
 #include "ctest.h"
 
 #define PARENT_OPACITY 0.8f

@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <LCUI.h>
 #include <LCUI/main.h>
-#include <LCUI/pandagl.h>
+#include <pandagl.h>
 #include <LCUI/ui/widgets/textview.h>
 
 #define SCREEN_WIDTH 1600

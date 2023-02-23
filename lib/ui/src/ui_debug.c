@@ -35,7 +35,7 @@ void ui_widget_to_string(ui_widget_t *w, char *str)
 	css_selector_node_destroy(node);
 }
 
-void ui_widget_size_to_string(ui_widget_t *w, char str[32])
+void ui_widget_size_to_string(ui_widget_t *w, char str[40])
 {
 	char width_str[16] = "auto";
 	char height_str[16] = "auto";
@@ -57,5 +57,5 @@ void ui_widget_size_to_string(ui_widget_t *w, char str[32])
 			 get_css_unit_str(w->computed_style.unit_bits.height));
 		break;
 	}
-	snprintf(str, 31, "(%s, %s)", width_str, height_str);
+	snprintf(str, 40, "(%s, %s)", width_str, height_str);
 }

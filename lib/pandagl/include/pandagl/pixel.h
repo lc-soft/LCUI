@@ -1,8 +1,8 @@
 #ifndef LIB_PANDAGL_INCLUDE_PANDAGL_PIXEL_H
 #define LIB_PANDAGL_INCLUDE_PANDAGL_PIXEL_H
 
-#include <LCUI/def.h>
-#include "def.h"
+#include "common.h"
+#include "types.h"
 
 #define _pd_alpha_blend(__back__, __fore__, __alpha__) \
 	((((__fore__ - __back__) * (__alpha__)) >> 8) + __back__)
@@ -19,15 +19,15 @@
 		pd_alpha_blend((px1)->b, (px2)->b, a); \
 	}
 
-LCUI_BEGIN_HEADER
+PD_BEGIN_DECLS
 
-LCUI_API unsigned pd_get_pixel_size(pd_color_type_t color_type);
+PD_PUBLIC unsigned pd_get_pixel_size(pd_color_type_t color_type);
 
-LCUI_API unsigned pd_get_pixel_row_size(pd_color_type_t color_type, size_t len);
+PD_PUBLIC unsigned pd_get_pixel_row_size(pd_color_type_t color_type, size_t len);
 
-LCUI_API int pd_format_pixels(const uchar_t *in_pixels,
+PD_PUBLIC int pd_format_pixels(const uint8_t *in_pixels,
 				   pd_color_type_t in_color_type,
-				   uchar_t *out_pixels,
+				   uint8_t *out_pixels,
 				   pd_color_type_t out_color_type,
 				   size_t count);
 
@@ -35,7 +35,7 @@ LCUI_API int pd_format_pixels(const uchar_t *in_pixels,
  * Pixel over operator with alpha channel
  * See more: https://en.wikipedia.org/wiki/Alpha_compositing
  */
-INLINE void pd_over_pixel(pd_color_t *dst, const pd_color_t *src, double opacity)
+PD_INLINE void pd_over_pixel(pd_color_t *dst, const pd_color_t *src, double opacity)
 {
 	/*
 	 * Original formula:
@@ -79,6 +79,6 @@ INLINE void pd_over_pixel(pd_color_t *dst, const pd_color_t *src, double opacity
 	*/
 }
 
-LCUI_END_HEADER
+PD_END_DECLS
 
 #endif
