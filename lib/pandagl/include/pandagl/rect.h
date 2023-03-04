@@ -52,6 +52,8 @@ PD_PUBLIC int pd_rects_remove(list_t *list, pd_rect_t *rect);
 
 PD_PUBLIC void pd_rects_clear(list_t *list);
 
+PD_PUBLIC int pd_rect_to_str(pd_rect_t *rect, char *str, unsigned max_len);
+
 PD_END_DECLS
 
 #endif

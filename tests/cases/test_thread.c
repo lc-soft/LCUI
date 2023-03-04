@@ -1,8 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <LCUI.h>
-#include <thread.h>
-#include "ctest.h"
+#include <ctest-custom.h>
 
 typedef struct TestWorkerRec_ {
 	char data[32];
@@ -79,6 +78,6 @@ void test_thread(void)
 	TestWorker_Send(&worker, "bye!");
 	sleep_ms(100);
 	TestWorker_Destroy(&worker);
-	it_i("check worker data count", worker.data_count, 7);
-	it_b("check worker is no longer active", worker.active, FALSE);
+	ctest_euqal_int("check worker data count", worker.data_count, 7);
+	ctest_euqal_bool("check worker is no longer active", worker.active, FALSE);
 }

@@ -6,7 +6,7 @@
 #define LIBTIMER_VERSION_MAJOR 3
 #define LIBTIMER_VERSION_MINOR 0
 #define LIBTIMER_VERSION_ALTER 0
-/* #undef LIBTIMER_STATIC_BUILD */
+#define LIBTIMER_STATIC_BUILD 1
 
 #include <stddef.h>
 

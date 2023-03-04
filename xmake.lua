@@ -42,6 +42,7 @@ end
 target("lcui_tests")
     set_kind("binary")
     set_rundir("tests")
+    add_includedirs("tests/include")
     add_files("tests/run_tests.c", "tests/cases/*.c")
     add_deps("ctest", "lcui")
     on_run(function (target)

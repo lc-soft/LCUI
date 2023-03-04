@@ -7,10 +7,10 @@
 LIBUI_BEGIN_DECLS
 
 LIBUI_PUBLIC void ui_convert_rect(const pd_rect_t *rect, ui_rect_t *rectf,
-			      float scale);
+				  float scale);
 
 LIBUI_PUBLIC bool ui_rect_correct(ui_rect_t *rect, float container_width,
-				   float container_height);
+				  float container_height);
 
 LIBUI_INLINE bool ui_rect_has_point(ui_rect_t *rect, float x, float y)
 {
@@ -35,10 +35,12 @@ LIBUI_INLINE bool ui_rect_is_include(ui_rect_t *a, ui_rect_t *b)
 }
 
 LIBUI_PUBLIC bool ui_rect_overlap(const ui_rect_t *a, const ui_rect_t *b,
-				   ui_rect_t *overlapping_rect);
+				  ui_rect_t *overlapping_rect);
 
 LIBUI_PUBLIC void ui_rect_merge(ui_rect_t *merged_rect, const ui_rect_t *a,
-			    const ui_rect_t *b);
+				const ui_rect_t *b);
+
+LIBUI_PUBLIC int ui_rect_to_str(ui_rect_t *rect, char *str, unsigned max_len);
 
 LIBUI_END_DECLS
 

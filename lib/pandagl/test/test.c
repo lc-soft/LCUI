@@ -5,6 +5,6 @@ int main()
 {
 	int ret = 0;
 
-	describe("test_canvas_mix", test_canvas_mix);
-	return ret - print_test_result();
+	ctest_describe("test_canvas_mix", test_canvas_mix);
+	return ret - ctest_finish();
 }

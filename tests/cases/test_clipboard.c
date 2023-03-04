@@ -1,8 +1,6 @@
 #include <stdlib.h>
 #include <LCUI.h>
-#include <ui_widgets/textedit.h>
-#include <timer.h>
-#include "ctest.h"
+#include <ctest-custom.h>
 
 static void paste_text(void *arg)
 {
@@ -40,7 +38,7 @@ static void on_check_text(ui_widget_t *w, ui_event_t *e, void *arg)
 	if (clipboard && clipboard->text) {
 		encode_utf8(actual_text, clipboard->text, 31);
 	}
-	it_s("check the pasted text", actual_text, "helloworld");
+	ctest_euqal_str("check the pasted text", actual_text, "helloworld");
 	lcui_quit();
 }
 

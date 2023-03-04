@@ -1,10 +1,5 @@
 #include <LCUI.h>
-#include <css.h>
-#include <ui.h>
-#include <ui_xml.h>
-#include <ui_widgets/textview.h>
-#include <ui_widgets/scrollbar.h>
-#include "ctest.h"
+#include <ctest-custom.h>
 
 /* clang-format off */
 
@@ -128,7 +123,7 @@ void test_scrollbar(void)
 	ui_dispatch_event(&e);
 	lcui_update_ui();
 
-	it_b("content should be moved to the left",
+	ctest_euqal_bool("content should be moved to the left",
 	     content->computed_style.left < left &&
 		 top == content->computed_style.top,
 	     TRUE);
@@ -147,7 +142,7 @@ void test_scrollbar(void)
 	ui_dispatch_event(&e);
 	lcui_update_ui();
 
-	it_b("content should be moved to the right",
+	ctest_euqal_bool("content should be moved to the right",
 	     content->computed_style.left > left &&
 		 top == content->computed_style.top,
 	     TRUE);
@@ -174,7 +169,7 @@ void test_scrollbar(void)
 	ui_dispatch_event(&e);
 	lcui_update_ui();
 
-	it_b("content should be moved to the top",
+	ctest_euqal_bool("content should be moved to the top",
 	     content->computed_style.left == left &&
 		 top > content->computed_style.top,
 	     TRUE);
@@ -193,7 +188,7 @@ void test_scrollbar(void)
 	ui_dispatch_event(&e);
 	lcui_update_ui();
 
-	it_b("the content should have scrolled to the bottom",
+	ctest_euqal_bool("the content should have scrolled to the bottom",
 	     content->computed_style.left == left &&
 		 top < content->computed_style.top,
 	     TRUE);

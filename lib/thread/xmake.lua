@@ -1,3 +1,5 @@
+set_version("0.1.0-a")
+
 target("libthread")
     set_kind("$(kind)")
     add_files("src/*.c")

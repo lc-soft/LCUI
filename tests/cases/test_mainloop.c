@@ -1,10 +1,6 @@
 #include <stdlib.h>
 #include <LCUI.h>
-#include <ui.h>
-#include <thread.h>
-#include <ui_widgets/button.h>
-#include <timer.h>
-#include "ctest.h"
+#include <ctest-custom.h>
 
 static void OnRefreshScreen(void *arg)
 {
@@ -45,9 +41,9 @@ static void ObserverThread(void *arg)
 	for (i = 0; i < 20 && !*exited; ++i) {
 		sleep_ms(100);
 	}
-	it_b("main loop should exit within 2000ms", *exited, TRUE);
+	ctest_euqal_bool("main loop should exit within 2000ms", *exited, TRUE);
 	if (!*exited) {
-		exit(-print_test_result());
+		exit(-ctest_finish());
 		return;
 	}
 	thread_exit(NULL);

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <LCUI.h>
 #include <ui.h>
-#include "ctest.h"
+#include <ctest-custom.h>
 
 void test_widget_mouse_event(void)
 {
@@ -26,33 +26,33 @@ void test_widget_mouse_event(void)
 	ev.mouse.y = 150;
 	ui_dispatch_event(&ev);
 	ui_update();
-	it_b("mousemove(150, 150): root.hasStatus('hover') == true",
+	ctest_euqal_bool("mousemove(150, 150): root.hasStatus('hover') == true",
 	     ui_widget_has_status(root, "hover"), TRUE);
-	it_b("mousemove(150, 150): parent.hasStatus('hover') == false",
+	ctest_euqal_bool("mousemove(150, 150): parent.hasStatus('hover') == false",
 	     ui_widget_has_status(parent, "hover"), FALSE);
-	it_b("mousemove(150, 150): child.hasStatus('hover') == false",
+	ctest_euqal_bool("mousemove(150, 150): child.hasStatus('hover') == false",
 	     ui_widget_has_status(child, "hover"), FALSE);
 
 	ev.mouse.x = 80;
 	ev.mouse.y = 80;
 	ui_dispatch_event(&ev);
 	ui_update();
-	it_b("mousemove(80, 80): root.hasStatus('hover') == true",
+	ctest_euqal_bool("mousemove(80, 80): root.hasStatus('hover') == true",
 	     ui_widget_has_status(root, "hover"), TRUE);
-	it_b("mousemove(80, 80): parent.hasStatus('hover') == true",
+	ctest_euqal_bool("mousemove(80, 80): parent.hasStatus('hover') == true",
 	     ui_widget_has_status(parent, "hover"), TRUE);
-	it_b("mousemove(80, 80): child.hasStatus('hover') == false",
+	ctest_euqal_bool("mousemove(80, 80): child.hasStatus('hover') == false",
 	     ui_widget_has_status(child, "hover"), FALSE);
 
 	ev.mouse.x = 40;
 	ev.mouse.y = 40;
 	ui_dispatch_event(&ev);
 	ui_update();
-	it_b("mousemove(40, 40): root.hasStatus('hover') == true",
+	ctest_euqal_bool("mousemove(40, 40): root.hasStatus('hover') == true",
 	     ui_widget_has_status(root, "hover"), TRUE);
-	it_b("mousemove(40, 40): parent.hasStatus('hover') == true",
+	ctest_euqal_bool("mousemove(40, 40): parent.hasStatus('hover') == true",
 	     ui_widget_has_status(parent, "hover"), TRUE);
-	it_b("mousemove(40, 40): child.hasStatus('hover') == true",
+	ctest_euqal_bool("mousemove(40, 40): child.hasStatus('hover') == true",
 	     ui_widget_has_status(child, "hover"), TRUE);
 
 	ev.type = UI_EVENT_MOUSEDOWN;
@@ -61,21 +61,21 @@ void test_widget_mouse_event(void)
 	ev.mouse.button = MOUSE_BUTTON_LEFT;
 	ui_dispatch_event(&ev);
 	ui_update();
-	it_b("mousedown(40, 40): root.hasStatus('active') == true",
+	ctest_euqal_bool("mousedown(40, 40): root.hasStatus('active') == true",
 	     ui_widget_has_status(root, "active"), TRUE);
-	it_b("mousedown(40, 40): parent.hasStatus('active') == true",
+	ctest_euqal_bool("mousedown(40, 40): parent.hasStatus('active') == true",
 	     ui_widget_has_status(parent, "active"), TRUE);
-	it_b("mousedown(40, 40): child.hasStatus('active') == true",
+	ctest_euqal_bool("mousedown(40, 40): child.hasStatus('active') == true",
 	     ui_widget_has_status(child, "active"), TRUE);
 
 	ev.type = UI_EVENT_MOUSEUP;
 	ui_dispatch_event(&ev);
 	ui_update();
-	it_b("mouseup(40, 40): root.hasStatus('active') == false",
+	ctest_euqal_bool("mouseup(40, 40): root.hasStatus('active') == false",
 	     ui_widget_has_status(root, "active"), FALSE);
-	it_b("mouseup(40, 40): parent.hasStatus('active') == false",
+	ctest_euqal_bool("mouseup(40, 40): parent.hasStatus('active') == false",
 	     ui_widget_has_status(parent, "active"), FALSE);
-	it_b("mouseup(40, 40): child.hasStatus('active') == false",
+	ctest_euqal_bool("mouseup(40, 40): child.hasStatus('active') == false",
 	     ui_widget_has_status(child, "active"), FALSE);
 
 	ev.type = UI_EVENT_MOUSEMOVE;
@@ -83,22 +83,22 @@ void test_widget_mouse_event(void)
 	ev.mouse.y = 80;
 	ui_dispatch_event(&ev);
 	ui_update();
-	it_b("mousemove(80, 80): root.hasStatus('hover') == true",
+	ctest_euqal_bool("mousemove(80, 80): root.hasStatus('hover') == true",
 	     ui_widget_has_status(root, "hover"), TRUE);
-	it_b("mousemove(80, 80): parent.hasStatus('hover') == true",
+	ctest_euqal_bool("mousemove(80, 80): parent.hasStatus('hover') == true",
 	     ui_widget_has_status(parent, "hover"), TRUE);
-	it_b("mousemove(80, 80): child.hasStatus('hover') == false",
+	ctest_euqal_bool("mousemove(80, 80): child.hasStatus('hover') == false",
 	     ui_widget_has_status(child, "hover"), FALSE);
 
 	ev.mouse.x = 150;
 	ev.mouse.y = 150;
 	ui_dispatch_event(&ev);
 	ui_update();
-	it_b("mousemove(150, 150): root.hasStatus('hover') == true",
+	ctest_euqal_bool("mousemove(150, 150): root.hasStatus('hover') == true",
 	     ui_widget_has_status(root, "hover"), TRUE);
-	it_b("mousemove(150, 150): parent.hasStatus('hover') == false",
+	ctest_euqal_bool("mousemove(150, 150): parent.hasStatus('hover') == false",
 	     ui_widget_has_status(parent, "hover"), FALSE);
-	it_b("mousemove(150, 150): child.hasStatus('hover') == false",
+	ctest_euqal_bool("mousemove(150, 150): child.hasStatus('hover') == false",
 	     ui_widget_has_status(child, "hover"), FALSE);
 
 	lcui_quit();
@@ -107,5 +107,5 @@ void test_widget_mouse_event(void)
 
 void test_widget_event(void)
 {
-	describe("test widget mouse event", test_widget_mouse_event);
+	ctest_describe("test widget mouse event", test_widget_mouse_event);
 }

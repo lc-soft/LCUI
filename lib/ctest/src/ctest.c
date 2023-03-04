@@ -1,9 +1,8 @@
-﻿#include "ctest.h"
-#include <stdio.h>
+﻿#include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
 #include <yutil.h>
-#include <pandagl.h>
+#include <ctest.h>
 
 #ifdef _WIN32
 #define COLOR_NONE
@@ -30,7 +29,7 @@ static size_t tests_total = 0;
 static int test_msg_indent = 0;
 static int64_t test_start_time = 0;
 
-int test_msg(const char *fmt, ...)
+int ctest_printf(const char *fmt, ...)
 {
 	int ret;
 	char str[1024];
@@ -43,7 +42,7 @@ int test_msg(const char *fmt, ...)
 	return ret;
 }
 
-void test_begin(void)
+void ctest_group_begin(void)
 {
 	if (test_start_time == 0) {
 		test_start_time = get_time_ms();
@@ -51,20 +50,91 @@ void test_begin(void)
 	test_msg_indent++;
 }
 
-void test_end(void)
+void ctest_group_end(void)
 {
 	test_msg_indent--;
 }
 
-int test_result(void)
+void ctest_describe(const char *name, void (*func)())
 {
-	if (tests_total > tests_passed) {
-		return (int)(tests_total - tests_passed);
-	}
-	return 0;
+	ctest_printf("%s\n", name);
+	ctest_group_begin();
+	func();
+	ctest_group_end();
+	ctest_printf("\n");
 }
 
-int print_test_result(void)
+bool ctest_equal(const char *name, int (*to_str)(void *, char *, unsigned),
+		 void *actual, void *expected)
+{
+	char actual_str[256] = { 0 };
+	char expected_str[256] = { 0 };
+
+	to_str(actual, actual_str, 255);
+	to_str(expected, expected_str, 255);
+	if (strncmp(actual_str, expected_str, 255) == 0) {
+		ctest_printf(CHECK_MARK "%s\n", name);
+		tests_passed++;
+		return true;
+	}
+	ctest_printf(RED(ERROR_MARK "%s\n"), name);
+	ctest_printf(GREEN("  + expected ") RED("- actual\n\n"));
+	ctest_printf(RED("  - %s\n"), actual_str);
+	ctest_printf(GREEN("  + %s\n\n"), expected_str);
+	return false;
+}
+
+int ctest_int_to_str(void *data, char *str, unsigned max_len)
+{
+	return snprintf(str, max_len, "%d", *(int *)data);
+}
+
+int ctest_uint_to_str(void *data, char *str, unsigned max_len)
+{
+	return snprintf(str, max_len, "%u", *(unsigned *)data);
+}
+
+int ctest_float_to_str(void *data, char *str, unsigned max_len)
+{
+	return snprintf(str, max_len, "%f", *(float *)data);
+}
+
+int ctest_str_to_str(void *data, char *str, unsigned max_len)
+{
+	return snprintf(str, max_len, "\"%s\"", (char *)data);
+}
+
+int ctest_bool_to_str(void *data, char *str, unsigned max_len)
+{
+	return snprintf(str, max_len, "\"%s\"", data ? "true" : "false");
+}
+
+bool ctest_euqal_int(const char *name, int actual, int expected)
+{
+	return ctest_equal(name, ctest_int_to_str, &actual, &expected);
+}
+
+bool ctest_euqal_bool(const char *name, bool actual, bool expected)
+{
+	return ctest_equal(name, ctest_bool_to_str, &actual, &expected);
+}
+
+bool ctest_euqal_uint(const char *name, unsigned actual, unsigned expected)
+{
+	return ctest_equal(name, ctest_uint_to_str, &actual, &expected);
+}
+
+bool ctest_euqal_float(const char *name, float actual, float expected)
+{
+	return ctest_equal(name, ctest_float_to_str, &actual, &expected);
+}
+
+bool ctest_euqal_str(const char *name, const char *actual, const char *expected)
+{
+	return ctest_equal(name, ctest_str_to_str, (void *)actual, (void *)expected);
+}
+
+int ctest_finish(void)
 {
 	printf(GREEN("  %zu passing") " (%ums)\n", tests_passed,
 	       (unsigned)get_time_delta(test_start_time));
@@ -74,132 +144,4 @@ int print_test_result(void)
 	}
 	printf("\n");
 	return 0;
-}
-
-void describe(const char *name, void (*func)())
-{
-	test_msg("%s\n", name);
-	test_begin();
-	func();
-	test_end();
-	test_msg("\n");
-}
-
-void it_i(const char *name, int actual, int expected)
-{
-	tests_total++;
-	if (actual == expected) {
-		test_msg(CHECK_MARK "%s == %d\n", name, expected);
-		tests_passed++;
-		return;
-	}
-	test_msg(RED(ERROR_MARK "%s == %d\n"), name, expected);
-	test_msg(RED("  AssertionError: %d == %d\n"), actual, expected);
-	test_msg(GREEN("  + expected ") RED("- actual\n\n"));
-	test_msg(RED("  - %d\n"), actual);
-	test_msg(GREEN("  + %d\n\n"), expected);
-}
-
-void it_u(const char *name, unsigned actual, unsigned expected)
-{
-	tests_total++;
-	if (actual == expected) {
-		test_msg(CHECK_MARK "%s == %u\n", name, expected);
-		tests_passed++;
-		return;
-	}
-	test_msg(RED(ERROR_MARK "%s == %u\n"), name, expected);
-	test_msg(RED("  AssertionError: %u == %u\n"), actual, expected);
-	test_msg(GREEN("  + expected ") RED("- actual\n\n"));
-	test_msg(RED("  - %u\n"), actual);
-	test_msg(GREEN("  + %u\n\n"), expected);
-}
-
-void it_b(const char *name, int actual, int expected)
-{
-	const char *actual_str = actual ? "true" : "false";
-	const char *expected_str = expected ? "true" : "false";
-
-	tests_total++;
-	if (!actual == !expected) {
-		test_msg(CHECK_MARK "%s\n", name);
-		tests_passed++;
-		return;
-	}
-	test_msg(RED(ERROR_MARK "%s\n"), name);
-	test_msg(RED("  AssertionError: %s == %s\n"), actual_str, expected_str);
-	test_msg(GREEN("  + expected ") RED("- actual\n\n"));
-	test_msg(RED("  - %s\n"), actual_str);
-	test_msg(GREEN("  + %s\n\n"), expected_str);
-}
-
-void it_s(const char *name, const char *actual, const char *expected)
-{
-	tests_total++;
-	if ((actual && expected && strcmp(actual, expected) == 0) ||
-	    actual == expected) {
-		test_msg(CHECK_MARK "%s == '%s'\n", name, expected);
-		tests_passed++;
-		return;
-	}
-	test_msg(RED(ERROR_MARK "%s == '%s'\n"), name, expected);
-	if (expected) {
-		test_msg(RED("  AssertionError: '%s' == '%s'\n"), actual,
-			 expected);
-	} else {
-		test_msg(RED("  AssertionError: '%s' == null\n"), actual);
-	}
-	test_msg(GREEN("  + expected ") RED("- actual\n\n"));
-	test_msg(RED("  - %s\n"), actual);
-	test_msg(GREEN("  + %s\n\n"), expected);
-}
-
-// TODO: 取消对自定义类型的判断
-
-void it_rectf(const char *name, const ui_rect_t *actual,
-	      const ui_rect_t *expected)
-{
-	tests_total++;
-	if (ui_rect_is_equal(actual, expected)) {
-		test_msg(CHECK_MARK "%s == (%g, %g, %g, %g)\n", name,
-			 expected->x, expected->y, expected->width,
-			 expected->height);
-		tests_passed++;
-		return;
-	}
-	test_msg(RED(ERROR_MARK "%s == (%g, %g, %g, %g)\n"), name, expected->x,
-		 expected->y, expected->width, expected->height);
-	test_msg(
-	    RED("  AssertionError: (%g, %g, %g, %g) == (%g, %g, %g, %g)\n"),
-	    actual->x, actual->y, actual->width, actual->height, expected->x,
-	    expected->y, expected->width, expected->height);
-	test_msg(GREEN("  + expected ") RED("- actual\n\n"));
-	test_msg(RED("  - (%g, %g, %g, %g)\n"), actual->x, actual->y,
-		 actual->width, actual->height);
-	test_msg(GREEN("  + (%g, %g, %g, %g)\n\n"), expected->x, expected->y,
-		 expected->width, expected->height);
-}
-
-void it_rect(const char *name, const pd_rect_t *actual,
-	     const pd_rect_t *expected)
-{
-	tests_total++;
-	if (pd_rect_is_equal(actual, expected)) {
-		test_msg(CHECK_MARK "%s == (%d, %d, %d, %d)\n", name,
-			 expected->x, expected->y, expected->width,
-			 expected->height);
-		tests_passed++;
-		return;
-	}
-	test_msg(RED(ERROR_MARK "%s == (%d, %d, %d, %d)\n"), name, expected->x,
-		 expected->y, expected->width, expected->height);
-	test_msg(
-	    RED("  AssertionError: (%d, %d, %d, %d) == (%d, %d, %d, %d)\n"),
-	    actual->x, actual->y, actual->width, actual->height, expected->x,
-	    expected->y, expected->width, expected->height);
-	test_msg(GREEN("  + expected ") RED("- actual\n\n"));
-	test_msg(RED("  - (%d, %d, %d, %d)\n"), actual->x, actual->y,
-		 actual->width, actual->height);
-	test_msg(GREEN("  + (%d, %d, %d, %d)\n\n"), expected->x, expected->y,
-		 expected->width, expected->height);
 }

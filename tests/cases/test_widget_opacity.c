@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <LCUI.h>
-#include "ctest.h"
+#include <ctest-custom.h>
 
 #define PARENT_OPACITY 0.8f
 #define CHILD_OPACITY 0.5f
@@ -66,14 +66,14 @@ static void check_widget_opactiy(void)
 	color = pd_canvas_get_pixel(&canvas, 10, 10);
 	pd_blend_pixel(&expected_color, &parent_bcolor,
 		       (int)(PARENT_OPACITY * 255));
-	it_b("check parent border color", check_color(expected_color, color),
+	ctest_euqal_bool("check parent border color", check_color(expected_color, color),
 	     TRUE);
 
 	expected_color = bgcolor;
 	color = pd_canvas_get_pixel(&canvas, 30, 30);
 	pd_blend_pixel(&expected_color, &parent_bgcolor,
 		       (int)(PARENT_OPACITY * 255));
-	it_b("check parent background color",
+	ctest_euqal_bool("check parent background color",
 	     check_color(expected_color, color), TRUE);
 
 	tmp = parent_bgcolor;
@@ -81,7 +81,7 @@ static void check_widget_opactiy(void)
 	color = pd_canvas_get_pixel(&canvas, 60, 90);
 	pd_blend_pixel(&tmp, &child_bgcolor, (int)(CHILD_OPACITY * 255));
 	pd_blend_pixel(&expected_color, &tmp, (int)(PARENT_OPACITY * 255));
-	it_b("check child 1 background color",
+	ctest_euqal_bool("check child 1 background color",
 	     check_color(expected_color, color), TRUE);
 
 	tmp = parent_bgcolor;
@@ -89,18 +89,18 @@ static void check_widget_opactiy(void)
 	color = pd_canvas_get_pixel(&canvas, 60, 120);
 	pd_blend_pixel(&tmp, &child_footer_bgcolor, (int)(CHILD_OPACITY * 255));
 	pd_blend_pixel(&expected_color, &tmp, (int)(PARENT_OPACITY * 255));
-	it_b("check child 1 footer background color",
+	ctest_euqal_bool("check child 1 footer background color",
 	     check_color(expected_color, color), TRUE);
 
 	expected_color = bgcolor;
 	color = pd_canvas_get_pixel(&canvas, 220, 90);
 	pd_blend_pixel(&expected_color, &child_bgcolor,
 		       (int)(PARENT_OPACITY * 255));
-	it_b("check child 2 background color",
+	ctest_euqal_bool("check child 2 background color",
 	     check_color(expected_color, color), TRUE);
 	expected_color = child_footer_bgcolor;
 	color = pd_canvas_get_pixel(&canvas, 220, 120);
-	it_b("check child 2 footer background color",
+	ctest_euqal_bool("check child 2 footer background color",
 	     check_color(expected_color, color), TRUE);
 
 	pd_canvas_destroy(&canvas);
@@ -111,7 +111,7 @@ void test_widget_opacity(void)
 	lcui_init();
 
 	build();
-	describe("check widget opacity", check_widget_opactiy);
+	ctest_describe("check widget opacity", check_widget_opactiy);
 	lcui_quit();
 	lcui_main();
 }
