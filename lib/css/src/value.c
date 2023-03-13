@@ -10,11 +10,13 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <assert.h>
-#include "../include/css/keywords.h"
-#include "../include/css/library.h"
-#include "../include/css/style_value.h"
-#include "../include/css/value.h"
-#include "./dump.h"
+#include <css/keywords.h>
+#include <css/library.h>
+#include <css/style_value.h>
+#include <css/value.h>
+#include "parser.h"
+#include "dump.h"
+#include "debug.h"
 
 #define CSS_VALDEF_PARSER_ERROR_SIZE 256
 
@@ -91,7 +93,7 @@ static struct css_value_module_t {
 	dict_t *types;
 } css_value;
 
-static LCUI_BOOL css_valdef_has_children(css_valdef_t *valdef)
+static libcss_bool_t css_valdef_has_children(css_valdef_t *valdef)
 {
 	switch (valdef->sign) {
 	case CSS_VALDEF_SIGN_JUXTAPOSITION:
@@ -99,7 +101,7 @@ static LCUI_BOOL css_valdef_has_children(css_valdef_t *valdef)
 	case CSS_VALDEF_SIGN_DOUBLE_BAR:
 	case CSS_VALDEF_SIGN_SINGLE_BAR:
 	case CSS_VALDEF_SIGN_BRACKETS:
-		return TRUE;
+		return LIBCSS_TRUE;
 	default:
 		break;
 	}
@@ -250,7 +252,7 @@ void css_valdef_parser_destroy(css_valdef_parser_t *parser)
 	free(parser);
 }
 
-INLINE void css_valdef_parser_get_char(css_valdef_parser_t *parser)
+LIBCSS_INLINE void css_valdef_parser_get_char(css_valdef_parser_t *parser)
 {
 	parser->buffer[parser->pos++] = *(parser->cur);
 	parser->buffer[parser->pos] = 0;
@@ -269,14 +271,14 @@ static int css_valdef_parser_error(css_valdef_parser_t *parser, const char *fmt,
 	return -1;
 }
 
-INLINE css_valdef_t *css_valdef_parser_get_parent_valdef(
+LIBCSS_INLINE css_valdef_t *css_valdef_parser_get_parent_valdef(
     css_valdef_parser_t *parser)
 {
 	assert(parser->valdef_parents.tail.prev);
 	return parser->valdef_parents.tail.prev->data;
 }
 
-INLINE void css_valdef_parser_reset_buffer(css_valdef_parser_t *parser)
+LIBCSS_INLINE void css_valdef_parser_reset_buffer(css_valdef_parser_t *parser)
 {
 	parser->buffer[0] = 0;
 	parser->pos = 0;

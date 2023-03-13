@@ -1,5 +1,5 @@
 ﻿#include <errno.h>
-#include "../include/css/keywords.h"
+#include <css/keywords.h>
 
 typedef struct css_keyword_t {
 	int key;
@@ -146,7 +146,6 @@ void css_init_keywords(void)
 	css_set_keyword(CSS_KEYWORD_CONTENT_BOX, "content-box");
 	css_set_keyword(CSS_KEYWORD_PADDING_BOX, "padding-box");
 	css_set_keyword(CSS_KEYWORD_BORDER_BOX, "border-box");
-	css_set_keyword(CSS_KEYWORD_GRAPH_BOX, "graph-box");
 
 	css_set_keyword(CSS_KEYWORD_SOLID, "solid");
 	css_set_keyword(CSS_KEYWORD_DOTTED, "dotted");

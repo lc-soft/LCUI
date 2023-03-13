@@ -1,8 +1,8 @@
 ﻿// #define UI_DEBUG_ENABLED
 #include <string.h>
 #include <time.h>
-#include <LCUI/css/selector.h>
-#include <LCUI/css/style_decl.h>
+#include <css/selector.h>
+#include <css/style_decl.h>
 #include "internal.h"
 #include "ui_debug.h"
 

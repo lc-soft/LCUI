@@ -1,6 +1,6 @@
 ﻿#include <stdio.h>
 #include <LCUI.h>
-#include <LCUI/css.h>
+#include <css.h>
 #include <pandagl.h>
 #include "../include/ui.h"
 #include "internal.h"

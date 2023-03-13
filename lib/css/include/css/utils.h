@@ -1,15 +1,15 @@
 ﻿#ifndef LIBCSS_INCLUDE_CSS_UTILS_H
 #define LIBCSS_INCLUDE_CSS_UTILS_H
 
-#include <LCUI/def.h>
-#include "def.h"
+#include "common.h"
+#include "types.h"
 
-LCUI_BEGIN_HEADER
+LIBCSS_BEGIN_DECLS
 
-LCUI_API LCUI_BOOL css_parse_font_weight(const char *str, int *weight);
+LIBCSS_PUBLIC libcss_bool_t css_parse_font_weight(const char *str, int *weight);
 
-LCUI_API LCUI_BOOL css_parse_font_style(const char *str, int *style);
+LIBCSS_PUBLIC libcss_bool_t css_parse_font_style(const char *str, int *style);
 
-LCUI_END_HEADER
+LIBCSS_END_DECLS
 
 #endif

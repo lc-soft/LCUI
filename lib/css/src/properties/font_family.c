@@ -1,6 +1,4 @@
-#include "../../include/css/computed.h"
-#include "../../include/css/properties.h"
-#include "../../include/css/style_value.h"
+#include "../properties.h"
 #include "./helpers.h"
 
 int css_cascade_font_family(const css_style_array_value_t input,

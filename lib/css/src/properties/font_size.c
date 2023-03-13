@@ -1,5 +1,4 @@
-#include "../../include/css/computed.h"
-#include "../../include/css/properties.h"
+#include "../properties.h"
 #include "./helpers.h"
 
 int css_cascade_font_size(const css_style_array_value_t input,

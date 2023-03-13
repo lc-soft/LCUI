@@ -1,5 +1,5 @@
 ﻿#include <assert.h>
-#include <LCUI/css.h>
+#include <css.h>
 #include "../include/ui.h"
 #include "internal.h"
 

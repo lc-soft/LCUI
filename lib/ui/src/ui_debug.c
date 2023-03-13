@@ -1,5 +1,5 @@
 #include "./internal.h"
-#include <LCUI/css.h>
+#include <css.h>
 #include <stdio.h>
 
 int ui_debug_msg_indent = 0;

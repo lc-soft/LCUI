@@ -6,9 +6,10 @@ add_rpathdirs("@loader_path/lib", "@loader_path")
 add_requires("libomp", "libxml2", "libx11", {optional = true})
 add_defines("LCUI_EXPORTS", "YUTIL_EXPORTS", "UNICODE", "_CRT_SECURE_NO_WARNINGS")
 add_includedirs(
-    "lib/ctest/include/",
+    "lib/ctest/include",
     "lib/yutil/include",
     "lib/pandagl/include",
+    "lib/css/include",
     "include"
 )
 includes("lib/*/xmake.lua")
@@ -109,8 +110,6 @@ target("headers")
     before_build(function (target)
         -- Copy the header file of the internal library to the LCUI header file directory
         os.cp("$(projectdir)/lib/thread/include/*.h", "$(projectdir)/include/LCUI/")
-        os.cp("$(projectdir)/lib/css/include/*.h", "$(projectdir)/include/LCUI/")
-        os.cp("$(projectdir)/lib/css/include/css/*.h", "$(projectdir)/include/LCUI/css/")
         os.cp("$(projectdir)/lib/ui/include/*.h", "$(projectdir)/include/LCUI/")
         os.cp("$(projectdir)/lib/ui-widgets/include/*.h", "$(projectdir)/include/LCUI/ui/widgets/")
         os.cp("$(projectdir)/lib/ui-cursor/include/*.h", "$(projectdir)/include/LCUI/ui/")

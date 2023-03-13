@@ -1,10 +1,10 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include "../include/css/keywords.h"
-#include "../include/css/value.h"
-#include "../include/css/library.h"
-#include "../include/css/properties.h"
+#include <css/keywords.h>
+#include <css/value.h>
+#include <css/library.h>
+#include <css/properties.h>
 #include "./dump.h"
 
 unsigned css_array_value_get_length(const css_style_array_value_t val)

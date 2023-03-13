@@ -32,7 +32,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../include/css.h"
+#include <css.h>
+#include "parser.h"
+#include "debug.h"
 
 css_parser_t *css_parser_create(size_t buffer_size, const char *space)
 {
@@ -83,10 +85,10 @@ int css_parser_begin_parse_comment(css_parser_t *parser)
 {
 	switch (*(parser->cur + 1)) {
 	case '/':
-		parser->comment_parser.is_line_comment = TRUE;
+		parser->comment_parser.is_line_comment = LIBCSS_TRUE;
 		break;
 	case '*':
-		parser->comment_parser.is_line_comment = FALSE;
+		parser->comment_parser.is_line_comment = LIBCSS_FALSE;
 		break;
 	default:
 		css_parser_get_char(parser);

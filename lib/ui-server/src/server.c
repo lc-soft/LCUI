@@ -6,7 +6,7 @@
 #include <pandagl.h>
 #include <LCUI/ui/cursor.h>
 #include <LCUI/config.h>
-#include <LCUI/css/computed.h>
+#include <css/computed.h>
 #include "../include/server.h"
 
 #ifdef ENABLE_OPENMP
@@ -177,7 +177,7 @@ static void ui_server_on_window_paint(app_event_t *e, void *arg)
 		}
 		ui_convert_rect(&e->paint.rect, &rect, ui_metrics.scale);
 		ui_widget_mark_dirty_rect(conn->widget, &rect,
-					  CSS_KEYWORD_GRAPH_BOX);
+					  UI_BOX_TYPE_GRAPH_BOX);
 	}
 }
 
@@ -203,7 +203,7 @@ static void ui_server_on_window_resize(app_event_t *e, void *arg)
 			return;
 		}
 	}
-	ui_widget_mark_dirty_rect(conn->widget, NULL, CSS_KEYWORD_GRAPH_BOX);
+	ui_widget_mark_dirty_rect(conn->widget, NULL, UI_BOX_TYPE_GRAPH_BOX);
 	ui_widget_resize(conn->widget, width, height);
 	logger_debug("[ui-server] on_window_resize, widget: (%p, %s), size "
 		     "(%g, %g), window: %p\n",
@@ -271,7 +271,7 @@ static void ui_server_refresh_window(ui_connection_t *conn)
 {
 	pd_rect_t rect;
 
-	ui_widget_mark_dirty_rect(conn->widget, NULL, CSS_KEYWORD_GRAPH_BOX);
+	ui_widget_mark_dirty_rect(conn->widget, NULL, UI_BOX_TYPE_GRAPH_BOX);
 	ui_compute_rect(&rect, &conn->widget->canvas_box);
 	app_window_set_title(conn->window, conn->widget->title);
 	app_window_set_size(conn->window, rect.width, rect.height);

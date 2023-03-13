@@ -33,7 +33,7 @@
 #include <string.h>
 #include <errno.h>
 #include <pandagl.h>
-#include <LCUI/css.h>
+#include <css.h>
 #include "./internal.h"
 #include "../include/textview.h"
 
@@ -105,7 +105,7 @@ static void ui_textview_on_update(ui_widget_t *w)
 	pd_text_update(txt->layer, &rects);
 	for (list_each(node, &rects)) {
 		ui_convert_rect(node->data, &rect, 1.0f / scale);
-		ui_widget_mark_dirty_rect(w, &rect, CSS_KEYWORD_CONTENT_BOX);
+		ui_widget_mark_dirty_rect(w, &rect, UI_BOX_TYPE_CONTENT_BOX);
 	}
 	pd_rects_clear(&rects);
 	ui_widget_add_task(w, UI_TASK_REFLOW);
@@ -237,7 +237,7 @@ static void ui_textview_on_resize(ui_widget_t *w, float width, float height)
 	pd_text_update(txt->layer, &rects);
 	for (list_each(node, &rects)) {
 		ui_convert_rect(node->data, &rect, 1.0f / scale);
-		ui_widget_mark_dirty_rect(w, &rect, CSS_KEYWORD_CONTENT_BOX);
+		ui_widget_mark_dirty_rect(w, &rect, UI_BOX_TYPE_CONTENT_BOX);
 	}
 	pd_rects_clear(&rects);
 }

@@ -32,7 +32,7 @@
 #include <LCUI.h>
 #include <LCUI/timer.h>
 #include <LCUI/ui.h>
-#include <LCUI/css.h>
+#include <css.h>
 #include "../include/textedit.h"
 
 typedef struct ui_textcaret_task_t {

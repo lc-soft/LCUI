@@ -2,21 +2,21 @@
 #ifndef LIBCSS_INCLUDE_CSS_DATA_TYPES_H
 #define LIBCSS_INCLUDE_CSS_DATA_TYPES_H
 
-#include <LCUI/def.h>
-#include "def.h"
+#include "common.h"
+#include "types.h"
 
-LCUI_BEGIN_HEADER
+LIBCSS_BEGIN_DECLS
 
-LCUI_API LCUI_BOOL css_parse_numeric_value(css_style_value_t *s,
+LIBCSS_PUBLIC libcss_bool_t css_parse_numeric_value(css_style_value_t *s,
 					   const char *str);
-LCUI_API LCUI_BOOL css_parse_unit_value(css_style_value_t *s, const char *str);
-LCUI_API LCUI_BOOL css_parse_string_value(css_style_value_t *val,
+LIBCSS_PUBLIC libcss_bool_t css_parse_unit_value(css_style_value_t *s, const char *str);
+LIBCSS_PUBLIC libcss_bool_t css_parse_string_value(css_style_value_t *val,
 					  const char *str);
-LCUI_API LCUI_BOOL css_parse_url_value(css_style_value_t *s, const char *str);
-LCUI_API LCUI_BOOL css_parse_color_value(css_style_value_t *val,
+LIBCSS_PUBLIC libcss_bool_t css_parse_url_value(css_style_value_t *s, const char *str);
+LIBCSS_PUBLIC libcss_bool_t css_parse_color_value(css_style_value_t *val,
 					 const char *str);
-LCUI_API void css_init_data_types(void);
+LIBCSS_PUBLIC void css_init_data_types(void);
 
-LCUI_END_HEADER
+LIBCSS_END_DECLS
 
 #endif

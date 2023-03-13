@@ -1,8 +1,4 @@
-﻿#include "../../include/css/computed.h"
-#include "../../include/css/properties.h"
-#include "../../include/css/style_value.h"
-#include "../../include/css/style_decl.h"
-#include "../../include/css/value.h"
+﻿#include "../properties.h"
 
 int css_cascade_background_color(const css_style_array_value_t input,
 				 css_computed_style_t *s)

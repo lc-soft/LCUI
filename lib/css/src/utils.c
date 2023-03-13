@@ -31,33 +31,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../include/css/utils.h"
+#include <css/utils.h>
 
-LCUI_BOOL css_parse_font_weight(const char *str, int *weight)
+libcss_bool_t css_parse_font_weight(const char *str, int *weight)
 {
 	int value;
 	// TODO
 	if (strcmp(str, "normal") == 0) {
 		*weight = CSS_FONT_WEIGHT_NORMAL;
-		return TRUE;
+		return LIBCSS_TRUE;
 	}
 	if (strcmp(str, "bold") == 0) {
 		*weight = CSS_FONT_WEIGHT_BOLD;
-		return TRUE;
+		return LIBCSS_TRUE;
 	}
 	if (sscanf(str, "%d", &value) != 1) {
 		*weight = CSS_FONT_WEIGHT_NORMAL;
-		return FALSE;
+		return LIBCSS_FALSE;
 	}
 	if (value < 100) {
 		*weight = CSS_FONT_WEIGHT_100;
-		return TRUE;
+		return LIBCSS_TRUE;
 	}
 	*weight = y_iround(value / 100.0) * 100;
-	return TRUE;
+	return LIBCSS_TRUE;
 }
 
-LCUI_BOOL css_parse_font_style(const char *str, int *style)
+libcss_bool_t css_parse_font_style(const char *str, int *style)
 {
 	char value[64] = "";
 	// TODO
@@ -69,7 +69,7 @@ LCUI_BOOL css_parse_font_style(const char *str, int *style)
 	} else if (strcmp(value, "oblique") == 0) {
 		*style = CSS_FONT_STYLE_OBLIQUE;
 	} else {
-		return FALSE;
+		return LIBCSS_FALSE;
 	}
-	return TRUE;
+	return LIBCSS_TRUE;
 }

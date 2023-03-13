@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <LCUI/ui.h>
-#include <LCUI/css.h>
+#include <css.h>
 #include "../include/button.h"
 #include "../include/textview.h"
 

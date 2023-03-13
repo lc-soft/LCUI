@@ -1,7 +1,16 @@
+set_version("0.1.0-a")
+
 target("libcss")
     set_kind("$(kind)")
     add_files("src/**.c")
+    set_configdir("include/css")
+    add_configfiles("src/config.h.in")
     add_deps("yutil")
+    if is_kind("static") then
+        set_configvar("LIBCSS_STATIC_BUILD", 1)
+    elseif is_plat("windows") then
+        add_defines("LIBCSS_DLL_EXPORT")
+    end
 
 target("libcss_tests")
     set_kind("binary")

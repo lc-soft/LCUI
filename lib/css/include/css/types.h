@@ -1,20 +1,17 @@
 ﻿#ifndef LIBCSS_INCLUDE_CSS_DEF_H
 #define LIBCSS_INCLUDE_CSS_DEF_H
 
-#include <LCUI/def.h>
 #include <yutil.h>
-#include <pandagl/types.h>
 
 #define CSS_SELECTOR_MAX_LEN 1024
 #define CSS_SELECTOR_MAX_DEPTH 32
 
 #define css_string(...) "" #__VA_ARGS__ ""
 
-#define CASE_WHITE_SPACE \
-	case ' ':        \
-	case '\n':       \
-	case '\r':       \
-	case '\t'
+typedef unsigned char libcss_bool_t;
+
+#define LIBCSS_FALSE 0
+#define LIBCSS_TRUE 1
 
 typedef enum {
 	// position start
@@ -465,11 +462,51 @@ typedef enum {
 	CSS_POINTER_EVENTS_NONE
 } css_pointer_events_t;
 
-/* FIXME: remove css_keyword_value_t
- * These values do not need to put in css_keyword_value_t, because they are not
- * strongly related and should be defined separately where they are needed.
- */
+typedef enum css_style_value_type_t {
+	CSS_NO_VALUE,
+	CSS_INVALID_VALUE,
+	CSS_UNPARSED_VALUE,
+	CSS_ARRAY_VALUE,
 
+	CSS_NUMERIC_VALUE,
+	CSS_STRING_VALUE,
+	CSS_KEYWORD_VALUE,
+	CSS_COLOR_VALUE,
+	CSS_IMAGE_VALUE,
+
+	CSS_UNIT_VALUE,
+	CSS_BOOLEAN_VALUE,
+} css_style_value_type_t;
+
+typedef char *css_image_value_t;
+typedef char *css_unparsed_value_t;
+typedef char *css_string_value_t;
+typedef int32_t css_integer_value_t;
+typedef float css_numeric_value_t;
+typedef uint32_t css_color_value_t;
+typedef void *css_private_value_t;
+typedef int css_boolean_value_t;
+
+typedef enum {
+	CSS_UNIT_PX,
+	CSS_UNIT_PERCENT,
+	CSS_UNIT_DIP,
+	CSS_UNIT_SP,
+	CSS_UNIT_PT
+} css_unit_t;
+
+typedef int32_t css_unit_ident_t;
+
+// TODO: 优化内存占用
+
+/** https://developer.mozilla.org/en-US/docs/Web/API/CSSUnitValue */
+typedef struct css_unit_value_t {
+	css_numeric_value_t value;
+	css_unit_t unit;
+} css_unit_value_t;
+
+typedef struct css_style_value_t css_style_value_t;
+typedef css_style_value_t *css_style_array_value_t;
 typedef enum css_keyword_value_t {
 	CSS_KEYWORD_INHERIT,
 	CSS_KEYWORD_INITIAL,
@@ -522,7 +559,6 @@ typedef enum css_keyword_value_t {
 	CSS_KEYWORD_CONTENT_BOX,
 	CSS_KEYWORD_PADDING_BOX,
 	CSS_KEYWORD_BORDER_BOX,
-	CSS_KEYWORD_GRAPH_BOX,
 
 	CSS_KEYWORD_SOLID,
 	CSS_KEYWORD_DOTTED,
@@ -536,52 +572,6 @@ typedef enum css_keyword_value_t {
 	CSS_KEYWORD_REPEAT_X,
 	CSS_KEYWORD_REPEAT_Y
 } css_keyword_value_t;
-
-typedef enum css_style_value_type_t {
-	CSS_NO_VALUE,
-	CSS_INVALID_VALUE,
-	CSS_UNPARSED_VALUE,
-	CSS_ARRAY_VALUE,
-
-	CSS_NUMERIC_VALUE,
-	CSS_STRING_VALUE,
-	CSS_KEYWORD_VALUE,
-	CSS_COLOR_VALUE,
-	CSS_IMAGE_VALUE,
-
-	CSS_UNIT_VALUE,
-	CSS_BOOLEAN_VALUE,
-} css_style_value_type_t;
-
-typedef char *css_image_value_t;
-typedef char *css_unparsed_value_t;
-typedef char *css_string_value_t;
-typedef int32_t css_integer_value_t;
-typedef float css_numeric_value_t;
-typedef uint32_t css_color_value_t;
-typedef void *css_private_value_t;
-typedef int css_boolean_value_t;
-
-typedef enum {
-	CSS_UNIT_PX,
-	CSS_UNIT_PERCENT,
-	CSS_UNIT_DIP,
-	CSS_UNIT_SP,
-	CSS_UNIT_PT
-} css_unit_t;
-
-typedef int32_t css_unit_ident_t;
-
-// TODO: 优化内存占用
-
-/** https://developer.mozilla.org/en-US/docs/Web/API/CSSUnitValue */
-typedef struct css_unit_value_t {
-	css_numeric_value_t value;
-	css_unit_t unit;
-} css_unit_value_t;
-
-typedef struct css_style_value_t css_style_value_t;
-typedef css_style_value_t *css_style_array_value_t;
 
 /** https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleValue */
 struct css_style_value_t {
@@ -855,7 +845,7 @@ struct css_propdef_t {
 	int (*cascade)(const css_style_array_value_t, css_computed_style_t *);
 };
 
-typedef LCUI_BOOL (*css_value_parse_func_t)(css_style_value_t *, const char *);
+typedef libcss_bool_t (*css_value_parse_func_t)(css_style_value_t *, const char *);
 
 typedef struct css_value_type_record_t css_value_type_record_t;
 

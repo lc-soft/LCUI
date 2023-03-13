@@ -774,7 +774,7 @@ static ui_widget_t *ui_resolve_event_target(float x, float y)
 		target = ui_events.mouse_capturer;
 	} else {
 		target =
-		    ui_widget_get_event_target(root, x, y, CSS_KEYWORD_AUTO);
+		    ui_widget_get_event_target(root, x, y, CSS_POINTER_EVENTS_AUTO);
 	}
 	for (w = target; w; w = w->parent) {
 		if (w->event_blocked) {

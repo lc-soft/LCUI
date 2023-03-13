@@ -1,7 +1,7 @@
-#include <stdio.h>
+﻿#include <stdio.h>
+#include <css.h>
 #include "test.h"
 #include "ctest.h"
-#include "../include/css.h"
 
 static void test_css_valdef_string(const css_valdef_t *valdef)
 {
