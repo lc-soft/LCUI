@@ -1,5 +1,5 @@
 ﻿#include <errno.h>
-#include "../include/css/selector.h"
+#include <css/selector.h>
 
 #define MAX_NAME_LEN 256
 
@@ -358,7 +358,7 @@ css_selector_t *css_selector_create(const char *selector)
 	int ni, si, rank;
 	static int batch_num = 0;
 	char type = 0, name[MAX_NAME_LEN];
-	LCUI_BOOL is_saving = FALSE;
+	libcss_bool_t is_saving = LIBCSS_FALSE;
 	css_selector_node_t *node = NULL;
 	css_selector_t *s = calloc(sizeof(css_selector_t), 1);
 
@@ -385,13 +385,13 @@ css_selector_t *css_selector_create(const char *selector)
 		case '.':
 		case '#':
 			if (!is_saving) {
-				is_saving = TRUE;
+				is_saving = LIBCSS_TRUE;
 				type = *p;
 				continue;
 			}
 			/* 保存上个结点 */
 			rank = SelectorNode_Save(node, name, ni, type);
-			is_saving = TRUE;
+			is_saving = LIBCSS_TRUE;
 			type = *p;
 			if (rank > 0) {
 				s->rank += rank;
@@ -413,7 +413,7 @@ css_selector_t *css_selector_create(const char *selector)
 				node = NULL;
 				continue;
 			}
-			is_saving = FALSE;
+			is_saving = LIBCSS_FALSE;
 			rank = SelectorNode_Save(node, name, ni, type);
 			if (rank > 0) {
 				css_selector_node_update(node);
@@ -437,7 +437,7 @@ css_selector_t *css_selector_create(const char *selector)
 		    (*p >= '0' && *p <= '9')) {
 			if (!is_saving) {
 				type = 0;
-				is_saving = TRUE;
+				is_saving = LIBCSS_TRUE;
 			}
 			name[ni++] = *p;
 			name[ni] = 0;

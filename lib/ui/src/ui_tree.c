@@ -1,6 +1,6 @@
 ﻿#include <assert.h>
 #include <string.h>
-#include <LCUI/css/selector.h>
+#include <css/selector.h>
 #include "internal.h"
 
 #define TYPE_CHILD_LIST UI_MUTATION_RECORD_TYPE_CHILD_LIST
@@ -220,7 +220,7 @@ void ui_widget_empty(ui_widget_t* w)
 		ui_trash_add(child);
 	}
 	list_destroy_without_node(&w->stacking_context, NULL);
-	ui_widget_mark_dirty_rect(w, NULL, CSS_KEYWORD_GRAPH_BOX);
+	ui_widget_mark_dirty_rect(w, NULL, UI_BOX_TYPE_GRAPH_BOX);
 	ui_widget_refresh_style(w);
 }
 
@@ -245,7 +245,7 @@ void ui_widget_remove(ui_widget_t* w)
 		ui_widget_add_task(w->parent, UI_TASK_REFLOW);
 	}
 	ui_widget_mark_dirty_rect(w->parent, &w->canvas_box,
-				  CSS_KEYWORD_CONTENT_BOX);
+				  UI_BOX_TYPE_CONTENT_BOX);
 	ui_widget_unlink(w);
 	ui_trash_add(w);
 }

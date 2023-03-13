@@ -1,5 +1,4 @@
-#include "../../include/css/computed.h"
-#include "../../include/css/properties.h"
+#include "../properties.h"
 #include "./helpers.h"
 
 static void set_right(css_computed_style_t* computed, uint8_t keyword,

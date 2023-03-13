@@ -1,4 +1,4 @@
-﻿#include <LCUI/css/computed.h>
+﻿#include <css/computed.h>
 #include "../include/ui.h"
 #include "./ui_debug.h"
 

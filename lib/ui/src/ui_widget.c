@@ -1,6 +1,6 @@
 ﻿#include <string.h>
 #include <assert.h>
-#include <LCUI/css/style_value.h>
+#include <css/style_value.h>
 #include "internal.h"
 
 static void ui_widget_destroy_children(ui_widget_t* w);

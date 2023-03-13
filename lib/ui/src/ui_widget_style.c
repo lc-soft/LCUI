@@ -1,6 +1,7 @@
 ﻿#include <string.h>
-#include <LCUI/css.h>
+#include <css.h>
 #include "internal.h"
+
 
 css_selector_node_t *ui_widget_create_selector_node(ui_widget_t *w)
 {
@@ -245,7 +246,7 @@ static void ui_widget_on_background_image_load(ui_image_t *image, void *data)
 	css_computed_style_t *s = &w->computed_style;
 	pd_canvas_t *img = (pd_canvas_t *)image;
 
-	ui_widget_mark_dirty_rect(w, NULL, CSS_KEYWORD_BORDER_BOX);
+	ui_widget_mark_dirty_rect(w, NULL, UI_BOX_TYPE_BORDER_BOX);
 	if (!image) {
 		return;
 	}

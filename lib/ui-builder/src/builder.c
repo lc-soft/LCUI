@@ -33,7 +33,7 @@
 #include <LCUI/config.h>
 #include <LCUI.h>
 #include <LCUI/ui.h>
-#include <LCUI/css.h>
+#include <css.h>
 #include <pandagl.h>
 #include "../include/builder.h"
 

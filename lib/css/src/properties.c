@@ -1,8 +1,8 @@
 ﻿#include <errno.h>
-#include "../include/css/properties.h"
-#include "../include/css/value.h"
-#include "../include/css/style_value.h"
-#include "../include/css/computed.h"
+#include <css/properties.h>
+#include <css/value.h>
+#include <css/style_value.h>
+#include <css/computed.h>
 
 #define DEFINE_PROP(PROP_KEY, PROP_NAME, VALDEF, INIT)                        \
 	extern int css_cascade_##PROP_KEY(const css_style_array_value_t,      \

@@ -1,17 +1,18 @@
 ﻿#include <stdio.h>
 #include <string.h>
-#include "../include/css/value.h"
-#include "../include/css/data_types.h"
-#include "../include/css/style_value.h"
-#include "../include/css/utils.h"
+#include <css/value.h>
+#include <css/data_types.h>
+#include <css/style_value.h>
+#include <css/utils.h>
+#include "parser.h"
 
-LCUI_BOOL css_parse_numeric_value(css_style_value_t *s, const char *str)
+libcss_bool_t css_parse_numeric_value(css_style_value_t *s, const char *str)
 {
 	s->type = CSS_NUMERIC_VALUE;
 	return sscanf(str, "%f", &s->numeric_value) == 1;
 }
 
-LCUI_BOOL css_parse_integer_value(css_style_value_t *s, const char *str)
+libcss_bool_t css_parse_integer_value(css_style_value_t *s, const char *str)
 {
 	int num;
 	s->type = CSS_NUMERIC_VALUE;
@@ -22,17 +23,17 @@ LCUI_BOOL css_parse_integer_value(css_style_value_t *s, const char *str)
 	return 0;
 }
 
-LCUI_BOOL css_parse_unit_value(css_style_value_t *s, const char *str)
+libcss_bool_t css_parse_unit_value(css_style_value_t *s, const char *str)
 {
 	int n = 0;
 	const char *p;
 	char num_str[32] = { 0 };
 	char unit[4];
 	css_numeric_value_t num;
-	LCUI_BOOL has_point = FALSE;
+	libcss_bool_t has_point = LIBCSS_FALSE;
 
 	if (str == NULL) {
-		return FALSE;
+		return LIBCSS_FALSE;
 	}
 	/* 先取出数值 */
 	for (p = str; *p && n < 30; ++p) {
@@ -48,14 +49,14 @@ LCUI_BOOL css_parse_unit_value(css_style_value_t *s, const char *str)
 				n = 0;
 				break;
 			}
-			has_point = TRUE;
+			has_point = LIBCSS_TRUE;
 		} else {
 			break;
 		}
 		num_str[n++] = *p;
 	}
 	if (n == 0) {
-		return FALSE;
+		return LIBCSS_FALSE;
 	}
 	strncpy(unit, p, 4);
 	sscanf(num_str, "%f", &num);
@@ -70,35 +71,35 @@ LCUI_BOOL css_parse_unit_value(css_style_value_t *s, const char *str)
 	} else if (strncmp(unit, "pt", 4) == 0) {
 		s->unit_value.unit = CSS_UNIT_PT;
 	} else {
-		return FALSE;
+		return LIBCSS_FALSE;
 	}
 	num_str[n] = 0;
 	s->type = CSS_UNIT_VALUE;
 	s->unit_value.value = num;
-	return TRUE;
+	return LIBCSS_TRUE;
 }
 
-LCUI_BOOL css_parse_percentage_value(css_style_value_t *s, const char *str)
+libcss_bool_t css_parse_percentage_value(css_style_value_t *s, const char *str)
 {
 	if (css_parse_unit_value(s, str) &&
 	    s->unit_value.unit == CSS_UNIT_PERCENT) {
-		return TRUE;
+		return LIBCSS_TRUE;
 	}
 	s->type = CSS_INVALID_VALUE;
-	return FALSE;
+	return LIBCSS_FALSE;
 }
 
-LCUI_BOOL css_parse_length_value(css_style_value_t *s, const char *str)
+libcss_bool_t css_parse_length_value(css_style_value_t *s, const char *str)
 {
 	if (css_parse_unit_value(s, str) &&
 	    s->unit_value.unit != CSS_UNIT_PERCENT) {
-		return TRUE;
+		return LIBCSS_TRUE;
 	}
 	s->type = CSS_INVALID_VALUE;
-	return FALSE;
+	return LIBCSS_FALSE;
 }
 
-LCUI_BOOL css_parse_string_value(css_style_value_t *val, const char *str)
+libcss_bool_t css_parse_string_value(css_style_value_t *val, const char *str)
 {
 	size_t len;
 
@@ -114,10 +115,10 @@ LCUI_BOOL css_parse_string_value(css_style_value_t *val, const char *str)
 	} else {
 		val->string_value = NULL;
 	}
-	return TRUE;
+	return LIBCSS_TRUE;
 }
 
-LCUI_BOOL css_parse_url_value(css_style_value_t *s, const char *str)
+libcss_bool_t css_parse_url_value(css_style_value_t *s, const char *str)
 {
 	size_t n;
 	const char *p, *head, *tail;
@@ -125,14 +126,14 @@ LCUI_BOOL css_parse_url_value(css_style_value_t *s, const char *str)
 	p = str;
 	tail = head = strstr(p, "url(");
 	if (!head) {
-		return FALSE;
+		return LIBCSS_FALSE;
 	}
 	while (p) {
 		tail = p;
 		p = strstr(p + 1, ")");
 	}
 	if (tail == head) {
-		return FALSE;
+		return LIBCSS_FALSE;
 	}
 	head += 4;
 	if (*head == '"') {
@@ -141,7 +142,7 @@ LCUI_BOOL css_parse_url_value(css_style_value_t *s, const char *str)
 	n = tail - head;
 	s->string_value = malloc((n + 1) * sizeof(char));
 	if (!s->string_value) {
-		return FALSE;
+		return LIBCSS_FALSE;
 	}
 	strncpy(s->string_value, head, n);
 	s->string_value[n] = 0;
@@ -150,22 +151,22 @@ LCUI_BOOL css_parse_url_value(css_style_value_t *s, const char *str)
 		s->string_value[n] = 0;
 	}
 	s->type = CSS_STRING_VALUE;
-	return TRUE;
+	return LIBCSS_TRUE;
 }
 
-static LCUI_BOOL css_parse_rgba(css_style_value_t *val, const char *str)
+static libcss_bool_t css_parse_rgba(css_style_value_t *val, const char *str)
 {
 	float data[4];
 	char num_str[16];
 	int i, j, count;
 
 	if (!strstr(str, "rgba(")) {
-		return FALSE;
+		return LIBCSS_FALSE;
 	}
 	for (count = 0, i = 5, j = 0; str[i]; ++i) {
 		if (str[i] == ',' || str[i] == ')') {
 			if (sscanf(num_str, "%f", &data[count++]) != 1) {
-				return FALSE;
+				return LIBCSS_FALSE;
 			}
 			j = 0;
 			if (str[i] == ')') {
@@ -179,27 +180,27 @@ static LCUI_BOOL css_parse_rgba(css_style_value_t *val, const char *str)
 		}
 	}
 	if (count != 4) {
-		return FALSE;
+		return LIBCSS_FALSE;
 	}
 	val->type = CSS_COLOR_VALUE;
 	val->color_value = css_color((uint8_t)(255 * data[3]), (uint8_t)data[0],
 				     (uint8_t)data[1], (uint8_t)data[2]);
-	return TRUE;
+	return LIBCSS_TRUE;
 }
 
-static LCUI_BOOL css_parse_rgb(css_style_value_t *val, const char *str)
+static libcss_bool_t css_parse_rgb(css_style_value_t *val, const char *str)
 {
 	float data[3];
 	char num_str[16];
 	int i, j, count;
 
 	if (!strstr(str, "rgb(")) {
-		return FALSE;
+		return LIBCSS_FALSE;
 	}
 	for (count = 0, i = 4, j = 0; str[i]; ++i) {
 		if (str[i] == ',' || str[i] == ')') {
 			if (sscanf(num_str, "%f", &data[count++]) != 1) {
-				return FALSE;
+				return LIBCSS_FALSE;
 			}
 			j = 0;
 			if (str[i] == ')') {
@@ -213,15 +214,15 @@ static LCUI_BOOL css_parse_rgb(css_style_value_t *val, const char *str)
 		}
 	}
 	if (count != 3) {
-		return FALSE;
+		return LIBCSS_FALSE;
 	}
 	val->type = CSS_COLOR_VALUE;
 	val->color_value = css_color(255, (uint8_t)data[0], (uint8_t)data[1],
 				     (uint8_t)data[2]);
-	return TRUE;
+	return LIBCSS_TRUE;
 }
 
-LCUI_BOOL css_parse_color_value(css_style_value_t *val, const char *str)
+libcss_bool_t css_parse_color_value(css_style_value_t *val, const char *str)
 {
 	const char *p;
 	int len = 0, status = 0, r, g, b;
@@ -270,17 +271,17 @@ LCUI_BOOL css_parse_color_value(css_style_value_t *val, const char *str)
 	if (status == 3) {
 		val->type = CSS_COLOR_VALUE;
 		val->color_value = css_color(0xff, r, g, b);
-		return TRUE;
+		return LIBCSS_TRUE;
 	}
 	if (strcmp("transparent", str) == 0) {
 		val->type = CSS_COLOR_VALUE;
 		val->color_value = CSS_COLOR_TRANSPARENT;
-		return TRUE;
+		return LIBCSS_TRUE;
 	}
-	return FALSE;
+	return LIBCSS_FALSE;
 }
 
-LCUI_BOOL css_parse_font_family_value(css_style_value_t *val, const char *str)
+libcss_bool_t css_parse_font_family_value(css_style_value_t *val, const char *str)
 {
 	char name[256];
 	const char *p;
@@ -295,11 +296,11 @@ LCUI_BOOL css_parse_font_family_value(css_style_value_t *val, const char *str)
 		case '"':
 		case '\'':
 			if (quotes > 0) {
-				return FALSE;
+				return LIBCSS_FALSE;
 			}
 			if (i > 0) {
 				if (quotes < 1) {
-					return FALSE;
+					return LIBCSS_FALSE;
 				}
 				quotes--;
 				if (quotes < 1) {
@@ -314,7 +315,7 @@ LCUI_BOOL css_parse_font_family_value(css_style_value_t *val, const char *str)
 				goto save;
 			}
 			if (i < 1) {
-				return FALSE;
+				return LIBCSS_FALSE;
 			}
 			goto append;
 		CASE_WHITE_SPACE:
@@ -329,7 +330,7 @@ LCUI_BOOL css_parse_font_family_value(css_style_value_t *val, const char *str)
 			break;
 		default:
 			if (finished) {
-				return FALSE;
+				return LIBCSS_FALSE;
 			}
 			break;
 		}
@@ -351,7 +352,7 @@ LCUI_BOOL css_parse_font_family_value(css_style_value_t *val, const char *str)
 			break;
 		}
 	}
-	return TRUE;
+	return LIBCSS_TRUE;
 }
 
 void css_init_data_types(void)

@@ -2,8 +2,8 @@
 #ifndef LIBCSS_INCLUDE_CSS_DUMP_H
 #define LIBCSS_INCLUDE_CSS_DUMP_H
 
-#include "../include/css/style_value.h"
-#include "../include/css/style_decl.h"
+#include <css/style_value.h>
+#include <css/style_decl.h>
 
 typedef struct css_dump_context_t css_dump_context_t;
 

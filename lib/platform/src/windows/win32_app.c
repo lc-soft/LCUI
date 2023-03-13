@@ -682,7 +682,6 @@ void app_exit(int exit_code)
 int app_destroy_engine(void)
 {
 	MSG msg;
-	list_node_t *node;
 
 	// 销毁未关闭的窗口
 	if (win32_app.windows.length > 0) {

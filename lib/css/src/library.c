@@ -32,13 +32,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../include/css/value.h"
-#include "../include/css/style_value.h"
-#include "../include/css/style_decl.h"
-#include "../include/css/selector.h"
-#include "../include/css/properties.h"
-#include "../include/css/library.h"
-#include "./dump.h"
+#include <css/value.h>
+#include <css/style_value.h>
+#include <css/style_decl.h>
+#include <css/selector.h>
+#include <css/properties.h>
+#include <css/library.h>
+#include "dump.h"
 
 #define LEN(A) sizeof(A) / sizeof(*A)
 
@@ -116,23 +116,23 @@ static void css_style_cache_destructor(void *privdata, void *val)
 	css_style_decl_destroy(val);
 }
 
-LCUI_BOOL css_selector_node_match(css_selector_node_t *sn1,
+libcss_bool_t css_selector_node_match(css_selector_node_t *sn1,
 				  css_selector_node_t *sn2)
 {
 	int i, j;
 	if (sn2->id) {
 		if (!sn1->id || strcmp(sn1->id, sn2->id) != 0) {
-			return FALSE;
+			return LIBCSS_FALSE;
 		}
 	}
 	if (sn2->type && strcmp(sn2->type, "*") != 0) {
 		if (!sn1->type || strcmp(sn1->type, sn2->type) != 0) {
-			return FALSE;
+			return LIBCSS_FALSE;
 		}
 	}
 	if (sn2->classes) {
 		if (!sn1->classes) {
-			return FALSE;
+			return LIBCSS_FALSE;
 		}
 		for (i = 0; sn2->classes[i]; ++i) {
 			for (j = 0; sn1->classes[j]; ++j) {
@@ -143,13 +143,13 @@ LCUI_BOOL css_selector_node_match(css_selector_node_t *sn1,
 				}
 			}
 			if (j != -1) {
-				return FALSE;
+				return LIBCSS_FALSE;
 			}
 		}
 	}
 	if (sn2->status) {
 		if (!sn1->status) {
-			return FALSE;
+			return LIBCSS_FALSE;
 		}
 		for (i = 0; sn2->status[i]; ++i) {
 			for (j = 0; sn1->status[j]; ++j) {
@@ -160,11 +160,11 @@ LCUI_BOOL css_selector_node_match(css_selector_node_t *sn1,
 				}
 			}
 			if (j != -1) {
-				return FALSE;
+				return LIBCSS_FALSE;
 			}
 		}
 	}
-	return TRUE;
+	return LIBCSS_TRUE;
 }
 
 static void css_style_rule_destroy(css_style_rule_t *node)
@@ -341,7 +341,7 @@ int css_add_style_decl(css_selector_t *selector, const css_style_decl_t *style,
 static size_t css_style_link_get_styles(css_style_link_t *link, list_t *outlist)
 {
 	size_t i;
-	LCUI_BOOL found;
+	libcss_bool_t found;
 	css_style_rule_t *snode, *out_snode;
 	list_node_t *node, *out_node;
 
@@ -350,12 +350,12 @@ static size_t css_style_link_get_styles(css_style_link_t *link, list_t *outlist)
 	}
 	for (list_each(node, &link->styles)) {
 		i = 0;
-		found = FALSE;
+		found = LIBCSS_FALSE;
 		snode = node->data;
 		for (list_each(out_node, outlist)) {
 			out_snode = out_node->data;
 			if (snode->rank > out_snode->rank) {
-				found = TRUE;
+				found = LIBCSS_TRUE;
 				break;
 			}
 			if (snode->rank != out_snode->rank) {
@@ -363,7 +363,7 @@ static size_t css_style_link_get_styles(css_style_link_t *link, list_t *outlist)
 				continue;
 			}
 			if (snode->batch_num > out_snode->batch_num) {
-				found = TRUE;
+				found = LIBCSS_TRUE;
 				break;
 			}
 			i += 1;

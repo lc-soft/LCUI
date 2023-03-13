@@ -1,5 +1,5 @@
-#include "./helpers.h"
-#include "../../include/css/style_value.h"
+#include "helpers.h"
+#include "../properties.h"
 
 int css_cascade_length_auto(const css_style_array_value_t input,
 			    css_computed_style_t* computed,
