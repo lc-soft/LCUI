@@ -31,12 +31,12 @@
 #ifndef LIBCSS_INCLUDE_CSS_LIBRARY_H
 #define LIBCSS_INCLUDE_CSS_LIBRARY_H
 
-#include <LCUI/def.h>
-#include "def.h"
+#include "common.h"
+#include "types.h"
 
-LCUI_BEGIN_HEADER
+LIBCSS_BEGIN_DECLS
 
-LCUI_API int css_add_style_decl(css_selector_t *selector,
+LIBCSS_PUBLIC int css_add_style_decl(css_selector_t *selector,
 				const css_style_decl_t *in_ss,
 				const char *space);
 
@@ -47,31 +47,31 @@ LCUI_API int css_add_style_decl(css_selector_t *selector,
  * @param[in] s 选择器
  * @param[out] list 找到的样式表列表
  */
-LCUI_API int css_query_selector_from_group(int group, const char *name,
+LIBCSS_PUBLIC int css_query_selector_from_group(int group, const char *name,
 					   const css_selector_t *s,
 					   list_t *list);
 
-INLINE int css_query_selector(const css_selector_t *s, list_t *list)
+LIBCSS_INLINE int css_query_selector(const css_selector_t *s, list_t *list)
 {
 	return css_query_selector_from_group(0, NULL, s, list);
 }
 
-LCUI_API void css_each_style_rule(void (*callback)(css_style_rule_t *, const char *,
+LIBCSS_PUBLIC void css_each_style_rule(void (*callback)(css_style_rule_t *, const char *,
 					     void *),
 			    void *data);
 
-LCUI_API css_style_decl_t *css_select_style(const css_selector_t *s);
+LIBCSS_PUBLIC css_style_decl_t *css_select_style(const css_selector_t *s);
 
-LCUI_API css_style_decl_t *css_select_style_with_cache(const css_selector_t *s);
+LIBCSS_PUBLIC css_style_decl_t *css_select_style_with_cache(const css_selector_t *s);
 
-LCUI_API void css_init_library(void);
+LIBCSS_PUBLIC void css_init_library(void);
 
-LCUI_API void css_destroy_library(void);
+LIBCSS_PUBLIC void css_destroy_library(void);
 
-LCUI_API size_t css_print_style_rules(void);
+LIBCSS_PUBLIC size_t css_print_style_rules(void);
 
-LCUI_API size_t css_style_rules_to_string(char *str, size_t max_len);
+LIBCSS_PUBLIC size_t css_style_rules_to_string(char *str, size_t max_len);
 
-LCUI_END_HEADER
+LIBCSS_END_DECLS
 
 #endif

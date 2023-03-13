@@ -1,5 +1,5 @@
 ﻿#include <pandagl.h>
-#include <LCUI/css/style_value.h>
+#include <css/style_value.h>
 #include "internal.h"
 
 void ui_widget_paint_background(ui_widget_t *w, pd_context_t *ctx,

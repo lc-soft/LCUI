@@ -1,10 +1,10 @@
 ﻿#ifndef LIB_UI_INCLUDE_UI_H
 #define LIB_UI_INCLUDE_UI_H
 
-#include <yutil.h>
 #include <LCUI/def.h>
-#include <LCUI/css/def.h>
-#include <LCUI/css/library.h>
+#include <yutil.h>
+#include <css/types.h>
+#include <css/library.h>
 #include <pandagl/types.h>
 
 LCUI_BEGIN_HEADER
@@ -52,6 +52,13 @@ typedef enum ui_widget_state_t {
 	UI_WIDGET_STATE_NORMAL,
 	UI_WIDGET_STATE_DELETED,
 } ui_widget_state_t;
+
+typedef enum ui_box_type_t {
+	UI_BOX_TYPE_CONTENT_BOX,
+	UI_BOX_TYPE_PADDING_BOX,
+	UI_BOX_TYPE_BORDER_BOX,
+	UI_BOX_TYPE_GRAPH_BOX
+} ui_box_type_t;
 
 typedef enum ui_dirty_rect_type_t {
 	UI_DIRTY_RECT_TYPE_NONE,
@@ -630,7 +637,7 @@ LCUI_API void ui_widget_set_style_unit_value(ui_widget_t *w, int key,
 					     css_numeric_value_t value,
 					     css_unit_t unit);
 LCUI_API void ui_widget_set_style_keyword_value(ui_widget_t *w, int key,
-						css_keyword_value_t value);
+				       css_keyword_value_t value);
 LCUI_API void ui_widget_set_style_color_value(ui_widget_t *w, int key,
 					      css_color_value_t value);
 LCUI_API void ui_widget_set_style_numeric_value(ui_widget_t *w, int key,
@@ -680,7 +687,7 @@ LCUI_API void ui_widget_reflow(ui_widget_t *w);
 // Renderer
 
 LCUI_API LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
-					     int box_type);
+					     ui_box_type_t box_type);
 LCUI_API size_t ui_widget_get_dirty_rects(ui_widget_t *w, list_t *rects);
 LCUI_API size_t ui_widget_render(ui_widget_t *w, pd_context_t *paint);
 

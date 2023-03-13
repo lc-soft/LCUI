@@ -32,7 +32,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../include/css.h"
+#include <css.h>
+#include "parser.h"
 
 enum FontFaceParserState { STATE_HEAD, STATE_KEY, STATE_KEY_END, STATE_VALUE };
 
@@ -51,7 +52,7 @@ typedef struct css_font_face_parser_t {
 	void (*callback)(const css_font_face_t *);
 } css_font_face_parser_t;
 
-INLINE css_font_face_parser_t *get_css_font_face_parser(css_parser_t *parser)
+LIBCSS_INLINE css_font_face_parser_t *get_css_font_face_parser(css_parser_t *parser)
 {
 	return parser->rule_parsers[CSS_RULE_FONT_FACE].data;
 }

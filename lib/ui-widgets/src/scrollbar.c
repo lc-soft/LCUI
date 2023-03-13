@@ -33,7 +33,7 @@
 #include <stdlib.h>
 #include <LCUI/timer.h>
 #include <LCUI/ui.h>
-#include <LCUI/css.h>
+#include <css.h>
 #include "../include/scrollbar.h"
 
 /* clang-format off */

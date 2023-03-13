@@ -30,7 +30,7 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <LCUI/css.h>
+#include <css.h>
 #include <LCUI/ui.h>
 #include <pandagl.h>
 

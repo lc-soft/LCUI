@@ -34,7 +34,7 @@
 #include <LCUI/thread.h>
 #include <LCUI/platform.h>
 #include <pandagl.h>
-#include <LCUI/css.h>
+#include <css.h>
 #include "./internal.h"
 #include "../include/textedit.h"
 #include "../include/textcaret.h"
@@ -354,7 +354,7 @@ static void TextEdit_UpdateTextLayer(ui_widget_t* w)
 	pd_text_update(edit->layer, &rects);
 	for (list_each(node, &rects)) {
 		ui_convert_rect(node->data, &rect, 1.0f / scale);
-		ui_widget_mark_dirty_rect(w, &rect, CSS_KEYWORD_CONTENT_BOX);
+		ui_widget_mark_dirty_rect(w, &rect, UI_BOX_TYPE_CONTENT_BOX);
 	}
 	pd_rects_clear(&rects);
 }
@@ -395,7 +395,7 @@ static void ui_textedit_on_task(ui_widget_t* widget, int task)
 		TextEdit_UpdateTextLayer(widget);
 		if (edit->is_placeholder_shown != is_shown) {
 			ui_widget_mark_dirty_rect(widget, NULL,
-						  CSS_KEYWORD_PADDING_BOX);
+						  UI_BOX_TYPE_PADDING_BOX);
 		}
 		edit->is_placeholder_shown = is_shown;
 		edit->tasks[TASK_UPDATE] = FALSE;
@@ -421,7 +421,7 @@ static void ui_textedit_on_resize(ui_widget_t* w, float width, float height)
 	pd_text_update(edit->layer, &rects);
 	for (list_each(node, &rects)) {
 		ui_convert_rect(node->data, &rect, 1.0f / scale);
-		ui_widget_mark_dirty_rect(w, &rect, CSS_KEYWORD_CONTENT_BOX);
+		ui_widget_mark_dirty_rect(w, &rect, UI_BOX_TYPE_CONTENT_BOX);
 	}
 	pd_rects_clear(&rects);
 }
@@ -517,7 +517,7 @@ void ui_textedit_clear_text(ui_widget_t* widget)
 	edit->tasks[TASK_UPDATE] = TRUE;
 	ui_widget_add_task(widget, UI_TASK_USER);
 	thread_mutex_unlock(&edit->mutex);
-	ui_widget_mark_dirty_rect(widget, NULL, CSS_KEYWORD_PADDING_BOX);
+	ui_widget_mark_dirty_rect(widget, NULL, UI_BOX_TYPE_PADDING_BOX);
 }
 
 size_t ui_textedit_get_text_w(ui_widget_t* w, size_t start, size_t max_len,
@@ -598,7 +598,7 @@ int ui_textedit_set_placeholder_w(ui_widget_t* w, const wchar_t* wstr)
 	pd_text_empty(edit->layer_placeholder);
 	thread_mutex_unlock(&edit->mutex);
 	if (edit->is_placeholder_shown) {
-		ui_widget_mark_dirty_rect(w, NULL, CSS_KEYWORD_PADDING_BOX);
+		ui_widget_mark_dirty_rect(w, NULL, UI_BOX_TYPE_PADDING_BOX);
 	}
 	return ui_textedit_add_textblock(w, wstr, TEXTBLOCK_ACTION_INSERT,
 					 TEXTBLOCK_OWNER_PLACEHOLDER);

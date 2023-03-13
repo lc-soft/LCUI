@@ -1,8 +1,4 @@
-#include "../../include/css/computed.h"
-#include "../../include/css/properties.h"
-#include "../../include/css/style_value.h"
-#include "../../include/css/style_decl.h"
-#include "../../include/css/value.h"
+#include "../properties.h"
 #include "./helpers.h"
 
 static void set_flex_basis(css_computed_style_t *computed, uint8_t keyword,

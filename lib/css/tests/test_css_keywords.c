@@ -1,7 +1,7 @@
 #include <stdio.h>
+#include <css/keywords.h>
 #include "test.h"
 #include "ctest.h"
-#include "../include/css/keywords.h"
 
 static void test_keyword_value(const char *name, int value)
 {

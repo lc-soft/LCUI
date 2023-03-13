@@ -1,7 +1,7 @@
 ﻿#include <stdio.h>
 #include <LCUI.h>
 #include <pandagl.h>
-#include <LCUI/css/style_value.h>
+#include <css/style_value.h>
 #include "internal.h"
 
 //#define DEBUG_FRAME_RENDER
@@ -85,7 +85,7 @@ static LCUI_BOOL ui_widget_has_round_border(ui_widget_t *w)
 }
 
 LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
-				    int box_type)
+				    ui_box_type_t box_type)
 {
 	ui_rect_t rect;
 	ui_dirty_rect_type_t type;
@@ -95,14 +95,14 @@ LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
 	}
 	if (!in_rect) {
 		switch (box_type) {
-		case CSS_KEYWORD_BORDER_BOX:
+		case UI_BOX_TYPE_BORDER_BOX:
 			type = UI_DIRTY_RECT_TYPE_BORDER_BOX;
 			break;
-		case CSS_KEYWORD_GRAPH_BOX:
+		case UI_BOX_TYPE_GRAPH_BOX:
 			type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
 			break;
-		case CSS_KEYWORD_PADDING_BOX:
-		case CSS_KEYWORD_CONTENT_BOX:
+		case UI_BOX_TYPE_PADDING_BOX:
+		case UI_BOX_TYPE_CONTENT_BOX:
 		default:
 			type = UI_DIRTY_RECT_TYPE_PADDING_BOX;
 			break;
@@ -120,14 +120,14 @@ LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
 
 	rect = *in_rect;
 	switch (box_type) {
-	case CSS_KEYWORD_GRAPH_BOX:
+	case UI_BOX_TYPE_GRAPH_BOX:
 		if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_CANVAS_BOX) {
 			return FALSE;
 		}
 		ui_rect_correct(&rect, w->canvas_box.width,
 				w->canvas_box.height);
 		break;
-	case CSS_KEYWORD_BORDER_BOX:
+	case UI_BOX_TYPE_BORDER_BOX:
 		if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_BORDER_BOX) {
 			return FALSE;
 		}
@@ -136,7 +136,7 @@ LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
 		rect.x += w->border_box.x - w->canvas_box.x;
 		rect.y += w->border_box.y - w->canvas_box.y;
 		break;
-	case CSS_KEYWORD_PADDING_BOX:
+	case UI_BOX_TYPE_PADDING_BOX:
 		if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_PADDING_BOX) {
 			return FALSE;
 		}
@@ -145,7 +145,7 @@ LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
 		rect.x += w->padding_box.x - w->canvas_box.x;
 		rect.y += w->padding_box.y - w->canvas_box.y;
 		break;
-	case CSS_KEYWORD_CONTENT_BOX:
+	case UI_BOX_TYPE_CONTENT_BOX:
 	default:
 		ui_rect_correct(&rect, w->content_box.width,
 				w->content_box.height);

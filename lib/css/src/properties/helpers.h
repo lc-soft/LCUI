@@ -1,8 +1,7 @@
 #ifndef LIB_CSS_SRC_PROPERTIES_HELPERS_H
 #define LIB_CSS_SRC_PROPERTIES_HELPERS_H
 
-#include <LCUI/def.h>
-#include "../../include/css/def.h"
+#include <css/types.h>
 
 int css_cascade_length_auto(const css_style_array_value_t input,
 			    css_computed_style_t* computed,

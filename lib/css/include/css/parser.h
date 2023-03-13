@@ -31,10 +31,10 @@
 #ifndef LIBCSS_INCLUDE_CSS_PARSER_H
 #define LIBCSS_INCLUDE_CSS_PARSER_H
 
-#include <LCUI/def.h>
-#include "def.h"
+#include "common.h"
+#include "types.h"
 
-LCUI_BEGIN_HEADER
+LIBCSS_BEGIN_DECLS
 
 typedef enum css_parser_target_t {
 	CSS_PARSER_TARGET_NONE,      /**< 无 */
@@ -81,7 +81,7 @@ typedef struct css_style_parser_t {
 
 typedef struct css_comment_parser_t {
 	/** 是否为单行注释 */
-	LCUI_BOOL is_line_comment;
+	libcss_bool_t is_line_comment;
 
 	/** 保存的上一个目标，解析完注释后将还原成该目标 */
 	css_parser_target_t prev_target;
@@ -104,47 +104,47 @@ struct css_parser_t {
 
 // css parser
 
-INLINE void css_parser_get_char(css_parser_t *parser)
+LIBCSS_INLINE void css_parser_get_char(css_parser_t *parser)
 {
 	parser->buffer[parser->pos++] = *(parser->cur);
 }
 
-LCUI_API css_parser_t *css_parser_create(size_t buffer_size, const char *space);
+LIBCSS_PUBLIC css_parser_t *css_parser_create(size_t buffer_size, const char *space);
 
-LCUI_API void css_parser_destroy(css_parser_t *parser);
+LIBCSS_PUBLIC void css_parser_destroy(css_parser_t *parser);
 
-LCUI_API void css_parser_end_parse_rule(css_parser_t *parser);
+LIBCSS_PUBLIC void css_parser_end_parse_rule(css_parser_t *parser);
 
-LCUI_API void css_parser_commit(css_parser_t *parser);
+LIBCSS_PUBLIC void css_parser_commit(css_parser_t *parser);
 
-LCUI_API size_t css_parser_parse(css_parser_t *parser, const char *str);
+LIBCSS_PUBLIC size_t css_parser_parse(css_parser_t *parser, const char *str);
 
-LCUI_API int css_parser_begin_parse_comment(css_parser_t *parser);
+LIBCSS_PUBLIC int css_parser_begin_parse_comment(css_parser_t *parser);
 
 // css style parser
 
-LCUI_API void css_style_parser_init(css_style_parser_t *parser,
+LIBCSS_PUBLIC void css_style_parser_init(css_style_parser_t *parser,
 				    const char *space);
 
-LCUI_API void css_style_parser_destroy(css_style_parser_t *parser);
+LIBCSS_PUBLIC void css_style_parser_destroy(css_style_parser_t *parser);
 
-LCUI_API void css_style_parser_commit(css_style_parser_t *parser);
+LIBCSS_PUBLIC void css_style_parser_commit(css_style_parser_t *parser);
 
 // css property parser
 
-LCUI_API void css_init_preset_property_parsers(void);
+LIBCSS_PUBLIC void css_init_preset_property_parsers(void);
 
-LCUI_API void css_destroy_preset_property_parsers(void);
+LIBCSS_PUBLIC void css_destroy_preset_property_parsers(void);
 
 // css font face parser
 
-LCUI_API void css_font_face_parser_on_load(
+LIBCSS_PUBLIC void css_font_face_parser_on_load(
     css_parser_t *ctx, void (*func)(const css_font_face_t *));
 
-LCUI_API int css_font_face_parser_init(css_parser_t *ctx);
+LIBCSS_PUBLIC int css_font_face_parser_init(css_parser_t *ctx);
 
-LCUI_API void css_font_face_parser_destroy(css_parser_t *ctx);
+LIBCSS_PUBLIC void css_font_face_parser_destroy(css_parser_t *ctx);
 
-LCUI_END_HEADER
+LIBCSS_END_DECLS
 
 #endif

@@ -1,4 +1,4 @@
-#include "../include/css/properties.h"
+#include <css/properties.h>
 #include "./dump.h"
 
 css_style_decl_t *css_style_decl_create(void)

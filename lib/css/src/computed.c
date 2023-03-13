@@ -1,8 +1,8 @@
-﻿#include "../include/css/utils.h"
-#include "../include/css/computed.h"
-#include "../include/css/properties.h"
-#include "../include/css/style_value.h"
-#include "../include/css/style_decl.h"
+﻿#include <css/utils.h>
+#include <css/computed.h>
+#include <css/properties.h>
+#include <css/style_value.h>
+#include <css/style_decl.h>
 
 static uint8_t get_padding_top(const css_computed_style_t *s,
 			       css_numeric_value_t *value, css_unit_t *unit)
@@ -813,7 +813,7 @@ int css_cascade_style(const css_style_decl_t *style,
 	css_prop_t *prop;
 	const css_propdef_t *propdef;
 	unsigned count = css_get_prop_count();
-	LCUI_BOOL *setted_props = calloc(count, sizeof(LCUI_BOOL));
+	libcss_bool_t *setted_props = calloc(count, sizeof(libcss_bool_t));
 
 	for (list_each(node, style)) {
 		prop = node->data;
@@ -821,7 +821,7 @@ int css_cascade_style(const css_style_decl_t *style,
 		    prop->style.type <= CSS_INVALID_VALUE) {
 			continue;
 		}
-		setted_props[prop->key] = TRUE;
+		setted_props[prop->key] = LIBCSS_TRUE;
 		propdef = css_get_propdef(prop->key);
 		assert(propdef && propdef->cascade);
 		propdef->cascade(prop->style.array_value, computed);
@@ -886,7 +886,7 @@ static uint8_t compute_content_box_width(const css_computed_style_t *s,
 	return type;
 }
 
-static LCUI_BOOL compute_content_box_fixed_width(const css_computed_style_t *s,
+static libcss_bool_t compute_content_box_fixed_width(const css_computed_style_t *s,
 						 css_numeric_value_t *value)
 {
 	css_unit_t unit;
@@ -927,7 +927,7 @@ static uint8_t compute_padding_box_height(const css_computed_style_t *s,
 	return type;
 }
 
-static LCUI_BOOL compute_padding_box_fixed_width(const css_computed_style_t *s,
+static libcss_bool_t compute_padding_box_fixed_width(const css_computed_style_t *s,
 						 css_numeric_value_t *value)
 {
 	css_unit_t unit;
@@ -935,7 +935,7 @@ static LCUI_BOOL compute_padding_box_fixed_width(const css_computed_style_t *s,
 	       unit == CSS_UNIT_PX;
 }
 
-static LCUI_BOOL compute_padding_box_fixed_height(const css_computed_style_t *s,
+static libcss_bool_t compute_padding_box_fixed_height(const css_computed_style_t *s,
 						  css_numeric_value_t *value)
 {
 	css_unit_t unit;
