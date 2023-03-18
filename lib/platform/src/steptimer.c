@@ -3,11 +3,12 @@
  */
 
 #include <stdlib.h>
-#include "./internal.h"
+#include <yutil.h>
+#include <platform/step_timer.h>
 
 void step_timer_init(step_timer_t *timer)
 {
-	timer->is_fixed_time_step = FALSE;
+	timer->is_fixed_time_step = false;
 	timer->elapsed_time = 0;
 	timer->total_time = 0;
 	timer->left_over_time = 0;
@@ -15,7 +16,7 @@ void step_timer_init(step_timer_t *timer)
 	timer->frames_per_second = 0;
 	timer->frames_this_second = 0;
 	timer->second_counter = 0;
-	timer->is_fixed_time_step = FALSE;
+	timer->is_fixed_time_step = false;
 	timer->target_elapsed_time = 1000 / 60;
 	timer->max_delta = 1000;
 }

@@ -105,7 +105,7 @@ int thread_cond_timedwait(thread_cond_t *cond, thread_mutex_t *mutex,
 int thread_cond_signal(thread_cond_t *cond)
 {
 	/* 当编译为 Windows 运行时组件时，直接改为广播 */
-#ifdef LCUI_PLATFORM_UWP
+#ifdef LIBPLAT_UWP
 	return thread_cond_broadcast(cond);
 #else
 	if (PulseEvent((*cond)->handle)) {
@@ -270,7 +270,7 @@ void thread_exit(void *retval)
 
 void thread_cancel(thread_t tid)
 {
-#ifdef LCUI_PLATFORM_UWP
+#ifdef LIBPLAT_UWP
 	abort();
 #else
 	thread_info_t *thread;

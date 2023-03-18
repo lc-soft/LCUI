@@ -1,6 +1,7 @@
 #include <errno.h>
 #include <yutil.h>
-#include "internal.h"
+#include "app.h"
+#include "events.h"
 
 static struct app_events_t {
 	/** list_t<app_event_t> */

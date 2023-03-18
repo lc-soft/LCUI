@@ -1,4 +1,7 @@
-#include "../include/platform.h"
+#include "app.h"
+#include "ime.h"
+#include "events.h"
+#include "clipboard.h"
 
 int app_init(const wchar_t *name)
 {

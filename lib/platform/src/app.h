@@ -1,16 +1,15 @@
-#include <LCUI/config.h>
 #include <yutil.h>
-#include "../include/platform.h"
+#include <platform.h>
 
-#ifdef LCUI_PLATFORM_WIN_DESKTOP
+#ifdef LIBPLAT_WIN_DESKTOP
 
 int ime_add_win32(void);
 
 #endif
 
-#ifdef LCUI_PLATFORM_LINUX
+#ifdef LIBPLAT_LINUX
 
-#ifdef HAVE_LIBX11
+#ifdef LIBPLAT_HAS_LIBX11
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xos.h>
@@ -40,3 +39,6 @@ int linux_keyboard_destroy(void);
 int ime_add_linux(void);
 
 #endif
+
+int app_init_engine(const wchar_t *name);
+int app_destroy_engine(void);

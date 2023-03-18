@@ -27,9 +27,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#include "./internal.h"
 
 #include <string.h>
+#include "app.h"
+#include "clipboard.h"
 
 static struct clipboard_module_t {
 	char *text;
@@ -38,7 +39,7 @@ static struct clipboard_module_t {
 
 int clipboard_request_text(clipboard_callback_t callback, void *arg)
 {
-#ifdef HAVE_LIBX11
+#ifdef LIBPLAT_HAS_LIBX11
 	if (app_get_id() == APP_ID_LINUX_X11) {
 		return x11_clipboard_request_text(callback, arg);
 	}
@@ -60,7 +61,7 @@ int clipboard_request_text(clipboard_callback_t callback, void *arg)
 
 int clipboard_set_text(const wchar_t *text, size_t len)
 {
-#ifdef HAVE_LIBX11
+#ifdef LIBPLAT_HAS_LIBX11
 	if (app_get_id() == APP_ID_LINUX_X11) {
 		return x11_clipboard_set_text(text, len);
 	}
@@ -80,7 +81,7 @@ int clipboard_set_text(const wchar_t *text, size_t len)
 
 void clipboard_init(void)
 {
-#ifdef HAVE_LIBX11
+#ifdef LIBPLAT_HAS_LIBX11
 	if (app_get_id() == APP_ID_LINUX_X11) {
 		x11_clipboard_init();
 		return;
@@ -90,7 +91,7 @@ void clipboard_init(void)
 
 void clipboard_destroy(void)
 {
-#ifdef HAVE_LIBX11
+#ifdef LIBPLAT_HAS_LIBX11
 	if (app_get_id() == APP_ID_LINUX_X11) {
 		x11_clipboard_destroy();
 		return;

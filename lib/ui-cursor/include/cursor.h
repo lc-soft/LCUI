@@ -2,7 +2,7 @@
 
 #include <LCUI/def.h>
 #include <pandagl.h>
-#include <LCUI/platform.h>
+#include <platform.h>
 #include <LCUI/ui.h>
 
 LCUI_BEGIN_HEADER
