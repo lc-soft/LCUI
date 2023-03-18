@@ -1,6 +1,6 @@
 #define PREVIEW_MODE
 #include "./cases/test_flex_layout.c"
-#include <LCUI/main.h>
+#include <platform/main.h>
 
 int main(int argc, char **argv)
 {

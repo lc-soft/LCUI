@@ -1,3 +1,4 @@
+set_project("pandagl")
 set_version("0.1.0-a")
 add_requires("libpng", "libjpeg", {optional = true})
 add_requires("freetype", {optional = true, configs = {shared = false}})

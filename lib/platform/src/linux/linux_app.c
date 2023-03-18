@@ -1,10 +1,10 @@
 #include <string.h>
-#include "../internal.h"
+#include "../app.h"
 
-#ifdef LCUI_PLATFORM_LINUX
+#ifdef LIBPLAT_LINUX
 
 static struct app_t {
-	LCUI_BOOL active;
+	bool active;
 	app_window_driver_t window;
 	app_driver_t app;
 	app_id_t id;
@@ -25,12 +25,12 @@ int app_remove_native_event_listener(int type, app_native_event_handler_t handle
 	return linux_app.app.off_event(type, handler);
 }
 
-LCUI_API int app_get_screen_width(void)
+LIBPLAT_PUBLIC int app_get_screen_width(void)
 {
 	return linux_app.app.get_screen_width();
 }
 
-LCUI_API int app_get_screen_height(void)
+LIBPLAT_PUBLIC int app_get_screen_height(void)
 {
 	return linux_app.app.get_screen_height();
 }
@@ -154,13 +154,13 @@ app_id_t app_get_id(void)
 int app_init_engine(const wchar_t *name)
 {
 	linux_app.id = APP_ID_LINUX;
-#ifdef HAVE_LIBX11
+#ifdef LIBPLAT_HAS_LIBX11
 	x11_app_driver_init(&linux_app.app);
 	x11_app_window_driver_init(&linux_app.window);
 	if (linux_app.app.init(name) == 0) {
 		logger_debug("[app] use engine: x11app\n");
 		linux_app.id = APP_ID_LINUX_X11;
-		linux_app.active = TRUE;
+		linux_app.active = true;
 		return 0;
 	}
 	memset(&linux_app.app, 0, sizeof(linux_app.app));
@@ -170,7 +170,7 @@ int app_init_engine(const wchar_t *name)
 	fb_app_driver_init(&linux_app.app);
 	fb_app_window_driver_init(&linux_app.window);
 	if (linux_app.app.init(name) == 0) {
-		linux_app.active = TRUE;
+		linux_app.active = true;
 		linux_mouse_init();
 		linux_keyboard_init();
 		return 0;
@@ -183,7 +183,7 @@ int app_destroy_engine(void)
 	if (!linux_app.active) {
 		return -1;
 	}
-	linux_app.active = FALSE;
+	linux_app.active = false;
 	if (linux_app.id != APP_ID_LINUX_X11) {
 		linux_mouse_destroy();
 		linux_keyboard_destroy();

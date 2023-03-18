@@ -1,6 +1,6 @@
-﻿#include "../internal.h"
+﻿#include "../app.h"
 
-#ifdef LCUI_PLATFORM_WIN_DESKTOP
+#ifdef LIBPLAT_WIN_DESKTOP
 #pragma comment(lib, "User32")
 #pragma comment(lib, "Gdi32")
 #include <windows.h>
@@ -25,13 +25,13 @@ struct app_window_t {
 	int width, height;
 	int min_width, min_height;
 	int max_width, max_height;
-	LCUI_BOOL visible;
+	bool visible;
 
 	app_window_render_mode_t mode;
 	HDC hdc_fb;
 	HDC hdc_client;
 	HBITMAP fb_bmp;
-	LCUI_BOOL is_ready;
+	bool is_ready;
 	pd_canvas_t fb;
 	list_node_t node;
 };
@@ -62,7 +62,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID unused)
 	case DLL_PROCESS_DETACH:
 		break;
 	}
-	return TRUE;
+	return true;
 }
 
 static DWORD format_error_message(DWORD err, wchar_t *buf, int len)
@@ -274,7 +274,7 @@ static LRESULT CALLBACK app_window_process(HWND hwnd, UINT msg, WPARAM arg1,
 	switch (msg) {
 	case WM_SHOWWINDOW:
 		e.type = APP_EVENT_VISIBILITY_CHANGE;
-		e.window->visible = arg1 ? TRUE : FALSE;
+		e.window->visible = arg1 ? true : false;
 		e.visibility_change.visible = e.window->visible;
 		break;
 	case WM_SIZE: {
@@ -363,9 +363,9 @@ static LRESULT CALLBACK app_window_process(HWND hwnd, UINT msg, WPARAM arg1,
 	case WM_KEYUP:
 		e.key.code = (int)arg1;
 		e.key.shift_key =
-		    (GetKeyState(VK_SHIFT) & 0x8000) ? TRUE : FALSE;
+		    (GetKeyState(VK_SHIFT) & 0x8000) ? true : false;
 		e.key.ctrl_key =
-		    (GetKeyState(VK_CONTROL) & 0x8000) ? TRUE : FALSE;
+		    (GetKeyState(VK_CONTROL) & 0x8000) ? true : false;
 		e.type =
 		    msg == WM_KEYDOWN ? APP_EVENT_KEYDOWN : APP_EVENT_KEYUP;
 		break;
@@ -426,9 +426,9 @@ static LRESULT CALLBACK app_window_process(HWND hwnd, UINT msg, WPARAM arg1,
 			e.touch.points[i].y = pos.y;
 			e.touch.points[i].id = inputs[i].dwID;
 			if (inputs[i].dwFlags & TOUCHEVENTF_PRIMARY) {
-				e.touch.points[i].is_primary = TRUE;
+				e.touch.points[i].is_primary = true;
 			} else {
-				e.touch.points[i].is_primary = FALSE;
+				e.touch.points[i].is_primary = false;
 			}
 			if (inputs[i].dwFlags & TOUCHEVENTF_DOWN) {
 				e.touch.points[i].state = APP_EVENT_TOUCHDOWN;
@@ -477,13 +477,13 @@ app_window_t *app_window_create(const wchar_t *title, int x, int y, int width,
 	wnd->hdc_fb = NULL;
 	wnd->hdc_client = NULL;
 	wnd->fb_bmp = NULL;
-	wnd->is_ready = FALSE;
+	wnd->is_ready = false;
 	wnd->node.data = wnd;
 	wnd->min_width = MIN_WIDTH;
 	wnd->min_height = MIN_HEIGHT;
 	wnd->width = width;
 	wnd->height = height;
-	wnd->visible = FALSE;
+	wnd->visible = false;
 	wnd->max_width = GetSystemMetrics(SM_CXMAXTRACK);
 	wnd->max_height = GetSystemMetrics(SM_CYMAXTRACK);
 	pd_canvas_init(&wnd->fb);
@@ -501,7 +501,7 @@ app_window_t *app_window_create(const wchar_t *title, int x, int y, int width,
 	return wnd;
 }
 
-void app_window_set_fullscreen(app_window_t *wnd, LCUI_BOOL fullscreen)
+void app_window_set_fullscreen(app_window_t *wnd, bool fullscreen)
 {
 	// TODO:
 }

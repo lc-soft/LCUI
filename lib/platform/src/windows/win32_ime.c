@@ -1,16 +1,16 @@
 ﻿#include <errno.h>
 #include <string.h>
 #include <stdlib.h>
-#include "../internal.h"
-#ifdef LCUI_PLATFORM_WIN_DESKTOP
+#include "../app.h"
+#ifdef LIBPLAT_WIN_DESKTOP
 #include <windows.h>
 #include <ime.h>
 
 #pragma comment(lib, "Imm32.lib")
 
-static LCUI_BOOL win32ime_process_key(int key, LCUI_BOOL is_pressed)
+static bool win32ime_process_key(int key, bool is_pressed)
 {
-	return FALSE;
+	return false;
 }
 
 static void win32ime_to_text(int ch)
@@ -42,16 +42,16 @@ static void win32ime_set_caret(int x, int y)
 	}
 }
 
-static LCUI_BOOL win32ime_open(void)
+static bool win32ime_open(void)
 {
 	app_on_native_event(WM_CHAR, win32ime_on_char, NULL);
-	return TRUE;
+	return true;
 }
 
-static LCUI_BOOL win32ime_close(void)
+static bool win32ime_close(void)
 {
 	app_off_native_event(WM_CHAR, win32ime_on_char);
-	return TRUE;
+	return true;
 }
 
 int ime_add_win32(void)

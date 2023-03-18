@@ -28,9 +28,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "../internal.h"
+#include "../app.h"
 
-#ifdef LCUI_PLATFORM_LINUX
+#ifdef LIBPLAT_LINUX
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -51,7 +51,7 @@ static struct linux_mouse_t {
 	const char *dev_path;
 
 	thread_t tid;
-	LCUI_BOOL active;
+	bool active;
 } linux_mouse;
 
 static void linux_dispatch_mouse_button_event(int button, int state)
@@ -121,7 +121,7 @@ static void linux_mouse_thread(void *arg)
 
 int linux_mouse_init(void)
 {
-	linux_mouse.active = TRUE;
+	linux_mouse.active = true;
 	linux_mouse.x = app_get_screen_width() / 2;
 	linux_mouse.y = app_get_screen_height() / 2;
 	linux_mouse.dev_path = getenv("LCUI_MOUSE_DEVICE");
@@ -141,7 +141,7 @@ int linux_mouse_init(void)
 int linux_mouse_destroy(void)
 {
 	if (linux_mouse.active) {
-		linux_mouse.active = FALSE;
+		linux_mouse.active = false;
 		thread_join(linux_mouse.tid, NULL);
 		close(linux_mouse.dev_fd);
 	}

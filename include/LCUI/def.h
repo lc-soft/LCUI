@@ -23,14 +23,14 @@
 #endif
 
 #ifdef _WIN32
-	#define LCUI_PLATFORM_WIN32
+	#define LIBPLAT_WIN32
 	#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
-	#define LCUI_PLATFORM_UWP
+	#define LIBPLAT_UWP
 	#else
-	#define LCUI_PLATFORM_WIN_DESKTOP
+	#define LIBPLAT_WIN_DESKTOP
 	#endif
 #else
-	#define LCUI_PLATFORM_LINUX
+	#define LIBPLAT_LINUX
 #endif
 
 #ifdef __cplusplus

@@ -28,8 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "../internal.h"
-#ifdef LCUI_PLATFORM_LINUX
+#include "../app.h"
+#ifdef LIBPLAT_LINUX
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,7 +43,7 @@ static struct linux_keyboard_t {
 	int fd;
 	struct termios tm;
 	thread_t tid;
-	LCUI_BOOL active;
+	bool active;
 } linux_keyboard;
 
 static void linux_keyboard_dispatch_event(int key)
@@ -104,7 +104,7 @@ static void linux_keyboard_dispatch_event(int key)
 	}
 }
 
-static LCUI_BOOL kbhit(void)
+static bool kbhit(void)
 {
 	int ch, flags;
 	struct termios tm;
@@ -117,9 +117,9 @@ static LCUI_BOOL kbhit(void)
 	fcntl(linux_keyboard.fd, F_SETFL, flags);
 	if (ch != EOF) {
 		ungetc(ch, stdin);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 static int getch(void)
@@ -175,7 +175,7 @@ int linux_keyboard_init(void)
 	for (; i < len; ++i) {
 		signal(signals[i], on_signal);
 	}
-	linux_keyboard.active = TRUE;
+	linux_keyboard.active = true;
 	thread_create(&linux_keyboard.tid, linux_keyboard_thread, NULL);
 	logger_debug("[input] keyboard driver thread: %lld\n", linux_keyboard.tid);
 	return 0;
@@ -186,7 +186,7 @@ int linux_keyboard_destroy(void)
 	if (!linux_keyboard.active) {
 		return 0;
 	}
-	linux_keyboard.active = FALSE;
+	linux_keyboard.active = false;
 	thread_join(linux_keyboard.tid, NULL);
 	if (tcsetattr(linux_keyboard.fd, TCSANOW, &linux_keyboard.tm) < 0) {
 		return -1;

@@ -31,9 +31,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../internal.h"
+#include "../app.h"
 
-#if defined(LCUI_PLATFORM_WIN32) && !defined(WINAPI_PARTITION_APP)
+#if defined(LIBPLAT_WIN32) && !defined(WINAPI_PARTITION_APP)
 #pragma warning(disable:4091)
 #include <Windows.h>
 #include <ShlObj.h>

@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include <LCUI.h>
-#include <LCUI/platform.h>
+#include <platform.h>
 #include <LCUI/ui.h>
 #include <LCUI/ui/widgets/textview.h>
 #include <LCUI/ui/widgets/textedit.h>
