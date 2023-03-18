@@ -1,5 +1,5 @@
 #define PREVIEW_MODE
-#include <LCUI/main.h>
+#include <platform/main.h>
 #include "./cases/test_widget_opacity.c"
 
 static void on_opacity_minus(ui_widget_t *w, ui_event_t *e, void *arg)

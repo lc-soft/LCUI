@@ -1,7 +1,7 @@
 #include <LCUI.h>
 #include <pandagl.h>
 #include <LCUI/ui/builder.h>
-#include <LCUI/main.h>
+#include <platform/main.h>
 
 int main(void)
 {

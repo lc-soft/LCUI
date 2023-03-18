@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <LCUI.h>
-#include <LCUI/main.h>
+#include <platform/main.h>
 #include <pandagl.h>
 #include <LCUI/ui/widgets/textview.h>
 

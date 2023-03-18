@@ -1,6 +1,6 @@
-#include "../internal.h"
+#include "../app.h"
 
-#if defined(LCUI_PLATFORM_LINUX) && defined(HAVE_LIBX11)
+#if defined(LIBPLAT_LINUX) && defined(LIBPLAT_HAS_LIBX11)
 
 #define MOUSE_WHEEL_DELTA 20
 #define MIN_WINDOW_WIDTH 100
@@ -257,8 +257,8 @@ static int x11_app_process_native_event(void)
 		XAutoRepeatOn(dsp);
 		keysym = XkbKeycodeToKeysym(dsp, xe.xkey.keycode, 0, 1);
 		e.key.code = convert_keycode(keysym);
-		e.key.shift_key = xe.xkey.state & ShiftMask ? TRUE : FALSE;
-		e.key.ctrl_key = xe.xkey.state & ControlMask ? TRUE : FALSE;
+		e.key.shift_key = xe.xkey.state & ShiftMask ? true : false;
+		e.key.ctrl_key = xe.xkey.state & ControlMask ? true : false;
 		// @WhoAteDaCake
 		// TODO: this triggers and line 155 causes event to trigger
 		// twice? I tried to remove the one in if statement and put it
@@ -552,7 +552,7 @@ static app_window_paint_t *x11_app_window_begin_paint(app_window_t *wnd,
 
 	paint = malloc(sizeof(pd_context_t));
 	paint->rect = *rect;
-	paint->with_alpha = FALSE;
+	paint->with_alpha = false;
 	pd_canvas_init(&paint->canvas);
 	pd_rect_correct(&paint->rect, wnd->width, wnd->height);
 	pd_canvas_quote(&paint->canvas, &wnd->fb, &paint->rect);
@@ -613,8 +613,8 @@ static int x11_app_init(const wchar_t *name)
 	    x11_app.display, x11_app.win_root, 0, 0, 10, 10, 0, 0, 0);
 	x11_app.cmap = DefaultColormap(x11_app.display, x11_app.screen);
 	x11_app.wm_delete =
-	    XInternAtom(x11_app.display, "WM_DELETE_WINDOW", FALSE);
-	x11_app.wm_exit = XInternAtom(x11_app.display, "WM_EXIT", FALSE);
+	    XInternAtom(x11_app.display, "WM_DELETE_WINDOW", false);
+	x11_app.wm_exit = XInternAtom(x11_app.display, "WM_EXIT", false);
 	XSelectInput(x11_app.display, x11_app.win_events, StructureNotifyMask);
 	return 0;
 }

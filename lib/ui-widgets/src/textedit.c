@@ -32,7 +32,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <LCUI/thread.h>
-#include <LCUI/platform.h>
+#include <platform.h>
 #include <pandagl.h>
 #include <css.h>
 #include "./internal.h"

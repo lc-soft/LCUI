@@ -267,7 +267,7 @@ void lcui_destroy_ui_preset_widgets(void)
 	ui_unregister_anchor();
 }
 
-#ifdef LCUI_PLATFORM_WIN32
+#ifdef LIBPLAT_WIN32
 static void lcui_load_fonts_for_windows(void)
 {
 	size_t i;
@@ -364,7 +364,7 @@ static void lcui_load_fonts_for_linux(void)
 
 static void lcui_load_default_fonts(void)
 {
-#ifdef LCUI_PLATFORM_WIN32
+#ifdef LIBPLAT_WIN32
 	lcui_load_fonts_for_windows();
 #elif defined(HAVE_FONTCONFIG)
 	logger_debug("[font] fontconfig enabled\n");

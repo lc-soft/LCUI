@@ -2,7 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "internal.h"
+#include "app.h"
+#include "ime.h"
 
 typedef struct ime_t_ {
 	int id;
@@ -16,8 +17,8 @@ static struct app_ime_t {
 	list_t list;
 
 	ime_t *ime;
-	LCUI_BOOL enable_caps_lock;
-	LCUI_BOOL active;
+	bool enable_caps_lock;
+	bool active;
 } app_ime;
 
 static ime_t *ime_get(int ime_id)
@@ -74,24 +75,24 @@ int ime_add(const char *name, ime_handler_t *handler)
 	return ime->id;
 }
 
-static LCUI_BOOL ime_open(ime_t *ime)
+static bool ime_open(ime_t *ime)
 {
 	if (ime && ime->handler.open) {
 		return ime->handler.open();
 	}
-	return FALSE;
+	return false;
 }
 
-static LCUI_BOOL ime_close(ime_t *ime)
+static bool ime_close(ime_t *ime)
 {
 	if (ime && ime->handler.close) {
 		logger_debug("[ime] close engine: %s\n", ime->name);
 		return ime->handler.close();
 	}
-	return FALSE;
+	return false;
 }
 
-LCUI_BOOL ime_select(int ime_id)
+bool ime_select(int ime_id)
 {
 	ime_t *ime = ime_get(ime_id);
 	if (ime) {
@@ -99,21 +100,21 @@ LCUI_BOOL ime_select(int ime_id)
 		logger_debug("[ime] select engine: %s\n", ime->name);
 		app_ime.ime = ime;
 		ime_open(app_ime.ime);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
-LCUI_BOOL ime_select_by_name(const char *name)
+bool ime_select_by_name(const char *name)
 {
 	ime_t *ime = ime_get_by_name(name);
 	if (ime) {
 		ime_close(app_ime.ime);
 		app_ime.ime = ime;
 		ime_open(app_ime.ime);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 void ime_switch(void)
@@ -137,7 +138,7 @@ static void ime_on_destroy(void *arg)
 	free(ime);
 }
 
-LCUI_BOOL ime_check_char_key(int key)
+bool ime_check_char_key(int key)
 {
 	switch (key) {
 	case KEY_TAB:
@@ -153,14 +154,14 @@ LCUI_BOOL ime_check_char_key(int key)
 	case KEY_BACKSLASH:
 	case KEY_BRACKETRIGHT:
 	case KEY_APOSTROPHE:
-		return TRUE;
+		return true;
 	default:
 		if (key >= KEY_0 && key <= KEY_Z) {
-			return TRUE;
+			return true;
 		}
 		break;
 	}
-	return FALSE;
+	return false;
 }
 
 static void ime_to_text(app_event_t *e)
@@ -168,28 +169,28 @@ static void ime_to_text(app_event_t *e)
 	app_ime.ime->handler.totext(e->key.code);
 }
 
-LCUI_BOOL ime_process_key(app_event_t *e)
+bool ime_process_key(app_event_t *e)
 {
-	LCUI_BOOL is_presed = FALSE;
+	bool is_presed = false;
 
 	/* 根据事件类型判定按键状态 */
 	if (e->type == APP_EVENT_KEYUP) {
 		/* 如果是 caps lock 按键被释放 */
 		if (e->key.code == KEY_CAPITAL) {
 			app_ime.enable_caps_lock = !app_ime.enable_caps_lock;
-			return FALSE;
+			return false;
 		}
 	} else {
-		is_presed = TRUE;
+		is_presed = true;
 		/* 如果按下的是 shift 键，但没释放，则直接退出 */
 		if (e->key.code == KEY_SHIFT) {
-			return FALSE;
+			return false;
 		}
 	}
 	if (app_ime.ime && app_ime.ime->handler.prockey) {
 		return app_ime.ime->handler.prockey(e->key.code, is_presed);
 	}
-	return FALSE;
+	return false;
 }
 
 int ime_commit(const wchar_t *str, size_t len)
@@ -219,12 +220,12 @@ void ime_set_caret(int x, int y)
 void app_init_ime(void)
 {
 	list_create(&app_ime.list);
-	app_ime.active = TRUE;
+	app_ime.active = true;
 	app_on_event(APP_EVENT_KEYDOWN, ime_on_keydown, NULL);
-#ifdef LCUI_PLATFORM_UWP
+#ifdef LIBPLAT_UWP
 	return;
 #else
-#ifdef LCUI_PLATFORM_WIN_DESKTOP
+#ifdef LIBPLAT_WIN_DESKTOP
 	ime_select(ime_add_win32());
 #else
 	ime_select(ime_add_linux());
@@ -234,7 +235,7 @@ void app_init_ime(void)
 
 void app_destroy_ime(void)
 {
-	app_ime.active = FALSE;
+	app_ime.active = false;
 	ime_close(app_ime.ime);
 	list_destroy_without_node(&app_ime.list, ime_on_destroy);
 }

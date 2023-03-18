@@ -34,7 +34,7 @@
 #include <string.h>
 #include <LCUI/ui.h>
 #include <LCUI/worker.h>
-#include <LCUI/platform.h>
+#include <platform.h>
 #include <LCUI/ui/builder.h>
 #include "../include/anchor.h"
 

@@ -1,6 +1,6 @@
-#include "../internal.h"
+#include "../app.h"
 
-#ifdef LCUI_PLATFORM_LINUX
+#ifdef LIBPLAT_LINUX
 
 #include <errno.h>
 #include <fcntl.h>
@@ -52,8 +52,8 @@ static struct fb_app_t {
 	unsigned window_count;
 	int exit_code;
 
-	LCUI_BOOL active;
-	LCUI_BOOL loop_active;
+	bool active;
+	bool loop_active;
 	pd_canvas_t canvas;
 } fbapp;
 
@@ -460,8 +460,8 @@ static int fb_app_init(const wchar_t *name)
 	fb_app_print_info();
 	fb_app_init_canvas();
 	fb_app_init_root_window();
-	fbapp.active = TRUE;
-	fbapp.loop_active = TRUE;
+	fbapp.active = true;
+	fbapp.loop_active = true;
 	return 0;
 }
 
@@ -483,7 +483,7 @@ static int fb_app_destroy(void)
 	close(fbapp.fb.dev_fd);
 	fbapp.fb.mem = NULL;
 	fbapp.fb.mem_len = 0;
-	fbapp.active = FALSE;
+	fbapp.active = false;
 	return 0;
 }
 
@@ -508,13 +508,13 @@ static int fb_app_process_events(app_process_events_option_t option)
 		app_process_events();
 		sleep_ms(1);
 	}
-	fbapp.loop_active = TRUE;
+	fbapp.loop_active = true;
 	return fbapp.exit_code;
 }
 
 static void fb_app_exit(int exit_code)
 {
-	fbapp.loop_active = FALSE;
+	fbapp.loop_active = false;
 	fbapp.exit_code = exit_code;
 }
 

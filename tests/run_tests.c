@@ -1,7 +1,7 @@
 ﻿#include <stdio.h>
 #include <wchar.h>
 #include <LCUI.h>
-#include <LCUI/main.h>
+#include <platform/main.h>
 #include "ctest.h"
 #include "run_tests.h"
 

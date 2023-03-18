@@ -1,3 +1,4 @@
+set_project("libcss")
 set_version("0.1.0-a")
 
 target("libcss")

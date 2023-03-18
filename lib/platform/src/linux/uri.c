@@ -31,9 +31,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../internal.h"
+#include "../app.h"
 
-#ifdef LCUI_PLATFORM_LINUX
+#ifdef LIBPLAT_LINUX
 
 int open_uri(const char *uri)
 {

@@ -2,7 +2,7 @@
 #define LCUI_H
 
 #include <LCUI/def.h>
-#include <LCUI/platform.h>
+#include <platform.h>
 #include <LCUI/worker.h>
 
 #define LCUI_MAX_FRAMES_PER_SEC 120

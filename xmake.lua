@@ -3,13 +3,14 @@ set_version("3.0.0-a")
 set_warnings("all")
 add_rules("mode.debug", "mode.release", "mode.coverage")
 add_rpathdirs("@loader_path/lib", "@loader_path")
-add_requires("libomp", "libxml2", "libx11", {optional = true})
+add_requires("libomp", "libxml2", {optional = true})
 add_defines("LCUI_EXPORTS", "YUTIL_EXPORTS", "UNICODE", "_CRT_SECURE_NO_WARNINGS")
 add_includedirs(
     "lib/ctest/include",
     "lib/yutil/include",
     "lib/pandagl/include",
     "lib/css/include",
+    "lib/platform/include",
     "include"
 )
 includes("lib/*/xmake.lua")
@@ -19,11 +20,6 @@ includes("tests/xmake.lua")
 option("ci-env", {showmenu = true, default = false})
 
 option("enable-openmp", {showmenu = true, default = true})
-
-option("enable-touch")
-    set_showmenu(true)
-    set_default(true)
-    set_configvar("ENABLE_TOUCH", 1)
 
 if has_config("ci-env") then
     add_defines("CI_ENV")
@@ -70,7 +66,6 @@ target("lcui")
     set_kind("$(kind)")
     add_files(
         "src/*.c",
-        "lib/platform/src/**.c",
         "lib/worker/src/**.c",
         "lib/ui-builder/src/**.c",
         "lib/ui-cursor/src/**.c",
@@ -79,25 +74,12 @@ target("lcui")
     )
     add_configfiles("src/config.h.in")
     set_configdir("include/LCUI")
-    add_packages("libomp", "libxml2", "libx11")
+    add_packages("libomp", "libxml2")
     add_options("enable-openmp")
-    add_deps("yutil", "pandagl", "libcss", "libui", "libthread", "libtimer")
+    add_deps("yutil", "pandagl", "libcss", "libui", "libthread", "libtimer", "libplatform")
 
     if has_package("libomp") and has_config("enable-openmp") then
         set_configvar("ENABLE_OPENMP", 1)
-    end
-
-    if is_plat("windows") then
-        add_options("enable-touch")
-        add_files("lib/platform/src/windows/*.c")
-        add_links("Shell32")
-    else
-        add_files("lib/platform/src/linux/*.c")
-        add_packages("libx11")
-        if has_package("libx11") then
-            set_configvar("HAVE_LIBX11", 1)
-        end
-        add_syslinks("pthread", "dl")
     end
 
     if has_package("libxml2") then
@@ -115,7 +97,6 @@ target("headers")
         os.cp("$(projectdir)/lib/ui-cursor/include/*.h", "$(projectdir)/include/LCUI/ui/")
         os.cp("$(projectdir)/lib/ui-builder/include/*.h", "$(projectdir)/include/LCUI/ui/")
         os.cp("$(projectdir)/lib/ui-server/include/*.h", "$(projectdir)/include/LCUI/ui/")
-        os.cp("$(projectdir)/lib/platform/include/*.h", "$(projectdir)/include/LCUI/")
         os.cp("$(projectdir)/lib/timer/include/*.h", "$(projectdir)/include/LCUI/")
         os.cp("$(projectdir)/lib/worker/include/*.h", "$(projectdir)/include/LCUI/")
     end)
