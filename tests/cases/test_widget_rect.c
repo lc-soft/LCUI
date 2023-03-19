@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <LCUI.h>
-#include <LCUI/ui.h>
+#include <ui.h>
 #include "ctest.h"
 
 void test_widget_rect(void)

@@ -32,11 +32,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <LCUI/ui.h>
+#include <ui.h>
+#include <ui_builder.h>
+#include <ui_widgets/anchor.h>
 #include <LCUI/worker.h>
 #include <platform.h>
-#include <LCUI/ui/builder.h>
-#include "../include/anchor.h"
 
 typedef struct xml_loader_t {
 	char* key; /**< 键，作为在视图加载完后传给事件处理器的额外参数 */

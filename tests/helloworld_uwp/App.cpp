@@ -1,10 +1,10 @@
 ﻿#include "pch.h"
 #include <LCUI.h>
 #include <platform.h>
-#include <LCUI/ui.h>
-#include <LCUI/ui/widgets/textview.h>
-#include <LCUI/ui/widgets/textedit.h>
-#include <LCUI/ui/builder.h>
+#include <ui.h>
+#include <ui_widgets/textview.h>
+#include <ui_widgets/textedit.h>
+#include <ui_builder.h>
 #include LCUI_APP_H
 
 class App : public LCUI::Application

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <LCUI.h>
-#include <LCUI/ui.h>
+#include <ui.h>
 #include "ctest.h"
 
 void test_widget_mouse_event(void)

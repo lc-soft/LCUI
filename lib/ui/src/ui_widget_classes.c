@@ -1,6 +1,6 @@
-﻿#include <LCUI.h>
-#include "../include/ui.h"
-#include "internal.h"
+﻿#include <ui/base.h>
+#include "ui_widget_classes.h"
+#include "ui_widget_style.h"
 
 static void ui_widget_refresh_children_by_classes(ui_widget_t* w)
 {
@@ -44,12 +44,12 @@ int ui_widget_add_class(ui_widget_t* w, const char *class_name)
 	return ui_widget_handle_classes_change(w, class_name);
 }
 
-LCUI_BOOL ui_widget_has_class(ui_widget_t* w, const char *class_name)
+bool ui_widget_has_class(ui_widget_t* w, const char *class_name)
 {
 	if (strlist_has(w->classes, class_name)) {
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 int ui_widget_remove_class(ui_widget_t* w, const char *class_name)

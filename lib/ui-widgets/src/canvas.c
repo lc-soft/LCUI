@@ -30,8 +30,8 @@
 
 #include <stdlib.h>
 #include <pandagl.h>
-#include <LCUI/ui.h>
-#include "../include/canvas.h"
+#include <ui.h>
+#include <ui_widgets/canvas.h>
 
 typedef struct ui_canvas_t {
 	pd_canvas_t buffer;

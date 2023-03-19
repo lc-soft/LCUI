@@ -4,7 +4,7 @@
 #include <LCUI.h>
 #include <platform/main.h>
 #include <pandagl.h>
-#include <LCUI/ui/widgets/textview.h>
+#include <ui_widgets/textview.h>
 
 #define SCREEN_WIDTH 1600
 #define SCREEN_HEIGHT 900

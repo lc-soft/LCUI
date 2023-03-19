@@ -1,8 +1,8 @@
 ﻿#include <LCUI.h>
 #include <platform/main.h>
-#include <LCUI/ui/builder.h>
-#include <LCUI/ui/widgets/textview.h>
-#include <LCUI/ui/widgets/textedit.h>
+#include <ui_builder.h>
+#include <ui_widgets/textview.h>
+#include <ui_widgets/textedit.h>
 
 static void on_btn_click(ui_widget_t* self, ui_event_t* e, void *arg)
 {

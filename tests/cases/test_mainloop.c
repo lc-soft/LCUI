@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <LCUI.h>
-#include <LCUI/ui.h>
+#include <ui.h>
 #include <LCUI/thread.h>
-#include <LCUI/ui/widgets/button.h>
+#include <ui_widgets/button.h>
 #include <LCUI/timer.h>
 #include "ctest.h"
 

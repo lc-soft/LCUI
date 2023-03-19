@@ -1,7 +1,18 @@
 ﻿#include <string.h>
 #include <assert.h>
 #include <css/style_value.h>
-#include "internal.h"
+#include <css/computed.h>
+#include <ui.h>
+#include <ui/mutation_observer.h>
+#include "ui_widget.h"
+#include "ui_widget_id.h"
+#include "ui_widget_attributes.h"
+#include "ui_widget_classes.h"
+#include "ui_widget_prototype.h"
+#include "ui_widget_status.h"
+#include "ui_widget_observer.h"
+#include "ui_widget_style.h"
+#include "ui_events.h"
 
 static void ui_widget_destroy_children(ui_widget_t* w);
 
@@ -90,7 +101,7 @@ void ui_widget_add_state(ui_widget_t* w, ui_widget_state_t state)
 		if (w->state == UI_WIDGET_STATE_READY) {
 			ui_event_t e = { 0 };
 			e.type = UI_EVENT_READY;
-			e.cancel_bubble = TRUE;
+			e.cancel_bubble = true;
 			ui_widget_emit_event(w, e, NULL);
 			w->state = UI_WIDGET_STATE_NORMAL;
 		}
@@ -158,7 +169,7 @@ void ui_widget_get_offset(ui_widget_t* w, ui_widget_t* parent, float* offset_x,
 	*offset_y = y;
 }
 
-LCUI_BOOL ui_widget_in_viewport(ui_widget_t* w)
+bool ui_widget_in_viewport(ui_widget_t* w)
 {
 	list_node_t* node;
 	ui_rect_t rect;
@@ -177,7 +188,7 @@ LCUI_BOOL ui_widget_in_viewport(ui_widget_t* w)
 	for (self = w, parent = w->parent; parent;
 	     self = parent, parent = parent->parent) {
 		if (!ui_widget_is_visible(parent)) {
-			return FALSE;
+			return false;
 		}
 		for (node = self->node_show.prev; node && node->prev;
 		     node = node->prev) {
@@ -199,7 +210,7 @@ LCUI_BOOL ui_widget_in_viewport(ui_widget_t* w)
 			}
 			if (style->opacity == 1.0f &&
 			    css_color_alpha(style->background_color) == 255) {
-				return FALSE;
+				return false;
 			}
 		}
 		rect.x += parent->padding_box.x;
@@ -207,8 +218,8 @@ LCUI_BOOL ui_widget_in_viewport(ui_widget_t* w)
 		ui_rect_correct(&rect, parent->padding_box.width,
 				parent->padding_box.height);
 		if (rect.width < 1 || rect.height < 1) {
-			return FALSE;
+			return false;
 		}
 	}
-	return TRUE;
+	return true;
 }

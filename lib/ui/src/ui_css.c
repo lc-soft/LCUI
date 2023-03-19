@@ -1,9 +1,9 @@
 ﻿#include <stdio.h>
-#include <LCUI.h>
 #include <css.h>
 #include <pandagl.h>
-#include "../include/ui.h"
-#include "internal.h"
+#include <ui/css.h>
+#include <ui/events.h>
+#include "ui_css.h"
 
 const char *ui_default_css = css_string(
 

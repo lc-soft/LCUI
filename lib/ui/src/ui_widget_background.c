@@ -1,6 +1,8 @@
 ﻿#include <pandagl.h>
 #include <css/style_value.h>
-#include "internal.h"
+#include <ui/base.h>
+#include <ui/metrics.h>
+#include "ui_widget_background.h"
 
 void ui_widget_paint_background(ui_widget_t *w, pd_context_t *ctx,
 				ui_widget_actual_style_t *style)

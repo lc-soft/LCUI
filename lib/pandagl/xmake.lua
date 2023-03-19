@@ -2,9 +2,6 @@ set_project("pandagl")
 set_version("0.1.0-a")
 add_requires("libpng", "libjpeg", {optional = true})
 add_requires("freetype", {optional = true, configs = {shared = false}})
-add_includedirs("include")
-set_configdir("include/pandagl")
-add_configfiles("src/config.h.in")
 
 if is_plat("linux") then
     add_requires("fontconfig", {optional = true})
@@ -29,6 +26,9 @@ target("pandagl")
     set_kind("$(kind)")
     add_files("src/*.c")
     add_deps("yutil")
+    add_includedirs("include")
+    set_configdir("include/pandagl")
+    add_configfiles("src/config.h.in")
     if is_kind("static") then
         set_configvar("PANDAGL_STATIC_BUILD", 1)
     elseif is_plat("windows") then

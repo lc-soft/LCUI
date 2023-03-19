@@ -30,10 +30,10 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <LCUI/ui.h>
+#include <ui.h>
 #include <css.h>
-#include "../include/button.h"
-#include "../include/textview.h"
+#include <ui_widgets/button.h>
+#include <ui_widgets/textview.h>
 
 static ui_widget_prototype_t *ui_button_prototype = NULL;
 

@@ -1,9 +1,11 @@
 ﻿#include <assert.h>
 #include <css.h>
-#include "../include/ui.h"
-#include "internal.h"
+#include <ui/base.h>
+#include <ui/events.h>
+#include <ui/style.h>
+#include <ui/prototype.h>
 
-LCUI_BOOL ui_widget_is_visible(ui_widget_t *w)
+bool ui_widget_is_visible(ui_widget_t *w)
 {
 	return css_computed_display(&w->computed_style) != CSS_DISPLAY_NONE &&
 	       css_computed_visibility(&w->computed_style) !=

@@ -1,6 +1,6 @@
-﻿#include <LCUI.h>
-#include "../include/ui.h"
-#include "internal.h"
+﻿#include <ui/base.h>
+#include "ui_widget_status.h"
+#include "ui_widget_style.h"
 
 static void ui_widget_refresh_children_by_status(ui_widget_t* w)
 {
@@ -42,12 +42,12 @@ int ui_widget_add_status(ui_widget_t* w, const char *status_name)
 	return ui_wdiget_handle_status_change(w, status_name);
 }
 
-LCUI_BOOL ui_widget_has_status(ui_widget_t* w, const char *status_name)
+bool ui_widget_has_status(ui_widget_t* w, const char *status_name)
 {
 	if (strlist_has(w->status, status_name)) {
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 int ui_widget_remove_status(ui_widget_t* w, const char *status_name)
@@ -83,7 +83,7 @@ void ui_widget_update_status(ui_widget_t* widget)
 	}
 }
 
-void ui_widget_set_disabled(ui_widget_t* w, LCUI_BOOL disabled)
+void ui_widget_set_disabled(ui_widget_t* w, bool disabled)
 {
 	w->disabled = disabled;
 	if (w->disabled) {

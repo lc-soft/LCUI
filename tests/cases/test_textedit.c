@@ -1,6 +1,6 @@
 #include <LCUI.h>
-#include <LCUI/ui.h>
-#include <LCUI/ui/widgets/textedit.h>
+#include <ui.h>
+#include <ui_widgets/textedit.h>
 #include "ctest.h"
 
 void test_textedit(void)

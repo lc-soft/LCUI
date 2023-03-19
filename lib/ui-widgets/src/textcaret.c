@@ -29,11 +29,12 @@
  */
 
 #include <stdlib.h>
-#include <LCUI.h>
-#include <LCUI/timer.h>
-#include <LCUI/ui.h>
+#include <ui.h>
 #include <css.h>
-#include "../include/textedit.h"
+#include <yutil.h>
+#include <LCUI/timer.h>
+#include <ui_widgets/textedit.h>
+#include <platform/ime.h>
 
 typedef struct ui_textcaret_task_t {
 	LCUI_BOOL active;

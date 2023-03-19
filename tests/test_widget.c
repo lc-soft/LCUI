@@ -1,7 +1,7 @@
 ﻿#include <stdio.h>
 #include <time.h>
-#include <LCUI/ui.h>
-#include <LCUI/ui/widgets/textview.h>
+#include <ui.h>
+#include <ui_widgets/textview.h>
 
 int main(void)
 {

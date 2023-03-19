@@ -1,9 +1,9 @@
 #include <LCUI.h>
 #include <css.h>
-#include <LCUI/ui.h>
-#include <LCUI/ui/builder.h>
-#include <LCUI/ui/widgets/textview.h>
-#include <LCUI/ui/widgets/scrollbar.h>
+#include <ui.h>
+#include <ui_builder.h>
+#include <ui_widgets/textview.h>
+#include <ui_widgets/scrollbar.h>
 #include "ctest.h"
 
 /* clang-format off */

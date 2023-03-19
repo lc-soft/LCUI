@@ -1,6 +1,6 @@
 ﻿#include <LCUI.h>
-#include <LCUI/ui.h>
-#include <LCUI/ui/builder.h>
+#include <ui.h>
+#include <ui_builder.h>
 #include "ctest.h"
 
 static void check_widget_attribute(void)

@@ -1,7 +1,7 @@
 ﻿#include "ctest.h"
 #include <LCUI.h>
-#include <LCUI/ui/builder.h>
-#include <LCUI/ui/widgets/textview.h>
+#include <ui_builder.h>
+#include <ui_widgets/textview.h>
 
 static void test_dropdown(void)
 {

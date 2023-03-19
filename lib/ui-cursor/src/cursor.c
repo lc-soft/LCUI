@@ -1,4 +1,4 @@
-﻿#include "../include/cursor.h"
+﻿#include <ui_cursor.h>
 
 static struct ui_cursor_t {
 	int x, y;

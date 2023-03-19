@@ -1,8 +1,16 @@
 ﻿#include <stdio.h>
-#include <LCUI.h>
+#include <yutil.h>
 #include <pandagl.h>
 #include <css/style_value.h>
-#include "internal.h"
+#include <ui/base.h>
+#include <ui/metrics.h>
+#include <ui/prototype.h>
+#include <ui/rect.h>
+#include "ui_widget_box.h"
+#include "ui_widget_border.h"
+#include "ui_widget_background.h"
+#include "ui_widget_box_shadow.h"
+#include "ui_widget_prototype.h"
 
 //#define DEBUG_FRAME_RENDER
 #define MAX_VISIBLE_WIDTH 20000
@@ -55,15 +63,15 @@ typedef struct ui_renderer_t {
 	 * root canvas */
 	ui_rect_t content_rect;
 
-	LCUI_BOOL has_content_graph;
-	LCUI_BOOL has_self_graph;
-	LCUI_BOOL has_layer_graph;
-	LCUI_BOOL can_render_self;
-	LCUI_BOOL can_render_centent;
+	bool has_content_graph;
+	bool has_self_graph;
+	bool has_layer_graph;
+	bool can_render_self;
+	bool can_render_centent;
 } ui_renderer_t;
 
 /** 判断部件是否有可绘制内容 */
-static LCUI_BOOL ui_widget_is_paintable(ui_widget_t *w)
+static bool ui_widget_is_paintable(ui_widget_t *w)
 {
 	const css_computed_style_t *s = &w->computed_style;
 
@@ -71,12 +79,12 @@ static LCUI_BOOL ui_widget_is_paintable(ui_widget_t *w)
 	    s->border_top_width > 0 || s->border_right_width > 0 ||
 	    s->border_bottom_width > 0 || s->border_left_width > 0 ||
 	    s->type_bits.box_shadow == CSS_BOX_SHADOW_SET) {
-		return TRUE;
+		return true;
 	}
 	return w->proto != ui_get_widget_prototype(NULL);
 }
 
-static LCUI_BOOL ui_widget_has_round_border(ui_widget_t *w)
+static bool ui_widget_has_round_border(ui_widget_t *w)
 {
 	const css_computed_style_t *s = &w->computed_style;
 
@@ -84,14 +92,14 @@ static LCUI_BOOL ui_widget_has_round_border(ui_widget_t *w)
 	       s->border_bottom_left_radius || s->border_bottom_right_radius;
 }
 
-LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
+bool ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
 				    ui_box_type_t box_type)
 {
 	ui_rect_t rect;
 	ui_dirty_rect_type_t type;
 
 	if (!ui_widget_is_visible(w)) {
-		return FALSE;
+		return false;
 	}
 	if (!in_rect) {
 		switch (box_type) {
@@ -108,28 +116,28 @@ LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
 			break;
 		}
 		if (w->dirty_rect_type >= type) {
-			return FALSE;
+			return false;
 		}
 		w->dirty_rect_type = type;
 		while (w->parent) {
-			w->parent->has_child_dirty_rect = TRUE;
+			w->parent->has_child_dirty_rect = true;
 			w = w->parent;
 		}
-		return TRUE;
+		return true;
 	}
 
 	rect = *in_rect;
 	switch (box_type) {
 	case UI_BOX_TYPE_GRAPH_BOX:
 		if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_CANVAS_BOX) {
-			return FALSE;
+			return false;
 		}
 		ui_rect_correct(&rect, w->canvas_box.width,
 				w->canvas_box.height);
 		break;
 	case UI_BOX_TYPE_BORDER_BOX:
 		if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_BORDER_BOX) {
-			return FALSE;
+			return false;
 		}
 		ui_rect_correct(&rect, w->border_box.width,
 				w->border_box.height);
@@ -138,7 +146,7 @@ LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
 		break;
 	case UI_BOX_TYPE_PADDING_BOX:
 		if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_PADDING_BOX) {
-			return FALSE;
+			return false;
 		}
 		ui_rect_correct(&rect, w->padding_box.width,
 				w->padding_box.height);
@@ -161,11 +169,11 @@ LCUI_BOOL ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
 		w->dirty_rect = rect;
 		w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CUSTOM;
 		while (w->parent) {
-			w->parent->has_child_dirty_rect = TRUE;
+			w->parent->has_child_dirty_rect = true;
 			w = w->parent;
 		}
 	}
-	return TRUE;
+	return true;
 }
 
 #define add_dirty_rect()                                         \
@@ -227,7 +235,7 @@ static void ui_widget_collect_dirty_rect(ui_widget_t *w, list_t *rects, float x,
 		}
 	}
 	w->dirty_rect_type = UI_DIRTY_RECT_TYPE_NONE;
-	w->has_child_dirty_rect = FALSE;
+	w->has_child_dirty_rect = false;
 }
 
 size_t ui_widget_get_dirty_rects(ui_widget_t *w, list_t *rects)
@@ -272,9 +280,9 @@ static ui_renderer_t *ui_renderer_create(ui_widget_t *w, pd_context_t *paint,
 	that->target = w;
 	that->style = style;
 	that->paint = paint;
-	that->has_self_graph = FALSE;
-	that->has_layer_graph = FALSE;
-	that->has_content_graph = FALSE;
+	that->has_self_graph = false;
+	that->has_layer_graph = false;
+	that->has_content_graph = false;
 	if (parent) {
 		that->root_paint = parent->root_paint;
 		that->x = parent->x + parent->content_left + w->canvas_box.x;
@@ -284,11 +292,11 @@ static ui_renderer_t *ui_renderer_create(ui_widget_t *w, pd_context_t *paint,
 		that->root_paint = that->paint;
 	}
 	if (w->computed_style.opacity < 1.0) {
-		that->has_self_graph = TRUE;
-		that->has_content_graph = TRUE;
-		that->has_layer_graph = TRUE;
+		that->has_self_graph = true;
+		that->has_content_graph = true;
+		that->has_layer_graph = true;
 	} else if (ui_widget_has_round_border(w)) {
-		that->has_content_graph = TRUE;
+		that->has_content_graph = true;
 	}
 	pd_canvas_init(&that->self_graph);
 	pd_canvas_init(&that->layer_graph);
@@ -359,7 +367,7 @@ static void ui_renderer_destroy(ui_renderer_t *renderer)
 	free(renderer);
 }
 
-INLINE void ui_widget_compute_box(ui_widget_t *w, ui_widget_actual_style_t *s)
+LIBUI_INLINE void ui_widget_compute_box(ui_widget_t *w, ui_widget_actual_style_t *s)
 {
 	s->content_box.x = ui_compute(s->x + w->content_box.x);
 	s->content_box.y = ui_compute(s->y + w->content_box.y);
@@ -443,7 +451,7 @@ static size_t ui_renderer_render_children(ui_renderer_t *that)
 		child_paint.rect.x -= style.canvas_box.x;
 		child_paint.rect.y -= style.canvas_box.y;
 		if (that->has_content_graph) {
-			child_paint.with_alpha = TRUE;
+			child_paint.with_alpha = true;
 			paint_rect.x -= that->actual_content_rect.x;
 			paint_rect.y -= that->actual_content_rect.y;
 			pd_canvas_quote(&child_paint.canvas,
@@ -484,7 +492,7 @@ static size_t ui_renderer_render(ui_renderer_t *renderer)
 	if (that->can_render_self) {
 		count += 1;
 		self_paint = *that->paint;
-		self_paint.with_alpha = TRUE;
+		self_paint.with_alpha = true;
 		self_paint.canvas = that->self_graph;
 		ui_widget_on_paint(that->target, &self_paint, that->style);
 #ifdef DEBUG_FRAME_RENDER
@@ -521,7 +529,7 @@ static size_t ui_renderer_render(ui_renderer_t *renderer)
 		if (that->has_content_graph) {
 			pd_canvas_mix(&that->paint->canvas,
 				      &that->content_graph, content_x,
-				      content_y, TRUE);
+				      content_y, true);
 		}
 #ifdef DEBUG_FRAME_RENDER
 		sprintf(filename, "frame-%zd-L%d-%s-canvas.png", frame++,
@@ -541,7 +549,7 @@ static size_t ui_renderer_render(ui_renderer_t *renderer)
 	if (that->can_render_self) {
 		pd_canvas_copy(&that->layer_graph, &that->self_graph);
 		pd_canvas_mix(&that->layer_graph, &that->content_graph,
-			      content_x, content_y, TRUE);
+			      content_x, content_y, true);
 #ifdef DEBUG_FRAME_RENDER
 		sprintf(filename, "frame-%zd-L%d-%s-content-graph-%d-%d.png",
 			frame++, __LINE__, renderer->target->id, content_x,

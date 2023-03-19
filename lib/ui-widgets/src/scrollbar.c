@@ -31,10 +31,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <LCUI/timer.h>
-#include <LCUI/ui.h>
 #include <css.h>
-#include "../include/scrollbar.h"
+#include <ui.h>
+#include <ui_widgets/scrollbar.h>
+#include <LCUI/timer.h>
 
 /* clang-format off */
 

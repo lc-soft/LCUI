@@ -11,6 +11,11 @@ add_includedirs(
     "lib/pandagl/include",
     "lib/css/include",
     "lib/platform/include",
+    "lib/ui/include",
+    "lib/ui-server/include",
+    "lib/ui-widgets/include",
+    "lib/ui-cursor/include",
+    "lib/ui-builder/include",
     "include"
 )
 includes("lib/*/xmake.lua")
@@ -92,11 +97,6 @@ target("headers")
     before_build(function (target)
         -- Copy the header file of the internal library to the LCUI header file directory
         os.cp("$(projectdir)/lib/thread/include/*.h", "$(projectdir)/include/LCUI/")
-        os.cp("$(projectdir)/lib/ui/include/*.h", "$(projectdir)/include/LCUI/")
-        os.cp("$(projectdir)/lib/ui-widgets/include/*.h", "$(projectdir)/include/LCUI/ui/widgets/")
-        os.cp("$(projectdir)/lib/ui-cursor/include/*.h", "$(projectdir)/include/LCUI/ui/")
-        os.cp("$(projectdir)/lib/ui-builder/include/*.h", "$(projectdir)/include/LCUI/ui/")
-        os.cp("$(projectdir)/lib/ui-server/include/*.h", "$(projectdir)/include/LCUI/ui/")
         os.cp("$(projectdir)/lib/timer/include/*.h", "$(projectdir)/include/LCUI/")
         os.cp("$(projectdir)/lib/worker/include/*.h", "$(projectdir)/include/LCUI/")
     end)

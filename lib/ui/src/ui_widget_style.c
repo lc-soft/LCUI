@@ -1,7 +1,10 @@
 ﻿#include <string.h>
 #include <css.h>
-#include "internal.h"
-
+#include <ui/base.h>
+#include <ui/metrics.h>
+#include <ui/style.h>
+#include <ui/image.h>
+#include "ui_widget_style.h"
 
 css_selector_node_t *ui_widget_create_selector_node(ui_widget_t *w)
 {
@@ -129,7 +132,7 @@ size_t ui_widget_get_children_style_changes(ui_widget_t *w, int type,
 void ui_widget_update_children_style(ui_widget_t *w)
 {
 	list_node_t *node;
-	w->update.for_children = TRUE;
+	w->update.for_children = true;
 	for (list_each(node, &w->children)) {
 		ui_widget_update_style(node->data);
 		ui_widget_update_children_style(node->data);
@@ -139,7 +142,7 @@ void ui_widget_update_children_style(ui_widget_t *w)
 void ui_widget_refresh_children_style(ui_widget_t *w)
 {
 	list_node_t *node;
-	w->update.for_children = TRUE;
+	w->update.for_children = true;
 	for (list_each(node, &w->children)) {
 		ui_widget_refresh_style(node->data);
 		ui_widget_refresh_children_style(node->data);
@@ -327,7 +330,7 @@ void ui_widget_force_update_style(ui_widget_t *w)
 	DEBUG_MSG("begin, %s\n", w->classes ? w->classes[0] : "null");
 	if (s->background_image &&
 	    s->type_bits.background_image == CSS_BACKGROUND_IMAGE_DATA) {
-		ui_image_remove_ref((ui_image_t *)s->background_image);
+		ui_image_destroy((ui_image_t *)s->background_image);
 	}
 	css_computed_style_destroy(s);
 	if (w->custom_style) {
@@ -344,10 +347,9 @@ void ui_widget_force_update_style(ui_widget_t *w)
 	if (s->background_image) {
 		s->type_bits.background_image = CSS_BACKGROUND_IMAGE_DATA;
 		s->background_image =
-		    (css_image_value_t)ui_load_image(s->background_image);
+		    (css_image_value_t)ui_image_create(s->background_image);
 		ui_image_on_event((ui_image_t *)s->background_image,
 				  ui_widget_on_background_image_load, w);
-		ui_image_add_ref((ui_image_t *)s->background_image);
 	}
 	if (w->proto && w->proto->update) {
 		/* 扩展部分的样式交给该部件自己处理 */
@@ -370,7 +372,7 @@ void ui_widget_destroy_style(ui_widget_t *w)
 	w->matched_style = NULL;
 	if (w->computed_style.type_bits.background_image ==
 	    CSS_BACKGROUND_IMAGE_DATA) {
-		ui_image_remove_ref(
+		ui_image_destroy(
 		    (ui_image_t *)w->computed_style.background_image);
 	}
 	if (w->custom_style) {

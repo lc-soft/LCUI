@@ -1,5 +1,10 @@
 ﻿// #define UI_DEBUG_ENABLED
-#include "internal.h"
+#include <ui/base.h>
+#include <ui/style.h>
+#include <css/computed.h>
+#include "ui_diff.h"
+#include "ui_widget_style.h"
+#include "ui_widget_box.h"
 
 typedef struct ui_block_layout_row_t {
 	float width;
@@ -12,7 +17,7 @@ typedef struct ui_block_layout_row_t {
 typedef struct ui_block_layout_context_t {
 	ui_widget_t *widget;
 	ui_layout_rule_t rule;
-	LCUI_BOOL is_initiative;
+	bool is_initiative;
 
 	float x, y;
 	float content_width;

@@ -1,5 +1,13 @@
 ﻿#include <string.h>
-#include "internal.h"
+#include <css/computed.h>
+#include <ui/base.h>
+#include <ui/rect.h>
+#include <ui/mutation_observer.h>
+#include "ui_widget.h"
+#include "ui_widget_box.h"
+#include "ui_widget_style.h"
+#include "ui_widget_observer.h"
+#include "ui_diff.h"
 
 #define IS_PROP_TYPE_CHANGED(PROP_KEY) \
 	diff->style.type_bits.PROP_KEY != w->computed_style.type_bits.PROP_KEY
@@ -17,7 +25,7 @@ void ui_style_diff_init(ui_style_diff_t *diff, ui_widget_t *w)
 	diff->border_box = w->border_box;
 	diff->canvas_box = w->canvas_box;
 	diff->outer_box = w->outer_box;
-	diff->should_add_dirty_rect = FALSE;
+	diff->should_add_dirty_rect = false;
 	if (w->parent) {
 		if (!ui_widget_is_visible(w->parent)) {
 			return;
@@ -31,7 +39,7 @@ void ui_style_diff_init(ui_style_diff_t *diff, ui_widget_t *w)
 	if (w->state < UI_WIDGET_STATE_LAYOUTED) {
 		w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
 	}
-	diff->should_add_dirty_rect = TRUE;
+	diff->should_add_dirty_rect = true;
 }
 
 void ui_style_diff_begin(ui_style_diff_t *diff, ui_widget_t *w)
@@ -40,7 +48,7 @@ void ui_style_diff_begin(ui_style_diff_t *diff, ui_widget_t *w)
 	diff->visible = ui_widget_is_visible(w);
 }
 
-INLINE void ui_widget_add_reflow_task(ui_widget_t *w)
+LIBUI_INLINE void ui_widget_add_reflow_task(ui_widget_t *w)
 {
 	if (w) {
 		if (w->parent && !ui_widget_has_absolute_position(w) &&
@@ -51,7 +59,7 @@ INLINE void ui_widget_add_reflow_task(ui_widget_t *w)
 	}
 }
 
-INLINE void ui_widget_add_reflow_task_to_parent(ui_widget_t *w)
+LIBUI_INLINE void ui_widget_add_reflow_task_to_parent(ui_widget_t *w)
 {
 	switch (css_computed_position(&w->computed_style)) {
 	case CSS_POSITION_ABSOLUTE:
@@ -66,7 +74,7 @@ INLINE void ui_widget_add_reflow_task_to_parent(ui_widget_t *w)
 void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w)
 {
 	ui_mutation_record_t *record;
-	const LCUI_BOOL is_flex_item = ui_widget_is_flex_item(w);
+	const bool is_flex_item = ui_widget_is_flex_item(w);
 
 	if (ui_widget_is_visible(w) != diff->visible) {
 		w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
@@ -209,7 +217,7 @@ void ui_layout_diff_end(ui_layout_diff_t *diff, ui_widget_t *w)
 			}
 		}
 		for (parent = w->parent; parent; parent = parent->parent) {
-			parent->has_child_dirty_rect = TRUE;
+			parent->has_child_dirty_rect = true;
 		}
 	} else {
 		w->dirty_rect_type = UI_DIRTY_RECT_TYPE_NONE;

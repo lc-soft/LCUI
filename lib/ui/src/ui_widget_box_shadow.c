@@ -1,5 +1,7 @@
 ﻿#include <pandagl.h>
-#include "internal.h"
+#include <ui/base.h>
+#include <ui/metrics.h>
+#include "ui_widget_box_shadow.h"
 
 void ui_widget_paint_box_shadow(ui_widget_t* w, pd_context_t* ctx,
 				ui_widget_actual_style_t* style)
