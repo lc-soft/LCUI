@@ -1,5 +1,8 @@
 #include <errno.h>
-#include "./internal.h"
+#include <ui/base.h>
+#include <ui/events.h>
+#include <ui/mutation_observer.h>
+#include "ui_mutation_observer.h"
 
 static list_t ui_observers = { 0 };
 

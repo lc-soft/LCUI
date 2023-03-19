@@ -1,5 +1,5 @@
 #include <LCUI.h>
-#include <LCUI/ui/builder.h>
+#include <ui_builder.h>
 #include <platform/main.h>
 
 int main(void)

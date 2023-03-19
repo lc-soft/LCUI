@@ -1,6 +1,8 @@
 
 #include <string.h>
-#include "internal.h"
+#include <ui/base.h>
+#include <ui/prototype.h>
+#include "ui_widget_prototype.h"
 
 static dict_t *ui_widget_prototype_dict;
 
@@ -102,37 +104,37 @@ ui_widget_prototype_t *ui_get_widget_prototype(const char *name)
 	return proto;
 }
 
-LCUI_BOOL ui_check_widget_type(ui_widget_t *w, const char *type)
+bool ui_check_widget_type(ui_widget_t *w, const char *type)
 {
 	const ui_widget_prototype_t *proto;
 
 	if (!w || !w->type) {
-		return FALSE;
+		return false;
 	}
 	if (strcmp(w->type, type) == 0) {
-		return TRUE;
+		return true;
 	}
 	if (!w->proto) {
-		return FALSE;
+		return false;
 	}
 	for (proto = w->proto->proto; proto; proto = proto->proto) {
 		if (strcmp(proto->name, type) == 0) {
-			return TRUE;
+			return true;
 		}
 	}
-	return FALSE;
+	return false;
 }
 
-LCUI_BOOL ui_check_widget_prototype(ui_widget_t *w,
+bool ui_check_widget_prototype(ui_widget_t *w,
 				    const ui_widget_prototype_t *proto)
 {
 	const ui_widget_prototype_t *p;
 	for (p = w->proto; p; p = p->proto) {
 		if (p == proto) {
-			return TRUE;
+			return true;
 		}
 	}
-	return FALSE;
+	return false;
 }
 
 void *ui_widget_get_data(ui_widget_t *widget, ui_widget_prototype_t *proto)

@@ -1,6 +1,9 @@
-#include "./internal.h"
+#include <ui/base.h>
+#include <ui/mutation_observer.h>
+#include "ui_mutation_observer.h"
+#include "ui_widget_observer.h"
 
-LCUI_BOOL ui_widget_has_observer(ui_widget_t *widget,
+bool ui_widget_has_observer(ui_widget_t *widget,
 				 ui_mutation_record_type_t type)
 {
 	ui_widget_t *parent;
@@ -20,17 +23,17 @@ LCUI_BOOL ui_widget_has_observer(ui_widget_t *widget,
 			switch (type) {
 			case UI_MUTATION_RECORD_TYPE_CHILD_LIST:
 				if (conn->options.child_list) {
-					return TRUE;
+					return true;
 				}
 				break;
 			case UI_MUTATION_RECORD_TYPE_PROPERTIES:
 				if (conn->options.properties) {
-					return TRUE;
+					return true;
 				}
 				break;
 			case UI_MUTATION_RECORD_TYPE_ATTRIBUTES:
 				if (conn->options.attributes) {
-					return TRUE;
+					return true;
 				}
 				break;
 			default:
@@ -38,7 +41,7 @@ LCUI_BOOL ui_widget_has_observer(ui_widget_t *widget,
 			}
 		}
 	}
-	return FALSE;
+	return false;
 }
 
 int ui_widget_add_mutation_recrod(ui_widget_t *widget,

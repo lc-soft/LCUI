@@ -1,6 +1,14 @@
 ﻿#include <pandagl.h>
-#include "../include/ui.h"
-#include "internal.h"
+#include <ui/types.h>
+#include "ui_trash.h"
+#include "ui_root.h"
+#include "ui_events.h"
+#include "ui_image.h"
+#include "ui_widget_id.h"
+#include "ui_widget_prototype.h"
+#include "ui_css.h"
+#include "ui_updater.h"
+#include "ui_metrics.h"
 
 void ui_init(void)
 {

@@ -35,9 +35,9 @@
 #include <platform.h>
 #include <pandagl.h>
 #include <css.h>
-#include "./internal.h"
-#include "../include/textedit.h"
-#include "../include/textcaret.h"
+#include <ui_widgets/textedit.h>
+#include <ui_widgets/textcaret.h>
+#include "textstyle.h"
 
 #define TEXTBLOCK_SIZE 512
 #define DEFAULT_WIDTH 176.0f

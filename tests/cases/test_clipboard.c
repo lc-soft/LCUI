@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <LCUI.h>
-#include <LCUI/ui/widgets/textedit.h>
+#include <ui_widgets/textedit.h>
 #include <LCUI/timer.h>
 #include "ctest.h"
 

@@ -45,6 +45,8 @@ typedef struct LCUI_WorkerRec_ *LCUI_Worker;
 
 LCUI_API LCUI_Worker LCUIWorker_New(void);
 
+LCUI_API void LCUIWorker_setFrameRateCap(LCUI_Worker worker, unsigned rate_cap);
+
 LCUI_API void LCUIWorker_PostTask(LCUI_Worker worker, LCUI_Task task);
 
 LCUI_API LCUI_BOOL LCUIWorker_RunTask(LCUI_Worker worker);

@@ -1,7 +1,13 @@
 ﻿#include <assert.h>
 #include <string.h>
 #include <css/selector.h>
-#include "internal.h"
+#include <ui/base.h>
+#include <ui/style.h>
+#include <ui/events.h>
+#include <ui/rect.h>
+#include <ui/mutation_observer.h>
+#include "ui_widget_observer.h"
+#include "ui_trash.h"
 
 #define TYPE_CHILD_LIST UI_MUTATION_RECORD_TYPE_CHILD_LIST
 
@@ -20,9 +26,9 @@ int ui_widget_append(ui_widget_t* parent, ui_widget_t* widget)
 	widget->parent = parent;
 	widget->state = UI_WIDGET_STATE_CREATED;
 	widget->index = parent->children.length;
-	widget->parent->update.for_children = TRUE;
+	widget->parent->update.for_children = true;
 	list_append_node(&parent->children, &widget->node);
-	ev.cancel_bubble = TRUE;
+	ev.cancel_bubble = true;
 	ev.type = UI_EVENT_LINK;
 	ui_widget_refresh_style(widget);
 	ui_widget_refresh_children_style(widget);
@@ -56,7 +62,7 @@ int ui_widget_prepend(ui_widget_t* parent, ui_widget_t* widget)
 	widget->index = 0;
 	widget->parent = parent;
 	widget->state = UI_WIDGET_STATE_CREATED;
-	widget->parent->update.for_children = TRUE;
+	widget->parent->update.for_children = true;
 	node = &widget->node;
 	list_insert_node(&parent->children, 0, node);
 	/** 修改它后面的部件的 index 值 */
@@ -66,7 +72,7 @@ int ui_widget_prepend(ui_widget_t* parent, ui_widget_t* widget)
 		child->index += 1;
 		node = node->next;
 	}
-	ev.cancel_bubble = TRUE;
+	ev.cancel_bubble = true;
 	ev.type = UI_EVENT_LINK;
 	ui_widget_emit_event(widget, ev, NULL);
 	ui_widget_add_task_for_children(widget, UI_TASK_REFRESH_STYLE);
@@ -120,7 +126,7 @@ int ui_widget_unwrap(ui_widget_t* w)
 	node = &w->node;
 	target = node->prev;
 	node = w->children.tail.prev;
-	ev.cancel_bubble = TRUE;
+	ev.cancel_bubble = true;
 	while (len > 0) {
 		assert(node != NULL);
 		assert(node->data != NULL);
@@ -181,7 +187,7 @@ int ui_widget_unlink(ui_widget_t* w)
 		node = node->next;
 	}
 	node = &w->node;
-	ev.cancel_bubble = TRUE;
+	ev.cancel_bubble = true;
 	ev.type = UI_EVENT_UNLINK;
 	ui_widget_emit_event(w, ev, NULL);
 	list_unlink(&w->parent->children, node);
@@ -301,7 +307,7 @@ size_t ui_widget_each(ui_widget_t* w, void (*callback)(ui_widget_t*, void*),
 ui_widget_t* ui_widget_at(ui_widget_t* widget, int ix, int iy)
 {
 	float x, y;
-	LCUI_BOOL is_hit;
+	bool is_hit;
 	list_node_t* node;
 	ui_widget_t *target = widget, *c = NULL;
 
@@ -311,7 +317,7 @@ ui_widget_t* ui_widget_at(ui_widget_t* widget, int ix, int iy)
 	x = 1.0f * ix;
 	y = 1.0f * iy;
 	do {
-		is_hit = FALSE;
+		is_hit = false;
 		for (list_each(node, &target->stacking_context)) {
 			c = node->data;
 			if (!ui_widget_is_visible(c)) {
@@ -321,7 +327,7 @@ ui_widget_t* ui_widget_at(ui_widget_t* widget, int ix, int iy)
 				target = c;
 				x -= c->padding_box.x;
 				y -= c->padding_box.y;
-				is_hit = TRUE;
+				is_hit = true;
 				break;
 			}
 		}

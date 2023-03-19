@@ -1,8 +1,8 @@
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
-#include "../include/ui.h"
-#include "internal.h"
+#include <ui/base.h>
+#include "ui_widget_attributes.h"
 
 static void ui_widget_attribute_destructor(void *privdata, void *data)
 {
@@ -22,12 +22,12 @@ int ui_widget_set_attribute_ex(ui_widget_t *w, const char *name, void *value,
 {
 	ui_widget_attribute_t *attr;
 	static dict_type_t dict_type;
-	static LCUI_BOOL dict_type_available = FALSE;
+	static bool dict_type_available = false;
 
 	if (!dict_type_available) {
 		dict_init_string_key_type(&dict_type);
 		dict_type.val_destructor = ui_widget_attribute_destructor;
-		dict_type_available = TRUE;
+		dict_type_available = true;
 	}
 	if (!w->attributes) {
 		w->attributes = dict_create(&dict_type, NULL);
@@ -60,9 +60,9 @@ int ui_widget_set_attribute(ui_widget_t *w, const char *name, const char *value)
 		}
 		if (strcmp(name, "disabled") == 0) {
 			if (!value || strcmp(value, "false") != 0) {
-				ui_widget_set_disabled(w, TRUE);
+				ui_widget_set_disabled(w, true);
 			} else {
-				ui_widget_set_disabled(w, FALSE);
+				ui_widget_set_disabled(w, false);
 			}
 		} else if (strcmp(name, "tabindex") == 0) {
 			if (value) {

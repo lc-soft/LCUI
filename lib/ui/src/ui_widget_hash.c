@@ -1,7 +1,5 @@
-﻿
-#include <LCUI.h>
-#include "../include/ui.h"
-#include "internal.h"
+﻿#include <ui/base.h>
+#include <ui/hash.h>
 
 void ui_widget_generate_self_hash(ui_widget_t* widget)
 {

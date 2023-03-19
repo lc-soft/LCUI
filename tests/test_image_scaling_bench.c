@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <LCUI.h>
 #include <LCUI/timer.h>
-#include <LCUI/ui.h>
-#include <LCUI/ui/builder.h>
+#include <ui.h>
+#include <ui_builder.h>
 #include <pandagl.h>
 
 int main(int argc, char **argv)

@@ -1,20 +1,15 @@
 #include <math.h>
 #include <yutil.h>
-#include <LCUI/ui/server.h>
-#include <LCUI/app.h>
-#include <LCUI/ui/widgets/textview.h>
-#include <LCUI/ui/widgets/button.h>
-#include <LCUI/ui/widgets/anchor.h>
-#include <LCUI/ui/widgets/canvas.h>
-#include <LCUI/ui/widgets/scrollbar.h>
-#include <LCUI/ui/widgets/textedit.h>
-#include <LCUI/ui/widgets/textcaret.h>
 #include <pandagl.h>
+#include <ui_server.h>
+#include <ui_widgets.h>
+#include <LCUI/app.h>
 
 #define DEFAULT_WINDOW_WIDTH 800
 #define DEFAULT_WINDOW_HEIGHT 600
 
 static struct lcui_ui_t {
+	int image_loading_timer;
 	lcui_display_mode_t mode;
 	ui_mutation_observer_t *observer;
 
@@ -374,6 +369,11 @@ static void lcui_load_default_fonts(void)
 #endif
 }
 
+static void lcui_ui_image_loading_timer(void *arg)
+{
+	ui_load_images();
+}
+
 void lcui_init_ui(void)
 {
 	ui_init();
@@ -385,10 +385,12 @@ void lcui_init_ui(void)
 	lcui_init_ui_preset_widgets();
 	lcui_load_default_fonts();
 	app_on_event(APP_EVENT_CLOSE, lcui_on_window_destroy, NULL);
+	lcui_ui.image_loading_timer = lcui_set_interval(100, lcui_ui_image_loading_timer, NULL);
 }
 
 void lcui_destroy_ui(void)
 {
+	lcui_destroy_timer(lcui_ui.image_loading_timer);
 	lcui_destroy_ui_preset_widgets();
 	app_off_event(APP_EVENT_CLOSE, lcui_on_window_destroy);
 	list_destroy(&lcui_ui.windows, lcui_close_window);

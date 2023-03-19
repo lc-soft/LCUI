@@ -1,6 +1,5 @@
-#include <LCUI.h>
-#include "../include/ui.h"
-#include "internal.h"
+#include <ui.h>
+#include "ui_root.h"
 
 static ui_widget_t *ui_root_widget;
 

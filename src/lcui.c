@@ -6,7 +6,7 @@
 #include <LCUI/config.h>
 #include <LCUI/app.h>
 #include <platform.h>
-#include <LCUI/ui.h>
+#include <ui.h>
 #include <LCUI/thread.h>
 #include <LCUI/worker.h>
 #include <LCUI/timer.h>

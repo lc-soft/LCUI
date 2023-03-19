@@ -1,10 +1,21 @@
 ﻿// #define UI_DEBUG_ENABLED
 #include <string.h>
 #include <time.h>
-#include <css/selector.h>
-#include <css/style_decl.h>
-#include "internal.h"
+#include <css.h>
+#include <ui/base.h>
+#include <ui/style.h>
+#include <ui/rect.h>
+#include <ui/metrics.h>
+#include <ui/mutation_observer.h>
+#include <ui/hash.h>
 #include "ui_debug.h"
+#include "ui_diff.h"
+#include "ui_trash.h"
+#include "ui_updater.h"
+#include "ui_mutation_observer.h"
+#include "ui_widget_style.h"
+#include "ui_widget_box.h"
+#include "ui_widget.h"
 
 // TODO: 考虑将 style_cache 移动到 ui_updater 内
 
@@ -22,7 +33,7 @@ struct ui_updater_profile_t {
 static struct ui_updater_t {
 	dict_type_t style_cache_dict;
 	ui_metrics_t metrics;
-	LCUI_BOOL refresh_all;
+	bool refresh_all;
 	ui_widget_function_t handlers[UI_TASK_TOTAL_NUM];
 } ui_updater;
 
@@ -61,7 +72,7 @@ static void ui_widget_on_refresh_style(ui_widget_t* w)
 {
 	// TODO：是否有必要将样式计算功能分为 refresh 和 update？
 	ui_widget_force_refresh_style(w);
-	w->update.states[UI_TASK_UPDATE_STYLE] = FALSE;
+	w->update.states[UI_TASK_UPDATE_STYLE] = false;
 }
 
 static void ui_widget_on_update_style(ui_widget_t* w)
@@ -74,7 +85,7 @@ void ui_widget_add_task_for_children(ui_widget_t* widget, ui_task_type_t task)
 	ui_widget_t* child;
 	list_node_t* node;
 
-	widget->update.for_children = TRUE;
+	widget->update.for_children = true;
 	for (list_each(node, &widget->children)) {
 		child = node->data;
 		ui_widget_add_task(child, task);
@@ -88,12 +99,12 @@ void ui_widget_add_task(ui_widget_t* widget, int task)
 		return;
 	}
 	DEBUG_MSG("[%lu] %s, %d\n", widget->index, widget->type, task);
-	widget->update.for_self = TRUE;
-	widget->update.states[task] = TRUE;
+	widget->update.for_self = true;
+	widget->update.states[task] = true;
 	widget = widget->parent;
 	/* 向没有标记的父级部件添加标记 */
 	while (widget && !widget->update.for_children) {
-		widget->update.for_children = TRUE;
+		widget->update.for_children = true;
 		widget = widget->parent;
 	}
 }
@@ -170,7 +181,7 @@ void ui_init_updater(void)
 	set_task_handler(UPDATE_STYLE, ui_widget_on_update_style);
 	set_task_handler(REFRESH_STYLE, ui_widget_on_refresh_style);
 	set_task_handler(REFLOW, NULL);
-	ui_updater.refresh_all = TRUE;
+	ui_updater.refresh_all = true;
 }
 
 static ui_updater_profile_t* ui_widget_begin_update(ui_widget_t* w,
@@ -248,7 +259,7 @@ static size_t ui_widget_update_visible_children(ui_widget_t* w,
 						ui_updater_profile_t* ctx)
 {
 	size_t total = 0, count;
-	LCUI_BOOL found = FALSE;
+	bool found = false;
 	ui_rect_t rect, visible_rect;
 	ui_widget_t *child, *parent;
 	list_node_t *node, *next;
@@ -290,10 +301,10 @@ static size_t ui_widget_update_visible_children(ui_widget_t* w,
 			}
 			continue;
 		}
-		found = TRUE;
+		found = true;
 		count = ui_widget_update_with_context(child, ctx);
 		if (child->update.for_self || child->update.for_children) {
-			w->update.for_children = TRUE;
+			w->update.for_children = true;
 		}
 		total += count;
 		node = next;
@@ -336,13 +347,13 @@ static size_t ui_widget_update_children(ui_widget_t* w,
 		}
 	}
 
-	w->update.for_children = FALSE;
+	w->update.for_children = false;
 	while (node) {
 		child = node->data;
 		next = node->next;
 		count = ui_widget_update_with_context(child, ctx);
 		if (child->update.for_self || child->update.for_children) {
-			w->update.for_children = TRUE;
+			w->update.for_children = true;
 		}
 		total += count;
 		node = next;
@@ -361,14 +372,14 @@ static size_t ui_widget_update_children(ui_widget_t* w,
 		if (rules->max_update_children_count > 0) {
 			if (update_count >=
 			    (size_t)rules->max_update_children_count) {
-				w->update.for_children = TRUE;
+				w->update.for_children = true;
 				break;
 			}
 		}
 		if (update_count < w->extra->default_max_update_count) {
 			continue;
 		}
-		w->update.for_children = TRUE;
+		w->update.for_children = true;
 		msec = (clock() - msec);
 		if (msec < 1) {
 			w->extra->default_max_update_count += 128;
@@ -395,7 +406,7 @@ static size_t ui_widget_update_children(ui_widget_t* w,
 static void ui_widget_update_self(ui_widget_t* w, ui_updater_profile_t* ctx)
 {
 	int i;
-	LCUI_BOOL* states;
+	bool* states;
 	ui_style_diff_t style_diff = { 0 };
 
 	if (!w->update.for_self) {
@@ -406,20 +417,20 @@ static void ui_widget_update_self(ui_widget_t* w, ui_updater_profile_t* ctx)
 		ui_style_diff_begin(&style_diff, w);
 	}
 	states = w->update.states;
-	w->update.for_self = FALSE;
+	w->update.for_self = false;
 	for (i = 0; i < UI_TASK_REFLOW; ++i) {
 		if (states[i]) {
 			if (w->proto && w->proto->runtask) {
 				w->proto->runtask(w, i);
 			}
-			states[i] = FALSE;
+			states[i] = false;
 			if (ui_updater.handlers[i]) {
 				ui_updater.handlers[i](w);
 			}
 		}
 	}
 	if (states[UI_TASK_USER] && w->proto && w->proto->runtask) {
-		states[UI_TASK_USER] = FALSE;
+		states[UI_TASK_USER] = false;
 		w->proto->runtask(w, UI_TASK_USER);
 	}
 	ui_widget_add_state(w, UI_WIDGET_STATE_UPDATED);
@@ -434,10 +445,10 @@ static size_t ui_widget_update_with_context(ui_widget_t* w,
 	ui_layout_diff_t diff;
 
 	if (ui_updater.refresh_all) {
-		w->update.for_self = TRUE;
-		w->update.for_children = TRUE;
-		w->update.states[UI_TASK_REFRESH_STYLE] = TRUE;
-		w->update.states[UI_TASK_REFLOW] = TRUE;
+		w->update.for_self = true;
+		w->update.for_children = true;
+		w->update.states[UI_TASK_REFRESH_STYLE] = true;
+		w->update.states[UI_TASK_REFLOW] = true;
 		w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
 	}
 	if (!w->update.for_self && !w->update.for_children) {
@@ -476,7 +487,7 @@ static size_t ui_widget_update_with_context(ui_widget_t* w,
 		if (!w->parent || !ui_widget_in_layout_flow(w)) {
 			ui_widget_update_box_position(w);
 		}
-		w->update.states[UI_TASK_REFLOW] = FALSE;
+		w->update.states[UI_TASK_REFLOW] = false;
 #ifdef UI_DEBUG_ENABLED
 		{
 			UI_WIDGET_STR(w, str);
@@ -503,7 +514,7 @@ size_t ui_widget_update(ui_widget_t* w)
 
 void ui_refresh_style(void)
 {
-	ui_updater.refresh_all = TRUE;
+	ui_updater.refresh_all = true;
 }
 
 size_t ui_update(void)
@@ -513,7 +524,7 @@ size_t ui_update(void)
 	ui_layout_diff_t diff;
 
 	if (memcmp(&ui_metrics, &ui_updater.metrics, sizeof(ui_metrics_t))) {
-		ui_updater.refresh_all = TRUE;
+		ui_updater.refresh_all = true;
 	}
 	if (ui_updater.refresh_all) {
 		ui_refresh_style();
@@ -522,7 +533,7 @@ size_t ui_update(void)
 	ui_layout_diff_begin(&diff, root);
 	count = ui_widget_update(root);
 	ui_updater.metrics = ui_metrics;
-	ui_updater.refresh_all = FALSE;
+	ui_updater.refresh_all = false;
 	ui_layout_diff_end(&diff, root);
 	ui_process_mutation_observers();
 	ui_trash_clear();
@@ -546,7 +557,7 @@ void ui_update_with_profile(ui_profile_t* profile)
 
 	profile->time = clock();
 	if (memcmp(&ui_metrics, &ui_updater.metrics, sizeof(ui_metrics_t))) {
-		ui_updater.refresh_all = TRUE;
+		ui_updater.refresh_all = true;
 	}
 	if (ui_updater.refresh_all) {
 		ui_refresh_style();

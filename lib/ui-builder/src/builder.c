@@ -31,11 +31,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <LCUI/config.h>
-#include <LCUI.h>
-#include <LCUI/ui.h>
+#include <yutil.h>
 #include <css.h>
 #include <pandagl.h>
-#include "../include/builder.h"
+#include <ui.h>
+#include <ui_builder.h>
 
 #define WARN_TXT "[builder] warning: this module is not enabled before build.\n"
 

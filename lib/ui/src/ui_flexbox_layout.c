@@ -5,7 +5,12 @@
  */
 
 // #define UI_DEBUG_ENABLED
-#include "internal.h"
+#include <ui.h>
+#include <ui/style.h>
+#include <css/computed.h>
+#include "ui_diff.h"
+#include "ui_widget_style.h"
+#include "ui_widget_box.h"
 
 typedef struct ui_flexbox_line_t {
 	float main_size;
@@ -25,8 +30,8 @@ typedef struct ui_flexbox_line_t {
 typedef struct ui_flexbox_layout_context_t {
 	ui_widget_t *widget;
 	ui_layout_rule_t rule;
-	LCUI_BOOL is_initiative;
-	LCUI_BOOL direction_is_column;
+	bool is_initiative;
+	bool direction_is_column;
 
 	float main_size;
 	float cross_size;
@@ -83,7 +88,7 @@ static void ui_flexbox_layout_next_line(ui_flexbox_layout_context_t *ctx)
 	list_append(&ctx->lines, ctx->line);
 }
 
-INLINE float ui_compute_row_item_main_size(css_computed_style_t *s)
+LIBUI_INLINE float ui_compute_row_item_main_size(css_computed_style_t *s)
 {
 	if (css_computed_box_sizing(s) == CSS_BOX_SIZING_BORDER_BOX) {
 	    if (s->flex_basis < css_padding_x(s) + css_border_x(s)) {
@@ -94,7 +99,7 @@ INLINE float ui_compute_row_item_main_size(css_computed_style_t *s)
 	return s->flex_basis;
 }
 
-INLINE float ui_compute_column_item_main_size(css_computed_style_t *s)
+LIBUI_INLINE float ui_compute_column_item_main_size(css_computed_style_t *s)
 {
 	if (css_computed_box_sizing(s) == CSS_BOX_SIZING_BORDER_BOX) {
 	    if (s->flex_basis < css_padding_y(s) + css_border_y(s)) {

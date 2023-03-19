@@ -1,7 +1,11 @@
-#include <pandagl.h>
 #include <yutil.h>
 #include <css.h>
-#include <LCUI/ui.h>
-#include <LCUI/timer.h>
+#include <pandagl.h>
+#include <ui.h>
+#include <ui_widgets.h>
+#include <ui_cursor.h>
+#include <ui_server.h>
+#include <ui_builder.h>
 #include <platform.h>
+#include <LCUI/timer.h>
 #include <LCUI/app.h>

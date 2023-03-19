@@ -1,4 +1,5 @@
-﻿#include "internal.h"
+﻿#include <ui/metrics.h>
+#include "ui_metrics.h"
 
 ui_metrics_t ui_metrics;
 

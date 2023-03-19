@@ -1,6 +1,6 @@
 ﻿#include <LCUI.h>
 #include <pandagl.h>
-#include <LCUI/ui/widgets/textview.h>
+#include <ui_widgets/textview.h>
 
 int main(void)
 {

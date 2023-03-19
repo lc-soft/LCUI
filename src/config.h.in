@@ -1,8 +1,4 @@
 #define PACKAGE_VERSION "${VERSION}-${GIT_COMMIT}"
 
 ${define WITH_LIBXML2}
-
-${define HAVE_LIBX11}
-${define ENABLE_TOUCH}
-
 ${define ENABLE_OPENMP}

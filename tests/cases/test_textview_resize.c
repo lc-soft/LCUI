@@ -1,5 +1,5 @@
 #include <LCUI.h>
-#include <LCUI/ui/widgets/textview.h>
+#include <ui_widgets/textview.h>
 #include <css.h>
 #include "ctest.h"
 

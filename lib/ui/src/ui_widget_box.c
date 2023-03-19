@@ -1,6 +1,8 @@
 #include <pandagl.h>
 #include <math.h>
-#include "internal.h"
+#include <ui/base.h>
+#include <css/computed.h>
+#include "ui_widget_box.h"
 
 #define SHADOW_WIDTH(s) (s->box_shadow_blur + s->box_shadow_spread)
 
@@ -95,7 +97,7 @@ void ui_widget_update_box_position(ui_widget_t *w)
 		w->dirty_rect = w->canvas_box;
 		w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
 		while (parent) {
-			parent->has_child_dirty_rect = TRUE;
+			parent->has_child_dirty_rect = true;
 			parent = parent->parent;
 		}
 	}
@@ -148,7 +150,7 @@ void ui_widget_update_box_size(ui_widget_t *w)
 			w->dirty_rect = w->canvas_box;
 			w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
 			while (parent) {
-				parent->has_child_dirty_rect = TRUE;
+				parent->has_child_dirty_rect = true;
 				parent = parent->parent;
 			}
 		}
@@ -169,7 +171,7 @@ void ui_widget_update_box_size(ui_widget_t *w)
 			w->dirty_rect = w->canvas_box;
 			w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CANVAS_BOX;
 			while (parent) {
-				parent->has_child_dirty_rect = TRUE;
+				parent->has_child_dirty_rect = true;
 				parent = parent->parent;
 			}
 		}

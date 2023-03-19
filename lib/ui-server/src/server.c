@@ -4,10 +4,10 @@
 #include <errno.h>
 #include <yutil.h>
 #include <pandagl.h>
-#include <LCUI/ui/cursor.h>
+#include <ui_cursor.h>
+#include <ui_server.h>
 #include <LCUI/config.h>
 #include <css/computed.h>
-#include "../include/server.h"
 
 #ifdef ENABLE_OPENMP
 #include <omp.h>

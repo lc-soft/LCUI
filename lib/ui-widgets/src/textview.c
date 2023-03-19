@@ -34,8 +34,8 @@
 #include <errno.h>
 #include <pandagl.h>
 #include <css.h>
-#include "./internal.h"
-#include "../include/textview.h"
+#include <ui_widgets/textview.h>
+#include "textstyle.h"
 
 typedef struct ui_textview_task_t {
 	wchar_t *content;

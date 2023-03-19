@@ -1,7 +1,7 @@
 #include "ctest.h"
 #include <LCUI.h>
-#include <LCUI/ui.h>
-#include <LCUI/ui/builder.h>
+#include <ui.h>
+#include <ui_builder.h>
 
 static void test_flex_layout_with_content_width(float width)
 {

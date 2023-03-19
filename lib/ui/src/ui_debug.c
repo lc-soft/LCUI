@@ -1,10 +1,10 @@
-#include "./internal.h"
-#include <css.h>
 #include <stdio.h>
+#include <css.h>
+#include <ui.h>
 
 int ui_debug_msg_indent = 0;
 
-INLINE const char *get_css_unit_str(css_unit_t unit)
+LIBUI_INLINE const char *get_css_unit_str(css_unit_t unit)
 {
 	switch (unit) {
 	case CSS_UNIT_PERCENT:

@@ -27,9 +27,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <ui.h>
+#include <ui_server.h>
 #include <LCUI/app.h>
-#include <LCUI/ui.h>
-#include <LCUI/ui/server.h>
 
 static lcui_settings_t lcui_settings;
 

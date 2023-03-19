@@ -1,10 +1,13 @@
 ﻿#include <math.h>
 #include <errno.h>
 #include <string.h>
-#include <LCUI.h>
+#include <yutil.h>
 #include <LCUI/thread.h>
-#include "../include/ui.h"
-#include "internal.h"
+#include <ui/base.h>
+#include <ui/rect.h>
+#include <ui/events.h>
+#include <ui/metrics.h>
+#include "ui_events.h"
 
 /* clang-format off */
 
@@ -19,7 +22,7 @@ typedef struct ui_touch_capturer_t {
 struct ui_event_listener_t {
 	list_node_t node;
 	size_t ref_count;
-	LCUI_BOOL active;
+	bool active;
 	int event_id;
 	ui_event_handler_t handler;
 	void *data;
@@ -75,7 +78,6 @@ static struct ui_events_t {
 
 	int base_event_id;
 	ui_widget_click_record_t click;
-	thread_mutex_t mutex;
 } ui_events;
 
 /* clang-format on */
@@ -94,9 +96,8 @@ int ui_set_event_id(int event_id, const char *event_name)
 {
 	int ret;
 	ui_event_mapping_t *mapping;
-	thread_mutex_lock(&ui_events.mutex);
+
 	if (dict_fetch_value(ui_events.event_ids, event_name)) {
-		thread_mutex_unlock(&ui_events.mutex);
 		return -1;
 	}
 	mapping = malloc(sizeof(ui_event_mapping_t));
@@ -108,7 +109,6 @@ int ui_set_event_id(int event_id, const char *event_name)
 	list_append(&ui_events.event_mappings, mapping);
 	rbtree_insert_by_key(&ui_events.event_names, event_id, mapping);
 	ret = dict_add(ui_events.event_ids, mapping->name, mapping);
-	thread_mutex_unlock(&ui_events.mutex);
 	return ret;
 }
 
@@ -120,18 +120,14 @@ int ui_alloc_event_id(void)
 const char *ui_get_event_name(int event_id)
 {
 	ui_event_mapping_t *mapping;
-	thread_mutex_lock(&ui_events.mutex);
 	mapping = rbtree_get_data_by_key(&ui_events.event_names, event_id);
-	thread_mutex_unlock(&ui_events.mutex);
 	return mapping ? mapping->name : NULL;
 }
 
 int ui_get_event_id(const char *event_name)
 {
 	ui_event_mapping_t *mapping;
-	thread_mutex_lock(&ui_events.mutex);
 	mapping = dict_fetch_value(ui_events.event_ids, event_name);
-	thread_mutex_unlock(&ui_events.mutex);
 	return mapping ? mapping->id : -1;
 }
 
@@ -139,7 +135,7 @@ void ui_event_init(ui_event_t *e, const char *name)
 {
 	e->target = NULL;
 	e->type = ui_use_widget_event_id(name);
-	e->cancel_bubble = FALSE;
+	e->cancel_bubble = false;
 	e->data = NULL;
 }
 
@@ -236,7 +232,7 @@ static void ui_touch_capturer_destroy(void *arg)
 	free(tc);
 }
 
-INLINE void ui_clear_touch_capturers(list_t *list)
+LIBUI_INLINE void ui_clear_touch_capturers(list_t *list)
 {
 	list_destroy_without_node(list, ui_touch_capturer_destroy);
 }
@@ -330,7 +326,7 @@ ui_event_listener_t *ui_widget_add_event_listener(
 		return NULL;
 	}
 	listener->ref_count = 0;
-	listener->active = TRUE;
+	listener->active = true;
 	listener->handler = handler;
 	listener->data = data;
 	listener->event_id = event_id;
@@ -366,7 +362,7 @@ int ui_widget_remove_event_listener(ui_widget_t *w, int event_id,
 		    data != listener->data) {
 			continue;
 		}
-		listener->active = FALSE;
+		listener->active = false;
 		if (listener->ref_count == 0) {
 			prev = node->prev;
 			list_unlink(&w->extra->listeners, node);
@@ -383,6 +379,44 @@ int ui_widget_off(ui_widget_t *w, const char *event_name,
 {
 	int id = ui_use_widget_event_id(event_name);
 	return ui_widget_remove_event_listener(w, id, handler, data);
+}
+
+int ui_emit_event(ui_event_t e, void *arg)
+{
+	return ui_widget_emit_event(ui_root(), e, arg);
+}
+
+int ui_post_event(const ui_event_t *e, void *arg,
+		  ui_event_arg_destructor_t destroy_arg)
+{
+	return ui_widget_post_event(ui_root(), e, arg, destroy_arg);
+}
+
+ui_event_listener_t *ui_add_event_listener(
+    ui_widget_t *widget, int event_id, ui_event_handler_t handler, void *arg,
+    ui_event_arg_destructor_t destroy_arg)
+{
+	return ui_widget_add_event_listener(ui_root(), event_id, handler, arg,
+					    destroy_arg);
+}
+
+int ui_remove_event_listener(ui_widget_t *w, int event_id,
+			     ui_event_handler_t handler, void *data)
+{
+	return ui_widget_remove_event_listener(ui_root(), event_id, handler,
+					       data);
+}
+
+ui_event_listener_t *ui_on_event(const char *event_name,
+				 ui_event_handler_t handler, void *data,
+				 void (*destroy_arg)(void *))
+{
+	return ui_widget_on(ui_root(), event_name, handler, data, destroy_arg);
+}
+
+int ui_off_event(const char *event_name, ui_event_handler_t handler, void *data)
+{
+	return ui_widget_off(ui_root(), event_name, handler, data);
 }
 
 static ui_widget_t *ui_widget_get_next_at(ui_widget_t *widget, float x, float y)
@@ -472,7 +506,7 @@ int ui_widget_emit_event(ui_widget_t *w, ui_event_t e, void *arg)
 	float pointer_x, pointer_y;
 
 	ui_widget_t *sibling;
-	LCUI_BOOL is_pointer_event = FALSE;
+	bool is_pointer_event = false;
 
 	if (!e.target) {
 		e.target = w;
@@ -487,7 +521,7 @@ int ui_widget_emit_event(ui_widget_t *w, ui_event_t e, void *arg)
 	case UI_EVENT_WHEEL:
 		pointer_x = e.mouse.x;
 		pointer_y = e.mouse.y;
-		is_pointer_event = TRUE;
+		is_pointer_event = true;
 		if (w->computed_style.type_bits.pointer_events ==
 		    CSS_POINTER_EVENTS_NONE) {
 			break;
@@ -588,7 +622,7 @@ static void ui_widget_trigger_mouseover_event(ui_widget_t *widget,
 	ui_widget_t *w;
 	ui_event_t e = { 0 };
 
-	e.cancel_bubble = FALSE;
+	e.cancel_bubble = false;
 	e.type = UI_EVENT_MOUSEOVER;
 	for (w = widget; w && w != parent; w = w->parent) {
 		e.target = w;
@@ -603,7 +637,7 @@ static void ui_widget_trigger_mouseout_event(ui_widget_t *widget,
 	ui_widget_t *w;
 	ui_event_t e = { 0 };
 
-	e.cancel_bubble = FALSE;
+	e.cancel_bubble = false;
 	e.type = UI_EVENT_MOUSEOUT;
 	for (w = widget; w && w != parent; w = w->parent) {
 		e.target = w;
@@ -702,7 +736,6 @@ void ui_clear_event_target(ui_widget_t *w)
 	list_node_t *node, *prev;
 	ui_event_pack_t *pack;
 
-	thread_mutex_lock(&ui_events.mutex);
 	for (list_each(node, &ui_events.queue)) {
 		prev = node->prev;
 		pack = node->data;
@@ -712,13 +745,12 @@ void ui_clear_event_target(ui_widget_t *w)
 			node = prev;
 		}
 	}
-	thread_mutex_unlock(&ui_events.mutex);
 	ui_clear_mouseover_target(w);
 	ui_clear_mousedown_target(w);
 	ui_clear_focus_target(w);
 }
 
-INLINE LCUI_BOOL ui_widget_is_focusable(ui_widget_t *w)
+LIBUI_INLINE bool ui_widget_is_focusable(ui_widget_t *w)
 {
 	return w &&
 	       w->computed_style.type_bits.pointer_events !=
@@ -756,7 +788,7 @@ int ui_set_focus(ui_widget_t *widget)
 	}
 	e.target = w;
 	e.type = UI_EVENT_FOCUS;
-	e.cancel_bubble = FALSE;
+	e.cancel_bubble = false;
 	ui_events.targets[UI_WIDGET_STATUS_FOCUS] = w;
 	ui_widget_add_status(e.target, "focus");
 	ui_widget_post_event(e.target, &e, NULL, NULL);
@@ -773,8 +805,8 @@ static ui_widget_t *ui_resolve_event_target(float x, float y)
 	if (ui_events.mouse_capturer) {
 		target = ui_events.mouse_capturer;
 	} else {
-		target =
-		    ui_widget_get_event_target(root, x, y, CSS_POINTER_EVENTS_AUTO);
+		target = ui_widget_get_event_target(root, x, y,
+						    CSS_POINTER_EVENTS_AUTO);
 	}
 	for (w = target; w; w = w->parent) {
 		if (w->event_blocked) {
@@ -791,7 +823,7 @@ static int ui_on_wheel_event(ui_event_t *origin_event)
 {
 	ui_event_t e = *origin_event;
 
-	e.cancel_bubble = FALSE;
+	e.cancel_bubble = false;
 	e.target = ui_events.targets[UI_WIDGET_STATUS_HOVER];
 	if (!e.target) {
 		return -1;
@@ -804,7 +836,7 @@ static int ui_on_mouse_event(ui_event_t *origin_event)
 {
 	ui_event_t e = *origin_event;
 
-	e.cancel_bubble = FALSE;
+	e.cancel_bubble = false;
 	switch (e.type) {
 	case UI_EVENT_MOUSEDOWN:
 		e.target = ui_resolve_event_target(e.mouse.x, e.mouse.y);
@@ -813,12 +845,12 @@ static int ui_on_mouse_event(ui_event_t *origin_event)
 		}
 		ui_widget_emit_event(e.target, e, NULL);
 		ui_events.click.interval = DBLCLICK_INTERVAL;
-		if (e.mouse.button == MOUSE_BUTTON_LEFT &&
+		if (e.mouse.button == UI_MOUSE_BUTTON_LEFT &&
 		    ui_events.click.widget == e.target) {
 			int delta;
 			delta = (int)get_time_delta(ui_events.click.time);
 			ui_events.click.interval = delta;
-		} else if (e.mouse.button == MOUSE_BUTTON_RIGHT &&
+		} else if (e.mouse.button == UI_MOUSE_BUTTON_RIGHT &&
 			   ui_events.click.widget != e.target) {
 			ui_events.click.x = e.mouse.x;
 			ui_events.click.y = e.mouse.y;
@@ -835,7 +867,7 @@ static int ui_on_mouse_event(ui_event_t *origin_event)
 		}
 		ui_widget_emit_event(e.target, e, NULL);
 		if (ui_events.targets[UI_WIDGET_STATUS_ACTIVE] != e.target ||
-		    e.mouse.button != MOUSE_BUTTON_LEFT) {
+		    e.mouse.button != UI_MOUSE_BUTTON_LEFT) {
 			ui_events.click.x = 0;
 			ui_events.click.y = 0;
 			ui_events.click.time = 0;
@@ -890,7 +922,7 @@ static int ui_on_keyboard_event(ui_event_t *origin_event)
 	if (!e.target) {
 		return -1;
 	}
-	e.cancel_bubble = FALSE;
+	e.cancel_bubble = false;
 	ui_widget_emit_event(e.target, e, NULL);
 	return 0;
 }
@@ -903,7 +935,7 @@ static int ui_on_text_input(ui_event_t *origin_event)
 	if (!e.target) {
 		return -1;
 	}
-	e.cancel_bubble = FALSE;
+	e.cancel_bubble = false;
 	ui_widget_emit_event(e.target, e, NULL);
 	return 0;
 }
@@ -922,7 +954,7 @@ static int ui_dispatch_touch_event(list_t *capturers, ui_touch_point_t *points,
 	root = ui_root();
 	scale = ui_metrics.scale;
 	e.type = UI_EVENT_TOUCH;
-	e.cancel_bubble = FALSE;
+	e.cancel_bubble = false;
 	e.touch.points = malloc(sizeof(ui_touch_point_t) * n_points);
 	/* 先将各个触点按命中的部件进行分组 */
 	for (i = 0; i < n_points; ++i) {
@@ -976,7 +1008,6 @@ static int ui_on_touch_event(ui_event_t *e)
 	n = e->touch.n_points;
 	points = e->touch.points;
 	list_create(&capturers);
-	thread_mutex_lock(&ui_events.mutex);
 	/* 合并现有的触点捕捉记录 */
 	for (list_each(node, &ui_events.touch_capturers)) {
 		ui_touch_capturer_t *tc = node->data;
@@ -998,7 +1029,6 @@ static int ui_on_touch_event(ui_event_t *e)
 	}
 	ui_dispatch_touch_event(&capturers, points, n);
 	ui_clear_touch_capturers(&capturers);
-	thread_mutex_unlock(&ui_events.mutex);
 	return 0;
 }
 
@@ -1015,9 +1045,7 @@ void ui_widget_release_mouse_capture(ui_widget_t *w)
 int ui_widget_set_touch_capture(ui_widget_t *w, int point_id)
 {
 	int ret;
-	thread_mutex_lock(&ui_events.mutex);
 	ret = ui_add_touch_capturer(&ui_events.touch_capturers, w, point_id);
-	thread_mutex_unlock(&ui_events.mutex);
 	return ret;
 }
 
@@ -1028,9 +1056,7 @@ int ui_widget_release_touch_capture(ui_widget_t *w, int point_id)
 	if (ui_events.touch_capturers.length <= 1) {
 		return 0;
 	}
-	thread_mutex_lock(&ui_events.mutex);
 	ret = ui_remove_touch_capturer(&ui_events.touch_capturers, w, point_id);
-	thread_mutex_unlock(&ui_events.mutex);
 	return ret;
 }
 
@@ -1085,7 +1111,6 @@ void ui_init_events(void)
 			 { UI_EVENT_PASTE, "paste" },
 			 { UI_EVENT_FONT_FACE_LOAD, "font_face_load" } };
 
-	thread_mutex_init(&ui_events.mutex);
 	rbtree_init(&ui_events.event_names);
 	list_create(&ui_events.event_mappings);
 	list_create(&ui_events.touch_capturers);
@@ -1156,13 +1181,10 @@ void ui_process_events(void)
 
 void ui_destroy_events(void)
 {
-	thread_mutex_lock(&ui_events.mutex);
 	rbtree_destroy(&ui_events.event_names);
 	dict_destroy(ui_events.event_ids);
 	ui_clear_touch_capturers(&ui_events.touch_capturers);
 	list_destroy_without_node(&ui_events.queue, ui_on_destroy_event_pack);
 	list_destroy(&ui_events.event_mappings, ui_event_mapping_destroy);
-	thread_mutex_unlock(&ui_events.mutex);
-	thread_mutex_destroy(&ui_events.mutex);
 	ui_events.event_ids = NULL;
 }

@@ -1,11 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <LCUI.h>
-#include <LCUI/ui.h>
-#include <LCUI/ui/widgets/textview.h>
-#include <css.h>
-#include <LCUI/ui/builder.h>
-#include <pandagl.h>
 #include "ctest.h"
 
 #define PARENT_OPACITY 0.8f

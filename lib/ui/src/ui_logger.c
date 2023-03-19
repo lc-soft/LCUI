@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <css/selector.h>
-#include "internal.h"
+#include <ui/style.h>
 
 #define LOG_BUFFER_SIZE 1024
 #define WIDGET_STR_SIZE 256

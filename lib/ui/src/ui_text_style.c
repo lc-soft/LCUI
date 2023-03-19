@@ -31,7 +31,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <css.h>
-#include <LCUI/ui.h>
+#include <ui/text_style.h>
 #include <pandagl.h>
 
 static size_t unescape(const wchar_t *instr, wchar_t *outstr)
@@ -120,8 +120,7 @@ void ui_text_style_destroy(ui_text_style_t *fs)
 	}
 }
 
-LCUI_BOOL ui_text_style_is_equal(const ui_text_style_t *a,
-				 const ui_text_style_t *b)
+bool ui_text_style_is_equal(const ui_text_style_t *a, const ui_text_style_t *b)
 {
 	int i;
 
@@ -131,25 +130,25 @@ LCUI_BOOL ui_text_style_is_equal(const ui_text_style_t *a,
 	    a->white_space != b->white_space ||
 	    a->font_style != b->font_style ||
 	    a->font_weight != b->font_weight || a->font_size != b->font_size) {
-		return FALSE;
+		return false;
 	}
 	if (a->content && b->content) {
 		if (wcscmp(a->content, b->content) != 0) {
-			return FALSE;
+			return false;
 		}
 	} else if (a->content != b->content) {
-		return FALSE;
+		return false;
 	}
 	if (a->font_ids && b->font_ids) {
 		for (i = 0; a->font_ids[i] && b->font_ids[i]; ++i) {
 			if (a->font_ids[i] != b->font_ids[i]) {
-				return FALSE;
+				return false;
 			}
 		}
 	} else if (a->font_ids != b->font_ids) {
-		return FALSE;
+		return false;
 	}
-	return TRUE;
+	return true;
 }
 
 void ui_compute_text_style(ui_text_style_t *fs,
@@ -244,7 +243,8 @@ void ui_compute_text_style(ui_text_style_t *fs,
 		fs->font_ids = NULL;
 	}
 	if (style->font_family) {
-		pd_font_library_query(&fs->font_ids, fs->font_style, fs->font_weight,
-			      (const char *const *)style->font_family);
+		pd_font_library_query(&fs->font_ids, fs->font_style,
+				      fs->font_weight,
+				      (const char *const *)style->font_family);
 	}
 }

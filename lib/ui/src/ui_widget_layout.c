@@ -1,7 +1,14 @@
 ﻿// #define UI_DEBUG_ENABLED
-#include "internal.h"
-#include <css/types.h>
+#include <css/computed.h>
+#include <ui/base.h>
+#include <ui/events.h>
+#include <ui/style.h>
 #include "ui_debug.h"
+#include "ui_block_layout.h"
+#include "ui_flexbox_layout.h"
+#include "ui_widget.h"
+#include "ui_widget_style.h"
+#include "ui_widget_box.h"
 
 static void ui_widget_reflow_with_rule(ui_widget_t *w, ui_layout_rule_t rule)
 {
@@ -68,7 +75,7 @@ void ui_widget_reset_size(ui_widget_t *w)
 void ui_widget_reflow(ui_widget_t *w)
 {
 	ui_layout_rule_t rule = UI_LAYOUT_RULE_MAX_CONTENT;
-	ui_event_t ev = { .type = UI_EVENT_AFTERLAYOUT, .cancel_bubble = TRUE };
+	ui_event_t ev = { .type = UI_EVENT_AFTERLAYOUT, .cancel_bubble = true };
 
 	if (IS_CSS_FIXED_LENGTH(&w->computed_style, width)) {
 		rule |= UI_LAYOUT_RULE_FIXED_WIDTH;

@@ -1,5 +1,5 @@
 ﻿#include <LCUI.h>
-#include <LCUI/ui.h>
+#include <ui.h>
 #include <css.h>
 #include <pandagl.h>
 #include "ctest.h"

@@ -9,24 +9,24 @@ void ui_convert_rect(const pd_rect_t *rect, ui_rect_t *ui_rect, float scale)
 	ui_rect->height = rect->height * scale;
 }
 
-LCUI_BOOL ui_rect_correct(ui_rect_t *rect, float container_width,
+bool ui_rect_correct(ui_rect_t *rect, float container_width,
 			  float container_height)
 {
-	LCUI_BOOL overflow = FALSE;
+	bool overflow = false;
 
 	if (rect->x < 0) {
-		overflow = TRUE;
+		overflow = true;
 		rect->width += rect->x;
 		rect->x = 0;
 	}
 	if (rect->y < 0) {
-		overflow = TRUE;
+		overflow = true;
 		rect->height += rect->y;
 		rect->y = 0;
 	}
 
 	if (rect->x + rect->width - container_width > 0) {
-		overflow = TRUE;
+		overflow = true;
 		if (rect->x - container_width < 0) {
 			rect->width = container_width - rect->x;
 		} else {
@@ -34,7 +34,7 @@ LCUI_BOOL ui_rect_correct(ui_rect_t *rect, float container_width,
 		}
 	}
 	if (rect->y + rect->height - container_height > 0) {
-		overflow = TRUE;
+		overflow = true;
 		if (rect->y - container_height < 0) {
 			rect->height = container_height - rect->y;
 		} else {
@@ -44,30 +44,30 @@ LCUI_BOOL ui_rect_correct(ui_rect_t *rect, float container_width,
 	return overflow;
 }
 
-LCUI_BOOL ui_rect_is_cover(const ui_rect_t *a, const ui_rect_t *b)
+bool ui_rect_is_cover(const ui_rect_t *a, const ui_rect_t *b)
 {
 	if (a->x > b->x) {
 		if (b->x + b->width <= a->x) {
-			return FALSE;
+			return false;
 		}
 	} else {
 		if (a->x + a->width <= b->x) {
-			return FALSE;
+			return false;
 		}
 	}
 	if (a->y > b->y) {
 		if (b->y + b->height <= a->y) {
-			return FALSE;
+			return false;
 		}
 	} else {
 		if (a->y + a->height <= b->y) {
-			return FALSE;
+			return false;
 		}
 	}
-	return TRUE;
+	return true;
 }
 
-LCUI_BOOL ui_rect_overlap(const ui_rect_t *a, const ui_rect_t *b,
+bool ui_rect_overlap(const ui_rect_t *a, const ui_rect_t *b,
 			  ui_rect_t *overlapping_rect)
 {
 	if (a->x > b->x) {
@@ -101,9 +101,9 @@ LCUI_BOOL ui_rect_overlap(const ui_rect_t *a, const ui_rect_t *b,
 		overlapping_rect->y = b->y;
 	}
 	if (overlapping_rect->width <= 0 || overlapping_rect->height <= 0) {
-		return FALSE;
+		return false;
 	}
-	return TRUE;
+	return true;
 }
 
 void ui_rect_merge(ui_rect_t *merged_rect, const ui_rect_t *a, const ui_rect_t *b)
