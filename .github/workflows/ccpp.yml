@@ -1,141 +1,117 @@
 name: C/C++ CI
 on: [push, pull_request]
 jobs:
-  ubuntu_build:
+  build:
     timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
-        os: ['ubuntu-latest']
+        os: ['ubuntu-latest', 'windows-latest']
     runs-on: ${{ matrix.os }}
     name: "Builds binaries on ${{ matrix.os }}"
     steps:
       - uses: actions/checkout@v1
       - uses: xmake-io/github-action-setup-xmake@v1
-      - name: install tools
-        run: sudo apt install debhelper lcov valgrind -yy
 
       - name: Update git submodule
         run: |
           git submodule update --init
 
+      - name: Restore xmake packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.xmake/.cache/packages
+          key: ${{ runner.os }}-xmake-packages
+
+      - name: Install tools
+        if: runner.os == 'Linux'
+        run: sudo apt install debhelper lcov valgrind -yy
+
+      - name: Configure
+        if: runner.os == 'Linux'
+        run: xmake config -m coverage -y -v --ci-env=y
+
+      - name: Configure
+        if: runner.os == 'Windows'
+        run: xmake config -y -v -k shared --ci-env=y
+
       - name: Build
-        run: |
-          xmake config -m coverage -y -v
-          xmake -w
+        run: xmake -w
 
       - name: Run PandaGL tests
         run: xmake run pandagl_tests
 
       - name: Run LibCSS tests
-        run: xmake run libcss_tests --memcheck
+        if: runner.os == 'Windows'
+        run: xmake run libcss_tests
 
       - name: Run LCUI tests
+        if: runner.os == 'Windows'
+        run: xmake run lcui_tests
+
+      - name: Run YUtil tests
+        if: runner.os == 'Windows'
+        run: |
+          xmake build yutil_test
+          xmake run yutil_test
+
+      - name: Run LibCSS tests with memcheck
+        if: runner.os == 'Linux'
+        run: xmake run libcss_tests --memcheck
+
+      - name: Run LCUI tests with memcheck
+        if: runner.os == 'Linux'
         run: xmake run lcui_tests --memcheck
 
-      - name: Run yutil tests
+      - name: Run YUtil tests with memcheck
+        if: runner.os == 'Linux'
         run: |
           xmake build yutil_test
           xmake run yutil_test --memcheck
 
       - name: Upload reports to Codecov
+        if: runner.os == 'Linux'
         run: bash <(curl -s https://codecov.io/bash);
 
-      - name: Package
-        run: |
-          xmake clean
-          xmake config -m release -y -k shared -c -v
-          xmake package
-          xmake install -o dist/ubuntu
-
-      - name: Package exmaples
-        run: |
-          cd examples
-          xmake -P . -v
-          xmake install -P . -o ../dist/ubuntu-examples
-          mv ../dist/ubuntu-examples/bin/* ../dist/ubuntu-examples/
-          rm -r ../dist/ubuntu-examples/bin
-
-      - uses: actions/upload-artifact@master
-        with:
-          name: ubuntu-dist
-          path: |
-            dist/ubuntu
-
-      - uses: actions/upload-artifact@master
-        with:
-          name: ubuntu-examples
-          path: |
-            dist/ubuntu-examples
-
-  windows_build:
-    timeout-minutes: 10
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ['windows-latest']
-        include:
-          - os: 'windows-latest'
-            triplet: 'x64-windows'
-    runs-on: ${{ matrix.os }}
-    name: "Builds binaries on ${{ matrix.os }}"
-
-    steps:
-      - uses: actions/checkout@master
-      - uses: xmake-io/github-action-setup-xmake@v1
-
-      - name: Update git submodule
-        run: |
-          git submodule update --init
-
-      - name: Build
-        run: |
-          xmake config -y -v -k shared --ci-env=y
-          xmake -w
-
-      - name: Run PandaGL tests
-        run: xmake run pandagl_tests
-
-      - name: Run LibCSS tests
-        run: xmake run libcss_tests
-
-      - name: Run LCUI tests
-        run: xmake run lcui_tests
-
-      - name: Run YUtil tests
-        run: |
-          xmake build yutil_test
-          xmake run yutil_test
+      - name: Reconfigure for release
+        if: runner.os == 'Linux'
+        run: xmake config -y -v -k shared --ci-env=y
 
       - name: Package
         run: |
           xmake package
-          xmake install -o dist/windows
+          xmake install -o dist/lcui-package
 
       - name: Package exmaples
         run: |
           cd examples
-          xmake -P . -v
-          xmake install -P . -o ../dist/windows-examples
-          mv ../dist/windows-examples/bin/* ../dist/windows-examples/
-          rm ../dist/windows-examples/bin
+          xmake -P . -v -y
+          xmake install -P . -o ../dist/lcui-examples
+          mv ../dist/lcui-examples/bin/* ../dist/lcui-examples/
+          rm -r ../dist/lcui-examples/bin
 
       - uses: actions/upload-artifact@master
         with:
-          name: windows-dist
+          name: lcui-${{ runner.os }}-package
           path: |
-            dist/windows
+            dist/lcui-package
 
       - uses: actions/upload-artifact@master
         with:
-          name: windows-examples
+          name: lcui-${{ runner.os }}-examples
           path: |
-            dist/windows-examples
+            dist/lcui-examples
+
+      - name: Cache xmake packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.xmake/.cache/packages
+          key: ${{ runner.os }}-xmake-pacages
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
-    needs: [ubuntu_build, windows_build]
+    needs: [build]
     env:
       ARTIFACT_DIR: ./release
 
