@@ -31,16 +31,16 @@
 #ifndef LIB_UI_WIDGETS_INCLUDE_TEXTCARET_H
 #define LIB_UI_WIDGETS_INCLUDE_TEXTCARET_H
 
-#include <LCUI/def.h>
 #include <ui.h>
+#include "ui_widgets/common.h"
 
-LCUI_API void ui_textcaret_refresh(ui_widget_t* widget);
+LIBUI_WIDGETS_PUBLIC void ui_textcaret_refresh(ui_widget_t* widget);
 
-LCUI_API void ui_textcaret_set_visible(ui_widget_t* widget, LCUI_BOOL visible);
+LIBUI_WIDGETS_PUBLIC void ui_textcaret_set_visible(ui_widget_t* widget, bool visible);
 
 /** 设置闪烁的时间间隔 */
-LCUI_API void ui_textcaret_set_blink_time(ui_widget_t* widget, unsigned int n_ms);
+LIBUI_WIDGETS_PUBLIC void ui_textcaret_set_blink_time(ui_widget_t* widget, unsigned int n_ms);
 
-LCUI_API void ui_register_textcaret(void);
+LIBUI_WIDGETS_PUBLIC void ui_register_textcaret(void);
 
 #endif

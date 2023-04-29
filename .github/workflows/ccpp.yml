@@ -22,7 +22,6 @@ jobs:
       - name: Build
         run: |
           xmake config -m coverage -y -v
-          xmake build headers
           xmake -w
 
       - name: Run PandaGL tests
@@ -45,15 +44,29 @@ jobs:
       - name: Package
         run: |
           xmake clean
-          xmake config -m release -y -c -v
-          xmake -w
+          xmake config -m release -y -k shared -c -v
           xmake package
+          xmake install -o dist/ubuntu
+
+      - name: Package exmaples
+        run: |
+          cd examples
+          xmake -P . -v
+          xmake install -P . -o ../dist/ubuntu-examples
+          mv ../dist/ubuntu-examples/bin/* ../dist/ubuntu-examples/
+          rm -r ../dist/ubuntu-examples/bin
 
       - uses: actions/upload-artifact@master
         with:
-          name: ubuntu-pacakges
+          name: ubuntu-dist
           path: |
-            build/packages
+            dist/ubuntu
+
+      - uses: actions/upload-artifact@master
+        with:
+          name: ubuntu-examples
+          path: |
+            dist/ubuntu-examples
 
   windows_build:
     timeout-minutes: 10
@@ -77,8 +90,7 @@ jobs:
 
       - name: Build
         run: |
-          xmake config -y -v --ci-env=y
-          xmake build headers
+          xmake config -y -v -k shared --ci-env=y
           xmake -w
 
       - name: Run PandaGL tests
@@ -97,14 +109,28 @@ jobs:
 
       - name: Package
         run: |
-          xmake -v
           xmake package
+          xmake install -o dist/windows
+
+      - name: Package exmaples
+        run: |
+          cd examples
+          xmake -P . -v
+          xmake install -P . -o ../dist/windows-examples
+          mv ../dist/windows-examples/bin/* ../dist/windows-examples/
+          rm ../dist/windows-examples/bin
 
       - uses: actions/upload-artifact@master
         with:
-          name: ubuntu-pacakges
+          name: windows-dist
           path: |
-            build/packages
+            dist/windows
+
+      - uses: actions/upload-artifact@master
+        with:
+          name: windows-examples
+          path: |
+            dist/windows-examples
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')

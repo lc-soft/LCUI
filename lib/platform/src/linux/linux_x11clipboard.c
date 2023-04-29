@@ -44,7 +44,7 @@
 
 #include "../app.h"
 #if defined(LIBPLAT_LINUX) && defined(LIBPLAT_HAS_LIBX11)
-#include <LCUI/thread.h>
+#include <thread.h>
 
 #define CLIPBOARD_TIMEOUT 1000
 

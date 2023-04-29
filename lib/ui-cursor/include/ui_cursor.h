@@ -1,21 +1,24 @@
-// TODO: Reduce dependence on lcui header files
+#ifndef LIB_UI_CURSOR_INCLUDE_UI_CURSOR_H
+#define LIB_UI_CURSOR_INCLUDE_UI_CURSOR_H
 
-#include <LCUI/def.h>
+#include "ui_cursor/common.h"
 #include <pandagl.h>
 #include <platform.h>
 #include <ui.h>
 
-LCUI_BEGIN_HEADER
+LIBUI_CURSOR_BEGIN_DECLS
 
-LCUI_API void ui_cursor_refresh(void);
-LCUI_API LCUI_BOOL ui_cursor_is_visible(void);
-LCUI_API void ui_cursor_show(void);
-LCUI_API void ui_cursor_hide(void);
-LCUI_API void ui_cursor_set_position(int x, int y);
-LCUI_API int ui_cursor_set_image(pd_canvas_t *image);
-LCUI_API void ui_cursor_get_position(int *x, int *y);
-LCUI_API int ui_cursor_paint(app_window_t *w, app_window_paint_t* paint);
-LCUI_API void ui_cursor_init(void);
-LCUI_API void ui_cursor_destroy(void);
+LIBUI_CURSOR_PUBLIC void ui_cursor_refresh(void);
+LIBUI_CURSOR_PUBLIC bool ui_cursor_is_visible(void);
+LIBUI_CURSOR_PUBLIC void ui_cursor_show(void);
+LIBUI_CURSOR_PUBLIC void ui_cursor_hide(void);
+LIBUI_CURSOR_PUBLIC void ui_cursor_set_position(int x, int y);
+LIBUI_CURSOR_PUBLIC int ui_cursor_set_image(pd_canvas_t *image);
+LIBUI_CURSOR_PUBLIC void ui_cursor_get_position(int *x, int *y);
+LIBUI_CURSOR_PUBLIC int ui_cursor_paint(app_window_t *w, app_window_paint_t* paint);
+LIBUI_CURSOR_PUBLIC void ui_cursor_init(void);
+LIBUI_CURSOR_PUBLIC void ui_cursor_destroy(void);
 
-LCUI_END_HEADER
+LIBUI_CURSOR_END_DECLS
+
+#endif

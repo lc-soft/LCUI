@@ -6,7 +6,7 @@
 
 LIBCSS_BEGIN_DECLS
 
-void css_valdef_destroy(css_valdef_t *valdef);
+LIBCSS_PUBLIC void css_valdef_destroy(css_valdef_t *valdef);
 
 LIBCSS_PUBLIC void css_init_value_definitons(void);
 

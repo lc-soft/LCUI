@@ -16,6 +16,7 @@ target("libplatform")
     set_configdir("include/platform")
     add_configfiles("src/config.h.in")
     add_deps("yutil", "pandagl")
+    add_headerfiles("include/platform.h", "include/(platform/*.h)")
     if is_kind("static") then
         set_configvar("LIBPLAT_STATIC_BUILD", 1)
     elseif is_plat("windows") then

@@ -1,7 +1,7 @@
 ﻿#include <stdio.h>
 #include <stdlib.h>
-#include <LCUI/thread.h>
-#include <LCUI/timer.h>
+#include <thread.h>
+#include <timer.h>
 #include <yutil.h>
 
 static struct lcui_timers_t {

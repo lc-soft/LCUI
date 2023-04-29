@@ -591,17 +591,10 @@ struct css_style_value_t {
 	};
 };
 
-struct css_style_t {
-	css_style_value_t *list;
-	unsigned length;
-};
-
 typedef struct css_valdef_t css_valdef_t;
-typedef struct css_style_t css_style_t;
 typedef list_t css_style_decl_t;
 
 typedef css_style_decl_t css_style_decl_t;
-typedef css_style_t css_style_t;
 typedef unsigned css_selector_hash_t;
 
 /** 样式规则记录 */

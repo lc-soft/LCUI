@@ -31,9 +31,10 @@
 #ifndef LIB_UI_WIDGETS_INCLUDE_CANVAS_H
 #define LIB_UI_WIDGETS_INCLUDE_CANVAS_H
 
-#include <LCUI/def.h>
 #include <ui.h>
-LCUI_BEGIN_HEADER
+#include "ui_widgets/common.h"
+
+LIBUI_WIDGETS_BEGIN_DECLS
 
 /** @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas#attributes */
 
@@ -43,7 +44,7 @@ LCUI_BEGIN_HEADER
 typedef struct ui_canvas_rendering_context_t ui_canvas_context_t;
 
 typedef struct ui_canvas_rendering_context_t {
-	LCUI_BOOL available;
+	bool available;
 	pd_color_t fill_color;
 	pd_canvas_t buffer;
 	ui_widget_t* canvas;
@@ -73,10 +74,10 @@ typedef struct ui_canvas_rendering_context_t {
  * Get a drawing context on the canvas
  * Reference: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext
 */
-LCUI_API ui_canvas_context_t *ui_canvas_get_context(ui_widget_t* w);
+LIBUI_WIDGETS_PUBLIC ui_canvas_context_t *ui_canvas_get_context(ui_widget_t* w);
 
-void ui_register_canvas(void);
+LIBUI_WIDGETS_PUBLIC void ui_register_canvas(void);
 
-LCUI_END_HEADER
+LIBUI_WIDGETS_END_DECLS
 
 #endif

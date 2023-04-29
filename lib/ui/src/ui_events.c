@@ -2,7 +2,7 @@
 #include <errno.h>
 #include <string.h>
 #include <yutil.h>
-#include <LCUI/thread.h>
+#include <thread.h>
 #include <ui/base.h>
 #include <ui/rect.h>
 #include <ui/events.h>

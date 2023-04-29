@@ -32,13 +32,17 @@
 #ifndef LIB_UI_WIDGETS_INCLUDE_ANCHOR_H
 #define LIB_UI_WIDGETS_INCLUDE_ANCHOR_H
 
-#include <LCUI/def.h>
 #include <ui.h>
+#include "ui_widgets/common.h"
 
-LCUI_API void ui_anchor_open(ui_widget_t* w);
+LIBUI_WIDGETS_BEGIN_DECLS
 
-LCUI_API void ui_register_anchor(void);
+LIBUI_WIDGETS_PUBLIC void ui_anchor_open(ui_widget_t* w);
 
-LCUI_API void ui_unregister_anchor(void);
+LIBUI_WIDGETS_PUBLIC void ui_register_anchor(void);
+
+LIBUI_WIDGETS_PUBLIC void ui_unregister_anchor(void);
+
+LIBUI_WIDGETS_END_DECLS
 
 #endif

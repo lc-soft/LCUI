@@ -11,7 +11,6 @@ int main(void)
 
 	ui_widget_t *box, *w;
 
-	pd_font_library_init();
 	ui_init();
 	box = ui_create_widget(NULL);
 
@@ -51,6 +50,5 @@ int main(void)
 	logger_debug("it should take less than 1s\n");
 
 	ui_destroy();
-	pd_font_library_destroy();
 	return 0;
 }

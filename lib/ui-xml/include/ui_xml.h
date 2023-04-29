@@ -1,5 +1,5 @@
-﻿/*
- * thread.h -- basic thread management
+﻿/* ***************************************************************************
+ * XML.h -- The GUI build module, parse UI config code and build UI.
  *
  * Copyright (c) 2018-2022, Liu chao <lc-soft@live.cn> All rights reserved.
  *
@@ -28,38 +28,28 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_THREAD_H
-#define LCUI_THREAD_H
+#ifndef LIB_UI_XML_INCLUDE_XML_H
+#define LIB_UI_XML_INCLUDE_XML_H
 
-#include <LCUI/def.h>
+#include "ui_xml/common.h"
+#include <ui.h>
 
-typedef unsigned long thread_t;
-typedef union thread_mutex_record_t *thread_mutex_t;
-typedef union thread_cond_record_t *thread_cond_t;
+LIBUI_XML_BEGIN_DECLS
 
-LCUI_BEGIN_HEADER
+/**
+ * 从字符串中载入界面配置代码，解析并生成相应的图形界面(元素)
+ * @param[in] str 包含界面配置代码的字符串
+ * @return 正常解析会返回一个部件，出现错误则返回 NULL
+ */
+LIBUI_XML_PUBLIC ui_widget_t* ui_load_xml_string(const char *str, int size);
 
-LCUI_API int thread_mutex_init(thread_mutex_t *mutex);
-LCUI_API void thread_mutex_destroy(thread_mutex_t *mutex);
-LCUI_API int thread_mutex_trylock(thread_mutex_t *mutex);
-LCUI_API int thread_mutex_lock(thread_mutex_t *mutex);
-LCUI_API int thread_mutex_unlock(thread_mutex_t *mutex);
+/**
+ * 从文件中载入界面配置代码，解析并生成相应的图形界面(元素)
+ * @param[in] filepath 文件路径
+ * @return 正常解析会返回一个部件，出现错误则返回 NULL
+ */
+LIBUI_XML_PUBLIC ui_widget_t* ui_load_xml_file(const char *filepath);
 
-LCUI_API int thread_cond_init(thread_cond_t *cond);
-LCUI_API int thread_cond_destroy(thread_cond_t *cond);
-LCUI_API int thread_cond_wait(thread_cond_t *cond, thread_mutex_t *mutex);
-LCUI_API int thread_cond_timedwait(thread_cond_t *cond, thread_mutex_t *mutex,
-				   unsigned int ms);
-LCUI_API int thread_cond_signal(thread_cond_t *cond);
-LCUI_API int thread_cond_broadcast(thread_cond_t *cond);
-
-LCUI_API thread_t thread_self(void);
-LCUI_API int thread_create(thread_t *tidp, void (*start_rtn)(void *),
-			   void *arg);
-LCUI_API int thread_join(thread_t thread, void **retval);
-LCUI_API void thread_cancel(thread_t thread);
-LCUI_API void thread_exit(void *retval);
-
-LCUI_END_HEADER
+LIBUI_XML_END_DECLS
 
 #endif

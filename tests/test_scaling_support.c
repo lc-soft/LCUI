@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <LCUI.h>
-#include <ui_builder.h>
+#include <ui_xml.h>
 #include <platform/main.h>
 
 enum { TYPE_DENSITY, TYPE_SCALED_DENSITY, TYPE_SCALE };

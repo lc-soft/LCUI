@@ -1,7 +1,7 @@
 ﻿#ifndef TEST_UTIL_H
 #define TEST_UTIL_H
 
-#include <LCUI/def.h>
+#include <LCUI/common.h>
 #include <pandagl/types.h>
 #include <ui.h>
 

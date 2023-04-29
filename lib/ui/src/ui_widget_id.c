@@ -1,6 +1,6 @@
 
 #include <LCUI.h>
-#include <LCUI/thread.h>
+#include <thread.h>
 #include <ui/base.h>
 #include "ui_widget_id.h"
 

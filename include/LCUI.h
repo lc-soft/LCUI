@@ -5,7 +5,8 @@
 #include <ui_widgets.h>
 #include <ui_cursor.h>
 #include <ui_server.h>
-#include <ui_builder.h>
+#include <ui_xml.h>
 #include <platform.h>
-#include <LCUI/timer.h>
+#include <worker.h>
+#include <timer.h>
 #include <LCUI/app.h>

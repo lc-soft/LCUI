@@ -71,3 +71,4 @@ test/build
 lcpkg/*
 !lcpkg/ports
 vsxmake*
+compile_commands.json

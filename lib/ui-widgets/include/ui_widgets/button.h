@@ -31,17 +31,17 @@
 #ifndef LIB_UI_WIDGETS_INCLUDE_BUTTON_H
 #define LIB_UI_WIDGETS_INCLUDE_BUTTON_H
 
-#include <LCUI/def.h>
 #include <ui.h>
+#include "ui_widgets/common.h"
 
-LCUI_BEGIN_HEADER
+LIBUI_WIDGETS_BEGIN_DECLS
 
-LCUI_API void ui_button_set_text_w(ui_widget_t* w, const wchar_t *wstr);
+LIBUI_WIDGETS_PUBLIC void ui_button_set_text_w(ui_widget_t* w, const wchar_t *wstr);
 
-LCUI_API void ui_button_set_text(ui_widget_t* w, const char *str);
+LIBUI_WIDGETS_PUBLIC void ui_button_set_text(ui_widget_t* w, const char *str);
 
-LCUI_API void ui_register_button(void);
+LIBUI_WIDGETS_PUBLIC void ui_register_button(void);
 
-LCUI_END_HEADER
+LIBUI_WIDGETS_END_DECLS
 
 #endif

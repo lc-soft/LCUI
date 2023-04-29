@@ -52,7 +52,7 @@ static void ui_image_force_destroy(void *privdata, void *data)
 	free(image);
 }
 
-static void ui_image_load(ui_image_t *image)
+static void ui_image_dispatch_events(ui_image_t *image)
 {
 	list_t events;
 	list_node_t *node;
@@ -60,12 +60,6 @@ static void ui_image_load(ui_image_t *image)
 	ui_image_event_listener_t *listener;
 
 	list_create(&events);
-	if (!image->loaded) {
-		if (pd_read_image_from_file(image->path, &image->data) != 0) {
-			return;
-		}
-		image->loaded = true;
-	}
 	for (list_each(node, &image->listeners)) {
 		listener = node->data;
 		if (!listener->is_fresh) {
@@ -75,7 +69,10 @@ static void ui_image_load(ui_image_t *image)
 		if (!e) {
 			return;
 		}
-		e->image = image;
+		e->image = NULL;
+		if (pd_canvas_is_valid(&image->data)) {
+			e->image = image;
+		}
 		e->data = listener->data;
 		e->handler = listener->handler;
 		list_append_node(&events, &e->node);
@@ -84,12 +81,24 @@ static void ui_image_load(ui_image_t *image)
 	list_concat(&ui_image_loader.events, &events);
 }
 
+static void ui_image_load(ui_image_t *image)
+{
+	if (!image->loaded) {
+		if (pd_read_image_from_file(image->path, &image->data) != 0) {
+			pd_canvas_init(&image->data);
+		}
+		image->loaded = true;
+	}
+	ui_image_dispatch_events(image);
+}
+
 ui_image_t *ui_image_create(const char *path)
 {
 	ui_image_t *image;
 
 	image = dict_fetch_value(ui_image_loader.dict, path);
 	if (image) {
+		ui_image_dispatch_events(image);
 		image->refs_count++;
 		return image;
 	}
