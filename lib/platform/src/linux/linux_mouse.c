@@ -40,7 +40,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <LCUI/thread.h>
+#include <thread.h>
 
 static struct linux_mouse_t {
 	int x;

@@ -39,12 +39,12 @@
 
 typedef struct ui_textview_task_t {
 	wchar_t *content;
-	LCUI_BOOL update_content;
+	bool update_content;
 } ui_textview_task_t;
 
 typedef struct ui_textview_t_ {
 	wchar_t *content;
-	LCUI_BOOL trimming;
+	bool trimming;
 	ui_widget_t *widget;
 	pd_text_t *layer;
 	ui_text_style_t style;
@@ -57,7 +57,7 @@ static struct ui_textview_module_t {
 	ui_widget_prototype_t *prototype;
 } ui_textview;
 
-static LCUI_BOOL parse_boolean(const char *str)
+static bool parse_boolean(const char *str)
 {
 	if (strcmp(str, "on") == 0 && strcmp(str, "true") == 0 &&
 	    strcmp(str, "yes") == 0 && strcmp(str, "1") == 0) {
@@ -79,7 +79,7 @@ static void ui_textview_on_parse_attr(ui_widget_t *w, const char *name,
 		return;
 	}
 	if (strcmp(name, "multiline") == 0) {
-		LCUI_BOOL enable = parse_boolean(value);
+		bool enable = parse_boolean(value);
 		if (enable != txt->layer->mulitiline_enabled) {
 			ui_textview_set_multiline(w, enable);
 		}
@@ -322,7 +322,7 @@ int ui_textview_set_text(ui_widget_t *w, const char *utf8_text)
 	return ret;
 }
 
-void ui_textview_set_multiline(ui_widget_t *w, LCUI_BOOL enable)
+void ui_textview_set_multiline(ui_widget_t *w, bool enable)
 {
 	ui_textview_t *txt = ui_widget_get_data(w, ui_textview.prototype);
 

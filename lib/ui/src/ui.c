@@ -1,5 +1,6 @@
 ﻿#include <pandagl.h>
 #include <ui/types.h>
+#include "ui/base.h"
 #include "ui_trash.h"
 #include "ui_root.h"
 #include "ui_events.h"

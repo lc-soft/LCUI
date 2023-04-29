@@ -1,4 +1,4 @@
-﻿/*
+/*
  * thread.h -- basic thread management
  *
  * Copyright (c) 2018-2022, Liu chao <lc-soft@live.cn> All rights reserved.
@@ -28,38 +28,62 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_THREAD_H
-#define LCUI_THREAD_H
+#ifndef LIB_THREAD_INCLUDE_THREAD_H
+#define LIB_THREAD_INCLUDE_THREAD_H
 
-#include <LCUI/def.h>
+#define LIBTHREAD_VERSION "3.0.0-a"
+#define LIBTHREAD_VERSION_MAJOR 3
+#define LIBTHREAD_VERSION_MINOR 0
+#define LIBTHREAD_VERSION_ALTER 0
+/* #undef LIBTHREAD_STATIC_BUILD */
+
+#ifndef LIBTHREAD_PUBLIC
+#if defined(_MSC_VER) && !defined(LIBTHREAD_STATIC_BUILD)
+#ifdef LIBTHREAD_DLL_EXPORT
+#define LIBTHREAD_PUBLIC __declspec(dllexport)
+#else
+#define LIBTHREAD_PUBLIC __declspec(dllimport)
+#endif
+#elif __GNUC__ >= 4
+#define LIBTHREAD_PUBLIC extern __attribute__((visibility("default")))
+#else
+#define LIBTHREAD_PUBLIC extern
+#endif
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef unsigned long thread_t;
 typedef union thread_mutex_record_t *thread_mutex_t;
 typedef union thread_cond_record_t *thread_cond_t;
 
-LCUI_BEGIN_HEADER
+LIBTHREAD_PUBLIC int thread_mutex_init(thread_mutex_t *mutex);
+LIBTHREAD_PUBLIC void thread_mutex_destroy(thread_mutex_t *mutex);
+LIBTHREAD_PUBLIC int thread_mutex_trylock(thread_mutex_t *mutex);
+LIBTHREAD_PUBLIC int thread_mutex_lock(thread_mutex_t *mutex);
+LIBTHREAD_PUBLIC int thread_mutex_unlock(thread_mutex_t *mutex);
 
-LCUI_API int thread_mutex_init(thread_mutex_t *mutex);
-LCUI_API void thread_mutex_destroy(thread_mutex_t *mutex);
-LCUI_API int thread_mutex_trylock(thread_mutex_t *mutex);
-LCUI_API int thread_mutex_lock(thread_mutex_t *mutex);
-LCUI_API int thread_mutex_unlock(thread_mutex_t *mutex);
+LIBTHREAD_PUBLIC int thread_cond_init(thread_cond_t *cond);
+LIBTHREAD_PUBLIC int thread_cond_destroy(thread_cond_t *cond);
+LIBTHREAD_PUBLIC int thread_cond_wait(thread_cond_t *cond,
+                                      thread_mutex_t *mutex);
+LIBTHREAD_PUBLIC int thread_cond_timedwait(thread_cond_t *cond,
+                                           thread_mutex_t *mutex,
+                                           unsigned int ms);
+LIBTHREAD_PUBLIC int thread_cond_signal(thread_cond_t *cond);
+LIBTHREAD_PUBLIC int thread_cond_broadcast(thread_cond_t *cond);
 
-LCUI_API int thread_cond_init(thread_cond_t *cond);
-LCUI_API int thread_cond_destroy(thread_cond_t *cond);
-LCUI_API int thread_cond_wait(thread_cond_t *cond, thread_mutex_t *mutex);
-LCUI_API int thread_cond_timedwait(thread_cond_t *cond, thread_mutex_t *mutex,
-				   unsigned int ms);
-LCUI_API int thread_cond_signal(thread_cond_t *cond);
-LCUI_API int thread_cond_broadcast(thread_cond_t *cond);
+LIBTHREAD_PUBLIC thread_t thread_self(void);
+LIBTHREAD_PUBLIC int thread_create(thread_t *tidp, void (*start_rtn)(void *),
+                                   void *arg);
+LIBTHREAD_PUBLIC int thread_join(thread_t thread, void **retval);
+LIBTHREAD_PUBLIC void thread_cancel(thread_t thread);
+LIBTHREAD_PUBLIC void thread_exit(void *retval);
 
-LCUI_API thread_t thread_self(void);
-LCUI_API int thread_create(thread_t *tidp, void (*start_rtn)(void *),
-			   void *arg);
-LCUI_API int thread_join(thread_t thread, void **retval);
-LCUI_API void thread_cancel(thread_t thread);
-LCUI_API void thread_exit(void *retval);
-
-LCUI_END_HEADER
+#ifdef __cplusplus
+}
+#endif
 
 #endif

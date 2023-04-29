@@ -29,6 +29,8 @@ target("pandagl")
     add_includedirs("include")
     set_configdir("include/pandagl")
     add_configfiles("src/config.h.in")
+    add_headerfiles("include/pandagl.h", "include/(pandagl/*.h)")
+    add_packages("libpng", "libjpeg", "freetype", "fontconfig")
     if is_kind("static") then
         set_configvar("PANDAGL_STATIC_BUILD", 1)
     elseif is_plat("windows") then
@@ -37,7 +39,6 @@ target("pandagl")
     add_options("with-pandagl-font", "with-pandagl-image", "with-pandagl-text")
     if has_config("with-pandagl-font") then
         add_files("src/font/*.c")
-        add_packages("freetype", "fontconfig")
         if has_package("freetype") then
             set_configvar("PANDAGL_HAS_FREETYPE", 1)
         end
@@ -50,7 +51,6 @@ target("pandagl")
     end
     if has_config("with-pandagl-image") then
         add_files("src/image/*.c")
-        add_packages("libpng", "libjpeg")
         if has_package("libpng") then
             set_configvar("PANDAGL_HAS_LIBPNG", 1)
         end

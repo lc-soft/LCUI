@@ -31,21 +31,24 @@
 #ifndef LIB_UI_WIDGETS_INCLUDE_TEXTVIEW_H
 #define LIB_UI_WIDGETS_INCLUDE_TEXTVIEW_H
 
-#include <LCUI/def.h>
 #include <ui.h>
+#include "ui_widgets/common.h"
 
-LCUI_BEGIN_HEADER
+LIBUI_WIDGETS_BEGIN_DECLS
 
-LCUI_API int ui_textview_set_text_w(ui_widget_t* w, const wchar_t *text);
+LIBUI_WIDGETS_PUBLIC int ui_textview_set_text_w(ui_widget_t *w,
+                                                const wchar_t *text);
 
-LCUI_API int ui_textview_set_text(ui_widget_t* w, const char *utf8_text);
+LIBUI_WIDGETS_PUBLIC int ui_textview_set_text(ui_widget_t *w,
+                                              const char *utf8_text);
 
-LCUI_API void ui_textview_set_multiline(ui_widget_t* w, LCUI_BOOL enable);
+LIBUI_WIDGETS_PUBLIC void ui_textview_set_multiline(ui_widget_t *w,
+                                                    bool enable);
 
-LCUI_API void ui_register_textview(void);
+LIBUI_WIDGETS_PUBLIC void ui_register_textview(void);
 
-LCUI_API void ui_unregister_textview(void);
+LIBUI_WIDGETS_PUBLIC void ui_unregister_textview(void);
 
-LCUI_END_HEADER
+LIBUI_WIDGETS_END_DECLS
 
 #endif

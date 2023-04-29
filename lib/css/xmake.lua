@@ -6,6 +6,7 @@ target("libcss")
     add_files("src/**.c")
     set_configdir("include/css")
     add_configfiles("src/config.h.in")
+    add_headerfiles("include/css.h", "include/(css/*.h)")
     add_deps("yutil")
     if is_kind("static") then
         set_configvar("LIBCSS_STATIC_BUILD", 1)

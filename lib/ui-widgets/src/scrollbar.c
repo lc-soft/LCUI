@@ -34,7 +34,7 @@
 #include <css.h>
 #include <ui.h>
 #include <ui_widgets/scrollbar.h>
-#include <LCUI/timer.h>
+#include <timer.h>
 
 /* clang-format off */
 
@@ -49,7 +49,7 @@ typedef struct ui_scroll_effect_t {
 	float speed;		/**< 滚动速度 */
 	float speed_delta;	/**< 速度差（加速度） */
 	int64_t timestamp;	/**< 开始时间 */
-	LCUI_BOOL is_running;	/**< 当前效果是否正在运行 */
+	bool is_running;	/**< 当前效果是否正在运行 */
 } ui_scroll_effect_t;
 
 /** 滚动条的相关数据 */
@@ -57,8 +57,8 @@ typedef struct ui_scrollbar_t_ {
 	ui_widget_t *container;
 	ui_widget_t *target;
 	ui_widget_t *thumb;			/**< thumb of scrollbar */
-	LCUI_BOOL is_dragging;			/**< whether the content is dragged */
-	LCUI_BOOL is_draggable;			/**< whether the content can be dragged */
+	bool is_dragging;			/**< whether the content is dragged */
+	bool is_draggable;			/**< whether the content can be dragged */
 	ui_scrollbar_direction_t direction;	/**< 滚动条的方向（垂直或水平） */
 	float thumb_x, thumb_y;			/**< 拖拽开始时的滑块位置 */
 	float mouse_x, mouse_y;			/**< 拖拽开始时的鼠标坐标 */

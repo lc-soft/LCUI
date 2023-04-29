@@ -1,8 +1,8 @@
 ﻿#include <LCUI.h>
 #include <platform/main.h>
-#include <ui_builder.h>
 #include <ui_widgets/textview.h>
 #include <ui_widgets/textedit.h>
+#include <ui_xml.h>
 
 static void on_btn_click(ui_widget_t* self, ui_event_t* e, void *arg)
 {
@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 	ui_widget_t *pack, *btn;
 
 	lcui_init();
-	pack = ui_load_xml_file("main.xml");
+	pack = ui_load_xml_file("hello.xml");
 	if (!pack) {
 		return -1;
 	}

@@ -1,10 +1,12 @@
-﻿#ifdef LIBPLATFORM_INCLUDE_MAIN_H
-#define LIBPLATFORM_INCLUDE_MAIN_H
+﻿#ifndef LIBPLATFORM_INCLUDE_PLATFORM_MAIN_H
+#define LIBPLATFORM_INCLUDE_PLATFORM_MAIN_H
 
-#include <errno.h>
 #include <Windows.h>
 #include <platform.h>
+
+#ifdef LIBPLAT_WIN_DESKTOP
 #include <yutil.h>
+#include <errno.h>
 
 extern int main(int argc, char *argv[]);
 
@@ -29,4 +31,5 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance,
 	return ret;
 }
 
+#endif
 #endif

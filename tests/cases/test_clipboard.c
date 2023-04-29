@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <LCUI.h>
 #include <ui_widgets/textedit.h>
-#include <LCUI/timer.h>
+#include <timer.h>
 #include "ctest.h"
 
 static void paste_text(void *arg)

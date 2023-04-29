@@ -5,7 +5,7 @@
 #include <sys/time.h>
 #include <pthread.h>
 #include <yutil.h>
-#include "../include/thread.h"
+#include "thread.h"
 
 typedef union thread_mutex_record_t {
 	pthread_mutex_t handle;
@@ -73,10 +73,7 @@ int thread_cond_timedwait(thread_cond_t *cond, thread_mutex_t *mutex,
 	out_usec = now.tv_usec + ms * 1000;
 	outtime.tv_sec = now.tv_sec + out_usec / 1000000;
 	outtime.tv_nsec = (out_usec % 1000000) * 1000;
-	DEBUG_MSG("wait, ms = %u, outtime.tv_nsec: %ld\n", ms, outtime.tv_nsec);
 	ret = pthread_cond_timedwait(&(*cond)->handle, &(*mutex)->handle, &outtime);
-	DEBUG_MSG("ret: %d, ETIMEDOUT = %d, EINVAL = %d\n", ret, ETIMEDOUT,
-		  EINVAL);
 	switch (ret) {
 	case 0:
 		return 0;

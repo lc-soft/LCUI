@@ -37,7 +37,7 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <termios.h>
-#include <LCUI/thread.h>
+#include <thread.h>
 
 static struct linux_keyboard_t {
 	int fd;
@@ -85,7 +85,6 @@ static void linux_keyboard_dispatch_event(int key)
 	default:
 		break;
 	}
-	DEBUG_MSG("%c, %d\n", ev.key.code, ev.key.code);
 	ev.type = APP_EVENT_KEYDOWN;
 	app_post_event(&ev);
 	app_event_destroy(&ev);

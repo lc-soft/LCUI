@@ -32,12 +32,13 @@
 #include <ui.h>
 #include <css.h>
 #include <yutil.h>
-#include <LCUI/timer.h>
+#include <timer.h>
+#include <ui_widgets/textcaret.h>
 #include <ui_widgets/textedit.h>
 #include <platform/ime.h>
 
 typedef struct ui_textcaret_task_t {
-	LCUI_BOOL active;
+	bool active;
 	ui_widget_t *widget;
 } ui_textcaret_task_t;
 
@@ -45,7 +46,7 @@ typedef struct ui_textcaret_task_t {
 typedef struct ui_textcaret_t {
 	int timer_id;
 	int blink_interval;
-	LCUI_BOOL visible;
+	bool visible;
 	ui_textcaret_task_t *task;
 } ui_textcaret_t;
 
@@ -99,7 +100,7 @@ static void ui_textcaret_on_blink(void *arg)
 	}
 }
 
-void ui_textcaret_set_visible(ui_widget_t *widget, LCUI_BOOL visible)
+void ui_textcaret_set_visible(ui_widget_t *widget, bool visible)
 {
 	ui_textcaret_t *caret;
 

@@ -1,15 +1,12 @@
-﻿// TODO: Reduce dependence on lcui header files
-
-#include <string.h>
+﻿#include <string.h>
 #include <errno.h>
 #include <yutil.h>
 #include <pandagl.h>
 #include <ui_cursor.h>
 #include <ui_server.h>
-#include <LCUI/config.h>
 #include <css/computed.h>
 
-#ifdef ENABLE_OPENMP
+#ifdef LIBUI_SERVER_HAS_OPENMP
 #include <omp.h>
 #endif
 
@@ -17,16 +14,16 @@
 
 typedef struct window_mutation_record_t {
 	app_window_t *window;
-	LCUI_BOOL update_size;
-	LCUI_BOOL update_position;
-	LCUI_BOOL update_title;
-	LCUI_BOOL update_visible;
+	bool update_size;
+	bool update_position;
+	bool update_title;
+	bool update_visible;
 	int x;
 	int y;
 	int width;
 	int height;
 	wchar_t title[TITLE_MAX_SIZE];
-	LCUI_BOOL visible;
+	bool visible;
 } window_mutation_record_t;
 
 typedef struct ui_flash_rect_t {
@@ -42,15 +39,15 @@ typedef struct ui_dirty_layer_t {
 
 typedef struct ui_connection_t {
 	/** widget is ready to sync data from window */
-	LCUI_BOOL ready;
+	bool ready;
 
 	/** whether new content has been rendered */
-	LCUI_BOOL rendered;
+	bool rendered;
 
 	/** flashing rect list */
 	list_t flash_rects;
 
-	LCUI_BOOL window_visible;
+	bool window_visible;
 	app_window_t *window;
 	ui_widget_t *widget;
 } ui_connection_t;
@@ -59,11 +56,11 @@ static struct ui_server_t {
 	/** list_t<ui_connection_t> */
 	list_t connections;
 	ui_mutation_observer_t *observer;
-	LCUI_BOOL paint_flashing_enabled;
+	bool paint_flashing_enabled;
 	int num_rendering_threads;
 } ui_server;
 
-INLINE int is_rect_equals(const pd_rect_t *a, const pd_rect_t *b)
+static inline int is_rect_equals(const pd_rect_t *a, const pd_rect_t *b)
 {
 	return a->x == b->x && a->y == b->y && a->width == b->width &&
 	       a->height == b->height;
@@ -213,7 +210,7 @@ static void ui_server_on_window_resize(app_event_t *e, void *arg)
 
 static void ui_server_on_window_minmaxinfo(app_event_t *e, void *arg)
 {
-	LCUI_BOOL resizable = FALSE;
+	bool resizable = FALSE;
 	int width, height;
 	ui_widget_t *widget;
 	css_computed_style_t *style;
@@ -690,6 +687,7 @@ static void ui_server_on_widget_mutation(ui_mutation_list_t *mutation_list,
 
 void ui_server_init(void)
 {
+	ui_cursor_init();
 	ui_server.observer =
 	    ui_mutation_observer_create(ui_server_on_widget_mutation, NULL);
 	app_on_event(APP_EVENT_VISIBILITY_CHANGE,
@@ -716,13 +714,14 @@ void ui_server_set_threads(int threads)
 	ui_server.num_rendering_threads = threads;
 }
 
-void ui_server_set_paint_flashing_enabled(LCUI_BOOL enabled)
+void ui_server_set_paint_flashing_enabled(bool enabled)
 {
 	ui_server.paint_flashing_enabled = enabled;
 }
 
 void ui_server_destroy(void)
 {
+	ui_cursor_destroy();
 	app_off_event(APP_EVENT_MINMAXINFO, ui_server_on_window_minmaxinfo);
 	app_off_event(APP_EVENT_SIZE, ui_server_on_window_resize);
 	app_off_event(APP_EVENT_CLOSE, ui_server_on_window_close);

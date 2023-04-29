@@ -2,12 +2,12 @@
 
 static struct ui_cursor_t {
 	int x, y;
-	LCUI_BOOL visible;
+	bool visible;
 	pd_canvas_t image;
 	app_window_t *window;
 } ui_cursor;
 
-static uchar_t ui_cursor_image_data[4][12 * 19] = {
+static unsigned char ui_cursor_image_data[4][12 * 19] = {
 	{ 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3,
 	3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 229, 3, 3,
 	0, 0, 0, 0, 0, 0, 0, 0, 3, 255, 229, 3, 3, 0,
@@ -138,7 +138,7 @@ void ui_cursor_refresh(void)
 	app_post_event(&e);
 }
 
-LCUI_BOOL ui_cursor_is_visible(void)
+bool ui_cursor_is_visible(void)
 {
 	return ui_cursor.visible;
 }
@@ -203,8 +203,6 @@ void ui_cursor_init(void)
 	pd_canvas_init(&ui_cursor.image);
 	/* 载入自带的游标的图形数据 */
 	ui_cursor_load_default_image(&image);
-	ui_cursor.x = app_get_screen_width() / 2;
-	ui_cursor.y = app_get_screen_height() / 2;
 	// TODO: 移除 app 依赖
 	app_on_event(APP_EVENT_MOUSEMOVE, ui_cursor_on_mouse_event, NULL);
 	ui_cursor_set_image(&image);

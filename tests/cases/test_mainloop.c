@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <LCUI.h>
 #include <ui.h>
-#include <LCUI/thread.h>
+#include <thread.h>
 #include <ui_widgets/button.h>
-#include <LCUI/timer.h>
+#include <timer.h>
 #include "ctest.h"
 
 static void OnRefreshScreen(void *arg)

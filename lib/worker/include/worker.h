@@ -28,31 +28,34 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LCUI_WORKER_H
-#define LCUI_WORKER_H
+#ifndef LIB_WORKER_INCLULDE_WORKER_H
+#define LIB_WORKER_INCLULDE_WORKER_H
 
-LCUI_BEGIN_HEADER
+#include <stdbool.h>
+#include "worker/common.h"
 
-typedef void(*LCUI_TaskFunc)(void*, void*);
+LIBWORKER_BEGIN_DECLS
 
-typedef struct LCUI_TaskRec_ {
-	LCUI_TaskFunc func;		/**< 任务处理函数 */
-	void *arg[2];			/**< 两个参数 */
-	void(*destroy_arg[2])(void*);	/**< 参数的销毁函数 */
-} LCUI_TaskRec, *LCUI_Task;
+typedef void (*worker_callback_t)(void *, void *);
 
-typedef struct LCUI_WorkerRec_ *LCUI_Worker;
+typedef struct worker_task_t {
+        worker_callback_t callback;     /**< 任务处理函数 */
+        void *arg[2];                   /**< 两个参数 */
+        void (*destroy_arg[2])(void *); /**< 参数的销毁函数 */
+} worker_task_t;
 
-LCUI_API LCUI_Worker LCUIWorker_New(void);
+typedef struct worker_t worker_t;
 
-LCUI_API void LCUIWorker_PostTask(LCUI_Worker worker, LCUI_Task task);
+LIBWORKER_PUBLIC worker_t *worker_create(void);
 
-LCUI_API LCUI_BOOL LCUIWorker_RunTask(LCUI_Worker worker);
+LIBWORKER_PUBLIC void worker_post_task(worker_t *worker, worker_task_t *task);
 
-LCUI_API int LCUIWorker_RunAsync(LCUI_Worker worker);
+LIBWORKER_PUBLIC bool worker_run_task(worker_t *worker);
 
-LCUI_API void LCUIWorker_Destroy(LCUI_Worker worker);
+LIBWORKER_PUBLIC int worker_run_async(worker_t *worker);
 
-LCUI_END_HEADER
+LIBWORKER_PUBLIC void worker_destroy(worker_t *worker);
+
+LIBWORKER_END_DECLS
 
 #endif

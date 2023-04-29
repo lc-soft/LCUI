@@ -1,6 +1,8 @@
 #include <math.h>
 #include <yutil.h>
 #include <pandagl.h>
+#include <timer.h>
+#include <ui.h>
 #include <ui_server.h>
 #include <ui_widgets.h>
 #include <LCUI/app.h>

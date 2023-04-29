@@ -2,9 +2,9 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <LCUI.h>
-#include <LCUI/timer.h>
+#include <timer.h>
 #include <ui.h>
-#include <ui_builder.h>
+#include <ui_xml.h>
 #include <pandagl.h>
 
 int main(int argc, char **argv)

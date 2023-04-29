@@ -4,7 +4,7 @@
 #include <ui.h>
 #include <ui_widgets/textview.h>
 #include <ui_widgets/textedit.h>
-#include <ui_builder.h>
+#include <ui_xml.h>
 #include LCUI_APP_H
 
 class App : public LCUI::Application

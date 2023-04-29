@@ -4,7 +4,7 @@
 #include <windows.h>
 #include <process.h>
 #include <yutil.h>
-#include "../include/thread.h"
+#include "thread.h"
 
 typedef union thread_mutex_record_t {
 	HANDLE handle;

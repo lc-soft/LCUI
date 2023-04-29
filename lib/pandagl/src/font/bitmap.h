@@ -1,4 +1,4 @@
-
+﻿
 /** 初始化字体位图 */
 void pd_font_bitmap_init(pd_font_bitmap_t *bitmap);
 

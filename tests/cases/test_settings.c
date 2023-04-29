@@ -1,6 +1,6 @@
 ﻿#include <stdio.h>
 #include <LCUI.h>
-#include <LCUI/timer.h>
+#include <timer.h>
 #include "ctest.h"
 
 static void check_settings_frame_rate_cap(void *arg)

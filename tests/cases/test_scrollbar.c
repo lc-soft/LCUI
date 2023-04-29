@@ -1,7 +1,7 @@
 #include <LCUI.h>
 #include <css.h>
 #include <ui.h>
-#include <ui_builder.h>
+#include <ui_xml.h>
 #include <ui_widgets/textview.h>
 #include <ui_widgets/scrollbar.h>
 #include "ctest.h"

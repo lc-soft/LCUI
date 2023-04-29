@@ -31,7 +31,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <LCUI/thread.h>
+#include <thread.h>
 #include <platform.h>
 #include <pandagl.h>
 #include <css.h>
@@ -47,21 +47,21 @@ enum task_type_t { TASK_SET_TEXT, TASK_UPDATE, TASK_TOTAL };
 
 typedef struct ui_textedit_t {
 	ui_text_style_t style;          /**< 字体样式 */
-	pd_text_t* layer_source;        /**< 实际文本层 */
-	pd_text_t* layer_mask;          /**< 屏蔽后的文本层 */
-	pd_text_t* layer_placeholder;   /**< 占位符的文本层 */
-	pd_text_t* layer;               /**< 当前使用的文本层 */
-	ui_widget_t* scrollbars[2];     /**< 两个滚动条 */
-	ui_widget_t* caret;             /**< 文本插入符 */
-	LCUI_BOOL is_read_only;         /**< 是否只读 */
-	LCUI_BOOL is_multiline_mode;    /**< 是否为多行模式 */
-	LCUI_BOOL is_placeholder_shown; /**< 是否已经显示占位符 */
-	wchar_t* allow_input_char;      /**< 允许输入的字符 */
+	pd_text_t *layer_source;        /**< 实际文本层 */
+	pd_text_t *layer_mask;          /**< 屏蔽后的文本层 */
+	pd_text_t *layer_placeholder;   /**< 占位符的文本层 */
+	pd_text_t *layer;               /**< 当前使用的文本层 */
+	ui_widget_t *scrollbars[2];     /**< 两个滚动条 */
+	ui_widget_t *caret;             /**< 文本插入符 */
+	bool is_read_only;         /**< 是否只读 */
+	bool is_multiline_mode;    /**< 是否为多行模式 */
+	bool is_placeholder_shown; /**< 是否已经显示占位符 */
+	wchar_t *allow_input_char;      /**< 允许输入的字符 */
 	wchar_t password_char;          /**< 屏蔽符的副本 */
 	size_t text_block_size;         /**< 块大小 */
 	list_t text_blocks;             /**< 文本块缓冲区 */
 	list_t text_tags;               /**< 当前处理的标签列表 */
-	LCUI_BOOL tasks[TASK_TOTAL];    /**< 待处理的任务 */
+	bool tasks[TASK_TOTAL];    /**< 待处理的任务 */
 	thread_mutex_t mutex;           /**< 互斥锁 */
 } ui_textedit_t;
 
@@ -86,11 +86,11 @@ typedef struct textblock_t {
 	textblock_type_t type;     /**< 文本块类型 */
 	textblock_owner_t owner;   /**< 所属的文本层 */
 	textblock_action_t action; /**< 指定该文本块的添加方式 */
-	wchar_t* text;             /**< 文本块(段) */
+	wchar_t *text;             /**< 文本块(段) */
 	size_t length;             /**< 文本块的长度 */
 } textblock_t;
 
-static ui_widget_prototype_t* ui_textedit_proto;
+static ui_widget_prototype_t *ui_textedit_proto;
 
 static const char *ui_textedit_css = css_string(
 
@@ -113,19 +113,19 @@ textedit:disabled {
 
 );
 
-static void fillchar(wchar_t* str, wchar_t ch)
+static void fillchar(wchar_t *str, wchar_t ch)
 {
 	if (str) {
-		wchar_t* p;
+		wchar_t *p;
 		for (p = str; *p; ++p) {
 			*p = ch;
 		}
 	}
 }
 
-static void ui_textedit_update_caret(ui_widget_t* widget)
+static void ui_textedit_update_caret(ui_widget_t *widget)
 {
-	ui_textedit_t* edit = ui_widget_get_data(widget, ui_textedit_proto);
+	ui_textedit_t *edit = ui_widget_get_data(widget, ui_textedit_proto);
 
 	int row = edit->layer->insert_y;
 	int offset_x, offset_y;
@@ -187,9 +187,9 @@ static void ui_textedit_update_caret(ui_widget_t* widget)
 	}
 }
 
-void ui_textedit_move_caret(ui_widget_t* widget, int row, int col)
+void ui_textedit_move_caret(ui_widget_t *widget, int row, int col)
 {
-	ui_textedit_t* edit = ui_widget_get_data(widget, ui_textedit_proto);
+	ui_textedit_t *edit = ui_widget_get_data(widget, ui_textedit_proto);
 	if (edit->is_placeholder_shown) {
 		row = col = 0;
 	}
@@ -197,20 +197,20 @@ void ui_textedit_move_caret(ui_widget_t* widget, int row, int col)
 	ui_textedit_update_caret(widget);
 }
 
-static void textblock_destroy(textblock_t* blk)
+static void textblock_destroy(textblock_t *blk)
 {
 	free(blk->text);
 	blk->text = NULL;
 	free(blk);
 }
 
-static int ui_textedit_add_textblock(ui_widget_t* widget, const wchar_t* wtext,
+static int ui_textedit_add_textblock(ui_widget_t *widget, const wchar_t *wtext,
 				     textblock_action_t action,
 				     textblock_owner_t owner)
 {
-	const wchar_t* p;
-	ui_textedit_t* edit;
-	textblock_t* block;
+	const wchar_t *p;
+	ui_textedit_t *edit;
+	textblock_t *block;
 	size_t i, j, len, tag_len, size;
 
 	if (!wtext) {
@@ -250,7 +250,7 @@ static int ui_textedit_add_textblock(ui_widget_t* widget, const wchar_t* wtext,
 			continue;
 		}
 		for (j = 0; i < len && j < size - 1; ++j, ++i) {
-			wchar_t* text;
+			wchar_t *text;
 			block->text[j] = wtext[i];
 			/* 检测是否有样式标签 */
 			p = pd_scan_style_open_tag(wtext + i, NULL, 0, NULL);
@@ -286,11 +286,11 @@ static int ui_textedit_add_textblock(ui_widget_t* widget, const wchar_t* wtext,
 }
 
 /** 更新文本框内的字体位图 */
-static void TextEdit_ProcTextBlock(ui_widget_t* widget, textblock_t* txtblk)
+static void TextEdit_ProcTextBlock(ui_widget_t *widget, textblock_t *txtblk)
 {
-	list_t* tags;
-	ui_textedit_t* edit;
-	pd_text_t* layer;
+	list_t *tags;
+	ui_textedit_t *edit;
+	pd_text_t *layer;
 
 	edit = ui_widget_get_data(widget, ui_textedit_proto);
 	switch (txtblk->owner) {
@@ -317,7 +317,7 @@ static void TextEdit_ProcTextBlock(ui_widget_t* widget, textblock_t* txtblk)
 		break;
 	}
 	if (edit->password_char && txtblk->owner == TEXTBLOCK_OWNER_SOURCE) {
-		wchar_t* text = malloc(sizeof(wchar_t) * txtblk->length + 1);
+		wchar_t *text = malloc(sizeof(wchar_t) * txtblk->length + 1);
 		wcsncpy(text, txtblk->text, txtblk->length + 1);
 		fillchar(text, edit->password_char);
 		layer = edit->layer_mask;
@@ -331,14 +331,14 @@ static void TextEdit_ProcTextBlock(ui_widget_t* widget, textblock_t* txtblk)
 }
 
 /** 更新文本框的文本图层 */
-static void TextEdit_UpdateTextLayer(ui_widget_t* w)
+static void TextEdit_UpdateTextLayer(ui_widget_t *w)
 {
 	float scale;
 	list_t rects;
 	ui_rect_t rect;
-	ui_textedit_t* edit;
+	ui_textedit_t *edit;
 	pd_text_style_t style;
-	list_node_t* node;
+	list_node_t *node;
 
 	list_create(&rects);
 	scale = ui_metrics.scale;
@@ -359,13 +359,13 @@ static void TextEdit_UpdateTextLayer(ui_widget_t* w)
 	pd_rects_clear(&rects);
 }
 
-static void ui_textedit_on_task(ui_widget_t* widget, int task)
+static void ui_textedit_on_task(ui_widget_t *widget, int task)
 {
-	ui_textedit_t* edit = ui_widget_get_data(widget, ui_textedit_proto);
+	ui_textedit_t *edit = ui_widget_get_data(widget, ui_textedit_proto);
 
 	if (edit->tasks[TASK_SET_TEXT]) {
 		list_t blocks;
-		list_node_t* node;
+		list_node_t *node;
 		ui_event_t ev;
 
 		list_create(&blocks);
@@ -383,7 +383,7 @@ static void ui_textedit_on_task(ui_widget_t* widget, int task)
 		edit->tasks[TASK_UPDATE] = TRUE;
 	}
 	if (edit->tasks[TASK_UPDATE]) {
-		LCUI_BOOL is_shown;
+		bool is_shown;
 		is_shown = edit->layer_source->length == 0;
 		if (is_shown) {
 			edit->layer = edit->layer_placeholder;
@@ -403,15 +403,15 @@ static void ui_textedit_on_task(ui_widget_t* widget, int task)
 	}
 }
 
-static void ui_textedit_on_resize(ui_widget_t* w, float width, float height)
+static void ui_textedit_on_resize(ui_widget_t *w, float width, float height)
 {
 	float scale = ui_metrics.scale;
 
 	list_t rects;
-	list_node_t* node;
+	list_node_t *node;
 
 	ui_rect_t rect;
-	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
+	ui_textedit_t *edit = ui_widget_get_data(w, ui_textedit_proto);
 
 	list_create(&rects);
 	pd_text_set_fixed_size(edit->layer, (int)(width * scale),
@@ -426,14 +426,14 @@ static void ui_textedit_on_resize(ui_widget_t* w, float width, float height)
 	pd_rects_clear(&rects);
 }
 
-static void ui_textedit_on_auto_size(ui_widget_t* w, float* width,
-				     float* height, ui_layout_rule_t rule)
+static void ui_textedit_on_auto_size(ui_widget_t *w, float *width,
+				     float *height, ui_layout_rule_t rule)
 {
 	int i, n;
 	int max_width = 0, max_height = 0;
 	float scale = ui_metrics.scale;
 
-	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
+	ui_textedit_t *edit = ui_widget_get_data(w, ui_textedit_proto);
 
 	switch (rule) {
 	case UI_LAYOUT_RULE_FIXED_WIDTH:
@@ -473,9 +473,9 @@ static void ui_textedit_on_auto_size(ui_widget_t* w, float* width,
 	*width = max_width / scale;
 }
 
-void ui_textedit_enable_style_tag(ui_widget_t* widget, LCUI_BOOL enable)
+void ui_textedit_enable_style_tag(ui_widget_t *widget, bool enable)
 {
-	ui_textedit_t* edit = ui_widget_get_data(widget, ui_textedit_proto);
+	ui_textedit_t *edit = ui_widget_get_data(widget, ui_textedit_proto);
 	pd_text_set_style_tag(edit->layer, enable);
 }
 
@@ -484,7 +484,7 @@ void ui_textedit_enable_style_tag(ui_widget_t* widget, LCUI_BOOL enable)
  * tested, it may have many problems.
  */
 
-void ui_textedit_enable_multiline(ui_widget_t* w, LCUI_BOOL enable)
+void ui_textedit_enable_multiline(ui_widget_t *w, bool enable)
 {
 	if (enable) {
 		ui_widget_set_style_keyword_value(w, css_key_white_space,
@@ -495,10 +495,10 @@ void ui_textedit_enable_multiline(ui_widget_t* w, LCUI_BOOL enable)
 	}
 }
 
-void ui_textedit_clear_text(ui_widget_t* widget)
+void ui_textedit_clear_text(ui_widget_t *widget)
 {
-	ui_textedit_t* edit;
-	textblock_t* block;
+	ui_textedit_t *edit;
+	textblock_t *block;
 	list_node_t *node, *prev;
 
 	edit = ui_widget_get_data(widget, ui_textedit_proto);
@@ -520,31 +520,31 @@ void ui_textedit_clear_text(ui_widget_t* widget)
 	ui_widget_mark_dirty_rect(widget, NULL, UI_BOX_TYPE_PADDING_BOX);
 }
 
-size_t ui_textedit_get_text_w(ui_widget_t* w, size_t start, size_t max_len,
-			      wchar_t* buf)
+size_t ui_textedit_get_text_w(ui_widget_t *w, size_t start, size_t max_len,
+			      wchar_t *buf)
 {
-	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
+	ui_textedit_t *edit = ui_widget_get_data(w, ui_textedit_proto);
 	return pd_text_dump(edit->layer_source, start, max_len, buf);
 }
 
-size_t ui_textedit_get_text_length(ui_widget_t* w)
+size_t ui_textedit_get_text_length(ui_widget_t *w)
 {
-	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
+	ui_textedit_t *edit = ui_widget_get_data(w, ui_textedit_proto);
 	return edit->layer_source->length;
 }
 
-int ui_textedit_set_text_w(ui_widget_t* w, const wchar_t* wstr)
+int ui_textedit_set_text_w(ui_widget_t *w, const wchar_t *wstr)
 {
 	ui_textedit_clear_text(w);
 	return ui_textedit_add_textblock(w, wstr, TEXTBLOCK_ACTION_APPEND,
 					 TEXTBLOCK_OWNER_SOURCE);
 }
 
-int ui_textedit_set_text(ui_widget_t* widget, const char* utf8_str)
+int ui_textedit_set_text(ui_widget_t *widget, const char* utf8_str)
 {
 	int ret;
 	size_t len = strlen(utf8_str) + 1;
-	wchar_t* wstr = malloc(len * sizeof(wchar_t));
+	wchar_t *wstr = malloc(len * sizeof(wchar_t));
 
 	if (!wstr) {
 		return -ENOMEM;
@@ -556,11 +556,11 @@ int ui_textedit_set_text(ui_widget_t* widget, const char* utf8_str)
 	return ret;
 }
 
-void ui_textedit_set_passworld_char(ui_widget_t* w, wchar_t ch)
+void ui_textedit_set_password_char(ui_widget_t *w, wchar_t ch)
 {
 	size_t i, len;
 	wchar_t text[256];
-	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
+	ui_textedit_t *edit = ui_widget_get_data(w, ui_textedit_proto);
 
 	edit->password_char = ch;
 	edit->tasks[TASK_UPDATE] = TRUE;
@@ -579,21 +579,21 @@ void ui_textedit_set_passworld_char(ui_widget_t* w, wchar_t ch)
 	}
 }
 
-int ui_textedit_append_text_w(ui_widget_t* w, const wchar_t* wstr)
+int ui_textedit_append_text_w(ui_widget_t *w, const wchar_t *wstr)
 {
 	return ui_textedit_add_textblock(w, wstr, TEXTBLOCK_ACTION_APPEND,
 					 TEXTBLOCK_OWNER_SOURCE);
 }
 
-int ui_textedit_insert_text_w(ui_widget_t* w, const wchar_t* wstr)
+int ui_textedit_insert_text_w(ui_widget_t *w, const wchar_t *wstr)
 {
 	return ui_textedit_add_textblock(w, wstr, TEXTBLOCK_ACTION_INSERT,
 					 TEXTBLOCK_OWNER_SOURCE);
 }
 
-int ui_textedit_set_placeholder_w(ui_widget_t* w, const wchar_t* wstr)
+int ui_textedit_set_placeholder_w(ui_widget_t *w, const wchar_t *wstr)
 {
-	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
+	ui_textedit_t *edit = ui_widget_get_data(w, ui_textedit_proto);
 	thread_mutex_lock(&edit->mutex);
 	pd_text_empty(edit->layer_placeholder);
 	thread_mutex_unlock(&edit->mutex);
@@ -604,11 +604,11 @@ int ui_textedit_set_placeholder_w(ui_widget_t* w, const wchar_t* wstr)
 					 TEXTBLOCK_OWNER_PLACEHOLDER);
 }
 
-int ui_textedit_set_placeholder(ui_widget_t* w, const char* str)
+int ui_textedit_set_placeholder(ui_widget_t *w, const char* str)
 {
 	int ret;
 	size_t len = strlen(str) + 1;
-	wchar_t* wstr = malloc(len * sizeof(wchar_t));
+	wchar_t *wstr = malloc(len * sizeof(wchar_t));
 
 	if (!wstr) {
 		return -ENOMEM;
@@ -620,30 +620,30 @@ int ui_textedit_set_placeholder(ui_widget_t* w, const char* str)
 	return ret;
 }
 
-void ui_textedit_set_caret_blink(ui_widget_t* w, LCUI_BOOL visible, int time)
+void ui_textedit_set_caret_blink(ui_widget_t *w, bool visible, int time)
 {
-	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
+	ui_textedit_t *edit = ui_widget_get_data(w, ui_textedit_proto);
 	ui_textcaret_set_visible(edit->caret, visible);
 	ui_textcaret_set_blink_time(edit->caret, time);
 }
 
-static void ui_textedit_on_parse_text(ui_widget_t* w, const char* text)
+static void ui_textedit_on_parse_text(ui_widget_t *w, const char* text)
 {
 	ui_textedit_set_text(w, text);
 }
 
-static void ui_textedit_on_focus(ui_widget_t* widget, ui_event_t* e, void* arg)
+static void ui_textedit_on_focus(ui_widget_t *widget, ui_event_t *e, void* arg)
 {
-	ui_textedit_t* edit;
+	ui_textedit_t *edit;
 
 	edit = ui_widget_get_data(widget, ui_textedit_proto);
 	ui_textcaret_set_visible(edit->caret, TRUE);
 	ui_textedit_update_caret(widget);
 }
 
-static void ui_textedit_on_blur(ui_widget_t* widget, ui_event_t* e, void* arg)
+static void ui_textedit_on_blur(ui_widget_t *widget, ui_event_t *e, void* arg)
 {
-	ui_textedit_t* edit;
+	ui_textedit_t *edit;
 
 	edit = ui_widget_get_data(widget, ui_textedit_proto);
 	ui_textcaret_set_visible(edit->caret, FALSE);
@@ -655,9 +655,9 @@ static void ui_textedit_on_blur(ui_widget_t* widget, ui_event_t* e, void* arg)
 	}
 }
 
-static void ui_textedit_on_press_backspace_key(ui_widget_t* widget, int n_ch)
+static void ui_textedit_on_press_backspace_key(ui_widget_t *widget, int n_ch)
 {
-	ui_textedit_t* edit;
+	ui_textedit_t *edit;
 	ui_event_t ev;
 
 	edit = ui_widget_get_data(widget, ui_textedit_proto);
@@ -674,9 +674,9 @@ static void ui_textedit_on_press_backspace_key(ui_widget_t* widget, int n_ch)
 	ui_widget_emit_event(widget, ev, NULL);
 }
 
-static void ui_textedit_on_press_delete_key(ui_widget_t* widget, int n_ch)
+static void ui_textedit_on_press_delete_key(ui_widget_t *widget, int n_ch)
 {
-	ui_textedit_t* edit;
+	ui_textedit_t *edit;
 	ui_event_t ev;
 
 	edit = ui_widget_get_data(widget, ui_textedit_proto);
@@ -693,17 +693,17 @@ static void ui_textedit_on_press_delete_key(ui_widget_t* widget, int n_ch)
 	ui_widget_emit_event(widget, ev, NULL);
 }
 
-static void ui_textedit_on_paste(ui_widget_t* w, ui_event_t* e, void* arg)
+static void ui_textedit_on_paste(ui_widget_t *w, ui_event_t *e, void* arg)
 {
-	clipboard_t* clipboard = arg;
+	clipboard_t *clipboard = arg;
 	if (clipboard) {
 		ui_textedit_insert_text_w(w, clipboard->text);
 	}
 }
 
-static void ui_textedit_on_clipboard_ready(void* arg, ui_widget_t* widget)
+static void ui_textedit_on_clipboard_ready(void* arg, ui_widget_t *widget)
 {
-	clipboard_t* clipboard = arg;
+	clipboard_t *clipboard = arg;
 	ui_event_t e = { 0 };
 
 	ui_event_init(&e, "paste");
@@ -711,12 +711,12 @@ static void ui_textedit_on_clipboard_ready(void* arg, ui_widget_t* widget)
 }
 
 /** 处理按键事件 */
-static void ui_textedit_on_keydown(ui_widget_t* widget, ui_event_t* e,
+static void ui_textedit_on_keydown(ui_widget_t *widget, ui_event_t *e,
 				   void* arg)
 {
 	int cols, rows;
 	int cur_col, cur_row;
-	ui_textedit_t* edit = ui_widget_get_data(widget, ui_textedit_proto);
+	ui_textedit_t *edit = ui_widget_get_data(widget, ui_textedit_proto);
 
 	cur_row = edit->layer->insert_y;
 	cur_col = edit->layer->insert_x;
@@ -780,7 +780,7 @@ static void ui_textedit_on_keydown(ui_widget_t* widget, ui_event_t* e,
 		// Currently copies internal widget text
 		// once selection is implemented, it would copy that instead
 		size_t len = ui_textedit_get_text_length(widget);
-		wchar_t* wcs = malloc((len + 1) * sizeof(wchar_t));
+		wchar_t *wcs = malloc((len + 1) * sizeof(wchar_t));
 		ui_textedit_get_text_w(widget, 0, len, wcs);
 		clipboard_set_text(wcs, len);
 		free(wcs);
@@ -788,12 +788,12 @@ static void ui_textedit_on_keydown(ui_widget_t* widget, ui_event_t* e,
 }
 
 /** 处理输入法对文本框输入的内容 */
-static void ui_textedit_on_textinput(ui_widget_t* widget, ui_event_t* e,
+static void ui_textedit_on_textinput(ui_widget_t *widget, ui_event_t *e,
 				     void* arg)
 {
 	unsigned i, j, k;
 	wchar_t ch, *text, excludes[8] = L"\b\r\t\x1b";
-	ui_textedit_t* edit = ui_widget_get_data(widget, ui_textedit_proto);
+	ui_textedit_t *edit = ui_widget_get_data(widget, ui_textedit_proto);
 
 	/* 如果不是多行文本编辑模式则删除换行符 */
 	if (!edit->is_multiline_mode) {
@@ -839,10 +839,10 @@ static void ui_textedit_on_textinput(ui_widget_t* widget, ui_event_t* e,
 	free(text);
 }
 
-static void ui_textedit_on_mousemove(ui_widget_t* w, ui_event_t* e, void* arg)
+static void ui_textedit_on_mousemove(ui_widget_t *w, ui_event_t *e, void* arg)
 {
 	float offset_x, offset_y;
-	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
+	ui_textedit_t *edit = ui_widget_get_data(w, ui_textedit_proto);
 
 	if (edit->is_placeholder_shown) {
 		ui_textedit_update_caret(w);
@@ -856,16 +856,16 @@ static void ui_textedit_on_mousemove(ui_widget_t* w, ui_event_t* e, void* arg)
 	ui_textedit_update_caret(w);
 }
 
-static void ui_textedit_on_mouseup(ui_widget_t* w, ui_event_t* e, void* arg)
+static void ui_textedit_on_mouseup(ui_widget_t *w, ui_event_t *e, void* arg)
 {
 	ui_widget_release_mouse_capture(w);
 	ui_widget_off(w, "mousemove", ui_textedit_on_mousemove, w);
 }
 
-static void ui_textedit_on_mousedown(ui_widget_t* w, ui_event_t* e, void* arg)
+static void ui_textedit_on_mousedown(ui_widget_t *w, ui_event_t *e, void* arg)
 {
 	float offset_x, offset_y;
-	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
+	ui_textedit_t *edit = ui_widget_get_data(w, ui_textedit_proto);
 
 	ui_widget_get_offset(w, NULL, &offset_x, &offset_y);
 	pd_text_set_insert_pixel_position(
@@ -874,15 +874,15 @@ static void ui_textedit_on_mousedown(ui_widget_t* w, ui_event_t* e, void* arg)
 	    ui_compute(e->mouse.y - offset_y - w->computed_style.padding_top));
 	ui_textedit_update_caret(w);
 	ui_widget_set_mouse_capture(w);
-	ui_widget_on(w, "mousemove", ui_textedit_on_mousemove, NULL, NULL);
+	ui_widget_on(w, "mousemove", ui_textedit_on_mousemove, w, NULL);
 }
 
-static void ui_textedit_on_ready(ui_widget_t* w, ui_event_t* e, void* arg)
+static void ui_textedit_on_ready(ui_widget_t *w, ui_event_t *e, void* arg)
 {
 	ui_textedit_update_caret(w);
 }
 
-static void ui_textedit_on_set_attr(ui_widget_t* w, const char* name,
+static void ui_textedit_on_set_attr(ui_widget_t *w, const char* name,
 				    const char* val)
 {
 	if (strcmp(name, "placeholder") == 0) {
@@ -890,9 +890,9 @@ static void ui_textedit_on_set_attr(ui_widget_t* w, const char* name,
 	}
 }
 
-static void ui_textedit_on_init(ui_widget_t* w)
+static void ui_textedit_on_init(ui_widget_t *w)
 {
-	ui_textedit_t* edit;
+	ui_textedit_t *edit;
 
 	edit = ui_widget_add_data(w, ui_textedit_proto, sizeof(ui_textedit_t));
 	edit->is_read_only = FALSE;
@@ -928,9 +928,9 @@ static void ui_textedit_on_init(ui_widget_t* w)
 	ui_text_style_init(&edit->style);
 }
 
-static void ui_textedit_on_destroy(ui_widget_t* widget)
+static void ui_textedit_on_destroy(ui_widget_t *widget)
 {
-	ui_textedit_t* edit = ui_widget_get_data(widget, ui_textedit_proto);
+	ui_textedit_t *edit = ui_widget_get_data(widget, ui_textedit_proto);
 
 	edit->layer = NULL;
 	pd_text_destroy(edit->layer_source);
@@ -942,13 +942,13 @@ static void ui_textedit_on_destroy(ui_widget_t* widget)
 		     (list_item_destructor_t)textblock_destroy);
 }
 
-static void ui_textedit_on_paint(ui_widget_t* w, pd_context_t* paint,
-				 ui_widget_actual_style_t* style)
+static void ui_textedit_on_paint(ui_widget_t *w, pd_context_t *paint,
+				 ui_widget_actual_style_t *style)
 {
 	pd_pos_t pos;
 	pd_canvas_t canvas;
 	pd_rect_t content_rect, rect;
-	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
+	ui_textedit_t *edit = ui_widget_get_data(w, ui_textedit_proto);
 
 	content_rect.width = style->content_box.width;
 	content_rect.height = style->content_box.height;
@@ -968,14 +968,14 @@ static void ui_textedit_on_paint(ui_widget_t* w, pd_context_t* paint,
 	pd_text_render_to(edit->layer, rect, pos, &canvas);
 }
 
-static void ui_textedit_on_update_style(ui_widget_t* w)
+static void ui_textedit_on_update_style(ui_widget_t *w)
 {
 	int i;
 
-	ui_textedit_t* edit = ui_widget_get_data(w, ui_textedit_proto);
+	ui_textedit_t *edit = ui_widget_get_data(w, ui_textedit_proto);
 	pd_text_style_t text_style;
 	ui_text_style_t style;
-	pd_text_t* layers[3] = { edit->layer_mask, edit->layer_placeholder,
+	pd_text_t *layers[3] = { edit->layer_mask, edit->layer_placeholder,
 				 edit->layer_source };
 
 	ui_text_style_init(&style);

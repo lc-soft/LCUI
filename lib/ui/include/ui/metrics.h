@@ -4,9 +4,9 @@
 #include "common.h"
 #include "types.h"
 
-LIBUI_BEGIN_DECLS
-
 LIBUI_PUBLIC ui_metrics_t ui_metrics;
+
+LIBUI_BEGIN_DECLS
 
 LIBUI_INLINE int ui_compute(float value)
 {

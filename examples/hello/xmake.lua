@@ -1,6 +1,6 @@
 target("hello")
-    set_default(false)
+    add_installfiles("app/*")
     set_kind("binary")
     set_rundir("app")
-    add_deps("lcui")
+    add_packages("lcui")
     add_files("src/*.c")
