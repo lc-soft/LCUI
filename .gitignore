@@ -67,6 +67,7 @@ vendor/lib
 build/*.png
 build/*.jpg
 config.h
+!lib/ui-router/include/ui_router/config.h
 test/build
 lcpkg/*
 !lcpkg/ports

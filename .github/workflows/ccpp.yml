@@ -27,7 +27,7 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt install debhelper lcov valgrind -yy
 
-      - name: Configure
+      - name: Configure for coverage mode
         if: runner.os == 'Linux'
         run: xmake config -m coverage -y -v --ci-env=y
 
@@ -38,6 +38,12 @@ jobs:
       - name: Build
         run: xmake -w
 
+      - name: Run YUtil tests
+        if: runner.os == 'Windows'
+        run: |
+          xmake build yutil_test
+          xmake run yutil_test
+
       - name: Run PandaGL tests
         run: xmake run pandagl_tests
 
@@ -45,29 +51,31 @@ jobs:
         if: runner.os == 'Windows'
         run: xmake run libcss_tests
 
+      - name: Run LibUIRouter tests
+        if: runner.os == 'Windows'
+        run: xmake run libui-router-tests
+
       - name: Run LCUI tests
         if: runner.os == 'Windows'
         run: xmake run lcui_tests
-
-      - name: Run YUtil tests
-        if: runner.os == 'Windows'
-        run: |
-          xmake build yutil_test
-          xmake run yutil_test
-
-      - name: Run LibCSS tests with memcheck
-        if: runner.os == 'Linux'
-        run: xmake run libcss_tests --memcheck
-
-      - name: Run LCUI tests with memcheck
-        if: runner.os == 'Linux'
-        run: xmake run lcui_tests --memcheck
 
       - name: Run YUtil tests with memcheck
         if: runner.os == 'Linux'
         run: |
           xmake build yutil_test
           xmake run yutil_test --memcheck
+
+      - name: Run LibCSS tests with memcheck
+        if: runner.os == 'Linux'
+        run: xmake run libcss_tests --memcheck
+
+      - name: Run LibUIRouter tests with memcheck
+        if: runner.os == 'Linux'
+        run: xmake run libui-router-tests --memcheck
+
+      - name: Run LCUI tests with memcheck
+        if: runner.os == 'Linux'
+        run: xmake run lcui_tests --memcheck
 
       - name: Upload reports to Codecov
         if: runner.os == 'Linux'

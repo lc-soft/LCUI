@@ -3,13 +3,15 @@
 
 #include <stdbool.h>
 
+typedef int (*ctest_to_str_func_t)(void *, char *, unsigned);
+
 void ctest_describe(const char *name, void (*func)());
 int ctest_printf(const char *fmt, ...);
 void ctest_group_begin(void);
 void ctest_group_end(void);
 void ctest_describe(const char *name, void (*func)());
-bool ctest_equal(const char *name, int (*to_str)(void *, char *, unsigned),
-                 void *actual, void *expected);
+bool ctest_equal(const char *name, ctest_to_str_func_t to_str, void *actual,
+                 void *expected);
 int ctest_int_to_str(void *data, char *str, unsigned max_len);
 int ctest_uint_to_str(void *data, char *str, unsigned max_len);
 int ctest_float_to_str(void *data, char *str, unsigned max_len);

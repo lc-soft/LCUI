@@ -7,7 +7,6 @@
 
 int main(int argc, char **argv)
 {
-	int ret = 0;
 	logger_set_level(LOGGER_LEVEL_ERROR);
 	ctest_describe("test settings", test_settings);
 	ctest_describe("test thread", test_thread);
@@ -24,5 +23,5 @@ int main(int argc, char **argv)
 	ctest_describe("test widget rect", test_widget_rect);
 	ctest_describe("test block layout", test_block_layout);
 	ctest_describe("test flex layout", test_flex_layout);
-	return ret - ctest_finish();
+	return ctest_finish();
 }

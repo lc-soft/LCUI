@@ -70,6 +70,7 @@ bool ctest_equal(const char *name, int (*to_str)(void *, char *, unsigned),
 	char actual_str[256] = { 0 };
 	char expected_str[256] = { 0 };
 
+	tests_total++;
 	to_str(actual, actual_str, 255);
 	to_str(expected, expected_str, 255);
 	if (strncmp(actual_str, expected_str, 255) == 0) {

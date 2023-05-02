@@ -18,6 +18,7 @@ add_includedirs(
     "lib/ui-widgets/include",
     "lib/ui-cursor/include",
     "lib/ui-xml/include",
+    "lib/ui-router/include",
     "include"
 )
 includes("lib/*/xmake.lua")
@@ -89,6 +90,7 @@ target("lcui")
         "libui-widgets",
         "libui-cursor",
         "libui-server",
+        "libui-router",
         "libui-xml"
     )
     add_headerfiles("include/LCUI.h", "include/(LCUI/*.h)")
