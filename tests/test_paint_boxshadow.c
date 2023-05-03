@@ -4,7 +4,7 @@
 int paint_background(pd_context_t* ctx, pd_rect_t* box)
 {
 	pd_canvas_t image;
-	pd_color_t green = RGB(102, 204, 0);
+	pd_color_t green = pd_rgb(102, 204, 0);
 	pd_background_t bg = { 0 };
 
 	pd_canvas_init(&image);
@@ -30,7 +30,7 @@ int paint_background(pd_context_t* ctx, pd_rect_t* box)
 void paint_border(pd_context_t* ctx, pd_rect_t* box, int size, int radius)
 {
 	pd_border_t border = { 0 };
-	pd_color_t black = RGB(0, 0, 0);
+	pd_color_t black = pd_rgb(0, 0, 0);
 
 	border.top.color = black;
 	border.top.style = CSS_KEYWORD_SOLID;
@@ -60,12 +60,12 @@ int main(void)
 
 	pd_canvas_t canvas;
 	pd_canvas_t layer;
-	pd_color_t gray = RGB(240, 240, 240);
+	pd_color_t gray = pd_rgb(240, 240, 240);
 	pd_boxshadow_t shadow = { .x = 0,
 				  .y = 0,
 				  .blur = 40,
 				  .spread = 0,
-				  .color = ARGB(150, 0, 0, 0),
+				  .color = pd_argb(150, 0, 0, 0),
 				  .top_left_radius = border_radius,
 				  .top_right_radius = border_radius,
 				  .bottom_left_radius = border_radius,

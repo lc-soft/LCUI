@@ -589,7 +589,7 @@ static void pd_clear_boxshadow_content_rect(pd_boxshadow_context_t *ctx)
 			rect.x -= ctx->paint->rect.x;
 			rect.y -= ctx->paint->rect.y;
 			pd_canvas_fill_rect(&ctx->paint->canvas,
-					    ARGB(0, 0, 0, 0), rect);
+					    pd_argb(0, 0, 0, 0), rect);
 		}
 	}
 	pd_rects_clear(&rects);

@@ -429,10 +429,10 @@ static size_t ui_server_render_flash_rect(ui_connection_t *conn,
 	mask.color_type = PD_COLOR_TYPE_ARGB;
 	pd_canvas_create(&mask, flash_rect->rect.width,
 			 flash_rect->rect.height);
-	pd_canvas_fill(&mask, ARGB(125, 124, 179, 5));
+	pd_canvas_fill(&mask, pd_argb(125, 124, 179, 5));
 	mask.opacity = 0.6f * (duration - (float)period) / duration;
 	pos.x = pos.y = 0;
-	color = RGB(124, 179, 5);
+	color = pd_rgb(124, 179, 5);
 	pd_canvas_draw_hline(&mask, color, 1, pos, mask.width - 1);
 	pd_canvas_draw_vline(&mask, color, 1, pos, mask.height - 1);
 	pos.x = mask.width - 1;

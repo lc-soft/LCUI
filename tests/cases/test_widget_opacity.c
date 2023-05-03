@@ -36,11 +36,11 @@ static void check_widget_opactiy(void)
 	pd_color_t color;
 	pd_color_t tmp;
 	pd_color_t expected_color;
-	pd_color_t child_bgcolor = RGB(0, 255, 0);
-	pd_color_t child_footer_bgcolor = RGB(255, 255, 255);
-	pd_color_t parent_bgcolor = RGB(255, 0, 0);
-	pd_color_t parent_bcolor = RGB(0, 0, 0);
-	pd_color_t bgcolor = RGB(255, 255, 255);
+	pd_color_t child_bgcolor = pd_rgb(0, 255, 0);
+	pd_color_t child_footer_bgcolor = pd_rgb(255, 255, 255);
+	pd_color_t parent_bgcolor = pd_rgb(255, 0, 0);
+	pd_color_t parent_bcolor = pd_rgb(0, 0, 0);
+	pd_color_t bgcolor = pd_rgb(255, 255, 255);
 	pd_rect_t rect = { 0, 0, 400, 256 };
 	pd_context_t paint;
 

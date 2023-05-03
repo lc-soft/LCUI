@@ -7,8 +7,8 @@ int main(void)
 	pd_canvas_t img;
 	pd_font_bitmap_t bmp;
 	pd_pos_t pos = { 25, 25 };
-	pd_color_t bg = RGB(240, 240, 240);
-	pd_color_t color = RGB(255, 0, 0);
+	pd_color_t bg = pd_rgb(240, 240, 240);
+	pd_color_t color = pd_rgb(255, 0, 0);
 
 	/* 初始化字体处理功能 */
 	pd_font_library_init();

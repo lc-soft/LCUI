@@ -123,7 +123,7 @@ static void ui_canvas_context_clear_rect(ui_canvas_context_t *ctx, int x, int y,
 	rect.y = y;
 	rect.width = width;
 	rect.height = height;
-	pd_canvas_fill_rect(&ctx->buffer, ARGB(0, 0, 0, 0), rect);
+	pd_canvas_fill_rect(&ctx->buffer, pd_argb(0, 0, 0, 0), rect);
 }
 
 static void ui_canvas_context_fill_rect(ui_canvas_context_t *ctx, int x, int y,
@@ -160,7 +160,7 @@ ui_canvas_context_t *ui_canvas_get_context(ui_widget_t *w)
 	ctx->buffer = canvas->buffer;
 	ctx->width = ctx->buffer.width;
 	ctx->height = ctx->buffer.height;
-	ctx->fill_color = RGB(0, 0, 0);
+	ctx->fill_color = pd_rgb(0, 0, 0);
 	ctx->scale = ui_metrics.scale;
 	ctx->clear_rect = ui_canvas_context_clear_rect;
 	ctx->fill_rect = ui_canvas_context_fill_rect;

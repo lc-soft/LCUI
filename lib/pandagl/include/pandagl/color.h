@@ -10,12 +10,7 @@ PD_INLINE pd_color_t pd_color(uint8_t a, uint8_t r, uint8_t g, uint8_t b)
 	return color;
 }
 
-// cancel RGB macro from wingdi.h
-#ifdef RGB
-#undef RGB
-#endif
-
-#define ARGB pd_color
-#define RGB(R, G, B) pd_color(255, R, G, B)
+#define pd_argb pd_color
+#define pd_rgb(R, G, B) pd_color(255, R, G, B)
 
 #endif

@@ -4,8 +4,8 @@
 int test_paint_background_color(void)
 {
 	pd_canvas_t canvas;
-	pd_color_t gray = RGB(240, 240, 240);
-	pd_color_t green = RGB(102, 204, 0);
+	pd_color_t gray = pd_rgb(240, 240, 240);
+	pd_color_t green = pd_rgb(102, 204, 0);
 	pd_rect_t rect = { 200, 100, 400, 300 };
 	pd_background_t bg = { 0 };
 	pd_context_t* ctx;
@@ -29,8 +29,8 @@ int test_paint_background_image(void)
 {
 	pd_canvas_t canvas;
 	pd_canvas_t image;
-	pd_color_t gray = RGB(240, 240, 240);
-	pd_color_t green = RGB(102, 204, 0);
+	pd_color_t gray = pd_rgb(240, 240, 240);
+	pd_color_t green = pd_rgb(102, 204, 0);
 	pd_rect_t rect = { 200, 100, 400, 300 };
 	pd_background_t bg = { 0 };
 	pd_context_t* ctx;
@@ -64,8 +64,8 @@ int test_paint_background_image_with_size(void)
 {
 	pd_canvas_t canvas;
 	pd_canvas_t image;
-	pd_color_t gray = RGB(240, 240, 240);
-	pd_color_t green = RGB(102, 204, 0);
+	pd_color_t gray = pd_rgb(240, 240, 240);
+	pd_color_t green = pd_rgb(102, 204, 0);
 	pd_rect_t rect = { 200, 100, 400, 300 };
 	pd_background_t bg = { 0 };
 	pd_context_t* ctx;
@@ -100,8 +100,8 @@ int test_paint_background_image_with_position(void)
 {
 	pd_canvas_t canvas;
 	pd_canvas_t image;
-	pd_color_t gray = RGB(240, 240, 240);
-	pd_color_t green = RGB(102, 204, 0);
+	pd_color_t gray = pd_rgb(240, 240, 240);
+	pd_color_t green = pd_rgb(102, 204, 0);
 	pd_rect_t rect = { 200, 100, 400, 300 };
 	pd_background_t bg = { 0 };
 	pd_context_t* ctx;

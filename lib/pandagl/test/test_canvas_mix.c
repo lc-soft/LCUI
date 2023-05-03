@@ -13,9 +13,9 @@ void test_canvas_mix(void)
 {
 	char rgba_str[64];
 	pd_color_t *pixel;
-	pd_color_t white = RGB(255, 255, 255);
-	pd_color_t red = RGB(255, 0, 0);
-	pd_color_t blue = ARGB(204, 0, 0, 255);
+	pd_color_t white = pd_rgb(255, 255, 255);
+	pd_color_t red = pd_rgb(255, 0, 0);
+	pd_color_t blue = pd_argb(204, 0, 0, 255);
 	pd_canvas_t white_layer;
 	pd_canvas_t red_layer;
 	pd_canvas_t blue_layer;

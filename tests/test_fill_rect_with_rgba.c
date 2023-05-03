@@ -18,13 +18,13 @@ int main(void)
 	rect.y = 0;
 	rect.width = 160;
 	rect.height = 40;
-	pd_canvas_fill_rect(&canvas, RGB(255, 221, 0), rect);
+	pd_canvas_fill_rect(&canvas, pd_rgb(255, 221, 0), rect);
 	rect.y += 40;
-	pd_canvas_fill_rect(&canvas, RGB(102, 204, 0), rect);
+	pd_canvas_fill_rect(&canvas, pd_rgb(102, 204, 0), rect);
 	rect.y += 40;
-	pd_canvas_fill_rect(&canvas, RGB(0, 153, 255), rect);
+	pd_canvas_fill_rect(&canvas, pd_rgb(0, 153, 255), rect);
 	rect.y += 40;
-	pd_canvas_fill_rect(&canvas, RGB(255, 51, 0), rect);
+	pd_canvas_fill_rect(&canvas, pd_rgb(255, 51, 0), rect);
 	color.red = 255;
 	color.green = 255;
 	color.blue = 255;

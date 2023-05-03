@@ -16,7 +16,7 @@ int main(void)
 	/* 创建一个图像，并使用灰色填充 */
 	pd_canvas_init(&img);
 	pd_canvas_create(&img, 320, 240);
-	pd_canvas_fill(&img, RGB(240, 240, 240));
+	pd_canvas_fill(&img, pd_rgb(240, 240, 240));
 
 	/* 设置文本的字体大小 */
 	pd_text_style_Init(&txtstyle);

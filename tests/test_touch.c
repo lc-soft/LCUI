@@ -53,7 +53,7 @@ static void OnTouch(app_event_t *e, void *arg)
 	ui_widget_t *w;
 	list_node_t *node;
 	touch_point_t *point;
-	pd_color_t bgcolor = RGB(255, 0, 0);
+	pd_color_t bgcolor = pd_rgb(255, 0, 0);
 
 	for (i = 0; i < e->touch.n_points; ++i) {
 		TouchPointBinding binding;
