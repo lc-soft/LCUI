@@ -32,7 +32,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <pandagl.h>
-#include "png.h"
+#include "png-private.h"
 
 #ifdef ASSERT
 #undef ASSERT

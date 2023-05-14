@@ -118,7 +118,6 @@ int css_style_value_set_array_length(css_style_value_t *val, unsigned new_len)
 void css_style_value_copy(css_style_value_t *dst, const css_style_value_t *src)
 {
 	switch (src->type) {
-	case CSS_IMAGE_VALUE:
 	case CSS_STRING_VALUE:
 	case CSS_UNPARSED_VALUE:
 		if (src->string_value) {
@@ -190,9 +189,6 @@ void css_dump_style_value(const css_style_value_t *s, css_dump_context_t *ctx)
 		} else {
 			DUMPF("#%02x%02x%02x", color.r, color.g, color.b);
 		}
-		break;
-	case CSS_IMAGE_VALUE:
-		DUMPF("image(\"%s\")", s->image_value);
 		break;
 	case CSS_STRING_VALUE:
 		DUMP(s->string_value);

@@ -24,11 +24,11 @@ LIBCSS_BEGIN_DECLS
                 (S)->unit_bits.PROP_KEY = CSS_UNIT_PX;    \
         } while (0);
 
-#define CSS_COPY_LENGTH(SRC, DEST, PROP_KEY)                            \
+#define CSS_COPY_LENGTH(DEST, SRC, PROP_KEY)                            \
         do {                                                            \
-                (SRC)->PROP_KEY = (DEST)->PROP_KEY;                     \
-                (SRC)->type_bits.PROP_KEY = (DEST)->type_bits.PROP_KEY; \
-                (SRC)->unit_bits.PROP_KEY = (DEST)->unit_bits.PROP_KEY; \
+                (DEST)->PROP_KEY = (SRC)->PROP_KEY;                     \
+                (DEST)->type_bits.PROP_KEY = (SRC)->type_bits.PROP_KEY; \
+                (DEST)->unit_bits.PROP_KEY = (SRC)->unit_bits.PROP_KEY; \
         } while (0);
 
 LIBCSS_INLINE libcss_bool_t is_css_display_inline(uint8_t display)

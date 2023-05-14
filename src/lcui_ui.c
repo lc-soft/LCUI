@@ -144,6 +144,7 @@ void lcui_update_ui(void)
 	ui_process_image_events();
 	ui_process_events();
 	ui_update();
+	ui_clear_images();
 }
 
 static void lcui_process_ui_mutation(ui_mutation_record_t *mutation)

@@ -315,7 +315,7 @@ int css_cascade_background_image(const css_style_array_value_t input,
 {
 	s->background_image = NULL;
 	s->type_bits.background_image = CSS_BACKGROUND_IMAGE_NONE;
-	if (input[0].type == CSS_IMAGE_VALUE) {
+	if (input[0].type == CSS_STRING_VALUE) {
 		s->background_image = strdup2(input[0].image_value);
 		s->type_bits.background_image = CSS_BACKGROUND_IMAGE_IMAGE;
 		return 1;

@@ -147,8 +147,7 @@ typedef enum {
 	CSS_BACKGROUND_IMAGE_INHERIT,
 	/* Consult pointer in struct to determine which */
 	CSS_BACKGROUND_IMAGE_NONE,
-	CSS_BACKGROUND_IMAGE_IMAGE,
-	CSS_BACKGROUND_IMAGE_DATA
+	CSS_BACKGROUND_IMAGE_IMAGE
 } css_background_image_t;
 
 typedef enum {
@@ -472,7 +471,6 @@ typedef enum css_style_value_type_t {
 	CSS_STRING_VALUE,
 	CSS_KEYWORD_VALUE,
 	CSS_COLOR_VALUE,
-	CSS_IMAGE_VALUE,
 
 	CSS_UNIT_VALUE,
 	CSS_BOOLEAN_VALUE,
