@@ -64,18 +64,6 @@ uint32_t lcui_get_fps(void)
         return lcui_app.timer.frames_per_second;
 }
 
-void lcui_init_app(void)
-{
-        int i;
-        step_timer_init(&lcui_app.timer);
-        lcui_app.main_worker = worker_create();
-        for (i = 0; i < LCUI_WORKER_NUM; ++i) {
-                lcui_app.workers[i] = worker_create();
-                worker_run_async(lcui_app.workers[i]);
-        }
-        lcui_app.timer.target_elapsed_time = 0;
-}
-
 void lcui_set_frame_rate_cap(unsigned rate_cap)
 {
         if (rate_cap > 0) {
@@ -84,31 +72,6 @@ void lcui_set_frame_rate_cap(unsigned rate_cap)
         } else {
                 lcui_app.timer.is_fixed_time_step = FALSE;
         }
-}
-
-static void lcui_destroy_app(void)
-{
-        int i;
-
-        for (i = 0; i < LCUI_WORKER_NUM; ++i) {
-                worker_destroy(lcui_app.workers[i]);
-                lcui_app.workers[i] = NULL;
-        }
-        worker_destroy(lcui_app.main_worker);
-        lcui_app.main_worker = NULL;
-}
-
-static void lcui_print_info(void)
-{
-        logger_log(LOGGER_LEVEL_INFO,
-                   "LCUI (LC's UI) version " PACKAGE_VERSION "\n"
-                   "Build at "__DATE__
-                   " - "__TIME__
-                   "\n"
-                   "Copyright (C) 2012-2023 Liu Chao <root@lc-soft.io>.\n"
-                   "This is open source software, licensed under MIT. \n"
-                   "See source distribution for detailed copyright notices.\n"
-                   "To learn more, visit http://www.lcui.org.\n\n");
 }
 
 static void lcui_app_on_tick(step_timer_t *timer, void *data)
@@ -135,16 +98,45 @@ int lcui_process_events(app_process_events_option_t option)
         return app_process_native_events(option);
 }
 
-void lcui_init_base(void)
+void lcui_init_app(void)
 {
+        int i;
+        logger_log(LOGGER_LEVEL_INFO,
+                   "LCUI (LC's UI) version " PACKAGE_VERSION "\n"
+                   "Build at "__DATE__
+                   " - "__TIME__
+                   "\n"
+                   "Copyright (C) 2012-2023 Liu Chao <root@lc-soft.io>.\n"
+                   "This is open source software, licensed under MIT. \n"
+                   "See source distribution for detailed copyright notices.\n"
+                   "To learn more, visit http://www.lcui.org.\n\n");
+
         lcui_init_timers();
         lcui_reset_settings();
+        step_timer_init(&lcui_app.timer);
+        lcui_app.main_worker = worker_create();
+        for (i = 0; i < LCUI_WORKER_NUM; ++i) {
+                lcui_app.workers[i] = worker_create();
+                worker_run_async(lcui_app.workers[i]);
+        }
+        lcui_app.timer.target_elapsed_time = 0;
+}
+
+void lcui_destroy_app(void)
+{
+        int i;
+
+        for (i = 0; i < LCUI_WORKER_NUM; ++i) {
+                worker_destroy(lcui_app.workers[i]);
+                lcui_app.workers[i] = NULL;
+        }
+        worker_destroy(lcui_app.main_worker);
+        lcui_app.main_worker = NULL;
+        lcui_destroy_timers();
 }
 
 void lcui_init(void)
 {
-        lcui_print_info();
-        lcui_init_base();
         lcui_init_app();
         if (app_init(L"LCUI Application") != 0) {
                 abort();
@@ -157,7 +149,6 @@ void lcui_destroy(void)
 {
         lcui_destroy_ui();
         lcui_destroy_app();
-        lcui_destroy_timers();
         app_destroy();
 }
 

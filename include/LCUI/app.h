@@ -82,7 +82,8 @@ LCUI_API uint32_t lcui_get_fps(void);
 
 LCUI_API void lcui_set_frame_rate_cap(unsigned rate_cap);
 
-LCUI_API void lcui_init_base(void);
+LCUI_API void lcui_init_app(void);
+LCUI_API void lcui_destroy_app(void);
 
 /** 初始化 LCUI 各项功能 */
 LCUI_API void lcui_init(void);
