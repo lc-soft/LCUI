@@ -1,7 +1,7 @@
 ﻿#include <stdio.h>
 #include <time.h>
 #include <ui.h>
-#include <ui_widgets/textview.h>
+#include <ui_widgets/text.h>
 
 int main(void)
 {
@@ -18,8 +18,8 @@ int main(void)
 	logger_debug("start create %zu widgets...\n", n);
 	ui_widget_append(ui_root(), box);
 	for (i = 0; i < n; ++i) {
-		w = ui_create_widget("textview");
-		ui_textview_set_text_w(w, L"hello, test");
+		w = ui_create_widget("text");
+		ui_text_set_content_w(w, L"hello, test");
 		ui_widget_append(box, w);
 	}
 	sec = (clock() - c) * 1.0 / CLOCKS_PER_SEC;

@@ -586,7 +586,7 @@ void test_router_components(void)
         router_config_destroy(config);
 
         ui_init();
-        ui_register_textview();
+        ui_register_text();
         ui_register_router_link();
         ui_register_router_view();
         ui_create_widget_prototype("foo", NULL);

@@ -218,7 +218,7 @@ static void ui_anchor_on_init(ui_widget_t* w)
 
 void ui_register_anchor(void)
 {
-        ui_anchor.proto = ui_create_widget_prototype("a", "textview");
+        ui_anchor.proto = ui_create_widget_prototype("a", "text");
         ui_anchor.proto->init = ui_anchor_on_init;
         ui_anchor.worker = worker_create();
         worker_run_async(ui_anchor.worker);

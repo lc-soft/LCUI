@@ -2,7 +2,7 @@
 <lcui-app>
   <ui>
     <w class="container">
-      <textview id="content">
+      <text id="content">
 /* ***************************************************************************
  * test_scrollbar.c -- test scrollbar
  *
@@ -32,7 +32,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-      </textview>
+      </text>
       <scrollbar target="content" />
       <scrollbar target="content" direction="horizontal" />
     </w>

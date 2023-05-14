@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 	ctest_describe("test clipboard", test_clipboard);
 	ctest_describe("test widget event", test_widget_event);
 	ctest_describe("test widget opacity", test_widget_opacity);
-	ctest_describe("test textview resize", test_textview_resize);
+	ctest_describe("test text resize", test_text_resize);
 	ctest_describe("test textedit", test_textedit);
 	ctest_describe("test scrollbar", test_scrollbar);
 	ctest_describe("test widget rect", test_widget_rect);

@@ -13,7 +13,7 @@
       <w id="test-flex-0-0-100px"></w>
       <w id="test-flex-box"></w>
       <w id="test-btn" class="btn">
-        <w id="test-textview" type="textview" class="text">test</w>
+        <w id="test-text" type="text" class="text">test</w>
       </w>
     </w>
   </w>

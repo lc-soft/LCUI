@@ -56,8 +56,8 @@ target("test_scrollbar")
 target("test_string_render")
     add_files("test_string_render.c")
 
-target("test_textview_resize")
-    add_files("test_textview_resize.c")
+target("test_text_resize")
+    add_files("test_text_resize.c")
     add_deps("ctest")
 
 target("test_touch")

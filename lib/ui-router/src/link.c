@@ -169,7 +169,7 @@ void ui_router_link_set_exact(ui_widget_t *w, bool exact)
 void ui_register_router_link(void)
 {
         ui_router_link_proto =
-            ui_create_widget_prototype("router-link", "textview");
+            ui_create_widget_prototype("router-link", "text");
         ui_router_link_proto->init = ui_router_link_on_init;
         ui_router_link_proto->setattr = ui_router_link_on_set_attr;
         ui_router_link_proto->destroy = ui_router_link_on_destroy;

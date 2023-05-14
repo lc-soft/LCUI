@@ -1,6 +1,5 @@
 ﻿#include <LCUI.h>
 #include <pandagl.h>
-#include <ui_widgets/textview.h>
 
 int main(void)
 {
@@ -14,7 +13,7 @@ int main(void)
 
 	root = ui_create_widget(NULL);
 	box = ui_create_widget(NULL);
-	txt = ui_create_widget("textview");
+	txt = ui_create_widget("text");
 
 	/* 创建一块灰色的画板 */
 	pd_canvas_init(&canvas);
@@ -32,7 +31,7 @@ int main(void)
 	ui_widget_set_style_string(box, "padding", "20px");
 	ui_widget_set_style_string(box, "border", "1px solid rgb(201,230,242)");
 	ui_widget_set_style_string(box, "background-color", "rgb(242,249,252)");
-	ui_textview_set_text_w(txt, L"[size=24px]这是一段测试文本[/size]");
+	ui_text_set_content_w(txt, L"[size=24px]这是一段测试文本[/size]");
 	ui_widget_append(box, txt);
 	ui_widget_append(root, box);
 	/* 更新部件，此处的更新顺序必须是父级到子级 */

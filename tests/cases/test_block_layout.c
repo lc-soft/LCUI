@@ -47,7 +47,7 @@ static void test_auto_size(void)
 
 	w = ui_get_widget("test-text-auto-height");
 	example = w->parent->parent;
-	ui_textview_set_text_w(w, L"long long long long long long text");
+	ui_text_set_content_w(w, L"long long long long long long text");
 	ui_update();
 
 	rect.x = 5;
@@ -72,7 +72,7 @@ static void test_auto_size(void)
 
 	w = ui_get_widget("test-text-auto-size");
 
-	ui_textview_set_text_w(
+	ui_text_set_content_w(
 	    w, L"long long long long long long long long long long long long "
 	       L"long long long long long long long long long long long long "
 	       L"long long text");
@@ -96,11 +96,11 @@ static void test_auto_size(void)
 	// Update test-text-block-auto-height content
 
 	w = ui_get_widget("test-text-block-auto-height");
-	ui_textview_set_text_w(
+	ui_text_set_content_w(
 	    w, L"long long long long long long long long long long long long "
 	       L"long long long long long long long long long long long long "
 	       L"long long text");
-	// TODO: 检查 textview 尺寸是否正确更新
+	// TODO: 检查 text 尺寸是否正确更新
 	ui_update();
 	rect.x = 5;
 	rect.y = 5 + 50 + 50;

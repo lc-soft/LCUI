@@ -250,7 +250,7 @@ void lcui_set_ui_display_mode(lcui_display_mode_t mode)
 
 void lcui_init_ui_preset_widgets(void)
 {
-	ui_register_textview();
+	ui_register_text();
 	ui_register_canvas();
 	ui_register_anchor();
 	ui_register_button();
@@ -261,7 +261,7 @@ void lcui_init_ui_preset_widgets(void)
 
 void lcui_destroy_ui_preset_widgets(void)
 {
-	ui_unregister_textview();
+	ui_unregister_text();
 	ui_unregister_anchor();
 }
 

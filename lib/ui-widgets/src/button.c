@@ -33,7 +33,7 @@
 #include <ui.h>
 #include <css.h>
 #include <ui_widgets/button.h>
-#include <ui_widgets/textview.h>
+#include <ui_widgets/text.h>
 
 static ui_widget_prototype_t *ui_button_prototype = NULL;
 
@@ -70,17 +70,17 @@ static void ui_button_on_init(ui_widget_t* w)
 
 void ui_button_set_text_w(ui_widget_t* w, const wchar_t *wstr)
 {
-	ui_textview_set_text_w(w, wstr);
+	ui_text_set_content_w(w, wstr);
 }
 
 void ui_button_set_text(ui_widget_t* w, const char *str)
 {
-	ui_textview_set_text(w, str);
+	ui_text_set_content(w, str);
 }
 
 void ui_register_button(void)
 {
-	ui_button_prototype = ui_create_widget_prototype("button", "textview");
+	ui_button_prototype = ui_create_widget_prototype("button", "text");
 	ui_button_prototype->init = ui_button_on_init;
 	ui_load_css_string(ui_button_css, __FILE__);
 }

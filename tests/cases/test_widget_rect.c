@@ -17,7 +17,7 @@ void test_widget_rect(void)
 	lcui_init();
 	root = ui_root();
 	parent = ui_create_widget("button");
-	child = ui_create_widget("textview");
+	child = ui_create_widget("text");
 
 	ui_widget_set_style_keyword_value(parent, css_key_box_sizing,
 					  CSS_KEYWORD_BORDER_BOX);

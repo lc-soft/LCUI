@@ -13,7 +13,7 @@ const char *test_css = css_string(
 	border: 1px solid #eee;
 }
 
-textview {
+text {
 	white-space: nowrap;
 	display: inline-block;
 }
@@ -58,12 +58,12 @@ const char *test_content = "\n\
 void BuildContentView(void)
 {
 	ui_widget_t* container = ui_create_widget(NULL);
-	ui_widget_t* content = ui_create_widget("textview");
+	ui_widget_t* content = ui_create_widget("text");
 	ui_widget_t* vscrollbar = ui_create_widget("scrollbar");
 	ui_widget_t* hscrollbar = ui_create_widget("scrollbar");
 
 	ui_widget_set_id(content, "license_content");
-	ui_textview_set_text(content, test_content);
+	ui_text_set_content(content, test_content);
 	ui_scrollbar_set_direction(hscrollbar, UI_SCROLLBAR_HORIZONTAL);
 	ui_scrollbar_bind_target(vscrollbar, content);
 	ui_scrollbar_bind_target(hscrollbar, content);

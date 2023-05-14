@@ -12,7 +12,7 @@ void test_widget_mouse_event(void)
 	lcui_init();
 	root = ui_root();
 	parent = ui_create_widget("button");
-	child = ui_create_widget("textview");
+	child = ui_create_widget("text");
 
 	ui_widget_resize(root, 200, 200);
 	ui_widget_resize(parent, 100, 100);

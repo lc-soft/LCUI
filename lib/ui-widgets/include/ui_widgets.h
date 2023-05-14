@@ -1,5 +1,5 @@
 #include "ui_widgets/common.h"
-#include "ui_widgets/textview.h"
+#include "ui_widgets/text.h"
 #include "ui_widgets/button.h"
 #include "ui_widgets/anchor.h"
 #include "ui_widgets/canvas.h"

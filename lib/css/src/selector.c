@@ -85,11 +85,11 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder, lis
 			return 0;
 		}
 		/* 按类选择器生成选择器全名
-		 * 假设当前选择器全名为：textview#main-btn-text，且有 .a .b .c
+		 * 假设当前选择器全名为：text#main-btn-text，且有 .a .b .c
 		 * 这三个类，那么下面的处理将会拆分成以下三个选择器：
-		 * textview#test-text.a
-		 * textview#test-text.b
-		 * textview#test-text.a
+		 * text#test-text.a
+		 * text#test-text.b
+		 * text#test-text.a
 		 */
 		fullname[len++] = '.';
 		for (i = 0; sfinder->node->classes[i]; ++i) {
@@ -113,10 +113,10 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder, lis
 			return 0;
 		}
 		/* 按类选择器生成选择器全名，结果类似于这样：
-		 * textview#test-text.a.b
-		 * textview#test-text.a.c
-		 * textview#test-text.b.c
-		 * textview#test-text.a.b.c
+		 * text#test-text.a.b
+		 * text#test-text.a.c
+		 * text#test-text.b.c
+		 * text#test-text.a.b.c
 		 */
 		fullname[len++] = '.';
 		for (i = 0; sfinder->node->classes[i]; ++i) {
@@ -131,7 +131,7 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder, lis
 			sfinder->level = LEVEL_STATUS;
 			/**
 			 * 递归拼接伪类名，例如：
-			 * textview#main-btn-text:active
+			 * text#main-btn-text:active
 			 */
 			count += css_selector_collect_name(sfinder, list);
 			sfinder->level = LEVEL_CLASS_2;
@@ -147,15 +147,15 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder, lis
 		sfinder->level = LEVEL_STATUS_2;
 		/**
 		 * 按伪类选择器生成选择器全名
-		 * 假设当前选择器全名为：textview#main-btn-text:hover:focus:active
+		 * 假设当前选择器全名为：text#main-btn-text:hover:focus:active
 		 * 那么下面的循环会将它拆分为以下几个选择器：
-		 * textview#main-btn-text:active
-		 * textview#main-btn-text:active:focus
-		 * textview#main-btn-text:active:focus:hover
-		 * textview#main-btn-text:active:hover
-		 * textview#main-btn-text:focus
-		 * textview#main-btn-text:focus:hover
-		 * textview#main-btn-text:hover
+		 * text#main-btn-text:active
+		 * text#main-btn-text:active:focus
+		 * text#main-btn-text:active:focus:hover
+		 * text#main-btn-text:active:hover
+		 * text#main-btn-text:focus
+		 * text#main-btn-text:focus:hover
+		 * text#main-btn-text:hover
 		 */
 		for (i = 0; sfinder->node->status[i]; ++i) {
 			sfinder->status_i = i;
@@ -163,7 +163,7 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder, lis
 			list_append(list, strdup2(fullname));
 			/**
 			 * 递归调用，以一层层拼接出像下面这样的选择器：
-			 * textview#main-btn-text:active:focus:hover
+			 * text#main-btn-text:active:focus:hover
 			 */
 			count += css_selector_collect_name(sfinder, list);
 		}

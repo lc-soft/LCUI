@@ -3,8 +3,6 @@
 #include <stdio.h>
 #include <LCUI.h>
 #include <platform/main.h>
-#include <pandagl.h>
-#include <ui_widgets/textview.h>
 
 #define SCREEN_WIDTH 1600
 #define SCREEN_HEIGHT 900
@@ -41,7 +39,7 @@ void UpdateRenderStatus(void* arg)
 	char str[32];
 
 	sprintf(str, "[size=24px]FPS: %d[/size]", self.fps);
-	ui_textview_set_text(arg, str);
+	ui_text_set_content(arg, str);
 	self.fps = 0;
 }
 
@@ -119,7 +117,7 @@ void InitRenderStatus(void)
 	ui_widget_t* status;
 
 	root = ui_root();
-	status = ui_create_widget("textview");
+	status = ui_create_widget("text");
 	ui_widget_set_style_string(status, "top", "10px");
 	ui_widget_set_style_string(status, "right", "10px");
 	ui_widget_set_style_string(status, "position", "absolute");
