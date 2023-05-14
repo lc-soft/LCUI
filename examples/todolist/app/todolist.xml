@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <resource type="text/css" src="todolist.css"/>
+  <ui>
+    <w class="app">
+      <w class="header">
+        <text class="title">Todo list</text>
+        <w class="tools">
+          <text id="count" class="count" />
+          <w id="filters" class="task-filters">
+            <text class="task-filter" data-value="all">All</text>
+            <text class="task-filter" data-value="active">Active</text>
+            <text class="task-filter" data-value="completed">Completed</text>
+          </w>
+        </w>
+      </w>
+      <textedit id="input" class="task-input" placeholder="Add a new task..." />
+      <w id="list" class="task-list" />
+    </w>
+  </ui>
+</lcui-app>
