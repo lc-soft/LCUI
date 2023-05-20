@@ -100,13 +100,13 @@ jobs:
 
       - uses: actions/upload-artifact@master
         with:
-          name: lcui-${{ runner.os }}-package
+          name: lcui-package (${{ runner.os }})
           path: |
             dist/lcui-package
 
       - uses: actions/upload-artifact@master
         with:
-          name: lcui-${{ runner.os }}-examples
+          name: lcui-examples (${{ runner.os }})
           path: |
             dist/lcui-examples
 
@@ -126,16 +126,9 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - name: Download artifacts [build-ubuntu]
-        uses: actions/download-artifact@master
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
         with:
-          name: ubuntu-packages
-          path: ${{ env.ARTIFACT_DIR }}
-
-      - name: Download artifacts [build-windows]
-        uses: actions/download-artifact@master
-        with:
-          name: windows-packages
           path: ${{ env.ARTIFACT_DIR }}
 
       - name: Set release version
