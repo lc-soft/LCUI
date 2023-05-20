@@ -118,7 +118,7 @@ static void ui_router_view_on_init(ui_widget_t *w)
         dict_init_string_copy_key_type(&view->cache_dict_type);
         view->cache = dict_create(&view->cache_dict_type, NULL);
         view->keep_alive = FALSE;
-        ui_widget_on(w, "ready", ui_router_view_on_ready, NULL, NULL);
+        ui_widget_on(w, "ready", ui_router_view_on_ready, NULL);
 }
 
 static void ui_router_view_on_destroy(ui_widget_t *w)

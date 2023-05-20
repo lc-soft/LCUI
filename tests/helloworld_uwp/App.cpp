@@ -32,7 +32,7 @@ void App::Load(Platform::String ^ entryPoint)
 	ui_widget_append(root, pack);
 	ui_widget_unwrap(pack);
 	btn = ui_get_widget("btn");
-	ui_widget_on(btn, "click", OnBtnClick, NULL, NULL);
+	ui_widget_on(btn, "click", OnBtnClick, NULL);
 }
 
 [Platform::MTAThread] int main(Platform::Array<Platform::String ^> ^) {

@@ -22,6 +22,6 @@ int main(int argc, char **argv)
         }
         ui_root_append(pack);
         ui_widget_unwrap(pack);
-        ui_widget_on(ui_get_widget("btn"), "click", on_btn_click, NULL, NULL);
+        ui_widget_on(ui_get_widget("btn"), "click", on_btn_click, NULL);
         return lcui_main();
 }

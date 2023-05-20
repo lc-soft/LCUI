@@ -88,7 +88,7 @@ static xml_loader_t* xml_loader_create(ui_widget_t* w)
         loader->widget = w;
         loader->filepath = strdup2(ui_widget_get_attribute_value(w, "href"));
         loader->target_id = strdup2(ui_widget_get_attribute_value(w, "target"));
-        ui_widget_on(w, "destroy", xml_loader_on_widget_destroy, loader, NULL);
+        ui_widget_on(w, "destroy", xml_loader_on_widget_destroy, loader);
         if (key) {
                 loader->key = strdup2(key);
         } else {
@@ -210,9 +210,9 @@ static void ui_anchor_on_click(ui_widget_t* w, ui_event_t* e, void* arg)
 
 static void ui_anchor_on_init(ui_widget_t* w)
 {
-        ui_widget_on(w, "click", ui_anchor_on_click, NULL, NULL);
-        ui_widget_on(w, "startload.anchor", ui_anchor_on_startload, NULL, NULL);
-        ui_widget_on(w, "load.anchor", ui_anchor_on_load, NULL, NULL);
+        ui_widget_on(w, "click", ui_anchor_on_click, NULL);
+        ui_widget_on(w, "startload.anchor", ui_anchor_on_startload, NULL);
+        ui_widget_on(w, "load.anchor", ui_anchor_on_load, NULL);
         ui_anchor.proto->proto->init(w);
 }
 

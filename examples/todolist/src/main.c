@@ -156,9 +156,9 @@ void on_task_list_click(ui_widget_t *w, ui_event_t *e, void *arg)
 
 void ui_todolist_init(void)
 {
-        ui_widget_on(ui_get_widget("input"), "keydown", on_input_keydown, NULL, NULL);
-        ui_widget_on(ui_get_widget("filters"), "click", on_filter_click, NULL, NULL);
-        ui_widget_on(ui_get_widget("list"), "click", on_task_list_click, NULL, NULL);
+        ui_widget_on(ui_get_widget("input"), "keydown", on_input_keydown, NULL);
+        ui_widget_on(ui_get_widget("filters"), "click", on_filter_click, NULL);
+        ui_widget_on(ui_get_widget("list"), "click", on_task_list_click, NULL);
         ui_todolist_filter("all");
 }
 

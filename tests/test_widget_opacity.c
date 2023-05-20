@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 	build();
 	btn_plus = ui_get_widget("btn-plus");
 	btn_minus = ui_get_widget("btn-minus");
-	ui_widget_on(btn_plus, "click", on_opacity_plus, NULL, NULL);
-	ui_widget_on(btn_minus, "click", on_opacity_minus, NULL, NULL);
+	ui_widget_on(btn_plus, "click", on_opacity_plus, NULL);
+	ui_widget_on(btn_minus, "click", on_opacity_minus, NULL);
 	return lcui_main();
 }

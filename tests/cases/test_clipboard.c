@@ -4,57 +4,57 @@
 
 static void paste_text(void *arg)
 {
-	ui_widget_t *w = arg;
-	app_event_t ev = { 0 };
+        ui_widget_t *w = arg;
+        app_event_t ev = { 0 };
 
-	ev.type = APP_EVENT_KEYDOWN;
-	ev.key.code = KEY_V;
-	ev.key.ctrl_key = TRUE;
-	ui_set_focus(w);
-	app_post_event(&ev);
+        ev.type = APP_EVENT_KEYDOWN;
+        ev.key.code = KEY_V;
+        ev.key.ctrl_key = TRUE;
+        ui_set_focus(w);
+        app_post_event(&ev);
 }
 
 static void on_text1_focused(ui_widget_t *w, ui_event_t *e, void *arg)
 {
-	app_event_t ev = { 0 };
+        app_event_t ev = { 0 };
 
-	ev.type = APP_EVENT_KEYDOWN;
-	ev.key.code = KEY_C;
-	ev.key.ctrl_key = TRUE;
-	app_post_event(&ev);
-	lcui_set_timeout(100, paste_text, e->data);
+        ev.type = APP_EVENT_KEYDOWN;
+        ev.key.code = KEY_C;
+        ev.key.ctrl_key = TRUE;
+        app_post_event(&ev);
+        lcui_set_timeout(100, paste_text, e->data);
 }
 
 static void focus_text1(void *arg)
 {
-	ui_set_focus(arg);
+        ui_set_focus(arg);
 }
 
 static void on_check_text(ui_widget_t *w, ui_event_t *e, void *arg)
 {
-	clipboard_t *clipboard = arg;
-	char actual_text[32] = "none";
+        clipboard_t *clipboard = arg;
+        char actual_text[32] = "none";
 
-	if (clipboard && clipboard->text) {
-		encode_utf8(actual_text, clipboard->text, 31);
-	}
-	ctest_euqal_str("check the pasted text", actual_text, "helloworld");
-	lcui_quit();
+        if (clipboard && clipboard->text) {
+                encode_utf8(actual_text, clipboard->text, 31);
+        }
+        ctest_euqal_str("check the pasted text", actual_text, "helloworld");
+        lcui_quit();
 }
 
 void test_clipboard(void)
 {
-	ui_widget_t *text1, *text2;
+        ui_widget_t *text1, *text2;
 
-	lcui_init();
+        lcui_init();
 
-	text1 = ui_create_widget("textedit");
-	text2 = ui_create_widget("textedit");
-	ui_root_append(text1);
-	ui_root_append(text2);
-	ui_textedit_set_text_w(text1, L"helloworld");
-	ui_widget_on(text1, "focus", on_text1_focused, text2, NULL);
-	ui_widget_on(text2, "paste", on_check_text, NULL, NULL);
-	lcui_set_timeout(500, focus_text1, text1);
-	lcui_main();
+        text1 = ui_create_widget("textedit");
+        text2 = ui_create_widget("textedit");
+        ui_root_append(text1);
+        ui_root_append(text2);
+        ui_textedit_set_text_w(text1, L"helloworld");
+        ui_widget_on(text1, "focus", on_text1_focused, text2);
+        ui_widget_on(text2, "paste", on_check_text, NULL);
+        lcui_set_timeout(500, focus_text1, text1);
+        lcui_main();
 }

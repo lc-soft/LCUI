@@ -126,8 +126,8 @@ static void ui_router_link_on_init(ui_widget_t *w)
         link->exact = FALSE;
         link->router = NULL;
         link->watcher = NULL;
-        ui_widget_on(w, "ready", ui_router_link_on_ready, NULL, NULL);
-        ui_widget_on(w, "click", ui_router_on_click, NULL, NULL);
+        ui_widget_on(w, "ready", ui_router_link_on_ready, NULL);
+        ui_widget_on(w, "click", ui_router_on_click, NULL);
         ui_router_link_proto->proto->init(w);
 }
 

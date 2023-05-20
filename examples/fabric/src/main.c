@@ -102,9 +102,9 @@ void ui_fabric_on_init(ui_widget_t *w)
         ui_fabric_t *data;
         ui_fabric_proto->proto->init(w);
         data = ui_widget_add_data(w, ui_fabric_proto, sizeof(ui_fabric_t));
-        ui_widget_on(w, "mousedown", ui_fabric_on_mousedown, NULL, NULL);
-        ui_widget_on(w, "mousemove", ui_fabric_on_mousemove, NULL, NULL);
-        ui_widget_on(w, "mouseup", ui_fabric_on_mouseup, NULL, NULL);
+        ui_widget_on(w, "mousedown", ui_fabric_on_mousedown, NULL);
+        ui_widget_on(w, "mousemove", ui_fabric_on_mousemove, NULL);
+        ui_widget_on(w, "mouseup", ui_fabric_on_mouseup, NULL);
         ui_widget_resize(w, FABRIC_WIDTH, FABRIC_HEIGHT);
         ui_widget_set_style_string(w, "background-color", "#f00");
         data->timer = lcui_set_interval(LCUI_MAX_FRAME_MSEC,

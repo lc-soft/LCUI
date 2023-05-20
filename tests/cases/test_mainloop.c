@@ -58,7 +58,7 @@ void test_mainloop(void)
 	lcui_init();
 	btn = ui_create_widget("button");
 	ui_button_set_text(btn, "button");
-	ui_widget_on(btn, "click", OnBtnClick, NULL, NULL);
+	ui_widget_on(btn, "click", OnBtnClick, NULL);
 	ui_root_append(btn);
 	/* Observe whether the main loop has exited in a new thread */
 	thread_create(&tid, ObserverThread, &exited);

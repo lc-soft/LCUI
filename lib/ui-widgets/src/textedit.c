@@ -874,7 +874,7 @@ static void ui_textedit_on_mousedown(ui_widget_t *w, ui_event_t *e, void* arg)
 	    ui_compute(e->mouse.y - offset_y - w->computed_style.padding_top));
 	ui_textedit_update_caret(w);
 	ui_widget_set_mouse_capture(w);
-	ui_widget_on(w, "mousemove", ui_textedit_on_mousemove, w, NULL);
+	ui_widget_on(w, "mousemove", ui_textedit_on_mousemove, w);
 }
 
 static void ui_textedit_on_ready(ui_widget_t *w, ui_event_t *e, void* arg)
@@ -914,14 +914,14 @@ static void ui_textedit_on_init(ui_widget_t *w)
 	pd_text_set_autowrap(edit->layer, TRUE);
 	pd_text_set_autowrap(edit->layer_mask, TRUE);
 	pd_text_set_style_tag(edit->layer, FALSE);
-	ui_widget_on(w, "textinput", ui_textedit_on_textinput, NULL, NULL);
-	ui_widget_on(w, "mousedown", ui_textedit_on_mousedown, NULL, NULL);
-	ui_widget_on(w, "mouseup", ui_textedit_on_mouseup, NULL, NULL);
-	ui_widget_on(w, "keydown", ui_textedit_on_keydown, NULL, NULL);
-	ui_widget_on(w, "focus", ui_textedit_on_focus, NULL, NULL);
-	ui_widget_on(w, "blur", ui_textedit_on_blur, NULL, NULL);
-	ui_widget_on(w, "ready", ui_textedit_on_ready, NULL, NULL);
-	ui_widget_on(w, "paste", ui_textedit_on_paste, NULL, NULL);
+	ui_widget_on(w, "textinput", ui_textedit_on_textinput, NULL);
+	ui_widget_on(w, "mousedown", ui_textedit_on_mousedown, NULL);
+	ui_widget_on(w, "mouseup", ui_textedit_on_mouseup, NULL);
+	ui_widget_on(w, "keydown", ui_textedit_on_keydown, NULL);
+	ui_widget_on(w, "focus", ui_textedit_on_focus, NULL);
+	ui_widget_on(w, "blur", ui_textedit_on_blur, NULL);
+	ui_widget_on(w, "ready", ui_textedit_on_ready, NULL);
+	ui_widget_on(w, "paste", ui_textedit_on_paste, NULL);
 	ui_widget_append(w, edit->caret);
 	ui_widget_hide(edit->caret);
 	thread_mutex_init(&edit->mutex);

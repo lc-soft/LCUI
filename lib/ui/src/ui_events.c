@@ -338,11 +338,10 @@ ui_event_listener_t *ui_widget_add_event_listener(
 }
 
 ui_event_listener_t *ui_widget_on(ui_widget_t *w, const char *event_name,
-				  ui_event_handler_t handler, void *data,
-				  void (*destroy_data)(void *))
+				  ui_event_handler_t handler, void *data)
 {
 	int id = ui_use_widget_event_id(event_name);
-	return ui_widget_add_event_listener(w, id, handler, data, destroy_data);
+	return ui_widget_add_event_listener(w, id, handler, data, NULL);
 }
 
 int ui_widget_remove_event_listener(ui_widget_t *w, int event_id,
@@ -408,10 +407,9 @@ int ui_remove_event_listener(ui_widget_t *w, int event_id,
 }
 
 ui_event_listener_t *ui_on_event(const char *event_name,
-				 ui_event_handler_t handler, void *data,
-				 void (*destroy_arg)(void *))
+				 ui_event_handler_t handler, void *data)
 {
-	return ui_widget_on(ui_root(), event_name, handler, data, destroy_arg);
+	return ui_widget_on(ui_root(), event_name, handler, data);
 }
 
 int ui_off_event(const char *event_name, ui_event_handler_t handler, void *data)

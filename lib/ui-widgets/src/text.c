@@ -371,7 +371,7 @@ void ui_register_text(void)
         ui_text.prototype->setattr = ui_text_on_parse_attr;
         ui_text.prototype->runtask = ui_text_on_run_rask;
         list_create(&ui_text.list);
-        ui_on_event("font_face_load", text_on_font_face_load, NULL, NULL);
+        ui_on_event("font_face_load", text_on_font_face_load, NULL);
 }
 
 void ui_unregister_text(void)

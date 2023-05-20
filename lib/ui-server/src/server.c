@@ -312,13 +312,11 @@ void ui_server_connect(ui_widget_t *widget, app_window_t *window)
 	conn->rendered = FALSE;
 	options.properties = TRUE;
 	list_create(&conn->flash_rects);
-	ui_widget_on(widget, "destroy", ui_server_on_destroy_widget, NULL,
-		     NULL);
+	ui_widget_on(widget, "destroy", ui_server_on_destroy_widget, NULL);
 	ui_mutation_observer_observe(ui_server.observer, widget, options);
 	list_append(&ui_server.connections, conn);
 	if (widget->state < UI_WIDGET_STATE_NORMAL) {
-		ui_widget_on(widget, "ready", ui_server_on_widget_ready, NULL,
-			     NULL);
+		ui_widget_on(widget, "ready", ui_server_on_widget_ready, NULL);
 	} else {
 		ui_server_refresh_window(conn);
 	}
