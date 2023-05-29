@@ -55,6 +55,10 @@ jobs:
         if: runner.os == 'Windows'
         run: xmake run libui-router-tests
 
+      - name: Run LibI18n tests
+        if: runner.os == 'Windows'
+        run: xmake run libi18n-tests
+
       - name: Run LCUI tests
         if: runner.os == 'Windows'
         run: xmake run lcui_tests
@@ -72,6 +76,10 @@ jobs:
       - name: Run LibUIRouter tests with memcheck
         if: runner.os == 'Linux'
         run: xmake run libui-router-tests --memcheck
+
+      - name: Run LibI18n tests with memcheck
+        if: runner.os == 'Linux'
+        run: xmake run libi18n-tests --memcheck
 
       - name: Run LCUI tests with memcheck
         if: runner.os == 'Linux'

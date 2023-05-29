@@ -107,7 +107,7 @@ int ctest_str_to_str(void *data, char *str, unsigned max_len)
 
 int ctest_bool_to_str(void *data, char *str, unsigned max_len)
 {
-	return snprintf(str, max_len, "\"%s\"", data ? "true" : "false");
+	return snprintf(str, max_len, "%s", *(bool*)data ? "true" : "false");
 }
 
 bool ctest_euqal_int(const char *name, int actual, int expected)
