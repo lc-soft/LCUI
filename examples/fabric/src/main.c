@@ -1,5 +1,5 @@
 #include <LCUI.h>
-#include <platform/main.h>
+#include <LCUI/main.h>
 #include <cairo.h>
 #include "fabric.h"
 
@@ -105,8 +105,6 @@ void ui_fabric_on_init(ui_widget_t *w)
         ui_widget_on(w, "mousedown", ui_fabric_on_mousedown, NULL);
         ui_widget_on(w, "mousemove", ui_fabric_on_mousemove, NULL);
         ui_widget_on(w, "mouseup", ui_fabric_on_mouseup, NULL);
-        ui_widget_resize(w, FABRIC_WIDTH, FABRIC_HEIGHT);
-        ui_widget_set_style_string(w, "background-color", "#f00");
         data->timer = lcui_set_interval(LCUI_MAX_FRAME_MSEC,
                                         (timer_callback)ui_fabric_on_frame, w);
 }
@@ -116,12 +114,14 @@ void ui_fabric_on_destroy(ui_widget_t *w)
         ui_fabric_t *data;
         data = ui_widget_get_data(w, ui_fabric_proto);
         lcui_destroy_timer(data->timer);
+        ui_fabric_proto->proto->destroy(w);
 }
 
 void ui_register_fabric(void)
 {
         ui_fabric_proto = ui_create_widget_prototype("fabric", "canvas");
         ui_fabric_proto->init = ui_fabric_on_init;
+        ui_fabric_proto->destroy = ui_fabric_on_destroy;
 }
 
 const char *app_css = "\
@@ -130,32 +130,24 @@ root {\
         align-items: center;\
         justify-content: center;\
         background: #f2f4f5;\
+        width: 800px;\
+        height: 600px;\
 }\
 fabric {\
+        width: 800px;\
+        height: 600px;\
         border: 1px solid #697b8c;\
-        box-sizing : border-box;\
-        box-shadow : 0 3px 6px rgba(0, 0, 0, 0.1);\
+        box-sizing: border-box;\
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);\
 }";
 
 int main(int argc, char **argv)
 {
-        ui_widget_t *w;
-
         lcui_init();
-        Fabric_init(66, 55, FABRIC_WIDTH, FABRIC_HEIGHT);
+        Fabric_init(66, 55, 800, 600);
         ui_register_fabric();
         ui_load_css_string(app_css, __FILE__);
         ui_widget_set_title(ui_root(), L"Fabric");
-        ui_widget_resize(ui_root(), FABRIC_WIDTH + 100, FABRIC_HEIGHT + 100);
-        w = ui_create_widget("fabric");
-        ui_widget_set_style_unit_value(w, css_key_max_width, FABRIC_WIDTH,
-                                       CSS_UNIT_PX);
-        ui_widget_set_style_unit_value(w, css_key_min_width, FABRIC_WIDTH,
-                                       CSS_UNIT_PX);
-        ui_widget_set_style_unit_value(w, css_key_max_height, FABRIC_HEIGHT,
-                                       CSS_UNIT_PX);
-        ui_widget_set_style_unit_value(w, css_key_min_height, FABRIC_HEIGHT,
-                                       CSS_UNIT_PX);
-        ui_root_append(w);
+        ui_root_append(ui_create_widget("fabric"));
         return lcui_main();
 }
