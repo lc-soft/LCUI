@@ -1,0 +1,134 @@
+root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #adcdfc;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.app {
+  max-width: 400px;
+  width: 100%;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
+}
+
+text {
+  font-size: 14px;
+  color: #455963;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  padding: 20px 20px 6px 20px;
+}
+
+.tools {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 0 20px;
+}
+
+.count {
+  color: #8a9ca5;
+  display: inline-block;
+}
+
+.task-filters {
+  margin-left: auto;
+  display: inline-block;
+}
+
+.task-input {
+  color: #455963;
+  padding: 10px 20px;
+  border-top-width: 0;
+  border-left-width: 0;
+  border-right-width: 0;
+  width: 100%;
+}
+
+.task-input:focus {
+  box-shadow: none;
+  border-top-width: 0;
+  border-left-width: 0;
+  border-right-width: 0;
+}
+
+.task-filter {
+  padding: 3px 8px;
+  color: #8a9ca5;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+.task-filter:hover {
+  background-color: rgba(121, 150, 165, 0.1);
+}
+
+.task-filter.is-active {
+  background-color: #7996a5;
+  color: #fff;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  border-top: 1px solid #eef0f5;
+}
+
+.task-item:last-child {
+  border-bottom: 0;
+}
+
+.task-item:hover {
+  background-color: #f6fbff;
+}
+
+.task-item.is-completed {
+  background-color: rgba(74, 206, 163, 0.1);
+}
+
+.task-status {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  border: 2px solid #bbbdc7;
+  border-radius: 9px;
+  background-color: #fff;
+  background-image: url("check.png");
+  background-size: 100%;
+  margin-right: 10px;
+  flex: none;
+  text-align: center;
+}
+
+.task-item.is-completed .task-status {
+  color: #fff;
+  background-color: #4acea3;
+  border-color: #38bb90;
+}
+
+.task-name {
+  flex: 1;
+}
+
+.task-delete {
+  width: 18px;
+  height: 18px;
+  opacity: 0;
+  flex: none;
+  background-size: 100%;
+  background-image: url("delete.png");
+}
+
+.task-item:hover .task-delete {
+  opacity: 1;
+}

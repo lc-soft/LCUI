@@ -23,7 +23,7 @@ PointerAlignment: Right
 ReflowComments: true
 SpaceAfterCStyleCast: false
 SpaceBeforeAssignmentOperators: true
-SpaceBeforeParens: ControlStatements 
+SpaceBeforeParens: ControlStatements
 SpaceInEmptyParentheses: false
 SpacesBeforeTrailingComments: 4
 SpacesInAngles: false
@@ -32,4 +32,4 @@ SpacesInContainerLiterals: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
 SortIncludes: false
-UseTab: ForContinuationAndIndentation
+UseTab: Never

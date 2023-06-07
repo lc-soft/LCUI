@@ -1,0 +1,6 @@
+target("todolist")
+    add_installfiles("app/*")
+    set_kind("binary")
+    set_rundir("app")
+    add_packages("lcui")
+    add_files("src/*.c")

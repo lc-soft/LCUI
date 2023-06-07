@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+<resource type="text/css" src="test_border.css"/>
+<ui>
+  <w class="content">
+    <w>
+      <w class="box"></w>
+      <w class="box box-1"></w>
+      <w class="box box-2"></w>
+      <w class="box box-3"></w>
+      <w class="box box-4"></w>
+      <w class="box box-5"></w>
+      <w class="box box-6"></w>
+      <w class="box square"></w>
+    </w>
+    <w>
+      <w class="rounded box">
+        <text class="box-content">
+          Box content 1
+        </text>
+        <text class="box-content">
+          Box content 2
+        </text>
+      </w>
+      <w class="rounded box box-1">
+        <text class="box-content">
+          Box content 1
+        </text>
+        <text class="box-content">
+          Box content 2
+        </text>
+      </w>
+      <w class="rounded box box-2">
+        <text class="box-content">
+          Box content 1
+        </text>
+        <text class="box-content">
+          Box content 2
+        </text>
+      </w>
+      <w class="rounded box box-3">
+        <text class="box-content">
+          Box content 1
+        </text>
+        <text class="box-content">
+          Box content 2
+        </text>
+      </w>
+      <w class="rounded box box-4">
+        <text class="box-content">
+          Box content 1
+        </text>
+        <text class="box-content">
+          Box content 2
+        </text>
+      </w>
+      <w class="rounded box box-5">
+        <text class="box-content">
+          Box content 1
+        </text>
+        <text class="box-content">
+          Box content 2
+        </text>
+      </w>
+      <w class="rounded box box-6">
+        <text class="box-content">
+          Box content 1
+        </text>
+        <text class="box-content">
+          Box content 2
+        </text>
+      </w>
+      <w class="rounded square box">
+        <text class="box-content">
+          Box content 1
+        </text>
+        <text class="box-content">
+          Box content 2
+        </text>
+      </w>
+    </w>
+    <w>
+      <w class="rounded-2 box">
+        <text class="box-content">
+          Box content 1
+        </text>
+        <text class="box-content">
+          Box content 2
+        </text>
+      </w>
+      <w class="rounded-2 box box-1">
+        <text class="box-content">
+          Box content 1
+        </text>
+        <text class="box-content">
+          Box content 2
+        </text>
+      </w>
+      <w class="rounded-2 box box-2">
+        <text class="box-content">
+          Box content 1
+        </text>
+        <text class="box-content">
+          Box content 2
+        </text>
+      </w>
+      <w class="rounded-2 box box-3">
+        <text class="box-content">
+          Box content 1
+        </text>
+        <text id="debug" class="box-content">
+          Box content 2
+        </text>
+      </w>
+      <w class="rounded-2 box box-4">
+        <text class="box-content">
+          Box content 1
+        </text>
+        <text class="box-content">
+          Box content 2
+        </text>
+      </w>
+      <w class="rounded-2 box box-5">
+        <text class="box-content">
+          Box content 1
+        </text>
+        <text class="box-content">
+          Box content 2
+        </text>
+      </w>
+      <w class="rounded-2 box box-6">
+        <text class="box-content">
+          Box content 1
+        </text>
+        <text class="box-content">
+          Box content 2
+        </text>
+      </w>
+      <w class="rounded-2 square box">
+        <text class="box-content">
+          Box content 1
+        </text>
+        <text class="box-content">
+          Box content 2
+        </text>
+      </w>
+    </w>
+  </w>
+</ui>
+</lcui-app>

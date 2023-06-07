@@ -25,13 +25,10 @@
 - [Introduction](#introduction)
     - [Features](#features)
     - [Screenshots](#screenshots)
-    - [Related projects](#related-projects)
+    - [Architecture](#architecture)
     - [Design references](#design-references)
-- [Quick start](#quick-start)
-    - [Use LCUI CLI](#use-lcui-cli)
-    - [Manual compilation and installation](#manual-compilation-and-installation)
-        - [Windows](#windows)
-        - [Ubuntu](#ubuntu)
+- [Compilation](#compilation)
+- [Installation](#installation)
 - [Contribution](#contribution)
 - [Documentation](#documentation)
 - [FAQ](#faq)
@@ -84,18 +81,41 @@ LCUI (LC's UI Library) is a small C library for building user interfaces.
   </tbody>
 </table>
 
-### Related projects
+### Architecture
 
-Want to know what LCUI can do? You can view the following projects:
+Over time LCUI has been built up to be based on various libraries, as shown below:
 
-- [LCUI CLI](https://github.com/lc-ui/lcui-cli) - Command line interface for rapid LCUI development.
-- [LCUI Router](https://github.com/lc-soft/lcui-router) - The official router for LCUI. It provides a similar development experience to the [Vue Router](https://github.com/vuejs/vue-router) and make building multiple views applications with LCUI a breeze.
-- [LC Design](https://github.com/lc-ui/lc-design) - A UI component framework for building LCUI application.
-- [LC Finder](https://github.com/lc-soft/LC-Finder) - An image manager, it uses most of the features of LCUI, and you can use it as a reference to evaluate whether LCUI's performance and development complexity meets your needs.
-- [Trad](https://github.com/lc-soft/trad) - A language based on JavaScript syntax that can be compiled into C, it preset LCUI bindings, provides [React](https://reactjs.org/) like development experience, makes it painless to create interactive UIs based on LCUI.
-- [LCUI Quick Start](https://github.com/lc-ui/lcui-quick-start) - A minimal LCUI application.
-- [LCUI Router App](https://github.com/lc-ui/lcui-router-app) - A very simple browser-like application to show the LCUI and LCUI Router features.
-- [LC Design App](https://github.com/lc-ui/lc-design-app) - A minimal LCUI application for preview LC Design component library.
+```text
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                                                               ┃
+┃                        LCUI Application                       ┃
+┃                                                               ┃
+┃        ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓        ┃
+┃        ┃                    LCUI 3                   ┃        ┃
+┃      ┏━┻━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━┻━┓      ┃
+┃      ┃ ui-server ┃ ui-widgets ┃ ui-builder ┃ ui-anchor ┃      ┃
+┃    ┏━┻━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━┻━┓    ┃
+┃    ┃ platform ┃    ui    ┃  worker  ┃  timer  ┃  cursor  ┃    ┃
+┣━━━━┻━━━━━━━━━━┻━━━━━━━━━━┻━━━━━━━━━━┻━━━━━━━━━┻━━━━━━━━━━┻━━━━┫
+┃ thread ┃ yutil  ┃ image  ┃   css   ┃ paint  ┃  font  ┃  text  ┃
+┗━━━━━━━━┻━━━━━━━━┻━━━━━━━━┻━━━━━━━━━┻━━━━━━━━┻━━━━━━━━┻━━━━━━━━┛
+```
+
+- [lib/css](./lib/css): CSS (Cascading Style Sheet) parser and selection engine, providing CSS parsing and selection capabilities.
+- [lib/image](./lib/image): Image file manipulation library, provides BMP, JPG, PNG image file reading ability and PNG write ability.
+- [lib/paint](./lib/paint): 2D graphics library.
+- [lib/platform](./lib/platform): Platform library, provides cross-platform unified system related API, including message loop, window management, input method, etc.
+- [lib/text](./lib/text): Text typesetting library, provides text typesetting capabilities.
+- [lib/thread](./lib/thread): Thread library, providing cross-platform multithreading capabilities.
+- [lib/timer](./ui/timer): Timer library, provides the ability to perform operations on a scheduled basis.
+- [lib/ui](./lib/ui): Graphical interface core library, providing UI component management, event queue, style calculation, drawing and other necessary UI capabilities.
+- [lib/ui-anchor](./lib/anchor): Anchor widget, provide capabilities similar to hyperlinks.
+- [lib/ui-builder](./lib/anchor): UI Builder, provides the ability to create a UI from the content of an XML file.
+- [lib/ui-cursor](./lib/ui-cursor): Cursor, provides cursor drawing capability.
+- [lib/ui-server](./lib/ui-server): UI Server, provides the ability to map UI widgets to system Windows.
+- [lib/ui-widgets](./lib//ui/widgets): UI widget library, provides basic UI components like text, buttons, scrollbars, and so on.
+- [lib/worker](./lib/worker): Worker thread library, provides simple worker thread communication and management capabilities.
+- [lib/yutil](./lib/yutil): Utility library, provides linked list, hash table, red black tree, string and other related common functions.
 
 ### Design references
 
@@ -105,80 +125,46 @@ Want to know what LCUI can do? You can view the following projects:
 - [jQuery](https://jquery.com/) — Widget operation method naming style reference
 - [MDN](https://developer.mozilla.org/zh-CN/docs/Web/CSS) — CSS standard reference
 
-## Quick start
+## Compilation
 
-### Use LCUI CLI
-
-LCUI CLI is a command line tool, you need to install [Node.js](https://nodejs.org/) before using it, and then run the following command to quickly experience it:
+Install [XMake](https://xmake.io/#/zh-cn/) and run the following command:
 
 ```bash
-# Install lcui-cli and lcpkg
-npm install -g @lcui/cli lcpkg
-
-# Create an LCUI project named myapp
-lcui create myapp
-
-# Go into project directory
-cd myapp
-
-# set up the development environment for this project
-lcui setup
-
-# Build project
-lcui build
-
-# run project
-lcui run
-```
-
-### Manual compilation and installation
-
-#### Windows
-
-1. Open CMD window, and run following command in the LCUI source directory to install the dependency libraries:
-    ```bash
-    lcpkg install
-    # If you want compile for x64 CPU architecture
-    lcpkg install --arch x64
-    # If you want compile for Universal Windows Platform (UWP)
-    lcpkg install --platform uwp
-    lcpkg install --arch x64 --platform uwp
-    ```
-1. Rename `config.win32.h.in` in the include directory to `config.h`.
-1. Open the `build/windows/LCUI.sln` file with [Visual Studio](https://visualstudio.microsoft.com/), and then build LCUI.
-
-#### Ubuntu
-
-```bash
-# Install the dependencies
-sudo apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev
-
-# Clone this repository
+# Clone repository
 git clone https://github.com/lc-soft/LCUI.git
 
 # Go into the repository
 cd LCUI
 
-# Generate automake configure script
-./autogen.sh
-
-# Check the build environment and configure automake scripts
-./configure
-
 # Build
-make
+xmake
 
-# If you want to install LCUI
-sudo make install
+```
+
+If you want to experience the results of the test program:
+
+```bash
+# Package the built files for building the test program
+xmake package
 
 # Go into test directory
 cd test
 
-# Run helloworld application
-./helloworld
+# Build
+xmake -P .
+
+# Run
+xmake run -P . -w . helloworld
 ```
 
-> **Note:** If you want to customize the compiler, compile flags, install location, and other configuration items, read the [INSTALL](INSTALL) file.
+## Installation
+
+```bash
+xmake install
+
+# Or install it in your custom directory
+xmake install -o /path/to/your/custom/installdir
+```
 
 ## Contribution
 
