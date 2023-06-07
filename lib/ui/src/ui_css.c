@@ -44,13 +44,11 @@ int ui_load_css_file(const char *filepath)
 	if (!fp) {
 		return -1;
 	}
-	parser = css_parser_create(512, filepath);
+	parser = css_parser_create(filepath);
 	css_font_face_parser_on_load(parser, ui_on_parsed_font_face);
-	n = fread(buff, 1, 511, fp);
-	while (n > 0) {
+	while ((n = fread(buff, 1, 511, fp)) > 0) {
 		buff[n] = 0;
 		css_parser_parse(parser, buff);
-		n = fread(buff, 1, 511, fp);
 	}
 	css_parser_destroy(parser);
 	fclose(fp);
@@ -64,7 +62,7 @@ size_t ui_load_css_string(const char *str, const char *space)
 	css_parser_t *parser;
 
 	DEBUG_MSG("parse begin\n");
-	parser = css_parser_create(512, space);
+	parser = css_parser_create(space);
 	css_font_face_parser_on_load(parser, ui_on_parsed_font_face);
 	for (cur = str; len > 0; cur += len) {
 		len = css_parser_parse(parser, cur);

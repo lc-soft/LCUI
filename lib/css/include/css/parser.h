@@ -34,6 +34,8 @@
 #include "common.h"
 #include "types.h"
 
+#define CSS_PARSER_BUFFER_SIZE 512
+
 LIBCSS_BEGIN_DECLS
 
 typedef enum css_parser_target_t {
@@ -109,7 +111,7 @@ LIBCSS_INLINE void css_parser_get_char(css_parser_t *parser)
 	parser->buffer[parser->pos++] = *(parser->cur);
 }
 
-LIBCSS_PUBLIC css_parser_t *css_parser_create(size_t buffer_size, const char *space);
+LIBCSS_PUBLIC css_parser_t *css_parser_create(const char *space);
 
 LIBCSS_PUBLIC void css_parser_destroy(css_parser_t *parser);
 

@@ -597,9 +597,9 @@ void test_router_components(void)
         link_foo = ui_create_widget("router-link");
         link_foobar = ui_create_widget("router-link");
         link_bar = ui_create_widget("router-link");
-        ui_widget_set_attribute(link_foo, "to", "/foo");
-        ui_widget_set_attribute(link_foobar, "to", "/foo/bar");
-        ui_widget_set_attribute(link_bar, "to", "/bar");
+        ui_widget_set_attr(link_foo, "to", "/foo");
+        ui_widget_set_attr(link_foobar, "to", "/foo/bar");
+        ui_widget_set_attr(link_bar, "to", "/bar");
         ui_widget_append(root, link_foo);
         ui_widget_append(root, link_foobar);
         ui_widget_append(root, link_bar);
@@ -641,7 +641,7 @@ void test_router_components(void)
             (!ui_widget_has_class(link_foo, "router-link-exact-active") &&
              ui_widget_has_class(link_foo, "router-link-active")),
             TRUE);
-        ui_widget_set_attribute(link_foo, "exact", "exact");
+        ui_widget_set_attr(link_foo, "exact", "exact");
         ui_widget_emit_event(link_foobar, e, NULL);
         ctest_euqal_bool(
             "[/foo/bar] linkFoo should not has any active classes (exact)",

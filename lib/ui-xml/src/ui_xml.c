@@ -227,7 +227,7 @@ static int ui_builder_parse_widget_node(xml_parser_t *parser, xmlNodePtr node)
                 } else {
                         prop_name = strdup2((const char *)prop->name);
                         strtolower(prop_name, (const char *)prop->name);
-                        ui_widget_set_attribute(w, prop_name, prop_val);
+                        ui_widget_set_attr(w, prop_name, prop_val);
                         free(prop_name);
                 }
                 if (prop_val) {

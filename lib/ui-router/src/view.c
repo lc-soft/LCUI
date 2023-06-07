@@ -23,7 +23,7 @@ static ui_widget_t *ui_router_view_get_matched(ui_widget_t *w,
         ui_widget_t *component;
 
         view = ui_widget_get_data(w, ui_router_view_proto);
-        name = ui_widget_get_attribute_value(w, "name");
+        name = ui_widget_get_attr(w, "name");
         record = router_route_get_matched_record(route, view->index);
         if (!record) {
                 logger_error("%s", "no matching route found");
@@ -77,7 +77,7 @@ static void ui_router_view_on_ready(ui_widget_t *w, ui_event_t *e, void *arg)
                 }
         }
         for (parent = w; parent; parent = parent->parent) {
-                name = ui_widget_get_attribute_value(parent, "router");
+                name = ui_widget_get_attr(parent, "router");
                 if (name) {
                         break;
                 }

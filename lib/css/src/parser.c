@@ -36,7 +36,7 @@
 #include "parser.h"
 #include "debug.h"
 
-css_parser_t *css_parser_create(size_t buffer_size, const char *space)
+css_parser_t *css_parser_create(const char *space)
 {
 	css_parser_t *parser;
 
@@ -46,8 +46,8 @@ css_parser_t *css_parser_create(size_t buffer_size, const char *space)
 	} else {
 		parser->space = NULL;
 	}
-	parser->buffer = calloc(sizeof(char), buffer_size);
-	parser->buffer_size = buffer_size;
+	parser->buffer = calloc(sizeof(char), CSS_PARSER_BUFFER_SIZE);
+	parser->buffer_size = CSS_PARSER_BUFFER_SIZE;
 	parser->target = CSS_PARSER_TARGET_NONE;
 	parser->comment_parser.prev_target = CSS_PARSER_TARGET_NONE;
 	memset(&parser->rule, 0, sizeof(parser->rule));

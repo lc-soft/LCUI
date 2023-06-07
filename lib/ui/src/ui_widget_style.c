@@ -156,7 +156,7 @@ void ui_widget_get_style(ui_widget_t *w, int key, css_style_value_t *value)
         if (w->custom_style) {
                 prop = css_style_decl_find(w->custom_style, key);
                 if (prop) {
-                        *value = prop->style;
+                        *value = prop->value;
                         return;
                 }
         }

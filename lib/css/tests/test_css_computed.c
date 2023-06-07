@@ -25,7 +25,7 @@ void test_css_computed(void)
 		return;
 	}
 	css_init();
-	parser = css_parser_create(512, __FILE__);
+	parser = css_parser_create(__FILE__);
 	n = fread(buff, 1, 511, fp);
 	while (n > 0) {
 		buff[n] = 0;

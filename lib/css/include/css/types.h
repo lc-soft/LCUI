@@ -607,7 +607,7 @@ typedef struct css_style_rule_t {
 
 typedef struct css_prop_t {
 	css_prop_key_t key;
-	css_style_value_t style;
+	css_style_value_t value;
 	list_node_t node;
 } css_prop_t;
 

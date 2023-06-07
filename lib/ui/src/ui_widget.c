@@ -44,7 +44,7 @@ void ui_widget_destroy(ui_widget_t* w)
 	}
 	ui_widget_destroy_id(w);
 	ui_widget_destroy_style(w);
-	ui_widget_destroy_attributes(w);
+	ui_widget_destroy_attrs(w);
 	ui_widget_destroy_classes(w);
 	ui_widget_destroy_status(w);
 	free(w->extra);

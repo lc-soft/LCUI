@@ -99,7 +99,7 @@ static void ui_router_link_on_ready(ui_widget_t *w, ui_event_t *e, void *arg)
 
         link = ui_widget_get_data(w, ui_router_link_proto);
         for (parent = w; parent; parent = parent->parent) {
-                name = ui_widget_get_attribute_value(parent, "router");
+                name = ui_widget_get_attr(parent, "router");
                 if (name) {
                         break;
                 }

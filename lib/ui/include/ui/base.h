@@ -42,12 +42,12 @@ LIBUI_INLINE ui_widget_extra_data_t *ui_widget_use_extra_data(ui_widget_t *widge
 
 // Attributes
 
-LIBUI_PUBLIC int ui_widget_set_attribute_ex(ui_widget_t *w, const char *name,
+LIBUI_PUBLIC int ui_widget_set_attr_ex(ui_widget_t *w, const char *name,
 					    void *value, int value_type,
 					    void (*value_destructor)(void *));
-LIBUI_PUBLIC int ui_widget_set_attribute(ui_widget_t *w, const char *name,
+LIBUI_PUBLIC int ui_widget_set_attr(ui_widget_t *w, const char *name,
 					 const char *value);
-LIBUI_PUBLIC const char *ui_widget_get_attribute_value(ui_widget_t *w,
+LIBUI_PUBLIC const char *ui_widget_get_attr(ui_widget_t *w,
 						       const char *name);
 
 // Classes

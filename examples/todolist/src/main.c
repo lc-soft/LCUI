@@ -23,7 +23,7 @@ ui_widget_t *ui_task_item_create(task_t *task)
         ui_widget_t *name = ui_create_widget("text");
         snprintf(id, 32, "%u", task->id);
         ui_text_set_content_w(name, task->name);
-        ui_widget_set_attribute(item, "data-id", id);
+        ui_widget_set_attr(item, "data-id", id);
         ui_widget_add_class(item, "task-item");
         if (strcmp(task->status, "completed") == 0) {
                 ui_widget_add_class(item, "is-completed");
@@ -48,7 +48,7 @@ void ui_todolist_update_count(void)
 
 void update_filter_status(ui_widget_t *w, void *activeStatus)
 {
-        const char *status = ui_widget_get_attribute_value(w, "data-value");
+        const char *status = ui_widget_get_attr(w, "data-value");
         if (status && strcmp(status, activeStatus) == 0) {
                 ui_widget_add_class(w, "is-active");
         } else {
@@ -101,7 +101,7 @@ void on_input_keydown(ui_widget_t *w, ui_event_t *e, void *arg)
 
 void on_filter_click(ui_widget_t *w, ui_event_t *e, void *arg)
 {
-        const char *status = ui_widget_get_attribute_value(e->target, "data-value");
+        const char *status = ui_widget_get_attr(e->target, "data-value");
 
         if (status) {
                 ui_todolist_filter(status);
@@ -119,7 +119,7 @@ void on_task_list_click(ui_widget_t *w, ui_event_t *e, void *arg)
         for (item = e->target; !ui_widget_has_class(item, "task-item");
              item = item->parent)
                 ;
-        id_str = ui_widget_get_attribute_value(item, "data-id");
+        id_str = ui_widget_get_attr(item, "data-id");
         if (!id_str || sscanf(id_str, "%u", &id) != 1) {
                 return;
         }

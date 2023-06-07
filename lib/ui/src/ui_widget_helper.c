@@ -57,7 +57,7 @@ ui_widget_t *ui_widget_get_closest(ui_widget_t *w, const char *type)
 
 static void ui_widget_collect_reference(ui_widget_t *w, void *arg)
 {
-	const char *ref = ui_widget_get_attribute_value(w, "ref");
+	const char *ref = ui_widget_get_attr(w, "ref");
 
 	if (ref) {
 		dict_add(arg, (void *)ref, w);

@@ -79,15 +79,15 @@ static void xml_loader_destroy(xml_loader_t* loader)
 static xml_loader_t* xml_loader_create(ui_widget_t* w)
 {
         xml_loader_t* loader;
-        const char* key = ui_widget_get_attribute_value(w, "key");
+        const char* key = ui_widget_get_attr(w, "key");
 
         loader = malloc(sizeof(xml_loader_t));
         if (!loader) {
                 return NULL;
         }
         loader->widget = w;
-        loader->filepath = strdup2(ui_widget_get_attribute_value(w, "href"));
-        loader->target_id = strdup2(ui_widget_get_attribute_value(w, "target"));
+        loader->filepath = strdup2(ui_widget_get_attr(w, "href"));
+        loader->target_id = strdup2(ui_widget_get_attr(w, "target"));
         ui_widget_on(w, "destroy", xml_loader_on_widget_destroy, loader);
         if (key) {
                 loader->key = strdup2(key);
@@ -174,7 +174,7 @@ void ui_anchor_open(ui_widget_t* w)
 {
         ui_event_t e;
         xml_loader_t* loader;
-        const char* attr_href = ui_widget_get_attribute_value(w, "href");
+        const char* attr_href = ui_widget_get_attr(w, "href");
 
         if (!attr_href) {
                 logger_error("[anchor] href are required\n");

@@ -1,2 +1,2 @@
 
-void ui_widget_destroy_attributes(ui_widget_t *w);
+void ui_widget_destroy_attrs(ui_widget_t *w);
