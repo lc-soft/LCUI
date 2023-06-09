@@ -97,43 +97,43 @@ int css_parse_border_width(css_propdef_t *propdef, const char *input,
 	}
 	switch (css_style_value_get_array_length(&value)) {
 	case 1:
-		css_style_decl_add(s, css_key_border_top_width,
+		css_style_decl_add(s, css_prop_border_top_width,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_right_width,
+		css_style_decl_add(s, css_prop_border_right_width,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_bottom_width,
+		css_style_decl_add(s, css_prop_border_bottom_width,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_left_width,
+		css_style_decl_add(s, css_prop_border_left_width,
 				   value.array_value);
 		break;
 	case 2:
-		css_style_decl_add(s, css_key_border_top_width,
+		css_style_decl_add(s, css_prop_border_top_width,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_bottom_width,
+		css_style_decl_add(s, css_prop_border_bottom_width,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_left_width,
+		css_style_decl_add(s, css_prop_border_left_width,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_border_right_width,
+		css_style_decl_add(s, css_prop_border_right_width,
 				   value.array_value + 1);
 		break;
 	case 3:
-		css_style_decl_add(s, css_key_border_top_width,
+		css_style_decl_add(s, css_prop_border_top_width,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_left_width,
+		css_style_decl_add(s, css_prop_border_left_width,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_border_right_width,
+		css_style_decl_add(s, css_prop_border_right_width,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_border_bottom_width,
+		css_style_decl_add(s, css_prop_border_bottom_width,
 				   value.array_value + 2);
 		break;
 	case 4:
-		css_style_decl_add(s, css_key_border_top_width,
+		css_style_decl_add(s, css_prop_border_top_width,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_right_width,
+		css_style_decl_add(s, css_prop_border_right_width,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_border_bottom_width,
+		css_style_decl_add(s, css_prop_border_bottom_width,
 				   value.array_value + 2);
-		css_style_decl_add(s, css_key_border_left_width,
+		css_style_decl_add(s, css_prop_border_left_width,
 				   value.array_value + 3);
 		break;
 	default:
@@ -154,43 +154,43 @@ int css_parse_border_style(css_propdef_t *propdef, const char *input,
 	}
 	switch (css_style_value_get_array_length(&value)) {
 	case 1:
-		css_style_decl_add(s, css_key_border_top_style,
+		css_style_decl_add(s, css_prop_border_top_style,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_right_style,
+		css_style_decl_add(s, css_prop_border_right_style,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_bottom_style,
+		css_style_decl_add(s, css_prop_border_bottom_style,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_left_style,
+		css_style_decl_add(s, css_prop_border_left_style,
 				   value.array_value);
 		break;
 	case 2:
-		css_style_decl_add(s, css_key_border_top_style,
+		css_style_decl_add(s, css_prop_border_top_style,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_bottom_style,
+		css_style_decl_add(s, css_prop_border_bottom_style,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_left_style,
+		css_style_decl_add(s, css_prop_border_left_style,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_border_right_style,
+		css_style_decl_add(s, css_prop_border_right_style,
 				   value.array_value + 1);
 		break;
 	case 3:
-		css_style_decl_add(s, css_key_border_top_style,
+		css_style_decl_add(s, css_prop_border_top_style,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_left_style,
+		css_style_decl_add(s, css_prop_border_left_style,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_border_right_style,
+		css_style_decl_add(s, css_prop_border_right_style,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_border_bottom_style,
+		css_style_decl_add(s, css_prop_border_bottom_style,
 				   value.array_value + 2);
 		break;
 	case 4:
-		css_style_decl_add(s, css_key_border_top_style,
+		css_style_decl_add(s, css_prop_border_top_style,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_right_style,
+		css_style_decl_add(s, css_prop_border_right_style,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_border_bottom_style,
+		css_style_decl_add(s, css_prop_border_bottom_style,
 				   value.array_value + 2);
-		css_style_decl_add(s, css_key_border_left_style,
+		css_style_decl_add(s, css_prop_border_left_style,
 				   value.array_value + 3);
 		break;
 	default:
@@ -211,43 +211,43 @@ int css_parse_border_color(css_propdef_t *propdef, const char *input,
 	}
 	switch (css_style_value_get_array_length(&value)) {
 	case 1:
-		css_style_decl_add(s, css_key_border_top_color,
+		css_style_decl_add(s, css_prop_border_top_color,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_right_color,
+		css_style_decl_add(s, css_prop_border_right_color,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_bottom_color,
+		css_style_decl_add(s, css_prop_border_bottom_color,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_left_color,
+		css_style_decl_add(s, css_prop_border_left_color,
 				   value.array_value);
 		break;
 	case 2:
-		css_style_decl_add(s, css_key_border_top_color,
+		css_style_decl_add(s, css_prop_border_top_color,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_bottom_color,
+		css_style_decl_add(s, css_prop_border_bottom_color,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_left_color,
+		css_style_decl_add(s, css_prop_border_left_color,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_border_right_color,
+		css_style_decl_add(s, css_prop_border_right_color,
 				   value.array_value + 1);
 		break;
 	case 3:
-		css_style_decl_add(s, css_key_border_top_color,
+		css_style_decl_add(s, css_prop_border_top_color,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_left_color,
+		css_style_decl_add(s, css_prop_border_left_color,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_border_right_color,
+		css_style_decl_add(s, css_prop_border_right_color,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_border_bottom_color,
+		css_style_decl_add(s, css_prop_border_bottom_color,
 				   value.array_value + 2);
 		break;
 	case 4:
-		css_style_decl_add(s, css_key_border_top_color,
+		css_style_decl_add(s, css_prop_border_top_color,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_right_color,
+		css_style_decl_add(s, css_prop_border_right_color,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_border_bottom_color,
+		css_style_decl_add(s, css_prop_border_bottom_color,
 				   value.array_value + 2);
-		css_style_decl_add(s, css_key_border_left_color,
+		css_style_decl_add(s, css_prop_border_left_color,
 				   value.array_value + 3);
 		break;
 	default:
@@ -268,43 +268,43 @@ int css_parse_border_radius(css_propdef_t *propdef, const char *input,
 	}
 	switch (css_style_value_get_array_length(&value)) {
 	case 1:
-		css_style_decl_add(s, css_key_border_top_left_radius,
+		css_style_decl_add(s, css_prop_border_top_left_radius,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_top_right_radius,
+		css_style_decl_add(s, css_prop_border_top_right_radius,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_bottom_left_radius,
+		css_style_decl_add(s, css_prop_border_bottom_left_radius,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_bottom_right_radius,
+		css_style_decl_add(s, css_prop_border_bottom_right_radius,
 				   value.array_value);
 		break;
 	case 2:
-		css_style_decl_add(s, css_key_border_top_left_radius,
+		css_style_decl_add(s, css_prop_border_top_left_radius,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_bottom_right_radius,
+		css_style_decl_add(s, css_prop_border_bottom_right_radius,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_top_right_radius,
+		css_style_decl_add(s, css_prop_border_top_right_radius,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_border_bottom_left_radius,
+		css_style_decl_add(s, css_prop_border_bottom_left_radius,
 				   value.array_value + 1);
 		break;
 	case 3:
-		css_style_decl_add(s, css_key_border_top_left_radius,
+		css_style_decl_add(s, css_prop_border_top_left_radius,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_top_right_radius,
+		css_style_decl_add(s, css_prop_border_top_right_radius,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_border_bottom_left_radius,
+		css_style_decl_add(s, css_prop_border_bottom_left_radius,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_border_bottom_right_radius,
+		css_style_decl_add(s, css_prop_border_bottom_right_radius,
 				   value.array_value + 2);
 		break;
 	case 4:
-		css_style_decl_add(s, css_key_border_top_left_radius,
+		css_style_decl_add(s, css_prop_border_top_left_radius,
 				   value.array_value);
-		css_style_decl_add(s, css_key_border_top_right_radius,
+		css_style_decl_add(s, css_prop_border_top_right_radius,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_border_bottom_right_radius,
+		css_style_decl_add(s, css_prop_border_bottom_right_radius,
 				   value.array_value + 2);
-		css_style_decl_add(s, css_key_border_bottom_left_radius,
+		css_style_decl_add(s, css_prop_border_bottom_left_radius,
 				   value.array_value + 3);
 		break;
 	default:
@@ -334,22 +334,22 @@ int css_parse_border(css_propdef_t *propdef, const char *input,
 			break;
 		}
 		if (!has_width && v->type == CSS_UNIT_VALUE) {
-			css_style_decl_add(s, css_key_border_top_width, v);
-			css_style_decl_add(s, css_key_border_right_width, v);
-			css_style_decl_add(s, css_key_border_bottom_width, v);
-			css_style_decl_add(s, css_key_border_left_width, v);
+			css_style_decl_add(s, css_prop_border_top_width, v);
+			css_style_decl_add(s, css_prop_border_right_width, v);
+			css_style_decl_add(s, css_prop_border_bottom_width, v);
+			css_style_decl_add(s, css_prop_border_left_width, v);
 			has_width = 1;
 		} else if (!has_style && v->type == CSS_KEYWORD_VALUE) {
-			css_style_decl_add(s, css_key_border_top_style, v);
-			css_style_decl_add(s, css_key_border_right_style, v);
-			css_style_decl_add(s, css_key_border_bottom_style, v);
-			css_style_decl_add(s, css_key_border_left_style, v);
+			css_style_decl_add(s, css_prop_border_top_style, v);
+			css_style_decl_add(s, css_prop_border_right_style, v);
+			css_style_decl_add(s, css_prop_border_bottom_style, v);
+			css_style_decl_add(s, css_prop_border_left_style, v);
 			has_style = 1;
 		} else if (!has_color && v->type == CSS_COLOR_VALUE) {
-			css_style_decl_add(s, css_key_border_top_color, v);
-			css_style_decl_add(s, css_key_border_right_color, v);
-			css_style_decl_add(s, css_key_border_bottom_color, v);
-			css_style_decl_add(s, css_key_border_left_color, v);
+			css_style_decl_add(s, css_prop_border_top_color, v);
+			css_style_decl_add(s, css_prop_border_right_color, v);
+			css_style_decl_add(s, css_prop_border_bottom_color, v);
+			css_style_decl_add(s, css_prop_border_left_color, v);
 			has_color = 1;
 		} else {
 			break;

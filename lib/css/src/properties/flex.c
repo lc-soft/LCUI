@@ -115,9 +115,9 @@ static void css_parse_flex_1(const css_style_array_value_t input,
 	default:
 		return;
 	}
-	css_style_decl_add(s, css_key_flex_grow, val);
-	css_style_decl_add(s, css_key_flex_shrink, val + 1);
-	css_style_decl_add(s, css_key_flex_basis, val + 2);
+	css_style_decl_add(s, css_prop_flex_grow, val);
+	css_style_decl_add(s, css_prop_flex_shrink, val + 1);
+	css_style_decl_add(s, css_prop_flex_basis, val + 2);
 }
 
 static void css_parse_flex_2(const css_style_array_value_t input,
@@ -126,13 +126,13 @@ static void css_parse_flex_2(const css_style_array_value_t input,
 	if (input[0].type != CSS_NUMERIC_VALUE) {
 		return;
 	}
-	css_style_decl_add(s, css_key_flex_grow, input);
+	css_style_decl_add(s, css_prop_flex_grow, input);
 	switch (input[1].type) {
 	case CSS_NUMERIC_VALUE:
-		css_style_decl_add(s, css_key_flex_shrink, input + 1);
+		css_style_decl_add(s, css_prop_flex_shrink, input + 1);
 		break;
 	case CSS_UNIT_VALUE:
-		css_style_decl_add(s, css_key_flex_basis, input + 1);
+		css_style_decl_add(s, css_prop_flex_basis, input + 1);
 		break;
 	default:
 		break;
@@ -149,16 +149,16 @@ static void css_parse_flex_3(const css_style_array_value_t input,
 
 	for (i = 0; i < 3 && input[i].type != CSS_NO_VALUE; ++i) {
 		if (!has_flex_grow && input[i].type == CSS_NUMERIC_VALUE) {
-			css_style_decl_add(s, css_key_flex_grow, input + i);
+			css_style_decl_add(s, css_prop_flex_grow, input + i);
 			has_flex_grow = 1;
 		} else if (!has_flex_shrink &&
 			   input[i].type == CSS_NUMERIC_VALUE) {
-			css_style_decl_add(s, css_key_flex_shrink, input + i);
+			css_style_decl_add(s, css_prop_flex_shrink, input + i);
 			has_flex_shrink = 1;
 		} else if (!has_flex_basis &&
 			   (input[i].type == CSS_KEYWORD_VALUE ||
 			    input[i].type == CSS_UNIT_VALUE)) {
-			css_style_decl_add(s, css_key_flex_basis, input + i);
+			css_style_decl_add(s, css_prop_flex_basis, input + i);
 			has_flex_basis = 1;
 		} else {
 			break;

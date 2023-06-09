@@ -11,7 +11,7 @@ static void on_opacity_minus(ui_widget_t *w, ui_event_t *e, void *arg)
 		opacity = 0.1f;
 	}
 	swprintf(str, 32, L"%.1f", opacity);
-	ui_widget_set_style_numeric_value(self.parent, css_key_opacity,
+	ui_widget_set_style_numeric_value(self.parent, css_prop_opacity,
 					  opacity);
 	ui_text_set_content_w(self.text, str);
 }
@@ -25,7 +25,7 @@ static void on_opacity_plus(ui_widget_t *w, ui_event_t *e, void *arg)
 		opacity = 1.0f;
 	}
 	swprintf(str, 32, L"%.1f", opacity);
-	ui_widget_set_style_numeric_value(self.parent, css_key_opacity,
+	ui_widget_set_style_numeric_value(self.parent, css_prop_opacity,
 					  opacity);
 	ui_text_set_content_w(self.text, str);
 }

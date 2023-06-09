@@ -25,7 +25,7 @@ void UpdateWidgetStyle(ui_widget_t* w, void* arg)
 	color.green = (unsigned char)(index > 255 ? 511 - index : index);
 	color.blue = 0;
 	color.alpha = 255;
-	ui_widget_set_style_color_value(w, css_key_background_color,
+	ui_widget_set_style_color_value(w, css_prop_background_color,
 					color.value);
 }
 
@@ -97,7 +97,7 @@ void InitBackground(void)
 		color.green = (unsigned char)(c > 255 ? 511 - c : c);
 		ui_widget_resize(w, width, height);
 		ui_widget_set_style_string(w, "display", "inline-block");
-		ui_widget_set_style_color_value(w, css_key_background_color,
+		ui_widget_set_style_color_value(w, css_prop_background_color,
 						color.value);
 		ui_widget_append(self.box, w);
 	}

@@ -7,7 +7,7 @@
 #define DEFINE_PROP(PROP_KEY, PROP_NAME, VALDEF, INIT)                        \
 	extern int css_cascade_##PROP_KEY(const css_style_array_value_t,      \
 					  css_computed_style_t *);            \
-	css_register_property_with_key(css_key_##PROP_KEY, PROP_NAME, VALDEF, \
+	css_register_property_with_key(css_prop_##PROP_KEY, PROP_NAME, VALDEF, \
 				       INIT, css_cascade_##PROP_KEY)
 
 #define DEFINE_SHORTHAND_PROP(PROP_KEY, NAME, VALDEF)                  \

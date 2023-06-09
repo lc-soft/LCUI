@@ -14,32 +14,32 @@ bool ui_widget_is_visible(ui_widget_t *w)
 
 void ui_widget_move(ui_widget_t *w, float left, float top)
 {
-	ui_widget_set_style_unit_value(w, css_key_top, top, CSS_UNIT_PX);
-	ui_widget_set_style_unit_value(w, css_key_left, left, CSS_UNIT_PX);
+	ui_widget_set_style_unit_value(w, css_prop_top, top, CSS_UNIT_PX);
+	ui_widget_set_style_unit_value(w, css_prop_left, left, CSS_UNIT_PX);
 }
 
 void ui_widget_resize(ui_widget_t *w, float width, float height)
 {
-	ui_widget_set_style_unit_value(w, css_key_width, width, CSS_UNIT_PX);
-	ui_widget_set_style_unit_value(w, css_key_height, height, CSS_UNIT_PX);
+	ui_widget_set_style_unit_value(w, css_prop_width, width, CSS_UNIT_PX);
+	ui_widget_set_style_unit_value(w, css_prop_height, height, CSS_UNIT_PX);
 }
 
 void ui_widget_show(ui_widget_t *w)
 {
 	css_style_value_t v;
 
-	ui_widget_get_style(w, css_key_display, &v);
+	ui_widget_get_style(w, css_prop_display, &v);
 	if (v.type == CSS_ARRAY_VALUE &&
 	    v.array_value[0].type == CSS_KEYWORD_VALUE &&
 	    v.array_value[0].keyword_value == CSS_KEYWORD_NONE) {
-		ui_widget_unset_style(w, css_key_display);
+		ui_widget_unset_style(w, css_prop_display);
 		ui_widget_update_style(w);
 	}
 }
 
 void ui_widget_hide(ui_widget_t *w)
 {
-	ui_widget_set_style_keyword_value(w, css_key_display, CSS_KEYWORD_NONE);
+	ui_widget_set_style_keyword_value(w, css_prop_display, CSS_KEYWORD_NONE);
 	ui_widget_update_style(w);
 }
 

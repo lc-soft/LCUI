@@ -34,37 +34,37 @@ int css_parse_padding(css_propdef_t *propdef, const char *input,
 	}
 	switch (css_style_value_get_array_length(&value)) {
 	case 1:
-		css_style_decl_add(s, css_key_padding_top, value.array_value);
-		css_style_decl_add(s, css_key_padding_right, value.array_value);
-		css_style_decl_add(s, css_key_padding_bottom,
+		css_style_decl_add(s, css_prop_padding_top, value.array_value);
+		css_style_decl_add(s, css_prop_padding_right, value.array_value);
+		css_style_decl_add(s, css_prop_padding_bottom,
 				   value.array_value);
-		css_style_decl_add(s, css_key_padding_left, value.array_value);
+		css_style_decl_add(s, css_prop_padding_left, value.array_value);
 		break;
 	case 2:
-		css_style_decl_add(s, css_key_padding_top, value.array_value);
-		css_style_decl_add(s, css_key_padding_bottom,
+		css_style_decl_add(s, css_prop_padding_top, value.array_value);
+		css_style_decl_add(s, css_prop_padding_bottom,
 				   value.array_value);
-		css_style_decl_add(s, css_key_padding_left,
+		css_style_decl_add(s, css_prop_padding_left,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_padding_right,
+		css_style_decl_add(s, css_prop_padding_right,
 				   value.array_value + 1);
 		break;
 	case 3:
-		css_style_decl_add(s, css_key_padding_top, value.array_value);
-		css_style_decl_add(s, css_key_padding_left,
+		css_style_decl_add(s, css_prop_padding_top, value.array_value);
+		css_style_decl_add(s, css_prop_padding_left,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_padding_right,
+		css_style_decl_add(s, css_prop_padding_right,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_padding_bottom,
+		css_style_decl_add(s, css_prop_padding_bottom,
 				   value.array_value + 2);
 		break;
 	case 4:
-		css_style_decl_add(s, css_key_padding_top, value.array_value);
-		css_style_decl_add(s, css_key_padding_right,
+		css_style_decl_add(s, css_prop_padding_top, value.array_value);
+		css_style_decl_add(s, css_prop_padding_right,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_padding_bottom,
+		css_style_decl_add(s, css_prop_padding_bottom,
 				   value.array_value + 2);
-		css_style_decl_add(s, css_key_padding_left,
+		css_style_decl_add(s, css_prop_padding_left,
 				   value.array_value + 3);
 		break;
 	default:

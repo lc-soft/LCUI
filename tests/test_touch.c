@@ -83,7 +83,7 @@ static void OnTouch(app_event_t *e, void *arg)
 		ui_widget_set_touch_capture(w, binding->point_id);
 		ui_widget_on(w, "touch", OnTouchWidget, binding, NULL);
 		ui_widget_set_style_string(w, "position", "absolute");
-		ui_widget_set_style_color_value(w, css_key_background_color,
+		ui_widget_set_style_color_value(w, css_prop_background_color,
 						bgcolor.value);
 		list_append_node(&touch_bindings, &binding->node);
 		ui_root_append(w);

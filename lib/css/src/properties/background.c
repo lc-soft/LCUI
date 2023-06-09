@@ -333,18 +333,18 @@ int css_parse_background_position(const char *input, css_style_decl_t *s)
 	uint8_t has_x = 0;
 	uint8_t has_y = 0;
 	css_style_value_t value;
-	css_propdef_t *prop_x = css_get_propdef(css_key_background_position_x);
-	css_propdef_t *prop_y = css_get_propdef(css_key_background_position_y);
+	css_propdef_t *prop_x = css_get_propdef(css_prop_background_position_x);
+	css_propdef_t *prop_y = css_get_propdef(css_prop_background_position_y);
 
 	for (cur = input, len = 0; *cur; cur += len) {
 		if (!has_x &&
 		    (len = css_parse_value(prop_x->valdef, cur, &value) > 0)) {
-			css_style_decl_add(s, css_key_background_position_x,
+			css_style_decl_add(s, css_prop_background_position_x,
 					   &value);
 			has_x = 1;
 		} else if (!has_y && (len = css_parse_value(prop_y->valdef, cur,
 							    &value) > 0)) {
-			css_style_decl_add(s, css_key_background_position_y,
+			css_style_decl_add(s, css_prop_background_position_y,
 					   &value);
 			has_y = 1;
 		} else {
@@ -365,21 +365,21 @@ int css_parse_background(css_propdef_t *propdef, const char *input,
 	uint8_t has_position = 0;
 	uint8_t has_size = 0;
 	uint8_t has_repeat = 0;
-	css_propdef_t *prop_image = css_get_propdef(css_key_background_image);
-	css_propdef_t *prop_color = css_get_propdef(css_key_background_color);
-	css_propdef_t *prop_size = css_get_propdef(css_key_background_size);
-	css_propdef_t *prop_repeat = css_get_propdef(css_key_background_repeat);
+	css_propdef_t *prop_image = css_get_propdef(css_prop_background_image);
+	css_propdef_t *prop_color = css_get_propdef(css_prop_background_color);
+	css_propdef_t *prop_size = css_get_propdef(css_prop_background_size);
+	css_propdef_t *prop_repeat = css_get_propdef(css_prop_background_repeat);
 	css_style_value_t value;
 
 	for (cur = input, len = 0; *cur; cur += len) {
 		if (!has_image && (len = css_parse_value(prop_image->valdef,
 							 cur, &value)) > 0) {
-			css_style_decl_add(s, css_key_background_image, &value);
+			css_style_decl_add(s, css_prop_background_image, &value);
 			has_image = 1;
 		} else if (!has_color &&
 			   (len = css_parse_value(prop_color->valdef, cur,
 						  &value)) > 0) {
-			css_style_decl_add(s, css_key_background_color, &value);
+			css_style_decl_add(s, css_prop_background_color, &value);
 			has_color = 1;
 		} else if (!has_position &&
 			   (len = css_parse_background_position(cur, s) > 0)) {
@@ -387,12 +387,12 @@ int css_parse_background(css_propdef_t *propdef, const char *input,
 		} else if (!has_size &&
 			   (len = css_parse_value(prop_size->valdef, cur,
 						  &value)) > 0) {
-			css_style_decl_add(s, css_key_background_size, &value);
+			css_style_decl_add(s, css_prop_background_size, &value);
 			has_size = 1;
 		} else if (!has_repeat &&
 			   (len = css_parse_value(prop_repeat->valdef, cur,
 						  &value)) > 0) {
-			css_style_decl_add(s, css_key_background_repeat,
+			css_style_decl_add(s, css_prop_background_repeat,
 					   &value);
 			has_repeat = 1;
 		} else {

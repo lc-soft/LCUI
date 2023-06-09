@@ -33,35 +33,35 @@ int css_parse_margin(css_propdef_t *propdef, const char *input,
 	}
 	switch (css_style_value_get_array_length(&value)) {
 	case 1:
-		css_style_decl_add(s, css_key_margin_top, value.array_value);
-		css_style_decl_add(s, css_key_margin_right, value.array_value);
-		css_style_decl_add(s, css_key_margin_bottom, value.array_value);
-		css_style_decl_add(s, css_key_margin_left, value.array_value);
+		css_style_decl_add(s, css_prop_margin_top, value.array_value);
+		css_style_decl_add(s, css_prop_margin_right, value.array_value);
+		css_style_decl_add(s, css_prop_margin_bottom, value.array_value);
+		css_style_decl_add(s, css_prop_margin_left, value.array_value);
 		break;
 	case 2:
-		css_style_decl_add(s, css_key_margin_top, value.array_value);
-		css_style_decl_add(s, css_key_margin_bottom, value.array_value);
-		css_style_decl_add(s, css_key_margin_left,
+		css_style_decl_add(s, css_prop_margin_top, value.array_value);
+		css_style_decl_add(s, css_prop_margin_bottom, value.array_value);
+		css_style_decl_add(s, css_prop_margin_left,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_margin_right,
+		css_style_decl_add(s, css_prop_margin_right,
 				   value.array_value + 1);
 		break;
 	case 3:
-		css_style_decl_add(s, css_key_margin_top, value.array_value);
-		css_style_decl_add(s, css_key_margin_left,
+		css_style_decl_add(s, css_prop_margin_top, value.array_value);
+		css_style_decl_add(s, css_prop_margin_left,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_margin_right,
+		css_style_decl_add(s, css_prop_margin_right,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_margin_bottom,
+		css_style_decl_add(s, css_prop_margin_bottom,
 				   value.array_value + 2);
 		break;
 	case 4:
-		css_style_decl_add(s, css_key_margin_top, value.array_value);
-		css_style_decl_add(s, css_key_margin_right,
+		css_style_decl_add(s, css_prop_margin_top, value.array_value);
+		css_style_decl_add(s, css_prop_margin_right,
 				   value.array_value + 1);
-		css_style_decl_add(s, css_key_margin_bottom,
+		css_style_decl_add(s, css_prop_margin_bottom,
 				   value.array_value + 2);
-		css_style_decl_add(s, css_key_margin_left,
+		css_style_decl_add(s, css_prop_margin_left,
 				   value.array_value + 3);
 		break;
 	default:
