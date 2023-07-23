@@ -4,7 +4,7 @@
   <ui>
     <w class="app">
       <w class="header">
-        <text class="title">Todo list</text>
+        <text id="title" class="title" />
         <w class="tools">
           <text id="count" class="count" />
           <w id="filters" class="task-filters">

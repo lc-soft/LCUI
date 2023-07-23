@@ -1,91 +1,51 @@
-﻿// Reference from: https://codepen.io/knyttneve/details/mddGVjB
-#include <stdio.h>
 #include <LCUI.h>
-#include <platform/main.h>
+#include <LCUI/main.h>
+#include <time.h>
+#include "ui_tasklist.h"
 
-typedef struct task_t {
-        unsigned id;
-        wchar_t *name;
-        const char *status;
-} task_t;
+static tasklist_t tasks;
 
-struct todolist_app_t {
-        unsigned id;
-        list_t tasks;
-} app = { 0 };
-
-ui_widget_t *ui_task_item_create(task_t *task)
+void update_title(void)
 {
-        char id[32] = { 0 };
-        ui_widget_t *item = ui_create_widget("text");
-        ui_widget_t *status = ui_create_widget(NULL);
-        ui_widget_t *del = ui_create_widget(NULL);
-        ui_widget_t *name = ui_create_widget("text");
-        snprintf(id, 32, "%u", task->id);
-        ui_text_set_content_w(name, task->name);
-        ui_widget_set_attr(item, "data-id", id);
-        ui_widget_add_class(item, "task-item");
-        if (strcmp(task->status, "completed") == 0) {
-                ui_widget_add_class(item, "is-completed");
-        }
-        ui_widget_add_class(status, "task-status");
-        ui_widget_add_class(del, "task-delete");
-        ui_widget_append(item, status);
-        ui_widget_append(item, name);
-        ui_widget_append(item, del);
-        return item;
+        char str[64];
+        time_t t = time(NULL);
+        struct tm *tm = localtime(&t);
+
+        strftime(str, 64, "%a %b %d %Y", tm);
+        ui_text_set_content(ui_get_widget("title"), str);
 }
 
-void ui_todolist_update_count(void)
+void update_count(void)
 {
         wchar_t text[32];
-        ui_widget_t *count = ui_get_widget("count");
 
-        swprintf(text, 32, app.tasks.length > 1 ? L"%u tasks" : L"%u task",
-                 app.tasks.length);
-        ui_text_set_content_w(count, text);
+        swprintf(text, 32, tasks.length > 1 ? L"%u tasks" : L"%u task",
+                 tasks.length);
+        ui_text_set_content_w(ui_get_widget("count"), text);
 }
 
-void update_filter_status(ui_widget_t *w, void *activeStatus)
+void update_filter_status(const char *status)
 {
-        const char *status = ui_widget_get_attr(w, "data-value");
-        if (status && strcmp(status, activeStatus) == 0) {
-                ui_widget_add_class(w, "is-active");
+        ui_widget_t *child;
+        const char *attr;
+
+        if (strcmp(status, "active") == 0) {
+                ui_tasklist_filter(0);
+        } else if (strcmp(status, "completed") == 0) {
+                ui_tasklist_filter(1);
         } else {
-                ui_widget_remove_class(w, "is-active");
+                ui_tasklist_filter(2);
         }
-}
-
-void ui_todolist_filter(const char *status)
-{
-        task_t *task;
-        list_node_t *node;
-        ui_widget_t *list = ui_get_widget("list");
-
-        ui_widget_empty(list);
-        for (list_each(node, &app.tasks)) {
-                task = node->data;
-                if (strcmp(status, "all") != 0 &&
-                    strcmp(task->status, status) != 0) {
-                        continue;
+        for (child = ui_widget_get_child(ui_get_widget("filters"), 0);
+             child != NULL; child = ui_widget_next(child)) {
+                attr = ui_widget_get_attr(child, "data-value");
+                if (attr != NULL && strcmp(attr, status) == 0) {
+                        ui_widget_add_class(child, "is-active");
+                } else {
+                        ui_widget_remove_class(child, "is-active");
                 }
-                ui_widget_append(list, ui_task_item_create(task));
         }
-        ui_widget_each(ui_get_widget("filters"), update_filter_status,
-                       (void *)status);
-        ui_todolist_update_count();
-}
-
-void ui_todolist_add(const wchar_t *name, const char *status)
-{
-        task_t *task = malloc(sizeof(task_t));
-
-        task->id = ++app.id;
-        task->name = wcsdup2(name);
-        task->status = status ? status : "active";
-        list_append(&app.tasks, task);
-        ui_widget_append(ui_get_widget("list"), ui_task_item_create(task));
-        ui_todolist_update_count();
+        update_count();
 }
 
 void on_input_keydown(ui_widget_t *w, ui_event_t *e, void *arg)
@@ -94,7 +54,7 @@ void on_input_keydown(ui_widget_t *w, ui_event_t *e, void *arg)
 
         if (e->key.code == KEY_ENTER) {
                 ui_textedit_get_text_w(w, 0, 255, name);
-                ui_todolist_add(name, "active");
+                ui_tasklist_append(name, false);
                 ui_textedit_clear_text(w);
         }
 }
@@ -103,63 +63,9 @@ void on_filter_click(ui_widget_t *w, ui_event_t *e, void *arg)
 {
         const char *status = ui_widget_get_attr(e->target, "data-value");
 
-        if (status) {
-                ui_todolist_filter(status);
+        if (status != NULL) {
+                update_filter_status(status);
         }
-}
-
-void on_task_list_click(ui_widget_t *w, ui_event_t *e, void *arg)
-{
-        const char *id_str;
-        unsigned id;
-        task_t *task;
-        list_node_t *node;
-        ui_widget_t *item = e->target->parent;
-
-        for (item = e->target; !ui_widget_has_class(item, "task-item");
-             item = item->parent)
-                ;
-        id_str = ui_widget_get_attr(item, "data-id");
-        if (!id_str || sscanf(id_str, "%u", &id) != 1) {
-                return;
-        }
-        if (ui_widget_has_class(e->target, "task-delete")) {
-                ui_widget_remove(item);
-                for (list_each(node, &app.tasks)) {
-                        task = node->data;
-                        if (task->id == id) {
-                                list_delete_node(&app.tasks, node);
-                                break;
-                        }
-                }
-                ui_todolist_update_count();
-                return;
-        }
-        if (!ui_widget_has_class(e->target, "task-status")) {
-                return;
-        }
-        for (list_each(node, &app.tasks)) {
-                task = node->data;
-                if (task->id != id) {
-                        continue;
-                }
-                if (strcmp(task->status, "completed") == 0) {
-                        task->status = "active";
-                        ui_widget_remove_class(item, "is-completed");
-                        break;
-                }
-                task->status = "completed";
-                ui_widget_add_class(item, "is-completed");
-                break;
-        }
-}
-
-void ui_todolist_init(void)
-{
-        ui_widget_on(ui_get_widget("input"), "keydown", on_input_keydown, NULL);
-        ui_widget_on(ui_get_widget("filters"), "click", on_filter_click, NULL);
-        ui_widget_on(ui_get_widget("list"), "click", on_task_list_click, NULL);
-        ui_todolist_filter("all");
 }
 
 int main(int argc, char **argv)
@@ -171,13 +77,21 @@ int main(int argc, char **argv)
         if (!pack) {
                 return -1;
         }
+        tasklist_append(&tasks, L"Download LCUI source code", true);
+        tasklist_append(&tasks, L"Build LCUI", true);
+        tasklist_append(&tasks, L"Read LCUI tutorials", false);
+        tasklist_append(&tasks, L"Create my LCUI application", false);
+
         ui_root_append(pack);
         ui_widget_unwrap(pack);
         ui_widget_set_title(ui_root(), L"Todo list");
-        ui_todolist_init();
-        ui_todolist_add(L"Download LCUI source code", "completed");
-        ui_todolist_add(L"Build LCUI", "completed");
-        ui_todolist_add(L"Read LCUI tutorials", "active");
-        ui_todolist_add(L"Create my LCUI application", "active");
+        ui_tasklist_init(ui_get_widget("list"), &tasks);
+        ui_widget_on(ui_get_widget("input"), "keydown", on_input_keydown, NULL);
+        ui_widget_on(ui_get_widget("filters"), "click", on_filter_click, NULL);
+        ui_widget_on(ui_get_widget("list"), "update",
+                     (ui_event_handler_t)update_count, NULL);
+
+        update_title();
+        update_filter_status("all");
         return lcui_main();
 }
