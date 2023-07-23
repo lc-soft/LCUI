@@ -15,6 +15,7 @@ target("libui-router")
     end
 
 target("libui-router-tests")
+    set_default(false)
     set_kind("binary")
     add_files("tests/test.c")
     add_deps("libui-router", "ctest")

@@ -21,6 +21,7 @@ target("libi18n")
     end
 
 target("libi18n-tests")
+    set_default(false)
     set_kind("binary")
     add_files("tests/test.c")
     add_deps("libi18n", "ctest")

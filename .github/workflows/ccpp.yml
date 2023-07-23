@@ -36,13 +36,18 @@ jobs:
         run: xmake config -y -v -k shared --ci-env=y
 
       - name: Build
-        run: xmake -w
+        run: |
+          xmake -w
+          xmake build yutil_test
+          xmake build pandagl_tests
+          xmake build libcss_tests
+          xmake build libui-router-tests
+          xmake build libi18n-tests
+          xmake build lcui_tests
 
       - name: Run YUtil tests
         if: runner.os == 'Windows'
-        run: |
-          xmake build yutil_test
-          xmake run yutil_test
+        run: xmake run yutil_test
 
       - name: Run PandaGL tests
         run: xmake run pandagl_tests
