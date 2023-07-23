@@ -1,5 +1,5 @@
-﻿#ifndef LIBCSS_INCLUDE_CSS_DEF_H
-#define LIBCSS_INCLUDE_CSS_DEF_H
+﻿#ifndef LIBCSS_INCLUDE_CSS_TYPES_H
+#define LIBCSS_INCLUDE_CSS_TYPES_H
 
 #include <yutil.h>
 

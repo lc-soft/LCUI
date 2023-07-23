@@ -1,5 +1,5 @@
-﻿#ifndef LIB_UI_INCLUDE_UI_TPYES_H
-#define LIB_UI_INCLUDE_UI_TPYES_H
+﻿#ifndef LIB_UI_INCLUDE_UI_TYPES_H
+#define LIB_UI_INCLUDE_UI_TYPES_H
 
 #include <stdbool.h>
 #include <yutil.h>
