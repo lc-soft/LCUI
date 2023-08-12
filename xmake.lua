@@ -20,7 +20,8 @@ add_includedirs(
     "lib/ui-cursor/include",
     "lib/ui-xml/include",
     "lib/ui-router/include",
-    "include"
+    "include",
+    {public = true}
 )
 includes("lib/*/xmake.lua")
 includes("tests/xmake.lua")
