@@ -256,18 +256,6 @@ static void ui_widget_on_image_load(ui_image_t *loaded_image, void *data)
         CSS_COPY_LENGTH(s, &w->specified_style, background_height);
         CSS_COPY_LENGTH(s, &w->specified_style, background_position_x);
         CSS_COPY_LENGTH(s, &w->specified_style, background_position_y);
-        // See more:
-        // https://developer.mozilla.org/en-US/docs/Web/CSS/background-position#regarding_percentages
-        if (IS_CSS_PERCENTAGE(s, background_position_x)) {
-                CSS_SET_FIXED_LENGTH(s, background_position_x,
-                                     (w->padding_box.width - img->width) *
-                                         s->background_position_x / 100.f);
-        }
-        if (IS_CSS_PERCENTAGE(s, background_position_y)) {
-                CSS_SET_FIXED_LENGTH(s, background_position_y,
-                                     (w->padding_box.height - img->height) *
-                                         s->background_position_y / 100.f);
-        }
         switch (s->type_bits.background_width) {
         case CSS_BACKGROUND_SIZE_CONVER:
                 scale = 1.f * w->padding_box.width / img->width;
@@ -315,6 +303,20 @@ static void ui_widget_on_image_load(ui_image_t *loaded_image, void *data)
                 CSS_SET_FIXED_LENGTH(
                     s, background_height,
                     s->background_width * img->height / img->width);
+        }
+        // See more:
+        // https://developer.mozilla.org/en-US/docs/Web/CSS/background-position#regarding_percentages
+        if (IS_CSS_PERCENTAGE(s, background_position_x)) {
+                CSS_SET_FIXED_LENGTH(
+                    s, background_position_x,
+                    (w->padding_box.width - s->background_width) *
+                        s->background_position_x / 100.f);
+        }
+        if (IS_CSS_PERCENTAGE(s, background_position_y)) {
+                CSS_SET_FIXED_LENGTH(
+                    s, background_position_y,
+                    (w->padding_box.height - s->background_height) *
+                        s->background_position_y / 100.f);
         }
         ui_widget_mark_dirty_rect(w, NULL, UI_BOX_TYPE_BORDER_BOX);
 }
