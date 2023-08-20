@@ -148,8 +148,8 @@ static int css_cascade_background_size_2(const css_style_array_value_t input,
                 }
                 break;
         case CSS_UNIT_VALUE:
-                s->background_height = input[0].unit_value.value;
-                s->unit_bits.background_height = input[0].unit_value.unit;
+                s->background_height = input[1].unit_value.value;
+                s->unit_bits.background_height = input[1].unit_value.unit;
                 s->type_bits.background_height = CSS_BACKGROUND_SIZE_SET;
                 break;
         default:
