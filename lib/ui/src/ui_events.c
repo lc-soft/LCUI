@@ -918,7 +918,7 @@ static int ui_on_keyboard_event(ui_event_t *origin_event)
 
 	e.target = ui_events.targets[UI_WIDGET_STATUS_FOCUS];
 	if (!e.target) {
-		return -1;
+		e.target = ui_root();
 	}
 	e.cancel_bubble = false;
 	ui_widget_emit_event(e.target, e, NULL);
