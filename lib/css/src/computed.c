@@ -1040,11 +1040,12 @@ static void compute_absolute_width(const css_computed_style_t *parent,
                         s->type_bits.width = CSS_WIDTH_FIT_CONTENT;
                         break;
                 }
-                if (is_css_display_inline(s->type_bits.display) || !parent) {
+                if (is_css_display_inline(s) || !parent) {
                         s->type_bits.width = CSS_WIDTH_FIT_CONTENT;
                         break;
                 }
-                if (compute_content_box_fixed_width(parent, &parent_value)) {
+                if (is_css_display_block(parent) &&
+                    compute_content_box_fixed_width(parent, &parent_value)) {
                         value = parent_value - s->margin_left - s->margin_right;
                         if (s->type_bits.box_sizing ==
                             CSS_BOX_SIZING_CONTENT_BOX) {
@@ -1104,7 +1105,7 @@ static void compute_absolute_height(const css_computed_style_t *parent,
                         s->type_bits.height = CSS_HEIGHT_FIT_CONTENT;
                         break;
                 }
-                if (is_css_display_inline(s->type_bits.display) || !parent) {
+                if (is_css_display_inline(s) || !parent) {
                         s->type_bits.height = CSS_WIDTH_FIT_CONTENT;
                 }
                 break;
