@@ -26,3 +26,7 @@
   color: #fff;
   background: #0050c9;
 }
+
+.button.borderless {
+  border: none;
+}
