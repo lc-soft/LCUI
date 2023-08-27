@@ -31,11 +31,17 @@ LIBCSS_BEGIN_DECLS
                 (DEST)->unit_bits.PROP_KEY = (SRC)->unit_bits.PROP_KEY; \
         } while (0);
 
-LIBCSS_INLINE libcss_bool_t is_css_display_inline(uint8_t display)
+LIBCSS_INLINE libcss_bool_t is_css_display_inline(const css_computed_style_t *s)
 {
-        return display == CSS_DISPLAY_INLINE ||
-               display == CSS_DISPLAY_INLINE_BLOCK ||
-               display == CSS_DISPLAY_INLINE_FLEX;
+        return s->type_bits.display == CSS_DISPLAY_INLINE ||
+               s->type_bits.display == CSS_DISPLAY_INLINE_BLOCK ||
+               s->type_bits.display == CSS_DISPLAY_INLINE_FLEX;
+}
+
+LIBCSS_INLINE libcss_bool_t is_css_display_flex(const css_computed_style_t *s)
+{
+        return s->type_bits.display == CSS_DISPLAY_FLEX ||
+               s->type_bits.display == CSS_DISPLAY_INLINE_FLEX;
 }
 
 LIBCSS_INLINE css_numeric_value_t css_padding_x(const css_computed_style_t *s)

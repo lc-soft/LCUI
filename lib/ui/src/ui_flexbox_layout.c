@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 弹性布局
  *
  * 布局算法参考 W3C 的文档：https://www.w3.org/TR/css-flexbox/#layout-algorithm
@@ -502,7 +502,7 @@ static void ui_flexbox_layout_update_column(ui_flexbox_layout_context_t *ctx)
 		}
 		// 计算拉伸的宽度
 		if (align_items == CSS_ALIGN_ITEMS_STRETCH &&
-		    s->type_bits.height == CSS_HEIGHT_AUTO) {
+		    s->type_bits.width == CSS_HEIGHT_AUTO) {
 			CSS_SET_FIXED_LENGTH(s, width,
 					     css_convert_border_box_height(
 						 s, ctx->line->max_cross_size -
