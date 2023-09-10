@@ -295,9 +295,6 @@ libcss_bool_t css_parse_font_family_value(css_style_value_t *val, const char *st
 		switch (*p) {
 		case '"':
 		case '\'':
-			if (quotes > 0) {
-				return LIBCSS_FALSE;
-			}
 			if (i > 0) {
 				if (quotes < 1) {
 					return LIBCSS_FALSE;
