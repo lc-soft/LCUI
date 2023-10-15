@@ -3,7 +3,7 @@
 #include <platform.h>
 #include <ui.h>
 #include <ui_widgets/text.h>
-#include <ui_widgets/textedit.h>
+#include <ui_widgets/textinput.h>
 #include <ui_xml.h>
 #include LCUI_APP_H
 
@@ -17,7 +17,7 @@ static void OnBtnClick(ui_widget_t* self, ui_event_t* e, void *arg)
 	wchar_t str[256];
 	ui_widget_t* edit = ui_get_widget("edit");
 	ui_widget_t* txt = ui_get_widget("text-hello");
-	ui_textedit_get_text_w(edit, 0, 255, str);
+	ui_textinput_get_text_w(edit, 0, 255, str);
 	ui_text_set_content_w(txt, str);
 }
 

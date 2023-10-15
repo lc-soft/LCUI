@@ -256,7 +256,7 @@ void lcui_init_ui_preset_widgets(void)
 	ui_register_button();
 	ui_register_scrollbar();
 	ui_register_textcaret();
-	ui_register_textedit();
+	ui_register_textinput();
 }
 
 void lcui_destroy_ui_preset_widgets(void)

@@ -48,11 +48,11 @@ void test_clipboard(void)
 
         lcui_init();
 
-        text1 = ui_create_widget("textedit");
-        text2 = ui_create_widget("textedit");
+        text1 = ui_create_widget("textinput");
+        text2 = ui_create_widget("textinput");
         ui_root_append(text1);
         ui_root_append(text2);
-        ui_textedit_set_text_w(text1, L"helloworld");
+        ui_textinput_set_text_w(text1, L"helloworld");
         ui_widget_on(text1, "focus", on_text1_focused, text2);
         ui_widget_on(text2, "paste", on_check_text, NULL);
         lcui_set_timeout(500, focus_text1, text1);

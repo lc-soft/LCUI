@@ -14,7 +14,7 @@
           </w>
         </w>
       </w>
-      <textedit id="input" class="task-input" placeholder="Add a new task..." />
+      <textinput id="input" class="task-input" placeholder="Add a new task..." />
       <w id="list" class="task-list" />
     </w>
   </ui>

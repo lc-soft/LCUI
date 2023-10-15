@@ -4,7 +4,7 @@
   <ui>
     <widget class="image"></widget>
     <widget class="container">
-      <widget id="edit" type="textedit">Hello, World!</widget>
+      <widget id="edit" type="textinput">Hello, World!</widget>
     </widget>
     <widget class="container">
       <widget type="text" class="text-box box-px">width: 80px</widget>

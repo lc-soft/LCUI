@@ -93,9 +93,9 @@ void on_input_keydown(ui_widget_t *w, ui_event_t *e, void *arg)
         wchar_t name[256];
 
         if (e->key.code == KEY_ENTER) {
-                ui_textedit_get_text_w(w, 0, 255, name);
+                ui_textinput_get_text_w(w, 0, 255, name);
                 ui_todolist_add(name, "active");
-                ui_textedit_clear_text(w);
+                ui_textinput_clear_text(w);
         }
 }
 

@@ -5,7 +5,7 @@ void test_xml_parser(void);
 void test_widget_opacity(void);
 void test_widget_event(void);
 void test_text_resize(void);
-void test_textedit(void);
+void test_textinput(void);
 void test_scrollbar(void);
 void test_image_reader(void);
 void test_mainloop(void);

@@ -1,5 +1,5 @@
 ﻿/*
- * textcaret.h -- textcaret widget, used in textedit.
+ * textcaret.h -- textcaret widget, used in textinput.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn> All rights reserved.
  *
