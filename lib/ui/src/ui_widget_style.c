@@ -5,6 +5,7 @@
 #include <ui/style.h>
 #include <ui/image.h>
 #include "ui_widget_style.h"
+#include "ui_widget_box.h"
 
 css_selector_node_t *ui_widget_create_selector_node(ui_widget_t *w)
 {
@@ -371,6 +372,8 @@ void ui_widget_force_update_style(ui_widget_t *w)
                 ui_image_create(s->background_image);
         }
         ui_widget_compute_style(w);
+        ui_widget_update_box_size(w);
+        ui_widget_update_box_position(w);
         if (w->proto && w->proto->update) {
                 /* 扩展部分的样式交给该部件自己处理 */
                 w->proto->update(w);

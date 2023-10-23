@@ -77,7 +77,7 @@ LIBUI_PUBLIC ui_widget_t *ui_widget_prev(ui_widget_t *w);
 LIBUI_PUBLIC ui_widget_t *ui_widget_next(ui_widget_t *w);
 LIBUI_PUBLIC ui_widget_t *ui_widget_get_child(ui_widget_t *w, size_t index);
 LIBUI_PUBLIC size_t ui_widget_each(ui_widget_t *w,
-				   void (*callback)(ui_widget_t *, void *),
+				   ui_widget_callback_t callback,
 				   void *arg);
 LIBUI_PUBLIC ui_widget_t *ui_widget_at(ui_widget_t *widget, int ix, int iy);
 LIBUI_PUBLIC void ui_print_tree(ui_widget_t *w);
@@ -105,10 +105,13 @@ LIBUI_PUBLIC void ui_widget_prepare_reflow(ui_widget_t *w,
 
 LIBUI_PUBLIC void ui_widget_reset_size(ui_widget_t *w);
 
+LIBUI_PUBLIC void ui_widget_auto_reflow(ui_widget_t *w);
+
 LIBUI_PUBLIC void ui_widget_reflow(ui_widget_t *w);
 
 // Renderer
 
+LIBUI_PUBLIC void ui_widget_expose_dirty_rect(ui_widget_t *w);
 LIBUI_PUBLIC bool ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
 					    ui_box_type_t box_type);
 LIBUI_PUBLIC size_t ui_widget_get_dirty_rects(ui_widget_t *w, list_t *rects);

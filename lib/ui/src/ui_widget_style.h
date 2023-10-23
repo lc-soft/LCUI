@@ -79,13 +79,6 @@ LIBUI_INLINE bool ui_widget_has_inline_block_display(ui_widget_t *w)
 	       CSS_DISPLAY_INLINE_BLOCK;
 }
 
-LIBUI_INLINE bool ui_widget_is_flex_item(ui_widget_t *w)
-{
-	return ui_widget_has_flex_display(w) ||
-	       (!ui_widget_has_absolute_position(w) && w->parent &&
-		ui_widget_has_flex_display(w->parent));
-}
-
 LIBUI_INLINE bool ui_widget_has_fill_available_width(ui_widget_t *w)
 {
 	return (ui_widget_has_block_display(w) ||

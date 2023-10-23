@@ -25,8 +25,6 @@ static void test_default_settings(void)
 	ctest_euqal_int("check default frame rate cap", settings.frame_rate_cap, 120);
 	ctest_euqal_int("check default parallel rendering threads",
 	     settings.parallel_rendering_threads, 4);
-	ctest_euqal_bool("check default record profile", settings.record_profile, FALSE);
-	ctest_euqal_bool("check default fps meter", settings.fps_meter, FALSE);
 	ctest_euqal_bool("check default paint flashing", settings.paint_flashing, FALSE);
 	lcui_quit();
 	lcui_main();
@@ -38,8 +36,6 @@ static void test_apply_settings(void)
 
 	settings.frame_rate_cap = 60;
 	settings.parallel_rendering_threads = 2;
-	settings.record_profile = TRUE;
-	settings.fps_meter = TRUE;
 	settings.paint_flashing = TRUE;
 
 	lcui_init();
@@ -48,8 +44,6 @@ static void test_apply_settings(void)
 	ctest_euqal_int("check frame rate cap", settings.frame_rate_cap, 60);
 	ctest_euqal_int("check parallel rendering threads",
 	     settings.parallel_rendering_threads, 2);
-	ctest_euqal_bool("check record profile", settings.record_profile, TRUE);
-	ctest_euqal_bool("check fps meter", settings.fps_meter, TRUE);
 	ctest_euqal_bool("check paint flashing", settings.paint_flashing, TRUE);
 
 	settings.frame_rate_cap = -1;
