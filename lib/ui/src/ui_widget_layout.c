@@ -72,6 +72,18 @@ void ui_widget_reset_size(ui_widget_t *w)
 	ui_widget_update_box_size(w);
 }
 
+void ui_widget_auto_reflow(ui_widget_t *w)
+{
+        float width, height;
+
+        width = w->padding_box.width;
+        height = w->padding_box.height;
+        ui_widget_update_box_size(w);
+        if (width != w->padding_box.width || height != w->padding_box.height) {
+                ui_widget_reflow(w);
+        }
+}
+
 void ui_widget_reflow(ui_widget_t *w)
 {
 	ui_layout_rule_t rule = UI_LAYOUT_RULE_MAX_CONTENT;

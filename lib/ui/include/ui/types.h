@@ -58,9 +58,7 @@ typedef enum ui_box_type_t {
 typedef enum ui_dirty_rect_type_t {
 	UI_DIRTY_RECT_TYPE_NONE,
 	UI_DIRTY_RECT_TYPE_CUSTOM,
-	UI_DIRTY_RECT_TYPE_PADDING_BOX,
-	UI_DIRTY_RECT_TYPE_BORDER_BOX,
-	UI_DIRTY_RECT_TYPE_CANVAS_BOX
+	UI_DIRTY_RECT_TYPE_FULL,
 } ui_dirty_rect_type_t;
 
 typedef struct ui_border_style_t_ {
@@ -107,6 +105,7 @@ typedef struct ui_event_listener_t ui_event_listener_t;
 typedef struct ui_widget_t ui_widget_t;
 typedef list_t ui_widget_listeners_t;
 
+typedef void (*ui_widget_callback_t)(ui_widget_t *, void*);
 typedef void (*ui_widget_function_t)(ui_widget_t *);
 typedef void (*ui_widget_task_handler_t)(ui_widget_t *, int);
 typedef void (*ui_widget_size_getter_t)(ui_widget_t *, float *, float *,
@@ -171,9 +170,6 @@ typedef struct ui_widget_update_t {
 
 	/** Should update for children? */
 	bool for_children;
-
-	/** Should skip the property sync of bound surface? */
-	bool skip_surface_props_sync;
 
 	/** States of tasks */
 	bool states[UI_TASK_TOTAL_NUM];
@@ -402,6 +398,8 @@ struct ui_widget_t {
 	ui_rect_t dirty_rect;
 	ui_dirty_rect_type_t dirty_rect_type;
 	bool has_child_dirty_rect;
+	ui_rect_t border_box_backup;
+	ui_rect_t canvas_box_backup;
 
 	/** Parent widget */
 	ui_widget_t *parent;
@@ -428,7 +426,7 @@ struct ui_widget_t {
 	 */
 	list_node_t node;
 
-	/** Node in the parent->children_shoa */
+	/** Node in the parent->children_show */
 	list_node_t node_show;
 };
 

@@ -129,10 +129,6 @@ void test_css_computed(void)
         char buff[512];
         css_parser_t *parser;
 
-        css_selector_t *selector;
-        css_style_decl_t *result;
-        css_computed_style_t computed;
-
         fp = fopen("test_css_computed.css", "r");
         if (!fp) {
                 return;

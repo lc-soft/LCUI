@@ -283,8 +283,7 @@ ui_widget_t* ui_widget_get_child(ui_widget_t* w, size_t index)
 	return NULL;
 }
 
-size_t ui_widget_each(ui_widget_t* w, void (*callback)(ui_widget_t*, void*),
-		      void* arg)
+size_t ui_widget_each(ui_widget_t* w, ui_widget_callback_t callback, void *arg)
 {
 	size_t count = 0;
 

@@ -57,8 +57,6 @@ void lcui_reset_settings(void)
 	lcui_settings_t settings = {
 		.frame_rate_cap = LCUI_MAX_FRAMES_PER_SEC,
 		.parallel_rendering_threads = 4,
-		.record_profile = FALSE,
-		.fps_meter = FALSE,
 		.paint_flashing = FALSE
 	};
 	lcui_apply_settings(&settings);

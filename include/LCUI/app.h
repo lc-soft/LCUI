@@ -15,8 +15,6 @@ LCUI_BEGIN_HEADER
 typedef struct lcui_settings_t {
         int frame_rate_cap;
         int parallel_rendering_threads;
-        bool record_profile;
-        bool fps_meter;
         bool paint_flashing;
 } lcui_settings_t;
 
