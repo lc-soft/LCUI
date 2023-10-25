@@ -35,7 +35,7 @@
   },
   "homepage": "https://github.com/lc-soft/LCUI#readme",
   "devDependencies": {
-    "@commitlint/cli": "^8.3.5",
+    "@commitlint/cli": "^8.3.6",
     "@commitlint/config-conventional": "^8.3.4",
     "commitlint": "^8.3.5",
     "husky": "^3.1.0"
