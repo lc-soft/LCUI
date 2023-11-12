@@ -32,7 +32,7 @@ static void ui_widget_init(ui_widget_t* w)
 void ui_widget_destroy(ui_widget_t* w)
 {
 	if (w->parent) {
-		ui_widget_add_task(w->parent, UI_TASK_REFLOW);
+		ui_widget_request_reflow(w->parent);
 		ui_widget_unlink(w);
 	}
 	ui_widget_destroy_listeners(w);
@@ -76,7 +76,7 @@ ui_widget_t* ui_create_widget(const char* type)
 		widget->type = strdup2(type);
 	}
 	widget->proto->init(widget);
-	ui_widget_add_task(widget, UI_TASK_REFRESH_STYLE);
+	ui_widget_request_refresh_style(widget);
 	return widget;
 }
 
@@ -88,7 +88,7 @@ ui_widget_t* ui_create_widget_with_prototype(const ui_widget_prototype_t* proto)
 	widget->proto = proto;
 	widget->type = widget->proto->name;
 	widget->proto->init(widget);
-	ui_widget_add_task(widget, UI_TASK_REFRESH_STYLE);
+	ui_widget_request_refresh_style(widget);
 	return widget;
 }
 
@@ -129,7 +129,7 @@ void ui_widget_set_title(ui_widget_t* w, const wchar_t* title)
 		record = ui_mutation_record_create(
 		    w, UI_MUTATION_RECORD_TYPE_PROPERTIES);
 		record->property_name = strdup2("title");
-		ui_widget_add_mutation_recrod(w, record);
+		ui_widget_add_mutation_record(w, record);
 		ui_mutation_record_destroy(record);
 	}
 }

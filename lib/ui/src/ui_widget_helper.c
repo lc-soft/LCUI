@@ -33,14 +33,14 @@ void ui_widget_show(ui_widget_t *w)
 	    v.array_value[0].type == CSS_KEYWORD_VALUE &&
 	    v.array_value[0].keyword_value == CSS_KEYWORD_NONE) {
 		ui_widget_unset_style(w, css_prop_display);
-		ui_widget_update_style(w);
+		ui_widget_request_update_style(w);
 	}
 }
 
 void ui_widget_hide(ui_widget_t *w)
 {
 	ui_widget_set_style_keyword_value(w, css_prop_display, CSS_KEYWORD_NONE);
-	ui_widget_update_style(w);
+	ui_widget_request_update_style(w);
 }
 
 ui_widget_t *ui_widget_get_closest(ui_widget_t *w, const char *type)

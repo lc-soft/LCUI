@@ -18,7 +18,7 @@ LIBUI_PUBLIC void ui_widget_destroy(ui_widget_t *w);
 LIBUI_PUBLIC void ui_widget_set_title(ui_widget_t *w, const wchar_t *title);
 LIBUI_PUBLIC void ui_widget_set_text(ui_widget_t *w, const char *text);
 LIBUI_PUBLIC void ui_widget_get_offset(ui_widget_t *w, ui_widget_t *parent,
-				       float *offset_x, float *offset_y);
+                                       float *offset_x, float *offset_y);
 LIBUI_PUBLIC bool ui_widget_in_viewport(ui_widget_t *w);
 
 // Root
@@ -35,20 +35,20 @@ LIBUI_PUBLIC int ui_widget_set_id(ui_widget_t *w, const char *idstr);
 
 LIBUI_PUBLIC ui_widget_extra_data_t *ui_create_extra_data(ui_widget_t *widget);
 
-LIBUI_INLINE ui_widget_extra_data_t *ui_widget_use_extra_data(ui_widget_t *widget)
+LIBUI_INLINE ui_widget_extra_data_t *ui_widget_use_extra_data(
+    ui_widget_t *widget)
 {
-	return widget->extra ? widget->extra : ui_create_extra_data(widget);
+        return widget->extra ? widget->extra : ui_create_extra_data(widget);
 }
 
 // Attributes
 
 LIBUI_PUBLIC int ui_widget_set_attr_ex(ui_widget_t *w, const char *name,
-					    void *value, int value_type,
-					    void (*value_destructor)(void *));
+                                       void *value, int value_type,
+                                       void (*value_destructor)(void *));
 LIBUI_PUBLIC int ui_widget_set_attr(ui_widget_t *w, const char *name,
-					 const char *value);
-LIBUI_PUBLIC const char *ui_widget_get_attr(ui_widget_t *w,
-						       const char *name);
+                                    const char *value);
+LIBUI_PUBLIC const char *ui_widget_get_attr(ui_widget_t *w, const char *name);
 
 // Classes
 
@@ -61,7 +61,7 @@ LIBUI_PUBLIC int ui_widget_remove_class(ui_widget_t *w, const char *class_name);
 LIBUI_PUBLIC int ui_widget_add_status(ui_widget_t *w, const char *status_name);
 LIBUI_PUBLIC bool ui_widget_has_status(ui_widget_t *w, const char *status_name);
 LIBUI_PUBLIC int ui_widget_remove_status(ui_widget_t *w,
-					 const char *status_name);
+                                         const char *status_name);
 LIBUI_PUBLIC void ui_widget_update_status(ui_widget_t *widget);
 LIBUI_PUBLIC void ui_widget_set_disabled(ui_widget_t *w, bool disabled);
 
@@ -77,8 +77,7 @@ LIBUI_PUBLIC ui_widget_t *ui_widget_prev(ui_widget_t *w);
 LIBUI_PUBLIC ui_widget_t *ui_widget_next(ui_widget_t *w);
 LIBUI_PUBLIC ui_widget_t *ui_widget_get_child(ui_widget_t *w, size_t index);
 LIBUI_PUBLIC size_t ui_widget_each(ui_widget_t *w,
-				   ui_widget_callback_t callback,
-				   void *arg);
+                                   ui_widget_callback_t callback, void *arg);
 LIBUI_PUBLIC ui_widget_t *ui_widget_at(ui_widget_t *widget, int ix, int iy);
 LIBUI_PUBLIC void ui_print_tree(ui_widget_t *w);
 
@@ -90,7 +89,7 @@ LIBUI_PUBLIC void ui_widget_resize(ui_widget_t *w, float width, float height);
 LIBUI_PUBLIC void ui_widget_show(ui_widget_t *w);
 LIBUI_PUBLIC void ui_widget_hide(ui_widget_t *w);
 LIBUI_PUBLIC ui_widget_t *ui_widget_get_closest(ui_widget_t *w,
-						const char *type);
+                                                const char *type);
 LIBUI_PUBLIC dict_t *ui_widget_collect_references(ui_widget_t *w);
 
 // Layout
@@ -101,7 +100,7 @@ LIBUI_PUBLIC dict_t *ui_widget_collect_references(ui_widget_t *w);
  * @param rule 父级组件所使用的布局规则
  */
 LIBUI_PUBLIC void ui_widget_prepare_reflow(ui_widget_t *w,
-					   ui_layout_rule_t rule);
+                                           ui_layout_rule_t rule);
 
 LIBUI_PUBLIC void ui_widget_reset_size(ui_widget_t *w);
 
@@ -113,7 +112,7 @@ LIBUI_PUBLIC void ui_widget_reflow(ui_widget_t *w);
 
 LIBUI_PUBLIC void ui_widget_expose_dirty_rect(ui_widget_t *w);
 LIBUI_PUBLIC bool ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
-					    ui_box_type_t box_type);
+                                            ui_box_type_t box_type);
 LIBUI_PUBLIC size_t ui_widget_get_dirty_rects(ui_widget_t *w, list_t *rects);
 LIBUI_PUBLIC size_t ui_widget_render(ui_widget_t *w, pd_context_t *paint);
 
@@ -124,19 +123,32 @@ LIBUI_PUBLIC size_t ui_update(void);
 LIBUI_PUBLIC void ui_refresh_style(void);
 
 LIBUI_PUBLIC void ui_widget_set_rules(ui_widget_t *w,
-				      const ui_widget_rules_t *rules);
-LIBUI_PUBLIC void ui_widget_add_task_for_children(ui_widget_t *widget,
-						  ui_task_type_t task);
-LIBUI_PUBLIC void ui_widget_add_task(ui_widget_t *widget, int task);
+                                      const ui_widget_rules_t *rules);
+LIBUI_PUBLIC void ui_widget_request_refresh_children(ui_widget_t *widget);
+LIBUI_PUBLIC void ui_widget_request_update(ui_widget_t *w);
 
-LIBUI_INLINE void ui_widget_refresh_style(ui_widget_t *w)
+LIBUI_INLINE void ui_widget_request_reflow(ui_widget_t *w)
 {
-	ui_widget_add_task(w, UI_TASK_REFRESH_STYLE);
+        w->update.should_reflow = true;
+        ui_widget_request_update(w);
 }
 
-LIBUI_INLINE void ui_widget_update_style(ui_widget_t *w)
+LIBUI_INLINE void ui_widget_request_refresh_style(ui_widget_t *w)
 {
-	ui_widget_add_task(w, UI_TASK_UPDATE_STYLE);
+        w->update.should_refresh_style = true;
+        ui_widget_request_update(w);
+}
+
+LIBUI_INLINE void ui_widget_request_update_style(ui_widget_t *w)
+{
+        w->update.should_update_style = true;
+        ui_widget_request_update(w);
+}
+
+LIBUI_INLINE bool ui_widget_has_update(ui_widget_t *w)
+{
+        return w->update.should_update_self || w->update.should_refresh_style ||
+               w->update.should_update_style;
 }
 
 LIBUI_END_DECLS

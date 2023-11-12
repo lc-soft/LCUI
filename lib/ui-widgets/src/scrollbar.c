@@ -281,7 +281,7 @@ static void ui_scrollbar_thumb_on_mousemove(ui_widget_t *thumb, ui_event_t *e,
                 ui_widget_emit_event(target, e, &layer_pos);
         }
         scrollbar->pos = layer_pos;
-        ui_widget_update_style(target);
+        ui_widget_request_update_style(target);
         ui_widget_move(thumb, x, y);
 }
 
@@ -373,7 +373,7 @@ static void ui_scrollbar_update_size(ui_widget_t *w)
                                                CSS_UNIT_PERCENT);
         }
         ui_scrollbar_set_position(w, scrollbar->pos);
-        ui_widget_update_style(thumb);
+        ui_widget_request_update_style(thumb);
         if (n < 100.f) {
                 ui_widget_show(w);
                 if (scrollbar->direction == UI_SCROLLBAR_HORIZONTAL) {
@@ -687,8 +687,8 @@ float ui_scrollbar_set_position(ui_widget_t *w, float pos)
                 ui_widget_emit_event(content, e, &new_pos);
         }
         scrollbar->pos = pos;
-        ui_widget_update_style(thumb);
-        ui_widget_update_style(content);
+        ui_widget_request_update_style(thumb);
+        ui_widget_request_update_style(content);
         return pos;
 }
 

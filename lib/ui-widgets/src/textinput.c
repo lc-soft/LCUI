@@ -55,7 +55,7 @@ typedef struct ui_textinput_t {
         ui_widget_t *caret;           /**< 文本插入符 */
         bool is_read_only;            /**< 是否只读 */
         bool is_multiline_mode;       /**< 是否为多行模式 */
-        bool is_placeholder_shown;    /**< 是否已经显示占位符 */
+        bool placeholder_visible;     /**< 是否已经显示占位符 */
         wchar_t *allow_input_char;    /**< 允许输入的字符 */
         wchar_t password_char;        /**< 屏蔽符的副本 */
         size_t text_block_size;       /**< 块大小 */
@@ -129,7 +129,7 @@ static void ui_textinput_update_caret(ui_widget_t *widget)
         float scale = ui_metrics.scale;
         float x, y, caret_x = 0, caret_y = 0;
 
-        if (!edit->is_placeholder_shown) {
+        if (!edit->placeholder_visible) {
                 pd_pos_t pos;
                 if (pd_text_get_insert_pixel_position(edit->layer, &pos) != 0) {
                         return;
@@ -170,7 +170,7 @@ static void ui_textinput_update_caret(ui_widget_t *widget)
         offset_y = y_iround((y - caret_y) * scale);
         if (pd_text_set_offset(edit->layer, offset_x, offset_y)) {
                 edit->tasks[TASK_UPDATE] = TRUE;
-                ui_widget_add_task(widget, UI_TASK_USER);
+                ui_widget_request_update(widget);
         }
         x += widget->computed_style.padding_left;
         y += widget->computed_style.padding_top;
@@ -186,7 +186,7 @@ static void ui_textinput_update_caret(ui_widget_t *widget)
 void ui_textinput_move_caret(ui_widget_t *widget, int row, int col)
 {
         ui_textinput_t *edit = ui_widget_get_data(widget, ui_textinput_proto);
-        if (edit->is_placeholder_shown) {
+        if (edit->placeholder_visible) {
                 row = col = 0;
         }
         pd_text_set_insert_position(edit->layer, row, col);
@@ -276,13 +276,14 @@ static int ui_textinput_add_textblock(ui_widget_t *widget, const wchar_t *wtext,
                 /* 添加文本块至缓冲区 */
                 list_append(&edit->text_blocks, block);
         }
-        edit->tasks[TASK_SET_TEXT] = TRUE;
-        ui_widget_add_task(widget, UI_TASK_USER);
+        edit->tasks[TASK_SET_TEXT] = true;
+        ui_widget_request_update(widget);
         return 0;
 }
 
 /** 更新文本框内的字体位图 */
-static void TextEdit_ProcTextBlock(ui_widget_t *widget, textblock_t *txtblk)
+static void textinput_process_textblock(ui_widget_t *widget,
+                                        textblock_t *txtblk)
 {
         list_t *tags;
         ui_textinput_t *edit;
@@ -327,7 +328,7 @@ static void TextEdit_ProcTextBlock(ui_widget_t *widget, textblock_t *txtblk)
 }
 
 /** 更新文本框的文本图层 */
-static void TextEdit_UpdateTextLayer(ui_widget_t *w)
+static void textinput_update_textlayer(ui_widget_t *w)
 {
         float scale;
         list_t rects;
@@ -355,48 +356,44 @@ static void TextEdit_UpdateTextLayer(ui_widget_t *w)
         pd_rects_clear(&rects);
 }
 
-static void ui_textinput_on_task(ui_widget_t *widget, int task)
+static void ui_textinput_update(ui_widget_t *w)
 {
+        ui_textinput_t *edit = ui_widget_get_data(w, ui_textinput_proto);
+        bool placeholder_visible = edit->layer_source->length == 0;
+
+        if (placeholder_visible) {
+                edit->layer = edit->layer_placeholder;
+        } else if (edit->password_char) {
+                edit->layer = edit->layer_mask;
+        } else {
+                edit->layer = edit->layer_source;
+        }
+        textinput_update_textlayer(w);
+        if (edit->placeholder_visible != placeholder_visible) {
+                ui_widget_mark_dirty_rect(w, NULL, UI_BOX_TYPE_PADDING_BOX);
+        }
+        edit->placeholder_visible = placeholder_visible;
+        ui_textinput_update_caret(w);
+}
+
+static void ui_textinput_update_text(ui_widget_t *widget)
+{
+        list_t blocks;
+        list_node_t *node;
+        ui_event_t ev;
         ui_textinput_t *edit = ui_widget_get_data(widget, ui_textinput_proto);
 
-        if (edit->tasks[TASK_SET_TEXT]) {
-                list_t blocks;
-                list_node_t *node;
-                ui_event_t ev;
-
-                list_create(&blocks);
-                thread_mutex_lock(&edit->mutex);
-                list_concat(&blocks, &edit->text_blocks);
-                thread_mutex_unlock(&edit->mutex);
-                for (list_each(node, &blocks)) {
-                        TextEdit_ProcTextBlock(widget, node->data);
-                }
-                list_destroy(&blocks,
-                             (list_item_destructor_t)textblock_destroy);
-                ui_event_init(&ev, "change");
-                ui_widget_emit_event(widget, ev, NULL);
-                edit->tasks[TASK_SET_TEXT] = FALSE;
-                edit->tasks[TASK_UPDATE] = TRUE;
+        list_create(&blocks);
+        thread_mutex_lock(&edit->mutex);
+        list_concat(&blocks, &edit->text_blocks);
+        thread_mutex_unlock(&edit->mutex);
+        for (list_each(node, &blocks)) {
+                textinput_process_textblock(widget, node->data);
         }
-        if (edit->tasks[TASK_UPDATE]) {
-                bool is_shown;
-                is_shown = edit->layer_source->length == 0;
-                if (is_shown) {
-                        edit->layer = edit->layer_placeholder;
-                } else if (edit->password_char) {
-                        edit->layer = edit->layer_mask;
-                } else {
-                        edit->layer = edit->layer_source;
-                }
-                TextEdit_UpdateTextLayer(widget);
-                if (edit->is_placeholder_shown != is_shown) {
-                        ui_widget_mark_dirty_rect(widget, NULL,
-                                                  UI_BOX_TYPE_PADDING_BOX);
-                }
-                edit->is_placeholder_shown = is_shown;
-                edit->tasks[TASK_UPDATE] = FALSE;
-                ui_textinput_update_caret(widget);
-        }
+        list_destroy(&blocks,
+                        (list_item_destructor_t)textblock_destroy);
+        ui_event_init(&ev, "change");
+        ui_widget_emit_event(widget, ev, NULL);
 }
 
 static void ui_textinput_on_resize(ui_widget_t *w, float width, float height)
@@ -511,7 +508,7 @@ void ui_textinput_clear_text(ui_widget_t *widget)
         pd_text_empty(edit->layer_source);
         pd_style_tags_clear(&edit->text_tags);
         edit->tasks[TASK_UPDATE] = TRUE;
-        ui_widget_add_task(widget, UI_TASK_USER);
+        ui_widget_request_update(widget);
         thread_mutex_unlock(&edit->mutex);
         ui_widget_mark_dirty_rect(widget, NULL, UI_BOX_TYPE_PADDING_BOX);
 }
@@ -559,8 +556,8 @@ void ui_textinput_set_password_char(ui_widget_t *w, wchar_t ch)
         ui_textinput_t *edit = ui_widget_get_data(w, ui_textinput_proto);
 
         edit->password_char = ch;
-        edit->tasks[TASK_UPDATE] = TRUE;
-        ui_widget_add_task(w, UI_TASK_USER);
+        edit->tasks[TASK_UPDATE] = true;
+        ui_widget_request_update(w);
         pd_text_empty(edit->layer_mask);
         if (!edit->password_char) {
                 edit->layer = edit->layer_source;
@@ -593,7 +590,7 @@ int ui_textinput_set_placeholder_w(ui_widget_t *w, const wchar_t *wstr)
         thread_mutex_lock(&edit->mutex);
         pd_text_empty(edit->layer_placeholder);
         thread_mutex_unlock(&edit->mutex);
-        if (edit->is_placeholder_shown) {
+        if (edit->placeholder_visible) {
                 ui_widget_mark_dirty_rect(w, NULL, UI_BOX_TYPE_PADDING_BOX);
         }
         return ui_textinput_add_textblock(w, wstr, TEXTBLOCK_ACTION_INSERT,
@@ -663,8 +660,8 @@ static void ui_textinput_on_press_backspace_key(ui_widget_t *widget, int n_ch)
                 pd_text_backspace(edit->layer_mask, n_ch);
         }
         ui_textcaret_refresh(edit->caret);
-        edit->tasks[TASK_UPDATE] = TRUE;
-        ui_widget_add_task(widget, UI_TASK_USER);
+        edit->tasks[TASK_UPDATE] = true;
+        ui_widget_request_update(widget);
         thread_mutex_unlock(&edit->mutex);
         ui_event_init(&ev, "change");
         ui_widget_emit_event(widget, ev, NULL);
@@ -682,8 +679,8 @@ static void ui_textinput_on_press_delete_key(ui_widget_t *widget, int n_ch)
                 pd_text_delete(edit->layer_mask, n_ch);
         }
         ui_textcaret_refresh(edit->caret);
-        edit->tasks[TASK_UPDATE] = TRUE;
-        ui_widget_add_task(widget, UI_TASK_USER);
+        edit->tasks[TASK_UPDATE] = true;
+        ui_widget_request_update(widget);
         thread_mutex_unlock(&edit->mutex);
         ui_event_init(&ev, "change");
         ui_widget_emit_event(widget, ev, NULL);
@@ -840,7 +837,7 @@ static void ui_textinput_on_mousemove(ui_widget_t *w, ui_event_t *e, void *arg)
         float offset_x, offset_y;
         ui_textinput_t *edit = ui_widget_get_data(w, ui_textinput_proto);
 
-        if (edit->is_placeholder_shown) {
+        if (edit->placeholder_visible) {
                 ui_textinput_update_caret(w);
                 return;
         }
@@ -895,7 +892,7 @@ static void ui_textinput_on_init(ui_widget_t *w)
         edit->is_read_only = FALSE;
         edit->password_char = 0;
         edit->allow_input_char = NULL;
-        edit->is_placeholder_shown = FALSE;
+        edit->placeholder_visible = FALSE;
         edit->is_multiline_mode = FALSE;
         edit->layer_mask = pd_text_create();
         edit->layer_source = pd_text_create();
@@ -992,8 +989,30 @@ static void ui_textinput_on_update_style(ui_widget_t *w)
         ui_text_style_destroy(&edit->style);
         pd_text_style_destroy(&text_style);
         edit->style = style;
-        edit->tasks[TASK_UPDATE] = TRUE;
-        ui_widget_add_task(w, UI_TASK_USER);
+        edit->tasks[TASK_UPDATE] = true;
+}
+
+static void ui_textinput_on_update(ui_widget_t *w, ui_task_type_t task)
+{
+        ui_textinput_t *edit = ui_widget_get_data(w, ui_textinput_proto);
+
+        switch (task) {
+        case UI_TASK_UPDATE_STYLE:
+                ui_textinput_on_update_style(w);
+                break;
+        case UI_TASK_AFTER_UPDATE:
+                if (edit->tasks[TASK_SET_TEXT]) {
+                        ui_textinput_update_text(w);
+                        edit->tasks[TASK_SET_TEXT] = false;
+                        edit->tasks[TASK_UPDATE] = true;
+                }
+                if (edit->tasks[TASK_UPDATE]) {
+                        ui_textinput_update(w);
+                        edit->tasks[TASK_UPDATE] = false;
+                }
+        default:
+                break;
+        }
 }
 
 void ui_register_textinput(void)
@@ -1006,7 +1025,6 @@ void ui_register_textinput(void)
         ui_textinput_proto->setattr = ui_textinput_on_set_attr;
         ui_textinput_proto->autosize = ui_textinput_on_auto_size;
         ui_textinput_proto->resize = ui_textinput_on_resize;
-        ui_textinput_proto->runtask = ui_textinput_on_task;
-        ui_textinput_proto->update = ui_textinput_on_update_style;
+        ui_textinput_proto->update = ui_textinput_on_update;
         ui_load_css_string(ui_textinput_css, __FILE__);
 }

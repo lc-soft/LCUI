@@ -27,13 +27,14 @@ void ui_style_diff_init(ui_style_diff_t *diff, ui_widget_t *w)
                 if (!ui_widget_is_visible(w->parent)) {
                         return;
                 }
-                if (w->parent->dirty_rect_type == UI_DIRTY_RECT_TYPE_FULL) {
-                        w->dirty_rect_type = UI_DIRTY_RECT_TYPE_FULL;
+                if (w->parent->rendering.dirty_rect_type ==
+                    UI_DIRTY_RECT_TYPE_FULL) {
+                        w->rendering.dirty_rect_type = UI_DIRTY_RECT_TYPE_FULL;
                         return;
                 }
         }
         if (w->state < UI_WIDGET_STATE_LAYOUTED) {
-                w->dirty_rect_type = UI_DIRTY_RECT_TYPE_FULL;
+                w->rendering.dirty_rect_type = UI_DIRTY_RECT_TYPE_FULL;
         }
         diff->should_add_dirty_rect = true;
 }
@@ -58,7 +59,7 @@ void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w)
                                 IS_PROP_TYPE_CHANGED(justify_content) ||
                                 IS_PROP_TYPE_CHANGED(align_content) ||
                                 IS_PROP_TYPE_CHANGED(align_items)))) {
-                ui_widget_add_task(w, UI_TASK_REFLOW);
+                ui_widget_request_reflow(w);
         }
         if (w->parent && ui_widget_in_layout_flow(w)) {
                 if (layout_changed || IS_LENGTH_PROP_CHANGED(margin_left) ||
@@ -69,7 +70,7 @@ void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w)
                      (IS_PROP_TYPE_CHANGED(flex_grow) ||
                       IS_PROP_TYPE_CHANGED(flex_shrink) ||
                       IS_PROP_TYPE_CHANGED(flex_basis)))) {
-                        ui_widget_add_task(w->parent, UI_TASK_REFLOW);
+                        ui_widget_request_reflow(w->parent);
                 }
         }
         if (ui_widget_is_visible(w) != diff->visible) {
@@ -78,12 +79,12 @@ void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w)
                         record = ui_mutation_record_create(
                             w, UI_MUTATION_RECORD_TYPE_PROPERTIES);
                         record->property_name = strdup2("visible");
-                        ui_widget_add_mutation_recrod(w, record);
+                        ui_widget_add_mutation_record(w, record);
                         ui_mutation_record_destroy(record);
                 }
                 if (diff->should_add_dirty_rect) {
-                        w->dirty_rect_type = UI_DIRTY_RECT_TYPE_FULL;
-                        w->dirty_rect = diff->canvas_box;
+                        w->rendering.dirty_rect_type = UI_DIRTY_RECT_TYPE_FULL;
+                        w->rendering.dirty_rect = diff->canvas_box;
                         ui_widget_expose_dirty_rect(w);
                 }
                 return;
@@ -120,7 +121,7 @@ void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w)
             IS_PROP_VALUE_CHANGED(background_position_y) ||
             IS_PROP_VALUE_CHANGED(background_width) ||
             IS_PROP_VALUE_CHANGED(background_height)) {
-                w->dirty_rect_type = UI_DIRTY_RECT_TYPE_FULL;
+                w->rendering.dirty_rect_type = UI_DIRTY_RECT_TYPE_FULL;
                 ui_widget_expose_dirty_rect(w);
         }
 }

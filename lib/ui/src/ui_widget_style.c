@@ -133,9 +133,9 @@ size_t ui_widget_get_children_style_changes(ui_widget_t *w, int type,
 void ui_widget_update_children_style(ui_widget_t *w)
 {
         list_node_t *node;
-        w->update.for_children = true;
+        w->update.should_update_children = true;
         for (list_each(node, &w->children)) {
-                ui_widget_update_style(node->data);
+                ui_widget_request_update_style(node->data);
                 ui_widget_update_children_style(node->data);
         }
 }
@@ -143,9 +143,9 @@ void ui_widget_update_children_style(ui_widget_t *w)
 void ui_widget_refresh_children_style(ui_widget_t *w)
 {
         list_node_t *node;
-        w->update.for_children = true;
+        w->update.should_update_children = true;
         for (list_each(node, &w->children)) {
-                ui_widget_refresh_style(node->data);
+                ui_widget_request_refresh_style(node->data);
                 ui_widget_refresh_children_style(node->data);
         }
 }
@@ -173,7 +173,7 @@ void ui_widget_set_style(ui_widget_t *w, int key,
                 w->custom_style = css_style_decl_create();
                 css_style_decl_add(w->custom_style, key, value);
         }
-        ui_widget_update_style(w);
+        ui_widget_request_update_style(w);
 }
 
 int ui_widget_unset_style(ui_widget_t *w, int key)
@@ -181,7 +181,7 @@ int ui_widget_unset_style(ui_widget_t *w, int key)
         if (!w->custom_style) {
                 return -1;
         }
-        ui_widget_update_style(w);
+        ui_widget_request_update_style(w);
         return css_style_decl_remove(w->custom_style, key);
 }
 
@@ -374,19 +374,6 @@ void ui_widget_force_update_style(ui_widget_t *w)
         ui_widget_compute_style(w);
         ui_widget_update_box_size(w);
         ui_widget_update_box_position(w);
-        if (w->proto && w->proto->update) {
-                /* 扩展部分的样式交给该部件自己处理 */
-                w->proto->update(w);
-        }
-}
-
-void ui_widget_force_refresh_style(ui_widget_t *w)
-{
-        ui_widget_force_update_style(w);
-        /* 刷新该部件的相关数据 */
-        if (w->proto && w->proto->refresh) {
-                w->proto->refresh(w);
-        }
 }
 
 void ui_widget_destroy_style(ui_widget_t *w)

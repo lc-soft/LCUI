@@ -61,9 +61,9 @@ static bool parse_boolean(const char *str)
 {
         if (strcmp(str, "on") == 0 && strcmp(str, "true") == 0 &&
             strcmp(str, "yes") == 0 && strcmp(str, "1") == 0) {
-                return TRUE;
+                return true;
         }
-        return FALSE;
+        return false;
 }
 
 static void ui_text_on_parse_attr(ui_widget_t *w, const char *name,
@@ -91,15 +91,13 @@ static void ui_text_on_parse_text(ui_widget_t *w, const char *text)
         ui_text_set_content(w, text);
 }
 
-static void ui_text_on_update(ui_widget_t *w)
+static void ui_text_on_update_content(ui_widget_t *w)
 {
-        float scale = ui_metrics.scale;
-
-        ui_rect_t rect;
-        ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
-
         list_t rects;
         list_node_t *node;
+        ui_rect_t rect;
+        ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
+        float scale = ui_metrics.scale;
 
         list_create(&rects);
         pd_text_update(txt->layer, &rects);
@@ -108,7 +106,7 @@ static void ui_text_on_update(ui_widget_t *w)
                 ui_widget_mark_dirty_rect(w, &rect, UI_BOX_TYPE_CONTENT_BOX);
         }
         pd_rects_clear(&rects);
-        ui_widget_add_task(w, UI_TASK_REFLOW);
+        ui_widget_request_reflow(w);
 }
 
 static void ui_text_on_update_style(ui_widget_t *w)
@@ -116,6 +114,7 @@ static void ui_text_on_update_style(ui_widget_t *w)
         ui_text_style_t style;
         pd_text_style_t text_style;
         ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
+        bool content_changed;
 
         ui_text_style_init(&style);
         ui_compute_text_style(&style, &w->computed_style);
@@ -123,6 +122,7 @@ static void ui_text_on_update_style(ui_widget_t *w)
                 ui_text_style_destroy(&style);
                 return;
         }
+        content_changed = (!txt->style.content != !style.content);
         convert_font_style_to_text_style(&style, &text_style);
         pd_text_set_align(txt->layer, style.text_align);
         pd_text_set_line_height(txt->layer, style.line_height);
@@ -132,16 +132,34 @@ static void ui_text_on_update_style(ui_widget_t *w)
                                style.word_break == CSS_WORD_BREAK_BREAK_ALL
                                    ? PD_WORD_BREAK_BREAK_ALL
                                    : PD_WORD_BREAK_NORMAL);
-        pd_text_set_style(txt->layer, &text_style);
-        if (style.content) {
+        if (content_changed) {
                 ui_text_set_content_w(w, style.content);
-        } else if (txt->style.content) {
-                ui_text_set_content_w(w, NULL);
         }
+        pd_text_set_style(txt->layer, &text_style);
         ui_text_style_destroy(&txt->style);
         pd_text_style_destroy(&text_style);
         txt->style = style;
-        ui_text_on_update(w);
+}
+
+static void ui_text_on_update(ui_widget_t *w, ui_task_type_t task)
+{
+        ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
+
+        switch (task) {
+        case UI_TASK_UPDATE_STYLE:
+                ui_text_on_update_style(w);
+                break;
+        case UI_TASK_AFTER_UPDATE:
+                if (txt->task.update_content) {
+                        pd_text_write(txt->layer, txt->task.content, NULL);
+                        ui_text_on_update_content(w);
+                        free(txt->task.content);
+                        txt->task.content = NULL;
+                        txt->task.update_content = false;
+                }
+        default:
+                break;
+        }
 }
 
 static void ui_text_on_init(ui_widget_t *w)
@@ -150,14 +168,14 @@ static void ui_text_on_init(ui_widget_t *w)
 
         txt = ui_widget_add_data(w, ui_text.prototype, sizeof(ui_text_t));
         txt->widget = w;
-        txt->task.update_content = FALSE;
+        txt->task.update_content = false;
         txt->task.content = NULL;
         txt->content = NULL;
-        txt->trimming = TRUE;
+        txt->trimming = true;
         txt->layer = pd_text_create();
-        pd_text_set_autowrap(txt->layer, TRUE);
-        pd_text_set_multiline(txt->layer, TRUE);
-        pd_text_set_style_tag(txt->layer, TRUE);
+        pd_text_set_autowrap(txt->layer, true);
+        pd_text_set_multiline(txt->layer, true);
+        pd_text_set_style_tag(txt->layer, true);
         ui_text_style_init(&txt->style);
         txt->node.data = txt;
         txt->node.prev = txt->node.next = NULL;
@@ -226,7 +244,6 @@ static void ui_text_on_resize(ui_widget_t *w, float width, float height)
 
         ui_rect_t rect;
         ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
-        ;
 
         list_t rects;
         list_node_t *node;
@@ -274,6 +291,9 @@ int ui_text_set_content_w(ui_widget_t *w, const wchar_t *text)
         ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
         wchar_t *newtext = wcsdup2(text);
 
+        if (ui_widget_has_class(w, "fui-icon-regular")) {
+                _DEBUG_MSG("set content\n");
+        }
         if (!newtext) {
                 return -ENOMEM;
         }
@@ -301,9 +321,9 @@ int ui_text_set_content_w(ui_widget_t *w, const wchar_t *text)
         if (txt->task.content) {
                 free(txt->task.content);
         }
-        txt->task.update_content = TRUE;
+        txt->task.update_content = true;
         txt->task.content = newtext;
-        ui_widget_add_task(w, UI_TASK_USER);
+        ui_widget_request_update(w);
         return 0;
 }
 
@@ -327,7 +347,7 @@ void ui_text_set_multiline(ui_widget_t *w, bool enable)
         ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
 
         pd_text_set_multiline(txt->layer, enable);
-        ui_widget_add_task(w, UI_TASK_USER);
+        ui_widget_request_update(w);
 }
 
 static void text_on_font_face_load(ui_widget_t *w, ui_event_t *e, void *arg)
@@ -338,23 +358,8 @@ static void text_on_font_face_load(ui_widget_t *w, ui_event_t *e, void *arg)
         for (list_each(node, &ui_text.list)) {
                 txt = node->data;
                 if (txt->widget->state != UI_WIDGET_STATE_DELETED) {
-                        ui_widget_refresh_style(txt->widget);
+                        ui_widget_request_refresh_style(txt->widget);
                 }
-        }
-}
-
-static void ui_text_on_run_rask(ui_widget_t *w, int task)
-{
-        ui_text_t *txt;
-
-        txt = ui_widget_get_data(w, ui_text.prototype);
-        if (txt->task.update_content) {
-                pd_text_write(txt->layer, txt->task.content, NULL);
-                ui_text_on_update(w);
-                free(txt->task.content);
-                txt->task.content = NULL;
-                txt->task.update_content = FALSE;
-                ui_widget_add_task(w->parent, UI_TASK_REFLOW);
         }
 }
 
@@ -366,10 +371,9 @@ void ui_register_text(void)
         ui_text.prototype->destroy = ui_text_on_destroy;
         ui_text.prototype->autosize = ui_text_on_auto_size;
         ui_text.prototype->resize = ui_text_on_resize;
-        ui_text.prototype->update = ui_text_on_update_style;
+        ui_text.prototype->update = ui_text_on_update;
         ui_text.prototype->settext = ui_text_on_parse_text;
         ui_text.prototype->setattr = ui_text_on_parse_attr;
-        ui_text.prototype->runtask = ui_text_on_run_rask;
         list_create(&ui_text.list);
         ui_on_event("font_face_load", text_on_font_face_load, NULL);
 }
