@@ -10,6 +10,10 @@ static void widget_default_method(ui_widget_t *w)
 {
 }
 
+static void widget_default_update(ui_widget_t *w, ui_task_type_t task)
+{
+}
+
 static void widget_default_attr_setter(ui_widget_t *w, const char *name,
 				       const char *value)
 {
@@ -29,10 +33,6 @@ static void widget_default_size_setter(ui_widget_t *w, float width,
 {
 }
 
-static void widget_default_task_handler(ui_widget_t *w, int task)
-{
-}
-
 static void widget_default_painter(ui_widget_t *w, pd_context_t *paint,
 				   ui_widget_actual_style_t *style)
 {
@@ -41,10 +41,8 @@ static void widget_default_painter(ui_widget_t *w, pd_context_t *paint,
 static ui_widget_prototype_t ui_default_widget_prototype = {
 	.name = NULL,
 	.init = widget_default_method,
-	.refresh = widget_default_method,
 	.destroy = widget_default_method,
-	.update = widget_default_method,
-	.runtask = widget_default_task_handler,
+	.update = widget_default_update,
 	.setattr = widget_default_attr_setter,
 	.settext = widget_default_text_setter,
 	.autosize = widget_default_size_getter,

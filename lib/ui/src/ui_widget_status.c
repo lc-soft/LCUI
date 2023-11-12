@@ -9,7 +9,7 @@ static void ui_widget_refresh_children_by_status(ui_widget_t* w)
 	if (w->extra && w->extra->rules.ignore_status_change) {
 		return;
 	}
-	ui_widget_add_task(w, UI_TASK_REFRESH_STYLE);
+	ui_widget_request_refresh_style(w);
 	for (list_each(node, &w->children)) {
 		ui_widget_refresh_children_by_status(node->data);
 	}
@@ -17,7 +17,7 @@ static void ui_widget_refresh_children_by_status(ui_widget_t* w)
 
 static int ui_wdiget_handle_status_change(ui_widget_t* w, const char *name)
 {
-	ui_widget_refresh_style(w);
+	ui_widget_request_refresh_style(w);
 	if (w->state < UI_WIDGET_STATE_READY || w->state == UI_WIDGET_STATE_DELETED) {
 		return 1;
 	}

@@ -26,19 +26,19 @@ int ui_widget_append(ui_widget_t* parent, ui_widget_t* widget)
 	widget->parent = parent;
 	widget->state = UI_WIDGET_STATE_CREATED;
 	widget->index = parent->children.length;
-	widget->parent->update.for_children = true;
+	widget->parent->update.should_update_children = true;
 	list_append_node(&parent->children, &widget->node);
 	ev.cancel_bubble = true;
 	ev.type = UI_EVENT_LINK;
-	ui_widget_refresh_style(widget);
+	ui_widget_request_refresh_style(widget);
 	ui_widget_refresh_children_style(widget);
 	ui_widget_emit_event(widget, ev, NULL);
 	ui_widget_update_status(widget);
-	ui_widget_add_task(parent, UI_TASK_REFLOW);
+	ui_widget_request_reflow(parent);
 	if (ui_widget_has_observer(parent, TYPE_CHILD_LIST)) {
 		record = ui_mutation_record_create(widget, TYPE_CHILD_LIST);
 		list_append(&record->added_widgets, widget);
-		ui_widget_add_mutation_recrod(parent, record);
+		ui_widget_add_mutation_record(parent, record);
 		ui_mutation_record_destroy(record);
 	}
 	return 0;
@@ -62,7 +62,7 @@ int ui_widget_prepend(ui_widget_t* parent, ui_widget_t* widget)
 	widget->index = 0;
 	widget->parent = parent;
 	widget->state = UI_WIDGET_STATE_CREATED;
-	widget->parent->update.for_children = true;
+	widget->parent->update.should_update_children = true;
 	node = &widget->node;
 	list_insert_node(&parent->children, 0, node);
 	/** 修改它后面的部件的 index 值 */
@@ -75,13 +75,13 @@ int ui_widget_prepend(ui_widget_t* parent, ui_widget_t* widget)
 	ev.cancel_bubble = true;
 	ev.type = UI_EVENT_LINK;
 	ui_widget_emit_event(widget, ev, NULL);
-	ui_widget_add_task_for_children(widget, UI_TASK_REFRESH_STYLE);
+	ui_widget_request_refresh_children(widget);
 	ui_widget_update_status(widget);
-	ui_widget_add_task(parent, UI_TASK_REFLOW);
+	ui_widget_request_reflow(parent);
 	if (ui_widget_has_observer(parent, TYPE_CHILD_LIST)) {
 		record = ui_mutation_record_create(widget, TYPE_CHILD_LIST);
 		list_append(&record->added_widgets, widget);
-		ui_widget_add_mutation_recrod(parent, record);
+		ui_widget_add_mutation_record(parent, record);
 		ui_mutation_record_destroy(record);
 	}
 	return 0;
@@ -104,7 +104,7 @@ int ui_widget_unwrap(ui_widget_t* w)
 		for (list_each(node, &w->children)) {
 			list_append(&record->removed_widgets, node->data);
 		}
-		ui_widget_add_mutation_recrod(w, record);
+		ui_widget_add_mutation_record(w, record);
 		ui_mutation_record_destroy(record);
 	}
 	if (ui_widget_has_observer(w->parent, TYPE_CHILD_LIST)) {
@@ -112,7 +112,7 @@ int ui_widget_unwrap(ui_widget_t* w)
 		for (list_each(node, &w->children)) {
 			list_append(&record->added_widgets, node->data);
 		}
-		ui_widget_add_mutation_recrod(w->parent, record);
+		ui_widget_add_mutation_record(w->parent, record);
 		ui_mutation_record_destroy(record);
 	}
 	children = &w->parent->children;
@@ -139,7 +139,7 @@ int ui_widget_unwrap(ui_widget_t* w)
 		child->parent = w->parent;
 		ev.type = UI_EVENT_LINK;
 		ui_widget_emit_event(child, ev, NULL);
-		ui_widget_add_task_for_children(child, UI_TASK_REFRESH_STYLE);
+		ui_widget_request_refresh_children(child);
 		node = prev;
 		--len;
 	}
@@ -192,11 +192,11 @@ int ui_widget_unlink(ui_widget_t* w)
 	ui_widget_emit_event(w, ev, NULL);
 	list_unlink(&w->parent->children, node);
 	list_unlink(&w->parent->stacking_context, &w->node_show);
-	ui_widget_add_task(w->parent, UI_TASK_REFLOW);
+	ui_widget_request_reflow(w->parent);
 	if (ui_widget_has_observer(w->parent, TYPE_CHILD_LIST)) {
 		record = ui_mutation_record_create(w->parent, TYPE_CHILD_LIST);
 		list_append(&record->removed_widgets, w->parent);
-		ui_widget_add_mutation_recrod(w->parent, record);
+		ui_widget_add_mutation_record(w->parent, record);
 		ui_mutation_record_destroy(record);
 	}
 	w->parent = NULL;
@@ -216,7 +216,7 @@ void ui_widget_empty(ui_widget_t* w)
 		for (list_each(node, &w->children)) {
 			list_append(&record->removed_widgets, node->data);
 		}
-		ui_widget_add_mutation_recrod(w, record);
+		ui_widget_add_mutation_record(w, record);
 		ui_mutation_record_destroy(record);
 	}
 	while ((node = list_get_first_node(&w->children)) != NULL) {
@@ -227,7 +227,7 @@ void ui_widget_empty(ui_widget_t* w)
 	}
 	list_destroy_without_node(&w->stacking_context, NULL);
 	ui_widget_mark_dirty_rect(w, NULL, UI_BOX_TYPE_GRAPH_BOX);
-	ui_widget_refresh_style(w);
+	ui_widget_request_refresh_style(w);
 }
 
 void ui_widget_remove(ui_widget_t* w)
@@ -248,7 +248,7 @@ void ui_widget_remove(ui_widget_t* w)
 		node = node->next;
 	}
 	if (w->computed_style.type_bits.position != CSS_POSITION_ABSOLUTE) {
-		ui_widget_add_task(w->parent, UI_TASK_REFLOW);
+		ui_widget_request_reflow(w->parent);
 	}
 	ui_widget_mark_dirty_rect(w->parent, &w->canvas_box,
 				  UI_BOX_TYPE_CONTENT_BOX);

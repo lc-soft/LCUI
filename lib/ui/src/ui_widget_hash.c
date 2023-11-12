@@ -32,9 +32,6 @@ void ui_widget_generate_self_hash(ui_widget_t* widget)
 				hash = strhash(hash, w->status[i]);
 			}
 		}
-		if (w->extra && w->extra->rules.cache_children_style) {
-			break;
-		}
 	}
 	widget->hash = hash;
 }

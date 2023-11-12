@@ -56,8 +56,8 @@ static void check_widget_opactiy(void)
 
 	ui_widget_set_style_string(self.parent, "opacity", "0.8");
 	ui_widget_resize(self.parent, 512, 256);
-	ui_widget_refresh_style(self.child);
-	ui_widget_refresh_style(self.parent);
+	ui_widget_request_refresh_style(self.child);
+	ui_widget_request_refresh_style(self.parent);
 	ui_widget_update(self.child);
 	ui_widget_update(self.parent);
 	ui_widget_render(self.parent, &paint);

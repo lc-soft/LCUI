@@ -95,7 +95,7 @@ static bool ui_widget_has_round_border(ui_widget_t *w)
 void ui_widget_expose_dirty_rect(ui_widget_t *w)
 {
         while (w->parent) {
-                w->parent->has_child_dirty_rect = true;
+                w->parent->rendering.has_child_dirty_rect = true;
                 w = w->parent;
         }
 }
@@ -109,7 +109,7 @@ bool ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
                 return false;
         }
         if (in_rect) {
-                if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_FULL) {
+                if (w->rendering.dirty_rect_type == UI_DIRTY_RECT_TYPE_FULL) {
                         return false;
                 }
                 rect = *in_rect;
@@ -138,14 +138,14 @@ bool ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
                         rect.y += w->content_box.y - w->canvas_box.y;
                         break;
                 }
-                if (w->dirty_rect_type > UI_DIRTY_RECT_TYPE_NONE) {
-                        ui_rect_merge(&w->dirty_rect, &rect, &w->dirty_rect);
+                if (w->rendering.dirty_rect_type > UI_DIRTY_RECT_TYPE_NONE) {
+                        ui_rect_merge(&w->rendering.dirty_rect, &rect, &w->rendering.dirty_rect);
                 } else {
-                        w->dirty_rect = rect;
+                        w->rendering.dirty_rect = rect;
                 }
-                w->dirty_rect_type = UI_DIRTY_RECT_TYPE_CUSTOM;
+                w->rendering.dirty_rect_type = UI_DIRTY_RECT_TYPE_CUSTOM;
         } else {
-                w->dirty_rect_type = UI_DIRTY_RECT_TYPE_FULL;
+                w->rendering.dirty_rect_type = UI_DIRTY_RECT_TYPE_FULL;
         }
         ui_widget_expose_dirty_rect(w);
         return true;
@@ -159,15 +159,16 @@ static void ui_widget_collect_dirty_rect(ui_widget_t *w, list_t *rects, float x,
         list_node_t *node;
 
         do {
-                if (w->parent &&
-                    w->parent->dirty_rect_type == UI_DIRTY_RECT_TYPE_FULL) {
-                        w->dirty_rect_type = UI_DIRTY_RECT_TYPE_FULL;
+                if (w->parent && w->parent->rendering.dirty_rect_type ==
+                                     UI_DIRTY_RECT_TYPE_FULL) {
+                        w->rendering.dirty_rect_type = UI_DIRTY_RECT_TYPE_FULL;
                         break;
                 }
-                if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_FULL) {
+                if (w->rendering.dirty_rect_type == UI_DIRTY_RECT_TYPE_FULL) {
                         rect = w->canvas_box;
-                } else if (w->dirty_rect_type == UI_DIRTY_RECT_TYPE_CUSTOM) {
-                        rect = w->dirty_rect;
+                } else if (w->rendering.dirty_rect_type ==
+                           UI_DIRTY_RECT_TYPE_CUSTOM) {
+                        rect = w->rendering.dirty_rect;
                         rect.x += w->canvas_box.x;
                         rect.y += w->canvas_box.y;
                 } else {
@@ -182,7 +183,7 @@ static void ui_widget_collect_dirty_rect(ui_widget_t *w, list_t *rects, float x,
                         list_append(rects, actual_rect);
                 }
         } while (0);
-        if (w->has_child_dirty_rect) {
+        if (w->rendering.has_child_dirty_rect) {
                 visible_area.x -= x;
                 visible_area.y -= y;
                 ui_rect_overlap(&visible_area, &w->padding_box, &visible_area);
@@ -194,8 +195,8 @@ static void ui_widget_collect_dirty_rect(ui_widget_t *w, list_t *rects, float x,
                             y + w->padding_box.y, visible_area);
                 }
         }
-        w->dirty_rect_type = UI_DIRTY_RECT_TYPE_NONE;
-        w->has_child_dirty_rect = false;
+        w->rendering.dirty_rect_type = UI_DIRTY_RECT_TYPE_NONE;
+        w->rendering.has_child_dirty_rect = false;
 }
 
 size_t ui_widget_get_dirty_rects(ui_widget_t *w, list_t *rects)

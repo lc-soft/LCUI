@@ -43,7 +43,7 @@ bool ui_widget_has_observer(ui_widget_t *widget, ui_mutation_record_type_t type)
         return false;
 }
 
-int ui_widget_add_mutation_recrod(ui_widget_t *widget,
+int ui_widget_add_mutation_record(ui_widget_t *widget,
                                   ui_mutation_record_t *record)
 {
         int count = 0;
