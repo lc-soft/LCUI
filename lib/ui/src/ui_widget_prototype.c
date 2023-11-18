@@ -6,48 +6,52 @@
 
 static dict_t *ui_widget_prototype_dict;
 
-static void widget_default_method(ui_widget_t *w)
+static void ui_widget_on_init(ui_widget_t *w)
 {
 }
 
-static void widget_default_update(ui_widget_t *w, ui_task_type_t task)
+static void ui_widget_on_destroy(ui_widget_t *w)
 {
 }
 
-static void widget_default_attr_setter(ui_widget_t *w, const char *name,
+static void ui_widget_on_update(ui_widget_t *w, ui_task_type_t task)
+{
+}
+
+static void ui_widget_on_set_attr(ui_widget_t *w, const char *name,
 				       const char *value)
 {
 }
 
-static void widget_default_text_setter(ui_widget_t *w, const char *text)
+static void ui_widget_on_set_text(ui_widget_t *w, const char *text)
 {
 }
 
-static void widget_default_size_getter(ui_widget_t *w, float *width,
+static void ui_widget_on_autosize(ui_widget_t *w, float *width,
 				       float *height, ui_layout_rule_t rule)
 {
 }
 
-static void widget_default_size_setter(ui_widget_t *w, float width,
+static void ui_widget_on_resize(ui_widget_t *w, float width,
 				       float height)
 {
 }
 
-static void widget_default_painter(ui_widget_t *w, pd_context_t *paint,
+static void ui_widget_on_paint(ui_widget_t *w, pd_context_t *paint,
 				   ui_widget_actual_style_t *style)
 {
 }
 
-static ui_widget_prototype_t ui_default_widget_prototype = {
+static ui_widget_prototype_t ui_widget_default_prototype = {
 	.name = NULL,
-	.init = widget_default_method,
-	.destroy = widget_default_method,
-	.update = widget_default_update,
-	.setattr = widget_default_attr_setter,
-	.settext = widget_default_text_setter,
-	.autosize = widget_default_size_getter,
-	.resize = widget_default_size_setter,
-	.paint = widget_default_painter
+	.init = ui_widget_on_init,
+	.destroy = ui_widget_on_destroy,
+	.update = ui_widget_on_update,
+	.setattr = ui_widget_on_set_attr,
+	.settext = ui_widget_on_set_text,
+	.autosize = ui_widget_on_autosize,
+	.resize = ui_widget_on_resize,
+	.paint = ui_widget_on_paint
 };
 
 static void ui_widget_prototype_dict_val_destructor(void *privdata, void *data)
@@ -74,10 +78,10 @@ ui_widget_prototype_t *ui_create_widget_prototype(const char *name,
 			*proto = *parent;
 			proto->proto = parent;
 		} else {
-			*proto = ui_default_widget_prototype;
+			*proto = ui_widget_default_prototype;
 		}
 	} else {
-		*proto = ui_default_widget_prototype;
+		*proto = ui_widget_default_prototype;
 	}
 	proto->name = strdup2(name);
 	if (dict_add(ui_widget_prototype_dict, proto->name, proto) == 0) {
@@ -93,11 +97,11 @@ ui_widget_prototype_t *ui_get_widget_prototype(const char *name)
 	ui_widget_prototype_t *proto;
 
 	if (!name) {
-		return &ui_default_widget_prototype;
+		return &ui_widget_default_prototype;
 	}
 	proto = dict_fetch_value(ui_widget_prototype_dict, name);
 	if (!proto) {
-		return &ui_default_widget_prototype;
+		return &ui_widget_default_prototype;
 	}
 	return proto;
 }
