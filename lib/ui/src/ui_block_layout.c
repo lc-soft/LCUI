@@ -175,13 +175,13 @@ static void ui_block_layout_update_item_position(ui_block_layout_context_t *ctx,
                         if (!w->parent) {
                                 break;
                         }
-                        y += (ctx->row->height - w->border_box.width) / 2.f;
+                        y += (ctx->row->height - w->border_box.height) / 2.f;
                         break;
                 case CSS_VERTICAL_ALIGN_BOTTOM:
                         if (!w->parent) {
                                 break;
                         }
-                        y += ctx->row->height - w->border_box.width;
+                        y += ctx->row->height - w->border_box.height;
                 default:
                         break;
                 }
