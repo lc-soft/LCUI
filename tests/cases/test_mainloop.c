@@ -41,7 +41,7 @@ static void ObserverThread(void *arg)
 	for (i = 0; i < 20 && !*exited; ++i) {
 		sleep_ms(100);
 	}
-	ctest_euqal_bool("main loop should exit within 2000ms", *exited, TRUE);
+	ctest_equal_bool("main loop should exit within 2000ms", *exited, TRUE);
 	if (!*exited) {
 		exit(-ctest_finish());
 		return;

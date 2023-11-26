@@ -8,7 +8,7 @@ static void test_keyword_value(const char *name, int value)
 	char str[256] = { 0 };
 
 	snprintf(str, 255, "keyword('%s').value", name);
-	ctest_euqal_int(str, css_get_keyword_key(name), value);
+	ctest_equal_int(str, css_get_keyword_key(name), value);
 }
 
 static void test_keyword_register(const char *name)
@@ -18,7 +18,7 @@ static void test_keyword_register(const char *name)
 	int b = css_get_keyword_key(name);
 
 	snprintf(str, 255, "keyword('%s')", name);
-	ctest_euqal_int(str, a, b);
+	ctest_equal_int(str, a, b);
 }
 
 void test_css_keywords(void)

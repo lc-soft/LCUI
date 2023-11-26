@@ -110,27 +110,27 @@ int ctest_bool_to_str(void *data, char *str, unsigned max_len)
 	return snprintf(str, max_len, "%s", *(bool*)data ? "true" : "false");
 }
 
-bool ctest_euqal_int(const char *name, int actual, int expected)
+bool ctest_equal_int(const char *name, int actual, int expected)
 {
 	return ctest_equal(name, ctest_int_to_str, &actual, &expected);
 }
 
-bool ctest_euqal_bool(const char *name, bool actual, bool expected)
+bool ctest_equal_bool(const char *name, bool actual, bool expected)
 {
 	return ctest_equal(name, ctest_bool_to_str, &actual, &expected);
 }
 
-bool ctest_euqal_uint(const char *name, unsigned actual, unsigned expected)
+bool ctest_equal_uint(const char *name, unsigned actual, unsigned expected)
 {
 	return ctest_equal(name, ctest_uint_to_str, &actual, &expected);
 }
 
-bool ctest_euqal_float(const char *name, float actual, float expected)
+bool ctest_equal_float(const char *name, float actual, float expected)
 {
 	return ctest_equal(name, ctest_float_to_str, &actual, &expected);
 }
 
-bool ctest_euqal_str(const char *name, const char *actual, const char *expected)
+bool ctest_equal_str(const char *name, const char *actual, const char *expected)
 {
 	return ctest_equal(name, ctest_str_to_str, (void *)actual, (void *)expected);
 }

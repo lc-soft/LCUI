@@ -1,26 +1,21 @@
 #include <LCUI.h>
 #include <ctest-custom.h>
 
-/* clang-format off */
-
-const char *test_css = css_string(
-
-.container {
-	width: 300px;
-	height: 240px;
-	padding: 10px;
-	margin: 20px auto 0 auto;
-	border: 1px solid #eee;
-}
-
-text {
-	white-space: nowrap;
-	display: inline-block;
-}
-
-);
-
-/* clang-format on */
+const char *test_css = "\
+.container {\
+	width: 300px;\
+	height: 240px;\
+	padding: 10px;\
+	margin: 20px auto 0 auto;\
+	border: 1px solid #eee;\
+}\
+\
+text {\
+	white-space: nowrap;\
+	display: inline-block;\
+}\
+\
+);";
 
 const char *test_content = "\n\
 /* ***************************************************************************\n\
@@ -57,142 +52,142 @@ const char *test_content = "\n\
 /* Build content view with native C code */
 void BuildContentView(void)
 {
-	ui_widget_t* container = ui_create_widget(NULL);
-	ui_widget_t* content = ui_create_widget("text");
-	ui_widget_t* vscrollbar = ui_create_widget("scrollbar");
-	ui_widget_t* hscrollbar = ui_create_widget("scrollbar");
+        ui_widget_t *container = ui_create_widget(NULL);
+        ui_widget_t *content = ui_create_widget("text");
+        ui_widget_t *vscrollbar = ui_create_widget("scrollbar");
+        ui_widget_t *hscrollbar = ui_create_widget("scrollbar");
 
-	ui_widget_set_id(content, "license_content");
-	ui_text_set_content(content, test_content);
-	ui_scrollbar_set_direction(hscrollbar, UI_SCROLLBAR_HORIZONTAL);
-	ui_scrollbar_bind_target(vscrollbar, content);
-	ui_scrollbar_bind_target(hscrollbar, content);
-	ui_widget_add_class(container, "container");
-	ui_widget_append(container, content);
-	ui_widget_append(container, vscrollbar);
-	ui_widget_append(container, hscrollbar);
-	ui_root_append(container);
+        ui_widget_set_id(content, "license_content");
+        ui_text_set_content(content, test_content);
+        ui_scrollbar_set_direction(hscrollbar, UI_SCROLLBAR_HORIZONTAL);
+        ui_scrollbar_bind_target(vscrollbar, content);
+        ui_scrollbar_bind_target(hscrollbar, content);
+        ui_widget_add_class(container, "container");
+        ui_widget_append(container, content);
+        ui_widget_append(container, vscrollbar);
+        ui_widget_append(container, hscrollbar);
+        ui_root_append(container);
 }
 
 /* Build content view with the XML code in test_scrollbar.xml */
 int BuildContentViewFromXML(void)
 {
-	ui_widget_t* root = ui_root();
-	ui_widget_t* pack = ui_load_xml_file("test_scrollbar.xml");
+        ui_widget_t *root = ui_root();
+        ui_widget_t *pack = ui_load_xml_file("test_scrollbar.xml");
 
-	if (!pack) {
-		return -1;
-	}
-	ui_widget_append(root, pack);
-	ui_widget_unwrap(pack);
-	return 0;
+        if (!pack) {
+                return -1;
+        }
+        ui_widget_append(root, pack);
+        ui_widget_unwrap(pack);
+        return 0;
 }
 
 void test_scrollbar(void)
 {
-	float left, top;
-	ui_event_t e = { 0 };
-	ui_widget_t* content;
+        float left, top;
+        ui_event_t e = { 0 };
+        ui_widget_t *content;
 
-	lcui_init();
-	ui_widget_resize(ui_root(), 800, 640);
-	ui_load_css_string(test_css, __FILE__);
-	BuildContentView();
-	lcui_update_ui();
+        lcui_init();
+        ui_widget_resize(ui_root(), 800, 640);
+        ui_load_css_string(test_css, __FILE__);
+        BuildContentView();
+        lcui_update_ui();
 
-	content = ui_get_widget("license_content");
-	left = content->computed_style.left;
-	top = content->computed_style.top;
+        content = ui_get_widget("license_content");
+        left = content->computed_style.left;
+        top = content->computed_style.top;
 
-	e.type = UI_EVENT_MOUSEMOVE;
-	e.mouse.x = 300;
-	e.mouse.y = 275;
-	ui_dispatch_event(&e);
-	lcui_update_ui();
+        e.type = UI_EVENT_MOUSEMOVE;
+        e.mouse.x = 300;
+        e.mouse.y = 275;
+        ui_dispatch_event(&e);
+        lcui_update_ui();
 
-	e.type = UI_EVENT_MOUSEDOWN;
-	e.mouse.button = MOUSE_BUTTON_LEFT;
-	e.mouse.x = 300;
-	e.mouse.y = 275;
-	ui_dispatch_event(&e);
-	lcui_update_ui();
+        e.type = UI_EVENT_MOUSEDOWN;
+        e.mouse.button = MOUSE_BUTTON_LEFT;
+        e.mouse.x = 300;
+        e.mouse.y = 275;
+        ui_dispatch_event(&e);
+        lcui_update_ui();
 
-	e.type = UI_EVENT_MOUSEMOVE;
-	e.mouse.x = 600;
-	e.mouse.y = 275;
-	ui_dispatch_event(&e);
-	lcui_update_ui();
+        e.type = UI_EVENT_MOUSEMOVE;
+        e.mouse.x = 600;
+        e.mouse.y = 275;
+        ui_dispatch_event(&e);
+        lcui_update_ui();
 
-	ctest_euqal_bool("content should be moved to the left",
-	     content->computed_style.left < left &&
-		 top == content->computed_style.top,
-	     TRUE);
+        ctest_equal_bool("content should be moved to the left",
+                         content->computed_style.left < left &&
+                             top == content->computed_style.top,
+                         TRUE);
 
-	left = content->computed_style.left;
-	top = content->computed_style.top;
+        left = content->computed_style.left;
+        top = content->computed_style.top;
 
-	e.type = UI_EVENT_MOUSEMOVE;
-	e.mouse.x = 400;
-	e.mouse.y = 275;
-	ui_dispatch_event(&e);
-	e.type = UI_EVENT_MOUSEUP;
-	e.mouse.button = MOUSE_BUTTON_LEFT;
-	e.mouse.x = 400;
-	e.mouse.y = 275;
-	ui_dispatch_event(&e);
-	lcui_update_ui();
+        e.type = UI_EVENT_MOUSEMOVE;
+        e.mouse.x = 400;
+        e.mouse.y = 275;
+        ui_dispatch_event(&e);
+        e.type = UI_EVENT_MOUSEUP;
+        e.mouse.button = MOUSE_BUTTON_LEFT;
+        e.mouse.x = 400;
+        e.mouse.y = 275;
+        ui_dispatch_event(&e);
+        lcui_update_ui();
 
-	ctest_euqal_bool("content should be moved to the right",
-	     content->computed_style.left > left &&
-		 top == content->computed_style.top,
-	     TRUE);
+        ctest_equal_bool("content should be moved to the right",
+                         content->computed_style.left > left &&
+                             top == content->computed_style.top,
+                         TRUE);
 
-	left = content->computed_style.left;
-	top = content->computed_style.top;
+        left = content->computed_style.left;
+        top = content->computed_style.top;
 
-	e.type = UI_EVENT_MOUSEMOVE;
-	e.mouse.x = 555;
-	e.mouse.y = 45;
-	ui_dispatch_event(&e);
-	lcui_update_ui();
+        e.type = UI_EVENT_MOUSEMOVE;
+        e.mouse.x = 555;
+        e.mouse.y = 45;
+        ui_dispatch_event(&e);
+        lcui_update_ui();
 
-	e.type = UI_EVENT_MOUSEDOWN;
-	e.mouse.button = MOUSE_BUTTON_LEFT;
-	e.mouse.x = 555;
-	e.mouse.y = 45;
-	ui_dispatch_event(&e);
-	lcui_update_ui();
+        e.type = UI_EVENT_MOUSEDOWN;
+        e.mouse.button = MOUSE_BUTTON_LEFT;
+        e.mouse.x = 555;
+        e.mouse.y = 45;
+        ui_dispatch_event(&e);
+        lcui_update_ui();
 
-	e.type = UI_EVENT_MOUSEMOVE;
-	e.mouse.x = 555;
-	e.mouse.y = 200;
-	ui_dispatch_event(&e);
-	lcui_update_ui();
+        e.type = UI_EVENT_MOUSEMOVE;
+        e.mouse.x = 555;
+        e.mouse.y = 200;
+        ui_dispatch_event(&e);
+        lcui_update_ui();
 
-	ctest_euqal_bool("content should be moved to the top",
-	     content->computed_style.left == left &&
-		 top > content->computed_style.top,
-	     TRUE);
+        ctest_equal_bool("content should be moved to the top",
+                         content->computed_style.left == left &&
+                             top > content->computed_style.top,
+                         TRUE);
 
-	left = content->computed_style.left;
-	top = content->computed_style.top;
+        left = content->computed_style.left;
+        top = content->computed_style.top;
 
-	e.type = UI_EVENT_MOUSEMOVE;
-	e.mouse.x = 555;
-	e.mouse.y = 100;
-	ui_dispatch_event(&e);
-	e.type = UI_EVENT_MOUSEUP;
-	e.mouse.button = MOUSE_BUTTON_LEFT;
-	e.mouse.x = 555;
-	e.mouse.y = 100;
-	ui_dispatch_event(&e);
-	lcui_update_ui();
+        e.type = UI_EVENT_MOUSEMOVE;
+        e.mouse.x = 555;
+        e.mouse.y = 100;
+        ui_dispatch_event(&e);
+        e.type = UI_EVENT_MOUSEUP;
+        e.mouse.button = MOUSE_BUTTON_LEFT;
+        e.mouse.x = 555;
+        e.mouse.y = 100;
+        ui_dispatch_event(&e);
+        lcui_update_ui();
 
-	ctest_euqal_bool("the content should have scrolled to the bottom",
-	     content->computed_style.left == left &&
-		 top < content->computed_style.top,
-	     TRUE);
+        ctest_equal_bool("the content should have scrolled to the bottom",
+                         content->computed_style.left == left &&
+                             top < content->computed_style.top,
+                         TRUE);
 
-	lcui_quit();
-	lcui_main();
+        lcui_quit();
+        lcui_main();
 }

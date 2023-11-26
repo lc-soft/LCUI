@@ -38,7 +38,7 @@ void test_widget_rect(void)
 	ui_dispatch_event(&e);
 	ui_update();
 	ui_widget_get_dirty_rects(root, &rects);
-	ctest_euqal_bool("app.trigger({ type: 'mousemove', x: 150, y: 150}), "
+	ctest_equal_bool("app.trigger({ type: 'mousemove', x: 150, y: 150}), "
 	     "root.getDirtyRects().length == 0",
 	     rects.length == 0, TRUE);
 
@@ -47,7 +47,7 @@ void test_widget_rect(void)
 	ui_dispatch_event(&e);
 	ui_update();
 	ui_widget_get_dirty_rects(root, &rects);
-	ctest_euqal_bool("app.trigger({ type: 'mousemove', x: 80, y: 80 }), "
+	ctest_equal_bool("app.trigger({ type: 'mousemove', x: 80, y: 80 }), "
 	     "root.getDirtyRects().length == 1",
 	     rects.length == 1, TRUE);
 
@@ -58,7 +58,7 @@ void test_widget_rect(void)
 	if (rects.length == 1) {
 		rect = *(pd_rect_t *)list_get(&rects, 0);
 	}
-	ctest_euqal_pd_rect("root.getDirtyRects()[0]", &rect, &expected_rect);
+	ctest_equal_pd_rect("root.getDirtyRects()[0]", &rect, &expected_rect);
 	list_destroy(&rects, free);
 
 	e.mouse.x = 40;
@@ -66,7 +66,7 @@ void test_widget_rect(void)
 	ui_dispatch_event(&e);
 	ui_update();
 	ui_widget_get_dirty_rects(root, &rects);
-	ctest_euqal_bool("app.trigger({ type: 'mousemove', x: 40, y: 40 }), "
+	ctest_equal_bool("app.trigger({ type: 'mousemove', x: 40, y: 40 }), "
 	     "root.getDirtyRects().length == 0",
 	     rects.length == 0, TRUE);
 
@@ -77,26 +77,26 @@ void test_widget_rect(void)
 	ui_dispatch_event(&e);
 	ui_update();
 	ui_widget_get_dirty_rects(root, &rects);
-	ctest_euqal_bool("app.trigger({ type: 'mousedown', x: 40, y: 40 }), "
+	ctest_equal_bool("app.trigger({ type: 'mousedown', x: 40, y: 40 }), "
 	     "root.getDirtyRects().length == 1",
 	     rects.length == 1, TRUE);
 	if (rects.length == 1) {
 		rect = *(pd_rect_t *)list_get(&rects, 0);
 	}
-	ctest_euqal_pd_rect("root.getDirtyRects()[0]", &rect, &expected_rect);
+	ctest_equal_pd_rect("root.getDirtyRects()[0]", &rect, &expected_rect);
 	list_destroy(&rects, free);
 
 	e.type = UI_EVENT_MOUSEUP;
 	ui_dispatch_event(&e);
 	ui_update();
 	ui_widget_get_dirty_rects(root, &rects);
-	ctest_euqal_bool("app.trigger({ type: 'mouseup', x: 40, y: 40 }), "
+	ctest_equal_bool("app.trigger({ type: 'mouseup', x: 40, y: 40 }), "
 	     "root.getDirtyRects().length == 1",
 	     rects.length == 1, TRUE);
 	if (rects.length == 1) {
 		rect = *(pd_rect_t *)list_get(&rects, 0);
 	}
-	ctest_euqal_pd_rect("root.getDirtyRects()[0]", &rect, &expected_rect);
+	ctest_equal_pd_rect("root.getDirtyRects()[0]", &rect, &expected_rect);
 	list_destroy(&rects, free);
 
 	e.type = UI_EVENT_MOUSEMOVE;
@@ -105,7 +105,7 @@ void test_widget_rect(void)
 	ui_dispatch_event(&e);
 	ui_update();
 	ui_widget_get_dirty_rects(root, &rects);
-	ctest_euqal_bool("app.trigger({ type: 'mousemove', x: 80, y: 80 }), "
+	ctest_equal_bool("app.trigger({ type: 'mousemove', x: 80, y: 80 }), "
 	     "root.getDirtyRects().length == 0",
 	     rects.length == 0, TRUE);
 
@@ -115,13 +115,13 @@ void test_widget_rect(void)
 	ui_update();
 	ui_widget_get_dirty_rects(root, &rects);
 
-	ctest_euqal_bool("app.trigger({ type: 'mousemove', x: 150, y: 150 }), "
+	ctest_equal_bool("app.trigger({ type: 'mousemove', x: 150, y: 150 }), "
 	     "root.getDirtyRects().length == 1",
 	     rects.length == 1, TRUE);
 	if (rects.length == 1) {
 		rect = *(pd_rect_t *)list_get(&rects, 0);
 	}
-	ctest_euqal_pd_rect("root.getDirtyRects()[0]", &rect, &expected_rect);
+	ctest_equal_pd_rect("root.getDirtyRects()[0]", &rect, &expected_rect);
 	list_destroy(&rects, free);
 
 	expected_rect.x = 21;
@@ -131,12 +131,12 @@ void test_widget_rect(void)
 	ui_widget_remove(child);
 	ui_update();
 	ui_widget_get_dirty_rects(root, &rects);
-	ctest_euqal_bool("child.destroy(), root.getDirtyRects().length == 1",
+	ctest_equal_bool("child.destroy(), root.getDirtyRects().length == 1",
 	     rects.length == 1, TRUE);
 	if (rects.length == 1) {
 		rect = *(pd_rect_t *)list_get(&rects, 0);
 	}
-	ctest_euqal_pd_rect("root.getDirtyRects()[0]", &rect, &expected_rect);
+	ctest_equal_pd_rect("root.getDirtyRects()[0]", &rect, &expected_rect);
 	list_destroy(&rects, free);
 
 	expected_rect.x = 0;
@@ -146,12 +146,12 @@ void test_widget_rect(void)
 	ui_widget_remove(parent);
 	ui_update();
 	ui_widget_get_dirty_rects(root, &rects);
-	ctest_euqal_bool("parent.destroy(), root.getDirtyRects().length == 1",
+	ctest_equal_bool("parent.destroy(), root.getDirtyRects().length == 1",
 	     rects.length == 1, TRUE);
 	if (rects.length == 1) {
 		rect = *(pd_rect_t *)list_get(&rects, 0);
 	}
-	ctest_euqal_pd_rect("root.getDirtyRects()[0]", &rect, &expected_rect);
+	ctest_equal_pd_rect("root.getDirtyRects()[0]", &rect, &expected_rect);
 	list_destroy(&rects, free);
 
 	lcui_destroy();

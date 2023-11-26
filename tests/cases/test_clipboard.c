@@ -38,7 +38,7 @@ static void on_check_text(ui_widget_t *w, ui_event_t *e, void *arg)
         if (clipboard && clipboard->text) {
                 encode_utf8(actual_text, clipboard->text, 31);
         }
-        ctest_euqal_str("check the pasted text", actual_text, "helloworld");
+        ctest_equal_str("check the pasted text", actual_text, "helloworld");
         lcui_quit();
 }
 
