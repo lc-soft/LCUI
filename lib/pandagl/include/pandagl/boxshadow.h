@@ -41,7 +41,7 @@ PD_PUBLIC void pd_get_boxshadow_canvas_rect(const pd_boxshadow_t *shadow,
 					   pd_rect_t *canvas_rect);
 
 PD_PUBLIC int pd_paint_boxshadow(pd_context_t *ctx, const pd_boxshadow_t *shadow,
-				const pd_rect_t *box, int centent_width,
+				const pd_rect_t *box, int content_width,
 				int content_height);
 
 PD_END_DECLS
