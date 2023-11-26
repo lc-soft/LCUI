@@ -18,10 +18,10 @@ void ui_init(void)
 	ui_init_widget_id();
 	ui_init_widget_prototype();
 	ui_init_updater();
+	ui_init_root();
 	ui_init_events();
 	ui_init_css();
 	ui_init_image_loader();
-	ui_init_root();
 }
 
 void ui_destroy(void)

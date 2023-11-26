@@ -375,11 +375,11 @@ void ui_register_text(void)
         ui_text.prototype->settext = ui_text_on_parse_text;
         ui_text.prototype->setattr = ui_text_on_parse_attr;
         list_create(&ui_text.list);
-        ui_on_event("font_face_load", text_on_font_face_load, NULL);
+        ui_on_event("css_font_face_load", text_on_font_face_load, NULL);
 }
 
 void ui_unregister_text(void)
 {
         list_destroy_without_node(&ui_text.list, NULL);
-        ui_off_event("font_face_load", text_on_font_face_load, NULL);
+        ui_off_event("css_font_face_load", text_on_font_face_load, NULL);
 }

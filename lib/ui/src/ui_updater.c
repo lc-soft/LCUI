@@ -1,4 +1,4 @@
-﻿// #define UI_DEBUG_ENABLED
+// #define UI_DEBUG_ENABLED
 #include <string.h>
 #include <time.h>
 #include <css.h>
@@ -336,7 +336,7 @@ size_t ui_widget_update(ui_widget_t* w)
                         if (!ui_updater.refresh_all) {
                                 ui_style_diff_begin(&style_diff, w);
                         }
-                        ui_widget_force_update_style(w);
+                        ui_widget_update_style(w);
                         ui_style_diff_end(&style_diff, w);
                         if (w->proto && w->proto->update) {
                                 w->proto->update(w, UI_TASK_UPDATE_STYLE);

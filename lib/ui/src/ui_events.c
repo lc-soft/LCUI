@@ -1107,7 +1107,8 @@ void ui_init_events(void)
 			 { UI_EVENT_FOCUS, "focus" },
 			 { UI_EVENT_BLUR, "blur" },
 			 { UI_EVENT_PASTE, "paste" },
-			 { UI_EVENT_FONT_FACE_LOAD, "font_face_load" } };
+			 { UI_EVENT_CSS_LOAD, "css_load" },
+			 { UI_EVENT_CSS_FONT_FACE_LOAD, "css_font_face_load" } };
 
 	rbtree_init(&ui_events.event_names);
 	list_create(&ui_events.event_mappings);
