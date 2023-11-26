@@ -3,6 +3,7 @@
 #include <ui/style.h>
 #include <css/computed.h>
 #include "ui_diff.h"
+#include "ui_debug.h"
 #include "ui_widget_style.h"
 #include "ui_widget_box.h"
 
@@ -105,7 +106,7 @@ static void ui_block_layout_load(ui_block_layout_context_t *ctx)
                         UI_WIDGET_STR(child, str);
                         UI_DEBUG_MSG("[%lu] %s: row = %lu, xy = (%g, %g), "
                                      "outer_box_size = (%g, %g), display: %d",
-                                     item - ctx->items, str, ctx->rows.length,
+                                     ctx->row->items.length, str, ctx->rows.length,
                                      ctx->x, ctx->y, child->outer_box.width,
                                      child->outer_box.height,
                                      child->computed_style.type_bits.display);
@@ -222,7 +223,7 @@ static void ui_block_layout_update(ui_block_layout_context_t *ctx)
                         }
 #endif
                         ui_widget_compute_style(child);
-                        ui_widget_auto_reflow(w);
+                        ui_widget_auto_reflow(child);
                         ui_block_layout_update_item_margin(ctx, child);
                         ui_block_layout_update_item_position(ctx, child, x, y);
 #ifdef UI_DEBUG_ENABLED

@@ -9,6 +9,7 @@
 #include <ui/style.h>
 #include <css/computed.h>
 #include "ui_diff.h"
+#include "ui_debug.h"
 #include "ui_widget_style.h"
 #include "ui_widget_box.h"
 
@@ -63,7 +64,8 @@ static void ui_flexbox_line_destroy(void *arg)
         free(line);
 }
 
-static void ui_flexbox_line_load_item(ui_flexbox_line_t *line, ui_widget_t *item)
+static void ui_flexbox_line_load_item(ui_flexbox_line_t *line,
+                                      ui_widget_t *item)
 {
         if (item->computed_style.flex_grow > 0) {
                 line->sum_of_grow_value += item->computed_style.flex_grow;
@@ -131,9 +133,10 @@ static void ui_flexbox_layout_load_rows(ui_flexbox_layout_context_t *ctx)
                 }
                 ui_widget_prepare_reflow(child, ctx->rule);
                 if (!ui_widget_in_layout_flow(child)) {
-                	list_append(&ctx->line->items, child);
+                        list_append(&ctx->line->items, child);
                         continue;
                 }
+                ui_widget_compute_style(child);
                 ui_widget_auto_reflow(child);
                 switch (cs->type_bits.flex_basis) {
                 case CSS_FLEX_BASIS_CONTENT:
@@ -154,7 +157,7 @@ static void ui_flexbox_layout_load_rows(ui_flexbox_layout_context_t *ctx)
                         UI_DEBUG_MSG("[%lu] %s: size = %s, cross_size = %g, "
                                      "main_size = %g, basis_type = %d, "
                                      "row[%lu].main_size = %g",
-                                     item - ctx->items, str, size_str,
+                                     ctx->line->items.length, str, size_str,
                                      child->outer_box.height, main_size,
                                      cs->type_bits.flex_basis,
                                      ctx->lines.length - 1,
@@ -214,9 +217,10 @@ static void ui_flexbox_layout_load_columns(ui_flexbox_layout_context_t *ctx)
                 }
                 ui_widget_prepare_reflow(child, ctx->rule);
                 if (!ui_widget_in_layout_flow(child)) {
-                	list_append(&ctx->line->items, child);
+                        list_append(&ctx->line->items, child);
                         continue;
                 }
+                ui_widget_compute_style(child);
                 ui_widget_auto_reflow(child);
                 if (cs->type_bits.flex_basis == CSS_FLEX_BASIS_CONTENT) {
                         CSS_SET_FIXED_LENGTH(
@@ -232,7 +236,7 @@ static void ui_flexbox_layout_load_columns(ui_flexbox_layout_context_t *ctx)
                         UI_WIDGET_STR(child, str);
                         UI_DEBUG_MSG("[%lu] %s: column[%lu].main_size = %g, "
                                      "main_size = %g",
-                                     item - ctx->items, str,
+                                     ctx->line->items.length, str,
                                      ctx->lines.length - 1,
                                      ctx->line->main_size, main_size);
                 }
@@ -345,8 +349,7 @@ static void ui_flexbox_layout_update_row(ui_flexbox_layout_context_t *ctx)
         {
                 UI_WIDGET_STR(ctx->widget, str);
                 UI_DEBUG_MSG("%s: cross_axis = %g, max_cross_size = %g, "
-                             "free_space = %g, alloc "
-                             "free space",
+                             "free_space = %g, alloc free space",
                              str, ctx->line->cross_axis,
                              ctx->line->max_cross_size, space);
         }
@@ -355,6 +358,7 @@ static void ui_flexbox_layout_update_row(ui_flexbox_layout_context_t *ctx)
         for (list_each(node, &ctx->line->items)) {
                 child = node->data;
                 s = &child->computed_style;
+                ui_widget_prepare_reflow(child, ctx->rule);
                 ui_widget_compute_style(child);
                 main_size = ui_compute_row_item_main_size(s);
                 if (css_computed_box_sizing(s) == CSS_BOX_SIZING_BORDER_BOX) {
@@ -418,13 +422,13 @@ static void ui_flexbox_layout_update_row(ui_flexbox_layout_context_t *ctx)
                 child = node->data;
                 child->layout_x = main_axis;
                 child->layout_y = ctx->line->cross_axis;
-		if (!ui_widget_in_layout_flow(child)) {
-			ui_widget_compute_style(node->data);
-			ui_widget_auto_reflow(node->data);
-			ui_widget_update_box_position(node->data);
-			main_axis -= space;
-			continue;
-		}
+                if (!ui_widget_in_layout_flow(child)) {
+                        ui_widget_compute_style(node->data);
+                        ui_widget_auto_reflow(node->data);
+                        ui_widget_update_box_position(node->data);
+                        main_axis -= space;
+                        continue;
+                }
                 switch (align_items) {
                 case CSS_ALIGN_ITEMS_CENTER:
                         child->layout_y += (ctx->line->max_cross_size -
@@ -467,8 +471,7 @@ static void ui_flexbox_layout_update_column(ui_flexbox_layout_context_t *ctx)
         {
                 UI_WIDGET_STR(ctx->widget, str);
                 UI_DEBUG_MSG("%s: cross_axis = %g, max_cross_size = %g, "
-                             "free_space = %g, alloc "
-                             "free space",
+                             "free_space = %g, alloc free space",
                              str, ctx->line->cross_axis,
                              ctx->line->max_cross_size, space);
         }
@@ -477,6 +480,7 @@ static void ui_flexbox_layout_update_column(ui_flexbox_layout_context_t *ctx)
         for (list_each(node, &ctx->line->items)) {
                 child = node->data;
                 s = &child->computed_style;
+                ui_widget_prepare_reflow(child, ctx->rule);
                 ui_widget_compute_style(child);
                 main_size = ui_compute_column_item_main_size(s);
                 if (css_computed_box_sizing(s) == CSS_BOX_SIZING_BORDER_BOX) {
@@ -540,13 +544,13 @@ static void ui_flexbox_layout_update_column(ui_flexbox_layout_context_t *ctx)
                 child = node->data;
                 child->layout_y = main_axis;
                 child->layout_x = ctx->line->cross_axis;
-		if (!ui_widget_in_layout_flow(child)) {
-			ui_widget_compute_style(node->data);
-			ui_widget_auto_reflow(node->data);
-			ui_widget_update_box_position(node->data);
-			main_axis-= space;
-			continue;
-		}
+                if (!ui_widget_in_layout_flow(child)) {
+                        ui_widget_compute_style(node->data);
+                        ui_widget_auto_reflow(node->data);
+                        ui_widget_update_box_position(node->data);
+                        main_axis -= space;
+                        continue;
+                }
                 switch (align_items) {
                 case CSS_ALIGN_ITEMS_CENTER:
                         child->layout_x += (ctx->line->max_cross_size -
