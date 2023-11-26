@@ -1,6 +1,6 @@
 set_project("lcui")
 set_version("3.0.0-a")
-set_warnings("all")
+set_warnings("all", "error")
 add_rules("mode.debug", "mode.release", "mode.coverage")
 add_rpathdirs("@loader_path/lib", "@loader_path")
 add_defines("UNICODE", "_CRT_SECURE_NO_WARNINGS", "YUTIL_EXPORTS")
@@ -53,7 +53,7 @@ target("lcui_tests")
         local argv = {}
         local options = {{nil, "memcheck",  "k",  nil, "enable memory check."}}
         local args = option.raw_parse(option.get("arguments") or {}, options)
-        os.cd("$(projectdir)/tests")
+        os.cd("$(scriptdir)/tests")
         if args.memcheck then
             if is_plat("windows") then
                 table.insert(argv, target:targetfile())
