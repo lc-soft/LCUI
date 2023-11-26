@@ -310,6 +310,7 @@ void ui_server_connect(ui_widget_t *widget, app_window_t *window)
 	conn->window = window;
 	conn->widget = widget;
 	conn->rendered = FALSE;
+	conn->window_visible = FALSE;
 	options.properties = TRUE;
 	list_create(&conn->flash_rects);
 	ui_widget_on(widget, "destroy", ui_server_on_destroy_widget, NULL);
