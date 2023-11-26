@@ -67,7 +67,7 @@ typedef struct ui_renderer_t {
         bool has_self_graph;
         bool has_layer_graph;
         bool can_render_self;
-        bool can_render_centent;
+        bool can_render_content;
 } ui_renderer_t;
 
 /** 判断部件是否有可绘制内容 */
@@ -284,7 +284,7 @@ static ui_renderer_t *ui_renderer_create(ui_widget_t *w, pd_context_t *paint,
                   that->actual_paint_rect.width,
                   that->actual_paint_rect.height);
         /* get actual paint rectangle in widget content rectangle */
-        that->can_render_centent =
+        that->can_render_content =
             pd_rect_overlap(&that->style->padding_box, &that->actual_paint_rect,
                             &that->actual_content_rect);
         ;
@@ -308,7 +308,7 @@ static ui_renderer_t *ui_renderer_create(ui_widget_t *w, pd_context_t *paint,
             that->actual_content_rect.width, that->actual_content_rect.height,
             that->paint->canvas.quote.left, that->paint->canvas.quote.top,
             that->paint->canvas.width, that->paint->canvas.height);
-        if (!that->can_render_centent) {
+        if (!that->can_render_content) {
                 return that;
         }
         if (that->has_content_graph) {
@@ -476,7 +476,7 @@ static size_t ui_renderer_render(ui_renderer_t *renderer)
 #endif
                 }
         }
-        if (that->can_render_centent) {
+        if (that->can_render_content) {
                 count += ui_renderer_render_children(that);
         }
         if (that->has_content_graph &&
