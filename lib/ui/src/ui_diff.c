@@ -20,21 +20,17 @@
 
 void ui_style_diff_init(ui_style_diff_t *diff, ui_widget_t *w)
 {
+        ui_widget_t *parent;
+
         diff->canvas_box = w->canvas_box;
         diff->padding_box = w->padding_box;
         diff->should_add_dirty_rect = false;
-        if (w->parent) {
-                if (!ui_widget_is_visible(w->parent)) {
+        for (parent = w->parent; parent; parent = parent->parent) {
+                if (!ui_widget_is_visible(parent) ||
+                    parent->rendering.dirty_rect_type ==
+                        UI_DIRTY_RECT_TYPE_FULL) {
                         return;
                 }
-                if (w->parent->rendering.dirty_rect_type ==
-                    UI_DIRTY_RECT_TYPE_FULL) {
-                        w->rendering.dirty_rect_type = UI_DIRTY_RECT_TYPE_FULL;
-                        return;
-                }
-        }
-        if (w->state < UI_WIDGET_STATE_LAYOUTED) {
-                w->rendering.dirty_rect_type = UI_DIRTY_RECT_TYPE_FULL;
         }
         diff->should_add_dirty_rect = true;
 }
