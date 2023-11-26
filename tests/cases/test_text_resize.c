@@ -75,13 +75,13 @@ static void check_text_set_content(void)
 {
         ui_update();
 
-        ctest_euqal_bool("check block width",
+        ctest_equal_bool("check block width",
                          self.block->border_box.width == 122.0f, TRUE);
-        ctest_euqal_bool("check block height",
+        ctest_equal_bool("check block height",
                          self.block->border_box.height > 140.0f, TRUE);
-        ctest_euqal_bool("check inline block width",
+        ctest_equal_bool("check inline block width",
                          self.inline_block->border_box.width > 520.0f, TRUE);
-        ctest_euqal_bool("check inline block height",
+        ctest_equal_bool("check inline block height",
                          self.inline_block->border_box.height < 45.0f, TRUE);
 }
 
@@ -95,13 +95,13 @@ static void check_text_set_short_content_css(void)
 {
         ui_update();
 
-        ctest_euqal_bool("check block width",
+        ctest_equal_bool("check block width",
                          self.block->border_box.width == 122.0f, TRUE);
-        ctest_euqal_bool("check block height",
+        ctest_equal_bool("check block height",
                          self.block->border_box.height < 45.0f, TRUE);
-        ctest_euqal_bool("check inline block width",
+        ctest_equal_bool("check inline block width",
                          self.inline_block->border_box.width < 70.0f, TRUE);
-        ctest_euqal_bool("check inline block height",
+        ctest_equal_bool("check inline block height",
                          self.inline_block->border_box.height < 45.0f, TRUE);
 }
 
@@ -117,13 +117,13 @@ static void check_text_set_long_content_css(void)
 {
         ui_update();
 
-        ctest_euqal_bool("check block width",
+        ctest_equal_bool("check block width",
                          self.block->border_box.width == 122.0f, TRUE);
-        ctest_euqal_bool("check block height",
+        ctest_equal_bool("check block height",
                          self.block->border_box.height > 60.0f, TRUE);
-        ctest_euqal_bool("check inline block width",
+        ctest_equal_bool("check inline block width",
                          self.inline_block->border_box.width > 250.0f, TRUE);
-        ctest_euqal_bool("check inline block height",
+        ctest_equal_bool("check inline block height",
                          self.inline_block->border_box.height < 45.0f, TRUE);
 }
 

@@ -6,7 +6,7 @@
 static void check_length(const char *str, css_numeric_value_t actual,
                          css_numeric_value_t expected)
 {
-        ctest_euqal_int(str, (int)actual, (int)expected);
+        ctest_equal_int(str, (int)actual, (int)expected);
 }
 
 static test_button_focus_style(void)
@@ -19,10 +19,10 @@ static test_button_focus_style(void)
         result = css_select_style(selector);
         css_cascade_style(result, &computed);
 
-        ctest_euqal_str("content", computed.content, "submit");
+        ctest_equal_str("content", computed.content, "submit");
         check_length("font-size", computed.font_size, 16);
         check_length("min-width", computed.min_width, 80);
-        ctest_euqal_int("box-sizing", computed.type_bits.box_sizing,
+        ctest_equal_int("box-sizing", computed.type_bits.box_sizing,
                         CSS_BOX_SIZING_BORDER_BOX);
 
         check_length("padding-left", computed.padding_left, 8);
@@ -35,18 +35,18 @@ static test_button_focus_style(void)
         check_length("border-bottom-width", computed.border_bottom_width, 1);
         check_length("border-left-width", computed.border_left_width, 1);
 
-        ctest_euqal_int("border-top-style", computed.type_bits.border_top_style,
+        ctest_equal_int("border-top-style", computed.type_bits.border_top_style,
                         CSS_BORDER_STYLE_SOLID);
-        ctest_euqal_int("border-right-style",
+        ctest_equal_int("border-right-style",
                         computed.type_bits.border_right_style,
                         CSS_BORDER_STYLE_SOLID);
-        ctest_euqal_int("border-bottom-style",
+        ctest_equal_int("border-bottom-style",
                         computed.type_bits.border_bottom_style,
                         CSS_BORDER_STYLE_SOLID);
-        ctest_euqal_int("border-left-style",
+        ctest_equal_int("border-left-style",
                         computed.type_bits.border_left_style,
                         CSS_BORDER_STYLE_SOLID);
-        ctest_euqal_uint("background-color", computed.background_color,
+        ctest_equal_uint("background-color", computed.background_color,
                          css_color(255, 0, 0x50, 0xc9));
 
         check_length("border-top-left-radius", computed.border_top_left_radius,
@@ -61,7 +61,7 @@ static test_button_focus_style(void)
         check_length("box-shadow-y", computed.box_shadow_y, 0);
         check_length("box-shadow-blur", computed.box_shadow_blur, 0);
         check_length("box-shadow-spread", computed.box_shadow_spread, 2);
-        ctest_euqal_uint("box-shadow-color", computed.box_shadow_color,
+        ctest_equal_uint("box-shadow-color", computed.box_shadow_color,
                          css_color(127, 0, 0, 200));
 
         css_style_decl_destroy(result);
@@ -81,9 +81,9 @@ void test_container_style(void)
 
         check_length("margin-top", computed.margin_top, 24);
         check_length("margin-bottom", computed.margin_top, 24);
-        ctest_euqal_int("margin-left", computed.type_bits.margin_left,
+        ctest_equal_int("margin-left", computed.type_bits.margin_left,
                         CSS_MARGIN_AUTO);
-        ctest_euqal_int("margin-right", computed.type_bits.margin_right,
+        ctest_equal_int("margin-right", computed.type_bits.margin_right,
                         CSS_MARGIN_AUTO);
 
         css_style_decl_destroy(result);
@@ -105,15 +105,15 @@ void test_button_borderless_style(void)
         check_length("border-right-width", computed.border_right_width, 0);
         check_length("border-bottom-width", computed.border_bottom_width, 0);
         check_length("border-left-width", computed.border_left_width, 0);
-        ctest_euqal_int("border-top-style", computed.type_bits.border_top_style,
+        ctest_equal_int("border-top-style", computed.type_bits.border_top_style,
                         CSS_BORDER_STYLE_NONE);
-        ctest_euqal_int("border-right-style",
+        ctest_equal_int("border-right-style",
                         computed.type_bits.border_right_style,
                         CSS_BORDER_STYLE_NONE);
-        ctest_euqal_int("border-bottom-style",
+        ctest_equal_int("border-bottom-style",
                         computed.type_bits.border_bottom_style,
                         CSS_BORDER_STYLE_NONE);
-        ctest_euqal_int("border-left-style",
+        ctest_equal_int("border-left-style",
                         computed.type_bits.border_left_style,
                         CSS_BORDER_STYLE_NONE);
 

@@ -78,6 +78,6 @@ void test_thread(void)
 	TestWorker_Send(&worker, "bye!");
 	sleep_ms(100);
 	TestWorker_Destroy(&worker);
-	ctest_euqal_int("check worker data count", worker.data_count, 7);
-	ctest_euqal_bool("check worker is no longer active", worker.active, FALSE);
+	ctest_equal_int("check worker data count", worker.data_count, 7);
+	ctest_equal_bool("check worker is no longer active", worker.active, FALSE);
 }

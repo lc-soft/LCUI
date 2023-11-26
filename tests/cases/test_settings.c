@@ -10,7 +10,7 @@ static void check_settings_frame_rate_cap(void *arg)
 
 	sprintf(str, "should work when frame cap is %u (actual %u)", fps_limit,
 		fps);
-	ctest_euqal_bool(str, fps <= fps_limit + 2 && fps > fps_limit / 2, TRUE);
+	ctest_equal_bool(str, fps <= fps_limit + 2 && fps > fps_limit / 2, TRUE);
 	lcui_quit();
 }
 
@@ -22,10 +22,10 @@ static void test_default_settings(void)
 	lcui_reset_settings();
 	lcui_get_settings(&settings);
 
-	ctest_euqal_int("check default frame rate cap", settings.frame_rate_cap, 120);
-	ctest_euqal_int("check default parallel rendering threads",
+	ctest_equal_int("check default frame rate cap", settings.frame_rate_cap, 120);
+	ctest_equal_int("check default parallel rendering threads",
 	     settings.parallel_rendering_threads, 4);
-	ctest_euqal_bool("check default paint flashing", settings.paint_flashing, FALSE);
+	ctest_equal_bool("check default paint flashing", settings.paint_flashing, FALSE);
 	lcui_quit();
 	lcui_main();
 }
@@ -41,10 +41,10 @@ static void test_apply_settings(void)
 	lcui_init();
 	lcui_apply_settings(&settings);
 	lcui_get_settings(&settings);
-	ctest_euqal_int("check frame rate cap", settings.frame_rate_cap, 60);
-	ctest_euqal_int("check parallel rendering threads",
+	ctest_equal_int("check frame rate cap", settings.frame_rate_cap, 60);
+	ctest_equal_int("check parallel rendering threads",
 	     settings.parallel_rendering_threads, 2);
-	ctest_euqal_bool("check paint flashing", settings.paint_flashing, TRUE);
+	ctest_equal_bool("check paint flashing", settings.paint_flashing, TRUE);
 
 	settings.frame_rate_cap = -1;
 	settings.parallel_rendering_threads = -1;
@@ -52,14 +52,14 @@ static void test_apply_settings(void)
 	lcui_apply_settings(&settings);
 	lcui_get_settings(&settings);
 
-	ctest_euqal_int("check frame rate cap minimum", settings.frame_rate_cap, 1);
-	ctest_euqal_int("check parallel rendering threads minimum",
+	ctest_equal_int("check frame rate cap minimum", settings.frame_rate_cap, 1);
+	ctest_equal_int("check parallel rendering threads minimum",
 	     settings.parallel_rendering_threads, 1);
 
 	lcui_reset_settings();
 
 	lcui_get_settings(&settings);
-	ctest_euqal_int("check frame rate cap", settings.frame_rate_cap, LCUI_MAX_FRAMES_PER_SEC);
+	ctest_equal_int("check frame rate cap", settings.frame_rate_cap, LCUI_MAX_FRAMES_PER_SEC);
 	lcui_quit();
 	lcui_main();
 }

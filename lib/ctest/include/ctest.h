@@ -17,11 +17,11 @@ int ctest_uint_to_str(void *data, char *str, unsigned max_len);
 int ctest_float_to_str(void *data, char *str, unsigned max_len);
 int ctest_str_to_str(void *data, char *str, unsigned max_len);
 int ctest_bool_to_str(void *data, char *str, unsigned max_len);
-bool ctest_euqal_int(const char *name, int actual, int expected);
-bool ctest_euqal_bool(const char *name, bool actual, bool expected);
-bool ctest_euqal_uint(const char *name, unsigned actual, unsigned expected);
-bool ctest_euqal_float(const char *name, float actual, float expected);
-bool ctest_euqal_str(const char *name, const char *actual,
+bool ctest_equal_int(const char *name, int actual, int expected);
+bool ctest_equal_bool(const char *name, bool actual, bool expected);
+bool ctest_equal_uint(const char *name, unsigned actual, unsigned expected);
+bool ctest_equal_float(const char *name, float actual, float expected);
+bool ctest_equal_str(const char *name, const char *actual,
                      const char *expected);
 int ctest_finish(void);
 

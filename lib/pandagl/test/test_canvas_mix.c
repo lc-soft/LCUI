@@ -39,20 +39,20 @@ void test_canvas_mix(void)
 	pd_canvas_mix(&red_layer, &blue_layer, 10, 10, PD_TRUE);
 	pixel = pd_canvas_pixel_at(&red_layer, 15, 15);
 	color2str(rgba_str, pixel);
-	ctest_euqal_str("red_layer(15, 15)", rgba_str, "rgba(50, 0, 204, 1)");
+	ctest_equal_str("red_layer(15, 15)", rgba_str, "rgba(50, 0, 204, 1)");
 
 	pd_canvas_mix(&white_layer, &red_layer, 10, 10, PD_TRUE);
 	pixel = pd_canvas_pixel_at(&white_layer, 0, 0);
 	color2str(rgba_str, pixel);
-	ctest_euqal_str("white_layer(0, 0)", rgba_str, "rgba(255, 255, 255, 1)");
+	ctest_equal_str("white_layer(0, 0)", rgba_str, "rgba(255, 255, 255, 1)");
 
 	pixel = pd_canvas_pixel_at(&white_layer, 15, 15);
 	color2str(rgba_str, pixel);
-	ctest_euqal_str("white_layer(15, 15)", rgba_str, "rgba(255, 127, 127, 1)");
+	ctest_equal_str("white_layer(15, 15)", rgba_str, "rgba(255, 127, 127, 1)");
 
 	pixel = pd_canvas_pixel_at(&white_layer, 25, 25);
 	color2str(rgba_str, pixel);
-	ctest_euqal_str("white_layer(25, 25)", rgba_str, "rgba(152, 127, 229, 1)");
+	ctest_equal_str("white_layer(25, 25)", rgba_str, "rgba(152, 127, 229, 1)");
 
 	pd_canvas_destroy(&white_layer);
 	pd_canvas_destroy(&red_layer);

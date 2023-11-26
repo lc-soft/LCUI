@@ -16,13 +16,13 @@ void test_router_location(void)
         location = router_location_normalize(raw, NULL, FALSE);
 
         str = strmap_get(location->query, "type");
-        ctest_euqal_str("location.query.type", str, "issue");
+        ctest_equal_str("location.query.type", str, "issue");
 
         str = strmap_get(location->query, "order");
-        ctest_euqal_str("location.query.order", str, "desc");
+        ctest_equal_str("location.query.order", str, "desc");
 
         str = location->path;
-        ctest_euqal_str("location.path", str, "/search");
+        ctest_equal_str("location.path", str, "/search");
 
         router_location_destroy(raw);
         router_location_destroy(location);
@@ -31,7 +31,7 @@ void test_router_location(void)
         location = router_location_normalize(raw, NULL, FALSE);
 
         str = location->hash;
-        ctest_euqal_str("location.hash", str, "#pagination");
+        ctest_equal_str("location.hash", str, "#pagination");
 
         router_location_destroy(raw);
         router_location_destroy(location);
@@ -45,7 +45,7 @@ void test_router_location(void)
         router_location_set_param(raw, "user", "foo");
         router_location_set_param(raw, "repo", "bar");
         location = router_location_normalize(raw, route, FALSE);
-        ctest_euqal_str(
+        ctest_equal_str(
             "normalize({ params: { user: 'foo', repo: 'bar' } }).path",
             router_location_get_path(location), "/repos/foo/bar/issues");
         router_location_destroy(raw);
@@ -55,7 +55,7 @@ void test_router_location(void)
         router_location_set_param(raw, "user", "root");
         router_location_set_param(raw, "repo", "example");
         location = router_location_normalize(raw, route, FALSE);
-        ctest_euqal_str(
+        ctest_equal_str(
             "normalize({ params: { user: 'root', repo: 'example' } }).path",
             router_location_get_path(location), "/repos/root/example/issues");
         router_location_destroy(raw);
@@ -66,7 +66,7 @@ void test_router_location(void)
         router_location_set_query(raw, "state", "closed");
         location = router_location_normalize(raw, route, FALSE);
         path = router_location_stringify(location);
-        ctest_euqal_str(
+        ctest_equal_str(
             "stringify(normalize({ query: { q: 'bug', state: 'closed' } }))",
             path, "/repos/root/example/issues?q=bug&state=closed");
         free(path);
@@ -78,7 +78,7 @@ void test_router_location(void)
         router_location_set_query(raw, "assignee", "root");
         location = router_location_normalize(raw, route, FALSE);
         path = router_location_stringify(location);
-        ctest_euqal_str("stringify(normalize({ query: { order: 'desc', "
+        ctest_equal_str("stringify(normalize({ query: { order: 'desc', "
                         "assignee: 'root' } }))",
                         path,
                         "/repos/root/example/issues?order=desc&assignee=root");
@@ -102,19 +102,19 @@ void test_router_route(void)
         location = router_location_normalize(raw, NULL, FALSE);
         route = router_route_create(NULL, location);
 
-        ctest_euqal_str("route.path", router_route_get_path(route),
+        ctest_equal_str("route.path", router_route_get_path(route),
                         "/user/profile");
-        ctest_euqal_str("route.query.q", router_route_get_query(route, "q"),
+        ctest_equal_str("route.query.q", router_route_get_query(route, "q"),
                         "test");
-        ctest_euqal_str("route.query.tab", router_route_get_query(route, "tab"),
+        ctest_equal_str("route.query.tab", router_route_get_query(route, "tab"),
                         "repos");
-        ctest_euqal_str("route.query.order",
+        ctest_equal_str("route.query.order",
                         router_route_get_query(route, "order"), "desc");
-        ctest_euqal_str("route.query.other",
+        ctest_equal_str("route.query.other",
                         router_route_get_query(route, "other"), NULL);
-        ctest_euqal_str("route.hash", router_route_get_hash(route),
+        ctest_equal_str("route.hash", router_route_get_hash(route),
                         "#pagination");
-        ctest_euqal_str("route.fullPath.length",
+        ctest_equal_str("route.fullPath.length",
                         router_route_get_full_path(route), full_path);
         router_location_destroy(raw);
         router_location_destroy(location);
@@ -199,13 +199,13 @@ void test_router_matcher(void)
         router_location_destroy(location);
         route = router_resolved_get_route(resolved);
         str = router_route_get_param(route, "username");
-        ctest_euqal_str("match('/users/root').route.params.username", str,
+        ctest_equal_str("match('/users/root').route.params.username", str,
                         "root");
         router_resolved_destroy(resolved);
 
         location = router_location_create("user#posts", NULL);
         resolved = router_resolve(router, location, FALSE);
-        ctest_euqal_bool("match({ name: 'user#posts' })", !resolved, FALSE);
+        ctest_equal_bool("match({ name: 'user#posts' })", !resolved, FALSE);
         router_location_destroy(location);
         router_resolved_destroy(resolved);
 
@@ -214,12 +214,12 @@ void test_router_matcher(void)
         router_location_destroy(location);
         location = router_location_create("user#posts", NULL);
         resolved = router_resolve(router, location, FALSE);
-        ctest_euqal_bool("match({ name: 'user#posts' })", !!resolved, TRUE);
+        ctest_equal_bool("match({ name: 'user#posts' })", !!resolved, TRUE);
         route = router_resolved_get_route(resolved);
         str = router_route_get_param(route, "username");
-        ctest_euqal_str("match({ name: 'user#posts' }).route.params.username",
+        ctest_equal_str("match({ name: 'user#posts' }).route.params.username",
                         router_route_get_param(route, "username"), "root");
-        ctest_euqal_str("match({ name: 'user#posts' }).route.fullPath",
+        ctest_equal_str("match({ name: 'user#posts' }).route.fullPath",
                         router_route_get_full_path(route), "/users/root/posts");
         router_location_destroy(location);
         router_resolved_destroy(resolved);
@@ -229,17 +229,17 @@ void test_router_matcher(void)
         router_location_destroy(location);
         route = router_resolved_get_route(resolved);
         record = router_route_get_matched_record(route, 0);
-        ctest_euqal_bool("match('/users/root/posts').route.matched[0] != null",
+        ctest_equal_bool("match('/users/root/posts').route.matched[0] != null",
                          !!record, TRUE);
-        ctest_euqal_str(
+        ctest_equal_str(
             "match('/users/root/posts').route.matched[0].components.default",
             record ? router_route_record_get_component(record, NULL) : NULL,
             "user-show");
         route = router_resolved_get_route(resolved);
         record = router_route_get_matched_record(route, 1);
-        ctest_euqal_bool("match('/users/root/posts').route.matched[1] != null",
+        ctest_equal_bool("match('/users/root/posts').route.matched[1] != null",
                          !!record, TRUE);
-        ctest_euqal_str(
+        ctest_equal_str(
             "match('/users/root/posts').route.matched[1].components.default",
             record ? router_route_record_get_component(record, NULL) : NULL,
             "user-posts");
@@ -250,14 +250,14 @@ void test_router_matcher(void)
         router_location_destroy(location);
         route = router_resolved_get_route(resolved);
         record = router_route_get_matched_record(route, 0);
-        ctest_euqal_bool(
+        ctest_equal_bool(
             "match('/other/path/to/file').route.matched[0] != null", !!record,
             TRUE);
-        ctest_euqal_str(
+        ctest_equal_str(
             "match('/other/path/to/file').route.matched[0].components.default",
             record ? router_route_record_get_component(record, NULL) : NULL,
             "not-found");
-        ctest_euqal_str(
+        ctest_equal_str(
             "match('/other/path/to/file').route.params.pathMatch",
             route ? router_route_get_param(route, "pathMatch") : NULL,
             "other/path/to/file");
@@ -268,11 +268,11 @@ void test_router_matcher(void)
         router_location_destroy(location);
         route = router_resolved_get_route(resolved);
         record = router_route_get_matched_record(route, 0);
-        ctest_euqal_str(
+        ctest_equal_str(
             "match('/files/path/to/file').route.matched[0].components.default",
             record ? router_route_record_get_component(record, NULL) : NULL,
             "files");
-        ctest_euqal_str(
+        ctest_equal_str(
             "match('/files/path/to/file').route.params.pathMatch",
             route ? router_route_get_param(route, "pathMatch") : NULL,
             "path/to/file");
@@ -298,112 +298,112 @@ void test_router_utils(void)
         strmap_set(a, "name", "git");
         strmap_set(b, "name", "git");
 
-        ctest_euqal_bool(
+        ctest_equal_bool(
             "isObjectEqual({ id: '404', name: 'git' }, { id: '404', name: "
             "'git' })",
             strmap_equal(a, b), TRUE);
 
         strmap_set(b, "id", "200");
-        ctest_euqal_bool(
+        ctest_equal_bool(
             "isObjectEqual({ id: '404', name: 'git' }, { id: '200', name: "
             "'git' })",
             strmap_equal(a, b), FALSE);
 
         strmap_delete(b, "id");
-        ctest_euqal_bool(
+        ctest_equal_bool(
             "isObjectIncludes({ id: '404', name: 'git' }, { name: 'git' })",
             strmap_includes(a, b), TRUE);
         strmap_delete(a, "name");
-        ctest_euqal_bool("isObjectIncludes({ id: '404' }, { name: '200' })",
+        ctest_equal_bool("isObjectIncludes({ id: '404' }, { name: '200' })",
                          strmap_includes(a, b), FALSE);
         strmap_delete(a, "id");
         strmap_delete(b, "name");
-        ctest_euqal_bool("isObjectEqual({}, {})", strmap_equal(a, b), TRUE);
-        ctest_euqal_int("string.compare('', '')", router_string_compare("", ""),
+        ctest_equal_bool("isObjectEqual({}, {})", strmap_equal(a, b), TRUE);
+        ctest_equal_int("string.compare('', '')", router_string_compare("", ""),
                         0);
-        ctest_euqal_bool("string.compare(null, 'a') != 0",
+        ctest_equal_bool("string.compare(null, 'a') != 0",
                          router_string_compare(NULL, "a") != 0, TRUE);
-        ctest_euqal_int("string.compare(null, null)",
+        ctest_equal_int("string.compare(null, null)",
                         router_string_compare(NULL, NULL), 0);
         strmap_destroy(a);
         strmap_destroy(b);
 
         str = router_path_resolve("", NULL, TRUE);
-        ctest_euqal_str("path.resolve('', null, true) == '/'", str, "/");
+        ctest_equal_str("path.resolve('', null, true) == '/'", str, "/");
         free(str);
 
         str = router_path_resolve("", "/root", TRUE);
-        ctest_euqal_str("path.resolve('', '/root', true)", str, "/root");
+        ctest_equal_str("path.resolve('', '/root', true)", str, "/root");
         free(str);
 
         str = router_path_resolve("hello/../world/./", NULL, TRUE);
-        ctest_euqal_str("path.resolve('hello/../world/./', null, true)", str,
+        ctest_equal_str("path.resolve('hello/../world/./', null, true)", str,
                         "/world");
         free(str);
 
         str = router_path_resolve("/root/path", "base/path", TRUE);
-        ctest_euqal_str("path.resolve('/root/path', 'base/path', true)", str,
+        ctest_equal_str("path.resolve('/root/path', 'base/path', true)", str,
                         "/root/path");
         free(str);
 
         str = router_path_resolve("../../profile", "base/path/to/file", TRUE);
-        ctest_euqal_str(
+        ctest_equal_str(
             "path.resolve('../../profile', 'base/path/to/file', true)", str,
             "/base/path/profile");
         free(str);
 
         str = router_path_resolve("profile", "base/file", FALSE);
-        ctest_euqal_str("path.resolve('profile', 'base/profile', false)", str,
+        ctest_equal_str("path.resolve('profile', 'base/profile', false)", str,
                         "/base/profile");
         free(str);
 
         str = router_path_resolve("/profile", "base/file", FALSE);
-        ctest_euqal_str("path.resolve('/profile', 'base/profile', false)", str,
+        ctest_equal_str("path.resolve('/profile', 'base/profile', false)", str,
                         "/profile");
         free(str);
 
-        ctest_euqal_bool("path.compare('/a/b', '/a/b/')",
+        ctest_equal_bool("path.compare('/a/b', '/a/b/')",
                          router_path_compare("/a/b", "/a/b/"), TRUE);
-        ctest_euqal_bool("path.compare('/a/b/', '/a/b/')",
+        ctest_equal_bool("path.compare('/a/b/', '/a/b/')",
                          router_path_compare("/a/b/", "/a/b"), TRUE);
-        ctest_euqal_bool("path.compare('', '')",
+        ctest_equal_bool("path.compare('', '')",
                          router_path_compare("", "") == 0, TRUE);
-        ctest_euqal_bool("path.compare('a', '')",
+        ctest_equal_bool("path.compare('a', '')",
                          router_path_compare("a", "") != 0, TRUE);
-        ctest_euqal_bool("path.compare('', 'b')",
+        ctest_equal_bool("path.compare('', 'b')",
                          router_path_compare("", "b") != 0, TRUE);
-        ctest_euqal_bool("path.compare('a', 'b')",
+        ctest_equal_bool("path.compare('a', 'b')",
                          router_path_compare("a", "b") != 0, TRUE);
 
-        ctest_euqal_bool(
+        ctest_equal_bool(
             "path.startsWith('/profile/events', '/profile/event')",
             router_path_starts_with("/profile/events", "/profile/event"),
             FALSE);
-        ctest_euqal_bool(
+        ctest_equal_bool(
             "path.startsWith('/profile/events', '/profile/')",
             router_path_starts_with("/profile/events", "/profile/"), TRUE);
-        ctest_euqal_bool("path.startsWith('/profile', '/profile/')",
+        ctest_equal_bool("path.startsWith('/profile', '/profile/')",
                          router_path_starts_with("/profile", "/profile/"),
                          TRUE);
-        ctest_euqal_bool("path.startsWith('/profile/', '/profile')",
+        ctest_equal_bool("path.startsWith('/profile/', '/profile')",
                          router_path_starts_with("/profile/", "/profile"),
                          TRUE);
 
         p = str = "/:username/:repo/settings";
         p = router_path_parse_key(p, key, &key_len);
-        ctest_euqal_str("path.keys('/:username/:repo/settings')[0].key", key,
+        ctest_equal_str("path.keys('/:username/:repo/settings')[0].key", key,
                         "username");
-        ctest_euqal_int("path.keys('/:username/:repo/settings')[0].index",
+        ctest_equal_int("path.keys('/:username/:repo/settings')[0].index",
                         (int)(p ? p - str : 0), 11);
         p = router_path_parse_key(p, key, &key_len);
-        ctest_euqal_str("path.keys('/:username/:repo/settings')[1].key", key,
+        ctest_equal_str("path.keys('/:username/:repo/settings')[1].key", key,
                         "repo");
-        ctest_euqal_int("path.keys('/:username/:repo/settings')[1].index",
+        ctest_equal_int("path.keys('/:username/:repo/settings')[1].index",
                         (int)(p ? p - str : 0), 17);
         p = router_path_parse_key(p, key, &key_len);
-        ctest_euqal_str("path.keys('/:username/:repo/settings')[2].key", key,
+        ctest_equal_str("path.keys('/:username/:repo/settings')[2].key", key,
                         "");
-        ctest_euqal_int("path.keys('/:username/:repo/settings')[2].index",
+        ctest_equal_int("path.keys('/:username/:repo/settings')[2].index",
                         (int)(p ? p - str : -1), -1);
 
         params = strmap_create();
@@ -412,21 +412,21 @@ void test_router_utils(void)
         strmap_set(params, "3", "three");
         strmap_set(params, "word", "good");
         str = router_path_fill_params("/:1/:2/:3/foo", params);
-        ctest_euqal_str(
+        ctest_equal_str(
             "path.fillParams('/:1/:2/:3/foo', { 1: 'one', 2: 'two', 3: "
             "'three' })",
             str, "/one/two/three/foo");
         free(str);
 
         str = router_path_fill_params("/:1:2:3/foo", params);
-        ctest_euqal_str(
+        ctest_equal_str(
             "path.fillParams('/:1:2:3/foo', { 1: 'one', 2: 'two', 3: "
             "'three' })",
             str, NULL);
 
         strmap_destroy(params);
         str = router_path_fill_params("/foo/bar", NULL);
-        ctest_euqal_str("path.fillParams('/foo/bar')", str, "/foo/bar");
+        ctest_equal_str("path.fillParams('/foo/bar')", str, "/foo/bar");
         free(str);
 }
 
@@ -461,94 +461,94 @@ void test_router_history(void)
         location = router_location_create(NULL, "/foo/bar");
         router_push(router, location);
         route = router_get_current_route(router);
-        ctest_euqal_str("router.push('/foo/bar'), router.currentRoute.path",
+        ctest_equal_str("router.push('/foo/bar'), router.currentRoute.path",
                         router_route_get_path(route), "/foo/bar");
         router_location_destroy(location);
 
         location = router_location_create(NULL, "/bar");
         router_push(router, location);
         route = router_get_current_route(router);
-        ctest_euqal_str("router.push('/bar'), router.currentRoute.path",
+        ctest_equal_str("router.push('/bar'), router.currentRoute.path",
                         router_route_get_path(route), "/bar");
         router_location_destroy(location);
 
         location = router_location_create(NULL, "/foo");
         router_push(router, location);
         route = router_get_current_route(router);
-        ctest_euqal_str("router.push('/foo'), router.currentRoute.path",
+        ctest_equal_str("router.push('/foo'), router.currentRoute.path",
                         router_route_get_path(route), "/foo");
         router_location_destroy(location);
 
-        ctest_euqal_int("router.history.index",
+        ctest_equal_int("router.history.index",
                         (int)router_history_get_index(history), 2);
 
         router_back(router);
         route = router_get_current_route(router);
-        ctest_euqal_str("router.back(), router.currentRoute.path",
+        ctest_equal_str("router.back(), router.currentRoute.path",
                         router_route_get_path(route), "/bar");
 
         router_back(router);
         route = router_get_current_route(router);
-        ctest_euqal_str("router.back(), router.currentRoute.path",
+        ctest_equal_str("router.back(), router.currentRoute.path",
                         router_route_get_path(route), "/foo/bar");
 
         router_back(router);
         route = router_get_current_route(router);
-        ctest_euqal_str("router.back(), router.currentRoute.path",
+        ctest_equal_str("router.back(), router.currentRoute.path",
                         router_route_get_path(route), "/foo/bar");
 
         router_forward(router);
         route = router_get_current_route(router);
-        ctest_euqal_str("router.forward(), router.currentRoute.path",
+        ctest_equal_str("router.forward(), router.currentRoute.path",
                         router_route_get_path(route), "/bar");
 
         router_back(router);
         router_go(router, 100);
         route = router_get_current_route(router);
-        ctest_euqal_str(
+        ctest_equal_str(
             "router.back(), router.go(100), router.currentRoute.path",
             router_route_get_path(route), "/foo");
 
         router_go(router, -2);
         route = router_get_current_route(router);
-        ctest_euqal_str(
+        ctest_equal_str(
             "router.back(), router.go(-2), router.currentRoute.path",
             router_route_get_path(route), "/foo/bar");
 
         router_go(router, -100);
         route = router_get_current_route(router);
-        ctest_euqal_str(
+        ctest_equal_str(
             "router.back(), router.go(-100), router.currentRoute.path",
             router_route_get_path(route), "/foo/bar");
 
         location = router_location_create(NULL, "/bar");
-        ctest_euqal_int("router.history.length",
+        ctest_equal_int("router.history.length",
                         (int)router_history_get_length(history), 3);
         router_push(router, location);
-        ctest_euqal_int("router.push('/bar'), router.history.length",
+        ctest_equal_int("router.push('/bar'), router.history.length",
                         (int)router_history_get_length(history), 2);
         router_location_destroy(location);
 
         location = router_location_create(NULL, "/foo");
         router_replace(router, location);
         route = router_get_current_route(router);
-        ctest_euqal_str("router.replace('/foo'), router.currentRoute.path",
+        ctest_equal_str("router.replace('/foo'), router.currentRoute.path",
                         router_route_get_path(route), "/foo");
         router_location_destroy(location);
 
         router_back(router);
         route = router_get_current_route(router);
-        ctest_euqal_str("router.back(), router.currentRoute.path",
+        ctest_equal_str("router.back(), router.currentRoute.path",
                         router_route_get_path(route), "/foo/bar");
 
         router_forward(router);
         route = router_get_current_route(router);
-        ctest_euqal_str("router.forward(), router.currentRoute.path",
+        ctest_equal_str("router.forward(), router.currentRoute.path",
                         router_route_get_path(route), "/foo");
 
         router_forward(router);
         route = router_get_current_route(router);
-        ctest_euqal_str("router.forward(), router.currentRoute.path",
+        ctest_equal_str("router.forward(), router.currentRoute.path",
                         router_route_get_path(route), "/foo");
 
         router_destroy(router);
@@ -609,18 +609,18 @@ void test_router_components(void)
         ui_event_init(&e, "click");
         ui_widget_emit_event(link_foo, e, NULL);
         matched_widget = ui_router_view_get_matched_widget(view);
-        ctest_euqal_bool("[/foo] <router-view> widget should load <foo> widget",
+        ctest_equal_bool("[/foo] <router-view> widget should load <foo> widget",
                          strcmp(matched_widget->type, "foo") == 0, TRUE);
-        ctest_euqal_bool(
+        ctest_equal_bool(
             "[/foo] linkFoo should has active classes",
             (ui_widget_has_class(link_foo, "router-link-active") &&
              ui_widget_has_class(link_foo, "router-link-exact-active")),
             TRUE);
         ui_widget_emit_event(link_bar, e, NULL);
         matched_widget = ui_router_view_get_matched_widget(view);
-        ctest_euqal_bool("[/bar] <router-view> widget should load <bar> widget",
+        ctest_equal_bool("[/bar] <router-view> widget should load <bar> widget",
                          strcmp(matched_widget->type, "bar") == 0, TRUE);
-        ctest_euqal_bool(
+        ctest_equal_bool(
             "[/bar] linkFoo should not has active classes",
             (!ui_widget_has_class(link_foo, "router-link-exact-active") &&
              !ui_widget_has_class(link_foo, "router-link-active")),
@@ -628,22 +628,22 @@ void test_router_components(void)
 
         ui_widget_emit_event(link_foobar, e, NULL);
         matched_widget = ui_router_view_get_matched_widget(view);
-        ctest_euqal_bool(
+        ctest_equal_bool(
             "[/foo/bar] <router-view> widget should load <foobar> widget",
             strcmp(matched_widget->type, "foobar") == 0, TRUE);
-        ctest_euqal_bool(
+        ctest_equal_bool(
             "[/foo/bar] linkFooBar should has active classes",
             (ui_widget_has_class(link_foobar, "router-link-exact-active") &&
              ui_widget_has_class(link_foobar, "router-link-active")),
             TRUE);
-        ctest_euqal_bool(
+        ctest_equal_bool(
             "[/foo/bar] linkFoo should only has the exact active class",
             (!ui_widget_has_class(link_foo, "router-link-exact-active") &&
              ui_widget_has_class(link_foo, "router-link-active")),
             TRUE);
         ui_widget_set_attr(link_foo, "exact", "exact");
         ui_widget_emit_event(link_foobar, e, NULL);
-        ctest_euqal_bool(
+        ctest_equal_bool(
             "[/foo/bar] linkFoo should not has any active classes (exact)",
             (!ui_widget_has_class(link_foo, "router-link-exact-active") &&
              !ui_widget_has_class(link_foo, "router-link-active")),
