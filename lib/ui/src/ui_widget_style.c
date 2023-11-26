@@ -350,7 +350,7 @@ void ui_widget_compute_style(ui_widget_t *w)
         }
 }
 
-void ui_widget_force_update_style(ui_widget_t *w)
+void ui_widget_update_style(ui_widget_t *w)
 {
         css_computed_style_t *s = &w->specified_style;
         css_style_decl_t *style;

@@ -31,7 +31,7 @@ LIBUI_PUBLIC void ui_widget_set_style_color_value(ui_widget_t *w, int key,
 LIBUI_PUBLIC void ui_widget_set_style_numeric_value(ui_widget_t *w, int key,
 						    css_numeric_value_t value);
 LIBUI_PUBLIC void ui_widget_compute_style(ui_widget_t *w);
-LIBUI_PUBLIC void ui_widget_force_update_style(ui_widget_t *w);
+LIBUI_PUBLIC void ui_widget_update_style(ui_widget_t *w);
 
 LIBUI_END_DECLS
 

@@ -227,7 +227,8 @@ typedef enum ui_event_type_t {
         UI_EVENT_TOUCHMOVE,
         UI_EVENT_PASTE,
 
-        UI_EVENT_FONT_FACE_LOAD,
+        UI_EVENT_CSS_LOAD,
+        UI_EVENT_CSS_FONT_FACE_LOAD,
         UI_EVENT_USER
 } ui_event_type_t;
 

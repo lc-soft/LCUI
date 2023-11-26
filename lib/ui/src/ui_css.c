@@ -1,6 +1,7 @@
 ﻿#include <stdio.h>
 #include <css.h>
 #include <pandagl.h>
+#include <ui/base.h>
 #include <ui/css.h>
 #include <ui/events.h>
 #include "ui_css.h"
@@ -28,9 +29,18 @@ static void ui_on_parsed_font_face(const css_font_face_t *face)
 {
 	ui_event_t e;
 
-	ui_event_init(&e, "font_face_load");
+	ui_event_init(&e, "css_font_face_load");
 	pd_font_library_load_file(face->src);
 	ui_post_event(&e, (css_font_face_t*)face, NULL);
+}
+
+static void ui_on_css_loaded(void)
+{
+	ui_event_t e;
+
+        ui_refresh_style();
+	ui_event_init(&e, "css_load");
+	ui_post_event(&e, NULL, NULL);
 }
 
 int ui_load_css_file(const char *filepath)
@@ -52,6 +62,7 @@ int ui_load_css_file(const char *filepath)
 	}
 	css_parser_destroy(parser);
 	fclose(fp);
+	ui_on_css_loaded();
 	return 0;
 }
 
@@ -68,6 +79,7 @@ size_t ui_load_css_string(const char *str, const char *space)
 		len = css_parser_parse(parser, cur);
 	}
 	css_parser_destroy(parser);
+	ui_on_css_loaded();
 	DEBUG_MSG("parse end\n");
 	return 0;
 }
