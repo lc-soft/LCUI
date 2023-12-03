@@ -106,8 +106,9 @@ static void ui_block_layout_load(ui_block_layout_context_t *ctx)
                         UI_WIDGET_STR(child, str);
                         UI_DEBUG_MSG("[%lu] %s: row = %lu, xy = (%g, %g), "
                                      "outer_box_size = (%g, %g), display: %d",
-                                     ctx->row->items.length, str, ctx->rows.length,
-                                     ctx->x, ctx->y, child->outer_box.width,
+                                     ctx->row->items.length, str,
+                                     ctx->rows.length, ctx->x, ctx->y,
+                                     child->outer_box.width,
                                      child->outer_box.height,
                                      child->computed_style.type_bits.display);
                 }
