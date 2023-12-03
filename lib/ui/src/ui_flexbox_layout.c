@@ -131,7 +131,7 @@ static void ui_flexbox_layout_load_rows(ui_flexbox_layout_context_t *ctx)
                 if (cs->type_bits.display == CSS_DISPLAY_NONE) {
                         continue;
                 }
-                ui_widget_prepare_reflow(child, ctx->rule);
+                ui_widget_reset_layout(child, ctx->rule);
                 if (!ui_widget_in_layout_flow(child)) {
                         list_append(&ctx->line->items, child);
                         continue;
@@ -215,7 +215,7 @@ static void ui_flexbox_layout_load_columns(ui_flexbox_layout_context_t *ctx)
                 if (cs->type_bits.display == CSS_DISPLAY_NONE) {
                         continue;
                 }
-                ui_widget_prepare_reflow(child, ctx->rule);
+                ui_widget_reset_layout(child, ctx->rule);
                 if (!ui_widget_in_layout_flow(child)) {
                         list_append(&ctx->line->items, child);
                         continue;
@@ -358,7 +358,7 @@ static void ui_flexbox_layout_update_row(ui_flexbox_layout_context_t *ctx)
         for (list_each(node, &ctx->line->items)) {
                 child = node->data;
                 s = &child->computed_style;
-                ui_widget_prepare_reflow(child, ctx->rule);
+                ui_widget_reset_layout(child, ctx->rule);
                 ui_widget_compute_style(child);
                 main_size = ui_compute_row_item_main_size(s);
                 if (css_computed_box_sizing(s) == CSS_BOX_SIZING_BORDER_BOX) {
@@ -480,7 +480,7 @@ static void ui_flexbox_layout_update_column(ui_flexbox_layout_context_t *ctx)
         for (list_each(node, &ctx->line->items)) {
                 child = node->data;
                 s = &child->computed_style;
-                ui_widget_prepare_reflow(child, ctx->rule);
+                ui_widget_reset_layout(child, ctx->rule);
                 ui_widget_compute_style(child);
                 main_size = ui_compute_column_item_main_size(s);
                 if (css_computed_box_sizing(s) == CSS_BOX_SIZING_BORDER_BOX) {
