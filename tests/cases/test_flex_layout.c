@@ -448,20 +448,20 @@ static void test_browser_layout(void)
 
 	w = ui_get_widget("browser-frame-client");
 	ctest_equal_int("$('#browser-frame-client')[0].height", (int)w->border_box.height,
-	     224);
+	     223);
 	w = ui_get_widget("browser-frame-content");
 	ctest_equal_int("$('#browser-frame-content')[0].height", (int)w->border_box.height,
-	     224);
+	     223);
 	w = ui_get_widget("browser-page-home");
 	ctest_equal_int("$('#browser-page-home')[0].height", (int)w->border_box.height,
-	     224);
+	     223);
 	w = ui_get_widget("browser-page-home-container");
 	rect.width = 256;
 	rect.height = 70;
 	rect.x =
 	    (538.f - rect.width) / 2.f + w->parent->computed_style.padding_left;
 	rect.y =
-	    (204.f - rect.height) / 2.f + w->parent->computed_style.padding_top;
+	    (203.f - rect.height) / 2.f + w->parent->computed_style.padding_top;
 	ctest_equal_ui_rect("$('#browser-page-home-container')[0].border_box",
 		 &w->border_box, &rect);
 }

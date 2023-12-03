@@ -297,16 +297,35 @@ static size_t ui_widget_update_children(ui_widget_t* w)
 
 static void ui_widget_update_size(ui_widget_t* w)
 {
-	css_computed_style_t *src = &w->specified_style;
-	css_computed_style_t *dest = &w->computed_style;
+        css_unit_t unit;
+        css_numeric_value_t limit;
+        css_computed_style_t* src = &w->specified_style;
+        css_computed_style_t* dest = &w->computed_style;
 
-	CSS_COPY_LENGTH(dest, src, width);
-	CSS_COPY_LENGTH(dest, src, height);
-	ui_widget_compute_style(w);
-	ui_widget_update_box_size(w);
+        CSS_COPY_LENGTH(dest, src, width);
+        CSS_COPY_LENGTH(dest, src, height);
+        ui_widget_compute_style(w);
+        ui_widget_update_box_size(w);
         ui_widget_reflow(w);
         w->max_content_width = w->content_box.width;
         w->max_content_height = w->content_box.height;
+        if (css_computed_max_width(dest, &limit, &unit) == CSS_MAX_WIDTH_SET &&
+            unit == CSS_UNIT_PX) {
+                w->max_content_width = limit;
+        } else if (css_computed_min_width(dest, &limit, &unit) ==
+                       CSS_MIN_WIDTH_SET &&
+                   unit == CSS_UNIT_PX && w->max_content_width < limit) {
+                w->max_content_width = limit;
+        }
+        if (css_computed_max_height(dest, &limit, &unit) ==
+                CSS_MAX_HEIGHT_SET &&
+            unit == CSS_UNIT_PX) {
+                w->max_content_width = limit;
+        } else if (css_computed_min_height(dest, &limit, &unit) ==
+                       CSS_MIN_HEIGHT_SET &&
+                   unit == CSS_UNIT_PX && w->max_content_height < limit) {
+                w->max_content_height = limit;
+        }
 }
 
 size_t ui_widget_update(ui_widget_t* w)
@@ -354,7 +373,8 @@ size_t ui_widget_update(ui_widget_t* w)
                         float width = w->border_box.width;
                         float height = w->border_box.height;
                         ui_widget_update_size(w);
-                        // 只需要判断宽高的变化，因为 style diff 已经判断了位置变化
+                        // 只需要判断宽高的变化，因为 style diff
+                        // 已经判断了位置变化
                         if (width != w->border_box.width ||
                             height != w->border_box.height) {
                                 ui_widget_request_reflow(w->parent);

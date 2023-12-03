@@ -134,26 +134,16 @@ void ui_widget_update_box_size(ui_widget_t *w)
                 w->content_box.height = s->height;
         } else {
                 w->content_box.width =
-                    s->width - (s->padding_left + s->padding_right +
-                                s->border_left_width + s->border_right_width);
+                    s->width - css_padding_x(s) - css_border_x(s);
                 w->content_box.height =
-                    s->height - (s->padding_top + s->padding_bottom +
-                                 s->border_top_width + s->border_bottom_width);
+                    s->height - css_padding_y(s) - css_border_y(s);
         }
-        w->border_box.width = w->content_box.width +
-                              (s->padding_left + s->padding_right +
-                               s->border_left_width + s->border_right_width);
-        w->border_box.height = w->content_box.height +
-                               (s->padding_top + s->padding_bottom +
-                                s->border_top_width + s->border_bottom_width);
-        w->padding_box.width =
-            w->content_box.width + s->padding_left + s->padding_right;
-        w->padding_box.height =
-            w->content_box.height + s->padding_top + s->padding_bottom;
-        w->outer_box.width =
-            w->border_box.width + s->margin_left + s->margin_right;
-        w->outer_box.height =
-            w->border_box.height + s->margin_top + s->margin_bottom;
+        w->padding_box.width = w->content_box.width + css_padding_x(s);
+        w->padding_box.height = w->content_box.height + css_padding_y(s);
+        w->border_box.width = w->padding_box.width + css_border_x(s);
+        w->border_box.height = w->padding_box.height + css_border_y(s);
+        w->outer_box.width = w->border_box.width + css_margin_x(s);
+        w->outer_box.height = w->border_box.height + css_margin_y(s);
         ui_widget_update_canvas_box_width(w);
         ui_widget_update_canvas_box_height(w);
 }
