@@ -500,7 +500,7 @@ static void ui_flexbox_layout_update_column(ui_flexbox_layout_context_t *ctx)
                 if (align_items == CSS_ALIGN_ITEMS_STRETCH &&
                     s->type_bits.width == CSS_WIDTH_AUTO) {
                         CSS_SET_FIXED_LENGTH(s, width,
-                                             css_convert_border_box_height(
+                                             css_convert_border_box_width(
                                                  s, ctx->line->max_cross_size -
                                                         css_margin_x(s)));
                 }
@@ -518,7 +518,7 @@ static void ui_flexbox_layout_update_column(ui_flexbox_layout_context_t *ctx)
         }
 #endif
 
-        // 计算 marign-top 和 margin-bottom
+        // 计算 margin-top 和 margin-bottom
         if (space > 0 && ctx->line->count_of_auto_margin_items > 0) {
                 main_axis = 0;
                 k = space / ctx->line->count_of_auto_margin_items;

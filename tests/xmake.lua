@@ -1,6 +1,7 @@
 add_deps("lcui")
 set_default(false)
 set_rundir("./")
+add_includedirs("./include")
 
 target("test_block_layout")
     add_files("test_block_layout.c")
