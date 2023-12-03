@@ -295,6 +295,14 @@ static size_t ui_widget_update_children(ui_widget_t* w)
         return total;
 }
 
+void ui_widget_update_size(ui_widget_t* w)
+{
+        ui_widget_reset_size(w);
+        ui_widget_reflow(w);
+        w->max_content_width = w->content_box.width;
+        w->max_content_height = w->content_box.height;
+}
+
 size_t ui_widget_update(ui_widget_t* w)
 {
         size_t count = 0;
@@ -336,11 +344,18 @@ size_t ui_widget_update(ui_widget_t* w)
                 count += ui_widget_update_children(w);
         }
         if (w->update.should_reflow) {
-                ui_widget_reset_size(w);
-                ui_widget_reflow(w);
-                w->max_content_width = w->content_box.width;
-                w->max_content_height = w->content_box.height;
-                if (!w->parent || !ui_widget_in_layout_flow(w)) {
+                if (w->parent && ui_widget_in_layout_flow(w)) {
+                        float width = w->border_box.width;
+                        float height = w->border_box.height;
+                        ui_widget_update_size(w);
+                        // 只需要判断宽高的变化，因为 style diff 已经判断了位置变化
+                        if (width != w->border_box.width ||
+                            height != w->border_box.height) {
+                                ui_widget_request_reflow(w->parent);
+                        }
+                } else {
+                        ui_widget_update_size(w);
+                        // TODO: 更新 box size？
                         ui_widget_update_box_position(w);
                 }
         }
