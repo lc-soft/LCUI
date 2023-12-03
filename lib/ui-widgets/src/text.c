@@ -122,7 +122,7 @@ static void ui_text_on_update_style(ui_widget_t *w)
                 ui_text_style_destroy(&style);
                 return;
         }
-        content_changed = (!txt->style.content != !style.content);
+        content_changed = style.content || txt->style.content;
         convert_font_style_to_text_style(&style, &text_style);
         pd_text_set_align(txt->layer, style.text_align);
         pd_text_set_line_height(txt->layer, style.line_height);
@@ -292,9 +292,6 @@ int ui_text_set_content_w(ui_widget_t *w, const wchar_t *text)
         ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
         wchar_t *newtext = wcsdup2(text);
 
-        if (ui_widget_has_class(w, "fui-icon-regular")) {
-                _DEBUG_MSG("set content\n");
-        }
         if (!newtext) {
                 return -ENOMEM;
         }
