@@ -93,7 +93,7 @@ static void ui_block_layout_load(ui_block_layout_context_t *ctx)
 #endif
         for (list_each(node, &ctx->widget->children)) {
                 child = node->data;
-                ui_widget_prepare_reflow(child, ctx->rule);
+                ui_widget_reset_layout(child, ctx->rule);
                 if (!ui_widget_in_layout_flow(child)) {
                         list_append(&ctx->row->items, child);
                         continue;
@@ -223,6 +223,7 @@ static void ui_block_layout_update(ui_block_layout_context_t *ctx)
                                              size_str);
                         }
 #endif
+                        ui_widget_reset_layout(child, ctx->rule);
                         ui_widget_compute_style(child);
                         ui_widget_auto_reflow(child);
                         ui_block_layout_update_item_margin(ctx, child);

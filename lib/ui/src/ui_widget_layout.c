@@ -27,11 +27,10 @@ static void ui_widget_reflow_with_rule(ui_widget_t *w, ui_layout_rule_t rule)
 }
 
 /**
- * 执行布局前的准备操作
  * 重置布局相关属性，以让它们在布局时被重新计算
  * @param rule 父级组件所使用的布局规则
  */
-void ui_widget_prepare_reflow(ui_widget_t *w, ui_layout_rule_t rule)
+void ui_widget_reset_layout(ui_widget_t *w, ui_layout_rule_t rule)
 {
 	css_computed_style_t *src = &w->specified_style;
 	css_computed_style_t *dest = &w->computed_style;
@@ -59,17 +58,6 @@ void ui_widget_prepare_reflow(ui_widget_t *w, ui_layout_rule_t rule)
 		CSS_COPY_LENGTH(dest, src, margin_top);
 		CSS_COPY_LENGTH(dest, src, margin_bottom);
 	}
-}
-
-void ui_widget_reset_size(ui_widget_t *w)
-{
-	css_computed_style_t *src = &w->specified_style;
-	css_computed_style_t *dest = &w->computed_style;
-
-	CSS_COPY_LENGTH(dest, src, width);
-	CSS_COPY_LENGTH(dest, src, height);
-	ui_widget_compute_style(w);
-	ui_widget_update_box_size(w);
 }
 
 void ui_widget_auto_reflow(ui_widget_t *w)

@@ -295,9 +295,15 @@ static size_t ui_widget_update_children(ui_widget_t* w)
         return total;
 }
 
-void ui_widget_update_size(ui_widget_t* w)
+static void ui_widget_update_size(ui_widget_t* w)
 {
-        ui_widget_reset_size(w);
+	css_computed_style_t *src = &w->specified_style;
+	css_computed_style_t *dest = &w->computed_style;
+
+	CSS_COPY_LENGTH(dest, src, width);
+	CSS_COPY_LENGTH(dest, src, height);
+	ui_widget_compute_style(w);
+	ui_widget_update_box_size(w);
         ui_widget_reflow(w);
         w->max_content_width = w->content_box.width;
         w->max_content_height = w->content_box.height;
