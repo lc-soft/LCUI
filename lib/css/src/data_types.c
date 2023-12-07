@@ -58,7 +58,8 @@ libcss_bool_t css_parse_unit_value(css_style_value_t *s, const char *str)
 	if (n == 0) {
 		return LIBCSS_FALSE;
 	}
-	strncpy(unit, p, 4);
+	strncpy(unit, p, 3);
+	unit[3] = 0;
 	sscanf(num_str, "%f", &num);
 	if (strncmp(unit, "%", 4) == 0) {
 		s->unit_value.unit = CSS_UNIT_PERCENT;

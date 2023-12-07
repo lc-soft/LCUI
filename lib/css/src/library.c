@@ -254,7 +254,7 @@ static css_style_group_t *css_style_group_create(void)
 static css_style_decl_t *css_find_style_store(css_selector_t *selector,
                                               const char *space)
 {
-        int i, right;
+        int i, right, len;
         css_style_link_t *link;
         css_style_rule_t *snode;
         css_style_link_group_t *slg;
@@ -296,8 +296,15 @@ static css_style_decl_t *css_find_style_store(css_selector_t *selector,
                         strcpy(fullname, buf);
                 } else {
                         strcpy(fullname, buf);
-                        snprintf(buf, CSS_SELECTOR_MAX_LEN, "%s %s",
+                        len = snprintf(buf, CSS_SELECTOR_MAX_LEN, "%s %s",
                                  sn->fullname, fullname);
+                        if (len < 0) {
+                                logger_error("[css-library] %s: "
+                                             "selector(%s...) too long\n",
+                                             space, fullname);
+                                return NULL;
+                        }
+                        buf[len] = 0;
                 }
                 /* 如果有上一级的父链接记录，则将当前链接添加进去 */
                 if (parents) {

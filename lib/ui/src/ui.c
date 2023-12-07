@@ -34,4 +34,5 @@ void ui_destroy(void)
 	ui_destroy_widget_id();
 	ui_destroy_widget_prototype();
 	ui_destroy_css();
+	ui_destroy_updater();
 }

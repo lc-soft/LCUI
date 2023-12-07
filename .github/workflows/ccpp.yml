@@ -25,7 +25,9 @@ jobs:
 
       - name: Install tools
         if: runner.os == 'Linux'
-        run: sudo apt install debhelper lcov valgrind -yy
+        run: |
+          sudo apt-get update --fix-missing
+          sudo apt-get install debhelper lcov valgrind -yy
 
       - name: Configure for coverage mode
         if: runner.os == 'Linux'
@@ -95,10 +97,10 @@ jobs:
 
       - name: Package
         run: |
-          xmake package
+          xmake package -v
           xmake install -o dist/lcui-package
 
-      - name: Package exmaples
+      - name: Package examples
         run: |
           cd examples
           xmake -P . -v -y
@@ -122,7 +124,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.xmake/.cache/packages
-          key: ${{ runner.os }}-xmake-pacages
+          key: ${{ runner.os }}-xmake-packages
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')

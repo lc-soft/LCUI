@@ -22,29 +22,29 @@ void test_i18n(void)
 
 	i18n_change_language(L"en");
 
-        ctest_equal_bool("i18n_translate(L\"name\") == L\"English\")",
+        ctest_equal_bool("en: i18n_translate(L\"name\") == L\"English\")",
                          wcscmp(i18n_translate(L"name"), L"English") == 0,
                          true);
 
-        ctest_equal_bool("i18n_translate(L\"button.ok\") == L\"Ok\")",
+        ctest_equal_bool("en: i18n_translate(L\"button.ok\") == L\"Ok\")",
                          wcscmp(i18n_translate(L"button.ok"), L"Ok") == 0,
                          true);
 
-        ctest_equal_bool("i18n_translate(L\"button.notfound\") == NULL)",
+        ctest_equal_bool("en: i18n_translate(L\"button.notfound\") == NULL)",
                          i18n_translate(L"button.notfound")== NULL,
                          true);
 
 	i18n_change_language(L"zh-CN");
 
-        ctest_equal_bool("i18n_translate(L\"name\") == L\"中文\")",
-                         wcscmp(i18n_translate(L"name"), L"中文") == 0,
+        ctest_equal_bool("zh-CN: i18n_translate(L\"name\")",
+                         wcscmp(i18n_translate(L"name"), L"\u4E2D\u6587") == 0,
                          true);
 
-        ctest_equal_bool("i18n_translate(L\"button.ok\") == L\"确定\")",
-                         wcscmp(i18n_translate(L"button.ok"), L"确定") == 0,
+        ctest_equal_bool("zh-CN: i18n_translate(L\"button.ok\")",
+                         wcscmp(i18n_translate(L"button.ok"), L"\u786E\u5B9A") == 0,
                          true);
 
-        ctest_equal_bool("i18n_translate(L\"button.notfound\") == NULL)",
+        ctest_equal_bool("zh-CN: i18n_translate(L\"button.notfound\") == NULL",
                          i18n_translate(L"button.notfound")== NULL,
                          true);
 	i18n_clear();

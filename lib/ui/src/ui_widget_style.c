@@ -378,7 +378,6 @@ void ui_widget_update_style(ui_widget_t *w)
 
 void ui_widget_destroy_style(ui_widget_t *w)
 {
-        css_computed_style_t *s = &w->computed_style;
         w->matched_style = NULL;
         ui_widget_destroy_background_style(w);
         if (w->custom_style) {

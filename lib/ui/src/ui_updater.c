@@ -132,12 +132,10 @@ static void ui_widget_match_style(ui_widget_t* w)
 {
         css_selector_t* selector;
         css_style_decl_t* style;
-        const css_style_decl_t* matched_style;
 
         if (w->hash && w->update.should_refresh_style) {
                 ui_widget_generate_self_hash(w);
         }
-        matched_style = w->matched_style;
         if (w->hash) {
                 style = dict_fetch_value(ui_updater.style_cache, &w->hash);
                 if (!style) {
@@ -492,4 +490,10 @@ void ui_init_updater(void)
         type.val_destructor = ui_style_dict_val_free;
         ui_updater.refresh_all = true;
         ui_updater.style_cache = dict_create(&type, NULL);
+}
+
+void ui_destroy_updater(void)
+{
+        dict_destroy(ui_updater.style_cache);
+        ui_updater.style_cache = NULL;
 }
