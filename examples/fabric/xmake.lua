@@ -1,4 +1,4 @@
-add_requires("cairo 1.17.6")
+add_requires("cairo")
 
 target("fabric")
     set_kind("binary")

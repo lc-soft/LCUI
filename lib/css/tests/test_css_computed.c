@@ -9,7 +9,7 @@ static void check_length(const char *str, css_numeric_value_t actual,
         ctest_equal_int(str, (int)actual, (int)expected);
 }
 
-static test_button_focus_style(void)
+static void test_button_focus_style(void)
 {
         css_selector_t *selector;
         css_style_decl_t *result;

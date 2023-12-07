@@ -36,10 +36,9 @@ void test_segoe_ui_font_load(void)
         ctest_equal_int(
             "load seguili.ttf",
             pd_font_library_load_file("C:/windows/fonts/seguili.ttf"), 0);
-        ctest_equal_bool(
-            "check get font (style: normal, weight: normal)",
-            id = GetSegoeUIFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_NORMAL),
-            TRUE);
+        id = GetSegoeUIFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_NORMAL);
+        ctest_equal_bool("check get font (style: normal, weight: normal)",
+                         id > 0, true);
         if (id > 0) {
                 font = pd_font_library_get_font(id);
                 ctest_equal_int("check font style", font->style,
@@ -47,10 +46,9 @@ void test_segoe_ui_font_load(void)
                 ctest_equal_int("check font weight", font->weight,
                                 PD_FONT_WEIGHT_NORMAL);
         }
-        ctest_equal_bool(
-            "check get font (style: italic, weight: normal)",
-            id = GetSegoeUIFont(PD_FONT_STYLE_ITALIC, PD_FONT_WEIGHT_NORMAL),
-            TRUE);
+        id = GetSegoeUIFont(PD_FONT_STYLE_ITALIC, PD_FONT_WEIGHT_NORMAL);
+        ctest_equal_bool("check get font (style: italic, weight: normal)",
+                         id > 0, true);
         if (id > 0) {
                 font = pd_font_library_get_font(id);
                 ctest_equal_int("check font style", font->style,
@@ -58,10 +56,9 @@ void test_segoe_ui_font_load(void)
                 ctest_equal_int("check font weight", font->weight,
                                 PD_FONT_WEIGHT_NORMAL);
         }
-        ctest_equal_bool(
-            "check get font (style: normal, weight: bold)",
-            id = GetSegoeUIFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_BOLD),
-            TRUE);
+        id = GetSegoeUIFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_BOLD);
+        ctest_equal_bool("check get font (style: normal, weight: bold)", id > 0,
+                         true);
         if (id > 0) {
                 font = pd_font_library_get_font(id);
                 ctest_equal_int("check font style", font->style,
@@ -69,10 +66,9 @@ void test_segoe_ui_font_load(void)
                 ctest_equal_int("check font weight", font->weight,
                                 PD_FONT_WEIGHT_BOLD);
         }
-        ctest_equal_bool(
-            "check get font (style: normal, weight: light)",
-            id = GetSegoeUIFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_LIGHT),
-            TRUE);
+        id = GetSegoeUIFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_LIGHT);
+        ctest_equal_bool("check get font (style: normal, weight: light)",
+                         id > 0, true);
         if (id > 0) {
                 font = pd_font_library_get_font(id);
                 ctest_equal_int("check font style", font->style,
@@ -80,10 +76,9 @@ void test_segoe_ui_font_load(void)
                 ctest_equal_int("check font weight", font->weight,
                                 PD_FONT_WEIGHT_LIGHT);
         }
+        id = GetSegoeUIFont(PD_FONT_STYLE_ITALIC, PD_FONT_WEIGHT_EXTRA_LIGHT);
         ctest_equal_bool("check get font (style: italic, weight: extra light)",
-                         id = GetSegoeUIFont(PD_FONT_STYLE_ITALIC,
-                                             PD_FONT_WEIGHT_EXTRA_LIGHT),
-                         TRUE);
+                         id > 0, true);
         if (id > 0) {
                 font = pd_font_library_get_font(id);
                 ctest_equal_int("check font style", font->style,
@@ -112,10 +107,9 @@ void test_arial_font_load(void)
         ctest_equal_int(
             "load ariali.ttf",
             pd_font_library_load_file("C:/windows/fonts/ariali.ttf"), 0);
-        ctest_equal_bool(
-            "check get font (style: normal, weight: normal)",
-            id = GetArialFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_NORMAL),
-            TRUE);
+        id = GetArialFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_NORMAL);
+        ctest_equal_bool("check get font (style: normal, weight: normal)",
+                         id > 0, true);
         if (id > 0) {
                 font = pd_font_library_get_font(id);
                 ctest_equal_int("check font style", font->style,
@@ -123,10 +117,9 @@ void test_arial_font_load(void)
                 ctest_equal_int("check font weight", font->weight,
                                 PD_FONT_WEIGHT_NORMAL);
         }
-        ctest_equal_bool(
-            "check get font (style: italic, weight: normal)",
-            id = GetArialFont(PD_FONT_STYLE_ITALIC, PD_FONT_WEIGHT_NORMAL),
-            TRUE);
+        id = GetArialFont(PD_FONT_STYLE_ITALIC, PD_FONT_WEIGHT_NORMAL);
+        ctest_equal_bool("check get font (style: italic, weight: normal)",
+                         id > 0, true);
         if (id > 0) {
                 font = pd_font_library_get_font(id);
                 ctest_equal_int("check font style", font->style,
@@ -134,9 +127,9 @@ void test_arial_font_load(void)
                 ctest_equal_int("check font weight", font->weight,
                                 PD_FONT_WEIGHT_NORMAL);
         }
-        ctest_equal_bool(
-            "check get font (style: normal, weight: bold)",
-            id = GetArialFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_BOLD), TRUE);
+        id = GetArialFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_BOLD);
+        ctest_equal_bool("check get font (style: normal, weight: bold)", id > 0,
+                         true);
         if (id > 0) {
                 font = pd_font_library_get_font(id);
                 ctest_equal_int("check font style", font->style,
@@ -144,10 +137,9 @@ void test_arial_font_load(void)
                 ctest_equal_int("check font weight", font->weight,
                                 PD_FONT_WEIGHT_BOLD);
         }
-        ctest_equal_bool(
-            "check get font (style: normal, weight: black)",
-            id = GetArialFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_BLACK),
-            TRUE);
+        id = GetArialFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_BLACK);
+        ctest_equal_bool("check get font (style: normal, weight: black)",
+                         id > 0, true);
         if (id > 0) {
                 font = pd_font_library_get_font(id);
                 ctest_equal_int("check font style", font->style,
@@ -155,10 +147,9 @@ void test_arial_font_load(void)
                 ctest_equal_int("check font weight", font->weight,
                                 PD_FONT_WEIGHT_BLACK);
         }
-        ctest_equal_bool(
-            "check get font (style: italic, weight: bold)",
-            id = GetSegoeUIFont(PD_FONT_STYLE_ITALIC, PD_FONT_WEIGHT_BOLD),
-            TRUE);
+        id = GetSegoeUIFont(PD_FONT_STYLE_ITALIC, PD_FONT_WEIGHT_BOLD);
+        ctest_equal_bool("check get font (style: italic, weight: bold)", id > 0,
+                         true);
         if (id > 0) {
                 font = pd_font_library_get_font(id);
                 ctest_equal_int("check font style", font->style,
@@ -186,6 +177,6 @@ void test_font_load(void)
                         ui_load_css_file("test_font_load.css"), 0);
         ctest_equal_bool("check pd_font_library_get_font_id success",
                          pd_font_library_get_font_id("icomoon", 0, 0) > 0,
-                         TRUE);
+                         true);
         ui_destroy();
 }
