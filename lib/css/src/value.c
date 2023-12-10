@@ -1,4 +1,14 @@
-﻿
+﻿/*
+ * lib/css/src/value.c
+ *
+ * Copyright (c) 2023, Liu Chao <i@lc-soft.io> All rights reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * This file is part of LCUI, distributed under the MIT License found in the
+ * LICENSE.TXT file in the root directory of this source tree.
+ */
+
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/CSS/Value_definition_syntax
  * @see https://drafts.csswg.org/css-values/#value-defs

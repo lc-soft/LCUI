@@ -1,4 +1,15 @@
-﻿// #define UI_DEBUG_ENABLED
+﻿/*
+ * lib/ui/src/ui_block_layout.c
+ *
+ * Copyright (c) 2023, Liu Chao <i@lc-soft.io> All rights reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * This file is part of LCUI, distributed under the MIT License found in the
+ * LICENSE.TXT file in the root directory of this source tree.
+ */
+
+// #define UI_DEBUG_ENABLED
 #include <ui/base.h>
 #include <ui/style.h>
 #include <css/computed.h>

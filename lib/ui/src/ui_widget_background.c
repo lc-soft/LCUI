@@ -1,4 +1,15 @@
-﻿#include <pandagl.h>
+﻿/*
+ * lib/ui/src/ui_widget_background.c
+ *
+ * Copyright (c) 2023, Liu Chao <i@lc-soft.io> All rights reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * This file is part of LCUI, distributed under the MIT License found in the
+ * LICENSE.TXT file in the root directory of this source tree.
+ */
+
+#include <pandagl.h>
 #include <css/style_value.h>
 #include <ui/base.h>
 #include <ui/image.h>

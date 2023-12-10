@@ -1,4 +1,15 @@
-﻿#include <pandagl.h>
+﻿/*
+ * lib/ui/src/ui.c
+ *
+ * Copyright (c) 2023, Liu Chao <i@lc-soft.io> All rights reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * This file is part of LCUI, distributed under the MIT License found in the
+ * LICENSE.TXT file in the root directory of this source tree.
+ */
+
+#include <pandagl.h>
 #include <ui/types.h>
 #include "ui/base.h"
 #include "ui_trash.h"

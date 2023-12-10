@@ -1,4 +1,15 @@
-﻿#include "private.h"
+﻿/*
+ * lib/ui-router/src/utils.c
+ *
+ * Copyright (c) 2023, Liu Chao <i@lc-soft.io> All rights reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * This file is part of LCUI, distributed under the MIT License found in the
+ * LICENSE.TXT file in the root directory of this source tree.
+ */
+
+#include "private.h"
 
 const char *router_path_parse_key(const char *path, char key[256],
                                   size_t *key_len)

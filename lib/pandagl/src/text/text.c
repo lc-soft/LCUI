@@ -1,4 +1,15 @@
 ﻿/*
+ * lib/pandagl/src/text/text.c
+ *
+ * Copyright (c) 2023, Liu Chao <i@lc-soft.io> All rights reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * This file is part of LCUI, distributed under the MIT License found in the
+ * LICENSE.TXT file in the root directory of this source tree.
+ */
+
+/*
  * textlayer.c -- text layout and rendering module.
  *
  * copyright (c) 2018, liu chao <lc-soft@live.cn> all rights reserved.
