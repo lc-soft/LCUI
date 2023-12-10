@@ -1,4 +1,15 @@
-﻿#include <stdio.h>
+﻿/*
+ * tests/test_widget.c
+ *
+ * Copyright (c) 2023, Liu Chao <i@lc-soft.io> All rights reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * This file is part of LCUI, distributed under the MIT License found in the
+ * LICENSE.TXT file in the root directory of this source tree.
+ */
+
+#include <stdio.h>
 #include <time.h>
 #include <ui.h>
 #include <ui_widgets/text.h>

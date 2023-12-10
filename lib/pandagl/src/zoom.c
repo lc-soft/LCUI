@@ -1,4 +1,15 @@
-﻿#include <pandagl.h>
+﻿/*
+ * lib/pandagl/src/zoom.c
+ *
+ * Copyright (c) 2023, Liu Chao <i@lc-soft.io> All rights reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * This file is part of LCUI, distributed under the MIT License found in the
+ * LICENSE.TXT file in the root directory of this source tree.
+ */
+
+#include <pandagl.h>
 
 static uint8_t canvas_bilinear_resampling_core(uint8_t a, uint8_t b, uint8_t c,
 					       uint8_t d, float dx, float dy)

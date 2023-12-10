@@ -1,4 +1,15 @@
-﻿#ifndef LIBCSS_INCLUDE_CSS_DEF_H
+﻿/*
+ * lib/css/include/css/types.h
+ *
+ * Copyright (c) 2023, Liu Chao <i@lc-soft.io> All rights reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * This file is part of LCUI, distributed under the MIT License found in the
+ * LICENSE.TXT file in the root directory of this source tree.
+ */
+
+#ifndef LIBCSS_INCLUDE_CSS_DEF_H
 #define LIBCSS_INCLUDE_CSS_DEF_H
 
 #include <yutil.h>

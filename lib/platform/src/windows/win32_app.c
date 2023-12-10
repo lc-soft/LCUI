@@ -1,13 +1,24 @@
-﻿#include "../app.h"
+﻿/*
+ * lib/platform/src/windows/win32_app.c
+ *
+ * Copyright (c) 2023, Liu Chao <i@lc-soft.io> All rights reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * This file is part of LCUI, distributed under the MIT License found in the
+ * LICENSE.TXT file in the root directory of this source tree.
+ */
+
+#include "../app.h"
 
 #ifdef LIBPLAT_WIN_DESKTOP
 #pragma comment(lib, "User32")
 #pragma comment(lib, "Gdi32")
 #include <windows.h>
-#include "resource.h"
-#include <LCUI/config.h>
 #include <yutil.h>
 #include <pandagl.h>
+
+#include "resource.h"
 
 #define MIN_WIDTH 320
 #define MIN_HEIGHT 240

@@ -1,4 +1,15 @@
-﻿void test_settings(void);
+﻿/*
+ * tests/run_tests.h
+ *
+ * Copyright (c) 2023, Liu Chao <i@lc-soft.io> All rights reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * This file is part of LCUI, distributed under the MIT License found in the
+ * LICENSE.TXT file in the root directory of this source tree.
+ */
+
+void test_settings(void);
 void test_thread(void);
 void test_font_load(void);
 void test_xml_parser(void);

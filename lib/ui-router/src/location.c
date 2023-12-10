@@ -1,4 +1,15 @@
-﻿#include "private.h"
+﻿/*
+ * lib/ui-router/src/location.c
+ *
+ * Copyright (c) 2023, Liu Chao <i@lc-soft.io> All rights reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * This file is part of LCUI, distributed under the MIT License found in the
+ * LICENSE.TXT file in the root directory of this source tree.
+ */
+
+#include "private.h"
 #include <ui_router/location.h>
 
 router_location_t *router_location_create(const char *name, const char *path)
