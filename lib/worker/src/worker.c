@@ -159,7 +159,6 @@ int worker_run_async(worker_t *worker)
         }
         worker->active = TRUE;
         thread_create(&worker->thread, worker_thread, worker);
-        logger_debug("[worker] worker %u is running\n", worker->thread);
         return 0;
 }
 
@@ -168,13 +167,11 @@ void worker_destroy(worker_t *worker)
         thread_t thread = worker->thread;
 
         if (worker->active) {
-                logger_debug("[worker] worker %u is stopping...\n", thread);
                 thread_mutex_lock(&worker->mutex);
                 worker->active = FALSE;
                 thread_cond_signal(&worker->cond);
                 thread_mutex_unlock(&worker->mutex);
                 thread_join(thread, NULL);
-                logger_debug("[worker] worker %u has stopped\n", thread);
                 return;
         }
         worker_do_destroy(worker);
