@@ -38,3 +38,5 @@ struct dict_value_t {
 dict_t *i18n_dict_create(void);
 
 bool i18n_dict_add_dict(dict_t *dict, const wchar_t *key, dict_t *child_dict);
+
+dict_t *i18n_load_yaml_file(const char *path);
