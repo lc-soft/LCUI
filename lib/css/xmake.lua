@@ -15,6 +15,7 @@ target("libcss")
     end
 
 target("libcss_tests")
+    set_default(false)
     set_kind("binary")
     set_rundir("tests")
     add_files("tests/*.c")
