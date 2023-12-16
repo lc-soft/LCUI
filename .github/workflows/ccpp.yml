@@ -44,8 +44,8 @@ jobs:
           xmake build pandagl_tests
           xmake build libcss_tests
           xmake build libui-router-tests
-          xmake run libi18n-tests
-          xmake run lcui_tests
+          xmake build libi18n-tests
+          xmake build lcui_tests
 
       - name: Run YUtil tests
         if: runner.os == 'Windows'
