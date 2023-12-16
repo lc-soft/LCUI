@@ -43,6 +43,7 @@ else
 end
 
 target("lcui_tests")
+    set_default(false)
     set_kind("binary")
     set_rundir("tests")
     add_includedirs("tests/include")

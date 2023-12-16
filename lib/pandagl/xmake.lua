@@ -60,6 +60,7 @@ target("pandagl")
     end
 
 target("pandagl_tests")
+    set_default(false)
     set_kind("binary")
     add_files("test/*.c")
     add_deps("ctest", "pandagl")
