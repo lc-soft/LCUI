@@ -117,10 +117,14 @@ bool ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
         ui_rect_t rect;
 
         if (!ui_widget_is_visible(w)) {
+                logger_debug(
+                    "ui_widget_mark_dirty_rect: widget is hidden, ignore\n");
                 return false;
         }
         if (in_rect) {
                 if (w->rendering.dirty_rect_type == UI_DIRTY_RECT_TYPE_FULL) {
+                        logger_debug(
+                            "ui_widget_mark_dirty_rect: duplicate, ignore\n");
                         return false;
                 }
                 rect = *in_rect;
@@ -150,7 +154,8 @@ bool ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
                         break;
                 }
                 if (w->rendering.dirty_rect_type > UI_DIRTY_RECT_TYPE_NONE) {
-                        ui_rect_merge(&w->rendering.dirty_rect, &rect, &w->rendering.dirty_rect);
+                        ui_rect_merge(&w->rendering.dirty_rect, &rect,
+                                      &w->rendering.dirty_rect);
                 } else {
                         w->rendering.dirty_rect = rect;
                 }

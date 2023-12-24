@@ -69,7 +69,7 @@ typedef enum lcui_display_mode_t {
 LCUI_API void lcui_init_ui(void);
 LCUI_API void lcui_destroy_ui(void);
 LCUI_API void lcui_update_ui(void);
-LCUI_API size_t lcui_render_ui(void);
+LCUI_API void lcui_render_ui(void);
 LCUI_API void lcui_preset_ui(void);
 LCUI_API void lcui_dispatch_ui_event(app_event_t *app_event);
 LCUI_API void lcui_set_ui_display_mode(lcui_display_mode_t mode);

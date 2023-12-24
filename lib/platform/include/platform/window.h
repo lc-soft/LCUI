@@ -34,6 +34,8 @@ LIBPLAT_PUBLIC void app_window_set_framebuffer_size(app_window_t *wnd, int width
 LIBPLAT_PUBLIC void app_window_set_size(app_window_t *wnd, int width, int height);
 LIBPLAT_PUBLIC void app_window_show(app_window_t *wnd);
 LIBPLAT_PUBLIC void app_window_hide(app_window_t *wnd);
+LIBPLAT_PUBLIC void app_window_fullscreen(app_window_t *wnd);
+LIBPLAT_PUBLIC void app_window_unfullscreen(app_window_t *wnd);
 LIBPLAT_PUBLIC void app_window_activate(app_window_t *wnd);
 LIBPLAT_PUBLIC void app_window_set_title(app_window_t *wnd, const wchar_t *title);
 LIBPLAT_PUBLIC int app_window_get_width(app_window_t *wnd);
