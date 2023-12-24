@@ -839,7 +839,7 @@ int css_cascade_style(const css_style_decl_t *style,
                 // TODO: 确定 cascade() 返回值的用法
         }
         // 给其它属性设置初始值
-        for (i = 1; i < count; ++i) {
+        for (i = 0; i < count; ++i) {
                 if (setted_props[i]) {
                         continue;
                 }
