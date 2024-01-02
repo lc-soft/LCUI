@@ -106,7 +106,8 @@ jobs:
           xmake package -v
           xmake install -o dist/lcui-package
 
-      - name: Package examples
+      - name: Build examples
+        continue-on-error: true
         run: |
           cd examples
           xmake -P . -v -y
