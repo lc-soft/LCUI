@@ -1,6 +1,8 @@
 #include <LCUI.h>
 #include <LCUI/main.h>
+#ifdef HAS_CAIRO
 #include <cairo.h>
+#endif
 #include "fabric.h"
 
 #define M_PI 3.1415926
@@ -16,6 +18,7 @@ bool displaySpans = true;
 
 ui_widget_prototype_t *ui_fabric_proto;
 
+#ifdef HAS_CAIRO
 // displays points
 void render_points(cairo_t *cr)
 {
@@ -50,8 +53,11 @@ void render_spans(cairo_t *cr)
         cairo_stroke(cr);
 }
 
+#endif
+
 void ui_fabric_on_frame(ui_widget_t *w)
 {
+#ifdef HAS_CAIRO
         ui_canvas_context_t *ctx = ui_canvas_get_context(w);
         cairo_surface_t *surface = cairo_image_surface_create_for_data(
             ctx->buffer.bytes, CAIRO_FORMAT_RGB24, ctx->buffer.width,
@@ -72,6 +78,7 @@ void ui_fabric_on_frame(ui_widget_t *w)
         cairo_surface_destroy(surface);
         ui_widget_mark_dirty_rect(w, NULL, UI_BOX_TYPE_GRAPH_BOX);
         ctx->release(ctx);
+#endif
 }
 
 static void ui_fabric_on_mousedown(ui_widget_t *w, ui_event_t *e, void *arg)
