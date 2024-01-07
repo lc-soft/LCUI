@@ -86,7 +86,6 @@ static void ui_image_dispatch_events(ui_image_t *image)
                 list_append_node(&events, &e->node);
         }
         list_destroy_without_node(&listeners, free);
-        ;
         list_concat(&ui_image_loader.events, &events);
 }
 
