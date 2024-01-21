@@ -1,7 +1,7 @@
 ﻿/*
  * lib/css/src/library.c: -- CSS library operation module.
  *
- * Copyright (c) 2018-2023-2023-2023-2023, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2024, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *

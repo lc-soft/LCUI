@@ -1,7 +1,7 @@
 ﻿/*
  * lib/css/src/properties/opacity.c
  *
- * Copyright (c) 2023, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2024, Liu Chao <i@lc-soft.io> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
