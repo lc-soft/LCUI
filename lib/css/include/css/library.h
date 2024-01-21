@@ -1,7 +1,7 @@
 ﻿/*
  * lib/css/include/css/library.h: -- CSS library operation module.
  *
- * Copyright (c) 2022-2023-2023-2023-2023, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2022-2024, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *

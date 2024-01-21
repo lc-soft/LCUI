@@ -1,7 +1,7 @@
 ﻿/*
  * lib/ui/src/ui_text_style.c: -- CSS font style parse and operation set.
  *
- * Copyright (c) 2018-2023-2023, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2024, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *

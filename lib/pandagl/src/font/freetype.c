@@ -1,7 +1,7 @@
 ﻿/*
  * lib/pandagl/src/font/freetype.c: -- The FreeType font-engine support module.
  *
- * Copyright (c) 2018-2019-2023-2023, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2024, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *

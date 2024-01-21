@@ -4,7 +4,7 @@ const path = require("path");
 const bom = "\ufeff";
 const cwd = process.cwd();
 const project = path.basename(cwd);
-const includes = ["lib\\platform"].map((file) =>
+const includes = ["lib", "include", "src"].map((file) =>
   path.resolve(cwd, file)
 );
 const excludes = ["lib/yutil"].map((file) => path.resolve(cwd, file));

@@ -1,7 +1,7 @@
 ﻿/*
  * lib/ui-widgets/src/canvas.c: -- canvas, used to draw custom graphics
  *
- * Copyright (c) 2019-2022-2023-2023, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2019-2024, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
