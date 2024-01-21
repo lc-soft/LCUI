@@ -68,7 +68,6 @@ typedef enum pd_text_eol_t {
 typedef struct pd_text_line_t {
 	int width;          /**< 宽度 */
 	int height;         /**< 高度 */
-	int text_height;    /**< 当前行中最大字体的高度 */
 	int length;         /**< 该行文本长度 */
 	pd_char_t **string; /**< 该行文本的数据 */
 	pd_text_eol_t eol;  /**< 行尾结束类型 */

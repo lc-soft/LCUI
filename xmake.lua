@@ -63,6 +63,7 @@ target("lcui_tests")
                 table.insert(argv, "valgrind")
                 table.insert(argv, "--leak-check=full")
                 table.insert(argv, "--error-exitcode=42")
+                table.insert(argv, "--num-callers=20")
                 table.insert(argv, target:targetfile())
                 os.execv("sudo", argv)
             end

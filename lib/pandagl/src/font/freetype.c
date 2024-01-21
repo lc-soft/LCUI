@@ -107,13 +107,17 @@ static size_t convert_glyph(pd_font_bitmap_t *bmp, FT_GlyphSlot slot, int mode)
 	 * 此情况的处理。
 	 * */
 	bmp->top = bitmap_glyph->top;
-	bmp->left = slot->metrics.horiBearingX >> 6;
+	bmp->left = bitmap_glyph->left;
 	bmp->rows = bitmap_glyph->bitmap.rows;
 	bmp->width = bitmap_glyph->bitmap.width;
-	bmp->advance.x = slot->metrics.horiAdvance >> 6; /* 水平跨距 */
-	bmp->advance.y = slot->metrics.vertAdvance >> 6; /* 垂直跨距 */
+	bmp->pitch = bmp->width * sizeof(uint8_t);
+	bmp->metrics.ascender = slot->face->size->metrics.ascender >> 6;
+	bmp->metrics.bbox_width = slot->face->size->metrics.max_advance >> 6;
+	bmp->metrics.bbox_height = slot->face->size->metrics.height >> 6;
+	bmp->metrics.hori_advance = slot->metrics.horiAdvance >> 6; /* 水平跨距 */
+	bmp->metrics.vert_advance = slot->metrics.vertAdvance >> 6; /* 垂直跨距 */
 	/* 分配内存，用于保存字体位图 */
-	size = bmp->rows * bmp->width * sizeof(uint8_t);
+	size = bmp->rows * bmp->pitch;
 	bmp->buffer = (uint8_t *)malloc(size);
 	if (!bmp->buffer) {
 		FT_Done_Glyph(glyph);
