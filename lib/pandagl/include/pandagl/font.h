@@ -41,12 +41,12 @@ typedef struct pd_font_bitmap_t {
 	int width; /**< 位图宽度 */
 	int rows;  /**< 位图行数 */
 	int pitch;
-	unsigned char *buffer; /**< 字体位图数据 */
-	short num_grays;
-	char pixel_mode;
+	uint8_t *buffer; /**< 字体位图数据 */
 	struct {
-		int x, y;
-	} advance;
+		int hori_advance, vert_advance;
+		int bbox_width, bbox_height;
+		int ascender;
+	} metrics;
 } pd_font_bitmap_t;
 
 typedef struct font_engine_t font_engine_t;

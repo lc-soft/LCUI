@@ -1,7 +1,7 @@
 ﻿/*
  * lib/pandagl/src/text/text.c
  *
- * Copyright (c) 2023, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2018-2023, Liu Chao <i@lc-soft.io> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -9,43 +9,14 @@
  * LICENSE.TXT file in the root directory of this source tree.
  */
 
-/*
- * textlayer.c -- text layout and rendering module.
- *
- * copyright (c) 2018, liu chao <lc-soft@live.cn> all rights reserved.
- *
- * redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *   * redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *   * neither the name of lcui nor the names of its contributors may be used
- *     to endorse or promote products derived from this software without
- *     specific prior written permission.
- *
- * this software is provided by the copyright holders and contributors "as is"
- * and any express or implied warranties, including, but not limited to, the
- * implied warranties of merchantability and fitness for a particular purpose
- * are disclaimed. in no event shall the copyright owner or contributors be
- * liable for any direct, indirect, incidental, special, exemplary, or
- * consequential damages (including, but not limited to, procurement of
- * substitute goods or services; loss of use, data, or profits; or business
- * interruption) however caused and on any theory of liability, whether in
- * contract, strict liability, or tort (including negligence or otherwise)
- * arising in any way out of the use of this software, even if advised of the
- * possibility of such damage.
- */
-
 #include <stdlib.h>
 #include <wctype.h>
 #include <pandagl.h>
+#include <math.h>
 
 typedef enum { PD_TEXT_ACTION_INSERT, PD_TEXT_ACTION_APPEND } pd_text_action_t;
 
-#define get_default_line_height(h) y_iround(h * 1.42857143)
+#define DEFAULT_LINE_HEIGHT 1.42857143
 #define isalpha(ch) (ch >= 'a' && ch <= 'z') || (ch >= 'a' && ch <= 'z')
 
 static void pd_text_line_init(pd_text_line_t *line)
@@ -55,7 +26,6 @@ static void pd_text_line_init(pd_text_line_t *line)
         line->length = 0;
         line->string = NULL;
         line->eol = PD_TEXT_EOL_NONE;
-        line->text_height = 0;
 }
 
 static void pd_text_line_destroy(pd_text_line_t *line)
@@ -69,7 +39,6 @@ static void pd_text_line_destroy(pd_text_line_t *line)
         line->width = 0;
         line->height = 0;
         line->length = 0;
-        line->text_height = 0;
         if (line->string) {
                 free(line->string);
         }
@@ -134,24 +103,24 @@ PD_INLINE pd_text_line_t *pd_text_get_line(pd_text_t *text, int line_num)
 static void pd_text_update_line_size(pd_text_t *text, pd_text_line_t *line)
 {
         int i;
-        pd_char_t *txtchar;
+        int text_height = text->default_style.pixel_size;
+        pd_char_t *ch;
 
         line->width = 0;
-        line->text_height = text->default_style.pixel_size;
         for (i = 0; i < line->length; ++i) {
-                txtchar = line->string[i];
-                if (!txtchar->bitmap) {
+                ch = line->string[i];
+                if (!ch->bitmap) {
                         continue;
                 }
-                line->width += txtchar->bitmap->advance.x;
-                if (line->text_height < txtchar->bitmap->advance.y) {
-                        line->text_height = txtchar->bitmap->advance.y;
+                line->width += ch->bitmap->metrics.hori_advance;
+                if (text_height < ch->bitmap->metrics.vert_advance) {
+                        text_height = ch->bitmap->metrics.vert_advance;
                 }
         }
         if (text->line_height > 0) {
                 line->height = text->line_height;
         } else {
-                line->height = get_default_line_height(line->text_height);
+                line->height = (int)round(text_height * DEFAULT_LINE_HEIGHT);
         }
 }
 
@@ -386,14 +355,16 @@ static int pd_text_get_line_rect(pd_text_t *text, int line_num, int start_col,
                         if (!line->string[i]->bitmap) {
                                 continue;
                         }
-                        rect->x += line->string[i]->bitmap->advance.x;
+                        rect->x +=
+                            line->string[i]->bitmap->metrics.hori_advance;
                 }
                 rect->width = 0;
                 for (i = start_col; i <= end_col && i < line->length; ++i) {
                         if (!line->string[i]->bitmap) {
                                 continue;
                         }
-                        rect->width += line->string[i]->bitmap->advance.x;
+                        rect->width +=
+                            line->string[i]->bitmap->metrics.hori_advance;
                 }
         }
         if (rect->width <= 0 || rect->height <= 0) {
@@ -494,9 +465,10 @@ int pd_text_set_insert_pixel_position(pd_text_t *text, int x, int y)
                 if (!txtchar->bitmap) {
                         continue;
                 }
-                pixel_pos += txtchar->bitmap->advance.x;
+                pixel_pos += txtchar->bitmap->metrics.hori_advance;
                 /* 如果在当前字中心点的前面 */
-                if (x <= pixel_pos - txtchar->bitmap->advance.x / 2) {
+                if (x <=
+                    pixel_pos - txtchar->bitmap->metrics.hori_advance / 2) {
                         ins_x = i;
                         break;
                 }
@@ -531,7 +503,7 @@ int pd_text_get_char_pixel_position(pd_text_t *text, int line_num, int col,
                 if (!txtchar || !txtchar->bitmap) {
                         continue;
                 }
-                pixel_x += txtchar->bitmap->advance.x;
+                pixel_x += txtchar->bitmap->metrics.hori_advance;
         }
         pixel_pos->x = pixel_x;
         pixel_pos->y = pixel_y;
@@ -607,7 +579,7 @@ static void pd_text_typeset_line(pd_text_t *text, int line_num)
                         continue;
                 }
                 /* 累加行宽度 */
-                line_width += txtchar->bitmap->advance.x;
+                line_width += txtchar->bitmap->metrics.hori_advance;
                 /* 如果是当前行的第一个字符，或者行宽度没有超过宽度限制 */
                 if (!autowrap || col < 1 || line_width <= max_width) {
                         if (isalpha(txtchar->code)) {
@@ -851,7 +823,7 @@ int pd_text_get_width(pd_text_t *text)
                             !line->string[i]->bitmap->buffer) {
                                 continue;
                         }
-                        w += line->string[i]->bitmap->advance.x;
+                        w += line->string[i]->bitmap->metrics.hori_advance;
                 }
                 if (w > max_w) {
                         max_w = w;
@@ -1196,58 +1168,34 @@ static void pd_text_render_line(pd_text_t *text, pd_rect_t *area,
                                 pd_canvas_t *graph, pd_pos_t layer_pos,
                                 pd_text_line_t *line, int y)
 {
-        pd_char_t *txtchar;
-        pd_pos_t ch_pos;
-        int baseline, col, x;
+        pd_char_t *ch;
+        pd_pos_t pen;
+        int col, x;
 
-        baseline = line->text_height * 4 / 5;
         x = pd_text_get_line_start_x(text, line) + text->offset_x;
-        /* 确定从哪个文字开始绘制 */
-        for (col = 0; col < line->length; ++col) {
-                txtchar = line->string[col];
-                /* 忽略无字体位图的文字 */
-                if (!txtchar->bitmap) {
+        for (col = 0; col < line->length && x < area->x + area->width; ++col) {
+                ch = line->string[col];
+                if (!ch->bitmap) {
                         continue;
                 }
-                x += txtchar->bitmap->advance.x;
-                if (x > area->x) {
-                        x -= txtchar->bitmap->advance.x;
-                        break;
-                }
-        }
-        /* 若一整行的文本都不在可绘制区域内 */
-        if (col >= line->length) {
-                y += line->height;
-                return;
-        }
-        /* 遍历该行的文字 */
-        for (; col < line->length; ++col) {
-                txtchar = line->string[col];
-                if (!txtchar->bitmap) {
+                if (x + ch->bitmap->metrics.hori_advance < area->x) {
                         continue;
                 }
-                /* 计算字体位图的绘制坐标 */
-                ch_pos.x = layer_pos.x + x;
-                ch_pos.y = layer_pos.y + y;
-                if (txtchar->style && txtchar->style->has_back_color) {
+                pen.x = layer_pos.x + x;
+                pen.y = layer_pos.y + y;
+                if (ch->style && ch->style->has_back_color) {
                         pd_rect_t rect;
-                        rect.x = ch_pos.x;
-                        rect.y = ch_pos.y;
+                        rect.x = pen.x;
+                        rect.y = pen.y;
                         rect.height = line->height;
-                        rect.width = txtchar->bitmap->advance.x;
-                        pd_canvas_fill_rect(graph, txtchar->style->back_color,
-                                            rect);
+                        rect.width = ch->bitmap->metrics.hori_advance;
+                        pd_canvas_fill_rect(graph, ch->style->back_color, rect);
                 }
-                ch_pos.x += txtchar->bitmap->left;
-                ch_pos.y += baseline;
-                ch_pos.y += (line->height - baseline) / 2;
-                ch_pos.y -= txtchar->bitmap->top;
-                pd_text_render_char(text, txtchar, graph, ch_pos);
-                x += txtchar->bitmap->advance.x;
-                /* 如果超过绘制区域则不继续绘制该行文本 */
-                if (x > area->x + area->width) {
-                        break;
-                }
+                pen.x += ch->bitmap->left;
+                pen.y += (line->height - ch->bitmap->metrics.bbox_height) /
+                2 + ch->bitmap->metrics.ascender - ch->bitmap->top;
+                pd_text_render_char(text, ch, graph, pen);
+                x += ch->bitmap->metrics.hori_advance;
         }
 }
 
