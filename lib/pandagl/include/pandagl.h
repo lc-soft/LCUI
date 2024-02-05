@@ -20,6 +20,7 @@
 #include "pandagl/background.h"
 #include "pandagl/border.h"
 #include "pandagl/boxshadow.h"
+#include "pandagl/file_reader.h"
 #include "pandagl/font.h"
 #include "pandagl/text.h"
 #include "pandagl/image.h"

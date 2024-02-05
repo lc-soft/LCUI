@@ -14,193 +14,237 @@
 #include <string.h>
 #include <stdlib.h>
 #include <pandagl.h>
-#include "bmp.h"
-#include "png.h"
-#include "jpeg.h"
+#include "bmp_private.h"
+#include "png_private.h"
+#include "jpeg_private.h"
 
-typedef struct pd_image_interface_t {
-	const char *suffix;
-	int (*init)(pd_image_reader_t *);
-	int (*read_header)(pd_image_reader_t *);
-	int (*read)(pd_image_reader_t *, pd_canvas_t *);
-} pd_image_interface_t;
+typedef struct {
+        const char *suffix;
+        pd_image_reader_type_t type;
+        void (*create)(pd_image_reader_t *);
+        void (*destroy)(pd_image_reader_t *);
+        jmp_buf *(*jmpbuf)(pd_image_reader_t *);
+        pd_error_t (*reade_header)(pd_image_reader_t *);
+        void (*start)(pd_image_reader_t *);
+        void (*read_row)(pd_image_reader_t *, pd_canvas_t *);
+        void (*finish)(pd_image_reader_t *);
+} pd_image_reader_methods_t;
 
-static const pd_image_interface_t pd_image_interfaces[] = {
+static pd_image_reader_methods_t pd_image_readers[] = {
 #ifdef PANDAGL_HAS_LIBPNG
-	{ ".png", pd_png_reader_init, pd_png_reader_read_header,
-	  pd_png_reader_read_data },
+        { ".png", PD_PNG_READER, pd_png_reader_create, pd_png_reader_destroy,
+          pd_png_reader_jmpbuf, pd_png_reader_read_header, pd_png_reader_start,
+          pd_png_reader_read_row, pd_png_reader_finish },
 #endif
 #ifdef PANDAGL_HAS_LIBJPEG
-	{ ".jpeg .jpg", pd_jpeg_reader_init, pd_jpeg_reader_read_header,
-	  pd_jpeg_reader_read_data },
+        { ".jpeg .jpg", PD_JPEG_READER, pd_jpeg_reader_create,
+          pd_jpeg_reader_destroy, pd_jpeg_reader_jmpbuf,
+          pd_jpeg_reader_read_header, pd_jpeg_reader_start,
+          pd_jpeg_reader_read_row, pd_jpeg_reader_finish },
 #endif
-	{ ".bmp", pd_bmp_reader_init, pd_bmp_reader_read_header,
-	  pd_bmp_reader_read_data }
+        { ".bmp", PD_BMP_READER, pd_bmp_reader_create, pd_bmp_reader_destroy,
+          pd_bmp_reader_jmpbuf, pd_bmp_reader_read_header, pd_bmp_reader_start,
+          pd_bmp_reader_read_row, pd_bmp_reader_finish },
 };
 
-#define INTERFACES_COUNT \
-	(sizeof(pd_image_interfaces) / sizeof(pd_image_interface_t))
-
-static size_t pd_file_stream_on_read(void *data, void *buffer, size_t size)
+static pd_image_reader_type_t pd_image_reader_detect_suffix(
+    const char *filename)
 {
-	return fread(buffer, 1, size, data);
+        int i;
+        const char *suffix = NULL;
+
+        for (i = 0; filename[i]; ++i) {
+                if (filename[i] == '.') {
+                        suffix = filename + i;
+                }
+        }
+        if (!suffix) {
+                return PD_UNKNOWN_READER;
+        }
+        for (i = 0; i < sizeof(pd_image_readers) / sizeof(pd_image_readers[0]);
+             ++i) {
+                if (strstr(pd_image_readers[i].suffix, suffix)) {
+                        return pd_image_readers[i].type;
+                }
+        }
+        return PD_UNKNOWN_READER;
 }
 
-static void pd_file_stream_on_skip(void *data, long offset)
+static pd_image_reader_methods_t *pd_image_reader_get_methods(
+    pd_image_reader_t *reader)
 {
-	fseek(data, offset, SEEK_CUR);
+        int i;
+        for (i = 0; i < sizeof(pd_image_readers) / sizeof(pd_image_readers[0]);
+             ++i) {
+                if (pd_image_readers[i].type == reader->type) {
+                        return pd_image_readers + i;
+                }
+        }
+        return NULL;
 }
 
-static void pd_file_stream_on_rewind(void *data)
+pd_image_reader_t *pd_image_reader_create(void)
 {
-	rewind(data);
+        pd_image_reader_t *reader = calloc(1, sizeof(pd_image_reader_t));
+        reader->passes = 1;
+        return reader;
 }
 
-void pd_image_reader_set_file(pd_image_reader_t *reader, FILE *fp)
+pd_image_reader_t *pd_image_reader_create_from_file(const char *filename)
 {
-	reader->stream_data = fp;
-	reader->fn_skip = pd_file_stream_on_skip;
-	reader->fn_read = pd_file_stream_on_read;
-	reader->fn_rewind = pd_file_stream_on_rewind;
-}
+        pd_image_reader_t *reader;
+        pd_file_reader_t *file_reader;
 
-static int pd_detech_image_type(const char *filename)
-{
-	int i;
-	const char *suffix = NULL;
-
-	for (i = 0; filename[i]; ++i) {
-		if (filename[i] == '.') {
-			suffix = filename + i;
-		}
-	}
-	if (!suffix) {
-		return -1;
-	}
-	for (i = 0; i < INTERFACES_COUNT; ++i) {
-		if (strstr(pd_image_interfaces[i].suffix, suffix)) {
-			return i;
-		}
-	}
-	return -1;
-}
-
-static int pd_image_reader_init_for_type(pd_image_reader_t *reader, int type)
-{
-	int ret;
-	reader->fn_rewind(reader->stream_data);
-	ret = pd_image_interfaces[type].init(reader);
-	if (ret != 0) {
-		return -2;
-	}
-	if (pd_image_reader_set_jump(reader)) {
-		return -2;
-	}
-	return pd_image_interfaces[type].read_header(reader);
-}
-
-int pd_image_reader_init(pd_image_reader_t *reader)
-{
-	int ret, i;
-	for (i = 0; i < INTERFACES_COUNT; ++i) {
-		reader->fn_rewind(reader->stream_data);
-		ret = pd_image_reader_init_for_type(reader, i);
-		if (ret == 0) {
-			return 0;
-		}
-		pd_image_reader_destroy(reader);
-	}
-	reader->fn_rewind(reader->stream_data);
-	reader->type = PD_UNKNOWN_READER;
-	return -ENOENT;
+        file_reader = pd_file_reader_create_from_file(filename);
+        if (!file_reader) {
+                return NULL;
+        }
+        reader = pd_image_reader_create();
+        reader->type = pd_image_reader_detect_suffix(filename);
+        reader->file_reader = file_reader;
+        return reader;
 }
 
 void pd_image_reader_destroy(pd_image_reader_t *reader)
 {
-	if (reader->data) {
-		reader->destructor(reader->data);
-	}
-	reader->data = NULL;
-	reader->type = PD_UNKNOWN_READER;
-	reader->header.type = PD_UNKNOWN_IMAGE;
+        if (reader->reader_data) {
+                pd_image_reader_get_methods(reader)->destroy(reader);
+        }
+        pd_file_reader_destroy(reader->file_reader);
+        reader->type = PD_UNKNOWN_READER;
+        reader->header.type = PD_UNKNOWN_IMAGE;
+        reader->reader_data = NULL;
+        reader->file_reader = NULL;
+        free(reader);
 }
 
-int pd_image_reader_read_header(pd_image_reader_t *reader)
+static pd_error_t pd_image_reader_try_read_header(pd_image_reader_t *reader)
 {
-	int i = reader->type - 1;
-	if (reader->header.type != PD_UNKNOWN_IMAGE) {
-		return 0;
-	}
-	if (i < INTERFACES_COUNT && i >= 0) {
-		return pd_image_interfaces[i].read_header(reader);
-	}
-	return -2;
+        pd_error_t err;
+        pd_image_reader_methods_t *methods =
+            pd_image_reader_get_methods(reader);
+
+        if (methods) {
+                methods->create(reader);
+                err = methods->reade_header(reader);
+                if (err != PD_OK) {
+                        methods->destroy(reader);
+                        reader->reader_data = NULL;
+                }
+                return err;
+        }
+        return PD_ERROR_IMAGE_HEADER_INVALID;
 }
 
-int pd_image_reader_read_data(pd_image_reader_t *reader, pd_canvas_t *out)
+pd_error_t pd_image_reader_read_header(pd_image_reader_t *reader)
 {
-	int i = reader->type - 1;
-	if (i < INTERFACES_COUNT && i >= 0) {
-		return pd_image_interfaces[i].read(reader, out);
-	}
-	return -2;
+        pd_error_t err;
+        pd_image_reader_type_t type = reader->type;
+        pd_image_reader_methods_t *methods;
+
+        if (!reader->reader_data) {
+                if (reader->type != PD_UNKNOWN_READER &&
+                    pd_image_reader_try_read_header(reader) == PD_OK) {
+                        return PD_OK;
+                }
+                type = reader->type;
+                for (reader->type = PD_PNG_READER;
+                     reader->type < PD_READER_COUNT; ++reader->type) {
+                        if (reader->type == type) {
+                                continue;
+                        }
+                        pd_file_reader_rewind(reader->file_reader);
+                        err = pd_image_reader_try_read_header(reader);
+                        if (err == PD_OK) {
+                                break;
+                        }
+                }
+        }
+        methods = pd_image_reader_get_methods(reader);
+        if (methods) {
+                return methods->reade_header(reader);
+        }
+        reader->type = PD_UNKNOWN_READER;
+        return PD_ERROR_IMAGE_TYPE_INCORRECT;
 }
 
-int pd_read_image_from_file(const char *filepath, pd_canvas_t *out)
+pd_error_t pd_image_reader_create_buffer(pd_image_reader_t *reader,
+                                         pd_canvas_t *out)
 {
-	int ret;
-	FILE *fp;
-	pd_image_reader_t reader = { 0 };
-
-	fp = fopen(filepath, "rb");
-	if (!fp) {
-		return -ENOENT;
-	}
-	ret = pd_detech_image_type(filepath);
-	pd_image_reader_set_file(&reader, fp);
-	if (ret >= 0) {
-		ret = pd_image_reader_init_for_type(&reader, ret);
-	}
-	if (ret < 0) {
-		if (pd_image_reader_init(&reader) != 0) {
-			fclose(fp);
-			return -2;
-		}
-	}
-	if (pd_image_reader_set_jump(&reader)) {
-		ret = -2;
-	} else {
-		ret = pd_image_reader_read_data(&reader, out);
-	}
-	pd_image_reader_destroy(&reader);
-	fclose(fp);
-	return ret;
+        switch (reader->header.color_type) {
+        case PD_COLOR_TYPE_ARGB:
+                out->color_type = PD_COLOR_TYPE_ARGB;
+                break;
+        case PD_COLOR_TYPE_RGB:
+                out->color_type = PD_COLOR_TYPE_RGB;
+                break;
+        default:
+                return PD_ERROR_IMAGE_DATA_NOT_SUPPORTED;
+        }
+        return pd_canvas_create(out, reader->header.width,
+                                reader->header.height);
 }
 
-int pd_read_image_size_from_file(const char *filepath, int *width, int *height)
+jmp_buf *pd_image_reader_jmpbuf(pd_image_reader_t *reader)
 {
-	int ret;
-	FILE *fp;
-	pd_image_reader_t reader = { 0 };
+        return pd_image_reader_get_methods(reader)->jmpbuf(reader);
+}
 
-	fp = fopen(filepath, "rb");
-	if (!fp) {
-		return -ENOENT;
-	}
-	ret = pd_detech_image_type(filepath);
-	pd_image_reader_set_file(&reader, fp);
-	if (ret >= 0) {
-		ret = pd_image_reader_init_for_type(&reader, ret);
-	}
-	if (ret < 0) {
-		if (pd_image_reader_init(&reader) != 0) {
-			fclose(fp);
-			return -2;
-		}
-	}
-	*width = reader.header.width;
-	*height = reader.header.height;
-	pd_image_reader_destroy(&reader);
-	fclose(fp);
-	return 0;
+void pd_image_reader_start(pd_image_reader_t *reader)
+{
+        pd_image_reader_get_methods(reader)->start(reader);
+}
+
+void pd_image_reader_finish(pd_image_reader_t *reader)
+{
+        pd_image_reader_get_methods(reader)->finish(reader);
+}
+
+void pd_image_reader_read_row(pd_image_reader_t *reader, pd_canvas_t *data)
+{
+        pd_image_reader_get_methods(reader)->read_row(reader, data);
+        reader->read_row_index++;
+}
+
+pd_error_t pd_image_reader_read_data(pd_image_reader_t *reader,
+                                     pd_canvas_t *out)
+{
+        pd_image_reader_methods_t *methods =
+            pd_image_reader_get_methods(reader);
+
+        if (!methods) {
+                return PD_ERROR_IMAGE_TYPE_INCORRECT;
+        }
+        if (setjmp(*pd_image_reader_jmpbuf(reader))) {
+                return PD_ERROR_IMAGE_READING;
+        }
+        if (pd_image_reader_create_buffer(reader, out) != PD_OK) {
+                return PD_ERROR_IMAGE_DATA_NOT_SUPPORTED;
+        }
+        pd_image_reader_start(reader);
+        for (reader->pass = 0; reader->pass < reader->passes; ++reader->pass) {
+                reader->read_row_index = 0;
+                while (reader->read_row_index < reader->header.height) {
+                        pd_image_reader_read_row(reader, out);
+                }
+        }
+        pd_image_reader_finish(reader);
+        return PD_OK;
+}
+
+pd_error_t pd_read_image_from_file(const char *filepath, pd_canvas_t *out)
+{
+        pd_error_t err;
+        pd_image_reader_t *reader;
+
+        reader = pd_image_reader_create_from_file(filepath);
+        if (!reader) {
+                return PD_ERROR_NOT_FOUND;
+        }
+        err = pd_image_reader_read_header(reader);
+        if (err == PD_OK) {
+                err = pd_image_reader_read_data(reader, out);
+        }
+        pd_image_reader_destroy(reader);
+        return err;
 }

@@ -9,6 +9,7 @@
  * LICENSE.TXT file in the root directory of this source tree.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <yutil.h>
@@ -24,6 +25,7 @@ typedef struct ui_image_event_listener_t {
 struct ui_image_t {
         pd_canvas_t data;
         bool loaded;
+        int error;
         char *path;
         size_t refs_count;
         /** list_t<ui_image_event_listener_t> */
@@ -91,13 +93,14 @@ static void ui_image_dispatch_events(ui_image_t *image)
 
 static void ui_image_load(ui_image_t *image)
 {
-        if (!image->loaded) {
-                if (pd_read_image_from_file(image->path, &image->data) != 0) {
-                        pd_canvas_init(&image->data);
-                }
+        if (image->loaded) {
+                return;
+        }
+        pd_canvas_init(&image->data);
+        image->error = pd_read_image_from_file(image->path, &image->data);
+        if (image->error == PD_OK) {
                 image->loaded = true;
         }
-        ui_image_dispatch_events(image);
 }
 
 ui_image_t *ui_get_image(const char *path)
@@ -195,6 +198,7 @@ void ui_load_images(void)
         list_concat(&list, &ui_image_loader.images);
         for (list_each(node, &list)) {
                 ui_image_load(node->data);
+                ui_image_dispatch_events(node->data);
         }
 }
 
