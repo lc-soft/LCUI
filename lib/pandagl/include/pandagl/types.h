@@ -21,6 +21,7 @@ typedef unsigned char pd_bool_t;
 #define PD_TRUE 1
 
 typedef enum pd_color_type_t {
+	PD_COLOR_TYPE_UNSUPPORTED,
 	PD_COLOR_TYPE_INDEX8,   /**< 8位索引 */
 	PD_COLOR_TYPE_GRAY8,    /**< 8位灰度 */
 	PD_COLOR_TYPE_RGB323,   /**< RGB323 */
@@ -28,7 +29,7 @@ typedef enum pd_color_type_t {
 	PD_COLOR_TYPE_RGB555,   /**< RGB555 */
 	PD_COLOR_TYPE_RGB565,   /**< RGB565 */
 	PD_COLOR_TYPE_RGB888,   /**< RGB888 */
-	PD_COLOR_TYPE_ARGB8888  /**< RGB8888 */
+	PD_COLOR_TYPE_ARGB8888,  /**< RGB8888 */
 } pd_color_type_t;
 
 #define PD_COLOR_TYPE_RGB PD_COLOR_TYPE_RGB888
@@ -125,5 +126,15 @@ typedef struct pd_border_t {
 	unsigned int bottom_left_radius;
 	unsigned int bottom_right_radius;
 } pd_border_t;
+
+typedef enum pd_error_t {
+	PD_OK = 0,
+	PD_ERROR_NOT_FOUND,
+	PD_ERROR_NOT_IMPLEMENTED,
+	PD_ERROR_IMAGE_HEADER_INVALID,
+	PD_ERROR_IMAGE_TYPE_INCORRECT,
+	PD_ERROR_IMAGE_DATA_NOT_SUPPORTED,
+	PD_ERROR_IMAGE_READING
+} pd_error_t;
 
 #endif
