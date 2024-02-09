@@ -1,4 +1,4 @@
-/*
+﻿/*
  * lib/ui/src/ui_widget_style.c
  *
  * Copyright (c) 2023-2024, Liu Chao <i@lc-soft.io> All rights reserved.
@@ -254,16 +254,13 @@ void ui_widget_set_style_keyword_value(ui_widget_t *w, int key,
         ui_widget_set_style(w, key, &v);
 }
 
-static void ui_widget_on_image_load(ui_image_t *loaded_image, void *data)
+static void ui_widget_on_image_load(ui_image_event_t *e)
 {
         float scale;
-        ui_widget_t *w = data;
-        pd_canvas_t *img = (pd_canvas_t *)loaded_image;
+        ui_widget_t *w = e->data;
+        pd_canvas_t *img = &e->image->data;
         css_computed_style_t *s = &w->computed_style;
 
-        if (!loaded_image) {
-                return;
-        }
         CSS_COPY_LENGTH(s, &w->specified_style, background_width);
         CSS_COPY_LENGTH(s, &w->specified_style, background_height);
         CSS_COPY_LENGTH(s, &w->specified_style, background_position_x);
@@ -333,6 +330,17 @@ static void ui_widget_on_image_load(ui_image_t *loaded_image, void *data)
         ui_widget_mark_dirty_rect(w, NULL, UI_BOX_TYPE_BORDER_BOX);
 }
 
+static void ui_widget_on_image_load_start(ui_image_event_t *e)
+{
+        ui_widget_on_image_load(e);
+        ui_image_off_progress(e->image, ui_widget_on_image_load_start, e->data);
+}
+
+static void ui_widget_on_image_progress(ui_image_event_t *e)
+{
+        ui_widget_mark_dirty_rect(e->data, NULL, UI_BOX_TYPE_GRAPH_BOX);
+}
+
 static void ui_widget_destroy_background_style(ui_widget_t *w)
 {
         ui_image_t *image;
@@ -340,7 +348,11 @@ static void ui_widget_destroy_background_style(ui_widget_t *w)
         if (w->computed_style.background_image) {
                 image = ui_get_image(w->computed_style.background_image);
                 if (image) {
-                        ui_image_off_event(image, ui_widget_on_image_load, w);
+                        ui_image_off_load(image, ui_widget_on_image_load, w);
+                        ui_image_off_progress(image,
+                                              ui_widget_on_image_load_start, w);
+                        ui_image_off_progress(image,
+                                              ui_widget_on_image_progress, w);
                         ui_image_destroy(image);
                 }
         }
@@ -349,6 +361,7 @@ static void ui_widget_destroy_background_style(ui_widget_t *w)
 void ui_widget_compute_style(ui_widget_t *w)
 {
         ui_image_t *image;
+        ui_image_event_t e;
         css_computed_style_t *s = &w->computed_style;
 
         if (w->parent) {
@@ -357,12 +370,19 @@ void ui_widget_compute_style(ui_widget_t *w)
         }
         if (s->background_image) {
                 image = ui_get_image(s->background_image);
-                ui_image_on_event(image, ui_widget_on_image_load, w);
+                if (image->state == UI_IMAGE_STATE_COMPLETE &&
+                    image->error == PD_OK) {
+                        e.type = UI_IMAGE_EVENT_LOAD;
+                        e.data = w;
+                        e.image = image;
+                        ui_widget_on_image_load(&e);
+                }
         }
 }
 
 void ui_widget_update_style(ui_widget_t *w)
 {
+        ui_image_t *image;
         css_computed_style_t *s = &w->specified_style;
         css_style_decl_t *style;
 
@@ -380,7 +400,10 @@ void ui_widget_update_style(ui_widget_t *w)
         w->computed_style = *s;
         // 增加 UIImage 的引用次数，让它在部件销毁和背景图改变前一直可用
         if (s->background_image) {
-                ui_image_create(s->background_image);
+                image = ui_image_create(s->background_image);
+                ui_image_on_load(image, ui_widget_on_image_load, w);
+                ui_image_on_progress(image, ui_widget_on_image_load_start, w);
+                ui_image_on_progress(image, ui_widget_on_image_progress, w);
         }
         ui_widget_compute_style(w);
         ui_widget_update_box_size(w);
