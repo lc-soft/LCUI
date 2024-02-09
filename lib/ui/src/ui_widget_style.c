@@ -1,4 +1,4 @@
-﻿/*
+/*
  * lib/ui/src/ui_widget_style.c
  *
  * Copyright (c) 2023-2024, Liu Chao <i@lc-soft.io> All rights reserved.
@@ -269,7 +269,7 @@ static void ui_widget_on_image_load(ui_image_t *loaded_image, void *data)
         CSS_COPY_LENGTH(s, &w->specified_style, background_position_x);
         CSS_COPY_LENGTH(s, &w->specified_style, background_position_y);
         switch (s->type_bits.background_width) {
-        case CSS_BACKGROUND_SIZE_CONVER:
+        case CSS_BACKGROUND_SIZE_COVER:
                 scale = 1.f * w->padding_box.width / img->width;
                 scale = y_max(scale, 1.f * w->padding_box.height / img->height);
                 CSS_SET_FIXED_LENGTH(s, background_width, scale * img->width);

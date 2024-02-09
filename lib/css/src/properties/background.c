@@ -102,7 +102,7 @@ static int css_cascade_background_size_1(const css_style_array_value_t input,
                         break;
                 case CSS_KEYWORD_COVER:
                         s->type_bits.background_width =
-                            CSS_BACKGROUND_SIZE_CONVER;
+                            CSS_BACKGROUND_SIZE_COVER;
                         break;
                 case CSS_KEYWORD_CONTAIN:
                         s->type_bits.background_width =
