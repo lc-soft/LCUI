@@ -10,6 +10,7 @@
  */
 
 #include <time.h>
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -149,6 +150,7 @@ void lcui_destroy_app(void)
 void lcui_init(void)
 {
         lcui_init_app();
+        setlocale(LC_CTYPE, "");
         if (app_init(L"LCUI Application") != 0) {
                 abort();
         }

@@ -29,7 +29,7 @@ int clipboard_request_text(clipboard_callback_t callback, void *arg)
 	wchar_t *wstr = malloc(sizeof(wchar_t) * len);
 	clipboard_t clipboard_data = { 0 };
 
-	len = decode_utf8(wstr, clipboard.text, len);
+	len = mbstowcs(wstr, clipboard.text, len);
 	wstr[len] = 0;
 	// Assign the data
 	clipboard_data.text = wstr;

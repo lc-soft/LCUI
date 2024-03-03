@@ -21,7 +21,7 @@ static wchar_t *yaml_token_getwcs(yaml_token_t *token)
         char *str = (char *)token->data.scalar.value;
         size_t len = token->data.scalar.length;
         wchar_t *wcs = malloc(sizeof(wchar_t) * (len + 1));
-        len = decode_utf8(wcs, str, len);
+        len = mbstowcs(wcs, str, len);
         if (len < 1) {
                 abort();
         }
