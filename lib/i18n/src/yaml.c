@@ -19,13 +19,9 @@
 static wchar_t *yaml_token_getwcs(yaml_token_t *token)
 {
         char *str = (char *)token->data.scalar.value;
-        size_t len = token->data.scalar.length;
-        wchar_t *wcs = malloc(sizeof(wchar_t) * (len + 1));
-        len = decode_utf8(wcs, str, len);
-        if (len < 1) {
-                abort();
-        }
-        wcs[len] = 0;
+        size_t len = token->data.scalar.length + 1;
+        wchar_t *wcs = calloc(len, sizeof(wchar_t));
+        mbstowcs(wcs, str, len + 1);
         return wcs;
 }
 
@@ -73,7 +69,7 @@ dict_t *i18n_load_yaml_file(const char *path)
                 return NULL;
         }
         if (!yaml_parser_initialize(&parser)) {
-		free(buffer);
+                free(buffer);
                 logger_error("[i18n] failed to initialize parser!\n");
                 return NULL;
         }

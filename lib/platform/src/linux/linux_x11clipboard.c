@@ -77,7 +77,7 @@ void x11_clipboard_execute_action(bool timed_out)
 	} else {
 		size_t len = x11_clipboard.text_len + 1;
 		wstr = malloc(sizeof(wchar_t) * len);
-		len = decode_utf8(wstr, x11_clipboard.text, len);
+		len = mbstowcs(wstr, x11_clipboard.text, len);
 		wstr[len] = 0;
 		// Assign the data
 		clipboard_data.text = wstr;
