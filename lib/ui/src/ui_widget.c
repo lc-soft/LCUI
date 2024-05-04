@@ -113,7 +113,7 @@ void ui_widget_add_state(ui_widget_t* w, ui_widget_state_t state)
 			ui_event_t e = { 0 };
 			e.type = UI_EVENT_READY;
 			e.cancel_bubble = true;
-			ui_widget_emit_event(w, e, NULL);
+			ui_widget_post_event(w, &e, NULL, NULL);
 			w->state = UI_WIDGET_STATE_NORMAL;
 		}
 	}

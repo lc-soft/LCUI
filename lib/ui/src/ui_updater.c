@@ -21,7 +21,6 @@
 #include <ui/hash.h>
 #include "ui_debug.h"
 #include "ui_diff.h"
-#include "ui_trash.h"
 #include "ui_updater.h"
 #include "ui_mutation_observer.h"
 #include "ui_widget_style.h"
@@ -485,7 +484,6 @@ size_t ui_update(void)
         ui_updater.refresh_all = false;
         ui_process_mutations(root);
         ui_process_mutation_observers();
-        ui_trash_clear();
         return count;
 }
 

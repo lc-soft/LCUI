@@ -103,7 +103,7 @@ void ui_widget_reflow(ui_widget_t *w)
 #endif
 
 	ui_widget_reflow_with_rule(w, rule);
-	ui_widget_emit_event(w, ev, NULL);
+	ui_widget_post_event(w, &ev, NULL, NULL);
 	ui_widget_add_state(w, UI_WIDGET_STATE_LAYOUTED);
 #ifdef UI_DEBUG_ENABLED
 	{

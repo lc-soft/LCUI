@@ -160,6 +160,7 @@ size_t lcui_render_ui(void)
 
 void lcui_update_ui(void)
 {
+        ui_clear_trash();
         ui_process_image_events();
         ui_process_events();
         ui_update();

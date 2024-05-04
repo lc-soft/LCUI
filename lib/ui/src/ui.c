@@ -12,7 +12,6 @@
 #include <pandagl.h>
 #include <ui/types.h>
 #include "ui/base.h"
-#include "ui_trash.h"
 #include "ui_root.h"
 #include "ui_events.h"
 #include "ui_image.h"
@@ -38,7 +37,7 @@ void ui_init(void)
 void ui_destroy(void)
 {
 	pd_font_library_destroy();
-	ui_trash_clear();
+	ui_clear_trash();
 	ui_destroy_root();
 	ui_destroy_events();
 	ui_destroy_image_loader();

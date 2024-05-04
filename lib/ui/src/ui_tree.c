@@ -18,9 +18,31 @@
 #include <ui/rect.h>
 #include <ui/mutation_observer.h>
 #include "ui_widget_observer.h"
-#include "ui_trash.h"
 
 #define TYPE_CHILD_LIST UI_MUTATION_RECORD_TYPE_CHILD_LIST
+
+static list_t ui_trash = { 0 };
+
+size_t ui_clear_trash(void)
+{
+        list_node_t *node = ui_trash.head.next;
+        size_t count = ui_trash.length;
+
+        while (node) {
+                list_node_t *next = node->next;
+                list_unlink(&ui_trash, node);
+                ui_widget_destroy(node->data);
+                node = next;
+        }
+        return count;
+}
+
+static void ui_trash_add(ui_widget_t *w)
+{
+        w->state = UI_WIDGET_STATE_DELETED;
+        w->parent = NULL;
+        list_append_node(&ui_trash, &w->node);
+}
 
 int ui_widget_append(ui_widget_t *parent, ui_widget_t *widget)
 {
