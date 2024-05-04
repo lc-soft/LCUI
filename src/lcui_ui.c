@@ -160,10 +160,7 @@ size_t lcui_render_ui(void)
 
 void lcui_update_ui(void)
 {
-        ui_process_image_events();
-        ui_process_events();
         ui_update();
-
 	thread_mutex_lock(&lcui_ui.image_loader.mutex);
         ui_clear_images();
 	thread_mutex_unlock(&lcui_ui.image_loader.mutex);

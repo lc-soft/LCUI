@@ -19,9 +19,9 @@
 #include <ui/metrics.h>
 #include <ui/mutation_observer.h>
 #include <ui/hash.h>
+#include <ui/image.h>
 #include "ui_debug.h"
 #include "ui_diff.h"
-#include "ui_trash.h"
 #include "ui_updater.h"
 #include "ui_mutation_observer.h"
 #include "ui_widget_style.h"
@@ -99,7 +99,7 @@ void ui_widget_set_rules(ui_widget_t* w, const ui_widget_rules_t* rules)
         w->extra->default_max_update_count = 2048;
 }
 
-void ui_widget_update_stacking_context(ui_widget_t* w)
+static void ui_widget_update_stacking_context(ui_widget_t* w)
 {
         ui_widget_t *child, *target;
         css_computed_style_t *s, *ts;
@@ -470,23 +470,22 @@ static void ui_process_mutations(ui_widget_t* w)
         w->update.border_box_backup = w->border_box;
 }
 
-size_t ui_update(void)
+void ui_update(void)
 {
-        size_t count;
-        ui_widget_t* root;
-
-        root = ui_root();
+        ui_widget_t *root = ui_root();
         if (memcmp(&ui_metrics, &ui_updater.metrics, sizeof(ui_metrics_t))) {
                 ui_updater.refresh_all = true;
                 root->rendering.dirty_rect_type = UI_DIRTY_RECT_TYPE_FULL;
         }
-        count = ui_widget_update(root);
+        ui_process_image_events();
+        ui_process_events();
+        ui_widget_update(root);
         ui_updater.metrics = ui_metrics;
         ui_updater.refresh_all = false;
         ui_process_mutations(root);
         ui_process_mutation_observers();
-        ui_trash_clear();
-        return count;
+        ui_process_events();
+        ui_clear_trash();
 }
 
 void ui_init_updater(void)

@@ -619,6 +619,7 @@ void test_router_components(void)
 
         ui_event_init(&e, "click");
         ui_widget_emit_event(link_foo, e, NULL);
+        // ui_update();
         matched_widget = ui_router_view_get_matched_widget(view);
         ctest_equal_bool("[/foo] <router-view> widget should load <foo> widget",
                          strcmp(matched_widget->type, "foo") == 0, TRUE);
