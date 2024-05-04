@@ -35,29 +35,32 @@ static void ui_router_link_on_route_update(void *w, const router_route_t *to,
         router_resolved_t *resolved;
         bool is_same_route;
 
+        if (!to) {
+                return;
+        }
         link = ui_widget_get_data(w, ui_router_link_proto);
         resolved = router_resolve(link->router, link->to, FALSE);
         route = router_resolved_get_route(resolved);
         // https://github.com/vuejs/vue-router/blob/65de048ee9f0ebf899ae99c82b71ad397727e55d/src/components/link.js#L65
         is_same_route = router_is_same_route(to, route);
+        ui_widget_remove_class(w, link->active_class);
+        ui_widget_remove_class(w, link->exact_active_class);
         if (is_same_route) {
                 ui_widget_add_class(w, link->exact_active_class);
-        } else {
-                ui_widget_remove_class(w, link->exact_active_class);
+                ui_widget_add_class(w, link->active_class);
+        } else if (!link->exact && router_is_included_route(to, route)) {
+                ui_widget_add_class(w, link->active_class);
         }
-        do {
-                if (link->exact) {
-                        if (is_same_route) {
-                                ui_widget_add_class(w, link->active_class);
-                                break;
-                        }
-                } else if (router_is_included_route(to, route)) {
-                        ui_widget_add_class(w, link->active_class);
-                        break;
-                }
-                ui_widget_remove_class(w, link->active_class);
-        } while (0);
         router_resolved_destroy(resolved);
+}
+
+static void ui_router_link_refresh(ui_widget_t *w)
+{
+        ui_router_link_t *link = ui_widget_get_data(w, ui_router_link_proto);
+        if (link->router) {
+                ui_router_link_on_route_update(
+                    w, link->router->history->current, NULL);
+        }
 }
 
 static void ui_router_on_click(ui_widget_t *w, ui_event_t *e, void *arg)
@@ -83,18 +86,24 @@ static void ui_router_link_on_set_attr(ui_widget_t *w, const char *name,
                 location = router_location_create(NULL, value);
                 ui_router_link_set_location(w, location);
                 router_location_destroy(location);
+                ui_router_link_refresh(w);
         } else if (strcmp(name, "exact") == 0) {
                 ui_router_link_set_exact(w, strcmp(value, "exact") == 0);
+                ui_router_link_refresh(w);
         } else if (strcmp(name, "exact-active-class") == 0) {
                 if (link->exact_active_class) {
+                        ui_widget_remove_class(w, link->exact_active_class);
                         free(link->exact_active_class);
                 }
                 link->exact_active_class = strdup(value);
+                ui_router_link_refresh(w);
         } else if (strcmp(name, "active-class") == 0) {
                 if (link->active_class) {
+                        ui_widget_remove_class(w, link->active_class);
                         free(link->active_class);
                 }
                 link->active_class = strdup(value);
+                ui_router_link_refresh(w);
         } else {
                 ui_router_link_proto->proto->setattr(w, name, value);
         }
@@ -103,8 +112,6 @@ static void ui_router_link_on_set_attr(ui_widget_t *w, const char *name,
 static void ui_router_link_on_ready(ui_widget_t *w, ui_event_t *e, void *arg)
 {
         const char *name = NULL;
-        router_t *router;
-
         ui_router_link_t *link;
         ui_widget_t *parent;
 
@@ -118,10 +125,11 @@ static void ui_router_link_on_ready(ui_widget_t *w, ui_event_t *e, void *arg)
         if (!name) {
                 name = "default";
         }
-        router = router_get_by_name(name);
-        link->watcher = router_watch(router, ui_router_link_on_route_update, w);
-        link->router = router;
+        link->router = router_get_by_name(name);
+        link->watcher =
+            router_watch(link->router, ui_router_link_on_route_update, w);
         ui_widget_off(w, "ready", ui_router_link_on_ready, NULL);
+        ui_router_link_refresh(w);
 }
 
 static void ui_router_link_on_init(ui_widget_t *w)
