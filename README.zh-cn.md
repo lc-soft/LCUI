@@ -9,9 +9,6 @@
   <p align="center">
     <a href="https://github.com/lc-soft/LCUI/actions"><img alt="GitHub Actions" src="https://github.com/lc-soft/LCUI/workflows/C%2FC%2B%2B%20CI/badge.svg"></a>
     <a href="https://codecov.io/gh/lc-soft/LCUI"><img src="https://codecov.io/gh/lc-soft/LCUI/branch/develop/graph/badge.svg" /></a>
-    <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/github/license/lc-soft/LCUI.svg" alt="License"></a>
-    <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/release/lc-soft/LCUI/all.svg" alt="Github Release"></a>
-    <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/downloads/lc-soft/LCUI/total.svg" alt="Github All Releases"></a>
     <img src="https://img.shields.io/github/repo-size/lc-soft/LCUI.svg" alt="Repo size">
     <img src="https://img.shields.io/github/languages/code-size/lc-soft/LCUI.svg" alt="Code size">
   </p>
@@ -31,6 +28,7 @@
   - [参考资料](#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
 - [路线图](#%E8%B7%AF%E7%BA%BF%E5%9B%BE)
 - [贡献](#%E8%B4%A1%E7%8C%AE)
+- [常见问题](#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98)
 - [许可](#%E8%AE%B8%E5%8F%AF)
 
 <!-- /TOC -->
@@ -106,7 +104,7 @@ lcui create my-lcui-app
 
 ### 参考资料
 
-LCUI 的部分功能设计参考了其它开源项目，你可以查看它们的文档以了解基本概念和用法。
+LCUI 及相关项目的部分功能设计参考了其它开源项目，你可以查看它们的文档以了解基本概念和用法。
 
 - [DirectXTK](https://github.com/Microsoft/DirectXTK/wiki/StepTimer)：步进定时器的源码参考。
 - [Vue Router](https://router.vuejs.org/zh/guide/)：路由管理器的参考，[部分功能的实现](https://github.com/search?q=repo%3Alc-soft%2FLCUI+vuejs%2Fvue-router&type=code)还参考了 Vue Router 的源码。
@@ -116,11 +114,16 @@ LCUI 的部分功能设计参考了其它开源项目，你可以查看它们的
 
 以下是未来可推进的事项：
 
+- LCUI
+  - 改进 API 设计。
+  - 改进 CSS 引擎，增加支持 `inherit`、`!important`、转义字符。
+  - 添加 [SDL](https://www.libsdl.org/) 后端，代替 lib/platform 库。
+  - 适配其它开源图形库，以获得更好的渲染性能。
 - 命令行工具
   - `lcui build --watch`：持续监听文件变更并自动重新构建。
   - `lcui dev-server`：与 webpack-dev-server 类似，将 LCUI 应用构建为网站以便开发者在浏览器中预览界面。
   - 添加构建缓存，仅重新构建有更改的文件。
-- React 组件库：参考一些 web 前端组件库（例如：[radix](https://www.radix-ui.com/)），用 TypeScript + React 开发一个适用于 LCUI 应用程序的组件库，复用 [LC Design](https://github.com/lcui-dev/lc-design) 组件库中的组件。
+- React 组件库：参考一些 web 前端组件库（例如：[radix](https://www.radix-ui.com/)、[shadcn/ui](https://ui.shadcn.com/)），用 TypeScript + React 开发一个适用于 LCUI 应用程序的组件库，复用 [LC Design](https://github.com/lcui-dev/lc-design) 组件库中的组件。
 - 文档
   - 教程
   - 意见征集稿（RFC）
@@ -137,6 +140,147 @@ LCUI 的部分功能设计参考了其它开源项目，你可以查看它们的
 - 修复已知问题
 
 本项目采用了参与者公约定义的行为准则，该文档应用于许多开源社区，有关更多信息，请参阅[《行为准则》](CODE_OF_CONDUCT.zh-cn.md)。
+
+## 常见问题
+
+**这是一个浏览器内核吗？或者是像 Electron 这样的集成了浏览器环境的开发库？**
+
+不是，你可以当成是一个应用了部分 Web 技术的传统 GUI 开发库。
+
+**建议添加 MacOS、Android 系统支持！**
+
+这些特性的开发和维护成本较高，暂无相关计划。如果你迫切需要这些特性，你可以尝试实现它们，例如新建 lcui-macos 和 lcui-android 项目，然后在相关专业人员和 Chat GPT 的帮助下完成它们。
+
+**我想要 ???? 功能，就像 ???? 里的那样。**
+
+请先[新建 issue](https://github.com/lc-soft/LCUI/issues/new/choose)，按照已有的模板补全内容，我们建议你尽量将需求描述清楚，如果能提供开发思路、相关参考文档等内容那是最好的，例如：
+
+```markdown
+# 建议添加 xxx
+
+（简介）xxx 是......
+（特性）它能够......
+（理由）对于 LCUI 它能解决 ...... 等问题
+（实现思路）大致的实现方法是先这样......然后......再......最后......
+（参考资料）具体可参考这些 ......
+```
+
+你也可以参考现有的[意见征集稿（RFC）](https://lcui-dev.github.io/docs/next/rfcs/)来撰写内容。
+
+不推荐的写法：
+
+```markdown
+# 建议添加 xxx
+
+如题，我觉得很有必要，请添加，谢谢。
+```
+
+**求添加 Python/Go/Rust/C#/Java 语言绑定！**
+
+LCUI 的命令行开发工具已经支持将 TypeScript 写的界面配置文件编译为 C 源文件，虽然不是语言绑定但也够用，所以作者不会再添加其它语言绑定。
+
+如果你实在需要的话可以自己动手设计，毕竟你比作者更懂这些语言的编程思想和设计哲学，也算是一个展现技术实力的好机会。
+
+**CSS 标准的支持程度如何？**
+
+以下列出了支持的 CSS 特性。勾选的即是支持（但并不意味着完全支持），未列出特性则默认不支持。
+
+<details>
+  <summary>CSS 特性覆盖情况</summary>
+
+- at rules
+  - [x] `@font-face`
+  - [ ] `@keyframes`
+  - [ ] `@media`
+- keywords
+  - [ ] `!important`
+- selectors
+  - [x] `*`
+  - [x] `type`
+  - [x] `#id`
+  - [x] `.class`
+  - [x] `:hover`
+  - [x] `:focus`
+  - [x] `:active`
+  - [x] `:first-child`
+  - [x] `:last-child`
+  - [ ] `[attr="value"]`
+  - [ ] `:not()`
+  - [ ] `:nth-child()`
+  - [ ] `parent > child`
+  - [ ] `a ~ b`
+  - [ ] `::after`
+  - [ ] `::before`
+  - [ ] ...
+- units
+  - [x] px
+  - [x] dp
+  - [x] sp
+  - [x] pt
+  - [x] %
+  - [ ] rem
+  - [ ] vh
+  - [ ] vw
+- properties
+  - [x] top, right, bottom, left
+  - [x] width, height
+  - [x] visibility
+  - [x] display
+    - [x] none
+    - [x] inline-block
+    - [x] block
+    - [x] flex
+    - [ ] inline-flex
+    - [ ] inline
+    - [ ] grid
+    - [ ] table
+    - [ ] table-cell
+    - [ ] table-row
+    - [ ] table-column
+    - [ ] ...
+  - [x] position
+    - [x] static
+    - [x] relative
+    - [x] absolute
+    - [ ] fixed
+  - [x] box-sizing
+    - [x] border-box
+    - [x] content-box
+  - [x] border
+  - [x] border-radius
+  - [x] background-color
+  - [x] background-image
+  - [x] background-position
+  - [x] background-cover
+  - [ ] background
+  - [x] pointer-events
+  - [x] font-face
+  - [x] font-family
+  - [x] font-size
+  - [x] font-style
+  - [x] flex
+  - [x] flex-shrink
+  - [x] flex-grow
+  - [x] flex-basis
+  - [x] flex-wrap
+  - [x] flex-direction
+  - [x] justify-content
+    - [x] flex-start
+    - [x] center
+    - [x] flex-end
+  - [x] align-items
+    - [x] flex-start
+    - [x] center
+    - [x] flex-end
+    - [x] stretch
+  - [ ] float
+  - [ ] transition
+  - [ ] transform
+  - [ ] ...
+
+</details>
+
+具体的属性和值的支持情况可查看：[lib/css/src/properties.c](lib/css/src/properties.c#L177)
 
 ## 许可
 

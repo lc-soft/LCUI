@@ -1,17 +1,14 @@
 <p align="center">
-  <a href="https://lcui.org/">
+  <a href="http://lcui.org/">
     <img src="https://lcui.lc-soft.io/static/images/lcui-logo-lg.png" alt="" width=72 height=72>
   </a>
   <h3 align="center">LCUI</h3>
   <p align="center">
-    A small C library for building user interfaces with C, XML and CSS.
+    The C library for build user interfaces
   </p>
   <p align="center">
     <a href="https://github.com/lc-soft/LCUI/actions"><img alt="GitHub Actions" src="https://github.com/lc-soft/LCUI/workflows/C%2FC%2B%2B%20CI/badge.svg"></a>
     <a href="https://codecov.io/gh/lc-soft/LCUI"><img src="https://codecov.io/gh/lc-soft/LCUI/branch/develop/graph/badge.svg" /></a>
-    <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/github/license/lc-soft/LCUI.svg" alt="License"></a>
-    <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/release/lc-soft/LCUI/all.svg" alt="Github Release"></a>
-    <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/downloads/lc-soft/LCUI/total.svg" alt="Github All Releases"></a>
     <img src="https://img.shields.io/github/repo-size/lc-soft/LCUI.svg" alt="Repo size">
     <img src="https://img.shields.io/github/languages/code-size/lc-soft/LCUI.svg" alt="Code size">
   </p>
@@ -23,14 +20,14 @@
 
 - [Table of contents](#table-of-contents)
 - [Introduction](#introduction)
-    - [Features](#features)
-    - [Screenshots](#screenshots)
-    - [Architecture](#architecture)
-    - [Design references](#design-references)
-- [Compilation](#compilation)
-- [Installation](#installation)
-- [Contribution](#contribution)
+  - [Overview of Features](#overview-of-features)
+  - [Architecture](#architecture)
+- [Quick Start](#quick-start)
 - [Documentation](#documentation)
+  - [Tutorials](#tutorials)
+  - [References](#references)
+- [Roadmap](#roadmap)
+- [Contribution](#contribution)
 - [FAQ](#faq)
 - [License](#license)
 
@@ -38,133 +35,100 @@
 
 ## Introduction
 
-LCUI (LC's UI Library) is a small C library for building user interfaces.
-
 [中文版说明文档](README.zh-cn.md)
 
-### Features
+LCUI is a library written in C language for building graphical user interfaces. Its functional design and usage refer to some popular technologies in the field of web front-end, such as CSS and Flex layout. It is easier for developers with experience in web page development to get started.
 
-- **Written in C:** Suitable for small applications written primarily in C.language designed for LCUI, it makes it easier to create interactive UIs.
-- **Cross platform:** Support for Windows and Linux, you can write Windows Desktop apps and Universal Windows Platform apps, as well as Linux Desktop apps.
-- **XML + CSS:** Includes XML and CSS parsers, you can use XML and CSS to describe interface structure and style.
-- **Web-like development experience:** Since the design and implementation of LCUI's functions, including layout, CSS, and renderer, are mostly referenced from MDN documents and some popular web front-end development libraries, its development experience and interface effects will have some similarities to web pages. If you already have experience writing web pages with HTML and CSS, it will be easier to get started.
-- **Flexible:** Support for adapting the interface to screens of different pixel densities by setting global scaling. Support for using screen density related sp and dp units to describe position and size of the elements.
+**LC** originates from the first letter of the author's name, and was originally designed to facilitate the author's development of small projects and accumulate development experience. However, unfortunately, the author did not gain sufficient competitive advantage in the employment environment of many excellent C/C++developers, and could only be forced to work in web front-end development. It is precisely because of this that LCUI's current development direction leans towards integrating technologies in the field of web front-end.
 
-### Screenshots
+### Overview of Features
 
-<table>
-  <tbody>
-    <tr>
-      <td>
-        <a class="thumbnail" href="https://github.com/lc-soft/LCUI/blob/develop/test/helloworld.c">
-          <img src="https://lcui.org/static/images/showcase/screenshot-lcui-hello.png" alt="Hello App"/>
-        </a>
-      </td>
-      <td>
-        <a class="thumbnail" href="https://github.com/lc-soft/LC-Finder">
-          <img src="https://gitee.com/lc-soft/LC-Finder/raw/develop/screenshots/2.jpg" alt="LC Finder"/>
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <a class="thumbnail" href="https://github.com/lc-ui/lcui-router-app">
-          <img src="https://gitee.com/lc-ui/lcui-router-app/raw/master/screenshot.gif" alt="LCUI Router App"/>
-        </a>
-      </td>
-      <td>
-        <a class="thumbnail" href="https://github.com/lc-ui/lc-design">
-          <img src="https://lcui.lc-soft.io/static/images/showcase/lc-design-example-preview.png" alt="LC Design"/>
-        </a>
-      </td>
-    </tr>
-  </tbody>
-</table>
+You can learn about the development experience of LCUI applications from the following screenshot:
+
+![preview](preview.png)
+
+- **Component Development in React-like Style:** Writing UI configuration files using TypeScript. With the combined advantages of TypeScript, JSX syntax, and the LCUI React library, you can succinctly describe interface structure, resource dependencies, component states, data binding, and event binding.
+- **Various Stylesheet Writing Methods:** [Tailwind CSS](https://tailwindcss.com/), [CSS Modules](https://github.com/css-modules/css-modules), [Sass](https://sass-lang.com/), and global CSS.
+- **File-system based router:** Organize application pages in directory form, with each page corresponding to a directory. The path of the directory serves as the route for that page. With the built-in application router, you can easily implement page switching and navigation without manual route configuration.
+- **User-friendly and Modern Icon Library:** Icons are sourced from the [fluentui-system-icons](https://github.com/microsoft/fluentui-system-icons) library, with partial customization to fit LCUI's characteristics, offering similar usage patterns.
+- **Command-line Development Tool:** Run the `lcui build` command to preprocess configuration files within the app directory, then generate corresponding C source code and resource files.
 
 ### Architecture
 
-Over time LCUI has been built up to be based on various libraries, as shown below:
+Over time LCUI has been built up to be based on various libraries:
 
-```text
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃                                                               ┃
-┃                        LCUI Application                       ┃
-┃                                                               ┃
-┃        ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓        ┃
-┃        ┃                    LCUI 3                   ┃        ┃
-┃      ┏━┻━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━┻━┓      ┃
-┃      ┃ ui-server ┃ ui-widgets ┃ ui-builder ┃ ui-anchor ┃      ┃
-┃    ┏━┻━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━┻━┓    ┃
-┃    ┃ platform ┃    ui    ┃  worker  ┃  timer  ┃  cursor  ┃    ┃
-┣━━━━┻━━━━━━━━━━┻━━━━━━━━━━┻━━━━━━━━━━┻━━━━━━━━━┻━━━━━━━━━━┻━━━━┫
-┃ thread ┃ yutil  ┃ image  ┃   css   ┃ paint  ┃  font  ┃  text  ┃
-┗━━━━━━━━┻━━━━━━━━┻━━━━━━━━┻━━━━━━━━━┻━━━━━━━━┻━━━━━━━━┻━━━━━━━━┛
+- [lib/yutil](./lib/yutil): Utility library providing common data structures and functions.
+- [lib/pandagl](./lib/pandagl): PandaGL (Panda Graphics Library), offering font management, text layout, image I/O, graphics processing, and rendering capabilities.
+- [lib/css](./lib/css): CSS parser and selector engine providing CSS parsing and selection capabilities.
+- [lib/platform](./lib/platform): Platform library offering cross-platform unified system-related APIs, including message loop, window management, input method, etc.
+- [lib/thread](./lib/thread): Thread library providing cross-platform multithreading capabilities.
+- [lib/timer](./ui/timer): Timer library providing the ability to execute tasks at regular intervals.
+- [lib/ui](./lib/ui): UI core library providing essential UI capabilities such as UI component management, event queue, style computation, and drawing.
+- [lib/ui-xml](./lib/anchor): XML parsing library providing the ability to create UI from XML file content.
+- [lib/ui-cursor](./lib/ui-cursor): Cursor library offering cursor drawing capabilities.
+- [lib/ui-server](./lib/ui-server): UI server providing the ability to map UI components to system windows.
+- [lib/ui-router](./lib/ui-router): Router manager offering route mapping and navigation capabilities.
+- [lib/ui-widgets](./lib//ui/widgets): Predefined basic component library providing basic UI components such as text, button, scrollbar, etc.
+- [lib/worker](./lib/worker): Worker thread library providing simple worker thread communication and management capabilities.
+
+## Quick Start
+
+Before you begin, you need to install the following software on your computer:
+
+- [Git](https://git-scm.com/download/): Version control tool used to download the source code of the example project.
+- [XMake](https://xmake.io/#/zh-cn/?id=%e5%ae%89%e8%a3%85): Build tool used to build the project.
+- [Node.js](https://nodejs.org/): JavaScript runtime environment used to run the LCUI command-line development tool.
+
+Then, run the following commands in a command-line window:
+
+```shell
+# Install the LCUI command-line development tool
+npm install -g @lcui/cli
+
+# Create an LCUI application project
+lcui create my-lcui-app
 ```
 
-- [lib/css](./lib/css): CSS (Cascading Style Sheet) parser and selection engine, providing CSS parsing and selection capabilities.
-- [lib/image](./lib/image): Image file manipulation library, provides BMP, JPG, PNG image file reading ability and PNG write ability.
-- [lib/paint](./lib/paint): 2D graphics library.
-- [lib/platform](./lib/platform): Platform library, provides cross-platform unified system related API, including message loop, window management, input method, etc.
-- [lib/text](./lib/text): Text typesetting library, provides text typesetting capabilities.
-- [lib/thread](./lib/thread): Thread library, providing cross-platform multithreading capabilities.
-- [lib/timer](./ui/timer): Timer library, provides the ability to perform operations on a scheduled basis.
-- [lib/ui](./lib/ui): Graphical interface core library, providing UI component management, event queue, style calculation, drawing and other necessary UI capabilities.
-- [lib/ui-anchor](./lib/anchor): Anchor widget, provide capabilities similar to hyperlinks.
-- [lib/ui-builder](./lib/anchor): UI Builder, provides the ability to create a UI from the content of an XML file.
-- [lib/ui-cursor](./lib/ui-cursor): Cursor, provides cursor drawing capability.
-- [lib/ui-server](./lib/ui-server): UI Server, provides the ability to map UI widgets to system Windows.
-- [lib/ui-widgets](./lib//ui/widgets): UI widget library, provides basic UI components like text, buttons, scrollbars, and so on.
-- [lib/worker](./lib/worker): Worker thread library, provides simple worker thread communication and management capabilities.
-- [lib/yutil](./lib/yutil): Utility library, provides linked list, hash table, red black tree, string and other related common functions.
+Follow the prompts provided by the commands afterward.
 
-### Design references
+## Documentation
 
-- [SDL](https://github.com/SDL-mirror/SDL/tree/master/src/video/x11) — X11 driver code reference
-- [FreeType](https://www.freetype.org/freetype2/docs/design/design-3.html#section-1) — Data structure naming style reference
-- [LevelDB](https://github.com/google/leveldb/blob/master/include/leveldb/c.h) — Function naming style reference
-- [jQuery](https://jquery.com/) — Widget operation method naming style reference
-- [MDN](https://developer.mozilla.org/zh-CN/docs/Web/CSS) — CSS standard reference
+- [Online Documentation](https://lcui-dev.github.io/docs/next/guides/base/)
+- [Request for Comments (RFC)](https://lcui-dev.github.io/docs/next/rfcs/)
+- [Changelog](CHANGELOG.md)
+- [Contribution Guidelines](.github/CONTRIBUTING.md)
 
-## Compilation
+### Tutorials
 
-Install [XMake](https://xmake.io/#/zh-cn/) and run the following command:
+- [Todo List](https://lcui-dev.github.io/docs/next/tutorials/todolist): Learn the basic concepts and usage of LCUI, as well as how to use it to build interfaces and implement state management, interface updates, and interactions.
+- [Rendering Fabric Animation](https://lcui-dev.github.io/docs/next/tutorials/render-fabric): Rewrite the existing fabric simulation program's JavaScript source code in C language, and use the cairo graphics library for fabric rendering. Then, apply LCUI to implement fabric animation playback and interaction.
+- [Browser](https://lcui-dev.github.io/docs/next/tutorials/browser): Referencing a web browser, use LCUI to implement similar interface structure, layout, style, and multi-tab management features. Utilize LCUI's routing management functionality to implement multi-tab page state management and navigation, as well as a simple file browsing page. **(This tutorial is outdated, contributions to update it are welcome)**
 
-```bash
-# Clone repository
-git clone https://github.com/lc-soft/LCUI.git
+### References
 
-# Go into the repository
-cd LCUI
+Some features of LCUI and related projects are inspired by other open-source projects. You can refer to their documentation to understand the basic concepts and usage.
 
-# Build
-xmake
+- [DirectXTK](https://github.com/Microsoft/DirectXTK/wiki/StepTimer): Source code reference for the step timer.
+- [Vue Router](https://router.vuejs.org/zh/guide/): Reference for the router manager. [Some functionalities](https://github.com/search?q=repo%3Alc-soft%2FLCUI+vuejs%2Fvue-router&type=code) also reference the source code of Vue Router.
+- [Next.js](https://nextjs.org/docs/app/building-your-application/routing): Reference for route definition methods.
 
-```
+## Roadmap
 
-If you want to experience the results of the test program:
+Here are the upcoming items:
 
-```bash
-# Package the built files for building the test program
-xmake package
-
-# Go into test directory
-cd test
-
-# Build
-xmake -P .
-
-# Run
-xmake run -P . -w . helloworld
-```
-
-## Installation
-
-```bash
-xmake install
-
-# Or install it in your custom directory
-xmake install -o /path/to/your/custom/installdir
-```
+- LCUI
+  - Improve API design.
+  - Enhance the CSS engine to support `inherit`, `!important`, and escape characters.
+  - Add [SDL](https://www.libsdl.org/) backend to replace the lib/platform library.
+  - Adapt to other open-source graphics libraries for better rendering performance.
+- Command-line Tools
+  - `lcui build --watch`: Continuously monitor file changes and automatically rebuild.
+  - `lcui dev-server`: Similar to webpack-dev-server, builds the LCUI application as a website for developers to preview interfaces in the browser.
+  - Add build cache to rebuild only files that have changed.
+- React Component Library: Referencing some web frontend component libraries (e.g., [radix](https://www.radix-ui.com/), [shadcn/ui](https://ui.shadcn.com/)), develop a TypeScript + React component library suitable for LCUI applications, reusing components from the [LC Design](https://github.com/lcui-dev/lc-design) component library.
+- Documentation
+  - Tutorials
+  - Request for Comments (RFC)
 
 ## Contribution
 
@@ -179,148 +143,110 @@ Think LCUI is slow to update? there are many ways to [contribute](.github/CONTRI
 
 LCUI has adopted the code of conduct defined by the Contributor Covenant. This document is used across many open source communities, and we think it articulates our values well. For more, see the [Code of Conduct](CODE_OF_CONDUCT.md).
 
-## Documentation
-
-- Tutorial: [https://docs.lcui.lc-soft.io/](https://docs.lcui.lc-soft.io/) (Chinese version only)
-- Changelog: [docs/CHANGES.md](docs/CHANGES.md)
-
-The English version of the documentation is not available, because the author does not have time to write the English version, please read the files in the [test](test) directory and related projects to learn how to use LCUI.
-
 ## FAQ
 
-1. **Why develop it?**
+**Is this a browser kernel? Or a development library like Electron that integrates the browser environment?**
 
-   - Explore and experiment new GUI development way
-   - Let other developers share about how to write better code
-   - Make it easier for me to find better jobs to make more money
-   - Pass the time
+No, you can think of it as a traditional GUI development library that applied some Web technologies.
 
-1. **Is this a browser kernel? Or a development library like Electron that integrates the browser environment?**
+**How about CSS support?**
 
-    No, you can think of it as a traditional GUI development library that applied some Web technologies.
+The following is a list of supported CSS features. Checked is supported (But does not mean full support). Unlisted properties are not supported by default.
 
-1. **What do I need to pay attention to if I'm going to use it?**
+<details>
+  <summary>CSS feature coverage</summary>
 
-    We recommend that your project meet the following requirements:
+- at rules
+  - [x] `@font-face`
+  - [ ] `@keyframes`
+  - [ ] `@media`
+- keywords
+  - [ ] `!important`
+- selectors
+  - [x] `*`
+  - [x] `type`
+  - [x] `#id`
+  - [x] `.class`
+  - [x] `:hover`
+  - [x] `:focus`
+  - [x] `:active`
+  - [x] `:first-child`
+  - [x] `:last-child`
+  - [ ] `[attr="value"]`
+  - [ ] `:not()`
+  - [ ] `:nth-child()`
+  - [ ] `parent > child`
+  - [ ] `a ~ b`
+  - [ ] `::after`
+  - [ ] `::before`
+  - [ ] ...
+- units
+  - [x] px
+  - [x] dp
+  - [x] sp
+  - [x] pt
+  - [x] %
+  - [ ] rem
+  - [ ] vh
+  - [ ] vw
+- properties
+  - [x] top, right, bottom, left
+  - [x] width, height
+  - [x] visibility
+  - [x] display
+    - [x] none
+    - [x] inline-block
+    - [x] block
+    - [x] flex
+    - [ ] inline-flex
+    - [ ] inline
+    - [ ] grid
+    - [ ] table
+    - [ ] table-cell
+    - [ ] table-row
+    - [ ] table-column
+    - [ ] ...
+  - [x] position
+    - [x] static
+    - [x] relative
+    - [x] absolute
+    - [ ] fixed
+  - [x] box-sizing
+    - [x] border-box
+    - [x] content-box
+  - [x] border
+  - [x] border-radius
+  - [x] background-color
+  - [x] background-image
+  - [x] background-position
+  - [x] background-cover
+  - [ ] background
+  - [x] pointer-events
+  - [x] font-face
+  - [x] font-family
+  - [x] font-size
+  - [x] font-style
+  - [x] flex
+  - [x] flex-shrink
+  - [x] flex-grow
+  - [x] flex-basis
+  - [x] flex-wrap
+  - [x] flex-direction
+  - [x] justify-content
+    - [x] flex-start
+    - [x] center
+    - [x] flex-end
+  - [x] align-items
+    - [x] flex-start
+    - [x] center
+    - [x] flex-end
+    - [x] stretch
+  - [ ] float
+  - [ ] transition
+  - [ ] transform
+  - [ ] ...
 
-    - The user interface is simple and does not require advanced features such as tables, animations, and transformations.
-    - The code design is reasonable, and the core function code and UI logic code are independent of each other. Even if you find that the requirements are not met after using LCUI, you can easily migrate to other GUI libraries.
-
-1. **Why do I choose the LCUI instead of Electron?**
-
-    In contrast to fully functional Electron, these features of LCUI, such as small binary file size and low memory usage, are not worth mentioning, except for technical research and share, you have no reason to use LCUI.
-
-1. **Is it the same as writing a web page?**
-
-    Not exactly, there are the following differences need to be noted:
-
-    - The interface description file format is XML, slightly different from HTML.
-    - You need to implement all the features of your application in C code, which is much less development efficiency than JavaScript.
-    - No `<script>` tag, you can't embed JavaScript or C code like HTML.
-    - The widget is the basic layout element, not the text, and there is no `inline` display type.
-    - The scrollbar is a widget, and the `overflow: scroll;` style doesn't show scrollbars automatically, you need to create it and specify the container and scroll layer.
-    - All text is rendered by the TextView widget, which has a display type of `block` instead of `inline`.
-    - The widget does not overflow the bounding box of the parent widget, and the effect is similar to the applied style: `overflow: hidden;`.
-    - An absolutely positioned widget is always relative to its parent widget, not the first non-statically positioned widget of the parent.
-    - There are no tools like [Chrome Devtools](https://developers.google.com/web/tools/chrome-devtools) to debug graphical interfaces, you need to rely on your own imagination and development experience to verify that the bug is from your code or LCUI.。
-
-1. **How about CSS support?**
-
-    The following is a list of supported CSS features. Checked is supported (But does not mean full support). Unlisted properties are not supported by default.
-
-    <details>
-      <summary>CSS feature coverage</summary>
-
-      - at rules
-        - [x] `@font-face`
-        - [ ] `@keyframes`
-        - [ ] `@media`
-      - keywords
-        - [ ] `!important`
-      - selectors
-        - [x] `*`
-        - [x] `type`
-        - [x] `#id`
-        - [x] `.class`
-        - [x] `:hover`
-        - [x] `:focus`
-        - [x] `:active`
-        - [x] `:first-child`
-        - [x] `:last-child`
-        - [ ] `[attr="value"]`
-        - [ ] `:not()`
-        - [ ] `:nth-child()`
-        - [ ] `parent > child`
-        - [ ] `a ~ b`
-        - [ ] `::after`
-        - [ ] `::before`
-        - [ ] ...
-      - units
-        - [x] px
-        - [x] dp
-        - [x] sp
-        - [x] pt
-        - [x] %
-        - [ ] rem
-        - [ ] vh
-        - [ ] vw
-      - properties
-        - [x] top, right, bottom, left
-        - [x] width, height
-        - [x] visibility
-        - [x] display
-          - [x] none
-          - [x] inline-block
-          - [x] block
-          - [x] flex
-          - [ ] inline-flex
-          - [ ] inline
-          - [ ] grid
-          - [ ] table
-          - [ ] table-cell
-          - [ ] table-row
-          - [ ] table-column
-          - [ ] ...
-        - [x] position
-          - [x] static
-          - [x] relative
-          - [x] absolute
-          - [ ] fixed
-        - [x] box-sizing
-          - [x] border-box
-          - [x] content-box
-        - [x] border
-        - [x] border-radius
-        - [x] background-color
-        - [x] background-image
-        - [x] background-position
-        - [x] background-cover
-        - [ ] background
-        - [x] pointer-events
-        - [x] font-face
-        - [x] font-family
-        - [x] font-size
-        - [x] font-style
-        - [x] flex
-        - [x] flex-shrink
-        - [x] flex-grow
-        - [x] flex-basis
-        - [x] flex-wrap
-        - [x] flex-direction
-        - [x] justify-content
-          - [x] flex-start
-          - [x] center
-          - [x] flex-end
-        - [x] align-items
-          - [x] flex-start
-          - [x] center
-          - [x] flex-end
-          - [x] stretch
-        - [ ] float
-        - [ ] transition
-        - [ ] transform
-        - [ ] ...
-    </details>
+</details>
 
 ## License
 
