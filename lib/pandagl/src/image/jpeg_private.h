@@ -1,5 +1,5 @@
 ﻿/*
- * lib/pandagl/src/image/jpeg.h
+ * lib/pandagl/src/image/jpeg_private.h
  *
  * Copyright (c) 2023-2024, Liu Chao <i@lc-soft.io> All rights reserved.
  *

@@ -8,7 +8,7 @@ const includes = ["lib", "include", "src"].map((file) =>
   path.resolve(cwd, file)
 );
 const excludes = ["lib/yutil"].map((file) => path.resolve(cwd, file));
-const extensions = [".c", ".h"];
+const extensions = [".c", ".h", ".h.in"];
 const copyrightHolder = "Liu Chao <i@lc-soft.io>";
 const copyright = `/*
  * {{filePath}}{{summary}}

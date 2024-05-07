@@ -1,5 +1,5 @@
 ﻿/*
- * lib/pandagl/src/image/bmp.h
+ * lib/pandagl/src/image/bmp_private.h
  *
  * Copyright (c) 2023-2024, Liu Chao <i@lc-soft.io> All rights reserved.
  *
