@@ -116,6 +116,11 @@ int ctest_str_to_str(void *data, char *str, unsigned max_len)
 	return snprintf(str, max_len, "\"%s\"", (char *)data);
 }
 
+int ctest_wcs_to_str(void *data, char *str, unsigned max_len)
+{
+	return snprintf(str, max_len, "\"%S\"", (wchar_t *)data);
+}
+
 int ctest_bool_to_str(void *data, char *str, unsigned max_len)
 {
 	return snprintf(str, max_len, "%s", *(bool*)data ? "true" : "false");
@@ -144,6 +149,11 @@ bool ctest_equal_float(const char *name, float actual, float expected)
 bool ctest_equal_str(const char *name, const char *actual, const char *expected)
 {
 	return ctest_equal(name, ctest_str_to_str, (void *)actual, (void *)expected);
+}
+
+bool ctest_equal_wcs(const char *name, const wchar_t *actual, const wchar_t *expected)
+{
+	return ctest_equal(name, ctest_wcs_to_str, (void *)actual, (void *)expected);
 }
 
 int ctest_finish(void)
