@@ -18,7 +18,7 @@ jobs:
           git submodule update --init
 
       - name: Restore xmake packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.xmake/.cache/packages
           key: ${{ runner.os }}-xmake-packages
@@ -128,7 +128,7 @@ jobs:
             dist/lcui-examples
 
       - name: Cache xmake packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.xmake/.cache/packages
           key: ${{ runner.os }}-xmake-packages
