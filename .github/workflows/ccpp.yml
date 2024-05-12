@@ -2,6 +2,10 @@ name: C/C++ CI
 on: [push, pull_request]
 jobs:
   build:
+    env:
+      TARGET_MAJOR: 3
+      TARGET_VERSION: 3.0.0
+      TARGET_KIND: static
     timeout-minutes: 10
     strategy:
       fail-fast: false
@@ -29,13 +33,13 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get install debhelper lcov valgrind -yy
 
-      - name: Configure for coverage mode
-        if: runner.os == 'Linux'
-        run: xmake config -m coverage -y -v --ci-env=y
-
       - name: Configure
         if: runner.os == 'Windows'
-        run: xmake config -y -v -k shared --ci-env=y
+        run: xmake config -y -k ${{ env.TARGET_KIND }} -m release --ci-env=y
+
+      - name: Configure for coverage mode
+        if: runner.os == 'Linux'
+        run: xmake config -y -k ${{ env.TARGET_KIND }} -m coverage --ci-env=y
 
       - name: Build
         run: |
@@ -47,59 +51,34 @@ jobs:
           xmake build libi18n-tests
           xmake build lcui_tests
 
-      - name: Run YUtil tests
-        if: runner.os == 'Windows'
-        run: |
-          xmake run yutil_test
-
-      - name: Run PandaGL tests
-        run: xmake run pandagl_tests
-
-      - name: Run LibCSS tests
-        if: runner.os == 'Windows'
-        run: xmake run libcss_tests
-
-      - name: Run LibUIRouter tests
-        if: runner.os == 'Windows'
-        run: xmake run libui-router-tests
-
-      - name: Run LibI18n tests
-        if: runner.os == 'Windows'
-        run: xmake run libi18n-tests
-
-      - name: Run LCUI tests
-        if: runner.os == 'Windows'
-        run: xmake run lcui_tests
-
-      - name: Run YUtil tests with memcheck
+      - name: Run tests with memcheck
         if: runner.os == 'Linux'
         run: |
-          xmake build yutil_test
+          xmake run pandagl_tests
           xmake run yutil_test --memcheck
+          xmake run libcss_tests --memcheck
+          xmake run libui-router-tests --memcheck
+          xmake run libi18n-tests --memcheck
+          xmake run lcui_tests --memcheck
 
-      - name: Run LibCSS tests with memcheck
-        if: runner.os == 'Linux'
-        run: xmake run libcss_tests --memcheck
-
-      - name: Run LibUIRouter tests with memcheck
-        if: runner.os == 'Linux'
-        run: xmake run libui-router-tests --memcheck
-
-      - name: Run LibI18n tests with memcheck
-        if: runner.os == 'Linux'
-        run: xmake run libi18n-tests --memcheck
-
-      - name: Run LCUI tests with memcheck
-        if: runner.os == 'Linux'
-        run: xmake run lcui_tests --memcheck
+      - name: Run tests
+        if: runner.os == 'Windows'
+        run: |
+          xmake run pandagl_tests
+          xmake run yutil_test
+          xmake run libcss_tests
+          xmake run libui-router-tests
+          xmake run libi18n-tests
+          xmake run lcui_tests
 
       - name: Upload reports to Codecov
         if: runner.os == 'Linux'
         run: bash <(curl -s https://codecov.io/bash);
 
-      - name: Reconfigure for release
-        if: runner.os == 'Linux'
-        run: xmake config -y -v -k shared --ci-env=y
+      - name: Build for release
+        run: |
+          xmake config -y -v -k ${{ env.TARGET_KIND }} -m release
+          xmake -w
 
       - name: Package
         run: |
@@ -110,20 +89,21 @@ jobs:
         continue-on-error: true
         run: |
           cd examples
-          xmake -P . -v -y
+          xmake config -P . -y
+          xmake build -P . -v
           xmake install -P . -o ../dist/lcui-examples
           mv ../dist/lcui-examples/bin/* ../dist/lcui-examples/
           rm -r ../dist/lcui-examples/bin
 
       - uses: actions/upload-artifact@master
         with:
-          name: lcui-package (${{ runner.os }})
+          name: lcui${{ env.TARGET_MAJOR }}-${{ env.TARGET_VERSION }}-${{ env.TARGET_KIND }} (${{ runner.os }})
           path: |
             dist/lcui-package
 
       - uses: actions/upload-artifact@master
         with:
-          name: lcui-examples (${{ runner.os }})
+          name: lcui${{ env.TARGET_MAJOR }}-examples (${{ runner.os }})
           path: |
             dist/lcui-examples
 
