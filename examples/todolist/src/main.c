@@ -28,6 +28,7 @@ ui_widget_t *ui_task_item_create(task_t *task)
         if (strcmp(task->status, "completed") == 0) {
                 ui_widget_add_class(item, "is-completed");
         }
+        ui_widget_add_class(name, "task-name");
         ui_widget_add_class(status, "task-status");
         ui_widget_add_class(del, "task-delete");
         ui_widget_append(item, status);
