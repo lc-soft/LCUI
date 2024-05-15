@@ -19,7 +19,7 @@ static uint8_t canvas_bilinear_resampling_core(uint8_t a, uint8_t b, uint8_t c,
 }
 
 int pd_canvas_zoom(const pd_canvas_t *canvas, pd_canvas_t *buff,
-		   pd_bool_t keep_scale, int width, int height)
+		   bool keep_scale, int width, int height)
 {
 	pd_rect_t rect;
 	int x, y, src_x, src_y;
@@ -90,7 +90,7 @@ int pd_canvas_zoom(const pd_canvas_t *canvas, pd_canvas_t *buff,
 }
 
 int pd_canvas_zoom_bilinear(const pd_canvas_t *canvas, pd_canvas_t *buff,
-			    pd_bool_t keep_scale, int width, int height)
+			    bool keep_scale, int width, int height)
 {
 	pd_rect_t rect;
 	pd_color_t a, b, c, d, t_color;

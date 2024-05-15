@@ -77,7 +77,7 @@ void on_window_paint(app_event_t *e, void *arg)
     // 开始绘制，创建绘制上下文
     paint = app_window_begin_paint(e->window, &e->paint.rect);
     // 自定义绘制窗口内容，例如填充白色：
-    pd_canvas_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, TRUE);
+    pd_canvas_fill_rect(&paint->canvas, RGB(255, 255, 255), NULL, true);
     // 结束绘制，销毁绘制上下文
 	app_window_end_paint(e->window, paint);
 }
@@ -125,7 +125,7 @@ int main(int argc, char *argv)
 
     // 设置每秒 60 tick
     timer.target_elapsed_time = 1000 / 60;
-    timer.is_fixed_time_step = TRUE;
+    timer.is_fixed_time_step = true;
 	step_timer_init(&timer);
     while (frames <= 240) {
         step_timer_tick(&timer, on_tick, &frames);

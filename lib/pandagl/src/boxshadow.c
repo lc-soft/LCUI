@@ -140,7 +140,7 @@ void pd_get_boxshadow_canvas_rect(const pd_boxshadow_t *shadow,
 			      canvas_rect->y;
 }
 
-static pd_bool_t pd_paint_boxshadow_left_blur(pd_boxshadow_context_t *ctx)
+static bool pd_paint_boxshadow_left_blur(pd_boxshadow_context_t *ctx)
 {
 	int x, y;
 	int right;
@@ -181,7 +181,7 @@ static pd_bool_t pd_paint_boxshadow_left_blur(pd_boxshadow_context_t *ctx)
 	return PD_TRUE;
 }
 
-static pd_bool_t pd_paint_boxshadow_right_blur(pd_boxshadow_context_t *ctx)
+static bool pd_paint_boxshadow_right_blur(pd_boxshadow_context_t *ctx)
 {
 	int x, y;
 	int left;
@@ -222,7 +222,7 @@ static pd_bool_t pd_paint_boxshadow_right_blur(pd_boxshadow_context_t *ctx)
 	return PD_TRUE;
 }
 
-static pd_bool_t pd_paint_boxshadow_top_blur(pd_boxshadow_context_t *ctx)
+static bool pd_paint_boxshadow_top_blur(pd_boxshadow_context_t *ctx)
 {
 	int x, y;
 	int bottom;
@@ -263,7 +263,7 @@ static pd_bool_t pd_paint_boxshadow_top_blur(pd_boxshadow_context_t *ctx)
 	return PD_TRUE;
 }
 
-static pd_bool_t pd_paint_boxshadow_bottom_blur(pd_boxshadow_context_t *ctx)
+static bool pd_paint_boxshadow_bottom_blur(pd_boxshadow_context_t *ctx)
 {
 	int x, y;
 	int top;
@@ -303,7 +303,7 @@ static pd_bool_t pd_paint_boxshadow_bottom_blur(pd_boxshadow_context_t *ctx)
 	return PD_TRUE;
 }
 
-static pd_bool_t pd_paint_boxshadow_circle_blur(pd_boxshadow_context_t *ctx,
+static bool pd_paint_boxshadow_circle_blur(pd_boxshadow_context_t *ctx,
 					      const pd_rect_t *circle_rect,
 					      double center_x, double center_y,
 					      int radius)
@@ -373,7 +373,7 @@ static pd_bool_t pd_paint_boxshadow_circle_blur(pd_boxshadow_context_t *ctx,
 	return PD_TRUE;
 }
 
-static pd_bool_t pd_paint_boxshadow_top_left_blur(pd_boxshadow_context_t *ctx)
+static bool pd_paint_boxshadow_top_left_blur(pd_boxshadow_context_t *ctx)
 {
 	int radius;
 	pd_rect_t rect;
@@ -388,7 +388,7 @@ static pd_bool_t pd_paint_boxshadow_top_left_blur(pd_boxshadow_context_t *ctx)
 					      rect.height, radius);
 }
 
-static pd_bool_t pd_paint_boxshadow_top_right_blur(pd_boxshadow_context_t *ctx)
+static bool pd_paint_boxshadow_top_right_blur(pd_boxshadow_context_t *ctx)
 {
 	int radius;
 	pd_rect_t rect;
@@ -403,7 +403,7 @@ static pd_bool_t pd_paint_boxshadow_top_right_blur(pd_boxshadow_context_t *ctx)
 					      radius);
 }
 
-static pd_bool_t pd_paint_boxshadow_bottom_left_blur(pd_boxshadow_context_t *ctx)
+static bool pd_paint_boxshadow_bottom_left_blur(pd_boxshadow_context_t *ctx)
 {
 	int radius;
 	pd_rect_t rect;
@@ -418,7 +418,7 @@ static pd_bool_t pd_paint_boxshadow_bottom_left_blur(pd_boxshadow_context_t *ctx
 					      radius);
 }
 
-static pd_bool_t pd_paint_boxshadow_bottom_right_blur(pd_boxshadow_context_t *ctx)
+static bool pd_paint_boxshadow_bottom_right_blur(pd_boxshadow_context_t *ctx)
 {
 	int radius;
 	pd_rect_t rect;

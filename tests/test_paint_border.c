@@ -87,11 +87,11 @@ int main(void)
 
 	// 创建绘制上下文
 	paint = pd_context_create(&layer, &layer_rect);
-	paint->with_alpha = TRUE;
+	paint->with_alpha = true;
 	paint_background(paint, &bg_box);
 	paint_border(paint, &border_box);
 	pd_canvas_mix(&canvas, &layer, (canvas.width - layer_rect.width) / 2,
-		      (canvas.height - layer_rect.height) / 2, FALSE);
+		      (canvas.height - layer_rect.height) / 2, false);
 	pd_write_png_file("test_paint_border.png", &canvas);
 	pd_canvas_destroy(&canvas);
 	return 0;

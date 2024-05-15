@@ -14,6 +14,7 @@
 #include <windows.h>
 #include <process.h>
 #include <yutil.h>
+#include <stdbool.h>
 #include "thread.h"
 
 typedef union thread_mutex_record_t {
@@ -45,7 +46,7 @@ int thread_cond_init(thread_cond_t *cond)
 {
 	HANDLE handle;
 
-	handle = CreateEvent(NULL, FALSE, FALSE, NULL);
+	handle = CreateEvent(NULL, false, false, NULL);
 	if (handle == 0) {
 		return -1;
 	}
@@ -140,7 +141,7 @@ int thread_mutex_init(thread_mutex_t *mutex)
 	if (!*mutex) {
 		return -1;
 	}
-	(*mutex)->handle = CreateMutex(NULL, FALSE, NULL);
+	(*mutex)->handle = CreateMutex(NULL, false, NULL);
 	return 0;
 }
 
@@ -178,7 +179,7 @@ int thread_mutex_lock(thread_mutex_t *mutex)
 /* Unlock the mutex */
 int thread_mutex_unlock(thread_mutex_t *mutex)
 {
-	if (ReleaseMutex((*mutex)->handle) == FALSE) {
+	if (ReleaseMutex((*mutex)->handle) == false) {
 		return -1;
 	}
 	return 0;
@@ -199,7 +200,7 @@ int thread_create(thread_t *tid, void (*func)(void *), void *arg)
 	if (!thread_manager.active) {
 		list_create(&thread_manager.threads);
 		thread_mutex_init(&thread_manager.mutex);
-		thread_manager.active = TRUE;
+		thread_manager.active = true;
 	}
 	thread = malloc(sizeof(thread_info_t));
 	if (!thread) {
@@ -304,7 +305,7 @@ int thread_join(thread_t tid, void **retval)
 		thread_mutex_unlock(&thread_manager.mutex);
 		return -1;
 	}
-	thread->has_waiter = TRUE;
+	thread->has_waiter = true;
 	thread_mutex_unlock(&thread_manager.mutex);
 	do {
 		code = 0;

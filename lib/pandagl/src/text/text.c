@@ -570,7 +570,7 @@ static void pd_text_typeset_line(pd_text_t *text, int line_num)
 
         pd_char_t *txtchar;
         pd_text_line_t *line = text->lines[line_num];
-        pd_bool_t autowrap =
+        bool autowrap =
             max_width > 0 && text->autowrap_enabled && text->mulitiline_enabled;
 
         for (col = 0; col < line->length; ++col) {
@@ -665,7 +665,7 @@ static int pd_text_process(pd_text_t *text, const wchar_t *wstr,
         list_t tmp_tags;
         const wchar_t *p;
         int cur_col, cur_line, start_line, ins_x, ins_y;
-        pd_bool_t need_typeset, rect_has_added;
+        bool need_typeset, rect_has_added;
         pd_text_style_t *style = NULL;
 
         if (!wstr) {
@@ -866,7 +866,7 @@ int pd_text_set_max_size(pd_text_t *text, int width, int height)
 }
 
 /** 设置是否启用多行文本模式 */
-void pd_text_set_multiline(pd_text_t *text, pd_bool_t enabled)
+void pd_text_set_multiline(pd_text_t *text, bool enabled)
 {
         if (text->mulitiline_enabled != enabled) {
                 text->mulitiline_enabled = enabled;
@@ -1054,7 +1054,7 @@ int pd_text_backspace(pd_text_t *text, int n_char)
         return 0;
 }
 
-void pd_text_set_autowrap(pd_text_t *text, pd_bool_t autowrap)
+void pd_text_set_autowrap(pd_text_t *text, bool autowrap)
 {
         if (text->autowrap_enabled != autowrap) {
                 text->autowrap_enabled = autowrap;
@@ -1071,7 +1071,7 @@ void pd_text_set_word_break(pd_text_t *text, pd_word_break_t word_break)
 }
 
 /** 设置是否使用样式标签 */
-void pd_text_set_style_tag(pd_text_t *text, pd_bool_t enabled)
+void pd_text_set_style_tag(pd_text_t *text, bool enabled)
 {
         text->style_tag_enabled = enabled;
 }
@@ -1255,7 +1255,7 @@ void pd_text_set_line_height(pd_text_t *text, int height)
         text->task.typeset_start_line = 0;
 }
 
-pd_bool_t pd_text_set_offset(pd_text_t *text, int offset_x, int offset_y)
+bool pd_text_set_offset(pd_text_t *text, int offset_x, int offset_y)
 {
         if (text->new_offset_x != offset_x || text->new_offset_y != offset_y) {
                 text->new_offset_x = offset_x;

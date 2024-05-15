@@ -27,7 +27,7 @@ void pd_canvas_init(pd_canvas_t *canvas)
 	canvas->bytes_per_row = 0;
 }
 
-pd_bool_t pd_canvas_is_valid(const pd_canvas_t *canvas)
+bool pd_canvas_is_valid(const pd_canvas_t *canvas)
 {
 	if (!canvas) {
 		return PD_FALSE;
@@ -378,7 +378,7 @@ mix_with_opacity:
 }
 
 int pd_canvas_mix(pd_canvas_t *back, const pd_canvas_t *fore, int left, int top,
-		  pd_bool_t with_alpha)
+		  bool with_alpha)
 {
 	pd_canvas_t w_slot;
 	pd_rect_t r_rect, w_rect;

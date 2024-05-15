@@ -19,9 +19,9 @@ static void test_dropdown(void)
 
 	w = ui_get_widget("test-dropdown-menu");
 	ctest_equal_bool("$('#test-dropdown-menu')[0].border_box.height < 200",
-	     w->border_box.width < 200, TRUE);
+	     w->border_box.width < 200, true);
 	ctest_equal_bool("$('#test-dropdown-menu')[0].border_box.width > 100",
-	     w->border_box.width > 100, TRUE);
+	     w->border_box.width > 100, true);
 	ctest_equal_int("$('#test-dropdown-menu')[0].border_box.height",
 	     (int)w->border_box.height, 142);
 
@@ -93,7 +93,7 @@ static void test_auto_size(void)
 	ctest_equal_int("$('#test-text-auto-size')[0].border_box.y", (int)w->border_box.y,
 	     5 + 50);
 	ctest_equal_bool("$('#test-text-auto-size')[0].border_box.width <= 758",
-	     w->border_box.width < 758.f, TRUE);
+	     w->border_box.width < 758.f, true);
 	ctest_equal_int("$('#test-text-auto-size')[0].border_box.height",
 	     (int)w->border_box.height, 50);
 
@@ -433,7 +433,7 @@ static void test_block_layout_1280(void)
 
 	w = ui_get_widget("test-text-auto-size");
 	ctest_equal_bool("$('#test-text-auto-size')[0].width < 140px",
-	     w->border_box.width < 170, TRUE);
+	     w->border_box.width < 170, true);
 	ctest_equal_int("$('#test-text-auto-size')[0].height", (int)w->border_box.height,
 	     31);
 

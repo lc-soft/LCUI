@@ -130,17 +130,17 @@ bool strmap_includes(strmap_t *a, strmap_t *b)
                 value = strmap_get(a, item->key);
                 if (!value || strcmp(value, item->value) != 0) {
                         strmap_destroy_iterator(iter);
-                        return FALSE;
+                        return false;
                 }
         }
         strmap_destroy_iterator(iter);
-        return TRUE;
+        return true;
 }
 
 bool strmap_equal(strmap_t *a, strmap_t *b)
 {
         if (dict_size(a->dict) != dict_size(b->dict)) {
-                return FALSE;
+                return false;
         }
         return strmap_includes(a, b);
 }

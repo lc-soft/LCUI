@@ -59,7 +59,7 @@ static void check_widget_opactiy(void)
 	pd_canvas_create(&canvas, rect.width, rect.height);
 	pd_canvas_fill(&canvas, bgcolor);
 
-	paint.with_alpha = FALSE;
+	paint.with_alpha = false;
 	paint.rect.width = 400;
 	paint.rect.height = 256;
 	paint.rect.x = paint.rect.y = 0;
@@ -78,14 +78,14 @@ static void check_widget_opactiy(void)
 	pd_blend_pixel(&expected_color, &parent_bcolor,
 		       (int)(PARENT_OPACITY * 255));
 	ctest_equal_bool("check parent border color", check_color(expected_color, color),
-	     TRUE);
+	     true);
 
 	expected_color = bgcolor;
 	color = pd_canvas_get_pixel(&canvas, 30, 30);
 	pd_blend_pixel(&expected_color, &parent_bgcolor,
 		       (int)(PARENT_OPACITY * 255));
 	ctest_equal_bool("check parent background color",
-	     check_color(expected_color, color), TRUE);
+	     check_color(expected_color, color), true);
 
 	tmp = parent_bgcolor;
 	expected_color = bgcolor;
@@ -93,7 +93,7 @@ static void check_widget_opactiy(void)
 	pd_blend_pixel(&tmp, &child_bgcolor, (int)(CHILD_OPACITY * 255));
 	pd_blend_pixel(&expected_color, &tmp, (int)(PARENT_OPACITY * 255));
 	ctest_equal_bool("check child 1 background color",
-	     check_color(expected_color, color), TRUE);
+	     check_color(expected_color, color), true);
 
 	tmp = parent_bgcolor;
 	expected_color = bgcolor;
@@ -101,18 +101,18 @@ static void check_widget_opactiy(void)
 	pd_blend_pixel(&tmp, &child_footer_bgcolor, (int)(CHILD_OPACITY * 255));
 	pd_blend_pixel(&expected_color, &tmp, (int)(PARENT_OPACITY * 255));
 	ctest_equal_bool("check child 1 footer background color",
-	     check_color(expected_color, color), TRUE);
+	     check_color(expected_color, color), true);
 
 	expected_color = bgcolor;
 	color = pd_canvas_get_pixel(&canvas, 220, 90);
 	pd_blend_pixel(&expected_color, &child_bgcolor,
 		       (int)(PARENT_OPACITY * 255));
 	ctest_equal_bool("check child 2 background color",
-	     check_color(expected_color, color), TRUE);
+	     check_color(expected_color, color), true);
 	expected_color = child_footer_bgcolor;
 	color = pd_canvas_get_pixel(&canvas, 220, 120);
 	ctest_equal_bool("check child 2 footer background color",
-	     check_color(expected_color, color), TRUE);
+	     check_color(expected_color, color), true);
 
 	pd_canvas_destroy(&canvas);
 }

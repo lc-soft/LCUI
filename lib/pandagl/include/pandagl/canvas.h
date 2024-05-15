@@ -67,7 +67,7 @@ PD_INLINE const pd_canvas_t *pd_canvas_get_quote_source_readonly(
 
 PD_PUBLIC void pd_canvas_init(pd_canvas_t *canvas);
 
-PD_PUBLIC pd_bool_t pd_canvas_is_valid(const pd_canvas_t *canvas);
+PD_PUBLIC bool pd_canvas_is_valid(const pd_canvas_t *canvas);
 
 PD_PUBLIC int pd_canvas_quote(pd_canvas_t *self, pd_canvas_t *source,
 			     const pd_rect_t *rect);
@@ -91,7 +91,7 @@ PD_PUBLIC int pd_canvas_cut(const pd_canvas_t *canvas, pd_rect_t rect,
 PD_PUBLIC void pd_canvas_copy(pd_canvas_t *des, const pd_canvas_t *src);
 
 PD_PUBLIC int pd_canvas_mix(pd_canvas_t *back, const pd_canvas_t *fore, int left,
-			   int top, pd_bool_t with_alpha);
+			   int top, bool with_alpha);
 
 PD_PUBLIC int pd_canvas_fill_rect(pd_canvas_t *canvas, pd_color_t color,
 				 pd_rect_t rect);
@@ -103,17 +103,17 @@ PD_INLINE int pd_canvas_fill(pd_canvas_t *canvas, pd_color_t color)
 }
 
 PD_PUBLIC int pd_canvas_tile(pd_canvas_t *buff, const pd_canvas_t *canvas,
-			    pd_bool_t replace, pd_bool_t with_alpha);
+			    bool replace, bool with_alpha);
 
 PD_PUBLIC int pd_canvas_veri_flip(const pd_canvas_t *canvas, pd_canvas_t *buff);
 
 PD_PUBLIC int pd_canvas_horiz_flip(const pd_canvas_t *canvas, pd_canvas_t *buff);
 
 PD_PUBLIC int pd_canvas_zoom(const pd_canvas_t *canvas, pd_canvas_t *buff,
-			    pd_bool_t keep_scale, int width, int height);
+			    bool keep_scale, int width, int height);
 
 PD_PUBLIC int pd_canvas_zoom_bilinear(const pd_canvas_t *canvas,
-				     pd_canvas_t *buff, pd_bool_t keep_scale,
+				     pd_canvas_t *buff, bool keep_scale,
 				     int width, int height);
 
 PD_END_DECLS

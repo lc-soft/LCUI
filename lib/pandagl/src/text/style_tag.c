@@ -42,7 +42,7 @@ pd_text_style_t *pd_style_tags_get_text_style(list_t *tags)
 	list_node_t *node;
 	pd_style_tag_t *tag;
 	pd_text_style_t *style;
-	pd_bool_t found_tags[PD_TEXT_STYLE_TYPE_TOTAL_NUM] = { 0 };
+	bool found_tags[PD_TEXT_STYLE_TYPE_TOTAL_NUM] = { 0 };
 
 	if (tags->length <= 0) {
 		return NULL;
@@ -170,7 +170,7 @@ const wchar_t *pd_scan_style_open_tag(const wchar_t *wstr, wchar_t *name,
 				      int max_name_len, wchar_t *data)
 {
 	size_t i, j, len;
-	pd_bool_t end_name = FALSE;
+	bool end_name = false;
 
 	len = wcslen(wstr);
 	if (wstr[0] != '<') {
@@ -181,7 +181,7 @@ const wchar_t *pd_scan_style_open_tag(const wchar_t *wstr, wchar_t *name,
 		if (wstr[i] == ' ') {
 			/* 如果上个字符不是空格，说明标签名已经结束 */
 			if (i > 0 && wstr[i - 1] != ' ') {
-				end_name = TRUE;
+				end_name = true;
 			}
 			/* 标签名首部和尾部可包含空格 */
 			if (j == 0 || max_name_len == 0 ||
@@ -287,7 +287,7 @@ static const wchar_t *pd_scan_style_tag_by_name(const wchar_t *wstr,
 	return wstr + i;
 }
 
-static pd_bool_t pd_parse_color(const char *str, pd_color_t *value)
+static bool pd_parse_color(const char *str, pd_color_t *value)
 {
 	size_t len = strlen(str);
 	int r, g, b;

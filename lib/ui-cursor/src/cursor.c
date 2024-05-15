@@ -156,14 +156,14 @@ bool ui_cursor_is_visible(void)
 
 void ui_cursor_show(void)
 {
-	ui_cursor.visible = TRUE;
+	ui_cursor.visible = true;
 	ui_cursor_refresh();
 }
 
 void ui_cursor_hide(void)
 {
 	ui_cursor_refresh();
-	ui_cursor.visible = FALSE;
+	ui_cursor.visible = false;
 }
 
 void ui_cursor_set_position(int x, int y)
@@ -203,7 +203,7 @@ int ui_cursor_paint(app_window_t *w, app_window_paint_t* paint)
 	// TODO: 转换为窗口客户区内的坐标
 	x = ui_cursor.x - paint->rect.x;
 	y = ui_cursor.y - paint->rect.y;
-	return pd_canvas_mix(&paint->canvas, &ui_cursor.image, x, y, FALSE);
+	return pd_canvas_mix(&paint->canvas, &ui_cursor.image, x, y, false);
 }
 
 void ui_cursor_init(void)

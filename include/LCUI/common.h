@@ -63,15 +63,4 @@
         logger_log(LOGGER_LEVEL_DEBUG, __FILE__ ":%d: %s(): " format, \
                    __LINE__, __FUNCTION__, ##__VA_ARGS__)
 
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-typedef unsigned char LCUI_BOOL;
-typedef unsigned char uchar_t;
-
 #endif

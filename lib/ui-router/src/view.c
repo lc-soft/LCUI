@@ -128,7 +128,7 @@ static void ui_router_view_on_init(ui_widget_t *w)
         view->watcher = NULL;
         dict_init_string_copy_key_type(&view->cache_dict_type);
         view->cache = dict_create(&view->cache_dict_type, NULL);
-        view->keep_alive = FALSE;
+        view->keep_alive = false;
         ui_widget_on(w, "ready", ui_router_view_on_ready, NULL);
 }
 

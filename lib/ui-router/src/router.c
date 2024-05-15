@@ -129,7 +129,7 @@ void router_push(router_t *router, router_location_t *location)
 {
 	router_resolved_t *resolved;
 
-	resolved = router_resolve(router, location, FALSE);
+	resolved = router_resolve(router, location, false);
 	router_history_push(router->history, resolved->route);
 	resolved->route = NULL;
 	router_resolved_destroy(resolved);
@@ -139,7 +139,7 @@ void router_replace(router_t *router, router_location_t *location)
 {
 	router_resolved_t *resolved;
 
-	resolved = router_resolve(router, location, FALSE);
+	resolved = router_resolve(router, location, false);
 	router_history_replace(router->history, resolved->route);
 	resolved->route = NULL;
 	router_resolved_destroy(resolved);

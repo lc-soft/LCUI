@@ -13,9 +13,8 @@
 #define LIB_PANDAGL_INCLUDE_PANDAGL_TPYES_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <stddef.h>
-
-typedef unsigned char pd_bool_t;
 
 #define PD_FALSE 0
 #define PD_TRUE 1
@@ -65,7 +64,7 @@ typedef struct pd_canvas_t pd_canvas_t;
 typedef struct pd_canvas_quote_t {
 	int top;
 	int left;
-	pd_bool_t is_valid;
+	bool is_valid;
 	pd_canvas_t *source;
 } pd_canvas_quote_t;
 
@@ -88,14 +87,14 @@ struct pd_canvas_t {
 typedef struct pd_context_t {
 	pd_rect_t rect;    /**< 需要绘制的区域 */
 	pd_canvas_t canvas; /**< 绘制后的位图缓存（可称为：画布） */
-	pd_bool_t with_alpha; /**< 绘制时是否需要处理 alpha 通道 */
+	bool with_alpha; /**< 绘制时是否需要处理 alpha 通道 */
 } pd_context_t;
 
 typedef struct pd_background_t {
 	pd_canvas_t *image;
 	pd_color_t color;
-	pd_bool_t repeat_x;
-	pd_bool_t repeat_y;
+	bool repeat_x;
+	bool repeat_y;
 	int x;
 	int y;
 	int width;

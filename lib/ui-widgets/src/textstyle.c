@@ -15,12 +15,12 @@ void convert_font_style_to_text_style(ui_text_style_t *fs, pd_text_style_t *ts)
 {
 	size_t len;
 	ts->font_ids = NULL;
-	ts->has_style = TRUE;
-	ts->has_weight = TRUE;
-	ts->has_family = FALSE;
-	ts->has_back_color = FALSE;
-	ts->has_pixel_size = TRUE;
-	ts->has_fore_color = TRUE;
+	ts->has_style = true;
+	ts->has_weight = true;
+	ts->has_family = false;
+	ts->has_back_color = false;
+	ts->has_pixel_size = true;
+	ts->has_fore_color = true;
 	ts->fore_color = fs->color;
 	ts->pixel_size = fs->font_size;
 	ts->weight = fs->font_weight;
@@ -30,6 +30,6 @@ void convert_font_style_to_text_style(ui_text_style_t *fs, pd_text_style_t *ts)
 			;
 		ts->font_ids = malloc(sizeof(int) * ++len);
 		memcpy(ts->font_ids, fs->font_ids, len * sizeof(int));
-		ts->has_family = TRUE;
+		ts->has_family = true;
 	}
 }

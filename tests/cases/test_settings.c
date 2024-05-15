@@ -21,7 +21,7 @@ static void check_settings_frame_rate_cap(void *arg)
 
 	sprintf(str, "should work when frame cap is %u (actual %u)", fps_limit,
 		fps);
-	ctest_equal_bool(str, fps <= fps_limit + 2 && fps > fps_limit / 2, TRUE);
+	ctest_equal_bool(str, fps <= fps_limit + 2 && fps > fps_limit / 2, true);
 	lcui_quit();
 }
 
@@ -36,7 +36,7 @@ static void test_default_settings(void)
 	ctest_equal_int("check default frame rate cap", settings.frame_rate_cap, 120);
 	ctest_equal_int("check default parallel rendering threads",
 	     settings.parallel_rendering_threads, 4);
-	ctest_equal_bool("check default paint flashing", settings.paint_flashing, FALSE);
+	ctest_equal_bool("check default paint flashing", settings.paint_flashing, false);
 	lcui_quit();
 	lcui_main();
 }
@@ -47,7 +47,7 @@ static void test_apply_settings(void)
 
 	settings.frame_rate_cap = 60;
 	settings.parallel_rendering_threads = 2;
-	settings.paint_flashing = TRUE;
+	settings.paint_flashing = true;
 
 	lcui_init();
 	lcui_apply_settings(&settings);
@@ -55,7 +55,7 @@ static void test_apply_settings(void)
 	ctest_equal_int("check frame rate cap", settings.frame_rate_cap, 60);
 	ctest_equal_int("check parallel rendering threads",
 	     settings.parallel_rendering_threads, 2);
-	ctest_equal_bool("check paint flashing", settings.paint_flashing, TRUE);
+	ctest_equal_bool("check paint flashing", settings.paint_flashing, true);
 
 	settings.frame_rate_cap = -1;
 	settings.parallel_rendering_threads = -1;
