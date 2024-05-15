@@ -115,7 +115,7 @@ static bool css_valdef_has_children(css_valdef_t *valdef)
 	default:
 		break;
 	}
-	return FALSE;
+	return false;
 }
 
 void css_valdef_destroy(css_valdef_t *valdef)

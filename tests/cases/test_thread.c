@@ -28,8 +28,8 @@ static void TestWorker_Thread(void *arg)
 {
 	TestWorker worker = arg;
 
-	worker->cancel = FALSE;
-	worker->active = TRUE;
+	worker->cancel = false;
+	worker->active = true;
 	worker->data_count = 0;
 	thread_mutex_lock(&worker->mutex);
 	while (!worker->cancel && worker->data_count < 20) {
@@ -40,7 +40,7 @@ static void TestWorker_Thread(void *arg)
 	}
 	thread_mutex_unlock(&worker->mutex);
 	logger_debug("count: %d\n", worker->data_count);
-	worker->active = FALSE;
+	worker->active = false;
 	thread_exit(NULL);
 }
 
@@ -61,7 +61,7 @@ static void TestWorker_Init(TestWorker worker)
 static void TestWorker_Destroy(TestWorker worker)
 {
 	thread_mutex_lock(&worker->mutex);
-	worker->cancel = TRUE;
+	worker->cancel = true;
 	thread_cond_signal(&worker->cond);
 	thread_mutex_unlock(&worker->mutex);
 	thread_join(worker->thread, NULL);
@@ -90,5 +90,5 @@ void test_thread(void)
 	sleep_ms(100);
 	TestWorker_Destroy(&worker);
 	ctest_equal_int("check worker data count", worker.data_count, 7);
-	ctest_equal_bool("check worker is no longer active", worker.active, FALSE);
+	ctest_equal_bool("check worker is no longer active", worker.active, false);
 }

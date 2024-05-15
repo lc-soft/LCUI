@@ -34,7 +34,7 @@ typedef struct pd_jpeg_reader_t {
 	struct jpeg_decompress_struct cinfo;
 	jmp_buf env;
 	pd_jpeg_error_t err;
-	pd_bool_t start_of_file;
+	bool start_of_file;
 	pd_image_reader_t *base;
 	unsigned char buffer[BUFFER_SIZE];
 } pd_jpeg_reader_t;

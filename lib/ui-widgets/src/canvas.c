@@ -57,7 +57,7 @@ static void ui_canvas_on_destroy(ui_widget_t *w)
 	canvas = ui_widget_add_data(w, ui_canvas.proto, sizeof(ui_canvas_t));
 	for (list_each(node, &canvas->contexts)) {
 		ctx = node->data;
-		ctx->available = FALSE;
+		ctx->available = false;
 	}
 	list_destroy_without_node(&canvas->contexts, NULL);
 	pd_canvas_destroy(&canvas->buffer);
@@ -137,7 +137,7 @@ ui_canvas_context_t *ui_canvas_get_context(ui_widget_t *w)
 
 	ctx = malloc(sizeof(ui_canvas_context_t));
 	ctx->canvas = w;
-	ctx->available = TRUE;
+	ctx->available = true;
 	ctx->buffer = canvas->buffer;
 	ctx->width = ctx->buffer.width;
 	ctx->height = ctx->buffer.height;

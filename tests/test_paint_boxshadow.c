@@ -115,7 +115,7 @@ int main(void)
 
 	// 基于临时绘制层创建绘制上下文
 	ctx = pd_context_create(&layer, &layer_rect);
-	ctx->with_alpha = TRUE;
+	ctx->with_alpha = true;
 	// 将背景区域和边框区域的坐标转换成相对于阴影区域
 	bg_box.x -= shadow_box.x;
 	bg_box.y -= shadow_box.y;
@@ -127,7 +127,7 @@ int main(void)
 			   border_box.height);
 
 	// 将临时绘制层混合到画布中
-	pd_canvas_mix(&canvas, &layer, shadow_box.x, shadow_box.y, FALSE);
+	pd_canvas_mix(&canvas, &layer, shadow_box.x, shadow_box.y, false);
 	pd_write_png_file("test_paint_boxshadow.png", &canvas);
 	pd_canvas_destroy(&canvas);
 	return 0;

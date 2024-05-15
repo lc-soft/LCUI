@@ -46,7 +46,7 @@ int main(void)
 		color.alpha = (unsigned char)(255 * (i + 1) / 10.0);
 		pd_canvas_fill(&fore_canvas, color);
 		for (j = 0; j < 4; ++j) {
-			pd_canvas_mix(&canvas, &fore_canvas, 5 + i * 15, 5 + j * 40, TRUE);
+			pd_canvas_mix(&canvas, &fore_canvas, 5 + i * 15, 5 + j * 40, true);
 		}
 	}
 	pd_write_png_file("test_fill_rect_with_rgba.png", &canvas);

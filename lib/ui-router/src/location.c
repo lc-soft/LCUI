@@ -22,7 +22,7 @@ router_location_t *router_location_create(const char *name, const char *path)
         location->hash = NULL;
         location->query = NULL;
         location->params = NULL;
-        location->normalized = FALSE;
+        location->normalized = false;
         return location;
 }
 
@@ -101,7 +101,7 @@ static router_location_t *router_location_from_path(
         strmap_extend(query, raw->query);
         location->query = query;
         location->hash = hash;
-        location->normalized = TRUE;
+        location->normalized = true;
         router_mem_free(query_str);
         return location;
 }
@@ -121,7 +121,7 @@ router_location_t *router_location_normalize(const router_location_t *raw,
         }
         if (!raw->path && raw->params && current) {
                 location = router_location_duplicate(raw);
-                location->normalized = TRUE;
+                location->normalized = true;
                 params = strmap_create();
                 strmap_extend(params, current->params);
                 strmap_extend(params, raw->params);

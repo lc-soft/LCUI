@@ -48,7 +48,7 @@ worker_t *worker_create(void)
         thread_mutex_init(&worker->mutex);
         thread_cond_init(&worker->cond);
         list_create(&worker->tasks);
-        worker->active = FALSE;
+        worker->active = false;
         worker->thread = 0;
         return worker;
 }
@@ -87,12 +87,12 @@ bool worker_run_task(worker_t *worker)
         task = worker_get_task(worker);
         thread_mutex_unlock(&worker->mutex);
         if (!task) {
-                return FALSE;
+                return false;
         }
         worker_task_run(task);
         worker_task_destroy(task);
         free(task);
-        return TRUE;
+        return true;
 }
 
 static void worker_on_destroy_task(void *arg)
@@ -139,7 +139,7 @@ int worker_run_async(worker_t *worker)
         if (worker->thread != 0) {
                 return -EEXIST;
         }
-        worker->active = TRUE;
+        worker->active = true;
         thread_create(&worker->thread, worker_thread, worker);
         return 0;
 }
@@ -150,7 +150,7 @@ void worker_destroy(worker_t *worker)
 
         if (worker->active) {
                 thread_mutex_lock(&worker->mutex);
-                worker->active = FALSE;
+                worker->active = false;
                 thread_cond_signal(&worker->cond);
                 thread_mutex_unlock(&worker->mutex);
                 thread_join(thread, NULL);

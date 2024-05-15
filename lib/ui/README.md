@@ -87,11 +87,11 @@ void example(void)
     ...
 
     // 监听属性变化
-	options.properties = TRUE;
+	options.properties = true;
     // 监听子组件的变化
-    options.child_list = TRUE;
+    options.child_list = true;
     // 监听子树的变化
-    options.subtree = TRUE;
+    options.subtree = true;
     // 监听组件
     ui_mutation_observer_observe(observer, widget, options);
 

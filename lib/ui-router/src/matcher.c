@@ -56,7 +56,7 @@ router_route_record_t *router_matcher_add_route_record(
         list_node_t *node;
 
         record = router_route_record_create();
-        record->path = router_path_resolve(config->path, base_path, TRUE);
+        record->path = router_path_resolve(config->path, base_path, true);
         strmap_extend(record->components, config->components);
         if (config->name) {
                 if (dict_fetch_value(matcher->name_map, config->name)) {
@@ -107,8 +107,8 @@ bool router_matcher_match_route(router_route_record_t *record, const char *path,
         size_t record_nodes_count;
         size_t path_match_len = 0;
         size_t path_match_i = 0;
-        bool matched = TRUE;
-        bool match_all = FALSE;
+        bool matched = true;
+        bool match_all = false;
 
         nodes_count = strsplit(path, "/", &nodes);
         record_nodes_count = strsplit(record->path, "/", &record_nodes);
@@ -124,7 +124,7 @@ bool router_matcher_match_route(router_route_record_t *record, const char *path,
                                     "[router] %s",
                                     "the asterisk should be at the end\n");
                         }
-                        match_all = TRUE;
+                        match_all = true;
                 }
                 if (match_all) {
                         if (path_match_len > 0) {
@@ -145,7 +145,7 @@ bool router_matcher_match_route(router_route_record_t *record, const char *path,
                 } else if (record_nodes[j][0] == ':') {
                         strmap_set(params, record_nodes[j] + 1, nodes[i]);
                 } else if (strcmp(record_nodes[j], nodes[i]) != 0) {
-                        matched = FALSE;
+                        matched = false;
                         break;
                 }
                 ++j;
@@ -236,7 +236,7 @@ router_route_t *router_matcher_match(router_matcher_t *matcher,
         router_location_t *location;
 
         location =
-            router_location_normalize(raw_location, current_route, FALSE);
+            router_location_normalize(raw_location, current_route, false);
         if (location->name) {
                 route = router_matcher_match_by_name(matcher, location,
                                                      current_route);

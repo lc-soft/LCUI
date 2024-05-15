@@ -12,7 +12,7 @@
 #include <pandagl.h>
 
 int pd_canvas_tile(pd_canvas_t *buff, const pd_canvas_t *canvas,
-		   pd_bool_t replace, pd_bool_t with_alpha)
+		   bool replace, bool with_alpha)
 {
 	int ret = 0;
 	unsigned x, y;

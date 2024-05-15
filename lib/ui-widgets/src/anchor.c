@@ -91,7 +91,7 @@ static void ui_anchor_on_load(ui_widget_t* w, ui_event_t* e, void* arg)
         ui_widget_append(target, loader->pack);
         ui_widget_unwrap(loader->pack);
         ui_event_init(&ev, "loaded.anchor");
-        ev.cancel_bubble = TRUE;
+        ev.cancel_bubble = true;
         ev.target = loader->widget;
         ui_widget_emit_event(root, ev, loader->key);
 }
@@ -125,7 +125,7 @@ static void xml_loader_load(xml_loader_t* loader)
         }
         ui_event_init(&e, "load.anchor");
         e.target = loader->widget;
-        e.cancel_bubble = TRUE;
+        e.cancel_bubble = true;
         loader->pack = pack;
         ui_post_event(&e, loader,
                       (ui_event_arg_destructor_t)xml_loader_destroy);
@@ -175,7 +175,7 @@ void ui_anchor_open(ui_widget_t* w)
                 return;
         }
         ui_event_init(&e, "startload.anchor");
-        e.cancel_bubble = TRUE;
+        e.cancel_bubble = true;
         ui_post_event(&e, loader, NULL);
 }
 

@@ -52,7 +52,7 @@ typedef struct font_family_node_t {
 static struct font_library_module_t {
 	int count;			/**< 计数器，主要用于为字体信息生成标识号 */
 	int font_cache_num;		/**< 字体信息缓存区的数量 */
-	pd_bool_t active;		/**< 标记，指示数据库是否初始化 */
+	bool active;		/**< 标记，指示数据库是否初始化 */
 	dict_t *font_families;		/**< 字族信息库，以字族名称索引字体信息 */
 	dict_type_t font_families_type;	/**< 字族信息库的字典类型数据 */
 	rbtree_t bitmap_cache;		/**< 字体位图缓存区 */

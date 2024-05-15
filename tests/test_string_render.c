@@ -32,7 +32,7 @@ int main(void)
 	/* 设置文本的字体大小 */
 	pd_text_style_Init(&txtstyle);
 	txtstyle.pixel_size = 24;
-	txtstyle.has_pixel_size = TRUE;
+	txtstyle.has_pixel_size = true;
 
 	/* 设置文本图层的固定尺寸、文本样式、文本内容、对齐方式 */
 	pd_text_set_fixed_size(txt, 320, 240);

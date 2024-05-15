@@ -12,6 +12,7 @@
 #ifndef LIBCSS_INCLUDE_CSS_DEF_H
 #define LIBCSS_INCLUDE_CSS_DEF_H
 
+#include <stdbool.h>
 #include <yutil.h>
 #include <stdbool.h>
 

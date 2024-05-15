@@ -199,7 +199,7 @@ int thread_create(thread_t *tid, void (*func)(void *), void *arg)
 	if (!thread_manager.active) {
 		list_create(&thread_manager.threads);
 		thread_mutex_init(&thread_manager.mutex);
-		thread_manager.active = TRUE;
+		thread_manager.active = true;
 	}
 	thread = malloc(sizeof(thread_info_t));
 	if (!thread) {

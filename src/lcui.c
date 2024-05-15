@@ -40,10 +40,10 @@ const char *lcui_get_version(void)
 bool lcui_post_task(worker_task_t *task)
 {
         if (!lcui_app.main_worker) {
-                return FALSE;
+                return false;
         }
         worker_post_task(lcui_app.main_worker, task);
-        return TRUE;
+        return true;
 }
 
 bool lcui_post_simple_task(worker_callback_t callback, void *arg1, void *arg2)
@@ -79,9 +79,9 @@ void lcui_set_frame_rate_cap(unsigned rate_cap)
 {
         if (rate_cap > 0) {
                 lcui_app.timer.target_elapsed_time = 1000 / rate_cap;
-                lcui_app.timer.is_fixed_time_step = TRUE;
+                lcui_app.timer.is_fixed_time_step = true;
         } else {
-                lcui_app.timer.is_fixed_time_step = FALSE;
+                lcui_app.timer.is_fixed_time_step = false;
         }
 }
 

@@ -32,7 +32,7 @@ int main(void)
 	pd_canvas_fill(&canvas, pd_rgb(240, 240, 240));
 
 	/* 初始化一个绘制实例，绘制区域为整个画板 */
-	paint.with_alpha = FALSE;
+	paint.with_alpha = false;
 	paint.rect.width = 320;
 	paint.rect.height = 320;
 	paint.rect.x = paint.rect.y = 0;

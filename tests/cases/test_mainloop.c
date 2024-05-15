@@ -52,7 +52,7 @@ static void ObserverThread(void *arg)
 	for (i = 0; i < 20 && !*exited; ++i) {
 		sleep_ms(100);
 	}
-	ctest_equal_bool("main loop should exit within 2000ms", *exited, TRUE);
+	ctest_equal_bool("main loop should exit within 2000ms", *exited, true);
 	if (!*exited) {
 		exit(-ctest_finish());
 		return;
@@ -64,7 +64,7 @@ void test_mainloop(void)
 {
 	thread_t tid;
 	ui_widget_t *btn;
-	LCUI_BOOL exited = FALSE;
+	LCUI_BOOL exited = false;
 
 	lcui_init();
 	btn = ui_create_widget("button");
@@ -76,6 +76,6 @@ void test_mainloop(void)
 	/* Trigger the click event after the first frame is updated */
 	lcui_set_timeout(50, OnTriggerBtnClick, btn);
 	lcui_main();
-	exited = TRUE;
+	exited = true;
 	thread_join(tid, NULL);
 }

@@ -255,7 +255,7 @@ void lcui_set_ui_display_mode(lcui_display_mode_t mode)
                 app_window_set_fullscreen(wnd, true);
                 break;
         case LCUI_DISPLAY_MODE_SEAMLESS:
-                options.child_list = TRUE;
+                options.child_list = true;
                 lcui_ui.observer =
                     ui_mutation_observer_create(lcui_on_ui_mutation, NULL);
                 ui_mutation_observer_observe(lcui_ui.observer, ui_root(),

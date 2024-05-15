@@ -156,7 +156,7 @@ static void ui_scrollbar_on_scrolling(void *arg)
                 }
         }
         lcui_destroy_timer(effect->timer);
-        effect->is_running = FALSE;
+        effect->is_running = false;
         effect->timer = -1;
 }
 
@@ -168,14 +168,14 @@ static void ui_scroll_effect_init(ui_scroll_effect_t *effect)
         effect->timestamp = 0;
         effect->speed = 0;
         effect->speed_delta = 320;
-        effect->is_running = FALSE;
+        effect->is_running = false;
         effect->interval = 1000 / EFFECT_FRAMES;
 }
 
 static void ui_scroll_effect_update(ui_scroll_effect_t *effect, float pos)
 {
         effect->speed = 0;
-        effect->is_running = FALSE;
+        effect->is_running = false;
         effect->start_pos = pos;
         effect->timestamp = get_time_ms();
 }
@@ -205,7 +205,7 @@ static void ui_scrollbar_start_scrolling(ui_widget_t *w)
         if (effect->is_running) {
                 return;
         }
-        effect->is_running = TRUE;
+        effect->is_running = true;
         if (effect->timer > 0) {
                 lcui_destroy_timer(effect->timer);
         }
@@ -258,7 +258,7 @@ static void ui_scrollbar_thumb_on_mousemove(ui_widget_t *thumb, ui_event_t *e,
         if (scrollbar->pos != layer_pos) {
                 ui_event_t e;
                 ui_event_init(&e, "scroll");
-                e.cancel_bubble = TRUE;
+                e.cancel_bubble = true;
                 ui_widget_emit_event(target, e, &layer_pos);
         }
         scrollbar->pos = layer_pos;
@@ -275,7 +275,7 @@ static void ui_scrollbar_thumb_on_mouseup(ui_widget_t *thumb, ui_event_t *e,
         ui_widget_off(thumb, "mousemove", ui_scrollbar_thumb_on_mousemove, w);
         ui_widget_off(thumb, "mouseup", ui_scrollbar_thumb_on_mouseup, w);
         ui_widget_release_mouse_capture(thumb);
-        scrollbar->is_dragging = FALSE;
+        scrollbar->is_dragging = false;
 }
 
 static void Ui_scrollbar_thumb_on_mousedown(ui_widget_t *thumb, ui_event_t *e,
@@ -291,7 +291,7 @@ static void Ui_scrollbar_thumb_on_mousedown(ui_widget_t *thumb, ui_event_t *e,
         scrollbar->thumb_y = thumb->canvas_box.y;
         scrollbar->mouse_x = e->mouse.x;
         scrollbar->mouse_y = e->mouse.y;
-        scrollbar->is_dragging = TRUE;
+        scrollbar->is_dragging = true;
         ui_widget_set_mouse_capture(thumb);
         ui_widget_on(thumb, "mousemove", ui_scrollbar_thumb_on_mousemove, w);
         ui_widget_on(thumb, "mouseup", ui_scrollbar_thumb_on_mouseup, w);
@@ -398,7 +398,7 @@ static void ui_scrollbar_on_container_wheel(ui_widget_t *container,
         /* If the position of the scroll bar is changed, then prevent
          * the event bubbling, to avoid change the parent scroll bars */
         if (pos != ui_scrollbar_set_position(w, new_pos)) {
-                e->cancel_bubble = TRUE;
+                e->cancel_bubble = true;
         }
 }
 
@@ -441,14 +441,14 @@ static void ui_scrollbar_on_container_touch(ui_widget_t *container,
         case UI_EVENT_TOUCHDOWN:
                 scrollbar->distance = 0;
                 scrollbar->effect.speed = 0;
-                scrollbar->effect.is_running = FALSE;
+                scrollbar->effect.is_running = false;
                 scrollbar->old_pos = scrollbar->pos;
                 if (scrollbar->is_dragging) {
                         return;
                 }
                 scrollbar->mouse_x = point->x;
                 scrollbar->mouse_y = point->y;
-                scrollbar->is_draggable = TRUE;
+                scrollbar->is_draggable = true;
                 break;
         case UI_EVENT_TOUCHUP:
                 ui_widget_release_touch_capture(container, -1);
@@ -457,14 +457,14 @@ static void ui_scrollbar_on_container_touch(ui_widget_t *container,
                         ui_scrollbar_start_scrolling(w);
                 }
                 scrollbar->touch_point_id = -1;
-                scrollbar->is_dragging = FALSE;
-                ui_widget_block_event(container, FALSE);
+                scrollbar->is_dragging = false;
+                ui_widget_block_event(container, false);
                 break;
         case UI_EVENT_TOUCHMOVE:
                 if (!scrollbar->is_draggable) {
                         break;
                 }
-                e->cancel_bubble = TRUE;
+                e->cancel_bubble = true;
                 pos = scrollbar->old_pos;
                 if (scrollbar->direction == UI_SCROLLBAR_HORIZONTAL) {
                         pos -= point->x - scrollbar->mouse_x;
@@ -490,15 +490,15 @@ static void ui_scrollbar_on_container_touch(ui_widget_t *container,
                  * mark current drag action should be ignore */
                 if (scrollbar->is_draggable &&
                     scrollbar->old_pos == scrollbar->pos) {
-                        scrollbar->is_dragging = FALSE;
-                        scrollbar->is_draggable = FALSE;
-                        e->cancel_bubble = FALSE;
+                        scrollbar->is_dragging = false;
+                        scrollbar->is_draggable = false;
+                        e->cancel_bubble = false;
                         break;
                 }
                 /* start drag action and block all events of container */
-                scrollbar->is_dragging = TRUE;
+                scrollbar->is_dragging = true;
                 ui_clear_event_target(NULL);
-                ui_widget_block_event(container, TRUE);
+                ui_widget_block_event(container, true);
                 ui_widget_set_touch_capture(container, point->id);
         default:
                 break;
@@ -528,12 +528,12 @@ static void ui_scrollbar_on_container_set_scroll(ui_widget_t *container,
 {
         float *pos = arg;
         ui_scrollbar_set_position(e->data, *pos);
-        e->cancel_bubble = TRUE;
+        e->cancel_bubble = true;
 }
 
 static void ui_scrollbar_observe(ui_widget_t *w)
 {
-        ui_mutation_observer_init_t options = { .properties = TRUE };
+        ui_mutation_observer_init_t options = { .properties = true };
         ui_scrollbar_t *scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
 
         if (scrollbar->container) {
@@ -664,7 +664,7 @@ float ui_scrollbar_set_position(ui_widget_t *w, float pos)
         if (scrollbar->pos != pos) {
                 ui_event_t e;
                 ui_event_init(&e, "scroll");
-                e.cancel_bubble = TRUE;
+                e.cancel_bubble = true;
                 ui_widget_emit_event(content, e, &new_pos);
         }
         scrollbar->pos = pos;
@@ -721,8 +721,8 @@ static void ui_scrollbar_on_init(ui_widget_t *w)
         self =
             ui_widget_add_data(w, ui_scrollbar_proto, sizeof(ui_scrollbar_t));
         self->direction = UI_SCROLLBAR_VERTICAL;
-        self->is_dragging = FALSE;
-        self->is_draggable = FALSE;
+        self->is_dragging = false;
+        self->is_draggable = false;
         self->scroll_step = 64;
         self->target = NULL;
         self->container = NULL;

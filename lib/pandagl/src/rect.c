@@ -42,10 +42,10 @@ pd_rect_t pd_rect_crop(const pd_rect_t *rect, int container_width,
         return cropped_rect;
 }
 
-pd_bool_t pd_rect_correct(pd_rect_t *rect, int container_width,
+bool pd_rect_correct(pd_rect_t *rect, int container_width,
                           int container_height)
 {
-        pd_bool_t overflow = PD_FALSE;
+        bool overflow = PD_FALSE;
 
         if (rect->x < 0) {
                 overflow = PD_TRUE;
@@ -77,7 +77,7 @@ pd_bool_t pd_rect_correct(pd_rect_t *rect, int container_width,
         return overflow;
 }
 
-pd_bool_t pd_rect_is_cover(const pd_rect_t *a, const pd_rect_t *b)
+bool pd_rect_is_cover(const pd_rect_t *a, const pd_rect_t *b)
 {
         if (a->x > b->x) {
                 if (b->x + b->width <= a->x) {
@@ -100,7 +100,7 @@ pd_bool_t pd_rect_is_cover(const pd_rect_t *a, const pd_rect_t *b)
         return PD_TRUE;
 }
 
-pd_bool_t pd_rect_overlap(const pd_rect_t *a, const pd_rect_t *b,
+bool pd_rect_overlap(const pd_rect_t *a, const pd_rect_t *b,
                           pd_rect_t *overlapping_rect)
 {
         if (a->x > b->x) {
@@ -286,7 +286,7 @@ int pd_rects_remove(list_t *list, pd_rect_t *rect)
 {
         int i;
 
-        pd_bool_t deletable;
+        bool deletable;
         pd_rect_t *p, child_rects[4];
 
         list_t extra_list;

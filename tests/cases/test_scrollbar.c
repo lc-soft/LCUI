@@ -132,7 +132,7 @@ void test_scrollbar(void)
         ctest_equal_bool("content should be moved to the left",
                          content->computed_style.left < left &&
                              top == content->computed_style.top,
-                         TRUE);
+                         true);
 
         left = content->computed_style.left;
         top = content->computed_style.top;
@@ -151,7 +151,7 @@ void test_scrollbar(void)
         ctest_equal_bool("content should be moved to the right",
                          content->computed_style.left > left &&
                              top == content->computed_style.top,
-                         TRUE);
+                         true);
 
         left = content->computed_style.left;
         top = content->computed_style.top;
@@ -178,7 +178,7 @@ void test_scrollbar(void)
         ctest_equal_bool("content should be moved to the top",
                          content->computed_style.left == left &&
                              top > content->computed_style.top,
-                         TRUE);
+                         true);
 
         left = content->computed_style.left;
         top = content->computed_style.top;
@@ -197,7 +197,7 @@ void test_scrollbar(void)
         ctest_equal_bool("the content should have scrolled to the bottom",
                          content->computed_style.left == left &&
                              top < content->computed_style.top,
-                         TRUE);
+                         true);
 
         lcui_quit();
         lcui_main();

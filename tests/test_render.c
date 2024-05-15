@@ -112,9 +112,9 @@ void InitBackground(void)
 						color.value);
 		ui_widget_append(self.box, w);
 	}
-	rules.cache_children_style = TRUE;
-	rules.ignore_classes_change = TRUE;
-	rules.ignore_status_change = TRUE;
+	rules.cache_children_style = true;
+	rules.ignore_classes_change = true;
+	rules.ignore_status_change = true;
 	rules.max_update_children_count = -1;
 	rules.max_render_children_count = 0;
 	ui_widget_generate_hash(self.box);
