@@ -47,7 +47,7 @@ static void handle_trigger_btn_click(void *arg)
 static void observer_thread(void *arg)
 {
 	int i;
-	LCUI_BOOL *exited = arg;
+	bool *exited = arg;
 
 	for (i = 0; i < 100 && !*exited; ++i) {
 		sleep_ms(1);
@@ -64,7 +64,7 @@ void test_mainloop(void)
 {
 	thread_t tid;
 	ui_widget_t *btn;
-	LCUI_BOOL exited = FALSE;
+	bool exited = false;
 
 	lcui_init();
 	btn = ui_create_widget("button");
@@ -76,6 +76,6 @@ void test_mainloop(void)
 	/* Trigger the click event after the first frame is updated */
 	lcui_set_timeout(50, handle_trigger_btn_click, btn);
 	lcui_main();
-	exited = TRUE;
+	exited = true;
 	thread_join(tid, NULL);
 }

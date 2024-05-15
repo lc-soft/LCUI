@@ -13,7 +13,7 @@
 
 void pd_canvas_init(pd_canvas_t *canvas)
 {
-	canvas->quote.is_valid = PD_FALSE;
+	canvas->quote.is_valid = false;
 	canvas->quote.source = NULL;
 	canvas->quote.top = 0;
 	canvas->quote.left = 0;
@@ -27,10 +27,10 @@ void pd_canvas_init(pd_canvas_t *canvas)
 	canvas->bytes_per_row = 0;
 }
 
-pd_bool_t pd_canvas_is_valid(const pd_canvas_t *canvas)
+bool pd_canvas_is_valid(const pd_canvas_t *canvas)
 {
 	if (!canvas) {
-		return PD_FALSE;
+		return false;
 	}
 	if (canvas->quote.is_valid) {
 		return canvas->quote.source &&
@@ -67,7 +67,7 @@ int pd_canvas_quote(pd_canvas_t *self, pd_canvas_t *source,
 		self->quote.top = 0;
 		self->bytes = NULL;
 		self->quote.source = NULL;
-		self->quote.is_valid = PD_FALSE;
+		self->quote.is_valid = false;
 		return -1;
 	}
 	self->opacity = 1.0;
@@ -78,7 +78,7 @@ int pd_canvas_quote(pd_canvas_t *self, pd_canvas_t *source,
 	self->color_type = source->color_type;
 	self->bytes_per_pixel = source->bytes_per_pixel;
 	self->bytes_per_row = source->bytes_per_row;
-	self->quote.is_valid = PD_TRUE;
+	self->quote.is_valid = true;
 	self->quote.source = source;
 	self->quote.left = quote_rect.x;
 	self->quote.top = quote_rect.y;
@@ -103,7 +103,7 @@ void pd_canvas_destroy(pd_canvas_t *canvas)
 	/* 解除引用 */
 	if (canvas && canvas->quote.is_valid) {
 		canvas->quote.source = NULL;
-		canvas->quote.is_valid = PD_FALSE;
+		canvas->quote.is_valid = false;
 		return;
 	}
 	if (canvas->bytes) {
@@ -378,7 +378,7 @@ mix_with_opacity:
 }
 
 int pd_canvas_mix(pd_canvas_t *back, const pd_canvas_t *fore, int left, int top,
-		  pd_bool_t with_alpha)
+		  bool with_alpha)
 {
 	pd_canvas_t w_slot;
 	pd_rect_t r_rect, w_rect;

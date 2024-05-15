@@ -21,7 +21,7 @@ typedef struct TouchPointBindingRec_ {
 	int point_id;        /**< 触点 ID */
 	ui_widget_t *widget; /**< 部件 */
 	list_node_t node;    /**< 在链表中的结点 */
-	LCUI_BOOL is_valid;  /**< 是否有效 */
+	bool is_valid;  /**< 是否有效 */
 } TouchPointBindingRec, *TouchPointBinding;
 
 /** 触点绑定记录列表 */
@@ -48,7 +48,7 @@ static void OnTouchWidget(ui_widget_t *w, ui_event_t *e, void *arg)
 		/* 当触点释放后销毁部件及绑定记录 */
 		ui_widget_release_touch_capture(w, -1);
 		list_unlink(&touch_bindings, &binding->node);
-		binding->is_valid = FALSE;
+		binding->is_valid = false;
 		ui_widget_remove(w);
 		free(binding);
 		break;
@@ -68,14 +68,14 @@ static void OnTouch(app_event_t *e, void *arg)
 
 	for (i = 0; i < e->touch.n_points; ++i) {
 		TouchPointBinding binding;
-		LCUI_BOOL is_existed = FALSE;
+		bool is_existed = false;
 		point = &e->touch.points[i];
 		_DEBUG_MSG("point: %d\n", point->id);
 		/* 检查该触点是否已经被绑定 */
 		for (list_each(node, &touch_bindings)) {
 			binding = node->data;
 			if (binding->point_id == point->id) {
-				is_existed = TRUE;
+				is_existed = true;
 			}
 		}
 		if (is_existed) {
@@ -86,7 +86,7 @@ static void OnTouch(app_event_t *e, void *arg)
 		binding = malloc(sizeof(TouchPointBindingRec));
 		binding->point_id = point->id;
 		binding->node.data = binding;
-		binding->is_valid = TRUE;
+		binding->is_valid = true;
 		binding->widget = w;
 		ui_widget_resize(w, 64, 64);
 		ui_widget_move(w, point->x - 32.0f, point->y - 32.0f);

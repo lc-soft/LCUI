@@ -47,7 +47,7 @@ int main(void)
 		pd_canvas_fill(&fore_canvas, pd_rgb(255, 255, 255));
 		// 将前景图混合到背景图中
 		pd_canvas_mix(&canvas, &fore_canvas, 75 - size / 2, 75 - size / 2,
-			  FALSE);
+			  false);
 	}
 	pd_write_png_file("test_mix_rect_with_opacity.png", &canvas);
 	pd_canvas_destroy(&fore_canvas);

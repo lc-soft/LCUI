@@ -140,7 +140,7 @@ void pd_get_boxshadow_canvas_rect(const pd_boxshadow_t *shadow,
 			      canvas_rect->y;
 }
 
-static pd_bool_t pd_paint_boxshadow_left_blur(pd_boxshadow_context_t *ctx)
+static bool pd_paint_boxshadow_left_blur(pd_boxshadow_context_t *ctx)
 {
 	int x, y;
 	int right;
@@ -160,7 +160,7 @@ static pd_bool_t pd_paint_boxshadow_left_blur(pd_boxshadow_context_t *ctx)
 	right = rect.x + rect.width;
 	gradient_init(&g, BLUR_WIDTH(ctx->shadow));
 	if (!pd_rect_overlap(&ctx->paint->rect, &rect, &rect)) {
-		return PD_FALSE;
+		return false;
 	}
 	right -= rect.x;
 	paint_rect.width = rect.width;
@@ -178,10 +178,10 @@ static pd_bool_t pd_paint_boxshadow_left_blur(pd_boxshadow_context_t *ctx)
 			*p = color;
 		}
 	}
-	return PD_TRUE;
+	return true;
 }
 
-static pd_bool_t pd_paint_boxshadow_right_blur(pd_boxshadow_context_t *ctx)
+static bool pd_paint_boxshadow_right_blur(pd_boxshadow_context_t *ctx)
 {
 	int x, y;
 	int left;
@@ -201,7 +201,7 @@ static pd_bool_t pd_paint_boxshadow_right_blur(pd_boxshadow_context_t *ctx)
 	left = rect.x;
 	gradient_init(&g, BLUR_WIDTH(ctx->shadow));
 	if (!pd_rect_overlap(&ctx->paint->rect, &rect, &rect)) {
-		return PD_FALSE;
+		return false;
 	}
 	left -= rect.x + 1;
 	paint_rect.width = rect.width;
@@ -219,10 +219,10 @@ static pd_bool_t pd_paint_boxshadow_right_blur(pd_boxshadow_context_t *ctx)
 			*p = color;
 		}
 	}
-	return PD_TRUE;
+	return true;
 }
 
-static pd_bool_t pd_paint_boxshadow_top_blur(pd_boxshadow_context_t *ctx)
+static bool pd_paint_boxshadow_top_blur(pd_boxshadow_context_t *ctx)
 {
 	int x, y;
 	int bottom;
@@ -242,7 +242,7 @@ static pd_bool_t pd_paint_boxshadow_top_blur(pd_boxshadow_context_t *ctx)
 	bottom = rect.y + rect.height;
 	gradient_init(&g, BLUR_WIDTH(ctx->shadow));
 	if (!pd_rect_overlap(&ctx->paint->rect, &rect, &rect)) {
-		return PD_FALSE;
+		return false;
 	}
 	bottom -= rect.y;
 	paint_rect.width = rect.width;
@@ -260,10 +260,10 @@ static pd_bool_t pd_paint_boxshadow_top_blur(pd_boxshadow_context_t *ctx)
 			*p = color;
 		}
 	}
-	return PD_TRUE;
+	return true;
 }
 
-static pd_bool_t pd_paint_boxshadow_bottom_blur(pd_boxshadow_context_t *ctx)
+static bool pd_paint_boxshadow_bottom_blur(pd_boxshadow_context_t *ctx)
 {
 	int x, y;
 	int top;
@@ -283,7 +283,7 @@ static pd_bool_t pd_paint_boxshadow_bottom_blur(pd_boxshadow_context_t *ctx)
 	top = rect.y;
 	gradient_init(&g, BLUR_WIDTH(ctx->shadow));
 	if (!pd_rect_overlap(&ctx->paint->rect, &rect, &rect)) {
-		return PD_FALSE;
+		return false;
 	}
 	top -= rect.y + 1;
 	paint_rect.width = rect.width;
@@ -300,10 +300,10 @@ static pd_bool_t pd_paint_boxshadow_bottom_blur(pd_boxshadow_context_t *ctx)
 			*p = color;
 		}
 	}
-	return PD_TRUE;
+	return true;
 }
 
-static pd_bool_t pd_paint_boxshadow_circle_blur(pd_boxshadow_context_t *ctx,
+static bool pd_paint_boxshadow_circle_blur(pd_boxshadow_context_t *ctx,
 					      const pd_rect_t *circle_rect,
 					      double center_x, double center_y,
 					      int radius)
@@ -327,7 +327,7 @@ static pd_bool_t pd_paint_boxshadow_circle_blur(pd_boxshadow_context_t *ctx,
 	pd_color_t *p;
 
 	if (!pd_rect_overlap(&ctx->paint->rect, circle_rect, &rect)) {
-		return PD_FALSE;
+		return false;
 	}
 	color = ctx->shadow->color;
 	center_x = center_x + circle_rect->x - rect.x - 0.5;
@@ -370,10 +370,10 @@ static pd_bool_t pd_paint_boxshadow_circle_blur(pd_boxshadow_context_t *ctx,
 			*p = color;
 		}
 	}
-	return PD_TRUE;
+	return true;
 }
 
-static pd_bool_t pd_paint_boxshadow_top_left_blur(pd_boxshadow_context_t *ctx)
+static bool pd_paint_boxshadow_top_left_blur(pd_boxshadow_context_t *ctx)
 {
 	int radius;
 	pd_rect_t rect;
@@ -388,7 +388,7 @@ static pd_bool_t pd_paint_boxshadow_top_left_blur(pd_boxshadow_context_t *ctx)
 					      rect.height, radius);
 }
 
-static pd_bool_t pd_paint_boxshadow_top_right_blur(pd_boxshadow_context_t *ctx)
+static bool pd_paint_boxshadow_top_right_blur(pd_boxshadow_context_t *ctx)
 {
 	int radius;
 	pd_rect_t rect;
@@ -403,7 +403,7 @@ static pd_bool_t pd_paint_boxshadow_top_right_blur(pd_boxshadow_context_t *ctx)
 					      radius);
 }
 
-static pd_bool_t pd_paint_boxshadow_bottom_left_blur(pd_boxshadow_context_t *ctx)
+static bool pd_paint_boxshadow_bottom_left_blur(pd_boxshadow_context_t *ctx)
 {
 	int radius;
 	pd_rect_t rect;
@@ -418,7 +418,7 @@ static pd_bool_t pd_paint_boxshadow_bottom_left_blur(pd_boxshadow_context_t *ctx
 					      radius);
 }
 
-static pd_bool_t pd_paint_boxshadow_bottom_right_blur(pd_boxshadow_context_t *ctx)
+static bool pd_paint_boxshadow_bottom_right_blur(pd_boxshadow_context_t *ctx)
 {
 	int radius;
 	pd_rect_t rect;
@@ -610,7 +610,7 @@ int pd_paint_boxshadow(pd_context_t *ctx, const pd_boxshadow_t *shadow,
 	sd_ctx.paint = &tmp;
 	pd_canvas_init(&tmp.canvas);
 	tmp.rect = ctx->rect;
-	tmp.with_alpha = PD_TRUE;
+	tmp.with_alpha = true;
 	tmp.canvas.color_type = PD_COLOR_TYPE_ARGB;
 	pd_canvas_create(&sd_ctx.paint->canvas, ctx->rect.width,
 			 ctx->rect.height);

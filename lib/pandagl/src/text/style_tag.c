@@ -42,7 +42,7 @@ pd_text_style_t *pd_style_tags_get_text_style(list_t *tags)
 	list_node_t *node;
 	pd_style_tag_t *tag;
 	pd_text_style_t *style;
-	pd_bool_t found_tags[PD_TEXT_STYLE_TYPE_TOTAL_NUM] = { 0 };
+	bool found_tags[PD_TEXT_STYLE_TYPE_TOTAL_NUM] = { 0 };
 
 	if (tags->length <= 0) {
 		return NULL;
@@ -57,25 +57,25 @@ pd_text_style_t *pd_style_tags_get_text_style(list_t *tags)
 			if (found_tags[tag->id]) {
 				break;
 			}
-			style->has_fore_color = PD_TRUE;
+			style->has_fore_color = true;
 			style->fore_color = tag->data.color;
-			found_tags[tag->id] = PD_TRUE;
+			found_tags[tag->id] = true;
 			++count;
 			break;
 		case PD_TEXT_STYLE_TYPE_BG_COLOR:
 			if (found_tags[tag->id]) {
 				break;
 			}
-			style->has_back_color = PD_TRUE;
+			style->has_back_color = true;
 			style->back_color = tag->data.color;
-			found_tags[tag->id] = PD_TRUE;
+			found_tags[tag->id] = true;
 			++count;
 			break;
 		case PD_TEXT_STYLE_TYPE_BOLD:
 			if (found_tags[tag->id]) {
 				break;
 			}
-			found_tags[tag->id] = PD_TRUE;
+			found_tags[tag->id] = true;
 			pd_text_style_set_weight(style, PD_FONT_WEIGHT_BOLD);
 			++count;
 			break;
@@ -83,7 +83,7 @@ pd_text_style_t *pd_style_tags_get_text_style(list_t *tags)
 			if (found_tags[tag->id]) {
 				break;
 			}
-			found_tags[tag->id] = PD_TRUE;
+			found_tags[tag->id] = true;
 			pd_text_style_set_style(style, PD_FONT_STYLE_ITALIC);
 			++count;
 			break;
@@ -91,9 +91,9 @@ pd_text_style_t *pd_style_tags_get_text_style(list_t *tags)
 			if (found_tags[tag->id]) {
 				break;
 			}
-			style->has_pixel_size = PD_TRUE;
+			style->has_pixel_size = true;
 			style->pixel_size = tag->data.number;
-			found_tags[tag->id] = PD_TRUE;
+			found_tags[tag->id] = true;
 			++count;
 			break;
 		default:
@@ -170,7 +170,7 @@ const wchar_t *pd_scan_style_open_tag(const wchar_t *wstr, wchar_t *name,
 				      int max_name_len, wchar_t *data)
 {
 	size_t i, j, len;
-	pd_bool_t end_name = FALSE;
+	bool end_name = false;
 
 	len = wcslen(wstr);
 	if (wstr[0] != '<') {
@@ -181,7 +181,7 @@ const wchar_t *pd_scan_style_open_tag(const wchar_t *wstr, wchar_t *name,
 		if (wstr[i] == ' ') {
 			/* 如果上个字符不是空格，说明标签名已经结束 */
 			if (i > 0 && wstr[i - 1] != ' ') {
-				end_name = TRUE;
+				end_name = true;
 			}
 			/* 标签名首部和尾部可包含空格 */
 			if (j == 0 || max_name_len == 0 ||
@@ -287,13 +287,13 @@ static const wchar_t *pd_scan_style_tag_by_name(const wchar_t *wstr,
 	return wstr + i;
 }
 
-static pd_bool_t pd_parse_color(const char *str, pd_color_t *value)
+static bool pd_parse_color(const char *str, pd_color_t *value)
 {
 	size_t len = strlen(str);
 	int r, g, b;
 
 	if (str[0] != '#') {
-		return PD_FALSE;
+		return false;
 	}
 	if (len == 4) {
 		len = sscanf(str, "#%1X%1X%1X", &r, &g, &b);
@@ -303,16 +303,16 @@ static pd_bool_t pd_parse_color(const char *str, pd_color_t *value)
 	} else if (len == 7) {
 		len = sscanf(str, "#%2X%2X%2X", &r, &g, &b);
 	} else {
-		return PD_FALSE;
+		return false;
 	}
 	if (len == 3) {
 		value->r = r;
 		value->g = g;
 		value->b = b;
 		value->a = 255;
-		return PD_TRUE;
+		return true;
 	}
-	return PD_FALSE;
+	return false;
 }
 
 /** 根据字符串中的标签得到相应的样式数据，并返回指向标签后面字符的指针 */

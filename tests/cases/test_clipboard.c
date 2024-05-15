@@ -20,7 +20,7 @@ static void paste_text(void *arg)
 
         ev.type = APP_EVENT_KEYDOWN;
         ev.key.code = KEY_V;
-        ev.key.ctrl_key = TRUE;
+        ev.key.ctrl_key = true;
         ui_set_focus(w);
         app_post_event(&ev);
 }
@@ -31,7 +31,7 @@ static void on_text1_focused(ui_widget_t *w, ui_event_t *e, void *arg)
 
         ev.type = APP_EVENT_KEYDOWN;
         ev.key.code = KEY_C;
-        ev.key.ctrl_key = TRUE;
+        ev.key.ctrl_key = true;
         app_post_event(&ev);
         lcui_set_timeout(100, paste_text, e->data);
 }

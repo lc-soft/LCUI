@@ -24,7 +24,7 @@ void test_router_location(void)
         char *path;
 
         raw = router_location_create(NULL, "/search?type=issue&order=desc");
-        location = router_location_normalize(raw, NULL, FALSE);
+        location = router_location_normalize(raw, NULL, false);
 
         str = strmap_get(location->query, "type");
         ctest_equal_str("location.query.type", str, "issue");
@@ -39,7 +39,7 @@ void test_router_location(void)
         router_location_destroy(location);
 
         raw = router_location_create(NULL, "/search?type=issue#pagination");
-        location = router_location_normalize(raw, NULL, FALSE);
+        location = router_location_normalize(raw, NULL, false);
 
         str = location->hash;
         ctest_equal_str("location.hash", str, "#pagination");
@@ -55,7 +55,7 @@ void test_router_location(void)
         raw = router_location_create(NULL, NULL);
         router_location_set_param(raw, "user", "foo");
         router_location_set_param(raw, "repo", "bar");
-        location = router_location_normalize(raw, route, FALSE);
+        location = router_location_normalize(raw, route, false);
         ctest_equal_str(
             "normalize({ params: { user: 'foo', repo: 'bar' } }).path",
             router_location_get_path(location), "/repos/foo/bar/issues");
@@ -65,7 +65,7 @@ void test_router_location(void)
         raw = router_location_create(NULL, NULL);
         router_location_set_param(raw, "user", "root");
         router_location_set_param(raw, "repo", "example");
-        location = router_location_normalize(raw, route, FALSE);
+        location = router_location_normalize(raw, route, false);
         ctest_equal_str(
             "normalize({ params: { user: 'root', repo: 'example' } }).path",
             router_location_get_path(location), "/repos/root/example/issues");
@@ -75,7 +75,7 @@ void test_router_location(void)
         raw = router_location_create(NULL, NULL);
         router_location_set_query(raw, "q", "bug");
         router_location_set_query(raw, "state", "closed");
-        location = router_location_normalize(raw, route, FALSE);
+        location = router_location_normalize(raw, route, false);
         path = router_location_stringify(location);
         ctest_equal_str(
             "stringify(normalize({ query: { q: 'bug', state: 'closed' } }))",
@@ -87,7 +87,7 @@ void test_router_location(void)
         raw = router_location_create(NULL, NULL);
         router_location_set_query(raw, "order", "desc");
         router_location_set_query(raw, "assignee", "root");
-        location = router_location_normalize(raw, route, FALSE);
+        location = router_location_normalize(raw, route, false);
         path = router_location_stringify(location);
         ctest_equal_str("stringify(normalize({ query: { order: 'desc', "
                         "assignee: 'root' } }))",
@@ -110,7 +110,7 @@ void test_router_route(void)
             "/user/profile?tab=repos&order=desc&q=test#pagination";
 
         raw = router_location_create(NULL, full_path);
-        location = router_location_normalize(raw, NULL, FALSE);
+        location = router_location_normalize(raw, NULL, false);
         route = router_route_create(NULL, location);
 
         ctest_equal_str("route.path", router_route_get_path(route),
@@ -206,7 +206,7 @@ void test_router_matcher(void)
         router_config_destroy(config);
 
         location = router_location_create(NULL, "/users/root");
-        resolved = router_resolve(router, location, FALSE);
+        resolved = router_resolve(router, location, false);
         router_location_destroy(location);
         route = router_resolved_get_route(resolved);
         str = router_route_get_param(route, "username");
@@ -215,8 +215,8 @@ void test_router_matcher(void)
         router_resolved_destroy(resolved);
 
         location = router_location_create("user#posts", NULL);
-        resolved = router_resolve(router, location, FALSE);
-        ctest_equal_bool("match({ name: 'user#posts' })", !resolved, FALSE);
+        resolved = router_resolve(router, location, false);
+        ctest_equal_bool("match({ name: 'user#posts' })", !resolved, false);
         router_location_destroy(location);
         router_resolved_destroy(resolved);
 
@@ -224,8 +224,8 @@ void test_router_matcher(void)
         router_push(router, location);
         router_location_destroy(location);
         location = router_location_create("user#posts", NULL);
-        resolved = router_resolve(router, location, FALSE);
-        ctest_equal_bool("match({ name: 'user#posts' })", !!resolved, TRUE);
+        resolved = router_resolve(router, location, false);
+        ctest_equal_bool("match({ name: 'user#posts' })", !!resolved, true);
         route = router_resolved_get_route(resolved);
         str = router_route_get_param(route, "username");
         ctest_equal_str("match({ name: 'user#posts' }).route.params.username",
@@ -236,12 +236,12 @@ void test_router_matcher(void)
         router_resolved_destroy(resolved);
 
         location = router_location_create(NULL, "/users/root/posts");
-        resolved = router_resolve(router, location, FALSE);
+        resolved = router_resolve(router, location, false);
         router_location_destroy(location);
         route = router_resolved_get_route(resolved);
         record = router_route_get_matched_record(route, 0);
         ctest_equal_bool("match('/users/root/posts').route.matched[0] != null",
-                         !!record, TRUE);
+                         !!record, true);
         ctest_equal_str(
             "match('/users/root/posts').route.matched[0].components.default",
             record ? router_route_record_get_component(record, NULL) : NULL,
@@ -249,7 +249,7 @@ void test_router_matcher(void)
         route = router_resolved_get_route(resolved);
         record = router_route_get_matched_record(route, 1);
         ctest_equal_bool("match('/users/root/posts').route.matched[1] != null",
-                         !!record, TRUE);
+                         !!record, true);
         ctest_equal_str(
             "match('/users/root/posts').route.matched[1].components.default",
             record ? router_route_record_get_component(record, NULL) : NULL,
@@ -257,13 +257,13 @@ void test_router_matcher(void)
         router_resolved_destroy(resolved);
 
         location = router_location_create(NULL, "/other/path/to/file");
-        resolved = router_resolve(router, location, FALSE);
+        resolved = router_resolve(router, location, false);
         router_location_destroy(location);
         route = router_resolved_get_route(resolved);
         record = router_route_get_matched_record(route, 0);
         ctest_equal_bool(
             "match('/other/path/to/file').route.matched[0] != null", !!record,
-            TRUE);
+            true);
         ctest_equal_str(
             "match('/other/path/to/file').route.matched[0].components.default",
             record ? router_route_record_get_component(record, NULL) : NULL,
@@ -275,7 +275,7 @@ void test_router_matcher(void)
         router_resolved_destroy(resolved);
 
         location = router_location_create(NULL, "/files/path/to/file");
-        resolved = router_resolve(router, location, FALSE);
+        resolved = router_resolve(router, location, false);
         router_location_destroy(location);
         route = router_resolved_get_route(resolved);
         record = router_route_get_matched_record(route, 0);
@@ -312,93 +312,93 @@ void test_router_utils(void)
         ctest_equal_bool(
             "isObjectEqual({ id: '404', name: 'git' }, { id: '404', name: "
             "'git' })",
-            strmap_equal(a, b), TRUE);
+            strmap_equal(a, b), true);
 
         strmap_set(b, "id", "200");
         ctest_equal_bool(
             "isObjectEqual({ id: '404', name: 'git' }, { id: '200', name: "
             "'git' })",
-            strmap_equal(a, b), FALSE);
+            strmap_equal(a, b), false);
 
         strmap_delete(b, "id");
         ctest_equal_bool(
             "isObjectIncludes({ id: '404', name: 'git' }, { name: 'git' })",
-            strmap_includes(a, b), TRUE);
+            strmap_includes(a, b), true);
         strmap_delete(a, "name");
         ctest_equal_bool("isObjectIncludes({ id: '404' }, { name: '200' })",
-                         strmap_includes(a, b), FALSE);
+                         strmap_includes(a, b), false);
         strmap_delete(a, "id");
         strmap_delete(b, "name");
-        ctest_equal_bool("isObjectEqual({}, {})", strmap_equal(a, b), TRUE);
+        ctest_equal_bool("isObjectEqual({}, {})", strmap_equal(a, b), true);
         ctest_equal_int("string.compare('', '')", router_string_compare("", ""),
                         0);
         ctest_equal_bool("string.compare(null, 'a') != 0",
-                         router_string_compare(NULL, "a") != 0, TRUE);
+                         router_string_compare(NULL, "a") != 0, true);
         ctest_equal_int("string.compare(null, null)",
                         router_string_compare(NULL, NULL), 0);
         strmap_destroy(a);
         strmap_destroy(b);
 
-        str = router_path_resolve("", NULL, TRUE);
+        str = router_path_resolve("", NULL, true);
         ctest_equal_str("path.resolve('', null, true) == '/'", str, "/");
         free(str);
 
-        str = router_path_resolve("", "/root", TRUE);
+        str = router_path_resolve("", "/root", true);
         ctest_equal_str("path.resolve('', '/root', true)", str, "/root");
         free(str);
 
-        str = router_path_resolve("hello/../world/./", NULL, TRUE);
+        str = router_path_resolve("hello/../world/./", NULL, true);
         ctest_equal_str("path.resolve('hello/../world/./', null, true)", str,
                         "/world");
         free(str);
 
-        str = router_path_resolve("/root/path", "base/path", TRUE);
+        str = router_path_resolve("/root/path", "base/path", true);
         ctest_equal_str("path.resolve('/root/path', 'base/path', true)", str,
                         "/root/path");
         free(str);
 
-        str = router_path_resolve("../../profile", "base/path/to/file", TRUE);
+        str = router_path_resolve("../../profile", "base/path/to/file", true);
         ctest_equal_str(
             "path.resolve('../../profile', 'base/path/to/file', true)", str,
             "/base/path/profile");
         free(str);
 
-        str = router_path_resolve("profile", "base/file", FALSE);
+        str = router_path_resolve("profile", "base/file", false);
         ctest_equal_str("path.resolve('profile', 'base/profile', false)", str,
                         "/base/profile");
         free(str);
 
-        str = router_path_resolve("/profile", "base/file", FALSE);
+        str = router_path_resolve("/profile", "base/file", false);
         ctest_equal_str("path.resolve('/profile', 'base/profile', false)", str,
                         "/profile");
         free(str);
 
         ctest_equal_bool("path.compare('/a/b', '/a/b/')",
-                         router_path_compare("/a/b", "/a/b/"), TRUE);
+                         router_path_compare("/a/b", "/a/b/"), true);
         ctest_equal_bool("path.compare('/a/b/', '/a/b/')",
-                         router_path_compare("/a/b/", "/a/b"), TRUE);
+                         router_path_compare("/a/b/", "/a/b"), true);
         ctest_equal_bool("path.compare('', '')",
-                         router_path_compare("", "") == 0, TRUE);
+                         router_path_compare("", "") == 0, true);
         ctest_equal_bool("path.compare('a', '')",
-                         router_path_compare("a", "") != 0, TRUE);
+                         router_path_compare("a", "") != 0, true);
         ctest_equal_bool("path.compare('', 'b')",
-                         router_path_compare("", "b") != 0, TRUE);
+                         router_path_compare("", "b") != 0, true);
         ctest_equal_bool("path.compare('a', 'b')",
-                         router_path_compare("a", "b") != 0, TRUE);
+                         router_path_compare("a", "b") != 0, true);
 
         ctest_equal_bool(
             "path.startsWith('/profile/events', '/profile/event')",
             router_path_starts_with("/profile/events", "/profile/event"),
-            FALSE);
+            false);
         ctest_equal_bool(
             "path.startsWith('/profile/events', '/profile/')",
-            router_path_starts_with("/profile/events", "/profile/"), TRUE);
+            router_path_starts_with("/profile/events", "/profile/"), true);
         ctest_equal_bool("path.startsWith('/profile', '/profile/')",
                          router_path_starts_with("/profile", "/profile/"),
-                         TRUE);
+                         true);
         ctest_equal_bool("path.startsWith('/profile/', '/profile')",
                          router_path_starts_with("/profile/", "/profile"),
-                         TRUE);
+                         true);
 
         p = str = "/:username/:repo/settings";
         p = router_path_parse_key(p, key, &key_len);
@@ -622,44 +622,44 @@ void test_router_components(void)
         // ui_update();
         matched_widget = ui_router_view_get_matched_widget(view);
         ctest_equal_bool("[/foo] <router-view> widget should load <foo> widget",
-                         strcmp(matched_widget->type, "foo") == 0, TRUE);
+                         strcmp(matched_widget->type, "foo") == 0, true);
         ctest_equal_bool(
             "[/foo] linkFoo should has active classes",
             (ui_widget_has_class(link_foo, "router-link-active") &&
              ui_widget_has_class(link_foo, "router-link-exact-active")),
-            TRUE);
+            true);
         ui_widget_emit_event(link_bar, e, NULL);
         matched_widget = ui_router_view_get_matched_widget(view);
         ctest_equal_bool("[/bar] <router-view> widget should load <bar> widget",
-                         strcmp(matched_widget->type, "bar") == 0, TRUE);
+                         strcmp(matched_widget->type, "bar") == 0, true);
         ctest_equal_bool(
             "[/bar] linkFoo should not has active classes",
             (!ui_widget_has_class(link_foo, "router-link-exact-active") &&
              !ui_widget_has_class(link_foo, "router-link-active")),
-            TRUE);
+            true);
 
         ui_widget_emit_event(link_foobar, e, NULL);
         matched_widget = ui_router_view_get_matched_widget(view);
         ctest_equal_bool(
             "[/foo/bar] <router-view> widget should load <foobar> widget",
-            strcmp(matched_widget->type, "foobar") == 0, TRUE);
+            strcmp(matched_widget->type, "foobar") == 0, true);
         ctest_equal_bool(
             "[/foo/bar] linkFooBar should has active classes",
             (ui_widget_has_class(link_foobar, "router-link-exact-active") &&
              ui_widget_has_class(link_foobar, "router-link-active")),
-            TRUE);
+            true);
         ctest_equal_bool(
             "[/foo/bar] linkFoo should only has the exact active class",
             (!ui_widget_has_class(link_foo, "router-link-exact-active") &&
              ui_widget_has_class(link_foo, "router-link-active")),
-            TRUE);
+            true);
         ui_widget_set_attr(link_foo, "exact", "exact");
         ui_widget_emit_event(link_foobar, e, NULL);
         ctest_equal_bool(
             "[/foo/bar] linkFoo should not has any active classes (exact)",
             (!ui_widget_has_class(link_foo, "router-link-exact-active") &&
              !ui_widget_has_class(link_foo, "router-link-active")),
-            TRUE);
+            true);
 
         ui_destroy();
         router_destroy(router);

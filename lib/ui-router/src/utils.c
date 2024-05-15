@@ -257,7 +257,7 @@ bool router_path_starts_with(const char *path, const char *subpath)
 
         while (*p && *q) {
                 if (*p != *q) {
-                        return FALSE;
+                        return false;
                 }
                 p++;
                 q++;
@@ -268,19 +268,19 @@ bool router_path_starts_with(const char *path, const char *subpath)
                 if (*q == '/' && !*(q + 1)) {
                         q++;
                 } else {
-                        return FALSE;
+                        return false;
                 }
         }
         if (q - subpath > 0) {
                 // path: "path/to/a/b/c"
                 // subpath: "path/to/"
                 if (*(q - 1) == '/') {
-                        return TRUE;
+                        return true;
                 }
                 // path: "path/to/a/b/c"
                 // subpath: "path/to"
                 if (*p == '/') {
-                        return TRUE;
+                        return true;
                 }
         }
         return *p == *q;
@@ -291,7 +291,7 @@ bool router_path_starts_with(const char *path, const char *subpath)
 bool router_is_same_route(const router_route_t *a, const router_route_t *b)
 {
         if (!b) {
-                return FALSE;
+                return false;
         }
         if (a->path && b->path) {
                 return router_path_compare(a->path, b->path) == 0 &&
@@ -304,7 +304,7 @@ bool router_is_same_route(const router_route_t *a, const router_route_t *b)
                        strmap_equal(a->query, b->query) &&
                        strmap_equal(a->params, b->params);
         }
-        return FALSE;
+        return false;
 }
 
 // https://github.com/vuejs/vue-router/blob/65de048ee9f0ebf899ae99c82b71ad397727e55d/src/util/route.js#L115

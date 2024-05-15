@@ -39,7 +39,7 @@ static void ui_router_link_on_route_update(void *w, const router_route_t *to,
                 return;
         }
         link = ui_widget_get_data(w, ui_router_link_proto);
-        resolved = router_resolve(link->router, link->to, FALSE);
+        resolved = router_resolve(link->router, link->to, false);
         route = router_resolved_get_route(resolved);
         // https://github.com/vuejs/vue-router/blob/65de048ee9f0ebf899ae99c82b71ad397727e55d/src/components/link.js#L65
         is_same_route = router_is_same_route(to, route);
@@ -141,8 +141,8 @@ static void ui_router_link_on_init(ui_widget_t *w)
         link->active_class = strdup("router-link-active");
         link->exact_active_class = strdup("router-link-exact-active");
         link->to = NULL;
-        link->replace = FALSE;
-        link->exact = FALSE;
+        link->replace = false;
+        link->exact = false;
         link->router = NULL;
         link->watcher = NULL;
         ui_widget_on(w, "ready", ui_router_link_on_ready, NULL);

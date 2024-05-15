@@ -13,6 +13,7 @@
 
 #include <errno.h>
 #include <sys/time.h>
+#include <stdbool.h>
 #include <pthread.h>
 #include <yutil.h>
 #include "thread.h"
@@ -33,7 +34,7 @@ typedef struct thread_info_t {
 } thread_info_t;
 
 static struct thread_manager_module_t {
-	int active;
+	bool active;
 	thread_mutex_t mutex;
 	list_t threads;
 } thread_manager;
@@ -199,7 +200,7 @@ int thread_create(thread_t *tid, void (*func)(void *), void *arg)
 	if (!thread_manager.active) {
 		list_create(&thread_manager.threads);
 		thread_mutex_init(&thread_manager.mutex);
-		thread_manager.active = TRUE;
+		thread_manager.active = true;
 	}
 	thread = malloc(sizeof(thread_info_t));
 	if (!thread) {

@@ -20,12 +20,12 @@
 PD_BEGIN_DECLS
 
 typedef struct pd_text_style_t {
-	pd_bool_t has_family : 1;
-	pd_bool_t has_style : 1;
-	pd_bool_t has_weight : 1;
-	pd_bool_t has_back_color : 1;
-	pd_bool_t has_fore_color : 1;
-	pd_bool_t has_pixel_size : 1;
+	bool has_family : 1;
+	bool has_style : 1;
+	bool has_weight : 1;
+	bool has_back_color : 1;
+	bool has_fore_color : 1;
+	bool has_pixel_size : 1;
 
 	int style;
 	int weight;
@@ -109,19 +109,19 @@ typedef struct pd_text_t {
 	int line_height;
 	pd_text_align_t text_align;
 	pd_word_break_t word_break;
-	pd_bool_t mulitiline_enabled;
-	pd_bool_t autowrap_enabled;
-	pd_bool_t style_tag_enabled;
+	bool mulitiline_enabled;
+	bool autowrap_enabled;
+	bool style_tag_enabled;
 	list_t dirty_rects;
 	list_t styles;
 	pd_text_style_t default_style;
 	pd_text_line_t **lines;
 	int lines_length;
 	struct {
-		pd_bool_t update_bitmap;
-		pd_bool_t update_typeset;
+		bool update_bitmap;
+		bool update_typeset;
 		int typeset_start_line;
-		pd_bool_t redraw_all;
+		bool redraw_all;
 	} task;
 } pd_text_t;
 
@@ -141,7 +141,7 @@ PD_PUBLIC void pd_text_set_typeset_task(pd_text_t *layer, int start_row);
 PD_PUBLIC void pd_text_set_align(pd_text_t *layer, int align);
 
 /** 设置坐标偏移量 */
-PD_PUBLIC pd_bool_t pd_text_set_offset(pd_text_t *layer, int offset_x,
+PD_PUBLIC bool pd_text_set_offset(pd_text_t *layer, int offset_x,
 				       int offset_y);
 
 PD_PUBLIC pd_text_t *pd_text_create(void);
@@ -195,7 +195,7 @@ PD_PUBLIC int pd_text_set_fixed_size(pd_text_t *layer, int width, int height);
 PD_PUBLIC int pd_text_set_max_size(pd_text_t *layer, int width, int height);
 
 /** 设置是否启用多行文本模式 */
-PD_PUBLIC void pd_text_set_multiline(pd_text_t *layer, pd_bool_t enabled);
+PD_PUBLIC void pd_text_set_multiline(pd_text_t *layer, bool enabled);
 
 /** 删除文本光标的当前坐标右边的文本 */
 PD_PUBLIC int pd_text_delete(pd_text_t *layer, int n_char);
@@ -204,13 +204,13 @@ PD_PUBLIC int pd_text_delete(pd_text_t *layer, int n_char);
 PD_PUBLIC int pd_text_backspace(pd_text_t *layer, int n_char);
 
 /** 设置是否启用自动换行模式 */
-PD_PUBLIC void pd_text_set_autowrap(pd_text_t *layer, pd_bool_t autowrap);
+PD_PUBLIC void pd_text_set_autowrap(pd_text_t *layer, bool autowrap);
 
 /** 设置单词内断行模式 */
 PD_PUBLIC void pd_text_set_word_break(pd_text_t *layer, pd_word_break_t mode);
 
 /** 设置是否使用样式标签 */
-PD_PUBLIC void pd_text_set_style_tag(pd_text_t *layer, pd_bool_t enabled);
+PD_PUBLIC void pd_text_set_style_tag(pd_text_t *layer, bool enabled);
 
 /** 重新载入各个文字的字体位图 */
 PD_PUBLIC void pd_text_reload_bitmap(pd_text_t *layer);

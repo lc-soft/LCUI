@@ -96,10 +96,10 @@ static void ui_textcaret_on_init(ui_widget_t *widget)
         caret = ui_widget_add_data(widget, ui_textcaret_proto,
                                    sizeof(ui_textcaret_t));
         caret->task = malloc(sizeof(ui_textcaret_task_t));
-        caret->task->active = TRUE;
+        caret->task->active = true;
         caret->task->widget = widget;
         caret->blink_interval = 500;
-        caret->visible = FALSE;
+        caret->visible = false;
         caret->timer_id = lcui_set_interval(caret->blink_interval,
                                             ui_textcaret_on_blink, caret->task);
 }
@@ -118,7 +118,7 @@ static void ui_textcaret_on_destroy(ui_widget_t *widget)
         ui_textcaret_t *caret;
 
         caret = ui_widget_get_data(widget, ui_textcaret_proto);
-        caret->task->active = FALSE;
+        caret->task->active = false;
         if (lcui_destroy_timer(caret->timer_id) != -1) {
                 free(caret->task);
                 caret->task = NULL;

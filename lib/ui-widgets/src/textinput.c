@@ -150,7 +150,7 @@ static void ui_textinput_update_caret(ui_widget_t *widget)
         offset_x = y_iround((x - caret_x) * scale);
         offset_y = y_iround((y - caret_y) * scale);
         if (pd_text_set_offset(edit->layer, offset_x, offset_y)) {
-                edit->tasks[TASK_UPDATE] = TRUE;
+                edit->tasks[TASK_UPDATE] = true;
                 ui_widget_request_update(widget);
         }
         x += widget->computed_style.padding_left;
@@ -325,7 +325,7 @@ static void textinput_update_textlayer(ui_widget_t *w)
         if (edit->password_char) {
                 pd_text_set_style(edit->layer_mask, &style);
         }
-        style.has_fore_color = TRUE;
+        style.has_fore_color = true;
         style.fore_color = PLACEHOLDER_COLOR;
         pd_text_set_style(edit->layer_placeholder, &style);
         pd_text_style_destroy(&style);
@@ -488,7 +488,7 @@ void ui_textinput_clear_text(ui_widget_t *widget)
         }
         pd_text_empty(edit->layer_source);
         pd_style_tags_clear(&edit->text_tags);
-        edit->tasks[TASK_UPDATE] = TRUE;
+        edit->tasks[TASK_UPDATE] = true;
         ui_widget_request_update(widget);
         thread_mutex_unlock(&edit->mutex);
         ui_widget_mark_dirty_rect(widget, NULL, UI_BOX_TYPE_PADDING_BOX);
@@ -611,7 +611,7 @@ static void ui_textinput_on_focus(ui_widget_t *widget, ui_event_t *e, void *arg)
         ui_textinput_t *edit;
 
         edit = ui_widget_get_data(widget, ui_textinput_proto);
-        ui_textcaret_set_visible(edit->caret, TRUE);
+        ui_textcaret_set_visible(edit->caret, true);
         ui_textinput_update_caret(widget);
 }
 
@@ -620,7 +620,7 @@ static void ui_textinput_on_blur(ui_widget_t *widget, ui_event_t *e, void *arg)
         ui_textinput_t *edit;
 
         edit = ui_widget_get_data(widget, ui_textinput_proto);
-        ui_textcaret_set_visible(edit->caret, FALSE);
+        ui_textcaret_set_visible(edit->caret, false);
         /* In single-line editing mode, we should reset the caret position to
          * the head, otherwise it will mistakenly think that only the last part
          * is entered after inputting long text. */
@@ -696,7 +696,7 @@ static void ui_textinput_on_keydown(ui_widget_t *widget, ui_event_t *e,
         cur_col = edit->layer->insert_x;
         rows = pd_text_get_lines_length(edit->layer);
         cols = pd_text_get_line_length(edit->layer, cur_row);
-        e->cancel_bubble = TRUE;
+        e->cancel_bubble = true;
         switch (e->key.code) {
         case KEY_HOME:
                 cur_col = 0;
@@ -870,11 +870,11 @@ static void ui_textinput_on_init(ui_widget_t *w)
 
         edit =
             ui_widget_add_data(w, ui_textinput_proto, sizeof(ui_textinput_t));
-        edit->is_read_only = FALSE;
+        edit->is_read_only = false;
         edit->password_char = 0;
         edit->allow_input_char = NULL;
-        edit->placeholder_visible = FALSE;
-        edit->is_multiline_mode = FALSE;
+        edit->placeholder_visible = false;
+        edit->is_multiline_mode = false;
         edit->layer_mask = pd_text_create();
         edit->layer_source = pd_text_create();
         edit->layer_placeholder = pd_text_create();
@@ -885,10 +885,10 @@ static void ui_textinput_on_init(ui_widget_t *w)
         memset(edit->tasks, 0, sizeof(edit->tasks));
         list_create(&edit->text_blocks);
         list_create(&edit->text_tags);
-        ui_textinput_enable_multiline(w, FALSE);
-        pd_text_set_autowrap(edit->layer, TRUE);
-        pd_text_set_autowrap(edit->layer_mask, TRUE);
-        pd_text_set_style_tag(edit->layer, FALSE);
+        ui_textinput_enable_multiline(w, false);
+        pd_text_set_autowrap(edit->layer, true);
+        pd_text_set_autowrap(edit->layer_mask, true);
+        pd_text_set_style_tag(edit->layer, false);
         ui_widget_on(w, "textinput", ui_textinput_on_textinput, NULL);
         ui_widget_on(w, "mousedown", ui_textinput_on_mousedown, NULL);
         ui_widget_on(w, "mouseup", ui_textinput_on_mouseup, NULL);
