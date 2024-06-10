@@ -20,6 +20,7 @@
 
 - [Table of contents](#table-of-contents)
 - [Introduction](#introduction)
+  - [Main Features](#main-features)
   - [Overview of Features](#overview-of-features)
   - [Architecture](#architecture)
 - [Quick Start](#quick-start)
@@ -37,9 +38,16 @@
 
 [中文版说明文档](README.zh-cn.md)
 
-LCUI is a library written in C language for building graphical user interfaces. Its functional design and usage refer to some popular technologies in the field of web front-end, such as CSS and Flex layout. It is easier for developers with experience in web page development to get started.
+LCUI is a library written in C for building graphical user interfaces. Its goal is to explore and practice new ways of developing user interfaces, characterized by its small size, ease of use, and provision of convenient development tools to help developers quickly create desktop applications with graphical user interfaces.
 
-**LC** originates from the first letter of the author's name, and was originally designed to facilitate the author's development of small projects and accumulate development experience. However, unfortunately, the author did not gain sufficient competitive advantage in the employment environment of many excellent C/C++developers, and could only be forced to work in web front-end development. It is precisely because of this that LCUI's current development direction leans towards integrating technologies in the field of web front-end.
+**LC** originates from the initials of the author's name. The library was initially designed to help the author develop small projects and gain development experience. However, the author did not gain a competitive advantage in the job market, which is crowded with C/C++ experts, and thus had to work in web front-end development. As a result, LCUI now leans towards integrating technologies from the web front-end domain.
+
+### Main Features
+
+- **Cross-Platform:** Supports Windows and Linux.
+- **Fully Custom-Drawn Components:** Components maintain a consistent appearance and behavior across multiple platforms.
+- **Built-in CSS Engine:** Supports using CSS to define the style and layout of the user interface, making it easier to get started for those with web development experience.
+- **Provides Modern Development Tools:** The tools allow you to use the [TypeScript](https://lcui-dev.github.io/docs/guide/typescript) language with JSX syntax, the React library, and other web front-end technologies to write user interfaces.
 
 ### Overview of Features
 
@@ -148,6 +156,16 @@ LCUI has adopted the code of conduct defined by the Contributor Covenant. This d
 **Is this a browser kernel? Or a development library like Electron that integrates the browser environment?**
 
 No, you can think of it as a traditional GUI development library that applied some Web technologies.
+
+**Since it supports the use of TypeScript language, why don't I use Electron?**
+
+Yes, if you have web development experience and are willing to learn Electron, then Electron is obviously the best choice.
+
+Given LCUI's current capabilities, it is primarily suitable for meeting the author's personal needs and developing simple tools.
+
+**Why should I choose LCUI over other GUI libraries/frameworks?**
+
+We suggest that you prioritize other GUI libraries/frameworks.
 
 **How about CSS support?**
 
