@@ -1147,10 +1147,9 @@ static void compute_absolute_height(const css_computed_style_t *parent,
                 }
                 if (css_computed_position(s) > CSS_POSITION_RELATIVE) {
                         parent_value += css_padding_y(parent);
-                        break;
                 }
                 CSS_SET_FIXED_LENGTH(s, height,
-                                     parent->height * value / 100.0f);
+                                     parent_value * value / 100.0f);
                 break;
         default:
                 break;
