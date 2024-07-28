@@ -97,7 +97,7 @@ static void css_style_cache_destructor(void *privdata, void *val)
         css_style_decl_destroy(val);
 }
 
-libcss_bool_t css_selector_node_match(css_selector_node_t *sn1,
+bool css_selector_node_match(css_selector_node_t *sn1,
                                       css_selector_node_t *sn2)
 {
         int i, j;
@@ -330,7 +330,7 @@ int css_add_style_decl(css_selector_t *selector, const css_style_decl_t *style,
 static size_t css_style_link_get_styles(css_style_link_t *link, list_t *outlist)
 {
         size_t i;
-        libcss_bool_t found;
+        bool found;
         css_style_rule_t *snode, *out_snode;
         list_node_t *node, *out_node;
 

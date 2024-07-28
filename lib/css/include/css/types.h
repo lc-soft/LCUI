@@ -13,13 +13,12 @@
 #define LIBCSS_INCLUDE_CSS_DEF_H
 
 #include <yutil.h>
+#include <stdbool.h>
 
 #define CSS_SELECTOR_MAX_LEN 1024
 #define CSS_SELECTOR_MAX_DEPTH 32
 
 #define css_string(...) "" #__VA_ARGS__ ""
-
-typedef unsigned char libcss_bool_t;
 
 #define LIBCSS_FALSE 0
 #define LIBCSS_TRUE 1
@@ -847,7 +846,7 @@ struct css_propdef_t {
 	int (*cascade)(const css_style_array_value_t, css_computed_style_t *);
 };
 
-typedef libcss_bool_t (*css_value_parse_func_t)(css_style_value_t *, const char *);
+typedef bool (*css_value_parse_func_t)(css_style_value_t *, const char *);
 
 typedef struct css_value_type_record_t css_value_type_record_t;
 

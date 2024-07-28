@@ -17,13 +17,13 @@
 #include <css/utils.h>
 #include "parser.h"
 
-libcss_bool_t css_parse_numeric_value(css_style_value_t *s, const char *str)
+bool css_parse_numeric_value(css_style_value_t *s, const char *str)
 {
 	s->type = CSS_NUMERIC_VALUE;
 	return sscanf(str, "%f", &s->numeric_value) == 1;
 }
 
-libcss_bool_t css_parse_integer_value(css_style_value_t *s, const char *str)
+bool css_parse_integer_value(css_style_value_t *s, const char *str)
 {
 	int num;
 	s->type = CSS_NUMERIC_VALUE;
@@ -34,14 +34,14 @@ libcss_bool_t css_parse_integer_value(css_style_value_t *s, const char *str)
 	return 0;
 }
 
-libcss_bool_t css_parse_unit_value(css_style_value_t *s, const char *str)
+bool css_parse_unit_value(css_style_value_t *s, const char *str)
 {
 	int n = 0;
 	const char *p;
 	char num_str[32] = { 0 };
 	char unit[4];
 	css_numeric_value_t num;
-	libcss_bool_t has_point = LIBCSS_FALSE;
+	bool has_point = LIBCSS_FALSE;
 
 	if (str == NULL) {
 		return LIBCSS_FALSE;
@@ -91,7 +91,7 @@ libcss_bool_t css_parse_unit_value(css_style_value_t *s, const char *str)
 	return LIBCSS_TRUE;
 }
 
-libcss_bool_t css_parse_percentage_value(css_style_value_t *s, const char *str)
+bool css_parse_percentage_value(css_style_value_t *s, const char *str)
 {
 	if (css_parse_unit_value(s, str) &&
 	    s->unit_value.unit == CSS_UNIT_PERCENT) {
@@ -101,7 +101,7 @@ libcss_bool_t css_parse_percentage_value(css_style_value_t *s, const char *str)
 	return LIBCSS_FALSE;
 }
 
-libcss_bool_t css_parse_length_value(css_style_value_t *s, const char *str)
+bool css_parse_length_value(css_style_value_t *s, const char *str)
 {
 	if (css_parse_unit_value(s, str) &&
 	    s->unit_value.unit != CSS_UNIT_PERCENT) {
@@ -111,7 +111,7 @@ libcss_bool_t css_parse_length_value(css_style_value_t *s, const char *str)
 	return LIBCSS_FALSE;
 }
 
-libcss_bool_t css_parse_string_value(css_style_value_t *val, const char *str)
+bool css_parse_string_value(css_style_value_t *val, const char *str)
 {
 	size_t len;
 
@@ -130,7 +130,7 @@ libcss_bool_t css_parse_string_value(css_style_value_t *val, const char *str)
 	return LIBCSS_TRUE;
 }
 
-libcss_bool_t css_parse_url_value(css_style_value_t *s, const char *str)
+bool css_parse_url_value(css_style_value_t *s, const char *str)
 {
 	size_t n;
 	const char *p, *head, *tail;
@@ -166,7 +166,7 @@ libcss_bool_t css_parse_url_value(css_style_value_t *s, const char *str)
 	return LIBCSS_TRUE;
 }
 
-static libcss_bool_t css_parse_rgba(css_style_value_t *val, const char *str)
+static bool css_parse_rgba(css_style_value_t *val, const char *str)
 {
 	float data[4];
 	char num_str[16];
@@ -200,7 +200,7 @@ static libcss_bool_t css_parse_rgba(css_style_value_t *val, const char *str)
 	return LIBCSS_TRUE;
 }
 
-static libcss_bool_t css_parse_rgb(css_style_value_t *val, const char *str)
+static bool css_parse_rgb(css_style_value_t *val, const char *str)
 {
 	float data[3];
 	char num_str[16];
@@ -234,7 +234,7 @@ static libcss_bool_t css_parse_rgb(css_style_value_t *val, const char *str)
 	return LIBCSS_TRUE;
 }
 
-libcss_bool_t css_parse_color_value(css_style_value_t *val, const char *str)
+bool css_parse_color_value(css_style_value_t *val, const char *str)
 {
 	const char *p;
 	int len = 0, status = 0, r, g, b;
@@ -293,7 +293,7 @@ libcss_bool_t css_parse_color_value(css_style_value_t *val, const char *str)
 	return LIBCSS_FALSE;
 }
 
-libcss_bool_t css_parse_font_family_value(css_style_value_t *val, const char *str)
+bool css_parse_font_family_value(css_style_value_t *val, const char *str)
 {
 	char name[256];
 	const char *p;

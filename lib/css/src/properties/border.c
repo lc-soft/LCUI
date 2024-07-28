@@ -394,9 +394,9 @@ static void css_parse_border_value(css_style_value_t *arr,
                                    css_style_value_t *color)
 {
         int i;
-        libcss_bool_t has_width = LIBCSS_FALSE;
-        libcss_bool_t has_style = LIBCSS_FALSE;
-        libcss_bool_t has_color = LIBCSS_FALSE;
+        bool has_width = LIBCSS_FALSE;
+        bool has_style = LIBCSS_FALSE;
+        bool has_color = LIBCSS_FALSE;
 
         for (i = 0; i < 3; ++i) {
                 if (!has_width && arr[i].type == CSS_UNIT_VALUE) {

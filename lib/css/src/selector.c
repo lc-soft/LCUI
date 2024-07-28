@@ -369,7 +369,7 @@ css_selector_t *css_selector_create(const char *selector)
 	int ni, si, rank;
 	static int batch_num = 0;
 	char type = 0, name[MAX_NAME_LEN];
-	libcss_bool_t is_saving = LIBCSS_FALSE;
+	bool is_saving = LIBCSS_FALSE;
 	css_selector_node_t *node = NULL;
 	css_selector_t *s = calloc(sizeof(css_selector_t), 1);
 

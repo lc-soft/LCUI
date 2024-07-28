@@ -15,7 +15,7 @@
 #include <string.h>
 #include <css/utils.h>
 
-libcss_bool_t css_parse_font_weight(const char *str, int *weight)
+bool css_parse_font_weight(const char *str, int *weight)
 {
 	int value;
 	// TODO
@@ -39,7 +39,7 @@ libcss_bool_t css_parse_font_weight(const char *str, int *weight)
 	return LIBCSS_TRUE;
 }
 
-libcss_bool_t css_parse_font_style(const char *str, int *style)
+bool css_parse_font_style(const char *str, int *style)
 {
 	char value[64] = "";
 	// TODO

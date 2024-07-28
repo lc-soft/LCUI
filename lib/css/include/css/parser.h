@@ -64,7 +64,7 @@ typedef struct css_style_parser_t {
 
 typedef struct css_comment_parser_t {
 	/** 是否为单行注释 */
-	libcss_bool_t is_line_comment;
+	bool is_line_comment;
 
 	/** 保存的上一个目标，解析完注释后将还原成该目标 */
 	css_parser_target_t prev_target;
