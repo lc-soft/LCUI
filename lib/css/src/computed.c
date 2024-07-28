@@ -905,6 +905,30 @@ static libcss_bool_t compute_content_box_fixed_width(
                unit == CSS_UNIT_PX;
 }
 
+static uint8_t compute_content_box_height(const css_computed_style_t *s,
+                                          css_numeric_value_t *value,
+                                          css_unit_t *unit)
+{
+        uint8_t type = css_computed_height(s, value, unit);
+
+        if (type != CSS_HEIGHT_SET && *unit == CSS_UNIT_PERCENT) {
+                return type;
+        }
+        *value = s->height;
+        if (s->type_bits.box_sizing == CSS_BOX_SIZING_BORDER_BOX) {
+                *value -= css_border_y(s) + css_padding_y(s);
+        }
+        return type;
+}
+
+static libcss_bool_t compute_content_box_fixed_height(
+    const css_computed_style_t *s, css_numeric_value_t *value)
+{
+        css_unit_t unit;
+        return compute_content_box_height(s, value, &unit) == CSS_HEIGHT_SET &&
+               unit == CSS_UNIT_PX;
+}
+
 static uint8_t compute_padding_box_width(const css_computed_style_t *s,
                                          css_numeric_value_t *value,
                                          css_unit_t *unit)
@@ -1068,25 +1092,17 @@ static void compute_absolute_width(const css_computed_style_t *parent,
                 break;
         case CSS_WIDTH_SET:
                 if (unit != CSS_UNIT_PERCENT) {
-                        return;
-                }
-                if (!parent) {
-                        s->type_bits.width = CSS_WIDTH_FIT_CONTENT;
-                        return;
-                }
-                if (css_computed_position(s) > CSS_POSITION_RELATIVE) {
-                        if (!compute_padding_box_fixed_width(parent,
-                                                             &parent_value)) {
-                                break;
-                        }
-                        CSS_SET_FIXED_LENGTH(s, width,
-                                             parent_value * value / 100.0f);
                         break;
                 }
-                if (IS_CSS_FIXED_LENGTH(parent, width)) {
-                        CSS_SET_FIXED_LENGTH(s, width,
-                                             parent->width * value / 100.0f);
+                if (!parent ||
+                    !compute_content_box_fixed_width(parent, &parent_value)) {
+                        s->type_bits.width = CSS_WIDTH_FIT_CONTENT;
+                        break;
                 }
+                if (css_computed_position(s) > CSS_POSITION_RELATIVE) {
+                        parent_value += css_padding_x(parent);
+                }
+                CSS_SET_FIXED_LENGTH(s, width, parent_value * value / 100.0f);
                 break;
         default:
                 break;
@@ -1124,24 +1140,18 @@ static void compute_absolute_height(const css_computed_style_t *parent,
                 if (unit != CSS_UNIT_PERCENT) {
                         break;
                 }
-                if (!parent) {
+                if (!parent ||
+                    !compute_content_box_fixed_height(parent, &parent_value)) {
                         s->type_bits.height = CSS_HEIGHT_FIT_CONTENT;
                         break;
                 }
                 if (css_computed_position(s) > CSS_POSITION_RELATIVE) {
-                        if (!compute_padding_box_fixed_height(parent,
-                                                              &parent_value)) {
-                                break;
-                        }
-                        CSS_SET_FIXED_LENGTH(s, height,
-                                             parent_value * value / 100.0f);
+                        parent_value += css_padding_y(parent);
                         break;
                 }
-                if (IS_CSS_FIXED_LENGTH(parent, height)) {
-                        CSS_SET_FIXED_LENGTH(s, height,
-                                             parent->height * value / 100.0f);
-                        break;
-                }
+                CSS_SET_FIXED_LENGTH(s, height,
+                                     parent->height * value / 100.0f);
+                break;
         default:
                 break;
         }
