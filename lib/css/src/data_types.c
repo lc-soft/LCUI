@@ -17,13 +17,13 @@
 #include <css/utils.h>
 #include "parser.h"
 
-libcss_bool_t css_parse_numeric_value(css_style_value_t *s, const char *str)
+bool css_parse_numeric_value(css_style_value_t *s, const char *str)
 {
 	s->type = CSS_NUMERIC_VALUE;
 	return sscanf(str, "%f", &s->numeric_value) == 1;
 }
 
-libcss_bool_t css_parse_integer_value(css_style_value_t *s, const char *str)
+bool css_parse_integer_value(css_style_value_t *s, const char *str)
 {
 	int num;
 	s->type = CSS_NUMERIC_VALUE;
@@ -34,17 +34,17 @@ libcss_bool_t css_parse_integer_value(css_style_value_t *s, const char *str)
 	return 0;
 }
 
-libcss_bool_t css_parse_unit_value(css_style_value_t *s, const char *str)
+bool css_parse_unit_value(css_style_value_t *s, const char *str)
 {
 	int n = 0;
 	const char *p;
 	char num_str[32] = { 0 };
 	char unit[4];
 	css_numeric_value_t num;
-	libcss_bool_t has_point = LIBCSS_FALSE;
+	bool has_point = false;
 
 	if (str == NULL) {
-		return LIBCSS_FALSE;
+		return false;
 	}
 	/* 先取出数值 */
 	for (p = str; *p && n < 30; ++p) {
@@ -60,14 +60,14 @@ libcss_bool_t css_parse_unit_value(css_style_value_t *s, const char *str)
 				n = 0;
 				break;
 			}
-			has_point = LIBCSS_TRUE;
+			has_point = true;
 		} else {
 			break;
 		}
 		num_str[n++] = *p;
 	}
 	if (n == 0) {
-		return LIBCSS_FALSE;
+		return false;
 	}
 	strncpy(unit, p, 3);
 	unit[3] = 0;
@@ -83,35 +83,35 @@ libcss_bool_t css_parse_unit_value(css_style_value_t *s, const char *str)
 	} else if (strncmp(unit, "pt", 4) == 0) {
 		s->unit_value.unit = CSS_UNIT_PT;
 	} else {
-		return LIBCSS_FALSE;
+		return false;
 	}
 	num_str[n] = 0;
 	s->type = CSS_UNIT_VALUE;
 	s->unit_value.value = num;
-	return LIBCSS_TRUE;
+	return true;
 }
 
-libcss_bool_t css_parse_percentage_value(css_style_value_t *s, const char *str)
+bool css_parse_percentage_value(css_style_value_t *s, const char *str)
 {
 	if (css_parse_unit_value(s, str) &&
 	    s->unit_value.unit == CSS_UNIT_PERCENT) {
-		return LIBCSS_TRUE;
+		return true;
 	}
 	s->type = CSS_INVALID_VALUE;
-	return LIBCSS_FALSE;
+	return false;
 }
 
-libcss_bool_t css_parse_length_value(css_style_value_t *s, const char *str)
+bool css_parse_length_value(css_style_value_t *s, const char *str)
 {
 	if (css_parse_unit_value(s, str) &&
 	    s->unit_value.unit != CSS_UNIT_PERCENT) {
-		return LIBCSS_TRUE;
+		return true;
 	}
 	s->type = CSS_INVALID_VALUE;
-	return LIBCSS_FALSE;
+	return false;
 }
 
-libcss_bool_t css_parse_string_value(css_style_value_t *val, const char *str)
+bool css_parse_string_value(css_style_value_t *val, const char *str)
 {
 	size_t len;
 
@@ -127,10 +127,10 @@ libcss_bool_t css_parse_string_value(css_style_value_t *val, const char *str)
 	} else {
 		val->string_value = NULL;
 	}
-	return LIBCSS_TRUE;
+	return true;
 }
 
-libcss_bool_t css_parse_url_value(css_style_value_t *s, const char *str)
+bool css_parse_url_value(css_style_value_t *s, const char *str)
 {
 	size_t n;
 	const char *p, *head, *tail;
@@ -138,14 +138,14 @@ libcss_bool_t css_parse_url_value(css_style_value_t *s, const char *str)
 	p = str;
 	tail = head = strstr(p, "url(");
 	if (!head) {
-		return LIBCSS_FALSE;
+		return false;
 	}
 	while (p) {
 		tail = p;
 		p = strstr(p + 1, ")");
 	}
 	if (tail == head) {
-		return LIBCSS_FALSE;
+		return false;
 	}
 	head += 4;
 	if (*head == '"') {
@@ -154,7 +154,7 @@ libcss_bool_t css_parse_url_value(css_style_value_t *s, const char *str)
 	n = tail - head;
 	s->string_value = malloc((n + 1) * sizeof(char));
 	if (!s->string_value) {
-		return LIBCSS_FALSE;
+		return false;
 	}
 	strncpy(s->string_value, head, n);
 	s->string_value[n] = 0;
@@ -163,22 +163,22 @@ libcss_bool_t css_parse_url_value(css_style_value_t *s, const char *str)
 		s->string_value[n] = 0;
 	}
 	s->type = CSS_STRING_VALUE;
-	return LIBCSS_TRUE;
+	return true;
 }
 
-static libcss_bool_t css_parse_rgba(css_style_value_t *val, const char *str)
+static bool css_parse_rgba(css_style_value_t *val, const char *str)
 {
 	float data[4];
 	char num_str[16];
 	int i, j, count;
 
 	if (!strstr(str, "rgba(")) {
-		return LIBCSS_FALSE;
+		return false;
 	}
 	for (count = 0, i = 5, j = 0; str[i]; ++i) {
 		if (str[i] == ',' || str[i] == ')') {
 			if (sscanf(num_str, "%f", &data[count++]) != 1) {
-				return LIBCSS_FALSE;
+				return false;
 			}
 			j = 0;
 			if (str[i] == ')') {
@@ -192,27 +192,27 @@ static libcss_bool_t css_parse_rgba(css_style_value_t *val, const char *str)
 		}
 	}
 	if (count != 4) {
-		return LIBCSS_FALSE;
+		return false;
 	}
 	val->type = CSS_COLOR_VALUE;
 	val->color_value = css_color((uint8_t)(255 * data[3]), (uint8_t)data[0],
 				     (uint8_t)data[1], (uint8_t)data[2]);
-	return LIBCSS_TRUE;
+	return true;
 }
 
-static libcss_bool_t css_parse_rgb(css_style_value_t *val, const char *str)
+static bool css_parse_rgb(css_style_value_t *val, const char *str)
 {
 	float data[3];
 	char num_str[16];
 	int i, j, count;
 
 	if (!strstr(str, "rgb(")) {
-		return LIBCSS_FALSE;
+		return false;
 	}
 	for (count = 0, i = 4, j = 0; str[i]; ++i) {
 		if (str[i] == ',' || str[i] == ')') {
 			if (sscanf(num_str, "%f", &data[count++]) != 1) {
-				return LIBCSS_FALSE;
+				return false;
 			}
 			j = 0;
 			if (str[i] == ')') {
@@ -226,15 +226,15 @@ static libcss_bool_t css_parse_rgb(css_style_value_t *val, const char *str)
 		}
 	}
 	if (count != 3) {
-		return LIBCSS_FALSE;
+		return false;
 	}
 	val->type = CSS_COLOR_VALUE;
 	val->color_value = css_color(255, (uint8_t)data[0], (uint8_t)data[1],
 				     (uint8_t)data[2]);
-	return LIBCSS_TRUE;
+	return true;
 }
 
-libcss_bool_t css_parse_color_value(css_style_value_t *val, const char *str)
+bool css_parse_color_value(css_style_value_t *val, const char *str)
 {
 	const char *p;
 	int len = 0, status = 0, r, g, b;
@@ -283,17 +283,17 @@ libcss_bool_t css_parse_color_value(css_style_value_t *val, const char *str)
 	if (status == 3) {
 		val->type = CSS_COLOR_VALUE;
 		val->color_value = css_color(0xff, r, g, b);
-		return LIBCSS_TRUE;
+		return true;
 	}
 	if (strcmp("transparent", str) == 0) {
 		val->type = CSS_COLOR_VALUE;
 		val->color_value = CSS_COLOR_TRANSPARENT;
-		return LIBCSS_TRUE;
+		return true;
 	}
-	return LIBCSS_FALSE;
+	return false;
 }
 
-libcss_bool_t css_parse_font_family_value(css_style_value_t *val, const char *str)
+bool css_parse_font_family_value(css_style_value_t *val, const char *str)
 {
 	char name[256];
 	const char *p;
@@ -309,7 +309,7 @@ libcss_bool_t css_parse_font_family_value(css_style_value_t *val, const char *st
 		case '\'':
 			if (i > 0) {
 				if (quotes < 1) {
-					return LIBCSS_FALSE;
+					return false;
 				}
 				quotes--;
 				if (quotes < 1) {
@@ -324,7 +324,7 @@ libcss_bool_t css_parse_font_family_value(css_style_value_t *val, const char *st
 				goto save;
 			}
 			if (i < 1) {
-				return LIBCSS_FALSE;
+				return false;
 			}
 			goto append;
 		CASE_WHITE_SPACE:
@@ -339,7 +339,7 @@ libcss_bool_t css_parse_font_family_value(css_style_value_t *val, const char *st
 			break;
 		default:
 			if (finished) {
-				return LIBCSS_FALSE;
+				return false;
 			}
 			break;
 		}
@@ -361,7 +361,7 @@ libcss_bool_t css_parse_font_family_value(css_style_value_t *val, const char *st
 			break;
 		}
 	}
-	return LIBCSS_TRUE;
+	return true;
 }
 
 void css_init_data_types(void)

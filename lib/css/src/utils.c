@@ -15,31 +15,31 @@
 #include <string.h>
 #include <css/utils.h>
 
-libcss_bool_t css_parse_font_weight(const char *str, int *weight)
+bool css_parse_font_weight(const char *str, int *weight)
 {
 	int value;
 	// TODO
 	if (strcmp(str, "normal") == 0) {
 		*weight = CSS_FONT_WEIGHT_NORMAL;
-		return LIBCSS_TRUE;
+		return true;
 	}
 	if (strcmp(str, "bold") == 0) {
 		*weight = CSS_FONT_WEIGHT_BOLD;
-		return LIBCSS_TRUE;
+		return true;
 	}
 	if (sscanf(str, "%d", &value) != 1) {
 		*weight = CSS_FONT_WEIGHT_NORMAL;
-		return LIBCSS_FALSE;
+		return false;
 	}
 	if (value < 100) {
 		*weight = CSS_FONT_WEIGHT_100;
-		return LIBCSS_TRUE;
+		return true;
 	}
 	*weight = y_iround(value / 100.0) * 100;
-	return LIBCSS_TRUE;
+	return true;
 }
 
-libcss_bool_t css_parse_font_style(const char *str, int *style)
+bool css_parse_font_style(const char *str, int *style)
 {
 	char value[64] = "";
 	// TODO
@@ -51,7 +51,7 @@ libcss_bool_t css_parse_font_style(const char *str, int *style)
 	} else if (strcmp(value, "oblique") == 0) {
 		*style = CSS_FONT_STYLE_OBLIQUE;
 	} else {
-		return LIBCSS_FALSE;
+		return false;
 	}
-	return LIBCSS_TRUE;
+	return true;
 }

@@ -369,7 +369,7 @@ css_selector_t *css_selector_create(const char *selector)
 	int ni, si, rank;
 	static int batch_num = 0;
 	char type = 0, name[MAX_NAME_LEN];
-	libcss_bool_t is_saving = LIBCSS_FALSE;
+	bool is_saving = false;
 	css_selector_node_t *node = NULL;
 	css_selector_t *s = calloc(sizeof(css_selector_t), 1);
 
@@ -396,13 +396,13 @@ css_selector_t *css_selector_create(const char *selector)
 		case '.':
 		case '#':
 			if (!is_saving) {
-				is_saving = LIBCSS_TRUE;
+				is_saving = true;
 				type = *p;
 				continue;
 			}
 			/* 保存上个结点 */
 			rank = SelectorNode_Save(node, name, ni, type);
-			is_saving = LIBCSS_TRUE;
+			is_saving = true;
 			type = *p;
 			if (rank > 0) {
 				s->rank += rank;
@@ -424,7 +424,7 @@ css_selector_t *css_selector_create(const char *selector)
 				node = NULL;
 				continue;
 			}
-			is_saving = LIBCSS_FALSE;
+			is_saving = false;
 			rank = SelectorNode_Save(node, name, ni, type);
 			if (rank > 0) {
 				css_selector_node_update(node);
@@ -448,7 +448,7 @@ css_selector_t *css_selector_create(const char *selector)
 		    (*p >= '0' && *p <= '9')) {
 			if (!is_saving) {
 				type = 0;
-				is_saving = LIBCSS_TRUE;
+				is_saving = true;
 			}
 			name[ni++] = *p;
 			name[ni] = 0;

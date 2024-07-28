@@ -394,20 +394,20 @@ static void css_parse_border_value(css_style_value_t *arr,
                                    css_style_value_t *color)
 {
         int i;
-        libcss_bool_t has_width = LIBCSS_FALSE;
-        libcss_bool_t has_style = LIBCSS_FALSE;
-        libcss_bool_t has_color = LIBCSS_FALSE;
+        bool has_width = false;
+        bool has_style = false;
+        bool has_color = false;
 
         for (i = 0; i < 3; ++i) {
                 if (!has_width && arr[i].type == CSS_UNIT_VALUE) {
                         *width = arr[i];
-                        has_width = LIBCSS_TRUE;
+                        has_width = true;
                 } else if (!has_style && arr[i].type == CSS_KEYWORD_VALUE) {
                         *style = arr[i];
-                        has_style = LIBCSS_TRUE;
+                        has_style = true;
                 } else if (!has_color && arr[i].type == CSS_COLOR_VALUE) {
                         *color = arr[i];
-                        has_color = LIBCSS_TRUE;
+                        has_color = true;
                 } else {
                         break;
                 }

@@ -17,7 +17,7 @@
 
 LIBCSS_BEGIN_DECLS
 
-LIBCSS_INLINE libcss_bool_t css_check_keyword(css_style_value_t *sv, css_keyword_value_t kv)
+LIBCSS_INLINE bool css_check_keyword(css_style_value_t *sv, css_keyword_value_t kv)
 {
 	return sv->type == CSS_KEYWORD_VALUE && sv->keyword_value == kv;
 }

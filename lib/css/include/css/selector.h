@@ -41,7 +41,7 @@ LIBCSS_PUBLIC void css_selector_node_destroy(css_selector_node_t *node);
  * 匹配选择器节点
  * 左边的选择器必须包含右边的选择器的所有属性。
  */
-LIBCSS_PUBLIC libcss_bool_t css_selector_node_match(css_selector_node_t *sn1,
+LIBCSS_PUBLIC bool css_selector_node_match(css_selector_node_t *sn1,
 					   css_selector_node_t *sn2);
 
 LIBCSS_END_DECLS

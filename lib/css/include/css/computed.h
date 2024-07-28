@@ -41,20 +41,20 @@ LIBCSS_BEGIN_DECLS
                 (DEST)->unit_bits.PROP_KEY = (SRC)->unit_bits.PROP_KEY; \
         } while (0);
 
-LIBCSS_INLINE libcss_bool_t is_css_display_inline(const css_computed_style_t *s)
+LIBCSS_INLINE bool is_css_display_inline(const css_computed_style_t *s)
 {
         return s->type_bits.display == CSS_DISPLAY_INLINE ||
                s->type_bits.display == CSS_DISPLAY_INLINE_BLOCK ||
                s->type_bits.display == CSS_DISPLAY_INLINE_FLEX;
 }
 
-LIBCSS_INLINE libcss_bool_t is_css_display_flex(const css_computed_style_t *s)
+LIBCSS_INLINE bool is_css_display_flex(const css_computed_style_t *s)
 {
         return s->type_bits.display == CSS_DISPLAY_FLEX ||
                s->type_bits.display == CSS_DISPLAY_INLINE_FLEX;
 }
 
-LIBCSS_INLINE libcss_bool_t is_css_display_block(const css_computed_style_t *s)
+LIBCSS_INLINE bool is_css_display_block(const css_computed_style_t *s)
 {
         return s->type_bits.display == CSS_DISPLAY_BLOCK;
 }

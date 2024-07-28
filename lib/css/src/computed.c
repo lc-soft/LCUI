@@ -824,7 +824,7 @@ int css_cascade_style(const css_style_decl_t *style,
         css_prop_t *prop;
         const css_propdef_t *propdef;
         unsigned count = css_get_prop_count();
-        libcss_bool_t *setted_props = calloc(count, sizeof(libcss_bool_t));
+        bool *setted_props = calloc(count, sizeof(bool));
 
         for (list_each(node, style)) {
                 prop = node->data;
@@ -832,7 +832,7 @@ int css_cascade_style(const css_style_decl_t *style,
                     prop->value.type <= CSS_INVALID_VALUE) {
                         continue;
                 }
-                setted_props[prop->key] = LIBCSS_TRUE;
+                setted_props[prop->key] = true;
                 propdef = css_get_propdef(prop->key);
                 assert(propdef && propdef->cascade);
                 propdef->cascade(prop->value.array_value, computed);
@@ -897,7 +897,7 @@ static uint8_t compute_content_box_width(const css_computed_style_t *s,
         return type;
 }
 
-static libcss_bool_t compute_content_box_fixed_width(
+static bool compute_content_box_fixed_width(
     const css_computed_style_t *s, css_numeric_value_t *value)
 {
         css_unit_t unit;
@@ -921,7 +921,7 @@ static uint8_t compute_content_box_height(const css_computed_style_t *s,
         return type;
 }
 
-static libcss_bool_t compute_content_box_fixed_height(
+static bool compute_content_box_fixed_height(
     const css_computed_style_t *s, css_numeric_value_t *value)
 {
         css_unit_t unit;
@@ -962,7 +962,7 @@ static uint8_t compute_padding_box_height(const css_computed_style_t *s,
         return type;
 }
 
-static libcss_bool_t compute_padding_box_fixed_width(
+static bool compute_padding_box_fixed_width(
     const css_computed_style_t *s, css_numeric_value_t *value)
 {
         css_unit_t unit;
@@ -970,7 +970,7 @@ static libcss_bool_t compute_padding_box_fixed_width(
                unit == CSS_UNIT_PX;
 }
 
-static libcss_bool_t compute_padding_box_fixed_height(
+static bool compute_padding_box_fixed_height(
     const css_computed_style_t *s, css_numeric_value_t *value)
 {
         css_unit_t unit;

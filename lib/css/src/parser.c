@@ -66,10 +66,10 @@ int css_parser_begin_parse_comment(css_parser_t *parser)
 {
 	switch (*(parser->cur + 1)) {
 	case '/':
-		parser->comment_parser.is_line_comment = LIBCSS_TRUE;
+		parser->comment_parser.is_line_comment = true;
 		break;
 	case '*':
-		parser->comment_parser.is_line_comment = LIBCSS_FALSE;
+		parser->comment_parser.is_line_comment = false;
 		break;
 	default:
 		css_parser_get_char(parser);

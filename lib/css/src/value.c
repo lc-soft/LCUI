@@ -103,7 +103,7 @@ static struct css_value_module_t {
 	dict_t *types;
 } css_value;
 
-static libcss_bool_t css_valdef_has_children(css_valdef_t *valdef)
+static bool css_valdef_has_children(css_valdef_t *valdef)
 {
 	switch (valdef->sign) {
 	case CSS_VALDEF_SIGN_JUXTAPOSITION:
@@ -111,7 +111,7 @@ static libcss_bool_t css_valdef_has_children(css_valdef_t *valdef)
 	case CSS_VALDEF_SIGN_DOUBLE_BAR:
 	case CSS_VALDEF_SIGN_SINGLE_BAR:
 	case CSS_VALDEF_SIGN_BRACKETS:
-		return LIBCSS_TRUE;
+		return true;
 	default:
 		break;
 	}
