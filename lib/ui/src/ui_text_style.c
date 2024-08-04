@@ -61,9 +61,9 @@ static void ui_compute_content(ui_text_style_t *fs, const char *str)
 	if (!str) {
 		return;
 	}
-	len = mbstowcs(NULL, str, 0);
+	len = decode_utf8(NULL, str, 0);
 	content = malloc((len + 1) * sizeof(wchar_t));
-	len = mbstowcs(content, str, len);
+	len = decode_utf8(content, str, len);
 	content[len] = 0;
 	if (content[0] == '"') {
 		for (i = 0; content[i + 1]; ++i) {
