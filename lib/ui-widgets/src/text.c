@@ -312,7 +312,7 @@ int ui_text_set_content(ui_widget_t *w, const char *utf8_text)
         size_t len = strlen(utf8_text) + 1;
 
         wstr = malloc(sizeof(wchar_t) * len);
-        mbstowcs(wstr, utf8_text, len);
+        decode_utf8(wstr, utf8_text, len);
         ret = ui_text_set_content_w(w, wstr);
         if (wstr) {
                 free(wstr);

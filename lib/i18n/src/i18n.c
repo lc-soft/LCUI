@@ -148,7 +148,7 @@ size_t i18n_detect_language(wchar_t *lang, size_t max_len)
         const char *str = getenv("LANG");
 
         if (str) {
-                len = mbstowcs(lang, str, max_len);
+                len = decode_utf8(lang, str, max_len);
                 // zh_CN -> zh-CN
                 if (len > 3 && max_len > 3) {
                         lang[2] = '-';

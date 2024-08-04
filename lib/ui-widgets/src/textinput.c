@@ -523,7 +523,7 @@ int ui_textinput_set_text(ui_widget_t *widget, const char *utf8_str)
         if (!wstr) {
                 return -ENOMEM;
         }
-        len = mbstowcs(wstr, utf8_str, len);
+        len = decode_utf8(wstr, utf8_str, len);
         wstr[len] = 0;
         ret = ui_textinput_set_text_w(widget, wstr);
         free(wstr);
@@ -587,7 +587,7 @@ int ui_textinput_set_placeholder(ui_widget_t *w, const char *str)
         if (!wstr) {
                 return -ENOMEM;
         }
-        len = mbstowcs(wstr, str, len);
+        len = decode_utf8(wstr, str, len);
         wstr[len] = 0;
         ret = ui_textinput_set_placeholder_w(w, wstr);
         free(wstr);
