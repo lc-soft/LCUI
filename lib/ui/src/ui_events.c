@@ -961,7 +961,7 @@ static int ui_dispatch_touch_event(list_t *capturers, ui_touch_point_t *points,
 	ui_touch_capturer_t *tc;
 
 	root = ui_root();
-	scale = ui_metrics.scale;
+	scale = ui_get_actual_scale();
 	e.type = UI_EVENT_TOUCH;
 	e.cancel_bubble = false;
 	e.touch.points = malloc(sizeof(ui_touch_point_t) * n_points);

@@ -20,6 +20,7 @@ LIBPLAT_BEGIN_DECLS
 LIBPLAT_PUBLIC int app_get_screen_width(void);
 LIBPLAT_PUBLIC int app_get_screen_height(void);
 LIBPLAT_PUBLIC void *app_window_get_handle(app_window_t *wnd);
+LIBPLAT_PUBLIC unsigned app_window_get_dpi(app_window_t *wnd);
 
 LIBPLAT_PUBLIC app_window_t *app_get_window_by_handle(void *handle);
 LIBPLAT_PUBLIC app_window_t *app_window_create(const wchar_t *title, int x, int y,
@@ -28,6 +29,7 @@ LIBPLAT_PUBLIC app_window_t *app_window_create(const wchar_t *title, int x, int 
 
 LIBPLAT_PUBLIC void app_window_close(app_window_t *wnd);
 LIBPLAT_PUBLIC void app_window_destroy(app_window_t *wnd);
+LIBPLAT_PUBLIC void app_window_set_fullscreen(app_window_t *wnd, bool fullscreen);
 LIBPLAT_PUBLIC void app_window_set_position(app_window_t *wnd, int x, int y);
 LIBPLAT_PUBLIC void app_window_set_framebuffer_size(app_window_t *wnd, int width,
 					      int height);

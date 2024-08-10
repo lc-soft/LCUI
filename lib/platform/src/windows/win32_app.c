@@ -1,4 +1,4 @@
-﻿/*
+/*
  * lib/platform/src/windows/win32_app.c
  *
  * Copyright (c) 2023-2024, Liu Chao <i@lc-soft.io> All rights reserved.
@@ -33,6 +33,10 @@ typedef enum app_window_render_mode_t {
 
 struct app_window_t {
 	HWND hwnd;
+        DWORD style;
+        DWORD ex_style;
+        WINDOWPLACEMENT placement;
+
 	int width, height;
 	int min_width, min_height;
 	int max_width, max_height;
@@ -293,7 +297,8 @@ static LRESULT CALLBACK app_window_process(HWND hwnd, UINT msg, WPARAM arg1,
 		e.size.width = LOWORD(arg2);
 		e.size.height = HIWORD(arg2);
 		app_window_on_size(wnd, e.size.width, e.size.height);
-		logger_debug("[win32-app] on WM_SIZE, size: (%d, %d)\n",
+                logger_debug(
+                    "[win32-app] [window %p] on WM_SIZE, size: (%d, %d)\n", wnd,
 			     e.size.width, e.size.height);
 		break;
 	}
@@ -514,7 +519,34 @@ app_window_t *app_window_create(const wchar_t *title, int x, int y, int width,
 
 void app_window_set_fullscreen(app_window_t *wnd, bool fullscreen)
 {
-	// TODO:
+        if (fullscreen) {
+                MONITORINFO mi = { sizeof(mi) };
+                wnd->style = GetWindowLong(wnd->hwnd, GWL_STYLE);
+                wnd->ex_style = GetWindowLong(wnd->hwnd, GWL_EXSTYLE);
+                GetWindowPlacement(wnd->hwnd, &wnd->placement);
+                SetWindowLong(wnd->hwnd, GWL_STYLE,
+                              wnd->style & ~(WS_CAPTION | WS_THICKFRAME));
+                SetWindowLong(
+                    wnd->hwnd, GWL_EXSTYLE,
+                    wnd->ex_style & ~(WS_EX_DLGMODALFRAME | WS_EX_WINDOWEDGE |
+                                      WS_EX_CLIENTEDGE | WS_EX_STATICEDGE));
+                if (GetMonitorInfo(
+                        MonitorFromWindow(wnd->hwnd, MONITOR_DEFAULTTOPRIMARY),
+                        &mi)) {
+                        SetWindowPos(wnd->hwnd, HWND_TOP, mi.rcMonitor.left,
+                                     mi.rcMonitor.top,
+                                     mi.rcMonitor.right - mi.rcMonitor.left,
+                                     mi.rcMonitor.bottom - mi.rcMonitor.top,
+                                     SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+                }
+        } else {
+                SetWindowLong(wnd->hwnd, GWL_STYLE, wnd->style);
+                SetWindowLong(wnd->hwnd, GWL_EXSTYLE, wnd->ex_style);
+                SetWindowPlacement(wnd->hwnd, &wnd->placement);
+                SetWindowPos(
+                    wnd->hwnd, NULL, 0, 0, 0, 0,
+                    SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+        }
 }
 
 void app_window_activate(app_window_t *wnd)
@@ -524,7 +556,7 @@ void app_window_activate(app_window_t *wnd)
 
 void app_window_close(app_window_t *wnd)
 {
-	PostMessage(wnd->hwnd, WM_CLOSE, 0, 0);
+        SendMessage(wnd->hwnd, WM_CLOSE, 0, 0);
 }
 
 void app_window_destroy(app_window_t *wnd)

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * src/lcui_ui.c
  *
  * Copyright (c) 2023-2024, Liu Chao <i@lc-soft.io> All rights reserved.
@@ -219,33 +219,35 @@ void lcui_set_ui_display_mode(lcui_display_mode_t mode)
         if (mode == LCUI_DISPLAY_MODE_DEFAULT) {
                 mode = LCUI_DISPLAY_MODE_WINDOWED;
         }
+        if (lcui_ui.mode == mode) {
+                return;
+        }
+        if (lcui_ui.mode == LCUI_DISPLAY_MODE_FULLSCREEN ||
+            lcui_ui.mode == LCUI_DISPLAY_MODE_WINDOWED) {
+                wnd = ui_server_get_window(ui_root());
+                if (mode == LCUI_DISPLAY_MODE_FULLSCREEN) {
+                        app_window_set_fullscreen(wnd, true);
+                        lcui_ui.mode = mode;
+                        return;
+                } else if (mode == LCUI_DISPLAY_MODE_WINDOWED) {
+                        app_window_set_fullscreen(wnd, false);
+                        lcui_ui.mode = mode;
+                        return;
+                }
+        }
         if (lcui_ui.observer) {
                 ui_mutation_observer_disconnect(lcui_ui.observer);
                 ui_mutation_observer_destroy(lcui_ui.observer);
                 lcui_ui.observer = NULL;
         }
         list_destroy(&lcui_ui.windows, lcui_close_window);
-        switch (lcui_ui.mode) {
-        case LCUI_DISPLAY_MODE_FULLSCREEN:
-        case LCUI_DISPLAY_MODE_WINDOWED:
-                ui_server_disconnect(ui_root(), NULL);
-                break;
-        case LCUI_DISPLAY_MODE_SEAMLESS:
-                for (list_each(node, &ui_root()->children)) {
-                        ui_server_disconnect(node->data, NULL);
-                }
-        default:
-                break;
-        }
         switch (mode) {
         case LCUI_DISPLAY_MODE_FULLSCREEN:
-                scale = ui_metrics.scale;
-                // TODO: set window fullscreen style
+                scale = ui_get_actual_scale();
                 wnd = app_window_create(NULL, 0, 0, 0, 0, NULL);
-                ui_widget_resize(ui_root(), app_get_screen_width() / scale,
-                                 app_get_screen_height() / scale);
                 list_append(&lcui_ui.windows, wnd);
                 ui_server_connect(ui_root(), wnd);
+                app_window_set_fullscreen(wnd, true);
                 break;
         case LCUI_DISPLAY_MODE_SEAMLESS:
                 options.child_list = TRUE;
@@ -261,6 +263,7 @@ void lcui_set_ui_display_mode(lcui_display_mode_t mode)
         case LCUI_DISPLAY_MODE_WINDOWED:
         default:
                 wnd = app_window_create(NULL, 0, 0, 0, 0, NULL);
+                list_append(&lcui_ui.windows, wnd);
                 ui_server_connect(ui_root(), wnd);
                 break;
         }

@@ -19,17 +19,22 @@ LIBUI_PUBLIC ui_metrics_t ui_metrics;
 
 LIBUI_BEGIN_DECLS
 
+LIBUI_INLINE float ui_get_actual_scale(void)
+{
+        return ui_metrics.dpi / 96.0f * ui_metrics.scale;
+}
+
 LIBUI_INLINE int ui_compute(float value)
 {
-	return (int)(ui_metrics.scale * value);
+        return (int)(ui_get_actual_scale() * value);
 }
 
 LIBUI_INLINE void ui_compute_rect(pd_rect_t *actual_rect, const ui_rect_t *rect)
 {
-	actual_rect->x = ui_compute(rect->x);
-	actual_rect->y = ui_compute(rect->y);
-	actual_rect->width = ui_compute(rect->width);
-	actual_rect->height = ui_compute(rect->height);
+        actual_rect->x = ui_compute(rect->x);
+        actual_rect->y = ui_compute(rect->y);
+        actual_rect->width = ui_compute(rect->width);
+        actual_rect->height = ui_compute(rect->height);
 }
 
 /** 设置密度 */

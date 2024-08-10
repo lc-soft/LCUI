@@ -59,6 +59,7 @@ typedef enum app_event_type_t {
 	APP_EVENT_TOUCHMOVE,
 	APP_EVENT_TOUCHDOWN,
 	APP_EVENT_TOUCHUP,
+	APP_EVENT_DPICHANGED,
 	APP_EVENT_USER = 100
 } app_event_type_t;
 
@@ -240,6 +241,10 @@ typedef struct app_visibility_change_event_t {
 	bool visible;
 } app_visibility_change_event_t;
 
+typedef struct app_dpi_change_event_t {
+	int dpi;
+} app_dpi_change_event_t;
+
 struct app_event_t {
 	app_event_type_t type;
 	app_window_t *window;
@@ -256,6 +261,7 @@ struct app_event_t {
 		app_size_event_t size;
 		app_minmaxinfo_event_t minmaxinfo;
 		app_visibility_change_event_t visibility_change;
+		app_dpi_change_event_t dpi_change;
 	};
 };
 
