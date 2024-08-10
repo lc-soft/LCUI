@@ -61,6 +61,11 @@ void app_window_destroy(app_window_t *wnd)
 	return linux_app.window.destroy(wnd);
 }
 
+void app_window_set_fullscreen(app_window_t *wnd, bool fullscreen)
+{
+	// TODO:
+}
+
 void app_window_activate(app_window_t *wnd)
 {
 	return linux_app.window.activate(wnd);
@@ -84,6 +89,12 @@ void app_window_set_position(app_window_t *wnd, int x, int y)
 void *app_window_get_handle(app_window_t *wnd)
 {
 	return linux_app.window.get_handle(wnd);
+}
+
+unsigned app_window_get_dpi(app_window_t *wnd)
+{
+	// TODO: get dpi from x11 window or framebuffer?
+	return 96;
 }
 
 int app_window_get_width(app_window_t *wnd)

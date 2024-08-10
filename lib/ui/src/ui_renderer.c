@@ -215,7 +215,7 @@ size_t ui_widget_get_dirty_rects(ui_widget_t *w, list_t *rects)
         pd_rect_t *rect;
         list_node_t *node;
 
-        float scale = ui_metrics.scale;
+        float scale = ui_get_actual_scale();
         int x = y_iround(w->padding_box.x * scale);
         int y = y_iround(w->padding_box.y * scale);
 
