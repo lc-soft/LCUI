@@ -538,5 +538,6 @@ void ui_init_updater(void)
 void ui_destroy_updater(void)
 {
         dict_destroy(ui_style_cache);
+        list_destroy_ex(&ui_updaters, free, false);
         ui_style_cache = NULL;
 }

@@ -13,27 +13,27 @@
 #include <LCUI.h>
 #include <ctest-custom.h>
 
-static void OnRefreshScreen(void *arg)
+static void handle_refresh(void *arg)
 {
 	ui_refresh_style();
 }
 
-static void OnQuit(void *arg)
+static void handle_quit(void *arg)
 {
 	lcui_quit();
 }
 
-static void OnBtnClick(ui_widget_t* w, ui_event_t* ui_event, void *arg)
+static void handle_btn_click(ui_widget_t* w, ui_event_t* ui_event, void *arg)
 {
-	lcui_set_timeout(10, OnRefreshScreen, NULL);
-	lcui_set_timeout(50, OnQuit, NULL);
+	lcui_set_timeout(0, handle_refresh, NULL);
+	lcui_set_timeout(1, handle_quit, NULL);
 	lcui_process_events(APP_PROCESS_EVENTS_UNTIL_QUIT);
 	lcui_quit();
 }
 
-static void OnTriggerBtnClick(void *arg)
+static void handle_trigger_btn_click(void *arg)
 {
-	app_event_t e;
+	app_event_t e = { 0 };
 
 	e.type = APP_EVENT_MOUSEDOWN;
 	e.mouse.button = MOUSE_BUTTON_LEFT;
@@ -44,15 +44,15 @@ static void OnTriggerBtnClick(void *arg)
 	app_post_event(&e);
 }
 
-static void ObserverThread(void *arg)
+static void observer_thread(void *arg)
 {
 	int i;
 	LCUI_BOOL *exited = arg;
 
-	for (i = 0; i < 20 && !*exited; ++i) {
-		sleep_ms(100);
+	for (i = 0; i < 100 && !*exited; ++i) {
+		sleep_ms(1);
 	}
-	ctest_equal_bool("main loop should exit within 2000ms", *exited, TRUE);
+	ctest_equal_bool("main loop should exit within 100ms", *exited, true);
 	if (!*exited) {
 		exit(-ctest_finish());
 		return;
@@ -69,12 +69,12 @@ void test_mainloop(void)
 	lcui_init();
 	btn = ui_create_widget("button");
 	ui_button_set_text(btn, "button");
-	ui_widget_on(btn, "click", OnBtnClick, NULL);
+	ui_widget_on(btn, "click", handle_btn_click, NULL);
 	ui_root_append(btn);
 	/* Observe whether the main loop has exited in a new thread */
-	thread_create(&tid, ObserverThread, &exited);
+	thread_create(&tid, observer_thread, &exited);
 	/* Trigger the click event after the first frame is updated */
-	lcui_set_timeout(50, OnTriggerBtnClick, btn);
+	lcui_set_timeout(50, handle_trigger_btn_click, btn);
 	lcui_main();
 	exited = TRUE;
 	thread_join(tid, NULL);

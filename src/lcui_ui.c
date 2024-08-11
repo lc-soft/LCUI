@@ -89,8 +89,10 @@ static void lcui_dispatch_ui_touch_event(app_event_t *app_event)
                 default:
                         break;
                 }
-                e.touch.points[i].x = (float)round(app_event->touch.points[i].x / scale);
-                e.touch.points[i].y = (float)round(app_event->touch.points[i].y / scale);
+                e.touch.points[i].x =
+                    (float)round(app_event->touch.points[i].x / scale);
+                e.touch.points[i].y =
+                    (float)round(app_event->touch.points[i].y / scale);
         }
         ui_dispatch_event(&e);
         ui_event_destroy(&e);
@@ -215,7 +217,6 @@ static void lcui_close_window(void *arg)
 
 void lcui_set_ui_display_mode(lcui_display_mode_t mode)
 {
-        float scale;
         app_window_t *wnd;
         list_node_t *node;
         ui_mutation_observer_init_t options = { 0 };
@@ -248,11 +249,11 @@ void lcui_set_ui_display_mode(lcui_display_mode_t mode)
         list_destroy(&lcui_ui.windows, lcui_close_window);
         switch (mode) {
         case LCUI_DISPLAY_MODE_FULLSCREEN:
-                scale = ui_get_actual_scale();
                 wnd = app_window_create(NULL, 0, 0, 0, 0, NULL);
                 list_append(&lcui_ui.windows, wnd);
                 ui_server_connect(ui_root(), wnd);
                 app_window_set_fullscreen(wnd, true);
+                ui_metrics.dpi = 1.f * app_window_get_dpi(wnd);
                 break;
         case LCUI_DISPLAY_MODE_SEAMLESS:
                 options.child_list = TRUE;
@@ -270,6 +271,7 @@ void lcui_set_ui_display_mode(lcui_display_mode_t mode)
                 wnd = app_window_create(NULL, 0, 0, 0, 0, NULL);
                 list_append(&lcui_ui.windows, wnd);
                 ui_server_connect(ui_root(), wnd);
+                ui_metrics.dpi = 1.f * app_window_get_dpi(wnd);
                 break;
         }
         lcui_ui.mode = mode;

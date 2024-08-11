@@ -239,7 +239,12 @@ void *app_window_get_handle(app_window_t *wnd)
 
 unsigned app_window_get_dpi(app_window_t *wnd)
 {
-        return GetDpiForWindow(wnd->hwnd);
+        UINT dpi = GetDpiForWindow(wnd->hwnd);
+        if (dpi == 0) {
+                logger_error("[win32-app] GetDpiForWindow failed, hwnd: %p\n", wnd->hwnd);
+                dpi = GetDpiForSystem();
+        }
+        return dpi;
 }
 
 static void convert_client_size_to_window_size(app_window_t *wnd, int *width,

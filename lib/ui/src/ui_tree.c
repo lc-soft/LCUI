@@ -9,6 +9,8 @@
  * LICENSE.TXT file in the root directory of this source tree.
  */
 
+#include <stdio.h>
+#include <locale.h>
 #include <assert.h>
 #include <string.h>
 #include <css/selector.h>
@@ -367,9 +369,6 @@ ui_widget_t *ui_widget_at(ui_widget_t *widget, int ix, int iy)
         return target == widget ? NULL : target;
 }
 
-#include <locale.h>
-#include <stdio.h>
-
 static void _ui_print_tree(ui_widget_t *w, int depth, const wchar_t *prefix)
 {
         ui_widget_t *child;
@@ -421,7 +420,9 @@ static void _ui_print_tree(ui_widget_t *w, int depth, const wchar_t *prefix)
 void ui_print_tree(ui_widget_t *w)
 {
         css_selector_node_t *node;
+        char *ctype = setlocale(LC_CTYPE, NULL);
 
+        setlocale(LC_CTYPE, "");
         w = w ? w : ui_root();
         node = ui_widget_create_selector_node(w);
         logger_error("%s, xy:(%g,%g), size:(%g,%g), visible: %s\n",
@@ -430,4 +431,5 @@ void ui_print_tree(ui_widget_t *w)
                      ui_widget_is_visible(w) ? "true" : "false");
         css_selector_node_destroy(node);
         _ui_print_tree(w, 0, L"  ");
+        setlocale(LC_CTYPE, ctype);
 }
