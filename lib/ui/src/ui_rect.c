@@ -13,12 +13,12 @@
 #include <ui/rect.h>
 #include <pandagl/rect.h>
 
-void ui_convert_rect(const pd_rect_t *rect, ui_rect_t *ui_rect, float scale)
+void ui_rect_from_pd_rect(ui_rect_t *ui_rect, const pd_rect_t *rect, float scale)
 {
-        ui_rect->x = rect->x * scale;
-        ui_rect->y = rect->y * scale;
-        ui_rect->width = rect->width * scale;
-        ui_rect->height = rect->height * scale;
+        ui_rect->x = rect->x / scale;
+        ui_rect->y = rect->y / scale;
+        ui_rect->width = rect->width / scale;
+        ui_rect->height = rect->height / scale;
 }
 
 bool ui_rect_correct(ui_rect_t *rect, float container_width,

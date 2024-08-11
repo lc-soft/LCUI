@@ -107,7 +107,7 @@ static void ui_textinput_update_caret(ui_widget_t *widget)
         int row = edit->layer->insert_y;
         int offset_x, offset_y;
         float height, width;
-        float scale = ui_metrics.scale;
+        float scale = ui_get_actual_scale();
         float x, y, caret_x = 0, caret_y = 0;
 
         if (!edit->placeholder_visible) {
@@ -319,7 +319,7 @@ static void textinput_update_textlayer(ui_widget_t *w)
         list_node_t *node;
 
         list_create(&rects);
-        scale = ui_metrics.scale;
+        scale = ui_get_actual_scale();
         edit = ui_widget_get_data(w, ui_textinput_proto);
         pd_text_style_copy(&style, &edit->layer_source->default_style);
         if (edit->password_char) {
@@ -331,7 +331,7 @@ static void textinput_update_textlayer(ui_widget_t *w)
         pd_text_style_destroy(&style);
         pd_text_update(edit->layer, &rects);
         for (list_each(node, &rects)) {
-                ui_convert_rect(node->data, &rect, 1.0f / scale);
+                ui_rect_from_pd_rect(&rect, node->data, scale);
                 ui_widget_mark_dirty_rect(w, &rect, UI_BOX_TYPE_CONTENT_BOX);
         }
         pd_rects_clear(&rects);
@@ -379,7 +379,7 @@ static void ui_textinput_update_text(ui_widget_t *widget)
 
 static void ui_textinput_on_resize(ui_widget_t *w, float width, float height)
 {
-        float scale = ui_metrics.scale;
+        float scale = ui_get_actual_scale();
 
         list_t rects;
         list_node_t *node;
@@ -394,7 +394,7 @@ static void ui_textinput_on_resize(ui_widget_t *w, float width, float height)
                              (int)(height * scale));
         pd_text_update(edit->layer, &rects);
         for (list_each(node, &rects)) {
-                ui_convert_rect(node->data, &rect, 1.0f / scale);
+                ui_rect_from_pd_rect(&rect, node->data, scale);
                 ui_widget_mark_dirty_rect(w, &rect, UI_BOX_TYPE_CONTENT_BOX);
         }
         pd_rects_clear(&rects);
@@ -405,7 +405,7 @@ static void ui_textinput_on_auto_size(ui_widget_t *w, float *width,
 {
         int i, n;
         int max_width = 0, max_height = 0;
-        float scale = ui_metrics.scale;
+        float scale = ui_get_actual_scale();
 
         ui_textinput_t *edit = ui_widget_get_data(w, ui_textinput_proto);
 

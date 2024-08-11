@@ -866,10 +866,10 @@ static int compute_absolute_length(
         case CSS_UNIT_PX:
                 break;
         case CSS_UNIT_DIP:
-                value = value * m->density;
+                value = value * css_metrics_actual_scale(m) * m->density;
                 break;
         case CSS_UNIT_SP:
-                value = value * m->scaled_density;
+                value = value * css_metrics_actual_scale(m) * m->scaled_density;
                 break;
         case CSS_UNIT_PT:
                 value = value * m->dpi / 72.0f;
@@ -897,8 +897,8 @@ static uint8_t compute_content_box_width(const css_computed_style_t *s,
         return type;
 }
 
-static bool compute_content_box_fixed_width(
-    const css_computed_style_t *s, css_numeric_value_t *value)
+static bool compute_content_box_fixed_width(const css_computed_style_t *s,
+                                            css_numeric_value_t *value)
 {
         css_unit_t unit;
         return compute_content_box_width(s, value, &unit) == CSS_WIDTH_SET &&
@@ -921,8 +921,8 @@ static uint8_t compute_content_box_height(const css_computed_style_t *s,
         return type;
 }
 
-static bool compute_content_box_fixed_height(
-    const css_computed_style_t *s, css_numeric_value_t *value)
+static bool compute_content_box_fixed_height(const css_computed_style_t *s,
+                                             css_numeric_value_t *value)
 {
         css_unit_t unit;
         return compute_content_box_height(s, value, &unit) == CSS_HEIGHT_SET &&
@@ -962,16 +962,16 @@ static uint8_t compute_padding_box_height(const css_computed_style_t *s,
         return type;
 }
 
-static bool compute_padding_box_fixed_width(
-    const css_computed_style_t *s, css_numeric_value_t *value)
+static bool compute_padding_box_fixed_width(const css_computed_style_t *s,
+                                            css_numeric_value_t *value)
 {
         css_unit_t unit;
         return compute_padding_box_width(s, value, &unit) == CSS_WIDTH_SET &&
                unit == CSS_UNIT_PX;
 }
 
-static bool compute_padding_box_fixed_height(
-    const css_computed_style_t *s, css_numeric_value_t *value)
+static bool compute_padding_box_fixed_height(const css_computed_style_t *s,
+                                             css_numeric_value_t *value)
 {
         css_unit_t unit;
         return compute_padding_box_height(s, value, &unit) == CSS_HEIGHT_SET &&

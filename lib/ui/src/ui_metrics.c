@@ -10,59 +10,54 @@
  */
 
 #include <ui/metrics.h>
-#include "ui_metrics.h"
 
-ui_metrics_t ui_metrics;
+ui_metrics_t ui_metrics = { .scale = 1.0f,
+                            .density = 1.0f,
+                            .scaled_density = 1.0f,
+                            .dpi = 96.0f };
 
 static float ui_compute_density_by_level(ui_density_Level_t level)
 {
-	float density = ui_metrics.dpi / 96.0f;
-	switch (level) {
-	case UI_DENSITY_LEVEL_SMALL: density *= 0.75f; break;
-	case UI_DENSITY_LEVEL_LARGE: density *= 1.25f; break;
-	case UI_DENSITY_LEVEL_BIG: density *= 1.5f; break;
-	case UI_DENSITY_LEVEL_NORMAL:
-	default: break;
-	}
-	return density;
+        switch (level) {
+        case UI_DENSITY_LEVEL_SMALL:
+                return 0.75f;
+        case UI_DENSITY_LEVEL_LARGE:
+                return 1.25f;
+        case UI_DENSITY_LEVEL_BIG:
+                return 1.5f;
+        case UI_DENSITY_LEVEL_NORMAL:
+        default:
+                break;
+        }
+        return 1.0f;
 }
 
 void ui_set_density(float density)
 {
-	ui_metrics.density = density;
+        ui_metrics.density = density;
 }
 
 void ui_set_scaled_density(float density)
 {
-	ui_metrics.scaled_density = density;
+        ui_metrics.scaled_density = density;
 }
 
 void ui_set_density_level(ui_density_Level_t level)
 {
-	ui_metrics.density = ui_compute_density_by_level(level);
+        ui_metrics.density = ui_compute_density_by_level(level);
 }
 
 void ui_set_scaled_density_level(ui_density_Level_t level)
 {
-	ui_metrics.scaled_density = ui_compute_density_by_level(level);
-}
-
-void ui_set_dpi(float dpi)
-{
-	ui_metrics.dpi = dpi;
-	ui_set_density_level(UI_DENSITY_LEVEL_NORMAL);
-	ui_set_scaled_density_level(UI_DENSITY_LEVEL_NORMAL);
+        ui_metrics.scaled_density = ui_compute_density_by_level(level);
 }
 
 void ui_set_scale(float scale)
 {
-	scale = y_max(0.5f, scale);
-	scale = y_min(5.0f, scale);
-	ui_metrics.scale = scale;
-}
-
-void ui_init_metrics(void)
-{
-	ui_metrics.scale = 1.0f;
-	ui_set_dpi(96.0f);
+        if (scale < 0.5f) {
+                scale = 0.5f;
+        } else if (scale > 5.0f) {
+                scale = 5.0f;
+        }
+        ui_metrics.scale = scale;
 }

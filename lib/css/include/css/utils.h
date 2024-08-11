@@ -17,6 +17,12 @@
 
 LIBCSS_BEGIN_DECLS
 
+
+LIBCSS_INLINE float css_metrics_actual_scale(css_metrics_t *metrics)
+{
+        return metrics->dpi / 96.0f * metrics->scale;
+}
+
 LIBCSS_PUBLIC bool css_parse_font_weight(const char *str, int *weight);
 
 LIBCSS_PUBLIC bool css_parse_font_style(const char *str, int *style);

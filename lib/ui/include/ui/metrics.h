@@ -14,6 +14,7 @@
 
 #include "common.h"
 #include "types.h"
+#include <css/utils.h>
 
 LIBUI_PUBLIC ui_metrics_t ui_metrics;
 
@@ -21,7 +22,7 @@ LIBUI_BEGIN_DECLS
 
 LIBUI_INLINE float ui_get_actual_scale(void)
 {
-        return ui_metrics.dpi / 96.0f * ui_metrics.scale;
+        return css_metrics_actual_scale(&ui_metrics);
 }
 
 LIBUI_INLINE int ui_compute(float value)
@@ -48,9 +49,6 @@ LIBUI_PUBLIC void ui_set_density_level(ui_density_Level_t level);
 
 /** 设置缩放密度等级 */
 LIBUI_PUBLIC void ui_set_scaled_density_level(ui_density_Level_t level);
-
-/** 设置 DPI */
-LIBUI_PUBLIC void ui_set_dpi(float dpi);
 
 /** 设置全局缩放比例 */
 LIBUI_PUBLIC void ui_set_scale(float scale);

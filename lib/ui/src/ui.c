@@ -19,12 +19,10 @@
 #include "ui_widget_prototype.h"
 #include "ui_css.h"
 #include "ui_updater.h"
-#include "ui_metrics.h"
 
 void ui_init(void)
 {
 	pd_font_library_init();
-	ui_init_metrics();
 	ui_init_widget_id();
 	ui_init_widget_prototype();
 	ui_init_updater();

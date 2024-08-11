@@ -58,6 +58,7 @@ typedef struct ui_connection_t {
         bool window_visible;
         app_window_t *window;
         ui_widget_t *widget;
+        ui_updater_t *updater;
 } ui_connection_t;
 
 static struct ui_server_t {
@@ -114,6 +115,7 @@ static void ui_connection_destroy(void *arg)
         ui_connection_t *conn = arg;
 
         list_destroy(&conn->flash_rects, free);
+        ui_updater_destroy(conn->updater);
         free(conn);
 }
 
@@ -135,6 +137,15 @@ int ui_server_disconnect(ui_widget_t *widget, app_window_t *window)
                 }
         }
         return count;
+}
+
+float ui_server_get_window_scale(app_window_t *window)
+{
+        ui_connection_t *conn = ui_server_find_connection(NULL, window);
+        if (conn) {
+                return css_metrics_actual_scale(&conn->updater->metrics);
+        }
+        return app_window_get_dpi(window) / 96.f;
 }
 
 static void ui_server_on_window_close(app_event_t *e, void *arg)
@@ -180,7 +191,10 @@ static void ui_server_on_window_paint(app_event_t *e, void *arg)
                 if (conn && conn->window != e->window) {
                         continue;
                 }
-                ui_convert_rect(&e->paint.rect, &rect, ui_metrics.scale);
+                ui_rect_from_pd_rect(
+                    &rect,
+                    &e->paint.rect,
+                    css_metrics_actual_scale(&conn->updater->metrics));
                 ui_widget_mark_dirty_rect(conn->widget, &rect,
                                           UI_BOX_TYPE_GRAPH_BOX);
         }
@@ -189,14 +203,16 @@ static void ui_server_on_window_paint(app_event_t *e, void *arg)
 static void ui_server_on_window_resize(app_event_t *e, void *arg)
 {
         ui_connection_t *conn;
-        float scale = ui_get_actual_scale();
-        float width = e->size.width / scale;
-        float height = e->size.height / scale;
+        float scale, width, height;
 
         conn = ui_server_find_connection(NULL, e->window);
         if (!conn) {
                 return;
         }
+
+        scale = css_metrics_actual_scale(&conn->updater->metrics);
+        width = e->size.width / scale;
+        height = e->size.height / scale;
         ui_widget_mark_dirty_rect(conn->widget, NULL, UI_BOX_TYPE_GRAPH_BOX);
         ui_widget_resize(conn->widget, width, height);
         logger_debug(
@@ -207,7 +223,6 @@ static void ui_server_on_window_resize(app_event_t *e, void *arg)
 
 static void ui_server_on_window_dpi_changed(app_event_t *e, void *arg)
 {
-        ui_set_dpi(e->dpi_change.dpi * 1.f);
         logger_debug("[ui-server] [window %p] on_window_dpi_changed, dpi: %d\n",
                      e->window, e->dpi_change.dpi);
         ui_refresh_style();
@@ -321,6 +336,8 @@ void ui_server_connect(ui_widget_t *widget, app_window_t *window)
         conn->widget = widget;
         conn->rendered = false;
         conn->window_visible = false;
+        conn->updater = ui_updater_create();
+        conn->updater->metrics.dpi = 1.f * app_window_get_dpi(window);
         options.properties = true;
         list_create(&conn->flash_rects);
         list_append(&ui_server.connections, conn);
@@ -339,11 +356,12 @@ void ui_server_connect(ui_widget_t *widget, app_window_t *window)
 
 static void get_rendering_layer_size(int *width, int *height)
 {
-        float scale = ui_get_actual_scale();
-
-        *width = (int)(app_get_screen_width() * scale);
-        *height = (int)(app_get_screen_height() * scale);
-        *height = y_max(200, *height / ui_server.num_rendering_threads + 1);
+        *width = (int)app_get_screen_width();
+        *height =
+            (int)app_get_screen_height() / ui_server.num_rendering_threads + 1;
+        if (*height < 200) {
+                *height = 200;
+        }
 }
 
 static void ui_server_dump_rects(ui_connection_t *conn, list_t *out_rects)
@@ -569,15 +587,18 @@ size_t ui_server_render(void)
         size_t count = 0;
         list_node_t *node;
         ui_connection_t *conn;
+        float dpi = 1.f * ui_metrics.dpi;
 
         for (list_each(node, &ui_server.connections)) {
                 conn = node->data;
-                if (conn->window_visible) {
-                        count += ui_server_render_window(conn);
-                        count += ui_server_update_flash_rects(conn);
-                        return 0;
+                if (!conn->window_visible) {
+                        continue;
                 }
+                ui_metrics.dpi = 1.f * app_window_get_dpi(conn->window);
+                count += ui_server_render_window(conn);
+                count += ui_server_update_flash_rects(conn);
         }
+        ui_metrics.dpi = dpi;
         return count;
 }
 
@@ -689,6 +710,20 @@ static void ui_server_on_widget_mutation(ui_mutation_list_t *mutation_list,
                 }
         }
         list_destroy(&wnd_mutation_list, free);
+}
+
+void ui_server_update(void)
+{
+        ui_connection_t *conn;
+        list_node_t *node;
+        float dpi = 1.f * ui_metrics.dpi;
+
+        for (list_each(node, &ui_server.connections)) {
+                conn = node->data;
+                ui_metrics.dpi = 1.f * app_window_get_dpi(conn->window);
+                ui_updater_update(conn->updater, conn->widget);
+        }
+        ui_metrics.dpi = dpi;
 }
 
 void ui_server_init(void)
