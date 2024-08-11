@@ -1,4 +1,4 @@
-/*
+﻿/*
  * src/lcui_ui.c
  *
  * Copyright (c) 2023-2024, Liu Chao <i@lc-soft.io> All rights reserved.
@@ -30,6 +30,7 @@ typedef struct {
 } lcui_ui_image_loader_t;
 
 static struct lcui_ui_t {
+        bool quit_after_all_windows_closed;
         lcui_ui_image_loader_t image_loader;
         lcui_display_mode_t mode;
         ui_mutation_observer_t *observer;
@@ -42,7 +43,7 @@ static void lcui_dispatch_ui_mouse_event(ui_event_type_t type,
                                          app_event_t *app_evt)
 {
         ui_event_t e = { 0 };
-        float scale = ui_metrics.scale;
+        float scale = ui_server_get_window_scale(app_evt->window);
 
         e.type = type;
         e.mouse.y = (float)round(app_evt->mouse.y / scale);
@@ -65,18 +66,17 @@ static void lcui_dispatch_ui_keyboard_event(ui_event_type_t type,
         ui_dispatch_event(&e);
 }
 
-static void lcui_dispatch_ui_touch_event(app_touch_event_t *touch)
+static void lcui_dispatch_ui_touch_event(app_event_t *app_event)
 {
         size_t i;
-        float scale;
         ui_event_t e = { 0 };
+        float scale = ui_server_get_window_scale(app_event->window);
 
-        scale = ui_metrics.scale;
         e.type = UI_EVENT_TOUCH;
-        e.touch.n_points = touch->n_points;
+        e.touch.n_points = app_event->touch.n_points;
         e.touch.points = malloc(sizeof(ui_touch_point_t) * e.touch.n_points);
         for (i = 0; i < e.touch.n_points; ++i) {
-                switch (touch->points[i].state) {
+                switch (app_event->touch.points[i].state) {
                 case APP_EVENT_TOUCHDOWN:
                         e.touch.points[i].state = UI_EVENT_TOUCHDOWN;
                         break;
@@ -89,8 +89,8 @@ static void lcui_dispatch_ui_touch_event(app_touch_event_t *touch)
                 default:
                         break;
                 }
-                e.touch.points[i].x = (float)round(touch->points[i].x / scale);
-                e.touch.points[i].y = (float)round(touch->points[i].y / scale);
+                e.touch.points[i].x = (float)round(app_event->touch.points[i].x / scale);
+                e.touch.points[i].y = (float)round(app_event->touch.points[i].y / scale);
         }
         ui_dispatch_event(&e);
         ui_event_destroy(&e);
@@ -140,7 +140,7 @@ void lcui_dispatch_ui_event(app_event_t *app_event)
                 lcui_dispatch_ui_mouse_event(UI_EVENT_MOUSEMOVE, app_event);
                 break;
         case APP_EVENT_TOUCH:
-                lcui_dispatch_ui_touch_event(&app_event->touch);
+                lcui_dispatch_ui_touch_event(app_event);
                 break;
         case APP_EVENT_WHEEL:
                 lcui_dispatch_ui_wheel_event(&app_event->wheel);
@@ -160,10 +160,10 @@ size_t lcui_render_ui(void)
 
 void lcui_update_ui(void)
 {
-        ui_update();
-	thread_mutex_lock(&lcui_ui.image_loader.mutex);
+        ui_server_update();
+        thread_mutex_lock(&lcui_ui.image_loader.mutex);
         ui_clear_images();
-	thread_mutex_unlock(&lcui_ui.image_loader.mutex);
+        thread_mutex_unlock(&lcui_ui.image_loader.mutex);
 }
 
 static void lcui_process_ui_mutation(ui_mutation_record_t *mutation)
@@ -201,6 +201,10 @@ static void lcui_on_window_destroy(app_event_t *e, void *arg)
                         list_delete_node(&lcui_ui.windows, node);
                         break;
                 }
+        }
+        if (lcui_ui.quit_after_all_windows_closed &&
+            lcui_ui.windows.length == 0) {
+                lcui_quit();
         }
 }
 
@@ -240,6 +244,7 @@ void lcui_set_ui_display_mode(lcui_display_mode_t mode)
                 ui_mutation_observer_destroy(lcui_ui.observer);
                 lcui_ui.observer = NULL;
         }
+        lcui_ui.quit_after_all_windows_closed = false;
         list_destroy(&lcui_ui.windows, lcui_close_window);
         switch (mode) {
         case LCUI_DISPLAY_MODE_FULLSCREEN:
@@ -268,6 +273,7 @@ void lcui_set_ui_display_mode(lcui_display_mode_t mode)
                 break;
         }
         lcui_ui.mode = mode;
+        lcui_ui.quit_after_all_windows_closed = true;
 }
 
 void lcui_init_ui_preset_widgets(void)
@@ -442,14 +448,14 @@ void lcui_init_ui(void)
         lcui_init_ui_preset_widgets();
         lcui_load_default_fonts();
         app_on_event(APP_EVENT_CLOSE, lcui_on_window_destroy, NULL);
-
 }
 
 void lcui_destroy_ui(void)
 {
         lcui_ui.image_loader.active = false;
+        lcui_ui.quit_after_all_windows_closed = true;
         lcui_ui_image_loader_refresh();
-	thread_join(lcui_ui.image_loader.thread, NULL);
+        thread_join(lcui_ui.image_loader.thread, NULL);
         thread_mutex_destroy(&lcui_ui.image_loader.mutex);
         thread_cond_destroy(&lcui_ui.image_loader.cond);
 

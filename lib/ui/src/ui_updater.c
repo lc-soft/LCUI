@@ -20,6 +20,7 @@
 #include <ui/mutation_observer.h>
 #include <ui/hash.h>
 #include <ui/image.h>
+#include <ui/updater.h>
 #include "ui_debug.h"
 #include "ui_diff.h"
 #include "ui_updater.h"
@@ -29,47 +30,46 @@
 #include "ui_widget_observer.h"
 #include "ui_widget.h"
 
-static struct ui_updater_t {
-        /**
-         * dict_t<hash, css_style_decl_t*>
-         */
-        dict_t* style_cache;
-        ui_metrics_t metrics;
-        bool refresh_all;
-} ui_updater;
+/** dict_t<hash, css_style_decl_t*> */
+static dict_t *ui_style_cache = NULL;
 
-static uint64_t ui_style_dict_hash(const void* key)
+/** list_t<ui_updater_t*> */
+static list_t ui_updaters;
+
+static ui_updater_t *ui_default_updater = NULL;
+
+static uint64_t ui_style_dict_hash(const void *key)
 {
-        return (*(unsigned int*)key);
+        return (*(unsigned int *)key);
 }
 
-static int ui_style_dict_string_key_compare(void* privdata, const void* key1,
-                                            const void* key2)
+static int ui_style_dict_string_key_compare(void *privdata, const void *key1,
+                                            const void *key2)
 {
-        return *(unsigned int*)key1 == *(unsigned int*)key2;
+        return *(unsigned int *)key1 == *(unsigned int *)key2;
 }
 
-static void ui_style_dict_string_key_free(void* privdata, void* key)
+static void ui_style_dict_string_key_free(void *privdata, void *key)
 {
         free(key);
 }
 
-static void* ui_style_dict_string_key_dup(void* privdata, const void* key)
+static void *ui_style_dict_string_key_dup(void *privdata, const void *key)
 {
-        unsigned int* newkey = malloc(sizeof(unsigned int));
-        *newkey = *(unsigned int*)key;
+        unsigned int *newkey = malloc(sizeof(unsigned int));
+        *newkey = *(unsigned int *)key;
         return newkey;
 }
 
-static void ui_style_dict_val_free(void* privdata, void* val)
+static void ui_style_dict_val_free(void *privdata, void *val)
 {
         css_style_decl_destroy(val);
 }
 
-void ui_widget_request_refresh_children(ui_widget_t* widget)
+void ui_widget_request_refresh_children(ui_widget_t *widget)
 {
-        ui_widget_t* child;
-        list_node_t* node;
+        ui_widget_t *child;
+        list_node_t *node;
 
         widget->update.should_update_children = true;
         for (list_each(node, &widget->children)) {
@@ -79,7 +79,7 @@ void ui_widget_request_refresh_children(ui_widget_t* widget)
         }
 }
 
-void ui_widget_request_update(ui_widget_t* w)
+void ui_widget_request_update(ui_widget_t *w)
 {
         w->update.should_update_self = true;
         for (w = w->parent; w; w = w->parent) {
@@ -87,7 +87,7 @@ void ui_widget_request_update(ui_widget_t* w)
         }
 }
 
-void ui_widget_set_rules(ui_widget_t* w, const ui_widget_rules_t* rules)
+void ui_widget_set_rules(ui_widget_t *w, const ui_widget_rules_t *rules)
 {
         ui_widget_use_extra_data(w);
         if (rules) {
@@ -99,12 +99,12 @@ void ui_widget_set_rules(ui_widget_t* w, const ui_widget_rules_t* rules)
         w->extra->default_max_update_count = 2048;
 }
 
-static void ui_widget_update_stacking_context(ui_widget_t* w)
+static void ui_widget_update_stacking_context(ui_widget_t *w)
 {
         ui_widget_t *child, *target;
         css_computed_style_t *s, *ts;
         list_node_t *node, *target_node;
-        list_t* list;
+        list_t *list;
 
         list = &w->stacking_context;
         list_destroy_without_node(list, NULL);
@@ -139,20 +139,20 @@ static void ui_widget_update_stacking_context(ui_widget_t* w)
         }
 }
 
-static void ui_widget_match_style(ui_widget_t* w)
+static void ui_widget_match_style(ui_widget_t *w)
 {
-        css_selector_t* selector;
-        css_style_decl_t* style;
+        css_selector_t *selector;
+        css_style_decl_t *style;
 
         if (w->hash && w->update.should_refresh_style) {
                 ui_widget_generate_self_hash(w);
         }
         if (w->hash) {
-                style = dict_fetch_value(ui_updater.style_cache, &w->hash);
+                style = dict_fetch_value(ui_style_cache, &w->hash);
                 if (!style) {
                         selector = ui_widget_create_selector(w);
                         style = css_select_style_with_cache(selector);
-                        dict_add(ui_updater.style_cache, &w->hash, style);
+                        dict_add(ui_style_cache, &w->hash, style);
                         css_selector_destroy(selector);
                 }
                 w->matched_style = style;
@@ -163,7 +163,7 @@ static void ui_widget_match_style(ui_widget_t* w)
         }
 }
 
-static size_t ui_widget_update_visible_children(ui_widget_t* w)
+static size_t ui_widget_update_visible_children(ui_updater_t *updater, ui_widget_t *w)
 {
         size_t total = 0, count;
         bool found = false;
@@ -209,7 +209,7 @@ static size_t ui_widget_update_visible_children(ui_widget_t* w)
                         continue;
                 }
                 found = true;
-                count = ui_widget_update(child);
+                count = ui_updater_update_widget(updater, child);
                 if (ui_widget_has_update(child)) {
                         w->update.should_update_children = true;
                 }
@@ -219,11 +219,11 @@ static size_t ui_widget_update_visible_children(ui_widget_t* w)
         return total;
 }
 
-static size_t ui_widget_update_children(ui_widget_t* w)
+static size_t ui_updater_update_children(ui_updater_t *updater, ui_widget_t *w)
 {
         clock_t msec = 0;
-        ui_widget_t* child;
-        ui_widget_rules_t* rules;
+        ui_widget_t *child;
+        ui_widget_rules_t *rules;
         list_node_t *node, *next;
         size_t total = 0, update_count = 0, count;
 
@@ -240,7 +240,7 @@ static size_t ui_widget_update_children(ui_widget_t* w)
                 }
                 DEBUG_MSG("%s %s: is visible\n", w->type, w->id);
                 if (rules->first_update_visible_children) {
-                        total += ui_widget_update_visible_children(w);
+                        total += ui_widget_update_visible_children(updater, w);
                         DEBUG_MSG("first update visible children "
                                   "count: %zu\n",
                                   total);
@@ -252,7 +252,7 @@ static size_t ui_widget_update_children(ui_widget_t* w)
         while (node) {
                 child = node->data;
                 next = node->next;
-                count = ui_widget_update(child);
+                count = ui_updater_update_widget(updater, child);
                 if (ui_widget_has_update(child)) {
                         w->update.should_update_children = true;
                 }
@@ -304,12 +304,12 @@ static size_t ui_widget_update_children(ui_widget_t* w)
         return total;
 }
 
-static void ui_widget_update_size(ui_widget_t* w)
+static void ui_widget_update_size(ui_widget_t *w)
 {
         css_unit_t unit;
         css_numeric_value_t limit;
-        css_computed_style_t* src = &w->specified_style;
-        css_computed_style_t* dest = &w->computed_style;
+        css_computed_style_t *src = &w->specified_style;
+        css_computed_style_t *dest = &w->computed_style;
 
         CSS_COPY_LENGTH(dest, src, width);
         CSS_COPY_LENGTH(dest, src, height);
@@ -337,17 +337,18 @@ static void ui_widget_update_size(ui_widget_t* w)
         }
 }
 
-size_t ui_widget_update(ui_widget_t* w)
+size_t ui_updater_update_widget(ui_updater_t *updater, ui_widget_t *w)
 {
         size_t count = 0;
         ui_style_diff_t style_diff = { 0 };
 
-        if (ui_updater.refresh_all) {
+        if (updater->refresh_all) {
                 w->update.should_update_children = true;
                 w->update.should_refresh_style = true;
                 w->update.should_reflow = true;
         }
         if (ui_widget_has_update(w)) {
+                count = 1;
                 if (w->proto && w->proto->update) {
                         w->proto->update(w, UI_TASK_BEFORE_UPDATE);
                 }
@@ -360,7 +361,7 @@ size_t ui_widget_update(ui_widget_t* w)
                 }
                 if (w->update.should_update_style) {
                         ui_style_diff_init(&style_diff, w);
-                        if (!ui_updater.refresh_all) {
+                        if (!updater->refresh_all) {
                                 ui_style_diff_begin(&style_diff, w);
                         }
                         ui_widget_update_style(w);
@@ -375,7 +376,7 @@ size_t ui_widget_update(ui_widget_t* w)
                 }
         }
         if (w->update.should_update_children) {
-                count += ui_widget_update_children(w);
+                count += ui_updater_update_children(updater, w);
         }
         if (w->update.should_reflow) {
                 if (w->parent && ui_widget_in_layout_flow(w)) {
@@ -398,14 +399,9 @@ size_t ui_widget_update(ui_widget_t* w)
         return count;
 }
 
-void ui_refresh_style(void)
+static void ui_process_mutations(ui_widget_t *w)
 {
-        ui_updater.refresh_all = true;
-}
-
-static void ui_process_mutations(ui_widget_t* w)
-{
-        ui_mutation_record_t* record;
+        ui_mutation_record_t *record;
         ui_mutation_record_type_t type = UI_MUTATION_RECORD_TYPE_PROPERTIES;
 
         if (w->parent) {
@@ -470,22 +466,58 @@ static void ui_process_mutations(ui_widget_t* w)
         w->update.border_box_backup = w->border_box;
 }
 
-void ui_update(void)
+ui_updater_t *ui_updater_create(void)
 {
-        ui_widget_t *root = ui_root();
-        if (memcmp(&ui_metrics, &ui_updater.metrics, sizeof(ui_metrics_t))) {
-                ui_updater.refresh_all = true;
+        ui_updater_t *updater = malloc(sizeof(ui_updater_t));
+
+        updater->refresh_all = true;
+        updater->metrics = ui_metrics;
+        updater->node.data = updater;
+        updater->node.prev = updater->node.next = NULL;
+        list_append_node(&ui_updaters, &updater->node);
+        return updater;
+}
+
+void ui_updater_destroy(ui_updater_t *updater)
+{
+        list_unlink(&ui_updaters, &updater->node);
+        free(updater);
+}
+
+void ui_updater_update(ui_updater_t *updater, ui_widget_t *root)
+{
+        if (memcmp(&ui_metrics, &updater->metrics, sizeof(ui_metrics_t))) {
+                updater->refresh_all = true;
                 root->rendering.dirty_rect_type = UI_DIRTY_RECT_TYPE_FULL;
         }
         ui_process_image_events();
         ui_process_events();
-        ui_widget_update(root);
-        ui_updater.metrics = ui_metrics;
-        ui_updater.refresh_all = false;
+        ui_updater_update_widget(updater, root);
+        updater->metrics = ui_metrics;
+        updater->refresh_all = false;
         ui_process_mutations(root);
         ui_process_mutation_observers();
         ui_process_events();
         ui_clear_trash();
+}
+
+void ui_update(void)
+{
+        ui_updater_update(ui_default_updater, ui_root());
+}
+
+size_t ui_widget_update(ui_widget_t *w)
+{
+        return ui_updater_update_widget(ui_default_updater, w);
+}
+
+void ui_refresh_style(void)
+{
+        list_node_t *node;
+
+        for (list_each(node, &ui_updaters)) {
+                ((ui_updater_t *)node->data)->refresh_all = true;
+        }
 }
 
 void ui_init_updater(void)
@@ -498,12 +530,13 @@ void ui_init_updater(void)
         type.hash_function = ui_style_dict_hash;
         type.key_destructor = ui_style_dict_string_key_free;
         type.val_destructor = ui_style_dict_val_free;
-        ui_updater.refresh_all = true;
-        ui_updater.style_cache = dict_create(&type, NULL);
+        ui_style_cache = dict_create(&type, NULL);
+        list_create(&ui_updaters);
+        ui_default_updater = ui_updater_create();
 }
 
 void ui_destroy_updater(void)
 {
-        dict_destroy(ui_updater.style_cache);
-        ui_updater.style_cache = NULL;
+        dict_destroy(ui_style_cache);
+        ui_style_cache = NULL;
 }

@@ -210,14 +210,17 @@ static void ui_widget_collect_dirty_rect(ui_widget_t *w, list_t *rects, float x,
         w->rendering.has_child_dirty_rect = false;
 }
 
+/**
+ * @param rects list_t<pd_rect_t*>
+ */
 size_t ui_widget_get_dirty_rects(ui_widget_t *w, list_t *rects)
 {
         pd_rect_t *rect;
         list_node_t *node;
 
-        float scale = ui_get_actual_scale();
-        int x = y_iround(w->padding_box.x * scale);
-        int y = y_iround(w->padding_box.y * scale);
+        int x = ui_compute(w->padding_box.x);
+        int y = ui_compute(w->padding_box.y);
+        
 
         ui_widget_collect_dirty_rect(w, rects, 0, 0, w->padding_box);
         for (list_each(node, rects)) {
@@ -298,9 +301,9 @@ static ui_renderer_t *ui_renderer_create(ui_widget_t *w, pd_context_t *paint,
         that->can_render_content =
             pd_rect_overlap(&that->style->padding_box, &that->actual_paint_rect,
                             &that->actual_content_rect);
-        ;
-        ui_convert_rect(&that->actual_content_rect, &that->content_rect,
-                        1.0f / ui_metrics.scale);
+        
+        ui_rect_from_pd_rect(&that->content_rect, &that->actual_content_rect, 
+                        ui_get_actual_scale());
         DEBUG_MSG("[%s] content_rect: (%d, %d, %d, %d)\n", w->id,
                   that->actual_content_rect.x, that->actual_content_rect.y,
                   that->actual_content_rect.width,

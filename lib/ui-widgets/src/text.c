@@ -78,12 +78,12 @@ static void ui_text_on_update_content(ui_widget_t *w)
         list_node_t *node;
         ui_rect_t rect;
         ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
-        float scale = ui_metrics.scale;
+        float scale = ui_get_actual_scale();
 
         list_create(&rects);
         pd_text_update(txt->layer, &rects);
         for (list_each(node, &rects)) {
-                ui_convert_rect(node->data, &rect, 1.0f / scale);
+                ui_rect_from_pd_rect(&rect, node->data, scale);
                 ui_widget_mark_dirty_rect(w, &rect, UI_BOX_TYPE_CONTENT_BOX);
         }
         pd_rects_clear(&rects);
@@ -212,14 +212,14 @@ static void ui_text_on_auto_size(ui_widget_t *w, float *width, float *height,
         pd_text_set_max_size(txt->layer, ui_compute(max_width),
                              ui_compute(max_height));
         pd_text_update(txt->layer, &rects);
-        *width = pd_text_get_width(txt->layer) / ui_metrics.scale;
-        *height = pd_text_get_height(txt->layer) / ui_metrics.scale;
+        *width = pd_text_get_width(txt->layer) / ui_get_actual_scale();
+        *height = pd_text_get_height(txt->layer) / ui_get_actual_scale();
         pd_rects_clear(&rects);
 }
 
 static void ui_text_on_resize(ui_widget_t *w, float width, float height)
 {
-        float scale = ui_metrics.scale;
+        float scale = ui_get_actual_scale();
         int fixed_width = (int)(width * scale);
         int fixed_height = (int)(height * scale);
 
@@ -234,7 +234,7 @@ static void ui_text_on_resize(ui_widget_t *w, float width, float height)
         pd_text_set_max_size(txt->layer, fixed_width, fixed_height);
         pd_text_update(txt->layer, &rects);
         for (list_each(node, &rects)) {
-                ui_convert_rect(node->data, &rect, 1.0f / scale);
+                ui_rect_from_pd_rect(&rect, node->data, scale);
                 ui_widget_mark_dirty_rect(w, &rect, UI_BOX_TYPE_CONTENT_BOX);
         }
         pd_rects_clear(&rects);
@@ -247,7 +247,6 @@ static void ui_text_on_paint(ui_widget_t *w, pd_context_t *paint,
         pd_canvas_t canvas;
         pd_rect_t content_rect, rect;
         ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
-        ;
 
         content_rect.width = style->content_box.width;
         content_rect.height = style->content_box.height;
@@ -314,9 +313,7 @@ int ui_text_set_content(ui_widget_t *w, const char *utf8_text)
         wstr = malloc(sizeof(wchar_t) * len);
         decode_utf8(wstr, utf8_text, len);
         ret = ui_text_set_content_w(w, wstr);
-        if (wstr) {
-                free(wstr);
-        }
+        free(wstr);
         return ret;
 }
 
