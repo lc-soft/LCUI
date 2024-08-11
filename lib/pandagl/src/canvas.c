@@ -118,7 +118,7 @@ void pd_canvas_destroy(pd_canvas_t *canvas)
 int pd_canvas_create(pd_canvas_t *canvas, unsigned width, unsigned height)
 {
 	size_t size;
-	if (width > 10000 || height > 10000) {
+	if (width > 100000 || height > 100000) {
 		logger_error("canvas size is too large!");
 		abort();
 	}
