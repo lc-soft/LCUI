@@ -43,7 +43,7 @@ jobs:
 
       - name: Build
         run: |
-          xmake -w
+          xmake
           xmake build yutil_test
           xmake build pandagl_tests
           xmake build libcss_tests
@@ -78,7 +78,7 @@ jobs:
       - name: Build for release
         run: |
           xmake config -y -v -k ${{ env.TARGET_KIND }} -m release
-          xmake -w
+          xmake
 
       - name: Package
         run: |
