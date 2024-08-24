@@ -14,6 +14,7 @@
 #include <windows.h>
 #include <process.h>
 #include <yutil.h>
+#include <stdbool.h>
 #include "thread.h"
 
 typedef union thread_mutex_record_t {
