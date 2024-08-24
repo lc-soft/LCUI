@@ -215,7 +215,6 @@ static void lcui_close_window(void *arg)
 
 void lcui_set_ui_display_mode(lcui_display_mode_t mode)
 {
-        float scale;
         app_window_t *wnd;
         list_node_t *node;
         ui_mutation_observer_init_t options = { 0 };
@@ -248,7 +247,6 @@ void lcui_set_ui_display_mode(lcui_display_mode_t mode)
         list_destroy(&lcui_ui.windows, lcui_close_window);
         switch (mode) {
         case LCUI_DISPLAY_MODE_FULLSCREEN:
-                scale = ui_get_actual_scale();
                 wnd = app_window_create(NULL, 0, 0, 0, 0, NULL);
                 list_append(&lcui_ui.windows, wnd);
                 ui_server_connect(ui_root(), wnd);
