@@ -58,7 +58,7 @@ struct xml_parser_t {
         code = CODE; \
         goto exit;
 
-static void xmlPrintErrorMessage(xmlErrorPtr err)
+static void xmlPrintErrorMessage(const xmlError *err)
 {
         logger_error("[builder] %s (%d): error %d: %s\n",
                      err->file ? err->file : "(memory)", err->line, err->code,
