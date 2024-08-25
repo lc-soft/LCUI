@@ -21,7 +21,7 @@ typedef struct TouchPointBindingRec_ {
 	int point_id;        /**< 触点 ID */
 	ui_widget_t *widget; /**< 部件 */
 	list_node_t node;    /**< 在链表中的结点 */
-	LCUI_BOOL is_valid;  /**< 是否有效 */
+	bool is_valid;  /**< 是否有效 */
 } TouchPointBindingRec, *TouchPointBinding;
 
 /** 触点绑定记录列表 */
@@ -68,7 +68,7 @@ static void OnTouch(app_event_t *e, void *arg)
 
 	for (i = 0; i < e->touch.n_points; ++i) {
 		TouchPointBinding binding;
-		LCUI_BOOL is_existed = false;
+		bool is_existed = false;
 		point = &e->touch.points[i];
 		_DEBUG_MSG("point: %d\n", point->id);
 		/* 检查该触点是否已经被绑定 */

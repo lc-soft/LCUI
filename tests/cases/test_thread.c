@@ -17,8 +17,8 @@
 typedef struct TestWorkerRec_ {
 	char data[32];
 	int data_count;
-	LCUI_BOOL cancel;
-	LCUI_BOOL active;
+	bool cancel;
+	bool active;
 	thread_cond_t cond;
 	thread_mutex_t mutex;
 	thread_t thread;

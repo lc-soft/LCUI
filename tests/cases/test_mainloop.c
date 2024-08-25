@@ -47,7 +47,7 @@ static void OnTriggerBtnClick(void *arg)
 static void ObserverThread(void *arg)
 {
 	int i;
-	LCUI_BOOL *exited = arg;
+	bool *exited = arg;
 
 	for (i = 0; i < 20 && !*exited; ++i) {
 		sleep_ms(100);
@@ -64,7 +64,7 @@ void test_mainloop(void)
 {
 	thread_t tid;
 	ui_widget_t *btn;
-	LCUI_BOOL exited = false;
+	bool exited = false;
 
 	lcui_init();
 	btn = ui_create_widget("button");
