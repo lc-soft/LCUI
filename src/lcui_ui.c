@@ -450,14 +450,6 @@ void lcui_init_ui(void)
 
 void lcui_destroy_ui(void)
 {
-        lcui_ui.image_loader.active = false;
-        lcui_ui.quit_after_all_windows_closed = true;
-        lcui_ui_image_loader_refresh();
-        thread_join(lcui_ui.image_loader.thread, NULL);
-        thread_mutex_destroy(&lcui_ui.image_loader.mutex);
-        thread_cond_destroy(&lcui_ui.image_loader.cond);
-
-        lcui_destroy_ui_preset_widgets();
         app_off_event(APP_EVENT_CLOSE, lcui_on_window_destroy);
         list_destroy(&lcui_ui.windows, lcui_close_window);
         if (lcui_ui.observer) {
@@ -465,6 +457,13 @@ void lcui_destroy_ui(void)
                 ui_mutation_observer_destroy(lcui_ui.observer);
                 lcui_ui.observer = NULL;
         }
+        lcui_ui.image_loader.active = false;
+        lcui_ui.quit_after_all_windows_closed = true;
+        lcui_ui_image_loader_refresh();
+        thread_join(lcui_ui.image_loader.thread, NULL);
+        thread_mutex_destroy(&lcui_ui.image_loader.mutex);
+        thread_cond_destroy(&lcui_ui.image_loader.cond);
+        lcui_destroy_ui_preset_widgets();
         ui_server_destroy();
         ui_destroy();
 }
