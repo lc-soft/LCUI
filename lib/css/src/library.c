@@ -97,8 +97,7 @@ static void css_style_cache_destructor(void *privdata, void *val)
         css_style_decl_destroy(val);
 }
 
-bool css_selector_node_match(css_selector_node_t *sn1,
-                                      css_selector_node_t *sn2)
+bool css_selector_node_match(css_selector_node_t *sn1, css_selector_node_t *sn2)
 {
         int i, j;
         if (sn2->id) {
@@ -278,7 +277,7 @@ static css_style_decl_t *css_find_style_store(css_selector_t *selector,
                 } else {
                         strcpy(fullname, buf);
                         len = snprintf(buf, CSS_SELECTOR_MAX_LEN, "%s %s",
-                                 sn->fullname, fullname);
+                                       sn->fullname, fullname);
                         if (len < 0) {
                                 logger_error("[css-library] %s: "
                                              "selector(%s...) too long\n",
@@ -327,6 +326,10 @@ int css_add_style_decl(css_selector_t *selector, const css_style_decl_t *style,
         return 0;
 }
 
+/**
+ * 从指定样式链接记录中查找样式表
+ * @param[out] outlist 输出样式表列表，按照权重从大到小排序
+ */
 static size_t css_style_link_get_styles(css_style_link_t *link, list_t *outlist)
 {
         size_t i;
@@ -361,27 +364,27 @@ static size_t css_style_link_get_styles(css_style_link_t *link, list_t *outlist)
 }
 
 static size_t css_query_selector_from_link(css_style_link_t *link,
-                                           const css_selector_t *s, int i,
-                                           list_t *list)
+                                           const css_selector_t *selector,
+                                           int i, list_t *list)
 {
         size_t count = 0;
         css_style_link_t *parent;
         list_t names;
         list_node_t *node;
-        css_selector_node_t *sn;
+        css_selector_node_t *selector_node;
 
         list_create(&names);
         count += css_style_link_get_styles(link, list);
         while (--i >= 0) {
-                sn = s->nodes[i];
-                css_selector_node_get_name_list(sn, &names);
+                selector_node = selector->nodes[i];
+                css_selector_node_get_name_list(selector_node, &names);
                 for (list_each(node, &names)) {
                         parent = dict_fetch_value(link->parents, node->data);
                         if (!parent) {
                                 continue;
                         }
-                        count +=
-                            css_query_selector_from_link(parent, s, i, list);
+                        count += css_query_selector_from_link(parent, selector,
+                                                              i, list);
                 }
                 list_destroy(&names, free);
         }
@@ -389,40 +392,41 @@ static size_t css_query_selector_from_link(css_style_link_t *link,
 }
 
 int css_query_selector_from_group(int group, const char *name,
-                                  const css_selector_t *s, list_t *list)
+                                  const css_selector_t *selector, list_t *list)
 {
         int i;
         size_t count;
         dict_t *groups;
-        css_style_link_group_t *slg;
+        css_style_link_group_t *link_group;
         list_node_t *node;
         list_t names;
 
         groups = list_get(&css_library.groups, group);
-        if (!groups || s->length < 1) {
+        if (!groups || selector->length < 1) {
                 return 0;
         }
         count = 0;
-        i = s->length - 1;
+        i = selector->length - 1;
         list_create(&names);
         if (name) {
                 list_append(&names, strdup2(name));
         } else {
-                css_selector_node_get_name_list(s->nodes[i], &names);
+                css_selector_node_get_name_list(selector->nodes[i], &names);
                 list_append(&names, strdup2("*"));
         }
         for (list_each(node, &names)) {
                 dict_entry_t *entry;
                 dict_iterator_t *iter;
                 char *name = node->data;
-                slg = dict_fetch_value(groups, name);
-                if (!slg) {
+                link_group = dict_fetch_value(groups, name);
+                if (!link_group) {
                         continue;
                 }
-                iter = dict_get_iterator(slg->links);
+                iter = dict_get_iterator(link_group->links);
                 while ((entry = dict_next(iter))) {
                         css_style_link_t *link = dict_get_val(entry);
-                        count += css_query_selector_from_link(link, s, i, list);
+                        count += css_query_selector_from_link(link, selector, i,
+                                                              list);
                 }
                 dict_destroy_iterator(iter);
         }
@@ -462,7 +466,7 @@ void css_each_style_rule(void (*callback)(css_style_rule_t *, const char *,
 {
         dict_t *group;
         css_style_link_t *link;
-        css_style_link_group_t *slg;
+        css_style_link_group_t *link_group;
         dict_iterator_t *iter;
         dict_entry_t *entry;
 
@@ -473,8 +477,8 @@ void css_each_style_rule(void (*callback)(css_style_rule_t *, const char *,
                 dict_entry_t *entry_slg;
                 dict_iterator_t *iter_slg;
 
-                slg = dict_get_val(entry);
-                iter_slg = dict_get_iterator(slg->links);
+                link_group = dict_get_val(entry);
+                iter_slg = dict_get_iterator(link_group->links);
                 while ((entry_slg = dict_next(iter_slg))) {
                         link = dict_get_val(entry_slg);
                         css_each_style_link(link, NULL, callback, data);
@@ -499,6 +503,11 @@ css_style_decl_t *css_select_style(const css_selector_t *s)
         }
         list_destroy(&list, NULL);
         return style;
+}
+
+size_t css_get_groups_length(void)
+{
+        return css_library.groups.length;
 }
 
 css_style_decl_t *css_select_style_with_cache(const css_selector_t *s)
@@ -545,9 +554,8 @@ static void css_dump_style_rule(css_style_rule_t *rule,
         css_dump_context_t *ctx = data;
 
         DUMPF("\n[%s]", rule->space ? rule->space : "<none>");
-        DUMPF("[rank: %d]\n%s {\n", rule->rank, selector_text);
+        DUMPF("[rank: %d]\n%s ", rule->rank, selector_text);
         css_dump_style_decl(rule->list, ctx);
-        DUMP("}\n");
 }
 
 static void css_dump_style_rules(css_dump_context_t *ctx)

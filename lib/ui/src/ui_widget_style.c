@@ -79,7 +79,7 @@ size_t ui_widget_get_children_style_changes(ui_widget_t *w, int type,
                                             const char *name)
 {
         css_selector_t *s;
-        list_t snames;
+        list_t selector_names;
         list_node_t *node;
 
         size_t i, n, len;
@@ -96,7 +96,7 @@ size_t ui_widget_get_children_style_changes(ui_widget_t *w, int type,
         default:
                 return 0;
         }
-        list_create(&snames);
+        list_create(&selector_names);
         s = ui_widget_create_selector(w);
         n = strsplit(name, " ", &names);
         /* 为分割出来的字符串加上前缀 */
@@ -108,12 +108,13 @@ size_t ui_widget_get_children_style_changes(ui_widget_t *w, int type,
                 free(names[i]);
                 names[i] = str;
         }
-        css_selector_node_get_name_list(s->nodes[s->length - 1], &snames);
-        for (list_each(node, &snames)) {
-                char *sname = node->data;
+        css_selector_node_get_name_list(s->nodes[s->length - 1],
+                                        &selector_names);
+        for (list_each(node, &selector_names)) {
+                char *selector_name = node->data;
                 /* 过滤掉不包含 name 中存在的名称 */
                 for (i = 0; i < n; ++i) {
-                        char *p = strstr(sname, names[i]);
+                        char *p = strstr(selector_name, names[i]);
                         if (p) {
                                 p += strlen(names[i]);
                                 switch (*p) {
@@ -127,13 +128,16 @@ size_t ui_widget_get_children_style_changes(ui_widget_t *w, int type,
                                 break;
                         }
                 }
-                if (i < n) {
-                        count +=
-                            css_query_selector_from_group(1, sname, s, NULL);
+                if (i == n) {
+                        continue;
+                }
+                for (i = 1; i < css_get_groups_length(); ++i) {
+                        count += css_query_selector_from_group(
+                            (int)i, selector_name, s, NULL);
                 }
         }
         css_selector_destroy(s);
-        list_destroy(&snames, free);
+        list_destroy(&selector_names, free);
         for (i = 0; names[i]; ++i) {
                 free(names[i]);
         }
