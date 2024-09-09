@@ -44,7 +44,7 @@ void css_style_parser_init(css_style_parser_t *parser, const char *space)
 	parser->style_handler = NULL;
 	parser->style_handler_arg = NULL;
 	list_create(&parser->selectors);
-	if (parser->space) {
+	if (space) {
 		parser->space = strdup2(space);
 		parser->dirname = getdirname(parser->space);
 	} else {
