@@ -1179,6 +1179,7 @@ static void pd_text_render_line(pd_text_t *text, pd_rect_t *area,
                         continue;
                 }
                 if (x + ch->bitmap->metrics.hori_advance < area->x) {
+                        x += ch->bitmap->metrics.hori_advance;
                         continue;
                 }
                 pen.x = layer_pos.x + x;
@@ -1192,8 +1193,8 @@ static void pd_text_render_line(pd_text_t *text, pd_rect_t *area,
                         pd_canvas_fill_rect(graph, ch->style->back_color, rect);
                 }
                 pen.x += ch->bitmap->left;
-                pen.y += (line->height - ch->bitmap->metrics.bbox_height) /
-                2 + ch->bitmap->metrics.ascender - ch->bitmap->top;
+                pen.y += (line->height - ch->bitmap->metrics.bbox_height) / 2 +
+                         ch->bitmap->metrics.ascender - ch->bitmap->top;
                 pd_text_render_char(text, ch, graph, pen);
                 x += ch->bitmap->metrics.hori_advance;
         }
