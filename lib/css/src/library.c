@@ -541,9 +541,9 @@ void css_init_library(void)
 
 void css_destroy_library(void)
 {
+        list_destroy(&css_library.groups, (list_item_destructor_t)dict_destroy);
         dict_destroy(css_library.cache);
         strpool_destroy(css_library.strpool);
-        list_destroy(&css_library.groups, (list_item_destructor_t)dict_destroy);
         css_library.strpool = NULL;
         css_library.cache = NULL;
 }
