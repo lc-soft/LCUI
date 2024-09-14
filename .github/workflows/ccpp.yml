@@ -43,7 +43,7 @@ jobs:
 
       - name: Build
         run: |
-          xmake -w
+          xmake
           xmake build yutil_test
           xmake build pandagl_tests
           xmake build libcss_tests
@@ -51,7 +51,7 @@ jobs:
           xmake build libi18n-tests
           xmake build lcui_tests
 
-      - name: Run tests with memcheck
+      - name: Run tests for libraries with memcheck
         if: runner.os == 'Linux'
         run: |
           xmake run pandagl_tests
@@ -59,7 +59,11 @@ jobs:
           xmake run libcss_tests --memcheck
           xmake run libui-router-tests --memcheck
           xmake run libi18n-tests --memcheck
-          xmake run lcui_tests --memcheck
+
+      - name: Run tests for lcui with memcheck
+        if: runner.os == 'Linux'
+        run: |
+            xmake run lcui_tests --memcheck
 
       - name: Run tests
         if: runner.os == 'Windows'
@@ -78,7 +82,7 @@ jobs:
       - name: Build for release
         run: |
           xmake config -y -v -k ${{ env.TARGET_KIND }} -m release
-          xmake -w
+          xmake
 
       - name: Package
         run: |
@@ -86,10 +90,9 @@ jobs:
           xmake install -o dist/lcui-package
 
       - name: Build examples
-        continue-on-error: true
         run: |
           cd examples
-          xmake config -P . -y
+          xmake config -P . -y -v
           xmake build -P . -v
           xmake install -P . -o ../dist/lcui-examples
           mv ../dist/lcui-examples/bin/* ../dist/lcui-examples/
