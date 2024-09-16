@@ -153,6 +153,13 @@ static void fb_app_init_root_window(void)
                                fbapp.screen_height);
 }
 
+static void fb_app_destroy_root_window(void)
+{
+        app_window_t *wnd = &fbapp.window;
+
+        list_destroy(&wnd->rects, free);
+}
+
 static void fb_app_init_canvas(void)
 {
         fbapp.canvas.width = fbapp.screen_width;
@@ -491,6 +498,7 @@ static int fb_app_destroy(void)
                 pd_canvas_destroy(&fbapp.window.canvas);
                 break;
         }
+        fb_app_destroy_root_window();
         close(fbapp.fb.dev_fd);
         fbapp.fb.mem = NULL;
         fbapp.fb.mem_len = 0;
