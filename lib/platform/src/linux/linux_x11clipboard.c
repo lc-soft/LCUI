@@ -52,42 +52,21 @@ static struct x11_clipboard_module_t {
         Atom xa_string;
         Atom xa_targets;
         Atom xa_text;
-        // Observer thread
+
         thread_t observer_thread;
+        bool observer_thread_active;
 } x11_clipboard;
 
-void x11_clipboard_execute_action(bool timed_out)
+void x11_clipboard_notify(clipboard_t *cb)
 {
-        wchar_t *wstr = NULL;
-        clipboard_t clipboard_data = { 0 };
         clipboard_action_t *action = x11_clipboard.action;
 
-        if (!timed_out) {
-                logger_debug("Didn't time out canceling observer thread\n");
-                thread_cancel(x11_clipboard.observer_thread);
-        }
-
         if (!action->running) {
-                logger_debug("Tried to x11_clipboard_execute_action before "
+                logger_debug("Tried to x11_clipboard_notify before "
                              "copying started\n");
                 return;
         }
-        if (timed_out) {
-                logger_debug("action timed out\n");
-        } else {
-                size_t len = x11_clipboard.text_len + 1;
-                wstr = malloc(sizeof(wchar_t) * len);
-                len = decode_utf8(wstr, x11_clipboard.text, len);
-                wstr[len] = 0;
-                // Assign the data
-                clipboard_data.text = wstr;
-                clipboard_data.len = len;
-                clipboard_data.image = NULL;
-        }
-        action->callback(&clipboard_data, action->arg);
-        if (wstr != NULL) {
-                free(wstr);
-        }
+        action->callback(cb, action->arg);
         // Reset properties, so if something goes wrongly, we crash
         // instead of having undefined behaviour
         action->arg = NULL;
@@ -95,11 +74,36 @@ void x11_clipboard_execute_action(bool timed_out)
         action->running = false;
 }
 
+void x11_clipboard_execute_action(void)
+{
+        clipboard_t clipboard_data = { 0 };
+        size_t len = x11_clipboard.text_len + 1;
+        wchar_t *wstr = malloc(sizeof(wchar_t) * len);
+
+        len = decode_utf8(wstr, x11_clipboard.text, len);
+        wstr[len] = 0;
+        // Assign the data
+        clipboard_data.text = wstr;
+        clipboard_data.len = len;
+        clipboard_data.image = NULL;
+        x11_clipboard.observer_thread_active = false;
+        x11_clipboard_notify(&clipboard_data);
+        free(wstr);
+}
+
 void x11_clipboard_request_timeout(void *arg)
 {
-        sleep_ms(CLIPBOARD_TIMEOUT);
-        if (x11_clipboard.action->running) {
-                x11_clipboard_execute_action(true);
+        int ms;
+        clipboard_t clipboard_data = { 0 };
+
+        for (ms = 0;
+             ms <= CLIPBOARD_TIMEOUT && x11_clipboard.observer_thread_active;
+             ms += 100) {
+                sleep_ms(100);
+        }
+        if (x11_clipboard.observer_thread_active) {
+                logger_debug("action timed out\n");
+                x11_clipboard_notify(&clipboard_data);
         }
 }
 
@@ -168,13 +172,14 @@ int x11_clipboard_request_text(clipboard_callback_t callback, void *arg)
         // This branch will only get executed once we implement copy event
         if (clipboard_owner == window) {
                 logger_debug("Clipboard owned by self\n");
-                x11_clipboard_execute_action(false);
+                x11_clipboard_execute_action();
                 return 0;
         }
         if (clipboard_owner == None) {
                 logger_debug("Clipboard owner not found\n");
                 return 1;
         }
+        x11_clipboard.observer_thread_active = true;
         // @WhoAteDaCake
         // TODO: needs error handling if we can't access the clipboard?
         // TODO: some other implementations will try XA_STRING if no text was
@@ -220,7 +225,7 @@ static void x11_clipboard_on_notify(app_native_event_t *ev, void *arg)
                 XDeleteProperty(x_ev->xselection.display,
                                 x_ev->xselection.requestor,
                                 x_ev->xselection.property);
-                x11_clipboard_execute_action(false);
+                x11_clipboard_execute_action();
         }
 }
 
@@ -318,6 +323,8 @@ void x11_clipboard_destroy(void)
         app_off_native_event(SelectionNotify, x11_clipboard_on_notify);
         app_off_native_event(SelectionClear, x11_clipboard_on_clear);
         app_off_native_event(SelectionRequest, x11_clipboard_on_request);
+        x11_clipboard.observer_thread_active = false;
+        thread_join(x11_clipboard.observer_thread, NULL);
 }
 
 #endif
