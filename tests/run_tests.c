@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <wchar.h>
 #include <LCUI.h>
-#include <platform/main.h>
+#include <ptk/main.h>
 #include <ctest-custom.h>
 #include "run_tests.h"
 

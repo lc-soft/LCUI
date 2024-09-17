@@ -13,7 +13,7 @@ add_includedirs(
     "lib/thread/include",
     "lib/css/include",
     "lib/i18n/include",
-    "lib/platform/include",
+    "lib/ptk/include",
     "lib/worker/include",
     "lib/ui/include",
     "lib/ui-server/include",
@@ -86,7 +86,7 @@ target("lcui")
     add_deps(
         "yutil",
         "libthread",
-        "libplatform",
+        "libptk",
         "libworker",
         "libtimer",
         "pandagl",

@@ -16,7 +16,7 @@
 #include <string.h>
 #include <LCUI/config.h>
 #include <LCUI/app.h>
-#include <platform.h>
+#include <ptk.h>
 #include <ui.h>
 #include <worker.h>
 #include <thread.h>
@@ -26,7 +26,7 @@
 
 /** LCUI 应用程序数据 */
 static struct lcui_app_t {
-        step_timer_t timer;
+        ptk_steptimer_t timer;
         worker_t *main_worker;
         worker_t *workers[LCUI_WORKER_NUM];
         int worker_next;
@@ -85,28 +85,28 @@ void lcui_set_frame_rate_cap(unsigned rate_cap)
         }
 }
 
-static void lcui_app_on_tick(step_timer_t *timer, void *data)
+static void lcui_app_on_tick(ptk_steptimer_t *timer, void *data)
 {
         lcui_render_ui();
         app_present();
 }
 
-static int lcui_dispatch_app_event(app_event_t *e)
+static int lcui_dispatch_app_event(ptk_event_t *e)
 {
-        if (e->type == APP_EVENT_QUIT) {
+        if (e->type == PTK_EVENT_QUIT) {
                 return 0;
         }
         worker_run_task(lcui_app.main_worker);
         lcui_process_timers();
         lcui_dispatch_ui_event(e);
         lcui_update_ui();
-        step_timer_tick(&lcui_app.timer, lcui_app_on_tick, NULL);
+        ptk_steptimer_tick(&lcui_app.timer, lcui_app_on_tick, NULL);
         return 0;
 }
 
-int lcui_process_events(app_process_events_option_t option)
+int lcui_process_events(ptk_process_events_option_t option)
 {
-        return app_process_native_events(option);
+        return ptk_process_native_events(option);
 }
 
 void lcui_init_app(void)
@@ -124,7 +124,7 @@ void lcui_init_app(void)
 
         lcui_init_timers();
         lcui_reset_settings();
-        step_timer_init(&lcui_app.timer);
+        ptk_steptimer_init(&lcui_app.timer);
         lcui_app.main_worker = worker_create();
         for (i = 0; i < LCUI_WORKER_NUM; ++i) {
                 lcui_app.workers[i] = worker_create();
@@ -149,10 +149,10 @@ void lcui_destroy_app(void)
 void lcui_init(void)
 {
         lcui_init_app();
-        if (app_init(L"LCUI Application") != 0) {
+        if (ptk_init(L"LCUI Application") != 0) {
                 abort();
         }
-        app_set_event_dispatcher(lcui_dispatch_app_event);
+        ptk_set_event_dispatcher(lcui_dispatch_app_event);
         lcui_init_ui();
 }
 
@@ -160,7 +160,7 @@ void lcui_destroy(void)
 {
         lcui_destroy_ui();
         lcui_destroy_app();
-        app_destroy();
+        ptk_destroy();
 }
 
 void lcui_exit(int code)
@@ -175,7 +175,7 @@ void lcui_quit(void)
 
 int lcui_run(void)
 {
-        return lcui_process_events(APP_PROCESS_EVENTS_UNTIL_QUIT);
+        return lcui_process_events(PTK_PROCESS_EVENTS_UNTIL_QUIT);
 }
 
 int lcui_main(void)

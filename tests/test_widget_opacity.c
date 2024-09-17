@@ -10,7 +10,7 @@
  */
 
 #define PREVIEW_MODE
-#include <platform/main.h>
+#include <ptk/main.h>
 #include "./cases/test_widget_opacity.c"
 
 static void on_opacity_minus(ui_widget_t *w, ui_event_t *e, void *arg)

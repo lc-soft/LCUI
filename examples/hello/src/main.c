@@ -1,5 +1,5 @@
 ﻿#include <LCUI.h>
-#include <platform/main.h>
+#include <ptk/main.h>
 
 static void on_btn_click(ui_widget_t *self, ui_event_t *e, void *arg)
 {

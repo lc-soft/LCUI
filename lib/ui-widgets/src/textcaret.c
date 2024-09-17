@@ -16,7 +16,7 @@
 #include <timer.h>
 #include <ui_widgets/textcaret.h>
 #include <ui_widgets/textinput.h>
-#include <platform/ime.h>
+#include <ptk/ime.h>
 
 typedef struct ui_textcaret_task_t {
         bool active;
@@ -54,7 +54,7 @@ void ui_textcaret_refresh(ui_widget_t *widget)
         }
         lcui_reset_timer(caret->timer_id, caret->blink_interval);
         ui_widget_get_offset(widget, ui_root(), &x, &y);
-        ime_set_caret((int)x, (int)y);
+        ptk_ime_set_caret((int)x, (int)y);
         ui_widget_show(widget);
 }
 

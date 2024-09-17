@@ -11,7 +11,7 @@
 
 #define PREVIEW_MODE
 #include "./cases/test_flex_layout.c"
-#include <platform/main.h>
+#include <ptk/main.h>
 
 int main(int argc, char **argv)
 {

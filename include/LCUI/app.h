@@ -13,7 +13,7 @@
 #define LCUI_INCLUDE_LCUI_APP_H
 
 #include "common.h"
-#include <platform.h>
+#include <ptk.h>
 #include <worker.h>
 
 #define LCUI_MAX_FRAMES_PER_SEC 120
@@ -71,18 +71,18 @@ LCUI_API void lcui_destroy_ui(void);
 LCUI_API void lcui_update_ui(void);
 LCUI_API size_t lcui_render_ui(void);
 LCUI_API void lcui_preset_ui(void);
-LCUI_API void lcui_dispatch_ui_event(app_event_t *app_event);
+LCUI_API void lcui_dispatch_ui_event(ptk_event_t *app_event);
 LCUI_API void lcui_set_ui_display_mode(lcui_display_mode_t mode);
 
 // Event
 
-LCUI_API int lcui_get_event(app_event_t *e);
-LCUI_API int lcui_process_event(app_event_t *e);
-LCUI_API int lcui_process_events(app_process_events_option_t option);
+LCUI_API int lcui_get_event(ptk_event_t *e);
+LCUI_API int lcui_process_event(ptk_event_t *e);
+LCUI_API int lcui_process_events(ptk_process_events_option_t option);
 
 INLINE int lcui_process_all_events(void)
 {
-        return lcui_process_events(APP_PROCESS_EVENTS_ALL_IF_PRESENT);
+        return lcui_process_events(PTK_PROCESS_EVENTS_ALL_IF_PRESENT);
 }
 
 // Base

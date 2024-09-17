@@ -6,21 +6,21 @@ UI 服务器，提供了将 widget 与系统窗口绑定的能力。它基于 UI
 
 ```c
 #include <LCUI/ui.h>
-#include <LCUI/platform.h>
+#include <LCUI/ptk.h>
 
 int main(int argc, char *argv)
 {
     ui_widget_t *w;
-	app_window_t *wnd;
+	ptk_window_t *wnd;
 
-    app_init(L"My Application");
+    ptk_init(L"My Application");
     ui_init();
     // 初始化服务器
     ui_server_init();
     // 创建一个 widget
     w = ui_widget_create(NULL);
     // 创建一个窗口
-    wnd = app_window_create("My Widget", 0, 0, 0, 0, NULL);
+    wnd = ptk_window_create("My Widget", 0, 0, 0, 0, NULL);
     // 调整 widget 尺寸
     widget_resize(800, 600);
     // 将 widget 与窗口建立连接

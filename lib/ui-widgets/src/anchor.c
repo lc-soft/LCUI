@@ -15,7 +15,7 @@
 #include <ui_xml.h>
 #include <ui_widgets/anchor.h>
 #include <worker.h>
-#include <platform.h>
+#include <ptk.h>
 
 typedef struct xml_loader_t {
         /** 键，作为在视图加载完后传给事件处理器的额外参数 */
@@ -161,12 +161,12 @@ void ui_anchor_open(ui_widget_t* w)
                 return;
         }
         if (strstr(attr_href, "file:") == attr_href) {
-                open_uri(attr_href + 5);
+                ptk_open_uri(attr_href + 5);
                 return;
         }
         if (strstr(attr_href, "http://") == attr_href ||
             strstr(attr_href, "https://") == attr_href) {
-                open_uri(attr_href);
+                ptk_open_uri(attr_href);
                 return;
         }
         loader = xml_loader_create(w);

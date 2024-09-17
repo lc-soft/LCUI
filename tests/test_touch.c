@@ -58,7 +58,7 @@ static void OnTouchWidget(ui_widget_t *w, ui_event_t *e, void *arg)
 	}
 }
 
-static void OnTouch(app_event_t *e, void *arg)
+static void OnTouch(ptk_event_t *e, void *arg)
 {
 	int i;
 	ui_widget_t *w;
@@ -105,6 +105,6 @@ int main(int argc, char **argv)
 {
 	lcui_init();
 	list_create(&touch_bindings);
-	app_on_event(APP_EVENT_TOUCH, OnTouch, NULL);
+	ptk_on_event(PTK_EVENT_TOUCH, OnTouch, NULL);
 	return lcui_main();
 }

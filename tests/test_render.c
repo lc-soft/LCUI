@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <LCUI.h>
-#include <platform/main.h>
+#include <ptk/main.h>
 
 #define SCREEN_WIDTH 1600
 #define SCREEN_HEIGHT 900

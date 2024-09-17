@@ -16,23 +16,23 @@
 static void paste_text(void *arg)
 {
         ui_widget_t *w = arg;
-        app_event_t ev = { 0 };
+        ptk_event_t ev = { 0 };
 
-        ev.type = APP_EVENT_KEYDOWN;
+        ev.type = PTK_EVENT_KEYDOWN;
         ev.key.code = KEY_V;
         ev.key.ctrl_key = true;
         ui_set_focus(w);
-        app_post_event(&ev);
+        ptk_post_event(&ev);
 }
 
 static void on_text1_focused(ui_widget_t *w, ui_event_t *e, void *arg)
 {
-        app_event_t ev = { 0 };
+        ptk_event_t ev = { 0 };
 
-        ev.type = APP_EVENT_KEYDOWN;
+        ev.type = PTK_EVENT_KEYDOWN;
         ev.key.code = KEY_C;
         ev.key.ctrl_key = true;
-        app_post_event(&ev);
+        ptk_post_event(&ev);
         lcui_set_timeout(100, paste_text, e->data);
 }
 
@@ -43,7 +43,7 @@ static void focus_text1(void *arg)
 
 static void on_check_text(ui_widget_t *w, ui_event_t *e, void *arg)
 {
-        clipboard_t *clipboard = arg;
+        ptk_clipboard_t *clipboard = arg;
         char actual_text[32] = "none";
 
         if (clipboard && clipboard->text) {

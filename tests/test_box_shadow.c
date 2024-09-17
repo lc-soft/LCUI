@@ -11,7 +11,7 @@
 
 #include <LCUI.h>
 #include <ui_xml.h>
-#include <platform/main.h>
+#include <ptk/main.h>
 
 int main(void)
 {
