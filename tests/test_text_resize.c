@@ -11,7 +11,7 @@
 
 #define PREVIEW_MODE
 #include "./cases/test_text_resize.c"
-#include <platform/main.h>
+#include <ptk/main.h>
 
 int main(int argc, char *argv[])
 {

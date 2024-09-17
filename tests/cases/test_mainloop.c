@@ -27,21 +27,21 @@ static void handle_btn_click(ui_widget_t *w, ui_event_t *ui_event, void *arg)
 {
         lcui_set_timeout(0, handle_refresh, NULL);
         lcui_set_timeout(1, handle_quit, NULL);
-        lcui_process_events(APP_PROCESS_EVENTS_UNTIL_QUIT);
+        lcui_process_events(PTK_PROCESS_EVENTS_UNTIL_QUIT);
         lcui_quit();
 }
 
 static void handle_trigger_btn_click(void *arg)
 {
-        app_event_t e = { 0 };
+        ptk_event_t e = { 0 };
 
-        e.type = APP_EVENT_MOUSEDOWN;
+        e.type = PTK_EVENT_MOUSEDOWN;
         e.mouse.button = MOUSE_BUTTON_LEFT;
         e.mouse.x = 5;
         e.mouse.y = 5;
-        app_post_event(&e);
-        e.type = APP_EVENT_MOUSEUP;
-        app_post_event(&e);
+        ptk_post_event(&e);
+        e.type = PTK_EVENT_MOUSEUP;
+        ptk_post_event(&e);
 }
 
 static void observer_thread(void *arg)

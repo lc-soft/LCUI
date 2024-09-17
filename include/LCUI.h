@@ -18,7 +18,7 @@
 #include <ui_server.h>
 #include <ui_xml.h>
 #include <thread.h>
-#include <platform.h>
+#include <ptk.h>
 #include <worker.h>
 #include <timer.h>
 #include <LCUI/app.h>

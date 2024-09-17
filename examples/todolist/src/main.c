@@ -1,7 +1,7 @@
 ﻿// Reference from: https://codepen.io/knyttneve/details/mddGVjB
 #include <stdio.h>
 #include <LCUI.h>
-#include <platform/main.h>
+#include <ptk/main.h>
 
 typedef struct task_t {
         unsigned id;

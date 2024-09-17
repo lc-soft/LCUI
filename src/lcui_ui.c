@@ -35,12 +35,12 @@ static struct lcui_ui_t {
         lcui_display_mode_t mode;
         ui_mutation_observer_t *observer;
 
-        /** list_t<app_window_t> */
+        /** list_t<ptk_window_t> */
         list_t windows;
 } lcui_ui;
 
 static void lcui_dispatch_ui_mouse_event(ui_event_type_t type,
-                                         app_event_t *app_evt)
+                                         ptk_event_t *app_evt)
 {
         ui_event_t e = { 0 };
         float scale = ui_server_get_window_scale(app_evt->window);
@@ -52,7 +52,7 @@ static void lcui_dispatch_ui_mouse_event(ui_event_type_t type,
 }
 
 static void lcui_dispatch_ui_keyboard_event(ui_event_type_t type,
-                                            app_event_t *app_evt)
+                                            ptk_event_t *app_evt)
 {
         ui_event_t e = { 0 };
 
@@ -66,7 +66,7 @@ static void lcui_dispatch_ui_keyboard_event(ui_event_type_t type,
         ui_dispatch_event(&e);
 }
 
-static void lcui_dispatch_ui_touch_event(app_event_t *app_event)
+static void lcui_dispatch_ui_touch_event(ptk_event_t *app_event)
 {
         size_t i;
         ui_event_t e = { 0 };
@@ -77,13 +77,13 @@ static void lcui_dispatch_ui_touch_event(app_event_t *app_event)
         e.touch.points = malloc(sizeof(ui_touch_point_t) * e.touch.n_points);
         for (i = 0; i < e.touch.n_points; ++i) {
                 switch (app_event->touch.points[i].state) {
-                case APP_EVENT_TOUCHDOWN:
+                case PTK_EVENT_TOUCHDOWN:
                         e.touch.points[i].state = UI_EVENT_TOUCHDOWN;
                         break;
-                case APP_EVENT_TOUCHUP:
+                case PTK_EVENT_TOUCHUP:
                         e.touch.points[i].state = UI_EVENT_TOUCHUP;
                         break;
-                case APP_EVENT_TOUCHMOVE:
+                case PTK_EVENT_TOUCHMOVE:
                         e.touch.points[i].state = UI_EVENT_TOUCHMOVE;
                         break;
                 default:
@@ -98,7 +98,7 @@ static void lcui_dispatch_ui_touch_event(app_event_t *app_event)
         ui_event_destroy(&e);
 }
 
-static void lcui_dispatch_ui_textinput_event(app_event_t *app_evt)
+static void lcui_dispatch_ui_textinput_event(ptk_event_t *app_evt)
 {
         ui_event_t e = { 0 };
 
@@ -120,34 +120,34 @@ static void lcui_dispatch_ui_wheel_event(app_wheel_event_t *wheel)
         ui_dispatch_event(&e);
 }
 
-void lcui_dispatch_ui_event(app_event_t *app_event)
+void lcui_dispatch_ui_event(ptk_event_t *app_event)
 {
         switch (app_event->type) {
-        case APP_EVENT_KEYDOWN:
+        case PTK_EVENT_KEYDOWN:
                 lcui_dispatch_ui_keyboard_event(UI_EVENT_KEYDOWN, app_event);
                 break;
-        case APP_EVENT_KEYUP:
+        case PTK_EVENT_KEYUP:
                 lcui_dispatch_ui_keyboard_event(UI_EVENT_KEYUP, app_event);
                 break;
-        case APP_EVENT_KEYPRESS:
+        case PTK_EVENT_KEYPRESS:
                 lcui_dispatch_ui_keyboard_event(UI_EVENT_KEYPRESS, app_event);
                 break;
-        case APP_EVENT_MOUSEDOWN:
+        case PTK_EVENT_MOUSEDOWN:
                 lcui_dispatch_ui_mouse_event(UI_EVENT_MOUSEDOWN, app_event);
                 break;
-        case APP_EVENT_MOUSEUP:
+        case PTK_EVENT_MOUSEUP:
                 lcui_dispatch_ui_mouse_event(UI_EVENT_MOUSEUP, app_event);
                 break;
-        case APP_EVENT_MOUSEMOVE:
+        case PTK_EVENT_MOUSEMOVE:
                 lcui_dispatch_ui_mouse_event(UI_EVENT_MOUSEMOVE, app_event);
                 break;
-        case APP_EVENT_TOUCH:
+        case PTK_EVENT_TOUCH:
                 lcui_dispatch_ui_touch_event(app_event);
                 break;
-        case APP_EVENT_WHEEL:
+        case PTK_EVENT_WHEEL:
                 lcui_dispatch_ui_wheel_event(&app_event->wheel);
                 break;
-        case APP_EVENT_COMPOSITION:
+        case PTK_EVENT_COMPOSITION:
                 lcui_dispatch_ui_textinput_event(app_event);
                 break;
         default:
@@ -194,7 +194,7 @@ static void lcui_on_ui_mutation(ui_mutation_list_t *mutation_list,
         }
 }
 
-static void lcui_on_window_destroy(app_event_t *e, void *arg)
+static void lcui_on_window_destroy(ptk_event_t *e, void *arg)
 {
         list_node_t *node;
 
@@ -212,12 +212,12 @@ static void lcui_on_window_destroy(app_event_t *e, void *arg)
 
 static void lcui_close_window(void *arg)
 {
-        app_window_close(arg);
+        ptk_window_close(arg);
 }
 
 void lcui_set_ui_display_mode(lcui_display_mode_t mode)
 {
-        app_window_t *wnd;
+        ptk_window_t *wnd;
         list_node_t *node;
         ui_mutation_observer_init_t options = { 0 };
 
@@ -231,11 +231,11 @@ void lcui_set_ui_display_mode(lcui_display_mode_t mode)
             lcui_ui.mode == LCUI_DISPLAY_MODE_WINDOWED) {
                 wnd = ui_server_get_window(ui_root());
                 if (mode == LCUI_DISPLAY_MODE_FULLSCREEN) {
-                        app_window_set_fullscreen(wnd, true);
+                        ptk_window_set_fullscreen(wnd, true);
                         lcui_ui.mode = mode;
                         return;
                 } else if (mode == LCUI_DISPLAY_MODE_WINDOWED) {
-                        app_window_set_fullscreen(wnd, false);
+                        ptk_window_set_fullscreen(wnd, false);
                         lcui_ui.mode = mode;
                         return;
                 }
@@ -249,11 +249,11 @@ void lcui_set_ui_display_mode(lcui_display_mode_t mode)
         list_destroy(&lcui_ui.windows, lcui_close_window);
         switch (mode) {
         case LCUI_DISPLAY_MODE_FULLSCREEN:
-                wnd = app_window_create(NULL, 0, 0, 0, 0, NULL);
+                wnd = ptk_window_create(NULL, 0, 0, 0, 0, NULL);
                 list_append(&lcui_ui.windows, wnd);
                 ui_server_connect(ui_root(), wnd);
-                app_window_set_fullscreen(wnd, true);
-                ui_metrics.dpi = 1.f * app_window_get_dpi(wnd);
+                ptk_window_set_fullscreen(wnd, true);
+                ui_metrics.dpi = 1.f * ptk_window_get_dpi(wnd);
                 break;
         case LCUI_DISPLAY_MODE_SEAMLESS:
                 options.child_list = true;
@@ -262,16 +262,16 @@ void lcui_set_ui_display_mode(lcui_display_mode_t mode)
                 ui_mutation_observer_observe(lcui_ui.observer, ui_root(),
                                              options);
                 for (list_each(node, &ui_root()->children)) {
-                        wnd = app_window_create(NULL, 0, 0, 0, 0, NULL);
+                        wnd = ptk_window_create(NULL, 0, 0, 0, 0, NULL);
                         ui_server_connect(node->data, wnd);
                 }
                 break;
         case LCUI_DISPLAY_MODE_WINDOWED:
         default:
-                wnd = app_window_create(NULL, 0, 0, 0, 0, NULL);
+                wnd = ptk_window_create(NULL, 0, 0, 0, 0, NULL);
                 list_append(&lcui_ui.windows, wnd);
                 ui_server_connect(ui_root(), wnd);
-                ui_metrics.dpi = 1.f * app_window_get_dpi(wnd);
+                ui_metrics.dpi = 1.f * ptk_window_get_dpi(wnd);
                 break;
         }
         lcui_ui.mode = mode;
@@ -295,7 +295,7 @@ void lcui_destroy_ui_preset_widgets(void)
         ui_unregister_anchor();
 }
 
-#ifdef LIBPLAT_WIN32
+#ifdef PTK_WIN32
 static void lcui_load_fonts_for_windows(void)
 {
         size_t i;
@@ -395,7 +395,7 @@ static void lcui_load_fonts_for_linux(void)
 
 static void lcui_load_default_fonts(void)
 {
-#ifdef LIBPLAT_WIN32
+#ifdef PTK_WIN32
         lcui_load_fonts_for_windows();
 #elif defined(HAVE_FONTCONFIG)
         logger_debug("[font] fontconfig enabled\n");
@@ -449,12 +449,12 @@ void lcui_init_ui(void)
         lcui_set_ui_display_mode(LCUI_DISPLAY_MODE_DEFAULT);
         lcui_init_ui_preset_widgets();
         lcui_load_default_fonts();
-        app_on_event(APP_EVENT_CLOSE, lcui_on_window_destroy, NULL);
+        ptk_on_event(PTK_EVENT_CLOSE, lcui_on_window_destroy, NULL);
 }
 
 void lcui_destroy_ui(void)
 {
-        app_off_event(APP_EVENT_CLOSE, lcui_on_window_destroy);
+        ptk_off_event(PTK_EVENT_CLOSE, lcui_on_window_destroy);
         list_destroy(&lcui_ui.windows, lcui_close_window);
         if (lcui_ui.observer) {
                 ui_mutation_observer_disconnect(lcui_ui.observer);

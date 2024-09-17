@@ -35,14 +35,14 @@
 #endif
 
 #ifdef _WIN32
-#define LIBPLAT_WIN32
+#define PTK_WIN32
 #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
-#define LIBPLAT_UWP
+#define PTK_UWP
 #else
-#define LIBPLAT_WIN_DESKTOP
+#define PTK_WIN_DESKTOP
 #endif
 #else
-#define LIBPLAT_LINUX
+#define PTK_LINUX
 #endif
 
 #ifdef __cplusplus

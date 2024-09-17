@@ -15,7 +15,7 @@ static struct ui_cursor_t {
 	int x, y;
 	bool visible;
 	pd_canvas_t image;
-	app_window_t *window;
+	ptk_window_t *window;
 } ui_cursor;
 
 static unsigned char ui_cursor_image_data[4][12 * 19] = {
@@ -116,7 +116,7 @@ static int ui_cursor_load_default_image(pd_canvas_t *buff)
 	return 0;
 }
 
-static void ui_cursor_on_mouse_event(app_event_t *e, void *arg)
+static void ui_cursor_on_mouse_event(ptk_event_t *e, void *arg)
 {
 	// TODO: 事件中的 xy 是否需要转换为相对于窗口客户区？
 	ui_cursor.x = e->mouse.x;
@@ -138,15 +138,15 @@ static void ui_cursor_get_rect(pd_rect_t *rect)
 
 void ui_cursor_refresh(void)
 {
-	app_event_t e = { 0 };
+	ptk_event_t e = { 0 };
 
 	if (!ui_cursor.visible || !ui_cursor.window) {
 		return;
 	}
-	e.type = APP_EVENT_PAINT;
+	e.type = PTK_EVENT_PAINT;
 	e.window = ui_cursor.window;
 	ui_cursor_get_rect(&e.paint.rect);
-	app_post_event(&e);
+	ptk_post_event(&e);
 }
 
 bool ui_cursor_is_visible(void)
@@ -194,7 +194,7 @@ void ui_cursor_get_position(int *x, int *y)
 	*y = ui_cursor.y;
 }
 
-int ui_cursor_paint(app_window_t *w, app_window_paint_t* paint)
+int ui_cursor_paint(ptk_window_t *w, ptk_window_paint_t* paint)
 {
 	int x, y;
 	if (!ui_cursor.visible) {
@@ -215,7 +215,7 @@ void ui_cursor_init(void)
 	/* 载入自带的游标的图形数据 */
 	ui_cursor_load_default_image(&image);
 	// TODO: 移除 app 依赖
-	app_on_event(APP_EVENT_MOUSEMOVE, ui_cursor_on_mouse_event, NULL);
+	ptk_on_event(PTK_EVENT_MOUSEMOVE, ui_cursor_on_mouse_event, NULL);
 	ui_cursor_set_image(&image);
 	pd_canvas_destroy(&image);
 }

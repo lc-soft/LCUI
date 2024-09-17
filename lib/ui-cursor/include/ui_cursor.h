@@ -14,7 +14,7 @@
 
 #include "ui_cursor/common.h"
 #include <pandagl.h>
-#include <platform.h>
+#include <ptk.h>
 #include <ui.h>
 
 LIBUI_CURSOR_BEGIN_DECLS
@@ -26,7 +26,7 @@ LIBUI_CURSOR_PUBLIC void ui_cursor_hide(void);
 LIBUI_CURSOR_PUBLIC void ui_cursor_set_position(int x, int y);
 LIBUI_CURSOR_PUBLIC int ui_cursor_set_image(pd_canvas_t *image);
 LIBUI_CURSOR_PUBLIC void ui_cursor_get_position(int *x, int *y);
-LIBUI_CURSOR_PUBLIC int ui_cursor_paint(app_window_t *w, app_window_paint_t* paint);
+LIBUI_CURSOR_PUBLIC int ui_cursor_paint(ptk_window_t *w, ptk_window_paint_t* paint);
 LIBUI_CURSOR_PUBLIC void ui_cursor_init(void);
 LIBUI_CURSOR_PUBLIC void ui_cursor_destroy(void);
 

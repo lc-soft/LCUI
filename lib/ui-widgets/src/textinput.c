@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <thread.h>
-#include <platform.h>
+#include <ptk.h>
 #include <pandagl.h>
 #include <css.h>
 #include <ui_widgets/textinput.h>
@@ -669,7 +669,7 @@ static void ui_textinput_on_press_delete_key(ui_widget_t *widget, int n_ch)
 
 static void ui_textinput_on_paste(ui_widget_t *w, ui_event_t *e, void *arg)
 {
-        clipboard_t *clipboard = arg;
+        ptk_clipboard_t *clipboard = arg;
         if (clipboard) {
                 ui_textinput_insert_text_w(w, clipboard->text);
         }
@@ -677,7 +677,7 @@ static void ui_textinput_on_paste(ui_widget_t *w, ui_event_t *e, void *arg)
 
 static void ui_textinput_on_clipboard_ready(void *arg, ui_widget_t *widget)
 {
-        clipboard_t *clipboard = arg;
+        ptk_clipboard_t *clipboard = arg;
         ui_event_t e = { 0 };
 
         ui_event_init(&e, "paste");
@@ -744,8 +744,8 @@ static void ui_textinput_on_keydown(ui_widget_t *widget, ui_event_t *e,
         char key = e->key.code;
         // CTRL+V
         if (key == KEY_V && e->key.ctrl_key) {
-                clipboard_request_text(
-                    (clipboard_callback_t)ui_textinput_on_clipboard_ready,
+                ptk_clipboard_request_text(
+                    (ptk_clipboard_callback_t)ui_textinput_on_clipboard_ready,
                     widget);
         }
         // CTRL+C
@@ -756,7 +756,7 @@ static void ui_textinput_on_keydown(ui_widget_t *widget, ui_event_t *e,
                 size_t len = ui_textinput_get_text_length(widget);
                 wchar_t *wcs = malloc((len + 1) * sizeof(wchar_t));
                 ui_textinput_get_text_w(widget, 0, len, wcs);
-                clipboard_set_text(wcs, len);
+                ptk_clipboard_set_text(wcs, len);
                 free(wcs);
         }
 }

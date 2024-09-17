@@ -66,7 +66,7 @@ LCUI 建立在各种库的基础之上：
 - [lib/yutil](./lib/yutil): 实用工具库，提供常用的数据结构和函数。
 - [lib/pandagl](./lib/pandagl): PandaGL (Panda Graphics Library) 图形库，提供字体管理、文字排版、图片读写、图形处理和渲染能力。
 - [lib/css](./lib/css): CSS 解析器和选择引擎，提供 CSS 解析和选择能力。
-- [lib/platform](./lib/platform): 平台库，提供跨平台统一的系统相关 API，包括消息循环、窗口管理、输入法等。
+- [lib/ptk](./lib/ptk): 平台库（**P**ing **T**ai **K**u），提供跨平台统一的系统相关 API，包括消息循环、窗口管理、输入法等。
 - [lib/thread](./lib/thread): 线程库，提供跨平台的多线程能力。
 - [lib/timer](./ui/timer): 定时器库，提供定时执行任务的能力。
 - [lib/ui](./lib/ui): UI 核心库，提供 UI 组件管理、事件队列、样式计算、绘制等 UI 必要能力。
@@ -125,7 +125,7 @@ LCUI 及相关项目的部分功能设计参考了其它开源项目，你可以
 - LCUI
   - 改进 API 设计。
   - 改进 CSS 引擎，增加支持 `inherit`、`!important`、转义字符。
-  - 添加 [SDL](https://www.libsdl.org/) 后端，代替 lib/platform 库。
+  - 添加 [SDL](https://www.libsdl.org/) 后端，代替 lib/ptk 库。
   - 适配其它开源图形库，以获得更好的渲染性能。
 - 命令行工具
   - `lcui build --watch`：持续监听文件变更并自动重新构建。

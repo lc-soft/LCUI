@@ -24,7 +24,7 @@
 #define TITLE_MAX_SIZE 256
 
 typedef struct window_mutation_record_t {
-        app_window_t *window;
+        ptk_window_t *window;
         bool update_size;
         bool update_position;
         bool update_title;
@@ -56,7 +56,7 @@ typedef struct ui_connection_t {
         list_t flash_rects;
 
         bool window_visible;
-        app_window_t *window;
+        ptk_window_t *window;
         ui_widget_t *widget;
         ui_updater_t *updater;
 } ui_connection_t;
@@ -76,7 +76,7 @@ static inline int is_rect_equals(const pd_rect_t *a, const pd_rect_t *b)
 }
 
 static ui_connection_t *ui_server_find_connection(ui_widget_t *widget,
-                                                  app_window_t *window)
+                                                  ptk_window_t *window)
 {
         ui_connection_t *conn;
         list_node_t *node;
@@ -94,7 +94,7 @@ static ui_connection_t *ui_server_find_connection(ui_widget_t *widget,
         return NULL;
 }
 
-ui_widget_t *ui_server_get_widget(app_window_t *window)
+ui_widget_t *ui_server_get_widget(ptk_window_t *window)
 {
         ui_connection_t *conn;
 
@@ -102,7 +102,7 @@ ui_widget_t *ui_server_get_widget(app_window_t *window)
         return conn ? conn->widget : NULL;
 }
 
-app_window_t *ui_server_get_window(ui_widget_t *widget)
+ptk_window_t *ui_server_get_window(ui_widget_t *widget)
 {
         ui_connection_t *conn;
 
@@ -119,7 +119,7 @@ static void ui_connection_destroy(void *arg)
         free(conn);
 }
 
-int ui_server_disconnect(ui_widget_t *widget, app_window_t *window)
+int ui_server_disconnect(ui_widget_t *widget, ptk_window_t *window)
 {
         int count = 0;
         ui_connection_t *conn;
@@ -132,26 +132,26 @@ int ui_server_disconnect(ui_widget_t *widget, app_window_t *window)
                         logger_debug(
                             "[ui-server] [window %p] disconnect widget: %p\n",
                             conn->window, conn->widget);
-                        app_window_close(conn->window);
+                        ptk_window_close(conn->window);
                         count++;
                 }
         }
         return count;
 }
 
-float ui_server_get_window_scale(app_window_t *window)
+float ui_server_get_window_scale(ptk_window_t *window)
 {
         ui_connection_t *conn = ui_server_find_connection(NULL, window);
         if (conn) {
                 return css_metrics_actual_scale(&conn->updater->metrics);
         }
         if (window) {
-                return app_window_get_dpi(window) / 96.f;
+                return ptk_window_get_dpi(window) / 96.f;
         }
         return 1.f;
 }
 
-static void ui_server_on_window_close(app_event_t *e, void *arg)
+static void ui_server_on_window_close(ptk_event_t *e, void *arg)
 {
         ui_connection_t *conn;
         list_node_t *node;
@@ -160,7 +160,7 @@ static void ui_server_on_window_close(app_event_t *e, void *arg)
         for (list_each(node, &ui_server.connections)) {
                 conn = node->data;
                 if (conn->window == e->window) {
-                        app_window_destroy(conn->window);
+                        ptk_window_destroy(conn->window);
                         ui_connection_destroy(conn);
                         list_delete_node(&ui_server.connections, node);
                         break;
@@ -168,7 +168,7 @@ static void ui_server_on_window_close(app_event_t *e, void *arg)
         }
 }
 
-static void ui_server_on_window_visibility_change(app_event_t *e, void *arg)
+static void ui_server_on_window_visibility_change(ptk_event_t *e, void *arg)
 {
         ui_connection_t *conn;
 
@@ -183,7 +183,7 @@ static void ui_server_on_window_visibility_change(app_event_t *e, void *arg)
         }
 }
 
-static void ui_server_on_window_paint(app_event_t *e, void *arg)
+static void ui_server_on_window_paint(ptk_event_t *e, void *arg)
 {
         ui_rect_t rect;
         list_node_t *node;
@@ -202,7 +202,7 @@ static void ui_server_on_window_paint(app_event_t *e, void *arg)
         }
 }
 
-static void ui_server_on_window_resize(app_event_t *e, void *arg)
+static void ui_server_on_window_resize(ptk_event_t *e, void *arg)
 {
         ui_connection_t *conn;
         float scale, width, height;
@@ -223,14 +223,14 @@ static void ui_server_on_window_resize(app_event_t *e, void *arg)
             e->window, conn->widget, conn->widget->type, width, height);
 }
 
-static void ui_server_on_window_dpi_changed(app_event_t *e, void *arg)
+static void ui_server_on_window_dpi_changed(ptk_event_t *e, void *arg)
 {
         logger_debug("[ui-server] [window %p] on_window_dpi_changed, dpi: %d\n",
                      e->window, e->dpi_change.dpi);
         ui_refresh_style();
 }
 
-static void ui_server_on_window_minmaxinfo(app_event_t *e, void *arg)
+static void ui_server_on_window_minmaxinfo(ptk_event_t *e, void *arg)
 {
         bool resizable = false;
         int width, height;
@@ -244,8 +244,8 @@ static void ui_server_on_window_minmaxinfo(app_event_t *e, void *arg)
         if (!widget) {
                 return;
         }
-        width = app_window_get_width(e->window);
-        height = app_window_get_height(e->window);
+        width = ptk_window_get_width(e->window);
+        height = ptk_window_get_height(e->window);
         style = &widget->computed_style;
         if (IS_CSS_FIXED_LENGTH(style, min_width)) {
                 e->minmaxinfo.min_width = ui_compute(style->min_width);
@@ -276,7 +276,7 @@ static void ui_server_on_window_minmaxinfo(app_event_t *e, void *arg)
                 }
         }
         if (resizable) {
-                app_window_set_size(e->window, width, height);
+                ptk_window_set_size(e->window, width, height);
         }
 }
 
@@ -292,22 +292,22 @@ static void ui_server_refresh_window(ui_connection_t *conn)
 
         ui_widget_mark_dirty_rect(conn->widget, NULL, UI_BOX_TYPE_GRAPH_BOX);
         ui_compute_rect(&rect, &conn->widget->canvas_box);
-        app_window_set_title(conn->window, conn->widget->title);
-        app_window_set_size(conn->window, rect.width, rect.height);
+        ptk_window_set_title(conn->window, conn->widget->title);
+        ptk_window_set_size(conn->window, rect.width, rect.height);
         if (conn->widget->computed_style.type_bits.top == CSS_TOP_AUTO) {
-                rect.y = (app_get_screen_height() - rect.height) / 2;
+                rect.y = (ptk_screen_get_height() - rect.height) / 2;
         }
         if (conn->widget->computed_style.type_bits.left == CSS_LEFT_AUTO) {
-                rect.x = (app_get_screen_width() - rect.width) / 2;
+                rect.x = (ptk_screen_get_width() - rect.width) / 2;
         }
-        app_window_set_position(conn->window, rect.x, rect.y);
+        ptk_window_set_position(conn->window, rect.x, rect.y);
         conn->window_visible = ui_widget_is_visible(conn->widget);
         if (conn->window_visible) {
-                app_window_show(conn->window);
+                ptk_window_show(conn->window);
         } else {
-                app_window_hide(conn->window);
+                ptk_window_hide(conn->window);
         }
-        app_window_activate(conn->window);
+        ptk_window_activate(conn->window);
 }
 
 static void ui_server_on_widget_ready(ui_widget_t *w, ui_event_t *e, void *arg)
@@ -327,7 +327,7 @@ static void ui_server_on_widget_ready(ui_widget_t *w, ui_event_t *e, void *arg)
         }
 }
 
-void ui_server_connect(ui_widget_t *widget, app_window_t *window)
+void ui_server_connect(ui_widget_t *widget, ptk_window_t *window)
 {
         ui_event_t e = { 0 };
         ui_connection_t *conn;
@@ -339,7 +339,7 @@ void ui_server_connect(ui_widget_t *widget, app_window_t *window)
         conn->rendered = false;
         conn->window_visible = false;
         conn->updater = ui_updater_create();
-        conn->updater->metrics.dpi = 1.f * app_window_get_dpi(window);
+        conn->updater->metrics.dpi = 1.f * ptk_window_get_dpi(window);
         options.properties = true;
         list_create(&conn->flash_rects);
         list_append(&ui_server.connections, conn);
@@ -351,16 +351,16 @@ void ui_server_connect(ui_widget_t *widget, app_window_t *window)
                 e.target = widget;
                 ui_post_event(&e, NULL, NULL);
         }
-        app_process_native_events(APP_PROCESS_EVENTS_ALL_IF_PRESENT);
+        ptk_process_native_events(PTK_PROCESS_EVENTS_ALL_IF_PRESENT);
         logger_debug("[ui-server] [window %p] connect widget(%p, %s)\n", window,
                      widget, widget->type);
 }
 
 static void get_rendering_layer_size(int *width, int *height)
 {
-        *width = (int)app_get_screen_width();
+        *width = (int)ptk_screen_get_width();
         *height =
-            (int)app_get_screen_height() / ui_server.num_rendering_threads + 1;
+            (int)ptk_screen_get_height() / ui_server.num_rendering_threads + 1;
         if (*height < 200) {
                 *height = 200;
         }
@@ -444,7 +444,7 @@ static size_t ui_server_render_flash_rect(ui_connection_t *conn,
         pd_canvas_t mask;
         pd_context_t *paint;
 
-        paint = app_window_begin_paint(conn->window, &flash_rect->rect);
+        paint = ptk_window_begin_paint(conn->window, &flash_rect->rect);
         if (!paint) {
                 return 0;
         }
@@ -453,7 +453,7 @@ static size_t ui_server_render_flash_rect(ui_connection_t *conn,
         ui_cursor_paint(conn->window, paint);
         if (period >= duration) {
                 flash_rect->paint_time = 0;
-                app_window_end_paint(conn->window, paint);
+                ptk_window_end_paint(conn->window, paint);
                 return count;
         }
         pd_canvas_init(&mask);
@@ -473,7 +473,7 @@ static size_t ui_server_render_flash_rect(ui_connection_t *conn,
         pd_canvas_draw_hline(&mask, color, 1, pos, mask.width - 1);
         pd_canvas_mix(&paint->canvas, &mask, 0, 0, true);
         pd_canvas_destroy(&mask);
-        app_window_end_paint(conn->window, paint);
+        ptk_window_end_paint(conn->window, paint);
         return count;
 }
 
@@ -525,7 +525,7 @@ static size_t ui_server_render_rect(ui_connection_t *conn, pd_rect_t *rect)
         if (!conn->widget || !conn->window) {
                 return 0;
         }
-        paint = app_window_begin_paint(conn->window, rect);
+        paint = ptk_window_begin_paint(conn->window, rect);
         if (!paint) {
                 return 0;
         }
@@ -536,7 +536,7 @@ static size_t ui_server_render_rect(ui_connection_t *conn, pd_rect_t *rect)
         if (ui_server.paint_flashing_enabled) {
                 ui_server_add_flash_rect(conn, &paint->rect);
         }
-        app_window_end_paint(conn->window, paint);
+        ptk_window_end_paint(conn->window, paint);
         return count;
 }
 
@@ -596,7 +596,7 @@ size_t ui_server_render(void)
                 if (!conn->window_visible) {
                         continue;
                 }
-                ui_metrics.dpi = 1.f * app_window_get_dpi(conn->window);
+                ui_metrics.dpi = 1.f * ptk_window_get_dpi(conn->window);
                 count += ui_server_render_window(conn);
                 count += ui_server_update_flash_rects(conn);
         }
@@ -608,7 +608,7 @@ static int window_mutation_list_add(list_t *list,
                                     ui_mutation_record_t *mutation)
 {
         list_node_t *node;
-        app_window_t *wnd;
+        ptk_window_t *wnd;
         ui_widget_t *widget = mutation->target;
         window_mutation_record_t *wnd_mutation = NULL;
 
@@ -676,7 +676,7 @@ static void ui_server_on_widget_mutation(ui_mutation_list_t *mutation_list,
         for (list_each(node, &wnd_mutation_list)) {
                 wnd_mutation = node->data;
                 if (wnd_mutation->update_position) {
-                        app_window_set_position(wnd_mutation->window,
+                        ptk_window_set_position(wnd_mutation->window,
                                                 wnd_mutation->x,
                                                 wnd_mutation->y);
                         logger_debug("[ui-server] [window %p] update position: "
@@ -685,7 +685,7 @@ static void ui_server_on_widget_mutation(ui_mutation_list_t *mutation_list,
                                      wnd_mutation->y);
                 }
                 if (wnd_mutation->update_size) {
-                        app_window_set_size(wnd_mutation->window,
+                        ptk_window_set_size(wnd_mutation->window,
                                             wnd_mutation->width,
                                             wnd_mutation->height);
                         logger_debug(
@@ -694,7 +694,7 @@ static void ui_server_on_widget_mutation(ui_mutation_list_t *mutation_list,
                             wnd_mutation->height);
                 }
                 if (wnd_mutation->update_title) {
-                        app_window_set_title(wnd_mutation->window,
+                        ptk_window_set_title(wnd_mutation->window,
                                              wnd_mutation->title);
                         logger_debug(
                             "[ui-server] [window %p] update title: %ls\n",
@@ -705,9 +705,9 @@ static void ui_server_on_widget_mutation(ui_mutation_list_t *mutation_list,
                             "[ui-server] [window %p] update visible %d\n",
                             wnd_mutation->window, wnd_mutation->visible);
                         if (wnd_mutation->visible) {
-                                app_window_show(wnd_mutation->window);
+                                ptk_window_show(wnd_mutation->window);
                         } else {
-                                app_window_hide(wnd_mutation->window);
+                                ptk_window_hide(wnd_mutation->window);
                         }
                 }
         }
@@ -723,7 +723,7 @@ void ui_server_update(void)
         if (ui_server.connections.length > 0) {
                 for (list_each(node, &ui_server.connections)) {
                         conn = node->data;
-                        ui_metrics.dpi = 1.f * app_window_get_dpi(conn->window);
+                        ui_metrics.dpi = 1.f * ptk_window_get_dpi(conn->window);
                         ui_updater_update(conn->updater, conn->widget);
                 }
         } else {
@@ -737,20 +737,20 @@ void ui_server_init(void)
         ui_cursor_init();
         ui_server.observer =
             ui_mutation_observer_create(ui_server_on_widget_mutation, NULL);
-        app_on_event(APP_EVENT_VISIBILITY_CHANGE,
+        ptk_on_event(PTK_EVENT_VISIBILITY_CHANGE,
                      ui_server_on_window_visibility_change, NULL);
-        app_on_event(APP_EVENT_MINMAXINFO, ui_server_on_window_minmaxinfo,
+        ptk_on_event(PTK_EVENT_MINMAXINFO, ui_server_on_window_minmaxinfo,
                      NULL);
-        app_on_event(APP_EVENT_SIZE, ui_server_on_window_resize, NULL);
-        app_on_event(APP_EVENT_CLOSE, ui_server_on_window_close, NULL);
-        app_on_event(APP_EVENT_PAINT, ui_server_on_window_paint, NULL);
-        app_on_event(APP_EVENT_DPICHANGED, ui_server_on_window_dpi_changed,
+        ptk_on_event(PTK_EVENT_SIZE, ui_server_on_window_resize, NULL);
+        ptk_on_event(PTK_EVENT_CLOSE, ui_server_on_window_close, NULL);
+        ptk_on_event(PTK_EVENT_PAINT, ui_server_on_window_paint, NULL);
+        ptk_on_event(PTK_EVENT_DPICHANGED, ui_server_on_window_dpi_changed,
                      NULL);
         list_create(&ui_server.connections);
-        switch (app_get_id()) {
-        case APP_ID_LINUX_X11:
-        case APP_ID_UWP:
-        case APP_ID_WIN32:
+        switch (ptk_get_app_id()) {
+        case PTK_APP_ID_LINUX_X11:
+        case PTK_APP_ID_UWP:
+        case PTK_APP_ID_WIN32:
                 ui_cursor_hide();
                 break;
         default:
@@ -771,12 +771,12 @@ void ui_server_set_paint_flashing_enabled(bool enabled)
 void ui_server_destroy(void)
 {
         ui_cursor_destroy();
-        app_off_event(APP_EVENT_MINMAXINFO, ui_server_on_window_minmaxinfo);
-        app_off_event(APP_EVENT_SIZE, ui_server_on_window_resize);
-        app_off_event(APP_EVENT_CLOSE, ui_server_on_window_close);
-        app_off_event(APP_EVENT_VISIBILITY_CHANGE,
+        ptk_off_event(PTK_EVENT_MINMAXINFO, ui_server_on_window_minmaxinfo);
+        ptk_off_event(PTK_EVENT_SIZE, ui_server_on_window_resize);
+        ptk_off_event(PTK_EVENT_CLOSE, ui_server_on_window_close);
+        ptk_off_event(PTK_EVENT_VISIBILITY_CHANGE,
                       ui_server_on_window_visibility_change);
-        app_off_event(APP_EVENT_DPICHANGED, ui_server_on_window_dpi_changed);
+        ptk_off_event(PTK_EVENT_DPICHANGED, ui_server_on_window_dpi_changed);
         list_destroy(&ui_server.connections, ui_connection_destroy);
         ui_mutation_observer_destroy(ui_server.observer);
         ui_server.observer = NULL;

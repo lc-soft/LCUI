@@ -68,7 +68,7 @@ Over time LCUI has been built up to be based on various libraries:
 - [lib/yutil](./lib/yutil): Utility library providing common data structures and functions.
 - [lib/pandagl](./lib/pandagl): PandaGL (Panda Graphics Library), offering font management, text layout, image I/O, graphics processing, and rendering capabilities.
 - [lib/css](./lib/css): CSS parser and selector engine providing CSS parsing and selection capabilities.
-- [lib/platform](./lib/platform): Platform library offering cross-platform unified system-related APIs, including message loop, window management, input method, etc.
+- [lib/ptk](./lib/ptk): Platform Toolkit library offering cross-platform unified system-related APIs, including message loop, window management, input method, etc.
 - [lib/thread](./lib/thread): Thread library providing cross-platform multithreading capabilities.
 - [lib/timer](./ui/timer): Timer library providing the ability to execute tasks at regular intervals.
 - [lib/ui](./lib/ui): UI core library providing essential UI capabilities such as UI component management, event queue, style computation, and drawing.
@@ -127,7 +127,7 @@ Here are the upcoming items:
 - LCUI
   - Improve API design.
   - Enhance the CSS engine to support `inherit`, `!important`, and escape characters.
-  - Add [SDL](https://www.libsdl.org/) backend to replace the lib/platform library.
+  - Add [SDL](https://www.libsdl.org/) backend to replace the lib/ptk library.
   - Adapt to other open-source graphics libraries for better rendering performance.
 - Command-line Tools
   - `lcui build --watch`: Continuously monitor file changes and automatically rebuild.
