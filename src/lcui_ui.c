@@ -12,7 +12,6 @@
 #include <math.h>
 #include <yutil.h>
 #include <pandagl.h>
-#include <timer.h>
 #include <ui.h>
 #include <thread.h>
 #include <ui_server.h>

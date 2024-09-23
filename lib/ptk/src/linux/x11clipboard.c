@@ -38,7 +38,6 @@
 #include "x11clipboard.h"
 
 #if defined(PTK_LINUX) && defined(PTK_HAS_LIBX11)
-#include <thread.h>
 
 #define CLIPBOARD_TIMEOUT 1000
 
@@ -63,8 +62,7 @@ static struct ptk_x11clipboard_module_t {
         Atom xa_targets;
         Atom xa_text;
 
-        thread_t observer_thread;
-        bool observer_thread_active;
+        int timer;
 } ptk_x11clipboard;
 
 void ptk_x11clipboard_notify(ptk_clipboard_t *cb)
@@ -96,25 +94,18 @@ void ptk_x11clipboard_execute_action(void)
         clipboard_data.text = wstr;
         clipboard_data.len = len;
         clipboard_data.image = NULL;
-        ptk_x11clipboard.observer_thread_active = false;
+        ptk_clear_timeout(ptk_x11clipboard.timer);
         ptk_x11clipboard_notify(&clipboard_data);
+        ptk_x11clipboard.timer = 0;
         free(wstr);
 }
 
 void ptk_x11clipboard_request_timeout(void *arg)
 {
-        int ms;
         ptk_clipboard_t clipboard_data = { 0 };
 
-        for (ms = 0;
-             ms <= CLIPBOARD_TIMEOUT && ptk_x11clipboard.observer_thread_active;
-             ms += 100) {
-                sleep_ms(100);
-        }
-        if (ptk_x11clipboard.observer_thread_active) {
-                logger_debug("action timed out\n");
-                ptk_x11clipboard_notify(&clipboard_data);
-        }
+        logger_debug("action timed out\n");
+        ptk_x11clipboard_notify(&clipboard_data);
 }
 
 /**
@@ -189,15 +180,14 @@ int ptk_x11clipboard_request_text(ptk_clipboard_callback_t callback, void *arg)
                 logger_debug("Clipboard owner not found\n");
                 return 1;
         }
-        ptk_x11clipboard.observer_thread_active = true;
         // @WhoAteDaCake
         // TODO: needs error handling if we can't access the clipboard?
         // TODO: some other implementations will try XA_STRING if no text was
         // retrieved from UTF8_STRING, however, our implementation is not
         // synchronous, so not sure how it would work, it needs further
         // investigation
-        thread_create(&ptk_x11clipboard.observer_thread,
-                      ptk_x11clipboard_request_timeout, NULL);
+        ptk_set_timeout(CLIPBOARD_TIMEOUT, ptk_x11clipboard_request_timeout,
+                        NULL);
         XConvertSelection(display, ptk_x11clipboard.xclipboard,
                           ptk_x11clipboard.xutf8_string, XSEL_DATA, window,
                           CurrentTime);
@@ -322,6 +312,7 @@ void ptk_x11clipboard_init(void)
         ptk_x11clipboard.xa_string = XA_STRING;
         ptk_x11clipboard.xa_targets = XInternAtom(display, "TARGETS", false);
         ptk_x11clipboard.xa_text = XInternAtom(display, "TEXT", false);
+        ptk_x11clipboard.timer = 0;
 
         ptk_on_native_event(SelectionNotify, ptk_x11clipboard_on_notify, NULL);
         ptk_on_native_event(SelectionClear, ptk_x11clipboard_on_clear, NULL);
@@ -335,8 +326,10 @@ void ptk_x11clipboard_destroy(void)
         ptk_off_native_event(SelectionNotify, ptk_x11clipboard_on_notify);
         ptk_off_native_event(SelectionClear, ptk_x11clipboard_on_clear);
         ptk_off_native_event(SelectionRequest, ptk_x11clipboard_on_request);
-        ptk_x11clipboard.observer_thread_active = false;
-        thread_join(ptk_x11clipboard.observer_thread, NULL);
+        if (ptk_x11clipboard.timer) {
+                ptk_clear_timeout(ptk_x11clipboard.timer);
+        }
+        ptk_x11clipboard.timer = 0;
 }
 
 #endif

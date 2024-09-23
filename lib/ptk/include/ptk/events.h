@@ -70,6 +70,21 @@ PTK_PUBLIC void ptk_set_event_dispatcher(ptk_event_dispatcher_t dispatcher);
 PTK_PUBLIC int ptk_post_event(ptk_event_t *e);
 PTK_PUBLIC void ptk_process_events(void);
 
+PTK_PUBLIC int ptk_set_timeout(long ms, ptk_timer_cb cb, void *cb_arg);
+PTK_PUBLIC int ptk_set_interval(long ms, ptk_timer_cb cb, void *cb_arg);
+PTK_PUBLIC int ptk_clear_timer(int timer_id);
+PTK_PUBLIC int ptk_reset_timer(int timer_id, long ms);
+
+PTK_INLINE int ptk_clear_timeout(int timer_id)
+{
+	return ptk_clear_timer(timer_id);
+}
+
+PTK_INLINE int ptk_clear_interval(int timer_id)
+{
+	return ptk_clear_timer(timer_id);
+}
+
 PTK_END_DECLS
 
 #endif

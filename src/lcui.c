@@ -20,7 +20,6 @@
 #include <ui.h>
 #include <worker.h>
 #include <thread.h>
-#include <timer.h>
 
 #define LCUI_WORKER_NUM 4
 
@@ -97,7 +96,6 @@ static int lcui_dispatch_app_event(ptk_event_t *e)
                 return 0;
         }
         worker_run_task(lcui_app.main_worker);
-        lcui_process_timers();
         lcui_dispatch_ui_event(e);
         lcui_update_ui();
         ptk_steptimer_tick(&lcui_app.timer, lcui_app_on_tick, NULL);
@@ -117,12 +115,11 @@ void lcui_init_app(void)
                    "Build at "__DATE__
                    " - "__TIME__
                    "\n"
-                   "Copyright (C) 2012-2023 Liu Chao <root@lc-soft.io>.\n"
+                   "Copyright (C) 2012-2024 Liu Chao <root@lc-soft.io>.\n"
                    "This is open source software, licensed under MIT. \n"
                    "See source distribution for detailed copyright notices.\n"
                    "To learn more, visit http://www.lcui.org.\n\n");
 
-        lcui_init_timers();
         lcui_reset_settings();
         ptk_steptimer_init(&lcui_app.timer);
         lcui_app.main_worker = worker_create();
@@ -143,7 +140,6 @@ void lcui_destroy_app(void)
         }
         worker_destroy(lcui_app.main_worker);
         lcui_app.main_worker = NULL;
-        lcui_destroy_timers();
 }
 
 void lcui_init(void)

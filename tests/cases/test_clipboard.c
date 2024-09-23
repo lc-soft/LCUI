@@ -33,7 +33,7 @@ static void on_text1_focused(ui_widget_t *w, ui_event_t *e, void *arg)
         ev.key.code = KEY_C;
         ev.key.ctrl_key = true;
         ptk_post_event(&ev);
-        lcui_set_timeout(100, paste_text, e->data);
+        ptk_set_timeout(100, paste_text, e->data);
 }
 
 static void focus_text1(void *arg)
@@ -66,6 +66,6 @@ void test_clipboard(void)
         ui_textinput_set_text_w(text1, L"helloworld");
         ui_widget_on(text1, "focus", on_text1_focused, text2);
         ui_widget_on(text2, "paste", on_check_text, NULL);
-        lcui_set_timeout(500, focus_text1, text1);
+        ptk_set_timeout(500, focus_text1, text1);
         lcui_main();
 }

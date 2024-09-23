@@ -137,7 +137,7 @@ void InitRenderStatus(void)
 	ui_widget_set_style_string(status, "padding", "10px 15px");
 	ui_widget_append(root, status);
 	UpdateRenderStatus(status);
-	lcui_set_interval(1000, UpdateRenderStatus, status);
+	ptk_set_interval(1000, UpdateRenderStatus, status);
 }
 
 int main(int argc, char* argv[])

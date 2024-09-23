@@ -13,10 +13,9 @@
 #include <ui.h>
 #include <css.h>
 #include <yutil.h>
-#include <timer.h>
 #include <ui_widgets/textcaret.h>
 #include <ui_widgets/textinput.h>
-#include <ptk/ime.h>
+#include <ptk.h>
 
 typedef struct ui_textcaret_task_t {
         bool active;
@@ -52,7 +51,7 @@ void ui_textcaret_refresh(ui_widget_t *widget)
         if (!caret->visible) {
                 return;
         }
-        lcui_reset_timer(caret->timer_id, caret->blink_interval);
+        ptk_reset_timer(caret->timer_id, caret->blink_interval);
         ui_widget_get_offset(widget, ui_root(), &x, &y);
         ptk_ime_set_caret((int)x, (int)y);
         ui_widget_show(widget);
@@ -84,7 +83,7 @@ void ui_textcaret_set_visible(ui_widget_t *widget, bool visible)
         if (visible) {
                 ui_textcaret_refresh(widget);
         } else {
-                lcui_reset_timer(caret->timer_id, caret->blink_interval);
+                ptk_reset_timer(caret->timer_id, caret->blink_interval);
                 ui_widget_hide(widget);
         }
 }
@@ -100,7 +99,7 @@ static void ui_textcaret_on_init(ui_widget_t *widget)
         caret->task->widget = widget;
         caret->blink_interval = 500;
         caret->visible = false;
-        caret->timer_id = lcui_set_interval(caret->blink_interval,
+        caret->timer_id = ptk_set_interval(caret->blink_interval,
                                             ui_textcaret_on_blink, caret->task);
 }
 
@@ -110,7 +109,7 @@ void ui_textcaret_set_blink_time(ui_widget_t *widget, unsigned int n_ms)
 
         caret = ui_widget_get_data(widget, ui_textcaret_proto);
         caret->blink_interval = n_ms;
-        lcui_reset_timer(caret->timer_id, caret->blink_interval);
+        ptk_reset_timer(caret->timer_id, caret->blink_interval);
 }
 
 static void ui_textcaret_on_destroy(ui_widget_t *widget)
@@ -119,7 +118,7 @@ static void ui_textcaret_on_destroy(ui_widget_t *widget)
 
         caret = ui_widget_get_data(widget, ui_textcaret_proto);
         caret->task->active = false;
-        if (lcui_destroy_timer(caret->timer_id) != -1) {
+        if (ptk_clear_timer(caret->timer_id) != -1) {
                 free(caret->task);
                 caret->task = NULL;
         }

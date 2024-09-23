@@ -15,7 +15,7 @@
 #include <css.h>
 #include <ui.h>
 #include <ui_widgets/scrollbar.h>
-#include <timer.h>
+#include <ptk.h>
 
 /* clang-format off */
 
@@ -155,7 +155,7 @@ static void ui_scrollbar_on_scrolling(void *arg)
                         return;
                 }
         }
-        lcui_destroy_timer(effect->timer);
+        ptk_clear_interval(effect->timer);
         effect->is_running = false;
         effect->timer = -1;
 }
@@ -207,10 +207,10 @@ static void ui_scrollbar_start_scrolling(ui_widget_t *w)
         }
         effect->is_running = true;
         if (effect->timer > 0) {
-                lcui_destroy_timer(effect->timer);
+                ptk_clear_interval(effect->timer);
         }
         effect->timer =
-            lcui_set_interval(effect->interval, ui_scrollbar_on_scrolling, w);
+            ptk_set_interval(effect->interval, ui_scrollbar_on_scrolling, w);
         DEBUG_MSG("start_pos: %d, end_pos: %d\n", effect->start_pos,
                   effect->end_pos);
         DEBUG_MSG("effect->speed: %g, distance: %d, time: %d\n", effect->speed,

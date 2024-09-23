@@ -13,7 +13,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <LCUI.h>
-#include <timer.h>
 #include <ui.h>
 #include <ui_xml.h>
 #include <pandagl.h>
