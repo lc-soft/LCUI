@@ -20,5 +20,4 @@
 #include <thread.h>
 #include <ptk.h>
 #include <worker.h>
-#include <timer.h>
 #include <LCUI/app.h>

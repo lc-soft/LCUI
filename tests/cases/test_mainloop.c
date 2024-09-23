@@ -25,8 +25,8 @@ static void handle_quit(void *arg)
 
 static void handle_btn_click(ui_widget_t *w, ui_event_t *ui_event, void *arg)
 {
-        lcui_set_timeout(0, handle_refresh, NULL);
-        lcui_set_timeout(1, handle_quit, NULL);
+        ptk_set_timeout(0, handle_refresh, NULL);
+        ptk_set_timeout(1, handle_quit, NULL);
         lcui_process_events(PTK_PROCESS_EVENTS_UNTIL_QUIT);
         lcui_quit();
 }
@@ -74,7 +74,7 @@ void test_mainloop(void)
         /* Observe whether the main loop has exited in a new thread */
         thread_create(&tid, observer_thread, &exited);
         /* Trigger the click event after the first frame is updated */
-        lcui_set_timeout(50, handle_trigger_btn_click, btn);
+        ptk_set_timeout(50, handle_trigger_btn_click, btn);
         lcui_main();
         exited = true;
         thread_join(tid, NULL);

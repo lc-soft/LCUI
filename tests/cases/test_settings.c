@@ -84,28 +84,28 @@ void test_settings_frame_rate_cap(void)
 
 	settings.frame_rate_cap = 30;
 	lcui_apply_settings(&settings);
-	lcui_set_timeout(2000, check_settings_frame_rate_cap,
+	ptk_set_timeout(2000, check_settings_frame_rate_cap,
 			&settings.frame_rate_cap);
 	lcui_main();
 
 	lcui_init();
 	settings.frame_rate_cap = 5;
 	lcui_apply_settings(&settings);
-	lcui_set_timeout(2000, check_settings_frame_rate_cap,
+	ptk_set_timeout(2000, check_settings_frame_rate_cap,
 			&settings.frame_rate_cap);
 	lcui_main();
 
 	lcui_init();
 	settings.frame_rate_cap = 90;
 	lcui_apply_settings(&settings);
-	lcui_set_timeout(2000, check_settings_frame_rate_cap,
+	ptk_set_timeout(2000, check_settings_frame_rate_cap,
 			&settings.frame_rate_cap);
 	lcui_main();
 
 	lcui_init();
 	settings.frame_rate_cap = 25;
 	lcui_apply_settings(&settings);
-	lcui_set_timeout(2000, check_settings_frame_rate_cap,
+	ptk_set_timeout(2000, check_settings_frame_rate_cap,
 			&settings.frame_rate_cap);
 	lcui_main();
 }

@@ -20,6 +20,8 @@ static struct {
         /** list_t<app_listener_t> */
         list_t listeners;
 
+        timer_list_t *timers;
+
         ptk_event_dispatcher_t dispatcher;
 } ptk_events;
 
@@ -144,6 +146,28 @@ void ptk_tick(void)
         ptk_process_event(&tick_event);
 }
 
+int ptk_reset_timer(int timer_id, long ms)
+{
+        return timer_reset(ptk_events.timers, timer_id, ms);
+}
+
+int ptk_clear_timer(int timer_id)
+{
+        return timer_destroy(ptk_events.timers, timer_id);
+}
+
+int ptk_set_timeout(long ms, ptk_timer_cb cb, void *cb_arg)
+{
+        return timer_list_add_timeout(ptk_events.timers, ms, cb,
+                                      cb_arg);
+}
+
+int ptk_set_interval(long ms, ptk_timer_cb cb, void *cb_arg)
+{
+        return timer_list_add_interval(ptk_events.timers, ms, cb,
+                                      cb_arg);
+}
+
 int ptk_process_event(ptk_event_t *e)
 {
         int count = 0;
@@ -157,6 +181,7 @@ int ptk_process_event(ptk_event_t *e)
                         ++count;
                 }
         }
+        timer_list_process(ptk_events.timers);
         if (ptk_events.dispatcher) {
                 ptk_events.dispatcher(e);
         }
@@ -182,6 +207,7 @@ void ptk_set_event_dispatcher(ptk_event_dispatcher_t dispatcher)
 
 void ptk_events_init(void)
 {
+        ptk_events.timers = timer_list_create();
         list_create(&ptk_events.queue);
 }
 
@@ -189,4 +215,5 @@ void ptk_events_destroy(void)
 {
         ptk_set_event_dispatcher(NULL);
         list_destroy(&ptk_events.queue, free);
+        timer_list_destroy(ptk_events.timers);
 }

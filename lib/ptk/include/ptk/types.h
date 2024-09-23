@@ -16,6 +16,7 @@
 #include <pandagl/types.h>
 
 typedef pd_context_t ptk_window_paint_t;
+typedef void (*ptk_timer_cb)(void *);
 
 typedef enum {
 	PTK_APP_ID_UNKNOWN,
