@@ -16,6 +16,8 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: branch@dev
 
       - name: Update git submodule
         run: |
@@ -86,14 +88,14 @@ jobs:
 
       - name: Package
         run: |
-          xmake package -v
+          xmake package
           xmake install -o dist/lcui-package
 
       - name: Build examples
         run: |
           cd examples
-          xmake config -P . -y -v
-          xmake build -P . -v
+          xmake config -P . -y
+          xmake build -P .
           xmake install -P . -o ../dist/lcui-examples
           mv ../dist/lcui-examples/bin/* ../dist/lcui-examples/
           rm -r ../dist/lcui-examples/bin
