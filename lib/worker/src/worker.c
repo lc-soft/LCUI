@@ -15,28 +15,32 @@
 #include <yutil.h>
 #include <thread.h>
 
-struct worker_t {
-        bool active;          /**< 是否处于活动状态 */
-        list_t tasks;         /**< 任务队列 */
-        thread_mutex_t mutex; /**< 互斥锁 */
-        thread_cond_t cond;   /**< 条件变量 */
-        thread_t thread;      /**< 所在的线程 */
+struct worker {
+        bool active;
+        list_t tasks;
+        thread_mutex_t mutex;
+        thread_cond_t cond;
+        thread_t thread;
+};
+
+struct worker_task {
+        worker_task_cb task_cb;
+        worker_task_cb after_task_cb;
+        void *data;
 };
 
 static void worker_task_destroy(worker_task_t *task)
 {
-        if (task->destroy_arg[0] && task->arg[0]) {
-                task->destroy_arg[0](task->arg[0]);
+        if (task->after_task_cb) {
+                task->after_task_cb(task->data);
         }
-        if (task->destroy_arg[1] && task->arg[1]) {
-                task->destroy_arg[1](task->arg[1]);
-        }
+        free(task);
 }
 
 static int worker_task_run(worker_task_t *task)
 {
-        if (task && task->callback) {
-                task->callback(task->arg[0], task->arg[1]);
+        if (task && task->task_cb) {
+                task->task_cb(task->data);
                 return 0;
         }
         return -1;
@@ -53,18 +57,42 @@ worker_t *worker_create(void)
         return worker;
 }
 
-void worker_post_task(worker_t *worker, worker_task_t *task)
+void worker_destroy(worker_t *worker)
 {
-        worker_task_t *newtask;
-        newtask = malloc(sizeof(worker_task_t));
-        *newtask = *task;
-        thread_mutex_lock(&worker->mutex);
-        list_append(&worker->tasks, newtask);
-        thread_cond_signal(&worker->cond);
+        thread_t thread = worker->thread;
+
+        if (worker->active) {
+                thread_mutex_lock(&worker->mutex);
+                worker->active = false;
+                thread_cond_signal(&worker->cond);
+                thread_mutex_unlock(&worker->mutex);
+                thread_join(thread, NULL);
+        }
+        list_destroy(&worker->tasks, (list_item_destructor_t)worker_task_destroy);
         thread_mutex_unlock(&worker->mutex);
+        thread_mutex_destroy(&worker->mutex);
+        thread_cond_destroy(&worker->cond);
+        free(worker);
 }
 
-worker_task_t *worker_get_task(worker_t *worker)
+worker_task_t *worker_post_task(worker_t *worker, void *data,
+                                worker_task_cb task_cb,
+                                worker_task_cb after_task_cb)
+{
+        worker_task_t *task;
+
+        task = malloc(sizeof(worker_task_t));
+        task->data = data;
+        task->task_cb = task_cb;
+        task->after_task_cb = after_task_cb;
+        thread_mutex_lock(&worker->mutex);
+        list_append(&worker->tasks, task);
+        thread_cond_signal(&worker->cond);
+        thread_mutex_unlock(&worker->mutex);
+        return task;
+}
+
+static worker_task_t *worker_get_task(worker_t *worker)
 {
         worker_task_t *task;
         list_node_t *node;
@@ -79,7 +107,7 @@ worker_task_t *worker_get_task(worker_t *worker)
         return task;
 }
 
-bool worker_run_task(worker_t *worker)
+bool worker_run(worker_t *worker)
 {
         worker_task_t *task;
 
@@ -91,23 +119,24 @@ bool worker_run_task(worker_t *worker)
         }
         worker_task_run(task);
         worker_task_destroy(task);
-        free(task);
         return true;
 }
 
-static void worker_on_destroy_task(void *arg)
+bool worker_cancel_task(worker_t *worker, worker_task_t *task)
 {
-        worker_task_destroy(arg);
-        free(arg);
-}
+        list_node_t *node;
 
-static void worker_do_destroy(worker_t *worker)
-{
-        list_destroy(&worker->tasks, worker_on_destroy_task);
+        thread_mutex_lock(&worker->mutex);
+        for (list_each(node, &worker->tasks)) {
+                if (node->data == task) {
+                        worker_task_destroy(task);
+                        list_delete_node(&worker->tasks, node);
+                        thread_mutex_unlock(&worker->mutex);
+                        return true;
+                }
+        }
         thread_mutex_unlock(&worker->mutex);
-        thread_mutex_destroy(&worker->mutex);
-        thread_cond_destroy(&worker->cond);
-        free(worker);
+        return false;
 }
 
 static void worker_thread(void *arg)
@@ -115,22 +144,16 @@ static void worker_thread(void *arg)
         worker_task_t *task;
         worker_t *worker = arg;
 
-        thread_mutex_lock(&worker->mutex);
         while (worker->active) {
+                thread_mutex_lock(&worker->mutex);
+                thread_cond_wait(&worker->cond, &worker->mutex);
                 task = worker_get_task(worker);
+                thread_mutex_unlock(&worker->mutex);
                 if (task) {
-                        thread_mutex_unlock(&worker->mutex);
                         worker_task_run(task);
                         worker_task_destroy(task);
-                        free(task);
-                        thread_mutex_lock(&worker->mutex);
-                        continue;
-                }
-                if (worker->active) {
-                        thread_cond_wait(&worker->cond, &worker->mutex);
                 }
         }
-        worker_do_destroy(worker);
         thread_exit(NULL);
 }
 
@@ -142,19 +165,4 @@ int worker_run_async(worker_t *worker)
         worker->active = true;
         thread_create(&worker->thread, worker_thread, worker);
         return 0;
-}
-
-void worker_destroy(worker_t *worker)
-{
-        thread_t thread = worker->thread;
-
-        if (worker->active) {
-                thread_mutex_lock(&worker->mutex);
-                worker->active = false;
-                thread_cond_signal(&worker->cond);
-                thread_mutex_unlock(&worker->mutex);
-                thread_join(thread, NULL);
-                return;
-        }
-        worker_do_destroy(worker);
 }

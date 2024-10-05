@@ -40,22 +40,13 @@ LCUI_API void lcui_reset_settings(void);
 
 // Tasks
 
-/**
- * 添加任务
- * 该任务将会添加至主线程中执行
- */
-LCUI_API bool lcui_post_task(worker_task_t *task);
+LCUI_API worker_task_t *lcui_post_task(void *data, worker_task_cb task_cb,
+                                       worker_task_cb after_task_cb);
+LCUI_API worker_task_t *lcui_post_async_task(void *data, worker_task_cb task_cb,
+                                             worker_task_cb after_task_cb);
 
-/**
- * 添加异步任务
- * 该任务将会添加至指定 id 的工作线程中执行
- * @param[in] task 任务数据
- * @param[in] target_worker_id 目标工作线程的编号
- */
-LCUI_API void lcui_post_async_task(worker_task_t *task, int target_worker_id);
-
-LCUI_API bool lcui_post_simple_task(worker_callback_t callback, void *arg1,
-                                    void *arg2);
+bool lcui_cancel_async_task(worker_task_t *task);
+bool lcui_cancel_task(worker_task_t *task);
 
 // UI
 

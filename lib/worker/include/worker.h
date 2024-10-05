@@ -17,21 +17,19 @@
 
 LIBWORKER_BEGIN_DECLS
 
-typedef void (*worker_callback_t)(void *, void *);
-
-typedef struct worker_task_t {
-        worker_callback_t callback;     /**< 任务处理函数 */
-        void *arg[2];                   /**< 两个参数 */
-        void (*destroy_arg[2])(void *); /**< 参数的销毁函数 */
-} worker_task_t;
-
-typedef struct worker_t worker_t;
+typedef void (*worker_task_cb)(void *);
+typedef struct worker worker_t;
+typedef struct worker_task worker_task_t;
 
 LIBWORKER_PUBLIC worker_t *worker_create(void);
 
-LIBWORKER_PUBLIC void worker_post_task(worker_t *worker, worker_task_t *task);
+LIBWORKER_PUBLIC worker_task_t *worker_post_task(worker_t *worker, void *data,
+                                                 worker_task_cb task_cb,
+                                                 worker_task_cb after_task_cb);
 
-LIBWORKER_PUBLIC bool worker_run_task(worker_t *worker);
+LIBWORKER_PUBLIC bool worker_cancel_task(worker_t *worker, worker_task_t *task);
+
+LIBWORKER_PUBLIC bool worker_run(worker_t *worker);
 
 LIBWORKER_PUBLIC int worker_run_async(worker_t *worker);
 

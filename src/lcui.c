@@ -21,14 +21,11 @@
 #include <worker.h>
 #include <thread.h>
 
-#define LCUI_WORKER_NUM 4
-
 /** LCUI 应用程序数据 */
 static struct lcui_app_t {
         ptk_steptimer_t timer;
         worker_t *main_worker;
-        worker_t *workers[LCUI_WORKER_NUM];
-        int worker_next;
+        worker_t *async_worker;
 } lcui_app;
 
 const char *lcui_get_version(void)
@@ -36,37 +33,30 @@ const char *lcui_get_version(void)
         return PACKAGE_VERSION;
 }
 
-bool lcui_post_task(worker_task_t *task)
+worker_task_t *lcui_post_task(void *data, worker_task_cb task_cb,
+                              worker_task_cb after_task_cb)
 {
         if (!lcui_app.main_worker) {
-                return false;
+                return NULL;
         }
-        worker_post_task(lcui_app.main_worker, task);
-        return true;
+        return worker_post_task(lcui_app.main_worker, data, task_cb,
+                                after_task_cb);
+}
+worker_task_t *lcui_post_async_task(void *data, worker_task_cb task_cb,
+                                    worker_task_cb after_task_cb)
+{
+        return worker_post_task(lcui_app.async_worker, data, task_cb,
+                                after_task_cb);
 }
 
-bool lcui_post_simple_task(worker_callback_t callback, void *arg1, void *arg2)
+bool lcui_cancel_async_task(worker_task_t *task)
 {
-        worker_task_t task = { 0 };
-        task.arg[0] = arg1;
-        task.arg[1] = arg2;
-        task.callback = callback;
-        return lcui_post_task(&task);
+        return worker_cancel_task(lcui_app.async_worker, task);
 }
 
-void lcui_post_async_task(worker_task_t *task, int worker_id)
+bool lcui_cancel_task(worker_task_t *task)
 {
-        if (worker_id < 0) {
-                if (lcui_app.worker_next >= LCUI_WORKER_NUM) {
-                        lcui_app.worker_next = 0;
-                }
-                worker_id = lcui_app.worker_next;
-                lcui_app.worker_next += 1;
-        }
-        if (worker_id >= LCUI_WORKER_NUM) {
-                worker_id = 0;
-        }
-        worker_post_task(lcui_app.workers[worker_id], task);
+        return worker_cancel_task(lcui_app.async_worker, task);
 }
 
 uint32_t lcui_get_fps(void)
@@ -95,7 +85,7 @@ static int lcui_dispatch_app_event(ptk_event_t *e)
         if (e->type == PTK_EVENT_QUIT) {
                 return 0;
         }
-        worker_run_task(lcui_app.main_worker);
+        worker_run(lcui_app.main_worker);
         lcui_dispatch_ui_event(e);
         lcui_update_ui();
         ptk_steptimer_tick(&lcui_app.timer, lcui_app_on_tick, NULL);
@@ -109,7 +99,6 @@ int lcui_process_events(ptk_process_events_option_t option)
 
 void lcui_init_app(void)
 {
-        int i;
         logger_log(LOGGER_LEVEL_INFO,
                    "LCUI (LC's UI) version " PACKAGE_VERSION "\n"
                    "Build at "__DATE__
@@ -123,23 +112,17 @@ void lcui_init_app(void)
         lcui_reset_settings();
         ptk_steptimer_init(&lcui_app.timer);
         lcui_app.main_worker = worker_create();
-        for (i = 0; i < LCUI_WORKER_NUM; ++i) {
-                lcui_app.workers[i] = worker_create();
-                worker_run_async(lcui_app.workers[i]);
-        }
+        lcui_app.async_worker = worker_create();
         lcui_app.timer.target_elapsed_time = 0;
+        worker_run_async(lcui_app.async_worker);
 }
 
 void lcui_destroy_app(void)
 {
-        int i;
-
-        for (i = 0; i < LCUI_WORKER_NUM; ++i) {
-                worker_destroy(lcui_app.workers[i]);
-                lcui_app.workers[i] = NULL;
-        }
         worker_destroy(lcui_app.main_worker);
+        worker_destroy(lcui_app.async_worker);
         lcui_app.main_worker = NULL;
+        lcui_app.async_worker = NULL;
 }
 
 void lcui_init(void)
