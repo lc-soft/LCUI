@@ -30,3 +30,7 @@
 .button.borderless {
   border: none;
 }
+
+.w-\[360px\] {
+  width: 360px;
+}

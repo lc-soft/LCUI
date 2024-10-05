@@ -102,6 +102,23 @@ void test_container_style(void)
         css_computed_style_destroy(&computed);
 }
 
+void test_w360px_style(void)
+{
+        css_selector_t *selector;
+        css_style_decl_t *result;
+        css_computed_style_t computed;
+
+        selector = css_selector_create(".w-\\[360px\\]");
+        result = css_select_style(selector);
+        css_cascade_style(result, &computed);
+
+        check_length("width", computed.width, 360);
+
+        css_style_decl_destroy(result);
+        css_selector_destroy(selector);
+        css_computed_style_destroy(&computed);
+}
+
 void test_button_borderless_style(void)
 {
         css_selector_t *selector;
@@ -158,6 +175,7 @@ void test_css_computed(void)
         ctest_describe(".primary.button:focus", test_button_focus_style);
         ctest_describe(".container", test_container_style);
         ctest_describe(".button.borderless", test_button_borderless_style);
+        ctest_describe(".w-[360px]", test_w360px_style);
 
         css_destroy();
 }
