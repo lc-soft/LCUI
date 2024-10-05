@@ -58,7 +58,7 @@ LIBUI_PUBLIC ui_image_t *ui_image_create(const char *path);
 
 LIBUI_INLINE bool ui_image_valid(ui_image_t *image)
 {
-        return image->error == PD_OK && image->state == UI_IMAGE_STATE_COMPLETE;
+        return image != NULL && image->error == PD_OK && image->state == UI_IMAGE_STATE_COMPLETE;
 }
 
 LIBUI_PUBLIC void ui_image_destroy(ui_image_t *image);
