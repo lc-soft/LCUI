@@ -157,8 +157,8 @@ void ui_anchor_open(ui_widget_t* w)
                 logger_error("[anchor] href are required\n");
                 return;
         }
-        if (strstr(attr_href, "file:") == attr_href) {
-                ptk_open_uri(attr_href + 5);
+        if (strstr(attr_href, "file:///") == attr_href) {
+                ptk_open_uri(attr_href + 8);
                 return;
         }
         if (strstr(attr_href, "http://") == attr_href ||
