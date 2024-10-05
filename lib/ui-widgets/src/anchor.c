@@ -135,7 +135,6 @@ static void ui_anchor_on_startload(ui_widget_t* w, ui_event_t* e, void* arg)
 {
         ui_widget_t* target;
         xml_loader_t* loader = arg;
-        worker_task_t task = { 0 };
 
         target = ui_get_widget(loader->target_id);
         if (!target) {
@@ -145,9 +144,7 @@ static void ui_anchor_on_startload(ui_widget_t* w, ui_event_t* e, void* arg)
                 return;
         }
         ui_widget_empty(target);
-        task.arg[0] = loader;
-        task.callback = (worker_callback_t)xml_loader_load;
-        worker_post_task(ui_anchor.worker, &task);
+        worker_post_task(ui_anchor.worker, loader, xml_loader_load, NULL);
 }
 
 void ui_anchor_open(ui_widget_t* w)
@@ -181,11 +178,7 @@ void ui_anchor_open(ui_widget_t* w)
 
 static void ui_anchor_on_click(ui_widget_t* w, ui_event_t* e, void* arg)
 {
-        worker_task_t task = { 0 };
-
-        task.callback = (worker_callback_t)ui_anchor_open;
-        task.arg[0] = w;
-        worker_post_task(ui_anchor.worker, &task);
+        worker_post_task(ui_anchor.worker, w, ui_anchor_open, NULL);
 }
 
 static void ui_anchor_on_init(ui_widget_t* w)
