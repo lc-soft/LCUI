@@ -428,6 +428,13 @@ static void ui_flexbox_layout_update_row(ui_flexbox_layout_context_t *ctx)
 
         // 根据 justify-content 和 align-items，更新每个项目的位置和尺寸
         ui_flexbox_layout_compute_justify_content(ctx, &main_axis, &space);
+#ifdef UI_DEBUG_ENABLED
+        {
+                UI_WIDGET_STR(ctx->widget, str);
+                UI_DEBUG_MSG("%s: main_axis_start = %g, free_space = %g, justify_content = %d",
+                             str, main_axis, space, ctx->widget->computed_style.type_bits.justify_content);
+        }
+#endif
         for (list_each(node, &ctx->line->items)) {
                 main_axis += space;
                 child = node->data;
