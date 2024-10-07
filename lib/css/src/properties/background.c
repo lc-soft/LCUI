@@ -224,6 +224,28 @@ int css_cascade_background_repeat(const css_style_array_value_t input,
         return 1;
 }
 
+int css_cascade_background_clip(const css_style_array_value_t input,
+                                css_computed_style_t *s)
+{
+        if (input[0].type != CSS_KEYWORD_VALUE) {
+                return 0;
+        }
+        switch (input[0].keyword_value) {
+        case CSS_KEYWORD_BORDER_BOX:
+                s->type_bits.background_clip = CSS_BACKGROUND_CLIP_BORDER_BOX;
+                break;
+        case CSS_KEYWORD_PADDING_BOX:
+                s->type_bits.background_clip = CSS_BACKGROUND_CLIP_PADDING_BOX;
+                break;
+        case CSS_KEYWORD_CONTENT_BOX:
+                s->type_bits.background_clip = CSS_BACKGROUND_CLIP_CONTENT_BOX;
+                break;
+        default:
+                return 0;
+        }
+        return 1;
+}
+
 int css_cascade_background_image(const css_style_array_value_t input,
                                  css_computed_style_t *s)
 {

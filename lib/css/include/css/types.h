@@ -85,6 +85,7 @@ typedef enum {
 	css_prop_background_image,
 	css_prop_background_size,
 	css_prop_background_repeat,
+	css_prop_background_clip,
 	css_prop_background_position_x,
 	css_prop_background_position_y,
 	// background end
@@ -178,6 +179,13 @@ typedef enum {
 	CSS_BACKGROUND_REPEAT_REPEAT,
 	CSS_BACKGROUND_REPEAT_NO_REPEAT
 } css_background_repeat_t;
+
+typedef enum {
+	CSS_BACKGROUND_CLIP_INHERIT,
+	CSS_BACKGROUND_CLIP_BORDER_BOX,
+	CSS_BACKGROUND_CLIP_PADDING_BOX,
+	CSS_BACKGROUND_CLIP_CONTENT_BOX
+} css_background_clip_t;
 
 typedef enum {
 	CSS_BORDER_RADIUS_INHERIT,
@@ -694,6 +702,7 @@ typedef struct css_computed_style_t {
 		uint8_t background_width : 3;
 		uint8_t background_height : 3;
 		uint8_t background_repeat : 3;
+		uint8_t background_clip : 3;
 		uint8_t background_position_x : 1;
 		uint8_t background_position_y : 1;
 

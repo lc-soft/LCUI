@@ -287,6 +287,11 @@ void css_init_properties(void)
                     "transparent");
 
         /** @see
+         * https://developer.mozilla.org/en-US/docs/Web/CSS/background-clip */
+        DEFINE_PROP(background_clip, "background-clip", "border-box | padding-box | content-box",
+                    "border-box");
+
+        /** @see
          * https://developer.mozilla.org/en-US/docs/Web/CSS/background-position
          */
         DEFINE_SHORTHAND_PROP(background_position, "background-position",
