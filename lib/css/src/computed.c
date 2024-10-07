@@ -1079,7 +1079,10 @@ static void compute_absolute_width(const css_computed_style_t *parent,
                         s->type_bits.width = CSS_WIDTH_FIT_CONTENT;
                         break;
                 }
-                if (compute_content_box_fixed_width(parent, &parent_value)) {
+                // 当父元素是块级元素且 display 为 block 时，width 为父元素的
+                // content box 的宽度
+                if (is_css_display_block(parent) &&
+                    compute_content_box_fixed_width(parent, &parent_value)) {
                         value = parent_value - s->margin_left - s->margin_right;
                         if (s->type_bits.box_sizing ==
                             CSS_BOX_SIZING_CONTENT_BOX) {
@@ -1147,8 +1150,7 @@ static void compute_absolute_height(const css_computed_style_t *parent,
                 if (css_computed_position(s) > CSS_POSITION_RELATIVE) {
                         parent_value += css_padding_y(parent);
                 }
-                CSS_SET_FIXED_LENGTH(s, height,
-                                     parent_value * value / 100.0f);
+                CSS_SET_FIXED_LENGTH(s, height, parent_value * value / 100.0f);
                 break;
         default:
                 break;
