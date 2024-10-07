@@ -43,9 +43,25 @@ void ui_widget_paint_background(ui_widget_t *w, pd_context_t *ctx,
             s->type_bits.background_repeat == CSS_BACKGROUND_REPEAT_REPEAT ||
             s->type_bits.background_repeat == CSS_BACKGROUND_REPEAT_REPEAT_Y;
 
-        box.x = style->padding_box.x - style->canvas_box.x;
-        box.y = style->padding_box.y - style->canvas_box.y;
-        box.width = style->padding_box.width;
-        box.height = style->padding_box.height;
+        switch (s->type_bits.background_clip) {
+        case CSS_BACKGROUND_CLIP_PADDING_BOX:
+                box.x = style->padding_box.x - style->canvas_box.x;
+                box.y = style->padding_box.y - style->canvas_box.y;
+                box.width = style->padding_box.width;
+                box.height = style->padding_box.height;
+                break;
+        case CSS_BACKGROUND_CLIP_CONTENT_BOX:
+                box.x = style->content_box.x - style->canvas_box.x;
+                box.y = style->content_box.y - style->canvas_box.y;
+                box.width = style->content_box.width;
+                box.height = style->content_box.height;
+                break;
+        default:
+                box.x = style->border_box.x - style->canvas_box.x;
+                box.y = style->border_box.y - style->canvas_box.y;
+                box.width = style->border_box.width;
+                box.height = style->border_box.height;
+                break;
+        }
         pd_paint_background(ctx, &bg, &box);
 }

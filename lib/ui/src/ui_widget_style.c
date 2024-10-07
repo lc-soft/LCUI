@@ -9,7 +9,6 @@
  * LICENSE.TXT file in the root directory of this source tree.
  */
 
-#include <string.h>
 #include <css.h>
 #include <ui/base.h>
 #include <ui/metrics.h>
@@ -264,21 +263,33 @@ static void ui_widget_on_image_load(ui_image_event_t *e)
         ui_widget_t *w = e->data;
         pd_canvas_t *img = &e->image->data;
         css_computed_style_t *s = &w->computed_style;
+        ui_rect_t *box;
 
+        switch (s->type_bits.background_clip) {
+        case CSS_BACKGROUND_CLIP_PADDING_BOX:
+                box = &w->padding_box;
+                break;
+        case CSS_BACKGROUND_CLIP_CONTENT_BOX:
+                box = &w->content_box;
+                break;
+        default:
+                box = &w->border_box;
+                break;
+        }
         CSS_COPY_LENGTH(s, &w->specified_style, background_width);
         CSS_COPY_LENGTH(s, &w->specified_style, background_height);
         CSS_COPY_LENGTH(s, &w->specified_style, background_position_x);
         CSS_COPY_LENGTH(s, &w->specified_style, background_position_y);
         switch (s->type_bits.background_width) {
         case CSS_BACKGROUND_SIZE_COVER:
-                scale = 1.f * w->padding_box.width / img->width;
-                scale = y_max(scale, 1.f * w->padding_box.height / img->height);
+                scale = 1.f * box->width / img->width;
+                scale = y_max(scale, 1.f * box->height / img->height);
                 CSS_SET_FIXED_LENGTH(s, background_width, scale * img->width);
                 CSS_SET_FIXED_LENGTH(s, background_height, scale * img->height);
                 break;
         case CSS_BACKGROUND_SIZE_CONTAIN:
-                scale = 1.f * w->padding_box.width / img->width;
-                scale = y_min(scale, 1.f * w->padding_box.height / img->height);
+                scale = 1.f * box->width / img->width;
+                scale = y_min(scale, 1.f * box->height / img->height);
                 CSS_SET_FIXED_LENGTH(s, background_width, scale * img->width);
                 CSS_SET_FIXED_LENGTH(s, background_height, scale * img->height);
                 break;
@@ -286,7 +297,7 @@ static void ui_widget_on_image_load(ui_image_event_t *e)
                 if (IS_CSS_PERCENTAGE(s, background_width)) {
                         CSS_SET_FIXED_LENGTH(
                             s, background_width,
-                            s->background_width * w->padding_box.width / 100.f);
+                            s->background_width * box->width / 100.f);
                 }
                 break;
         default:
@@ -295,9 +306,9 @@ static void ui_widget_on_image_load(ui_image_event_t *e)
         switch (s->type_bits.background_height) {
         case CSS_BACKGROUND_SIZE_SET:
                 if (IS_CSS_PERCENTAGE(s, background_height)) {
-                        CSS_SET_FIXED_LENGTH(s, background_height,
-                                             s->background_height *
-                                                 w->padding_box.height / 100.f);
+                        CSS_SET_FIXED_LENGTH(
+                            s, background_height,
+                            s->background_height * box->height / 100.f);
                 }
                 break;
         default:
@@ -322,13 +333,13 @@ static void ui_widget_on_image_load(ui_image_event_t *e)
         if (IS_CSS_PERCENTAGE(s, background_position_x)) {
                 CSS_SET_FIXED_LENGTH(
                     s, background_position_x,
-                    (w->padding_box.width - s->background_width) *
+                    (box->width - s->background_width) *
                         s->background_position_x / 100.f);
         }
         if (IS_CSS_PERCENTAGE(s, background_position_y)) {
                 CSS_SET_FIXED_LENGTH(
                     s, background_position_y,
-                    (w->padding_box.height - s->background_height) *
+                    (box->height - s->background_height) *
                         s->background_position_y / 100.f);
         }
         ui_widget_mark_dirty_rect(w, NULL, UI_BOX_TYPE_BORDER_BOX);
