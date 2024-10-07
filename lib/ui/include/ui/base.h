@@ -98,6 +98,7 @@ LIBUI_PUBLIC void ui_print_tree(ui_widget_t *w);
 LIBUI_PUBLIC bool ui_widget_is_visible(ui_widget_t *w);
 LIBUI_PUBLIC void ui_widget_move(ui_widget_t *w, float left, float top);
 LIBUI_PUBLIC void ui_widget_resize(ui_widget_t *w, float width, float height);
+LIBUI_PUBLIC void ui_widget_set_background_image_url(ui_widget_t *w, const char *path);
 LIBUI_PUBLIC void ui_widget_show(ui_widget_t *w);
 LIBUI_PUBLIC void ui_widget_hide(ui_widget_t *w);
 LIBUI_PUBLIC ui_widget_t *ui_widget_get_closest(ui_widget_t *w,
