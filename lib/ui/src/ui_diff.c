@@ -55,21 +55,23 @@ void ui_style_diff_begin(ui_style_diff_t *diff, ui_widget_t *w)
 void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w)
 {
         ui_mutation_record_t *record;
-        bool layout_changed = IS_PROP_TYPE_CHANGED(display) ||
-                              IS_PROP_TYPE_CHANGED(position) ||
-                              diff->padding_box.width != w->padding_box.width ||
-                              diff->padding_box.height != w->padding_box.height;
+        bool flow_changed =
+            IS_PROP_TYPE_CHANGED(display) || IS_PROP_TYPE_CHANGED(position);
+        bool inner_changed = diff->padding_box.width != w->padding_box.width ||
+                             diff->padding_box.height != w->padding_box.height;
 
-        if (layout_changed || (ui_widget_has_flex_display(w) &&
-                               (IS_PROP_TYPE_CHANGED(flex_wrap) ||
-                                IS_PROP_TYPE_CHANGED(flex_direction) ||
-                                IS_PROP_TYPE_CHANGED(justify_content) ||
-                                IS_PROP_TYPE_CHANGED(align_content) ||
-                                IS_PROP_TYPE_CHANGED(align_items)))) {
+        if (flow_changed || inner_changed ||
+            (ui_widget_has_flex_display(w) &&
+             (IS_PROP_TYPE_CHANGED(flex_wrap) ||
+              IS_PROP_TYPE_CHANGED(flex_direction) ||
+              IS_PROP_TYPE_CHANGED(justify_content) ||
+              IS_PROP_TYPE_CHANGED(align_content) ||
+              IS_PROP_TYPE_CHANGED(align_items)))) {
                 ui_widget_request_reflow(w);
         }
-        if (w->parent && ui_widget_in_layout_flow(w)) {
-                if (layout_changed || IS_LENGTH_PROP_CHANGED(margin_left) ||
+        if (w->parent && (flow_changed || ui_widget_in_layout_flow(w))) {
+                if (flow_changed || inner_changed ||
+                    IS_LENGTH_PROP_CHANGED(margin_left) ||
                     IS_LENGTH_PROP_CHANGED(margin_right) ||
                     IS_LENGTH_PROP_CHANGED(margin_top) ||
                     IS_LENGTH_PROP_CHANGED(margin_bottom) ||

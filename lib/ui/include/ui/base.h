@@ -110,9 +110,8 @@ LIBUI_PUBLIC dict_t *ui_widget_collect_references(ui_widget_t *w);
 /**
  * 执行布局前的准备操作
  * 重置布局相关属性，以让它们在布局时被重新计算
- * @param rule 父级组件所使用的布局规则
  */
-LIBUI_PUBLIC void ui_widget_reset_layout(ui_widget_t *w, ui_layout_rule_t rule);
+LIBUI_PUBLIC void ui_widget_reset_layout(ui_widget_t *w);
 
 LIBUI_PUBLIC void ui_widget_auto_reflow(ui_widget_t *w);
 

@@ -177,8 +177,8 @@ static void ui_text_on_destroy(ui_widget_t *w)
         }
 }
 
-static void ui_text_on_auto_size(ui_widget_t *w, float *width, float *height,
-                                 ui_layout_rule_t rule)
+static void ui_text_on_autosize(ui_widget_t *w, float *width, float *height,
+                                ui_layout_rule_t rule)
 {
         float max_width, max_height;
         ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
@@ -344,7 +344,7 @@ void ui_register_text(void)
         ui_text.prototype->init = ui_text_on_init;
         ui_text.prototype->paint = ui_text_on_paint;
         ui_text.prototype->destroy = ui_text_on_destroy;
-        ui_text.prototype->autosize = ui_text_on_auto_size;
+        ui_text.prototype->autosize = ui_text_on_autosize;
         ui_text.prototype->resize = ui_text_on_resize;
         ui_text.prototype->update = ui_text_on_update;
         ui_text.prototype->settext = ui_text_on_parse_text;
