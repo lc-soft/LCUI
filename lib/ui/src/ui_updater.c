@@ -311,8 +311,7 @@ static void ui_widget_update_size(ui_widget_t *w)
         css_computed_style_t *src = &w->specified_style;
         css_computed_style_t *dest = &w->computed_style;
 
-        CSS_COPY_LENGTH(dest, src, width);
-        CSS_COPY_LENGTH(dest, src, height);
+        ui_widget_reset_layout(w);
         ui_widget_compute_style(w);
         ui_widget_update_box_size(w);
         ui_widget_reflow(w);

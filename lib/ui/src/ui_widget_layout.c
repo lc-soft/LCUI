@@ -41,34 +41,30 @@ static void ui_widget_reflow_with_rule(ui_widget_t *w, ui_layout_rule_t rule)
  * 重置布局相关属性，以让它们在布局时被重新计算
  * @param rule 父级组件所使用的布局规则
  */
-void ui_widget_reset_layout(ui_widget_t *w, ui_layout_rule_t rule)
+void ui_widget_reset_layout(ui_widget_t *w)
 {
 	css_computed_style_t *src = &w->specified_style;
 	css_computed_style_t *dest = &w->computed_style;
 
-	if ((rule & UI_LAYOUT_RULE_FIXED_WIDTH) == UI_LAYOUT_RULE_FIXED_WIDTH) {
-		CSS_COPY_LENGTH(dest, src, width);
-		CSS_COPY_LENGTH(dest, src, min_width);
-		CSS_COPY_LENGTH(dest, src, max_width);
-		CSS_COPY_LENGTH(dest, src, left);
-		CSS_COPY_LENGTH(dest, src, right);
-		CSS_COPY_LENGTH(dest, src, padding_left);
-		CSS_COPY_LENGTH(dest, src, padding_right);
-		CSS_COPY_LENGTH(dest, src, margin_left);
-		CSS_COPY_LENGTH(dest, src, margin_right);
-	}
-	if ((rule & UI_LAYOUT_RULE_FIXED_HEIGHT) ==
-	    UI_LAYOUT_RULE_FIXED_HEIGHT) {
-		CSS_COPY_LENGTH(dest, src, height);
-		CSS_COPY_LENGTH(dest, src, min_height);
-		CSS_COPY_LENGTH(dest, src, max_height);
-		CSS_COPY_LENGTH(dest, src, top);
-		CSS_COPY_LENGTH(dest, src, bottom);
-		CSS_COPY_LENGTH(dest, src, padding_top);
-		CSS_COPY_LENGTH(dest, src, padding_bottom);
-		CSS_COPY_LENGTH(dest, src, margin_top);
-		CSS_COPY_LENGTH(dest, src, margin_bottom);
-	}
+	CSS_COPY_LENGTH(dest, src, width);
+	CSS_COPY_LENGTH(dest, src, min_width);
+	CSS_COPY_LENGTH(dest, src, max_width);
+	CSS_COPY_LENGTH(dest, src, left);
+	CSS_COPY_LENGTH(dest, src, right);
+	CSS_COPY_LENGTH(dest, src, padding_left);
+	CSS_COPY_LENGTH(dest, src, padding_right);
+	CSS_COPY_LENGTH(dest, src, margin_left);
+	CSS_COPY_LENGTH(dest, src, margin_right);
+	CSS_COPY_LENGTH(dest, src, height);
+	CSS_COPY_LENGTH(dest, src, min_height);
+	CSS_COPY_LENGTH(dest, src, max_height);
+	CSS_COPY_LENGTH(dest, src, top);
+	CSS_COPY_LENGTH(dest, src, bottom);
+	CSS_COPY_LENGTH(dest, src, padding_top);
+	CSS_COPY_LENGTH(dest, src, padding_bottom);
+	CSS_COPY_LENGTH(dest, src, margin_top);
+	CSS_COPY_LENGTH(dest, src, margin_bottom);
+        CSS_COPY_LENGTH(dest, src, flex_basis);
 }
 
 void ui_widget_auto_reflow(ui_widget_t *w)

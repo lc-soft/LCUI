@@ -42,7 +42,7 @@ void ui_widget_to_string(ui_widget_t *w, char *str)
 		node->status = NULL;
 		css_selector_node_update(node);
 	}
-	strcpy(str, node->fullname);
+	strcpy(str, node->fullname ? node->fullname : "<widget>");
 	css_selector_node_destroy(node);
 }
 
@@ -63,7 +63,7 @@ void ui_widget_size_to_string(ui_widget_t *w, char str[40])
 		break;
 	}
 	switch (w->computed_style.type_bits.height) {
-	case CSS_WIDTH_SET:
+	case CSS_HEIGHT_SET:
 		snprintf(height_str, 16, "%g%s", w->computed_style.height,
 			 get_css_unit_str(w->computed_style.unit_bits.height));
 		break;
