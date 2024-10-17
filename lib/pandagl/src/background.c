@@ -68,7 +68,7 @@ void pd_paint_background(pd_context_t *ctx, const pd_background_t *bg,
                 width = read_rect.width;
                 height = read_rect.height;
                 /* 按比例进行缩放 */
-                pd_canvas_zoom(&canvas, &buffer, PD_FALSE, width, height);
+                pd_canvas_zoom(&canvas, &buffer, false, width, height);
                 pd_canvas_quote(&canvas, &buffer, NULL);
         }
         /* 计算相对于绘制区域的坐标 */

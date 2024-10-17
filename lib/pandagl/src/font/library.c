@@ -691,7 +691,7 @@ static void pd_font_library_init_base(void)
 	fontlib.font_families_type.val_destructor = destroy_font_family_node;
 	fontlib.font_families = dict_create(&fontlib.font_families_type, NULL);
 	rbtree_set_destroy_func(&fontlib.bitmap_cache, destroy_tree_node);
-	fontlib.active = PD_TRUE;
+	fontlib.active = true;
 }
 
 static void pd_font_library_init_engine(void)
@@ -723,7 +723,7 @@ static void pd_font_library_destroy_base(void)
 	if (!fontlib.active) {
 		return;
 	}
-	fontlib.active = PD_FALSE;
+	fontlib.active = false;
 	while (fontlib.font_cache_num > 0) {
 		--fontlib.font_cache_num;
 		font_cache_destroy(fontlib.font_cache[fontlib.font_cache_num]);

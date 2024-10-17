@@ -218,9 +218,9 @@ pd_text_t *pd_text_create(void)
         text->lines_length = 0;
         text->lines = NULL;
         text->text_align = PD_TEXT_ALIGN_LEFT;
-        text->autowrap_enabled = PD_FALSE;
-        text->mulitiline_enabled = PD_FALSE;
-        text->style_tag_enabled = PD_FALSE;
+        text->autowrap_enabled = false;
+        text->mulitiline_enabled = false;
+        text->style_tag_enabled = false;
         text->word_break = PD_WORD_BREAK_NORMAL;
         text->task.typeset_start_line = 0;
         text->task.update_typeset = 0;
@@ -259,7 +259,7 @@ static void pd_text_clear(pd_text_t *text)
         text->insert_x = 0;
         text->insert_y = 0;
         list_destroy(&text->styles, on_destroy_text_style);
-        text->task.redraw_all = PD_TRUE;
+        text->task.redraw_all = true;
 }
 
 void pd_text_empty(pd_text_t *text)
@@ -323,7 +323,7 @@ void pd_text_set_typeset_task(pd_text_t *text, int start_line)
         if (start_line < text->task.typeset_start_line) {
                 text->task.typeset_start_line = start_line;
         }
-        text->task.update_typeset = PD_TRUE;
+        text->task.update_typeset = true;
 }
 
 /** 获取指定文本行中的文本段的矩形区域 */
@@ -671,8 +671,8 @@ static int pd_text_process(pd_text_t *text, const wchar_t *wstr,
         if (!wstr) {
                 return -1;
         }
-        need_typeset = PD_FALSE;
-        rect_has_added = PD_FALSE;
+        need_typeset = false;
+        rect_has_added = false;
         list_create(&tmp_tags);
         if (!tags) {
                 tags = &tmp_tags;
@@ -723,13 +723,13 @@ static int pd_text_process(pd_text_t *text, const wchar_t *wstr,
                         /* 如果没有记录过文本行的矩形区域 */
                         if (!rect_has_added) {
                                 pd_text_mark_dirty(text, ins_y, -1);
-                                rect_has_added = PD_TRUE;
+                                rect_has_added = true;
                                 start_line = ins_y;
                         }
                         /* 将当前行中的插入点为截点，进行断行 */
                         pd_text_break_line(text, ins_y, ins_x, eol);
                         text->width = y_max(text->width, line->width);
-                        need_typeset = PD_TRUE;
+                        need_typeset = true;
                         ++text->length;
                         ins_x = 0;
                         ++ins_y;
@@ -759,7 +759,7 @@ static int pd_text_process(pd_text_t *text, const wchar_t *wstr,
         /* 如果已经记录过文本行矩形区域 */
         if (rect_has_added) {
                 pd_text_mark_dirty(text, start_line, -1);
-                rect_has_added = PD_TRUE;
+                rect_has_added = true;
         }
         pd_style_tags_clear(&tmp_tags);
         return 0;
@@ -845,10 +845,10 @@ int pd_text_set_fixed_size(pd_text_t *text, int width, int height)
 {
         text->fixed_width = width;
         text->fixed_height = height;
-        text->task.redraw_all = PD_TRUE;
+        text->task.redraw_all = true;
         if (text->autowrap_enabled) {
                 text->task.typeset_start_line = 0;
-                text->task.update_typeset = PD_TRUE;
+                text->task.update_typeset = true;
         }
         return 0;
 }
@@ -857,10 +857,10 @@ int pd_text_set_max_size(pd_text_t *text, int width, int height)
 {
         text->max_width = width;
         text->max_height = height;
-        text->task.redraw_all = PD_TRUE;
+        text->task.redraw_all = true;
         if (text->autowrap_enabled) {
                 text->task.typeset_start_line = 0;
-                text->task.update_typeset = PD_TRUE;
+                text->task.update_typeset = true;
         }
         return 0;
 }
@@ -1109,12 +1109,12 @@ void pd_text_update(pd_text_t *text, list_t *rects)
                 pd_text_mark_dirty(text, 0, -1);
                 pd_text_reload_bitmap(text);
                 pd_text_mark_dirty(text, 0, -1);
-                text->task.update_bitmap = PD_FALSE;
-                text->task.redraw_all = PD_TRUE;
+                text->task.update_bitmap = false;
+                text->task.redraw_all = true;
         }
         if (text->task.update_typeset) {
                 pd_text_typeset(text, text->task.typeset_start_line);
-                text->task.update_typeset = PD_FALSE;
+                text->task.update_typeset = false;
                 text->task.typeset_start_line = 0;
         }
         text->width = pd_text_get_width(text);
@@ -1125,7 +1125,7 @@ void pd_text_update(pd_text_t *text, list_t *rects)
                 text->offset_x = text->new_offset_x;
                 text->offset_y = text->new_offset_y;
                 pd_text_mark_dirty(text, 0, -1);
-                text->task.redraw_all = PD_TRUE;
+                text->task.redraw_all = true;
         }
         if (rects) {
                 list_concat(rects, &text->dirty_rects);
@@ -1239,20 +1239,20 @@ void pd_text_set_style(pd_text_t *text, pd_text_style_t *style)
 {
         pd_text_style_destroy(&text->default_style);
         pd_text_style_copy(&text->default_style, style);
-        text->task.update_bitmap = PD_TRUE;
+        text->task.update_bitmap = true;
 }
 
 void pd_text_set_align(pd_text_t *text, int align)
 {
         text->text_align = align;
-        text->task.update_typeset = PD_TRUE;
+        text->task.update_typeset = true;
         text->task.typeset_start_line = 0;
 }
 
 void pd_text_set_line_height(pd_text_t *text, int height)
 {
         text->line_height = height;
-        text->task.update_typeset = PD_TRUE;
+        text->task.update_typeset = true;
         text->task.typeset_start_line = 0;
 }
 
@@ -1261,7 +1261,7 @@ bool pd_text_set_offset(pd_text_t *text, int offset_x, int offset_y)
         if (text->new_offset_x != offset_x || text->new_offset_y != offset_y) {
                 text->new_offset_x = offset_x;
                 text->new_offset_y = offset_y;
-                return PD_TRUE;
+                return true;
         }
-        return PD_FALSE;
+        return false;
 }

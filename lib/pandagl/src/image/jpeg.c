@@ -51,7 +51,7 @@ static void pd_jpeg_reader_on_init(j_decompress_ptr cinfo)
 {
 	pd_jpeg_reader_t *jpeg_reader;
 	jpeg_reader = (pd_jpeg_reader_t *)cinfo->src;
-	jpeg_reader->start_of_file = PD_TRUE;
+	jpeg_reader->start_of_file = true;
 }
 
 static boolean pd_jpeg_reader_on_read(j_decompress_ptr cinfo)
@@ -76,7 +76,7 @@ static boolean pd_jpeg_reader_on_read(j_decompress_ptr cinfo)
 	/* 设置数据缓存地址和大小，供 jpeg 解码器使用 */
 	jpeg_reader->src.next_input_byte = jpeg_reader->buffer;
 	jpeg_reader->src.bytes_in_buffer = size;
-	jpeg_reader->start_of_file = PD_FALSE;
+	jpeg_reader->start_of_file = false;
 	return true;
 }
 
@@ -173,7 +173,7 @@ pd_error_t pd_jpeg_reader_read_header(pd_image_reader_t *reader)
 	if (setjmp(jpeg_reader->env)) {
 		return PD_ERROR_IMAGE_HEADER_INVALID;
 	}
-	jpeg_read_header(cinfo, PD_TRUE);
+	jpeg_read_header(cinfo, true);
 	header->width = cinfo->image_width;
 	header->height = cinfo->image_height;
 	header->type = PD_JPEG_IMAGE;

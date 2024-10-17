@@ -16,7 +16,7 @@ pd_context_t* pd_context_create(pd_canvas_t *canvas, pd_rect_t *rect)
 {
 	pd_context_t* paint = (pd_context_t*)malloc(sizeof(pd_context_t));
 	paint->rect = *rect;
-	paint->with_alpha = PD_FALSE;
+	paint->with_alpha = false;
 	pd_canvas_init(&paint->canvas);
 	pd_canvas_quote(&paint->canvas, canvas, &paint->rect);
 	return paint;

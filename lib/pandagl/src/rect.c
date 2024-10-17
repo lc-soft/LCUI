@@ -45,21 +45,21 @@ pd_rect_t pd_rect_crop(const pd_rect_t *rect, int container_width,
 bool pd_rect_correct(pd_rect_t *rect, int container_width,
                           int container_height)
 {
-        bool overflow = PD_FALSE;
+        bool overflow = false;
 
         if (rect->x < 0) {
-                overflow = PD_TRUE;
+                overflow = true;
                 rect->width += rect->x;
                 rect->x = 0;
         }
         if (rect->y < 0) {
-                overflow = PD_TRUE;
+                overflow = true;
                 rect->height += rect->y;
                 rect->y = 0;
         }
 
         if (rect->x + rect->width > container_width) {
-                overflow = PD_TRUE;
+                overflow = true;
                 if (rect->x < container_width) {
                         rect->width = container_width - rect->x;
                 } else {
@@ -67,7 +67,7 @@ bool pd_rect_correct(pd_rect_t *rect, int container_width,
                 }
         }
         if (rect->y + rect->height > container_height) {
-                overflow = PD_TRUE;
+                overflow = true;
                 if (rect->y < container_height) {
                         rect->height = container_height - rect->y;
                 } else {
@@ -81,23 +81,23 @@ bool pd_rect_is_cover(const pd_rect_t *a, const pd_rect_t *b)
 {
         if (a->x > b->x) {
                 if (b->x + b->width <= a->x) {
-                        return PD_FALSE;
+                        return false;
                 }
         } else {
                 if (a->x + a->width <= b->x) {
-                        return PD_FALSE;
+                        return false;
                 }
         }
         if (a->y > b->y) {
                 if (b->y + b->height <= a->y) {
-                        return PD_FALSE;
+                        return false;
                 }
         } else {
                 if (a->y + a->height <= b->y) {
-                        return PD_FALSE;
+                        return false;
                 }
         }
-        return PD_TRUE;
+        return true;
 }
 
 bool pd_rect_overlap(const pd_rect_t *a, const pd_rect_t *b,
@@ -134,9 +134,9 @@ bool pd_rect_overlap(const pd_rect_t *a, const pd_rect_t *b,
                 overlapping_rect->y = b->y;
         }
         if (overlapping_rect->width <= 0 || overlapping_rect->height <= 0) {
-                return PD_FALSE;
+                return false;
         }
-        return PD_TRUE;
+        return true;
 }
 
 void pd_rect_merge(pd_rect_t *merged_rect, const pd_rect_t *a,
@@ -309,7 +309,7 @@ int pd_rects_remove(list_t *list, pd_rect_t *rect)
                 if (!pd_rect_is_cover(p, rect)) {
                         continue;
                 }
-                deletable = PD_TRUE;
+                deletable = true;
                 pd_rect_split(rect, p, child_rects);
                 for (i = 0; i < 4; ++i) {
                         if (child_rects[i].width <= 0 ||
@@ -321,7 +321,7 @@ int pd_rects_remove(list_t *list, pd_rect_t *rect)
                                 free(node->data);
                                 list_delete_node(list, node);
                                 node = prev;
-                                deletable = PD_FALSE;
+                                deletable = false;
                         }
                         p = malloc(sizeof(pd_rect_t));
                         *p = child_rects[i];

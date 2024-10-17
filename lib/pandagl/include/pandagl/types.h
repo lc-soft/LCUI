@@ -16,9 +16,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#define PD_FALSE 0
-#define PD_TRUE 1
-
 typedef enum pd_color_type_t {
 	PD_COLOR_TYPE_UNSUPPORTED,
 	PD_COLOR_TYPE_INDEX8,   /**< 8位索引 */

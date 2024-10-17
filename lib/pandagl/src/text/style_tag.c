@@ -57,25 +57,25 @@ pd_text_style_t *pd_style_tags_get_text_style(list_t *tags)
 			if (found_tags[tag->id]) {
 				break;
 			}
-			style->has_fore_color = PD_TRUE;
+			style->has_fore_color = true;
 			style->fore_color = tag->data.color;
-			found_tags[tag->id] = PD_TRUE;
+			found_tags[tag->id] = true;
 			++count;
 			break;
 		case PD_TEXT_STYLE_TYPE_BG_COLOR:
 			if (found_tags[tag->id]) {
 				break;
 			}
-			style->has_back_color = PD_TRUE;
+			style->has_back_color = true;
 			style->back_color = tag->data.color;
-			found_tags[tag->id] = PD_TRUE;
+			found_tags[tag->id] = true;
 			++count;
 			break;
 		case PD_TEXT_STYLE_TYPE_BOLD:
 			if (found_tags[tag->id]) {
 				break;
 			}
-			found_tags[tag->id] = PD_TRUE;
+			found_tags[tag->id] = true;
 			pd_text_style_set_weight(style, PD_FONT_WEIGHT_BOLD);
 			++count;
 			break;
@@ -83,7 +83,7 @@ pd_text_style_t *pd_style_tags_get_text_style(list_t *tags)
 			if (found_tags[tag->id]) {
 				break;
 			}
-			found_tags[tag->id] = PD_TRUE;
+			found_tags[tag->id] = true;
 			pd_text_style_set_style(style, PD_FONT_STYLE_ITALIC);
 			++count;
 			break;
@@ -91,9 +91,9 @@ pd_text_style_t *pd_style_tags_get_text_style(list_t *tags)
 			if (found_tags[tag->id]) {
 				break;
 			}
-			style->has_pixel_size = PD_TRUE;
+			style->has_pixel_size = true;
 			style->pixel_size = tag->data.number;
-			found_tags[tag->id] = PD_TRUE;
+			found_tags[tag->id] = true;
 			++count;
 			break;
 		default:
@@ -293,7 +293,7 @@ static bool pd_parse_color(const char *str, pd_color_t *value)
 	int r, g, b;
 
 	if (str[0] != '#') {
-		return PD_FALSE;
+		return false;
 	}
 	if (len == 4) {
 		len = sscanf(str, "#%1X%1X%1X", &r, &g, &b);
@@ -303,16 +303,16 @@ static bool pd_parse_color(const char *str, pd_color_t *value)
 	} else if (len == 7) {
 		len = sscanf(str, "#%2X%2X%2X", &r, &g, &b);
 	} else {
-		return PD_FALSE;
+		return false;
 	}
 	if (len == 3) {
 		value->r = r;
 		value->g = g;
 		value->b = b;
 		value->a = 255;
-		return PD_TRUE;
+		return true;
 	}
-	return PD_FALSE;
+	return false;
 }
 
 /** 根据字符串中的标签得到相应的样式数据，并返回指向标签后面字符的指针 */
