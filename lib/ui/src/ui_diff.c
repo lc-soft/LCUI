@@ -69,10 +69,6 @@ void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w)
               IS_PROP_TYPE_CHANGED(align_items)))) {
                 ui_widget_request_reflow(w);
         }
-        if (ui_widget_has_class(w, "file-info-panel")) {
-                logger_debug("[ui-diff] [.file-info-panel] flow_changed=%d\n",
-                             flow_changed);
-        }
         if (w->parent && (flow_changed || ui_widget_in_layout_flow(w))) {
                 if (flow_changed || inner_changed ||
                     IS_LENGTH_PROP_CHANGED(margin_left) ||
@@ -83,10 +79,6 @@ void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w)
                      (IS_PROP_TYPE_CHANGED(flex_grow) ||
                       IS_PROP_TYPE_CHANGED(flex_shrink) ||
                       IS_PROP_TYPE_CHANGED(flex_basis)))) {
-                        if (ui_widget_has_class(w, "file-info-panel")) {
-                                logger_debug("[ui-diff] [.file-info-panel] "
-                                             "parent reflow\n");
-                        }
                         ui_widget_request_reflow(w->parent);
                 }
         }
