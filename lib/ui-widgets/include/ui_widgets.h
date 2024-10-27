@@ -14,6 +14,7 @@
 #include "ui_widgets/button.h"
 #include "ui_widgets/anchor.h"
 #include "ui_widgets/canvas.h"
+#include "ui_widgets/scrollarea.h"
 #include "ui_widgets/scrollbar.h"
 #include "ui_widgets/textinput.h"
 #include "ui_widgets/textcaret.h"

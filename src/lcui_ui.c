@@ -283,6 +283,7 @@ void lcui_init_ui_preset_widgets(void)
         ui_register_canvas();
         ui_register_anchor();
         ui_register_button();
+        ui_register_scrollarea();
         ui_register_scrollbar();
         ui_register_textcaret();
         ui_register_textinput();
