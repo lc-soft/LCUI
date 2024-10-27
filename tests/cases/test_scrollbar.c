@@ -70,7 +70,7 @@ void BuildContentView(void)
 
         ui_widget_set_id(content, "license_content");
         ui_text_set_content(content, test_content);
-        ui_scrollbar_set_direction(hscrollbar, UI_SCROLLBAR_HORIZONTAL);
+        ui_scrollbar_set_orientation(hscrollbar, UI_SCROLLBAR_HORIZONTAL);
         ui_scrollbar_bind_target(vscrollbar, content);
         ui_scrollbar_bind_target(hscrollbar, content);
         ui_widget_add_class(container, "container");

@@ -17,25 +17,15 @@
 
 LIBUI_WIDGETS_BEGIN_DECLS
 
-typedef enum ui_scrollbar_direction_t {
+typedef enum {
 	UI_SCROLLBAR_HORIZONTAL,
 	UI_SCROLLBAR_VERTICAL
-} ui_scrollbar_direction_t;
+} ui_scrollbar_orientation_t;
 
-LIBUI_WIDGETS_PUBLIC void ui_scrollbar_bind_container(ui_widget_t* w,
-					  ui_widget_t* container);
+LIBUI_WIDGETS_PUBLIC void ui_scrollbar_update(ui_widget_t *w);
 
-LIBUI_WIDGETS_PUBLIC void ui_scrollbar_bind_target(ui_widget_t* w, ui_widget_t* target);
-
-/** 获取滚动条的位置 */
-LIBUI_WIDGETS_PUBLIC float ui_scrollbar_get_position(ui_widget_t* w);
-
-/** 将与滚动条绑定的内容滚动至指定位置 */
-LIBUI_WIDGETS_PUBLIC float ui_scrollbar_set_position(ui_widget_t* w, float pos);
-
-/** 设置滚动条的方向 */
-LIBUI_WIDGETS_PUBLIC void ui_scrollbar_set_direction(ui_widget_t* w,
-					 ui_scrollbar_direction_t direction);
+LIBUI_WIDGETS_PUBLIC void ui_scrollbar_set_orientation(ui_widget_t* w,
+					 ui_scrollbar_orientation_t orientation);
 
 LIBUI_WIDGETS_PUBLIC void ui_register_scrollbar(void);
 
