@@ -26,7 +26,6 @@
 #include "ui_updater.h"
 #include "ui_mutation_observer.h"
 #include "ui_widget_style.h"
-#include "ui_widget_box.h"
 #include "ui_widget_observer.h"
 #include "ui_widget.h"
 
@@ -85,6 +84,12 @@ void ui_widget_request_update(ui_widget_t *w)
         for (w = w->parent; w; w = w->parent) {
                 w->update.should_update_children = true;
         }
+}
+
+void ui_widget_request_reflow(ui_widget_t *w)
+{
+        w->update.should_reflow = true;
+        ui_widget_request_update(w);
 }
 
 void ui_widget_set_rules(ui_widget_t *w, const ui_widget_rules_t *rules)
@@ -163,7 +168,8 @@ static void ui_widget_match_style(ui_widget_t *w)
         }
 }
 
-static size_t ui_widget_update_visible_children(ui_updater_t *updater, ui_widget_t *w)
+static size_t ui_widget_update_visible_children(ui_updater_t *updater,
+                                                ui_widget_t *w)
 {
         size_t total = 0, count;
         bool found = false;
@@ -306,34 +312,10 @@ static size_t ui_updater_update_children(ui_updater_t *updater, ui_widget_t *w)
 
 static void ui_widget_update_size(ui_widget_t *w)
 {
-        css_unit_t unit;
-        css_numeric_value_t limit;
-        css_computed_style_t *src = &w->specified_style;
-        css_computed_style_t *dest = &w->computed_style;
-
         ui_widget_reset_layout(w);
         ui_widget_compute_style(w);
         ui_widget_update_box_size(w);
         ui_widget_reflow(w);
-        w->max_content_width = w->content_box.width;
-        w->max_content_height = w->content_box.height;
-        if (css_computed_max_width(dest, &limit, &unit) == CSS_MAX_WIDTH_SET &&
-            unit == CSS_UNIT_PX) {
-                w->max_content_width = limit;
-        } else if (css_computed_min_width(dest, &limit, &unit) ==
-                       CSS_MIN_WIDTH_SET &&
-                   unit == CSS_UNIT_PX && w->max_content_width < limit) {
-                w->max_content_width = limit;
-        }
-        if (css_computed_max_height(dest, &limit, &unit) ==
-                CSS_MAX_HEIGHT_SET &&
-            unit == CSS_UNIT_PX) {
-                w->max_content_width = limit;
-        } else if (css_computed_min_height(dest, &limit, &unit) ==
-                       CSS_MIN_HEIGHT_SET &&
-                   unit == CSS_UNIT_PX && w->max_content_height < limit) {
-                w->max_content_height = limit;
-        }
 }
 
 size_t ui_updater_update_widget(ui_updater_t *updater, ui_widget_t *w)
@@ -363,7 +345,22 @@ size_t ui_updater_update_widget(ui_updater_t *updater, ui_widget_t *w)
                         if (!updater->refresh_all) {
                                 ui_style_diff_begin(&style_diff, w);
                         }
+#ifdef UI_DEBUG_ENABLED
+                        if (ui_widget_has_class(w, "debug")) {
+                                UI_WIDGET_STR(w, str);
+                                UI_WIDGET_SIZE_STR(w, size_str);
+                                UI_DEBUG_MSG("%s: %s: size=%s, change (%g, %g) => (%g, %g)",
+                                             __FUNCTION__, str,
+                                             size_str,
+                                             style_diff.padding_box.width,
+                                             style_diff.padding_box.height,
+                                             w->padding_box.width,
+                                             w->padding_box.height);
+                        }
+#endif
                         ui_widget_update_style(w);
+                        ui_widget_update_box_size(w);
+                        ui_widget_update_box_position(w);
                         ui_style_diff_end(&style_diff, w);
                         if (w->proto && w->proto->update) {
                                 w->proto->update(w, UI_TASK_UPDATE_STYLE);
@@ -379,20 +376,19 @@ size_t ui_updater_update_widget(ui_updater_t *updater, ui_widget_t *w)
         }
         if (w->update.should_reflow) {
                 if (w->parent && ui_widget_in_layout_flow(w)) {
-                        float width = w->border_box.width;
-                        float height = w->border_box.height;
+                        int width = (int)(w->outer_box.width * 64.f);
+                        int height = (int)(w->outer_box.height * 64.f);
                         ui_widget_update_size(w);
-                        // 只需要判断宽高的变化，因为 style diff
-                        // 已经判断了位置变化
-                        if (width != w->border_box.width ||
-                            height != w->border_box.height) {
+                        if (width != (int)(w->outer_box.width * 64.f) ||
+                            height != (int)(w->outer_box.height * 64.f)) {
                                 ui_widget_request_reflow(w->parent);
                         }
                 } else {
                         ui_widget_update_size(w);
-                        // TODO: 更新 box size？
                         ui_widget_update_box_position(w);
                 }
+                w->max_content_width = w->content_box.width;
+                w->max_content_height = w->content_box.height;
         }
         ui_widget_update_stacking_context(w);
         return count;

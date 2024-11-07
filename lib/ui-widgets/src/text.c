@@ -177,35 +177,22 @@ static void ui_text_on_destroy(ui_widget_t *w)
         }
 }
 
-static void ui_text_on_autosize(ui_widget_t *w, float *width, float *height,
-                                ui_layout_rule_t rule)
+static void ui_text_on_autosize(ui_widget_t *w, float *width, float *height)
 {
-        float max_width, max_height;
+        float max_width = 0, max_height = 0;
         ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
+        css_computed_style_t *s = &w->computed_style;
         list_t rects;
 
-        if (w->parent &&
-            IS_CSS_FIXED_LENGTH(&w->parent->computed_style, width)) {
-                max_width = w->parent->content_box.width -
-                            (w->border_box.width - w->content_box.width);
-        } else {
-                max_width = 0;
+        if (IS_CSS_FIXED_LENGTH(s, width)) {
+                max_width = css_width_to_content_box_width(s, s->width);
+        } else if (ui_widget_get_max_width(w, &max_width)) {
+                max_width = css_width_to_content_box_width(s, max_width);
         }
-        switch (rule) {
-        case UI_LAYOUT_RULE_FIXED_WIDTH:
-                max_width = w->content_box.width;
-                max_height = 0;
-                break;
-        case UI_LAYOUT_RULE_FIXED_HEIGHT:
-                max_height = w->content_box.height;
-                break;
-        case UI_LAYOUT_RULE_FIXED:
-                max_width = w->content_box.width;
-                max_height = w->content_box.height;
-                break;
-        default:
-                max_height = 0;
-                break;
+        if (IS_CSS_FIXED_LENGTH(s, height)) {
+                max_height = css_height_to_content_box_height(s, s->height);
+        } else if (ui_widget_get_max_height(w, &max_height)) {
+                max_height = css_height_to_content_box_height(s, max_height);
         }
         list_create(&rects);
         pd_text_set_fixed_size(txt->layer, 0, 0);
@@ -233,6 +220,7 @@ static void ui_text_on_resize(ui_widget_t *w, float width, float height)
         pd_text_set_fixed_size(txt->layer, fixed_width, fixed_height);
         pd_text_set_max_size(txt->layer, fixed_width, fixed_height);
         pd_text_update(txt->layer, &rects);
+
         for (list_each(node, &rects)) {
                 ui_rect_from_pd_rect(&rect, node->data, scale);
                 ui_widget_mark_dirty_rect(w, &rect, UI_BOX_TYPE_CONTENT_BOX);

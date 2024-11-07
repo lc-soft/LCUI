@@ -17,7 +17,6 @@
 #include <ui/metrics.h>
 #include <ui/prototype.h>
 #include <ui/rect.h>
-#include "ui_widget_box.h"
 #include "ui_widget_border.h"
 #include "ui_widget_background.h"
 #include "ui_widget_box_shadow.h"

@@ -8,17 +8,17 @@
  * This file is part of LCUI, distributed under the MIT License found in the
  * LICENSE.TXT file in the root directory of this source tree.
  */
-
+// #define UI_DEBUG_ENABLED
 #include <string.h>
 #include <css/computed.h>
 #include <ui/base.h>
 #include <ui/rect.h>
 #include <ui/mutation_observer.h>
 #include "ui_widget.h"
-#include "ui_widget_box.h"
 #include "ui_widget_style.h"
 #include "ui_widget_observer.h"
 #include "ui_diff.h"
+#include "ui_debug.h"
 
 #define IS_PROP_TYPE_CHANGED(PROP_KEY) \
         diff->style.type_bits.PROP_KEY != w->computed_style.type_bits.PROP_KEY
@@ -67,6 +67,12 @@ void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w)
               IS_PROP_TYPE_CHANGED(justify_content) ||
               IS_PROP_TYPE_CHANGED(align_content) ||
               IS_PROP_TYPE_CHANGED(align_items)))) {
+#ifdef UI_DEBUG_ENABLED
+                {
+                        UI_WIDGET_STR(w, str);
+                        UI_DEBUG_MSG("%s: %s: reflow", __FUNCTION__, str);
+                }
+#endif
                 ui_widget_request_reflow(w);
         }
         if (w->parent && (flow_changed || ui_widget_in_layout_flow(w))) {

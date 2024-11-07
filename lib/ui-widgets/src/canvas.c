@@ -63,8 +63,7 @@ static void ui_canvas_on_destroy(ui_widget_t *w)
 	pd_canvas_destroy(&canvas->buffer);
 }
 
-static void ui_canvas_on_auto_size(ui_widget_t *w, float *width, float *height,
-				   ui_layout_rule_t rule)
+static void ui_canvas_on_autosize(ui_widget_t *w, float *width, float *height)
 {
 	*width = UI_CANVAS_DEFAULT_WIDTH;
 	*height = UI_CANVAS_DEFAULT_HEIGHT;
@@ -158,6 +157,6 @@ void ui_register_canvas(void)
 	ui_canvas.proto->init = ui_canvas_on_init;
 	ui_canvas.proto->destroy = ui_canvas_on_destroy;
 	ui_canvas.proto->paint = ui_canvas_on_paint;
-	ui_canvas.proto->autosize = ui_canvas_on_auto_size;
+	ui_canvas.proto->autosize = ui_canvas_on_autosize;
 	ui_canvas.proto->resize = ui_canvas_on_resize;
 }

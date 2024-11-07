@@ -34,22 +34,6 @@ typedef enum ui_density_Level_t {
         UI_DENSITY_LEVEL_BIG
 } ui_density_Level_t;
 
-typedef enum ui_sizing_rule_t {
-        UI_SIZING_RULE_NONE,
-        UI_SIZING_RULE_FIXED,
-        UI_SIZING_RULE_FILL,
-        UI_SIZING_RULE_PERCENT,
-        UI_SIZING_RULE_FIT_CONTENT
-} ui_sizing_rule_t;
-
-typedef enum ui_layout_rule_t {
-        UI_LAYOUT_RULE_AUTO,
-        UI_LAYOUT_RULE_MAX_CONTENT,
-        UI_LAYOUT_RULE_FIXED_WIDTH = 0b11,
-        UI_LAYOUT_RULE_FIXED_HEIGHT = 0b101,
-        UI_LAYOUT_RULE_FIXED = 0b111
-} ui_layout_rule_t;
-
 typedef enum ui_widget_state_t {
         UI_WIDGET_STATE_CREATED = 0,
         UI_WIDGET_STATE_UPDATED,
@@ -191,7 +175,7 @@ struct ui_widget_prototype_t {
         void (*update)(ui_widget_t *, ui_task_type_t);
         void (*setattr)(ui_widget_t *, const char *, const char *);
         void (*settext)(ui_widget_t *, const char *);
-        void (*autosize)(ui_widget_t *, float *, float *, ui_layout_rule_t);
+        void (*autosize)(ui_widget_t *, float *, float *);
         void (*resize)(ui_widget_t *, float, float);
         void (*paint)(ui_widget_t *, pd_context_t *,
                       ui_widget_actual_style_t *);

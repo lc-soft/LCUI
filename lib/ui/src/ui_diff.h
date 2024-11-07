@@ -29,8 +29,3 @@ typedef struct ui_widget_style_diff_t_ {
 void ui_style_diff_init(ui_style_diff_t *diff, ui_widget_t *w);
 void ui_style_diff_begin(ui_style_diff_t *diff, ui_widget_t *w);
 void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w);
-
-// Layout
-
-void ui_block_layout_reflow(ui_widget_t *w, ui_layout_rule_t rule);
-void ui_flexbox_layout_reflow(ui_widget_t *w, ui_layout_rule_t rule);
