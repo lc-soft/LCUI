@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <lcui-app>
-  <resource type="text/css">
-    #content {
-      display: inline-block;
-    }
-  </resource>
   <ui>
     <scrollarea class="container">
-      <scrollarea-content id="content">
+      <scrollarea-content>
         <text>
 /* ***************************************************************************
  * test_scrollbar.c -- test scrollbar

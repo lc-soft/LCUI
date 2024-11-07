@@ -9,7 +9,7 @@
  * LICENSE.TXT file in the root directory of this source tree.
  */
 
-typedef struct ui_diff_item_t {
+typedef struct ui_diff_item {
         ui_widget_t *widget;
         ui_rect_t border_box;
         ui_rect_t canvas_box;
@@ -29,8 +29,3 @@ typedef struct ui_widget_style_diff_t_ {
 void ui_style_diff_init(ui_style_diff_t *diff, ui_widget_t *w);
 void ui_style_diff_begin(ui_style_diff_t *diff, ui_widget_t *w);
 void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w);
-
-// Layout
-
-void ui_block_layout_reflow(ui_widget_t *w, ui_layout_rule_t rule);
-void ui_flexbox_layout_reflow(ui_widget_t *w, ui_layout_rule_t rule);

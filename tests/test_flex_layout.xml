@@ -1,349 +1,351 @@
 <lcui-app>
   <resource type="text/css" src="test_flex_layout.css"/>
   <ui>
-    <w id="main">
-      <w class="container">
-        <w class="example">
-          <text class="example__title">(0) Default</text>
-          <w class="example__content d-flex">
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-          </w>
-        </w>
-        <w class="example">
-          <text class="example__title">(1) justify-content: center;</text>
-          <w class="example__content d-flex justify-content-center">
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-          </w>
-        </w>
-        <w class="example">
-          <text class="example__title">(2) justify-content: flex-end;</text>
-          <w class="example__content d-flex justify-content-end">
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-          </w>
-        </w>
-        <w class="example">
-          <text class="example__title">(3) justify-content: space-between;</text>
-          <w class="example__content d-flex justify-content-space-between">
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-          </w>
-        </w>
-        <w class="example">
-          <text class="example__title">(4) justify-content: space-around;</text>
-          <w class="example__content d-flex justify-content-space-around">
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-          </w>
-        </w>
-        <w class="example">
-          <text class="example__title">(5) Auto margin</text>
-          <w class="example__content d-flex justify-content-center">
-            <text class="box mr-auto">mr-auto</text>
-            <w class="box"></w>
-            <w class="box"></w>
-            <text class="box ml-auto">ml-auto</text>
-          </w>
-        </w>
-        <w class="example">
-          <text class="example__title">(6) flex-shrink</text>
-          <w class="example__content d-flex">
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <text class="box w-3">width: 150px</text>
-            <w class="box"></w>
-            <w class="box"></w>
-            <text class="box w-2">width: 100px</text>
-            <w class="box"></w>
-            <w class="box"></w>
-            <text class="box w-4">width: 200px</text>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-          </w>
-        </w>
-        <w class="example">
-          <text class="example__title">(7) flex-grow</text>
-          <w class="example__content d-flex">
-            <text class="box flex-auto">auto</text>
-            <text class="box flex-auto">auto</text>
-            <text class="box flex-auto">auto</text>
-          </w>
-          <w class="example__content d-flex">
-            <text class="box flex-auto">auto</text>
-            <text class="box flex-initial">initial</text>
-            <text class="box flex-initial">initial</text>
-          </w>
-          <w class="example__content d-flex">
-            <text class="box flex-auto">auto</text>
-            <text class="box flex-auto">auto</text>
-            <text class="box flex-none">none</text>
-          </w>
-          <w class="example__content d-flex">
-            <text class="box flex-initial">initial</text>
-            <text class="box flex-auto">auto</text>
-            <text class="box flex-auto">auto</text>
-          </w>
-          <w class="example__content d-flex">
-            <text class="box flex-4">flex: 4</text>
-            <text class="box flex-2">flex: 2</text>
-            <text class="box flex-1">flex: 1</text>
-          </w>
-        </w>
-        <w class="example">
-          <text class="example__title">(8) flex-wrap: wrap;</text>
-          <w class="example__content d-flex felx-wrap">
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <text class="box w-3">width: 150px</text>
-            <w class="box"></w>
-            <w class="box"></w>
-            <text class="box w-2">width: 100px</text>
-            <w class="box"></w>
-            <w class="box"></w>
-            <text class="box w-4">width: 200px</text>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-          </w>
-        </w>
-        <w class="example">
-          <text class="example__title">(9) flex-wrap: wrap; height: 300px;</text>
-          <w class="example__content d-flex felx-wrap h-6">
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <text class="box w-3">width: 150px</text>
-            <w class="box"></w>
-            <w class="box"></w>
-            <text class="box w-2">width: 100px</text>
-            <w class="box"></w>
-            <w class="box"></w>
-            <text class="box w-4">width: 200px</text>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-          </w>
-        </w>
-        <w class="example">
-          <text class="example__title">(10) align-items: center; height: 300px;</text>
-          <w class="example__content d-flex felx-wrap h-6 align-items-center">
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <text class="box w-3">width: 150px</text>
-            <w class="box"></w>
-            <w class="box"></w>
-            <text class="box w-2">width: 100px</text>
-            <w class="box"></w>
-            <w class="box"></w>
-            <text class="box w-4">width: 200px</text>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-          </w>
-        </w>
-        <w class="example">
-          <text class="example__title">(11) align-items: end; height: 300px;</text>
-          <w class="example__content d-flex felx-wrap h-6 align-items-end">
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <text class="box w-3">width: 150px</text>
-            <w class="box"></w>
-            <w class="box"></w>
-            <text class="box w-2">width: 100px</text>
-            <w class="box"></w>
-            <w class="box"></w>
-            <text class="box w-4">width: 200px</text>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-          </w>
-        </w>
-        <w class="example">
-          <text class="example__title">(12) align-items: stretch; height: 300px;</text>
-          <w class="example__content d-flex felx-wrap h-6 align-items-stretch">
-            <text class="h-auto box">h-auto</text>
-            <text class="h-auto box">h-auto</text>
-            <text class="h-auto box">h-auto</text>
-            <w class="box"></w>
-            <text class="box w-3">width: 150px</text>
-            <w class="box"></w>
-            <w class="box"></w>
-            <text class="box w-2">width: 100px</text>
-            <w class="box"></w>
-            <w class="box"></w>
-            <text class="box w-4">width: 200px</text>
-            <text class="h-auto box">h-auto</text>
-            <text class="h-auto box">h-auto</text>
-            <text class="h-auto box">h-auto</text>
-            <w class="box"></w>
-            <w class="box"></w>
-            <text class="h-auto box">h-auto</text>
-            <text class="h-auto box">h-auto</text>
-            <w class="box"></w>
-            <w class="box"></w>
-          </w>
-        </w>
-        <w class="example">
-          <text class="example__title">(13) Vertically Centered Layout</text>
-          <w class="example__content d-flex h-6 justify-content-center align-items-center">
-            <w class="box"></w>
-          </w>
-        </w>
-        <w class="example">
-          <text class="example__title">(14) flex-direction: column;</text>
-          <w class="example__content d-flex flex-direction-column felx-wrap h-4">
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <text class="box w-3">width: 150px</text>
-            <w class="box"></w>
-            <w class="box"></w>
-            <text class="box w-2">width: 100px</text>
-            <w class="box"></w>
-            <w class="box"></w>
-            <text class="box w-4">width: 200px</text>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-            <w class="box"></w>
-          </w>
-        </w>
-        <w class="example example-holy-grail-layout">
-          <text class="example__title">(15) Holy Grail Layout</text>
-          <w class="example__content">
-            <text class="box w-auto layout__header">Header</text>
-            <w class="layout__body">
-              <text class="box layout__left">Left</text>
-              <text class="box w-auto layout__center">Center</text>
-              <text class="box layout__right">Right</text>
+    <scrollarea class="h-full">
+      <scrollarea-content  id="main">
+        <w class="container">
+          <w class="example">
+            <text class="example__title">(0) Default</text>
+            <w class="example__content d-flex">
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
             </w>
-            <text class="box w-auto layout__footer">Footer</text>
           </w>
-        </w>
-        <w class="example example-holy-grail-layout">
-          <text class="example__title">(16) Holy Grail Layout (height: 300px)</text>
-          <w class="example__content h-6">
-            <text class="box w-auto layout__header">Header</text>
-            <w class="layout__body">
-              <text class="box layout__left">Left</text>
-              <text class="box w-auto layout__center">Center</text>
-              <text class="box layout__right">Right</text>
+          <w class="example">
+            <text class="example__title">(1) justify-content: center;</text>
+            <w class="example__content d-flex justify-content-center">
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
             </w>
-            <text class="box w-auto layout__footer">Footer</text>
           </w>
-        </w>
-        <w class="example example-browser">
-          <text class="example__title">(17) Browser Layout</text>
-          <w class="example__content h-6">
-            <w class="v-browser">
-              <w id="browser-tabbar" class="v-browser__tabbar">
-                <w class="c-frame-tab active">
-                  <w class="c-frame-tab__icon"></w>
-                  <text class="c-frame-tab__text">Tab 1</text>
-                  <text class="c-frame-tab__close">X</text>
-                </w>
-                <w class="c-frame-tab">
-                  <w class="c-frame-tab__icon"></w>
-                  <text class="c-frame-tab__text">Tab 2</text>
-                  <text class="c-frame-tab__close">X</text>
-                </w>
-                <w class="c-frame-tab">
-                  <w class="c-frame-tab__icon"></w>
-                  <text class="c-frame-tab__text">Tab 3</text>
-                  <text class="c-frame-tab__close">X</text>
-                </w>
-                <w class="c-frame-tab">
-                  <w class="c-frame-tab__icon"></w>
-                  <text class="c-frame-tab__text">Tab 4</text>
-                  <text class="c-frame-tab__close">X</text>
-                </w>
-                <w class="c-frame-tab">
-                  <w class="c-frame-tab__icon"></w>
-                  <text class="c-frame-tab__text">Tab 5</text>
-                  <text class="c-frame-tab__close">X</text>
-                </w>
-                <text class="v-browser__btn-add-tab">+</text>
+          <w class="example">
+            <text class="example__title">(2) justify-content: flex-end;</text>
+            <w class="example__content d-flex justify-content-end">
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">(3) justify-content: space-between;</text>
+            <w class="example__content d-flex justify-content-space-between">
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">(4) justify-content: space-around;</text>
+            <w class="example__content d-flex justify-content-space-around">
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">(5) Auto margin</text>
+            <w class="example__content d-flex justify-content-center">
+              <text class="box mr-auto">mr-auto</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box ml-auto">ml-auto</text>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">(6) flex-shrink</text>
+            <w class="example__content d-flex">
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-3">width: 150px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-2">width: 100px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-4">width: 200px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">(7) flex-grow</text>
+            <w class="example__content d-flex">
+              <text class="box flex-auto">auto</text>
+              <text class="box flex-auto">auto</text>
+              <text class="box flex-auto">auto</text>
+            </w>
+            <w class="example__content d-flex">
+              <text class="box flex-auto">auto</text>
+              <text class="box flex-initial">initial</text>
+              <text class="box flex-initial">initial</text>
+            </w>
+            <w class="example__content d-flex">
+              <text class="box flex-auto">auto</text>
+              <text class="box flex-auto">auto</text>
+              <text class="box flex-none">none</text>
+            </w>
+            <w class="example__content d-flex">
+              <text class="box flex-initial">initial</text>
+              <text class="box flex-auto">auto</text>
+              <text class="box flex-auto">auto</text>
+            </w>
+            <w class="example__content d-flex">
+              <text class="box flex-4">flex: 4</text>
+              <text class="box flex-2">flex: 2</text>
+              <text class="box flex-1">flex: 1</text>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">(8) flex-wrap: wrap;</text>
+            <w class="example__content d-flex felx-wrap">
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-3">width: 150px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-2">width: 100px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-4">width: 200px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">(9) flex-wrap: wrap; height: 300px;</text>
+            <w class="example__content d-flex felx-wrap h-6">
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-3">width: 150px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-2">width: 100px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-4">width: 200px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">(10) align-items: center; height: 300px;</text>
+            <w class="example__content d-flex felx-wrap h-6 align-items-center">
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-3">width: 150px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-2">width: 100px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-4">width: 200px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">(11) align-items: end; height: 300px;</text>
+            <w class="example__content d-flex felx-wrap h-6 align-items-end">
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-3">width: 150px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-2">width: 100px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-4">width: 200px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">(12) align-items: stretch; height: 300px;</text>
+            <w class="example__content d-flex felx-wrap h-6 align-items-stretch">
+              <text class="h-auto box">h-auto</text>
+              <text class="h-auto box">h-auto</text>
+              <text class="h-auto box">h-auto</text>
+              <w class="box"></w>
+              <text class="box w-3">width: 150px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-2">width: 100px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-4">width: 200px</text>
+              <text class="h-auto box">h-auto</text>
+              <text class="h-auto box">h-auto</text>
+              <text class="h-auto box">h-auto</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="h-auto box">h-auto</text>
+              <text class="h-auto box">h-auto</text>
+              <w class="box"></w>
+              <w class="box"></w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">(13) Vertically Centered Layout</text>
+            <w class="example__content d-flex h-6 justify-content-center align-items-center">
+              <w class="box"></w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">(14) flex-direction: column;</text>
+            <w class="example__content d-flex flex-direction-column felx-wrap h-4">
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-3">width: 150px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-2">width: 100px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-4">width: 200px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+            </w>
+          </w>
+          <w class="example example-holy-grail-layout">
+            <text class="example__title">(15) Holy Grail Layout</text>
+            <w class="example__content">
+              <text class="box w-auto layout__header">Header</text>
+              <w class="layout__body">
+                <text class="box layout__left">Left</text>
+                <text class="box w-auto layout__center">Center</text>
+                <text class="box layout__right">Right</text>
               </w>
-              <w class="v-frame">
-                <text class="v-frame__navbar c-navbar">
-                  Navbar
-                </text>
-                <w id="browser-frame-client" class="v-frame__client">
-                  <w id="browser-frame-content" class="v-frame__content">
-                    <w id="browser-page-home" class="v-home">
-                      <w id="browser-page-home-container" class="container">
-                        <w class="box"></w>
-                        <w class="box"></w>
-                        <w class="box"></w>
-                        <w class="box"></w>
+              <text class="box w-auto layout__footer">Footer</text>
+            </w>
+          </w>
+          <w class="example example-holy-grail-layout">
+            <text class="example__title">(16) Holy Grail Layout (height: 300px)</text>
+            <w class="example__content h-6">
+              <text class="box w-auto layout__header">Header</text>
+              <w class="layout__body">
+                <text class="box layout__left">Left</text>
+                <text class="box w-auto layout__center">Center</text>
+                <text class="box layout__right">Right</text>
+              </w>
+              <text class="box w-auto layout__footer">Footer</text>
+            </w>
+          </w>
+          <w class="example example-browser">
+            <text class="example__title">(17) Browser Layout</text>
+            <w class="example__content h-6">
+              <w class="v-browser">
+                <w id="browser-tabbar" class="v-browser__tabbar">
+                  <w class="c-frame-tab active">
+                    <w class="c-frame-tab__icon"></w>
+                    <text class="c-frame-tab__text">Tab 1</text>
+                    <text class="c-frame-tab__close">X</text>
+                  </w>
+                  <w class="c-frame-tab">
+                    <w class="c-frame-tab__icon"></w>
+                    <text class="c-frame-tab__text">Tab 2</text>
+                    <text class="c-frame-tab__close">X</text>
+                  </w>
+                  <w class="c-frame-tab">
+                    <w class="c-frame-tab__icon"></w>
+                    <text class="c-frame-tab__text">Tab 3</text>
+                    <text class="c-frame-tab__close">X</text>
+                  </w>
+                  <w class="c-frame-tab">
+                    <w class="c-frame-tab__icon"></w>
+                    <text class="c-frame-tab__text">Tab 4</text>
+                    <text class="c-frame-tab__close">X</text>
+                  </w>
+                  <w class="c-frame-tab">
+                    <w class="c-frame-tab__icon"></w>
+                    <text class="c-frame-tab__text">Tab 5</text>
+                    <text class="c-frame-tab__close">X</text>
+                  </w>
+                  <text class="v-browser__btn-add-tab">+</text>
+                </w>
+                <w class="v-frame">
+                  <text class="v-frame__navbar c-navbar">
+                    Navbar
+                  </text>
+                  <w id="browser-frame-client" class="v-frame__client">
+                    <w id="browser-frame-content" class="v-frame__content">
+                      <w id="browser-page-home" class="v-home">
+                        <w id="browser-page-home-container" class="container">
+                          <w class="box"></w>
+                          <w class="box"></w>
+                          <w class="box"></w>
+                          <w class="box"></w>
+                        </w>
                       </w>
                     </w>
                   </w>
@@ -352,8 +354,8 @@
             </w>
           </w>
         </w>
-      </w>
-    </w>
-    <scrollbar target="main" />
+      </scrollarea-content>
+      <scrollbar target="main" />
+    </scrollarea>
   </ui>
 </lcui-app>

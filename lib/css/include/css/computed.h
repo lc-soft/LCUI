@@ -59,6 +59,11 @@ LIBCSS_INLINE bool is_css_display_block(const css_computed_style_t *s)
         return s->type_bits.display == CSS_DISPLAY_BLOCK;
 }
 
+LIBCSS_INLINE bool is_css_border_box_sizing(const css_computed_style_t *s)
+{
+        return s->type_bits.box_sizing == CSS_BOX_SIZING_BORDER_BOX;
+}
+
 LIBCSS_INLINE css_numeric_value_t css_padding_x(const css_computed_style_t *s)
 {
         return s->padding_left + s->padding_right;
@@ -138,6 +143,9 @@ LIBCSS_PUBLIC uint8_t css_computed_left(const css_computed_style_t *s,
                                         css_unit_t *unit);
 
 LIBCSS_PUBLIC uint8_t css_computed_display(const css_computed_style_t *s);
+
+LIBCSS_PUBLIC uint8_t
+css_computed_flex_direction(const css_computed_style_t *s);
 
 LIBCSS_PUBLIC uint8_t
 css_computed_vertical_align(const css_computed_style_t *s);
@@ -243,7 +251,7 @@ LIBCSS_PUBLIC void css_compute_absolute_values(
     const css_computed_style_t *parent, css_computed_style_t *s,
     css_metrics_t *m);
 
-LIBCSS_INLINE css_numeric_value_t css_convert_content_box_width(
+LIBCSS_INLINE css_numeric_value_t css_content_box_width_to_width(
     css_computed_style_t *s, css_numeric_value_t content_width)
 {
         if (css_computed_box_sizing(s) == CSS_BOX_SIZING_BORDER_BOX) {
@@ -252,7 +260,7 @@ LIBCSS_INLINE css_numeric_value_t css_convert_content_box_width(
         return content_width;
 }
 
-LIBCSS_INLINE css_numeric_value_t css_convert_content_box_height(
+LIBCSS_INLINE css_numeric_value_t css_content_box_height_to_height(
     css_computed_style_t *s, css_numeric_value_t content_height)
 {
         if (css_computed_box_sizing(s) == CSS_BOX_SIZING_BORDER_BOX) {
@@ -261,7 +269,7 @@ LIBCSS_INLINE css_numeric_value_t css_convert_content_box_height(
         return content_height;
 }
 
-LIBCSS_INLINE css_numeric_value_t css_convert_border_box_width(
+LIBCSS_INLINE css_numeric_value_t css_border_box_width_to_width(
     css_computed_style_t *s, css_numeric_value_t border_width)
 {
         if (css_computed_box_sizing(s) == CSS_BOX_SIZING_CONTENT_BOX) {
@@ -270,7 +278,7 @@ LIBCSS_INLINE css_numeric_value_t css_convert_border_box_width(
         return border_width;
 }
 
-LIBCSS_INLINE css_numeric_value_t css_convert_border_box_height(
+LIBCSS_INLINE css_numeric_value_t css_border_box_height_to_height(
     css_computed_style_t *s, css_numeric_value_t border_height)
 {
         if (css_computed_box_sizing(s) == CSS_BOX_SIZING_CONTENT_BOX) {
@@ -279,6 +287,61 @@ LIBCSS_INLINE css_numeric_value_t css_convert_border_box_height(
         return border_height;
 }
 
+LIBCSS_INLINE css_numeric_value_t css_width_to_content_box_width(
+    const css_computed_style_t *s, css_numeric_value_t width)
+{
+        return css_computed_box_sizing(s) == CSS_BOX_SIZING_CONTENT_BOX
+                   ? width
+                   : width - css_padding_x(s) - css_border_x(s);
+}
+
+LIBCSS_INLINE css_numeric_value_t css_height_to_content_box_height(
+    const css_computed_style_t *s, css_numeric_value_t height)
+{
+        return css_computed_box_sizing(s) == CSS_BOX_SIZING_CONTENT_BOX
+                   ? height
+                   : height - css_padding_y(s) - css_border_y(s);
+}
+
+LIBCSS_INLINE css_numeric_value_t css_width_to_border_box_width(
+    const css_computed_style_t *s, css_numeric_value_t width)
+{
+        return css_computed_box_sizing(s) == CSS_BOX_SIZING_BORDER_BOX
+                   ? width
+                   : width + css_padding_x(s) + css_border_x(s);
+}
+
+LIBCSS_INLINE css_numeric_value_t css_height_to_border_box_height(
+    const css_computed_style_t *s, css_numeric_value_t height)
+{
+        return css_computed_box_sizing(s) == CSS_BOX_SIZING_BORDER_BOX
+                   ? height
+                   : height + css_padding_y(s) + css_border_y(s);
+}
+
+LIBCSS_INLINE css_numeric_value_t css_width_to_outer_box_width(
+    const css_computed_style_t *s, css_numeric_value_t width)
+{
+        return css_width_to_border_box_width(s, width) + css_margin_x(s);
+}
+
+LIBCSS_INLINE css_numeric_value_t css_height_to_outer_box_height(
+    const css_computed_style_t *s, css_numeric_value_t height)
+{
+        return css_height_to_border_box_height(s, height) + css_margin_y(s);
+}
+
 LIBCSS_END_DECLS
+
+#define css_width_from_cbox css_content_box_width_to_width
+#define css_height_from_cbox css_content_box_height_to_height
+#define css_width_from_bbox css_border_box_width_to_width
+#define css_height_from_bbox css_border_box_height_to_height
+#define css_cbox_width css_width_to_content_box_width
+#define css_cbox_height css_height_to_content_box_height
+#define css_bbox_width css_width_to_border_box_width
+#define css_bbox_height css_height_to_border_box_height
+#define css_obox_width css_width_to_outer_box_width
+#define css_obox_height css_height_to_outer_box_height
 
 #endif

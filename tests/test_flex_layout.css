@@ -5,6 +5,10 @@ body {
   font-family: "Ubuntu Mono", "Consola";
 }
 
+scrollarea-content {
+  min-width: 0;
+}
+
 .example {
   padding: 5px;
   background-color: #f1f2f3;
@@ -39,6 +43,7 @@ body {
   border: 1px solid #7cbbff;
   box-sizing: border-box;
   font-size: 12px;
+  line-height: 18px;
   padding: 5px
 }
 
@@ -76,6 +81,10 @@ body {
 
 .h-auto {
   height: auto;
+}
+
+.h-full {
+  height: 100%;
 }
 
 .w-2 {
@@ -222,6 +231,7 @@ body {
   margin: 0 8px 0 8px;
   white-space: nowrap;
   overflow: hidden;
+  font-size: 12px;
 }
 
 .example-browser .c-frame-tab__close {

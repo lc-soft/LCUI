@@ -222,17 +222,18 @@ void css_init_properties(void)
         DEFINE_PROP(visibility, "visibility", "visible | hidden", "visible");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/width */
-        DEFINE_PROP(width, "width", "auto | <length> | <percentage>", "auto");
+        DEFINE_PROP(width, "width",
+                    "auto | fit-content | <length> | <percentage>", "auto");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/height */
         DEFINE_PROP(height, "height", "auto | <length> | <percentage>", "auto");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/min-width */
-        DEFINE_PROP(min_width, "min-width", "auto | <length> | <percentage>",
-                    "auto");
+        DEFINE_PROP(min_width, "min-width",
+                    "auto | min-content | <length> | <percentage>", "auto");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/min-height */
-        DEFINE_PROP(min_height, "min-height", "auto | <length> | <percentage>",
+        DEFINE_PROP(min_height, "min-height", "auto | min-content | <length> | <percentage>",
                     "auto");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/max-width */
@@ -244,7 +245,8 @@ void css_init_properties(void)
                     "auto");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/display */
-        DEFINE_PROP(display, "display", "none | block | inline-block | flex",
+        DEFINE_PROP(display, "display",
+                    "none | block | inline-block | flex | inline-flex",
                     "block");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/z-index */
@@ -288,8 +290,8 @@ void css_init_properties(void)
 
         /** @see
          * https://developer.mozilla.org/en-US/docs/Web/CSS/background-clip */
-        DEFINE_PROP(background_clip, "background-clip", "border-box | padding-box | content-box",
-                    "border-box");
+        DEFINE_PROP(background_clip, "background-clip",
+                    "border-box | padding-box | content-box", "border-box");
 
         /** @see
          * https://developer.mozilla.org/en-US/docs/Web/CSS/background-position

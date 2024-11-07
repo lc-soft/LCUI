@@ -12,6 +12,8 @@
 #include <LCUI.h>
 #include <ctest-custom.h>
 
+#define SCROLLBAR_WIDTH 14
+
 static void test_flex_layout_with_content_width(float width)
 {
 	float content_width = width - 22;
@@ -97,7 +99,7 @@ static void test_flex_layout_with_content_width(float width)
 	ctest_equal_ui_rect("$('.example')[14].border_box", &w->border_box, &rect);
 
 	rect.y += rect.height + 10;
-	rect.height = 185;
+	rect.height = 184;
 	w = ui_widget_get_child(container, 15);
 	ctest_equal_ui_rect("$('.example')[15].border_box", &w->border_box, &rect);
 
@@ -371,14 +373,14 @@ static void test_flex_layout_with_content_width(float width)
 		 &w->border_box, &rect);
 
 	w = ui_widget_get_child(content, 2);
-	rect.y = 5 + 50 + 31;
+	rect.y = 5 + 50 + 30;
 	ctest_equal_ui_rect("$('.example:eq(15) .layout__footer')[0].border_box",
 		 &w->border_box, &rect);
 
 	rect.x = 0;
 	rect.y = 0;
 	rect.width = 100;
-	rect.height = 31;
+	rect.height = 30;
 	w = ui_widget_get_child(content, 1);
 	w = ui_widget_get_child(w, 0);
 	ctest_equal_ui_rect("$('.example:eq(15) .layout__left')[0].border_box",
@@ -486,12 +488,12 @@ static void test_flex_layout_1280(void)
 static void test_flex_layout_600(void)
 {
 	ui_widget_resize(ui_root(), 600, 400);
-	test_flex_layout_with_content_width(580 - 14);
+	test_flex_layout_with_content_width(580 - SCROLLBAR_WIDTH);
 }
 
 static void test_flex_layout_320(void)
 {
-	float width = 320 - 10 - 10 - 14;
+	float width = 320 - 10 - 10 - SCROLLBAR_WIDTH;
 	float content_width = width - 12 - 10;
 
 	ui_widget_t *w;
@@ -576,7 +578,7 @@ static void test_flex_layout_320(void)
 	ctest_equal_ui_rect("$('.example')[14].border_box", &w->border_box, &rect);
 
 	rect.y += rect.height + 10;
-	rect.height = 185;
+	rect.height = 184;
 	w = ui_widget_get_child(container, 15);
 	ctest_equal_ui_rect("$('.example')[15].border_box", &w->border_box, &rect);
 
@@ -661,14 +663,14 @@ static void test_flex_layout_320(void)
 		 &w->border_box, &rect);
 
 	w = ui_widget_get_child(content, 2);
-	rect.y = 5 + 50 + 31;
+	rect.y = 5 + 50 + 30;
 	ctest_equal_ui_rect("$('.example:eq(15) .layout__footer')[0].border_box",
 		 &w->border_box, &rect);
 
 	rect.x = 0;
 	rect.y = 0;
 	rect.width = 100;
-	rect.height = 31;
+	rect.height = 30;
 	w = ui_widget_get_child(content, 1);
 	w = ui_widget_get_child(w, 0);
 	ctest_equal_ui_rect("$('.example:eq(15) .layout__left')[0].border_box",

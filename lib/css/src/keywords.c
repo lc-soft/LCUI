@@ -137,6 +137,7 @@ void css_init_keywords(void)
 
 	css_set_keyword(CSS_KEYWORD_BLOCK, "block");
 	css_set_keyword(CSS_KEYWORD_INLINE_BLOCK, "inline-block");
+	css_set_keyword(CSS_KEYWORD_INLINE_FLEX, "inline-flex");
 	css_set_keyword(CSS_KEYWORD_FLEX, "flex");
 
 	css_set_keyword(CSS_KEYWORD_START, "start");
@@ -181,6 +182,10 @@ void css_init_keywords(void)
 
 	css_set_keyword(CSS_KEYWORD_VISIBLE, "visible");
 	css_set_keyword(CSS_KEYWORD_HIDDEN, "hidden");
+	
+	css_set_keyword(CSS_KEYWORD_FIT_CONTENT, "fit-content");
+	css_set_keyword(CSS_KEYWORD_MIN_CONTENT, "min-content");
+	css_set_keyword(CSS_KEYWORD_MAX_CONTENT, "max-content");
 }
 
 void css_destroy_keywords(void)

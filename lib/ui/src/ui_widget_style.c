@@ -14,8 +14,8 @@
 #include <ui/metrics.h>
 #include <ui/style.h>
 #include <ui/image.h>
+#include "ui_widget.h"
 #include "ui_widget_style.h"
-#include "ui_widget_box.h"
 
 css_selector_node_t *ui_widget_create_selector_node(ui_widget_t *w)
 {
@@ -421,8 +421,6 @@ void ui_widget_update_style(ui_widget_t *w)
                 ui_image_on_progress(image, ui_widget_on_image_progress, w);
         }
         ui_widget_compute_style(w);
-        ui_widget_update_box_size(w);
-        ui_widget_update_box_position(w);
 }
 
 void ui_widget_destroy_style(ui_widget_t *w)

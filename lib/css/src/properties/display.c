@@ -29,6 +29,9 @@ int css_cascade_display(const css_style_array_value_t input,
 	case CSS_KEYWORD_FLEX:
 		value = CSS_DISPLAY_FLEX;
 		break;
+	case CSS_KEYWORD_INLINE_FLEX:
+		value = CSS_DISPLAY_INLINE_FLEX;
+		break;
 	default:
 		break;
 	}

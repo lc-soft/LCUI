@@ -17,7 +17,6 @@
 #include <ui/metrics.h>
 #include <ui/prototype.h>
 #include <ui/rect.h>
-#include "ui_widget_box.h"
 #include "ui_widget_border.h"
 #include "ui_widget_background.h"
 #include "ui_widget_box_shadow.h"
@@ -221,7 +220,6 @@ size_t ui_widget_get_dirty_rects(ui_widget_t *w, list_t *rects)
         int x = ui_compute(w->padding_box.x);
         int y = ui_compute(w->padding_box.y);
         
-
         ui_widget_collect_dirty_rect(w, rects, 0, 0, w->padding_box);
         for (list_each(node, rects)) {
                 rect = node->data;
