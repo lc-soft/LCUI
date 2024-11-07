@@ -9,16 +9,17 @@
  * LICENSE.TXT file in the root directory of this source tree.
  */
 
+// #define UI_DEBUG_ENABLED
 #include <string.h>
 #include <css/computed.h>
 #include <ui/base.h>
 #include <ui/rect.h>
 #include <ui/mutation_observer.h>
 #include "ui_widget.h"
-#include "ui_widget_box.h"
 #include "ui_widget_style.h"
 #include "ui_widget_observer.h"
 #include "ui_diff.h"
+#include "ui_debug.h"
 
 #define IS_PROP_TYPE_CHANGED(PROP_KEY) \
         diff->style.type_bits.PROP_KEY != w->computed_style.type_bits.PROP_KEY
@@ -67,6 +68,13 @@ void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w)
               IS_PROP_TYPE_CHANGED(justify_content) ||
               IS_PROP_TYPE_CHANGED(align_content) ||
               IS_PROP_TYPE_CHANGED(align_items)))) {
+#ifdef UI_DEBUG_ENABLED
+                {
+                        UI_WIDGET_STR(w, str);
+                        UI_WIDGET_SIZE_STR(w, size_str);
+                        UI_DEBUG_MSG("%s: %s: size=%s, reflow", __FUNCTION__, str, size_str);
+                }
+#endif
                 ui_widget_request_reflow(w);
         }
         if (w->parent && (flow_changed || ui_widget_in_layout_flow(w))) {
@@ -95,6 +103,14 @@ void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w)
                         w->rendering.dirty_rect_type = UI_DIRTY_RECT_TYPE_FULL;
                         w->rendering.dirty_rect = diff->canvas_box;
                         ui_widget_expose_dirty_rect(w);
+#ifdef UI_DEBUG_ENABLED
+                        {
+                                UI_WIDGET_STR(w, str);
+                                UI_WIDGET_SIZE_STR(w, size_str);
+                                UI_DEBUG_MSG("%s: %s: size=%s, repaint all",
+                                             __FUNCTION__, str, size_str);
+                        }
+#endif
                 }
                 return;
         }
@@ -130,6 +146,14 @@ void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w)
             IS_PROP_VALUE_CHANGED(background_position_y) ||
             IS_PROP_VALUE_CHANGED(background_width) ||
             IS_PROP_VALUE_CHANGED(background_height)) {
+#ifdef UI_DEBUG_ENABLED
+                {
+                        UI_WIDGET_STR(w, str);
+                        UI_WIDGET_SIZE_STR(w, size_str);
+                        UI_DEBUG_MSG("%s: %s: size=%s, repaint all",
+                                     __FUNCTION__, str, size_str);
+                }
+#endif
                 w->rendering.dirty_rect_type = UI_DIRTY_RECT_TYPE_FULL;
                 ui_widget_expose_dirty_rect(w);
         }

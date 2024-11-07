@@ -1,5 +1,6 @@
 ﻿/*
- * lib/ui-widgets/src/textinput.c: -- textinput widget, used to allow user edit text.
+ * lib/ui-widgets/src/textinput.c: -- textinput widget, used to allow user edit
+ * text.
  *
  * Copyright (c) 2018-2024, Liu chao <lc-soft@live.cn> All rights reserved.
  *
@@ -26,7 +27,7 @@
 
 enum task_type_t { TASK_SET_TEXT, TASK_UPDATE, TASK_TOTAL };
 
-typedef struct ui_textinput_t {
+typedef struct ui_textinput {
         ui_text_style_t style;        /**< 字体样式 */
         pd_text_t *layer_source;      /**< 实际文本层 */
         pd_text_t *layer_mask;        /**< 屏蔽后的文本层 */
@@ -371,8 +372,7 @@ static void ui_textinput_update_text(ui_widget_t *widget)
         for (list_each(node, &blocks)) {
                 textinput_process_textblock(widget, node->data);
         }
-        list_destroy(&blocks,
-                        (list_item_destructor_t)textblock_destroy);
+        list_destroy(&blocks, (list_item_destructor_t)textblock_destroy);
         ui_event_init(&ev, "change");
         ui_widget_emit_event(widget, ev, NULL);
 }
@@ -400,51 +400,25 @@ static void ui_textinput_on_resize(ui_widget_t *w, float width, float height)
         pd_rects_clear(&rects);
 }
 
-static void ui_textinput_on_auto_size(ui_widget_t *w, float *width,
-                                      float *height, ui_layout_rule_t rule)
+static void ui_textinput_on_autosize(ui_widget_t *w, ui_sizehint_t *hint)
 {
-        int i, n;
+        int i;
         int max_width = 0, max_height = 0;
         float scale = ui_get_actual_scale();
-
         ui_textinput_t *edit = ui_widget_get_data(w, ui_textinput_proto);
 
-        switch (rule) {
-        case UI_LAYOUT_RULE_FIXED_WIDTH:
-                max_width = ui_compute(w->content_box.width);
-                if (edit->is_multiline_mode) {
-                        n = y_max(pd_text_get_lines_length(edit->layer), 6);
-                        for (max_height = 0, i = 0; i < n; ++i) {
-                                max_height +=
-                                    pd_text_get_line_height(edit->layer, i);
-                        }
-                } else {
-                        max_height = pd_text_get_height(edit->layer);
+        max_width = ui_compute(DEFAULT_WIDTH);
+        if (edit->is_multiline_mode) {
+                for (max_height = 0, i = 0; i < 6; ++i) {
+                        max_height += pd_text_get_line_height(edit->layer, i);
                 }
-                break;
-        case UI_LAYOUT_RULE_FIXED_HEIGHT:
-                max_width = ui_compute(DEFAULT_WIDTH);
-                max_height = ui_compute(w->content_box.height);
-                break;
-        case UI_LAYOUT_RULE_FIXED:
-                max_width = ui_compute(w->content_box.width);
-                max_height = ui_compute(w->content_box.height);
-                break;
-        default:
-                max_width = ui_compute(DEFAULT_WIDTH);
-                if (edit->is_multiline_mode) {
-                        n = y_max(pd_text_get_lines_length(edit->layer), 6);
-                        for (max_height = 0, i = 0; i < n; ++i) {
-                                max_height +=
-                                    pd_text_get_line_height(edit->layer, i);
-                        }
-                } else {
-                        max_height = pd_text_get_height(edit->layer);
-                }
-                break;
+        } else {
+                max_height = pd_text_get_height(edit->layer);
         }
-        *height = max_height / scale;
-        *width = max_width / scale;
+        hint->max_height = max_height / scale;
+        hint->max_width = max_width / scale;
+        hint->min_width = 0;
+        hint->min_height = 0;
 }
 
 void ui_textinput_enable_style_tag(ui_widget_t *widget, bool enable)
@@ -1004,7 +978,7 @@ void ui_register_textinput(void)
         ui_textinput_proto->destroy = ui_textinput_on_destroy;
         ui_textinput_proto->settext = ui_textinput_on_parse_text;
         ui_textinput_proto->setattr = ui_textinput_on_set_attr;
-        ui_textinput_proto->autosize = ui_textinput_on_auto_size;
+        ui_textinput_proto->sizehint = ui_textinput_on_autosize;
         ui_textinput_proto->resize = ui_textinput_on_resize;
         ui_textinput_proto->update = ui_textinput_on_update;
         ui_load_css_string(ui_textinput_css, __FILE__);

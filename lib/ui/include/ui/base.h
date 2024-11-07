@@ -105,7 +105,17 @@ LIBUI_PUBLIC ui_widget_t *ui_widget_get_closest(ui_widget_t *w,
                                                 const char *type);
 LIBUI_PUBLIC dict_t *ui_widget_collect_references(ui_widget_t *w);
 
+LIBUI_PUBLIC float ui_widget_fix_width(ui_widget_t *w, float width);
+LIBUI_PUBLIC float ui_widget_fix_height(ui_widget_t *w, float height);
+LIBUI_PUBLIC bool ui_widget_get_max_width(ui_widget_t *w, float *width);
+LIBUI_PUBLIC bool ui_widget_get_max_height(ui_widget_t *w, float *height);
+LIBUI_PUBLIC bool ui_widget_get_min_width(ui_widget_t *w, float *width);
+LIBUI_PUBLIC bool ui_widget_get_min_height(ui_widget_t *w, float *height);
+
 // Layout
+
+
+LIBUI_PUBLIC void ui_widget_reset_size(ui_widget_t *w);
 
 /**
  * 执行布局前的准备操作
@@ -113,8 +123,15 @@ LIBUI_PUBLIC dict_t *ui_widget_collect_references(ui_widget_t *w);
  */
 LIBUI_PUBLIC void ui_widget_reset_layout(ui_widget_t *w);
 
-LIBUI_PUBLIC void ui_widget_auto_reflow(ui_widget_t *w);
+LIBUI_PUBLIC void ui_widget_reset_width(ui_widget_t *w);
 
+LIBUI_PUBLIC void ui_widget_reset_height(ui_widget_t *w);
+
+LIBUI_PUBLIC void ui_widget_compute_size(ui_widget_t *w, float *width, float *height);
+
+
+LIBUI_PUBLIC void ui_widget_reflow_if_width_changed(ui_widget_t *w);
+LIBUI_PUBLIC void ui_widget_reflow_if_height_changed(ui_widget_t *w);
 LIBUI_PUBLIC void ui_widget_reflow(ui_widget_t *w);
 
 // Renderer
@@ -137,11 +154,7 @@ LIBUI_PUBLIC void ui_widget_set_rules(ui_widget_t *w,
 LIBUI_PUBLIC void ui_widget_request_refresh_children(ui_widget_t *widget);
 LIBUI_PUBLIC void ui_widget_request_update(ui_widget_t *w);
 
-LIBUI_INLINE void ui_widget_request_reflow(ui_widget_t *w)
-{
-        w->update.should_reflow = true;
-        ui_widget_request_update(w);
-}
+LIBUI_PUBLIC void ui_widget_request_reflow(ui_widget_t *w);
 
 LIBUI_INLINE void ui_widget_request_refresh_style(ui_widget_t *w)
 {

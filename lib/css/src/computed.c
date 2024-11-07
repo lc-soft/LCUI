@@ -398,6 +398,11 @@ uint8_t css_computed_display(const css_computed_style_t *s)
         return s->type_bits.display;
 }
 
+uint8_t css_computed_flex_direction(const css_computed_style_t *s)
+{
+        return s->type_bits.flex_direction;
+}
+
 uint8_t css_computed_vertical_align(const css_computed_style_t *s)
 {
         return s->type_bits.vertical_align;
@@ -1079,18 +1084,6 @@ static void compute_absolute_width(const css_computed_style_t *parent,
                         s->type_bits.width = CSS_WIDTH_FIT_CONTENT;
                         break;
                 }
-                // 当父元素是块级元素且 display 为 block 时，width 为父元素的
-                // content box 的宽度
-                if (is_css_display_block(parent) &&
-                    compute_content_box_fixed_width(parent, &parent_value)) {
-                        value = parent_value - s->margin_left - s->margin_right;
-                        if (s->type_bits.box_sizing ==
-                            CSS_BOX_SIZING_CONTENT_BOX) {
-                                value -= css_padding_x(s) + css_border_x(s);
-                        }
-                        CSS_SET_FIXED_LENGTH(s, width, value);
-                        break;
-                }
                 break;
         case CSS_WIDTH_SET:
                 if (unit != CSS_UNIT_PERCENT) {
@@ -1162,26 +1155,6 @@ static void compute_absolute_flex_basis(const css_computed_style_t *parent,
                                         css_metrics_t *m)
 {
         compute_absolute_length(s, m, get_flex_basis, set_flex_basis);
-        if (parent &&
-            parent->type_bits.flex_direction == CSS_FLEX_DIRECTION_COLUMN) {
-                if (s->type_bits.flex_basis == CSS_FLEX_BASIS_AUTO) {
-                        if (IS_CSS_FIXED_LENGTH(s, height)) {
-                                CSS_SET_FIXED_LENGTH(s, flex_basis, s->height);
-                        } else {
-                                s->type_bits.flex_basis =
-                                    CSS_FLEX_BASIS_CONTENT;
-                        }
-                }
-                return;
-        }
-        if (s->type_bits.flex_basis == CSS_FLEX_BASIS_AUTO) {
-                if (IS_CSS_FIXED_LENGTH(s, width)) {
-                        CSS_SET_FIXED_LENGTH(s, flex_basis, s->width);
-                } else {
-                        // 交给布局引擎计算实际值
-                        s->type_bits.flex_basis = CSS_FLEX_BASIS_CONTENT;
-                }
-        }
 }
 
 void css_compute_absolute_values(const css_computed_style_t *parent,
