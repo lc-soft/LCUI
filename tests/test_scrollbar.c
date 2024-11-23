@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 	ui_widget_resize(ui_root(), 800, 640);
 	ui_load_css_string(test_css, __FILE__);
 	/* We have two ways to build content view */
-	BuildContentViewFromXML();
-	BuildContentView();
+	build_content_view_from_xml();
+	build_content_view();
 	return lcui_main();
 }

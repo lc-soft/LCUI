@@ -60,28 +60,27 @@ const char *test_content = "\n\
  */\n\
 ";
 
-/* Build content view with native C code */
-void BuildContentView(void)
+void build_content_view(void)
 {
-        ui_widget_t *container = ui_create_widget(NULL);
-        ui_widget_t *content = ui_create_widget("text");
-        ui_widget_t *vscrollbar = ui_create_widget("scrollbar");
-        ui_widget_t *hscrollbar = ui_create_widget("scrollbar");
+        ui_widget_t *container = ui_create_scrollarea();
+        ui_widget_t *content = ui_create_scrollarea_content();
+        ui_widget_t *text = ui_create_widget("text");
+        ui_widget_t *vscrollbar = ui_create_scrollbar();
+        ui_widget_t *hscrollbar = ui_create_scrollbar();
 
         ui_widget_set_id(content, "license_content");
-        ui_text_set_content(content, test_content);
+        ui_widget_set_style_string(content, "display", "inline-block");
+        ui_text_set_content(text, test_content);
         ui_scrollbar_set_orientation(hscrollbar, UI_SCROLLBAR_HORIZONTAL);
-        ui_scrollbar_bind_target(vscrollbar, content);
-        ui_scrollbar_bind_target(hscrollbar, content);
         ui_widget_add_class(container, "container");
+        ui_widget_append(content, text);
         ui_widget_append(container, content);
         ui_widget_append(container, vscrollbar);
         ui_widget_append(container, hscrollbar);
         ui_root_append(container);
 }
 
-/* Build content view with the XML code in test_scrollbar.xml */
-int BuildContentViewFromXML(void)
+int build_content_view_from_xml(void)
 {
         ui_widget_t *root = ui_root();
         ui_widget_t *pack = ui_load_xml_file("test_scrollbar.xml");
@@ -103,7 +102,7 @@ void test_scrollbar(void)
         lcui_init();
         ui_widget_resize(ui_root(), 800, 640);
         ui_load_css_string(test_css, __FILE__);
-        BuildContentView();
+        build_content_view();
         lcui_update_ui();
 
         content = ui_get_widget("license_content");

@@ -27,6 +27,8 @@ LIBUI_WIDGETS_PUBLIC void ui_scrollbar_update(ui_widget_t *w);
 LIBUI_WIDGETS_PUBLIC void ui_scrollbar_set_orientation(ui_widget_t* w,
 					 ui_scrollbar_orientation_t orientation);
 
+LIBUI_WIDGETS_PUBLIC ui_widget_t *ui_create_scrollbar(void);
+
 LIBUI_WIDGETS_PUBLIC void ui_register_scrollbar(void);
 
 LIBUI_WIDGETS_END_DECLS

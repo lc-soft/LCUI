@@ -46,7 +46,7 @@ scrollbar.vertical {\
 	right: 0;\
 	width: 14px;\
 	height: 100%;\
-	flex-orientation: column;\
+	flex-direction: column;\
 }\
 \
 scrollbar.horizontal {\
@@ -112,33 +112,41 @@ void ui_scrollbar_update(ui_widget_t *w)
                 float scroll_left = ui_scrollarea_get_scroll_left(w->parent);
                 float scroll_width = ui_scrollarea_get_scroll_width(w->parent);
                 float viewport_width = w->parent->padding_box.width;
-                float distance = scroll_width - viewport_width;
-                float left = track->computed_style.padding_left;
+                float overflow_width = scroll_width - viewport_width;
+                float thumb_left = track->computed_style.padding_left;
                 float track_width = track->content_box.width;
-                float width = 0;
+                float thumb_width = 0;
 
                 if (scroll_width > 0) {
-                        width = track_width * viewport_width / scroll_width;
+                        thumb_width =
+                            track_width * viewport_width / scroll_width;
                 }
-                if (width < that->thumb->computed_style.min_width) {
-                        width = that->thumb->computed_style.min_width;
+                if (thumb_width < that->thumb->computed_style.min_width) {
+                        thumb_width = that->thumb->computed_style.min_width;
                 }
-                if (width > track_width) {
-                        width = track_width;
+                if (thumb_width > track_width) {
+                        thumb_width = track_width;
                 }
-                if (distance > 0) {
-                        left += (track_width - width) * scroll_left / distance;
+                if (overflow_width > 0) {
+                        thumb_left += (track_width - thumb_width) *
+                                      scroll_left / overflow_width;
                         ui_widget_set_style_unit_value(
-                            that->thumb, css_prop_width, width, CSS_UNIT_PX);
-                        ui_widget_set_style_unit_value(
-                            that->thumb, css_prop_left, left, CSS_UNIT_PX);
-                        ui_widget_set_style_keyword_value(w, css_prop_pointer_events, CSS_KEYWORD_AUTO);
-                        ui_widget_set_style_keyword_value(w, css_prop_visibility, CSS_KEYWORD_VISIBLE);
+                            that->thumb, css_prop_width, thumb_width,
+                            CSS_UNIT_PX);
+                        ui_widget_set_style_unit_value(that->thumb,
+                                                       css_prop_left,
+                                                       thumb_left, CSS_UNIT_PX);
+                        ui_widget_set_style_keyword_value(
+                            w, css_prop_pointer_events, CSS_KEYWORD_AUTO);
+                        ui_widget_set_style_keyword_value(
+                            w, css_prop_visibility, CSS_KEYWORD_VISIBLE);
                         ui_widget_add_class(w->parent,
                                             "has-horizontal-scrollbar");
                 } else {
-                        ui_widget_set_style_keyword_value(w, css_prop_pointer_events, CSS_KEYWORD_NONE);
-                        ui_widget_set_style_keyword_value(w, css_prop_visibility, CSS_KEYWORD_HIDDEN);
+                        ui_widget_set_style_keyword_value(
+                            w, css_prop_pointer_events, CSS_KEYWORD_NONE);
+                        ui_widget_set_style_keyword_value(
+                            w, css_prop_visibility, CSS_KEYWORD_HIDDEN);
                         ui_widget_remove_class(w->parent,
                                                "has-horizontal-scrollbar");
                 }
@@ -148,34 +156,44 @@ void ui_scrollbar_update(ui_widget_t *w)
         float scroll_top = ui_scrollarea_get_scroll_top(w->parent);
         float scroll_height = ui_scrollarea_get_scroll_height(w->parent);
         float viewport_height = w->parent->padding_box.height;
-        float distance = scroll_height - viewport_height;
-        float top = track->computed_style.padding_top;
+        float overflow_height = scroll_height - viewport_height;
+        float thumb_top = track->computed_style.padding_top;
         float track_height = track->content_box.height;
-        float height = 0;
+        float thumb_height = 0;
 
         if (scroll_height > 0) {
-                height = track_height * viewport_height / scroll_height;
+                thumb_height = track_height * viewport_height / scroll_height;
         }
-        if (height < that->thumb->computed_style.min_height) {
-                height = that->thumb->computed_style.min_height;
+        if (thumb_height < that->thumb->computed_style.min_height) {
+                thumb_height = that->thumb->computed_style.min_height;
         }
-        if (height > track_height) {
-                height = track_height;
+        if (thumb_height > track_height) {
+                thumb_height = track_height;
         }
-        if (distance > 0) {
-                top += (track_height - height) * scroll_top / distance;
+        if (overflow_height > 0) {
+                thumb_top += (track_height - thumb_height) * scroll_top /
+                             overflow_height;
                 ui_widget_set_style_unit_value(that->thumb, css_prop_height,
-                                               height, CSS_UNIT_PX);
-                ui_widget_set_style_unit_value(that->thumb, css_prop_top, top,
-                                               CSS_UNIT_PX);
-                ui_widget_set_style_keyword_value(w, css_prop_pointer_events, CSS_KEYWORD_AUTO);
-                ui_widget_set_style_keyword_value(w, css_prop_visibility, CSS_KEYWORD_VISIBLE);
+                                               thumb_height, CSS_UNIT_PX);
+                ui_widget_set_style_unit_value(that->thumb, css_prop_top,
+                                               thumb_top, CSS_UNIT_PX);
+                ui_widget_set_style_keyword_value(w, css_prop_pointer_events,
+                                                  CSS_KEYWORD_AUTO);
+                ui_widget_set_style_keyword_value(w, css_prop_visibility,
+                                                  CSS_KEYWORD_VISIBLE);
                 ui_widget_add_class(w->parent, "has-vertical-scrollbar");
         } else {
-                ui_widget_set_style_keyword_value(w, css_prop_pointer_events, CSS_KEYWORD_NONE);
-                ui_widget_set_style_keyword_value(w, css_prop_visibility, CSS_KEYWORD_HIDDEN);
+                ui_widget_set_style_keyword_value(w, css_prop_pointer_events,
+                                                  CSS_KEYWORD_NONE);
+                ui_widget_set_style_keyword_value(w, css_prop_visibility,
+                                                  CSS_KEYWORD_HIDDEN);
                 ui_widget_remove_class(w->parent, "has-vertical-scrollbar");
         }
+        DEBUG_MSG("[vscrollbar] scroll_top=%g, scroll_height=%g, "
+                  "overflow_height=%g, track_height=%g, thumb_height=%g, "
+                  "thumb_top=%g\n",
+                  scroll_top, scroll_height, overflow_height, track_height,
+                  thumb_height, thumb_top);
 }
 
 static void ui_scrollbar_thumb_on_mousemove(ui_widget_t *thumb, ui_event_t *e,
@@ -307,6 +325,11 @@ static void ui_scrollbar_on_init(ui_widget_t *w)
 static void ui_scrollbar_on_destroy(ui_widget_t *w)
 {
         ui_scrollbar_t *scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
+}
+
+ui_widget_t *ui_create_scrollbar(void)
+{
+        return ui_create_widget_with_prototype(ui_scrollbar_proto);
 }
 
 void ui_register_scrollbar(void)
