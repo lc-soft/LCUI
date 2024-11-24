@@ -85,9 +85,9 @@ static int lcui_dispatch_app_event(ptk_event_t *e)
         if (e->type == PTK_EVENT_QUIT) {
                 return 0;
         }
-        worker_run(lcui_app.main_worker);
         lcui_dispatch_ui_event(e);
         lcui_update_ui();
+        worker_run(lcui_app.main_worker);
         ptk_steptimer_tick(&lcui_app.timer, lcui_app_on_tick, NULL);
         return 0;
 }
