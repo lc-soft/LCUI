@@ -1,5 +1,6 @@
 ﻿/*
- * lib/ui-widgets/include/ui_widgets/text.h: -- TextView widget for display text.
+ * lib/ui-widgets/include/ui_widgets/text.h: -- TextView widget for display
+ * text.
  *
  * Copyright (c) 2018-2024, Liu chao <lc-soft@live.cn> All rights reserved.
  *
@@ -18,13 +19,15 @@
 LIBUI_WIDGETS_BEGIN_DECLS
 
 LIBUI_WIDGETS_PUBLIC int ui_text_set_content_w(ui_widget_t *w,
-                                                const wchar_t *text);
+                                               const wchar_t *text);
+
+LIBUI_WIDGETS_PUBLIC size_t ui_text_get_content_w(ui_widget_t *w, wchar_t *buf,
+                                                  size_t size);
 
 LIBUI_WIDGETS_PUBLIC int ui_text_set_content(ui_widget_t *w,
-                                              const char *utf8_text);
+                                             const char *utf8_text);
 
-LIBUI_WIDGETS_PUBLIC void ui_text_set_multiline(ui_widget_t *w,
-                                                    bool enable);
+LIBUI_WIDGETS_PUBLIC void ui_text_set_multiline(ui_widget_t *w, bool enable);
 
 LIBUI_WIDGETS_PUBLIC void ui_register_text(void);
 
