@@ -136,6 +136,10 @@ void ui_scrollarea_update(ui_widget_t *w)
         if (that->scroll_left < 0) {
                 that->scroll_left = 0;
         }
+        DEBUG_MSG("[ui-scrollarea] scroll_width=%g, scroll_height=%g, "
+                     "scroll_top=%g, scroll_left=%g\n",
+                     that->scroll_width, that->scroll_height, that->scroll_top,
+                     that->scroll_left);
         ui_widget_set_style_keyword_value(content, css_prop_position,
                                           CSS_KEYWORD_RELATIVE);
         ui_widget_set_style_unit_value(content, css_prop_top, -that->scroll_top,

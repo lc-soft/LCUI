@@ -189,7 +189,7 @@ void ui_scrollbar_update(ui_widget_t *w)
                                                   CSS_KEYWORD_HIDDEN);
                 ui_widget_remove_class(w->parent, "has-vertical-scrollbar");
         }
-        DEBUG_MSG("[vscrollbar] scroll_top=%g, scroll_height=%g, "
+        DEBUG_MSG("[ui-scrollbar(vertical)] scroll_top=%g, scroll_height=%g, "
                   "overflow_height=%g, track_height=%g, thumb_height=%g, "
                   "thumb_top=%g\n",
                   scroll_top, scroll_height, overflow_height, track_height,
