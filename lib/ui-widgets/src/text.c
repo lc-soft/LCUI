@@ -305,6 +305,17 @@ int ui_text_set_content(ui_widget_t *w, const char *utf8_text)
         return ret;
 }
 
+size_t ui_text_get_content_w(ui_widget_t *w, wchar_t *buf, size_t size)
+{
+        ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
+
+        if (buf && size > 0) {
+                wcsncpy(buf, txt->content, size);
+                buf[size - 1] = 0;
+        }
+        return wcslen(txt->content);
+}
+
 void ui_text_set_multiline(ui_widget_t *w, bool enable)
 {
         ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
