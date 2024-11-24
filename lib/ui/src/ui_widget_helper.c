@@ -104,12 +104,12 @@ float ui_widget_fix_width(ui_widget_t *w, float width)
         css_numeric_value_t limit;
         css_unit_t unit;
 
-        if (css_computed_min_width(s, &limit, &unit) == CSS_MIN_WIDTH_SET &&
-            unit == CSS_UNIT_PX && width < limit) {
-                width = limit;
-        }
         if (css_computed_max_width(s, &limit, &unit) == CSS_MAX_WIDTH_SET &&
             unit == CSS_UNIT_PX && width > limit) {
+                width = limit;
+        }
+        if (css_computed_min_width(s, &limit, &unit) == CSS_MIN_WIDTH_SET &&
+            unit == CSS_UNIT_PX && width < limit) {
                 width = limit;
         }
         return width;
@@ -121,12 +121,12 @@ float ui_widget_fix_height(ui_widget_t *w, float height)
         css_numeric_value_t limit;
         css_unit_t unit;
 
-        if (css_computed_min_height(s, &limit, &unit) == CSS_MIN_HEIGHT_SET &&
-            unit == CSS_UNIT_PX && height < limit) {
-                height = limit;
-        }
         if (css_computed_max_height(s, &limit, &unit) == CSS_MAX_HEIGHT_SET &&
             unit == CSS_UNIT_PX && height > limit) {
+                height = limit;
+        }
+        if (css_computed_min_height(s, &limit, &unit) == CSS_MIN_HEIGHT_SET &&
+            unit == CSS_UNIT_PX && height < limit) {
                 height = limit;
         }
         return height;

@@ -185,6 +185,17 @@ static void ui_block_layout_apply_width(ui_block_layout_context_t *ctx)
                         continue;
                 }
                 ui_widget_reset_layout(child);
+#ifdef UI_DEBUG_ENABLED
+                {
+                        UI_WIDGET_STR(child, str);
+                        UI_WIDGET_SIZE_STR(child, size_str);
+                        UI_DEBUG_MSG("row[%zu][%zu] %s: before apply, size=%s, "
+                                     "content_box_size=(%g, %g)",
+                                     row->index, child_index, str, size_str,
+                                     child->content_box.width,
+                                     child->content_box.height);
+                }
+#endif
                 switch (cs->type_bits.display) {
                 case CSS_DISPLAY_INLINE_BLOCK:
                 case CSS_DISPLAY_INLINE_FLEX:
@@ -195,15 +206,34 @@ static void ui_block_layout_apply_width(ui_block_layout_context_t *ctx)
                                                   0.4f) {
                                 row = ui_block_layout_next_row(ctx, row);
                         }
+                        row->width += child->outer_box.width;
+                        if (child->outer_box.height > row->height) {
+                                row->height = child->outer_box.height;
+                        }
+                        list_append(&row->items, child);
                         break;
                 case CSS_DISPLAY_FLEX:
                 case CSS_DISPLAY_BLOCK:
+                        if (row->items.length > 0) {
+                                row = ui_block_layout_next_row(ctx, row);
+                        }
                         if (cs->type_bits.width == CSS_WIDTH_AUTO) {
-                                ui_widget_set_computed_width(
-                                    child,
+                                CSS_SET_FIXED_LENGTH(
+                                    cs, width,
                                     css_border_box_width_to_width(
                                         cs, content_width - css_margin_x(cs)));
+#ifdef UI_DEBUG_ENABLED
+                                {
+                                        UI_WIDGET_STR(child, str);
+                                        UI_DEBUG_MSG("row[%zu][%zu] %s: "
+                                                     "width=%g (stretch)",
+                                                     row->index, child_index,
+                                                     str,
+                                                     child->outer_box.width);
+                                }
+#endif
                         }
+                        ui_widget_reflow_if_width_changed(child);
                         if (cs->type_bits.margin_left == CSS_MARGIN_AUTO) {
                                 space = content_width - child->border_box.width;
                                 if (cs->type_bits.margin_right ==
@@ -218,24 +248,27 @@ static void ui_block_layout_apply_width(ui_block_layout_context_t *ctx)
                                             space - cs->margin_right);
                                 }
                         }
-                        ui_widget_reflow_if_width_changed(child);
-                        if (row->width > 0) {
-                                row = ui_block_layout_next_row(ctx, row);
+                        row->width = child->outer_box.width;
+                        if (child->outer_box.height > row->height) {
+                                row->height = child->outer_box.height;
                         }
+                        list_append(&row->items, child);
+                        row = ui_block_layout_next_row(ctx, row);
                         break;
                 default:
                         continue;
                 }
-                row->width += child->outer_box.width;
-                if (child->outer_box.height > row->height) {
-                        row->height = child->outer_box.height;
-                }
-                list_append(&row->items, child);
 #ifdef UI_DEBUG_ENABLED
-                UI_WIDGET_STR(child, str);
-                UI_DEBUG_MSG("row[%zu][%zu] %s: width=%g", row->index,
-                             child_index, str, child->outer_box.width);
-                child_index++;
+                {
+                        UI_WIDGET_STR(child, str);
+                        UI_WIDGET_SIZE_STR(child, size_str);
+                        UI_DEBUG_MSG("row[%zu][%zu] %s: after apply, size=%s, "
+                                     "content_box_size=(%g, %g)",
+                                     row->index, child_index, str, size_str,
+                                     child->content_box.width,
+                                     child->content_box.height);
+                        child_index++;
+                }
 #endif
         }
         ctx->content_height += row->height;

@@ -341,6 +341,7 @@ void ui_widget_update_box_width(ui_widget_t *w)
 {
         css_computed_style_t *s = &w->computed_style;
 
+        s->width = ui_widget_fix_width(w, s->width);
         if (s->type_bits.box_sizing == CSS_BOX_SIZING_BORDER_BOX) {
                 w->content_box.width =
                     s->width - css_padding_x(s) - css_border_x(s);
@@ -359,6 +360,7 @@ void ui_widget_update_box_height(ui_widget_t *w)
 {
         css_computed_style_t *s = &w->computed_style;
 
+        s->height = ui_widget_fix_height(w, s->height);
         if (s->type_bits.box_sizing == CSS_BOX_SIZING_BORDER_BOX) {
                 w->content_box.height =
                     s->height - css_padding_y(s) - css_border_y(s);
@@ -379,29 +381,19 @@ void ui_widget_update_box_size(ui_widget_t *w)
         ui_widget_update_box_height(w);
 }
 
-void ui_widget_set_computed_width(ui_widget_t *w, float width)
-{
-        CSS_SET_FIXED_LENGTH(&w->computed_style, width,
-                             ui_widget_fix_width(w, width));
-}
-
-void ui_widget_set_computed_height(ui_widget_t *w, float height)
-{
-        CSS_SET_FIXED_LENGTH(&w->computed_style, height,
-                             ui_widget_fix_height(w, height));
-}
-
 void ui_widget_set_content_width(ui_widget_t *w, float width)
 {
-        ui_widget_set_computed_width(
-            w, css_content_box_width_to_width(&w->computed_style, width));
+        CSS_SET_FIXED_LENGTH(
+            &w->computed_style, width,
+            css_content_box_width_to_width(&w->computed_style, width));
         ui_widget_update_box_width(w);
 }
 
 void ui_widget_set_content_height(ui_widget_t *w, float height)
 {
-        ui_widget_set_computed_height(
-            w, css_content_box_height_to_height(&w->computed_style, height));
+        CSS_SET_FIXED_LENGTH(
+            &w->computed_style, height,
+            css_content_box_height_to_height(&w->computed_style, height));
         ui_widget_update_box_height(w);
 }
 

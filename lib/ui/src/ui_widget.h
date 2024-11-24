@@ -11,10 +11,6 @@
 
 void ui_widget_add_state(ui_widget_t *w, ui_widget_state_t state);
 
-void ui_widget_set_computed_width(ui_widget_t *w, float width);
-
-void ui_widget_set_computed_height(ui_widget_t *w, float height);
-
 void ui_widget_set_content_width(ui_widget_t *w, float width);
 
 void ui_widget_set_content_height(ui_widget_t *w, float height);

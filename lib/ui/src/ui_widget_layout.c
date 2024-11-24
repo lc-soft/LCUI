@@ -91,8 +91,9 @@ void ui_widget_reflow_if_width_changed(ui_widget_t *w)
         int padding_box_width = (int)(w->padding_box.width * 64.f);
 
         if (s->type_bits.width == CSS_WIDTH_FIT_CONTENT) {
-                ui_widget_set_computed_width(
-                    w, css_content_box_width_to_width(s, w->max_content_width));
+                CSS_SET_FIXED_LENGTH(
+                    s, width,
+                    css_content_box_width_to_width(s, w->max_content_width));
         }
         ui_widget_update_box_width(w);
         if (content_box_width != (int)(w->content_box.width * 64.f) ||
@@ -117,8 +118,8 @@ void ui_widget_reflow_if_height_changed(ui_widget_t *w)
         int padding_box_height = (int)(w->padding_box.height * 64.f);
 
         if (s->type_bits.height == CSS_HEIGHT_FIT_CONTENT) {
-                ui_widget_set_computed_height(
-                    w,
+                CSS_SET_FIXED_LENGTH(
+                    s, height,
                     css_content_box_height_to_height(s, w->max_content_height));
         }
         ui_widget_update_box_height(w);
