@@ -312,7 +312,7 @@ static size_t ui_updater_update_children(ui_updater_t *updater, ui_widget_t *w)
 
 static void ui_widget_update_size(ui_widget_t *w)
 {
-        ui_widget_reset_layout(w);
+        ui_widget_reset_size(w);
         ui_widget_compute_style(w);
         ui_widget_update_box_size(w);
         ui_widget_reflow(w);

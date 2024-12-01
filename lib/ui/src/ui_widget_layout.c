@@ -20,6 +20,25 @@
 #include "ui_widget.h"
 #include "ui_widget_style.h"
 
+void ui_widget_reset_size(ui_widget_t *w)
+{
+        css_computed_style_t *src = &w->specified_style;
+        css_computed_style_t *dest = &w->computed_style;
+
+        CSS_COPY_LENGTH(dest, src, width);
+        CSS_COPY_LENGTH(dest, src, min_width);
+        CSS_COPY_LENGTH(dest, src, max_width);
+        CSS_COPY_LENGTH(dest, src, padding_left);
+        CSS_COPY_LENGTH(dest, src, padding_right);
+        CSS_COPY_LENGTH(dest, src, height);
+        CSS_COPY_LENGTH(dest, src, min_height);
+        CSS_COPY_LENGTH(dest, src, max_height);
+        CSS_COPY_LENGTH(dest, src, padding_top);
+        CSS_COPY_LENGTH(dest, src, padding_bottom);
+        CSS_COPY_LENGTH(dest, src, flex_basis);
+        ui_widget_compute_style(w);
+}
+
 /**
  * 重置布局相关属性，并重新计算样式
  */

@@ -8,6 +8,7 @@
  * This file is part of LCUI, distributed under the MIT License found in the
  * LICENSE.TXT file in the root directory of this source tree.
  */
+
 // #define UI_DEBUG_ENABLED
 #include <string.h>
 #include <css/computed.h>
@@ -70,7 +71,8 @@ void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w)
 #ifdef UI_DEBUG_ENABLED
                 {
                         UI_WIDGET_STR(w, str);
-                        UI_DEBUG_MSG("%s: %s: reflow", __FUNCTION__, str);
+                        UI_WIDGET_SIZE_STR(w, size_str);
+                        UI_DEBUG_MSG("%s: %s: size=%s, reflow", __FUNCTION__, str, size_str);
                 }
 #endif
                 ui_widget_request_reflow(w);
@@ -101,6 +103,14 @@ void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w)
                         w->rendering.dirty_rect_type = UI_DIRTY_RECT_TYPE_FULL;
                         w->rendering.dirty_rect = diff->canvas_box;
                         ui_widget_expose_dirty_rect(w);
+#ifdef UI_DEBUG_ENABLED
+                        {
+                                UI_WIDGET_STR(w, str);
+                                UI_WIDGET_SIZE_STR(w, size_str);
+                                UI_DEBUG_MSG("%s: %s: size=%s, repaint all",
+                                             __FUNCTION__, str, size_str);
+                        }
+#endif
                 }
                 return;
         }
@@ -136,6 +146,14 @@ void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w)
             IS_PROP_VALUE_CHANGED(background_position_y) ||
             IS_PROP_VALUE_CHANGED(background_width) ||
             IS_PROP_VALUE_CHANGED(background_height)) {
+#ifdef UI_DEBUG_ENABLED
+                {
+                        UI_WIDGET_STR(w, str);
+                        UI_WIDGET_SIZE_STR(w, size_str);
+                        UI_DEBUG_MSG("%s: %s: size=%s, repaint all",
+                                     __FUNCTION__, str, size_str);
+                }
+#endif
                 w->rendering.dirty_rect_type = UI_DIRTY_RECT_TYPE_FULL;
                 ui_widget_expose_dirty_rect(w);
         }

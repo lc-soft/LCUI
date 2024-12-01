@@ -18,7 +18,7 @@
 LIBUI_BEGIN_DECLS
 
 LIBUI_PUBLIC void ui_rect_from_pd_rect(ui_rect_t *ui_rect,
-                                            const pd_rect_t *rect, float scale);
+                                       const pd_rect_t *rect, float scale);
 
 LIBUI_PUBLIC bool ui_rect_correct(ui_rect_t *rect, float container_width,
                                   float container_height);
