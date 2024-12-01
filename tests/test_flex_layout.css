@@ -39,6 +39,7 @@ body {
   border: 1px solid #7cbbff;
   box-sizing: border-box;
   font-size: 12px;
+  line-height: 18px;
   padding: 5px
 }
 
@@ -76,6 +77,10 @@ body {
 
 .h-auto {
   height: auto;
+}
+
+.h-full {
+  height: 100%;
 }
 
 .w-2 {

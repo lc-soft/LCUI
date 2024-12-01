@@ -15,7 +15,7 @@
 
 int main(int argc, char **argv)
 {
-	logger_set_level(LOGGER_LEVEL_ERROR);
+	logger_set_level(LOGGER_LEVEL_ALL);
 	test_block_layout();
 	return lcui_main();
 }

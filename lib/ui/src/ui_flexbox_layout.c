@@ -40,10 +40,8 @@ typedef struct ui_flexbox_line {
 typedef struct ui_flexbox_layout_context_t {
         ui_widget_t *widget;
         bool column_direction;
-
+        ui_sizehint_t sizehint;
         float cross_size;
-        float hint_content_width;
-        float hint_content_height;
 
         /** list_t<ui_flexbox_line_t*> lines */
         list_t lines;
@@ -92,64 +90,84 @@ static ui_flexbox_line_t *ui_flexbox_layout_next_line(
         return next_line;
 }
 
-static float ui_compute_row_item_main_size(ui_widget_t *item)
+static void ui_reset_row_item_flex_basis(ui_widget_t *item)
+{
+        css_computed_style_t *s = &item->computed_style;
+
+        CSS_COPY_LENGTH(s, &item->specified_style, flex_basis);
+        if (s->type_bits.width == CSS_WIDTH_AUTO) {
+                s->type_bits.width = CSS_WIDTH_FIT_CONTENT;
+        }
+        if (s->type_bits.flex_basis == CSS_FLEX_BASIS_AUTO) {
+                if (!IS_CSS_FIXED_LENGTH(s, width)) {
+                        s->type_bits.flex_basis = CSS_FLEX_BASIS_CONTENT;
+                        return;
+                }
+                CSS_SET_FIXED_LENGTH(s, flex_basis, s->width);
+        }
+}
+
+static void ui_reset_column_item_flex_basis(ui_widget_t *item)
+{
+        css_computed_style_t *s = &item->computed_style;
+
+        CSS_COPY_LENGTH(s, &item->specified_style, flex_basis);
+        if (s->type_bits.height == CSS_HEIGHT_AUTO) {
+                s->type_bits.height = CSS_HEIGHT_FIT_CONTENT;
+        }
+        if (s->type_bits.flex_basis == CSS_FLEX_BASIS_AUTO) {
+                if (!IS_CSS_FIXED_LENGTH(s, height)) {
+                        s->type_bits.flex_basis = CSS_FLEX_BASIS_CONTENT;
+                        return;
+                }
+                CSS_SET_FIXED_LENGTH(s, flex_basis, s->height);
+        }
+}
+
+static void ui_compute_row_item_flex_basis(ui_widget_t *item)
 {
         css_computed_style_t *s = &item->computed_style;
         float main_inner_size = css_padding_x(s) + css_border_x(s);
-        bool is_border_box = is_css_border_box_sizing(s);
 
-        do {
-                if (s->type_bits.flex_basis == CSS_FLEX_BASIS_AUTO) {
-                        if (IS_CSS_FIXED_LENGTH(s, width)) {
-                                CSS_SET_FIXED_LENGTH(s, flex_basis, s->width);
-                                break;
-                        }
-                } else if (s->type_bits.flex_basis == CSS_FLEX_BASIS_SET) {
-                        if (IS_CSS_FIXED_LENGTH(s, flex_basis)) {
-                                break;
-                        }
-                }
-                CSS_SET_FIXED_LENGTH(s, flex_basis,
-                                     item->max_content_width +
-                                         (is_border_box ? main_inner_size : 0));
-        } while (0);
-        if (is_border_box) {
+        if (IS_CSS_PERCENTAGE(s, flex_basis)) {
+                CSS_SET_FIXED_LENGTH(
+                    s, flex_basis,
+                    s->flex_basis * item->parent->content_box.width / 100);
+        } else if (!IS_CSS_FIXED_LENGTH(s, flex_basis)) {
+                CSS_SET_FIXED_LENGTH(
+                    s, flex_basis,
+                    item->max_content_width +
+                        (is_css_border_box_sizing(s) ? main_inner_size : 0));
+        }
+        s->flex_basis = ui_widget_fix_width(item, s->flex_basis);
+        if (is_css_border_box_sizing(s)) {
                 if (s->flex_basis < main_inner_size) {
                         s->flex_basis = main_inner_size;
                 }
-                return s->flex_basis + css_margin_x(s);
         }
-        return s->flex_basis + css_margin_x(s) + main_inner_size;
 }
 
-static float ui_compute_column_item_main_size(ui_widget_t *item)
+static void ui_compute_column_item_flex_basis(ui_widget_t *item)
 {
         css_computed_style_t *s = &item->computed_style;
         float main_inner_size = css_padding_y(s) + css_border_y(s);
-        bool is_border_box = is_css_border_box_sizing(s);
-
-        do {
-                if (s->type_bits.flex_basis == CSS_FLEX_BASIS_AUTO) {
-                        if (IS_CSS_FIXED_LENGTH(s, height)) {
-                                CSS_SET_FIXED_LENGTH(s, flex_basis, s->height);
-                                break;
-                        }
-                } else if (s->type_bits.flex_basis == CSS_FLEX_BASIS_SET) {
-                        if (IS_CSS_FIXED_LENGTH(s, flex_basis)) {
-                                break;
-                        }
-                }
-                CSS_SET_FIXED_LENGTH(s, flex_basis,
-                                     item->max_content_height +
-                                         (is_border_box ? main_inner_size : 0));
-        } while (0);
-        if (is_border_box) {
+        
+        if (IS_CSS_PERCENTAGE(s, flex_basis)) {
+                CSS_SET_FIXED_LENGTH(
+                    s, flex_basis,
+                    s->flex_basis * item->parent->content_box.height / 100);
+        } else if (!IS_CSS_FIXED_LENGTH(s, flex_basis)) {
+                CSS_SET_FIXED_LENGTH(
+                    s, flex_basis,
+                    item->max_content_height +
+                        (is_css_border_box_sizing(s) ? main_inner_size : 0));
+        }
+        s->flex_basis = ui_widget_fix_height(item, s->flex_basis);
+        if (is_css_border_box_sizing(s)) {
                 if (s->flex_basis < main_inner_size) {
                         s->flex_basis = main_inner_size;
                 }
-                return s->flex_basis + css_margin_y(s);
         }
-        return s->flex_basis + css_margin_y(s) + main_inner_size;
 }
 
 static void ui_flexbox_layout_compute_justify_content(
@@ -201,6 +219,7 @@ static void ui_flexbox_row_layout_load_main_size(
         css_computed_style_t *s = &ctx->widget->computed_style;
         css_computed_style_t *cs;
         float main_size = 0;
+        float min_main_size = 0;
 
 #ifdef UI_DEBUG_ENABLED
         unsigned child_index = 0;
@@ -216,26 +235,47 @@ static void ui_flexbox_row_layout_load_main_size(
                         continue;
                 }
                 ui_widget_reset_layout(child);
-                if (cs->type_bits.width == CSS_WIDTH_AUTO) {
-                        cs->type_bits.width = CSS_WIDTH_FIT_CONTENT;
+                ui_reset_row_item_flex_basis(child);
+                if (IS_CSS_FIXED_LENGTH(cs, flex_basis)) {
+                        min_main_size += cs->flex_basis;
+                        if (!is_css_border_box_sizing(cs)) {
+                                min_main_size +=
+                                    css_padding_x(cs) + css_border_x(cs);
+                        }
+                } else {
+                        min_main_size += css_padding_x(cs) + css_border_x(cs);
                 }
-                main_size += ui_compute_row_item_main_size(child);
+                ui_compute_row_item_flex_basis(child);
+                main_size += cs->flex_basis;
+                if (!is_css_border_box_sizing(cs)) {
+                        main_size += css_padding_x(cs) + css_border_x(cs);
+                }
+                min_main_size += css_margin_x(cs);
+                main_size += css_margin_x(cs);
 #ifdef UI_DEBUG_ENABLED
                 {
                         UI_WIDGET_STR(child, str);
                         UI_WIDGET_SIZE_STR(child, size_str);
                         UI_DEBUG_MSG(
                             "children[%u]=%s, size=%s, max_content_size=(%g, "
-                            "%g), flex_basis(%d)=%g",
+                            "%g), max_width(%d)=%g, flex_basis(%d)=%g",
                             child_index, str, size_str,
                             child->max_content_width, child->max_content_height,
+                            cs->type_bits.max_width, cs->max_width,
                             cs->type_bits.flex_basis, cs->flex_basis);
                         child_index++;
                 }
 #endif
         }
-        if (ctx->hint_content_width > main_size) {
-                main_size = ctx->hint_content_width;
+        if (main_size < ctx->sizehint.intrinsic_width) {
+                main_size = ctx->sizehint.intrinsic_width;
+        }
+        if (ctx->sizehint.available_width > 0 &&
+            main_size > ctx->sizehint.available_width) {
+                main_size = ctx->sizehint.available_width;
+        }
+        if (main_size < min_main_size) {
+                main_size = min_main_size;
         }
         if (!IS_CSS_FIXED_LENGTH(s, width)) {
                 ui_widget_set_content_width(
@@ -258,7 +298,7 @@ static void ui_flexbox_column_layout_load_main_size(
         ui_widget_t *child;
         css_computed_style_t *s = &ctx->widget->computed_style;
         css_computed_style_t *cs;
-        float main_size = 0;
+        float main_size = 0, min_main_size = 0;
 
 #ifdef UI_DEBUG_ENABLED
         unsigned child_index = 0;
@@ -272,10 +312,24 @@ static void ui_flexbox_column_layout_load_main_size(
                 if (!ui_widget_in_layout_flow(child)) {
                         continue;
                 }
-                if (cs->type_bits.height == CSS_HEIGHT_AUTO) {
-                        cs->type_bits.height = CSS_HEIGHT_FIT_CONTENT;
+                ui_widget_reset_layout(child);
+                ui_reset_column_item_flex_basis(child);
+                if (IS_CSS_FIXED_LENGTH(cs, flex_basis)) {
+                        min_main_size += cs->flex_basis;
+                        if (!is_css_border_box_sizing(cs)) {
+                                min_main_size +=
+                                    css_padding_y(cs) + css_border_y(cs);
+                        }
+                } else {
+                        min_main_size += css_padding_y(cs) + css_border_y(cs);
                 }
-                main_size += ui_compute_column_item_main_size(child);
+                ui_compute_column_item_flex_basis(child);
+                main_size += cs->flex_basis;
+                if (cs->type_bits.box_sizing == CSS_BOX_SIZING_CONTENT_BOX) {
+                        main_size += css_padding_y(cs) + css_border_y(cs);
+                }
+                min_main_size += css_margin_y(cs);
+                main_size += css_margin_y(cs);
 #ifdef UI_DEBUG_ENABLED
                 {
                         UI_WIDGET_STR(child, str);
@@ -290,8 +344,15 @@ static void ui_flexbox_column_layout_load_main_size(
                 }
 #endif
         }
-        if (ctx->hint_content_height > main_size) {
-                main_size = ctx->hint_content_height;
+        if (main_size < ctx->sizehint.intrinsic_height) {
+                main_size = ctx->sizehint.intrinsic_height;
+        }
+        if (ctx->sizehint.available_height > 0 &&
+            main_size > ctx->sizehint.available_height) {
+                main_size = ctx->sizehint.available_height;
+        }
+        if (main_size < min_main_size) {
+                main_size = min_main_size;
         }
         if (!IS_CSS_FIXED_LENGTH(s, height)) {
                 ui_widget_set_content_height(ctx->widget, main_size);
@@ -396,6 +457,8 @@ static void ui_flexbox_row_layout_apply_main_size(
                 }
                 cs = &child->computed_style;
                 ui_widget_reset_width(child);
+                ui_reset_row_item_flex_basis(child);
+                ui_compute_row_item_flex_basis(child);
 #ifdef UI_DEBUG_ENABLED
                 {
                         UI_WIDGET_STR(child, str);
@@ -406,7 +469,10 @@ static void ui_flexbox_row_layout_apply_main_size(
                                      cs->type_bits.flex_basis, cs->flex_basis);
                 }
 #endif
-                main_size = ui_compute_row_item_main_size(child);
+                main_size = cs->flex_basis + css_margin_x(cs);
+                if (!is_css_border_box_sizing(cs)) {
+                        main_size += css_padding_x(cs) + css_border_x(cs);
+                }
 #ifdef UI_DEBUG_ENABLED
                 {
                         UI_WIDGET_STR(child, str);
@@ -475,10 +541,16 @@ static void ui_flexbox_row_layout_apply_main_size(
                                 UI_WIDGET_STR(child, str);
                                 UI_WIDGET_SIZE_STR(child, size_str);
                                 UI_DEBUG_MSG("[%zu] %s: size=%s, "
-                                             "flex-shrink=%g, flex-grow=%g",
+                                             "flex-shrink=%g, flex-grow=%g, "
+                                             "content_box_size=(%g, %g), "
+                                             "outer_box_size=(%g, %g)",
                                              child_index, str, size_str,
                                              child->computed_style.flex_shrink,
-                                             child->computed_style.flex_grow);
+                                             child->computed_style.flex_grow,
+                                             child->content_box.width,
+                                             child->content_box.height,
+                                             child->outer_box.width,
+                                             child->outer_box.height);
                                 ui_debug_msg_indent++;
                         }
 #endif
@@ -489,11 +561,14 @@ static void ui_flexbox_row_layout_apply_main_size(
                                 ui_debug_msg_indent--;
                                 UI_WIDGET_STR(child, str);
                                 UI_WIDGET_SIZE_STR(child, size_str);
-                                UI_DEBUG_MSG("[%zu] %s: size=%s, main_size=%g, "
-                                             "cross_size=%g",
-                                             child_index, str, size_str,
-                                             child->outer_box.width,
-                                             child->outer_box.height);
+                                UI_DEBUG_MSG(
+                                    "[%zu] %s: size=%s, main_size=%g, "
+                                    "cross_size=%g, content_box_size=(%g, %g)",
+                                    child_index, str, size_str,
+                                    child->outer_box.width,
+                                    child->outer_box.height,
+                                    child->content_box.width,
+                                    child->content_box.height);
                         }
                         child_index++;
 #endif
@@ -509,9 +584,11 @@ static void ui_flexbox_row_layout_apply_main_size(
 #endif
                 ctx->cross_size += line->cross_size;
         }
+        if (ctx->cross_size < ctx->sizehint.intrinsic_height) {
+                ctx->cross_size = ctx->sizehint.intrinsic_height;
+        }
         if (!IS_CSS_FIXED_LENGTH(s, height)) {
-                ui_widget_set_content_height(ctx->widget,
-                                             ctx->cross_size - s->padding_top);
+                ui_widget_set_content_height(ctx->widget, ctx->cross_size);
         }
 #ifdef UI_DEBUG_ENABLED
         ui_debug_msg_indent--;
@@ -568,7 +645,11 @@ static void ui_flexbox_column_layout_apply_main_size(
                                      cs->type_bits.flex_basis, cs->flex_basis);
                 }
 #endif
-                main_size = ui_compute_column_item_main_size(child);
+                ui_compute_column_item_flex_basis(child);
+                main_size = cs->flex_basis + css_margin_y(cs);
+                if (cs->type_bits.box_sizing == CSS_BOX_SIZING_CONTENT_BOX) {
+                        main_size += css_padding_y(cs) + css_border_y(cs);
+                }
 #ifdef UI_DEBUG_ENABLED
                 {
                         UI_WIDGET_STR(child, str);
@@ -671,9 +752,11 @@ static void ui_flexbox_column_layout_apply_main_size(
 #endif
                 ctx->cross_size += line->cross_size;
         }
+        if (ctx->cross_size < ctx->sizehint.intrinsic_width) {
+                ctx->cross_size = ctx->sizehint.intrinsic_width;
+        }
         if (!IS_CSS_FIXED_LENGTH(s, width)) {
-                ui_widget_set_content_width(ctx->widget,
-                                            ctx->cross_size - s->padding_left);
+                ui_widget_set_content_width(ctx->widget, ctx->cross_size);
         }
 #ifdef UI_DEBUG_ENABLED
         ui_debug_msg_indent--;
@@ -702,8 +785,8 @@ static float ui_compute_row_item_layout(ui_widget_t *item, float x, float y,
                     s, height,
                     css_border_box_height_to_height(
                         s, line_max_cross_size - css_margin_y(s)));
-                ui_widget_reflow_if_height_changed(item);
         }
+        ui_widget_reflow_if_height_changed(item);
         switch (align) {
         case CSS_ALIGN_ITEMS_CENTER:
                 y += (line_max_cross_size - item->outer_box.height) * 0.5f;
@@ -746,8 +829,8 @@ static float ui_compute_column_item_layout(ui_widget_t *item, float x, float y,
                     s, width,
                     css_border_box_width_to_width(
                         s, line_max_cross_size - css_margin_x(s)));
-                ui_widget_reflow_if_width_changed(item);
         }
+        ui_widget_reflow_if_width_changed(item);
         switch (align) {
         case CSS_ALIGN_ITEMS_CENTER:
                 x += (line_max_cross_size - item->outer_box.width) * 0.5f;
@@ -885,8 +968,7 @@ void ui_flexbox_layout_reflow(ui_widget_t *w)
         ctx.widget = w;
         ctx.column_direction = ui_widget_has_flex_column_direction(w);
         list_create(&ctx.lines);
-        ui_widget_get_hint_content_size(w, &ctx.hint_content_width,
-                                        &ctx.hint_content_height);
+        ui_widget_get_sizehint(w, &ctx.sizehint);
 #ifdef UI_DEBUG_ENABLED
         {
                 UI_WIDGET_STR(w, str);
@@ -895,7 +977,8 @@ void ui_flexbox_layout_reflow(ui_widget_t *w)
                              "hint_content_size=(%g,%g)",
                              __FUNCTION__, str,
                              ctx.column_direction ? "column" : "row", size_str,
-                             ctx.hint_content_width, ctx.hint_content_height);
+                             ctx.sizehint.intrinsic_width,
+                             ctx.sizehint.intrinsic_height);
                 ui_debug_msg_indent++;
         }
 #endif
