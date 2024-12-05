@@ -19,32 +19,28 @@ static struct {
 	ui_widget_t* inline_block;
 } self;
 
-static const char *css = css_string(
-
-.block {
-	width: 100px;
-	margin: 10px;
-	padding: 10px;
-	display: block;
-	border: 1px solid #f00;
-}
-
-.inline-block {
-	margin: 10px;
-	padding: 10px;
-	display: inline-block;
-	border: 1px solid #f00;
-}
-
-.short-content {
-	content: "hello!";
-}
-
-.long-content {
-	content: "this is long long long long long long long text";
-}
-
-);
+static const char *css = "\
+.block {\
+	width: 100px;\
+	margin: 10px;\
+	padding: 10px;\
+	display: block;\
+	border: 1px solid #f00;\
+        line-height: 20px;\
+}\
+.inline-block {\
+	margin: 10px;\
+	padding: 10px;\
+	display: inline-block;\
+	border: 1px solid #f00;\
+        line-height: 20px;\
+}\
+.short-content {\
+	content: \"hello!\";\
+}\
+.long-content {\
+	content: \"this is long long long long long long long text\";\
+}";
 
 /* clang-format on */
 
@@ -86,14 +82,14 @@ static void check_text_set_content(void)
 {
         ui_update();
 
-        ctest_equal_bool("check block width",
-                         self.block->border_box.width == 122.0f, true);
+        ctest_equal_float("check block width",
+                         self.block->border_box.width, 122.f);
         ctest_equal_bool("check block height",
-                         self.block->border_box.height > 140.0f, true);
-        ctest_equal_bool("check inline block width",
-                         self.inline_block->border_box.width > 520.0f, true);
-        ctest_equal_bool("check inline block height",
-                         self.inline_block->border_box.height < 45.0f, true);
+                         self.block->border_box.height > 140.f, true);
+        ctest_equal_float("check inline block width",
+                         self.inline_block->border_box.width, 580.f);
+        ctest_equal_float("check inline block height",
+                         self.inline_block->border_box.height, 62.f);
 }
 
 static void test_text_set_short_content_css(void *arg)
@@ -106,14 +102,14 @@ static void check_text_set_short_content_css(void)
 {
         ui_update();
 
-        ctest_equal_bool("check block width",
-                         self.block->border_box.width == 122.0f, true);
-        ctest_equal_bool("check block height",
-                         self.block->border_box.height < 45.0f, true);
+        ctest_equal_float("check block width",
+                         self.block->border_box.width, 122.f);
+        ctest_equal_float("check block height",
+                         self.block->border_box.height, 42.f);
         ctest_equal_bool("check inline block width",
-                         self.inline_block->border_box.width < 70.0f, true);
-        ctest_equal_bool("check inline block height",
-                         self.inline_block->border_box.height < 45.0f, true);
+                         self.inline_block->border_box.width < 70.f, true);
+        ctest_equal_float("check inline block height",
+                         self.inline_block->border_box.height, 42.f);
 }
 
 static void test_text_set_long_content_css(void *arg)
@@ -128,8 +124,8 @@ static void check_text_set_long_content_css(void)
 {
         ui_update();
 
-        ctest_equal_bool("check block width",
-                         self.block->border_box.width == 122.0f, true);
+        ctest_equal_float("check block width",
+                         self.block->border_box.width, 122.0f);
         ctest_equal_bool("check block height",
                          self.block->border_box.height > 60.0f, true);
         ctest_equal_bool("check inline block width",
@@ -144,6 +140,7 @@ void test_text_resize(void)
 
         build();
 
+        ui_widget_resize(ui_root(), 600, 600);
         test_text_set_content(NULL);
         ctest_describe("check text set content", check_text_set_content);
         test_text_set_short_content_css(NULL);
