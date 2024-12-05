@@ -18,7 +18,7 @@
 
 int main(int argc, char **argv)
 {
-	logger_set_level(LOGGER_LEVEL_ALL);
+	logger_set_level(LOGGER_LEVEL_ERROR);
 	ctest_describe("test settings", test_settings);
 	ctest_describe("test thread", test_thread);
 	ctest_describe("test font load", test_font_load);

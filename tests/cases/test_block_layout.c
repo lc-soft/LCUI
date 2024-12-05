@@ -63,12 +63,13 @@ static void test_auto_size(void)
         ui_rect_t rect;
         int box_height = 18 + 5 * 2 + 2;
         int two_lines_box_height = 18 * 2 + 5 * 2 + 2;
-	wchar_t textlist[3][256];
+        int container_height = 32 + 5 * 2 + 5 * 2 + 2;
+        wchar_t textlist[3][256];
 
         // Update #test-text-auto-height content
 
         w = ui_get_widget("test-text-auto-height");
-	ui_text_get_content_w(w, textlist[0], 256);
+        ui_text_get_content_w(w, textlist[0], 256);
         example = w->parent->parent;
         ui_text_set_content_w(w, L"long long long long long long text");
         ui_update();
@@ -85,18 +86,19 @@ static void test_auto_size(void)
                         (int)w->border_box.y, 5 + two_lines_box_height);
 
         w = ui_widget_next(w);
-        ctest_equal_int("$('#test-text-block-auto-height')[0].border_box.y",
-                        (int)w->border_box.y,
-                        5 + two_lines_box_height + box_height);
+        ctest_equal_int(
+            "$('#test-text-block-auto-height')[0].border_box.y",
+            (int)w->border_box.y,
+            5 + two_lines_box_height + box_height);
 
         ctest_equal_int("$('.example')[2].border_box.height",
                         (int)example->border_box.height,
-                        32 + two_lines_box_height + 2 * box_height + 5 * 2 + 5 * 2 + 2);
+                        two_lines_box_height + 2 * box_height + container_height);
 
         // Update #test-text-auto-size content
 
         w = ui_get_widget("test-text-auto-size");
-	ui_text_get_content_w(w, textlist[1], 256);
+        ui_text_get_content_w(w, textlist[1], 256);
         ui_text_set_content_w(
             w, L"long long long long long long long long long long long long "
                L"long long long long long long long long long long long long "
@@ -107,27 +109,28 @@ static void test_auto_size(void)
         ctest_equal_int("$('#test-text-auto-size')[0].border_box.y",
                         (int)w->border_box.y, 5 + two_lines_box_height);
         ctest_equal_bool("$('#test-text-auto-size')[0].border_box.width <= 758",
-                         w->border_box.width < 758.f, true);
+                         w->border_box.width <= 758.f, true);
         ctest_equal_int("$('#test-text-auto-size')[0].border_box.height",
                         (int)w->border_box.height, two_lines_box_height);
 
         w = ui_widget_next(w);
         ctest_equal_int("$('#test-text-block-auto-height')[0].border_box.y",
                         (int)w->border_box.y,
-                        5 + two_lines_box_height + two_lines_box_height);
+                        5 + two_lines_box_height * 2);
 
         ctest_equal_int("$('.example')[2].border_box.height",
-                        (int)example->border_box.height, 185);
+                        (int)example->border_box.height,
+                        container_height + box_height + 2 * two_lines_box_height);
 
         // Update test-text-block-auto-height content
 
         w = ui_get_widget("test-text-block-auto-height");
-	ui_text_get_content_w(w, textlist[2], 256);
+        ui_text_get_content_w(w, textlist[2], 256);
         ui_text_set_content_w(
             w, L"long long long long long long long long long long long long "
                L"long long long long long long long long long long long long "
                L"long long text");
-        
+
         ui_update();
         rect.x = 5;
         rect.y = 5 + 2.f * two_lines_box_height;
@@ -136,16 +139,19 @@ static void test_auto_size(void)
         ctest_equal_ui_rect("$('#test-text-block-auto-height')[0].border_box",
                             &w->border_box, &rect);
 
-	ui_text_set_content_w(ui_get_widget("test-text-auto-height"), textlist[0]);
-	ui_text_set_content_w(ui_get_widget("test-text-auto-size"), textlist[1]);
-	ui_text_set_content_w(ui_get_widget("test-text-block-auto-height"), textlist[2]);
+        ui_text_set_content_w(ui_get_widget("test-text-auto-height"),
+                              textlist[0]);
+        ui_text_set_content_w(ui_get_widget("test-text-auto-size"),
+                              textlist[1]);
+        ui_text_set_content_w(ui_get_widget("test-text-block-auto-height"),
+                              textlist[2]);
 }
 
 static void test_inline_block_nesting(void)
 {
         ui_widget_t *w;
         ui_rect_t rect;
-	int box_height = 30;
+        int box_height = 30;
 
         w = ui_get_widget("example-inline-block-nesting__block-1");
         rect.x = 5;

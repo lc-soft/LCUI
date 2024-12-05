@@ -23,6 +23,7 @@ void test_widget_rect(void)
 	ui_event_t e = { 0 };
 	pd_rect_t rect = { 0 };
 	pd_rect_t expected_rect;
+	ui_rect_t expected_ui_rect;
 	list_t rects;
 
 	lcui_init();
@@ -62,10 +63,11 @@ void test_widget_rect(void)
 	     "root.getDirtyRects().length == 1",
 	     rects.length == 1, true);
 
-	expected_rect.x = 0;
-	expected_rect.y = 0;
-	expected_rect.width = 100;
-	expected_rect.height = 100;
+	expected_ui_rect.x = 0;
+	expected_ui_rect.y = 0;
+	expected_ui_rect.width = 100;
+	expected_ui_rect.height = 100;
+	ui_compute_rect(&expected_rect, &expected_ui_rect);
 	if (rects.length == 1) {
 		rect = *(pd_rect_t *)list_get(&rects, 0);
 	}
@@ -135,10 +137,11 @@ void test_widget_rect(void)
 	ctest_equal_pd_rect("root.getDirtyRects()[0]", &rect, &expected_rect);
 	list_destroy(&rects, free);
 
-	expected_rect.x = 21;
-	expected_rect.y = 11;
-	expected_rect.width = 50;
-	expected_rect.height = 50;
+	expected_ui_rect.x = 21;
+	expected_ui_rect.y = 11;
+	expected_ui_rect.width = 50;
+	expected_ui_rect.height = 50;
+	ui_compute_rect(&expected_rect, &expected_ui_rect);
 	ui_widget_remove(child);
 	ui_update();
 	ui_widget_get_dirty_rects(root, &rects);
@@ -150,10 +153,11 @@ void test_widget_rect(void)
 	ctest_equal_pd_rect("root.getDirtyRects()[0]", &rect, &expected_rect);
 	list_destroy(&rects, free);
 
-	expected_rect.x = 0;
-	expected_rect.y = 0;
-	expected_rect.width = 100;
-	expected_rect.height = 100;
+	expected_ui_rect.x = 0;
+	expected_ui_rect.y = 0;
+	expected_ui_rect.width = 100;
+	expected_ui_rect.height = 100;
+	ui_compute_rect(&expected_rect, &expected_ui_rect);
 	ui_widget_remove(parent);
 	ui_update();
 	ui_widget_get_dirty_rects(root, &rects);
