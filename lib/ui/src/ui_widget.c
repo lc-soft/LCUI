@@ -402,9 +402,13 @@ void ui_widget_get_sizehint(ui_widget_t *w, ui_sizehint_t *hint)
         css_computed_style_t *s = &w->computed_style;
         css_computed_style_t *ps;
 
+        hint->min_width = 0;
+        hint->min_height = 0;
+        hint->max_width = 0;
+        hint->max_height = 0;
         hint->available_width = -1.f;
         hint->available_height = -1.f;
-        w->proto->autosize(w, &hint->intrinsic_width, &hint->intrinsic_height);
+        w->proto->sizehint(w, hint);
         if (!w->parent || s->type_bits.position == CSS_POSITION_FIXED ||
             s->type_bits.position == CSS_POSITION_ABSOLUTE ||
             (s->type_bits.display != CSS_DISPLAY_BLOCK &&
@@ -416,8 +420,12 @@ void ui_widget_get_sizehint(ui_widget_t *w, ui_sizehint_t *hint)
             ps->type_bits.display != CSS_DISPLAY_INLINE_BLOCK) {
                 return;
         }
-        hint->available_width = css_width_to_content_box_width(
-            s, w->parent->content_box.width - css_margin_x(s));
-        hint->available_height = css_height_to_content_box_height(
-            s, w->parent->content_box.height - css_margin_y(s));
+        if (IS_CSS_FIXED_LENGTH(ps, width)) {
+                hint->available_width = css_width_to_content_box_width(
+                    s, w->parent->content_box.width - css_margin_x(s));
+        }
+        if (IS_CSS_FIXED_LENGTH(ps, height)) {
+                hint->available_height = css_height_to_content_box_height(
+                    s, w->parent->content_box.height - css_margin_y(s));
+        }
 }

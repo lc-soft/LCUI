@@ -37,7 +37,7 @@ static void ui_widget_on_set_text(ui_widget_t *w, const char *text)
 {
 }
 
-static void ui_widget_on_autosize(ui_widget_t *w, float *width, float *height)
+static void ui_widget_on_sizehint(ui_widget_t *w, ui_sizehint_t *hint)
 {
 }
 
@@ -57,7 +57,7 @@ static ui_widget_prototype_t ui_widget_default_prototype = {
         .update = ui_widget_on_update,
         .setattr = ui_widget_on_set_attr,
         .settext = ui_widget_on_set_text,
-        .autosize = ui_widget_on_autosize,
+        .sizehint = ui_widget_on_sizehint,
         .resize = ui_widget_on_resize,
         .paint = ui_widget_on_paint
 };

@@ -267,8 +267,8 @@ static void ui_flexbox_row_layout_load_main_size(
                 }
 #endif
         }
-        if (main_size < ctx->sizehint.intrinsic_width) {
-                main_size = ctx->sizehint.intrinsic_width;
+        if (main_size < ctx->sizehint.max_width) {
+                main_size = ctx->sizehint.max_width;
         }
         if (ctx->sizehint.available_width > 0 &&
             main_size > ctx->sizehint.available_width) {
@@ -344,8 +344,8 @@ static void ui_flexbox_column_layout_load_main_size(
                 }
 #endif
         }
-        if (main_size < ctx->sizehint.intrinsic_height) {
-                main_size = ctx->sizehint.intrinsic_height;
+        if (main_size < ctx->sizehint.max_height) {
+                main_size = ctx->sizehint.max_height;
         }
         if (ctx->sizehint.available_height > 0 &&
             main_size > ctx->sizehint.available_height) {
@@ -584,8 +584,8 @@ static void ui_flexbox_row_layout_apply_main_size(
 #endif
                 ctx->cross_size += line->cross_size;
         }
-        if (ctx->cross_size < ctx->sizehint.intrinsic_height) {
-                ctx->cross_size = ctx->sizehint.intrinsic_height;
+        if (ctx->cross_size < ctx->sizehint.max_height) {
+                ctx->cross_size = ctx->sizehint.max_height;
         }
         if (!IS_CSS_FIXED_LENGTH(s, height)) {
                 ui_widget_set_content_height(ctx->widget, ctx->cross_size);
@@ -752,8 +752,8 @@ static void ui_flexbox_column_layout_apply_main_size(
 #endif
                 ctx->cross_size += line->cross_size;
         }
-        if (ctx->cross_size < ctx->sizehint.intrinsic_width) {
-                ctx->cross_size = ctx->sizehint.intrinsic_width;
+        if (ctx->cross_size < ctx->sizehint.max_width) {
+                ctx->cross_size = ctx->sizehint.max_width;
         }
         if (!IS_CSS_FIXED_LENGTH(s, width)) {
                 ui_widget_set_content_width(ctx->widget, ctx->cross_size);
@@ -977,7 +977,7 @@ void ui_flexbox_layout_reflow(ui_widget_t *w)
                              "hint_content_size=(%g,%g)",
                              __FUNCTION__, str,
                              ctx.column_direction ? "column" : "row", size_str,
-                             ctx.sizehint.intrinsic_width,
+                             ctx.sizehint.min_width,
                              ctx.sizehint.intrinsic_height);
                 ui_debug_msg_indent++;
         }

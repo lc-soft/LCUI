@@ -103,8 +103,8 @@ static void ui_block_layout_load_width(ui_block_layout_context_t *ctx)
         css_computed_style_t *cs;
 
         float line_max_width = 0, line_min_width = 0;
-        float content_width = ctx->sizehint.intrinsic_width;
-        float min_content_width = ctx->sizehint.intrinsic_width;
+        float content_width = ctx->sizehint.max_width;
+        float min_content_width = ctx->sizehint.min_width;
         float max_content_width = 0;
         bool max_content_width_valid =
             ui_widget_get_max_width(ctx->widget, &max_content_width);
@@ -117,23 +117,53 @@ static void ui_block_layout_load_width(ui_block_layout_context_t *ctx)
                 max_content_width = css_width_to_content_box_width(s, s->width);
                 max_content_width_valid = true;
         }
+#ifdef UI_DEBUG_ENABLED
+        size_t child_index = 0;
+        size_t line_index = 0;
+
+        UI_DEBUG_MSG("%s: begin, max_content_width(%d)=%g", __FUNCTION__,
+                     max_content_width_valid, max_content_width);
+        ui_debug_msg_indent++;
+#endif
         for (list_each(node, &ctx->widget->children)) {
                 child = node->data;
                 cs = &child->computed_style;
                 if (!ui_widget_in_layout_flow(child)) {
+#ifdef UI_DEBUG_ENABLED
+                        UI_WIDGET_STR(child, str);
+                        UI_DEBUG_MSG("children[%zu]=%s: skip", child_index,
+                                     str);
+                        child_index++;
+#endif
                         continue;
                 }
                 switch (cs->type_bits.display) {
                 case CSS_DISPLAY_FLEX:
                 case CSS_DISPLAY_BLOCK:
+#ifdef UI_DEBUG_ENABLED
+                        UI_DEBUG_MSG(
+                            "line[%zu]: min_width=%g, max_width=%g, next",
+                            line_index, line_min_width, line_max_width);
+                        line_index++;
+#endif
                         if (line_max_width > content_width) {
                                 content_width = line_max_width;
                         }
+                        line_min_width = 0;
                         line_max_width = 0;
                         break;
                 default:
                         break;
                 }
+#ifdef UI_DEBUG_ENABLED
+                {
+                        UI_WIDGET_STR(child, str);
+                        UI_WIDGET_SIZE_STR(child, size_str);
+                        UI_DEBUG_MSG("line[%zu]: children[%zu]=%s, size=%s",
+                                     line_index, child_index, str, size_str);
+                        child_index++;
+                }
+#endif
                 line_max_width += child->outer_box.width;
                 if (IS_CSS_FIXED_LENGTH(cs, width)) {
                         line_min_width += child->outer_box.width;
@@ -153,7 +183,7 @@ static void ui_block_layout_load_width(ui_block_layout_context_t *ctx)
                         content_width = line_max_width;
                 }
         }
-        if (ctx->sizehint.available_width > 0 &&
+        if (ctx->sizehint.available_width >= 0 &&
             content_width > ctx->sizehint.available_width) {
                 content_width = ctx->sizehint.available_width;
         }
@@ -162,9 +192,14 @@ static void ui_block_layout_load_width(ui_block_layout_context_t *ctx)
         }
         if (!IS_CSS_FIXED_LENGTH(s, width)) {
                 ui_widget_set_content_width(ctx->widget, content_width);
+                if (content_width < ctx->sizehint.max_width) {
+                        ui_widget_get_sizehint(ctx->widget, &ctx->sizehint);
+                }
         }
+        ctx->widget->min_content_width = min_content_width;
 #ifdef UI_DEBUG_ENABLED
-        UI_DEBUG_MSG("%s: min_content_width=%g, available_width=%g, "
+        ui_debug_msg_indent--;
+        UI_DEBUG_MSG("%s: end, min_content_width=%g, available_width=%g, "
                      "max_content_width(%d)=%g, content_width=%g",
                      __FUNCTION__, min_content_width,
                      ctx->sizehint.available_width, max_content_width_valid,
@@ -181,6 +216,7 @@ static void ui_block_layout_apply_width(ui_block_layout_context_t *ctx)
         float space;
         float content_width = ctx->widget->content_box.width;
         float content_height = 0;
+        float child_content_width;
 #ifdef UI_DEBUG_ENABLED
         size_t child_index = 0;
 
@@ -217,6 +253,19 @@ static void ui_block_layout_apply_width(ui_block_layout_context_t *ctx)
                 switch (cs->type_bits.display) {
                 case CSS_DISPLAY_INLINE_BLOCK:
                 case CSS_DISPLAY_INLINE_FLEX:
+                        if (!IS_CSS_FIXED_LENGTH(cs, width)) {
+                                child_content_width =
+                                    content_width - css_margin_x(cs) -
+                                    css_border_x(cs) - css_padding_x(cs);
+                                child_content_width =
+                                    y_max(child->min_content_width,
+                                          y_min(child->max_content_width,
+                                                child_content_width));
+                                CSS_SET_FIXED_LENGTH(
+                                    cs, width,
+                                    css_content_box_width_to_width(
+                                        cs, child_content_width));
+                        }
                         ui_widget_reflow_if_width_changed(child);
                         if (row->width > 0 && row->width +
                                                       child->outer_box.width -
@@ -293,8 +342,8 @@ static void ui_block_layout_apply_width(ui_block_layout_context_t *ctx)
 #endif
         }
         content_height += row->height;
-        if (content_height < ctx->sizehint.intrinsic_height) {
-                content_height = ctx->sizehint.intrinsic_height;
+        if (content_height < ctx->sizehint.max_height) {
+                content_height = ctx->sizehint.max_height;
         }
         if (!IS_CSS_FIXED_LENGTH(&ctx->widget->computed_style, height)) {
                 ui_widget_set_content_height(ctx->widget, content_height);
@@ -322,8 +371,10 @@ static void ui_block_layout_update(ui_block_layout_context_t *ctx)
                 x = ctx->widget->computed_style.padding_left;
 #ifdef UI_DEBUG_ENABLED
                 child_index = 0;
-                UI_DEBUG_MSG("row[%zu]: begin, x=%g, y=%g, width=%g, height=%g",
-                             row->index, x, row_y, row->width, row->height);
+                UI_DEBUG_MSG(
+                    "row[%zu]: update begin, x=%g, y=%g, width=%g, height=%g",
+                    row->index, x, row_y, row->width, row->height);
+                ui_debug_msg_indent++;
 #endif
                 for (list_each(node, &row->items)) {
                         y = row_y;
@@ -349,8 +400,11 @@ static void ui_block_layout_update(ui_block_layout_context_t *ctx)
 #endif
                                 continue;
                         }
-                        ui_widget_reset_height(child);
-                        ui_widget_reflow_if_height_changed(child);
+                        if (IS_CSS_PERCENTAGE(&child->specified_style,
+                                              height)) {
+                                ui_widget_reset_height(child);
+                                ui_widget_reflow_if_height_changed(child);
+                        }
                         if (ui_widget_has_inline_block_display(child)) {
                                 switch (css_computed_vertical_align(
                                     &child->computed_style)) {
@@ -382,6 +436,10 @@ static void ui_block_layout_update(ui_block_layout_context_t *ctx)
 #endif
                         x += child->outer_box.width;
                 }
+#ifdef UI_DEBUG_ENABLED
+                ui_debug_msg_indent--;
+                UI_DEBUG_MSG("row[%zu]: update end", row->index);
+#endif
                 row_y += row->height;
         }
 }
@@ -402,8 +460,7 @@ void ui_block_layout_reflow(ui_widget_t *w)
                 UI_DEBUG_MSG("%s: %s: begin, size=%s, "
                              "hint_content_size=(%g, %g)",
                              __FUNCTION__, str, size_str,
-                             ctx.sizehint.intrinsic_width,
-                             ctx.sizehint.intrinsic_height);
+                             ctx.sizehint.max_width, ctx.sizehint.max_height);
                 ui_debug_msg_indent++;
         }
 #endif

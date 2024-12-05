@@ -400,8 +400,7 @@ static void ui_textinput_on_resize(ui_widget_t *w, float width, float height)
         pd_rects_clear(&rects);
 }
 
-static void ui_textinput_on_autosize(ui_widget_t *w, float *width,
-                                     float *height)
+static void ui_textinput_on_autosize(ui_widget_t *w, ui_sizehint_t *hint)
 {
         int i;
         int max_width = 0, max_height = 0;
@@ -416,8 +415,10 @@ static void ui_textinput_on_autosize(ui_widget_t *w, float *width,
         } else {
                 max_height = pd_text_get_height(edit->layer);
         }
-        *height = max_height / scale;
-        *width = max_width / scale;
+        hint->max_height = max_height / scale;
+        hint->max_width = max_width / scale;
+        hint->min_width = 0;
+        hint->min_height = 0;
 }
 
 void ui_textinput_enable_style_tag(ui_widget_t *widget, bool enable)
@@ -977,7 +978,7 @@ void ui_register_textinput(void)
         ui_textinput_proto->destroy = ui_textinput_on_destroy;
         ui_textinput_proto->settext = ui_textinput_on_parse_text;
         ui_textinput_proto->setattr = ui_textinput_on_set_attr;
-        ui_textinput_proto->autosize = ui_textinput_on_autosize;
+        ui_textinput_proto->sizehint = ui_textinput_on_autosize;
         ui_textinput_proto->resize = ui_textinput_on_resize;
         ui_textinput_proto->update = ui_textinput_on_update;
         ui_load_css_string(ui_textinput_css, __FILE__);

@@ -18,12 +18,12 @@
 #include <ui_widgets/text.h>
 #include "textstyle.h"
 
-typedef struct ui_text_task_t {
+typedef struct ui_text_task {
         wchar_t *content;
         bool update_content;
 } ui_text_task_t;
 
-typedef struct ui_text_t_ {
+typedef struct ui_text {
         wchar_t *content;
         bool trimming;
         ui_widget_t *widget;
@@ -177,10 +177,11 @@ static void ui_text_on_destroy(ui_widget_t *w)
         }
 }
 
-static void ui_text_on_autosize(ui_widget_t *w, float *width, float *height)
+static void ui_text_on_sizehint(ui_widget_t *w, ui_sizehint_t *hint)
 {
         float max_width = 0, max_height = 0;
         ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
+        pd_text_line_t *line;
         css_computed_style_t *s = &w->computed_style;
         list_t rects;
 
@@ -199,9 +200,31 @@ static void ui_text_on_autosize(ui_widget_t *w, float *width, float *height)
         pd_text_set_max_size(txt->layer, ui_compute(max_width),
                              ui_compute(max_height));
         pd_text_update(txt->layer, &rects);
-        *width = pd_text_get_width(txt->layer) / ui_get_actual_scale();
-        *height = pd_text_get_height(txt->layer) / ui_get_actual_scale();
+        hint->max_width = pd_text_get_width(txt->layer) / ui_get_actual_scale();
+        hint->max_height =
+            pd_text_get_height(txt->layer) / ui_get_actual_scale();
         pd_rects_clear(&rects);
+        if (txt->layer->lines_length > 0) {
+                line = txt->layer->lines[0];
+                // 这里用了简单的做法，取前四个字的宽度作为最小宽度
+                // 严谨点的做法是根据 word-break
+                // 属性值来决定取单词或一个字的宽度
+                if (line->length > 4) {
+                        hint->min_width = 4.f * line->string[0]->bitmap->width;
+                } else {
+                        hint->min_width = 1.f * line->width;
+                }
+                hint->min_height = 1.f * line->height;
+        } else {
+                hint->min_width = 0;
+                hint->min_height = 0;
+        }
+        hint->min_width /= ui_get_actual_scale();
+        hint->min_height /= ui_get_actual_scale();
+        // logger_debug("[ui-text] sizehint, min_size=(%g, %g), max_size=(%g, "
+        //              "%g), lines=%d\n",
+        //              hint->min_width, hint->min_height, hint->max_width,
+        //              hint->max_height, txt->layer->lines_length);
 }
 
 static void ui_text_on_resize(ui_widget_t *w, float width, float height)
@@ -226,6 +249,7 @@ static void ui_text_on_resize(ui_widget_t *w, float width, float height)
                 ui_widget_mark_dirty_rect(w, &rect, UI_BOX_TYPE_CONTENT_BOX);
         }
         pd_rects_clear(&rects);
+        // logger_debug("[ui-text] resize: %g, %g\n", width, height);
 }
 
 static void ui_text_on_paint(ui_widget_t *w, pd_context_t *paint,
@@ -343,7 +367,7 @@ void ui_register_text(void)
         ui_text.prototype->init = ui_text_on_init;
         ui_text.prototype->paint = ui_text_on_paint;
         ui_text.prototype->destroy = ui_text_on_destroy;
-        ui_text.prototype->autosize = ui_text_on_autosize;
+        ui_text.prototype->sizehint = ui_text_on_sizehint;
         ui_text.prototype->resize = ui_text_on_resize;
         ui_text.prototype->update = ui_text_on_update;
         ui_text.prototype->settext = ui_text_on_parse_text;
