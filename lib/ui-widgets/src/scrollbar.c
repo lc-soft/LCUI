@@ -322,11 +322,6 @@ static void ui_scrollbar_on_init(ui_widget_t *w)
         ui_scrollbar_set_orientation(w, UI_SCROLLBAR_VERTICAL);
 }
 
-static void ui_scrollbar_on_destroy(ui_widget_t *w)
-{
-        ui_scrollbar_t *scrollbar = ui_widget_get_data(w, ui_scrollbar_proto);
-}
-
 ui_widget_t *ui_create_scrollbar(void)
 {
         return ui_create_widget_with_prototype(ui_scrollbar_proto);
@@ -340,6 +335,5 @@ void ui_register_scrollbar(void)
         ui_scrollbar_proto = ui_create_widget_prototype("scrollbar", NULL);
         ui_scrollbar_proto->init = ui_scrollbar_on_init;
         ui_scrollbar_proto->setattr = ui_scrollbar_on_set_attr;
-        ui_scrollbar_proto->destroy = ui_scrollbar_on_destroy;
         ui_load_css_string(ui_scrollbar_css, __FILE__);
 }
