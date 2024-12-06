@@ -47,12 +47,12 @@ void test_canvas_mix(void)
 	pd_canvas_create(&blue_layer, 60, 60);
 	pd_canvas_fill(&blue_layer, blue);
 
-	pd_canvas_mix(&red_layer, &blue_layer, 10, 10, PD_TRUE);
+	pd_canvas_mix(&red_layer, &blue_layer, 10, 10, true);
 	pixel = pd_canvas_pixel_at(&red_layer, 15, 15);
 	color2str(rgba_str, pixel);
 	ctest_equal_str("red_layer(15, 15)", rgba_str, "rgba(50, 0, 204, 1)");
 
-	pd_canvas_mix(&white_layer, &red_layer, 10, 10, PD_TRUE);
+	pd_canvas_mix(&white_layer, &red_layer, 10, 10, true);
 	pixel = pd_canvas_pixel_at(&white_layer, 0, 0);
 	color2str(rgba_str, pixel);
 	ctest_equal_str("white_layer(0, 0)", rgba_str, "rgba(255, 255, 255, 1)");

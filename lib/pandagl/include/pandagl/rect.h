@@ -40,7 +40,7 @@ PD_PUBLIC bool pd_rect_is_cover(const pd_rect_t *a, const pd_rect_t *b);
  * @param[in] a		矩形A
  * @param[in] b		矩形B
  * @param[out] out	矩形A和B重叠处的矩形
- * @returns 如果两个矩形重叠，则返回PD_TRUE，否则返回PD_FALSE
+ * @returns 如果两个矩形重叠，则返回true，否则返回false
  */
 PD_PUBLIC bool pd_rect_overlap(const pd_rect_t *a, const pd_rect_t *b,
 				 pd_rect_t *overlapping_rect);
