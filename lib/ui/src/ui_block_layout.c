@@ -447,8 +447,6 @@ static void ui_block_layout_update(ui_block_layout_context_t *ctx)
 void ui_block_layout_reflow(ui_widget_t *w)
 {
         ui_block_layout_context_t ctx = { 0 };
-        css_computed_style_t *s = &w->computed_style;
-        css_computed_style_t *ps = &w->parent->computed_style;
 
         ctx.widget = w;
         ui_widget_get_sizehint(w, &ctx.sizehint);

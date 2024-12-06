@@ -963,7 +963,6 @@ static void ui_flexbox_column_layout_reflow(ui_flexbox_layout_context_t *ctx)
 void ui_flexbox_layout_reflow(ui_widget_t *w)
 {
         ui_flexbox_layout_context_t ctx = { 0 };
-        css_computed_style_t *s = &w->computed_style;
 
         ctx.widget = w;
         ctx.column_direction = ui_widget_has_flex_column_direction(w);
