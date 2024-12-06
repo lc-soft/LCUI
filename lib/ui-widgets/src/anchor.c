@@ -19,27 +19,27 @@
 
 typedef struct xml_loader_t {
         /** 键，作为在视图加载完后传给事件处理器的额外参数 */
-        char* key;
-        char* filepath;      /**< 视图文件路径 */
-        char* target_id;     /**< 目标容器部件的标识 */
-        ui_widget_t* pack;   /**< 已经加载的视图内容包 */
-        ui_widget_t* widget; /**< 触发视图加载器的部件 */
+        char *key;
+        char *filepath;      /**< 视图文件路径 */
+        char *target_id;     /**< 目标容器部件的标识 */
+        ui_widget_t *pack;   /**< 已经加载的视图内容包 */
+        ui_widget_t *widget; /**< 触发视图加载器的部件 */
 } xml_loader_t;
 
 static struct ui_anchor_module_t {
-        ui_widget_prototype_t* proto;
-        worker_t * worker;
+        ui_widget_prototype_t *proto;
+        worker_t *worker;
 } ui_anchor;
 
-static void xml_loader_on_widget_destroy(ui_widget_t* w, ui_event_t* e,
-                                         void* arg)
+static void xml_loader_on_widget_destroy(ui_widget_t *w, ui_event_t *e,
+                                         void *arg)
 {
-        xml_loader_t* loader = e->data;
+        xml_loader_t *loader = e->data;
 
         loader->widget = NULL;
 }
 
-static void xml_loader_destroy(xml_loader_t* loader)
+static void xml_loader_destroy(xml_loader_t *loader)
 {
         if (loader->widget) {
                 ui_widget_off(loader->widget, "destroy",
@@ -56,10 +56,10 @@ static void xml_loader_destroy(xml_loader_t* loader)
         free(loader);
 }
 
-static xml_loader_t* xml_loader_create(ui_widget_t* w)
+static xml_loader_t *xml_loader_create(ui_widget_t *w)
 {
-        xml_loader_t* loader;
-        const char* key = ui_widget_get_attr(w, "key");
+        xml_loader_t *loader;
+        const char *key = ui_widget_get_attr(w, "key");
 
         loader = malloc(sizeof(xml_loader_t));
         if (!loader) {
@@ -77,9 +77,9 @@ static xml_loader_t* xml_loader_create(ui_widget_t* w)
         return loader;
 }
 
-static void ui_anchor_on_load(ui_widget_t* w, ui_event_t* e, void* arg)
+static void ui_anchor_on_load(ui_widget_t *w, ui_event_t *e, void *arg)
 {
-        xml_loader_t* loader = arg;
+        xml_loader_t *loader = arg;
         ui_widget_t *target, *root;
         ui_event_t ev = { 0 };
 
@@ -96,9 +96,9 @@ static void ui_anchor_on_load(ui_widget_t* w, ui_event_t* e, void* arg)
         ui_widget_emit_event(root, ev, loader->key);
 }
 
-static void xml_loader_load(xml_loader_t* loader)
+static void xml_loader_load(xml_loader_t *loader)
 {
-        ui_widget_t* pack;
+        ui_widget_t *pack;
         ui_event_t e;
         char *path, dirname[] = "assets/views/";
 
@@ -131,10 +131,10 @@ static void xml_loader_load(xml_loader_t* loader)
                       (ui_event_arg_destructor_t)xml_loader_destroy);
 }
 
-static void ui_anchor_on_startload(ui_widget_t* w, ui_event_t* e, void* arg)
+static void ui_anchor_on_startload(ui_widget_t *w, ui_event_t *e, void *arg)
 {
-        ui_widget_t* target;
-        xml_loader_t* loader = arg;
+        ui_widget_t *target;
+        xml_loader_t *loader = arg;
 
         target = ui_get_widget(loader->target_id);
         if (!target) {
@@ -144,14 +144,15 @@ static void ui_anchor_on_startload(ui_widget_t* w, ui_event_t* e, void* arg)
                 return;
         }
         ui_widget_empty(target);
-        worker_post_task(ui_anchor.worker, loader, xml_loader_load, NULL);
+        worker_post_task(ui_anchor.worker, loader,
+                         (worker_task_cb)xml_loader_load, NULL);
 }
 
-void ui_anchor_open(ui_widget_t* w)
+void ui_anchor_open(ui_widget_t *w)
 {
         ui_event_t e;
-        xml_loader_t* loader;
-        const char* attr_href = ui_widget_get_attr(w, "href");
+        xml_loader_t *loader;
+        const char *attr_href = ui_widget_get_attr(w, "href");
 
         if (!attr_href) {
                 logger_error("[anchor] href are required\n");
@@ -176,12 +177,13 @@ void ui_anchor_open(ui_widget_t* w)
         ui_post_event(&e, loader, NULL);
 }
 
-static void ui_anchor_on_click(ui_widget_t* w, ui_event_t* e, void* arg)
+static void ui_anchor_on_click(ui_widget_t *w, ui_event_t *e, void *arg)
 {
-        worker_post_task(ui_anchor.worker, w, ui_anchor_open, NULL);
+        worker_post_task(ui_anchor.worker, w, (worker_task_cb)ui_anchor_open,
+                         NULL);
 }
 
-static void ui_anchor_on_init(ui_widget_t* w)
+static void ui_anchor_on_init(ui_widget_t *w)
 {
         ui_widget_on(w, "click", ui_anchor_on_click, NULL);
         ui_widget_on(w, "startload.anchor", ui_anchor_on_startload, NULL);
