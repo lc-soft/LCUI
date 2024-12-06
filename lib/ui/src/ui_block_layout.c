@@ -27,7 +27,7 @@ typedef struct ui_block_row {
         list_t items;
 } ui_block_row_t;
 
-typedef struct ui_block_layout_context_t {
+typedef struct ui_block_layout_context {
         ui_widget_t *widget;
         ui_sizehint_t sizehint;
 
@@ -64,35 +64,6 @@ static ui_block_row_t *ui_block_layout_next_row(ui_block_layout_context_t *ctx,
         row->index = ctx->rows.length;
         list_append(&ctx->rows, row);
         return row;
-}
-
-static void ui_compute_item_size(ui_widget_t *item, float *width, float *height)
-{
-        css_computed_style_t *s = &item->computed_style;
-        float inner_width = css_padding_x(s) + css_border_x(s);
-        float inner_height = css_padding_y(s) + css_border_y(s);
-        bool is_border_box = is_css_border_box_sizing(s);
-
-        *width = item->max_content_width + (is_border_box ? inner_width : 0);
-        *height = item->max_content_height + (is_border_box ? inner_height : 0);
-        if (IS_CSS_FIXED_LENGTH(s, width)) {
-                *width = s->width;
-                if (IS_CSS_FIXED_LENGTH(s, height)) {
-                        *height = s->height;
-                } else {
-                        *height = 0;
-                }
-        }
-        if (is_border_box) {
-                if (*width < inner_width) {
-                        *width = inner_width;
-                }
-                if (*height < inner_height) {
-                        *height = inner_height;
-                }
-        }
-        *width += css_margin_x(s);
-        *height += css_margin_y(s);
 }
 
 static void ui_block_layout_load_width(ui_block_layout_context_t *ctx)
@@ -466,6 +437,7 @@ void ui_block_layout_reflow(ui_widget_t *w)
         ui_block_layout_load_width(&ctx);
         ui_block_layout_apply_width(&ctx);
         ui_block_layout_update(&ctx);
+        list_destroy(&ctx.rows, ui_block_row_destroy);
         w->proto->resize(w, w->content_box.width, w->content_box.height);
 
 #ifdef UI_DEBUG_ENABLED
