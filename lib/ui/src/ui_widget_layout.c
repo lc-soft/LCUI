@@ -159,7 +159,6 @@ void ui_widget_reflow_if_height_changed(ui_widget_t *w)
 
 void ui_widget_reflow(ui_widget_t *w)
 {
-        css_computed_style_t *s = &w->computed_style;
         ui_event_t ev = { .type = UI_EVENT_AFTERLAYOUT, .cancel_bubble = true };
 
         switch (w->computed_style.type_bits.display) {
