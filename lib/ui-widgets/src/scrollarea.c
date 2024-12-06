@@ -36,8 +36,7 @@ static ui_widget_prototype_t *ui_scrollarea_content_proto;
 
 static void ui_scrollarea_emit_scroll(ui_widget_t *w)
 {
-        ui_event_t e;
-        ui_scrollarea_t *that = ui_widget_get_data(w, ui_scrollarea_proto);
+        ui_event_t e = { 0 };
 
         ui_event_init(&e, "scroll");
         e.cancel_bubble = true;

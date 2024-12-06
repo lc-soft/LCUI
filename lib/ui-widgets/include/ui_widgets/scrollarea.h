@@ -23,8 +23,6 @@ typedef enum {
 
 LIBUI_WIDGETS_BEGIN_DECLS
 
-LIBUI_WIDGETS_PUBLIC void ui_scrollarea_content_update(ui_widget_t *w);
-
 LIBUI_WIDGETS_PUBLIC void ui_scrollarea_set_wheel_scroll_direction(
     ui_widget_t *w, ui_scrollarea_direction_t direction);
 
