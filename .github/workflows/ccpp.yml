@@ -15,6 +15,7 @@ jobs:
     name: "Builds binaries on ${{ matrix.os }}"
     steps:
       - uses: actions/checkout@v1
+    
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
           xmake-version: branch@dev
@@ -26,7 +27,7 @@ jobs:
       - name: Restore xmake packages
         uses: actions/cache@v4
         with:
-          path: ~/.xmake/.cache/packages
+          path: ${{ github.workspace }}/xmake-global/.xmake/packages
           key: ${{ runner.os }}-xmake-packages
 
       - name: Install tools
@@ -42,6 +43,12 @@ jobs:
       - name: Configure for coverage mode
         if: runner.os == 'Linux'
         run: xmake config -y -k ${{ env.TARGET_KIND }} -m coverage --ci-env=y
+
+      - name: Cache xmake packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/xmake-global/.xmake/packages
+          key: ${{ runner.os }}-xmake-packages
 
       - name: Build
         run: |
@@ -111,12 +118,6 @@ jobs:
           name: lcui${{ env.TARGET_MAJOR }}-examples (${{ runner.os }})
           path: |
             dist/lcui-examples
-
-      - name: Cache xmake packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.xmake/.cache/packages
-          key: ${{ runner.os }}-xmake-packages
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
