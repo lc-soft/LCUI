@@ -106,7 +106,7 @@ void ui_scrollarea_set_wheel_scroll_direction(
 void ui_scrollarea_update(ui_widget_t *w)
 {
         list_node_t *node;
-        ui_widget_t *content;
+        ui_widget_t *content = NULL;
         ui_scrollarea_t *that = ui_widget_get_data(w, ui_scrollarea_proto);
 
         for (list_each(node, &w->children)) {
