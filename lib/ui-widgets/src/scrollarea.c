@@ -282,6 +282,13 @@ static void ui_scrollarea_init(ui_widget_t *w)
         ui_widget_on(w, "touchup", ui_scrollarea_on_touch, NULL);
 }
 
+static void ui_scrollarea_destroy(ui_widget_t *w)
+{
+        ui_scrollarea_t *that = ui_widget_get_data(w, ui_scrollarea_proto);
+
+        ui_mutation_observer_destroy(that->observer);
+}
+
 void ui_scrollarea_set_scroll_top(ui_widget_t *w, float value)
 {
         ui_scrollarea_t *that = ui_widget_get_data(w, ui_scrollarea_proto);
@@ -342,6 +349,7 @@ void ui_register_scrollarea(void)
 {
         ui_scrollarea_proto = ui_create_widget_prototype("scrollarea", NULL);
         ui_scrollarea_proto->init = ui_scrollarea_init;
+        ui_scrollarea_proto->destroy = ui_scrollarea_destroy;
 
         ui_scrollarea_content_proto =
             ui_create_widget_prototype("scrollarea-content", NULL);
