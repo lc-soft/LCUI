@@ -22,9 +22,9 @@ LIBUI_WIDGETS_BEGIN_DECLS
 #define UI_CANVAS_DEFAULT_WIDTH 300
 #define UI_CANVAS_DEFAULT_HEIGHT 150
 
-typedef struct ui_canvas_rendering_context_t ui_canvas_context_t;
+typedef struct ui_canvas_rendering_context ui_canvas_context_t;
 
-typedef struct ui_canvas_rendering_context_t {
+typedef struct ui_canvas_rendering_context {
 	bool available;
 	pd_color_t fill_color;
 	pd_canvas_t buffer;

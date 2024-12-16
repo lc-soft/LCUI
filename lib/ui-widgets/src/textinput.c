@@ -64,7 +64,7 @@ typedef enum {
 } textblock_owner_t;
 
 /** 文本块数据结构 */
-typedef struct textblock_t {
+typedef struct textblock {
         textblock_type_t type;     /**< 文本块类型 */
         textblock_owner_t owner;   /**< 所属的文本层 */
         textblock_action_t action; /**< 指定该文本块的添加方式 */

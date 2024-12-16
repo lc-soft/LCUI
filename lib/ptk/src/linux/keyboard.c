@@ -21,7 +21,7 @@
 #include <termios.h>
 #include <thread.h>
 
-static struct linux_keyboard_t {
+static struct linux_keyboard {
 	int fd;
 	struct termios tm;
 	thread_t tid;

@@ -34,7 +34,7 @@ enum css_selector_name_finder_level {
 };
 
 /* 样式表查找器的上下文数据结构 */
-typedef struct css_selector_name_collector_t {
+typedef struct css_selector_name_collector {
         int level;    /**< 当前选择器层级 */
         int class_i;  /**< 当前处理到第几个类名 */
         int status_i; /**< 当前处理到第几个状态名（伪类名） */

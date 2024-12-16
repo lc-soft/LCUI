@@ -35,7 +35,7 @@ typedef enum pd_font_weight_t {
 	PD_FONT_WEIGHT_TOTAL_NUM
 } pd_font_weight_t;
 
-typedef struct pd_font_bitmap_t {
+typedef struct pd_font_bitmap {
 	int top;   /**< 与顶边框的距离 */
 	int left;  /**< 与左边框的距离 */
 	int width; /**< 位图宽度 */
@@ -49,9 +49,9 @@ typedef struct pd_font_bitmap_t {
 	} metrics;
 } pd_font_bitmap_t;
 
-typedef struct font_engine_t font_engine_t;
+typedef struct font_engine font_engine_t;
 
-typedef struct pd_font_t {
+typedef struct pd_font {
 	int id;                  /**< 字体信息ID */
 	char *style_name;        /**< 样式名称 */
 	char *family_name;       /**< 字族名称 */
@@ -61,7 +61,7 @@ typedef struct pd_font_t {
 	font_engine_t *engine;   /**< 所属的字体引擎 */
 } pd_font_t;
 
-struct font_engine_t {
+struct font_engine {
 	char name[64];
 	int (*open)(const char *, pd_font_t ***);
 	int (*render)(pd_font_bitmap_t *, unsigned, int, pd_font_t *);

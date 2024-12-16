@@ -27,14 +27,14 @@
 typedef dict_t css_style_group_t;
 
 /** 样式链接记录组 */
-typedef struct css_style_link_group_t {
+typedef struct css_style_link_group {
         dict_t *links;              /**< 样式链接表 */
         char *name;                 /**< 选择器名称 */
         css_selector_node_t *snode; /**< 选择器结点 */
 } css_style_link_group_t;
 
 /** 样式链接记录 */
-typedef struct css_style_link_t {
+typedef struct css_style_link {
         char *selector;                /**< 选择器 */
         css_style_link_group_t *group; /**< 所属组 */
 
@@ -51,7 +51,7 @@ typedef struct css_style_link_t {
         dict_t *parents;
 } css_style_link_t;
 
-static struct css_library_module_t {
+static struct css_library_module {
         /**
          * 样式组列表
          * list_t<css_style_group_t*>

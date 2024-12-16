@@ -20,7 +20,7 @@
 
 #ifdef PTK_LINUX
 
-static struct app_t {
+static struct app {
         bool active;
         ptk_window_driver_t window;
         ptk_app_driver_t app;

@@ -49,7 +49,7 @@ struct ptk_window {
         list_node_t node;
 };
 
-static struct app_t {
+static struct app {
         const wchar_t *class_name;
         HINSTANCE main_instance;
         HINSTANCE dll_instance;

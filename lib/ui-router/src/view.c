@@ -12,7 +12,7 @@
 #include "private.h"
 #include <ui_router.h>
 
-typedef struct ui_router_view_t {
+typedef struct ui_router_view {
         size_t index;
         router_t *router;
         router_watcher_t *watcher;

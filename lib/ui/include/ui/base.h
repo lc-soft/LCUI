@@ -89,7 +89,7 @@ LIBUI_PUBLIC ui_widget_t *ui_widget_prev(ui_widget_t *w);
 LIBUI_PUBLIC ui_widget_t *ui_widget_next(ui_widget_t *w);
 LIBUI_PUBLIC ui_widget_t *ui_widget_get_child(ui_widget_t *w, size_t index);
 LIBUI_PUBLIC size_t ui_widget_each(ui_widget_t *w,
-                                   ui_widget_callback_t callback, void *arg);
+                                   ui_widget_cb callback, void *arg);
 LIBUI_PUBLIC ui_widget_t *ui_widget_at(ui_widget_t *widget, int ix, int iy);
 LIBUI_PUBLIC void ui_print_tree(ui_widget_t *w);
 

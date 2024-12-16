@@ -17,7 +17,7 @@
 
 PTK_BEGIN_DECLS
 
-typedef struct ptk_steptimer_t {
+typedef struct ptk_steptimer {
         // Source timing data.
         uint64_t frequency;
         uint64_t last_time;

@@ -29,7 +29,7 @@
 #ifdef DEBUG_FRAME_RENDER
 #endif
 
-typedef struct ui_renderer_t {
+typedef struct ui_renderer {
         /* target widget position, it relative to root canvas */
         float x, y;
 

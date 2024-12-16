@@ -33,7 +33,7 @@ typedef struct ui_text {
         list_node_t node;
 } ui_text_t;
 
-static struct ui_text_module_t {
+static struct ui_text_module {
         list_t list;
         ui_widget_prototype_t *prototype;
 } ui_text;
@@ -204,6 +204,11 @@ static void ui_text_on_sizehint(ui_widget_t *w, ui_sizehint_t *hint)
         hint->max_height =
             pd_text_get_height(txt->layer) / ui_get_actual_scale();
         pd_rects_clear(&rects);
+        if (!txt->layer->autowrap_enabled) {
+                hint->min_width = hint->max_width;
+                hint->min_height = hint->max_height;
+                return;
+        }
         if (txt->layer->lines_length > 0) {
                 line = txt->layer->lines[0];
                 // 这里用了简单的做法，取前四个字的宽度作为最小宽度

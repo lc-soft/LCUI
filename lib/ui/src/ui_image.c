@@ -18,13 +18,13 @@
 
 #define UI_IMAGE_PROGRESS_EVENT_INTERVAL 100
 
-typedef struct ui_image_event_listener_t {
+typedef struct ui_image_event_listener {
         ui_image_event_type_t type;
         void *data;
         ui_image_event_handler_t handler;
 } ui_image_event_listener_t;
 
-typedef struct ui_image_source_t {
+typedef struct ui_image_source {
         ui_image_t image;
         size_t refs_count;
         pd_image_reader_t *reader;
@@ -33,13 +33,13 @@ typedef struct ui_image_source_t {
         list_node_t node;
 } ui_image_source_t;
 
-typedef struct ui_image_mutation_t {
+typedef struct ui_image_mutation {
         ui_image_event_type_t type;
         ui_image_source_t *src;
         list_node_t node;
 } ui_image_mutation_t;
 
-typedef struct ui_image_loader_t {
+typedef struct ui_image_loader {
         int64_t progress_tick_time;
         void (*callback)(ui_image_t *);
 

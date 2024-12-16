@@ -1,4 +1,4 @@
-﻿/*
+/*
  * lib/css/include/css/types.h
  *
  * Copyright (c) 2023-2024, Liu Chao <i@lc-soft.io> All rights reserved.
@@ -516,12 +516,12 @@ typedef int32_t css_unit_ident_t;
 // TODO: 优化内存占用
 
 /** https://developer.mozilla.org/en-US/docs/Web/API/CSSUnitValue */
-typedef struct css_unit_value_t {
+typedef struct css_unit_value {
 	css_numeric_value_t value;
 	css_unit_t unit;
 } css_unit_value_t;
 
-typedef struct css_style_value_t css_style_value_t;
+typedef struct css_style_value css_style_value_t;
 typedef css_style_value_t *css_style_array_value_t;
 typedef enum css_keyword_value_t {
 	CSS_KEYWORD_INHERIT,
@@ -537,6 +537,7 @@ typedef enum css_keyword_value_t {
 	CSS_KEYWORD_BLOCK,
 	CSS_KEYWORD_INLINE_BLOCK,
 	CSS_KEYWORD_FLEX,
+	CSS_KEYWORD_INLINE_FLEX,
 
 	CSS_KEYWORD_LEFT,
 	CSS_KEYWORD_CENTER,
@@ -594,7 +595,7 @@ typedef enum css_keyword_value_t {
 } css_keyword_value_t;
 
 /** https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleValue */
-struct css_style_value_t {
+struct css_style_value {
 	css_style_value_type_t type;
 	union {
 		css_private_value_t value;
@@ -611,14 +612,14 @@ struct css_style_value_t {
 	};
 };
 
-typedef struct css_valdef_t css_valdef_t;
+typedef struct css_valdef css_valdef_t;
 typedef list_t css_style_decl_t;
 
 typedef css_style_decl_t css_style_decl_t;
 typedef unsigned css_selector_hash_t;
 
 /** 样式规则记录 */
-typedef struct css_style_rule_t {
+typedef struct css_style_rule {
 	int rank;               /**< 权值，决定优先级 */
 	int batch_num;          /**< 批次号 */
 	char *space;            /**< 所属的空间 */
@@ -627,13 +628,13 @@ typedef struct css_style_rule_t {
 	list_node_t node;       /**< 在链表中的结点 */
 } css_style_rule_t;
 
-typedef struct css_prop_t {
+typedef struct css_prop {
 	css_prop_key_t key;
 	css_style_value_t value;
 	list_node_t node;
 } css_prop_t;
 
-typedef struct css_selector_node_t {
+typedef struct css_selector_node {
 	char *id;
 	char *type;
 	char **classes;
@@ -642,7 +643,7 @@ typedef struct css_selector_node_t {
 	int rank;
 } css_selector_node_t;
 
-typedef struct css_selector_t {
+typedef struct css_selector {
 	int rank;                    /**< 权值，决定优先级 */
 	int batch_num;               /**< 批次号 */
 	int length;                  /**< 选择器结点长度 */
@@ -650,26 +651,26 @@ typedef struct css_selector_t {
 	css_selector_node_t **nodes; /**< 选择器结点列表 */
 } css_selector_t;
 
-typedef struct css_font_face_t {
+typedef struct css_font_face {
 	char *font_family;
 	css_font_style_t font_style;
 	css_font_weight_t font_weight;
 	char *src;
 } css_font_face_t;
 
-typedef struct css_metrics_t {
+typedef struct css_metrics {
 	float dpi;
 	float density;
 	float scaled_density;
 	float scale;
 } css_metrics_t;
 
-typedef struct css_computed_style_t {
+typedef struct css_computed_style {
 	/**
 	 * 属性值类型的比特数据
 	 * 以比特位为单位分配的存储空间，用于节省属性值的内存占用
 	 */
-	struct css_type_bits_t {
+	struct css_type_bits {
 		uint8_t display : 5;
 		uint8_t box_sizing : 2;
 		uint8_t visibility : 4;
@@ -738,7 +739,7 @@ typedef struct css_computed_style_t {
 	/**
 	 * 属性值单位的比特数据
 	 */
-	struct css_unit_bits_t {
+	struct css_unit_bits {
 		css_unit_t left : 4;
 		css_unit_t right : 4;
 		css_unit_t top : 4;
@@ -844,9 +845,9 @@ typedef struct css_computed_style_t {
 	size_t custom_props_count;
 } css_computed_style_t;
 
-typedef struct css_propdef_t css_propdef_t;
+typedef struct css_propdef css_propdef_t;
 
-struct css_propdef_t {
+struct css_propdef {
 	/**
 	 * 属性标识号
 	 * 值为 -1 时，则表明它是简写属性
@@ -859,8 +860,8 @@ struct css_propdef_t {
 	int (*cascade)(const css_style_array_value_t, css_computed_style_t *);
 };
 
-typedef bool (*css_value_parse_func_t)(css_style_value_t *, const char *);
+typedef bool (*css_value_parse_cb)(css_style_value_t *, const char *);
 
-typedef struct css_value_type_record_t css_value_type_record_t;
+typedef struct css_value_type_record css_value_type_record_t;
 
 #endif

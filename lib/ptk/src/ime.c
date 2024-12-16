@@ -25,7 +25,7 @@ typedef struct {
         list_node_t node;
 } ptk_ime_t;
 
-static struct ptk_ime_t {
+static struct ptk_ime {
         int id_count;
         list_t list;
 

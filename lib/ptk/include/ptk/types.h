@@ -72,7 +72,7 @@ typedef struct ptk_window ptk_window_t;
 typedef void (*ptk_event_handler_t)(ptk_event_t *, void *);
 typedef int (*ptk_event_dispatcher_t)(ptk_event_t *);
 
-typedef struct ptk_event_listener_t {
+typedef struct ptk_event_listener {
 	ptk_event_type_t type;
 	ptk_event_handler_t handler;
 	void *data;
@@ -170,7 +170,7 @@ typedef enum mouse_button_code_t {
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent
  */
-typedef struct app_keyboard_event_t {
+typedef struct app_keyboard_event {
 	int code;
 	bool alt_key;
 	bool ctrl_key;
@@ -179,7 +179,7 @@ typedef struct app_keyboard_event_t {
 	bool is_composing;
 } app_keyboard_event_t;
 
-typedef struct touch_point_t {
+typedef struct touch_point {
 	int x;
 	int y;
 	int id;
@@ -187,16 +187,16 @@ typedef struct touch_point_t {
 	bool is_primary;
 } touch_point_t;
 
-typedef struct app_touch_event_t {
+typedef struct app_touch_event {
 	unsigned n_points;
 	touch_point_t *points;
 } app_touch_event_t;
 
-typedef struct app_paint_event_t {
+typedef struct app_paint_event {
 	pd_rect_t rect;
 } app_paint_event_t;
 
-typedef struct app_textinput_event_t {
+typedef struct app_textinput_event {
 	wchar_t *text;
 	size_t length;
 } app_textinput_event_t;
@@ -204,7 +204,7 @@ typedef struct app_textinput_event_t {
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent
  */
-typedef struct app_mouse_event_t {
+typedef struct app_mouse_event {
 	int x;
 	int y;
 	int button;
@@ -219,30 +219,30 @@ typedef enum app_wheel_delta_mode_t {
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/API/WheelEvent
  */
-typedef struct app_wheel_event_t {
+typedef struct app_wheel_event {
 	int delta_x;
 	int delta_y;
 	int delta_z;
 	int delta_mode;
 } app_wheel_event_t;
 
-typedef struct app_size_event_t {
+typedef struct app_size_event {
 	int width;
 	int height;
 } app_size_event_t;
 
-typedef struct app_minmaxinfo_event_t {
+typedef struct app_minmaxinfo_event {
 	int min_width;
 	int min_height;
 	int max_width;
 	int max_height;
 } app_minmaxinfo_event_t;
 
-typedef struct app_visibility_change_event_t {
+typedef struct app_visibility_change_event {
 	bool visible;
 } app_visibility_change_event_t;
 
-typedef struct app_dpi_change_event_t {
+typedef struct app_dpi_change_event {
 	int dpi;
 } app_dpi_change_event_t;
 

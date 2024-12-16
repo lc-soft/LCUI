@@ -48,24 +48,24 @@ typedef union pd_color_t {
 } pd_color_t;
 
 /** Position in plane coordinate system */
-typedef struct pd_pos_t {
+typedef struct pd_pos {
 	int x, y;
 } pd_pos_t;
 
-typedef struct pd_rect_t {
+typedef struct pd_rect {
 	int x, y, width, height;
 } pd_rect_t;
 
-typedef struct pd_canvas_t pd_canvas_t;
+typedef struct pd_canvas pd_canvas_t;
 
-typedef struct pd_canvas_quote_t {
+typedef struct pd_canvas_quote {
 	int top;
 	int left;
 	bool is_valid;
 	pd_canvas_t *source;
 } pd_canvas_quote_t;
 
-struct pd_canvas_t {
+struct pd_canvas {
 	unsigned width;
 	unsigned height;
 	float opacity;
@@ -81,13 +81,13 @@ struct pd_canvas_t {
 };
 
 /** 进行绘制时所需的上下文 */
-typedef struct pd_context_t {
+typedef struct pd_context {
 	pd_rect_t rect;    /**< 需要绘制的区域 */
 	pd_canvas_t canvas; /**< 绘制后的位图缓存（可称为：画布） */
 	bool with_alpha; /**< 绘制时是否需要处理 alpha 通道 */
 } pd_context_t;
 
-typedef struct pd_background_t {
+typedef struct pd_background {
 	pd_canvas_t *image;
 	pd_color_t color;
 	bool repeat_x;
@@ -98,7 +98,7 @@ typedef struct pd_background_t {
 	int height;
 } pd_background_t;
 
-typedef struct pd_boxshadow_t {
+typedef struct pd_boxshadow {
 	int x, y;
 	int blur;
 	int spread;
@@ -109,13 +109,13 @@ typedef struct pd_boxshadow_t {
 	int bottom_right_radius;
 } pd_boxshadow_t;
 
-typedef struct pd_border_line_t {
+typedef struct pd_border_line {
 	int style;
 	unsigned int width;
 	pd_color_t color;
 } pd_border_line_t;
 
-typedef struct pd_border_t {
+typedef struct pd_border {
 	pd_border_line_t top, right, bottom, left;
 	unsigned int top_left_radius;
 	unsigned int top_right_radius;

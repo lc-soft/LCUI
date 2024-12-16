@@ -17,13 +17,13 @@
 #include <ui_widgets/textinput.h>
 #include <ptk.h>
 
-typedef struct ui_textcaret_task_t {
+typedef struct ui_textcaret_task {
         bool active;
         ui_widget_t *widget;
 } ui_textcaret_task_t;
 
 /** 文本插入符相关数据 */
-typedef struct ui_textcaret_t {
+typedef struct ui_textcaret {
         int timer_id;
         int blink_interval;
         bool visible;

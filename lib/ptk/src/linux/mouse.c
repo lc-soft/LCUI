@@ -24,7 +24,7 @@
 #include <sys/stat.h>
 #include <thread.h>
 
-static struct linux_mouse_t {
+static struct linux_mouse {
         int x;
         int y;
         int button_state[2];

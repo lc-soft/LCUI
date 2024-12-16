@@ -41,7 +41,7 @@ struct ptk_window {
         list_t rects;
 };
 
-typedef struct linux_fb_t {
+typedef struct linux_fb {
         int dev_fd;
         const char *dev_path;
 
@@ -53,7 +53,7 @@ typedef struct linux_fb_t {
         struct fb_cmap cmap;
 } linux_frame_buffer_t;
 
-static struct ptk_fbapp_t {
+static struct ptk_fbapp {
         linux_frame_buffer_t fb;
 
         unsigned screen_width;

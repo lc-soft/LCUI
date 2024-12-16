@@ -30,7 +30,7 @@ typedef enum ui_image_event_type_t {
         UI_IMAGE_EVENT_ERROR,
 } ui_image_event_type_t;
 
-typedef struct ui_image_t {
+typedef struct ui_image {
         pd_canvas_t data;
         pd_error_t error;
         ui_image_state_t state;
@@ -38,7 +38,7 @@ typedef struct ui_image_t {
         float progress;
 } ui_image_t;
 
-typedef struct ui_image_event_t {
+typedef struct ui_image_event {
         ui_image_event_type_t type;
         ui_image_t *image;
         void *data;

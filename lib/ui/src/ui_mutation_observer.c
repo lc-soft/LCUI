@@ -17,7 +17,7 @@
 
 static list_t ui_observers = { 0 };
 
-struct ui_mutation_observer_t {
+struct ui_mutation_observer {
         list_node_t node;
 
         /** list_t<ui_mutation_connection_t> */
@@ -26,7 +26,7 @@ struct ui_mutation_observer_t {
         /** list_t<ui_mutation_record_t> */
         list_t records;
 
-        ui_mutation_observer_callback_t callback;
+        ui_mutation_observer_cb callback;
         void *data;
 };
 
@@ -89,7 +89,7 @@ void ui_mutation_record_destroy(ui_mutation_record_t *mutation)
  * @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
  */
 ui_mutation_observer_t *ui_mutation_observer_create(
-    ui_mutation_observer_callback_t callback, void *data)
+    ui_mutation_observer_cb callback, void *data)
 {
         ui_mutation_observer_t *observer;
 

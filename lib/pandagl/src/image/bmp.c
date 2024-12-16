@@ -38,7 +38,7 @@ typedef struct {
 	uint32_t importantcolours;		/**< Important colours */
 } pd_bmp_info_header_t;
 
-typedef struct pd_bmp_reader_t {
+typedef struct pd_bmp_reader {
 	pd_bmp_header_t header;
 	pd_bmp_info_header_t info;
         jmp_buf buf;

@@ -9,7 +9,7 @@
 #define FABRIC_WIDTH 800
 #define FABRIC_HEIGHT 600
 
-typedef struct ui_fabric_t {
+typedef struct ui_fabric {
         int timer;
 } ui_fabric_t;
 

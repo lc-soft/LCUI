@@ -15,7 +15,7 @@
 #include "ptk/app.h"
 #include "linux/x11clipboard.h"
 
-static struct ptk_clipboard_module_t {
+static struct ptk_clipboard_module {
 	char *text;
 	size_t text_len;
 } ptk_clipboard;

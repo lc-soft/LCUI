@@ -25,7 +25,7 @@ typedef union thread_cond_record_t {
 	HANDLE handle;
 } thread_cond_record_t;
 
-typedef struct thread_info_t {
+typedef struct thread_info {
 	HANDLE handle;
 	thread_t tid;
 	void (*func)(void *);
@@ -35,7 +35,7 @@ typedef struct thread_info_t {
 	list_node_t node;
 } thread_info_t;
 
-static struct thread_manager_module_t {
+static struct thread_manager_module {
 	int active;
 	thread_mutex_t mutex;
 	list_t threads;

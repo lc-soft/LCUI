@@ -22,7 +22,7 @@ typedef enum pd_text_style_type_t {
 	PD_TEXT_STYLE_TYPE_TOTAL_NUM
 } pd_text_style_type_t;
 
-typedef struct pd_style_tag_t {
+typedef struct pd_style_tag {
 	pd_text_style_type_t id;
 	union {
 		pd_color_t color;

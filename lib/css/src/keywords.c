@@ -1,4 +1,4 @@
-﻿/*
+/*
  * lib/css/src/keywords.c
  *
  * Copyright (c) 2023-2024, Liu Chao <i@lc-soft.io> All rights reserved.
@@ -12,12 +12,12 @@
 #include <errno.h>
 #include <css/keywords.h>
 
-typedef struct css_keyword_t {
+typedef struct css_keyword {
 	int key;
 	char *name;
 } css_keyword_t;
 
-static struct css_keywords_module_t {
+static struct css_keywords_module {
 	css_keyword_t **list;
 	unsigned used;
 	unsigned size;

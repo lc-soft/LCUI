@@ -30,7 +30,7 @@
 		ptr = NULL;        \
 	} while (0)
 
-struct router_location_t {
+struct router_location {
 	char *name;
 	char *path;
 	char *hash;
@@ -39,7 +39,7 @@ struct router_location_t {
 	bool normalized;
 };
 
-struct router_route_t {
+struct router_route {
 	char *name;
 	char *path;
 	char *full_path;
@@ -49,7 +49,7 @@ struct router_route_t {
 	router_linkedlist_t matched;
 };
 
-struct router_route_record_t {
+struct router_route_record {
 	char *name;
 	char *path;
 	const router_route_record_t *parent;
@@ -57,37 +57,37 @@ struct router_route_record_t {
 	router_linkedlist_node_t node;
 };
 
-struct router_history_t {
+struct router_history {
 	int index;
 	router_route_t *current;
 	router_linkedlist_t routes;
 	router_linkedlist_t watchers;
 };
 
-struct router_config_t {
+struct router_config {
 	char *name;
 	char *path;
 	strmap_t *components;
 };
 
-struct router_matcher_t {
+struct router_matcher {
 	dict_t *name_map;
 	dict_t *path_map;
 	router_linkedlist_t path_list;
 };
 
-struct router_watcher_t {
+struct router_watcher {
 	void *data;
 	router_callback_t callback;
 	router_linkedlist_node_t node;
 };
 
-struct router_resolved_t {
+struct router_resolved {
 	router_route_t *route;
 	router_location_t *location;
 };
 
-struct router_t {
+struct router {
 	char *name;
 	char *link_active_class;
 	char *link_exact_active_class;
