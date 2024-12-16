@@ -24,13 +24,13 @@
 
 #define DBLCLICK_INTERVAL 500
 
-typedef struct ui_touch_capturer_t {
+typedef struct ui_touch_capturer {
 	list_t points;
 	ui_widget_t *widget;
 	list_node_t node;
 } ui_touch_capturer_t;
 
-struct ui_event_listener_t {
+struct ui_event_listener {
 	list_node_t node;
 	size_t ref_count;
 	bool active;
@@ -40,7 +40,7 @@ struct ui_event_listener_t {
 	ui_event_arg_destructor_t destroy_data;
 };
 
-typedef struct ui_event_pack_t {
+typedef struct ui_event_pack {
 	list_node_t node;
 	void *data;
 	void(*destroy_data)(void *);
@@ -55,13 +55,13 @@ enum ui_widget_status_type_t {
 	UI_WIDGET_STATUS_TOTAL
 };
 
-typedef struct ui_event_mapping_t {
+typedef struct ui_event_mapping {
 	int id;
 	char *name;
 } ui_event_mapping_t;
 
 /** 鼠标点击记录 */
-typedef struct ui_widget_click_record_t {
+typedef struct ui_widget_click_record {
 	int64_t time;       /**< 时间 */
 	float x, y;         /**< 坐标 */
 	int interval;       /**< 与上次点击时的时间间隔 */
@@ -69,7 +69,7 @@ typedef struct ui_widget_click_record_t {
 } ui_widget_click_record_t;
 
 /** 当前功能模块的相关数据 */
-static struct ui_events_t {
+static struct ui_events {
 	ui_widget_t *mouse_capturer;
 	list_t touch_capturers;
 	ui_widget_t *targets[UI_WIDGET_STATUS_TOTAL];

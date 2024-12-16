@@ -26,14 +26,14 @@ typedef union thread_cond_record_t {
 	pthread_cond_t handle;
 } thread_cond_record_t;
 
-typedef struct thread_info_t {
+typedef struct thread_info {
 	void (*func)(void *);
 	void *arg;
 	thread_t tid;
 	list_node_t node;
 } thread_info_t;
 
-static struct thread_manager_module_t {
+static struct thread_manager_module {
 	bool active;
 	thread_mutex_t mutex;
 	list_t threads;

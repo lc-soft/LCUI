@@ -24,7 +24,7 @@ LIBUI_BEGIN_DECLS
 #define UI_MIN_FONT_SIZE 12
 #define UI_LINE_HEIGHT_SCALE 1.42857143
 
-typedef struct ui_text_style_t {
+typedef struct ui_text_style {
 	int font_size;
 	int line_height;
 	int *font_ids;

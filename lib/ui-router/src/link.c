@@ -14,7 +14,7 @@
 
 // Refer: https://router.vuejs.org/api/#router-link-props
 
-typedef struct ui_router_link_t {
+typedef struct ui_router_link {
         char *active_class;
         char *exact_active_class;
         bool exact;

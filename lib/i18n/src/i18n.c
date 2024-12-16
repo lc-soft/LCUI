@@ -11,7 +11,7 @@
 
 #include "i18n-private.h"
 
-static struct i18n_module_t {
+static struct i18n_module {
         size_t length;       /**< 语言列表的长度 */
         wchar_t **languages; /**< 语言列表 */
         wchar_t *language;   /**< 当前选中的语言 */

@@ -35,16 +35,16 @@ enum ParserBehavior {
         PB_ENTER    /**< 进入子元素列表 */
 };
 
-typedef struct xml_parser_t xml_parser_t;
-typedef int (*xml_parser_method_t)(xml_parser_t *, xmlNodePtr);
+typedef struct xml_parser xml_parser_t;
+typedef int (*xml_parser_cb)(xml_parser_t *, xmlNodePtr);
 
-typedef struct xml_node_parser_t {
+typedef struct xml_node_parser {
         int id;
         const char *name;
-        xml_parser_method_t parse;
+        xml_parser_cb parse;
 } xml_node_parser_t;
 
-struct xml_parser_t {
+struct xml_parser {
         int id;
         ui_widget_t *root;
         ui_widget_t *widget;

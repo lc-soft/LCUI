@@ -16,14 +16,14 @@
 
 typedef enum { NONE, STRING, DICT } dict_value_type_t;
 
-typedef struct dict_string_value_t {
+typedef struct dict_string_value {
         wchar_t *data;
         size_t length;
 } dict_string_value_t;
 
-typedef struct dict_value_t dict_value_t;
+typedef struct dict_value dict_value_t;
 
-struct dict_value_t {
+struct dict_value {
         dict_value_type_t type;
         union {
                 dict_string_value_t string;

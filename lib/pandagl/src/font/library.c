@@ -31,17 +31,17 @@
  * 位图。
  */
 
-typedef struct font_style_node_t {
+typedef struct font_style_node {
 	/* 字体列表，按粗细程度存放 */
 	pd_font_t *weights[PD_FONT_WEIGHT_TOTAL_NUM];
 } font_style_node_t;
 
-typedef struct font_cache_t {
+typedef struct font_cache {
 	pd_font_t *fonts[FONT_CACHE_SIZE];
 } font_cache_t;
 
 /** 字体字族索引结点 */
-typedef struct font_family_node_t {
+typedef struct font_family_node {
 	/** 字体的字族名称  */
 	char *family_name;
 
@@ -49,7 +49,7 @@ typedef struct font_family_node_t {
 	font_style_node_t styles[PD_FONT_STYLE_TOTAL_NUM];
 } font_family_node_t;
 
-static struct font_library_module_t {
+static struct font_library_module {
 	int count;			/**< 计数器，主要用于为字体信息生成标识号 */
 	int font_cache_num;		/**< 字体信息缓存区的数量 */
 	bool active;		/**< 标记，指示数据库是否初始化 */

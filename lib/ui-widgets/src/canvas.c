@@ -14,7 +14,7 @@
 #include <ui.h>
 #include <ui_widgets/canvas.h>
 
-typedef struct ui_canvas_t {
+typedef struct ui_canvas {
 	pd_canvas_t buffer;
 	list_t contexts;
 } ui_canvas_t;

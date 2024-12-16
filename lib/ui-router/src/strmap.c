@@ -11,7 +11,7 @@
 
 #include "private.h"
 
-struct strmap_t {
+struct strmap {
         /** dict_t<char*, strmap_item_t*> */
         dict_t *dict;
 

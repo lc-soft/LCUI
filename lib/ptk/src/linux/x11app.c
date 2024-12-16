@@ -40,7 +40,7 @@ struct ptk_window {
 	list_node_t node;
 };
 
-static struct ptk_x11app_t {
+static struct ptk_x11app {
 	int screen;
 	Display *display;
 	Window win_root;

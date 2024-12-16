@@ -11,7 +11,7 @@
 
 #include <ui_cursor.h>
 
-static struct ui_cursor_t {
+static struct ui_cursor {
 	int x, y;
 	bool visible;
 	pd_canvas_t image;

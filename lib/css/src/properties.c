@@ -1,4 +1,4 @@
-﻿/*
+/*
  * lib/css/src/properties.c
  *
  * Copyright (c) 2023-2024, Liu Chao <i@lc-soft.io> All rights reserved.
@@ -26,7 +26,7 @@
                                         css_style_decl_t *);           \
         css_register_shorthand_property(NAME, VALDEF, css_parse_##PROP_KEY)
 
-static struct css_properties_module_t {
+static struct css_properties_module {
         /**
          * 样式属性列表
          * css_propdef_t*[]

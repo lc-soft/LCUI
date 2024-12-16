@@ -26,7 +26,7 @@ enum FontFaceKey {
 	KEY_SRC
 };
 
-typedef struct css_font_face_parser_t {
+typedef struct css_font_face_parser {
 	int key;
 	int state;
 	css_font_face_t *face;

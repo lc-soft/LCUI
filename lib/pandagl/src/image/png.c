@@ -20,7 +20,7 @@
 
 #define PNG_BYTES_TO_CHECK 4
 
-typedef struct pd_png_reader_t {
+typedef struct pd_png_reader {
         pd_error_t error;
         pd_file_reader_t *file_reader;
         png_structp png_ptr;

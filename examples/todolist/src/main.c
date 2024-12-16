@@ -3,13 +3,13 @@
 #include <LCUI.h>
 #include <ptk/main.h>
 
-typedef struct task_t {
+typedef struct task {
         unsigned id;
         wchar_t *name;
         const char *status;
 } task_t;
 
-struct todolist_app_t {
+struct todolist_app {
         unsigned id;
         list_t tasks;
 } app = { 0 };

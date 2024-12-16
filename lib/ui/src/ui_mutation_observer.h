@@ -9,7 +9,7 @@
  * LICENSE.TXT file in the root directory of this source tree.
  */
 
-typedef struct ui_mutation_connection_t {
+typedef struct ui_mutation_connection {
 	ui_widget_t *widget;
 	ui_mutation_observer_t *observer;
 	ui_mutation_observer_init_t options;

@@ -24,12 +24,12 @@
 
 #define BUFFER_SIZE 4096
 
-typedef struct pd_jpeg_error_t {
+typedef struct pd_jpeg_error {
 	struct jpeg_error_mgr pub;
 	pd_image_reader_t *reader;
 } pd_jpeg_error_t;
 
-typedef struct pd_jpeg_reader_t {
+typedef struct pd_jpeg_reader {
 	struct jpeg_source_mgr src;
 	struct jpeg_decompress_struct cinfo;
 	jmp_buf env;

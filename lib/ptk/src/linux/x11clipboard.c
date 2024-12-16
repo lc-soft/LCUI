@@ -50,7 +50,7 @@ typedef struct ptk_clipboard_action {
 // @WhoAteDaCake
 // TODO: do we need a mutex here? As the action is unlikely to happen
 // often, safety seems to be a bigger priority than speed
-static struct ptk_x11clipboard_module_t {
+static struct ptk_x11clipboard_module {
         char *text;
         size_t text_len;
         ptk_clipboard_action_t *action;

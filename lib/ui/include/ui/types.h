@@ -1,4 +1,4 @@
-﻿/*
+/*
  * lib/ui/include/ui/types.h
  *
  * Copyright (c) 2023-2024, Liu Chao <i@lc-soft.io> All rights reserved.
@@ -17,11 +17,11 @@
 #include <css/types.h>
 #include <pandagl/types.h>
 
-typedef struct ui_rect_t {
+typedef struct ui_rect {
         float x, y, width, height;
 } ui_rect_t;
 
-typedef struct ui_area_t {
+typedef struct ui_area {
         float left, top, right, bottom;
 } ui_area_t;
 
@@ -96,25 +96,23 @@ typedef enum ui_task_type_t {
         UI_TASK_REFLOW,
 } ui_task_type_t;
 
-typedef struct ui_event_listener_t ui_event_listener_t;
-typedef struct ui_widget_t ui_widget_t;
+typedef struct ui_event_listener ui_event_listener_t;
+typedef struct ui_widget ui_widget_t;
 typedef list_t ui_widget_listeners_t;
 
-typedef void (*ui_widget_callback_t)(ui_widget_t *, void *);
-typedef void (*ui_widget_function_t)(ui_widget_t *);
+typedef void (*ui_widget_cb)(ui_widget_t *, void *);
+typedef void (*ui_widget_fn)(ui_widget_t *);
 
-typedef struct ui_widget_prototype_t ui_widget_prototype_t;
+typedef struct ui_widget_prototype ui_widget_prototype_t;
 
 typedef struct ui_sizehint {
         float max_width;
         float max_height;
         float min_width;
         float min_height;
-        float available_width;
-        float available_height;
 } ui_sizehint_t;
 
-typedef struct ui_widget_rules_t {
+typedef struct ui_widget_rules {
         /**
          * Suspend update if the current widget is not visible or is
          * completely covered by other widgets
@@ -151,7 +149,7 @@ typedef struct ui_widget_rules_t {
         void (*on_update_progress)(ui_widget_t *, size_t);
 } ui_widget_rules_t;
 
-typedef struct ui_widget_update_t {
+typedef struct ui_widget_update {
         bool should_update_self : 1;
         bool should_refresh_style : 1;
         bool should_update_style : 1;
@@ -161,13 +159,13 @@ typedef struct ui_widget_update_t {
         ui_rect_t canvas_box_backup;
 } ui_widget_update_t;
 
-typedef struct ui_widget_rendering_t {
+typedef struct ui_widget_rendering {
         ui_rect_t dirty_rect;
         ui_dirty_rect_type_t dirty_rect_type;
         bool has_child_dirty_rect;
 } ui_widget_rendering_t;
 
-typedef struct ui_profile_t {
+typedef struct ui_profile {
         long time;
         size_t update_count;
         size_t refresh_count;
@@ -177,10 +175,10 @@ typedef struct ui_profile_t {
         size_t destroy_time;
 } ui_profile_t;
 
-struct ui_widget_prototype_t {
+struct ui_widget_prototype {
         char *name;
-        ui_widget_function_t init;
-        ui_widget_function_t destroy;
+        ui_widget_fn init;
+        ui_widget_fn destroy;
         void (*update)(ui_widget_t *, ui_task_type_t);
         void (*setattr)(ui_widget_t *, const char *, const char *);
         void (*settext)(ui_widget_t *, const char *);
@@ -191,12 +189,12 @@ struct ui_widget_prototype_t {
         ui_widget_prototype_t *proto;
 };
 
-typedef struct ui_widget_data_entry_t {
+typedef struct ui_widget_data_entry {
         void *data;
         ui_widget_prototype_t *proto;
 } ui_widget_data_entry_t;
 
-typedef struct ui_widget_data_t {
+typedef struct ui_widget_data {
         unsigned length;
         ui_widget_data_entry_t *list;
 } ui_widget_data_t;
@@ -252,7 +250,7 @@ typedef enum ui_mouse_button_code_t {
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent
  */
-typedef struct ui_keyboard_event_t {
+typedef struct ui_keyboard_event {
         int code;
         bool alt_key;
         bool ctrl_key;
@@ -261,7 +259,7 @@ typedef struct ui_keyboard_event_t {
         bool is_composing;
 } ui_keyboard_event_t;
 
-typedef struct ui_touch_point_t {
+typedef struct ui_touch_point {
         float x;
         float y;
         int id;
@@ -269,16 +267,16 @@ typedef struct ui_touch_point_t {
         bool is_primary;
 } ui_touch_point_t;
 
-typedef struct ui_touch_event_t {
+typedef struct ui_touch_event {
         unsigned n_points;
         ui_touch_point_t *points;
 } ui_touch_event_t;
 
-typedef struct ui_paint_event_t {
+typedef struct ui_paint_event {
         pd_rect_t rect;
 } ui_paint_event_t;
 
-typedef struct ui_textinput_event_t {
+typedef struct ui_textinput_event {
         wchar_t *text;
         size_t length;
 } ui_textinput_event_t;
@@ -286,7 +284,7 @@ typedef struct ui_textinput_event_t {
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent
  */
-typedef struct ui_mouse_event_t {
+typedef struct ui_mouse_event {
         float x;
         float y;
         int button;
@@ -301,18 +299,18 @@ typedef enum ui_wheel_delta_mode_t {
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/API/WheelEvent
  */
-typedef struct ui_wheel_event_t {
+typedef struct ui_wheel_event {
         int delta_x;
         int delta_y;
         int delta_z;
         int delta_mode;
 } ui_wheel_event_t;
 
-typedef struct ui_event_t ui_event_t;
+typedef struct ui_event ui_event_t;
 typedef void (*ui_event_handler_t)(ui_widget_t *, ui_event_t *, void *);
 typedef void (*ui_event_arg_destructor_t)(void *);
 
-struct ui_event_t {
+struct ui_event {
         uint32_t type;       /**< 事件类型标识号 */
         void *data;          /**< 附加数据 */
         ui_widget_t *target; /**< 触发事件的部件 */
@@ -326,7 +324,7 @@ struct ui_event_t {
         };
 };
 
-typedef struct ui_widget_extra_data_t {
+typedef struct ui_widget_extra_data {
         ui_widget_listeners_t listeners;
         list_t observer_connections;
         ui_widget_rules_t rules;
@@ -334,7 +332,7 @@ typedef struct ui_widget_extra_data_t {
         size_t update_progress;
 } ui_widget_extra_data_t;
 
-struct ui_widget_t {
+struct ui_widget {
         unsigned hash;
         ui_widget_state_t state;
 

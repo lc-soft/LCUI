@@ -38,7 +38,7 @@
 #define smooth_left_pixel(PX, X) (uint8_t)((PX)->a * (1.0 - (X - 1.0 * (int)X)))
 #define smooth_right_pixel(PX, X) (uint8_t)((PX)->a * (X - 1.0 * (int)X))
 
-typedef struct pd_boxshadow_context_t {
+typedef struct pd_boxshadow_context {
 	int max_radius;
 	const pd_boxshadow_t *shadow;
 	const pd_rect_t *box;

@@ -17,7 +17,7 @@
 
 PTK_BEGIN_DECLS
 
-typedef struct ptk_ime_handler_t {
+typedef struct ptk_ime_handler {
 	bool (*prockey)(int, bool);
 	void (*totext)(int);
 	bool (*open)(void);

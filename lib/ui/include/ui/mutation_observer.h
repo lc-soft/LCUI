@@ -18,36 +18,35 @@
 LIBUI_BEGIN_DECLS
 
 typedef list_t ui_mutation_list_t;
-typedef struct ui_mutation_observer_t ui_mutation_observer_t;
+typedef struct ui_mutation_observer ui_mutation_observer_t;
 
-typedef enum ui_mutation_record_type_t {
-	UI_MUTATION_RECORD_TYPE_NONE,
-	UI_MUTATION_RECORD_TYPE_ATTRIBUTES,
-	UI_MUTATION_RECORD_TYPE_PROPERTIES,
-	UI_MUTATION_RECORD_TYPE_CHILD_LIST,
+typedef enum {
+        UI_MUTATION_RECORD_TYPE_NONE,
+        UI_MUTATION_RECORD_TYPE_ATTRIBUTES,
+        UI_MUTATION_RECORD_TYPE_PROPERTIES,
+        UI_MUTATION_RECORD_TYPE_CHILD_LIST,
 } ui_mutation_record_type_t;
 
-typedef struct ui_mutation_record_t {
-	ui_mutation_record_type_t type;
-	ui_widget_t *target;
-	list_t added_widgets;
-	list_t removed_widgets;
-	char *attribute_name;
-	char *property_name;
+typedef struct ui_mutation_record {
+        ui_mutation_record_type_t type;
+        ui_widget_t *target;
+        list_t added_widgets;
+        list_t removed_widgets;
+        char *attribute_name;
+        char *property_name;
 } ui_mutation_record_t;
 
-typedef void (*ui_mutation_observer_callback_t)(ui_mutation_list_t *,
-						ui_mutation_observer_t *,
-						void *);
+typedef void (*ui_mutation_observer_cb)(ui_mutation_list_t *,
+                                        ui_mutation_observer_t *, void *);
 
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserverInit
  */
-typedef struct ui_mutation_observer_init_t {
-	bool child_list;
-	bool subtree;
-	bool properties;
-	bool attributes;
+typedef struct ui_mutation_observer_init {
+        bool child_list;
+        bool subtree;
+        bool properties;
+        bool attributes;
 } ui_mutation_observer_init_t;
 
 LIBUI_PUBLIC ui_mutation_record_t *ui_mutation_record_create(
@@ -62,7 +61,7 @@ LIBUI_PUBLIC void ui_mutation_record_destroy(ui_mutation_record_t *mutation);
  * @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
  */
 LIBUI_PUBLIC ui_mutation_observer_t *ui_mutation_observer_create(
-    ui_mutation_observer_callback_t callback, void *callback_arg);
+    ui_mutation_observer_cb callback, void *callback_arg);
 
 LIBUI_PUBLIC int ui_mutation_observer_observe(
     ui_mutation_observer_t *observer, ui_widget_t *w,

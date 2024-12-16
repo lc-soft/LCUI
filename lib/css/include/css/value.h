@@ -27,7 +27,7 @@ LIBCSS_PUBLIC size_t css_valdef_to_string(const css_valdef_t *valdef, char *str,
 					  size_t max_len);
 
 LIBCSS_PUBLIC const css_value_type_record_t *css_register_value_type(
-    const char *type_name, css_value_parse_func_t parse);
+    const char *type_name, css_value_parse_cb parse);
 
 LIBCSS_PUBLIC const css_value_type_record_t *css_get_value_type(
     const char *type_name);

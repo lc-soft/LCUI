@@ -23,7 +23,7 @@
 
 #define TITLE_MAX_SIZE 256
 
-typedef struct window_mutation_record_t {
+typedef struct window_mutation_record {
         ptk_window_t *window;
         bool update_size;
         bool update_position;
@@ -37,18 +37,18 @@ typedef struct window_mutation_record_t {
         bool visible;
 } window_mutation_record_t;
 
-typedef struct ui_flash_rect_t {
+typedef struct ui_flash_rect {
         int64_t paint_time;
         pd_rect_t rect;
 } ui_flash_rect_t;
 
-typedef struct ui_dirty_layer_t {
+typedef struct ui_dirty_layer {
         list_t rects;
         pd_rect_t rect;
         int dirty;
 } ui_dirty_layer_t;
 
-typedef struct ui_connection_t {
+typedef struct ui_connection {
         /** whether new content has been rendered */
         bool rendered;
 
@@ -61,7 +61,7 @@ typedef struct ui_connection_t {
         ui_updater_t *updater;
 } ui_connection_t;
 
-static struct ui_server_t {
+static struct ui_server {
         /** list_t<ui_connection_t> */
         list_t connections;
         ui_mutation_observer_t *observer;

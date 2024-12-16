@@ -19,7 +19,7 @@
 
 PD_BEGIN_DECLS
 
-typedef struct pd_text_style_t {
+typedef struct pd_text_style {
 	bool has_family : 1;
 	bool has_style : 1;
 	bool has_weight : 1;
@@ -43,7 +43,7 @@ typedef enum pd_text_align_t {
 	PD_TEXT_ALIGN_CENTER
 } pd_text_align_t;
 
-typedef struct pd_char_t {
+typedef struct pd_char {
 	wchar_t code;                   /**< 字符码 */
 	pd_text_style_t *style;         /**< 该字符使用的样式数据 */
 	const pd_font_bitmap_t *bitmap; /**< 字体位图数据(只读) */
@@ -65,7 +65,7 @@ typedef enum pd_text_eol_t {
 } pd_text_eol_t;
 
 /* 文本行 */
-typedef struct pd_text_line_t {
+typedef struct pd_text_line {
 	int width;          /**< 宽度 */
 	int height;         /**< 高度 */
 	int length;         /**< 该行文本长度 */
@@ -84,7 +84,7 @@ typedef enum pd_word_break_t {
 	PD_WORD_BREAK_BREAK_ALL
 } pd_word_break_t;
 
-typedef struct pd_text_t {
+typedef struct pd_text {
 	int offset_x;     /**< x轴坐标偏移量 */
 	int offset_y;     /**< y轴坐标偏移量 */
 	int new_offset_x; /**< 新的x轴坐标偏移量 */

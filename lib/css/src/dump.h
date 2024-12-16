@@ -15,9 +15,9 @@
 #include <css/style_value.h>
 #include <css/style_decl.h>
 
-typedef struct css_dump_context_t css_dump_context_t;
+typedef struct css_dump_context css_dump_context_t;
 
-struct css_dump_context_t {
+struct css_dump_context {
 	char *data;
 	size_t len;
 	size_t max_len;

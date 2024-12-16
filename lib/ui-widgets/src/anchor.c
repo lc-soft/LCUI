@@ -17,7 +17,7 @@
 #include <worker.h>
 #include <ptk.h>
 
-typedef struct xml_loader_t {
+typedef struct xml_loader {
         /** 键，作为在视图加载完后传给事件处理器的额外参数 */
         char *key;
         char *filepath;      /**< 视图文件路径 */
@@ -26,7 +26,7 @@ typedef struct xml_loader_t {
         ui_widget_t *widget; /**< 触发视图加载器的部件 */
 } xml_loader_t;
 
-static struct ui_anchor_module_t {
+static struct ui_anchor_module {
         ui_widget_prototype_t *proto;
         worker_t *worker;
 } ui_anchor;

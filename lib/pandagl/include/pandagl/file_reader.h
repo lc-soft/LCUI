@@ -17,7 +17,7 @@
 
 PD_BEGIN_DECLS
 
-typedef struct pd_file_reader_t {
+typedef struct pd_file_reader {
         void *stream_data;
         void (*fn_close)(void*);
         void (*fn_rewind)(void*);

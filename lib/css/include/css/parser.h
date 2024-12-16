@@ -38,19 +38,18 @@ typedef enum css_rule_type_t {
 	CSS_RULE_TOTAL_NUM
 } css_rule_type_t;
 
-typedef struct css_parser_t css_parser_t;
-typedef struct css_style_parser_t css_style_parser_t;
-typedef int (*css_parser_method_t)(css_parser_t *);
-typedef int (*css_property_parser_method_t)(css_style_parser_t *, const char *);
+typedef struct css_parser css_parser_t;
+typedef struct css_style_parser css_style_parser_t;
+typedef int (*css_parser_cb)(css_parser_t *);
 
-typedef struct css_rule_parser_t {
+typedef struct css_rule_parser {
 	char name[32];
 	void *data;
-	css_parser_method_t begin;
-	css_parser_method_t parse;
+	css_parser_cb begin;
+	css_parser_cb parse;
 } css_rule_parser_t;
 
-typedef struct css_style_parser_t {
+typedef struct css_style_parser {
 	char *dirname; /**< 当前所在的目录 */
 	char *space;   /**< 样式记录所属的空间 */
 	char *property;
@@ -62,7 +61,7 @@ typedef struct css_style_parser_t {
 	css_style_decl_t *style; /**< 当前缓存的样式表 */
 } css_style_parser_t;
 
-typedef struct css_comment_parser_t {
+typedef struct css_comment_parser {
 	/** 是否为单行注释 */
 	bool is_line_comment;
 
@@ -71,7 +70,7 @@ typedef struct css_comment_parser_t {
 } css_comment_parser_t;
 
 /** CSS 代码解析器的环境参数（上下文数据） */
-struct css_parser_t {
+struct css_parser {
 	int pos;         /**< 缓存中的字符串的下标位置 */
 	const char *cur; /**< 用于遍历字符串的指针 */
 	char *space;     /**< 样式记录所属的空间 */

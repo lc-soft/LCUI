@@ -40,12 +40,12 @@ typedef enum css_valdef_sign_t {
 	CSS_VALDEF_SIGN_ANGLE_BRACKET
 } css_valdef_sign_t;
 
-struct css_value_type_record_t {
+struct css_value_type_record {
 	char *name;
-	css_value_parse_func_t parse_value;
+	css_value_parse_cb parse_value;
 };
 
-struct css_valdef_t {
+struct css_valdef {
 	css_valdef_sign_t sign;
 	unsigned min_count;
 	unsigned max_count;
@@ -69,7 +69,7 @@ typedef enum css_valdef_parser_target_t {
 	CSS_VALDEF_PARSER_TARGET_SIGN
 } css_valdef_parser_target_t;
 
-typedef struct css_valdef_parser_t {
+typedef struct css_valdef_parser {
 	const char *cur;
 	char *buffer;
 	char terminator;
@@ -84,7 +84,7 @@ typedef struct css_valdef_parser_t {
 	list_t valdef_parents;
 } css_valdef_parser_t;
 
-typedef struct css_value_matcher_t {
+typedef struct css_value_matcher {
 	const char *cur;
 	const char *next;
 
@@ -95,7 +95,7 @@ typedef struct css_value_matcher_t {
 	unsigned value_len;
 } css_value_matcher_t;
 
-static struct css_value_module_t {
+static struct css_value_module {
 	/** dict_t<string, css_valdef_t> */
 	dict_t *alias;
 
@@ -212,7 +212,7 @@ static void css_valdef_append(css_valdef_t *valdef, css_valdef_t *child)
 }
 
 const css_value_type_record_t *css_register_value_type(
-    const char *type_name, css_value_parse_func_t parse)
+    const char *type_name, css_value_parse_cb parse)
 {
 	css_value_type_record_t *t;
 

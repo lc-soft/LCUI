@@ -34,14 +34,14 @@ typedef enum pd_image_reader_type_t {
 #define pd_image_reader_set_jump(READER) \
         (READER)->env &&setjmp(*((READER)->env))
 
-typedef struct pd_image_header_t {
+typedef struct pd_image_header {
         int type;
         int bit_depth;
         pd_color_type_t color_type;
         unsigned int width, height;
 } pd_image_header_t;
 
-typedef struct pd_image_reader_t {
+typedef struct pd_image_reader {
         char error_message[256];
         pd_image_reader_type_t type;
         pd_file_reader_t *file_reader;
