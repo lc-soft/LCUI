@@ -22,7 +22,7 @@
 #include <thread.h>
 
 /** LCUI 应用程序数据 */
-static struct lcui_app_t {
+static struct lcui_app {
         ptk_steptimer_t timer;
         worker_t *main_worker;
         worker_t *async_worker;

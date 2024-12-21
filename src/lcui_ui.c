@@ -28,7 +28,7 @@ typedef struct {
         thread_cond_t cond;
 } lcui_ui_image_loader_t;
 
-static struct lcui_ui_t {
+static struct lcui_ui {
         bool quit_after_all_windows_closed;
         lcui_ui_image_loader_t image_loader;
         lcui_display_mode_t mode;
