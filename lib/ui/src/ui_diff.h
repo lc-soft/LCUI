@@ -9,7 +9,7 @@
  * LICENSE.TXT file in the root directory of this source tree.
  */
 
-typedef struct ui_diff_item_t {
+typedef struct ui_diff_item {
         ui_widget_t *widget;
         ui_rect_t border_box;
         ui_rect_t canvas_box;

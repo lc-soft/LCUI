@@ -27,6 +27,8 @@
 #include "ui_mutation_observer.h"
 #include "ui_widget_style.h"
 #include "ui_widget_observer.h"
+#include "ui_resizer.h"
+#include "ui_widget_layout.h"
 #include "ui_widget.h"
 
 /** dict_t<hash, css_style_decl_t*> */
@@ -310,12 +312,41 @@ static size_t ui_updater_update_children(ui_updater_t *updater, ui_widget_t *w)
         return total;
 }
 
+static void ui_widget_reset_size(ui_widget_t *w)
+{
+        css_computed_style_t *src = &w->specified_style;
+        css_computed_style_t *dest = &w->computed_style;
+
+        CSS_COPY_LENGTH(dest, src, width);
+        CSS_COPY_LENGTH(dest, src, min_width);
+        CSS_COPY_LENGTH(dest, src, max_width);
+        CSS_COPY_LENGTH(dest, src, padding_left);
+        CSS_COPY_LENGTH(dest, src, padding_right);
+        CSS_COPY_LENGTH(dest, src, height);
+        CSS_COPY_LENGTH(dest, src, min_height);
+        CSS_COPY_LENGTH(dest, src, max_height);
+        CSS_COPY_LENGTH(dest, src, padding_top);
+        CSS_COPY_LENGTH(dest, src, padding_bottom);
+        CSS_COPY_LENGTH(dest, src, flex_basis);
+}
+
 static void ui_widget_update_size(ui_widget_t *w)
 {
+        ui_resizer_t resizer;
+
         ui_widget_reset_size(w);
         ui_widget_compute_style(w);
         ui_widget_update_box_size(w);
-        ui_widget_reflow(w);
+        ui_widget_reflow_with_resizer(w, &resizer);
+        w->max_content_width = w->content_box.width;
+        w->max_content_height = w->content_box.height;
+        if (ui_widget_has_flex_column_direction(w)) {
+                w->min_content_width = resizer.min_cross_size;
+                w->min_content_height = resizer.min_main_size;
+        } else {
+                w->min_content_width = resizer.min_main_size;
+                w->min_content_height = resizer.min_cross_size;
+        }
 }
 
 size_t ui_updater_update_widget(ui_updater_t *updater, ui_widget_t *w)
@@ -328,6 +359,17 @@ size_t ui_updater_update_widget(ui_updater_t *updater, ui_widget_t *w)
                 w->update.should_refresh_style = true;
                 w->update.should_reflow = true;
         }
+#ifdef UI_DEBUG_ENABLED
+        {
+                UI_WIDGET_STR(w, str);
+                UI_DEBUG_MSG(
+                    "%s: %s: begin, updateSelf?=%d, updateStyle?=%d, reflow?=%d"
+                    "updateChildren?=%d",
+                    __FUNCTION__, str, ui_widget_has_update(w),
+                    w->update.should_update_style, w->update.should_reflow,
+                    w->update.should_update_children);
+        }
+#endif
         if (ui_widget_has_update(w)) {
                 count = 1;
                 if (w->proto && w->proto->update) {
@@ -349,9 +391,9 @@ size_t ui_updater_update_widget(ui_updater_t *updater, ui_widget_t *w)
                         if (ui_widget_has_class(w, "debug")) {
                                 UI_WIDGET_STR(w, str);
                                 UI_WIDGET_SIZE_STR(w, size_str);
-                                UI_DEBUG_MSG("%s: %s: size=%s, change (%g, %g) => (%g, %g)",
-                                             __FUNCTION__, str,
-                                             size_str,
+                                UI_DEBUG_MSG("%s: %s: size=%s, change (%g, %g) "
+                                             "=> (%g, %g)",
+                                             __FUNCTION__, str, size_str,
                                              style_diff.padding_box.width,
                                              style_diff.padding_box.height,
                                              w->padding_box.width,
@@ -371,26 +413,43 @@ size_t ui_updater_update_widget(ui_updater_t *updater, ui_widget_t *w)
                         w->proto->update(w, UI_TASK_AFTER_UPDATE);
                 }
         }
+#ifdef UI_DEBUG_ENABLED
+        {
+                UI_WIDGET_STR(w, str);
+                UI_WIDGET_SIZE_STR(w, size_str);
+                UI_DEBUG_MSG(
+                    "%s: %s: updatedSelf, size=%s, content_box_size=(%g, %g)",
+                    __FUNCTION__, str, size_str, w->content_box.width,
+                    w->content_box.height);
+                ui_debug_msg_indent++;
+        }
+#endif
         if (w->update.should_update_children) {
                 count += ui_updater_update_children(updater, w);
         }
         if (w->update.should_reflow) {
+                int width = (int)(w->outer_box.width * 64.f);
+                int height = (int)(w->outer_box.height * 64.f);
+
+                ui_widget_update_size(w);
+
                 if (w->parent && ui_widget_in_layout_flow(w)) {
-                        int width = (int)(w->outer_box.width * 64.f);
-                        int height = (int)(w->outer_box.height * 64.f);
-                        ui_widget_update_size(w);
                         if (width != (int)(w->outer_box.width * 64.f) ||
                             height != (int)(w->outer_box.height * 64.f)) {
                                 ui_widget_request_reflow(w->parent);
                         }
                 } else {
-                        ui_widget_update_size(w);
                         ui_widget_update_box_position(w);
                 }
-                w->max_content_width = w->content_box.width;
-                w->max_content_height = w->content_box.height;
         }
         ui_widget_update_stacking_context(w);
+#ifdef UI_DEBUG_ENABLED
+        ui_debug_msg_indent--;
+        {
+                UI_WIDGET_STR(w, str);
+                UI_DEBUG_MSG("%s: %s: end", __FUNCTION__, str);
+        }
+#endif
         return count;
 }
 
@@ -421,8 +480,7 @@ static void ui_process_mutations(ui_widget_t *w)
                 ui_widget_expose_dirty_rect(w);
         }
         if (w->update.should_update_children || w->update.should_reflow) {
-                ui_widget_each(w, (ui_widget_callback_t)ui_process_mutations,
-                               NULL);
+                ui_widget_each(w, (ui_widget_cb)ui_process_mutations, NULL);
         }
         w->update.should_update_self = false;
         w->update.should_update_style = false;

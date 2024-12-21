@@ -23,7 +23,7 @@ const char *test_css = "\
 \
 text {\
 	white-space: nowrap;\
-	display: inline-block;\
+    display: inline-block;\
 }\
 \
 );";
@@ -69,7 +69,6 @@ void build_content_view(void)
         ui_widget_t *hscrollbar = ui_create_scrollbar();
 
         ui_widget_set_id(content, "license_content");
-        ui_widget_set_style_string(content, "display", "inline-block");
         ui_text_set_content(text, test_content);
         ui_scrollbar_set_orientation(hscrollbar, UI_SCROLLBAR_HORIZONTAL);
         ui_widget_add_class(container, "container");

@@ -92,12 +92,6 @@ LIBUI_INLINE bool ui_widget_has_flex_column_direction(ui_widget_t *w)
                    CSS_FLEX_DIRECTION_COLUMN_REVERSE;
 }
 
-LIBUI_INLINE bool ui_widget_has_inline_block_display(ui_widget_t *w)
-{
-        return css_computed_display(&w->computed_style) ==
-               CSS_DISPLAY_INLINE_BLOCK;
-}
-
 size_t ui_widget_get_children_style_changes(ui_widget_t *w, int type,
                                             const char *name);
 

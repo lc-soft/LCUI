@@ -34,6 +34,11 @@ typedef struct ui_scrollarea_content {
 static ui_widget_prototype_t *ui_scrollarea_proto;
 static ui_widget_prototype_t *ui_scrollarea_content_proto;
 
+static const char *ui_scrollarea_css ="\
+scrollarea-content {\
+    min-width: min-content;\
+}";
+
 static void ui_scrollarea_emit_scroll(ui_widget_t *w)
 {
         ui_event_t e = { 0 };
@@ -136,9 +141,9 @@ void ui_scrollarea_update(ui_widget_t *w)
                 that->scroll_left = 0;
         }
         DEBUG_MSG("[ui-scrollarea] scroll_width=%g, scroll_height=%g, "
-                     "scroll_top=%g, scroll_left=%g\n",
-                     that->scroll_width, that->scroll_height, that->scroll_top,
-                     that->scroll_left);
+                  "scroll_top=%g, scroll_left=%g\n",
+                  that->scroll_width, that->scroll_height, that->scroll_top,
+                  that->scroll_left);
         ui_widget_set_style_keyword_value(content, css_prop_position,
                                           CSS_KEYWORD_RELATIVE);
         ui_widget_set_style_unit_value(content, css_prop_top, -that->scroll_top,
@@ -355,4 +360,5 @@ void ui_register_scrollarea(void)
             ui_create_widget_prototype("scrollarea-content", NULL);
         ui_scrollarea_content_proto->init = ui_scrollarea_content_init;
         ui_scrollarea_content_proto->destroy = ui_scrollarea_content_destroy;
+        ui_load_css_string(ui_scrollarea_css, __FILE__);
 }

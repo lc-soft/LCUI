@@ -5,6 +5,10 @@ body {
   font-family: "Ubuntu Mono", "Consola";
 }
 
+scrollarea-content {
+  min-width: 0;
+}
+
 .example {
   padding: 5px;
   background-color: #f1f2f3;
@@ -227,6 +231,7 @@ body {
   margin: 0 8px 0 8px;
   white-space: nowrap;
   overflow: hidden;
+  font-size: 12px;
 }
 
 .example-browser .c-frame-tab__close {

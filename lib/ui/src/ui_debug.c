@@ -70,3 +70,28 @@ void ui_widget_size_to_string(ui_widget_t *w, char str[40])
 	}
 	snprintf(str, 40, "(%s, %s)", width_str, height_str);
 }
+
+void ui_widget_min_size_to_string(ui_widget_t *w, char str[40])
+{
+	char width_str[16] = "auto";
+	char height_str[16] = "auto";
+
+	switch (w->computed_style.type_bits.min_width) {
+	case CSS_WIDTH_FIT_CONTENT:
+		strcpy(width_str, "fit-content");
+		break;
+	case CSS_WIDTH_SET:
+		snprintf(width_str, 16, "%g%s", w->computed_style.min_width,
+			 get_css_unit_str(w->computed_style.unit_bits.min_width));
+		break;
+	default:
+		break;
+	}
+	switch (w->computed_style.type_bits.min_height) {
+	case CSS_HEIGHT_SET:
+		snprintf(height_str, 16, "%g%s", w->computed_style.min_height,
+			 get_css_unit_str(w->computed_style.unit_bits.min_height));
+		break;
+	}
+	snprintf(str, 40, "(%s, %s)", width_str, height_str);
+}

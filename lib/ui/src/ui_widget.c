@@ -383,49 +383,14 @@ void ui_widget_update_box_size(ui_widget_t *w)
 
 void ui_widget_set_content_width(ui_widget_t *w, float width)
 {
-        CSS_SET_FIXED_LENGTH(
-            &w->computed_style, width,
-            css_content_box_width_to_width(&w->computed_style, width));
+        CSS_SET_FIXED_LENGTH(&w->computed_style, width,
+                             css_width_from_cbox(&w->computed_style, width));
         ui_widget_update_box_width(w);
 }
 
 void ui_widget_set_content_height(ui_widget_t *w, float height)
 {
-        CSS_SET_FIXED_LENGTH(
-            &w->computed_style, height,
-            css_content_box_height_to_height(&w->computed_style, height));
+        CSS_SET_FIXED_LENGTH(&w->computed_style, height,
+                             css_height_from_cbox(&w->computed_style, height));
         ui_widget_update_box_height(w);
-}
-
-void ui_widget_get_sizehint(ui_widget_t *w, ui_sizehint_t *hint)
-{
-        css_computed_style_t *s = &w->computed_style;
-        css_computed_style_t *ps;
-
-        hint->min_width = 0;
-        hint->min_height = 0;
-        hint->max_width = 0;
-        hint->max_height = 0;
-        hint->available_width = -1.f;
-        hint->available_height = -1.f;
-        w->proto->sizehint(w, hint);
-        if (!w->parent || s->type_bits.position == CSS_POSITION_FIXED ||
-            s->type_bits.position == CSS_POSITION_ABSOLUTE ||
-            (s->type_bits.display != CSS_DISPLAY_BLOCK &&
-             s->type_bits.display != CSS_DISPLAY_FLEX)) {
-                return;
-        }
-        ps = &w->parent->computed_style;
-        if (ps->type_bits.display != CSS_DISPLAY_BLOCK &&
-            ps->type_bits.display != CSS_DISPLAY_INLINE_BLOCK) {
-                return;
-        }
-        if (IS_CSS_FIXED_LENGTH(ps, width)) {
-                hint->available_width = css_width_to_content_box_width(
-                    s, w->parent->content_box.width - css_margin_x(s));
-        }
-        if (IS_CSS_FIXED_LENGTH(ps, height)) {
-                hint->available_height = css_height_to_content_box_height(
-                    s, w->parent->content_box.height - css_margin_y(s));
-        }
 }

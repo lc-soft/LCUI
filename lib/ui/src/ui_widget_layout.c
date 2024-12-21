@@ -15,29 +15,12 @@
 #include <ui/events.h>
 #include <ui/style.h>
 #include "ui_debug.h"
+#include "ui_resizer.h"
 #include "ui_block_layout.h"
 #include "ui_flexbox_layout.h"
 #include "ui_widget.h"
 #include "ui_widget_style.h"
-
-void ui_widget_reset_size(ui_widget_t *w)
-{
-        css_computed_style_t *src = &w->specified_style;
-        css_computed_style_t *dest = &w->computed_style;
-
-        CSS_COPY_LENGTH(dest, src, width);
-        CSS_COPY_LENGTH(dest, src, min_width);
-        CSS_COPY_LENGTH(dest, src, max_width);
-        CSS_COPY_LENGTH(dest, src, padding_left);
-        CSS_COPY_LENGTH(dest, src, padding_right);
-        CSS_COPY_LENGTH(dest, src, height);
-        CSS_COPY_LENGTH(dest, src, min_height);
-        CSS_COPY_LENGTH(dest, src, max_height);
-        CSS_COPY_LENGTH(dest, src, padding_top);
-        CSS_COPY_LENGTH(dest, src, padding_bottom);
-        CSS_COPY_LENGTH(dest, src, flex_basis);
-        ui_widget_compute_style(w);
-}
+#include "ui_widget_layout.h"
 
 /**
  * 重置布局相关属性，并重新计算样式
@@ -157,18 +140,18 @@ void ui_widget_reflow_if_height_changed(ui_widget_t *w)
         }
 }
 
-void ui_widget_reflow(ui_widget_t *w)
+void ui_widget_reflow_with_resizer(ui_widget_t *w, ui_resizer_t *resizer)
 {
         ui_event_t ev = { .type = UI_EVENT_AFTERLAYOUT, .cancel_bubble = true };
 
         switch (w->computed_style.type_bits.display) {
         case CSS_DISPLAY_BLOCK:
         case CSS_DISPLAY_INLINE_BLOCK:
-                ui_block_layout_reflow(w);
+                ui_block_layout_reflow(w, resizer);
                 break;
         case CSS_DISPLAY_FLEX:
         case CSS_DISPLAY_INLINE_FLEX:
-                ui_flexbox_layout_reflow(w);
+                ui_flexbox_layout_reflow(w, resizer);
                 break;
         case CSS_DISPLAY_NONE:
         default:
@@ -183,4 +166,12 @@ void ui_widget_reflow(ui_widget_t *w)
 #endif
         ui_widget_post_event(w, &ev, NULL, NULL);
         ui_widget_add_state(w, UI_WIDGET_STATE_LAYOUTED);
+}
+
+void ui_widget_reflow(ui_widget_t *w)
+{
+        ui_resizer_t resizer;
+
+        ui_resizer_init(&resizer, w);
+        ui_widget_reflow_with_resizer(w, &resizer);
 }

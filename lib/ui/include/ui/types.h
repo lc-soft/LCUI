@@ -1,4 +1,4 @@
-/*
+﻿/*
  * lib/ui/include/ui/types.h
  *
  * Copyright (c) 2023-2024, Liu Chao <i@lc-soft.io> All rights reserved.
@@ -357,7 +357,8 @@ struct ui_widget {
          * space. See more: https://drafts.csswg.org/css-sizing-3/#max-content
          */
         float max_content_width, max_content_height;
-        float min_content_width;
+
+        float min_content_width, min_content_height;
 
         /** See more:
          * https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model */

@@ -9,4 +9,5 @@
  * LICENSE.TXT file in the root directory of this source tree.
  */
 
-void ui_block_layout_reflow(ui_widget_t *w);
+void ui_block_layout_reflow(ui_widget_t *w, ui_resizer_t *resizer);
+
