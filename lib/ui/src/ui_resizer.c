@@ -111,6 +111,11 @@ void ui_resizer_init(ui_resizer_t *resizer, ui_widget_t *target)
         resizer->wrap = ui_widget_is_wrap(target);
         resizer->line_min_main_size = 0;
         resizer->line_min_cross_size = 0;
+        resizer->line_main_size = 0;
+        resizer->line_cross_size = 0;
+        resizer->min_main_size = 0;
+        resizer->min_cross_size = 0;
+        resizer->main_size = 0;
         resizer->max_main_size = -1;
         ui_widget_get_sizehint(target, &resizer->hint);
 }
