@@ -12,6 +12,8 @@
 #include <LCUI.h>
 #include <ctest-custom.h>
 
+#define SCROLLBAR_WIDTH 14
+
 static void test_dropdown(void)
 {
         ui_widget_t *w;
@@ -503,7 +505,7 @@ static void test_block_layout_600(void)
 
         rect.x = 10;
         rect.y = 10;
-        rect.width = 600 - 20 - 14;
+        rect.width = 600 - 20 - SCROLLBAR_WIDTH;
         rect.height = 504;
         w = ui_widget_get_child(container, 0);
         ctest_equal_ui_rect("$('.example')[0].border_box", &w->border_box,
@@ -695,7 +697,7 @@ static void test_block_layout_320(void)
 
         rect.x = 10;
         rect.y = 10;
-        rect.width = 320 - 20 - 14;
+        rect.width = 320 - 20 - SCROLLBAR_WIDTH;
         rect.height = 604;
         w = ui_widget_get_child(container, 0);
         ctest_equal_ui_rect("$('.example')[0].border_box", &w->border_box,

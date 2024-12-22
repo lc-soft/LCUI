@@ -333,6 +333,8 @@ static void ui_widget_reset_size(ui_widget_t *w)
 static void ui_widget_update_size(ui_widget_t *w)
 {
         ui_resizer_t resizer;
+        int width = (int)(w->outer_box.width * 64.f);
+        int height = (int)(w->outer_box.height * 64.f);
 
         ui_widget_reset_size(w);
         ui_widget_compute_style(w);
@@ -346,6 +348,14 @@ static void ui_widget_update_size(ui_widget_t *w)
         } else {
                 w->min_content_width = resizer.min_main_size;
                 w->min_content_height = resizer.min_cross_size;
+        }
+        if (w->parent && ui_widget_in_layout_flow(w)) {
+                if (width != (int)(w->outer_box.width * 64.f) ||
+                    height != (int)(w->outer_box.height * 64.f)) {
+                        ui_widget_request_reflow(w->parent);
+                }
+        } else {
+                ui_widget_update_box_position(w);
         }
 }
 
@@ -428,19 +438,7 @@ size_t ui_updater_update_widget(ui_updater_t *updater, ui_widget_t *w)
                 count += ui_updater_update_children(updater, w);
         }
         if (w->update.should_reflow) {
-                int width = (int)(w->outer_box.width * 64.f);
-                int height = (int)(w->outer_box.height * 64.f);
-
                 ui_widget_update_size(w);
-
-                if (w->parent && ui_widget_in_layout_flow(w)) {
-                        if (width != (int)(w->outer_box.width * 64.f) ||
-                            height != (int)(w->outer_box.height * 64.f)) {
-                                ui_widget_request_reflow(w->parent);
-                        }
-                } else {
-                        ui_widget_update_box_position(w);
-                }
         }
         ui_widget_update_stacking_context(w);
 #ifdef UI_DEBUG_ENABLED

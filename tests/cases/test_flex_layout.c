@@ -12,6 +12,8 @@
 #include <LCUI.h>
 #include <ctest-custom.h>
 
+#define SCROLLBAR_WIDTH 14
+
 static void test_flex_layout_with_content_width(float width)
 {
 	float content_width = width - 22;
@@ -486,12 +488,12 @@ static void test_flex_layout_1280(void)
 static void test_flex_layout_600(void)
 {
 	ui_widget_resize(ui_root(), 600, 400);
-	test_flex_layout_with_content_width(580 - 14);
+	test_flex_layout_with_content_width(580 - SCROLLBAR_WIDTH);
 }
 
 static void test_flex_layout_320(void)
 {
-	float width = 320 - 10 - 10 - 14;
+	float width = 320 - 10 - 10 - SCROLLBAR_WIDTH;
 	float content_width = width - 12 - 10;
 
 	ui_widget_t *w;

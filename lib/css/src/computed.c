@@ -1128,7 +1128,7 @@ static void compute_absolute_height(const css_computed_style_t *parent,
                         break;
                 }
                 if (is_css_display_inline(s) || !parent) {
-                        s->type_bits.height = CSS_WIDTH_FIT_CONTENT;
+                        s->type_bits.height = CSS_HEIGHT_FIT_CONTENT;
                 }
                 break;
         case CSS_HEIGHT_SET:

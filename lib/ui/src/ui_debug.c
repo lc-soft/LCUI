@@ -77,8 +77,8 @@ void ui_widget_min_size_to_string(ui_widget_t *w, char str[40])
 	char height_str[16] = "auto";
 
 	switch (w->computed_style.type_bits.min_width) {
-	case CSS_WIDTH_FIT_CONTENT:
-		strcpy(width_str, "fit-content");
+	case CSS_MIN_WIDTH_MIN_CONTENT:
+		strcpy(width_str, "min-content");
 		break;
 	case CSS_WIDTH_SET:
 		snprintf(width_str, 16, "%g%s", w->computed_style.min_width,

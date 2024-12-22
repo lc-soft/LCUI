@@ -727,7 +727,9 @@ static float ui_compute_row_item_layout(ui_widget_t *item, float x, float y,
                 ui_widget_update_box_position(item);
                 return 0;
         }
-        if (align == CSS_ALIGN_ITEMS_STRETCH &&
+        if (IS_CSS_PERCENTAGE(&item->specified_style, height)) {
+                ui_widget_reset_height(item);
+        } else if (align == CSS_ALIGN_ITEMS_STRETCH &&
             item->specified_style.type_bits.height == CSS_HEIGHT_AUTO) {
                 CSS_SET_FIXED_LENGTH(
                     s, height,
@@ -771,7 +773,9 @@ static float ui_compute_column_item_layout(ui_widget_t *item, float x, float y,
                 ui_widget_update_box_position(item);
                 return 0;
         }
-        if (align == CSS_ALIGN_ITEMS_STRETCH &&
+        if (IS_CSS_PERCENTAGE(&item->specified_style, width)) {
+                ui_widget_reset_width(item);
+        } else if (align == CSS_ALIGN_ITEMS_STRETCH &&
             item->specified_style.type_bits.width == CSS_WIDTH_AUTO) {
                 CSS_SET_FIXED_LENGTH(
                     s, width,
@@ -921,7 +925,8 @@ void ui_flexbox_layout_reflow(ui_widget_t *w, ui_resizer_t *resizer)
         {
                 UI_WIDGET_STR(w, str);
                 UI_WIDGET_SIZE_STR(w, size_str);
-                UI_DEBUG_MSG("%s: %s: begin, direction=%s, size=%s, content_size=(%g, %g)",
+                UI_DEBUG_MSG("%s: %s: begin, direction=%s, size=%s, "
+                             "content_size=(%g, %g)",
                              __FUNCTION__, str,
                              ctx.column_direction ? "column" : "row", size_str,
                              w->content_box.width, w->content_box.height);
