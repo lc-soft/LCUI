@@ -35,7 +35,7 @@ jobs:
         run: |
           sudo apt-get update --fix-missing
           sudo apt-get install debhelper lcov valgrind -yy
-          sudo apt-get install libfreetype6-dev libpng-dev libyaml-dev libomp-dev libx11-dev
+          sudo apt-get install libfreetype6-dev libpng-dev libyaml-dev libomp-dev libx11-dev ninja-build fontconfig libfontconfig1-dev libjpeg-dev
 
       - name: Configure
         if: runner.os == 'Windows'
