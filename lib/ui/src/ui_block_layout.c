@@ -89,7 +89,6 @@ static void ui_block_layout_load_width(ui_block_layout_context_t *ctx)
         list_node_t *node;
         ui_widget_t *child;
         ui_resizer_t *resizer = ctx->resizer;
-        css_computed_style_t *s = &ctx->widget->computed_style;
         css_computed_style_t *cs;
 
 #ifdef UI_DEBUG_ENABLED
