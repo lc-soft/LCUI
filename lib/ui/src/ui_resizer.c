@@ -107,8 +107,6 @@ void ui_resizer_load_column_minmaxinfo(ui_resizer_t *resizer)
 
 void ui_resizer_init(ui_resizer_t *resizer, ui_widget_t *target)
 {
-        css_computed_style_t *s = &target->computed_style;
-
         resizer->target = target;
         resizer->wrap = ui_widget_is_wrap(target);
         resizer->line_min_main_size = 0;
