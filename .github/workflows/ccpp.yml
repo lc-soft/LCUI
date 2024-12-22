@@ -42,7 +42,7 @@ jobs:
 
       - name: Configure for coverage mode
         if: runner.os == 'Linux'
-        run: xmake config -y -k ${{ env.TARGET_KIND }} -m coverage --ci-env=y
+        run: xmake config -y -k ${{ env.TARGET_KIND }} -m coverage --ci-env=y -v
 
       - name: Cache xmake packages
         uses: actions/cache@v4
