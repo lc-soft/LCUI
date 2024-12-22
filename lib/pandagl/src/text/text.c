@@ -436,7 +436,7 @@ void pd_text_set_insert_position(pd_text_t *text, int line_num, int col)
 int pd_text_set_insert_pixel_position(pd_text_t *text, int x, int y)
 {
         pd_text_line_t *line;
-        int i, pixel_pos, ins_x, ins_y;
+        int i, pixel_pos, ins_x, ins_y = 0;
 
         pixel_pos = text->offset_y;
         for (i = 0; i < text->lines_length; ++i) {
