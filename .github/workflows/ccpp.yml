@@ -18,7 +18,7 @@ jobs:
     
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
-          xmake-version: '2.9.6'
+          xmake-version: branch@dev
 
       - name: Update git submodule
         run: |
@@ -35,6 +35,7 @@ jobs:
         run: |
           sudo apt-get update --fix-missing
           sudo apt-get install debhelper lcov valgrind -yy
+          sudo apt-get install libfreetype6-dev libpng-dev libyaml-dev libomp-dev libx11-dev
 
       - name: Configure
         if: runner.os == 'Windows'
@@ -42,7 +43,7 @@ jobs:
 
       - name: Configure for coverage mode
         if: runner.os == 'Linux'
-        run: xmake config -y -k ${{ env.TARGET_KIND }} -m coverage --ci-env=y -v
+        run: xmake config -y -k ${{ env.TARGET_KIND }} -m coverage --ci-env=y
 
       - name: Cache xmake packages
         uses: actions/cache@v4
