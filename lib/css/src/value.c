@@ -299,7 +299,7 @@ static int css_valdef_parser_commit(css_valdef_parser_t *parser,
 				    css_valdef_sign_t sign)
 {
 	css_valdef_t *parent_valdef;
-	css_valdef_t *deleted_valdef;
+	css_valdef_t *deleted_valdef = NULL;
 	css_valdef_t *child;
 
 	// TODO: 处理 && 和 || 混写情况
