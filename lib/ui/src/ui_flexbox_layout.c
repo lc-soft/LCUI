@@ -205,7 +205,6 @@ static void ui_flexbox_row_layout_load_main_size(
 {
         list_node_t *node;
         ui_widget_t *child;
-        css_computed_style_t *s = &ctx->widget->computed_style;
         css_computed_style_t *cs;
         float main_size, min_main_size;
 
@@ -266,7 +265,6 @@ static void ui_flexbox_column_layout_load_main_size(
 {
         list_node_t *node;
         ui_widget_t *child;
-        css_computed_style_t *s = &ctx->widget->computed_style;
         css_computed_style_t *cs;
         float main_size = 0, min_main_size = 0;
 
