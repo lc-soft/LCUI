@@ -18,7 +18,7 @@ jobs:
     
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
-          xmake-version: branch@dev
+          xmake-version: '2.9.6'
 
       - name: Update git submodule
         run: |
