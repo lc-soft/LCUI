@@ -44,10 +44,11 @@ LCUI 是一个用 C 语言编写的用于构建图形用户界面的库。它的
 
 - **跨平台：** 支持 Windows、Linux。
 - **全自绘组件：** 组件在多个平台中都能保持一致的外观和行为。
+- **DPI 感知：** 在高分辨率的屏幕内自动缩放界面以保持清晰的显示效果。
 - **自带 CSS 引擎：** 支持使用 CSS 来定义用户界面的样式和布局，对于有网页开发经验的人比较容易上手。
 - **提供现代化的开发工具：** 该工具允许你使用 [TypeScript](https://lcui-dev.github.io/docs/guide/typescript) 语言搭配 JSX 语法、 React 库以及其它 Web 前端技术来编写用户界面。
 
-### 一图速览
+### 开发体验预览
 
 你可以从下图了解 LCUI 应用程序的开发体验：
 
@@ -66,9 +67,8 @@ LCUI 建立在各种库的基础之上：
 - [lib/yutil](./lib/yutil): 实用工具库，提供常用的数据结构和函数。
 - [lib/pandagl](./lib/pandagl): PandaGL (Panda Graphics Library) 图形库，提供字体管理、文字排版、图片读写、图形处理和渲染能力。
 - [lib/css](./lib/css): CSS 解析器和选择引擎，提供 CSS 解析和选择能力。
-- [lib/ptk](./lib/ptk): 平台库（**P**ing **T**ai **K**u），提供跨平台统一的系统相关 API，包括消息循环、窗口管理、输入法等。
+- [lib/ptk](./lib/ptk): 平台库（**P**ing **T**ai **K**u），提供跨平台统一的系统相关 API，包括消息循环、窗口管理、定时器、工作线程、输入法等。
 - [lib/thread](./lib/thread): 线程库，提供跨平台的多线程能力。
-- [lib/timer](./ui/timer): 定时器库，提供定时执行任务的能力。
 - [lib/ui](./lib/ui): UI 核心库，提供 UI 组件管理、事件队列、样式计算、绘制等 UI 必要能力。
 - [lib/ui-xml](./lib/anchor): XML 解析库，提供从 XML 文件内容创建 UI 的能力。
 - [lib/ui-cursor](./lib/ui-cursor): 光标，提供光标绘制能力。
@@ -81,9 +81,9 @@ LCUI 建立在各种库的基础之上：
 
 在开始前你需要在你的计算机上安装以下软件：
 
-- [Git](https://git-scm.com/download/)：版本管理工具，用于下载示例项目源码
-- [XMake](https://xmake.io/#/zh-cn/?id=%e5%ae%89%e8%a3%85)：构建工具，用于构建项目
-- [Node.js](https://nodejs.org/): JavaScript 运行环境，用于运行 LCUI 的命令行开发工具
+- [Git](https://git-scm.com/download/)：版本管理工具，用于下载示例项目源码。
+- [XMake](https://xmake.io/#/zh-cn/?id=%e5%ae%89%e8%a3%85)：C/C++ 构建工具，用于构建项目。
+- [Node.js](https://nodejs.org/): JavaScript 运行环境，用于运行 LCUI 的命令行开发工具。
 
 然后在命令行窗口中运行以下命令：
 
@@ -124,9 +124,11 @@ LCUI 及相关项目的部分功能设计参考了其它开源项目，你可以
 
 - LCUI
   - 改进 API 设计。
-  - 改进 CSS 引擎，增加支持 `inherit`、`!important`、转义字符。
+  - 改进 CSS 引擎，增加支持 `inherit`、`!important`。
   - 添加 [SDL](https://www.libsdl.org/) 后端，代替 lib/ptk 库。
   - 适配其它开源图形库，以获得更好的渲染性能。
+  - 优化内存占用。
+  - 优化性能。
 - 命令行工具
   - `lcui build --watch`：持续监听文件变更并自动重新构建。
   - `lcui dev-server`：与 webpack-dev-server 类似，将 LCUI 应用构建为网站以便开发者在浏览器中预览界面。
@@ -140,12 +142,11 @@ LCUI 及相关项目的部分功能设计参考了其它开源项目，你可以
 
 有很多方式可以为此项目的发展做贡献：
 
-- 完善 lib 目录中各个库的自述文档，内容包括但不仅限于补充示例代码、相关功能讲解、运行效果图等
-- [反馈问题](https://github.com/lc-soft/LCUI/issues)并在问题关闭时帮助我们验证它们是否已经修复
-- 在源码中搜索 [FIXME 注释](https://github.com/lc-soft/LCUI/search?l=C&q=FIXME)和 [TODO 注释](https://github.com/lc-soft/LCUI/search?l=C&q=TODO)，然后尝试解决它们
-- 在 [IssueHunt](https://issuehunt.io/r/lc-soft/LCUI) 上为感兴趣的 issue 设置悬赏，吸引其他开发者参与开发
-- 审查[源代码的改动](https://github.com/lc-soft/LCUI/pulls)
-- 修复已知问题
+- 完善 lib 目录中各个库的自述文档，内容包括但不仅限于补充示例代码、相关功能讲解、运行效果图等。
+- [反馈问题](https://github.com/lc-soft/LCUI/issues)并在问题关闭时帮助我们验证它们是否已经修复。
+- 在源码中搜索 [FIXME 注释](https://github.com/lc-soft/LCUI/search?l=C&q=FIXME)和 [TODO 注释](https://github.com/lc-soft/LCUI/search?l=C&q=TODO)，然后尝试解决它们。
+- 审查[源代码的改动](https://github.com/lc-soft/LCUI/pulls)。
+- 修复已知问题。
 
 本项目采用了参与者公约定义的行为准则，该文档应用于许多开源社区，有关更多信息，请参阅[《行为准则》](CODE_OF_CONDUCT.zh-cn.md)。
 
@@ -155,15 +156,21 @@ LCUI 及相关项目的部分功能设计参考了其它开源项目，你可以
 
 不是，你可以当成是一个应用了部分 Web 技术的传统 GUI 开发库。
 
-**都用上 TypeScript 语言了，那我为什么不直接用 Electron？**
-
-是的，如果你有 web 开发经验且愿意学习 Electron，显然 Electron 是最合适的选择。
-
-以 LCUI 现有的条件，除了满足作者的个人需求外，也就只适用于开发一些简单的小工具。
-
 **相比其它 GUI 库/框架，我为什么选择 LCUI？**
 
-建议优先考虑其它 GUI 库/框架。
+建议优先考虑其它 GUI 库/框架，因为 LCUI 目前缺少：
+
+- **丰富的预置组件：** 你需要从零开始实现界面中几乎所有的组件，开发成本较高。
+- **高效的图形渲染性能：** 界面内容较多且较大时，可能会出现卡顿。
+- **动画系统：** 界面没有动效反馈，影响交互体验。
+
+以 LCUI 现有的条件，除了满足作者的个人需求外，也就只适用于开发一些界面内容和交互都很简单的小工具。
+
+**都用上 TypeScript 语言了，那我为什么不直接用 Electron？**
+
+目前，TypeScript 语言主要用于描述界面和资源依赖，用到的 TypeScript 特性较少，并不需要你深入学习并它，大多数情况下你只需要参考示例代码进行编写。
+
+如果你有较丰富的 web 开发经验且愿意学习 Electron，显然 Electron 是最合适的选择。
 
 **建议添加 MacOS、Android 系统支持！**
 
