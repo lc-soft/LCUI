@@ -102,7 +102,7 @@ void test_scrollbar(void)
         ui_widget_resize(ui_root(), 800, 640);
         ui_load_css_string(test_css, __FILE__);
         build_content_view();
-        lcui_update_ui();
+        lcui_ui_update();
 
         content = ui_get_widget("license_content");
         left = content->computed_style.left;
@@ -112,20 +112,20 @@ void test_scrollbar(void)
         e.mouse.x = 300;
         e.mouse.y = 275;
         ui_dispatch_event(&e);
-        lcui_update_ui();
+        lcui_ui_update();
 
         e.type = UI_EVENT_MOUSEDOWN;
         e.mouse.button = MOUSE_BUTTON_LEFT;
         e.mouse.x = 300;
         e.mouse.y = 275;
         ui_dispatch_event(&e);
-        lcui_update_ui();
+        lcui_ui_update();
 
         e.type = UI_EVENT_MOUSEMOVE;
         e.mouse.x = 600;
         e.mouse.y = 275;
         ui_dispatch_event(&e);
-        lcui_update_ui();
+        lcui_ui_update();
 
         ctest_equal_bool("content should be moved to the left",
                          content->computed_style.left < left &&
@@ -144,7 +144,7 @@ void test_scrollbar(void)
         e.mouse.x = 400;
         e.mouse.y = 275;
         ui_dispatch_event(&e);
-        lcui_update_ui();
+        lcui_ui_update();
 
         ctest_equal_bool("content should be moved to the right",
                          content->computed_style.left > left &&
@@ -158,20 +158,20 @@ void test_scrollbar(void)
         e.mouse.x = 555;
         e.mouse.y = 45;
         ui_dispatch_event(&e);
-        lcui_update_ui();
+        lcui_ui_update();
 
         e.type = UI_EVENT_MOUSEDOWN;
         e.mouse.button = MOUSE_BUTTON_LEFT;
         e.mouse.x = 555;
         e.mouse.y = 45;
         ui_dispatch_event(&e);
-        lcui_update_ui();
+        lcui_ui_update();
 
         e.type = UI_EVENT_MOUSEMOVE;
         e.mouse.x = 555;
         e.mouse.y = 200;
         ui_dispatch_event(&e);
-        lcui_update_ui();
+        lcui_ui_update();
 
         ctest_equal_bool("content should be moved to the top",
                          content->computed_style.left == left &&
@@ -190,7 +190,7 @@ void test_scrollbar(void)
         e.mouse.x = 555;
         e.mouse.y = 100;
         ui_dispatch_event(&e);
-        lcui_update_ui();
+        lcui_ui_update();
 
         ctest_equal_bool("the content should have scrolled to the bottom",
                          content->computed_style.left == left &&

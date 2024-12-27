@@ -157,9 +157,9 @@ int main(int argc, char* argv[])
 	for (i = 0; i < 600; ++i) {
 		UpdateFrame(self.box);
 		lcui_process_timers();
-		lcui_update_ui();
-		lcui_render_ui();
-		app_present();
+		lcui_ui_update();
+		lcui_ui_render();
+		ptk_app_present();
 		++self.fps;
 		++self.color_index;
 	}

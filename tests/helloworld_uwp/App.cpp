@@ -2,8 +2,8 @@
 #include <LCUI.h>
 #include <ptk.h>
 #include <ui.h>
-#include <ui_widgets/text.h>
-#include <ui_widgets/textinput.h>
+#include <LCUI/widgets/text.h>
+#include <LCUI/widgets/textinput.h>
 #include <ui_xml.h>
 #include LCUI_APP_H
 

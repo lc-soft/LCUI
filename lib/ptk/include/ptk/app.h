@@ -23,10 +23,10 @@ PTK_PUBLIC int ptk_app_init(const wchar_t *name);
 PTK_PUBLIC int ptk_app_destroy(void);
 PTK_PUBLIC void ptk_set_instance(void *instance);
 PTK_PUBLIC ptk_app_id_t ptk_get_app_id(void);
-PTK_PUBLIC void app_present(void);
+PTK_PUBLIC void ptk_app_present(void);
 PTK_PUBLIC int ptk_init(const wchar_t *name);
 PTK_PUBLIC int ptk_run(void);
-PTK_PUBLIC void app_exit(int exit_code);
+PTK_PUBLIC void ptk_app_exit(int exit_code);
 PTK_PUBLIC void ptk_destroy(void);
 
 PTK_END_DECLS

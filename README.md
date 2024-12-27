@@ -20,8 +20,8 @@
 
 - [Table of contents](#table-of-contents)
 - [Introduction](#introduction)
-  - [Main Features](#main-features)
-  - [Overview of Features](#overview-of-features)
+  - [Key Features](#key-features)
+  - [Development Experience Preview](#development-experience-preview)
   - [Architecture](#architecture)
 - [Quick Start](#quick-start)
 - [Documentation](#documentation)
@@ -42,13 +42,13 @@ LCUI is a library written in C for building graphical user interfaces. Its goal 
 
 **LC** originates from the initials of the author's name. The library was initially designed to help the author develop small projects and gain development experience. However, the author did not gain a competitive advantage in the job market, which is crowded with C/C++ experts, and thus had to work in web front-end development. As a result, LCUI now leans towards integrating technologies from the web front-end domain.
 
-### Key Features  
+### Key Features
 
-- **Cross-platform:** Supports Windows and Linux.  
-- **Fully custom-drawn components:** Ensures consistent appearance and behavior of components across platforms.  
-- **DPI awareness:** Automatically scales the UI on high-resolution screens to maintain a clear display.  
-- **Built-in CSS engine:** Enables the use of CSS for defining UI styles and layouts, making it easier for developers with web development experience to get started.  
-- **Modern development tools:** Includes tools that allow you to build user interfaces using [TypeScript](https://lcui-dev.github.io/docs/guide/typescript) with JSX syntax, the React library, and other web frontend technologies.  
+- **Cross-platform:** Supports Windows and Linux.
+- **Fully custom-drawn components:** Ensures consistent appearance and behavior of components across platforms.
+- **DPI awareness:** Automatically scales the UI on high-resolution screens to maintain a clear display.
+- **Built-in CSS engine:** Enables the use of CSS for defining UI styles and layouts, making it easier for developers with web development experience to get started.
+- **Modern development tools:** Includes tools that allow you to build user interfaces using [TypeScript](https://lcui-dev.github.io/docs/guide/typescript) with JSX syntax, the React library, and other web frontend technologies.
 
 ### Development Experience Preview
 
@@ -56,7 +56,7 @@ You can get an overview of the development experience for LCUI applications from
 
 ![preview](preview.png)
 
-- **Component Development in React-like Style:** Writing UI configuration files using TypeScript. With the combined advantages of TypeScript, JSX syntax, and the LCUI React library, you can succinctly describe interface structure, resource dependencies, component states, data binding, and event binding.
+- **Component Development in React-like Style:** Writing UI configuration files using TypeScript. With the combined advantages of TypeScript, JSX syntax, and the LCUI React library, you can succinctly describe UI structure, resource dependencies, component states, data binding, and event binding.
 - **Various Stylesheet Writing Methods:** [Tailwind CSS](https://tailwindcss.com/), [CSS Modules](https://github.com/css-modules/css-modules), [Sass](https://sass-lang.com/), and global CSS.
 - **File-system based router:** Organize application pages in directory form, with each page corresponding to a directory. The path of the directory serves as the route for that page. With the built-in application router, you can easily implement page switching and navigation without manual route configuration.
 - **User-friendly and Modern Icon Library:** Icons are sourced from the [fluentui-system-icons](https://github.com/microsoft/fluentui-system-icons) library, with partial customization to fit LCUI's characteristics, offering similar usage patterns.
@@ -66,18 +66,26 @@ You can get an overview of the development experience for LCUI applications from
 
 Over time LCUI has been built up to be based on various libraries:
 
-- [lib/yutil](./lib/yutil): Utility library providing common data structures and functions.  
-- [lib/pandagl](./lib/pandagl): PandaGL (Panda Graphics Library), a graphics library offering font management, text layout, image processing, and rendering capabilities.  
-- [lib/css](./lib/css): CSS parser and selector engine, enabling CSS parsing and selection functionalities.  
-- [lib/ptk](./lib/ptk): Platform Toolkit library offering cross-platform unified system-related APIs, including message loops, window management, timers, worker threads, and input methods.  
-- [lib/thread](./lib/thread): Thread library offering cross-platform multithreading capabilities.  
-- [lib/ui](./lib/ui): Core UI library that manages UI components, event queues, style computation, drawing, and other essential UI functionalities.  
-- [lib/ui-xml](./lib/ui-xml): XML parsing library enabling the creation of UI components from XML file content.  
-- [lib/ui-cursor](./lib/ui-cursor): Cursor library providing cursor rendering capabilities.  
-- [lib/ui-server](./lib/ui-server): UI server that maps UI components to system windows.  
-- [lib/ui-router](./lib/ui-router): Router manager offering routing and navigation functionalities.  
-- [lib/ui-widgets](./lib/ui/widgets): Predefined basic component library offering essential UI components such as text, buttons, and scrollbars.  
-- [lib/worker](./lib/worker): Worker thread library providing simple communication and management for worker threads.  
+- [lib/yutil](./lib/yutil): Utility library providing common data structures and functions.
+- [lib/pandagl](./lib/pandagl): PandaGL (Panda Graphics Library), a graphics library offering font management, text layout, image processing, and rendering capabilities.
+- [lib/css](./lib/css): CSS parser and selector engine, enabling CSS parsing and selection functionalities.
+- [lib/ptk](./lib/ptk): Platform Toolkit library offering cross-platform unified system-related APIs, including message loops, window management, timers, worker threads, and input methods.
+- [lib/thread](./lib/thread): Thread library offering cross-platform multithreading capabilities.
+- [lib/router](./lib/ui-router): Router manager offering routing and navigation functionalities.
+- [lib/worker](./lib/worker): Worker thread library providing simple communication and management for worker threads.
+- [lib/ui](./lib/ui): Core UI library that manages UI components, event queues, style computation, drawing, and other essential UI functionalities.
+- [lib/ui-xml](./lib/ui-xml): XML parsing library enabling the creation of UI components from XML file content.
+- [lib/ui-cursor](./lib/ui-cursor): Cursor library providing cursor rendering capabilities.
+- [lib/ui-server](./lib/ui-server): UI server that maps UI components to system windows.
+
+The core source code of LCUI is located in the `src/` directory and is divided into the following modules:
+
+- **app:** Application lifecycle, event, and UI management.
+- **fonts:** Default font settings.
+- **settings:** Global settings, providing switches and parameter configurations for certain features.
+- **ui:** UI and window management.
+- **widgets:** Predefined components.
+- **worker:** Asynchronous task management.
 
 ## Quick Start
 
@@ -108,9 +116,9 @@ Follow the prompts provided by the commands afterward.
 
 ### Tutorials
 
-- [Todo List](https://lcui-dev.github.io/docs/next/tutorials/todolist): Learn the basic concepts and usage of LCUI, as well as how to use it to build interfaces and implement state management, interface updates, and interactions.
+- [Todo List](https://lcui-dev.github.io/docs/next/tutorials/todolist): Learn the basic concepts and usage of LCUI, as well as how to use it to build UI and implement state management, UI updates, and interactions.
 - [Rendering Fabric Animation](https://lcui-dev.github.io/docs/next/tutorials/render-fabric): Rewrite the existing fabric simulation program's JavaScript source code in C language, and use the cairo graphics library for fabric rendering. Then, apply LCUI to implement fabric animation playback and interaction.
-- [Browser](https://lcui-dev.github.io/docs/next/tutorials/browser): Referencing a web browser, use LCUI to implement similar interface structure, layout, style, and multi-tab management features. Utilize LCUI's routing management functionality to implement multi-tab page state management and navigation, as well as a simple file browsing page. **(This tutorial is outdated, contributions to update it are welcome)**
+- [Browser](https://lcui-dev.github.io/docs/next/tutorials/browser): Referencing a web browser, use LCUI to implement similar UI structure, layout, style, and multi-tab management features. Utilize LCUI's routing management functionality to implement multi-tab page state management and navigation, as well as a simple file browsing page. **(This tutorial is outdated, contributions to update it are welcome)**
 
 ### References
 
@@ -124,25 +132,27 @@ Some features of LCUI and related projects are inspired by other open-source pro
 
 Below are the items for potential future development:
 
-- **LCUI**  
-  - Improve API design.  
-  - Enhance the CSS engine to support `inherit` and `!important`.  
-  - Add an [SDL](https://www.libsdl.org/) backend to replace the lib/ptk library.  
-  - Adapt other open-source graphics libraries to achieve better rendering performance.  
-  - Optimize memory usage.  
-  - Improve performance.  
+- **LCUI**
 
-- **Command-Line Tools**  
-  - `lcui build --watch`: Continuously monitor file changes and automatically rebuild.  
-  - `lcui dev-server`: Similar to webpack-dev-server, build LCUI applications as websites to allow developers to preview interfaces in the browser.  
-  - Add build caching to rebuild only the modified files.  
+  - Improve API design.
+  - Enhance the CSS engine to support `inherit` and `!important`.
+  - Add an [SDL](https://www.libsdl.org/) backend to replace the lib/ptk library.
+  - Adapt other open-source graphics libraries to achieve better rendering performance.
+  - Optimize memory usage.
+  - Improve performance.
+
+- **Command-Line Tools**
+
+  - `lcui build --watch`: Continuously monitor file changes and automatically rebuild.
+  - `lcui dev-server`: Similar to webpack-dev-server, build LCUI applications as websites to allow developers to preview UI in the browser.
+  - Add build caching to rebuild only the modified files.
 
 - **React Component Library**  
-  Develop a component library for LCUI applications using TypeScript + React, inspired by some web frontend component libraries (e.g., [radix](https://www.radix-ui.com/), [shadcn/ui](https://ui.shadcn.com/)), and reuse components from the [LC Design](https://github.com/lcui-dev/lc-design) library.  
+  Develop a component library for LCUI applications using TypeScript + React, inspired by some web frontend component libraries (e.g., [radix](https://www.radix-ui.com/), [shadcn/ui](https://ui.shadcn.com/)), and reuse components from the [LC Design](https://github.com/lcui-dev/lc-design) library.
 
-- **Documentation**  
-  - Tutorials  
-  - Request for Comments (RFC)  
+- **Documentation**
+  - Tutorials
+  - Request for Comments (RFC)
 
 ## Contribution
 
@@ -158,19 +168,20 @@ Think LCUI is slow to update? there are many ways to [contribute](.github/CONTRI
 LCUI has adopted the code of conduct defined by the Contributor Covenant. This document is used across many open source communities, and we think it articulates our values well. For more, see the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## FAQ
-**Is this a browser engine? Or a development library like Electron that integrates a browser environment?**  
 
-No, you can think of it as a traditional GUI development library that incorporates some web technologies.  
+**Is this a browser engine? Or a development library like Electron that integrates a browser environment?**
 
-**Why should I choose LCUI over other GUI libraries/frameworks?**  
+No, you can think of it as a traditional GUI development library that incorporates some web technologies.
 
-It's recommended to prioritize other GUI libraries/frameworks, as LCUI currently lacks:  
+**Why should I choose LCUI over other GUI libraries/frameworks?**
 
-- **A rich set of built-in components:** You will need to build almost all the components in your interface from scratch, leading to higher development costs.  
-- **Efficient graphics rendering performance:** Interfaces with extensive and complex content may experience lag.  
-- **An animation system:** The lack of visual feedback affects the user interaction experience.  
+It's recommended to prioritize other GUI libraries/frameworks, as LCUI currently lacks:
 
-Given its current state, LCUI is best suited for fulfilling the author's personal needs or developing simple tools with minimal interface content and interactions.  
+- **A rich set of built-in components:** You will need to build almost all the components in your UI from scratch, leading to higher development costs.
+- **Efficient graphics rendering performance:** Interfaces with extensive and complex content may experience lag.
+- **An animation system:** The lack of visual feedback affects the user interaction experience.
+
+Given its current state, LCUI is best suited for fulfilling the author's personal needs or developing simple tools with minimal UI content and interactions.
 
 **Support development with TypeScript? If I know how to use it, why wouldn’t I just go with Electron?**
 
@@ -279,4 +290,4 @@ The following is a list of supported CSS features. Checked is supported (But doe
 
 ## License
 
-The LCUI Project is released under [the MIT License]((https://opensource.org/licenses/MIT)).
+The LCUI Project is released under [the MIT License](<(https://opensource.org/licenses/MIT)>).

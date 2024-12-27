@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <ui.h>
-#include <ui_widgets/text.h>
+#include <LCUI/widgets/text.h>
 
 int main(void)
 {

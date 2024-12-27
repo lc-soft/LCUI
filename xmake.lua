@@ -14,12 +14,11 @@ add_includedirs(
     "lib/i18n/include",
     "lib/ptk/include",
     "lib/worker/include",
+    "lib/router/include",
     "lib/ui/include",
     "lib/ui-server/include",
-    "lib/ui-widgets/include",
     "lib/ui-cursor/include",
     "lib/ui-xml/include",
-    "lib/ui-router/include",
     "include",
     {public = true}
 )
@@ -74,7 +73,7 @@ target("lcui_tests")
 
 target("lcui")
     set_kind("$(kind)")
-    add_files("src/*.c")
+    add_files("src/**.c")
     if is_kind("static") then
         set_configvar("LCUI_STATIC_BUILD", 1)
     elseif is_plat("windows") then
@@ -91,10 +90,9 @@ target("lcui")
         "libcss",
         "libi18n",
         "libui",
-        "libui-widgets",
         "libui-cursor",
         "libui-server",
-        "libui-router",
+        "librouter",
         "libui-xml"
     )
-    add_headerfiles("include/LCUI.h", "include/(LCUI/*.h)")
+    add_headerfiles("include/LCUI.h", "include/(LCUI/**.h)")

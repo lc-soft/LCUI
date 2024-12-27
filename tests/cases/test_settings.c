@@ -17,7 +17,7 @@ static void check_settings_frame_rate_cap(void *arg)
 {
 	char str[256];
 	int fps_limit = *((int *)arg);
-	int fps = (int)lcui_get_fps();
+	int fps = (int)lcui_app_get_fps();
 
 	sprintf(str, "should work when frame cap is %u (actual %u)", fps_limit,
 		fps);

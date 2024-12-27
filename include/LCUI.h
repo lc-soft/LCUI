@@ -13,11 +13,15 @@
 #include <css.h>
 #include <pandagl.h>
 #include <ui.h>
-#include <ui_widgets.h>
 #include <ui_cursor.h>
 #include <ui_server.h>
 #include <ui_xml.h>
 #include <thread.h>
 #include <ptk.h>
 #include <worker.h>
+#include <LCUI/worker.h>
 #include <LCUI/app.h>
+#include <LCUI/ui.h>
+#include <LCUI/widgets.h>
+#include <LCUI/settings.h>
+#include <LCUI/base.h>
