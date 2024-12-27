@@ -31,6 +31,7 @@ int main(int argc, char **argv)
 	ctest_describe("test text resize", test_text_resize);
 	ctest_describe("test textinput", test_textinput);
 	ctest_describe("test scrollbar", test_scrollbar);
+        ctest_describe("test router components", test_router_components);
 	ctest_describe("test widget rect", test_widget_rect);
 	ctest_describe("test block layout", test_block_layout);
 	ctest_describe("test flex layout", test_flex_layout);

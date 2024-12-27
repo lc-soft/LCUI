@@ -13,6 +13,7 @@
 
 #include <ui.h>
 #include <ui_server.h>
+#include <LCUI/settings.h>
 #include <LCUI/app.h>
 
 static lcui_settings_t lcui_settings;
@@ -32,7 +33,7 @@ void lcui_apply_settings(lcui_settings_t *settings)
 	    y_max(lcui_settings.parallel_rendering_threads, 1);
 	ui_server_set_threads(lcui_settings.parallel_rendering_threads);
 	ui_server_set_paint_flashing_enabled(lcui_settings.paint_flashing);
-	lcui_set_frame_rate_cap(lcui_settings.frame_rate_cap);
+	lcui_app_set_frame_rate_cap(lcui_settings.frame_rate_cap);
 }
 
 /* Reset global settings to their defaults. */

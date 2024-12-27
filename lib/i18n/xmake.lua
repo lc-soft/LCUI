@@ -20,7 +20,7 @@ target("libi18n")
         add_defines("LIBI18N_DLL_EXPORT")
     end
 
-target("libi18n-tests")
+target("libi18n_tests")
     set_default(false)
     set_kind("binary")
     add_files("tests/test.c")

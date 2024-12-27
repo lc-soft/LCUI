@@ -166,12 +166,12 @@ ptk_window_t *ptk_window_create(const wchar_t *title, int x, int y, int width,
         return linux_app.app.create_window(title, x, y, width, height, parent);
 }
 
-void app_present(void)
+void ptk_app_present(void)
 {
         linux_app.app.present();
 }
 
-void app_exit(int exit_code)
+void ptk_app_exit(int exit_code)
 {
         linux_app.app.exit(exit_code);
 }

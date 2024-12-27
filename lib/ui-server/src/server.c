@@ -735,6 +735,7 @@ void ui_server_update(void)
 void ui_server_init(void)
 {
         ui_cursor_init();
+        ui_server.num_rendering_threads = 4;
         ui_server.observer =
             ui_mutation_observer_create(ui_server_on_widget_mutation, NULL);
         ptk_on_event(PTK_EVENT_VISIBILITY_CHANGE,
@@ -760,6 +761,9 @@ void ui_server_init(void)
 
 void ui_server_set_threads(int threads)
 {
+        if (threads < 1) {
+                return;
+        }
         ui_server.num_rendering_threads = threads;
 }
 

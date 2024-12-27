@@ -12,6 +12,7 @@
 #ifndef LCUI_INCLUDE_LCUI_COMMON_H
 #define LCUI_INCLUDE_LCUI_COMMON_H
 
+#include <stddef.h>
 #include "config.h"
 
 #ifndef LCUI_API

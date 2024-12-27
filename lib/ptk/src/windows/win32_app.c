@@ -698,7 +698,7 @@ ptk_app_id_t ptk_get_app_id(void)
         return PTK_APP_ID_WIN32;
 }
 
-void app_present(void)
+void ptk_app_present(void)
 {
         list_node_t *node;
 
@@ -740,7 +740,7 @@ int ptk_app_init(const wchar_t *name)
         return 0;
 }
 
-void app_exit(int exit_code)
+void ptk_app_exit(int exit_code)
 {
         PostQuitMessage(exit_code);
 }
