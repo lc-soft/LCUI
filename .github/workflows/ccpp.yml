@@ -24,12 +24,6 @@ jobs:
         run: |
           git submodule update --init
 
-      - name: Restore xmake packages
-        uses: actions/cache@v4
-        with:
-          path: ${{ github.workspace }}/xmake-global/.xmake/packages
-          key: ${{ runner.os }}-xmake-packages
-
       - name: Install tools
         if: runner.os == 'Linux'
         run: |
@@ -44,12 +38,6 @@ jobs:
       - name: Configure for coverage mode
         if: runner.os == 'Linux'
         run: xmake config -y -k ${{ env.TARGET_KIND }} -m coverage --ci-env=y
-
-      - name: Cache xmake packages
-        uses: actions/cache@v4
-        with:
-          path: ${{ github.workspace }}/xmake-global/.xmake/packages
-          key: ${{ runner.os }}-xmake-packages
 
       - name: Build
         run: |
