@@ -1,7 +1,7 @@
 ﻿/*
  * lib/pandagl/src/image/reader.c: -- Image read operations set
  *
- * Copyright (c) 2018-2024, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2025, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *

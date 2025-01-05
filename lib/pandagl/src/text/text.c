@@ -1,7 +1,7 @@
 ﻿/*
  * lib/pandagl/src/text/text.c
  *
- * Copyright (c) 2018-2024, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2018-2025, Liu Chao <i@lc-soft.io> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *

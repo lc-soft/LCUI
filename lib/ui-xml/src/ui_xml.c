@@ -1,7 +1,7 @@
 ﻿/*
  * lib/ui-xml/src/ui_xml.c: -- the GUI build module, parse UI config code and build UI.
  *
- * Copyright (c) 2018-2024, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2025, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *

@@ -1,8 +1,7 @@
 ﻿/*
  * lib/pandagl/src/font/library.c: -- The font info and font bitmap cache
- * module.
  *
- * Copyright (c) 2018-2024, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2018-2025, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *

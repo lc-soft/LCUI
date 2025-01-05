@@ -1,7 +1,7 @@
 ﻿/*
  * lib/ptk/src/linux/mouse.h
  *
- * Copyright (c) 2024, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2024-2025, Liu Chao <i@lc-soft.io> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *

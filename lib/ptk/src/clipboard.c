@@ -1,7 +1,7 @@
 ﻿/*
  * lib/ptk/src/clipboard.c: -- Clipboard support
  *
- * Copyright (c) 2022-2024, Liu chao <lc-soft@live.cn> All rights reserved.
+ * Copyright (c) 2022-2025, Liu chao <lc-soft@live.cn> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *

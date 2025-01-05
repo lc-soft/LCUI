@@ -2,7 +2,7 @@
  * src/lcui_settings.c: -- global settings.
  *
  * Copyright (c) 2020, James Duong <duong.james@gmail.com>
- * Copyright (c) 2023-2024, Liu Chao <i@lc-soft.io>
+ * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io>
  * All rights reserved.
  *
  * SPDX-License-Identifier: MIT
