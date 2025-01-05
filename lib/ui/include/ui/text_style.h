@@ -28,7 +28,6 @@ typedef struct ui_text_style {
 	int font_size;
 	int line_height;
 	int *font_ids;
-	char *font_family;
 	wchar_t *content;
 	pd_color_t color;
 	uint8_t font_style;

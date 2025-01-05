@@ -13,26 +13,39 @@
 #include <ptk.h>
 #include <pandagl.h>
 
+bool lcui_fonts_set_default(const char *family_name)
+{
+        int id = pd_font_library_get_font_id(family_name, PD_FONT_STYLE_NORMAL,
+                                             PD_FONT_WEIGHT_NORMAL);
+        if (id < 0) {
+                return false;
+        }
+        pd_font_library_set_default_font(id);
+        pd_font_library_set_font_family_alias("system-ui", family_name);
+        return true;
+}
+
 #ifdef PTK_WIN32
 static void lcui_windows_fonts_init(void)
 {
         size_t i;
-        int *ids = NULL;
-        const char *names[] = { "Consola", "Simsun", "Microsoft YaHei", NULL };
         const char *fonts[] = { "C:/Windows/Fonts/consola.ttf",
+                                "C:/Windows/Fonts/consolai.ttf",
+                                "C:/Windows/Fonts/consolab.ttf",
+                                "C:/Windows/Fonts/consolaz.ttf",
                                 "C:/Windows/Fonts/simsun.ttc",
                                 "C:/Windows/Fonts/msyh.ttf",
-                                "C:/Windows/Fonts/msyh.ttc" };
+                                "C:/Windows/Fonts/msyh.ttc",
+                                "C:/Windows/Fonts/msyhbd.ttc",
+                                "C:/Windows/Fonts/msyhl.ttc" };
 
         for (i = 0; i < sizeof(fonts) / sizeof(char *); ++i) {
                 pd_font_library_load_file(fonts[i]);
         }
-        i = pd_font_library_query(&ids, PD_FONT_STYLE_NORMAL,
-                                  PD_FONT_WEIGHT_NORMAL, names);
-        if (i > 0) {
-                pd_font_library_set_default_font(ids[i - 1]);
-        }
-        free(ids);
+        lcui_fonts_set_default("Microsoft YaHei");
+        pd_font_library_set_font_family_alias("serif", "Simsun");
+        pd_font_library_set_font_family_alias("sans-serif", "Microsoft YaHei");
+        pd_font_library_set_font_family_alias("monospace", "Consola");
 }
 
 #else
@@ -42,24 +55,20 @@ static void lcui_windows_fonts_init(void)
 static void lcui_fc_fonts_init(void)
 {
         size_t i;
+        bool has_default = false;
         char *path;
-        int *ids = NULL;
-        const char *names[] = { "Noto Sans CJK", "Ubuntu",
-                                "WenQuanYi Micro Hei", NULL };
         const char *fonts[] = { "Ubuntu", "Noto Sans CJK SC",
                                 "WenQuanYi Micro Hei" };
 
         for (i = 0; i < sizeof(fonts) / sizeof(char *); ++i) {
                 path = pd_font_library_get_font_path(fonts[i]);
-                pd_font_library_load_file(path);
+                id = pd_font_library_load_file(path);
                 free(path);
+                // TODO: 使用系统已设置的默认字体
+                if (!has_default) {
+                        has_default = lcui_fonts_set_default(fonts[i]);
+                }
         }
-        i = pd_font_library_query(&ids, PD_FONT_STYLE_NORMAL,
-                                  PD_FONT_WEIGHT_NORMAL, names);
-        if (i > 0) {
-                pd_font_library_set_default_font(ids[i - 1]);
-        }
-        free(ids);
 }
 
 #else
@@ -67,9 +76,6 @@ static void lcui_fc_fonts_init(void)
 static void lcui_linux_fonts_init(void)
 {
         size_t i;
-        int *ids = NULL;
-        const char *names[] = { "Noto Sans CJK SC", "Ubuntu", "Ubuntu Mono",
-                                "WenQuanYi Micro Hei", NULL };
         const char *fonts[] = {
                 "/usr/share/fonts/truetype/ubuntu/Ubuntu-BI.ttf",
                 "/usr/share/fonts/truetype/ubuntu/Ubuntu-B.ttf",
@@ -100,12 +106,12 @@ static void lcui_linux_fonts_init(void)
         for (i = 0; i < sizeof(fonts) / sizeof(char *); ++i) {
                 pd_font_library_load_file(fonts[i]);
         }
-        i = pd_font_library_query(&ids, PD_FONT_STYLE_NORMAL,
-                                  PD_FONT_WEIGHT_NORMAL, names);
-        if (i > 0) {
-                pd_font_library_set_default_font(ids[i - 1]);
+        // TODO: 使用系统已设置的默认字体
+        if (!lcui_fonts_set_default("Noto Sans CJK SC")) {
+                lcui_fonts_set_default("Ubuntu");
         }
-        free(ids);
+        pd_font_library_set_font_family_alias("sans-serif", "Ubuntu");
+        pd_font_library_set_font_family_alias("monospace", "Ubuntu Mono");
 }
 #endif
 
