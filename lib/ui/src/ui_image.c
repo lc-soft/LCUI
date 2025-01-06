@@ -175,8 +175,7 @@ int ui_image_remove_event_listener(ui_image_t *image,
         ui_image_source_t *src = (ui_image_source_t *)image;
         ui_image_event_listener_t *listener;
 
-        for (node = list_get_first_node(&src->listeners); node;
-             node = next) {
+        for (node = list_get_first_node(&src->listeners); node; node = next) {
                 next = node->next;
                 listener = node->data;
                 if (listener->type == type && listener->handler == handler &&
@@ -257,12 +256,12 @@ void ui_load_images(void)
 
         do {
                 ui_image_loader.changed = false;
-        for (list_each(node, &ui_image_loader.images)) {
-                if (ui_image_loader.changed) {
+                for (list_each(node, &ui_image_loader.images)) {
+                        if (ui_image_loader.changed) {
                                 break;
+                        }
+                        ui_image_loader_load(node->data);
                 }
-                ui_image_loader_load(node->data);
-        }
         } while (ui_image_loader.changed);
 }
 

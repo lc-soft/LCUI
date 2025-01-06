@@ -35,7 +35,7 @@ static void pd_file_stream_on_close(void *data)
 
 pd_file_reader_t *pd_file_reader_create(void)
 {
-	return calloc(1, sizeof(pd_file_reader_t));
+        return calloc(1, sizeof(pd_file_reader_t));
 }
 
 pd_file_reader_t *pd_file_reader_create_from_file(const char *filename)
@@ -44,20 +44,20 @@ pd_file_reader_t *pd_file_reader_create_from_file(const char *filename)
         pd_file_reader_t *reader;
 
         fp = fopen(filename, "rb");
-	if (fp == NULL) {
-		return NULL;
-	}
-	reader = pd_file_reader_create();
+        if (fp == NULL) {
+                return NULL;
+        }
+        reader = pd_file_reader_create();
         reader->stream_data = fp;
         reader->fn_skip = pd_file_stream_on_skip;
         reader->fn_read = pd_file_stream_on_read;
         reader->fn_rewind = pd_file_stream_on_rewind;
         reader->fn_close = pd_file_stream_on_close;
-	return reader;
+        return reader;
 }
 
 void pd_file_reader_destroy(pd_file_reader_t *reader)
 {
-	reader->fn_close(reader->stream_data);
-	free(reader);
+        reader->fn_close(reader->stream_data);
+        free(reader);
 }
