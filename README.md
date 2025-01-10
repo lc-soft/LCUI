@@ -138,6 +138,7 @@ Below are the items for potential future development:
   - Enhance the CSS engine to support `inherit` and `!important`.
   - Add an [SDL](https://www.libsdl.org/) backend to replace the lib/ptk library.
   - Adapt other open-source graphics libraries to achieve better rendering performance.
+  - Multi language support for internationalization.
   - Optimize memory usage.
   - Improve performance.
 

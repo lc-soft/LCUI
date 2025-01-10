@@ -1,3 +1,50 @@
+# [3.0.0-alpha.0](https://github.com/lc-soft/LCUI/compare/v2.2.0...v3.0.0-alpha.0) (2025-01-10)
+
+- 更改命名风格为小写+下划线
+- 更改构建工具为 XMake
+- 更改架构为基于多个子库：
+    - lib/yutil
+    - lib/pandagl
+    - lib/css
+    - lib/i18n
+    - lib/ptk
+    - lib/thread
+    - lib/router
+    - lib/worker
+    - lib/ui
+    - lib/ui-xml
+    - lib/ui-cursor
+    - lib/ui-server
+- 重新设计 LCUI 和子库的接口
+- 使用 stdbool.h 中定义的布尔类型
+- **css:** 优化数据结构，减少内存占用
+- **css:** 添加值定义语法解析器
+- **css:** 更新属性解析器
+- **css:** 支持注册自定义属性
+- **css:** 支持使用 `\` 转义字符
+- **css:** 新增 `background` 简写属性
+- **css:** 新增 `border` 简写属性
+- **css:** 新增 `border-top/right/bottom/left` 简写属性
+- **css:** 新增 `background-clip` 属性
+- **css:** 新增 `inline-flex` 关键字
+- **worker:** 支持取消未执行的任务
+- **pandagl:** 支持设置字族别名
+- **ptk:** 新增剪切板模块
+- **ptk:** 新增 DPI 感知
+- **ui:** 新增变更观察器（UIMutationObserver）
+- **ui:** 改进图像异步加载和缓存管理
+- **ui:** 改进组件更新流程
+- **ui:** 改进布局计算流程
+- **ui:** 改进脏矩形收集
+- **ui-server:** 支持将组件与系统窗口绑定
+- **ui-server:** 支持每窗口 DPI 感知
+- **lcui/ui:** 改进全屏显示模式
+- **lcui/widgets:** 新增 `scrollarea` 组件，改进 `scrollbar` 组件的工作模式
+- **lcui/widgets:** 新增 `router-link` 和 `router-view` 组件
+- **lcui/widgets:** 更改文件 URI 格式为 `"file:///path/to/file"`
+- **lcui/widgets:** `textview` 组件更名为 `text`
+- **lcui/widgets:** `textedit` 组件更名为 `textinput`
+
 # [2.2.0](https://github.com/lc-soft/LCUI/compare/v2.1.0...v2.2.0) (2021-05-30)
 
 

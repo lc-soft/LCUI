@@ -1,3 +1,51 @@
+# [3.0.0-alpha.0](https://github.com/lc-soft/LCUI/compare/v2.2.0...v3.0.0-alpha.0) (2025-01-10)
+### Changelog (Updated with Present Tense)
+
+- Change naming style to `snake_case`  
+- Switch to using XMake as the build tool
+- Restructure architecture into multiple sub-libraries:  
+    - `lib/yutil`  
+    - `lib/pandagl`  
+    - `lib/css`  
+    - `lib/i18n`  
+    - `lib/ptk`  
+    - `lib/thread`  
+    - `lib/router`  
+    - `lib/worker`  
+    - `lib/ui`  
+    - `lib/ui-xml`  
+    - `lib/ui-cursor`  
+    - `lib/ui-server`  
+- Redesign the interfaces of LCUI and its sub-libraries  
+- Introduce the boolean type defined in `stdbool.h`  
+- **css:** Optimize data structures to reduce memory usage  
+- **css:** Add a value definition syntax parser  
+- **css:** Update property parsers  
+- **css:** Add support for registering custom properties  
+- **css:** Add support for the escape character `\`  
+- **css:** Add shorthand property `background`  
+- **css:** Add shorthand property `border`  
+- **css:** Add shorthand properties for `border-top/right/bottom/left`  
+- **css:** Add the `background-clip` property  
+- **css:** Add the `inline-flex` keyword  
+- **worker:** Add support for canceling unexecuted tasks  
+- **pandagl:** Add support for setting font family aliases  
+- **ptk:** Add clipboard module  
+- **ptk:** Add DPI awareness  
+- **ui:** Add UIMutationObserver
+- **ui:** Improve asynchronous image loading and cache management  
+- **ui:** Improve widet update processes  
+- **ui:** Improve layout calculation processes  
+- **ui:** Improve dirty rectangle collection  
+- **ui-server:** Add support for binding widets to system windows  
+- **ui-server:** Add per-window DPI awareness  
+- **lcui/ui:** Improve fullscreen mode  
+- **lcui/widgets:** Add `scrollarea` widet and improve the working mode of the `scrollbar` widet  
+- **lcui/widgets:** Add `router-link` and `router-view` widets  
+- **lcui/widgets:** Change file URI format to `"file:///path/to/file"`  
+- **lcui/widgets:** Rename `textview` widet to `text`  
+- **lcui/widgets:** Rename `textedit` widet to `textinput`  
+
 # [2.2.0](https://github.com/lc-soft/LCUI/compare/v2.1.0...v2.2.0) (2021-05-30)
 
 
