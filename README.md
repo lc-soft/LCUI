@@ -20,13 +20,13 @@
 
 - [Table of contents](#table-of-contents)
 - [Introduction](#introduction)
-  - [Key Features](#key-features)
-  - [Development Experience Preview](#development-experience-preview)
-  - [Architecture](#architecture)
+    - [Key Features](#key-features)
+    - [Development Experience Preview](#development-experience-preview)
+    - [Architecture](#architecture)
 - [Quick Start](#quick-start)
 - [Documentation](#documentation)
-  - [Tutorials](#tutorials)
-  - [References](#references)
+    - [Tutorials](#tutorials)
+    - [References](#references)
 - [Roadmap](#roadmap)
 - [Contribution](#contribution)
 - [FAQ](#faq)
@@ -178,11 +178,13 @@ No, you can think of it as a traditional GUI development library that incorporat
 
 It's recommended to prioritize other GUI libraries/frameworks, as LCUI currently lacks:
 
-- **A rich set of built-in components:** You will need to build almost all the components in your UI from scratch, leading to higher development costs.
-- **Efficient graphics rendering performance:** Interfaces with extensive and complex content may experience lag.
-- **An animation system:** The lack of visual feedback affects the user interaction experience.
+- **Rich Built-in Components:** You will need to build almost all the components in your UI from scratch, leading to higher development costs.
+- **Efficient Graphics Rendering Performance:** Interfaces with extensive and complex content may experience lag.
+- **Animation System:** The lack of visual feedback affects the user interaction experience.
+- **Detailed and User-friendly Documentation**: The existing documentation and examples are only for a simple understanding. If you want to study in depth, you need to read the source code, so the learning cost is relatively high.
+- **Active Updates**: Limited by the maintainer's personal interests and time, the update frequency of this project is very low. Therefore, the functional requirements or bugs you submit may not necessarily be resolved, especially those in the old versions.
 
-Given its current state, LCUI is best suited for fulfilling the author's personal needs or developing simple tools with minimal UI content and interactions.
+Given its current state, LCUI is best suited for fulfilling the maintainer's personal needs or developing simple tools with minimal UI content and interactions.
 
 **Support development with TypeScript? If I know how to use it, why wouldn’t I just go with Electron?**
 
