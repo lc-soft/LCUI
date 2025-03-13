@@ -62,7 +62,7 @@ static void lcui_fc_fonts_init(void)
 
         for (i = 0; i < sizeof(fonts) / sizeof(char *); ++i) {
                 path = pd_font_library_get_font_path(fonts[i]);
-                id = pd_font_library_load_file(path);
+                pd_font_library_load_file(path);
                 free(path);
                 // TODO: 使用系统已设置的默认字体
                 if (!has_default) {
