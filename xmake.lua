@@ -79,6 +79,9 @@ target("lcui")
     elseif is_plat("windows") then
         add_defines("LCUI_DLL_EXPORT")
     end
+    if has_package("fontconfig") then
+        add_defines("HAVE_FONTCONFIG")
+    end
     add_configfiles("src/config.h.in")
     set_configdir("include/LCUI")
     add_deps(
