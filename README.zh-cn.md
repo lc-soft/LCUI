@@ -1,6 +1,6 @@
 <p align="center">
   <a href="http://lcui.org/">
-    <img src="https://lcui.lc-soft.io/static/images/lcui-logo-lg.png" alt="" width=72 height=72>
+    <img src="https://lcui.org/img/logo.png" alt="logo" width=72 height=72>
   </a>
   <h3 align="center">LCUI</h3>
   <p align="center">
@@ -26,17 +26,12 @@
 - [快速体验](#%E5%BF%AB%E9%80%9F%E4%BD%93%E9%AA%8C)
 - [文档](#%E6%96%87%E6%A1%A3)
     - [教程](#%E6%95%99%E7%A8%8B)
-    - [参考资料](#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
 - [路线图](#%E8%B7%AF%E7%BA%BF%E5%9B%BE)
 - [贡献](#%E8%B4%A1%E7%8C%AE)
 - [常见问题](#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98)
 - [许可](#%E8%AE%B8%E5%8F%AF)
 
-<!-- /TOC -->
-
-## 介绍
-
-LCUI 是一个用 C 语言编写的用于构建图形用户界面的库。它的定位是探索和实践新的用户界面开发方式，以体积小、易于使用、提供便捷的开发工具为特点，帮助开发者快速开发带有图形用户界面的桌面端应用程序。
+<!-- /TOC -->用户界面的桌面端应用程序。
 
 **LC** 源自作者名字首字母，设计之初的目的是为了方便作者开发一些小项目和积累开发经验，不过遗憾的是作者并没有因此在 C/C++ 高手众多的就业环境下获得足够竞争优势，于是只能从事 Web 前端开发工作，也正是因为如此，LCUI 现在的发展方向偏向于融合 Web 前端领域的技术。
 
@@ -114,17 +109,46 @@ lcui create my-lcui-app
 
 ### 教程
 
-- [待办清单](https://lcui-dev.github.io/docs/next/tutorials/todolist)：学习 LCUI 的基本概念和用法，以及如何使用它构建界面，并实现状态管理、界面更新和交互。
-- [渲染布料动画](https://lcui-dev.github.io/docs/next/tutorials/render-fabric)：参照现有的布料模拟程序的 JavaScript 源码，以 C 语言重新编写，并采用 cairo 图形库进行布料渲染，再运用 LCUI 实现布料动画的播放和交互。
-- [浏览器](https://lcui-dev.github.io/docs/next/tutorials/browser)：参照网页浏览器，用 LCUI 实现与之类似的界面结构、布局、样式和多标签管理功能，并运用 LCUI 路由管理功能实现多标签页的状态管理和导航，以及一个简单的文件浏览页面。**（该教程已过时，欢迎参与更新）**
-
-### 参考资料
-
-LCUI 及相关项目的部分功能设计参考了其它开源项目，你可以查看它们的文档以了解基本概念和用法。
-
-- [DirectXTK](https://github.com/Microsoft/DirectXTK/wiki/StepTimer)：步进定时器的源码参考。
-- [Vue Router](https://router.vuejs.org/zh/guide/)：路由管理器的参考，[部分功能的实现](https://github.com/search?q=repo%3Alc-soft%2FLCUI+vuejs%2Fvue-router&type=code)还参考了 Vue Router 的源码。
-- [Next.js](https://nextjs.org/docs/app/building-your-application/routing)：路由定义方式的参考。
+<table>
+  <thead>
+    <tr>
+      <th width="140">标题</th>
+      <th>预览</th>
+      <th>简介</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <a href="https://lcui-dev.github.io/docs/tutorials/kantu">图像查看器</a>
+      </td>
+      <td><img src="./examples/kantu.jpg" alt="kantu" /></td>
+      <td>基于 LCUI 库开发一个图像查看器程序，用 Web 技术为其构建图形界面，用 C 语言实现界面交互逻辑和各项功能，深入发掘 LCUI 在 UI 方面的特性和开发技巧。</td>
+    </tr>
+    <tr>
+      <td>
+        <a href="https://lcui-dev.github.io/docs/tutorials/todolist">待办清单</a>
+      </td>
+      <td><img src="./examples/todolist.jpg" alt="kantu" /></td>
+      <td>学习 LCUI 的基本概念和用法，以及如何使用它构建界面，并实现状态管理、界面更新和交互。</td>
+    </tr>
+    <tr>
+      <td>
+        <a href="https://lcui-dev.github.io/docs/tutorials/render-fabric">渲染布料动画</a>
+      </td>
+      <td><img src="./examples/fabric.jpg" alt="kantu" /></td>
+      <td>参照现有的布料模拟程序的 JavaScript 源码，以 C 语言重新编写，并采用 cairo 图形库进行布料渲染，再运用 LCUI 实现布料动画的播放和交互。</td>
+    </tr>
+    <tr>
+      <td>
+        <a href="https://lcui-dev.github.io/docs/2.x/tutorial/browser">浏览器</a>
+        <b>(已过时)</b>
+      </td>
+      <td><img src="./examples/browser.jpg" alt="browser" /></td>
+      <td>参照网页浏览器，用 LCUI 实现与之类似的界面结构、布局、样式和多标签管理功能，并运用 LCUI 路由管理功能实现多标签页的状态管理和导航，以及一个简单的文件浏览页面。</td>
+    </tr>
+  </tbody>
+</table>
 
 ## 路线图
 
@@ -160,6 +184,10 @@ LCUI 及相关项目的部分功能设计参考了其它开源项目，你可以
 本项目采用了参与者公约定义的行为准则，该文档应用于许多开源社区，有关更多信息，请参阅[《行为准则》](CODE_OF_CONDUCT.zh-cn.md)。
 
 ## 常见问题
+
+**编译报错了**
+
+本项目的构建配置加入了"将警告视为错误"编译选项，可能是因为你的编译器比较新，能够从代码中发现更多问题。你可以尝试搜索所有包含 `set_warnings("all", "error")` 的 xmake.lua 文件然后将这项规则删除。
 
 **这是一个浏览器内核吗？或者是像 Electron 这样的集成了浏览器环境的开发库？**
 

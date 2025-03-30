@@ -1,6 +1,6 @@
 <p align="center">
   <a href="http://lcui.org/">
-    <img src="https://lcui.lc-soft.io/static/images/lcui-logo-lg.png" alt="" width=72 height=72>
+    <img src="https://lcui.org/img/logo.png" alt="logo" width=72 height=72>
   </a>
   <h3 align="center">LCUI</h3>
   <p align="center">
@@ -26,7 +26,6 @@
 - [Quick Start](#quick-start)
 - [Documentation](#documentation)
     - [Tutorials](#tutorials)
-    - [References](#references)
 - [Roadmap](#roadmap)
 - [Contribution](#contribution)
 - [FAQ](#faq)
@@ -116,17 +115,46 @@ Follow the prompts provided by the commands afterward.
 
 ### Tutorials
 
-- [Todo List](https://lcui-dev.github.io/docs/next/tutorials/todolist): Learn the basic concepts and usage of LCUI, as well as how to use it to build UI and implement state management, UI updates, and interactions.
-- [Rendering Fabric Animation](https://lcui-dev.github.io/docs/next/tutorials/render-fabric): Rewrite the existing fabric simulation program's JavaScript source code in C language, and use the cairo graphics library for fabric rendering. Then, apply LCUI to implement fabric animation playback and interaction.
-- [Browser](https://lcui-dev.github.io/docs/next/tutorials/browser): Referencing a web browser, use LCUI to implement similar UI structure, layout, style, and multi-tab management features. Utilize LCUI's routing management functionality to implement multi-tab page state management and navigation, as well as a simple file browsing page. **(This tutorial is outdated, contributions to update it are welcome)**
-
-### References
-
-Some features of LCUI and related projects are inspired by other open-source projects. You can refer to their documentation to understand the basic concepts and usage.
-
-- [DirectXTK](https://github.com/Microsoft/DirectXTK/wiki/StepTimer): Source code reference for the step timer.
-- [Vue Router](https://router.vuejs.org/zh/guide/): Reference for the router manager. [Some functionalities](https://github.com/search?q=repo%3Alc-soft%2FLCUI+vuejs%2Fvue-router&type=code) also reference the source code of Vue Router.
-- [Next.js](https://nextjs.org/docs/app/building-your-application/routing): Reference for route definition methods.
+<table>
+  <thead>
+    <tr>
+      <th width="140">Title</th>
+      <th>Preview</th>
+      <th>Summary</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <a href="https://lcui-dev.github.io/docs/tutorials/kantu">Image Viewer</a>
+      </td>
+      <td><img src="./examples/kantu.jpg" alt="kantu" /></td>
+      <td>Develop an image viewer program based on the LCUI library, build its graphical interface with web technologies, implement the interface interaction logic and various functions with C language, and deeply explore the features and development techniques of LCUI in the UI aspect.</td>
+    </tr>
+    <tr>
+      <td>
+        <a href="https://lcui-dev.github.io/docs/tutorials/todolist">Todo List</a>
+      </td>
+      <td><img src="./examples/todolist.jpg" alt="kantu" /></td>
+      <td>Learn the basic concepts and usage of LCUI, as well as how to use it to build UI and implement state management, UI updates, and interactions.</td>
+    </tr>
+    <tr>
+      <td>
+        <a href="https://lcui-dev.github.io/docs/tutorials/render-fabric">Fabric</a>
+      </td>
+      <td><img src="./examples/fabric.jpg" alt="kantu" /></td>
+      <td>Rewrite the existing fabric simulation program's JavaScript source code in C language, and use the cairo graphics library for fabric rendering. Then, apply LCUI to implement fabric animation playback and interaction.</td>
+    </tr>
+    <tr>
+      <td>
+        <a href="https://lcui-dev.github.io/docs/2.x/tutorial/browser">Browser</a>
+        <b>(Outdated)</b>
+      </td>
+      <td><img src="./examples/browser.jpg" alt="browser" /></td>
+      <td>Referencing a web browser, use LCUI to implement similar UI structure, layout, style, and multi-tab management features. Utilize LCUI's routing management functionality to implement multi-tab page state management and navigation, as well as a simple file browsing page.</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Roadmap
 
@@ -169,6 +197,12 @@ Think LCUI is slow to update? there are many ways to [contribute](.github/CONTRI
 LCUI has adopted the code of conduct defined by the Contributor Covenant. This document is used across many open source communities, and we think it articulates our values well. For more, see the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## FAQ
+
+**Compilation error**
+
+The build configuration of this project has included the "Treat Warnings as Errors" compilation option. This might be because your compiler is relatively new and can detect more issues from the code. 
+
+You can try to search for all xmake.lua files that contain `set_warnings("all", "error")` and remove this rule.
 
 **Is this a browser engine? Or a development library like Electron that integrates a browser environment?**
 
