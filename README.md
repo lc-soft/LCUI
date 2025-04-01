@@ -14,25 +14,6 @@
   </p>
 </p>
 
-## Table of contents
-
-<!-- TOC -->
-
-- [Table of contents](#table-of-contents)
-- [Introduction](#introduction)
-    - [Key Features](#key-features)
-    - [Development Experience Preview](#development-experience-preview)
-    - [Architecture](#architecture)
-- [Quick Start](#quick-start)
-- [Documentation](#documentation)
-    - [Tutorials](#tutorials)
-- [Roadmap](#roadmap)
-- [Contribution](#contribution)
-- [FAQ](#faq)
-- [License](#license)
-
-<!-- /TOC -->
-
 ## Introduction
 
 [中文版说明文档](README.zh-cn.md)
