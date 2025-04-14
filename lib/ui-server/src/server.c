@@ -48,7 +48,15 @@ typedef struct ui_dirty_layer {
         int dirty;
 } ui_dirty_layer_t;
 
+typedef enum {
+        UI_CONNECTION_STATE_PENDING,
+        UI_CONNECTION_STATE_INITIALIZING,
+        UI_CONNECTION_STATE_INITIALIZED,
+} ui_connection_state_t;
+
 typedef struct ui_connection {
+        ui_connection_state_t state;
+
         /** whether new content has been rendered */
         bool rendered;
 
@@ -173,7 +181,7 @@ static void ui_server_on_window_visibility_change(ptk_event_t *e, void *arg)
         ui_connection_t *conn;
 
         conn = ui_server_find_connection(NULL, e->window);
-        if (conn) {
+        if (conn && conn->state == UI_CONNECTION_STATE_INITIALIZED) {
                 conn->window_visible = e->visibility_change.visible;
                 if (conn->window_visible) {
                         ui_widget_show(conn->widget);
@@ -208,10 +216,9 @@ static void ui_server_on_window_resize(ptk_event_t *e, void *arg)
         float scale, width, height;
 
         conn = ui_server_find_connection(NULL, e->window);
-        if (!conn) {
+        if (!conn || conn->state != UI_CONNECTION_STATE_INITIALIZED) {
                 return;
         }
-
         scale = css_metrics_actual_scale(&conn->updater->metrics);
         width = e->size.width / scale;
         height = e->size.height / scale;
@@ -289,47 +296,26 @@ static void ui_server_on_destroy_widget(ui_widget_t *widget, ui_event_t *e,
 static void ui_server_refresh_window(ui_connection_t *conn)
 {
         pd_rect_t rect;
+        float scale = css_metrics_actual_scale(&conn->updater->metrics);
 
         ui_widget_mark_dirty_rect(conn->widget, NULL, UI_BOX_TYPE_GRAPH_BOX);
         ui_compute_rect(&rect, &conn->widget->canvas_box);
         ptk_window_set_title(conn->window, conn->widget->title);
-        ptk_window_set_size(conn->window, rect.width, rect.height);
         if (conn->widget->computed_style.type_bits.top == CSS_TOP_AUTO) {
-                rect.y = (ptk_screen_get_height() - rect.height) / 2;
+                rect.y =
+                    (int)((ptk_screen_get_height() - rect.height * scale) / 2);
         }
         if (conn->widget->computed_style.type_bits.left == CSS_LEFT_AUTO) {
-                rect.x = (ptk_screen_get_width() - rect.width) / 2;
+                rect.x =
+                    (int)((ptk_screen_get_width() - rect.width * scale) / 2);
         }
+        ptk_window_set_size(conn->window, rect.width, rect.height);
         ptk_window_set_position(conn->window, rect.x, rect.y);
-        conn->window_visible = ui_widget_is_visible(conn->widget);
-        if (conn->window_visible) {
-                ptk_window_show(conn->window);
-        } else {
-                ptk_window_hide(conn->window);
-        }
         ptk_window_activate(conn->window);
-}
-
-static void ui_server_on_widget_ready(ui_widget_t *w, ui_event_t *e, void *arg)
-{
-        list_node_t *node;
-        ui_connection_t *conn;
-
-        // 考虑到连接可能会在组件 ready 事件之前被销毁，
-        // 所以从连接列表中查找以确认连接是否存在
-        for (list_each(node, &ui_server.connections)) {
-                conn = node->data;
-                if (conn || conn->widget == w) {
-                        ui_server_refresh_window(conn);
-                        logger_debug("[ui-server] [window %p] refresh\n",
-                                     conn->window);
-                }
-        }
 }
 
 void ui_server_connect(ui_widget_t *widget, ptk_window_t *window)
 {
-        ui_event_t e = { 0 };
         ui_connection_t *conn;
         ui_mutation_observer_init_t options = { 0 };
 
@@ -337,20 +323,16 @@ void ui_server_connect(ui_widget_t *widget, ptk_window_t *window)
         conn->window = window;
         conn->widget = widget;
         conn->rendered = false;
-        conn->window_visible = false;
         conn->updater = ui_updater_create();
         conn->updater->metrics.dpi = 1.f * ptk_window_get_dpi(window);
+        conn->state = UI_CONNECTION_STATE_PENDING;
+        conn->window_visible = ui_widget_is_visible(widget);
         options.properties = true;
         list_create(&conn->flash_rects);
         list_append(&ui_server.connections, conn);
         ui_widget_on(widget, "destroy", ui_server_on_destroy_widget, NULL);
         ui_mutation_observer_observe(ui_server.observer, widget, options);
-        ui_widget_on(widget, "ready", ui_server_on_widget_ready, NULL);
-        if (widget->state == UI_WIDGET_STATE_NORMAL) {
-                e.type = UI_EVENT_READY;
-                e.target = widget;
-                ui_post_event(&e, NULL, NULL);
-        }
+        // 在同步前处理所有消息，包括窗口位置、大小变更消息，避免在初次更新时组件的位置和尺寸被窗口覆盖
         ptk_process_native_events(PTK_PROCESS_EVENTS_ALL_IF_PRESENT);
         logger_debug("[ui-server] [window %p] connect widget(%p, %s)\n", window,
                      widget, widget->type);
@@ -609,13 +591,15 @@ static int window_mutation_list_add(list_t *list,
 {
         list_node_t *node;
         ptk_window_t *wnd;
+        ui_connection_t *conn;
         ui_widget_t *widget = mutation->target;
         window_mutation_record_t *wnd_mutation = NULL;
 
-        wnd = ui_server_get_window(widget);
-        if (!wnd) {
+        conn = ui_server_find_connection(widget, NULL);
+        if (!conn || conn->state != UI_CONNECTION_STATE_INITIALIZED) {
                 return -1;
         }
+        wnd = conn->window;
         for (list_each(node, list)) {
                 wnd_mutation = node->data;
                 if (wnd_mutation->window == wnd) {
@@ -725,6 +709,11 @@ void ui_server_update(void)
                         conn = node->data;
                         ui_metrics.dpi = 1.f * ptk_window_get_dpi(conn->window);
                         ui_updater_update(conn->updater, conn->widget);
+                        if (conn->state == UI_CONNECTION_STATE_PENDING) {
+                                conn->state = UI_CONNECTION_STATE_INITIALIZING;
+                                ui_server_refresh_window(conn);
+                                conn->state = UI_CONNECTION_STATE_INITIALIZED;
+                        }
                 }
         } else {
                 ui_update();

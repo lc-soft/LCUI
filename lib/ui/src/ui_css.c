@@ -17,24 +17,23 @@
 #include <ui/events.h>
 #include "ui_css.h"
 
-const char *ui_default_css = css_string(
-
-* {
-	width: auto;
-	height:	auto;
-	background-color: transparent;
-	border: 0px solid transparent;
-	display: block;
-	position: static;
-	padding: 0;
-	margin: 0;
-}
-
-root {
-	box-sizing: border-box;
-}
-
-);
+const char *ui_default_css = "\
+* {\
+	width: auto;\
+	height:	auto;\
+	background-color: transparent;\
+	border: 0px solid transparent;\
+	display: block;\
+	position: static;\
+	padding: 0;\
+	margin: 0;\
+}\
+\
+root {\
+	box-sizing: border-box;\
+	width: 800px;\
+	height: 600px;\
+}";
 
 static void ui_on_parsed_font_face(const css_font_face_t *face)
 {

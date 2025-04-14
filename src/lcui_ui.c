@@ -16,6 +16,7 @@
 #include <thread.h>
 #include <ui_server.h>
 #include <LCUI/ui.h>
+#include <LCUI/worker.h>
 
 #define DEFAULT_WINDOW_WIDTH 800
 #define DEFAULT_WINDOW_HEIGHT 600
@@ -198,8 +199,6 @@ void lcui_ui_init(void)
 
         ui_init();
         ui_server_init();
-        ui_widget_resize(ui_root(), DEFAULT_WINDOW_WIDTH,
-                         DEFAULT_WINDOW_HEIGHT);
         list_create(&lcui_ui.windows);
         lcui_ui_set_display(LCUI_DISPLAY_DEFAULT);
         ptk_on_event(PTK_EVENT_CLOSE, lcui_ui_on_window_destroy, NULL);
