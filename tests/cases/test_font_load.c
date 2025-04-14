@@ -174,7 +174,7 @@ void test_font_load(void)
 {
         pd_font_library_init();
         /* 测试是否能够从字体文件中载入字体 */
-        ctest_equal_int("check pd_font_library_load_file success",
+        ctest_equal_int("check pd_font_library_load_file() success",
                         pd_font_library_load_file("test_font_load.ttf"), 0);
 #ifdef PTK_WIN32
         ctest_describe("test segoe ui font load", test_segoe_ui_font_load);
@@ -184,9 +184,9 @@ void test_font_load(void)
 
         ui_init();
         /* 测试是否能够根据 CSS 文件中定义的 @font-face 规则来载入字体 */
-        ctest_equal_int("check LCUIFont_LoadCSSFile success",
+        ctest_equal_int("check ui_load_css_file() success",
                         ui_load_css_file("test_font_load.css"), 0);
-        ctest_equal_bool("check pd_font_library_get_font_id success",
+        ctest_equal_bool("check pd_font_library_get_font_id() success",
                          pd_font_library_get_font_id("icomoon", 0, 0) > 0,
                          true);
         ui_destroy();
