@@ -651,7 +651,7 @@ int pd_font_library_load_file(const char *filepath)
         }
         num_fonts = fontlib.engine->open(filepath, &fonts);
         if (num_fonts < 1) {
-                logger_debug("[font] failed to load file: %s\n", filepath);
+                logger_error("[font] failed to load file: %s\n", filepath);
                 return -2;
         }
         for (i = 0; i < num_fonts; ++i) {
