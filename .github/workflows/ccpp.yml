@@ -33,11 +33,11 @@ jobs:
 
       - name: Configure
         if: runner.os == 'Windows'
-        run: xmake config -y -k ${{ env.TARGET_KIND }} -m release --ci-env=y
+        run: xmake config -y -v -k ${{ env.TARGET_KIND }} -m release --ci-env=y
 
       - name: Configure for coverage mode
         if: runner.os == 'Linux'
-        run: xmake config -y -k ${{ env.TARGET_KIND }} -m coverage --ci-env=y
+        run: xmake config -y -v -k ${{ env.TARGET_KIND }} -m coverage --ci-env=y
 
       - name: Build
         run: |
