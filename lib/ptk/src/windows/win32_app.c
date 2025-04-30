@@ -329,6 +329,7 @@ static LRESULT CALLBACK ptk_window_process(HWND hwnd, UINT msg, WPARAM arg1,
                 info->min_height = MIN_HEIGHT;
                 info->max_width = GetSystemMetrics(SM_CXMAXTRACK);
                 info->max_height = GetSystemMetrics(SM_CYMAXTRACK);
+                ptk_process_event(&e);
                 convert_client_size_to_window_size(wnd, &info->min_width,
                                                    &info->min_height);
                 convert_client_size_to_window_size(wnd, &info->max_width,
@@ -345,7 +346,7 @@ static LRESULT CALLBACK ptk_window_process(HWND hwnd, UINT msg, WPARAM arg1,
                         style &= ~WS_MAXIMIZEBOX;
                 }
                 SetWindowLong(hwnd, GWL_STYLE, style);
-                break;
+                return 0;
         }
         case WM_DPICHANGED: {
                 RECT *const new_rect = (RECT *)arg2;

@@ -239,7 +239,6 @@ static void ui_server_on_window_dpi_changed(ptk_event_t *e, void *arg)
 
 static void ui_server_on_window_minmaxinfo(ptk_event_t *e, void *arg)
 {
-        bool resizable = false;
         int width, height;
         ui_widget_t *widget;
         css_computed_style_t *style;
@@ -258,32 +257,25 @@ static void ui_server_on_window_minmaxinfo(ptk_event_t *e, void *arg)
                 e->minmaxinfo.min_width = ui_compute(style->min_width);
                 if (width < e->minmaxinfo.min_width) {
                         width = e->minmaxinfo.min_width;
-                        resizable = true;
                 }
         }
         if (IS_CSS_FIXED_LENGTH(style, max_width)) {
                 e->minmaxinfo.max_width = ui_compute(style->max_width);
                 if (width > e->minmaxinfo.max_width) {
                         width = e->minmaxinfo.max_width;
-                        resizable = true;
                 }
         }
         if (IS_CSS_FIXED_LENGTH(style, min_height)) {
                 e->minmaxinfo.min_height = ui_compute(style->min_height);
                 if (height < e->minmaxinfo.min_height) {
                         height = e->minmaxinfo.min_height;
-                        resizable = true;
                 }
         }
         if (IS_CSS_FIXED_LENGTH(style, max_height)) {
                 e->minmaxinfo.max_height = ui_compute(style->max_height);
                 if (height > e->minmaxinfo.max_height) {
                         height = e->minmaxinfo.max_height;
-                        resizable = true;
                 }
-        }
-        if (resizable) {
-                ptk_window_set_size(e->window, width, height);
         }
 }
 
