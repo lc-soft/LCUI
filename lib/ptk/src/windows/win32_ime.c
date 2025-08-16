@@ -35,6 +35,9 @@ static void ptk_win32ime_on_char(MSG *msg, void *arg)
 {
 	wchar_t text[2];
 
+	if (GetKeyState(VK_CONTROL) & 0x8000) {
+		return;
+	}
 	text[0] = (wchar_t)msg->wParam;
 	text[1] = 0;
 	ptk_ime_commit(text, 2);
