@@ -71,7 +71,7 @@ static void ui_image_force_destroy(ui_image_source_t *src)
 }
 
 static void ui_image_loader_add_mutation(ui_image_source_t *src,
-                                         ui_event_type_t type)
+                                         ui_image_event_type_t type)
 {
         ui_image_mutation_t *mutation;
 
