@@ -14,6 +14,9 @@
 #include <string.h>
 #include "ptk/app.h"
 #include "linux/x11clipboard.h"
+#ifdef PTK_WIN_DESKTOP
+#include "windows/win32clipboard.h"
+#endif
 
 static struct ptk_clipboard_module {
         char *text;
@@ -25,6 +28,11 @@ int ptk_clipboard_request_text(ptk_clipboard_callback_t callback, void *arg)
 #ifdef PTK_HAS_LIBX11
         if (ptk_get_app_id() == PTK_APP_ID_LINUX_X11) {
                 return ptk_x11clipboard_request_text(callback, arg);
+        }
+#endif
+#ifdef PTK_WIN_DESKTOP
+        if (ptk_get_app_id() == PTK_APP_ID_WIN_DESKTOP) {
+                return ptk_win32clipboard_request_text(callback, arg);
         }
 #endif
         size_t len = ptk_clipboard.text_len + 1;
@@ -53,6 +61,11 @@ int ptk_clipboard_set_text(const wchar_t *text, size_t len)
                 return ptk_x11clipboard_set_text(text, len);
         }
 #endif
+#ifdef PTK_WIN_DESKTOP
+        if (ptk_get_app_id() == PTK_APP_ID_WIN_DESKTOP) {
+                return ptk_win32clipboard_set_text(text, len);
+        }
+#endif
         size_t raw_len = encode_utf8(NULL, text, 0);
         char *raw_text = malloc((raw_len + 1) * sizeof(char));
         raw_len = encode_utf8(raw_text, text, raw_len);
@@ -74,6 +87,12 @@ void ptk_clipboard_init(void)
                 return;
         }
 #endif
+#ifdef PTK_WIN_DESKTOP
+        if (ptk_get_app_id() == PTK_APP_ID_WIN_DESKTOP) {
+                ptk_win32clipboard_init();
+                return;
+        }
+#endif
 }
 
 void ptk_clipboard_destroy(void)
@@ -81,6 +100,12 @@ void ptk_clipboard_destroy(void)
 #ifdef PTK_HAS_LIBX11
         if (ptk_get_app_id() == PTK_APP_ID_LINUX_X11) {
                 ptk_x11clipboard_destroy();
+                return;
+        }
+#endif
+#ifdef PTK_WIN_DESKTOP
+        if (ptk_get_app_id() == PTK_APP_ID_WIN_DESKTOP) {
+                ptk_win32clipboard_destroy();
                 return;
         }
 #endif
