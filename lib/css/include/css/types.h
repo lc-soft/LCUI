@@ -856,7 +856,7 @@ struct css_propdef {
 	char *name;
 	css_valdef_t *valdef;
 	css_style_value_t initial_value;
-	int (*parse)(css_propdef_t *, const char *, css_style_decl_t *);
+	int (*parse)(const css_propdef_t *, const char *, css_style_decl_t *);
 	int (*cascade)(const css_style_array_value_t, css_computed_style_t *);
 };
 

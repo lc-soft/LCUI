@@ -22,7 +22,7 @@
                                        INIT, css_cascade_##PROP_KEY)
 
 #define DEFINE_SHORTHAND_PROP(PROP_KEY, NAME, VALDEF)                  \
-        extern int css_parse_##PROP_KEY(css_propdef_t *, const char *, \
+        extern int css_parse_##PROP_KEY(const css_propdef_t *, const char *, \
                                         css_style_decl_t *);           \
         css_register_shorthand_property(NAME, VALDEF, css_parse_##PROP_KEY)
 
@@ -61,7 +61,7 @@ static void css_propdef_destroy(css_propdef_t *prop)
 }
 
 int css_register_shorthand_property(const char *name, const char *syntax,
-                                    int (*parse)(css_propdef_t *, const char *,
+                                    int (*parse)(const css_propdef_t *, const char *,
                                                  css_style_decl_t *))
 {
         css_propdef_t *prop;

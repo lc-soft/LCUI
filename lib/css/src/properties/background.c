@@ -310,7 +310,7 @@ static void css_parse_background_position_1(css_style_value_t *input,
  * background-position-x = calc(100% - 50px)
  * background-position-y = calc(100% - 50px)
  */
-int css_parse_background_position(css_propdef_t *propdef, const char *input,
+int css_parse_background_position(const css_propdef_t *propdef, const char *input,
                                   css_style_decl_t *s)
 {
         unsigned len;
@@ -346,7 +346,7 @@ int css_parse_background_position(css_propdef_t *propdef, const char *input,
         return (int)(cur - input);
 }
 
-int css_parse_background(css_propdef_t *propdef, const char *input,
+int css_parse_background(const css_propdef_t *propdef, const char *input,
                          css_style_decl_t *s)
 {
         int len;

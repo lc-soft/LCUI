@@ -33,7 +33,7 @@ CSS_CASCADE_MARGIN_SIDE(right)
 CSS_CASCADE_MARGIN_SIDE(bottom)
 CSS_CASCADE_MARGIN_SIDE(left)
 
-int css_parse_margin(css_propdef_t *propdef, const char *input,
+int css_parse_margin(const css_propdef_t *propdef, const char *input,
 		     css_style_decl_t *s)
 {
 	css_style_value_t value;

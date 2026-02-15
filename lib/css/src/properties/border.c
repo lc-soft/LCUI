@@ -97,7 +97,7 @@ CSS_CASCADE_BORDER_ANGLE_RADIUS(top_right)
 CSS_CASCADE_BORDER_ANGLE_RADIUS(bottom_left)
 CSS_CASCADE_BORDER_ANGLE_RADIUS(bottom_right)
 
-int css_parse_border_width(css_propdef_t *propdef, const char *input,
+int css_parse_border_width(const css_propdef_t *propdef, const char *input,
                            css_style_decl_t *s)
 {
         css_style_value_t value;
@@ -154,7 +154,7 @@ int css_parse_border_width(css_propdef_t *propdef, const char *input,
         return len;
 }
 
-int css_parse_border_style(css_propdef_t *propdef, const char *input,
+int css_parse_border_style(const css_propdef_t *propdef, const char *input,
                            css_style_decl_t *s)
 {
         css_style_value_t value;
@@ -211,7 +211,7 @@ int css_parse_border_style(css_propdef_t *propdef, const char *input,
         return len;
 }
 
-int css_parse_border_color(css_propdef_t *propdef, const char *input,
+int css_parse_border_color(const css_propdef_t *propdef, const char *input,
                            css_style_decl_t *s)
 {
         css_style_value_t value;
@@ -268,7 +268,7 @@ int css_parse_border_color(css_propdef_t *propdef, const char *input,
         return len;
 }
 
-int css_parse_border_radius(css_propdef_t *propdef, const char *input,
+int css_parse_border_radius(const css_propdef_t *propdef, const char *input,
                             css_style_decl_t *s)
 {
         css_style_value_t value;
@@ -414,7 +414,7 @@ static void css_parse_border_value(css_style_value_t *arr,
         }
 }
 
-int css_parse_border_top(css_propdef_t *propdef, const char *input,
+int css_parse_border_top(const css_propdef_t *propdef, const char *input,
                          css_style_decl_t *s)
 {
         css_style_value_t value, width, style, color;
@@ -429,7 +429,7 @@ int css_parse_border_top(css_propdef_t *propdef, const char *input,
         return len;
 }
 
-int css_parse_border_right(css_propdef_t *propdef, const char *input,
+int css_parse_border_right(const css_propdef_t *propdef, const char *input,
                            css_style_decl_t *s)
 {
         css_style_value_t value, width, style, color;
@@ -444,7 +444,7 @@ int css_parse_border_right(css_propdef_t *propdef, const char *input,
         return len;
 }
 
-int css_parse_border_bottom(css_propdef_t *propdef, const char *input,
+int css_parse_border_bottom(const css_propdef_t *propdef, const char *input,
                             css_style_decl_t *s)
 {
         css_style_value_t value, width, style, color;
@@ -459,7 +459,7 @@ int css_parse_border_bottom(css_propdef_t *propdef, const char *input,
         return len;
 }
 
-int css_parse_border_left(css_propdef_t *propdef, const char *input,
+int css_parse_border_left(const css_propdef_t *propdef, const char *input,
                           css_style_decl_t *s)
 {
         css_style_value_t value, width, style, color;
@@ -474,7 +474,7 @@ int css_parse_border_left(css_propdef_t *propdef, const char *input,
         return len;
 }
 
-int css_parse_border(css_propdef_t *propdef, const char *input,
+int css_parse_border(const css_propdef_t *propdef, const char *input,
                      css_style_decl_t *s)
 {
         css_style_value_t value, width, style, color;

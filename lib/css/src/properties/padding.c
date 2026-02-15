@@ -34,7 +34,7 @@ CSS_CASCADE_PADDING_SIDE(right)
 CSS_CASCADE_PADDING_SIDE(bottom)
 CSS_CASCADE_PADDING_SIDE(left)
 
-int css_parse_padding(css_propdef_t *propdef, const char *input,
+int css_parse_padding(const css_propdef_t *propdef, const char *input,
 		      css_style_decl_t *s)
 {
 	css_style_value_t value;

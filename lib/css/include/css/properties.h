@@ -24,7 +24,7 @@ LIBCSS_PUBLIC int css_register_property(const char *name, const char *syntax,
 
 LIBCSS_PUBLIC int css_register_shorthand_property(
     const char *name, const char *syntax,
-    int (*parse)(css_propdef_t *, const char *, css_style_decl_t *));
+    int (*parse)(const css_propdef_t *, const char *, css_style_decl_t *));
 
 LIBCSS_PUBLIC void css_init_properties(void);
 

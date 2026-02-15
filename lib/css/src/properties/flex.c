@@ -177,7 +177,7 @@ static void css_parse_flex_3(const css_style_array_value_t input,
 	}
 }
 
-int css_parse_flex(css_propdef_t *propdef, const char *input,
+int css_parse_flex(const css_propdef_t *propdef, const char *input,
 		   css_style_decl_t *s)
 {
 	css_style_value_t value;
