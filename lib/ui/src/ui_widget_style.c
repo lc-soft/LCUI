@@ -209,10 +209,17 @@ int ui_widget_set_style_string(ui_widget_t *w, const char *property,
         if (!propdef) {
                 return -1;
         }
-        if (css_parse_value(propdef->valdef, css_text, &value) <= 0) {
-                return -2;
+        if (propdef->key >= 0) {
+                if (css_parse_value(propdef->valdef, css_text, &value) <= 0) {
+                        return -2;
+                }
+                ui_widget_set_style(w, propdef->key, &value);
+                return 0;
         }
-        ui_widget_set_style(w, propdef->key, &value);
+        if (!w->custom_style) {
+                w->custom_style = css_style_decl_create();
+        }
+        propdef->parse(propdef, css_text, w->custom_style);
         return 0;
 }
 
@@ -331,16 +338,14 @@ static void ui_widget_on_image_load(ui_image_event_t *e)
         // See more:
         // https://developer.mozilla.org/en-US/docs/Web/CSS/background-position#regarding_percentages
         if (IS_CSS_PERCENTAGE(s, background_position_x)) {
-                CSS_SET_FIXED_LENGTH(
-                    s, background_position_x,
-                    (box->width - s->background_width) *
-                        s->background_position_x / 100.f);
+                CSS_SET_FIXED_LENGTH(s, background_position_x,
+                                     (box->width - s->background_width) *
+                                         s->background_position_x / 100.f);
         }
         if (IS_CSS_PERCENTAGE(s, background_position_y)) {
-                CSS_SET_FIXED_LENGTH(
-                    s, background_position_y,
-                    (box->height - s->background_height) *
-                        s->background_position_y / 100.f);
+                CSS_SET_FIXED_LENGTH(s, background_position_y,
+                                     (box->height - s->background_height) *
+                                         s->background_position_y / 100.f);
         }
         ui_widget_mark_dirty_rect(w, NULL, UI_BOX_TYPE_BORDER_BOX);
 }
