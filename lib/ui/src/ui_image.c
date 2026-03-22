@@ -196,11 +196,15 @@ static bool ui_image_loader_create_reader(ui_image_source_t *src)
         }
         src->image.error = pd_image_reader_read_header(src->reader);
         if (src->image.error != PD_OK) {
+                pd_image_reader_destroy(src->reader);
+                src->reader = NULL;
                 return false;
         }
         src->image.error =
             pd_image_reader_create_buffer(src->reader, &src->image.data);
         if (src->image.error != PD_OK) {
+                pd_image_reader_destroy(src->reader);
+                src->reader = NULL;
                 return false;
         }
         return true;
@@ -233,10 +237,12 @@ static void ui_image_loader_load(ui_image_source_t *src)
         while (src->image.state != UI_IMAGE_STATE_COMPLETE &&
                !ui_image_loader.changed) {
                 pd_image_reader_read_row(src->reader, &src->image.data);
-                src->image.progress = 100.f * src->reader->read_row_index /
-                                      src->reader->header.height *
-                                      (src->reader->pass + 1) /
-                                      src->reader->passes;
+                src->image.progress =
+                    src->reader->passes > 0
+                        ? 100.f * src->reader->read_row_index /
+                              src->reader->header.height *
+                              (src->reader->pass + 1) / src->reader->passes
+                        : 0;
                 if (src->reader->read_row_index >= src->reader->header.height) {
                         src->reader->read_row_index = 0;
                         src->reader->pass++;
@@ -321,6 +327,7 @@ void ui_init_image_loader(void)
         ui_image_loader.cache = dict_create(&ui_image_loader.dict_type, NULL);
         ui_image_loader.progress_tick_time = get_time_ms();
         list_create(&ui_image_loader.images);
+        list_create(&ui_image_loader.mutations);
 }
 
 void ui_destroy_image_loader(void)
