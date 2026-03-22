@@ -18,13 +18,13 @@
 #define ui_image_on ui_image_add_event_listener
 #define ui_image_off ui_image_remove_event_listener
 
-typedef enum ui_image_state_t {
+typedef enum ui_image_state {
         UI_IMAGE_STATE_PENDING,
         UI_IMAGE_STATE_LOADING,
         UI_IMAGE_STATE_COMPLETE
 } ui_image_state_t;
 
-typedef enum ui_image_event_type_t {
+typedef enum ui_image_event_type {
         UI_IMAGE_EVENT_LOAD,
         UI_IMAGE_EVENT_PROGRESS,
         UI_IMAGE_EVENT_ERROR,
@@ -58,58 +58,61 @@ LIBUI_PUBLIC ui_image_t *ui_image_create(const char *path);
 
 LIBUI_INLINE bool ui_image_valid(ui_image_t *image)
 {
-        return image != NULL && image->error == PD_OK && image->state == UI_IMAGE_STATE_COMPLETE;
+        return image != NULL && image->error == PD_OK &&
+               image->state == UI_IMAGE_STATE_COMPLETE;
 }
 
 LIBUI_PUBLIC void ui_image_destroy(ui_image_t *image);
-LIBUI_PUBLIC int ui_image_add_event_listener(ui_image_t *image,
-                                             ui_image_event_type_t type,
-                                             ui_image_event_handler_t handler,
-                                             void *data);
-LIBUI_PUBLIC int ui_image_remove_event_listener(
+LIBUI_PUBLIC bool ui_image_add_event_listener(ui_image_t *image,
+                                              ui_image_event_type_t type,
+                                              ui_image_event_handler_t handler,
+                                              void *data);
+LIBUI_PUBLIC bool ui_image_remove_event_listener(
     ui_image_t *image, ui_image_event_type_t type,
     ui_image_event_handler_t handler, void *data);
 
-LIBUI_INLINE int ui_image_on_load(ui_image_t *image,
-                                  ui_image_event_handler_t handler, void *data)
+LIBUI_INLINE bool ui_image_on_load(ui_image_t *image,
+                                   ui_image_event_handler_t handler, void *data)
 {
         return ui_image_add_event_listener(image, UI_IMAGE_EVENT_LOAD, handler,
                                            data);
 }
 
-LIBUI_INLINE int ui_image_on_error(ui_image_t *image,
-                                   ui_image_event_handler_t handler, void *data)
+LIBUI_INLINE bool ui_image_on_error(ui_image_t *image,
+                                    ui_image_event_handler_t handler,
+                                    void *data)
 {
         return ui_image_add_event_listener(image, UI_IMAGE_EVENT_ERROR, handler,
                                            data);
 }
 
-LIBUI_INLINE int ui_image_on_progress(ui_image_t *image,
-                                      ui_image_event_handler_t handler,
-                                      void *data)
+LIBUI_INLINE bool ui_image_on_progress(ui_image_t *image,
+                                       ui_image_event_handler_t handler,
+                                       void *data)
 {
         return ui_image_add_event_listener(image, UI_IMAGE_EVENT_PROGRESS,
                                            handler, data);
 }
 
-LIBUI_INLINE int ui_image_off_load(ui_image_t *image,
-                                   ui_image_event_handler_t handler, void *data)
+LIBUI_INLINE bool ui_image_off_load(ui_image_t *image,
+                                    ui_image_event_handler_t handler,
+                                    void *data)
 {
         return ui_image_remove_event_listener(image, UI_IMAGE_EVENT_LOAD,
                                               handler, data);
 }
 
-LIBUI_INLINE int ui_image_off_error(ui_image_t *image,
-                                    ui_image_event_handler_t handler,
-                                    void *data)
+LIBUI_INLINE bool ui_image_off_error(ui_image_t *image,
+                                     ui_image_event_handler_t handler,
+                                     void *data)
 {
         return ui_image_remove_event_listener(image, UI_IMAGE_EVENT_ERROR,
                                               handler, data);
 }
 
-LIBUI_INLINE int ui_image_off_progress(ui_image_t *image,
-                                       ui_image_event_handler_t handler,
-                                       void *data)
+LIBUI_INLINE bool ui_image_off_progress(ui_image_t *image,
+                                        ui_image_event_handler_t handler,
+                                        void *data)
 {
         return ui_image_remove_event_listener(image, UI_IMAGE_EVENT_PROGRESS,
                                               handler, data);

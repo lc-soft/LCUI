@@ -143,7 +143,7 @@ void ui_image_destroy(ui_image_t *image)
         ((ui_image_source_t *)image)->refs_count--;
 }
 
-int ui_image_add_event_listener(ui_image_t *image, ui_image_event_type_t type,
+bool ui_image_add_event_listener(ui_image_t *image, ui_image_event_type_t type,
                                 ui_image_event_handler_t handler, void *data)
 {
         ui_image_event_t ev = { .type = type, .image = image, .data = data };
@@ -154,26 +154,27 @@ int ui_image_add_event_listener(ui_image_t *image, ui_image_event_type_t type,
                     (image->error != PD_OK && type == UI_IMAGE_EVENT_ERROR)) {
                         handler(&ev);
                 }
-                return 0;
+                return true;
         }
         listener = malloc(sizeof(ui_image_event_listener_t));
         if (listener == NULL) {
-                return -1;
+                return false;
         }
         listener->type = type;
         listener->handler = handler;
         listener->data = data;
         list_append(&((ui_image_source_t *)image)->listeners, listener);
-        return 0;
+        return true;
 }
 
-int ui_image_remove_event_listener(ui_image_t *image,
+bool ui_image_remove_event_listener(ui_image_t *image,
                                    ui_image_event_type_t type,
                                    ui_image_event_handler_t handler, void *data)
 {
         list_node_t *node, *next;
         ui_image_source_t *src = (ui_image_source_t *)image;
         ui_image_event_listener_t *listener;
+        bool removed = false;
 
         for (node = list_get_first_node(&src->listeners); node; node = next) {
                 next = node->next;
@@ -182,9 +183,10 @@ int ui_image_remove_event_listener(ui_image_t *image,
                     listener->data == data) {
                         list_unlink(&src->listeners, node);
                         free(listener);
+                        removed = true;
                 }
         }
-        return -1;
+        return removed;
 }
 
 static bool ui_image_loader_create_reader(ui_image_source_t *src)
