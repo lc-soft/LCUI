@@ -30,21 +30,24 @@ typedef struct {
         void (*finish)(pd_image_reader_t *);
 } pd_image_reader_methods_t;
 
-static pd_image_reader_methods_t pd_image_readers[] = {
+static pd_image_reader_methods_t pd_image_readers[PD_READER_COUNT] = {
 #ifdef PANDAGL_HAS_LIBPNG
-        { ".png", PD_PNG_READER, pd_png_reader_create, pd_png_reader_destroy,
-          pd_png_reader_jmpbuf, pd_png_reader_read_header, pd_png_reader_start,
-          pd_png_reader_read_row, pd_png_reader_finish },
+        [PD_PNG_READER] = { ".png", PD_PNG_READER, pd_png_reader_create,
+                            pd_png_reader_destroy, pd_png_reader_jmpbuf,
+                            pd_png_reader_read_header, pd_png_reader_start,
+                            pd_png_reader_read_row, pd_png_reader_finish },
 #endif
 #ifdef PANDAGL_HAS_LIBJPEG
-        { ".jpeg .jpg", PD_JPEG_READER, pd_jpeg_reader_create,
-          pd_jpeg_reader_destroy, pd_jpeg_reader_jmpbuf,
-          pd_jpeg_reader_read_header, pd_jpeg_reader_start,
-          pd_jpeg_reader_read_row, pd_jpeg_reader_finish },
+        [PD_JPEG_READER] = { ".jpeg .jpg", PD_JPEG_READER,
+                             pd_jpeg_reader_create, pd_jpeg_reader_destroy,
+                             pd_jpeg_reader_jmpbuf, pd_jpeg_reader_read_header,
+                             pd_jpeg_reader_start, pd_jpeg_reader_read_row,
+                             pd_jpeg_reader_finish },
 #endif
-        { ".bmp", PD_BMP_READER, pd_bmp_reader_create, pd_bmp_reader_destroy,
-          pd_bmp_reader_jmpbuf, pd_bmp_reader_read_header, pd_bmp_reader_start,
-          pd_bmp_reader_read_row, pd_bmp_reader_finish },
+        [PD_BMP_READER] = { ".bmp", PD_BMP_READER, pd_bmp_reader_create,
+                            pd_bmp_reader_destroy, pd_bmp_reader_jmpbuf,
+                            pd_bmp_reader_read_header, pd_bmp_reader_start,
+                            pd_bmp_reader_read_row, pd_bmp_reader_finish },
 };
 
 static pd_image_reader_type_t pd_image_reader_detect_suffix(
@@ -61,8 +64,10 @@ static pd_image_reader_type_t pd_image_reader_detect_suffix(
         if (!suffix) {
                 return PD_UNKNOWN_READER;
         }
-        for (i = 0; i < sizeof(pd_image_readers) / sizeof(pd_image_readers[0]);
-             ++i) {
+        for (i = 0; i < PD_READER_COUNT; ++i) {
+                if (!pd_image_readers[i].suffix) {
+                        continue;
+                }
                 if (strstr(pd_image_readers[i].suffix, suffix)) {
                         return pd_image_readers[i].type;
                 }
@@ -73,14 +78,17 @@ static pd_image_reader_type_t pd_image_reader_detect_suffix(
 static pd_image_reader_methods_t *pd_image_reader_get_methods(
     pd_image_reader_t *reader)
 {
-        int i;
-        for (i = 0; i < sizeof(pd_image_readers) / sizeof(pd_image_readers[0]);
-             ++i) {
-                if (pd_image_readers[i].type == reader->type) {
-                        return pd_image_readers + i;
-                }
+        pd_image_reader_methods_t *m;
+
+        if (reader->type <= PD_UNKNOWN_READER ||
+            reader->type >= PD_READER_COUNT) {
+                return NULL;
         }
-        return NULL;
+        m = &pd_image_readers[reader->type];
+        if (!m->create) {
+                return NULL;
+        }
+        return m;
 }
 
 pd_image_reader_t *pd_image_reader_create(void)
