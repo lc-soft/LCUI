@@ -17,9 +17,22 @@
 
 PTK_BEGIN_DECLS
 
+/**
+ * A simple timer that provides elapsed time information for animation and
+ * simulation loops. This is a C port of DirectXTK's StepTimer, with the time
+ * base changed from QueryPerformanceCounter ticks to milliseconds.
+ *
+ * @see https://github.com/Microsoft/DirectXTK/wiki/StepTimer
+ *
+ * In fixed-step mode, the handler may be invoked multiple times per `tick`
+ * to catch up with the wall clock. This makes the timer suitable for
+ * driving stable physics simulation or animation timelines, NOT for
+ * throttling render frame rate. Render throttling should be implemented as
+ * a separate minimum-interval gate by the caller.
+ */
+
 typedef struct ptk_steptimer {
         // Source timing data.
-        uint64_t frequency;
         uint64_t last_time;
         uint64_t max_delta;
 

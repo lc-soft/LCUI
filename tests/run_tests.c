@@ -21,6 +21,7 @@ int main(int argc, char **argv)
 	logger_set_level(LOGGER_LEVEL_ERROR);
 	ctest_describe("test settings", test_settings);
 	ctest_describe("test thread", test_thread);
+	ctest_describe("test steptimer", test_steptimer);
 	ctest_describe("test font load", test_font_load);
 	ctest_describe("test image reader", test_image_reader);
 	ctest_describe("test xml parser", test_xml_parser);

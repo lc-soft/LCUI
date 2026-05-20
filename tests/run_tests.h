@@ -25,3 +25,4 @@ void test_flex_layout(void);
 void test_widget_rect(void);
 void test_clipboard(void);
 void test_router_components(void);
+void test_steptimer(void);

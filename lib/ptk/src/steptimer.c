@@ -19,7 +19,7 @@
 
 void ptk_steptimer_init(ptk_steptimer_t *timer)
 {
-	timer->is_fixed_time_step = false;
+	timer->last_time = get_time_ms();
 	timer->elapsed_time = 0;
 	timer->total_time = 0;
 	timer->left_over_time = 0;
