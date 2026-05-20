@@ -13,6 +13,7 @@
 #include <ptk.h>
 #include <LCUI/config.h>
 #include <LCUI/app.h>
+#include "lcui_app.h"
 #include <LCUI/widgets.h>
 #include <LCUI/settings.h>
 
