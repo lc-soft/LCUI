@@ -28,6 +28,7 @@ void ptk_steptimer_init(ptk_steptimer_t *timer)
 	timer->frames_this_second = 0;
 	timer->second_counter = 0;
 	timer->is_fixed_time_step = false;
+	timer->enable_catch_up = false;
 	timer->target_elapsed_time = 1000 / 60;
 	timer->max_delta = 1000;
 }
@@ -69,10 +70,27 @@ void ptk_steptimer_tick(ptk_steptimer_t *timer, ptk_steptimer_handler_t handler,
 
 		timer->left_over_time += time_delta;
 
-		while (timer->left_over_time >= timer->target_elapsed_time) {
-			timer->elapsed_time = timer->target_elapsed_time;
-			timer->total_time += timer->target_elapsed_time;
-			timer->left_over_time -= timer->target_elapsed_time;
+		if (timer->enable_catch_up) {
+			// DirectXTK behavior: catch up by invoking the handler
+			// multiple times to fully consume accumulated time.
+			while (timer->left_over_time >= timer->target_elapsed_time) {
+				timer->elapsed_time = timer->target_elapsed_time;
+				timer->total_time += timer->target_elapsed_time;
+				timer->left_over_time -= timer->target_elapsed_time;
+				timer->frame_count++;
+
+				handler(timer, data);
+			}
+		} else if (timer->left_over_time >= timer->target_elapsed_time) {
+			// No catch-up: invoke the handler at most once per tick.
+			// elapsed_time reflects the actual accumulated delta so
+			// the handler can respond to real-time passage (useful
+			// for visual callbacks like requestAnimationFrame). The
+			// remainder is preserved via modulo to prevent long-term
+			// drift without causing a burst of calls.
+			timer->elapsed_time = timer->left_over_time;
+			timer->total_time += timer->left_over_time;
+			timer->left_over_time %= timer->target_elapsed_time;
 			timer->frame_count++;
 
 			handler(timer, data);
@@ -97,4 +115,13 @@ void ptk_steptimer_tick(ptk_steptimer_t *timer, ptk_steptimer_handler_t handler,
 		timer->frames_this_second = 0;
 		timer->second_counter %= 1000;
 	}
+}
+
+void ptk_steptimer_reset_elapsed_time(ptk_steptimer_t *timer)
+{
+	timer->last_time = get_time_ms();
+	timer->left_over_time = 0;
+	timer->frames_per_second = 0;
+	timer->frames_this_second = 0;
+	timer->second_counter = 0;
 }
