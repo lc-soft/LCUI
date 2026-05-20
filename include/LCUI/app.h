@@ -17,11 +17,8 @@
 
 LCUI_BEGIN_HEADER
 
-LCUI_API uint32_t lcui_app_get_fps(void);
-LCUI_API void lcui_app_set_frame_rate_cap(unsigned rate_cap);
-LCUI_API int lcui_app_process_events(ptk_process_events_option_t option);
-LCUI_API void lcui_app_init(void);
-LCUI_API void lcui_app_destroy(void);
+LCUI_API uint32_t lcui_get_fps(void);
+LCUI_API void lcui_set_fps_cap(unsigned fps_cap);
 
 typedef void (*lcui_frame_cb_t)(uint64_t timestamp, void *data);
 

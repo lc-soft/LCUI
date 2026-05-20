@@ -28,19 +28,19 @@ void lcui_get_settings(lcui_settings_t *settings)
 void lcui_apply_settings(lcui_settings_t *settings)
 {
 	lcui_settings = *settings;
-	lcui_settings.frame_rate_cap = y_max(lcui_settings.frame_rate_cap, 1);
+	lcui_settings.fps_cap = y_max(lcui_settings.fps_cap, 1);
 	lcui_settings.parallel_rendering_threads =
 	    y_max(lcui_settings.parallel_rendering_threads, 1);
 	ui_server_set_threads(lcui_settings.parallel_rendering_threads);
 	ui_server_set_paint_flashing_enabled(lcui_settings.paint_flashing);
-	lcui_app_set_frame_rate_cap(lcui_settings.frame_rate_cap);
+	lcui_set_fps_cap(lcui_settings.fps_cap);
 }
 
 /* Reset global settings to their defaults. */
 void lcui_reset_settings(void)
 {
 	lcui_settings_t settings = {
-		.frame_rate_cap = LCUI_MAX_FRAMES_PER_SEC,
+		.fps_cap = LCUI_MAX_FRAMES_PER_SEC,
 		.parallel_rendering_threads = 4,
 		.paint_flashing = false
 	};

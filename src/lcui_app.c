@@ -19,6 +19,7 @@
 #include <LCUI/ui.h>
 #include <LCUI/worker.h>
 #include <LCUI/app.h>
+#include "lcui_app.h"
 
 typedef struct lcui_frame_request {
         list_node_t node;
@@ -246,16 +247,16 @@ static int lcui_app_dispatch(ptk_event_t *e)
         return 0;
 }
 
-uint32_t lcui_app_get_fps(void)
+uint32_t lcui_get_fps(void)
 {
         return lcui_app.frames_per_second;
 }
 
-void lcui_app_set_frame_rate_cap(unsigned rate_cap)
+void lcui_set_fps_cap(unsigned fps_cap)
 {
-        lcui_app.min_render_interval = (rate_cap > 0) ? (1000 / rate_cap) : 0;
+        lcui_app.min_render_interval = (fps_cap > 0) ? (1000 / fps_cap) : 0;
         lcui_app.anim_timer.target_elapsed_time =
-            (rate_cap > 0) ? (1000 / rate_cap) : (1000 / 60);
+            (fps_cap > 0) ? (1000 / fps_cap) : (1000 / 60);
 }
 
 int lcui_app_process_events(ptk_process_events_option_t option)
