@@ -23,6 +23,11 @@ LCUI_API int lcui_app_process_events(ptk_process_events_option_t option);
 LCUI_API void lcui_app_init(void);
 LCUI_API void lcui_app_destroy(void);
 
+typedef void (*lcui_frame_cb_t)(uint64_t timestamp, void *data);
+
+LCUI_API int lcui_request_frame(lcui_frame_cb_t callback, void *data);
+LCUI_API void lcui_cancel_frame(int request_id);
+
 LCUI_END_HEADER
 
 #endif

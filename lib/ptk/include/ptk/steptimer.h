@@ -29,6 +29,13 @@ PTK_BEGIN_DECLS
  * driving stable physics simulation or animation timelines, NOT for
  * throttling render frame rate. Render throttling should be implemented as
  * a separate minimum-interval gate by the caller.
+ *
+ * When enable_catch_up is false (the default), fixed-step mode invokes the
+ * handler at most once per tick, treating target_elapsed_time as a cadence
+ * gate. This is appropriate for visual callbacks like requestAnimationFrame
+ * where replaying missed frames would cause a burst of renders. When true,
+ * the original DirectXTK catch-up behavior is preserved, suitable for
+ * physics or simulation where accumulated time must be fully consumed.
  */
 
 typedef struct ptk_steptimer {
@@ -49,6 +56,7 @@ typedef struct ptk_steptimer {
 
         // Members for configuring fixed timestep mode.
         bool is_fixed_time_step;
+        bool enable_catch_up;
         uint64_t target_elapsed_time;
 } ptk_steptimer_t;
 
@@ -60,6 +68,11 @@ PTK_PUBLIC void ptk_steptimer_init(ptk_steptimer_t *timer);
 // number of times.
 PTK_PUBLIC void ptk_steptimer_tick(ptk_steptimer_t *timer,
                                     ptk_steptimer_handler_t handler, void *data);
+
+// After an intentional timing discontinuity (for instance a blocking IO
+// operation or a long pause), call this to avoid having the fixed timestep
+// logic attempt a set of catch-up Update calls.
+PTK_PUBLIC void ptk_steptimer_reset_elapsed_time(ptk_steptimer_t *timer);
 
 PTK_END_DECLS
 

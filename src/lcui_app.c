@@ -10,15 +10,31 @@
  */
 
 #include <math.h>
+#include <stdlib.h>
 #include <yutil.h>
 #include <ptk.h>
+#include <ptk/steptimer.h>
 #include <ui.h>
 #include <ui_server.h>
 #include <LCUI/ui.h>
 #include <LCUI/worker.h>
 #include <LCUI/app.h>
 
+typedef struct lcui_frame_request {
+        list_node_t node;
+        int id;
+        lcui_frame_cb_t callback;
+        void *data;
+} lcui_frame_request_t;
+
 static struct lcui_app {
+        // Animation frame driver. Fixed-step, no catch-up: the handler
+        // fires at most once per tick when enough time has accumulated,
+        // flushing all registered lcui_request_frame callbacks.
+        ptk_steptimer_t anim_timer;
+        list_t frame_cbs;
+        int next_frame_id;
+
         // Render throttling. Two consecutive renders are at least
         // min_render_interval milliseconds apart. 0 disables throttling.
         uint64_t last_render_time;
@@ -146,6 +162,47 @@ static void lcui_dispatch_ui_event(ptk_event_t *app_event)
         }
 }
 
+static void lcui_app_on_anim_frame(ptk_steptimer_t *timer, void *data)
+{
+        uint64_t timestamp = (uint64_t)get_time_ms();
+        list_node_t *node;
+
+        list_for_each(node, &lcui_app.frame_cbs) {
+                lcui_frame_request_t *req = node->data;
+                req->callback(timestamp, req->data);
+        }
+        list_destroy(&lcui_app.frame_cbs, NULL);
+}
+
+int lcui_request_frame(lcui_frame_cb_t callback, void *data)
+{
+        lcui_frame_request_t *req = malloc(sizeof(lcui_frame_request_t));
+
+        if (!req) {
+                return -1;
+        }
+        req->id = ++lcui_app.next_frame_id;
+        req->callback = callback;
+        req->data = data;
+        list_append(&lcui_app.frame_cbs, req);
+        return req->id;
+}
+
+void lcui_cancel_frame(int request_id)
+{
+        list_node_t *node;
+
+        list_for_each(node, &lcui_app.frame_cbs) {
+                lcui_frame_request_t *req = node->data;
+                if (req->id == request_id) {
+                        list_unlink(&lcui_app.frame_cbs, node);
+                        free(req);
+                        list_node_free(node);
+                        return;
+                }
+        }
+}
+
 static void lcui_app_render_frame(void)
 {
         uint64_t now = (uint64_t)get_time_ms();
@@ -175,8 +232,9 @@ static int lcui_app_dispatch(ptk_event_t *e)
                 return 0;
         }
         lcui_dispatch_ui_event(e);
-        lcui_ui_update();
         lcui_worker_run();
+        ptk_steptimer_tick(&lcui_app.anim_timer, lcui_app_on_anim_frame, NULL);
+        lcui_ui_update();
         lcui_app_render_frame();
         return 0;
 }
@@ -189,6 +247,8 @@ uint32_t lcui_app_get_fps(void)
 void lcui_app_set_frame_rate_cap(unsigned rate_cap)
 {
         lcui_app.min_render_interval = (rate_cap > 0) ? (1000 / rate_cap) : 0;
+        lcui_app.anim_timer.target_elapsed_time =
+            (rate_cap > 0) ? (1000 / rate_cap) : (1000 / 60);
 }
 
 int lcui_app_process_events(ptk_process_events_option_t option)
@@ -201,6 +261,12 @@ void lcui_app_init(void)
         uint64_t now = (uint64_t)get_time_ms();
 
         lcui_worker_init();
+        ptk_steptimer_init(&lcui_app.anim_timer);
+        lcui_app.anim_timer.is_fixed_time_step = true;
+        lcui_app.anim_timer.enable_catch_up = false;
+        lcui_app.anim_timer.target_elapsed_time = 1000 / 60;
+        list_create(&lcui_app.frame_cbs);
+        lcui_app.next_frame_id = 0;
         lcui_app.last_render_time = now;
         lcui_app.min_render_interval = 0;
         lcui_app.fps_window_start = now;
@@ -217,5 +283,6 @@ void lcui_app_destroy(void)
 {
         lcui_ui_destroy();
         lcui_worker_destroy();
+        list_destroy_without_node(&lcui_app.frame_cbs, NULL);
         ptk_destroy();
 }
