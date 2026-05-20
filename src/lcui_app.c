@@ -10,6 +10,7 @@
  */
 
 #include <math.h>
+#include <yutil.h>
 #include <ptk.h>
 #include <ui.h>
 #include <ui_server.h>
@@ -18,7 +19,15 @@
 #include <LCUI/app.h>
 
 static struct lcui_app {
-        ptk_steptimer_t timer;
+        // Render throttling. Two consecutive renders are at least
+        // min_render_interval milliseconds apart. 0 disables throttling.
+        uint64_t last_render_time;
+        uint64_t min_render_interval;
+
+        // FPS tracking based on actually rendered frames.
+        uint64_t fps_window_start;
+        uint32_t frames_this_second;
+        uint32_t frames_per_second;
 } lcui_app;
 
 static void lcui_dispatch_ui_mouse_event(ui_event_type_t type,
@@ -137,10 +146,27 @@ static void lcui_dispatch_ui_event(ptk_event_t *app_event)
         }
 }
 
-static void lcui_app_on_tick(ptk_steptimer_t *timer, void *data)
+static void lcui_app_render_frame(void)
 {
+        uint64_t now = (uint64_t)get_time_ms();
+
+        // Throttle: skip this frame if the previous render is too recent.
+        if (lcui_app.min_render_interval > 0 &&
+            now - lcui_app.last_render_time < lcui_app.min_render_interval) {
+                return;
+        }
+        lcui_app.last_render_time = now;
+
         lcui_ui_render();
         ptk_app_present();
+
+        // Count actually rendered frames into the FPS statistic.
+        lcui_app.frames_this_second++;
+        if (now - lcui_app.fps_window_start >= 1000) {
+                lcui_app.frames_per_second = lcui_app.frames_this_second;
+                lcui_app.frames_this_second = 0;
+                lcui_app.fps_window_start = now;
+        }
 }
 
 static int lcui_app_dispatch(ptk_event_t *e)
@@ -151,23 +177,18 @@ static int lcui_app_dispatch(ptk_event_t *e)
         lcui_dispatch_ui_event(e);
         lcui_ui_update();
         lcui_worker_run();
-        ptk_steptimer_tick(&lcui_app.timer, lcui_app_on_tick, NULL);
+        lcui_app_render_frame();
         return 0;
 }
 
 uint32_t lcui_app_get_fps(void)
 {
-        return lcui_app.timer.frames_per_second;
+        return lcui_app.frames_per_second;
 }
 
 void lcui_app_set_frame_rate_cap(unsigned rate_cap)
 {
-        if (rate_cap > 0) {
-                lcui_app.timer.target_elapsed_time = 1000 / rate_cap;
-                lcui_app.timer.is_fixed_time_step = true;
-        } else {
-                lcui_app.timer.is_fixed_time_step = false;
-        }
+        lcui_app.min_render_interval = (rate_cap > 0) ? (1000 / rate_cap) : 0;
 }
 
 int lcui_app_process_events(ptk_process_events_option_t option)
@@ -177,9 +198,14 @@ int lcui_app_process_events(ptk_process_events_option_t option)
 
 void lcui_app_init(void)
 {
+        uint64_t now = (uint64_t)get_time_ms();
+
         lcui_worker_init();
-        ptk_steptimer_init(&lcui_app.timer);
-        lcui_app.timer.target_elapsed_time = 0;
+        lcui_app.last_render_time = now;
+        lcui_app.min_render_interval = 0;
+        lcui_app.fps_window_start = now;
+        lcui_app.frames_this_second = 0;
+        lcui_app.frames_per_second = 0;
         if (ptk_init(L"LCUI Application") != 0) {
                 abort();
         }
