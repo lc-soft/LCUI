@@ -72,6 +72,7 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder,
         size_t len, old_len;
         int i, old_level, count = 0;
         char *fullname = sfinder->name + sfinder->name_i;
+        size_t avail = MAX_NAME_LEN - sfinder->name_i;
 
         old_len = len = strlen(fullname);
         old_level = sfinder->level;
@@ -81,7 +82,7 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder,
                 if (!sfinder->node->type) {
                         return 0;
                 }
-                strcpy(fullname, sfinder->node->type);
+                snprintf(fullname, avail, "%s", sfinder->node->type);
                 list_append(list, strdup2(fullname));
                 break;
         case LEVEL_ID:
@@ -91,7 +92,7 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder,
                 }
                 fullname[len++] = '#';
                 fullname[len] = 0;
-                strcpy(fullname + len, sfinder->node->id);
+                snprintf(fullname + len, avail - len, "%s", sfinder->node->id);
                 list_append(list, strdup2(fullname));
                 break;
         case LEVEL_CLASS:
@@ -109,7 +110,7 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder,
                 for (i = 0; sfinder->node->classes[i]; ++i) {
                         sfinder->level += 1;
                         sfinder->class_i = i;
-                        strcpy(fullname + len, sfinder->node->classes[i]);
+                        snprintf(fullname + len, avail - len, "%s", sfinder->node->classes[i]);
                         list_append(list, strdup2(fullname));
                         /* 将当前选择器名与其它层级的选择器名组合 */
                         while (sfinder->level < LEVEL_TOTAL_NUM) {
