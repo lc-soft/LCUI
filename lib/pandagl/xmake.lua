@@ -59,8 +59,14 @@ target("pandagl")
         end
     end
 
-target("pandagl_tests")
+target("pandagl-tests")
     set_default(false)
     set_kind("binary")
-    add_files("test/*.c")
+    set_group("tests")
+    set_rundir("tests/fixtures")
+    add_files("tests/main.c", "tests/test_canvas_mix.c", "tests/test_image_reader.c", "tests/test_font_load.c")
     add_deps("ctest", "pandagl")
+    add_rules("tests.runnable")
+    add_tests("default", {group = "tests"})
+
+includes("examples/*/xmake.lua")

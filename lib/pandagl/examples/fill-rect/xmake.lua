@@ -1,0 +1,7 @@
+target("fill-rect")
+    set_default(false)
+    set_kind("binary")
+    set_rundir("app")
+    add_deps("pandagl")
+    add_files("src/*.c")
+    add_installfiles("app/*")
