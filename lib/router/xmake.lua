@@ -14,29 +14,12 @@ target("librouter")
         add_defines("LIBROUTER_DLL_EXPORT")
     end
 
-target("librouter_tests")
+target("librouter-tests")
     set_default(false)
     set_kind("binary")
+    set_group("tests")
+    set_rundir("tests")
     add_files("tests/test.c")
-    add_deps("librouter", "ctest")
-    on_run(function (target)
-        import("core.base.option")
-        local argv = {}
-        local options = {{nil, "memcheck",  "k",  nil, "enable memory check."}}
-        local args = option.raw_parse(option.get("arguments") or {}, options)
-        os.cd("$(projectdir)/tests")
-        if args.memcheck then
-            if is_plat("windows") then
-                table.insert(argv, target:targetfile())
-                os.execv("drmemory", argv)
-            else
-                table.insert(argv, "valgrind")
-                table.insert(argv, "--leak-check=full")
-                table.insert(argv, "--error-exitcode=42")
-                table.insert(argv, target:targetfile())
-                os.execv("sudo", argv)
-            end
-        else
-            os.execv(target:targetfile())
-        end
-    end)
+    add_deps("ctest", "librouter")
+    add_rules("tests.runnable")
+    add_tests("default", {group = "tests"})

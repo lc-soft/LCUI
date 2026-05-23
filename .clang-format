@@ -33,3 +33,4 @@ SpacesInParentheses: false
 SpacesInSquareBrackets: false
 SortIncludes: false
 UseTab: Never
+InsertNewlineAtEOF: true

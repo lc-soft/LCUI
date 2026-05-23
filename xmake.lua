@@ -22,6 +22,50 @@ add_includedirs(
     "include",
     {public = true}
 )
+
+option("memcheck")
+    set_default(false)
+    set_showmenu(true)
+    set_description("Enable memory check tools (drmemory on Windows, valgrind on Linux)")
+option_end()
+
+rule("tests.runnable")
+    on_test(function (target, opt)
+        import("core.base.option")
+        opt = opt or {}
+        local args = opt.runargs or {}
+        local rundir = opt.rundir or target:rundir()
+        local envs = opt.runenvs
+        local exec_opt = {curdir = rundir, envs = envs}
+        local exepath = path.absolute(target:targetfile())
+        if has_config("memcheck") then
+            local cmd
+            if is_plat("windows") then
+                cmd = {"drmemory", "--", exepath}
+            else
+                cmd = {"valgrind",
+                       "--leak-check=full",
+                       "--error-exitcode=42",
+                       "--num-callers=20",
+                       exepath}
+            end
+            for _, a in ipairs(args) do
+                table.insert(cmd, a)
+            end
+            local ok = try { function ()
+                os.execv(cmd[1], table.slice(cmd, 2), exec_opt)
+                return true
+            end }
+            return ok ~= nil, ok == nil and "memcheck failed" or nil
+        end
+        local ok = try { function ()
+            os.execv(exepath, args, exec_opt)
+            return true
+        end }
+        return ok ~= nil, ok == nil and "test failed" or nil
+    end)
+rule_end()
+
 includes("lib/*/xmake.lua")
 includes("tests/xmake.lua")
 
@@ -40,36 +84,6 @@ else
         add_syslinks("gcov")
     end
 end
-
-target("lcui_tests")
-    set_default(false)
-    set_kind("binary")
-    set_rundir("tests")
-    add_includedirs("tests/include")
-    add_files("tests/run_tests.c", "tests/cases/*.c")
-    add_deps("ctest", "lcui")
-    on_run(function (target)
-        import("core.base.option")
-        local argv = {}
-        local options = {{nil, "memcheck",  "k",  nil, "enable memory check."}}
-        local args = option.raw_parse(option.get("arguments") or {}, options)
-        os.cd("$(scriptdir)/tests")
-        if args.memcheck then
-            if is_plat("windows") then
-                table.insert(argv, target:targetfile())
-                os.execv("drmemory", argv)
-            else
-                table.insert(argv, "valgrind")
-                table.insert(argv, "--leak-check=full")
-                table.insert(argv, "--error-exitcode=42")
-                table.insert(argv, "--num-callers=20")
-                table.insert(argv, target:targetfile())
-                os.execv("sudo", argv)
-            end
-        else
-            os.execv(target:targetfile())
-        end
-    end)
 
 target("lcui")
     set_kind("$(kind)")

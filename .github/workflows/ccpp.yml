@@ -42,36 +42,20 @@ jobs:
       - name: Build
         run: |
           xmake
-          xmake build yutil_test
-          xmake build pandagl_tests
-          xmake build libcss_tests
-          xmake build librouter_tests
-          xmake build libi18n_tests
-          xmake build lcui_tests
+          xmake build yutil-tests
 
-      - name: Run tests for libraries with memcheck
-        if: runner.os == 'Linux'
-        run: |
-          xmake run pandagl_tests
-          xmake run yutil_test --memcheck
-          xmake run libcss_tests --memcheck
-          xmake run librouter_tests --memcheck
-          xmake run libi18n_tests --memcheck
+      - name: Run yutil tests
+        run: xmake run yutil-tests
 
-      - name: Run tests for lcui with memcheck
-        if: runner.os == 'Linux'
-        run: |
-            xmake run lcui_tests --memcheck
-
-      - name: Run tests
+      - name: Run all tests
         if: runner.os == 'Windows'
+        run: xmake test
+
+      - name: Run all tests with memcheck
+        if: runner.os == 'Linux'
         run: |
-          xmake run pandagl_tests
-          xmake run yutil_test
-          xmake run libcss_tests
-          xmake run librouter_tests
-          xmake run libi18n_tests
-          xmake run lcui_tests
+          xmake f -m debug --memcheck=y
+          xmake test
 
       - name: Upload reports to Codecov
         if: runner.os == 'Linux'

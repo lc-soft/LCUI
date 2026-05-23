@@ -20,30 +20,12 @@ target("libi18n")
         add_defines("LIBI18N_DLL_EXPORT")
     end
 
-target("libi18n_tests")
+target("libi18n-tests")
     set_default(false)
     set_kind("binary")
-    add_files("tests/test.c")
-    add_deps("libi18n", "ctest")
+    set_group("tests")
     set_rundir("tests")
-    on_run(function (target)
-        import("core.base.option")
-        local argv = {}
-        local options = {{nil, "memcheck",  "k",  nil, "enable memory check."}}
-        local args = option.raw_parse(option.get("arguments") or {}, options)
-        os.cd("$(scriptdir)/tests")
-        if args.memcheck then
-            if is_plat("windows") then
-                table.insert(argv, target:targetfile())
-                os.execv("drmemory", argv)
-            else
-                table.insert(argv, "valgrind")
-                table.insert(argv, "--leak-check=full")
-                table.insert(argv, "--error-exitcode=42")
-                table.insert(argv, target:targetfile())
-                os.execv("sudo", argv)
-            end
-        else
-            os.execv(target:targetfile())
-        end
-    end)
+    add_files("tests/test.c")
+    add_deps("ctest", "libi18n")
+    add_rules("tests.runnable")
+    add_tests("default", {group = "tests"})

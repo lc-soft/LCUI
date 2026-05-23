@@ -15,3 +15,14 @@ target("libthread")
     elseif is_plat("windows") then
         add_defines("LIBTHREAD_DLL_EXPORT")
     end
+
+target("libthread-tests")
+    set_default(false)
+    set_kind("binary")
+    set_group("tests")
+    set_rundir("tests")
+    add_files("tests/main.c", "tests/test_thread.c")
+    add_deps("ctest", "libthread")
+    add_rules("tests.runnable")
+    add_tests("default", {group = "tests"})
+

@@ -18,3 +18,13 @@ target("libui-xml")
     elseif is_plat("windows") then
         add_defines("LIBUI_XML_DLL_EXPORT")
     end
+
+target("libui-xml-tests")
+    set_default(false)
+    set_kind("binary")
+    set_group("tests")
+    set_rundir("tests/fixtures")
+    add_files("tests/main.c", "tests/test_xml_parser.c")
+    add_deps("ctest", "libui-xml")
+    add_rules("tests.runnable")
+    add_tests("default", {group = "tests"})
