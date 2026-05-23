@@ -16,6 +16,10 @@
 #include "keyboard.h"
 #include "fbapp.h"
 #include "x11app.h"
+
+#ifdef PTK_HAS_WAYLAND
+#include "waylandapp.h"
+#endif
 #include "x11clipboard.h"
 
 #ifdef PTK_LINUX
@@ -111,7 +115,9 @@ void *ptk_window_get_handle(ptk_window_t *wnd)
 
 unsigned ptk_window_get_dpi(ptk_window_t *wnd)
 {
-        // TODO: get dpi from x11 window or framebuffer?
+        if (linux_app.window.get_dpi) {
+                return linux_app.window.get_dpi(wnd);
+        }
         return 96;
 }
 
@@ -199,7 +205,20 @@ ptk_app_id_t ptk_get_app_id(void)
 int ptk_app_init(const wchar_t *name)
 {
         linux_app.id = PTK_APP_ID_LINUX;
+#ifdef PTK_HAS_WAYLAND
+        ptk_waylandapp_driver_init(&linux_app.app);
+        ptk_waylandwindow_driver_init(&linux_app.window);
+        if (linux_app.app.init(name) == 0) {
+                logger_debug("[app] use engine: waylandapp\n");
+                linux_app.id = PTK_APP_ID_LINUX_WAYLAND;
+                linux_app.active = true;
+                return 0;
+        }
+        memset(&linux_app.app, 0, sizeof(linux_app.app));
+        memset(&linux_app.window, 0, sizeof(linux_app.window));
+#endif
 #ifdef PTK_HAS_LIBX11
+
         ptk_x11app_driver_init(&linux_app.app);
         ptk_x11window_driver_init(&linux_app.window);
         if (linux_app.app.init(name) == 0) {
@@ -229,7 +248,7 @@ int ptk_app_destroy(void)
                 return -1;
         }
         linux_app.active = false;
-        if (linux_app.id != PTK_APP_ID_LINUX_X11) {
+        if (linux_app.id == PTK_APP_ID_LINUX) {
                 ptk_linux_mouse_destroy();
                 ptk_linux_keyboard_destroy();
         }
