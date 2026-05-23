@@ -36,7 +36,28 @@ bool ctest_equal_uint(const char *name, unsigned actual, unsigned expected);
 bool ctest_equal_float(const char *name, float actual, float expected);
 bool ctest_equal_str(const char *name, const char *actual,
                      const char *expected);
-bool ctest_equal_wcs(const char *name, const wchar_t *actual, const wchar_t *expected);
+bool ctest_equal_wcs(const char *name, const wchar_t *actual,
+                     const wchar_t *expected);
 int ctest_finish(void);
+
+typedef struct {
+        const char *name;
+        void (*run)(void);
+} ctest_suite_t;
+
+void ctest_set_grep(const char *pattern);
+bool ctest_should_run(const char *name);
+bool ctest_is_interactive(void);
+void ctest_set_interactive(bool interactive);
+int ctest_parse_args(int argc, char **argv);
+int ctest_run_suites(const ctest_suite_t *suites);
+
+#define CTEST_MAIN(SUITES)                             \
+        int main(int argc, char **argv)                \
+        {                                              \
+                if (ctest_parse_args(argc, argv) != 0) \
+                        return 1;                      \
+                return ctest_run_suites(SUITES);       \
+        }
 
 #endif
