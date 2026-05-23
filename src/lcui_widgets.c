@@ -10,6 +10,7 @@
  */
 
 #include <LCUI/widgets.h>
+#include <ui_router.h>
 
 void lcui_widgets_init(void)
 {

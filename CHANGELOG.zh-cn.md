@@ -10,6 +10,7 @@
     - lib/ptk
     - lib/thread
     - lib/router
+    - lib/ui-router
     - lib/worker
     - lib/ui
     - lib/ui-xml
