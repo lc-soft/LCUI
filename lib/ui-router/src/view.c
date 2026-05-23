@@ -1,7 +1,7 @@
-﻿/*
- * src/widgets/router_view.c
+/*
+ * lib/ui-router/src/view.c
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao <i@lc-soft.io> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -11,7 +11,7 @@
 
 #include <ui.h>
 #include <router.h>
-#include <LCUI/widgets/router_view.h>
+#include <ui_router/view.h>
 
 typedef struct ui_router_view {
         size_t index;

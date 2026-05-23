@@ -17,5 +17,3 @@
 #include "widgets/scrollbar.h"
 #include "widgets/textinput.h"
 #include "widgets/textcaret.h"
-#include "widgets/router_link.h"
-#include "widgets/router_view.h"
