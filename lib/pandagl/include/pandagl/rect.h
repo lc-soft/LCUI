@@ -18,6 +18,12 @@
 
 PD_BEGIN_DECLS
 
+PD_INLINE pd_rect_t pd_rect(int x, int y, int width, int height)
+{
+        pd_rect_t rect = { x, y, width, height };
+        return rect;
+}
+
 PD_INLINE bool pd_rect_is_include(pd_rect_t *a, pd_rect_t *b)
 {
 	return (b->x >= a->x && b->x + b->width <= a->x + a->width &&

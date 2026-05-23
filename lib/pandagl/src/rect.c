@@ -13,12 +13,6 @@
 #include <stdlib.h>
 #include <pandagl/rect.h>
 
-pd_rect_t pd_rect(int x, int y, int width, int height)
-{
-        pd_rect_t rect = { x, y, width, height };
-        return rect;
-}
-
 pd_rect_t pd_rect_crop(const pd_rect_t *rect, int container_width,
                        int container_height)
 {
