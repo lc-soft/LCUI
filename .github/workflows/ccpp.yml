@@ -14,15 +14,26 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: "Builds binaries on ${{ matrix.os }}"
     steps:
-      - uses: actions/checkout@v1
-    
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
           xmake-version: branch@dev
 
-      - name: Update git submodule
-        run: |
-          git submodule update --init
+      - name: Cache xmake packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.xmake/packages
+            ~/.xmake/repositories
+            ~/AppData/Local/.xmake/packages
+            ~/AppData/Local/.xmake/repositories
+          key: ${{ runner.os }}-xmake-${{ runner.os == 'Linux' && 'coverage' || 'release' }}-${{ hashFiles('xmake-requires.lock', 'examples/xmake-requires.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-xmake-${{ runner.os == 'Linux' && 'coverage' || 'release' }}-
+            ${{ runner.os }}-xmake-
 
       - name: Install tools
         if: runner.os == 'Linux'
@@ -80,13 +91,13 @@ jobs:
           mv ../dist/lcui-examples/bin/* ../dist/lcui-examples/
           rm -r ../dist/lcui-examples/bin
 
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v4
         with:
           name: lcui${{ env.TARGET_MAJOR }}-${{ env.TARGET_VERSION }}-${{ env.TARGET_KIND }} (${{ runner.os }})
           path: |
             dist/lcui-package
 
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v4
         with:
           name: lcui${{ env.TARGET_MAJOR }}-examples (${{ runner.os }})
           path: |
@@ -100,10 +111,10 @@ jobs:
       ARTIFACT_DIR: ./release
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
 
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: ${{ env.ARTIFACT_DIR }}
 
