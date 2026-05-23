@@ -6,3 +6,7 @@ target("ctest")
     add_files("src/*.c")
     add_deps("yutil")
     add_headerfiles("include/ctest.h")
+
+if os.isdir("tests") then
+    includes("tests/xmake.lua")
+end
