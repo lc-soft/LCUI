@@ -27,7 +27,7 @@ enum font_index {
 };
 
 /* inconsolata 字体数据索引 */
-static const pd_font_bitmap_t pd_inconsolata_font_bitmap_info[SIZE_TOTAL][95] = {
+static const pd_glyph_bitmap_t pd_inconsolata_font_bitmap_info[SIZE_TOTAL][95] = {
 	{
 		{ 16, 0, 0, 0, 0, (uint8_t*)0x00000000, { 6, 12 } },
 		{ 11, 1, 3, 9, 9, (uint8_t*)0x00000000, { 6, 12 } },
@@ -7585,7 +7585,7 @@ static const unsigned char *pd_inconsolata_font_bitmap[SIZE_TOTAL] = {
 	pd_inconsolata_font_bitmap_18px_bytes
 };
 
-int pd_render_inconsolata_font_bitmap(pd_font_bitmap_t *bmp, unsigned ch, int size)
+int pd_render_inconsolata_font_bitmap(pd_glyph_bitmap_t *bmp, unsigned ch, int size)
 {
 	int i, j, *ptr;
 	const uint8_t *byte_ptr;

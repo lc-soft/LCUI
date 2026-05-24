@@ -18,7 +18,7 @@ void test_font_face(void)
         ctest_equal_int("should load CSS file containing @font-face",
                         ui_load_css_file("test_font_face.css"), 0);
         ctest_equal_bool("should resolve font registered via @font-face",
-                         pd_font_library_get_font_id("icomoon", 0, 0) > 0,
+                         pd_font_get_id("icomoon", 0, 0) > 0,
                          true);
         ui_destroy();
 }

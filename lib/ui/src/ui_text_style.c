@@ -223,7 +223,7 @@ void ui_compute_text_style(ui_text_style_t *fs,
                 fs->font_ids = NULL;
         }
         if (style->font_family) {
-                pd_font_library_query(&fs->font_ids, fs->font_style,
+                pd_font_query(&fs->font_ids, fs->font_style,
                                       fs->font_weight,
                                       (const char *const *)style->font_family);
         }

@@ -9,5 +9,5 @@
  * LICENSE.TXT file in the root directory of this source tree.
  */
 
-int pd_incore_font_create(font_engine_t *engine);
+int pd_incore_font_create(pd_font_engine_t *engine);
 int pd_incore_font_destroy(void);

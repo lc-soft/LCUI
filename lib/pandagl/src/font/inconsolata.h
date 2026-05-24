@@ -9,4 +9,4 @@
  * LICENSE.TXT file in the root directory of this source tree.
  */
 
-int pd_render_inconsolata_font_bitmap(pd_font_bitmap_t *bmp, unsigned ch, int size);
+int pd_render_inconsolata_font_bitmap(pd_glyph_bitmap_t *bmp, unsigned ch, int size);
