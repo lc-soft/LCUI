@@ -39,7 +39,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update --fix-missing
-          sudo apt-get install debhelper lcov valgrind -yy
+          sudo apt-get install debhelper lcov valgrind xvfb -yy
           sudo apt-get install libfreetype6-dev libpng-dev libyaml-dev libomp-dev libx11-dev ninja-build fontconfig libfontconfig1-dev libjpeg-dev
 
       - name: Configure
@@ -66,11 +66,14 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           xmake f -m debug --memcheck=y
-          xmake test
+          xvfb-run -a xmake test
 
       - name: Upload reports to Codecov
         if: runner.os == 'Linux'
-        run: bash <(curl -s https://codecov.io/bash);
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
 
       - name: Build for release
         run: |
