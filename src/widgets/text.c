@@ -61,7 +61,7 @@ static void ui_text_on_parse_attr(ui_widget_t *w, const char *name,
         }
         if (strcmp(name, "multiline") == 0) {
                 bool enable = parse_boolean(value);
-                if (enable != txt->layer->mulitiline_enabled) {
+                if (enable != txt->layer->multiline_enabled) {
                         ui_text_set_multiline(w, enable);
                 }
         }

@@ -84,13 +84,17 @@ typedef enum pd_word_break_t {
 	PD_WORD_BREAK_BREAK_ALL
 } pd_word_break_t;
 
+typedef struct pd_text_caret {
+	int x; /**< 光标所在列数 */
+	int y; /**< 光标所在行数 */
+} pd_text_caret_t;
+
 typedef struct pd_text {
 	int offset_x;     /**< x轴坐标偏移量 */
 	int offset_y;     /**< y轴坐标偏移量 */
 	int new_offset_x; /**< 新的x轴坐标偏移量 */
 	int new_offset_y; /**< 新的y轴坐标偏移量 */
-	int insert_x;     /**< 光标所在列数 */
-	int insert_y;     /**< 光标所在行数 */
+	pd_text_caret_t caret; /**< 光标位置 */
 	int width;        /**< 实际文本宽度 */
 
 	/**
@@ -109,7 +113,7 @@ typedef struct pd_text {
 	int line_height;
 	pd_text_align_t text_align;
 	pd_word_break_t word_break;
-	bool mulitiline_enabled;
+	bool multiline_enabled;
 	bool autowrap_enabled;
 	bool style_tag_enabled;
 	list_t dirty_rects;
@@ -135,7 +139,7 @@ PD_PUBLIC int pd_text_get_line_height(pd_text_t *layer, int line_num);
 PD_PUBLIC int pd_text_get_line_length(pd_text_t *layer, int line_num);
 
 /** 添加 更新文本排版 的任务 */
-PD_PUBLIC void pd_text_set_typeset_task(pd_text_t *layer, int start_row);
+PD_PUBLIC void pd_text_request_typeset(pd_text_t *layer, int start_row);
 
 /** 设置文本对齐方式 */
 PD_PUBLIC void pd_text_set_align(pd_text_t *layer, int align);
@@ -152,22 +156,22 @@ PD_PUBLIC void pd_text_destroy(pd_text_t *layer);
 PD_PUBLIC void pd_text_mark_dirty(pd_text_t *layer, int start_row, int end_row);
 
 /** 设置插入点的行列坐标 */
-PD_PUBLIC void pd_text_set_insert_position(pd_text_t *layer, int line_num,
+PD_PUBLIC void pd_text_set_caret(pd_text_t *layer, int line_num,
 					   int col);
 
 /** 根据像素坐标设置文本光标的行列坐标 */
-PD_PUBLIC int pd_text_set_insert_pixel_position(pd_text_t *layer, int x, int y);
+PD_PUBLIC int pd_text_set_caret_pixel(pd_text_t *layer, int x, int y);
 
 /** 获取指定行列的文字的像素坐标 */
-PD_PUBLIC int pd_text_get_char_pixel_position(pd_text_t *layer, int line_num,
+PD_PUBLIC int pd_text_get_char_pixel(pd_text_t *layer, int line_num,
 					      int col, pd_pos_t *pixel_pos);
 
 /** 获取文本光标的像素坐标 */
-PD_PUBLIC int pd_text_get_insert_pixel_position(pd_text_t *layer,
+PD_PUBLIC int pd_text_get_caret_pixel(pd_text_t *layer,
 						pd_pos_t *pixel_pos);
 
 /** 清空文本 */
-PD_PUBLIC void pd_text_empty(pd_text_t *layer);
+PD_PUBLIC void pd_text_clear(pd_text_t *layer);
 
 PD_PUBLIC int pd_text_insert(pd_text_t *layer, const wchar_t *wstr,
 			     list_t *tag_stack);
@@ -179,8 +183,14 @@ PD_PUBLIC int pd_text_write(pd_text_t *layer, const wchar_t *wstr,
 			    list_t *tag_stack);
 
 /** 获取文本图层中的文本（宽字符版） */
-PD_PUBLIC size_t pd_text_dump(pd_text_t *text, size_t start_pos, size_t max_len,
+PD_PUBLIC size_t pd_text_read(pd_text_t *text, size_t start_pos, size_t max_len,
 			      wchar_t *wstr_buff);
+
+/**
+ * 取得文本图层完整内容（含按 line.eol 还原的换行符）
+ * 返回值由调用方负责 free，失败时返回 NULL
+ */
+PD_PUBLIC wchar_t *pd_text_to_wcs(pd_text_t *text);
 
 /** 计算并获取文本的宽度 */
 PD_PUBLIC int pd_text_get_width(pd_text_t *layer);

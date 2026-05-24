@@ -104,7 +104,7 @@ static void ui_textinput_update_caret(ui_widget_t *widget)
 {
         ui_textinput_t *edit = ui_widget_get_data(widget, ui_textinput_proto);
 
-        int row = edit->layer->insert_y;
+        int row = edit->layer->caret.y;
         int offset_x, offset_y;
         float height, width;
         float scale = ui_get_actual_scale();
@@ -112,7 +112,7 @@ static void ui_textinput_update_caret(ui_widget_t *widget)
 
         if (!edit->placeholder_visible) {
                 pd_pos_t pos;
-                if (pd_text_get_insert_pixel_position(edit->layer, &pos) != 0) {
+                if (pd_text_get_caret_pixel(edit->layer, &pos) != 0) {
                         return;
                 }
                 caret_x = pos.x / scale;
@@ -158,9 +158,9 @@ static void ui_textinput_update_caret(ui_widget_t *widget)
         ui_widget_move(edit->caret, x, y);
         ui_textcaret_refresh(edit->caret);
         if (edit->password_char) {
-                pd_text_set_insert_position(edit->layer_source,
-                                            edit->layer->insert_y,
-                                            edit->layer->insert_x);
+                pd_text_set_caret(edit->layer_source,
+                                            edit->layer->caret.y,
+                                            edit->layer->caret.x);
         }
 }
 
@@ -170,7 +170,7 @@ void ui_textinput_move_caret(ui_widget_t *widget, int row, int col)
         if (edit->placeholder_visible) {
                 row = col = 0;
         }
-        pd_text_set_insert_position(edit->layer, row, col);
+        pd_text_set_caret(edit->layer, row, col);
         ui_textinput_update_caret(widget);
 }
 
@@ -459,7 +459,7 @@ void ui_textinput_clear_text(ui_widget_t *widget)
                         node = prev;
                 }
         }
-        pd_text_empty(edit->layer_source);
+        pd_text_clear(edit->layer_source);
         pd_style_tags_clear(&edit->text_tags);
         edit->tasks[TASK_UPDATE] = true;
         ui_widget_request_update(widget);
@@ -471,7 +471,7 @@ size_t ui_textinput_get_text_w(ui_widget_t *w, size_t start, size_t max_len,
                                wchar_t *buf)
 {
         ui_textinput_t *edit = ui_widget_get_data(w, ui_textinput_proto);
-        return pd_text_dump(edit->layer_source, start, max_len, buf);
+        return pd_text_read(edit->layer_source, start, max_len, buf);
 }
 
 size_t ui_textinput_get_text_length(ui_widget_t *w)
@@ -512,7 +512,7 @@ void ui_textinput_set_password_char(ui_widget_t *w, wchar_t ch)
         edit->password_char = ch;
         edit->tasks[TASK_UPDATE] = true;
         ui_widget_request_update(w);
-        pd_text_empty(edit->layer_mask);
+        pd_text_clear(edit->layer_mask);
         if (!edit->password_char) {
                 edit->layer = edit->layer_source;
                 return;
@@ -542,7 +542,7 @@ int ui_textinput_set_placeholder_w(ui_widget_t *w, const wchar_t *wstr)
 {
         ui_textinput_t *edit = ui_widget_get_data(w, ui_textinput_proto);
         thread_mutex_lock(&edit->mutex);
-        pd_text_empty(edit->layer_placeholder);
+        pd_text_clear(edit->layer_placeholder);
         thread_mutex_unlock(&edit->mutex);
         if (edit->placeholder_visible) {
                 ui_widget_mark_dirty_rect(w, NULL, UI_BOX_TYPE_PADDING_BOX);
@@ -665,8 +665,8 @@ static void ui_textinput_on_keydown(ui_widget_t *widget, ui_event_t *e,
         int cur_col, cur_row;
         ui_textinput_t *edit = ui_widget_get_data(widget, ui_textinput_proto);
 
-        cur_row = edit->layer->insert_y;
-        cur_col = edit->layer->insert_x;
+        cur_row = edit->layer->caret.y;
+        cur_col = edit->layer->caret.x;
         rows = pd_text_get_lines_length(edit->layer);
         cols = pd_text_get_line_length(edit->layer, cur_row);
         e->cancel_bubble = true;
@@ -796,7 +796,7 @@ static void ui_textinput_on_mousemove(ui_widget_t *w, ui_event_t *e, void *arg)
                 return;
         }
         ui_widget_get_offset(w, NULL, &offset_x, &offset_y);
-        pd_text_set_insert_pixel_position(
+        pd_text_set_caret_pixel(
             edit->layer,
             ui_compute(e->mouse.x - offset_x - w->computed_style.padding_left),
             ui_compute(e->mouse.y - offset_y - w->computed_style.padding_top));
@@ -815,7 +815,7 @@ static void ui_textinput_on_mousedown(ui_widget_t *w, ui_event_t *e, void *arg)
         ui_textinput_t *edit = ui_widget_get_data(w, ui_textinput_proto);
 
         ui_widget_get_offset(w, NULL, &offset_x, &offset_y);
-        pd_text_set_insert_pixel_position(
+        pd_text_set_caret_pixel(
             edit->layer,
             ui_compute(e->mouse.x - offset_x - w->computed_style.padding_left),
             ui_compute(e->mouse.y - offset_y - w->computed_style.padding_top));
