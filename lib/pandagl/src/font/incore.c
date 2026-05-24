@@ -54,11 +54,19 @@ static int pd_incore_font_render(pd_glyph_bitmap_t *bmp, unsigned ch,
 	return -1;
 }
 
+static unsigned pd_incore_font_get_glyph_index(pd_font_face_t *face, unsigned ch)
+{
+	(void)face;
+	/* 内置位图字体没有 cmap，字符码即字形索引 */
+	return ch;
+}
+
 int pd_incore_font_create(pd_font_engine_t *engine)
 {
 	engine->render = pd_incore_font_render;
 	engine->close = pd_incore_font_close;
 	engine->open = pd_incore_font_open;
+	engine->get_glyph_index = pd_incore_font_get_glyph_index;
 	strcpy(engine->name, "in-core");
 	return 0;
 }

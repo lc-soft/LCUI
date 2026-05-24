@@ -15,12 +15,14 @@ extern void test_pandagl_canvas_mix(void);
 extern void test_pandagl_image_reader(void);
 extern void test_pandagl_font_load(void);
 extern void test_pandagl_text_edit(void);
+extern void test_pandagl_font_cache(void);
 
 static const ctest_suite_t suites[] = {
         { "pandagl/canvas mix", test_pandagl_canvas_mix },
         { "pandagl/image reader", test_pandagl_image_reader },
         { "pandagl/font load", test_pandagl_font_load },
         { "pandagl/text edit", test_pandagl_text_edit },
+        { "pandagl/font cache", test_pandagl_font_cache },
         { NULL, NULL }
 };
 

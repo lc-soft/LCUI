@@ -22,13 +22,13 @@
 
 #define FONT_CACHE_SIZE		32
 #define FONT_CACHE_MAX_SIZE	1024
+#define GLYPH_CACHE_DEFAULT_CAPACITY	8192
 
 /**
- * 库中缓存的字体位图是分组存放的，共有三级分组，分别为：
- * 字符->字体信息->字体大小
- * 获取字体位图时的搜索顺序为：先找到字符的记录，然后在记录中的字体数据库里找
- * 到指定字体样式标识号的字体位图库，之后在字体位图库中找到指定像素大小的字体
- * 位图。
+ * 字形位图缓存使用扁平 hash 表 + LRU 双链表：
+ * key   = (face_id, glyph_index, size) 打包为 64 位整数
+ * value = glyph_cache_entry_t，包含位图数据和指向 LRU 链表节点的反向引用
+ * 命中时移动到链首；超过 capacity 时从链尾驱逐。
  */
 
 typedef struct font_style_node {
@@ -49,6 +49,18 @@ typedef struct font_family_node {
 	font_style_node_t styles[PD_FONT_STYLE_TOTAL_NUM];
 } font_family_node_t;
 
+typedef struct glyph_cache_key {
+	int face_id;
+	unsigned glyph_index;
+	int size;
+} glyph_cache_key_t;
+
+typedef struct glyph_cache_entry {
+	uint64_t key;
+	pd_glyph_bitmap_t bitmap;
+	list_node_t *lru_node;
+} glyph_cache_entry_t;
+
 static struct font_library_module {
 	int count;
 	int font_cache_num;
@@ -60,8 +72,10 @@ static struct font_library_module {
 	/** dict_t<string, string> */
 	dict_t *font_family_aliases;
 
-	/** rbtree_t<wchar_t, rbtree_t<int, rbtree_t<int, pd_glyph_bitmap_t>>>  */
-	rbtree_t bitmap_cache;
+	/** dict_t<uint64_t, glyph_cache_entry_t> */
+	dict_t *glyph_cache;
+	list_t glyph_lru;
+	size_t glyph_cache_capacity;
 
 	font_cache_t **font_cache;
 	pd_font_face_t *default_font;
@@ -72,24 +86,101 @@ static struct font_library_module {
 
 /* clang-format on */
 
-PD_INLINE rbtree_t *select_char_cache(wchar_t ch)
-{
-        return rbtree_get_data_by_key(&fontlib.bitmap_cache, ch);
-}
-
-PD_INLINE rbtree_t *select_font_cache(rbtree_t *font_cache, int font_id)
-{
-        return rbtree_get_data_by_key(font_cache, font_id);
-}
-
-PD_INLINE pd_glyph_bitmap_t *select_bitmap_cache(rbtree_t *bmp_cache, int size)
-{
-        return rbtree_get_data_by_key(bmp_cache, size);
-}
-
 PD_INLINE font_family_node_t *select_font_family_cache(const char *family_name)
 {
         return dict_fetch_value(fontlib.font_families, family_name);
+}
+
+PD_INLINE uint64_t glyph_cache_pack_key(int face_id, unsigned glyph_index,
+                                        int size)
+{
+        /* face_id 占高 16 位，glyph_index 占中间 32 位，size 占低 16 位。 */
+        return ((uint64_t)(unsigned)face_id << 48) |
+               ((uint64_t)glyph_index << 16) |
+               (uint64_t)((unsigned)size & 0xFFFFu);
+}
+
+static uint64_t glyph_cache_key_hash(const void *key)
+{
+        return dict_gen_hash_function(key, (int)sizeof(uint64_t));
+}
+
+static int glyph_cache_key_compare(void *priv_data, const void *key1,
+                                   const void *key2)
+{
+        (void)priv_data;
+        return *(const uint64_t *)key1 == *(const uint64_t *)key2;
+}
+
+static void *glyph_cache_key_dup(void *priv_data, const void *key)
+{
+        uint64_t *copy;
+        (void)priv_data;
+        copy = malloc(sizeof(uint64_t));
+        if (copy) {
+                *copy = *(const uint64_t *)key;
+        }
+        return copy;
+}
+
+static void glyph_cache_key_destructor(void *priv_data, void *key)
+{
+        (void)priv_data;
+        free(key);
+}
+
+static void glyph_cache_entry_destructor(void *priv_data, void *val)
+{
+        glyph_cache_entry_t *entry = val;
+        (void)priv_data;
+        if (!entry) {
+                return;
+        }
+        if (entry->lru_node) {
+                list_unlink(&fontlib.glyph_lru, entry->lru_node);
+                list_node_free(entry->lru_node);
+        }
+        pd_glyph_bitmap_destroy(&entry->bitmap);
+        free(entry);
+}
+
+static void glyph_cache_evict_one(void)
+{
+        list_node_t *node = list_get_first_node(&fontlib.glyph_lru);
+        glyph_cache_entry_t *victim;
+
+        if (!node) {
+                return;
+        }
+        victim = node->data;
+        /* dict_delete 触发 destructor 会再次解链 lru_node，
+         * 所以这里只清掉反向引用并把 list_node 自己处理掉 */
+        list_unlink(&fontlib.glyph_lru, node);
+        list_node_free(node);
+        victim->lru_node = NULL;
+        dict_delete(fontlib.glyph_cache, &victim->key);
+}
+
+static void glyph_cache_touch(glyph_cache_entry_t *entry)
+{
+        if (!entry->lru_node) {
+                return;
+        }
+        if (entry->lru_node == fontlib.glyph_lru.tail.prev) {
+                return;
+        }
+        list_unlink(&fontlib.glyph_lru, entry->lru_node);
+        list_append_node(&fontlib.glyph_lru, entry->lru_node);
+}
+
+static unsigned resolve_glyph_index(unsigned ch, int font_id)
+{
+        pd_font_face_t *face = pd_font_get(font_id);
+
+        if (!face || !face->engine || !face->engine->get_glyph_index) {
+                return ch;
+        }
+        return face->engine->get_glyph_index(face, ch);
 }
 
 #ifdef PANDAGL_HAS_FONTCONFIG
@@ -167,73 +258,64 @@ static void destroy_font_family_node(void *privdata, void *data)
         free(node);
 }
 
-static void destroy_font_bitmap(void *arg)
-{
-        pd_glyph_bitmap_destroy(arg);
-        free(arg);
-}
-
-static void destroy_tree_node(void *arg)
-{
-        rbtree_destroy(arg);
-        free(arg);
-}
-
 pd_glyph_bitmap_t *pd_font_cache_add_bitmap(wchar_t ch, int font_id, int size,
-                                             const pd_glyph_bitmap_t *bmp)
+                                            const pd_glyph_bitmap_t *bmp)
 {
-        pd_glyph_bitmap_t *bmp_cache;
-        rbtree_t *tree_font, *tree_bmp;
+        uint64_t key;
+        unsigned glyph_index;
+        glyph_cache_entry_t *entry;
 
         if (!fontlib.active) {
                 return NULL;
-        }
-        /* 获取字符的字体信息集 */
-        tree_font = select_char_cache(ch);
-        if (!tree_font) {
-                tree_font = malloc(sizeof(rbtree_t));
-                if (!tree_font) {
-                        return NULL;
-                }
-                rbtree_init(tree_font);
-                rbtree_set_destroy_func(tree_font, destroy_tree_node);
-                rbtree_insert_by_key(&fontlib.bitmap_cache, ch, tree_font);
         }
         /* 当字体ID不大于0时，使用内置字体 */
         if (font_id <= 0) {
                 font_id = fontlib.incore_font->id;
         }
-        /* 获取相应字体样式标识号的字体位图库 */
-        tree_bmp = select_font_cache(tree_font, font_id);
-        if (!tree_bmp) {
-                tree_bmp = malloc(sizeof(rbtree_t));
-                if (!tree_bmp) {
-                        return NULL;
-                }
-                rbtree_init(tree_bmp);
-                rbtree_set_destroy_func(tree_bmp, destroy_font_bitmap);
-                rbtree_insert_by_key(tree_font, font_id, tree_bmp);
+        glyph_index = resolve_glyph_index(ch, font_id);
+        key = glyph_cache_pack_key(font_id, glyph_index, size);
+        entry = dict_fetch_value(fontlib.glyph_cache, &key);
+        if (entry) {
+                /* 已存在则就地覆盖位图数据 */
+                pd_glyph_bitmap_destroy(&entry->bitmap);
+                memcpy(&entry->bitmap, bmp, sizeof(pd_glyph_bitmap_t));
+                glyph_cache_touch(entry);
+                return &entry->bitmap;
         }
-        /* 在字体位图库中获取指定像素大小的字体位图 */
-        bmp_cache = select_bitmap_cache(tree_bmp, size);
-        if (!bmp_cache) {
-                bmp_cache = malloc(sizeof(pd_glyph_bitmap_t));
-                if (!bmp_cache) {
-                        return NULL;
-                }
-                rbtree_insert_by_key(tree_bmp, size, bmp_cache);
+        /* 容量到上限时驱逐链尾 */
+        while (fontlib.glyph_cache_capacity > 0 &&
+               fontlib.glyph_lru.length >= fontlib.glyph_cache_capacity) {
+                glyph_cache_evict_one();
         }
-        /* 拷贝数据至该空间内 */
-        memcpy(bmp_cache, bmp, sizeof(pd_glyph_bitmap_t));
-        return bmp_cache;
+        entry = malloc(sizeof(glyph_cache_entry_t));
+        if (!entry) {
+                return NULL;
+        }
+        entry->key = key;
+        memcpy(&entry->bitmap, bmp, sizeof(pd_glyph_bitmap_t));
+        entry->lru_node = NULL;
+        if (dict_add(fontlib.glyph_cache, &key, entry) != DICT_OK) {
+                free(entry);
+                return NULL;
+        }
+        entry->lru_node = malloc(sizeof(list_node_t));
+        if (entry->lru_node) {
+                entry->lru_node->data = entry;
+                entry->lru_node->prev = NULL;
+                entry->lru_node->next = NULL;
+                list_append_node(&fontlib.glyph_lru, entry->lru_node);
+        }
+        return &entry->bitmap;
 }
 
 int pd_font_cache_get_bitmap(unsigned ch, int font_id, int size,
-                               const pd_glyph_bitmap_t **bmp)
+                             const pd_glyph_bitmap_t **bmp)
 {
         int ret;
-        rbtree_t *ctx;
-        pd_glyph_bitmap_t bmp_cache;
+        uint64_t key;
+        unsigned glyph_index;
+        glyph_cache_entry_t *entry;
+        pd_glyph_bitmap_t tmp;
 
         *bmp = NULL;
         if (!fontlib.active) {
@@ -246,35 +328,45 @@ int pd_font_cache_get_bitmap(unsigned ch, int font_id, int size,
                         font_id = fontlib.incore_font->id;
                 }
         }
-        do {
-                if (!(ctx = select_char_cache(ch))) {
-                        break;
-                }
-                ctx = select_font_cache(ctx, font_id);
-                if (!ctx) {
-                        break;
-                }
-                *bmp = select_bitmap_cache(ctx, size);
-                if (*bmp) {
-                        return 0;
-                }
-                break;
-        } while (0);
+        glyph_index = resolve_glyph_index(ch, font_id);
+        key = glyph_cache_pack_key(font_id, glyph_index, size);
+        entry = dict_fetch_value(fontlib.glyph_cache, &key);
+        if (entry) {
+                glyph_cache_touch(entry);
+                *bmp = &entry->bitmap;
+                return 0;
+        }
         if (ch == 0) {
                 return -1;
         }
-        pd_glyph_bitmap_init(&bmp_cache);
-        ret = pd_font_render_glyph(&bmp_cache, ch, font_id, size);
+        pd_glyph_bitmap_init(&tmp);
+        ret = pd_font_render_glyph(&tmp, ch, font_id, size);
         if (ret == 0) {
-                *bmp =
-                    pd_font_cache_add_bitmap(ch, font_id, size, &bmp_cache);
+                *bmp = pd_font_cache_add_bitmap(ch, font_id, size, &tmp);
                 return 0;
         }
+        /* 渲染失败：回退到 .notdef（ch == 0）位图 */
         ret = pd_font_cache_get_bitmap(0, font_id, size, bmp);
         if (ret != 0) {
-                *bmp = pd_font_cache_add_bitmap(0, font_id, size, &bmp_cache);
+                *bmp = pd_font_cache_add_bitmap(0, font_id, size, &tmp);
         }
         return -1;
+}
+
+void pd_font_cache_set_capacity(size_t capacity)
+{
+        fontlib.glyph_cache_capacity = capacity;
+        if (capacity == 0) {
+                return;
+        }
+        while (fontlib.glyph_lru.length > capacity) {
+                glyph_cache_evict_one();
+        }
+}
+
+size_t pd_font_cache_count(void)
+{
+        return fontlib.glyph_lru.length;
 }
 
 static font_cache_t *font_cache_create(void)
@@ -712,12 +804,12 @@ static void pd_font_library_init_base(void)
 {
         static dict_type_t dict_type;
         static dict_type_t alias_dict_type;
+        static dict_type_t glyph_dict_type;
 
         fontlib.count = 0;
         fontlib.font_cache_num = 1;
         fontlib.font_cache = malloc(sizeof(font_cache_t));
         fontlib.font_cache[0] = font_cache_create();
-        rbtree_init(&fontlib.bitmap_cache);
         dict_init_string_key_type(&dict_type);
         dict_init_string_copy_key_type(&alias_dict_type);
         dict_type.val_destructor = destroy_font_family_node;
@@ -725,7 +817,18 @@ static void pd_font_library_init_base(void)
         alias_dict_type.val_dup = font_family_dict_val_dup;
         fontlib.font_families = dict_create(&dict_type, NULL);
         fontlib.font_family_aliases = dict_create(&alias_dict_type, NULL);
-        rbtree_set_destroy_func(&fontlib.bitmap_cache, destroy_tree_node);
+
+        /* glyph 位图缓存：key 为打包后的 64 位整数 */
+        memset(&glyph_dict_type, 0, sizeof(glyph_dict_type));
+        glyph_dict_type.hash_function = glyph_cache_key_hash;
+        glyph_dict_type.key_compare = glyph_cache_key_compare;
+        glyph_dict_type.key_dup = glyph_cache_key_dup;
+        glyph_dict_type.key_destructor = glyph_cache_key_destructor;
+        glyph_dict_type.val_destructor = glyph_cache_entry_destructor;
+        fontlib.glyph_cache = dict_create(&glyph_dict_type, NULL);
+        list_create(&fontlib.glyph_lru);
+        fontlib.glyph_cache_capacity = GLYPH_CACHE_DEFAULT_CAPACITY;
+
         fontlib.active = true;
 }
 
@@ -765,11 +868,13 @@ static void pd_font_library_destroy_base(void)
         }
         dict_destroy(fontlib.font_family_aliases);
         dict_destroy(fontlib.font_families);
-        rbtree_destroy(&fontlib.bitmap_cache);
+        /* dict 的 val_destructor 会解链并释放各 entry 的 LRU 节点 */
+        dict_destroy(fontlib.glyph_cache);
         free(fontlib.font_cache);
         fontlib.font_cache = NULL;
         fontlib.font_families = NULL;
         fontlib.font_family_aliases = NULL;
+        fontlib.glyph_cache = NULL;
 }
 
 static void pd_font_library_destroy_engine(void)
