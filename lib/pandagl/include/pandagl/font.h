@@ -64,6 +64,7 @@ typedef struct pd_font_face {
 struct pd_font_engine {
         char name[64];
         int (*open)(const char *, pd_font_face_t ***);
+        unsigned (*get_glyph_index)(pd_font_face_t *, unsigned);
         int (*render)(pd_glyph_bitmap_t *, unsigned, int, pd_font_face_t *);
         void (*close)(void *);
 };
@@ -174,6 +175,15 @@ PD_PUBLIC pd_glyph_bitmap_t *pd_font_cache_add_bitmap(
  */
 PD_PUBLIC int pd_font_cache_get_bitmap(unsigned ch, int font_id, int size,
                                          const pd_glyph_bitmap_t **bmp);
+
+/**
+ * 设置字形位图缓存上限（按 entry 数）。0 表示不限制。
+ * 当现有缓存超出新上限时，立即按 LRU 顺序驱逐多余 entry。
+ */
+PD_PUBLIC void pd_font_cache_set_capacity(size_t capacity);
+
+/** 当前缓存中实际持有的 entry 数 */
+PD_PUBLIC size_t pd_font_cache_count(void);
 
 /** 载入字体至数据库中 */
 PD_PUBLIC int pd_font_load_file(const char *filepath);

@@ -180,6 +180,13 @@ static int pd_freetype_render(pd_glyph_bitmap_t *bmp, unsigned ch,
 	return ret;
 }
 
+static unsigned pd_freetype_get_glyph_index(pd_font_face_t *font, unsigned ch)
+{
+	FT_Face ft_face = (FT_Face)font->data;
+
+	return FT_Get_Char_Index(ft_face, ch);
+}
+
 int pd_freetype_engine_init(pd_font_engine_t *engine)
 {
 	if (FT_Init_FreeType(&freetype.library)) {
@@ -189,6 +196,7 @@ int pd_freetype_engine_init(pd_font_engine_t *engine)
 	engine->render = pd_freetype_render;
 	engine->open = pd_freetype_open;
 	engine->close = pd_freetype_close;
+	engine->get_glyph_index = pd_freetype_get_glyph_index;
 	return 0;
 }
 
