@@ -14,7 +14,7 @@
 #include <pandagl.h>
 #include "bitmap.h"
 
-void pd_font_bitmap_init(pd_font_bitmap_t *bitmap)
+void pd_glyph_bitmap_init(pd_glyph_bitmap_t *bitmap)
 {
 	bitmap->rows = 0;
 	bitmap->width = 0;
@@ -23,17 +23,17 @@ void pd_font_bitmap_init(pd_font_bitmap_t *bitmap)
 	bitmap->buffer = NULL;
 }
 
-void pd_font_bitmap_destroy(pd_font_bitmap_t *bitmap)
+void pd_glyph_bitmap_destroy(pd_glyph_bitmap_t *bitmap)
 {
 	if (bitmap->buffer) {
 		free(bitmap->buffer);
 	}
-	pd_font_bitmap_init(bitmap);
+	pd_glyph_bitmap_init(bitmap);
 }
 
-static void pd_canvas_mix_font_bitmap_argb(pd_canvas_t *graph,
+static void pd_canvas_mix_glyph_bitmap_argb(pd_canvas_t *graph,
 					   pd_rect_t *write_rect,
-					   const pd_font_bitmap_t *bmp,
+					   const pd_glyph_bitmap_t *bmp,
 					   pd_color_t color,
 					   pd_rect_t *read_rect)
 {
@@ -59,9 +59,9 @@ static void pd_canvas_mix_font_bitmap_argb(pd_canvas_t *graph,
 	}
 }
 
-static void pd_canvas_mix_font_bitmap_rgb(pd_canvas_t *graph,
+static void pd_canvas_mix_glyph_bitmap_rgb(pd_canvas_t *graph,
 					  pd_rect_t *write_rect,
-					  const pd_font_bitmap_t *bmp,
+					  const pd_glyph_bitmap_t *bmp,
 					  pd_color_t color,
 					  pd_rect_t *read_rect)
 {
@@ -88,8 +88,8 @@ static void pd_canvas_mix_font_bitmap_rgb(pd_canvas_t *graph,
 	}
 }
 
-int pd_canvas_mix_font_bitmap(pd_canvas_t *graph, pd_pos_t pos,
-			      const pd_font_bitmap_t *bmp, pd_color_t color)
+int pd_canvas_mix_glyph_bitmap(pd_canvas_t *graph, pd_pos_t pos,
+			      const pd_glyph_bitmap_t *bmp, pd_color_t color)
 {
 	pd_canvas_t write_slot;
 	pd_rect_t r_rect, w_rect;
@@ -113,10 +113,10 @@ int pd_canvas_mix_font_bitmap(pd_canvas_t *graph, pd_pos_t pos,
 	/* 获取背景图引用的源图形 */
 	graph = pd_canvas_get_quote_source(graph);
 	if (graph->color_type == PD_COLOR_TYPE_ARGB) {
-		pd_canvas_mix_font_bitmap_argb(graph, &w_rect, bmp, color,
+		pd_canvas_mix_glyph_bitmap_argb(graph, &w_rect, bmp, color,
 					       &r_rect);
 	} else {
-		pd_canvas_mix_font_bitmap_rgb(graph, &w_rect, bmp, color,
+		pd_canvas_mix_glyph_bitmap_rgb(graph, &w_rect, bmp, color,
 					      &r_rect);
 	}
 	return 0;

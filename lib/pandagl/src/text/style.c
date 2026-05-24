@@ -77,7 +77,7 @@ void pd_text_style_merge(pd_text_style_t *base, pd_text_style_t *target)
 		base->has_style = true;
 		base->style = target->style;
 	}
-	if (pd_font_library_update_font_style(base->font_ids, base->style,
+	if (pd_font_replace_style(base->font_ids, base->style,
 					      &font_ids) > 0) {
 		free(base->font_ids);
 		base->font_ids = font_ids;
@@ -87,7 +87,7 @@ void pd_text_style_merge(pd_text_style_t *base, pd_text_style_t *target)
 		base->has_weight = true;
 		base->weight = target->weight;
 	}
-	if (pd_font_library_update_font_weight(base->font_ids, base->weight,
+	if (pd_font_replace_weight(base->font_ids, base->weight,
 					       &font_ids) > 0) {
 		free(base->font_ids);
 		base->font_ids = font_ids;
@@ -117,7 +117,7 @@ int pd_text_style_set_weight(pd_text_style_t *ts, pd_font_weight_t weight)
 	int *font_ids;
 	ts->weight = weight;
 	ts->has_weight = true;
-	if (pd_font_library_update_font_weight(ts->font_ids, weight,
+	if (pd_font_replace_weight(ts->font_ids, weight,
 					       &font_ids) > 0) {
 		free(ts->font_ids);
 		ts->font_ids = font_ids;
@@ -131,7 +131,7 @@ int pd_text_style_set_style(pd_text_style_t *ts, pd_font_style_t style)
 	int *font_ids;
 	ts->style = style;
 	ts->has_style = true;
-	if (pd_font_library_update_font_style(ts->font_ids, style, &font_ids) >
+	if (pd_font_replace_style(ts->font_ids, style, &font_ids) >
 	    0) {
 		free(ts->font_ids);
 		ts->font_ids = font_ids;
@@ -150,7 +150,7 @@ int pd_text_style_set_font(pd_text_style_t *ts, const char *const *names)
 	ts->font_ids = NULL;
 	ts->has_family = false;
 	count =
-	    pd_font_library_query(&ts->font_ids, ts->style, ts->weight, names);
+	    pd_font_query(&ts->font_ids, ts->style, ts->weight, names);
 	if (count > 0) {
 		ts->has_family = true;
 		return 0;
@@ -170,7 +170,7 @@ int pd_text_style_set_default_font(pd_text_style_t *ts)
 		return -ENOMEM;
 	}
 	ts->has_family = true;
-	ts->font_ids[0] = pd_font_library_get_default_font();
+	ts->font_ids[0] = pd_font_get_default();
 	ts->font_ids[1] = 0;
 	return 0;
 }

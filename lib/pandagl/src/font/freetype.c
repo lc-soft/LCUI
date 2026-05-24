@@ -29,10 +29,10 @@ static struct {
 	FT_Library library;
 } freetype;
 
-static int pd_freetype_open(const char *filepath, pd_font_t ***outfonts)
+static int pd_freetype_open(const char *filepath, pd_font_face_t ***outfonts)
 {
 	FT_Face face;
-	pd_font_t *font, **fonts;
+	pd_font_face_t *font, **fonts;
 	int i, err, num_faces;
 
 	err = FT_New_Face(freetype.library, filepath, -1, &face);
@@ -45,7 +45,7 @@ static int pd_freetype_open(const char *filepath, pd_font_t ***outfonts)
 	if (num_faces < 1) {
 		return 0;
 	}
-	fonts = malloc(sizeof(pd_font_t *) * num_faces);
+	fonts = malloc(sizeof(pd_font_face_t *) * num_faces);
 	if (!fonts) {
 		return -ENOMEM;
 	}
@@ -56,7 +56,7 @@ static int pd_freetype_open(const char *filepath, pd_font_t ***outfonts)
 			continue;
 		}
 		FT_Select_Charmap(face, FT_ENCODING_UNICODE);
-		font = pd_font_create(face->family_name, face->style_name);
+		font = pd_font_face_create(face->family_name, face->style_name);
 		font->data = face;
 		fonts[i] = font;
 	}
@@ -69,8 +69,8 @@ static void pd_freetype_close(void *face)
 	FT_Done_Face(face);
 }
 
-/** 转换 FT_GlyphSlot 类型数据为 pd_font_bitmap_t */
-static size_t convert_glyph(pd_font_bitmap_t *bmp, FT_GlyphSlot slot, int mode)
+/** 转换 FT_GlyphSlot 类型数据为 pd_glyph_bitmap_t */
+static size_t convert_glyph(pd_glyph_bitmap_t *bmp, FT_GlyphSlot slot, int mode)
 {
 	int error;
 	size_t size;
@@ -159,8 +159,8 @@ static size_t convert_glyph(pd_font_bitmap_t *bmp, FT_GlyphSlot slot, int mode)
 	return size;
 }
 
-static int pd_freetype_render(pd_font_bitmap_t *bmp, unsigned ch,
-			      int pixel_size, pd_font_t *font)
+static int pd_freetype_render(pd_glyph_bitmap_t *bmp, unsigned ch,
+			      int pixel_size, pd_font_face_t *font)
 {
 	int ret = 0;
 	FT_UInt index;
@@ -180,7 +180,7 @@ static int pd_freetype_render(pd_font_bitmap_t *bmp, unsigned ch,
 	return ret;
 }
 
-int pd_freetype_engine_init(font_engine_t *engine)
+int pd_freetype_engine_init(pd_font_engine_t *engine)
 {
 	if (FT_Init_FreeType(&freetype.library)) {
 		return -1;

@@ -20,17 +20,17 @@ enum in_core_font_type {
 	FONT_INCONSOLATA
 };
 
-static int pd_incore_font_open(const char *filepath, pd_font_t ***outfonts)
+static int pd_incore_font_open(const char *filepath, pd_font_face_t ***outfonts)
 {
 	int *code;
-	pd_font_t **fonts, *font;
+	pd_font_face_t **fonts, *font;
 	if (strcmp(filepath, "in-core.inconsolata") != 0) {
 		return 0;
 	}
 	code = malloc(sizeof(int));
 	*code = FONT_INCONSOLATA;
-	font = pd_font_create("inconsolata", "Regular");
-	fonts = malloc(sizeof(pd_font_t*));
+	font = pd_font_face_create("inconsolata", "Regular");
+	fonts = malloc(sizeof(pd_font_face_t*));
 	font->data = code;
 	fonts[0] = font;
 	*outfonts = fonts;
@@ -42,8 +42,8 @@ static void pd_incore_font_close(void *face)
 	free(face);
 }
 
-static int pd_incore_font_render(pd_font_bitmap_t *bmp, unsigned ch,
-			     int pixel_size, pd_font_t *font)
+static int pd_incore_font_render(pd_glyph_bitmap_t *bmp, unsigned ch,
+			     int pixel_size, pd_font_face_t *font)
 {
 	int *code = (int*)font->data;
 	switch (*code) {
@@ -54,7 +54,7 @@ static int pd_incore_font_render(pd_font_bitmap_t *bmp, unsigned ch,
 	return -1;
 }
 
-int pd_incore_font_create(font_engine_t *engine)
+int pd_incore_font_create(pd_font_engine_t *engine)
 {
 	engine->render = pd_incore_font_render;
 	engine->close = pd_incore_font_close;

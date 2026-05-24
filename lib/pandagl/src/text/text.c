@@ -230,14 +230,14 @@ static void pd_char_update_bitmap(pd_char_t *ch, pd_text_style_t *style)
                 }
         }
         while (font_ids && font_ids[i] > 0) {
-                int ret = pd_font_library_get_bitmap(ch->code, font_ids[i],
+                int ret = pd_font_cache_get_bitmap(ch->code, font_ids[i],
                                                      size, &ch->bitmap);
                 if (ret == 0) {
                         return;
                 }
                 ++i;
         }
-        pd_font_library_get_bitmap(ch->code, -1, size, &ch->bitmap);
+        pd_font_cache_get_bitmap(ch->code, -1, size, &ch->bitmap);
 }
 
 pd_text_t *pd_text_create(void)
@@ -1224,10 +1224,10 @@ static void pd_text_render_char(pd_text_t *text, pd_char_t *ch,
 {
         /* 判断文字使用的前景颜色，再进行绘制 */
         if (ch->style && ch->style->has_fore_color) {
-                pd_canvas_mix_font_bitmap(graph, ch_pos, ch->bitmap,
+                pd_canvas_mix_glyph_bitmap(graph, ch_pos, ch->bitmap,
                                           ch->style->fore_color);
         } else {
-                pd_canvas_mix_font_bitmap(graph, ch_pos, ch->bitmap,
+                pd_canvas_mix_glyph_bitmap(graph, ch_pos, ch->bitmap,
                                           text->default_style.fore_color);
         }
 }

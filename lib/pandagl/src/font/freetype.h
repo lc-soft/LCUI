@@ -9,5 +9,5 @@
  * LICENSE.TXT file in the root directory of this source tree.
  */
 
-int pd_freetype_engine_init(font_engine_t *engine);
+int pd_freetype_engine_init(pd_font_engine_t *engine);
 int pd_freetype_engine_destroy(void);

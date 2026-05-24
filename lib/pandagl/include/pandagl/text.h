@@ -46,7 +46,7 @@ typedef enum pd_text_align_t {
 typedef struct pd_char {
 	wchar_t code;                   /**< 字符码 */
 	pd_text_style_t *style;         /**< 该字符使用的样式数据 */
-	const pd_font_bitmap_t *bitmap; /**< 字体位图数据(只读) */
+	const pd_glyph_bitmap_t *bitmap; /**< 字体位图数据(只读) */
 } pd_char_t;
 
 /** end of line character */
