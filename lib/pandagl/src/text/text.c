@@ -126,6 +126,8 @@ static void pd_text_update_line_size(pd_text_t *text, pd_text_line_t *line)
 
 static int pd_text_line_set_length(pd_text_line_t *line, int len)
 {
+        int i;
+        int old_len = line->length;
         pd_char_t **txtstr;
 
         if (len < 0) {
@@ -135,10 +137,50 @@ static int pd_text_line_set_length(pd_text_line_t *line, int len)
         if (!txtstr) {
                 return -1;
         }
+        /* 清零新增槽位，防止遗留指针被误用或重复释放 */
+        for (i = old_len; i < len; ++i) {
+                txtstr[i] = NULL;
+        }
         txtstr[len] = NULL;
         line->string = txtstr;
         line->length = len;
         return 0;
+}
+
+/* 释放并清空指定区间 [start, end) 内的字符槽位 */
+static void pd_text_line_erase(pd_text_line_t *line, int start, int end)
+{
+        int i;
+
+        if (start < 0) {
+                start = 0;
+        }
+        if (end > line->length) {
+                end = line->length;
+        }
+        for (i = start; i < end; ++i) {
+                if (line->string[i]) {
+                        free(line->string[i]);
+                        line->string[i] = NULL;
+                }
+        }
+}
+
+/* 将 src 行 [src_start, src_end) 的字符所有权转移到 dst 行的 dst_start 起始位置。
+ * 转移后 src 对应槽位被置 NULL，防止 delete_line 时被重复释放。
+ * 调用者负责保证 dst 已有足够容量。 */
+static void pd_text_line_move(pd_text_line_t *dst, int dst_start,
+                              pd_text_line_t *src, int src_start, int src_end)
+{
+        int i, j;
+
+        if (src_end > src->length) {
+                src_end = src->length;
+        }
+        for (i = dst_start, j = src_start; j < src_end; ++i, ++j) {
+                dst->string[i] = src->string[j];
+                src->string[j] = NULL;
+        }
 }
 
 static int pd_text_line_insert(pd_text_line_t *line, int offset,
@@ -538,7 +580,7 @@ static void pd_text_break_line(pd_text_t *text, int line_num, int col,
 
 static void pd_text_merge_line(pd_text_t *text, int line_num)
 {
-        int i, j;
+        int old_len;
         pd_text_line_t *line = pd_text_get_line(text, line_num);
         pd_text_line_t *next = pd_text_get_line(text, line_num + 1);
 
@@ -551,12 +593,9 @@ static void pd_text_merge_line(pd_text_t *text, int line_num)
                         text->insert_x += line->length;
                 }
         }
-        i = line->length;
+        old_len = line->length;
         pd_text_line_set_length(line, line->length + next->length);
-        for (j = 0; j < next->length; ++i, ++j) {
-                line->string[i] = next->string[j];
-                next->string[j] = NULL;
-        }
+        pd_text_line_move(line, old_len, next, 0, next->length);
         line->eol = next->eol;
         pd_text_update_line_size(text, line);
         pd_text_delete_line(text, line_num + 1);
@@ -805,6 +844,30 @@ size_t pd_text_dump(pd_text_t *text, size_t start_pos, size_t max_len,
                 for (; col < line->length && i < max_len; ++col, ++i) {
                         wstr_buff[i] = line->string[col]->code;
                 }
+                /* 进入下一行前，按行尾符还原对应的换行字符 */
+                if (i >= max_len) {
+                        break;
+                }
+                switch (line->eol) {
+                case PD_TEXT_EOL_CR:
+                        wstr_buff[i++] = L'\r';
+                        break;
+                case PD_TEXT_EOL_LF:
+                        wstr_buff[i++] = L'\n';
+                        break;
+                case PD_TEXT_EOL_CR_LF:
+                        wstr_buff[i++] = L'\r';
+                        if (i >= max_len) {
+                                break;
+                        }
+                        wstr_buff[i++] = L'\n';
+                        break;
+                case PD_TEXT_EOL_NONE:
+                default:
+                        break;
+                }
+                /* 切换到下一行时必须重置列号 */
+                col = 0;
         }
         wstr_buff[i] = 0;
         return i;
@@ -934,8 +997,8 @@ static int pd_text_delete_ex(pd_text_t *text, int char_y, int char_x,
         if (end_x == char_x && end_y == char_y) {
                 return 0;
         }
-        /* 获取上一行文本 */
-        prev_line = text->lines[char_y - 1];
+        /* 获取上一行文本（首行时无上一行） */
+        prev_line = char_y > 0 ? text->lines[char_y - 1] : NULL;
         // 计算起始行与结束行拼接后的长度
         // 起始行：0 1 2 3 4 5，起点位置：2
         // 结束行：0 1 2 3 4 5，终点位置：4
@@ -951,13 +1014,16 @@ static int pd_text_delete_ex(pd_text_t *text, int char_y, int char_x,
                 }
                 pd_text_mark_line_dirty(text, char_y, char_x, -1);
                 pd_text_set_typeset_task(text, char_y);
-                for (i = char_x, j = end_x; j < line->length; ++i, ++j) {
-                        line->string[i] = line->string[j];
-                }
-                /* 如果当前行为空，也不是第一行，并且上一行没有结束符 */
-                if (len <= 0 && end_y > 0 &&
+                /* 释放被删除范围内的字符 */
+                pd_text_line_erase(line, char_x, end_x);
+                /* 将结束点之后的内容向前搬移 */
+                pd_text_line_move(line, char_x, line, end_x, line->length);
+                /* 如果当前行为空，也不是第一行，并且上一行没有结束符，
+                 * 则直接移除当前行，不能再访问 line */
+                if (len <= 0 && char_y > 0 && prev_line &&
                     prev_line->eol != PD_TEXT_EOL_NONE) {
-                        pd_text_delete_line(text, end_y);
+                        pd_text_delete_line(text, char_y);
+                        return 0;
                 }
                 /* 调整起始行的容量 */
                 pd_text_line_set_length(line, len);
@@ -965,11 +1031,16 @@ static int pd_text_delete_ex(pd_text_t *text, int char_y, int char_x,
                 pd_text_update_line_size(text, line);
                 return 0;
         }
-        /* 如果结束点在行尾，并且该行不是最后一行 */
+        /* 释放起始行中被删除的字符（区间为 [char_x, line->length)） */
+        pd_text_line_erase(line, char_x, line->length);
+        /* 释放结束行中被删除的字符（区间为 [0, end_x)） */
+        pd_text_line_erase(end_line, 0, end_x);
+        /* 如果结束点在行尾，并且该行不是最后一行，
+         * 则将结束点推进到下一行的行首 */
         if (end_x == end_line->length && end_y < text->lines_length - 1) {
                 ++end_y;
                 end_line = pd_text_get_line(text, end_y);
-                end_x = -1;
+                end_x = 0;
                 len = char_x + end_line->length;
         }
         pd_text_line_set_length(line, len);
@@ -980,20 +1051,17 @@ static int pd_text_delete_ex(pd_text_t *text, int char_y, int char_x,
                 pd_text_mark_line_dirty(text, i, 0, -1);
                 pd_text_delete_line(text, i);
         }
-        i = char_x;
-        j = end_x + 1;
         end_y = char_y + 1;
-        /* 将结束行的内容拼接至起始行 */
-        for (; i < len && j < end_line->length; ++i, ++j) {
-                line->string[i] = end_line->string[j];
-        }
+        /* 将结束行的内容拼接至起始行（所有权随之转移） */
+        pd_text_line_move(line, char_x, end_line, end_x, end_line->length);
         pd_text_update_line_size(text, line);
         pd_text_mark_line_dirty(text, end_y, 0, -1);
         /* 移除结束行 */
         pd_text_delete_line(text, end_y);
         /* 如果起始行无内容，并且上一行没有结束符（换行符），则
          * 说明需要删除起始行 */
-        if (len <= 0 && char_y > 0 && prev_line->eol != PD_TEXT_EOL_NONE) {
+        if (len <= 0 && char_y > 0 && prev_line &&
+            prev_line->eol != PD_TEXT_EOL_NONE) {
                 pd_text_mark_line_dirty(text, char_y, 0, -1);
                 pd_text_delete_line(text, char_y);
         }
