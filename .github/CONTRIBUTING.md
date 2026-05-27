@@ -74,9 +74,10 @@ To ensure consistency throughout the source code, keep these rules in mind as yo
 
 - All features or bug fixes **must be tested** by one or more specs (unit-tests).
 - All public API methods **must be documented**. (Details TBC).
-- Follow the existing code style. You have the following two ways to format the code:
-  - Use [clang-format](http://clang.llvm.org/docs/ClangFormat.html) to format the changed files: `clang-format --style=file [src/????.c]`.
-  - Install the [NodeJS](https://nodejs.org/en/) Environment and run `npm install`, which will add a git hook to format the changed code, and it will run before you run `git commit`.
+- Follow the existing code style. The project uses [clang-format](http://clang.llvm.org/docs/ClangFormat.html) with the rules defined in `.clang-format`. You have two options:
+  - Run `clang-format -i path/to/file.c` manually on the files you changed.
+  - Install [Node.js](https://nodejs.org/) and run `npm install` once. This installs [husky](https://typicode.github.io/husky/) + [lint-staged](https://github.com/lint-staged/lint-staged), which formats every staged `.c` / `.h` file with clang-format on `git commit` automatically.
+  - CI checks formatting of only the files changed in each PR, so pre-existing style deviations won't block you.
 
 ## Commit Message Guidelines
 

@@ -10,7 +10,17 @@
   "scripts": {
     "build-changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
     "update-changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
-    "update-copyright": "node scripts/add-copyright.js"
+    "update-copyright": "node scripts/add-copyright.js",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "**/*.{c,h}": [
+      "clang-format -i"
+    ]
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.10"
   },
   "repository": {
     "type": "git",
