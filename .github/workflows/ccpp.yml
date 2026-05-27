@@ -1,6 +1,24 @@
 name: C/C++ CI
 on: [push, pull_request]
 jobs:
+  format:
+    name: Check C/C++ formatting
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install clang-format
+        run: |
+          sudo apt-get update --fix-missing
+          sudo apt-get install -y clang-format
+
+      - name: Check formatting of changed files
+        run: |
+          node scripts/clang-format-changed.js origin/${{ github.base_ref || 'develop' }}
+
   build:
     env:
       TARGET_MAJOR: 3
