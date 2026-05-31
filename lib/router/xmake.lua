@@ -1,7 +1,5 @@
-set_project("librouter")
-set_version("0.1.0-a")
-
 target("librouter")
+    set_version("0.1.0-a")
     set_kind("$(kind)")
     add_files("src/*.c")
     add_deps("yutil", "libui")

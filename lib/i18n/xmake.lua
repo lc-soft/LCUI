@@ -1,8 +1,7 @@
-set_project("i18n")
-set_version("0.1.0-a")
 add_requires("libyaml", { optional = true })
 
 target("libi18n")
+    set_version("0.1.0-a")
     set_kind("$(kind)")
     add_files("src/*.c")
     add_deps("yutil")
