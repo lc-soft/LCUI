@@ -6,7 +6,7 @@ local previews = {
 }
 
 for _, topic in ipairs(previews) do
-    target("preview_" .. topic)
+    target("preview-" .. topic:gsub("_", "-"))
         set_default(false)
         set_kind("binary")
         set_group("previews")

@@ -1,5 +1,3 @@
-set_project("pandagl")
-set_version("0.1.0-a")
 add_requires("libpng", "libjpeg", {optional = true})
 add_requires("freetype", {optional = true, configs = {shared = false}})
 
@@ -23,6 +21,7 @@ option("with-pandagl-text")
     set_configvar("PANDAGL_HAS_TEXT", 1)
 
 target("pandagl")
+    set_version("0.1.0-a")
     set_kind("$(kind)")
     add_files("src/*.c")
     add_deps("yutil")
