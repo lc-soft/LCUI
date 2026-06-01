@@ -10,9 +10,11 @@
  */
 
 #include <stdio.h>
-#include <locale.h>
 #include <assert.h>
 #include <string.h>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 #include <css/selector.h>
 #include <ui/base.h>
 #include <ui/style.h>
@@ -369,34 +371,35 @@ ui_widget_t *ui_widget_at(ui_widget_t *widget, int ix, int iy)
         return target == widget ? NULL : target;
 }
 
-static void _ui_print_tree(ui_widget_t *w, int depth, const wchar_t *prefix)
+static void _ui_print_tree(ui_widget_t *w, int depth, const char *prefix)
 {
         ui_widget_t *child;
         list_node_t *node;
         css_selector_node_t *snode;
-        wchar_t str[16], child_prefix[512];
+        char str[32], child_prefix[1024];
         size_t len;
 
-        len = wcslen(prefix);
-        wcscpy(child_prefix, prefix);
+        len = strlen(prefix);
+        strcpy(child_prefix, prefix);
         for (list_each(node, &w->children)) {
                 if (node == w->children.tail.prev) {
-                        wcscpy(str, L"\u2514");
-                        wcscpy(child_prefix + len, L"   ");
+                        strcpy(str, "\xe2\x94\x94"); /* U+2514 └ */
+                        strcpy(child_prefix + len, "   ");
                 } else {
-                        wcscpy(str, L"\u251C");
-                        wcscpy(child_prefix + len, L"\u2502  ");
+                        strcpy(str, "\xe2\x94\x9c"); /* U+251C ├ */
+                        strcpy(child_prefix + len,
+                               "\xe2\x94\x82  "); /* U+2502 │ */
                 }
-                wcscat(str, L"\u2500\u2500");
+                strcat(str, "\xe2\x94\x80\xe2\x94\x80"); /* ── */
                 child = node->data;
                 if (child->children.length == 0) {
-                        wcscat(str, L"\u2500\u2500");
+                        strcat(str, "\xe2\x94\x80\xe2\x94\x80"); /* ── */
                 } else {
-                        wcscat(str, L"\u252C\u2500");
+                        strcat(str, "\xe2\x94\xac\xe2\x94\x80"); /* ┬─ */
                 }
                 snode = ui_widget_create_selector_node(child);
                 logger_error(
-                    "%ls%ls %s, xy:(%g,%g), size:(%g,%g), "
+                    "%s%s %s, xy:(%g,%g), size:(%g,%g), "
                     "visible: %s, display: %d, padding: (%g,%g,%g,%g), margin: "
                     "(%g,%g,%g,%g)\n",
                     prefix, str, snode->fullname, child->border_box.x,
@@ -420,9 +423,11 @@ static void _ui_print_tree(ui_widget_t *w, int depth, const wchar_t *prefix)
 void ui_print_tree(ui_widget_t *w)
 {
         css_selector_node_t *node;
-        char *ctype = setlocale(LC_CTYPE, NULL);
+#ifdef _WIN32
+        UINT prev_cp = GetConsoleOutputCP();
 
-        setlocale(LC_CTYPE, "");
+        SetConsoleOutputCP(CP_UTF8);
+#endif
         w = w ? w : ui_root();
         node = ui_widget_create_selector_node(w);
         logger_error("%s, xy:(%g,%g), size:(%g,%g), visible: %s\n",
@@ -430,6 +435,8 @@ void ui_print_tree(ui_widget_t *w)
                      w->border_box.width, w->border_box.height,
                      ui_widget_is_visible(w) ? "true" : "false");
         css_selector_node_destroy(node);
-        _ui_print_tree(w, 0, L"  ");
-        setlocale(LC_CTYPE, ctype);
+        _ui_print_tree(w, 0, "  ");
+#ifdef _WIN32
+        SetConsoleOutputCP(prev_cp);
+#endif
 }
