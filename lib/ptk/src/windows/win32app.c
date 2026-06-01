@@ -136,7 +136,6 @@ static int ptk_process_native_event(void)
         return ret;
 }
 
-
 static int ptk_win32_pending(void)
 {
         MSG msg;
@@ -227,7 +226,8 @@ unsigned ptk_window_get_dpi(ptk_window_t *wnd)
 {
         UINT dpi = GetDpiForWindow(wnd->hwnd);
         if (dpi == 0) {
-                logger_error("[win32-app] GetDpiForWindow failed, hwnd: %p\n", wnd->hwnd);
+                logger_error("[win32-app] GetDpiForWindow failed, hwnd: %p\n",
+                             wnd->hwnd);
                 dpi = GetDpiForSystem();
         }
         return dpi;
@@ -498,11 +498,10 @@ ptk_window_t *ptk_window_create(const wchar_t *title, int x, int y, int width,
                                 int height, ptk_window_t *parent)
 {
         ptk_window_t *wnd;
+        DWORD err;
+        wchar_t errmsg[256];
 
         wnd = malloc(sizeof(ptk_window_t));
-        if (!wnd) {
-                return NULL;
-        }
         if (x == PTK_WINDOW_DEFAULT_X) {
                 x = CW_USEDEFAULT;
         } else if (x == PTK_WINDOW_CENTER_X) {
@@ -534,11 +533,43 @@ ptk_window_t *ptk_window_create(const wchar_t *title, int x, int y, int width,
             CreateWindowW(win32_app.class_name, title, WIN32_WINDOW_STYLE, x, y,
                           width, height, parent ? parent->hwnd : NULL, NULL,
                           win32_app.main_instance, NULL);
+        if (!wnd->hwnd) {
+                err = GetLastError();
+                format_error_message(err, errmsg, 256);
+                logger_error(
+                    "[win32-app] CreateWindowW failed, error %d: %ls\n", err,
+                    errmsg);
+                list_unlink(&win32_app.windows, &wnd->node);
+                free(wnd);
+                return NULL;
+        }
 #ifdef PTK_TOUCH_ENABLED
         RegisterTouchWindow(wnd->hwnd, 0);
 #endif
         wnd->hdc_client = GetDC(wnd->hwnd);
+        if (!wnd->hdc_client) {
+                err = GetLastError();
+                format_error_message(err, errmsg, 256);
+                logger_error("[win32-app] GetDC failed, error %d: %ls\n", err,
+                             errmsg);
+                DestroyWindow(wnd->hwnd);
+                list_unlink(&win32_app.windows, &wnd->node);
+                free(wnd);
+                return NULL;
+        }
         wnd->hdc_fb = CreateCompatibleDC(wnd->hdc_client);
+        if (!wnd->hdc_fb) {
+                err = GetLastError();
+                format_error_message(err, errmsg, 256);
+                logger_error(
+                    "[win32-app] CreateCompatibleDC failed, error %d: %ls\n",
+                    err, errmsg);
+                ReleaseDC(wnd->hwnd, wnd->hdc_client);
+                DestroyWindow(wnd->hwnd);
+                list_unlink(&win32_app.windows, &wnd->node);
+                free(wnd);
+                return NULL;
+        }
         return wnd;
 }
 
