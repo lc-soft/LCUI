@@ -612,7 +612,7 @@ static int window_mutation_list_add(list_t *list,
             strcmp(mutation->property_name, "title") == 0;
         wnd_mutation->update_visible =
             wnd_mutation->update_visible ||
-            strcmp(mutation->property_name, "visible");
+            strcmp(mutation->property_name, "visible") == 0;
         wnd_mutation->update_position =
             wnd_mutation->update_position ||
             strcmp(mutation->property_name, "x") == 0 ||
