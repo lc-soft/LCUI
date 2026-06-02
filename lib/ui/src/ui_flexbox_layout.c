@@ -765,15 +765,15 @@ static float ui_compute_column_item_layout(ui_widget_t *item, float x, float y,
 
 static float ui_flexbox_compute_item_layout(
     const ui_flexbox_layout_context_t *ctx, ui_widget_t *item, float main_axis,
-    float cross_axis, css_align_items_t align, float line_max_cross_size)
+    float cross_axis, css_align_items_t align, float max_cross_size)
 {
         if (ctx->column_direction) {
                 return ui_compute_column_item_layout(item, cross_axis,
                                                      main_axis, align,
-                                                     line_max_cross_size);
+                                                     max_cross_size);
         }
-        return ui_compute_row_item_layout(item, main_axis, cross_axis, align,
-                                          line_max_cross_size);
+        return ui_compute_row_item_layout(item, main_axis, cross_axis,
+                                          align, max_cross_size);
 }
 
 static const ui_flexbox_axis_ops_t row_ops = {
