@@ -124,16 +124,6 @@ static inline void ui_flexbox_reset_item_main(
         }
 }
 
-static inline void ui_flexbox_load_main_size_info(
-    const ui_flexbox_layout_context_t *ctx)
-{
-        if (ctx->column_direction) {
-                ui_resizer_load_column_minmaxinfo(ctx->resizer);
-        } else {
-                ui_resizer_load_row_minmaxinfo(ctx->resizer);
-        }
-}
-
 static inline void ui_flexbox_commit_main_size(
     const ui_flexbox_layout_context_t *ctx)
 {
@@ -864,7 +854,11 @@ void ui_flexbox_layout_reflow(ui_widget_t *w, ui_resizer_t *resizer)
                 ui_debug_msg_indent++;
         }
 #endif
-        ui_flexbox_load_main_size_info(&ctx);
+        if (ctx.column_direction) {
+                ui_resizer_load_column_minmaxinfo(resizer);
+        } else {
+                ui_resizer_load_row_minmaxinfo(resizer);
+        }
         ui_flexbox_layout_load_main_size(&ctx, ops);
         ui_flexbox_layout_apply_main_size(&ctx, ops);
         ui_flexbox_layout_reflow_lines(&ctx);
