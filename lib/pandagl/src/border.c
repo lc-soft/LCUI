@@ -74,23 +74,22 @@ static int draw_border_corner(pd_canvas_t *dst, int bound_left, int bound_top,
 			      const pd_corner_flags_t *flags)
 {
 	BorderRenderContext();
-	int corner_height = y_max(radius, xline->width);
+	int bottom_corner_height = y_max(radius, xline->width);
 	double circle_center_y = bound_top +
 				 (flags->is_bottom
-				      ? corner_height - 1.0 * radius - 0.5
+				      ? bottom_corner_height - 1.0 * radius - 0.5
 				      : r);
 	double circle_center_x = bound_left +
 				 (flags->is_right ? width - 1.0 * radius - 0.5
 						  : r);
-	double split_k = xline->width > 0
-			     ? 1.0 * yline->width / xline->width
-			     : 0.0;
+	double split_slope =
+	    xline->width > 0 ? 1.0 * yline->width / xline->width : 0.0;
 	double split_center_x = bound_left +
 				(flags->is_right ? width - 1.0 * yline->width
 						 : 1.0 * yline->width);
 	double split_center_y = bound_top +
 				(flags->is_bottom
-				     ? corner_height - 1.0 * xline->width
+				     ? bottom_corner_height - 1.0 * xline->width
 				     : 1.0 * xline->width);
 	double inner_ellipse_limit = flags->is_bottom
 					 ? circle_center_y + radius_y
@@ -110,13 +109,13 @@ static int draw_border_corner(pd_canvas_t *dst, int bound_left, int bound_top,
 		inner_x = flags->is_right ? -1.0 : width;
 		circle_y = ToGeoY(y, circle_center_y);
 		if (r > 0 && (flags->is_bottom ? circle_y <= 0 : circle_y >= 0)) {
-			int allow_inner =
+			int should_draw_inner_ellipse =
 			    !flags->is_bottom || !flags->is_right ||
 			    y >= circle_center_y;
 			outer_x = flags->is_right
 				      ? width - radius + ellipse_x(r, r, circle_y)
 				      : r - ellipse_x(r, r, circle_y);
-			if (radius_y > 0 && allow_inner &&
+			if (radius_y > 0 && should_draw_inner_ellipse &&
 			    (flags->is_bottom ? y <= inner_ellipse_limit
 					      : y >= inner_ellipse_limit)) {
 				inner_x = flags->is_right
@@ -129,7 +128,8 @@ static int draw_border_corner(pd_canvas_t *dst, int bound_left, int bound_top,
 		}
 		if (xline->width > 0) {
 			split_x = split_center_x + split_sign *
-					      ToGeoY(y, split_center_y) * split_k;
+					      ToGeoY(y, split_center_y) *
+					      split_slope;
 		}
 		outer_x = bound_left + outer_x;
 		inner_x = bound_left + inner_x;
