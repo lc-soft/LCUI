@@ -398,6 +398,7 @@ static void ui_flexbox_layout_apply_main_size(ui_flexbox_layout_context_t *ctx,
         ui_flexbox_line_t *line;
         css_computed_style_t *s = &ctx->widget->computed_style;
         css_computed_style_t *cs;
+        bool margin_start_auto, margin_end_auto;
 
         float main_size;
         float max_main_size = ctx->column_direction
@@ -473,16 +474,20 @@ static void ui_flexbox_layout_apply_main_size(ui_flexbox_layout_context_t *ctx,
                         line = ui_flexbox_layout_next_line(ctx);
                 }
                 line->main_size += main_size;
-                if ((ctx->column_direction &&
-                     cs->type_bits.margin_top == CSS_MARGIN_AUTO) ||
-                    (!ctx->column_direction &&
-                     cs->type_bits.margin_left == CSS_MARGIN_AUTO)) {
+                margin_start_auto = ctx->column_direction
+                                        ? cs->type_bits.margin_top ==
+                                              CSS_MARGIN_AUTO
+                                        : cs->type_bits.margin_left ==
+                                              CSS_MARGIN_AUTO;
+                if (margin_start_auto) {
                         line->count_of_auto_margin_items++;
                 }
-                if ((ctx->column_direction &&
-                     cs->type_bits.margin_bottom == CSS_MARGIN_AUTO) ||
-                    (!ctx->column_direction &&
-                     cs->type_bits.margin_right == CSS_MARGIN_AUTO)) {
+                margin_end_auto = ctx->column_direction
+                                      ? cs->type_bits.margin_bottom ==
+                                            CSS_MARGIN_AUTO
+                                      : cs->type_bits.margin_right ==
+                                            CSS_MARGIN_AUTO;
+                if (margin_end_auto) {
                         line->count_of_auto_margin_items++;
                 }
                 ui_flexbox_line_load_item(line, child);
@@ -538,8 +543,11 @@ static void ui_flexbox_layout_apply_main_size(ui_flexbox_layout_context_t *ctx,
                         ui_widget_set_content_width(ctx->widget,
                                                     ctx->cross_size);
                 }
-        } else if (!IS_CSS_FIXED_LENGTH(s, height)) {
-                ui_widget_set_content_height(ctx->widget, ctx->cross_size);
+        } else {
+                if (!IS_CSS_FIXED_LENGTH(s, height)) {
+                        ui_widget_set_content_height(ctx->widget,
+                                                     ctx->cross_size);
+                }
         }
 #ifdef UI_DEBUG_ENABLED
         ui_debug_msg_indent--;
