@@ -48,6 +48,14 @@ typedef struct ui_flexbox_layout_context {
         list_t lines;
 } ui_flexbox_layout_context_t;
 
+/**
+ * Axis-specific operations used by the shared flexbox layout pipeline.
+ *
+ * "main" and "cross" refer to the flex container's main axis and cross axis.
+ * Row and column directions differ mostly in which widget/style fields map to
+ * those axes, so these callbacks let the common layout code access the correct
+ * direction-specific behavior.
+ */
 typedef struct ui_flexbox_axis_ops {
         void (*reset_item_flex_basis)(ui_widget_t *item);
         void (*compute_item_flex_basis)(ui_widget_t *item);
@@ -789,12 +797,13 @@ static inline bool ui_flexbox_column_margin_end_is_auto(
 }
 
 static float ui_flexbox_column_item_compute_layout(ui_widget_t *item,
-                                                   float main_axis,
-                                                   float cross_axis,
+                                                   float main_axis_param,
+                                                   float cross_axis_param,
                                                    css_align_items_t align,
                                                    float line_max_cross_size)
 {
-        return ui_compute_column_item_layout(item, cross_axis, main_axis, align,
+        return ui_compute_column_item_layout(item, cross_axis_param,
+                                             main_axis_param, align,
                                              line_max_cross_size);
 }
 
