@@ -474,19 +474,20 @@ static void ui_flexbox_layout_apply_main_size(ui_flexbox_layout_context_t *ctx,
                         line = ui_flexbox_layout_next_line(ctx);
                 }
                 line->main_size += main_size;
-                margin_start_auto = ctx->column_direction
-                                        ? cs->type_bits.margin_top ==
-                                              CSS_MARGIN_AUTO
-                                        : cs->type_bits.margin_left ==
-                                              CSS_MARGIN_AUTO;
+                if (ctx->column_direction) {
+                        margin_start_auto =
+                            cs->type_bits.margin_top == CSS_MARGIN_AUTO;
+                        margin_end_auto =
+                            cs->type_bits.margin_bottom == CSS_MARGIN_AUTO;
+                } else {
+                        margin_start_auto =
+                            cs->type_bits.margin_left == CSS_MARGIN_AUTO;
+                        margin_end_auto =
+                            cs->type_bits.margin_right == CSS_MARGIN_AUTO;
+                }
                 if (margin_start_auto) {
                         line->count_of_auto_margin_items++;
                 }
-                margin_end_auto = ctx->column_direction
-                                      ? cs->type_bits.margin_bottom ==
-                                            CSS_MARGIN_AUTO
-                                      : cs->type_bits.margin_right ==
-                                            CSS_MARGIN_AUTO;
                 if (margin_end_auto) {
                         line->count_of_auto_margin_items++;
                 }
@@ -533,17 +534,14 @@ static void ui_flexbox_layout_apply_main_size(ui_flexbox_layout_context_t *ctx,
                 if (ctx->cross_size < ctx->resizer->hint.max_width) {
                         ctx->cross_size = ctx->resizer->hint.max_width;
                 }
-        } else {
-                if (ctx->cross_size < ctx->resizer->hint.max_height) {
-                        ctx->cross_size = ctx->resizer->hint.max_height;
-                }
-        }
-        if (ctx->column_direction) {
                 if (!IS_CSS_FIXED_LENGTH(s, width)) {
                         ui_widget_set_content_width(ctx->widget,
                                                     ctx->cross_size);
                 }
         } else {
+                if (ctx->cross_size < ctx->resizer->hint.max_height) {
+                        ctx->cross_size = ctx->resizer->hint.max_height;
+                }
                 if (!IS_CSS_FIXED_LENGTH(s, height)) {
                         ui_widget_set_content_height(ctx->widget,
                                                      ctx->cross_size);
