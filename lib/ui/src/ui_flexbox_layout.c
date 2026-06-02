@@ -669,6 +669,7 @@ static void ui_flexbox_layout_reflow_lines(ui_flexbox_layout_context_t *ctx)
              ctx->cross_size) /
             ctx->lines.length;
         float line_max_cross_size;
+        float item_x, item_y;
 
 #ifdef UI_DEBUG_ENABLED
         {
@@ -693,13 +694,17 @@ static void ui_flexbox_layout_reflow_lines(ui_flexbox_layout_context_t *ctx)
                         child = node->data;
                         main_axis += space;
                         if (ctx->column_direction) {
+                                item_x = cross_axis;
+                                item_y = main_axis;
                                 main_axis += ui_compute_column_item_layout(
-                                    child, cross_axis, main_axis,
+                                    child, item_x, item_y,
                                     s->type_bits.align_items,
                                     line_max_cross_size);
                         } else {
+                                item_x = main_axis;
+                                item_y = cross_axis;
                                 main_axis += ui_compute_row_item_layout(
-                                    child, main_axis, cross_axis,
+                                    child, item_x, item_y,
                                     s->type_bits.align_items,
                                     line_max_cross_size);
                         }
