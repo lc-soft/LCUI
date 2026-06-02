@@ -788,7 +788,7 @@ static inline bool ui_flexbox_column_margin_end_is_auto(
         return cs->type_bits.margin_bottom == CSS_MARGIN_AUTO;
 }
 
-static float ui_flexbox_column_compute_item_layout(ui_widget_t *item,
+static float ui_flexbox_column_item_compute_layout(ui_widget_t *item,
                                                    float main_axis,
                                                    float cross_axis,
                                                    css_align_items_t align,
@@ -838,7 +838,7 @@ static const ui_flexbox_axis_ops_t column_ops = {
         .cross_size_is_fixed = ui_flexbox_column_cross_size_is_fixed,
         .set_content_cross = ui_flexbox_column_set_content_cross,
         .apply_item_main_size = ui_apply_column_item_main_size,
-        .compute_item_layout = ui_flexbox_column_compute_item_layout,
+        .compute_item_layout = ui_flexbox_column_item_compute_layout,
         .margin_start_is_auto = ui_flexbox_column_margin_start_is_auto,
         .margin_end_is_auto = ui_flexbox_column_margin_end_is_auto,
 };
