@@ -48,16 +48,6 @@ typedef struct ui_flexbox_layout_context {
         list_t lines;
 } ui_flexbox_layout_context_t;
 
-/**
- * Axis-specific operations that still need dedicated row/column logic.
- */
-typedef struct ui_flexbox_axis_ops {
-        void (*reset_item_flex_basis)(ui_widget_t *item);
-        void (*compute_item_flex_basis)(ui_widget_t *item);
-        void (*apply_item_main_size)(ui_widget_t *item, float flex_space,
-                                     float margin_space);
-} ui_flexbox_axis_ops_t;
-
 static ui_flexbox_line_t *ui_flexbox_line_create(void)
 {
         ui_flexbox_line_t *line;
@@ -260,8 +250,7 @@ static void ui_apply_column_item_main_size(ui_widget_t *item, float flex_space,
         ui_widget_reflow_if_height_changed(item);
 }
 
-static void ui_flexbox_layout_load_main_size(ui_flexbox_layout_context_t *ctx,
-                                             const ui_flexbox_axis_ops_t *ops)
+static void ui_flexbox_layout_load_main_size(ui_flexbox_layout_context_t *ctx)
 {
         list_node_t *node;
         ui_widget_t *child;
@@ -285,11 +274,13 @@ static void ui_flexbox_layout_load_main_size(ui_flexbox_layout_context_t *ctx,
                         continue;
                 }
                 ui_widget_reset_layout(child);
-                ops->reset_item_flex_basis(child);
-                ops->compute_item_flex_basis(child);
                 if (ctx->column_direction) {
+                        ui_reset_column_item_flex_basis(child);
+                        ui_compute_column_item_flex_basis(child);
                         main_size = css_obox_height(cs, cs->flex_basis);
                 } else {
+                        ui_reset_row_item_flex_basis(child);
+                        ui_compute_row_item_flex_basis(child);
                         main_size = css_obox_width(cs, cs->flex_basis);
                 }
                 if (cs->flex_shrink > 0) {
@@ -333,9 +324,8 @@ static void ui_flexbox_layout_load_main_size(ui_flexbox_layout_context_t *ctx,
 }
 
 static void ui_flexbox_layout_apply_line(ui_flexbox_layout_context_t *ctx,
-                                         ui_flexbox_line_t *line,
-                                         const ui_flexbox_axis_ops_t *ops,
-                                         float flex_space, float margin_space)
+                                         ui_flexbox_line_t *line, float flex_space,
+                                         float margin_space)
 {
         list_node_t *node;
         ui_widget_t *child;
@@ -363,11 +353,14 @@ static void ui_flexbox_layout_apply_line(ui_flexbox_layout_context_t *ctx,
                         ui_debug_msg_indent++;
                 }
 #endif
-                ops->apply_item_main_size(child, flex_space, margin_space);
                 if (ctx->column_direction) {
+                        ui_apply_column_item_main_size(child, flex_space,
+                                                       margin_space);
                         item_main_size = child->outer_box.height;
                         item_cross_size = child->outer_box.width;
                 } else {
+                        ui_apply_row_item_main_size(child, flex_space,
+                                                    margin_space);
                         item_main_size = child->outer_box.width;
                         item_cross_size = child->outer_box.height;
                 }
@@ -390,8 +383,7 @@ static void ui_flexbox_layout_apply_line(ui_flexbox_layout_context_t *ctx,
         }
 }
 
-static void ui_flexbox_layout_apply_main_size(ui_flexbox_layout_context_t *ctx,
-                                              const ui_flexbox_axis_ops_t *ops)
+static void ui_flexbox_layout_apply_main_size(ui_flexbox_layout_context_t *ctx)
 {
         list_node_t *node, *line_node;
         ui_widget_t *child;
@@ -446,11 +438,13 @@ static void ui_flexbox_layout_apply_main_size(ui_flexbox_layout_context_t *ctx,
                                      cs->type_bits.flex_basis, cs->flex_basis);
                 }
 #endif
-                ops->reset_item_flex_basis(child);
-                ops->compute_item_flex_basis(child);
                 if (ctx->column_direction) {
+                        ui_reset_column_item_flex_basis(child);
+                        ui_compute_column_item_flex_basis(child);
                         main_size = css_obox_height(cs, cs->flex_basis);
                 } else {
+                        ui_reset_row_item_flex_basis(child);
+                        ui_compute_row_item_flex_basis(child);
                         main_size = css_obox_width(cs, cs->flex_basis);
                 }
 #ifdef UI_DEBUG_ENABLED
@@ -521,7 +515,7 @@ static void ui_flexbox_layout_apply_main_size(ui_flexbox_layout_context_t *ctx,
                              margin_space);
                 ui_debug_msg_indent++;
 #endif
-                ui_flexbox_layout_apply_line(ctx, line, ops, flex_space,
+                ui_flexbox_layout_apply_line(ctx, line, flex_space,
                                              margin_space);
 #ifdef UI_DEBUG_ENABLED
                 --ui_debug_msg_indent;
@@ -646,18 +640,6 @@ static float ui_compute_column_item_layout(ui_widget_t *item, float x, float y,
         return item->outer_box.height;
 }
 
-static const ui_flexbox_axis_ops_t row_ops = {
-        .reset_item_flex_basis = ui_reset_row_item_flex_basis,
-        .compute_item_flex_basis = ui_compute_row_item_flex_basis,
-        .apply_item_main_size = ui_apply_row_item_main_size,
-};
-
-static const ui_flexbox_axis_ops_t column_ops = {
-        .reset_item_flex_basis = ui_reset_column_item_flex_basis,
-        .compute_item_flex_basis = ui_compute_column_item_flex_basis,
-        .apply_item_main_size = ui_apply_column_item_main_size,
-};
-
 static void ui_flexbox_layout_reflow_lines(ui_flexbox_layout_context_t *ctx)
 {
         list_node_t *line_node, *node;
@@ -731,12 +713,10 @@ static void ui_flexbox_layout_reflow_lines(ui_flexbox_layout_context_t *ctx)
 void ui_flexbox_layout_reflow(ui_widget_t *w, ui_resizer_t *resizer)
 {
         ui_flexbox_layout_context_t ctx = { 0 };
-        const ui_flexbox_axis_ops_t *ops;
 
         ctx.widget = w;
         ctx.resizer = resizer;
         ctx.column_direction = ui_widget_has_flex_column_direction(w);
-        ops = ctx.column_direction ? &column_ops : &row_ops;
         list_create(&ctx.lines);
         ui_resizer_init(resizer, w);
 #ifdef UI_DEBUG_ENABLED
@@ -756,8 +736,8 @@ void ui_flexbox_layout_reflow(ui_widget_t *w, ui_resizer_t *resizer)
         } else {
                 ui_resizer_load_row_minmaxinfo(resizer);
         }
-        ui_flexbox_layout_load_main_size(&ctx, ops);
-        ui_flexbox_layout_apply_main_size(&ctx, ops);
+        ui_flexbox_layout_load_main_size(&ctx);
+        ui_flexbox_layout_apply_main_size(&ctx);
         ui_flexbox_layout_reflow_lines(&ctx);
         w->proto->resize(w, w->content_box.width, w->content_box.height);
         list_destroy(&ctx.lines, ui_flexbox_line_destroy);
