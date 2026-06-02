@@ -28,8 +28,23 @@ void ui_widget_min_size_to_string(ui_widget_t *w, char str[40]);
 #ifdef UI_DEBUG_ENABLED
 extern int ui_debug_msg_indent;
 
+#define UI_DEBUG_BEGIN {
+#define UI_DEBUG_END }
+
 #define UI_DEBUG_MSG(FMT, ...)                                               \
 	logger_log(LOGGER_LEVEL_DEBUG, "%*s" FMT "\n", ui_debug_msg_indent * 4, \
 		   "", ##__VA_ARGS__)
+
+#else
+
+#define UI_DEBUG_BEGIN if (0) {
+#define UI_DEBUG_END }
+
+#define UI_DEBUG_MSG(...) \
+	do {              \
+		if (0) {  \
+			logger_log(LOGGER_LEVEL_DEBUG, __VA_ARGS__); \
+		} \
+	} while (0)
 
 #endif
