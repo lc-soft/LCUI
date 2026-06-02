@@ -1,5 +1,13 @@
 name: C/C++ CI
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - develop
+      - master
+      - main
+    tags:
+      - 'v*'
+  pull_request:
 jobs:
   format:
     name: Check C/C++ formatting
