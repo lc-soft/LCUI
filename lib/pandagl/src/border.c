@@ -74,10 +74,11 @@ static int draw_border_corner(pd_canvas_t *dst, int bound_left, int bound_top,
 			      const pd_corner_flags_t *flags)
 {
 	BorderRenderContext();
-	int height = y_max(radius, xline->width);
+	int corner_height = y_max(radius, xline->width);
 	double circle_center_y = bound_top +
-				 (flags->is_bottom ? height - 1.0 * radius - 0.5
-						   : r);
+				 (flags->is_bottom
+				      ? corner_height - 1.0 * radius - 0.5
+				      : r);
 	double circle_center_x = bound_left +
 				 (flags->is_right ? width - 1.0 * radius - 0.5
 						  : r);
@@ -88,8 +89,9 @@ static int draw_border_corner(pd_canvas_t *dst, int bound_left, int bound_top,
 				(flags->is_right ? width - 1.0 * yline->width
 						 : 1.0 * yline->width);
 	double split_center_y = bound_top +
-				(flags->is_bottom ? height - 1.0 * xline->width
-						  : 1.0 * xline->width);
+				(flags->is_bottom
+				     ? corner_height - 1.0 * xline->width
+				     : 1.0 * xline->width);
 	double inner_ellipse_limit = flags->is_bottom
 					 ? circle_center_y + radius_y
 					 : split_center_y;
@@ -108,14 +110,15 @@ static int draw_border_corner(pd_canvas_t *dst, int bound_left, int bound_top,
 		inner_x = flags->is_right ? -1.0 : width;
 		circle_y = ToGeoY(y, circle_center_y);
 		if (r > 0 && (flags->is_bottom ? circle_y <= 0 : circle_y >= 0)) {
+			int allow_inner =
+			    !flags->is_bottom || !flags->is_right ||
+			    y >= circle_center_y;
 			outer_x = flags->is_right
 				      ? width - radius + ellipse_x(r, r, circle_y)
 				      : r - ellipse_x(r, r, circle_y);
-			if (radius_y > 0 &&
-			    (flags->is_bottom
-				 ? (y <= inner_ellipse_limit &&
-				    (!flags->is_right || y >= circle_center_y))
-				 : y >= inner_ellipse_limit)) {
+			if (radius_y > 0 && allow_inner &&
+			    (flags->is_bottom ? y <= inner_ellipse_limit
+					      : y >= inner_ellipse_limit)) {
 				inner_x = flags->is_right
 					      ? width - radius - 0.5 +
 						    ellipse_x(radius_x, radius_y,
@@ -305,28 +308,28 @@ int pd_crop_border_content(pd_context_t *ctx, const pd_border_t *border,
 		int width, height;
 	} corners[] = {
 		{
-		    .flags = {0, 0},
+		    .flags = {.is_right = 0, .is_bottom = 0},
 		    .x = box->x + border->left.width,
 		    .y = box->y + border->top.width,
 		    .width = border->top_left_radius - border->left.width,
 		    .height = border->top_left_radius - border->top.width,
 		},
 		{
-		    .flags = {1, 0},
+		    .flags = {.is_right = 1, .is_bottom = 0},
 		    .x = box->x + box->width - border->top_right_radius,
 		    .y = box->y + border->top.width,
 		    .width = border->top_right_radius - border->right.width,
 		    .height = border->top_right_radius - border->top.width,
 		},
 		{
-		    .flags = {0, 1},
+		    .flags = {.is_right = 0, .is_bottom = 1},
 		    .x = box->x + border->left.width,
 		    .y = box->y + box->height - border->bottom_left_radius,
 		    .width = border->bottom_left_radius - border->left.width,
 		    .height = border->bottom_left_radius - border->bottom.width,
 		},
 		{
-		    .flags = {1, 1},
+		    .flags = {.is_right = 1, .is_bottom = 1},
 		    .x = box->x + box->width - border->bottom_right_radius,
 		    .y = box->y + box->height - border->bottom_right_radius,
 		    .width = border->bottom_right_radius - border->right.width,
@@ -379,7 +382,7 @@ int pd_paint_border(pd_context_t *ctx, const pd_border_t *border,
 		unsigned int radius;
 	} corners[] = {
 		{
-		    .flags = {0, 0},
+		    .flags = {.is_right = 0, .is_bottom = 0},
 		    .x = box->x,
 		    .y = box->y,
 		    .width = tl_width,
@@ -389,7 +392,7 @@ int pd_paint_border(pd_context_t *ctx, const pd_border_t *border,
 		    .radius = border->top_left_radius,
 		},
 		{
-		    .flags = {1, 0},
+		    .flags = {.is_right = 1, .is_bottom = 0},
 		    .x = box->x + box->width - tr_width,
 		    .y = box->y,
 		    .width = tr_width,
@@ -399,7 +402,7 @@ int pd_paint_border(pd_context_t *ctx, const pd_border_t *border,
 		    .radius = border->top_right_radius,
 		},
 		{
-		    .flags = {0, 1},
+		    .flags = {.is_right = 0, .is_bottom = 1},
 		    .x = box->x,
 		    .y = box->y + box->height - bl_height,
 		    .width = bl_width,
@@ -409,7 +412,7 @@ int pd_paint_border(pd_context_t *ctx, const pd_border_t *border,
 		    .radius = border->bottom_left_radius,
 		},
 		{
-		    .flags = {1, 1},
+		    .flags = {.is_right = 1, .is_bottom = 1},
 		    .x = box->x + box->width - br_width,
 		    .y = box->y + box->height - br_height,
 		    .width = br_width,
