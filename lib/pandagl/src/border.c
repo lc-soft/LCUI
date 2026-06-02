@@ -62,20 +62,38 @@ static double ellipse_x(double radius_x, double radius_y, double y)
  * Merge the four functions of DrawBorder* into one function and make it simple.
  */
 
-/** Draw border top left corner */
-static int draw_border_top_left(pd_canvas_t *dst, int bound_left, int bound_top,
-				const pd_border_line_t *xline,
-				const pd_border_line_t *yline,
-				unsigned int radius)
+typedef struct pd_corner_flags_t {
+	int is_right;
+	int is_bottom;
+} pd_corner_flags_t;
+
+static int draw_border_corner(pd_canvas_t *dst, int bound_left, int bound_top,
+			      const pd_border_line_t *xline,
+			      const pd_border_line_t *yline,
+			      unsigned int radius,
+			      const pd_corner_flags_t *flags)
 {
 	BorderRenderContext();
-
-	double cirlce_center_x = bound_left + r;
-	double circle_center_y = bound_top + r;
-	double split_k = 1.0 * yline->width / xline->width;
-	double split_center_x = bound_left + 1.0 * yline->width;
-	double split_center_y = bound_top + 1.0 * xline->width;
-	int inner_ellipse_top = (int)split_center_y;
+	int height = y_max(radius, xline->width);
+	double circle_center_y = bound_top +
+				 (flags->is_bottom ? height - 1.0 * radius - 0.5
+						   : r);
+	double circle_center_x = bound_left +
+				 (flags->is_right ? width - 1.0 * radius - 0.5
+						  : r);
+	double split_k = xline->width > 0
+			     ? 1.0 * yline->width / xline->width
+			     : 0.0;
+	double split_center_x = bound_left +
+				(flags->is_right ? width - 1.0 * yline->width
+						 : 1.0 * yline->width);
+	double split_center_y = bound_top +
+				(flags->is_bottom ? height - 1.0 * xline->width
+						  : 1.0 * xline->width);
+	double inner_ellipse_limit = flags->is_bottom
+					 ? circle_center_y + radius_y
+					 : split_center_y;
+	int split_sign = flags->is_right == flags->is_bottom ? -1 : 1;
 
 	/* Get the actual rectangle that can be drawn */
 	pd_canvas_get_quote_rect(dst, &rect);
@@ -85,335 +103,99 @@ static int draw_border_top_left(pd_canvas_t *dst, int bound_left, int bound_top,
 	}
 	right = y_min(rect.width, bound_left + width);
 	for (y = 0; y < rect.height; ++y) {
-		outer_x = 0;
+		outer_x = flags->is_right ? width : 0;
 		split_x = 0;
-		inner_x = width;
+		inner_x = flags->is_right ? -1.0 : width;
 		circle_y = ToGeoY(y, circle_center_y);
-		if (r > 0 && circle_y >= 0) {
-			outer_x = r - ellipse_x(r, r, circle_y);
-			if (radius_y > 0 && y >= inner_ellipse_top) {
-				inner_x =
-				    r - ellipse_x(radius_x, radius_y, circle_y);
+		if (r > 0 && (flags->is_bottom ? circle_y <= 0 : circle_y >= 0)) {
+			outer_x = flags->is_right
+				      ? width - radius + ellipse_x(r, r, circle_y)
+				      : r - ellipse_x(r, r, circle_y);
+			if (radius_y > 0 &&
+			    (flags->is_bottom
+				 ? (y <= inner_ellipse_limit &&
+				    (!flags->is_right || y >= circle_center_y))
+				 : y >= inner_ellipse_limit)) {
+				inner_x = flags->is_right
+					      ? width - radius - 0.5 +
+						    ellipse_x(radius_x, radius_y,
+							      circle_y)
+					      : r - ellipse_x(radius_x, radius_y,
+							      circle_y);
 			}
 		}
 		if (xline->width > 0) {
-			split_x = split_center_x -
-				  ToGeoY(y, split_center_y) * split_k;
+			split_x = split_center_x + split_sign *
+					      ToGeoY(y, split_center_y) * split_k;
 		}
 		outer_x = bound_left + outer_x;
 		inner_x = bound_left + inner_x;
-		/* Limit coordinates into the current drawing region */
 		outer_x = y_max(0, y_min(right, outer_x));
-		inner_x = y_max(0, y_min(right, inner_x));
-		outer_xi = y_max(0, (int)outer_x - (int)radius / 2);
-		inner_xi = y_min(right, (int)inner_x + (int)radius / 2);
-		p = pd_canvas_pixel_at(dst, rect.x, rect.y + y);
-		/* Clear the outer pixels */
-		for (x = 0; x < outer_xi; ++x, ++p) {
-			p->alpha = 0;
+		if (flags->is_right) {
+			inner_x = y_max(-1.0, y_min(outer_x, inner_x));
+			inner_xi = y_max(0, (int)inner_x - (int)radius / 2);
+			outer_xi = y_min(right, (int)outer_x + (int)radius / 2);
+			x = inner_xi;
+			p = pd_canvas_pixel_at(dst, rect.x + inner_xi,
+					       rect.y + y);
+		} else {
+			inner_x = y_max(0, y_min(right, inner_x));
+			outer_xi = y_max(0, (int)outer_x - (int)radius / 2);
+			inner_xi = y_min(right, (int)inner_x + (int)radius / 2);
+			x = 0;
+			p = pd_canvas_pixel_at(dst, rect.x, rect.y + y);
+			for (; x < outer_xi; ++x, ++p) {
+				p->alpha = 0;
+			}
 		}
-		for (; x < inner_xi; ++x, ++p) {
-			outer_d = -1;
-			inner_d = inner_x - 1.0 * x;
-			circle_x = ToGeoX(x, cirlce_center_x);
-			/* If in the circle */
-			if (r > 0 && circle_y >= 0 && circle_x <= 0) {
+		for (; x < (flags->is_right ? outer_xi : inner_xi); ++x, ++p) {
+			outer_d = -1.0;
+			inner_d = flags->is_right ? x - inner_x : inner_x - x;
+			circle_x = ToGeoX(x, circle_center_x);
+			if (r > 0 &&
+			    (flags->is_bottom ? circle_y <= 0 : circle_y >= 0) &&
+			    (flags->is_right ? circle_x >= 0 : circle_x <= 0)) {
 				outer_d =
 				    sqrt(POW2(circle_x) + POW2(circle_y)) - r;
-				/* If the inside is a circle is not an ellipse,
-				 * Use the same anti-aliasing method
-				 */
 				if (radius_x == radius_y && radius_y > 0 &&
-				    y >= inner_ellipse_top) {
+				    (flags->is_bottom
+					 ? y <= inner_ellipse_limit
+					 : y >= inner_ellipse_limit)) {
 					inner_d = outer_d + r - radius_x;
 				}
 			}
 			if (outer_d >= 1.0) {
+				if (flags->is_right) {
+					break;
+				}
 				p->alpha = 0;
 				continue;
 			}
 			if (x < split_x) {
-				color = yline->color;
+				color = flags->is_right ? xline->color
+							: yline->color;
 			} else {
-				color = xline->color;
-			}
-			if (outer_d >= 0) {
-				/* Fill the border color if the border width is
-				 * valid */
-				if (inner_d - outer_d >= 0.5) {
-					*p = color;
-				}
-				p->a = smooth_left_pixel(p, outer_d);
-			} else if (inner_d >= 1.0) {
-				pd_over_pixel(p, &color, 1.0);
-			} else if (inner_d >= 0) {
-				color.a = smooth_right_pixel(&color, inner_d);
-				pd_over_pixel(p, &color, 1.0);
-			} else {
-				break;
-			}
-		}
-	}
-	return 0;
-}
-
-static int draw_border_top_right(pd_canvas_t *dst, int bound_left,
-				 int bound_top, const pd_border_line_t *xline,
-				 const pd_border_line_t *yline,
-				 unsigned int radius)
-{
-	BorderRenderContext();
-
-	double circle_center_y = bound_top + r;
-	double circle_center_x = bound_left + width - 1.0 * radius - 0.5;
-	double split_k = 1.0 * yline->width / xline->width;
-	double split_center_x = bound_left + width - 1.0 * yline->width;
-	double split_center_y = bound_top + 1.0 * xline->width;
-	double inner_ellipse_top = split_center_y;
-
-	/* Get the actual rectangle that can be drawn */
-	pd_canvas_get_quote_rect(dst, &rect);
-	dst = pd_canvas_get_quote_source(dst);
-	if (!pd_canvas_is_valid(dst)) {
-		return -1;
-	}
-	right = y_min(rect.width, bound_left + width);
-	for (y = 0; y < rect.height; ++y) {
-		outer_x = width;
-		split_x = 0;
-		inner_x = -1.0;
-		circle_y = ToGeoY(y, circle_center_y);
-		if (r > 0 && circle_y >= 0) {
-			outer_x = width - radius + ellipse_x(r, r, circle_y);
-			if (radius_y > 0 && y >= inner_ellipse_top) {
-				inner_x =
-				    width - radius - 0.5 +
-				    ellipse_x(radius_x, radius_y, circle_y);
-			}
-		}
-		if (xline->width > 0) {
-			split_x = split_center_x +
-				  ToGeoY(y, split_center_y) * split_k;
-		}
-		outer_x = bound_left + outer_x;
-		inner_x = bound_left + inner_x;
-		/* Limit coordinates into the current drawing region */
-		outer_x = y_max(0, y_min(right, outer_x));
-		inner_x = y_max(-1.0, y_min(outer_x, inner_x));
-		inner_xi = y_max(0, (int)inner_x - (int)radius / 2);
-		outer_xi = y_min(right, (int)outer_x + (int)radius / 2);
-		p = pd_canvas_pixel_at(dst, rect.x + inner_xi, rect.y + y);
-		for (x = inner_xi; x < outer_xi; ++x, ++p) {
-			outer_d = -1.0;
-			inner_d = x - inner_x;
-			circle_x = ToGeoX(x, circle_center_x);
-			if (r > 0 && circle_y >= 0 && circle_x >= 0) {
-				outer_d =
-				    sqrt(POW2(circle_x) + POW2(circle_y)) - r;
-				if (radius_x == radius_y && radius_y > 0 &&
-				    y >= inner_ellipse_top) {
-					inner_d = outer_d + r - radius_x;
-				}
-			}
-			if (outer_d >= 1.0) {
-				break;
-			}
-			if (x < split_x) {
-				color = xline->color;
-			} else {
-				color = yline->color;
+				color = flags->is_right ? yline->color
+							: xline->color;
 			}
 			if (outer_d >= 0) {
 				if (inner_d - outer_d >= 0.5) {
 					*p = color;
 				}
 				p->a = smooth_left_pixel(p, outer_d);
-			} else if (inner_d >= 0.5) {
+			} else if (inner_d >= (flags->is_right ? 0.5 : 1.0)) {
 				pd_over_pixel(p, &color, 1.0);
 			} else if (inner_d >= 0) {
 				color.a = smooth_right_pixel(&color, inner_d);
 				pd_over_pixel(p, &color, 1.0);
+			} else if (!flags->is_right) {
+				break;
 			}
 		}
-		/* Clear the outer pixels */
-		for (; x < right; ++x, ++p) {
-			p->alpha = 0;
-		}
-	}
-	return 0;
-}
-
-static int draw_border_bottom_left(pd_canvas_t *dst, int bound_left,
-				   int bound_top, const pd_border_line_t *xline,
-				   const pd_border_line_t *yline,
-				   unsigned int radius)
-{
-	BorderRenderContext();
-
-	int height = y_max(radius, xline->width);
-	double cirlce_center_x = bound_left + r;
-	double circle_center_y = bound_top + height - 1.0 * radius - 0.5;
-	double split_k = 1.0 * yline->width / xline->width;
-	double split_center_x = bound_left + 1.0 * yline->width;
-	double split_center_y = bound_top + height - 1.0 * xline->width;
-	double inner_ellipse_bottom = circle_center_y + radius_y;
-
-	/* Get the actual rectangle that can be drawn */
-	pd_canvas_get_quote_rect(dst, &rect);
-	dst = pd_canvas_get_quote_source(dst);
-	if (!pd_canvas_is_valid(dst)) {
-		return -1;
-	}
-	right = y_min(rect.width, bound_left + width);
-	for (y = 0; y < rect.height; ++y) {
-		outer_x = 0;
-		split_x = 0;
-		inner_x = width;
-		circle_y = ToGeoY(y, circle_center_y);
-		if (r > 0 && circle_y <= 0) {
-			outer_x = r - ellipse_x(r, r, circle_y);
-			if (radius_y > 0 && y <= inner_ellipse_bottom) {
-				inner_x =
-				    r - ellipse_x(radius_x, radius_y, circle_y);
-			}
-		}
-		if (xline->width > 0) {
-			split_x = split_center_x +
-				  ToGeoY(y, split_center_y) * split_k;
-		}
-		outer_x = bound_left + outer_x;
-		inner_x = bound_left + inner_x;
-		/* Limit coordinates into the current drawing region */
-		outer_x = y_max(0, y_min(right, outer_x));
-		inner_x = y_max(0, y_min(right, inner_x));
-		outer_xi = y_max(0, (int)outer_x - (int)radius / 2);
-		inner_xi = y_min(right, (int)inner_x + (int)radius / 2);
-		p = pd_canvas_pixel_at(dst, rect.x, rect.y + y);
-		for (x = 0; x < outer_xi; ++x, ++p) {
-			p->alpha = 0;
-		}
-		for (; x < inner_xi; ++x, ++p) {
-			outer_d = -1;
-			inner_d = inner_x - 1.0 * x;
-			circle_x = ToGeoX(x, cirlce_center_x);
-			if (r > 0 && circle_y <= 0 && circle_x <= 0) {
-				outer_d =
-				    sqrt(POW2(circle_x) + POW2(circle_y)) - r;
-				if (radius_x == radius_y && radius_y > 0 &&
-				    y <= inner_ellipse_bottom) {
-					inner_d = outer_d + r - radius_x;
-				}
-			}
-			if (outer_d >= 1.0) {
+		if (flags->is_right) {
+			for (; x < right; ++x, ++p) {
 				p->alpha = 0;
-				continue;
 			}
-			if (x < split_x) {
-				color = yline->color;
-			} else {
-				color = xline->color;
-			}
-			if (outer_d >= 0) {
-				if (inner_d - outer_d >= 0.5) {
-					*p = color;
-				}
-				p->a = smooth_left_pixel(p, outer_d);
-			} else if (inner_d >= 1.0) {
-				pd_over_pixel(p, &color, 1.0);
-			} else if (inner_d >= 0) {
-				color.a = smooth_right_pixel(&color, inner_d);
-				pd_over_pixel(p, &color, 1.0);
-			} else {
-				break;
-			}
-		}
-	}
-	return 0;
-}
-
-static int draw_border_bottom_right(pd_canvas_t *dst, int bound_left,
-				    int bound_top,
-				    const pd_border_line_t *xline,
-				    const pd_border_line_t *yline,
-				    unsigned int radius)
-{
-	BorderRenderContext();
-
-	int height = y_max(radius, xline->width);
-	double circle_center_y = bound_top + height - 1.0 * radius - 0.5;
-	double circle_center_x = bound_left + width - 1.0 * radius - 0.5;
-	double split_k = 1.0 * yline->width / xline->width;
-	double split_center_x = bound_left + width - 1.0 * yline->width;
-	double split_center_y = bound_top + height - 1.0 * xline->width;
-	double inner_ellipse_bottom = circle_center_y + radius_y;
-
-	/* Get the actual rectangle that can be drawn */
-	pd_canvas_get_quote_rect(dst, &rect);
-	dst = pd_canvas_get_quote_source(dst);
-	if (!pd_canvas_is_valid(dst)) {
-		return -1;
-	}
-	right = y_min(rect.width, bound_left + width);
-	for (y = 0; y < rect.height; ++y) {
-		outer_x = width;
-		split_x = 0;
-		inner_x = -1.0;
-		circle_y = ToGeoY(y, circle_center_y);
-		if (r > 0 && circle_y <= 0) {
-			outer_x = width - r + ellipse_x(r, r, circle_y);
-			if (radius_y > 0 && y <= inner_ellipse_bottom &&
-			    y >= circle_center_y) {
-				inner_x =
-				    width - radius - 0.5 +
-				    ellipse_x(radius_x, radius_y, circle_y);
-			}
-		}
-		if (xline->width > 0) {
-			split_x = split_center_x -
-				  ToGeoY(y, split_center_y) * split_k;
-		}
-		outer_x = bound_left + outer_x;
-		inner_x = bound_left + inner_x;
-		outer_x = y_max(0, y_min(right, outer_x));
-		inner_x = y_max(-1.0, y_min(outer_x, inner_x));
-		inner_xi = y_max(0, (int)inner_x - (int)radius / 2);
-		outer_xi = y_min(right, (int)outer_x + (int)radius / 2);
-		p = pd_canvas_pixel_at(dst, rect.x + inner_xi, rect.y + y);
-		for (x = inner_xi; x < outer_xi; ++x, ++p) {
-			outer_d = -1.0;
-			inner_d = 1.0 * x - inner_x;
-			circle_x = ToGeoX(x, circle_center_x);
-			if (r > 0 && circle_y <= 0 && circle_x >= 0) {
-				outer_d =
-				    sqrt(POW2(circle_x) + POW2(circle_y)) - r;
-				if (radius_x == radius_y && radius_y > 0 &&
-				    y <= inner_ellipse_bottom) {
-					inner_d = outer_d + r - radius_x;
-				}
-			}
-			if (outer_d >= 1.0) {
-				break;
-			}
-			if (x < split_x) {
-				color = xline->color;
-			} else {
-				color = yline->color;
-			}
-			if (outer_d >= 0) {
-				if (inner_d - outer_d >= 0.5) {
-					*p = color;
-				}
-				p->a = smooth_left_pixel(p, outer_d);
-			} else if (inner_d >= 0.5) {
-				pd_over_pixel(p, &color, 1.0);
-			} else if (inner_d >= 0) {
-				color.a = smooth_right_pixel(&color, inner_d);
-				pd_over_pixel(p, &color, 1.0);
-			}
-		}
-		/* Clear the outer pixels */
-		for (; x < right; ++x, ++p) {
-			p->alpha = 0;
 		}
 	}
 	return 0;
@@ -426,9 +208,9 @@ static int draw_border_bottom_right(pd_canvas_t *dst, int bound_left,
  */
 
 /** Crop the top left corner of the content area */
-static int crop_content_top_left(pd_canvas_t *dst, int bound_left,
-				 int bound_top, double radius_x,
-				 double radius_y)
+static int crop_content_corner(pd_canvas_t *dst, int bound_left, int bound_top,
+			       double radius_x, double radius_y,
+			       const pd_corner_flags_t *flags)
 {
 	int xi, yi;
 	int outer_xi;
@@ -441,8 +223,8 @@ static int crop_content_top_left(pd_canvas_t *dst, int bound_left,
 
 	radius_x -= 0.5;
 	radius_y -= 0.5;
-	center_x = bound_left + radius_x;
-	center_y = bound_top + radius_y;
+	center_x = flags->is_right ? bound_left : bound_left + radius_x;
+	center_y = flags->is_bottom ? bound_top : bound_top + radius_y;
 	pd_canvas_get_quote_rect(dst, &rect);
 	dst = pd_canvas_get_quote_source(dst);
 	if (!pd_canvas_is_valid(dst)) {
@@ -450,23 +232,36 @@ static int crop_content_top_left(pd_canvas_t *dst, int bound_left,
 	}
 	for (yi = 0; yi < rect.height; ++yi) {
 		y = ToGeoY(yi, center_y);
-		x = ellipse_x(radius_x + 1.0, radius_y + 1.0, y);
-		outer_xi = (int)(center_x - x);
-		outer_xi = y_max(0, y_min(outer_xi, rect.width));
-		p = pd_canvas_pixel_at(dst, rect.x, rect.y + yi);
-		for (xi = 0; xi < outer_xi; ++xi, ++p) {
-			p->alpha = 0;
+		x = flags->is_right
+			    ? ellipse_x(y_max(0, radius_x - 1),
+					y_max(0, radius_y - 1), y)
+			    : ellipse_x(radius_x + 1.0, radius_y + 1.0, y);
+		outer_xi = flags->is_right ? (int)(center_x + x)
+					   : (int)(center_x - x);
+		if (flags->is_right) {
+			outer_xi = y_max(0, outer_xi);
+			xi = outer_xi;
+			p = pd_canvas_pixel_at(dst, rect.x + outer_xi, rect.y + yi);
+		} else {
+			outer_xi = y_max(0, y_min(outer_xi, rect.width));
+			xi = 0;
+			p = pd_canvas_pixel_at(dst, rect.x, rect.y + yi);
+			for (; xi < outer_xi; ++xi, ++p) {
+				p->alpha = 0;
+			}
 		}
-		/* If inner ellipse is circle */
 		if (radius_x == radius_y) {
 			for (; xi < rect.width; ++xi, ++p) {
 				x = ToGeoX(xi, center_x);
 				d = sqrt(x * x + y * y) - radius_x;
 				if (d >= 1.0) {
+					if (flags->is_right) {
+						break;
+					}
 					p->alpha = 0;
 				} else if (d >= 0) {
 					p->alpha = smooth_left_pixel(p, d);
-				} else {
+				} else if (!flags->is_right) {
 					break;
 				}
 			}
@@ -477,197 +272,21 @@ static int crop_content_top_left(pd_canvas_t *dst, int bound_left,
 				x = ToGeoX(xi, center_x);
 				d = x - outer_x;
 				if (d >= 1.0) {
+					if (flags->is_right) {
+						break;
+					}
 					p->alpha = 0;
 				} else if (d >= 0) {
 					p->alpha = smooth_left_pixel(p, d);
-				} else {
+				} else if (!flags->is_right) {
 					break;
 				}
 			}
 		}
-	}
-	return 0;
-}
-
-static int crop_content_top_right(pd_canvas_t *dst, int bound_left,
-				  int bound_top, double radius_x,
-				  double radius_y)
-{
-	int xi, yi;
-	int outer_xi;
-	double x, y, d;
-	double outer_x;
-	double center_x, center_y;
-
-	pd_rect_t rect;
-	pd_color_t *p;
-
-	radius_x -= 0.5;
-	radius_y -= 0.5;
-	center_x = bound_left;
-	center_y = bound_top + radius_y;
-	pd_canvas_get_quote_rect(dst, &rect);
-	dst = pd_canvas_get_quote_source(dst);
-	if (!pd_canvas_is_valid(dst)) {
-		return -1;
-	}
-	for (yi = 0; yi < rect.height; ++yi) {
-		y = ToGeoY(yi, center_y);
-		x = ellipse_x(y_max(0, radius_x - 1), y_max(0, radius_y - 1),
-			      y);
-		outer_xi = (int)(center_x + x);
-		outer_xi = y_max(0, outer_xi);
-		p = pd_canvas_pixel_at(dst, rect.x + outer_xi, rect.y + yi);
-		if (radius_x == radius_y) {
-			for (xi = outer_xi; xi < rect.width; ++xi, ++p) {
-				x = ToGeoX(xi, center_x);
-				d = sqrt(x * x + y * y) - radius_x;
-				if (d >= 1.0) {
-					break;
-				}
-				if (d >= 0) {
-					p->alpha = smooth_left_pixel(p, d);
-				}
-			}
-		} else {
-			outer_x =
-			    ToGeoX(ellipse_x(radius_x, radius_y, y), center_x);
-			for (xi = outer_xi; xi < rect.width; ++xi, ++p) {
-				x = ToGeoX(xi, center_x);
-				d = x - outer_x;
-				if (d >= 1.0) {
-					break;
-				}
-				if (d >= 0) {
-					p->alpha = smooth_left_pixel(p, d);
-				}
-			}
-		}
-		for (; xi < rect.width; ++xi, ++p) {
-			p->alpha = 0;
-		}
-	}
-	return 0;
-}
-
-static int crop_content_bottom_left(pd_canvas_t *dst, int bound_left,
-				    int bound_top, double radius_x,
-				    double radius_y)
-{
-	int xi, yi;
-	int outer_xi;
-	double x, y, d;
-	double outer_x;
-	double center_x, center_y;
-
-	pd_rect_t rect;
-	pd_color_t *p;
-
-	radius_x -= 0.5;
-	radius_y -= 0.5;
-	center_x = bound_left + radius_x;
-	center_y = bound_top;
-	pd_canvas_get_quote_rect(dst, &rect);
-	dst = pd_canvas_get_quote_source(dst);
-	if (!pd_canvas_is_valid(dst)) {
-		return -1;
-	}
-	for (yi = 0; yi < rect.height; ++yi) {
-		y = ToGeoY(yi, center_y);
-		x = ellipse_x(radius_x + 1.0, radius_y + 1.0, y);
-		outer_xi = (int)(center_x - x);
-		outer_xi = y_max(0, y_min(outer_xi, rect.width));
-		p = pd_canvas_pixel_at(dst, rect.x, rect.y + yi);
-		for (xi = 0; xi < outer_xi; ++xi, ++p) {
-			p->alpha = 0;
-		}
-		if (radius_x == radius_y) {
+		if (flags->is_right) {
 			for (; xi < rect.width; ++xi, ++p) {
-				x = ToGeoX(xi, center_x);
-				d = sqrt(x * x + y * y) - radius_x;
-				if (d >= 1.0) {
-					p->alpha = 0;
-				} else if (d >= 0) {
-					p->alpha = smooth_left_pixel(p, d);
-				} else {
-					break;
-				}
+				p->alpha = 0;
 			}
-		} else {
-			outer_x =
-			    ToGeoX(ellipse_x(radius_x, radius_y, y), center_x);
-			for (; xi < rect.width; ++xi, ++p) {
-				x = ToGeoX(xi, center_x);
-				d = x - outer_x;
-				if (d >= 1.0) {
-					p->alpha = 0;
-				} else if (d >= 0) {
-					p->alpha = smooth_left_pixel(p, d);
-				} else {
-					break;
-				}
-			}
-		}
-	}
-	return 0;
-}
-
-static int crop_content_bottom_right(pd_canvas_t *dst, int bound_left,
-				     int bound_top, double radius_x,
-				     double radius_y)
-{
-	int xi, yi;
-	int outer_xi;
-	double x, y, d;
-	double outer_x;
-	double center_x, center_y;
-
-	pd_rect_t rect;
-	pd_color_t *p;
-
-	radius_x -= 0.5;
-	radius_y -= 0.5;
-	center_x = bound_left;
-	center_y = bound_top;
-	pd_canvas_get_quote_rect(dst, &rect);
-	dst = pd_canvas_get_quote_source(dst);
-	if (!pd_canvas_is_valid(dst)) {
-		return -1;
-	}
-	for (yi = 0; yi < rect.height; ++yi) {
-		y = ToGeoY(yi, center_y);
-		x = ellipse_x(y_max(0, radius_x - 1), y_max(0, radius_y - 1),
-			      y);
-		outer_xi = (int)(center_x + x);
-		outer_xi = y_max(0, outer_xi);
-		p = pd_canvas_pixel_at(dst, rect.x + outer_xi, rect.y + yi);
-		if (radius_x == radius_y) {
-			for (xi = outer_xi; xi < rect.width; ++xi, ++p) {
-				x = ToGeoX(xi, center_x);
-				d = sqrt(x * x + y * y) - radius_x;
-				if (d >= 1.0) {
-					break;
-				}
-				if (d >= 0) {
-					p->alpha = smooth_left_pixel(p, d);
-				}
-			}
-		} else {
-			outer_x =
-			    ToGeoX(ellipse_x(radius_x, radius_y, y), center_x);
-			for (xi = outer_xi; xi < rect.width; ++xi, ++p) {
-				x = ToGeoX(xi, center_x);
-				d = x - outer_x;
-				if (d >= 1.0) {
-					break;
-				}
-				if (d >= 0) {
-					p->alpha = smooth_left_pixel(p, d);
-				}
-			}
-		}
-		for (; xi < rect.width; ++xi, ++p) {
-			p->alpha = 0;
 		}
 	}
 	return 0;
@@ -678,73 +297,59 @@ int pd_crop_border_content(pd_context_t *ctx, const pd_border_t *border,
 {
 	pd_canvas_t canvas;
 	pd_rect_t bound, rect;
-
-	int radius;
 	int bound_top, bound_left;
+	int i;
+	struct {
+		pd_corner_flags_t flags;
+		int x, y;
+		int width, height;
+	} corners[] = {
+		{
+		    .flags = {0, 0},
+		    .x = box->x + border->left.width,
+		    .y = box->y + border->top.width,
+		    .width = border->top_left_radius - border->left.width,
+		    .height = border->top_left_radius - border->top.width,
+		},
+		{
+		    .flags = {1, 0},
+		    .x = box->x + box->width - border->top_right_radius,
+		    .y = box->y + border->top.width,
+		    .width = border->top_right_radius - border->right.width,
+		    .height = border->top_right_radius - border->top.width,
+		},
+		{
+		    .flags = {0, 1},
+		    .x = box->x + border->left.width,
+		    .y = box->y + box->height - border->bottom_left_radius,
+		    .width = border->bottom_left_radius - border->left.width,
+		    .height = border->bottom_left_radius - border->bottom.width,
+		},
+		{
+		    .flags = {1, 1},
+		    .x = box->x + box->width - border->bottom_right_radius,
+		    .y = box->y + box->height - border->bottom_right_radius,
+		    .width = border->bottom_right_radius - border->right.width,
+		    .height = border->bottom_right_radius - border->bottom.width,
+		},
+	};
 
-	radius = border->top_left_radius;
-	bound.x = box->x + border->left.width;
-	bound.y = box->y + border->top.width;
-	bound.width = radius - border->left.width;
-	bound.height = radius - border->top.width;
-	if (bound.width > 0 && bound.height > 0 &&
-	    pd_rect_overlap(&bound, &ctx->rect, &rect)) {
-		bound_left = bound.x - rect.x;
-		bound_top = bound.y - rect.y;
-		rect.x -= ctx->rect.x;
-		rect.y -= ctx->rect.y;
-		pd_canvas_quote(&canvas, &ctx->canvas, &rect);
-		crop_content_top_left(&canvas, bound_left, bound_top,
-				      bound.width, bound.height);
-	}
-
-	radius = border->top_right_radius;
-	bound.x = box->x + box->width - radius;
-	bound.y = box->y + border->top.width;
-	bound.width = radius - border->right.width;
-	bound.height = radius - border->top.width;
-	if (bound.width > 0 && bound.height > 0 &&
-	    pd_rect_overlap(&bound, &ctx->rect, &rect)) {
-		bound_left = bound.x - rect.x;
-		bound_top = bound.y - rect.y;
-		rect.x -= ctx->rect.x;
-		rect.y -= ctx->rect.y;
-		pd_canvas_quote(&canvas, &ctx->canvas, &rect);
-		crop_content_top_right(&canvas, bound_left, bound_top,
-				       bound.width, bound.height);
-	}
-
-	radius = border->bottom_left_radius;
-	bound.x = box->x + border->left.width;
-	bound.y = box->y + box->height - radius;
-	bound.width = radius - border->left.width;
-	bound.height = radius - border->bottom.width;
-	if (bound.width > 0 && bound.height > 0 &&
-	    pd_rect_overlap(&bound, &ctx->rect, &rect)) {
-		bound_left = bound.x - rect.x;
-		bound_top = bound.y - rect.y;
-		rect.x -= ctx->rect.x;
-		rect.y -= ctx->rect.y;
-		pd_canvas_quote(&canvas, &ctx->canvas, &rect);
-		crop_content_bottom_left(&canvas, bound_left, bound_top,
-					 bound.width, bound.height);
-	}
-
-	radius = border->bottom_right_radius;
-	bound.x = box->x + box->width - radius;
-	bound.y = box->y + box->height - radius;
-	;
-	bound.width = radius - border->right.width;
-	bound.height = radius - border->bottom.width;
-	if (bound.width > 0 && bound.height > 0 &&
-	    pd_rect_overlap(&bound, &ctx->rect, &rect)) {
-		bound_left = bound.x - rect.x;
-		bound_top = bound.y - rect.y;
-		rect.x -= ctx->rect.x;
-		rect.y -= ctx->rect.y;
-		pd_canvas_quote(&canvas, &ctx->canvas, &rect);
-		crop_content_bottom_right(&canvas, bound_left, bound_top,
-					  bound.width, bound.height);
+	for (i = 0; i < 4; ++i) {
+		bound.x = corners[i].x;
+		bound.y = corners[i].y;
+		bound.width = corners[i].width;
+		bound.height = corners[i].height;
+		if (bound.width > 0 && bound.height > 0 &&
+		    pd_rect_overlap(&bound, &ctx->rect, &rect)) {
+			bound_left = bound.x - rect.x;
+			bound_top = bound.y - rect.y;
+			rect.x -= ctx->rect.x;
+			rect.y -= ctx->rect.y;
+			pd_canvas_quote(&canvas, &ctx->canvas, &rect);
+			crop_content_corner(&canvas, bound_left, bound_top,
+					    bound.width, bound.height,
+					    &corners[i].flags);
+		}
 	}
 	return 0;
 }
@@ -754,8 +359,8 @@ int pd_paint_border(pd_context_t *ctx, const pd_border_t *border,
 {
 	pd_canvas_t canvas;
 	pd_rect_t bound, rect;
-
 	int bound_top, bound_left;
+	int i;
 	int tl_width = y_max(border->top_left_radius, border->left.width);
 	int tl_height = y_max(border->top_left_radius, border->top.width);
 	int tr_width = y_max(border->top_right_radius, border->right.width);
@@ -765,69 +370,75 @@ int pd_paint_border(pd_context_t *ctx, const pd_border_t *border,
 	int br_width = y_max(border->bottom_right_radius, border->right.width);
 	int br_height =
 	    y_max(border->bottom_right_radius, border->bottom.width);
+	struct {
+		pd_corner_flags_t flags;
+		int x, y;
+		int width, height;
+		const pd_border_line_t *xline;
+		const pd_border_line_t *yline;
+		unsigned int radius;
+	} corners[] = {
+		{
+		    .flags = {0, 0},
+		    .x = box->x,
+		    .y = box->y,
+		    .width = tl_width,
+		    .height = tl_height,
+		    .xline = &border->top,
+		    .yline = &border->left,
+		    .radius = border->top_left_radius,
+		},
+		{
+		    .flags = {1, 0},
+		    .x = box->x + box->width - tr_width,
+		    .y = box->y,
+		    .width = tr_width,
+		    .height = tr_height,
+		    .xline = &border->top,
+		    .yline = &border->right,
+		    .radius = border->top_right_radius,
+		},
+		{
+		    .flags = {0, 1},
+		    .x = box->x,
+		    .y = box->y + box->height - bl_height,
+		    .width = bl_width,
+		    .height = bl_height,
+		    .xline = &border->bottom,
+		    .yline = &border->left,
+		    .radius = border->bottom_left_radius,
+		},
+		{
+		    .flags = {1, 1},
+		    .x = box->x + box->width - br_width,
+		    .y = box->y + box->height - br_height,
+		    .width = br_width,
+		    .height = br_height,
+		    .xline = &border->bottom,
+		    .yline = &border->right,
+		    .radius = border->bottom_right_radius,
+		},
+	};
 
 	if (!pd_canvas_is_valid(&ctx->canvas)) {
 		return -1;
 	}
-	/* Draw border top left angle */
-	bound.x = box->x;
-	bound.y = box->y;
-	bound.width = tl_width;
-	bound.height = tl_height;
-	if (pd_rect_overlap(&bound, &ctx->rect, &rect)) {
-		bound_left = bound.x - rect.x;
-		bound_top = bound.y - rect.y;
-		rect.x -= ctx->rect.x;
-		rect.y -= ctx->rect.y;
-		pd_canvas_quote(&canvas, &ctx->canvas, &rect);
-		draw_border_top_left(&canvas, bound_left, bound_top,
-				     &border->top, &border->left,
-				     border->top_left_radius);
-	}
-	/* Draw border top right angle */
-	bound.y = box->y;
-	bound.width = tr_width;
-	bound.height = tr_height;
-	bound.x = box->x + box->width - bound.width;
-	if (pd_rect_overlap(&bound, &ctx->rect, &rect)) {
-		bound_left = bound.x - rect.x;
-		bound_top = bound.y - rect.y;
-		rect.x -= ctx->rect.x;
-		rect.y -= ctx->rect.y;
-		pd_canvas_quote(&canvas, &ctx->canvas, &rect);
-		draw_border_top_right(&canvas, bound_left, bound_top,
-				      &border->top, &border->right,
-				      border->top_right_radius);
-	}
-	/* Draw border bottom left angle */
-	bound.x = box->x;
-	bound.width = bl_width;
-	bound.height = bl_height;
-	bound.y = box->y + box->height - bound.height;
-	if (pd_rect_overlap(&bound, &ctx->rect, &rect)) {
-		bound_left = bound.x - rect.x;
-		bound_top = bound.y - rect.y;
-		rect.x -= ctx->rect.x;
-		rect.y -= ctx->rect.y;
-		pd_canvas_quote(&canvas, &ctx->canvas, &rect);
-		draw_border_bottom_left(&canvas, bound_left, bound_top,
-					&border->bottom, &border->left,
-					border->bottom_left_radius);
-	}
-	/* Draw border bottom right angle */
-	bound.width = br_width;
-	bound.height = br_height;
-	bound.x = box->x + box->width - bound.width;
-	bound.y = box->y + box->height - bound.height;
-	if (pd_rect_overlap(&bound, &ctx->rect, &rect)) {
-		bound_left = bound.x - rect.x;
-		bound_top = bound.y - rect.y;
-		rect.x -= ctx->rect.x;
-		rect.y -= ctx->rect.y;
-		pd_canvas_quote(&canvas, &ctx->canvas, &rect);
-		draw_border_bottom_right(&canvas, bound_left, bound_top,
-					 &border->bottom, &border->right,
-					 border->bottom_right_radius);
+	for (i = 0; i < 4; ++i) {
+		bound.x = corners[i].x;
+		bound.y = corners[i].y;
+		bound.width = corners[i].width;
+		bound.height = corners[i].height;
+		if (pd_rect_overlap(&bound, &ctx->rect, &rect)) {
+			bound_left = bound.x - rect.x;
+			bound_top = bound.y - rect.y;
+			rect.x -= ctx->rect.x;
+			rect.y -= ctx->rect.y;
+			pd_canvas_quote(&canvas, &ctx->canvas, &rect);
+			draw_border_corner(&canvas, bound_left, bound_top,
+					   corners[i].xline, corners[i].yline,
+					   corners[i].radius,
+					   &corners[i].flags);
+		}
 	}
 	/* Draw top border line */
 	bound.x = box->x + tl_width;
