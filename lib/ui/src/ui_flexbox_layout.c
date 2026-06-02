@@ -713,16 +713,6 @@ static inline bool ui_flexbox_row_margin_end_is_auto(css_computed_style_t *cs)
         return cs->type_bits.margin_right == CSS_MARGIN_AUTO;
 }
 
-static float ui_flexbox_row_compute_item_layout(ui_widget_t *item,
-                                                float main_axis,
-                                                float cross_axis,
-                                                css_align_items_t align,
-                                                float line_max_cross_size)
-{
-        return ui_compute_row_item_layout(item, main_axis, cross_axis, align,
-                                          line_max_cross_size);
-}
-
 static inline float ui_flexbox_column_item_outer_main(ui_widget_t *item)
 {
         return item->outer_box.height;
@@ -825,7 +815,7 @@ static const ui_flexbox_axis_ops_t row_ops = {
         .cross_size_is_fixed = ui_flexbox_row_cross_size_is_fixed,
         .set_content_cross = ui_flexbox_row_set_content_cross,
         .apply_item_main_size = ui_apply_row_item_main_size,
-        .compute_item_layout = ui_flexbox_row_compute_item_layout,
+        .compute_item_layout = ui_compute_row_item_layout,
         .margin_start_is_auto = ui_flexbox_row_margin_start_is_auto,
         .margin_end_is_auto = ui_flexbox_row_margin_end_is_auto,
 };
