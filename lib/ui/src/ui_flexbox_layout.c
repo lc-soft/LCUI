@@ -327,8 +327,7 @@ static void ui_flexbox_layout_load_main_size(ui_flexbox_layout_context_t *ctx,
         {
                 ui_debug_msg_indent--;
                 UI_WIDGET_SIZE_STR(ctx->widget, size_str);
-                UI_DEBUG_MSG("%s: end, size=%s, main_size=%g, min_main_size=%g",
-                             __FUNCTION__, size_str, main_size, min_main_size);
+                UI_DEBUG_MSG("%s: end, size=%s", __FUNCTION__, size_str);
         }
 #endif
 }
@@ -529,8 +528,10 @@ static void ui_flexbox_layout_apply_main_size(ui_flexbox_layout_context_t *ctx,
                 if (ctx->cross_size < ctx->resizer->hint.max_width) {
                         ctx->cross_size = ctx->resizer->hint.max_width;
                 }
-        } else if (ctx->cross_size < ctx->resizer->hint.max_height) {
-                ctx->cross_size = ctx->resizer->hint.max_height;
+        } else {
+                if (ctx->cross_size < ctx->resizer->hint.max_height) {
+                        ctx->cross_size = ctx->resizer->hint.max_height;
+                }
         }
         if (ctx->column_direction) {
                 if (!IS_CSS_FIXED_LENGTH(s, width)) {
