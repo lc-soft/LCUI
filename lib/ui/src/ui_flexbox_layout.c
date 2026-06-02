@@ -90,8 +90,8 @@ static inline float ui_flexbox_item_min_outer_main(
                    ? css_obox_height(
                          s,
                          css_height_from_cbox(s, item->min_content_height))
-                   : css_obox_width(s, css_width_from_cbox(
-                                           s, item->min_content_width));
+                   : css_obox_width(
+                         s, css_width_from_cbox(s, item->min_content_width));
 }
 
 static inline float ui_flexbox_container_content_main(
