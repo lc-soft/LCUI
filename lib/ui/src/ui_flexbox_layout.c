@@ -171,9 +171,9 @@ static inline void ui_flexbox_set_content_cross(
 static inline bool ui_flexbox_margin_start_is_auto(
     const ui_flexbox_layout_context_t *ctx, css_computed_style_t *cs)
 {
-        return ctx->column_direction ? cs->type_bits.margin_top == CSS_MARGIN_AUTO
-                                     : cs->type_bits.margin_left ==
-                                           CSS_MARGIN_AUTO;
+        return ctx->column_direction
+                   ? cs->type_bits.margin_top == CSS_MARGIN_AUTO
+                   : cs->type_bits.margin_left == CSS_MARGIN_AUTO;
 }
 
 static inline bool ui_flexbox_margin_end_is_auto(
@@ -768,12 +768,11 @@ static float ui_flexbox_compute_item_layout(
     float cross_axis, css_align_items_t align, float max_cross_size)
 {
         if (ctx->column_direction) {
-                return ui_compute_column_item_layout(item, cross_axis,
-                                                     main_axis, align,
-                                                     max_cross_size);
+                return ui_compute_column_item_layout(
+                    item, cross_axis, main_axis, align, max_cross_size);
         }
-        return ui_compute_row_item_layout(item, main_axis, cross_axis,
-                                          align, max_cross_size);
+        return ui_compute_row_item_layout(item, main_axis, cross_axis, align,
+                                          max_cross_size);
 }
 
 static const ui_flexbox_axis_ops_t row_ops = {
