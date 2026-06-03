@@ -11,7 +11,7 @@
 
 #include <pandagl.h>
 
-int paint_background(pd_context_t* ctx, pd_rect_t* box)
+int paint_background(pd_context_t *ctx, pd_rect_t *box)
 {
         pd_canvas_t image;
         pd_color_t green = pd_rgb(102, 204, 0);
@@ -32,22 +32,18 @@ int paint_background(pd_context_t* ctx, pd_rect_t* box)
         return 0;
 }
 
-void paint_border(pd_context_t* ctx, pd_rect_t* box)
+void paint_border(pd_context_t *ctx, pd_rect_t *box)
 {
         pd_border_t border = { 0 };
         pd_color_t black = pd_rgb(0, 0, 0);
 
         border.top.color = black;
-        border.top.style = CSS_KEYWORD_SOLID;
         border.top.width = 4;
         border.right.color = black;
-        border.right.style = CSS_KEYWORD_SOLID;
         border.right.width = 4;
         border.bottom.color = black;
-        border.bottom.style = CSS_KEYWORD_SOLID;
         border.bottom.width = 4;
         border.left.color = black;
-        border.left.style = CSS_KEYWORD_SOLID;
         border.left.width = 4;
         border.top_left_radius = 32;
         border.top_right_radius = 32;
@@ -69,7 +65,7 @@ int main(void)
                              border_box.width - border_size * 2,
                              border_box.height - border_size * 2 };
         pd_rect_t layer_rect = { 0, 0, border_box.width, border_box.height };
-        pd_context_t* paint;
+        pd_context_t *paint;
 
         pd_canvas_init(&canvas);
         pd_canvas_create(&canvas, 800, 600);
