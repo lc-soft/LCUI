@@ -2,7 +2,7 @@
   <resource type="text/css" src="test_flex_layout.css"/>
   <ui>
     <scrollarea class="h-full">
-      <scrollarea-content  id="main">
+      <scrollarea-content id="main">
         <w class="container">
           <w class="example">
             <text class="example__title">(0) Default</text>
@@ -351,6 +351,46 @@
                   </w>
                 </w>
               </w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">(18) gap: 10px;</text>
+            <w class="example__content d-flex gap-2">
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+            </w>
+            <text class="example__title">(18.1) gap: 10px 5px; flex-wrap: wrap;</text>
+            <w class="example__content d-flex felx-wrap gap-2-1">
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-3">width: 150px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-2">width: 100px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+              <text class="box w-4">width: 200px</text>
+              <w class="box"></w>
+              <w class="box"></w>
+            </w>
+            <text class="example__title">(18.2) row-gap: 10px; flex-direction: column;</text>
+            <w class="example__content d-flex flex-direction-column row-gap-2 h-4">
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+            </w>
+            <text class="example__title">(18.3) column-gap: 10px; justify-content: space-between;</text>
+            <w class="example__content d-flex justify-content-space-between column-gap-2">
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
+              <w class="box"></w>
             </w>
           </w>
         </w>
