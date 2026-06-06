@@ -95,7 +95,8 @@ static int css_parser_parse_selector(css_parser_t *parser)
         case ',':
                 css_parser_commit(parser);
                 s = css_selector_create(parser->buffer);
-                DEBUG_MSG("[css-parser] selector=%s, valid=%s\n", parser->buffer, s == NULL ? "false" : "true");
+                DEBUG_MSG("[css-parser] selector=%s, valid=%s\n",
+                          parser->buffer, s == NULL ? "false" : "true");
                 if (!s) {
                         return -1;
                 }
@@ -182,7 +183,10 @@ static int css_parser_parse_style_property_value(css_parser_t *parser)
         case '/':
                 return css_parser_begin_parse_comment(parser);
         case '}':
+                parser->target = CSS_PARSER_TARGET_NONE;
+                break;
         case ';':
+                parser->target = CSS_PARSER_TARGET_KEY;
                 break;
         CASE_WHITE_SPACE:
                 if (parser->pos == 0) {
@@ -192,10 +196,8 @@ static int css_parser_parse_style_property_value(css_parser_t *parser)
                 css_parser_get_char(parser);
                 return 0;
         }
-        if (*parser->cur == ';') {
-                parser->target = CSS_PARSER_TARGET_KEY;
-        }
         css_parser_commit(parser);
+        assert(parser->style_parser.property != NULL);
         propdef = css_get_propdef_by_name(parser->style_parser.property);
         if (!propdef) {
                 logger_error(
@@ -288,7 +290,7 @@ void css_parser_commit(css_parser_t *parser)
         for (i = parser->pos; i > 0; --i) {
                 switch (parser->buffer[i]) {
                 CASE_WHITE_SPACE:
-                case  0:
+                case 0:
                         parser->buffer[i] = 0;
                         break;
                 default:
