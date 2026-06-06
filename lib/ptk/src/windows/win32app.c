@@ -113,7 +113,6 @@ static int ptk_process_native_event(void)
         ret = GetMessage(&msg, NULL, 0, 0);
         ptk_process_events();
         if (ret == 0) {
-                logger_debug("[win32-app] WM_QUIT\n");
                 win32_app.exit_code = (int)msg.wParam;
                 e.type = PTK_EVENT_QUIT;
                 ptk_process_event(&e);
@@ -310,9 +309,6 @@ static LRESULT CALLBACK ptk_window_process(HWND hwnd, UINT msg, WPARAM arg1,
                 e.size.width = LOWORD(arg2);
                 e.size.height = HIWORD(arg2);
                 ptk_window_on_size(wnd, e.size.width, e.size.height);
-                logger_debug(
-                    "[win32-app] [window %p] on WM_SIZE, size: (%d, %d)\n", wnd,
-                    e.size.width, e.size.height);
                 break;
         }
         case WM_GETMINMAXINFO: {

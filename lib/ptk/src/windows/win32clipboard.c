@@ -194,9 +194,6 @@ void ptk_win32clipboard_init(void)
         if (ptk_win32clipboard.hwnd == NULL) {
                 ptk_win32clipboard.hwnd = GetDesktopWindow();
         }
-
-        logger_debug("Win32 clipboard initialized with HWND: %p\n",
-                     ptk_win32clipboard.hwnd);
 }
 
 void ptk_win32clipboard_destroy(void)

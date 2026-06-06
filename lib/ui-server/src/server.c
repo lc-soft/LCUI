@@ -137,9 +137,6 @@ int ui_server_disconnect(ui_widget_t *widget, ptk_window_t *window)
                 conn = node->data;
                 if ((widget && conn->widget == widget) ||
                     (window && conn->window == window)) {
-                        logger_debug(
-                            "[ui-server] [window %p] disconnect widget: %p\n",
-                            conn->window, conn->widget);
                         ptk_window_close(conn->window);
                         count++;
                 }
@@ -164,7 +161,6 @@ static void ui_server_on_window_close(ptk_event_t *e, void *arg)
         ui_connection_t *conn;
         list_node_t *node;
 
-        logger_debug("[ui-server] [window %p] on close\n", e->window);
         for (list_each(node, &ui_server.connections)) {
                 conn = node->data;
                 if (conn->window == e->window) {
@@ -224,16 +220,10 @@ static void ui_server_on_window_resize(ptk_event_t *e, void *arg)
         height = e->size.height / scale;
         ui_widget_mark_dirty_rect(conn->widget, NULL, UI_BOX_TYPE_GRAPH_BOX);
         ui_widget_resize(conn->widget, width, height);
-        logger_debug(
-            "[ui-server] [window %p] on_window_resize, widget: (%p, %s), size "
-            "(%g, %g)\n",
-            e->window, conn->widget, conn->widget->type, width, height);
 }
 
 static void ui_server_on_window_dpi_changed(ptk_event_t *e, void *arg)
 {
-        logger_debug("[ui-server] [window %p] on_window_dpi_changed, dpi: %d\n",
-                     e->window, e->dpi_change.dpi);
         ui_refresh_style();
 }
 
@@ -326,8 +316,6 @@ void ui_server_connect(ui_widget_t *widget, ptk_window_t *window)
         ui_mutation_observer_observe(ui_server.observer, widget, options);
         // 在同步前处理所有消息，包括窗口位置、大小变更消息，避免在初次更新时组件的位置和尺寸被窗口覆盖
         ptk_process_native_events(PTK_PROCESS_EVENTS_ALL_IF_PRESENT);
-        logger_debug("[ui-server] [window %p] connect widget(%p, %s)\n", window,
-                     widget, widget->type);
 }
 
 static void get_rendering_layer_size(int *width, int *height)
@@ -655,31 +643,17 @@ static void ui_server_on_widget_mutation(ui_mutation_list_t *mutation_list,
                         ptk_window_set_position(wnd_mutation->window,
                                                 wnd_mutation->x,
                                                 wnd_mutation->y);
-                        logger_debug("[ui-server] [window %p] update position: "
-                                     "(%d, %d)\n",
-                                     wnd_mutation->window, wnd_mutation->x,
-                                     wnd_mutation->y);
                 }
                 if (wnd_mutation->update_size) {
                         ptk_window_set_size(wnd_mutation->window,
                                             wnd_mutation->width,
                                             wnd_mutation->height);
-                        logger_debug(
-                            "[ui-server] [window %p] update size: (%d, %d)\n",
-                            wnd_mutation->window, wnd_mutation->width,
-                            wnd_mutation->height);
                 }
                 if (wnd_mutation->update_title) {
                         ptk_window_set_title(wnd_mutation->window,
                                              wnd_mutation->title);
-                        logger_debug(
-                            "[ui-server] [window %p] update title: %ls\n",
-                            wnd_mutation->window, wnd_mutation->title);
                 }
                 if (wnd_mutation->update_visible) {
-                        logger_debug(
-                            "[ui-server] [window %p] update visible %d\n",
-                            wnd_mutation->window, wnd_mutation->visible);
                         if (wnd_mutation->visible) {
                                 ptk_window_show(wnd_mutation->window);
                         } else {
