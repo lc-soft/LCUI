@@ -34,3 +34,29 @@
 .w-\[360px\] {
   width: 360px;
 }
+
+.flex-gap {
+  display: flex;
+  gap: 12px;
+}
+
+.flex-gap-two-values {
+  display: flex;
+  gap: 8px 16px;
+}
+
+.flex-gap-axis {
+  display: flex;
+  row-gap: 4px;
+  column-gap: 20px;
+}
+
+.flex-gap-normal {
+  display: flex;
+  gap: normal;
+}
+
+.flex-gap-percentage {
+  display: flex;
+  gap: 25% 50%;
+}

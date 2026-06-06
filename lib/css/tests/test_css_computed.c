@@ -150,6 +150,122 @@ void test_button_borderless_style(void)
         css_computed_style_destroy(&computed);
 }
 
+void test_flex_gap_shorthand_one_value(void)
+{
+        css_selector_t *selector;
+        css_style_decl_t *result;
+        css_computed_style_t computed;
+
+        selector = css_selector_create(".flex-gap");
+        result = css_select_style(selector);
+        css_cascade_style(result, &computed);
+
+        ctest_equal_int("row-gap type", computed.type_bits.row_gap,
+                        CSS_GAP_SET);
+        ctest_equal_int("column-gap type", computed.type_bits.column_gap,
+                        CSS_GAP_SET);
+        ctest_equal_int("row-gap unit", computed.unit_bits.row_gap,
+                        CSS_UNIT_PX);
+        ctest_equal_int("column-gap unit", computed.unit_bits.column_gap,
+                        CSS_UNIT_PX);
+        check_length("row-gap", computed.row_gap, 12);
+        check_length("column-gap", computed.column_gap, 12);
+
+        css_style_decl_destroy(result);
+        css_selector_destroy(selector);
+        css_computed_style_destroy(&computed);
+}
+
+void test_flex_gap_shorthand_two_values(void)
+{
+        css_selector_t *selector;
+        css_style_decl_t *result;
+        css_computed_style_t computed;
+
+        selector = css_selector_create(".flex-gap-two-values");
+        result = css_select_style(selector);
+        css_cascade_style(result, &computed);
+
+        ctest_equal_int("row-gap type", computed.type_bits.row_gap,
+                        CSS_GAP_SET);
+        ctest_equal_int("column-gap type", computed.type_bits.column_gap,
+                        CSS_GAP_SET);
+        check_length("row-gap", computed.row_gap, 8);
+        check_length("column-gap", computed.column_gap, 16);
+
+        css_style_decl_destroy(result);
+        css_selector_destroy(selector);
+        css_computed_style_destroy(&computed);
+}
+
+void test_flex_gap_axis(void)
+{
+        css_selector_t *selector;
+        css_style_decl_t *result;
+        css_computed_style_t computed;
+
+        selector = css_selector_create(".flex-gap-axis");
+        result = css_select_style(selector);
+        css_cascade_style(result, &computed);
+
+        ctest_equal_int("row-gap type", computed.type_bits.row_gap,
+                        CSS_GAP_SET);
+        ctest_equal_int("column-gap type", computed.type_bits.column_gap,
+                        CSS_GAP_SET);
+        check_length("row-gap", computed.row_gap, 4);
+        check_length("column-gap", computed.column_gap, 20);
+
+        css_style_decl_destroy(result);
+        css_selector_destroy(selector);
+        css_computed_style_destroy(&computed);
+}
+
+void test_flex_gap_normal(void)
+{
+        css_selector_t *selector;
+        css_style_decl_t *result;
+        css_computed_style_t computed;
+
+        selector = css_selector_create(".flex-gap-normal");
+        result = css_select_style(selector);
+        css_cascade_style(result, &computed);
+
+        ctest_equal_int("row-gap type", computed.type_bits.row_gap,
+                        CSS_GAP_NORMAL);
+        ctest_equal_int("column-gap type", computed.type_bits.column_gap,
+                        CSS_GAP_NORMAL);
+
+        css_style_decl_destroy(result);
+        css_selector_destroy(selector);
+        css_computed_style_destroy(&computed);
+}
+
+void test_flex_gap_percentage(void)
+{
+        css_selector_t *selector;
+        css_style_decl_t *result;
+        css_computed_style_t computed;
+
+        selector = css_selector_create(".flex-gap-percentage");
+        result = css_select_style(selector);
+        css_cascade_style(result, &computed);
+
+        ctest_equal_int("row-gap type", computed.type_bits.row_gap,
+                        CSS_GAP_SET);
+        ctest_equal_int("column-gap type", computed.type_bits.column_gap,
+                        CSS_GAP_SET);
+        ctest_equal_int("row-gap unit", computed.unit_bits.row_gap,
+                        CSS_UNIT_PERCENT);
+        ctest_equal_int("column-gap unit", computed.unit_bits.column_gap,
+                        CSS_UNIT_PERCENT);
+        check_length("row-gap", computed.row_gap, 25);
+        check_length("column-gap", computed.column_gap, 50);
+
+        css_style_decl_destroy(result);
+        css_selector_destroy(selector);
+        css_computed_style_destroy(&computed);
+}
+
 void test_css_computed(void)
 {
         size_t n;
@@ -176,6 +292,13 @@ void test_css_computed(void)
         ctest_describe(".container", test_container_style);
         ctest_describe(".button.borderless", test_button_borderless_style);
         ctest_describe(".w-[360px]", test_w360px_style);
+        ctest_describe(".flex-gap (one value)",
+                       test_flex_gap_shorthand_one_value);
+        ctest_describe(".flex-gap-two-values",
+                       test_flex_gap_shorthand_two_values);
+        ctest_describe(".flex-gap-axis", test_flex_gap_axis);
+        ctest_describe(".flex-gap-normal", test_flex_gap_normal);
+        ctest_describe(".flex-gap-percentage", test_flex_gap_percentage);
 
         css_destroy();
 }
