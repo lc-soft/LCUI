@@ -774,6 +774,209 @@ static void test_flex_layout_320(void)
                             &w->border_box, &rect);
 }
 
+static void test_flex_layout_gap(void)
+{
+        ui_widget_t *root;
+        ui_widget_t *container;
+        ui_widget_t *child;
+        ui_rect_t rect;
+
+        root = ui_root();
+        ui_widget_resize(root, 800, 600);
+
+        /* (1) row direction with column-gap shorthand */
+
+        container = ui_create_widget(NULL);
+        ui_widget_set_style_string(container, "display", "flex");
+        ui_widget_set_style_string(container, "width", "300px");
+        ui_widget_set_style_string(container, "height", "60px");
+        ui_widget_set_style_string(container, "gap", "10px");
+        ui_widget_append(root, container);
+
+        child = ui_create_widget(NULL);
+        ui_widget_set_style_string(child, "width", "50px");
+        ui_widget_set_style_string(child, "height", "50px");
+        ui_widget_append(container, child);
+        child = ui_create_widget(NULL);
+        ui_widget_set_style_string(child, "width", "50px");
+        ui_widget_set_style_string(child, "height", "50px");
+        ui_widget_append(container, child);
+        child = ui_create_widget(NULL);
+        ui_widget_set_style_string(child, "width", "50px");
+        ui_widget_set_style_string(child, "height", "50px");
+        ui_widget_append(container, child);
+        child = ui_create_widget(NULL);
+        ui_widget_set_style_string(child, "width", "50px");
+        ui_widget_set_style_string(child, "height", "50px");
+        ui_widget_append(container, child);
+        ui_update();
+
+        rect.y = 0;
+        rect.width = 50;
+        rect.height = 50;
+
+        child = ui_widget_get_child(container, 0);
+        rect.x = 0;
+        ctest_equal_ui_rect("row gap: child[0] border_box", &child->border_box,
+                            &rect);
+
+        child = ui_widget_get_child(container, 1);
+        rect.x = 60;
+        ctest_equal_ui_rect("row gap: child[1] border_box", &child->border_box,
+                            &rect);
+
+        child = ui_widget_get_child(container, 2);
+        rect.x = 120;
+        ctest_equal_ui_rect("row gap: child[2] border_box", &child->border_box,
+                            &rect);
+
+        child = ui_widget_get_child(container, 3);
+        rect.x = 180;
+        ctest_equal_ui_rect("row gap: child[3] border_box", &child->border_box,
+                            &rect);
+
+        ui_widget_remove(container);
+
+        /* (2) column direction with row-gap */
+
+        container = ui_create_widget(NULL);
+        ui_widget_set_style_string(container, "display", "flex");
+        ui_widget_set_style_string(container, "flex-direction", "column");
+        ui_widget_set_style_string(container, "width", "100px");
+        ui_widget_set_style_string(container, "height", "300px");
+        ui_widget_set_style_string(container, "row-gap", "20px");
+        ui_widget_append(root, container);
+
+        child = ui_create_widget(NULL);
+        ui_widget_set_style_string(child, "width", "50px");
+        ui_widget_set_style_string(child, "height", "50px");
+        ui_widget_append(container, child);
+        child = ui_create_widget(NULL);
+        ui_widget_set_style_string(child, "width", "50px");
+        ui_widget_set_style_string(child, "height", "50px");
+        ui_widget_append(container, child);
+        child = ui_create_widget(NULL);
+        ui_widget_set_style_string(child, "width", "50px");
+        ui_widget_set_style_string(child, "height", "50px");
+        ui_widget_append(container, child);
+        ui_update();
+
+        rect.x = 0;
+        rect.width = 50;
+        rect.height = 50;
+
+        child = ui_widget_get_child(container, 0);
+        rect.y = 0;
+        ctest_equal_ui_rect("column gap: child[0] border_box",
+                            &child->border_box, &rect);
+
+        child = ui_widget_get_child(container, 1);
+        rect.y = 70;
+        ctest_equal_ui_rect("column gap: child[1] border_box",
+                            &child->border_box, &rect);
+
+        child = ui_widget_get_child(container, 2);
+        rect.y = 140;
+        ctest_equal_ui_rect("column gap: child[2] border_box",
+                            &child->border_box, &rect);
+
+        ui_widget_remove(container);
+
+        /* (3) row + wrap with two-value gap */
+
+        container = ui_create_widget(NULL);
+        ui_widget_set_style_string(container, "display", "flex");
+        ui_widget_set_style_string(container, "flex-wrap", "wrap");
+        ui_widget_set_style_string(container, "width", "200px");
+        ui_widget_set_style_string(container, "height", "85px");
+        ui_widget_set_style_string(container, "gap", "5px 10px");
+        ui_widget_append(root, container);
+
+        child = ui_create_widget(NULL);
+        ui_widget_set_style_string(child, "width", "80px");
+        ui_widget_set_style_string(child, "height", "40px");
+        ui_widget_append(container, child);
+        child = ui_create_widget(NULL);
+        ui_widget_set_style_string(child, "width", "80px");
+        ui_widget_set_style_string(child, "height", "40px");
+        ui_widget_append(container, child);
+        child = ui_create_widget(NULL);
+        ui_widget_set_style_string(child, "width", "80px");
+        ui_widget_set_style_string(child, "height", "40px");
+        ui_widget_append(container, child);
+        child = ui_create_widget(NULL);
+        ui_widget_set_style_string(child, "width", "80px");
+        ui_widget_set_style_string(child, "height", "40px");
+        ui_widget_append(container, child);
+        ui_update();
+
+        rect.width = 80;
+        rect.height = 40;
+
+        child = ui_widget_get_child(container, 0);
+        rect.x = 0;
+        rect.y = 0;
+        ctest_equal_ui_rect("wrap gap: child[0] border_box", &child->border_box,
+                            &rect);
+
+        child = ui_widget_get_child(container, 1);
+        rect.x = 90;
+        rect.y = 0;
+        ctest_equal_ui_rect("wrap gap: child[1] border_box", &child->border_box,
+                            &rect);
+
+        child = ui_widget_get_child(container, 2);
+        rect.x = 0;
+        rect.y = 45;
+        ctest_equal_ui_rect("wrap gap: child[2] border_box", &child->border_box,
+                            &rect);
+
+        child = ui_widget_get_child(container, 3);
+        rect.x = 90;
+        rect.y = 45;
+        ctest_equal_ui_rect("wrap gap: child[3] border_box", &child->border_box,
+                            &rect);
+
+        ui_widget_remove(container);
+
+        /* (4) gap: normal should fall back to 0 */
+
+        container = ui_create_widget(NULL);
+        ui_widget_set_style_string(container, "display", "flex");
+        ui_widget_set_style_string(container, "width", "300px");
+        ui_widget_set_style_string(container, "height", "60px");
+        ui_widget_set_style_string(container, "gap", "normal");
+        ui_widget_append(root, container);
+
+        child = ui_create_widget(NULL);
+        ui_widget_set_style_string(child, "width", "50px");
+        ui_widget_set_style_string(child, "height", "50px");
+        ui_widget_append(container, child);
+        child = ui_create_widget(NULL);
+        ui_widget_set_style_string(child, "width", "50px");
+        ui_widget_set_style_string(child, "height", "50px");
+        ui_widget_append(container, child);
+        ui_update();
+
+        rect.width = 50;
+        rect.height = 50;
+
+        child = ui_widget_get_child(container, 0);
+        rect.x = 0;
+        rect.y = 0;
+        ctest_equal_ui_rect("normal gap: child[0] border_box",
+                            &child->border_box, &rect);
+
+        child = ui_widget_get_child(container, 1);
+        rect.x = 50;
+        rect.y = 0;
+        ctest_equal_ui_rect("normal gap: child[1] border_box",
+                            &child->border_box, &rect);
+
+        ui_widget_remove(container);
+        ui_update();
+}
+
 void test_flex_layout(void)
 {
         lcui_init();
@@ -784,6 +987,7 @@ void test_flex_layout(void)
         ctest_describe("root width 1280px", test_flex_layout_1280);
         ctest_describe("root width 600px", test_flex_layout_600);
         ctest_describe("root width 320px", test_flex_layout_320);
+        ctest_describe("flex gap", test_flex_layout_gap);
 
         lcui_destroy();
 }

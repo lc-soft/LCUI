@@ -21,9 +21,9 @@
         css_register_property_with_key(css_prop_##PROP_KEY, PROP_NAME, VALDEF, \
                                        INIT, css_cascade_##PROP_KEY)
 
-#define DEFINE_SHORTHAND_PROP(PROP_KEY, NAME, VALDEF)                  \
+#define DEFINE_SHORTHAND_PROP(PROP_KEY, NAME, VALDEF)                        \
         extern int css_parse_##PROP_KEY(const css_propdef_t *, const char *, \
-                                        css_style_decl_t *);           \
+                                        css_style_decl_t *);                 \
         css_register_shorthand_property(NAME, VALDEF, css_parse_##PROP_KEY)
 
 static struct css_properties_module {
@@ -61,7 +61,8 @@ static void css_propdef_destroy(css_propdef_t *prop)
 }
 
 int css_register_shorthand_property(const char *name, const char *syntax,
-                                    int (*parse)(const css_propdef_t *, const char *,
+                                    int (*parse)(const css_propdef_t *,
+                                                 const char *,
                                                  css_style_decl_t *))
 {
         css_propdef_t *prop;
@@ -233,8 +234,8 @@ void css_init_properties(void)
                     "auto | min-content | <length> | <percentage>", "auto");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/min-height */
-        DEFINE_PROP(min_height, "min-height", "auto | min-content | <length> | <percentage>",
-                    "auto");
+        DEFINE_PROP(min_height, "min-height",
+                    "auto | min-content | <length> | <percentage>", "auto");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/max-width */
         DEFINE_PROP(max_width, "max-width", "auto | <length> | <percentage>",
@@ -546,6 +547,18 @@ void css_init_properties(void)
         DEFINE_PROP(align_items, "align-items",
                     "normal | stretch | flex-start | flex-end | center",
                     "normal");
+
+        /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/row-gap */
+        DEFINE_PROP(row_gap, "row-gap", "normal | <length-percentage>",
+                    "normal");
+
+        /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/column-gap */
+        DEFINE_PROP(column_gap, "column-gap", "normal | <length-percentage>",
+                    "normal");
+
+        /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/gap */
+        DEFINE_SHORTHAND_PROP(gap, "gap",
+                              "[ normal | <length-percentage> ]{1,2}");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/color */
         DEFINE_PROP(color, "color", "<color>", "#000");

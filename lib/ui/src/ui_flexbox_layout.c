@@ -43,6 +43,8 @@ typedef struct ui_flexbox_layout_context {
         bool column_direction;
         ui_resizer_t *resizer;
         float cross_size;
+        float main_gap;
+        float cross_gap;
 
         /** list_t<ui_flexbox_line_t*> lines */
         list_t lines;
@@ -89,6 +91,19 @@ static ui_flexbox_line_t *ui_flexbox_layout_next_line(
         next_line->index = ctx->lines.length;
         list_append(&ctx->lines, next_line);
         return next_line;
+}
+
+/* 将 gap 值解析为像素长度，percentage 引用容器对应轴上的内容尺寸 */
+static float ui_flexbox_resolve_gap(uint8_t type, css_numeric_value_t value,
+                                    css_unit_t unit, float reference)
+{
+        if (type != CSS_GAP_SET) {
+                return 0;
+        }
+        if (unit == CSS_UNIT_PERCENT) {
+                return value * reference / 100.f;
+        }
+        return value;
 }
 
 static void ui_reset_row_item_flex_basis(ui_widget_t *item)
@@ -289,6 +304,7 @@ static void ui_flexbox_layout_load_main_size(ui_flexbox_layout_context_t *ctx)
         css_computed_style_t *cs;
         float main_size, min_main_size;
         unsigned child_index = 0;
+        unsigned in_flow_count = 0;
 
         UI_DEBUG_BEGIN;
         UI_DEBUG_MSG(
@@ -309,8 +325,13 @@ static void ui_flexbox_layout_load_main_size(ui_flexbox_layout_context_t *ctx)
                 min_main_size = cs->flex_shrink > 0
                                     ? ui_flexbox_item_min_main_size(ctx, child)
                                     : main_size;
+                if (in_flow_count > 0 && ctx->main_gap > 0) {
+                        ui_resizer_load_item_main_size(
+                            ctx->resizer, ctx->main_gap, ctx->main_gap);
+                }
                 ui_resizer_load_item_main_size(ctx->resizer, main_size,
                                                min_main_size);
+                in_flow_count++;
                 UI_DEBUG_BEGIN;
                 UI_WIDGET_STR(child, str);
                 UI_WIDGET_SIZE_STR(child, size_str);
@@ -340,6 +361,7 @@ static void ui_flexbox_layout_apply_line(ui_flexbox_layout_context_t *ctx,
         ui_widget_t *child;
         float item_main_size, item_cross_size;
         unsigned child_index = 0;
+        unsigned in_flow_count = 0;
 
         line->main_size = 0;
         line->cross_size = 0;
@@ -382,7 +404,11 @@ static void ui_flexbox_layout_apply_line(ui_flexbox_layout_context_t *ctx,
                 if (line->cross_size < item_cross_size) {
                         line->cross_size = item_cross_size;
                 }
+                if (in_flow_count > 0) {
+                        line->main_size += ctx->main_gap;
+                }
                 line->main_size += item_main_size;
+                in_flow_count++;
         }
 }
 
@@ -435,8 +461,12 @@ static void ui_flexbox_layout_apply_main_size(ui_flexbox_layout_context_t *ctx)
                 UI_DEBUG_END;
                 if (s->type_bits.flex_wrap == CSS_FLEX_WRAP_WRAP &&
                     line->main_size > 0 &&
-                    line->main_size + main_size > max_main_size) {
+                    line->main_size + ctx->main_gap + main_size >
+                        max_main_size) {
                         line = ui_flexbox_layout_next_line(ctx);
+                }
+                if (line->items.length > 0) {
+                        line->main_size += ctx->main_gap;
                 }
                 line->main_size += main_size;
                 if (column) {
@@ -489,6 +519,9 @@ static void ui_flexbox_layout_apply_main_size(ui_flexbox_layout_context_t *ctx)
                 UI_DEBUG_MSG("line[%zu]: cross_size=%g", line->index,
                              line->cross_size);
                 UI_DEBUG_END;
+                if (line->index > 0) {
+                        ctx->cross_size += ctx->cross_gap;
+                }
                 ctx->cross_size += line->cross_size;
         }
         if (ctx->cross_size < hint_cross_size) {
@@ -585,14 +618,16 @@ static void ui_flexbox_layout_reflow_lines(ui_flexbox_layout_context_t *ctx)
         ui_flexbox_line_t *line;
         css_computed_style_t *s = &ctx->widget->computed_style;
         bool column = ctx->column_direction;
+        unsigned item_index;
 
         float space;
         float main_axis;
         float cross_axis = column ? s->padding_left : s->padding_top;
-        float cross_space = ((column ? ctx->widget->content_box.width
-                                     : ctx->widget->content_box.height) -
-                             ctx->cross_size) /
-                            ctx->lines.length;
+        float cross_free_space = (column ? ctx->widget->content_box.width
+                                         : ctx->widget->content_box.height) -
+                                 ctx->cross_size;
+        float cross_space =
+            ctx->lines.length > 0 ? cross_free_space / ctx->lines.length : 0;
         float line_max_cross_size;
 
         UI_DEBUG_BEGIN;
@@ -602,6 +637,9 @@ static void ui_flexbox_layout_reflow_lines(ui_flexbox_layout_context_t *ctx)
         UI_DEBUG_END;
         for (list_each(line_node, &ctx->lines)) {
                 line = line_node->data;
+                if (line->index > 0) {
+                        cross_axis += ctx->cross_gap;
+                }
                 line_max_cross_size = line->cross_size + cross_space;
                 ui_flexbox_layout_compute_justify_content(ctx, line, &main_axis,
                                                           &space);
@@ -612,12 +650,19 @@ static void ui_flexbox_layout_reflow_lines(ui_flexbox_layout_context_t *ctx)
                              line_max_cross_size);
                 UI_DEBUG_INDENT_INC;
                 UI_DEBUG_END;
+                item_index = 0;
                 for (list_each(node, &line->items)) {
                         child = node->data;
                         main_axis += space;
+                        if (item_index > 0 && ui_widget_in_layout_flow(child)) {
+                                main_axis += ctx->main_gap;
+                        }
                         main_axis += ui_flexbox_compute_item_layout(
                             ctx, child, main_axis, cross_axis,
                             s->type_bits.align_items, line_max_cross_size);
+                        if (ui_widget_in_layout_flow(child)) {
+                                item_index++;
+                        }
                 }
                 cross_axis += line_max_cross_size;
                 UI_DEBUG_BEGIN;
@@ -639,6 +684,22 @@ void ui_flexbox_layout_reflow(ui_widget_t *w, ui_resizer_t *resizer)
         ctx.column_direction = ui_widget_has_flex_column_direction(w);
         list_create(&ctx.lines);
         ui_resizer_init(resizer, w);
+        {
+                css_computed_style_t *s = &w->computed_style;
+                float row_gap = ui_flexbox_resolve_gap(
+                    s->type_bits.row_gap, s->row_gap, s->unit_bits.row_gap,
+                    w->content_box.height);
+                float column_gap = ui_flexbox_resolve_gap(
+                    s->type_bits.column_gap, s->column_gap,
+                    s->unit_bits.column_gap, w->content_box.width);
+                if (ctx.column_direction) {
+                        ctx.main_gap = row_gap;
+                        ctx.cross_gap = column_gap;
+                } else {
+                        ctx.main_gap = column_gap;
+                        ctx.cross_gap = row_gap;
+                }
+        }
         UI_DEBUG_BEGIN;
         UI_WIDGET_STR(w, str);
         UI_WIDGET_SIZE_STR(w, size_str);
