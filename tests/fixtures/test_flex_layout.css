@@ -183,6 +183,22 @@ scrollarea-content {
   align-items: stretch;
 }
 
+.gap-2 {
+  gap: 10px;
+}
+
+.gap-2-1 {
+  gap: 10px 5px;
+}
+
+.row-gap-2 {
+  row-gap: 10px;
+}
+
+.column-gap-2 {
+  column-gap: 10px;
+}
+
 .example-1-flex-default .example__content {
   display: flex;
 }
