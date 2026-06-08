@@ -101,8 +101,22 @@ static bool lcui_mkdir_recursive(const char *path)
                 if (ch != 0) {
                         buffer[i] = 0;
                 }
-                if (buffer[0] != 0 && lcui_mkdir(buffer) != 0 &&
-                    errno != EEXIST) {
+                if (buffer[0] == 0) {
+                        if (ch != 0) {
+                                buffer[i] = ch;
+                        }
+                        continue;
+                }
+#ifdef _WIN32
+                if (isalpha((unsigned char)buffer[0]) &&
+                    buffer[1] == ':' && buffer[2] == 0) {
+                        if (ch != 0) {
+                                buffer[i] = ch;
+                        }
+                        continue;
+                }
+#endif
+                if (lcui_mkdir(buffer) != 0 && errno != EEXIST) {
                         free(buffer);
                         return false;
                 }

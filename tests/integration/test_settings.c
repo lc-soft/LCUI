@@ -70,9 +70,15 @@ static bool test_prepare_env(char *base_dir, size_t base_dir_size,
         if (ret != 0 && errno != EEXIST) {
                 return false;
         }
+#ifdef _WIN32
+        if (!test_set_env("APPDATA", base_dir)) {
+                return false;
+        }
+#else
         if (!test_set_env("XDG_CONFIG_HOME", base_dir)) {
                 return false;
         }
+#endif
         if (!lcui_set_app_id(app_id)) {
                 return false;
         }
