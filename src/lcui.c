@@ -41,11 +41,16 @@ void lcui_init(void)
         lcui_app_init();
         lcui_fonts_init();
         lcui_widgets_init();
-        lcui_reset_settings();
+        if (!lcui_settings_load()) {
+                logger_warning(
+                    "failed to load settings, fallback to built-in defaults\n");
+                lcui_reset_settings();
+        }
 }
 
 void lcui_destroy(void)
 {
+        lcui_settings_unload();
         lcui_widgets_destroy();
         lcui_app_destroy();
 }
