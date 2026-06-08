@@ -16,7 +16,7 @@
 bool lcui_fonts_set_default(const char *family_name)
 {
         int id = pd_font_get_id(family_name, PD_FONT_STYLE_NORMAL,
-                                             PD_FONT_WEIGHT_NORMAL);
+                                PD_FONT_WEIGHT_NORMAL);
         if (id < 0) {
                 return false;
         }
@@ -45,7 +45,7 @@ static void lcui_windows_fonts_init(void)
         lcui_fonts_set_default("Microsoft YaHei");
         pd_font_family_set_alias("serif", "Simsun");
         pd_font_family_set_alias("sans-serif", "Microsoft YaHei");
-        pd_font_family_set_alias("monospace", "Consola");
+        pd_font_family_set_alias("monospace", "Consolas");
 }
 
 #else
