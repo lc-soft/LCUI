@@ -108,8 +108,8 @@ static bool lcui_mkdir_recursive(const char *path)
                         continue;
                 }
 #ifdef _WIN32
-                if (isalpha((unsigned char)buffer[0]) &&
-                    buffer[1] == ':' && buffer[2] == 0) {
+                if (isalpha((unsigned char)buffer[0]) && buffer[1] == ':' &&
+                    buffer[2] == 0) {
                         if (ch != 0) {
                                 buffer[i] = ch;
                         }
