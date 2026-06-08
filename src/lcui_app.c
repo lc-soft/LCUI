@@ -11,6 +11,8 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 #include <yutil.h>
 #include <ptk.h>
 #include <ptk/steptimer.h>
@@ -46,6 +48,47 @@ static struct lcui_app {
         uint32_t frames_this_second;
         uint32_t frames_per_second;
 } lcui_app;
+static char *lcui_app_id = NULL;
+
+static bool lcui_app_id_is_valid(const char *app_id)
+{
+        const unsigned char *p;
+
+        if (!app_id || app_id[0] == 0) {
+                return false;
+        }
+        for (p = (const unsigned char *)app_id; *p; ++p) {
+                if (isalnum(*p) || *p == '.' || *p == '_' || *p == '-') {
+                        continue;
+                }
+                return false;
+        }
+        return true;
+}
+
+bool lcui_set_app_id(const char *app_id)
+{
+        size_t len;
+        char *new_app_id;
+
+        if (!lcui_app_id_is_valid(app_id)) {
+                return false;
+        }
+        len = strlen(app_id);
+        new_app_id = malloc(sizeof(char) * (len + 1));
+        if (!new_app_id) {
+                return false;
+        }
+        strcpy(new_app_id, app_id);
+        free(lcui_app_id);
+        lcui_app_id = new_app_id;
+        return true;
+}
+
+const char *lcui_get_app_id(void)
+{
+        return lcui_app_id ? lcui_app_id : "lcui";
+}
 
 static void lcui_dispatch_ui_mouse_event(ui_event_type_t type,
                                          ptk_event_t *app_evt)
@@ -169,9 +212,6 @@ static void lcui_app_on_anim_frame(ptk_steptimer_t *timer, void *data)
         list_node_t *node;
         list_t active;
 
-        /* Snapshot pending requests so callbacks may re-request the next
-         * frame into lcui_app.frame_cbs without extending the list we are
-         * iterating, which would otherwise loop forever. */
         list_create(&active);
         list_concat(&active, &lcui_app.frame_cbs);
         list_for_each(node, &active)
@@ -200,7 +240,8 @@ void lcui_cancel_frame(int request_id)
 {
         list_node_t *node;
 
-        list_for_each(node, &lcui_app.frame_cbs) {
+        list_for_each(node, &lcui_app.frame_cbs)
+        {
                 lcui_frame_request_t *req = node->data;
                 if (req->id == request_id) {
                         list_unlink(&lcui_app.frame_cbs, node);
@@ -292,5 +333,7 @@ void lcui_app_destroy(void)
         lcui_ui_destroy();
         lcui_worker_destroy();
         list_destroy_without_node(&lcui_app.frame_cbs, NULL);
+        free(lcui_app_id);
+        lcui_app_id = NULL;
         ptk_destroy();
 }

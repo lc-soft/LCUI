@@ -13,9 +13,13 @@
 #define LCUI_INCLUDE_LCUI_APP_H
 
 #include "common.h"
+#include <stdbool.h>
 #include <ptk/types.h>
 
 LCUI_BEGIN_HEADER
+
+LCUI_API bool lcui_set_app_id(const char *app_id);
+LCUI_API const char *lcui_get_app_id(void);
 
 LCUI_API uint32_t lcui_get_fps(void);
 LCUI_API void lcui_set_fps_cap(unsigned fps_cap);
