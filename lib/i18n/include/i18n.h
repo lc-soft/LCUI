@@ -1,4 +1,4 @@
-﻿/*
+/*
  * lib/i18n/include/i18n.h
  *
  * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.

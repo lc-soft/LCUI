@@ -1,4 +1,4 @@
-﻿/*
+/*
  * lib/router/include/router/version.h
  *
  * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
