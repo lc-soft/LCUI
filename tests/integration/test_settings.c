@@ -65,8 +65,7 @@ static bool test_prepare_env(char *base_dir, size_t base_dir_size,
 #endif
 
         snprintf(base_dir, base_dir_size, "%s/lcui-settings-%d-%lu", tmp_root,
-                 pid,
-                 (unsigned long)time(NULL) + ++test_path_counter);
+                 pid, (unsigned long)time(NULL) + ++test_path_counter);
         ret = test_mkdir(base_dir);
         if (ret != 0 && errno != EEXIST) {
                 return false;
@@ -144,7 +143,8 @@ static void test_settings_rendering_accessors(void)
         ctest_equal_int("should default frame rate cap to 120",
                         settings.fps_cap, LCUI_DEFAULT_FPS_CAP);
         ctest_equal_int("should default parallel rendering threads to 4",
-                        settings.parallel_threads, LCUI_DEFAULT_PARALLEL_THREADS);
+                        settings.parallel_threads,
+                        LCUI_DEFAULT_PARALLEL_THREADS);
         ctest_equal_bool("should disable paint flashing by default",
                          settings.paint_flashing, false);
 
@@ -198,26 +198,27 @@ static void test_settings_load_merge_validate_flush(void)
                          lcui_settings_get_rendering(&settings), true);
         ctest_equal_int("should fallback fps_cap to default on invalid value",
                         settings.fps_cap, LCUI_DEFAULT_FPS_CAP);
-        ctest_equal_int("should keep valid parallel_threads", settings.parallel_threads,
-                        8);
-        ctest_equal_bool("should fallback paint_flashing to default on invalid value",
-                         settings.paint_flashing, false);
-        ctest_equal_bool("should flush normalized settings", lcui_settings_flush(),
-                         true);
+        ctest_equal_int("should keep valid parallel_threads",
+                        settings.parallel_threads, 8);
+        ctest_equal_bool(
+            "should fallback paint_flashing to default on invalid value",
+            settings.paint_flashing, false);
+        ctest_equal_bool("should flush normalized settings",
+                         lcui_settings_flush(), true);
         ctest_equal_bool("should normalize version during flush",
                          test_read_file_contains(base_dir, app_id, "version=1"),
                          true);
-        ctest_equal_bool("should normalize fps_cap during flush",
-                         test_read_file_contains(base_dir, app_id, "fps_cap=120"),
-                         true);
-        ctest_equal_bool("should keep valid parallel_threads during flush",
-                         test_read_file_contains(base_dir, app_id,
-                                                 "parallel_threads=8"),
-                         true);
-        ctest_equal_bool("should normalize paint_flashing during flush",
-                         test_read_file_contains(base_dir, app_id,
-                                                 "paint_flashing=0"),
-                         true);
+        ctest_equal_bool(
+            "should normalize fps_cap during flush",
+            test_read_file_contains(base_dir, app_id, "fps_cap=120"), true);
+        ctest_equal_bool(
+            "should keep valid parallel_threads during flush",
+            test_read_file_contains(base_dir, app_id, "parallel_threads=8"),
+            true);
+        ctest_equal_bool(
+            "should normalize paint_flashing during flush",
+            test_read_file_contains(base_dir, app_id, "paint_flashing=0"),
+            true);
 
         lcui_settings_unload();
         ctest_equal_bool("write valid boolean rendering config",
@@ -232,8 +233,8 @@ static void test_settings_load_merge_validate_flush(void)
                          lcui_settings_load(), true);
         ctest_equal_bool("should get rendering settings after reload",
                          lcui_settings_get_rendering(&settings), true);
-        ctest_equal_int("should parse fps_cap from user config", settings.fps_cap,
-                        60);
+        ctest_equal_int("should parse fps_cap from user config",
+                        settings.fps_cap, 60);
         ctest_equal_int("should parse parallel_threads from user config",
                         settings.parallel_threads, 5);
         ctest_equal_bool("should parse true bool values from user config",

@@ -27,15 +27,15 @@
 LCUI_BEGIN_HEADER
 
 typedef struct lcui_rendering_settings {
-	int fps_cap;
-	int parallel_threads;
-	bool paint_flashing;
+        int fps_cap;
+        int parallel_threads;
+        bool paint_flashing;
 } lcui_rendering_settings_t;
 
 typedef struct lcui_settings {
-	int fps_cap;
-	int parallel_rendering_threads;
-	bool paint_flashing;
+        int fps_cap;
+        int parallel_rendering_threads;
+        bool paint_flashing;
 } lcui_settings_t;
 
 LCUI_API bool lcui_settings_load(void);

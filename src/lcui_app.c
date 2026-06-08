@@ -52,42 +52,42 @@ static char *lcui_app_id = NULL;
 
 static bool lcui_app_id_is_valid(const char *app_id)
 {
-	const unsigned char *p;
+        const unsigned char *p;
 
-	if (!app_id || app_id[0] == 0) {
-		return false;
-	}
-	for (p = (const unsigned char *)app_id; *p; ++p) {
-		if (isalnum(*p) || *p == '.' || *p == '_' || *p == '-') {
-			continue;
-		}
-		return false;
-	}
-	return true;
+        if (!app_id || app_id[0] == 0) {
+                return false;
+        }
+        for (p = (const unsigned char *)app_id; *p; ++p) {
+                if (isalnum(*p) || *p == '.' || *p == '_' || *p == '-') {
+                        continue;
+                }
+                return false;
+        }
+        return true;
 }
 
 bool lcui_set_app_id(const char *app_id)
 {
-	size_t len;
-	char *new_app_id;
+        size_t len;
+        char *new_app_id;
 
-	if (!lcui_app_id_is_valid(app_id)) {
-		return false;
-	}
-	len = strlen(app_id);
-	new_app_id = malloc(sizeof(char) * (len + 1));
-	if (!new_app_id) {
-		return false;
-	}
-	strcpy(new_app_id, app_id);
-	free(lcui_app_id);
-	lcui_app_id = new_app_id;
-	return true;
+        if (!lcui_app_id_is_valid(app_id)) {
+                return false;
+        }
+        len = strlen(app_id);
+        new_app_id = malloc(sizeof(char) * (len + 1));
+        if (!new_app_id) {
+                return false;
+        }
+        strcpy(new_app_id, app_id);
+        free(lcui_app_id);
+        lcui_app_id = new_app_id;
+        return true;
 }
 
 const char *lcui_get_app_id(void)
 {
-	return lcui_app_id ? lcui_app_id : "lcui";
+        return lcui_app_id ? lcui_app_id : "lcui";
 }
 
 static void lcui_dispatch_ui_mouse_event(ui_event_type_t type,
@@ -211,7 +211,8 @@ static void lcui_app_on_anim_frame(ptk_steptimer_t *timer, void *data)
         uint64_t timestamp = (uint64_t)get_time_ms();
         list_node_t *node;
 
-        list_for_each(node, &lcui_app.frame_cbs) {
+        list_for_each(node, &lcui_app.frame_cbs)
+        {
                 lcui_frame_request_t *req = node->data;
                 req->callback(timestamp, req->data);
         }
@@ -236,7 +237,8 @@ void lcui_cancel_frame(int request_id)
 {
         list_node_t *node;
 
-        list_for_each(node, &lcui_app.frame_cbs) {
+        list_for_each(node, &lcui_app.frame_cbs)
+        {
                 lcui_frame_request_t *req = node->data;
                 if (req->id == request_id) {
                         list_unlink(&lcui_app.frame_cbs, node);
