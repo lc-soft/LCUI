@@ -22,6 +22,7 @@
 #endif
 #ifdef _WIN32
 #include <direct.h>
+#include <windows.h>
 #else
 #include <sys/stat.h>
 #include <unistd.h>
@@ -83,6 +84,7 @@ static int lcui_mkdir(const char *path)
 static bool lcui_mkdir_recursive(const char *path)
 {
 	size_t i, len;
+	char ch;
 	char *buffer;
 
 	if (!path || path[0] == 0) {
@@ -97,15 +99,16 @@ static bool lcui_mkdir_recursive(const char *path)
 		if (buffer[i] != '/' && buffer[i] != '\\' && buffer[i] != 0) {
 			continue;
 		}
-		if (buffer[i] != 0) {
+		ch = buffer[i];
+		if (ch != 0) {
 			buffer[i] = 0;
 		}
 		if (buffer[0] != 0 && lcui_mkdir(buffer) != 0 && errno != EEXIST) {
 			free(buffer);
 			return false;
 		}
-		if (buffer[i] != 0) {
-			buffer[i] = '/';
+		if (ch != 0) {
+			buffer[i] = ch;
 		}
 	}
 	free(buffer);
@@ -164,28 +167,12 @@ static char *lcui_settings_get_config_root(void)
 	return NULL;
 }
 
-static bool lcui_settings_validate_app_id(const char *app_id)
-{
-	const unsigned char *p;
-
-	if (!app_id || app_id[0] == 0) {
-		return false;
-	}
-	for (p = (const unsigned char *)app_id; *p; ++p) {
-		if (isalnum(*p) || *p == '.' || *p == '_' || *p == '-') {
-			continue;
-		}
-		return false;
-	}
-	return true;
-}
-
 static bool lcui_settings_resolve_path(char **out_path)
 {
 	char *config_root, *app_dir, *settings_path;
 	const char *app_id = lcui_get_app_id();
 
-	if (!lcui_settings_validate_app_id(app_id)) {
+	if (!app_id || app_id[0] == 0) {
 		return false;
 	}
 	config_root = lcui_settings_get_config_root();
@@ -264,7 +251,7 @@ static bool lcui_store_load(const char *path, lcui_store_rendering_t *settings,
 	int value;
 	bool flag;
 	bool has_version = false;
-	char line[256];
+	char line[1024];
 	char section[64] = { 0 };
 	FILE *fp = fopen(path, "r");
 
@@ -289,8 +276,7 @@ static bool lcui_store_load(const char *path, lcui_store_rendering_t *settings,
 				continue;
 			}
 			*end = 0;
-			strncpy(section, data + 1, sizeof(section) - 1);
-			section[sizeof(section) - 1] = 0;
+			snprintf(section, sizeof(section), "%s", data + 1);
 			continue;
 		}
 		equal = strchr(data, '=');
@@ -368,9 +354,13 @@ static bool lcui_store_save(const char *path, const lcui_store_rendering_t *sett
 	fprintf(fp, "paint_flashing=%d\n", settings->paint_flashing ? 1 : 0);
 	fclose(fp);
 #ifdef _WIN32
-	remove(path);
-#endif
+	ret = MoveFileExA(tmp_path, path,
+			  MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH)
+		  ? 0
+		  : -1;
+#else
 	ret = rename(tmp_path, path);
+#endif
 	free(tmp_path);
 	return ret == 0;
 }

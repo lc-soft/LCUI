@@ -34,6 +34,8 @@ static int test_mkdir(const char *path)
 #endif
 }
 
+static unsigned test_path_counter = 0;
+
 static bool test_set_env(const char *name, const char *value)
 {
 #ifdef _WIN32
@@ -47,14 +49,24 @@ static bool test_prepare_env(char *base_dir, size_t base_dir_size,
                              const char *app_id)
 {
         int ret;
+        const char *tmp_root;
 #ifdef _WIN32
         int pid = _getpid();
+        tmp_root = getenv("TEMP");
+        if (!tmp_root || tmp_root[0] == 0) {
+                tmp_root = "C:/Temp";
+        }
 #else
         int pid = getpid();
+        tmp_root = getenv("TMPDIR");
+        if (!tmp_root || tmp_root[0] == 0) {
+                tmp_root = "/tmp";
+        }
 #endif
 
-        snprintf(base_dir, base_dir_size, "/tmp/lcui-settings-%d-%lu", pid,
-                 (unsigned long)time(NULL));
+        snprintf(base_dir, base_dir_size, "%s/lcui-settings-%d-%lu", tmp_root,
+                 pid,
+                 (unsigned long)time(NULL) + ++test_path_counter);
         ret = test_mkdir(base_dir);
         if (ret != 0 && errno != EEXIST) {
                 return false;
