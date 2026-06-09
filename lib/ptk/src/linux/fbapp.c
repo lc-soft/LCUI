@@ -242,6 +242,35 @@ static void ptk_fb_window_set_size(ptk_window_t *wnd, int width, int height)
 
 static void ptk_fb_window_set_position(ptk_window_t *wnd, int x, int y)
 {
+        wnd->x = x;
+        wnd->y = y;
+        wnd->rect.x = x;
+        wnd->rect.y = y;
+        wnd->actual_rect = wnd->rect;
+        pd_rect_correct(&wnd->actual_rect, fbapp.screen_width,
+                        fbapp.screen_height);
+}
+
+static void ptk_fb_window_get_position(ptk_window_t *wnd, int *x, int *y)
+{
+        if (x) {
+                *x = wnd->x;
+        }
+        if (y) {
+                *y = wnd->y;
+        }
+}
+
+static void ptk_fb_window_set_maximized(ptk_window_t *wnd, bool maximized)
+{
+        (void)wnd;
+        (void)maximized;
+}
+
+static bool ptk_fb_window_is_maximized(ptk_window_t *wnd)
+{
+        (void)wnd;
+        return false;
 }
 
 static ptk_window_t *ptk_fbapp_get_window_by_handle(void *handle)
@@ -567,8 +596,11 @@ void ptk_fbwindow_driver_init(ptk_window_driver_t *driver)
         driver->set_title = ptk_fb_window_set_title;
         driver->set_size = ptk_fb_window_set_size;
         driver->set_position = ptk_fb_window_set_position;
+        driver->get_position = ptk_fb_window_get_position;
+        driver->set_maximized = ptk_fb_window_set_maximized;
         driver->get_width = ptk_fb_window_get_width;
         driver->get_height = ptk_fb_window_get_height;
+        driver->is_maximized = ptk_fb_window_is_maximized;
         driver->get_handle = ptk_fb_window_get_handle;
         driver->set_max_width = ptk_fb_window_set_max_width;
         driver->set_max_height = ptk_fb_window_set_max_height;

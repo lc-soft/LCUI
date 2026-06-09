@@ -1,5 +1,5 @@
-﻿/*
- * src/lcui_settings.c: -- global settings.
+/*
+ * src/lcui_settings.c -- global settings infrastructure.
  *
  * Copyright (c) 2020, James Duong <duong.james@gmail.com>
  * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io>
@@ -13,61 +13,89 @@
 
 #include <ctype.h>
 #include <errno.h>
-#include <limits.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <yutil.h>
 #ifndef _WIN32
 #include <strings.h>
 #endif
 #ifdef _WIN32
 #include <direct.h>
-#include <windows.h>
 #else
 #include <sys/stat.h>
 #include <unistd.h>
 #endif
-#include <ui.h>
-#include <ui_server.h>
-#include <LCUI/settings.h>
 #include <LCUI/app.h>
+#include "lcui_settings.h"
 
 #ifdef _WIN32
 #define strcasecmp _stricmp
 #endif
 
-typedef struct lcui_store_rendering {
-        int fps_cap;
-        int parallel_threads;
-        bool paint_flashing;
-} lcui_store_rendering_t;
+typedef struct lcui_settings_callback_entry {
+        void *fn;
+        void *data;
+} lcui_settings_callback_entry_t;
 
-static struct lcui_settings_module {
-        bool loaded;
-        bool dirty;
-        char *path;
-        lcui_store_rendering_t rendering;
-} lcui_settings;
+struct lcui_settings_module lcui_settings;
 
-static const lcui_store_rendering_t lcui_default_rendering_settings = {
-        LCUI_DEFAULT_FPS_CAP, LCUI_DEFAULT_PARALLEL_THREADS, false
-};
-
-static char *lcui_strdup(const char *str)
+static void lcui_settings_callback_entry_destroy(void *data)
 {
-        size_t len;
-        char *copy;
+        free(data);
+}
 
-        if (!str) {
-                return NULL;
+static bool lcui_settings_ensure_deserialize_list(void)
+{
+        if (lcui_settings.deserialize_ready) {
+                return true;
         }
-        len = strlen(str);
-        copy = malloc(sizeof(char) * (len + 1));
-        if (!copy) {
-                return NULL;
+        list_create(&lcui_settings.deserialize_callbacks);
+        lcui_settings.deserialize_ready = true;
+        return true;
+}
+
+static bool lcui_settings_ensure_serialize_list(void)
+{
+        if (lcui_settings.serialize_ready) {
+                return true;
         }
-        strcpy(copy, str);
-        return copy;
+        list_create(&lcui_settings.serialize_callbacks);
+        lcui_settings.serialize_ready = true;
+        return true;
+}
+
+static void lcui_settings_run_deserializers(void)
+{
+        list_node_t *node;
+        bool dirty = false;
+
+        if (!lcui_settings.deserialize_ready || !lcui_settings.doc) {
+                return;
+        }
+        for (list_each(node, &lcui_settings.deserialize_callbacks)) {
+                lcui_settings_callback_entry_t *entry = node->data;
+                ((lcui_settings_deserialize_fn)entry->fn)(lcui_settings.doc,
+                                                          &dirty, entry->data);
+        }
+        if (dirty) {
+                lcui_settings.dirty = true;
+        }
+}
+
+static void lcui_settings_run_serializers(void)
+{
+        list_node_t *node;
+
+        if (!lcui_settings.serialize_ready || !lcui_settings.doc) {
+                return;
+        }
+        for (list_each(node, &lcui_settings.serialize_callbacks)) {
+                lcui_settings_callback_entry_t *entry = node->data;
+                ((lcui_settings_serialize_fn)entry->fn)(lcui_settings.doc,
+                                                        entry->data);
+        }
 }
 
 static int lcui_mkdir(const char *path)
@@ -85,11 +113,8 @@ static bool lcui_mkdir_recursive(const char *path)
         char ch;
         char *buffer;
 
-        if (!path || path[0] == 0) {
-                return false;
-        }
         len = strlen(path);
-        buffer = lcui_strdup(path);
+        buffer = strdup2(path);
         if (!buffer) {
                 return false;
         }
@@ -133,9 +158,6 @@ static char *lcui_join_path(const char *left, const char *right)
         size_t left_len, right_len;
         char *path;
 
-        if (!left || !right) {
-                return NULL;
-        }
         left_len = strlen(left);
         right_len = strlen(right);
         path = malloc(sizeof(char) * (left_len + right_len + 2));
@@ -157,7 +179,7 @@ static char *lcui_settings_get_config_root(void)
 #ifdef _WIN32
         const char *base = getenv("APPDATA");
         if (base && base[0] != 0) {
-                return lcui_strdup(base);
+                return strdup2(base);
         }
         base = getenv("USERPROFILE");
         if (base && base[0] != 0) {
@@ -171,7 +193,7 @@ static char *lcui_settings_get_config_root(void)
 #else
         const char *base = getenv("XDG_CONFIG_HOME");
         if (base && base[0] != 0) {
-                return lcui_strdup(base);
+                return strdup2(base);
         }
         base = getenv("HOME");
         if (base && base[0] != 0) {
@@ -211,223 +233,123 @@ static bool lcui_settings_resolve_path(char **out_path)
         return true;
 }
 
-static char *lcui_store_trim(char *str)
+bool lcui_settings_on_deserialize(lcui_settings_deserialize_fn fn, void *data)
 {
-        size_t len;
+        lcui_settings_callback_entry_t *entry;
+        list_node_t *node;
 
-        while (*str && isspace((unsigned char)*str)) {
-                ++str;
-        }
-        len = strlen(str);
-        while (len > 0 && isspace((unsigned char)str[len - 1])) {
-                str[--len] = 0;
-        }
-        return str;
-}
-
-static bool lcui_store_parse_int(const char *str, int *out)
-{
-        long value;
-        char *endptr;
-
-        if (!str || !out) {
+        if (!lcui_settings_ensure_deserialize_list()) {
                 return false;
         }
-        errno = 0;
-        value = strtol(str, &endptr, 10);
-        if (errno != 0 || endptr == str || *endptr != 0 || value > INT_MAX ||
-            value < INT_MIN) {
-                return false;
-        }
-        *out = (int)value;
-        return true;
-}
-
-static bool lcui_store_parse_bool(const char *str, bool *out)
-{
-        if (!str || !out) {
-                return false;
-        }
-        if (strcmp(str, "1") == 0 || strcasecmp(str, "true") == 0) {
-                *out = true;
-                return true;
-        }
-        if (strcmp(str, "0") == 0 || strcasecmp(str, "false") == 0) {
-                *out = false;
-                return true;
-        }
-        return false;
-}
-
-static bool lcui_store_load(const char *path, lcui_store_rendering_t *settings,
-                            bool *dirty, bool *exists)
-{
-        int value;
-        bool flag;
-        bool has_version = false;
-        char line[1024];
-        char section[64] = { 0 };
-        FILE *fp = fopen(path, "r");
-
-        if (!fp) {
-                if (errno == ENOENT) {
-                        *exists = false;
+        for (list_each(node, &lcui_settings.deserialize_callbacks)) {
+                entry = node->data;
+                if (entry->fn == (void *)fn) {
                         return true;
                 }
+        }
+        entry = malloc(sizeof(*entry));
+        if (!entry) {
                 return false;
         }
-        *exists = true;
-        while (fgets(line, sizeof(line), fp)) {
-                char *data = lcui_store_trim(line);
-                char *equal;
-
-                if (data[0] == 0 || data[0] == ';' || data[0] == '#') {
-                        continue;
-                }
-                if (data[0] == '[') {
-                        char *end = strchr(data, ']');
-                        if (!end) {
-                                continue;
-                        }
-                        *end = 0;
-                        snprintf(section, sizeof(section), "%s", data + 1);
-                        continue;
-                }
-                equal = strchr(data, '=');
-                if (!equal) {
-                        continue;
-                }
-                *equal++ = 0;
-                data = lcui_store_trim(data);
-                equal = lcui_store_trim(equal);
-                if (strcasecmp(section, "meta") == 0 &&
-                    strcasecmp(data, "version") == 0) {
-                        has_version = true;
-                        if (!lcui_store_parse_int(equal, &value) ||
-                            value != 1) {
-                                *dirty = true;
-                        }
-                        continue;
-                }
-                if (strcasecmp(section, "rendering") != 0) {
-                        continue;
-                }
-                if (strcasecmp(data, "fps_cap") == 0) {
-                        if (lcui_store_parse_int(equal, &value)) {
-                                settings->fps_cap = value;
-                        } else {
-                                *dirty = true;
-                        }
-                        continue;
-                }
-                if (strcasecmp(data, "parallel_threads") == 0) {
-                        if (lcui_store_parse_int(equal, &value)) {
-                                settings->parallel_threads = value;
-                        } else {
-                                *dirty = true;
-                        }
-                        continue;
-                }
-                if (strcasecmp(data, "paint_flashing") == 0) {
-                        if (lcui_store_parse_bool(equal, &flag)) {
-                                settings->paint_flashing = flag;
-                        } else {
-                                *dirty = true;
-                        }
-                }
-        }
-        fclose(fp);
-        if (!has_version) {
-                *dirty = true;
-        }
+        entry->fn = (void *)fn;
+        entry->data = data;
+        list_append(&lcui_settings.deserialize_callbacks, entry);
         return true;
 }
 
-static bool lcui_store_save(const char *path,
-                            const lcui_store_rendering_t *settings)
+int lcui_settings_off_deserialize(lcui_settings_deserialize_fn fn, void *data)
 {
-        size_t path_len;
-        char *tmp_path;
-        FILE *fp;
-        int ret;
+        int count = 0;
+        list_node_t *node, *next;
 
-        path_len = strlen(path);
-        tmp_path = malloc(sizeof(char) * (path_len + 5));
-        if (!tmp_path) {
-                return false;
+        if (!lcui_settings.deserialize_ready) {
+                return 0;
         }
-        strcpy(tmp_path, path);
-        strcat(tmp_path, ".tmp");
-        fp = fopen(tmp_path, "w");
-        if (!fp) {
-                free(tmp_path);
-                return false;
+        for (node = lcui_settings.deserialize_callbacks.head.next; node;
+             node = next) {
+                next = node->next;
+                {
+                        lcui_settings_callback_entry_t *entry = node->data;
+                        if (entry->fn == (void *)fn) {
+                                list_delete_node(
+                                    &lcui_settings.deserialize_callbacks, node);
+                                lcui_settings_callback_entry_destroy(entry);
+                                ++count;
+                        }
+                }
         }
-        fprintf(fp, "[meta]\nversion=1\n\n");
-        fprintf(fp, "[rendering]\n");
-        fprintf(fp, "fps_cap=%d\n", settings->fps_cap);
-        fprintf(fp, "parallel_threads=%d\n", settings->parallel_threads);
-        fprintf(fp, "paint_flashing=%d\n", settings->paint_flashing ? 1 : 0);
-        fclose(fp);
-#ifdef _WIN32
-        ret = MoveFileExA(tmp_path, path,
-                          MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH)
-                  ? 0
-                  : -1;
-#else
-        ret = rename(tmp_path, path);
-#endif
-        free(tmp_path);
-        return ret == 0;
+        return count;
 }
 
-static bool lcui_settings_repair_rendering(lcui_store_rendering_t *settings)
+bool lcui_settings_on_serialize(lcui_settings_serialize_fn fn, void *data)
 {
-        bool valid = true;
+        lcui_settings_callback_entry_t *entry;
+        list_node_t *node;
 
-        if (settings->fps_cap < LCUI_RENDERING_FPS_CAP_MIN ||
-            settings->fps_cap > LCUI_RENDERING_FPS_CAP_MAX) {
-                settings->fps_cap = lcui_default_rendering_settings.fps_cap;
-                valid = false;
-        }
-        if (settings->parallel_threads < LCUI_RENDERING_PARALLEL_THREADS_MIN ||
-            settings->parallel_threads > LCUI_RENDERING_PARALLEL_THREADS_MAX) {
-                settings->parallel_threads =
-                    lcui_default_rendering_settings.parallel_threads;
-                valid = false;
-        }
-        return valid;
-}
-
-static bool lcui_settings_validate_rendering(
-    const lcui_rendering_settings_t *settings)
-{
-        if (!settings) {
+        if (!lcui_settings_ensure_serialize_list()) {
                 return false;
         }
-        if (settings->fps_cap < LCUI_RENDERING_FPS_CAP_MIN ||
-            settings->fps_cap > LCUI_RENDERING_FPS_CAP_MAX) {
+        for (list_each(node, &lcui_settings.serialize_callbacks)) {
+                entry = node->data;
+                if (entry->fn == (void *)fn) {
+                        return true;
+                }
+        }
+        entry = malloc(sizeof(*entry));
+        if (!entry) {
                 return false;
         }
-        if (settings->parallel_threads < LCUI_RENDERING_PARALLEL_THREADS_MIN ||
-            settings->parallel_threads > LCUI_RENDERING_PARALLEL_THREADS_MAX) {
-                return false;
-        }
+        entry->fn = (void *)fn;
+        entry->data = data;
+        list_append(&lcui_settings.serialize_callbacks, entry);
         return true;
 }
 
-static void lcui_settings_apply_rendering(void)
+int lcui_settings_off_serialize(lcui_settings_serialize_fn fn, void *data)
 {
-        ui_server_set_threads(lcui_settings.rendering.parallel_threads);
-        ui_server_set_paint_flashing_enabled(
-            lcui_settings.rendering.paint_flashing);
-        lcui_set_fps_cap((unsigned)lcui_settings.rendering.fps_cap);
+        int count = 0;
+        list_node_t *node, *next;
+
+        if (!lcui_settings.serialize_ready) {
+                return 0;
+        }
+        for (node = lcui_settings.serialize_callbacks.head.next; node;
+             node = next) {
+                next = node->next;
+                {
+                        lcui_settings_callback_entry_t *entry = node->data;
+                        if (entry->fn == (void *)fn) {
+                                list_delete_node(
+                                    &lcui_settings.serialize_callbacks, node);
+                                lcui_settings_callback_entry_destroy(entry);
+                                ++count;
+                        }
+                }
+        }
+        return count;
+}
+
+ini_doc_t *lcui_settings_get_doc(void)
+{
+        return lcui_settings.doc;
+}
+
+void lcui_settings_mark_dirty(void)
+{
+        lcui_settings.dirty = true;
+}
+
+bool lcui_settings_is_loaded(void)
+{
+        return lcui_settings.loaded;
 }
 
 bool lcui_settings_load(void)
 {
-        bool exists = false;
+        bool has_version = false;
         char *path;
+        ini_doc_t *doc;
+        int version = 0;
 
         if (lcui_settings.loaded) {
                 return true;
@@ -435,20 +357,25 @@ bool lcui_settings_load(void)
         if (!lcui_settings_resolve_path(&path)) {
                 return false;
         }
-        lcui_settings.rendering = lcui_default_rendering_settings;
-        lcui_settings.dirty = false;
-        if (!lcui_store_load(path, &lcui_settings.rendering,
-                             &lcui_settings.dirty, &exists)) {
+        doc = ini_doc_load(path);
+        if (!doc) {
                 free(path);
                 return false;
         }
-        if (!exists ||
-            !lcui_settings_repair_rendering(&lcui_settings.rendering)) {
+        if (ini_doc_get_int(doc, "meta", "version", &version)) {
+                has_version = (version == 1);
+        }
+        if (!has_version) {
+                ini_doc_set_int(doc, "meta", "version", 1);
                 lcui_settings.dirty = true;
         }
-        lcui_settings.loaded = true;
+        lcui_settings.doc = doc;
         lcui_settings.path = path;
-        lcui_settings_apply_rendering();
+        lcui_settings.loaded = true;
+        lcui_settings_run_deserializers();
+        if (!has_version) {
+                lcui_settings.dirty = true;
+        }
         return true;
 }
 
@@ -460,7 +387,11 @@ bool lcui_settings_flush(void)
         if (!lcui_settings.dirty) {
                 return true;
         }
-        if (!lcui_store_save(lcui_settings.path, &lcui_settings.rendering)) {
+        if (!lcui_settings.doc) {
+                return false;
+        }
+        lcui_settings_run_serializers();
+        if (!ini_doc_save(lcui_settings.doc, lcui_settings.path)) {
                 return false;
         }
         lcui_settings.dirty = false;
@@ -469,97 +400,12 @@ bool lcui_settings_flush(void)
 
 void lcui_settings_unload(void)
 {
+        if (lcui_settings.doc) {
+                ini_doc_destroy(lcui_settings.doc);
+                lcui_settings.doc = NULL;
+        }
         free(lcui_settings.path);
         lcui_settings.path = NULL;
         lcui_settings.loaded = false;
         lcui_settings.dirty = false;
-        lcui_settings.rendering = lcui_default_rendering_settings;
-}
-
-bool lcui_settings_get_rendering(lcui_rendering_settings_t *out)
-{
-        if (!lcui_settings.loaded || !out) {
-                return false;
-        }
-        out->fps_cap = lcui_settings.rendering.fps_cap;
-        out->parallel_threads = lcui_settings.rendering.parallel_threads;
-        out->paint_flashing = lcui_settings.rendering.paint_flashing;
-        return true;
-}
-
-bool lcui_settings_set_rendering(const lcui_rendering_settings_t *in)
-{
-        if (!lcui_settings.loaded || !in ||
-            !lcui_settings_validate_rendering(in)) {
-                return false;
-        }
-        if (lcui_settings.rendering.fps_cap == in->fps_cap &&
-            lcui_settings.rendering.parallel_threads == in->parallel_threads &&
-            lcui_settings.rendering.paint_flashing == in->paint_flashing) {
-                return true;
-        }
-        lcui_settings.rendering.fps_cap = in->fps_cap;
-        lcui_settings.rendering.parallel_threads = in->parallel_threads;
-        lcui_settings.rendering.paint_flashing = in->paint_flashing;
-        lcui_settings_apply_rendering();
-        lcui_settings.dirty = true;
-        return true;
-}
-
-/* Initialize settings with the current global settings. */
-void lcui_get_settings(lcui_settings_t *settings)
-{
-        if (!settings) {
-                return;
-        }
-        settings->fps_cap = lcui_settings.rendering.fps_cap;
-        settings->parallel_rendering_threads =
-            lcui_settings.rendering.parallel_threads;
-        settings->paint_flashing = lcui_settings.rendering.paint_flashing;
-}
-
-/* Update global settings with the given input. */
-void lcui_apply_settings(lcui_settings_t *settings)
-{
-        lcui_rendering_settings_t rendering;
-
-        if (!settings) {
-                return;
-        }
-        rendering.fps_cap = settings->fps_cap;
-        rendering.parallel_threads = settings->parallel_rendering_threads;
-        rendering.paint_flashing = settings->paint_flashing;
-        if (!lcui_settings_validate_rendering(&rendering)) {
-                lcui_store_rendering_t repaired = { rendering.fps_cap,
-                                                    rendering.parallel_threads,
-                                                    rendering.paint_flashing };
-                lcui_settings_repair_rendering(&repaired);
-                rendering.fps_cap = repaired.fps_cap;
-                rendering.parallel_threads = repaired.parallel_threads;
-        }
-        if (lcui_settings.loaded) {
-                (void)lcui_settings_set_rendering(&rendering);
-                return;
-        }
-        lcui_settings.rendering.fps_cap = rendering.fps_cap;
-        lcui_settings.rendering.parallel_threads = rendering.parallel_threads;
-        lcui_settings.rendering.paint_flashing = rendering.paint_flashing;
-        lcui_settings_apply_rendering();
-}
-
-/* Reset global settings to their defaults. */
-void lcui_reset_settings(void)
-{
-        lcui_rendering_settings_t settings = {
-                lcui_default_rendering_settings.fps_cap,
-                lcui_default_rendering_settings.parallel_threads,
-                lcui_default_rendering_settings.paint_flashing
-        };
-
-        if (lcui_settings.loaded) {
-                (void)lcui_settings_set_rendering(&settings);
-                return;
-        }
-        lcui_settings.rendering = lcui_default_rendering_settings;
-        lcui_settings_apply_rendering();
 }

@@ -18,6 +18,10 @@
 #include <LCUI/settings.h>
 
 extern void lcui_fonts_init(void);
+extern void lcui_rendering_destroy(void);
+extern void lcui_rendering_init(void);
+extern void lcui_window_state_destroy(void);
+extern void lcui_window_state_init(void);
 extern void lcui_widgets_init(void);
 extern void lcui_widgets_destroy(void);
 
@@ -41,16 +45,19 @@ void lcui_init(void)
         lcui_app_init();
         lcui_fonts_init();
         lcui_widgets_init();
+        lcui_rendering_init();
+        lcui_window_state_init();
         if (!lcui_settings_load()) {
                 logger_warning(
                     "failed to load settings, fallback to built-in defaults\n");
-                lcui_reset_settings();
         }
 }
 
 void lcui_destroy(void)
 {
         lcui_settings_unload();
+        lcui_window_state_destroy();
+        lcui_rendering_destroy();
         lcui_widgets_destroy();
         lcui_app_destroy();
 }

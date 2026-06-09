@@ -18,7 +18,21 @@
 
 LCUI_BEGIN_HEADER
 
+/*
+ * Set the application identifier used for config file resolution.
+ *
+ * The id is used as a subdirectory name under the platform config root
+ * (e.g., %APPDATA%/<id>/settings.ini on Windows,
+ *       $XDG_CONFIG_HOME/<id>/settings.ini or ~/.config/<id>/settings.ini on
+ * Linux).
+ *
+ * Allowed characters: alphanumeric, '.', '_', '-'. Must be non-empty.
+ * Recommended format: reverse-domain notation, e.g. "com.example.myapp".
+ *
+ * Returns true on success, false if app_id is invalid.
+ */
 LCUI_API bool lcui_set_app_id(const char *app_id);
+
 LCUI_API const char *lcui_get_app_id(void);
 
 LCUI_API uint32_t lcui_get_fps(void);
