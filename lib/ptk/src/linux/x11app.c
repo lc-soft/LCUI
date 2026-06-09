@@ -61,6 +61,103 @@ static struct ptk_x11app {
 static void ptk_x11window__show(ptk_window_t *wnd);
 static void ptk_x11window__set_size(ptk_window_t *wnd, int width, int height);
 
+static bool ptk_x11window__update_position(ptk_window_t *wnd, int *x, int *y)
+{
+        Window child, root;
+        int actual_x = wnd ? wnd->x : 0;
+        int actual_y = wnd ? wnd->y : 0;
+
+        if (!wnd) {
+                return false;
+        }
+        root = DefaultRootWindow(x11_app.display);
+        if (!XTranslateCoordinates(x11_app.display, wnd->handle, root, 0, 0,
+                                   &actual_x, &actual_y, &child)) {
+                return false;
+        }
+        wnd->x = actual_x;
+        wnd->y = actual_y;
+        if (x) {
+                *x = actual_x;
+        }
+        if (y) {
+                *y = actual_y;
+        }
+        return true;
+}
+
+static bool ptk_x11window__is_maximized(ptk_window_t *wnd)
+{
+        Atom actual_type;
+        Atom wm_state;
+        Atom max_horz;
+        Atom max_vert;
+        int actual_format;
+        unsigned long i, nitems, bytes_after;
+        unsigned char *data = NULL;
+        bool maximized = false;
+
+        if (!wnd) {
+                return false;
+        }
+        wm_state = XInternAtom(x11_app.display, "_NET_WM_STATE", False);
+        max_horz =
+            XInternAtom(x11_app.display, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
+        max_vert =
+            XInternAtom(x11_app.display, "_NET_WM_STATE_MAXIMIZED_VERT", False);
+        if (XGetWindowProperty(x11_app.display, wnd->handle, wm_state, 0, 32,
+                               False, XA_ATOM, &actual_type, &actual_format,
+                               &nitems, &bytes_after, &data) == Success &&
+            actual_type == XA_ATOM && actual_format == 32 && data) {
+                Atom *atoms = (Atom *)data;
+                bool has_horz = false;
+                bool has_vert = false;
+
+                for (i = 0; i < nitems; ++i) {
+                        if (atoms[i] == max_horz) {
+                                has_horz = true;
+                        } else if (atoms[i] == max_vert) {
+                                has_vert = true;
+                        }
+                }
+                maximized = has_horz && has_vert;
+        }
+        if (data) {
+                XFree(data);
+        }
+        return maximized;
+}
+
+static void ptk_x11window__set_maximized(ptk_window_t *wnd, bool maximized)
+{
+        Atom max_horz;
+        Atom max_vert;
+        Atom wm_state;
+        Window root;
+        XEvent event = { 0 };
+
+        if (!wnd) {
+                return;
+        }
+        root = DefaultRootWindow(x11_app.display);
+        wm_state = XInternAtom(x11_app.display, "_NET_WM_STATE", False);
+        max_horz =
+            XInternAtom(x11_app.display, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
+        max_vert =
+            XInternAtom(x11_app.display, "_NET_WM_STATE_MAXIMIZED_VERT", False);
+        event.xclient.type = ClientMessage;
+        event.xclient.window = wnd->handle;
+        event.xclient.message_type = wm_state;
+        event.xclient.format = 32;
+        event.xclient.data.l[0] = maximized ? 1 : 0;
+        event.xclient.data.l[1] = max_horz;
+        event.xclient.data.l[2] = max_vert;
+        event.xclient.data.l[3] = 1;
+        XSendEvent(x11_app.display, root, False,
+                   SubstructureNotifyMask | SubstructureRedirectMask, &event);
+        XFlush(x11_app.display);
+}
+
 static int convert_keycode(KeySym keysym)
 {
         switch (keysym) {
@@ -248,13 +345,18 @@ static int x11_ptk_process_native_event(void)
         e.window = ptk_x11app_get_window_by_handle(&xe.xany.window);
         switch (xe.type) {
         case ConfigureNotify:
+                if (!e.window) {
+                        break;
+                }
+                ptk_x11window__update_position(e.window, NULL, NULL);
+                e.type = PTK_EVENT_MOVE;
+                ptk_process_event(&e);
                 e.type = PTK_EVENT_SIZE;
                 e.size.width = xe.xconfigure.width;
                 e.size.height = xe.xconfigure.height;
                 ptk_x11window__on_size(e.window, xe.xconfigure.width,
                                        xe.xconfigure.height);
                 ptk_process_event(&e);
-                // TODO: add MOVE event?
                 break;
         case Expose:
                 e.type = PTK_EVENT_PAINT;
@@ -507,6 +609,18 @@ static void ptk_x11window__set_position(ptk_window_t *wnd, int x, int y)
         XMoveWindow(x11_app.display, wnd->handle, x, y);
 }
 
+static void ptk_x11window__get_position(ptk_window_t *wnd, int *x, int *y)
+{
+        if (!ptk_x11window__update_position(wnd, x, y)) {
+                if (x) {
+                        *x = wnd ? wnd->x : 0;
+                }
+                if (y) {
+                        *y = wnd ? wnd->y : 0;
+                }
+        }
+}
+
 static void *ptk_x11window__get_handle(ptk_window_t *wnd)
 {
         return &wnd->handle;
@@ -682,9 +796,12 @@ void ptk_x11window_driver_init(ptk_window_driver_t *driver)
         driver->activate = ptk_x11window__activate;
         driver->set_title = ptk_x11window__set_title;
         driver->set_position = ptk_x11window__set_position;
+        driver->get_position = ptk_x11window__get_position;
         driver->set_size = ptk_x11window__set_size;
+        driver->set_maximized = ptk_x11window__set_maximized;
         driver->get_width = ptk_x11window__get_width;
         driver->get_height = ptk_x11window__get_height;
+        driver->is_maximized = ptk_x11window__is_maximized;
         driver->get_handle = ptk_x11window__get_handle;
         driver->set_max_width = ptk_x11window__set_max_width;
         driver->set_max_height = ptk_x11window__set_max_height;

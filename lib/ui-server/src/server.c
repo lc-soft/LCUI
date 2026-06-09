@@ -675,9 +675,14 @@ void ui_server_update(void)
                         ui_metrics.dpi = 1.f * ptk_window_get_dpi(conn->window);
                         ui_updater_update(conn->updater, conn->widget);
                         if (conn->state == UI_CONNECTION_STATE_PENDING) {
+                                ptk_event_t e = { 0 };
+
                                 conn->state = UI_CONNECTION_STATE_INITIALIZING;
                                 ui_server_refresh_window(conn);
                                 conn->state = UI_CONNECTION_STATE_INITIALIZED;
+                                e.type = PTK_EVENT_CREATE;
+                                e.window = conn->window;
+                                ptk_process_event(&e);
                         }
                 }
         } else {

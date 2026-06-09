@@ -94,6 +94,16 @@ void ptk_window_set_position(ptk_window_t *wnd, int x, int y)
         return linux_app.window.set_position(wnd, x, y);
 }
 
+void ptk_window_get_position(ptk_window_t *wnd, int *x, int *y)
+{
+        linux_app.window.get_position(wnd, x, y);
+}
+
+void ptk_window_set_maximized(ptk_window_t *wnd, bool maximized)
+{
+        linux_app.window.set_maximized(wnd, maximized);
+}
+
 void *ptk_window_get_handle(ptk_window_t *wnd)
 {
         return linux_app.window.get_handle(wnd);
@@ -113,6 +123,11 @@ int ptk_window_get_width(ptk_window_t *wnd)
 int ptk_window_get_height(ptk_window_t *wnd)
 {
         return linux_app.window.get_height(wnd);
+}
+
+bool ptk_window_is_maximized(ptk_window_t *wnd)
+{
+        return linux_app.window.is_maximized(wnd);
 }
 
 void ptk_window_set_min_width(ptk_window_t *wnd, int min_width)
