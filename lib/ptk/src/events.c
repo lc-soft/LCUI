@@ -158,23 +158,24 @@ int ptk_clear_timer(int timer_id)
 
 int ptk_set_timeout(long ms, ptk_timer_cb cb, void *cb_arg)
 {
-        return timer_list_add_timeout(ptk_events.timers, ms, cb,
-                                      cb_arg);
+        return timer_list_add_timeout(ptk_events.timers, ms, cb, cb_arg);
 }
 
 int ptk_set_interval(long ms, ptk_timer_cb cb, void *cb_arg)
 {
-        return timer_list_add_interval(ptk_events.timers, ms, cb,
-                                      cb_arg);
+        return timer_list_add_interval(ptk_events.timers, ms, cb, cb_arg);
 }
 
 int ptk_process_event(ptk_event_t *e)
 {
         int count = 0;
         list_node_t *node;
+        list_node_t *next;
         ptk_event_listener_t *listener;
 
-        for (list_each(node, &ptk_events.listeners)) {
+        for (node = list_get_first_node(&ptk_events.listeners); node;
+             node = next) {
+                next = node->next;
                 listener = node->data;
                 if (listener->type == e->type) {
                         listener->handler(e, listener->data);
