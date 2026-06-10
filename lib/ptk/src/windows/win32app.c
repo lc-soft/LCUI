@@ -369,7 +369,9 @@ static LRESULT CALLBACK ptk_window_process(HWND hwnd, UINT msg, WPARAM arg1,
         }
         case WM_CLOSE:
                 e.type = PTK_EVENT_CLOSE;
-                break;
+                ptk_process_event(&e);
+                ptk_event_destroy(&e);
+                return DefWindowProc(hwnd, msg, arg1, arg2);
         case WM_DESTROY:
                 if (wnd) {
                         list_unlink(&win32_app.windows, &wnd->node);

@@ -164,7 +164,6 @@ static void ui_server_on_window_close(ptk_event_t *e, void *arg)
         for (list_each(node, &ui_server.connections)) {
                 conn = node->data;
                 if (conn->window == e->window) {
-                        ptk_window_destroy(conn->window);
                         ui_connection_destroy(conn);
                         list_delete_node(&ui_server.connections, node);
                         break;
