@@ -519,7 +519,6 @@ static int ptk_fb_off_event(int type, ptk_native_event_handler_t handler)
 
 static int ptk_fb_process_events(ptk_process_events_option_t option)
 {
-
         fbapp.exit_code = 0;
         if (option == PTK_PROCESS_EVENTS_ONE_IF_PRESENT ||
             option == PTK_PROCESS_EVENTS_ALL_IF_PRESENT) {
@@ -531,7 +530,8 @@ static int ptk_fb_process_events(ptk_process_events_option_t option)
                 ptk_tick();
                 ptk_process_events();
                 sleep_ms(1);
-        } while (option == PTK_PROCESS_EVENTS_UNTIL_QUIT && !fbapp.should_quit_loop);
+        } while (option == PTK_PROCESS_EVENTS_UNTIL_QUIT &&
+                 !fbapp.should_quit_loop);
         fbapp.should_quit_loop = false;
         return fbapp.exit_code;
 }
@@ -560,7 +560,7 @@ void ptk_fbapp_driver_init(ptk_app_driver_t *driver)
 void ptk_fbwindow_driver_init(ptk_window_driver_t *driver)
 {
         driver->close = ptk_fb_window_close;
-        driver->close = ptk_fb_window_destroy;
+        driver->destroy = ptk_fb_window_destroy;
         driver->show = ptk_fb_window_show;
         driver->hide = ptk_fb_window_hide;
         driver->activate = ptk_fb_window_activate;
