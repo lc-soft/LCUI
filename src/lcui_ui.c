@@ -213,6 +213,7 @@ void lcui_ui_destroy(void)
                 ui_mutation_observer_destroy(lcui_ui.observer);
                 lcui_ui.observer = NULL;
         }
+        lcui_ui.mode = LCUI_DISPLAY_DEFAULT;
         lcui_ui.image_loader.active = false;
         lcui_ui.quit_after_all_windows_closed = true;
         lcui_ui_image_loader_refresh();
