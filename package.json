@@ -11,6 +11,7 @@
     "build-changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
     "update-changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "update-copyright": "node scripts/add-copyright.js",
+    "format:check": "node scripts/clang-format-changed.js",
     "prepare": "husky"
   },
   "lint-staged": {
