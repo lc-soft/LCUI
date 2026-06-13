@@ -1,7 +1,7 @@
 ﻿/*
  * lib/ui/src/ui_widget_observer.h
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -10,7 +10,7 @@
  */
 
 bool ui_widget_has_observer(ui_widget_t *widget,
-			    ui_mutation_record_type_t type);
+                            ui_mutation_record_type_t type);
 
 int ui_widget_add_mutation_record(ui_widget_t *widget,
-				  ui_mutation_record_t *record);
+                                  ui_mutation_record_t *record);

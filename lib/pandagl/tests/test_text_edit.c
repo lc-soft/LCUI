@@ -1,12 +1,15 @@
 ﻿/*
  * lib/pandagl/tests/test_text_edit.c
  *
- * Copyright (c) 2026, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2026, Liu Chao
+ * <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+
+ * * This file is part of LCUI, distributed under the MIT License found in the
+
+ * * LICENSE.TXT file in the root directory of this source tree.
  */
 
 #include <stdio.h>
@@ -53,8 +56,8 @@ static void should_backspace_then_continue_typing(void)
         pd_text_insert(text, L"X", NULL);
         ctest_equal_int("should merge into two lines after backspace + insert",
                         pd_text_get_lines_length(text), 2);
-        ctest_equal_int("line 0 keeps 'abc'",
-                        pd_text_get_line_length(text, 0), 3);
+        ctest_equal_int("line 0 keeps 'abc'", pd_text_get_line_length(text, 0),
+                        3);
         ctest_equal_int("line 1 becomes 'defX'",
                         pd_text_get_line_length(text, 1), 4);
         pd_text_destroy(text);
@@ -87,8 +90,8 @@ static void should_delete_char_at_caret(void)
         ctest_equal_int("should delete one char", pd_text_delete(text, 1), 0);
         pd_text_read(text, 0, 16, buf);
         ctest_equal_wcs("should produce expected text", buf, L"abdef");
-        ctest_equal_int("line length is 5",
-                        pd_text_get_line_length(text, 0), 5);
+        ctest_equal_int("line length is 5", pd_text_get_line_length(text, 0),
+                        5);
         pd_text_destroy(text);
 }
 
@@ -105,8 +108,8 @@ static void should_join_next_line_when_delete_at_line_end(void)
                         pd_text_delete(text, 1), 0);
         ctest_equal_int("should reduce one line after merge",
                         pd_text_get_lines_length(text), 2);
-        ctest_equal_int("line 0 keeps 'abc'",
-                        pd_text_get_line_length(text, 0), 3);
+        ctest_equal_int("line 0 keeps 'abc'", pd_text_get_line_length(text, 0),
+                        3);
         ctest_equal_int("line 1 becomes 'defghi' (6 chars)",
                         pd_text_get_line_length(text, 1), 6);
         pd_text_destroy(text);
@@ -125,8 +128,8 @@ static void should_preserve_chars_when_joining_lines(void)
                         pd_text_get_lines_length(text), 2);
         ctest_equal_int("line 0 becomes 'abcdef' (6 chars)",
                         pd_text_get_line_length(text, 0), 6);
-        ctest_equal_int("line 1 stays empty",
-                        pd_text_get_line_length(text, 1), 0);
+        ctest_equal_int("line 1 stays empty", pd_text_get_line_length(text, 1),
+                        0);
         pd_text_destroy(text);
 }
 
@@ -255,8 +258,7 @@ void test_pandagl_text_edit(void)
         ctest_describe("text backspace sequence",
                        should_handle_multi_line_backspace_sequence);
         ctest_describe("text dump single line", should_dump_single_line);
-        ctest_describe("text dump multiline lf",
-                       should_dump_multiline_with_lf);
+        ctest_describe("text dump multiline lf", should_dump_multiline_with_lf);
         ctest_describe("text dump trailing newline",
                        should_dump_multiline_with_trailing_newline);
         ctest_describe("text dump max len", should_dump_respect_max_len);

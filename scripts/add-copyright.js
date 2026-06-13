@@ -9,7 +9,7 @@ const includes = ["lib", "include", "src"].map((file) =>
 );
 const excludes = ["lib/yutil"].map((file) => path.resolve(cwd, file));
 const extensions = [".c", ".h", ".h.in"];
-const copyrightHolder = "Liu Chao <i@lc-soft.io>";
+const copyrightHolder = "Liu Chao <hello@lcui.dev>";
 const copyright = `/*
  * {{filePath}}{{summary}}
  *
@@ -159,4 +159,8 @@ function traverseFolder(folderPath) {
   });
 }
 
-traverseFolder(cwd);
+for (const include of includes) {
+  if (fs.existsSync(include) && fs.statSync(include).isDirectory()) {
+    traverseFolder(include);
+  }
+}

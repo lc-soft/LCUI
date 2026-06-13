@@ -1,12 +1,15 @@
 ﻿/*
  * lib/pandagl/include/pandagl/font.h
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao
+ * <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+
+ * * This file is part of LCUI, distributed under the MIT License found in the
+
+ * * LICENSE.TXT file in the root directory of this source tree.
  */
 
 #ifndef LIB_PANDAGL_INCLUDE_FONT_H
@@ -52,13 +55,13 @@ typedef struct pd_glyph_bitmap {
 typedef struct pd_font_engine pd_font_engine_t;
 
 typedef struct pd_font_face {
-        int id;                  /**< 字体信息ID */
-        char *style_name;        /**< 样式名称 */
-        char *family_name;       /**< 字族名称 */
-        void *data;              /**< 相关数据 */
-        pd_font_style_t style;   /**< 风格 */
-        pd_font_weight_t weight; /**< 粗细程度 */
-        pd_font_engine_t *engine;   /**< 所属的字体引擎 */
+        int id;                   /**< 字体信息ID */
+        char *style_name;         /**< 样式名称 */
+        char *family_name;        /**< 字族名称 */
+        void *data;               /**< 相关数据 */
+        pd_font_style_t style;    /**< 风格 */
+        pd_font_weight_t weight;  /**< 粗细程度 */
+        pd_font_engine_t *engine; /**< 所属的字体引擎 */
 } pd_font_face_t;
 
 struct pd_font_engine {
@@ -73,8 +76,8 @@ PD_BEGIN_DECLS
 
 /** 将字体位图绘制到目标图像上 */
 PD_PUBLIC int pd_canvas_mix_glyph_bitmap(pd_canvas_t *graph, pd_pos_t pos,
-                                        const pd_glyph_bitmap_t *bmp,
-                                        pd_color_t color);
+                                         const pd_glyph_bitmap_t *bmp,
+                                         pd_color_t color);
 
 PD_PUBLIC char *pd_font_find_path(const char *name);
 
@@ -92,7 +95,7 @@ PD_PUBLIC pd_font_style_t pd_font_parse_style(const char *str);
 
 /** 载入字体位图 */
 PD_PUBLIC int pd_font_render_glyph(pd_glyph_bitmap_t *buff, unsigned ch,
-                                            int font_id, int pixel_size);
+                                   int font_id, int pixel_size);
 
 /** 添加字体族，并返回该字族的ID */
 PD_PUBLIC int pd_font_register(pd_font_face_t *font);
@@ -103,9 +106,8 @@ PD_PUBLIC int pd_font_register(pd_font_face_t *font);
  * @param[in] style 字体风格
  * @param[in] weight 字体粗细程度，若为值 0，则默认为 PD_FONT_WEIGHT_NORMAL
  */
-PD_PUBLIC int pd_font_get_id(const char *family_name,
-                                          pd_font_style_t style,
-                                          pd_font_weight_t weight);
+PD_PUBLIC int pd_font_get_id(const char *family_name, pd_font_style_t style,
+                             pd_font_weight_t weight);
 
 /**
  * 更新当前字体的粗细程度
@@ -114,8 +116,8 @@ PD_PUBLIC int pd_font_get_id(const char *family_name,
  * @params[out] new_font_ids 更新字体粗细程度后的字体 id 列表
  */
 PD_PUBLIC size_t pd_font_replace_weight(const int *font_ids,
-                                                    pd_font_weight_t weight,
-                                                    int **new_font_ids);
+                                        pd_font_weight_t weight,
+                                        int **new_font_ids);
 
 /**
  * 更新当前字体的风格
@@ -124,8 +126,8 @@ PD_PUBLIC size_t pd_font_replace_weight(const int *font_ids,
  * @params[out] new_font_ids 更新字体粗细程度后的字体 id 列表
  */
 PD_PUBLIC size_t pd_font_replace_style(const int *font_ids,
-                                                   pd_font_style_t style,
-                                                   int **new_font_ids);
+                                       pd_font_style_t style,
+                                       int **new_font_ids);
 
 /**
  * 根据字族名称获取对应的字体 ID 列表
@@ -136,8 +138,8 @@ PD_PUBLIC size_t pd_font_replace_style(const int *font_ids,
  * @return 获取到的字体 ID 的数量
  */
 PD_PUBLIC unsigned pd_font_query(int **font_ids, pd_font_style_t style,
-                                         pd_font_weight_t weight,
-                                         const char *const *names);
+                                 pd_font_weight_t weight,
+                                 const char *const *names);
 
 /** 获取指定字体ID的字体信息 */
 PD_PUBLIC pd_font_face_t *pd_font_get(int id);
@@ -150,7 +152,7 @@ PD_PUBLIC void pd_font_set_default(int id);
 
 /** 设置字体族的别名 */
 PD_PUBLIC bool pd_font_family_set_alias(const char *alias,
-                                                     const char *family_name);
+                                        const char *family_name);
 
 /**
  * 向字体缓存中添加字体位图
@@ -174,7 +176,7 @@ PD_PUBLIC pd_glyph_bitmap_t *pd_font_cache_add_bitmap(
  * 空间存储字体位图的拷贝。
  */
 PD_PUBLIC int pd_font_cache_get_bitmap(unsigned ch, int font_id, int size,
-                                         const pd_glyph_bitmap_t **bmp);
+                                       const pd_glyph_bitmap_t **bmp);
 
 /**
  * 设置字形位图缓存上限（按 entry 数）。0 表示不限制。

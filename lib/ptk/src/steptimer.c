@@ -1,12 +1,15 @@
 ﻿/*
  * lib/ptk/src/steptimer.c
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao
+ * <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+
+ * * This file is part of LCUI, distributed under the MIT License found in the
+
+ * * LICENSE.TXT file in the root directory of this source tree.
  */
 
 /**
@@ -19,109 +22,114 @@
 
 void ptk_steptimer_init(ptk_steptimer_t *timer)
 {
-	timer->last_time = get_time_ms();
-	timer->elapsed_time = 0;
-	timer->total_time = 0;
-	timer->left_over_time = 0;
-	timer->frame_count = 0;
-	timer->frames_per_second = 0;
-	timer->frames_this_second = 0;
-	timer->second_counter = 0;
-	timer->is_fixed_time_step = false;
-	timer->enable_catch_up = false;
-	timer->target_elapsed_time = 1000 / 60;
-	timer->max_delta = 1000;
+        timer->last_time = get_time_ms();
+        timer->elapsed_time = 0;
+        timer->total_time = 0;
+        timer->left_over_time = 0;
+        timer->frame_count = 0;
+        timer->frames_per_second = 0;
+        timer->frames_this_second = 0;
+        timer->second_counter = 0;
+        timer->is_fixed_time_step = false;
+        timer->enable_catch_up = false;
+        timer->target_elapsed_time = 1000 / 60;
+        timer->max_delta = 1000;
 }
 
 void ptk_steptimer_tick(ptk_steptimer_t *timer, ptk_steptimer_handler_t handler,
-		     void *data)
+                        void *data)
 {
-	// Query the current time.
-	uint64_t current_time = get_time_ms();
-	uint64_t time_delta = current_time - timer->last_time;
+        // Query the current time.
+        uint64_t current_time = get_time_ms();
+        uint64_t time_delta = current_time - timer->last_time;
 
-	timer->last_time = current_time;
-	timer->second_counter += time_delta;
+        timer->last_time = current_time;
+        timer->second_counter += time_delta;
 
-	// Clamp excessively large time deltas (e.g. after paused in the
-	// debugger).
-	if (time_delta > timer->max_delta) {
-		time_delta = timer->max_delta;
-	}
+        // Clamp excessively large time deltas (e.g. after paused in the
+        // debugger).
+        if (time_delta > timer->max_delta) {
+                time_delta = timer->max_delta;
+        }
 
-	uint32_t last_frame_count = timer->frame_count;
+        uint32_t last_frame_count = timer->frame_count;
 
-	if (timer->is_fixed_time_step) {
-		// Fixed timestep update logic
+        if (timer->is_fixed_time_step) {
+                // Fixed timestep update logic
 
-		// If the app is running very close to the target elapsed time
-		// (within 1/4 of a millisecond) just clamp the clock to exactly
-		// match the target value. This prevents tiny and irrelevant
-		// errors from accumulating over time. Without this clamping, a
-		// game that requested a 60 fps fixed update, running with vsync
-		// enabled on a 59.94 NTSC display, would eventually accumulate
-		// enough tiny errors that it would drop a frame. It is better
-		// to just round small deviations down to zero to leave things
-		// running smoothly.
+                // If the app is running very close to the target elapsed time
+                // (within 1/4 of a millisecond) just clamp the clock to exactly
+                // match the target value. This prevents tiny and irrelevant
+                // errors from accumulating over time. Without this clamping, a
+                // game that requested a 60 fps fixed update, running with vsync
+                // enabled on a 59.94 NTSC display, would eventually accumulate
+                // enough tiny errors that it would drop a frame. It is better
+                // to just round small deviations down to zero to leave things
+                // running smoothly.
 
-		if (abs((int)(time_delta - timer->target_elapsed_time)) < 4) {
-			time_delta = timer->target_elapsed_time;
-		}
+                if (abs((int)(time_delta - timer->target_elapsed_time)) < 4) {
+                        time_delta = timer->target_elapsed_time;
+                }
 
-		timer->left_over_time += time_delta;
+                timer->left_over_time += time_delta;
 
-		if (timer->enable_catch_up) {
-			// DirectXTK behavior: catch up by invoking the handler
-			// multiple times to fully consume accumulated time.
-			while (timer->left_over_time >= timer->target_elapsed_time) {
-				timer->elapsed_time = timer->target_elapsed_time;
-				timer->total_time += timer->target_elapsed_time;
-				timer->left_over_time -= timer->target_elapsed_time;
-				timer->frame_count++;
+                if (timer->enable_catch_up) {
+                        // DirectXTK behavior: catch up by invoking the handler
+                        // multiple times to fully consume accumulated time.
+                        while (timer->left_over_time >=
+                               timer->target_elapsed_time) {
+                                timer->elapsed_time =
+                                    timer->target_elapsed_time;
+                                timer->total_time += timer->target_elapsed_time;
+                                timer->left_over_time -=
+                                    timer->target_elapsed_time;
+                                timer->frame_count++;
 
-				handler(timer, data);
-			}
-		} else if (timer->left_over_time >= timer->target_elapsed_time) {
-			// No catch-up: invoke the handler at most once per tick.
-			// elapsed_time reflects the actual accumulated delta so
-			// the handler can respond to real-time passage (useful
-			// for visual callbacks like requestAnimationFrame). The
-			// remainder is preserved via modulo to prevent long-term
-			// drift without causing a burst of calls.
-			timer->elapsed_time = timer->left_over_time;
-			timer->total_time += timer->left_over_time;
-			timer->left_over_time %= timer->target_elapsed_time;
-			timer->frame_count++;
+                                handler(timer, data);
+                        }
+                } else if (timer->left_over_time >=
+                           timer->target_elapsed_time) {
+                        // No catch-up: invoke the handler at most once per
+                        // tick. elapsed_time reflects the actual accumulated
+                        // delta so the handler can respond to real-time passage
+                        // (useful for visual callbacks like
+                        // requestAnimationFrame). The remainder is preserved
+                        // via modulo to prevent long-term drift without causing
+                        // a burst of calls.
+                        timer->elapsed_time = timer->left_over_time;
+                        timer->total_time += timer->left_over_time;
+                        timer->left_over_time %= timer->target_elapsed_time;
+                        timer->frame_count++;
 
-			handler(timer, data);
-		}
-	} else {
-		// Variable timestep update logic.
-		timer->elapsed_time = time_delta;
-		timer->total_time += time_delta;
-		timer->left_over_time = 0;
-		timer->frame_count++;
+                        handler(timer, data);
+                }
+        } else {
+                // Variable timestep update logic.
+                timer->elapsed_time = time_delta;
+                timer->total_time += time_delta;
+                timer->left_over_time = 0;
+                timer->frame_count++;
 
-		handler(timer, data);
-	}
+                handler(timer, data);
+        }
 
-	// Track the current framerate.
-	if (timer->frame_count != last_frame_count) {
-		timer->frames_this_second++;
-	}
+        // Track the current framerate.
+        if (timer->frame_count != last_frame_count) {
+                timer->frames_this_second++;
+        }
 
-	if (timer->second_counter >= 1000) {
-		timer->frames_per_second = timer->frames_this_second;
-		timer->frames_this_second = 0;
-		timer->second_counter %= 1000;
-	}
+        if (timer->second_counter >= 1000) {
+                timer->frames_per_second = timer->frames_this_second;
+                timer->frames_this_second = 0;
+                timer->second_counter %= 1000;
+        }
 }
 
 void ptk_steptimer_reset_elapsed_time(ptk_steptimer_t *timer)
 {
-	timer->last_time = get_time_ms();
-	timer->left_over_time = 0;
-	timer->frames_per_second = 0;
-	timer->frames_this_second = 0;
-	timer->second_counter = 0;
+        timer->last_time = get_time_ms();
+        timer->left_over_time = 0;
+        timer->frames_per_second = 0;
+        timer->frames_this_second = 0;
+        timer->second_counter = 0;
 }

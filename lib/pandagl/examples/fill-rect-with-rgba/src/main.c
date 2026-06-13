@@ -1,12 +1,16 @@
-/*
+﻿/*
  * lib/pandagl/examples/fill-rect-with-rgba/src/main.c
  *
- * Copyright (c) 2023, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c)
+ * 2023-2026, Liu Chao <i@lc-soft.io> All rights reserved.
+ *
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+ * This file is part of LCUI, distributed
+ * under the MIT License found in the
+ * LICENSE.TXT file in the root directory
+ * of this source tree.
  */
 
 #include <pandagl.h>
@@ -43,7 +47,8 @@ int main(void)
                 color.alpha = (unsigned char)(255 * (i + 1) / 10.0);
                 pd_canvas_fill(&fore_canvas, color);
                 for (j = 0; j < 4; ++j) {
-                        pd_canvas_mix(&canvas, &fore_canvas, 5 + i * 15, 5 + j * 40, true);
+                        pd_canvas_mix(&canvas, &fore_canvas, 5 + i * 15,
+                                      5 + j * 40, true);
                 }
         }
         pd_write_png_file("test_fill_rect_with_rgba.png", &canvas);

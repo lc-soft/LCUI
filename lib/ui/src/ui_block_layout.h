@@ -1,7 +1,7 @@
 ﻿/*
  * lib/ui/src/ui_block_layout.h
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -10,4 +10,3 @@
  */
 
 void ui_block_layout_reflow(ui_widget_t *w, ui_resizer_t *resizer);
-

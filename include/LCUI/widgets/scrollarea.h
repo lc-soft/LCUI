@@ -1,12 +1,15 @@
 ﻿/*
  * include/LCUI/widgets/scrollarea.h
  *
- * Copyright (c) 2024-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2024-2026, Liu Chao
+ * <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+
+ * * This file is part of LCUI, distributed under the MIT License found in the
+
+ * * LICENSE.TXT file in the root directory of this source tree.
  */
 
 #ifndef LCUI_INCLUDE_WIDGETS_SCROLLAREA_H
@@ -34,11 +37,9 @@ LCUI_API ui_widget_t *ui_create_scrollarea(void);
 
 LCUI_API ui_widget_t *ui_create_scrollarea_content(void);
 
-LCUI_API void ui_scrollarea_set_scroll_top(ui_widget_t *w,
-                                                       float value);
+LCUI_API void ui_scrollarea_set_scroll_top(ui_widget_t *w, float value);
 
-LCUI_API void ui_scrollarea_set_scroll_left(ui_widget_t *w,
-                                                        float value);
+LCUI_API void ui_scrollarea_set_scroll_left(ui_widget_t *w, float value);
 
 LCUI_API float ui_scrollarea_get_scroll_top(ui_widget_t *w);
 

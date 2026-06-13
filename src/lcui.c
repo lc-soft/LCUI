@@ -1,12 +1,15 @@
 ﻿/*
  * src/lcui.c
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao <hello@lcui.dev> All
+ * rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+ * This file is part
+ * of LCUI, distributed under the MIT License found in the
+ * LICENSE.TXT file
+ * in the root directory of this source tree.
  */
 
 #include <time.h>
@@ -37,10 +40,10 @@ void lcui_init(void)
                    "Build at "__DATE__
                    " - "__TIME__
                    "\n"
-                   "Copyright (C) 2012-2024 Liu Chao <root@lc-soft.io>.\n"
+                   "Copyright (C) 2012-2026 Liu Chao <hello@lcui.dev>.\n"
                    "This is open source software, licensed under MIT. \n"
                    "See source distribution for detailed copyright notices.\n"
-                   "To learn more, visit http://www.lcui.org.\n\n");
+                   "To learn more, visit http://lcui.dev\n\n");
 
         lcui_app_init();
         lcui_fonts_init();

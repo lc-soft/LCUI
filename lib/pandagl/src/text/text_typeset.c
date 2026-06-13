@@ -1,11 +1,14 @@
 ﻿/*
  * lib/pandagl/src/text/text_typeset.c
  *
- * Copyright (c) 2018-2026, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2018-2026, Liu
+ * Chao <hello@lcui.dev> All rights reserved.
  *
- * SPDX-License-Identifier: MIT
+ * SPDX-License-Identifier:
+ * MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
+ * This file is part of LCUI, distributed under the MIT License found
+ * in the
  * LICENSE.TXT file in the root directory of this source tree.
  */
 
@@ -16,7 +19,7 @@
 #define isalpha_(ch) ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'))
 
 void pd_text_break_line(pd_text_t *text, int line_num, int col,
-                               pd_text_eol_t eol)
+                        pd_text_eol_t eol)
 {
         int n;
         pd_text_line_t *line, *next;

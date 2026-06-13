@@ -1,12 +1,15 @@
 ﻿/*
  * lib/css/src/library.c: -- CSS library operation module.
  *
- * Copyright (c) 2018-2025, Liu chao <lc-soft@live.cn> All rights reserved.
- *
+ * Copyright (c) 2018-2026, Liu chao <lc-soft@live.cn> All rights reserved.
+
+ * *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+ * This file is part of LCUI,
+ * distributed under the MIT License found in the
+ * LICENSE.TXT file in the
+ * root directory of this source tree.
  */
 
 #include <errno.h>
@@ -445,7 +448,8 @@ static void css_each_style_link(css_style_link_t *link, const char *selector,
         char fullname[CSS_SELECTOR_MAX_LEN];
 
         if (selector) {
-                snprintf(fullname, sizeof(fullname), "%s %s", link->group->name, selector);
+                snprintf(fullname, sizeof(fullname), "%s %s", link->group->name,
+                         selector);
         } else {
                 strcpy(fullname, link->group->name);
         }

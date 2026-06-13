@@ -237,6 +237,14 @@
         }
     },
     ["windows|x64"] = {
+        ["cairo#31fecfc4"] = {
+            repo = {
+                branch = "master",
+                commit = "c406b5487b71cbbdd7487b432e2d962409663cbe",
+                url = "https://gitee.com/tboox/xmake-repo.git"
+            },
+            version = "1.18.0"
+        },
         ["cmake#31fecfc4"] = {
             repo = {
                 branch = "master",
@@ -245,13 +253,45 @@
             },
             version = "3.30.5-msvc23"
         },
-        ["freetype#8cb27d06"] = {
+        ["expat#31fecfc4"] = {
+            repo = {
+                branch = "master",
+                commit = "c406b5487b71cbbdd7487b432e2d962409663cbe",
+                url = "https://gitee.com/tboox/xmake-repo.git"
+            },
+            version = "2.7.1"
+        },
+        ["fontconfig#31fecfc4"] = {
+            repo = {
+                branch = "master",
+                commit = "c406b5487b71cbbdd7487b432e2d962409663cbe",
+                url = "https://gitee.com/tboox/xmake-repo.git"
+            },
+            version = "2.14.2"
+        },
+        ["freetype#31fecfc4"] = {
             repo = {
                 branch = "master",
                 commit = "c406b5487b71cbbdd7487b432e2d962409663cbe",
                 url = "https://gitee.com/tboox/xmake-repo.git"
             },
             version = "2.13.3"
+        },
+        ["gperf#31fecfc4"] = {
+            repo = {
+                branch = "master",
+                commit = "c406b5487b71cbbdd7487b432e2d962409663cbe",
+                url = "https://gitee.com/tboox/xmake-repo.git"
+            },
+            version = "3.2.1"
+        },
+        ["libintl#31fecfc4"] = {
+            repo = {
+                branch = "master",
+                commit = "c406b5487b71cbbdd7487b432e2d962409663cbe",
+                url = "https://gitee.com/tboox/xmake-repo.git"
+            },
+            version = "0.22.3"
         },
         ["libjpeg#31fecfc4"] = {
             repo = {
@@ -308,6 +348,14 @@
                 url = "https://gitee.com/tboox/xmake-repo.git"
             },
             version = "1.12.1"
+        },
+        ["pixman#31fecfc4"] = {
+            repo = {
+                branch = "master",
+                commit = "c406b5487b71cbbdd7487b432e2d962409663cbe",
+                url = "https://gitee.com/tboox/xmake-repo.git"
+            },
+            version = "0.46.2"
         },
         ["pkgconf#31fecfc4"] = {
             repo = {

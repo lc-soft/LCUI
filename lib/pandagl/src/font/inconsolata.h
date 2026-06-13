@@ -1,7 +1,7 @@
 ﻿/*
  * lib/pandagl/src/font/inconsolata.h
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -9,4 +9,5 @@
  * LICENSE.TXT file in the root directory of this source tree.
  */
 
-int pd_render_inconsolata_font_bitmap(pd_glyph_bitmap_t *bmp, unsigned ch, int size);
+int pd_render_inconsolata_font_bitmap(pd_glyph_bitmap_t *bmp, unsigned ch,
+                                      int size);

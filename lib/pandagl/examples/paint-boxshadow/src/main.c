@@ -1,17 +1,21 @@
-/*
+﻿/*
  * lib/pandagl/examples/paint-boxshadow/src/main.c
  *
- * Copyright (c) 2023, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c)
+ * 2023-2026, Liu Chao <i@lc-soft.io> All rights reserved.
+ *
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+ * This file is part of LCUI, distributed
+ * under the MIT License found in the
+ * LICENSE.TXT file in the root directory
+ * of this source tree.
  */
 
 #include <pandagl.h>
 
-int paint_background(pd_context_t* ctx, pd_rect_t* box)
+int paint_background(pd_context_t *ctx, pd_rect_t *box)
 {
         pd_canvas_t image;
         pd_color_t green = pd_rgb(102, 204, 0);
@@ -32,7 +36,7 @@ int paint_background(pd_context_t* ctx, pd_rect_t* box)
         return 0;
 }
 
-void paint_border(pd_context_t* ctx, pd_rect_t* box, int size, int radius)
+void paint_border(pd_context_t *ctx, pd_rect_t *box, int size, int radius)
 {
         pd_border_t border = { 0 };
         pd_color_t black = pd_rgb(0, 0, 0);
@@ -79,7 +83,7 @@ int main(void)
         pd_rect_t border_box;
         pd_rect_t bg_box;
         pd_rect_t layer_rect;
-        pd_context_t* ctx;
+        pd_context_t *ctx;
 
         pd_canvas_init(&canvas);
         pd_canvas_create(&canvas, width, height);

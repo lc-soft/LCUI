@@ -1,45 +1,48 @@
 ﻿/*
  * lib/css/src/properties/justify_content.c
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026,
+ * Liu Chao <hello@lcui.dev> All rights reserved.
  *
- * SPDX-License-Identifier: MIT
+ * SPDX-License-Identifier:
+ * MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
+ * This file is part of LCUI, distributed under the MIT License found
+ * in the
  * LICENSE.TXT file in the root directory of this source tree.
  */
 
 #include "../properties.h"
 
 int css_cascade_justify_content(const css_style_array_value_t input,
-				css_computed_style_t* computed)
+                                css_computed_style_t *computed)
 {
-	uint8_t value = CSS_JUSTIFY_CONTENT_FLEX_START;
+        uint8_t value = CSS_JUSTIFY_CONTENT_FLEX_START;
 
-	switch (input[0].keyword_value) {
-	case CSS_KEYWORD_CENTER:
-		value = CSS_JUSTIFY_CONTENT_CENTER;
-		break;
-	case CSS_KEYWORD_LEFT:
-	case CSS_KEYWORD_FLEX_START:
-		value = CSS_JUSTIFY_CONTENT_FLEX_START;
-		break;
-	case CSS_KEYWORD_RIGHT:
-	case CSS_KEYWORD_FLEX_END:
-		value = CSS_JUSTIFY_CONTENT_FLEX_END;
-		break;
-	case CSS_KEYWORD_SPACE_AROUND:
-		value = CSS_JUSTIFY_CONTENT_SPACE_AROUND;
-		break;
-	case CSS_KEYWORD_SPACE_BETWEEN:
-		value = CSS_JUSTIFY_CONTENT_SPACE_BETWEEN;
-		break;
-	case CSS_KEYWORD_SPACE_EVENLY:
-		value = CSS_JUSTIFY_CONTENT_SPACE_EVENLY;
-		break;
-	default:
-		break;
-	}
-	computed->type_bits.justify_content = value;
-	return 0;
+        switch (input[0].keyword_value) {
+        case CSS_KEYWORD_CENTER:
+                value = CSS_JUSTIFY_CONTENT_CENTER;
+                break;
+        case CSS_KEYWORD_LEFT:
+        case CSS_KEYWORD_FLEX_START:
+                value = CSS_JUSTIFY_CONTENT_FLEX_START;
+                break;
+        case CSS_KEYWORD_RIGHT:
+        case CSS_KEYWORD_FLEX_END:
+                value = CSS_JUSTIFY_CONTENT_FLEX_END;
+                break;
+        case CSS_KEYWORD_SPACE_AROUND:
+                value = CSS_JUSTIFY_CONTENT_SPACE_AROUND;
+                break;
+        case CSS_KEYWORD_SPACE_BETWEEN:
+                value = CSS_JUSTIFY_CONTENT_SPACE_BETWEEN;
+                break;
+        case CSS_KEYWORD_SPACE_EVENLY:
+                value = CSS_JUSTIFY_CONTENT_SPACE_EVENLY;
+                break;
+        default:
+                break;
+        }
+        computed->type_bits.justify_content = value;
+        return 0;
 }

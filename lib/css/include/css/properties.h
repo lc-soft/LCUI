@@ -1,12 +1,15 @@
 ﻿/*
  * lib/css/include/css/properties.h
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao
+ * <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+
+ * * This file is part of LCUI, distributed under the MIT License found in the
+
+ * * LICENSE.TXT file in the root directory of this source tree.
  */
 
 #ifndef LIBCSS_INCLUDE_CSS_PROPERTIES_H
@@ -17,10 +20,9 @@
 
 LIBCSS_BEGIN_DECLS
 
-LIBCSS_PUBLIC int css_register_property(const char *name, const char *syntax,
-				   const char *initial_value,
-				   int (*cascade)(const css_style_array_value_t,
-						  css_computed_style_t *));
+LIBCSS_PUBLIC int css_register_property(
+    const char *name, const char *syntax, const char *initial_value,
+    int (*cascade)(const css_style_array_value_t, css_computed_style_t *));
 
 LIBCSS_PUBLIC int css_register_shorthand_property(
     const char *name, const char *syntax,

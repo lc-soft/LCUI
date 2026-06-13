@@ -1,7 +1,7 @@
 /*
  * tests/cases/test_font_face.c
  *
- * Copyright (c) 2023-2026, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -18,7 +18,6 @@ void test_font_face(void)
         ctest_equal_int("should load CSS file containing @font-face",
                         ui_load_css_file("test_font_face.css"), 0);
         ctest_equal_bool("should resolve font registered via @font-face",
-                         pd_font_get_id("icomoon", 0, 0) > 0,
-                         true);
+                         pd_font_get_id("icomoon", 0, 0) > 0, true);
         ui_destroy();
 }

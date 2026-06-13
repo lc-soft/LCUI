@@ -1,12 +1,15 @@
 ﻿/*
  * lib/ui/include/ui/base.h
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao
+ * <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+
+ * * This file is part of LCUI, distributed under the MIT License found in the
+
+ * * LICENSE.TXT file in the root directory of this source tree.
  */
 
 #ifndef LIB_UI_INCLUDE_UI_BASE_H
@@ -88,8 +91,8 @@ LIBUI_PUBLIC int ui_widget_unlink(ui_widget_t *w);
 LIBUI_PUBLIC ui_widget_t *ui_widget_prev(ui_widget_t *w);
 LIBUI_PUBLIC ui_widget_t *ui_widget_next(ui_widget_t *w);
 LIBUI_PUBLIC ui_widget_t *ui_widget_get_child(ui_widget_t *w, size_t index);
-LIBUI_PUBLIC size_t ui_widget_each(ui_widget_t *w,
-                                   ui_widget_cb callback, void *arg);
+LIBUI_PUBLIC size_t ui_widget_each(ui_widget_t *w, ui_widget_cb callback,
+                                   void *arg);
 LIBUI_PUBLIC ui_widget_t *ui_widget_at(ui_widget_t *widget, int ix, int iy);
 LIBUI_PUBLIC void ui_print_tree(ui_widget_t *w);
 
@@ -98,7 +101,8 @@ LIBUI_PUBLIC void ui_print_tree(ui_widget_t *w);
 LIBUI_PUBLIC bool ui_widget_is_visible(ui_widget_t *w);
 LIBUI_PUBLIC void ui_widget_move(ui_widget_t *w, float left, float top);
 LIBUI_PUBLIC void ui_widget_resize(ui_widget_t *w, float width, float height);
-LIBUI_PUBLIC void ui_widget_set_background_image_url(ui_widget_t *w, const char *path);
+LIBUI_PUBLIC void ui_widget_set_background_image_url(ui_widget_t *w,
+                                                     const char *path);
 LIBUI_PUBLIC void ui_widget_show(ui_widget_t *w);
 LIBUI_PUBLIC void ui_widget_hide(ui_widget_t *w);
 LIBUI_PUBLIC ui_widget_t *ui_widget_get_closest(ui_widget_t *w,
@@ -124,8 +128,8 @@ LIBUI_PUBLIC void ui_widget_reset_width(ui_widget_t *w);
 
 LIBUI_PUBLIC void ui_widget_reset_height(ui_widget_t *w);
 
-LIBUI_PUBLIC void ui_widget_compute_size(ui_widget_t *w, float *width, float *height);
-
+LIBUI_PUBLIC void ui_widget_compute_size(ui_widget_t *w, float *width,
+                                         float *height);
 
 LIBUI_PUBLIC void ui_widget_reflow_if_width_changed(ui_widget_t *w);
 LIBUI_PUBLIC void ui_widget_reflow_if_height_changed(ui_widget_t *w);

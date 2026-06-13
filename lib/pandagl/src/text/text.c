@@ -1,12 +1,15 @@
 ﻿/*
  * lib/pandagl/src/text/text.c
  *
- * Copyright (c) 2018-2026, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2018-2026, Liu Chao
+ * <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+
+ * * This file is part of LCUI, distributed under the MIT License found in the
+
+ * * LICENSE.TXT file in the root directory of this source tree.
  */
 
 #include <stdlib.h>
@@ -164,11 +167,11 @@ void pd_text_line_erase(pd_text_line_t *line, int start, int end)
         }
 }
 
-/* 将 src 行 [src_start, src_end) 的字符所有权转移到 dst 行的 dst_start 起始位置。
- * 转移后 src 对应槽位被置 NULL，防止 delete_line 时被重复释放。
+/* 将 src 行 [src_start, src_end) 的字符所有权转移到 dst 行的 dst_start
+ * 起始位置。 转移后 src 对应槽位被置 NULL，防止 delete_line 时被重复释放。
  * 调用者负责保证 dst 已有足够容量。 */
-void pd_text_line_move(pd_text_line_t *dst, int dst_start,
-                              pd_text_line_t *src, int src_start, int src_end)
+void pd_text_line_move(pd_text_line_t *dst, int dst_start, pd_text_line_t *src,
+                       int src_start, int src_end)
 {
         int i, j;
 
@@ -181,8 +184,7 @@ void pd_text_line_move(pd_text_line_t *dst, int dst_start,
         }
 }
 
-int pd_text_line_insert(pd_text_line_t *line, int offset,
-                               pd_char_t *txtchar)
+int pd_text_line_insert(pd_text_line_t *line, int offset, pd_char_t *txtchar)
 {
         size_t i, insert_index;
 
@@ -205,7 +207,7 @@ int pd_text_line_insert(pd_text_line_t *line, int offset,
 }
 
 int pd_text_line_insert_copy(pd_text_line_t *line, int ins_pos,
-                                    pd_char_t *txtchar)
+                             pd_char_t *txtchar)
 {
         pd_char_t *txtchar2;
         txtchar2 = malloc(sizeof(pd_char_t));
@@ -343,7 +345,7 @@ void pd_text_request_typeset(pd_text_t *text, int start_line)
 
 /** 获取指定文本行中的文本段的矩形区域 */
 int pd_text_get_line_rect(pd_text_t *text, int line_num, int start_col,
-                                 int end_col, pd_rect_t *rect)
+                          int end_col, pd_rect_t *rect)
 {
         int i;
         pd_text_line_t *line;
@@ -388,8 +390,7 @@ int pd_text_get_line_rect(pd_text_t *text, int line_num, int start_col,
         return 0;
 }
 
-void pd_text_mark_line_dirty(pd_text_t *text, int line_num, int start,
-                                    int end)
+void pd_text_mark_line_dirty(pd_text_t *text, int line_num, int start, int end)
 {
         pd_rect_t rect;
         if (pd_text_get_line_rect(text, line_num, start, end, &rect) == 0) {

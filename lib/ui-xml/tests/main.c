@@ -1,4 +1,4 @@
-/*
+﻿/*
  * lib/ui-xml/tests/main.c
  *
  * Copyright (c) 2026, Liu Chao <i@lc-soft.io> All rights reserved.

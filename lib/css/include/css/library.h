@@ -1,12 +1,15 @@
 ﻿/*
  * lib/css/include/css/library.h: -- CSS library operation module.
  *
- * Copyright (c) 2022-2025, Liu chao <lc-soft@live.cn> All rights reserved.
- *
+ * Copyright (c) 2022-2026, Liu chao <lc-soft@live.cn> All rights reserved.
+
+ * *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+ * This file is part of LCUI,
+ * distributed under the MIT License found in the
+ * LICENSE.TXT file in the
+ * root directory of this source tree.
  */
 
 #ifndef LIBCSS_INCLUDE_CSS_LIBRARY_H

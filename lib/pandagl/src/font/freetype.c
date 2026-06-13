@@ -1,12 +1,15 @@
 ﻿/*
- * lib/pandagl/src/font/freetype.c: -- The FreeType font-engine support module.
- *
- * Copyright (c) 2018-2025, Liu chao <lc-soft@live.cn> All rights reserved.
+ * lib/pandagl/src/font/freetype.c: -- The FreeType font-engine support
+ * module. 
+ * Copyright (c) 2018-2026, Liu chao <lc-soft@live.cn> All rights
+ * reserved.
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+ * This file is part of LCUI,
+ * distributed under the MIT License found in the
+ * LICENSE.TXT file in the
+ * root directory of this source tree.
  */
 
 #include <pandagl.h>
@@ -26,184 +29,186 @@
 #define LCUI_FONT_LOAD_FALGS (FT_LOAD_RENDER | FT_LOAD_FORCE_AUTOHINT)
 
 static struct {
-	FT_Library library;
+        FT_Library library;
 } freetype;
 
 static int pd_freetype_open(const char *filepath, pd_font_face_t ***outfonts)
 {
-	FT_Face face;
-	pd_font_face_t *font, **fonts;
-	int i, err, num_faces;
+        FT_Face face;
+        pd_font_face_t *font, **fonts;
+        int i, err, num_faces;
 
-	err = FT_New_Face(freetype.library, filepath, -1, &face);
-	if (err) {
-		*outfonts = NULL;
-		return -1;
-	}
-	num_faces = face->num_faces;
-	FT_Done_Face(face);
-	if (num_faces < 1) {
-		return 0;
-	}
-	fonts = malloc(sizeof(pd_font_face_t *) * num_faces);
-	if (!fonts) {
-		return -ENOMEM;
-	}
-	for (i = 0; i < num_faces; ++i) {
-		err = FT_New_Face(freetype.library, filepath, i, &face);
-		if (err) {
-			fonts[i] = NULL;
-			continue;
-		}
-		FT_Select_Charmap(face, FT_ENCODING_UNICODE);
-		font = pd_font_face_create(face->family_name, face->style_name);
-		font->data = face;
-		fonts[i] = font;
-	}
-	*outfonts = fonts;
-	return num_faces;
+        err = FT_New_Face(freetype.library, filepath, -1, &face);
+        if (err) {
+                *outfonts = NULL;
+                return -1;
+        }
+        num_faces = face->num_faces;
+        FT_Done_Face(face);
+        if (num_faces < 1) {
+                return 0;
+        }
+        fonts = malloc(sizeof(pd_font_face_t *) * num_faces);
+        if (!fonts) {
+                return -ENOMEM;
+        }
+        for (i = 0; i < num_faces; ++i) {
+                err = FT_New_Face(freetype.library, filepath, i, &face);
+                if (err) {
+                        fonts[i] = NULL;
+                        continue;
+                }
+                FT_Select_Charmap(face, FT_ENCODING_UNICODE);
+                font = pd_font_face_create(face->family_name, face->style_name);
+                font->data = face;
+                fonts[i] = font;
+        }
+        *outfonts = fonts;
+        return num_faces;
 }
 
 static void pd_freetype_close(void *face)
 {
-	FT_Done_Face(face);
+        FT_Done_Face(face);
 }
 
 /** 转换 FT_GlyphSlot 类型数据为 pd_glyph_bitmap_t */
 static size_t convert_glyph(pd_glyph_bitmap_t *bmp, FT_GlyphSlot slot, int mode)
 {
-	int error;
-	size_t size;
-	FT_BitmapGlyph bitmap_glyph;
-	FT_Glyph glyph;
+        int error;
+        size_t size;
+        FT_BitmapGlyph bitmap_glyph;
+        FT_Glyph glyph;
 
-	/* 从字形槽中提取一个字形图像
-	 * 请注意，创建的FT_Glyph对象必须与FT_Done_Glyph成对使用 */
-	error = FT_Get_Glyph(slot, &glyph);
-	if (error) {
-		return -1;
-	}
-	/*---------------------- 打印字体信息 --------------------------
-	LOG(" width= %ld,  met->height= %ld\n"
-	"horiBearingX = %ld, horiBearingY = %ld, horiAdvance = %ld\n"
-	"vertBearingX = %ld, vertBearingY = %ld,  vertAdvance = %ld\n",
-	slot->metrics.width>>6, slot->metrics.height>>6,
-	slot->metrics.horiBearingX>>6, slot->metrics.horiBearingY>>6,
-	slot->metrics.horiAdvance>>6, slot->metrics.vertBearingX>>6,
-	slot->metrics.vertBearingY>>6, slot->metrics.vertAdvance>>6 );
-	------------------------------------------------------------*/
-	if (glyph->format != FT_GLYPH_FORMAT_BITMAP) {
-		error = FT_Glyph_To_Bitmap(&glyph, mode, 0, 1);
-		if (error) {
-			return -1;
-		}
-	}
-	bitmap_glyph = (FT_BitmapGlyph)glyph;
-	/*
-	 * FT_Glyph_Metrics结构体中保存字形度量，通过face->glyph->metrics结
-	 * 构访问，可得到字形的宽、高、左边界距、上边界距、水平跨距等等。
-	 * 注意：因为不是所有的字体都包含垂直度量，当FT_HAS_VERTICAL为假时，
-	 * vertBearingX，vertBearingY和vertAdvance的值是不可靠的，目前暂不考虑
-	 * 此情况的处理。
-	 * */
-	bmp->top = bitmap_glyph->top;
-	bmp->left = bitmap_glyph->left;
-	bmp->rows = bitmap_glyph->bitmap.rows;
-	bmp->width = bitmap_glyph->bitmap.width;
-	bmp->pitch = bmp->width * sizeof(uint8_t);
-	bmp->metrics.ascender = slot->face->size->metrics.ascender >> 6;
-	bmp->metrics.bbox_width = slot->face->size->metrics.max_advance >> 6;
-	bmp->metrics.bbox_height = slot->face->size->metrics.height >> 6;
-	bmp->metrics.hori_advance = slot->metrics.horiAdvance >> 6; /* 水平跨距 */
-	bmp->metrics.vert_advance = slot->metrics.vertAdvance >> 6; /* 垂直跨距 */
-	/* 分配内存，用于保存字体位图 */
-	size = bmp->rows * bmp->pitch;
-	bmp->buffer = (uint8_t *)malloc(size);
-	if (!bmp->buffer) {
-		FT_Done_Glyph(glyph);
-		return -1;
-	}
+        /* 从字形槽中提取一个字形图像
+         * 请注意，创建的FT_Glyph对象必须与FT_Done_Glyph成对使用 */
+        error = FT_Get_Glyph(slot, &glyph);
+        if (error) {
+                return -1;
+        }
+        /*---------------------- 打印字体信息 --------------------------
+        LOG(" width= %ld,  met->height= %ld\n"
+        "horiBearingX = %ld, horiBearingY = %ld, horiAdvance = %ld\n"
+        "vertBearingX = %ld, vertBearingY = %ld,  vertAdvance = %ld\n",
+        slot->metrics.width>>6, slot->metrics.height>>6,
+        slot->metrics.horiBearingX>>6, slot->metrics.horiBearingY>>6,
+        slot->metrics.horiAdvance>>6, slot->metrics.vertBearingX>>6,
+        slot->metrics.vertBearingY>>6, slot->metrics.vertAdvance>>6 );
+        ------------------------------------------------------------*/
+        if (glyph->format != FT_GLYPH_FORMAT_BITMAP) {
+                error = FT_Glyph_To_Bitmap(&glyph, mode, 0, 1);
+                if (error) {
+                        return -1;
+                }
+        }
+        bitmap_glyph = (FT_BitmapGlyph)glyph;
+        /*
+         * FT_Glyph_Metrics结构体中保存字形度量，通过face->glyph->metrics结
+         * 构访问，可得到字形的宽、高、左边界距、上边界距、水平跨距等等。
+         * 注意：因为不是所有的字体都包含垂直度量，当FT_HAS_VERTICAL为假时，
+         * vertBearingX，vertBearingY和vertAdvance的值是不可靠的，目前暂不考虑
+         * 此情况的处理。
+         * */
+        bmp->top = bitmap_glyph->top;
+        bmp->left = bitmap_glyph->left;
+        bmp->rows = bitmap_glyph->bitmap.rows;
+        bmp->width = bitmap_glyph->bitmap.width;
+        bmp->pitch = bmp->width * sizeof(uint8_t);
+        bmp->metrics.ascender = slot->face->size->metrics.ascender >> 6;
+        bmp->metrics.bbox_width = slot->face->size->metrics.max_advance >> 6;
+        bmp->metrics.bbox_height = slot->face->size->metrics.height >> 6;
+        bmp->metrics.hori_advance =
+            slot->metrics.horiAdvance >> 6; /* 水平跨距 */
+        bmp->metrics.vert_advance =
+            slot->metrics.vertAdvance >> 6; /* 垂直跨距 */
+        /* 分配内存，用于保存字体位图 */
+        size = bmp->rows * bmp->pitch;
+        bmp->buffer = (uint8_t *)malloc(size);
+        if (!bmp->buffer) {
+                FT_Done_Glyph(glyph);
+                return -1;
+        }
 
-	switch (bitmap_glyph->bitmap.pixel_mode) {
-		/* 8位灰度位图，直接拷贝 */
-	case FT_PIXEL_MODE_GRAY:
-		memcpy(bmp->buffer, bitmap_glyph->bitmap.buffer, size);
-		break;
-		/* 单色点阵图，需要转换 */
-	case FT_PIXEL_MODE_MONO: {
-		FT_Bitmap bitmap;
-		FT_Int x, y;
-		uint8_t *bit_ptr, *byte_ptr;
+        switch (bitmap_glyph->bitmap.pixel_mode) {
+                /* 8位灰度位图，直接拷贝 */
+        case FT_PIXEL_MODE_GRAY:
+                memcpy(bmp->buffer, bitmap_glyph->bitmap.buffer, size);
+                break;
+                /* 单色点阵图，需要转换 */
+        case FT_PIXEL_MODE_MONO: {
+                FT_Bitmap bitmap;
+                FT_Int x, y;
+                uint8_t *bit_ptr, *byte_ptr;
 
-		FT_Bitmap_New(&bitmap);
-		/* 转换位图bitmap_glyph->bitmap至bitmap，1个像素占1个字节 */
-		FT_Bitmap_Convert(freetype.library, &bitmap_glyph->bitmap,
-				  &bitmap, 1);
-		bit_ptr = bitmap.buffer;
-		byte_ptr = bmp->buffer;
-		for (y = 0; y < bmp->rows; ++y) {
-			for (x = 0; x < bmp->width; ++x) {
-				*byte_ptr = *bit_ptr ? 255 : 0;
-				++byte_ptr, ++bit_ptr;
-			}
-		}
-		FT_Bitmap_Done(freetype.library, &bitmap);
-		break;
-	}
-	/* 其它像素模式的位图，暂时先直接填充255，等需要时再完善 */
-	default:
-		memset(bmp->buffer, 255, size);
-		break;
-	}
-	FT_Done_Glyph(glyph);
-	return size;
+                FT_Bitmap_New(&bitmap);
+                /* 转换位图bitmap_glyph->bitmap至bitmap，1个像素占1个字节 */
+                FT_Bitmap_Convert(freetype.library, &bitmap_glyph->bitmap,
+                                  &bitmap, 1);
+                bit_ptr = bitmap.buffer;
+                byte_ptr = bmp->buffer;
+                for (y = 0; y < bmp->rows; ++y) {
+                        for (x = 0; x < bmp->width; ++x) {
+                                *byte_ptr = *bit_ptr ? 255 : 0;
+                                ++byte_ptr, ++bit_ptr;
+                        }
+                }
+                FT_Bitmap_Done(freetype.library, &bitmap);
+                break;
+        }
+        /* 其它像素模式的位图，暂时先直接填充255，等需要时再完善 */
+        default:
+                memset(bmp->buffer, 255, size);
+                break;
+        }
+        FT_Done_Glyph(glyph);
+        return size;
 }
 
 static int pd_freetype_render(pd_glyph_bitmap_t *bmp, unsigned ch,
-			      int pixel_size, pd_font_face_t *font)
+                              int pixel_size, pd_font_face_t *font)
 {
-	int ret = 0;
-	FT_UInt index;
-	FT_Face ft_face = (FT_Face)font->data;
+        int ret = 0;
+        FT_UInt index;
+        FT_Face ft_face = (FT_Face)font->data;
 
-	/* 设定字体尺寸 */
-	FT_Set_Pixel_Sizes(ft_face, 0, pixel_size);
-	index = FT_Get_Char_Index(ft_face, ch);
-	if (index == 0) {
-		ret = -1;
-	}
-	/* 载入该字的字形数据 */
-	if (FT_Load_Glyph(ft_face, index, LCUI_FONT_LOAD_FALGS) != 0) {
-		return -2;
-	}
-	convert_glyph(bmp, ft_face->glyph, LCUI_FONT_RENDER_MODE);
-	return ret;
+        /* 设定字体尺寸 */
+        FT_Set_Pixel_Sizes(ft_face, 0, pixel_size);
+        index = FT_Get_Char_Index(ft_face, ch);
+        if (index == 0) {
+                ret = -1;
+        }
+        /* 载入该字的字形数据 */
+        if (FT_Load_Glyph(ft_face, index, LCUI_FONT_LOAD_FALGS) != 0) {
+                return -2;
+        }
+        convert_glyph(bmp, ft_face->glyph, LCUI_FONT_RENDER_MODE);
+        return ret;
 }
 
 static unsigned pd_freetype_get_glyph_index(pd_font_face_t *font, unsigned ch)
 {
-	FT_Face ft_face = (FT_Face)font->data;
+        FT_Face ft_face = (FT_Face)font->data;
 
-	return FT_Get_Char_Index(ft_face, ch);
+        return FT_Get_Char_Index(ft_face, ch);
 }
 
 int pd_freetype_engine_init(pd_font_engine_t *engine)
 {
-	if (FT_Init_FreeType(&freetype.library)) {
-		return -1;
-	}
-	strcpy(engine->name, "FreeType");
-	engine->render = pd_freetype_render;
-	engine->open = pd_freetype_open;
-	engine->close = pd_freetype_close;
-	engine->get_glyph_index = pd_freetype_get_glyph_index;
-	return 0;
+        if (FT_Init_FreeType(&freetype.library)) {
+                return -1;
+        }
+        strcpy(engine->name, "FreeType");
+        engine->render = pd_freetype_render;
+        engine->open = pd_freetype_open;
+        engine->close = pd_freetype_close;
+        engine->get_glyph_index = pd_freetype_get_glyph_index;
+        return 0;
 }
 
 int pd_freetype_engine_destroy(void)
 {
-	FT_Done_FreeType(freetype.library);
-	return 0;
+        FT_Done_FreeType(freetype.library);
+        return 0;
 }
 
 #endif

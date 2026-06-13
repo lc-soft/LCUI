@@ -1,12 +1,15 @@
 ﻿/*
  * src/widgets/scrollarea.c
  *
- * Copyright (c) 2024-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2024-2026, Liu Chao
+ * <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+
+ * * This file is part of LCUI, distributed under the MIT License found in the
+
+ * * LICENSE.TXT file in the root directory of this source tree.
  */
 
 #include <ui.h>
@@ -34,7 +37,7 @@ typedef struct ui_scrollarea_content {
 static ui_widget_prototype_t *ui_scrollarea_proto;
 static ui_widget_prototype_t *ui_scrollarea_content_proto;
 
-static const char *ui_scrollarea_css ="\
+static const char *ui_scrollarea_css = "\
 scrollarea-content {\
     min-width: min-content;\
 }";

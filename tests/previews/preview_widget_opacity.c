@@ -1,7 +1,7 @@
 /*
  * tests/previews/preview_widget_opacity.c
  *
- * Copyright (c) 2026, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2026, Liu Chao <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *

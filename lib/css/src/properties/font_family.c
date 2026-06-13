@@ -1,11 +1,14 @@
 ﻿/*
  * lib/css/src/properties/font_family.c
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu
+ * Chao <hello@lcui.dev> All rights reserved.
  *
- * SPDX-License-Identifier: MIT
+ * SPDX-License-Identifier:
+ * MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
+ * This file is part of LCUI, distributed under the MIT License found
+ * in the
  * LICENSE.TXT file in the root directory of this source tree.
  */
 
@@ -13,11 +16,11 @@
 #include "./helpers.h"
 
 int css_cascade_font_family(const css_style_array_value_t input,
-                            css_computed_style_t* computed)
+                            css_computed_style_t *computed)
 {
-        char* str;
+        char *str;
         unsigned i, len;
-	size_t str_len;
+        size_t str_len;
         const css_style_array_value_t arr = input[0].array_value;
 
         computed->font_family = NULL;
@@ -29,7 +32,7 @@ int css_cascade_font_family(const css_style_array_value_t input,
         if (len < 1) {
                 return -1;
         }
-        computed->font_family = malloc(sizeof(char*) * (len + 1));
+        computed->font_family = malloc(sizeof(char *) * (len + 1));
         for (i = 0; i < len; ++i) {
                 assert(arr[i].type == CSS_STRING_VALUE);
                 str = arr[i].string_value;

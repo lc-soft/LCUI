@@ -1,12 +1,15 @@
 ﻿/*
  * lib/ui/src/ui_image.c
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao
+ * <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+
+ * * This file is part of LCUI, distributed under the MIT License found in the
+
+ * * LICENSE.TXT file in the root directory of this source tree.
  */
 
 #include <stdio.h>
@@ -144,7 +147,7 @@ void ui_image_destroy(ui_image_t *image)
 }
 
 bool ui_image_add_event_listener(ui_image_t *image, ui_image_event_type_t type,
-                                ui_image_event_handler_t handler, void *data)
+                                 ui_image_event_handler_t handler, void *data)
 {
         ui_image_event_t ev = { .type = type, .image = image, .data = data };
         ui_image_event_listener_t *listener;
@@ -168,8 +171,9 @@ bool ui_image_add_event_listener(ui_image_t *image, ui_image_event_type_t type,
 }
 
 bool ui_image_remove_event_listener(ui_image_t *image,
-                                   ui_image_event_type_t type,
-                                   ui_image_event_handler_t handler, void *data)
+                                    ui_image_event_type_t type,
+                                    ui_image_event_handler_t handler,
+                                    void *data)
 {
         list_node_t *node, *next;
         ui_image_source_t *src = (ui_image_source_t *)image;

@@ -1,12 +1,15 @@
 ﻿/*
  * lib/css/src/selector.c
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao
+ * <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+
+ * * This file is part of LCUI, distributed under the MIT License found in the
+
+ * * LICENSE.TXT file in the root directory of this source tree.
  */
 
 #include <stdio.h>
@@ -36,10 +39,10 @@ enum css_selector_name_finder_level {
 
 /* 样式表查找器的上下文数据结构 */
 typedef struct css_selector_name_collector {
-        int level;    /**< 当前选择器层级 */
-        int class_i;  /**< 当前处理到第几个类名 */
-        int status_i; /**< 当前处理到第几个状态名（伪类名） */
-        int name_i;   /**< 选择器名称从第几个字符开始 */
+        int level;                 /**< 当前选择器层级 */
+        int class_i;               /**< 当前处理到第几个类名 */
+        int status_i;              /**< 当前处理到第几个状态名（伪类名） */
+        int name_i;                /**< 选择器名称从第几个字符开始 */
         char name[MAX_NAME_LEN];   /**< 选择器名称缓存 */
         css_selector_node_t *node; /**< 针对的选择器结点 */
 } css_selector_name_collector_t;
@@ -111,7 +114,8 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder,
                 for (i = 0; sfinder->node->classes[i]; ++i) {
                         sfinder->level += 1;
                         sfinder->class_i = i;
-                        snprintf(fullname + len, avail - len, "%s", sfinder->node->classes[i]);
+                        snprintf(fullname + len, avail - len, "%s",
+                                 sfinder->node->classes[i]);
                         list_append(list, strdup2(fullname));
                         /* 将当前选择器名与其它层级的选择器名组合 */
                         while (sfinder->level < LEVEL_TOTAL_NUM) {
@@ -460,7 +464,7 @@ css_selector_t *css_selector_create(const char *selector)
                                 break;
                         }
                 }
-		escape = false;
+                escape = false;
                 if (!name_valid) {
                         type = 0;
                         name_valid = true;

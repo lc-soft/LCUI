@@ -1,11 +1,14 @@
 ﻿/*
  * lib/pandagl/examples/cairo/src/main.c
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu
+ * Chao <i@lc-soft.io> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
- *
- * This file is part of LCUI, distributed under the MIT License found in the
+
+ * *
+ * This file is part of LCUI, distributed under the MIT License found in
+ * the
  * LICENSE.TXT file in the root directory of this source tree.
  */
 
@@ -16,12 +19,12 @@
 
 // Source code from: https://www.cairographics.org/samples/text_align_center/
 
-void draw_cairo_text(cairo_surface_t* surface)
+void draw_cairo_text(cairo_surface_t *surface)
 {
-        cairo_t* cr;
+        cairo_t *cr;
         cairo_text_extents_t extents;
 
-        const char* utf8 = "cairo";
+        const char *utf8 = "cairo";
         double x, y;
 
         cr = cairo_create(surface);
@@ -50,10 +53,10 @@ void draw_cairo_text(cairo_surface_t* surface)
         cairo_destroy(cr);
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
         pd_canvas_t canvas;
-        cairo_surface_t* surface;
+        cairo_surface_t *surface;
 
         // Create a canvas
         pd_canvas_init(&canvas);

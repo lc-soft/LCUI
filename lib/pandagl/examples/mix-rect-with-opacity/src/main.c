@@ -1,12 +1,16 @@
-/*
+﻿/*
  * lib/pandagl/examples/mix-rect-with-opacity/src/main.c
  *
- * Copyright (c) 2023, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c)
+ * 2023-2026, Liu Chao <i@lc-soft.io> All rights reserved.
+ *
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+ * This file is part of LCUI, distributed
+ * under the MIT License found in the
+ * LICENSE.TXT file in the root directory
+ * of this source tree.
  */
 
 #include <pandagl.h>
@@ -39,8 +43,8 @@ int main(void)
                 size = 2 * (10 + 10 * i);
                 pd_canvas_create(&fore_canvas, size, size);
                 pd_canvas_fill(&fore_canvas, pd_rgb(255, 255, 255));
-                pd_canvas_mix(&canvas, &fore_canvas, 75 - size / 2, 75 - size / 2,
-                          false);
+                pd_canvas_mix(&canvas, &fore_canvas, 75 - size / 2,
+                              75 - size / 2, false);
         }
         pd_write_png_file("test_mix_rect_with_opacity.png", &canvas);
         pd_canvas_destroy(&fore_canvas);

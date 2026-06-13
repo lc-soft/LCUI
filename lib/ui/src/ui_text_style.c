@@ -1,12 +1,15 @@
 ﻿/*
  * lib/ui/src/ui_text_style.c: -- CSS font style parse and operation set.
  *
- * Copyright (c) 2018-2025, Liu chao <lc-soft@live.cn> All rights reserved.
- *
+ * Copyright (c) 2018-2026, Liu chao <lc-soft@live.cn> All rights reserved.
+
+ * *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+ * This file is part of LCUI,
+ * distributed under the MIT License found in the
+ * LICENSE.TXT file in the
+ * root directory of this source tree.
  */
 
 #include <string.h>
@@ -223,8 +226,7 @@ void ui_compute_text_style(ui_text_style_t *fs,
                 fs->font_ids = NULL;
         }
         if (style->font_family) {
-                pd_font_query(&fs->font_ids, fs->font_style,
-                                      fs->font_weight,
-                                      (const char *const *)style->font_family);
+                pd_font_query(&fs->font_ids, fs->font_style, fs->font_weight,
+                              (const char *const *)style->font_family);
         }
 }

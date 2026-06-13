@@ -1,12 +1,16 @@
-/*
+﻿/*
  * lib/pandagl/examples/paint-background/src/main.c
  *
- * Copyright (c) 2023, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c)
+ * 2023-2026, Liu Chao <i@lc-soft.io> All rights reserved.
+ *
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+ * This file is part of LCUI, distributed
+ * under the MIT License found in the
+ * LICENSE.TXT file in the root directory
+ * of this source tree.
  */
 
 #include <pandagl.h>
@@ -18,7 +22,7 @@ int test_paint_background_color(void)
         pd_color_t green = pd_rgb(102, 204, 0);
         pd_rect_t rect = { 200, 100, 400, 300 };
         pd_background_t bg = { 0 };
-        pd_context_t* ctx;
+        pd_context_t *ctx;
 
         pd_canvas_init(&canvas);
         pd_canvas_create(&canvas, 800, 600);
@@ -40,7 +44,7 @@ int test_paint_background_image(void)
         pd_color_t green = pd_rgb(102, 204, 0);
         pd_rect_t rect = { 200, 100, 400, 300 };
         pd_background_t bg = { 0 };
-        pd_context_t* ctx;
+        pd_context_t *ctx;
 
         pd_canvas_init(&canvas);
         pd_canvas_init(&image);
@@ -70,7 +74,7 @@ int test_paint_background_image_with_size(void)
         pd_color_t green = pd_rgb(102, 204, 0);
         pd_rect_t rect = { 200, 100, 400, 300 };
         pd_background_t bg = { 0 };
-        pd_context_t* ctx;
+        pd_context_t *ctx;
 
         pd_canvas_init(&canvas);
         pd_canvas_init(&image);
@@ -100,7 +104,7 @@ int test_paint_background_image_with_position(void)
         pd_color_t green = pd_rgb(102, 204, 0);
         pd_rect_t rect = { 200, 100, 400, 300 };
         pd_background_t bg = { 0 };
-        pd_context_t* ctx;
+        pd_context_t *ctx;
 
         pd_canvas_init(&canvas);
         pd_canvas_init(&image);
