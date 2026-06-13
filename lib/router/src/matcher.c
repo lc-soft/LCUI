@@ -1,12 +1,15 @@
 ﻿/*
  * lib/router/src/matcher.c
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao
+ * <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+
+ * * This file is part of LCUI, distributed under the MIT License found in the
+
+ * * LICENSE.TXT file in the root directory of this source tree.
  */
 
 #include "private.h"
@@ -172,9 +175,9 @@ bool router_matcher_match_route(router_route_record_t *record, const char *path,
 
 // https://github.com/vuejs/vue-router/blob/65de048ee9f0ebf899ae99c82b71ad397727e55d/dist/vue-router.esm.js#L1457
 
-router_route_t *router_matcher_match_by_name(router_matcher_t *matcher,
-                                             router_location_t *location,
-                                             const router_route_t *current_route)
+router_route_t *router_matcher_match_by_name(
+    router_matcher_t *matcher, router_location_t *location,
+    const router_route_t *current_route)
 {
         char *key;
         const char *value;

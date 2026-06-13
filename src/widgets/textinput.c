@@ -1,12 +1,15 @@
 ﻿/*
  * src/widgets/textinput.c: -- textinput widget, used to allow user edit
  *
- * Copyright (c) 2018-2025, Liu chao <lc-soft@live.cn> All rights reserved.
- *
+ * Copyright (c) 2018-2026, Liu chao <lc-soft@live.cn> All rights reserved.
+
+ * *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+ * This file is part of LCUI,
+ * distributed under the MIT License found in the
+ * LICENSE.TXT file in the
+ * root directory of this source tree.
  */
 
 #include <errno.h>
@@ -158,9 +161,8 @@ static void ui_textinput_update_caret(ui_widget_t *widget)
         ui_widget_move(edit->caret, x, y);
         ui_textcaret_refresh(edit->caret);
         if (edit->password_char) {
-                pd_text_set_caret(edit->layer_source,
-                                            edit->layer->caret.y,
-                                            edit->layer->caret.x);
+                pd_text_set_caret(edit->layer_source, edit->layer->caret.y,
+                                  edit->layer->caret.x);
         }
 }
 

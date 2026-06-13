@@ -1,12 +1,15 @@
 ﻿/*
  * lib/ui/include/ui/types.h
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao
+ * <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+
+ * * This file is part of LCUI, distributed under the MIT License found in the
+
+ * * LICENSE.TXT file in the root directory of this source tree.
  */
 
 #ifndef LIB_UI_INCLUDE_UI_TPYES_H
@@ -182,7 +185,7 @@ struct ui_widget_prototype {
         void (*update)(ui_widget_t *, ui_task_type_t);
         void (*setattr)(ui_widget_t *, const char *, const char *);
         void (*settext)(ui_widget_t *, const char *);
-        void (*sizehint)(ui_widget_t *, ui_sizehint_t*);
+        void (*sizehint)(ui_widget_t *, ui_sizehint_t *);
         void (*resize)(ui_widget_t *, float, float);
         void (*paint)(ui_widget_t *, pd_context_t *,
                       ui_widget_actual_style_t *);

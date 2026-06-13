@@ -1,13 +1,15 @@
-/*
- * src/lcui_settings.h -- internal definitions for settings infrastructure.
+﻿/*
+ * src/lcui_settings.h: -- internal definitions for settings infrastructure.
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io>
- * All rights reserved.
- *
+ * Copyright (c) 2023-2026, Liu Chao <hello@lcui.dev> All rights reserved.
+
+ * *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+ * This file is part of LCUI,
+ * distributed under the MIT License found in the
+ * LICENSE.TXT file in the
+ * root directory of this source tree.
  */
 
 #ifndef LCUI_SRC_SETTINGS_H

@@ -1,12 +1,15 @@
 ﻿/*
  * lib/pandagl/src/text/text_render.c
  *
- * Copyright (c) 2018-2026, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2018-2026, Liu Chao
+ * <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+
+ * * This file is part of LCUI, distributed under the MIT License found in the
+
+ * * LICENSE.TXT file in the root directory of this source tree.
  */
 
 #include <stdlib.h>
@@ -28,8 +31,8 @@ void pd_char_update_bitmap(pd_char_t *ch, pd_text_style_t *style)
                 }
         }
         while (font_ids && font_ids[i] > 0) {
-                int ret = pd_font_cache_get_bitmap(ch->code, font_ids[i],
-                                                     size, &ch->bitmap);
+                int ret = pd_font_cache_get_bitmap(ch->code, font_ids[i], size,
+                                                   &ch->bitmap);
                 if (ret == 0) {
                         return;
                 }
@@ -90,10 +93,10 @@ static void pd_text_render_char(pd_text_t *text, pd_char_t *ch,
         /* 判断文字使用的前景颜色，再进行绘制 */
         if (ch->style && ch->style->has_fore_color) {
                 pd_canvas_mix_glyph_bitmap(graph, ch_pos, ch->bitmap,
-                                          ch->style->fore_color);
+                                           ch->style->fore_color);
         } else {
                 pd_canvas_mix_glyph_bitmap(graph, ch_pos, ch->bitmap,
-                                          text->default_style.fore_color);
+                                           text->default_style.fore_color);
         }
 }
 

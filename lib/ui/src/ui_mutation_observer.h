@@ -1,7 +1,7 @@
 ﻿/*
  * lib/ui/src/ui_mutation_observer.h
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -10,8 +10,8 @@
  */
 
 typedef struct ui_mutation_connection {
-	ui_widget_t *widget;
-	ui_mutation_observer_t *observer;
-	ui_mutation_observer_init_t options;
-	list_node_t node;
+        ui_widget_t *widget;
+        ui_mutation_observer_t *observer;
+        ui_mutation_observer_init_t options;
+        list_node_t node;
 } ui_mutation_connection_t;

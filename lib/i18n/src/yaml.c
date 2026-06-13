@@ -1,12 +1,15 @@
 ﻿/*
  * lib/i18n/src/yaml.c
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao
+ * <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+
+ * * This file is part of LCUI, distributed under the MIT License found in the
+
+ * * LICENSE.TXT file in the root directory of this source tree.
  */
 
 #include <yutil.h>
@@ -73,7 +76,7 @@ dict_t *i18n_load_yaml_file(const char *path)
                 return NULL;
         }
         if (!yaml_parser_initialize(&parser)) {
-		free(buffer);
+                free(buffer);
                 logger_error("[i18n] failed to initialize parser!\n");
                 return NULL;
         }

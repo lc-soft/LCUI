@@ -1,7 +1,7 @@
 ﻿/*
  * tests/cases/test_widget_rect.c
  *
- * Copyright (c) 2023, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023, Liu Chao <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *

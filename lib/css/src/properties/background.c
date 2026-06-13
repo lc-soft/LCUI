@@ -1,11 +1,14 @@
 ﻿/*
  * lib/css/src/properties/background.c
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu
+ * Chao <hello@lcui.dev> All rights reserved.
  *
- * SPDX-License-Identifier: MIT
+ * SPDX-License-Identifier:
+ * MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
+ * This file is part of LCUI, distributed under the MIT License found
+ * in the
  * LICENSE.TXT file in the root directory of this source tree.
  */
 
@@ -310,8 +313,8 @@ static void css_parse_background_position_1(css_style_value_t *input,
  * background-position-x = calc(100% - 50px)
  * background-position-y = calc(100% - 50px)
  */
-int css_parse_background_position(const css_propdef_t *propdef, const char *input,
-                                  css_style_decl_t *s)
+int css_parse_background_position(const css_propdef_t *propdef,
+                                  const char *input, css_style_decl_t *s)
 {
         unsigned len;
         const char *cur;

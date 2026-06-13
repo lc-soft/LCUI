@@ -1,12 +1,15 @@
 ﻿/*
  * lib/router/include/router/router.h
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao
+ * <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+
+ * * This file is part of LCUI, distributed under the MIT License found in the
+
+ * * LICENSE.TXT file in the root directory of this source tree.
  */
 
 #ifndef LIB_ROUTER_INCLUDE_ROUTER_ROUTER_H
@@ -35,14 +38,15 @@ LIBROUTER_PUBLIC router_route_record_t *router_get_matched_route_record(
 LIBROUTER_PUBLIC router_history_t *router_get_history(router_t *router);
 
 LIBROUTER_PUBLIC router_watcher_t *router_watch(router_t *router,
-                                                   router_callback_t callback,
-                                                   void *data);
+                                                router_callback_t callback,
+                                                void *data);
 
 LIBROUTER_PUBLIC void router_unwatch(router_t *router,
-                                        router_watcher_t *watcher);
+                                     router_watcher_t *watcher);
 
-LIBROUTER_PUBLIC router_resolved_t *router_resolve(
-    router_t *router, router_location_t *location, bool append);
+LIBROUTER_PUBLIC router_resolved_t *router_resolve(router_t *router,
+                                                   router_location_t *location,
+                                                   bool append);
 
 LIBROUTER_PUBLIC router_location_t *router_resolved_get_location(
     router_resolved_t *resolved);
@@ -56,10 +60,10 @@ LIBROUTER_PUBLIC const router_route_t *router_get_current_route(
     router_t *router);
 
 LIBROUTER_PUBLIC void router_push(router_t *router,
-                                     router_location_t *location);
+                                  router_location_t *location);
 
 LIBROUTER_PUBLIC void router_replace(router_t *router,
-                                        router_location_t *location);
+                                     router_location_t *location);
 
 LIBROUTER_PUBLIC void router_go(router_t *router, int delta);
 

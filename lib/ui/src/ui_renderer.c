@@ -1,12 +1,15 @@
 ﻿/*
  * lib/ui/src/ui_renderer.c
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao
+ * <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+
+ * * This file is part of LCUI, distributed under the MIT License found in the
+
+ * * LICENSE.TXT file in the root directory of this source tree.
  */
 
 #include <stdio.h>
@@ -149,7 +152,8 @@ bool ui_widget_mark_dirty_rect(ui_widget_t *w, ui_rect_t *in_rect,
                         break;
                 }
                 if (w->rendering.dirty_rect_type > UI_DIRTY_RECT_TYPE_NONE) {
-                        ui_rect_merge(&w->rendering.dirty_rect, &rect, &w->rendering.dirty_rect);
+                        ui_rect_merge(&w->rendering.dirty_rect, &rect,
+                                      &w->rendering.dirty_rect);
                 } else {
                         w->rendering.dirty_rect = rect;
                 }
@@ -219,7 +223,7 @@ size_t ui_widget_get_dirty_rects(ui_widget_t *w, list_t *rects)
 
         int x = ui_compute(w->padding_box.x);
         int y = ui_compute(w->padding_box.y);
-        
+
         ui_widget_collect_dirty_rect(w, rects, 0, 0, w->padding_box);
         for (list_each(node, rects)) {
                 rect = node->data;
@@ -299,9 +303,9 @@ static ui_renderer_t *ui_renderer_create(ui_widget_t *w, pd_context_t *paint,
         that->can_render_content =
             pd_rect_overlap(&that->style->padding_box, &that->actual_paint_rect,
                             &that->actual_content_rect);
-        
-        ui_rect_from_pd_rect(&that->content_rect, &that->actual_content_rect, 
-                        ui_get_actual_scale());
+
+        ui_rect_from_pd_rect(&that->content_rect, &that->actual_content_rect,
+                             ui_get_actual_scale());
         DEBUG_MSG("[%s] content_rect: (%d, %d, %d, %d)\n", w->id,
                   that->actual_content_rect.x, that->actual_content_rect.y,
                   that->actual_content_rect.width,

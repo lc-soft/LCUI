@@ -1,12 +1,15 @@
 ﻿/*
  * lib/ptk/include/ptk/steptimer.h
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao
+ * <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+
+ * * This file is part of LCUI, distributed under the MIT License found in the
+
+ * * LICENSE.TXT file in the root directory of this source tree.
  */
 
 #ifndef PTK_INCLUDE_PLATFORM_STEP_TIMER_H
@@ -67,7 +70,7 @@ PTK_PUBLIC void ptk_steptimer_init(ptk_steptimer_t *timer);
 // Update timer state, calling the specified Update function the appropriate
 // number of times.
 PTK_PUBLIC void ptk_steptimer_tick(ptk_steptimer_t *timer,
-                                    ptk_steptimer_handler_t handler, void *data);
+                                   ptk_steptimer_handler_t handler, void *data);
 
 // After an intentional timing discontinuity (for instance a blocking IO
 // operation or a long pause), call this to avoid having the fixed timestep

@@ -1,12 +1,15 @@
 ﻿/*
  * src/widgets/button.c: -- Button widget
  *
- * Copyright (c) 2018-2025, Liu chao <lc-soft@live.cn> All rights reserved.
- *
+ * Copyright (c) 2018-2026, Liu chao <lc-soft@live.cn> All rights reserved.
+
+ * *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+ * This file is part of LCUI,
+ * distributed under the MIT License found in the
+ * LICENSE.TXT file in the
+ * root directory of this source tree.
  */
 
 #include <stdlib.h>
@@ -43,25 +46,25 @@ button:disabled {
 
 );
 
-static void ui_button_on_init(ui_widget_t* w)
+static void ui_button_on_init(ui_widget_t *w)
 {
-	ui_button_prototype->proto->init(w);
-	w->tab_index = 0;
+        ui_button_prototype->proto->init(w);
+        w->tab_index = 0;
 }
 
-void ui_button_set_text_w(ui_widget_t* w, const wchar_t *wstr)
+void ui_button_set_text_w(ui_widget_t *w, const wchar_t *wstr)
 {
-	ui_text_set_content_w(w, wstr);
+        ui_text_set_content_w(w, wstr);
 }
 
-void ui_button_set_text(ui_widget_t* w, const char *str)
+void ui_button_set_text(ui_widget_t *w, const char *str)
 {
-	ui_text_set_content(w, str);
+        ui_text_set_content(w, str);
 }
 
 void ui_register_button(void)
 {
-	ui_button_prototype = ui_create_widget_prototype("button", "text");
-	ui_button_prototype->init = ui_button_on_init;
-	ui_load_css_string(ui_button_css, __FILE__);
+        ui_button_prototype = ui_create_widget_prototype("button", "text");
+        ui_button_prototype->init = ui_button_on_init;
+        ui_load_css_string(ui_button_css, __FILE__);
 }

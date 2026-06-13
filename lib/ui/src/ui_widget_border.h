@@ -1,7 +1,7 @@
 ﻿/*
  * lib/ui/src/ui_widget_border.h
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -10,6 +10,6 @@
  */
 
 void ui_widget_paint_border(ui_widget_t *w, pd_context_t *paint,
-			    ui_widget_actual_style_t *style);
+                            ui_widget_actual_style_t *style);
 void ui_widget_crop_content(ui_widget_t *w, pd_context_t *paint,
-			    ui_widget_actual_style_t *style);
+                            ui_widget_actual_style_t *style);

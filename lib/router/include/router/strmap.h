@@ -1,12 +1,15 @@
 ﻿/*
  * lib/router/include/router/strmap.h
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao
+ * <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+
+ * * This file is part of LCUI, distributed under the MIT License found in the
+
+ * * LICENSE.TXT file in the root directory of this source tree.
  */
 
 #ifndef LIB_ROUTER_INCLUDE_ROUTER_STRMAP_H
@@ -24,7 +27,7 @@ LIBROUTER_PUBLIC void strmap_destroy(strmap_t *dict);
 LIBROUTER_PUBLIC void strmap_delete(strmap_t *dict, const char *key);
 
 LIBROUTER_PUBLIC int strmap_set(strmap_t *dict, const char *key,
-                                   const char *value);
+                                const char *value);
 
 LIBROUTER_PUBLIC const char *strmap_get(strmap_t *dict, const char *key);
 

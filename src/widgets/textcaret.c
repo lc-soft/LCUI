@@ -1,12 +1,15 @@
 ﻿/*
  * src/widgets/textcaret.c: -- textcaret widget, used in textinput.
  *
- * Copyright (c) 2018-2025, Liu chao <lc-soft@live.cn> All rights reserved.
- *
+ * Copyright (c) 2018-2026, Liu chao <lc-soft@live.cn> All rights reserved.
+
+ * *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+ * This file is part of LCUI,
+ * distributed under the MIT License found in the
+ * LICENSE.TXT file in the
+ * root directory of this source tree.
  */
 
 #include <stdlib.h>
@@ -100,7 +103,7 @@ static void ui_textcaret_on_init(ui_widget_t *widget)
         caret->blink_interval = 500;
         caret->visible = false;
         caret->timer_id = ptk_set_interval(caret->blink_interval,
-                                            ui_textcaret_on_blink, caret->task);
+                                           ui_textcaret_on_blink, caret->task);
 }
 
 void ui_textcaret_set_blink_time(ui_widget_t *widget, unsigned int n_ms)

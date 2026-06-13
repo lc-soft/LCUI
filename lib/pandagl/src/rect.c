@@ -1,12 +1,15 @@
 ﻿/*
  * lib/pandagl/src/rect.c: -- Rectangle area handling
  *
- * Copyright (c) 2018-2025, Liu chao <lc-soft@live.cn> All rights reserved.
- *
+ * Copyright (c) 2018-2026, Liu chao <lc-soft@live.cn> All rights reserved.
+
+ * *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+ * This file is part of LCUI,
+ * distributed under the MIT License found in the
+ * LICENSE.TXT file in the
+ * root directory of this source tree.
  */
 
 #include <stdio.h>
@@ -36,8 +39,7 @@ pd_rect_t pd_rect_crop(const pd_rect_t *rect, int container_width,
         return cropped_rect;
 }
 
-bool pd_rect_correct(pd_rect_t *rect, int container_width,
-                          int container_height)
+bool pd_rect_correct(pd_rect_t *rect, int container_width, int container_height)
 {
         bool overflow = false;
 
@@ -95,7 +97,7 @@ bool pd_rect_is_cover(const pd_rect_t *a, const pd_rect_t *b)
 }
 
 bool pd_rect_overlap(const pd_rect_t *a, const pd_rect_t *b,
-                          pd_rect_t *overlapping_rect)
+                     pd_rect_t *overlapping_rect)
 {
         if (a->x > b->x) {
                 if (b->x + b->width > a->x + a->width) {

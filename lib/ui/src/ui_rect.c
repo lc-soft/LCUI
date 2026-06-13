@@ -1,19 +1,23 @@
 ﻿/*
  * lib/ui/src/ui_rect.c
  *
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao
+ * <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+
+ * * This file is part of LCUI, distributed under the MIT License found in the
+
+ * * LICENSE.TXT file in the root directory of this source tree.
  */
 
 #include <stdio.h>
 #include <ui/rect.h>
 #include <pandagl/rect.h>
 
-void ui_rect_from_pd_rect(ui_rect_t *ui_rect, const pd_rect_t *rect, float scale)
+void ui_rect_from_pd_rect(ui_rect_t *ui_rect, const pd_rect_t *rect,
+                          float scale)
 {
         ui_rect->x = rect->x / scale;
         ui_rect->y = rect->y / scale;

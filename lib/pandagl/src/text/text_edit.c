@@ -1,12 +1,15 @@
 ﻿/*
  * lib/pandagl/src/text/text_edit.c
  *
- * Copyright (c) 2018-2026, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c) 2018-2026, Liu Chao
+ * <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+
+ * * This file is part of LCUI, distributed under the MIT License found in the
+
+ * * LICENSE.TXT file in the root directory of this source tree.
  */
 
 #include <stdlib.h>
@@ -87,7 +90,7 @@ int pd_text_set_caret_pixel(pd_text_t *text, int x, int y)
 
 /** 获取指定行列的文字的像素坐标 */
 int pd_text_get_char_pixel(pd_text_t *text, int line_num, int col,
-                                    pd_pos_t *pixel_pos)
+                           pd_pos_t *pixel_pos)
 {
         pd_text_line_t *line;
         int i, pixel_x = 0, pixel_y = 0;
@@ -120,8 +123,8 @@ int pd_text_get_char_pixel(pd_text_t *text, int line_num, int col,
 
 int pd_text_get_caret_pixel(pd_text_t *text, pd_pos_t *pixel_pos)
 {
-        return pd_text_get_char_pixel(text, text->caret.y,
-                                               text->caret.x, pixel_pos);
+        return pd_text_get_char_pixel(text, text->caret.y, text->caret.x,
+                                      pixel_pos);
 }
 
 static const wchar_t *pd_text_process_style_tags(pd_text_t *text,

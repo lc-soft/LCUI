@@ -1,12 +1,16 @@
-/*
+﻿/*
  * lib/pandagl/examples/string-render/src/main.c
  *
- * Copyright (c) 2023, Liu Chao <i@lc-soft.io> All rights reserved.
+ * Copyright (c)
+ * 2023-2026, Liu Chao <i@lc-soft.io> All rights reserved.
+ *
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+ * This file is part of LCUI, distributed
+ * under the MIT License found in the
+ * LICENSE.TXT file in the root directory
+ * of this source tree.
  */
 
 #include <pandagl.h>
@@ -17,7 +21,7 @@ int main(void)
         pd_canvas_t img;
         pd_pos_t pos = { 0, 80 };
         pd_rect_t area = { 0, 0, 320, 240 };
-        pd_text_t* txt = pd_text_create();
+        pd_text_t *txt = pd_text_create();
         pd_text_style_t txtstyle;
 
         pd_font_library_init();

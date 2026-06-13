@@ -1,14 +1,18 @@
-/*
- * src/lcui_settings.c -- global settings infrastructure.
+﻿/*
+ * src/lcui_settings.c: -- global settings infrastructure.
  *
  * Copyright (c) 2020, James Duong <duong.james@gmail.com>
- * Copyright (c) 2023-2025, Liu Chao <i@lc-soft.io>
+ * Copyright (c)
+ * 2023-2026, Liu Chao <hello@lcui.dev>
  * All rights reserved.
+ *
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+ * This file is part of LCUI, distributed
+ * under the MIT License found in the
+ * LICENSE.TXT file in the root directory
+ * of this source tree.
  */
 
 #include <ctype.h>

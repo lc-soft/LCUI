@@ -1,12 +1,15 @@
 ﻿/*
  * lib/pandagl/src/font/library.c: -- The font info and font bitmap cache
  *
- * Copyright (c) 2018-2025, Liu chao <lc-soft@live.cn> All rights reserved.
- *
+ * Copyright (c) 2018-2026, Liu chao <lc-soft@live.cn> All rights reserved.
+
+ * *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+ * This file is part of LCUI,
+ * distributed under the MIT License found in the
+ * LICENSE.TXT file in the
+ * root directory of this source tree.
  */
 
 #include <errno.h>
@@ -222,7 +225,8 @@ char *pd_font_find_path(const char *name)
 #endif
 }
 
-pd_font_face_t *pd_font_face_create(const char *family_name, const char *style_name)
+pd_font_face_t *pd_font_face_create(const char *family_name,
+                                    const char *style_name)
 {
         pd_font_face_t *font;
 
@@ -571,7 +575,7 @@ static pd_font_weight_t font_weight_fallback(font_style_node_t *snode,
 }
 
 int pd_font_get_id(const char *family_name, pd_font_style_t style,
-                                pd_font_weight_t weight)
+                   pd_font_weight_t weight)
 {
         int style_num;
         const char *name;
@@ -606,9 +610,8 @@ int pd_font_get_id(const char *family_name, pd_font_style_t style,
         return -3;
 }
 
-size_t pd_font_replace_weight(const int *font_ids,
-                                          pd_font_weight_t weight,
-                                          int **new_font_ids)
+size_t pd_font_replace_weight(const int *font_ids, pd_font_weight_t weight,
+                              int **new_font_ids)
 {
         int id, *ids;
         pd_font_face_t *font;
@@ -627,8 +630,7 @@ size_t pd_font_replace_weight(const int *font_ids,
         }
         for (i = 0, count = 0; i < len; ++i) {
                 font = pd_font_get(font_ids[i]);
-                id = pd_font_get_id(font->family_name, font->style,
-                                                 weight);
+                id = pd_font_get_id(font->family_name, font->style, weight);
                 if (id > 0) {
                         ids[count++] = id;
                 }
@@ -643,9 +645,8 @@ size_t pd_font_replace_weight(const int *font_ids,
         return count;
 }
 
-size_t pd_font_replace_style(const int *font_ids,
-                                         pd_font_style_t style,
-                                         int **new_font_ids)
+size_t pd_font_replace_style(const int *font_ids, pd_font_style_t style,
+                             int **new_font_ids)
 {
         int id, *ids;
         pd_font_face_t *font;
@@ -664,8 +665,7 @@ size_t pd_font_replace_style(const int *font_ids,
         }
         for (i = 0, count = 0; i < len; ++i) {
                 font = pd_font_get(font_ids[i]);
-                id = pd_font_get_id(font->family_name, style,
-                                                 font->weight);
+                id = pd_font_get_id(font->family_name, style, font->weight);
                 if (id > 0) {
                         ids[count++] = id;
                 }
@@ -681,8 +681,7 @@ size_t pd_font_replace_style(const int *font_ids,
 }
 
 unsigned pd_font_query(int **font_ids, pd_font_style_t style,
-                               pd_font_weight_t weight,
-                               const char *const *names)
+                       pd_font_weight_t weight, const char *const *names)
 {
         int *ids;
         unsigned i, count, loaded_count;
@@ -700,8 +699,7 @@ unsigned pd_font_query(int **font_ids, pd_font_style_t style,
                 return 0;
         }
         for (loaded_count = 0, i = 0; i < count; ++i) {
-                ids[loaded_count] =
-                    pd_font_get_id(names[i], style, weight);
+                ids[loaded_count] = pd_font_get_id(names[i], style, weight);
                 if (ids[loaded_count] > 0) {
                         ++loaded_count;
                 }
@@ -758,8 +756,8 @@ int pd_font_load_file(const char *filepath)
         return 0;
 }
 
-int pd_font_render_glyph(pd_glyph_bitmap_t *buff, unsigned ch,
-                                  int font_id, int pixel_size)
+int pd_font_render_glyph(pd_glyph_bitmap_t *buff, unsigned ch, int font_id,
+                         int pixel_size)
 {
         pd_font_face_t *font = fontlib.default_font;
         do {
@@ -783,8 +781,7 @@ int pd_font_render_glyph(pd_glyph_bitmap_t *buff, unsigned ch,
         return font->engine->render(buff, ch, pixel_size, font);
 }
 
-bool pd_font_family_set_alias(const char *alias,
-                                           const char *family_name)
+bool pd_font_family_set_alias(const char *alias, const char *family_name)
 {
         return dict_add(fontlib.font_family_aliases, (void *)alias,
                         (void *)family_name) == DICT_OK;
