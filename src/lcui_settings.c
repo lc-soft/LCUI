@@ -1,9 +1,7 @@
 ﻿/*
- * src/lcui_settings.c: -- global settings infrastructure.
+ * src/lcui_settings.c -- global settings infrastructure.
  *
- * Copyright (c) 2020, James Duong <duong.james@gmail.com>
- * Copyright (c)
- * 2023-2026, Liu Chao <hello@lcui.dev>
+ * Copyright (c) 2023-2026, Liu Chao <hello@lcui.dev>
  * All rights reserved.
  *
  *
@@ -412,4 +410,25 @@ void lcui_settings_unload(void)
         lcui_settings.path = NULL;
         lcui_settings.loaded = false;
         lcui_settings.dirty = false;
+}
+
+bool lcui_settings_get_string(const char *section, const char *key, char **out)
+{
+        if (!lcui_settings.loaded || !lcui_settings.doc) {
+                return false;
+        }
+        return ini_doc_get_string(lcui_settings.doc, section, key, out);
+}
+
+bool lcui_settings_set_string(const char *section, const char *key,
+                              const char *value)
+{
+        if (!lcui_settings.loaded || !lcui_settings.doc) {
+                return false;
+        }
+        if (!ini_doc_set_string(lcui_settings.doc, section, key, value)) {
+                return false;
+        }
+        lcui_settings.dirty = true;
+        return true;
 }

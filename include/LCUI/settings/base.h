@@ -25,6 +25,16 @@ LCUI_API bool lcui_settings_load(void);
 LCUI_API bool lcui_settings_flush(void);
 LCUI_API void lcui_settings_unload(void);
 
+/* Read / write a custom string setting under [section].  `section`
+ * and `key` must be ASCII.  Returns true on read if the key exists
+ * (the caller owns the returned string).  Returns true on write if
+ * the value was stored (the setting is not persisted until the next
+ * call to lcui_settings_flush()). */
+LCUI_API bool lcui_settings_get_string(const char *section, const char *key,
+                                       char **out);
+LCUI_API bool lcui_settings_set_string(const char *section, const char *key,
+                                       const char *value);
+
 LCUI_END_HEADER
 
 #endif
