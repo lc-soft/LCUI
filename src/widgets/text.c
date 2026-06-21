@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <math.h>
 #include <pandagl.h>
 #include <css.h>
 #include <LCUI/widgets/text.h>
@@ -203,9 +204,10 @@ static void ui_text_on_sizehint(ui_widget_t *w, ui_sizehint_t *hint)
         pd_text_set_max_size(txt->layer, ui_compute(max_width),
                              ui_compute(max_height));
         pd_text_update(txt->layer, &rects);
-        hint->max_width = pd_text_get_width(txt->layer) / ui_get_actual_scale();
+        hint->max_width =
+            ceilf(pd_text_get_width(txt->layer) / ui_get_actual_scale());
         hint->max_height =
-            pd_text_get_height(txt->layer) / ui_get_actual_scale();
+            ceilf(pd_text_get_height(txt->layer) / ui_get_actual_scale());
         pd_rects_clear(&rects);
         if (!txt->layer->autowrap_enabled) {
                 hint->min_width = hint->max_width;
