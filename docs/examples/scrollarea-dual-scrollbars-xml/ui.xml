@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lcui-app>
+  <style>
+    .demo-scrollarea {
+        width: 400px;
+        height: 300px;
+        border: 1px solid #d0d7de;
+    }
+    .demo-grid {
+        display: flex;
+        flex-wrap: wrap;
+        width: 1088px;
+        height: 1088px;
+        gap: 8px;
+        padding: 8px;
+    }
+    .demo-cell {
+        width: 100px;
+        height: 100px;
+        background: #e1e5e9;
+        border: 1px solid #b0b8c0;
+        text-align: center;
+        line-height: 100px;
+    }
+  </style>
+  <ui>
+    <scrollarea class="demo-scrollarea">
+      <scrollarea-content class="demo-grid">
+        <text class="demo-cell">1</text>
+        <text class="demo-cell">2</text>
+        <text class="demo-cell">3</text>
+        <text class="demo-cell">4</text>
+        <text class="demo-cell">5</text>
+        <text class="demo-cell">6</text>
+        <text class="demo-cell">7</text>
+        <text class="demo-cell">8</text>
+        <text class="demo-cell">9</text>
+        <text class="demo-cell">10</text>
+      </scrollarea-content>
+      <scrollbar orientation="horizontal" />
+      <scrollbar />
+    </scrollarea>
+  </ui>
+</lcui-app>

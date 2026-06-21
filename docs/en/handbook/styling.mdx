@@ -1,0 +1,151 @@
+# Styling
+
+Use CSS to set colors, borders, padding, margins, dimensions, and layout for widgets.
+
+## How to set styles
+
+### Inline styles
+
+Use `ui_widget_set_style_string()` to set individual CSS properties directly:
+
+```c title="main.c"
+ui_widget_t *w = ui_create_widget("text");
+
+ui_widget_set_style_string(w, "color", "#336699");
+ui_widget_set_style_string(w, "font-size", "20px");
+ui_widget_set_style_string(w, "padding", "8px 16px");
+```
+
+### CSS class selectors
+
+Use `ui_load_css_string()` or `ui_load_css_file()` to load CSS rules, then apply them to widgets with `ui_widget_add_class()`:
+
+```c title="main.c"
+ui_load_css_file("styles.css");
+
+ui_widget_t *w = ui_create_widget("text");
+ui_widget_add_class(w, "title");
+```
+
+```css title="app/styles.css"
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+```
+
+You can also use `ui_load_css_string()` to load CSS rules from a string. The second parameter is a source identifier used for debugging to locate conflicting rules:
+
+```c title="main.c"
+ui_load_css_string(".title { font-size: 24px; }", "app.css");
+```
+
+## Supported CSS features
+
+LCUI's CSS engine implements a subset of the web standard. This section lists all supported features and their supported values; **anything not listed is not supported by default**.
+
+### At Rules
+
+- **`@font-face`** — Load external fonts
+
+### Selectors
+
+- `*` (universal), `type`, `#id`, `.class`
+- Pseudo-classes `:hover`, `:focus`, `:active`, `:first-child`, `:last-child`
+- `!important` is not supported
+
+### Units
+
+- `px`, `dp`, `sp`, `pt`, `%`
+
+### Properties
+
+#### Layout
+
+- **`display`** — `none`, `inline-block`, `block`, `flex`, `inline-flex`, `table`, `inline-table`, `table-row`, `table-cell`
+- **`position`** — `static`, `relative`, `absolute`
+- **`top` / `right` / `bottom` / `left`** — `<length>` or `<percentage>` or `auto`
+- **`z-index`** — `auto` or integer
+- **`box-sizing`** — `content-box`, `border-box`
+
+#### Box model
+
+- **`width` / `height`** — `<length>`, `<percentage>`, `auto`
+- **`min-width` / `max-width` / `min-height` / `max-height`** — same as above
+- **`padding`** — shorthand, 1-4 `<length>` values (e.g. `8px`, `4px 8px`, `4px 8px 12px`, `4px 8px 12px 16px`)
+- **`padding-top` / `padding-right` / `padding-bottom` / `padding-left`** — longhand properties
+- **`margin`** — shorthand, same syntax as padding
+- **`margin-top` / `margin-right` / `margin-bottom` / `margin-left`**
+- **`border`** — shorthand `1px solid #ccc` (width + style + color)
+- **`border-color` / `border-width` / `border-style` / `border-radius`** — multi-value shorthand, same syntax as padding
+- **`border-top` / `border-right` / `border-bottom` / `border-left`** — per-side shorthand
+- **`border-top-color` / `border-right-color` / `border-bottom-color` / `border-left-color`**
+- **`border-top-width` / `border-right-width` / `border-bottom-width` / `border-left-width`**
+- **`border-top-style` / `border-right-style` / `border-bottom-style` / `border-left-style`**
+- **`border-top-left-radius` / `border-top-right-radius` / `border-bottom-left-radius` / `border-bottom-right-radius`**
+- **`border-style` values** — `none`, `solid`
+- **`table-layout`** — `auto`, `fixed`
+- **`border-spacing`** — `<length>{1,2}`
+
+#### Background
+
+- **`background`** — shorthand `bg-image || bg-position || bg-size || repeat-style || color` (single layer only)
+- **`background-color`** — `<color>`
+- **`background-image`** — `none` or `<url>`
+- **`background-position`** — two values: x y
+- **`background-position-x` / `background-position-y`**
+- **`background-repeat`** — `<repeat-style>`
+- **`background-size`** — `<bg-size>`
+- **`background-clip`** — `border-box`, `padding-box`, `content-box`
+
+#### Flexbox layout
+
+- **`flex`** — shorthand (`flex-grow` + `flex-shrink` + `flex-basis`)
+- **`flex-shrink` / `flex-grow` / `flex-basis`**
+- **`flex-wrap`** — `nowrap`, `wrap`
+- **`flex-direction`** — `row`, `column`
+- **`justify-content`** — `flex-start`, `center`, `flex-end`
+- **`align-items`** — `flex-start`, `center`, `flex-end`, `stretch`
+- **`align-content`** — same as justify-content plus `space-between`, `space-around`, `space-evenly`
+- **`gap`** — shorthand, sets both row-gap and column-gap
+- **`row-gap` / `column-gap`** — `normal` or `<length-percentage>`
+
+#### Typography
+
+- **`font-face`** — (load fonts via `@font-face` rule)
+- **`font-family`** — `<font-family>` (recommended to use built-in aliases like `monospace`)
+- **`font-size`** — `<length>`
+- **`font-style`** — `normal`, `italic`, `oblique`
+- **`font-weight`** — `normal`, `bold`, `<number>`
+- **`text-align`** — `left`, `center`, `right`
+- **`line-height`** — `normal` or `<length>` or `<number>`
+- **`color`** — `<color>`
+- **`white-space`** — `normal`, `nowrap`
+- **`word-break`** — `normal`, `break-all`
+- **`content`** — `<string>` or `none`
+
+#### Other
+
+- **`opacity`** — `<number>` or `<percentage>`
+- **`visibility`** — `visible`, `hidden`
+- **`pointer-events`** — `auto`, `none`
+- **`box-shadow`** — `none` or `<shadow>` (format `<length>{2,4} && <color>?`)
+
+## Caveats
+
+:::warning
+**`white-space: pre` does not work.** LCUI's `white-space` only implements `normal` and `nowrap`. If you need to preserve leading whitespace from source code, replace spaces with U+00A0 (NBSP).
+:::
+
+:::warning
+**`overflow` does not clip content.** To clip or scroll child content, use the `scrollarea` built-in widget instead.
+:::
+
+:::warning
+**`background` shorthand does not support multiple layers.** Writing multi-background syntax like `background: url(a.png) no-repeat, url(b.png) center;` will not work. Use individual properties like `background-image` / `background-position` to set each layer separately.
+:::
+
+:::warning
+**CSS does not support inheritance.** Properties like `color`, `font-family`, and `font-size` do not cascade from parent to child widgets. Every widget that displays text (e.g. `text`, `button`) must explicitly set these properties.
+:::

@@ -1,0 +1,31 @@
+# Tailwind CSS
+
+Tailwind CSS is a utility-first CSS framework that helps developers quickly apply styles through predefined CSS classes. Compared to traditional CSS, you don't need to create new CSS files, write rules, or think up class names.
+
+## Installation
+
+```sh
+npm install -D tailwindcss postcss @thedutchcoder/postcss-rem-to-px
+```
+
+## Configuration
+
+Copy the following files from the [lcui-quick-start](https://github.com/lcui-dev/lcui-quick-start) template project to your project root:
+
+- `postcss.config.js`
+- `tailwind.config.js`
+- `app/global.css`
+
+`global.css` contains the Tailwind directives:
+
+```css title="app/global.css"
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+When compiling, `@lcui/cli` processes Tailwind directives through the PostCSS chain (postcss + tailwindcss + postcss-rem-to-px) to generate the final CSS output.
+
+:::tip
+If you don't want to place global.css inside the app directory, change the `content` path matching rules in `tailwind.config.js`.
+:::

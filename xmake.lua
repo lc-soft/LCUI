@@ -69,6 +69,7 @@ rule_end()
 
 includes("lib/*/xmake.lua")
 includes("tests/xmake.lua")
+includes("examples/xmake.lua")
 
 option("ci-env", {showmenu = true, default = false})
 

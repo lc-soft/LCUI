@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lcui-app>
+  <ui>
+    <scrollarea style="width: 300px; height: 200px;">
+      <text>Item 1</text>
+      <text>Item 2</text>
+      <text>Item 3</text>
+      <text>Item 4</text>
+      <text>Item 5</text>
+      <text>Item 6</text>
+      <text>Item 7</text>
+      <text>Item 8</text>
+      <text>Item 9</text>
+      <text>Item 10</text>
+    </scrollarea>
+  </ui>
+</lcui-app>

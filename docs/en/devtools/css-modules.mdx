@@ -1,0 +1,29 @@
+# CSS Modules
+
+CSS Modules create locally scoped CSS classes for TSX components, avoiding naming conflicts and improving maintainability.
+
+## Usage
+
+Create a file with the `.module.css` suffix:
+
+```css title="MyComponent.module.css"
+.card {
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
+```
+
+Import it in a `.tsx` file:
+
+```tsx title="MyComponent.tsx"
+import styles from "./MyComponent.module.css";
+```
+
+Use the `styles` object instead of string class names in JSX:
+
+```diff
+- <Widget className="card" />
++ <Widget className={styles.card} />
+```
+
+During compilation, `@lcui/cli` converts `.module.css` into C identifier bindings, automatically generating unique C constant names for class names to avoid global conflicts.

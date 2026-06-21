@@ -1,0 +1,31 @@
+# Tailwind CSS
+
+Tailwind CSS 是一个功能类优先（Utility-First）的 CSS 框架，通过预定义的 CSS 类帮助开发者快速设置样式。相比传统 CSS 编写方式，无需新建 CSS 文件、编写规则和思考类名。
+
+## 安装
+
+```sh
+npm install -D tailwindcss postcss @thedutchcoder/postcss-rem-to-px
+```
+
+## 配置
+
+从 [lcui-quick-start](https://github.com/lcui-dev/lcui-quick-start) 模板项目复制以下文件到项目根目录：
+
+- `postcss.config.js`
+- `tailwind.config.js`
+- `app/global.css`
+
+`global.css` 中包含 Tailwind 的指令：
+
+```css title="app/global.css"
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+`@lcui/cli` 编译时会通过 PostCSS 链（postcss + tailwindcss + postcss-rem-to-px）处理 Tailwind 指令，生成最终的 CSS 输出。
+
+:::tip
+如果你不想将 global.css 放到 app 目录内，请更改 `tailwind.config.js` 中 `content` 配置项的路径匹配规则。
+:::

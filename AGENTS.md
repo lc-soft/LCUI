@@ -155,6 +155,31 @@ write_log(logger, msg);
 
 若公共逻辑较长，可提取为独立函数，并保持调用路径一致，减少分叉实现。
 
+## LCUI CSS 引擎约束
+
+### 选择器
+
+- 仅支持：通配符 `*`、类型 `type`、类 `.cls`、ID `#id`、后代空格 `A B`
+- 不支持：子代 `>`、相邻兄弟 `+`、通用兄弟 `~`
+- 不支持：属性选择器 `[attr]` `[data-x]`
+- 不支持：功能性伪类 `:not()` `:is()` `:where()` `:has()` `:nth-child()`（解析器无 `(` 语法）
+- 不支持：伪元素 `::before` `::after`
+
+### 优先级
+
+- Rank：`GENERAL=0`，`TYPE=1`，`CLASS=10`，`PCLASS=10`，`ID=100`
+- 同 rank 用 `batch_num`（声明顺序）决胜，后声明覆盖先声明
+- 无 `!important` 机制
+- class 与 pclass rank 相同（都是 10）
+
+### 属性与值
+
+- `position`：仅 `static` / `relative` / `absolute`，无 `fixed`
+- `white-space`：仅 `normal` / `nowrap`
+- `border-style`：仅 `none` / `solid`
+- 无 `calc()` / `var()` / CSS 自定义属性
+- 无 `calc()` / `var()` / `em` / `rem` / `vh` / `vw` 单位（可用 `dp` / `px` / `pt` / `%`）
+
 ## 指令
 
 ### gen-commit

@@ -1,0 +1,29 @@
+# 图标库
+
+`@lcui/fluent-icons` 是专为 LCUI 适配的图标库，图标都来自 Microsoft 的 [fluentui-system-icons](https://github.com/microsoft/fluentui-system-icons) 项目。
+
+## 安装
+
+```sh
+npm install @lcui/fluent-icons
+```
+
+## 选取图标
+
+在 [flicon.io](https://www.flicon.io/) 网站中搜索和选取图标。以放大图标为例，英文名通常是 Zoom In。
+
+fluentui-system-icons 的图标有 16、20、24 等几种尺寸可选，命名方式是"图标名+尺寸+风格"。`@lcui/fluent-icons` 的命名方式是"图标名+风格"，当风格为 Regular 时可以省略它。
+
+## 用法
+
+```tsx
+import { ZoomIn } from "@lcui/fluent-icons";
+
+<ZoomIn />
+```
+
+默认尺寸是 20。如果图标尺寸固定且希望更好的渲染效果，可以指定 size 参数：
+
+```tsx
+<ZoomIn size={32} />
+```

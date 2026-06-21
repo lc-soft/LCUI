@@ -1,0 +1,136 @@
+# 自定义
+
+你可以创建全新的部件类型，也可以在现有部件基础上进行扩展。
+
+## 创建自定义部件
+
+使用 `ui_create_widget_prototype()` 注册新的部件类型：
+
+```c title="src/counter.c"
+#include <LCUI.h>
+
+typedef struct {
+        int value;
+} counter_data_t;
+
+static ui_widget_prototype_t *counter_proto;
+
+static void counter_init(ui_widget_t *w)
+{
+        counter_data_t *data;
+        ui_widget_t *text;
+
+        data = ui_widget_add_data(w, counter_proto, sizeof(counter_data_t));
+        data->value = 0;
+
+        text = ui_create_widget("text");
+        ui_text_set_content(text, "0");
+        ui_widget_append(w, text);
+}
+
+static void counter_destroy(ui_widget_t *w)
+{
+        /* 释放自有资源（如有） */
+}
+
+void register_counter_widget(void)
+{
+        counter_proto = ui_create_widget_prototype("counter", NULL);
+        counter_proto->init = counter_init;
+        counter_proto->destroy = counter_destroy;
+}
+```
+
+使用这个自定义部件：
+
+```c title="src/main.c"
+extern void register_counter_widget(void);
+
+int main(void)
+{
+        ui_widget_t *counter;
+
+        lcui_init();
+        register_counter_widget();
+
+        counter = ui_create_widget("counter");
+        ui_widget_append(ui_root(), counter);
+        return lcui_main();
+}
+```
+
+## 扩展现有部件
+
+把父类型名作为 `ui_create_widget_prototype()` 的第二个参数传入：
+
+```c title="src/icon_button.c"
+static ui_widget_prototype_t *icon_button_proto;
+
+static void icon_button_init(ui_widget_t *w)
+{
+        /* 调用父类（button）的初始化逻辑 */
+        icon_button_proto->proto->init(w);
+        ui_widget_add_class(w, "icon-button");
+}
+
+void register_icon_button(void)
+{
+        icon_button_proto =
+            ui_create_widget_prototype("icon-button", "button");
+        icon_button_proto->init = icon_button_init;
+}
+```
+
+:::warning
+**父类的 `init` 必须手动调用。** LCUI 在创建子类型部件时不会自动调用父类型的 `init`。如果你忘记调用 `proto->proto->init(w)`，部件会缺少父类型的基础行为（例如 `button` 不会注册点击事件、不会设置默认样式）。
+:::
+
+## 部件生命周期
+
+`ui_widget_prototype_t` 上有多个回调钩子，覆盖部件的各个生命周期阶段：
+
+- **`init`** — 部件创建时。负责初始化自有数据、子部件、事件绑定。
+- **`destroy`** — 部件销毁时。负责释放自有内存、解绑事件。
+- **`update`** — 部件需要更新时，接收 `ui_task_type_t` 参数标识更新类型（样式更新、属性更新等）。LCUI 内部在每帧更新循环中调用此钩子。
+- **`setattr`** — 设置 XML 属性时（用于响应属性变更）。
+- **`settext`** — 设置文本内容时。
+- **`sizehint`** — 估算部件在无外部约束时的自然尺寸约束（最小/最大内容尺寸）。布局引擎在计算子部件尺寸时会参考此结果。
+- **`resize`** — 部件尺寸变化时。接收新的内容区域宽高作为参数。
+- **`paint`** — 部件需要重绘时。用于自定义绘制逻辑。
+
+## 自定义绘制
+
+可以重写 `paint` 回调，在部件上绘制自定义图形：
+
+```c title="src/my_widget.c"
+static void my_widget_paint(ui_widget_t *w, pd_context_t *paint_ctx,
+                              ui_widget_actual_style_t *style)
+{
+        pd_canvas_t *canvas = paint_ctx->canvas;
+        pd_color_t color = pd_color_from_rgb(255, 0, 0);
+        pd_rect_t rect = { style->left, style->top, w->width, w->height };
+
+        pd_canvas_fill_rect(canvas, color, rect);
+}
+
+static void register_my_widget(void)
+{
+        ui_widget_prototype_t *proto =
+            ui_create_widget_prototype("my-widget", NULL);
+        proto->paint = my_widget_paint;
+}
+```
+
+:::warning
+**`paint` 只负责绘制。** 部件尺寸估算由 `sizehint` 处理；不要在 `paint` 里修改部件尺寸或子部件树，否则可能触发无限循环。
+:::
+
+## 注意事项
+
+:::warning
+**`destroy` 回调要释放自有资源。** 如果自定义部件在 `init` 里分配了内存、打开了文件、订阅了系统事件（如 `lcui_settings_on_deserialize`），必须在 `destroy` 里做对称释放。
+:::
+
+:::warning
+**自定义部件必须在 `lcui_init()` 之后、首次实例化之前注册。** 在 `main()` 开头立即调用你的 `register_xxx()` 函数是最稳妥的位置，可以确保所有使用方（XML 加载、路由实例化、TSX 编译结果）都能看到原型。
+:::

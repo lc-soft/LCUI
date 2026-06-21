@@ -1,0 +1,44 @@
+# 快速开始
+
+几分钟内上手 LCUI。
+
+## 环境要求
+
+- **操作系统** — Windows（推荐）或 Linux
+- **Node.js** — 运行 `@lcui/cli` 工具
+- **xmake** — C/C++ 构建工具
+- **Git** — 下载和管理源码
+
+## 安装
+
+全局安装 LCUI CLI：
+
+```sh
+npm install -g @lcui/cli
+```
+
+创建并运行你的第一个应用：
+
+```sh
+lcui create my-app
+cd my-app
+lcui build
+xmake run app
+```
+
+`lcui create` 会从 lcui-quick-start 模板仓库克隆一个最小项目，包含 xmake.lua 配置、示例代码和依赖。完成后运行 `lcui build` 编译 TSX 资源，再运行 `xmake run app` 启动应用。
+
+## 下一步
+
+- 查看样板项目（`lcui create` 生成的项目）中的代码和文件结构，了解 LCUI 应用的基本用法。
+- 阅读组件参考（Button、Text、TextInput、Anchor、ScrollArea），了解内置部件。
+- 阅读样式章节，学习如何用 CSS 为部件添加外观。
+- 阅读自定义章节，学习如何创建自定义部件。
+- 阅读 TSX 与开发工具章节，深入理解 `@lcui/react` 的用法和限制。
+
+## 遇到问题？
+
+如果你在学习过程中遇到问题，可以通过以下途径获取帮助：
+
+- 在 GitHub Discussions 提问（建议使用 `Q&A` 标签）。
+- 在仓库根目录查看 CONTRIBUTING.md，了解如何参与贡献。

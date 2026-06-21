@@ -1,0 +1,50 @@
+# Anchor
+
+A navigation widget similar to the HTML `<a>` element. It can open external URLs in the system browser or load an XML view into a target container widget.
+
+<WidgetExample name="anchor-basic" />
+
+## API
+
+### `ui_anchor_open`
+
+```c
+void ui_anchor_open(ui_widget_t *w);
+```
+
+Programmatically triggers the anchor's action (same as a click). Reads the `href` attribute from the widget:
+
+- If `href` starts with `http://` or `https://` — opens in the system browser.
+- If `href` starts with `file:///` — opens the local file in the system browser.
+- Otherwise — asynchronously loads an XML file at the given path and injects its content into the widget identified by the `target` attribute.
+
+## XML tag
+
+```xml
+<a href="..." target="..." key="...">Link text</a>
+```
+
+Attributes:
+
+| Attribute | Required | Description |
+|---|---|---|
+| `href` | Yes | URL to open, or relative XML file path to load |
+| `target` | For view loading | ID of the container widget where the loaded view is injected |
+| `key` | No | Arbitrary string passed as `event.data` to the `loaded.anchor` event |
+
+## Events
+
+### `loaded.anchor`
+
+Fired on `ui_root()` after a view has been loaded and injected:
+
+```c
+static void on_view_loaded(ui_widget_t *w, ui_event_t *e, void *arg)
+{
+        /* e->data contains the value of the anchor's "key" attribute */
+        printf("Loaded view key: %s\n", (char *)e->data);
+}
+
+ui_widget_on(ui_root(), "loaded.anchor", on_view_loaded, NULL);
+```
+

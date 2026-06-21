@@ -1,0 +1,27 @@
+{
+  "name": "doc-viewer",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "compile": "bun run scripts/compiler/index.ts",
+    "compile:watch": "bun run scripts/compiler/index.ts --watch"
+  },
+  "devDependencies": {
+    "@lcui/fluent-icons": "^2.0.0",
+    "@lcui/react": "0.6.0",
+    "@thedutchcoder/postcss-rem-to-px": "^0.0.2",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "highlight.js": "^11.9.0",
+    "postcss": "^8.5.10",
+    "tailwindcss": "3.4.17",
+    "typescript": "^5.5.2"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "dependencies": {
+    "mdast-util-from-markdown": "^2.0.3",
+    "micromark": "^4.0.2"
+  }
+}

@@ -1,0 +1,128 @@
+# TextInput
+
+An editable text input widget. Supports single-line, multiline, password, placeholder, and readonly modes.
+
+<WidgetExample name="text-input-basic" />
+
+## API
+
+### `ui_textinput_set_text`
+
+```c
+int ui_textinput_set_text(ui_widget_t *widget, const char *utf8_str);
+```
+
+Sets the input value from a UTF-8 string.
+
+### `ui_textinput_set_text_w`
+
+```c
+int ui_textinput_set_text_w(ui_widget_t *widget, const wchar_t *wstr);
+```
+
+Sets the input value from a wide character string.
+
+### `ui_textinput_get_text_w`
+
+```c
+size_t ui_textinput_get_text_w(ui_widget_t *w, size_t start,
+                               size_t max_len, wchar_t *buf);
+```
+
+Reads the current input value. Returns the number of characters written.
+
+### `ui_textinput_get_text_length`
+
+```c
+size_t ui_textinput_get_text_length(ui_widget_t *w);
+```
+
+Returns the current text length in characters.
+
+### `ui_textinput_clear_text`
+
+```c
+void ui_textinput_clear_text(ui_widget_t *widget);
+```
+
+Clears all text from the input.
+
+### `ui_textinput_set_placeholder`
+
+```c
+int ui_textinput_set_placeholder(ui_widget_t *w, const char *str);
+```
+
+Sets the placeholder text shown when the input is empty.
+
+### `ui_textinput_set_placeholder_w`
+
+```c
+int ui_textinput_set_placeholder_w(ui_widget_t *w, const wchar_t *wstr);
+```
+
+Sets the placeholder text from a wide character string.
+
+### `ui_textinput_set_password_char`
+
+```c
+void ui_textinput_set_password_char(ui_widget_t *w, wchar_t ch);
+```
+
+Masks the input with the given character (e.g. `L'*'` for password fields).
+
+### `ui_textinput_enable_multiline`
+
+```c
+void ui_textinput_enable_multiline(ui_widget_t *widget, bool enable);
+```
+
+Enables or disables multiline input mode.
+
+### `ui_textinput_enable_style_tag`
+
+```c
+void ui_textinput_enable_style_tag(ui_widget_t *widget, bool enable);
+```
+
+Enables or disables inline style tag parsing in the input.
+
+### `ui_textinput_append_text_w`
+
+```c
+int ui_textinput_append_text_w(ui_widget_t *widget, const wchar_t *wstr);
+```
+
+Appends text at the end of the current content.
+
+### `ui_textinput_insert_text_w`
+
+```c
+int ui_textinput_insert_text_w(ui_widget_t *widget, const wchar_t *wstr);
+```
+
+Inserts text at the current caret position.
+
+### `ui_textinput_set_caret_blink`
+
+```c
+void ui_textinput_set_caret_blink(ui_widget_t *w, bool visible, int time);
+```
+
+Controls the caret blink animation. `time` is the blink interval in milliseconds.
+
+## XML tag
+
+```xml
+<textedit placeholder="..." style="width: 200px;" />
+```
+
+Attributes:
+
+| Attribute | Description |
+|---|---|
+| `placeholder` | Placeholder text |
+| `multiline` | `"true"` for multiline mode |
+| `readonly` | `"true"` to make the input read-only |
+| `type` | `"password"` to mask input |
+

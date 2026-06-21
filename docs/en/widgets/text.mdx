@@ -1,0 +1,63 @@
+# Text
+
+A widget for displaying text. Supports single-line and multiline modes, inline style tags, and CSS styling.
+
+<WidgetExample name="text-basic" />
+
+## API
+
+### `ui_text_set_content`
+
+```c
+int ui_text_set_content(ui_widget_t *w, const char *utf8_text);
+```
+
+Sets the text content from a UTF-8 string. Supports inline style tags.
+
+### `ui_text_set_content_w`
+
+```c
+int ui_text_set_content_w(ui_widget_t *w, const wchar_t *text);
+```
+
+Sets the text content from a wide character string.
+
+### `ui_text_get_content_w`
+
+```c
+size_t ui_text_get_content_w(ui_widget_t *w, wchar_t *buf, size_t size);
+```
+
+Reads the current text content into `buf` (up to `size` wide characters). Returns the number of characters written.
+
+### `ui_text_set_multiline`
+
+```c
+void ui_text_set_multiline(ui_widget_t *w, bool enable);
+```
+
+Enables or disables multiline mode. When enabled, `\n` characters create new lines.
+
+## XML tag
+
+```xml
+<text>Text content here</text>
+```
+
+Attributes:
+
+| Attribute | Description |
+|---|---|
+| `multiline` | Set to `"true"` to enable multiline mode |
+
+## Inline style tags
+
+The text widget supports a BBCode-like inline styling syntax:
+
+| Tag | Example | Effect |
+|---|---|---|
+| `[color=X]` | `[color=#ff0000]Red[/color]` | Text color |
+| `[b]` | `[b]Bold[/b]` | Bold font |
+| `[i]` | `[i]Italic[/i]` | Italic font |
+| `[size=X]` | `[size=20]Large[/size]` | Font size in px |
+
