@@ -70,3 +70,4 @@ config.h
 test/build
 vsxmake*
 compile_commands.json
+docs/build/

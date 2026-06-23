@@ -1,0 +1,42 @@
+{
+  "sidebar": [
+    {
+      "slug": "overview",
+      "label": { "en": "Overview", "zh-CN": "概述" },
+      "items": [
+        { "slug": "quick-start", "label": { "en": "Quick Start", "zh-CN": "快速开始" } },
+        { "slug": "about", "label": { "en": "About", "zh-CN": "关于" } }
+      ]
+    },
+    {
+      "slug": "handbook",
+      "label": { "en": "Handbook", "zh-CN": "手册" },
+      "items": [
+        { "slug": "styling", "label": { "en": "Styling", "zh-CN": "样式" } },
+        { "slug": "customization", "label": { "en": "Customization", "zh-CN": "自定义" } }
+      ]
+    },
+    {
+      "slug": "devtools",
+      "label": { "en": "Dev Tools", "zh-CN": "开发工具" },
+      "items": [
+        { "slug": "tsx-and-dev-tools", "label": { "en": "TSX & @lcui/cli", "zh-CN": "TSX 与 @lcui/cli" } },
+        { "slug": "css-modules", "label": { "en": "CSS Modules", "zh-CN": "CSS Modules" } },
+        { "slug": "tailwind-css", "label": { "en": "Tailwind CSS", "zh-CN": "Tailwind CSS" } },
+        { "slug": "sass", "label": { "en": "Sass", "zh-CN": "Sass" } },
+        { "slug": "icon-library", "label": { "en": "Icon Library", "zh-CN": "图标库" } }
+      ]
+    },
+    {
+      "slug": "widgets",
+      "label": { "en": "Widgets", "zh-CN": "组件" },
+      "items": [
+        { "slug": "anchor", "label": { "en": "Anchor", "zh-CN": "Anchor 锚点" } },
+        { "slug": "button", "label": { "en": "Button", "zh-CN": "Button 按钮" } },
+        { "slug": "scrollarea", "label": { "en": "ScrollArea", "zh-CN": "ScrollArea 滚动区域" } },
+        { "slug": "text", "label": { "en": "Text", "zh-CN": "Text 文本" } },
+        { "slug": "text-input", "label": { "en": "TextInput", "zh-CN": "TextInput 文本输入" } }
+      ]
+    }
+  ]
+}

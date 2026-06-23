@@ -1,0 +1,15 @@
+# Sass
+
+Sass is a popular CSS preprocessor that extends CSS with variables, nesting rules, mixins, and more.
+
+## Usage
+
+`@lcui/cli` has a built-in Sass preprocessor that is automatically invoked when compiling `.sass` and `.scss` files — no additional installation or configuration needed.
+
+Import Sass files directly in TSX:
+
+```tsx title="MyComponent.tsx"
+import "./MyComponent.scss";
+```
+
+The CLI compiles Sass files into CSS, then converts them to C code for runtime loading.

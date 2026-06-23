@@ -1,0 +1,51 @@
+.navbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 56px;
+  padding: 0 24px;
+  background-color: #fff;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.navbar-logo {
+  font-size: 20px;
+  font-weight: bold;
+  color: #1890ff;
+}
+
+.navbar-spacer { flex: 1; }
+
+.navbar-path {
+  flex: 1;
+  margin: 0 16px;
+  padding: 4px 12px;
+  font-size: 13px;
+  color: #666;
+  background-color: #f5f5f5;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+}
+
+.navbar-links {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+
+.navbar-btn {
+  @apply px-2 py-1 rounded border-0 text-sm text-gray-700;
+}
+.navbar-btn:hover {
+  @apply bg-gray-50 text-gray-900;
+}
+.navbar-btn.active {
+  @apply bg-gray-100;
+}
+
+.navbar-version {
+  @apply text-sm text-gray-400 font-mono;
+}
+
+.navbar-github:hover { color: #1890ff; }

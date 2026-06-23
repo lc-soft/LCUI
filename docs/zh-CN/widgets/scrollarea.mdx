@@ -1,0 +1,53 @@
+# ScrollArea
+
+当子内容超出容器范围时，提供滚动能力的容器部件。
+
+<WidgetExample name="scrollarea-basic" />
+
+## 适用场景
+
+- **适用** — 内容高度或宽度可能超过容器（长列表、文档、日志）。
+- **适用** — 需要滚动条可视化反馈的场景。
+- **不适用** — 内容总是小于容器（直接用普通 `widget` 即可）。
+
+## 结构
+
+导入部件并组装其子组件：
+
+```tsx
+import { ScrollArea, ScrollAreaContent, Scrollbar } from "@lcui/react";
+
+<ScrollArea>
+  <ScrollAreaContent>{/* 子内容 */}</ScrollAreaContent>
+  <Scrollbar orientation="horizontal" />
+  <Scrollbar />
+</ScrollArea>
+```
+
+## 示例
+
+### 双向滚动
+
+<WidgetExample name="scrollarea-dual-scrollbars" />
+
+当内容需要在水平和垂直两个方向上滚动时，同时设置横向和纵向滚动条。
+
+## API 参考
+
+### ScrollArea
+
+滚动容器，负责裁剪超出范围的子内容并接收滚动事件。
+
+<FieldTable name="scrollarea" />
+
+### ScrollAreaContent
+
+滚动内容容器，承载实际的子部件。必须作为 ScrollArea 的直接子部件使用。
+
+<FieldTable name="scrollarea-content" />
+
+### Scrollbar
+
+滚动条部件，用于显示并操作滚动条。作为 ScrollArea 的直接子部件使用。
+
+<FieldTable name="scrollbar" />

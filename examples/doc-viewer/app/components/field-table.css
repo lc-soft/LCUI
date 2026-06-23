@@ -1,0 +1,77 @@
+.field-table-provider {
+  @apply my-4;
+}
+.field-table {
+  display: block;
+  @apply rounded border border-gray-200 bg-white;
+}
+.field-table-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  @apply items-center border-b border-gray-100;
+}
+.field-table-row:last-child {
+  @apply border-b-0;
+}
+.field-table-row:hover {
+  @apply bg-gray-50;
+}
+.field-table-row.field-table-header {
+  @apply bg-gray-100 border-b border-gray-200;
+}
+.field-table-cell {
+  @apply px-4 py-2.5 text-sm text-gray-800;
+}
+.field-table-cell.cell-name {
+  width: 160px;
+  font-family: monospace;
+  @apply font-medium;
+}
+.field-table-cell.cell-type {
+  flex: 1;
+  font-family: monospace;
+}
+.field-table-cell.cell-default {
+  width: 160px;
+  font-family: monospace;
+}
+.field-table-row.field-table-header .field-table-cell {
+  @apply font-bold text-gray-900;
+}
+.field-table-expand-icon,
+.field-table-collapse-icon {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  @apply text-gray-400 cursor-pointer;
+}
+.field-table-collapse-icon {
+  display: none;
+}
+.field-table-row.expanded .field-table-expand-icon {
+  display: none;
+}
+.field-table-row.expanded .field-table-collapse-icon {
+  display: inline-block;
+}
+.field-table-details {
+  width: 100%;
+  display: none;
+  @apply bg-gray-100 px-4 py-3 border-t border-gray-200;
+}
+.field-table-details.expanded {
+  display: block;
+}
+.field-table-detail-row {
+  display: flex;
+  flex-direction: row;
+  @apply py-1 text-sm;
+}
+.field-table-detail-name {
+  width: 160px;
+  @apply font-medium text-gray-600;
+}
+.field-table-detail-value {
+  @apply text-gray-800;
+}

@@ -1,0 +1,19 @@
+node_modules/
+build/
+dist/
+.lcui/
+.xmake/
+
+# lcui-cli generated artifacts:
+# *.tsx.h and *.css.h are emitted alongside source files by lcui build.
+# *.mjs is the transpiled module output (kept under .lcui/build/).
+# Per-widget *.h next to a TSX file is also emitted by lcui-cli.
+*.tsx.h
+*.css.h
+*.json.mjs
+app/widgets/*/*/index.h
+app/examples/*/index.h
+app/main.h
+app/components/route-titles.h
+app/components/code-snippets.h
+app/components/code-snippets.c

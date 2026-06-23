@@ -1,0 +1,29 @@
+# CSS Modules
+
+CSS Modules 为 TSX 组件创建局部作用域的 CSS 类，避免命名冲突并提高可维护性。
+
+## 用法
+
+创建 `.module.css` 后缀的文件：
+
+```css title="MyComponent.module.css"
+.card {
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
+```
+
+在 `.tsx` 文件中导入：
+
+```tsx title="MyComponent.tsx"
+import styles from "./MyComponent.module.css";
+```
+
+在 JSX 中用 `styles` 对象替代字符串类名：
+
+```diff
+- <Widget className="card" />
++ <Widget className={styles.card} />
+```
+
+`@lcui/cli` 编译时会将 `.module.css` 转换为 C 标识符绑定，类名会自动生成唯一的 C 常量名，避免全局冲突。

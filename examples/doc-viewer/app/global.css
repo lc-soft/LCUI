@@ -1,0 +1,267 @@
+/* LCUI Documentation Viewer - Global styles
+ *
+ * Hand-maintained.  Loaded into the doc-viewer via `import "./global.css"`
+ * in app/layout.tsx; lcui-cli converts this file to app/global.css.h on
+ * each build and the runtime registers the rules via
+ * `ui_load_css_string`.
+ *
+ * Tailwind utilities are reused through @apply where possible so the
+ * spacing / typography scale stays consistent with any inline tailwind
+ * class an MDX-derived page widget might emit.
+ */
+
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+root {
+  min-width: 800px;
+  min-height: 480px;
+}
+
+text,
+p {
+  @apply text-base text-gray-800;
+}
+
+/* -- Page -- */
+
+.doc-page {
+  @apply px-4 py-8 max-w-3xl mx-auto;
+}
+.doc-page-desc {
+  @apply text-lg text-gray-600 mb-6 leading-relaxed;
+}
+.doc-section {
+  @apply mb-8;
+}
+
+/* -- Locale-controlled visibility --
+ *
+ * Any element that should only appear when a specific locale is active
+ * on ui_root() gets both `.lang` and the matching locale class.
+ * `.lang` hides by default; the override below shows it when the root
+ * locale matches.  Components like sidebar and code-block-copy share
+ * this pattern. */
+
+.lang {
+  display: none;
+}
+.en .lang.en,
+.zh-CN .lang.zh-CN {
+  display: block;
+}
+
+/* -- Semantic typography (h1-h6, p) --
+ *
+ * These are registered as `text` widget aliases in app/main.c.  Each
+ * tag maps to a tailwind size on the default type scale; p shares the
+ * h6 size and is distinguished only by weight. */
+
+h1 {
+  @apply text-4xl  font-bold text-gray-900 mb-4;
+}
+h2 {
+  @apply text-3xl  font-bold text-gray-900 mt-8 mb-3;
+}
+h3 {
+  @apply text-2xl  font-bold text-gray-900 mt-6 mb-2;
+}
+h4 {
+  @apply text-xl   font-bold text-gray-900 mt-6 mb-2;
+}
+h5 {
+  @apply text-lg   font-bold text-gray-900 mt-4 mb-2;
+}
+h6 {
+  @apply text-base font-bold text-gray-900 mt-4 mb-2;
+}
+p {
+  @apply text-base text-gray-800 mb-3 leading-relaxed;
+}
+
+/* -- Code block card --
+ *
+ * Light-themed card: a 1px border with rounded corners, a gray header
+ * carrying the file name (or language) plus a clickable Copy button,
+ * and a white body with one <Text> per source line.  Both the demo
+ * code blocks and MDX-derived fenced blocks share this structure
+ * (see scripts/compiler/page-generator.ts). */
+
+.code-block {
+  @apply rounded border border-gray-200 my-4 bg-white;
+}
+.code-block-header {
+  @apply flex flex-row items-center pl-3 pr-1 py-1 bg-gray-50 border-b border-gray-200 min-h-[36px];
+}
+.code-block-title {
+  @apply flex-1 text-sm text-gray-700;
+}
+.code-block-copy {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  @apply flex gap-1 items-center px-2 py-1 text-sm text-gray-600 cursor-pointer rounded;
+}
+.code-block-copy text {
+  white-space: nowrap;
+}
+.code-block-copy .copy-icon,
+.code-block-copy .check-icon {
+  position: relative;
+  top: 1px;
+}
+.code-block-copy .check-icon {
+  display: none;
+}
+.code-block-copy.copied .copy-icon {
+  display: none;
+}
+.code-block-copy.copied .check-icon {
+  display: inline-block;
+}
+.code-block-copy:hover {
+  @apply bg-gray-100 text-gray-900;
+}
+.code-block-body {
+  @apply p-3 text-sm text-gray-800 whitespace-pre;
+  position: relative;
+  font-family: monospace;
+}
+.code-line {
+  @apply text-gray-800;
+  font-family: monospace;
+}
+
+/* -- Demo widget (see app/components/demo-provider.tsx) -- */
+
+.demo {
+  @apply mb-6;
+}
+.demo-preview {
+  @apply px-6 py-8 bg-white border rounded-tl-md rounded-tr-md border-gray-200 flex items-center justify-center min-h-[128px];
+}
+.demo .code-block {
+  @apply rounded-tr-none rounded-tl-none border-t-0 my-0;
+}
+
+/* The code-block wrapper holds the shared card chrome.  Inner code
+ * block bodies are siblings of the header and carry data attributes
+ * for language/file/source selection. */
+
+/* The header uses flex so that the file tab group, the language tab
+ * group, and the copy button share a single row.  The `.demo-files`
+ * and `.demo-languages` containers themselves are plain blocks; their
+ * `.demo-tab` children are laid out with `display: inline-block` (see
+ * "CSS `display` property" in .opencode/skills/lcui-cli/SKILL.md). */
+
+.code-block-header .demo-files {
+  flex: 1;
+}
+.code-block-header .demo-languages,
+.code-block-header .demo-files {
+  @apply px-1 py-1;
+}
+
+.demo .code-block-header {
+  @apply px-1;
+}
+
+.demo-tab {
+  display: inline-block;
+  @apply px-2 py-1 text-sm rounded-lg mr-1;
+}
+.demo-tab:hover {
+  @apply bg-gray-100;
+}
+.demo-tab.active {
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
+  @apply text-gray-900 font-bold bg-white;
+}
+
+/* -- Lists (ol/ul/li) --
+ *
+ * ol/ul are registered as native widgets in app/components/list.c.
+ * Each li has an absolutely-positioned marker child created in C
+ * (class .list-marker).  The container's padding-left is set per-li
+ * at runtime in px (LCUI does not currently support em on padding).
+ * The defaults below apply when no inline override is present. */
+
+ol,
+ul {
+  display: block;
+  @apply my-3;
+}
+li {
+  display: block;
+  position: relative;
+  padding-left: 20px;
+  @apply text-base text-gray-800 mb-1;
+}
+.list-marker {
+  position: absolute;
+  left: 0;
+  top: 0;
+  @apply text-gray-700;
+}
+
+/* -- Admonitions (:::note / :::info / :::tip / :::caution / :::warning)
+ *
+ * Docusaurus-style admonition containers rendered by
+ * page-generator.ts.  Each admonition is a rounded container with a
+ * coloured left border and a bold title that takes its colour from
+ * the admonition type.  The generator recurses into the body so
+ * admonitions can contain paragraphs, lists, fenced code blocks,
+ * and other admonitions. */
+
+.admonition {
+  display: block;
+  @apply my-4 py-3 px-4 rounded border-l-4 bg-gray-50;
+}
+.admonition-note    { border-left-color: #3b82f6; }
+.admonition-info    { border-left-color: #06b6d4; }
+.admonition-tip     { border-left-color: #10b981; }
+.admonition-caution { border-left-color: #eab308; }
+.admonition-warning { border-left-color: #ef4444; }
+.admonition-title {
+  @apply font-bold mb-1;
+}
+.admonition-note .admonition-title    { color: #1d4ed8; }
+.admonition-info .admonition-title    { color: #0891b2; }
+.admonition-tip .admonition-title     { color: #047857; }
+.admonition-caution .admonition-title { color: #ca8a04; }
+.admonition-warning .admonition-title { color: #b91c1c; }
+.admonition-content p,
+.admonition-content ul,
+.admonition-content ol {
+  @apply my-1;
+}
+
+/* -- Markdown tables (-- generated by scripts/compiler/page-generator.ts)
+ *
+ * LCUI does not support display: table, so every markdown table is
+ * emitted as a vertical stack of horizontal flex rows.  Each cell is
+ * a widget with either a fixed width (for short, label-style columns)
+ * or flex-grow (for the last "description" column).  A minimum width
+ * is applied so empty cells do not collapse. */
+
+.mdx-table {
+  display: block;
+  @apply my-4 rounded border border-gray-200 bg-white;
+}
+.mdx-table-row {
+  display: flex;
+  flex-direction: row;
+}
+.mdx-table-head {
+  @apply bg-gray-50 border-b border-gray-200;
+}
+.mdx-table-cell {
+  @apply px-3 py-2 text-sm text-gray-800;
+}
+.mdx-table-head-cell {
+  @apply font-bold text-gray-900;
+}

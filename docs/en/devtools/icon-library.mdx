@@ -1,0 +1,29 @@
+# Icon Library
+
+`@lcui/fluent-icons` is an icon library adapted for LCUI. All icons come from Microsoft's [fluentui-system-icons](https://github.com/microsoft/fluentui-system-icons) project.
+
+## Installation
+
+```sh
+npm install @lcui/fluent-icons
+```
+
+## Choosing icons
+
+Search and select icons on [flicon.io](https://www.flicon.io/). For example, the zoom-in icon is typically named "Zoom In" in English.
+
+fluentui-system-icons icons are available in sizes like 16, 20, and 24, named in the format "icon name + size + style". `@lcui/fluent-icons` uses the naming format "icon name + style", and when the style is Regular it can be omitted.
+
+## Usage
+
+```tsx
+import { ZoomIn } from "@lcui/fluent-icons";
+
+<ZoomIn />
+```
+
+The default size is 20. If the icon size is fixed and you want better rendering, specify the size parameter:
+
+```tsx
+<ZoomIn size={32} />
+```

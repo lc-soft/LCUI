@@ -1,0 +1,151 @@
+# 样式
+
+用 CSS 给部件设置颜色、边框、内外边距、尺寸和布局。
+
+## 设置方式
+
+### 内联样式
+
+用 `ui_widget_set_style_string()` 直接设置单个 CSS 属性：
+
+```c title="main.c"
+ui_widget_t *w = ui_create_widget("text");
+
+ui_widget_set_style_string(w, "color", "#336699");
+ui_widget_set_style_string(w, "font-size", "20px");
+ui_widget_set_style_string(w, "padding", "8px 16px");
+```
+
+### CSS 类选择器
+
+用 `ui_load_css_string()` 或 `ui_load_css_file()` 加载 CSS 规则，再用 `ui_widget_add_class()` 给部件加类名使其生效：
+
+```c title="main.c"
+ui_load_css_file("styles.css");
+
+ui_widget_t *w = ui_create_widget("text");
+ui_widget_add_class(w, "title");
+```
+
+```css title="app/styles.css"
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+```
+
+也可以用 `ui_load_css_string()` 从字符串加载 CSS 规则，第二个参数是来源标识，用于调试定位冲突规则：
+
+```c title="main.c"
+ui_load_css_string(".title { font-size: 24px; }", "app.css");
+```
+
+## 支持的 CSS 特性
+
+LCUI 的 CSS 引擎实现了 Web 标准的一个子集。本节列出所有已支持的特性和它们支持的值；**未列出的特性默认不支持**。
+
+### At Rules
+
+- **`@font-face`** — 加载外部字体
+
+### 选择器
+
+- `*`（通配符）、`type`、`#id`、`.class`
+- 伪类 `:hover`、`:focus`、`:active`、`:first-child`、`:last-child`
+- 不支持 `!important`
+
+### 单位
+
+- `px`、`dp`、`sp`、`pt`、`%`
+
+### 属性
+
+#### 布局
+
+- **`display`** — `none`、`inline-block`、`block`、`flex`、`inline-flex`、`table`、`inline-table`、`table-row`、`table-cell`
+- **`position`** — `static`、`relative`、`absolute`
+- **`top` / `right` / `bottom` / `left`** — `<length>` 或 `<percentage>` 或 `auto`
+- **`z-index`** — `auto` 或整数
+- **`box-sizing`** — `content-box`、`border-box`
+
+#### 盒模型
+
+- **`width` / `height`** — `<length>`、`<percentage>`、`auto`
+- **`min-width` / `max-width` / `min-height` / `max-height`** — 同上
+- **`padding`** — 简写，1-4 个 `<length>` 值（如 `8px`、`4px 8px`、`4px 8px 12px`、`4px 8px 12px 16px`）
+- **`padding-top` / `padding-right` / `padding-bottom` / `padding-left`** — 长边属性
+- **`margin`** — 简写，同 padding
+- **`margin-top` / `margin-right` / `margin-bottom` / `margin-left`**
+- **`border`** — 简写 `1px solid #ccc`（width + style + color）
+- **`border-color` / `border-width` / `border-style` / `border-radius`** — 同 padding 语法的多值简写
+- **`border-top` / `border-right` / `border-bottom` / `border-left`** — 单边简写
+- **`border-top-color` / `border-right-color` / `border-bottom-color` / `border-left-color`**
+- **`border-top-width` / `border-right-width` / `border-bottom-width` / `border-left-width`**
+- **`border-top-style` / `border-right-style` / `border-bottom-style` / `border-left-style`**
+- **`border-top-left-radius` / `border-top-right-radius` / `border-bottom-left-radius` / `border-bottom-right-radius`**
+- **`border-style` 可取值** — `none`、`solid`
+- **`table-layout`** — `auto`、`fixed`
+- **`border-spacing`** — `<length>{1,2}`
+
+#### 背景
+
+- **`background`** — 简写形式 `bg-image || bg-position || bg-size || repeat-style || color`（仅单图层）
+- **`background-color`** — `<color>`
+- **`background-image`** — `none` 或 `<url>`
+- **`background-position`** — x y 两个值
+- **`background-position-x` / `background-position-y`**
+- **`background-repeat`** — `<repeat-style>`
+- **`background-size`** — `<bg-size>`
+- **`background-clip`** — `border-box`、`padding-box`、`content-box`
+
+#### Flexbox 布局
+
+- **`flex`** — 简写（`flex-grow` + `flex-shrink` + `flex-basis`）
+- **`flex-shrink` / `flex-grow` / `flex-basis`**
+- **`flex-wrap`** — `nowrap`、`wrap`
+- **`flex-direction`** — `row`、`column`
+- **`justify-content`** — `flex-start`、`center`、`flex-end`
+- **`align-items`** — `flex-start`、`center`、`flex-end`、`stretch`
+- **`align-content`** — 同 justify-content 加 `space-between`、`space-around`、`space-evenly`
+- **`gap`** — 简写，同时设 row-gap + column-gap
+- **`row-gap` / `column-gap`** — `normal` 或 `<length-percentage>`
+
+#### 排版
+
+- **`font-face`** — （通过 `@font-face` 规则加载字体）
+- **`font-family`** — `<font-family>`（建议用内置别名如 `monospace`）
+- **`font-size`** — `<length>`
+- **`font-style`** — `normal`、`italic`、`oblique`
+- **`font-weight`** — `normal`、`bold`、`<number>`
+- **`text-align`** — `left`、`center`、`right`
+- **`line-height`** — `normal` 或 `<length>` 或 `<number>`
+- **`color`** — `<color>`
+- **`white-space`** — `normal`、`nowrap`
+- **`word-break`** — `normal`、`break-all`
+- **`content`** — `<string>` 或 `none`
+
+#### 其他
+
+- **`opacity`** — `<number>` 或 `<percentage>`
+- **`visibility`** — `visible`、`hidden`
+- **`pointer-events`** — `auto`、`none`
+- **`box-shadow`** — `none` 或 `<shadow>`（格式 `<length>{2,4} && <color>?`）
+
+## 注意事项
+
+:::warning
+**`white-space: pre` 无效。** LCUI 的 `white-space` 仅实现 `normal` 和 `nowrap`。如需保留源代码前导缩进，把空格换成 U+00A0 (NBSP)。
+:::
+
+:::warning
+**`overflow` 不裁切内容。** 要裁切或滚动子内容，改用 `scrollarea` 内置部件。
+:::
+
+:::warning
+**`background` 简写不支持多图层。** 写 `background: url(a.png) no-repeat, url(b.png) center;` 这种多背景语法不会生效。请拆成 `background-image` / `background-position` 等分属性逐个设置。
+:::
+
+:::warning
+**CSS 不支持继承。** 像 `color`、`font-family`、`font-size` 不会从父部件流向子部件。每个 `text` / `button` 等需要文本显示的部件都必须显式设置这些属性。
+:::
