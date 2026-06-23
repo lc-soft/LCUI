@@ -1,0 +1,201 @@
+# TSX & Dev Tools
+
+With `@lcui/cli`, you can write declarative UIs using TypeScript with JSX syntax. The CLI compiles TSX into C code, so you don't need to manually write widget tree construction logic.
+
+The benefit is that the declarative approach makes state binding, event binding, and resource imports more concise and intuitive. Handling logic and view in the same file reduces context switching.
+
+However, `@lcui/react` currently has limited capabilities — you can only declare component state, data bindings, and event bindings. For complex operations like conditional rendering or list rendering, you still need to write C code.
+
+## Installing dev tools
+
+`@lcui/cli` is a command-line tool that integrates a TypeScript compiler, Sass preprocessor, resource file loader, and more. It requires a Node.js runtime:
+
+```sh
+npm install -g @lcui/cli
+```
+
+## How the preprocessor works
+
+LCUI uses a preprocessor approach: TSX files are only executed during preprocessing and do not become runtime code. You can think of TSX files as configuration files, where the TypeScript code acts as preprocessing directives.
+
+The preprocessor matches the appropriate loader by file extension, parses the TSX code, collects dependencies, executes component functions, and then generates C source files based on the returned JSX elements and Hook call results.
+
+## Usage overview
+
+```tsx title="src/App.tsx"
+import { useState, TextInput, Button } from "@lcui/react";
+
+export default function App() {
+  const inputRef = { current: { value: "" } };
+  const [name, setName] = useState("LCUI");
+
+  return (
+    <Widget className="container">
+      <Widget className="flex flex-col items-center pt-6">
+        <Text className="my-4 text-2xl text-center">Hello, {name}!</Text>
+        <TextInput
+          $ref={inputRef}
+          className="mt-2"
+          placeholder="Please input..."
+        />
+        <Button
+          className="mt-2"
+          onClick={() => setName(inputRef.current.value)}
+        >
+          Change
+        </Button>
+      </Widget>
+    </Widget>
+  );
+}
+```
+
+## React library
+
+`@lcui/react` is a UI library tailored for LCUI's features and preprocessor workflow, providing built-in components, utility functions, and hooks.
+
+Installation:
+
+```sh
+npm install @lcui/react
+```
+
+### Component functions
+
+The preprocessor executes component functions, collects data from `useState`, `useRef`, etc. and the returned JSX elements, then converts them into C code.
+
+:::warning
+- Component function return values must be a single JSX element — `<Fragment>`, null, undefined, strings, numbers, or other objects are not supported.
+- Declaring and passing component props is not yet supported.
+:::
+
+### State management
+
+`useState` declares a state variable for a component:
+
+```tsx
+import { useState } from "@lcui/react";
+
+function MyComponent() {
+  const [age, setAge] = useState(23);
+  const [name, setName] = useState("Taylor");
+  // ...
+}
+```
+
+`useState` returns an array:
+
+- The state variable, initialized to the value passed to `useState`.
+- A set function, which lets you change the state variable in response to interactions.
+
+`useState` adds a member to the component's state struct and generates initialization code in the init function:
+
+```c
+/* Component state struct */
+struct MyComponent_state {
+  int age;
+  char *name;
+};
+
+/* Code in component init function */
+_that->state.age = 23;
+_that->state.name = strdup2("Taylor");
+```
+
+The state's set function inserts C code in the current scope, e.g. `setAge(30)` generates `_that->state.age = 30;`.
+
+:::warning
+`useState` parameters can only be string or number types.
+:::
+
+### Refs
+
+Use the `$ref` attribute to reference a widget object:
+
+```tsx
+<TextInput $ref="input" />
+```
+
+Then operate on it in C code:
+
+```c
+ui_textinput_set_content(_that->refs.input, "hello");
+```
+
+The `$ref` value can also be a reference object returned by `useRef`:
+
+```tsx
+import { useRef } from "@lcui/react";
+
+function MyComponent() {
+  const inputRef = useRef();
+
+  return <TextInput $ref={inputRef} />;
+}
+```
+
+`useRef` currently only implements value property read/write binding for TextInput:
+
+```tsx
+inputRef.current.value = "World";
+
+<Button onClick={() => setName(inputRef.current.value)}>Click</Button>
+```
+
+:::warning
+`@lcui/react`'s `useRef` is different from React's `useRef` — it is only for referencing widget objects.
+:::
+
+### Responding to events
+
+Declare event handlers using the `on + event name` attribute:
+
+```tsx
+<Button onClick="handleClick">Click me</Button>
+```
+
+The preprocessor generates C code to bind the event:
+
+```c
+ui_widget_on(_that->refs.ref_0, "click", handleClick, w);
+```
+
+You can also bind JavaScript functions to events:
+
+```tsx
+import { useState, Text, Button } from "@lcui/react";
+
+export default function Counter() {
+  const [text, setText] = useState("Click me");
+
+  function handleClick() {
+    setText("You clicked");
+  }
+
+  return (
+    <Button onClick={handleClick}>
+      {text}
+    </Button>
+  );
+}
+```
+
+The preprocessor generates a C-language version of the event handler based on the code executed inside the handler function.
+
+:::warning
+Currently, only state variable set functions can be called inside event handlers. Accessing the event object or executing other statements is not supported.
+:::
+
+### Conditional rendering
+
+:::warning
+Not yet supported.
+We are considering implementing conditional rendering with a `<Show>` component, inspired by Solid.js's `<Show>`.
+:::
+
+### Rendering lists
+
+:::warning
+Not yet supported.
+We are considering implementing array iteration with a `<For>` component, inspired by Solid.js's `<For>`.
+:::

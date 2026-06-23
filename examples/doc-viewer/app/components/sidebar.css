@@ -1,0 +1,52 @@
+.sidebar-container {
+  width: 240px;
+  min-width: 240px;
+  height: 100%;
+  background-color: #f8f9fa;
+  border-right: 1px solid #e8e8e8;
+}
+
+.sidebar {
+  flex-direction: column;
+  padding: 16px 0;
+}
+
+/* Override .lang's display:block with flex for sidebar layout. */
+.en .sidebar.en,
+.zh-CN .sidebar.zh-CN {
+  display: flex;
+}
+
+.sidebar-section {
+  margin-bottom: 8px;
+}
+
+.sidebar-heading {
+  padding: 4px 16px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #999;
+}
+
+.sidebar-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-item {
+  display: block;
+  padding: 6px 16px 6px 24px;
+  color: #333;
+  font-size: 14px;
+}
+
+.sidebar-item:hover {
+  background-color: #e6f4ff;
+  color: #1890ff;
+}
+
+.sidebar-item.active {
+  background-color: #e6f4ff;
+  color: #1890ff;
+  font-weight: 500;
+}

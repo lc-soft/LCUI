@@ -1,0 +1,15 @@
+# Sass
+
+Sass 是一个流行的 CSS 预处理器，通过变量、嵌套规则和混合元素等功能扩展 CSS。
+
+## 用法
+
+`@lcui/cli` 已内置 Sass 预处理器，在编译 `.sass` 和 `.scss` 后缀的文件时会自动调用，无需额外安装或配置。
+
+在 TSX 中直接导入 Sass 文件：
+
+```tsx title="MyComponent.tsx"
+import "./MyComponent.scss";
+```
+
+CLI 会将 Sass 文件编译为 CSS，再转换为 C 代码在运行时加载。

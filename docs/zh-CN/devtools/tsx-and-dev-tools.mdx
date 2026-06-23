@@ -1,0 +1,201 @@
+# TSX 与开发工具
+
+配合 `@lcui/cli`，你可以用 TypeScript 搭配 JSX 语法编写声明式界面。CLI 会编译 TSX 为 C 代码，你无需手动编写部件树构建逻辑。
+
+这样做的好处是：声明式编程方式使得状态绑定、事件绑定和资源引入更加简洁直观，在同一份文件中处理逻辑和视图可以减少上下文切换。
+
+不过，`@lcui/react` 目前功能有限，你只能声明组件的状态、数据绑定和事件绑定。对于条件渲染、列表渲染等复杂操作，你仍需要编写 C 代码。
+
+## 安装开发工具
+
+`@lcui/cli` 是一个命令行工具，集成了 TypeScript 编译器、Sass 预处理器、资源文件加载器等功能。它依赖 Node.js 运行时环境：
+
+```sh
+npm install -g @lcui/cli
+```
+
+## 预处理器工作原理
+
+LCUI 采用预处理器方案：TSX 文件只在预处理阶段执行，不会成为运行时代码。你可以理解为 TSX 文件是配置文件，其中的 TypeScript 代码都是预处理指令。
+
+预处理器按文件后缀名匹配合适的加载器，解析 TSX 代码、收集依赖、执行组件函数，然后根据返回的 JSX 元素和 Hook 调用结果生成 C 源文件。
+
+## 用法概览
+
+```tsx title="src/App.tsx"
+import { useState, TextInput, Button } from "@lcui/react";
+
+export default function App() {
+  const inputRef = { current: { value: "" } };
+  const [name, setName] = useState("LCUI");
+
+  return (
+    <Widget className="container">
+      <Widget className="flex flex-col items-center pt-6">
+        <Text className="my-4 text-2xl text-center">Hello, {name}!</Text>
+        <TextInput
+          $ref={inputRef}
+          className="mt-2"
+          placeholder="Please input..."
+        />
+        <Button
+          className="mt-2"
+          onClick={() => setName(inputRef.current.value)}
+        >
+          Change
+        </Button>
+      </Widget>
+    </Widget>
+  );
+}
+```
+
+## React 库
+
+`@lcui/react` 是针对 LCUI 特性和预处理器工作模式的用户界面库，提供预置组件、工具函数和 Hook 函数。
+
+安装方法：
+
+```sh
+npm install @lcui/react
+```
+
+### 组件函数
+
+预处理器会执行组件函数，收集 `useState`、`useRef` 等产出的数据和返回的 JSX 元素，然后转换成 C 代码。
+
+:::warning
+- 组件函数返回值必须是一个 JSX 元素，不能是 `<Fragment>`、null、undefined、字符串、数字等对象。
+- 暂不支持声明和传递组件 props 参数。
+:::
+
+### 状态管理
+
+`useState` 为组件声明状态变量：
+
+```tsx
+import { useState } from "@lcui/react";
+
+function MyComponent() {
+  const [age, setAge] = useState(23);
+  const [name, setName] = useState("Taylor");
+  // ...
+}
+```
+
+`useState` 返回一个数组：
+
+- 状态变量，初始值为你传给 `useState` 的值。
+- set 函数，允许你在响应交互时更改状态变量。
+
+`useState` 会为组件的状态结构体添加成员，并在初始化函数中添加初始化代码：
+
+```c
+/* 组件状态结构体 */
+struct MyComponent_state {
+  int age;
+  char *name;
+};
+
+/* 组件初始化函数中的代码 */
+_that->state.age = 23;
+_that->state.name = strdup2("Taylor");
+```
+
+状态的 set 函数会在当前作用域中插入 C 代码，例如 `setAge(30)` 会生成 `_that->state.age = 30;`。
+
+:::warning
+`useState` 的参数只能是 string、number 类型。
+:::
+
+### 引用
+
+用 `$ref` 属性引用部件对象：
+
+```tsx
+<TextInput $ref="input" />
+```
+
+之后在 C 代码中操作它：
+
+```c
+ui_textinput_set_content(_that->refs.input, "hello");
+```
+
+`$ref` 的值也可以是 `useRef` 返回的引用对象：
+
+```tsx
+import { useRef } from "@lcui/react";
+
+function MyComponent() {
+  const inputRef = useRef();
+
+  return <TextInput $ref={inputRef} />;
+}
+```
+
+`useRef` 目前只实现了 TextInput 的 value 属性读写绑定：
+
+```tsx
+inputRef.current.value = "World";
+
+<Button onClick={() => setName(inputRef.current.value)}>Click</Button>
+```
+
+:::warning
+`@lcui/react` 的 `useRef` 和 React 的 `useRef` 不同，仅用于引用部件对象。
+:::
+
+### 响应事件
+
+通过 `on + 事件名` 属性声明事件处理函数：
+
+```tsx
+<Button onClick="handleClick">点我</Button>
+```
+
+预处理器会生成 C 代码绑定事件：
+
+```c
+ui_widget_on(_that->refs.ref_0, "click", handleClick, w);
+```
+
+也可以将 JavaScript 函数与事件绑定：
+
+```tsx
+import { useState, Text, Button } from "@lcui/react";
+
+export default function Counter() {
+  const [text, setText] = useState("点我");
+
+  function handleClick() {
+    setText("你已点击");
+  }
+
+  return (
+    <Button onClick={handleClick}>
+      {text}
+    </Button>
+  );
+}
+```
+
+预处理器会根据事件处理函数内部的代码执行结果，为其生成 C 语言版本的事件处理函数。
+
+:::warning
+暂时只支持在事件处理函数中执行状态变量的 set 函数，不支持访问事件对象，不支持执行其它语句。
+:::
+
+### 条件渲染
+
+:::warning
+暂不支持。
+我们正考虑使用 `<Show>` 组件实现条件渲染，参考 Solid.js 的 `<Show>`。
+:::
+
+### 渲染列表
+
+:::warning
+暂不支持。
+我们正考虑使用 `<For>` 组件实现数组遍历，参考 Solid.js 的 `<For>`。
+:::

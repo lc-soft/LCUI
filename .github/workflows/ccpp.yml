@@ -21,7 +21,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install dependencies
         run: npm ci
@@ -49,20 +49,8 @@ jobs:
 
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
-          xmake-version: branch@dev
-
-      - name: Cache xmake packages
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.xmake/packages
-            ~/.xmake/repositories
-            ~/AppData/Local/.xmake/packages
-            ~/AppData/Local/.xmake/repositories
-          key: ${{ runner.os }}-xmake-${{ runner.os == 'Linux' && 'coverage' || 'release' }}-${{ hashFiles('xmake-requires.lock', 'examples/xmake-requires.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-xmake-${{ runner.os == 'Linux' && 'coverage' || 'release' }}-
-            ${{ runner.os }}-xmake-
+          package-cache: true
+          actions-cache-folder: '.xmake-cache'
 
       - name: Install tools
         if: runner.os == 'Linux'
@@ -107,14 +95,32 @@ jobs:
           xmake package
           xmake install -o dist/lcui-package
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install doc-viewer dependencies
+        working-directory: examples/doc-viewer
+        run: bun install
+
+      - name: Install lcui-cli
+        run: npm install -g @lcui/cli
+
+      - name: Generate doc-viewer sources
+        working-directory: examples/doc-viewer
+        run: bun run compile
+
+      - name: Process doc-viewer TSX files
+        working-directory: examples/doc-viewer
+        run: lcui build
+
       - name: Build examples
-        run: |
-          cd examples
-          xmake config -P . -y
-          xmake build -P .
-          xmake install -P . -o ../dist/lcui-examples
-          mv ../dist/lcui-examples/bin/* ../dist/lcui-examples/
-          rm -r ../dist/lcui-examples/bin
+        run: xmake build -yg lcui-examples
+
+      - name: Install examples
+        run: xmake install -o dist/lcui-examples -g lcui-examples
 
       - uses: actions/upload-artifact@v4
         with:

@@ -1,0 +1,59 @@
+# About LCUI
+
+LCUI is an open-source desktop graphical user interface library written in C, designed to provide C developers with a simple and easy-to-use GUI development experience, while incorporating CSS styling and declarative UI description from web development to lower the learning barrier.
+
+## Key features
+
+- **Cross-platform** — Supports Windows and Linux.
+- **Fully self-drawn widgets** — Widgets maintain consistent appearance and behavior across platforms.
+- **DPI-adaptive** — Automatically scales the UI on high-resolution screens for crisp display.
+- **Built-in CSS engine** — Supports using CSS to define UI styles and layouts, making it easy to pick up for those with web development experience.
+- **Modern development tools** — Through the `@lcui/cli` tool, you can use TypeScript with JSX syntax to write user interfaces.
+
+## Who should use LCUI
+
+LCUI is suitable for these developers:
+
+- Want to keep using C on the desktop, but want to escape the tedious Win32 / X11 native development experience.
+- Already familiar with web frontend (HTML, CSS) and want to transfer that experience to desktop applications.
+- Need to build single-window desktop tools with simple UI content.
+
+If your use case is a large commercial desktop product, a game engine, or a tool deeply integrated with the OS, LCUI may not be the best choice; in such scenarios, consider Qt, GTK, or native APIs instead.
+
+## Architecture
+
+LCUI is divided into four layers from top to bottom:
+
+### Application layer
+
+Your business code: custom widgets, CSS styles, TSX/JSX code, event handling. This is the only part tied to your project domain.
+
+### LCUI Runtime
+
+Initialization, event loop, application lifecycle management. Responsible for running the app, dispatching events, and driving rendering.
+
+### UI Helpers
+
+UI XML parsing, UI Router, cursor management, internationalization (i18n), and other helper modules. These package common UI behaviors into pluggable subsystems.
+
+### Foundation layer
+
+YUtil (general utility library), PandaGL (2D rendering engine), CSS engine, UI widget system, Thread / Worker abstractions. These modules can also be used independently.
+
+The platform layer (Windows / Linux) handles window management and input events.
+
+## License
+
+LCUI is released under the MIT License. See LICENSE.TXT in the repository root for details.
+
+## Contributing
+
+Contributions are welcome! Before submitting a Pull Request, please read CONTRIBUTING.md in the repository root.
+
+- **Bug reports** — Open an issue on GitHub Issues.
+- **Feature requests** — Start a discussion on GitHub Discussions.
+- **Code contributions** — Fork the repo, create a branch, and submit a PR.
+
+## Community
+
+If you run into issues, you can ask questions on GitHub Discussions (use the `Q&A` label). We also encourage experienced users to help newcomers.

@@ -1,0 +1,136 @@
+# Customization
+
+You can create entirely new widget types or extend existing ones.
+
+## Creating a custom widget
+
+Use `ui_create_widget_prototype()` to register a new widget type:
+
+```c title="src/counter.c"
+#include <LCUI.h>
+
+typedef struct {
+        int value;
+} counter_data_t;
+
+static ui_widget_prototype_t *counter_proto;
+
+static void counter_init(ui_widget_t *w)
+{
+        counter_data_t *data;
+        ui_widget_t *text;
+
+        data = ui_widget_add_data(w, counter_proto, sizeof(counter_data_t));
+        data->value = 0;
+
+        text = ui_create_widget("text");
+        ui_text_set_content(text, "0");
+        ui_widget_append(w, text);
+}
+
+static void counter_destroy(ui_widget_t *w)
+{
+        /* Release owned resources (if any) */
+}
+
+void register_counter_widget(void)
+{
+        counter_proto = ui_create_widget_prototype("counter", NULL);
+        counter_proto->init = counter_init;
+        counter_proto->destroy = counter_destroy;
+}
+```
+
+Use the custom widget:
+
+```c title="src/main.c"
+extern void register_counter_widget(void);
+
+int main(void)
+{
+        ui_widget_t *counter;
+
+        lcui_init();
+        register_counter_widget();
+
+        counter = ui_create_widget("counter");
+        ui_widget_append(ui_root(), counter);
+        return lcui_main();
+}
+```
+
+## Extending an existing widget
+
+Pass a parent type name as the second argument to `ui_create_widget_prototype()`:
+
+```c title="src/icon_button.c"
+static ui_widget_prototype_t *icon_button_proto;
+
+static void icon_button_init(ui_widget_t *w)
+{
+        /* Call parent (button) init logic */
+        icon_button_proto->proto->init(w);
+        ui_widget_add_class(w, "icon-button");
+}
+
+void register_icon_button(void)
+{
+        icon_button_proto =
+            ui_create_widget_prototype("icon-button", "button");
+        icon_button_proto->init = icon_button_init;
+}
+```
+
+:::warning
+**Parent `init` must be called manually.** LCUI does not automatically call the parent type's `init` when creating a subtype widget. If you forget to call `proto->proto->init(w)`, the widget will lack the parent type's base behaviors (e.g. `button` won't register click events or set default styles).
+:::
+
+## Widget lifecycle
+
+`ui_widget_prototype_t` has several callback hooks covering each lifecycle stage:
+
+- **`init`** — When the widget is created. Responsible for initializing owned data, child widgets, and event bindings.
+- **`destroy`** — When the widget is destroyed. Responsible for releasing owned memory and unbinding events.
+- **`update`** — When the widget needs updating, receives a `ui_task_type_t` parameter indicating the update type (style update, property update, etc.). Called by LCUI during each frame's update loop.
+- **`setattr`** — When an XML attribute is set (for responding to attribute changes).
+- **`settext`** — When text content is set.
+- **`sizehint`** — Estimates the widget's natural size constraints (min/max content size) without external constraints. The layout engine uses this when computing child widget sizes.
+- **`resize`** — When the widget size changes. Receives the new content area width and height as parameters.
+- **`paint`** — When the widget needs to be redrawn. Used for custom drawing logic.
+
+## Custom painting
+
+Override the `paint` callback to draw custom graphics on a widget:
+
+```c title="src/my_widget.c"
+static void my_widget_paint(ui_widget_t *w, pd_context_t *paint_ctx,
+                              ui_widget_actual_style_t *style)
+{
+        pd_canvas_t *canvas = paint_ctx->canvas;
+        pd_color_t color = pd_color_from_rgb(255, 0, 0);
+        pd_rect_t rect = { style->left, style->top, w->width, w->height };
+
+        pd_canvas_fill_rect(canvas, color, rect);
+}
+
+static void register_my_widget(void)
+{
+        ui_widget_prototype_t *proto =
+            ui_create_widget_prototype("my-widget", NULL);
+        proto->paint = my_widget_paint;
+}
+```
+
+:::warning
+**`paint` is only for drawing.** Widget size estimation is handled by `sizehint`; do not modify widget size or the child widget tree inside `paint`, as it may cause infinite loops.
+:::
+
+## Caveats
+
+:::warning
+**`destroy` must release owned resources.** If a custom widget allocated memory, opened files, or subscribed to system events (e.g. `lcui_settings_on_deserialize`) in `init`, it must perform symmetric cleanup in `destroy`.
+:::
+
+:::warning
+**Custom widgets must be registered after `lcui_init()` and before first instantiation.** Calling your `register_xxx()` function right at the start of `main()` is the safest place, ensuring all consumers (XML loading, router instantiation, TSX compilation results) can see the prototype.
+:::
