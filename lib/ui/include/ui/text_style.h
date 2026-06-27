@@ -1,15 +1,12 @@
 ﻿/*
  * lib/ui/include/ui/text_style.h
  *
- * Copyright (c) 2023-2026, Liu Chao
- * <hello@lcui.dev> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
-
- * * This file is part of LCUI, distributed under the MIT License found in the
-
- * * LICENSE.TXT file in the root directory of this source tree.
+ * This file is part of LCUI, distributed under the MIT License found
+ * in the LICENSE.TXT file in the root directory of this source tree.
  */
 
 #ifndef LIB_UI_INCLUDE_UI_TEXT_STYLE_H

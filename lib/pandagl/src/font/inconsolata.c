@@ -2,14 +2,11 @@
  * lib/pandagl/src/font/inconsolata.c: bitmap data of the inconsolata font.
  *
  * Copyright (c) 2018-2026, Liu chao <lc-soft@live.cn> All rights reserved.
-
- * *
+ *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI,
- * distributed under the MIT License found in the
- * LICENSE.TXT file in the
- * root directory of this source tree.
+ * This file is part of LCUI, distributed under the MIT License found
+ * in the LICENSE.TXT file in the root directory of this source tree.
  */
 
 // TODO: 删除此文件，可考虑由 lcui-cli 提供字体位图到 C 源码的生成功能

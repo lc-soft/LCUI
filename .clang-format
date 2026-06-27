@@ -34,3 +34,5 @@ SpacesInSquareBrackets: false
 SortIncludes: false
 UseTab: Never
 InsertNewlineAtEOF: true
+DeriveLineEnding: false
+UseCRLF: false
