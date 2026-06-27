@@ -238,6 +238,93 @@ static void should_to_wcs_handle_empty_text(void)
         pd_text_destroy(text);
 }
 
+static void should_escape_open_bracket(void)
+{
+        pd_text_t *text = pd_text_create();
+        wchar_t *buf;
+
+        pd_text_set_style_tag(text, true);
+        pd_text_write(text, L"\\[b\\]hello\\[/b\\]", NULL);
+        buf = pd_text_to_wcs(text);
+        ctest_equal_bool("should not return NULL", buf != NULL, true);
+        if (buf) {
+                ctest_equal_wcs("should produce literal brackets", buf,
+                                L"[b]hello[/b]");
+                free(buf);
+        }
+        pd_text_destroy(text);
+}
+
+static void should_escape_close_bracket(void)
+{
+        pd_text_t *text = pd_text_create();
+        wchar_t buf[64];
+
+        pd_text_set_style_tag(text, true);
+        pd_text_write(text, L"a\\]b", NULL);
+        ctest_equal_uint("should preserve escaped close bracket",
+                         (unsigned)pd_text_read(text, 0, 64, buf), 3u);
+        ctest_equal_wcs("should produce literal close bracket", buf, L"a]b");
+        pd_text_destroy(text);
+}
+
+static void should_escape_backslash(void)
+{
+        pd_text_t *text = pd_text_create();
+        wchar_t buf[64];
+
+        pd_text_set_style_tag(text, true);
+        pd_text_write(text, L"a\\\\b", NULL);
+        ctest_equal_uint("should keep single backslash",
+                         (unsigned)pd_text_read(text, 0, 64, buf), 3u);
+        ctest_equal_wcs("should collapse double backslash", buf, L"a\\b");
+        pd_text_destroy(text);
+}
+
+static void should_mix_real_and_escaped_tags(void)
+{
+        pd_text_t *text = pd_text_create();
+        wchar_t buf[64];
+
+        pd_text_set_style_tag(text, true);
+        pd_text_write(text, L"[b]bold\\[/b\\]not-bold[/b]", NULL);
+        ctest_equal_uint("should keep total chars",
+                         (unsigned)pd_text_read(text, 0, 64, buf), 16u);
+        ctest_equal_wcs("should mix real and escaped tags", buf,
+                        L"bold[/b]not-bold");
+        pd_text_destroy(text);
+}
+
+static void should_not_apply_style_for_escaped_tag(void)
+{
+        pd_text_t *text = pd_text_create();
+        wchar_t *buf;
+
+        pd_text_set_style_tag(text, true);
+        pd_text_write(text, L"\\[b\\]hello\\[/b\\]", NULL);
+        buf = pd_text_to_wcs(text);
+        ctest_equal_bool("should not return NULL", buf != NULL, true);
+        if (buf) {
+                ctest_equal_wcs("should produce literal brackets without style",
+                                buf, L"[b]hello[/b]");
+                free(buf);
+        }
+        pd_text_destroy(text);
+}
+
+static void should_leave_unrelated_backslash_alone(void)
+{
+        pd_text_t *text = pd_text_create();
+        wchar_t buf[64];
+
+        pd_text_set_style_tag(text, true);
+        pd_text_write(text, L"a\\nb", NULL);
+        ctest_equal_uint("should keep backslash when followed by n",
+                         (unsigned)pd_text_read(text, 0, 64, buf), 4u);
+        ctest_equal_wcs("should not consume unrelated escape", buf, L"a\\nb");
+        pd_text_destroy(text);
+}
+
 void test_pandagl_text_edit(void)
 {
         pd_font_library_init();
@@ -261,5 +348,15 @@ void test_pandagl_text_edit(void)
         ctest_describe("text dump max len", should_dump_respect_max_len);
         ctest_describe("text to_wcs full text", should_to_wcs_return_full_text);
         ctest_describe("text to_wcs empty", should_to_wcs_handle_empty_text);
+        ctest_describe("text escape open bracket", should_escape_open_bracket);
+        ctest_describe("text escape close bracket",
+                       should_escape_close_bracket);
+        ctest_describe("text escape backslash", should_escape_backslash);
+        ctest_describe("text mix real and escaped tags",
+                       should_mix_real_and_escaped_tags);
+        ctest_describe("text escape prevents style",
+                       should_not_apply_style_for_escaped_tag);
+        ctest_describe("text unrelated backslash",
+                       should_leave_unrelated_backslash_alone);
         pd_font_library_destroy();
 }

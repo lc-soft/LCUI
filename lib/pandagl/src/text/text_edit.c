@@ -199,7 +199,7 @@ static int pd_text_process(pd_text_t *text, const wchar_t *wstr,
         ins_x = cur_col;
         ins_y = cur_line;
         for (p = wstr; *p; ++p) {
-                if (text->style_tag_enabled) {
+                if (text->style_tag_enabled && *p != L'\\') {
                         const wchar_t *pp;
                         pp = pd_text_process_style_tags(text, p, tags, &style);
                         if (pp) {
@@ -207,7 +207,10 @@ static int pd_text_process(pd_text_t *text, const wchar_t *wstr,
                                 continue;
                         }
                 }
-                if (*p == '\r' || *p == '\n') {
+                if (*p == L'\\' &&
+                    (p[1] == L'[' || p[1] == L']' || p[1] == L'\\')) {
+                        ++p;
+                } else if (*p == '\r' || *p == '\n') {
                         /* 判断是哪一种换行模式 */
                         if (*p == '\r') {
                                 if (*(p + 1) == '\n') {
