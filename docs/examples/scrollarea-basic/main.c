@@ -1,5 +1,4 @@
 ﻿#include <LCUI.h>
-#include <LCUI/widgets.h>
 
 void scrollarea_basic_init(ui_widget_t *parent)
 {

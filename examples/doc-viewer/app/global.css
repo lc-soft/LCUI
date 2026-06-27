@@ -61,23 +61,26 @@ p {
  * tag maps to a tailwind size on the default type scale; p shares the
  * h6 size and is distinguished only by weight. */
 
+h1, h2, h3, h4, h5, h6 {
+  @apply font-bold text-gray-900 leading-normal;
+}
 h1 {
-  @apply text-4xl  font-bold text-gray-900 mb-4;
+  @apply text-4xl  mb-4;
 }
 h2 {
-  @apply text-3xl  font-bold text-gray-900 mt-8 mb-3;
+  @apply text-3xl  mt-8 mb-3;
 }
 h3 {
-  @apply text-2xl  font-bold text-gray-900 mt-6 mb-2;
+  @apply text-2xl  mt-6 mb-2;
 }
 h4 {
-  @apply text-xl   font-bold text-gray-900 mt-6 mb-2;
+  @apply text-xl   mt-6 mb-2;
 }
 h5 {
-  @apply text-lg   font-bold text-gray-900 mt-4 mb-2;
+  @apply text-lg   mt-4 mb-2;
 }
 h6 {
-  @apply text-base font-bold text-gray-900 mt-4 mb-2;
+  @apply text-base mt-4 mb-2;
 }
 p {
   @apply text-base text-gray-800 mb-3 leading-relaxed;

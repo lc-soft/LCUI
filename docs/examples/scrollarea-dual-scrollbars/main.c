@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <LCUI.h>
-#include <LCUI/widgets.h>
 
 void scrollarea_dual_scrollbars_init(ui_widget_t *parent)
 {

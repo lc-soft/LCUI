@@ -12,8 +12,8 @@ export default function TextInputBasicDemo() {
             <Text className="demo-tab active" data-language="tsx" data-value="example.tsx">example.tsx</Text>
             <Text className="demo-tab" data-language="tsx" data-value="main.c" style={{ display: "none" }}>main.c</Text>
             <Text className="demo-tab" data-language="c" data-value="main.c" style={{ display: "none" }}>main.c</Text>
-            <Text className="demo-tab" data-language="xml" data-value="main.c" style={{ display: "none" }}>main.c</Text>
             <Text className="demo-tab" data-language="xml" data-value="ui.xml" style={{ display: "none" }}>ui.xml</Text>
+            <Text className="demo-tab" data-language="xml" data-value="main.c" style={{ display: "none" }}>main.c</Text>
           </Widget>
           <Widget className="demo-languages">
             <Text className="demo-tab active" data-value="tsx">TSX</Text>
@@ -32,7 +32,6 @@ export default function TextInputBasicDemo() {
         <Widget className="code-block-body" data-language="tsx" data-file="main.c" data-source="examples/text-input-basic/6" style={{ display: "none" }}>
           <CodeBlockCopy />
           <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
-          <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI/widgets.h>[/color][/color]`}</Text>
           <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]"example.h"[/color][/color]`}</Text>
           <Text className="code-line">{` `}</Text>
           <Text className="code-line">{`[color=#953800]int[/color] [color=#8250df]main[/color][color=#0550ae]([color=#953800]void[/color])[/color]`}</Text>
@@ -55,10 +54,18 @@ export default function TextInputBasicDemo() {
           <Text className="code-line">{`        ui_widget_append(parent, w);`}</Text>
           <Text className="code-line">{`}`}</Text>
         </Widget>
-        <Widget className="code-block-body" data-language="xml" data-file="main.c" data-source="examples/text-input-basic/8" style={{ display: "none" }}>
+        <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/text-input-basic/8" style={{ display: "none" }}>
+          <CodeBlockCopy />
+          <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color]?>[/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+          <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
+          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]textedit[/color] [color=#0550ae]style[/color]=[color=#0a3069]"width: 200px;"[/color] />[/color]`}</Text>
+          <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ui[/color]>[/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]</[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+        </Widget>
+        <Widget className="code-block-body" data-language="xml" data-file="main.c" data-source="examples/text-input-basic/9" style={{ display: "none" }}>
           <CodeBlockCopy />
           <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
-          <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI/widgets.h>[/color][/color]`}</Text>
           <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<ui_xml.h>[/color][/color]`}</Text>
           <Text className="code-line">{` `}</Text>
           <Text className="code-line">{`[color=#953800]int[/color] [color=#8250df]main[/color][color=#0550ae]([color=#953800]void[/color])[/color]`}</Text>
@@ -67,15 +74,6 @@ export default function TextInputBasicDemo() {
           <Text className="code-line">{`        ui_load_xml_file([color=#0a3069]"ui.xml"[/color]);`}</Text>
           <Text className="code-line">{`        [color=#cf222e]return[/color] lcui_main();`}</Text>
           <Text className="code-line">{`}`}</Text>
-        </Widget>
-        <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/text-input-basic/9" style={{ display: "none" }}>
-          <CodeBlockCopy />
-          <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color]?>[/color]`}</Text>
-          <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
-          <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
-          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]textedit[/color] [color=#0550ae]style[/color]=[color=#0a3069]"width: 200px;"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ui[/color]>[/color]`}</Text>
-          <Text className="code-line">{`[color=#116329]</[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
         </Widget>
       </Widget>
     </DemoProvider>
