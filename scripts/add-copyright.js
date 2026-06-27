@@ -5,7 +5,7 @@ const bom = "\ufeff";
 const cwd = process.cwd();
 const project = path.basename(cwd);
 const includes = ["lib", "include", "src"].map((file) =>
-  path.resolve(cwd, file)
+  path.resolve(cwd, file),
 );
 const excludes = ["lib/yutil"].map((file) => path.resolve(cwd, file));
 const extensions = [".c", ".h", ".h.in"];
@@ -17,8 +17,8 @@ const copyright = `/*
  *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of ${project}, distributed under the MIT License found in the
- * LICENSE.TXT file in the root directory of this source tree.
+ * This file is part of ${project}, distributed under the MIT License found
+ * in the LICENSE.TXT file in the root directory of this source tree.
  */
 `;
 
@@ -45,19 +45,34 @@ function parseCopyrightComment(content) {
   if (!hasComment) {
     return result;
   }
-  result.comment = content.substring(0, index);
-  result.comment.split("\n").forEach((line) => {
-    if (!line.includes("Copyright")) {
-      return;
-    }
-    const [year, holder] = line
-      .substring(3)
-      .replace("Copyright (c)", "")
-      .replace("All rights reserved.", "")
+
+  let parsingCopyright = false;
+  let copyrightCommnet = "";
+
+  function processCopyright() {
+    const [year, holder] = copyrightCommnet
       .split(", ")
       .map((str) => str.trim());
     result.holders.push({ year, holder });
     result.exists = true;
+  }
+
+  result.comment = content.substring(0, index);
+  result.comment.split(/\r?\n/).forEach((lineRaw) => {
+    const line = lineRaw.substring(3).trimEnd();
+    if (line.includes("Copyright")) {
+      if (copyrightCommnet) {
+        processCopyright();
+      }
+      parsingCopyright = true;
+      copyrightCommnet = line.replace("Copyright (c)", "");
+    } else if (parsingCopyright) {
+      copyrightCommnet += ` ${line}`;
+    }
+    if (line.includes("All rights reserved")) {
+      copyrightCommnet = copyrightCommnet.replace("All rights reserved.", "");
+      processCopyright();
+    }
   });
   return result;
 }
@@ -68,11 +83,15 @@ function parseFile(filePath) {
     content = content.slice(1);
   }
   const copyright = parseCopyrightComment(content);
-  if (
-    !copyright.exists ||
-    !copyright.holders.some(({ holder }) => isCurrentHolder(holder))
-  ) {
-    copyright.holders.push({ year: null, holder: copyrightHolder });
+  try {
+    if (
+      !copyright.exists ||
+      !copyright.holders.some(({ holder }) => isCurrentHolder(holder))
+    ) {
+      copyright.holders.push({ year: null, holder: copyrightHolder });
+    }
+  } catch (err) {
+    throw err;
   }
   const result = {
     summary: "",
@@ -82,7 +101,7 @@ function parseFile(filePath) {
   };
   if (copyright.exists) {
     copyright.comment
-      .split("\n")
+      .split(/\r?\n/)
       .slice(0, 3)
       .some((line) => {
         if (line.includes("Copyright")) {
@@ -112,16 +131,16 @@ function generateCopyright(holders, fileCreatedAt) {
       if (!year) {
         copyrightYear = fileCreatedAt.getFullYear();
       }
-      const startYear = `${copyrightYear}`.split('-')[0];
+      const startYear = `${copyrightYear}`.split("-")[0];
       if (startYear !== `${currentYear}`) {
         copyrightYear = `${startYear}-${currentYear}`;
       }
     }
     return `Copyright (c) ${copyrightYear}, ${holder}`;
   });
-  const result = lines.join("\n * ");
+  const result = lines.join("\r\n * ");
   return `${
-    lines.length > 1 ? `${result}\n * ` : `${result} `
+    lines.length > 1 ? `${result}\r\n * ` : `${result} `
   }All rights reserved.`;
 }
 
@@ -132,10 +151,10 @@ function insertCopyright(filePath) {
     .replace("{{summary}}", result.summary ? `: ${result.summary}` : "")
     .replace(
       "{{copyright}}",
-      generateCopyright(result.copyright.holders, result.createdAt)
+      generateCopyright(result.copyright.holders, result.createdAt),
     );
 
-  fs.writeFileSync(filePath, `${bom}${header}\n${result.content}`, "utf-8");
+  fs.writeFileSync(filePath, `${bom}${header}\r\n${result.content}`, "utf-8");
 }
 
 function traverseFolder(folderPath) {

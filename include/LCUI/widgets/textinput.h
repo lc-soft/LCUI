@@ -1,6 +1,17 @@
 ﻿/*
+ * include/LCUI/widgets/textinput.h
+ *
+ * Copyright (c) 2026, Liu Chao <hello@lcui.dev> All rights reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * This file is part of LCUI, distributed under the MIT License found
+ * in the LICENSE.TXT file in the root directory of this source tree.
+ */
+
+/*
  * include/LCUI/widgets/textinput.h: -- textinput widget, used to allow user
- * edit text. 
+ * edit text.
  * Copyright (c) 2018-2026, Liu chao <lc-soft@live.cn> All rights
  * reserved.
  *

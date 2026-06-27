@@ -2,14 +2,11 @@
  * lib/css/include/css/parser.h: -- CSS parser module
  *
  * Copyright (c) 2018-2026, Liu chao <lc-soft@live.cn> All rights reserved.
-
- * *
+ *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI,
- * distributed under the MIT License found in the
- * LICENSE.TXT file in the
- * root directory of this source tree.
+ * This file is part of LCUI, distributed under the MIT License found
+ * in the LICENSE.TXT file in the root directory of this source tree.
  */
 
 #ifndef LIBCSS_INCLUDE_CSS_PARSER_H

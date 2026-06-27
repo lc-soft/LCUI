@@ -1,15 +1,12 @@
 ﻿/*
  * lib/ui/src/ui_debug.h
  *
- * Copyright (c) 2023-2026, Liu Chao
- * <hello@lcui.dev> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
-
- * * This file is part of LCUI, distributed under the MIT License found in the
-
- * * LICENSE.TXT file in the root directory of this source tree.
+ * This file is part of LCUI, distributed under the MIT License found
+ * in the LICENSE.TXT file in the root directory of this source tree.
  */
 
 void ui_widget_to_string(ui_widget_t *w, char *str);

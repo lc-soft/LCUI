@@ -2,14 +2,11 @@
  * lib/ptk/src/windows/win32clipboard.c: clipboard support for Windows
  *
  * Copyright (c) 2025-2026, Liu Chao <hello@lcui.dev> All rights reserved.
-
- * *
+ *
  * SPDX-License-Identifier: MIT
  *
- * This file is part of LCUI,
- * distributed under the MIT License found in the
- * LICENSE.TXT file in the
- * root directory of this source tree.
+ * This file is part of LCUI, distributed under the MIT License found
+ * in the LICENSE.TXT file in the root directory of this source tree.
  */
 
 /*
