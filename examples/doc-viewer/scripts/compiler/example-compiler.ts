@@ -107,14 +107,15 @@ function highlight(source: string, lang: string): string {
 
 const VARIANT_FILES: Record<string, string[]> = {
   c: ["main.c"],
-  xml: ["main.c", "ui.xml"],
-  tsx: ["main.c", "example.tsx", "example.css"],
+  xml: ["ui.xml", "main.c"],
+  tsx: ["example.tsx", "example.c", "example.css", "main.c"],
 };
 
 const FILE_LANG: Record<string, string> = {
   "main.c": "c",
   "ui.xml": "xml",
   "example.tsx": "typescript",
+  "example.c": "c",
   "example.css": "css",
 };
 

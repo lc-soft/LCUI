@@ -145,9 +145,12 @@ docs/examples/{name}-tsx/
   example.tsx
 ```
 
+- **三变体必齐**：C、XML、TSX 三种实现都要提供。即使 widget 暂未在 `@lcui/react` 中导出，也要给出 TSX 变体作为前瞻占位（example.tsx 仅作为代码块展示，不会实际编译）。
+- **TSX 优先展示**：编译器按 `tsx > xml > c` 排序变体，TSX 是默认激活的标签。
 - C 变体的 main.c 须定义 `{widget}_{variant}_init(ui_widget_t *parent)`
 - TSX 变体的 main.c 须 `#include "example.h"` 并调用 `example_load()`
 - 编译器自动用 highlight.js 高亮并提取 local symbols
+- **`<LCUI.h>` 是聚合头**，已包含 `<LCUI/widgets.h>`、`<ptk.h>`、`<ui_xml.h>`、`<LCUI/app.h>` 等。Demo 的 main.c **只能**写 `#include <LCUI.h>`，不要重复 include 子头。
 
 ## widget-fields 数据
 

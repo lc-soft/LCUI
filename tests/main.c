@@ -25,6 +25,7 @@ extern void test_widget_opacity(void);
 extern void test_block_layout(void);
 extern void test_flex_layout(void);
 extern void test_scrollbar(void);
+extern void test_progress(void);
 
 static const ctest_suite_t suites[] = {
         { "settings", test_settings },
@@ -40,6 +41,7 @@ static const ctest_suite_t suites[] = {
         { "block layout", test_block_layout },
         { "flex layout", test_flex_layout },
         { "scrollbar", test_scrollbar },
+        { "progress", test_progress },
         { NULL, NULL }
 };
 

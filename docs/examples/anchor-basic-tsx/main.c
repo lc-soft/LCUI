@@ -1,5 +1,4 @@
 #include <LCUI.h>
-#include <LCUI/widgets.h>
 #include "example.h"
 
 int main(void)

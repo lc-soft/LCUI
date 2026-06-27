@@ -33,6 +33,7 @@
       "items": [
         { "slug": "anchor", "label": { "en": "Anchor", "zh-CN": "Anchor 锚点" } },
         { "slug": "button", "label": { "en": "Button", "zh-CN": "Button 按钮" } },
+        { "slug": "progress", "label": { "en": "Progress", "zh-CN": "Progress 进度条" } },
         { "slug": "scrollarea", "label": { "en": "ScrollArea", "zh-CN": "ScrollArea 滚动区域" } },
         { "slug": "text", "label": { "en": "Text", "zh-CN": "Text 文本" } },
         { "slug": "text-input", "label": { "en": "TextInput", "zh-CN": "TextInput 文本输入" } }

@@ -179,6 +179,7 @@ write_log(logger, msg);
 - `border-style`：仅 `none` / `solid`
 - 无 `calc()` / `var()` / CSS 自定义属性
 - 无 `calc()` / `var()` / `em` / `rem` / `vh` / `vw` 单位（可用 `dp` / `px` / `pt` / `%`）
+- 无 `overflow` 属性
 
 ## 指令
 
