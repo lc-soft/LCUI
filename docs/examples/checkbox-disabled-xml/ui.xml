@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lcui-app>
+  <ui>
+    <div style="display:flex; flex-direction:column; gap:8px">
+      <div style="display:flex; align-items:center; gap:8px">
+        <checkbox id="d1" disabled="true" checked="true" />
+        <label for="d1">Disabled (pre-checked)</label>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px">
+        <checkbox id="d2" checked="true" />
+        <label for="d2">Normal</label>
+      </div>
+    </div>
+  </ui>
+</lcui-app>
