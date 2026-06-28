@@ -26,6 +26,7 @@ extern void test_block_layout(void);
 extern void test_flex_layout(void);
 extern void test_scrollbar(void);
 extern void test_progress(void);
+extern void test_label(void);
 
 static const ctest_suite_t suites[] = {
         { "settings", test_settings },
@@ -42,6 +43,7 @@ static const ctest_suite_t suites[] = {
         { "flex layout", test_flex_layout },
         { "scrollbar", test_scrollbar },
         { "progress", test_progress },
+        { "label", test_label },
         { NULL, NULL }
 };
 
