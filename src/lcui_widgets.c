@@ -26,6 +26,7 @@ void lcui_widgets_init(void)
         ui_register_router_link();
         ui_register_router_view();
         ui_register_label();
+        ui_register_checkbox();
 }
 
 void lcui_widgets_destroy(void)
