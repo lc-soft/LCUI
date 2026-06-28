@@ -19,19 +19,38 @@ export default function ButtonDocPage() {
         </ul>
       </Widget>
       <Widget className="doc-section">
-        <h2>Anatomy</h2>
+        <h2>Usage</h2>
         <Widget className="code-block" data-language="tsx" data-source="en/widgets/button/0">
           <Widget className="code-block-header">
-            <Text className="code-block-title">Anatomy</Text>
+            <Text className="code-block-title">TypeScript</Text>
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Button[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
-            <Text className="code-line">{` `}</Text>
-            <Text className="code-line">{`[color=#116329]<[color=#0550ae]Button[/color] />[/color]`}</Text>
+            <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Button[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
           </Widget>
         </Widget>
-        <p>{`Button is a single-line widget composed of a background layer and text content. The [bgcolor=#eee] :hover [/bgcolor] / [bgcolor=#eee] :active [/bgcolor] pseudo-classes toggle the background color to provide click feedback.`}</p>
+        <Widget className="code-block" data-language="tsx" data-source="en/widgets/button/1">
+          <Widget className="code-block-header">
+            <Text className="code-block-title">TypeScript</Text>
+          </Widget>
+          <Widget className="code-block-body">
+            <CodeBlockCopy />
+            <Text className="code-line">{`<[color=#8250df]Button[/color]>[color=#8250df]Button[/color]</[color=#8250df]Button[/color]>`}</Text>
+          </Widget>
+        </Widget>
+      </Widget>
+      <Widget className="doc-section">
+        <h2>Composition</h2>
+        <p>{`Use the following composition to build a [bgcolor=#eee] Button [/bgcolor]:`}</p>
+        <Widget className="code-block" data-language="text" data-source="en/widgets/button/2">
+          <Widget className="code-block-header">
+            <Text className="code-block-title">TEXT</Text>
+          </Widget>
+          <Widget className="code-block-body">
+            <CodeBlockCopy />
+            <Text className="code-line">{`Button`}</Text>
+          </Widget>
+        </Widget>
       </Widget>
       <Widget className="doc-section">
         <h2>API Reference</h2>

@@ -10,17 +10,15 @@ A linear progress bar widget used to indicate the completion of a task such as f
 - **Suitable**: form submission or async operations that need a wait indicator
 - **Not suitable**: scenarios that require precise numeric values or indeterminate progress (use `text` to render manually)
 
-## Anatomy
-
-Import the component:
+## Usage
 
 ```tsx
-import { Progress } from "@lcui/react";
-
-<Progress />
+import { Progress } from "@lcui/react"
 ```
 
-Progress is composed of two strip-shaped children: a bottom `progress-track` that serves as the rail, and a foreground `progress-indicator` whose width is a percentage of the track driven by the current `value`. The `value` accepts a number in the range `0~100`; values outside this range are clamped to the nearest boundary.
+```tsx
+<Progress value={20} />
+```
 
 ## API Reference
 

@@ -9,9 +9,50 @@ export default function TextInputDocPage() {
       <p className="doc-page-desc">{`An editable text input widget. Supports single-line, multiline, password, placeholder, and readonly modes.`}</p>
       <TextInputBasicDemo />
       <Widget className="doc-section">
+        <h2>Use cases</h2>
+        <ul>
+          <li><Text>{`[b]Suitable[/b] — user text input (form fields, search boxes).`}</Text></li>
+          <li><Text>{`[b]Not suitable[/b] — text display only (use [bgcolor=#eee] text [/bgcolor]).`}</Text></li>
+        </ul>
+      </Widget>
+      <Widget className="doc-section">
+        <h2>Usage</h2>
+        <Widget className="code-block" data-language="tsx" data-source="en/widgets/text-input/0">
+          <Widget className="code-block-header">
+            <Text className="code-block-title">TypeScript</Text>
+          </Widget>
+          <Widget className="code-block-body">
+            <CodeBlockCopy />
+            <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]TextInput[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+          </Widget>
+        </Widget>
+        <Widget className="code-block" data-language="tsx" data-source="en/widgets/text-input/1">
+          <Widget className="code-block-header">
+            <Text className="code-block-title">TypeScript</Text>
+          </Widget>
+          <Widget className="code-block-body">
+            <CodeBlockCopy />
+            <Text className="code-line">{`<[color=#8250df]TextInput[/color] placeholder=[color=#0a3069]"Enter text"[/color] />`}</Text>
+          </Widget>
+        </Widget>
+      </Widget>
+      <Widget className="doc-section">
+        <h2>Composition</h2>
+        <p>{`Use the following composition to build a [bgcolor=#eee] TextInput [/bgcolor]:`}</p>
+        <Widget className="code-block" data-language="text" data-source="en/widgets/text-input/2">
+          <Widget className="code-block-header">
+            <Text className="code-block-title">TEXT</Text>
+          </Widget>
+          <Widget className="code-block-body">
+            <CodeBlockCopy />
+            <Text className="code-line">{`TextInput`}</Text>
+          </Widget>
+        </Widget>
+      </Widget>
+      <Widget className="doc-section">
         <h2>API</h2>
         <h3>`ui_textinput_set_text`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/0">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/3">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -22,7 +63,7 @@ export default function TextInputDocPage() {
         </Widget>
         <p>{`Sets the input value from a UTF-8 string.`}</p>
         <h3>`ui_textinput_set_text_w`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/1">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/4">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -33,7 +74,7 @@ export default function TextInputDocPage() {
         </Widget>
         <p>{`Sets the input value from a wide character string.`}</p>
         <h3>`ui_textinput_get_text_w`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/2">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/5">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -45,7 +86,7 @@ export default function TextInputDocPage() {
         </Widget>
         <p>{`Reads the current input value. Returns the number of characters written.`}</p>
         <h3>`ui_textinput_get_text_length`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/3">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/6">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -56,7 +97,7 @@ export default function TextInputDocPage() {
         </Widget>
         <p>{`Returns the current text length in characters.`}</p>
         <h3>`ui_textinput_clear_text`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/4">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/7">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -67,7 +108,7 @@ export default function TextInputDocPage() {
         </Widget>
         <p>{`Clears all text from the input.`}</p>
         <h3>`ui_textinput_set_placeholder`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/5">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/8">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -78,7 +119,7 @@ export default function TextInputDocPage() {
         </Widget>
         <p>{`Sets the placeholder text shown when the input is empty.`}</p>
         <h3>`ui_textinput_set_placeholder_w`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/6">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/9">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -89,7 +130,7 @@ export default function TextInputDocPage() {
         </Widget>
         <p>{`Sets the placeholder text from a wide character string.`}</p>
         <h3>`ui_textinput_set_password_char`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/7">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/10">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -100,7 +141,7 @@ export default function TextInputDocPage() {
         </Widget>
         <p>{`Masks the input with the given character (e.g. [bgcolor=#eee] L'*' [/bgcolor] for password fields).`}</p>
         <h3>`ui_textinput_enable_multiline`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/8">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/11">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -111,7 +152,7 @@ export default function TextInputDocPage() {
         </Widget>
         <p>{`Enables or disables multiline input mode.`}</p>
         <h3>`ui_textinput_enable_style_tag`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/9">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/12">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -122,7 +163,7 @@ export default function TextInputDocPage() {
         </Widget>
         <p>{`Enables or disables inline style tag parsing in the input.`}</p>
         <h3>`ui_textinput_append_text_w`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/10">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/13">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -133,7 +174,7 @@ export default function TextInputDocPage() {
         </Widget>
         <p>{`Appends text at the end of the current content.`}</p>
         <h3>`ui_textinput_insert_text_w`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/11">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/14">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -144,7 +185,7 @@ export default function TextInputDocPage() {
         </Widget>
         <p>{`Inserts text at the current caret position.`}</p>
         <h3>`ui_textinput_set_caret_blink`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/12">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/15">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -157,7 +198,7 @@ export default function TextInputDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>XML tag</h2>
-        <Widget className="code-block" data-language="xml" data-source="en/widgets/text-input/13">
+        <Widget className="code-block" data-language="xml" data-source="en/widgets/text-input/16">
           <Widget className="code-block-header">
             <Text className="code-block-title">XML</Text>
           </Widget>

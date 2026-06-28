@@ -18,17 +18,36 @@ export default function TextInputDocPage() {
         </ul>
       </Widget>
       <Widget className="doc-section">
-        <h2>结构</h2>
-        <p>{`导入部件：`}</p>
+        <h2>用法</h2>
         <Widget className="code-block" data-language="tsx" data-source="zh-CN/widgets/text-input/0">
           <Widget className="code-block-header">
             <Text className="code-block-title">TypeScript</Text>
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]TextInput[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
-            <Text className="code-line">{` `}</Text>
-            <Text className="code-line">{`[color=#116329]<[color=#0550ae]TextInput[/color] />[/color]`}</Text>
+            <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]TextInput[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+          </Widget>
+        </Widget>
+        <Widget className="code-block" data-language="tsx" data-source="zh-CN/widgets/text-input/1">
+          <Widget className="code-block-header">
+            <Text className="code-block-title">TypeScript</Text>
+          </Widget>
+          <Widget className="code-block-body">
+            <CodeBlockCopy />
+            <Text className="code-line">{`<[color=#8250df]TextInput[/color] />`}</Text>
+          </Widget>
+        </Widget>
+      </Widget>
+      <Widget className="doc-section">
+        <h2>组合</h2>
+        <p>{`使用以下组合来构建 [bgcolor=#eee] TextInput [/bgcolor]：`}</p>
+        <Widget className="code-block" data-language="text" data-source="zh-CN/widgets/text-input/2">
+          <Widget className="code-block-header">
+            <Text className="code-block-title">TEXT</Text>
+          </Widget>
+          <Widget className="code-block-body">
+            <CodeBlockCopy />
+            <Text className="code-line">{`TextInput`}</Text>
           </Widget>
         </Widget>
       </Widget>

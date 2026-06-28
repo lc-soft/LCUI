@@ -35,14 +35,24 @@ examples/doc-viewer/
 - **适用**：...
 - **不适用**：...
 
-## 结构
-
-引导语...
+## 用法
 
 \`\`\`tsx
-import { WidgetName } from "@lcui/react";
+import { WidgetName } from "@lcui/react"
+\`\`\`
 
+\`\`\`tsx
 <WidgetName />
+\`\`\`
+
+## 组合（可选）
+
+使用以下组合来构建 `WidgetName`：
+
+\`\`\`
+WidgetName
+├── SubComponent
+└── SubComponent
 \`\`\`
 
 ## API 参考
@@ -65,12 +75,17 @@ import { WidgetName } from "@lcui/react";
 - 每个列表项以 `- **适用**：` 或 `- **不适用**：` 开头
 - 中文用全角冒号 `：`，英文用半角冒号 `: `
 
-#### ## 结构（Anatomy）
-- 代码块标签：` ```tsx `（无 title 属性）
-- 内容：`import { X } from "@lcui/react"` + 组件用法
-- 代码块**前**写一行引导语，二选一：
-  - 单组件即可使用（如 Button、Text）→ `Import the component:`
-  - 需多个部件组合使用（如 ScrollArea + Scrollbar）→ `Import the component and assemble its parts:`
+#### ## 用法（Usage）
+- 两个代码块，均为 ` ```tsx `（无 title 属性）
+- 第一个代码块：import 语句
+- 第二个代码块：组件核心用法（无需构造完整函数实现）
+- 代码块**前**无需引导语
+
+#### ## 组合（Composition）—— 仅多部件组件需要
+- 仅当组件包含子部件（如 ScrollArea 由 ScrollAreaContent + Scrollbar 组成）时才写此小节，单组件省略
+- 代码块标签：` ``` `（无语言标记，纯文本块）
+- 内容：用树形结构展示组件层次关系（`├──` / `└──`）
+- 代码块**前**写一行引导语：`使用以下组合来构建 `WidgetName`：`（英文：`Use the following composition to build a `WidgetName`:`）
 - 代码块后**禁止**写"X 由 Y + Z 组成"等内部实现说明
 - **可以**写行为/模式描述（如 Anchor 的 URL 与 XML 视图模式区别）
 
@@ -175,13 +190,13 @@ interface FieldData {
 | zh-CN | en |
 |-------|-----|
 | 适用场景 | Use cases |
-| 结构 | Anatomy |
+| 用法 | Usage |
+| 组合 | Composition |
 | API 参考 | API Reference |
 | 示例 | Examples |
 | 注意事项 | Caveats |
 | 内联样式标签 | Inline style tags |
-| 导入部件： | Import the component: |
-| 导入部件并组装其子组件： | Import the component and assemble its parts: |
+| 使用以下组合来构建 `WidgetName`： | Use the following composition to build a `WidgetName`: |
 
 ### FieldTable labels
 
