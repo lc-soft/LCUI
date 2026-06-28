@@ -30,19 +30,6 @@ export default function AnchorDocPage() {
         </Widget>
       </Widget>
       <Widget className="doc-section">
-        <h2>组合</h2>
-        <p>{`使用以下组合来构建 [bgcolor=#eee] Anchor [/bgcolor]：`}</p>
-        <Widget className="code-block" data-language="text" data-source="zh-CN/widgets/anchor/1">
-          <Widget className="code-block-header">
-            <Text className="code-block-title">TEXT</Text>
-          </Widget>
-          <Widget className="code-block-body">
-            <CodeBlockCopy />
-            <Text className="code-line">{`Anchor`}</Text>
-          </Widget>
-        </Widget>
-      </Widget>
-      <Widget className="doc-section">
         <h2>API 参考</h2>
         <FieldTable fields={anchorFields} locale="zh-CN" />
       </Widget>

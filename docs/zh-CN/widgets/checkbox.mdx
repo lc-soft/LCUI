@@ -1,0 +1,37 @@
+# Checkbox
+
+允许用户在已选和未选之间切换的控件。
+
+<WidgetExample name="checkbox-basic" />
+
+## 适用场景
+
+- **适用**：单条二元选择（同意条款、订阅开关）
+- **适用**：表单中的勾选项
+- **不适用**：互斥的多选一场景（用 `radio-group`）
+
+## 用法
+
+```tsx
+import { Checkbox } from "@lcui/react"
+```
+
+```tsx
+<Checkbox />
+```
+
+## 注意事项
+
+:::caution
+**indeterminate 是状态，不是默认值**。半选态（`indeterminate="true"`）用于表达"子项部分被选中"的视觉状态（例如父级 checkbox 在部分子项被选时显示半选）。点击 indeterminate 状态的 checkbox 会转为 checked 状态。
+:::
+
+## 示例
+
+### 禁用
+
+<WidgetExample name="checkbox-disabled" />
+
+## API 参考
+
+<FieldTable name="checkbox" />
