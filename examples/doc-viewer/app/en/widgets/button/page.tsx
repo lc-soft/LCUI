@@ -40,19 +40,6 @@ export default function ButtonDocPage() {
         </Widget>
       </Widget>
       <Widget className="doc-section">
-        <h2>Composition</h2>
-        <p>{`Use the following composition to build a [bgcolor=#eee] Button [/bgcolor]:`}</p>
-        <Widget className="code-block" data-language="text" data-source="en/widgets/button/2">
-          <Widget className="code-block-header">
-            <Text className="code-block-title">TEXT</Text>
-          </Widget>
-          <Widget className="code-block-body">
-            <CodeBlockCopy />
-            <Text className="code-line">{`Button`}</Text>
-          </Widget>
-        </Widget>
-      </Widget>
-      <Widget className="doc-section">
         <h2>API Reference</h2>
         <FieldTable fields={buttonFields} locale="en" />
       </Widget>

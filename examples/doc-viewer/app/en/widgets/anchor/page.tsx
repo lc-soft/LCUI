@@ -28,22 +28,9 @@ export default function AnchorDocPage() {
         </Widget>
       </Widget>
       <Widget className="doc-section">
-        <h2>Composition</h2>
-        <p>{`Use the following composition to build an [bgcolor=#eee] Anchor [/bgcolor]:`}</p>
-        <Widget className="code-block" data-language="text" data-source="en/widgets/anchor/1">
-          <Widget className="code-block-header">
-            <Text className="code-block-title">TEXT</Text>
-          </Widget>
-          <Widget className="code-block-body">
-            <CodeBlockCopy />
-            <Text className="code-line">{`Anchor`}</Text>
-          </Widget>
-        </Widget>
-      </Widget>
-      <Widget className="doc-section">
         <h2>API</h2>
         <h3>`ui_anchor_open`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/anchor/2">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/anchor/1">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -61,7 +48,7 @@ export default function AnchorDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>XML tag</h2>
-        <Widget className="code-block" data-language="xml" data-source="en/widgets/anchor/3">
+        <Widget className="code-block" data-language="xml" data-source="en/widgets/anchor/2">
           <Widget className="code-block-header">
             <Text className="code-block-title">XML</Text>
           </Widget>
@@ -122,7 +109,7 @@ export default function AnchorDocPage() {
         <h2>Events</h2>
         <h3>`loaded.anchor`</h3>
         <p>{`Fired on [bgcolor=#eee] ui_root() [/bgcolor] after a view has been loaded and injected:`}</p>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/anchor/4">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/anchor/3">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>

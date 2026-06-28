@@ -39,19 +39,6 @@ export default function TextDocPage() {
         </Widget>
       </Widget>
       <Widget className="doc-section">
-        <h2>组合</h2>
-        <p>{`使用以下组合来构建 [bgcolor=#eee] Text [/bgcolor]：`}</p>
-        <Widget className="code-block" data-language="text" data-source="zh-CN/widgets/text/2">
-          <Widget className="code-block-header">
-            <Text className="code-block-title">TEXT</Text>
-          </Widget>
-          <Widget className="code-block-body">
-            <CodeBlockCopy />
-            <Text className="code-line">{`Text`}</Text>
-          </Widget>
-        </Widget>
-      </Widget>
-      <Widget className="doc-section">
         <h2>API 参考</h2>
         <FieldTable fields={textFields} locale="zh-CN" />
       </Widget>

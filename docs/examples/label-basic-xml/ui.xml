@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lcui-app>
+  <ui>
+    <checkbox id="terms" />
+    <label for="terms">Accept terms and conditions</label>
+  </ui>
+</lcui-app>

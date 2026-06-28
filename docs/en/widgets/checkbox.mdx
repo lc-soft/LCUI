@@ -1,0 +1,37 @@
+# Checkbox
+
+A control that allows the user to toggle between checked and not checked.
+
+<WidgetExample name="checkbox-basic" />
+
+## Use cases
+
+- **Suitable**: a single binary choice (accepting terms, toggling a subscription).
+- **Suitable**: checkable options inside a form.
+- **Not suitable**: mutually exclusive single-choice scenarios (use `radio-group`).
+
+## Usage
+
+```tsx
+import { Checkbox } from "@lcui/react"
+```
+
+```tsx
+<Checkbox />
+```
+
+## Caveats
+
+:::caution
+**indeterminate is a state, not a default value.** The half-selected state (`indeterminate="true"`) expresses the visual notion that some sub-items are selected (for example, a parent checkbox shown as indeterminate when only some of its children are checked). Clicking a checkbox in the indeterminate state transitions it to the checked state.
+:::
+
+## Examples
+
+### Disabled
+
+<WidgetExample name="checkbox-disabled" />
+
+## API Reference
+
+<FieldTable name="checkbox" />

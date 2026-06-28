@@ -1,0 +1,25 @@
+# Label
+
+渲染与控件关联的可访问标签，点击时将 click 事件转发到 `for` 指向的目标部件。
+
+<WidgetExample name="label-basic" />
+
+## 适用场景
+
+- **适用**：为 checkbox、text-input 等可交互控件提供点击区域扩展（点击文字也能触发控件）
+- **适用**：辅助功能（a11y）中将文本与控件关联
+- **不适用**：纯展示文本（用 `text` 部件）
+
+## 用法
+
+```tsx
+import { Label } from "@lcui/react"
+```
+
+```tsx
+<Label for="agree">I agree</Label>
+```
+
+## API 参考
+
+<FieldTable name="label" />

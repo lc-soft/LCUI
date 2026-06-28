@@ -1,0 +1,25 @@
+# Label
+
+Renders an accessible label associated with controls. Click events are forwarded to the target widget referenced by the `for` attribute.
+
+<WidgetExample name="label-basic" />
+
+## Use cases
+
+- **Suitable**: extending the clickable area of interactive widgets such as checkbox and text-input so that clicking the label text also triggers the widget.
+- **Suitable**: associating text with a control for accessibility (a11y).
+- **Not suitable**: purely decorative text display (use the `text` widget instead).
+
+## Usage
+
+```tsx
+import { Label } from "@lcui/react"
+```
+
+```tsx
+<Label for="agree">I agree</Label>
+```
+
+## API Reference
+
+<FieldTable name="label" />

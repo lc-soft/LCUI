@@ -33,6 +33,8 @@
       "items": [
         { "slug": "anchor", "label": { "en": "Anchor", "zh-CN": "Anchor 锚点" } },
         { "slug": "button", "label": { "en": "Button", "zh-CN": "Button 按钮" } },
+        { "slug": "checkbox", "label": { "en": "Checkbox", "zh-CN": "Checkbox 复选框" } },
+        { "slug": "label", "label": { "en": "Label", "zh-CN": "Label 标签" } },
         { "slug": "progress", "label": { "en": "Progress", "zh-CN": "Progress 进度条" } },
         { "slug": "scrollarea", "label": { "en": "ScrollArea", "zh-CN": "ScrollArea 滚动区域" } },
         { "slug": "text", "label": { "en": "Text", "zh-CN": "Text 文本" } },
