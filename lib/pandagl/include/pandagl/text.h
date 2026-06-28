@@ -69,6 +69,7 @@ typedef struct pd_text_line {
         int width;          /**< 宽度 */
         int height;         /**< 高度 */
         int length;         /**< 该行文本长度 */
+        int baseline_y;     /**< 基线相对于行顶的 y 偏移 */
         pd_char_t **string; /**< 该行文本的数据 */
         pd_text_eol_t eol;  /**< 行尾结束类型 */
 } pd_text_line_t;

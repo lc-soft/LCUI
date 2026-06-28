@@ -22,6 +22,7 @@ static void pd_text_line_init(pd_text_line_t *line)
         line->width = 0;
         line->height = 0;
         line->length = 0;
+        line->baseline_y = 0;
         line->string = NULL;
         line->eol = PD_TEXT_EOL_NONE;
 }
@@ -102,6 +103,7 @@ void pd_text_update_line_size(pd_text_t *text, pd_text_line_t *line)
 {
         int i;
         int text_height = text->default_style.pixel_size;
+        int max_asc = 0, max_desc = 0;
         pd_char_t *ch;
 
         line->width = 0;
@@ -114,12 +116,24 @@ void pd_text_update_line_size(pd_text_t *text, pd_text_line_t *line)
                 if (text_height < ch->bitmap->metrics.vert_advance) {
                         text_height = ch->bitmap->metrics.vert_advance;
                 }
+                int ascender = ch->bitmap->metrics.ascender;
+                int descender = ch->bitmap->metrics.bbox_height - ascender;
+                if (descender < 0) {
+                        descender = 0;
+                }
+                if (max_asc < ascender) {
+                        max_asc = ascender;
+                }
+                if (max_desc < descender) {
+                        max_desc = descender;
+                }
         }
         if (text->line_height > 0) {
                 line->height = text->line_height;
         } else {
                 line->height = (int)round(text_height * DEFAULT_LINE_HEIGHT);
         }
+        line->baseline_y = (line->height + max_asc - max_desc) / 2;
 }
 
 int pd_text_line_set_length(pd_text_line_t *line, int len)
