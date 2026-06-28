@@ -76,19 +76,19 @@ void test_thread_worker(void)
 
         TestWorker_Init(&worker);
         thread_create(&worker.thread, TestWorker_Thread, &worker);
-        sleep_ms(100);
+        y_sleep(100);
         TestWorker_Send(&worker, "hello");
-        sleep_ms(20);
+        y_sleep(20);
         TestWorker_Send(&worker, "world");
-        sleep_ms(100);
+        y_sleep(100);
         TestWorker_Send(&worker, "this");
-        sleep_ms(50);
+        y_sleep(50);
         TestWorker_Send(&worker, "is");
-        sleep_ms(100);
+        y_sleep(100);
         TestWorker_Send(&worker, "test");
-        sleep_ms(50);
+        y_sleep(50);
         TestWorker_Send(&worker, "bye!");
-        sleep_ms(100);
+        y_sleep(100);
         TestWorker_Destroy(&worker);
         ctest_equal_int("should receive 7 data items", worker.data_count, 7);
         ctest_equal_bool("should no longer be active", worker.active, false);

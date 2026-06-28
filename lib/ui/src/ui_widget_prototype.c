@@ -91,7 +91,7 @@ ui_widget_prototype_t *ui_create_widget_prototype(const char *name,
         } else {
                 *proto = ui_widget_default_prototype;
         }
-        proto->name = strdup2(name);
+        proto->name = y_strdup(name);
         if (dict_add(ui_widget_prototype_dict, proto->name, proto) == 0) {
                 return proto;
         }

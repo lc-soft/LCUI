@@ -115,7 +115,7 @@ int ui_set_event_id(int event_id, const char *event_name)
         if (!mapping) {
                 return -2;
         }
-        mapping->name = strdup2(event_name);
+        mapping->name = y_strdup(event_name);
         mapping->id = event_id;
         list_append(&ui_events.event_mappings, mapping);
         rbtree_insert_by_key(&ui_events.event_names, event_id, mapping);
@@ -857,14 +857,14 @@ static int ui_on_mouse_event(ui_event_t *origin_event)
                 if (e.mouse.button == UI_MOUSE_BUTTON_LEFT &&
                     ui_events.click.widget == e.target) {
                         int delta;
-                        delta = (int)get_time_delta(ui_events.click.time);
+                        delta = (int)(y_gettime() - ui_events.click.time);
                         ui_events.click.interval = delta;
                 } else if (e.mouse.button == UI_MOUSE_BUTTON_RIGHT &&
                            ui_events.click.widget != e.target) {
                         ui_events.click.x = e.mouse.x;
                         ui_events.click.y = e.mouse.y;
                 }
-                ui_events.click.time = get_time_ms();
+                ui_events.click.time = y_gettime();
                 ui_events.click.widget = e.target;
                 ui_widget_on_mousedown_event(e.target);
                 ui_set_focus(e.target);
@@ -967,8 +967,8 @@ static int ui_dispatch_touch_event(list_t *capturers, ui_touch_point_t *points,
         e.touch.points = malloc(sizeof(ui_touch_point_t) * n_points);
         /* 先将各个触点按命中的部件进行分组 */
         for (i = 0; i < n_points; ++i) {
-                target = ui_widget_at(root, y_iround(points[i].x / scale),
-                                      y_iround(points[i].y / scale));
+                target = ui_widget_at(root, (int)round(points[i].x / scale),
+                                      (int)round(points[i].y / scale));
                 if (!target) {
                         continue;
                 }

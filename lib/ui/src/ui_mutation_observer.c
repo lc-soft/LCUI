@@ -55,10 +55,10 @@ ui_mutation_record_t *ui_mutation_record_duplicate(ui_mutation_record_t *source)
 
         mutation = ui_mutation_record_create(source->target, source->type);
         if (source->attribute_name) {
-                mutation->attribute_name = strdup2(source->attribute_name);
+                mutation->attribute_name = y_strdup(source->attribute_name);
         }
         if (source->property_name) {
-                mutation->property_name = strdup2(source->property_name);
+                mutation->property_name = y_strdup(source->property_name);
         }
         for (list_each(node, &source->added_widgets)) {
                 list_append(&mutation->added_widgets, node->data);

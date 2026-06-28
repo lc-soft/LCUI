@@ -1,5 +1,5 @@
 ﻿/*
- * charset.h -- The charset opreation set.
+ * encoding.h -- String encoding/decoding utilities.
  *
  * Copyright (c) 2018, Liu chao <lc-soft@live.cn>
  * Copyright (c) 2021, Li Zihao <yidianyiko@foxmail.com>
@@ -29,28 +29,41 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef UTIL_CHARSET_H
-#define UTIL_CHARSET_H
+#ifndef YUTIL_ENCODING_H
+#define YUTIL_ENCODING_H
 
 #include <wchar.h>
 
 Y_BEGIN_DECLS
 
-enum encoding_e { ENCODING_ANSI, ENCODING_UTF8 };
+/**
+ * Decode an UTF-8 encoded string to a wide character string.
+ *
+ * When \p wstr is NULL, returns the number of wchar_t needed (excluding the
+ * null terminator), similar to strlen().  When \p wstr is not NULL, writes up
+ * to \p max_len characters and always null-terminates at wstr[count], so the
+ * buffer must have room for at least max_len+1 elements.  If the decoded
+ * length exceeds max_len, only max_len characters are written.
+ */
+YUTIL_API size_t decode_utf8(wchar_t *wstr, const char *str, size_t max_len);
 
-typedef enum encoding_e encoding_e;
+/**
+ * Encode a wide character string to UTF-8.
+ *
+ * When \p str is NULL, returns the number of bytes needed (excluding the null
+ * terminator), similar to strlen().  When \p str is not NULL, writes up to
+ * \p max_len bytes and always null-terminates at str[count], so the buffer
+ * must have room for at least max_len+1 elements.  If the encoded length
+ * exceeds max_len, only max_len bytes are written.
+ */
+YUTIL_API size_t encode_utf8(char *str, const wchar_t *wstr, size_t max_len);
 
-#define decode_utf8(WSTR, STR, MAX_LEN) \
-	decode_string(WSTR, STR, MAX_LEN, ENCODING_UTF8)
+#ifdef _WIN32
+YUTIL_API size_t decode_ansi(wchar_t *wstr, const char *str, size_t max_len);
 
-#define encode_utf8(STR, WSTR, MAX_LEN) \
-	encode_string(STR, WSTR, MAX_LEN, ENCODING_UTF8)
+YUTIL_API size_t encode_ansi(char *str, const wchar_t *wstr, size_t max_len);
+#endif
 
-YUTIL_API size_t decode_string(wchar_t *wstr, const char *str, size_t max_len,
-			       encoding_e encoding);
-
-YUTIL_API size_t encode_string(char *str, const wchar_t *wstr, size_t max_len,
-			       encoding_e encoding);
 Y_END_DECLS
 
 #endif

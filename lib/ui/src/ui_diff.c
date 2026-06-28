@@ -96,7 +96,7 @@ void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w)
                         w, UI_MUTATION_RECORD_TYPE_PROPERTIES)) {
                         record = ui_mutation_record_create(
                             w, UI_MUTATION_RECORD_TYPE_PROPERTIES);
-                        record->property_name = strdup2("visible");
+                        record->property_name = y_strdup("visible");
                         ui_widget_add_mutation_record(w, record);
                         ui_mutation_record_destroy(record);
                 }

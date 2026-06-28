@@ -96,14 +96,14 @@ static void ui_router_link_on_set_attr(ui_widget_t *w, const char *name,
                         ui_widget_remove_class(w, link->exact_active_class);
                         free(link->exact_active_class);
                 }
-                link->exact_active_class = strdup2(value);
+                link->exact_active_class = y_strdup(value);
                 ui_router_link_refresh(w);
         } else if (strcmp(name, "active-class") == 0) {
                 if (link->active_class) {
                         ui_widget_remove_class(w, link->active_class);
                         free(link->active_class);
                 }
-                link->active_class = strdup2(value);
+                link->active_class = y_strdup(value);
                 ui_router_link_refresh(w);
         } else {
                 ui_router_link_proto->proto->setattr(w, name, value);
@@ -139,8 +139,8 @@ static void ui_router_link_on_init(ui_widget_t *w)
 
         link = ui_widget_add_data(w, ui_router_link_proto,
                                   sizeof(ui_router_link_t));
-        link->active_class = strdup2("router-link-active");
-        link->exact_active_class = strdup2("router-link-exact-active");
+        link->active_class = y_strdup("router-link-active");
+        link->exact_active_class = y_strdup("router-link-exact-active");
         link->to = NULL;
         link->replace = false;
         link->exact = false;

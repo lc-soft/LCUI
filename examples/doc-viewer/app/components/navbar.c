@@ -108,7 +108,7 @@ static void navbar_set_locale(ui_widget_t *w, const char *locale)
         navbar_save_locale(locale);
         navbar_navigate_to(w, locale);
         free(that->current_locale);
-        that->current_locale = strdup2(locale);
+        that->current_locale = y_strdup(locale);
 }
 
 /* -----------------------------------------------------------------------
@@ -192,7 +192,7 @@ static void navbar_init(ui_widget_t *w)
                 }
         }
         locale = app_get_locale();
-        that->current_locale = strdup2(locale);
+        that->current_locale = y_strdup(locale);
         navbar_apply_locale(w, locale);
         navbar_update(w);
 }

@@ -82,7 +82,7 @@ void ui_todolist_add(const wchar_t *name, const char *status)
         task_t *task = malloc(sizeof(task_t));
 
         task->id = ++app.id;
-        task->name = wcsdup2(name);
+        task->name = y_wcsdup(name);
         task->status = status ? status : "active";
         list_append(&app.tasks, task);
         ui_widget_append(ui_get_widget("list"), ui_task_item_create(task));
@@ -118,8 +118,7 @@ void on_task_list_click(ui_widget_t *w, ui_event_t *e, void *arg)
         ui_widget_t *item = e->target->parent;
 
         for (item = e->target; !ui_widget_has_class(item, "task-item");
-             item = item->parent)
-                ;
+             item = item->parent);
         id_str = ui_widget_get_attr(item, "data-id");
         if (!id_str || sscanf(id_str, "%u", &id) != 1) {
                 return;

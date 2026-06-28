@@ -89,7 +89,6 @@ void ptk_x11clipboard_execute_action(void)
         wchar_t *wstr = malloc(sizeof(wchar_t) * len);
 
         len = decode_utf8(wstr, ptk_x11clipboard.text, len);
-        wstr[len] = 0;
         // Assign the data
         clipboard_data.text = wstr;
         clipboard_data.len = len;
@@ -123,7 +122,6 @@ int ptk_x11clipboard_set_text(const wchar_t *text, size_t len)
         char *raw_text = malloc((raw_len + 1) * sizeof(char));
 
         raw_len = encode_utf8(raw_text, text, raw_len);
-        raw_text[raw_len] = '\0';
         if (raw_len == -1) {
                 logger_debug("Failed converting wchar_t* to char*\n");
                 // Something failed here, should probably add debug message

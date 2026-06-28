@@ -66,11 +66,11 @@ static xml_loader_t *xml_loader_create(ui_widget_t *w)
                 return NULL;
         }
         loader->widget = w;
-        loader->filepath = strdup2(ui_widget_get_attr(w, "href"));
-        loader->target_id = strdup2(ui_widget_get_attr(w, "target"));
+        loader->filepath = y_strdup(ui_widget_get_attr(w, "href"));
+        loader->target_id = y_strdup(ui_widget_get_attr(w, "target"));
         ui_widget_on(w, "destroy", xml_loader_on_widget_destroy, loader);
         if (key) {
-                loader->key = strdup2(key);
+                loader->key = y_strdup(key);
         } else {
                 loader->key = NULL;
         }

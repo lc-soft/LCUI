@@ -12,8 +12,11 @@
 #include <ctest.h>
 
 extern void test_ptk_steptimer(void);
+extern void test_ptk_timer_scheduler(void);
 
 static const ctest_suite_t suites[] = { { "ptk/steptimer", test_ptk_steptimer },
+                                        { "ptk/timer_scheduler",
+                                          test_ptk_timer_scheduler },
                                         { NULL, NULL } };
 
 CTEST_MAIN(suites)

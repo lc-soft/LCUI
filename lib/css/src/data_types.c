@@ -119,10 +119,10 @@ bool css_parse_string_value(css_style_value_t *val, const char *str)
         val->type = CSS_STRING_VALUE;
         if (len > 0) {
                 if (str[0] == '"' && str[len - 1] == '"') {
-                        val->string_value = strdup2(str + 1);
+                        val->string_value = y_strdup(str + 1);
                         val->string_value[len - 2] = 0;
                 } else {
-                        val->string_value = strdup2(str);
+                        val->string_value = y_strdup(str);
                 }
         } else {
                 val->string_value = NULL;
@@ -355,7 +355,7 @@ bool css_parse_font_family_value(css_style_value_t *val, const char *str)
         append:
                 css_style_value_set_array_length(val, count + 1);
                 val->array_value[count].type = CSS_STRING_VALUE;
-                val->array_value[count].string_value = strdup2(name);
+                val->array_value[count].string_value = y_strdup(name);
                 count++;
                 if (!*p) {
                         break;

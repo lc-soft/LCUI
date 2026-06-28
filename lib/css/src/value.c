@@ -220,7 +220,7 @@ const css_value_type_record_t *css_register_value_type(const char *type_name,
         if (!t) {
                 return NULL;
         }
-        t->name = strdup2(type_name);
+        t->name = y_strdup(type_name);
         t->parse_value = parse;
         if (dict_add(css_value.types, t->name, t) != 0) {
                 free(t->name);

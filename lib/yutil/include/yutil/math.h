@@ -37,10 +37,6 @@ Y_BEGIN_DECLS
 
 #define y_min(X, Y) (((X) > (Y)) ? (Y) : (X))
 
-#define y_iround(X) ((X) > 0 ? (int)((X) + 0.5) : (int)((X) - 0.5))
-
-#define y_pow2(X) ((X) * (X))
-
 Y_END_DECLS
 
 #endif /* UTIL_MATH_H */

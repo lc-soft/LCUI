@@ -489,26 +489,26 @@ static void ui_process_mutations(ui_widget_t *w)
         if (ui_widget_has_observer(w, type)) {
                 if (w->update.border_box_backup.x != w->border_box.x) {
                         record = ui_mutation_record_create(w, type);
-                        record->property_name = strdup2("x");
+                        record->property_name = y_strdup("x");
                         ui_widget_add_mutation_record(w, record);
                         ui_mutation_record_destroy(record);
                 }
                 if (w->update.border_box_backup.y != w->border_box.y) {
                         record = ui_mutation_record_create(w, type);
-                        record->property_name = strdup2("y");
+                        record->property_name = y_strdup("y");
                         ui_widget_add_mutation_record(w, record);
                         ui_mutation_record_destroy(record);
                 }
                 if (w->update.border_box_backup.width != w->border_box.width) {
                         record = ui_mutation_record_create(w, type);
-                        record->property_name = strdup2("width");
+                        record->property_name = y_strdup("width");
                         ui_widget_add_mutation_record(w, record);
                         ui_mutation_record_destroy(record);
                 }
                 if (w->update.border_box_backup.height !=
                     w->border_box.height) {
                         record = ui_mutation_record_create(w, type);
-                        record->property_name = strdup2("height");
+                        record->property_name = y_strdup("height");
                         ui_widget_add_mutation_record(w, record);
                         ui_mutation_record_destroy(record);
                 }

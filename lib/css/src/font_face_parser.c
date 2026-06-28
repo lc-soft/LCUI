@@ -207,11 +207,11 @@ static int css_font_face_parser_parse_value(css_parser_t *parser)
                 if (data->face->font_family) {
                         free(data->face->font_family);
                 }
-                data->face->font_family = strdup2(parser->buffer);
+                data->face->font_family = y_strdup(parser->buffer);
                 if (!data->face->font_family) {
                         return -ENOMEM;
                 }
-                strtrim(data->face->font_family, parser->buffer, " \"");
+                y_strtrim(data->face->font_family, parser->buffer, " \"");
                 break;
         case KEY_FONT_STYLE:
                 css_font_face_parser_parse_font_style(data->face,

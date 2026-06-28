@@ -12,6 +12,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <string.h>
 #include <css/utils.h>
 
@@ -35,7 +36,7 @@ bool css_parse_font_weight(const char *str, int *weight)
                 *weight = CSS_FONT_WEIGHT_100;
                 return true;
         }
-        *weight = y_iround(value / 100.0) * 100;
+        *weight = (int)round(value / 100.0) * 100;
         return true;
 }
 
@@ -43,7 +44,7 @@ bool css_parse_font_style(const char *str, int *style)
 {
         char value[64] = "";
         // TODO
-        strtrim(value, str, NULL);
+        y_strtrim(value, str, NULL);
         if (strcmp(value, "normal") == 0) {
                 *style = CSS_FONT_STYLE_NORMAL;
         } else if (strcmp(value, "italic") == 0) {

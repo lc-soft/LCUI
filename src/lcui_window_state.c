@@ -158,7 +158,7 @@ static bool wstate_set_entry(const char *id, const lcui_window_state_t *state)
         if (!entry) {
                 return false;
         }
-        entry->id = strdup2(id);
+        entry->id = y_strdup(id);
         if (!entry->id) {
                 free(entry);
                 return false;
@@ -330,7 +330,7 @@ static bool wstate_add_invalid(wstate_deserialize_ctx_t *c, const char *section)
                 c->invalid_sections = new_arr;
                 c->invalid_capacity = new_cap;
         }
-        copy = strdup2(section);
+        copy = y_strdup(section);
         if (!copy) {
                 return false;
         }
@@ -454,7 +454,7 @@ bool lcui_bind_window_state(ui_widget_t *widget, const char *id)
         if (!binding) {
                 return false;
         }
-        binding->id = strdup2(id);
+        binding->id = y_strdup(id);
         if (!binding->id) {
                 free(binding);
                 return false;

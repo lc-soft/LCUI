@@ -220,8 +220,8 @@ static int ui_builder_parse_widget_node(xml_parser_t *parser, xmlNodePtr node)
                         DEBUG_MSG("widget: %p, add class: %s\n", w, prop_val);
                         ui_widget_add_class(w, prop_val);
                 } else {
-                        prop_name = strdup2((const char *)prop->name);
-                        strtolower(prop_name, (const char *)prop->name);
+                        prop_name = y_strdup((const char *)prop->name);
+                        y_strlower(prop_name, (const char *)prop->name);
                         ui_widget_set_attr(w, prop_name, prop_val);
                         free(prop_name);
                 }

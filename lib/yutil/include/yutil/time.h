@@ -35,15 +35,9 @@
 
 Y_BEGIN_DECLS
 
-YUTIL_API int64_t get_time_ms(void);
+YUTIL_API int64_t y_gettime(void);
 
-YUTIL_API int64_t get_time_us(void);
-
-YUTIL_API int64_t get_time_delta(int64_t start);
-
-YUTIL_API void sleep_s(unsigned int s);
-
-YUTIL_API void sleep_ms(unsigned int ms);
+YUTIL_API void y_sleep(unsigned int ms);
 
 Y_END_DECLS
 

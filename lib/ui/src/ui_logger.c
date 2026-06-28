@@ -29,11 +29,11 @@ int ui_logger_log(logger_level_e level, ui_widget_t *w, const char *fmt, ...)
         va_end(args);
         if (w) {
                 node = ui_widget_create_selector_node(w);
-                strreplace(buffer, LOG_BUFFER_SIZE, "${widget}",
-                           node->fullname);
+                y_strreplace(buffer, LOG_BUFFER_SIZE, "${widget}",
+                             node->fullname);
                 css_selector_node_destroy(node);
         } else {
-                strreplace(buffer, LOG_BUFFER_SIZE, "${widget}", "(null)");
+                y_strreplace(buffer, LOG_BUFFER_SIZE, "${widget}", "(null)");
         }
         return logger_log(level, buffer);
 }

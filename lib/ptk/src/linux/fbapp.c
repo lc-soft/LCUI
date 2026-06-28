@@ -558,7 +558,7 @@ static int ptk_fb_process_events(ptk_process_events_option_t option)
         do {
                 ptk_tick();
                 ptk_process_events();
-                sleep_ms(1);
+                y_sleep(1);
         } while (option == PTK_PROCESS_EVENTS_UNTIL_QUIT &&
                  !fbapp.should_quit_loop);
         fbapp.should_quit_loop = false;

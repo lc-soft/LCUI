@@ -57,7 +57,7 @@ int ctest_printf(const char *fmt, ...)
 void ctest_group_begin(void)
 {
         if (test_start_time == 0) {
-                test_start_time = get_time_ms();
+                test_start_time = y_gettime();
         }
         test_msg_indent++;
 }
@@ -165,7 +165,7 @@ bool ctest_equal_wcs(const char *name, const wchar_t *actual,
 int ctest_finish(void)
 {
         printf(GREEN("  %zu passing") " (%ums)\n", tests_passed,
-               (unsigned)get_time_delta(test_start_time));
+               (unsigned)(y_gettime() - test_start_time));
         if (tests_total > tests_passed) {
                 printf(RED("  %zu faling\n\n"), tests_total - tests_passed);
                 return (int)(tests_total - tests_passed);
@@ -241,6 +241,9 @@ int ctest_run_suites(const ctest_suite_t *suites)
                         printf("%s\n", s->name);
                 }
                 return 0;
+        }
+        if (test_start_time == 0) {
+                test_start_time = y_gettime();
         }
         for (s = suites; s->name; ++s) {
                 if (!ctest_should_run(s->name))

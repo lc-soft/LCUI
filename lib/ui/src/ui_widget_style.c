@@ -25,10 +25,10 @@ css_selector_node_t *ui_widget_create_selector_node(ui_widget_t *w)
         sn = malloc(sizeof(css_selector_node_t));
         memset(sn, 0, sizeof(css_selector_node_t));
         if (w->id) {
-                sn->id = strdup2(w->id);
+                sn->id = y_strdup(w->id);
         }
         if (w->type) {
-                sn->type = strdup2(w->type);
+                sn->type = y_strdup(w->type);
         }
         for (i = 0; w->classes && w->classes[i]; ++i) {
                 strlist_sorted_add(&sn->classes, w->classes[i]);
@@ -97,7 +97,7 @@ size_t ui_widget_get_children_style_changes(ui_widget_t *w, int type,
         }
         list_create(&selector_names);
         s = ui_widget_create_selector(w);
-        n = strsplit(name, " ", &names);
+        n = y_strsplit(name, " ", &names);
         /* 为分割出来的字符串加上前缀 */
         for (i = 0; i < n; ++i) {
                 len = strlen(names[i]) + 2;

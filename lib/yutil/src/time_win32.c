@@ -35,48 +35,21 @@
 #include "yutil/keywords.h"
 #include "yutil/time.h"
 
-#define TIME_WRAP_VALUE (~(int64_t)0)
-
-int64_t get_time_ms(void)
+int64_t y_gettime(void)
 {
-	int64_t time;
-	LARGE_INTEGER hires = { { 0 } };
-	LARGE_INTEGER hires_now = { { 0 } };
-	if (QueryPerformanceFrequency(&hires)) {
-		QueryPerformanceCounter(&hires_now);
-		time = hires_now.QuadPart * 1000;
-		return time / hires.QuadPart;
-	}
-	return 0;
+        int64_t time;
+        LARGE_INTEGER hires = { { 0 } };
+        LARGE_INTEGER hires_now = { { 0 } };
+        if (QueryPerformanceFrequency(&hires)) {
+                QueryPerformanceCounter(&hires_now);
+                time = hires_now.QuadPart * 1000;
+                return time / hires.QuadPart;
+        }
+        return 0;
 }
 
-int64_t get_time_us()
+void y_sleep(unsigned int ms)
 {
-	LARGE_INTEGER hires = { { 0 } };
-	LARGE_INTEGER hires_now = { { 0 } };
-	if (QueryPerformanceFrequency(&hires)) {
-		if (!QueryPerformanceFrequency(&hires_now))
-			return 0;
-
-		return (hires_now.QuadPart * 1000000) / hires.QuadPart;
-	}
-	return 0;
-}
-
-int64_t get_time_delta(int64_t start)
-{
-	int64_t now = get_time_ms();
-	return (now < start) ? ((TIME_WRAP_VALUE - start) + now)
-			     : (now - start);
-}
-
-void sleep_ms(unsigned int ms)
-{
-	Sleep((DWORD)ms);
-}
-
-void sleep_s(unsigned int s)
-{
-	sleep_ms(s * 1000);
+        Sleep((DWORD)ms);
 }
 #endif

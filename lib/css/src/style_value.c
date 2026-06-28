@@ -131,7 +131,7 @@ void css_style_value_copy(css_style_value_t *dst, const css_style_value_t *src)
         case CSS_STRING_VALUE:
         case CSS_UNPARSED_VALUE:
                 if (src->string_value) {
-                        dst->string_value = strdup2(src->string_value);
+                        dst->string_value = y_strdup(src->string_value);
                 } else {
                         dst->string_value = NULL;
                 }

@@ -110,8 +110,8 @@ bool router_matcher_match_route(router_route_record_t *record, const char *path,
         bool matched = true;
         bool match_all = false;
 
-        nodes_count = strsplit(path, "/", &nodes);
-        record_nodes_count = strsplit(record->path, "/", &record_nodes);
+        nodes_count = y_strsplit(path, "/", &nodes);
+        record_nodes_count = y_strsplit(record->path, "/", &record_nodes);
         // record->path: "/example/:type/:name/info"
         // path: "/exmaple/food/orange/info"
         for (i = 0, j = 0; i < nodes_count && j < record_nodes_count; ++i) {

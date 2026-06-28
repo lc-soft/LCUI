@@ -50,7 +50,7 @@ static void test_steptimer_variable_step(void)
         ptk_steptimer_init(&timer);
         timer.is_fixed_time_step = false;
         // Simulate 500ms elapsed since last tick.
-        timer.last_time = (uint64_t)get_time_ms() - 500;
+        timer.last_time = (uint64_t)y_gettime() - 500;
 
         ptk_steptimer_tick(&timer, on_steptimer_tick, &probe);
 
@@ -69,7 +69,7 @@ static void test_steptimer_fixed_step_catch_up(void)
         timer.enable_catch_up = true;
         timer.target_elapsed_time = 8;
         // max_delta defaults to 1000; a 500ms delta will not be clamped.
-        timer.last_time = (uint64_t)get_time_ms() - 500;
+        timer.last_time = (uint64_t)y_gettime() - 500;
 
         ptk_steptimer_tick(&timer, on_steptimer_tick, &probe);
 
@@ -90,7 +90,7 @@ static void test_steptimer_fixed_step_no_catch_up(void)
         timer.is_fixed_time_step = true;
         timer.enable_catch_up = false;
         timer.target_elapsed_time = 8;
-        timer.last_time = (uint64_t)get_time_ms() - 500;
+        timer.last_time = (uint64_t)y_gettime() - 500;
 
         ptk_steptimer_tick(&timer, on_steptimer_tick, &probe);
 
@@ -114,7 +114,7 @@ static void test_steptimer_reset_elapsed_time(void)
 
         // Accumulate some left-over time by ticking twice with a gap.
         ptk_steptimer_tick(&timer, on_steptimer_tick, &probe);
-        sleep_ms(20);
+        y_sleep(20);
         ptk_steptimer_tick(&timer, on_steptimer_tick, &probe);
 
         // Before reset, left_over_time should be non-zero.
@@ -138,7 +138,7 @@ static void test_steptimer_max_delta_clamp(void)
         timer.is_fixed_time_step = false;
         timer.max_delta = 1000;
         // Pretend 10 seconds have elapsed; max_delta should clamp this.
-        timer.last_time = (uint64_t)get_time_ms() - 10000;
+        timer.last_time = (uint64_t)y_gettime() - 10000;
 
         ptk_steptimer_tick(&timer, on_steptimer_tick, &probe);
 

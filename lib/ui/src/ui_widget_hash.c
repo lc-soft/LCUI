@@ -20,27 +20,27 @@ void ui_widget_generate_self_hash(ui_widget_t *widget)
 
         for (w = widget; w; w = w->parent) {
                 if (w != widget) {
-                        hash = strhash(hash, " ");
+                        hash = y_strhash(hash, " ");
                 }
                 if (w->type) {
-                        hash = strhash(hash, w->type);
+                        hash = y_strhash(hash, w->type);
                 } else {
-                        hash = strhash(hash, "*");
+                        hash = y_strhash(hash, "*");
                 }
                 if (w->id) {
-                        hash = strhash(hash, "#");
-                        hash = strhash(hash, w->id);
+                        hash = y_strhash(hash, "#");
+                        hash = y_strhash(hash, w->id);
                 }
                 if (w->classes) {
                         for (i = 0; w->classes[i]; ++i) {
-                                hash = strhash(hash, ".");
-                                hash = strhash(hash, w->classes[i]);
+                                hash = y_strhash(hash, ".");
+                                hash = y_strhash(hash, w->classes[i]);
                         }
                 }
                 if (w->status) {
                         for (i = 0; w->status[i]; ++i) {
-                                hash = strhash(hash, ":");
-                                hash = strhash(hash, w->status[i]);
+                                hash = y_strhash(hash, ":");
+                                hash = y_strhash(hash, w->status[i]);
                         }
                 }
         }

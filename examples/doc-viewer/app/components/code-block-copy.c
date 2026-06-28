@@ -24,10 +24,6 @@
 #include <string.h>
 #include <wchar.h>
 #include <LCUI.h>
-#include <LCUI/widgets.h>
-#include <ptk/clipboard.h>
-#include <ptk/events.h>
-#include <yutil/charset.h>
 #include "code-block-copy.tsx.h"
 #include "code-block-copy.h"
 #include "code-snippets.h"
