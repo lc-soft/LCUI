@@ -1,0 +1,6 @@
+target("font-mixed-baseline")
+    set_default(false)
+    set_kind("binary")
+    set_group("examples")
+    add_deps("pandagl")
+    add_files("src/*.c")
