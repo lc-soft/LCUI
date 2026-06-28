@@ -4,6 +4,36 @@ A container that provides scrollable content when children overflow.
 
 <WidgetExample name="scrollarea-basic" />
 
+## Use cases
+
+- **Suitable** — content height or width may exceed the container (long lists, documents, logs).
+- **Suitable** — scrollbars needed for visual feedback.
+- **Not suitable** — content always fits within the container (use a plain `widget`).
+
+## Usage
+
+```tsx
+import { ScrollArea, ScrollAreaContent, Scrollbar } from "@lcui/react"
+```
+
+```tsx
+<ScrollArea>
+  <ScrollAreaContent>{/* child content */}</ScrollAreaContent>
+  <Scrollbar orientation="horizontal" />
+  <Scrollbar />
+</ScrollArea>
+```
+
+## Composition
+
+Use the following composition to build a `ScrollArea`:
+
+```
+ScrollArea
+├── ScrollAreaContent
+└── Scrollbar
+```
+
 ## API
 
 ### `ui_create_scrollarea`

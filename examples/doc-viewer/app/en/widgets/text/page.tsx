@@ -9,9 +9,50 @@ export default function TextDocPage() {
       <p className="doc-page-desc">{`A widget for displaying text. Supports single-line and multiline modes, inline style tags, and CSS styling.`}</p>
       <TextBasicDemo />
       <Widget className="doc-section">
+        <h2>Use cases</h2>
+        <ul>
+          <li><Text>{`[b]Suitable[/b] — static text display (titles, labels, descriptions).`}</Text></li>
+          <li><Text>{`[b]Not suitable[/b] — editable text input (use [bgcolor=#eee] textinput [/bgcolor]).`}</Text></li>
+        </ul>
+      </Widget>
+      <Widget className="doc-section">
+        <h2>Usage</h2>
+        <Widget className="code-block" data-language="tsx" data-source="en/widgets/text/0">
+          <Widget className="code-block-header">
+            <Text className="code-block-title">TypeScript</Text>
+          </Widget>
+          <Widget className="code-block-body">
+            <CodeBlockCopy />
+            <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Text[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+          </Widget>
+        </Widget>
+        <Widget className="code-block" data-language="tsx" data-source="en/widgets/text/1">
+          <Widget className="code-block-header">
+            <Text className="code-block-title">TypeScript</Text>
+          </Widget>
+          <Widget className="code-block-body">
+            <CodeBlockCopy />
+            <Text className="code-line">{`<[color=#8250df]Text[/color]>[color=#8250df]Hello[/color]</[color=#8250df]Text[/color]>`}</Text>
+          </Widget>
+        </Widget>
+      </Widget>
+      <Widget className="doc-section">
+        <h2>Composition</h2>
+        <p>{`Use the following composition to build a [bgcolor=#eee] Text [/bgcolor]:`}</p>
+        <Widget className="code-block" data-language="text" data-source="en/widgets/text/2">
+          <Widget className="code-block-header">
+            <Text className="code-block-title">TEXT</Text>
+          </Widget>
+          <Widget className="code-block-body">
+            <CodeBlockCopy />
+            <Text className="code-line">{`Text`}</Text>
+          </Widget>
+        </Widget>
+      </Widget>
+      <Widget className="doc-section">
         <h2>API</h2>
         <h3>`ui_text_set_content`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/text/0">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/text/3">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -22,7 +63,7 @@ export default function TextDocPage() {
         </Widget>
         <p>{`Sets the text content from a UTF-8 string. Supports inline style tags.`}</p>
         <h3>`ui_text_set_content_w`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/text/1">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/text/4">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -33,7 +74,7 @@ export default function TextDocPage() {
         </Widget>
         <p>{`Sets the text content from a wide character string.`}</p>
         <h3>`ui_text_get_content_w`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/text/2">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/text/5">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -44,7 +85,7 @@ export default function TextDocPage() {
         </Widget>
         <p>{`Reads the current text content into [bgcolor=#eee] buf [/bgcolor] (up to [bgcolor=#eee] size [/bgcolor] wide characters). Returns the number of characters written.`}</p>
         <h3>`ui_text_set_multiline`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/text/3">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/text/6">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -57,7 +98,7 @@ export default function TextDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>XML tag</h2>
-        <Widget className="code-block" data-language="xml" data-source="en/widgets/text/4">
+        <Widget className="code-block" data-language="xml" data-source="en/widgets/text/7">
           <Widget className="code-block-header">
             <Text className="code-block-title">XML</Text>
           </Widget>

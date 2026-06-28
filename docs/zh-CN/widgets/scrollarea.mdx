@@ -10,18 +10,28 @@
 - **适用** — 需要滚动条可视化反馈的场景。
 - **不适用** — 内容总是小于容器（直接用普通 `widget` 即可）。
 
-## 结构
-
-导入部件并组装其子组件：
+## 用法
 
 ```tsx
-import { ScrollArea, ScrollAreaContent, Scrollbar } from "@lcui/react";
+import { ScrollArea, ScrollAreaContent, Scrollbar } from "@lcui/react"
+```
 
+```tsx
 <ScrollArea>
   <ScrollAreaContent>{/* 子内容 */}</ScrollAreaContent>
   <Scrollbar orientation="horizontal" />
   <Scrollbar />
 </ScrollArea>
+```
+
+## 组合
+
+使用以下组合来构建 `ScrollArea`：
+
+```
+ScrollArea
+├── ScrollAreaContent
+└── Scrollbar
 ```
 
 ## 示例

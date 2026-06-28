@@ -9,9 +9,57 @@ export default function ScrollareaDocPage() {
       <p className="doc-page-desc">{`A container that provides scrollable content when children overflow.`}</p>
       <ScrollareaBasicDemo />
       <Widget className="doc-section">
+        <h2>Use cases</h2>
+        <ul>
+          <li><Text>{`[b]Suitable[/b] — content height or width may exceed the container (long lists, documents, logs).`}</Text></li>
+          <li><Text>{`[b]Suitable[/b] — scrollbars needed for visual feedback.`}</Text></li>
+          <li><Text>{`[b]Not suitable[/b] — content always fits within the container (use a plain [bgcolor=#eee] widget [/bgcolor]).`}</Text></li>
+        </ul>
+      </Widget>
+      <Widget className="doc-section">
+        <h2>Usage</h2>
+        <Widget className="code-block" data-language="tsx" data-source="en/widgets/scrollarea/0">
+          <Widget className="code-block-header">
+            <Text className="code-block-title">TypeScript</Text>
+          </Widget>
+          <Widget className="code-block-body">
+            <CodeBlockCopy />
+            <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]ScrollArea[/color], [color=#8250df]ScrollAreaContent[/color], [color=#8250df]Scrollbar[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+          </Widget>
+        </Widget>
+        <Widget className="code-block" data-language="tsx" data-source="en/widgets/scrollarea/1">
+          <Widget className="code-block-header">
+            <Text className="code-block-title">TypeScript</Text>
+          </Widget>
+          <Widget className="code-block-body">
+            <CodeBlockCopy />
+            <Text className="code-line">{`<[color=#8250df]ScrollArea[/color]>`}</Text>
+            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ScrollAreaContent[/color]>[/color]{/* child content */}[color=#116329]</[color=#0550ae]ScrollAreaContent[/color]>[/color]`}</Text>
+            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]Scrollbar[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color] />[/color]`}</Text>
+            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]Scrollbar[/color] />[/color]`}</Text>
+            <Text className="code-line">{`</[color=#8250df]ScrollArea[/color]>`}</Text>
+          </Widget>
+        </Widget>
+      </Widget>
+      <Widget className="doc-section">
+        <h2>Composition</h2>
+        <p>{`Use the following composition to build a [bgcolor=#eee] ScrollArea [/bgcolor]:`}</p>
+        <Widget className="code-block" data-language="text" data-source="en/widgets/scrollarea/2">
+          <Widget className="code-block-header">
+            <Text className="code-block-title">TEXT</Text>
+          </Widget>
+          <Widget className="code-block-body">
+            <CodeBlockCopy />
+            <Text className="code-line">{`ScrollArea`}</Text>
+            <Text className="code-line">{`├── ScrollAreaContent`}</Text>
+            <Text className="code-line">{`└── Scrollbar`}</Text>
+          </Widget>
+        </Widget>
+      </Widget>
+      <Widget className="doc-section">
         <h2>API</h2>
         <h3>`ui_create_scrollarea`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/scrollarea/0">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/scrollarea/3">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -22,7 +70,7 @@ export default function ScrollareaDocPage() {
         </Widget>
         <p>{`Creates and returns a new scroll area widget.`}</p>
         <h3>`ui_create_scrollarea_content`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/scrollarea/1">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/scrollarea/4">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -33,7 +81,7 @@ export default function ScrollareaDocPage() {
         </Widget>
         <p>{`Creates and returns a new scroll content container to be appended inside a scroll area.`}</p>
         <h3>`ui_scrollarea_set_scroll_top`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/scrollarea/2">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/scrollarea/5">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -44,7 +92,7 @@ export default function ScrollareaDocPage() {
         </Widget>
         <p>{`Sets the vertical scroll position in pixels.`}</p>
         <h3>`ui_scrollarea_set_scroll_left`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/scrollarea/3">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/scrollarea/6">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -55,7 +103,7 @@ export default function ScrollareaDocPage() {
         </Widget>
         <p>{`Sets the horizontal scroll position in pixels.`}</p>
         <h3>`ui_scrollarea_get_scroll_top`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/scrollarea/4">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/scrollarea/7">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -66,7 +114,7 @@ export default function ScrollareaDocPage() {
         </Widget>
         <p>{`Returns the current vertical scroll position.`}</p>
         <h3>`ui_scrollarea_get_scroll_left`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/scrollarea/5">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/scrollarea/8">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -77,7 +125,7 @@ export default function ScrollareaDocPage() {
         </Widget>
         <p>{`Returns the current horizontal scroll position.`}</p>
         <h3>`ui_scrollarea_get_scroll_width`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/scrollarea/6">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/scrollarea/9">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -88,7 +136,7 @@ export default function ScrollareaDocPage() {
         </Widget>
         <p>{`Returns the total scrollable width of the content.`}</p>
         <h3>`ui_scrollarea_get_scroll_height`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/scrollarea/7">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/scrollarea/10">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -99,7 +147,7 @@ export default function ScrollareaDocPage() {
         </Widget>
         <p>{`Returns the total scrollable height of the content.`}</p>
         <h3>`ui_scrollarea_set_wheel_scroll_direction`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/scrollarea/8">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/scrollarea/11">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -145,7 +193,7 @@ export default function ScrollareaDocPage() {
           </Widget>
         </Widget>
         <h3>`ui_scrollarea_update`</h3>
-        <Widget className="code-block" data-language="c" data-source="en/widgets/scrollarea/9">
+        <Widget className="code-block" data-language="c" data-source="en/widgets/scrollarea/12">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
           </Widget>
@@ -158,7 +206,7 @@ export default function ScrollareaDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>XML tag</h2>
-        <Widget className="code-block" data-language="xml" data-source="en/widgets/scrollarea/10">
+        <Widget className="code-block" data-language="xml" data-source="en/widgets/scrollarea/13">
           <Widget className="code-block-header">
             <Text className="code-block-title">XML</Text>
           </Widget>

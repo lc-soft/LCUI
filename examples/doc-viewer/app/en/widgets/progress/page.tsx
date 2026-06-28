@@ -19,20 +19,38 @@ export default function ProgressDocPage() {
         </ul>
       </Widget>
       <Widget className="doc-section">
-        <h2>Anatomy</h2>
-        <p>{`Import the component:`}</p>
+        <h2>Usage</h2>
         <Widget className="code-block" data-language="tsx" data-source="en/widgets/progress/0">
           <Widget className="code-block-header">
             <Text className="code-block-title">TypeScript</Text>
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Progress[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
-            <Text className="code-line">{` `}</Text>
-            <Text className="code-line">{`[color=#116329]<[color=#0550ae]Progress[/color] />[/color]`}</Text>
+            <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Progress[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
           </Widget>
         </Widget>
-        <p>{`Progress is composed of two strip-shaped children: a bottom [bgcolor=#eee] progress-track [/bgcolor] that serves as the rail, and a foreground [bgcolor=#eee] progress-indicator [/bgcolor] whose width is a percentage of the track driven by the current [bgcolor=#eee] value [/bgcolor]. The [bgcolor=#eee] value [/bgcolor] accepts a number in the range [bgcolor=#eee] 0~100 [/bgcolor]; values outside this range are clamped to the nearest boundary.`}</p>
+        <Widget className="code-block" data-language="tsx" data-source="en/widgets/progress/1">
+          <Widget className="code-block-header">
+            <Text className="code-block-title">TypeScript</Text>
+          </Widget>
+          <Widget className="code-block-body">
+            <CodeBlockCopy />
+            <Text className="code-line">{`<[color=#8250df]Progress[/color] value={[color=#0550ae]20[/color]} />`}</Text>
+          </Widget>
+        </Widget>
+      </Widget>
+      <Widget className="doc-section">
+        <h2>Composition</h2>
+        <p>{`Use the following composition to build a [bgcolor=#eee] Progress [/bgcolor]:`}</p>
+        <Widget className="code-block" data-language="text" data-source="en/widgets/progress/2">
+          <Widget className="code-block-header">
+            <Text className="code-block-title">TEXT</Text>
+          </Widget>
+          <Widget className="code-block-body">
+            <CodeBlockCopy />
+            <Text className="code-line">{`Progress`}</Text>
+          </Widget>
+        </Widget>
       </Widget>
       <Widget className="doc-section">
         <h2>API Reference</h2>

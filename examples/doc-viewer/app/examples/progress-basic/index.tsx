@@ -133,6 +133,7 @@ export default function ProgressBasicDemo() {
           <Text className="code-line">{`        ui_progress_set_value(progress, progress_value);`}</Text>
           <Text className="code-line">{`        ui_widget_append(parent, progress);`}</Text>
           <Text className="code-line">{`        timer_id = ptk_set_interval([color=#0550ae]500[/color], on_timer, progress);`}</Text>
+          <Text className="code-line">{`        progress_value = [color=#0550ae]20.0f[/color];`}</Text>
           <Text className="code-line">{`}`}</Text>
           <Text className="code-line">{` `}</Text>
           <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]progress_basic_destroy[/color][color=#0550ae]([color=#953800]void[/color])[/color]`}</Text>
