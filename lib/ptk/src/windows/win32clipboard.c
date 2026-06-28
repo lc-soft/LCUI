@@ -171,7 +171,6 @@ int ptk_win32clipboard_set_text(const wchar_t *text, size_t len)
         char *utf8_text = malloc((utf8_len + 1) * sizeof(char));
         if (utf8_text != NULL) {
                 utf8_len = encode_utf8(utf8_text, text, utf8_len);
-                utf8_text[utf8_len] = '\0';
 
                 if (ptk_win32clipboard.text) {
                         free(ptk_win32clipboard.text);

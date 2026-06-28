@@ -36,15 +36,15 @@ int main(int argc, char **argv)
                     "Graph_ZoomBilinear()");
         for (i = 0; i < sizeof(resx) / sizeof(int); i++) {
                 resy = resx[i] * 9 / 16;
-                t0 = get_time_ms();
+                t0 = y_gettime();
                 pd_canvas_init(&g_dst);
                 pd_canvas_zoom(&g_src, &g_dst, false, resx[i], resy);
                 pd_canvas_destroy(&g_dst);
-                t1 = get_time_ms();
+                t1 = y_gettime();
                 pd_canvas_init(&g_dst);
                 pd_canvas_zoom_bilinear(&g_src, &g_dst, false, resx[i], resy);
                 pd_canvas_destroy(&g_dst);
-                t2 = get_time_ms();
+                t2 = y_gettime();
                 sprintf(s_res, "%dx%d", resx[i], resy);
                 sprintf(s_t0, "%ldms", (int)(t1 - t0));
                 sprintf(s_t1, "%ldms", (int)(t2 - t1));

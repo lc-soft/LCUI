@@ -41,7 +41,6 @@ int ptk_clipboard_request_text(ptk_clipboard_callback_t callback, void *arg)
 
         if (len > 1) {
                 len = decode_utf8(wstr, ptk_clipboard.text, len);
-                wstr[len] = 0;
         } else {
                 wstr[0] = 0;
         }
@@ -73,7 +72,6 @@ int ptk_clipboard_set_text(const wchar_t *text, size_t len)
         if (ptk_clipboard.text) {
                 free(ptk_clipboard.text);
         }
-        raw_text[raw_len] = '\0';
         ptk_clipboard.text = raw_text;
         ptk_clipboard.text_len = raw_len;
         return 0;

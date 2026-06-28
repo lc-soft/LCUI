@@ -10,6 +10,7 @@
  */
 
 #include <errno.h>
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <thread.h>
@@ -118,8 +119,8 @@ static void ui_textinput_update_caret(ui_widget_t *widget)
                 caret_x = pos.x / scale;
                 caret_y = pos.y / scale;
         }
-        offset_x = y_iround(edit->layer->offset_x / scale);
-        offset_y = y_iround(edit->layer->offset_y / scale);
+        offset_x = (int)round(edit->layer->offset_x / scale);
+        offset_y = (int)round(edit->layer->offset_y / scale);
         x = caret_x + offset_x;
         y = caret_y + offset_y;
         width = edit->layer->width / scale;
@@ -147,8 +148,8 @@ static void ui_textinput_update_caret(ui_widget_t *widget)
                 x = caret_x + widget->content_box.width -
                     (edit->layer->width / scale);
         }
-        offset_x = y_iround((x - caret_x) * scale);
-        offset_y = y_iround((y - caret_y) * scale);
+        offset_x = (int)round((x - caret_x) * scale);
+        offset_y = (int)round((y - caret_y) * scale);
         if (pd_text_set_offset(edit->layer, offset_x, offset_y)) {
                 edit->tasks[TASK_UPDATE] = true;
                 ui_widget_request_update(widget);
@@ -496,7 +497,6 @@ int ui_textinput_set_text(ui_widget_t *widget, const char *utf8_str)
                 return -ENOMEM;
         }
         len = decode_utf8(wstr, utf8_str, len);
-        wstr[len] = 0;
         ret = ui_textinput_set_text_w(widget, wstr);
         free(wstr);
         return ret;
@@ -560,7 +560,6 @@ int ui_textinput_set_placeholder(ui_widget_t *w, const char *str)
                 return -ENOMEM;
         }
         len = decode_utf8(wstr, str, len);
-        wstr[len] = 0;
         ret = ui_textinput_set_placeholder_w(w, wstr);
         free(wstr);
         return ret;

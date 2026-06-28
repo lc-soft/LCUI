@@ -73,7 +73,7 @@ static ini_section_t *ini_doc_find_section(ini_doc_t *doc, const char *name,
         }
         section = &doc->sections[doc->section_count];
         memset(section, 0, sizeof(*section));
-        section->name = strdup2(name);
+        section->name = y_strdup(name);
         if (!section->name) {
                 return NULL;
         }
@@ -142,7 +142,7 @@ static ini_entry_t *ini_section_ensure_entry(ini_section_t *section,
         }
         entry = &section->entries[section->entry_count];
         memset(entry, 0, sizeof(*entry));
-        entry->key = strdup2(key);
+        entry->key = y_strdup(key);
         if (!entry->key) {
                 return NULL;
         }
@@ -152,7 +152,7 @@ static ini_entry_t *ini_section_ensure_entry(ini_section_t *section,
 
 static bool ini_entry_set_value(ini_entry_t *entry, const char *value)
 {
-        char *copy = strdup2(value);
+        char *copy = y_strdup(value);
 
         if (!copy) {
                 return false;
@@ -389,7 +389,7 @@ bool ini_doc_get_string(const ini_doc_t *doc, const char *section,
         if (!e || !e->value) {
                 return false;
         }
-        *out = strdup2(e->value);
+        *out = y_strdup(e->value);
         return *out != NULL;
 }
 

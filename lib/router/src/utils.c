@@ -145,12 +145,12 @@ char *router_path_resolve(const char *relative, const char *base, bool append)
         if (first_char == '?' || first_char == '#') {
                 return strcat(strcpy(path, base), relative);
         }
-        stack_size = strsplit(base, "/", &stack);
+        stack_size = y_strsplit(base, "/", &stack);
         if (!append || !stack[stack_size - 1][0]) {
                 stack_size--;
                 router_mem_free(stack[stack_size]);
         }
-        segments_size = strsplit(relative, "/", &segments);
+        segments_size = y_strsplit(relative, "/", &segments);
         for (i = 0; i < segments_size; ++i) {
                 if (strcmp(segments[i], "..") == 0) {
                         stack_size--;
@@ -196,7 +196,7 @@ strmap_t *router_parse_query(const char *query_str)
         if (!query_str) {
                 return query;
         }
-        pairs_size = strsplit(query_str, "&", &pairs);
+        pairs_size = y_strsplit(query_str, "&", &pairs);
         for (i = 0; i < pairs_size; ++i) {
                 for (split_i = 0; pairs[i][split_i]; ++split_i) {
                         if (pairs[i][split_i] == '=') {

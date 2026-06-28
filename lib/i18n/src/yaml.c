@@ -25,7 +25,6 @@ static wchar_t *yaml_token_getwcs(yaml_token_t *token)
         if (len < 1) {
                 abort();
         }
-        wcs[len] = 0;
         return wcs;
 }
 

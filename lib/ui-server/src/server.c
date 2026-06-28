@@ -409,7 +409,7 @@ static size_t ui_server_render_flash_rect(ui_connection_t *conn,
         if (!paint) {
                 return 0;
         }
-        period = get_time_delta(flash_rect->paint_time);
+        period = (y_gettime() - flash_rect->paint_time);
         count = ui_widget_render(conn->widget, paint);
         ui_cursor_paint(conn->window, paint);
         if (period >= duration) {
@@ -467,14 +467,14 @@ static void ui_server_add_flash_rect(ui_connection_t *conn, pd_rect_t *rect)
         for (list_each(node, &conn->flash_rects)) {
                 flash_rect = node->data;
                 if (is_rect_equals(&flash_rect->rect, rect)) {
-                        flash_rect->paint_time = get_time_ms();
+                        flash_rect->paint_time = y_gettime();
                         return;
                 }
         }
 
         flash_rect = malloc(sizeof(ui_flash_rect_t));
         flash_rect->rect = *rect;
-        flash_rect->paint_time = get_time_ms();
+        flash_rect->paint_time = y_gettime();
         list_append(&conn->flash_rects, flash_rect);
 }
 

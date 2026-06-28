@@ -40,7 +40,7 @@ static css_keyword_t *keyword_create(int key, const char *name)
 {
         css_keyword_t *kw;
         kw = malloc(sizeof(css_keyword_t));
-        kw->name = strdup2(name);
+        kw->name = y_strdup(name);
         kw->key = key;
         return kw;
 }

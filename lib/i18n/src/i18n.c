@@ -39,7 +39,7 @@ static bool i18n_add_language(const wchar_t *name, dict_t *dict)
         for (i = i18n.length; i > pos; --i) {
                 langs[i] = langs[i - 1];
         }
-        langs[pos] = wcsdup2(name);
+        langs[pos] = y_wcsdup(name);
         i18n.languages = langs;
         i18n.length += 1;
         if (i18n.locales == NULL) {

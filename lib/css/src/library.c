@@ -268,7 +268,7 @@ static css_style_decl_t *css_find_style_store(css_selector_t *selector,
                 if (!link) {
                         link = css_style_link_create();
                         link->group = slg;
-                        link->selector = strdup2(fullname);
+                        link->selector = y_strdup(fullname);
                         dict_add(slg->links, fullname, link);
                 }
                 if (i == 0) {
@@ -307,7 +307,7 @@ static css_style_decl_t *css_find_style_store(css_selector_t *selector,
         snode->node.data = snode;
         snode->list = css_style_decl_create();
         snode->rank = selector->rank;
-        snode->selector = strdup2(fullname);
+        snode->selector = y_strdup(fullname);
         snode->batch_num = selector->batch_num;
         list_append_node(&link->styles, &snode->node);
         return snode->list;
@@ -409,10 +409,10 @@ int css_query_selector_from_group(int group, const char *name,
         i = selector->length - 1;
         list_create(&names);
         if (name) {
-                list_append(&names, strdup2(name));
+                list_append(&names, y_strdup(name));
         } else {
                 css_selector_node_get_name_list(selector->nodes[i], &names);
-                list_append(&names, strdup2("*"));
+                list_append(&names, y_strdup("*"));
         }
         for (list_each(node, &names)) {
                 dict_entry_t *entry;

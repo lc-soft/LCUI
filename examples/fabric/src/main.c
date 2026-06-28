@@ -113,7 +113,7 @@ void ui_fabric_on_init(ui_widget_t *w)
         ui_widget_on(w, "mousemove", ui_fabric_on_mousemove, NULL);
         ui_widget_on(w, "mouseup", ui_fabric_on_mouseup, NULL);
         data->timer = ptk_set_interval(LCUI_MAX_FRAME_MSEC,
-                                        (timer_callback)ui_fabric_on_frame, w);
+                                       (ptk_timer_cb)ui_fabric_on_frame, w);
 }
 
 void ui_fabric_on_destroy(ui_widget_t *w)

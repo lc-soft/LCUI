@@ -50,7 +50,7 @@ int ui_widget_set_attr_ex(ui_widget_t *w, const char *name, void *value,
                 }
         } else {
                 attr = malloc(sizeof(ui_widget_attribute_t));
-                attr->name = strdup2(name);
+                attr->name = y_strdup(name);
                 dict_add(w->attributes, attr->name, attr);
         }
         attr->value.data = value;
@@ -65,7 +65,7 @@ int ui_widget_set_attr(ui_widget_t *w, const char *name, const char *value)
         char *value_str = NULL;
 
         if (value) {
-                value_str = strdup2(value);
+                value_str = y_strdup(value);
                 if (!value_str) {
                         return -ENOMEM;
                 }

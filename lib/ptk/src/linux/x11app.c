@@ -478,7 +478,7 @@ static int x11_ptk_process_native_events(ptk_process_events_option_t option)
         do {
                 for (ptk_tick(); !ptk_x11app_pending(); ptk_tick()) {
                         ptk_process_events();
-                        sleep_ms(1);
+                        y_sleep(1);
                 }
                 ret = x11_ptk_process_native_event();
                 ptk_process_events();

@@ -48,7 +48,7 @@ int ui_widget_set_id(ui_widget_t *w, const char *idstr)
         if (!idstr) {
                 return -1;
         }
-        w->id = strdup2(idstr);
+        w->id = y_strdup(idstr);
         if (!w->id) {
                 goto error_exit;
         }

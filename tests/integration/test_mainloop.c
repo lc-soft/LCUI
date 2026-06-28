@@ -50,7 +50,7 @@ static void observer_thread(void *arg)
         bool *exited = arg;
 
         for (i = 0; i < 10 && !*exited; ++i) {
-                sleep_ms(100);
+                y_sleep(100);
         }
         ctest_equal_bool("should exit main loop within 1000ms", *exited, true);
         if (!*exited) {

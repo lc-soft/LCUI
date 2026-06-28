@@ -112,7 +112,7 @@ static bool lcui_mkdir_recursive(const char *path)
         char *buffer;
 
         len = strlen(path);
-        buffer = strdup2(path);
+        buffer = y_strdup(path);
         if (!buffer) {
                 return false;
         }
@@ -177,7 +177,7 @@ static char *lcui_settings_get_config_root(void)
 #ifdef _WIN32
         const char *base = getenv("APPDATA");
         if (base && base[0] != 0) {
-                return strdup2(base);
+                return y_strdup(base);
         }
         base = getenv("USERPROFILE");
         if (base && base[0] != 0) {
@@ -191,7 +191,7 @@ static char *lcui_settings_get_config_root(void)
 #else
         const char *base = getenv("XDG_CONFIG_HOME");
         if (base && base[0] != 0) {
-                return strdup2(base);
+                return y_strdup(base);
         }
         base = getenv("HOME");
         if (base && base[0] != 0) {

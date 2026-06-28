@@ -6,18 +6,16 @@
 
 void test_time(void)
 {
-	int64_t time1 = get_time_ms();
-	it_b("get_time_ms() should work", time1 != 0, true);
+        int64_t time1 = y_gettime();
+        it_b("y_gettime() should work", time1 != 0, true);
 
-	it_b("get_time_us() should work", get_time_us() != 0, true);
+        y_sleep(1000);
 
-	sleep_s(1);
+        it_b("y_gettime() subtraction should work", y_gettime() - time1 != 0,
+             true);
+        it_b("y_sleep() should work", y_gettime() - time1 >= 900, true);
 
-	it_b("get_time_delta() should work", get_time_delta(time1) != 0, true);
-	it_b("sleep_ms() should work", get_time_delta(time1) >= 90, true);
-	int64_t time2 = get_time_ms();
-
-	sleep_ms(100);
-
-	it_b("sleep_ms() should work", get_time_delta(time2) >= 90, true);
+        int64_t time2 = y_gettime();
+        y_sleep(100);
+        it_b("y_sleep() should work", y_gettime() - time2 >= 90, true);
 }

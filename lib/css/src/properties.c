@@ -89,7 +89,7 @@ int css_register_shorthand_property(const char *name, const char *syntax,
         }
         prop->key = -1;
         prop->parse = parse;
-        prop->name = strdup2(name);
+        prop->name = y_strdup(name);
         props[css_properties.shorthand_list_length] = prop;
         css_properties.shorthand_list_length++;
         css_properties.shorthand_list = props;
@@ -126,7 +126,7 @@ static int css_register_property_with_key(
                 free(prop);
                 return -1;
         }
-        prop->name = strdup2(name);
+        prop->name = y_strdup(name);
         prop->key = key;
         prop->cascade = cascade;
         if (key >= css_properties.list_length) {

@@ -23,7 +23,7 @@ css_parser_t *css_parser_create(const char *space)
 
         parser = calloc(sizeof(css_parser_t), 1);
         if (space) {
-                parser->space = strdup2(space);
+                parser->space = y_strdup(space);
         } else {
                 parser->space = NULL;
         }

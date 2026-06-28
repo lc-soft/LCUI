@@ -37,40 +37,16 @@
 #include "yutil/keywords.h"
 #include "yutil/time.h"
 
-#define TIME_WRAP_VALUE (~(int64_t)0)
-
-int64_t get_time_ms(void)
+int64_t y_gettime(void)
 {
-	struct timeval tv;
+        struct timeval tv;
 
-	gettimeofday(&tv, NULL);
-	return ((int64_t)tv.tv_sec * 1000 + tv.tv_usec / 1000);
+        gettimeofday(&tv, NULL);
+        return ((int64_t)tv.tv_sec * 1000 + tv.tv_usec / 1000);
 }
 
-int64_t get_time_us(void)
+void y_sleep(unsigned int ms)
 {
-	struct timeval tv;
-
-	gettimeofday(&tv, NULL);
-	return ((int64_t)tv.tv_sec * 1000000 + tv.tv_usec);
-}
-
-int64_t get_time_delta(int64_t start)
-{
-	int64_t now = get_time_ms();
-	if (now < start) {
-		return (TIME_WRAP_VALUE - start) + now;
-	}
-	return now - start;
-}
-
-void sleep_ms(unsigned int ms)
-{
-	usleep(ms * 1000);
-}
-
-void sleep_s(unsigned int s)
-{
-	sleep(s);
+        usleep(ms * 1000);
 }
 #endif

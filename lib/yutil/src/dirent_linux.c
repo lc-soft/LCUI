@@ -37,120 +37,119 @@
 #include <dirent.h>
 #include "yutil/keywords.h"
 #include "yutil/dirent.h"
-#include "yutil/charset.h"
+#include "yutil/encoding.h"
 
 #define DIRENT_MAX_LEN 4096
 
 typedef DIR *dir_handle_t;
 
 struct dir_entry_t {
-	struct dirent dirent;
-	wchar_t name[DIRENT_MAX_LEN];
+        struct dirent dirent;
+        wchar_t name[DIRENT_MAX_LEN];
 };
 struct dir_t {
-	dir_handle_t handle;
-	dir_entry_t entry;
-	int cached;
+        dir_handle_t handle;
+        dir_entry_t entry;
+        int cached;
 };
 
 dir_t *dir_create()
 {
-	dir_t *dir = (dir_t *)malloc(sizeof(dir_t));
-	dir_entry_t t = { 0 };
-	dir->cached = 0;
-	dir->entry = t;
-	dir->handle = NULL;
-	return dir;
+        dir_t *dir = (dir_t *)malloc(sizeof(dir_t));
+        dir_entry_t t = { 0 };
+        dir->cached = 0;
+        dir->entry = t;
+        dir->handle = NULL;
+        return dir;
 }
 
 void dir_destroy(dir_t *dir)
 {
-	free(dir);
+        free(dir);
 }
 
 int dir_open_a(const char *path, dir_t *dir)
 {
-	dir->handle = opendir(path);
-	if (!dir->handle) {
-		return -1;
-	}
-	return 0;
+        dir->handle = opendir(path);
+        if (!dir->handle) {
+                return -1;
+        }
+        return 0;
 }
 
 int dir_open_w(const wchar_t *path, dir_t *dir)
 {
-	int len;
-	char *newpath;
+        int len;
+        char *newpath;
 
-	len = encode_string(NULL, path, 0, ENCODING_UTF8) + 1;
-	newpath = malloc(len * sizeof(wchar_t));
-	encode_string(newpath, path, len, ENCODING_UTF8);
+        len = encode_utf8(NULL, path, 0) + 1;
+        newpath = malloc(len * sizeof(wchar_t));
+        encode_utf8(newpath, path, len);
 
-	dir->handle = opendir(newpath);
-	free(newpath);
-	if (!dir->handle) {
-		return -1;
-	}
-	return 0;
+        dir->handle = opendir(newpath);
+        free(newpath);
+        if (!dir->handle) {
+                return -1;
+        }
+        return 0;
 }
 
 dir_entry_t *dir_read_a(dir_t *dir)
 {
-	int len;
-	struct dirent *d;
-	d = readdir(dir->handle);
-	if (!d) {
-		return NULL;
-	}
-	dir->entry.dirent = *d;
-	len = sizeof(d->d_name);
-	if (len >= DIRENT_MAX_LEN) {
-		return NULL;
-	}
-	dir->entry.name[len] = 0;
-	return &dir->entry;
+        int len;
+        struct dirent *d;
+        d = readdir(dir->handle);
+        if (!d) {
+                return NULL;
+        }
+        dir->entry.dirent = *d;
+        len = sizeof(d->d_name);
+        if (len >= DIRENT_MAX_LEN) {
+                return NULL;
+        }
+        dir->entry.name[len] = 0;
+        return &dir->entry;
 }
 
 dir_entry_t *dir_read_w(dir_t *dir)
 {
-	int len;
-	struct dirent *d;
-	d = readdir(dir->handle);
-	if (!d) {
-		return NULL;
-	}
-	dir->entry.dirent = *d;
-	len = decode_string(dir->entry.name, d->d_name, DIRENT_MAX_LEN,
-			    ENCODING_UTF8);
-	if (len >= DIRENT_MAX_LEN) {
-		return NULL;
-	}
-	dir->entry.name[len] = 0;
-	return &dir->entry;
+        int len;
+        struct dirent *d;
+        d = readdir(dir->handle);
+        if (!d) {
+                return NULL;
+        }
+        dir->entry.dirent = *d;
+        len = decode_utf8(dir->entry.name, d->d_name, DIRENT_MAX_LEN);
+        if (len >= DIRENT_MAX_LEN) {
+                return NULL;
+        }
+        dir->entry.name[len] = 0;
+        return &dir->entry;
 }
 
 int dir_close(dir_t *dir)
 {
-	return closedir(dir->handle);
+        return closedir(dir->handle);
 }
 
 char *dir_get_file_name_a(dir_entry_t *entry)
 {
-	return entry->dirent.d_name;
+        return entry->dirent.d_name;
 }
 
 wchar_t *dir_get_file_name_w(dir_entry_t *entry)
 {
-	return entry->name;
+        return entry->name;
 }
 
 int dir_entry_is_directory(dir_entry_t *entry)
 {
-	return entry->dirent.d_type == DT_DIR;
+        return entry->dirent.d_type == DT_DIR;
 }
 
 int dir_entry_is_regular(dir_entry_t *entry)
 {
-	return entry->dirent.d_type == DT_REG;
+        return entry->dirent.d_type == DT_REG;
 }
 #endif

@@ -139,7 +139,7 @@ static void helper_process_window_events(unsigned rounds)
 
         for (i = 0; i < rounds; ++i) {
                 ptk_process_native_events(PTK_PROCESS_EVENTS_ALL_IF_PRESENT);
-                sleep_ms(10);
+                y_sleep(10);
         }
 }
 

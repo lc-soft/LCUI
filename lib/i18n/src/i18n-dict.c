@@ -54,6 +54,6 @@ bool i18n_dict_add_dict(dict_t *dict, const wchar_t *key, dict_t *child_dict)
         value->type = DICT;
         value->parent_dict = dict;
         value->dict = child_dict;
-        value->key = wcsdup2(key);
+        value->key = y_wcsdup(key);
         return dict_add(dict, (void *)value->key, value) == DICT_OK;
 }

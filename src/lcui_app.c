@@ -155,7 +155,7 @@ static void lcui_dispatch_ui_textinput_event(ptk_event_t *app_evt)
 
         e.type = UI_EVENT_TEXTINPUT;
         e.text.length = app_evt->text.length;
-        e.text.text = wcsdup2(app_evt->text.text);
+        e.text.text = y_wcsdup(app_evt->text.text);
         ui_dispatch_event(&e);
         ui_event_destroy(&e);
 }
@@ -208,7 +208,7 @@ static void lcui_dispatch_ui_event(ptk_event_t *app_event)
 
 static void lcui_app_on_anim_frame(ptk_steptimer_t *timer, void *data)
 {
-        uint64_t timestamp = (uint64_t)get_time_ms();
+        uint64_t timestamp = (uint64_t)y_gettime();
         list_node_t *node;
 
         list_for_each(node, &lcui_app.frame_cbs)
@@ -251,7 +251,7 @@ void lcui_cancel_frame(int request_id)
 
 static void lcui_app_render_frame(void)
 {
-        uint64_t now = (uint64_t)get_time_ms();
+        uint64_t now = (uint64_t)y_gettime();
 
         // Throttle: skip this frame if the previous render is too recent.
         if (lcui_app.min_render_interval > 0 &&
@@ -304,7 +304,7 @@ int lcui_app_process_events(ptk_process_events_option_t option)
 
 void lcui_app_init(void)
 {
-        uint64_t now = (uint64_t)get_time_ms();
+        uint64_t now = (uint64_t)y_gettime();
 
         lcui_worker_init();
         ptk_steptimer_init(&lcui_app.anim_timer);

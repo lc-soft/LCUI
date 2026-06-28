@@ -87,7 +87,7 @@ ui_widget_t *ui_create_widget(const char *type)
         if (widget->proto->name) {
                 widget->type = widget->proto->name;
         } else if (type) {
-                widget->type = strdup2(type);
+                widget->type = y_strdup(type);
         }
         widget->proto->init(widget);
         ui_widget_request_refresh_style(widget);
@@ -142,7 +142,7 @@ void ui_widget_set_title(ui_widget_t *w, const wchar_t *title)
         if (ui_widget_has_observer(w, UI_MUTATION_RECORD_TYPE_PROPERTIES)) {
                 record = ui_mutation_record_create(
                     w, UI_MUTATION_RECORD_TYPE_PROPERTIES);
-                record->property_name = strdup2("title");
+                record->property_name = y_strdup("title");
                 ui_widget_add_mutation_record(w, record);
                 ui_mutation_record_destroy(record);
         }

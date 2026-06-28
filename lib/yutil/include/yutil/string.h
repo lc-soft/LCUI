@@ -38,12 +38,10 @@
 
 Y_BEGIN_DECLS
 
-/** strdup() 的再实现版本，用于清除编译错误 */
-YUTIL_API char *strdup2(const char *str);
-YUTIL_API wchar_t *wcsdup2(const wchar_t *str);
+YUTIL_API char *y_strdup(const char *str);
+YUTIL_API wchar_t *y_wcsdup(const wchar_t *str);
 
-/** 将字符串中的字母转成小写字母 */
-YUTIL_API size_t strtolower(char *outstr, const char *instr);
+YUTIL_API size_t y_strlower(char *outstr, const char *instr);
 
 /**
  * 清除字符串首尾的字符
@@ -52,33 +50,23 @@ YUTIL_API size_t strtolower(char *outstr, const char *instr);
  * @param[in] charlist 需要清除的字符列表，当为NULL时，默认清除空白符
  * @return 处理后的字符串的长度
  */
-YUTIL_API size_t strtrim(char *outstr, const char *instr, const char *charlist);
-YUTIL_API size_t wcstrim(wchar_t *outstr, const wchar_t *instr,
-			 const wchar_t *charlist);
+YUTIL_API size_t y_strtrim(char *outstr, const char *instr,
+                           const char *charlist);
+YUTIL_API size_t y_wcstrim(wchar_t *outstr, const wchar_t *instr,
+                           const wchar_t *charlist);
 
-YUTIL_API unsigned strhash(unsigned hash, const char *str);
+YUTIL_API unsigned y_strhash(unsigned hash, const char *str);
 
 /**
- * 字符串替换
+ * 字符串替换（原地修改，仅替换第一个匹配）
  * @param[in][out] str 需要处理的字符串，替换成功后字符串内容也会被修改
  * @param[in] max_len 输出字符串的最大长度
  * @param[in] substr 字符串中需要被替换的子字符串
  * @param[in] newstr 替换的新字符串
  * @returns 替换后的字符串长度，若未替换，则返回 0
  */
-YUTIL_API size_t wcsreplace(wchar_t *str, size_t max_len, const wchar_t *substr,
-			    const wchar_t *newstr);
-
-YUTIL_API size_t strreplace(char *str, size_t max_len, const char *substr,
-			    const char *newstr);
-
-/**
- * 分割命令行字符串
- * @param[in] cmd 需分割的命令行字符串
- * @param[out] outargv 分割后的命令行参数列表
- * @return 参数数量
- */
-YUTIL_API int cmdsplit(const char *cmd, char ***outargv);
+YUTIL_API size_t y_strreplace(char *str, size_t max_len, const char *substr,
+                              const char *newstr);
 
 /**
  * 分割字符串
@@ -86,7 +74,7 @@ YUTIL_API int cmdsplit(const char *cmd, char ***outargv);
  * @param[in] sep 分割标记字符串
  * @param[out] outstrs 分割后的字符串列表
  */
-YUTIL_API int strsplit(const char *instr, const char *sep, char ***outstrs);
+YUTIL_API int y_strsplit(const char *instr, const char *sep, char ***outstrs);
 
 Y_END_DECLS
 

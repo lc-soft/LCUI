@@ -84,7 +84,7 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder,
                         return 0;
                 }
                 snprintf(fullname, avail, "%s", sfinder->node->type);
-                list_append(list, strdup2(fullname));
+                list_append(list, y_strdup(fullname));
                 break;
         case LEVEL_ID:
                 /* 按ID选择器生成选择器全名 */
@@ -94,7 +94,7 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder,
                 fullname[len++] = '#';
                 fullname[len] = 0;
                 snprintf(fullname + len, avail - len, "%s", sfinder->node->id);
-                list_append(list, strdup2(fullname));
+                list_append(list, y_strdup(fullname));
                 break;
         case LEVEL_CLASS:
                 if (!sfinder->node->classes) {
@@ -113,7 +113,7 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder,
                         sfinder->class_i = i;
                         snprintf(fullname + len, avail - len, "%s",
                                  sfinder->node->classes[i]);
-                        list_append(list, strdup2(fullname));
+                        list_append(list, y_strdup(fullname));
                         /* 将当前选择器名与其它层级的选择器名组合 */
                         while (sfinder->level < LEVEL_TOTAL_NUM) {
                                 count +=
@@ -142,7 +142,7 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder,
                                 continue;
                         }
                         strcpy(fullname + len, sfinder->node->classes[i]);
-                        list_append(list, strdup2(fullname));
+                        list_append(list, y_strdup(fullname));
                         sfinder->class_i = i;
                         count += css_selector_collect_name(sfinder, list);
                         sfinder->class_i = 0;
@@ -178,7 +178,7 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder,
                 for (i = 0; sfinder->node->status[i]; ++i) {
                         sfinder->status_i = i;
                         strcpy(fullname + len, sfinder->node->status[i]);
-                        list_append(list, strdup2(fullname));
+                        list_append(list, y_strdup(fullname));
                         /**
                          * 递归调用，以一层层拼接出像下面这样的选择器：
                          * text#main-btn-text:active:focus:hover
@@ -200,7 +200,7 @@ static int css_selector_collect_name(css_selector_name_collector_t *sfinder,
                         }
                         fullname[len] = ':';
                         strcpy(fullname + len + 1, sfinder->node->status[i]);
-                        list_append(list, strdup2(fullname));
+                        list_append(list, y_strdup(fullname));
                         sfinder->status_i = i;
                         count += css_selector_collect_name(sfinder, list);
                         sfinder->status_i = 0;
@@ -502,9 +502,9 @@ css_selector_node_t *css_selector_node_duplicate(const css_selector_node_t *src)
         css_selector_node_t *dst;
 
         dst = calloc(sizeof(css_selector_node_t), 1);
-        dst->id = src->id ? strdup2(src->id) : NULL;
-        dst->type = src->type ? strdup2(src->type) : NULL;
-        dst->fullname = src->fullname ? strdup2(src->fullname) : NULL;
+        dst->id = src->id ? y_strdup(src->id) : NULL;
+        dst->type = src->type ? y_strdup(src->type) : NULL;
+        dst->fullname = src->fullname ? y_strdup(src->fullname) : NULL;
         if (src->classes) {
                 for (i = 0; src->classes[i]; ++i) {
                         strlist_sorted_add(&dst->classes, src->classes[i]);

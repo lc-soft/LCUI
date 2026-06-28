@@ -19,7 +19,7 @@
 
 void ptk_steptimer_init(ptk_steptimer_t *timer)
 {
-        timer->last_time = get_time_ms();
+        timer->last_time = y_gettime();
         timer->elapsed_time = 0;
         timer->total_time = 0;
         timer->left_over_time = 0;
@@ -37,7 +37,7 @@ void ptk_steptimer_tick(ptk_steptimer_t *timer, ptk_steptimer_handler_t handler,
                         void *data)
 {
         // Query the current time.
-        uint64_t current_time = get_time_ms();
+        uint64_t current_time = y_gettime();
         uint64_t time_delta = current_time - timer->last_time;
 
         timer->last_time = current_time;
@@ -124,7 +124,7 @@ void ptk_steptimer_tick(ptk_steptimer_t *timer, ptk_steptimer_handler_t handler,
 
 void ptk_steptimer_reset_elapsed_time(ptk_steptimer_t *timer)
 {
-        timer->last_time = get_time_ms();
+        timer->last_time = y_gettime();
         timer->left_over_time = 0;
         timer->frames_per_second = 0;
         timer->frames_this_second = 0;

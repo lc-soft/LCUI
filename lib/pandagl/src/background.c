@@ -9,6 +9,7 @@
  * in the LICENSE.TXT file in the root directory of this source tree.
  */
 
+#include <math.h>
 #include <yutil.h>
 #include <pandagl.h>
 
@@ -55,13 +56,13 @@ void pd_paint_background(pd_context_t *ctx, const pd_background_t *bg,
                 /* 根据宽高的缩放比例，计算实际需要引用的区域 */
                 if (width != bg->image->width) {
                         scale = 1.0 * bg->image->width / width;
-                        rect.x = y_iround(rect.x * scale);
-                        rect.width = y_iround(rect.width * scale);
+                        rect.x = (int)round(rect.x * scale);
+                        rect.width = (int)round(rect.width * scale);
                 }
                 if (height != bg->image->height) {
                         scale = 1.0 * bg->image->height / height;
-                        rect.y = y_iround(rect.y * scale);
-                        rect.height = y_iround(rect.height * scale);
+                        rect.y = (int)round(rect.y * scale);
+                        rect.height = (int)round(rect.height * scale);
                 }
                 /* 引用源背景图像的一块区域 */
                 pd_canvas_quote(&canvas, bg->image, &rect);

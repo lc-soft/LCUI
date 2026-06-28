@@ -231,8 +231,8 @@ pd_font_face_t *pd_font_face_create(const char *family_name,
         font->id = 0;
         font->data = NULL;
         font->engine = NULL;
-        font->family_name = strdup2(family_name);
-        font->style_name = strdup2(style_name);
+        font->family_name = y_strdup(family_name);
+        font->style_name = y_strdup(style_name);
         font->weight = pd_font_parse_weight(style_name);
         font->style = pd_font_parse_style(style_name);
         return font;
@@ -435,11 +435,11 @@ pd_font_weight_t pd_font_parse_weight(const char *str)
         char *buf;
         pd_font_weight_t weight = PD_FONT_WEIGHT_NORMAL;
 
-        buf = strdup2(str);
+        buf = y_strdup(str);
         if (!buf) {
                 return weight;
         }
-        strtolower(buf, str);
+        y_strlower(buf, str);
         if (strstr(buf, "thin")) {
                 weight = PD_FONT_WEIGHT_THIN;
         } else if (strstr(buf, "semilight")) {
@@ -464,11 +464,11 @@ pd_font_style_t pd_font_parse_style(const char *str)
         char *buf;
         pd_font_style_t style = PD_FONT_STYLE_NORMAL;
 
-        buf = strdup2(str);
+        buf = y_strdup(str);
         if (!buf) {
                 return style;
         }
-        strtolower(buf, str);
+        y_strlower(buf, str);
         if (strstr(buf, "oblique")) {
                 style = PD_FONT_STYLE_OBLIQUE;
         } else if (strstr(buf, "italic")) {
@@ -487,7 +487,7 @@ int pd_font_register(pd_font_face_t *font)
         node = select_font_family_cache(font->family_name);
         if (!node) {
                 node = malloc(sizeof(font_family_node_t));
-                node->family_name = strdup2(font->family_name);
+                node->family_name = y_strdup(font->family_name);
                 memset(node->styles, 0, sizeof(node->styles));
                 dict_add(fontlib.font_families, node->family_name, node);
         }
@@ -791,7 +791,7 @@ static void font_family_dict_val_destructor(void *privdata, void *data)
 
 static void *font_family_dict_val_dup(void *privdata, const void *data)
 {
-        return strdup2(data);
+        return y_strdup(data);
 }
 
 static void pd_font_library_init_base(void)

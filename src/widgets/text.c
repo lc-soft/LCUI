@@ -288,7 +288,7 @@ static void ui_text_on_paint(ui_widget_t *w, pd_context_t *paint,
 int ui_text_set_content_w(ui_widget_t *w, const wchar_t *text)
 {
         ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
-        wchar_t *newtext = wcsdup2(text);
+        wchar_t *newtext = y_wcsdup(text);
 
         if (!newtext) {
                 return -ENOMEM;
@@ -296,7 +296,7 @@ int ui_text_set_content_w(ui_widget_t *w, const wchar_t *text)
         if (txt->content) {
                 free(txt->content);
         }
-        txt->content = wcsdup2(text);
+        txt->content = y_wcsdup(text);
         if (!txt->content) {
                 free(newtext);
                 return -ENOMEM;
@@ -312,7 +312,7 @@ int ui_text_set_content_w(ui_widget_t *w, const wchar_t *text)
                         wcscpy(newtext, text);
                         break;
                 }
-                wcstrim(newtext, text, NULL);
+                y_wcstrim(newtext, text, NULL);
         } while (0);
         if (txt->task.content) {
                 free(txt->task.content);

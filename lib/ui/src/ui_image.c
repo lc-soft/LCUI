@@ -122,7 +122,7 @@ ui_image_t *ui_image_create(const char *path)
                 src->image.error = PD_OK;
                 src->refs_count = 1;
                 src->image.state = UI_IMAGE_STATE_PENDING;
-                src->image.path = strdup2(path);
+                src->image.path = y_strdup(path);
                 src->node.data = src;
                 pd_canvas_init(&src->image.data);
                 list_create(&src->listeners);
@@ -130,7 +130,7 @@ ui_image_t *ui_image_create(const char *path)
         }
         list_insert_node(&ui_image_loader.images, 0, &src->node);
         ui_image_loader.changed = true;
-        ui_image_loader.progress_tick_time = get_time_ms();
+        ui_image_loader.progress_tick_time = y_gettime();
         if (ui_image_loader.callback) {
                 ui_image_loader.callback(&src->image);
         }
@@ -282,7 +282,7 @@ void ui_process_image_events(void)
         ui_image_source_t *src;
         ui_image_mutation_t mutation = { .type = UI_IMAGE_EVENT_PROGRESS };
 
-        now = get_time_ms();
+        now = y_gettime();
         list_create(&mutations);
         list_concat(&mutations, &ui_image_loader.mutations);
         for (list_each(node, &mutations)) {
@@ -328,7 +328,7 @@ void ui_init_image_loader(void)
 {
         dict_init_string_key_type(&ui_image_loader.dict_type);
         ui_image_loader.cache = dict_create(&ui_image_loader.dict_type, NULL);
-        ui_image_loader.progress_tick_time = get_time_ms();
+        ui_image_loader.progress_tick_time = y_gettime();
         list_create(&ui_image_loader.images);
         list_create(&ui_image_loader.mutations);
 }
