@@ -1,4 +1,0 @@
-[submodule "lib/yutil"]
-	path = lib/yutil
-	url = https://gitee.com/lcui-dev/yutil.git
-	branch = main
