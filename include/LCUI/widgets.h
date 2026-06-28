@@ -19,3 +19,4 @@
 #include "widgets/textinput.h"
 #include "widgets/textcaret.h"
 #include "widgets/label.h"
+#include "widgets/checkbox.h"
