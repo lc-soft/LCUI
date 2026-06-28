@@ -18,3 +18,4 @@
 #include "widgets/scrollbar.h"
 #include "widgets/textinput.h"
 #include "widgets/textcaret.h"
+#include "widgets/label.h"
