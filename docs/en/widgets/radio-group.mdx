@@ -1,0 +1,58 @@
+# RadioGroup
+
+A set of mutually exclusive radio buttons—only one item in the group can be selected at a time.
+
+<WidgetExample name="radio-group-basic" />
+
+## Use cases
+
+- **Suitable**: pick exactly one option from a mutually exclusive set (view density, sort order, single-choice enumerations).
+- **Suitable**: simple cases with a fixed 2–7 options.
+- **Not suitable**: scenarios that allow multiple concurrent selections (use `checkbox`).
+- **Not suitable**: large option lists that need search or filtering (no `select` provided yet).
+
+## Usage
+
+```tsx
+import { RadioGroup, RadioGroupItem } from "@lcui/react"
+```
+
+```tsx
+<RadioGroup value="comfortable">
+  <RadioGroupItem value="default" id="r1" />
+  <RadioGroupItem value="comfortable" id="r2" />
+  <RadioGroupItem value="compact" id="r3" />
+</RadioGroup>
+```
+
+## Composition
+
+Use the following composition to build a `RadioGroup`:
+
+```
+RadioGroup
+├── RadioGroupItem
+└── RadioGroupItem
+```
+
+In practice, each item is paired with a `Label` placed in the same flex row, with the Label's `for` pointing at the RadioGroupItem's `id`—clicking the Label forwards the click event to the matching item.
+
+## Examples
+
+### Disabled
+
+<WidgetExample name="radio-group-disabled" />
+
+## API Reference
+
+### RadioGroup
+
+The container that manages mutually exclusive selection across its items.
+
+<FieldTable name="radio-group" />
+
+### RadioGroupItem
+
+A single selectable option. At most one RadioGroupItem within the same RadioGroup is checked at any time.
+
+<FieldTable name="radio-group-item" />

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lcui-app>
+  <ui>
+    <radio-group value="comfortable">
+      <div style="display:flex; align-items:center; gap:8px">
+        <radio-group-item id="r1" value="default" />
+        <label for="r1">Default</label>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px">
+        <radio-group-item id="r2" value="comfortable" checked="true" />
+        <label for="r2">Comfortable</label>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px">
+        <radio-group-item id="r3" value="compact" />
+        <label for="r3">Compact</label>
+      </div>
+    </radio-group>
+  </ui>
+</lcui-app>

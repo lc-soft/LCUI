@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lcui-app>
+  <ui>
+    <radio-group value="option2">
+      <div style="display:flex; align-items:center; gap:8px">
+        <radio-group-item id="rd1" value="disabled" disabled="true" />
+        <label for="rd1">Disabled</label>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px">
+        <radio-group-item id="rd2" value="option2" checked="true" />
+        <label for="rd2">Option 2</label>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px">
+        <radio-group-item id="rd3" value="option3" />
+        <label for="rd3">Option 3</label>
+      </div>
+    </radio-group>
+  </ui>
+</lcui-app>
