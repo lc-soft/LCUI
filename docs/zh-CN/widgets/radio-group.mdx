@@ -1,0 +1,58 @@
+# RadioGroup
+
+一组互斥的单选按钮，同一时刻最多只有一项被选中。
+
+<WidgetExample name="radio-group-basic" />
+
+## 适用场景
+
+- **适用**：从一组互斥的选项中选出唯一一个（视图密度、排序方式、单选枚举等）
+- **适用**：选项数量固定为 2~7 个的简单场景
+- **不适用**：需要并选多个选项的场景（用 `checkbox`）
+- **不适用**：选项数量大到需要搜索或筛选（暂未提供 `select`）
+
+## 用法
+
+```tsx
+import { RadioGroup, RadioGroupItem } from "@lcui/react"
+```
+
+```tsx
+<RadioGroup value="comfortable">
+  <RadioGroupItem value="default" id="r1" />
+  <RadioGroupItem value="comfortable" id="r2" />
+  <RadioGroupItem value="compact" id="r3" />
+</RadioGroup>
+```
+
+## 组合
+
+使用以下组合来构建 `RadioGroup`：
+
+```
+RadioGroup
+├── RadioGroupItem
+└── RadioGroupItem
+```
+
+通常每项会与一个 `Label` 搭配放置在同一行 flex 容器里，Label 的 `for` 指向 RadioGroupItem 的 `id`，点击 Label 会把 click 事件转发到对应的 item。
+
+## 示例
+
+### 禁用
+
+<WidgetExample name="radio-group-disabled" />
+
+## API 参考
+
+### RadioGroup
+
+单选组容器，管理组内各项的互斥选中状态。
+
+<FieldTable name="radio-group" />
+
+### RadioGroupItem
+
+单选项，每一项代表一个可选值。同一 RadioGroup 内同一时刻最多只有一项处于 checked 状态。
+
+<FieldTable name="radio-group-item" />

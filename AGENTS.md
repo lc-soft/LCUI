@@ -53,6 +53,34 @@ void object2_func2() {
 
 注意！优先通过调整函数定义代码块的顺序来解决声明问题，而不是前置声明函数。
 
+### 未使用参数
+
+未使用的函数参数（包括回调签名里必须存在的 `void *arg`、事件回调的 `ui_event_t *e` 等）
+**不要写 `(void)xxx;`**。GCC、Clang、MSVC 都默认不警告未使用参数名，只有未使用局部变量
+才会警告。`(void)xxx;` 是冗余噪音，掩盖真正该处理的警告。
+
+❌ 禁止：
+```c
+static void on_event(ui_widget_t *w, ui_event_t *e, void *arg)
+{
+    (void)w;
+    (void)e;
+    (void)arg;
+    /* 实际逻辑 */
+}
+```
+
+✅ 允许：
+```c
+static void on_event(ui_widget_t *w, ui_event_t *e, void *arg)
+{
+    /* 直接用到的参数正常使用；用不到的参数名直接保留在签名里 */
+}
+```
+
+> 例外：C++ 模式下某些编译器会警告未使用参数，需要按上下文决定。LCUI 是纯 C，
+> 不适用此例外。
+
 ## 测试用例
 
 ### 归属规则
