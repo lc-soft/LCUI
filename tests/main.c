@@ -28,6 +28,7 @@ extern void test_scrollbar(void);
 extern void test_progress(void);
 extern void test_label(void);
 extern void test_checkbox(void);
+extern void test_radio_group(void);
 
 static const ctest_suite_t suites[] = {
         { "settings", test_settings },
@@ -46,6 +47,7 @@ static const ctest_suite_t suites[] = {
         { "progress", test_progress },
         { "label", test_label },
         { "checkbox", test_checkbox },
+        { "radio-group", test_radio_group },
         { NULL, NULL }
 };
 

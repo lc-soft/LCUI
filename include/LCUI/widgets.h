@@ -20,3 +20,4 @@
 #include "widgets/textcaret.h"
 #include "widgets/label.h"
 #include "widgets/checkbox.h"
+#include "widgets/radio_group.h"

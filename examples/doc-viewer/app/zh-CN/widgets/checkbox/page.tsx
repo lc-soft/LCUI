@@ -1,6 +1,7 @@
 import { Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "../../../components/code-block-copy";
 import CheckboxBasicDemo from "../../../examples/checkbox-basic/index";
+import CheckboxDisabledDemo from "../../../examples/checkbox-disabled/index";
 import FieldTable from "../../../components/field-table";
 import { checkboxFields } from "../../../widget-fields/checkbox";
 
@@ -47,6 +48,11 @@ export default function CheckboxDocPage() {
             <p>{`[b]indeterminate 是状态，不是默认值[/b]。半选态（[bgcolor=#eee] indeterminate="true" [/bgcolor]）用于表达"子项部分被选中"的视觉状态（例如父级 checkbox 在部分子项被选时显示半选）。点击 indeterminate 状态的 checkbox 会转为 checked 状态。`}</p>
           </Widget>
         </Widget>
+      </Widget>
+      <Widget className="doc-section">
+        <h2>示例</h2>
+        <h3>禁用</h3>
+        <CheckboxDisabledDemo />
       </Widget>
       <Widget className="doc-section">
         <h2>API 参考</h2>
