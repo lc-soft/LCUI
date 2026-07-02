@@ -50,7 +50,7 @@ pd_text_style_t *pd_style_tags_get_text_style(list_t *tags)
         style = malloc(sizeof(pd_text_style_t));
         pd_text_style_init(style);
         /* 根据已经记录的各种样式，生成当前应有的文本样式 */
-        for (list_each_reverse(node, tags)) {
+        for (list_each(node, tags)) {
                 tag = node->data;
                 switch (tag->id) {
                 case PD_TEXT_STYLE_TYPE_COLOR:
@@ -110,7 +110,7 @@ pd_text_style_t *pd_style_tags_get_text_style(list_t *tags)
         return style;
 }
 
-/** 将指定标签的样式数据从队列中删除，只删除队列尾部第一个匹配的标签 */
+/** 将指定标签的样式数据从队列中删除，只删除队列头部第一个匹配的标签 */
 static void pd_style_tags_remove(list_t *tags, int id)
 {
         pd_style_tag_t *tag;
