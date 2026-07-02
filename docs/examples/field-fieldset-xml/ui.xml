@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lcui-app>
+  <ui>
+    <div style="display:flex; flex-direction:column; gap:8px; max-width:400px">
+      <field-set>
+        <field-legend>Address Information</field-legend>
+        <field-description>We need your address to deliver your order.</field-description>
+        <field-group>
+          <field>
+            <field-label for="street">Street Address</field-label>
+            <textinput id="street" placeholder="123 Main St" />
+          </field>
+          <field>
+            <field-label for="city">City</field-label>
+            <textinput id="city" placeholder="New York" />
+          </field>
+          <field>
+            <field-label for="postal-code">Postal Code</field-label>
+            <textinput id="postal-code" placeholder="90502" />
+          </field>
+        </field-group>
+      </field-set>
+    </div>
+  </ui>
+</lcui-app>

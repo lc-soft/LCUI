@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lcui-app>
+  <ui>
+    <div style="display:flex; flex-direction:column; gap:8px; max-width:400px">
+      <field-set>
+        <field-legend>Payment Method</field-legend>
+        <field-description>All transactions are secure and encrypted</field-description>
+        <field-group>
+          <field>
+            <field-label for="name-on-card">Name on Card</field-label>
+            <textinput id="name-on-card" placeholder="Evil Rabbit" />
+          </field>
+          <field>
+            <field-label for="card-number">Card Number</field-label>
+            <textinput id="card-number" placeholder="1234 5678 9012 3456" />
+            <field-description>Enter your 16-digit card number</field-description>
+          </field>
+          <div style="display:flex; gap:16px">
+            <field style="flex:1">
+              <field-label for="card-month">Month</field-label>
+              <textinput id="card-month" placeholder="MM" />
+            </field>
+            <field style="flex:1">
+              <field-label for="card-year">Year</field-label>
+              <textinput id="card-year" placeholder="YYYY" />
+            </field>
+            <field style="flex:1">
+              <field-label for="card-cvv">CVV</field-label>
+              <textinput id="card-cvv" placeholder="123" />
+            </field>
+          </div>
+        </field-group>
+      </field-set>
+      <field-separator />
+      <field-set>
+        <field-legend>Billing Address</field-legend>
+        <field-description>The billing address associated with your payment method</field-description>
+        <field-group>
+          <field orientation="horizontal">
+            <checkbox id="billing-same" />
+            <field-label for="billing-same">Same as shipping address</field-label>
+          </field>
+        </field-group>
+      </field-set>
+      <field orientation="horizontal">
+        <button>Submit</button>
+        <button>Cancel</button>
+      </field>
+    </div>
+  </ui>
+</lcui-app>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lcui-app>
+  <ui>
+    <div style="display:flex; flex-direction:column; gap:8px; max-width:400px">
+      <field-set>
+        <field-group>
+          <field>
+            <field-label for="username">Username</field-label>
+            <textinput id="username" placeholder="Max Leiter" />
+            <field-description>Choose a unique username for your account.</field-description>
+          </field>
+          <field>
+            <field-label for="password">Password</field-label>
+            <field-description>Must be at least 8 characters long.</field-description>
+            <textinput id="password" placeholder="••••••••" />
+          </field>
+        </field-group>
+      </field-set>
+    </div>
+  </ui>
+</lcui-app>

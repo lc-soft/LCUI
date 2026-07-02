@@ -21,3 +21,4 @@
 #include "widgets/label.h"
 #include "widgets/checkbox.h"
 #include "widgets/radio_group.h"
+#include "widgets/field.h"

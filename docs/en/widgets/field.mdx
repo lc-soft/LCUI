@@ -1,0 +1,105 @@
+# Field
+
+Composes a label, a control, and helper text into an accessible form field.
+
+<WidgetExample name="field-basic" />
+
+## Use cases
+
+- **Use**: as a unified shell for form fields (label + control + description + error)
+- **Use**: when you need to place a label and a control side-by-side in a horizontal layout
+- **Use**: to group multiple fields into a semantic group (FieldSet + FieldLegend)
+- **Don't**: use for single-line inline text (use the `text` widget instead)
+- **Don't**: use in places where native HTML `<form>` submission semantics are required (LCUI does not replicate them)
+
+## Usage
+
+```tsx
+import { Field, FieldLabel, FieldDescription, FieldSet } from "@lcui/react"
+```
+
+```tsx
+<Field>
+  <FieldLabel htmlFor="username">Username</FieldLabel>
+  <TextInput id="username" placeholder="evil_rabbit" />
+  <FieldDescription>Choose a unique username.</FieldDescription>
+</Field>
+```
+
+## Composition
+
+Use the following composition to build a Field:
+
+```
+Field
+├── FieldLabel
+├── TextInput / Checkbox / RadioGroup
+└── FieldDescription
+
+FieldSet
+├── FieldLegend
+├── FieldDescription
+└── FieldGroup
+    ├── Field
+    ├── FieldSeparator
+    └── Field
+```
+
+## Examples
+
+### Checkbox
+<WidgetExample name="field-checkbox" />
+### Choice Card
+<WidgetExample name="field-choice-card" />
+### Fieldset
+<WidgetExample name="field-fieldset" />
+### Field Group
+<WidgetExample name="field-group" />
+### Input
+<WidgetExample name="field-input" />
+### Radio
+<WidgetExample name="field-radio" />
+
+## API Reference
+
+### Field
+A field container providing orientation control.
+<FieldTable name="field" />
+
+### FieldSet
+A semantic grouping container.
+<FieldTable name="field-set" />
+
+### FieldLegend
+The title of a group.
+<FieldTable name="field-legend" />
+
+### FieldGroup
+A visual stacking container.
+<FieldTable name="field-group" />
+
+### FieldLabel
+A field label whose clicks are forwarded to the target input.
+<FieldTable name="field-label" />
+
+### FieldContent
+The text content block within a horizontal field.
+<FieldTable name="field-content" />
+
+### FieldTitle
+The title text within a FieldContent.
+<FieldTable name="field-title" />
+
+### FieldDescription
+Helper text for a field.
+<FieldTable name="field-description" />
+
+### FieldSeparator
+A horizontal divider between field groups.
+<FieldTable name="field-separator" />
+
+## Caveats
+
+:::note
+**FieldLabel's click forwarding depends on the `for` attribute**. You must set `for="input-id"` on the FieldLabel and assign the same `id` to the target control, otherwise the click will not be forwarded.
+:::

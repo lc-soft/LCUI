@@ -20,7 +20,9 @@ static ui_widget_prototype_t *ui_radio_group_item_prototype = NULL;
 
 static const char *ui_radio_group_css = "\
 radio-group {\
-  display: inline-block;\
+  display: flex;\
+  flex-wrap: wrap;\
+  gap: 8px;\
 }\
 radio-group-item {\
   display: inline-flex;\

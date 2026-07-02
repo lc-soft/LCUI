@@ -1,0 +1,105 @@
+# Field
+
+组合 label、控件和说明文字，构成可访问的表单字段。
+
+<WidgetExample name="field-basic" />
+
+## 适用场景
+
+- **适用**：表单字段的统一外壳（label + 控件 + 描述 + 错误信息）
+- **适用**：需要在横向布局里把 label 和控件并排
+- **适用**：把多个字段组成语义分组（FieldSet + FieldLegend）
+- **不适用**：单行 inline 文本（用 text widget）
+- **不适用**：要求原生 HTML `<form>` 提交语义的场景（LCUI 没复刻）
+
+## 用法
+
+```tsx
+import { Field, FieldLabel, FieldDescription, FieldSet } from "@lcui/react"
+```
+
+```tsx
+<Field>
+  <FieldLabel htmlFor="username">用户名</FieldLabel>
+  <TextInput id="username" placeholder="evil_rabbit" />
+  <FieldDescription>选择一个唯一的用户名。</FieldDescription>
+</Field>
+```
+
+## 组合
+
+使用以下组合来构建 Field：
+
+```
+Field
+├── FieldLabel
+├── TextInput / Checkbox / RadioGroup
+└── FieldDescription
+
+FieldSet
+├── FieldLegend
+├── FieldDescription
+└── FieldGroup
+    ├── Field
+    ├── FieldSeparator
+    └── Field
+```
+
+## 示例
+
+### Checkbox
+<WidgetExample name="field-checkbox" />
+### Choice Card
+<WidgetExample name="field-choice-card" />
+### Fieldset
+<WidgetExample name="field-fieldset" />
+### Field Group
+<WidgetExample name="field-group" />
+### Input
+<WidgetExample name="field-input" />
+### Radio
+<WidgetExample name="field-radio" />
+
+## API 参考
+
+### Field
+字段容器，提供方向控制。
+<FieldTable name="field" />
+
+### FieldSet
+语义分组容器。
+<FieldTable name="field-set" />
+
+### FieldLegend
+分组标题。
+<FieldTable name="field-legend" />
+
+### FieldGroup
+视觉堆叠容器。
+<FieldTable name="field-group" />
+
+### FieldLabel
+字段标签，点击转发到目标 input。
+<FieldTable name="field-label" />
+
+### FieldContent
+横向字段中的文本内容块。
+<FieldTable name="field-content" />
+
+### FieldTitle
+FieldContent 内的标题文本。
+<FieldTable name="field-title" />
+
+### FieldDescription
+字段辅助说明。
+<FieldTable name="field-description" />
+
+### FieldSeparator
+字段组之间的分隔线。
+<FieldTable name="field-separator" />
+
+## 注意事项
+
+:::note
+**FieldLabel 的 click forwarding 依赖 `for` 属性**。必须给 FieldLabel 设 `for="input-id"` 并给目标控件设相同 `id`，点击才会转发。
+:::
