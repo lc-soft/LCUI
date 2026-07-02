@@ -27,6 +27,10 @@ p {
   @apply text-base text-gray-800;
 }
 
+textinput {
+  min-width: 20px;
+}
+
 /* -- Page -- */
 
 .doc-page {

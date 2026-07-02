@@ -34,6 +34,7 @@
         { "slug": "anchor", "label": { "en": "Anchor", "zh-CN": "Anchor 锚点" } },
         { "slug": "button", "label": { "en": "Button", "zh-CN": "Button 按钮" } },
         { "slug": "checkbox", "label": { "en": "Checkbox", "zh-CN": "Checkbox 复选框" } },
+        { "slug": "field", "label": { "en": "Field", "zh-CN": "Field 表单字段" } },
         { "slug": "label", "label": { "en": "Label", "zh-CN": "Label 标签" } },
         { "slug": "progress", "label": { "en": "Progress", "zh-CN": "Progress 进度条" } },
         { "slug": "radio-group", "label": { "en": "RadioGroup", "zh-CN": "RadioGroup 单选组" } },

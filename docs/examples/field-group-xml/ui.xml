@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lcui-app>
+  <ui>
+    <div style="display:flex; flex-direction:column; gap:8px; max-width:400px">
+      <field-group>
+        <field-set>
+          <field-label>Responses</field-label>
+          <field-description>Get notified when ChatGPT responds to requests that take time, like research or image generation.</field-description>
+          <field-group>
+            <field orientation="horizontal">
+              <checkbox id="push" checked="true" disabled="true" />
+              <field-label for="push">Push notifications</field-label>
+            </field>
+          </field-group>
+        </field-set>
+        <field-separator />
+        <field-set>
+          <field-label>Tasks</field-label>
+          <field-description>Get notified when tasks you've created have updates.</field-description>
+          <field-group>
+            <field orientation="horizontal">
+              <checkbox id="push-tasks" />
+              <field-label for="push-tasks">Push notifications</field-label>
+            </field>
+            <field orientation="horizontal">
+              <checkbox id="email-tasks" />
+              <field-label for="email-tasks">Email notifications</field-label>
+            </field>
+          </field-group>
+        </field-set>
+      </field-group>
+    </div>
+  </ui>
+</lcui-app>

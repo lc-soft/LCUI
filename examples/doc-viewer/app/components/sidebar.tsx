@@ -1,6 +1,6 @@
 import { RouterLink, ScrollArea, ScrollAreaContent, Scrollbar, Text } from "@lcui/react";
 import  "./sidebar.css";
-import sidebarData from "./sidebar.json";
+import sidebarData from "../../../../docs/sidebars.json";
 
 interface SidebarItemData {
   slug: string;

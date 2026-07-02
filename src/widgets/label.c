@@ -38,6 +38,9 @@ static void ui_label_on_click(ui_widget_t *w, ui_event_t *e, void *arg)
         if (!target) {
                 return;
         }
+        if (e->target == target) {
+                return;
+        }
         ui_event_init(&forwarded, "click");
         ui_widget_emit_event(target, forwarded, NULL);
 }

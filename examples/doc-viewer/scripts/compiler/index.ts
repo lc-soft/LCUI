@@ -135,14 +135,8 @@ async function main(): Promise<void> {
 
   ensureDir(APP_DIR);
 
-  // Copy sidebar.json to app/components/sidebar.json for the Sidebar component
-  const sidebarDestDir = join(APP_DIR, "components");
-  ensureDir(sidebarDestDir);
-  writeFileSync(
-    join(sidebarDestDir, "sidebar.json"),
-    readFileSync(SIDEBARS_PATH, "utf8"),
-    "utf8",
-  );
+  // sidebar.json is no longer copied here; sidebar.tsx imports
+  // docs/sidebars.json directly so docs/ stays the single source of truth.
 
   // Copy widget-fields data (widget.ts + per-component *.ts) into
   // app/widget-fields/ so generated page.tsx files can import them

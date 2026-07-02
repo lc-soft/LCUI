@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lcui-app>
+  <ui>
+    <div style="display:flex; flex-direction:column; gap:8px; max-width:400px">
+      <field-set>
+        <field-legend>Show these items on the desktop</field-legend>
+        <field-description>Select the items you want to show on the desktop.</field-description>
+        <field-group style="gap:12px">
+          <field orientation="horizontal">
+            <checkbox id="finder-pref-9k2-hard-disks-ljj" checked="true" />
+            <field-label for="finder-pref-9k2-hard-disks-ljj">Hard disks</field-label>
+          </field>
+          <field orientation="horizontal">
+            <checkbox id="finder-pref-9k2-external-disks-1yg" />
+            <field-label for="finder-pref-9k2-external-disks-1yg">External disks</field-label>
+          </field>
+          <field orientation="horizontal">
+            <checkbox id="finder-pref-9k2-cds-dvds-fzt" />
+            <field-label for="finder-pref-9k2-cds-dvds-fzt">CDs, DVDs, and iPods</field-label>
+          </field>
+          <field orientation="horizontal">
+            <checkbox id="finder-pref-9k2-connected-servers-6l2" />
+            <field-label for="finder-pref-9k2-connected-servers-6l2">Connected servers</field-label>
+          </field>
+        </field-group>
+      </field-set>
+      <field-separator />
+      <field orientation="horizontal">
+        <checkbox id="finder-pref-9k2-sync-folders-nep" checked="true" />
+        <field-content>
+          <field-label for="finder-pref-9k2-sync-folders-nep">Sync Desktop &amp; Documents folders</field-label>
+          <field-description>Your Desktop &amp; Documents folders are being synced with iCloud Drive. You can access them from other devices.</field-description>
+        </field-content>
+      </field>
+    </div>
+  </ui>
+</lcui-app>

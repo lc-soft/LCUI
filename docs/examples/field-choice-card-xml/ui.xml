@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lcui-app>
+  <ui>
+    <div style="display:flex; flex-direction:column; gap:8px; max-width:400px">
+      <field-group>
+        <field-set>
+          <field-label for="compute-environment">Compute Environment</field-label>
+          <field-description>Select the compute environment for your cluster.</field-description>
+          <radio-group value="kubernetes">
+            <field-label for="kubernetes-r2h">
+              <field orientation="horizontal">
+                <field-content>
+                  <field-title>Kubernetes</field-title>
+                  <field-description>Run GPU workloads on a K8s configured cluster.</field-description>
+                </field-content>
+                <radio-group-item id="kubernetes-r2h" value="kubernetes" />
+              </field>
+            </field-label>
+            <field-label for="vm-z4k">
+              <field orientation="horizontal">
+                <field-content>
+                  <field-title>Virtual Machine</field-title>
+                  <field-description>Access a VM configured cluster to run GPU workloads.</field-description>
+                </field-content>
+                <radio-group-item id="vm-z4k" value="vm" />
+              </field>
+            </field-label>
+          </radio-group>
+        </field-set>
+      </field-group>
+    </div>
+  </ui>
+</lcui-app>

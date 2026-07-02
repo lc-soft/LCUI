@@ -28,6 +28,15 @@ void lcui_widgets_init(void)
         ui_register_label();
         ui_register_checkbox();
         ui_register_radio_group();
+        ui_register_field();
+        ui_register_field_set();
+        ui_register_field_legend();
+        ui_register_field_group();
+        ui_register_field_label();
+        ui_register_field_description();
+        ui_register_field_separator();
+        ui_register_field_content();
+        ui_register_field_title();
 }
 
 void lcui_widgets_destroy(void)
