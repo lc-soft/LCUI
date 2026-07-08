@@ -307,7 +307,15 @@ typedef struct ui_wheel_event {
 } ui_wheel_event_t;
 
 typedef struct ui_event ui_event_t;
-typedef void (*ui_event_handler_t)(ui_widget_t *, ui_event_t *, void *);
+/**
+ * 部件事件处理函数
+ * @param[in] w   事件当前到达的部件（冒泡链上的当前节点，非原始发射源）
+ * @param[in] e   事件对象，e->data 为注册监听器时传入的 data（即
+ *                ui_widget_on / ui_widget_add_event_listener 的第四参数）
+ * @param[in] arg ui_widget_emit_event 的第三参数，大多数发射点传 NULL；
+ *                仅在少数显式传入非 NULL 值时才有效，常规监听器不应依赖此参数
+ */
+typedef void (*ui_event_handler_t)(ui_widget_t *w, ui_event_t *e, void *arg);
 typedef void (*ui_event_arg_destructor_t)(void *);
 
 struct ui_event {

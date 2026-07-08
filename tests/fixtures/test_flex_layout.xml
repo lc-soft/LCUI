@@ -392,6 +392,31 @@
               <w class="box"></w>
               <w class="box"></w>
             </w>
+            <text class="example__title">(19) Choice card layout</text>
+            <w class="example__content example-choice-card">
+              <w id="choice-card-preview" class="choice-card-preview">
+                <w id="choice-card-group" class="choice-card-group">
+                  <w id="choice-card-1" class="choice-card">
+                    <w class="choice-card-row">
+                      <w class="choice-card-content">
+                        <text>Title A</text>
+                        <text class="choice-card-desc">Description A</text>
+                      </w>
+                      <w class="choice-card-indicator"></w>
+                    </w>
+                  </w>
+                  <w id="choice-card-2" class="choice-card">
+                    <w class="choice-card-row">
+                      <w class="choice-card-content">
+                        <text>Title B</text>
+                        <text class="choice-card-desc">Description B</text>
+                      </w>
+                      <w class="choice-card-indicator"></w>
+                    </w>
+                  </w>
+                </w>
+              </w>
+            </w>
           </w>
         </w>
       </scrollarea-content>

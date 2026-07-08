@@ -977,6 +977,43 @@ static void test_flex_layout_gap(void)
         ui_update();
 }
 
+static void test_choice_card(void)
+{
+        ui_widget_t *preview = ui_get_widget("choice-card-preview");
+        ui_widget_t *group = ui_get_widget("choice-card-group");
+        ui_widget_t *card1 = ui_get_widget("choice-card-1");
+        ui_widget_t *card2 = ui_get_widget("choice-card-2");
+        float w1_init, w2_init;
+        ui_update();
+
+        w1_init = card1->border_box.width;
+        w2_init = card2->border_box.width;
+
+        ctest_equal_float("card1 width should be 400", card1->border_box.width,
+                          400);
+        ctest_equal_float("card2 width should be 400", card2->border_box.width,
+                          400);
+
+        ui_widget_request_reflow(preview);
+        ui_update();
+        ctest_equal_float("card1 width stable after reflow 1",
+                          card1->border_box.width, w1_init);
+        ctest_equal_float("card2 width stable after reflow 1",
+                          card2->border_box.width, w2_init);
+
+        ui_widget_request_reflow(preview);
+        ui_update();
+        ctest_equal_float("card1 width stable after reflow 2",
+                          card1->border_box.width, w1_init);
+        ctest_equal_float("card2 width stable after reflow 2",
+                          card2->border_box.width, w2_init);
+
+        ui_widget_request_reflow(preview);
+        ui_update();
+        ctest_equal_float("card1 width stable after reflow 3",
+                          card1->border_box.width, w1_init);
+}
+
 void test_flex_layout(void)
 {
         lcui_init();
@@ -988,6 +1025,7 @@ void test_flex_layout(void)
         ctest_describe("root width 600px", test_flex_layout_600);
         ctest_describe("root width 320px", test_flex_layout_320);
         ctest_describe("flex gap", test_flex_layout_gap);
+        ctest_describe("choice card", test_choice_card);
 
         lcui_destroy();
 }
