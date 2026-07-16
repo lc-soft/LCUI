@@ -26,7 +26,7 @@ int main(void)
         pd_canvas_create(&img, 320, 240);
         pd_canvas_fill(&img, pd_rgb(240, 240, 240));
 
-        pd_text_style_Init(&txtstyle);
+        pd_text_style_init(&txtstyle);
         txtstyle.pixel_size = 24;
         txtstyle.has_pixel_size = true;
 
