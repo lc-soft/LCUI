@@ -206,6 +206,19 @@ static float ui_flexbox_item_min_main_size(ui_flexbox_layout_context_t *ctx,
                               css_width_from_cbox(cs, item->min_content_width));
 }
 
+static float ui_flexbox_item_max_main_size(ui_flexbox_layout_context_t *ctx,
+                                           ui_widget_t *item)
+{
+        css_computed_style_t *cs = &item->computed_style;
+
+        if (ctx->column_direction) {
+                return css_obox_height(
+                    cs, css_height_from_cbox(cs, item->max_content_height));
+        }
+        return css_obox_width(cs,
+                              css_width_from_cbox(cs, item->max_content_width));
+}
+
 static void ui_flexbox_layout_compute_justify_content(
     ui_flexbox_layout_context_t *ctx, ui_flexbox_line_t *line,
     float *start_axis, float *space)
@@ -322,6 +335,8 @@ static void ui_flexbox_layout_load_main_size(ui_flexbox_layout_context_t *ctx)
                 }
                 ui_widget_reset_layout(child);
                 main_size = ui_flexbox_item_reset_main_size(ctx, child);
+                main_size =
+                    y_max(main_size, ui_flexbox_item_max_main_size(ctx, child));
                 min_main_size = cs->flex_shrink > 0
                                     ? ui_flexbox_item_min_main_size(ctx, child)
                                     : main_size;
@@ -384,7 +399,16 @@ static void ui_flexbox_layout_apply_line(ui_flexbox_layout_context_t *ctx,
                         ui_apply_column_item_main_size(child, flex_space,
                                                        margin_space);
                         item_main_size = child->outer_box.height;
-                        item_cross_size = child->outer_box.width;
+                        if (IS_CSS_FIXED_LENGTH(&child->computed_style,
+                                                width)) {
+                                item_cross_size = child->outer_box.width;
+                        } else {
+                                item_cross_size = css_obox_width(
+                                    &child->computed_style,
+                                    css_width_from_cbox(
+                                        &child->computed_style,
+                                        child->max_content_width));
+                        }
                 } else {
                         ui_apply_row_item_main_size(child, flex_space,
                                                     margin_space);
