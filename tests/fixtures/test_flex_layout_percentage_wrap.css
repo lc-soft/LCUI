@@ -1,0 +1,112 @@
+text,
+body {
+  font-size: 14px;
+  line-height: 1.6;
+  font-family: "Ubuntu Mono", "Consola";
+}
+
+scrollarea-content {
+  min-width: 0;
+}
+
+.example {
+  padding: 5px;
+  background-color: #f1f2f3;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+}
+
+.container {
+  max-width: 600px;
+  width: 100%;
+  padding: 10px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.example__title {
+  padding: 5px;
+  font-size: 12px;
+  line-height: 22px;
+}
+
+.example__content {
+  padding: 5px;
+  background-color: #fff;
+}
+
+.example-choice-card .choice-card-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 128px;
+  padding: 16px 24px;
+  background-color: #fff;
+  border: 1px solid #e7e7e7;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+
+.example-choice-card .choice-card-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 400px;
+}
+
+.example-choice-card .choice-card {
+  display: flex;
+  width: 100%;
+  border: 1px solid #e5e5e5;
+  padding: 8px;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.example-choice-card .choice-card-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+}
+
+.example-choice-card .choice-card-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.example-choice-card .choice-card-desc {
+  color: #666;
+  font-size: 12px;
+}
+
+.example-choice-card .choice-card-indicator {
+  width: 16px;
+  height: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.percent-wrap-group {
+  display: flex;
+  flex-wrap: wrap;
+  width: fit-content;
+}
+
+.percent-30-item {
+  width: 30%;
+  height: 20px;
+}
+
+.mixed-percent-item {
+  width: 30%;
+  height: 20px;
+}
+
+.mixed-fixed-item {
+  width: 100px;
+  height: 20px;
+}

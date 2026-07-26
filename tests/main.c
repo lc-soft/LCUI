@@ -24,6 +24,7 @@ extern void test_font_face(void);
 extern void test_widget_opacity(void);
 extern void test_block_layout(void);
 extern void test_flex_layout(void);
+extern void test_flex_layout_percentage_wrap(void);
 extern void test_scrollbar(void);
 extern void test_progress(void);
 extern void test_label(void);
@@ -44,6 +45,7 @@ static const ctest_suite_t suites[] = {
         { "widget opacity", test_widget_opacity },
         { "block layout", test_block_layout },
         { "flex layout", test_flex_layout },
+        { "flex layout percentage wrap", test_flex_layout_percentage_wrap },
         { "scrollbar", test_scrollbar },
         { "progress", test_progress },
         { "label", test_label },

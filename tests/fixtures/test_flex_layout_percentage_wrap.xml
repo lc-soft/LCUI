@@ -1,0 +1,59 @@
+<lcui-app>
+  <resource type="text/css" src="test_flex_layout_percentage_wrap.css" />
+  <ui>
+    <scrollarea class="h-full">
+      <scrollarea-content id="main">
+        <w class="container">
+          <w class="example">
+            <text class="example__title">Choice card layout</text>
+            <w class="example__content example-choice-card">
+              <w class="choice-card-preview">
+                <w id="choice-card-group" class="choice-card-group">
+                  <w id="choice-card-1" class="choice-card">
+                    <w id="choice-card-row-1" class="choice-card-row">
+                      <w id="choice-card-content-1" class="choice-card-content">
+                        <text>Title A</text>
+                        <text id="choice-card-desc-1" class="choice-card-desc">Description A</text>
+                      </w>
+                      <w class="choice-card-indicator"></w>
+                    </w>
+                  </w>
+                  <w id="choice-card-2" class="choice-card">
+                    <w id="choice-card-row-2" class="choice-card-row">
+                      <w class="choice-card-content">
+                        <text>Title B</text>
+                        <text class="choice-card-desc">Description B</text>
+                      </w>
+                      <w class="choice-card-indicator"></w>
+                    </w>
+                  </w>
+                </w>
+              </w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">Four 30 percent flex items</text>
+            <w class="example__content">
+              <w id="percent-30-group" class="percent-wrap-group percent-30-group">
+                <w id="percent-30-item-1" class="percent-30-item"></w>
+                <w id="percent-30-item-2" class="percent-30-item"></w>
+                <w id="percent-30-item-3" class="percent-30-item"></w>
+                <w id="percent-30-item-4" class="percent-30-item"></w>
+              </w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">Percentage and fixed flex items</text>
+            <w class="example__content">
+              <w id="mixed-size-group" class="percent-wrap-group mixed-size-group">
+                <w id="mixed-percent-item" class="mixed-percent-item"></w>
+                <w id="mixed-fixed-item" class="mixed-fixed-item"></w>
+              </w>
+            </w>
+          </w>
+        </w>
+      </scrollarea-content>
+      <scrollbar target="main" />
+    </scrollarea>
+  </ui>
+</lcui-app>
