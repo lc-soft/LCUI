@@ -35,10 +35,10 @@
             <text class="example__title">Four 30 percent flex items</text>
             <w class="example__content">
               <w id="percent-30-group" class="percent-wrap-group percent-30-group">
-                <w id="percent-30-item-1" class="percent-30-item"></w>
-                <w id="percent-30-item-2" class="percent-30-item"></w>
-                <w id="percent-30-item-3" class="percent-30-item"></w>
-                <w id="percent-30-item-4" class="percent-30-item"></w>
+                <w id="percent-30-item-1" class="percent-30-item percentage-wrap-box"></w>
+                <w id="percent-30-item-2" class="percent-30-item percentage-wrap-box"></w>
+                <w id="percent-30-item-3" class="percent-30-item percentage-wrap-box"></w>
+                <w id="percent-30-item-4" class="percent-30-item percentage-wrap-box"></w>
               </w>
             </w>
           </w>
@@ -46,8 +46,128 @@
             <text class="example__title">Percentage and fixed flex items</text>
             <w class="example__content">
               <w id="mixed-size-group" class="percent-wrap-group mixed-size-group">
-                <w id="mixed-percent-item" class="mixed-percent-item"></w>
-                <w id="mixed-fixed-item" class="mixed-fixed-item"></w>
+                <w id="mixed-percent-item" class="mixed-percent-item percentage-wrap-box"></w>
+                <w id="mixed-fixed-item" class="mixed-fixed-item percentage-wrap-box"></w>
+              </w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">Thirty thirty forty percent flex items</text>
+            <w class="example__content">
+              <w id="percent-100-group" class="percent-wrap-group percent-100-group">
+                <w id="percent-100-item-1" class="percent-100-item percent-100-item-30 percentage-wrap-box"></w>
+                <w id="percent-100-item-2" class="percent-100-item percent-100-item-30 percentage-wrap-box"></w>
+                <w id="percent-100-item-3" class="percent-100-item percent-100-item-40 percentage-wrap-box"></w>
+              </w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">Percentage and fixed flex items with gap</text>
+            <w class="example__content">
+              <w id="mixed-gap-group" class="percent-wrap-group mixed-gap-group">
+                <w id="mixed-gap-percent-item" class="mixed-gap-percent-item percentage-wrap-box"></w>
+                <w id="mixed-gap-fixed-item" class="mixed-gap-fixed-item percentage-wrap-box"></w>
+              </w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">Full width bordered flex item</text>
+            <w class="example__content">
+              <w id="full-width-group" class="percent-wrap-group full-width-group">
+                <w id="full-width-item" class="full-width-item percentage-wrap-box"></w>
+              </w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">Intrinsic percentage flex item</text>
+            <w class="example__content">
+              <w id="intrinsic-percent-group" class="percent-wrap-group">
+                <w id="intrinsic-percent-item" class="intrinsic-percent-item percentage-wrap-box">
+                  <w id="intrinsic-percent-child" class="intrinsic-percent-child percentage-wrap-box"></w>
+                </w>
+              </w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">Decorated intrinsic percentage flex item</text>
+            <w class="example__content">
+              <w id="decorated-percent-group" class="percent-wrap-group decorated-percent-group percentage-wrap-box">
+                <w id="decorated-percent-item" class="decorated-percent-item percentage-wrap-box">
+                  <w id="decorated-percent-child" class="decorated-percent-child percentage-wrap-box"></w>
+                </w>
+              </w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">Minimum percentage flex item</text>
+            <w class="example__content">
+              <w id="min-percent-group" class="percent-wrap-group">
+                <w id="min-percent-item" class="min-percent-item percentage-wrap-box"></w>
+                <w id="min-percent-fixed-item" class="review-fixed-item percentage-wrap-box"></w>
+              </w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">Percentage flex gap</text>
+            <w class="example__content">
+              <w id="percent-gap-group" class="percent-wrap-group percent-gap-group">
+                <w id="percent-gap-item" class="percent-gap-item percentage-wrap-box"></w>
+                <w id="percent-gap-fixed-item" class="review-fixed-item percentage-wrap-box"></w>
+              </w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">Fit-content percentage flex item with decorations</text>
+            <w class="example__content">
+              <w id="decorated-empty-percent-group" class="percent-wrap-group">
+                <w id="decorated-empty-percent-item" class="decorated-empty-percent-item percentage-wrap-box"></w>
+                <w id="decorated-empty-fixed-item" class="decorated-empty-fixed-item percentage-wrap-box"></w>
+              </w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">Fit-content full percentage row wrap</text>
+            <w class="example__content">
+              <w id="full-percent-wrap-group" class="percent-wrap-group">
+                <w id="full-percent-wrap-item" class="full-percent-wrap-item percentage-wrap-box"></w>
+                <w id="full-percent-wrap-fixed" class="percentage-wrap-fixed-item percentage-wrap-box"></w>
+              </w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">Fit-content percentage row totaling one hundred wrap</text>
+            <w class="example__content">
+              <w id="percent-row-wrap-group" class="percent-wrap-group">
+                <w id="percent-row-wrap-item-30" class="percent-row-wrap-item-30 percentage-wrap-box"></w>
+                <w id="percent-row-wrap-item-70" class="percent-row-wrap-item-70 percentage-wrap-box"></w>
+                <w id="percent-row-wrap-fixed" class="percentage-wrap-fixed-item percentage-wrap-box"></w>
+              </w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">Fixed item before full percentage item</text>
+            <w class="example__content">
+              <w id="fixed-before-percent-group" class="percent-wrap-group">
+                <w id="fixed-before-percent-fixed" class="no-flex-fixed-item fixed-wrap-box"></w>
+                <w id="fixed-before-percent-item" class="full-percent-no-flex-item percentage-wrap-box"></w>
+              </w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">Decorated percentage item before percentage item</text>
+            <w class="example__content">
+              <w id="decorated-before-percent-group" class="percent-wrap-group">
+                <w id="decorated-before-percent-item" class="decorated-before-percent-item percentage-wrap-box"></w>
+                <w id="decorated-before-percent-next" class="percent-row-wrap-item-70 percentage-wrap-box"></w>
+              </w>
+            </w>
+          </w>
+          <w class="example">
+            <text class="example__title">Fit-content contribution of fixed wrap items</text>
+            <w class="example__content">
+              <w id="fixed-contribution-group" class="percent-wrap-group">
+                <w id="fixed-contribution-item-1" class="no-flex-fixed-item fixed-wrap-box"></w>
+                <w id="fixed-contribution-item-2" class="no-flex-fixed-item fixed-wrap-box"></w>
               </w>
             </w>
           </w>
