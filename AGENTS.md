@@ -152,6 +152,8 @@ CTEST_MAIN(suites)
 - 按 group 过滤：`xmake test -g tests`
 - 单 binary 跑全部 suite：`xmake run <lib>-tests`，例如 `xmake run lcui-tests`
 - 单 binary 内细粒度过滤：`xmake run lcui-tests --grep="<pattern>"`，子串匹配 suite 名
+- 不要使用 `xmake test "lcui-tests/*" -- --grep "<pattern>"`：当前参数转发不会让
+  `--grep` 在 `lcui-tests` 中生效，实际会运行整个 binary
 - 单 binary 列出 suite：`xmake run lcui-tests --list`
 - 内存检查：`xmake f --memcheck=y && xmake test`，调用 drmemory（Windows）或 valgrind（Linux）；恢复正常运行：`xmake f --memcheck=n`
 
