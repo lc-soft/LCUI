@@ -19,6 +19,8 @@
 #include <ui.h>
 #include <ui/style.h>
 #include <css/computed.h>
+#include <float.h>
+#include <math.h>
 #include "ui_diff.h"
 #include "ui_debug.h"
 #include "ui_widget_style.h"
@@ -28,10 +30,17 @@
 typedef struct ui_flexbox_line {
         size_t index;
         float main_size;
+        float intrinsic_non_percentage_size;
+        float percentage_non_percentage_size;
+        float intrinsic_percentage;
+        float intrinsic_gap_percentage;
+        float intrinsic_min_size;
+        float intrinsic_container_min_size;
         float cross_axis;
         float cross_size;
         float sum_of_grow_value;
         float sum_of_shrink_value;
+        size_t count_of_in_flow_items;
         size_t count_of_auto_margin_items;
 
         /** list_t<ui_widget_t*> items */
@@ -45,10 +54,30 @@ typedef struct ui_flexbox_layout_context {
         float cross_size;
         float main_gap;
         float cross_gap;
+        uint8_t main_gap_type;
+        css_numeric_value_t main_gap_value;
+        css_unit_t main_gap_unit;
+        bool has_intrinsic_lines;
 
         /** list_t<ui_flexbox_line_t*> lines */
         list_t lines;
 } ui_flexbox_layout_context_t;
+
+typedef struct ui_flexbox_main_contribution {
+        float non_percentage_size;
+        float percentage;
+        float min_size;
+        float container_min_size;
+        bool has_percentage_size;
+} ui_flexbox_main_contribution_t;
+
+static float ui_ceil_layout_unit(float value)
+{
+        if (value > FLT_MAX / 64.f || value < -FLT_MAX / 64.f) {
+                return value;
+        }
+        return ceilf(value * 64.f) / 64.f;
+}
 
 static ui_flexbox_line_t *ui_flexbox_line_create(void)
 {
@@ -56,9 +85,16 @@ static ui_flexbox_line_t *ui_flexbox_line_create(void)
 
         line = malloc(sizeof(ui_flexbox_line_t));
         line->main_size = 0;
+        line->intrinsic_non_percentage_size = 0;
+        line->percentage_non_percentage_size = 0;
+        line->intrinsic_percentage = 0;
+        line->intrinsic_gap_percentage = 0;
+        line->intrinsic_min_size = 0;
+        line->intrinsic_container_min_size = 0;
         line->cross_size = 0;
         line->sum_of_grow_value = 0;
         line->sum_of_shrink_value = 0;
+        line->count_of_in_flow_items = 0;
         line->count_of_auto_margin_items = 0;
         list_create(&line->items);
         return line;
@@ -81,6 +117,7 @@ static void ui_flexbox_line_load_item(ui_flexbox_line_t *line,
         if (item->computed_style.flex_shrink > 0) {
                 line->sum_of_shrink_value += item->computed_style.flex_shrink;
         }
+        line->count_of_in_flow_items++;
         list_append(&line->items, item);
 }
 
@@ -104,6 +141,53 @@ static float ui_flexbox_resolve_gap(uint8_t type, css_numeric_value_t value,
                 return value * reference / 100.f;
         }
         return value;
+}
+
+static float ui_flexbox_layout_get_main_gap_percentage(
+    ui_flexbox_layout_context_t *ctx)
+{
+        if (ctx->main_gap_type != CSS_GAP_SET ||
+            ctx->main_gap_unit != CSS_UNIT_PERCENT) {
+                return 0;
+        }
+        return ctx->main_gap_value / 100.f;
+}
+
+static void ui_flexbox_layout_resolve_main_gap(ui_flexbox_layout_context_t *ctx)
+{
+        float reference = ctx->column_direction
+                              ? ctx->widget->content_box.height
+                              : ctx->widget->content_box.width;
+
+        ctx->main_gap =
+            ui_flexbox_resolve_gap(ctx->main_gap_type, ctx->main_gap_value,
+                                   ctx->main_gap_unit, reference);
+}
+
+static bool ui_flexbox_item_get_main_percentage(
+    ui_flexbox_layout_context_t *ctx, ui_widget_t *item, float *percentage)
+{
+        css_computed_style_t *s = &item->specified_style;
+
+        if (IS_CSS_PERCENTAGE(s, flex_basis)) {
+                *percentage = s->flex_basis / 100.f;
+                return true;
+        }
+        if (s->type_bits.flex_basis != CSS_FLEX_BASIS_AUTO) {
+                return false;
+        }
+        if (ctx->column_direction) {
+                if (!IS_CSS_PERCENTAGE(s, height)) {
+                        return false;
+                }
+                *percentage = s->height / 100.f;
+                return true;
+        }
+        if (!IS_CSS_PERCENTAGE(s, width)) {
+                return false;
+        }
+        *percentage = s->width / 100.f;
+        return true;
 }
 
 static void ui_reset_row_item_flex_basis(ui_widget_t *item)
@@ -219,6 +303,162 @@ static float ui_flexbox_item_max_main_size(ui_flexbox_layout_context_t *ctx,
                               css_width_from_cbox(cs, item->max_content_width));
 }
 
+static ui_flexbox_main_contribution_t ui_flexbox_item_get_main_contribution(
+    ui_flexbox_layout_context_t *ctx, ui_widget_t *item)
+{
+        ui_flexbox_main_contribution_t contribution = { 0 };
+        css_computed_style_t *cs = &item->computed_style;
+        float intrinsic_size;
+        float required_size;
+        float fixed_size;
+
+        if (ui_flexbox_item_get_main_percentage(ctx, item,
+                                                &contribution.percentage)) {
+                contribution.has_percentage_size = true;
+                intrinsic_size = ui_flexbox_item_max_main_size(ctx, item);
+                if (ctx->column_direction) {
+                        contribution.non_percentage_size =
+                            css_obox_height(cs, 0);
+                        fixed_size = ui_widget_fix_height(item, 0);
+                        contribution.min_size = css_obox_height(cs, fixed_size);
+                        required_size = css_height_from_bbox(
+                            cs, intrinsic_size - css_margin_y(cs));
+                        fixed_size = ui_widget_fix_height(item, required_size);
+                        fixed_size = css_obox_height(cs, fixed_size);
+                } else {
+                        contribution.non_percentage_size =
+                            css_obox_width(cs, 0);
+                        fixed_size = ui_widget_fix_width(item, 0);
+                        contribution.min_size = css_obox_width(cs, fixed_size);
+                        required_size = css_width_from_bbox(
+                            cs, intrinsic_size - css_margin_x(cs));
+                        fixed_size = ui_widget_fix_width(item, required_size);
+                        fixed_size = css_obox_width(cs, fixed_size);
+                }
+                if (contribution.percentage > 0 &&
+                    contribution.min_size + 0.0001f < intrinsic_size &&
+                    fixed_size + 0.0001f >= intrinsic_size) {
+                        contribution.container_min_size = ui_ceil_layout_unit(
+                            required_size / contribution.percentage);
+                }
+                return contribution;
+        }
+        contribution.min_size = ui_flexbox_item_min_main_size(ctx, item);
+        contribution.non_percentage_size =
+            ui_flexbox_item_reset_main_size(ctx, item);
+        contribution.non_percentage_size =
+            y_max(contribution.non_percentage_size,
+                  ui_flexbox_item_max_main_size(ctx, item));
+        return contribution;
+}
+
+static bool ui_flexbox_line_should_wrap_percentage(
+    ui_flexbox_layout_context_t *ctx, ui_flexbox_line_t *line,
+    ui_flexbox_main_contribution_t contribution)
+{
+        float gap_percentage = ui_flexbox_layout_get_main_gap_percentage(ctx);
+        float percentage;
+        float non_percentage_size = line->intrinsic_non_percentage_size +
+                                    line->percentage_non_percentage_size +
+                                    contribution.non_percentage_size;
+
+        if (ctx->widget->computed_style.type_bits.flex_wrap !=
+                CSS_FLEX_WRAP_WRAP ||
+            line->count_of_in_flow_items == 0) {
+                return false;
+        }
+        percentage = line->intrinsic_percentage + contribution.percentage +
+                     gap_percentage;
+        if (percentage > 1.0001f) {
+                return true;
+        }
+        if (ctx->main_gap_unit != CSS_UNIT_PERCENT) {
+                non_percentage_size += ctx->main_gap;
+        }
+        return 1.f - percentage <= 0.0001f && non_percentage_size > 0.0001f;
+}
+
+static void ui_flexbox_line_load_main_contribution(
+    ui_flexbox_layout_context_t *ctx, ui_flexbox_line_t *line,
+    ui_widget_t *item, ui_flexbox_main_contribution_t contribution)
+{
+        if (line->count_of_in_flow_items > 0) {
+                if (ctx->main_gap_unit == CSS_UNIT_PERCENT) {
+                        float percentage =
+                            ui_flexbox_layout_get_main_gap_percentage(ctx);
+
+                        line->intrinsic_percentage += percentage;
+                        line->intrinsic_gap_percentage += percentage;
+                } else {
+                        line->intrinsic_non_percentage_size += ctx->main_gap;
+                        line->intrinsic_min_size += ctx->main_gap;
+                }
+        }
+        if (contribution.has_percentage_size) {
+                line->percentage_non_percentage_size +=
+                    contribution.non_percentage_size;
+        } else {
+                line->intrinsic_non_percentage_size +=
+                    contribution.non_percentage_size;
+        }
+        line->intrinsic_percentage += contribution.percentage;
+        line->intrinsic_min_size += contribution.min_size;
+        line->intrinsic_container_min_size =
+            y_max(line->intrinsic_container_min_size,
+                  contribution.container_min_size);
+        ui_flexbox_line_load_item(line, item);
+}
+
+static float ui_flexbox_line_intrinsic_main_size(
+    ui_flexbox_layout_context_t *ctx, ui_flexbox_line_t *line)
+{
+        list_node_t *node;
+        ui_widget_t *item;
+        ui_flexbox_main_contribution_t contribution;
+        float denominator;
+        float main_size;
+        float next_size;
+        size_t i;
+
+        main_size =
+            y_max(line->intrinsic_min_size, line->intrinsic_container_min_size);
+        for (i = 0; i <= line->count_of_in_flow_items; ++i) {
+                denominator = 1.f - line->intrinsic_gap_percentage;
+                next_size = line->intrinsic_non_percentage_size;
+                for (list_each(node, &line->items)) {
+                        item = node->data;
+                        if (!ui_widget_in_layout_flow(item) ||
+                            !ui_flexbox_item_get_main_percentage(
+                                ctx, item, &contribution.percentage)) {
+                                continue;
+                        }
+                        contribution =
+                            ui_flexbox_item_get_main_contribution(ctx, item);
+                        if (contribution.percentage * main_size +
+                                contribution.non_percentage_size >=
+                            contribution.min_size) {
+                                denominator -= contribution.percentage;
+                                next_size += contribution.non_percentage_size;
+                        } else {
+                                next_size += contribution.min_size;
+                        }
+                }
+                if (denominator > 0.0001f) {
+                        next_size /= denominator;
+                } else {
+                        next_size = main_size;
+                }
+                next_size = y_max(next_size, line->intrinsic_min_size);
+                next_size =
+                    y_max(next_size, line->intrinsic_container_min_size);
+                if (next_size <= main_size + 0.0001f) {
+                        break;
+                }
+                main_size = next_size;
+        }
+        return main_size;
+}
+
 static void ui_flexbox_layout_compute_justify_content(
     ui_flexbox_layout_context_t *ctx, ui_flexbox_line_t *line,
     float *start_axis, float *space)
@@ -314,26 +554,64 @@ static void ui_flexbox_layout_load_main_size(ui_flexbox_layout_context_t *ctx)
 {
         list_node_t *node;
         ui_widget_t *child;
+        ui_flexbox_line_t *line = NULL;
+        ui_flexbox_main_contribution_t contribution;
         css_computed_style_t *cs;
         float main_size, min_main_size;
+        float max_item_min_size = 0;
+        bool main_size_fixed;
+        bool load_intrinsic_lines;
         unsigned child_index = 0;
         unsigned in_flow_count = 0;
 
-        UI_DEBUG_BEGIN;
-        UI_DEBUG_MSG(
-            "%s: begin, main_size_fixed?=%d", __FUNCTION__,
+        main_size_fixed =
             ctx->column_direction
                 ? IS_CSS_FIXED_LENGTH(&ctx->widget->computed_style, height)
-                : IS_CSS_FIXED_LENGTH(&ctx->widget->computed_style, width));
+                : IS_CSS_FIXED_LENGTH(&ctx->widget->computed_style, width);
+        load_intrinsic_lines =
+            !main_size_fixed &&
+            ctx->widget->computed_style.type_bits.flex_wrap ==
+                CSS_FLEX_WRAP_WRAP;
+        ctx->has_intrinsic_lines = load_intrinsic_lines;
+
+        UI_DEBUG_BEGIN;
+        UI_DEBUG_MSG("%s: begin, main_size_fixed?=%d", __FUNCTION__,
+                     main_size_fixed);
         UI_DEBUG_INDENT_INC;
         UI_DEBUG_END;
         for (list_each(node, &ctx->widget->children)) {
                 child = node->data;
                 cs = &child->computed_style;
                 if (!ui_widget_in_layout_flow(child)) {
+                        if (load_intrinsic_lines) {
+                                if (!line) {
+                                        line = ui_flexbox_layout_next_line(ctx);
+                                }
+                                list_append(&line->items, child);
+                        }
                         continue;
                 }
                 ui_widget_reset_layout(child);
+                if (load_intrinsic_lines) {
+                        contribution =
+                            ui_flexbox_item_get_main_contribution(ctx, child);
+                        min_main_size = contribution.min_size;
+                        if (cs->flex_shrink <= 0 &&
+                            !contribution.has_percentage_size) {
+                                min_main_size =
+                                    y_max(min_main_size,
+                                          contribution.non_percentage_size);
+                        }
+                        max_item_min_size =
+                            y_max(max_item_min_size, min_main_size);
+                        if (!line || ui_flexbox_line_should_wrap_percentage(
+                                         ctx, line, contribution)) {
+                                line = ui_flexbox_layout_next_line(ctx);
+                        }
+                        ui_flexbox_line_load_main_contribution(ctx, line, child,
+                                                               contribution);
+                        continue;
+                }
                 main_size = ui_flexbox_item_reset_main_size(ctx, child);
                 main_size =
                     y_max(main_size, ui_flexbox_item_max_main_size(ctx, child));
@@ -356,6 +634,18 @@ static void ui_flexbox_layout_load_main_size(ui_flexbox_layout_context_t *ctx)
                 child_index++;
                 UI_DEBUG_END;
         }
+        if (load_intrinsic_lines) {
+                for (list_each(node, &ctx->lines)) {
+                        line = node->data;
+                        main_size =
+                            ui_flexbox_line_intrinsic_main_size(ctx, line);
+                        ui_resizer_load_item_main_size(
+                            ctx->resizer, main_size,
+                            y_max(max_item_min_size,
+                                  line->intrinsic_container_min_size));
+                        ui_resizer_update(ctx->resizer);
+                }
+        }
         if (ctx->column_direction) {
                 ui_resizer_commit_column_main_size(ctx->resizer);
         } else {
@@ -366,6 +656,56 @@ static void ui_flexbox_layout_load_main_size(ui_flexbox_layout_context_t *ctx)
         UI_WIDGET_SIZE_STR(ctx->widget, size_str);
         UI_DEBUG_MSG("%s: end, size=%s", __FUNCTION__, size_str);
         UI_DEBUG_END;
+}
+
+static void ui_flexbox_line_reset_main_size(ui_flexbox_layout_context_t *ctx,
+                                            ui_flexbox_line_t *line)
+{
+        list_node_t *node;
+        ui_widget_t *child;
+        css_computed_style_t *cs;
+        float main_size;
+
+        line->main_size = 0;
+        line->cross_size = 0;
+        line->sum_of_grow_value = 0;
+        line->sum_of_shrink_value = 0;
+        line->count_of_in_flow_items = 0;
+        line->count_of_auto_margin_items = 0;
+        for (list_each(node, &line->items)) {
+                child = node->data;
+                if (!ui_widget_in_layout_flow(child)) {
+                        continue;
+                }
+                cs = &child->computed_style;
+                main_size = ui_flexbox_item_reset_main_size(ctx, child);
+                if (line->count_of_in_flow_items > 0) {
+                        line->main_size += ctx->main_gap;
+                }
+                line->main_size += main_size;
+                if (cs->flex_grow > 0) {
+                        line->sum_of_grow_value += cs->flex_grow;
+                }
+                if (cs->flex_shrink > 0) {
+                        line->sum_of_shrink_value += cs->flex_shrink;
+                }
+                if (ctx->column_direction) {
+                        if (cs->type_bits.margin_top == CSS_MARGIN_AUTO) {
+                                line->count_of_auto_margin_items++;
+                        }
+                        if (cs->type_bits.margin_bottom == CSS_MARGIN_AUTO) {
+                                line->count_of_auto_margin_items++;
+                        }
+                } else {
+                        if (cs->type_bits.margin_left == CSS_MARGIN_AUTO) {
+                                line->count_of_auto_margin_items++;
+                        }
+                        if (cs->type_bits.margin_right == CSS_MARGIN_AUTO) {
+                                line->count_of_auto_margin_items++;
+                        }
+                }
+                line->count_of_in_flow_items++;
+        }
 }
 
 static void ui_flexbox_layout_apply_line(ui_flexbox_layout_context_t *ctx,
@@ -458,57 +798,68 @@ static void ui_flexbox_layout_apply_main_size(ui_flexbox_layout_context_t *ctx)
                      max_main_size);
         UI_DEBUG_INDENT_INC;
         UI_DEBUG_END;
-        line = ui_flexbox_layout_next_line(ctx);
-        for (list_each(node, &ctx->widget->children)) {
-                child = node->data;
-                if (!ui_widget_in_layout_flow(child)) {
+        if (ctx->has_intrinsic_lines) {
+                for (list_each(line_node, &ctx->lines)) {
+                        line = line_node->data;
+                        ui_flexbox_line_reset_main_size(ctx, line);
+                }
+        } else {
+                line = ui_flexbox_layout_next_line(ctx);
+                for (list_each(node, &ctx->widget->children)) {
+                        child = node->data;
+                        if (!ui_widget_in_layout_flow(child)) {
+                                UI_DEBUG_BEGIN;
+                                UI_WIDGET_STR(child, str);
+                                UI_DEBUG_MSG("line[%zu]: children[%u]=%s, skip",
+                                             line->index, child_index, str);
+                                child_index++;
+                                UI_DEBUG_END;
+                                list_append(&line->items, child);
+                                continue;
+                        }
+                        cs = &child->computed_style;
+                        main_size = ui_flexbox_item_reset_main_size(ctx, child);
                         UI_DEBUG_BEGIN;
                         UI_WIDGET_STR(child, str);
-                        UI_DEBUG_MSG("line[%zu]: children[%u]=%s, skip",
-                                     line->index, child_index, str);
+                        UI_WIDGET_SIZE_STR(child, size_str);
+                        UI_DEBUG_MSG("line[%zu]: children[%u]=%s, size=%s, "
+                                     "flex_basis(%d)=%g, main_size=%g",
+                                     line->index, child_index, str, size_str,
+                                     cs->type_bits.flex_basis, cs->flex_basis,
+                                     main_size);
                         child_index++;
                         UI_DEBUG_END;
-                        list_append(&line->items, child);
-                        continue;
-                }
-                cs = &child->computed_style;
-                main_size = ui_flexbox_item_reset_main_size(ctx, child);
-                UI_DEBUG_BEGIN;
-                UI_WIDGET_STR(child, str);
-                UI_WIDGET_SIZE_STR(child, size_str);
-                UI_DEBUG_MSG("line[%zu]: children[%u]=%s, size=%s, "
-                             "flex_basis(%d)=%g, main_size=%g",
-                             line->index, child_index, str, size_str,
-                             cs->type_bits.flex_basis, cs->flex_basis,
-                             main_size);
-                child_index++;
-                UI_DEBUG_END;
-                if (s->type_bits.flex_wrap == CSS_FLEX_WRAP_WRAP &&
-                    line->main_size > 0 &&
-                    line->main_size + ctx->main_gap + main_size >
-                        max_main_size) {
-                        line = ui_flexbox_layout_next_line(ctx);
-                }
-                if (line->items.length > 0) {
-                        line->main_size += ctx->main_gap;
-                }
-                line->main_size += main_size;
-                if (column) {
-                        if (cs->type_bits.margin_top == CSS_MARGIN_AUTO) {
-                                line->count_of_auto_margin_items++;
+                        if (s->type_bits.flex_wrap == CSS_FLEX_WRAP_WRAP &&
+                            line->main_size > 0 &&
+                            line->main_size + ctx->main_gap + main_size >
+                                max_main_size) {
+                                line = ui_flexbox_layout_next_line(ctx);
                         }
-                        if (cs->type_bits.margin_bottom == CSS_MARGIN_AUTO) {
-                                line->count_of_auto_margin_items++;
+                        if (line->items.length > 0) {
+                                line->main_size += ctx->main_gap;
                         }
-                } else {
-                        if (cs->type_bits.margin_left == CSS_MARGIN_AUTO) {
-                                line->count_of_auto_margin_items++;
+                        line->main_size += main_size;
+                        if (column) {
+                                if (cs->type_bits.margin_top ==
+                                    CSS_MARGIN_AUTO) {
+                                        line->count_of_auto_margin_items++;
+                                }
+                                if (cs->type_bits.margin_bottom ==
+                                    CSS_MARGIN_AUTO) {
+                                        line->count_of_auto_margin_items++;
+                                }
+                        } else {
+                                if (cs->type_bits.margin_left ==
+                                    CSS_MARGIN_AUTO) {
+                                        line->count_of_auto_margin_items++;
+                                }
+                                if (cs->type_bits.margin_right ==
+                                    CSS_MARGIN_AUTO) {
+                                        line->count_of_auto_margin_items++;
+                                }
                         }
-                        if (cs->type_bits.margin_right == CSS_MARGIN_AUTO) {
-                                line->count_of_auto_margin_items++;
-                        }
+                        ui_flexbox_line_load_item(line, child);
                 }
-                ui_flexbox_line_load_item(line, child);
         }
         ctx->cross_size = 0;
         UI_DEBUG_BEGIN;
@@ -717,9 +1068,15 @@ void ui_flexbox_layout_reflow(ui_widget_t *w, ui_resizer_t *resizer)
                     s->type_bits.column_gap, s->column_gap,
                     s->unit_bits.column_gap, w->content_box.width);
                 if (ctx.column_direction) {
+                        ctx.main_gap_type = s->type_bits.row_gap;
+                        ctx.main_gap_value = s->row_gap;
+                        ctx.main_gap_unit = s->unit_bits.row_gap;
                         ctx.main_gap = row_gap;
                         ctx.cross_gap = column_gap;
                 } else {
+                        ctx.main_gap_type = s->type_bits.column_gap;
+                        ctx.main_gap_value = s->column_gap;
+                        ctx.main_gap_unit = s->unit_bits.column_gap;
                         ctx.main_gap = column_gap;
                         ctx.cross_gap = row_gap;
                 }
@@ -739,6 +1096,7 @@ void ui_flexbox_layout_reflow(ui_widget_t *w, ui_resizer_t *resizer)
                 ui_resizer_load_row_minmaxinfo(resizer);
         }
         ui_flexbox_layout_load_main_size(&ctx);
+        ui_flexbox_layout_resolve_main_gap(&ctx);
         ui_flexbox_layout_apply_main_size(&ctx);
         ui_flexbox_layout_reflow_lines(&ctx);
         w->proto->resize(w, w->content_box.width, w->content_box.height);

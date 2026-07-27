@@ -96,6 +96,10 @@ scrollarea-content {
   width: fit-content;
 }
 
+.percentage-wrap-box {
+  background-color: #f3b64c;
+}
+
 .percent-30-item {
   width: 30%;
   height: 20px;
@@ -109,4 +113,146 @@ scrollarea-content {
 .mixed-fixed-item {
   width: 100px;
   height: 20px;
+}
+
+.percent-100-item {
+  height: 20px;
+}
+
+.percent-100-item-30 {
+  width: 30%;
+}
+
+.percent-100-item-40 {
+  width: 40%;
+}
+
+.mixed-gap-group {
+  gap: 10px;
+}
+
+.mixed-gap-percent-item {
+  width: 30%;
+  height: 20px;
+}
+
+.mixed-gap-fixed-item {
+  width: 100px;
+  height: 20px;
+}
+
+.full-width-item {
+  width: 100%;
+  height: 20px;
+  padding: 4px;
+  border: 2px solid #333;
+  box-sizing: border-box;
+}
+
+.intrinsic-percent-item {
+  width: 30%;
+  height: 20px;
+}
+
+.intrinsic-percent-child {
+  width: 100px;
+  height: 20px;
+}
+
+.decorated-percent-group {
+  border: 1px solid #4f72be;
+}
+
+.decorated-percent-item {
+  width: 30%;
+  height: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border: 1px solid #333;
+  box-sizing: content-box;
+}
+
+.decorated-percent-child {
+  width: 100px;
+  height: 20px;
+  background-color: #6ca86c;
+}
+
+.min-percent-item {
+  width: 30%;
+  min-width: 100px;
+  height: 20px;
+}
+
+.review-fixed-item {
+  width: 100px;
+  height: 20px;
+}
+
+.percent-gap-group {
+  gap: 10%;
+}
+
+.percent-gap-item {
+  width: 30%;
+  height: 20px;
+}
+
+.decorated-empty-percent-item {
+  width: 30%;
+  height: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border: 1px solid #333;
+  box-sizing: content-box;
+}
+
+.decorated-empty-fixed-item {
+  width: 100px;
+  height: 20px;
+}
+
+.full-percent-wrap-item {
+  width: 100%;
+  height: 20px;
+}
+
+.percentage-wrap-fixed-item {
+  width: 100px;
+  height: 20px;
+}
+
+.percent-row-wrap-item-30 {
+  width: 30%;
+  height: 20px;
+}
+
+.percent-row-wrap-item-70 {
+  width: 70%;
+  height: 20px;
+}
+
+.no-flex-fixed-item {
+  width: 100px;
+  height: 20px;
+  flex: none;
+}
+
+.full-percent-no-flex-item {
+  width: 100%;
+  height: 20px;
+  flex: none;
+}
+
+.decorated-before-percent-item {
+  width: 30%;
+  height: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border: 1px solid #333;
+  box-sizing: content-box;
+}
+
+.fixed-wrap-box {
+  background-color: #4f72be;
 }
