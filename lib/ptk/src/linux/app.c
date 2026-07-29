@@ -9,6 +9,7 @@
  * in the LICENSE.TXT file in the root directory of this source tree.
  */
 
+#include <stdlib.h>
 #include <string.h>
 #include <yutil.h>
 #include "ptk.h"
@@ -204,32 +205,45 @@ ptk_app_id_t ptk_get_app_id(void)
 
 int ptk_app_init(const wchar_t *name)
 {
-        linux_app.id = PTK_APP_ID_LINUX_FRAMEBUFFER;
-#ifdef PTK_HAS_WAYLAND
-        ptk_waylandapp_driver_init(&linux_app.app);
-        ptk_waylandwindow_driver_init(&linux_app.window);
-        if (linux_app.app.init(name) == 0) {
-                logger_debug("[app] use engine: waylandapp\n");
-                linux_app.id = PTK_APP_ID_LINUX_WAYLAND;
-                linux_app.active = true;
-                return 0;
-        }
-        memset(&linux_app.app, 0, sizeof(linux_app.app));
-        memset(&linux_app.window, 0, sizeof(linux_app.window));
-#endif
-#ifdef PTK_HAS_LIBX11
+        const char *env;
 
-        ptk_x11app_driver_init(&linux_app.app);
-        ptk_x11window_driver_init(&linux_app.window);
-        if (linux_app.app.init(name) == 0) {
-                logger_debug("[app] use engine: x11app\n");
-                linux_app.id = PTK_APP_ID_LINUX_X11;
-                linux_app.active = true;
-                return 0;
-        }
-        memset(&linux_app.app, 0, sizeof(linux_app.app));
-        memset(&linux_app.window, 0, sizeof(linux_app.window));
+        linux_app.id = PTK_APP_ID_LINUX_FRAMEBUFFER;
+        env = getenv("WAYLAND_DISPLAY");
+        if (env && *env) {
+#ifdef PTK_HAS_WAYLAND
+                ptk_waylandapp_driver_init(&linux_app.app);
+                ptk_waylandwindow_driver_init(&linux_app.window);
+                if (linux_app.app.init(name) == 0) {
+                        logger_debug("[app] use engine: waylandapp\n");
+                        linux_app.id = PTK_APP_ID_LINUX_WAYLAND;
+                        linux_app.active = true;
+                        return 0;
+                }
+                memset(&linux_app.app, 0, sizeof(linux_app.app));
+                memset(&linux_app.window, 0, sizeof(linux_app.window));
+#else
+                logger_warning("[app] WAYLAND_DISPLAY is set but wayland "
+                               "backend is not compiled in\n");
 #endif
+        }
+        env = getenv("DISPLAY");
+        if (env && *env) {
+#ifdef PTK_HAS_LIBX11
+                ptk_x11app_driver_init(&linux_app.app);
+                ptk_x11window_driver_init(&linux_app.window);
+                if (linux_app.app.init(name) == 0) {
+                        logger_debug("[app] use engine: x11app\n");
+                        linux_app.id = PTK_APP_ID_LINUX_X11;
+                        linux_app.active = true;
+                        return 0;
+                }
+                memset(&linux_app.app, 0, sizeof(linux_app.app));
+                memset(&linux_app.window, 0, sizeof(linux_app.window));
+#else
+                logger_warning("[app] DISPLAY is set but x11 backend is not "
+                               "compiled in\n");
+#endif
+        }
         logger_debug("[app] use engine: fbapp\n");
         ptk_fbapp_driver_init(&linux_app.app);
         ptk_fbwindow_driver_init(&linux_app.window);
