@@ -204,7 +204,7 @@ ptk_app_id_t ptk_get_app_id(void)
 
 int ptk_app_init(const wchar_t *name)
 {
-        linux_app.id = PTK_APP_ID_LINUX;
+        linux_app.id = PTK_APP_ID_LINUX_FRAMEBUFFER;
 #ifdef PTK_HAS_WAYLAND
         ptk_waylandapp_driver_init(&linux_app.app);
         ptk_waylandwindow_driver_init(&linux_app.window);
@@ -248,7 +248,7 @@ int ptk_app_destroy(void)
                 return -1;
         }
         linux_app.active = false;
-        if (linux_app.id == PTK_APP_ID_LINUX) {
+        if (linux_app.id == PTK_APP_ID_LINUX_FRAMEBUFFER) {
                 ptk_linux_mouse_destroy();
                 ptk_linux_keyboard_destroy();
         }

@@ -20,7 +20,7 @@ typedef void (*ptk_timer_cb)(void *);
 
 typedef enum {
         PTK_APP_ID_UNKNOWN,
-        PTK_APP_ID_LINUX,
+        PTK_APP_ID_LINUX_FRAMEBUFFER,
         PTK_APP_ID_LINUX_X11,
         PTK_APP_ID_LINUX_WAYLAND,
         PTK_APP_ID_WIN_DESKTOP,
