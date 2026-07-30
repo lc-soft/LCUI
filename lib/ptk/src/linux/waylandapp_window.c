@@ -19,20 +19,25 @@ void ptk_waylandwindow_destroy_buffer(ptk_window_t *wnd)
         wnd->buffer_size = 0;
 }
 
+static int ptk_waylandwindow_get_width(ptk_window_t *wnd)
+{
+        return wnd->width;
+}
+
+static int ptk_waylandwindow_get_height(ptk_window_t *wnd)
+{
+        return wnd->height;
+}
+
 void ptk_waylandwindow_post_size_event(ptk_window_t *wnd)
 {
         ptk_event_t e = { 0 };
 
         e.type = PTK_EVENT_SIZE;
         e.window = wnd;
-        e.size.width = wnd->width;
-        e.size.height = wnd->height;
+        e.size.width = wnd->width * wl_app.output_scale;
+        e.size.height = wnd->height * wl_app.output_scale;
         ptk_post_event(&e);
-}
-
-static int ptk_waylandwindow_get_buffer_size(int size)
-{
-        return size * wl_app.output_scale;
 }
 
 static void ptk_waylandapp_on_wm_base_ping(void *data,
@@ -64,19 +69,15 @@ static void ptk_waylandwindow_on_toplevel_configure(
     int32_t height, struct wl_array *states)
 {
         ptk_window_t *wnd = data;
-        int buffer_width;
-        int buffer_height;
 
         if (width <= 0 || height <= 0) {
                 return;
         }
-        buffer_width = ptk_waylandwindow_get_buffer_size(width);
-        buffer_height = ptk_waylandwindow_get_buffer_size(height);
-        if (wnd->width == buffer_width && wnd->height == buffer_height) {
+        if (wnd->width == width && wnd->height == height) {
                 return;
         }
-        wnd->width = buffer_width;
-        wnd->height = buffer_height;
+        wnd->width = width;
+        wnd->height = height;
         ptk_waylandwindow_destroy_buffer(wnd);
         ptk_waylandwindow_post_size_event(wnd);
 }
@@ -124,10 +125,8 @@ ptk_window_t *ptk_waylandwindow_create(const wchar_t *title, int x, int y,
         if (!wnd) {
                 return NULL;
         }
-        wnd->width = ptk_waylandwindow_get_buffer_size(
-            width > 0 ? width : PTK_WINDOW_DEFAULT_WIDTH);
-        wnd->height = ptk_waylandwindow_get_buffer_size(
-            height > 0 ? height : PTK_WINDOW_DEFAULT_HEIGHT);
+        wnd->width = width > 0 ? width : PTK_WINDOW_DEFAULT_WIDTH;
+        wnd->height = height > 0 ? height : PTK_WINDOW_DEFAULT_HEIGHT;
         wnd->surface = wl_compositor_create_surface(wl_app.compositor);
         if (!wnd->surface) {
                 free(wnd);
@@ -240,20 +239,14 @@ static void ptk_waylandwindow_destroy(ptk_window_t *wnd)
 
 static void ptk_waylandwindow_set_size(ptk_window_t *wnd, int width, int height)
 {
-        int physical_width;
-        int physical_height;
-
         if (width <= 0 || height <= 0) {
                 return;
         }
-        physical_width = ptk_waylandwindow_get_buffer_size(width);
-        physical_height = ptk_waylandwindow_get_buffer_size(height);
-
-        if (wnd->width == physical_width && wnd->height == physical_height) {
+        if (wnd->width == width && wnd->height == height) {
                 return;
         }
-        wnd->width = physical_width;
-        wnd->height = physical_height;
+        wnd->width = width;
+        wnd->height = height;
         ptk_waylandwindow_destroy_buffer(wnd);
 }
 
@@ -266,27 +259,15 @@ static void *ptk_waylandwindow_get_handle(ptk_window_t *wnd)
         return wnd->surface;
 }
 
-static int ptk_waylandwindow_get_width(ptk_window_t *wnd)
-{
-        return wnd->width / wl_app.output_scale;
-}
-
-static int ptk_waylandwindow_get_height(ptk_window_t *wnd)
-{
-        return wnd->height / wl_app.output_scale;
-}
-
 static void ptk_waylandwindow_apply_size_hints(ptk_window_t *wnd)
 {
         if (!wnd->xdg_toplevel) {
                 return;
         }
-        xdg_toplevel_set_min_size(wnd->xdg_toplevel,
-                                  wnd->min_width * wl_app.output_scale,
-                                  wnd->min_height * wl_app.output_scale);
-        xdg_toplevel_set_max_size(wnd->xdg_toplevel,
-                                  wnd->max_width * wl_app.output_scale,
-                                  wnd->max_height * wl_app.output_scale);
+        xdg_toplevel_set_min_size(wnd->xdg_toplevel, wnd->min_width,
+                                  wnd->min_height);
+        xdg_toplevel_set_max_size(wnd->xdg_toplevel, wnd->max_width,
+                                  wnd->max_height);
 }
 
 static void ptk_waylandwindow_set_min_width(ptk_window_t *wnd, int min_width)
@@ -321,7 +302,6 @@ static unsigned ptk_waylandwindow_get_dpi(ptk_window_t *wnd)
 static ptk_window_paint_t *ptk_waylandwindow_begin_paint(ptk_window_t *wnd,
                                                          pd_rect_t *rect)
 {
-        size_t size;
         int fd;
         struct wl_shm_pool *pool;
 
@@ -329,7 +309,7 @@ static ptk_window_paint_t *ptk_waylandwindow_begin_paint(ptk_window_t *wnd,
                 return NULL;
         }
         if (!wnd->buffer) {
-                size = (size_t)wnd->width * (size_t)wnd->height * 4;
+                size_t size = (size_t)wnd->width * (size_t)wnd->height * 4;
                 fd = memfd_create("lcui-wayland-buffer", MFD_CLOEXEC);
                 if (fd < 0) {
                         return NULL;
@@ -352,12 +332,6 @@ static ptk_window_paint_t *ptk_waylandwindow_begin_paint(ptk_window_t *wnd,
                 wl_shm_pool_destroy(pool);
                 close(fd);
                 wnd->buffer_size = size;
-                /* Initialize the backing canvas once per buffer lifetime.
-                 * pd_canvas_init leaves mem_size=0 and bytes=NULL; we
-                 * override bytes to point at the mmap'd shm buffer.
-                 * The canvas must NOT be passed to pd_canvas_destroy(),
-                 * which would free() the pointer — use destroy_buffer instead.
-                 */
                 pd_canvas_init(&wnd->canvas);
                 wnd->canvas.width = wnd->width;
                 wnd->canvas.height = wnd->height;
@@ -372,19 +346,12 @@ static ptk_window_paint_t *ptk_waylandwindow_begin_paint(ptk_window_t *wnd,
                         return NULL;
                 }
         }
-        /* Set up the paint context following pd_context_create() semantics:
-         * paint->canvas must be a pd_canvas_quote() of the full backing canvas
-         * clipped to the dirty rect. Pandagl renderers draw at (0,0) within
-         * this quoted canvas, which corresponds to (rect->x, rect->y) in the
-         * actual shm buffer. Setting canvas = full buffer (old code) caused
-         * all renders to write to buffer[0,0] regardless of the dirty rect. */
         wnd->paint_ctx->rect = *rect;
         wnd->paint_ctx->with_alpha = false;
         pd_rect_correct(&wnd->paint_ctx->rect, wnd->width, wnd->height);
         pd_canvas_init(&wnd->paint_ctx->canvas);
         pd_canvas_quote(&wnd->paint_ctx->canvas, &wnd->canvas,
                         &wnd->paint_ctx->rect);
-        /* Clear the dirty region to white before the widget renders into it */
         pd_canvas_fill(&wnd->paint_ctx->canvas, pd_rgb(255, 255, 255));
         return wnd->paint_ctx;
 }
