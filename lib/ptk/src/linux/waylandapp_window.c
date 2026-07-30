@@ -1,0 +1,471 @@
+#define _GNU_SOURCE
+#include "ptk.h"
+
+#if defined(PTK_LINUX) && defined(PTK_HAS_WAYLAND)
+
+#include "wayland_internal.h"
+
+void ptk_waylandwindow_destroy_buffer(ptk_window_t *wnd)
+{
+        if (wnd->buffer) {
+                wl_buffer_destroy(wnd->buffer);
+                wnd->buffer = NULL;
+        }
+        if (wnd->buffer_data) {
+                munmap(wnd->buffer_data, wnd->buffer_size);
+                wnd->buffer_data = NULL;
+                wnd->canvas.bytes = NULL;
+        }
+        wnd->buffer_size = 0;
+}
+
+static int ptk_waylandwindow_get_width(ptk_window_t *wnd)
+{
+        return (int)lround(wnd->width * wnd->scale);
+}
+
+static int ptk_waylandwindow_get_height(ptk_window_t *wnd)
+{
+        return (int)lround(wnd->height * wnd->scale);
+}
+
+void ptk_waylandwindow_post_size_event(ptk_window_t *wnd)
+{
+        ptk_event_t e = { 0 };
+
+        e.type = PTK_EVENT_SIZE;
+        e.window = wnd;
+        e.size.width = (int)lround(wnd->width * wnd->scale);
+        e.size.height = (int)lround(wnd->height * wnd->scale);
+        ptk_post_event(&e);
+}
+
+static void ptk_waylandapp_on_wm_base_ping(void *data,
+                                           struct xdg_wm_base *wm_base,
+                                           uint32_t serial)
+{
+        xdg_wm_base_pong(wm_base, serial);
+}
+
+const struct xdg_wm_base_listener wm_base_listener = {
+        ptk_waylandapp_on_wm_base_ping
+};
+
+static void ptk_waylandwindow_on_xdg_surface_configure(
+    void *data, struct xdg_surface *surface, uint32_t serial)
+{
+        ptk_window_t *wnd = data;
+
+        xdg_surface_ack_configure(surface, serial);
+        wnd->configured = true;
+}
+
+const struct xdg_surface_listener xdg_surface_listener = {
+        ptk_waylandwindow_on_xdg_surface_configure
+};
+
+static void ptk_waylandwindow_on_toplevel_configure(
+    void *data, struct xdg_toplevel *xdg_toplevel, int32_t width,
+    int32_t height, struct wl_array *states)
+{
+        ptk_window_t *wnd = data;
+
+        if (width <= 0 || height <= 0) {
+                return;
+        }
+        if (wnd->width == width && wnd->height == height) {
+                return;
+        }
+        wnd->width = width;
+        wnd->height = height;
+        ptk_waylandwindow_destroy_buffer(wnd);
+        ptk_waylandwindow_post_size_event(wnd);
+}
+
+static void ptk_waylandwindow_on_toplevel_close(
+    void *data, struct xdg_toplevel *xdg_toplevel)
+{
+        ptk_window_t *wnd = data;
+        ptk_event_t e = { 0 };
+
+        e.type = PTK_EVENT_CLOSE;
+        e.window = wnd;
+        ptk_post_event(&e);
+}
+
+static void ptk_waylandwindow_on_toplevel_configure_bounds(
+    void *data, struct xdg_toplevel *xdg_toplevel, int32_t width,
+    int32_t height)
+{
+}
+
+static void ptk_waylandwindow_on_toplevel_wm_capabilities(
+    void *data, struct xdg_toplevel *xdg_toplevel,
+    struct wl_array *capabilities)
+{
+}
+
+const struct xdg_toplevel_listener xdg_toplevel_listener = {
+        ptk_waylandwindow_on_toplevel_configure,
+        ptk_waylandwindow_on_toplevel_close,
+        ptk_waylandwindow_on_toplevel_configure_bounds,
+        ptk_waylandwindow_on_toplevel_wm_capabilities
+};
+
+static void ptk_waylandwindow_on_fractional_scale_preferred(
+    void *data, struct wp_fractional_scale_v1 *wp_fractional_scale_v1,
+    uint32_t scale)
+{
+        ptk_window_t *wnd = data;
+        double new_scale = scale / 120.0;
+
+        if (new_scale != wnd->scale) {
+                wnd->scale = new_scale;
+                ptk_waylandwindow_destroy_buffer(wnd);
+                ptk_waylandwindow_post_size_event(wnd);
+        }
+}
+
+const struct wp_fractional_scale_v1_listener fractional_scale_listener = {
+        ptk_waylandwindow_on_fractional_scale_preferred
+};
+
+ptk_window_t *ptk_waylandwindow_create(const wchar_t *title, int x, int y,
+                                       int width, int height,
+                                       ptk_window_t *parent)
+{
+        ptk_window_t *wnd;
+        int physical_w;
+        int physical_h;
+
+        if (!wl_app.compositor || !wl_app.wm_base || !wl_app.shm) {
+                return NULL;
+        }
+        wnd = calloc(1, sizeof(*wnd));
+        if (!wnd) {
+                return NULL;
+        }
+        wnd->scale = wl_app.output_scale > 0.0 ? wl_app.output_scale : 1.0;
+        physical_w = width > 0 ? width : PTK_WINDOW_DEFAULT_WIDTH;
+        physical_h = height > 0 ? height : PTK_WINDOW_DEFAULT_HEIGHT;
+        wnd->width = (int)lround(physical_w / wnd->scale);
+        wnd->height = (int)lround(physical_h / wnd->scale);
+        wnd->surface = wl_compositor_create_surface(wl_app.compositor);
+        if (!wnd->surface) {
+                free(wnd);
+                return NULL;
+        }
+        wnd->xdg_surface =
+            xdg_wm_base_get_xdg_surface(wl_app.wm_base, wnd->surface);
+        wnd->xdg_toplevel = xdg_surface_get_toplevel(wnd->xdg_surface);
+        if (!wnd->xdg_surface || !wnd->xdg_toplevel) {
+                if (wnd->xdg_toplevel) {
+                        xdg_toplevel_destroy(wnd->xdg_toplevel);
+                }
+                if (wnd->xdg_surface) {
+                        xdg_surface_destroy(wnd->xdg_surface);
+                }
+                wl_surface_destroy(wnd->surface);
+                free(wnd);
+                return NULL;
+        }
+        wnd->node.data = wnd;
+        xdg_surface_add_listener(wnd->xdg_surface, &xdg_surface_listener, wnd);
+        xdg_toplevel_add_listener(wnd->xdg_toplevel, &xdg_toplevel_listener,
+                                  wnd);
+
+        if (wl_app.decoration_manager) {
+                wnd->decoration =
+                    zxdg_decoration_manager_v1_get_toplevel_decoration(
+                        wl_app.decoration_manager, wnd->xdg_toplevel);
+                if (wnd->decoration) {
+                        zxdg_toplevel_decoration_v1_set_mode(
+                            wnd->decoration,
+                            ZXDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE);
+                }
+        }
+        if (wl_app.viewporter) {
+                /* -1 means "source size follows the attached buffer"; the
+                 * viewport will scale the buffer to the destination set in
+                 * end_paint. */
+                wnd->viewport =
+                    wp_viewporter_get_viewport(wl_app.viewporter, wnd->surface);
+                wp_viewport_set_source(
+                    wnd->viewport, wl_fixed_from_int(-1), wl_fixed_from_int(-1),
+                    wl_fixed_from_int(-1), wl_fixed_from_int(-1));
+        }
+        if (wl_app.fractional_scale_manager) {
+                wnd->fractional_scale =
+                    wp_fractional_scale_manager_v1_get_fractional_scale(
+                        wl_app.fractional_scale_manager, wnd->surface);
+                wp_fractional_scale_v1_add_listener(
+                    wnd->fractional_scale, &fractional_scale_listener, wnd);
+        }
+        xdg_surface_set_window_geometry(wnd->xdg_surface, 0, 0, wnd->width,
+                                        wnd->height);
+        if (title) {
+                size_t len = encode_utf8(NULL, title, 0) + 1;
+                char *utf8_title = malloc(sizeof(char) * len);
+
+                if (utf8_title) {
+                        encode_utf8(utf8_title, title, len);
+                        xdg_toplevel_set_title(wnd->xdg_toplevel, utf8_title);
+                        free(utf8_title);
+                }
+        }
+        wl_surface_commit(wnd->surface);
+        wl_display_roundtrip(wl_app.display);
+        list_append_node(&wl_app.windows, &wnd->node);
+        return wnd;
+}
+
+static void ptk_waylandwindow_close(ptk_window_t *wnd)
+{
+        ptk_event_t e = { 0 };
+
+        e.type = PTK_EVENT_CLOSE;
+        e.window = wnd;
+        ptk_post_event(&e);
+}
+
+static void ptk_waylandwindow_show(ptk_window_t *wnd)
+{
+        wl_surface_commit(wnd->surface);
+}
+
+static void ptk_waylandwindow_activate(ptk_window_t *wnd)
+{
+        wl_surface_commit(wnd->surface);
+}
+
+static void ptk_waylandwindow_set_title(ptk_window_t *wnd, const wchar_t *title)
+{
+        size_t len;
+        char *utf8_title;
+
+        if (!title || !wnd->xdg_toplevel) {
+                return;
+        }
+        len = encode_utf8(NULL, title, 0) + 1;
+        utf8_title = malloc(sizeof(char) * len);
+        if (!utf8_title) {
+                return;
+        }
+        encode_utf8(utf8_title, title, len);
+        xdg_toplevel_set_title(wnd->xdg_toplevel, utf8_title);
+        free(utf8_title);
+}
+
+void ptk_waylandwindow_destroy(ptk_window_t *wnd)
+{
+        if (!wnd) {
+                return;
+        }
+        list_unlink(&wl_app.windows, &wnd->node);
+        if (wnd->fractional_scale) {
+                wp_fractional_scale_v1_destroy(wnd->fractional_scale);
+        }
+        if (wnd->viewport) {
+                wp_viewport_destroy(wnd->viewport);
+        }
+        if (wnd->decoration) {
+                zxdg_toplevel_decoration_v1_destroy(wnd->decoration);
+        }
+        if (wnd->xdg_toplevel) {
+                xdg_toplevel_destroy(wnd->xdg_toplevel);
+        }
+        if (wnd->xdg_surface) {
+                xdg_surface_destroy(wnd->xdg_surface);
+        }
+        if (wnd->surface) {
+                wl_surface_destroy(wnd->surface);
+        }
+        ptk_waylandwindow_destroy_buffer(wnd);
+        free(wnd->paint_ctx);
+        free(wnd);
+}
+
+static void ptk_waylandwindow_set_size(ptk_window_t *wnd, int width, int height)
+{
+        int logical_w = (int)lround(width / wnd->scale);
+        int logical_h = (int)lround(height / wnd->scale);
+
+        if (width <= 0 || height <= 0) {
+                return;
+        }
+        if (wnd->width == logical_w && wnd->height == logical_h) {
+                return;
+        }
+        wnd->width = logical_w;
+        wnd->height = logical_h;
+        ptk_waylandwindow_destroy_buffer(wnd);
+}
+
+static void ptk_waylandwindow_set_position(ptk_window_t *wnd, int x, int y)
+{
+}
+
+static void *ptk_waylandwindow_get_handle(ptk_window_t *wnd)
+{
+        return wnd->surface;
+}
+
+static void ptk_waylandwindow_apply_size_hints(ptk_window_t *wnd)
+{
+        if (!wnd->xdg_toplevel) {
+                return;
+        }
+        xdg_toplevel_set_min_size(wnd->xdg_toplevel,
+                                  (int)lround(wnd->min_width / wnd->scale),
+                                  (int)lround(wnd->min_height / wnd->scale));
+        xdg_toplevel_set_max_size(wnd->xdg_toplevel,
+                                  (int)lround(wnd->max_width / wnd->scale),
+                                  (int)lround(wnd->max_height / wnd->scale));
+}
+
+static void ptk_waylandwindow_set_min_width(ptk_window_t *wnd, int min_width)
+{
+        wnd->min_width = min_width;
+        ptk_waylandwindow_apply_size_hints(wnd);
+}
+
+static void ptk_waylandwindow_set_min_height(ptk_window_t *wnd, int min_height)
+{
+        wnd->min_height = min_height;
+        ptk_waylandwindow_apply_size_hints(wnd);
+}
+
+static void ptk_waylandwindow_set_max_width(ptk_window_t *wnd, int max_width)
+{
+        wnd->max_width = max_width;
+        ptk_waylandwindow_apply_size_hints(wnd);
+}
+
+static void ptk_waylandwindow_set_max_height(ptk_window_t *wnd, int max_height)
+{
+        wnd->max_height = max_height;
+        ptk_waylandwindow_apply_size_hints(wnd);
+}
+
+static unsigned ptk_waylandwindow_get_dpi(ptk_window_t *wnd)
+{
+        return (unsigned)lround(wnd->scale * 96);
+}
+
+static ptk_window_paint_t *ptk_waylandwindow_begin_paint(ptk_window_t *wnd,
+                                                         pd_rect_t *rect)
+{
+        int fd;
+        int buf_width;
+        int buf_height;
+        struct wl_shm_pool *pool;
+
+        if (!wnd->configured || !rect) {
+                return NULL;
+        }
+        buf_width = (int)lround(wnd->width * wnd->scale);
+        buf_height = (int)lround(wnd->height * wnd->scale);
+        if (buf_width <= 0)
+                buf_width = 1;
+        if (buf_height <= 0)
+                buf_height = 1;
+        if (!wnd->buffer) {
+                size_t size = (size_t)buf_width * (size_t)buf_height * 4;
+                fd = memfd_create("lcui-wayland-buffer", MFD_CLOEXEC);
+                if (fd < 0) {
+                        return NULL;
+                }
+                if (ftruncate(fd, (off_t)size) < 0) {
+                        close(fd);
+                        return NULL;
+                }
+                wnd->buffer_data =
+                    mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+                if (wnd->buffer_data == MAP_FAILED) {
+                        wnd->buffer_data = NULL;
+                        close(fd);
+                        return NULL;
+                }
+                pool = wl_shm_create_pool(wl_app.shm, fd, (int)size);
+                wnd->buffer = wl_shm_pool_create_buffer(
+                    pool, 0, buf_width, buf_height, buf_width * 4,
+                    WL_SHM_FORMAT_XRGB8888);
+                wl_shm_pool_destroy(pool);
+                close(fd);
+                wnd->buffer_size = size;
+                pd_canvas_init(&wnd->canvas);
+                wnd->canvas.width = buf_width;
+                wnd->canvas.height = buf_height;
+                wnd->canvas.color_type = PD_COLOR_TYPE_ARGB;
+                wnd->canvas.bytes = wnd->buffer_data;
+                wnd->canvas.bytes_per_pixel = 4;
+                wnd->canvas.bytes_per_row = buf_width * 4;
+        }
+        if (!wnd->paint_ctx) {
+                wnd->paint_ctx = calloc(1, sizeof(*wnd->paint_ctx));
+                if (!wnd->paint_ctx) {
+                        return NULL;
+                }
+        }
+        wnd->paint_ctx->rect = *rect;
+        wnd->paint_ctx->with_alpha = false;
+        pd_rect_correct(&wnd->paint_ctx->rect, buf_width, buf_height);
+        pd_canvas_init(&wnd->paint_ctx->canvas);
+        pd_canvas_quote(&wnd->paint_ctx->canvas, &wnd->canvas,
+                        &wnd->paint_ctx->rect);
+        pd_canvas_fill(&wnd->paint_ctx->canvas, pd_rgb(255, 255, 255));
+        return wnd->paint_ctx;
+}
+
+static void ptk_waylandwindow_end_paint(ptk_window_t *wnd,
+                                        ptk_window_paint_t *paint)
+{
+        if (!wnd || !paint || !wnd->buffer) {
+                return;
+        }
+        if (wnd->viewport) {
+                wp_viewport_set_destination(wnd->viewport, wnd->width,
+                                            wnd->height);
+                wl_surface_set_buffer_scale(wnd->surface, 1);
+        } else {
+                wl_surface_set_buffer_scale(wnd->surface, (int)wnd->scale);
+        }
+        wl_surface_attach(wnd->surface, wnd->buffer, 0, 0);
+        xdg_surface_set_window_geometry(wnd->xdg_surface, 0, 0, wnd->width,
+                                        wnd->height);
+        wl_surface_damage_buffer(wnd->surface, paint->rect.x, paint->rect.y,
+                                 paint->rect.width, paint->rect.height);
+        wl_surface_commit(wnd->surface);
+        wl_display_flush(wl_app.display);
+}
+
+static void ptk_waylandwindow_present(ptk_window_t *wnd)
+{
+        wl_surface_commit(wnd->surface);
+        wl_display_flush(wl_app.display);
+}
+
+void ptk_waylandwindow_driver_init(ptk_window_driver_t *driver)
+{
+        memset(driver, 0, sizeof(*driver));
+        driver->show = ptk_waylandwindow_show;
+        driver->activate = ptk_waylandwindow_activate;
+        driver->close = ptk_waylandwindow_close;
+        driver->destroy = ptk_waylandwindow_destroy;
+        driver->set_title = ptk_waylandwindow_set_title;
+        driver->set_size = ptk_waylandwindow_set_size;
+        driver->set_position = ptk_waylandwindow_set_position;
+        driver->get_handle = ptk_waylandwindow_get_handle;
+        driver->get_width = ptk_waylandwindow_get_width;
+        driver->get_height = ptk_waylandwindow_get_height;
+        driver->get_dpi = ptk_waylandwindow_get_dpi;
+        driver->set_min_width = ptk_waylandwindow_set_min_width;
+        driver->set_min_height = ptk_waylandwindow_set_min_height;
+        driver->set_max_width = ptk_waylandwindow_set_max_width;
+        driver->set_max_height = ptk_waylandwindow_set_max_height;
+        driver->begin_paint = ptk_waylandwindow_begin_paint;
+        driver->end_paint = ptk_waylandwindow_end_paint;
+        driver->present = ptk_waylandwindow_present;
+}
+
+#endif /* PTK_LINUX && PTK_HAS_WAYLAND */

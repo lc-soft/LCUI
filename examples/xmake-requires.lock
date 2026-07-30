@@ -1,4 +1,230 @@
 {
+    ["linux|x86_64"] = {
+        ["ca-certificates#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "20250131"
+        },
+        ["cairo#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "1.18.0"
+        },
+        ["cmake#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "4.2.3"
+        },
+        ["expat#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "2.7.4"
+        },
+        ["fontconfig#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "2.17.1"
+        },
+        ["freetype#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "2.14.1"
+        },
+        ["gperf#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "3.2.1"
+        },
+        ["libffi#0b3b0fcf"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "3.4.8"
+        },
+        ["libpng#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "v1.6.55"
+        },
+        ["libpthread-stubs#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "0.5"
+        },
+        ["libx11#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "1.8.13"
+        },
+        ["libxau#16fb575b"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "1.0.12"
+        },
+        ["libxcb#16fb575b"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "1.17.0"
+        },
+        ["libxdmcp#16fb575b"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "1.1.5"
+        },
+        ["libxext#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "1.3.7"
+        },
+        ["libxrender#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "0.9.12"
+        },
+        ["meson#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "1.10.2"
+        },
+        ["ninja#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "v1.13.1"
+        },
+        ["openssl >=1.1.1-a#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "1.1.1-w"
+        },
+        ["pixman#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "0.46.2"
+        },
+        ["pkg-config#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "0.29.2"
+        },
+        ["python 3.x#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "3.13.11"
+        },
+        ["util-macros#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "1.20.0"
+        },
+        ["xcb-proto#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "1.17.0"
+        },
+        ["xorgproto#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "2023.2"
+        },
+        ["xtrans#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "1.6.0"
+        },
+        ["zlib#0b3b0fcf"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "v1.3.2"
+        },
+        ["zlib#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "75c3fcffb897a8aeb37863c495b9f58266216b26",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "v1.3.2"
+        }
+    },
     __meta__ = {
         version = "1.0"
     },
@@ -53,19 +279,19 @@
         },
         ["lcui#31fecfc4"] = {
             repo = {
-                url = "../build"
+                url = "../build/packages"
             },
             version = "latest"
         },
         ["libcss#31fecfc4"] = {
             repo = {
-                url = "../build"
+                url = "../build/packages"
             },
             version = "latest"
         },
         ["libi18n#31fecfc4"] = {
             repo = {
-                url = "../build"
+                url = "../build/packages"
             },
             version = "latest"
         },
@@ -95,7 +321,7 @@
         },
         ["libplatform#31fecfc4"] = {
             repo = {
-                url = "../build"
+                url = "../build/packages"
             },
             version = "latest"
         },
@@ -109,55 +335,55 @@
         },
         ["libthread#31fecfc4"] = {
             repo = {
-                url = "../build"
+                url = "../build/packages"
             },
             version = "latest"
         },
         ["libtimer#31fecfc4"] = {
             repo = {
-                url = "../build"
+                url = "../build/packages"
             },
             version = "latest"
         },
         ["libui#31fecfc4"] = {
             repo = {
-                url = "../build"
+                url = "../build/packages"
             },
             version = "latest"
         },
         ["libui-cursor#31fecfc4"] = {
             repo = {
-                url = "../build"
+                url = "../build/packages"
             },
             version = "latest"
         },
         ["libui-router#31fecfc4"] = {
             repo = {
-                url = "../build"
+                url = "../build/packages"
             },
             version = "latest"
         },
         ["libui-server#31fecfc4"] = {
             repo = {
-                url = "../build"
+                url = "../build/packages"
             },
             version = "latest"
         },
         ["libui-widgets#31fecfc4"] = {
             repo = {
-                url = "../build"
+                url = "../build/packages"
             },
             version = "latest"
         },
         ["libui-xml#31fecfc4"] = {
             repo = {
-                url = "../build"
+                url = "../build/packages"
             },
             version = "latest"
         },
         ["libworker#31fecfc4"] = {
             repo = {
-                url = "../build"
+                url = "../build/packages"
             },
             version = "latest"
         },
@@ -195,7 +421,7 @@
         },
         ["pandagl#31fecfc4"] = {
             repo = {
-                url = "../build"
+                url = "../build/packages"
             },
             version = "latest"
         },
@@ -225,7 +451,7 @@
         },
         ["yutil#31fecfc4"] = {
             repo = {
-                url = "../build"
+                url = "../build/packages"
             },
             version = "latest"
         },

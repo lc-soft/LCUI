@@ -1,4 +1,4 @@
-﻿/*
+/*
  * lib/ptk/include/ptk/types.h
  *
  * Copyright (c) 2023-2026, Liu Chao <hello@lcui.dev> All rights reserved.
@@ -20,8 +20,9 @@ typedef void (*ptk_timer_cb)(void *);
 
 typedef enum {
         PTK_APP_ID_UNKNOWN,
-        PTK_APP_ID_LINUX,
+        PTK_APP_ID_LINUX_FRAMEBUFFER,
         PTK_APP_ID_LINUX_X11,
+        PTK_APP_ID_LINUX_WAYLAND,
         PTK_APP_ID_WIN_DESKTOP,
         PTK_APP_ID_UWP
 } ptk_app_id_t;
@@ -289,6 +290,7 @@ typedef struct ptk_window_driver {
         void (*get_position)(ptk_window_t *, int *, int *);
         void (*set_maximized)(ptk_window_t *, bool);
         void *(*get_handle)(ptk_window_t *);
+        unsigned (*get_dpi)(ptk_window_t *);
         int (*get_width)(ptk_window_t *);
         int (*get_height)(ptk_window_t *);
         bool (*is_maximized)(ptk_window_t *);
