@@ -21,22 +21,27 @@ void ptk_waylandwindow_destroy_buffer(ptk_window_t *wnd)
 
 static int ptk_waylandwindow_get_width(ptk_window_t *wnd)
 {
-        return wnd->width;
+        int scale = wl_app.output_scale > 0 ? wl_app.output_scale : 1;
+
+        return wnd->width * scale;
 }
 
 static int ptk_waylandwindow_get_height(ptk_window_t *wnd)
 {
-        return wnd->height;
+        int scale = wl_app.output_scale > 0 ? wl_app.output_scale : 1;
+
+        return wnd->height * scale;
 }
 
 void ptk_waylandwindow_post_size_event(ptk_window_t *wnd)
 {
         ptk_event_t e = { 0 };
+        int scale = wl_app.output_scale > 0 ? wl_app.output_scale : 1;
 
         e.type = PTK_EVENT_SIZE;
         e.window = wnd;
-        e.size.width = wnd->width * wl_app.output_scale;
-        e.size.height = wnd->height * wl_app.output_scale;
+        e.size.width = wnd->width * scale;
+        e.size.height = wnd->height * scale;
         ptk_post_event(&e);
 }
 
@@ -117,6 +122,9 @@ ptk_window_t *ptk_waylandwindow_create(const wchar_t *title, int x, int y,
                                        ptk_window_t *parent)
 {
         ptk_window_t *wnd;
+        int scale = wl_app.output_scale > 0 ? wl_app.output_scale : 1;
+        int physical_w;
+        int physical_h;
 
         if (!wl_app.compositor || !wl_app.wm_base || !wl_app.shm) {
                 return NULL;
@@ -125,8 +133,10 @@ ptk_window_t *ptk_waylandwindow_create(const wchar_t *title, int x, int y,
         if (!wnd) {
                 return NULL;
         }
-        wnd->width = width > 0 ? width : PTK_WINDOW_DEFAULT_WIDTH;
-        wnd->height = height > 0 ? height : PTK_WINDOW_DEFAULT_HEIGHT;
+        physical_w = width > 0 ? width : PTK_WINDOW_DEFAULT_WIDTH;
+        physical_h = height > 0 ? height : PTK_WINDOW_DEFAULT_HEIGHT;
+        wnd->width = physical_w / scale;
+        wnd->height = physical_h / scale;
         wnd->surface = wl_compositor_create_surface(wl_app.compositor);
         if (!wnd->surface) {
                 free(wnd);
@@ -239,14 +249,18 @@ static void ptk_waylandwindow_destroy(ptk_window_t *wnd)
 
 static void ptk_waylandwindow_set_size(ptk_window_t *wnd, int width, int height)
 {
+        int scale = wl_app.output_scale > 0 ? wl_app.output_scale : 1;
+        int logical_w = width / scale;
+        int logical_h = height / scale;
+
         if (width <= 0 || height <= 0) {
                 return;
         }
-        if (wnd->width == width && wnd->height == height) {
+        if (wnd->width == logical_w && wnd->height == logical_h) {
                 return;
         }
-        wnd->width = width;
-        wnd->height = height;
+        wnd->width = logical_w;
+        wnd->height = logical_h;
         ptk_waylandwindow_destroy_buffer(wnd);
 }
 
@@ -261,13 +275,15 @@ static void *ptk_waylandwindow_get_handle(ptk_window_t *wnd)
 
 static void ptk_waylandwindow_apply_size_hints(ptk_window_t *wnd)
 {
+        int scale = wl_app.output_scale > 0 ? wl_app.output_scale : 1;
+
         if (!wnd->xdg_toplevel) {
                 return;
         }
-        xdg_toplevel_set_min_size(wnd->xdg_toplevel, wnd->min_width,
-                                  wnd->min_height);
-        xdg_toplevel_set_max_size(wnd->xdg_toplevel, wnd->max_width,
-                                  wnd->max_height);
+        xdg_toplevel_set_min_size(wnd->xdg_toplevel, wnd->min_width / scale,
+                                  wnd->min_height / scale);
+        xdg_toplevel_set_max_size(wnd->xdg_toplevel, wnd->max_width / scale,
+                                  wnd->max_height / scale);
 }
 
 static void ptk_waylandwindow_set_min_width(ptk_window_t *wnd, int min_width)
@@ -303,13 +319,17 @@ static ptk_window_paint_t *ptk_waylandwindow_begin_paint(ptk_window_t *wnd,
                                                          pd_rect_t *rect)
 {
         int fd;
+        int buf_width;
+        int buf_height;
         struct wl_shm_pool *pool;
 
         if (!wnd->configured || !rect) {
                 return NULL;
         }
+        buf_width = wnd->width * wl_app.output_scale;
+        buf_height = wnd->height * wl_app.output_scale;
         if (!wnd->buffer) {
-                size_t size = (size_t)wnd->width * (size_t)wnd->height * 4;
+                size_t size = (size_t)buf_width * (size_t)buf_height * 4;
                 fd = memfd_create("lcui-wayland-buffer", MFD_CLOEXEC);
                 if (fd < 0) {
                         return NULL;
@@ -327,18 +347,18 @@ static ptk_window_paint_t *ptk_waylandwindow_begin_paint(ptk_window_t *wnd,
                 }
                 pool = wl_shm_create_pool(wl_app.shm, fd, (int)size);
                 wnd->buffer = wl_shm_pool_create_buffer(
-                    pool, 0, wnd->width, wnd->height, wnd->width * 4,
+                    pool, 0, buf_width, buf_height, buf_width * 4,
                     WL_SHM_FORMAT_XRGB8888);
                 wl_shm_pool_destroy(pool);
                 close(fd);
                 wnd->buffer_size = size;
                 pd_canvas_init(&wnd->canvas);
-                wnd->canvas.width = wnd->width;
-                wnd->canvas.height = wnd->height;
+                wnd->canvas.width = buf_width;
+                wnd->canvas.height = buf_height;
                 wnd->canvas.color_type = PD_COLOR_TYPE_ARGB;
                 wnd->canvas.bytes = wnd->buffer_data;
                 wnd->canvas.bytes_per_pixel = 4;
-                wnd->canvas.bytes_per_row = wnd->width * 4;
+                wnd->canvas.bytes_per_row = buf_width * 4;
         }
         if (!wnd->paint_ctx) {
                 wnd->paint_ctx = calloc(1, sizeof(*wnd->paint_ctx));
@@ -348,7 +368,7 @@ static ptk_window_paint_t *ptk_waylandwindow_begin_paint(ptk_window_t *wnd,
         }
         wnd->paint_ctx->rect = *rect;
         wnd->paint_ctx->with_alpha = false;
-        pd_rect_correct(&wnd->paint_ctx->rect, wnd->width, wnd->height);
+        pd_rect_correct(&wnd->paint_ctx->rect, buf_width, buf_height);
         pd_canvas_init(&wnd->paint_ctx->canvas);
         pd_canvas_quote(&wnd->paint_ctx->canvas, &wnd->canvas,
                         &wnd->paint_ctx->rect);

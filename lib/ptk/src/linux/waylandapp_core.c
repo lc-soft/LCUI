@@ -292,12 +292,12 @@ static int ptk_waylandapp_off_event(int type,
 
 static int ptk_waylandapp_get_screen_width(void)
 {
-        return wl_app.screen_width / wl_app.output_scale;
+        return wl_app.screen_width;
 }
 
 static int ptk_waylandapp_get_screen_height(void)
 {
-        return wl_app.screen_height / wl_app.output_scale;
+        return wl_app.screen_height;
 }
 
 void ptk_waylandapp_driver_init(ptk_app_driver_t *driver)

@@ -45,6 +45,7 @@ static void ptk_waylandapp_on_output_scale(void *data,
                 ptk_window_t *wnd = node->data;
                 if (wnd) {
                         ptk_waylandwindow_destroy_buffer(wnd);
+                        ptk_waylandwindow_post_size_event(wnd);
                 }
         }
 }

@@ -35,8 +35,8 @@ static void ptk_waylandapp_on_pointer_enter(
                 ptk_event_t e = { 0 };
                 e.type = PTK_EVENT_MOUSEMOVE;
                 e.window = wl_app.pointer_focus;
-                e.mouse.x = (int)wl_app.pointer_x;
-                e.mouse.y = (int)wl_app.pointer_y;
+                e.mouse.x = (int)(wl_app.pointer_x * wl_app.output_scale);
+                e.mouse.y = (int)(wl_app.pointer_y * wl_app.output_scale);
                 ptk_post_event(&e);
         }
 }
@@ -64,8 +64,8 @@ static void ptk_waylandapp_on_pointer_motion(void *data,
         if (wl_app.pointer_focus) {
                 e.type = PTK_EVENT_MOUSEMOVE;
                 e.window = wl_app.pointer_focus;
-                e.mouse.x = (int)wl_app.pointer_x;
-                e.mouse.y = (int)wl_app.pointer_y;
+                e.mouse.x = (int)(wl_app.pointer_x * wl_app.output_scale);
+                e.mouse.y = (int)(wl_app.pointer_y * wl_app.output_scale);
                 ptk_post_event(&e);
         }
 }
@@ -82,8 +82,8 @@ static void ptk_waylandapp_on_pointer_button(void *data,
                              ? PTK_EVENT_MOUSEDOWN
                              : PTK_EVENT_MOUSEUP;
                 e.window = wl_app.pointer_focus;
-                e.mouse.x = (int)wl_app.pointer_x;
-                e.mouse.y = (int)wl_app.pointer_y;
+                e.mouse.x = (int)(wl_app.pointer_x * wl_app.output_scale);
+                e.mouse.y = (int)(wl_app.pointer_y * wl_app.output_scale);
                 if (button == (0x110)) { /* BTN_LEFT */
                         e.mouse.button = MOUSE_BUTTON_LEFT;
                 } else if (button == (0x111)) { /* BTN_RIGHT */
