@@ -431,6 +431,8 @@ static void ptk_waylandwindow_end_paint(ptk_window_t *wnd,
                 wl_surface_set_buffer_scale(wnd->surface, (int)wnd->scale);
         }
         wl_surface_attach(wnd->surface, wnd->buffer, 0, 0);
+        xdg_surface_set_window_geometry(wnd->xdg_surface, 0, 0, wnd->width,
+                                        wnd->height);
         wl_surface_damage_buffer(wnd->surface, paint->rect.x, paint->rect.y,
                                  paint->rect.width, paint->rect.height);
         wl_surface_commit(wnd->surface);
