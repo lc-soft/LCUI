@@ -4,3 +4,4 @@
 #define PTK_VERSION_ALTER ${VERSION_ALTER}
 ${define PTK_STATIC_BUILD}
 ${define PTK_HAS_LIBX11}
+${define PTK_HAS_WAYLAND}

@@ -1,3 +1,6 @@
+#define _GNU_SOURCE
+#include "ptk.h"
+
 #if defined(PTK_LINUX) && defined(PTK_HAS_WAYLAND)
 
 #include "wayland_internal.h"

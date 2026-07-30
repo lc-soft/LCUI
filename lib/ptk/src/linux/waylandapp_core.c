@@ -1,3 +1,6 @@
+#define _GNU_SOURCE
+#include "ptk.h"
+
 #if defined(PTK_LINUX) && defined(PTK_HAS_WAYLAND)
 
 #include "wayland_internal.h"
@@ -116,45 +119,6 @@ static int ptk_waylandapp_poll_events(int timeout_ms, bool dispatch_all)
         return result < 0 ? -1 : 1;
 }
 
-static int ptk_waylandapp_init(const wchar_t *name)
-{
-        memset(&wl_app, 0, sizeof(wl_app));
-        wl_app.output_scale = 1;
-        wl_app.display = wl_display_connect(NULL);
-        if (!wl_app.display) {
-                logger_error("[wayland] wl_display_connect() failed\n");
-                return -1;
-        }
-        wl_app.screen_width = WAYLAND_DEFAULT_SCREEN_WIDTH;
-        wl_app.screen_height = WAYLAND_DEFAULT_SCREEN_HEIGHT;
-        wl_app.registry = wl_display_get_registry(wl_app.display);
-        if (!wl_app.registry) {
-                logger_error("[wayland] wl_display_get_registry() failed\n");
-                wl_display_disconnect(wl_app.display);
-                wl_app.display = NULL;
-                return -1;
-        }
-        list_create(&wl_app.windows);
-        wl_registry_add_listener(wl_app.registry, &registry_listener, NULL);
-        if (wl_display_roundtrip(wl_app.display) < 0) {
-                logger_error("[wayland] wl_display_roundtrip() failed during "
-                             "registry init\n");
-                ptk_waylandapp_destroy();
-                return -1;
-        }
-        if (!wl_app.compositor || !wl_app.shm || !wl_app.wm_base) {
-                logger_error("[wayland] missing globals: compositor=%p shm=%p "
-                             "wm_base=%p\n",
-                             wl_app.compositor, wl_app.shm, wl_app.wm_base);
-                ptk_waylandapp_destroy();
-                return -1;
-        }
-        xdg_wm_base_add_listener(wl_app.wm_base, &wm_base_listener, NULL);
-        wl_app.running = true;
-        wl_app.exit_code = 0;
-        return 0;
-}
-
 static int ptk_waylandapp_destroy(void)
 {
         list_node_t *node, *next;
@@ -235,6 +199,45 @@ static int ptk_waylandapp_destroy(void)
                 wl_display_disconnect(wl_app.display);
         }
         memset(&wl_app, 0, sizeof(wl_app));
+        return 0;
+}
+
+static int ptk_waylandapp_init(const wchar_t *name)
+{
+        memset(&wl_app, 0, sizeof(wl_app));
+        wl_app.output_scale = 1;
+        wl_app.display = wl_display_connect(NULL);
+        if (!wl_app.display) {
+                logger_error("[wayland] wl_display_connect() failed\n");
+                return -1;
+        }
+        wl_app.screen_width = WAYLAND_DEFAULT_SCREEN_WIDTH;
+        wl_app.screen_height = WAYLAND_DEFAULT_SCREEN_HEIGHT;
+        wl_app.registry = wl_display_get_registry(wl_app.display);
+        if (!wl_app.registry) {
+                logger_error("[wayland] wl_display_get_registry() failed\n");
+                wl_display_disconnect(wl_app.display);
+                wl_app.display = NULL;
+                return -1;
+        }
+        list_create(&wl_app.windows);
+        wl_registry_add_listener(wl_app.registry, &registry_listener, NULL);
+        if (wl_display_roundtrip(wl_app.display) < 0) {
+                logger_error("[wayland] wl_display_roundtrip() failed during "
+                             "registry init\n");
+                ptk_waylandapp_destroy();
+                return -1;
+        }
+        if (!wl_app.compositor || !wl_app.shm || !wl_app.wm_base) {
+                logger_error("[wayland] missing globals: compositor=%p shm=%p "
+                             "wm_base=%p\n",
+                             wl_app.compositor, wl_app.shm, wl_app.wm_base);
+                ptk_waylandapp_destroy();
+                return -1;
+        }
+        xdg_wm_base_add_listener(wl_app.wm_base, &wm_base_listener, NULL);
+        wl_app.running = true;
+        wl_app.exit_code = 0;
         return 0;
 }
 

@@ -1,3 +1,6 @@
+#define _GNU_SOURCE
+#include "ptk.h"
+
 #if defined(PTK_LINUX) && defined(PTK_HAS_WAYLAND)
 
 #include "wayland_internal.h"
@@ -16,8 +19,7 @@ static void ptk_waylandapp_on_pointer_enter(
                 struct wl_cursor_image *image =
                     wl_app.default_cursor->images[0];
                 wl_pointer_set_cursor(wl_pointer, serial, wl_app.cursor_surface,
-                                      image->hotspot_x / wl_app.output_scale,
-                                      image->hotspot_y / wl_app.output_scale);
+                                      image->hotspot_x, image->hotspot_y);
                 wl_surface_set_buffer_scale(wl_app.cursor_surface,
                                             wl_app.output_scale);
                 wl_surface_attach(wl_app.cursor_surface,
@@ -391,8 +393,8 @@ static void ptk_waylandapp_on_seat_capabilities(void *data,
                 wl_pointer_add_listener(wl_app.pointer, &pointer_listener,
                                         NULL);
                 if (wl_app.shm && !wl_app.cursor_theme) {
-                        wl_app.cursor_theme = wl_cursor_theme_load(
-                            NULL, 32 * wl_app.output_scale, wl_app.shm);
+                        wl_app.cursor_theme =
+                            wl_cursor_theme_load(NULL, 32, wl_app.shm);
                         if (wl_app.cursor_theme) {
                                 wl_app.default_cursor =
                                     wl_cursor_theme_get_cursor(

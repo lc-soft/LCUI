@@ -41,6 +41,10 @@ target("libptk")
             add_files(xdg_shell_xml, {rule = "wayland.protocol"})
             add_files(xdg_decoration_xml, {rule = "wayland.protocol"})
             set_configvar("PTK_HAS_WAYLAND", 1)
+            add_files("src/linux/waylandapp_core.c")
+            add_files("src/linux/waylandapp_input.c")
+            add_files("src/linux/waylandapp_output.c")
+            add_files("src/linux/waylandapp_window.c")
         end
         add_syslinks("pthread", "dl")
     end
