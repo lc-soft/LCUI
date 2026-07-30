@@ -3,6 +3,8 @@ includes("rules/xmake.lua")
 local wayland_protocol_root = os.getenv("WAYLAND_PROTOCOLS_DIR") or "/usr/share/wayland-protocols"
 local xdg_shell_xml = path.join(wayland_protocol_root, "stable", "xdg-shell", "xdg-shell.xml")
 local xdg_decoration_xml = path.join(wayland_protocol_root, "unstable", "xdg-decoration", "xdg-decoration-unstable-v1.xml")
+local viewporter_xml = path.join(wayland_protocol_root, "stable", "viewporter", "viewporter.xml")
+local fractional_scale_xml = path.join(wayland_protocol_root, "staging", "fractional-scale", "fractional-scale-v1.xml")
 
 if is_plat("linux") then
     add_requires("libx11", "wayland", "xkbcommon", "wayland-cursor", {optional = true})
@@ -40,6 +42,8 @@ target("libptk")
             add_rules("wayland.protocol")
             add_files(xdg_shell_xml, {rule = "wayland.protocol"})
             add_files(xdg_decoration_xml, {rule = "wayland.protocol"})
+            add_files(viewporter_xml, {rule = "wayland.protocol"})
+            add_files(fractional_scale_xml, {rule = "wayland.protocol"})
             set_configvar("PTK_HAS_WAYLAND", 1)
             add_files("src/linux/waylandapp_core.c")
             add_files("src/linux/waylandapp_input.c")

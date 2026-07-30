@@ -21,7 +21,7 @@ static void ptk_waylandapp_on_pointer_enter(
                 wl_pointer_set_cursor(wl_pointer, serial, wl_app.cursor_surface,
                                       image->hotspot_x, image->hotspot_y);
                 wl_surface_set_buffer_scale(wl_app.cursor_surface,
-                                            wl_app.output_scale);
+                                            wl_app.pointer_focus->scale);
                 wl_surface_attach(wl_app.cursor_surface,
                                   wl_cursor_image_get_buffer(image), 0, 0);
                 wl_surface_damage_buffer(wl_app.cursor_surface, 0, 0,
@@ -29,14 +29,16 @@ static void ptk_waylandapp_on_pointer_enter(
                 wl_surface_commit(wl_app.cursor_surface);
         }
 
-        /* Wayland enter does not emit motion, but LCUI needs initial coordinate
-         * state applied immediately */
+        /* Wayland enter does not emit motion, but LCUI needs initial
+         * coordinate state applied immediately */
         if (wl_app.pointer_focus) {
                 ptk_event_t e = { 0 };
+                double scale = wl_app.pointer_focus->scale;
+
                 e.type = PTK_EVENT_MOUSEMOVE;
                 e.window = wl_app.pointer_focus;
-                e.mouse.x = (int)(wl_app.pointer_x * wl_app.output_scale);
-                e.mouse.y = (int)(wl_app.pointer_y * wl_app.output_scale);
+                e.mouse.x = (int)lround(wl_app.pointer_x * scale);
+                e.mouse.y = (int)lround(wl_app.pointer_y * scale);
                 ptk_post_event(&e);
         }
 }
@@ -62,10 +64,12 @@ static void ptk_waylandapp_on_pointer_motion(void *data,
         wl_app.pointer_y = wl_fixed_to_double(surface_y);
 
         if (wl_app.pointer_focus) {
+                double scale = wl_app.pointer_focus->scale;
+
                 e.type = PTK_EVENT_MOUSEMOVE;
                 e.window = wl_app.pointer_focus;
-                e.mouse.x = (int)(wl_app.pointer_x * wl_app.output_scale);
-                e.mouse.y = (int)(wl_app.pointer_y * wl_app.output_scale);
+                e.mouse.x = (int)lround(wl_app.pointer_x * scale);
+                e.mouse.y = (int)lround(wl_app.pointer_y * scale);
                 ptk_post_event(&e);
         }
 }
@@ -78,12 +82,14 @@ static void ptk_waylandapp_on_pointer_button(void *data,
         ptk_event_t e = { 0 };
 
         if (wl_app.pointer_focus) {
+                double scale = wl_app.pointer_focus->scale;
+
                 e.type = state == WL_POINTER_BUTTON_STATE_PRESSED
                              ? PTK_EVENT_MOUSEDOWN
                              : PTK_EVENT_MOUSEUP;
                 e.window = wl_app.pointer_focus;
-                e.mouse.x = (int)(wl_app.pointer_x * wl_app.output_scale);
-                e.mouse.y = (int)(wl_app.pointer_y * wl_app.output_scale);
+                e.mouse.x = (int)lround(wl_app.pointer_x * scale);
+                e.mouse.y = (int)lround(wl_app.pointer_y * scale);
                 if (button == (0x110)) { /* BTN_LEFT */
                         e.mouse.button = MOUSE_BUTTON_LEFT;
                 } else if (button == (0x111)) { /* BTN_RIGHT */

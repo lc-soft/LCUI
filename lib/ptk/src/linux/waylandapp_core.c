@@ -61,6 +61,18 @@ static void ptk_waylandapp_on_registry_global(void *data,
                 wl_seat_add_listener(wl_app.seat, &seat_listener, NULL);
                 return;
         }
+        if (strcmp(interface, wp_viewporter_interface.name) == 0) {
+                wl_app.viewporter = wl_registry_bind(
+                    registry, name, &wp_viewporter_interface, 1);
+                return;
+        }
+        if (strcmp(interface, wp_fractional_scale_manager_v1_interface.name) ==
+            0) {
+                wl_app.fractional_scale_manager = wl_registry_bind(
+                    registry, name, &wp_fractional_scale_manager_v1_interface,
+                    1);
+                return;
+        }
 }
 
 static void ptk_waylandapp_on_registry_global_remove(
@@ -122,29 +134,10 @@ static int ptk_waylandapp_poll_events(int timeout_ms, bool dispatch_all)
 static int ptk_waylandapp_destroy(void)
 {
         list_node_t *node, *next;
-        ptk_window_t *wnd;
 
         for (node = wl_app.windows.head.next; node; node = next) {
                 next = node->next;
-                wnd = node->data;
-                if (wnd) {
-                        if (wnd->decoration) {
-                                zxdg_toplevel_decoration_v1_destroy(
-                                    wnd->decoration);
-                        }
-                        if (wnd->xdg_toplevel) {
-                                xdg_toplevel_destroy(wnd->xdg_toplevel);
-                        }
-                        if (wnd->xdg_surface) {
-                                xdg_surface_destroy(wnd->xdg_surface);
-                        }
-                        if (wnd->surface) {
-                                wl_surface_destroy(wnd->surface);
-                        }
-                        ptk_waylandwindow_destroy_buffer(wnd);
-                        free(wnd->paint_ctx);
-                        free(wnd);
-                }
+                ptk_waylandwindow_destroy(node->data);
         }
         list_create(&wl_app.windows);
         if (wl_app.pointer) {
@@ -180,6 +173,13 @@ static int ptk_waylandapp_destroy(void)
         if (wl_app.output) {
                 wl_output_destroy(wl_app.output);
         }
+        if (wl_app.fractional_scale_manager) {
+                wp_fractional_scale_manager_v1_destroy(
+                    wl_app.fractional_scale_manager);
+        }
+        if (wl_app.viewporter) {
+                wp_viewporter_destroy(wl_app.viewporter);
+        }
         if (wl_app.decoration_manager) {
                 zxdg_decoration_manager_v1_destroy(wl_app.decoration_manager);
         }
@@ -205,7 +205,7 @@ static int ptk_waylandapp_destroy(void)
 static int ptk_waylandapp_init(const wchar_t *name)
 {
         memset(&wl_app, 0, sizeof(wl_app));
-        wl_app.output_scale = 1;
+        wl_app.output_scale = 1.0;
         wl_app.display = wl_display_connect(NULL);
         if (!wl_app.display) {
                 logger_error("[wayland] wl_display_connect() failed\n");

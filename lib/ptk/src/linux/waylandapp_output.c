@@ -34,16 +34,17 @@ static void ptk_waylandapp_on_output_scale(void *data,
 {
         list_node_t *node;
 
-        if (factor <= 0 || wl_app.output_scale == factor) {
+        if (factor <= 0 || wl_app.output_scale == (double)factor) {
                 return;
         }
-        wl_app.output_scale = factor;
+        wl_app.output_scale = (double)factor;
         /* Destroy buffers so they are recreated at the new scale on
          * the next paint. The compositor will send a configure event
          * with updated logical size. */
         for (list_each(node, &wl_app.windows)) {
                 ptk_window_t *wnd = node->data;
-                if (wnd) {
+                if (wnd && !wnd->fractional_scale) {
+                        wnd->scale = wl_app.output_scale;
                         ptk_waylandwindow_destroy_buffer(wnd);
                         ptk_waylandwindow_post_size_event(wnd);
                 }

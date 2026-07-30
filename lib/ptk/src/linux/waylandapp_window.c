@@ -21,27 +21,22 @@ void ptk_waylandwindow_destroy_buffer(ptk_window_t *wnd)
 
 static int ptk_waylandwindow_get_width(ptk_window_t *wnd)
 {
-        int scale = wl_app.output_scale > 0 ? wl_app.output_scale : 1;
-
-        return wnd->width * scale;
+        return (int)lround(wnd->width * wnd->scale);
 }
 
 static int ptk_waylandwindow_get_height(ptk_window_t *wnd)
 {
-        int scale = wl_app.output_scale > 0 ? wl_app.output_scale : 1;
-
-        return wnd->height * scale;
+        return (int)lround(wnd->height * wnd->scale);
 }
 
 void ptk_waylandwindow_post_size_event(ptk_window_t *wnd)
 {
         ptk_event_t e = { 0 };
-        int scale = wl_app.output_scale > 0 ? wl_app.output_scale : 1;
 
         e.type = PTK_EVENT_SIZE;
         e.window = wnd;
-        e.size.width = wnd->width * scale;
-        e.size.height = wnd->height * scale;
+        e.size.width = (int)lround(wnd->width * wnd->scale);
+        e.size.height = (int)lround(wnd->height * wnd->scale);
         ptk_post_event(&e);
 }
 
@@ -117,12 +112,29 @@ const struct xdg_toplevel_listener xdg_toplevel_listener = {
         ptk_waylandwindow_on_toplevel_wm_capabilities
 };
 
+static void ptk_waylandwindow_on_fractional_scale_preferred(
+    void *data, struct wp_fractional_scale_v1 *wp_fractional_scale_v1,
+    uint32_t scale)
+{
+        ptk_window_t *wnd = data;
+        double new_scale = scale / 120.0;
+
+        if (new_scale != wnd->scale) {
+                wnd->scale = new_scale;
+                ptk_waylandwindow_destroy_buffer(wnd);
+                ptk_waylandwindow_post_size_event(wnd);
+        }
+}
+
+const struct wp_fractional_scale_v1_listener fractional_scale_listener = {
+        ptk_waylandwindow_on_fractional_scale_preferred
+};
+
 ptk_window_t *ptk_waylandwindow_create(const wchar_t *title, int x, int y,
                                        int width, int height,
                                        ptk_window_t *parent)
 {
         ptk_window_t *wnd;
-        int scale = wl_app.output_scale > 0 ? wl_app.output_scale : 1;
         int physical_w;
         int physical_h;
 
@@ -133,10 +145,11 @@ ptk_window_t *ptk_waylandwindow_create(const wchar_t *title, int x, int y,
         if (!wnd) {
                 return NULL;
         }
+        wnd->scale = wl_app.output_scale > 0.0 ? wl_app.output_scale : 1.0;
         physical_w = width > 0 ? width : PTK_WINDOW_DEFAULT_WIDTH;
         physical_h = height > 0 ? height : PTK_WINDOW_DEFAULT_HEIGHT;
-        wnd->width = physical_w / scale;
-        wnd->height = physical_h / scale;
+        wnd->width = (int)lround(physical_w / wnd->scale);
+        wnd->height = (int)lround(physical_h / wnd->scale);
         wnd->surface = wl_compositor_create_surface(wl_app.compositor);
         if (!wnd->surface) {
                 free(wnd);
@@ -171,6 +184,25 @@ ptk_window_t *ptk_waylandwindow_create(const wchar_t *title, int x, int y,
                             ZXDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE);
                 }
         }
+        if (wl_app.viewporter) {
+                /* -1 means "source size follows the attached buffer"; the
+                 * viewport will scale the buffer to the destination set in
+                 * end_paint. */
+                wnd->viewport =
+                    wp_viewporter_get_viewport(wl_app.viewporter, wnd->surface);
+                wp_viewport_set_source(
+                    wnd->viewport, wl_fixed_from_int(-1), wl_fixed_from_int(-1),
+                    wl_fixed_from_int(-1), wl_fixed_from_int(-1));
+        }
+        if (wl_app.fractional_scale_manager) {
+                wnd->fractional_scale =
+                    wp_fractional_scale_manager_v1_get_fractional_scale(
+                        wl_app.fractional_scale_manager, wnd->surface);
+                wp_fractional_scale_v1_add_listener(
+                    wnd->fractional_scale, &fractional_scale_listener, wnd);
+        }
+        xdg_surface_set_window_geometry(wnd->xdg_surface, 0, 0, wnd->width,
+                                        wnd->height);
         if (title) {
                 size_t len = encode_utf8(NULL, title, 0) + 1;
                 char *utf8_title = malloc(sizeof(char) * len);
@@ -224,12 +256,18 @@ static void ptk_waylandwindow_set_title(ptk_window_t *wnd, const wchar_t *title)
         free(utf8_title);
 }
 
-static void ptk_waylandwindow_destroy(ptk_window_t *wnd)
+void ptk_waylandwindow_destroy(ptk_window_t *wnd)
 {
         if (!wnd) {
                 return;
         }
         list_unlink(&wl_app.windows, &wnd->node);
+        if (wnd->fractional_scale) {
+                wp_fractional_scale_v1_destroy(wnd->fractional_scale);
+        }
+        if (wnd->viewport) {
+                wp_viewport_destroy(wnd->viewport);
+        }
         if (wnd->decoration) {
                 zxdg_toplevel_decoration_v1_destroy(wnd->decoration);
         }
@@ -249,9 +287,8 @@ static void ptk_waylandwindow_destroy(ptk_window_t *wnd)
 
 static void ptk_waylandwindow_set_size(ptk_window_t *wnd, int width, int height)
 {
-        int scale = wl_app.output_scale > 0 ? wl_app.output_scale : 1;
-        int logical_w = width / scale;
-        int logical_h = height / scale;
+        int logical_w = (int)lround(width / wnd->scale);
+        int logical_h = (int)lround(height / wnd->scale);
 
         if (width <= 0 || height <= 0) {
                 return;
@@ -275,15 +312,15 @@ static void *ptk_waylandwindow_get_handle(ptk_window_t *wnd)
 
 static void ptk_waylandwindow_apply_size_hints(ptk_window_t *wnd)
 {
-        int scale = wl_app.output_scale > 0 ? wl_app.output_scale : 1;
-
         if (!wnd->xdg_toplevel) {
                 return;
         }
-        xdg_toplevel_set_min_size(wnd->xdg_toplevel, wnd->min_width / scale,
-                                  wnd->min_height / scale);
-        xdg_toplevel_set_max_size(wnd->xdg_toplevel, wnd->max_width / scale,
-                                  wnd->max_height / scale);
+        xdg_toplevel_set_min_size(wnd->xdg_toplevel,
+                                  (int)lround(wnd->min_width / wnd->scale),
+                                  (int)lround(wnd->min_height / wnd->scale));
+        xdg_toplevel_set_max_size(wnd->xdg_toplevel,
+                                  (int)lround(wnd->max_width / wnd->scale),
+                                  (int)lround(wnd->max_height / wnd->scale));
 }
 
 static void ptk_waylandwindow_set_min_width(ptk_window_t *wnd, int min_width)
@@ -312,7 +349,7 @@ static void ptk_waylandwindow_set_max_height(ptk_window_t *wnd, int max_height)
 
 static unsigned ptk_waylandwindow_get_dpi(ptk_window_t *wnd)
 {
-        return wl_app.output_scale * 96;
+        return (unsigned)lround(wnd->scale * 96);
 }
 
 static ptk_window_paint_t *ptk_waylandwindow_begin_paint(ptk_window_t *wnd,
@@ -326,8 +363,12 @@ static ptk_window_paint_t *ptk_waylandwindow_begin_paint(ptk_window_t *wnd,
         if (!wnd->configured || !rect) {
                 return NULL;
         }
-        buf_width = wnd->width * wl_app.output_scale;
-        buf_height = wnd->height * wl_app.output_scale;
+        buf_width = (int)lround(wnd->width * wnd->scale);
+        buf_height = (int)lround(wnd->height * wnd->scale);
+        if (buf_width <= 0)
+                buf_width = 1;
+        if (buf_height <= 0)
+                buf_height = 1;
         if (!wnd->buffer) {
                 size_t size = (size_t)buf_width * (size_t)buf_height * 4;
                 fd = memfd_create("lcui-wayland-buffer", MFD_CLOEXEC);
@@ -382,7 +423,13 @@ static void ptk_waylandwindow_end_paint(ptk_window_t *wnd,
         if (!wnd || !paint || !wnd->buffer) {
                 return;
         }
-        wl_surface_set_buffer_scale(wnd->surface, wl_app.output_scale);
+        if (wnd->viewport) {
+                wp_viewport_set_destination(wnd->viewport, wnd->width,
+                                            wnd->height);
+                wl_surface_set_buffer_scale(wnd->surface, 1);
+        } else {
+                wl_surface_set_buffer_scale(wnd->surface, (int)wnd->scale);
+        }
         wl_surface_attach(wnd->surface, wnd->buffer, 0, 0);
         wl_surface_damage_buffer(wnd->surface, paint->rect.x, paint->rect.y,
                                  paint->rect.width, paint->rect.height);
