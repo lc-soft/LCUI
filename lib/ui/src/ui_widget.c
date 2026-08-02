@@ -168,16 +168,11 @@ void ui_widget_get_offset(ui_widget_t *w, ui_widget_t *parent, float *offset_x,
                           float *offset_y)
 {
         float x = 0, y = 0;
-        while (w != parent) {
+
+        while (w && w != parent) {
                 x += w->border_box.x;
                 y += w->border_box.y;
                 w = w->parent;
-                if (w) {
-                        x += w->padding_box.x - w->border_box.x;
-                        y += w->padding_box.y - w->border_box.y;
-                } else {
-                        break;
-                }
         }
         if (offset_x) {
                 *offset_x = x;

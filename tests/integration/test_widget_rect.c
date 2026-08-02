@@ -25,6 +25,7 @@ void test_widget_rect(void)
         pd_rect_t expected_rect;
         ui_rect_t expected_ui_rect;
         list_t rects;
+        float offset_x, offset_y;
 
         lcui_init();
         root = ui_root();
@@ -39,6 +40,12 @@ void test_widget_rect(void)
         ui_widget_append(parent, child);
         ui_widget_append(root, parent);
         ui_update();
+
+        ui_widget_get_offset(child, root, &offset_x, &offset_y);
+        ctest_equal_float("should calculate child offset from border boxes",
+                          offset_x, child->border_box.x + parent->border_box.x);
+        ctest_equal_float("should calculate child y offset from border boxes",
+                          offset_y, child->border_box.y + parent->border_box.y);
 
         list_create(&rects);
         ui_widget_get_dirty_rects(root, &rects);
