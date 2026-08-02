@@ -52,13 +52,13 @@ LIBUI_PUBLIC void ui_event_destroy(ui_event_t *e);
  * @param[in] widget 目标部件
  * @param[in] event_id 事件标识号
  * @param[in] handler 事件处理函数
- * @param[in] data 事件处理函数的附加数据
- * @param[in] destroy_arg 数据的销毁函数
+ * @param[in] listener_data 事件监听器的上下文数据，处理函数通过 e->data 访问
+ * @param[in] destroy_arg 监听器上下文数据的销毁函数
  * @return 成功则返回 0，失败返回负数
  */
 LIBUI_PUBLIC ui_event_listener_t *ui_widget_add_event_listener(
-    ui_widget_t *widget, int event_id, ui_event_handler_t handler, void *data,
-    void (*destroy_arg)(void *));
+    ui_widget_t *widget, int event_id, ui_event_handler_t handler,
+    void *listener_data, void (*destroy_arg)(void *));
 
 /**
  * 解除部件事件绑定
@@ -69,20 +69,20 @@ LIBUI_PUBLIC ui_event_listener_t *ui_widget_add_event_listener(
  */
 LIBUI_PUBLIC int ui_widget_remove_event_listener(ui_widget_t *w, int event_id,
                                                  ui_event_handler_t handler,
-                                                 void *data);
+                                                 void *listener_data);
 
 /**
  * 添加部件事件绑定
  * @param[in] widget 目标部件
  * @param[in] event_name 事件名称
  * @param[in] handler 事件处理函数
- * @param[in] data 事件处理函数的附加数据
+ * @param[in] listener_data 事件监听器的上下文数据，处理函数通过 e->data 访问
  * @return 返回已移除的事件监听器数量
  */
 LIBUI_PUBLIC ui_event_listener_t *ui_widget_on(ui_widget_t *widget,
                                                const char *event_name,
                                                ui_event_handler_t handler,
-                                               void *data);
+                                               void *listener_data);
 
 /**
  * 解除部件事件绑定
@@ -92,26 +92,26 @@ LIBUI_PUBLIC ui_event_listener_t *ui_widget_on(ui_widget_t *widget,
  * @return 成功则返回 0，失败返回负数
  */
 LIBUI_PUBLIC int ui_widget_off(ui_widget_t *widget, const char *event_name,
-                               ui_event_handler_t handler, void *data);
+                               ui_event_handler_t handler, void *listener_data);
 
-LIBUI_PUBLIC int ui_emit_event(ui_event_t e, void *arg);
+LIBUI_PUBLIC int ui_emit_event(ui_event_t e, void *emit_arg);
 
-LIBUI_PUBLIC int ui_post_event(const ui_event_t *e, void *arg,
+LIBUI_PUBLIC int ui_post_event(const ui_event_t *e, void *emit_arg,
                                ui_event_arg_destructor_t destroy_arg);
 
 LIBUI_PUBLIC ui_event_listener_t *ui_add_event_listener(
-    ui_widget_t *widget, int event_id, ui_event_handler_t handler, void *arg,
-    ui_event_arg_destructor_t destroy_arg);
+    ui_widget_t *widget, int event_id, ui_event_handler_t handler,
+    void *emit_arg, ui_event_arg_destructor_t destroy_arg);
 
 LIBUI_PUBLIC int ui_remove_event_listener(ui_widget_t *w, int event_id,
                                           ui_event_handler_t handler,
-                                          void *data);
+                                          void *listener_data);
 
 LIBUI_PUBLIC ui_event_listener_t *ui_on_event(const char *event_name,
                                               ui_event_handler_t handler,
-                                              void *data);
+                                              void *listener_data);
 LIBUI_PUBLIC int ui_off_event(const char *event_name,
-                              ui_event_handler_t handler, void *data);
+                              ui_event_handler_t handler, void *listener_data);
 
 /** 清除事件对象，通常在部件销毁时调用该函数，以避免部件销毁后还有事件发送给它
  */

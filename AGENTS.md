@@ -81,6 +81,25 @@ static void on_event(ui_widget_t *w, ui_event_t *e, void *arg)
 > 例外：C++ 模式下某些编译器会警告未使用参数，需要按上下文决定。LCUI 是纯 C，
 > 不适用此例外。
 
+### 事件处理器参数
+
+`ui_widget_on(widget, event, handler, listener_data)` 的第四个参数是监听器上下文，
+事件分发时通过 `e->data` 传给处理函数：
+
+```c
+static void on_click(ui_widget_t *w, ui_event_t *e, void *emit_arg)
+{
+        app_state_t *state = e->data;
+}
+
+ui_widget_on(button, "click", on_click, state);
+```
+
+处理函数的第三个参数 `emit_arg` 来自 `ui_widget_emit_event(widget, event,
+emit_arg)`，不是 `ui_widget_on()` 的第四个参数。常规监听器必须从 `e->data`
+获取通过 `ui_widget_on()` 绑定的上下文；只有显式发射事件传入的上下文才使用
+处理函数的第三个参数。
+
 ## 测试用例
 
 ### 归属规则
