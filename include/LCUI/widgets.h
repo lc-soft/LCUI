@@ -16,6 +16,8 @@
 #include "widgets/progress.h"
 #include "widgets/scrollarea.h"
 #include "widgets/scrollbar.h"
+#include "widgets/select.h"
+#include "widgets/portal.h"
 #include "widgets/textinput.h"
 #include "widgets/textcaret.h"
 #include "widgets/label.h"

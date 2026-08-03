@@ -38,6 +38,7 @@
         { "slug": "label", "label": { "en": "Label", "zh-CN": "Label 标签" } },
         { "slug": "progress", "label": { "en": "Progress", "zh-CN": "Progress 进度条" } },
         { "slug": "radio-group", "label": { "en": "RadioGroup", "zh-CN": "RadioGroup 单选组" } },
+        { "slug": "select", "label": { "en": "Select", "zh-CN": "Select 下拉选择" } },
         { "slug": "scrollarea", "label": { "en": "ScrollArea", "zh-CN": "ScrollArea 滚动区域" } },
         { "slug": "text", "label": { "en": "Text", "zh-CN": "Text 文本" } },
         { "slug": "text-input", "label": { "en": "TextInput", "zh-CN": "TextInput 文本输入" } }

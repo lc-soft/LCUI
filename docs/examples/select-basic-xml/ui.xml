@@ -1,0 +1,16 @@
+<lcui-app>
+  <ui>
+    <select>
+      <select-trigger>
+        <select-value />
+      </select-trigger>
+      <portal>
+        <select-content>
+          <select-item value="light" label="Light" />
+          <select-item value="dark" label="Dark" />
+          <select-item value="system" label="System" />
+        </select-content>
+      </portal>
+    </select>
+  </ui>
+</lcui-app>

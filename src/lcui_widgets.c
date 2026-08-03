@@ -14,10 +14,12 @@
 
 void lcui_widgets_init(void)
 {
+        ui_register_portal();
         ui_register_text();
         ui_register_canvas();
         ui_register_anchor();
         ui_register_button();
+        ui_register_select();
         ui_register_progress();
         ui_register_scrollarea();
         ui_register_scrollbar();
@@ -43,4 +45,5 @@ void lcui_widgets_destroy(void)
 {
         ui_unregister_text();
         ui_unregister_anchor();
+        ui_unregister_select();
 }

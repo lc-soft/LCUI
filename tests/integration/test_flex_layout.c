@@ -980,7 +980,6 @@ static void test_flex_layout_gap(void)
 static void test_choice_card(void)
 {
         ui_widget_t *preview = ui_get_widget("choice-card-preview");
-        ui_widget_t *group = ui_get_widget("choice-card-group");
         ui_widget_t *card1 = ui_get_widget("choice-card-1");
         ui_widget_t *card2 = ui_get_widget("choice-card-2");
         float w1_init, w2_init;
