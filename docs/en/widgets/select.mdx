@@ -1,0 +1,68 @@
+# Select
+
+Select provides an expandable list of options for choosing one value from multiple candidates.
+
+<WidgetExample name="select-basic" />
+
+## Use cases
+
+- **Suitable**: Choosing one value from multiple options
+- **Suitable**: Forms with many options where page space should be preserved
+- **Not suitable**: Choosing multiple values at once (use `checkbox`)
+
+## Usage
+
+```tsx
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@lcui/react"
+```
+
+```tsx
+<Select>
+  <SelectTrigger>
+    <SelectValue placeholder="Choose a theme" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="light">Light</SelectItem>
+    <SelectItem value="dark">Dark</SelectItem>
+    <SelectItem value="system">System</SelectItem>
+  </SelectContent>
+</Select>
+```
+
+## Composition
+
+Use the following composition to build a `Select`:
+
+```
+Select
+├── SelectTrigger
+│   └── SelectValue
+└── SelectContent
+    └── SelectItem
+```
+
+## API Reference
+
+### Select
+
+The Select state container that manages the current value, placeholder, and content panel.
+
+<FieldTable name="select" />
+
+### SelectTrigger
+
+The trigger that opens or closes the content panel.
+
+<FieldTable name="select-trigger" />
+
+### SelectContent
+
+The option panel mounted at the root level through Portal.
+
+<FieldTable name="select-content" />
+
+### SelectItem
+
+An option representing one selectable value.
+
+<FieldTable name="select-item" />

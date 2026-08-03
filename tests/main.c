@@ -31,6 +31,8 @@ extern void test_label(void);
 extern void test_checkbox(void);
 extern void test_field(void);
 extern void test_radio_group(void);
+extern void test_portal(void);
+extern void test_select(void);
 
 static const ctest_suite_t suites[] = {
         { "settings", test_settings },
@@ -52,6 +54,8 @@ static const ctest_suite_t suites[] = {
         { "checkbox", test_checkbox },
         { "field", test_field },
         { "radio-group", test_radio_group },
+        { "portal", test_portal },
+        { "select", test_select },
         { NULL, NULL }
 };
 

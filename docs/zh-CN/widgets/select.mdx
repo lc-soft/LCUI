@@ -1,0 +1,68 @@
+# Select
+
+Select 提供一个可展开的下拉选项列表，用于从多个候选值中选择一项。
+
+<WidgetExample name="select-basic" />
+
+## 适用场景
+
+- **适用**：从多个选项中选择唯一值
+- **适用**：选项较多、需要节省页面空间的表单
+- **不适用**：需要同时选择多个值的场景（用 `checkbox`）
+
+## 用法
+
+```tsx
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@lcui/react"
+```
+
+```tsx
+<Select>
+  <SelectTrigger>
+    <SelectValue placeholder="选择主题" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="light">浅色</SelectItem>
+    <SelectItem value="dark">深色</SelectItem>
+    <SelectItem value="system">跟随系统</SelectItem>
+  </SelectContent>
+</Select>
+```
+
+## 组合
+
+使用以下组合来构建 `Select`：
+
+```
+Select
+├── SelectTrigger
+│   └── SelectValue
+└── SelectContent
+    └── SelectItem
+```
+
+## API 参考
+
+### Select
+
+Select 状态容器，管理当前选中值、placeholder 和下拉面板。
+
+<FieldTable name="select" />
+
+### SelectTrigger
+
+触发下拉面板打开或关闭的按钮。
+
+<FieldTable name="select-trigger" />
+
+### SelectContent
+
+通过 Portal 挂载到 root 层级的选项面板。
+
+<FieldTable name="select-content" />
+
+### SelectItem
+
+代表一个可选值的选项。
+
+<FieldTable name="select-item" />
