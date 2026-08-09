@@ -7,6 +7,11 @@ typedef struct {
         select_basic_demo_react_t base;
 } select_basic_demo_t;
 
+void select_basic_demo_update(ui_widget_t *w)
+{
+        select_basic_demo_react_update(w);
+}
+
 static void select_basic_demo_init(ui_widget_t *w)
 {
         select_basic_demo_t *_that = ui_widget_add_data(
@@ -21,11 +26,6 @@ static void select_basic_demo_destroy(ui_widget_t *w)
 {
         select_basic_demo_proto->proto->destroy(w);
         select_basic_demo_react_destroy(w);
-}
-
-static void select_basic_demo_update(ui_widget_t *w)
-{
-        select_basic_demo_react_update(w);
 }
 
 ui_widget_t *ui_create_select_basic_demo(void)
