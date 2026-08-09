@@ -214,6 +214,7 @@ int ui_widget_set_style_string(ui_widget_t *w, const char *property,
                         return -2;
                 }
                 ui_widget_set_style(w, propdef->key, &value);
+                css_style_value_destroy(&value);
                 return 0;
         }
         if (!w->custom_style) {
