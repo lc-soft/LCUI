@@ -338,6 +338,8 @@ int css_parse_background_position(const css_propdef_t *propdef,
                                            &x);
                         css_style_decl_add(s, css_prop_background_position_y,
                                            &y);
+                        css_style_value_destroy(&x);
+                        css_style_value_destroy(&y);
                 } else {
                         css_parse_background_position_1(x.array_value, s);
                         css_style_value_destroy(&x);
@@ -368,12 +370,14 @@ int css_parse_background(const css_propdef_t *propdef, const char *input,
                                                          cur, &value)) > 0) {
                         css_style_decl_add(s, css_prop_background_image,
                                            &value);
+                        css_style_value_destroy(&value);
                         has_image = 1;
                 } else if (!has_color &&
                            (len = css_parse_value(prop_color->valdef, cur,
                                                   &value)) > 0) {
                         css_style_decl_add(s, css_prop_background_color,
                                            &value);
+                        css_style_value_destroy(&value);
                         has_color = 1;
                 } else if (!has_position &&
                            (len = css_parse_background_position(NULL, cur, s) >
@@ -383,12 +387,14 @@ int css_parse_background(const css_propdef_t *propdef, const char *input,
                            (len = css_parse_value(prop_size->valdef, cur,
                                                   &value)) > 0) {
                         css_style_decl_add(s, css_prop_background_size, &value);
+                        css_style_value_destroy(&value);
                         has_size = 1;
                 } else if (!has_repeat &&
                            (len = css_parse_value(prop_repeat->valdef, cur,
                                                   &value)) > 0) {
                         css_style_decl_add(s, css_prop_background_repeat,
                                            &value);
+                        css_style_value_destroy(&value);
                         has_repeat = 1;
                 } else {
                         break;

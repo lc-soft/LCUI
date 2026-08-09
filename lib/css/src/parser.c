@@ -216,6 +216,7 @@ static int css_parser_parse_style_property_value(css_parser_t *parser)
                 } else {
                         css_style_decl_add(parser->style_parser.style,
                                            propdef->key, &value);
+                        css_style_value_destroy(&value);
                 }
         } else {
                 if (propdef->parse(propdef, parser->buffer,
