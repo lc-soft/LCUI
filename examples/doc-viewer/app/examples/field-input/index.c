@@ -7,6 +7,11 @@ typedef struct {
         field_input_demo_react_t base;
 } field_input_demo_t;
 
+void field_input_demo_update(ui_widget_t *w)
+{
+        field_input_demo_react_update(w);
+}
+
 static void field_input_demo_init(ui_widget_t *w)
 {
         field_input_demo_t *_that = ui_widget_add_data(
@@ -21,11 +26,6 @@ static void field_input_demo_destroy(ui_widget_t *w)
 {
         field_input_demo_proto->proto->destroy(w);
         field_input_demo_react_destroy(w);
-}
-
-static void field_input_demo_update(ui_widget_t *w)
-{
-        field_input_demo_react_update(w);
 }
 
 ui_widget_t *ui_create_field_input_demo(void)

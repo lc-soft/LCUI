@@ -778,6 +778,11 @@ typedef struct {
         ${ns}_react_t base;
 } ${ns}_t;
 
+void ${ns}_update(ui_widget_t *w)
+{
+        ${ns}_react_update(w);
+}
+
 static void ${ns}_init(ui_widget_t *w)
 {
         ${ns}_t *_that = ui_widget_add_data(
@@ -792,11 +797,6 @@ static void ${ns}_destroy(ui_widget_t *w)
 {
         ${ns}_proto->proto->destroy(w);
         ${ns}_react_destroy(w);
-}
-
-static void ${ns}_update(ui_widget_t *w)
-{
-        ${ns}_react_update(w);
 }
 
 ui_widget_t *ui_create_${ns}(void)

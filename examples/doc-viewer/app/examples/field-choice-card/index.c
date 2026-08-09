@@ -7,6 +7,11 @@ typedef struct {
         field_choice_card_demo_react_t base;
 } field_choice_card_demo_t;
 
+void field_choice_card_demo_update(ui_widget_t *w)
+{
+        field_choice_card_demo_react_update(w);
+}
+
 static void field_choice_card_demo_init(ui_widget_t *w)
 {
         field_choice_card_demo_t *_that = ui_widget_add_data(
@@ -21,11 +26,6 @@ static void field_choice_card_demo_destroy(ui_widget_t *w)
 {
         field_choice_card_demo_proto->proto->destroy(w);
         field_choice_card_demo_react_destroy(w);
-}
-
-static void field_choice_card_demo_update(ui_widget_t *w)
-{
-        field_choice_card_demo_react_update(w);
 }
 
 ui_widget_t *ui_create_field_choice_card_demo(void)
