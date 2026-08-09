@@ -51,7 +51,7 @@ void css_style_decl_add(css_style_decl_t *list, int key,
 {
         css_prop_t *prop = css_style_decl_alloc(list, key);
         if (value->type == CSS_ARRAY_VALUE) {
-                prop->value = *value;
+                css_style_value_copy(&prop->value, value);
         } else {
                 prop->value.type = CSS_ARRAY_VALUE;
                 prop->value.array_value = NULL;
