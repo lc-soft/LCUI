@@ -350,6 +350,8 @@ int pd_font_cache_get_bitmap(unsigned ch, int font_id, int size,
         ret = pd_font_cache_get_bitmap(0, font_id, size, bmp);
         if (ret != 0) {
                 *bmp = pd_font_cache_add_bitmap(0, font_id, size, &tmp);
+        } else {
+                pd_glyph_bitmap_destroy(&tmp);
         }
         return -1;
 }

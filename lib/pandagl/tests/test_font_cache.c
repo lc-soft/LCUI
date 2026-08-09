@@ -48,9 +48,14 @@ static void should_treat_different_sizes_as_different_entries(void)
 static void should_not_crash_on_unknown_codepoint(void)
 {
         const pd_glyph_bitmap_t *bmp = NULL;
+        const pd_glyph_bitmap_t *fallback = NULL;
         /* 超出 BMP 的字符大概率没有 glyph，应回退而非崩溃 */
         int ret = pd_font_cache_get_bitmap(0x10FFFD, -1, 14, &bmp);
         ctest_equal_bool("should return non-positive code", ret <= 0, true);
+        ret = pd_font_cache_get_bitmap(0x10FFFC, -1, 14, &fallback);
+        ctest_equal_bool("should reuse the fallback bitmap", ret <= 0 &&
+                                                           fallback == bmp,
+                         true);
 }
 
 static void should_evict_least_recently_used(void)
