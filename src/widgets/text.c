@@ -313,32 +313,29 @@ static void ui_text_on_paint(ui_widget_t *w, pd_context_t *paint,
 int ui_text_set_content_w(ui_widget_t *w, const wchar_t *text)
 {
         ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
-        wchar_t *newtext = y_wcsdup(text);
+        wchar_t *content, *newtext = NULL;
 
-        if (!newtext) {
-                return -ENOMEM;
-        }
-        if (txt->content) {
-                free(txt->content);
-        }
-        txt->content = y_wcsdup(text);
-        if (!txt->content) {
-                free(newtext);
-                return -ENOMEM;
-        }
-        do {
-                if (!text) {
-                        newtext[0] = 0;
-                        txt->content[0] = 0;
-                        break;
+        if (text) {
+                /* Snapshot the source before releasing the previous buffer.
+                 * Callers may pass txt->content itself, so reading text after
+                 * the free below would be a use-after-free. */
+                content = y_wcsdup(text);
+                if (!content) {
+                        return -ENOMEM;
                 }
-                wcscpy(txt->content, text);
-                if (!txt->trimming) {
-                        wcscpy(newtext, text);
-                        break;
+                newtext = y_wcsdup(content);
+                if (!newtext) {
+                        free(content);
+                        return -ENOMEM;
                 }
-                y_wcstrim(newtext, text, NULL);
-        } while (0);
+                if (txt->content) {
+                        free(txt->content);
+                }
+                txt->content = content;
+                if (txt->trimming) {
+                        y_wcstrim(newtext, content, NULL);
+                }
+        }
         if (txt->task.content) {
                 free(txt->task.content);
         }
