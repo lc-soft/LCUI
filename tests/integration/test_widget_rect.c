@@ -1,7 +1,7 @@
 ﻿/*
- * tests/cases/test_widget_rect.c
+ * tests/integration/test_widget_rect.c
  *
- * Copyright (c) 2023, Liu Chao <hello@lcui.dev> All rights reserved.
+ * Copyright (c) 2023-2026, Liu Chao <hello@lcui.dev> All rights reserved.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -16,6 +16,32 @@
 #include <ui.h>
 #include <ctest-custom.h>
 
+static const char *widget_rect_test_css = "\
+.widget-rect-test {\
+	background-color: #ffffff;\
+}\
+.widget-rect-test:hover {\
+	background-color: #eeeeee;\
+}\
+.widget-rect-test:active {\
+	position: relative;\
+	top: 1px;\
+	background-color: #dddddd;\
+}\
+";
+
+static bool rects_contain(list_t *rects, const pd_rect_t *expected)
+{
+        list_node_t *node;
+
+        for (list_each(node, rects)) {
+                if (memcmp(node->data, expected, sizeof(pd_rect_t)) == 0) {
+                        return true;
+                }
+        }
+        return false;
+}
+
 void test_widget_rect(void)
 {
         ui_widget_t *root;
@@ -23,17 +49,18 @@ void test_widget_rect(void)
         ui_event_t e = { 0 };
         pd_rect_t rect = { 0 };
         pd_rect_t expected_rect;
+        pd_rect_t expected_shift_rect;
         ui_rect_t expected_ui_rect;
         list_t rects;
         float offset_x, offset_y;
 
         lcui_init();
+        ui_load_css_string(widget_rect_test_css, __FILE__);
         root = ui_root();
-        parent = ui_create_widget("button");
+        parent = ui_create_widget(NULL);
         child = ui_create_widget("text");
 
-        ui_widget_set_style_keyword_value(parent, css_prop_box_sizing,
-                                          CSS_KEYWORD_BORDER_BOX);
+        ui_widget_add_class(parent, "widget-rect-test");
         ui_widget_resize(root, 200, 200);
         ui_widget_resize(parent, 100, 100);
         ui_widget_resize(child, 50, 50);
@@ -99,26 +126,35 @@ void test_widget_rect(void)
         ui_update();
         ui_widget_get_dirty_rects(root, &rects);
         ctest_equal_bool(
-            "should produce one dirty rect on mousedown at (40,40)",
-            rects.length == 1, true);
-        if (rects.length == 1) {
-                rect = *(pd_rect_t *)list_get(&rects, 0);
-        }
-        ctest_equal_pd_rect("should match expected dirty rect", &rect,
-                            &expected_rect);
+            "should produce two dirty rects on mousedown at (40,40)",
+            rects.length == 2, true);
+        expected_ui_rect.x = 0;
+        expected_ui_rect.y = 0;
+        expected_ui_rect.width = 100;
+        expected_ui_rect.height = 100;
+        ui_compute_rect(&expected_rect, &expected_ui_rect);
+        expected_ui_rect.y = 1;
+        ui_compute_rect(&expected_shift_rect, &expected_ui_rect);
+        ctest_equal_bool("should dirty the original area on mousedown",
+                         rects_contain(&rects, &expected_rect), true);
+        ctest_equal_bool("should dirty the shifted area on mousedown",
+                         rects_contain(&rects, &expected_shift_rect), true);
         list_destroy(&rects, free);
 
         e.type = UI_EVENT_MOUSEUP;
         ui_dispatch_event(&e);
         ui_update();
         ui_widget_get_dirty_rects(root, &rects);
-        ctest_equal_bool("should produce one dirty rect on mouseup at (40,40)",
-                         rects.length == 1, true);
-        if (rects.length == 1) {
-                rect = *(pd_rect_t *)list_get(&rects, 0);
-        }
-        ctest_equal_pd_rect("should match expected dirty rect", &rect,
-                            &expected_rect);
+        ctest_equal_bool("should produce two dirty rects on mouseup at (40,40)",
+                         rects.length == 2, true);
+        expected_ui_rect.y = 0;
+        ui_compute_rect(&expected_rect, &expected_ui_rect);
+        expected_ui_rect.y = 1;
+        ui_compute_rect(&expected_shift_rect, &expected_ui_rect);
+        ctest_equal_bool("should dirty the original area on mouseup",
+                         rects_contain(&rects, &expected_rect), true);
+        ctest_equal_bool("should dirty the shifted area on mouseup",
+                         rects_contain(&rects, &expected_shift_rect), true);
         list_destroy(&rects, free);
 
         e.type = UI_EVENT_MOUSEMOVE;
@@ -147,8 +183,8 @@ void test_widget_rect(void)
                             &expected_rect);
         list_destroy(&rects, free);
 
-        expected_ui_rect.x = 21;
-        expected_ui_rect.y = 11;
+        expected_ui_rect.x = 0;
+        expected_ui_rect.y = 0;
         expected_ui_rect.width = 50;
         expected_ui_rect.height = 50;
         ui_compute_rect(&expected_rect, &expected_ui_rect);

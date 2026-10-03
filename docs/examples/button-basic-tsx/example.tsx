@@ -1,5 +1,13 @@
-import { Button } from "@lcui/react";
+import { Button, Widget } from "@lcui/react";
+import { ArrowUp } from "@lcui/fluent-icons";
 
 export default function App() {
-  return <Button>Click me</Button>;
+  return (
+    <Widget className="flex items-center gap-4">
+      <Button>Button</Button>
+      <Button size="icon">
+        <ArrowUp />
+      </Button>
+    </Widget>
+  );
 }

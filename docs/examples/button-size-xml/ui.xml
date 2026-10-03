@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <widget class="button-size-demo">
+      <widget class="button-size-group">
+        <button size="xs">Extra Small</button>
+        <button size="icon-xs"><icon name="arrow-up-right" /></button>
+      </widget>
+      <widget class="button-size-group">
+        <button size="sm">Small</button>
+        <button size="icon-sm"><icon name="arrow-up-right" /></button>
+      </widget>
+      <widget class="button-size-group">
+        <button>Default</button>
+        <button size="icon"><icon name="arrow-up-right" /></button>
+      </widget>
+      <widget class="button-size-group">
+        <button size="lg">Large</button>
+        <button size="icon-lg"><icon name="arrow-up-right" /></button>
+      </widget>
+    </widget>
+  </ui>
+</lcui-app>

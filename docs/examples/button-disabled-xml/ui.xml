@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <widget class="button-disabled-demo">
+      <button disabled="true">Outline</button>
+      <button variant="primary" disabled="true">Primary</button>
+      <button variant="secondary" disabled="true">Secondary</button>
+      <button variant="ghost" disabled="true">Ghost</button>
+      <button variant="destructive" disabled="true">Destructive</button>
+      <button variant="link" disabled="true">Link</button>
+    </widget>
+  </ui>
+</lcui-app>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <widget class="button-with-icon-demo">
+      <button><icon name="branch" /><text>New Branch</text></button>
+      <button><text>Fork</text><icon name="branch-fork" /></button>
+    </widget>
+  </ui>
+</lcui-app>

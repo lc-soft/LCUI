@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <widget class="button-icon-demo">
+      <button size="icon"><icon name="arrow-up-right" /></button>
+      <button size="icon" variant="ghost"><icon
+          name="arrow-up-right"
+        /></button>
+      <button size="icon" variant="destructive">
+        <icon name="arrow-up-right" />
+      </button>
+    </widget>
+  </ui>
+</lcui-app>

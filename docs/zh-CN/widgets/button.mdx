@@ -20,6 +20,36 @@ import { Button } from "@lcui/react"
 <Button>Button</Button>
 ```
 
+## 变体
+
+Button 默认使用描边（outline）外观，无需显式指定；主操作使用 `primary`，次级操作使用 `secondary`，低强调操作可使用 `ghost`，危险操作可使用 `destructive`，`link` 则会在 hover 时显示下划线。
+
+<WidgetExample name="button-variants" />
+
+## 图标
+
+`icon` 是尺寸而不是视觉变体。通过 `size="icon"` 将按钮设置为紧凑的方形，可与任意变体组合。
+
+<WidgetExample name="button-icon" />
+
+### 带图标
+
+图标与文字通过按钮内部的弹性布局自动横排对齐，图标在文字前即为图标前置，在文字后即为图标后置，两者的间距都由按钮的 gap 控制。
+
+<WidgetExample name="button-with-icon" />
+
+## 尺寸
+
+使用 `size` 属性设置按钮的大小。
+
+<WidgetExample name="button-size" />
+
+## 禁用状态
+
+为按钮设置 `disabled` 后，其整体透明度降低，且不再响应鼠标与键盘交互；各变体的禁用表现一致。
+
+<WidgetExample name="button-disabled" />
+
 ## API 参考
 
 <FieldTable name="button" />

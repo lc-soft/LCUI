@@ -1,6 +1,11 @@
 import { Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "../../../components/code-block-copy";
 import ButtonBasicDemo from "../../../examples/button-basic/index";
+import ButtonVariantsDemo from "../../../examples/button-variants/index";
+import ButtonIconDemo from "../../../examples/button-icon/index";
+import ButtonWithIconDemo from "../../../examples/button-with-icon/index";
+import ButtonSizeDemo from "../../../examples/button-size/index";
+import ButtonDisabledDemo from "../../../examples/button-disabled/index";
 import FieldTable from "../../../components/field-table";
 import { buttonFields } from "../../../widget-fields/button";
 
@@ -38,6 +43,29 @@ export default function ButtonDocPage() {
             <Text className="code-line">{`<[color=#8250df]Button[/color]>[color=#8250df]Button[/color]</[color=#8250df]Button[/color]>`}</Text>
           </Widget>
         </Widget>
+      </Widget>
+      <Widget className="doc-section">
+        <h2>Variants</h2>
+        <p>{`Buttons use the outline appearance by default, so there is no need to specify it. Use [bgcolor=#eee] primary [/bgcolor] for the main action and [bgcolor=#eee] secondary [/bgcolor] for a lower-emphasis filled action. Choose [bgcolor=#eee] ghost [/bgcolor] for a subtle action, [bgcolor=#eee] destructive [/bgcolor] for a dangerous action, or [bgcolor=#eee] link [/bgcolor] for a text-style button that becomes underlined on hover.`}</p>
+        <ButtonVariantsDemo />
+      </Widget>
+      <Widget className="doc-section">
+        <h2>Icon</h2>
+        <p>{`[bgcolor=#eee] icon [/bgcolor] is a size, not a visual variant. Set [bgcolor=#eee] size="icon" [/bgcolor] to render a compact square button, and combine it with any variant.`}</p>
+        <ButtonIconDemo />
+        <h3>With Icon</h3>
+        <p>{`Icons and labels are laid out side by side by the button's inner flex layout. Place the icon before the text for a leading icon, or after it for a trailing icon; the gap between them is controlled by the button.`}</p>
+        <ButtonWithIconDemo />
+      </Widget>
+      <Widget className="doc-section">
+        <h2>Size</h2>
+        <p>{`Use the [bgcolor=#eee] size [/bgcolor] prop to change the button size.`}</p>
+        <ButtonSizeDemo />
+      </Widget>
+      <Widget className="doc-section">
+        <h2>Disabled</h2>
+        <p>{`Setting [bgcolor=#eee] disabled [/bgcolor] on a button lowers its opacity and stops it from responding to mouse and keyboard interaction; all variants look the same way when disabled.`}</p>
+        <ButtonDisabledDemo />
       </Widget>
       <Widget className="doc-section">
         <h2>API Reference</h2>

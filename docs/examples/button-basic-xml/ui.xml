@@ -1,6 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <lcui-app>
   <ui>
-    <button>Click me</button>
+    <widget class="button-basic-demo">
+      <button>Button</button>
+      <button size="icon"><icon name="arrow-up" /></button>
+    </widget>
   </ui>
 </lcui-app>

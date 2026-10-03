@@ -17,7 +17,7 @@
 static void ui_widget_compute_border(ui_widget_t *w, pd_border_t *b)
 {
         css_computed_style_t *s = &w->computed_style;
-        float r = y_min(w->border_box.width, w->border_box.width) / 2.0f;
+        float r = y_min(w->border_box.width, w->border_box.height) / 2.0f;
 
         b->top.color.value = s->border_top_color;
         b->left.color.value = s->border_left_color;

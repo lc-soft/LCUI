@@ -20,6 +20,36 @@ import { Button } from "@lcui/react"
 <Button>Button</Button>
 ```
 
+## Variants
+
+Buttons use the outline appearance by default, so there is no need to specify it. Use `primary` for the main action and `secondary` for a lower-emphasis filled action. Choose `ghost` for a subtle action, `destructive` for a dangerous action, or `link` for a text-style button that becomes underlined on hover.
+
+<WidgetExample name="button-variants" />
+
+## Icon
+
+`icon` is a size, not a visual variant. Set `size="icon"` to render a compact square button, and combine it with any variant.
+
+<WidgetExample name="button-icon" />
+
+### With Icon
+
+Icons and labels are laid out side by side by the button's inner flex layout. Place the icon before the text for a leading icon, or after it for a trailing icon; the gap between them is controlled by the button.
+
+<WidgetExample name="button-with-icon" />
+
+## Size
+
+Use the `size` prop to change the button size.
+
+<WidgetExample name="button-size" />
+
+## Disabled
+
+Setting `disabled` on a button lowers its opacity and stops it from responding to mouse and keyboard interaction; all variants look the same way when disabled.
+
+<WidgetExample name="button-disabled" />
+
 ## API Reference
 
 <FieldTable name="button" />
