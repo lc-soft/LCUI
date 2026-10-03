@@ -220,7 +220,11 @@ int ui_widget_set_style_string(ui_widget_t *w, const char *property,
         if (!w->custom_style) {
                 w->custom_style = css_style_decl_create();
         }
-        propdef->parse(propdef, css_text, w->custom_style);
+        if (propdef->parse(propdef, css_text, w->custom_style) <= 0) {
+                return -2;
+        }
+        /* 与长写分支保持一致：写入自定义样式后必须请求刷新计算样式 */
+        ui_widget_request_update_style(w);
         return 0;
 }
 

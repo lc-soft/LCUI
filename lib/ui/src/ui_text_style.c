@@ -11,6 +11,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 #include <css.h>
 #include <ui/text_style.h>
 #include <pandagl.h>
@@ -80,12 +81,19 @@ static void ui_compute_content(ui_text_style_t *fs, const char *str)
 
 void ui_text_style_init(ui_text_style_t *fs)
 {
+        fs->font_size = 0;
+        fs->line_height = 0;
         fs->color.value = 0;
         fs->content = NULL;
         fs->font_ids = NULL;
         fs->font_style = PD_FONT_STYLE_NORMAL;
         fs->font_weight = PD_FONT_WEIGHT_NORMAL;
+        fs->text_align = PD_TEXT_ALIGN_LEFT;
+        fs->white_space = CSS_WHITE_SPACE_NORMAL;
         fs->word_break = PD_WORD_BREAK_NORMAL;
+        fs->text_decoration = CSS_TEXT_DECORATION_NONE;
+        fs->text_underline_offset = 0;
+        fs->text_decoration_thickness = 0;
 }
 
 void ui_text_style_destroy(ui_text_style_t *fs)
@@ -109,7 +117,10 @@ bool ui_text_style_is_equal(const ui_text_style_t *a, const ui_text_style_t *b)
             a->text_align != b->text_align ||
             a->white_space != b->white_space ||
             a->font_style != b->font_style ||
-            a->font_weight != b->font_weight || a->font_size != b->font_size) {
+            a->font_weight != b->font_weight || a->font_size != b->font_size ||
+            a->text_decoration != b->text_decoration ||
+            a->text_underline_offset != b->text_underline_offset ||
+            a->text_decoration_thickness != b->text_decoration_thickness) {
                 return false;
         }
         if (a->content && b->content) {
@@ -131,12 +142,50 @@ bool ui_text_style_is_equal(const ui_text_style_t *a, const ui_text_style_t *b)
         return true;
 }
 
+static int ui_text_decoration_auto_length(void)
+{
+        int length = (int)roundf(ui_get_actual_scale());
+
+        return length > 0 ? length : 1;
+}
+
 void ui_compute_text_style(ui_text_style_t *fs,
                            const css_computed_style_t *style)
 {
         fs->color.value = style->color;
         fs->white_space = style->type_bits.white_space;
+        fs->text_decoration = style->type_bits.text_decoration;
         ui_compute_content(fs, style->content);
+
+        switch (style->type_bits.text_underline_offset) {
+        case CSS_TEXT_UNDERLINE_OFFSET_SET:
+                fs->text_underline_offset = (int)roundf(
+                    ui_get_actual_scale() * style->text_underline_offset);
+                break;
+        case CSS_TEXT_UNDERLINE_OFFSET_AUTO:
+        default:
+                fs->text_underline_offset = ui_text_decoration_auto_length();
+                break;
+        }
+
+        switch (style->type_bits.text_decoration_thickness) {
+        case CSS_TEXT_DECORATION_THICKNESS_SET:
+                if (style->text_decoration_thickness <= 0) {
+                        fs->text_decoration_thickness = 0;
+                        break;
+                }
+                fs->text_decoration_thickness = (int)roundf(
+                    ui_get_actual_scale() * style->text_decoration_thickness);
+                if (fs->text_decoration_thickness < 1) {
+                        fs->text_decoration_thickness = 1;
+                }
+                break;
+        case CSS_TEXT_DECORATION_THICKNESS_AUTO:
+        default:
+                fs->text_decoration_thickness =
+                    ui_text_decoration_auto_length();
+                break;
+        }
 
         switch (style->type_bits.font_size) {
         case CSS_FONT_SIZE_DIMENSION:

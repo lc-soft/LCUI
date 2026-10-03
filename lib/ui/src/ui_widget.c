@@ -238,6 +238,42 @@ bool ui_widget_in_viewport(ui_widget_t *w)
         return true;
 }
 
+/* 依据 computed 的下划线相关属性估算其超出内容底部的绘制空间（逻辑像素）。
+ * 不依赖文本层实际折行结果，允许过度预留：只要 canvas_box 在大多数情况下
+ * 能容纳下划线即可。offset/thickness 取 auto 时用基于字号的保守估计。 */
+static float ui_widget_underline_overflow_bottom(ui_widget_t *w)
+{
+        const css_computed_style_t *s = &w->computed_style;
+        float font, offset, thickness;
+
+        if (s->type_bits.text_decoration != CSS_TEXT_DECORATION_UNDERLINE) {
+                return 0.f;
+        }
+        font = s->font_size;
+        if (font <= 0.f) {
+                font = 16.f;
+        }
+        if (s->type_bits.text_underline_offset ==
+            CSS_TEXT_UNDERLINE_OFFSET_SET) {
+                offset = s->text_underline_offset;
+        } else {
+                offset = font * 0.2f;
+        }
+        if (s->type_bits.text_decoration_thickness ==
+            CSS_TEXT_DECORATION_THICKNESS_SET) {
+                thickness = s->text_decoration_thickness;
+        } else {
+                thickness = font * 0.1f;
+        }
+        if (offset < 0.f) {
+                offset = 0.f;
+        }
+        if (thickness < 0.f) {
+                thickness = 0.f;
+        }
+        return offset + thickness;
+}
+
 static void ui_widget_update_canvas_box_width(ui_widget_t *w)
 {
         const css_computed_style_t *s = &w->computed_style;
@@ -251,9 +287,10 @@ static void ui_widget_update_canvas_box_height(ui_widget_t *w)
 {
         const css_computed_style_t *s = &w->computed_style;
         const float y = fabsf(s->box_shadow_x);
+        float overflow = ui_widget_underline_overflow_bottom(w);
 
-        w->canvas_box.height =
-            w->border_box.height + SHADOW_WIDTH(s) + y_max(y, SHADOW_WIDTH(s));
+        w->canvas_box.height = w->border_box.height + SHADOW_WIDTH(s) +
+                               y_max(y, SHADOW_WIDTH(s)) + overflow;
 }
 
 static void ui_widget_update_canvas_box_x(ui_widget_t *w)

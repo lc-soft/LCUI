@@ -35,6 +35,9 @@ typedef struct ui_text_style {
         uint8_t text_align;
         uint8_t white_space;
         uint8_t word_break;
+        uint8_t text_decoration;
+        int text_underline_offset;
+        int text_decoration_thickness;
 } ui_text_style_t;
 
 LIBUI_PUBLIC void ui_text_style_init(ui_text_style_t *fs);

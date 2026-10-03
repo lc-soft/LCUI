@@ -41,8 +41,8 @@ static struct ui_text_module {
 
 static bool parse_boolean(const char *str)
 {
-        if (strcmp(str, "on") == 0 && strcmp(str, "true") == 0 &&
-            strcmp(str, "yes") == 0 && strcmp(str, "1") == 0) {
+        if (strcmp(str, "on") == 0 || strcmp(str, "true") == 0 ||
+            strcmp(str, "yes") == 0 || strcmp(str, "1") == 0) {
                 return true;
         }
         return false;
@@ -73,7 +73,7 @@ static void ui_text_on_parse_text(ui_widget_t *w, const char *text)
         ui_text_set_content(w, text);
 }
 
-static void ui_text_on_update_content(ui_widget_t *w)
+static void ui_text_update_rendering(ui_widget_t *w)
 {
         list_t rects;
         list_node_t *node;
@@ -88,6 +88,11 @@ static void ui_text_on_update_content(ui_widget_t *w)
                 ui_widget_mark_dirty_rect(w, &rect, UI_BOX_TYPE_CONTENT_BOX);
         }
         pd_rects_clear(&rects);
+}
+
+static void ui_text_on_update_content(ui_widget_t *w)
+{
+        ui_text_update_rendering(w);
         ui_widget_request_reflow(w);
 }
 
@@ -97,6 +102,7 @@ static void ui_text_on_update_style(ui_widget_t *w)
         pd_text_style_t text_style;
         ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
         bool content_changed;
+        bool decoration_changed;
 
         ui_text_style_init(&style);
         ui_compute_text_style(&style, &w->computed_style);
@@ -104,10 +110,24 @@ static void ui_text_on_update_style(ui_widget_t *w)
                 ui_text_style_destroy(&style);
                 return;
         }
-        content_changed = style.content || txt->style.content;
+        if (style.content && txt->style.content) {
+                content_changed =
+                    wcscmp(style.content, txt->style.content) != 0;
+        } else {
+                content_changed = style.content != txt->style.content;
+        }
+        decoration_changed =
+            style.text_decoration != txt->style.text_decoration ||
+            style.text_underline_offset != txt->style.text_underline_offset ||
+            style.text_decoration_thickness !=
+                txt->style.text_decoration_thickness;
         convert_font_style_to_text_style(&style, &text_style);
-        pd_text_set_align(txt->layer, style.text_align);
-        pd_text_set_line_height(txt->layer, style.line_height);
+        if (style.text_align != txt->style.text_align) {
+                pd_text_set_align(txt->layer, style.text_align);
+        }
+        if (style.line_height != txt->style.line_height) {
+                pd_text_set_line_height(txt->layer, style.line_height);
+        }
         pd_text_set_autowrap(txt->layer,
                              style.white_space != CSS_WHITE_SPACE_NOWRAP);
         pd_text_set_word_break(txt->layer,
@@ -118,6 +138,15 @@ static void ui_text_on_update_style(ui_widget_t *w)
                 ui_text_set_content_w(w, style.content);
         }
         pd_text_set_style(txt->layer, &text_style);
+        pd_text_set_underline(
+            txt->layer, style.text_decoration == CSS_TEXT_DECORATION_UNDERLINE,
+            style.text_underline_offset, style.text_decoration_thickness);
+        if (!content_changed) {
+                ui_text_update_rendering(w);
+        }
+        if (decoration_changed) {
+                ui_widget_mark_dirty_rect(w, NULL, UI_BOX_TYPE_BORDER_BOX);
+        }
         ui_text_style_destroy(&txt->style);
         pd_text_style_destroy(&text_style);
         txt->style = style;
@@ -133,11 +162,15 @@ static void ui_text_on_update(ui_widget_t *w, ui_task_type_t task)
                 break;
         case UI_TASK_AFTER_UPDATE:
                 if (txt->task.update_content) {
-                        pd_text_write(txt->layer, txt->task.content, NULL);
-                        ui_text_on_update_content(w);
-                        free(txt->task.content);
+                        wchar_t *content = txt->task.content;
+
+                        /* 先接管指针再处理：更新链内可能重入
+                         * ui_text_set_content_w 并替换 task.content */
                         txt->task.content = NULL;
                         txt->task.update_content = false;
+                        pd_text_write(txt->layer, content, NULL);
+                        ui_text_on_update_content(w);
+                        free(content);
                 }
         default:
                 break;
@@ -240,22 +273,11 @@ static void ui_text_on_resize(ui_widget_t *w, float width, float height)
         int fixed_width = (int)(width * scale);
         int fixed_height = (int)(height * scale);
 
-        ui_rect_t rect;
         ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
 
-        list_t rects;
-        list_node_t *node;
-
-        list_create(&rects);
         pd_text_set_fixed_size(txt->layer, fixed_width, fixed_height);
         pd_text_set_max_size(txt->layer, fixed_width, fixed_height);
-        pd_text_update(txt->layer, &rects);
-
-        for (list_each(node, &rects)) {
-                ui_rect_from_pd_rect(&rect, node->data, scale);
-                ui_widget_mark_dirty_rect(w, &rect, UI_BOX_TYPE_CONTENT_BOX);
-        }
-        pd_rects_clear(&rects);
+        ui_text_update_rendering(w);
         // logger_debug("[ui-text] resize: %g, %g\n", width, height);
 }
 
@@ -271,6 +293,9 @@ static void ui_text_on_paint(ui_widget_t *w, pd_context_t *paint,
         content_rect.height = style->content_box.height;
         content_rect.x = style->content_box.x - style->canvas_box.x;
         content_rect.y = style->content_box.y - style->canvas_box.y;
+        /* 下划线可能绘制在文字行框之下（利用部件 padding 空间），不改变布局尺寸
+         */
+        content_rect.height += pd_text_get_underline_overflow(txt->layer);
         if (!pd_rect_overlap(&content_rect, &paint->rect, &rect)) {
                 return;
         }
