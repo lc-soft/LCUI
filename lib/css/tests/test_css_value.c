@@ -84,6 +84,16 @@ static void test_css_valdef_color(const css_valdef_t *valdef)
 
         ctest_equal_uint("match('rgba(100, 200, 255, 0.5)')", color,
                          css_color(127, 100, 200, 255));
+
+        color = 0;
+        if (css_parse_value(valdef, "rgb(245 245 245 / 0.3)", &val) > 0 &&
+            val.array_value[0].type == CSS_COLOR_VALUE) {
+                color = val.array_value[0].color_value;
+        }
+        css_style_value_destroy(&val);
+
+        ctest_equal_uint("match('rgb(245 245 245 / 0.3)')", color,
+                         css_color(76, 245, 245, 245));
 }
 
 static void test_css_valdef_none(const css_valdef_t *valdef)

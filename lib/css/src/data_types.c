@@ -202,12 +202,23 @@ static bool css_parse_rgba(css_style_value_t *val, const char *str)
 
 static bool css_parse_rgb(css_style_value_t *val, const char *str)
 {
-        float data[3];
+        float data[3], alpha;
         char num_str[16];
         int i, j, count;
 
         if (!strstr(str, "rgb(")) {
                 return false;
+        }
+        if (strchr(str, '/')) {
+                if (sscanf(str, "rgb(%f %f %f / %f)", &data[0], &data[1],
+                           &data[2], &alpha) != 4) {
+                        return false;
+                }
+                val->type = CSS_COLOR_VALUE;
+                val->color_value =
+                    css_color((uint8_t)(255 * alpha), (uint8_t)data[0],
+                              (uint8_t)data[1], (uint8_t)data[2]);
+                return true;
         }
         for (count = 0, i = 4, j = 0; str[i]; ++i) {
                 if (str[i] == ',' || str[i] == ')') {
