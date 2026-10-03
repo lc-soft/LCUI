@@ -10,7 +10,11 @@ npm install @lcui/fluent-icons
 
 ## Choosing icons
 
-Search and select icons on [flicon.io](https://www.flicon.io/). For example, the zoom-in icon is typically named "Zoom In" in English.
+Search and select icons in the browser below. For example, the zoom-in icon is typically named "Zoom In" in English.
+
+<IconBrowser />
+
+Fluent UI System Icons provides direction-related metadata, but its icon data has no category field, so the detail panel does not show category tags.
 
 fluentui-system-icons icons are available in sizes like 16, 20, and 24, named in the format "icon name + size + style". `@lcui/fluent-icons` uses the naming format "icon name + style", and when the style is Regular it can be omitted.
 
@@ -22,8 +26,18 @@ import { ZoomIn } from "@lcui/fluent-icons";
 <ZoomIn />
 ```
 
-The default size is 20. If the icon size is fixed and you want better rendering, specify the size parameter:
+The default glyph is regular 24; when an icon has no regular 24 glyph, the closest available regular size is used (ties choose the smaller size). `size` selects a design glyph size and, when explicitly set, also sets its display size. `fontSize` changes only the rendered size without changing glyph selection. If neither is set, the icon inherits the surrounding text size, so `className` or `style` can also control the display size:
 
 ```tsx
 <ZoomIn size={32} />
+```
+
+In C, create a Fluent icon with the convenience constructor. In XML, omitting `library` defaults to Fluent; specify it only when using another icon library:
+
+```c
+ui_widget_t *icon = ui_create_fluent_icon("dismiss");
+```
+
+```xml
+<icon name="dismiss" />
 ```

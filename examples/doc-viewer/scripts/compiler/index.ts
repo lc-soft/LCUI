@@ -202,7 +202,7 @@ async function main(): Promise<void> {
       }
     });
   } else {
-    console.log("\n[done] Build complete → tools/doc-viewer/app/");
+    console.log("\n[done] Build complete → examples/doc-viewer/app/");
   }
 }
 

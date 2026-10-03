@@ -1,0 +1,84 @@
+.icon-library-browser {
+  position: relative;
+  @apply my-4 min-h-[480px];
+}
+
+.icon-library-search {
+  @apply mb-3 w-full;
+}
+
+.icon-library-scroll-area {
+  @apply h-[480px];
+}
+
+.icon-library-list {
+  @apply flex flex-wrap gap-2;
+}
+
+.icon-library-item {
+  @apply flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-gray-100 cursor-pointer;
+}
+
+.icon-library-item:hover {
+  @apply bg-gray-200;
+}
+
+.icon-library-detail {
+  position: absolute;
+  z-index: 10;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  @apply flex min-h-[160px] w-full items-center gap-4 rounded-xl border border-gray-200 bg-white p-4;
+}
+
+.icon-library-preview {
+  @apply flex h-32 w-32 shrink-0 items-center justify-center rounded-lg bg-gray-100;
+}
+
+.icon-library-detail-content {
+  @apply flex min-w-0 h-full flex-1 flex-col gap-4 justify-between;
+}
+
+.icon-library-detail-header {
+  @apply flex justify-between gap-3;
+}
+
+.icon-library-detail-name {
+  @apply text-lg font-semibold;
+}
+
+.icon-library-close {
+  @apply p-0 flex h-8 w-8 items-center justify-center;
+}
+
+.icon-library-actions {
+  @apply flex flex-wrap gap-2;
+}
+
+/* Vertical centering nudges for the icons on this page (measured ink
+ * offsets at this page's sizes; see the text-* buckets in global.css
+ * for icons that carry them -- these use private classes, so nudge
+ * here instead).  The base `icon { position: relative; }` lives in
+ * global.css. */
+
+/* grid icons render at font-size 24: ink sits 0.5-1px above center */
+.icon-library-item .fui-icon {
+  top: 1px;
+  line-height: 28px;
+  position: relative;
+}
+
+/* 128px: ink sits ~5-6.5px above line center (top: 6px), and the
+ * default 1.43em line height is kept on purpose -- leading-none would
+ * shrink the line box to 128px and push the baseline to y=122, which
+ * clips full-bleed glyphs (bmp.top up to 124+) at the line-box edge
+ * before any widget offset can help.  The 183px line box overflows
+ * the 128x128 preview, but the ink (rows 32..138) stays well inside
+ * the visible window after flex centering. */
+.icon-library-preview .icon-library-detail-icon {
+  top: 6px;
+  position: relative;
+
+  @apply text-[116px] leading-[128px];
+}

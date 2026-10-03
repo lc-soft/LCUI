@@ -10,7 +10,11 @@ npm install @lcui/fluent-icons
 
 ## 选取图标
 
-在 [flicon.io](https://www.flicon.io/) 网站中搜索和选取图标。以放大图标为例，英文名通常是 Zoom In。
+你可以在下面的图标库视图中搜索并选择图标。以放大图标为例，英文名通常是 Zoom In。
+
+<IconBrowser />
+
+Fluent UI System Icons 提供方向相关的元数据，但图标数据没有分类字段，因此详情面板不显示分类标签。
 
 fluentui-system-icons 的图标有 16、20、24 等几种尺寸可选，命名方式是"图标名+尺寸+风格"。`@lcui/fluent-icons` 的命名方式是"图标名+风格"，当风格为 Regular 时可以省略它。
 
@@ -22,8 +26,18 @@ import { ZoomIn } from "@lcui/fluent-icons";
 <ZoomIn />
 ```
 
-默认尺寸是 20。如果图标尺寸固定且希望更好的渲染效果，可以指定 size 参数：
+默认选择 regular 24 字形；如果没有 24，则选择最接近的可用 regular 尺寸，距离相同时选较小尺寸。`size` 选择设计字形尺寸，并在显式设置时同步设置显示字号；`fontSize` 只改变显示字号、不改变字形选择。未显式设置时图标会继承周围的文字字号，因此也可以通过 `className` 或 `style` 调整显示大小：
 
 ```tsx
 <ZoomIn size={32} />
+```
+
+C 代码可用 Fluent 快捷构造函数创建图标。XML 中省略 `library` 时默认使用 Fluent；只有使用其它图标库时才需要指定该属性：
+
+```c
+ui_widget_t *icon = ui_create_fluent_icon("dismiss");
+```
+
+```xml
+<icon name="dismiss" />
 ```

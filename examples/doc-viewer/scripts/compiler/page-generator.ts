@@ -486,6 +486,14 @@ function renderSectionContent(
       continue;
     }
 
+    if (trimmed === "<IconBrowser />") {
+      out.push(
+        `${indent}<IconBrowser locale="${locale === "en" ? "en" : "zh-CN"}" />`,
+      );
+      i++;
+      continue;
+    }
+
     // ### heading inside section content
     const h3Match = line.match(/^### (.+)$/);
     if (h3Match) {
@@ -931,10 +939,15 @@ function buildContentPageTsx(
 
   const allImports = [ftImportBlock].filter(Boolean).join("\n");
   const importsBlock = allImports ? `${allImports}\n` : "";
+  const iconBrowserImport = parsed.sections.some((section) =>
+    section.content.includes("<IconBrowser />"),
+  )
+    ? `import IconBrowser from "${relativeImport(pageDir, join(examplesOutDir, "..", "components", "icon-browser"))}";\n`
+    : "";
 
   return `import { Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "${ccPath}";
-${importsBlock}
+${iconBrowserImport}${importsBlock}
 export default function ${componentName}() {
   return (
     <Widget className="doc-page">

@@ -1,5 +1,6 @@
 import { Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "../../../components/code-block-copy";
+import IconBrowser from "../../../components/icon-browser";
 
 export default function IconLibraryDocPage() {
   return (
@@ -20,7 +21,9 @@ export default function IconLibraryDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>Choosing icons</h2>
-        <p>{`Search and select icons on flicon.io. For example, the zoom-in icon is typically named "Zoom In" in English.`}</p>
+        <p>{`Search and select icons in the browser below. For example, the zoom-in icon is typically named "Zoom In" in English.`}</p>
+        <IconBrowser locale="en" />
+        <p>{`Fluent UI System Icons provides direction-related metadata, but its icon data has no category field, so the detail panel does not show category tags.`}</p>
         <p>{`fluentui-system-icons icons are available in sizes like 16, 20, and 24, named in the format "icon name + size + style". [bgcolor=#eee] @lcui/fluent-icons [/bgcolor] uses the naming format "icon name + style", and when the style is Regular it can be omitted.`}</p>
       </Widget>
       <Widget className="doc-section">
@@ -36,7 +39,7 @@ export default function IconLibraryDocPage() {
             <Text className="code-line">{`[color=#116329]<[color=#0550ae]ZoomIn[/color] />[/color]`}</Text>
           </Widget>
         </Widget>
-        <p>{`The default size is 20. If the icon size is fixed and you want better rendering, specify the size parameter:`}</p>
+        <p>{`The default glyph is regular 24; when an icon has no regular 24 glyph, the closest available regular size is used (ties choose the smaller size). [bgcolor=#eee] size [/bgcolor] selects a design glyph size and, when explicitly set, also sets its display size. [bgcolor=#eee] fontSize [/bgcolor] changes only the rendered size without changing glyph selection. If neither is set, the icon inherits the surrounding text size, so [bgcolor=#eee] className [/bgcolor] or [bgcolor=#eee] style [/bgcolor] can also control the display size:`}</p>
         <Widget className="code-block" data-language="tsx" data-source="en/devtools/icon-library/2">
           <Widget className="code-block-header">
             <Text className="code-block-title">TypeScript</Text>
@@ -44,6 +47,25 @@ export default function IconLibraryDocPage() {
           <Widget className="code-block-body">
             <CodeBlockCopy />
             <Text className="code-line">{`<[color=#8250df]ZoomIn[/color] size={[color=#0550ae]32[/color]} />`}</Text>
+          </Widget>
+        </Widget>
+        <p>{`In C, create a Fluent icon with the convenience constructor. In XML, omitting [bgcolor=#eee] library [/bgcolor] defaults to Fluent; specify it only when using another icon library:`}</p>
+        <Widget className="code-block" data-language="c" data-source="en/devtools/icon-library/3">
+          <Widget className="code-block-header">
+            <Text className="code-block-title">C</Text>
+          </Widget>
+          <Widget className="code-block-body">
+            <CodeBlockCopy />
+            <Text className="code-line">{`[color=#953800]ui_widget_t[/color] *icon = ui_create_fluent_icon([color=#0a3069]"dismiss"[/color]);`}</Text>
+          </Widget>
+        </Widget>
+        <Widget className="code-block" data-language="xml" data-source="en/devtools/icon-library/4">
+          <Widget className="code-block-header">
+            <Text className="code-block-title">XML</Text>
+          </Widget>
+          <Widget className="code-block-body">
+            <CodeBlockCopy />
+            <Text className="code-line">{`[color=#116329]<[color=#0550ae]icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"dismiss"[/color] />[/color]`}</Text>
           </Widget>
         </Widget>
       </Widget>

@@ -1,7 +1,8 @@
 import { PropsWithChildren, ScrollArea, ScrollAreaContent, Scrollbar } from "@lcui/react";
 import Navbar from "./components/navbar";
 import Sidebar from "./components/sidebar";
-import "@lcui/fluent-icons/dist/style.css";
+import "@lcui/fluent-icons/dist/icons.css";
+import "@lcui/fluent-icons/dist/icons-filled.css";
 import "./global.css";
 
 export default function AppLayout({ children }: PropsWithChildren) {
