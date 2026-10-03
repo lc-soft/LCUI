@@ -249,6 +249,9 @@ pd_text_t *pd_text_create(void)
         text->autowrap_enabled = false;
         text->multiline_enabled = false;
         text->style_tag_enabled = false;
+        text->underline_enabled = false;
+        text->underline_offset = 0;
+        text->underline_thickness = 0;
         text->word_break = PD_WORD_BREAK_NORMAL;
         text->task.typeset_start_line = 0;
         text->task.update_typeset = 0;
@@ -489,6 +492,38 @@ int pd_text_set_max_size(pd_text_t *text, int width, int height)
                 text->task.update_typeset = true;
         }
         return 0;
+}
+
+void pd_text_set_underline(pd_text_t *text, bool enabled, int offset,
+                           int thickness)
+{
+        bool should_redraw;
+        pd_rect_t rect;
+
+        if (thickness < 0) {
+                thickness = 0;
+        }
+        if (text->underline_enabled == enabled &&
+            text->underline_offset == offset &&
+            text->underline_thickness == thickness) {
+                return;
+        }
+        should_redraw = text->underline_enabled || enabled;
+        text->underline_enabled = enabled;
+        text->underline_offset = offset;
+        text->underline_thickness = thickness;
+        if (!should_redraw) {
+                return;
+        }
+        rect.x = 0;
+        rect.y = 0;
+        rect.width = text->fixed_width > 0 ? text->fixed_width : text->width;
+        rect.height = text->fixed_height > 0 ? text->fixed_height
+                                             : pd_text_get_height(text);
+        if (rect.width > 0 && rect.height > 0) {
+                pd_rects_add(&text->dirty_rects, &rect);
+        }
+        text->task.redraw_all = true;
 }
 
 void pd_text_update(pd_text_t *text, list_t *rects)

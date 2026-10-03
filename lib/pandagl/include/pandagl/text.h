@@ -117,6 +117,9 @@ typedef struct pd_text {
         bool multiline_enabled;
         bool autowrap_enabled;
         bool style_tag_enabled;
+        bool underline_enabled;
+        int underline_offset;
+        int underline_thickness;
         list_t dirty_rects;
         list_t styles;
         pd_text_style_t default_style;
@@ -241,6 +244,13 @@ PD_PUBLIC void pd_text_set_style(pd_text_t *layer, pd_text_style_t *style);
 
 /** 设置文本行的高度 */
 PD_PUBLIC void pd_text_set_line_height(pd_text_t *layer, int height);
+
+/** 设置文本下划线。offset/thickness 均为物理像素。 */
+PD_PUBLIC void pd_text_set_underline(pd_text_t *text, bool enabled, int offset,
+                                     int thickness);
+
+/** 获取下划线超出行框底部的像素数（物理像素），无下划线时为 0。 */
+PD_PUBLIC int pd_text_get_underline_overflow(pd_text_t *text);
 
 /** 初始化字体样式数据 */
 PD_PUBLIC void pd_text_style_init(pd_text_style_t *data);

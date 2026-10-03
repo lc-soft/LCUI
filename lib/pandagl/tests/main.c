@@ -18,6 +18,7 @@ extern void test_pandagl_text_edit(void);
 extern void test_pandagl_font_cache(void);
 extern void test_pandagl_text_baseline(void);
 extern void test_pandagl_text_style_tag(void);
+extern void test_pandagl_text_decoration(void);
 
 static const ctest_suite_t suites[] = {
         { "pandagl/canvas mix", test_pandagl_canvas_mix },
@@ -27,6 +28,7 @@ static const ctest_suite_t suites[] = {
         { "pandagl/font cache", test_pandagl_font_cache },
         { "pandagl/text baseline", test_pandagl_text_baseline },
         { "pandagl/text style tag", test_pandagl_text_style_tag },
+        { "pandagl/text decoration", test_pandagl_text_decoration },
         { NULL, NULL }
 };
 

@@ -9,6 +9,7 @@
  * in the LICENSE.TXT file in the root directory of this source tree.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <pandagl.h>
 #include "text_internal.h"
@@ -81,6 +82,8 @@ static void pd_text_validate_rect(pd_text_t *text, pd_rect_t *area)
         } else {
                 height = pd_text_get_height(text);
         }
+        /* 允许区域向下扩展以绘制超出行框的下划线 */
+        height += pd_text_get_underline_overflow(text);
         pd_rect_correct(area, width, height);
 }
 
@@ -97,6 +100,49 @@ static void pd_text_render_char(pd_text_t *text, pd_char_t *ch,
         }
 }
 
+static void pd_text_render_underline(pd_text_t *text, pd_rect_t *area,
+                                     pd_canvas_t *graph, pd_pos_t layer_pos,
+                                     pd_text_line_t *line, int y)
+{
+        pd_rect_t rect, clipped_rect;
+
+        if (!text->underline_enabled || line->width <= 0 ||
+            text->underline_thickness <= 0) {
+                return;
+        }
+        rect.x = pd_text_get_line_start_x(text, line) + text->offset_x;
+        rect.y = y + line->baseline_y + text->underline_offset;
+        rect.width = line->width;
+        rect.height = text->underline_thickness;
+        if (!pd_rect_overlap(&rect, area, &clipped_rect)) {
+                return;
+        }
+        clipped_rect.x += layer_pos.x;
+        clipped_rect.y += layer_pos.y;
+        pd_canvas_fill_rect(graph, text->default_style.fore_color,
+                            clipped_rect);
+}
+
+int pd_text_get_underline_overflow(pd_text_t *text)
+{
+        int overflow = 0;
+        int line_num, need;
+        pd_text_line_t *line;
+
+        if (!text->underline_enabled || text->underline_thickness <= 0) {
+                return 0;
+        }
+        for (line_num = 0; line_num < text->lines_length; ++line_num) {
+                line = pd_text_get_line(text, line_num);
+                need = line->baseline_y + text->underline_offset +
+                       text->underline_thickness - line->height;
+                if (need > overflow) {
+                        overflow = need;
+                }
+        }
+        return overflow;
+}
+
 static void pd_text_render_line(pd_text_t *text, pd_rect_t *area,
                                 pd_canvas_t *graph, pd_pos_t layer_pos,
                                 pd_text_line_t *line, int y)
@@ -106,6 +152,7 @@ static void pd_text_render_line(pd_text_t *text, pd_rect_t *area,
         int col, x;
 
         x = pd_text_get_line_start_x(text, line) + text->offset_x;
+        pd_text_render_underline(text, area, graph, layer_pos, line, y);
         for (col = 0; col < line->length && x < area->x + area->width; ++col) {
                 ch = line->string[col];
                 if (!ch->bitmap) {
