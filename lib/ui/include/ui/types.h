@@ -382,6 +382,10 @@ struct ui_widget {
         const css_style_decl_t *matched_style;
         css_computed_style_t specified_style;
         css_computed_style_t computed_style;
+        /** Parent-dependent computed properties, one bit per css_prop_key_t,
+         *  stored as 32-bit words so propagation can test whole words and
+         *  extract set bits sparsely. */
+        uint32_t style_dependencies[(STYLE_KEY_TOTAL + 31) / 32];
 
         /** Some data bound to the prototype */
         ui_widget_data_t data;

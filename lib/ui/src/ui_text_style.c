@@ -108,38 +108,56 @@ void ui_text_style_destroy(ui_text_style_t *fs)
         }
 }
 
-bool ui_text_style_is_equal(const ui_text_style_t *a, const ui_text_style_t *b)
+static bool ui_text_style_font_ids_equal(const int *a, const int *b)
 {
         int i;
 
-        if (a->color.value != b->color.value ||
-            a->line_height != b->line_height ||
-            a->text_align != b->text_align ||
-            a->white_space != b->white_space ||
-            a->font_style != b->font_style ||
-            a->font_weight != b->font_weight || a->font_size != b->font_size ||
-            a->text_decoration != b->text_decoration ||
-            a->text_underline_offset != b->text_underline_offset ||
-            a->text_decoration_thickness != b->text_decoration_thickness) {
-                return false;
+        if (!a || !b) {
+                return a == b;
         }
-        if (a->content && b->content) {
-                if (wcscmp(a->content, b->content) != 0) {
+        for (i = 0; a[i] && b[i]; ++i) {
+                if (a[i] != b[i]) {
                         return false;
                 }
-        } else if (a->content != b->content) {
-                return false;
         }
-        if (a->font_ids && b->font_ids) {
-                for (i = 0; a->font_ids[i] && b->font_ids[i]; ++i) {
-                        if (a->font_ids[i] != b->font_ids[i]) {
-                                return false;
-                        }
-                }
-        } else if (a->font_ids != b->font_ids) {
-                return false;
+        return a[i] == b[i];
+}
+
+static bool ui_text_style_content_equal(const wchar_t *a, const wchar_t *b)
+{
+        if (!a || !b) {
+                return a == b;
         }
-        return true;
+        return wcscmp(a, b) == 0;
+}
+
+static bool ui_text_style_paint_equal(const ui_text_style_t *a,
+                                      const ui_text_style_t *b)
+{
+        return a->color.value == b->color.value &&
+               a->text_align == b->text_align &&
+               a->text_decoration == b->text_decoration &&
+               a->text_underline_offset == b->text_underline_offset &&
+               a->text_decoration_thickness == b->text_decoration_thickness;
+}
+
+bool ui_text_style_metrics_equal(const ui_text_style_t *a,
+                                 const ui_text_style_t *b)
+{
+        return a->font_size == b->font_size &&
+               a->line_height == b->line_height &&
+               a->font_style == b->font_style &&
+               a->font_weight == b->font_weight &&
+               a->white_space == b->white_space &&
+               a->word_break == b->word_break &&
+               ui_text_style_font_ids_equal(a->font_ids, b->font_ids);
+}
+
+bool ui_text_style_is_equal(const ui_text_style_t *a, const ui_text_style_t *b)
+{
+        return ui_text_style_metrics_equal(a, b) &&
+               ui_text_style_content_equal(a->content, b->content) &&
+               ui_text_style_paint_equal(a, b);
 }
 
 static int ui_text_decoration_auto_length(void)
@@ -202,7 +220,12 @@ void ui_compute_text_style(ui_text_style_t *fs,
                 fs->line_height = (int)(fs->font_size * style->line_height);
                 break;
         case CSS_LINE_HEIGHT_DIMENSION:
-                fs->line_height = ui_compute(style->line_height);
+                if (style->unit_bits.line_height == CSS_UNIT_PERCENT) {
+                        fs->line_height =
+                            (int)(fs->font_size * style->line_height / 100.0f);
+                } else {
+                        fs->line_height = ui_compute(style->line_height);
+                }
                 break;
         case CSS_LINE_HEIGHT_NORMAL:
         default:
@@ -221,6 +244,10 @@ void ui_compute_text_style(ui_text_style_t *fs,
                 fs->text_align = PD_TEXT_ALIGN_LEFT;
                 break;
         }
+
+        fs->word_break = style->type_bits.word_break == CSS_WORD_BREAK_BREAK_ALL
+                             ? PD_WORD_BREAK_BREAK_ALL
+                             : PD_WORD_BREAK_NORMAL;
 
         switch (style->type_bits.font_style) {
         case CSS_FONT_STYLE_ITALIC:

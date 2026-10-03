@@ -39,6 +39,14 @@ static struct ui_text_module {
         ui_widget_prototype_t *prototype;
 } ui_text;
 
+static bool ui_text_content_equal(const wchar_t *a, const wchar_t *b)
+{
+        if (!a || !b) {
+                return a == b;
+        }
+        return wcscmp(a, b) == 0;
+}
+
 static bool parse_boolean(const char *str)
 {
         if (strcmp(str, "on") == 0 || strcmp(str, "true") == 0 ||
@@ -103,6 +111,7 @@ static void ui_text_on_update_style(ui_widget_t *w)
         ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
         bool content_changed;
         bool decoration_changed;
+        bool metrics_changed;
 
         ui_text_style_init(&style);
         ui_compute_text_style(&style, &w->computed_style);
@@ -121,6 +130,9 @@ static void ui_text_on_update_style(ui_widget_t *w)
             style.text_underline_offset != txt->style.text_underline_offset ||
             style.text_decoration_thickness !=
                 txt->style.text_decoration_thickness;
+        content_changed =
+            !ui_text_content_equal(style.content, txt->style.content);
+        metrics_changed = !ui_text_style_metrics_equal(&style, &txt->style);
         convert_font_style_to_text_style(&style, &text_style);
         if (style.text_align != txt->style.text_align) {
                 pd_text_set_align(txt->layer, style.text_align);
@@ -130,10 +142,7 @@ static void ui_text_on_update_style(ui_widget_t *w)
         }
         pd_text_set_autowrap(txt->layer,
                              style.white_space != CSS_WHITE_SPACE_NOWRAP);
-        pd_text_set_word_break(txt->layer,
-                               style.word_break == CSS_WORD_BREAK_BREAK_ALL
-                                   ? PD_WORD_BREAK_BREAK_ALL
-                                   : PD_WORD_BREAK_NORMAL);
+        pd_text_set_word_break(txt->layer, style.word_break);
         if (content_changed) {
                 ui_text_set_content_w(w, style.content);
         }
@@ -147,9 +156,14 @@ static void ui_text_on_update_style(ui_widget_t *w)
         if (decoration_changed) {
                 ui_widget_mark_dirty_rect(w, NULL, UI_BOX_TYPE_BORDER_BOX);
         }
+        ui_widget_mark_dirty_rect(w, NULL, UI_BOX_TYPE_CONTENT_BOX);
         ui_text_style_destroy(&txt->style);
         pd_text_style_destroy(&text_style);
         txt->style = style;
+        if (metrics_changed && !content_changed && txt->content &&
+            txt->content[0]) {
+                ui_widget_request_reflow(w);
+        }
 }
 
 static void ui_text_on_update(ui_widget_t *w, ui_task_type_t task)

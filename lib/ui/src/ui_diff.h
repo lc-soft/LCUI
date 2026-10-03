@@ -20,10 +20,16 @@ typedef struct ui_diff_item {
 /** for check widget difference */
 typedef struct ui_widget_style_diff_t_ {
         css_computed_style_t style;
+        css_computed_style_t specified_style;
+        /* Union of every direct child's dependency bitmap, computed before the
+         * parent cascades so propagation and the owning-pointer snapshot are
+         * both gated by exactly the properties children depend on. */
+        uint32_t dep_union[(STYLE_KEY_TOTAL + 31) / 32];
         ui_rect_t padding_box;
         ui_rect_t canvas_box;
         bool visible;
         bool should_add_dirty_rect;
+        bool has_style_snapshot;
 } ui_style_diff_t;
 
 void ui_style_diff_init(ui_style_diff_t *diff, ui_widget_t *w);

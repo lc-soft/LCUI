@@ -19,7 +19,7 @@
 
 LIBUI_BEGIN_DECLS
 
-#define UI_DEFAULT_FONT_SIZE 14
+#define UI_DEFAULT_FONT_SIZE CSS_DEFAULT_FONT_SIZE
 #define UI_DEFAULT_FONT_COLOR 0xff333333
 #define UI_MIN_FONT_SIZE 12
 #define UI_LINE_HEIGHT_SCALE 1.42857143
@@ -43,6 +43,10 @@ typedef struct ui_text_style {
 LIBUI_PUBLIC void ui_text_style_init(ui_text_style_t *fs);
 
 LIBUI_PUBLIC void ui_text_style_destroy(ui_text_style_t *fs);
+
+/** Compare only values that can change text measurement or line breaking. */
+LIBUI_PUBLIC bool ui_text_style_metrics_equal(const ui_text_style_t *a,
+                                              const ui_text_style_t *b);
 
 LIBUI_PUBLIC bool ui_text_style_is_equal(const ui_text_style_t *a,
                                          const ui_text_style_t *b);

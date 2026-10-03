@@ -30,6 +30,40 @@
 #define IS_LENGTH_PROP_CHANGED(PROP_KEY) \
         (IS_PROP_TYPE_CHANGED(PROP_KEY) || IS_PROP_VALUE_CHANGED(PROP_KEY))
 
+#define UI_STYLE_DEP_WORDS ((STYLE_KEY_TOTAL + 31) / 32)
+
+/* Index of the lowest set bit of a non-zero word (word != 0 preconditions). */
+static unsigned ui_style_dep_ctz(uint32_t word)
+{
+        unsigned n = 0;
+
+        if ((word & 0xffffU) == 0) {
+                n += 16;
+                word >>= 16;
+        }
+        if ((word & 0xffU) == 0) {
+                n += 8;
+                word >>= 8;
+        }
+        if ((word & 0xfU) == 0) {
+                n += 4;
+                word >>= 4;
+        }
+        if ((word & 0x3U) == 0) {
+                n += 2;
+                word >>= 2;
+        }
+        if ((word & 0x1U) == 0) {
+                n += 1;
+        }
+        return n;
+}
+
+static bool ui_style_dep_has(const uint32_t *bits, css_prop_key_t key)
+{
+        return (bits[key / 32] >> (key % 32)) & 1U;
+}
+
 void ui_style_diff_init(ui_style_diff_t *diff, ui_widget_t *w)
 {
         ui_widget_t *parent;
@@ -49,8 +83,109 @@ void ui_style_diff_init(ui_style_diff_t *diff, ui_widget_t *w)
 
 void ui_style_diff_begin(ui_style_diff_t *diff, ui_widget_t *w)
 {
+        unsigned i;
+        bool needed = false;
+        list_node_t *node;
+        ui_widget_t *child;
+
         diff->style = w->computed_style;
         diff->visible = ui_widget_is_visible(w);
+
+        /* Union of every direct child's dependency bitmap. This is the exact
+         * set of properties this node's inheritance can affect; when it is
+         * empty propagation is impossible, so we skip the snapshot entirely. */
+        for (i = 0; i < UI_STYLE_DEP_WORDS; ++i) {
+                diff->dep_union[i] = 0;
+        }
+        for (list_each(node, &w->children)) {
+                child = node->data;
+                for (i = 0; i < UI_STYLE_DEP_WORDS; ++i) {
+                        diff->dep_union[i] |= child->style_dependencies[i];
+                }
+        }
+        for (i = 0; i < UI_STYLE_DEP_WORDS; ++i) {
+                needed |= diff->dep_union[i] != 0;
+        }
+        if (!needed) {
+                diff->has_style_snapshot = false;
+                return;
+        }
+
+        /* Value-copy the pre-cascade specified_style. The copy aliases the
+         * three owning heap fields; cascade will free w->specified_style's
+         * copies, so make the snapshot independent only for the owning
+         * properties children actually depend on, and drop the alias for the
+         * rest so the snapshot never frees memory it does not own. */
+        diff->specified_style = w->specified_style;
+        if (ui_style_dep_has(diff->dep_union, css_prop_font_family)) {
+                css_computed_style_copy_property(&diff->specified_style,
+                                                 &w->specified_style,
+                                                 css_prop_font_family);
+        } else {
+                diff->specified_style.font_family = NULL;
+        }
+        if (ui_style_dep_has(diff->dep_union, css_prop_background_image)) {
+                css_computed_style_copy_property(&diff->specified_style,
+                                                 &w->specified_style,
+                                                 css_prop_background_image);
+        } else {
+                diff->specified_style.background_image = NULL;
+        }
+        if (ui_style_dep_has(diff->dep_union, css_prop_content)) {
+                css_computed_style_copy_property(&diff->specified_style,
+                                                 &w->specified_style,
+                                                 css_prop_content);
+        } else {
+                diff->specified_style.content = NULL;
+        }
+        diff->has_style_snapshot = true;
+}
+
+static void ui_style_diff_update_dependent_children(ui_style_diff_t *diff,
+                                                    ui_widget_t *w)
+{
+        uint32_t changed[UI_STYLE_DEP_WORDS];
+        unsigned word, bit, prop;
+        bool any_changed = false;
+        list_node_t *node;
+        ui_widget_t *child;
+
+        if (!diff->has_style_snapshot) {
+                return;
+        }
+
+        /* Compare only the unioned dependencies, extracting set bits word by
+         * word with a ctz loop; unchanged properties truncate propagation. */
+        memset(changed, 0, sizeof(changed));
+        for (word = 0; word < UI_STYLE_DEP_WORDS; ++word) {
+                uint32_t u = diff->dep_union[word];
+                while (u != 0) {
+                        bit = ui_style_dep_ctz(u);
+                        prop = word * 32 + bit;
+                        if (!css_computed_style_property_equal(
+                                &diff->specified_style, &w->specified_style,
+                                (css_prop_key_t)prop)) {
+                                changed[word] |= 1U << bit;
+                                any_changed = true;
+                        }
+                        u &= u - 1;
+                }
+        }
+        if (any_changed) {
+                for (list_each(node, &w->children)) {
+                        child = node->data;
+                        for (word = 0; word < UI_STYLE_DEP_WORDS; ++word) {
+                                if (child->style_dependencies[word] &
+                                    changed[word]) {
+                                        ui_widget_request_update_style(child);
+                                        break;
+                                }
+                        }
+                }
+        }
+
+        css_computed_style_destroy(&diff->specified_style);
+        diff->has_style_snapshot = false;
 }
 
 void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w)
@@ -61,6 +196,7 @@ void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w)
         bool inner_changed = diff->padding_box.width != w->padding_box.width ||
                              diff->padding_box.height != w->padding_box.height;
 
+        ui_style_diff_update_dependent_children(diff, w);
         if (flow_changed || inner_changed ||
             (ui_widget_has_flex_display(w) &&
              (IS_PROP_TYPE_CHANGED(flex_wrap) ||

@@ -148,6 +148,7 @@ export default function StylingDocPage() {
           <li><Text>{`[b][bgcolor=#eee] opacity [/bgcolor][/b] — [bgcolor=#eee] <number> [/bgcolor] 或 [bgcolor=#eee] <percentage> [/bgcolor]`}</Text></li>
           <li><Text>{`[b][bgcolor=#eee] visibility [/bgcolor][/b] — [bgcolor=#eee] visible [/bgcolor]、[bgcolor=#eee] hidden [/bgcolor]`}</Text></li>
           <li><Text>{`[b][bgcolor=#eee] pointer-events [/bgcolor][/b] — [bgcolor=#eee] auto [/bgcolor]、[bgcolor=#eee] none [/bgcolor]`}</Text></li>
+          <li><Text>{`[b][bgcolor=#eee] cursor [/bgcolor][/b] — [bgcolor=#eee] auto [/bgcolor]、[bgcolor=#eee] default [/bgcolor]、[bgcolor=#eee] none [/bgcolor]、[bgcolor=#eee] context-menu [/bgcolor]、[bgcolor=#eee] help [/bgcolor]、[bgcolor=#eee] pointer [/bgcolor]、[bgcolor=#eee] progress [/bgcolor]、[bgcolor=#eee] wait [/bgcolor]、[bgcolor=#eee] cell [/bgcolor]、[bgcolor=#eee] crosshair [/bgcolor]、[bgcolor=#eee] text [/bgcolor]、[bgcolor=#eee] vertical-text [/bgcolor]、[bgcolor=#eee] alias [/bgcolor]、[bgcolor=#eee] copy [/bgcolor]、[bgcolor=#eee] move [/bgcolor]、[bgcolor=#eee] no-drop [/bgcolor]、[bgcolor=#eee] not-allowed [/bgcolor]、[bgcolor=#eee] grab [/bgcolor]、[bgcolor=#eee] grabbing [/bgcolor]、[bgcolor=#eee] all-scroll [/bgcolor]、[bgcolor=#eee] col-resize [/bgcolor]、[bgcolor=#eee] row-resize [/bgcolor]、[bgcolor=#eee] n/e/s/w-resize [/bgcolor]、[bgcolor=#eee] ew/ns-resize [/bgcolor]、[bgcolor=#eee] ne/nw/se/sw-resize [/bgcolor]、[bgcolor=#eee] nesw/nwse-resize [/bgcolor]、[bgcolor=#eee] zoom-in [/bgcolor]、[bgcolor=#eee] zoom-out [/bgcolor]；不支持 [bgcolor=#eee] url() [/bgcolor] 图像光标`}</Text></li>
           <li><Text>{`[b][bgcolor=#eee] box-shadow [/bgcolor][/b] — [bgcolor=#eee] none [/bgcolor] 或 [bgcolor=#eee] <shadow> [/bgcolor]（格式 [bgcolor=#eee] <length>{2,4} && <color>? [/bgcolor]）`}</Text></li>
         </ul>
       </Widget>
@@ -174,7 +175,7 @@ export default function StylingDocPage() {
         <Widget className="admonition admonition-warning">
           <Text className="admonition-title">注意</Text>
           <Widget className="admonition-content">
-            <p>{`[b]CSS 不支持继承。[/b] 像 [bgcolor=#eee] color [/bgcolor]、[bgcolor=#eee] font-family [/bgcolor]、[bgcolor=#eee] font-size [/bgcolor] 不会从父部件流向子部件。每个 [bgcolor=#eee] text [/bgcolor] / [bgcolor=#eee] button [/bgcolor] 等需要文本显示的部件都必须显式设置这些属性。`}</p>
+            <p>{`[b][bgcolor=#eee] cursor [/bgcolor] 按平台近似映射，[bgcolor=#eee] url() [/bgcolor] 图像光标不支持。[/b] 悬停部件的 [bgcolor=#eee] cursor [/bgcolor] 值当帧生效（含 [bgcolor=#eee] :hover [/bgcolor] 等状态变化）。Windows/X11 映射到系统光标，无精确对应的取近似形状；[bgcolor=#eee] none [/bgcolor] 隐藏指针；framebuffer 软件指针不受影响。内置交互部件已带合理默认值（button 等 [bgcolor=#eee] pointer [/bgcolor]、textinput [bgcolor=#eee] text [/bgcolor]、滚动条滑块 [bgcolor=#eee] grab [/bgcolor]）。`}</p>
           </Widget>
         </Widget>
       </Widget>

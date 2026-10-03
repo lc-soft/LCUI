@@ -74,6 +74,42 @@ css_selector_t *ui_widget_create_selector(ui_widget_t *w)
         return s;
 }
 
+static bool ui_style_value_is_inherit(const css_style_value_t *value)
+{
+        return value && value->type == CSS_ARRAY_VALUE &&
+               css_style_value_get_array_length(value) == 1 &&
+               value->array_value[0].type == CSS_KEYWORD_VALUE &&
+               value->array_value[0].keyword_value == CSS_KEYWORD_INHERIT;
+}
+
+static bool ui_style_value_is_percentage(const css_style_value_t *value)
+{
+        return value && value->type == CSS_ARRAY_VALUE &&
+               css_style_value_get_array_length(value) == 1 &&
+               value->array_value[0].type == CSS_UNIT_VALUE &&
+               value->array_value[0].unit_value.unit == CSS_UNIT_PERCENT;
+}
+
+static void ui_widget_update_style_dependencies(ui_widget_t *w,
+                                                css_style_decl_t *style)
+{
+        unsigned i;
+        css_prop_t *prop;
+        css_propdef_t *propdef;
+
+        memset(w->style_dependencies, 0, sizeof(w->style_dependencies));
+        for (i = 0; i < STYLE_KEY_TOTAL; ++i) {
+                propdef = css_get_propdef((int)i);
+                prop = css_style_decl_find(style, (int)i);
+                if (ui_style_value_is_inherit(prop ? &prop->value : NULL) ||
+                    (!prop && propdef->inherited) ||
+                    (i == css_prop_font_size && prop &&
+                     ui_style_value_is_percentage(&prop->value))) {
+                        w->style_dependencies[i / 32] |= 1U << (i % 32);
+                }
+        }
+}
+
 size_t ui_widget_get_children_style_changes(ui_widget_t *w, int type,
                                             const char *name)
 {
@@ -203,23 +239,38 @@ int ui_widget_set_style_string(ui_widget_t *w, const char *property,
                                const char *css_text)
 {
         const css_propdef_t *propdef;
+        css_prop_t *prop;
+        list_node_t *node;
+        css_style_decl_t *style;
         css_style_value_t value;
+        int result;
 
         propdef = css_get_propdef_by_name(property);
         if (!propdef) {
                 return -1;
         }
         if (propdef->key >= 0) {
-                if (css_parse_value(propdef->valdef, css_text, &value) <= 0) {
+                if (css_parse_property_value(propdef, css_text, &value) <= 0) {
                         return -2;
                 }
                 ui_widget_set_style(w, propdef->key, &value);
                 css_style_value_destroy(&value);
                 return 0;
         }
-        if (!w->custom_style) {
-                w->custom_style = css_style_decl_create();
+        style = css_style_decl_create();
+        result = css_style_decl_add_property(style, propdef, css_text);
+        if (result > 0) {
+                if (!w->custom_style) {
+                        w->custom_style = css_style_decl_create();
+                }
+                for (list_each(node, style)) {
+                        prop = node->data;
+                        css_style_decl_set(w->custom_style, prop->key,
+                                           &prop->value);
+                }
+                ui_widget_request_update_style(w);
         }
+        css_style_decl_destroy(style);
         if (propdef->parse(propdef, css_text, w->custom_style) <= 0) {
                 return -2;
         }
@@ -413,15 +464,15 @@ void ui_widget_update_style(ui_widget_t *w)
 
         ui_widget_destroy_background_style(w);
         css_computed_style_destroy(s);
+        style = css_style_decl_create();
         if (w->custom_style) {
-                style = css_style_decl_create();
                 css_style_decl_merge(style, w->custom_style);
-                css_style_decl_merge(style, w->matched_style);
-                css_cascade_style(style, s);
-                css_style_decl_destroy(style);
-        } else {
-                css_cascade_style(w->matched_style, s);
         }
+        css_style_decl_merge(style, w->matched_style);
+        ui_widget_update_style_dependencies(w, style);
+        css_cascade_style_with_parent(
+            style, w->parent ? &w->parent->specified_style : NULL, s);
+        css_style_decl_destroy(style);
         w->computed_style = *s;
         // 增加 UIImage 的引用次数，让它在部件销毁和背景图改变前一直可用
         if (s->background_image) {

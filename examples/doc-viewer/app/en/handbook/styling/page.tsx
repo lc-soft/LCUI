@@ -148,6 +148,7 @@ export default function StylingDocPage() {
           <li><Text>{`[b][bgcolor=#eee] opacity [/bgcolor][/b] — [bgcolor=#eee] <number> [/bgcolor] or [bgcolor=#eee] <percentage> [/bgcolor]`}</Text></li>
           <li><Text>{`[b][bgcolor=#eee] visibility [/bgcolor][/b] — [bgcolor=#eee] visible [/bgcolor], [bgcolor=#eee] hidden [/bgcolor]`}</Text></li>
           <li><Text>{`[b][bgcolor=#eee] pointer-events [/bgcolor][/b] — [bgcolor=#eee] auto [/bgcolor], [bgcolor=#eee] none [/bgcolor]`}</Text></li>
+          <li><Text>{`[b][bgcolor=#eee] cursor [/bgcolor][/b] — [bgcolor=#eee] auto [/bgcolor], [bgcolor=#eee] default [/bgcolor], [bgcolor=#eee] none [/bgcolor], [bgcolor=#eee] context-menu [/bgcolor], [bgcolor=#eee] help [/bgcolor], [bgcolor=#eee] pointer [/bgcolor], [bgcolor=#eee] progress [/bgcolor], [bgcolor=#eee] wait [/bgcolor], [bgcolor=#eee] cell [/bgcolor], [bgcolor=#eee] crosshair [/bgcolor], [bgcolor=#eee] text [/bgcolor], [bgcolor=#eee] vertical-text [/bgcolor], [bgcolor=#eee] alias [/bgcolor], [bgcolor=#eee] copy [/bgcolor], [bgcolor=#eee] move [/bgcolor], [bgcolor=#eee] no-drop [/bgcolor], [bgcolor=#eee] not-allowed [/bgcolor], [bgcolor=#eee] grab [/bgcolor], [bgcolor=#eee] grabbing [/bgcolor], [bgcolor=#eee] all-scroll [/bgcolor], [bgcolor=#eee] col-resize [/bgcolor], [bgcolor=#eee] row-resize [/bgcolor], [bgcolor=#eee] n/e/s/w-resize [/bgcolor], [bgcolor=#eee] ew/ns-resize [/bgcolor], [bgcolor=#eee] ne/nw/se/sw-resize [/bgcolor], [bgcolor=#eee] nesw/nwse-resize [/bgcolor], [bgcolor=#eee] zoom-in [/bgcolor], [bgcolor=#eee] zoom-out [/bgcolor]; [bgcolor=#eee] url() [/bgcolor] image cursors are not supported`}</Text></li>
           <li><Text>{`[b][bgcolor=#eee] box-shadow [/bgcolor][/b] — [bgcolor=#eee] none [/bgcolor] or [bgcolor=#eee] <shadow> [/bgcolor] (format [bgcolor=#eee] <length>{2,4} && <color>? [/bgcolor])`}</Text></li>
         </ul>
       </Widget>
@@ -174,7 +175,7 @@ export default function StylingDocPage() {
         <Widget className="admonition admonition-warning">
           <Text className="admonition-title">注意</Text>
           <Widget className="admonition-content">
-            <p>{`[b]CSS does not support inheritance.[/b] Properties like [bgcolor=#eee] color [/bgcolor], [bgcolor=#eee] font-family [/bgcolor], and [bgcolor=#eee] font-size [/bgcolor] do not cascade from parent to child widgets. Every widget that displays text (e.g. [bgcolor=#eee] text [/bgcolor], [bgcolor=#eee] button [/bgcolor]) must explicitly set these properties.`}</p>
+            <p>{`[b][bgcolor=#eee] cursor [/bgcolor] maps to system cursors approximately; [bgcolor=#eee] url() [/bgcolor] image cursors are not supported.[/b] The [bgcolor=#eee] cursor [/bgcolor] value of the hovered widget takes effect in the same frame (including state changes like [bgcolor=#eee] :hover [/bgcolor]). On Windows/X11 values map to system cursors, and those without an exact match use the closest shape; [bgcolor=#eee] none [/bgcolor] hides the pointer; the framebuffer software cursor is unaffected. Built-in interactive widgets ship with sensible defaults ([bgcolor=#eee] button [/bgcolor] etc. [bgcolor=#eee] pointer [/bgcolor], [bgcolor=#eee] textinput [/bgcolor] [bgcolor=#eee] text [/bgcolor], scrollbar thumb [bgcolor=#eee] grab [/bgcolor]).`}</p>
           </Widget>
         </Widget>
       </Widget>
