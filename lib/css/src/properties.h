@@ -14,3 +14,6 @@
 #include <css/style_value.h>
 #include <css/style_decl.h>
 #include <css/value.h>
+
+void css_compute_font_size_value(const css_computed_style_t *parent,
+                                 css_computed_style_t *computed);

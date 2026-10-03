@@ -26,6 +26,10 @@ LIBCSS_PUBLIC css_prop_t *css_style_decl_alloc(css_style_decl_t *list, int key);
 LIBCSS_PUBLIC void css_style_decl_add(css_style_decl_t *list, int key,
                                       const css_style_value_t *value);
 
+LIBCSS_PUBLIC int css_style_decl_add_property(css_style_decl_t *list,
+                                              const css_propdef_t *propdef,
+                                              const char *css_text);
+
 LIBCSS_PUBLIC void css_style_decl_set(css_style_decl_t *list, int key,
                                       const css_style_value_t *value);
 

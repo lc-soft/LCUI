@@ -10,6 +10,7 @@
  */
 
 #include <assert.h>
+#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 #include <css/keywords.h>
@@ -155,6 +156,51 @@ size_t css_style_value_concat_array(css_style_value_t *val1,
 
 // https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleValue/parse
 
+bool css_is_inherit_keyword(const char *str)
+{
+        size_t i, len;
+        const char *start = str;
+        static const char inherit[] = "inherit";
+
+        while (*start && isspace((unsigned char)*start)) {
+                ++start;
+        }
+        len = strlen(start);
+        while (len > 0 && isspace((unsigned char)start[len - 1])) {
+                --len;
+        }
+        if (len != sizeof(inherit) - 1) {
+                return false;
+        }
+        for (i = 0; i < len; ++i) {
+                if (tolower((unsigned char)start[i]) != inherit[i]) {
+                        return false;
+                }
+        }
+        return true;
+}
+
+int css_parse_property_value(const css_propdef_t *propdef, const char *css_text,
+                             css_style_value_t *value)
+{
+        size_t len;
+
+        value->type = CSS_INVALID_VALUE;
+        if (!css_is_inherit_keyword(css_text)) {
+                return css_parse_value(propdef->valdef, css_text, value);
+        }
+        len = strlen(css_text);
+        value->array_value = calloc(2, sizeof(css_style_value_t));
+        if (!value->array_value) {
+                return -1;
+        }
+        value->type = CSS_ARRAY_VALUE;
+        value->array_value[0].type = CSS_KEYWORD_VALUE;
+        value->array_value[0].keyword_value = CSS_KEYWORD_INHERIT;
+        value->array_value[1].type = CSS_NO_VALUE;
+        return (int)len;
+}
+
 css_style_value_t *css_style_value_parse(const char *property,
                                          const char *css_text)
 {
@@ -167,7 +213,7 @@ css_style_value_t *css_style_value_parse(const char *property,
         }
         value = malloc(sizeof(css_style_value_t));
         value->type = CSS_INVALID_VALUE;
-        if (css_parse_value(propdef->valdef, css_text, value) > 0) {
+        if (css_parse_property_value(propdef, css_text, value) > 0) {
                 return value;
         }
         free(value);

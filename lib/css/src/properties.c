@@ -13,18 +13,31 @@
 #include <css/properties.h>
 #include <css/value.h>
 #include <css/style_value.h>
+#include <css/style_decl.h>
 #include <css/computed.h>
 
 #define DEFINE_PROP(PROP_KEY, PROP_NAME, VALDEF, INIT)                         \
         extern int css_cascade_##PROP_KEY(const css_style_array_value_t,       \
                                           css_computed_style_t *);             \
         css_register_property_with_key(css_prop_##PROP_KEY, PROP_NAME, VALDEF, \
-                                       INIT, css_cascade_##PROP_KEY)
+                                       INIT, false, css_cascade_##PROP_KEY)
+
+#define DEFINE_INHERITED_PROP(PROP_KEY, PROP_NAME, VALDEF, INIT)               \
+        extern int css_cascade_##PROP_KEY(const css_style_array_value_t,       \
+                                          css_computed_style_t *);             \
+        css_register_property_with_key(css_prop_##PROP_KEY, PROP_NAME, VALDEF, \
+                                       INIT, true, css_cascade_##PROP_KEY)
 
 #define DEFINE_SHORTHAND_PROP(PROP_KEY, NAME, VALDEF)                        \
         extern int css_parse_##PROP_KEY(const css_propdef_t *, const char *, \
                                         css_style_decl_t *);                 \
         css_register_shorthand_property(NAME, VALDEF, css_parse_##PROP_KEY)
+
+typedef struct css_shorthand_inherit_map {
+        const char *name;
+        const css_prop_key_t *keys;
+        unsigned key_count;
+} css_shorthand_inherit_map_t;
 
 static struct css_properties_module {
         /**
@@ -47,6 +60,98 @@ static struct css_properties_module {
          */
         dict_t *map;
 } css_properties;
+
+static const css_prop_key_t shorthand_background_keys[] = {
+        css_prop_background_image,      css_prop_background_color,
+        css_prop_background_position_x, css_prop_background_position_y,
+        css_prop_background_size,       css_prop_background_repeat
+};
+static const css_prop_key_t shorthand_background_position_keys[] = {
+        css_prop_background_position_x, css_prop_background_position_y
+};
+static const css_prop_key_t shorthand_padding_keys[] = {
+        css_prop_padding_top, css_prop_padding_right, css_prop_padding_bottom,
+        css_prop_padding_left
+};
+static const css_prop_key_t shorthand_margin_keys[] = { css_prop_margin_top,
+                                                        css_prop_margin_right,
+                                                        css_prop_margin_bottom,
+                                                        css_prop_margin_left };
+static const css_prop_key_t shorthand_border_color_keys[] = {
+        css_prop_border_top_color, css_prop_border_right_color,
+        css_prop_border_bottom_color, css_prop_border_left_color
+};
+static const css_prop_key_t shorthand_border_width_keys[] = {
+        css_prop_border_top_width, css_prop_border_right_width,
+        css_prop_border_bottom_width, css_prop_border_left_width
+};
+static const css_prop_key_t shorthand_border_style_keys[] = {
+        css_prop_border_top_style, css_prop_border_right_style,
+        css_prop_border_bottom_style, css_prop_border_left_style
+};
+static const css_prop_key_t shorthand_border_radius_keys[] = {
+        css_prop_border_top_left_radius, css_prop_border_top_right_radius,
+        css_prop_border_bottom_right_radius, css_prop_border_bottom_left_radius
+};
+static const css_prop_key_t shorthand_border_top_keys[] = {
+        css_prop_border_top_width, css_prop_border_top_style,
+        css_prop_border_top_color
+};
+static const css_prop_key_t shorthand_border_right_keys[] = {
+        css_prop_border_right_width, css_prop_border_right_style,
+        css_prop_border_right_color
+};
+static const css_prop_key_t shorthand_border_bottom_keys[] = {
+        css_prop_border_bottom_width, css_prop_border_bottom_style,
+        css_prop_border_bottom_color
+};
+static const css_prop_key_t shorthand_border_left_keys[] = {
+        css_prop_border_left_width, css_prop_border_left_style,
+        css_prop_border_left_color
+};
+static const css_prop_key_t shorthand_border_keys[] = {
+        css_prop_border_top_width,    css_prop_border_top_style,
+        css_prop_border_top_color,    css_prop_border_right_width,
+        css_prop_border_right_style,  css_prop_border_right_color,
+        css_prop_border_bottom_width, css_prop_border_bottom_style,
+        css_prop_border_bottom_color, css_prop_border_left_width,
+        css_prop_border_left_style,   css_prop_border_left_color
+};
+static const css_prop_key_t shorthand_flex_keys[] = { css_prop_flex_basis,
+                                                      css_prop_flex_grow,
+                                                      css_prop_flex_shrink };
+static const css_prop_key_t shorthand_gap_keys[] = { css_prop_row_gap,
+                                                     css_prop_column_gap };
+
+#define DEFINE_SHORTHAND_INHERIT_MAP(NAME, KEYS) \
+        { NAME, KEYS, sizeof(KEYS) / sizeof((KEYS)[0]) }
+
+static const css_shorthand_inherit_map_t shorthand_inherit_maps[] = {
+        DEFINE_SHORTHAND_INHERIT_MAP("background", shorthand_background_keys),
+        DEFINE_SHORTHAND_INHERIT_MAP("background-position",
+                                     shorthand_background_position_keys),
+        DEFINE_SHORTHAND_INHERIT_MAP("padding", shorthand_padding_keys),
+        DEFINE_SHORTHAND_INHERIT_MAP("margin", shorthand_margin_keys),
+        DEFINE_SHORTHAND_INHERIT_MAP("border-color",
+                                     shorthand_border_color_keys),
+        DEFINE_SHORTHAND_INHERIT_MAP("border-width",
+                                     shorthand_border_width_keys),
+        DEFINE_SHORTHAND_INHERIT_MAP("border-style",
+                                     shorthand_border_style_keys),
+        DEFINE_SHORTHAND_INHERIT_MAP("border-radius",
+                                     shorthand_border_radius_keys),
+        DEFINE_SHORTHAND_INHERIT_MAP("border-top", shorthand_border_top_keys),
+        DEFINE_SHORTHAND_INHERIT_MAP("border-right",
+                                     shorthand_border_right_keys),
+        DEFINE_SHORTHAND_INHERIT_MAP("border-bottom",
+                                     shorthand_border_bottom_keys),
+        DEFINE_SHORTHAND_INHERIT_MAP("border-left", shorthand_border_left_keys),
+        DEFINE_SHORTHAND_INHERIT_MAP("border", shorthand_border_keys),
+        DEFINE_SHORTHAND_INHERIT_MAP("flex", shorthand_flex_keys),
+        DEFINE_SHORTHAND_INHERIT_MAP("gap", shorthand_gap_keys)
+};
+
+#undef DEFINE_SHORTHAND_INHERIT_MAP
 
 static void css_propdef_destroy(css_propdef_t *prop)
 {
@@ -99,7 +204,7 @@ int css_register_shorthand_property(const char *name, const char *syntax,
 
 static int css_register_property_with_key(
     unsigned key, const char *name, const char *syntax,
-    const char *initial_value,
+    const char *initial_value, bool inherited,
     int (*cascade)(const css_style_array_value_t, css_computed_style_t *))
 {
         unsigned i;
@@ -128,6 +233,7 @@ static int css_register_property_with_key(
         }
         prop->name = y_strdup(name);
         prop->key = key;
+        prop->inherited = inherited;
         prop->cascade = cascade;
         if (key >= css_properties.list_length) {
                 props = realloc(css_properties.list,
@@ -154,7 +260,7 @@ int css_register_property(const char *name, const char *definition,
 {
         return css_register_property_with_key((int)css_properties.list_length,
                                               name, definition, initial_value,
-                                              cascade);
+                                              false, cascade);
 }
 
 css_propdef_t *css_get_propdef_by_name(const char *name)
@@ -168,6 +274,73 @@ css_propdef_t *css_get_propdef(int key)
                 return css_properties.list[key];
         }
         return NULL;
+}
+
+static bool css_value_is_inherit(const css_style_value_t *value)
+{
+        return value->type == CSS_ARRAY_VALUE &&
+               css_style_value_get_array_length(value) == 1 &&
+               value->array_value[0].type == CSS_KEYWORD_VALUE &&
+               value->array_value[0].keyword_value == CSS_KEYWORD_INHERIT;
+}
+
+static int css_style_decl_expand_shorthand_inherit(css_style_decl_t *style,
+                                                   const css_propdef_t *propdef)
+{
+        unsigned i, j;
+        css_style_value_t value = { 0 };
+        const css_shorthand_inherit_map_t *map;
+
+        for (i = 0; i < sizeof(shorthand_inherit_maps) /
+                            sizeof(shorthand_inherit_maps[0]);
+             ++i) {
+                map = &shorthand_inherit_maps[i];
+                if (strcmp(propdef->name, map->name) == 0) {
+                        break;
+                }
+        }
+        if (i == sizeof(shorthand_inherit_maps) /
+                     sizeof(shorthand_inherit_maps[0])) {
+                return -1;
+        }
+        value.type = CSS_KEYWORD_VALUE;
+        value.keyword_value = CSS_KEYWORD_INHERIT;
+        for (j = 0; j < map->key_count; ++j) {
+                css_style_decl_add(style, map->keys[j], &value);
+        }
+        return 1;
+}
+
+int css_style_decl_add_property(css_style_decl_t *style,
+                                const css_propdef_t *propdef,
+                                const char *css_text)
+{
+        css_style_value_t value = { 0 };
+        int len;
+
+        if (propdef->key < 0) {
+                if (css_is_inherit_keyword(css_text)) {
+                        return css_style_decl_expand_shorthand_inherit(
+                                   style, propdef) < 0
+                                   ? -1
+                                   : (int)strlen(css_text);
+                }
+                return propdef->parse(propdef, css_text, style);
+        }
+        len = css_parse_property_value(propdef, css_text, &value);
+        if (len <= 0) {
+                css_style_value_destroy(&value);
+                return len;
+        }
+        if (css_value_is_inherit(&value)) {
+                css_style_decl_add(style, propdef->key, &value);
+                css_style_value_destroy(&value);
+                return len;
+        }
+        /* 同一规则内重复声明取最后一次；条目保持首现位置，不影响跨规则优先级顺序 */
+        css_style_decl_set(style, propdef->key, &value);
+        css_style_value_destroy(&value);
+        return len;
 }
 
 unsigned css_get_prop_count(void)
@@ -223,7 +396,8 @@ void css_init_properties(void)
         css_register_valdef_alias("padding-top", "auto | <length-percentage>");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/visibility */
-        DEFINE_PROP(visibility, "visibility", "visible | hidden", "visible");
+        DEFINE_INHERITED_PROP(visibility, "visibility", "visible | hidden",
+                              "visible");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/width */
         DEFINE_PROP(width, "width",
@@ -507,7 +681,8 @@ void css_init_properties(void)
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/pointer-events
          */
-        DEFINE_PROP(pointer_events, "pointer-events", "auto | none", "auto");
+        DEFINE_INHERITED_PROP(pointer_events, "pointer-events", "auto | none",
+                              "auto");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing */
         DEFINE_PROP(box_sizing, "box-sizing", "content-box | border-box",
@@ -564,39 +739,40 @@ void css_init_properties(void)
                               "[ normal | <length-percentage> ]{1,2}");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/color */
-        DEFINE_PROP(color, "color", "<color>", "#000");
+        DEFINE_INHERITED_PROP(color, "color", "<color>", "#000");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/font-family */
-        DEFINE_PROP(font_family, "font-family", "<font-family>", "system-ui");
+        DEFINE_INHERITED_PROP(font_family, "font-family", "<font-family>",
+                              "system-ui");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/font-size */
-        DEFINE_PROP(font_size, "font-size",
-                    "small | medium | large | <length> | <percentage>",
-                    "medium");
+        DEFINE_INHERITED_PROP(
+            font_size, "font-size",
+            "small | medium | large | <length> | <percentage>", "medium");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/font-style */
-        DEFINE_PROP(font_style, "font-style", "normal | italic | oblique",
-                    "normal");
+        DEFINE_INHERITED_PROP(font_style, "font-style",
+                              "normal | italic | oblique", "normal");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight */
-        DEFINE_PROP(font_weight, "font-weight", "normal | bold | <number>",
-                    "normal");
+        DEFINE_INHERITED_PROP(font_weight, "font-weight",
+                              "normal | bold | <number>", "normal");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/text-align */
-        DEFINE_PROP(text_align, "text-align", "left | center | right", "left");
+        DEFINE_INHERITED_PROP(text_align, "text-align", "left | center | right",
+                              "left");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/line-height */
-        DEFINE_PROP(line_height, "line-height",
-                    "normal | <number> | <length-percentage>", "normal");
+        DEFINE_INHERITED_PROP(line_height, "line-height",
+                              "normal | <number> | <length-percentage>",
+                              "normal");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/content */
         DEFINE_PROP(content, "content", "<string> | none", "none");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/white-space */
-        DEFINE_PROP(white_space, "white-space", "normal | nowrap", "normal");
-
-        /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/word-break */
-        DEFINE_PROP(word_break, "word-break", "normal | break-all", "normal");
+        DEFINE_INHERITED_PROP(white_space, "white-space", "normal | nowrap",
+                              "normal");
 
         /** @see
          * https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration */
@@ -618,6 +794,10 @@ void css_init_properties(void)
          */
         DEFINE_PROP(text_decoration_thickness, "text-decoration-thickness",
                     "auto | <length>", "auto");
+
+        /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/word-break */
+        DEFINE_INHERITED_PROP(word_break, "word-break", "normal | break-all",
+                              "normal");
 }
 
 void css_destroy_properties(void)

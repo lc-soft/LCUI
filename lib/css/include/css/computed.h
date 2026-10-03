@@ -41,6 +41,53 @@ LIBCSS_BEGIN_DECLS
                 (DEST)->unit_bits.PROP_KEY = (SRC)->unit_bits.PROP_KEY; \
         } while (0);
 
+/* Copy a value that has both a numeric field and a type_bits classifier. */
+#define CSS_COPY_VALUE_TYPE(DEST, SRC, PROP_KEY)                        \
+        do {                                                            \
+                (DEST)->PROP_KEY = (SRC)->PROP_KEY;                     \
+                (DEST)->type_bits.PROP_KEY = (SRC)->type_bits.PROP_KEY; \
+        } while (0);
+
+/* Copy a value that has both a numeric field and a unit_bits classifier. */
+#define CSS_COPY_VALUE_UNIT(DEST, SRC, PROP_KEY)                        \
+        do {                                                            \
+                (DEST)->PROP_KEY = (SRC)->PROP_KEY;                     \
+                (DEST)->unit_bits.PROP_KEY = (SRC)->unit_bits.PROP_KEY; \
+        } while (0);
+
+/* Copy a value field only (e.g. plain color without metadata). */
+#define CSS_COPY_VALUE(DEST, SRC, PROP_KEY) (DEST)->PROP_KEY = (SRC)->PROP_KEY
+
+/* Copy a type_bits-only classifier. */
+#define CSS_COPY_TYPE_BITS(DEST, SRC, PROP_KEY) \
+        (DEST)->type_bits.PROP_KEY = (SRC)->type_bits.PROP_KEY
+
+/* Property equality macros mirroring the copy shapes above. */
+#define CSS_LENGTH_EQUAL(A, B, PROP_KEY)                       \
+        ((A)->PROP_KEY == (B)->PROP_KEY &&                     \
+         (A)->type_bits.PROP_KEY == (B)->type_bits.PROP_KEY && \
+         (A)->unit_bits.PROP_KEY == (B)->unit_bits.PROP_KEY)
+
+#define CSS_VALUE_TYPE_EQUAL(A, B, PROP_KEY) \
+        ((A)->PROP_KEY == (B)->PROP_KEY &&   \
+         (A)->type_bits.PROP_KEY == (B)->type_bits.PROP_KEY)
+
+#define CSS_VALUE_UNIT_EQUAL(A, B, PROP_KEY) \
+        ((A)->PROP_KEY == (B)->PROP_KEY &&   \
+         (A)->unit_bits.PROP_KEY == (B)->unit_bits.PROP_KEY)
+
+#define CSS_VALUE_EQUAL(A, B, PROP_KEY) ((A)->PROP_KEY == (B)->PROP_KEY)
+
+#define CSS_TYPE_BITS_EQUAL(A, B, PROP_KEY) \
+        ((A)->type_bits.PROP_KEY == (B)->type_bits.PROP_KEY)
+
+/* Compares an owned string field plus its type_bits classifier. */
+#define CSS_STRING_TYPE_EQUAL(A, B, PROP_KEY)   \
+        (CSS_TYPE_BITS_EQUAL(A, B, PROP_KEY) && \
+         ((A)->PROP_KEY == (B)->PROP_KEY ||     \
+          ((A)->PROP_KEY && (B)->PROP_KEY &&    \
+           strcmp((A)->PROP_KEY, (B)->PROP_KEY) == 0)))
+
 LIBCSS_INLINE bool is_css_display_inline(const css_computed_style_t *s)
 {
         return s->type_bits.display == CSS_DISPLAY_INLINE ||
@@ -244,8 +291,20 @@ LIBCSS_PUBLIC uint8_t css_computed_visibility(const css_computed_style_t *s);
 
 LIBCSS_PUBLIC void css_computed_style_destroy(css_computed_style_t *s);
 
+LIBCSS_PUBLIC void css_computed_style_copy_property(
+    css_computed_style_t *dest, const css_computed_style_t *src,
+    css_prop_key_t key);
+
+LIBCSS_PUBLIC bool css_computed_style_property_equal(
+    const css_computed_style_t *a, const css_computed_style_t *b,
+    css_prop_key_t key);
+
 LIBCSS_PUBLIC int css_cascade_style(const css_style_decl_t *style,
                                     css_computed_style_t *computed);
+
+LIBCSS_PUBLIC int css_cascade_style_with_parent(
+    const css_style_decl_t *style, const css_computed_style_t *parent,
+    css_computed_style_t *computed);
 
 LIBCSS_PUBLIC void css_compute_absolute_values(
     const css_computed_style_t *parent, css_computed_style_t *s,

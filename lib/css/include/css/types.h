@@ -18,6 +18,7 @@
 
 #define CSS_SELECTOR_MAX_LEN 1024
 #define CSS_SELECTOR_MAX_DEPTH 32
+#define CSS_DEFAULT_FONT_SIZE 14
 
 #define css_string(...) "" #__VA_ARGS__ ""
 
@@ -892,6 +893,7 @@ struct css_propdef {
         char *name;
         css_valdef_t *valdef;
         css_style_value_t initial_value;
+        bool inherited;
         int (*parse)(const css_propdef_t *, const char *, css_style_decl_t *);
         int (*cascade)(const css_style_array_value_t, css_computed_style_t *);
 };

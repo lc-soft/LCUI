@@ -14,6 +14,7 @@
 #include <css/properties.h>
 #include <css/style_value.h>
 #include <css/style_decl.h>
+#include "properties.h"
 
 static uint8_t get_padding_top(const css_computed_style_t *s,
                                css_numeric_value_t *value, css_unit_t *unit)
@@ -855,8 +856,17 @@ uint8_t css_computed_visibility(const css_computed_style_t *s)
         return s->type_bits.visibility;
 }
 
-int css_cascade_style(const css_style_decl_t *style,
-                      css_computed_style_t *computed)
+static bool css_computed_value_is_inherit(const css_style_value_t *value)
+{
+        return value->type == CSS_ARRAY_VALUE &&
+               css_style_value_get_array_length(value) == 1 &&
+               value->array_value[0].type == CSS_KEYWORD_VALUE &&
+               value->array_value[0].keyword_value == CSS_KEYWORD_INHERIT;
+}
+
+int css_cascade_style_with_parent(const css_style_decl_t *style,
+                                  const css_computed_style_t *parent,
+                                  css_computed_style_t *computed)
 {
         unsigned i;
         list_node_t *node;
@@ -874,19 +884,43 @@ int css_cascade_style(const css_style_decl_t *style,
                 setted_props[prop->key] = true;
                 propdef = css_get_propdef(prop->key);
                 assert(propdef && propdef->cascade);
+                if (css_computed_value_is_inherit(&prop->value)) {
+                        if (parent) {
+                                css_computed_style_copy_property(
+                                    computed, parent, prop->key);
+                        } else {
+                                propdef->cascade(
+                                    propdef->initial_value.array_value,
+                                    computed);
+                        }
+                        continue;
+                }
                 propdef->cascade(prop->value.array_value, computed);
-                // TODO: 确定 cascade() 返回值的用法
+                if (prop->key == css_prop_font_size) {
+                        css_compute_font_size_value(parent, computed);
+                }
         }
-        // 给其它属性设置初始值
         for (i = 0; i < count; ++i) {
                 if (setted_props[i]) {
                         continue;
                 }
                 propdef = css_get_propdef((int)i);
-                propdef->cascade(propdef->initial_value.array_value, computed);
+                if (parent && propdef->inherited) {
+                        css_computed_style_copy_property(computed, parent,
+                                                         (css_prop_key_t)i);
+                } else {
+                        propdef->cascade(propdef->initial_value.array_value,
+                                         computed);
+                }
         }
         free(setted_props);
         return 0;
+}
+
+int css_cascade_style(const css_style_decl_t *style,
+                      css_computed_style_t *computed)
+{
+        return css_cascade_style_with_parent(style, NULL, computed);
 }
 
 static int compute_absolute_length(
@@ -1297,20 +1331,282 @@ void css_compute_absolute_values(const css_computed_style_t *parent,
                                     set_text_decoration_thickness);
 }
 
-void css_computed_style_destroy(css_computed_style_t *s)
+static void css_computed_style_destroy_font_family(char **font_family)
 {
         unsigned i;
 
+        if (!font_family) {
+                return;
+        }
+        for (i = 0; font_family[i]; ++i) {
+                free(font_family[i]);
+        }
+        free(font_family);
+}
+
+static char **css_computed_style_copy_font_family(char *const *font_family)
+{
+        unsigned i, count;
+        char **copy;
+
+        if (!font_family) {
+                return NULL;
+        }
+        for (count = 0; font_family[count]; ++count) {
+        }
+        copy = calloc(count + 1, sizeof(char *));
+        if (!copy) {
+                return NULL;
+        }
+        for (i = 0; i < count; ++i) {
+                copy[i] = y_strdup(font_family[i]);
+        }
+        return copy;
+}
+
+/*
+ * Property copy/equality is generated from a single table (P0). Every
+ * css_prop_key_t appears exactly once; the field layout is resolved at
+ * compile time (C bitfields are not addressable at runtime), and a
+ * a compile-time assert ties the table length to STYLE_KEY_TOTAL so that a
+ * newly added property which is not registered here fails the build instead of
+ * silently falling into the default branch.
+ */
+
+/* Regular forms: the struct field name is identical to the css_prop_* key
+ * (NAME == FIELD convention); the key is passed through as the field. */
+#define CSS_PROP_COPY_LENGTH(D, S, K) CSS_COPY_LENGTH(D, S, K)
+#define CSS_PROP_COPY_VALUE_UNIT(D, S, K) CSS_COPY_VALUE_UNIT(D, S, K)
+#define CSS_PROP_COPY_VALUE_TYPE(D, S, K) CSS_COPY_VALUE_TYPE(D, S, K)
+#define CSS_PROP_COPY_VALUE(D, S, K) CSS_COPY_VALUE(D, S, K)
+#define CSS_PROP_COPY_TYPE_BITS(D, S, K) CSS_COPY_TYPE_BITS(D, S, K)
+
+#define CSS_PROP_EQ_LENGTH(A, B, K) CSS_LENGTH_EQUAL(A, B, K)
+#define CSS_PROP_EQ_VALUE_UNIT(A, B, K) CSS_VALUE_UNIT_EQUAL(A, B, K)
+#define CSS_PROP_EQ_VALUE_TYPE(A, B, K) CSS_VALUE_TYPE_EQUAL(A, B, K)
+#define CSS_PROP_EQ_VALUE(A, B, K) CSS_VALUE_EQUAL(A, B, K)
+#define CSS_PROP_EQ_TYPE_BITS(A, B, K) CSS_TYPE_BITS_EQUAL(A, B, K)
+
+/* Owned string duplicated with y_strdup, plus its type_bits classifier. */
+#define CSS_PROP_COPY_STRING(D, S, K)                          \
+        do {                                                   \
+                char *_str = (S)->K ? y_strdup((S)->K) : NULL; \
+                if ((D)->K != (S)->K) {                        \
+                        free((D)->K);                          \
+                }                                              \
+                (D)->K = _str;                                 \
+                (D)->type_bits.K = (S)->type_bits.K;           \
+        } while (0)
+#define CSS_PROP_EQ_STRING(A, B, K) CSS_STRING_TYPE_EQUAL(A, B, K)
+
+/* Owned font-family array with dedicated copy/destroy and element compare. */
+#define CSS_PROP_COPY_FONT_FAMILY(D, S, K)                                 \
+        do {                                                               \
+                char **_ff =                                               \
+                    css_computed_style_copy_font_family((S)->font_family); \
+                if ((D)->font_family != (S)->font_family) {                \
+                        css_computed_style_destroy_font_family(            \
+                            (D)->font_family);                             \
+                }                                                          \
+                (D)->font_family = _ff;                                    \
+                (D)->type_bits.font_family = (S)->type_bits.font_family;   \
+        } while (0)
+#define CSS_PROP_EQ_FONT_FAMILY(A, B, K) css_font_family_equal(A, B)
+
+/* Composite properties that touch several fields under one key. */
+#define CSS_PROP_COPY_BACKGROUND_SIZE(D, S, K)            \
+        do {                                              \
+                CSS_COPY_LENGTH(D, S, background_width);  \
+                CSS_COPY_LENGTH(D, S, background_height); \
+        } while (0)
+#define CSS_PROP_EQ_BACKGROUND_SIZE(A, B, K)         \
+        (CSS_LENGTH_EQUAL(A, B, background_width) && \
+         CSS_LENGTH_EQUAL(A, B, background_height))
+
+#define CSS_PROP_COPY_BOX_SHADOW(D, S, K)                     \
+        do {                                                  \
+                CSS_COPY_VALUE_UNIT(D, S, box_shadow_x);      \
+                CSS_COPY_VALUE_UNIT(D, S, box_shadow_y);      \
+                CSS_COPY_VALUE_UNIT(D, S, box_shadow_blur);   \
+                CSS_COPY_VALUE_UNIT(D, S, box_shadow_spread); \
+                CSS_COPY_VALUE(D, S, box_shadow_color);       \
+                CSS_COPY_TYPE_BITS(D, S, box_shadow);         \
+        } while (0)
+#define CSS_PROP_EQ_BOX_SHADOW(A, B, K)                   \
+        (CSS_VALUE_UNIT_EQUAL(A, B, box_shadow_x) &&      \
+         CSS_VALUE_UNIT_EQUAL(A, B, box_shadow_y) &&      \
+         CSS_VALUE_UNIT_EQUAL(A, B, box_shadow_blur) &&   \
+         CSS_VALUE_UNIT_EQUAL(A, B, box_shadow_spread) && \
+         CSS_VALUE_EQUAL(A, B, box_shadow_color) &&       \
+         CSS_TYPE_BITS_EQUAL(A, B, box_shadow))
+
+/* TYPE_BITS form whose storage field name differs from the key. */
+#define CSS_PROP_COPY_TEXT_DECORATION(D, S, K) \
+        CSS_COPY_TYPE_BITS(D, S, text_decoration)
+#define CSS_PROP_EQ_TEXT_DECORATION(A, B, K) \
+        CSS_TYPE_BITS_EQUAL(A, B, text_decoration)
+
+/*
+ * Single source of truth: KEY (css_prop_* suffix) + KIND (form above).
+ * Listed in css_prop_key_t declaration order. background_size/box_shadow/
+ * text_decoration_line/font_family/background_image/content use dedicated
+ * kinds; everything else maps to a regular form.
+ */
+#define CSS_PROP_TABLE(X)                         \
+        X(left, LENGTH)                           \
+        X(right, LENGTH)                          \
+        X(top, LENGTH)                            \
+        X(bottom, LENGTH)                         \
+        X(position, TYPE_BITS)                    \
+        X(visibility, TYPE_BITS)                  \
+        X(display, TYPE_BITS)                     \
+        X(z_index, VALUE_TYPE)                    \
+        X(opacity, VALUE_TYPE)                    \
+        X(box_sizing, TYPE_BITS)                  \
+        X(width, LENGTH)                          \
+        X(height, LENGTH)                         \
+        X(min_width, LENGTH)                      \
+        X(min_height, LENGTH)                     \
+        X(max_width, LENGTH)                      \
+        X(max_height, LENGTH)                     \
+        X(margin_top, LENGTH)                     \
+        X(margin_right, LENGTH)                   \
+        X(margin_bottom, LENGTH)                  \
+        X(margin_left, LENGTH)                    \
+        X(padding_top, LENGTH)                    \
+        X(padding_right, LENGTH)                  \
+        X(padding_bottom, LENGTH)                 \
+        X(padding_left, LENGTH)                   \
+        X(vertical_align, TYPE_BITS)              \
+        X(border_top_width, VALUE_UNIT)           \
+        X(border_top_style, TYPE_BITS)            \
+        X(border_top_color, VALUE)                \
+        X(border_right_width, VALUE_UNIT)         \
+        X(border_right_style, TYPE_BITS)          \
+        X(border_right_color, VALUE)              \
+        X(border_bottom_width, VALUE_UNIT)        \
+        X(border_bottom_style, TYPE_BITS)         \
+        X(border_bottom_color, VALUE)             \
+        X(border_left_width, VALUE_UNIT)          \
+        X(border_left_style, TYPE_BITS)           \
+        X(border_left_color, VALUE)               \
+        X(border_top_left_radius, VALUE_UNIT)     \
+        X(border_top_right_radius, VALUE_UNIT)    \
+        X(border_bottom_left_radius, VALUE_UNIT)  \
+        X(border_bottom_right_radius, VALUE_UNIT) \
+        X(background_color, VALUE)                \
+        X(background_image, STRING)               \
+        X(background_size, BACKGROUND_SIZE)       \
+        X(background_repeat, TYPE_BITS)           \
+        X(background_clip, TYPE_BITS)             \
+        X(background_position_x, LENGTH)          \
+        X(background_position_y, LENGTH)          \
+        X(box_shadow, BOX_SHADOW)                 \
+        X(flex_basis, LENGTH)                     \
+        X(flex_grow, VALUE_TYPE)                  \
+        X(flex_shrink, VALUE_TYPE)                \
+        X(flex_direction, TYPE_BITS)              \
+        X(flex_wrap, TYPE_BITS)                   \
+        X(justify_content, TYPE_BITS)             \
+        X(align_content, TYPE_BITS)               \
+        X(align_items, TYPE_BITS)                 \
+        X(row_gap, LENGTH)                        \
+        X(column_gap, LENGTH)                     \
+        X(color, VALUE_TYPE)                      \
+        X(font_size, LENGTH)                      \
+        X(font_style, TYPE_BITS)                  \
+        X(font_weight, TYPE_BITS)                 \
+        X(font_family, FONT_FAMILY)               \
+        X(line_height, LENGTH)                    \
+        X(text_align, TYPE_BITS)                  \
+        X(content, STRING)                        \
+        X(white_space, TYPE_BITS)                 \
+        X(word_break, TYPE_BITS)                  \
+        X(pointer_events, TYPE_BITS)              \
+        X(text_decoration_line, TEXT_DECORATION)  \
+        X(text_underline_offset, LENGTH)          \
+        X(text_decoration_thickness, LENGTH)
+
+enum {
+        CSS_PROP_TABLE_COUNT =
+#define X(KEY, KIND) +1
+            CSS_PROP_TABLE(X)
+#undef X
+            + 0
+};
+/*
+ * Compile-time coverage gate. If this line fails to compile (MSVC reports
+ * "error C2118: negative subscript"), a property was added to the
+ * css_prop_key_t enum but is NOT registered in CSS_PROP_TABLE above.
+ * FIX: add one `X(<name>, <KIND>)` row for every missing key so the table
+ * lists exactly STYLE_KEY_TOTAL properties. The array is intentionally sized
+ * -1 when the table is incomplete.
+ */
+typedef char css_prop_table_must_cover_every_css_prop_key
+    [(CSS_PROP_TABLE_COUNT == STYLE_KEY_TOTAL) ? 1 : -1];
+
+/* Element-wise font-family comparison (used by the FONT_FAMILY kind). */
+static bool css_font_family_equal(const css_computed_style_t *a,
+                                  const css_computed_style_t *b)
+{
+        unsigned i;
+
+        if (!CSS_TYPE_BITS_EQUAL(a, b, font_family)) {
+                return false;
+        }
+        if (!a->font_family || !b->font_family) {
+                return a->font_family == b->font_family;
+        }
+        for (i = 0; a->font_family[i] && b->font_family[i]; ++i) {
+                if (strcmp(a->font_family[i], b->font_family[i]) != 0) {
+                        return false;
+                }
+        }
+        return a->font_family[i] == NULL && b->font_family[i] == NULL;
+}
+
+void css_computed_style_copy_property(css_computed_style_t *dest,
+                                      const css_computed_style_t *src,
+                                      css_prop_key_t key)
+{
+        if (dest == src) {
+                return;
+        }
+        switch (key) {
+#define X(KEY, KIND)                                  \
+        case css_prop_##KEY:                          \
+                CSS_PROP_COPY_##KIND(dest, src, KEY); \
+                return;
+                CSS_PROP_TABLE(X)
+#undef X
+        default:
+                assert(false);
+                return;
+        }
+}
+
+bool css_computed_style_property_equal(const css_computed_style_t *a,
+                                       const css_computed_style_t *b,
+                                       css_prop_key_t key)
+{
+        switch (key) {
+#define X(KEY, KIND)         \
+        case css_prop_##KEY: \
+                return CSS_PROP_EQ_##KIND(a, b, KEY);
+                CSS_PROP_TABLE(X)
+#undef X
+        default:
+                assert(false);
+                return false;
+        }
+}
+
+void css_computed_style_destroy(css_computed_style_t *s)
+{
         if (s->background_image) {
                 free(s->background_image);
         }
-        if (s->font_family) {
-                for (i = 0; s->font_family[i]; ++i) {
-                        free(s->font_family[i]);
-                        s->font_family[i] = NULL;
-                }
-                free(s->font_family);
-        }
+        css_computed_style_destroy_font_family(s->font_family);
         if (s->content) {
                 free(s->content);
         }

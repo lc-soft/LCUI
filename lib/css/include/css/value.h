@@ -46,6 +46,12 @@ LIBCSS_PUBLIC css_valdef_t *css_compile_valdef(const char *definition_str);
 LIBCSS_PUBLIC int css_parse_value(const css_valdef_t *valdef, const char *str,
                                   css_style_value_t *val);
 
+LIBCSS_PUBLIC int css_parse_property_value(const css_propdef_t *propdef,
+                                           const char *css_text,
+                                           css_style_value_t *value);
+
+LIBCSS_PUBLIC bool css_is_inherit_keyword(const char *css_text);
+
 LIBCSS_PUBLIC size_t css_print_valdef(const css_valdef_t *s);
 
 LIBCSS_PUBLIC size_t css_valdef_to_string(const css_valdef_t *s, char *str,

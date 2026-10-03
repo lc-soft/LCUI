@@ -39,3 +39,21 @@ int css_cascade_font_size(const css_style_array_value_t input,
         }
         return 0;
 }
+
+void css_compute_font_size_value(const css_computed_style_t *parent,
+                                 css_computed_style_t *computed)
+{
+        css_numeric_value_t parent_size = CSS_DEFAULT_FONT_SIZE;
+        css_unit_t parent_unit = CSS_UNIT_PX;
+
+        if (computed->type_bits.font_size != CSS_FONT_SIZE_DIMENSION ||
+            computed->unit_bits.font_size != CSS_UNIT_PERCENT) {
+                return;
+        }
+        if (parent && parent->type_bits.font_size == CSS_FONT_SIZE_DIMENSION) {
+                parent_size = parent->font_size;
+                parent_unit = parent->unit_bits.font_size;
+        }
+        computed->font_size = computed->font_size * parent_size / 100.0f;
+        computed->unit_bits.font_size = parent_unit;
+}
