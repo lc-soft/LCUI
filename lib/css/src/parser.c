@@ -214,7 +214,9 @@ static int css_parser_parse_style_property_value(css_parser_t *parser)
                             "[css-parser] [property: %s] invalid value: %s\n",
                             propdef->name, parser->buffer);
                 } else {
-                        css_style_decl_add(parser->style_parser.style,
+                        /* 同一规则内重复声明取最后一次；
+                         * 条目保持首现位置，不影响跨规则优先级顺序 */
+                        css_style_decl_set(parser->style_parser.style,
                                            propdef->key, &value);
                         css_style_value_destroy(&value);
                 }

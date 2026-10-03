@@ -117,6 +117,9 @@ typedef enum {
         css_prop_word_break,
 
         css_prop_pointer_events,
+        css_prop_text_decoration_line,
+        css_prop_text_underline_offset,
+        css_prop_text_decoration_thickness,
         STYLE_KEY_TOTAL
 } css_prop_key_t;
 
@@ -428,6 +431,21 @@ typedef enum {
         CSS_TEXT_ALIGN_LIBCSS_RIGHT
 } css_text_align_t;
 
+typedef enum {
+        CSS_TEXT_DECORATION_NONE,
+        CSS_TEXT_DECORATION_UNDERLINE
+} css_text_decoration_t;
+
+typedef enum {
+        CSS_TEXT_UNDERLINE_OFFSET_AUTO,
+        CSS_TEXT_UNDERLINE_OFFSET_SET
+} css_text_underline_offset_t;
+
+typedef enum {
+        CSS_TEXT_DECORATION_THICKNESS_AUTO,
+        CSS_TEXT_DECORATION_THICKNESS_SET
+} css_text_decoration_thickness_t;
+
 typedef enum { CSS_TOP_INHERIT, CSS_TOP_SET, CSS_TOP_AUTO } css_top_t;
 typedef enum {
         CSS_VERTICAL_ALIGN_INHERIT,
@@ -596,6 +614,7 @@ typedef enum css_keyword_value_t {
         CSS_KEYWORD_MAX_CONTENT,
         CSS_KEYWORD_MIN_CONTENT,
         CSS_KEYWORD_FIT_CONTENT,
+        CSS_KEYWORD_UNDERLINE,
 } css_keyword_value_t;
 
 /** https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleValue */
@@ -740,6 +759,9 @@ typedef struct css_computed_style {
                 uint8_t content : 2;
                 uint8_t white_space : 3;
                 uint8_t word_break : 3;
+                uint8_t text_decoration : 1;
+                uint8_t text_underline_offset : 1;
+                uint8_t text_decoration_thickness : 1;
         } type_bits;
 
         /**
@@ -785,6 +807,8 @@ typedef struct css_computed_style {
                 css_unit_t line_height : 4;
                 css_unit_t row_gap : 4;
                 css_unit_t column_gap : 4;
+                css_unit_t text_underline_offset : 4;
+                css_unit_t text_decoration_thickness : 4;
         } unit_bits;
 
         css_numeric_value_t z_index;
@@ -823,6 +847,8 @@ typedef struct css_computed_style {
 
         css_numeric_value_t line_height;
         css_string_value_t content;
+        css_numeric_value_t text_underline_offset;
+        css_numeric_value_t text_decoration_thickness;
 
         css_numeric_value_t border_top_width;
         css_numeric_value_t border_right_width;

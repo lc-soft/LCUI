@@ -300,6 +300,40 @@ static void set_flex_basis(css_computed_style_t *s, css_numeric_value_t value,
         s->unit_bits.flex_basis = unit;
 }
 
+static uint8_t get_text_underline_offset(const css_computed_style_t *s,
+                                         css_numeric_value_t *value,
+                                         css_unit_t *unit)
+{
+        *value = s->text_underline_offset;
+        *unit = s->unit_bits.text_underline_offset;
+        return s->type_bits.text_underline_offset;
+}
+
+static void set_text_underline_offset(css_computed_style_t *s,
+                                      css_numeric_value_t value,
+                                      css_unit_t unit)
+{
+        s->text_underline_offset = value;
+        s->unit_bits.text_underline_offset = unit;
+}
+
+static uint8_t get_text_decoration_thickness(const css_computed_style_t *s,
+                                             css_numeric_value_t *value,
+                                             css_unit_t *unit)
+{
+        *value = s->text_decoration_thickness;
+        *unit = s->unit_bits.text_decoration_thickness;
+        return s->type_bits.text_decoration_thickness;
+}
+
+static void set_text_decoration_thickness(css_computed_style_t *s,
+                                          css_numeric_value_t value,
+                                          css_unit_t unit)
+{
+        s->text_decoration_thickness = value;
+        s->unit_bits.text_decoration_thickness = unit;
+}
+
 uint8_t css_computed_padding_top(const css_computed_style_t *s,
                                  css_numeric_value_t *value, css_unit_t *unit)
 {
@@ -886,6 +920,37 @@ static int compute_absolute_length(
         return 0;
 }
 
+static int compute_absolute_css_length(
+    css_computed_style_t *s, css_metrics_t *m,
+    uint8_t (*getter)(const css_computed_style_t *, css_numeric_value_t *,
+                      css_unit_t *),
+    void (*setter)(css_computed_style_t *, css_numeric_value_t, css_unit_t))
+{
+        css_unit_t unit;
+        css_numeric_value_t value;
+
+        if (getter(s, &value, &unit) != CSS_LENGTH_SET) {
+                return 0;
+        }
+        switch (unit) {
+        case CSS_UNIT_PX:
+                break;
+        case CSS_UNIT_DIP:
+                value *= m->density;
+                break;
+        case CSS_UNIT_SP:
+                value *= m->scaled_density;
+                break;
+        case CSS_UNIT_PT:
+                value *= 96.f / 72.f;
+                break;
+        default:
+                return -1;
+        }
+        setter(s, value, CSS_UNIT_PX);
+        return 0;
+}
+
 static uint8_t compute_content_box_width(const css_computed_style_t *s,
                                          css_numeric_value_t *value,
                                          css_unit_t *unit)
@@ -1226,6 +1291,10 @@ void css_compute_absolute_values(const css_computed_style_t *parent,
                                 set_box_shadow_blur);
         compute_absolute_length(s, m, css_computed_box_shadow_spread,
                                 set_box_shadow_spread);
+        compute_absolute_css_length(s, m, get_text_underline_offset,
+                                    set_text_underline_offset);
+        compute_absolute_css_length(s, m, get_text_decoration_thickness,
+                                    set_text_decoration_thickness);
 }
 
 void css_computed_style_destroy(css_computed_style_t *s)

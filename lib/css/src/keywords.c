@@ -186,6 +186,7 @@ void css_init_keywords(void)
         css_set_keyword(CSS_KEYWORD_FIT_CONTENT, "fit-content");
         css_set_keyword(CSS_KEYWORD_MIN_CONTENT, "min-content");
         css_set_keyword(CSS_KEYWORD_MAX_CONTENT, "max-content");
+        css_set_keyword(CSS_KEYWORD_UNDERLINE, "underline");
 }
 
 void css_destroy_keywords(void)

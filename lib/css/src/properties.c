@@ -188,6 +188,9 @@ void css_init_properties(void)
 
         css_register_valdef_alias("line-width", "<length>");
         css_register_valdef_alias("line-style", "none | solid");
+        css_register_valdef_alias("text-decoration-line", "none | underline");
+        css_register_valdef_alias("text-decoration-thickness",
+                                  "auto | <length>");
         css_register_valdef_alias("length-percentage",
                                   "<length> | <percentage>");
         css_register_valdef_alias("shadow", "<length>{2,4} && <color>?");
@@ -594,6 +597,27 @@ void css_init_properties(void)
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/word-break */
         DEFINE_PROP(word_break, "word-break", "normal | break-all", "normal");
+
+        /** @see
+         * https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration */
+        DEFINE_SHORTHAND_PROP(text_decoration, "text-decoration",
+                              "<text-decoration-line> || "
+                              "<text-decoration-thickness>");
+
+        DEFINE_PROP(text_decoration_line, "text-decoration-line",
+                    "none | underline", "none");
+
+        /** @see
+         * https://developer.mozilla.org/en-US/docs/Web/CSS/text-underline-offset
+         */
+        DEFINE_PROP(text_underline_offset, "text-underline-offset",
+                    "auto | <length>", "auto");
+
+        /** @see
+         * https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-thickness
+         */
+        DEFINE_PROP(text_decoration_thickness, "text-decoration-thickness",
+                    "auto | <length>", "auto");
 }
 
 void css_destroy_properties(void)
