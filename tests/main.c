@@ -39,6 +39,7 @@ extern void test_cursor(void);
 extern void test_icon(void);
 extern void test_button(void);
 extern void test_badge(void);
+extern void test_alert(void);
 
 static const ctest_suite_t suites[] = {
         { "settings", test_settings },
@@ -68,6 +69,7 @@ static const ctest_suite_t suites[] = {
         { "icon", test_icon },
         { "button", test_button },
         { "badge", test_badge },
+        { "alert", test_alert },
         { NULL, NULL }
 };
 

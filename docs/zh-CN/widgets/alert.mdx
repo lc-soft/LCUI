@@ -1,0 +1,89 @@
+# Alert
+
+在当前内容区域显示非阻塞的状态、结果或风险提示。
+
+<WidgetExample name="alert-basic" />
+
+## 适用场景
+
+- **适用**：展示保存结果、权限提醒或可恢复错误
+- **适用**：在局部内容附近提供后续操作
+- **不适用**：需要全局队列或自动消失的通知
+
+## 用法
+
+```tsx
+import { Alert, AlertContent, AlertDescription, AlertTitle } from "@lcui/react"
+```
+
+```tsx
+<Alert>
+  <AlertContent>
+    <AlertTitle>Payment successful</AlertTitle>
+    <AlertDescription>Your payment has been processed.</AlertDescription>
+  </AlertContent>
+</Alert>
+```
+
+## 组合
+
+使用以下组合来构建 `Alert`：
+
+```
+Alert
+├── Icon
+├── AlertContent
+│   ├── AlertTitle
+│   └── AlertDescription
+└── AlertAction
+```
+
+## 变体
+
+使用 `variant` 属性切换提示的视觉语义。
+
+<WidgetExample name="alert-variants" />
+
+## 破坏性提示
+
+使用 `variant="destructive"` 表示无法恢复或需要立即处理的错误。
+
+<WidgetExample name="alert-destructive" />
+
+## 操作
+
+使用 `AlertAction` 放置与提示相关的后续操作。
+
+<WidgetExample name="alert-action" />
+
+## API 参考
+
+### Alert
+
+提示容器，控制整体视觉变体。
+
+<FieldTable name="alert" />
+
+### AlertContent
+
+标题和说明的纵向内容容器。
+
+<FieldTable name="alert-content" />
+
+### AlertTitle
+
+提示标题。
+
+<FieldTable name="alert-title" />
+
+### AlertDescription
+
+提示补充说明。
+
+<FieldTable name="alert-description" />
+
+### AlertAction
+
+操作按钮的布局槽位。
+
+<FieldTable name="alert-action" />

@@ -1,0 +1,89 @@
+# Alert
+
+Displays a non-blocking status, result, or risk message within the current content area.
+
+<WidgetExample name="alert-basic" />
+
+## Use cases
+
+- **Suitable**: showing a save result, a permission reminder, or a recoverable error
+- **Suitable**: offering a follow-up action next to local content
+- **Not suitable**: notifications that need a global queue or auto-dismiss
+
+## Usage
+
+```tsx
+import { Alert, AlertContent, AlertDescription, AlertTitle } from "@lcui/react"
+```
+
+```tsx
+<Alert>
+  <AlertContent>
+    <AlertTitle>Payment successful</AlertTitle>
+    <AlertDescription>Your payment has been processed.</AlertDescription>
+  </AlertContent>
+</Alert>
+```
+
+## Composition
+
+Use the following composition to build an `Alert`:
+
+```
+Alert
+├── Icon
+├── AlertContent
+│   ├── AlertTitle
+│   └── AlertDescription
+└── AlertAction
+```
+
+## Variants
+
+Use the `variant` prop to switch the alert's visual semantics.
+
+<WidgetExample name="alert-variants" />
+
+## Destructive
+
+Use `variant="destructive"` for errors that cannot be recovered or need immediate attention.
+
+<WidgetExample name="alert-destructive" />
+
+## Action
+
+Use `AlertAction` to place a follow-up action related to the alert.
+
+<WidgetExample name="alert-action" />
+
+## API Reference
+
+### Alert
+
+The alert container; controls the overall visual variant.
+
+<FieldTable name="alert" />
+
+### AlertContent
+
+A vertical content container for the title and description.
+
+<FieldTable name="alert-content" />
+
+### AlertTitle
+
+The alert title.
+
+<FieldTable name="alert-title" />
+
+### AlertDescription
+
+The alert's supporting description.
+
+<FieldTable name="alert-description" />
+
+### AlertAction
+
+The layout slot for an action button.
+
+<FieldTable name="alert-action" />

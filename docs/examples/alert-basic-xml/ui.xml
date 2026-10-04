@@ -1,0 +1,24 @@
+<lcui-app>
+  <ui>
+    <widget class="alert-basic-demo">
+      <alert class="mb-6">
+        <icon name="checkmark-circle" />
+        <alert-content>
+          <alert-title>Payment successful</alert-title>
+          <alert-description
+          >Your payment of $29.99 has been processed. A receipt has been sent to
+            your email address.</alert-description>
+        </alert-content>
+      </alert>
+      <alert class="mb-6">
+        <icon name="info" />
+        <alert-content>
+          <alert-title>New feature available</alert-title>
+          <alert-description
+          >We've added dark mode support. You can enable it in your account
+            settings.</alert-description>
+        </alert-content>
+      </alert>
+    </widget>
+  </ui>
+</lcui-app>

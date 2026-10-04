@@ -1,0 +1,13 @@
+<lcui-app>
+  <ui>
+    <alert class="alert-destructive-demo" variant="destructive">
+      <icon name="error-circle" />
+      <alert-content>
+        <alert-title>Payment failed</alert-title>
+        <alert-description
+        >Your payment could not be processed. Please check your payment method
+          and try again.</alert-description>
+      </alert-content>
+    </alert>
+  </ui>
+</lcui-app>

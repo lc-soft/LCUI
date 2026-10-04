@@ -1,0 +1,34 @@
+<lcui-app>
+  <ui>
+    <widget class="alert-variants-demo">
+      <alert variant="info" class="mb-6">
+        <icon name="info" />
+        <alert-content>
+          <alert-title>New feature available</alert-title>
+          <alert-description>Try the updated dashboard.</alert-description>
+        </alert-content>
+      </alert>
+      <alert variant="success" class="mb-6">
+        <icon name="checkmark-circle" />
+        <alert-content>
+          <alert-title>Payment successful</alert-title>
+          <alert-description>Your payment has been processed.</alert-description>
+        </alert-content>
+      </alert>
+      <alert variant="warning" class="mb-6">
+        <icon name="warning" />
+        <alert-content>
+          <alert-title>Storage almost full</alert-title>
+          <alert-description>Free up space to continue.</alert-description>
+        </alert-content>
+      </alert>
+      <alert variant="destructive" class="mb-6">
+        <icon name="error-circle" />
+        <alert-content>
+          <alert-title>Unable to save changes</alert-title>
+          <alert-description>Please try again.</alert-description>
+        </alert-content>
+      </alert>
+    </widget>
+  </ui>
+</lcui-app>

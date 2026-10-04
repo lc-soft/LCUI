@@ -1,0 +1,13 @@
+<lcui-app>
+  <ui>
+    <alert class="alert-action-demo">
+      <alert-content>
+        <alert-title>Dark mode is now available</alert-title>
+        <alert-description
+        >Enable it under your profile settings to get started.</alert-description>
+      </alert-content>
+      <alert-action
+      ><button variant="primary" size="xs">Enable</button></alert-action>
+    </alert>
+  </ui>
+</lcui-app>

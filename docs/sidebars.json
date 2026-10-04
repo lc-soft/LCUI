@@ -32,6 +32,7 @@
       "label": { "en": "Widgets", "zh-CN": "组件" },
       "items": [
         { "slug": "anchor", "label": { "en": "Anchor", "zh-CN": "Anchor 锚点" } },
+        { "slug": "alert", "label": { "en": "Alert", "zh-CN": "Alert 提示" } },
         { "slug": "badge", "label": { "en": "Badge", "zh-CN": "Badge 徽标" } },
         { "slug": "button", "label": { "en": "Button", "zh-CN": "Button 按钮" } },
         { "slug": "checkbox", "label": { "en": "Checkbox", "zh-CN": "Checkbox 复选框" } },
