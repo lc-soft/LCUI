@@ -1,0 +1,10 @@
+<lcui-app>
+  <ui>
+    <widget class="badge-basic-demo">
+      <badge>Badge</badge>
+      <badge variant="secondary">Secondary</badge>
+      <badge variant="destructive">Destructive</badge>
+      <badge variant="outline">Outline</badge>
+    </widget>
+  </ui>
+</lcui-app>

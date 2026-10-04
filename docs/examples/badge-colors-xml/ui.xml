@@ -1,0 +1,11 @@
+<lcui-app>
+  <ui>
+    <widget class="badge-colors-demo">
+      <badge color="blue">blue</badge>
+      <badge color="green">green</badge>
+      <badge color="sky">sky</badge>
+      <badge color="purple">purple</badge>
+      <badge color="red">red</badge>
+    </widget>
+  </ui>
+</lcui-app>

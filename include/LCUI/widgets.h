@@ -25,3 +25,4 @@
 #include "widgets/radio_group.h"
 #include "widgets/field.h"
 #include "widgets/icon.h"
+#include "widgets/badge.h"

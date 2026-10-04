@@ -1,0 +1,43 @@
+# Badge
+
+用于显示短标签、状态和计数的轻量文本部件。
+
+<WidgetExample name="badge-basic" />
+
+## 适用场景
+
+- **适用**：在列表、卡片和表单中标记状态或分类
+- **适用**：展示简短的计数或提示文本
+- **不适用**：需要点击行为的命令控件（用 `button`）
+
+## 用法
+
+```tsx
+import { Badge } from "@lcui/react"
+```
+
+```tsx
+<Badge variant="secondary">Secondary</Badge>
+```
+
+## 变体
+
+使用 `variant` 属性切换徽标的预置外观。
+
+<WidgetExample name="badge-variants" />
+
+## 带图标
+
+组合 Icon 与 Text 子部件，可以用图标和文本共同表达状态或类别。把 Icon 放在 Text 之前即为前置图标，放在之后即为尾随图标。Badge 会自动横向排列子部件、保持 20px 高度，并将图标字号约束为与文本一致，因此无需额外设置间距或尺寸类。
+
+<WidgetExample name="badge-icon" />
+
+## 自定义颜色
+
+使用 `color` 属性或 `ui_badge_set_color()` 设置命名配色。
+
+<WidgetExample name="badge-colors" />
+
+## API 参考
+
+<FieldTable name="badge" />

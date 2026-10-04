@@ -40,6 +40,7 @@ void lcui_widgets_init(void)
         ui_register_field_separator();
         ui_register_field_content();
         ui_register_field_title();
+        ui_register_badge();
 }
 
 void lcui_widgets_destroy(void)

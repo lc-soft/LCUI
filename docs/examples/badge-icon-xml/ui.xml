@@ -1,0 +1,14 @@
+<lcui-app>
+  <ui>
+    <widget class="badge-icon-demo">
+      <badge variant="secondary">
+        <icon name="checkmark-starburst" />
+        <text>Verified</text>
+      </badge>
+      <badge variant="outline">
+        <text>Bookmark</text>
+        <icon name="bookmark" />
+      </badge>
+    </widget>
+  </ui>
+</lcui-app>
