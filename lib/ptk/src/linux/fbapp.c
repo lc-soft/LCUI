@@ -35,6 +35,8 @@ struct ptk_window {
         int min_width, min_height;
         int max_width, max_height;
 
+        ptk_cursor_type_t cursor;
+
         pd_rect_t rect;
         pd_rect_t actual_rect;
         pd_canvas_t canvas;
@@ -464,6 +466,21 @@ static void ptk_fb_window_present(ptk_window_t *wnd)
         list_destroy(&rects, free);
 }
 
+/* 软件指针由 lib/ui-cursor 绘制，此处仅记录状态供查询 */
+static void ptk_fb_window_set_cursor(ptk_window_t *wnd,
+                                     ptk_cursor_type_t cursor)
+{
+        if (wnd->cursor == cursor) {
+                return;
+        }
+        wnd->cursor = cursor;
+}
+
+static ptk_cursor_type_t ptk_fb_window_get_cursor(ptk_window_t *wnd)
+{
+        return wnd->cursor;
+}
+
 static int ptk_fb_screen_get_width(void)
 {
         return fbapp.screen_width;
@@ -609,6 +626,8 @@ void ptk_fbwindow_driver_init(ptk_window_driver_t *driver)
         driver->begin_paint = ptk_fb_window_begin_paint;
         driver->end_paint = ptk_fb_window_end_paint;
         driver->present = ptk_fb_window_present;
+        driver->set_cursor = ptk_fb_window_set_cursor;
+        driver->get_cursor = ptk_fb_window_get_cursor;
 }
 
 #endif

@@ -13,6 +13,7 @@
 #include <X11/Xos.h>
 #include <X11/Xatom.h>
 #include <X11/XKBlib.h>
+#include <X11/cursorfont.h>
 #include "ptk.h"
 #include "x11app.h"
 
@@ -31,6 +32,9 @@ struct ptk_window {
         int min_width, min_height;
         int max_width, max_height;
 
+        /* calloc 零初始化即为 PTK_CURSOR_AUTO */
+        ptk_cursor_type_t cursor;
+
         GC gc;
         XImage *ximage;
         pd_canvas_t fb;
@@ -48,6 +52,9 @@ static struct ptk_x11app {
         Atom wm_delete;
         Atom wm_exit;
         Colormap cmap;
+
+        /* 按 ptk_cursor_type_t 索引的惰性光标缓存，None(0) 表示未创建 */
+        Cursor cursor_shapes[PTK_CURSOR_TOTAL];
 
         int exit_code;
 
@@ -656,6 +663,115 @@ static void ptk_x11window__set_max_height(ptk_window_t *wnd, int max_height)
         wnd->max_height = max_height;
 }
 
+/* 取（并按需创建、缓存）类型对应的系统光标资源 */
+static Cursor ptk_x11window__get_shape(ptk_cursor_type_t type)
+{
+        unsigned glyph;
+        XColor black = { 0 };
+        Pixmap pixmap;
+
+        if (type >= PTK_CURSOR_TOTAL) {
+                type = PTK_CURSOR_AUTO;
+        }
+        if (x11_app.cursor_shapes[type] != None) {
+                return x11_app.cursor_shapes[type];
+        }
+        if (type == PTK_CURSOR_NONE) {
+                /* 1x1 全空掩码 pixmap：指针进入窗口时不可见 */
+                pixmap =
+                    XCreatePixmap(x11_app.display, x11_app.win_root, 1, 1, 1);
+                x11_app.cursor_shapes[type] = XCreatePixmapCursor(
+                    x11_app.display, pixmap, pixmap, &black, &black, 0, 0);
+                XFreePixmap(x11_app.display, pixmap);
+                return x11_app.cursor_shapes[type];
+        }
+        switch (type) {
+        case PTK_CURSOR_HELP:
+                glyph = XC_question_arrow;
+                break;
+        case PTK_CURSOR_POINTER:
+        case PTK_CURSOR_GRABBING:
+                glyph = XC_hand2;
+                break;
+        case PTK_CURSOR_GRAB:
+                glyph = XC_hand1;
+                break;
+        case PTK_CURSOR_PROGRESS:
+        case PTK_CURSOR_WAIT:
+                glyph = XC_watch;
+                break;
+        case PTK_CURSOR_CELL:
+                glyph = XC_cross;
+                break;
+        case PTK_CURSOR_CROSSHAIR:
+                glyph = XC_crosshair;
+                break;
+        case PTK_CURSOR_TEXT:
+        case PTK_CURSOR_VERTICAL_TEXT:
+                glyph = XC_xterm;
+                break;
+        case PTK_CURSOR_MOVE:
+        case PTK_CURSOR_ALL_SCROLL:
+                glyph = XC_fleur;
+                break;
+        case PTK_CURSOR_NO_DROP:
+        case PTK_CURSOR_NOT_ALLOWED:
+                glyph = XC_circle;
+                break;
+        case PTK_CURSOR_COPY:
+                glyph = XC_plus;
+                break;
+        case PTK_CURSOR_COL_RESIZE:
+        case PTK_CURSOR_EW_RESIZE:
+        case PTK_CURSOR_E_RESIZE:
+        case PTK_CURSOR_W_RESIZE:
+                glyph = XC_sb_h_double_arrow;
+                break;
+        case PTK_CURSOR_ROW_RESIZE:
+        case PTK_CURSOR_NS_RESIZE:
+        case PTK_CURSOR_N_RESIZE:
+        case PTK_CURSOR_S_RESIZE:
+                glyph = XC_sb_v_double_arrow;
+                break;
+        case PTK_CURSOR_NW_RESIZE:
+        case PTK_CURSOR_NWSE_RESIZE:
+                glyph = XC_top_left_corner;
+                break;
+        case PTK_CURSOR_NE_RESIZE:
+        case PTK_CURSOR_NESW_RESIZE:
+                glyph = XC_top_right_corner;
+                break;
+        case PTK_CURSOR_SE_RESIZE:
+                glyph = XC_bottom_right_corner;
+                break;
+        case PTK_CURSOR_SW_RESIZE:
+                glyph = XC_bottom_left_corner;
+                break;
+        default:
+                glyph = XC_left_ptr;
+                break;
+        }
+        x11_app.cursor_shapes[type] = XCreateFontCursor(x11_app.display, glyph);
+        return x11_app.cursor_shapes[type];
+}
+
+static void ptk_x11window__set_cursor(ptk_window_t *wnd,
+                                      ptk_cursor_type_t cursor)
+{
+        if (wnd->cursor == cursor) {
+                return;
+        }
+        wnd->cursor = cursor;
+        XDefineCursor(x11_app.display, wnd->handle,
+                      ptk_x11window__get_shape(cursor));
+        XFlush(x11_app.display);
+}
+
+static ptk_cursor_type_t ptk_x11window__get_cursor(ptk_window_t *wnd)
+{
+        return wnd->cursor;
+}
+
 static void ptk_x11window__show(ptk_window_t *wnd)
 {
         XMapWindow(x11_app.display, wnd->handle);
@@ -742,9 +858,17 @@ static int ptk_x11app_init(const wchar_t *name)
 
 static int ptk_x11app_destroy(void)
 {
+        int i;
+
         list_destroy_without_node(
             &x11_app.windows,
             (list_item_destructor_t)ptk_x11window__on_destroy);
+        for (i = 0; i < PTK_CURSOR_TOTAL; ++i) {
+                if (x11_app.cursor_shapes[i] != None) {
+                        XFreeCursor(x11_app.display, x11_app.cursor_shapes[i]);
+                        x11_app.cursor_shapes[i] = None;
+                }
+        }
         XCloseDisplay(x11_app.display);
         return 0;
 }
@@ -810,6 +934,8 @@ void ptk_x11window_driver_init(ptk_window_driver_t *driver)
         driver->begin_paint = ptk_x11window__begin_paint;
         driver->end_paint = ptk_x11window__end_paint;
         driver->present = ptk_x11window__present;
+        driver->set_cursor = ptk_x11window__set_cursor;
+        driver->get_cursor = ptk_x11window__get_cursor;
 }
 
 #endif

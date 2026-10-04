@@ -84,6 +84,16 @@ void ptk_window_set_title(ptk_window_t *wnd, const wchar_t *title)
         return linux_app.window.set_title(wnd, title);
 }
 
+void ptk_window_set_cursor(ptk_window_t *wnd, ptk_cursor_type_t cursor)
+{
+        linux_app.window.set_cursor(wnd, cursor);
+}
+
+ptk_cursor_type_t ptk_window_get_cursor(ptk_window_t *wnd)
+{
+        return linux_app.window.get_cursor(wnd);
+}
+
 void ptk_window_set_size(ptk_window_t *wnd, int width, int height)
 {
         return linux_app.window.set_size(wnd, width, height);

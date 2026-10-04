@@ -204,6 +204,50 @@ typedef struct app_textinput_event {
 } app_textinput_event_t;
 
 /**
+ * 系统鼠标指针类型，值序与 css_cursor_t（lib/css）保持一致，
+ * 由 lib/ui-server 的光标同步层直接按序映射。
+ */
+typedef enum ptk_cursor_type {
+        PTK_CURSOR_AUTO,
+        PTK_CURSOR_DEFAULT,
+        PTK_CURSOR_NONE,
+        PTK_CURSOR_CONTEXT_MENU,
+        PTK_CURSOR_HELP,
+        PTK_CURSOR_POINTER,
+        PTK_CURSOR_PROGRESS,
+        PTK_CURSOR_WAIT,
+        PTK_CURSOR_CELL,
+        PTK_CURSOR_CROSSHAIR,
+        PTK_CURSOR_TEXT,
+        PTK_CURSOR_VERTICAL_TEXT,
+        PTK_CURSOR_ALIAS,
+        PTK_CURSOR_COPY,
+        PTK_CURSOR_MOVE,
+        PTK_CURSOR_NO_DROP,
+        PTK_CURSOR_NOT_ALLOWED,
+        PTK_CURSOR_GRAB,
+        PTK_CURSOR_GRABBING,
+        PTK_CURSOR_ALL_SCROLL,
+        PTK_CURSOR_COL_RESIZE,
+        PTK_CURSOR_ROW_RESIZE,
+        PTK_CURSOR_N_RESIZE,
+        PTK_CURSOR_E_RESIZE,
+        PTK_CURSOR_S_RESIZE,
+        PTK_CURSOR_W_RESIZE,
+        PTK_CURSOR_EW_RESIZE,
+        PTK_CURSOR_NS_RESIZE,
+        PTK_CURSOR_NE_RESIZE,
+        PTK_CURSOR_NW_RESIZE,
+        PTK_CURSOR_SE_RESIZE,
+        PTK_CURSOR_SW_RESIZE,
+        PTK_CURSOR_NESW_RESIZE,
+        PTK_CURSOR_NWSE_RESIZE,
+        PTK_CURSOR_ZOOM_IN,
+        PTK_CURSOR_ZOOM_OUT,
+        PTK_CURSOR_TOTAL
+} ptk_cursor_type_t;
+
+/**
  * @see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent
  */
 typedef struct app_mouse_event {
@@ -299,6 +343,8 @@ typedef struct ptk_window_driver {
         ptk_window_paint_t *(*begin_paint)(ptk_window_t *, pd_rect_t *);
         void (*end_paint)(ptk_window_t *, ptk_window_paint_t *);
         void (*present)(ptk_window_t *);
+        void (*set_cursor)(ptk_window_t *, ptk_cursor_type_t);
+        ptk_cursor_type_t (*get_cursor)(ptk_window_t *);
 } ptk_window_driver_t;
 
 typedef struct ptk_app_driver {

@@ -41,6 +41,9 @@ struct ptk_window {
         int max_width, max_height;
         bool visible;
 
+        ptk_cursor_type_t cursor;
+        HCURSOR hcursor;
+
         ptk_window_render_mode_t mode;
         HDC hdc_fb;
         HDC hdc_client;
@@ -300,6 +303,13 @@ static LRESULT CALLBACK ptk_window_process(HWND hwnd, UINT msg, WPARAM arg1,
                 break;
         }
         switch (msg) {
+        case WM_SETCURSOR:
+                if (wnd && LOWORD(arg2) == HTCLIENT) {
+                        SetCursor(wnd->hcursor); /* NONE 时为 NULL，隐藏指针 */
+                        return TRUE;
+                }
+                /* 非客户区：交给默认处理（系统箭头） */
+                return DefWindowProc(hwnd, msg, arg1, arg2);
         case WM_SHOWWINDOW:
                 e.type = PTK_EVENT_VISIBILITY_CHANGE;
                 e.window->visible = arg1 ? true : false;
@@ -525,6 +535,8 @@ ptk_window_t *ptk_window_create(const wchar_t *title, int x, int y, int width,
         wnd->hdc_client = NULL;
         wnd->fb_bmp = NULL;
         wnd->is_ready = false;
+        wnd->cursor = PTK_CURSOR_AUTO;
+        wnd->hcursor = LoadCursorW(NULL, IDC_ARROW);
         wnd->node.data = wnd;
         wnd->min_width = MIN_WIDTH;
         wnd->min_height = MIN_HEIGHT;
@@ -693,6 +705,73 @@ void ptk_window_hide(ptk_window_t *wnd)
 void ptk_window_set_title(ptk_window_t *wnd, const wchar_t *title)
 {
         SetWindowTextW(wnd->hwnd, title);
+}
+
+/* 将光标类型映射为系统光标句柄；PTK_CURSOR_NONE 返回 NULL 以隐藏指针。
+ * 无法精确对应的值取最接近的系统光标（见 spec 平台近似映射表）。 */
+static HCURSOR ptk_load_system_cursor_by_type(ptk_cursor_type_t type)
+{
+        switch (type) {
+        case PTK_CURSOR_HELP:
+                return LoadCursor(NULL, IDC_HELP);
+        case PTK_CURSOR_POINTER:
+        case PTK_CURSOR_GRAB:
+        case PTK_CURSOR_GRABBING:
+                return LoadCursor(NULL, IDC_HAND);
+        case PTK_CURSOR_PROGRESS:
+                return LoadCursor(NULL, IDC_APPSTARTING);
+        case PTK_CURSOR_WAIT:
+                return LoadCursor(NULL, IDC_WAIT);
+        case PTK_CURSOR_CELL:
+        case PTK_CURSOR_CROSSHAIR:
+                return LoadCursor(NULL, IDC_CROSS);
+        case PTK_CURSOR_TEXT:
+        case PTK_CURSOR_VERTICAL_TEXT:
+                return LoadCursor(NULL, IDC_IBEAM);
+        case PTK_CURSOR_MOVE:
+        case PTK_CURSOR_ALL_SCROLL:
+                return LoadCursor(NULL, IDC_SIZEALL);
+        case PTK_CURSOR_NO_DROP:
+        case PTK_CURSOR_NOT_ALLOWED:
+                return LoadCursor(NULL, IDC_NO);
+        case PTK_CURSOR_COL_RESIZE:
+        case PTK_CURSOR_EW_RESIZE:
+        case PTK_CURSOR_E_RESIZE:
+        case PTK_CURSOR_W_RESIZE:
+                return LoadCursor(NULL, IDC_SIZEWE);
+        case PTK_CURSOR_ROW_RESIZE:
+        case PTK_CURSOR_NS_RESIZE:
+        case PTK_CURSOR_N_RESIZE:
+        case PTK_CURSOR_S_RESIZE:
+                return LoadCursor(NULL, IDC_SIZENS);
+        case PTK_CURSOR_NW_RESIZE:
+        case PTK_CURSOR_SE_RESIZE:
+        case PTK_CURSOR_NWSE_RESIZE:
+                return LoadCursor(NULL, IDC_SIZENWSE);
+        case PTK_CURSOR_NE_RESIZE:
+        case PTK_CURSOR_SW_RESIZE:
+        case PTK_CURSOR_NESW_RESIZE:
+                return LoadCursor(NULL, IDC_SIZENESW);
+        case PTK_CURSOR_NONE:
+                return NULL;
+        default:
+                return LoadCursor(NULL, IDC_ARROW);
+        }
+}
+
+void ptk_window_set_cursor(ptk_window_t *wnd, ptk_cursor_type_t cursor)
+{
+        if (wnd->cursor == cursor) {
+                return;
+        }
+        wnd->cursor = cursor;
+        wnd->hcursor = ptk_load_system_cursor_by_type(cursor);
+        SetCursor(wnd->hcursor);
+}
+
+ptk_cursor_type_t ptk_window_get_cursor(ptk_window_t *wnd)
+{
+        return wnd->cursor;
 }
 
 int ptk_window_get_width(ptk_window_t *wnd)
