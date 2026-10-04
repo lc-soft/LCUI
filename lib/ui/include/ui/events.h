@@ -120,6 +120,9 @@ LIBUI_PUBLIC void ui_clear_event_target(ui_widget_t *widget);
 /** get current focused widget */
 LIBUI_PUBLIC ui_widget_t *ui_get_focus(void);
 
+/** get the widget currently under the mouse pointer (mouseover target) */
+LIBUI_PUBLIC ui_widget_t *ui_get_mouseover(void);
+
 /** 将一个部件设置为焦点 */
 LIBUI_PUBLIC int ui_set_focus(ui_widget_t *widget);
 

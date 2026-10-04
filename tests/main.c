@@ -35,6 +35,7 @@ extern void test_field(void);
 extern void test_radio_group(void);
 extern void test_portal(void);
 extern void test_select(void);
+extern void test_cursor(void);
 
 static const ctest_suite_t suites[] = {
         { "settings", test_settings },
@@ -60,6 +61,7 @@ static const ctest_suite_t suites[] = {
         { "radio-group", test_radio_group },
         { "portal", test_portal },
         { "select", test_select },
+        { "cursor", test_cursor },
         { NULL, NULL }
 };
 

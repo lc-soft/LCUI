@@ -2,7 +2,8 @@ local previews = {
     "flex_layout",
     "block_layout",
     "widget_opacity",
-    "scrollbar"
+    "scrollbar",
+    "cursor"
 }
 
 for _, topic in ipairs(previews) do

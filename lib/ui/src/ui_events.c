@@ -772,6 +772,11 @@ ui_widget_t *ui_get_focus(void)
         return ui_events.targets[UI_WIDGET_STATUS_FOCUS];
 }
 
+ui_widget_t *ui_get_mouseover(void)
+{
+        return ui_events.targets[UI_WIDGET_STATUS_HOVER];
+}
+
 int ui_set_focus(ui_widget_t *widget)
 {
         ui_widget_t *w;

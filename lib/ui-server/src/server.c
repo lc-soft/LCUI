@@ -77,6 +77,31 @@ static struct ui_server {
         int num_rendering_threads;
 } ui_server;
 
+/* css_cursor_t 值序到 ptk_cursor_type_t 的映射（值序 1:1，显式表防漂移） */
+static const ptk_cursor_type_t cursor_map[CSS_CURSOR_TOTAL] = {
+        PTK_CURSOR_AUTO,        PTK_CURSOR_DEFAULT,
+        PTK_CURSOR_NONE,        PTK_CURSOR_CONTEXT_MENU,
+        PTK_CURSOR_HELP,        PTK_CURSOR_POINTER,
+        PTK_CURSOR_PROGRESS,    PTK_CURSOR_WAIT,
+        PTK_CURSOR_CELL,        PTK_CURSOR_CROSSHAIR,
+        PTK_CURSOR_TEXT,        PTK_CURSOR_VERTICAL_TEXT,
+        PTK_CURSOR_ALIAS,       PTK_CURSOR_COPY,
+        PTK_CURSOR_MOVE,        PTK_CURSOR_NO_DROP,
+        PTK_CURSOR_NOT_ALLOWED, PTK_CURSOR_GRAB,
+        PTK_CURSOR_GRABBING,    PTK_CURSOR_ALL_SCROLL,
+        PTK_CURSOR_COL_RESIZE,  PTK_CURSOR_ROW_RESIZE,
+        PTK_CURSOR_N_RESIZE,    PTK_CURSOR_E_RESIZE,
+        PTK_CURSOR_S_RESIZE,    PTK_CURSOR_W_RESIZE,
+        PTK_CURSOR_EW_RESIZE,   PTK_CURSOR_NS_RESIZE,
+        PTK_CURSOR_NE_RESIZE,   PTK_CURSOR_NW_RESIZE,
+        PTK_CURSOR_SE_RESIZE,   PTK_CURSOR_SW_RESIZE,
+        PTK_CURSOR_NESW_RESIZE, PTK_CURSOR_NWSE_RESIZE,
+        PTK_CURSOR_ZOOM_IN,     PTK_CURSOR_ZOOM_OUT,
+};
+
+/* hover 目标悬空（部件销毁）时用于回写 AUTO 的窗口；随连接销毁置空 */
+static ptk_window_t *last_synced_cursor_window;
+
 static inline int is_rect_equals(const pd_rect_t *a, const pd_rect_t *b)
 {
         return a->x == b->x && a->y == b->y && a->width == b->width &&
@@ -122,6 +147,9 @@ static void ui_connection_destroy(void *arg)
 {
         ui_connection_t *conn = arg;
 
+        if (last_synced_cursor_window == conn->window) {
+                last_synced_cursor_window = NULL;
+        }
         list_destroy(&conn->flash_rects, free);
         ui_updater_destroy(conn->updater);
         free(conn);
@@ -663,6 +691,36 @@ static void ui_server_on_widget_mutation(ui_mutation_list_t *mutation_list,
         list_destroy(&wnd_mutation_list, free);
 }
 
+/* 将系统光标与 hover 链同步：从 hover 目标沿祖先向上，
+ * 第一个非 auto 的值生效（模拟 CSS cursor 继承语义）；
+ * 全链 auto 或无目标时回写 AUTO，清掉上一次设置的自定义光标 */
+static void ui_update_cursor(void)
+{
+        ui_widget_t *w;
+        ui_widget_t *owner = ui_get_mouseover();
+        css_cursor_t cursor = CSS_CURSOR_AUTO;
+        ptk_window_t *window = NULL;
+
+        /* 单遍上行：取第一个非 auto 的 cursor 值（继承模拟），
+         * 并沿父链回溯到已连接的根部件以解析窗口（hover 目标可以是任意后代） */
+        for (w = owner; w; w = w->parent) {
+                if (cursor == CSS_CURSOR_AUTO) {
+                        cursor = w->computed_style.type_bits.cursor;
+                }
+                if (!window) {
+                        window = ui_server_get_window(w);
+                }
+        }
+        if (!window) {
+                window = last_synced_cursor_window;
+                cursor = CSS_CURSOR_AUTO;
+        }
+        if (window) {
+                ptk_window_set_cursor(window, cursor_map[cursor]);
+                last_synced_cursor_window = window;
+        }
+}
+
 void ui_server_update(void)
 {
         ui_connection_t *conn;
@@ -689,6 +747,7 @@ void ui_server_update(void)
                 ui_update();
         }
         ui_metrics.dpi = dpi;
+        ui_update_cursor();
 }
 
 void ui_server_init(void)
