@@ -187,6 +187,41 @@ void css_init_keywords(void)
         css_set_keyword(CSS_KEYWORD_MIN_CONTENT, "min-content");
         css_set_keyword(CSS_KEYWORD_MAX_CONTENT, "max-content");
         css_set_keyword(CSS_KEYWORD_UNDERLINE, "underline");
+
+        css_set_keyword(CSS_KEYWORD_DEFAULT, "default");
+        css_set_keyword(CSS_KEYWORD_CONTEXT_MENU, "context-menu");
+        css_set_keyword(CSS_KEYWORD_HELP, "help");
+        css_set_keyword(CSS_KEYWORD_POINTER, "pointer");
+        css_set_keyword(CSS_KEYWORD_PROGRESS, "progress");
+        css_set_keyword(CSS_KEYWORD_WAIT, "wait");
+        css_set_keyword(CSS_KEYWORD_CELL, "cell");
+        css_set_keyword(CSS_KEYWORD_CROSSHAIR, "crosshair");
+        css_set_keyword(CSS_KEYWORD_TEXT, "text");
+        css_set_keyword(CSS_KEYWORD_VERTICAL_TEXT, "vertical-text");
+        css_set_keyword(CSS_KEYWORD_ALIAS, "alias");
+        css_set_keyword(CSS_KEYWORD_COPY, "copy");
+        css_set_keyword(CSS_KEYWORD_MOVE, "move");
+        css_set_keyword(CSS_KEYWORD_NO_DROP, "no-drop");
+        css_set_keyword(CSS_KEYWORD_NOT_ALLOWED, "not-allowed");
+        css_set_keyword(CSS_KEYWORD_GRAB, "grab");
+        css_set_keyword(CSS_KEYWORD_GRABBING, "grabbing");
+        css_set_keyword(CSS_KEYWORD_ALL_SCROLL, "all-scroll");
+        css_set_keyword(CSS_KEYWORD_COL_RESIZE, "col-resize");
+        css_set_keyword(CSS_KEYWORD_ROW_RESIZE, "row-resize");
+        css_set_keyword(CSS_KEYWORD_N_RESIZE, "n-resize");
+        css_set_keyword(CSS_KEYWORD_E_RESIZE, "e-resize");
+        css_set_keyword(CSS_KEYWORD_S_RESIZE, "s-resize");
+        css_set_keyword(CSS_KEYWORD_W_RESIZE, "w-resize");
+        css_set_keyword(CSS_KEYWORD_EW_RESIZE, "ew-resize");
+        css_set_keyword(CSS_KEYWORD_NS_RESIZE, "ns-resize");
+        css_set_keyword(CSS_KEYWORD_NE_RESIZE, "ne-resize");
+        css_set_keyword(CSS_KEYWORD_NW_RESIZE, "nw-resize");
+        css_set_keyword(CSS_KEYWORD_SE_RESIZE, "se-resize");
+        css_set_keyword(CSS_KEYWORD_SW_RESIZE, "sw-resize");
+        css_set_keyword(CSS_KEYWORD_NESW_RESIZE, "nesw-resize");
+        css_set_keyword(CSS_KEYWORD_NWSE_RESIZE, "nwse-resize");
+        css_set_keyword(CSS_KEYWORD_ZOOM_IN, "zoom-in");
+        css_set_keyword(CSS_KEYWORD_ZOOM_OUT, "zoom-out");
 }
 
 void css_destroy_keywords(void)

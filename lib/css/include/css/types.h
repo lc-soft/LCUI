@@ -118,6 +118,7 @@ typedef enum {
         css_prop_word_break,
 
         css_prop_pointer_events,
+        css_prop_cursor,
         css_prop_text_decoration_line,
         css_prop_text_underline_offset,
         css_prop_text_decoration_thickness,
@@ -502,6 +503,46 @@ typedef enum {
         CSS_POINTER_EVENTS_NONE
 } css_pointer_events_t;
 
+typedef enum {
+        CSS_CURSOR_AUTO,
+        CSS_CURSOR_DEFAULT,
+        CSS_CURSOR_NONE,
+        CSS_CURSOR_CONTEXT_MENU,
+        CSS_CURSOR_HELP,
+        CSS_CURSOR_POINTER,
+        CSS_CURSOR_PROGRESS,
+        CSS_CURSOR_WAIT,
+        CSS_CURSOR_CELL,
+        CSS_CURSOR_CROSSHAIR,
+        CSS_CURSOR_TEXT,
+        CSS_CURSOR_VERTICAL_TEXT,
+        CSS_CURSOR_ALIAS,
+        CSS_CURSOR_COPY,
+        CSS_CURSOR_MOVE,
+        CSS_CURSOR_NO_DROP,
+        CSS_CURSOR_NOT_ALLOWED,
+        CSS_CURSOR_GRAB,
+        CSS_CURSOR_GRABBING,
+        CSS_CURSOR_ALL_SCROLL,
+        CSS_CURSOR_COL_RESIZE,
+        CSS_CURSOR_ROW_RESIZE,
+        CSS_CURSOR_N_RESIZE,
+        CSS_CURSOR_E_RESIZE,
+        CSS_CURSOR_S_RESIZE,
+        CSS_CURSOR_W_RESIZE,
+        CSS_CURSOR_EW_RESIZE,
+        CSS_CURSOR_NS_RESIZE,
+        CSS_CURSOR_NE_RESIZE,
+        CSS_CURSOR_NW_RESIZE,
+        CSS_CURSOR_SE_RESIZE,
+        CSS_CURSOR_SW_RESIZE,
+        CSS_CURSOR_NESW_RESIZE,
+        CSS_CURSOR_NWSE_RESIZE,
+        CSS_CURSOR_ZOOM_IN,
+        CSS_CURSOR_ZOOM_OUT,
+        CSS_CURSOR_TOTAL
+} css_cursor_t;
+
 typedef enum css_style_value_type_t {
         CSS_NO_VALUE,
         CSS_INVALID_VALUE,
@@ -616,6 +657,41 @@ typedef enum css_keyword_value_t {
         CSS_KEYWORD_MIN_CONTENT,
         CSS_KEYWORD_FIT_CONTENT,
         CSS_KEYWORD_UNDERLINE,
+
+        CSS_KEYWORD_DEFAULT,
+        CSS_KEYWORD_CONTEXT_MENU,
+        CSS_KEYWORD_HELP,
+        CSS_KEYWORD_POINTER,
+        CSS_KEYWORD_PROGRESS,
+        CSS_KEYWORD_WAIT,
+        CSS_KEYWORD_CELL,
+        CSS_KEYWORD_CROSSHAIR,
+        CSS_KEYWORD_TEXT,
+        CSS_KEYWORD_VERTICAL_TEXT,
+        CSS_KEYWORD_ALIAS,
+        CSS_KEYWORD_COPY,
+        CSS_KEYWORD_MOVE,
+        CSS_KEYWORD_NO_DROP,
+        CSS_KEYWORD_NOT_ALLOWED,
+        CSS_KEYWORD_GRAB,
+        CSS_KEYWORD_GRABBING,
+        CSS_KEYWORD_ALL_SCROLL,
+        CSS_KEYWORD_COL_RESIZE,
+        CSS_KEYWORD_ROW_RESIZE,
+        CSS_KEYWORD_N_RESIZE,
+        CSS_KEYWORD_E_RESIZE,
+        CSS_KEYWORD_S_RESIZE,
+        CSS_KEYWORD_W_RESIZE,
+        CSS_KEYWORD_EW_RESIZE,
+        CSS_KEYWORD_NS_RESIZE,
+        CSS_KEYWORD_NE_RESIZE,
+        CSS_KEYWORD_NW_RESIZE,
+        CSS_KEYWORD_SE_RESIZE,
+        CSS_KEYWORD_SW_RESIZE,
+        CSS_KEYWORD_NESW_RESIZE,
+        CSS_KEYWORD_NWSE_RESIZE,
+        CSS_KEYWORD_ZOOM_IN,
+        CSS_KEYWORD_ZOOM_OUT,
 } css_keyword_value_t;
 
 /** https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleValue */
@@ -763,6 +839,7 @@ typedef struct css_computed_style {
                 uint8_t text_decoration : 1;
                 uint8_t text_underline_offset : 1;
                 uint8_t text_decoration_thickness : 1;
+                uint8_t cursor : 6;
         } type_bits;
 
         /**

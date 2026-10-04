@@ -1523,6 +1523,7 @@ static char **css_computed_style_copy_font_family(char *const *font_family)
         X(white_space, TYPE_BITS)                 \
         X(word_break, TYPE_BITS)                  \
         X(pointer_events, TYPE_BITS)              \
+        X(cursor, TYPE_BITS)                      \
         X(text_decoration_line, TEXT_DECORATION)  \
         X(text_underline_offset, LENGTH)          \
         X(text_decoration_thickness, LENGTH)

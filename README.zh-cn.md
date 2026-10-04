@@ -303,6 +303,7 @@ LCUI 的命令行开发工具已经支持将 TypeScript 写的界面配置文件
   - [x] background-cover
   - [ ] background
   - [x] pointer-events
+  - [x] cursor
   - [x] font-face
   - [x] font-family
   - [x] font-size

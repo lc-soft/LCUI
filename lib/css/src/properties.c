@@ -337,7 +337,8 @@ int css_style_decl_add_property(css_style_decl_t *style,
                 css_style_value_destroy(&value);
                 return len;
         }
-        /* 同一规则内重复声明取最后一次；条目保持首现位置，不影响跨规则优先级顺序 */
+        /* 同一规则内重复声明取最后一次；条目保持首现位置，不影响跨规则优先级顺序
+         */
         css_style_decl_set(style, propdef->key, &value);
         css_style_value_destroy(&value);
         return len;
@@ -683,6 +684,18 @@ void css_init_properties(void)
          */
         DEFINE_INHERITED_PROP(pointer_events, "pointer-events", "auto | none",
                               "auto");
+
+        /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/cursor */
+        DEFINE_PROP(cursor, "cursor",
+                    "auto | default | none | context-menu | help | pointer | "
+                    "progress | wait | cell | crosshair | text | "
+                    "vertical-text | alias | copy | move | no-drop | "
+                    "not-allowed | grab | grabbing | all-scroll | col-resize "
+                    "| row-resize | n-resize | e-resize | s-resize | w-resize "
+                    "| ew-resize | ns-resize | ne-resize | nw-resize "
+                    "| se-resize | sw-resize | nesw-resize | nwse-resize "
+                    "| zoom-in | zoom-out",
+                    "auto");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing */
         DEFINE_PROP(box_sizing, "box-sizing", "content-box | border-box",

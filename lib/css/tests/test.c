@@ -21,5 +21,6 @@ int main()
         ctest_describe("css computed", test_css_computed);
         ctest_describe("css text decoration", test_css_text_decoration);
         ctest_describe("css inheritance", test_css_inheritance);
+        ctest_describe("css cursor", test_css_cursor);
         return ctest_finish();
 }

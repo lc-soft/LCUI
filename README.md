@@ -280,6 +280,7 @@ The following is a list of supported CSS features. Checked is supported (But doe
   - [x] background-cover
   - [ ] background
   - [x] pointer-events
+  - [x] cursor
   - [x] font-face
   - [x] font-family
   - [x] font-size
