@@ -130,6 +130,7 @@ LCUI's CSS engine implements a subset of the web standard. This section lists al
 - **`opacity`** — `<number>` or `<percentage>`
 - **`visibility`** — `visible`, `hidden`
 - **`pointer-events`** — `auto`, `none`
+- **`cursor`** — `auto`, `default`, `none`, `context-menu`, `help`, `pointer`, `progress`, `wait`, `cell`, `crosshair`, `text`, `vertical-text`, `alias`, `copy`, `move`, `no-drop`, `not-allowed`, `grab`, `grabbing`, `all-scroll`, `col-resize`, `row-resize`, `n/e/s/w-resize`, `ew/ns-resize`, `ne/nw/se/sw-resize`, `nesw/nwse-resize`, `zoom-in`, `zoom-out`; `url()` image cursors are not supported
 - **`box-shadow`** — `none` or `<shadow>` (format `<length>{2,4} && <color>?`)
 
 ## Caveats
@@ -147,5 +148,5 @@ LCUI's CSS engine implements a subset of the web standard. This section lists al
 :::
 
 :::warning
-**CSS does not support inheritance.** Properties like `color`, `font-family`, and `font-size` do not cascade from parent to child widgets. Every widget that displays text (e.g. `text`, `button`) must explicitly set these properties.
+**`cursor` maps to system cursors approximately; `url()` image cursors are not supported.** The `cursor` value of the hovered widget takes effect in the same frame (including state changes like `:hover`). On Windows/X11 values map to system cursors, and those without an exact match use the closest shape; `none` hides the pointer; the framebuffer software cursor is unaffected. Built-in interactive widgets ship with sensible defaults (`button` etc. `pointer`, `textinput` `text`, scrollbar thumb `grab`).
 :::

@@ -130,6 +130,7 @@ LCUI 的 CSS 引擎实现了 Web 标准的一个子集。本节列出所有已�
 - **`opacity`** — `<number>` 或 `<percentage>`
 - **`visibility`** — `visible`、`hidden`
 - **`pointer-events`** — `auto`、`none`
+- **`cursor`** — `auto`、`default`、`none`、`context-menu`、`help`、`pointer`、`progress`、`wait`、`cell`、`crosshair`、`text`、`vertical-text`、`alias`、`copy`、`move`、`no-drop`、`not-allowed`、`grab`、`grabbing`、`all-scroll`、`col-resize`、`row-resize`、`n/e/s/w-resize`、`ew/ns-resize`、`ne/nw/se/sw-resize`、`nesw/nwse-resize`、`zoom-in`、`zoom-out`；不支持 `url()` 图像光标
 - **`box-shadow`** — `none` 或 `<shadow>`（格式 `<length>{2,4} && <color>?`）
 
 ## 注意事项
@@ -147,5 +148,5 @@ LCUI 的 CSS 引擎实现了 Web 标准的一个子集。本节列出所有已�
 :::
 
 :::warning
-**CSS 不支持继承。** 像 `color`、`font-family`、`font-size` 不会从父部件流向子部件。每个 `text` / `button` 等需要文本显示的部件都必须显式设置这些属性。
+**`cursor` 按平台近似映射，`url()` 图像光标不支持。** 悬停部件的 `cursor` 值当帧生效（含 `:hover` 等状态变化）。Windows/X11 映射到系统光标，无精确对应的取近似形状；`none` 隐藏指针；framebuffer 软件指针不受影响。内置交互部件已带合理默认值（button 等 `pointer`、textinput `text`、滚动条滑块 `grab`）。
 :::
