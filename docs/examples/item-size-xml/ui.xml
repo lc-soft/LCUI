@@ -1,0 +1,27 @@
+<lcui-app>
+  <ui>
+    <widget class="item-size-demo">
+      <item variant="outline">
+        <item-media variant="image" class="bg-violet-400" />
+        <item-content>
+          <item-title>Default Size</item-title>
+          <item-description>The standard size for most use cases.</item-description>
+        </item-content>
+      </item>
+      <item variant="outline" size="sm">
+        <item-media variant="image" class="bg-violet-400" />
+        <item-content>
+          <item-title>Small Size</item-title>
+          <item-description>A compact size for dense layouts.</item-description>
+        </item-content>
+      </item>
+      <item variant="outline" size="xs">
+        <item-media variant="image" class="bg-violet-400" />
+        <item-content>
+          <item-title>Extra Small Size</item-title>
+          <item-description>The most compact size available.</item-description>
+        </item-content>
+      </item>
+    </widget>
+  </ui>
+</lcui-app>

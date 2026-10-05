@@ -1,0 +1,27 @@
+<lcui-app>
+  <ui>
+    <widget class="item-basic-demo">
+      <item variant="outline">
+        <item-content>
+          <item-title>Basic Item</item-title>
+          <item-description
+          >A simple item with title and description.</item-description>
+        </item-content>
+        <item-actions>
+          <button variant="outline" size="sm">Action</button>
+        </item-actions>
+      </item>
+      <item variant="outline" size="sm" interactive="true">
+        <item-media>
+          <icon name="checkmark-starburst" class="text-xl" />
+        </item-media>
+        <item-content>
+          <item-title>Your profile has been verified.</item-title>
+        </item-content>
+        <item-actions>
+          <icon name="chevron-right" class="text-base" />
+        </item-actions>
+      </item>
+    </widget>
+  </ui>
+</lcui-app>

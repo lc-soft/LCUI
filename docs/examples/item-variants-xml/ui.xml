@@ -1,0 +1,36 @@
+<lcui-app>
+  <ui>
+    <widget class="item-variants-demo">
+      <item>
+        <item-content>
+          <item-title>Default Variant</item-title>
+          <item-description
+          >Standard styling with subtle background and borders.</item-description>
+        </item-content>
+        <item-actions>
+          <button variant="outline" size="sm">Open</button>
+        </item-actions>
+      </item>
+      <item variant="outline">
+        <item-content>
+          <item-title>Outline Variant</item-title>
+          <item-description
+          >Outlined style with clear borders and transparent background.</item-description>
+        </item-content>
+        <item-actions>
+          <button variant="outline" size="sm">Open</button>
+        </item-actions>
+      </item>
+      <item variant="muted">
+        <item-content>
+          <item-title>Muted Variant</item-title>
+          <item-description
+          >Subdued appearance with muted colors for secondary content.</item-description>
+        </item-content>
+        <item-actions>
+          <button variant="outline" size="sm">Open</button>
+        </item-actions>
+      </item>
+    </widget>
+  </ui>
+</lcui-app>

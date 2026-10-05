@@ -1,0 +1,102 @@
+# Item
+
+A general content-row container for settings, lists, and quick actions.
+
+<WidgetExample name="item-basic" />
+
+## Use cases
+
+- **Suitable**: settings entries, resource lists, and content rows with actions
+- **Suitable**: combining media, a title, a description, and trailing actions
+- **Not suitable**: menu items with a selected value and keyboard selection logic
+
+## Usage
+
+```tsx
+import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@lcui/react"
+```
+
+```tsx
+<Item variant="outline">
+  <ItemContent>
+    <ItemTitle>Basic Item</ItemTitle>
+    <ItemDescription>A simple item with title and description.</ItemDescription>
+  </ItemContent>
+  <ItemActions><button>Action</button></ItemActions>
+</Item>
+```
+
+## Composition
+
+Use the following composition to build an `Item`:
+
+```
+Item
+├── ItemMedia
+├── ItemContent
+│   ├── ItemTitle
+│   └── ItemDescription
+└── ItemActions
+```
+
+## Variants
+
+Use the `variant` prop to change the row's visual style.
+
+<WidgetExample name="item-variants" />
+
+## Size
+
+Use the `size` prop to change the row size; the available values are `default`, `sm`, and `xs`.
+
+<WidgetExample name="item-size" />
+
+## Icon
+
+Use an `ItemMedia` with `variant="icon"` to show an icon.
+
+<WidgetExample name="item-icon" />
+
+## Image
+
+Use an `ItemMedia` with `variant="image"` to show an image.
+
+<WidgetExample name="item-image" />
+
+## API Reference
+
+### Item
+
+The content-row container.
+
+<FieldTable name="item" />
+
+### ItemMedia
+
+The icon or thumbnail slot at the start of the row.
+
+<FieldTable name="item-media" />
+
+### ItemContent
+
+The flexible content slot for the title and description.
+
+<FieldTable name="item-content" />
+
+### ItemTitle
+
+The row title.
+
+<FieldTable name="item-title" />
+
+### ItemDescription
+
+The row's supporting description.
+
+<FieldTable name="item-description" />
+
+### ItemActions
+
+The layout slot for actions at the end of the row.
+
+<FieldTable name="item-actions" />

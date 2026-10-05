@@ -1,0 +1,102 @@
+# Item
+
+用于设置、列表和快捷操作的通用内容行容器。
+
+<WidgetExample name="item-basic" />
+
+## 适用场景
+
+- **适用**：设置项、资源列表和带操作的内容行
+- **适用**：组合媒体、标题、说明和尾部操作
+- **不适用**：带选中值和键盘选择逻辑的菜单项
+
+## 用法
+
+```tsx
+import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@lcui/react"
+```
+
+```tsx
+<Item variant="outline">
+  <ItemContent>
+    <ItemTitle>Basic Item</ItemTitle>
+    <ItemDescription>A simple item with title and description.</ItemDescription>
+  </ItemContent>
+  <ItemActions><button>Action</button></ItemActions>
+</Item>
+```
+
+## 组合
+
+使用以下组合来构建 `Item`：
+
+```
+Item
+├── ItemMedia
+├── ItemContent
+│   ├── ItemTitle
+│   └── ItemDescription
+└── ItemActions
+```
+
+## 变体
+
+使用 `variant` 属性更改条目的视觉样式。
+
+<WidgetExample name="item-variants" />
+
+## 尺寸
+
+使用 `size` 属性更改条目尺寸，可选值为 `default`、`sm` 和 `xs`。
+
+<WidgetExample name="item-size" />
+
+## 图标
+
+使用 `variant="icon"` 的 `ItemMedia` 显示图标。
+
+<WidgetExample name="item-icon" />
+
+## 图片
+
+使用 `variant="image"` 的 `ItemMedia` 显示图片。
+
+<WidgetExample name="item-image" />
+
+## API 参考
+
+### Item
+
+内容行容器。
+
+<FieldTable name="item" />
+
+### ItemMedia
+
+行首的图标或缩略图槽位。
+
+<FieldTable name="item-media" />
+
+### ItemContent
+
+标题和说明的可伸缩内容槽位。
+
+<FieldTable name="item-content" />
+
+### ItemTitle
+
+内容行标题。
+
+<FieldTable name="item-title" />
+
+### ItemDescription
+
+内容行补充说明。
+
+<FieldTable name="item-description" />
+
+### ItemActions
+
+行尾操作的布局槽位。
+
+<FieldTable name="item-actions" />

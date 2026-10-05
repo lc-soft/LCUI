@@ -1,0 +1,18 @@
+<lcui-app>
+  <ui>
+    <widget class="item-icon-demo">
+      <item variant="outline">
+        <item-media variant="icon">
+          <icon name="shield-error" />
+        </item-media>
+        <item-content>
+          <item-title>Security Alert</item-title>
+          <item-description>New login detected from unknown device.</item-description>
+        </item-content>
+        <item-actions>
+          <button variant="outline" size="sm">Review</button>
+        </item-actions>
+      </item>
+    </widget>
+  </ui>
+</lcui-app>

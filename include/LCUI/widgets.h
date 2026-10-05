@@ -27,3 +27,4 @@
 #include "widgets/icon.h"
 #include "widgets/badge.h"
 #include "widgets/alert.h"
+#include "widgets/item.h"

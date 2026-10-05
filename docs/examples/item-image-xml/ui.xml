@@ -1,0 +1,30 @@
+<lcui-app>
+  <ui>
+    <widget class="item-image-demo">
+      <item variant="outline" interactive="true">
+        <item-media variant="image" class="bg-violet-400" />
+        <item-content>
+          <item-title>Midnight City Lights - Electric Nights</item-title>
+          <item-description>Neon Dreams</item-description>
+        </item-content>
+        <item-actions><text class="item-duration">3:45</text></item-actions>
+      </item>
+      <item variant="outline" interactive="true">
+        <item-media variant="image" class="bg-sky-400" />
+        <item-content>
+          <item-title>Coffee Shop Conversations - Urban Stories</item-title>
+          <item-description>The Morning Brew</item-description>
+        </item-content>
+        <item-actions><text class="item-duration">4:05</text></item-actions>
+      </item>
+      <item variant="outline" interactive="true">
+        <item-media variant="image" class="bg-emerald-400" />
+        <item-content>
+          <item-title>Digital Rain - Binary Beats</item-title>
+          <item-description>Cyber Symphony</item-description>
+        </item-content>
+        <item-actions><text class="item-duration">3:30</text></item-actions>
+      </item>
+    </widget>
+  </ui>
+</lcui-app>
