@@ -29,10 +29,13 @@ void pd_char_update_bitmap(pd_char_t *ch, pd_text_style_t *style)
                 }
         }
         while (font_ids && font_ids[i] > 0) {
-                int ret = pd_font_cache_get_bitmap(ch->code, font_ids[i], size,
-                                                   &ch->bitmap);
-                if (ret == 0) {
-                        return;
+                /* 跳过不含该字形的字体，保证缺字能继续回退到后续字体
+                 * （如拉丁字体命中失败时，回退到含中文的字体） */
+                if (pd_font_get_glyph_index(ch->code, font_ids[i]) > 0) {
+                        if (pd_font_cache_get_bitmap(ch->code, font_ids[i],
+                                                     size, &ch->bitmap) == 0) {
+                                return;
+                        }
                 }
                 ++i;
         }

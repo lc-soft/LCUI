@@ -35,19 +35,115 @@
 #include FT_GLYPH_H
 #include FT_OUTLINE_H
 #include FT_BITMAP_H
+#include FT_MULTIPLE_MASTERS_H
 
 #define LCUI_FONT_RENDER_MODE FT_RENDER_MODE_NORMAL
 #define LCUI_FONT_LOAD_FALGS (FT_LOAD_RENDER | FT_LOAD_FORCE_AUTOHINT)
+
+/* CSS font-weight 数值（×65536 转为 FreeType 设计坐标 FT_Fixed）。
+ * 可变字体的 wght 轴以此表把枚举字重映射到设计坐标值。 */
+static const FT_Fixed pd_font_wght_axis[PD_FONT_WEIGHT_TOTAL_NUM] = {
+        [PD_FONT_WEIGHT_NONE] = 0,
+        [PD_FONT_WEIGHT_THIN] = 100 << 16,
+        [PD_FONT_WEIGHT_EXTRA_LIGHT] = 200 << 16,
+        [PD_FONT_WEIGHT_LIGHT] = 300 << 16,
+        [PD_FONT_WEIGHT_NORMAL] = 400 << 16,
+        [PD_FONT_WEIGHT_MEDIUM] = 500 << 16,
+        [PD_FONT_WEIGHT_SEMI_BOLD] = 600 << 16,
+        [PD_FONT_WEIGHT_BOLD] = 700 << 16,
+        [PD_FONT_WEIGHT_EXTRA_BOLD] = 800 << 16,
+        [PD_FONT_WEIGHT_BLACK] = 900 << 16,
+};
 
 static struct {
         FT_Library library;
 } freetype;
 
+/* 检测 face 是否为带 wght 轴的可变字体；是则输出轴索引、总轴数与取值范围 */
+static int ft_face_has_weight_axis(FT_Face face, FT_UInt *axis_idx,
+                                   FT_UInt *num_axis, FT_Fixed *minimum,
+                                   FT_Fixed *maximum)
+{
+        FT_UInt i;
+        FT_MM_Var *mm = NULL;
+
+        if (FT_Get_MM_Var(face, &mm) || !mm) {
+                return 0;
+        }
+        for (i = 0; i < mm->num_axis; ++i) {
+                if (mm->axis[i].tag == FT_MAKE_TAG('w', 'g', 'h', 't')) {
+                        *axis_idx = i;
+                        *num_axis = mm->num_axis;
+                        *minimum = mm->axis[i].minimum;
+                        *maximum = mm->axis[i].maximum;
+                        FT_Done_MM_Var(freetype.library, mm);
+                        return 1;
+                }
+        }
+        FT_Done_MM_Var(freetype.library, mm);
+        return 0;
+}
+
+static FT_Fixed ft_clamp_design_value(FT_Fixed value, FT_Fixed minimum,
+                                      FT_Fixed maximum)
+{
+        if (value < minimum) {
+                return minimum;
+        }
+        if (value > maximum) {
+                return maximum;
+        }
+        return value;
+}
+
+/* 将可变字体的单个 face 展开为各字重静态实例，逐个追加到 fonts 数组。
+ * base_coords 为该 face 的默认设计坐标模板（长度 num_axis）。 */
+static void ft_open_variable_face(const char *filepath, int face_index,
+                                  FT_Face ref_face, pd_font_face_t ***fonts,
+                                  int *count, int *cap, FT_UInt axis_idx,
+                                  FT_UInt num_axis, FT_Fixed minimum,
+                                  FT_Fixed maximum, FT_Fixed *base_coords)
+{
+        FT_Fixed *coords;
+        pd_font_face_t *font;
+        pd_font_weight_t weight;
+
+        for (weight = PD_FONT_WEIGHT_THIN; weight < PD_FONT_WEIGHT_TOTAL_NUM;
+             ++weight) {
+                FT_Face face;
+                if (FT_New_Face(freetype.library, filepath, face_index,
+                                &face)) {
+                        continue;
+                }
+                FT_Select_Charmap(face, FT_ENCODING_UNICODE);
+                coords = base_coords;
+                coords[axis_idx] = ft_clamp_design_value(
+                    pd_font_wght_axis[weight], minimum, maximum);
+                FT_Set_Var_Design_Coordinates(face, num_axis, coords);
+                if (*count >= *cap) {
+                        int new_cap = *cap ? *cap * 2 : 8;
+                        pd_font_face_t **grown =
+                            realloc(*fonts, sizeof(pd_font_face_t *) * new_cap);
+                        if (!grown) {
+                                FT_Done_Face(face);
+                                return;
+                        }
+                        *fonts = grown;
+                        *cap = new_cap;
+                }
+                font = pd_font_face_create(ref_face->family_name,
+                                           ref_face->style_name);
+                font->data = face;
+                font->weight = weight;
+                (*fonts)[(*count)++] = font;
+        }
+}
+
 static int pd_freetype_open(const char *filepath, pd_font_face_t ***outfonts)
 {
         FT_Face face;
-        pd_font_face_t *font, **fonts;
-        int i, err, num_faces;
+        pd_font_face_t **fonts = NULL;
+        int i, err, num_faces, count = 0, cap = 0;
 
         err = FT_New_Face(freetype.library, filepath, -1, &face);
         if (err) {
@@ -59,23 +155,52 @@ static int pd_freetype_open(const char *filepath, pd_font_face_t ***outfonts)
         if (num_faces < 1) {
                 return 0;
         }
-        fonts = malloc(sizeof(pd_font_face_t *) * num_faces);
-        if (!fonts) {
-                return -ENOMEM;
-        }
         for (i = 0; i < num_faces; ++i) {
+                FT_UInt axis_idx = 0, num_axis = 0;
+                FT_Fixed minimum = 0, maximum = 0;
+                FT_Fixed *base_coords = NULL;
+
                 err = FT_New_Face(freetype.library, filepath, i, &face);
                 if (err) {
-                        fonts[i] = NULL;
                         continue;
                 }
                 FT_Select_Charmap(face, FT_ENCODING_UNICODE);
+                if (ft_face_has_weight_axis(face, &axis_idx, &num_axis,
+                                            &minimum, &maximum)) {
+                        base_coords = malloc(sizeof(FT_Fixed) * num_axis);
+                        if (base_coords &&
+                            FT_Get_Var_Design_Coordinates(face, num_axis,
+                                                          base_coords) == 0) {
+                                ft_open_variable_face(filepath, i, face, &fonts,
+                                                      &count, &cap, axis_idx,
+                                                      num_axis, minimum,
+                                                      maximum, base_coords);
+                                free(base_coords);
+                                FT_Done_Face(face);
+                                continue;
+                        }
+                        free(base_coords);
+                }
+
+                /* 非可变字体：保留单个 face */
+                pd_font_face_t *font;
+                if (count >= cap) {
+                        int new_cap = cap ? cap * 2 : 8;
+                        pd_font_face_t **grown =
+                            realloc(fonts, sizeof(pd_font_face_t *) * new_cap);
+                        if (!grown) {
+                                FT_Done_Face(face);
+                                continue;
+                        }
+                        fonts = grown;
+                        cap = new_cap;
+                }
                 font = pd_font_face_create(face->family_name, face->style_name);
                 font->data = face;
-                fonts[i] = font;
+                fonts[count++] = font;
         }
         *outfonts = fonts;
-        return num_faces;
+        return count;
 }
 
 static void pd_freetype_close(void *face)

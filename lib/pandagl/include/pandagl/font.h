@@ -144,6 +144,14 @@ PD_PUBLIC pd_font_face_t *pd_font_get(int id);
 /** 获取默认的字体ID */
 PD_PUBLIC int pd_font_get_default(void);
 
+/**
+ * 查询指定字体对字符码位的字形索引。
+ * @param[in] ch 字符码位
+ * @param[in] font_id 字体 ID，<=0 时使用默认字体
+ * @return 字形索引，返回 0 表示该字体不含此字形（需要向后续字体回退）
+ */
+PD_PUBLIC unsigned pd_font_get_glyph_index(unsigned ch, int font_id);
+
 /** 设置默认的字体 */
 PD_PUBLIC void pd_font_set_default(int id);
 

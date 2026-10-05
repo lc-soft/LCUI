@@ -159,6 +159,97 @@ static void test_arial_font_load(void)
                                 PD_FONT_WEIGHT_BOLD);
         }
 }
+
+static void test_variable_font_weights(void)
+{
+        const char *candidates[] = { "Noto Sans SC", "Noto Sans CJK SC",
+                                     "Noto Sans" };
+        const char *family = NULL;
+        size_t c;
+        int normal_id, medium_id, bold_id;
+
+        if (pd_font_load_file("C:/windows/fonts/NotoSansSC-VF.ttf") != 0) {
+                return;
+        }
+        for (c = 0; c < sizeof(candidates) / sizeof(candidates[0]); ++c) {
+                if (pd_font_get_id(candidates[c], PD_FONT_STYLE_NORMAL,
+                                   PD_FONT_WEIGHT_NORMAL) > 0) {
+                        family = candidates[c];
+                        break;
+                }
+        }
+        if (!family) {
+                return;
+        }
+        normal_id =
+            pd_font_get_id(family, PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_NORMAL);
+        medium_id =
+            pd_font_get_id(family, PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_MEDIUM);
+        bold_id =
+            pd_font_get_id(family, PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_BOLD);
+        ctest_equal_bool(
+            "variable font should expose distinct medium and bold faces",
+            medium_id > 0 && bold_id > 0 && medium_id != normal_id &&
+                bold_id != normal_id,
+            true);
+        if (medium_id > 0) {
+                ctest_equal_int(
+                    "medium instance should carry the medium weight",
+                    pd_font_get(medium_id)->weight, PD_FONT_WEIGHT_MEDIUM);
+        }
+}
+
+static void test_cjk_font_fallback_glyph(void)
+{
+        unsigned cjk = 0x4E2D; /* 中 */
+        int latin_id, cjk_id;
+
+        if (pd_font_load_file("C:/windows/fonts/segoeui.ttf") != 0) {
+                return;
+        }
+        if (pd_font_load_file("C:/windows/fonts/msyh.ttc") != 0) {
+                return;
+        }
+        latin_id = pd_font_get_id("Segoe UI", PD_FONT_STYLE_NORMAL,
+                                  PD_FONT_WEIGHT_NORMAL);
+        cjk_id = pd_font_get_id("Microsoft YaHei", PD_FONT_STYLE_NORMAL,
+                                PD_FONT_WEIGHT_NORMAL);
+        if (latin_id <= 0 || cjk_id <= 0) {
+                return;
+        }
+        ctest_equal_bool("latin font should not contain the CJK glyph",
+                         pd_font_get_glyph_index(cjk, latin_id) == 0, true);
+        ctest_equal_bool("CJK font should contain the CJK glyph",
+                         pd_font_get_glyph_index(cjk, cjk_id) > 0, true);
+}
+
+static void test_weight_fallback_safety(void)
+{
+        int id;
+
+        if (pd_font_load_file("C:/windows/fonts/segoeui.ttf") != 0) {
+                return;
+        }
+        /* Load a sparse set of weights: Regular, Light, Semilight, Bold, Black.
+         * Requests for the missing medium/semibold/extra-bold tiers must fall
+         * back to a neighbour instead of dereferencing a NULL slot. */
+        pd_font_load_file("C:/windows/fonts/segoeuil.ttf");
+        pd_font_load_file("C:/windows/fonts/segoeuisl.ttf");
+        pd_font_load_file("C:/windows/fonts/segoeuib.ttf");
+        pd_font_load_file("C:/windows/fonts/seguibl.ttf");
+        id = pd_font_get_id("Segoe UI", PD_FONT_STYLE_NORMAL,
+                            PD_FONT_WEIGHT_SEMI_BOLD);
+        ctest_equal_bool("semibold request should fall back to a face", id > 0,
+                         true);
+        id = pd_font_get_id("Segoe UI", PD_FONT_STYLE_NORMAL,
+                            PD_FONT_WEIGHT_MEDIUM);
+        ctest_equal_bool("medium request should fall back to a face", id > 0,
+                         true);
+        id = pd_font_get_id("Segoe UI", PD_FONT_STYLE_NORMAL,
+                            PD_FONT_WEIGHT_EXTRA_BOLD);
+        ctest_equal_bool("extra-bold request should fall back to a face",
+                         id > 0, true);
+}
 #endif
 
 void test_pandagl_font_load(void)
@@ -169,6 +260,9 @@ void test_pandagl_font_load(void)
 #ifdef _WIN32
         ctest_describe("segoe ui font load", test_segoe_ui_font_load);
         ctest_describe("arial font load", test_arial_font_load);
+        ctest_describe("variable font weights", test_variable_font_weights);
+        ctest_describe("cjk font fallback glyph", test_cjk_font_fallback_glyph);
+        ctest_describe("weight fallback safety", test_weight_fallback_safety);
 #endif
         pd_font_library_destroy();
 }

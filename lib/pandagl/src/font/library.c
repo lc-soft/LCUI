@@ -183,6 +183,27 @@ static unsigned resolve_glyph_index(unsigned ch, int font_id)
         return face->engine->get_glyph_index(face, ch);
 }
 
+unsigned pd_font_get_glyph_index(unsigned ch, int font_id)
+{
+        pd_font_face_t *face;
+
+        if (!fontlib.active) {
+                return 0;
+        }
+        if (font_id <= 0) {
+                if (fontlib.default_font) {
+                        font_id = fontlib.default_font->id;
+                } else {
+                        font_id = fontlib.incore_font->id;
+                }
+        }
+        face = pd_font_get(font_id);
+        if (!face || !face->engine || !face->engine->get_glyph_index) {
+                return 0;
+        }
+        return face->engine->get_glyph_index(face, ch);
+}
+
 #ifdef PANDAGL_HAS_FONTCONFIG
 #include <fontconfig/fontconfig.h>
 #endif
@@ -526,7 +547,7 @@ static pd_font_weight_t find_bolder_weight(font_style_node_t *snode,
                                            pd_font_weight_t weight)
 {
         for (weight += 1; weight <= PD_FONT_WEIGHT_BLACK; weight += 1) {
-                if (snode->weights[weight]) {
+                if (snode->weights[weight - 1]) {
                         return weight;
                 }
         }
@@ -537,7 +558,7 @@ static pd_font_weight_t find_lighter_weight(font_style_node_t *snode,
                                             pd_font_weight_t weight)
 {
         for (weight -= 1; weight >= PD_FONT_WEIGHT_THIN; weight -= 1) {
-                if (snode->weights[weight]) {
+                if (snode->weights[weight - 1]) {
                         return weight;
                 }
         }
