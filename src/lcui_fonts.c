@@ -37,7 +37,15 @@ static void lcui_windows_fonts_init(void)
                                 "C:/Windows/Fonts/msyh.ttf",
                                 "C:/Windows/Fonts/msyh.ttc",
                                 "C:/Windows/Fonts/msyhbd.ttc",
-                                "C:/Windows/Fonts/msyhl.ttc" };
+                                "C:/Windows/Fonts/msyhl.ttc",
+                                "C:/Windows/Fonts/segoeui.ttf",
+                                "C:/Windows/Fonts/segoeuil.ttf",
+                                "C:/Windows/Fonts/segoeuisl.ttf",
+                                "C:/Windows/Fonts/segoeuib.ttf",
+                                "C:/Windows/Fonts/segoeuii.ttf",
+                                "C:/Windows/Fonts/segoeuiz.ttf",
+                                "C:/Windows/Fonts/seguibl.ttf",
+                                "C:/Windows/Fonts/NotoSansSC-VF.ttf" };
 
         for (i = 0; i < sizeof(fonts) / sizeof(char *); ++i) {
                 pd_font_load_file(fonts[i]);
@@ -57,17 +65,51 @@ static void lcui_fc_fonts_init(void)
         size_t i;
         bool has_default = false;
         char *path;
-        const char *fonts[] = { "Ubuntu", "Noto Sans CJK SC",
-                                "WenQuanYi Micro Hei" };
+        const char *sans[] = { "Ubuntu", "Noto Sans CJK SC",
+                               "WenQuanYi Micro Hei" };
+        const char *mono[] = { "Ubuntu Mono", "DejaVu Sans Mono",
+                               "Liberation Mono" };
+        const char *serif[] = { "Noto Serif CJK SC", "DejaVu Serif",
+                                "Liberation Serif" };
+        const char *sans_default = NULL;
 
-        for (i = 0; i < sizeof(fonts) / sizeof(char *); ++i) {
-                path = pd_font_find_path(fonts[i]);
+        /* 加载全部 sans 候选（含 CJK），供按字形回退；默认族取第一个成功的 */
+        for (i = 0; i < sizeof(sans) / sizeof(sans[0]); ++i) {
+                path = pd_font_find_path(sans[i]);
+                if (path) {
+                        pd_font_load_file(path);
+                        free(path);
+                }
+                if (!has_default) {
+                        has_default = lcui_fonts_set_default(sans[i]);
+                        if (has_default) {
+                                sans_default = sans[i];
+                        }
+                }
+        }
+        if (sans_default) {
+                pd_font_family_set_alias("sans-serif", sans_default);
+        }
+        /* monospace / serif 取第一个可定位到的族，加载后设对应通用名别名 */
+        for (i = 0; i < sizeof(mono) / sizeof(mono[0]); ++i) {
+                path = pd_font_find_path(mono[i]);
+                if (!path) {
+                        continue;
+                }
                 pd_font_load_file(path);
                 free(path);
-                // TODO: 使用系统已设置的默认字体
-                if (!has_default) {
-                        has_default = lcui_fonts_set_default(fonts[i]);
+                pd_font_family_set_alias("monospace", mono[i]);
+                break;
+        }
+        for (i = 0; i < sizeof(serif) / sizeof(serif[0]); ++i) {
+                path = pd_font_find_path(serif[i]);
+                if (!path) {
+                        continue;
                 }
+                pd_font_load_file(path);
+                free(path);
+                pd_font_family_set_alias("serif", serif[i]);
+                break;
         }
 }
 
@@ -100,7 +142,9 @@ static void lcui_linux_fonts_init(void)
                 "/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-LI.ttf",
                 "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
                 "/usr/share/fonts/opentype/noto/NotoSansCJK.ttc",
-                "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc"
+                "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc",
+                "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
+                "/usr/share/fonts/dejavu/DejaVuSerif.ttf"
         };
 
         for (i = 0; i < sizeof(fonts) / sizeof(char *); ++i) {
@@ -111,6 +155,7 @@ static void lcui_linux_fonts_init(void)
                 lcui_fonts_set_default("Ubuntu");
         }
         pd_font_family_set_alias("sans-serif", "Ubuntu");
+        pd_font_family_set_alias("serif", "DejaVu Serif");
         pd_font_family_set_alias("monospace", "Ubuntu Mono");
 }
 #endif
