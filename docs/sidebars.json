@@ -36,6 +36,7 @@
         { "slug": "badge", "label": { "en": "Badge", "zh-CN": "Badge 徽标" } },
         { "slug": "button", "label": { "en": "Button", "zh-CN": "Button 按钮" } },
         { "slug": "checkbox", "label": { "en": "Checkbox", "zh-CN": "Checkbox 复选框" } },
+        { "slug": "empty", "label": { "en": "Empty", "zh-CN": "Empty 空状态" } },
         { "slug": "field", "label": { "en": "Field", "zh-CN": "Field 表单字段" } },
         { "slug": "item", "label": { "en": "Item", "zh-CN": "Item 内容行" } },
         { "slug": "label", "label": { "en": "Label", "zh-CN": "Label 标签" } },

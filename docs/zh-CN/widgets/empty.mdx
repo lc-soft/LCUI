@@ -1,0 +1,89 @@
+# Empty
+
+为无数据、无搜索结果等状态提供居中且可组合的占位内容。
+
+<WidgetExample name="empty-basic" />
+
+## 适用场景
+
+- **适用**：列表、搜索结果或内容区域为空时
+- **适用**：需要引导用户创建第一项内容
+- **不适用**：数据仍在加载中的状态（用 loading 指示器）
+
+## 用法
+
+```tsx
+import {
+  Button,
+  Empty,
+  EmptyAction,
+  EmptyDescription,
+  EmptyMedia,
+  EmptyTitle,
+  Text,
+} from "@lcui/react"
+import { Folder } from "@lcui/fluent-icons"
+```
+
+```tsx
+<Empty>
+  <EmptyMedia>
+    <Folder />
+  </EmptyMedia>
+  <EmptyTitle>No data</EmptyTitle>
+  <EmptyDescription>No data found</EmptyDescription>
+  <EmptyAction>
+    <Button><Text>Add data</Text></Button>
+  </EmptyAction>
+</Empty>
+```
+
+## 组合
+
+使用以下组合来构建 `Empty`：
+
+```
+Empty
+├── EmptyMedia
+├── EmptyTitle
+├── EmptyDescription
+└── EmptyAction
+```
+
+## 背景
+
+添加浅色背景可以弱化空状态与周围内容的边界。
+
+<WidgetExample name="empty-background" />
+
+## API 参考
+
+### Empty
+
+空状态容器。
+
+<FieldTable name="empty" />
+
+### EmptyMedia
+
+图标、插画或其他媒体槽位。
+
+<FieldTable name="empty-media" />
+
+### EmptyTitle
+
+空状态标题。
+
+<FieldTable name="empty-title" />
+
+### EmptyDescription
+
+空状态说明。
+
+<FieldTable name="empty-description" />
+
+### EmptyAction
+
+后续操作的布局槽位。
+
+<FieldTable name="empty-action" />

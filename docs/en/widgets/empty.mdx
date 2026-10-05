@@ -1,0 +1,89 @@
+# Empty
+
+Provides centered, composable placeholder content for states such as no data or no search results.
+
+<WidgetExample name="empty-basic" />
+
+## Use cases
+
+- **Suitable**: when a list, search result, or content area is empty
+- **Suitable**: guiding the user to create their first item
+- **Not suitable**: a state where data is still loading (use a loading indicator)
+
+## Usage
+
+```tsx
+import {
+  Button,
+  Empty,
+  EmptyAction,
+  EmptyDescription,
+  EmptyMedia,
+  EmptyTitle,
+  Text,
+} from "@lcui/react"
+import { Folder } from "@lcui/fluent-icons"
+```
+
+```tsx
+<Empty>
+  <EmptyMedia>
+    <Folder />
+  </EmptyMedia>
+  <EmptyTitle>No data</EmptyTitle>
+  <EmptyDescription>No data found</EmptyDescription>
+  <EmptyAction>
+    <Button><Text>Add data</Text></Button>
+  </EmptyAction>
+</Empty>
+```
+
+## Composition
+
+Use the following composition to build an `Empty`:
+
+```
+Empty
+├── EmptyMedia
+├── EmptyTitle
+├── EmptyDescription
+└── EmptyAction
+```
+
+## Background
+
+Adding a light background softens the boundary between the empty state and the surrounding content.
+
+<WidgetExample name="empty-background" />
+
+## API Reference
+
+### Empty
+
+The empty-state container.
+
+<FieldTable name="empty" />
+
+### EmptyMedia
+
+The slot for an icon, illustration, or other media.
+
+<FieldTable name="empty-media" />
+
+### EmptyTitle
+
+The empty-state title.
+
+<FieldTable name="empty-title" />
+
+### EmptyDescription
+
+The empty-state description.
+
+<FieldTable name="empty-description" />
+
+### EmptyAction
+
+The layout slot for a follow-up action.
+
+<FieldTable name="empty-action" />

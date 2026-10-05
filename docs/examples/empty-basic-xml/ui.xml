@@ -1,0 +1,22 @@
+<lcui-app>
+  <ui>
+    <empty class="empty-basic-demo">
+      <empty-header>
+      <empty-media variant="icon">
+        <icon name="folder" size="24" />
+      </empty-media>
+      <empty-title>No Projects Yet</empty-title>
+      <empty-description
+      >You haven't created any projects yet. Get started by creating your first project.</empty-description>
+      </empty-header>
+      <empty-content>
+      <empty-action>
+        <button variant="primary"><text>Create Project</text></button>
+        <button><text>Import Project</text></button>
+      </empty-action>
+      </empty-content>
+      <button variant="link" size="sm" class="text-muted-foreground"><text
+        >Learn More</text><icon name="arrow-up-right" /></button>
+    </empty>
+  </ui>
+</lcui-app>

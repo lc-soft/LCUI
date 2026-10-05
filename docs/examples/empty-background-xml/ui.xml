@@ -1,0 +1,16 @@
+<lcui-app>
+  <ui>
+    <empty class="empty-background-demo">
+      <empty-header>
+      <empty-media variant="icon"><icon name="alert" /></empty-media>
+      <empty-title>No Notifications</empty-title>
+      <empty-description
+      >You're all caught up. New notifications will appear here.</empty-description>
+        </empty-header>
+        <empty-content>
+      <empty-action><button variant="outline"><icon name="arrow-sync" /><text
+          >Refresh</text></button></empty-action>
+        </empty-content>
+    </empty>
+  </ui>
+</lcui-app>

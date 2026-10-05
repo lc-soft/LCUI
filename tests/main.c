@@ -41,6 +41,7 @@ extern void test_button(void);
 extern void test_badge(void);
 extern void test_alert(void);
 extern void test_item(void);
+extern void test_empty(void);
 
 static const ctest_suite_t suites[] = {
         { "settings", test_settings },
@@ -72,6 +73,7 @@ static const ctest_suite_t suites[] = {
         { "badge", test_badge },
         { "alert", test_alert },
         { "item", test_item },
+        { "empty", test_empty },
         { NULL, NULL }
 };
 
