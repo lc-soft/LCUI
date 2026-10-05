@@ -13,7 +13,7 @@
 #include <ctest-custom.h>
 #include "../scenes/block_layout_scene.h"
 
-#define SCROLLBAR_WIDTH 14
+#define SCROLLBAR_WIDTH 10
 
 static void test_dropdown(void)
 {

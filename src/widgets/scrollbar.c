@@ -33,18 +33,20 @@ static const char *ui_scrollbar_css = "\
 scrollbar {\
 	display: flex;\
 	position: absolute;\
-	background-color: #fafafa;\
+	background-color: transparent;\
 	box-sizing: border-box;\
+        justify-content: center;\
 }\
 \
 scrollbar-track {\
 	flex: auto;\
+	background-color: transparent;\
 }\
 \
 scrollbar.vertical {\
 	top: 0;\
 	right: 0;\
-	width: 14px;\
+	width: 10px;\
 	height: 100%;\
 	flex-direction: column;\
 }\
@@ -53,41 +55,51 @@ scrollbar.horizontal {\
 	bottom: 0;\
 	left: 0;\
 	width: 100%;\
-	height: 14px;\
+	height: 10px;\
 }\
 \
 scrollbar-corner {\
 	flex: none;\
-	width: 14px;\
-	height: 14px;\
+	width: 10px;\
+	height: 10px;\
 	display: none;\
 }\
 \
 scrollbar-thumb {\
 	top: 0;\
 	left: 0;\
-	width: 14px;\
-	height: 14px;\
-	min-width: 14px;\
-	min-height: 14px;\
+	cursor: grab;\
+	width: 4px;\
+	height: 4px;\
 	position: absolute;\
-	background-color: #aaa;\
+	border-radius: 4px;\
+	background-color: rgba(0, 0, 0, 0.25);\
+}\
+\
+scrollbar.vertical scrollbar-thumb {\
+	left: 3px;\
+	min-height: 24px;\
+}\
+\
+scrollbar.horizontal scrollbar-thumb {\
+	top: 3px;\
+	min-width: 24px;\
 }\
 \
 scrollbar-thumb:hover {\
-	background-color: #bbb;\
+	background-color: rgba(0, 0, 0, 0.45);\
 }\
 \
 scrollbar-thumb:active {\
-	background-color: #999;\
+	background-color: rgba(0, 0, 0, 0.6);\
 }\
 \
 .has-horizontal-scrollbar {\
-	padding-bottom: 14px;\
+	padding-bottom: 10px;\
 }\
 \
 .has-vertical-scrollbar {\
-	padding-right: 14px;\
+	padding-right: 10px;\
 }\
 \
 .has-horizontal-scrollbar scrollbar.vertical scrollbar-corner,\
