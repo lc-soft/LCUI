@@ -562,9 +562,13 @@ size_t ui_widget_render(ui_widget_t *w, pd_context_t *paint)
         ui_renderer_t *ctx;
         ui_widget_actual_style_t style;
 
-        /* reset widget position to relative paint rect */
-        style.x = -1.f * ui_compute(w->canvas_box.x);
-        style.y = -1.f * ui_compute(w->canvas_box.y);
+        /* Reset the widget position to the paint rect origin. canvas_box is
+         * stored in logical units, and ui_widget_compute_box() scales
+         * (style.x + canvas_box.x) as a whole, so style.x must stay in logical
+         * units here; applying ui_compute() would scale the offset twice and
+         * misplace the render whenever actual_scale != 1. */
+        style.x = -w->canvas_box.x;
+        style.y = -w->canvas_box.y;
         ui_widget_compute_box(w, &style);
         ctx = ui_renderer_create(w, paint, &style, NULL);
         DEBUG_MSG("[%d] %s: start render\n", ctx->target->index,
