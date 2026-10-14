@@ -429,6 +429,57 @@ int pd_canvas_mix(pd_canvas_t *back, const pd_canvas_t *fore, int left, int top,
         return -3;
 }
 
+int pd_canvas_mask_composite(pd_canvas_t *dst, const pd_canvas_t *mask)
+{
+        pd_rect_t mask_rect;
+        pd_rect_t overlap;
+        int x, y;
+        int mask_off_x, mask_off_y;
+        pd_color_t dst_px, mask_px;
+        pd_canvas_t *real_dst;
+        const pd_canvas_t *real_mask;
+
+        if (!pd_canvas_is_valid(dst) || !pd_canvas_is_valid(mask)) {
+                return -1;
+        }
+        if (dst->color_type != PD_COLOR_TYPE_ARGB) {
+                return -1;
+        }
+
+        overlap.x = 0;
+        overlap.y = 0;
+        overlap.width = dst->width < mask->width ? dst->width : mask->width;
+        overlap.height =
+            dst->height < mask->height ? dst->height : mask->height;
+        if (overlap.width <= 0 || overlap.height <= 0) {
+                return -1;
+        }
+
+        pd_canvas_get_quote_rect(mask, &mask_rect);
+        mask_off_x = mask_rect.x;
+        mask_off_y = mask_rect.y;
+        real_mask = pd_canvas_get_quote_source_readonly(mask);
+
+        real_dst = dst;
+        if (pd_canvas_begin_writing(&real_dst, &overlap) != 0) {
+                return -1;
+        }
+
+        for (y = 0; y < overlap.height; ++y) {
+                for (x = 0; x < overlap.width; ++x) {
+                        mask_px = pd_canvas_get_pixel(real_mask, mask_off_x + x,
+                                                      mask_off_y + y);
+                        dst_px = pd_canvas_get_pixel(real_dst, overlap.x + x,
+                                                     overlap.y + y);
+                        dst_px.a = (uint8_t)((dst_px.a * mask_px.a) / 255);
+                        pd_canvas_set_pixel(real_dst, overlap.x + x,
+                                            overlap.y + y, dst_px);
+                }
+        }
+
+        return 0;
+}
+
 int pd_canvas_fill_rect(pd_canvas_t *canvas, pd_color_t color, pd_rect_t rect)
 {
         int x, y;

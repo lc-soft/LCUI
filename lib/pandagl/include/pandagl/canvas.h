@@ -93,6 +93,9 @@ PD_PUBLIC void pd_canvas_copy(pd_canvas_t *des, const pd_canvas_t *src);
 PD_PUBLIC int pd_canvas_mix(pd_canvas_t *back, const pd_canvas_t *fore,
                             int left, int top, bool with_alpha);
 
+PD_PUBLIC int pd_canvas_mask_composite(pd_canvas_t *dst,
+                                       const pd_canvas_t *mask);
+
 PD_PUBLIC int pd_canvas_fill_rect(pd_canvas_t *canvas, pd_color_t color,
                                   pd_rect_t rect);
 
@@ -116,6 +119,9 @@ PD_PUBLIC int pd_canvas_zoom(const pd_canvas_t *canvas, pd_canvas_t *buff,
 PD_PUBLIC int pd_canvas_zoom_bilinear(const pd_canvas_t *canvas,
                                       pd_canvas_t *buff, bool keep_scale,
                                       int width, int height);
+
+PD_PUBLIC int pd_canvas_rotate(const pd_canvas_t *src, pd_canvas_t *dst,
+                               double radians);
 
 PD_END_DECLS
 

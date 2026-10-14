@@ -18,9 +18,13 @@ extern void test_pandagl_text_edit(void);
 extern void test_pandagl_font_cache(void);
 extern void test_pandagl_text_baseline(void);
 extern void test_pandagl_text_style_tag(void);
+extern void test_pandagl_canvas_rotate(void);
+extern void test_pandagl_mask_composite(void);
 extern void test_pandagl_text_decoration(void);
 
 static const ctest_suite_t suites[] = {
+        { "pandagl/canvas rotate", test_pandagl_canvas_rotate },
+        { "pandagl/canvas mask", test_pandagl_mask_composite },
         { "pandagl/canvas mix", test_pandagl_canvas_mix },
         { "pandagl/image reader", test_pandagl_image_reader },
         { "pandagl/font load", test_pandagl_font_load },
