@@ -1,0 +1,159 @@
+# AlertDialog
+
+A modal dialog that interrupts the user with important content and expects a response.
+
+<WidgetExample name="alert-dialog-basic" />
+
+## Use cases
+
+- **Use for**: confirming destructive or irreversible operations such as deletion
+- **Use for**: flows that may continue only after an explicit "confirm / cancel" choice
+- **Don't use for**: ordinary panels that may be dismissed with Esc or an overlay click (use `dialog`)
+
+## Usage
+
+```tsx
+import { AlertDialog, AlertDialogTrigger, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Portal } from "@lcui/react"
+```
+
+```tsx
+<AlertDialog>
+  <AlertDialogTrigger>Show Dialog</AlertDialogTrigger>
+  <Portal>
+    <AlertDialogOverlay>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This action cannot be undone. This will permanently delete your
+            account and remove your data from our servers.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction>Continue</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialogOverlay>
+  </Portal>
+</AlertDialog>
+```
+
+## Composition
+
+Use the following composition to build an `AlertDialog`:
+
+```
+AlertDialog
+├── AlertDialogTrigger
+└── Portal
+    └── AlertDialogOverlay
+        └── AlertDialogContent
+            ├── AlertDialogHeader
+            │   ├── AlertDialogMedia
+            │   ├── AlertDialogTitle
+            │   └── AlertDialogDescription
+            └── AlertDialogFooter
+                ├── AlertDialogCancel
+                └── AlertDialogAction
+```
+
+## Small
+
+Use the `size="sm"` prop on the `AlertDialogContent` component to make the alert dialog narrower; the two footer buttons then stretch equally across the content area.
+
+<WidgetExample name="alert-dialog-small" />
+
+## Destructive
+
+Use an `AlertDialogAction` with `variant="destructive"` to express destructive actions such as deletion.
+
+<WidgetExample name="alert-dialog-destructive" />
+
+## Cancel and Confirm Callbacks
+
+`AlertDialogCancel` and `AlertDialogAction` close the dialog and then emit the `cancel` / `action` events respectively; handling the business result is up to the caller. Plain buttons outside the subtree can join the flow through the `data-dialog-cancel` / `data-dialog-action` association keys.
+
+<WidgetExample name="alert-dialog-callback" />
+
+## Caveats
+
+:::caution
+
+**Pressing Esc or clicking the overlay does not close the alert dialog**; the user can only choose cancel or confirm, while an explicit `ui_dialog_close()` still works. Open/close animations and focus traps are not implemented.
+
+:::
+
+:::note
+
+Confirm actions are synchronous events; waiting on async results or multi-step confirmations is out of scope and can be built on top of the `action` event in the application layer. The Media section from shadcn relies on a two-column CSS grid layout, which LCUI does not support; the `AlertDialogMedia` icon stacks vertically and centers (see the Destructive example). RTL layouts are not supported either.
+
+:::
+
+## API Reference
+
+### AlertDialog
+
+The alert dialog state container; it reuses the Dialog open/close APIs and rejects implicit dismissal by default.
+
+<FieldTable name="alert-dialog" />
+
+### AlertDialogTrigger
+
+The trigger that opens the alert dialog; it creates a button by default.
+
+<FieldTable name="alert-dialog-trigger" />
+
+### AlertDialogOverlay
+
+The full-screen overlay mounted on the portal root through Portal; it never closes on click.
+
+<FieldTable name="alert-dialog-overlay" />
+
+### AlertDialogContent
+
+The confirmation content container centered on the overlay.
+
+<FieldTable name="alert-dialog-content" />
+
+### AlertDialogHeader
+
+The header combining media, title and description; centered only under `size="sm"`.
+
+<FieldTable name="alert-dialog-header" />
+
+### AlertDialogMedia
+
+The media slot in the header for an icon or an image.
+
+<FieldTable name="alert-dialog-media" />
+
+### AlertDialogTitle
+
+The alert dialog title.
+
+<FieldTable name="alert-dialog-title" />
+
+### AlertDialogDescription
+
+The alert dialog description text.
+
+<FieldTable name="alert-dialog-description" />
+
+### AlertDialogFooter
+
+The cancel and confirm button row, right-aligned by default; with `size="sm"` the buttons stretch equally.
+
+<FieldTable name="alert-dialog-footer" />
+
+### AlertDialogCancel
+
+The cancel button: closes the dialog and emits the `cancel` event.
+
+<FieldTable name="alert-dialog-cancel" />
+
+### AlertDialogAction
+
+The confirm button: closes the dialog and emits the `action` event.
+
+<FieldTable name="alert-dialog-action" />

@@ -1,0 +1,25 @@
+<lcui-app>
+  <ui>
+    <w style="display:flex; flex-direction:column; gap:8px">
+      <alert-dialog>
+        <alert-dialog-trigger>
+          <button>Confirm Changes</button>
+        </alert-dialog-trigger>
+        <portal>
+          <alert-dialog-overlay>
+            <alert-dialog-content>
+              <alert-dialog-header>
+                <alert-dialog-title>Save changes?</alert-dialog-title>
+              </alert-dialog-header>
+              <alert-dialog-footer>
+                <alert-dialog-cancel variant="outline">Discard</alert-dialog-cancel>
+                <alert-dialog-action variant="primary">Save</alert-dialog-action>
+              </alert-dialog-footer>
+            </alert-dialog-content>
+          </alert-dialog-overlay>
+        </portal>
+      </alert-dialog>
+      <text>No choice yet</text>
+    </w>
+  </ui>
+</lcui-app>

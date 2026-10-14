@@ -1,0 +1,55 @@
+<lcui-app>
+  <ui>
+    <dialog>
+      <dialog-trigger>
+        <button variant="outline">Sticky Footer</button>
+      </dialog-trigger>
+      <portal>
+        <dialog-overlay>
+          <dialog-content>
+            <dialog-header>
+              <dialog-title>Sticky Footer</dialog-title>
+              <dialog-description>
+                This dialog has a sticky footer that stays visible while the
+                content scrolls.
+              </dialog-description>
+            </dialog-header>
+            <scrollarea style="height: 200px">
+              <scrollarea-content>
+                <text
+                  >Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+                  do eiusmod tempor incididunt ut labore et dolore magna
+                  aliqua.</text
+                >
+                <text
+                  >Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                  laboris nisi ut aliquip ex ea commodo consequat.</text
+                >
+                <text
+                  >Duis aute irure dolor in reprehenderit in voluptate velit
+                  esse cillum dolore eu fugiat nulla pariatur.</text
+                >
+                <text
+                  >Excepteur sint occaecat cupidatat non proident, sunt in
+                  culpa qui officia deserunt mollit anim id est laborum.</text
+                >
+                <text
+                  >Sed ut perspiciatis unde omnis iste natus error sit
+                  voluptatem accusantium doloremque laudantium.</text
+                >
+                <text
+                  >Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut
+                  odit aut fugit.</text
+                >
+              </scrollarea-content>
+              <scrollbar />
+            </scrollarea>
+            <dialog-footer>
+              <button variant="outline" data-dialog-close="true">Close</button>
+            </dialog-footer>
+          </dialog-content>
+        </dialog-overlay>
+      </portal>
+    </dialog>
+  </ui>
+</lcui-app>

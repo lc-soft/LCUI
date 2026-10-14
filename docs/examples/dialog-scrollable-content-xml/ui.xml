@@ -1,0 +1,51 @@
+<lcui-app>
+  <ui>
+    <dialog>
+      <dialog-trigger>
+        <button variant="outline">Scrollable Content</button>
+      </dialog-trigger>
+      <portal>
+        <dialog-overlay>
+          <dialog-content>
+            <dialog-header>
+              <dialog-title>Scrollable Content</dialog-title>
+              <dialog-description>
+                This is a dialog with scrollable content.
+              </dialog-description>
+            </dialog-header>
+            <scrollarea style="height: 200px">
+              <scrollarea-content>
+                <text
+                  >Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+                  do eiusmod tempor incididunt ut labore et dolore magna
+                  aliqua.</text
+                >
+                <text
+                  >Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                  laboris nisi ut aliquip ex ea commodo consequat.</text
+                >
+                <text
+                  >Duis aute irure dolor in reprehenderit in voluptate velit
+                  esse cillum dolore eu fugiat nulla pariatur.</text
+                >
+                <text
+                  >Excepteur sint occaecat cupidatat non proident, sunt in
+                  culpa qui officia deserunt mollit anim id est laborum.</text
+                >
+                <text
+                  >Sed ut perspiciatis unde omnis iste natus error sit
+                  voluptatem accusantium doloremque laudantium.</text
+                >
+                <text
+                  >Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut
+                  odit aut fugit.</text
+                >
+              </scrollarea-content>
+              <scrollbar />
+            </scrollarea>
+          </dialog-content>
+        </dialog-overlay>
+      </portal>
+    </dialog>
+  </ui>
+</lcui-app>

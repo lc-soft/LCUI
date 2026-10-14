@@ -1,0 +1,159 @@
+# AlertDialog
+
+打断用户、呈现重要内容并要求明确响应的模态对话框。
+
+<WidgetExample name="alert-dialog-basic" />
+
+## 适用场景
+
+- **适用**：删除等破坏性或不可逆操作前的确认
+- **适用**：必须得到用户"确认 / 取消"明确回应才能继续的流程
+- **不适用**：允许被 Esc 或遮罩点击关闭的普通面板（用 `dialog`）
+
+## 用法
+
+```tsx
+import { AlertDialog, AlertDialogTrigger, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Portal } from "@lcui/react"
+```
+
+```tsx
+<AlertDialog>
+  <AlertDialogTrigger>Show Dialog</AlertDialogTrigger>
+  <Portal>
+    <AlertDialogOverlay>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This action cannot be undone. This will permanently delete your
+            account and remove your data from our servers.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction>Continue</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialogOverlay>
+  </Portal>
+</AlertDialog>
+```
+
+## 组合
+
+使用以下组合来构建 `AlertDialog`：
+
+```
+AlertDialog
+├── AlertDialogTrigger
+└── Portal
+    └── AlertDialogOverlay
+        └── AlertDialogContent
+            ├── AlertDialogHeader
+            │   ├── AlertDialogMedia
+            │   ├── AlertDialogTitle
+            │   └── AlertDialogDescription
+            └── AlertDialogFooter
+                ├── AlertDialogCancel
+                └── AlertDialogAction
+```
+
+## 小号尺寸
+
+在 `AlertDialogContent` 上使用 `size="sm"` 让对话框更窄，此时 Footer 的两个按钮等宽撑满内容区。
+
+<WidgetExample name="alert-dialog-small" />
+
+## 破坏性操作
+
+使用 `variant="destructive"` 的 `AlertDialogAction` 表达删除等破坏性动作。
+
+<WidgetExample name="alert-dialog-destructive" />
+
+## 取消与确认回调
+
+`AlertDialogCancel` / `AlertDialogAction` 关闭对话框后分别发出 `cancel` / `action` 事件，业务结果由调用方处理；也可以给脱离子树的普通按钮设置 `data-dialog-cancel` / `data-dialog-action` 关联键参与确认流程。
+
+<WidgetExample name="alert-dialog-callback" />
+
+## 注意事项
+
+:::caution
+
+**按 Esc 或点击遮罩不会关闭确认对话框**，用户只能通过取消或确认作出选择；显式关闭仍需 `ui_dialog_close()`。当前实现不包含打开/关闭动画与焦点陷阱。
+
+:::
+
+:::note
+
+确认动作是同步事件，不支持异步等待与二次确认流程；需要时可监听 `action` 事件在应用层实现。shadcn 的 Media 小节依赖 CSS grid 双列布局，LCUI 的 `AlertDialogMedia` 采用纵向居中堆叠（见"破坏性操作"示例）；RTL 排版 LCUI 暂不支持。
+
+:::
+
+## API 参考
+
+### AlertDialog
+
+确认对话框状态容器，复用 Dialog 的开关 API，默认拒绝隐式关闭。
+
+<FieldTable name="alert-dialog" />
+
+### AlertDialogTrigger
+
+打开确认对话框的触发器，内部默认创建一个按钮。
+
+<FieldTable name="alert-dialog-trigger" />
+
+### AlertDialogOverlay
+
+通过 Portal 挂载到 root 层级的全屏遮罩，不会响应点击关闭。
+
+<FieldTable name="alert-dialog-overlay" />
+
+### AlertDialogContent
+
+居中显示在遮罩上的确认内容容器。
+
+<FieldTable name="alert-dialog-content" />
+
+### AlertDialogHeader
+
+媒体、标题与描述的组合头部，默认左对齐，仅 `size="sm"` 时居中。
+
+<FieldTable name="alert-dialog-header" />
+
+### AlertDialogMedia
+
+头部媒体区域，可放置图标或图片。
+
+<FieldTable name="alert-dialog-media" />
+
+### AlertDialogTitle
+
+确认对话框标题。
+
+<FieldTable name="alert-dialog-title" />
+
+### AlertDialogDescription
+
+确认对话框说明文本。
+
+<FieldTable name="alert-dialog-description" />
+
+### AlertDialogFooter
+
+取消与确认按钮区域，默认右对齐；`size="sm"` 时按钮等宽撑满。
+
+<FieldTable name="alert-dialog-footer" />
+
+### AlertDialogCancel
+
+取消按钮，点击后关闭对话框并发出 `cancel` 事件。
+
+<FieldTable name="alert-dialog-cancel" />
+
+### AlertDialogAction
+
+确认按钮，点击后关闭对话框并发出 `action` 事件。
+
+<FieldTable name="alert-dialog-action" />

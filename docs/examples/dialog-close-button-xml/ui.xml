@@ -1,0 +1,36 @@
+<lcui-app>
+  <resource type="text/css">
+    .dialog-close-button-example dialog-footer {
+      justify-content: flex-start;
+    }
+    .dialog-close-button-example dialog-content {
+      max-width: 448px;
+    }
+  </resource>
+  <ui>
+    <dialog class="dialog-close-button-example">
+      <dialog-trigger>
+        <button variant="outline">Share</button>
+      </dialog-trigger>
+      <portal>
+        <dialog-overlay>
+          <dialog-content>
+            <dialog-header>
+              <dialog-title>Share link</dialog-title>
+              <dialog-description>
+                Anyone who has this link will be able to view this.
+              </dialog-description>
+            </dialog-header>
+            <textinput readonly tabindex="0" style="flex: 1"
+              >https://lcui.dev/docs/installation</textinput
+            >
+            <dialog-footer>
+              <button variant="primary" data-dialog-close="true">Close</button>
+            </dialog-footer>
+            <button class="dialog-close" variant="ghost" size="icon" data-dialog-close="true"><icon name="dismiss" /></button>
+          </dialog-content>
+        </dialog-overlay>
+      </portal>
+    </dialog>
+  </ui>
+</lcui-app>

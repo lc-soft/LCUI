@@ -44,6 +44,8 @@ void lcui_widgets_init(void)
         ui_register_alert();
         ui_register_item();
         ui_register_empty();
+        ui_register_dialog();
+        ui_register_alert_dialog();
 }
 
 void lcui_widgets_destroy(void)
@@ -51,4 +53,5 @@ void lcui_widgets_destroy(void)
         ui_unregister_text();
         ui_unregister_anchor();
         ui_unregister_select();
+        ui_unregister_dialog();
 }

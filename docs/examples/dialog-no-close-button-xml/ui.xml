@@ -1,0 +1,22 @@
+<lcui-app>
+  <ui>
+    <dialog>
+      <dialog-trigger>
+        <button variant="outline">No Close Button</button>
+      </dialog-trigger>
+      <portal>
+        <dialog-overlay>
+          <dialog-content>
+            <dialog-header>
+              <dialog-title>No Close Button</dialog-title>
+              <dialog-description>
+                This dialog doesn't have a close button in the top-right
+                corner.
+              </dialog-description>
+            </dialog-header>
+          </dialog-content>
+        </dialog-overlay>
+      </portal>
+    </dialog>
+  </ui>
+</lcui-app>

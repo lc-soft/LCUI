@@ -1,0 +1,166 @@
+# Dialog
+
+A window overlaid on either the primary window or another dialog window, rendering the content underneath inert.
+
+<WidgetExample name="dialog-basic" />
+
+## Use cases
+
+- **Use for**: form editing, profile updates and other tasks that should be completed on the current page
+- **Use for**: detail views and guided flows that temporarily interrupt the current interaction
+- **Don't use for**: confirmations that must not be dismissed implicitly (use `alert-dialog`)
+
+## Usage
+
+```tsx
+import { Dialog, DialogTrigger, DialogOverlay, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, Portal } from "@lcui/react"
+```
+
+```tsx
+<Dialog>
+  <DialogTrigger>Open</DialogTrigger>
+  <Portal>
+    <DialogOverlay>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Are you absolutely sure?</DialogTitle>
+          <DialogDescription>
+            This action cannot be undone. This will permanently delete your
+            account and remove your data from our servers.
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    </DialogOverlay>
+  </Portal>
+</Dialog>
+```
+
+## Composition
+
+Use the following composition to build a `Dialog`:
+
+```
+Dialog
+├── DialogTrigger
+└── Portal
+    └── DialogOverlay
+        └── DialogContent
+            ├── DialogHeader
+            │   ├── DialogTitle
+            │   └── DialogDescription
+            └── DialogFooter
+```
+
+## Custom Close Button
+
+Put your own close control in the footer (a `DialogClose` or any node carrying `data-dialog-close`).
+
+<WidgetExample name="dialog-close-button" />
+
+## No Close Button
+
+Simply leave out the `DialogClose` node; when building the default subtree, call `ui_dialog_show_close_button()` to hide the top-right button.
+
+<WidgetExample name="dialog-no-close-button" />
+
+## Sticky Footer
+
+Keep actions visible while the content scrolls.
+
+<WidgetExample name="dialog-sticky-footer" />
+
+## Scrollable Content
+
+Long content can scroll inside `DialogContent` while the header stays in view.
+
+<WidgetExample name="dialog-scrollable-content" />
+
+## Declarative Association
+
+Widgets outside the `Dialog` subtree can be bound loosely through association keys, without a unified container:
+
+```xml title="dialog-xml"
+<button data-dialog-trigger="profile">Edit Profile</button>
+<dialog-overlay data-dialog-target="profile">
+  <dialog-content>
+    <text class="text-sm">Clicking X or Esc closes the dialog.</text>
+    <button data-dialog-close="profile">Dismiss</button>
+  </dialog-content>
+</dialog-overlay>
+```
+
+:::note
+
+`data-dialog-trigger` toggles the dialog on click, `data-dialog-target` designates the floating node, `data-dialog-close` closes the dialog on click. One key may have multiple triggers and close nodes, but only one target.
+
+:::
+
+## Caveats
+
+:::caution
+
+**Open/close animations and focus traps are not implemented.** The background becomes unclickable once the overlay appears, but Tab can still move focus to background widgets. Handle strict modal behavior in the application layer if needed.
+
+:::
+
+:::note
+
+Pressing Esc, clicking the blank overlay area, or clicking any `DialogClose` / `data-dialog-close` node closes the dialog; clicking inside the content does not. Esc only works while the focus is inside the dialog content subtree (on open, focus moves to the first focusable element; if nothing is focusable and no close button is injected, Esc does nothing). RTL layouts from shadcn depend on `direction: rtl`, which LCUI does not support yet.
+
+:::
+
+## API Reference
+
+### Dialog
+
+The dialog state container that manages opening, overlay mounting and focus restoration.
+
+<FieldTable name="dialog" />
+
+### DialogTrigger
+
+The trigger that toggles the dialog; it creates a button by default.
+
+<FieldTable name="dialog-trigger" />
+
+### DialogOverlay
+
+The full-screen overlay mounted on the portal root through Portal; it blocks background pointer events.
+
+<FieldTable name="dialog-overlay" />
+
+### DialogContent
+
+The dialog content container centered on the overlay.
+
+<FieldTable name="dialog-content" />
+
+### DialogHeader
+
+The header combining title and description.
+
+<FieldTable name="dialog-header" />
+
+### DialogTitle
+
+The dialog title.
+
+<FieldTable name="dialog-title" />
+
+### DialogDescription
+
+The dialog description text.
+
+<FieldTable name="dialog-description" />
+
+### DialogFooter
+
+The action button row, right-aligned by default.
+
+<FieldTable name="dialog-footer" />
+
+### DialogClose
+
+The button that closes the dialog. The default one is a ghost + icon button combination absolutely positioned at the top-right corner; any node carrying `data-dialog-close` has the same behavior.
+
+<FieldTable name="dialog-close" />

@@ -1,0 +1,26 @@
+<lcui-app>
+  <ui>
+    <alert-dialog>
+      <alert-dialog-trigger>
+        <button>Show Dialog</button>
+      </alert-dialog-trigger>
+      <portal>
+        <alert-dialog-overlay>
+          <alert-dialog-content>
+            <alert-dialog-header>
+              <alert-dialog-title>Are you absolutely sure?</alert-dialog-title>
+              <alert-dialog-description>
+                This action cannot be undone. This will permanently delete your
+                account and remove your data from our servers.
+              </alert-dialog-description>
+            </alert-dialog-header>
+            <alert-dialog-footer>
+              <alert-dialog-cancel variant="outline">Cancel</alert-dialog-cancel>
+              <alert-dialog-action variant="primary">Continue</alert-dialog-action>
+            </alert-dialog-footer>
+          </alert-dialog-content>
+        </alert-dialog-overlay>
+      </portal>
+    </alert-dialog>
+  </ui>
+</lcui-app>

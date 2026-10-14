@@ -1,0 +1,167 @@
+# Dialog
+
+叠加在主窗口或其他对话框之上的模态窗口，其下方的内容进入不可交互状态。
+
+<WidgetExample name="dialog-basic" />
+
+## 适用场景
+
+- **适用**：表单编辑、资料修改等需要在当前页面上完成的任务
+- **适用**：展示详情、引导流程等临时打断当前操作的辅助内容
+- **不适用**：需要用户明确选择、不允许隐式关闭的确认流程（用 `alert-dialog`）
+
+## 用法
+
+```tsx
+import { Dialog, DialogTrigger, DialogOverlay, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, Portal } from "@lcui/react"
+```
+
+```tsx
+<Dialog>
+  <DialogTrigger>Open</DialogTrigger>
+  <Portal>
+    <DialogOverlay>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Are you absolutely sure?</DialogTitle>
+          <DialogDescription>
+            This action cannot be undone. This will permanently delete your
+            account and remove your data from our servers.
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    </DialogOverlay>
+  </Portal>
+</Dialog>
+```
+
+## 组合
+
+使用以下组合来构建 `Dialog`：
+
+```
+Dialog
+├── DialogTrigger
+└── Portal
+    └── DialogOverlay
+        └── DialogContent
+            ├── DialogHeader
+            │   ├── DialogTitle
+            │   └── DialogDescription
+            └── DialogFooter
+```
+
+## 自定义关闭按钮
+
+在 Footer 中放置自己的关闭按钮（`DialogClose` 或带 `data-dialog-close` 的任意部件）。
+
+<WidgetExample name="dialog-close-button" />
+
+## 无关闭按钮
+
+不放置 `DialogClose` 节点即可；使用默认子树构建时可调用 `ui_dialog_show_close_button()` 关闭右上角按钮。
+
+<WidgetExample name="dialog-no-close-button" />
+
+## 固定 Footer
+
+内容区滚动时，Footer 保持可见。
+
+<WidgetExample name="dialog-sticky-footer" />
+
+## 可滚动内容
+
+长内容可以在 `DialogContent` 内使用 `ScrollArea` 滚动，标题保持可见。
+
+<WidgetExample name="dialog-scrollable-content" />
+
+## 声明式关联
+
+脱离 `Dialog` 子树的普通部件可以用关联键松散绑定，无需嵌套在统一容器中：
+
+```xml title="dialog-xml"
+<button data-dialog-trigger="profile">Edit Profile</button>
+<dialog-overlay data-dialog-target="profile">
+  <dialog-content>
+    <text class="text-sm">Clicking X or Esc closes the dialog.</text>
+    <button data-dialog-close="profile">Dismiss</button>
+  </dialog-content>
+</dialog-overlay>
+```
+
+:::note
+
+`data-dialog-trigger` 点击切换对应对话框，`data-dialog-target` 指定浮层节点，`data-dialog-close` 点击关闭。同一键可以有多个 trigger 与 close，但只允许一个 target。
+
+:::
+
+## 注意事项
+
+:::caution
+
+**当前实现不包含打开/关闭动画与焦点陷阱。** 遮罩出现后背景内容不可点击，但 Tab 键仍可移动焦点到背景部件。需要严格模态行为时，请在应用层控制。
+
+:::
+
+:::note
+
+按 Esc、点击遮罩空白处或任意 `DialogClose` / `data-dialog-close` 节点都会关闭对话框；点击内容内部不会。Esc 生效要求焦点位于对话框内容子树内（打开时焦点会自动落在首个可聚焦元素；若内容中没有任何可聚焦部件且未注入关闭按钮，Esc 无法关闭）。shadcn 的 RTL 排版依赖 `direction: rtl`，LCUI 暂不支持。
+
+:::
+
+## API 参考
+
+### Dialog
+
+对话框状态容器，管理开关、遮罩挂载与焦点恢复。
+
+<FieldTable name="dialog" />
+
+### DialogTrigger
+
+打开或关闭对话框的触发器，内部默认创建一个按钮。
+
+<FieldTable name="dialog-trigger" />
+
+### DialogOverlay
+
+通过 Portal 挂载到 root 层级的全屏遮罩，负责拦截背景点击。
+
+<FieldTable name="dialog-overlay" />
+
+### DialogContent
+
+居中显示在遮罩上的对话框内容容器。
+
+<FieldTable name="dialog-content" />
+
+### DialogHeader
+
+标题与描述的组合头部。
+
+<FieldTable name="dialog-header" />
+
+### DialogTitle
+
+对话框标题。
+
+<FieldTable name="dialog-title" />
+
+### DialogDescription
+
+对话框说明文本。
+
+<FieldTable name="dialog-description" />
+
+### DialogFooter
+
+操作按钮区域，默认右对齐。
+
+<FieldTable name="dialog-footer" />
+
+### DialogClose
+
+关闭对话框的按钮。默认注入的是 ghost + icon 变体组合的标准按钮（绝对定位在右上角）；
+任何带 `data-dialog-close` 的节点都有同样的关闭行为。
+
+<FieldTable name="dialog-close" />

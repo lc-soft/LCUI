@@ -1,0 +1,26 @@
+<lcui-app>
+  <ui>
+    <alert-dialog>
+      <alert-dialog-trigger>
+        <button variant="outline">Show Dialog</button>
+      </alert-dialog-trigger>
+      <portal>
+        <alert-dialog-overlay>
+          <alert-dialog-content size="sm">
+            <alert-dialog-header>
+              <alert-dialog-title>Allow accessory to connect?</alert-dialog-title>
+              <alert-dialog-description>
+                Do you want to allow the USB accessory to connect to this
+                device?
+              </alert-dialog-description>
+            </alert-dialog-header>
+            <alert-dialog-footer>
+              <alert-dialog-cancel>Don't allow</alert-dialog-cancel>
+              <alert-dialog-action variant="primary">Allow</alert-dialog-action>
+            </alert-dialog-footer>
+          </alert-dialog-content>
+        </alert-dialog-overlay>
+      </portal>
+    </alert-dialog>
+  </ui>
+</lcui-app>

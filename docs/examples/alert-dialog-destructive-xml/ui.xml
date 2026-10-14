@@ -1,0 +1,29 @@
+<lcui-app>
+  <ui>
+    <alert-dialog>
+      <alert-dialog-trigger>
+        <button variant="destructive">Delete Chat</button>
+      </alert-dialog-trigger>
+      <portal>
+        <alert-dialog-overlay>
+          <alert-dialog-content size="sm">
+            <alert-dialog-header>
+              <alert-dialog-media>
+                <icon name="delete" />
+              </alert-dialog-media>
+              <alert-dialog-title>Delete chat?</alert-dialog-title>
+              <alert-dialog-description>
+                This will permanently delete this chat conversation and any
+                memories saved during this chat.
+              </alert-dialog-description>
+            </alert-dialog-header>
+            <alert-dialog-footer>
+              <alert-dialog-cancel variant="outline">Cancel</alert-dialog-cancel>
+              <alert-dialog-action variant="destructive">Delete</alert-dialog-action>
+            </alert-dialog-footer>
+          </alert-dialog-content>
+        </alert-dialog-overlay>
+      </portal>
+    </alert-dialog>
+  </ui>
+</lcui-app>
