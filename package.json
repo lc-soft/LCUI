@@ -12,6 +12,9 @@
     "update-changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "update-copyright": "node scripts/add-copyright.js",
     "format:check": "node scripts/clang-format-changed.js",
+    "build-styles": "lcui build src/styles/style-nova.css --force --skip-xmake",
+    "doc-viewer:compile-docs": "cd examples/doc-viewer && npm run compile",
+    "doc-viewer:compile-tsx": "cd examples/doc-viewer && lcui build --skip-xmake",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -19,11 +22,14 @@
       "clang-format -i"
     ]
   },
-    "devDependencies": {
+  "devDependencies": {
+    "@thedutchcoder/postcss-rem-to-px": "^0.0.2",
     "clang-format-node": "^3.0.6",
     "husky": "^9.1.7",
-    "lint-staged": "^15.2.10"
-    },
+    "lint-staged": "^15.2.10",
+    "postcss": "^8.5.28",
+    "tailwindcss": "^3.4.17"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lc-soft/LCUI.git"

@@ -1,0 +1,736 @@
+* {
+  @apply border-border;
+  font-family: "Noto Sans SC", sans-serif;
+}
+
+a {
+  cursor: pointer;
+}
+
+button {
+  cursor: pointer;
+  box-sizing: border-box;
+  @apply inline-flex items-center gap-1.5 text-center rounded-lg border border-border bg-background px-2.5 py-[5px] text-sm font-medium text-foreground;
+}
+
+button:hover {
+  @apply bg-muted text-foreground;
+}
+
+button:outline {
+  @apply border-border bg-background text-foreground;
+}
+
+button:outline:hover {
+  @apply bg-muted text-foreground;
+}
+
+button:primary {
+  @apply border-transparent bg-primary text-primary-foreground;
+}
+
+button:primary:hover {
+  @apply bg-neutral-600 text-primary-foreground;
+}
+
+button:secondary {
+  @apply border-secondary bg-secondary text-secondary-foreground;
+}
+
+button:secondary:hover {
+  @apply bg-neutral-200 text-secondary-foreground;
+}
+
+button:ghost {
+  @apply border-transparent bg-transparent text-foreground;
+}
+
+button:ghost:hover {
+  @apply bg-muted text-foreground;
+}
+
+button:destructive {
+  @apply border-transparent bg-destructive-muted text-destructive;
+}
+
+button:destructive:hover {
+  @apply bg-red-100 text-destructive;
+}
+
+button:link {
+  @apply border-transparent bg-transparent text-primary;
+}
+
+button:link:hover {
+  @apply bg-transparent text-primary;
+}
+
+button:link,
+button:link text {
+  @apply underline-offset-4;
+}
+
+button:link:hover,
+button:link:hover text {
+  @apply underline;
+}
+
+button:xs {
+  @apply gap-1 rounded-[6px] px-2 py-[3px] text-xs;
+}
+
+button:sm {
+  @apply rounded-[6px] px-2 py-[5px] text-xs;
+}
+
+button:lg {
+  @apply py-[5px] text-base;
+}
+
+button:icon {
+  @apply justify-center h-8 w-8 p-0;
+}
+
+button:icon-xs {
+  @apply justify-center h-6 w-6 rounded-[6px] p-0 text-xs;
+}
+
+button:icon-sm {
+  @apply justify-center h-7 w-7 rounded-[6px] p-0 text-xs;
+}
+
+button:icon-lg {
+  @apply justify-center h-9 w-9 p-0;
+}
+
+button:disabled {
+  @apply opacity-50 pointer-events-none;
+}
+
+button:active {
+  @apply relative top-px bg-neutral-300;
+}
+
+button:outline:active {
+  @apply bg-neutral-300;
+}
+
+button:primary:active {
+  @apply bg-neutral-700 text-primary-foreground;
+}
+
+button:secondary:active {
+  @apply bg-neutral-300 text-secondary-foreground;
+}
+
+button:ghost:active {
+  @apply bg-neutral-200 text-foreground;
+}
+
+button:destructive:active {
+  @apply bg-red-200 text-destructive;
+}
+
+button:link:active {
+  @apply bg-transparent text-primary underline;
+}
+
+button .fui-icon {
+  @apply text-base;
+}
+
+button text {
+  @apply text-sm;
+}
+
+button:xs text,
+button:icon-xs text {
+  @apply text-xs;
+}
+
+button:sm text,
+button:icon-sm text {
+  @apply text-xs;
+}
+
+button:lg text,
+button:icon-lg text {
+  @apply text-base;
+}
+
+button:xs .fui-icon,
+button:icon-xs .fui-icon {
+  @apply text-xs;
+}
+
+button:sm .fui-icon,
+button:icon-sm .fui-icon {
+  @apply text-sm;
+}
+
+button:lg .fui-icon,
+button:icon-lg .fui-icon {
+  @apply text-base;
+}
+
+badge {
+  box-sizing: border-box;
+  @apply inline-flex items-center gap-1 h-5 rounded-full border border-primary bg-primary px-2 text-xs font-medium leading-[18px] text-primary-foreground;
+}
+
+badge icon {
+  @apply text-xs leading-none;
+}
+
+badge:secondary {
+  @apply border-secondary bg-secondary text-secondary-foreground;
+}
+
+badge:destructive {
+  @apply border-destructive-muted bg-destructive-muted text-destructive;
+}
+
+badge:outline {
+  @apply border-border bg-transparent text-foreground;
+}
+
+badge:ghost {
+  @apply border-transparent bg-transparent text-foreground;
+}
+
+badge:disabled {
+  @apply opacity-50;
+}
+
+.badge-color-blue {
+  @apply border-blue-100 bg-blue-50 text-blue-700;
+}
+
+.badge-color-green {
+  @apply border-green-100 bg-green-50 text-green-700;
+}
+
+.badge-color-sky {
+  @apply border-sky-100 bg-sky-50 text-sky-700;
+}
+
+.badge-color-purple {
+  @apply border-purple-100 bg-purple-50 text-purple-700;
+}
+
+.badge-color-red {
+  @apply border-red-100 bg-red-50 text-red-700;
+}
+
+alert {
+  @apply flex items-start gap-2 text-sm px-2.5 py-2 bg-card text-card-foreground rounded-lg border;
+}
+
+alert icon {
+  margin-top: 2px;
+  font-size: 16px;
+}
+
+alert-content {
+  @apply flex flex-1 flex-col gap-0.5;
+}
+
+alert-title {
+  @apply block font-medium;
+}
+
+alert-description {
+  @apply block text-muted-foreground;
+}
+
+alert-action {
+  @apply ml-auto flex;
+}
+
+alert:success {
+  @apply border-green-200 bg-green-50 text-green-800;
+}
+
+alert:warning {
+  @apply border-yellow-300 bg-yellow-50 text-yellow-900;
+}
+
+alert:destructive {
+  @apply text-destructive;
+}
+alert:destructive alert-description {
+  @apply text-destructive/90;
+}
+
+empty {
+  @apply flex flex-col items-center gap-4 rounded-xl p-6 text-center;
+}
+
+empty-header {
+  @apply flex flex-col items-center gap-2;
+}
+
+empty-media {
+  @apply mb-2;
+}
+
+empty-media:icon {
+  @apply flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-foreground;
+}
+
+empty-title {
+  @apply block text-sm font-medium;
+}
+
+empty-description {
+  @apply block text-sm leading-relaxed text-muted-foreground;
+}
+
+empty-content {
+  @apply flex flex-col gap-2.5 text-sm;
+}
+
+empty-action {
+  @apply flex flex-row justify-center gap-2;
+}
+
+item {
+  @apply flex items-center gap-2.5 rounded-lg border border-transparent px-3 py-2.5 text-sm;
+}
+
+item:sm {
+  @apply gap-2.5 px-3 py-2.5;
+}
+
+item:xs {
+  @apply gap-2 px-2.5 py-2;
+}
+
+item:outline {
+  @apply border-border;
+}
+
+item:muted {
+  @apply border-transparent bg-muted/50;
+}
+
+item-content {
+  @apply flex flex-1 flex-col gap-1;
+}
+
+item:xs item-content {
+  @apply gap-0;
+}
+
+item-media,
+item-actions {
+  @apply flex;
+}
+
+item-media {
+  @apply gap-2;
+}
+
+item-media:icon {
+  @apply flex items-center justify-center;
+  font-size: 16px;
+}
+
+item-media:image {
+  @apply h-10 w-10 rounded-sm;
+}
+
+item:sm item-media:image {
+  @apply h-8 w-8;
+}
+
+item:xs item-media:image {
+  @apply h-6 w-6;
+}
+
+item-title {
+  @apply block text-sm font-medium leading-snug;
+}
+
+item-description {
+  @apply block text-sm leading-normal text-muted-foreground;
+}
+
+item:xs item-description {
+  @apply text-xs;
+}
+
+item:interactive:hover {
+  @apply bg-neutral-100;
+}
+
+item:interactive:active {
+  @apply bg-neutral-200;
+}
+
+item:disabled {
+  @apply opacity-50;
+}
+
+/* progress: structural rules live in src/widgets/progress.c */
+
+progress {
+  @apply flex gap-3 w-full;
+  flex-wrap: wrap;
+}
+
+progress-track {
+  @apply w-full h-1 rounded-full bg-muted;
+}
+
+progress-indicator {
+  @apply h-full rounded-full bg-primary;
+}
+
+progress-label {
+  @apply text-sm font-medium;
+}
+
+progress-value {
+  @apply text-sm text-muted-foreground ml-auto;
+}
+
+/* radio-group: structural rules live in src/widgets/radio_group.c */
+
+radio-group {
+  @apply flex flex-col items-stretch gap-2;
+}
+
+radio-group-item:checked {
+  @apply border-primary bg-primary;
+}
+
+radio-group-item .indicator {
+  @apply bg-primary-foreground;
+}
+
+radio-group-item:disabled {
+  @apply opacity-50;
+  cursor: not-allowed;
+}
+
+/* dialog / alert-dialog: structural rules (display, positioning, layout) live
+ * in src/widgets/dialog.c; keep only visual refinements here. */
+
+dialog-overlay,
+alert-dialog-overlay {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+dialog-content,
+alert-dialog-content {
+  @apply p-4 rounded-xl bg-popover text-popover-foreground;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  font-size: 14px;
+}
+
+dialog-footer,
+alert-dialog-footer {
+  @apply bg-muted/50 -mx-4 -mb-4 rounded-b-xl border-t p-4;
+}
+
+dialog-title,
+alert-dialog-title {
+  @apply font-medium;
+  font-size: 16px;
+  line-height: 1;
+}
+
+dialog-description,
+alert-dialog-description {
+  @apply text-sm text-muted-foreground;
+}
+
+alert-dialog-content:sm alert-dialog-header {
+  @apply text-center;
+}
+
+alert-dialog-media {
+  @apply rounded-md bg-muted;
+}
+
+alert-dialog-cancel,
+alert-dialog-action {
+  @apply inline-flex items-center gap-1.5 text-center rounded-lg border border-border bg-background px-2.5 py-[5px] text-sm font-medium text-foreground;
+}
+
+alert-dialog-cancel:hover,
+alert-dialog-action:hover {
+  @apply bg-muted text-foreground;
+}
+
+alert-dialog-action:primary {
+  @apply border-transparent bg-primary text-primary-foreground;
+}
+
+alert-dialog-action:primary:hover {
+  @apply bg-neutral-600 text-primary-foreground;
+}
+
+alert-dialog-action:destructive {
+  @apply border-transparent bg-destructive-muted text-destructive;
+}
+
+alert-dialog-action:destructive:hover {
+  @apply bg-red-100 text-destructive;
+}
+
+alert-dialog-content:sm {
+  max-width: 320px;
+}
+
+/* select: structural rules live in src/widgets/select.c; visual refinements
+ * follow the shadcn "nova" base style here. The trigger reuses the shared
+ * `button` rule as-is so it keeps the same metrics as sibling buttons;
+ * shadcn's data attribute, focus-visible, ring and animation variants that
+ * LCUI cannot express are approximated with :hover/:focus, plain :disabled
+ * rules and a hand-written box-shadow. */
+
+select-arrow {
+  @apply text-muted-foreground;
+}
+
+select-value {
+  white-space: nowrap;
+  @apply font-normal;
+}
+
+select-arrow.fui-icon {
+  line-height: 1;
+}
+
+select-content {
+  @apply border border-border bg-popover p-1 rounded-lg text-popover-foreground;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+select-label {
+  @apply text-muted-foreground px-1.5 py-1 text-xs;
+}
+
+select-separator {
+  @apply bg-border my-1;
+  height: 1px;
+}
+
+select-item {
+  @apply rounded-md gap-1.5 py-1 pl-1.5 pr-8 text-sm;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+select-item:hover {
+  @apply bg-muted text-foreground;
+}
+
+select-item:active {
+  @apply bg-neutral-200;
+}
+
+select-item:checked {
+  @apply bg-muted text-foreground;
+}
+
+select-item:highlighted {
+  @apply bg-muted text-foreground;
+}
+
+select-item .select-item-indicator {
+  position: absolute;
+  right: 8px;
+  top: 4px;
+  font-size: 16px;
+  line-height: 20px;
+  display: none;
+}
+
+select-item:checked .select-item-indicator {
+  display: block;
+}
+
+select:disabled button,
+select:disabled button:hover,
+select:disabled button:active,
+select-item:disabled,
+select-item:disabled:hover {
+  @apply opacity-50;
+  cursor: not-allowed;
+}
+
+select-item:disabled:hover,
+select-item:disabled:active {
+  background-color: transparent;
+}
+
+select:disabled button {
+  pointer-events: none;
+}
+
+select:disabled select-trigger {
+  cursor: not-allowed;
+}
+
+/* checkbox: structural rules live in src/widgets/checkbox.c */
+
+checkbox {
+  @apply rounded-[4px] border border-border;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+checkbox:checked,
+checkbox:indeterminate {
+  @apply border-primary bg-primary text-primary-foreground;
+}
+
+checkbox:disabled {
+  @apply opacity-50;
+  cursor: not-allowed;
+}
+
+/* field family: structural rules live in src/widgets/field.c */
+
+field {
+  @apply gap-2;
+}
+
+field-set {
+  /* Spacing between the set's children is provided by their own margins (the
+   * legend must stay tight to the text below it, which a flex gap cannot
+   * express since LCUI has no <legend> special layout). */
+  @apply gap-0;
+}
+
+field-set field-group {
+  @apply mt-3;
+}
+
+field-group {
+  @apply gap-5;
+}
+
+field-group field-group {
+  @apply gap-4 mt-0;
+}
+
+field-set.has-radio-group radio-group {
+  @apply mt-3;
+}
+
+field-legend {
+  @apply text-base font-medium;
+}
+
+field-label {
+  @apply gap-2 text-sm font-medium;
+  line-height: 1.375;
+}
+
+field-content {
+  @apply gap-0.5;
+  line-height: 1.375;
+}
+
+field-title {
+  @apply text-sm font-medium;
+  line-height: 1.375;
+}
+
+field-description {
+  @apply text-sm font-normal text-muted-foreground;
+  line-height: 1.5;
+  text-align: left;
+}
+
+field-separator {
+  height: 1px;
+  background-color: #e5e5e5;
+  margin: 0;
+}
+
+field-label.has-field {
+  @apply rounded-lg border border-border;
+  padding: 10px;
+}
+
+/* Workaround: the renderer clips children to the parent's padding box, so a
+ * control's focus ring (3px) is clipped at every ancestor. A matching padding
+ * and negative margin keeps the content in place while giving the ring room.
+ * Apply `.clip-safe` to any other container that needs the same gutter. */
+.clip-safe,
+field,
+field-group,
+field-set {
+  box-sizing: border-box;
+  padding: 4px;
+  margin: -4px;
+}
+
+/* Vertical fields make their controls fill the field width (that mirrors the
+ * `*:w-full` shadcn applies to vertical fields). Flex stretch already widens
+ * block-level children; composite controls need their inner trigger widened
+ * too. Horizontal fields keep intrinsic widths, like shadcn's w-auto. */
+field select {
+  width: 100%;
+}
+
+field select-trigger {
+  display: block;
+}
+
+field select-trigger button {
+  width: 100%;
+  min-width: 0;
+}
+
+field:horizontal select {
+  width: auto;
+}
+
+field:horizontal select-trigger {
+  display: inline-block;
+}
+
+field-label.has-field:hover {
+  background-color: rgba(245, 245, 245, 0.5);
+}
+
+field-label.has-checked {
+  background-color: rgba(34, 34, 34, 0.05);
+  border-color: rgba(34, 34, 34, 0.3);
+}
+
+field:disabled,
+field-set:disabled,
+field-legend:disabled,
+field-group:disabled,
+field-label:disabled,
+field-description:disabled,
+field-content:disabled,
+field-title:disabled,
+field-separator:disabled {
+  @apply opacity-50;
+}
+
+/* textinput: structural rules live in src/widgets/textinput.c; the visual
+ * style is applied here (like shadcn's input). */
+
+textinput {
+  @apply h-8 rounded-lg border border-border bg-background px-2.5 py-1 text-sm text-foreground;
+  box-sizing: border-box;
+}
+
+textinput:focus {
+  @apply border-foreground;
+  box-shadow: 0 0 0 3px rgba(34, 34, 34, 0.1);
+}
+
+textinput:disabled {
+  @apply opacity-50;
+}

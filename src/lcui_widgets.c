@@ -10,7 +10,10 @@
  */
 
 #include <LCUI/widgets.h>
+#include <ui/css.h>
 #include <ui_router.h>
+
+#include "styles/style-nova.css.h"
 
 void lcui_widgets_init(void)
 {
@@ -48,6 +51,11 @@ void lcui_widgets_init(void)
         ui_register_empty();
         ui_register_dialog();
         ui_register_alert_dialog();
+
+        /* The theme layer loads last so its rules win over each widget's own
+         * default CSS at equal specificity, letting style-nova.css refine the
+         * look without editing the widget sources. */
+        ui_load_css_string_style_nova_chunks();
 }
 
 void lcui_widgets_destroy(void)
