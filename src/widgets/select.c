@@ -11,10 +11,14 @@
 #include <wchar.h>
 #include <yutil.h>
 #include <LCUI/widgets/button.h>
+#include <LCUI/widgets/icon.h>
+#include <LCUI/widgets/scrollarea.h>
+#include <LCUI/widgets/scrollbar.h>
 #include <LCUI/widgets/select.h>
 #include <LCUI/widgets/text.h>
 #include <ui/events.h>
 #include <ui/prototype.h>
+#include <ui/style.h>
 #include <css.h>
 
 typedef struct ui_select_registry_entry {
@@ -28,11 +32,18 @@ struct ui_select {
         ui_widget_t *trigger;
         ui_widget_t *value_widget;
         ui_widget_t *content;
+        ui_widget_t *list;
         ui_widget_t *portal;
+        ui_widget_t *anchor;
         char *placeholder;
         char *value;
         bool open;
         bool loose;
+        bool align_item;
+        bool settling;
+        bool side_top;
+        int settle_stage;
+        int settle_pass;
         list_node_t node;
 };
 
@@ -41,54 +52,59 @@ static ui_widget_prototype_t *ui_select_trigger_prototype;
 static ui_widget_prototype_t *ui_select_value_prototype;
 static ui_widget_prototype_t *ui_select_arrow_prototype;
 static ui_widget_prototype_t *ui_select_content_prototype;
+static ui_widget_prototype_t *ui_select_group_prototype;
+static ui_widget_prototype_t *ui_select_label_prototype;
+static ui_widget_prototype_t *ui_select_separator_prototype;
 static ui_widget_prototype_t *ui_select_item_prototype;
 static list_t ui_select_registry;
 
 static void ui_select_on_destroy_event(ui_widget_t *w, ui_event_t *e,
                                        void *unused);
 
+/* Structural rules only (display, positioning, flex, sizing). visual
+ * refinements live in src/styles/style-nova.css so the shadcn-compatible
+ * look stays in one place. */
 static const char *ui_select_css = "\
 select {\
   display: inline-block;\
 }\
 select-trigger {\
   display: inline-block;\
+  cursor: pointer;\
 }\
 select-trigger button {\
   display: flex;\
   align-items: center;\
+  box-sizing: border-box;\
   min-width: 176px;\
+  width: 100%;\
 }\
 select-value {\
   display: inline-block;\
+  text-align: left;\
   flex: 1;\
 }\
 select-arrow {\
   display: inline-block;\
-  margin-left: 8px;\
 }\
 select-content {\
   display: none;\
   position: absolute;\
   box-sizing: border-box;\
-  min-width: 120px;\
-  padding: 4px 0;\
-  background-color: #fff;\
-  border: 1px solid #d9d9d9;\
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);\
+  min-width: 144px;\
+}\
+select-group {\
+  display: block;\
+}\
+select-label {\
+  display: block;\
+}\
+select-separator {\
+  display: block;\
 }\
 select-item {\
   display: block;\
-  padding: 6px 12px;\
-}\
-select-item:hover {\
-  background-color: #f5f5f5;\
-}\
-select-item:active {\
-  background-color: #e8e8e8;\
-}\
-select-item:checked {\
-  background-color: #e8f0fe;\
+  position: relative;\
 }\
 ";
 
@@ -200,6 +216,132 @@ static ui_widget_t *ui_select_find_value_node(ui_widget_t *trigger)
         return ui_select_find_descendant(trigger, ui_select_value_prototype);
 }
 
+static ui_widget_t *ui_select_find_first_item(ui_widget_t *w)
+{
+        ui_widget_t *child;
+        ui_widget_t *found;
+        size_t i;
+
+        for (i = 0; (child = ui_widget_get_child(w, i)); ++i) {
+                if (ui_select_is_item(child)) {
+                        return child;
+                }
+                found = ui_select_find_first_item(child);
+                if (found) {
+                        return found;
+                }
+        }
+        return NULL;
+}
+
+/* The item to align with the trigger: the selected one, or the first item
+ * when nothing is selected. */
+static ui_widget_t *ui_select_find_highlight_item(ui_select_t *data,
+                                                  ui_widget_t *content)
+{
+        ui_widget_t *item;
+
+        item = data->value ? ui_select_find_selected_item(content, data->value)
+                           : NULL;
+        return item ? item : ui_select_find_first_item(content);
+}
+
+static ui_widget_t *ui_select_find_align_item(ui_select_t *data,
+                                              ui_widget_t *content)
+{
+        if (!data->align_item) {
+                return NULL;
+        }
+        return ui_select_find_highlight_item(data, content);
+}
+
+static void ui_select_clear_highlight_each(ui_widget_t *w, void *arg)
+{
+        if (ui_select_is_item(w)) {
+                ui_widget_remove_status(w, "highlighted");
+        }
+}
+
+static void ui_select_set_highlight(ui_widget_t *content, ui_widget_t *item)
+{
+        ui_widget_each(content, ui_select_clear_highlight_each, NULL);
+        if (item) {
+                ui_widget_add_status(item, "highlighted");
+        }
+}
+
+static ui_widget_t *ui_select_content_find_type(ui_widget_t *content,
+                                                const char *type)
+{
+        ui_widget_t *child;
+        size_t i;
+
+        for (i = 0; (child = ui_widget_get_child(content, i)); ++i) {
+                if (ui_check_widget_type(child, type)) {
+                        return child;
+                }
+        }
+        return NULL;
+}
+
+/* Move any option or group appended directly to <select-content> into the
+ * internal <scrollarea-content> list, so the declarative model
+ * (SelectContent > SelectGroup / SelectItem) keeps working even though the
+ * options actually live inside the scrollable list. */
+static void ui_select_content_absorb(ui_widget_t *content, ui_widget_t *list)
+{
+        ui_widget_t *child;
+        size_t i = 0;
+
+        while ((child = ui_widget_get_child(content, i)) != NULL) {
+                if (child == list ||
+                    ui_check_widget_type(child, "scrollarea-content") ||
+                    ui_check_widget_type(child, "scrollbar")) {
+                        ++i;
+                        continue;
+                }
+                ui_widget_append(list, child);
+        }
+}
+
+static ui_widget_t *ui_select_content_ensure_list(ui_widget_t *content)
+{
+        ui_widget_t *list;
+
+        list = ui_select_content_find_type(content, "scrollarea-content");
+        if (!list) {
+                list = ui_create_scrollarea_content();
+                ui_widget_append(content, list);
+        }
+        if (!ui_select_content_find_type(content, "scrollbar")) {
+                ui_widget_append(content, ui_create_scrollbar());
+        }
+        ui_select_content_absorb(content, list);
+        return list;
+}
+
+static void ui_select_content_prepare(ui_widget_t *content)
+{
+        ui_select_content_ensure_list(content);
+        ui_scrollarea_set_scroll_top(content, 0);
+}
+
+/* Available space between the anchor and the root edge, used for both the
+ * flip side and the popup max-height. */
+static float ui_select_available_height(ui_widget_t *anchor, bool above)
+{
+        ui_widget_t *root = ui_root();
+        float x, y;
+        const float margin = 8.0f;
+
+        ui_widget_get_offset(anchor, root, &x, &y);
+        if (above) {
+                return y - margin;
+        }
+        return root->border_box.height - (y + anchor->border_box.height) -
+               margin;
+}
+
 static ui_select_registry_entry_t *ui_select_find_registry(const char *key)
 {
         list_node_t *node;
@@ -232,6 +374,7 @@ static ui_select_t *ui_select_get_loose(const char *key)
         entry->key = y_strdup(key);
         entry->select = calloc(1, sizeof(*entry->select));
         entry->select->loose = true;
+        entry->select->align_item = true;
         entry->select->owner = ui_root();
         entry->node.data = entry;
         list_append_node(&ui_select_registry, &entry->node);
@@ -334,6 +477,7 @@ static void ui_select_sync_values(ui_select_t *data)
                     value, data->value ? data->value : data->placeholder);
         }
         if (data->content) {
+                data->list = ui_select_content_ensure_list(data->content);
                 ui_widget_each(data->content, ui_select_sync_item_each, data);
                 if (data->value) {
                         selected = ui_select_find_selected_item(data->content,
@@ -354,10 +498,128 @@ static void ui_select_sync_values(ui_select_t *data)
         }
 }
 
+static void ui_select_content_reveal(ui_select_t *data, ui_widget_t *content)
+{
+        ui_widget_set_style_keyword_value(content, css_prop_visibility,
+                                          CSS_KEYWORD_VISIBLE);
+        data->settling = false;
+}
+
+/* Settle the popup before revealing it: stage 0 picks the flip side and
+ * max-height, stage 1 applies the alignment scroll and panel offset, stage 2
+ * reveals once the layout is stable. Keeping the content invisible during
+ * these passes avoids a visible re-position jitter. */
+static void ui_select_on_content_layout(ui_widget_t *w, ui_event_t *e,
+                                        void *arg)
+{
+        ui_select_t *data = e->data;
+        ui_widget_t *root = ui_root();
+        ui_widget_t *anchor = data->anchor;
+        ui_widget_t *item;
+        float below, above, natural, chrome, limit, panel_h, panel_top, scroll;
+        float ax, ay, ix, iy, item_h, anchor_h, root_h, desired_top;
+        bool clamped;
+        const float margin = 8.0f;
+
+        if (!data->settling || !data->open || !anchor || !data->portal) {
+                return;
+        }
+        data->settle_pass++;
+        if (data->settle_pass > 5) {
+                ui_select_content_reveal(data, w);
+                return;
+        }
+        if (data->settle_stage == 0) {
+                chrome = w->border_box.height - w->content_box.height;
+                natural = ui_scrollarea_get_scroll_height(w) + chrome;
+                root_h = root->border_box.height;
+                below = ui_select_available_height(anchor, false);
+                above = ui_select_available_height(anchor, true);
+                item = ui_select_find_align_item(data, w);
+                if (natural > below && above > below) {
+                        /* Near the bottom edge: flip above and use that
+                         * side's available height instead of aligning. */
+                        item = NULL;
+                        data->side_top = true;
+                        limit = above;
+                } else if (item) {
+                        /* Align mode: overlap the trigger, using the whole
+                         * viewport minus margins as the height cap. */
+                        data->side_top = false;
+                        limit = root_h - 2 * margin;
+                } else {
+                        data->side_top = false;
+                        limit = below;
+                }
+                if (limit < 0) {
+                        limit = 0;
+                }
+                ui_widget_set_style_unit_value(w, css_prop_max_height, limit,
+                                               CSS_UNIT_PX);
+                ui_portal_set_side(data->portal,
+                                   data->side_top ? "top" : "bottom");
+                ui_select_set_highlight(w,
+                                        ui_select_find_highlight_item(data, w));
+                data->settle_stage = 1;
+                ui_portal_open(data->portal);
+                ui_widget_request_update(w);
+                return;
+        }
+        if (data->settle_stage == 1) {
+                if (data->align_item && !data->side_top) {
+                        item = ui_select_find_align_item(data, w);
+                        if (item) {
+                                ui_widget_get_offset(item, w, &ix, &iy);
+                                item_h = item->border_box.height;
+                                ui_widget_get_offset(anchor, root, &ax, &ay);
+                                anchor_h = anchor->border_box.height;
+                                root_h = root->border_box.height;
+                                panel_h = w->border_box.height;
+                                /* Panel top that puts the selected item over
+                                 * the trigger. */
+                                desired_top =
+                                    ay + anchor_h / 2 - iy - item_h / 2;
+                                clamped = false;
+                                panel_top = desired_top;
+                                if (panel_top < margin) {
+                                        panel_top = margin;
+                                        clamped = true;
+                                }
+                                if (panel_top + panel_h + margin > root_h) {
+                                        panel_top = root_h - panel_h - margin;
+                                        clamped = true;
+                                }
+                                if (panel_top < margin) {
+                                        panel_top = margin;
+                                        clamped = true;
+                                }
+                                if (clamped) {
+                                        /* Could not overlap as asked; scroll
+                                         * the item into the viewport instead.
+                                         */
+                                        scroll = iy - (w->content_box.height -
+                                                       item_h) /
+                                                          2;
+                                        ui_scrollarea_set_scroll_top(w, scroll);
+                                }
+                                ui_portal_set_side_offset(
+                                    data->portal,
+                                    (int)(panel_top - ay - anchor_h));
+                        }
+                }
+                data->settle_stage = 2;
+                ui_portal_open(data->portal);
+                ui_widget_request_update(w);
+                return;
+        }
+        ui_select_content_reveal(data, w);
+}
+
 static void ui_select_open_data(ui_select_t *data, ui_widget_t *trigger)
 {
         ui_widget_t *anchor;
         float anchor_width;
+        float below;
 
         if (!data->portal) {
                 data->portal = ui_create_portal();
@@ -371,21 +633,40 @@ static void ui_select_open_data(ui_select_t *data, ui_widget_t *trigger)
                 ui_portal_set_content(data->portal, data->content);
         }
         anchor = trigger ? trigger : ui_widget_get_child(data->trigger, 0);
-        ui_portal_set_anchor(data->portal, anchor ? anchor : data->trigger);
+        anchor = anchor ? anchor : data->trigger;
+        data->anchor = anchor;
+        data->list = ui_select_content_ensure_list(data->content);
+        ui_select_content_prepare(data->content);
+        ui_portal_set_anchor(data->portal, anchor);
         ui_portal_set_side(data->portal, "bottom");
         ui_portal_set_align(data->portal, "start");
+        ui_portal_set_side_offset(data->portal, 0);
+        ui_widget_set_style_keyword_value(data->content, css_prop_visibility,
+                                          CSS_KEYWORD_HIDDEN);
         data->open = true;
-        ui_portal_open(data->portal);
-        anchor_width =
-            anchor ? anchor->border_box.width : data->trigger->border_box.width;
+        data->settling = true;
+        data->settle_stage = 0;
+        data->settle_pass = 0;
+        data->side_top = false;
+        anchor_width = anchor->border_box.width;
         ui_widget_set_style_unit_value(data->content, css_prop_width,
                                        anchor_width, CSS_UNIT_PX);
-        ui_widget_request_update(data->portal);
+        below = ui_select_available_height(anchor, false);
+        ui_widget_set_style_unit_value(data->content, css_prop_max_height,
+                                       below < 0 ? 0 : below, CSS_UNIT_PX);
+        ui_portal_open(data->portal);
+        ui_widget_request_update(data->content);
 }
 
 static void ui_select_close_data(ui_select_t *data)
 {
         data->open = false;
+        data->settling = false;
+        data->settle_stage = 0;
+        if (data->content) {
+                ui_widget_each(data->content, ui_select_clear_highlight_each,
+                               NULL);
+        }
         if (data->portal) {
                 ui_portal_close(data->portal);
         }
@@ -424,6 +705,9 @@ static void ui_select_on_trigger_click(ui_widget_t *w, ui_event_t *e,
 {
         ui_select_t *data = e->data;
 
+        if (data->owner && data->owner->disabled) {
+                return;
+        }
         if (data->open) {
                 ui_select_close_data(data);
         } else {
@@ -436,11 +720,16 @@ static void ui_select_bind_trigger(ui_widget_t *trigger)
 {
         ui_select_t *data = ui_select_resolve(trigger, "data-select-trigger");
         ui_widget_t *button;
+        const char *align_attr;
 
         if (!data) {
                 return;
         }
         data->trigger = trigger;
+        align_attr = ui_widget_get_attr(trigger, "align-item-with-trigger");
+        if (align_attr) {
+                data->align_item = strcmp(align_attr, "false") != 0;
+        }
         button = trigger->proto == ui_select_trigger_prototype
                      ? ui_widget_get_child(trigger, 0)
                      : trigger;
@@ -488,9 +777,13 @@ static void ui_select_bind_content(ui_widget_t *content)
                 return;
         }
         data->content = content;
+        data->list = ui_select_content_ensure_list(content);
         ui_select_bind_plain_widgets(ui_root());
         ui_widget_off(content, "click", ui_select_on_click, data);
         ui_widget_on(content, "click", ui_select_on_click, data);
+        ui_widget_off(content, "afterlayout", ui_select_on_content_layout,
+                      data);
+        ui_widget_on(content, "afterlayout", ui_select_on_content_layout, data);
 }
 
 static void ui_select_on_trigger_link(ui_widget_t *w, ui_event_t *e,
@@ -510,6 +803,24 @@ static void ui_select_on_value_link(ui_widget_t *w, ui_event_t *e, void *unused)
         ui_select_bind_value(w);
 }
 
+static void ui_select_on_set_attr(ui_widget_t *w, const char *name,
+                                  const char *value)
+{
+        ui_select_t *data = ui_select_get_data(w);
+
+        if (strcmp(name, "align-item-with-trigger") == 0) {
+                data->align_item = !(value && strcmp(value, "false") == 0);
+        } else if (strcmp(name, "value") == 0) {
+                free(data->value);
+                data->value = value ? y_strdup(value) : NULL;
+                ui_select_sync_values(data);
+        } else if (strcmp(name, "placeholder") == 0) {
+                free(data->placeholder);
+                data->placeholder = value ? y_strdup(value) : NULL;
+                ui_select_sync_values(data);
+        }
+}
+
 static void ui_select_on_init(ui_widget_t *w)
 {
         ui_select_t *data =
@@ -517,6 +828,7 @@ static void ui_select_on_init(ui_widget_t *w)
 
         memset(data, 0, sizeof(*data));
         data->owner = w;
+        data->align_item = true;
         ui_widget_on(w, "click", ui_select_on_click, data);
         ui_widget_on(w, "destroy", ui_select_on_destroy_event, data);
 }
@@ -557,11 +869,24 @@ static void ui_select_value_on_init(ui_widget_t *w)
 static void ui_select_arrow_on_init(ui_widget_t *w)
 {
         w->proto->proto->init(w);
-        ui_text_set_content(w, "\xE2\x96\xBC");
+        ui_icon_set_name(w, "chevron-down");
+}
+
+static void ui_select_item_on_init(ui_widget_t *w)
+{
+        ui_widget_t *indicator;
+
+        w->proto->proto->init(w);
+        indicator = ui_create_icon();
+        ui_icon_set_name(indicator, "checkmark");
+        ui_widget_add_class(indicator, "select-item-indicator");
+        ui_widget_append(w, indicator);
 }
 
 static void ui_select_content_on_init(ui_widget_t *w)
 {
+        w->proto->proto->init(w);
+        ui_select_content_ensure_list(w);
         ui_widget_on(w, "link", ui_select_on_content_link, NULL);
         ui_select_bind_content(w);
 }
@@ -593,6 +918,20 @@ void ui_select_set_placeholder(ui_widget_t *select, const char *placeholder)
 const char *ui_select_get_placeholder(ui_widget_t *select)
 {
         return ui_select_get_data(select)->placeholder;
+}
+
+void ui_select_set_align_item_with_trigger(ui_widget_t *select, bool enabled)
+{
+        ui_select_t *data = ui_select_get_data(select);
+
+        data->align_item = enabled;
+        ui_widget_set_attr(select, "align-item-with-trigger",
+                           enabled ? "true" : "false");
+}
+
+bool ui_select_get_align_item_with_trigger(ui_widget_t *select)
+{
+        return ui_select_get_data(select)->align_item;
 }
 
 void ui_select_open(ui_widget_t *select)
@@ -632,6 +971,7 @@ void ui_select_build_children(ui_widget_t *select)
                 ui_widget_append(select, content);
         }
         data->content = content;
+        data->list = ui_select_content_ensure_list(content);
         ui_select_bind_trigger(trigger);
         ui_select_bind_content(content);
         ui_select_sync_values(data);
@@ -642,7 +982,8 @@ int ui_select_append_item(ui_widget_t *select, ui_widget_t *item)
         ui_select_t *data = ui_select_get_data(select);
 
         ui_select_build_children(select);
-        return ui_widget_append(data->content, item);
+        data->list = ui_select_content_ensure_list(data->content);
+        return ui_widget_append(data->list, item);
 }
 
 ui_widget_t *ui_select_add_item(ui_widget_t *select, const char *label,
@@ -660,8 +1001,9 @@ void ui_select_clear_items(ui_widget_t *select)
         ui_select_t *data = ui_select_get_data(select);
 
         ui_select_build_children(select);
-        while (ui_widget_get_child(data->content, 0)) {
-                ui_widget_remove(ui_widget_get_child(data->content, 0));
+        data->list = ui_select_content_ensure_list(data->content);
+        while (ui_widget_get_child(data->list, 0)) {
+                ui_widget_remove(ui_widget_get_child(data->list, 0));
         }
 }
 
@@ -690,6 +1032,21 @@ ui_widget_t *ui_create_select_content(void)
         return ui_create_widget_with_prototype(ui_select_content_prototype);
 }
 
+ui_widget_t *ui_create_select_group(void)
+{
+        return ui_create_widget_with_prototype(ui_select_group_prototype);
+}
+
+ui_widget_t *ui_create_select_label(void)
+{
+        return ui_create_widget_with_prototype(ui_select_label_prototype);
+}
+
+ui_widget_t *ui_create_select_separator(void)
+{
+        return ui_create_widget_with_prototype(ui_select_separator_prototype);
+}
+
 ui_widget_t *ui_create_select_item(const char *value)
 {
         ui_widget_t *item =
@@ -707,6 +1064,7 @@ void ui_register_select(void)
         ui_select_prototype = ui_create_widget_prototype("select", NULL);
         ui_select_prototype->init = ui_select_on_init;
         ui_select_prototype->destroy = ui_select_on_destroy;
+        ui_select_prototype->setattr = ui_select_on_set_attr;
         ui_select_trigger_prototype =
             ui_create_widget_prototype("select-trigger", NULL);
         ui_select_trigger_prototype->init = ui_select_trigger_on_init;
@@ -714,13 +1072,20 @@ void ui_register_select(void)
             ui_create_widget_prototype("select-value", "text");
         ui_select_value_prototype->init = ui_select_value_on_init;
         ui_select_arrow_prototype =
-            ui_create_widget_prototype("select-arrow", "text");
+            ui_create_widget_prototype("select-arrow", "icon");
         ui_select_arrow_prototype->init = ui_select_arrow_on_init;
         ui_select_content_prototype =
-            ui_create_widget_prototype("select-content", NULL);
+            ui_create_widget_prototype("select-content", "scrollarea");
         ui_select_content_prototype->init = ui_select_content_on_init;
+        ui_select_group_prototype =
+            ui_create_widget_prototype("select-group", NULL);
+        ui_select_label_prototype =
+            ui_create_widget_prototype("select-label", "text");
+        ui_select_separator_prototype =
+            ui_create_widget_prototype("select-separator", NULL);
         ui_select_item_prototype =
             ui_create_widget_prototype("select-item", "text");
+        ui_select_item_prototype->init = ui_select_item_on_init;
         ui_load_css_string(ui_select_css, __FILE__);
 }
 

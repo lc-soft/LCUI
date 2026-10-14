@@ -256,6 +256,12 @@ static void ui_portal_on_destroy(ui_widget_t *w)
         ui_portal_remove_content_entry(content);
         ui_widget_off(content, "destroy", ui_portal_content_on_destroy, w);
         data->content = NULL;
+        if (content->state != UI_WIDGET_STATE_DELETED) {
+                /* Destroy immediately instead of ui_widget_remove(): the
+                 * trash would only be processed after prototypes are
+                 * torn down at ui_destroy, leaving a dangling proto. */
+                ui_widget_destroy(content);
+        }
 }
 
 static void ui_portal_on_init(ui_widget_t *w)

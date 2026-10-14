@@ -8,12 +8,13 @@ Select 提供一个可展开的下拉选项列表，用于从多个候选值中�
 
 - **适用**：从多个选项中选择唯一值
 - **适用**：选项较多、需要节省页面空间的表单
+- **适用**：选项可以按类别分组展示
 - **不适用**：需要同时选择多个值的场景（用 `checkbox`）
 
 ## 用法
 
 ```tsx
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@lcui/react"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectLabel, SelectItem } from "@lcui/react"
 ```
 
 ```tsx
@@ -22,9 +23,12 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
     <SelectValue placeholder="选择主题" />
   </SelectTrigger>
   <SelectContent>
-    <SelectItem value="light">浅色</SelectItem>
-    <SelectItem value="dark">深色</SelectItem>
-    <SelectItem value="system">跟随系统</SelectItem>
+    <SelectGroup>
+      <SelectLabel>主题</SelectLabel>
+      <SelectItem value="light">浅色</SelectItem>
+      <SelectItem value="dark">深色</SelectItem>
+      <SelectItem value="system">跟随系统</SelectItem>
+    </SelectGroup>
   </SelectContent>
 </Select>
 ```
@@ -38,8 +42,40 @@ Select
 ├── SelectTrigger
 │   └── SelectValue
 └── SelectContent
-    └── SelectItem
+    ├── SelectGroup
+    │   ├── SelectLabel
+    │   ├── SelectItem
+    │   └── SelectItem
+    ├── SelectSeparator
+    └── SelectGroup
+        ├── SelectLabel
+        ├── SelectItem
+        └── SelectItem
 ```
+
+## 分组
+
+用 `SelectGroup` 包裹一组相关的选项，`SelectLabel` 作为分组标题；当选项面板包含多组内容时，用 `SelectSeparator` 在分组之间画一条分隔线。
+
+<WidgetExample name="select-groups" />
+
+## 对齐触发器
+
+默认情况下，打开 `Select` 时选项面板会**覆盖触发器**，让**选中项**与触发器处于同一水平位置；没有选中项时对齐第一个选项。若触发器靠近窗口底部、空间不足以对齐，则改为翻到触发器上方并显示滚动条。将 `align-item-with-trigger` 设为 `false` 可关闭对齐，改为贴着触发器边缘展开。
+
+<WidgetExample name="select-align-item" />
+
+## 可滚动
+
+当选项内容超出可用高度时，选项面板会被限制为可用高度并出现滚动条；触发器靠近窗口底部时，面板会翻到触发器上方并以该侧的可用高度显示。
+
+<WidgetExample name="select-scrollable" />
+
+## 禁用
+
+为 `Select` 设置 `disabled` 后，触发器整体降低透明度且不再打开选项面板；也可以单独为某个 `SelectItem` 设置 `disabled`，被禁用的选项不可选中。
+
+<WidgetExample name="select-disabled" />
 
 ## API 参考
 
@@ -60,6 +96,24 @@ Select 状态容器，管理当前选中值、placeholder 和下拉面板。
 通过 Portal 挂载到 root 层级的选项面板。
 
 <FieldTable name="select-content" />
+
+### SelectGroup
+
+将一组相关选项组织在一起的容器，可配合 `SelectLabel` 显示分组标题。
+
+<FieldTable name="select-group" />
+
+### SelectLabel
+
+选项分组的小号标题文本。
+
+<FieldTable name="select-label" />
+
+### SelectSeparator
+
+分隔不同选项分组的一条细分隔线。
+
+<FieldTable name="select-separator" />
 
 ### SelectItem
 

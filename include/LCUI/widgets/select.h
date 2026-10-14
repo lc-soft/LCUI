@@ -26,6 +26,9 @@ LCUI_API void ui_select_build_children(ui_widget_t *select);
 LCUI_API void ui_select_set_placeholder(ui_widget_t *select,
                                         const char *placeholder);
 LCUI_API const char *ui_select_get_placeholder(ui_widget_t *select);
+LCUI_API void ui_select_set_align_item_with_trigger(ui_widget_t *select,
+                                                    bool enabled);
+LCUI_API bool ui_select_get_align_item_with_trigger(ui_widget_t *select);
 LCUI_API void ui_select_set_value(ui_widget_t *select, const char *value);
 LCUI_API const char *ui_select_get_value(ui_widget_t *select);
 LCUI_API void ui_select_open(ui_widget_t *select);
@@ -34,6 +37,9 @@ LCUI_API ui_widget_t *ui_create_select_trigger(void);
 LCUI_API ui_widget_t *ui_create_select_value(void);
 LCUI_API ui_widget_t *ui_create_select_arrow(void);
 LCUI_API ui_widget_t *ui_create_select_content(void);
+LCUI_API ui_widget_t *ui_create_select_group(void);
+LCUI_API ui_widget_t *ui_create_select_label(void);
+LCUI_API ui_widget_t *ui_create_select_separator(void);
 LCUI_API ui_widget_t *ui_create_select_item(const char *value);
 LCUI_API int ui_select_append_item(ui_widget_t *select, ui_widget_t *item);
 LCUI_API ui_widget_t *ui_select_add_item(ui_widget_t *select, const char *label,

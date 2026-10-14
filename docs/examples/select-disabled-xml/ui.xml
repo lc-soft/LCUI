@@ -1,0 +1,20 @@
+<lcui-app>
+  <ui>
+    <select class="select-disabled-demo" disabled="true">
+      <select-trigger>
+        <select-value data-select-placeholder="Select a fruit" />
+      </select-trigger>
+      <portal>
+        <select-content>
+          <select-group>
+            <select-item value="apple">Apple</select-item>
+            <select-item value="banana">Banana</select-item>
+            <select-item value="blueberry">Blueberry</select-item>
+            <select-item value="grapes" disabled="true">Grapes</select-item>
+            <select-item value="pineapple">Pineapple</select-item>
+          </select-group>
+        </select-content>
+      </portal>
+    </select>
+  </ui>
+</lcui-app>

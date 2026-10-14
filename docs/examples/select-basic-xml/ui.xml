@@ -1,14 +1,19 @@
 <lcui-app>
   <ui>
-    <select>
+    <select class="select-basic-demo">
       <select-trigger>
-        <select-value />
+        <select-value data-select-placeholder="Select a fruit" />
       </select-trigger>
       <portal>
         <select-content>
-          <select-item value="light" label="Light" />
-          <select-item value="dark" label="Dark" />
-          <select-item value="system" label="System" />
+          <select-group>
+            <select-label>Fruits</select-label>
+            <select-item value="apple">Apple</select-item>
+            <select-item value="banana">Banana</select-item>
+            <select-item value="blueberry">Blueberry</select-item>
+            <select-item value="grapes">Grapes</select-item>
+            <select-item value="pineapple">Pineapple</select-item>
+          </select-group>
         </select-content>
       </portal>
     </select>

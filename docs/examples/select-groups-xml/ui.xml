@@ -1,0 +1,26 @@
+<lcui-app>
+  <ui>
+    <select class="select-groups-demo">
+      <select-trigger>
+        <select-value data-select-placeholder="Select a fruit" />
+      </select-trigger>
+      <portal>
+        <select-content>
+          <select-group>
+            <select-label>Fruits</select-label>
+            <select-item value="apple">Apple</select-item>
+            <select-item value="banana">Banana</select-item>
+            <select-item value="blueberry">Blueberry</select-item>
+          </select-group>
+          <select-separator />
+          <select-group>
+            <select-label>Vegetables</select-label>
+            <select-item value="carrot">Carrot</select-item>
+            <select-item value="broccoli">Broccoli</select-item>
+            <select-item value="spinach">Spinach</select-item>
+          </select-group>
+        </select-content>
+      </portal>
+    </select>
+  </ui>
+</lcui-app>

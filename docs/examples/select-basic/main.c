@@ -1,12 +1,35 @@
 #include <LCUI.h>
 
+static ui_widget_t *add_item(ui_widget_t *group, const char *label,
+                             const char *value)
+{
+        ui_widget_t *item = ui_create_select_item(value);
+
+        ui_text_set_content(item, label);
+        ui_widget_append(group, item);
+        return item;
+}
+
 void select_basic_init(ui_widget_t *parent)
 {
         ui_widget_t *select = ui_create_select();
+        ui_widget_t *trigger = ui_create_select_trigger();
+        ui_widget_t *content = ui_create_select_content();
+        ui_widget_t *group = ui_create_select_group();
+        ui_widget_t *label = ui_create_select_label();
 
-        ui_select_set_placeholder(select, "Choose a theme");
-        ui_select_add_item(select, "Light", "light");
-        ui_select_add_item(select, "Dark", "dark");
-        ui_select_add_item(select, "System", "system");
+        ui_widget_add_class(select, "select-basic-demo");
+        ui_select_set_placeholder(select, "Select a fruit");
+        ui_text_set_content(label, "Fruits");
+        ui_widget_append(group, label);
+        add_item(group, "Apple", "apple");
+        add_item(group, "Banana", "banana");
+        add_item(group, "Blueberry", "blueberry");
+        add_item(group, "Grapes", "grapes");
+        add_item(group, "Pineapple", "pineapple");
+        ui_widget_append(content, group);
+        ui_widget_append(select, trigger);
+        ui_widget_append(select, content);
+        ui_select_build_children(select);
         ui_widget_append(parent, select);
 }

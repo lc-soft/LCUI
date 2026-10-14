@@ -1,0 +1,43 @@
+<lcui-app>
+  <ui>
+    <select class="select-scrollable-demo">
+      <select-trigger>
+        <select-value data-select-placeholder="Select a timezone" />
+      </select-trigger>
+      <portal>
+        <select-content>
+          <select-group>
+            <select-label>North America</select-label>
+            <select-item value="est">Eastern Standard Time</select-item>
+            <select-item value="cst">Central Standard Time</select-item>
+            <select-item value="mst">Mountain Standard Time</select-item>
+            <select-item value="pst">Pacific Standard Time</select-item>
+            <select-item value="akst">Alaska Standard Time</select-item>
+            <select-item value="hst">Hawaii Standard Time</select-item>
+          </select-group>
+          <select-group>
+            <select-label>Europe &amp; Africa</select-label>
+            <select-item value="gmt">Greenwich Mean Time</select-item>
+            <select-item value="cet">Central European Time</select-item>
+            <select-item value="eet">Eastern European Time</select-item>
+            <select-item value="west">Western European Summer Time</select-item>
+            <select-item value="cat">Central Africa Time</select-item>
+            <select-item value="eat">East Africa Time</select-item>
+          </select-group>
+          <select-separator />
+          <select-group>
+            <select-label>Asia</select-label>
+            <select-item value="msk">Moscow Time</select-item>
+            <select-item value="ist">India Standard Time</select-item>
+            <select-item value="cst_china">China Standard Time</select-item>
+            <select-item value="jst">Japan Standard Time</select-item>
+            <select-item value="kst">Korea Standard Time</select-item>
+            <select-item
+              value="ist_indonesia"
+            >Indonesia Central Standard Time</select-item>
+          </select-group>
+        </select-content>
+      </portal>
+    </select>
+  </ui>
+</lcui-app>

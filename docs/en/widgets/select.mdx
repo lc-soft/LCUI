@@ -8,23 +8,27 @@ Select provides an expandable list of options for choosing one value from multip
 
 - **Suitable**: Choosing one value from multiple options
 - **Suitable**: Forms with many options where page space should be preserved
+- **Suitable**: Options that can be grouped by category
 - **Not suitable**: Choosing multiple values at once (use `checkbox`)
 
 ## Usage
 
 ```tsx
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@lcui/react"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectLabel, SelectItem } from "@lcui/react"
 ```
 
 ```tsx
 <Select>
   <SelectTrigger>
-    <SelectValue placeholder="Choose a theme" />
+    <SelectValue placeholder="Select a theme" />
   </SelectTrigger>
   <SelectContent>
-    <SelectItem value="light">Light</SelectItem>
-    <SelectItem value="dark">Dark</SelectItem>
-    <SelectItem value="system">System</SelectItem>
+    <SelectGroup>
+      <SelectLabel>Theme</SelectLabel>
+      <SelectItem value="light">Light</SelectItem>
+      <SelectItem value="dark">Dark</SelectItem>
+      <SelectItem value="system">System</SelectItem>
+    </SelectGroup>
   </SelectContent>
 </Select>
 ```
@@ -38,8 +42,40 @@ Select
 ├── SelectTrigger
 │   └── SelectValue
 └── SelectContent
-    └── SelectItem
+    ├── SelectGroup
+    │   ├── SelectLabel
+    │   ├── SelectItem
+    │   └── SelectItem
+    ├── SelectSeparator
+    └── SelectGroup
+        ├── SelectLabel
+        ├── SelectItem
+        └── SelectItem
 ```
+
+## Groups
+
+Wrap a set of related options in `SelectGroup` and use `SelectLabel` as the group heading; when the panel holds several groups, use `SelectSeparator` to draw a divider between them.
+
+<WidgetExample name="select-groups" />
+
+## Align Item With Trigger
+
+By default, opening a `Select` makes the popup **overlap the trigger** so the **selected item** sits at the same height as it; when nothing is selected the first item is aligned instead. If the trigger is near the bottom of the window and there is not enough room to align, the popup flips above the trigger and shows a scrollbar. Set `align-item-with-trigger` to `false` to disable aligning and expand the popup against the trigger edge.
+
+<WidgetExample name="select-align-item" />
+
+## Scrollable
+
+When the options exceed the available height the popup is capped to that height and shows a scrollbar; when the trigger is near the bottom of the window the popup flips above it and uses the space available on that side.
+
+<WidgetExample name="select-scrollable" />
+
+## Disabled
+
+Setting `disabled` on `Select` lowers the opacity of the trigger and stops the content panel from opening; you can also disable an individual `SelectItem`, which then cannot be selected.
+
+<WidgetExample name="select-disabled" />
 
 ## API Reference
 
@@ -60,6 +96,24 @@ The trigger that opens or closes the content panel.
 The option panel mounted at the root level through Portal.
 
 <FieldTable name="select-content" />
+
+### SelectGroup
+
+A container that groups related options, optionally headed by a `SelectLabel`.
+
+<FieldTable name="select-group" />
+
+### SelectLabel
+
+The small heading text for an option group.
+
+<FieldTable name="select-label" />
+
+### SelectSeparator
+
+A thin divider between option groups.
+
+<FieldTable name="select-separator" />
 
 ### SelectItem
 

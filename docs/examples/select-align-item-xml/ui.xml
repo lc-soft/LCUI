@@ -1,0 +1,22 @@
+<lcui-app>
+  <ui>
+    <select
+      class="select-align-item-demo"
+      placeholder="Select a fruit"
+      value="banana"
+    >
+      <select-trigger>
+        <select-value />
+      </select-trigger>
+      <portal>
+        <select-content>
+          <select-item value="apple">Apple</select-item>
+          <select-item value="banana">Banana</select-item>
+          <select-item value="blueberry">Blueberry</select-item>
+          <select-item value="grapes">Grapes</select-item>
+          <select-item value="pineapple">Pineapple</select-item>
+        </select-content>
+      </portal>
+    </select>
+  </ui>
+</lcui-app>
