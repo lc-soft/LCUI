@@ -7,7 +7,7 @@ import "./global.css";
 
 export default function AppLayout({ children }: PropsWithChildren) {
   return (
-    <div className="flex flex-col w-full h-full">
+    <div className="flex flex-col w-full h-full typeset">
       <Navbar />
       <div className="flex flex-1">
         <Sidebar />

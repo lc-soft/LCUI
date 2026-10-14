@@ -13,18 +13,33 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Geist ships variable TTF files (wght 100-900), which FreeType can load
+ * directly. The lcui-cli asset loader copies each file into dist/assets and
+ * preloads it with pd_font_library_load_file() before the UI starts. */
+@font-face {
+  font-family: "Geist";
+  src: url("../node_modules/geist/dist/fonts/geist-sans/Geist-Variable.ttf");
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("../node_modules/geist/dist/fonts/geist-mono/GeistMono-Variable.ttf");
+}
+
 * {
   box-sizing: border-box;
+}
+
+.typeset {
+  color: #000;
+  font-family: "Geist", "Noto Sans SC", sans-serif;
 }
 
 root {
   min-width: 800px;
   min-height: 480px;
-}
 
-text,
-p {
-  @apply text-base text-gray-800;
+  @apply text-base;
 }
 
 textinput {
@@ -136,11 +151,11 @@ p {
 .code-block-body {
   @apply p-3 text-sm text-gray-800 whitespace-pre;
   position: relative;
-  font-family: monospace;
+  font-family: "Geist Mono", monospace;
 }
 .code-line {
   @apply text-gray-800;
-  font-family: monospace;
+  font-family: "Geist Mono", monospace;
 }
 
 /* -- Demo widget (see app/components/demo-provider.tsx) -- */
@@ -153,6 +168,136 @@ p {
 }
 .demo .code-block {
   @apply rounded-tr-none rounded-tl-none border-t-0 my-0;
+}
+
+/* -- Widget demos -- */
+
+.badge-basic-demo,
+.badge-variants-demo,
+.badge-colors-demo {
+  @apply flex flex-wrap gap-2;
+}
+
+.alert-variants-demo,
+.alert-basic-demo {
+  @apply block w-full max-w-md;
+}
+
+.alert-destructive-demo,
+.alert-action-demo {
+  @apply w-full max-w-md;
+}
+
+.item-basic-demo,
+.item-variants-demo,
+.item-size-demo,
+.item-icon-demo,
+.item-image-demo {
+  @apply flex max-w-md flex-col gap-6;
+}
+
+.item-duration {
+  @apply text-xs text-muted-foreground;
+}
+
+.button-basic-demo,
+.button-variants-demo,
+.button-icon-demo,
+.button-with-icon-demo,
+.button-size-demo,
+.button-disabled-demo {
+  @apply flex flex-wrap items-center gap-4;
+}
+
+.select-basic-demo,
+.select-groups-demo,
+.select-disabled-demo,
+.select-align-item-demo {
+  @apply w-full max-w-48;
+}
+
+.select-scrollable-demo {
+  @apply w-full max-w-64;
+}
+
+.checkbox-basic-demo {
+  @apply max-w-sm;
+}
+
+.checkbox-description-demo {
+  @apply max-w-72;
+}
+
+.checkbox-group-demo {
+  @apply w-full max-w-sm;
+}
+
+.checkbox-group-demo field-group {
+  @apply gap-3;
+}
+
+.checkbox-indeterminate-demo {
+  @apply flex flex-col gap-2;
+}
+
+.checkbox-indeterminate-demo .checkbox-row {
+  @apply flex items-center gap-2;
+}
+
+.field-demo {
+  @apply flex flex-col gap-5 max-w-[400px];
+  padding: 4px;
+  margin: -4px;
+}
+
+/* FieldLabel follows shadcn's `cn-label` (text-sm font-medium); examples that
+ * use a checkbox/radio as the control opt back into normal weight, mirroring
+ * the `className="font-normal"` in shadcn's field examples. */
+.field-label.font-normal {
+  font-weight: 400;
+}
+
+/* field-basic uses a 3-column card row, so give it a bit more room. */
+.field-demo.field-basic-demo {
+  @apply max-w-[448px];
+}
+
+.radio-group-demo {
+  @apply flex w-full max-w-[400px] flex-col;
+}
+
+.progress-label-demo {
+  @apply w-full max-w-[400px];
+}
+
+.field-checkbox-demo-group {
+  @apply gap-3;
+}
+
+.field-basic-card-row {
+  @apply flex gap-4;
+  padding: 4px;
+  margin: -4px;
+}
+
+.field-basic-card-field {
+  @apply flex-1;
+}
+
+.anchor-basic-demo:hover {
+  @apply text-blue-600 underline underline-offset-2;
+}
+
+.button-size-group {
+  @apply flex items-center gap-2;
+}
+
+.empty-basic-demo {
+  @apply w-full max-w-[400px];
+}
+
+.empty-background-demo {
+  @apply h-full w-full bg-muted/30;
 }
 
 /* The code-block wrapper holds the shared card chrome.  Inner code

@@ -1,12 +1,32 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./app/**/*.{tsx,html}"],
+  content: [
+    "./app/**/*.{tsx,html}",
+    "../../docs/examples/**/*-tsx/example.tsx",
+  ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        background: "#fff",
+        primary: "#222222",
+        "primary-foreground": "#ffffff",
+        secondary: "#f5f5f5",
+        "secondary-foreground": "#222222",
+        foreground: "#404040",
+        border: "#e5e5e5",
+        destructive: "#e7000b",
+        "destructive-muted": "#ffe8e9",
+        muted: "#f5f5f5",
+        "muted-foreground": "#666666",
+        card: "#fff",
+        "card-foreground": "#000",
+      },
+    },
   },
   corePlugins: [
     "display",
     "flexDirection",
+    "flexWrap",
     "flex",
     "flexShrink",
     "flexGrow",
@@ -34,5 +54,7 @@ module.exports = {
     "opacity",
     "whitespace",
     "cursor",
+    "textDecoration",
+    "textUnderlineOffset",
   ],
 };
