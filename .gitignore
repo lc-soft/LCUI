@@ -71,3 +71,4 @@ test/build
 vsxmake*
 compile_commands.json
 docs/build/
+docs/superpowers/plans
