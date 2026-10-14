@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<lcui-app>
+  <resource type="text/css" src="test_spinner.css"/>
+  <ui>
+    <spinner id="sp">
+      <spinner-content id="sc" class="content-bg">
+        <w id="mark" class="mark"/>
+      </spinner-content>
+    </spinner>
+  </ui>
+</lcui-app>

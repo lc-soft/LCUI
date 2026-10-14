@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <resource type="text/css">
+    .spinner-running-demo {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 24px;
+    }
+    .spinner-running-demo spinner {
+        width: 40px;
+        height: 40px;
+    }
+  </resource>
+  <ui>
+    <widget class="spinner-running-demo">
+      <spinner running="true" speed="0.5" />
+      <spinner running="false" angle="90" />
+    </widget>
+  </ui>
+</lcui-app>

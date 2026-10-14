@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <resource type="text/css">
+    .shimmer-running-demo {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .shimmer-running-demo shimmer {
+        width: 220px;
+        height: 28px;
+    }
+    .shimmer-running-demo shimmer-content {
+        display: flex;
+        align-items: center;
+        padding: 4px 8px;
+        font-size: 15px;
+        color: #46545f;
+    }
+  </resource>
+  <ui>
+    <widget class="shimmer-running-demo">
+      <shimmer running="true">
+        <shimmer-content>
+          <text>Searching the web…</text>
+        </shimmer-content>
+      </shimmer>
+      <shimmer running="false">
+        <shimmer-content>
+          <text>Reading 4 files</text>
+        </shimmer-content>
+      </shimmer>
+    </widget>
+  </ui>
+</lcui-app>

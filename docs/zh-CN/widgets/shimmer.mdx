@@ -1,0 +1,82 @@
+# Shimmer
+
+给文本、图标等内容叠加一道左右柔化、可倾斜的高光带，从左往右扫过；高光只落在内容的不透明像素上，内容本身保持原色。
+
+<WidgetExample name="shimmer-basic" />
+
+## 适用场景
+
+- **适用**：让一段状态文本（图标或纯文字）带着柔和高光扫过，表示“进行中/加载”
+- **适用**：流式输出时给“正在生成”的提示文字加一层滑动高光
+- **不适用**：纯灰块的骨架占位（Shimmer 叠加在真实内容上，不生成占位骨架）
+- **不适用**：有明确百分比或已知时长的任务进度（用 `progress`）
+- **不适用**：无固定形状的全局忙碌指示（用 `spinner`）
+
+## 用法
+
+```tsx
+import { Shimmer, ShimmerContent } from "@lcui/react"
+```
+
+Shimmer 是 C 代码自绘部件：先按原色完整合成内容，再把一道带倾斜的高光带裁剪到内容的不透明像素上叠加。高光本身可配置颜色、周期、宽度与倾斜角，通过部件属性或对应的 `ui_shimmer_set_*` 接口设置：
+
+```tsx
+<Shimmer running={true} duration={2000} spread={120} angle={20} color="rgba(255,255,255,0.86)">
+  <ShimmerContent>
+    <Text>Generating response…</Text>
+  </ShimmerContent>
+</Shimmer>
+```
+
+## 组合
+
+使用以下组合来构建 `Shimmer`：
+
+```
+Shimmer
+└── ShimmerContent
+```
+
+## 颜色
+
+高光带叠加的颜色取自 `color`，其 alpha 就是扫过处的峰值强度。同一段灰字上叠不同颜色，扫过时会被“染”向各自的色相。
+
+<WidgetExample name="shimmer-color" />
+
+## 时长
+
+`duration` 决定高光扫过一次所需的时间，单位为毫秒，默认 `2000`。值越小扫得越快。
+
+<WidgetExample name="shimmer-duration" />
+
+## 宽度
+
+`spread` 决定高光带的宽度（逻辑像素）。窄带像一道锐利反光，宽带则一次漫过整行，峰值强度不变、只是覆盖范围不同。
+
+<WidgetExample name="shimmer-spread" />
+
+## 倾斜
+
+`angle` 让高光带相对竖直方向倾斜（度数）。0° 时各行在同一列被扫到，倾斜后反光沿高度错切，先从顶部掠过再到下方。
+
+<WidgetExample name="shimmer-angle" />
+
+## 关闭高亮
+
+把 `running` 设为 `false` 即可关闭动画：此时不再叠加高光，内容按原色正常显示。
+
+<WidgetExample name="shimmer-running" />
+
+## API 参考
+
+### Shimmer
+
+扫光容器，捕获 `ShimmerContent` 子树；先按原色完整合成内容，再叠加一道可倾斜、左右渐隐的高光带并裁剪到内容不透明处。高光从左往右扫过，只在内容上显现。
+
+<FieldTable name="shimmer" />
+
+### ShimmerContent
+
+被捕获的内容子树（如文本或图标加文字的状态行），作为 Shimmer 的直属子部件使用；省略时使用一个填满整行的默认占位块。Shimmer 默认块级、高度 20px，可用 `width`/`height` 覆盖。
+
+<FieldTable name="shimmer-content" />

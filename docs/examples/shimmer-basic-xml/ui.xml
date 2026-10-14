@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <resource type="text/css">
+    .shimmer-basic-demo shimmer {
+        width: 220px;
+        height: 28px;
+    }
+    .shimmer-basic-demo shimmer-content {
+        display: flex;
+        align-items: center;
+        padding: 4px 8px;
+        font-size: 15px;
+        color: #46545f;
+    }
+  </resource>
+  <ui>
+    <widget class="shimmer-basic-demo">
+      <shimmer>
+        <shimmer-content>
+          <text>Generating response…</text>
+        </shimmer-content>
+      </shimmer>
+    </widget>
+  </ui>
+</lcui-app>

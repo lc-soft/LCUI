@@ -46,6 +46,8 @@
         { "slug": "radio-group", "label": { "en": "RadioGroup", "zh-CN": "RadioGroup 单选组" } },
         { "slug": "select", "label": { "en": "Select", "zh-CN": "Select 下拉选择" } },
         { "slug": "scrollarea", "label": { "en": "ScrollArea", "zh-CN": "ScrollArea 滚动区域" } },
+        { "slug": "spinner", "label": { "en": "Spinner", "zh-CN": "Spinner 加载指示器" } },
+        { "slug": "shimmer", "label": { "en": "Shimmer", "zh-CN": "Shimmer 高光" } },
         { "slug": "text", "label": { "en": "Text", "zh-CN": "Text 文本" } },
         { "slug": "text-input", "label": { "en": "TextInput", "zh-CN": "TextInput 文本输入" } }
       ]

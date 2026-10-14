@@ -13,6 +13,8 @@
 #include "widgets/button.h"
 #include "widgets/anchor.h"
 #include "widgets/canvas.h"
+#include "widgets/spinner.h"
+#include "widgets/shimmer.h"
 #include "widgets/progress.h"
 #include "widgets/scrollarea.h"
 #include "widgets/scrollbar.h"

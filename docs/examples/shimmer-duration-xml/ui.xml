@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <resource type="text/css">
+    .shimmer-duration-demo {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .shimmer-duration-demo shimmer {
+        width: 220px;
+        height: 28px;
+    }
+    .shimmer-duration-demo shimmer-content {
+        display: flex;
+        align-items: center;
+        padding: 4px 8px;
+        font-size: 15px;
+        color: #46545f;
+    }
+  </resource>
+  <ui>
+    <widget class="shimmer-duration-demo">
+      <shimmer running="true">
+        <shimmer-content>
+          <text>Default duration</text>
+        </shimmer-content>
+      </shimmer>
+      <shimmer running="true" duration="1000">
+        <shimmer-content>
+          <text>Faster duration</text>
+        </shimmer-content>
+      </shimmer>
+    </widget>
+  </ui>
+</lcui-app>

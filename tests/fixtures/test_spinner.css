@@ -1,0 +1,47 @@
+/*
+ * All fill colors use CLASS- or ID-rank selectors so they beat the UA default
+ * `* { background-color: transparent }` (GENERAL rank) in the cascade; an
+ * inline background-color would be overridden and render transparent.
+ *
+ * The spinner's box size is NOT set here: an ID-rank width/height would win
+ * over the inline size applied by ui_widget_resize (custom_style is merged
+ * before matched_style), pinning the widget and defeating the resize tests.
+ * The size is established in C via ui_widget_resize instead.
+ */
+
+/* Opaque red background covering the content box: the identity sample point. */
+.content-bg {
+    background-color: #ff0000;
+}
+
+/* A 10x10 green mark in the top-left corner: the feature rotation moves. */
+.mark {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 10px;
+    height: 10px;
+    background-color: #00ff00;
+}
+
+/* A blue block filling the whole content box: used to prove set_content swaps
+ * the captured subtree (the center sample changes to blue). */
+.mark-alt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0000ff;
+}
+
+/* An 80x80 red block that overflows a smaller spinner box: proves the capture
+ * is clipped to the content box so nothing spills onto the window target. */
+.bleed {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80px;
+    height: 80px;
+    background-color: #ff0000;
+}

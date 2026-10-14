@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<lcui-app>
+  <resource type="text/css" src="test_draw_backend.css"/>
+  <ui>
+    <w class="bg" id="box"/>
+  </ui>
+</lcui-app>

@@ -1,0 +1,33 @@
+/*
+ * All fill colors use CLASS-rank selectors so they beat the UA default
+ * `* { background-color: transparent }` (GENERAL rank) in the cascade; an
+ * inline background-color would be overridden and render transparent.
+ *
+ * The shimmer's box size is NOT set here: an ID-rank width/height would win
+ * over the inline size applied by ui_widget_resize, pinning the widget and
+ * defeating the resize tests. The size is established in C via
+ * ui_widget_resize instead.
+ */
+
+/* Left-half opaque red over a transparent content box: the mask must reveal
+ * the highlight sweep only where the captured content alpha is present. */
+.half-left {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    background-color: #ff0000;
+}
+
+/* A solid opaque blue block filling the whole content box: used by the phase,
+ * spread, angle, color, dpi and resize cases, which swap it in via
+ * set_content. */
+.content-bg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0000ff;
+}

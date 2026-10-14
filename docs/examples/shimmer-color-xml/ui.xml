@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <resource type="text/css">
+    .shimmer-color-demo {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .shimmer-color-demo shimmer {
+        width: 220px;
+        height: 28px;
+    }
+    .shimmer-color-demo shimmer-content {
+        display: flex;
+        align-items: center;
+        padding: 4px 8px;
+        font-size: 15px;
+        color: #46545f;
+    }
+  </resource>
+  <ui>
+    <widget class="shimmer-color-demo">
+      <shimmer color="#378ADD">
+        <shimmer-content>
+          <text>Generating response…</text>
+        </shimmer-content>
+      </shimmer>
+      <shimmer color="rgb(34 197 94)">
+        <shimmer-content>
+          <text>Sending request…</text>
+        </shimmer-content>
+      </shimmer>
+    </widget>
+  </ui>
+</lcui-app>

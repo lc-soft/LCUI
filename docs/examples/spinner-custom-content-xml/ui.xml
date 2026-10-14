@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <resource type="text/css">
+    .spinner-custom-content-demo {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+    }
+    .spinner-custom-content-demo .shape {
+        width: 40px;
+        height: 40px;
+    }
+    .spinner-custom-content-demo .word {
+        width: 96px;
+        height: 32px;
+    }
+    .spinner-custom-content-demo spinner-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .spinner-custom-content-demo .c-dot {
+        position: absolute;
+        left: 15px;
+        top: 3px;
+        width: 10px;
+        height: 10px;
+        background-color: #4a90d9;
+        border-radius: 8px;
+    }
+    .spinner-custom-content-demo .c-bar {
+        position: absolute;
+        left: 18px;
+        top: 6px;
+        width: 4px;
+        height: 20px;
+        background-color: #d9534f;
+        border-radius: 2px;
+    }
+    .spinner-custom-content-demo .c-text {
+        white-space: nowrap;
+        font-size: 18px;
+        color: #e5484d;
+    }
+  </resource>
+  <ui>
+    <widget class="spinner-custom-content-demo">
+      <spinner class="shape">
+        <spinner-content>
+          <w class="c-dot" />
+          <w class="c-bar" />
+        </spinner-content>
+      </spinner>
+      <spinner class="word">
+        <spinner-content>
+          <text class="c-text">Hello</text>
+        </spinner-content>
+      </spinner>
+    </widget>
+  </ui>
+</lcui-app>

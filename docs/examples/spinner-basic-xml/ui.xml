@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <resource type="text/css">
+    .spinner-basic-box spinner {
+        width: 40px;
+        height: 40px;
+    }
+  </resource>
+  <ui>
+    <w class="spinner-basic-box">
+      <spinner />
+    </w>
+  </ui>
+</lcui-app>

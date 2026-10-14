@@ -30,6 +30,11 @@ typedef struct ui_text {
         ui_widget_t *widget;
         pd_text_t *layer;
         ui_text_style_t style;
+        /* Device scale the layer's glyph bitmaps were last rasterised at. A
+         * self-drawn widget captures its subtree at a boosted scale for
+         * supersampling, so on_paint rebuilds the layer when the active scale
+         * no longer matches, keeping the glyphs at their intended size. */
+        float layer_scale;
         ui_text_task_t task;
         list_node_t node;
 } ui_text_t;
@@ -96,6 +101,7 @@ static void ui_text_update_rendering(ui_widget_t *w)
                 ui_widget_mark_dirty_rect(w, &rect, UI_BOX_TYPE_CONTENT_BOX);
         }
         pd_rects_clear(&rects);
+        txt->layer_scale = scale;
 }
 
 static void ui_text_on_update_content(ui_widget_t *w)
@@ -206,6 +212,7 @@ static void ui_text_on_init(ui_widget_t *w)
         pd_text_set_multiline(txt->layer, true);
         pd_text_set_style_tag(txt->layer, true);
         ui_text_style_init(&txt->style);
+        txt->layer_scale = 0.0f;
         txt->node.data = txt;
         txt->node.prev = txt->node.next = NULL;
         list_append_node(&ui_text.list, &txt->node);
@@ -295,6 +302,50 @@ static void ui_text_on_resize(ui_widget_t *w, float width, float height)
         // logger_debug("[ui-text] resize: %g, %g\n", width, height);
 }
 
+/* The layer caches glyph bitmaps rasterised at the device scale active when it
+ * was last laid out. A self-drawn widget captures its subtree at a boosted
+ * scale so the result can be supersampled, which makes the active scale differ
+ * from the cached one during that capture; without a rebuild the cached 1x
+ * bitmaps would be composited into a 2x backing and the text would shrink by
+ * half. Rebuild the layer here in paint at the current scale, deliberately
+ * without the widget-level side effects (dirty rects, reflow) the update-time
+ * path performs: only the layer that paint is about to blit is refreshed. */
+static void ui_text_sync_layer_scale(ui_widget_t *w,
+                                     ui_widget_actual_style_t *style)
+{
+        ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
+        ui_text_style_t fs;
+        pd_text_style_t ts;
+        list_t rects;
+        float scale = ui_get_actual_scale();
+
+        if (txt->layer_scale == scale) {
+                return;
+        }
+        ui_text_style_init(&fs);
+        ui_compute_text_style(&fs, &w->computed_style);
+        convert_font_style_to_text_style(&fs, &ts);
+        pd_text_set_align(txt->layer, fs.text_align);
+        pd_text_set_line_height(txt->layer, fs.line_height);
+        pd_text_set_autowrap(txt->layer,
+                             fs.white_space != CSS_WHITE_SPACE_NOWRAP);
+        pd_text_set_word_break(txt->layer, fs.word_break);
+        pd_text_set_style(txt->layer, &ts);
+        pd_text_set_underline(
+            txt->layer, fs.text_decoration == CSS_TEXT_DECORATION_UNDERLINE,
+            fs.text_underline_offset, fs.text_decoration_thickness);
+        pd_text_set_fixed_size(txt->layer, style->content_box.width,
+                               style->content_box.height);
+        pd_text_set_max_size(txt->layer, style->content_box.width,
+                             style->content_box.height);
+        list_create(&rects);
+        pd_text_update(txt->layer, &rects);
+        pd_rects_clear(&rects);
+        ui_text_style_destroy(&fs);
+        pd_text_style_destroy(&ts);
+        txt->layer_scale = scale;
+}
+
 static void ui_text_on_paint(ui_widget_t *w, pd_context_t *paint,
                              ui_widget_actual_style_t *style)
 {
@@ -303,6 +354,7 @@ static void ui_text_on_paint(ui_widget_t *w, pd_context_t *paint,
         pd_rect_t content_rect, rect;
         ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
 
+        ui_text_sync_layer_scale(w, style);
         content_rect.width = style->content_box.width;
         content_rect.height = style->content_box.height;
         content_rect.x = style->content_box.x - style->canvas_box.x;

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<lcui-app>
+  <resource type="text/css" src="test_shimmer.css"/>
+  <ui>
+    <shimmer id="sh">
+      <shimmer-content id="sc">
+        <w class="half-left"/>
+      </shimmer-content>
+    </shimmer>
+  </ui>
+</lcui-app>

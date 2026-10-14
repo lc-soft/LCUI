@@ -17,6 +17,8 @@ void lcui_widgets_init(void)
         ui_register_portal();
         ui_register_text();
         ui_register_canvas();
+        ui_register_spinner();
+        ui_register_shimmer();
         ui_register_anchor();
         ui_register_button();
         ui_register_icon();

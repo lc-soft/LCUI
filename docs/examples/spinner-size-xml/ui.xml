@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <resource type="text/css">
+    .spinner-size-demo {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 16px;
+    }
+    .spinner-size-demo .sz-sm {
+        width: 24px;
+        height: 24px;
+    }
+    .spinner-size-demo .sz-md {
+        width: 40px;
+        height: 40px;
+    }
+    .spinner-size-demo .sz-lg {
+        width: 64px;
+        height: 64px;
+    }
+  </resource>
+  <ui>
+    <widget class="spinner-size-demo">
+      <spinner class="sz-sm" />
+      <spinner class="sz-md" />
+      <spinner class="sz-lg" />
+    </widget>
+  </ui>
+</lcui-app>

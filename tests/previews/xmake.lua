@@ -2,6 +2,9 @@ local previews = {
     "flex_layout",
     "block_layout",
     "widget_opacity",
+    "spinner",
+    "spinner_perf",
+    "shimmer",
     "scrollbar",
     "cursor"
 }

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <resource type="text/css">
+    .shimmer-spread-demo {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .shimmer-spread-demo shimmer {
+        width: 220px;
+        height: 28px;
+    }
+    .shimmer-spread-demo shimmer-content {
+        display: flex;
+        align-items: center;
+        padding: 4px 8px;
+        font-size: 15px;
+        color: #46545f;
+    }
+  </resource>
+  <ui>
+    <widget class="shimmer-spread-demo">
+      <shimmer running="true" spread="40">
+        <shimmer-content>
+          <text>Narrow spread</text>
+        </shimmer-content>
+      </shimmer>
+      <shimmer running="true" spread="160">
+        <shimmer-content>
+          <text>Wide spread</text>
+        </shimmer-content>
+      </shimmer>
+    </widget>
+  </ui>
+</lcui-app>

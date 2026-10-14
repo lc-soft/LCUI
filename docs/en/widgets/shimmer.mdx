@@ -1,0 +1,82 @@
+# Shimmer
+
+Overlays a soft-edged, tiltable highlight band on text, icons, or other content and sweeps it from left to right; the highlight only lands on the content's opaque pixels while the content keeps its own colors.
+
+<WidgetExample name="shimmer-basic" />
+
+## Use cases
+
+- **Suitable**: letting a status line (an icon or plain text) sweep with a soft highlight to signal "in progress / loading"
+- **Suitable**: adding a sliding highlight to a "generating" hint while text streams in
+- **Not suitable**: a plain gray skeleton placeholder (Shimmer overlays real content and does not generate a skeleton)
+- **Not suitable**: progress with a definite percentage or a known duration (use `progress`)
+- **Not suitable**: a global busy indicator without a fixed shape (use `spinner`)
+
+## Usage
+
+```tsx
+import { Shimmer, ShimmerContent } from "@lcui/react"
+```
+
+Shimmer is a self-drawn widget implemented in C: it first composites the content at full strength in its own colors, then overlays a tilted highlight band clipped to the content's opaque pixels. The highlight itself can be configured with a color, period, width, and tilt, either through widget properties or the matching `ui_shimmer_set_*` APIs:
+
+```tsx
+<Shimmer running={true} duration={2000} spread={120} angle={20} color="rgba(255,255,255,0.86)">
+  <ShimmerContent>
+    <Text>Generating response…</Text>
+  </ShimmerContent>
+</Shimmer>
+```
+
+## Composition
+
+Use the following composition to build a `Shimmer`:
+
+```
+Shimmer
+└── ShimmerContent
+```
+
+## Color
+
+The highlight band takes its color from `color`, and its alpha is the peak strength where it sweeps. Overlaying different colors on the same gray text tints the sweep toward each hue as it passes.
+
+<WidgetExample name="shimmer-color" />
+
+## Duration
+
+`duration` sets how long one sweep takes, in milliseconds; it defaults to `2000`. A smaller value sweeps faster.
+
+<WidgetExample name="shimmer-duration" />
+
+## Width
+
+`spread` sets the width of the highlight band in logical pixels. A narrow band reads as a sharp glint, while a wide one washes over the whole row at once, with the same peak strength and only a different span.
+
+<WidgetExample name="shimmer-spread" />
+
+## Angle
+
+`angle` tilts the band relative to vertical, in degrees. At 0° every row is swept at the same column; when tilted, the glint shears along the height, grazing the top before the lower part.
+
+<WidgetExample name="shimmer-angle" />
+
+## Disabling
+
+Set `running` to `false` to stop the animation: no highlight is added and the content shows in its own colors.
+
+<WidgetExample name="shimmer-running" />
+
+## API Reference
+
+### Shimmer
+
+The shimmer container; it captures the `ShimmerContent` subtree, composites it at full strength in its own colors, then overlays a tiltable highlight band that fades out on both sides, clipped to the content's opaque pixels. The highlight sweeps from left to right and only shows on the content.
+
+<FieldTable name="shimmer" />
+
+### ShimmerContent
+
+The captured content subtree (such as a status row of text, or an icon plus text), used as a direct child of Shimmer. When omitted, a default placeholder block filling the whole row is used. Shimmer is block-level with a height of 20px by default, which can be overridden with `width`/`height`.
+
+<FieldTable name="shimmer-content" />

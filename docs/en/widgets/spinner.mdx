@@ -1,0 +1,58 @@
+# Spinner
+
+A self-drawn spinning indicator used to express a "loading" state.
+
+<WidgetExample name="spinner-basic" />
+
+## Use cases
+
+- **Suitable**: a loading state that waits for an async result whose progress cannot be predicted
+- **Suitable**: a busy indicator for a local area such as a button or a card
+- **Not suitable**: progress with a definite percentage or a known duration (use `progress`)
+
+## Usage
+
+```tsx
+import { Spinner, SpinnerContent } from "@lcui/react"
+```
+
+```tsx
+<Spinner running={true} speed={1} />
+```
+
+## Composition
+
+Use the following composition to build a `Spinner`:
+
+```
+Spinner
+└── SpinnerContent
+```
+
+## Examples
+
+### Custom Content
+
+<WidgetExample name="spinner-custom-content" />
+
+### Sizes
+
+<WidgetExample name="spinner-size" />
+
+### Running State
+
+<WidgetExample name="spinner-running" />
+
+## API Reference
+
+### Spinner
+
+The spinner container; it captures the `SpinnerContent` subtree and draws it rotated about its center. It is 16×16 by default and can be overridden with `width`/`height`.
+
+<FieldTable name="spinner" />
+
+### SpinnerContent
+
+The content subtree captured for rotation, used as a direct child of Spinner. When omitted, a default ring is used, with one side left transparent to form a gap that sweeps around as it rotates.
+
+<FieldTable name="spinner-content" />

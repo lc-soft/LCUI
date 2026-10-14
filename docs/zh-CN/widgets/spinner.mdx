@@ -1,0 +1,58 @@
+# Spinner
+
+用于表达“加载中”的自绘旋转指示器部件。
+
+<WidgetExample name="spinner-basic" />
+
+## 适用场景
+
+- **适用**：等待异步结果、无法预知进度的加载状态
+- **适用**：按钮、卡片等局部区域的忙碌指示
+- **不适用**：有明确百分比或已知时长的任务进度（用 `progress`）
+
+## 用法
+
+```tsx
+import { Spinner, SpinnerContent } from "@lcui/react"
+```
+
+```tsx
+<Spinner running={true} speed={1} />
+```
+
+## 组合
+
+使用以下组合来构建 `Spinner`：
+
+```
+Spinner
+└── SpinnerContent
+```
+
+## 示例
+
+### 自定义内容
+
+<WidgetExample name="spinner-custom-content" />
+
+### 不同尺寸
+
+<WidgetExample name="spinner-size" />
+
+### 运行状态控制
+
+<WidgetExample name="spinner-running" />
+
+## API 参考
+
+### Spinner
+
+旋转指示器容器，捕获 `SpinnerContent` 子树并绕其中心旋转绘制。默认自带 16×16 尺寸，可用 `width`/`height` 覆盖。
+
+<FieldTable name="spinner" />
+
+### SpinnerContent
+
+被旋转捕获的内容子树，作为 Spinner 的直接子部件使用；省略时使用默认的圆环，其中一边透明形成随旋转扫过的缺口。
+
+<FieldTable name="spinner-content" />
