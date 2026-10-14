@@ -1,10 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <lcui-app>
   <ui>
     <div style="display:flex; flex-direction:column; gap:8px; max-width:400px">
       <field-set>
         <field-legend>Address Information</field-legend>
-        <field-description>We need your address to deliver your order.</field-description>
+        <field-description
+        >We need your address to deliver your order.</field-description>
         <field-group>
           <field>
             <field-label for="street">Street Address</field-label>

@@ -41,11 +41,15 @@ export default function FieldInputDemo() {
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]Field[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"username"[/color]>[/color]Username[color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]TextInput[/color] [color=#0550ae]id[/color]=[color=#0a3069]"username"[/color] [color=#0550ae]placeholder[/color]=[color=#0a3069]"Max Leiter"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldDescription[/color]>[/color]Choose a unique username for your account.[color=#116329]</[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
+          <Text className="code-line">{`              Choose a unique username for your account.`}</Text>
+          <Text className="code-line">{`            [color=#116329]</[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]Field[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]Field[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"password"[/color]>[/color]Password[color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
-          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldDescription[/color]>[/color]Must be at least 8 characters long.[color=#116329]</[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
+          <Text className="code-line">{`              Must be at least 8 characters long.`}</Text>
+          <Text className="code-line">{`            [color=#116329]</[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]TextInput[/color] [color=#0550ae]id[/color]=[color=#0a3069]"password"[/color] [color=#0550ae]placeholder[/color]=[color=#0a3069]"••••••••"[/color] />[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]Field[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]</[color=#0550ae]FieldGroup[/color]>[/color]`}</Text>
@@ -132,7 +136,7 @@ export default function FieldInputDemo() {
         </Widget>
         <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/field-input/8" style={{ display: "none" }}>
           <CodeBlockCopy />
-          <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color]?>[/color]`}</Text>
+          <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
           <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
           <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
           <Text className="code-line">{`    [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]style[/color]=[color=#0a3069]"display:flex; flex-direction:column; gap:8px; max-width:400px"[/color]>[/color]`}</Text>
@@ -141,11 +145,13 @@ export default function FieldInputDemo() {
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"username"[/color]>[/color]Username[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]textinput[/color] [color=#0550ae]id[/color]=[color=#0a3069]"username"[/color] [color=#0550ae]placeholder[/color]=[color=#0a3069]"Max Leiter"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-description[/color]>[/color]Choose a unique username for your account.[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-description[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]            >[/color]Choose a unique username for your account.[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"password"[/color]>[/color]Password[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
-          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-description[/color]>[/color]Must be at least 8 characters long.[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-description[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]            >[/color]Must be at least 8 characters long.[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]textinput[/color] [color=#0550ae]id[/color]=[color=#0a3069]"password"[/color] [color=#0550ae]placeholder[/color]=[color=#0a3069]"••••••••"[/color] />[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]</[color=#0550ae]field-group[/color]>[/color]`}</Text>

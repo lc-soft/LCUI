@@ -41,7 +41,9 @@ export default function FieldChoiceCardDemo() {
           <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Widget[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex flex-col gap-2 max-w-\\[400px]"[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]<[color=#0550ae]FieldGroup[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]FieldSet[/color]>[/color]`}</Text>
-          <Text className="code-line">{`          [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"compute-environment"[/color]>[/color]Compute Environment[color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
+          <Text className="code-line">{`          [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"compute-environment"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            Compute Environment`}</Text>
+          <Text className="code-line">{`          [color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
           <Text className="code-line">{`            Select the compute environment for your cluster.`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
@@ -184,20 +186,24 @@ export default function FieldChoiceCardDemo() {
         </Widget>
         <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/field-choice-card/8" style={{ display: "none" }}>
           <CodeBlockCopy />
-          <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color]?>[/color]`}</Text>
+          <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
           <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
           <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
           <Text className="code-line">{`    [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]style[/color]=[color=#0a3069]"display:flex; flex-direction:column; gap:8px; max-width:400px"[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]<[color=#0550ae]field-group[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-set[/color]>[/color]`}</Text>
-          <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field-label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"compute-environment"[/color]>[/color]Compute Environment[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
-          <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field-description[/color]>[/color]Select the compute environment for your cluster.[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
+          <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field-label[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]            [color=#0550ae]for[/color]=[color=#0a3069]"compute-environment"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]          >[/color]Compute Environment[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
+          <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field-description[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]          >[/color]Select the compute environment for your cluster.[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]radio-group[/color] [color=#0550ae]value[/color]=[color=#0a3069]"kubernetes"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"kubernetes-r2h"[/color]>[/color]`}</Text>
           <Text className="code-line">{`              [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`                [color=#116329]<[color=#0550ae]field-content[/color]>[/color]`}</Text>
           <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]field-title[/color]>[/color]Kubernetes[color=#116329]</[color=#0550ae]field-title[/color]>[/color]`}</Text>
-          <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]field-description[/color]>[/color]Run GPU workloads on a K8s configured cluster.[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
+          <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]field-description[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]                  >[/color]Run GPU workloads on a K8s configured cluster.[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
           <Text className="code-line">{`                [color=#116329]</[color=#0550ae]field-content[/color]>[/color]`}</Text>
           <Text className="code-line">{`                [color=#116329]<[color=#0550ae]radio-group-item[/color] [color=#0550ae]id[/color]=[color=#0a3069]"kubernetes-r2h"[/color] [color=#0550ae]value[/color]=[color=#0a3069]"kubernetes"[/color] />[/color]`}</Text>
           <Text className="code-line">{`              [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
@@ -206,7 +212,8 @@ export default function FieldChoiceCardDemo() {
           <Text className="code-line">{`              [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`                [color=#116329]<[color=#0550ae]field-content[/color]>[/color]`}</Text>
           <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]field-title[/color]>[/color]Virtual Machine[color=#116329]</[color=#0550ae]field-title[/color]>[/color]`}</Text>
-          <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]field-description[/color]>[/color]Access a VM configured cluster to run GPU workloads.[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
+          <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]field-description[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]                  >[/color]Access a VM configured cluster to run GPU workloads.[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
           <Text className="code-line">{`                [color=#116329]</[color=#0550ae]field-content[/color]>[/color]`}</Text>
           <Text className="code-line">{`                [color=#116329]<[color=#0550ae]radio-group-item[/color] [color=#0550ae]id[/color]=[color=#0a3069]"vm-z4k"[/color] [color=#0550ae]value[/color]=[color=#0a3069]"vm"[/color] />[/color]`}</Text>
           <Text className="code-line">{`              [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>

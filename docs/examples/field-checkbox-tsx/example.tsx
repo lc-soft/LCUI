@@ -16,7 +16,9 @@ export default function App() {
     <Widget className="flex flex-col gap-2 max-w-[400px]">
       <FieldSet>
         <FieldLegend>Show these items on the desktop</FieldLegend>
-        <FieldDescription>Select the items you want to show on the desktop.</FieldDescription>
+        <FieldDescription>
+          Select the items you want to show on the desktop.
+        </FieldDescription>
         <FieldGroup className="gap-3">
           <Field orientation="horizontal">
             <Checkbox id="finder-pref-9k2-hard-disks-ljj" defaultChecked />

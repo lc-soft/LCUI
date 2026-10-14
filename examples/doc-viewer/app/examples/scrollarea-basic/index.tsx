@@ -100,7 +100,7 @@ export default function ScrollareaBasicDemo() {
         </Widget>
         <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/scrollarea-basic/10" style={{ display: "none" }}>
           <CodeBlockCopy />
-          <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color]?>[/color]`}</Text>
+          <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
           <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
           <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
           <Text className="code-line">{`    [color=#116329]<[color=#0550ae]scrollarea[/color] [color=#0550ae]style[/color]=[color=#0a3069]"width: 300px; height: 200px;"[/color]>[/color]`}</Text>

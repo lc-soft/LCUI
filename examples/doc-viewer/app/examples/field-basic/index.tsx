@@ -42,7 +42,9 @@ export default function FieldBasicDemo() {
           <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Widget[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex flex-col gap-2 max-w-\\[400px]"[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]<[color=#0550ae]FieldSet[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]FieldLegend[/color]>[/color]Payment Method[color=#116329]</[color=#0550ae]FieldLegend[/color]>[/color]`}</Text>
-          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]FieldDescription[/color]>[/color]All transactions are secure and encrypted[color=#116329]</[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
+          <Text className="code-line">{`          All transactions are secure and encrypted`}</Text>
+          <Text className="code-line">{`        [color=#116329]</[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]FieldGroup[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]Field[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"name-on-card"[/color]>[/color]Name on Card[color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
@@ -72,11 +74,15 @@ export default function FieldBasicDemo() {
           <Text className="code-line">{`      [color=#116329]<[color=#0550ae]FieldSeparator[/color] />[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]<[color=#0550ae]FieldSet[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]FieldLegend[/color]>[/color]Billing Address[color=#116329]</[color=#0550ae]FieldLegend[/color]>[/color]`}</Text>
-          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]FieldDescription[/color]>[/color]The billing address associated with your payment method[color=#116329]</[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
+          <Text className="code-line">{`          The billing address associated with your payment method`}</Text>
+          <Text className="code-line">{`        [color=#116329]</[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]FieldGroup[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]Field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]Checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"billing-same"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"billing-same"[/color]>[/color]Same as shipping address[color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"billing-same"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`              Same as shipping address`}</Text>
+          <Text className="code-line">{`            [color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]Field[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]</[color=#0550ae]FieldGroup[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]</[color=#0550ae]FieldSet[/color]>[/color]`}</Text>
@@ -256,13 +262,14 @@ export default function FieldBasicDemo() {
         </Widget>
         <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/field-basic/8" style={{ display: "none" }}>
           <CodeBlockCopy />
-          <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color]?>[/color]`}</Text>
+          <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
           <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
           <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
           <Text className="code-line">{`    [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]style[/color]=[color=#0a3069]"display:flex; flex-direction:column; gap:8px; max-width:400px"[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]<[color=#0550ae]field-set[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-legend[/color]>[/color]Payment Method[color=#116329]</[color=#0550ae]field-legend[/color]>[/color]`}</Text>
-          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-description[/color]>[/color]All transactions are secure and encrypted[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-description[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]        >[/color]All transactions are secure and encrypted[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-group[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"name-on-card"[/color]>[/color]Name on Card[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
@@ -271,7 +278,8 @@ export default function FieldBasicDemo() {
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"card-number"[/color]>[/color]Card Number[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]textinput[/color] [color=#0550ae]id[/color]=[color=#0a3069]"card-number"[/color] [color=#0550ae]placeholder[/color]=[color=#0a3069]"1234 5678 9012 3456"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-description[/color]>[/color]Enter your 16-digit card number[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-description[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]            >[/color]Enter your 16-digit card number[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]style[/color]=[color=#0a3069]"display:flex; gap:16px"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]style[/color]=[color=#0a3069]"flex:1"[/color]>[/color]`}</Text>
@@ -292,11 +300,14 @@ export default function FieldBasicDemo() {
           <Text className="code-line">{`      [color=#116329]<[color=#0550ae]field-separator[/color] />[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]<[color=#0550ae]field-set[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-legend[/color]>[/color]Billing Address[color=#116329]</[color=#0550ae]field-legend[/color]>[/color]`}</Text>
-          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-description[/color]>[/color]The billing address associated with your payment method[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-description[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]        >[/color]The billing address associated with your payment method[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-group[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"billing-same"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"billing-same"[/color]>[/color]Same as shipping address[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]for[/color]=[color=#0a3069]"billing-same"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]            >[/color]Same as shipping address[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]</[color=#0550ae]field-group[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]</[color=#0550ae]field-set[/color]>[/color]`}</Text>

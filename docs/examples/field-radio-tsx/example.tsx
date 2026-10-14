@@ -25,15 +25,11 @@ export default function App() {
           </Field>
           <Field orientation="horizontal">
             <RadioGroupItem value="yearly" id="plan-yearly" />
-            <FieldLabel htmlFor="plan-yearly">
-              Yearly ($99.99/year)
-            </FieldLabel>
+            <FieldLabel htmlFor="plan-yearly">Yearly ($99.99/year)</FieldLabel>
           </Field>
           <Field orientation="horizontal">
             <RadioGroupItem value="lifetime" id="plan-lifetime" />
-            <FieldLabel htmlFor="plan-lifetime">
-              Lifetime ($299.99)
-            </FieldLabel>
+            <FieldLabel htmlFor="plan-lifetime">Lifetime ($299.99)</FieldLabel>
           </Field>
         </RadioGroup>
       </FieldSet>

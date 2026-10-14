@@ -25,7 +25,12 @@ export default function AnchorBasicDemo() {
           <CodeBlockCopy />
           <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]App[/color]([color=#0550ae][/color]) {`}</Text>
           <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
-          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]a[/color] [color=#0550ae]href[/color]=[color=#0a3069]"https://lcui.dev"[/color]>[/color]LCUI Homepage[color=#116329]</[color=#0550ae]a[/color]>[/color]`}</Text>
+          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]a[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]      [color=#0550ae]href[/color]=[color=#0a3069]"https://lcui.dev"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]      [color=#0550ae]className[/color]=[color=#0a3069]"hover:text-blue-600 hover:underline hover:underline-offset-2"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]    >[/color]`}</Text>
+          <Text className="code-line">{`      LCUI Homepage`}</Text>
+          <Text className="code-line">{`    [color=#116329]</[color=#0550ae]a[/color]>[/color]`}</Text>
           <Text className="code-line">{`  );`}</Text>
           <Text className="code-line">{`}`}</Text>
         </Widget>
@@ -50,6 +55,7 @@ export default function AnchorBasicDemo() {
           <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *a;`}</Text>
           <Text className="code-line">{` `}</Text>
           <Text className="code-line">{`        a = ui_create_widget([color=#0a3069]"a"[/color]);`}</Text>
+          <Text className="code-line">{`        ui_widget_add_class(a, [color=#0a3069]"anchor-basic-demo"[/color]);`}</Text>
           <Text className="code-line">{`        ui_text_set_content(a, [color=#0a3069]"LCUI Homepage"[/color]);`}</Text>
           <Text className="code-line">{`        ui_widget_set_attr(a, [color=#0a3069]"href"[/color], [color=#0a3069]"https://lcui.dev"[/color]);`}</Text>
           <Text className="code-line">{`        ui_widget_append(parent, a);`}</Text>
@@ -57,10 +63,13 @@ export default function AnchorBasicDemo() {
         </Widget>
         <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/anchor-basic/8" style={{ display: "none" }}>
           <CodeBlockCopy />
-          <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color]?>[/color]`}</Text>
+          <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
           <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
           <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
-          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]a[/color] [color=#0550ae]href[/color]=[color=#0a3069]"https://lcui.lc-soft.io"[/color]>[/color]Open LCUI Homepage[color=#116329]</[color=#0550ae]a[/color]>[/color]`}</Text>
+          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]a[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]      [color=#0550ae]class[/color]=[color=#0a3069]"anchor-basic-demo"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]      [color=#0550ae]href[/color]=[color=#0a3069]"https://lcui.lc-soft.io"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]    >[/color]Open LCUI Homepage[color=#116329]</[color=#0550ae]a[/color]>[/color]`}</Text>
           <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ui[/color]>[/color]`}</Text>
           <Text className="code-line">{`[color=#116329]</[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
         </Widget>

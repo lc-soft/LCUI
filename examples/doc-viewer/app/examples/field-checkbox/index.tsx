@@ -41,7 +41,9 @@ export default function FieldCheckboxDemo() {
           <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Widget[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex flex-col gap-2 max-w-\\[400px]"[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]<[color=#0550ae]FieldSet[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]FieldLegend[/color]>[/color]Show these items on the desktop[color=#116329]</[color=#0550ae]FieldLegend[/color]>[/color]`}</Text>
-          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]FieldDescription[/color]>[/color]Select the items you want to show on the desktop.[color=#116329]</[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
+          <Text className="code-line">{`          Select the items you want to show on the desktop.`}</Text>
+          <Text className="code-line">{`        [color=#116329]</[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]FieldGroup[/color] [color=#0550ae]className[/color]=[color=#0a3069]"gap-3"[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]Field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]Checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"finder-pref-9k2-hard-disks-ljj"[/color] [color=#0550ae]defaultChecked[/color] />[/color]`}</Text>
@@ -194,29 +196,38 @@ export default function FieldCheckboxDemo() {
         </Widget>
         <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/field-checkbox/8" style={{ display: "none" }}>
           <CodeBlockCopy />
-          <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color]?>[/color]`}</Text>
+          <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
           <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
           <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
           <Text className="code-line">{`    [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]style[/color]=[color=#0a3069]"display:flex; flex-direction:column; gap:8px; max-width:400px"[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]<[color=#0550ae]field-set[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-legend[/color]>[/color]Show these items on the desktop[color=#116329]</[color=#0550ae]field-legend[/color]>[/color]`}</Text>
-          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-description[/color]>[/color]Select the items you want to show on the desktop.[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-description[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]        >[/color]Select the items you want to show on the desktop.[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-group[/color] [color=#0550ae]style[/color]=[color=#0a3069]"gap:12px"[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"finder-pref-9k2-hard-disks-ljj"[/color] [color=#0550ae]checked[/color]=[color=#0a3069]"true"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"finder-pref-9k2-hard-disks-ljj"[/color]>[/color]Hard disks[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]for[/color]=[color=#0a3069]"finder-pref-9k2-hard-disks-ljj"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]            >[/color]Hard disks[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"finder-pref-9k2-external-disks-1yg"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"finder-pref-9k2-external-disks-1yg"[/color]>[/color]External disks[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]for[/color]=[color=#0a3069]"finder-pref-9k2-external-disks-1yg"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]            >[/color]External disks[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"finder-pref-9k2-cds-dvds-fzt"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"finder-pref-9k2-cds-dvds-fzt"[/color]>[/color]CDs, DVDs, and iPods[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]for[/color]=[color=#0a3069]"finder-pref-9k2-cds-dvds-fzt"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]            >[/color]CDs, DVDs, and iPods[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"finder-pref-9k2-connected-servers-6l2"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"finder-pref-9k2-connected-servers-6l2"[/color]>[/color]Connected servers[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]for[/color]=[color=#0a3069]"finder-pref-9k2-connected-servers-6l2"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]            >[/color]Connected servers[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]</[color=#0550ae]field-group[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]</[color=#0550ae]field-set[/color]>[/color]`}</Text>
@@ -224,8 +235,11 @@ export default function FieldCheckboxDemo() {
           <Text className="code-line">{`      [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"finder-pref-9k2-sync-folders-nep"[/color] [color=#0550ae]checked[/color]=[color=#0a3069]"true"[/color] />[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-content[/color]>[/color]`}</Text>
-          <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field-label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"finder-pref-9k2-sync-folders-nep"[/color]>[/color]Sync Desktop [color=#0550ae]&amp;[/color] Documents folders[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
-          <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field-description[/color]>[/color]Your Desktop [color=#0550ae]&amp;[/color] Documents folders are being synced with iCloud Drive. You can access them from other devices.[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
+          <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field-label[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]            [color=#0550ae]for[/color]=[color=#0a3069]"finder-pref-9k2-sync-folders-nep"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]          >[/color]Sync Desktop [color=#0550ae]&amp;[/color] Documents folders[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
+          <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field-description[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]          >[/color]Your Desktop [color=#0550ae]&amp;[/color] Documents folders are being synced with iCloud Drive. You can access them from other devices.[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]</[color=#0550ae]field-content[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
           <Text className="code-line">{`    [color=#116329]</[color=#0550ae]div[/color]>[/color]`}</Text>

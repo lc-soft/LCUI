@@ -21,7 +21,7 @@ export default function EmptyBasicDemo() {
             <Text className="demo-tab" data-value="xml">XML</Text>
           </Widget>
         </Widget>
-        <Widget className="code-block-body active" data-language="tsx" data-file="example.tsx" data-source="examples/empty-basic/0">
+        <Widget className="code-block-body active" data-language="tsx" data-file="example.tsx" data-source="examples/empty-basic/5">
           <CodeBlockCopy />
           <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
           <Text className="code-line">{`  [color=#8250df]Button[/color],`}</Text>
@@ -67,7 +67,7 @@ export default function EmptyBasicDemo() {
           <Text className="code-line">{`  );`}</Text>
           <Text className="code-line">{`}`}</Text>
         </Widget>
-        <Widget className="code-block-body" data-language="tsx" data-file="main.c" data-source="examples/empty-basic/1" style={{ display: "none" }}>
+        <Widget className="code-block-body" data-language="tsx" data-file="main.c" data-source="examples/empty-basic/6" style={{ display: "none" }}>
           <CodeBlockCopy />
           <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
           <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]"example.h"[/color][/color]`}</Text>
@@ -77,7 +77,7 @@ export default function EmptyBasicDemo() {
           <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
           <Text className="code-line">{`}`}</Text>
         </Widget>
-        <Widget className="code-block-body" data-language="c" data-file="main.c" data-source="examples/empty-basic/2" style={{ display: "none" }}>
+        <Widget className="code-block-body" data-language="c" data-file="main.c" data-source="examples/empty-basic/7" style={{ display: "none" }}>
           <CodeBlockCopy />
           <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
           <Text className="code-line">{` `}</Text>
@@ -133,7 +133,7 @@ export default function EmptyBasicDemo() {
           <Text className="code-line">{`        ui_widget_append(parent, empty);`}</Text>
           <Text className="code-line">{`}`}</Text>
         </Widget>
-        <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/empty-basic/3" style={{ display: "none" }}>
+        <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/empty-basic/8" style={{ display: "none" }}>
           <CodeBlockCopy />
           <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
           <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
@@ -158,7 +158,7 @@ export default function EmptyBasicDemo() {
           <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ui[/color]>[/color]`}</Text>
           <Text className="code-line">{`[color=#116329]</[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
         </Widget>
-        <Widget className="code-block-body" data-language="xml" data-file="main.c" data-source="examples/empty-basic/4" style={{ display: "none" }}>
+        <Widget className="code-block-body" data-language="xml" data-file="main.c" data-source="examples/empty-basic/9" style={{ display: "none" }}>
           <CodeBlockCopy />
           <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
           <Text className="code-line">{` `}</Text>

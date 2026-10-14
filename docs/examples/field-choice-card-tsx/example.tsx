@@ -16,7 +16,9 @@ export default function App() {
     <Widget className="flex flex-col gap-2 max-w-[400px]">
       <FieldGroup>
         <FieldSet>
-          <FieldLabel htmlFor="compute-environment">Compute Environment</FieldLabel>
+          <FieldLabel htmlFor="compute-environment">
+            Compute Environment
+          </FieldLabel>
           <FieldDescription>
             Select the compute environment for your cluster.
           </FieldDescription>

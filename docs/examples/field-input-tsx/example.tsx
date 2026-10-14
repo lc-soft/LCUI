@@ -16,11 +16,15 @@ export default function App() {
           <Field>
             <FieldLabel htmlFor="username">Username</FieldLabel>
             <TextInput id="username" placeholder="Max Leiter" />
-            <FieldDescription>Choose a unique username for your account.</FieldDescription>
+            <FieldDescription>
+              Choose a unique username for your account.
+            </FieldDescription>
           </Field>
           <Field>
             <FieldLabel htmlFor="password">Password</FieldLabel>
-            <FieldDescription>Must be at least 8 characters long.</FieldDescription>
+            <FieldDescription>
+              Must be at least 8 characters long.
+            </FieldDescription>
             <TextInput id="password" placeholder="••••••••" />
           </Field>
         </FieldGroup>

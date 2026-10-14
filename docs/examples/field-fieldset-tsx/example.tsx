@@ -14,7 +14,9 @@ export default function App() {
     <Widget className="flex flex-col gap-2 max-w-[400px]">
       <FieldSet>
         <FieldLegend>Address Information</FieldLegend>
-        <FieldDescription>We need your address to deliver your order.</FieldDescription>
+        <FieldDescription>
+          We need your address to deliver your order.
+        </FieldDescription>
         <FieldGroup>
           <Field>
             <FieldLabel htmlFor="street">Street Address</FieldLabel>

@@ -17,7 +17,9 @@ export default function App() {
     <Widget className="flex flex-col gap-2 max-w-[400px]">
       <FieldSet>
         <FieldLegend>Payment Method</FieldLegend>
-        <FieldDescription>All transactions are secure and encrypted</FieldDescription>
+        <FieldDescription>
+          All transactions are secure and encrypted
+        </FieldDescription>
         <FieldGroup>
           <Field>
             <FieldLabel htmlFor="name-on-card">Name on Card</FieldLabel>
@@ -47,11 +49,15 @@ export default function App() {
       <FieldSeparator />
       <FieldSet>
         <FieldLegend>Billing Address</FieldLegend>
-        <FieldDescription>The billing address associated with your payment method</FieldDescription>
+        <FieldDescription>
+          The billing address associated with your payment method
+        </FieldDescription>
         <FieldGroup>
           <Field orientation="horizontal">
             <Checkbox id="billing-same" />
-            <FieldLabel htmlFor="billing-same">Same as shipping address</FieldLabel>
+            <FieldLabel htmlFor="billing-same">
+              Same as shipping address
+            </FieldLabel>
           </Field>
         </FieldGroup>
       </FieldSet>

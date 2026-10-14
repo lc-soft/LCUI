@@ -16,8 +16,8 @@ export default function App() {
         <FieldSet>
           <FieldLabel>Responses</FieldLabel>
           <FieldDescription>
-            Get notified when ChatGPT responds to requests that take time,
-            like research or image generation.
+            Get notified when ChatGPT responds to requests that take time, like
+            research or image generation.
           </FieldDescription>
           <FieldGroup>
             <Field orientation="horizontal">
