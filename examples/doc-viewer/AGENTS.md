@@ -142,6 +142,15 @@ overview、handbook 等页面结构更自由，仅要求：
    - 代码注释无需翻译
 4. **不要双语并行开发**：zh-CN 未定稿时不改 en，避免两边结构漂移。
 
+## 参考实现与示例样式
+
+- 新增或修改基础部件文档前，必须先读取 shadcn-ui 项目的 `/apps/v4/content/docs/components/base/{name}.mdx` 和该目录对应的 `examples/base/{name}-*.tsx`。shadcn-ui 项目目录与当前项目目录同级，可尝试解析路径 `../shadcn-ui-main` 或 `../shadcn-ui`。
+- 复用与 LCUI 能力兼容的文案、章节、默认示例和示例数据；不兼容的 React/网页能力必须在组件规格中说明替代方案，不能静默删减。
+- `docs/examples/*-tsx/example.tsx` 只使用已配置的 Tailwind 工具类组织布局和视觉样式。禁止为可用工具类写 `style={{ ... }}` 内联样式。
+- C demo 用字符串保存 CSS 规则，以唯一父 class 限定选择器；通过 `ui_widget_add_class()` 将该 class 加在 demo 根节点，禁止为可表达的布局/视觉规则逐项调用 inline style API。XML demo 在 `<resource type="text/css">` 中声明同样的作用域 CSS，禁止在元素 `style` 属性中堆叠规则。
+- 中文页面标题和小节使用中文：例如 `变体`、`带图标`、`自定义颜色`、`图片`，不得直接沿用参考文档的英文标题。
+- 多变体组件页面必须覆盖参考文档的基础示例和核心变体；新增 API 的示例、字段表与 C/XML/TSX 三变体必须同步更新。
+
 ## MDX 语法参考
 
 | 语法 | 渲染效果 |
@@ -229,7 +238,8 @@ interface FieldData {
 ```bash
 bun run compile                   # 全量编译 MDX → page.tsx
 bun run compile --watch           # 监听变更
-npx lcui build app --force        # 重生成 C 层 .tsx.h / main.h
+npx lcui build app --force        # 仅编译 app 目录，重生成 C 层 .tsx.h（不更新 main.h）
+npx lcui build --force            # 完整项目构建，同时重写 app/main.h
 xmake build doc-viewer            # 编译链接
 xmake run doc-viewer              # 运行验证
 ```
@@ -238,11 +248,22 @@ xmake run doc-viewer              # 运行验证
 
 ```bash
 bun run compile
-npx lcui build app --force
+npx lcui build --force           # 新增页面/demo 时必须完整构建以重写 main.h
 xmake build doc-viewer
 ```
 
-> ⚠️ `npx lcui build app --force` 输出末尾的 `unknown target(lcui) for doc-viewer.deps!` 警告无害，是已知问题，可忽略。`bun run compile` 自动复制 `widget-fields/` 并触发页面生成；任何一步失败都会产生连锁错误。
+> ⚠️ `lcui build` 有两种用法，只有一种会重写 `app/main.h`：
+> - **不带路径**（`lcui build` / `lcui build --force`）：完整项目构建，重写 `main.h`；
+> - **带路径**（如 `lcui build app`）：仅编译指定文件/目录，`isFullBuild=false`，**不重写** `main.h`。
+>
+> 因此**新增页面或 demo 后必须用完整构建**。若只跑 `lcui build app`，新组件不会进入
+> `main.h` 的注册表，页面上对应的 `ui_create_*` 会回退成通用部件而不显示内容。
+
+构建或排查涉及 `@lcui/cli`、`@lcui/react`、`@lcui/fluent-icons` 的问题，以及运行 `npm install` / `npm ci` 前，必须遵循仓库根目录 `AGENTS.md` 中“lcui-toolkit 本地开发包与依赖安装”规则，核实本地开发版包的软链接；如果用户提供过本地仓库路径但当前包未链接，汇报并暂停，请用户手动修复。
+
+项目根目录 `package.json` **没有** `build-doc-viewer` 脚本；可用的是 `npm run doc-viewer:compile-docs`（等价于 doc-viewer 的 `bun run compile`）与 `npm run doc-viewer:compile-tsx`（`lcui build --skip-xmake`），或手动执行上面的三步。脚本内容变更时，更新本节以保持实际命令与文档一致。
+
+> ⚠️ `bun run compile` 自动复制 `widget-fields/` 并触发页面生成；任何一步失败都会产生连锁错误。`lcui build` 输出末尾的 `unknown target(lcui) for doc-viewer.deps!` 警告无害，是已知问题，可忽略。
 
 ## Demo 变体命名约定
 
@@ -256,6 +277,10 @@ xmake build doc-viewer
 | `-<feature>` | 特性示例 | 镜像 `-tsx` 三件套结构，如 `-disabled`、`-dual-scrollbars` |
 
 **三变体必齐**：C、XML、TSX 三种实现都要提供。即使 widget 暂未在 `@lcui/react` 中导出，也要给出 TSX 变体作为前瞻占位（`example.tsx` 仅作为代码块展示，不会实际编译）。
+
+## 新部件脚手架
+
+新部件脚手架接受部件名和可选子部件列表。首版生成：公共 C 头和源、widgets 注册与聚合导出、中文 MDX、主部件字段表、C/XML/TSX 三变体 demo 及 `sidebars.json` 项。子部件只生成 C API/实现和需要的字段表、示例骨架，不单独创建文档页面或侧栏项。
 
 ## widget-fields 文件命名与目录复制陷阱
 

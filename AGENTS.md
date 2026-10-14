@@ -100,6 +100,13 @@ emit_arg)`，不是 `ui_widget_on()` 的第四个参数。常规监听器必须�
 获取通过 `ui_widget_on()` 绑定的上下文；只有显式发射事件传入的上下文才使用
 处理函数的第三个参数。
 
+## lcui-toolkit 本地开发包与依赖安装
+
+- 排查 `@lcui/cli`、`@lcui/react`、`@lcui/fluent-icons` 等 lcui-toolkit 相关包的问题时，先回顾用户是否提过本地开发版仓库路径（例如 `F:\code\lcui-toolkit\packages`）。
+- 如果用户提供过本地开发版路径，先检查当前实际使用的包是否软连接/目录联接到对应本地包；同时检查项目内 `node_modules` 与全局 `lcui` CLI 的实际解析路径。用 `Get-Item -Force` 的 `LinkType`/`Target` 或等效方法核实，不要只依据包名、版本号或 `NODE_PATH` 推断。
+- 如果相关包没有链接到用户提供的本地开发版，汇报包名、当前解析路径和链接状态后暂停工作，请用户手动修复链接。不要改用 npm 发布版继续排错，不要自行 `npm link`、创建 junction/symlink、复制包文件或改包源码绕过问题。
+- 执行 `npm install` / `npm ci` 前，先检查并记录所有 lcui-toolkit 相关包的链接目标。如果它们已经链接到本地开发版，安装后必须恢复到相同目标并再次核实；如果用户曾提供本地开发版路径但链接缺失，按上一条汇报并暂停，不要执行安装。
+
 ## 测试用例
 
 ### 归属规则
@@ -204,6 +211,37 @@ write_log(logger, msg);
 
 若公共逻辑较长，可提取为独立函数，并保持调用路径一致，减少分叉实现。
 
+### 优先用属性组合复用部件样式，而非新建带样式子类型
+
+当某个角色（如关闭按钮、确认按钮）本质上是既有部件的一种用法时，不要为它新建子类型原型
+（例如 `dialog-close` 继承自 `button`），而应直接用既有部件 + `data-*` 属性 + class 组合出该角色。
+原因：
+
+- LCUI 的 CSS 类型选择器只精确匹配 `w->type` 字符串，不做原型链匹配。子类型的 `w->type` 是
+  子类型名，匹配不到 `button:ghost`、`button:icon` 这类基于 `button` 的变体规则，只能重写一份
+  近似样式，造成重复与视觉漂移。
+- 行为绑定走 `data-*` 属性（如 `data-dialog-close`）而非类型判断，与 select 等部件的声明式关联
+  协议一致；工厂函数负责把属性设好（`variant`/`size`/`data-*`/`tabindex`），调用方零配置即可用。
+- 公共工厂保留语义化名字（如 `ui_create_dialog_close()`），但返回的是组合好的标准 `button`
+  部件；文档与字段表仍按角色（DialogClose）描述。
+
+```c
+/* before：子类型匹配不到 button:ghost/button:icon，需要为 dialog-close 重写整套视觉 */
+ui_dialog_close_prototype = ui_create_widget_prototype("dialog-close", "button");
+/* css 里被迫写 dialog-close:ghost { ... } —— 与 button:ghost 重复 */
+
+/* after：标准部件 + 属性组合，复用 button 全部变体样式 */
+ui_widget_t *close = ui_create_widget("button");
+ui_widget_add_class(close, "dialog-close");            /* 仅作绝对定位钩子，不定义视觉 */
+ui_widget_set_attr(close, "variant", "ghost");
+ui_widget_set_attr(close, "size", "icon");
+ui_widget_set_attr(close, "data-dialog-close", "true"); /* 行为靠属性绑定 */
+close->tab_index = 0;
+```
+
+这相当于各大 React 组件库里 `asChild` / `render` 的思路：角色部件不自带视觉实现，而是以组合
+方式借用基础部件（Button）的外观与交互，避免样式实现重复。
+
 ## LCUI CSS 引擎约束
 
 ### 选择器
@@ -230,8 +268,70 @@ write_log(logger, msg);
 - 无 `calc()` / `var()` / `em` / `rem` / `vh` / `vw` 单位（可用 `dp` / `px` / `pt` / `%`）
 - 无 `overflow` 属性
 
+### 图标尺寸
+
+- `icon` 部件（fluent-icons）按字体符号渲染，尺寸由 `font-size` 决定，
+  不像 SVG 可以通过宽高工具类（`size-4` / `w-4` / `h-4`）控制；
+  给图标写 `size-*` 类是无效的，属于常见错误。
+
+### 带图标按钮
+
+- 带图标且带标签的 `button`，标签必须作为独立的 `text` 子部件追加；不得使用
+  `ui_button_set_text()` 或直接文本子节点。Button 自身的文本排版不会参与子部件布局，
+  否则图标与标签无法按预期共同排版。
+- C 使用 `ui_create_widget("text")` 和 `ui_text_set_content()` 创建标签后追加到 Button；
+  XML 使用 `<text>标签</text>`；TSX 使用 `<Text>标签</Text>`。仅图标按钮不适用此规则。
+
+## 内置样式构建（style-nova.css）
+
+- `src/styles/style-nova.css` 里的 `@apply` 会被 `lcui build` 展开成生成文件
+  `src/styles/style-nova.css.h`，库与集成测试链接的是这个 `.h`，不是 `.css` 源。
+- 修改 `style-nova.css` 后必须重新生成：`npm run build-styles`
+  （等价于 `lcui build src/styles/style-nova.css --force --skip-xmake`），
+  否则改动不会进入 `lcui.lib`，测试与运行时仍按展开前的旧样式生效。
+- `style-nova.css` 会先经 Sass 处理，**注释里不能出现 `*/`**（例如把 `data-*` 写成
+  `data-*/foo` 会提前闭合注释），否则残留文本被当作选择器解析，报 `expected selector`。
+
+## 新组件开发
+
+- 新增内建部件时，必须同时提供 `include/LCUI/widgets/<name>.h` 公共 API、
+  `src/widgets/<name>.c` 实现、`include/LCUI/widgets.h` 聚合导出，以及
+  `src/lcui_widgets.c` 注册。
+- 有复杂结构或交互的部件，C API 应提供工厂、build 和状态/属性 setter，方便 C 调用方
+  按需构造默认结构；同时必须允许 TSX 直接声明子树，C 端优先绑定显式子节点，缺失时才
+  补齐默认节点。可参考 `src/widgets/select.c`。
+- 每个内建部件须有聚焦的 `tests/integration/test_<topic>.c`，覆盖公共 API、声明式
+  结构、状态/事件和销毁。测试注册到 `tests/main.c`。
+- 每个部件文档须有 `docs/widget-fields/<name>.ts`、中文 MDX，以及 C、XML、TSX 三种
+  demo，并更新 `docs/sidebars.json`。先完成并审核中文文档，再一次性同步英文；中文未
+  确认前不得创建或修改对应英文页面。
+- 部件文档、示例（C / XML / TSX 三变体）、`widget-fields`、demo 类名约定等编写规范，
+  统一以 `examples/doc-viewer/AGENTS.md` 为**唯一权威来源**；编写或修改部件文档 / 示例
+  前必须先读该文件，不在本文件重复定义、避免与其冲突。
+
+## 浮层组件
+
+- `combobox`、`dropdown-menu`、`dialog`、`alert-dialog` 等浮层必须复用 Portal，不得
+  私建覆盖 root 或复制跨树事件转发逻辑。
+- Portal content 的结构所有权、定位、outside 关闭和 destroy 顺序必须通过 Portal API
+  管理；浮层测试至少覆盖 logical click、outside 事件、锚定/overlay、content-first 和
+  owner-first 销毁。
+- 普通锚定浮层使用 Portal 的 anchor/side/align；模态 Dialog 将全屏 overlay/content
+  wrapper 作为 Portal content，不以 trigger 坐标定位。
+
+## 自绘动效
+
+- Spinner、Shimmer 等自绘动效使用 Canvas 的逻辑绘制 API 和 `lcui_request_frame()`；停止、
+  隐藏或销毁时必须取消 frame。调用层不得读取或处理实际 DPI、`pd_canvas_t` 或后端像素。
+- 每帧不得分配离屏缓冲；尺寸或实际 DPI 变化时由 Canvas/渲染后端重建。通用绘制、遮罩和
+  合成能力先在 Canvas 后端定义并测试，再由 widget 使用。
+- 自绘动效须同时提供集成像素测试和 `tests/previews/` 可视诊断，检查裁切、透明度和
+  高 DPI 行为。
+
 ## 指令
 
 ### gen-commit
 
-用于生成符合 Angular 规范的提交信息，scope 应为 lib 目录下的任意目录名（例如：ui、css），标题长度限制在 80 字符以内，应结合本次会话内容生成，无需读取实际改动文件内容。
+用于生成符合 Angular 规范的提交信息，scope 应为 `lib/` 下的库名（例如：ui、css、ptk）
+或 `src/` 下的模块名（例如：widgets、styles）；纯文档改动可不带 scope。
+标题长度限制在 80 字符以内，应结合本次会话内容生成，无需读取实际改动文件内容。
