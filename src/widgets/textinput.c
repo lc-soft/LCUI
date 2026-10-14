@@ -78,6 +78,7 @@ static const char *ui_textinput_css = "\
 textinput {\
 	min-width: 124px;\
 	min-height: 14px;\
+	cursor: text;\
 	background-color: #fff;\
 	border: 1px solid #eee;\
 	padding: 5px 10px;\
