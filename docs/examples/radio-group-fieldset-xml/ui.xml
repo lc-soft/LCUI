@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <div class="radio-group-demo">
+      <field-set>
+        <field-label>Subscription Plan</field-label>
+        <field-description
+        >Yearly and lifetime plans offer significant savings.</field-description>
+        <radio-group value="monthly">
+          <field orientation="horizontal">
+            <radio-group-item
+              id="plan-monthly"
+              value="monthly"
+              checked="true"
+            />
+            <field-label
+              class="font-normal"
+              for="plan-monthly"
+            >Monthly ($9.99/month)</field-label>
+          </field>
+          <field orientation="horizontal">
+            <radio-group-item id="plan-yearly" value="yearly" />
+            <field-label
+              class="font-normal"
+              for="plan-yearly"
+            >Yearly ($99.99/year)</field-label>
+          </field>
+          <field orientation="horizontal">
+            <radio-group-item id="plan-lifetime" value="lifetime" />
+            <field-label
+              class="font-normal"
+              for="plan-lifetime"
+            >Lifetime ($299.99)</field-label>
+          </field>
+        </radio-group>
+      </field-set>
+    </div>
+  </ui>
+</lcui-app>

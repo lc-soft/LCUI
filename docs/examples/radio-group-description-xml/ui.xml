@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <radio-group class="radio-group-demo" value="comfortable">
+      <field orientation="horizontal">
+        <radio-group-item id="desc-r1" value="default" />
+        <field-content>
+          <field-label for="desc-r1">Default</field-label>
+          <field-description
+          >Standard spacing for most use cases.</field-description>
+        </field-content>
+      </field>
+      <field orientation="horizontal">
+        <radio-group-item id="desc-r2" value="comfortable" checked="true" />
+        <field-content>
+          <field-label for="desc-r2">Comfortable</field-label>
+          <field-description>More space between elements.</field-description>
+        </field-content>
+      </field>
+      <field orientation="horizontal">
+        <radio-group-item id="desc-r3" value="compact" />
+        <field-content>
+          <field-label for="desc-r3">Compact</field-label>
+          <field-description
+          >Minimal spacing for dense layouts.</field-description>
+        </field-content>
+      </field>
+    </radio-group>
+  </ui>
+</lcui-app>

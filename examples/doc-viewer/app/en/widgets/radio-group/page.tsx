@@ -1,6 +1,9 @@
 import { Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "../../../components/code-block-copy";
 import RadioGroupBasicDemo from "../../../examples/radio-group-basic/index";
+import RadioGroupDescriptionDemo from "../../../examples/radio-group-description/index";
+import RadioGroupChoiceCardDemo from "../../../examples/radio-group-choice-card/index";
+import RadioGroupFieldsetDemo from "../../../examples/radio-group-fieldset/index";
 import RadioGroupDisabledDemo from "../../../examples/radio-group-disabled/index";
 import FieldTable from "../../../components/field-table";
 import { radioGroupFields } from "../../../widget-fields/radio-group";
@@ -64,6 +67,12 @@ export default function RadioGroupDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>Examples</h2>
+        <h3>Description</h3>
+        <RadioGroupDescriptionDemo />
+        <h3>Choice card</h3>
+        <RadioGroupChoiceCardDemo />
+        <h3>Fieldset</h3>
+        <RadioGroupFieldsetDemo />
         <h3>Disabled</h3>
         <RadioGroupDisabledDemo />
       </Widget>

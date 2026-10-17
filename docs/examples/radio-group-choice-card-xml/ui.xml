@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <radio-group class="radio-group-demo" value="plus">
+      <field-label for="plus-plan">
+        <field orientation="horizontal">
+          <field-content>
+            <field-title>Plus</field-title>
+            <field-description
+            >For individuals and small teams.</field-description>
+          </field-content>
+          <radio-group-item id="plus-plan" value="plus" checked="true" />
+        </field>
+      </field-label>
+      <field-label for="pro-plan">
+        <field orientation="horizontal">
+          <field-content>
+            <field-title>Pro</field-title>
+            <field-description>For growing businesses.</field-description>
+          </field-content>
+          <radio-group-item id="pro-plan" value="pro" />
+        </field>
+      </field-label>
+      <field-label for="enterprise-plan">
+        <field orientation="horizontal">
+          <field-content>
+            <field-title>Enterprise</field-title>
+            <field-description
+            >For large teams and enterprises.</field-description>
+          </field-content>
+          <radio-group-item id="enterprise-plan" value="enterprise" />
+        </field>
+      </field-label>
+    </radio-group>
+  </ui>
+</lcui-app>

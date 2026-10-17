@@ -19,31 +19,22 @@ static ui_widget_prototype_t *ui_radio_group_prototype = NULL;
 static ui_widget_prototype_t *ui_radio_group_item_prototype = NULL;
 
 static const char *ui_radio_group_css = "\
-radio-group {\
-  display: flex;\
-  flex-wrap: wrap;\
-  gap: 8px;\
-}\
 radio-group-item {\
   display: inline-flex;\
   cursor: pointer;\
   align-items: center;\
   justify-content: center;\
   width: 16px; height: 16px;\
-  border: 1px solid #ccc;\
+  border: 1px solid #e5e5e5;\
   border-radius: 8px;\
   vertical-align: middle;\
-}\
-radio-group-item:checked {\
-  border-color: #1e88e5;\
 }\
 radio-group-item .indicator {\
   display: none;\
   width: 8px; height: 8px;\
-  background-color: #1e88e5; border-radius: 4px;\
+  border-radius: 4px;\
 }\
-radio-group-item:checked .indicator { display: block; }\
-radio-group-item:disabled { opacity: 0.5; }";
+radio-group-item:checked .indicator { display: block; }";
 
 static bool ui_widget_is_radio_item(ui_widget_t *w)
 {

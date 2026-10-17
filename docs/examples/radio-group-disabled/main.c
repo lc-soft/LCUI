@@ -12,13 +12,16 @@ void radio_group_disabled_init(ui_widget_t *parent)
         int i;
 
         group = ui_create_radio_group();
+        ui_widget_add_class(group, "radio-group-demo");
         ui_widget_set_attr(group, "value", "option2");
 
         for (i = 0; i < 3; ++i) {
                 rows[i] = ui_create_widget(NULL);
                 ui_widget_set_style_string(rows[i], "display", "flex");
+                ui_widget_set_style_string(rows[i], "flex-direction", "row");
                 ui_widget_set_style_string(rows[i], "align-items", "center");
                 ui_widget_set_style_string(rows[i], "gap", "8px");
+                ui_widget_set_style_string(rows[i], "flex-wrap", "nowrap");
 
                 items[i] = ui_create_radio_group_item();
                 ui_widget_set_id(items[i], ids[i]);

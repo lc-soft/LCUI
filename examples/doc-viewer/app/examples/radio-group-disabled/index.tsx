@@ -28,22 +28,24 @@ export default function RadioGroupDisabledDemo() {
           <Text className="code-line">{` `}</Text>
           <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]App[/color]([color=#0550ae][/color]) {`}</Text>
           <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
-          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]RadioGroup[/color] [color=#0550ae]value[/color]=[color=#0a3069]"option2"[/color]>[/color]`}</Text>
-          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex items-center gap-3"[/color]>[/color]`}</Text>
-          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]RadioGroupItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"disabled"[/color] [color=#0550ae]id[/color]=[color=#0a3069]"rd1"[/color] [color=#0550ae]disabled[/color]=[color=#0a3069]{true}[/color] />[/color]`}</Text>
+          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]RadioGroup[/color] [color=#0550ae]value[/color]=[color=#0a3069]"option2"[/color] [color=#0550ae]className[/color]=[color=#0a3069]"radio-group-demo"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex flex-row items-center gap-3 flex-nowrap"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]RadioGroupItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"disabled"[/color] [color=#0550ae]id[/color]=[color=#0a3069]"rd1"[/color] [color=#0550ae]disabled[/color] />[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"rd1"[/color]>[/color]Disabled[color=#116329]</[color=#0550ae]Label[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]</[color=#0550ae]div[/color]>[/color]`}</Text>
-          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex items-center gap-3"[/color]>[/color]`}</Text>
-          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]RadioGroupItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"option2"[/color] [color=#0550ae]id[/color]=[color=#0a3069]"rd2"[/color] [color=#0550ae]checked[/color]=[color=#0a3069]{true}[/color] />[/color]`}</Text>
+          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex flex-row items-center gap-3 flex-nowrap"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]RadioGroupItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"option2"[/color] [color=#0550ae]id[/color]=[color=#0a3069]"rd2"[/color] [color=#0550ae]checked[/color] />[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"rd2"[/color]>[/color]Option 2[color=#116329]</[color=#0550ae]Label[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]</[color=#0550ae]div[/color]>[/color]`}</Text>
-          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex items-center gap-3"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex flex-row items-center gap-3 flex-nowrap"[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]RadioGroupItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"option3"[/color] [color=#0550ae]id[/color]=[color=#0a3069]"rd3"[/color] />[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"rd3"[/color]>[/color]Option 3[color=#116329]</[color=#0550ae]Label[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]</[color=#0550ae]div[/color]>[/color]`}</Text>
           <Text className="code-line">{`    [color=#116329]</[color=#0550ae]RadioGroup[/color]>[/color]`}</Text>
           <Text className="code-line">{`  );`}</Text>
           <Text className="code-line">{`}`}</Text>
+          <Text className="code-line">{` `}</Text>
+          <Text className="code-line">{` `}</Text>
         </Widget>
         <Widget className="code-block-body" data-language="tsx" data-file="main.c" data-source="examples/radio-group-disabled/6" style={{ display: "none" }}>
           <CodeBlockCopy />
@@ -75,13 +77,16 @@ export default function RadioGroupDisabledDemo() {
           <Text className="code-line">{`        [color=#953800]int[/color] i;`}</Text>
           <Text className="code-line">{` `}</Text>
           <Text className="code-line">{`        group = ui_create_radio_group();`}</Text>
+          <Text className="code-line">{`        ui_widget_add_class(group, [color=#0a3069]"radio-group-demo"[/color]);`}</Text>
           <Text className="code-line">{`        ui_widget_set_attr(group, [color=#0a3069]"value"[/color], [color=#0a3069]"option2"[/color]);`}</Text>
           <Text className="code-line">{` `}</Text>
           <Text className="code-line">{`        [color=#cf222e]for[/color] (i = [color=#0550ae]0[/color]; i < [color=#0550ae]3[/color]; ++i) {`}</Text>
           <Text className="code-line">{`                rows\\[i] = ui_create_widget([color=#0550ae]NULL[/color]);`}</Text>
           <Text className="code-line">{`                ui_widget_set_style_string(rows\\[i], [color=#0a3069]"display"[/color], [color=#0a3069]"flex"[/color]);`}</Text>
+          <Text className="code-line">{`                ui_widget_set_style_string(rows\\[i], [color=#0a3069]"flex-direction"[/color], [color=#0a3069]"row"[/color]);`}</Text>
           <Text className="code-line">{`                ui_widget_set_style_string(rows\\[i], [color=#0a3069]"align-items"[/color], [color=#0a3069]"center"[/color]);`}</Text>
           <Text className="code-line">{`                ui_widget_set_style_string(rows\\[i], [color=#0a3069]"gap"[/color], [color=#0a3069]"8px"[/color]);`}</Text>
+          <Text className="code-line">{`                ui_widget_set_style_string(rows\\[i], [color=#0a3069]"flex-wrap"[/color], [color=#0a3069]"nowrap"[/color]);`}</Text>
           <Text className="code-line">{` `}</Text>
           <Text className="code-line">{`                items\\[i] = ui_create_radio_group_item();`}</Text>
           <Text className="code-line">{`                ui_widget_set_id(items\\[i], ids\\[i]);`}</Text>
@@ -109,22 +114,23 @@ export default function RadioGroupDisabledDemo() {
           <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
           <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
           <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
-          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]radio-group[/color] [color=#0550ae]value[/color]=[color=#0a3069]"option2"[/color]>[/color]`}</Text>
-          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]style[/color]=[color=#0a3069]"display:flex; align-items:center; gap:8px"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]radio-group[/color] [color=#0550ae]class[/color]=[color=#0a3069]"radio-group-demo"[/color] [color=#0550ae]value[/color]=[color=#0a3069]"option2"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]style[/color]=[color=#0a3069]"display:flex; flex-direction:row; align-items:center; gap:8px; flex-wrap:nowrap"[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]radio-group-item[/color] [color=#0550ae]id[/color]=[color=#0a3069]"rd1"[/color] [color=#0550ae]value[/color]=[color=#0a3069]"disabled"[/color] [color=#0550ae]disabled[/color]=[color=#0a3069]"true"[/color] />[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"rd1"[/color]>[/color]Disabled[color=#116329]</[color=#0550ae]label[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]</[color=#0550ae]div[/color]>[/color]`}</Text>
-          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]style[/color]=[color=#0a3069]"display:flex; align-items:center; gap:8px"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]style[/color]=[color=#0a3069]"display:flex; flex-direction:row; align-items:center; gap:8px; flex-wrap:nowrap"[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]radio-group-item[/color] [color=#0550ae]id[/color]=[color=#0a3069]"rd2"[/color] [color=#0550ae]value[/color]=[color=#0a3069]"option2"[/color] [color=#0550ae]checked[/color]=[color=#0a3069]"true"[/color] />[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"rd2"[/color]>[/color]Option 2[color=#116329]</[color=#0550ae]label[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]</[color=#0550ae]div[/color]>[/color]`}</Text>
-          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]style[/color]=[color=#0a3069]"display:flex; align-items:center; gap:8px"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]style[/color]=[color=#0a3069]"display:flex; flex-direction:row; align-items:center; gap:8px; flex-wrap:nowrap"[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]radio-group-item[/color] [color=#0550ae]id[/color]=[color=#0a3069]"rd3"[/color] [color=#0550ae]value[/color]=[color=#0a3069]"option3"[/color] />[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"rd3"[/color]>[/color]Option 3[color=#116329]</[color=#0550ae]label[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]</[color=#0550ae]div[/color]>[/color]`}</Text>
           <Text className="code-line">{`    [color=#116329]</[color=#0550ae]radio-group[/color]>[/color]`}</Text>
           <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ui[/color]>[/color]`}</Text>
           <Text className="code-line">{`[color=#116329]</[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+          <Text className="code-line">{` `}</Text>
         </Widget>
         <Widget className="code-block-body" data-language="xml" data-file="main.c" data-source="examples/radio-group-disabled/9" style={{ display: "none" }}>
           <CodeBlockCopy />

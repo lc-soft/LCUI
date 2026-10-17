@@ -1,0 +1,40 @@
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldLabel,
+  RadioGroup,
+  RadioGroupItem,
+} from "@lcui/react";
+
+export default function App() {
+  return (
+    <RadioGroup value="comfortable" className="radio-group-demo">
+      <Field orientation="horizontal">
+        <RadioGroupItem value="default" id="desc-r1" />
+        <FieldContent>
+          <FieldLabel htmlFor="desc-r1">Default</FieldLabel>
+          <FieldDescription>
+            Standard spacing for most use cases.
+          </FieldDescription>
+        </FieldContent>
+      </Field>
+      <Field orientation="horizontal">
+        <RadioGroupItem value="comfortable" id="desc-r2" checked />
+        <FieldContent>
+          <FieldLabel htmlFor="desc-r2">Comfortable</FieldLabel>
+          <FieldDescription>More space between elements.</FieldDescription>
+        </FieldContent>
+      </Field>
+      <Field orientation="horizontal">
+        <RadioGroupItem value="compact" id="desc-r3" />
+        <FieldContent>
+          <FieldLabel htmlFor="desc-r3">Compact</FieldLabel>
+          <FieldDescription>
+            Minimal spacing for dense layouts.
+          </FieldDescription>
+        </FieldContent>
+      </Field>
+    </RadioGroup>
+  );
+}
