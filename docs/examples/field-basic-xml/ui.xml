@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <lcui-app>
   <ui>
-    <div style="display:flex; flex-direction:column; gap:8px; max-width:400px">
+    <div class="field-demo field-basic-demo">
       <field-set>
         <field-legend>Payment Method</field-legend>
         <field-description
@@ -17,16 +17,50 @@
             <field-description
             >Enter your 16-digit card number</field-description>
           </field>
-          <div style="display:flex; gap:16px">
-            <field style="flex:1">
+          <div class="field-basic-card-row">
+            <field class="field-basic-card-field">
               <field-label for="card-month">Month</field-label>
-              <textinput id="card-month" placeholder="MM" />
+              <select>
+                <select-trigger id="card-month">
+                  <select-value data-select-placeholder="MM" />
+                </select-trigger>
+                <portal>
+                  <select-content>
+                    <select-item value="01">01</select-item>
+                    <select-item value="02">02</select-item>
+                    <select-item value="03">03</select-item>
+                    <select-item value="04">04</select-item>
+                    <select-item value="05">05</select-item>
+                    <select-item value="06">06</select-item>
+                    <select-item value="07">07</select-item>
+                    <select-item value="08">08</select-item>
+                    <select-item value="09">09</select-item>
+                    <select-item value="10">10</select-item>
+                    <select-item value="11">11</select-item>
+                    <select-item value="12">12</select-item>
+                  </select-content>
+                </portal>
+              </select>
             </field>
-            <field style="flex:1">
+            <field class="field-basic-card-field">
               <field-label for="card-year">Year</field-label>
-              <textinput id="card-year" placeholder="YYYY" />
+              <select>
+                <select-trigger id="card-year">
+                  <select-value data-select-placeholder="YYYY" />
+                </select-trigger>
+                <portal>
+                  <select-content>
+                    <select-item value="2024">2024</select-item>
+                    <select-item value="2025">2025</select-item>
+                    <select-item value="2026">2026</select-item>
+                    <select-item value="2027">2027</select-item>
+                    <select-item value="2028">2028</select-item>
+                    <select-item value="2029">2029</select-item>
+                  </select-content>
+                </portal>
+              </select>
             </field>
-            <field style="flex:1">
+            <field class="field-basic-card-field">
               <field-label for="card-cvv">CVV</field-label>
               <textinput id="card-cvv" placeholder="123" />
             </field>
@@ -42,13 +76,14 @@
           <field orientation="horizontal">
             <checkbox id="billing-same" />
             <field-label
+              class="font-normal"
               for="billing-same"
             >Same as shipping address</field-label>
           </field>
         </field-group>
       </field-set>
       <field orientation="horizontal">
-        <button>Submit</button>
+        <button variant="primary">Submit</button>
         <button>Cancel</button>
       </field>
     </div>

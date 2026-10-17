@@ -13,6 +13,7 @@ static void make_check_field(ui_widget_t *parent, const char *id,
         ui_widget_t *cb = ui_create_checkbox();
         ui_widget_t *lbl = ui_create_field_label();
 
+        ui_widget_add_class(lbl, "font-normal");
         ui_field_set_orientation(row, "horizontal");
         ui_widget_set_id(cb, id);
         if (checked) {
@@ -47,10 +48,7 @@ void field_group_init(ui_widget_t *parent)
         sub2 = ui_create_field_group();
         sep = ui_create_field_separator();
 
-        ui_widget_set_style_string(outer, "display", "flex");
-        ui_widget_set_style_string(outer, "flex-direction", "column");
-        ui_widget_set_style_string(outer, "gap", "8px");
-        ui_widget_set_style_string(outer, "max-width", "400px");
+        ui_widget_add_class(outer, "field-demo");
 
         ui_widget_append(group, set1);
         ui_text_set_content(lbl1, "Responses");

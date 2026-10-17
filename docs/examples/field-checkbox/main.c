@@ -13,6 +13,7 @@ static void make_check_row(ui_widget_t *parent, const char *id,
         ui_widget_t *cb = ui_create_checkbox();
         ui_widget_t *lbl = ui_create_field_label();
 
+        ui_widget_add_class(lbl, "font-normal");
         ui_field_set_orientation(row, "horizontal");
         ui_widget_set_id(cb, id);
         if (checked) {
@@ -44,17 +45,14 @@ void field_checkbox_init(ui_widget_t *parent)
         sync_lbl = ui_create_field_label();
         sync_desc = ui_create_field_description();
 
-        ui_widget_set_style_string(outer, "display", "flex");
-        ui_widget_set_style_string(outer, "flex-direction", "column");
-        ui_widget_set_style_string(outer, "gap", "8px");
-        ui_widget_set_style_string(outer, "max-width", "400px");
+        ui_widget_add_class(outer, "field-demo");
 
         ui_text_set_content(legend, "Show these items on the desktop");
         ui_widget_append(set, legend);
         ui_text_set_content(
             desc, "Select the items you want to show on the desktop.");
         ui_widget_append(set, desc);
-        ui_widget_set_style_string(group, "gap", "12px");
+        ui_widget_add_class(group, "field-checkbox-demo-group");
         ui_widget_append(set, group);
 
         make_check_row(group, "finder-pref-9k2-hard-disks-ljj", "Hard disks",

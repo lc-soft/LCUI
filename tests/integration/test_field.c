@@ -158,6 +158,37 @@ static void field_label_has_class(void)
         ui_widget_destroy(field);
 }
 
+static void field_set_legend_spacing(void)
+{
+        ui_widget_t *set = ui_create_field_set();
+        ui_widget_t *legend = ui_create_field_legend();
+        ui_widget_t *desc = ui_create_field_description();
+        ui_widget_t *group = ui_create_field_group();
+        float legend_desc_gap;
+        float desc_group_gap;
+
+        ui_text_set_content(legend, "Payment Method");
+        ui_text_set_content(desc, "All transactions are secure and encrypted");
+        ui_widget_append(set, legend);
+        ui_widget_append(set, desc);
+        ui_widget_append(set, group);
+        ui_widget_append(ui_root(), set);
+        ui_update();
+
+        legend_desc_gap = desc->border_box.y -
+                          (legend->border_box.y + legend->border_box.height);
+        desc_group_gap = group->content_box.y -
+                         (desc->border_box.y + desc->border_box.height);
+
+        ctest_equal_int("legend should sit tight to the description",
+                        legend_desc_gap < 1.0f && legend_desc_gap > -1.0f, 1);
+        ctest_equal_int("description should keep the set gap to the group",
+                        desc_group_gap > 15.0f && desc_group_gap < 17.0f, 1);
+
+        ui_widget_destroy(set);
+        ui_clear_trash();
+}
+
 void test_field(void)
 {
         lcui_init();
@@ -168,6 +199,7 @@ void test_field(void)
         ctest_describe("field composition", field_composition);
         ctest_describe("field has-class", field_has_class);
         ctest_describe("field-label has-class", field_label_has_class);
+        ctest_describe("field-set legend spacing", field_set_legend_spacing);
 
         lcui_destroy();
 }

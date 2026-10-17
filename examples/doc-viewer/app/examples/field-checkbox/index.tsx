@@ -47,25 +47,37 @@ export default function FieldCheckboxDemo() {
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]FieldGroup[/color] [color=#0550ae]className[/color]=[color=#0a3069]"gap-3"[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]Field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]Checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"finder-pref-9k2-hard-disks-ljj"[/color] [color=#0550ae]defaultChecked[/color] />[/color]`}</Text>
-          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"finder-pref-9k2-hard-disks-ljj"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldLabel[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]htmlFor[/color]=[color=#0a3069]"finder-pref-9k2-hard-disks-ljj"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]className[/color]=[color=#0a3069]"font-normal"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]            >[/color]`}</Text>
           <Text className="code-line">{`              Hard disks`}</Text>
           <Text className="code-line">{`            [color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]Field[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]Field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]Checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"finder-pref-9k2-external-disks-1yg"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"finder-pref-9k2-external-disks-1yg"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldLabel[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]htmlFor[/color]=[color=#0a3069]"finder-pref-9k2-external-disks-1yg"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]className[/color]=[color=#0a3069]"font-normal"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]            >[/color]`}</Text>
           <Text className="code-line">{`              External disks`}</Text>
           <Text className="code-line">{`            [color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]Field[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]Field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]Checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"finder-pref-9k2-cds-dvds-fzt"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"finder-pref-9k2-cds-dvds-fzt"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldLabel[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]htmlFor[/color]=[color=#0a3069]"finder-pref-9k2-cds-dvds-fzt"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]className[/color]=[color=#0a3069]"font-normal"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]            >[/color]`}</Text>
           <Text className="code-line">{`              CDs, DVDs, and iPods`}</Text>
           <Text className="code-line">{`            [color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]Field[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]Field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]Checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"finder-pref-9k2-connected-servers-6l2"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"finder-pref-9k2-connected-servers-6l2"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldLabel[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]htmlFor[/color]=[color=#0a3069]"finder-pref-9k2-connected-servers-6l2"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]className[/color]=[color=#0a3069]"font-normal"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]            >[/color]`}</Text>
           <Text className="code-line">{`              Connected servers`}</Text>
           <Text className="code-line">{`            [color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]Field[/color]>[/color]`}</Text>
@@ -121,6 +133,7 @@ export default function FieldCheckboxDemo() {
           <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *cb = ui_create_checkbox();`}</Text>
           <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *lbl = ui_create_field_label();`}</Text>
           <Text className="code-line">{` `}</Text>
+          <Text className="code-line">{`        ui_widget_add_class(lbl, [color=#0a3069]"font-normal"[/color]);`}</Text>
           <Text className="code-line">{`        ui_field_set_orientation(row, [color=#0a3069]"horizontal"[/color]);`}</Text>
           <Text className="code-line">{`        ui_widget_set_id(cb, id);`}</Text>
           <Text className="code-line">{`        [color=#cf222e]if[/color] (checked) {`}</Text>
@@ -152,17 +165,14 @@ export default function FieldCheckboxDemo() {
           <Text className="code-line">{`        sync_lbl = ui_create_field_label();`}</Text>
           <Text className="code-line">{`        sync_desc = ui_create_field_description();`}</Text>
           <Text className="code-line">{` `}</Text>
-          <Text className="code-line">{`        ui_widget_set_style_string(outer, [color=#0a3069]"display"[/color], [color=#0a3069]"flex"[/color]);`}</Text>
-          <Text className="code-line">{`        ui_widget_set_style_string(outer, [color=#0a3069]"flex-direction"[/color], [color=#0a3069]"column"[/color]);`}</Text>
-          <Text className="code-line">{`        ui_widget_set_style_string(outer, [color=#0a3069]"gap"[/color], [color=#0a3069]"8px"[/color]);`}</Text>
-          <Text className="code-line">{`        ui_widget_set_style_string(outer, [color=#0a3069]"max-width"[/color], [color=#0a3069]"400px"[/color]);`}</Text>
+          <Text className="code-line">{`        ui_widget_add_class(outer, [color=#0a3069]"field-demo"[/color]);`}</Text>
           <Text className="code-line">{` `}</Text>
           <Text className="code-line">{`        ui_text_set_content(legend, [color=#0a3069]"Show these items on the desktop"[/color]);`}</Text>
           <Text className="code-line">{`        ui_widget_append([color=#953800]set[/color], legend);`}</Text>
           <Text className="code-line">{`        ui_text_set_content(`}</Text>
           <Text className="code-line">{`            desc, [color=#0a3069]"Select the items you want to show on the desktop."[/color]);`}</Text>
           <Text className="code-line">{`        ui_widget_append([color=#953800]set[/color], desc);`}</Text>
-          <Text className="code-line">{`        ui_widget_set_style_string(group, [color=#0a3069]"gap"[/color], [color=#0a3069]"12px"[/color]);`}</Text>
+          <Text className="code-line">{`        ui_widget_add_class(group, [color=#0a3069]"field-checkbox-demo-group"[/color]);`}</Text>
           <Text className="code-line">{`        ui_widget_append([color=#953800]set[/color], group);`}</Text>
           <Text className="code-line">{` `}</Text>
           <Text className="code-line">{`        make_check_row(group, [color=#0a3069]"finder-pref-9k2-hard-disks-ljj"[/color], [color=#0a3069]"Hard disks"[/color],`}</Text>
@@ -199,33 +209,37 @@ export default function FieldCheckboxDemo() {
           <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
           <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
           <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
-          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]style[/color]=[color=#0a3069]"display:flex; flex-direction:column; gap:8px; max-width:400px"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]class[/color]=[color=#0a3069]"field-demo"[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]<[color=#0550ae]field-set[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-legend[/color]>[/color]Show these items on the desktop[color=#116329]</[color=#0550ae]field-legend[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-description[/color][/color]`}</Text>
           <Text className="code-line">{`[color=#116329]        >[/color]Select the items you want to show on the desktop.[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
-          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-group[/color] [color=#0550ae]style[/color]=[color=#0a3069]"gap:12px"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-group[/color] [color=#0550ae]class[/color]=[color=#0a3069]"field-checkbox-demo-group"[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"finder-pref-9k2-hard-disks-ljj"[/color] [color=#0550ae]checked[/color]=[color=#0a3069]"true"[/color] />[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]class[/color]=[color=#0a3069]"font-normal"[/color][/color]`}</Text>
           <Text className="code-line">{`[color=#116329]              [color=#0550ae]for[/color]=[color=#0a3069]"finder-pref-9k2-hard-disks-ljj"[/color][/color]`}</Text>
           <Text className="code-line">{`[color=#116329]            >[/color]Hard disks[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"finder-pref-9k2-external-disks-1yg"[/color] />[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]class[/color]=[color=#0a3069]"font-normal"[/color][/color]`}</Text>
           <Text className="code-line">{`[color=#116329]              [color=#0550ae]for[/color]=[color=#0a3069]"finder-pref-9k2-external-disks-1yg"[/color][/color]`}</Text>
           <Text className="code-line">{`[color=#116329]            >[/color]External disks[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"finder-pref-9k2-cds-dvds-fzt"[/color] />[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]class[/color]=[color=#0a3069]"font-normal"[/color][/color]`}</Text>
           <Text className="code-line">{`[color=#116329]              [color=#0550ae]for[/color]=[color=#0a3069]"finder-pref-9k2-cds-dvds-fzt"[/color][/color]`}</Text>
           <Text className="code-line">{`[color=#116329]            >[/color]CDs, DVDs, and iPods[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"finder-pref-9k2-connected-servers-6l2"[/color] />[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]class[/color]=[color=#0a3069]"font-normal"[/color][/color]`}</Text>
           <Text className="code-line">{`[color=#116329]              [color=#0550ae]for[/color]=[color=#0a3069]"finder-pref-9k2-connected-servers-6l2"[/color][/color]`}</Text>
           <Text className="code-line">{`[color=#116329]            >[/color]Connected servers[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>

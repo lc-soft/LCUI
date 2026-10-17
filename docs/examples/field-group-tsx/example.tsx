@@ -22,7 +22,9 @@ export default function App() {
           <FieldGroup>
             <Field orientation="horizontal">
               <Checkbox id="push" defaultChecked disabled />
-              <FieldLabel htmlFor="push">Push notifications</FieldLabel>
+              <FieldLabel htmlFor="push" className="font-normal">
+                Push notifications
+              </FieldLabel>
             </Field>
           </FieldGroup>
         </FieldSet>
@@ -35,11 +37,15 @@ export default function App() {
           <FieldGroup>
             <Field orientation="horizontal">
               <Checkbox id="push-tasks" />
-              <FieldLabel htmlFor="push-tasks">Push notifications</FieldLabel>
+              <FieldLabel htmlFor="push-tasks" className="font-normal">
+                Push notifications
+              </FieldLabel>
             </Field>
             <Field orientation="horizontal">
               <Checkbox id="email-tasks" />
-              <FieldLabel htmlFor="email-tasks">Email notifications</FieldLabel>
+              <FieldLabel htmlFor="email-tasks" className="font-normal">
+                Email notifications
+              </FieldLabel>
             </Field>
           </FieldGroup>
         </FieldSet>

@@ -6,6 +6,28 @@
 
 #include <LCUI.h>
 
+static const char *month_items[12] = { "01", "02", "03", "04", "05", "06",
+                                       "07", "08", "09", "10", "11", "12" };
+static const char *year_items[6] = { "2024", "2025", "2026",
+                                     "2027", "2028", "2029" };
+
+/* Build a select and point the field label at its real trigger button. */
+static ui_widget_t *create_select(const char *id, const char *placeholder,
+                                  const char *const *items, int count)
+{
+        ui_widget_t *select = ui_create_select();
+        ui_widget_t *button;
+        int i;
+
+        ui_select_set_placeholder(select, placeholder);
+        for (i = 0; i < count; ++i) {
+                ui_select_add_item(select, items[i], items[i]);
+        }
+        button = ui_widget_get_child(ui_widget_get_child(select, 0), 0);
+        ui_widget_set_id(button, id);
+        return select;
+}
+
 void field_basic_init(ui_widget_t *parent)
 {
         ui_widget_t *outer;
@@ -13,8 +35,8 @@ void field_basic_init(ui_widget_t *parent)
         ui_widget_t *name_field, *name_lbl, *name_input;
         ui_widget_t *card_field, *card_lbl, *card_input, *card_desc;
         ui_widget_t *card_row;
-        ui_widget_t *month_field, *month_lbl, *month_input;
-        ui_widget_t *year_field, *year_lbl, *year_input;
+        ui_widget_t *month_field, *month_lbl, *month_select;
+        ui_widget_t *year_field, *year_lbl, *year_select;
         ui_widget_t *cvv_field, *cvv_lbl, *cvv_input;
         ui_widget_t *sep;
         ui_widget_t *set2, *legend2, *desc2, *group2;
@@ -36,10 +58,8 @@ void field_basic_init(ui_widget_t *parent)
         card_row = ui_create_widget(NULL);
         month_field = ui_create_field();
         month_lbl = ui_create_field_label();
-        month_input = ui_create_widget("textinput");
         year_field = ui_create_field();
         year_lbl = ui_create_field_label();
-        year_input = ui_create_widget("textinput");
         cvv_field = ui_create_field();
         cvv_lbl = ui_create_field_label();
         cvv_input = ui_create_widget("textinput");
@@ -51,14 +71,13 @@ void field_basic_init(ui_widget_t *parent)
         same_field = ui_create_field();
         same_cb = ui_create_checkbox();
         same_lbl = ui_create_field_label();
+        ui_widget_add_class(same_lbl, "font-normal");
         actions = ui_create_field();
         submit = ui_create_widget("button");
         cancel = ui_create_widget("button");
 
-        ui_widget_set_style_string(outer, "display", "flex");
-        ui_widget_set_style_string(outer, "flex-direction", "column");
-        ui_widget_set_style_string(outer, "gap", "8px");
-        ui_widget_set_style_string(outer, "max-width", "400px");
+        ui_widget_add_class(outer, "field-demo");
+        ui_widget_add_class(outer, "field-basic-demo");
 
         ui_text_set_content(legend1, "Payment Method");
         ui_widget_append(set1, legend1);
@@ -84,26 +103,23 @@ void field_basic_init(ui_widget_t *parent)
         ui_widget_append(card_field, card_desc);
         ui_widget_append(group1, card_field);
 
-        ui_widget_set_style_string(card_row, "display", "flex");
-        ui_widget_set_style_string(card_row, "gap", "16px");
-        ui_widget_set_style_string(month_field, "flex", "1");
-        ui_widget_set_style_string(year_field, "flex", "1");
-        ui_widget_set_style_string(cvv_field, "flex", "1");
+        ui_widget_add_class(card_row, "field-basic-card-row");
+        ui_widget_add_class(month_field, "field-basic-card-field");
+        ui_widget_add_class(year_field, "field-basic-card-field");
+        ui_widget_add_class(cvv_field, "field-basic-card-field");
 
         ui_label_set_for(month_lbl, "card-month");
         ui_text_set_content(month_lbl, "Month");
         ui_widget_append(month_field, month_lbl);
-        ui_textinput_set_placeholder(month_input, "MM");
-        ui_widget_set_id(month_input, "card-month");
-        ui_widget_append(month_field, month_input);
+        month_select = create_select("card-month", "MM", month_items, 12);
+        ui_widget_append(month_field, month_select);
         ui_widget_append(card_row, month_field);
 
         ui_label_set_for(year_lbl, "card-year");
         ui_text_set_content(year_lbl, "Year");
         ui_widget_append(year_field, year_lbl);
-        ui_textinput_set_placeholder(year_input, "YYYY");
-        ui_widget_set_id(year_input, "card-year");
-        ui_widget_append(year_field, year_input);
+        year_select = create_select("card-year", "YYYY", year_items, 6);
+        ui_widget_append(year_field, year_select);
         ui_widget_append(card_row, year_field);
 
         ui_label_set_for(cvv_lbl, "card-cvv");
@@ -138,6 +154,7 @@ void field_basic_init(ui_widget_t *parent)
 
         ui_field_set_orientation(actions, "horizontal");
         ui_button_set_text(submit, "Submit");
+        ui_button_set_variant(submit, UI_BUTTON_VARIANT_PRIMARY);
         ui_widget_append(actions, submit);
         ui_button_set_text(cancel, "Cancel");
         ui_widget_append(actions, cancel);

@@ -36,10 +36,7 @@ void field_choice_card_init(ui_widget_t *parent)
         item1 = ui_create_radio_group_item();
         item2 = ui_create_radio_group_item();
 
-        ui_widget_set_style_string(outer, "display", "flex");
-        ui_widget_set_style_string(outer, "flex-direction", "column");
-        ui_widget_set_style_string(outer, "gap", "8px");
-        ui_widget_set_style_string(outer, "max-width", "400px");
+        ui_widget_add_class(outer, "field-demo");
 
         ui_widget_append(group, set);
         ui_label_set_for(lbl, "compute-environment");

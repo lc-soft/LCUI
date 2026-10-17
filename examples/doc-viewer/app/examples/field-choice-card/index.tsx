@@ -134,10 +134,7 @@ export default function FieldChoiceCardDemo() {
           <Text className="code-line">{`        item1 = ui_create_radio_group_item();`}</Text>
           <Text className="code-line">{`        item2 = ui_create_radio_group_item();`}</Text>
           <Text className="code-line">{` `}</Text>
-          <Text className="code-line">{`        ui_widget_set_style_string(outer, [color=#0a3069]"display"[/color], [color=#0a3069]"flex"[/color]);`}</Text>
-          <Text className="code-line">{`        ui_widget_set_style_string(outer, [color=#0a3069]"flex-direction"[/color], [color=#0a3069]"column"[/color]);`}</Text>
-          <Text className="code-line">{`        ui_widget_set_style_string(outer, [color=#0a3069]"gap"[/color], [color=#0a3069]"8px"[/color]);`}</Text>
-          <Text className="code-line">{`        ui_widget_set_style_string(outer, [color=#0a3069]"max-width"[/color], [color=#0a3069]"400px"[/color]);`}</Text>
+          <Text className="code-line">{`        ui_widget_add_class(outer, [color=#0a3069]"field-demo"[/color]);`}</Text>
           <Text className="code-line">{` `}</Text>
           <Text className="code-line">{`        ui_widget_append(group, [color=#953800]set[/color]);`}</Text>
           <Text className="code-line">{`        ui_label_set_for(lbl, [color=#0a3069]"compute-environment"[/color]);`}</Text>
@@ -189,7 +186,7 @@ export default function FieldChoiceCardDemo() {
           <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
           <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
           <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
-          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]style[/color]=[color=#0a3069]"display:flex; flex-direction:column; gap:8px; max-width:400px"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]class[/color]=[color=#0a3069]"field-demo"[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]<[color=#0550ae]field-group[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-set[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field-label[/color][/color]`}</Text>

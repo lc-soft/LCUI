@@ -28,10 +28,7 @@ void field_fieldset_init(ui_widget_t *parent)
         zip_lbl = ui_create_field_label();
         zip_input = ui_create_widget("textinput");
 
-        ui_widget_set_style_string(outer, "display", "flex");
-        ui_widget_set_style_string(outer, "flex-direction", "column");
-        ui_widget_set_style_string(outer, "gap", "8px");
-        ui_widget_set_style_string(outer, "max-width", "400px");
+        ui_widget_add_class(outer, "field-demo");
 
         ui_text_set_content(legend, "Address Information");
         ui_widget_append(set, legend);

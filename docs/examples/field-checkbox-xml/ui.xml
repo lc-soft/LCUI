@@ -1,33 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <lcui-app>
   <ui>
-    <div style="display:flex; flex-direction:column; gap:8px; max-width:400px">
+    <div class="field-demo">
       <field-set>
         <field-legend>Show these items on the desktop</field-legend>
         <field-description
         >Select the items you want to show on the desktop.</field-description>
-        <field-group style="gap:12px">
+        <field-group class="field-checkbox-demo-group">
           <field orientation="horizontal">
             <checkbox id="finder-pref-9k2-hard-disks-ljj" checked="true" />
             <field-label
+              class="font-normal"
               for="finder-pref-9k2-hard-disks-ljj"
             >Hard disks</field-label>
           </field>
           <field orientation="horizontal">
             <checkbox id="finder-pref-9k2-external-disks-1yg" />
             <field-label
+              class="font-normal"
               for="finder-pref-9k2-external-disks-1yg"
             >External disks</field-label>
           </field>
           <field orientation="horizontal">
             <checkbox id="finder-pref-9k2-cds-dvds-fzt" />
             <field-label
+              class="font-normal"
               for="finder-pref-9k2-cds-dvds-fzt"
             >CDs, DVDs, and iPods</field-label>
           </field>
           <field orientation="horizontal">
             <checkbox id="finder-pref-9k2-connected-servers-6l2" />
             <field-label
+              class="font-normal"
               for="finder-pref-9k2-connected-servers-6l2"
             >Connected servers</field-label>
           </field>

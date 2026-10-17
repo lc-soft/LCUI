@@ -44,17 +44,21 @@ export default function FieldRadioDemo() {
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]RadioGroup[/color] [color=#0550ae]defaultValue[/color]=[color=#0a3069]"monthly"[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]Field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]RadioGroupItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"monthly"[/color] [color=#0550ae]id[/color]=[color=#0a3069]"plan-monthly"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"plan-monthly"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"plan-monthly"[/color] [color=#0550ae]className[/color]=[color=#0a3069]"font-normal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`              Monthly (\$9.99/month)`}</Text>
           <Text className="code-line">{`            [color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]Field[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]Field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]RadioGroupItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"yearly"[/color] [color=#0550ae]id[/color]=[color=#0a3069]"plan-yearly"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"plan-yearly"[/color]>[/color]Yearly (\$99.99/year)[color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"plan-yearly"[/color] [color=#0550ae]className[/color]=[color=#0a3069]"font-normal"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`              Yearly (\$99.99/year)`}</Text>
+          <Text className="code-line">{`            [color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]Field[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]Field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]RadioGroupItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"lifetime"[/color] [color=#0550ae]id[/color]=[color=#0a3069]"plan-lifetime"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"plan-lifetime"[/color]>[/color]Lifetime (\$299.99)[color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"plan-lifetime"[/color] [color=#0550ae]className[/color]=[color=#0a3069]"font-normal"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`              Lifetime (\$299.99)`}</Text>
+          <Text className="code-line">{`            [color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]Field[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]</[color=#0550ae]RadioGroup[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]</[color=#0550ae]FieldSet[/color]>[/color]`}</Text>
@@ -110,12 +114,10 @@ export default function FieldRadioDemo() {
           <Text className="code-line">{`                row\\[i] = ui_create_field();`}</Text>
           <Text className="code-line">{`                item\\[i] = ui_create_radio_group_item();`}</Text>
           <Text className="code-line">{`                row_lbl\\[i] = ui_create_field_label();`}</Text>
+          <Text className="code-line">{`                ui_widget_add_class(row_lbl\\[i], [color=#0a3069]"font-normal"[/color]);`}</Text>
           <Text className="code-line">{`        }`}</Text>
           <Text className="code-line">{` `}</Text>
-          <Text className="code-line">{`        ui_widget_set_style_string(outer, [color=#0a3069]"display"[/color], [color=#0a3069]"flex"[/color]);`}</Text>
-          <Text className="code-line">{`        ui_widget_set_style_string(outer, [color=#0a3069]"flex-direction"[/color], [color=#0a3069]"column"[/color]);`}</Text>
-          <Text className="code-line">{`        ui_widget_set_style_string(outer, [color=#0a3069]"gap"[/color], [color=#0a3069]"8px"[/color]);`}</Text>
-          <Text className="code-line">{`        ui_widget_set_style_string(outer, [color=#0a3069]"max-width"[/color], [color=#0a3069]"400px"[/color]);`}</Text>
+          <Text className="code-line">{`        ui_widget_add_class(outer, [color=#0a3069]"field-demo"[/color]);`}</Text>
           <Text className="code-line">{` `}</Text>
           <Text className="code-line">{`        ui_text_set_content(lbl, [color=#0a3069]"Subscription Plan"[/color]);`}</Text>
           <Text className="code-line">{`        ui_widget_append([color=#953800]set[/color], lbl);`}</Text>
@@ -147,7 +149,7 @@ export default function FieldRadioDemo() {
           <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
           <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
           <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
-          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]style[/color]=[color=#0a3069]"display:flex; flex-direction:column; gap:8px; max-width:400px"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]class[/color]=[color=#0a3069]"field-demo"[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]<[color=#0550ae]field-set[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-label[/color]>[/color]Subscription Plan[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-description[/color][/color]`}</Text>
@@ -155,15 +157,24 @@ export default function FieldRadioDemo() {
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]radio-group[/color] [color=#0550ae]value[/color]=[color=#0a3069]"monthly"[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]radio-group-item[/color] [color=#0550ae]id[/color]=[color=#0a3069]"plan-monthly"[/color] [color=#0550ae]value[/color]=[color=#0a3069]"monthly"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"plan-monthly"[/color]>[/color]Monthly (\$9.99/month)[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]class[/color]=[color=#0a3069]"font-normal"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]for[/color]=[color=#0a3069]"plan-monthly"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]            >[/color]Monthly (\$9.99/month)[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]radio-group-item[/color] [color=#0550ae]id[/color]=[color=#0a3069]"plan-yearly"[/color] [color=#0550ae]value[/color]=[color=#0a3069]"yearly"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"plan-yearly"[/color]>[/color]Yearly (\$99.99/year)[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]class[/color]=[color=#0a3069]"font-normal"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]for[/color]=[color=#0a3069]"plan-yearly"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]            >[/color]Yearly (\$99.99/year)[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]radio-group-item[/color] [color=#0550ae]id[/color]=[color=#0a3069]"plan-lifetime"[/color] [color=#0550ae]value[/color]=[color=#0a3069]"lifetime"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"plan-lifetime"[/color]>[/color]Lifetime (\$299.99)[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-label[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]class[/color]=[color=#0a3069]"font-normal"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              [color=#0550ae]for[/color]=[color=#0a3069]"plan-lifetime"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]            >[/color]Lifetime (\$299.99)[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]</[color=#0550ae]radio-group[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]</[color=#0550ae]field-set[/color]>[/color]`}</Text>

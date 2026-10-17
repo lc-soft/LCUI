@@ -47,7 +47,9 @@ export default function FieldGroupDemo() {
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]FieldGroup[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]Field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"push"[/color] [color=#0550ae]defaultChecked[/color] [color=#0550ae]disabled[/color] />[/color]`}</Text>
-          <Text className="code-line">{`              [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"push"[/color]>[/color]Push notifications[color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
+          <Text className="code-line">{`              [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"push"[/color] [color=#0550ae]className[/color]=[color=#0a3069]"font-normal"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`                Push notifications`}</Text>
+          <Text className="code-line">{`              [color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]</[color=#0550ae]Field[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]FieldGroup[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]</[color=#0550ae]FieldSet[/color]>[/color]`}</Text>
@@ -60,11 +62,15 @@ export default function FieldGroupDemo() {
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]FieldGroup[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]Field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"push-tasks"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`              [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"push-tasks"[/color]>[/color]Push notifications[color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
+          <Text className="code-line">{`              [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"push-tasks"[/color] [color=#0550ae]className[/color]=[color=#0a3069]"font-normal"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`                Push notifications`}</Text>
+          <Text className="code-line">{`              [color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]</[color=#0550ae]Field[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]Field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"email-tasks"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`              [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"email-tasks"[/color]>[/color]Email notifications[color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
+          <Text className="code-line">{`              [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"email-tasks"[/color] [color=#0550ae]className[/color]=[color=#0a3069]"font-normal"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`                Email notifications`}</Text>
+          <Text className="code-line">{`              [color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]</[color=#0550ae]Field[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]FieldGroup[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]</[color=#0550ae]FieldSet[/color]>[/color]`}</Text>
@@ -106,6 +112,7 @@ export default function FieldGroupDemo() {
           <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *cb = ui_create_checkbox();`}</Text>
           <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *lbl = ui_create_field_label();`}</Text>
           <Text className="code-line">{` `}</Text>
+          <Text className="code-line">{`        ui_widget_add_class(lbl, [color=#0a3069]"font-normal"[/color]);`}</Text>
           <Text className="code-line">{`        ui_field_set_orientation(row, [color=#0a3069]"horizontal"[/color]);`}</Text>
           <Text className="code-line">{`        ui_widget_set_id(cb, id);`}</Text>
           <Text className="code-line">{`        [color=#cf222e]if[/color] (checked) {`}</Text>
@@ -140,10 +147,7 @@ export default function FieldGroupDemo() {
           <Text className="code-line">{`        sub2 = ui_create_field_group();`}</Text>
           <Text className="code-line">{`        sep = ui_create_field_separator();`}</Text>
           <Text className="code-line">{` `}</Text>
-          <Text className="code-line">{`        ui_widget_set_style_string(outer, [color=#0a3069]"display"[/color], [color=#0a3069]"flex"[/color]);`}</Text>
-          <Text className="code-line">{`        ui_widget_set_style_string(outer, [color=#0a3069]"flex-direction"[/color], [color=#0a3069]"column"[/color]);`}</Text>
-          <Text className="code-line">{`        ui_widget_set_style_string(outer, [color=#0a3069]"gap"[/color], [color=#0a3069]"8px"[/color]);`}</Text>
-          <Text className="code-line">{`        ui_widget_set_style_string(outer, [color=#0a3069]"max-width"[/color], [color=#0a3069]"400px"[/color]);`}</Text>
+          <Text className="code-line">{`        ui_widget_add_class(outer, [color=#0a3069]"field-demo"[/color]);`}</Text>
           <Text className="code-line">{` `}</Text>
           <Text className="code-line">{`        ui_widget_append(group, set1);`}</Text>
           <Text className="code-line">{`        ui_text_set_content(lbl1, [color=#0a3069]"Responses"[/color]);`}</Text>
@@ -180,7 +184,7 @@ export default function FieldGroupDemo() {
           <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
           <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
           <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
-          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]style[/color]=[color=#0a3069]"display:flex; flex-direction:column; gap:8px; max-width:400px"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]class[/color]=[color=#0a3069]"field-demo"[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]<[color=#0550ae]field-group[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-set[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field-label[/color]>[/color]Responses[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
@@ -189,7 +193,10 @@ export default function FieldGroupDemo() {
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field-group[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`              [color=#116329]<[color=#0550ae]checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"push"[/color] [color=#0550ae]checked[/color]=[color=#0a3069]"true"[/color] [color=#0550ae]disabled[/color]=[color=#0a3069]"true"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`              [color=#116329]<[color=#0550ae]field-label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"push"[/color]>[/color]Push notifications[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
+          <Text className="code-line">{`              [color=#116329]<[color=#0550ae]field-label[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]                [color=#0550ae]class[/color]=[color=#0a3069]"font-normal"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]                [color=#0550ae]for[/color]=[color=#0a3069]"push"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              >[/color]Push notifications[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]field-group[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]</[color=#0550ae]field-set[/color]>[/color]`}</Text>
@@ -201,11 +208,17 @@ export default function FieldGroupDemo() {
           <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field-group[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`              [color=#116329]<[color=#0550ae]checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"push-tasks"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`              [color=#116329]<[color=#0550ae]field-label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"push-tasks"[/color]>[/color]Push notifications[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
+          <Text className="code-line">{`              [color=#116329]<[color=#0550ae]field-label[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]                [color=#0550ae]class[/color]=[color=#0a3069]"font-normal"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]                [color=#0550ae]for[/color]=[color=#0a3069]"push-tasks"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              >[/color]Push notifications[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
           <Text className="code-line">{`              [color=#116329]<[color=#0550ae]checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"email-tasks"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`              [color=#116329]<[color=#0550ae]field-label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"email-tasks"[/color]>[/color]Email notifications[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
+          <Text className="code-line">{`              [color=#116329]<[color=#0550ae]field-label[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]                [color=#0550ae]class[/color]=[color=#0a3069]"font-normal"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]                [color=#0550ae]for[/color]=[color=#0a3069]"email-tasks"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]              >[/color]Email notifications[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
           <Text className="code-line">{`            [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
           <Text className="code-line">{`          [color=#116329]</[color=#0550ae]field-group[/color]>[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]</[color=#0550ae]field-set[/color]>[/color]`}</Text>

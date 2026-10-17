@@ -8,13 +8,36 @@ import {
   FieldLegend,
   FieldSeparator,
   FieldSet,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   TextInput,
   Widget,
 } from "@lcui/react";
 
+const months = [
+  "01",
+  "02",
+  "03",
+  "04",
+  "05",
+  "06",
+  "07",
+  "08",
+  "09",
+  "10",
+  "11",
+  "12",
+];
+
+const years = ["2024", "2025", "2026", "2027", "2028", "2029"];
+
 export default function App() {
   return (
-    <Widget className="flex flex-col gap-2 max-w-[400px]">
+    <Widget className="flex flex-col gap-5 max-w-[448px] p-1 -m-1">
       <FieldSet>
         <FieldLegend>Payment Method</FieldLegend>
         <FieldDescription>
@@ -33,11 +56,37 @@ export default function App() {
           <div className="flex gap-4">
             <Field className="flex-1">
               <FieldLabel htmlFor="card-month">Month</FieldLabel>
-              <TextInput id="card-month" placeholder="MM" />
+              <Select>
+                <SelectTrigger id="card-month">
+                  <SelectValue placeholder="MM" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {months.map((item) => (
+                      <SelectItem key={item} value={item}>
+                        {item}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </Field>
             <Field className="flex-1">
               <FieldLabel htmlFor="card-year">Year</FieldLabel>
-              <TextInput id="card-year" placeholder="YYYY" />
+              <Select>
+                <SelectTrigger id="card-year">
+                  <SelectValue placeholder="YYYY" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {years.map((item) => (
+                      <SelectItem key={item} value={item}>
+                        {item}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </Field>
             <Field className="flex-1">
               <FieldLabel htmlFor="card-cvv">CVV</FieldLabel>
@@ -55,14 +104,14 @@ export default function App() {
         <FieldGroup>
           <Field orientation="horizontal">
             <Checkbox id="billing-same" />
-            <FieldLabel htmlFor="billing-same">
+            <FieldLabel htmlFor="billing-same" className="font-normal">
               Same as shipping address
             </FieldLabel>
           </Field>
         </FieldGroup>
       </FieldSet>
       <Field orientation="horizontal">
-        <Button>Submit</Button>
+        <Button variant="primary">Submit</Button>
         <Button>Cancel</Button>
       </Field>
     </Widget>

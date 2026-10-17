@@ -28,12 +28,10 @@ void field_radio_init(ui_widget_t *parent)
                 row[i] = ui_create_field();
                 item[i] = ui_create_radio_group_item();
                 row_lbl[i] = ui_create_field_label();
+                ui_widget_add_class(row_lbl[i], "font-normal");
         }
 
-        ui_widget_set_style_string(outer, "display", "flex");
-        ui_widget_set_style_string(outer, "flex-direction", "column");
-        ui_widget_set_style_string(outer, "gap", "8px");
-        ui_widget_set_style_string(outer, "max-width", "400px");
+        ui_widget_add_class(outer, "field-demo");
 
         ui_text_set_content(lbl, "Subscription Plan");
         ui_widget_append(set, lbl);

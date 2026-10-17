@@ -44,73 +44,46 @@ static ui_widget_prototype_t *ui_field_separator_prototype = NULL;
 static ui_widget_prototype_t *ui_field_content_prototype = NULL;
 static ui_widget_prototype_t *ui_field_title_prototype = NULL;
 
+/* Structural rules only; visual refinements live in src/styles/style-nova.css.
+ */
 static const char *ui_field_css = "\
 field {\
   display: flex;\
   flex-direction: column;\
-  gap: 4px;\
-  width: 100%;\
 }\
 field:horizontal {\
   flex-direction: row;\
   align-items: center;\
 }\
+field:horizontal field-label {\
+  flex: 1;\
+}\
 field-set {\
   display: flex;\
   flex-direction: column;\
-  gap: 8px;\
-}\
-field-legend {\
-  font-weight: 600;\
 }\
 field-group {\
   display: flex;\
   flex-direction: column;\
-  gap: 20px;\
-  width: 100%;\
 }\
 field-label {\
   display: flex;\
-  gap: 8px;\
-}\
-field-description {\
-  color: #666;\
-  font-size: 12px;\
-  line-height: 1.5;\
 }\
 field-content {\
   display: flex;\
   flex: 1;\
   flex-direction: column;\
-  gap: 2px;\
-}\
-field-title {\
-  font-weight: 500;\
 }\
 field-separator {\
   display: block;\
-  height: 0;\
-  border-top: 1px solid #e5e5e5;\
-  margin: 0;\
 }\
 field.has-field-content {\
   align-items: flex-start;\
 }\
 field-label.has-field {\
   width: 100%;\
-  border: 1px solid #e5e5e5;\
-  padding: 8px;\
-  border-radius: 6px;\
 }\
-field-label.has-checked {\
-  background-color: rgba(0, 0, 0, 0.05);\
-}\
-field:disabled, field-set:disabled, field-legend:disabled,\
-field-group:disabled, field-label:disabled,\
-field-description:disabled, field-content:disabled,\
-field-title:disabled, field-separator:disabled {\
-  opacity: 0.5;\
-}";
+";
 
 static void find_type_each(ui_widget_t *w, void *arg)
 {
@@ -145,6 +118,13 @@ static void checked_each(ui_widget_t *w, void *arg)
 static bool ui_field_check_has_field_content(ui_widget_t *w)
 {
         struct find_type_args a = { "field-content", false };
+        ui_widget_each(w, find_type_each, &a);
+        return a.found;
+}
+
+static bool ui_field_set_check_has_radio_group(ui_widget_t *w)
+{
+        struct find_type_args a = { "radio-group", false };
         ui_widget_each(w, find_type_each, &a);
         return a.found;
 }
@@ -262,6 +242,13 @@ static void ui_field_on_init(ui_widget_t *w)
                                  ui_field_check_has_field_content, true, false);
 }
 
+static void ui_field_set_on_init(ui_widget_t *w)
+{
+        ui_widget_sync_has_class(w, "has-radio-group",
+                                 ui_field_set_check_has_radio_group, true,
+                                 false);
+}
+
 static void ui_field_label_on_init(ui_widget_t *w)
 {
         ui_field_label_prototype->proto->init(w);
@@ -327,6 +314,7 @@ void ui_register_field(void)
 void ui_register_field_set(void)
 {
         ui_field_set_prototype = ui_create_widget_prototype("field-set", NULL);
+        ui_field_set_prototype->init = ui_field_set_on_init;
 }
 
 void ui_register_field_legend(void)
