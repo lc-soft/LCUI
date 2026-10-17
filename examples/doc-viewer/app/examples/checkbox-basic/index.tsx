@@ -23,15 +23,51 @@ export default function CheckboxBasicDemo() {
         </Widget>
         <Widget className="code-block-body active" data-language="tsx" data-file="example.tsx" data-source="examples/checkbox-basic/5">
           <CodeBlockCopy />
-          <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Checkbox[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
-          <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Label[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
+          <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
+          <Text className="code-line">{`  [color=#8250df]Checkbox[/color],`}</Text>
+          <Text className="code-line">{`  [color=#8250df]Field[/color],`}</Text>
+          <Text className="code-line">{`  [color=#8250df]FieldContent[/color],`}</Text>
+          <Text className="code-line">{`  [color=#8250df]FieldDescription[/color],`}</Text>
+          <Text className="code-line">{`  [color=#8250df]FieldGroup[/color],`}</Text>
+          <Text className="code-line">{`  [color=#8250df]FieldLabel[/color],`}</Text>
+          <Text className="code-line">{`  [color=#8250df]FieldTitle[/color],`}</Text>
+          <Text className="code-line">{`  [color=#8250df]Label[/color],`}</Text>
+          <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
           <Text className="code-line">{` `}</Text>
           <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]App[/color]([color=#0550ae][/color]) {`}</Text>
           <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
-          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Widget[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex gap-2"[/color]>[/color]`}</Text>
-          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"terms"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"terms"[/color]>[/color]Accept terms and conditions[color=#116329]</[color=#0550ae]Label[/color]>[/color]`}</Text>
-          <Text className="code-line">{`    [color=#116329]</[color=#0550ae]Widget[/color]>[/color]`}</Text>
+          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]FieldGroup[/color] [color=#0550ae]className[/color]=[color=#0a3069]"max-w-sm"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"terms-checkbox"[/color] />[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"terms-checkbox"[/color]>[/color]Accept terms and conditions[color=#116329]</[color=#0550ae]Label[/color]>[/color]`}</Text>
+          <Text className="code-line">{`      [color=#116329]</[color=#0550ae]Field[/color]>[/color]`}</Text>
+          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"terms-checkbox-2"[/color] [color=#0550ae]checked[/color] />[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]FieldContent[/color]>[/color]`}</Text>
+          <Text className="code-line">{`          [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]for[/color]=[color=#0a3069]"terms-checkbox-2"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            Accept terms and conditions`}</Text>
+          <Text className="code-line">{`          [color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
+          <Text className="code-line">{`          [color=#116329]<[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            By clicking this checkbox, you agree to the terms.`}</Text>
+          <Text className="code-line">{`          [color=#116329]</[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]</[color=#0550ae]FieldContent[/color]>[/color]`}</Text>
+          <Text className="code-line">{`      [color=#116329]</[color=#0550ae]Field[/color]>[/color]`}</Text>
+          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color] [color=#0550ae]disabled[/color]>[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"toggle-checkbox"[/color] [color=#0550ae]disabled[/color] />[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]for[/color]=[color=#0a3069]"toggle-checkbox"[/color]>[/color]Enable notifications[color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
+          <Text className="code-line">{`      [color=#116329]</[color=#0550ae]Field[/color]>[/color]`}</Text>
+          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]for[/color]=[color=#0a3069]"toggle-checkbox-2"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`          [color=#116329]<[color=#0550ae]Checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"toggle-checkbox-2"[/color] />[/color]`}</Text>
+          <Text className="code-line">{`          [color=#116329]<[color=#0550ae]FieldContent[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldTitle[/color]>[/color]Enable notifications[color=#116329]</[color=#0550ae]FieldTitle[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
+          <Text className="code-line">{`              You can enable and disable notifications at any time.`}</Text>
+          <Text className="code-line">{`            [color=#116329]</[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
+          <Text className="code-line">{`          [color=#116329]</[color=#0550ae]FieldContent[/color]>[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]</[color=#0550ae]Field[/color]>[/color]`}</Text>
+          <Text className="code-line">{`      [color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
+          <Text className="code-line">{`    [color=#116329]</[color=#0550ae]FieldGroup[/color]>[/color]`}</Text>
           <Text className="code-line">{`  );`}</Text>
           <Text className="code-line">{`}`}</Text>
         </Widget>
@@ -55,34 +91,112 @@ export default function CheckboxBasicDemo() {
           <Text className="code-line">{` `}</Text>
           <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]checkbox_basic_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
           <Text className="code-line">{`{`}</Text>
-          <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *cb = ui_create_checkbox();`}</Text>
-          <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *label = ui_create_label();`}</Text>
-          <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *box = ui_create_widget([color=#0550ae]NULL[/color]);`}</Text>
+          <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *group = ui_create_field_group();`}</Text>
+          <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *card;`}</Text>
+          <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *fields\\[[color=#0550ae]4[/color]];`}</Text>
+          <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *boxes\\[[color=#0550ae]4[/color]];`}</Text>
+          <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *contents\\[[color=#0550ae]2[/color]];`}</Text>
+          <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *labels\\[[color=#0550ae]3[/color]];`}</Text>
+          <Text className="code-line">{`        [color=#953800]const[/color] [color=#953800]char[/color] *ids\\[[color=#0550ae]4[/color]] = { [color=#0a3069]"terms-checkbox"[/color], [color=#0a3069]"terms-checkbox-2"[/color],`}</Text>
+          <Text className="code-line">{`                               [color=#0a3069]"toggle-checkbox"[/color], [color=#0a3069]"toggle-checkbox-2"[/color] };`}</Text>
+          <Text className="code-line">{`        [color=#953800]int[/color] i;`}</Text>
           <Text className="code-line">{` `}</Text>
-          <Text className="code-line">{`        ui_widget_set_id(cb, [color=#0a3069]"terms"[/color]);`}</Text>
-          <Text className="code-line">{`        ui_widget_append(box, cb);`}</Text>
-          <Text className="code-line">{`        ui_widget_set_style_string(box, [color=#0a3069]"display"[/color], [color=#0a3069]"flex"[/color]);`}</Text>
-          <Text className="code-line">{`        ui_widget_set_style_string(box, [color=#0a3069]"gap"[/color], [color=#0a3069]"8px"[/color]);`}</Text>
-          <Text className="code-line">{`        ui_label_set_for(label, [color=#0a3069]"terms"[/color]);`}</Text>
-          <Text className="code-line">{`        ui_text_set_content(label, [color=#0a3069]"Accept terms and conditions"[/color]);`}</Text>
-          <Text className="code-line">{`        ui_widget_append(box, label);`}</Text>
-          <Text className="code-line">{`        ui_widget_append(parent, box);`}</Text>
+          <Text className="code-line">{`        ui_widget_add_class(group, [color=#0a3069]"checkbox-basic-demo"[/color]);`}</Text>
+          <Text className="code-line">{`        [color=#cf222e]for[/color] (i = [color=#0550ae]0[/color]; i < [color=#0550ae]4[/color]; ++i) {`}</Text>
+          <Text className="code-line">{`                fields\\[i] = ui_create_field();`}</Text>
+          <Text className="code-line">{`                ui_field_set_orientation(fields\\[i], [color=#0a3069]"horizontal"[/color]);`}</Text>
+          <Text className="code-line">{`                boxes\\[i] = ui_create_checkbox();`}</Text>
+          <Text className="code-line">{`                ui_widget_set_id(boxes\\[i], ids\\[i]);`}</Text>
+          <Text className="code-line">{`                ui_widget_append(fields\\[i], boxes\\[i]);`}</Text>
+          <Text className="code-line">{`        }`}</Text>
+          <Text className="code-line">{`        ui_widget_set_attr(boxes\\[[color=#0550ae]1[/color]], [color=#0a3069]"checked"[/color], [color=#0a3069]"true"[/color]);`}</Text>
+          <Text className="code-line">{`        ui_widget_set_disabled(boxes\\[[color=#0550ae]2[/color]], [color=#0550ae]true[/color]);`}</Text>
+          <Text className="code-line">{`        ui_widget_set_disabled(fields\\[[color=#0550ae]2[/color]], [color=#0550ae]true[/color]);`}</Text>
+          <Text className="code-line">{` `}</Text>
+          <Text className="code-line">{`        labels\\[[color=#0550ae]0[/color]] = ui_create_label();`}</Text>
+          <Text className="code-line">{`        ui_label_set_for(labels\\[[color=#0550ae]0[/color]], ids\\[[color=#0550ae]0[/color]]);`}</Text>
+          <Text className="code-line">{`        ui_text_set_content(labels\\[[color=#0550ae]0[/color]], [color=#0a3069]"Accept terms and conditions"[/color]);`}</Text>
+          <Text className="code-line">{`        ui_widget_append(fields\\[[color=#0550ae]0[/color]], labels\\[[color=#0550ae]0[/color]]);`}</Text>
+          <Text className="code-line">{`        ui_widget_append(group, fields\\[[color=#0550ae]0[/color]]);`}</Text>
+          <Text className="code-line">{` `}</Text>
+          <Text className="code-line">{`        contents\\[[color=#0550ae]0[/color]] = ui_create_field_content();`}</Text>
+          <Text className="code-line">{`        labels\\[[color=#0550ae]1[/color]] = ui_create_field_label();`}</Text>
+          <Text className="code-line">{`        ui_label_set_for(labels\\[[color=#0550ae]1[/color]], ids\\[[color=#0550ae]1[/color]]);`}</Text>
+          <Text className="code-line">{`        ui_text_set_content(labels\\[[color=#0550ae]1[/color]], [color=#0a3069]"Accept terms and conditions"[/color]);`}</Text>
+          <Text className="code-line">{`        ui_widget_append(contents\\[[color=#0550ae]0[/color]], labels\\[[color=#0550ae]1[/color]]);`}</Text>
+          <Text className="code-line">{`        ui_widget_append(contents\\[[color=#0550ae]0[/color]], ui_create_field_description());`}</Text>
+          <Text className="code-line">{`        ui_text_set_content(`}</Text>
+          <Text className="code-line">{`            ui_widget_get_child(contents\\[[color=#0550ae]0[/color]], [color=#0550ae]1[/color]),`}</Text>
+          <Text className="code-line">{`            [color=#0a3069]"By clicking this checkbox, you agree to the terms."[/color]);`}</Text>
+          <Text className="code-line">{`        ui_widget_append(fields\\[[color=#0550ae]1[/color]], contents\\[[color=#0550ae]0[/color]]);`}</Text>
+          <Text className="code-line">{`        ui_widget_append(group, fields\\[[color=#0550ae]1[/color]]);`}</Text>
+          <Text className="code-line">{` `}</Text>
+          <Text className="code-line">{`        labels\\[[color=#0550ae]2[/color]] = ui_create_field_label();`}</Text>
+          <Text className="code-line">{`        ui_label_set_for(labels\\[[color=#0550ae]2[/color]], ids\\[[color=#0550ae]2[/color]]);`}</Text>
+          <Text className="code-line">{`        ui_text_set_content(labels\\[[color=#0550ae]2[/color]], [color=#0a3069]"Enable notifications"[/color]);`}</Text>
+          <Text className="code-line">{`        ui_widget_append(fields\\[[color=#0550ae]2[/color]], labels\\[[color=#0550ae]2[/color]]);`}</Text>
+          <Text className="code-line">{`        ui_widget_append(group, fields\\[[color=#0550ae]2[/color]]);`}</Text>
+          <Text className="code-line">{` `}</Text>
+          <Text className="code-line">{`        contents\\[[color=#0550ae]1[/color]] = ui_create_field_content();`}</Text>
+          <Text className="code-line">{`        ui_widget_append(contents\\[[color=#0550ae]1[/color]], ui_create_field_title());`}</Text>
+          <Text className="code-line">{`        ui_text_set_content(ui_widget_get_child(contents\\[[color=#0550ae]1[/color]], [color=#0550ae]0[/color]),`}</Text>
+          <Text className="code-line">{`                            [color=#0a3069]"Enable notifications"[/color]);`}</Text>
+          <Text className="code-line">{`        ui_widget_append(contents\\[[color=#0550ae]1[/color]], ui_create_field_description());`}</Text>
+          <Text className="code-line">{`        ui_text_set_content(`}</Text>
+          <Text className="code-line">{`            ui_widget_get_child(contents\\[[color=#0550ae]1[/color]], [color=#0550ae]1[/color]),`}</Text>
+          <Text className="code-line">{`            [color=#0a3069]"You can enable and disable notifications at any time."[/color]);`}</Text>
+          <Text className="code-line">{`        ui_widget_append(fields\\[[color=#0550ae]3[/color]], contents\\[[color=#0550ae]1[/color]]);`}</Text>
+          <Text className="code-line">{` `}</Text>
+          <Text className="code-line">{`        [color=#6e7781]/* The whole card is clickable: FieldLabel wraps the Field and targets[/color]`}</Text>
+          <Text className="code-line">{`[color=#6e7781]         * the checkbox through \`for\`. */[/color]`}</Text>
+          <Text className="code-line">{`        card = ui_create_field_label();`}</Text>
+          <Text className="code-line">{`        ui_label_set_for(card, ids\\[[color=#0550ae]3[/color]]);`}</Text>
+          <Text className="code-line">{`        ui_widget_append(card, fields\\[[color=#0550ae]3[/color]]);`}</Text>
+          <Text className="code-line">{`        ui_widget_append(group, card);`}</Text>
+          <Text className="code-line">{` `}</Text>
+          <Text className="code-line">{`        ui_widget_append(parent, group);`}</Text>
           <Text className="code-line">{`}`}</Text>
         </Widget>
         <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/checkbox-basic/8" style={{ display: "none" }}>
           <CodeBlockCopy />
-          <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
           <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
           <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
-          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"terms"[/color] />[/color]`}</Text>
-          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"terms"[/color]>[/color]Accept terms and conditions[color=#116329]</[color=#0550ae]label[/color]>[/color]`}</Text>
+          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]field-group[/color] [color=#0550ae]class[/color]=[color=#0a3069]"checkbox-basic-demo"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"terms-checkbox"[/color] />[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"terms-checkbox"[/color]>[/color]Accept terms and conditions[color=#116329]</[color=#0550ae]label[/color]>[/color]`}</Text>
+          <Text className="code-line">{`      [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
+          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"terms-checkbox-2"[/color] [color=#0550ae]checked[/color]=[color=#0a3069]"true"[/color] />[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-content[/color]>[/color]`}</Text>
+          <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field-label[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]            [color=#0550ae]for[/color]=[color=#0a3069]"terms-checkbox-2"[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]          >[/color]Accept terms and conditions[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
+          <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field-description[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]          >[/color]By clicking this checkbox, you agree to the terms.[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]</[color=#0550ae]field-content[/color]>[/color]`}</Text>
+          <Text className="code-line">{`      [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
+          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color] [color=#0550ae]disabled[/color]=[color=#0a3069]"true"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"toggle-checkbox"[/color] [color=#0550ae]disabled[/color]=[color=#0a3069]"true"[/color] />[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field-label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"toggle-checkbox"[/color]>[/color]Enable notifications[color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
+          <Text className="code-line">{`      [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
+          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]field-label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"toggle-checkbox-2"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]field[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color]>[/color]`}</Text>
+          <Text className="code-line">{`          [color=#116329]<[color=#0550ae]checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"toggle-checkbox-2"[/color] />[/color]`}</Text>
+          <Text className="code-line">{`          [color=#116329]<[color=#0550ae]field-content[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-title[/color]>[/color]Enable notifications[color=#116329]</[color=#0550ae]field-title[/color]>[/color]`}</Text>
+          <Text className="code-line">{`            [color=#116329]<[color=#0550ae]field-description[/color][/color]`}</Text>
+          <Text className="code-line">{`[color=#116329]            >[/color]You can enable and disable notifications at any time.[color=#116329]</[color=#0550ae]field-description[/color]>[/color]`}</Text>
+          <Text className="code-line">{`          [color=#116329]</[color=#0550ae]field-content[/color]>[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]</[color=#0550ae]field[/color]>[/color]`}</Text>
+          <Text className="code-line">{`      [color=#116329]</[color=#0550ae]field-label[/color]>[/color]`}</Text>
+          <Text className="code-line">{`    [color=#116329]</[color=#0550ae]field-group[/color]>[/color]`}</Text>
           <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ui[/color]>[/color]`}</Text>
           <Text className="code-line">{`[color=#116329]</[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
         </Widget>
         <Widget className="code-block-body" data-language="xml" data-file="main.c" data-source="examples/checkbox-basic/9" style={{ display: "none" }}>
           <CodeBlockCopy />
           <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
-          <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<ui_xml.h>[/color][/color]`}</Text>
           <Text className="code-line">{` `}</Text>
           <Text className="code-line">{`[color=#953800]int[/color] [color=#8250df]main[/color][color=#0550ae]([color=#953800]void[/color])[/color]`}</Text>
           <Text className="code-line">{`{`}</Text>

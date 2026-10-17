@@ -1,0 +1,16 @@
+<lcui-app>
+  <ui>
+    <field-group class="checkbox-description-demo">
+      <field orientation="horizontal">
+        <checkbox id="terms-checkbox-desc" checked="true" />
+        <field-content>
+          <field-label
+            for="terms-checkbox-desc"
+          >Accept terms and conditions</field-label>
+          <field-description
+          >By clicking this checkbox, you agree to the terms and conditions.</field-description>
+        </field-content>
+      </field>
+    </field-group>
+  </ui>
+</lcui-app>

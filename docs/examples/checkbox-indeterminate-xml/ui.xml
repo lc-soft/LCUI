@@ -1,0 +1,18 @@
+<lcui-app>
+  <ui>
+    <div class="checkbox-indeterminate-demo">
+      <div class="checkbox-row">
+        <checkbox id="select-all" indeterminate="true" />
+        <label for="select-all">Select all</label>
+      </div>
+      <div class="checkbox-row">
+        <checkbox id="option-a" checked="true" />
+        <label for="option-a">Option A</label>
+      </div>
+      <div class="checkbox-row">
+        <checkbox id="option-b" />
+        <label for="option-b">Option B</label>
+      </div>
+    </div>
+  </ui>
+</lcui-app>

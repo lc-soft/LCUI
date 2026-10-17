@@ -1,0 +1,39 @@
+<lcui-app>
+  <ui>
+    <field-set class="checkbox-group-demo">
+      <field-legend>Show these items on the desktop:</field-legend>
+      <field-description
+      >Select the items you want to show on the desktop.</field-description>
+      <field-group>
+        <field orientation="horizontal">
+          <checkbox id="finder-pref-hard-disks" checked="true" />
+          <field-label
+            class="font-normal"
+            for="finder-pref-hard-disks"
+          >Hard disks</field-label>
+        </field>
+        <field orientation="horizontal">
+          <checkbox id="finder-pref-external-disks" checked="true" />
+          <field-label
+            class="font-normal"
+            for="finder-pref-external-disks"
+          >External disks</field-label>
+        </field>
+        <field orientation="horizontal">
+          <checkbox id="finder-pref-cds-dvds" />
+          <field-label
+            class="font-normal"
+            for="finder-pref-cds-dvds"
+          >CDs, DVDs, and iPods</field-label>
+        </field>
+        <field orientation="horizontal">
+          <checkbox id="finder-pref-servers" />
+          <field-label
+            class="font-normal"
+            for="finder-pref-servers"
+          >Connected servers</field-label>
+        </field>
+      </field-group>
+    </field-set>
+  </ui>
+</lcui-app>

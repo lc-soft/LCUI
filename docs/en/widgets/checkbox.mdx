@@ -6,9 +6,9 @@ A control that allows the user to toggle between checked and not checked.
 
 ## Use cases
 
-- **Suitable**: a single binary choice (accepting terms, toggling a subscription).
-- **Suitable**: checkable options inside a form.
-- **Not suitable**: mutually exclusive single-choice scenarios (use `radio-group`).
+- **Suitable**: A single binary choice (accepting terms, a subscription toggle)
+- **Suitable**: Checkable items in a form
+- **Not suitable**: Mutually exclusive choices (use `radio-group`)
 
 ## Usage
 
@@ -20,17 +20,37 @@ import { Checkbox } from "@lcui/react"
 <Checkbox />
 ```
 
-## Caveats
-
-:::caution
-**indeterminate is a state, not a default value.** The half-selected state (`indeterminate="true"`) expresses the visual notion that some sub-items are selected (for example, a parent checkbox shown as indeterminate when only some of its children are checked). Clicking a checkbox in the indeterminate state transitions it to the checked state.
-:::
+Use `checked` to control the checked state; a `change` event is emitted when it changes.
 
 ## Examples
+
+### Description
+
+Pair `FieldContent` and `FieldDescription` to add helper text to the option.
+
+<WidgetExample name="checkbox-description" />
+
+### Group
+
+Combine several `Field`s to build a checkbox list.
+
+<WidgetExample name="checkbox-group" />
+
+### Indeterminate
+
+`indeterminate` expresses the "some children are selected" visual state, showing a minus icon.
+
+<WidgetExample name="checkbox-indeterminate" />
 
 ### Disabled
 
 <WidgetExample name="checkbox-disabled" />
+
+## Caveats
+
+:::caution
+**Indeterminate is a state, not a default.** The indeterminate state (`indeterminate="true"`) expresses the "some children are selected" visual state (for example, a parent checkbox when only some children are checked). Clicking an indeterminate checkbox transitions it to the checked state.
+:::
 
 ## API Reference
 

@@ -30,11 +30,11 @@ export default function CheckboxDisabledDemo() {
           <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
           <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Widget[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex flex-col gap-2"[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex items-center gap-2"[/color]>[/color]`}</Text>
-          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"d1"[/color] [color=#0550ae]disabled[/color]=[color=#0a3069]{true}[/color] [color=#0550ae]checked[/color]=[color=#0a3069]{true}[/color] />[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"d1"[/color] [color=#0550ae]disabled[/color] [color=#0550ae]checked[/color] />[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"d1"[/color]>[/color]Disabled (pre-checked)[color=#116329]</[color=#0550ae]Label[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]</[color=#0550ae]div[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex items-center gap-2"[/color]>[/color]`}</Text>
-          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"d2"[/color] [color=#0550ae]checked[/color]=[color=#0a3069]{true}[/color] />[/color]`}</Text>
+          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Checkbox[/color] [color=#0550ae]id[/color]=[color=#0a3069]"d2"[/color] [color=#0550ae]checked[/color] />[/color]`}</Text>
           <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Label[/color] [color=#0550ae]for[/color]=[color=#0a3069]"d2"[/color]>[/color]Normal[color=#116329]</[color=#0550ae]Label[/color]>[/color]`}</Text>
           <Text className="code-line">{`      [color=#116329]</[color=#0550ae]div[/color]>[/color]`}</Text>
           <Text className="code-line">{`    [color=#116329]</[color=#0550ae]Widget[/color]>[/color]`}</Text>

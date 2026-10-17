@@ -1,7 +1,34 @@
-<?xml version="1.0" encoding="UTF-8" ?>
 <lcui-app>
   <ui>
-    <checkbox id="terms" />
-    <label for="terms">Accept terms and conditions</label>
+    <field-group class="checkbox-basic-demo">
+      <field orientation="horizontal">
+        <checkbox id="terms-checkbox" />
+        <label for="terms-checkbox">Accept terms and conditions</label>
+      </field>
+      <field orientation="horizontal">
+        <checkbox id="terms-checkbox-2" checked="true" />
+        <field-content>
+          <field-label
+            for="terms-checkbox-2"
+          >Accept terms and conditions</field-label>
+          <field-description
+          >By clicking this checkbox, you agree to the terms.</field-description>
+        </field-content>
+      </field>
+      <field orientation="horizontal" disabled="true">
+        <checkbox id="toggle-checkbox" disabled="true" />
+        <field-label for="toggle-checkbox">Enable notifications</field-label>
+      </field>
+      <field-label for="toggle-checkbox-2">
+        <field orientation="horizontal">
+          <checkbox id="toggle-checkbox-2" />
+          <field-content>
+            <field-title>Enable notifications</field-title>
+            <field-description
+            >You can enable and disable notifications at any time.</field-description>
+          </field-content>
+        </field>
+      </field-label>
+    </field-group>
   </ui>
 </lcui-app>

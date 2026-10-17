@@ -20,17 +20,37 @@ import { Checkbox } from "@lcui/react"
 <Checkbox />
 ```
 
-## 注意事项
-
-:::caution
-**indeterminate 是状态，不是默认值**。半选态（`indeterminate="true"`）用于表达"子项部分被选中"的视觉状态（例如父级 checkbox 在部分子项被选时显示半选）。点击 indeterminate 状态的 checkbox 会转为 checked 状态。
-:::
+使用 `checked` 控制选中状态，状态变化时触发 `change` 事件。
 
 ## 示例
+
+### 说明
+
+配合 `FieldContent` 与 `FieldDescription` 为选项补充说明文字。
+
+<WidgetExample name="checkbox-description" />
+
+### 分组
+
+用一组 `Field` 组合出复选框列表。
+
+<WidgetExample name="checkbox-group" />
+
+### 半选
+
+`indeterminate` 用于表达“子项部分被选中”的视觉状态，此时显示减号图标。
+
+<WidgetExample name="checkbox-indeterminate" />
 
 ### 禁用
 
 <WidgetExample name="checkbox-disabled" />
+
+## 注意事项
+
+:::caution
+**indeterminate 是状态，不是默认值**。半选态（`indeterminate="true"`）用于表达“子项部分被选中”的视觉状态（例如父级 checkbox 在部分子项被选时显示半选）。点击 indeterminate 状态的 checkbox 会转为 checked 状态。
+:::
 
 ## API 参考
 
