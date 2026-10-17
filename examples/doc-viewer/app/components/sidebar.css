@@ -7,13 +7,16 @@
 }
 
 .sidebar {
-  flex-direction: column;
   padding: 16px 0;
 }
 
+.sidebar-lang {
+  flex-direction: column;
+}
+
 /* Override .lang's display:block with flex for sidebar layout. */
-.en .sidebar.en,
-.zh-CN .sidebar.zh-CN {
+.en .sidebar-lang.en,
+.zh-CN .sidebar-lang.zh-CN {
   display: flex;
 }
 
