@@ -13,12 +13,20 @@ A linear progress bar widget used to indicate the completion of a task such as f
 ## Usage
 
 ```tsx
-import { Progress } from "@lcui/react"
+import { Progress, ProgressLabel, ProgressValue } from "@lcui/react"
 ```
 
 ```tsx
 <Progress value={20} />
 ```
+
+## Examples
+
+### With label
+
+`Progress` accepts `ProgressLabel` and `ProgressValue` children; the label row is rendered above the track.
+
+<WidgetExample name="progress-label" />
 
 ## API Reference
 

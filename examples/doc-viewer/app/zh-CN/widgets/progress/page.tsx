@@ -1,6 +1,7 @@
 import { Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "../../../components/code-block-copy";
 import ProgressBasicDemo from "../../../examples/progress-basic/index";
+import ProgressLabelDemo from "../../../examples/progress-label/index";
 import FieldTable from "../../../components/field-table";
 import { progressFields } from "../../../widget-fields/progress";
 
@@ -26,7 +27,7 @@ export default function ProgressDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Progress[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+            <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Progress[/color], [color=#8250df]ProgressLabel[/color], [color=#8250df]ProgressValue[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
           </Widget>
         </Widget>
         <Widget className="code-block" data-language="tsx" data-source="zh-CN/widgets/progress/1">
@@ -38,6 +39,12 @@ export default function ProgressDocPage() {
             <Text className="code-line">{`<[color=#8250df]Progress[/color] value={[color=#0550ae]20[/color]} />`}</Text>
           </Widget>
         </Widget>
+      </Widget>
+      <Widget className="doc-section">
+        <h2>示例</h2>
+        <h3>带标签</h3>
+        <p>{`[bgcolor=#eee] Progress [/bgcolor] 可接受 [bgcolor=#eee] ProgressLabel [/bgcolor] 与 [bgcolor=#eee] ProgressValue [/bgcolor] 子部件，标签行会显示在进度条上方。`}</p>
+        <ProgressLabelDemo />
       </Widget>
       <Widget className="doc-section">
         <h2>API 参考</h2>

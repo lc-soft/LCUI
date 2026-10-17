@@ -19,6 +19,10 @@ LCUI_BEGIN_HEADER
 
 LCUI_API ui_widget_t *ui_create_progress(void);
 
+LCUI_API ui_widget_t *ui_create_progress_label(void);
+
+LCUI_API ui_widget_t *ui_create_progress_value(void);
+
 LCUI_API void ui_progress_set_value(ui_widget_t *w, float value);
 
 LCUI_API float ui_progress_get_value(ui_widget_t *w);

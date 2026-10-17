@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <progress class="progress-label-demo" value="56">
+      <progress-label>Upload progress</progress-label>
+      <progress-value />
+    </progress>
+  </ui>
+</lcui-app>
