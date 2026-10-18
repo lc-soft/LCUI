@@ -1,0 +1,130 @@
+# Tooltip
+
+悬停或聚焦时显示简短说明的浮层。
+
+<WidgetExample name="tooltip-basic" />
+
+## 适用场景
+
+- **适用**：图标按钮、截断文本、工具栏和表单标签等需要补充说明的场景
+- **适用**：短暂、非交互的提示信息
+- **不适用**：需要用户确认或操作的内容（使用 `dialog` / `alert-dialog`）
+- **不适用**：长篇说明或富文本内容（使用正文或 `field-description`）
+
+## 用法
+
+```tsx
+import { Tooltip, TooltipTrigger, TooltipContent } from "@lcui/react"
+```
+
+```tsx
+<Tooltip>
+  <TooltipTrigger>
+    <Button variant="outline">Hover</Button>
+  </TooltipTrigger>
+  <TooltipContent>Add to library</TooltipContent>
+</Tooltip>
+```
+
+## 纯属性用法
+
+任意部件都可以只加 `data-tooltip` 属性，无需 `Tooltip` 结构：
+
+```tsx
+<Button data-tooltip="Add to library">Hover</Button>
+```
+
+可用 `data-tooltip-*` 覆盖默认参数：
+
+| 属性 | 对应参数 | 默认值 |
+| --- | --- | --- |
+| `data-tooltip` | 提示文本（必填） | - |
+| `data-tooltip-side` | top / right / bottom / left | `top` |
+| `data-tooltip-align` | start / center / end | `center` |
+| `data-tooltip-side-offset` | 侧边偏移（px） | `4` |
+| `data-tooltip-align-offset` | 对齐偏移（px） | `0` |
+| `data-tooltip-delay` | 显示延迟（毫秒） | `0` |
+
+```tsx
+<Button
+  data-tooltip="Add to library"
+  data-tooltip-side="left"
+  data-tooltip-side-offset="8"
+  data-tooltip-delay="200"
+>
+  Hover
+</Button>
+```
+
+- 文本、方位、偏移和延迟在每次显示时从属性重新读取。
+- `data-tooltip` 为空字符串时不显示。
+- 显式 `Tooltip` 结构内部的部件不会重复触发属性模式。
+- 需要把 trigger 和 content 放在不同子树时，可用 `data-tooltip-trigger="key"` 与 `data-tooltip-target="key"` 关联。
+
+### C 便捷调用
+
+C 端无需手写属性：
+
+```c
+ui_tooltip_attach(button, "Add to library");
+```
+
+需要调整方位、偏移或延迟时：
+
+```c
+ui_tooltip_options_t options;
+
+ui_tooltip_options_init(&options);
+options.content = "Add to library";
+options.side = UI_TOOLTIP_SIDE_RIGHT;
+options.side_offset = 8;
+options.delay = 200;
+ui_tooltip_attach_ex(button, &options);
+```
+
+`ui_tooltip_options_init()` 会填入默认值（top、center、side offset 4、align offset 0、
+delay 0），因此未修改的字段保持默认行为。
+
+## 组合
+
+使用以下组合来构建 `Tooltip`：
+
+```
+Tooltip
+├── TooltipTrigger
+└── TooltipContent（Portal）
+```
+
+## 示例
+
+### 方向
+
+使用 `side` 属性控制提示出现的方位。
+
+<WidgetExample name="tooltip-sides" />
+
+### 禁用控件
+
+禁用的控件本身不接收鼠标事件，用 `TooltipTrigger` 包住它即可正常显示提示。
+
+<WidgetExample name="tooltip-disabled" />
+
+## API 参考
+
+### Tooltip
+
+提示的根节点，管理显示延迟和 Portal。
+
+<FieldTable name="tooltip" />
+
+### TooltipTrigger
+
+触发提示的包装层，按钮、图标或其他可 hover 的部件放在其中。
+
+<FieldTable name="tooltip-trigger" />
+
+### TooltipContent
+
+提示气泡，负责方位、对齐和内容。
+
+<FieldTable name="tooltip-content" />

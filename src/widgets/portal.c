@@ -23,6 +23,7 @@ typedef struct ui_portal {
         ui_widget_t *content;
         ui_widget_t *anchor;
         bool open;
+        bool passthrough;
 } ui_portal_t;
 
 typedef struct ui_portal_content_entry {
@@ -35,6 +36,8 @@ static ui_widget_prototype_t *ui_portal_prototype;
 static ui_widget_prototype_t *ui_portal_root_prototype;
 static ui_widget_t *ui_portal_root;
 static list_t ui_portal_contents;
+
+static void ui_portal_root_sync_visibility(void);
 
 static const char *ui_portal_css = "\
 portal-root {\
@@ -91,7 +94,9 @@ static void ui_portal_content_on_destroy(ui_widget_t *content, ui_event_t *e,
         ui_portal_remove_content_entry(content);
         if (data->content == content) {
                 data->content = NULL;
+                data->open = false;
         }
+        ui_portal_root_sync_visibility();
 }
 
 static void ui_portal_root_on_destroy(ui_widget_t *w)
@@ -250,18 +255,21 @@ static void ui_portal_on_destroy(ui_widget_t *w)
         ui_portal_t *data = ui_portal_get_data(w);
         ui_widget_t *content = data->content;
 
-        if (!content) {
-                return;
+        if (content) {
+                ui_portal_remove_content_entry(content);
+                ui_widget_off(content, "destroy", ui_portal_content_on_destroy,
+                              w);
+                data->content = NULL;
+                if (content->state != UI_WIDGET_STATE_DELETED) {
+                        /* Destroy immediately instead of ui_widget_remove():
+                         * the trash would only be processed after prototypes
+                         * are torn down at ui_destroy, leaving a dangling
+                         * proto. */
+                        ui_widget_destroy(content);
+                }
         }
-        ui_portal_remove_content_entry(content);
-        ui_widget_off(content, "destroy", ui_portal_content_on_destroy, w);
-        data->content = NULL;
-        if (content->state != UI_WIDGET_STATE_DELETED) {
-                /* Destroy immediately instead of ui_widget_remove(): the
-                 * trash would only be processed after prototypes are
-                 * torn down at ui_destroy, leaving a dangling proto. */
-                ui_widget_destroy(content);
-        }
+        data->open = false;
+        ui_portal_root_sync_visibility();
 }
 
 static void ui_portal_on_init(ui_widget_t *w)
@@ -270,6 +278,7 @@ static void ui_portal_on_init(ui_widget_t *w)
 
         data = ui_widget_add_data(w, ui_portal_prototype, sizeof(*data));
         data->content = NULL;
+        data->passthrough = false;
         data->anchor = NULL;
         data->open = false;
         ui_widget_on(w, "portal-outside", ui_portal_on_outside, NULL);
@@ -295,7 +304,12 @@ ui_widget_t *ui_get_portal_root(void)
 static void ui_portal_root_sync_visibility(void)
 {
         bool visible = false;
+        bool capture = false;
         list_node_t *node;
+
+        if (!ui_portal_root) {
+                return;
+        }
 
         for (list_each(node, &ui_portal_contents)) {
                 ui_portal_content_entry_t *entry = node->data;
@@ -303,14 +317,26 @@ static void ui_portal_root_sync_visibility(void)
 
                 if (data->open) {
                         visible = true;
-                        break;
+                        if (!data->passthrough) {
+                                capture = true;
+                        }
                 }
         }
         if (visible) {
                 ui_widget_set_style_string(ui_portal_root, "display", "block");
+                ui_widget_set_style_string(ui_portal_root, "pointer-events",
+                                           capture ? "auto" : "none");
         } else {
                 ui_widget_set_style_string(ui_portal_root, "display", "none");
         }
+}
+
+void ui_portal_set_passthrough(ui_widget_t *portal, bool passthrough)
+{
+        ui_portal_t *data = ui_portal_get_data(portal);
+
+        data->passthrough = passthrough;
+        ui_portal_root_sync_visibility();
 }
 
 void ui_portal_set_content(ui_widget_t *portal, ui_widget_t *content)

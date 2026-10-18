@@ -49,7 +49,8 @@
         { "slug": "spinner", "label": { "en": "Spinner", "zh-CN": "Spinner 加载指示器" } },
         { "slug": "shimmer", "label": { "en": "Shimmer", "zh-CN": "Shimmer 高光" } },
         { "slug": "text", "label": { "en": "Text", "zh-CN": "Text 文本" } },
-        { "slug": "text-input", "label": { "en": "TextInput", "zh-CN": "TextInput 文本输入" } }
+        { "slug": "text-input", "label": { "en": "TextInput", "zh-CN": "TextInput 文本输入" } },
+        { "slug": "tooltip", "label": { "en": "Tooltip", "zh-CN": "Tooltip 提示" } }
       ]
     }
   ]

@@ -1,0 +1,130 @@
+# Tooltip
+
+An overlay that shows a short description on hover or focus.
+
+<WidgetExample name="tooltip-basic" />
+
+## Use cases
+
+- **Suitable**: Icon buttons, truncated text, toolbars, and form labels that need extra context
+- **Suitable**: Short, non-interactive hints
+- **Not suitable**: Content that requires confirmation or user action (use `dialog` / `alert-dialog`)
+- **Not suitable**: Long explanations or rich text (use body text or `field-description`)
+
+## Usage
+
+```tsx
+import { Tooltip, TooltipTrigger, TooltipContent } from "@lcui/react"
+```
+
+```tsx
+<Tooltip>
+  <TooltipTrigger>
+    <Button variant="outline">Hover</Button>
+  </TooltipTrigger>
+  <TooltipContent>Add to library</TooltipContent>
+</Tooltip>
+```
+
+## Attribute-only usage
+
+Any widget can use the `data-tooltip` attribute without the `Tooltip` structure:
+
+```tsx
+<Button data-tooltip="Add to library">Hover</Button>
+```
+
+Use `data-tooltip-*` to override the defaults:
+
+| Attribute | Option | Default |
+| --- | --- | --- |
+| `data-tooltip` | Hint text (required) | - |
+| `data-tooltip-side` | top / right / bottom / left | `top` |
+| `data-tooltip-align` | start / center / end | `center` |
+| `data-tooltip-side-offset` | Side offset (px) | `4` |
+| `data-tooltip-align-offset` | Align offset (px) | `0` |
+| `data-tooltip-delay` | Show delay (ms) | `0` |
+
+```tsx
+<Button
+  data-tooltip="Add to library"
+  data-tooltip-side="left"
+  data-tooltip-side-offset="8"
+  data-tooltip-delay="200"
+>
+  Hover
+</Button>
+```
+
+- The text, side, offset, and delay are read from the attributes again every time the tooltip is shown.
+- An empty `data-tooltip` string does not show the tooltip.
+- Widgets inside an explicit `Tooltip` structure do not trigger attribute mode again.
+- When the trigger and content need to live in different subtrees, link them with `data-tooltip-trigger="key"` and `data-tooltip-target="key"`.
+
+### C convenience API
+
+The C side does not need to write attributes by hand:
+
+```c
+ui_tooltip_attach(button, "Add to library");
+```
+
+To adjust the side, offset, or delay:
+
+```c
+ui_tooltip_options_t options;
+
+ui_tooltip_options_init(&options);
+options.content = "Add to library";
+options.side = UI_SIDE_RIGHT;
+options.side_offset = 8;
+options.delay = 200;
+ui_tooltip_attach_ex(button, &options);
+```
+
+`ui_tooltip_options_init()` fills in the defaults (top, center, side offset 4, align offset 0,
+delay 0), so fields left untouched keep the default behavior.
+
+## Composition
+
+Use the following composition to build a `Tooltip`:
+
+```
+Tooltip
+├── TooltipTrigger
+└── TooltipContent (Portal)
+```
+
+## Examples
+
+### Sides
+
+Use the `side` prop to control where the tooltip appears.
+
+<WidgetExample name="tooltip-sides" />
+
+### Disabled controls
+
+A disabled control does not receive pointer events; wrap it in `TooltipTrigger` to show the hint normally.
+
+<WidgetExample name="tooltip-disabled" />
+
+## API Reference
+
+### Tooltip
+
+The tooltip root, which manages the show delay and the Portal.
+
+<FieldTable name="tooltip" />
+
+### TooltipTrigger
+
+The wrapper that triggers the tooltip. Put a button, icon, or other hoverable widget inside.
+
+<FieldTable name="tooltip-trigger" />
+
+### TooltipContent
+
+The tooltip bubble, which handles side, alignment, and content.
+
+<FieldTable name="tooltip-content" />

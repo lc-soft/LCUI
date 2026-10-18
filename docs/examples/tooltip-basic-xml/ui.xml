@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <button variant="outline" data-tooltip="Add to library">Hover</button>
+  </ui>
+</lcui-app>

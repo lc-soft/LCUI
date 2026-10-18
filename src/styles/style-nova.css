@@ -372,6 +372,94 @@ item:disabled {
   @apply opacity-50;
 }
 
+/* tooltip: structural rules live in src/widgets/tooltip.c */
+
+tooltip-content {
+  width: fit-content;
+  max-width: 240px;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+tooltip-content.tooltip-side-top {
+  padding-bottom: 5px;
+}
+
+tooltip-content.tooltip-side-bottom {
+  padding-top: 5px;
+}
+
+tooltip-content.tooltip-side-left {
+  padding-right: 5px;
+}
+
+tooltip-content.tooltip-side-right {
+  padding-left: 5px;
+}
+
+.tooltip-inner {
+  @apply rounded-md px-3 py-1.5 text-xs;
+  background-color: #0a0a0a;
+  color: #ffffff;
+  box-sizing: border-box;
+}
+
+tooltip-content text {
+  color: #ffffff;
+}
+
+.tooltip-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-color: transparent;
+}
+
+.tooltip-arrow.tooltip-side-top {
+  bottom: 0;
+  left: 50%;
+  margin-left: -4px;
+  border-width: 5px 4px 0 4px;
+  border-top-color: #0a0a0a;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+}
+
+.tooltip-arrow.tooltip-side-bottom {
+  top: 1px;
+  left: 50%;
+  margin-left: -4px;
+  border-width: 0 4px 5px 4px;
+  border-top-color: transparent;
+  border-right-color: transparent;
+  border-bottom-color: #0a0a0a;
+  border-left-color: transparent;
+}
+
+.tooltip-arrow.tooltip-side-left {
+  right: 0;
+  top: 50%;
+  margin-top: -4px;
+  border-width: 4px 0 4px 5px;
+  border-top-color: transparent;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  border-left-color: #0a0a0a;
+}
+
+.tooltip-arrow.tooltip-side-right {
+  left: 1px;
+  top: 50%;
+  margin-top: -4px;
+  border-width: 4px 5px 4px 0;
+  border-top-color: transparent;
+  border-right-color: #0a0a0a;
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+}
+
 /* progress: structural rules live in src/widgets/progress.c */
 
 progress {
@@ -734,3 +822,7 @@ textinput:focus {
 textinput:disabled {
   @apply opacity-50;
 }
+
+
+
+

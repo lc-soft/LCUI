@@ -56,6 +56,15 @@ LCUI_API void ui_portal_set_align(ui_widget_t *portal, const char *align);
 /** Set the alignment offset in pixels. */
 LCUI_API void ui_portal_set_align_offset(ui_widget_t *portal, int offset);
 
+/**
+ * Make the Portal transparent to pointer hits.
+ *
+ * Passthrough portals (tooltips) let the widgets below keep hover/click
+ * state while the content is visible. Interactive portals (select/dialog)
+ * keep the full-screen root capturing pointer events.
+ */
+LCUI_API void ui_portal_set_passthrough(ui_widget_t *portal, bool passthrough);
+
 /** Open the Portal, making the content visible. */
 LCUI_API void ui_portal_open(ui_widget_t *portal);
 

@@ -270,6 +270,10 @@ p {
   @apply w-full max-w-[400px];
 }
 
+.tooltip-sides-demo {
+  @apply flex flex-wrap gap-2;
+}
+
 .field-checkbox-demo-group {
   @apply gap-3;
 }

@@ -309,6 +309,42 @@ close->tab_index = 0;
   统一以 `examples/doc-viewer/AGENTS.md` 为**唯一权威来源**；编写或修改部件文档 / 示例
   前必须先读该文件，不在本文件重复定义、避免与其冲突。
 
+### 属性设置函数与 on_setattr
+
+- 部件对外的属性设置函数（`ui_<widget>_set_*`）参数应优先使用能表达取值范围的类型：
+  布尔值用 `bool`，数值用 `int` / `float`，固定取值集合用 `enum`；不要让
+  `const char *` 承担枚举语义。
+- 字符串只作为声明层输入：`ui_widget_set_attr()`、XML 属性、TSX props。部件原型的
+  `setattr`（`on_setattr`）负责把字符串解析成上述类型并同步到内部状态；公共 setter
+  使用类型化参数设置属性，由 `on_setattr` 完成转换。
+- `on_setattr` 中不要回调会再次调用 `ui_widget_set_attr()` 的公共 setter，以免递归；
+  直接更新内部字段，或调用不写属性的内部 sync 函数。
+- 示例：
+
+```c
+typedef enum ui_tooltip_side {
+        UI_TOOLTIP_SIDE_TOP = 0,
+        UI_TOOLTIP_SIDE_RIGHT,
+        UI_TOOLTIP_SIDE_BOTTOM,
+        UI_TOOLTIP_SIDE_LEFT,
+} ui_tooltip_side_t;
+
+void ui_tooltip_content_set_side(ui_widget_t *w, ui_tooltip_side_t side)
+{
+        ui_widget_set_attr(w, "side", ui_tooltip_side_names[side]);
+}
+
+static void ui_tooltip_content_on_set_attr(ui_widget_t *w, const char *name,
+                                           const char *value)
+{
+        if (strcmp(name, "side") == 0) {
+                data->side = ui_tooltip_side_from_name(value);
+        }
+}
+
+ui_tooltip_content_prototype->setattr = ui_tooltip_content_on_set_attr;
+```
+
 ## 浮层组件
 
 - `combobox`、`dropdown-menu`、`dialog`、`alert-dialog` 等浮层必须复用 Portal，不得

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <div class="tooltip-sides-demo">
+      <tooltip>
+        <tooltip-trigger>
+          <button variant="outline">Left</button>
+        </tooltip-trigger>
+        <tooltip-content side="left"><text
+          >Add to library</text></tooltip-content>
+      </tooltip>
+      <tooltip>
+        <tooltip-trigger>
+          <button variant="outline">Top</button>
+        </tooltip-trigger>
+        <tooltip-content side="top"><text
+          >Add to library</text></tooltip-content>
+      </tooltip>
+      <tooltip>
+        <tooltip-trigger>
+          <button variant="outline">Bottom</button>
+        </tooltip-trigger>
+        <tooltip-content side="bottom"><text
+          >Add to library</text></tooltip-content>
+      </tooltip>
+      <tooltip>
+        <tooltip-trigger>
+          <button variant="outline">Right</button>
+        </tooltip-trigger>
+        <tooltip-content side="right"><text
+          >Add to library</text></tooltip-content>
+      </tooltip>
+    </div>
+  </ui>
+</lcui-app>

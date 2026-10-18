@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <tooltip>
+      <tooltip-trigger>
+        <button variant="outline" disabled="true">Disabled</button>
+      </tooltip-trigger>
+      <tooltip-content><text
+        >This feature is currently unavailable</text></tooltip-content>
+    </tooltip>
+  </ui>
+</lcui-app>

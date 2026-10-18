@@ -51,6 +51,7 @@ void lcui_widgets_init(void)
         ui_register_empty();
         ui_register_dialog();
         ui_register_alert_dialog();
+        ui_register_tooltip();
 
         /* The theme layer loads last so its rules win over each widget's own
          * default CSS at equal specificity, letting style-nova.css refine the
@@ -64,4 +65,5 @@ void lcui_widgets_destroy(void)
         ui_unregister_anchor();
         ui_unregister_select();
         ui_unregister_dialog();
+        ui_unregister_tooltip();
 }

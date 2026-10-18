@@ -42,6 +42,7 @@ extern void test_badge(void);
 extern void test_alert(void);
 extern void test_item(void);
 extern void test_empty(void);
+extern void test_tooltip(void);
 extern void test_draw_backend(void);
 extern void test_spinner(void);
 extern void test_spinner_perf(void);
@@ -78,6 +79,7 @@ static const ctest_suite_t suites[] = {
         { "alert", test_alert },
         { "item", test_item },
         { "empty", test_empty },
+        { "tooltip", test_tooltip },
         { "draw backend", test_draw_backend },
         { "spinner", test_spinner },
         { "spinner perf", test_spinner_perf },
