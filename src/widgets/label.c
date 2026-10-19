@@ -41,6 +41,9 @@ static void ui_label_on_click(ui_widget_t *w, ui_event_t *e, void *arg)
         if (e->target == target) {
                 return;
         }
+        if (!target->disabled && target->tab_index >= 0) {
+                ui_set_focus(target);
+        }
         ui_event_init(&forwarded, "click");
         ui_widget_emit_event(target, forwarded, NULL);
 }

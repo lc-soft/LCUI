@@ -502,6 +502,27 @@ radio-group-item:disabled {
   cursor: not-allowed;
 }
 
+/* popover: structural rules live in src/widgets/popover.c; keep visual
+ * refinements here. */
+
+popover-content {
+  @apply border border-border bg-popover p-4 rounded-xl text-popover-foreground;
+  box-sizing: border-box;
+  width: 288px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  font-size: 14px;
+}
+
+popover-title {
+  @apply font-medium;
+  font-size: 16px;
+  line-height: 1;
+}
+
+popover-description {
+  @apply text-sm text-muted-foreground;
+}
+
 /* dialog / alert-dialog: structural rules (display, positioning, layout) live
  * in src/widgets/dialog.c; keep only visual refinements here. */
 
@@ -680,6 +701,12 @@ checkbox:indeterminate {
 checkbox:disabled {
   @apply opacity-50;
   cursor: not-allowed;
+}
+
+/* label: base typography follows shadcn's Label. */
+
+label {
+  @apply font-medium;
 }
 
 /* field family: structural rules live in src/widgets/field.c */

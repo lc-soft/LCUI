@@ -104,6 +104,30 @@ static void test_disabled_blocks_forward(void)
         ui_widget_destroy(target);
 }
 
+static void test_click_focuses_target(void)
+{
+        ui_widget_t *label;
+        ui_widget_t *target;
+        ui_event_t ev;
+
+        target = ui_create_widget("textinput");
+        ui_widget_set_id(target, "focus-target");
+        label = ui_create_label();
+        ui_label_set_for(label, "focus-target");
+        ui_widget_append(ui_root(), target);
+        ui_widget_append(ui_root(), label);
+        ui_update();
+
+        ui_event_init(&ev, "click");
+        ui_widget_emit_event(label, ev, NULL);
+
+        ctest_equal_bool("click should focus the target widget",
+                         ui_get_focus() == target, true);
+
+        ui_widget_destroy(label);
+        ui_widget_destroy(target);
+}
+
 static void test_click_without_for_is_safe(void)
 {
         ui_widget_t *label;
@@ -128,6 +152,7 @@ void test_label(void)
         ctest_describe("label set_for roundtrip", test_set_for_roundtrip);
         ctest_describe("label click forwards to target",
                        test_click_forwards_to_target);
+        ctest_describe("label click focuses target", test_click_focuses_target);
         ctest_describe("label click without for is safe",
                        test_click_without_for_is_safe);
         ctest_describe("label disabled blocks forward",

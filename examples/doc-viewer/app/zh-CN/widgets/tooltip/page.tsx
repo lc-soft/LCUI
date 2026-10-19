@@ -185,7 +185,7 @@ export default function TooltipDocPage() {
             <Text className="code-line">{` `}</Text>
             <Text className="code-line">{`ui_tooltip_options_init(&options);`}</Text>
             <Text className="code-line">{`options.content = [color=#0a3069]"Add to library"[/color];`}</Text>
-            <Text className="code-line">{`options.side = UI_TOOLTIP_SIDE_RIGHT;`}</Text>
+            <Text className="code-line">{`options.side = UI_SIDE_RIGHT;`}</Text>
             <Text className="code-line">{`options.side_offset = [color=#0550ae]8[/color];`}</Text>
             <Text className="code-line">{`options.delay = [color=#0550ae]200[/color];`}</Text>
             <Text className="code-line">{`ui_tooltip_attach_ex(button, &options);`}</Text>

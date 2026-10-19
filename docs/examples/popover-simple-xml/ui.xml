@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <popover>
+      <popover-trigger>
+        <button variant="outline">Open popover</button>
+      </popover-trigger>
+      <popover-content>
+        <popover-header>
+          <popover-title>Dimensions</popover-title>
+          <popover-description>Set the dimensions for the layer.</popover-description>
+        </popover-header>
+      </popover-content>
+    </popover>
+  </ui>
+</lcui-app>

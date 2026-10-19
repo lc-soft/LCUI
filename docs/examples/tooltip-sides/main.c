@@ -20,9 +20,9 @@ void tooltip_sides_init(ui_widget_t *parent)
         ui_widget_t *row = ui_create_widget(NULL);
 
         ui_widget_add_class(row, "tooltip-sides-demo");
-        add_tooltip(row, UI_TOOLTIP_SIDE_LEFT, "Left");
-        add_tooltip(row, UI_TOOLTIP_SIDE_TOP, "Top");
-        add_tooltip(row, UI_TOOLTIP_SIDE_BOTTOM, "Bottom");
-        add_tooltip(row, UI_TOOLTIP_SIDE_RIGHT, "Right");
+        add_tooltip(row, UI_SIDE_LEFT, "Left");
+        add_tooltip(row, UI_SIDE_TOP, "Top");
+        add_tooltip(row, UI_SIDE_BOTTOM, "Bottom");
+        add_tooltip(row, UI_SIDE_RIGHT, "Right");
         ui_widget_append(parent, row);
 }

@@ -33,4 +33,6 @@
 #include "widgets/empty.h"
 #include "widgets/dialog.h"
 #include "widgets/alert-dialog.h"
+#include "widgets/placement.h"
 #include "widgets/tooltip.h"
+#include "widgets/popover.h"

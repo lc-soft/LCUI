@@ -124,7 +124,56 @@ void test_widget_mouse_event(void)
         lcui_destroy();
 }
 
+static int g_mid_click_count;
+static int g_root_click_count;
+
+static void on_mid_click(ui_widget_t *w, ui_event_t *e, void *arg)
+{
+        ++g_mid_click_count;
+}
+
+static void on_root_click(ui_widget_t *w, ui_event_t *e, void *arg)
+{
+        ++g_root_click_count;
+}
+
+static void test_click_bubbles_through_listenerless_parent(void)
+{
+        ui_widget_t *root;
+        ui_widget_t *gap;
+        ui_widget_t *mid;
+        ui_widget_t *target;
+        ui_event_t ev;
+
+        lcui_init();
+        root = ui_root();
+        gap = ui_create_widget(NULL);
+        mid = ui_create_widget(NULL);
+        target = ui_create_widget("text");
+        ui_widget_append(mid, target);
+        ui_widget_append(gap, mid);
+        ui_widget_append(root, gap);
+        ui_update();
+        ui_widget_on(mid, "click", on_mid_click, NULL);
+        ui_widget_on(root, "click", on_root_click, NULL);
+
+        g_mid_click_count = 0;
+        g_root_click_count = 0;
+        ui_event_init(&ev, "click");
+        ui_widget_emit_event(target, ev, NULL);
+
+        ctest_equal_int("click should reach the middle listener",
+                        g_mid_click_count, 1);
+        ctest_equal_int(
+            "click should bubble through a listenerless parent to the root",
+            g_root_click_count, 1);
+
+        lcui_destroy();
+}
+
 void test_widget_event(void)
 {
         ctest_describe("widget mouse event", test_widget_mouse_event);
+        ctest_describe("widget click propagation",
+                       test_click_bubbles_through_listenerless_parent);
 }

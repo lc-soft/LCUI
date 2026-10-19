@@ -32,18 +32,23 @@ tooltip
 C API：
 
 ```c
-typedef enum ui_tooltip_side {
-        UI_TOOLTIP_SIDE_TOP = 0,
-        UI_TOOLTIP_SIDE_RIGHT,
-        UI_TOOLTIP_SIDE_BOTTOM,
-        UI_TOOLTIP_SIDE_LEFT,
-} ui_tooltip_side_t;
+/* include/LCUI/widgets/placement.h */
+typedef enum ui_side {
+        UI_SIDE_TOP = 0,
+        UI_SIDE_RIGHT,
+        UI_SIDE_BOTTOM,
+        UI_SIDE_LEFT,
+} ui_side_t;
 
-typedef enum ui_tooltip_align {
-        UI_TOOLTIP_ALIGN_CENTER = 0,
-        UI_TOOLTIP_ALIGN_START,
-        UI_TOOLTIP_ALIGN_END,
-} ui_tooltip_align_t;
+typedef enum ui_align {
+        UI_ALIGN_CENTER = 0,
+        UI_ALIGN_START,
+        UI_ALIGN_END,
+} ui_align_t;
+
+/* include/LCUI/widgets/tooltip.h */
+typedef ui_side_t ui_tooltip_side_t;
+typedef ui_align_t ui_tooltip_align_t;
 
 typedef struct ui_tooltip_options {
         const char *content;
@@ -96,7 +101,7 @@ ui_tooltip_options_t options;
 ui_tooltip_options_init(&options);
 options.content = "Add to library";
 options.delay = 500;
-options.side = UI_TOOLTIP_SIDE_RIGHT;
+options.side = UI_SIDE_RIGHT;
 options.side_offset = 8;
 ui_tooltip_attach_ex(button, &options);
 ```

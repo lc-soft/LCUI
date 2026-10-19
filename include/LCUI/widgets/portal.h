@@ -35,6 +35,15 @@ LCUI_API ui_widget_t *ui_portal_get_content(ui_widget_t *portal);
 LCUI_API void ui_portal_set_anchor(ui_widget_t *portal, ui_widget_t *anchor);
 
 /**
+ * Keep the content positioned against the anchor when an ancestor
+ * scrollarea scrolls.
+ *
+ * Disabled by default. The reposition is applied after the scroll layout
+ * settles, so the anchor offset is current.
+ */
+LCUI_API void ui_portal_set_follow_anchor(ui_widget_t *portal, bool follow);
+
+/**
  * Set the side from which the portal content expands relative to the anchor.
  *
  * @param side One of "top", "bottom" (default), "left", "right".
@@ -64,6 +73,15 @@ LCUI_API void ui_portal_set_align_offset(ui_widget_t *portal, int offset);
  * keep the full-screen root capturing pointer events.
  */
 LCUI_API void ui_portal_set_passthrough(ui_widget_t *portal, bool passthrough);
+
+/**
+ * Enable outside-close detection when the portal root is passthrough.
+ *
+ * With this enabled, a click outside both the content and the anchor emits
+ * portal-outside without consuming the click. Interactive portals (select,
+ * dialog) leave this disabled and keep the capturing root behavior.
+ */
+LCUI_API void ui_portal_set_outside_close(ui_widget_t *portal, bool enabled);
 
 /** Open the Portal, making the content visible. */
 LCUI_API void ui_portal_open(ui_widget_t *portal);

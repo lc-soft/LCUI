@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <div class="popover-align-demo">
+      <popover>
+        <popover-trigger>
+          <button variant="outline">Start</button>
+        </popover-trigger>
+        <popover-content align="start">
+          <popover-header>
+            <popover-title>Start</popover-title>
+            <popover-description>This popover uses a different alignment.</popover-description>
+          </popover-header>
+        </popover-content>
+      </popover>
+      <popover>
+        <popover-trigger>
+          <button variant="outline">Center</button>
+        </popover-trigger>
+        <popover-content align="center">
+          <popover-header>
+            <popover-title>Center</popover-title>
+            <popover-description>This popover uses a different alignment.</popover-description>
+          </popover-header>
+        </popover-content>
+      </popover>
+      <popover>
+        <popover-trigger>
+          <button variant="outline">End</button>
+        </popover-trigger>
+        <popover-content align="end">
+          <popover-header>
+            <popover-title>End</popover-title>
+            <popover-description>This popover uses a different alignment.</popover-description>
+          </popover-header>
+        </popover-content>
+      </popover>
+    </div>
+  </ui>
+</lcui-app>

@@ -470,9 +470,6 @@ static int ui_widget_call_listeners(ui_widget_t *w, ui_event_t e, void *arg)
                 e.data = listener->data;
                 listener->ref_count++;
                 listener->handler(w, &e, arg);
-                if (!e.cancel_bubble && w->parent) {
-                        ui_widget_call_listeners(w->parent, e, arg);
-                }
                 listener->ref_count--;
                 if (!listener->active && listener->ref_count < 1) {
                         prev = node->prev;
@@ -481,6 +478,9 @@ static int ui_widget_call_listeners(ui_widget_t *w, ui_event_t e, void *arg)
                         node = prev;
                 }
                 count++;
+        }
+        if (count > 0 && !e.cancel_bubble && w->parent) {
+                ui_widget_emit_event(w->parent, e, arg);
         }
         return count;
 }
@@ -555,7 +555,7 @@ int ui_widget_emit_event(ui_widget_t *w, ui_event_t e, void *arg)
                 /* 从当前部件后面找到当前坐标点命中的兄弟部件 */
                 sibling = ui_widget_get_next_at(w, x, y);
                 if (sibling) {
-                        return ui_widget_call_listeners(sibling, e, arg);
+                        return ui_widget_emit_event(sibling, e, arg);
                 }
         }
         return ui_widget_emit_event(w->parent, e, arg);

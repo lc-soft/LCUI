@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <popover>
+      <popover-trigger>
+        <button variant="outline">Open popover</button>
+      </popover-trigger>
+      <popover-content class="w-80">
+        <popover-header>
+          <popover-title>Dimensions</popover-title>
+          <popover-description>Set the dimensions for the layer.</popover-description>
+        </popover-header>
+        <div class="popover-form-grid clip-safe">
+          <field orientation="horizontal">
+            <field-label for="popover-width">Width</field-label>
+            <textinput id="popover-width" class="popover-form-input" tabindex="0">100%</textinput>
+          </field>
+          <field orientation="horizontal">
+            <field-label for="popover-max-width">Max. width</field-label>
+            <textinput id="popover-max-width" class="popover-form-input" tabindex="0">300px</textinput>
+          </field>
+          <field orientation="horizontal">
+            <field-label for="popover-height">Height</field-label>
+            <textinput id="popover-height" class="popover-form-input" tabindex="0">25px</textinput>
+          </field>
+          <field orientation="horizontal">
+            <field-label for="popover-max-height">Max. height</field-label>
+            <textinput id="popover-max-height" class="popover-form-input" tabindex="0">none</textinput>
+          </field>
+        </div>
+      </popover-content>
+    </popover>
+  </ui>
+</lcui-app>

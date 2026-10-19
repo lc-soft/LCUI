@@ -87,10 +87,10 @@ export default function TooltipSidesDemo() {
           <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *row = ui_create_widget([color=#0550ae]NULL[/color]);`}</Text>
           <Text className="code-line">{` `}</Text>
           <Text className="code-line">{`        ui_widget_add_class(row, [color=#0a3069]"tooltip-sides-demo"[/color]);`}</Text>
-          <Text className="code-line">{`        add_tooltip(row, UI_TOOLTIP_SIDE_LEFT, [color=#0a3069]"Left"[/color]);`}</Text>
-          <Text className="code-line">{`        add_tooltip(row, UI_TOOLTIP_SIDE_TOP, [color=#0a3069]"Top"[/color]);`}</Text>
-          <Text className="code-line">{`        add_tooltip(row, UI_TOOLTIP_SIDE_BOTTOM, [color=#0a3069]"Bottom"[/color]);`}</Text>
-          <Text className="code-line">{`        add_tooltip(row, UI_TOOLTIP_SIDE_RIGHT, [color=#0a3069]"Right"[/color]);`}</Text>
+          <Text className="code-line">{`        add_tooltip(row, UI_SIDE_LEFT, [color=#0a3069]"Left"[/color]);`}</Text>
+          <Text className="code-line">{`        add_tooltip(row, UI_SIDE_TOP, [color=#0a3069]"Top"[/color]);`}</Text>
+          <Text className="code-line">{`        add_tooltip(row, UI_SIDE_BOTTOM, [color=#0a3069]"Bottom"[/color]);`}</Text>
+          <Text className="code-line">{`        add_tooltip(row, UI_SIDE_RIGHT, [color=#0a3069]"Right"[/color]);`}</Text>
           <Text className="code-line">{`        ui_widget_append(parent, row);`}</Text>
           <Text className="code-line">{`}`}</Text>
         </Widget>

@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <LCUI/widgets/portal.h>
+#include <LCUI/widgets/scrollarea.h>
 #include <ui/events.h>
 #include <ui/prototype.h>
 #include <ui/style.h>
@@ -22,8 +23,17 @@
 typedef struct ui_portal {
         ui_widget_t *content;
         ui_widget_t *anchor;
+        ui_widget_t *owner;
+        ui_widget_t **scroll_parents;
+        float *scroll_tops;
+        float *scroll_lefts;
+        size_t scroll_parent_count;
+        float content_x;
+        float content_y;
         bool open;
         bool passthrough;
+        bool outside_close;
+        bool follow_anchor;
 } ui_portal_t;
 
 typedef struct ui_portal_content_entry {
@@ -140,6 +150,56 @@ static void ui_portal_emit_outside(void)
         }
 }
 
+static bool ui_portal_is_inside(ui_portal_t *data, ui_widget_t *target)
+{
+        for (; target; target = target->parent) {
+                if (target == data->content || target == data->anchor) {
+                        return true;
+                }
+        }
+        return false;
+}
+
+static void ui_portal_emit_outside_except(ui_widget_t *owner_portal)
+{
+        list_node_t *node;
+        ui_event_t event;
+
+        for (list_each(node, &ui_portal_contents)) {
+                ui_portal_content_entry_t *entry = node->data;
+                ui_portal_t *data = ui_portal_get_data(entry->portal);
+
+                if (entry->portal == owner_portal || !data->open ||
+                    !data->outside_close) {
+                        continue;
+                }
+                ui_event_init(&event, "portal-outside");
+                ui_widget_emit_event(entry->portal, event, NULL);
+        }
+}
+
+static void ui_portal_root_on_outside_input(ui_widget_t *w, ui_event_t *e,
+                                            void *arg)
+{
+        list_node_t *node;
+        ui_event_t event;
+
+        if (ui_portal_root && e->target == ui_portal_root) {
+                return;
+        }
+        for (list_each(node, &ui_portal_contents)) {
+                ui_portal_content_entry_t *entry = node->data;
+                ui_portal_t *data = ui_portal_get_data(entry->portal);
+
+                if (!data->open || !data->outside_close ||
+                    ui_portal_is_inside(data, e->target)) {
+                        continue;
+                }
+                ui_event_init(&event, "portal-outside");
+                ui_widget_emit_event(entry->portal, event, NULL);
+        }
+}
+
 static void ui_portal_root_on_pointer_event(ui_widget_t *w, ui_event_t *e,
                                             void *arg)
 {
@@ -155,6 +215,7 @@ static void ui_portal_root_on_pointer_event(ui_widget_t *w, ui_event_t *e,
         copied = *e;
         copied.cancel_bubble = false;
         ui_widget_emit_event(portal, copied, NULL);
+        ui_portal_emit_outside_except(portal);
 }
 
 static void ui_portal_set_offset(ui_widget_t *content, const char *name,
@@ -230,8 +291,105 @@ static void ui_portal_update_position(ui_widget_t *portal)
         } else {
                 x += align_offset;
         }
+        data->content_x = x;
+        data->content_y = y;
         ui_portal_set_offset(content, "left", x);
         ui_portal_set_offset(content, "top", y);
+}
+
+static void ui_portal_on_anchor_scroll(ui_widget_t *w, ui_event_t *e, void *arg)
+{
+        ui_widget_t *portal = e->data;
+        ui_portal_t *data = ui_portal_get_data(portal);
+        float left, top, dx = 0, dy = 0;
+        size_t i;
+
+        if (!data->open || !data->content) {
+                return;
+        }
+        for (i = 0; i < data->scroll_parent_count; ++i) {
+                top = ui_scrollarea_get_scroll_top(data->scroll_parents[i]);
+                left = ui_scrollarea_get_scroll_left(data->scroll_parents[i]);
+                dx += left - data->scroll_lefts[i];
+                dy += top - data->scroll_tops[i];
+                data->scroll_tops[i] = top;
+                data->scroll_lefts[i] = left;
+        }
+        if (dx == 0 && dy == 0) {
+                return;
+        }
+        data->content_x -= dx;
+        data->content_y -= dy;
+        ui_portal_set_offset(data->content, "left", data->content_x);
+        ui_portal_set_offset(data->content, "top", data->content_y);
+        ui_widget_request_update(portal);
+}
+
+static void ui_portal_clear_scroll_parents(ui_portal_t *data)
+{
+        size_t i;
+
+        for (i = 0; i < data->scroll_parent_count; ++i) {
+                ui_widget_t *w = data->scroll_parents[i];
+
+                if (w && w->state != UI_WIDGET_STATE_DELETED) {
+                        ui_widget_off(w, "scroll", ui_portal_on_anchor_scroll,
+                                      data->owner);
+                }
+        }
+        free(data->scroll_parents);
+        free(data->scroll_tops);
+        free(data->scroll_lefts);
+        data->scroll_parents = NULL;
+        data->scroll_tops = NULL;
+        data->scroll_lefts = NULL;
+        data->scroll_parent_count = 0;
+}
+
+static void ui_portal_bind_scroll_parents(ui_portal_t *data)
+{
+        ui_widget_t *w;
+        size_t count = 0;
+        size_t i = 0;
+
+        if (!data->anchor || data->scroll_parents) {
+                return;
+        }
+        for (w = data->anchor->parent; w; w = w->parent) {
+                if (ui_check_widget_type(w, "scrollarea")) {
+                        ++count;
+                }
+        }
+        if (count == 0) {
+                return;
+        }
+        data->scroll_parents = calloc(count, sizeof(ui_widget_t *));
+        data->scroll_tops = calloc(count, sizeof(float));
+        data->scroll_lefts = calloc(count, sizeof(float));
+        if (!data->scroll_parents || !data->scroll_tops ||
+            !data->scroll_lefts) {
+                free(data->scroll_parents);
+                free(data->scroll_tops);
+                free(data->scroll_lefts);
+                data->scroll_parents = NULL;
+                data->scroll_tops = NULL;
+                data->scroll_lefts = NULL;
+                return;
+        }
+        for (w = data->anchor->parent; w; w = w->parent) {
+                if (ui_check_widget_type(w, "scrollarea")) {
+                        data->scroll_parents[i] = w;
+                        data->scroll_tops[i] = ui_scrollarea_get_scroll_top(w);
+                        data->scroll_lefts[i] =
+                            ui_scrollarea_get_scroll_left(w);
+                        ++i;
+                }
+        }
+        data->scroll_parent_count = count;
+        for (i = 0; i < count; ++i) {
+                ui_widget_on(data->scroll_parents[i], "scroll",
+                             ui_portal_on_anchor_scroll, data->owner);
+        }
 }
 
 static void ui_portal_on_update(ui_widget_t *w, ui_task_type_t task)
@@ -255,6 +413,7 @@ static void ui_portal_on_destroy(ui_widget_t *w)
         ui_portal_t *data = ui_portal_get_data(w);
         ui_widget_t *content = data->content;
 
+        ui_portal_clear_scroll_parents(data);
         if (content) {
                 ui_portal_remove_content_entry(content);
                 ui_widget_off(content, "destroy", ui_portal_content_on_destroy,
@@ -277,9 +436,18 @@ static void ui_portal_on_init(ui_widget_t *w)
         ui_portal_t *data;
 
         data = ui_widget_add_data(w, ui_portal_prototype, sizeof(*data));
+        data->owner = w;
         data->content = NULL;
         data->passthrough = false;
+        data->outside_close = false;
+        data->follow_anchor = false;
         data->anchor = NULL;
+        data->scroll_parents = NULL;
+        data->scroll_tops = NULL;
+        data->scroll_lefts = NULL;
+        data->scroll_parent_count = 0;
+        data->content_x = 0;
+        data->content_y = 0;
         data->open = false;
         ui_widget_on(w, "portal-outside", ui_portal_on_outside, NULL);
 }
@@ -339,6 +507,11 @@ void ui_portal_set_passthrough(ui_widget_t *portal, bool passthrough)
         ui_portal_root_sync_visibility();
 }
 
+void ui_portal_set_outside_close(ui_widget_t *portal, bool enabled)
+{
+        ui_portal_get_data(portal)->outside_close = enabled;
+}
+
 void ui_portal_set_content(ui_widget_t *portal, ui_widget_t *content)
 {
         ui_portal_t *data = ui_portal_get_data(portal);
@@ -362,8 +535,9 @@ void ui_portal_set_content(ui_widget_t *portal, ui_widget_t *content)
         }
         ui_widget_append(ui_get_portal_root(), content);
         data->content = content;
+        ui_widget_set_style_string(content, "display",
+                                   data->open ? "block" : "none");
         if (data->open) {
-                ui_widget_set_style_string(content, "display", "block");
                 ui_portal_update_position(portal);
                 ui_portal_root_sync_visibility();
         }
@@ -382,7 +556,24 @@ ui_widget_t *ui_portal_get_content(ui_widget_t *portal)
 
 void ui_portal_set_anchor(ui_widget_t *portal, ui_widget_t *anchor)
 {
-        ui_portal_get_data(portal)->anchor = anchor;
+        ui_portal_t *data = ui_portal_get_data(portal);
+
+        ui_portal_clear_scroll_parents(data);
+        data->anchor = anchor;
+        if (data->follow_anchor) {
+                ui_portal_bind_scroll_parents(data);
+        }
+}
+
+void ui_portal_set_follow_anchor(ui_widget_t *portal, bool follow)
+{
+        ui_portal_t *data = ui_portal_get_data(portal);
+
+        data->follow_anchor = follow;
+        ui_portal_clear_scroll_parents(data);
+        if (follow) {
+                ui_portal_bind_scroll_parents(data);
+        }
 }
 
 void ui_portal_set_side(ui_widget_t *portal, const char *side)
@@ -453,4 +644,5 @@ void ui_register_portal(void)
         ui_portal_prototype->destroy = ui_portal_on_destroy;
         ui_portal_prototype->update = ui_portal_on_update;
         ui_load_css_string(ui_portal_css, __FILE__);
+        ui_widget_on(ui_root(), "click", ui_portal_root_on_outside_input, NULL);
 }

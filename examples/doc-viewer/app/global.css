@@ -274,6 +274,31 @@ p {
   @apply flex flex-wrap gap-2;
 }
 
+.popover-align-demo {
+  @apply flex flex-wrap gap-2;
+}
+
+.popover-form-grid {
+  @apply flex flex-col gap-2;
+  /* clip-safe supplies the 4px focus-ring gutter; keep the original visual
+   * 12px offset above the grid (8px margin + 4px padding). */
+  margin-top: 8px;
+}
+
+.popover-form-grid field {
+  gap: 16px;
+}
+
+.popover-form-grid field-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.popover-form-input {
+  flex: 2;
+  min-width: 0;
+}
+
 .field-checkbox-demo-group {
   @apply gap-3;
 }

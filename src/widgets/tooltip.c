@@ -105,16 +105,16 @@ static ui_tooltip_content_t *ui_tooltip_content_get_data(ui_widget_t *w)
 
 static ui_tooltip_side_t ui_tooltip_side_normalize(ui_tooltip_side_t side)
 {
-        if (side < UI_TOOLTIP_SIDE_TOP || side > UI_TOOLTIP_SIDE_LEFT) {
-                return UI_TOOLTIP_SIDE_TOP;
+        if (side < UI_SIDE_TOP || side > UI_SIDE_LEFT) {
+                return UI_SIDE_TOP;
         }
         return side;
 }
 
 static ui_tooltip_align_t ui_tooltip_align_normalize(ui_tooltip_align_t align)
 {
-        if (align < UI_TOOLTIP_ALIGN_CENTER || align > UI_TOOLTIP_ALIGN_END) {
-                return UI_TOOLTIP_ALIGN_CENTER;
+        if (align < UI_ALIGN_CENTER || align > UI_ALIGN_END) {
+                return UI_ALIGN_CENTER;
         }
         return align;
 }
@@ -131,7 +131,7 @@ static ui_tooltip_side_t ui_tooltip_side_from_name(const char *name)
                         }
                 }
         }
-        return UI_TOOLTIP_SIDE_TOP;
+        return UI_SIDE_TOP;
 }
 
 static ui_tooltip_align_t ui_tooltip_align_from_name(const char *name)
@@ -146,7 +146,7 @@ static ui_tooltip_align_t ui_tooltip_align_from_name(const char *name)
                         }
                 }
         }
-        return UI_TOOLTIP_ALIGN_CENTER;
+        return UI_ALIGN_CENTER;
 }
 
 static ui_widget_t *ui_tooltip_find_child(ui_widget_t *w,
@@ -525,8 +525,8 @@ void ui_tooltip_options_init(ui_tooltip_options_t *options)
                 return;
         }
         memset(options, 0, sizeof(*options));
-        options->side = UI_TOOLTIP_SIDE_TOP;
-        options->align = UI_TOOLTIP_ALIGN_CENTER;
+        options->side = UI_SIDE_TOP;
+        options->align = UI_ALIGN_CENTER;
         options->side_offset = 4;
         options->align_offset = 0;
 }
@@ -804,8 +804,8 @@ static void ui_tooltip_content_on_init(ui_widget_t *w)
 
         data = ui_widget_add_data(w, ui_tooltip_content_prototype,
                                   sizeof(ui_tooltip_content_t));
-        data->side = UI_TOOLTIP_SIDE_TOP;
-        data->align = UI_TOOLTIP_ALIGN_CENTER;
+        data->side = UI_SIDE_TOP;
+        data->align = UI_ALIGN_CENTER;
         data->side_offset = 4;
         data->align_offset = 0;
 }
@@ -891,9 +891,8 @@ static void ui_tooltip_apply_placement(ui_tooltip_t *data)
 {
         ui_tooltip_content_t *content =
             ui_tooltip_content_get_data(data->content);
-        ui_tooltip_side_t side = content ? content->side : UI_TOOLTIP_SIDE_TOP;
-        ui_tooltip_align_t align =
-            content ? content->align : UI_TOOLTIP_ALIGN_CENTER;
+        ui_tooltip_side_t side = content ? content->side : UI_SIDE_TOP;
+        ui_tooltip_align_t align = content ? content->align : UI_ALIGN_CENTER;
         int side_offset = content ? content->side_offset : 4;
         int align_offset = content ? content->align_offset : 0;
         const char *side_name = ui_tooltip_side_names[side];

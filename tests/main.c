@@ -43,10 +43,12 @@ extern void test_alert(void);
 extern void test_item(void);
 extern void test_empty(void);
 extern void test_tooltip(void);
+extern void test_popover(void);
 extern void test_draw_backend(void);
 extern void test_spinner(void);
 extern void test_spinner_perf(void);
 extern void test_shimmer(void);
+extern void test_style_nova(void);
 
 static const ctest_suite_t suites[] = {
         { "settings", test_settings },
@@ -80,10 +82,12 @@ static const ctest_suite_t suites[] = {
         { "item", test_item },
         { "empty", test_empty },
         { "tooltip", test_tooltip },
+        { "popover", test_popover },
         { "draw backend", test_draw_backend },
         { "spinner", test_spinner },
         { "spinner perf", test_spinner_perf },
         { "shimmer", test_shimmer },
+        { "style nova", test_style_nova },
         { NULL, NULL }
 };
 

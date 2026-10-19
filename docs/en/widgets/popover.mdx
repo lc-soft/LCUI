@@ -1,0 +1,119 @@
+# Popover
+
+A non-modal overlay that renders interactive content in a Portal after the trigger is clicked.
+
+<WidgetExample name="popover-basic" />
+
+## Use cases
+
+- **Suitable**: Forms, settings panels, filters, and other cases that host interactive content
+- **Suitable**: Showing a structured block of content after a click while keeping the rest of the page usable
+- **Not suitable**: Plain text or short hints (use `tooltip`)
+- **Not suitable**: Confirmation flows that need an overlay and focus trap (use `dialog` / `alert-dialog`)
+- **Not suitable**: Long content or complex panels that need continuous scrolling (use a page, `scrollarea`, or a drawer)
+
+## Usage
+
+```tsx
+import { Popover, PopoverTrigger, PopoverContent, PopoverHeader, PopoverTitle, PopoverDescription, Button } from "@lcui/react"
+```
+
+```tsx
+<Popover>
+  <PopoverTrigger>
+    <Button variant="outline">Open popover</Button>
+  </PopoverTrigger>
+  <PopoverContent>
+    <PopoverHeader>
+      <PopoverTitle>Dimensions</PopoverTitle>
+      <PopoverDescription>Set the dimensions for the layer.</PopoverDescription>
+    </PopoverHeader>
+  </PopoverContent>
+</Popover>
+```
+
+## Composition
+
+Use the following composition to build a `Popover`:
+
+```
+Popover
+├── PopoverTrigger
+└── PopoverContent
+    ├── PopoverHeader
+    │   ├── PopoverTitle
+    │   └── PopoverDescription
+    └── (any interactive content)
+```
+
+## Examples
+
+### Basic
+
+A basic popover with a title and a description.
+
+<WidgetExample name="popover-simple" />
+
+### Alignment
+
+Use `align` to control where the overlay is aligned on the side axis.
+
+<WidgetExample name="popover-align" />
+
+## Caveats
+
+:::note
+
+**Popover is a non-modal overlay.** It has no overlay backdrop or focus trap; clicking an outside control passes the click through, closes the popover, and still activates the outside control. The bubble follows the trigger when the page scrolls. Press Esc to close the current popover.
+
+:::
+
+:::note
+
+Only one active popover is kept at a time; opening another popover closes the previous one. Clicking inside the content does not close the popover; to close it, call `ui_popover_close()` or click the trigger or outside the popover.
+
+:::
+
+:::caution
+
+**The current implementation does not include edge collision flipping or repositioning on resize.** It also does not provide `PopoverAnchor`; to move the anchor, place `PopoverTrigger` at the target position.
+
+:::
+
+## API Reference
+
+### Popover
+
+The popover state container, which manages open state, the Portal, and focus restoration.
+
+<FieldTable name="popover" />
+
+### PopoverTrigger
+
+The wrapper that triggers the popover. Put a button, icon, or other clickable widget inside.
+
+<FieldTable name="popover-trigger" />
+
+### PopoverContent
+
+The Portal bubble that hosts interactive content and handles side, alignment, and offset.
+
+<FieldTable name="popover-content" />
+
+### PopoverHeader
+
+A header that groups the title and description.
+
+<FieldTable name="popover-header" />
+
+### PopoverTitle
+
+The popover title.
+
+<FieldTable name="popover-title" />
+
+### PopoverDescription
+
+The popover description text.
+
+<FieldTable name="popover-description" />

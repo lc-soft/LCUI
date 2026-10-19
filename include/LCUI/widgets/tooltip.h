@@ -13,22 +13,13 @@
 #define LCUI_INCLUDE_WIDGETS_TOOLTIP_H
 
 #include <LCUI/common.h>
+#include <LCUI/widgets/placement.h>
 #include <ui/base.h>
 
 LCUI_BEGIN_HEADER
 
-typedef enum ui_tooltip_side {
-        UI_TOOLTIP_SIDE_TOP = 0,
-        UI_TOOLTIP_SIDE_RIGHT,
-        UI_TOOLTIP_SIDE_BOTTOM,
-        UI_TOOLTIP_SIDE_LEFT,
-} ui_tooltip_side_t;
-
-typedef enum ui_tooltip_align {
-        UI_TOOLTIP_ALIGN_CENTER = 0,
-        UI_TOOLTIP_ALIGN_START,
-        UI_TOOLTIP_ALIGN_END,
-} ui_tooltip_align_t;
+typedef ui_side_t ui_tooltip_side_t;
+typedef ui_align_t ui_tooltip_align_t;
 
 typedef struct ui_tooltip_options {
         const char *content;

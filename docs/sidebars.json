@@ -42,6 +42,7 @@
         { "slug": "field", "label": { "en": "Field", "zh-CN": "Field 表单字段" } },
         { "slug": "item", "label": { "en": "Item", "zh-CN": "Item 内容行" } },
         { "slug": "label", "label": { "en": "Label", "zh-CN": "Label 标签" } },
+        { "slug": "popover", "label": { "en": "Popover", "zh-CN": "Popover 弹出层" } },
         { "slug": "progress", "label": { "en": "Progress", "zh-CN": "Progress 进度条" } },
         { "slug": "radio-group", "label": { "en": "RadioGroup", "zh-CN": "RadioGroup 单选组" } },
         { "slug": "select", "label": { "en": "Select", "zh-CN": "Select 下拉选择" } },

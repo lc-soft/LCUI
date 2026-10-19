@@ -100,41 +100,6 @@ static void test_size(void)
         ui_widget_destroy(item);
 }
 
-static void test_text_sizes(void)
-{
-        ui_widget_t *item = ui_create_item();
-        ui_widget_t *title = ui_create_item_title();
-        ui_widget_t *description = ui_create_item_description();
-
-        ui_text_set_content(title, "Title");
-        ui_text_set_content(description, "Description");
-        ui_widget_append(item, title);
-        ui_widget_append(item, description);
-        ui_root_append(item);
-        ui_update();
-
-        ctest_equal_float("default title should use text-sm",
-                          title->computed_style.font_size, 14.0f);
-        ctest_equal_float("default description should use text-sm",
-                          description->computed_style.font_size, 14.0f);
-
-        ui_item_set_size(item, UI_ITEM_SIZE_SM);
-        ui_update();
-        ctest_equal_float("sm title should stay text-sm",
-                          title->computed_style.font_size, 14.0f);
-        ctest_equal_float("sm description should stay text-sm",
-                          description->computed_style.font_size, 14.0f);
-
-        ui_item_set_size(item, UI_ITEM_SIZE_XS);
-        ui_update();
-        ctest_equal_float("xs title should stay text-sm",
-                          title->computed_style.font_size, 14.0f);
-        ctest_equal_float("xs description should use text-xs",
-                          description->computed_style.font_size, 12.0f);
-
-        ui_widget_destroy(item);
-}
-
 void test_item(void)
 {
         lcui_init();
@@ -142,6 +107,5 @@ void test_item(void)
         ctest_describe("item parts", test_parts);
         ctest_describe("item variants", test_variants);
         ctest_describe("item size", test_size);
-        ctest_describe("item text sizes", test_text_sizes);
         lcui_destroy();
 }

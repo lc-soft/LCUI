@@ -1,0 +1,119 @@
+# Popover
+
+点击触发器后在 Portal 中显示可交互内容的非模态浮层。
+
+<WidgetExample name="popover-basic" />
+
+## 适用场景
+
+- **适用**：表单、设置面板、筛选器等需要承载可交互内容的场景
+- **适用**：希望点击触发器后展示一段结构化内容，同时保留页面其余部分可操作
+- **不适用**：纯文本、短提示（使用 `tooltip`）
+- **不适用**：需要遮罩和焦点陷阱的确认流程（使用 `dialog` / `alert-dialog`）
+- **不适用**：长篇内容或需要持续滚动的复杂面板（使用页面、`scrollarea` 或抽屉）
+
+## 用法
+
+```tsx
+import { Popover, PopoverTrigger, PopoverContent, PopoverHeader, PopoverTitle, PopoverDescription, Button } from "@lcui/react"
+```
+
+```tsx
+<Popover>
+  <PopoverTrigger>
+    <Button variant="outline">Open popover</Button>
+  </PopoverTrigger>
+  <PopoverContent>
+    <PopoverHeader>
+      <PopoverTitle>Dimensions</PopoverTitle>
+      <PopoverDescription>Set the dimensions for the layer.</PopoverDescription>
+    </PopoverHeader>
+  </PopoverContent>
+</Popover>
+```
+
+## 组合
+
+使用以下组合来构建 `Popover`：
+
+```
+Popover
+├── PopoverTrigger
+└── PopoverContent
+    ├── PopoverHeader
+    │   ├── PopoverTitle
+    │   └── PopoverDescription
+    └── （任意可交互内容）
+```
+
+## 示例
+
+### 基础
+
+一个包含标题和描述的基础 Popover。
+
+<WidgetExample name="popover-simple" />
+
+### 对齐
+
+使用 `align` 控制弹出层在方位轴上的对齐方式。
+
+<WidgetExample name="popover-align" />
+
+## 注意事项
+
+:::note
+
+**Popover 是非模态浮层。** 没有遮罩和焦点陷阱；点击外部控件时，点击会穿透并关闭 Popover，外部控件本身仍然生效。页面滚动时气泡会跟随触发器移动。按 Esc 关闭当前 Popover。
+
+:::
+
+:::note
+
+同一时间只保留一个 active Popover；打开另一个 Popover 会关闭上一个。内部内容的点击不会关闭 Popover，需要关闭时调用 `ui_popover_close()` 或点击触发器/外部。
+
+:::
+
+:::caution
+
+**当前实现不包含边缘碰撞翻转和 resize 重定位。** 也不提供 `PopoverAnchor`；需要改变锚点时请把 `PopoverTrigger` 放到目标位置。
+
+:::
+
+## API 参考
+
+### Popover
+
+弹出层状态容器，管理开关、Portal 和焦点恢复。
+
+<FieldTable name="popover" />
+
+### PopoverTrigger
+
+触发弹出层的包装层，按钮、图标或其他可点击部件放在其中。
+
+<FieldTable name="popover-trigger" />
+
+### PopoverContent
+
+承载可交互内容的 Portal 气泡，负责方位、对齐和偏移。
+
+<FieldTable name="popover-content" />
+
+### PopoverHeader
+
+标题与描述的组合头部。
+
+<FieldTable name="popover-header" />
+
+### PopoverTitle
+
+弹出层标题。
+
+<FieldTable name="popover-title" />
+
+### PopoverDescription
+
+弹出层说明文本。
+
+<FieldTable name="popover-description" />
