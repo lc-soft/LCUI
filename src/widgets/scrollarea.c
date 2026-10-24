@@ -172,10 +172,59 @@ static void ui_scrollarea_on_mutation(ui_mutation_list_t *list,
         }
 }
 
+static bool ui_scrollarea_can_scroll_top(ui_widget_t *w, ui_scrollarea_t *that,
+                                         int delta)
+{
+        float max_top = that->scroll_height - w->content_box.height;
+
+        if (max_top <= 0.0f || delta == 0) {
+                return false;
+        }
+        if (delta < 0) {
+                return that->scroll_top < max_top - 0.5f;
+        }
+        return that->scroll_top > 0.5f;
+}
+
+static bool ui_scrollarea_can_scroll_left(ui_widget_t *w, ui_scrollarea_t *that,
+                                          int delta)
+{
+        float max_left = that->scroll_width - w->content_box.width;
+
+        if (max_left <= 0.0f || delta == 0) {
+                return false;
+        }
+        if (delta < 0) {
+                return that->scroll_left < max_left - 0.5f;
+        }
+        return that->scroll_left > 0.5f;
+}
+
 static void ui_scrollarea_on_wheel(ui_widget_t *w, ui_event_t *e, void *arg)
 {
         ui_scrollarea_t *that = ui_widget_get_data(w, ui_scrollarea_proto);
+        bool can_scroll = false;
 
+        ui_scrollarea_update(w);
+        switch (that->direction) {
+        case UI_SCROLLAREA_VERTICAL:
+                can_scroll =
+                    ui_scrollarea_can_scroll_top(w, that, e->wheel.delta_y);
+                break;
+        case UI_SCROLLAREA_HORIZONTAL:
+                can_scroll =
+                    ui_scrollarea_can_scroll_left(w, that, e->wheel.delta_y);
+                break;
+        default:
+                can_scroll =
+                    ui_scrollarea_can_scroll_top(w, that, e->wheel.delta_y) ||
+                    ui_scrollarea_can_scroll_left(w, that, e->wheel.delta_x);
+                break;
+        }
+        if (!can_scroll) {
+                return;
+        }
+        e->cancel_bubble = true;
         switch (that->direction) {
         case UI_SCROLLAREA_VERTICAL:
                 that->scroll_top -= e->wheel.delta_y;

@@ -28,6 +28,7 @@ extern void test_block_layout(void);
 extern void test_flex_layout(void);
 extern void test_flex_layout_percentage_wrap(void);
 extern void test_scrollbar(void);
+extern void test_scrollarea(void);
 extern void test_progress(void);
 extern void test_label(void);
 extern void test_checkbox(void);
@@ -70,6 +71,7 @@ static const ctest_suite_t suites[] = {
         { "flex layout", test_flex_layout },
         { "flex layout percentage wrap", test_flex_layout_percentage_wrap },
         { "scrollbar", test_scrollbar },
+        { "scrollarea", test_scrollarea },
         { "progress", test_progress },
         { "label", test_label },
         { "checkbox", test_checkbox },
