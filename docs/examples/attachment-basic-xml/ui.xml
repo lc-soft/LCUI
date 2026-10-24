@@ -1,0 +1,74 @@
+<lcui-app>
+  <resource type="text/css">
+    .attachment-basic-demo {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 384px;
+    }
+    .attachment-basic-demo attachment-group {
+      width: 100%;
+    }
+    .attachment-basic-demo attachment {
+      width: 100%;
+    }
+    .attachment-basic-demo attachment:vertical {
+      width: 120px;
+    }
+  </resource>
+  <ui>
+    <widget class="attachment-basic-demo">
+      <attachment-group>
+        <attachment orientation="vertical">
+          <attachment-media variant="image" src="assets/attachment/workspace.jpg" />
+          <attachment-content>
+            <attachment-title>workspace.png</attachment-title>
+            <attachment-description>PNG - 820 KB</attachment-description>
+          </attachment-content>
+        </attachment>
+        <attachment orientation="vertical">
+          <attachment-media variant="image" src="assets/attachment/desk-reference.jpg" />
+          <attachment-content>
+            <attachment-title>desk-reference.jpg</attachment-title>
+            <attachment-description>JPG - 1.1 MB</attachment-description>
+          </attachment-content>
+        </attachment>
+        <attachment orientation="vertical">
+          <attachment-media variant="image" src="assets/attachment/office-reference.jpg" />
+          <attachment-content>
+            <attachment-title>office-reference.jpg</attachment-title>
+            <attachment-description>JPG - 940 KB</attachment-description>
+          </attachment-content>
+        </attachment>
+      </attachment-group>
+      <attachment state="uploading">
+        <attachment-media>
+          <spinner />
+        </attachment-media>
+        <attachment-content>
+          <attachment-title>sales-dashboard.pdf</attachment-title>
+          <attachment-description>Uploading - 64%</attachment-description>
+        </attachment-content>
+        <attachment-actions>
+          <button variant="ghost" size="icon-xs" class="attachment-action" aria-label="Cancel upload">
+            <icon name="dismiss" />
+          </button>
+        </attachment-actions>
+      </attachment>
+      <attachment>
+        <attachment-media>
+          <icon name="code" />
+        </attachment-media>
+        <attachment-content>
+          <attachment-title>message-renderer.tsx</attachment-title>
+          <attachment-description>TypeScript - 12 KB</attachment-description>
+        </attachment-content>
+        <attachment-actions>
+          <button variant="ghost" size="icon-xs" class="attachment-action" aria-label="Remove message-renderer.tsx">
+            <icon name="dismiss" />
+          </button>
+        </attachment-actions>
+      </attachment>
+    </widget>
+  </ui>
+</lcui-app>

@@ -460,6 +460,59 @@ item:disabled {
   @apply opacity-50;
 }
 
+attachment {
+  @apply bg-card text-card-foreground;
+  border-color: #e5e5e5;
+  border-radius: 12px;
+}
+
+attachment:idle {
+  border-color: #d4d4d4;
+}
+
+attachment:error {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+attachment:error attachment-media {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+attachment:error attachment-description {
+  color: rgba(220, 38, 38, 0.8);
+}
+
+attachment.has-trigger:hover {
+  background-color: rgba(245, 245, 245, 0.5);
+}
+
+attachment.has-trigger:active,
+attachment.has-trigger:focus {
+  box-shadow: 0 0 0 2px rgba(34, 34, 34, 0.12);
+}
+
+attachment-media {
+  @apply bg-muted text-foreground;
+}
+
+attachment-title {
+  @apply font-medium;
+}
+
+attachment-description {
+  @apply text-muted-foreground;
+}
+
+attachment-action {
+  @apply rounded-md;
+}
+
+attachment-group {
+  @apply gap-3;
+  width: 100%;
+}
+
 /* tooltip: structural rules live in src/widgets/tooltip.c */
 
 tooltip-content {

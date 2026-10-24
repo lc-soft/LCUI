@@ -1,0 +1,152 @@
+# Attachment
+
+A composable attachment surface for files and images, including media, metadata, upload state, and actions.
+
+<WidgetExample name="attachment-basic" />
+
+## Use cases
+
+- **Use**: File attachments in chat composers, message threads, and upload lists
+- **Use**: Image attachments with thumbnails, names, sizes, and remove actions
+- **Use**: Attachments that need idle, uploading, processing, error, and done states
+- **Don't use**: Full file-manager workflows, which belong in a dedicated page
+
+## Usage
+
+```tsx
+import {
+  Attachment,
+  AttachmentAction,
+  AttachmentActions,
+  AttachmentContent,
+  AttachmentDescription,
+  AttachmentMedia,
+  AttachmentTitle,
+} from "@lcui/react"
+```
+
+```tsx
+<Attachment>
+  <AttachmentMedia>
+    <Icon name="document" />
+  </AttachmentMedia>
+  <AttachmentContent>
+    <AttachmentTitle>sales-dashboard.pdf</AttachmentTitle>
+    <AttachmentDescription>PDF · 2.4 MB</AttachmentDescription>
+  </AttachmentContent>
+  <AttachmentActions>
+    <AttachmentAction aria-label="Remove sales-dashboard.pdf">
+      <Icon name="dismiss" />
+    </AttachmentAction>
+  </AttachmentActions>
+</Attachment>
+```
+
+## Composition
+
+Use the following composition to build an `Attachment`:
+
+```
+Attachment
+├── AttachmentMedia
+├── AttachmentContent
+│   ├── AttachmentTitle
+│   └── AttachmentDescription
+├── AttachmentActions
+│   └── AttachmentAction
+└── AttachmentTrigger
+```
+
+Use `AttachmentGroup` to lay out multiple attachments in a row:
+
+```
+AttachmentGroup
+├── Attachment
+└── Attachment
+```
+
+## Examples
+
+### Image
+
+Set `variant="image"` on `AttachmentMedia` and provide an image through `src` or a background image. With vertical orientation the media sits above the content, which suits image thumbnails.
+
+<WidgetExample name="attachment-image" />
+
+### States
+
+`state` describes the upload lifecycle. `uploading` and `processing` add a Shimmer sweep to the title, and the media slot can hold a Spinner.
+
+<WidgetExample name="attachment-states" />
+
+### Sizes
+
+Use `size` to switch between `default`, `sm`, and `xs`.
+
+<WidgetExample name="attachment-sizes" />
+
+### Group
+
+The basic example arranges three image attachments in an `AttachmentGroup`. Each attachment keeps its own size, and actions remain independently clickable.
+
+### Trigger
+
+`AttachmentTrigger` is an absolutely positioned transparent layer that covers the whole card while leaving `AttachmentActions` clickable. Attachments with a trigger show a `bg-muted/50` background on hover and use a box-shadow instead of an outline for active/focus. Wire the click through declarative associations such as `data-dialog-trigger` to a preview, link, or dialog.
+
+<WidgetExample name="attachment-trigger" />
+
+## API Reference
+
+### Attachment
+
+The attachment root. Manages state, size, and orientation.
+
+<FieldTable name="attachment" />
+
+### AttachmentMedia
+
+The leading or top media slot for an icon or image preview.
+
+<FieldTable name="attachment-media" />
+
+### AttachmentContent
+
+The flexible content slot for the title and description.
+
+<FieldTable name="attachment-content" />
+
+### AttachmentTitle
+
+The attachment name. Uploading and processing states show a Shimmer sweep.
+
+<FieldTable name="attachment-title" />
+
+### AttachmentDescription
+
+Secondary metadata such as file type, size, or upload status.
+
+<FieldTable name="attachment-description" />
+
+### AttachmentActions
+
+The action slot. Vertically oriented attachments pin it to the top right.
+
+<FieldTable name="attachment-actions" />
+
+### AttachmentAction
+
+An icon action button based on the `ghost` button variant and `icon-xs` size.
+
+<FieldTable name="attachment-action" />
+
+### AttachmentTrigger
+
+A transparent full-card trigger layer that sits below the actions.
+
+<FieldTable name="attachment-trigger" />
+
+### AttachmentGroup
+
+A row container for multiple attachments.
+
+<FieldTable name="attachment-group" />

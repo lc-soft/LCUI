@@ -1,0 +1,43 @@
+<lcui-app>
+  <resource type="text/css">
+    .attachment-sizes-demo {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 384px;
+    }
+    .attachment-sizes-demo attachment {
+      width: 100%;
+    }
+  </resource>
+  <ui>
+    <widget class="attachment-sizes-demo">
+      <attachment size="default">
+        <attachment-media>
+          <icon name="document" />
+        </attachment-media>
+        <attachment-content>
+          <attachment-title>Default attachment</attachment-title>
+          <attachment-description>PDF - 2.4 MB</attachment-description>
+        </attachment-content>
+      </attachment>
+      <attachment size="sm">
+        <attachment-media>
+          <icon name="document" />
+        </attachment-media>
+        <attachment-content>
+          <attachment-title>Small attachment</attachment-title>
+          <attachment-description>PDF - 2.4 MB</attachment-description>
+        </attachment-content>
+      </attachment>
+      <attachment size="xs">
+        <attachment-media>
+          <icon name="document" />
+        </attachment-media>
+        <attachment-content>
+          <attachment-title>Extra small attachment</attachment-title>
+        </attachment-content>
+      </attachment>
+    </widget>
+  </ui>
+</lcui-app>

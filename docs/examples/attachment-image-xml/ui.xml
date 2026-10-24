@@ -1,0 +1,46 @@
+<lcui-app>
+  <resource type="text/css">
+    .attachment-image-demo {
+      width: 384px;
+    }
+    .attachment-image-demo attachment-group {
+      width: 100%;
+    }
+  </resource>
+  <ui>
+    <widget class="attachment-image-demo">
+      <attachment-group>
+        <attachment orientation="vertical">
+          <attachment-media variant="image" src="assets/attachment/workspace.jpg" />
+          <attachment-content>
+            <attachment-title>workspace.png</attachment-title>
+            <attachment-description>PNG - 820 KB</attachment-description>
+          </attachment-content>
+          <attachment-actions>
+            <button variant="ghost" size="icon-xs" class="attachment-action" aria-label="Remove workspace.png"><icon name="dismiss" /></button>
+          </attachment-actions>
+        </attachment>
+        <attachment orientation="vertical">
+          <attachment-media variant="image" src="assets/attachment/desk-reference.jpg" />
+          <attachment-content>
+            <attachment-title>desk-reference.jpg</attachment-title>
+            <attachment-description>JPG - 1.1 MB</attachment-description>
+          </attachment-content>
+          <attachment-actions>
+            <button variant="ghost" size="icon-xs" class="attachment-action" aria-label="Remove desk-reference.jpg"><icon name="dismiss" /></button>
+          </attachment-actions>
+        </attachment>
+        <attachment orientation="vertical">
+          <attachment-media variant="image" src="assets/attachment/office-reference.jpg" />
+          <attachment-content>
+            <attachment-title>office-reference.jpg</attachment-title>
+            <attachment-description>JPG - 940 KB</attachment-description>
+          </attachment-content>
+          <attachment-actions>
+            <button variant="ghost" size="icon-xs" class="attachment-action" aria-label="Remove office-reference.jpg"><icon name="dismiss" /></button>
+          </attachment-actions>
+        </attachment>
+      </attachment-group>
+    </widget>
+  </ui>
+</lcui-app>

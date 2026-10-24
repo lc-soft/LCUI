@@ -49,6 +49,7 @@ void lcui_widgets_init(void)
         ui_register_card();
         ui_register_alert();
         ui_register_item();
+        ui_register_attachment();
         ui_register_empty();
         ui_register_dialog();
         ui_register_alert_dialog();

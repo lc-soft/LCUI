@@ -1,0 +1,68 @@
+<lcui-app>
+  <resource type="text/css">
+    .attachment-states-demo {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 384px;
+    }
+    .attachment-states-demo attachment {
+      width: 100%;
+    }
+  </resource>
+  <ui>
+    <widget class="attachment-states-demo">
+      <attachment state="idle">
+        <attachment-media><icon name="clock" /></attachment-media>
+        <attachment-content>
+          <attachment-title>selected-file.pdf</attachment-title>
+          <attachment-description>Ready to upload</attachment-description>
+        </attachment-content>
+        <attachment-actions>
+          <button variant="ghost" size="icon-xs" class="attachment-action" aria-label="Remove selected-file.pdf"><icon name="dismiss" /></button>
+        </attachment-actions>
+      </attachment>
+      <attachment state="uploading">
+        <attachment-media><spinner /></attachment-media>
+        <attachment-content>
+          <attachment-title>design-system.zip</attachment-title>
+          <attachment-description>Uploading - 64%</attachment-description>
+        </attachment-content>
+        <attachment-actions>
+          <button variant="ghost" size="icon-xs" class="attachment-action" aria-label="Cancel upload"><icon name="dismiss" /></button>
+        </attachment-actions>
+      </attachment>
+      <attachment state="processing">
+        <attachment-media><icon name="document-text" /></attachment-media>
+        <attachment-content>
+          <attachment-title>market-research.pdf</attachment-title>
+          <attachment-description>Processing document</attachment-description>
+        </attachment-content>
+        <attachment-actions>
+          <button variant="ghost" size="icon-xs" class="attachment-action" aria-label="Remove market-research.pdf"><icon name="dismiss" /></button>
+        </attachment-actions>
+      </attachment>
+      <attachment state="error">
+        <attachment-media><icon name="document-error" /></attachment-media>
+        <attachment-content>
+          <attachment-title>financial-model.xlsx</attachment-title>
+          <attachment-description>Upload failed. Try again.</attachment-description>
+        </attachment-content>
+        <attachment-actions>
+          <button variant="ghost" size="icon-xs" class="attachment-action" aria-label="Retry upload"><icon name="arrow-sync" /></button>
+          <button variant="ghost" size="icon-xs" class="attachment-action" aria-label="Remove financial-model.xlsx"><icon name="dismiss" /></button>
+        </attachment-actions>
+      </attachment>
+      <attachment state="done">
+        <attachment-media><icon name="checkmark" /></attachment-media>
+        <attachment-content>
+          <attachment-title>uploaded-report.pdf</attachment-title>
+          <attachment-description>Uploaded - 1.8 MB</attachment-description>
+        </attachment-content>
+        <attachment-actions>
+          <button variant="ghost" size="icon-xs" class="attachment-action" aria-label="Remove uploaded-report.pdf"><icon name="dismiss" /></button>
+        </attachment-actions>
+      </attachment>
+    </widget>
+  </ui>
+</lcui-app>

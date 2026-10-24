@@ -1,0 +1,40 @@
+<lcui-app>
+  <resource type="text/css">
+    .attachment-trigger-demo {
+      box-sizing: border-box;
+      width: 384px;
+      padding: 4px;
+    }
+    .attachment-trigger-demo attachment {
+      width: 100%;
+    }
+  </resource>
+  <ui>
+    <widget class="attachment-trigger-demo">
+      <attachment>
+        <attachment-media><icon name="document" /></attachment-media>
+        <attachment-content>
+          <attachment-title>research-summary.pdf</attachment-title>
+          <attachment-description>Open preview dialog</attachment-description>
+        </attachment-content>
+        <attachment-actions>
+          <button variant="ghost" size="icon-xs" class="attachment-action" aria-label="Copy link"><icon name="copy" /></button>
+          <button variant="ghost" size="icon-xs" class="attachment-action" aria-label="Remove research-summary.pdf"><icon name="dismiss" /></button>
+        </attachment-actions>
+        <attachment-trigger data-dialog-trigger="attachment-preview" />
+      </attachment>
+      <dialog-overlay data-dialog-target="attachment-preview">
+        <dialog-content>
+          <dialog-header>
+            <dialog-title>research-summary.pdf</dialog-title>
+            <dialog-description>The attachment trigger opens this dialog while the actions stay independently clickable.</dialog-description>
+          </dialog-header>
+          <dialog-footer>
+            <button variant="outline" data-dialog-close="attachment-preview">Close</button>
+            <button variant="primary" data-dialog-close="attachment-preview">Open</button>
+          </dialog-footer>
+        </dialog-content>
+      </dialog-overlay>
+    </widget>
+  </ui>
+</lcui-app>

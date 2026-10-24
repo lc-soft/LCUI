@@ -1,0 +1,152 @@
+# Attachment
+
+展示文件或图片附件、名称、元数据、上传状态与操作的组合部件。
+
+<WidgetExample name="attachment-basic" />
+
+## 适用场景
+
+- **适用**：聊天输入框、消息线程和上传列表中的文件附件
+- **适用**：带缩略图、文件名、大小和移除操作的图片附件
+- **适用**：需要表达等待上传、处理中、失败和完成状态的附件
+- **不适用**：需要完整文件管理器能力的场景（使用独立的文件列表页面）
+
+## 用法
+
+```tsx
+import {
+  Attachment,
+  AttachmentAction,
+  AttachmentActions,
+  AttachmentContent,
+  AttachmentDescription,
+  AttachmentMedia,
+  AttachmentTitle,
+} from "@lcui/react"
+```
+
+```tsx
+<Attachment>
+  <AttachmentMedia>
+    <Icon name="document" />
+  </AttachmentMedia>
+  <AttachmentContent>
+    <AttachmentTitle>sales-dashboard.pdf</AttachmentTitle>
+    <AttachmentDescription>PDF · 2.4 MB</AttachmentDescription>
+  </AttachmentContent>
+  <AttachmentActions>
+    <AttachmentAction aria-label="Remove sales-dashboard.pdf">
+      <Icon name="dismiss" />
+    </AttachmentAction>
+  </AttachmentActions>
+</Attachment>
+```
+
+## 组合
+
+使用以下组合来构建 `Attachment`：
+
+```
+Attachment
+├── AttachmentMedia
+├── AttachmentContent
+│   ├── AttachmentTitle
+│   └── AttachmentDescription
+├── AttachmentActions
+│   └── AttachmentAction
+└── AttachmentTrigger
+```
+
+使用 `AttachmentGroup` 横向排列多个附件：
+
+```
+AttachmentGroup
+├── Attachment
+└── Attachment
+```
+
+## 示例
+
+### 图片
+
+将 `AttachmentMedia` 的 `variant` 设为 `image`，通过 `src` 属性或背景图显示图片。垂直排列时媒体位于内容上方，适合图片缩略图。
+
+<WidgetExample name="attachment-image" />
+
+### 状态
+
+`state` 用于表达上传生命周期。`uploading` 和 `processing` 会在标题位置显示 Shimmer 扫光，媒体槽位可以放置 Spinner。
+
+<WidgetExample name="attachment-states" />
+
+### 尺寸
+
+使用 `size` 在 `default`、`sm` 和 `xs` 之间切换附件尺寸。
+
+<WidgetExample name="attachment-sizes" />
+
+### 分组
+
+基础示例使用 `AttachmentGroup` 将三个图片附件横向排列。每个附件保持自身尺寸，操作按钮不会被覆盖。
+
+### 触发器
+
+`AttachmentTrigger` 是一个绝对定位的透明触发层，覆盖整张附件卡片，同时让 `AttachmentActions` 保持独立可点击。带触发器的附件在 hover 时显示 `bg-muted/50` 背景，在 active/focus 时用 box-shadow 模拟 outline。点击事件通过 `data-dialog-trigger` 等声明式关联连接到预览、链接或对话框。
+
+<WidgetExample name="attachment-trigger" />
+
+## API 参考
+
+### Attachment
+
+附件根容器，管理状态、尺寸和排列方向。
+
+<FieldTable name="attachment" />
+
+### AttachmentMedia
+
+行首或顶部的图标、图片预览槽位。
+
+<FieldTable name="attachment-media" />
+
+### AttachmentContent
+
+标题和描述的弹性内容槽位。
+
+<FieldTable name="attachment-content" />
+
+### AttachmentTitle
+
+附件名称。上传中和处理中会显示 Shimmer 扫光。
+
+<FieldTable name="attachment-title" />
+
+### AttachmentDescription
+
+文件类型、大小或上传状态等辅助信息。
+
+<FieldTable name="attachment-description" />
+
+### AttachmentActions
+
+操作按钮的布局槽位，垂直排列时固定在右上角。
+
+<FieldTable name="attachment-actions" />
+
+### AttachmentAction
+
+图标操作按钮，基于 `button` 的 `ghost` 变体和 `icon-xs` 尺寸。
+
+<FieldTable name="attachment-action" />
+
+### AttachmentTrigger
+
+覆盖整张卡片的透明触发层，位于操作按钮下方。
+
+<FieldTable name="attachment-trigger" />
+
+### AttachmentGroup
+
+横向排列多个附件的容器。
+
+<FieldTable name="attachment-group" />

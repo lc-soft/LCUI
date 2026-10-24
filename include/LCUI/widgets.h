@@ -31,6 +31,7 @@
 #include "widgets/card.h"
 #include "widgets/alert.h"
 #include "widgets/item.h"
+#include "widgets/attachment.h"
 #include "widgets/empty.h"
 #include "widgets/dialog.h"
 #include "widgets/alert-dialog.h"

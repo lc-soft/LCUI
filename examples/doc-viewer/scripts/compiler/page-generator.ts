@@ -3,7 +3,7 @@
  * for a single doc page.
  */
 
-import { writeFileSync, mkdirSync, existsSync } from "fs";
+import { writeFileSync, mkdirSync, existsSync, readFileSync, statSync } from "fs";
 import { join, relative, posix, sep } from "path";
 import hljs from "highlight.js";
 import type { ParsedMdx, ParsedSection } from "./mdx-parser.ts";
@@ -1035,6 +1035,18 @@ export async function generatePageFiles(
           buildDemoIndexC(ex, demoDir, repoRoot),
           "utf8",
         );
+      } else {
+        // index.c includes docs/examples/<name>/main.c.  xmake does not track
+        // that nested include dependency, so bump index.c's mtime when the
+        // source is newer; otherwise the live demo keeps running a stale
+        // object after the example C code changes.
+        const sourcePath = join(repoRoot, "docs", "examples", ex.name, "main.c");
+        if (
+          existsSync(sourcePath) &&
+          statSync(sourcePath).mtimeMs > statSync(indexCPath).mtimeMs
+        ) {
+          writeFileSync(indexCPath, readFileSync(indexCPath, "utf8"), "utf8");
+        }
       }
     }
   } else {

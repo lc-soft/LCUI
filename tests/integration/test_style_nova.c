@@ -378,6 +378,64 @@ static void check_card_theme(void)
         ui_widget_destroy(card);
 }
 
+static void check_attachment_theme(void)
+{
+        ui_widget_t *attachment = ui_create_attachment();
+        ui_widget_t *media = ui_create_attachment_media();
+        ui_widget_t *content = ui_create_attachment_content();
+        ui_widget_t *title = ui_create_attachment_title();
+        ui_widget_t *description = ui_create_attachment_description();
+
+        ui_text_set_content(title, "workspace.png");
+        ui_text_set_content(description, "PNG - 820 KB");
+        ui_widget_append(content, title);
+        ui_widget_append(content, description);
+        ui_widget_append(attachment, media);
+        ui_widget_append(attachment, content);
+        ui_root_append(attachment);
+        ui_update();
+
+        ctest_equal_int("attachment should use a solid border",
+                        attachment->computed_style.type_bits.border_top_style,
+                        CSS_BORDER_STYLE_SOLID);
+        ctest_equal_float("attachment should use a 12px radius",
+                          attachment->computed_style.border_top_left_radius,
+                          12.0f);
+        ctest_equal_float("attachment title should use text-sm",
+                          title->computed_style.font_size, 14.0f);
+        ctest_equal_int("attachment title should use medium weight",
+                        title->computed_style.type_bits.font_weight,
+                        CSS_FONT_WEIGHT_500);
+        ctest_equal_float("attachment description should use text-xs",
+                          description->computed_style.font_size, 12.0f);
+        ctest_equal_float("attachment media should be 40px wide",
+                          media->content_box.width, 40.0f);
+
+        ui_attachment_set_size(attachment, UI_ATTACHMENT_SIZE_SM);
+        ui_update();
+        ctest_equal_float("small attachment title should use text-xs",
+                          title->computed_style.font_size, 12.0f);
+        ctest_equal_float("small attachment media should be 32px wide",
+                          media->content_box.width, 32.0f);
+
+        ui_attachment_set_size(attachment, UI_ATTACHMENT_SIZE_DEFAULT);
+        ui_attachment_set_orientation(attachment,
+                                      UI_ATTACHMENT_ORIENTATION_VERTICAL);
+        ui_update();
+        ctest_equal_float("vertical attachment title should use 11px",
+                          title->computed_style.font_size, 11.0f);
+
+        ui_attachment_set_state(attachment, UI_ATTACHMENT_STATE_ERROR);
+        ui_update();
+        ctest_equal_bool(
+            "error attachment should keep a solid border",
+            attachment->computed_style.type_bits.border_top_style ==
+                CSS_BORDER_STYLE_SOLID,
+            true);
+
+        ui_widget_destroy(attachment);
+}
+
 void test_style_nova(void)
 {
         lcui_init();
@@ -399,6 +457,7 @@ void test_style_nova(void)
                        check_tooltip_arrow_padding);
         ctest_describe("style-nova: toast", check_toast_theme);
         ctest_describe("style-nova: card", check_card_theme);
+        ctest_describe("style-nova: attachment", check_attachment_theme);
 
         lcui_destroy();
 }
