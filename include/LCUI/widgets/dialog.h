@@ -48,6 +48,11 @@ LCUI_API ui_widget_t *ui_create_dialog_close(void);
 LCUI_API void ui_register_dialog(void);
 LCUI_API void ui_unregister_dialog(void);
 
+/* Bind a widget that declares `data-dialog-trigger` to its matching loose
+ * dialog. Useful for custom trigger widgets that link before the page root is
+ * mounted, when the dialog's attach-time trigger scan cannot see them yet. */
+LCUI_API void ui_dialog_bind_data_trigger(ui_widget_t *trigger);
+
 LCUI_END_HEADER
 
 #endif

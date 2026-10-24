@@ -381,6 +381,15 @@ static void ui_dialog_bind_trigger(ui_dialog_t *data, ui_widget_t *trigger)
         ui_widget_on(node, "click", ui_dialog_on_trigger_click, data);
 }
 
+void ui_dialog_bind_data_trigger(ui_widget_t *trigger)
+{
+        ui_dialog_t *data = ui_dialog_resolve(trigger, "data-dialog-trigger");
+
+        if (data) {
+                ui_dialog_bind_trigger(data, trigger);
+        }
+}
+
 // dismissal
 
 static bool ui_dialog_is_inside(ui_widget_t *target, ui_widget_t *ancestor)
