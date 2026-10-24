@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <card class="card-basic-demo">
+      <card-header>
+        <card-title>Login to your account</card-title>
+        <card-description>Enter your email below to login to your account</card-description>
+        <card-action>
+          <button variant="link">Sign Up</button>
+        </card-action>
+      </card-header>
+      <card-content class="clip-safe">
+        <div class="card-form clip-safe">
+          <field class="card-field" orientation="vertical">
+            <field-label for="card-email">Email</field-label>
+            <textinput id="card-email" type="email" placeholder="m@example.com" />
+          </field>
+          <field class="card-field" orientation="vertical">
+            <div class="card-label-row">
+              <field-label for="card-password">Password</field-label>
+              <button class="card-forgot" variant="link" size="sm">Forgot your password?</button>
+            </div>
+            <textinput id="card-password" type="password" />
+          </field>
+        </div>
+      </card-content>
+      <card-footer class="card-footer-stack">
+        <button variant="primary">Login</button>
+        <button variant="outline">Login with Google</button>
+      </card-footer>
+    </card>
+  </ui>
+</lcui-app>

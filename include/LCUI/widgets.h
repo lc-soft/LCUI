@@ -28,6 +28,7 @@
 #include "widgets/field.h"
 #include "widgets/icon.h"
 #include "widgets/badge.h"
+#include "widgets/card.h"
 #include "widgets/alert.h"
 #include "widgets/item.h"
 #include "widgets/empty.h"

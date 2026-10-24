@@ -134,6 +134,28 @@ overview、handbook 等页面结构更自由，仅要求：
 
 以中文文档为主，英文文档在中文文档更新完毕后再全量翻译。
 
+### shadcn 对照清单（新增/修改基础部件必做）
+
+在写 MDX 和示例之前，先完成这份清单；不要只读 `{name}.mdx` 或只看一个示例。
+
+1. **列出参考文档小节**：读取 `apps/v4/content/docs/components/base/{name}.mdx`，把其中所有 `##` / `###` 小节列出来。
+2. **找到每个小节的示例源码**：
+   - 顶层默认示例：`apps/v4/examples/base/{name}-demo.tsx`（存在时必须对齐）
+   - 其它示例：搜索 `apps/v4/examples/base/{name}-*.tsx`
+   - Base UI 的示例合集：`apps/v4/registry/bases/base/examples/{name}-example.tsx`
+3. **逐项标记处理方式**：
+   - `直接移植`：LCUI 能按原结构/样式实现
+   - `LCUI 替代`：结构或能力需要改写，记录替代方案
+   - `明确跳过`：记录跳过原因，并在 MDX 的「注意事项」中说明；不能静默删减
+4. **先确定页面结构**：根据清单决定顶部默认示例和各 `###` 小节，再开始写 MDX 和 C / XML / TSX 变体。
+5. **提交前逐项核对**：清单中每个「直接移植」和「LCUI 替代」项都必须有对应示例或文档说明；「明确跳过」项必须有原因。
+
+特别要求：
+
+- 顶部默认示例必须优先复刻 `apps/v4/examples/base/{name}-demo.tsx`，不能自行用一段通用文本代替。
+- 参考文档中实际存在的核心小节（例如 `Size`、`Image`）必须有对应示例；只出现在 API Reference 中的子部件不必额外增加示例小节。不兼容的小节（例如依赖 CSS 变量、RTL、复杂布局的能力）可以跳过，但必须写明原因。
+- C demo 的默认示例必须与顶部示例保持一致；XML / TSX 变体同步同一组内容。
+
 1. **新增组件文档**：先在 `docs/zh-CN/widgets/{name}.mdx` 完成全部内容。
 2. **修改/补充文档**：同样先改 zh-CN，确认章节结构、示例、描述完整后再同步。
 3. **同步英文**：对照 zh-CN 版本逐节翻译到 `docs/en/widgets/{name}.mdx`。
@@ -147,7 +169,10 @@ overview、handbook 等页面结构更自由，仅要求：
 - 新增或修改基础部件文档前，必须先读取 shadcn-ui 项目的 `/apps/v4/content/docs/components/base/{name}.mdx` 和该目录对应的 `examples/base/{name}-*.tsx`。shadcn-ui 项目目录与当前项目目录同级，可尝试解析路径 `../shadcn-ui-main` 或 `../shadcn-ui`。
 - 复用与 LCUI 能力兼容的文案、章节、默认示例和示例数据；不兼容的 React/网页能力必须在组件规格中说明替代方案，不能静默删减。
 - `docs/examples/*-tsx/example.tsx` 只使用已配置的 Tailwind 工具类组织布局和视觉样式。禁止为可用工具类写 `style={{ ... }}` 内联样式。
+- TSX 示例优先用 Tailwind 工具类表达布局和视觉；C / XML 示例给 demo 根容器加 `{部件名}-{示例名}-demo` 格式的唯一 class（例如 `card-basic-demo`），给需要微调的目标元素加明确的 class，CSS 效果必须与 TSX 示例的 Tailwind 类组合等价。禁止只沿用 `card-demo` 这类跨示例共用根 class。
+- 含输入框（`textinput`）的示例，输入框的容器及祖先需要按需添加 `clip-safe` 类，避免输入框 focus 阴影被父级裁剪；同时不得用 `clip-safe` 覆盖已有的 padding/margin 语义，必要时使用示例作用域 CSS 补充 gutter。
 - C demo 用字符串保存 CSS 规则，以唯一父 class 限定选择器；通过 `ui_widget_add_class()` 将该 class 加在 demo 根节点，禁止为可表达的布局/视觉规则逐项调用 inline style API。XML demo 在 `<resource type="text/css">` 中声明同样的作用域 CSS，禁止在元素 `style` 属性中堆叠规则。
+- shadcn Button 的默认变体是 primary，而 LCUI 的默认 Button 是 outline；所有对应 shadcn 默认按钮的 C / XML / TSX 示例必须显式指定 `primary` 变体。
 - 中文页面标题和小节使用中文：例如 `变体`、`带图标`、`自定义颜色`、`图片`，不得直接沿用参考文档的英文标题。
 - 多变体组件页面必须覆盖参考文档的基础示例和核心变体；新增 API 的示例、字段表与 C/XML/TSX 三变体必须同步更新。
 

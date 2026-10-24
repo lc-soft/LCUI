@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <card class="card-small-demo" size="sm">
+      <card-header>
+        <card-title>Scheduled reports</card-title>
+        <card-description>Weekly snapshots. No more manual exports.</card-description>
+      </card-header>
+      <card-content>
+        <div class="card-small-list">
+          <div class="card-small-row">
+            <icon class="card-small-chevron" name="chevron-right" size="16" />
+            <text>Choose a schedule (daily, or weekly).</text>
+          </div>
+          <div class="card-small-row">
+            <icon class="card-small-chevron" name="chevron-right" size="16" />
+            <text>Send to channels or specific teammates.</text>
+          </div>
+          <div class="card-small-row">
+            <icon class="card-small-chevron" name="chevron-right" size="16" />
+            <text>Include charts, tables, and key metrics.</text>
+          </div>
+        </div>
+      </card-content>
+      <card-footer class="card-footer-stack">
+        <button variant="primary" size="sm">Set up scheduled reports</button>
+        <button variant="outline" size="sm">See what's new</button>
+      </card-footer>
+    </card>
+  </ui>
+</lcui-app>

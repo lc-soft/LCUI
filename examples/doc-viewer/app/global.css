@@ -282,6 +282,84 @@ p {
   @apply flex flex-wrap gap-2;
 }
 
+.card-basic-demo,
+.card-image-demo {
+  width: 384px;
+}
+
+.card-image-demo {
+  padding-top: 0;
+}
+
+.card-image-cover {
+  position: relative;
+  width: 100%;
+  height: 216px;
+  background-color: #94a3b8;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.card-image-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.35);
+}
+
+.card-small-demo {
+  width: 320px;
+}
+
+.card-small-list {
+  @apply flex flex-col gap-2 py-2;
+}
+
+.card-small-row {
+  @apply flex gap-2;
+}
+
+.card-small-row text {
+  flex: 1;
+}
+
+.card-small-chevron {
+  @apply text-muted-foreground;
+  margin-top: 2px;
+}
+
+.card-basic-demo .card-form {
+  @apply flex flex-col gap-6;
+}
+
+.card-basic-demo .card-field {
+  @apply flex flex-col gap-2;
+}
+
+.card-basic-demo .card-field textinput {
+  width: 100%;
+}
+
+.card-basic-demo .card-label-row {
+  @apply flex items-center;
+}
+
+.card-basic-demo .card-forgot {
+  @apply ml-auto text-sm;
+  color: inherit;
+}
+
+.card-footer-stack {
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-footer-stack button {
+  width: 100%;
+}
+
 .popover-form-grid {
   @apply flex flex-col gap-2;
   /* clip-safe supplies the 4px focus-ring gutter; keep the original visual

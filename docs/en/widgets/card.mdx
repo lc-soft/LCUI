@@ -1,0 +1,105 @@
+# Card
+
+A container for related information and actions, composed of a header, content, and footer.
+
+<WidgetExample name="card-basic" />
+
+## Use cases
+
+- **Use**: forms, account details, settings, article summaries, and other grouped content
+- **Use**: cards that need a lightweight action such as edit or more in the top-right corner
+- **Don't use**: large expandable/collapsible content (use `dialog` or a dedicated page)
+- **Don't use**: short status messages (use `alert` or `toast`)
+
+## Usage
+
+```tsx
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@lcui/react"
+```
+
+```tsx
+<Card>
+  <CardHeader>
+    <CardTitle>Card Title</CardTitle>
+    <CardDescription>Card Description</CardDescription>
+  </CardHeader>
+  <CardContent>
+    <p>Card Content</p>
+  </CardContent>
+  <CardFooter>
+    <p>Card Footer</p>
+  </CardFooter>
+</Card>
+```
+
+## Composition
+
+Use the following composition to build a `Card`:
+
+```
+Card
+├── CardHeader
+│   ├── CardTitle
+│   ├── CardDescription
+│   └── CardAction
+├── CardContent
+└── CardFooter
+```
+
+## Examples
+
+### Small
+
+Use `size="sm"` for tighter spacing and a smaller title.
+
+<WidgetExample name="card-small" />
+
+### Image
+
+Place cover content before `CardHeader`. LCUI currently has no standalone image widget, so the example uses a solid placeholder `div` with an absolutely positioned overlay to simulate a cover image.
+
+<WidgetExample name="card-image" />
+
+## API Reference
+
+### Card
+
+The card container manages its size and child layout.
+
+<FieldTable name="card" />
+
+### CardHeader
+
+The card header holds the title, description, and optional action.
+
+<FieldTable name="card-header" />
+
+### CardTitle
+
+The card title.
+
+<FieldTable name="card-title" />
+
+### CardDescription
+
+Supporting text below the title.
+
+<FieldTable name="card-description" />
+
+### CardAction
+
+The top-right action area in the header.
+
+<FieldTable name="card-action" />
+
+### CardContent
+
+The main card body.
+
+<FieldTable name="card-content" />
+
+### CardFooter
+
+The bottom area for actions or secondary content.
+
+<FieldTable name="card-footer" />

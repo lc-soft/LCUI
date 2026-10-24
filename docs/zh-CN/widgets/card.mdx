@@ -1,0 +1,105 @@
+# Card
+
+用于承载一组相关信息与操作的容器，由头部、内容区和底部组合而成。
+
+<WidgetExample name="card-basic" />
+
+## 适用场景
+
+- **适用**：表单、账户信息、设置项、文章摘要等需要分组展示的内容
+- **适用**：需要在卡片右上角放置编辑、更多等轻量操作的场景
+- **不适用**：需要展开/收起的大量内容（使用 `dialog` 或独立页面）
+- **不适用**：纯提示信息（使用 `alert` 或 `toast`）
+
+## 用法
+
+```tsx
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@lcui/react"
+```
+
+```tsx
+<Card>
+  <CardHeader>
+    <CardTitle>Card Title</CardTitle>
+    <CardDescription>Card Description</CardDescription>
+  </CardHeader>
+  <CardContent>
+    <p>Card Content</p>
+  </CardContent>
+  <CardFooter>
+    <p>Card Footer</p>
+  </CardFooter>
+</Card>
+```
+
+## 组合
+
+使用以下组合来构建 `Card`：
+
+```
+Card
+├── CardHeader
+│   ├── CardTitle
+│   ├── CardDescription
+│   └── CardAction
+├── CardContent
+└── CardFooter
+```
+
+## 示例
+
+### 小尺寸
+
+使用 `size="sm"` 让卡片使用更紧凑的间距和小一号标题。
+
+<WidgetExample name="card-small" />
+
+### 图片
+
+在 `CardHeader` 前放置封面内容。当前 LCUI 没有独立的 image 部件，示例使用纯色占位 `div` 和绝对定位遮罩层模拟封面图。
+
+<WidgetExample name="card-image" />
+
+## API 参考
+
+### Card
+
+卡片根容器，管理尺寸和子部件布局。
+
+<FieldTable name="card" />
+
+### CardHeader
+
+卡片头部，包含标题、描述和可选操作。
+
+<FieldTable name="card-header" />
+
+### CardTitle
+
+卡片标题。
+
+<FieldTable name="card-title" />
+
+### CardDescription
+
+标题下方的辅助描述。
+
+<FieldTable name="card-description" />
+
+### CardAction
+
+位于头部右上角的操作区域。
+
+<FieldTable name="card-action" />
+
+### CardContent
+
+卡片主体内容区域。
+
+<FieldTable name="card-content" />
+
+### CardFooter
+
+卡片底部区域，用于操作或次要信息。
+
+<FieldTable name="card-footer" />

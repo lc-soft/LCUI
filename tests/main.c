@@ -39,6 +39,7 @@ extern void test_cursor(void);
 extern void test_icon(void);
 extern void test_button(void);
 extern void test_badge(void);
+extern void test_card(void);
 extern void test_alert(void);
 extern void test_item(void);
 extern void test_empty(void);
@@ -79,6 +80,7 @@ static const ctest_suite_t suites[] = {
         { "icon", test_icon },
         { "button", test_button },
         { "badge", test_badge },
+        { "card", test_card },
         { "alert", test_alert },
         { "item", test_item },
         { "empty", test_empty },

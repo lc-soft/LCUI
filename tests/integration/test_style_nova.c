@@ -328,6 +328,56 @@ static void check_toast_theme(void)
         ui_clear_trash();
 }
 
+static void check_card_theme(void)
+{
+        ui_widget_t *card = ui_create_card();
+        ui_widget_t *header = ui_create_card_header();
+        ui_widget_t *title = ui_create_card_title();
+        ui_widget_t *description = ui_create_card_description();
+        ui_widget_t *content = ui_create_card_content();
+        ui_widget_t *footer = ui_create_card_footer();
+
+        ui_widget_add_class(content, "clip-safe");
+        ui_text_set_content(title, "Card title");
+        ui_text_set_content(description, "Card description");
+        ui_widget_append(header, title);
+        ui_widget_append(header, description);
+        ui_widget_append(card, header);
+        ui_widget_append(card, content);
+        ui_widget_append(card, footer);
+        ui_root_append(card);
+        ui_update();
+
+        ctest_equal_float("card title should use text-base",
+                          title->computed_style.font_size, 16.0f);
+        ctest_equal_int("card title should use medium weight",
+                        title->computed_style.type_bits.font_weight,
+                        CSS_FONT_WEIGHT_500);
+        ctest_equal_float("card description should use text-sm",
+                          description->computed_style.font_size, 14.0f);
+        ctest_equal_float(
+            "clip-safe card content should use 16px inline padding",
+            content->computed_style.padding_left, 16.0f);
+        ctest_equal_float(
+            "clip-safe card content should reserve 4px top padding",
+            content->computed_style.padding_top, 4.0f);
+        ctest_equal_float("card footer should use 16px padding",
+                          footer->computed_style.padding_top, 16.0f);
+
+        ui_card_set_size(card, UI_CARD_SIZE_SM);
+        ui_update();
+        ctest_equal_float("small card title should use text-sm",
+                          title->computed_style.font_size, 14.0f);
+        ctest_equal_float(
+            "small clip-safe card content should use 12px inline padding",
+            content->computed_style.padding_left, 12.0f);
+        ctest_equal_float(
+            "small clip-safe card content should reserve 4px top padding",
+            content->computed_style.padding_top, 4.0f);
+
+        ui_widget_destroy(card);
+}
+
 void test_style_nova(void)
 {
         lcui_init();
@@ -348,6 +398,7 @@ void test_style_nova(void)
         ctest_describe("style-nova: tooltip padding",
                        check_tooltip_arrow_padding);
         ctest_describe("style-nova: toast", check_toast_theme);
+        ctest_describe("style-nova: card", check_card_theme);
 
         lcui_destroy();
 }

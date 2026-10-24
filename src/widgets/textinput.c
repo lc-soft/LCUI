@@ -833,6 +833,12 @@ static void ui_textinput_on_set_attr(ui_widget_t *w, const char *name,
 {
         if (strcmp(name, "placeholder") == 0) {
                 ui_textinput_set_placeholder(w, val);
+        } else if (strcmp(name, "type") == 0) {
+                if (val && strcmp(val, "password") == 0) {
+                        ui_textinput_set_password_char(w, L'*');
+                } else {
+                        ui_textinput_set_password_char(w, 0);
+                }
         }
 }
 

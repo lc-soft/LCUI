@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <card class="card-image-demo">
+      <div class="card-image-cover">
+        <div class="card-image-overlay"></div>
+      </div>
+      <card-header>
+        <card-title>Design systems meetup</card-title>
+        <card-description
+        >A practical talk on component APIs, accessibility, and shipping faster.</card-description>
+        <card-action>
+          <badge variant="secondary">Featured</badge>
+        </card-action>
+      </card-header>
+      <card-footer class="card-footer-stack">
+        <button variant="primary">View Event</button>
+      </card-footer>
+    </card>
+  </ui>
+</lcui-app>

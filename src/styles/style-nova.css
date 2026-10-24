@@ -294,6 +294,94 @@ empty-action {
   @apply flex flex-row justify-center gap-2;
 }
 
+/* card */
+
+card {
+  @apply border border-border bg-card text-card-foreground rounded-xl text-sm;
+  box-sizing: border-box;
+  gap: 16px;
+  padding: 16px 0;
+}
+
+card:sm {
+  gap: 12px;
+  padding: 12px 0;
+}
+
+card-header {
+  @apply gap-1 rounded-t-xl;
+  padding: 0 16px;
+}
+
+card:sm card-header {
+  padding: 0 12px;
+}
+
+card-header.border-b {
+  border-bottom: 1px solid #e5e5e5;
+  padding-bottom: 16px;
+}
+
+card:sm card-header.border-b {
+  padding-bottom: 12px;
+}
+
+card-title {
+  @apply text-base font-medium;
+  line-height: 1.375;
+}
+
+card-header.has-card-action {
+  padding-right: 88px;
+}
+
+card:sm card-header.has-card-action {
+  padding-right: 80px;
+}
+
+card:sm card-title {
+  @apply text-sm;
+}
+
+card-description {
+  @apply text-sm text-muted-foreground;
+}
+
+card-action {
+  right: 16px;
+}
+
+card:sm card-action {
+  right: 12px;
+}
+
+card-content {
+  padding: 0 16px;
+}
+
+card:sm card-content {
+  padding: 0 12px;
+}
+
+card-content.clip-safe {
+  padding: 4px 16px;
+}
+
+card:sm card-content.clip-safe {
+  padding: 4px 12px;
+}
+
+card-footer {
+  @apply bg-muted/50 rounded-b-xl border-t;
+  padding: 16px;
+  margin-bottom: -16px;
+}
+
+card:sm card-footer {
+  padding: 12px;
+  margin-bottom: -12px;
+}
+
 item {
   @apply flex items-center gap-2.5 rounded-lg border border-transparent px-3 py-2.5 text-sm;
 }
