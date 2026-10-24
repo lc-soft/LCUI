@@ -1,4 +1,4 @@
-import { Text, Widget } from "@lcui/react";
+import { ScrollArea, ScrollAreaContent, Scrollbar, Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "../../../components/code-block-copy";
 
 export default function StylingDocPage() {
@@ -16,11 +16,31 @@ export default function StylingDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#953800]ui_widget_t[/color] *w = ui_create_widget([color=#0a3069]"text"[/color]);`}</Text>
-            <Text className="code-line">{` `}</Text>
-            <Text className="code-line">{`ui_widget_set_style_string(w, [color=#0a3069]"color"[/color], [color=#0a3069]"#336699"[/color]);`}</Text>
-            <Text className="code-line">{`ui_widget_set_style_string(w, [color=#0a3069]"font-size"[/color], [color=#0a3069]"20px"[/color]);`}</Text>
-            <Text className="code-line">{`ui_widget_set_style_string(w, [color=#0a3069]"padding"[/color], [color=#0a3069]"8px 16px"[/color]);`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "124px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#953800]ui_widget_t[/color] *w = ui_create_widget([color=#0a3069]"text"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`ui_widget_set_style_string(w, [color=#0a3069]"color"[/color], [color=#0a3069]"#336699"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`ui_widget_set_style_string(w, [color=#0a3069]"font-size"[/color], [color=#0a3069]"20px"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`ui_widget_set_style_string(w, [color=#0a3069]"padding"[/color], [color=#0a3069]"8px 16px"[/color]);`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <h3>CSS class selectors</h3>
@@ -31,10 +51,27 @@ export default function StylingDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`ui_load_css_file([color=#0a3069]"styles.css"[/color]);`}</Text>
-            <Text className="code-line">{` `}</Text>
-            <Text className="code-line">{`[color=#953800]ui_widget_t[/color] *w = ui_create_widget([color=#0a3069]"text"[/color]);`}</Text>
-            <Text className="code-line">{`ui_widget_add_class(w, [color=#0a3069]"title"[/color]);`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "104px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`ui_load_css_file([color=#0a3069]"styles.css"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#953800]ui_widget_t[/color] *w = ui_create_widget([color=#0a3069]"text"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`ui_widget_add_class(w, [color=#0a3069]"title"[/color]);`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <Widget className="code-block" data-language="css" data-source="en/handbook/styling/2">
@@ -43,11 +80,31 @@ export default function StylingDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#953800].title[/color] {`}</Text>
-            <Text className="code-line">{`  font-size: [color=#0550ae]24px[/color];`}</Text>
-            <Text className="code-line">{`  font-weight: bold;`}</Text>
-            <Text className="code-line">{`  margin-bottom: [color=#0550ae]16px[/color];`}</Text>
-            <Text className="code-line">{`}`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "124px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#953800].title[/color] {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`  font-size: [color=#0550ae]24px[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  font-weight: bold;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`  margin-bottom: [color=#0550ae]16px[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <p>{`You can also use [bgcolor=#eee] ui_load_css_string() [/bgcolor] to load CSS rules from a string. The second parameter is a source identifier used for debugging to locate conflicting rules:`}</p>
@@ -57,7 +114,15 @@ export default function StylingDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`ui_load_css_string([color=#0a3069]".title { font-size: 24px; }"[/color], [color=#0a3069]"app.css"[/color]);`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`ui_load_css_string([color=#0a3069]".title { font-size: 24px; }"[/color], [color=#0a3069]"app.css"[/color]);`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
       </Widget>

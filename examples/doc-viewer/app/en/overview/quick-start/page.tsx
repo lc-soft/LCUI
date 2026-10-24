@@ -1,4 +1,4 @@
-import { Text, Widget } from "@lcui/react";
+import { ScrollArea, ScrollAreaContent, Scrollbar, Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "../../../components/code-block-copy";
 
 export default function QuickStartDocPage() {
@@ -24,7 +24,12 @@ export default function QuickStartDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`npm install -g @lcui/cli`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Text className="code-line">{`npm install -g @lcui/cli`}</Text>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <p>{`Create and run your first app:`}</p>
@@ -34,10 +39,15 @@ export default function QuickStartDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`lcui create my-app`}</Text>
-            <Text className="code-line">{`[color=#953800]cd[/color] my-app`}</Text>
-            <Text className="code-line">{`lcui build`}</Text>
-            <Text className="code-line">{`xmake run app`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "104px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Text className="code-line">{`lcui create my-app`}</Text>
+                <Text className="code-line">{`[color=#953800]cd[/color] my-app`}</Text>
+                <Text className="code-line">{`lcui build`}</Text>
+                <Text className="code-line">{`xmake run app`}</Text>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <p>{`[bgcolor=#eee] lcui create [/bgcolor] clones a minimal project from the lcui-quick-start template repository, including xmake.lua configuration, example code, and dependencies. Once done, run [bgcolor=#eee] lcui build [/bgcolor] to compile TSX resources, then [bgcolor=#eee] xmake run app [/bgcolor] to launch the application.`}</p>

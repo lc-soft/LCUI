@@ -1,4 +1,4 @@
-import { Text, Widget } from "@lcui/react";
+import { ScrollArea, ScrollAreaContent, Scrollbar, Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "../../../components/code-block-copy";
 import ToastBasicDemo from "../../../examples/toast-basic/index";
 import ToastTypesDemo from "../../../examples/toast-types/index";
@@ -30,17 +30,55 @@ export default function ToastDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
-            <Text className="code-line">{` `}</Text>
-            <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]notify_saved[/color][color=#0550ae]([color=#953800]void[/color])[/color]`}</Text>
-            <Text className="code-line">{`{`}</Text>
-            <Text className="code-line">{`        [color=#953800]ui_toast_options_t[/color] options = { [color=#0550ae]0[/color] };`}</Text>
-            <Text className="code-line">{` `}</Text>
-            <Text className="code-line">{`        options.type = UI_TOAST_TYPE_SUCCESS;`}</Text>
-            <Text className="code-line">{`        options.title = [color=#0a3069]"Saved"[/color];`}</Text>
-            <Text className="code-line">{`        options.description = [color=#0a3069]"Your changes have been saved."[/color];`}</Text>
-            <Text className="code-line">{`        ui_toast_show(&options);`}</Text>
-            <Text className="code-line">{`}`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]notify_saved[/color][color=#0550ae]([color=#953800]void[/color])[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_toast_options_t[/color] options = { [color=#0550ae]0[/color] };`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`        options.type = UI_TOAST_TYPE_SUCCESS;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`        options.title = [color=#0a3069]"Saved"[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`        options.description = [color=#0a3069]"Your changes have been saved."[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`        ui_toast_show(&options);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <p>{`第一次调用 [bgcolor=#eee] ui_toast_show() [/bgcolor] 时会在 [bgcolor=#eee] ui_root() [/bgcolor] 下创建单例 [bgcolor=#eee] toast-viewport [/bgcolor]。后续 Toast 会以右下角、从下往上的顺序堆叠。`}</p>
@@ -62,12 +100,35 @@ export default function ToastDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#953800]ui_toast_options_t[/color] options = { [color=#0550ae]0[/color] };`}</Text>
-            <Text className="code-line">{` `}</Text>
-            <Text className="code-line">{`options.type = UI_TOAST_TYPE_LOADING;`}</Text>
-            <Text className="code-line">{`options.title = [color=#0a3069]"Creating event..."[/color];`}</Text>
-            <Text className="code-line">{`options.duration = UI_TOAST_DURATION_PERSISTENT;`}</Text>
-            <Text className="code-line">{`ui_toast_show(&options);`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "144px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#953800]ui_toast_options_t[/color] options = { [color=#0550ae]0[/color] };`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`options.type = UI_TOAST_TYPE_LOADING;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`options.title = [color=#0a3069]"Creating event..."[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`options.duration = UI_TOAST_DURATION_PERSISTENT;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`ui_toast_show(&options);`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <ToastTypesDemo />
@@ -81,21 +142,71 @@ export default function ToastDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]void[/color] [color=#8250df]on_undo[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *toast, [color=#953800]void[/color] *arg)[/color]`}</Text>
-            <Text className="code-line">{`{`}</Text>
-            <Text className="code-line">{`        ui_toast_close(toast);`}</Text>
-            <Text className="code-line">{`}`}</Text>
-            <Text className="code-line">{` `}</Text>
-            <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]notify_with_action[/color][color=#0550ae]([color=#953800]void[/color])[/color]`}</Text>
-            <Text className="code-line">{`{`}</Text>
-            <Text className="code-line">{`        [color=#953800]ui_toast_options_t[/color] options = { [color=#0550ae]0[/color] };`}</Text>
-            <Text className="code-line">{` `}</Text>
-            <Text className="code-line">{`        options.title = [color=#0a3069]"Event created"[/color];`}</Text>
-            <Text className="code-line">{`        options.description = [color=#0a3069]"You can undo this action."[/color];`}</Text>
-            <Text className="code-line">{`        options.action_text = [color=#0a3069]"Undo"[/color];`}</Text>
-            <Text className="code-line">{`        options.on_action = on_undo;`}</Text>
-            <Text className="code-line">{`        ui_toast_show(&options);`}</Text>
-            <Text className="code-line">{`}`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]void[/color] [color=#8250df]on_undo[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *toast, [color=#953800]void[/color] *arg)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`        ui_toast_close(toast);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]notify_with_action[/color][color=#0550ae]([color=#953800]void[/color])[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_toast_options_t[/color] options = { [color=#0550ae]0[/color] };`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`        options.title = [color=#0a3069]"Event created"[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`        options.description = [color=#0a3069]"You can undo this action."[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`        options.action_text = [color=#0a3069]"Undo"[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`        options.on_action = on_undo;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`        ui_toast_show(&options);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <ToastActionDemo />
@@ -109,31 +220,111 @@ export default function ToastDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]void[/color] [color=#8250df]on_confirm[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *button, [color=#953800]ui_event_t[/color] *event, [color=#953800]void[/color] *arg)[/color]`}</Text>
-            <Text className="code-line">{`{`}</Text>
-            <Text className="code-line">{`        ui_toast_close(event->data);`}</Text>
-            <Text className="code-line">{`}`}</Text>
-            <Text className="code-line">{` `}</Text>
-            <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]confirm_delete[/color][color=#0550ae]([color=#953800]void[/color])[/color]`}</Text>
-            <Text className="code-line">{`{`}</Text>
-            <Text className="code-line">{`        [color=#953800]ui_toast_options_t[/color] options = { [color=#0550ae]0[/color] };`}</Text>
-            <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *toast;`}</Text>
-            <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *actions;`}</Text>
-            <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *confirm;`}</Text>
-            <Text className="code-line">{` `}</Text>
-            <Text className="code-line">{`        options.title = [color=#0a3069]"Delete event?"[/color];`}</Text>
-            <Text className="code-line">{`        options.description = [color=#0a3069]"This action cannot be undone."[/color];`}</Text>
-            <Text className="code-line">{`        options.duration = UI_TOAST_DURATION_PERSISTENT;`}</Text>
-            <Text className="code-line">{`        toast = ui_toast_show(&options);`}</Text>
-            <Text className="code-line">{`        actions = ui_toast_get_actions(toast);`}</Text>
-            <Text className="code-line">{` `}</Text>
-            <Text className="code-line">{`        confirm = ui_create_button();`}</Text>
-            <Text className="code-line">{`        ui_button_set_variant(confirm, UI_BUTTON_VARIANT_PRIMARY);`}</Text>
-            <Text className="code-line">{`        ui_button_set_size(confirm, UI_BUTTON_SIZE_SM);`}</Text>
-            <Text className="code-line">{`        ui_button_set_text(confirm, [color=#0a3069]"Confirm"[/color]);`}</Text>
-            <Text className="code-line">{`        ui_widget_on(confirm, [color=#0a3069]"click"[/color], on_confirm, toast);`}</Text>
-            <Text className="code-line">{`        ui_widget_append(actions, confirm);`}</Text>
-            <Text className="code-line">{`}`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]void[/color] [color=#8250df]on_confirm[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *button, [color=#953800]ui_event_t[/color] *event, [color=#953800]void[/color] *arg)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`        ui_toast_close(event->data);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]confirm_delete[/color][color=#0550ae]([color=#953800]void[/color])[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_toast_options_t[/color] options = { [color=#0550ae]0[/color] };`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *toast;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *actions;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *confirm;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`        options.title = [color=#0a3069]"Delete event?"[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`        options.description = [color=#0a3069]"This action cannot be undone."[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`        options.duration = UI_TOAST_DURATION_PERSISTENT;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`        toast = ui_toast_show(&options);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`        actions = ui_toast_get_actions(toast);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`        confirm = ui_create_button();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`        ui_button_set_variant(confirm, UI_BUTTON_VARIANT_PRIMARY);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`        ui_button_set_size(confirm, UI_BUTTON_SIZE_SM);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`        ui_button_set_text(confirm, [color=#0a3069]"Confirm"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`        ui_widget_on(confirm, [color=#0a3069]"click"[/color], on_confirm, toast);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`        ui_widget_append(actions, confirm);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <p>{`[bgcolor=#eee] ui_toast_get_actions() [/bgcolor] 返回的是 Toast 内部的 [bgcolor=#eee] toast-actions [/bgcolor] 容器；调用后该容器会显示。取消按钮可以用同样的方式创建并追加。`}</p>
@@ -147,13 +338,39 @@ export default function ToastDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#953800]ui_widget_t[/color] *toast = ui_toast_show(&loading_options);`}</Text>
-            <Text className="code-line">{` `}</Text>
-            <Text className="code-line">{`[color=#6e7781]/* 任务完成后 */[/color]`}</Text>
-            <Text className="code-line">{`ui_toast_set_type(toast, UI_TOAST_TYPE_SUCCESS);`}</Text>
-            <Text className="code-line">{`ui_toast_set_title(toast, [color=#0a3069]"Event created"[/color]);`}</Text>
-            <Text className="code-line">{`ui_toast_set_description(toast, [color=#0a3069]"Your event has been created."[/color]);`}</Text>
-            <Text className="code-line">{`ui_toast_set_duration(toast, [color=#0550ae]5000[/color]);`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#953800]ui_widget_t[/color] *toast = ui_toast_show(&loading_options);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#6e7781]/* 任务完成后 */[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`ui_toast_set_type(toast, UI_TOAST_TYPE_SUCCESS);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`ui_toast_set_title(toast, [color=#0a3069]"Event created"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`ui_toast_set_description(toast, [color=#0a3069]"Your event has been created."[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`ui_toast_set_duration(toast, [color=#0550ae]5000[/color]);`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <ToastPromiseDemo />

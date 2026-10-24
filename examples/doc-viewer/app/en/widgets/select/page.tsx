@@ -1,4 +1,4 @@
-import { Text, Widget } from "@lcui/react";
+import { ScrollArea, ScrollAreaContent, Scrollbar, Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "../../../components/code-block-copy";
 import SelectBasicDemo from "../../../examples/select-basic/index";
 import SelectGroupsDemo from "../../../examples/select-groups/index";
@@ -37,7 +37,15 @@ export default function SelectDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Select[/color], [color=#8250df]SelectTrigger[/color], [color=#8250df]SelectValue[/color], [color=#8250df]SelectContent[/color], [color=#8250df]SelectGroup[/color], [color=#8250df]SelectLabel[/color], [color=#8250df]SelectItem[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Select[/color], [color=#8250df]SelectTrigger[/color], [color=#8250df]SelectValue[/color], [color=#8250df]SelectContent[/color], [color=#8250df]SelectGroup[/color], [color=#8250df]SelectLabel[/color], [color=#8250df]SelectItem[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <Widget className="code-block" data-language="tsx" data-source="en/widgets/select/1">
@@ -46,19 +54,63 @@ export default function SelectDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`<[color=#8250df]Select[/color]>`}</Text>
-            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]SelectTrigger[/color]>[/color]`}</Text>
-            <Text className="code-line">{`    [color=#116329]<[color=#0550ae]SelectValue[/color] [color=#0550ae]placeholder[/color]=[color=#0a3069]"Select a theme"[/color] />[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]</[color=#0550ae]SelectTrigger[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]SelectContent[/color]>[/color]`}</Text>
-            <Text className="code-line">{`    [color=#116329]<[color=#0550ae]SelectGroup[/color]>[/color]`}</Text>
-            <Text className="code-line">{`      [color=#116329]<[color=#0550ae]SelectLabel[/color]>[/color]Theme[color=#116329]</[color=#0550ae]SelectLabel[/color]>[/color]`}</Text>
-            <Text className="code-line">{`      [color=#116329]<[color=#0550ae]SelectItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"light"[/color]>[/color]Light[color=#116329]</[color=#0550ae]SelectItem[/color]>[/color]`}</Text>
-            <Text className="code-line">{`      [color=#116329]<[color=#0550ae]SelectItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"dark"[/color]>[/color]Dark[color=#116329]</[color=#0550ae]SelectItem[/color]>[/color]`}</Text>
-            <Text className="code-line">{`      [color=#116329]<[color=#0550ae]SelectItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"system"[/color]>[/color]System[color=#116329]</[color=#0550ae]SelectItem[/color]>[/color]`}</Text>
-            <Text className="code-line">{`    [color=#116329]</[color=#0550ae]SelectGroup[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]</[color=#0550ae]SelectContent[/color]>[/color]`}</Text>
-            <Text className="code-line">{`</[color=#8250df]Select[/color]>`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`<[color=#8250df]Select[/color]>`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]SelectTrigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]SelectValue[/color] [color=#0550ae]placeholder[/color]=[color=#0a3069]"Select a theme"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]SelectTrigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]SelectContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]SelectGroup[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]SelectLabel[/color]>[/color]Theme[color=#116329]</[color=#0550ae]SelectLabel[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]SelectItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"light"[/color]>[/color]Light[color=#116329]</[color=#0550ae]SelectItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]SelectItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"dark"[/color]>[/color]Dark[color=#116329]</[color=#0550ae]SelectItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]SelectItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"system"[/color]>[/color]System[color=#116329]</[color=#0550ae]SelectItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`    [color=#116329]</[color=#0550ae]SelectGroup[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]SelectContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`</[color=#8250df]Select[/color]>`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
       </Widget>
@@ -71,19 +123,24 @@ export default function SelectDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`Select`}</Text>
-            <Text className="code-line">{`├── SelectTrigger`}</Text>
-            <Text className="code-line">{`│   └── SelectValue`}</Text>
-            <Text className="code-line">{`└── SelectContent`}</Text>
-            <Text className="code-line">{`    ├── SelectGroup`}</Text>
-            <Text className="code-line">{`    │   ├── SelectLabel`}</Text>
-            <Text className="code-line">{`    │   ├── SelectItem`}</Text>
-            <Text className="code-line">{`    │   └── SelectItem`}</Text>
-            <Text className="code-line">{`    ├── SelectSeparator`}</Text>
-            <Text className="code-line">{`    └── SelectGroup`}</Text>
-            <Text className="code-line">{`        ├── SelectLabel`}</Text>
-            <Text className="code-line">{`        ├── SelectItem`}</Text>
-            <Text className="code-line">{`        └── SelectItem`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Text className="code-line">{`Select`}</Text>
+                <Text className="code-line">{`├── SelectTrigger`}</Text>
+                <Text className="code-line">{`│   └── SelectValue`}</Text>
+                <Text className="code-line">{`└── SelectContent`}</Text>
+                <Text className="code-line">{`    ├── SelectGroup`}</Text>
+                <Text className="code-line">{`    │   ├── SelectLabel`}</Text>
+                <Text className="code-line">{`    │   ├── SelectItem`}</Text>
+                <Text className="code-line">{`    │   └── SelectItem`}</Text>
+                <Text className="code-line">{`    ├── SelectSeparator`}</Text>
+                <Text className="code-line">{`    └── SelectGroup`}</Text>
+                <Text className="code-line">{`        ├── SelectLabel`}</Text>
+                <Text className="code-line">{`        ├── SelectItem`}</Text>
+                <Text className="code-line">{`        └── SelectItem`}</Text>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
       </Widget>

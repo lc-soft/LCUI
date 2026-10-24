@@ -1,4 +1,4 @@
-import { Text, Widget } from "@lcui/react";
+import { ScrollArea, ScrollAreaContent, Scrollbar, Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "../../../components/code-block-copy";
 import FieldBasicDemo from "../../../examples/field-basic/index";
 import FieldCheckboxDemo from "../../../examples/field-checkbox/index";
@@ -42,7 +42,15 @@ export default function FieldDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Field[/color], [color=#8250df]FieldLabel[/color], [color=#8250df]FieldDescription[/color], [color=#8250df]FieldSet[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Field[/color], [color=#8250df]FieldLabel[/color], [color=#8250df]FieldDescription[/color], [color=#8250df]FieldSet[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <Widget className="code-block" data-language="tsx" data-source="zh-CN/widgets/field/1">
@@ -51,11 +59,31 @@ export default function FieldDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`<[color=#8250df]Field[/color]>`}</Text>
-            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"username"[/color]>[/color]用户名[color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]TextInput[/color] [color=#0550ae]id[/color]=[color=#0a3069]"username"[/color] [color=#0550ae]placeholder[/color]=[color=#0a3069]"evil_rabbit"[/color] />[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]FieldDescription[/color]>[/color]选择一个唯一的用户名。[color=#116329]</[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
-            <Text className="code-line">{`</[color=#8250df]Field[/color]>`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "124px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`<[color=#8250df]Field[/color]>`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"username"[/color]>[/color]用户名[color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]TextInput[/color] [color=#0550ae]id[/color]=[color=#0a3069]"username"[/color] [color=#0550ae]placeholder[/color]=[color=#0a3069]"evil_rabbit"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]FieldDescription[/color]>[/color]选择一个唯一的用户名。[color=#116329]</[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`</[color=#8250df]Field[/color]>`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
       </Widget>
@@ -68,18 +96,23 @@ export default function FieldDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`Field`}</Text>
-            <Text className="code-line">{`├── FieldLabel`}</Text>
-            <Text className="code-line">{`├── TextInput / Checkbox / RadioGroup`}</Text>
-            <Text className="code-line">{`└── FieldDescription`}</Text>
-            <Text className="code-line">{` `}</Text>
-            <Text className="code-line">{`FieldSet`}</Text>
-            <Text className="code-line">{`├── FieldLegend`}</Text>
-            <Text className="code-line">{`├── FieldDescription`}</Text>
-            <Text className="code-line">{`└── FieldGroup`}</Text>
-            <Text className="code-line">{`    ├── Field`}</Text>
-            <Text className="code-line">{`    ├── FieldSeparator`}</Text>
-            <Text className="code-line">{`    └── Field`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Text className="code-line">{`Field`}</Text>
+                <Text className="code-line">{`├── FieldLabel`}</Text>
+                <Text className="code-line">{`├── TextInput / Checkbox / RadioGroup`}</Text>
+                <Text className="code-line">{`└── FieldDescription`}</Text>
+                <Text className="code-line">{` `}</Text>
+                <Text className="code-line">{`FieldSet`}</Text>
+                <Text className="code-line">{`├── FieldLegend`}</Text>
+                <Text className="code-line">{`├── FieldDescription`}</Text>
+                <Text className="code-line">{`└── FieldGroup`}</Text>
+                <Text className="code-line">{`    ├── Field`}</Text>
+                <Text className="code-line">{`    ├── FieldSeparator`}</Text>
+                <Text className="code-line">{`    └── Field`}</Text>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
       </Widget>

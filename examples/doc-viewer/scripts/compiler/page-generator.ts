@@ -299,6 +299,16 @@ function parseCodeMeta(meta: string | undefined): { title?: string } {
   return m ? { title: m[1] } : {};
 }
 
+function shouldShowLineNumbers(lang: string): boolean {
+  const normalized = lang.trim().toLowerCase();
+  return (
+    normalized !== "" &&
+    !["text", "txt", "shell", "sh", "bash", "zsh", "console"].includes(
+      normalized,
+    )
+  );
+}
+
 function renderCodeBlock(
   lang: string,
   sourceLines: string[],
@@ -311,20 +321,38 @@ function renderCodeBlock(
   const source = sourceLines.join("\n");
   const html = highlightCode(source, lang);
   const lines = highlightedHtmlToLines(html);
+  const visibleLines = Math.max(1, Math.min(lines.length, 10));
+  const height = `${visibleLines * 20 + 24}px`;
+  const showLineNumbers = shouldShowLineNumbers(lang);
   const inner = lines
-    .map((l) => {
+    .map((l, index) => {
       const content = escapeTsxTemplateContent(preserveLeadingIndent(l));
-      return `${indent}    <Text className="code-line">{\`${content}\`}</Text>`;
+      if (!showLineNumbers) {
+        return `${indent}        <Text className="code-line">{\`${content}\`}</Text>`;
+      }
+      return (
+        `${indent}        <Widget className="code-line-row">\n` +
+        `${indent}          <Text className="code-line-number">${index + 1}</Text>\n` +
+        `${indent}          <Text className="code-line">{\`${content}\`}</Text>\n` +
+        `${indent}        </Widget>`
+      );
     })
     .join("\n");
   const id = snippets.add(snippetScope, source);
+  const body =
+    `${indent}  <Widget className="code-block-body">\n` +
+    `${indent}    <CodeBlockCopy />\n` +
+    `${indent}    <ScrollArea className="code-block-scroll" style={{ height: "${height}" }}>\n` +
+    `${indent}      <ScrollAreaContent className="code-block-scroll-content">\n` +
+    `${inner}\n` +
+    `${indent}      </ScrollAreaContent>\n` +
+    `${indent}      <Scrollbar />\n` +
+    `${indent}    </ScrollArea>\n` +
+    `${indent}  </Widget>\n`;
   if (noHeader) {
     return (
       `${indent}<Widget className="code-block" data-language="${lang}" data-source="${id}">\n` +
-      `${indent}  <Widget className="code-block-body">\n` +
-      `${indent}    <CodeBlockCopy />\n` +
-      `${inner}\n` +
-      `${indent}  </Widget>\n` +
+      body +
       `${indent}</Widget>`
     );
   }
@@ -334,10 +362,7 @@ function renderCodeBlock(
     `${indent}  <Widget className="code-block-header">\n` +
     `${indent}    <Text className="code-block-title">${escapeTsx(title)}</Text>\n` +
     `${indent}  </Widget>\n` +
-    `${indent}  <Widget className="code-block-body">\n` +
-    `${indent}    <CodeBlockCopy />\n` +
-    `${inner}\n` +
-    `${indent}  </Widget>\n` +
+    body +
     `${indent}</Widget>`
   );
 }
@@ -709,17 +734,29 @@ function buildDemoIndexTsx(ex: CompiledExample, snippets: SnippetRegistry): stri
         variant.id === defaultLanguage && file.filename === defaultFile;
       const cls = isDefault ? "code-block-body active" : "code-block-body";
       const style = isDefault ? "" : ' style={{ display: "none" }}';
+      const visibleLines = Math.max(1, Math.min(file.lines.length, 10));
+      const height = `${visibleLines * 20 + 24}px`;
       const lineWidgets = file.lines
-        .map((line) => {
+        .map((line, index) => {
           const content = escapeTsxTemplateContent(preserveLeadingIndent(line));
-          return `          <Text className="code-line">{\`${content}\`}</Text>`;
+          return (
+            `              <Widget className="code-line-row">\n` +
+            `                <Text className="code-line-number">${index + 1}</Text>\n` +
+            `                <Text className="code-line">{\`${content}\`}</Text>\n` +
+            `              </Widget>`
+          );
         })
         .join("\n");
       const id = snippets.add(snippetScope, file.source);
       codeBodies.push(
         `        <Widget className="${cls}" data-language="${variant.id}" data-file="${file.filename}" data-source="${id}"${style}>\n` +
         `          <CodeBlockCopy />\n` +
+        `          <ScrollArea className="code-block-scroll" style={{ height: "${height}" }}>\n` +
+        `            <ScrollAreaContent className="code-block-scroll-content">\n` +
         `${lineWidgets}\n` +
+        `            </ScrollAreaContent>\n` +
+        `            <Scrollbar />\n` +
+        `          </ScrollArea>\n` +
         `        </Widget>`,
       );
     }
@@ -728,7 +765,7 @@ function buildDemoIndexTsx(ex: CompiledExample, snippets: SnippetRegistry): stri
   // Header groups file tabs (.demo-files) and language tabs
   // (.demo-languages) in a single flex-row widget.  The code-block-copy
   // button lives inside each code-block-body (see codeBodies above).
-  return `import { Text, Widget } from "@lcui/react";
+  return `import { ScrollArea, ScrollAreaContent, Scrollbar, Text, Widget } from "@lcui/react";
 import DemoProvider from "../../components/demo-provider";
 import CodeBlockCopy from "../../components/code-block-copy";
 
@@ -891,7 +928,7 @@ function buildComponentPageTsx(
 
   const allImports = [demoImports, ftImportBlock].filter(Boolean).join("\n");
 
-  return `import { Text, Widget } from "@lcui/react";
+  return `import { ScrollArea, ScrollAreaContent, Scrollbar, Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "${ccPath}";
 ${allImports}
 
@@ -945,7 +982,7 @@ function buildContentPageTsx(
     ? `import IconBrowser from "${relativeImport(pageDir, join(examplesOutDir, "..", "components", "icon-browser"))}";\n`
     : "";
 
-  return `import { Text, Widget } from "@lcui/react";
+  return `import { ScrollArea, ScrollAreaContent, Scrollbar, Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "${ccPath}";
 ${iconBrowserImport}${importsBlock}
 export default function ${componentName}() {

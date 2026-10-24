@@ -1,4 +1,4 @@
-import { Text, Widget } from "@lcui/react";
+import { ScrollArea, ScrollAreaContent, Scrollbar, Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "../../../components/code-block-copy";
 import PopoverBasicDemo from "../../../examples/popover-basic/index";
 import PopoverSimpleDemo from "../../../examples/popover-simple/index";
@@ -35,7 +35,15 @@ export default function PopoverDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Popover[/color], [color=#8250df]PopoverTrigger[/color], [color=#8250df]PopoverContent[/color], [color=#8250df]PopoverHeader[/color], [color=#8250df]PopoverTitle[/color], [color=#8250df]PopoverDescription[/color], [color=#8250df]Button[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Popover[/color], [color=#8250df]PopoverTrigger[/color], [color=#8250df]PopoverContent[/color], [color=#8250df]PopoverHeader[/color], [color=#8250df]PopoverTitle[/color], [color=#8250df]PopoverDescription[/color], [color=#8250df]Button[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <Widget className="code-block" data-language="tsx" data-source="zh-CN/widgets/popover/1">
@@ -44,17 +52,55 @@ export default function PopoverDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`<[color=#8250df]Popover[/color]>`}</Text>
-            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]PopoverTrigger[/color]>[/color]`}</Text>
-            <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color]>[/color]Open popover[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]</[color=#0550ae]PopoverTrigger[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]PopoverContent[/color]>[/color]`}</Text>
-            <Text className="code-line">{`    [color=#116329]<[color=#0550ae]PopoverHeader[/color]>[/color]`}</Text>
-            <Text className="code-line">{`      [color=#116329]<[color=#0550ae]PopoverTitle[/color]>[/color]Dimensions[color=#116329]</[color=#0550ae]PopoverTitle[/color]>[/color]`}</Text>
-            <Text className="code-line">{`      [color=#116329]<[color=#0550ae]PopoverDescription[/color]>[/color]Set the dimensions for the layer.[color=#116329]</[color=#0550ae]PopoverDescription[/color]>[/color]`}</Text>
-            <Text className="code-line">{`    [color=#116329]</[color=#0550ae]PopoverHeader[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]</[color=#0550ae]PopoverContent[/color]>[/color]`}</Text>
-            <Text className="code-line">{`</[color=#8250df]Popover[/color]>`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`<[color=#8250df]Popover[/color]>`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]PopoverTrigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color]>[/color]Open popover[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]PopoverTrigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]PopoverContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]PopoverHeader[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]PopoverTitle[/color]>[/color]Dimensions[color=#116329]</[color=#0550ae]PopoverTitle[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]PopoverDescription[/color]>[/color]Set the dimensions for the layer.[color=#116329]</[color=#0550ae]PopoverDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`    [color=#116329]</[color=#0550ae]PopoverHeader[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]PopoverContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`</[color=#8250df]Popover[/color]>`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
       </Widget>
@@ -67,13 +113,18 @@ export default function PopoverDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`Popover`}</Text>
-            <Text className="code-line">{`├── PopoverTrigger`}</Text>
-            <Text className="code-line">{`└── PopoverContent`}</Text>
-            <Text className="code-line">{`    ├── PopoverHeader`}</Text>
-            <Text className="code-line">{`    │   ├── PopoverTitle`}</Text>
-            <Text className="code-line">{`    │   └── PopoverDescription`}</Text>
-            <Text className="code-line">{`    └── （任意可交互内容）`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Text className="code-line">{`Popover`}</Text>
+                <Text className="code-line">{`├── PopoverTrigger`}</Text>
+                <Text className="code-line">{`└── PopoverContent`}</Text>
+                <Text className="code-line">{`    ├── PopoverHeader`}</Text>
+                <Text className="code-line">{`    │   ├── PopoverTitle`}</Text>
+                <Text className="code-line">{`    │   └── PopoverDescription`}</Text>
+                <Text className="code-line">{`    └── （任意可交互内容）`}</Text>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
       </Widget>

@@ -1,4 +1,4 @@
-import { Text, Widget } from "@lcui/react";
+import { ScrollArea, ScrollAreaContent, Scrollbar, Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "../../../components/code-block-copy";
 import EmptyBasicDemo from "../../../examples/empty-basic/index";
 import EmptyBackgroundDemo from "../../../examples/empty-background/index";
@@ -31,16 +31,51 @@ export default function EmptyDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
-            <Text className="code-line">{`  [color=#8250df]Button[/color],`}</Text>
-            <Text className="code-line">{`  [color=#8250df]Empty[/color],`}</Text>
-            <Text className="code-line">{`  [color=#8250df]EmptyAction[/color],`}</Text>
-            <Text className="code-line">{`  [color=#8250df]EmptyDescription[/color],`}</Text>
-            <Text className="code-line">{`  [color=#8250df]EmptyMedia[/color],`}</Text>
-            <Text className="code-line">{`  [color=#8250df]EmptyTitle[/color],`}</Text>
-            <Text className="code-line">{`  [color=#8250df]Text[/color],`}</Text>
-            <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
-            <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Folder[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/fluent-icons"[/color]`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`  [color=#8250df]Button[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  [color=#8250df]Empty[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`  [color=#8250df]EmptyAction[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`  [color=#8250df]EmptyDescription[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`  [color=#8250df]EmptyMedia[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`  [color=#8250df]EmptyTitle[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`  [color=#8250df]Text[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Folder[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/fluent-icons"[/color]`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <Widget className="code-block" data-language="tsx" data-source="en/widgets/empty/1">
@@ -49,16 +84,51 @@ export default function EmptyDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`<[color=#8250df]Empty[/color]>`}</Text>
-            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]EmptyMedia[/color]>[/color]`}</Text>
-            <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Folder[/color] />[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]</[color=#0550ae]EmptyMedia[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]EmptyTitle[/color]>[/color]No data[color=#116329]</[color=#0550ae]EmptyTitle[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]EmptyDescription[/color]>[/color]No data found[color=#116329]</[color=#0550ae]EmptyDescription[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]EmptyAction[/color]>[/color]`}</Text>
-            <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Button[/color]>[/color][color=#116329]<[color=#0550ae]Text[/color]>[/color]Add data[color=#116329]</[color=#0550ae]Text[/color]>[/color][color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]</[color=#0550ae]EmptyAction[/color]>[/color]`}</Text>
-            <Text className="code-line">{`</[color=#8250df]Empty[/color]>`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`<[color=#8250df]Empty[/color]>`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]EmptyMedia[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Folder[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]EmptyMedia[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]EmptyTitle[/color]>[/color]No data[color=#116329]</[color=#0550ae]EmptyTitle[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]EmptyDescription[/color]>[/color]No data found[color=#116329]</[color=#0550ae]EmptyDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]EmptyAction[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Button[/color]>[/color][color=#116329]<[color=#0550ae]Text[/color]>[/color]Add data[color=#116329]</[color=#0550ae]Text[/color]>[/color][color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]EmptyAction[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`</[color=#8250df]Empty[/color]>`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
       </Widget>
@@ -71,11 +141,16 @@ export default function EmptyDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`Empty`}</Text>
-            <Text className="code-line">{`├── EmptyMedia`}</Text>
-            <Text className="code-line">{`├── EmptyTitle`}</Text>
-            <Text className="code-line">{`├── EmptyDescription`}</Text>
-            <Text className="code-line">{`└── EmptyAction`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "124px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Text className="code-line">{`Empty`}</Text>
+                <Text className="code-line">{`├── EmptyMedia`}</Text>
+                <Text className="code-line">{`├── EmptyTitle`}</Text>
+                <Text className="code-line">{`├── EmptyDescription`}</Text>
+                <Text className="code-line">{`└── EmptyAction`}</Text>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
       </Widget>

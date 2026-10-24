@@ -1,4 +1,4 @@
-import { Text, Widget } from "@lcui/react";
+import { ScrollArea, ScrollAreaContent, Scrollbar, Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "../../../components/code-block-copy";
 import AlertDialogBasicDemo from "../../../examples/alert-dialog-basic/index";
 import AlertDialogSmallDemo from "../../../examples/alert-dialog-small/index";
@@ -39,7 +39,15 @@ export default function AlertDialogDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]AlertDialog[/color], [color=#8250df]AlertDialogTrigger[/color], [color=#8250df]AlertDialogOverlay[/color], [color=#8250df]AlertDialogContent[/color], [color=#8250df]AlertDialogHeader[/color], [color=#8250df]AlertDialogMedia[/color], [color=#8250df]AlertDialogTitle[/color], [color=#8250df]AlertDialogDescription[/color], [color=#8250df]AlertDialogFooter[/color], [color=#8250df]AlertDialogCancel[/color], [color=#8250df]AlertDialogAction[/color], [color=#8250df]Portal[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]AlertDialog[/color], [color=#8250df]AlertDialogTrigger[/color], [color=#8250df]AlertDialogOverlay[/color], [color=#8250df]AlertDialogContent[/color], [color=#8250df]AlertDialogHeader[/color], [color=#8250df]AlertDialogMedia[/color], [color=#8250df]AlertDialogTitle[/color], [color=#8250df]AlertDialogDescription[/color], [color=#8250df]AlertDialogFooter[/color], [color=#8250df]AlertDialogCancel[/color], [color=#8250df]AlertDialogAction[/color], [color=#8250df]Portal[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <Widget className="code-block" data-language="tsx" data-source="zh-CN/widgets/alert-dialog/1">
@@ -48,26 +56,91 @@ export default function AlertDialogDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`<[color=#8250df]AlertDialog[/color]>`}</Text>
-            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]AlertDialogTrigger[/color]>[/color]Show Dialog[color=#116329]</[color=#0550ae]AlertDialogTrigger[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]Portal[/color]>[/color]`}</Text>
-            <Text className="code-line">{`    [color=#116329]<[color=#0550ae]AlertDialogOverlay[/color]>[/color]`}</Text>
-            <Text className="code-line">{`      [color=#116329]<[color=#0550ae]AlertDialogContent[/color]>[/color]`}</Text>
-            <Text className="code-line">{`        [color=#116329]<[color=#0550ae]AlertDialogHeader[/color]>[/color]`}</Text>
-            <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertDialogTitle[/color]>[/color]Are you absolutely sure?[color=#116329]</[color=#0550ae]AlertDialogTitle[/color]>[/color]`}</Text>
-            <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertDialogDescription[/color]>[/color]`}</Text>
-            <Text className="code-line">{`            This action cannot be undone. This will permanently delete your`}</Text>
-            <Text className="code-line">{`            account and remove your data from our servers.`}</Text>
-            <Text className="code-line">{`          [color=#116329]</[color=#0550ae]AlertDialogDescription[/color]>[/color]`}</Text>
-            <Text className="code-line">{`        [color=#116329]</[color=#0550ae]AlertDialogHeader[/color]>[/color]`}</Text>
-            <Text className="code-line">{`        [color=#116329]<[color=#0550ae]AlertDialogFooter[/color]>[/color]`}</Text>
-            <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertDialogCancel[/color]>[/color]Cancel[color=#116329]</[color=#0550ae]AlertDialogCancel[/color]>[/color]`}</Text>
-            <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertDialogAction[/color]>[/color]Continue[color=#116329]</[color=#0550ae]AlertDialogAction[/color]>[/color]`}</Text>
-            <Text className="code-line">{`        [color=#116329]</[color=#0550ae]AlertDialogFooter[/color]>[/color]`}</Text>
-            <Text className="code-line">{`      [color=#116329]</[color=#0550ae]AlertDialogContent[/color]>[/color]`}</Text>
-            <Text className="code-line">{`    [color=#116329]</[color=#0550ae]AlertDialogOverlay[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]</[color=#0550ae]Portal[/color]>[/color]`}</Text>
-            <Text className="code-line">{`</[color=#8250df]AlertDialog[/color]>`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`<[color=#8250df]AlertDialog[/color]>`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]AlertDialogTrigger[/color]>[/color]Show Dialog[color=#116329]</[color=#0550ae]AlertDialogTrigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]Portal[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]AlertDialogOverlay[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]AlertDialogContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]AlertDialogHeader[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertDialogTitle[/color]>[/color]Are you absolutely sure?[color=#116329]</[color=#0550ae]AlertDialogTitle[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertDialogDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`            This action cannot be undone. This will permanently delete your`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`            account and remove your data from our servers.`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`          [color=#116329]</[color=#0550ae]AlertDialogDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]AlertDialogHeader[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]AlertDialogFooter[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertDialogCancel[/color]>[/color]Cancel[color=#116329]</[color=#0550ae]AlertDialogCancel[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertDialogAction[/color]>[/color]Continue[color=#116329]</[color=#0550ae]AlertDialogAction[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]AlertDialogFooter[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]AlertDialogContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`    [color=#116329]</[color=#0550ae]AlertDialogOverlay[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]Portal[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`</[color=#8250df]AlertDialog[/color]>`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
       </Widget>
@@ -80,18 +153,23 @@ export default function AlertDialogDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`AlertDialog`}</Text>
-            <Text className="code-line">{`├── AlertDialogTrigger`}</Text>
-            <Text className="code-line">{`└── Portal`}</Text>
-            <Text className="code-line">{`    └── AlertDialogOverlay`}</Text>
-            <Text className="code-line">{`        └── AlertDialogContent`}</Text>
-            <Text className="code-line">{`            ├── AlertDialogHeader`}</Text>
-            <Text className="code-line">{`            │   ├── AlertDialogMedia`}</Text>
-            <Text className="code-line">{`            │   ├── AlertDialogTitle`}</Text>
-            <Text className="code-line">{`            │   └── AlertDialogDescription`}</Text>
-            <Text className="code-line">{`            └── AlertDialogFooter`}</Text>
-            <Text className="code-line">{`                ├── AlertDialogCancel`}</Text>
-            <Text className="code-line">{`                └── AlertDialogAction`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Text className="code-line">{`AlertDialog`}</Text>
+                <Text className="code-line">{`├── AlertDialogTrigger`}</Text>
+                <Text className="code-line">{`└── Portal`}</Text>
+                <Text className="code-line">{`    └── AlertDialogOverlay`}</Text>
+                <Text className="code-line">{`        └── AlertDialogContent`}</Text>
+                <Text className="code-line">{`            ├── AlertDialogHeader`}</Text>
+                <Text className="code-line">{`            │   ├── AlertDialogMedia`}</Text>
+                <Text className="code-line">{`            │   ├── AlertDialogTitle`}</Text>
+                <Text className="code-line">{`            │   └── AlertDialogDescription`}</Text>
+                <Text className="code-line">{`            └── AlertDialogFooter`}</Text>
+                <Text className="code-line">{`                ├── AlertDialogCancel`}</Text>
+                <Text className="code-line">{`                └── AlertDialogAction`}</Text>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
       </Widget>

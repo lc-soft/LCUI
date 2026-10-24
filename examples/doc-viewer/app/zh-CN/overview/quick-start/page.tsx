@@ -1,4 +1,4 @@
-import { Text, Widget } from "@lcui/react";
+import { ScrollArea, ScrollAreaContent, Scrollbar, Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "../../../components/code-block-copy";
 
 export default function QuickStartDocPage() {
@@ -24,7 +24,12 @@ export default function QuickStartDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`npm install -g @lcui/cli`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Text className="code-line">{`npm install -g @lcui/cli`}</Text>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <p>{`创建并运行你的第一个应用：`}</p>
@@ -34,10 +39,15 @@ export default function QuickStartDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`lcui create my-app`}</Text>
-            <Text className="code-line">{`[color=#953800]cd[/color] my-app`}</Text>
-            <Text className="code-line">{`lcui build`}</Text>
-            <Text className="code-line">{`xmake run app`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "104px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Text className="code-line">{`lcui create my-app`}</Text>
+                <Text className="code-line">{`[color=#953800]cd[/color] my-app`}</Text>
+                <Text className="code-line">{`lcui build`}</Text>
+                <Text className="code-line">{`xmake run app`}</Text>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <p>{`[bgcolor=#eee] lcui create [/bgcolor] 会从 lcui-quick-start 模板仓库克隆一个最小项目，包含 xmake.lua 配置、示例代码和依赖。完成后运行 [bgcolor=#eee] lcui build [/bgcolor] 编译 TSX 资源，再运行 [bgcolor=#eee] xmake run app [/bgcolor] 启动应用。`}</p>

@@ -1,4 +1,4 @@
-import { Text, Widget } from "@lcui/react";
+import { ScrollArea, ScrollAreaContent, Scrollbar, Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "../../../components/code-block-copy";
 import CardBasicDemo from "../../../examples/card-basic/index";
 import CardSmallDemo from "../../../examples/card-small/index";
@@ -35,7 +35,15 @@ export default function CardDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Card[/color], [color=#8250df]CardContent[/color], [color=#8250df]CardDescription[/color], [color=#8250df]CardFooter[/color], [color=#8250df]CardHeader[/color], [color=#8250df]CardTitle[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Card[/color], [color=#8250df]CardContent[/color], [color=#8250df]CardDescription[/color], [color=#8250df]CardFooter[/color], [color=#8250df]CardHeader[/color], [color=#8250df]CardTitle[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <Widget className="code-block" data-language="tsx" data-source="zh-CN/widgets/card/1">
@@ -44,18 +52,59 @@ export default function CardDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`<[color=#8250df]Card[/color]>`}</Text>
-            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]CardHeader[/color]>[/color]`}</Text>
-            <Text className="code-line">{`    [color=#116329]<[color=#0550ae]CardTitle[/color]>[/color]Card Title[color=#116329]</[color=#0550ae]CardTitle[/color]>[/color]`}</Text>
-            <Text className="code-line">{`    [color=#116329]<[color=#0550ae]CardDescription[/color]>[/color]Card Description[color=#116329]</[color=#0550ae]CardDescription[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]</[color=#0550ae]CardHeader[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]CardContent[/color]>[/color]`}</Text>
-            <Text className="code-line">{`    [color=#116329]<[color=#0550ae]p[/color]>[/color]Card Content[color=#116329]</[color=#0550ae]p[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]</[color=#0550ae]CardContent[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]CardFooter[/color]>[/color]`}</Text>
-            <Text className="code-line">{`    [color=#116329]<[color=#0550ae]p[/color]>[/color]Card Footer[color=#116329]</[color=#0550ae]p[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]</[color=#0550ae]CardFooter[/color]>[/color]`}</Text>
-            <Text className="code-line">{`</[color=#8250df]Card[/color]>`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`<[color=#8250df]Card[/color]>`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]CardHeader[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]CardTitle[/color]>[/color]Card Title[color=#116329]</[color=#0550ae]CardTitle[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]CardDescription[/color]>[/color]Card Description[color=#116329]</[color=#0550ae]CardDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]CardHeader[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]CardContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]p[/color]>[/color]Card Content[color=#116329]</[color=#0550ae]p[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]CardContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]CardFooter[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]p[/color]>[/color]Card Footer[color=#116329]</[color=#0550ae]p[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]CardFooter[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`</[color=#8250df]Card[/color]>`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
       </Widget>
@@ -68,13 +117,18 @@ export default function CardDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`Card`}</Text>
-            <Text className="code-line">{`├── CardHeader`}</Text>
-            <Text className="code-line">{`│   ├── CardTitle`}</Text>
-            <Text className="code-line">{`│   ├── CardDescription`}</Text>
-            <Text className="code-line">{`│   └── CardAction`}</Text>
-            <Text className="code-line">{`├── CardContent`}</Text>
-            <Text className="code-line">{`└── CardFooter`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Text className="code-line">{`Card`}</Text>
+                <Text className="code-line">{`├── CardHeader`}</Text>
+                <Text className="code-line">{`│   ├── CardTitle`}</Text>
+                <Text className="code-line">{`│   ├── CardDescription`}</Text>
+                <Text className="code-line">{`│   └── CardAction`}</Text>
+                <Text className="code-line">{`├── CardContent`}</Text>
+                <Text className="code-line">{`└── CardFooter`}</Text>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
       </Widget>

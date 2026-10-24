@@ -1,4 +1,4 @@
-import { Text, Widget } from "@lcui/react";
+import { ScrollArea, ScrollAreaContent, Scrollbar, Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "../../../components/code-block-copy";
 import AttachmentBasicDemo from "../../../examples/attachment-basic/index";
 import AttachmentImageDemo from "../../../examples/attachment-image/index";
@@ -39,15 +39,47 @@ export default function AttachmentDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
-            <Text className="code-line">{`  [color=#8250df]Attachment[/color],`}</Text>
-            <Text className="code-line">{`  [color=#8250df]AttachmentAction[/color],`}</Text>
-            <Text className="code-line">{`  [color=#8250df]AttachmentActions[/color],`}</Text>
-            <Text className="code-line">{`  [color=#8250df]AttachmentContent[/color],`}</Text>
-            <Text className="code-line">{`  [color=#8250df]AttachmentDescription[/color],`}</Text>
-            <Text className="code-line">{`  [color=#8250df]AttachmentMedia[/color],`}</Text>
-            <Text className="code-line">{`  [color=#8250df]AttachmentTitle[/color],`}</Text>
-            <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "204px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`  [color=#8250df]Attachment[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  [color=#8250df]AttachmentAction[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`  [color=#8250df]AttachmentActions[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`  [color=#8250df]AttachmentContent[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`  [color=#8250df]AttachmentDescription[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`  [color=#8250df]AttachmentMedia[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`  [color=#8250df]AttachmentTitle[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <Widget className="code-block" data-language="tsx" data-source="zh-CN/widgets/attachment/1">
@@ -56,20 +88,67 @@ export default function AttachmentDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`<[color=#8250df]Attachment[/color]>`}</Text>
-            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]AttachmentMedia[/color]>[/color]`}</Text>
-            <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"document"[/color] />[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]</[color=#0550ae]AttachmentMedia[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]AttachmentContent[/color]>[/color]`}</Text>
-            <Text className="code-line">{`    [color=#116329]<[color=#0550ae]AttachmentTitle[/color]>[/color]sales-dashboard.pdf[color=#116329]</[color=#0550ae]AttachmentTitle[/color]>[/color]`}</Text>
-            <Text className="code-line">{`    [color=#116329]<[color=#0550ae]AttachmentDescription[/color]>[/color]PDF · 2.4 MB[color=#116329]</[color=#0550ae]AttachmentDescription[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]</[color=#0550ae]AttachmentContent[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]AttachmentActions[/color]>[/color]`}</Text>
-            <Text className="code-line">{`    [color=#116329]<[color=#0550ae]AttachmentAction[/color] [color=#0550ae]aria-label[/color]=[color=#0a3069]"Remove sales-dashboard.pdf"[/color]>[/color]`}</Text>
-            <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"dismiss"[/color] />[/color]`}</Text>
-            <Text className="code-line">{`    [color=#116329]</[color=#0550ae]AttachmentAction[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]</[color=#0550ae]AttachmentActions[/color]>[/color]`}</Text>
-            <Text className="code-line">{`</[color=#8250df]Attachment[/color]>`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`<[color=#8250df]Attachment[/color]>`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]AttachmentMedia[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"document"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]AttachmentMedia[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]AttachmentContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]AttachmentTitle[/color]>[/color]sales-dashboard.pdf[color=#116329]</[color=#0550ae]AttachmentTitle[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]AttachmentDescription[/color]>[/color]PDF · 2.4 MB[color=#116329]</[color=#0550ae]AttachmentDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]AttachmentContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]AttachmentActions[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]AttachmentAction[/color] [color=#0550ae]aria-label[/color]=[color=#0a3069]"Remove sales-dashboard.pdf"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"dismiss"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`    [color=#116329]</[color=#0550ae]AttachmentAction[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]AttachmentActions[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`</[color=#8250df]Attachment[/color]>`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
       </Widget>
@@ -82,14 +161,19 @@ export default function AttachmentDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`Attachment`}</Text>
-            <Text className="code-line">{`├── AttachmentMedia`}</Text>
-            <Text className="code-line">{`├── AttachmentContent`}</Text>
-            <Text className="code-line">{`│   ├── AttachmentTitle`}</Text>
-            <Text className="code-line">{`│   └── AttachmentDescription`}</Text>
-            <Text className="code-line">{`├── AttachmentActions`}</Text>
-            <Text className="code-line">{`│   └── AttachmentAction`}</Text>
-            <Text className="code-line">{`└── AttachmentTrigger`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "184px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Text className="code-line">{`Attachment`}</Text>
+                <Text className="code-line">{`├── AttachmentMedia`}</Text>
+                <Text className="code-line">{`├── AttachmentContent`}</Text>
+                <Text className="code-line">{`│   ├── AttachmentTitle`}</Text>
+                <Text className="code-line">{`│   └── AttachmentDescription`}</Text>
+                <Text className="code-line">{`├── AttachmentActions`}</Text>
+                <Text className="code-line">{`│   └── AttachmentAction`}</Text>
+                <Text className="code-line">{`└── AttachmentTrigger`}</Text>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <p>{`使用 [bgcolor=#eee] AttachmentGroup [/bgcolor] 横向排列多个附件：`}</p>
@@ -99,9 +183,14 @@ export default function AttachmentDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`AttachmentGroup`}</Text>
-            <Text className="code-line">{`├── Attachment`}</Text>
-            <Text className="code-line">{`└── Attachment`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "84px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Text className="code-line">{`AttachmentGroup`}</Text>
+                <Text className="code-line">{`├── Attachment`}</Text>
+                <Text className="code-line">{`└── Attachment`}</Text>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
       </Widget>

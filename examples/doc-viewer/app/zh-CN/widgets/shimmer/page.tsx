@@ -1,4 +1,4 @@
-import { Text, Widget } from "@lcui/react";
+import { ScrollArea, ScrollAreaContent, Scrollbar, Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "../../../components/code-block-copy";
 import ShimmerBasicDemo from "../../../examples/shimmer-basic/index";
 import ShimmerColorDemo from "../../../examples/shimmer-color/index";
@@ -34,7 +34,15 @@ export default function ShimmerDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Shimmer[/color], [color=#8250df]ShimmerContent[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Shimmer[/color], [color=#8250df]ShimmerContent[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <p>{`Shimmer 是 C 代码自绘部件：先按原色完整合成内容，再把一道带倾斜的高光带裁剪到内容的不透明像素上叠加。高光本身可配置颜色、周期、宽度与倾斜角，通过部件属性或对应的 [bgcolor=#eee] ui_shimmer_set_* [/bgcolor] 接口设置：`}</p>
@@ -44,11 +52,31 @@ export default function ShimmerDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`<[color=#8250df]Shimmer[/color] running={[color=#0550ae]true[/color]} duration={[color=#0550ae]2000[/color]} spread={[color=#0550ae]120[/color]} angle={[color=#0550ae]20[/color]} color=[color=#0a3069]"rgba(255,255,255,0.86)"[/color]>`}</Text>
-            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ShimmerContent[/color]>[/color]`}</Text>
-            <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Text[/color]>[/color]Generating response…[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ShimmerContent[/color]>[/color]`}</Text>
-            <Text className="code-line">{`</[color=#8250df]Shimmer[/color]>`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "124px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`<[color=#8250df]Shimmer[/color] running={[color=#0550ae]true[/color]} duration={[color=#0550ae]2000[/color]} spread={[color=#0550ae]120[/color]} angle={[color=#0550ae]20[/color]} color=[color=#0a3069]"rgba(255,255,255,0.86)"[/color]>`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ShimmerContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Text[/color]>[/color]Generating response…[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ShimmerContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`</[color=#8250df]Shimmer[/color]>`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
       </Widget>
@@ -61,8 +89,13 @@ export default function ShimmerDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`Shimmer`}</Text>
-            <Text className="code-line">{`└── ShimmerContent`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "64px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Text className="code-line">{`Shimmer`}</Text>
+                <Text className="code-line">{`└── ShimmerContent`}</Text>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
       </Widget>

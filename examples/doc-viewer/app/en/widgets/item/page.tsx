@@ -1,4 +1,4 @@
-import { Text, Widget } from "@lcui/react";
+import { ScrollArea, ScrollAreaContent, Scrollbar, Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "../../../components/code-block-copy";
 import ItemBasicDemo from "../../../examples/item-basic/index";
 import ItemVariantsDemo from "../../../examples/item-variants/index";
@@ -35,7 +35,15 @@ export default function ItemDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Item[/color], [color=#8250df]ItemActions[/color], [color=#8250df]ItemContent[/color], [color=#8250df]ItemDescription[/color], [color=#8250df]ItemMedia[/color], [color=#8250df]ItemTitle[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Item[/color], [color=#8250df]ItemActions[/color], [color=#8250df]ItemContent[/color], [color=#8250df]ItemDescription[/color], [color=#8250df]ItemMedia[/color], [color=#8250df]ItemTitle[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <Widget className="code-block" data-language="tsx" data-source="en/widgets/item/1">
@@ -44,13 +52,39 @@ export default function ItemDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`<[color=#8250df]Item[/color] variant=[color=#0a3069]"outline"[/color]>`}</Text>
-            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ItemContent[/color]>[/color]`}</Text>
-            <Text className="code-line">{`    [color=#116329]<[color=#0550ae]ItemTitle[/color]>[/color]Basic Item[color=#116329]</[color=#0550ae]ItemTitle[/color]>[/color]`}</Text>
-            <Text className="code-line">{`    [color=#116329]<[color=#0550ae]ItemDescription[/color]>[/color]A simple item with title and description.[color=#116329]</[color=#0550ae]ItemDescription[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ItemContent[/color]>[/color]`}</Text>
-            <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ItemActions[/color]>[/color][color=#116329]<[color=#0550ae]button[/color]>[/color]Action[color=#116329]</[color=#0550ae]button[/color]>[/color][color=#116329]</[color=#0550ae]ItemActions[/color]>[/color]`}</Text>
-            <Text className="code-line">{`</[color=#8250df]Item[/color]>`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`<[color=#8250df]Item[/color] variant=[color=#0a3069]"outline"[/color]>`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ItemContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]ItemTitle[/color]>[/color]Basic Item[color=#116329]</[color=#0550ae]ItemTitle[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]ItemDescription[/color]>[/color]A simple item with title and description.[color=#116329]</[color=#0550ae]ItemDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ItemContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ItemActions[/color]>[/color][color=#116329]<[color=#0550ae]button[/color]>[/color]Action[color=#116329]</[color=#0550ae]button[/color]>[/color][color=#116329]</[color=#0550ae]ItemActions[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`</[color=#8250df]Item[/color]>`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
       </Widget>
@@ -63,12 +97,17 @@ export default function ItemDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`Item`}</Text>
-            <Text className="code-line">{`├── ItemMedia`}</Text>
-            <Text className="code-line">{`├── ItemContent`}</Text>
-            <Text className="code-line">{`│   ├── ItemTitle`}</Text>
-            <Text className="code-line">{`│   └── ItemDescription`}</Text>
-            <Text className="code-line">{`└── ItemActions`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "144px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Text className="code-line">{`Item`}</Text>
+                <Text className="code-line">{`├── ItemMedia`}</Text>
+                <Text className="code-line">{`├── ItemContent`}</Text>
+                <Text className="code-line">{`│   ├── ItemTitle`}</Text>
+                <Text className="code-line">{`│   └── ItemDescription`}</Text>
+                <Text className="code-line">{`└── ItemActions`}</Text>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
       </Widget>

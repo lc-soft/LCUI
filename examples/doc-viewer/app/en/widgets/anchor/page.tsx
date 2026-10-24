@@ -1,4 +1,4 @@
-import { Text, Widget } from "@lcui/react";
+import { ScrollArea, ScrollAreaContent, Scrollbar, Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "../../../components/code-block-copy";
 import AnchorBasicDemo from "../../../examples/anchor-basic/index";
 
@@ -23,7 +23,15 @@ export default function AnchorDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`<a href=[color=#0a3069]"https://example.com"[/color]>[color=#8250df]Link[/color] text</a>`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`<a href=[color=#0a3069]"https://example.com"[/color]>[color=#8250df]Link[/color] text</a>`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
       </Widget>
@@ -36,7 +44,15 @@ export default function AnchorDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]ui_anchor_open[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w)[/color];`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]ui_anchor_open[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w)[/color];`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <p>{`Programmatically triggers the anchor's action (same as a click). Reads the [bgcolor=#eee] href [/bgcolor] attribute from the widget:`}</p>
@@ -54,7 +70,15 @@ export default function AnchorDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#116329]<[color=#0550ae]a[/color] [color=#0550ae]href[/color]=[color=#0a3069]"..."[/color] [color=#0550ae]target[/color]=[color=#0a3069]"..."[/color] [color=#0550ae]key[/color]=[color=#0a3069]"..."[/color]>[/color]Link text[color=#116329]</[color=#0550ae]a[/color]>[/color]`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#116329]<[color=#0550ae]a[/color] [color=#0550ae]href[/color]=[color=#0a3069]"..."[/color] [color=#0550ae]target[/color]=[color=#0a3069]"..."[/color] [color=#0550ae]key[/color]=[color=#0a3069]"..."[/color]>[/color]Link text[color=#116329]</[color=#0550ae]a[/color]>[/color]`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <p>{`Attributes:`}</p>
@@ -115,13 +139,39 @@ export default function AnchorDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]void[/color] [color=#8250df]on_view_loaded[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w, [color=#953800]ui_event_t[/color] *e, [color=#953800]void[/color] *arg)[/color]`}</Text>
-            <Text className="code-line">{`{`}</Text>
-            <Text className="code-line">{`        [color=#6e7781]/* e->data contains the value of the anchor&#x27;s "key" attribute */[/color]`}</Text>
-            <Text className="code-line">{`        [color=#953800]printf[/color]([color=#0a3069]"Loaded view key: %s\\n"[/color], ([color=#953800]char[/color] *)e->data);`}</Text>
-            <Text className="code-line">{`}`}</Text>
-            <Text className="code-line">{` `}</Text>
-            <Text className="code-line">{`ui_widget_on(ui_root(), [color=#0a3069]"loaded.anchor"[/color], on_view_loaded, [color=#0550ae]NULL[/color]);`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]void[/color] [color=#8250df]on_view_loaded[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w, [color=#953800]ui_event_t[/color] *e, [color=#953800]void[/color] *arg)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`        [color=#6e7781]/* e->data contains the value of the anchor&#x27;s "key" attribute */[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`        [color=#953800]printf[/color]([color=#0a3069]"Loaded view key: %s\\n"[/color], ([color=#953800]char[/color] *)e->data);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`ui_widget_on(ui_root(), [color=#0a3069]"loaded.anchor"[/color], on_view_loaded, [color=#0550ae]NULL[/color]);`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
       </Widget>

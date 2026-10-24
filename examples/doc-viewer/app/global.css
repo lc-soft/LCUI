@@ -149,12 +149,37 @@ p {
   @apply bg-gray-100 text-gray-900;
 }
 .code-block-body {
-  @apply p-3 text-sm text-gray-800 whitespace-pre;
+  @apply text-sm text-gray-800 whitespace-pre;
   position: relative;
+  font-family: "Geist Mono", monospace;
+}
+.code-block-scroll {
+  width: 100%;
+}
+.code-block-scroll-content {
+  box-sizing: border-box;
+  padding: 12px;
+}
+.code-line-row {
+  display: flex;
+  align-items: flex-start;
+}
+.code-line-number {
+  @apply text-gray-400;
+
+  flex-shrink: 0;
+  width: 32px;
+  padding-right: 12px;
+  text-align: right;
+  line-height: 20px;
   font-family: "Geist Mono", monospace;
 }
 .code-line {
   @apply text-gray-800;
+
+  flex: 1;
+  min-width: 0;
+  line-height: 20px;
   font-family: "Geist Mono", monospace;
 }
 

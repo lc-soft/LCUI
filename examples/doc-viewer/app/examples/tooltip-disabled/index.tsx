@@ -1,4 +1,4 @@
-import { Text, Widget } from "@lcui/react";
+import { ScrollArea, ScrollAreaContent, Scrollbar, Text, Widget } from "@lcui/react";
 import DemoProvider from "../../components/demo-provider";
 import CodeBlockCopy from "../../components/code-block-copy";
 
@@ -23,79 +23,287 @@ export default function TooltipDisabledDemo() {
         </Widget>
         <Widget className="code-block-body active" data-language="tsx" data-file="example.tsx" data-source="examples/tooltip-disabled/5">
           <CodeBlockCopy />
-          <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
-          <Text className="code-line">{`  [color=#8250df]Button[/color],`}</Text>
-          <Text className="code-line">{`  [color=#8250df]Text[/color],`}</Text>
-          <Text className="code-line">{`  [color=#8250df]Tooltip[/color],`}</Text>
-          <Text className="code-line">{`  [color=#8250df]TooltipContent[/color],`}</Text>
-          <Text className="code-line">{`  [color=#8250df]TooltipTrigger[/color],`}</Text>
-          <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
-          <Text className="code-line">{` `}</Text>
-          <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]App[/color]([color=#0550ae][/color]) {`}</Text>
-          <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
-          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Tooltip[/color]>[/color]`}</Text>
-          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]TooltipTrigger[/color]>[/color]`}</Text>
-          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]disabled[/color]>[/color]`}</Text>
-          <Text className="code-line">{`          Disabled`}</Text>
-          <Text className="code-line">{`        [color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-          <Text className="code-line">{`      [color=#116329]</[color=#0550ae]TooltipTrigger[/color]>[/color]`}</Text>
-          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]TooltipContent[/color]>[/color]`}</Text>
-          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Text[/color]>[/color]This feature is currently unavailable[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
-          <Text className="code-line">{`      [color=#116329]</[color=#0550ae]TooltipContent[/color]>[/color]`}</Text>
-          <Text className="code-line">{`    [color=#116329]</[color=#0550ae]Tooltip[/color]>[/color]`}</Text>
-          <Text className="code-line">{`  );`}</Text>
-          <Text className="code-line">{`}`}</Text>
+          <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
+            <ScrollAreaContent className="code-block-scroll-content">
+              <Widget className="code-line-row">
+                <Text className="code-line-number">1</Text>
+                <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">2</Text>
+                <Text className="code-line">{`  [color=#8250df]Button[/color],`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">3</Text>
+                <Text className="code-line">{`  [color=#8250df]Text[/color],`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">4</Text>
+                <Text className="code-line">{`  [color=#8250df]Tooltip[/color],`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">5</Text>
+                <Text className="code-line">{`  [color=#8250df]TooltipContent[/color],`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">6</Text>
+                <Text className="code-line">{`  [color=#8250df]TooltipTrigger[/color],`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">7</Text>
+                <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">8</Text>
+                <Text className="code-line">{` `}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">9</Text>
+                <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]App[/color]([color=#0550ae][/color]) {`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">10</Text>
+                <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">11</Text>
+                <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Tooltip[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">12</Text>
+                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]TooltipTrigger[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">13</Text>
+                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]disabled[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">14</Text>
+                <Text className="code-line">{`          Disabled`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">15</Text>
+                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">16</Text>
+                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]TooltipTrigger[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">17</Text>
+                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]TooltipContent[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">18</Text>
+                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Text[/color]>[/color]This feature is currently unavailable[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">19</Text>
+                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]TooltipContent[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">20</Text>
+                <Text className="code-line">{`    [color=#116329]</[color=#0550ae]Tooltip[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">21</Text>
+                <Text className="code-line">{`  );`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">22</Text>
+                <Text className="code-line">{`}`}</Text>
+              </Widget>
+            </ScrollAreaContent>
+            <Scrollbar />
+          </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="tsx" data-file="main.c" data-source="examples/tooltip-disabled/6" style={{ display: "none" }}>
           <CodeBlockCopy />
-          <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
-          <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]"example.h"[/color][/color]`}</Text>
-          <Text className="code-line">{` `}</Text>
-          <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]tooltip_disabled_tsx_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
-          <Text className="code-line">{`{`}</Text>
-          <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
-          <Text className="code-line">{`}`}</Text>
+          <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
+            <ScrollAreaContent className="code-block-scroll-content">
+              <Widget className="code-line-row">
+                <Text className="code-line-number">1</Text>
+                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">2</Text>
+                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]"example.h"[/color][/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">3</Text>
+                <Text className="code-line">{` `}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">4</Text>
+                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]tooltip_disabled_tsx_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">5</Text>
+                <Text className="code-line">{`{`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">6</Text>
+                <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">7</Text>
+                <Text className="code-line">{`}`}</Text>
+              </Widget>
+            </ScrollAreaContent>
+            <Scrollbar />
+          </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="c" data-file="main.c" data-source="examples/tooltip-disabled/7" style={{ display: "none" }}>
           <CodeBlockCopy />
-          <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
-          <Text className="code-line">{` `}</Text>
-          <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]tooltip_disabled_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
-          <Text className="code-line">{`{`}</Text>
-          <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *trigger = ui_create_tooltip_trigger();`}</Text>
-          <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *button = ui_create_button();`}</Text>
-          <Text className="code-line">{` `}</Text>
-          <Text className="code-line">{`        ui_button_set_variant(button, UI_BUTTON_VARIANT_OUTLINE);`}</Text>
-          <Text className="code-line">{`        ui_button_set_text(button, [color=#0a3069]"Disabled"[/color]);`}</Text>
-          <Text className="code-line">{`        ui_widget_set_disabled(button, [color=#0550ae]true[/color]);`}</Text>
-          <Text className="code-line">{`        ui_widget_append(trigger, button);`}</Text>
-          <Text className="code-line">{`        ui_tooltip_attach(trigger, [color=#0a3069]"This feature is currently unavailable"[/color]);`}</Text>
-          <Text className="code-line">{`        ui_widget_append(parent, trigger);`}</Text>
-          <Text className="code-line">{`}`}</Text>
+          <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
+            <ScrollAreaContent className="code-block-scroll-content">
+              <Widget className="code-line-row">
+                <Text className="code-line-number">1</Text>
+                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">2</Text>
+                <Text className="code-line">{` `}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">3</Text>
+                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]tooltip_disabled_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">4</Text>
+                <Text className="code-line">{`{`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">5</Text>
+                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *trigger = ui_create_tooltip_trigger();`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">6</Text>
+                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *button = ui_create_button();`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">7</Text>
+                <Text className="code-line">{` `}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">8</Text>
+                <Text className="code-line">{`        ui_button_set_variant(button, UI_BUTTON_VARIANT_OUTLINE);`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">9</Text>
+                <Text className="code-line">{`        ui_button_set_text(button, [color=#0a3069]"Disabled"[/color]);`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">10</Text>
+                <Text className="code-line">{`        ui_widget_set_disabled(button, [color=#0550ae]true[/color]);`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">11</Text>
+                <Text className="code-line">{`        ui_widget_append(trigger, button);`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">12</Text>
+                <Text className="code-line">{`        ui_tooltip_attach(trigger, [color=#0a3069]"This feature is currently unavailable"[/color]);`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">13</Text>
+                <Text className="code-line">{`        ui_widget_append(parent, trigger);`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">14</Text>
+                <Text className="code-line">{`}`}</Text>
+              </Widget>
+            </ScrollAreaContent>
+            <Scrollbar />
+          </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/tooltip-disabled/8" style={{ display: "none" }}>
           <CodeBlockCopy />
-          <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
-          <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
-          <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
-          <Text className="code-line">{`    [color=#116329]<[color=#0550ae]tooltip[/color]>[/color]`}</Text>
-          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]tooltip-trigger[/color]>[/color]`}</Text>
-          <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]disabled[/color]=[color=#0a3069]"true"[/color]>[/color]Disabled[color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
-          <Text className="code-line">{`      [color=#116329]</[color=#0550ae]tooltip-trigger[/color]>[/color]`}</Text>
-          <Text className="code-line">{`      [color=#116329]<[color=#0550ae]tooltip-content[/color]>[/color][color=#116329]<[color=#0550ae]text[/color][/color]`}</Text>
-          <Text className="code-line">{`[color=#116329]        >[/color]This feature is currently unavailable[color=#116329]</[color=#0550ae]text[/color]>[/color][color=#116329]</[color=#0550ae]tooltip-content[/color]>[/color]`}</Text>
-          <Text className="code-line">{`    [color=#116329]</[color=#0550ae]tooltip[/color]>[/color]`}</Text>
-          <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ui[/color]>[/color]`}</Text>
-          <Text className="code-line">{`[color=#116329]</[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+          <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
+            <ScrollAreaContent className="code-block-scroll-content">
+              <Widget className="code-line-row">
+                <Text className="code-line-number">1</Text>
+                <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">2</Text>
+                <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">3</Text>
+                <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">4</Text>
+                <Text className="code-line">{`    [color=#116329]<[color=#0550ae]tooltip[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">5</Text>
+                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]tooltip-trigger[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">6</Text>
+                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]disabled[/color]=[color=#0a3069]"true"[/color]>[/color]Disabled[color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">7</Text>
+                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]tooltip-trigger[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">8</Text>
+                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]tooltip-content[/color]>[/color][color=#116329]<[color=#0550ae]text[/color][/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">9</Text>
+                <Text className="code-line">{`[color=#116329]        >[/color]This feature is currently unavailable[color=#116329]</[color=#0550ae]text[/color]>[/color][color=#116329]</[color=#0550ae]tooltip-content[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">10</Text>
+                <Text className="code-line">{`    [color=#116329]</[color=#0550ae]tooltip[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">11</Text>
+                <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ui[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">12</Text>
+                <Text className="code-line">{`[color=#116329]</[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+              </Widget>
+            </ScrollAreaContent>
+            <Scrollbar />
+          </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="xml" data-file="main.c" data-source="examples/tooltip-disabled/9" style={{ display: "none" }}>
           <CodeBlockCopy />
-          <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
-          <Text className="code-line">{` `}</Text>
-          <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]tooltip_disabled_xml_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
-          <Text className="code-line">{`{`}</Text>
-          <Text className="code-line">{`        ui_widget_append(parent, ui_create_widget([color=#0550ae]NULL[/color]));`}</Text>
-          <Text className="code-line">{`}`}</Text>
+          <ScrollArea className="code-block-scroll" style={{ height: "144px" }}>
+            <ScrollAreaContent className="code-block-scroll-content">
+              <Widget className="code-line-row">
+                <Text className="code-line-number">1</Text>
+                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">2</Text>
+                <Text className="code-line">{` `}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">3</Text>
+                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]tooltip_disabled_xml_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">4</Text>
+                <Text className="code-line">{`{`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">5</Text>
+                <Text className="code-line">{`        ui_widget_append(parent, ui_create_widget([color=#0550ae]NULL[/color]));`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">6</Text>
+                <Text className="code-line">{`}`}</Text>
+              </Widget>
+            </ScrollAreaContent>
+            <Scrollbar />
+          </ScrollArea>
         </Widget>
       </Widget>
     </DemoProvider>

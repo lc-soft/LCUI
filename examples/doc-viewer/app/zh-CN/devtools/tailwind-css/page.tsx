@@ -1,4 +1,4 @@
-import { Text, Widget } from "@lcui/react";
+import { ScrollArea, ScrollAreaContent, Scrollbar, Text, Widget } from "@lcui/react";
 import CodeBlockCopy from "../../../components/code-block-copy";
 
 export default function TailwindCssDocPage() {
@@ -14,7 +14,12 @@ export default function TailwindCssDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`npm install -D tailwindcss postcss @thedutchcoder/postcss-rem-to-px`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Text className="code-line">{`npm install -D tailwindcss postcss @thedutchcoder/postcss-rem-to-px`}</Text>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
       </Widget>
@@ -33,9 +38,23 @@ export default function TailwindCssDocPage() {
           </Widget>
           <Widget className="code-block-body">
             <CodeBlockCopy />
-            <Text className="code-line">{`[color=#cf222e]@tailwind[/color] base;`}</Text>
-            <Text className="code-line">{`[color=#cf222e]@tailwind[/color] components;`}</Text>
-            <Text className="code-line">{`[color=#cf222e]@tailwind[/color] utilities;`}</Text>
+            <ScrollArea className="code-block-scroll" style={{ height: "84px" }}>
+              <ScrollAreaContent className="code-block-scroll-content">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#cf222e]@tailwind[/color] base;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#cf222e]@tailwind[/color] components;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#cf222e]@tailwind[/color] utilities;`}</Text>
+                </Widget>
+              </ScrollAreaContent>
+              <Scrollbar />
+            </ScrollArea>
           </Widget>
         </Widget>
         <p>{`[bgcolor=#eee] @lcui/cli [/bgcolor] 编译时会通过 PostCSS 链（postcss + tailwindcss + postcss-rem-to-px）处理 Tailwind 指令，生成最终的 CSS 输出。`}</p>
