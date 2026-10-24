@@ -53,6 +53,7 @@ void lcui_widgets_init(void)
         ui_register_alert_dialog();
         ui_register_tooltip();
         ui_register_popover();
+        ui_register_toast();
 
         /* The theme layer loads last so its rules win over each widget's own
          * default CSS at equal specificity, letting style-nova.css refine the

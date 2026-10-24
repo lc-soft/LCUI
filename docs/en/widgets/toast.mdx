@@ -1,0 +1,156 @@
+# Toast
+
+A succinct message displayed temporarily in a page corner for feedback, status notifications, and lightweight confirmations.
+
+<WidgetExample name="toast-basic" />
+
+## Use cases
+
+- **Use**: transient feedback such as saved, failed, or a background task in progress
+- **Use**: lightweight actions such as undo, confirm, or cancel
+- **Don't use**: blocking confirmation flows (use `alert-dialog`)
+- **Don't use**: persistent, draggable, or complex editable content
+
+## Usage
+
+```c
+#include <LCUI.h>
+
+void notify_saved(void)
+{
+        ui_toast_options_t options = { 0 };
+
+        options.type = UI_TOAST_TYPE_SUCCESS;
+        options.title = "Saved";
+        options.description = "Your changes have been saved.";
+        ui_toast_show(&options);
+}
+```
+
+The first `ui_toast_show()` call creates a singleton `toast-viewport` under `ui_root()`. Later toasts stack bottom-right, with newer toasts below older ones.
+
+## Types
+
+`type` selects the status icon:
+
+- `UI_TOAST_TYPE_DEFAULT`: no icon
+- `UI_TOAST_TYPE_SUCCESS`
+- `UI_TOAST_TYPE_INFO`
+- `UI_TOAST_TYPE_WARNING`
+- `UI_TOAST_TYPE_ERROR`
+- `UI_TOAST_TYPE_LOADING`: uses the `spinner` widget
+
+```c
+ui_toast_options_t options = { 0 };
+
+options.type = UI_TOAST_TYPE_LOADING;
+options.title = "Creating event...";
+options.duration = UI_TOAST_DURATION_PERSISTENT;
+ui_toast_show(&options);
+```
+
+<WidgetExample name="toast-types" />
+
+## Action
+
+A single action button can be configured through options:
+
+```c
+static void on_undo(ui_widget_t *toast, void *arg)
+{
+        ui_toast_close(toast);
+}
+
+void notify_with_action(void)
+{
+        ui_toast_options_t options = { 0 };
+
+        options.title = "Event created";
+        options.description = "You can undo this action.";
+        options.action_text = "Undo";
+        options.on_action = on_undo;
+        ui_toast_show(&options);
+}
+```
+
+<WidgetExample name="toast-action" />
+
+## Custom actions
+
+For multiple buttons such as confirm and cancel, get the action row with `ui_toast_get_actions()` and append regular `button` widgets:
+
+```c
+static void on_confirm(ui_widget_t *button, ui_event_t *event, void *arg)
+{
+        ui_toast_close(event->data);
+}
+
+void confirm_delete(void)
+{
+        ui_toast_options_t options = { 0 };
+        ui_widget_t *toast;
+        ui_widget_t *actions;
+        ui_widget_t *confirm;
+
+        options.title = "Delete event?";
+        options.description = "This action cannot be undone.";
+        options.duration = UI_TOAST_DURATION_PERSISTENT;
+        toast = ui_toast_show(&options);
+        actions = ui_toast_get_actions(toast);
+
+        confirm = ui_create_button();
+        ui_button_set_variant(confirm, UI_BUTTON_VARIANT_PRIMARY);
+        ui_button_set_size(confirm, UI_BUTTON_SIZE_SM);
+        ui_button_set_text(confirm, "Confirm");
+        ui_widget_on(confirm, "click", on_confirm, toast);
+        ui_widget_append(actions, confirm);
+}
+```
+
+`ui_toast_get_actions()` returns the internal `toast-actions` row and makes it visible. A cancel button can be created and appended the same way.
+
+## Promise
+
+Start with `UI_TOAST_TYPE_LOADING`, then update the type, title, and duration when the task finishes:
+
+```c
+ui_widget_t *toast = ui_toast_show(&loading_options);
+
+/* After the task completes */
+ui_toast_set_type(toast, UI_TOAST_TYPE_SUCCESS);
+ui_toast_set_title(toast, "Event created");
+ui_toast_set_description(toast, "Your event has been created.");
+ui_toast_set_duration(toast, 5000);
+```
+
+<WidgetExample name="toast-promise" />
+
+## Duration
+
+- Default: auto-close after `5000ms`
+- `UI_TOAST_DURATION_PERSISTENT`: keep until `ui_toast_close()` or the close button is clicked
+- Loading toasts are persistent by default so they do not disappear before loading finishes
+
+Interactive toasts should use `UI_TOAST_DURATION_PERSISTENT`.
+
+## Caveats
+
+:::note
+
+Toast includes a close button. Clicking it, invoking an action callback, or timing out removes the toast. The associated timer is cancelled when the toast is closed.
+
+:::
+
+:::caution
+
+**This implementation does not include shadcn's slide/scale transitions or swipe gestures.** The visual style (bottom-right stacking, rounded corners, border, shadow, icons, and typography) follows shadcn Toast, while motion and gestures remain static to suit current LCUI capabilities.
+
+:::
+
+## API Reference
+
+### Toast
+
+Toast message container and its options.
+
+<FieldTable name="toast" />

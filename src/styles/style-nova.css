@@ -523,6 +523,69 @@ popover-description {
   @apply text-sm text-muted-foreground;
 }
 
+/* toast: structural rules live in src/widgets/toast.c */
+
+toast-viewport {
+  z-index: 10000;
+}
+
+toast {
+  @apply border border-border bg-popover text-popover-foreground rounded-2xl;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 384px;
+  pointer-events: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+toast-content {
+  @apply items-center gap-3 p-4;
+}
+
+toast-icon {
+  width: 16px;
+  height: 16px;
+}
+
+toast:error toast-icon {
+  @apply text-destructive;
+}
+
+toast-spinner {
+  width: 16px;
+  height: 16px;
+  color: inherit;
+}
+
+toast-body {
+  @apply gap-1;
+}
+
+toast-title {
+  @apply text-sm font-medium;
+}
+
+toast-description {
+  @apply text-sm text-muted-foreground;
+}
+
+toast-actions {
+  @apply gap-2;
+}
+
+.toast-action,
+.toast-close {
+  flex-shrink: 0;
+}
+
+.toast-close {
+  @apply text-muted-foreground;
+}
+
+.toast-close:hover {
+  @apply text-foreground;
+}
+
 /* dialog / alert-dialog: structural rules (display, positioning, layout) live
  * in src/widgets/dialog.c; keep only visual refinements here. */
 

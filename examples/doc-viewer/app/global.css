@@ -278,6 +278,10 @@ p {
   @apply flex flex-wrap gap-2;
 }
 
+.toast-demo-row {
+  @apply flex flex-wrap gap-2;
+}
+
 .popover-form-grid {
   @apply flex flex-col gap-2;
   /* clip-safe supplies the 4px focus-ring gutter; keep the original visual

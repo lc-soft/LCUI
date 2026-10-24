@@ -1,0 +1,156 @@
+# Toast
+
+Toast（轻提示）会在页面角落短暂显示一条消息，可用于操作反馈、状态通知和需要用户确认的轻量交互。
+
+<WidgetExample name="toast-basic" />
+
+## 适用场景
+
+- **适用**：保存成功、发送失败、后台任务进行中等短暂状态反馈
+- **适用**：需要提供撤销、确认或取消等轻量操作的场景
+- **不适用**：必须打断用户并等待处理的确认流程（使用 `alert-dialog`）
+- **不适用**：需要常驻页面、可拖动或复杂编辑的内容
+
+## 用法
+
+```c
+#include <LCUI.h>
+
+void notify_saved(void)
+{
+        ui_toast_options_t options = { 0 };
+
+        options.type = UI_TOAST_TYPE_SUCCESS;
+        options.title = "Saved";
+        options.description = "Your changes have been saved.";
+        ui_toast_show(&options);
+}
+```
+
+第一次调用 `ui_toast_show()` 时会在 `ui_root()` 下创建单例 `toast-viewport`。后续 Toast 会以右下角、从下往上的顺序堆叠。
+
+## 类型
+
+`type` 控制状态图标：
+
+- `UI_TOAST_TYPE_DEFAULT`：不显示图标
+- `UI_TOAST_TYPE_SUCCESS`
+- `UI_TOAST_TYPE_INFO`
+- `UI_TOAST_TYPE_WARNING`
+- `UI_TOAST_TYPE_ERROR`
+- `UI_TOAST_TYPE_LOADING`：使用 `spinner` 部件显示加载图标
+
+```c
+ui_toast_options_t options = { 0 };
+
+options.type = UI_TOAST_TYPE_LOADING;
+options.title = "Creating event...";
+options.duration = UI_TOAST_DURATION_PERSISTENT;
+ui_toast_show(&options);
+```
+
+<WidgetExample name="toast-types" />
+
+## 操作
+
+单个操作按钮可以通过 options 直接配置：
+
+```c
+static void on_undo(ui_widget_t *toast, void *arg)
+{
+        ui_toast_close(toast);
+}
+
+void notify_with_action(void)
+{
+        ui_toast_options_t options = { 0 };
+
+        options.title = "Event created";
+        options.description = "You can undo this action.";
+        options.action_text = "Undo";
+        options.on_action = on_undo;
+        ui_toast_show(&options);
+}
+```
+
+<WidgetExample name="toast-action" />
+
+## 自定义操作
+
+需要确认/取消等多个按钮时，通过 `ui_toast_get_actions()` 取得操作区域，然后追加普通 `button` 部件：
+
+```c
+static void on_confirm(ui_widget_t *button, ui_event_t *event, void *arg)
+{
+        ui_toast_close(event->data);
+}
+
+void confirm_delete(void)
+{
+        ui_toast_options_t options = { 0 };
+        ui_widget_t *toast;
+        ui_widget_t *actions;
+        ui_widget_t *confirm;
+
+        options.title = "Delete event?";
+        options.description = "This action cannot be undone.";
+        options.duration = UI_TOAST_DURATION_PERSISTENT;
+        toast = ui_toast_show(&options);
+        actions = ui_toast_get_actions(toast);
+
+        confirm = ui_create_button();
+        ui_button_set_variant(confirm, UI_BUTTON_VARIANT_PRIMARY);
+        ui_button_set_size(confirm, UI_BUTTON_SIZE_SM);
+        ui_button_set_text(confirm, "Confirm");
+        ui_widget_on(confirm, "click", on_confirm, toast);
+        ui_widget_append(actions, confirm);
+}
+```
+
+`ui_toast_get_actions()` 返回的是 Toast 内部的 `toast-actions` 容器；调用后该容器会显示。取消按钮可以用同样的方式创建并追加。
+
+## Promise
+
+可以先用 `UI_TOAST_TYPE_LOADING` 显示进行中状态，任务完成后再更新类型、标题和持续时间：
+
+```c
+ui_widget_t *toast = ui_toast_show(&loading_options);
+
+/* 任务完成后 */
+ui_toast_set_type(toast, UI_TOAST_TYPE_SUCCESS);
+ui_toast_set_title(toast, "Event created");
+ui_toast_set_description(toast, "Your event has been created.");
+ui_toast_set_duration(toast, 5000);
+```
+
+<WidgetExample name="toast-promise" />
+
+## 持续时间
+
+- 默认：`5000ms` 后自动关闭
+- `UI_TOAST_DURATION_PERSISTENT`：常驻，直到调用 `ui_toast_close()` 或点击关闭按钮
+- Loading 类型默认常驻，避免在加载完成前消失
+
+交互型 Toast（确认/取消）应使用 `UI_TOAST_DURATION_PERSISTENT`。
+
+## 注意事项
+
+:::note
+
+Toast 默认带有关闭按钮；点击关闭、执行操作回调或超时后都会移除当前 Toast。关闭时会取消关联的定时器。
+
+:::
+
+:::caution
+
+**当前实现不包含 shadcn 的滑入/滑出、缩放和 swipe 手势。** 视觉样式（右下角堆叠、圆角、边框、阴影、图标和排版）与 shadcn Toast 对齐，动画和手势保持静态以适配当前 LCUI 能力。
+
+:::
+
+## API 参考
+
+### Toast
+
+Toast 消息容器及其选项。
+
+<FieldTable name="toast" />

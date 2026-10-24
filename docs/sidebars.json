@@ -51,6 +51,7 @@
         { "slug": "shimmer", "label": { "en": "Shimmer", "zh-CN": "Shimmer 高光" } },
         { "slug": "text", "label": { "en": "Text", "zh-CN": "Text 文本" } },
         { "slug": "text-input", "label": { "en": "TextInput", "zh-CN": "TextInput 文本输入" } },
+        { "slug": "toast", "label": { "en": "Toast", "zh-CN": "Toast 轻提示" } },
         { "slug": "tooltip", "label": { "en": "Tooltip", "zh-CN": "Tooltip 提示" } }
       ]
     }

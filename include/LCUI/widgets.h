@@ -36,3 +36,4 @@
 #include "widgets/placement.h"
 #include "widgets/tooltip.h"
 #include "widgets/popover.h"
+#include "widgets/toast.h"

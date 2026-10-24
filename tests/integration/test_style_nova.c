@@ -273,6 +273,61 @@ static void check_tooltip_arrow_padding(void)
         ui_widget_destroy(right);
 }
 
+static ui_widget_t *find_type(ui_widget_t *w, const char *type)
+{
+        ui_widget_t *child;
+        ui_widget_t *found;
+        size_t index;
+
+        for (index = 0; (child = ui_widget_get_child(w, index)); ++index) {
+                if (ui_check_widget_type(child, type)) {
+                        return child;
+                }
+                found = find_type(child, type);
+                if (found) {
+                        return found;
+                }
+        }
+        return NULL;
+}
+
+static void check_toast_theme(void)
+{
+        ui_toast_options_t options = { 0 };
+        ui_widget_t *toast;
+        ui_widget_t *content;
+        ui_widget_t *title;
+        ui_widget_t *description;
+
+        options.title = "Event created";
+        options.description = "Sunday, December 3 at 9:00 AM";
+        options.duration = UI_TOAST_DURATION_PERSISTENT;
+        toast = ui_toast_show(&options);
+        ui_update();
+        content = find_type(toast, "toast-content");
+        title = find_type(toast, "toast-title");
+        description = find_type(toast, "toast-description");
+
+        ctest_equal_int("toast should use a solid border",
+                        toast->computed_style.type_bits.border_top_style,
+                        CSS_BORDER_STYLE_SOLID);
+        ctest_equal_float("toast should use a 16px corner radius",
+                          toast->computed_style.border_top_left_radius, 16.0f);
+        ctest_equal_float("toast content should use 16px padding",
+                          content->computed_style.padding_top, 16.0f);
+        ctest_equal_float("toast title should use text-sm",
+                          title->computed_style.font_size, 14.0f);
+        ctest_equal_int("toast title should use medium weight",
+                        title->computed_style.type_bits.font_weight,
+                        CSS_FONT_WEIGHT_500);
+        ctest_equal_float("toast description should use text-sm",
+                          description->computed_style.font_size, 14.0f);
+
+        ui_toast_close(toast);
+        ui_update();
+        ui_clear_trash();
+}
+
 void test_style_nova(void)
 {
         lcui_init();
@@ -292,6 +347,7 @@ void test_style_nova(void)
                        check_tooltip_arrow_geometry);
         ctest_describe("style-nova: tooltip padding",
                        check_tooltip_arrow_padding);
+        ctest_describe("style-nova: toast", check_toast_theme);
 
         lcui_destroy();
 }
