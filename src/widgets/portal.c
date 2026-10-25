@@ -152,9 +152,27 @@ static void ui_portal_emit_outside(void)
 
 static bool ui_portal_is_inside(ui_portal_t *data, ui_widget_t *target)
 {
-        for (; target; target = target->parent) {
-                if (target == data->content || target == data->anchor) {
+        ui_widget_t *w;
+        ui_portal_content_entry_t *entry;
+
+        for (w = target; w; w = w->parent) {
+                if (w == data->content || w == data->anchor) {
                         return true;
+                }
+        }
+        /* A nested portal belongs to this portal when its anchor sits inside
+         * this portal's content. Treat its content as inside too, otherwise
+         * clicking a submenu item would report an outside click on the
+         * parent menu. */
+        for (w = target; w && w != ui_portal_root; w = w->parent) {
+                entry = ui_portal_find_content(w);
+                if (entry && entry->portal != data->owner) {
+                        ui_portal_t *nested = ui_portal_get_data(entry->portal);
+
+                        if (nested->anchor &&
+                            ui_portal_is_inside(data, nested->anchor)) {
+                                return true;
+                        }
                 }
         }
         return false;

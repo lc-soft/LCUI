@@ -1,0 +1,238 @@
+# DropdownMenu
+
+A dropdown menu triggers a single command from a set of actions, with support for groups, submenus, checkbox items, radio items, shortcut hints, and destructive actions.
+
+<WidgetExample name="dropdown-menu-demo" />
+
+## Use cases
+
+- **Suitable**: User menus, inline action menus, and command lists that need groups or submenus
+- **Suitable**: Settings that show checked or selected state inside the menu
+- **Not suitable**: Overlays that need large text input or complex forms (use `dialog` or `popover`)
+- **Not suitable**: Cases that only need a regular button (use `button`)
+
+## Usage
+
+```tsx
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@lcui/react"
+```
+
+```tsx
+<DropdownMenu>
+  <DropdownMenuTrigger>
+    <Button>Open</Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent align="start">
+    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+    <DropdownMenuGroup>
+      <DropdownMenuItem>Profile</DropdownMenuItem>
+      <DropdownMenuItem>Settings</DropdownMenuItem>
+    </DropdownMenuGroup>
+    <DropdownMenuSeparator />
+    <DropdownMenuItem>Log out</DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>
+```
+
+## Composition
+
+Use the following composition to build a `DropdownMenu`:
+
+```
+DropdownMenu
+├── DropdownMenuTrigger
+└── DropdownMenuContent (Portal)
+    ├── DropdownMenuLabel
+    ├── DropdownMenuGroup
+    │   ├── DropdownMenuItem
+    │   └── DropdownMenuCheckboxItem
+    ├── DropdownMenuSeparator
+    ├── DropdownMenuGroup
+    │   └── DropdownMenuRadioGroup
+    │       ├── DropdownMenuRadioItem
+    │       └── DropdownMenuRadioItem
+    └── DropdownMenuSub
+        ├── DropdownMenuSubTrigger
+        └── DropdownMenuSubContent (Portal)
+            └── DropdownMenuItem
+```
+
+## Examples
+
+### Basic
+
+A basic menu with a group label, a separator, and a disabled item at the end.
+
+<WidgetExample name="dropdown-menu-basic-demo" />
+
+### Submenu
+
+Place `DropdownMenuSubTrigger` and `DropdownMenuSubContent` inside `DropdownMenuSub`. Hovering or clicking the trigger opens the submenu. Submenu content is also rendered through a Portal.
+
+<WidgetExample name="dropdown-menu-submenu" />
+
+### Shortcuts
+
+`DropdownMenuShortcut` only displays a shortcut hint; it does not bind a real shortcut. While the menu is open, typing a letter triggers typeahead: for example, pressing `s` moves to the menu item that starts with S. It only changes the highlight and never runs the command. Pressing the same letter repeatedly cycles through items with the same initial.
+
+<WidgetExample name="dropdown-menu-shortcuts" />
+
+### Icons
+
+Place an icon before the item label to make the action easier to recognize.
+
+<WidgetExample name="dropdown-menu-icons" />
+
+### Checkboxes
+
+`DropdownMenuCheckboxItem` toggles its `checked` status when activated and keeps the menu open so several items can be toggled in a row. Set the initial state with the `checked` attribute.
+
+<WidgetExample name="dropdown-menu-checkboxes" />
+
+### Checkboxes with icons
+
+Add icons before the checkbox labels to make each option easier to recognize. The check indicator is still inserted automatically at the right side by the widget.
+
+<WidgetExample name="dropdown-menu-checkboxes-icons" />
+
+### Radio group
+
+When the `value` of `DropdownMenuRadioGroup` matches the `value` of a `DropdownMenuRadioItem`, that item enters the selected state. Switching options keeps the menu open.
+
+<WidgetExample name="dropdown-menu-radio-group" />
+
+### Radio with icons
+
+Radio items can also show icons before their labels, which is useful for choices such as payment methods.
+
+<WidgetExample name="dropdown-menu-radio-icons" />
+
+### Disabled and destructive
+
+Setting `disabled` on an item prevents pointer and keyboard activation. Setting `variant="destructive"` renders the item in the danger color.
+
+<WidgetExample name="dropdown-menu-destructive" />
+
+### Avatar menu
+
+Use a circular avatar button as the trigger to build an account switcher menu.
+
+<WidgetExample name="dropdown-menu-avatar" />
+
+### Complex
+
+Combine icons, groups, separators, checkbox items, submenus, and shortcut hints to build a complete account menu.
+
+<WidgetExample name="dropdown-menu-complex" />
+
+## API Reference
+
+### DropdownMenu
+
+The menu state container that manages open state, focus, and keyboard navigation.
+
+<FieldTable name="dropdown-menu" />
+
+### DropdownMenuTrigger
+
+The trigger area that toggles the menu open state when clicked.
+
+<FieldTable name="dropdown-menu-trigger" />
+
+### DropdownMenuContent
+
+The menu panel rendered through a Portal. It handles positioning, outside-click closing, and item layout.
+
+<FieldTable name="dropdown-menu-content" />
+
+### DropdownMenuGroup
+
+A container that groups related menu items.
+
+<FieldTable name="dropdown-menu-group" />
+
+### DropdownMenuLabel
+
+A menu group heading that is skipped by keyboard navigation.
+
+<FieldTable name="dropdown-menu-label" />
+
+### DropdownMenuItem
+
+A regular command item that closes the menu and emits `select` when activated.
+
+<FieldTable name="dropdown-menu-item" />
+
+### DropdownMenuCheckboxItem
+
+A menu item with a checked state. Activating it toggles the state and emits `checked-change`.
+
+<FieldTable name="dropdown-menu-checkbox-item" />
+
+### DropdownMenuRadioGroup
+
+A container that manages a mutually exclusive radio value. The checked state of its items is synchronized from `value`.
+
+<FieldTable name="dropdown-menu-radio-group" />
+
+### DropdownMenuRadioItem
+
+A radio menu item. Activating it updates the value of its radio group and emits `value-change`.
+
+<FieldTable name="dropdown-menu-radio-item" />
+
+### DropdownMenuSeparator
+
+A thin divider between menu groups.
+
+<FieldTable name="dropdown-menu-separator" />
+
+### DropdownMenuShortcut
+
+Shortcut hint text aligned to the right side of a menu item.
+
+<FieldTable name="dropdown-menu-shortcut" />
+
+### DropdownMenuSub
+
+The submenu state container.
+
+<FieldTable name="dropdown-menu-sub" />
+
+### DropdownMenuSubTrigger
+
+The item that opens the submenu. Hovering or clicking it opens the submenu.
+
+<FieldTable name="dropdown-menu-sub-trigger" />
+
+### DropdownMenuSubContent
+
+The submenu panel rendered through a Portal. It opens to the right of the trigger by default.
+
+<FieldTable name="dropdown-menu-sub-content" />
+
+## Caveats
+
+:::note
+**Menu content is managed by Portal.** Put `DropdownMenuContent` inside `DropdownMenu`; do not mount it to `ui_root` manually.
+:::
+
+:::tip
+**Keyboard navigation is built in.** Once the menu is open, use `ArrowUp` / `ArrowDown` to cycle the highlight, `Home` / `End` to jump to the first or last item, `Enter` / `Space` to activate, `ArrowRight` to enter a submenu, `ArrowLeft` to return to the parent, and `Escape` to close the submenu and then the root menu.
+:::
+
+:::caution
+**Automatic collision flipping is not supported yet.** The menu does not flip or clamp itself against window edges. Set `side` / `align` manually when needed.
+:::
+
+:::caution
+**RTL is not implemented yet.** The current layout and arrow-key behavior assume LTR.
+:::

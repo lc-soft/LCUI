@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <dropdown-menu>
+    <dropdown-menu-trigger>
+      <button>Complex Menu</button>
+    </dropdown-menu-trigger>
+    <dropdown-menu-content class="dropdown-menu-complex-demo-content">
+      <dropdown-menu-group>
+        <dropdown-menu-label>File</dropdown-menu-label>
+        <dropdown-menu-item>
+          <icon name="document" />
+          <text>New File</text>
+          <dropdown-menu-shortcut>Ctrl+N</dropdown-menu-shortcut>
+        </dropdown-menu-item>
+        <dropdown-menu-item>
+          <icon name="folder" />
+          <text>New Folder</text>
+          <dropdown-menu-shortcut>Shift+N</dropdown-menu-shortcut>
+        </dropdown-menu-item>
+        <dropdown-menu-sub>
+          <dropdown-menu-sub-trigger>
+            <icon name="folder-open" />
+            <text>Open Recent</text>
+            <icon name="chevron-right" class="dropdown-menu-chevron" />
+          </dropdown-menu-sub-trigger>
+          <dropdown-menu-sub-content>
+            <dropdown-menu-label>Recent Projects</dropdown-menu-label>
+            <dropdown-menu-item>
+              <icon name="code" />
+              <text>Project Alpha</text>
+            </dropdown-menu-item>
+            <dropdown-menu-item>
+              <icon name="code" />
+              <text>Project Beta</text>
+            </dropdown-menu-item>
+            <dropdown-menu-sub>
+              <dropdown-menu-sub-trigger>
+                <icon name="more-horizontal" />
+                <text>More Projects</text>
+                <icon name="chevron-right" class="dropdown-menu-chevron" />
+              </dropdown-menu-sub-trigger>
+              <dropdown-menu-sub-content>
+                <dropdown-menu-item>
+                  <icon name="code" />
+                  <text>Project Gamma</text>
+                </dropdown-menu-item>
+                <dropdown-menu-item>
+                  <icon name="code" />
+                  <text>Project Delta</text>
+                </dropdown-menu-item>
+              </dropdown-menu-sub-content>
+            </dropdown-menu-sub>
+            <dropdown-menu-separator />
+            <dropdown-menu-item>
+              <icon name="search" />
+              <text>Browse...</text>
+            </dropdown-menu-item>
+          </dropdown-menu-sub-content>
+        </dropdown-menu-sub>
+        <dropdown-menu-separator />
+        <dropdown-menu-item>
+          <icon name="save" />
+          <text>Save</text>
+          <dropdown-menu-shortcut>Ctrl+S</dropdown-menu-shortcut>
+        </dropdown-menu-item>
+        <dropdown-menu-item>
+          <icon name="arrow-download" />
+          <text>Export</text>
+          <dropdown-menu-shortcut>Shift+E</dropdown-menu-shortcut>
+        </dropdown-menu-item>
+      </dropdown-menu-group>
+      <dropdown-menu-separator />
+      <dropdown-menu-group>
+        <dropdown-menu-label>View</dropdown-menu-label>
+        <dropdown-menu-checkbox-item checked="true">
+          <icon name="eye" />
+          <text>Show Sidebar</text>
+        </dropdown-menu-checkbox-item>
+        <dropdown-menu-checkbox-item>
+          <icon name="grid" />
+          <text>Show Status Bar</text>
+        </dropdown-menu-checkbox-item>
+        <dropdown-menu-sub>
+          <dropdown-menu-sub-trigger>
+            <icon name="paint-brush" />
+            <text>Theme</text>
+            <icon name="chevron-right" class="dropdown-menu-chevron" />
+          </dropdown-menu-sub-trigger>
+          <dropdown-menu-sub-content>
+            <dropdown-menu-label>Appearance</dropdown-menu-label>
+            <dropdown-menu-radio-group value="light">
+              <dropdown-menu-radio-item value="light">
+                <icon name="weather-sunny" />
+                <text>Light</text>
+              </dropdown-menu-radio-item>
+              <dropdown-menu-radio-item value="dark">
+                <icon name="weather-moon" />
+                <text>Dark</text>
+              </dropdown-menu-radio-item>
+              <dropdown-menu-radio-item value="system">
+                <icon name="desktop" />
+                <text>System</text>
+              </dropdown-menu-radio-item>
+            </dropdown-menu-radio-group>
+          </dropdown-menu-sub-content>
+        </dropdown-menu-sub>
+      </dropdown-menu-group>
+      <dropdown-menu-separator />
+      <dropdown-menu-group>
+        <dropdown-menu-label>Account</dropdown-menu-label>
+        <dropdown-menu-item>
+          <icon name="person" />
+          <text>Profile</text>
+          <dropdown-menu-shortcut>Shift+P</dropdown-menu-shortcut>
+        </dropdown-menu-item>
+        <dropdown-menu-item>
+          <icon name="payment" />
+          <text>Billing</text>
+        </dropdown-menu-item>
+        <dropdown-menu-sub>
+          <dropdown-menu-sub-trigger>
+            <icon name="settings" />
+            <text>Settings</text>
+            <icon name="chevron-right" class="dropdown-menu-chevron" />
+          </dropdown-menu-sub-trigger>
+          <dropdown-menu-sub-content>
+            <dropdown-menu-label>Preferences</dropdown-menu-label>
+            <dropdown-menu-item>
+              <icon name="keyboard" />
+              <text>Keyboard Shortcuts</text>
+            </dropdown-menu-item>
+            <dropdown-menu-item>
+              <icon name="local-language" />
+              <text>Language</text>
+            </dropdown-menu-item>
+            <dropdown-menu-sub>
+              <dropdown-menu-sub-trigger>
+                <icon name="alert" />
+                <text>Notifications</text>
+                <icon name="chevron-right" class="dropdown-menu-chevron" />
+              </dropdown-menu-sub-trigger>
+              <dropdown-menu-sub-content>
+                <dropdown-menu-label>Notification Types</dropdown-menu-label>
+                <dropdown-menu-checkbox-item checked="true">
+                  <icon name="alert" />
+                  <text>Push Notifications</text>
+                </dropdown-menu-checkbox-item>
+                <dropdown-menu-checkbox-item checked="true">
+                  <icon name="mail" />
+                  <text>Email Notifications</text>
+                </dropdown-menu-checkbox-item>
+              </dropdown-menu-sub-content>
+            </dropdown-menu-sub>
+            <dropdown-menu-separator />
+            <dropdown-menu-item>
+              <icon name="shield" />
+              <text>Privacy &amp; Security</text>
+            </dropdown-menu-item>
+          </dropdown-menu-sub-content>
+        </dropdown-menu-sub>
+      </dropdown-menu-group>
+      <dropdown-menu-separator />
+      <dropdown-menu-group>
+        <dropdown-menu-item>
+          <icon name="question-circle" />
+          <text>Help &amp; Support</text>
+        </dropdown-menu-item>
+        <dropdown-menu-item>
+          <icon name="document-text" />
+          <text>Documentation</text>
+        </dropdown-menu-item>
+      </dropdown-menu-group>
+      <dropdown-menu-separator />
+      <dropdown-menu-group>
+        <dropdown-menu-item variant="destructive">
+          <icon name="sign-out" />
+          <text>Sign Out</text>
+          <dropdown-menu-shortcut>Shift+Q</dropdown-menu-shortcut>
+        </dropdown-menu-item>
+      </dropdown-menu-group>
+    </dropdown-menu-content>
+  </dropdown-menu>
+</lcui-app>

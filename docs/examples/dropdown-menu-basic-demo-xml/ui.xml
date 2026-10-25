@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <dropdown-menu>
+    <dropdown-menu-trigger>
+      <button>Open</button>
+    </dropdown-menu-trigger>
+    <dropdown-menu-content class="dropdown-menu-basic-demo-content">
+      <dropdown-menu-group>
+        <dropdown-menu-label>My Account</dropdown-menu-label>
+        <dropdown-menu-item><text>Profile</text></dropdown-menu-item>
+        <dropdown-menu-item><text>Billing</text></dropdown-menu-item>
+        <dropdown-menu-item><text>Settings</text></dropdown-menu-item>
+      </dropdown-menu-group>
+      <dropdown-menu-separator />
+      <dropdown-menu-item><text>GitHub</text></dropdown-menu-item>
+      <dropdown-menu-item><text>Support</text></dropdown-menu-item>
+      <dropdown-menu-item disabled="true"><text>API</text></dropdown-menu-item>
+    </dropdown-menu-content>
+  </dropdown-menu>
+</lcui-app>

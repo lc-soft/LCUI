@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <dropdown-menu>
+    <dropdown-menu-trigger>
+      <button class="dropdown-menu-avatar-trigger">LR</button>
+    </dropdown-menu-trigger>
+    <dropdown-menu-content align="end">
+      <dropdown-menu-group>
+        <dropdown-menu-item>
+          <icon name="checkmark-circle" />
+          <text>Account</text>
+        </dropdown-menu-item>
+        <dropdown-menu-item>
+          <icon name="payment" />
+          <text>Billing</text>
+        </dropdown-menu-item>
+        <dropdown-menu-item>
+          <icon name="alert" />
+          <text>Notifications</text>
+        </dropdown-menu-item>
+      </dropdown-menu-group>
+      <dropdown-menu-separator />
+      <dropdown-menu-item>
+        <icon name="sign-out" />
+        <text>Sign Out</text>
+      </dropdown-menu-item>
+    </dropdown-menu-content>
+  </dropdown-menu>
+</lcui-app>

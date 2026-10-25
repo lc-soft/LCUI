@@ -1,0 +1,238 @@
+# DropdownMenu
+
+下拉菜单用于从一组操作中触发单个命令，支持分组、子菜单、复选项、单选项、快捷键提示和危险操作。
+
+<WidgetExample name="dropdown-menu-demo" />
+
+## 适用场景
+
+- **适用**：用户菜单、行内操作菜单、需要分组或子菜单的命令列表
+- **适用**：需要在菜单内展示勾选状态或单选状态的配置项
+- **不适用**：需要输入大量文本或复杂表单的浮层（使用 `dialog`、`popover`）
+- **不适用**：只需要一个普通按钮（使用 `button`）
+
+## 用法
+
+```tsx
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@lcui/react"
+```
+
+```tsx
+<DropdownMenu>
+  <DropdownMenuTrigger>
+    <Button>Open</Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent align="start">
+    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+    <DropdownMenuGroup>
+      <DropdownMenuItem>Profile</DropdownMenuItem>
+      <DropdownMenuItem>Settings</DropdownMenuItem>
+    </DropdownMenuGroup>
+    <DropdownMenuSeparator />
+    <DropdownMenuItem>Log out</DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>
+```
+
+## 组合
+
+使用以下组合来构建 `DropdownMenu`：
+
+```
+DropdownMenu
+├── DropdownMenuTrigger
+└── DropdownMenuContent（Portal）
+    ├── DropdownMenuLabel
+    ├── DropdownMenuGroup
+    │   ├── DropdownMenuItem
+    │   └── DropdownMenuCheckboxItem
+    ├── DropdownMenuSeparator
+    ├── DropdownMenuGroup
+    │   └── DropdownMenuRadioGroup
+    │       ├── DropdownMenuRadioItem
+    │       └── DropdownMenuRadioItem
+    └── DropdownMenuSub
+        ├── DropdownMenuSubTrigger
+        └── DropdownMenuSubContent（Portal）
+            └── DropdownMenuItem
+```
+
+## 示例
+
+### 基础
+
+带分组标题和分隔线的基础菜单，末尾包含一个禁用项。
+
+<WidgetExample name="dropdown-menu-basic-demo" />
+
+### 子菜单
+
+`DropdownMenuSub` 内放置 `DropdownMenuSubTrigger` 和 `DropdownMenuSubContent`，悬停或点击触发项展开子菜单。子菜单内容同样通过 Portal 渲染。
+
+<WidgetExample name="dropdown-menu-submenu" />
+
+### 快捷键
+
+`DropdownMenuShortcut` 只负责展示快捷键提示，不会绑定真实快捷键。菜单打开后直接键入字母会触发 typeahead：例如按 `s` 会移动到以 S 开头的菜单项，只改变高亮，不会执行命令；快速重复同一个字母可以在同首字母的选项之间循环。
+
+<WidgetExample name="dropdown-menu-shortcuts" />
+
+### 图标
+
+在菜单项文字前放置图标，用于快速识别操作类别。
+
+<WidgetExample name="dropdown-menu-icons" />
+
+### 复选项
+
+`DropdownMenuCheckboxItem` 激活后切换 `checked` status，并保持菜单打开，方便继续勾选其它项。初始勾选通过 `checked` 属性设置。
+
+<WidgetExample name="dropdown-menu-checkboxes" />
+
+### 复选项（带图标）
+
+在复选项文字前放置图标，方便快速识别选项类别；勾选指示器仍由部件自动放在右侧。
+
+<WidgetExample name="dropdown-menu-checkboxes-icons" />
+
+### 单选项
+
+`DropdownMenuRadioGroup` 的 `value` 与子项 `value` 匹配时，对应 `DropdownMenuRadioItem` 进入选中状态。切换选项时菜单保持打开。
+
+<WidgetExample name="dropdown-menu-radio-group" />
+
+### 单选项（带图标）
+
+单选项同样可以在文字前放置图标，用于支付方式等需要视觉区分的场景。
+
+<WidgetExample name="dropdown-menu-radio-icons" />
+
+### 禁用与危险操作
+
+为菜单项设置 `disabled` 后不再响应点击和键盘激活；设置 `variant="destructive"` 使用危险色显示。
+
+<WidgetExample name="dropdown-menu-destructive" />
+
+### 头像菜单
+
+使用圆形头像按钮作为触发器，构建账户切换菜单。
+
+<WidgetExample name="dropdown-menu-avatar" />
+
+### 复杂菜单
+
+将图标、分组、分隔线、复选项、子菜单和快捷键组合起来，可以构建完整的账户菜单。
+
+<WidgetExample name="dropdown-menu-complex" />
+
+## API 参考
+
+### DropdownMenu
+
+菜单状态容器，负责打开/关闭、焦点和键盘导航。
+
+<FieldTable name="dropdown-menu" />
+
+### DropdownMenuTrigger
+
+点击切换菜单打开状态的触发区域。
+
+<FieldTable name="dropdown-menu-trigger" />
+
+### DropdownMenuContent
+
+通过 Portal 渲染的菜单面板，负责定位、外部点击关闭和菜单项布局。
+
+<FieldTable name="dropdown-menu-content" />
+
+### DropdownMenuGroup
+
+将一组相关菜单项组织在一起的容器。
+
+<FieldTable name="dropdown-menu-group" />
+
+### DropdownMenuLabel
+
+菜单分组标题，不参与键盘导航。
+
+<FieldTable name="dropdown-menu-label" />
+
+### DropdownMenuItem
+
+普通命令项，激活后关闭菜单并触发 `select` 事件。
+
+<FieldTable name="dropdown-menu-item" />
+
+### DropdownMenuCheckboxItem
+
+带勾选状态的菜单项，激活后切换状态并触发 `checked-change` 事件。
+
+<FieldTable name="dropdown-menu-checkbox-item" />
+
+### DropdownMenuRadioGroup
+
+管理互斥单选值的容器，子项选中状态由 `value` 自动同步。
+
+<FieldTable name="dropdown-menu-radio-group" />
+
+### DropdownMenuRadioItem
+
+单选菜单项，激活后更新父级单选组的值并触发 `value-change` 事件。
+
+<FieldTable name="dropdown-menu-radio-item" />
+
+### DropdownMenuSeparator
+
+分隔不同菜单分组的一条细线。
+
+<FieldTable name="dropdown-menu-separator" />
+
+### DropdownMenuShortcut
+
+菜单项右侧的快捷键提示文本。
+
+<FieldTable name="dropdown-menu-shortcut" />
+
+### DropdownMenuSub
+
+子菜单状态容器。
+
+<FieldTable name="dropdown-menu-sub" />
+
+### DropdownMenuSubTrigger
+
+展开子菜单的触发项，悬停或点击均可打开。
+
+<FieldTable name="dropdown-menu-sub-trigger" />
+
+### DropdownMenuSubContent
+
+通过 Portal 渲染的子菜单面板，默认在触发项右侧展开。
+
+<FieldTable name="dropdown-menu-sub-content" />
+
+## 注意事项
+
+:::note
+**菜单内容由 Portal 管理。** 业务代码只需把 `DropdownMenuContent` 放进 `DropdownMenu`，不要手动挂载到 `ui_root`。
+:::
+
+:::tip
+**键盘导航已内置。** 打开菜单后可用 `ArrowUp` / `ArrowDown` 循环高亮，`Home` / `End` 跳转首尾，`Enter` / `Space` 激活，`ArrowRight` 进入子菜单，`ArrowLeft` 返回父级，`Escape` 依次关闭子菜单和根菜单。
+:::
+
+:::caution
+**暂不支持自动碰撞翻转。** 当前版本不会根据窗口边缘自动翻转菜单方向或裁剪可用高度；需要时请通过 `side` / `align` 手动指定。
+:::
+
+:::caution
+**RTL 暂未实现。** 当前菜单布局与方向键行为按 LTR 设计。
+:::

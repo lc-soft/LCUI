@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <dropdown-menu class="dropdown-menu-demo">
+    <dropdown-menu-trigger>
+      <button>Open</button>
+    </dropdown-menu-trigger>
+    <dropdown-menu-content class="dropdown-menu-demo-content" align="start">
+      <dropdown-menu-group>
+        <dropdown-menu-label>My Account</dropdown-menu-label>
+        <dropdown-menu-item>
+          <text>Profile</text>
+          <dropdown-menu-shortcut>Shift+P</dropdown-menu-shortcut>
+        </dropdown-menu-item>
+        <dropdown-menu-item>
+          <text>Billing</text>
+          <dropdown-menu-shortcut>Ctrl+B</dropdown-menu-shortcut>
+        </dropdown-menu-item>
+        <dropdown-menu-item>
+          <text>Settings</text>
+          <dropdown-menu-shortcut>Ctrl+S</dropdown-menu-shortcut>
+        </dropdown-menu-item>
+      </dropdown-menu-group>
+      <dropdown-menu-separator />
+      <dropdown-menu-group>
+        <dropdown-menu-item><text>Team</text></dropdown-menu-item>
+        <dropdown-menu-sub>
+          <dropdown-menu-sub-trigger>
+            <text>Invite users</text>
+            <icon name="chevron-right" class="dropdown-menu-chevron" />
+          </dropdown-menu-sub-trigger>
+          <dropdown-menu-sub-content>
+            <dropdown-menu-item><text>Email</text></dropdown-menu-item>
+            <dropdown-menu-item><text>Message</text></dropdown-menu-item>
+            <dropdown-menu-separator />
+            <dropdown-menu-item><text>More...</text></dropdown-menu-item>
+          </dropdown-menu-sub-content>
+        </dropdown-menu-sub>
+        <dropdown-menu-item>
+          <text>New Team</text>
+          <dropdown-menu-shortcut>Ctrl+T</dropdown-menu-shortcut>
+        </dropdown-menu-item>
+      </dropdown-menu-group>
+      <dropdown-menu-separator />
+      <dropdown-menu-group>
+        <dropdown-menu-item><text>GitHub</text></dropdown-menu-item>
+        <dropdown-menu-item><text>Support</text></dropdown-menu-item>
+        <dropdown-menu-item disabled="true">
+          <text>API</text>
+        </dropdown-menu-item>
+      </dropdown-menu-group>
+      <dropdown-menu-separator />
+      <dropdown-menu-group>
+        <dropdown-menu-item>
+          <text>Log out</text>
+          <dropdown-menu-shortcut>Shift+Q</dropdown-menu-shortcut>
+        </dropdown-menu-item>
+      </dropdown-menu-group>
+    </dropdown-menu-content>
+  </dropdown-menu>
+</lcui-app>

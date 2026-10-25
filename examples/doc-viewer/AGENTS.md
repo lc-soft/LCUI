@@ -154,6 +154,9 @@ overview、handbook 等页面结构更自由，仅要求：
 
 - 顶部默认示例必须优先复刻 `apps/v4/examples/base/{name}-demo.tsx`，不能自行用一段通用文本代替。
 - 参考文档中实际存在的核心小节（例如 `Size`、`Image`）必须有对应示例；只出现在 API Reference 中的子部件不必额外增加示例小节。不兼容的小节（例如依赖 CSS 变量、RTL、复杂布局的能力）可以跳过，但必须写明原因。
+- **每个 `##` / `###` 示例小节都必须使用 `<WidgetExample>` 指向真实 demo 目录，不得只放静态代码块。**
+- **每个 demo 的文案、菜单项、图标、勾选状态和禁用状态必须先从 shadcn 对应示例文件逐项抄录，再改写成 C / XML / TSX；不得凭印象自行编造示例内容。**
+- **每完成一个示例小节，必须回到 shadcn 源文件逐项核对：结构、数据、状态、图标和宽度是否一致。**
 - C demo 的默认示例必须与顶部示例保持一致；XML / TSX 变体同步同一组内容。
 
 1. **新增组件文档**：先在 `docs/zh-CN/widgets/{name}.mdx` 完成全部内容。
@@ -300,6 +303,12 @@ xmake build doc-viewer
 | `-xml` | XML 标记声明式 | `ui.xml` + `main.c`（`lcui_init` + `ui_load_xml_file`） |
 | `-tsx` | TSX 声明式 | `example.tsx` + `main.c`（`lcui_init` + `example_load()`） |
 | `-<feature>` | 特性示例 | 镜像 `-tsx` 三件套结构，如 `-disabled`、`-dual-scrollbars` |
+| `-demo` | 文档页开头示例 | 完整复制 shadcn 的同名默认示例，如 `<name>-demo` |
+| `-basic-demo` | 文档页「基础」小节示例 | 对应 shadcn 的 Basic 小节，如 `<name>-basic-demo` |
+
+> 页面开头的默认示例统一命名为 `[部件名]-demo`，基础示例统一命名为
+> `[部件名]-basic-demo`；不要使用 `[部件名]-basic` 作为 `WidgetExample` 的
+> demo 名，避免与生成的 `<slug>_basic_init` 约定混淆。
 
 **三变体必齐**：C、XML、TSX 三种实现都要提供。即使 widget 暂未在 `@lcui/react` 中导出，也要给出 TSX 变体作为前瞻占位（`example.tsx` 仅作为代码块展示，不会实际编译）。
 

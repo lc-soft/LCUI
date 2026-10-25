@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <dropdown-menu>
+    <dropdown-menu-trigger>
+      <button>Open</button>
+    </dropdown-menu-trigger>
+    <dropdown-menu-content class="dropdown-menu-checkboxes-demo-content">
+      <dropdown-menu-group>
+        <dropdown-menu-label>Appearance</dropdown-menu-label>
+        <dropdown-menu-checkbox-item checked="true">
+          <text>Status Bar</text>
+        </dropdown-menu-checkbox-item>
+        <dropdown-menu-checkbox-item disabled="true">
+          <text>Activity Bar</text>
+        </dropdown-menu-checkbox-item>
+        <dropdown-menu-checkbox-item>
+          <text>Panel</text>
+        </dropdown-menu-checkbox-item>
+      </dropdown-menu-group>
+    </dropdown-menu-content>
+  </dropdown-menu>
+</lcui-app>

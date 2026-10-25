@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <dropdown-menu>
+    <dropdown-menu-trigger>
+      <button>Open</button>
+    </dropdown-menu-trigger>
+    <dropdown-menu-content class="dropdown-menu-radio-group-demo-content">
+      <dropdown-menu-label>Panel position</dropdown-menu-label>
+      <dropdown-menu-radio-group value="bottom">
+        <dropdown-menu-radio-item value="top">
+          <text>Top</text>
+        </dropdown-menu-radio-item>
+        <dropdown-menu-radio-item value="bottom">
+          <text>Bottom</text>
+        </dropdown-menu-radio-item>
+        <dropdown-menu-radio-item value="right">
+          <text>Right</text>
+        </dropdown-menu-radio-item>
+      </dropdown-menu-radio-group>
+    </dropdown-menu-content>
+  </dropdown-menu>
+</lcui-app>

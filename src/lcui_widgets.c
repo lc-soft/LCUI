@@ -1,4 +1,4 @@
-﻿/*
+/*
  * src/lcui_widgets.c
  *
  * Copyright (c) 2024-2026, Liu Chao <hello@lcui.dev> All rights reserved.
@@ -48,6 +48,7 @@ void lcui_widgets_init(void)
         ui_register_badge();
         ui_register_card();
         ui_register_collapsible();
+        ui_register_dropdown_menu();
         ui_register_alert();
         ui_register_item();
         ui_register_attachment();
@@ -72,4 +73,5 @@ void lcui_widgets_destroy(void)
         ui_unregister_dialog();
         ui_unregister_tooltip();
         ui_unregister_popover();
+        ui_unregister_dropdown_menu();
 }

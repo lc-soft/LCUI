@@ -41,6 +41,7 @@
         { "slug": "checkbox", "label": { "en": "Checkbox", "zh-CN": "Checkbox 复选框" } },
         { "slug": "collapsible", "label": { "en": "Collapsible", "zh-CN": "Collapsible 折叠面板" } },
         { "slug": "dialog", "label": { "en": "Dialog", "zh-CN": "Dialog 对话框" } },
+        { "slug": "dropdown-menu", "label": { "en": "DropdownMenu", "zh-CN": "DropdownMenu 下拉菜单" } },
         { "slug": "empty", "label": { "en": "Empty", "zh-CN": "Empty 空状态" } },
         { "slug": "field", "label": { "en": "Field", "zh-CN": "Field 表单字段" } },
         { "slug": "item", "label": { "en": "Item", "zh-CN": "Item 内容行" } },

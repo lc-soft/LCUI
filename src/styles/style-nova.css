@@ -664,6 +664,129 @@ popover-description {
   @apply text-sm text-muted-foreground;
 }
 
+/* dropdown-menu: all rules live here (the widget source stays style-free). */
+
+dropdown-menu {
+  display: inline-block;
+  position: relative;
+}
+
+dropdown-menu-trigger {
+  display: inline-block;
+}
+
+dropdown-menu-content,
+dropdown-menu-sub-content {
+  display: none;
+  position: absolute;
+  box-sizing: border-box;
+  min-width: 128px;
+  pointer-events: auto;
+  @apply border border-border bg-popover rounded-md text-popover-foreground;
+  padding: 4px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  font-size: 14px;
+}
+
+dropdown-menu-group {
+  display: block;
+}
+
+dropdown-menu-label {
+  display: block;
+  @apply px-2 py-1.5 text-sm font-medium;
+}
+
+dropdown-menu-item,
+dropdown-menu-checkbox-item,
+dropdown-menu-radio-item,
+dropdown-menu-sub-trigger {
+  display: flex;
+  align-items: center;
+  position: relative;
+  box-sizing: border-box;
+  @apply px-2 py-1.5 rounded-md text-sm;
+  gap: 8px;
+  line-height: 1.25;
+}
+
+dropdown-menu-item:hover,
+dropdown-menu-checkbox-item:hover,
+dropdown-menu-radio-item:hover,
+dropdown-menu-sub-trigger:hover {
+  @apply bg-muted;
+}
+
+dropdown-menu-item:highlighted,
+dropdown-menu-checkbox-item:highlighted,
+dropdown-menu-radio-item:highlighted,
+dropdown-menu-sub-trigger:highlighted {
+  @apply bg-muted;
+}
+
+dropdown-menu-item:disabled,
+dropdown-menu-checkbox-item:disabled,
+dropdown-menu-radio-item:disabled,
+dropdown-menu-sub-trigger:disabled {
+  @apply opacity-50;
+  background-color: transparent;
+}
+
+dropdown-menu-item:destructive,
+dropdown-menu-checkbox-item:destructive,
+dropdown-menu-radio-item:destructive {
+  @apply text-destructive;
+}
+
+dropdown-menu-item:destructive:highlighted,
+dropdown-menu-checkbox-item:destructive:highlighted,
+dropdown-menu-radio-item:destructive:highlighted {
+  background-color: #ffe8e9;
+}
+
+dropdown-menu-separator {
+  display: block;
+  height: 1px;
+  margin: 4px -4px;
+  background-color: #e5e5e5;
+}
+
+dropdown-menu-shortcut {
+  display: inline-block;
+  @apply text-xs text-muted-foreground;
+  margin-left: auto;
+  letter-spacing: 0.08em;
+}
+
+dropdown-menu-sub {
+  display: block;
+  position: relative;
+}
+
+dropdown-menu-sub-trigger .dropdown-menu-chevron {
+  margin-left: auto;
+}
+
+dropdown-menu-item icon,
+dropdown-menu-checkbox-item icon,
+dropdown-menu-radio-item icon,
+dropdown-menu-sub-trigger icon {
+  font-size: 16px;
+}
+
+dropdown-menu-checkbox-item .dropdown-menu-indicator,
+dropdown-menu-radio-item .dropdown-menu-indicator {
+  visibility: hidden;
+  margin-left: auto;
+  font-size: 16px;
+  line-height: 1;
+}
+
+dropdown-menu-checkbox-item:checked .dropdown-menu-indicator,
+dropdown-menu-radio-item:checked .dropdown-menu-indicator {
+  visibility: visible;
+}
+
 /* toast: structural rules live in src/widgets/toast.c */
 
 toast-viewport {

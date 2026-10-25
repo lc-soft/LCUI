@@ -553,3 +553,26 @@ li {
 .mdx-table-head-cell {
   @apply font-bold text-gray-900;
 }
+
+/* -- DropdownMenu demos --
+ *
+ * The demo previews mount their menus through a Portal, so these rules
+ * are keyed by a unique class on each menu content instead of a
+ * descendant selector rooted at the demo container.
+ */
+
+.dropdown-menu-demo-content { width: 160px; }
+.dropdown-menu-basic-demo-content { width: 160px; }
+.dropdown-menu-checkboxes-demo-content { width: 160px; }
+.dropdown-menu-checkboxes-icons-demo-content { width: 224px; }
+.dropdown-menu-radio-group-demo-content { width: 128px; }
+.dropdown-menu-radio-icons-demo-content { width: 224px; }
+.dropdown-menu-icons-demo-content { width: 160px; }
+.dropdown-menu-complex-demo-content { width: 176px; }
+
+.dropdown-menu-avatar-trigger {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 20px;
+}

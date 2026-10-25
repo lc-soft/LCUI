@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <dropdown-menu>
+    <dropdown-menu-trigger>
+      <button>Open</button>
+    </dropdown-menu-trigger>
+    <dropdown-menu-content class="dropdown-menu-icons-demo-content">
+      <dropdown-menu-item>
+        <icon name="person" />
+        <text>Profile</text>
+      </dropdown-menu-item>
+      <dropdown-menu-item>
+        <icon name="payment" />
+        <text>Billing</text>
+      </dropdown-menu-item>
+      <dropdown-menu-item>
+        <icon name="settings" />
+        <text>Settings</text>
+      </dropdown-menu-item>
+      <dropdown-menu-separator />
+      <dropdown-menu-item variant="destructive">
+        <icon name="sign-out" />
+        <text>Log out</text>
+      </dropdown-menu-item>
+    </dropdown-menu-content>
+  </dropdown-menu>
+</lcui-app>

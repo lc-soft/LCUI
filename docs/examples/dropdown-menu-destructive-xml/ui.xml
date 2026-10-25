@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <dropdown-menu>
+    <dropdown-menu-trigger>
+      <button>Actions</button>
+    </dropdown-menu-trigger>
+    <dropdown-menu-content>
+      <dropdown-menu-group>
+        <dropdown-menu-item>
+          <icon name="edit" />
+          <text>Edit</text>
+        </dropdown-menu-item>
+        <dropdown-menu-item>
+          <icon name="share" />
+          <text>Share</text>
+        </dropdown-menu-item>
+      </dropdown-menu-group>
+      <dropdown-menu-separator />
+      <dropdown-menu-group>
+        <dropdown-menu-item variant="destructive">
+          <icon name="delete" />
+          <text>Delete</text>
+        </dropdown-menu-item>
+      </dropdown-menu-group>
+    </dropdown-menu-content>
+  </dropdown-menu>
+</lcui-app>

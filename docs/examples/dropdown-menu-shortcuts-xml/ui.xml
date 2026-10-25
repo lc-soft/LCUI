@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <dropdown-menu>
+    <dropdown-menu-trigger>
+      <button>Open</button>
+    </dropdown-menu-trigger>
+    <dropdown-menu-content>
+      <dropdown-menu-group>
+        <dropdown-menu-label>My Account</dropdown-menu-label>
+        <dropdown-menu-item>
+          <text>Profile</text>
+          <dropdown-menu-shortcut>Shift+P</dropdown-menu-shortcut>
+        </dropdown-menu-item>
+        <dropdown-menu-item>
+          <text>Billing</text>
+          <dropdown-menu-shortcut>Ctrl+B</dropdown-menu-shortcut>
+        </dropdown-menu-item>
+        <dropdown-menu-item>
+          <text>Settings</text>
+          <dropdown-menu-shortcut>Ctrl+S</dropdown-menu-shortcut>
+        </dropdown-menu-item>
+      </dropdown-menu-group>
+      <dropdown-menu-separator />
+      <dropdown-menu-item>
+        <text>Log out</text>
+        <dropdown-menu-shortcut>Shift+Q</dropdown-menu-shortcut>
+      </dropdown-menu-item>
+    </dropdown-menu-content>
+  </dropdown-menu>
+</lcui-app>

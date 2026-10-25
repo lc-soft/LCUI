@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <dropdown-menu>
+    <dropdown-menu-trigger>
+      <button>Payment Method</button>
+    </dropdown-menu-trigger>
+    <dropdown-menu-content class="dropdown-menu-radio-icons-demo-content">
+      <dropdown-menu-group>
+        <dropdown-menu-label>Select Payment Method</dropdown-menu-label>
+        <dropdown-menu-radio-group value="card">
+          <dropdown-menu-radio-item value="card">
+            <icon name="payment" />
+            <text>Credit Card</text>
+          </dropdown-menu-radio-item>
+          <dropdown-menu-radio-item value="paypal">
+            <icon name="wallet" />
+            <text>PayPal</text>
+          </dropdown-menu-radio-item>
+          <dropdown-menu-radio-item value="bank">
+            <icon name="building-bank" />
+            <text>Bank Transfer</text>
+          </dropdown-menu-radio-item>
+        </dropdown-menu-radio-group>
+      </dropdown-menu-group>
+    </dropdown-menu-content>
+  </dropdown-menu>
+</lcui-app>

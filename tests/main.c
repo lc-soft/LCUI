@@ -45,6 +45,7 @@ extern void test_alert(void);
 extern void test_item(void);
 extern void test_attachment(void);
 extern void test_collapsible(void);
+extern void test_dropdown_menu(void);
 extern void test_empty(void);
 extern void test_tooltip(void);
 extern void test_popover(void);
@@ -89,6 +90,7 @@ static const ctest_suite_t suites[] = {
         { "item", test_item },
         { "attachment", test_attachment },
         { "collapsible", test_collapsible },
+        { "dropdown-menu", test_dropdown_menu },
         { "empty", test_empty },
         { "tooltip", test_tooltip },
         { "popover", test_popover },

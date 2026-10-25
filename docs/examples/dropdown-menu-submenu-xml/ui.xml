@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <dropdown-menu>
+    <dropdown-menu-trigger>
+      <button>Open</button>
+    </dropdown-menu-trigger>
+    <dropdown-menu-content>
+      <dropdown-menu-group>
+        <dropdown-menu-item><text>Team</text></dropdown-menu-item>
+        <dropdown-menu-sub>
+          <dropdown-menu-sub-trigger>
+            <text>Invite users</text>
+            <icon name="chevron-right" class="dropdown-menu-chevron" />
+          </dropdown-menu-sub-trigger>
+          <dropdown-menu-sub-content>
+            <dropdown-menu-item><text>Email</text></dropdown-menu-item>
+            <dropdown-menu-item><text>Message</text></dropdown-menu-item>
+            <dropdown-menu-sub>
+              <dropdown-menu-sub-trigger>
+                <text>More options</text>
+                <icon name="chevron-right" class="dropdown-menu-chevron" />
+              </dropdown-menu-sub-trigger>
+              <dropdown-menu-sub-content>
+                <dropdown-menu-item><text>Calendly</text></dropdown-menu-item>
+                <dropdown-menu-item><text>Slack</text></dropdown-menu-item>
+                <dropdown-menu-separator />
+                <dropdown-menu-item><text>Webhook</text></dropdown-menu-item>
+              </dropdown-menu-sub-content>
+            </dropdown-menu-sub>
+            <dropdown-menu-separator />
+            <dropdown-menu-item><text>Advanced...</text></dropdown-menu-item>
+          </dropdown-menu-sub-content>
+        </dropdown-menu-sub>
+        <dropdown-menu-item>
+          <text>New Team</text>
+          <dropdown-menu-shortcut>Ctrl+T</dropdown-menu-shortcut>
+        </dropdown-menu-item>
+      </dropdown-menu-group>
+    </dropdown-menu-content>
+  </dropdown-menu>
+</lcui-app>

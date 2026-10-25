@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <dropdown-menu>
+    <dropdown-menu-trigger>
+      <button>Notifications</button>
+    </dropdown-menu-trigger>
+    <dropdown-menu-content class="dropdown-menu-checkboxes-icons-demo-content">
+      <dropdown-menu-group>
+        <dropdown-menu-label>Notification Preferences</dropdown-menu-label>
+        <dropdown-menu-checkbox-item checked="true">
+          <icon name="mail" />
+          <text>Email notifications</text>
+        </dropdown-menu-checkbox-item>
+        <dropdown-menu-checkbox-item>
+          <icon name="chat" />
+          <text>SMS notifications</text>
+        </dropdown-menu-checkbox-item>
+        <dropdown-menu-checkbox-item checked="true">
+          <icon name="alert" />
+          <text>Push notifications</text>
+        </dropdown-menu-checkbox-item>
+      </dropdown-menu-group>
+    </dropdown-menu-content>
+  </dropdown-menu>
+</lcui-app>

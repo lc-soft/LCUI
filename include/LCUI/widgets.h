@@ -30,6 +30,7 @@
 #include "widgets/badge.h"
 #include "widgets/card.h"
 #include "widgets/collapsible.h"
+#include "widgets/dropdown_menu.h"
 #include "widgets/alert.h"
 #include "widgets/item.h"
 #include "widgets/attachment.h"
