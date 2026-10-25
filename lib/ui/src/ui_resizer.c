@@ -25,6 +25,11 @@ LIBUI_INLINE bool ui_widget_is_wrap(ui_widget_t *w)
                s->type_bits.white_space == CSS_WHITE_SPACE_PRE_WRAP;
 }
 
+bool ui_widget_has_sizehint(ui_widget_t *w)
+{
+        return w->proto->has_sizehint;
+}
+
 void ui_widget_get_sizehint(ui_widget_t *w, ui_sizehint_t *hint)
 {
         hint->min_width = 0;
@@ -32,6 +37,35 @@ void ui_widget_get_sizehint(ui_widget_t *w, ui_sizehint_t *hint)
         hint->max_width = 0;
         hint->max_height = 0;
         w->proto->sizehint(w, hint);
+}
+
+void ui_widget_set_available_width_constraint(ui_widget_t *child,
+                                              float available_width,
+                                              ui_widget_t *source,
+                                              unsigned generation)
+{
+        child->layout_constraint.has_definite_width = true;
+        child->layout_constraint.available_width = available_width;
+        child->layout_constraint.source = source;
+        child->layout_constraint.generation = generation;
+}
+
+bool ui_widget_get_available_width(ui_widget_t *w, float *available_width)
+{
+        ui_layout_constraint_t *constraint = &w->layout_constraint;
+
+        if (!constraint->has_definite_width ||
+            constraint->source != w->parent) {
+                return false;
+        }
+        if (!w->parent ||
+            constraint->generation != w->parent->layout_generation) {
+                return false;
+        }
+        if (available_width) {
+                *available_width = constraint->available_width;
+        }
+        return true;
 }
 
 static float ui_widget_get_available_content_width(ui_widget_t *w)

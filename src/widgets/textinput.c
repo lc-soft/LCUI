@@ -983,6 +983,7 @@ void ui_register_textinput(void)
         ui_textinput_proto->settext = ui_textinput_on_parse_text;
         ui_textinput_proto->setattr = ui_textinput_on_set_attr;
         ui_textinput_proto->sizehint = ui_textinput_on_autosize;
+        ui_textinput_proto->has_sizehint = true;
         ui_textinput_proto->resize = ui_textinput_on_resize;
         ui_textinput_proto->update = ui_textinput_on_update;
         ui_load_css_string(ui_textinput_css, __FILE__);

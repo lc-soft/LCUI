@@ -15,6 +15,11 @@ void ui_widget_set_content_width(ui_widget_t *w, float width);
 
 void ui_widget_set_content_height(ui_widget_t *w, float height);
 
+void ui_widget_set_available_width_constraint(ui_widget_t *child,
+                                              float available_width,
+                                              ui_widget_t *source,
+                                              unsigned generation);
+
 void ui_widget_update_box_position(ui_widget_t *w);
 
 void ui_widget_update_box_size(ui_widget_t *w);

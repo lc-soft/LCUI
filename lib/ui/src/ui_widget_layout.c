@@ -140,6 +140,45 @@ void ui_widget_reflow_if_height_changed(ui_widget_t *w)
         }
 }
 
+void ui_widget_reflow_if_size_changed(ui_widget_t *w)
+{
+        css_computed_style_t *s = &w->computed_style;
+        int content_box_width = (int)(w->content_box.width * 64.f);
+        int padding_box_width = (int)(w->padding_box.width * 64.f);
+        int content_box_height = (int)(w->content_box.height * 64.f);
+        int padding_box_height = (int)(w->padding_box.height * 64.f);
+
+        if (s->type_bits.width == CSS_WIDTH_FIT_CONTENT) {
+                CSS_SET_FIXED_LENGTH(
+                    s, width,
+                    css_content_box_width_to_width(s, w->max_content_width));
+        }
+        if (s->type_bits.height == CSS_HEIGHT_FIT_CONTENT) {
+                CSS_SET_FIXED_LENGTH(
+                    s, height,
+                    css_content_box_height_to_height(s, w->max_content_height));
+        }
+        ui_widget_update_box_width(w);
+        ui_widget_update_box_height(w);
+        if (content_box_width != (int)(w->content_box.width * 64.f) ||
+            padding_box_width != (int)(w->padding_box.width * 64.f) ||
+            content_box_height != (int)(w->content_box.height * 64.f) ||
+            padding_box_height != (int)(w->padding_box.height * 64.f)) {
+#ifdef UI_DEBUG_ENABLED
+                UI_WIDGET_STR(w, str);
+                UI_DEBUG_MSG(
+                    "%s: %s: size changed, content_box_size[%g x %g => %g x "
+                    "%g], padding_box_size[%g x %g => %g x %g]",
+                    __FUNCTION__, str, content_box_width / 64.f,
+                    content_box_height / 64.f, w->content_box.width,
+                    w->content_box.height, padding_box_width / 64.f,
+                    padding_box_height / 64.f, w->padding_box.width,
+                    w->padding_box.height);
+#endif
+                ui_widget_reflow(w);
+        }
+}
+
 void ui_widget_reflow_with_resizer(ui_widget_t *w, ui_resizer_t *resizer)
 {
         ui_event_t ev = { .type = UI_EVENT_AFTERLAYOUT, .cancel_bubble = true };
@@ -151,7 +190,7 @@ void ui_widget_reflow_with_resizer(ui_widget_t *w, ui_resizer_t *resizer)
                 break;
         case CSS_DISPLAY_FLEX:
         case CSS_DISPLAY_INLINE_FLEX:
-                ui_flexbox_layout_reflow(w, resizer);
+                ui_flexbox_reflow(w, resizer);
                 break;
         case CSS_DISPLAY_NONE:
         default:

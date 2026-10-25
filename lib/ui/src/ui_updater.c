@@ -333,6 +333,7 @@ static void ui_widget_reset_size(ui_widget_t *w)
 static void ui_widget_update_size(ui_widget_t *w)
 {
         ui_resizer_t resizer;
+        float available_width = 0;
         int width = (int)(w->outer_box.width * 64.f);
         int height = (int)(w->outer_box.height * 64.f);
 
@@ -342,6 +343,11 @@ static void ui_widget_update_size(ui_widget_t *w)
         ui_widget_reflow_with_resizer(w, &resizer);
         w->max_content_width = w->content_box.width;
         w->max_content_height = w->content_box.height;
+        /* 仅有有效宽度约束时才更新内在尺寸缓存，避免 used size 污染。 */
+        if (!ui_widget_get_available_width(w, &available_width)) {
+                w->unconstrained_content_width = w->content_box.width;
+                w->unconstrained_content_height = w->content_box.height;
+        }
         if (ui_widget_has_flex_column_direction(w)) {
                 w->min_content_width = resizer.min_cross_size;
                 w->min_content_height = resizer.min_main_size;

@@ -39,6 +39,7 @@ extern void test_select(void);
 extern void test_sidebar(void);
 extern void test_cursor(void);
 extern void test_icon(void);
+extern void test_icon_centering(void);
 extern void test_button(void);
 extern void test_badge(void);
 extern void test_card(void);
@@ -86,6 +87,7 @@ static const ctest_suite_t suites[] = {
         { "sidebar", test_sidebar },
         { "cursor", test_cursor },
         { "icon", test_icon },
+        { "icon centering", test_icon_centering },
         { "button", test_button },
         { "badge", test_badge },
         { "card", test_card },

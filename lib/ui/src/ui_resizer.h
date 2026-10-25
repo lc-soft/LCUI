@@ -22,6 +22,8 @@ typedef struct ui_resizer {
         float max_main_size;
 } ui_resizer_t;
 
+/* 该部件的原型是否实现了 sizehint（默认原型是空实现）。 */
+bool ui_widget_has_sizehint(ui_widget_t *w);
 void ui_widget_get_sizehint(ui_widget_t *w, ui_sizehint_t *hint);
 void ui_widget_set_width_fit_content(ui_widget_t *w);
 void ui_widget_set_width_fill_available(ui_widget_t *w);

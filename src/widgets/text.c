@@ -234,7 +234,7 @@ static void ui_text_on_destroy(ui_widget_t *w)
 
 static void ui_text_on_sizehint(ui_widget_t *w, ui_sizehint_t *hint)
 {
-        float max_width = 0, max_height = 0;
+        float max_width = 0, max_height = 0, avail_width = 0;
         ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
         pd_text_line_t *line;
         css_computed_style_t *s = &w->computed_style;
@@ -242,8 +242,22 @@ static void ui_text_on_sizehint(ui_widget_t *w, ui_sizehint_t *hint)
 
         if (IS_CSS_FIXED_LENGTH(s, width)) {
                 max_width = css_width_to_content_box_width(s, s->width);
-        } else if (ui_widget_get_max_width(w, &max_width)) {
-                max_width = css_width_to_content_box_width(s, max_width);
+        } else {
+                float max_w = 0;
+                bool has_avail = ui_widget_get_available_width(w, &avail_width);
+                bool has_max = ui_widget_get_max_width(w, &max_w);
+
+                if (has_max) {
+                        max_w = css_width_to_content_box_width(s, max_w);
+                }
+                if (has_avail && has_max) {
+                        /* 父约束与自身 max-width 同时生效，取较小值。 */
+                        max_width = avail_width < max_w ? avail_width : max_w;
+                } else if (has_avail) {
+                        max_width = avail_width;
+                } else if (has_max) {
+                        max_width = max_w;
+                }
         }
         if (IS_CSS_FIXED_LENGTH(s, height)) {
                 max_height = css_height_to_content_box_height(s, s->height);
@@ -463,6 +477,7 @@ void ui_register_text(void)
         ui_text.prototype->paint = ui_text_on_paint;
         ui_text.prototype->destroy = ui_text_on_destroy;
         ui_text.prototype->sizehint = ui_text_on_sizehint;
+        ui_text.prototype->has_sizehint = true;
         ui_text.prototype->resize = ui_text_on_resize;
         ui_text.prototype->update = ui_text_on_update;
         ui_text.prototype->settext = ui_text_on_parse_text;

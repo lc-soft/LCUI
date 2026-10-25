@@ -9,4 +9,4 @@
  * in the LICENSE.TXT file in the root directory of this source tree.
  */
 
-void ui_flexbox_layout_reflow(ui_widget_t *w, ui_resizer_t *resizer);
+void ui_flexbox_reflow(ui_widget_t *w, ui_resizer_t *resizer);

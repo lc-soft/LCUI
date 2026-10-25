@@ -183,6 +183,9 @@ struct ui_widget_prototype {
         void (*setattr)(ui_widget_t *, const char *, const char *);
         void (*settext)(ui_widget_t *, const char *);
         void (*sizehint)(ui_widget_t *, ui_sizehint_t *);
+        /** 原型是否实现了 sizehint（区别于默认空实现）。
+         * 覆盖 sizehint 的原型必须置为 true，否则布局按空实现处理。 */
+        bool has_sizehint;
         void (*resize)(ui_widget_t *, float, float);
         void (*paint)(ui_widget_t *, pd_context_t *,
                       ui_widget_actual_style_t *);
@@ -342,6 +345,13 @@ typedef struct ui_widget_extra_data {
         size_t update_progress;
 } ui_widget_extra_data_t;
 
+typedef struct ui_layout_constraint {
+        bool has_definite_width;
+        float available_width;
+        ui_widget_t *source;
+        unsigned generation;
+} ui_layout_constraint_t;
+
 struct ui_widget {
         unsigned hash;
         ui_widget_state_t state;
@@ -368,7 +378,20 @@ struct ui_widget {
          */
         float max_content_width, max_content_height;
 
+        /**
+         * 无约束布局时测得的内容尺寸（内在尺寸），
+         * 不被约束布局产生的 used size 覆盖。
+         */
+        float unconstrained_content_width, unconstrained_content_height;
+
         float min_content_width, min_content_height;
+
+        /**
+         * 上次在确定宽度约束下测得的内容尺寸，用于跳过重复的嵌套重排。
+         * 约束宽不变且自身无待重排时复用。
+         */
+        float measured_content_width, measured_content_height;
+        bool has_measured;
 
         /** See more:
          * https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model */
@@ -386,6 +409,9 @@ struct ui_widget {
          *  stored as 32-bit words so propagation can test whole words and
          *  extract set bits sparsely. */
         uint32_t style_dependencies[(STYLE_KEY_TOTAL + 31) / 32];
+
+        ui_layout_constraint_t layout_constraint;
+        unsigned layout_generation;
 
         /** Some data bound to the prototype */
         ui_widget_data_t data;

@@ -158,5 +158,6 @@ void ui_register_canvas(void)
         ui_canvas.proto->destroy = ui_canvas_on_destroy;
         ui_canvas.proto->paint = ui_canvas_on_paint;
         ui_canvas.proto->sizehint = ui_canvas_on_sizehint;
+        ui_canvas.proto->has_sizehint = true;
         ui_canvas.proto->resize = ui_canvas_on_resize;
 }

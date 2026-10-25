@@ -108,6 +108,8 @@ LIBUI_PUBLIC dict_t *ui_widget_collect_references(ui_widget_t *w);
 
 LIBUI_PUBLIC float ui_widget_fix_width(ui_widget_t *w, float width);
 LIBUI_PUBLIC float ui_widget_fix_height(ui_widget_t *w, float height);
+LIBUI_PUBLIC bool ui_widget_get_available_width(ui_widget_t *w,
+                                                float *available_width);
 LIBUI_PUBLIC bool ui_widget_get_max_width(ui_widget_t *w, float *width);
 LIBUI_PUBLIC bool ui_widget_get_max_height(ui_widget_t *w, float *height);
 LIBUI_PUBLIC bool ui_widget_get_min_width(ui_widget_t *w, float *width);

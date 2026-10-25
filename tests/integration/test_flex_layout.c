@@ -10,10 +10,25 @@
  */
 
 #include <LCUI.h>
+#include <LCUI/widgets/text.h>
 #include <ctest-custom.h>
 #include "../scenes/flex_layout_scene.h"
 
+#include <math.h>
+#include <stdio.h>
+
+/* Internal (non-public) constraint API used by the column-wrap tests. */
+void ui_widget_set_available_width_constraint(ui_widget_t *child,
+                                              float available_width,
+                                              ui_widget_t *source,
+                                              unsigned generation);
+bool ui_widget_get_available_width(ui_widget_t *w, float *available_width);
+
 #define SCROLLBAR_WIDTH 10
+
+#define LONG_TEXT                                                           \
+        "The quick brown fox jumps over the lazy dog repeatedly until the " \
+        "line is far too long to fit inside a narrow column without wrapping."
 
 static void test_flex_layout_with_content_width(float width)
 {
@@ -1013,6 +1028,716 @@ static void test_choice_card(void)
                           card1->border_box.width, w1_init);
 }
 
+static ui_widget_t *build_column_with_long_text(float box_width)
+{
+        ui_widget_t *root = ui_root();
+        ui_widget_t *box = ui_create_widget(NULL);
+        ui_widget_t *title = ui_create_widget("text");
+        ui_widget_t *desc = ui_create_widget("text");
+        char wbuf[32];
+
+        snprintf(wbuf, sizeof(wbuf), "%gpx", box_width);
+        ui_widget_set_style_string(box, "display", "flex");
+        ui_widget_set_style_string(box, "flex-direction", "column");
+        ui_widget_set_style_string(box, "width", wbuf);
+        ui_text_set_content(title, "Title");
+        ui_widget_set_style_string(desc, "white-space", "normal");
+        ui_text_set_content(desc, LONG_TEXT);
+        ui_widget_append(box, title);
+        ui_widget_append(box, desc);
+        ui_widget_append(root, box);
+        ui_update();
+        return box;
+}
+
+static void test_description_wraps_within_container(void)
+{
+        ui_widget_t *box = build_column_with_long_text(300.f);
+        ui_widget_t *ref = build_column_with_long_text(3000.f);
+        ui_widget_t *desc = ui_widget_get_child(box, 1);
+        ui_widget_t *ref_desc = ui_widget_get_child(ref, 1);
+
+        ctest_equal_bool(
+            "desc wraps to greater height at 300px",
+            desc->content_box.height > 1.5f * ref_desc->content_box.height,
+            true);
+        ctest_equal_bool("desc border_box stays within 300px",
+                         desc->border_box.width <= 300.f + 1.f, true);
+
+        ui_widget_destroy(box);
+        ui_widget_destroy(ref);
+}
+
+static void on_afterlayout_count(ui_widget_t *w, ui_event_t *e, void *arg)
+{
+        (void)w;
+        (void)arg;
+        (*(size_t *)e->data)++;
+}
+
+static void test_child_reflow_count_at_most_once(void)
+{
+        ui_widget_t *box = build_column_with_long_text(300.f);
+        ui_widget_t *desc = ui_widget_get_child(box, 1);
+        float h0 = desc->content_box.height;
+        size_t n = 0;
+
+        ui_widget_on(desc, "afterlayout", on_afterlayout_count, &n);
+        /* Trigger one parent layout that changes both the main (height)
+         * and cross (width) size of the column child: narrowing the
+         * definite column width re-wraps the text. */
+        ui_widget_set_style_string(box, "width", "120px");
+        ui_update();
+        ctest_equal_bool("desc re-wrapped at narrower column width",
+                         desc->content_box.height > h0 + 2.f, true);
+        ctest_equal_bool("column child reflowed exactly once", n == 1, true);
+
+        ui_widget_destroy(box);
+}
+
+/* 约束宽不变时复用测量缓存；约束宽变化时重新测量。 */
+static void test_measure_cache_skips_repeated_reflow(void)
+{
+        ui_widget_t *empty = ui_create_empty();
+        ui_widget_t *header;
+        size_t n = 0;
+
+        ui_widget_set_style_string(empty, "display", "flex");
+        ui_widget_set_style_string(empty, "flex-direction", "column");
+        ui_widget_set_style_string(empty, "align-items", "center");
+        ui_widget_set_style_string(empty, "width", "400px");
+        ui_widget_append(ui_root(), empty);
+
+        ui_empty_set_description(empty, LONG_TEXT);
+        header = ui_widget_get_child(empty, 0);
+        ui_widget_set_style_string(header, "display", "flex");
+        ui_widget_set_style_string(header, "flex-direction", "column");
+        ui_widget_set_style_string(header, "align-items", "center");
+        ui_update();
+
+        ui_widget_on(header, "afterlayout", on_afterlayout_count, &n);
+
+        /* 约束宽不变：复用缓存，不重排。 */
+        ui_widget_request_reflow(empty);
+        ui_update();
+        ctest_equal_bool(
+            "generic container measurement reused when constraint unchanged",
+            n == 0, true);
+
+        /* 约束宽变化：缓存失效，重新测量一次。 */
+        n = 0;
+        ui_widget_set_style_string(empty, "width", "300px");
+        ui_update();
+        ctest_equal_bool("generic container remeasured when constraint changed",
+                         n == 1, true);
+
+        ui_widget_destroy(empty);
+}
+
+/* 居中嵌套容器先窄后宽：变宽后应重新展开，不被历史 used size 卡住。 */
+static void test_centered_container_reexpands_after_widening(void)
+{
+        ui_widget_t *empty = ui_create_empty();
+        ui_widget_t *header;
+        float h300, h600;
+
+        ui_widget_set_style_string(empty, "display", "flex");
+        ui_widget_set_style_string(empty, "flex-direction", "column");
+        ui_widget_set_style_string(empty, "align-items", "center");
+        ui_widget_set_style_string(empty, "width", "300px");
+        ui_widget_append(ui_root(), empty);
+
+        ui_empty_set_description(empty, LONG_TEXT);
+        header = ui_widget_get_child(empty, 0);
+        ui_widget_set_style_string(header, "display", "flex");
+        ui_widget_set_style_string(header, "flex-direction", "column");
+        ui_widget_set_style_string(header, "align-items", "center");
+        ui_update();
+        h300 = header->content_box.height;
+
+        ui_widget_set_style_string(empty, "width", "600px");
+        ui_update();
+        h600 = header->content_box.height;
+
+        ctest_equal_bool("container shrinks when widened", h600 < h300 - 2.f,
+                         true);
+
+        ui_widget_destroy(empty);
+}
+
+/* max-width 应参与测量：即使容器更宽，文本也按 max-width 折行。 */
+static void test_max_width_limits_measurement(void)
+{
+        ui_widget_t *box = ui_create_widget(NULL);
+        ui_widget_t *desc = ui_create_widget("text");
+        float h;
+
+        ui_widget_set_style_string(box, "display", "flex");
+        ui_widget_set_style_string(box, "flex-direction", "column");
+        ui_widget_set_style_string(box, "align-items", "center");
+        ui_widget_set_style_string(box, "width", "800px");
+        ui_widget_set_style_string(desc, "white-space", "normal");
+        ui_widget_set_style_string(desc, "max-width", "300px");
+        ui_text_set_content(desc, LONG_TEXT);
+        ui_widget_append(ui_root(), box);
+        ui_widget_append(box, desc);
+        ui_update();
+
+        h = desc->content_box.height;
+
+        ctest_equal_bool("text width stays within max-width",
+                         desc->border_box.width <= 300.f + 1.f, true);
+        ctest_equal_bool("text wraps taller than a single line", h > 30.f,
+                         true);
+
+        ui_widget_destroy(box);
+}
+
+/* 文本内容变化后，测量缓存必须失效并重新测量。 */
+static void test_measure_cache_invalidates_on_content_change(void)
+{
+        ui_widget_t *empty = ui_create_empty();
+        ui_widget_t *header;
+        ui_widget_t *desc;
+        float h_long, h_short;
+
+        ui_widget_set_style_string(empty, "display", "flex");
+        ui_widget_set_style_string(empty, "flex-direction", "column");
+        ui_widget_set_style_string(empty, "align-items", "center");
+        ui_widget_set_style_string(empty, "width", "400px");
+        ui_widget_append(ui_root(), empty);
+
+        ui_empty_set_description(empty, LONG_TEXT);
+        header = ui_widget_get_child(empty, 0);
+        desc = ui_widget_get_child(header, 0);
+        ui_widget_set_style_string(header, "display", "flex");
+        ui_widget_set_style_string(header, "flex-direction", "column");
+        ui_widget_set_style_string(header, "align-items", "center");
+        ui_widget_set_style_string(desc, "white-space", "normal");
+        ui_update();
+        h_long = desc->content_box.height;
+
+        ui_text_set_content(desc, "Short.");
+        ui_update();
+        h_short = desc->content_box.height;
+
+        ctest_equal_bool("content change invalidates measurement cache",
+                         h_short < h_long - 2.f, true);
+
+        ui_widget_destroy(empty);
+}
+
+/* 零高文本仍视为已测量：不得回退到可能过期的内在高度缓存。 */
+static void test_zero_height_text_ignores_stale_cache(void)
+{
+        ui_widget_t *container = ui_create_widget(NULL);
+        ui_widget_t *text = ui_create_widget("text");
+        float h;
+
+        ui_widget_set_style_string(container, "display", "flex");
+        ui_widget_set_style_string(container, "flex-direction", "column");
+        ui_widget_set_style_string(container, "width", "300px");
+        ui_widget_append(ui_root(), container);
+        ui_widget_append(container, text);
+        ui_widget_set_style_string(text, "font-size", "0px");
+        ui_text_set_content(text, "");
+        ui_update();
+        /* 首次布局后写入一段过期的内在高度缓存，再只触发重排
+         * （不触发子项自身更新），确保缓存不会被更新覆盖。 */
+        text->unconstrained_content_height = 120.f;
+        ui_widget_request_reflow(container);
+        ui_update();
+        h = text->content_box.height;
+
+        ctest_equal_bool("empty text does not reuse stale height", h <= 1.f,
+                         true);
+
+        ui_widget_destroy(container);
+}
+
+static void test_standalone_reflow_stays_wrapped(void)
+{
+        ui_widget_t *box = build_column_with_long_text(300.f);
+        ui_widget_t *title = ui_widget_get_child(box, 0);
+        ui_widget_t *desc = ui_widget_get_child(box, 1);
+        float h0 = desc->content_box.height;
+        float b0 = box->content_box.height;
+
+        ui_widget_request_reflow(title);
+        ui_update();
+        ctest_equal_bool("desc height unchanged after sibling reflow",
+                         fabsf(desc->content_box.height - h0) <= 2.f, true);
+        ctest_equal_bool("box height unchanged after sibling reflow",
+                         fabsf(box->content_box.height - b0) <= 2.f, true);
+        ctest_equal_bool(
+            "title does not overlap desc after sibling reflow",
+            title->layout_y + title->outer_box.height <= desc->layout_y + 2.f,
+            true);
+
+        ui_widget_destroy(box);
+}
+
+static void test_wrap_container_overflows_without_clamp(void)
+{
+        ui_widget_t *parent;
+        ui_widget_t *wrap;
+        ui_widget_t *child;
+        ui_widget_t *children[3];
+        float w_prev;
+        float w_cur;
+        int i;
+
+        /* A wrap container with indefinite cross (width) must overflow
+         * instead of clamping. Appending it directly under the block root
+         * would stretch its auto width (fill-available) into a definite
+         * value, so nest it under a column parent with
+         * align-items: flex-start: the parent does not stretch the child's
+         * cross axis, leaving the wrap container's width auto (indefinite). */
+        parent = ui_create_widget(NULL);
+        ui_widget_set_style_string(parent, "display", "flex");
+        ui_widget_set_style_string(parent, "flex-direction", "column");
+        ui_widget_set_style_string(parent, "align-items", "flex-start");
+        ui_widget_set_style_string(parent, "width", "400px");
+        ui_widget_append(ui_root(), parent);
+
+        wrap = ui_create_widget(NULL);
+        ui_widget_set_style_string(wrap, "display", "flex");
+        ui_widget_set_style_string(wrap, "flex-direction", "column");
+        ui_widget_set_style_string(wrap, "flex-wrap", "wrap");
+        ui_widget_set_style_string(wrap, "height", "100px");
+        ui_widget_append(parent, wrap);
+
+        for (i = 0; i < 3; ++i) {
+                children[i] = ui_create_widget(NULL);
+                ui_widget_set_style_string(children[i], "width", "40px");
+                ui_widget_set_style_string(children[i], "height", "60px");
+                ui_widget_append(wrap, children[i]);
+        }
+        ui_update();
+
+        /* 3 children, each 60px high, exceed the 100px container height, so
+         * they wrap into 3 columns; the container width accumulates the
+         * column content (3 * 40 = 120) and overflows, neither collapsing to
+         * 0 nor being clamped to the parent's 400px. */
+        ctest_equal_bool("container width grew to fit three columns",
+                         wrap->content_box.width >= 119.f &&
+                             wrap->content_box.width <= 121.f,
+                         true);
+        ctest_equal_bool("container width not clamped to parent width",
+                         wrap->content_box.width < 200.f, true);
+
+        /* Children keep their fixed width (not clamped to the container
+         * content width, not collapsed) and land in distinct columns. */
+        for (i = 0; i < 3; ++i) {
+                child = ui_widget_get_child(wrap, i);
+                ctest_equal_bool("child width not clamped or collapsed",
+                                 child->border_box.width >= 39.f &&
+                                     child->border_box.width <= 41.f,
+                                 true);
+                if (i > 0) {
+                        ctest_equal_bool(
+                            "child placed in a later column",
+                            child->border_box.x >
+                                ui_widget_get_child(wrap, i - 1)->border_box.x,
+                            true);
+                }
+        }
+
+        /* Converges: geometry is stable after a fixed number of updates
+         * (no oscillation, no runaway). */
+        for (i = 0; i < 3; ++i) {
+                ui_update();
+        }
+        w_prev = wrap->content_box.width;
+        ui_update();
+        w_cur = wrap->content_box.width;
+        ctest_equal_float("container width stable between last two updates",
+                          w_cur, w_prev);
+        ctest_equal_bool("container width still overflows after settle",
+                         wrap->content_box.width >= 119.f, true);
+
+        ui_widget_destroy(parent);
+}
+
+static void test_constraint_api(void)
+{
+        ui_widget_t *p = ui_create_widget(NULL), *c = ui_create_widget("text");
+        ui_widget_t *new_parent = ui_create_widget(NULL);
+        float aw;
+
+        ui_widget_append(p, c);
+        ctest_equal_bool("fresh child: no constraint",
+                         ui_widget_get_available_width(c, &aw), false);
+        ui_widget_set_available_width_constraint(c, 120.f, p,
+                                                 p->layout_generation);
+        ctest_equal_bool("recorded: child reports constraint",
+                         ui_widget_get_available_width(c, &aw), true);
+        ctest_equal_float("recorded: available_width round-trips", aw, 120.f);
+        ui_widget_append(new_parent, c);
+        ctest_equal_bool("reparented: constraint invalid",
+                         ui_widget_get_available_width(c, &aw), false);
+        /* a stale generation (parent has not re-laid-out to that round) is
+         * not a valid constraint */
+        ui_widget_append(p, c);
+        ui_widget_set_available_width_constraint(c, 90.f, p,
+                                                 p->layout_generation + 1);
+        ctest_equal_bool("stale generation: constraint invalid",
+                         ui_widget_get_available_width(c, &aw), false);
+
+        ui_widget_destroy(p);
+        ui_widget_destroy(new_parent);
+}
+
+/* Cross-axis INDEFINITE column: long text must stay single line (no
+ * constraint is recorded, so the child keeps its intrinsic size). */
+static void test_indefinite_width_keeps_single_line(void)
+{
+        ui_widget_t *outer = ui_create_widget(NULL);
+        ui_widget_t *col = ui_create_widget(NULL);
+        ui_widget_t *desc = ui_create_widget("text");
+        ui_widget_t *wide = build_column_with_long_text(3000.f);
+        ui_widget_t *wide_desc = ui_widget_get_child(wide, 1);
+
+        /* Nest under a column parent with align-items:flex-start so `col`
+         * keeps an auto (indefinite) cross width; appending it directly to
+         * the block root would stretch its width to a definite value. */
+        ui_widget_set_style_string(outer, "display", "flex");
+        ui_widget_set_style_string(outer, "flex-direction", "column");
+        ui_widget_set_style_string(outer, "align-items", "flex-start");
+        ui_widget_set_style_string(outer, "width", "400px");
+        ui_widget_append(ui_root(), outer);
+
+        ui_widget_set_style_string(col, "display", "flex");
+        ui_widget_set_style_string(col, "flex-direction", "column");
+        ui_widget_set_style_string(desc, "white-space", "normal");
+        ui_text_set_content(desc, LONG_TEXT);
+        ui_widget_append(col, desc);
+        ui_widget_append(outer, col);
+        ui_update();
+
+        ctest_equal_bool(
+            "indefinite-width column keeps long text single line",
+            desc->content_box.height <= wide_desc->content_box.height + 2.f,
+            true);
+        ctest_equal_bool(
+            "indefinite column width fits its content",
+            col->content_box.width >= desc->content_box.width - 2.f, true);
+
+        ui_widget_destroy(outer);
+        ui_widget_destroy(wide);
+}
+
+/* A child with a declared width wraps at its own width, not at the
+ * parent-provided constraint. */
+static void test_fixed_width_child_wraps_own_width(void)
+{
+        ui_widget_t *root = ui_root();
+        ui_widget_t *box = ui_create_widget(NULL);
+        ui_widget_t *desc = ui_create_widget("text");
+        ui_widget_t *ref = build_column_with_long_text(300.f);
+        ui_widget_t *ref_desc = ui_widget_get_child(ref, 1);
+
+        ui_widget_set_style_string(box, "display", "flex");
+        ui_widget_set_style_string(box, "flex-direction", "column");
+        ui_widget_set_style_string(box, "width", "300px");
+        ui_widget_set_style_string(desc, "white-space", "normal");
+        ui_widget_set_style_string(desc, "width", "100px");
+        ui_text_set_content(desc, LONG_TEXT);
+        ui_widget_append(box, desc);
+        ui_widget_append(root, box);
+        ui_update();
+
+        ctest_equal_bool(
+            "fixed-width child keeps its declared width",
+            desc->border_box.width >= 99.f && desc->border_box.width <= 101.f,
+            true);
+        ctest_equal_bool(
+            "fixed-width child wraps at its own (narrower) width",
+            desc->content_box.height > ref_desc->content_box.height, true);
+
+        ui_widget_destroy(box);
+        ui_widget_destroy(ref);
+}
+
+/* A flex-grow child's main size is allocated from remaining space and must
+ * not diverge across repeated updates. */
+static void test_grow_child_main_size_stable(void)
+{
+        ui_widget_t *root = ui_root();
+        ui_widget_t *box = ui_create_widget(NULL);
+        ui_widget_t *grow = ui_create_widget(NULL);
+        int i;
+
+        ui_widget_set_style_string(box, "display", "flex");
+        ui_widget_set_style_string(box, "flex-direction", "column");
+        ui_widget_set_style_string(box, "height", "200px");
+        ui_widget_set_style_string(grow, "flex", "1 1 auto");
+        ui_widget_append(box, grow);
+        ui_widget_append(root, box);
+        ui_update();
+
+        ctest_equal_bool("grow child fills the container main size",
+                         fabsf(grow->border_box.height - 200.f) <= 2.f, true);
+        for (i = 0; i < 3; ++i) {
+                ui_update();
+        }
+        ctest_equal_bool("grow child main size stable across repeated updates",
+                         fabsf(grow->border_box.height - 200.f) <= 2.f, true);
+
+        ui_widget_destroy(box);
+}
+
+/* After a parent re-layout, the child must use the refreshed constraint
+ * (new generation), never a stale one. */
+static void test_constraint_refreshes_after_parent_relayout(void)
+{
+        ui_widget_t *box = build_column_with_long_text(300.f);
+        ui_widget_t *desc = ui_widget_get_child(box, 1);
+        float h300 = desc->content_box.height;
+        float h200;
+
+        ui_widget_set_style_string(box, "width", "120px");
+        ui_update();
+        h200 = desc->content_box.height;
+
+        ctest_equal_bool(
+            "narrower constraint re-wraps taller after parent relayout",
+            h200 > h300 + 2.f, true);
+
+        ui_widget_destroy(box);
+}
+
+/* The empty widget's description (a centered column: `empty` and
+ * `empty-header` are `flex flex-col items-center`, description auto width)
+ * must still wrap at the container's available width, not overflow as a
+ * single centered line. Mirrors examples/empty-basic. */
+static void test_empty_description_wraps(void)
+{
+        ui_widget_t *empty = ui_create_empty();
+        ui_widget_t *header;
+        ui_widget_t *desc;
+        ui_widget_t *ref = build_column_with_long_text(3000.f);
+        ui_widget_t *ref_desc = ui_widget_get_child(ref, 1);
+
+        /* theme layout the test env may not load: centered column, width 400 */
+        ui_widget_set_style_string(empty, "display", "flex");
+        ui_widget_set_style_string(empty, "flex-direction", "column");
+        ui_widget_set_style_string(empty, "align-items", "center");
+        ui_widget_set_style_string(empty, "width", "400px");
+        ui_widget_append(ui_root(), empty);
+
+        ui_empty_set_description(empty, LONG_TEXT);
+        header = ui_widget_get_child(empty, 0);
+        desc = ui_widget_get_child(header, 0);
+        ui_widget_set_style_string(header, "display", "flex");
+        ui_widget_set_style_string(header, "flex-direction", "column");
+        ui_widget_set_style_string(header, "align-items", "center");
+        ui_widget_set_style_string(desc, "white-space", "normal");
+        ui_update();
+
+        ctest_equal_bool(
+            "empty-description wraps within the container",
+            desc->content_box.height > 1.5f * ref_desc->content_box.height,
+            true);
+        ctest_equal_bool("empty-description width stays within container",
+                         desc->border_box.width <= 400.f + 1.f, true);
+
+        ui_widget_destroy(empty);
+        ui_widget_destroy(ref);
+}
+
+/* Standalone reflow (hover) or a sibling reflow must not collapse the
+ * centered empty-description back to a single line or shift its position. */
+static void test_empty_description_stable_on_reflow(void)
+{
+        ui_widget_t *empty = ui_create_empty();
+        ui_widget_t *header;
+        ui_widget_t *title;
+        ui_widget_t *desc;
+        float h0;
+        float x0;
+
+        ui_widget_resize(ui_root(), 800, 600);
+        ui_widget_set_style_string(empty, "display", "flex");
+        ui_widget_set_style_string(empty, "flex-direction", "column");
+        ui_widget_set_style_string(empty, "align-items", "center");
+        ui_widget_set_style_string(empty, "width", "100%");
+        ui_widget_set_style_string(empty, "max-width", "400px");
+        ui_widget_append(ui_root(), empty);
+
+        ui_empty_set_title(empty, "No Projects Yet");
+        ui_empty_set_description(empty, LONG_TEXT);
+        header = ui_widget_get_child(empty, 0);
+        title = ui_widget_get_child(header, 0);
+        desc = ui_widget_get_child(header, 1);
+        ui_widget_set_style_string(header, "display", "flex");
+        ui_widget_set_style_string(header, "flex-direction", "column");
+        ui_widget_set_style_string(header, "align-items", "center");
+        ui_widget_set_style_string(desc, "white-space", "normal");
+        ui_update();
+
+        h0 = desc->content_box.height;
+        x0 = desc->layout_x;
+
+        /* hover on the description (status/style change) */
+        ui_widget_add_status(desc, "hover");
+        ui_update();
+        ctest_equal_bool("empty-description stays wrapped on hover",
+                         fabsf(desc->content_box.height - h0) <= 2.f, true);
+        ctest_equal_bool("empty-description x stable on hover",
+                         fabsf(desc->layout_x - x0) <= 2.f, true);
+
+        /* mouse moves from the description onto the title */
+        ui_widget_remove_status(desc, "hover");
+        ui_widget_add_status(title, "hover");
+        ui_update();
+        ctest_equal_bool(
+            "empty-description stays wrapped after hover moves to title",
+            fabsf(desc->content_box.height - h0) <= 2.f, true);
+        ctest_equal_bool(
+            "empty-description x stable after hover moves to title",
+            fabsf(desc->layout_x - x0) <= 2.f, true);
+
+        ui_widget_destroy(empty);
+}
+
+/* 复刻 examples/empty-basic：empty（flex-col items-center）下挂 header
+ * （media/title/description）、content（actions 两个按钮），以及作为 empty
+ * 直接子项的 learn-more 按钮。直接子项按钮必须水平居中，而非被拉伸成
+ * flex-start。theme（style-nova.css）已加载，此处仅手动定宽（empty-basic-demo
+ * 的 w-full max-w-[400px] 在测试环境不加载）。 */
+static void test_empty_basic_learn_more_centered(void)
+{
+        ui_widget_t *empty = ui_create_empty();
+        ui_widget_t *header = ui_create_empty_header();
+        ui_widget_t *media = ui_create_empty_media();
+        ui_widget_t *title = ui_create_empty_title();
+        ui_widget_t *desc = ui_create_empty_description();
+        ui_widget_t *content = ui_create_empty_content();
+        ui_widget_t *actions = ui_create_empty_action();
+        ui_widget_t *create_btn = ui_create_button();
+        ui_widget_t *create_text = ui_create_widget("text");
+        ui_widget_t *import_btn = ui_create_button();
+        ui_widget_t *import_text = ui_create_widget("text");
+        ui_widget_t *learn_btn = ui_create_button();
+        ui_widget_t *learn_text = ui_create_widget("text");
+        float btn_center, empty_center;
+
+        ui_widget_set_style_string(empty, "width", "400px");
+
+        ui_text_set_content(title, "No Projects Yet");
+        ui_text_set_content(
+            desc, "You haven't created any projects yet. Get started by "
+                  "creating your first project.");
+        ui_text_set_content(create_text, "Create Project");
+        ui_text_set_content(import_text, "Import Project");
+        ui_text_set_content(learn_text, "Learn More");
+
+        ui_widget_append(create_btn, create_text);
+        ui_widget_append(import_btn, import_text);
+        ui_widget_append(learn_btn, learn_text);
+        ui_widget_append(actions, create_btn);
+        ui_widget_append(actions, import_btn);
+        ui_widget_append(header, media);
+        ui_widget_append(header, title);
+        ui_widget_append(header, desc);
+        ui_widget_append(content, actions);
+        ui_widget_append(empty, header);
+        ui_widget_append(empty, content);
+        ui_widget_append(empty, learn_btn);
+        ui_widget_append(ui_root(), empty);
+        ui_update();
+
+        btn_center =
+            learn_btn->border_box.x + learn_btn->border_box.width * 0.5f;
+        empty_center = empty->border_box.width * 0.5f;
+        ctest_equal_bool("learn-more button centered",
+                         fabsf(btn_center - empty_center) <= 2.f, true);
+        /* 防止按钮被拉伸到容器宽后中心点仍相同而假绿。 */
+        ctest_equal_bool(
+            "learn-more button narrower than container",
+            learn_btn->border_box.width < empty->border_box.width - 1.f, true);
+
+        ui_widget_destroy(empty);
+}
+
+/* 复刻 docs/examples/field-checkbox 的 sync 行：field:horizontal 下
+ * field-content（flex:1 flex-col）内的 field-description 长文本，初始就应
+ * 在可用宽内折行（不单行溢出），且 hover 后保持稳定。 */
+static void test_field_checkbox_description_stable(void)
+{
+        ui_widget_t *preview = ui_create_widget(NULL);
+        ui_widget_t *outer = ui_create_widget(NULL);
+        ui_widget_t *sync_field = ui_create_field();
+        ui_widget_t *sync_cb = ui_create_checkbox();
+        ui_widget_t *sync_content = ui_create_field_content();
+        ui_widget_t *sync_lbl = ui_create_field_label();
+        ui_widget_t *sync_desc = ui_create_field_description();
+        float h0, h1;
+
+        /* 模拟 doc-viewer 的 .demo-preview：flex-row 水平/垂直居中 */
+        ui_widget_set_style_string(preview, "display", "flex");
+        ui_widget_set_style_string(preview, "justify-content", "center");
+        ui_widget_set_style_string(preview, "align-items", "center");
+
+        ui_widget_set_style_string(outer, "display", "flex");
+        ui_widget_set_style_string(outer, "flex-direction", "column");
+        ui_widget_set_style_string(outer, "max-width", "400px");
+
+        ui_field_set_orientation(sync_field, "horizontal");
+        ui_widget_append(sync_field, sync_cb);
+        ui_widget_append(sync_field, sync_content);
+        ui_text_set_content(sync_lbl, "Sync Desktop & Documents folders");
+        ui_text_set_content(sync_desc,
+                            "Your Desktop & Documents folders are being synced "
+                            "with iCloud Drive. You can access them from other "
+                            "devices.");
+        ui_widget_append(sync_content, sync_lbl);
+        ui_widget_append(sync_content, sync_desc);
+
+        ui_widget_append(outer, sync_field);
+        ui_widget_append(preview, outer);
+        ui_widget_append(ui_root(), preview);
+        ui_update();
+
+        ctest_equal_bool(
+            "description wrapped within available width",
+            sync_desc->border_box.width <= outer->border_box.width + 1.f, true);
+        h0 = sync_desc->content_box.height;
+
+        /* hover 的对象是 field-description 自身 */
+        ui_widget_add_status(sync_desc, "hover");
+        ui_update();
+        h1 = sync_desc->content_box.height;
+
+        ctest_equal_bool("description stays wrapped after hover",
+                         fabsf(h1 - h0) <= 2.f, true);
+        ctest_equal_bool(
+            "description stays within width after hover",
+            sync_desc->border_box.width <= outer->border_box.width + 1.f, true);
+
+        /* 重新挂载：unlink 后重新 append，验证仍折行、宽稳定。 */
+        ui_widget_unlink(sync_desc);
+        ui_widget_append(sync_content, sync_desc);
+        ui_update();
+        ctest_equal_bool("description stays wrapped after remount",
+                         fabsf(sync_desc->content_box.height - h0) <= 2.f,
+                         true);
+        ctest_equal_bool(
+            "description stays within width after remount",
+            sync_desc->border_box.width <= outer->border_box.width + 1.f, true);
+
+        /* field-content（row 父级的 flex:1 子项）单独 reflow 后应保持宽。 */
+        h0 = sync_desc->content_box.height;
+        ui_widget_request_reflow(sync_content);
+        ui_update();
+        ctest_equal_bool(
+            "description stays wrapped after field-content standalone reflow",
+            fabsf(sync_desc->content_box.height - h0) <= 2.f, true);
+
+        ui_widget_destroy(preview);
+}
+
 void test_flex_layout(void)
 {
         lcui_init();
@@ -1025,6 +1750,40 @@ void test_flex_layout(void)
         ctest_describe("root width 320px", test_flex_layout_320);
         ctest_describe("flex gap", test_flex_layout_gap);
         ctest_describe("choice card", test_choice_card);
+        ctest_describe("flex column text wrap",
+                       test_description_wraps_within_container);
+        ctest_describe("child reflow count",
+                       test_child_reflow_count_at_most_once);
+        ctest_describe("measure cache",
+                       test_measure_cache_skips_repeated_reflow);
+        ctest_describe("centered container reexpands",
+                       test_centered_container_reexpands_after_widening);
+        ctest_describe("max-width limits measurement",
+                       test_max_width_limits_measurement);
+        ctest_describe("measure cache invalidates on content change",
+                       test_measure_cache_invalidates_on_content_change);
+        ctest_describe("zero height text ignores stale cache",
+                       test_zero_height_text_ignores_stale_cache);
+        ctest_describe("standalone reflow stays wrapped",
+                       test_standalone_reflow_stays_wrapped);
+        ctest_describe("constraint api", test_constraint_api);
+        ctest_describe("wrap container overflows",
+                       test_wrap_container_overflows_without_clamp);
+        ctest_describe("indefinite width single line",
+                       test_indefinite_width_keeps_single_line);
+        ctest_describe("fixed width child wrap",
+                       test_fixed_width_child_wraps_own_width);
+        ctest_describe("grow child main size",
+                       test_grow_child_main_size_stable);
+        ctest_describe("constraint refresh",
+                       test_constraint_refreshes_after_parent_relayout);
+        ctest_describe("empty description wrap", test_empty_description_wraps);
+        ctest_describe("empty description reflow stable",
+                       test_empty_description_stable_on_reflow);
+        ctest_describe("empty basic learn more centered",
+                       test_empty_basic_learn_more_centered);
+        ctest_describe("field checkbox description stable",
+                       test_field_checkbox_description_stable);
 
         lcui_destroy();
 }

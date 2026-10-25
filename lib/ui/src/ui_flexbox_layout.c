@@ -26,6 +26,7 @@
 #include "ui_widget_style.h"
 #include "ui_widget.h"
 #include "ui_resizer.h"
+#include "ui_widget_layout.h"
 
 typedef struct ui_flexbox_line {
         size_t index;
@@ -47,7 +48,7 @@ typedef struct ui_flexbox_line {
         list_t items;
 } ui_flexbox_line_t;
 
-typedef struct ui_flexbox_layout_context {
+typedef struct ui_flexbox_context {
         ui_widget_t *widget;
         bool column_direction;
         ui_resizer_t *resizer;
@@ -58,10 +59,14 @@ typedef struct ui_flexbox_layout_context {
         css_numeric_value_t main_gap_value;
         css_unit_t main_gap_unit;
         bool has_intrinsic_lines;
+        /* 主轴可用尺寸上限与交叉轴提示尺寸，在 gap 重解析后一次性快照
+         * （对应旧 apply_main_size 入口处的读取），供各趟使用。 */
+        float max_main_size;
+        float hint_cross_size;
 
         /** list_t<ui_flexbox_line_t*> lines */
         list_t lines;
-} ui_flexbox_layout_context_t;
+} ui_flexbox_context_t;
 
 typedef struct ui_flexbox_main_contribution {
         float non_percentage_size;
@@ -121,8 +126,7 @@ static void ui_flexbox_line_load_item(ui_flexbox_line_t *line,
         list_append(&line->items, item);
 }
 
-static ui_flexbox_line_t *ui_flexbox_layout_next_line(
-    ui_flexbox_layout_context_t *ctx)
+static ui_flexbox_line_t *ui_flexbox_next_line(ui_flexbox_context_t *ctx)
 {
         ui_flexbox_line_t *next_line = ui_flexbox_line_create();
         next_line->index = ctx->lines.length;
@@ -143,8 +147,7 @@ static float ui_flexbox_resolve_gap(uint8_t type, css_numeric_value_t value,
         return value;
 }
 
-static float ui_flexbox_layout_get_main_gap_percentage(
-    ui_flexbox_layout_context_t *ctx)
+static float ui_flexbox_get_main_gap_percentage(ui_flexbox_context_t *ctx)
 {
         if (ctx->main_gap_type != CSS_GAP_SET ||
             ctx->main_gap_unit != CSS_UNIT_PERCENT) {
@@ -153,19 +156,9 @@ static float ui_flexbox_layout_get_main_gap_percentage(
         return ctx->main_gap_value / 100.f;
 }
 
-static void ui_flexbox_layout_resolve_main_gap(ui_flexbox_layout_context_t *ctx)
-{
-        float reference = ctx->column_direction
-                              ? ctx->widget->content_box.height
-                              : ctx->widget->content_box.width;
-
-        ctx->main_gap =
-            ui_flexbox_resolve_gap(ctx->main_gap_type, ctx->main_gap_value,
-                                   ctx->main_gap_unit, reference);
-}
-
-static bool ui_flexbox_item_get_main_percentage(
-    ui_flexbox_layout_context_t *ctx, ui_widget_t *item, float *percentage)
+static bool ui_flexbox_item_get_main_percentage(ui_flexbox_context_t *ctx,
+                                                ui_widget_t *item,
+                                                float *percentage)
 {
         css_computed_style_t *s = &item->specified_style;
 
@@ -237,9 +230,138 @@ static void ui_compute_row_item_flex_basis(ui_widget_t *item)
         } else if (!IS_CSS_FIXED_LENGTH(s, flex_basis)) {
                 CSS_SET_FIXED_LENGTH(
                     s, flex_basis,
-                    css_width_from_cbox(s, item->max_content_width));
+                    css_width_from_cbox(s, item->unconstrained_content_width));
         }
         s->flex_basis = ui_widget_fix_width(item, s->flex_basis);
+}
+
+/* 计算一个居中的自动宽度子项在给定可用宽度下的 fit-content 内容宽度：
+ * 文本按其 sizehint 折行后的自然宽度收缩（shrink-to-fit），无 sizehint 的
+ * 容器（如 empty-header、button）则回退到测量缓存的内容宽；两者都至少
+ * 不小于 min-content。 */
+static float ui_flexbox_fit_content_width(ui_widget_t *item, float avail_width)
+{
+        ui_sizehint_t hint = { 0 };
+        float content_width;
+        float max_content;
+        float max_width;
+
+        /* 实现了 sizehint 的部件（文本、画布等）以测量值为准，零宽也是
+         * 合法结果；只有默认空实现的原型才回退到测量缓存。 */
+        if (ui_widget_has_sizehint(item)) {
+                ui_widget_get_sizehint(item, &hint);
+                max_content = hint.max_width;
+        } else {
+                max_content = item->unconstrained_content_width;
+        }
+        /* 与 used width 的 clamp 保持一致：max-width 也限制 fit-content。 */
+        if (ui_widget_get_max_width(item, &max_width)) {
+                max_content =
+                    y_min(max_content, css_width_to_content_box_width(
+                                           &item->computed_style, max_width));
+        }
+        content_width = y_min(max_content, avail_width);
+        content_width = y_max(item->min_content_width, content_width);
+        return content_width;
+}
+
+/* 尝试用子项 sizehint 组合测量 flex column 容器的高度，不触发 reflow。
+ * avail_width 是容器的内容宽；子项按其内容宽约束测折行高。
+ * 仅当所有 in-flow 子项都有 sizehint 时成功，否则返回 -1。 */
+static float ui_flexbox_try_measure_container_height(ui_widget_t *item,
+                                                     float avail_width)
+{
+        list_node_t *node;
+        ui_widget_t *child;
+        css_computed_style_t *s = &item->computed_style;
+        ui_sizehint_t child_hint;
+        float child_avail;
+        float height = 0;
+        unsigned count = 0;
+
+        if (s->type_bits.display != CSS_DISPLAY_FLEX ||
+            s->type_bits.flex_direction != CSS_FLEX_DIRECTION_COLUMN) {
+                return -1;
+        }
+        for (list_each(node, &item->children)) {
+                child = node->data;
+                if (!ui_widget_in_layout_flow(child)) {
+                        continue;
+                }
+                child_avail = avail_width -
+                              css_margin_x(&child->computed_style) -
+                              css_border_x(&child->computed_style) -
+                              css_padding_x(&child->computed_style);
+                if (child_avail < 0) {
+                        child_avail = 0;
+                }
+                if (!ui_widget_has_sizehint(child)) {
+                        return -1;
+                }
+                ui_widget_set_available_width_constraint(
+                    child, child_avail, item, item->layout_generation);
+                /* 清除上次布局写入的固定宽，让 sizehint 使用新约束。 */
+                ui_widget_reset_width(child);
+                ui_widget_get_sizehint(child, &child_hint);
+                if (count > 0) {
+                        height += s->row_gap;
+                }
+                height += child_hint.max_height;
+                count++;
+        }
+        if (count == 0) {
+                return -1;
+        }
+        height += css_padding_y(s) + css_border_y(s);
+        return height;
+}
+
+/* 在给定的可用宽度约束下，测量一个无 sizehint 的 flex 容器子项的主轴
+ * （高度）内在尺寸。
+ *
+ * 普通容器（如 empty-header）的原型 sizehint 为空操作，其高度取决于子内容
+ * 在约束宽度下的折行；在 definite 宽度下回流一次即可让其子内容收到约束并
+ * 折行，从而得到正确的高度。宽度按 fit-content 钳制并写入 computed_style，
+ * 后续交叉趟复用该宽度、不再重复测量。 */
+static float ui_flexbox_measure_item_height_at_width(ui_widget_t *item,
+                                                     float avail_width)
+{
+        css_computed_style_t *s = &item->computed_style;
+        float content_width;
+
+        /* 本次父布局已在早前一趟测量过（宽度已固定）：直接复用结果，
+         * 避免对后代再触发一次回流，维持“每次父布局至多回流一次”。 */
+        if (IS_CSS_FIXED_LENGTH(s, width)) {
+                return item->content_box.height;
+        }
+        content_width = ui_flexbox_fit_content_width(item, avail_width);
+        /* 约束宽未变、且无待重排：复用缓存（含同轮与跨轮），
+         * 避免从根到叶逐级重复测量子孙。 */
+        if (!item->update.should_reflow && item->has_measured &&
+            fabsf(item->measured_content_width - content_width) < 0.01f) {
+                return item->measured_content_height;
+        }
+        /* 优先用 sizehint 组合测量，避免嵌套 reflow。 */
+        {
+                float no_reflow_height =
+                    ui_flexbox_try_measure_container_height(item, avail_width);
+
+                if (no_reflow_height >= 0) {
+                        item->measured_content_width = content_width;
+                        item->measured_content_height = no_reflow_height;
+                        item->has_measured = true;
+                        return no_reflow_height;
+                }
+        }
+        CSS_SET_FIXED_LENGTH(s, width, css_width_from_cbox(s, content_width));
+        /* 提交宽度，使子项回流时 record_width_constraint 读取到正确的
+         * content_box.width（否则会用陈旧的宽度记录后代约束）。 */
+        ui_widget_update_box_width(item);
+        ui_widget_reflow(item);
+        item->measured_content_width = content_width;
+        item->measured_content_height = item->content_box.height;
+        item->has_measured = true;
+        return item->content_box.height;
 }
 
 static void ui_compute_column_item_flex_basis(ui_widget_t *item)
@@ -251,15 +373,43 @@ static void ui_compute_column_item_flex_basis(ui_widget_t *item)
                     s, flex_basis,
                     s->flex_basis * item->parent->content_box.height / 100);
         } else if (!IS_CSS_FIXED_LENGTH(s, flex_basis)) {
-                CSS_SET_FIXED_LENGTH(
-                    s, flex_basis,
-                    css_height_from_cbox(s, item->max_content_height));
+                float intrinsic = 0;
+                float avail_width = 0;
+                bool has_constraint;
+                ui_sizehint_t hint = { 0 };
+
+                /* 父级（column 容器）记录了有效的可用宽度约束时，主轴
+                 * 内在高度按该约束宽度现算 sizehint（文本将折行），
+                 * 不回写 item->max_content_*。实现了 sizehint 的部件以测量
+                 * 值为准，零高也是合法结果；默认原型的 sizehint 是空实现
+                 * （如普通容器 widget），此时回退到测量缓存，保持其行为
+                 * 不变。 */
+                has_constraint =
+                    ui_widget_get_available_width(item, &avail_width);
+                if (has_constraint && ui_widget_has_sizehint(item)) {
+                        ui_widget_get_sizehint(item, &hint);
+                        intrinsic = hint.max_height;
+                } else if (has_constraint && ui_widget_has_flex_display(item) &&
+                           item->specified_style.type_bits.width ==
+                               CSS_WIDTH_AUTO &&
+                           item->parent &&
+                           item->parent->computed_style.type_bits.align_items ==
+                               CSS_ALIGN_ITEMS_CENTER) {
+                        /* 居中的 flex 容器子项会被钳制到可用宽度，其高度
+                         * 需在该宽度下测量，使折行高度向上传播。 */
+                        intrinsic = ui_flexbox_measure_item_height_at_width(
+                            item, avail_width);
+                } else {
+                        intrinsic = item->unconstrained_content_height;
+                }
+                CSS_SET_FIXED_LENGTH(s, flex_basis,
+                                     css_height_from_cbox(s, intrinsic));
         }
         s->flex_basis = ui_widget_fix_height(item, s->flex_basis);
 }
 
 /* 重置项目主轴方向上的尺寸与 flex_basis，返回其外框主轴尺寸 */
-static float ui_flexbox_item_reset_main_size(ui_flexbox_layout_context_t *ctx,
+static float ui_flexbox_item_reset_main_size(ui_flexbox_context_t *ctx,
                                              ui_widget_t *item)
 {
         css_computed_style_t *cs = &item->computed_style;
@@ -277,7 +427,7 @@ static float ui_flexbox_item_reset_main_size(ui_flexbox_layout_context_t *ctx,
 }
 
 /* 返回项目主轴方向上基于 min_content_* 的最小外框尺寸 */
-static float ui_flexbox_item_min_main_size(ui_flexbox_layout_context_t *ctx,
+static float ui_flexbox_item_min_main_size(ui_flexbox_context_t *ctx,
                                            ui_widget_t *item)
 {
         css_computed_style_t *cs = &item->computed_style;
@@ -290,21 +440,22 @@ static float ui_flexbox_item_min_main_size(ui_flexbox_layout_context_t *ctx,
                               css_width_from_cbox(cs, item->min_content_width));
 }
 
-static float ui_flexbox_item_max_main_size(ui_flexbox_layout_context_t *ctx,
+static float ui_flexbox_item_max_main_size(ui_flexbox_context_t *ctx,
                                            ui_widget_t *item)
 {
         css_computed_style_t *cs = &item->computed_style;
 
         if (ctx->column_direction) {
                 return css_obox_height(
-                    cs, css_height_from_cbox(cs, item->max_content_height));
+                    cs, css_height_from_cbox(
+                            cs, item->unconstrained_content_height));
         }
-        return css_obox_width(cs,
-                              css_width_from_cbox(cs, item->max_content_width));
+        return css_obox_width(
+            cs, css_width_from_cbox(cs, item->unconstrained_content_width));
 }
 
 static ui_flexbox_main_contribution_t ui_flexbox_item_get_main_contribution(
-    ui_flexbox_layout_context_t *ctx, ui_widget_t *item)
+    ui_flexbox_context_t *ctx, ui_widget_t *item)
 {
         ui_flexbox_main_contribution_t contribution = { 0 };
         css_computed_style_t *cs = &item->computed_style;
@@ -353,10 +504,10 @@ static ui_flexbox_main_contribution_t ui_flexbox_item_get_main_contribution(
 }
 
 static bool ui_flexbox_line_should_wrap_percentage(
-    ui_flexbox_layout_context_t *ctx, ui_flexbox_line_t *line,
+    ui_flexbox_context_t *ctx, ui_flexbox_line_t *line,
     ui_flexbox_main_contribution_t contribution)
 {
-        float gap_percentage = ui_flexbox_layout_get_main_gap_percentage(ctx);
+        float gap_percentage = ui_flexbox_get_main_gap_percentage(ctx);
         float percentage;
         float non_percentage_size = line->intrinsic_non_percentage_size +
                                     line->percentage_non_percentage_size +
@@ -379,13 +530,13 @@ static bool ui_flexbox_line_should_wrap_percentage(
 }
 
 static void ui_flexbox_line_load_main_contribution(
-    ui_flexbox_layout_context_t *ctx, ui_flexbox_line_t *line,
-    ui_widget_t *item, ui_flexbox_main_contribution_t contribution)
+    ui_flexbox_context_t *ctx, ui_flexbox_line_t *line, ui_widget_t *item,
+    ui_flexbox_main_contribution_t contribution)
 {
         if (line->count_of_in_flow_items > 0) {
                 if (ctx->main_gap_unit == CSS_UNIT_PERCENT) {
                         float percentage =
-                            ui_flexbox_layout_get_main_gap_percentage(ctx);
+                            ui_flexbox_get_main_gap_percentage(ctx);
 
                         line->intrinsic_percentage += percentage;
                         line->intrinsic_gap_percentage += percentage;
@@ -409,8 +560,8 @@ static void ui_flexbox_line_load_main_contribution(
         ui_flexbox_line_load_item(line, item);
 }
 
-static float ui_flexbox_line_intrinsic_main_size(
-    ui_flexbox_layout_context_t *ctx, ui_flexbox_line_t *line)
+static float ui_flexbox_line_intrinsic_main_size(ui_flexbox_context_t *ctx,
+                                                 ui_flexbox_line_t *line)
 {
         list_node_t *node;
         ui_widget_t *item;
@@ -459,9 +610,9 @@ static float ui_flexbox_line_intrinsic_main_size(
         return main_size;
 }
 
-static void ui_flexbox_layout_compute_justify_content(
-    ui_flexbox_layout_context_t *ctx, ui_flexbox_line_t *line,
-    float *start_axis, float *space)
+static void ui_flexbox_compute_justify_content(ui_flexbox_context_t *ctx,
+                                               ui_flexbox_line_t *line,
+                                               float *start_axis, float *space)
 {
         float free_space;
 
@@ -522,9 +673,19 @@ static void ui_apply_row_item_main_size(ui_widget_t *item, float flex_space,
                 CSS_SET_FIXED_LENGTH(
                     cs, width, cs->flex_basis + flex_space * cs->flex_shrink);
         }
+        /* 把主轴分配结果记录为宽度约束，供子项单独 reflow 时重推导。 */
+        if (item->parent) {
+                ui_widget_set_available_width_constraint(
+                    item, css_width_to_content_box_width(cs, cs->width),
+                    item->parent, item->parent->layout_generation);
+        }
         ui_widget_reflow_if_width_changed(item);
 }
 
+/* 写入列方向子项的主轴尺寸，不触发回流。
+ * 主轴（高）与交叉轴（宽）分别在主轴趟和交叉趟写入，回流效果一致，
+ * 故统一推迟到交叉趟的合并回流（ui_widget_reflow_if_size_changed），
+ * 保证每子项每次父布局至多回流一次。 */
 static void ui_apply_column_item_main_size(ui_widget_t *item, float flex_space,
                                            float margin_space)
 {
@@ -547,10 +708,39 @@ static void ui_apply_column_item_main_size(ui_widget_t *item, float flex_space,
                 CSS_SET_FIXED_LENGTH(
                     cs, height, cs->flex_basis + flex_space * cs->flex_shrink);
         }
-        ui_widget_reflow_if_height_changed(item);
 }
 
-static void ui_flexbox_layout_load_main_size(ui_flexbox_layout_context_t *ctx)
+/* 第一趟：收集流内子项并测量主轴尺寸。
+ *
+ * 先记录宽度约束，再按文档顺序测量各流内子项；内在分行路径由
+ * ui_flexbox_collect_intrinsic_lines 单独处理。
+ */
+/* 为单个 in-flow 且宽度 auto 的子项记录父级可用宽约束。
+ * 必须在 ui_widget_reset_layout(child) 之后调用，避免读到上一次布局
+ * 写入的 auto margin。 */
+static void ui_flexbox_record_width_constraint(ui_flexbox_context_t *ctx,
+                                               ui_widget_t *child)
+{
+        css_computed_style_t *cs;
+        float avail;
+
+        if (!ctx->column_direction ||
+            !IS_CSS_FIXED_LENGTH(&ctx->widget->computed_style, width) ||
+            child->specified_style.type_bits.width != CSS_WIDTH_AUTO) {
+                return;
+        }
+        cs = &child->computed_style;
+        avail = ctx->widget->content_box.width - css_margin_x(cs) -
+                css_border_x(cs) - css_padding_x(cs);
+        if (avail < 0) {
+                avail = 0;
+        }
+        ui_widget_set_available_width_constraint(
+            child, avail, ctx->widget, ctx->widget->layout_generation);
+}
+
+/* 按内在内容把子项分入内在行并累计主轴尺寸。 */
+static void ui_flexbox_collect_intrinsic_lines(ui_flexbox_context_t *ctx)
 {
         list_node_t *node;
         ui_widget_t *child;
@@ -559,6 +749,51 @@ static void ui_flexbox_layout_load_main_size(ui_flexbox_layout_context_t *ctx)
         css_computed_style_t *cs;
         float main_size, min_main_size;
         float max_item_min_size = 0;
+
+        for (list_each(node, &ctx->widget->children)) {
+                child = node->data;
+                cs = &child->computed_style;
+                if (!ui_widget_in_layout_flow(child)) {
+                        if (!line) {
+                                line = ui_flexbox_next_line(ctx);
+                        }
+                        list_append(&line->items, child);
+                        continue;
+                }
+                ui_widget_reset_layout(child);
+                ui_flexbox_record_width_constraint(ctx, child);
+                contribution =
+                    ui_flexbox_item_get_main_contribution(ctx, child);
+                min_main_size = contribution.min_size;
+                if (cs->flex_shrink <= 0 && !contribution.has_percentage_size) {
+                        min_main_size = y_max(min_main_size,
+                                              contribution.non_percentage_size);
+                }
+                max_item_min_size = y_max(max_item_min_size, min_main_size);
+                if (!line || ui_flexbox_line_should_wrap_percentage(
+                                 ctx, line, contribution)) {
+                        line = ui_flexbox_next_line(ctx);
+                }
+                ui_flexbox_line_load_main_contribution(ctx, line, child,
+                                                       contribution);
+        }
+        for (list_each(node, &ctx->lines)) {
+                line = node->data;
+                main_size = ui_flexbox_line_intrinsic_main_size(ctx, line);
+                ui_resizer_load_item_main_size(
+                    ctx->resizer, main_size,
+                    y_max(max_item_min_size,
+                          line->intrinsic_container_min_size));
+                ui_resizer_update(ctx->resizer);
+        }
+}
+
+static void ui_flexbox_collect_in_flow_items(ui_flexbox_context_t *ctx)
+{
+        list_node_t *node;
+        ui_widget_t *child;
+        css_computed_style_t *cs;
+        float main_size, min_main_size;
         bool main_size_fixed;
         bool load_intrinsic_lines;
         unsigned child_index = 0;
@@ -579,39 +814,23 @@ static void ui_flexbox_layout_load_main_size(ui_flexbox_layout_context_t *ctx)
                      main_size_fixed);
         UI_DEBUG_INDENT_INC;
         UI_DEBUG_END;
+        if (load_intrinsic_lines) {
+                ui_flexbox_collect_intrinsic_lines(ctx);
+                UI_DEBUG_BEGIN;
+                UI_DEBUG_INDENT_DEC;
+                UI_WIDGET_SIZE_STR(ctx->widget, size_str);
+                UI_DEBUG_MSG("%s: end, size=%s", __FUNCTION__, size_str);
+                UI_DEBUG_END;
+                return;
+        }
         for (list_each(node, &ctx->widget->children)) {
                 child = node->data;
                 cs = &child->computed_style;
                 if (!ui_widget_in_layout_flow(child)) {
-                        if (load_intrinsic_lines) {
-                                if (!line) {
-                                        line = ui_flexbox_layout_next_line(ctx);
-                                }
-                                list_append(&line->items, child);
-                        }
                         continue;
                 }
                 ui_widget_reset_layout(child);
-                if (load_intrinsic_lines) {
-                        contribution =
-                            ui_flexbox_item_get_main_contribution(ctx, child);
-                        min_main_size = contribution.min_size;
-                        if (cs->flex_shrink <= 0 &&
-                            !contribution.has_percentage_size) {
-                                min_main_size =
-                                    y_max(min_main_size,
-                                          contribution.non_percentage_size);
-                        }
-                        max_item_min_size =
-                            y_max(max_item_min_size, min_main_size);
-                        if (!line || ui_flexbox_line_should_wrap_percentage(
-                                         ctx, line, contribution)) {
-                                line = ui_flexbox_layout_next_line(ctx);
-                        }
-                        ui_flexbox_line_load_main_contribution(ctx, line, child,
-                                                               contribution);
-                        continue;
-                }
+                ui_flexbox_record_width_constraint(ctx, child);
                 main_size = ui_flexbox_item_reset_main_size(ctx, child);
                 main_size =
                     y_max(main_size, ui_flexbox_item_max_main_size(ctx, child));
@@ -634,23 +853,6 @@ static void ui_flexbox_layout_load_main_size(ui_flexbox_layout_context_t *ctx)
                 child_index++;
                 UI_DEBUG_END;
         }
-        if (load_intrinsic_lines) {
-                for (list_each(node, &ctx->lines)) {
-                        line = node->data;
-                        main_size =
-                            ui_flexbox_line_intrinsic_main_size(ctx, line);
-                        ui_resizer_load_item_main_size(
-                            ctx->resizer, main_size,
-                            y_max(max_item_min_size,
-                                  line->intrinsic_container_min_size));
-                        ui_resizer_update(ctx->resizer);
-                }
-        }
-        if (ctx->column_direction) {
-                ui_resizer_commit_column_main_size(ctx->resizer);
-        } else {
-                ui_resizer_commit_row_main_size(ctx->resizer);
-        }
         UI_DEBUG_BEGIN;
         UI_DEBUG_INDENT_DEC;
         UI_WIDGET_SIZE_STR(ctx->widget, size_str);
@@ -658,7 +860,31 @@ static void ui_flexbox_layout_load_main_size(ui_flexbox_layout_context_t *ctx)
         UI_DEBUG_END;
 }
 
-static void ui_flexbox_line_reset_main_size(ui_flexbox_layout_context_t *ctx,
+/* 累加单个子项的 auto margin 数量到行统计。 */
+static void ui_flexbox_line_add_auto_margin_count(ui_flexbox_context_t *ctx,
+                                                  ui_flexbox_line_t *line,
+                                                  ui_widget_t *item)
+{
+        css_computed_style_t *cs = &item->computed_style;
+
+        if (ctx->column_direction) {
+                if (cs->type_bits.margin_top == CSS_MARGIN_AUTO) {
+                        line->count_of_auto_margin_items++;
+                }
+                if (cs->type_bits.margin_bottom == CSS_MARGIN_AUTO) {
+                        line->count_of_auto_margin_items++;
+                }
+        } else {
+                if (cs->type_bits.margin_left == CSS_MARGIN_AUTO) {
+                        line->count_of_auto_margin_items++;
+                }
+                if (cs->type_bits.margin_right == CSS_MARGIN_AUTO) {
+                        line->count_of_auto_margin_items++;
+                }
+        }
+}
+
+static void ui_flexbox_line_reset_main_size(ui_flexbox_context_t *ctx,
                                             ui_flexbox_line_t *line)
 {
         list_node_t *node;
@@ -689,28 +915,14 @@ static void ui_flexbox_line_reset_main_size(ui_flexbox_layout_context_t *ctx,
                 if (cs->flex_shrink > 0) {
                         line->sum_of_shrink_value += cs->flex_shrink;
                 }
-                if (ctx->column_direction) {
-                        if (cs->type_bits.margin_top == CSS_MARGIN_AUTO) {
-                                line->count_of_auto_margin_items++;
-                        }
-                        if (cs->type_bits.margin_bottom == CSS_MARGIN_AUTO) {
-                                line->count_of_auto_margin_items++;
-                        }
-                } else {
-                        if (cs->type_bits.margin_left == CSS_MARGIN_AUTO) {
-                                line->count_of_auto_margin_items++;
-                        }
-                        if (cs->type_bits.margin_right == CSS_MARGIN_AUTO) {
-                                line->count_of_auto_margin_items++;
-                        }
-                }
+                ui_flexbox_line_add_auto_margin_count(ctx, line, child);
                 line->count_of_in_flow_items++;
         }
 }
 
-static void ui_flexbox_layout_apply_line(ui_flexbox_layout_context_t *ctx,
-                                         ui_flexbox_line_t *line,
-                                         float flex_space, float margin_space)
+static void ui_flexbox_apply_line(ui_flexbox_context_t *ctx,
+                                  ui_flexbox_line_t *line, float flex_space,
+                                  float margin_space)
 {
         list_node_t *node;
         ui_widget_t *child;
@@ -736,9 +948,17 @@ static void ui_flexbox_layout_apply_line(ui_flexbox_layout_context_t *ctx,
                 UI_DEBUG_INDENT_INC;
                 UI_DEBUG_END;
                 if (ctx->column_direction) {
+                        css_computed_style_t *cs = &child->computed_style;
+
                         ui_apply_column_item_main_size(child, flex_space,
                                                        margin_space);
-                        item_main_size = child->outer_box.height;
+                        /* 从刚写入的固定高度推导外框高度。
+                         * 主轴趟不再触发回流、outer_box 尚未更新，故按
+                         * update_box_height 的换算（fix_height 钳制 + 盒模型 +
+                         * 外边距）直接推导，使行主轴尺寸不依赖子项是否已回流；
+                         * row 路径仍读取回流后的 outer_box。 */
+                        item_main_size = css_obox_height(
+                            cs, ui_widget_fix_height(child, cs->height));
                         if (IS_CSS_FIXED_LENGTH(&child->computed_style,
                                                 width)) {
                                 item_cross_size = child->outer_box.width;
@@ -747,7 +967,7 @@ static void ui_flexbox_layout_apply_line(ui_flexbox_layout_context_t *ctx,
                                     &child->computed_style,
                                     css_width_from_cbox(
                                         &child->computed_style,
-                                        child->max_content_width));
+                                        child->unconstrained_content_width));
                         }
                 } else {
                         ui_apply_row_item_main_size(child, flex_space,
@@ -776,98 +996,120 @@ static void ui_flexbox_layout_apply_line(ui_flexbox_layout_context_t *ctx,
         }
 }
 
-static void ui_flexbox_layout_apply_main_size(ui_flexbox_layout_context_t *ctx)
+/* 第二趟：resolve_flex_basis，在已分好的行上重解析各子项的 flex basis
+ * （内在路径）。
+ *
+ * 容器主轴尺寸提交后，行内每个流内子项的主轴 basis 需按新的 content
+ * size 重新解析（百分比 basis 依赖它）。核心调用为
+ * ui_flexbox_line_reset_main_size → ui_flexbox_item_reset_main_size。
+ *
+ * 注意（行为保持）：ui_flexbox_line_reset_main_size 在同一次逐子项遍历中
+ * 一并重建各行的 main_size/grow/shrink/auto-margin 累计值，此处原样保留。
+ * nowrap 路径本趟为空操作：该路径的 basis 重解析内联在
+ * break_into_lines 中（分行判定需要按文档顺序消费重算后的 basis 值）。
+ */
+static void ui_flexbox_resolve_flex_basis(ui_flexbox_context_t *ctx)
 {
-        list_node_t *node, *line_node;
+        list_node_t *line_node;
+        ui_flexbox_line_t *line;
+
+        if (!ctx->has_intrinsic_lines) {
+                return;
+        }
+        for (list_each(line_node, &ctx->lines)) {
+                line = line_node->data;
+                ui_flexbox_line_reset_main_size(ctx, line);
+        }
+}
+
+/* 第三趟：break_into_lines，将子项分入最终行（非内在路径）。
+ *
+ * 以提交后的主轴可用尺寸（ctx->max_main_size）为界分行。内在路径
+ * 的行已在第一趟 collect_in_flow_items 中按百分比分好、并在第二趟
+ * resolve_flex_basis 中重置完毕，本趟为空操作。两处分行点刻意保持分离：
+ * 它们在不同时机、基于不同阶段的 basis 值运行，合并会改变 basis 的
+ * 计算时机从而改变数值。
+ *
+ * 注意（行为保持）：逐子项的 flex basis 重解析（分行判定按文档顺序消费
+ * 其返回值）与流外子项的归行逻辑原样内联在本趟。
+ */
+static void ui_flexbox_break_into_lines(ui_flexbox_context_t *ctx)
+{
+        list_node_t *node;
         ui_widget_t *child;
         ui_flexbox_line_t *line;
         css_computed_style_t *s = &ctx->widget->computed_style;
         css_computed_style_t *cs;
-        bool column = ctx->column_direction;
-
         float main_size;
-        float max_main_size = column ? ctx->widget->content_box.height
-                                     : ctx->widget->content_box.width;
-        float hint_cross_size = column ? ctx->resizer->hint.max_width
-                                       : ctx->resizer->hint.max_height;
-        float space, flex_space, margin_space;
         unsigned child_index = 0;
 
-        UI_DEBUG_BEGIN;
-        UI_DEBUG_MSG("%s: begin, max_main_size=%g", __FUNCTION__,
-                     max_main_size);
-        UI_DEBUG_INDENT_INC;
-        UI_DEBUG_END;
         if (ctx->has_intrinsic_lines) {
-                for (list_each(line_node, &ctx->lines)) {
-                        line = line_node->data;
-                        ui_flexbox_line_reset_main_size(ctx, line);
-                }
-        } else {
-                line = ui_flexbox_layout_next_line(ctx);
-                for (list_each(node, &ctx->widget->children)) {
-                        child = node->data;
-                        if (!ui_widget_in_layout_flow(child)) {
-                                UI_DEBUG_BEGIN;
-                                UI_WIDGET_STR(child, str);
-                                UI_DEBUG_MSG("line[%zu]: children[%u]=%s, skip",
-                                             line->index, child_index, str);
-                                child_index++;
-                                UI_DEBUG_END;
-                                list_append(&line->items, child);
-                                continue;
-                        }
-                        cs = &child->computed_style;
-                        main_size = ui_flexbox_item_reset_main_size(ctx, child);
+                return;
+        }
+        line = ui_flexbox_next_line(ctx);
+        for (list_each(node, &ctx->widget->children)) {
+                child = node->data;
+                if (!ui_widget_in_layout_flow(child)) {
                         UI_DEBUG_BEGIN;
                         UI_WIDGET_STR(child, str);
-                        UI_WIDGET_SIZE_STR(child, size_str);
-                        UI_DEBUG_MSG("line[%zu]: children[%u]=%s, size=%s, "
-                                     "flex_basis(%d)=%g, main_size=%g",
-                                     line->index, child_index, str, size_str,
-                                     cs->type_bits.flex_basis, cs->flex_basis,
-                                     main_size);
+                        UI_DEBUG_MSG("line[%zu]: children[%u]=%s, skip",
+                                     line->index, child_index, str);
                         child_index++;
                         UI_DEBUG_END;
-                        if (s->type_bits.flex_wrap == CSS_FLEX_WRAP_WRAP &&
-                            line->main_size > 0 &&
-                            line->main_size + ctx->main_gap + main_size >
-                                max_main_size) {
-                                line = ui_flexbox_layout_next_line(ctx);
-                        }
-                        if (line->items.length > 0) {
-                                line->main_size += ctx->main_gap;
-                        }
-                        line->main_size += main_size;
-                        if (column) {
-                                if (cs->type_bits.margin_top ==
-                                    CSS_MARGIN_AUTO) {
-                                        line->count_of_auto_margin_items++;
-                                }
-                                if (cs->type_bits.margin_bottom ==
-                                    CSS_MARGIN_AUTO) {
-                                        line->count_of_auto_margin_items++;
-                                }
-                        } else {
-                                if (cs->type_bits.margin_left ==
-                                    CSS_MARGIN_AUTO) {
-                                        line->count_of_auto_margin_items++;
-                                }
-                                if (cs->type_bits.margin_right ==
-                                    CSS_MARGIN_AUTO) {
-                                        line->count_of_auto_margin_items++;
-                                }
-                        }
-                        ui_flexbox_line_load_item(line, child);
+                        list_append(&line->items, child);
+                        continue;
                 }
+                cs = &child->computed_style;
+                main_size = ui_flexbox_item_reset_main_size(ctx, child);
+                UI_DEBUG_BEGIN;
+                UI_WIDGET_STR(child, str);
+                UI_WIDGET_SIZE_STR(child, size_str);
+                UI_DEBUG_MSG("line[%zu]: children[%u]=%s, size=%s, "
+                             "flex_basis(%d)=%g, main_size=%g",
+                             line->index, child_index, str, size_str,
+                             cs->type_bits.flex_basis, cs->flex_basis,
+                             main_size);
+                child_index++;
+                UI_DEBUG_END;
+                if (s->type_bits.flex_wrap == CSS_FLEX_WRAP_WRAP &&
+                    line->main_size > 0 &&
+                    line->main_size + ctx->main_gap + main_size >
+                        ctx->max_main_size) {
+                        line = ui_flexbox_next_line(ctx);
+                }
+                if (line->items.length > 0) {
+                        line->main_size += ctx->main_gap;
+                }
+                line->main_size += main_size;
+                ui_flexbox_line_add_auto_margin_count(ctx, line, child);
+                ui_flexbox_line_load_item(line, child);
         }
+}
+
+/* 第四趟：resolve_main_sizes，分配各行主轴空间并落到子项上。
+ *
+ * 对每行计算剩余空间（grow/shrink/auto margin 分摊），再经
+ * ui_flexbox_apply_line 将最终主轴尺寸写入各子项。
+ *
+ * 注意（行为保持）：apply_line 在应用主轴尺寸的同时顺带测量各行的交叉
+ * 尺寸。column 路径自本任务起主轴趟不再触发回流，行主轴尺寸改由刚写入
+ * 的固定高度直接推导（见 apply_line），子项的盒模型提交与回流统一推迟
+ * 到第五趟交叉轴的合并回流（ui_widget_reflow_if_size_changed），每子项
+ * 每次父布局至多回流一次；row 路径仍在 apply_line 内经 ui_widget_
+ * reflow_if_width_changed 触发回流并读取回流后的 outer_box，保持不变。
+ * 运行中的容器交叉尺寸累计也发生在本趟；容器交叉尺寸的提交属于第五趟
+ * resolve_cross_sizes。
+ */
+static void ui_flexbox_resolve_main_sizes(ui_flexbox_context_t *ctx)
+{
+        list_node_t *line_node;
+        ui_flexbox_line_t *line;
+        float space, flex_space, margin_space;
+
         ctx->cross_size = 0;
-        UI_DEBUG_BEGIN;
-        UI_DEBUG_MSG("%s: all lines loaded", __FUNCTION__);
-        UI_DEBUG_END;
         for (list_each(line_node, &ctx->lines)) {
                 line = line_node->data;
-                space = max_main_size - line->main_size;
+                space = ctx->max_main_size - line->main_size;
                 flex_space = 0;
                 margin_space = 0;
                 if (space >= 0) {
@@ -887,8 +1129,7 @@ static void ui_flexbox_layout_apply_main_size(ui_flexbox_layout_context_t *ctx)
                              margin_space);
                 UI_DEBUG_INDENT_INC;
                 UI_DEBUG_END;
-                ui_flexbox_layout_apply_line(ctx, line, flex_space,
-                                             margin_space);
+                ui_flexbox_apply_line(ctx, line, flex_space, margin_space);
                 UI_DEBUG_BEGIN;
                 UI_DEBUG_INDENT_DEC;
                 UI_DEBUG_MSG("line[%zu]: cross_size=%g", line->index,
@@ -899,27 +1140,29 @@ static void ui_flexbox_layout_apply_main_size(ui_flexbox_layout_context_t *ctx)
                 }
                 ctx->cross_size += line->cross_size;
         }
-        if (ctx->cross_size < hint_cross_size) {
-                ctx->cross_size = hint_cross_size;
-        }
-        if (column) {
-                if (!IS_CSS_FIXED_LENGTH(s, width)) {
-                        ui_widget_set_content_width(ctx->widget,
-                                                    ctx->cross_size);
-                }
-        } else {
-                if (!IS_CSS_FIXED_LENGTH(s, height)) {
-                        ui_widget_set_content_height(ctx->widget,
-                                                     ctx->cross_size);
-                }
-        }
-        UI_DEBUG_BEGIN;
-        UI_DEBUG_INDENT_DEC;
-        UI_DEBUG_MSG("%s: end, cross_size=%g", __FUNCTION__, ctx->cross_size);
-        UI_DEBUG_END;
 }
 
-static float ui_flexbox_compute_item_layout(ui_flexbox_layout_context_t *ctx,
+/* 第六趟：layout_out_of_flow，流外子项的布局。
+ *
+ * 原样抽取自 ui_flexbox_compute_item_layout 的流外分支。它必须保持逐项、
+ * 按文档顺序内联在交叉轴定位循环（见 resolve_cross_sizes）中执行：后面的
+ * 流内子项会推进 main_axis，而流外子项在此处对当时的坐标做快照，提前或
+ * 延后执行都会改变其落点。
+ */
+static void ui_flexbox_out_of_flow(ui_flexbox_context_t *ctx, ui_widget_t *item,
+                                   float main_axis, float cross_axis)
+{
+        bool column = ctx->column_direction;
+
+        item->layout_x = column ? cross_axis : main_axis;
+        item->layout_y = column ? main_axis : cross_axis;
+        ui_widget_reset_layout(item);
+        ui_widget_reflow_if_width_changed(item);
+        ui_widget_reflow_if_height_changed(item);
+        ui_widget_update_box_position(item);
+}
+
+static float ui_flexbox_compute_item_layout(ui_flexbox_context_t *ctx,
                                             ui_widget_t *item, float main_axis,
                                             float cross_axis,
                                             css_align_items_t align,
@@ -929,15 +1172,6 @@ static float ui_flexbox_compute_item_layout(ui_flexbox_layout_context_t *ctx,
         bool column = ctx->column_direction;
         float item_outer_cross;
 
-        if (!ui_widget_in_layout_flow(item)) {
-                item->layout_x = column ? cross_axis : main_axis;
-                item->layout_y = column ? main_axis : cross_axis;
-                ui_widget_reset_layout(item);
-                ui_widget_reflow_if_width_changed(item);
-                ui_widget_reflow_if_height_changed(item);
-                ui_widget_update_box_position(item);
-                return 0;
-        }
         if (column) {
                 if (IS_CSS_PERCENTAGE(&item->specified_style, width)) {
                         ui_widget_reset_width(item);
@@ -948,8 +1182,27 @@ static float ui_flexbox_compute_item_layout(ui_flexbox_layout_context_t *ctx,
                             s, width,
                             css_border_box_width_to_width(
                                 s, line_max_cross_size - css_margin_x(s)));
+                } else if (align == CSS_ALIGN_ITEMS_CENTER &&
+                           item->specified_style.type_bits.width ==
+                               CSS_WIDTH_AUTO) {
+                        /* 居中的自动宽度子项按 fit-content 钳制到可用宽度
+                         * （max-content 与可用宽度取小，并尊重 min-content），
+                         * 使文本等子内容折行，而非以单行溢出居中。 */
+                        float avail = 0;
+                        float content_width;
+
+                        if (ui_widget_get_available_width(item, &avail)) {
+                                content_width =
+                                    ui_flexbox_fit_content_width(item, avail);
+                                CSS_SET_FIXED_LENGTH(
+                                    s, width,
+                                    css_width_from_cbox(s, content_width));
+                        }
                 }
-                ui_widget_reflow_if_width_changed(item);
+                /* 合并回流：主轴趟写入的 height 与此处写入的 width 一并
+                 * 提交（update_box_width/height），任一维度变化时仅回流
+                 * 一次，覆盖两维。row 路径维持原有的单维回流不变。 */
+                ui_widget_reflow_if_size_changed(item);
                 item_outer_cross = item->outer_box.width;
         } else {
                 if (IS_CSS_PERCENTAGE(&item->specified_style, height)) {
@@ -986,7 +1239,18 @@ static float ui_flexbox_compute_item_layout(ui_flexbox_layout_context_t *ctx,
         return column ? item->outer_box.height : item->outer_box.width;
 }
 
-static void ui_flexbox_layout_reflow_lines(ui_flexbox_layout_context_t *ctx)
+/* 第五趟：resolve_cross_sizes，提交交叉尺寸并定位所有子项。
+ *
+ * 先提交容器交叉尺寸（宽/高未显式指定时，取行交叉尺寸累计与提示尺寸
+ * 的较大值），再逐行定位子项：主轴起点由 compute_justify_content（保留
+ * 的辅助函数）决定，交叉方向按 align 拉伸/对齐。流外子项由第六趟
+ * ui_flexbox_out_of_flow 在同一次逐项遍历中按文档顺序处理。
+ *
+ * 注意（行为保持）：交叉尺寸提交（原 apply_main_size 尾部）必须先于
+ * cross_axis/cross_free_space 的读取执行——提交会改写 content_box 与
+ * ctx->cross_size，读取时序与旧代码保持一致。
+ */
+static void ui_flexbox_resolve_cross_sizes(ui_flexbox_context_t *ctx)
 {
         list_node_t *line_node, *node;
         ui_widget_t *child;
@@ -997,13 +1261,31 @@ static void ui_flexbox_layout_reflow_lines(ui_flexbox_layout_context_t *ctx)
 
         float space;
         float main_axis;
-        float cross_axis = column ? s->padding_left : s->padding_top;
-        float cross_free_space = (column ? ctx->widget->content_box.width
-                                         : ctx->widget->content_box.height) -
-                                 ctx->cross_size;
-        float cross_space =
-            ctx->lines.length > 0 ? cross_free_space / ctx->lines.length : 0;
+        float cross_axis;
+        float cross_free_space;
+        float cross_space;
         float line_max_cross_size;
+
+        /* 合并交叉轴 hint（无论交叉尺寸是否固定都合并，保持旧行为）。 */
+        ctx->cross_size = y_max(ctx->cross_size, ctx->hint_cross_size);
+        if (column) {
+                cross_axis = s->padding_left;
+                if (!IS_CSS_FIXED_LENGTH(s, width)) {
+                        ui_widget_set_content_width(ctx->widget,
+                                                    ctx->cross_size);
+                }
+                cross_free_space = ctx->widget->content_box.width;
+        } else {
+                cross_axis = s->padding_top;
+                if (!IS_CSS_FIXED_LENGTH(s, height)) {
+                        ui_widget_set_content_height(ctx->widget,
+                                                     ctx->cross_size);
+                }
+                cross_free_space = ctx->widget->content_box.height;
+        }
+        cross_free_space -= ctx->cross_size;
+        cross_space =
+            ctx->lines.length > 0 ? cross_free_space / ctx->lines.length : 0;
 
         UI_DEBUG_BEGIN;
         UI_WIDGET_STR(ctx->widget, str);
@@ -1016,8 +1298,8 @@ static void ui_flexbox_layout_reflow_lines(ui_flexbox_layout_context_t *ctx)
                         cross_axis += ctx->cross_gap;
                 }
                 line_max_cross_size = line->cross_size + cross_space;
-                ui_flexbox_layout_compute_justify_content(ctx, line, &main_axis,
-                                                          &space);
+                ui_flexbox_compute_justify_content(ctx, line, &main_axis,
+                                                   &space);
                 UI_DEBUG_BEGIN;
                 UI_DEBUG_MSG("line[%zu]: main_axis=%g, cross_axis=%g, "
                              "space=%g, line_max_cross_size=%g",
@@ -1032,9 +1314,15 @@ static void ui_flexbox_layout_reflow_lines(ui_flexbox_layout_context_t *ctx)
                         if (item_index > 0 && ui_widget_in_layout_flow(child)) {
                                 main_axis += ctx->main_gap;
                         }
-                        main_axis += ui_flexbox_compute_item_layout(
-                            ctx, child, main_axis, cross_axis,
-                            s->type_bits.align_items, line_max_cross_size);
+                        if (!ui_widget_in_layout_flow(child)) {
+                                ui_flexbox_out_of_flow(ctx, child, main_axis,
+                                                       cross_axis);
+                        } else {
+                                main_axis += ui_flexbox_compute_item_layout(
+                                    ctx, child, main_axis, cross_axis,
+                                    s->type_bits.align_items,
+                                    line_max_cross_size);
+                        }
                         if (ui_widget_in_layout_flow(child)) {
                                 item_index++;
                         }
@@ -1050,36 +1338,95 @@ static void ui_flexbox_layout_reflow_lines(ui_flexbox_layout_context_t *ctx)
         UI_DEBUG_END;
 }
 
-void ui_flexbox_layout_reflow(ui_widget_t *w, ui_resizer_t *resizer)
+/* 测量阶段：收集子项、提交主轴尺寸、重解析 flex basis。 */
+static void ui_flexbox_measure(ui_flexbox_context_t *ctx)
 {
-        ui_flexbox_layout_context_t ctx = { 0 };
+        ui_widget_t *w = ctx->widget;
+
+        ui_flexbox_collect_in_flow_items(ctx);
+        if (ctx->column_direction) {
+                ui_resizer_commit_column_main_size(ctx->resizer);
+                ctx->main_gap = ui_flexbox_resolve_gap(
+                    ctx->main_gap_type, ctx->main_gap_value, ctx->main_gap_unit,
+                    w->content_box.height);
+                ctx->max_main_size = w->content_box.height;
+                ctx->hint_cross_size = ctx->resizer->hint.max_width;
+        } else {
+                ui_resizer_commit_row_main_size(ctx->resizer);
+                ctx->main_gap = ui_flexbox_resolve_gap(
+                    ctx->main_gap_type, ctx->main_gap_value, ctx->main_gap_unit,
+                    w->content_box.width);
+                ctx->max_main_size = w->content_box.width;
+                ctx->hint_cross_size = ctx->resizer->hint.max_height;
+        }
+        ui_flexbox_resolve_flex_basis(ctx);
+}
+
+/* 布局阶段：分行、分配主轴、分配交叉并定位。 */
+static void ui_flexbox_layout(ui_flexbox_context_t *ctx)
+{
+        ui_flexbox_break_into_lines(ctx);
+        ui_flexbox_resolve_main_sizes(ctx);
+        ui_flexbox_resolve_cross_sizes(ctx);
+}
+
+void ui_flexbox_reflow(ui_widget_t *w, ui_resizer_t *resizer)
+{
+        ui_flexbox_context_t ctx = { 0 };
+        css_computed_style_t *s = &w->computed_style;
+        css_computed_style_t *ps =
+            w->parent ? &w->parent->computed_style : NULL;
+        float row_gap, column_gap;
 
         ctx.widget = w;
         ctx.resizer = resizer;
         ctx.column_direction = ui_widget_has_flex_column_direction(w);
         list_create(&ctx.lines);
-        ui_resizer_init(resizer, w);
-        {
-                css_computed_style_t *s = &w->computed_style;
-                float row_gap = ui_flexbox_resolve_gap(
-                    s->type_bits.row_gap, s->row_gap, s->unit_bits.row_gap,
-                    w->content_box.height);
-                float column_gap = ui_flexbox_resolve_gap(
-                    s->type_bits.column_gap, s->column_gap,
-                    s->unit_bits.column_gap, w->content_box.width);
-                if (ctx.column_direction) {
-                        ctx.main_gap_type = s->type_bits.row_gap;
-                        ctx.main_gap_value = s->row_gap;
-                        ctx.main_gap_unit = s->unit_bits.row_gap;
-                        ctx.main_gap = row_gap;
-                        ctx.cross_gap = column_gap;
-                } else {
-                        ctx.main_gap_type = s->type_bits.column_gap;
-                        ctx.main_gap_value = s->column_gap;
-                        ctx.main_gap_unit = s->unit_bits.column_gap;
-                        ctx.main_gap = column_gap;
-                        ctx.cross_gap = row_gap;
+        /* 每次回流递增布局代数，使旧一轮记录的可用宽度约束失效，
+         * 本轮的约束记录以新代数为准。 */
+        w->layout_generation++;
+        /* 从持久宽度约束重推导居中列容器的交叉轴宽。
+         * 独立回流时父级不在场，但父级记录的约束仍有效，据此重算
+         * fit-content 宽并落地，使后代约束得以刷新、折行不丢失。 */
+        if (ctx.column_direction &&
+            w->specified_style.type_bits.width == CSS_WIDTH_AUTO &&
+            !IS_CSS_FIXED_LENGTH(&w->computed_style, width) && ps &&
+            (ps->type_bits.display == CSS_DISPLAY_FLEX ||
+             ps->type_bits.display == CSS_DISPLAY_INLINE_FLEX) &&
+            ps->type_bits.align_items == CSS_ALIGN_ITEMS_CENTER) {
+                float avail = 0;
+
+                if (ui_widget_get_available_width(w, &avail)) {
+                        float content_width =
+                            ui_flexbox_fit_content_width(w, avail);
+
+                        CSS_SET_FIXED_LENGTH(
+                            &w->computed_style, width,
+                            css_width_from_cbox(&w->computed_style,
+                                                content_width));
+                        ui_widget_update_box_width(w);
                 }
+        }
+        ui_resizer_init(resizer, w);
+        /* 解析 row/column gap，并按主轴方向映射为 main/cross gap。 */
+        row_gap =
+            ui_flexbox_resolve_gap(s->type_bits.row_gap, s->row_gap,
+                                   s->unit_bits.row_gap, w->content_box.height);
+        column_gap = ui_flexbox_resolve_gap(
+            s->type_bits.column_gap, s->column_gap, s->unit_bits.column_gap,
+            w->content_box.width);
+        if (ctx.column_direction) {
+                ctx.main_gap_type = s->type_bits.row_gap;
+                ctx.main_gap_value = s->row_gap;
+                ctx.main_gap_unit = s->unit_bits.row_gap;
+                ctx.main_gap = row_gap;
+                ctx.cross_gap = column_gap;
+        } else {
+                ctx.main_gap_type = s->type_bits.column_gap;
+                ctx.main_gap_value = s->column_gap;
+                ctx.main_gap_unit = s->unit_bits.column_gap;
+                ctx.main_gap = column_gap;
+                ctx.cross_gap = row_gap;
         }
         UI_DEBUG_BEGIN;
         UI_WIDGET_STR(w, str);
@@ -1095,10 +1442,10 @@ void ui_flexbox_layout_reflow(ui_widget_t *w, ui_resizer_t *resizer)
         } else {
                 ui_resizer_load_row_minmaxinfo(resizer);
         }
-        ui_flexbox_layout_load_main_size(&ctx);
-        ui_flexbox_layout_resolve_main_gap(&ctx);
-        ui_flexbox_layout_apply_main_size(&ctx);
-        ui_flexbox_layout_reflow_lines(&ctx);
+        /* 测量阶段：收集子项、提交主轴尺寸、重解析 basis。 */
+        ui_flexbox_measure(&ctx);
+        /* 布局阶段：分行、分配主轴、分配交叉并定位。 */
+        ui_flexbox_layout(&ctx);
         w->proto->resize(w, w->content_box.width, w->content_box.height);
         list_destroy(&ctx.lines, ui_flexbox_line_destroy);
         UI_DEBUG_BEGIN;
