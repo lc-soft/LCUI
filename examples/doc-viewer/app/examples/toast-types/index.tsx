@@ -317,6 +317,7 @@ export default function ToastTypesDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
       </Widget>

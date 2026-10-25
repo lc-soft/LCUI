@@ -33,6 +33,7 @@ export default function AnchorDocPage() {
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
+              <Scrollbar orientation="horizontal" />
             </ScrollArea>
           </Widget>
         </Widget>

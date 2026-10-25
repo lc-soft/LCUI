@@ -183,6 +183,7 @@ export default function SelectDisabledDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="tsx" data-file="main.c" data-source="examples/select-disabled/6" style={{ display: "none" }}>
@@ -219,6 +220,7 @@ export default function SelectDisabledDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="c" data-file="main.c" data-source="examples/select-disabled/7" style={{ display: "none" }}>
@@ -367,6 +369,7 @@ export default function SelectDisabledDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/select-disabled/8" style={{ display: "none" }}>
@@ -455,6 +458,7 @@ export default function SelectDisabledDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="xml" data-file="main.c" data-source="examples/select-disabled/9" style={{ display: "none" }}>
@@ -487,6 +491,7 @@ export default function SelectDisabledDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
       </Widget>

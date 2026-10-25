@@ -347,6 +347,7 @@ function renderCodeBlock(
     `${inner}\n` +
     `${indent}      </ScrollAreaContent>\n` +
     `${indent}      <Scrollbar />\n` +
+    `${indent}      <Scrollbar orientation="horizontal" />\n` +
     `${indent}    </ScrollArea>\n` +
     `${indent}  </Widget>\n`;
   if (noHeader) {
@@ -756,6 +757,7 @@ function buildDemoIndexTsx(ex: CompiledExample, snippets: SnippetRegistry): stri
         `${lineWidgets}\n` +
         `            </ScrollAreaContent>\n` +
         `            <Scrollbar />\n` +
+        `            <Scrollbar orientation="horizontal" />\n` +
         `          </ScrollArea>\n` +
         `        </Widget>`,
       );

@@ -45,6 +45,7 @@ export default function SelectDocPage() {
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
+              <Scrollbar orientation="horizontal" />
             </ScrollArea>
           </Widget>
         </Widget>
@@ -110,6 +111,7 @@ export default function SelectDocPage() {
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
+              <Scrollbar orientation="horizontal" />
             </ScrollArea>
           </Widget>
         </Widget>
@@ -140,6 +142,7 @@ export default function SelectDocPage() {
                 <Text className="code-line">{`        └── SelectItem`}</Text>
               </ScrollAreaContent>
               <Scrollbar />
+              <Scrollbar orientation="horizontal" />
             </ScrollArea>
           </Widget>
         </Widget>

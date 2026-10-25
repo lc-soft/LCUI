@@ -40,6 +40,7 @@ export default function RadioGroupDocPage() {
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
+              <Scrollbar orientation="horizontal" />
             </ScrollArea>
           </Widget>
         </Widget>
@@ -73,6 +74,7 @@ export default function RadioGroupDocPage() {
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
+              <Scrollbar orientation="horizontal" />
             </ScrollArea>
           </Widget>
         </Widget>
@@ -93,6 +95,7 @@ export default function RadioGroupDocPage() {
                 <Text className="code-line">{`└── RadioGroupItem`}</Text>
               </ScrollAreaContent>
               <Scrollbar />
+              <Scrollbar orientation="horizontal" />
             </ScrollArea>
           </Widget>
         </Widget>

@@ -297,6 +297,7 @@ export default function ToastPromiseDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
       </Widget>

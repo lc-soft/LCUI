@@ -147,6 +147,7 @@ export default function CustomizationDocPage() {
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
+              <Scrollbar orientation="horizontal" />
             </ScrollArea>
           </Widget>
         </Widget>
@@ -213,6 +214,7 @@ export default function CustomizationDocPage() {
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
+              <Scrollbar orientation="horizontal" />
             </ScrollArea>
           </Widget>
         </Widget>
@@ -290,6 +292,7 @@ export default function CustomizationDocPage() {
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
+              <Scrollbar orientation="horizontal" />
             </ScrollArea>
           </Widget>
         </Widget>
@@ -391,6 +394,7 @@ export default function CustomizationDocPage() {
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
+              <Scrollbar orientation="horizontal" />
             </ScrollArea>
           </Widget>
         </Widget>

@@ -141,6 +141,7 @@ export default function ToastActionDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
       </Widget>

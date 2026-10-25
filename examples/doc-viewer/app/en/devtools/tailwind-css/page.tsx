@@ -19,6 +19,7 @@ export default function TailwindCssDocPage() {
                 <Text className="code-line">{`npm install -D tailwindcss postcss @thedutchcoder/postcss-rem-to-px`}</Text>
               </ScrollAreaContent>
               <Scrollbar />
+              <Scrollbar orientation="horizontal" />
             </ScrollArea>
           </Widget>
         </Widget>
@@ -54,6 +55,7 @@ export default function TailwindCssDocPage() {
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
+              <Scrollbar orientation="horizontal" />
             </ScrollArea>
           </Widget>
         </Widget>

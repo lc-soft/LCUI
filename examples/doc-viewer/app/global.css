@@ -168,7 +168,7 @@ p {
   @apply text-gray-400;
 
   flex-shrink: 0;
-  width: 32px;
+  width: 80px;
   padding-right: 12px;
   text-align: right;
   line-height: 20px;
@@ -177,9 +177,9 @@ p {
 .code-line {
   @apply text-gray-800;
 
-  flex: 1;
-  min-width: 0;
+  flex: 0 0 auto;
   line-height: 20px;
+  white-space: nowrap;
   font-family: "Geist Mono", monospace;
 }
 

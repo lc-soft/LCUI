@@ -108,6 +108,7 @@ export default function ScrollareaBasicDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="tsx" data-file="example.css" data-source="examples/scrollarea-basic/7" style={{ display: "none" }}>
@@ -136,6 +137,7 @@ export default function ScrollareaBasicDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="tsx" data-file="main.c" data-source="examples/scrollarea-basic/8" style={{ display: "none" }}>
@@ -180,6 +182,7 @@ export default function ScrollareaBasicDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="c" data-file="main.c" data-source="examples/scrollarea-basic/9" style={{ display: "none" }}>
@@ -308,6 +311,7 @@ export default function ScrollareaBasicDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/scrollarea-basic/10" style={{ display: "none" }}>
@@ -384,6 +388,7 @@ export default function ScrollareaBasicDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="xml" data-file="main.c" data-source="examples/scrollarea-basic/11" style={{ display: "none" }}>
@@ -428,6 +433,7 @@ export default function ScrollareaBasicDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
       </Widget>

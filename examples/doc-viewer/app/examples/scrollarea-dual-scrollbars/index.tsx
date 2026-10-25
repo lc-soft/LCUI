@@ -100,6 +100,7 @@ export default function ScrollareaDualScrollbarsDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="tsx" data-file="example.css" data-source="examples/scrollarea-dual-scrollbars/1" style={{ display: "none" }}>
@@ -200,6 +201,7 @@ export default function ScrollareaDualScrollbarsDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="tsx" data-file="main.c" data-source="examples/scrollarea-dual-scrollbars/2" style={{ display: "none" }}>
@@ -244,6 +246,7 @@ export default function ScrollareaDualScrollbarsDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="c" data-file="main.c" data-source="examples/scrollarea-dual-scrollbars/3" style={{ display: "none" }}>
@@ -428,6 +431,7 @@ export default function ScrollareaDualScrollbarsDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/scrollarea-dual-scrollbars/4" style={{ display: "none" }}>
@@ -612,6 +616,7 @@ export default function ScrollareaDualScrollbarsDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="xml" data-file="main.c" data-source="examples/scrollarea-dual-scrollbars/5" style={{ display: "none" }}>
@@ -656,6 +661,7 @@ export default function ScrollareaDualScrollbarsDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
       </Widget>

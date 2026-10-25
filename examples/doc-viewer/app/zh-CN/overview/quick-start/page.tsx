@@ -29,6 +29,7 @@ export default function QuickStartDocPage() {
                 <Text className="code-line">{`npm install -g @lcui/cli`}</Text>
               </ScrollAreaContent>
               <Scrollbar />
+              <Scrollbar orientation="horizontal" />
             </ScrollArea>
           </Widget>
         </Widget>
@@ -47,6 +48,7 @@ export default function QuickStartDocPage() {
                 <Text className="code-line">{`xmake run app`}</Text>
               </ScrollAreaContent>
               <Scrollbar />
+              <Scrollbar orientation="horizontal" />
             </ScrollArea>
           </Widget>
         </Widget>

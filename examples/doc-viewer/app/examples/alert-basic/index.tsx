@@ -143,6 +143,7 @@ export default function AlertBasicDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="tsx" data-file="main.c" data-source="examples/alert-basic/6" style={{ display: "none" }}>
@@ -179,6 +180,7 @@ export default function AlertBasicDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="c" data-file="main.c" data-source="examples/alert-basic/7" style={{ display: "none" }}>
@@ -307,6 +309,7 @@ export default function AlertBasicDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/alert-basic/8" style={{ display: "none" }}>
@@ -411,6 +414,7 @@ export default function AlertBasicDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="xml" data-file="main.c" data-source="examples/alert-basic/9" style={{ display: "none" }}>
@@ -443,6 +447,7 @@ export default function AlertBasicDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
       </Widget>

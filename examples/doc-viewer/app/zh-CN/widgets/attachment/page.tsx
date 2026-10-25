@@ -79,6 +79,7 @@ export default function AttachmentDocPage() {
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
+              <Scrollbar orientation="horizontal" />
             </ScrollArea>
           </Widget>
         </Widget>
@@ -148,6 +149,7 @@ export default function AttachmentDocPage() {
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
+              <Scrollbar orientation="horizontal" />
             </ScrollArea>
           </Widget>
         </Widget>
@@ -173,6 +175,7 @@ export default function AttachmentDocPage() {
                 <Text className="code-line">{`└── AttachmentTrigger`}</Text>
               </ScrollAreaContent>
               <Scrollbar />
+              <Scrollbar orientation="horizontal" />
             </ScrollArea>
           </Widget>
         </Widget>
@@ -190,6 +193,7 @@ export default function AttachmentDocPage() {
                 <Text className="code-line">{`└── Attachment`}</Text>
               </ScrollAreaContent>
               <Scrollbar />
+              <Scrollbar orientation="horizontal" />
             </ScrollArea>
           </Widget>
         </Widget>

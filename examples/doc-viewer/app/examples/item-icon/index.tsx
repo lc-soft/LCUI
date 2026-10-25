@@ -159,6 +159,7 @@ export default function ItemIconDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="tsx" data-file="main.c" data-source="examples/item-icon/6" style={{ display: "none" }}>
@@ -195,6 +196,7 @@ export default function ItemIconDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="c" data-file="main.c" data-source="examples/item-icon/7" style={{ display: "none" }}>
@@ -339,6 +341,7 @@ export default function ItemIconDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/item-icon/8" style={{ display: "none" }}>
@@ -419,6 +422,7 @@ export default function ItemIconDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
         <Widget className="code-block-body" data-language="xml" data-file="main.c" data-source="examples/item-icon/9" style={{ display: "none" }}>
@@ -451,6 +455,7 @@ export default function ItemIconDemo() {
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
+            <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
       </Widget>
