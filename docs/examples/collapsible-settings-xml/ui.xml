@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <resource type="text/css">
+    .collapsible-settings-demo {
+      width: 320px;
+    }
+    .collapsible-settings-demo card {
+      width: 100%;
+    }
+    .collapsible-settings-demo collapsible-trigger button {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      justify-content: space-between;
+    }
+    .collapsible-settings-demo .settings-fields {
+      display: flex;
+      gap: 8px;
+      padding-top: 10px;
+    }
+    .collapsible-settings-demo .settings-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 50%;
+    }
+    .collapsible-settings-demo .settings-field textinput {
+      width: 100%;
+    }
+  </resource>
+  <ui>
+    <widget class="collapsible-settings-demo">
+      <card size="sm">
+        <card-header>
+          <card-title>Radius</card-title>
+          <card-description>Set the corner radius of the element.</card-description>
+        </card-header>
+        <card-content>
+          <collapsible>
+            <collapsible-trigger>
+              <button variant="ghost">
+                <text>Advanced settings</text>
+                <icon name="chevron-down" />
+              </button>
+            </collapsible-trigger>
+            <collapsible-content>
+              <div class="settings-fields">
+                <field class="settings-field" orientation="vertical">
+                  <field-label>Radius X</field-label>
+                  <textinput id="radius-x" placeholder="0" />
+                </field>
+                <field class="settings-field" orientation="vertical">
+                  <field-label>Radius Y</field-label>
+                  <textinput id="radius-y" placeholder="0" />
+                </field>
+              </div>
+            </collapsible-content>
+          </collapsible>
+        </card-content>
+      </card>
+    </widget>
+  </ui>
+</lcui-app>

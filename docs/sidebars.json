@@ -39,6 +39,7 @@
         { "slug": "button", "label": { "en": "Button", "zh-CN": "Button 按钮" } },
         { "slug": "card", "label": { "en": "Card", "zh-CN": "Card 卡片" } },
         { "slug": "checkbox", "label": { "en": "Checkbox", "zh-CN": "Checkbox 复选框" } },
+        { "slug": "collapsible", "label": { "en": "Collapsible", "zh-CN": "Collapsible 折叠面板" } },
         { "slug": "dialog", "label": { "en": "Dialog", "zh-CN": "Dialog 对话框" } },
         { "slug": "empty", "label": { "en": "Empty", "zh-CN": "Empty 空状态" } },
         { "slug": "field", "label": { "en": "Field", "zh-CN": "Field 表单字段" } },

@@ -1,0 +1,81 @@
+# Collapsible
+
+用于展开和收起一段内容的交互组件。
+
+<WidgetExample name="collapsible-demo" />
+
+## 适用场景
+
+- **适用**：产品详情、设置面板、文件树等需要按需显示的内容
+- **适用**：内容较多但默认只需展示摘要的场景
+- **不适用**：需要模态交互或阻断页面操作的场景（使用 `dialog`）
+- **不适用**：仅用于切换少量标签或选项（使用 `select` 或 `radio-group`）
+
+## 用法
+
+```tsx
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@lcui/react"
+```
+
+```tsx
+<Collapsible defaultOpen>
+  <CollapsibleTrigger>Product details</CollapsibleTrigger>
+  <CollapsibleContent>
+    This panel can be expanded or collapsed.
+  </CollapsibleContent>
+</Collapsible>
+```
+
+## 组合
+
+使用以下组合来构建 `Collapsible`：
+
+```
+Collapsible
+├── CollapsibleTrigger
+└── CollapsibleContent
+```
+
+## 示例
+
+### 基础
+
+使用带边框的摘要行和详情面板展示订单信息。
+
+<WidgetExample name="collapsible-basic" />
+
+### 设置面板
+
+使用触发器展开额外的输入项；`open` 可用于受控状态。
+
+<WidgetExample name="collapsible-settings" />
+
+### 文件树
+
+将 Collapsible 嵌套在文件夹节点中，可以实现独立的树形展开。
+
+<WidgetExample name="collapsible-file-tree" />
+
+## API 参考
+
+### Collapsible
+
+折叠面板根节点，持有 open/closed 状态。
+
+<FieldTable name="collapsible" />
+
+### CollapsibleTrigger
+
+触发面板切换的节点；也可以给任意后代设置 `data-collapsible-trigger`。
+
+<FieldTable name="collapsible-trigger" />
+
+### CollapsibleContent
+
+面板内容区域，closed 时不参与显示。
+
+<FieldTable name="collapsible-content" />
+
+:::note
+`data-collapsible-trigger` 只用于事件绑定，不参与 CSS 选择器。需要样式时请使用 class 或 `collapsible:open` / `collapsible:closed` 状态。
+:::

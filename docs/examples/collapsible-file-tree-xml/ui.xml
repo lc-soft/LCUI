@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <resource type="text/css">
+    .collapsible-file-tree-demo {
+      width: 320px;
+    }
+    .collapsible-file-tree-demo card {
+      width: 100%;
+    }
+    .collapsible-file-tree-demo .file-tree {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding-top: 8px;
+    }
+    .collapsible-file-tree-demo .file-row {
+      width: 100%;
+      justify-content: flex-start;
+      border: 0;
+      background: transparent;
+    }
+    .collapsible-file-tree-demo .file-children {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding-left: 20px;
+    }
+  </resource>
+  <ui>
+    <widget class="collapsible-file-tree-demo">
+      <card size="sm">
+        <card-header>
+          <card-title>Project files</card-title>
+        </card-header>
+        <card-content>
+          <div class="file-tree">
+            <collapsible default-open="true">
+              <collapsible-trigger>
+                <button class="file-row" variant="ghost" size="sm">
+                  <icon name="chevron-right" />
+                  <icon name="folder-open" />
+                  <text>components</text>
+                </button>
+              </collapsible-trigger>
+              <collapsible-content>
+                <div class="file-children">
+                  <collapsible default-open="true">
+                    <collapsible-trigger>
+                      <button class="file-row" variant="ghost" size="sm">
+                        <icon name="chevron-right" />
+                        <icon name="folder-open" />
+                        <text>ui</text>
+                      </button>
+                    </collapsible-trigger>
+                    <collapsible-content>
+                      <div class="file-children">
+                        <button class="file-row" variant="link" size="sm">
+                          <icon name="document-text" />
+                          <text>button.tsx</text>
+                        </button>
+                        <button class="file-row" variant="link" size="sm">
+                          <icon name="document-text" />
+                          <text>card.tsx</text>
+                        </button>
+                        <button class="file-row" variant="link" size="sm">
+                          <icon name="document-text" />
+                          <text>dialog.tsx</text>
+                        </button>
+                      </div>
+                    </collapsible-content>
+                  </collapsible>
+                  <button class="file-row" variant="link" size="sm">
+                    <icon name="document-text" />
+                    <text>login-form.tsx</text>
+                  </button>
+                  <button class="file-row" variant="link" size="sm">
+                    <icon name="document-text" />
+                    <text>register-form.tsx</text>
+                  </button>
+                </div>
+              </collapsible-content>
+            </collapsible>
+            <collapsible>
+              <collapsible-trigger>
+                <button class="file-row" variant="ghost" size="sm">
+                  <icon name="chevron-right" />
+                  <icon name="folder-open" />
+                  <text>lib</text>
+                </button>
+              </collapsible-trigger>
+              <collapsible-content>
+                <div class="file-children">
+                  <button class="file-row" variant="link" size="sm">
+                    <icon name="document-text" />
+                    <text>utils.ts</text>
+                  </button>
+                  <button class="file-row" variant="link" size="sm">
+                    <icon name="document-text" />
+                    <text>api.ts</text>
+                  </button>
+                </div>
+              </collapsible-content>
+            </collapsible>
+            <button class="file-row" variant="link" size="sm">
+              <icon name="document-text" />
+              <text>app.tsx</text>
+            </button>
+            <button class="file-row" variant="link" size="sm">
+              <icon name="document-text" />
+              <text>package.json</text>
+            </button>
+            <button class="file-row" variant="link" size="sm">
+              <icon name="document-text" />
+              <text>README.md</text>
+            </button>
+          </div>
+        </card-content>
+      </card>
+    </widget>
+  </ui>
+</lcui-app>

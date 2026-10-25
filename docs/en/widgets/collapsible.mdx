@@ -1,0 +1,81 @@
+# Collapsible
+
+An interactive component for expanding and collapsing a section of content.
+
+<WidgetExample name="collapsible-demo" />
+
+## Use cases
+
+- **Suitable**: Product details, settings panels, file trees, and other content that should be shown on demand
+- **Suitable**: Cases with a lot of content where only a summary needs to be visible by default
+- **Not suitable**: Cases that need modal interaction or block the page (use `dialog`)
+- **Not suitable**: Switching between a few tabs or options (use `select` or `radio-group`)
+
+## Usage
+
+```tsx
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@lcui/react"
+```
+
+```tsx
+<Collapsible defaultOpen>
+  <CollapsibleTrigger>Product details</CollapsibleTrigger>
+  <CollapsibleContent>
+    This panel can be expanded or collapsed.
+  </CollapsibleContent>
+</Collapsible>
+```
+
+## Composition
+
+Use the following composition to build a `Collapsible`:
+
+```
+Collapsible
+├── CollapsibleTrigger
+└── CollapsibleContent
+```
+
+## Examples
+
+### Basic
+
+A summary row with a border and a details panel that show order information.
+
+<WidgetExample name="collapsible-basic" />
+
+### Settings panel
+
+Use the trigger to reveal additional inputs; `open` can be used for controlled state.
+
+<WidgetExample name="collapsible-settings" />
+
+### File tree
+
+Nest Collapsible inside folder nodes to build independent tree expansion.
+
+<WidgetExample name="collapsible-file-tree" />
+
+## API Reference
+
+### Collapsible
+
+The collapsible root, which holds the open/closed state.
+
+<FieldTable name="collapsible" />
+
+### CollapsibleTrigger
+
+The node that toggles the panel. You can also set `data-collapsible-trigger` on any descendant.
+
+<FieldTable name="collapsible-trigger" />
+
+### CollapsibleContent
+
+The content area of the panel; it does not participate in display while closed.
+
+<FieldTable name="collapsible-content" />
+
+:::note
+`data-collapsible-trigger` is only used for event binding and does not participate in CSS selectors. To style a node, use a class or the `collapsible:open` / `collapsible:closed` states.
+:::

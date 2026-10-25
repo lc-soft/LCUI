@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <resource type="text/css">
+    .collapsible-demo {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 350px;
+    }
+    .collapsible-demo .order-header {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+      box-sizing: border-box;
+      gap: 16px;
+      padding: 0 16px;
+    }
+    .collapsible-demo collapsible-trigger {
+      display: inline-flex;
+      flex-shrink: 0;
+    }
+    .collapsible-demo .order-title {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .collapsible-demo .order-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-sizing: border-box;
+      padding: 8px 16px;
+      border: 1px solid #e5e5e5;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .collapsible-demo .order-box {
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      gap: 4px;
+      padding: 8px 16px;
+      border: 1px solid #e5e5e5;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .collapsible-demo .order-label {
+      display: block;
+      font-weight: 600;
+    }
+    .collapsible-demo .order-copy {
+      display: block;
+      color: #666666;
+    }
+  </resource>
+  <ui>
+    <widget class="collapsible-demo">
+      <collapsible>
+        <div class="order-header">
+          <text class="order-title">Order #4189</text>
+          <collapsible-trigger>
+            <button variant="ghost" size="icon">
+              <icon name="chevron-up-down" />
+            </button>
+          </collapsible-trigger>
+        </div>
+        <div class="order-row">
+          <text class="order-copy">Status</text>
+          <text>Shipped</text>
+        </div>
+        <collapsible-content>
+          <div class="order-box">
+            <text class="order-label">Shipping address</text>
+            <text class="order-copy">100 Market St, San Francisco</text>
+          </div>
+          <div class="order-box">
+            <text class="order-label">Items</text>
+            <text class="order-copy">2x Studio Headphones</text>
+          </div>
+        </collapsible-content>
+      </collapsible>
+    </widget>
+  </ui>
+</lcui-app>
