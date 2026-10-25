@@ -345,50 +345,46 @@ export default function DropdownMenuAvatarDemo() {
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">27</Text>
-                <Text className="code-line">{`        ui_widget_append(group,`}</Text>
+                <Text className="code-line">{`        ui_widget_append(group, create_item([color=#0a3069]"checkmark-circle"[/color], [color=#0a3069]"Account"[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">28</Text>
-                <Text className="code-line">{`                         create_item([color=#0a3069]"checkmark-circle"[/color], [color=#0a3069]"Account"[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">29</Text>
                 <Text className="code-line">{`        ui_widget_append(group, create_item([color=#0a3069]"payment"[/color], [color=#0a3069]"Billing"[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">30</Text>
+                <Text className="code-line-number">29</Text>
                 <Text className="code-line">{`        ui_widget_append(group, create_item([color=#0a3069]"alert"[/color], [color=#0a3069]"Notifications"[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">31</Text>
+                <Text className="code-line-number">30</Text>
                 <Text className="code-line">{`        ui_widget_append(content, group);`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">32</Text>
+                <Text className="code-line-number">31</Text>
                 <Text className="code-line">{`        ui_widget_append(content, ui_create_dropdown_menu_separator());`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">33</Text>
+                <Text className="code-line-number">32</Text>
                 <Text className="code-line">{`        ui_widget_append(content, create_item([color=#0a3069]"sign-out"[/color], [color=#0a3069]"Sign Out"[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">34</Text>
+                <Text className="code-line-number">33</Text>
                 <Text className="code-line">{` `}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">35</Text>
+                <Text className="code-line-number">34</Text>
                 <Text className="code-line">{`        ui_widget_append(menu, trigger);`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">36</Text>
+                <Text className="code-line-number">35</Text>
                 <Text className="code-line">{`        ui_widget_append(menu, content);`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">37</Text>
+                <Text className="code-line-number">36</Text>
                 <Text className="code-line">{`        ui_widget_append(parent, menu);`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">38</Text>
+                <Text className="code-line-number">37</Text>
                 <Text className="code-line">{`}`}</Text>
               </Widget>
             </ScrollAreaContent>

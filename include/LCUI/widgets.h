@@ -19,6 +19,7 @@
 #include "widgets/scrollarea.h"
 #include "widgets/scrollbar.h"
 #include "widgets/select.h"
+#include "widgets/sidebar.h"
 #include "widgets/portal.h"
 #include "widgets/textinput.h"
 #include "widgets/textcaret.h"

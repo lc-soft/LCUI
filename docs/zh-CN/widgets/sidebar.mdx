@@ -1,0 +1,190 @@
+# Sidebar
+
+用于构建可折叠应用导航侧栏的组合式部件。
+
+<WidgetExample name="sidebar-basic" />
+
+## 适用场景
+
+- **适用**：后台、文档站、桌面应用的主导航侧栏
+- **适用**：需要在展开、图标收起和无收起模式间切换的布局
+- **不适用**：只需要一个普通按钮组或短列表（使用 `button`、`menu`）
+
+## 用法
+
+```tsx
+import { SidebarProvider, SidebarTrigger } from "@lcui/react"
+```
+
+```tsx
+<SidebarProvider>
+  <Sidebar>
+    <SidebarContent />
+  </Sidebar>
+  <main>
+    <SidebarTrigger />
+  </main>
+</SidebarProvider>
+```
+
+## 组合
+
+使用以下组合来构建 `Sidebar`：
+
+```
+SidebarProvider
+├── Sidebar
+│   ├── SidebarHeader
+│   ├── SidebarContent
+│   │   └── SidebarGroup
+│   │       ├── SidebarGroupLabel
+│   │       ├── SidebarGroupAction
+│   │       └── SidebarGroupContent
+│   │           └── SidebarMenu
+│   │               └── SidebarMenuItem
+│   │                   ├── SidebarMenuButton（class）
+│   │                   ├── SidebarMenuAction
+│   │                   ├── SidebarMenuBadge
+│   │                   └── SidebarMenuSub
+│   ├── SidebarFooter
+│   └── SidebarRail
+└── SidebarTrigger
+```
+
+## 示例
+
+### 可折叠分组
+
+将 `SidebarGroup` 放进 `Collapsible`，并给 `SidebarGroupLabel` 加上
+`data-collapsible-trigger`，即可点击分组标题折叠内容。
+
+<WidgetExample name="sidebar-group-collapsible" />
+
+### 图标收起
+
+`collapsible="icon"` 收起时保留图标并隐藏菜单文字；Trigger 可以重新展开。
+
+<WidgetExample name="sidebar-collapsed" />
+
+## API 参考
+
+### SidebarProvider
+
+侧栏状态容器，保存展开/收起状态，并向上查找最近的 Provider。
+
+<FieldTable name="sidebar-provider" />
+
+### Sidebar
+
+主侧栏面板，负责宽度、边框和折叠模式。
+
+<FieldTable name="sidebar" />
+
+### SidebarTrigger
+
+切换最近 Provider 的按钮，默认使用 `panel-left` 图标。
+
+<FieldTable name="sidebar-trigger" />
+
+### SidebarRail
+
+位于侧栏边缘的窄触发区域，点击同样切换侧栏。
+
+<FieldTable name="sidebar-rail" />
+
+### SidebarHeader
+
+侧栏头部容器，用于品牌、工作区切换或标题。
+
+<FieldTable name="sidebar-header" />
+
+### SidebarFooter
+
+侧栏底部容器，通常放置设置或账户入口。
+
+<FieldTable name="sidebar-footer" />
+
+### SidebarContent
+
+侧栏主体区域；它只负责 flex 布局，需要滚动时在内部组合 `ScrollArea`。
+
+<FieldTable name="sidebar-content" />
+
+### SidebarGroup
+
+侧栏分组容器，可包含 Label、Action 和 Content。
+
+<FieldTable name="sidebar-group" />
+
+### SidebarGroupLabel
+
+分组标题；添加 `data-collapsible-trigger` 后可切换外层 Collapsible。
+
+<FieldTable name="sidebar-group-label" />
+
+### SidebarGroupAction
+
+分组标题右侧的操作按钮。
+
+<FieldTable name="sidebar-group-action" />
+
+### SidebarGroupContent
+
+分组内容容器，通常承载 SidebarMenu。
+
+<FieldTable name="sidebar-group-content" />
+
+### SidebarMenu
+
+侧栏菜单列表。
+
+<FieldTable name="sidebar-menu" />
+
+### SidebarMenuItem
+
+菜单项容器，可包含菜单按钮、操作、徽标和子菜单。
+
+<FieldTable name="sidebar-menu-item" />
+
+### SidebarMenuAction
+
+菜单项右侧的轻量操作按钮。
+
+<FieldTable name="sidebar-menu-action" />
+
+### SidebarMenuSub
+
+菜单项内的子菜单容器。
+
+<FieldTable name="sidebar-menu-sub" />
+
+### SidebarMenuSubItem
+
+子菜单项容器。
+
+<FieldTable name="sidebar-menu-sub-item" />
+
+### SidebarMenuBadge
+
+菜单项右侧的徽标。
+
+<FieldTable name="sidebar-menu-badge" />
+
+### SidebarMenuButton
+
+`SidebarMenuButton` 不注册独立部件，只使用 class 契约：
+
+- 给 `button`、`a` 或 `RouterLink` 添加 `sidebar-menu-button`
+- 文字放在带 `sidebar-menu-label` class 的 `text` 子节点中
+- 当前项额外添加 `active` class
+- 未来 `@lcui/react` 的 `SidebarMenuButton` 默认创建带该 class 的 button；指定 `render` 时把 class 追加到渲染的子元素
+
+## 注意事项
+
+:::note
+`SidebarContent` 不会自动创建 ScrollArea。需要滚动时，请在 `SidebarContent` 内组合 `ScrollArea` 和 `ScrollAreaContent`。
+:::
+
+:::caution
+当前版本暂不支持 floating/inset variant、键盘快捷键和 cookie 持久化。`SidebarInset` 也未实现。
+:::

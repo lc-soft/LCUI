@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <sidebar-provider class="sidebar-basic-demo">
+      <sidebar collapsible="icon">
+        <sidebar-header>
+          <dropdown-menu class="sidebar-team-menu">
+            <button class="sidebar-menu-button sidebar-team" data-sidebar-tooltip="Acme Inc" data-dropdown-menu-trigger="true">
+              <div class="sidebar-team-logo"><icon name="people-team" /></div>
+              <div class="sidebar-menu-text">
+                <text class="sidebar-menu-name">Acme Inc</text>
+                <text class="sidebar-menu-meta">Enterprise</text>
+              </div>
+              <icon class="sidebar-menu-chevron" name="chevron-up-down" />
+            </button>
+            <dropdown-menu-content class="sidebar-team-menu-content" side="right" align="start">
+              <dropdown-menu-label>Teams</dropdown-menu-label>
+              <dropdown-menu-item>
+                <icon name="people-team" />
+                <text>Acme Inc</text>
+              </dropdown-menu-item>
+              <dropdown-menu-item>
+                <icon name="building" />
+                <text>Acme Corp</text>
+              </dropdown-menu-item>
+              <dropdown-menu-item>
+                <icon name="shield" />
+                <text>Evil Corp</text>
+              </dropdown-menu-item>
+              <dropdown-menu-separator />
+              <dropdown-menu-item>
+                <icon name="add" />
+                <text>Add team</text>
+              </dropdown-menu-item>
+            </dropdown-menu-content>
+          </dropdown-menu>
+        </sidebar-header>
+        <sidebar-content>
+          <scrollarea class="sidebar-scroll">
+            <scrollarea-content>
+              <sidebar-group>
+                <sidebar-group-label>Platform</sidebar-group-label>
+            <sidebar-group-content>
+              <sidebar-menu>
+                <collapsible default-open="true">
+                  <sidebar-menu-item>
+                    <collapsible-trigger>
+                      <button class="sidebar-menu-button" data-sidebar-tooltip="Playground">
+                        <icon name="code-block" />
+                        <text class="sidebar-menu-label">Playground</text>
+                        <icon class="sidebar-menu-chevron" name="chevron-right" />
+                      </button>
+                    </collapsible-trigger>
+                    <collapsible-content>
+                      <sidebar-menu-sub>
+                        <sidebar-menu-sub-item>
+                          <button class="sidebar-menu-button sidebar-sub-button">
+                            <text class="sidebar-menu-label">History</text>
+                          </button>
+                        </sidebar-menu-sub-item>
+                        <sidebar-menu-sub-item>
+                          <button class="sidebar-menu-button sidebar-sub-button">
+                            <text class="sidebar-menu-label">Starred</text>
+                          </button>
+                        </sidebar-menu-sub-item>
+                        <sidebar-menu-sub-item>
+                          <button class="sidebar-menu-button sidebar-sub-button">
+                            <text class="sidebar-menu-label">Settings</text>
+                          </button>
+                        </sidebar-menu-sub-item>
+                      </sidebar-menu-sub>
+                    </collapsible-content>
+                  </sidebar-menu-item>
+                </collapsible>
+                <collapsible>
+                  <sidebar-menu-item>
+                    <collapsible-trigger>
+                      <button class="sidebar-menu-button" data-sidebar-tooltip="Models">
+                        <icon name="document-text" />
+                        <text class="sidebar-menu-label">Models</text>
+                        <icon class="sidebar-menu-chevron" name="chevron-right" />
+                      </button>
+                    </collapsible-trigger>
+                    <collapsible-content>
+                      <sidebar-menu-sub>
+                        <sidebar-menu-sub-item>
+                          <button class="sidebar-menu-button sidebar-sub-button">
+                            <text class="sidebar-menu-label">Genesis</text>
+                          </button>
+                        </sidebar-menu-sub-item>
+                        <sidebar-menu-sub-item>
+                          <button class="sidebar-menu-button sidebar-sub-button">
+                            <text class="sidebar-menu-label">Explorer</text>
+                          </button>
+                        </sidebar-menu-sub-item>
+                        <sidebar-menu-sub-item>
+                          <button class="sidebar-menu-button sidebar-sub-button">
+                            <text class="sidebar-menu-label">Quantum</text>
+                          </button>
+                        </sidebar-menu-sub-item>
+                      </sidebar-menu-sub>
+                    </collapsible-content>
+                  </sidebar-menu-item>
+                </collapsible>
+                <collapsible>
+                  <sidebar-menu-item>
+                    <collapsible-trigger>
+                      <button class="sidebar-menu-button" data-sidebar-tooltip="Documentation">
+                        <icon name="book-open" />
+                        <text class="sidebar-menu-label">Documentation</text>
+                        <icon class="sidebar-menu-chevron" name="chevron-right" />
+                      </button>
+                    </collapsible-trigger>
+                    <collapsible-content>
+                      <sidebar-menu-sub>
+                        <sidebar-menu-sub-item>
+                          <button class="sidebar-menu-button sidebar-sub-button">
+                            <text class="sidebar-menu-label">Introduction</text>
+                          </button>
+                        </sidebar-menu-sub-item>
+                        <sidebar-menu-sub-item>
+                          <button class="sidebar-menu-button sidebar-sub-button">
+                            <text class="sidebar-menu-label">Get Started</text>
+                          </button>
+                        </sidebar-menu-sub-item>
+                        <sidebar-menu-sub-item>
+                          <button class="sidebar-menu-button sidebar-sub-button">
+                            <text class="sidebar-menu-label">Tutorials</text>
+                          </button>
+                        </sidebar-menu-sub-item>
+                        <sidebar-menu-sub-item>
+                          <button class="sidebar-menu-button sidebar-sub-button">
+                            <text class="sidebar-menu-label">Changelog</text>
+                          </button>
+                        </sidebar-menu-sub-item>
+                      </sidebar-menu-sub>
+                    </collapsible-content>
+                  </sidebar-menu-item>
+                </collapsible>
+                <collapsible>
+                  <sidebar-menu-item>
+                    <collapsible-trigger>
+                      <button class="sidebar-menu-button" data-sidebar-tooltip="Settings">
+                        <icon name="calendar-settings" />
+                        <text class="sidebar-menu-label">Settings</text>
+                        <icon class="sidebar-menu-chevron" name="chevron-right" />
+                      </button>
+                    </collapsible-trigger>
+                    <collapsible-content>
+                      <sidebar-menu-sub>
+                        <sidebar-menu-sub-item>
+                          <button class="sidebar-menu-button sidebar-sub-button">
+                            <text class="sidebar-menu-label">General</text>
+                          </button>
+                        </sidebar-menu-sub-item>
+                        <sidebar-menu-sub-item>
+                          <button class="sidebar-menu-button sidebar-sub-button">
+                            <text class="sidebar-menu-label">Team</text>
+                          </button>
+                        </sidebar-menu-sub-item>
+                        <sidebar-menu-sub-item>
+                          <button class="sidebar-menu-button sidebar-sub-button">
+                            <text class="sidebar-menu-label">Billing</text>
+                          </button>
+                        </sidebar-menu-sub-item>
+                        <sidebar-menu-sub-item>
+                          <button class="sidebar-menu-button sidebar-sub-button">
+                            <text class="sidebar-menu-label">Limits</text>
+                          </button>
+                        </sidebar-menu-sub-item>
+                      </sidebar-menu-sub>
+                    </collapsible-content>
+                  </sidebar-menu-item>
+                </collapsible>
+              </sidebar-menu>
+            </sidebar-group-content>
+          </sidebar-group>
+          <sidebar-group class="sidebar-projects">
+            <sidebar-group-label>Projects</sidebar-group-label>
+            <sidebar-group-content>
+              <sidebar-menu>
+                <sidebar-menu-item>
+                  <button class="sidebar-menu-button">
+                    <icon name="code-block" />
+                    <text class="sidebar-menu-label">Design Engineering</text>
+                  </button>
+                  <dropdown-menu class="sidebar-project-menu">
+                    <sidebar-menu-action class="sidebar-menu-action-trigger" data-dropdown-menu-trigger="true">
+                      <icon name="more-horizontal" />
+                    </sidebar-menu-action>
+                    <dropdown-menu-content side="right" align="start">
+                      <dropdown-menu-item>
+                        <icon name="folder" />
+                        <text>View Project</text>
+                      </dropdown-menu-item>
+                      <dropdown-menu-item>
+                        <icon name="arrow-right" />
+                        <text>Share Project</text>
+                      </dropdown-menu-item>
+                      <dropdown-menu-separator />
+                      <dropdown-menu-item variant="destructive">
+                        <icon name="delete" />
+                        <text>Delete Project</text>
+                      </dropdown-menu-item>
+                    </dropdown-menu-content>
+                  </dropdown-menu>
+                </sidebar-menu-item>
+                <sidebar-menu-item>
+                  <button class="sidebar-menu-button">
+                    <icon name="book-open" />
+                    <text class="sidebar-menu-label">Sales &amp; Marketing</text>
+                  </button>
+                  <dropdown-menu class="sidebar-project-menu">
+                    <sidebar-menu-action class="sidebar-menu-action-trigger" data-dropdown-menu-trigger="true">
+                      <icon name="more-horizontal" />
+                    </sidebar-menu-action>
+                    <dropdown-menu-content side="right" align="start">
+                      <dropdown-menu-item>
+                        <icon name="folder" />
+                        <text>View Project</text>
+                      </dropdown-menu-item>
+                      <dropdown-menu-item>
+                        <icon name="arrow-right" />
+                        <text>Share Project</text>
+                      </dropdown-menu-item>
+                      <dropdown-menu-separator />
+                      <dropdown-menu-item variant="destructive">
+                        <icon name="delete" />
+                        <text>Delete Project</text>
+                      </dropdown-menu-item>
+                    </dropdown-menu-content>
+                  </dropdown-menu>
+                </sidebar-menu-item>
+                <sidebar-menu-item>
+                  <button class="sidebar-menu-button">
+                    <icon name="document-text" />
+                    <text class="sidebar-menu-label">Travel</text>
+                  </button>
+                  <dropdown-menu class="sidebar-project-menu">
+                    <sidebar-menu-action class="sidebar-menu-action-trigger" data-dropdown-menu-trigger="true">
+                      <icon name="more-horizontal" />
+                    </sidebar-menu-action>
+                    <dropdown-menu-content side="right" align="start">
+                      <dropdown-menu-item>
+                        <icon name="folder" />
+                        <text>View Project</text>
+                      </dropdown-menu-item>
+                      <dropdown-menu-item>
+                        <icon name="arrow-right" />
+                        <text>Share Project</text>
+                      </dropdown-menu-item>
+                      <dropdown-menu-separator />
+                      <dropdown-menu-item variant="destructive">
+                        <icon name="delete" />
+                        <text>Delete Project</text>
+                      </dropdown-menu-item>
+                    </dropdown-menu-content>
+                  </dropdown-menu>
+                </sidebar-menu-item>
+                <sidebar-menu-item>
+                  <button class="sidebar-menu-button sidebar-more">
+                    <icon name="more-horizontal" />
+                    <text class="sidebar-menu-label">More</text>
+                  </button>
+                </sidebar-menu-item>
+              </sidebar-menu>
+            </sidebar-group-content>
+          </sidebar-group>
+            </scrollarea-content>
+            <scrollbar />
+          </scrollarea>
+        </sidebar-content>
+        <sidebar-footer>
+          <sidebar-menu>
+            <sidebar-menu-item>
+              <dropdown-menu class="sidebar-user-menu">
+                <button class="sidebar-menu-button sidebar-user" data-sidebar-tooltip="shadcn" data-dropdown-menu-trigger="true">
+                  <div class="sidebar-avatar"><icon name="person-circle" /></div>
+                  <div class="sidebar-menu-text">
+                    <text class="sidebar-menu-name">shadcn</text>
+                    <text class="sidebar-menu-meta">m@example.com</text>
+                  </div>
+                  <icon class="sidebar-menu-chevron" name="chevron-up-down" />
+                </button>
+                <dropdown-menu-content class="sidebar-user-menu-content" side="right" align="end">
+                  <dropdown-menu-label>shadcn</dropdown-menu-label>
+                  <text class="sidebar-user-menu-email">m@example.com</text>
+                  <dropdown-menu-separator />
+                  <dropdown-menu-item>
+                    <icon name="premium" />
+                    <text>Upgrade to Pro</text>
+                  </dropdown-menu-item>
+                  <dropdown-menu-separator />
+                  <dropdown-menu-item>
+                    <icon name="person" />
+                    <text>Account</text>
+                  </dropdown-menu-item>
+                  <dropdown-menu-item>
+                    <icon name="payment" />
+                    <text>Billing</text>
+                  </dropdown-menu-item>
+                  <dropdown-menu-item>
+                    <icon name="alert" />
+                    <text>Notifications</text>
+                  </dropdown-menu-item>
+                  <dropdown-menu-separator />
+                  <dropdown-menu-item>
+                    <icon name="sign-out" />
+                    <text>Sign Out</text>
+                  </dropdown-menu-item>
+                </dropdown-menu-content>
+              </dropdown-menu>
+            </sidebar-menu-item>
+          </sidebar-menu>
+        </sidebar-footer>
+        <sidebar-rail />
+      </sidebar>
+      <div class="sidebar-main">
+        <sidebar-trigger />
+      </div>
+    </sidebar-provider>
+  </ui>
+</lcui-app>

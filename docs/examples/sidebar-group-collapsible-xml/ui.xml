@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <sidebar-provider class="sidebar-group-collapsible-demo">
+      <sidebar>
+        <sidebar-content>
+          <collapsible default-open="true">
+            <sidebar-group>
+              <sidebar-group-label data-collapsible-trigger="true">
+                <text>Help</text>
+                <icon name="chevron-down" />
+              </sidebar-group-label>
+              <collapsible-content>
+                <sidebar-group-content>
+                  <sidebar-menu>
+                    <sidebar-menu-item>
+                      <button class="sidebar-menu-button">
+                        <icon name="chat-help" />
+                        <text class="sidebar-menu-label">Support</text>
+                      </button>
+                    </sidebar-menu-item>
+                    <sidebar-menu-item>
+                      <button class="sidebar-menu-button">
+                        <icon name="calendar-mail" />
+                        <text class="sidebar-menu-label">Feedback</text>
+                      </button>
+                    </sidebar-menu-item>
+                  </sidebar-menu>
+                </sidebar-group-content>
+              </collapsible-content>
+            </sidebar-group>
+          </collapsible>
+        </sidebar-content>
+      </sidebar>
+      <div class="sidebar-main">
+        <sidebar-trigger />
+        <text class="sidebar-main-title">Workspace</text>
+        <text class="sidebar-main-copy">Groups can collapse without leaving the sidebar.</text>
+      </div>
+    </sidebar-provider>
+  </ui>
+</lcui-app>

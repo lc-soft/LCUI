@@ -1,0 +1,190 @@
+# Sidebar
+
+A composable widget for building collapsible application navigation sidebars.
+
+<WidgetExample name="sidebar-basic" />
+
+## Use cases
+
+- **Suitable**: Primary navigation sidebars for dashboards, documentation sites, and desktop apps
+- **Suitable**: Layouts that switch between expanded, icon-collapsed, and non-collapsible modes
+- **Not suitable**: Cases that only need a regular button group or a short list (use `button` or `menu`)
+
+## Usage
+
+```tsx
+import { SidebarProvider, SidebarTrigger } from "@lcui/react"
+```
+
+```tsx
+<SidebarProvider>
+  <Sidebar>
+    <SidebarContent />
+  </Sidebar>
+  <main>
+    <SidebarTrigger />
+  </main>
+</SidebarProvider>
+```
+
+## Composition
+
+Use the following composition to build a `Sidebar`:
+
+```
+SidebarProvider
+├── Sidebar
+│   ├── SidebarHeader
+│   ├── SidebarContent
+│   │   └── SidebarGroup
+│   │       ├── SidebarGroupLabel
+│   │       ├── SidebarGroupAction
+│   │       └── SidebarGroupContent
+│   │           └── SidebarMenu
+│   │               └── SidebarMenuItem
+│   │                   ├── SidebarMenuButton (class)
+│   │                   ├── SidebarMenuAction
+│   │                   ├── SidebarMenuBadge
+│   │                   └── SidebarMenuSub
+│   ├── SidebarFooter
+│   └── SidebarRail
+└── SidebarTrigger
+```
+
+## Examples
+
+### Collapsible groups
+
+Place a `SidebarGroup` inside a `Collapsible` and add `data-collapsible-trigger` to its
+`SidebarGroupLabel` to toggle the group content by clicking the group heading.
+
+<WidgetExample name="sidebar-group-collapsible" />
+
+### Icon collapse
+
+With `collapsible="icon"`, collapsing keeps the icons and hides the menu labels; the trigger can expand the sidebar again.
+
+<WidgetExample name="sidebar-collapsed" />
+
+## API Reference
+
+### SidebarProvider
+
+The sidebar state container, which stores the expanded/collapsed state and looks up the nearest provider.
+
+<FieldTable name="sidebar-provider" />
+
+### Sidebar
+
+The main sidebar panel, which handles width, border, and collapse mode.
+
+<FieldTable name="sidebar" />
+
+### SidebarTrigger
+
+A button that toggles the nearest provider; it uses the `panel-left` icon by default.
+
+<FieldTable name="sidebar-trigger" />
+
+### SidebarRail
+
+A narrow trigger area along the sidebar edge that also toggles the sidebar when clicked.
+
+<FieldTable name="sidebar-rail" />
+
+### SidebarHeader
+
+The sidebar header container, used for the brand, workspace switcher, or title.
+
+<FieldTable name="sidebar-header" />
+
+### SidebarFooter
+
+The sidebar footer container, usually for settings or account entries.
+
+<FieldTable name="sidebar-footer" />
+
+### SidebarContent
+
+The main sidebar area; it only handles flex layout, so compose `ScrollArea` inside it when scrolling is needed.
+
+<FieldTable name="sidebar-content" />
+
+### SidebarGroup
+
+A sidebar group container that can hold a label, action, and content.
+
+<FieldTable name="sidebar-group" />
+
+### SidebarGroupLabel
+
+The group heading; after you add `data-collapsible-trigger`, it toggles the outer Collapsible.
+
+<FieldTable name="sidebar-group-label" />
+
+### SidebarGroupAction
+
+The action button on the right side of the group heading.
+
+<FieldTable name="sidebar-group-action" />
+
+### SidebarGroupContent
+
+The group content container, usually holding a SidebarMenu.
+
+<FieldTable name="sidebar-group-content" />
+
+### SidebarMenu
+
+The sidebar menu list.
+
+<FieldTable name="sidebar-menu" />
+
+### SidebarMenuItem
+
+A menu item container that can hold a menu button, action, badge, and submenu.
+
+<FieldTable name="sidebar-menu-item" />
+
+### SidebarMenuAction
+
+A lightweight action button on the right side of a menu item.
+
+<FieldTable name="sidebar-menu-action" />
+
+### SidebarMenuSub
+
+The submenu container inside a menu item.
+
+<FieldTable name="sidebar-menu-sub" />
+
+### SidebarMenuSubItem
+
+A submenu item container.
+
+<FieldTable name="sidebar-menu-sub-item" />
+
+### SidebarMenuBadge
+
+The badge on the right side of a menu item.
+
+<FieldTable name="sidebar-menu-badge" />
+
+### SidebarMenuButton
+
+`SidebarMenuButton` does not register its own widget; it uses a class contract:
+
+- Add `sidebar-menu-button` to a `button`, `a`, or `RouterLink`
+- Put the label in a `text` child with the `sidebar-menu-label` class
+- Add the `active` class to the current item
+- In the future, `SidebarMenuButton` in `@lcui/react` will create a button with this class by default; when `render` is specified, append the class to the rendered child
+
+## Caveats
+
+:::note
+`SidebarContent` does not create a ScrollArea automatically. When scrolling is needed, compose `ScrollArea` and `ScrollAreaContent` inside `SidebarContent`.
+:::
+
+:::caution
+Floating/inset variants, keyboard shortcuts, and cookie persistence are not supported in the current version. `SidebarInset` is not implemented either.
+:::

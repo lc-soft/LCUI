@@ -1121,283 +1121,283 @@ export default function DropdownMenuComplexDemo() {
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">59</Text>
-                <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_sub_trigger[/color][color=#0550ae]([color=#953800]const[/color] [color=#953800]char[/color] *icon_name,[/color]`}</Text>
+                <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_sub_trigger[/color][color=#0550ae]([color=#953800]const[/color] [color=#953800]char[/color] *icon_name, [color=#953800]const[/color] [color=#953800]char[/color] *label)[/color]`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">60</Text>
-                <Text className="code-line">{`[color=#0550ae]                                       [color=#953800]const[/color] [color=#953800]char[/color] *label)[/color]`}</Text>
+                <Text className="code-line">{`{`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">61</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">62</Text>
                 <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *trigger = ui_create_dropdown_menu_sub_trigger();`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">63</Text>
+                <Text className="code-line-number">62</Text>
                 <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *text = ui_create_widget([color=#0a3069]"text"[/color]);`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">64</Text>
+                <Text className="code-line-number">63</Text>
                 <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *chevron = ui_create_fluent_icon([color=#0a3069]"chevron-right"[/color]);`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">65</Text>
+                <Text className="code-line-number">64</Text>
                 <Text className="code-line">{` `}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">66</Text>
+                <Text className="code-line-number">65</Text>
                 <Text className="code-line">{`        ui_widget_append(trigger, ui_create_fluent_icon(icon_name));`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">67</Text>
+                <Text className="code-line-number">66</Text>
                 <Text className="code-line">{`        ui_text_set_content(text, label);`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">68</Text>
+                <Text className="code-line-number">67</Text>
                 <Text className="code-line">{`        ui_widget_add_class(chevron, [color=#0a3069]"dropdown-menu-chevron"[/color]);`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">69</Text>
+                <Text className="code-line-number">68</Text>
                 <Text className="code-line">{`        ui_widget_append(trigger, text);`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">70</Text>
+                <Text className="code-line-number">69</Text>
                 <Text className="code-line">{`        ui_widget_append(trigger, chevron);`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">71</Text>
+                <Text className="code-line-number">70</Text>
                 <Text className="code-line">{`        [color=#cf222e]return[/color] trigger;`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">72</Text>
+                <Text className="code-line-number">71</Text>
                 <Text className="code-line">{`}`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">72</Text>
+                <Text className="code-line">{` `}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">73</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">74</Text>
                 <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_sub[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *trigger, [color=#953800]ui_widget_t[/color] *content)[/color]`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">75</Text>
+                <Text className="code-line-number">74</Text>
                 <Text className="code-line">{`{`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">76</Text>
+                <Text className="code-line-number">75</Text>
                 <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *sub = ui_create_dropdown_menu_sub();`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">77</Text>
+                <Text className="code-line-number">76</Text>
                 <Text className="code-line">{` `}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">78</Text>
+                <Text className="code-line-number">77</Text>
                 <Text className="code-line">{`        ui_widget_append(sub, trigger);`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">79</Text>
+                <Text className="code-line-number">78</Text>
                 <Text className="code-line">{`        ui_widget_append(sub, content);`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">80</Text>
+                <Text className="code-line-number">79</Text>
                 <Text className="code-line">{`        [color=#cf222e]return[/color] sub;`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">81</Text>
+                <Text className="code-line-number">80</Text>
                 <Text className="code-line">{`}`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">81</Text>
+                <Text className="code-line">{` `}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">82</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">83</Text>
                 <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_label[/color][color=#0550ae]([color=#953800]const[/color] [color=#953800]char[/color] *text)[/color]`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">84</Text>
+                <Text className="code-line-number">83</Text>
                 <Text className="code-line">{`{`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">85</Text>
+                <Text className="code-line-number">84</Text>
                 <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *label = ui_create_dropdown_menu_label();`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">86</Text>
+                <Text className="code-line-number">85</Text>
                 <Text className="code-line">{` `}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">87</Text>
+                <Text className="code-line-number">86</Text>
                 <Text className="code-line">{`        ui_text_set_content(label, text);`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">88</Text>
+                <Text className="code-line-number">87</Text>
                 <Text className="code-line">{`        [color=#cf222e]return[/color] label;`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">89</Text>
+                <Text className="code-line-number">88</Text>
                 <Text className="code-line">{`}`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">90</Text>
+                <Text className="code-line-number">89</Text>
                 <Text className="code-line">{` `}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">91</Text>
+                <Text className="code-line-number">90</Text>
                 <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]dropdown_menu_complex_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">92</Text>
+                <Text className="code-line-number">91</Text>
                 <Text className="code-line">{`{`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">93</Text>
+                <Text className="code-line-number">92</Text>
                 <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *menu = ui_create_dropdown_menu();`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">94</Text>
+                <Text className="code-line-number">93</Text>
                 <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *trigger = ui_create_dropdown_menu_trigger();`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">95</Text>
+                <Text className="code-line-number">94</Text>
                 <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *button = ui_create_button();`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">96</Text>
+                <Text className="code-line-number">95</Text>
                 <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *content = ui_create_dropdown_menu_content();`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">97</Text>
+                <Text className="code-line-number">96</Text>
                 <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *group;`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">98</Text>
+                <Text className="code-line-number">97</Text>
                 <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *sub_content;`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">99</Text>
+                <Text className="code-line-number">98</Text>
                 <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *sub_sub_content;`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">100</Text>
+                <Text className="code-line-number">99</Text>
                 <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *radios;`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">101</Text>
+                <Text className="code-line-number">100</Text>
                 <Text className="code-line">{` `}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">102</Text>
+                <Text className="code-line-number">101</Text>
                 <Text className="code-line">{`        ui_widget_add_class(content, [color=#0a3069]"dropdown-menu-complex-demo-content"[/color]);`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">103</Text>
+                <Text className="code-line-number">102</Text>
                 <Text className="code-line">{`        ui_button_set_text(button, [color=#0a3069]"Complex Menu"[/color]);`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">104</Text>
+                <Text className="code-line-number">103</Text>
                 <Text className="code-line">{`        ui_widget_append(trigger, button);`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">105</Text>
+                <Text className="code-line-number">104</Text>
                 <Text className="code-line">{` `}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">106</Text>
+                <Text className="code-line-number">105</Text>
                 <Text className="code-line">{`        group = ui_create_dropdown_menu_group();`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">107</Text>
+                <Text className="code-line-number">106</Text>
                 <Text className="code-line">{`        ui_widget_append(group, create_label([color=#0a3069]"File"[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
+                <Text className="code-line-number">107</Text>
+                <Text className="code-line">{`        ui_widget_append(`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
                 <Text className="code-line-number">108</Text>
-                <Text className="code-line">{`        ui_widget_append(group,`}</Text>
+                <Text className="code-line">{`            group, create_item([color=#0a3069]"document"[/color], [color=#0a3069]"New File"[/color], [color=#0a3069]"Ctrl+N"[/color], [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">109</Text>
-                <Text className="code-line">{`                         create_item([color=#0a3069]"document"[/color], [color=#0a3069]"New File"[/color], [color=#0a3069]"Ctrl+N"[/color], [color=#0550ae]false[/color],`}</Text>
+                <Text className="code-line">{`        ui_widget_append(group, create_item([color=#0a3069]"folder"[/color], [color=#0a3069]"New Folder"[/color], [color=#0a3069]"Shift+N"[/color],`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">110</Text>
-                <Text className="code-line">{`                                     [color=#0550ae]false[/color]));`}</Text>
+                <Text className="code-line">{`                                            [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">111</Text>
-                <Text className="code-line">{`        ui_widget_append(group,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">112</Text>
-                <Text className="code-line">{`                         create_item([color=#0a3069]"folder"[/color], [color=#0a3069]"New Folder"[/color], [color=#0a3069]"Shift+N"[/color], [color=#0550ae]false[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">113</Text>
-                <Text className="code-line">{`                                     [color=#0550ae]false[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">114</Text>
                 <Text className="code-line">{`        sub_content = ui_create_dropdown_menu_sub_content();`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">115</Text>
+                <Text className="code-line-number">112</Text>
                 <Text className="code-line">{`        ui_widget_append(sub_content, create_label([color=#0a3069]"Recent Projects"[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
+                <Text className="code-line-number">113</Text>
+                <Text className="code-line">{`        ui_widget_append(sub_content, create_item([color=#0a3069]"code"[/color], [color=#0a3069]"Project Alpha"[/color], [color=#0550ae]NULL[/color],`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">114</Text>
+                <Text className="code-line">{`                                                  [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">115</Text>
+                <Text className="code-line">{`        ui_widget_append(sub_content, create_item([color=#0a3069]"code"[/color], [color=#0a3069]"Project Beta"[/color], [color=#0550ae]NULL[/color],`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
                 <Text className="code-line-number">116</Text>
-                <Text className="code-line">{`        ui_widget_append(`}</Text>
+                <Text className="code-line">{`                                                  [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">117</Text>
-                <Text className="code-line">{`            sub_content,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">118</Text>
-                <Text className="code-line">{`            create_item([color=#0a3069]"code"[/color], [color=#0a3069]"Project Alpha"[/color], [color=#0550ae]NULL[/color], [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">119</Text>
-                <Text className="code-line">{`        ui_widget_append(`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">120</Text>
-                <Text className="code-line">{`            sub_content,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">121</Text>
-                <Text className="code-line">{`            create_item([color=#0a3069]"code"[/color], [color=#0a3069]"Project Beta"[/color], [color=#0550ae]NULL[/color], [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">122</Text>
                 <Text className="code-line">{`        sub_sub_content = ui_create_dropdown_menu_sub_content();`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">123</Text>
+                <Text className="code-line-number">118</Text>
+                <Text className="code-line">{`        ui_widget_append(sub_sub_content, create_item([color=#0a3069]"code"[/color], [color=#0a3069]"Project Gamma"[/color],`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">119</Text>
+                <Text className="code-line">{`                                                      [color=#0550ae]NULL[/color], [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">120</Text>
+                <Text className="code-line">{`        ui_widget_append(sub_sub_content, create_item([color=#0a3069]"code"[/color], [color=#0a3069]"Project Delta"[/color],`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">121</Text>
+                <Text className="code-line">{`                                                      [color=#0550ae]NULL[/color], [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">122</Text>
                 <Text className="code-line">{`        ui_widget_append(`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">123</Text>
+                <Text className="code-line">{`            sub_content,`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">124</Text>
-                <Text className="code-line">{`            sub_sub_content,`}</Text>
+                <Text className="code-line">{`            create_sub(create_sub_trigger([color=#0a3069]"more-horizontal"[/color], [color=#0a3069]"More Projects"[/color]),`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">125</Text>
-                <Text className="code-line">{`            create_item([color=#0a3069]"code"[/color], [color=#0a3069]"Project Gamma"[/color], [color=#0550ae]NULL[/color], [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
+                <Text className="code-line">{`                       sub_sub_content));`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">126</Text>
-                <Text className="code-line">{`        ui_widget_append(`}</Text>
+                <Text className="code-line">{`        ui_widget_append(sub_content, ui_create_dropdown_menu_separator());`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">127</Text>
-                <Text className="code-line">{`            sub_sub_content,`}</Text>
+                <Text className="code-line">{`        ui_widget_append(sub_content, create_item([color=#0a3069]"search"[/color], [color=#0a3069]"Browse..."[/color], [color=#0550ae]NULL[/color],`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">128</Text>
-                <Text className="code-line">{`            create_item([color=#0a3069]"code"[/color], [color=#0a3069]"Project Delta"[/color], [color=#0550ae]NULL[/color], [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
+                <Text className="code-line">{`                                                  [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">129</Text>
@@ -1405,55 +1405,55 @@ export default function DropdownMenuComplexDemo() {
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">130</Text>
-                <Text className="code-line">{`            sub_content,`}</Text>
+                <Text className="code-line">{`            group, create_sub(create_sub_trigger([color=#0a3069]"folder-open"[/color], [color=#0a3069]"Open Recent"[/color]),`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">131</Text>
-                <Text className="code-line">{`            create_sub(create_sub_trigger([color=#0a3069]"more-horizontal"[/color],`}</Text>
+                <Text className="code-line">{`                              sub_content));`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">132</Text>
-                <Text className="code-line">{`                                          [color=#0a3069]"More Projects"[/color]),`}</Text>
+                <Text className="code-line">{`        ui_widget_append(group, ui_create_dropdown_menu_separator());`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">133</Text>
-                <Text className="code-line">{`                       sub_sub_content));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">134</Text>
-                <Text className="code-line">{`        ui_widget_append(sub_content, ui_create_dropdown_menu_separator());`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">135</Text>
-                <Text className="code-line">{`        ui_widget_append(`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">136</Text>
-                <Text className="code-line">{`            sub_content,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">137</Text>
-                <Text className="code-line">{`            create_item([color=#0a3069]"search"[/color], [color=#0a3069]"Browse..."[/color], [color=#0550ae]NULL[/color], [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">138</Text>
                 <Text className="code-line">{`        ui_widget_append(group,`}</Text>
               </Widget>
               <Widget className="code-line-row">
+                <Text className="code-line-number">134</Text>
+                <Text className="code-line">{`                         create_item([color=#0a3069]"save"[/color], [color=#0a3069]"Save"[/color], [color=#0a3069]"Ctrl+S"[/color], [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">135</Text>
+                <Text className="code-line">{`        ui_widget_append(group, create_item([color=#0a3069]"arrow-download"[/color], [color=#0a3069]"Export"[/color],`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">136</Text>
+                <Text className="code-line">{`                                            [color=#0a3069]"Shift+E"[/color], [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">137</Text>
+                <Text className="code-line">{`        ui_widget_append(content, group);`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">138</Text>
+                <Text className="code-line">{`        ui_widget_append(content, ui_create_dropdown_menu_separator());`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
                 <Text className="code-line-number">139</Text>
-                <Text className="code-line">{`                         create_sub(create_sub_trigger([color=#0a3069]"folder-open"[/color],`}</Text>
+                <Text className="code-line">{` `}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">140</Text>
-                <Text className="code-line">{`                                                       [color=#0a3069]"Open Recent"[/color]),`}</Text>
+                <Text className="code-line">{`        group = ui_create_dropdown_menu_group();`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">141</Text>
-                <Text className="code-line">{`                                    sub_content));`}</Text>
+                <Text className="code-line">{`        ui_widget_append(group, create_label([color=#0a3069]"View"[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">142</Text>
-                <Text className="code-line">{`        ui_widget_append(group, ui_create_dropdown_menu_separator());`}</Text>
+                <Text className="code-line">{`        ui_widget_append(group, create_checkbox([color=#0a3069]"eye"[/color], [color=#0a3069]"Show Sidebar"[/color], [color=#0550ae]true[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">143</Text>
@@ -1461,99 +1461,99 @@ export default function DropdownMenuComplexDemo() {
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">144</Text>
-                <Text className="code-line">{`                         create_item([color=#0a3069]"save"[/color], [color=#0a3069]"Save"[/color], [color=#0a3069]"Ctrl+S"[/color], [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">145</Text>
-                <Text className="code-line">{`        ui_widget_append(group,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">146</Text>
-                <Text className="code-line">{`                         create_item([color=#0a3069]"arrow-download"[/color], [color=#0a3069]"Export"[/color], [color=#0a3069]"Shift+E"[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">147</Text>
-                <Text className="code-line">{`                                     [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">148</Text>
-                <Text className="code-line">{`        ui_widget_append(content, group);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">149</Text>
-                <Text className="code-line">{`        ui_widget_append(content, ui_create_dropdown_menu_separator());`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">150</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">151</Text>
-                <Text className="code-line">{`        group = ui_create_dropdown_menu_group();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">152</Text>
-                <Text className="code-line">{`        ui_widget_append(group, create_label([color=#0a3069]"View"[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">153</Text>
-                <Text className="code-line">{`        ui_widget_append(group,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">154</Text>
-                <Text className="code-line">{`                         create_checkbox([color=#0a3069]"eye"[/color], [color=#0a3069]"Show Sidebar"[/color], [color=#0550ae]true[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">155</Text>
-                <Text className="code-line">{`        ui_widget_append(group,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">156</Text>
                 <Text className="code-line">{`                         create_checkbox([color=#0a3069]"grid"[/color], [color=#0a3069]"Show Status Bar"[/color], [color=#0550ae]false[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">157</Text>
+                <Text className="code-line-number">145</Text>
                 <Text className="code-line">{`        sub_content = ui_create_dropdown_menu_sub_content();`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">158</Text>
+                <Text className="code-line-number">146</Text>
                 <Text className="code-line">{`        ui_widget_append(sub_content, create_label([color=#0a3069]"Appearance"[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">159</Text>
+                <Text className="code-line-number">147</Text>
                 <Text className="code-line">{`        radios = ui_create_dropdown_menu_radio_group();`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">160</Text>
+                <Text className="code-line-number">148</Text>
                 <Text className="code-line">{`        ui_widget_set_attr(radios, [color=#0a3069]"value"[/color], [color=#0a3069]"light"[/color]);`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">161</Text>
+                <Text className="code-line-number">149</Text>
                 <Text className="code-line">{`        ui_widget_append(radios,`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">162</Text>
+                <Text className="code-line-number">150</Text>
                 <Text className="code-line">{`                         create_radio([color=#0a3069]"weather-sunny"[/color], [color=#0a3069]"Light"[/color], [color=#0a3069]"light"[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
+                <Text className="code-line-number">151</Text>
+                <Text className="code-line">{`        ui_widget_append(radios, create_radio([color=#0a3069]"weather-moon"[/color], [color=#0a3069]"Dark"[/color], [color=#0a3069]"dark"[/color]));`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">152</Text>
+                <Text className="code-line">{`        ui_widget_append(radios, create_radio([color=#0a3069]"desktop"[/color], [color=#0a3069]"System"[/color], [color=#0a3069]"system"[/color]));`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">153</Text>
+                <Text className="code-line">{`        ui_widget_append(sub_content, radios);`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">154</Text>
+                <Text className="code-line">{`        ui_widget_append(group,`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">155</Text>
+                <Text className="code-line">{`                         create_sub(create_sub_trigger([color=#0a3069]"paint-brush"[/color], [color=#0a3069]"Theme"[/color]),`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">156</Text>
+                <Text className="code-line">{`                                    sub_content));`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">157</Text>
+                <Text className="code-line">{`        ui_widget_append(content, group);`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">158</Text>
+                <Text className="code-line">{`        ui_widget_append(content, ui_create_dropdown_menu_separator());`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">159</Text>
+                <Text className="code-line">{` `}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">160</Text>
+                <Text className="code-line">{`        group = ui_create_dropdown_menu_group();`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">161</Text>
+                <Text className="code-line">{`        ui_widget_append(group, create_label([color=#0a3069]"Account"[/color]));`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">162</Text>
+                <Text className="code-line">{`        ui_widget_append(`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
                 <Text className="code-line-number">163</Text>
-                <Text className="code-line">{`        ui_widget_append(radios,`}</Text>
+                <Text className="code-line">{`            group, create_item([color=#0a3069]"person"[/color], [color=#0a3069]"Profile"[/color], [color=#0a3069]"Shift+P"[/color], [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">164</Text>
-                <Text className="code-line">{`                         create_radio([color=#0a3069]"weather-moon"[/color], [color=#0a3069]"Dark"[/color], [color=#0a3069]"dark"[/color]));`}</Text>
+                <Text className="code-line">{`        ui_widget_append(group,`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">165</Text>
-                <Text className="code-line">{`        ui_widget_append(radios,`}</Text>
+                <Text className="code-line">{`                         create_item([color=#0a3069]"payment"[/color], [color=#0a3069]"Billing"[/color], [color=#0550ae]NULL[/color], [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">166</Text>
-                <Text className="code-line">{`                         create_radio([color=#0a3069]"desktop"[/color], [color=#0a3069]"System"[/color], [color=#0a3069]"system"[/color]));`}</Text>
+                <Text className="code-line">{`        sub_content = ui_create_dropdown_menu_sub_content();`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">167</Text>
-                <Text className="code-line">{`        ui_widget_append(sub_content, radios);`}</Text>
+                <Text className="code-line">{`        ui_widget_append(sub_content, create_label([color=#0a3069]"Preferences"[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">168</Text>
@@ -1561,131 +1561,131 @@ export default function DropdownMenuComplexDemo() {
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">169</Text>
-                <Text className="code-line">{`            group,`}</Text>
+                <Text className="code-line">{`            sub_content,`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">170</Text>
-                <Text className="code-line">{`            create_sub(create_sub_trigger([color=#0a3069]"paint-brush"[/color], [color=#0a3069]"Theme"[/color]),`}</Text>
+                <Text className="code-line">{`            create_item([color=#0a3069]"keyboard"[/color], [color=#0a3069]"Keyboard Shortcuts"[/color], [color=#0550ae]NULL[/color], [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">171</Text>
-                <Text className="code-line">{`                       sub_content));`}</Text>
+                <Text className="code-line">{`        ui_widget_append(sub_content, create_item([color=#0a3069]"local-language"[/color], [color=#0a3069]"Language"[/color],`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">172</Text>
-                <Text className="code-line">{`        ui_widget_append(content, group);`}</Text>
+                <Text className="code-line">{`                                                  [color=#0550ae]NULL[/color], [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">173</Text>
-                <Text className="code-line">{`        ui_widget_append(content, ui_create_dropdown_menu_separator());`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">174</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">175</Text>
-                <Text className="code-line">{`        group = ui_create_dropdown_menu_group();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">176</Text>
-                <Text className="code-line">{`        ui_widget_append(group, create_label([color=#0a3069]"Account"[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">177</Text>
-                <Text className="code-line">{`        ui_widget_append(group,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">178</Text>
-                <Text className="code-line">{`                         create_item([color=#0a3069]"person"[/color], [color=#0a3069]"Profile"[/color], [color=#0a3069]"Shift+P"[/color], [color=#0550ae]false[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">179</Text>
-                <Text className="code-line">{`                                     [color=#0550ae]false[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">180</Text>
-                <Text className="code-line">{`        ui_widget_append(group,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">181</Text>
-                <Text className="code-line">{`                         create_item([color=#0a3069]"payment"[/color], [color=#0a3069]"Billing"[/color], [color=#0550ae]NULL[/color], [color=#0550ae]false[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">182</Text>
-                <Text className="code-line">{`                                     [color=#0550ae]false[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">183</Text>
-                <Text className="code-line">{`        sub_content = ui_create_dropdown_menu_sub_content();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">184</Text>
-                <Text className="code-line">{`        ui_widget_append(sub_content, create_label([color=#0a3069]"Preferences"[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">185</Text>
-                <Text className="code-line">{`        ui_widget_append(`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">186</Text>
-                <Text className="code-line">{`            sub_content,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">187</Text>
-                <Text className="code-line">{`            create_item([color=#0a3069]"keyboard"[/color], [color=#0a3069]"Keyboard Shortcuts"[/color], [color=#0550ae]NULL[/color], [color=#0550ae]false[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">188</Text>
-                <Text className="code-line">{`                        [color=#0550ae]false[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">189</Text>
-                <Text className="code-line">{`        ui_widget_append(`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">190</Text>
-                <Text className="code-line">{`            sub_content,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">191</Text>
-                <Text className="code-line">{`            create_item([color=#0a3069]"local-language"[/color], [color=#0a3069]"Language"[/color], [color=#0550ae]NULL[/color], [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">192</Text>
                 <Text className="code-line">{`        sub_sub_content = ui_create_dropdown_menu_sub_content();`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">193</Text>
+                <Text className="code-line-number">174</Text>
+                <Text className="code-line">{`        ui_widget_append(sub_sub_content, create_label([color=#0a3069]"Notification Types"[/color]));`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">175</Text>
                 <Text className="code-line">{`        ui_widget_append(sub_sub_content,`}</Text>
               </Widget>
               <Widget className="code-line-row">
+                <Text className="code-line-number">176</Text>
+                <Text className="code-line">{`                         create_checkbox([color=#0a3069]"alert"[/color], [color=#0a3069]"Push Notifications"[/color], [color=#0550ae]true[/color]));`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">177</Text>
+                <Text className="code-line">{`        ui_widget_append(sub_sub_content,`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">178</Text>
+                <Text className="code-line">{`                         create_checkbox([color=#0a3069]"mail"[/color], [color=#0a3069]"Email Notifications"[/color], [color=#0550ae]true[/color]));`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">179</Text>
+                <Text className="code-line">{`        ui_widget_append(sub_content, create_sub(create_sub_trigger(`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">180</Text>
+                <Text className="code-line">{`                                                     [color=#0a3069]"alert"[/color], [color=#0a3069]"Notifications"[/color]),`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">181</Text>
+                <Text className="code-line">{`                                                 sub_sub_content));`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">182</Text>
+                <Text className="code-line">{`        ui_widget_append(sub_content, ui_create_dropdown_menu_separator());`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">183</Text>
+                <Text className="code-line">{`        ui_widget_append(`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">184</Text>
+                <Text className="code-line">{`            sub_content,`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">185</Text>
+                <Text className="code-line">{`            create_item([color=#0a3069]"shield"[/color], [color=#0a3069]"Privacy & Security"[/color], [color=#0550ae]NULL[/color], [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">186</Text>
+                <Text className="code-line">{`        ui_widget_append(group,`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">187</Text>
+                <Text className="code-line">{`                         create_sub(create_sub_trigger([color=#0a3069]"settings"[/color], [color=#0a3069]"Settings"[/color]),`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">188</Text>
+                <Text className="code-line">{`                                    sub_content));`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">189</Text>
+                <Text className="code-line">{`        ui_widget_append(content, group);`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">190</Text>
+                <Text className="code-line">{`        ui_widget_append(content, ui_create_dropdown_menu_separator());`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">191</Text>
+                <Text className="code-line">{` `}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">192</Text>
+                <Text className="code-line">{`        group = ui_create_dropdown_menu_group();`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">193</Text>
+                <Text className="code-line">{`        ui_widget_append(group, create_item([color=#0a3069]"question-circle"[/color], [color=#0a3069]"Help & Support"[/color],`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
                 <Text className="code-line-number">194</Text>
-                <Text className="code-line">{`                         create_label([color=#0a3069]"Notification Types"[/color]));`}</Text>
+                <Text className="code-line">{`                                            [color=#0550ae]NULL[/color], [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">195</Text>
-                <Text className="code-line">{`        ui_widget_append(`}</Text>
+                <Text className="code-line">{`        ui_widget_append(group, create_item([color=#0a3069]"document-text"[/color], [color=#0a3069]"Documentation"[/color],`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">196</Text>
-                <Text className="code-line">{`            sub_sub_content,`}</Text>
+                <Text className="code-line">{`                                            [color=#0550ae]NULL[/color], [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">197</Text>
-                <Text className="code-line">{`            create_checkbox([color=#0a3069]"alert"[/color], [color=#0a3069]"Push Notifications"[/color], [color=#0550ae]true[/color]));`}</Text>
+                <Text className="code-line">{`        ui_widget_append(content, group);`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">198</Text>
-                <Text className="code-line">{`        ui_widget_append(`}</Text>
+                <Text className="code-line">{`        ui_widget_append(content, ui_create_dropdown_menu_separator());`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">199</Text>
-                <Text className="code-line">{`            sub_sub_content,`}</Text>
+                <Text className="code-line">{` `}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">200</Text>
-                <Text className="code-line">{`            create_checkbox([color=#0a3069]"mail"[/color], [color=#0a3069]"Email Notifications"[/color], [color=#0550ae]true[/color]));`}</Text>
+                <Text className="code-line">{`        group = ui_create_dropdown_menu_group();`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">201</Text>
@@ -1693,146 +1693,30 @@ export default function DropdownMenuComplexDemo() {
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">202</Text>
-                <Text className="code-line">{`            sub_content,`}</Text>
+                <Text className="code-line">{`            group, create_item([color=#0a3069]"sign-out"[/color], [color=#0a3069]"Sign Out"[/color], [color=#0a3069]"Shift+Q"[/color], [color=#0550ae]false[/color], [color=#0550ae]true[/color]));`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">203</Text>
-                <Text className="code-line">{`            create_sub(create_sub_trigger([color=#0a3069]"alert"[/color], [color=#0a3069]"Notifications"[/color]),`}</Text>
+                <Text className="code-line">{`        ui_widget_append(content, group);`}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">204</Text>
-                <Text className="code-line">{`                       sub_sub_content));`}</Text>
+                <Text className="code-line">{` `}</Text>
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">205</Text>
-                <Text className="code-line">{`        ui_widget_append(sub_content, ui_create_dropdown_menu_separator());`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">206</Text>
-                <Text className="code-line">{`        ui_widget_append(`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">207</Text>
-                <Text className="code-line">{`            sub_content,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">208</Text>
-                <Text className="code-line">{`            create_item([color=#0a3069]"shield"[/color], [color=#0a3069]"Privacy & Security"[/color], [color=#0550ae]NULL[/color], [color=#0550ae]false[/color], [color=#0550ae]false[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">209</Text>
-                <Text className="code-line">{`        ui_widget_append(`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">210</Text>
-                <Text className="code-line">{`            group,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">211</Text>
-                <Text className="code-line">{`            create_sub(create_sub_trigger([color=#0a3069]"settings"[/color], [color=#0a3069]"Settings"[/color]),`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">212</Text>
-                <Text className="code-line">{`                       sub_content));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">213</Text>
-                <Text className="code-line">{`        ui_widget_append(content, group);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">214</Text>
-                <Text className="code-line">{`        ui_widget_append(content, ui_create_dropdown_menu_separator());`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">215</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">216</Text>
-                <Text className="code-line">{`        group = ui_create_dropdown_menu_group();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">217</Text>
-                <Text className="code-line">{`        ui_widget_append(`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">218</Text>
-                <Text className="code-line">{`            group,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">219</Text>
-                <Text className="code-line">{`            create_item([color=#0a3069]"question-circle"[/color], [color=#0a3069]"Help & Support"[/color], [color=#0550ae]NULL[/color], [color=#0550ae]false[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">220</Text>
-                <Text className="code-line">{`                        [color=#0550ae]false[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">221</Text>
-                <Text className="code-line">{`        ui_widget_append(`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">222</Text>
-                <Text className="code-line">{`            group,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">223</Text>
-                <Text className="code-line">{`            create_item([color=#0a3069]"document-text"[/color], [color=#0a3069]"Documentation"[/color], [color=#0550ae]NULL[/color], [color=#0550ae]false[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">224</Text>
-                <Text className="code-line">{`                        [color=#0550ae]false[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">225</Text>
-                <Text className="code-line">{`        ui_widget_append(content, group);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">226</Text>
-                <Text className="code-line">{`        ui_widget_append(content, ui_create_dropdown_menu_separator());`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">227</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">228</Text>
-                <Text className="code-line">{`        group = ui_create_dropdown_menu_group();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">229</Text>
-                <Text className="code-line">{`        ui_widget_append(`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">230</Text>
-                <Text className="code-line">{`            group,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">231</Text>
-                <Text className="code-line">{`            create_item([color=#0a3069]"sign-out"[/color], [color=#0a3069]"Sign Out"[/color], [color=#0a3069]"Shift+Q"[/color], [color=#0550ae]false[/color], [color=#0550ae]true[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">232</Text>
-                <Text className="code-line">{`        ui_widget_append(content, group);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">233</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">234</Text>
                 <Text className="code-line">{`        ui_widget_append(menu, trigger);`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">235</Text>
+                <Text className="code-line-number">206</Text>
                 <Text className="code-line">{`        ui_widget_append(menu, content);`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">236</Text>
+                <Text className="code-line-number">207</Text>
                 <Text className="code-line">{`        ui_widget_append(parent, menu);`}</Text>
               </Widget>
               <Widget className="code-line-row">
-                <Text className="code-line-number">237</Text>
+                <Text className="code-line-number">208</Text>
                 <Text className="code-line">{`}`}</Text>
               </Widget>
             </ScrollAreaContent>

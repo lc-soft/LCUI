@@ -28,6 +28,7 @@ void lcui_widgets_init(void)
         ui_register_scrollarea();
         ui_register_scrollbar();
         ui_register_select();
+        ui_register_sidebar();
         ui_register_progress();
         ui_register_textcaret();
         ui_register_textinput();

@@ -1180,3 +1180,131 @@ textinput:disabled {
 
 
 
+
+/* sidebar: structural rules live in src/widgets/sidebar.c */
+
+sidebar {
+  @apply bg-sidebar text-sidebar-foreground;
+  border-color: #e5e5e5;
+}
+
+sidebar-group-label {
+  @apply text-xs text-muted-foreground;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+sidebar-group-action {
+  @apply text-muted-foreground;
+}
+
+sidebar-menu-badge {
+  @apply text-xs text-muted-foreground;
+}
+
+.sidebar-menu-button {
+  display: flex;
+  align-items: center;
+  position: relative;
+  gap: 8px;
+  width: 100%;
+  height: 30px;
+  padding: 0 8px;
+  cursor: pointer;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #171717;
+  font-size: 12.8px;
+  font-weight: 400;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.sidebar-menu-button:hover {
+  @apply bg-sidebar-accent text-sidebar-accent-foreground;
+}
+
+.sidebar-menu-button.active {
+  @apply bg-sidebar-accent text-sidebar-accent-foreground;
+  border-color: #e5e5e5;
+  font-weight: 500;
+}
+
+.sidebar-menu-button icon,
+.sidebar-trigger icon {
+  flex: 0 0 16px;
+  width: 16px;
+}
+
+.sidebar-menu-chevron {
+  flex: 0 0 16px;
+  width: 16px;
+  margin-left: auto;
+}
+
+.sidebar-menu-label {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.sidebar-team-logo,
+.sidebar-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+}
+
+.sidebar-team-logo {
+  @apply bg-sidebar-primary text-sidebar-primary-foreground;
+}
+
+.sidebar-avatar {
+  @apply bg-sidebar-accent text-sidebar-accent-foreground;
+}
+
+.sidebar-more {
+  color: #666666;
+}
+
+.sidebar-more icon {
+  color: #666666;
+}
+
+
+sidebar-provider:collapsed sidebar:icon .sidebar-menu-label,
+sidebar-provider:collapsed sidebar:icon .sidebar-menu-text,
+sidebar-provider:collapsed sidebar:icon sidebar-group-label,
+sidebar-provider:collapsed sidebar:icon sidebar-menu-sub,
+sidebar-provider:collapsed sidebar:icon .sidebar-projects {
+  display: none;
+}
+
+sidebar-provider:collapsed sidebar:icon .sidebar-team,
+sidebar-provider:collapsed sidebar:icon .sidebar-user {
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  justify-content: center;
+}
+
+sidebar-provider:collapsed sidebar:icon .sidebar-team .sidebar-menu-chevron,
+sidebar-provider:collapsed sidebar:icon .sidebar-user .sidebar-menu-chevron {
+  display: none;
+}
+
+.sidebar-scroll {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+sidebar-trigger,
+sidebar-rail {
+  @apply text-foreground;
+}

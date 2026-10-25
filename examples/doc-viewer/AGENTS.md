@@ -174,7 +174,7 @@ overview、handbook 等页面结构更自由，仅要求：
 - `docs/examples/*-tsx/example.tsx` 只使用已配置的 Tailwind 工具类组织布局和视觉样式。禁止为可用工具类写 `style={{ ... }}` 内联样式。
 - TSX 示例优先用 Tailwind 工具类表达布局和视觉；C / XML 示例给 demo 根容器加 `{部件名}-{示例名}-demo` 格式的唯一 class（例如 `card-basic-demo`），给需要微调的目标元素加明确的 class，CSS 效果必须与 TSX 示例的 Tailwind 类组合等价。禁止只沿用 `card-demo` 这类跨示例共用根 class。
 - 含输入框（`textinput`）的示例，输入框的容器及祖先需要按需添加 `clip-safe` 类，避免输入框 focus 阴影被父级裁剪；同时不得用 `clip-safe` 覆盖已有的 padding/margin 语义，必要时使用示例作用域 CSS 补充 gutter。
-- C demo 用字符串保存 CSS 规则，以唯一父 class 限定选择器；通过 `ui_widget_add_class()` 将该 class 加在 demo 根节点，禁止为可表达的布局/视觉规则逐项调用 inline style API。XML demo 在 `<resource type="text/css">` 中声明同样的作用域 CSS，禁止在元素 `style` 属性中堆叠规则。
+- C / XML demo 的 CSS 统一写入 `examples/doc-viewer/app/global.css`，以唯一 demo class 限定选择器。示例源码中不得再包含 `static const char *..._css`、`ui_load_css_string()` 或 `<resource type="text/css">`，代码块只展示结构与行为。C demo 通过 `ui_widget_add_class()` 将唯一 class 加在 demo 根节点；禁止用 inline style 堆叠布局/视觉规则。
 - shadcn Button 的默认变体是 primary，而 LCUI 的默认 Button 是 outline；所有对应 shadcn 默认按钮的 C / XML / TSX 示例必须显式指定 `primary` 变体。
 - 中文页面标题和小节使用中文：例如 `变体`、`带图标`、`自定义颜色`、`图片`，不得直接沿用参考文档的英文标题。
 - 多变体组件页面必须覆盖参考文档的基础示例和核心变体；新增 API 的示例、字段表与 C/XML/TSX 三变体必须同步更新。

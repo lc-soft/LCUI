@@ -576,3 +576,124 @@ li {
   padding: 0;
   border-radius: 20px;
 }
+
+.sidebar-team-menu,
+.sidebar-user-menu,
+.sidebar-team-menu dropdown-menu-trigger,
+.sidebar-user-menu dropdown-menu-trigger {
+  display: block;
+  width: 100%;
+}
+
+.sidebar-team-menu-content,
+.sidebar-user-menu-content {
+  width: 224px;
+}
+
+.sidebar-user-menu-email {
+  display: block;
+  padding: 0 8px 6px;
+  color: #666666;
+  font-size: 12px;
+}
+
+/* -- Sidebar demos -- */
+
+.sidebar-basic-demo {
+  display: flex;
+  width: 100%;
+  height: 500px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+}
+.sidebar-basic-demo .sidebar-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 8px;
+  padding: 12px;
+}
+.sidebar-basic-demo .sidebar-team {
+  height: 48px;
+  padding: 8px;
+}
+.sidebar-basic-demo .sidebar-user {
+  height: 46px;
+  padding: 8px;
+}
+.sidebar-basic-demo .sidebar-menu-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+}
+.sidebar-basic-demo .sidebar-menu-name {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+}
+.sidebar-basic-demo .sidebar-menu-meta {
+  display: block;
+  font-size: 11px;
+  color: #666666;
+}
+.sidebar-basic-demo .sidebar-scroll {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+.sidebar-basic-demo .sidebar-sub-button {
+  height: 28px;
+  padding-left: 16px;
+}
+
+.sidebar-collapsed-demo {
+  display: flex;
+  width: 100%;
+  height: 360px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+}
+.sidebar-collapsed-demo .sidebar-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 8px;
+  padding: 12px;
+}
+.sidebar-collapsed-demo .sidebar-main-title {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+}
+.sidebar-collapsed-demo .sidebar-main-copy {
+  display: block;
+  font-size: 13px;
+  color: #666666;
+}
+
+.sidebar-group-collapsible-demo {
+  display: flex;
+  width: 100%;
+  height: 360px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+}
+.sidebar-group-collapsible-demo .sidebar-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 8px;
+  padding: 12px;
+}
+.sidebar-group-collapsible-demo .sidebar-main-title {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+}
+.sidebar-group-collapsible-demo .sidebar-main-copy {
+  display: block;
+  font-size: 13px;
+  color: #666666;
+}

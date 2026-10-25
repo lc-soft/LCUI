@@ -1,5 +1,4 @@
 import { RouterLink, ScrollArea, ScrollAreaContent, Scrollbar, Text } from "@lcui/react";
-import  "./sidebar.css";
 import sidebarData from "../../../../docs/sidebars.json";
 
 interface SidebarItemData {
@@ -13,33 +12,60 @@ interface SidebarSection {
   items: SidebarItemData[];
 }
 
-export default function Sidebar() {
+/**
+ * Widget items in the Chinese sidebar show the Chinese name first, followed by
+ * the English name in a muted color. Other sections and locales keep the label
+ * from sidebars.json unchanged.
+ */
+function getItemLabel(
+  section: SidebarSection,
+  item: SidebarItemData,
+  locale: "zh-CN" | "en"
+): string {
+  if (locale !== "zh-CN" || section.slug !== "widgets") {
+    return item.label[locale];
+  }
+  const en = item.label.en;
+  const zhLabel = item.label["zh-CN"];
+  const zh = zhLabel.startsWith(en) ? zhLabel.slice(en.length).trim() : zhLabel;
   return (
-    <ScrollArea className="sidebar-container">
+    <>
+      <Text className="mr-2">{zh}</Text>
+      <Text className="text-[#999999]">{en}</Text>
+    </>
+  );
+}
+
+export default function DocsSidebar() {
+  return (
+    <ScrollArea className="flex-1 min-h-0 w-full">
       {/* ScrollArea only tracks its first <ScrollAreaContent>, so both locales
        * live inside one content and CSS toggles which language block is shown. */}
-      <ScrollAreaContent className="sidebar">
+      <ScrollAreaContent>
         {(["zh-CN", "en"] as const).map((locale) => (
-          <div key={locale} className={`sidebar-lang lang ${locale}`}>
+          <div key={locale} className={`lang ${locale}`}>
             {(sidebarData as { sidebar: SidebarSection[] }).sidebar.map(
               (section: SidebarSection) => (
-                <div key={section.slug} className="sidebar-section">
-                  <Text className="sidebar-heading">
-                    {section.label[locale]}
-                  </Text>
-                  <div className="sidebar-list">
-                    {section.items.map((item: SidebarItemData) => (
-                      <RouterLink
-                        key={item.slug}
-                        to={`/${locale}/${section.slug}/${item.slug}`}
-                        className="sidebar-item"
-                        activeClass="active"
-                      >
-                        {item.label[locale]}
-                      </RouterLink>
-                    ))}
-                  </div>
-                </div>
+                <sidebar-group key={section.slug}>
+                  <sidebar-group-label>
+                    <Text>{section.label[locale]}</Text>
+                  </sidebar-group-label>
+                  <sidebar-group-content>
+                    <sidebar-menu>
+                      {section.items.map((item: SidebarItemData) => (
+                        <sidebar-menu-item key={item.slug}>
+                          <RouterLink
+                            to={`/${locale}/${section.slug}/${item.slug}`}
+                            className="sidebar-menu-button w-fit gap-0 font-medium leading-[30px]"
+                            activeClass="active"
+                          >
+                            {getItemLabel(section, item, locale)}
+                          </RouterLink>
+                        </sidebar-menu-item>
+                      ))}
+                    </sidebar-menu>
+                  </sidebar-group-content>
+                </sidebar-group>
               )
             )}
           </div>

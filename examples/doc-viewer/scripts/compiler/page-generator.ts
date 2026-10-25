@@ -1209,7 +1209,16 @@ static inline const wchar_t *route_title_for(const char *path)
 function cStringLiteral(s: string): string {
   let out = '"';
   let prevWasHex = false;
+  let chunkLength = 0;
   for (const ch of s) {
+    // MSVC rejects a single string literal longer than 16380 bytes.  Split
+    // long snippets into adjacent literals; C concatenates them at compile
+    // time and the resulting snippet is unchanged.
+    if (chunkLength >= 2000) {
+      out += '" "';
+      chunkLength = 0;
+    }
+    chunkLength += 1;
     const code = ch.codePointAt(0)!;
     if (code === 0x22) {
       out += '\\"';

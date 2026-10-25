@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <sidebar-provider class="sidebar-collapsed-demo" default-open="false">
+      <sidebar collapsible="icon">
+        <sidebar-content>
+          <sidebar-group>
+            <sidebar-group-label>Application</sidebar-group-label>
+            <sidebar-group-content>
+              <sidebar-menu>
+                <sidebar-menu-item>
+                  <button class="sidebar-menu-button">
+                    <icon name="book-open" />
+                    <text class="sidebar-menu-label">Home</text>
+                  </button>
+                </sidebar-menu-item>
+                <sidebar-menu-item>
+                  <button class="sidebar-menu-button">
+                    <icon name="calendar-mail" />
+                    <text class="sidebar-menu-label">Inbox</text>
+                  </button>
+                </sidebar-menu-item>
+              </sidebar-menu>
+            </sidebar-group-content>
+          </sidebar-group>
+        </sidebar-content>
+      </sidebar>
+      <div class="sidebar-main">
+        <sidebar-trigger />
+        <text class="sidebar-main-title">Dashboard</text>
+        <text class="sidebar-main-copy">Click the trigger to expand the sidebar.</text>
+      </div>
+    </sidebar-provider>
+  </ui>
+</lcui-app>
