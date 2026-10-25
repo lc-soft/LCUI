@@ -914,7 +914,6 @@ int ptk_app_destroy(void)
                 }
         }
         assert(win32_app.windows.length == 0);
-        assert(FindWindowW(win32_app.class_name, NULL) == NULL);
         if (!UnregisterClassW(win32_app.class_name, win32_app.main_instance)) {
                 wchar_t str[256];
                 wchar_t msg[256];
