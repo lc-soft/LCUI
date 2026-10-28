@@ -26,12 +26,12 @@
 - Basic、Submenu、Shortcuts、Icons、Checkboxes、Checkboxes Icons、Radio Group、Radio Icons、Destructive、Avatar、Complex 示例
 - 中英文文档、字段表、C/XML/TSX 示例
 - 外部点击、Escape、方向键、Home/End、Enter/Space、子菜单左右方向键
+- 打开后键入字母的 typeahead 匹配（重复同字母时循环同首字母项）
 - 禁用项、destructive 变体、checkbox 勾选状态、radio 互斥值
 
 ### 明确暂缓
 
 - RTL 示例
-- 类型 ahead 搜索（快速键入匹配菜单项）
 - 自动碰撞翻转和可用高度裁剪
 - CheckboxItem 的 indeterminate 状态
 
@@ -239,5 +239,5 @@ Submenu 对应使用 `dropdown-menu-sub-trigger` 原型或
 
 ## 注意事项
 
-- RTL、类型 ahead、自动碰撞翻转、Checkbox indeterminate 暂缓，文档注意事项需说明。
+- RTL、自动碰撞翻转、Checkbox indeterminate 暂缓，文档注意事项需说明。
 - `DropdownMenuContent` 由 Portal 管理，业务代码不要手动挂到 root。

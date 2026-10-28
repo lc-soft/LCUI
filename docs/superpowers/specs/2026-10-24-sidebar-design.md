@@ -2,7 +2,7 @@
 
 ## 目标
 
-为 LCUI 增加可组合的 `sidebar` 部件族，覆盖 shadcn 侧栏的核心导航能力，并为后续将 doc-viewer 文档侧栏迁移到 Sidebar 部件提供基础。
+为 LCUI 增加可组合的 `sidebar` 部件族，覆盖 shadcn 侧栏的核心导航能力，并作为 doc-viewer 文档侧栏的基础。
 
 ## 依赖
 
@@ -26,14 +26,12 @@
 
 ### 明确暂缓
 
-- 移动端 Sheet
 - `floating` / `inset` variant
 - `SidebarInset`
 - 键盘快捷键（Ctrl/Cmd+B）
 - cookie / session 持久化
 - `useSidebar` hook
 - SidebarInput、SidebarSeparator、SidebarMenuSkeleton
-- doc-viewer 文档侧栏迁移（单独任务）
 
 ## CSS 约束
 
@@ -129,7 +127,7 @@ void ui_sidebar_provider_toggle(ui_widget_t *provider);
 
 - `sidebar-content` 负责 flex 布局和高度占位，不自动创建 ScrollArea
 - 需要滚动时由调用方在 `sidebar-content` 内组合 `ScrollArea` / `ScrollAreaContent`
-- doc-viewer 迁移时沿用现有 ScrollArea 组合
+- doc-viewer 已沿用现有 ScrollArea 组合
 
 ## 菜单激活态
 
@@ -167,7 +165,7 @@ void ui_sidebar_provider_toggle(ui_widget_t *provider);
 - MenuButton：
   - 高度 30px
   - 圆角 6px
-  - 文本 0.8rem、medium
+  - 文本 0.8rem；active 时字重为 medium
   - hover 浅灰背景
   - active 浅灰背景 + 细边框 + medium
 - icon 收起模式通过 `sidebar-provider:collapsed sidebar:icon` 隐藏 `.sidebar-menu-label`
@@ -289,7 +287,7 @@ button.sidebar-menu-button
   `sidebar-tooltip`、`active` class 约定
 - 示例使用 DropdownMenu 实现企业切换和用户菜单
 - 字段表增加 DropdownMenu 相关引用说明（Sidebar 自身字段表不变）
-- 中文确认后再同步英文
+- 中英文文档已同步
 
 ### 新增测试
 
@@ -303,20 +301,21 @@ button.sidebar-menu-button
 
 ### 暂缓
 
-- 移动端 Sheet
 - floating/inset variant
 - SidebarInset
 - 键盘快捷键和 cookie 持久化
-- doc-viewer 文档侧栏迁移
 
-## 迁移计划
+## doc-viewer 迁移（已完成）
 
-Sidebar 与 Collapsible 完成并通过文档检查后，另开任务将 doc-viewer 文档侧栏迁移到 Sidebar 部件，并保留：
+doc-viewer 文档侧栏已迁移到 Sidebar 部件，并保留：
 
-- 透明背景
+- 透明背景（`bg-transparent`）
 - 文档侧栏专用的 MenuButton `w-fit`
-- 当前 Search/Sections/分组结构
-- 现有 ScrollArea 滚动行为
+- 由 `sidebars.json` 驱动的分组结构
+- 通过 `ScrollArea` 维持滚动行为
+
+实现位于 `examples/doc-viewer/app/layout.tsx` 和
+`examples/doc-viewer/app/components/sidebar.tsx`。
 
 ## 验收
 

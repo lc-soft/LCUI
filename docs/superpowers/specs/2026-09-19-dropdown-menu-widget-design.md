@@ -1,5 +1,7 @@
 # DropdownMenu 组件设计
 
+> 本文描述 DropdownMenu 首版设计。子菜单、checkbox/radio item、快捷键展示和类型搜索已在后续版本实现，当前设计见 `2026-10-25-dropdown-menu-design.md`。
+
 ## 目标
 
 `dropdown-menu` 提供锚定触发器的平面命令菜单。

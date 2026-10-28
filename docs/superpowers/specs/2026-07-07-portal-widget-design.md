@@ -212,6 +212,6 @@ tests/integration/main.c       ← + test_portal suite（如存在）
 依据本 spec 已实现的 portal，可被以下组件复用：
 
 - **select**：select 持有 Portal 本体，Portal 拥有外树 `select-content`（详见 select 部件 spec）
-- **dropdown-menu**（未来）：dropdown-menu 持有 Portal，Portal 拥有 `dropdown-menu-content`
-- **tooltip**（未来）：tooltip 持有 Portal，Portal 拥有 `tooltip-content`
-- **popover**（未来）：popover 持有 Portal，Portal 拥有 `popover-content`
+- **dropdown-menu**：dropdown-menu 持有 Portal，Portal 拥有 `dropdown-menu-content`
+- **tooltip**：tooltip 持有 Portal，Portal 拥有 `tooltip-content`
+- **popover**：popover 持有 Portal，Portal 拥有 `popover-content`
