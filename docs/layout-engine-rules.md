@@ -1,13 +1,14 @@
 # 布局引擎规则与流程
 
 本文档汇总 LCUI 布局引擎当前**生效的规则、布局流程与已知缺口**，面向布局代码贡献者。
+引擎架构、各布局流程与测量缓存细节见 `docs/internals/layout-engine.md`。
 设计动机见 `docs/superpowers/specs/2026-07-25-layout-constraint-preservation-design.md`
 与 `docs/superpowers/specs/2026-10-11-flex-column-text-wrap-design.md`；本文只描述
 「引擎现在遵守什么」。
 
 ## 1. 值模型
 
-布局引擎区分三类值：
+布局引擎区分五类值：
 
 1. **计算样式值**：CSS 语义值（`auto`、`100%`、固定值等），存于 `computed_style`。
    `reset_size()` 会把它从 `specified_style` 恢复。
@@ -15,6 +16,11 @@
    轮次 `generation`。持久化在 widget 上，独立于 `computed_style`。
 3. **used size**：前两者经 min/max 与盒模型规则解析出的实际尺寸，落到
    `content_box` / `padding_box` / `border_box` / `outer_box`。
+4. **内在缓存**：`max_content_*`、`min_content_*`、`unconstrained_content_*`。
+   `max_content_*` 每轮都会被 used size 覆盖；有有效宽度约束时不更新
+   `unconstrained_content_*`，它是布局可用的可信内在尺寸。
+5. **测量缓存**：`measured_content_width/height` + `has_measured`。用于“在给定宽度下
+   测折行高”的快路径；`should_reflow` 或缓存宽度变化时失效。
 
 规则：
 
@@ -30,8 +36,9 @@
 
 ### 写入
 
-- 时机：flex column 容器在**主轴测量之前**，由
-  `ui_flexbox_record_width_constraints()` 为每个 in-flow 且 `width:auto` 的子项记录。
+- 时机：flex column 容器在每个子项 `reset_layout` 之后、主轴测量之前，由
+  `ui_flexbox_record_width_constraint()` 为 in-flow 且 `width:auto` 的子项记录。
+  晚于 `reset_layout` 是为了避免读到上一轮布局写入的 `margin: auto` 实际值。
 - 值：`available_width = 容器 content_box.width − margin − border − padding`
   （不小于 0）。
 - 门控：仅当容器交叉轴（宽）为确定值（`IS_CSS_FIXED_LENGTH(width)`）。
@@ -53,23 +60,26 @@
 ### 3.1 reflow 入口（`ui_flexbox_reflow`）
 
 1. `layout_generation++`。
-2. **居中列容器交叉轴重推导**：若容器是 column、`width:auto`、父级
+2. **居中列容器交叉轴重推导**：若容器是 column、`width:auto`、父级仍是 flex 容器且
    `align-items:center` 且有有效宽约束，则从约束重算 fit-content 宽并落地
    （规范 §9.4「treating used size as its definite cross size」）。
 3. 解析 row/column gap，映射 main/cross。
 4. 按主轴方向加载 min/max info。
-5. 执行六趟布局。
+5. 执行测量与布局两段。
 6. 调用 widget 的 resize 回调。
 
-### 3.2 六趟
+### 3.2 测量与布局两段
 
-1. **collect_in_flow_items**：记录宽约束（`record_width_constraints`）、测量主轴
-   尺寸；内在分行由 `collect_intrinsic_lines` 处理。
-2. **resolve_flex_basis**：在已分好的行上重解析 flex-basis。
-3. **break_into_lines**：按主轴可用尺寸分行（非内在路径）。
-4. **resolve_main_sizes**：分配主轴空间（grow/shrink/auto margin），只写尺寸。
-5. **resolve_cross_sizes**：固化交叉尺寸、定位；把宽高合并为一次条件 reflow。
-6. **out_of_flow**：布局流外（绝对定位）子项。
+1. **`ui_flexbox_measure`**：
+   - `collect_in_flow_items`：逐子项 `reset_layout` → `record_width_constraint`
+     → 首次 basis；内在分行由 `collect_intrinsic_lines` 处理。
+   - 提交主轴尺寸、解析 gap、快照 `max_main_size` / `hint_cross_size`。
+   - `resolve_flex_basis`：在已确定的主轴尺寸上重解析 basis。
+2. **`ui_flexbox_layout`**：
+   - `break_into_lines`：按主轴可用尺寸分行（非内在路径）。
+   - `resolve_main_sizes`：分配主轴空间（grow/shrink/auto margin），只写尺寸。
+   - `resolve_cross_sizes`：固化交叉尺寸、定位；把宽高合并为一次条件 reflow；
+     流外子项按文档顺序在各趟逐项布局。
 
 ### 3.3 reflow 传播
 
@@ -82,7 +92,7 @@
 
 | # | 规则 | 代码锚点 | 违反后果 |
 |---|---|---|---|
-| I1 | 约束先于主轴测量 | `record_width_constraints` 在 collect 测量前 | 文本按单行测高，折行高不传播 |
+| I1 | 约束在子项 reset_layout 之后、主轴测量之前记录 | `record_width_constraint` | 文本按单行测高，或读到陈旧的 auto margin |
 | I2 | 父级分配的宽走约束，不写子项 `computed_style` | `ui_widget_set_available_width_constraint` | 单独 reflow 被 `reset_size` 擦除，宽度漂移 |
 | I3 | 约束仅在 source/generation 有效时复用 | `ui_widget_get_available_width` | 读到过期的父级宽度 |
 | I4 | 每子项每次父布局 ≤1 次 reflow | 主轴趟只写尺寸；交叉趟 `reflow_if_size_changed` | 多轮往返、抖动 |

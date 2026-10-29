@@ -1,3 +1,17 @@
+## 内部文档索引
+
+代码机制与细节在 `docs/`，本文件保留约束与索引；修改对应代码前先读文档。
+
+| 主题 | 文档 |
+|---|---|
+| 事件循环、窗口关闭、PTK、widget↔window、尺寸 | `docs/internals/overview.md` |
+| 头文件聚合规则、settings / window state | `docs/internals/settings-and-headers.md` |
+| 实现新 widget、Portal、自绘缓存、事件与销毁 | `docs/internals/widgets.md` |
+| CSS 支持范围、优先级、常见陷阱 | `docs/internals/css.md` |
+| 布局引擎、约束模型、测量缓存 | `docs/internals/layout-engine.md` |
+| 布局不变量速查（I1–I8）与已知缺口 | `docs/layout-engine-rules.md` |
+| 布局测试写法（fixture / scene / 断言） | `docs/testing/layout-tests.md` |
+
 ## 代码格式
 
 遵循 .clang-format 文件中定义的规则，修改文件后需格式化。
@@ -108,6 +122,8 @@ emit_arg)`，不是 `ui_widget_on()` 的第四个参数。常规监听器必须�
 - 执行 `npm install` / `npm ci` 前，先检查并记录所有 lcui-toolkit 相关包的链接目标。如果它们已经链接到本地开发版，安装后必须恢复到相同目标并再次核实；如果用户曾提供本地开发版路径但链接缺失，按上一条汇报并暂停，不要执行安装。
 
 ## 测试用例
+
+> 布局测试的 fixture、scene、断言细节见 `docs/testing/layout-tests.md`。
 
 ### 归属规则
 
@@ -244,6 +260,8 @@ close->tab_index = 0;
 
 ## LCUI CSS 引擎约束
 
+> 完整选择器/属性支持范围与陷阱见 `docs/internals/css.md`。
+
 ### 选择器
 
 - 仅支持：通配符 `*`、类型 `type`、类 `.cls`、ID `#id`、后代空格 `A B`
@@ -293,6 +311,8 @@ close->tab_index = 0;
   `data-*/foo` 会提前闭合注释），否则残留文本被当作选择器解析，报 `expected selector`。
 
 ## 新组件开发
+
+> widget 实现机制、Portal、事件与销毁顺序见 `docs/internals/widgets.md`。
 
 - 新增内建部件时，必须同时提供 `include/LCUI/widgets/<name>.h` 公共 API、
   `src/widgets/<name>.c` 实现、`include/LCUI/widgets.h` 聚合导出，以及
@@ -347,6 +367,8 @@ ui_tooltip_content_prototype->setattr = ui_tooltip_content_on_set_attr;
 
 ## 浮层组件
 
+> Portal 架构与跨树通信细节见 `docs/internals/widgets.md`。
+
 - `combobox`、`dropdown-menu`、`dialog`、`alert-dialog` 等浮层必须复用 Portal，不得
   私建覆盖 root 或复制跨树事件转发逻辑。
 - Portal content 的结构所有权、定位、outside 关闭和 destroy 顺序必须通过 Portal API
@@ -356,6 +378,8 @@ ui_tooltip_content_prototype->setattr = ui_tooltip_content_on_set_attr;
   wrapper 作为 Portal content，不以 trigger 坐标定位。
 
 ## 自绘动效
+
+> 内容捕获缓存与失效测试约定见 `docs/internals/widgets.md`。
 
 - Spinner、Shimmer 等自绘动效使用 Canvas 的逻辑绘制 API 和 `lcui_request_frame()`；停止、
   隐藏或销毁时必须取消 frame。调用层不得读取或处理实际 DPI、`pd_canvas_t` 或后端像素。
