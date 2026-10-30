@@ -466,7 +466,7 @@ static void ptk_fb_window_present(ptk_window_t *wnd)
         list_destroy(&rects, free);
 }
 
-/* 软件指针由 lib/ui-cursor 绘制，此处仅记录状态供查询 */
+/* 软件指针由 lib/ui-server 绘制，此处仅记录状态供查询 */
 static void ptk_fb_window_set_cursor(ptk_window_t *wnd,
                                      ptk_cursor_type_t cursor)
 {

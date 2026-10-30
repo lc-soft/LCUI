@@ -1,5 +1,5 @@
 ﻿/*
- * lib/ui-cursor/src/cursor.c
+ * lib/ui-server/src/cursor.c
  *
  * Copyright (c) 2023-2026, Liu Chao <hello@lcui.dev> All rights reserved.
  *

@@ -8,10 +8,11 @@ target("libui-server")
     add_files("src/**.c")
     add_packages("libomp")
     add_options("with-openmp")
-    add_deps("yutil", "pandagl", "libptk", "libui", "libui-cursor")
+    add_deps("yutil", "pandagl", "libptk", "libcss", "libui")
     set_configdir("include/ui_server")
     add_configfiles("src/config.h.in")
-    add_headerfiles("include/ui_server.h", "include/(ui_server/*.h)")
+    add_headerfiles("include/ui_server.h", "include/ui_cursor.h",
+                    "include/(ui_server/*.h)")
     if is_kind("static") then
         set_configvar("LIBUI_SERVER_STATIC_BUILD", 1)
     elseif is_plat("windows") then
