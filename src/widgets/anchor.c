@@ -13,9 +13,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ui_xml.h>
-#include <worker.h>
 #include <ptk.h>
 #include <LCUI/widgets/anchor.h>
+#include <LCUI/worker.h>
 
 typedef struct xml_loader {
         /** 键，作为在视图加载完后传给事件处理器的额外参数 */
@@ -28,7 +28,6 @@ typedef struct xml_loader {
 
 static struct ui_anchor_module {
         ui_widget_prototype_t *proto;
-        worker_t *worker;
 } ui_anchor;
 
 static void xml_loader_on_widget_destroy(ui_widget_t *w, ui_event_t *e,
@@ -144,8 +143,11 @@ static void ui_anchor_on_startload(ui_widget_t *w, ui_event_t *e, void *arg)
                 return;
         }
         ui_widget_empty(target);
-        worker_post_task(ui_anchor.worker, loader,
-                         (worker_task_cb)xml_loader_load, NULL);
+        if (!lcui_worker_post_async_task(
+                loader, (lcui_worker_task_cb)xml_loader_load, NULL)) {
+                logger_error("[anchor] failed to post load task\n");
+                xml_loader_destroy(loader);
+        }
 }
 
 void ui_anchor_open(ui_widget_t *w)
@@ -179,8 +181,8 @@ void ui_anchor_open(ui_widget_t *w)
 
 static void ui_anchor_on_click(ui_widget_t *w, ui_event_t *e, void *arg)
 {
-        worker_post_task(ui_anchor.worker, w, (worker_task_cb)ui_anchor_open,
-                         NULL);
+        lcui_worker_post_async_task(w, (lcui_worker_task_cb)ui_anchor_open,
+                                    NULL);
 }
 
 static void ui_anchor_on_init(ui_widget_t *w)
@@ -195,12 +197,8 @@ void ui_register_anchor(void)
 {
         ui_anchor.proto = ui_create_widget_prototype("a", "text");
         ui_anchor.proto->init = ui_anchor_on_init;
-        ui_anchor.worker = worker_create();
-        worker_run_async(ui_anchor.worker);
 }
 
 void ui_unregister_anchor(void)
 {
-        worker_destroy(ui_anchor.worker);
-        ui_anchor.worker = NULL;
 }

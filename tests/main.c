@@ -15,6 +15,7 @@
 extern void test_settings(void);
 extern void test_clipboard(void);
 extern void test_mainloop(void);
+extern void test_worker(void);
 extern void test_router_components(void);
 extern void test_widget_event(void);
 extern void test_widget_rect(void);
@@ -63,6 +64,7 @@ static const ctest_suite_t suites[] = {
         { "settings", test_settings },
         { "clipboard", test_clipboard },
         { "mainloop", test_mainloop },
+        { "worker", test_worker },
         { "router components", test_router_components },
         { "widget event", test_widget_event },
         { "widget rect", test_widget_rect },
