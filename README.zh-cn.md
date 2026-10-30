@@ -49,12 +49,10 @@ LCUI 建立在各种库的基础之上：
 - [lib/css](./lib/css): CSS 解析器和选择引擎，提供 CSS 解析和选择能力。
 - [lib/ptk](./lib/ptk): 平台库（**P**ing **T**ai **K**u），提供跨平台统一的系统相关 API，包括消息循环、窗口管理、定时器、工作线程、输入法等。
 - [lib/thread](./lib/thread): 线程库，提供跨平台的多线程能力。
-- [lib/router](./lib/ui-router): 路由管理器，提供路由映射和导航能力。
-- [lib/worker](./lib/worker): 工作线程库，提供基础的工作线程管理和异步任务管理能力。
+- [lib/router](./lib/router): 路由管理器，提供路由映射和导航能力。
 - [lib/ui](./lib/ui): UI 核心库，提供 UI 组件管理、事件队列、样式计算、绘制等 UI 必要能力。
-- [lib/ui-xml](./lib/anchor): XML 解析库，提供从 XML 文件内容创建 UI 的能力。
-- [lib/ui-cursor](./lib/ui-cursor): 光标，提供光标绘制能力。
-- [lib/ui-server](./lib/ui-server): UI 服务器，提供将 UI 组件映射至系统窗口的能力。
+- [lib/ui-xml](./lib/ui-xml): XML 解析库，提供从 XML 文件内容创建 UI 的能力。
+- [lib/ui-server](./lib/ui-server): UI 服务器，提供将 UI 组件映射至系统窗口的能力，并包含 framebuffer 后端的光标绘制。
 
 LCUI 的核心源码位于 `src/` 目录，划分为以下几个功能模块：
 

@@ -27,7 +27,7 @@ include 它的任一子头，避免重复包含与维护错配：
 | `<LCUI/settings.h>`、`<LCUI/settings/base.h>` | `#include <LCUI/settings.h>` / `…/base.h` |
 | `<LCUI/app.h>`、`<LCUI/ui.h>`、`<LCUI/widgets.h>` | 对应子头 |
 | `<LCUI/base.h>` | `#include <LCUI/base.h>` |
-| `<css.h>`、`<pandagl.h>`、`<thread.h>`、`<worker.h>`、`<ptk.h>` | 对应子头 |
+| `<css.h>`、`<pandagl.h>`、`<thread.h>`、`<ptk.h>` | 对应子头 |
 
 正确写法：
 

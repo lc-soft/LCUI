@@ -51,12 +51,10 @@ Over time LCUI has been built up to be based on various libraries:
 - [lib/css](./lib/css): CSS parser and selector engine, enabling CSS parsing and selection functionalities.
 - [lib/ptk](./lib/ptk): Platform Toolkit library offering cross-platform unified system-related APIs, including message loops, window management, timers, worker threads, and input methods.
 - [lib/thread](./lib/thread): Thread library offering cross-platform multithreading capabilities.
-- [lib/router](./lib/ui-router): Router manager offering routing and navigation functionalities.
-- [lib/worker](./lib/worker): Worker thread library providing simple communication and management for worker threads.
+- [lib/router](./lib/router): Router manager offering routing and navigation functionalities.
 - [lib/ui](./lib/ui): Core UI library that manages UI components, event queues, style computation, drawing, and other essential UI functionalities.
 - [lib/ui-xml](./lib/ui-xml): XML parsing library enabling the creation of UI components from XML file content.
-- [lib/ui-cursor](./lib/ui-cursor): Cursor library providing cursor rendering capabilities.
-- [lib/ui-server](./lib/ui-server): UI server that maps UI components to system windows.
+- [lib/ui-server](./lib/ui-server): UI server that maps UI components to system windows, including cursor rendering for the framebuffer backend.
 
 The core source code of LCUI is located in the `src/` directory and is divided into the following modules:
 
