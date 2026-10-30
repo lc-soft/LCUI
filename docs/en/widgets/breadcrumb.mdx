@@ -1,0 +1,161 @@
+# Breadcrumb
+
+Show the current resource path as hierarchical links and collapse middle nodes when space runs out.
+
+<WidgetExample name="breadcrumb-demo" />
+
+Clicking a node shows its key below the breadcrumb; the breadcrumb itself does not navigate.
+
+## Use cases
+
+- **Use**: file browsers, documentation sites and settings pages that show where the current page sits in a hierarchy
+- **Use**: navigating from the full path back to any ancestor
+- **Don't use**: step flows or progress display (use `progress`)
+- **Don't use**: switching between sibling pages (use `sidebar` or `dropdown-menu`)
+
+## Usage
+
+```tsx
+import {
+  Breadcrumb,
+  BreadcrumbEllipsis,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@lcui/react"
+```
+
+```tsx
+<Breadcrumb path="/workspace/docs/components" />
+```
+
+The C API builds the breadcrumb by appending items and accepts custom labels:
+
+```c
+ui_breadcrumb_append_item(breadcrumb, "workspace", "Workspace");
+ui_breadcrumb_append_item(breadcrumb, "docs", "Docs");
+ui_breadcrumb_append_item(breadcrumb, "components", "Components");
+```
+
+## Composition
+
+Use the following composition to build a `Breadcrumb`:
+
+```
+Breadcrumb
+└── BreadcrumbList
+    ├── BreadcrumbItem
+    │   ├── BreadcrumbLink or BreadcrumbPage
+    │   └── BreadcrumbSeparator
+    ├── BreadcrumbItem (when collapsed)
+    │   └── BreadcrumbEllipsis
+    │       └── DropdownMenu
+    ├── BreadcrumbItem
+    │   ├── BreadcrumbLink or BreadcrumbPage
+    │   └── BreadcrumbSeparator
+    └── ...
+```
+
+Every item except the last one owns a separator; an item hidden during collapse hides its separator as well.
+
+## Examples
+
+### Basic
+
+Declares three items explicitly; the last one uses `BreadcrumbPage` and ignores clicks.
+
+<WidgetExample name="breadcrumb-basic-demo" />
+
+### Custom separator
+
+Use the root's `separator` prop to replace the automatic separator icon.
+
+<WidgetExample name="breadcrumb-separator" />
+
+### Overflow collapse
+
+When the container is too narrow, items collapse starting from the node set by `collapse-from` while keeping as many trailing items as possible. It keeps collapsing leftwards only when they still do not fit, and the last item always stays visible. Collapsed items move into the ellipsis dropdown.
+
+<WidgetExample name="breadcrumb-collapse" />
+
+### Custom items
+
+`append()` accepts any widget. When custom content should participate in the collapse dropdown and events, set `data-key` / `data-label` before appending; the content handles its own clicks.
+
+<WidgetExample name="breadcrumb-custom" />
+
+## API Reference
+
+### Breadcrumb
+
+Breadcrumb root. Owns the item model, the collapse state and the `change` event.
+
+<FieldTable name="breadcrumb" />
+
+### BreadcrumbList
+
+Item list container. The root creates one by default, so it can be omitted when items are declared explicitly.
+
+<FieldTable name="breadcrumb-list" />
+
+### BreadcrumbItem
+
+Single item container. `data-path` supplies the item key.
+
+<FieldTable name="breadcrumb-item" />
+
+### BreadcrumbLink
+
+Clickable ancestor item. Emits `change` from the root when clicked.
+
+<FieldTable name="breadcrumb-link" />
+
+### BreadcrumbPage
+
+The current item. Not clickable and emits no `change`.
+
+<FieldTable name="breadcrumb-page" />
+
+### BreadcrumbSeparator
+
+Separator between items. Renders the `chevron-right` icon by default.
+
+<FieldTable name="breadcrumb-separator" />
+
+### BreadcrumbEllipsis
+
+Collapse indicator showing the `MoreHorizontal` icon. The root inserts it automatically on overflow.
+
+<FieldTable name="breadcrumb-ellipsis" />
+
+## Caveats
+
+:::note
+**The `change` payload is the item key.** The event is emitted by the `breadcrumb` root with `emit_arg` set to `const char *key`. The key is only valid for the duration of the dispatch; copy it if you need to keep it.
+:::
+
+:::info
+**A key identifies the item name, not the full path.** The `key` passed to `append_item()` only identifies the node and may repeat. The breadcrumb never navigates or changes state based on it.
+:::
+
+:::info
+**Custom content does not emit events automatically.** Widgets appended with `append()` handle their own interaction; only standard `BreadcrumbLink` items and ellipsis dropdown entries emit `change`. The final `BreadcrumbPage` and disabled items emit nothing.
+:::
+
+:::tip
+**Prefer the C API for custom labels.** The label provider of `build_from_path()` only applies to that build call; the XML / TSX `path` prop has no provider, so labels fall back to path segments. Use explicit items or `ui_breadcrumb_build_from_path()` when you need custom labels.
+:::
+
+:::tip
+**For an item switcher menu, compose a `DropdownMenu` inside the item.** The ellipsis in the demo above is a `BreadcrumbItem` + `DropdownMenu`; no dedicated API is required.
+:::
+
+:::tip
+**Declarative usage is static by default.** Writing `BreadcrumbItem` and `BreadcrumbLink` in XML / TSX needs no `data-*`; add `data-path` / `data-key` / `data-label` or use the C API only when you need the `change` event or collapse labels.
+:::
+
+:::caution
+**Explicit mode does not insert separators automatically.** Put `BreadcrumbSeparator` inside the matching item; it hides together with the item on collapse. `data-*` is only used for behavior lookup, not CSS selectors — style with classes or the `breadcrumb-item:collapsed` status.
+:::

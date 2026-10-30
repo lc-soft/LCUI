@@ -59,6 +59,7 @@ void lcui_widgets_init(void)
         ui_register_tooltip();
         ui_register_popover();
         ui_register_toast();
+        ui_register_breadcrumb();
 
         /* The theme layer loads last so its rules win over each widget's own
          * default CSS at equal specificity, letting style-nova.css refine the
@@ -75,4 +76,5 @@ void lcui_widgets_destroy(void)
         ui_unregister_tooltip();
         ui_unregister_popover();
         ui_unregister_dropdown_menu();
+        ui_unregister_breadcrumb();
 }

@@ -787,6 +787,38 @@ dropdown-menu-radio-item:checked .dropdown-menu-indicator {
   visibility: visible;
 }
 
+/* breadcrumb: structural rules live in src/widgets/breadcrumb.c */
+
+breadcrumb {
+  @apply text-sm;
+}
+
+breadcrumb-link {
+  @apply text-muted-foreground;
+  cursor: pointer;
+}
+
+breadcrumb-link:hover {
+  @apply text-foreground;
+}
+
+breadcrumb-page {
+  @apply text-foreground font-medium;
+}
+
+breadcrumb-separator,
+breadcrumb-ellipsis {
+  @apply text-muted-foreground;
+}
+
+breadcrumb-ellipsis {
+  border-radius: 4px;
+}
+
+breadcrumb-ellipsis:hover {
+  @apply bg-muted text-foreground;
+}
+
 /* toast: structural rules live in src/widgets/toast.c */
 
 toast-viewport {

@@ -56,6 +56,7 @@ extern void test_spinner_perf(void);
 extern void test_shimmer(void);
 extern void test_style_nova(void);
 extern void test_toast(void);
+extern void test_breadcrumb(void);
 
 static const ctest_suite_t suites[] = {
         { "settings", test_settings },
@@ -102,6 +103,7 @@ static const ctest_suite_t suites[] = {
         { "shimmer", test_shimmer },
         { "style nova", test_style_nova },
         { "toast", test_toast },
+        { "breadcrumb", test_breadcrumb },
         { NULL, NULL }
 };
 

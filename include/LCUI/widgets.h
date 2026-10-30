@@ -42,3 +42,4 @@
 #include "widgets/tooltip.h"
 #include "widgets/popover.h"
 #include "widgets/toast.h"
+#include "widgets/breadcrumb.h"

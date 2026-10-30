@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <breadcrumb class="breadcrumb-collapse-demo"
+               path="/workspace/projects/lcui/components/breadcrumb/navigation" />
+  </ui>
+</lcui-app>

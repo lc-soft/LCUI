@@ -903,6 +903,33 @@ static const struct {
         { "  visibility: visible;\n", 23 },
         { "}\n", 2 },
         { "\n", 1 },
+        { "breadcrumb {\n", 13 },
+        { "  font-size: 14px;\n", 19 },
+        { "  line-height: 20px;\n", 21 },
+        { "}\n", 2 },
+        { "breadcrumb-link {\n", 18 },
+        { "  color: #666666;\n", 18 },
+        { "  cursor: pointer;\n", 19 },
+        { "}\n", 2 },
+        { "breadcrumb-link:hover {\n", 24 },
+        { "  color: #000;\n", 15 },
+        { "}\n", 2 },
+        { "breadcrumb-page {\n", 18 },
+        { "  font-weight: 500;\n", 20 },
+        { "  color: #000;\n", 15 },
+        { "}\n", 2 },
+        { "breadcrumb-separator,\n", 22 },
+        { "breadcrumb-ellipsis {\n", 22 },
+        { "  color: #666666;\n", 18 },
+        { "}\n", 2 },
+        { "breadcrumb-ellipsis {\n", 22 },
+        { "  border-radius: 4px;\n", 22 },
+        { "}\n", 2 },
+        { "breadcrumb-ellipsis:hover {\n", 28 },
+        { "  background-color: #f5f5f5;\n", 29 },
+        { "  color: #000;\n", 15 },
+        { "}\n", 2 },
+        { "\n", 1 },
         { "toast-viewport {\n", 17 },
         { "  z-index: 10000;\n", 18 },
         { "}\n", 2 },
@@ -1415,7 +1442,7 @@ static const struct {
         { "  color: #000;\n", 15 },
         { "}\n", 2 },
 };
-static const size_t css_str_style_nova_total_length = 25548;
+static const size_t css_str_style_nova_total_length = 25941;
 static inline void ui_load_css_string_style_nova_chunks(void)
 {
         size_t i;

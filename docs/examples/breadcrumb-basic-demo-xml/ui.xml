@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <breadcrumb class="breadcrumb-basic-demo">
+      <breadcrumb-item data-path="/">
+        <breadcrumb-link>Home</breadcrumb-link>
+        <breadcrumb-separator />
+      </breadcrumb-item>
+      <breadcrumb-item data-path="/components">
+        <breadcrumb-link>Components</breadcrumb-link>
+        <breadcrumb-separator />
+      </breadcrumb-item>
+      <breadcrumb-item data-path="/components/breadcrumb">
+        <breadcrumb-page>Breadcrumb</breadcrumb-page>
+      </breadcrumb-item>
+    </breadcrumb>
+  </ui>
+</lcui-app>

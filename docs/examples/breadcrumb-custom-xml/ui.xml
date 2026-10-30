@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <breadcrumb class="breadcrumb-custom-demo">
+      <breadcrumb-item data-path="/home">
+        <breadcrumb-link>Home</breadcrumb-link>
+        <breadcrumb-separator />
+      </breadcrumb-item>
+      <breadcrumb-item data-path="/home/components">
+        <breadcrumb-link>Components</breadcrumb-link>
+        <breadcrumb-separator />
+      </breadcrumb-item>
+      <breadcrumb-item data-key="settings" data-label="Settings">
+        <button variant="ghost" size="sm">Settings</button>
+      </breadcrumb-item>
+    </breadcrumb>
+  </ui>
+</lcui-app>

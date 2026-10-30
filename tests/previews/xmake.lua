@@ -6,7 +6,8 @@ local previews = {
     "spinner_perf",
     "shimmer",
     "scrollbar",
-    "cursor"
+    "cursor",
+    "breadcrumb"
 }
 
 for _, topic in ipairs(previews) do

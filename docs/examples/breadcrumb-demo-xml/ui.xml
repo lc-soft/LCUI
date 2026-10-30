@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <div class="breadcrumb-demo">
+      <breadcrumb>
+        <breadcrumb-item data-path="/">
+          <breadcrumb-link>Home</breadcrumb-link>
+          <breadcrumb-separator />
+        </breadcrumb-item>
+        <breadcrumb-item>
+          <dropdown-menu>
+            <dropdown-menu-trigger>
+              <button variant="ghost" size="icon-sm">
+                <breadcrumb-ellipsis />
+              </button>
+            </dropdown-menu-trigger>
+            <dropdown-menu-content align="start">
+              <dropdown-menu-group>
+                <dropdown-menu-item>Documentation</dropdown-menu-item>
+                <dropdown-menu-item>Themes</dropdown-menu-item>
+                <dropdown-menu-item>GitHub</dropdown-menu-item>
+              </dropdown-menu-group>
+            </dropdown-menu-content>
+          </dropdown-menu>
+          <breadcrumb-separator />
+        </breadcrumb-item>
+        <breadcrumb-item data-path="/components">
+          <breadcrumb-link>Components</breadcrumb-link>
+          <breadcrumb-separator />
+        </breadcrumb-item>
+        <breadcrumb-item data-path="/components/breadcrumb">
+          <breadcrumb-page>Breadcrumb</breadcrumb-page>
+        </breadcrumb-item>
+      </breadcrumb>
+      <text class="breadcrumb-demo-status">Selected: -</text>
+    </div>
+  </ui>
+</lcui-app>

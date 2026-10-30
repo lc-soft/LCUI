@@ -168,7 +168,7 @@ p {
   @apply text-gray-400;
 
   flex-shrink: 0;
-  width: 80px;
+  width: 40px;
   padding-right: 12px;
   text-align: right;
   line-height: 20px;
@@ -696,4 +696,20 @@ li {
   display: block;
   font-size: 13px;
   color: #666666;
+}
+
+.breadcrumb-collapse-demo {
+  width: 320px;
+}
+
+.breadcrumb-demo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+.breadcrumb-demo-status {
+  color: #666666;
+  font-size: 13px;
 }

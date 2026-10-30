@@ -1,0 +1,161 @@
+# Breadcrumb
+
+用层级链接展示当前资源所在的路径，并在空间不足时自动折叠中间节点。
+
+<WidgetExample name="breadcrumb-demo" />
+
+点击任意节点后，下方会显示该节点对应的 key；面包屑本身不会自动导航。
+
+## 适用场景
+
+- **适用**：文件浏览器、文档站、设置页等需要展示当前位置层级的页面
+- **适用**：需要从完整路径快速回退到任意上级节点的导航
+- **不适用**：步骤流程或进度展示（使用 `progress`）
+- **不适用**：同级页面之间的切换（使用 `sidebar` 或 `dropdown-menu`）
+
+## 用法
+
+```tsx
+import {
+  Breadcrumb,
+  BreadcrumbEllipsis,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@lcui/react"
+```
+
+```tsx
+<Breadcrumb path="/workspace/docs/components" />
+```
+
+C API 通过追加节点构建，可以传入自定义标签：
+
+```c
+ui_breadcrumb_append_item(breadcrumb, "workspace", "工作区");
+ui_breadcrumb_append_item(breadcrumb, "docs", "项目文档");
+ui_breadcrumb_append_item(breadcrumb, "components", "组件库");
+```
+
+## 组合
+
+使用以下组合来构建 `Breadcrumb`：
+
+```
+Breadcrumb
+└── BreadcrumbList
+    ├── BreadcrumbItem
+    │   ├── BreadcrumbLink 或 BreadcrumbPage
+    │   └── BreadcrumbSeparator
+    ├── BreadcrumbItem（折叠时）
+    │   └── BreadcrumbEllipsis
+    │       └── DropdownMenu
+    ├── BreadcrumbItem
+    │   ├── BreadcrumbLink 或 BreadcrumbPage
+    │   └── BreadcrumbSeparator
+    └── ...
+```
+
+除最后一项外，每个 item 自带一个分隔符；折叠时被隐藏的 item 会连同分隔符一起隐藏。
+
+## 示例
+
+### 基础
+
+显式声明三个节点；最后一项使用 `BreadcrumbPage`，不响应点击。
+
+<WidgetExample name="breadcrumb-basic-demo" />
+
+### 自定义分隔符
+
+通过根节点的 `separator` 属性替换自动分隔符的图标。
+
+<WidgetExample name="breadcrumb-separator" />
+
+### 溢出折叠
+
+容器宽度不足时，从 `collapse-from` 指定的节点开始折叠，并尽可能多地保留尾部节点；只有仍然放不下时才继续向左折叠，最后一个节点始终显示。折叠后的节点收进省略号下拉菜单。
+
+<WidgetExample name="breadcrumb-collapse" />
+
+### 自定义节点
+
+`append()` 可以追加任意 widget。自定义内容需要参与折叠下拉和事件时，在追加前设置 `data-key` / `data-label`；其点击行为由内容自己处理。
+
+<WidgetExample name="breadcrumb-custom" />
+
+## API 参考
+
+### Breadcrumb
+
+面包屑根节点，持有节点模型、折叠状态和 `change` 事件。
+
+<FieldTable name="breadcrumb" />
+
+### BreadcrumbList
+
+节点列表容器；根节点默认创建一个，显式声明时可以省略。
+
+<FieldTable name="breadcrumb-list" />
+
+### BreadcrumbItem
+
+单个节点容器，通过 `data-path` 提供节点 key。
+
+<FieldTable name="breadcrumb-item" />
+
+### BreadcrumbLink
+
+可点击的上级节点，点击后从根节点发出 `change`。
+
+<FieldTable name="breadcrumb-link" />
+
+### BreadcrumbPage
+
+当前节点，不可点击，也不发出 `change`。
+
+<FieldTable name="breadcrumb-page" />
+
+### BreadcrumbSeparator
+
+节点之间的分隔符，默认渲染 `chevron-right` 图标。
+
+<FieldTable name="breadcrumb-separator" />
+
+### BreadcrumbEllipsis
+
+折叠指示器，显示 `MoreHorizontal` 图标；由根节点在溢出时自动插入。
+
+<FieldTable name="breadcrumb-ellipsis" />
+
+## 注意事项
+
+:::note
+**`change` 的载荷是节点 key**。事件从 `breadcrumb` 根节点发出，`emit_arg` 为 `const char *key`；key 只在本次分发期间有效，需要长期保存时请自行复制。
+:::
+
+:::info
+**key 表示节点名，不是完整路径**。`append_item()` 的 `key` 只用于标识节点，允许重复；面包屑不会根据 key 自动导航，也不会修改自身状态。
+:::
+
+:::info
+**自定义内容不自动发事件**。通过 `append()` 追加的 widget 由调用方处理交互；只有标准 `BreadcrumbLink` 和省略号下拉项会发出 `change`。最后一项 `BreadcrumbPage` 与禁用 item 同样不发出。
+:::
+
+:::tip
+**自定义标签优先使用 C API**。`build_from_path()` 的 label provider 只在本次构建调用中生效；XML / TSX 的 `path` 属性没有 provider，标签回退为路径段。需要自定义标签时，使用显式 item 或 `ui_breadcrumb_build_from_path()`。
+:::
+
+:::tip
+**需要「节点切换菜单」时，在 item 内组合 `DropdownMenu`**。顶部示例中的省略号就是一个 `BreadcrumbItem` + `DropdownMenu`，无需额外的专用 API。
+:::
+
+:::tip
+**声明式写法默认是静态展示**。XML / TSX 里直接写 `BreadcrumbItem` 和 `BreadcrumbLink` 即可，不需要 `data-*`；只有需要 `change` 事件或折叠下拉标签时，才在 item 上设置 `data-path` / `data-key` / `data-label`，或改用 C API。
+:::
+
+:::caution
+**显式模式不会自动插入分隔符**。调用方需要把 `BreadcrumbSeparator` 放在对应 item 内部；折叠时它会随 item 一起隐藏。`data-*` 只用于行为查找，不参与 CSS 选择器，样式请使用 class 或 `breadcrumb-item:collapsed` 状态。
+:::

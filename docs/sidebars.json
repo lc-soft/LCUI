@@ -36,6 +36,7 @@
         { "slug": "attachment", "label": { "en": "Attachment", "zh-CN": "Attachment 附件" } },
         { "slug": "alert-dialog", "label": { "en": "AlertDialog", "zh-CN": "AlertDialog 确认对话框" } },
         { "slug": "badge", "label": { "en": "Badge", "zh-CN": "Badge 徽标" } },
+        { "slug": "breadcrumb", "label": { "en": "Breadcrumb", "zh-CN": "Breadcrumb 面包屑" } },
         { "slug": "button", "label": { "en": "Button", "zh-CN": "Button 按钮" } },
         { "slug": "card", "label": { "en": "Card", "zh-CN": "Card 卡片" } },
         { "slug": "checkbox", "label": { "en": "Checkbox", "zh-CN": "Checkbox 复选框" } },
