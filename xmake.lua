@@ -18,7 +18,6 @@ add_includedirs(
     "lib/ui/include",
     "lib/ui-server/include",
     "lib/ui-xml/include",
-    "lib/ui-router/include",
     "include",
     {public = true}
 )
@@ -110,7 +109,6 @@ target("lcui")
         "libui",
         "libui-server",
         "librouter",
-        "libui-router",
         "libui-xml"
     )
     add_headerfiles("include/LCUI.h", "include/(LCUI/**.h)")

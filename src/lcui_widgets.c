@@ -11,7 +11,6 @@
 
 #include <LCUI/widgets.h>
 #include <ui/css.h>
-#include <ui_router.h>
 
 #include "styles/style-nova.css.h"
 

@@ -21,6 +21,7 @@
 #include "widgets/select.h"
 #include "widgets/sidebar.h"
 #include "widgets/portal.h"
+#include "widgets/router.h"
 #include "widgets/textinput.h"
 #include "widgets/textcaret.h"
 #include "widgets/label.h"

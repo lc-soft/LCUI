@@ -1,5 +1,5 @@
 ﻿/*
- * lib/ui-router/src/view.c
+ * src/widgets/router_view.c: -- Router view widget
  *
  * Copyright (c) 2023-2026, Liu Chao <hello@lcui.dev> All rights reserved.
  *
@@ -9,9 +9,12 @@
  * in the LICENSE.TXT file in the root directory of this source tree.
  */
 
-#include <ui.h>
+#include <yutil.h>
 #include <router.h>
-#include <ui_router/view.h>
+#include <ui/base.h>
+#include <ui/events.h>
+#include <ui/prototype.h>
+#include <LCUI/widgets/router.h>
 
 typedef struct ui_router_view {
         size_t index;

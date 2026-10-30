@@ -2,7 +2,7 @@
 #include <router.h>
 #include <ctest.h>
 #include <LCUI/widgets.h>
-#include <ui_router.h>
+#include <LCUI/widgets/router.h>
 
 void test_router_components(void)
 {
