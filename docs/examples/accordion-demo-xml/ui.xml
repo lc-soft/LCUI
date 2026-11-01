@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <accordion class="accordion-demo" default-value="shipping">
+      <accordion-item value="shipping">
+        <accordion-trigger>
+          <text>What are your shipping options?</text>
+        </accordion-trigger>
+        <accordion-content>
+          <text>
+            We offer standard (5-7 days), express (2-3 days), and overnight
+            shipping. Free shipping on international orders.
+          </text>
+        </accordion-content>
+      </accordion-item>
+      <accordion-item value="returns">
+        <accordion-trigger>
+          <text>What is your return policy?</text>
+        </accordion-trigger>
+        <accordion-content>
+          <text>
+            Returns accepted within 30 days. Items must be unused and in
+            original packaging. Refunds processed within 5-7 business days.
+          </text>
+        </accordion-content>
+      </accordion-item>
+      <accordion-item value="support">
+        <accordion-trigger>
+          <text>How can I contact customer support?</text>
+        </accordion-trigger>
+        <accordion-content>
+          <text>
+            Reach us via email, live chat, or phone. We respond within 24
+            hours during business days.
+          </text>
+        </accordion-content>
+      </accordion-item>
+    </accordion>
+  </ui>
+</lcui-app>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <accordion class="accordion-basic-demo" default-value="item-1">
+      <accordion-item value="item-1">
+        <accordion-trigger>
+          <text>How do I reset my password?</text>
+        </accordion-trigger>
+        <accordion-content>
+          <text>
+            Click on 'Forgot Password' on the login page, enter your email
+            address, and we'll send you a link to reset your password. The
+            link will expire in 24 hours.
+          </text>
+        </accordion-content>
+      </accordion-item>
+      <accordion-item value="item-2">
+        <accordion-trigger>
+          <text>Can I change my subscription plan?</text>
+        </accordion-trigger>
+        <accordion-content>
+          <text>
+            Yes, you can upgrade or downgrade your plan at any time from your
+            account settings. Changes will be reflected in your next billing
+            cycle.
+          </text>
+        </accordion-content>
+      </accordion-item>
+      <accordion-item value="item-3">
+        <accordion-trigger>
+          <text>What payment methods do you accept?</text>
+        </accordion-trigger>
+        <accordion-content>
+          <text>
+            We accept all major credit cards, PayPal, and bank transfers. All
+            payments are processed securely through our payment partners.
+          </text>
+        </accordion-content>
+      </accordion-item>
+    </accordion>
+  </ui>
+</lcui-app>

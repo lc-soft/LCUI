@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <accordion class="accordion-multiple-demo" multiple="true"
+               default-value="notifications">
+      <accordion-item value="notifications">
+        <accordion-trigger>
+          <text>Notification Settings</text>
+        </accordion-trigger>
+        <accordion-content>
+          <text>
+            Manage how you receive notifications. You can enable email alerts
+            for updates or push notifications for mobile devices.
+          </text>
+        </accordion-content>
+      </accordion-item>
+      <accordion-item value="privacy">
+        <accordion-trigger>
+          <text>Privacy &amp; Security</text>
+        </accordion-trigger>
+        <accordion-content>
+          <text>
+            Control your privacy settings and security preferences. Enable
+            two-factor authentication, manage connected devices, review
+            active sessions, and configure data sharing preferences. You can
+            also download your data or delete your account.
+          </text>
+        </accordion-content>
+      </accordion-item>
+      <accordion-item value="billing">
+        <accordion-trigger>
+          <text>Billing &amp; Subscription</text>
+        </accordion-trigger>
+        <accordion-content>
+          <text>
+            View your current plan, payment history, and upcoming invoices.
+            Update your payment method, change your subscription tier, or
+            cancel your subscription.
+          </text>
+        </accordion-content>
+      </accordion-item>
+    </accordion>
+  </ui>
+</lcui-app>

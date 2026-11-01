@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <card class="accordion-card-demo">
+      <card-header>
+        <card-title>Subscription &amp; Billing</card-title>
+        <card-description>
+          Common questions about your account, plans, payments and
+          cancellations.
+        </card-description>
+      </card-header>
+      <card-content>
+        <accordion default-value="plans">
+          <accordion-item value="plans">
+            <accordion-trigger>
+              <text>What subscription plans do you offer?</text>
+            </accordion-trigger>
+            <accordion-content>
+              <text>
+                We offer three subscription tiers: Starter ($9/month),
+                Professional ($29/month), and Enterprise ($99/month). Each
+                plan includes increasing storage limits, API access, priority
+                support, and team collaboration features.
+              </text>
+            </accordion-content>
+          </accordion-item>
+          <accordion-item value="billing">
+            <accordion-trigger>
+              <text>How does billing work?</text>
+            </accordion-trigger>
+            <accordion-content>
+              <text>
+                Billing occurs automatically at the start of each billing
+                cycle. We accept all major credit cards, PayPal, and ACH
+                transfers for enterprise customers. You'll receive an
+                invoice via email after each payment.
+              </text>
+            </accordion-content>
+          </accordion-item>
+          <accordion-item value="cancel">
+            <accordion-trigger>
+              <text>How do I cancel my subscription?</text>
+            </accordion-trigger>
+            <accordion-content>
+              <text>
+                You can cancel your subscription anytime from your account
+                settings. There are no cancellation fees or penalties. Your
+                access will continue until the end of your current billing
+                period.
+              </text>
+            </accordion-content>
+          </accordion-item>
+        </accordion>
+      </card-content>
+    </card>
+  </ui>
+</lcui-app>

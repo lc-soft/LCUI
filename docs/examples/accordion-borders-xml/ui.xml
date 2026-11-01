@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <accordion class="accordion-borders-demo" default-value="billing">
+      <accordion-item value="billing" class="accordion-borders-item">
+        <accordion-trigger>
+          <text>How does billing work?</text>
+        </accordion-trigger>
+        <accordion-content>
+          <text>
+            We offer monthly and annual subscription plans. Billing is charged
+            at the beginning of each cycle, and you can cancel anytime. All
+            plans include automatic backups, 24/7 support, and unlimited team
+            members.
+          </text>
+        </accordion-content>
+      </accordion-item>
+      <accordion-item value="security" class="accordion-borders-item">
+        <accordion-trigger>
+          <text>Is my data secure?</text>
+        </accordion-trigger>
+        <accordion-content>
+          <text>
+            Yes. We use end-to-end encryption, SOC 2 Type II compliance, and
+            regular third-party security audits. All data is encrypted at rest
+            and in transit using industry-standard protocols.
+          </text>
+        </accordion-content>
+      </accordion-item>
+      <accordion-item value="integration" class="accordion-borders-item">
+        <accordion-trigger>
+          <text>What integrations do you support?</text>
+        </accordion-trigger>
+        <accordion-content>
+          <text>
+            We integrate with 500+ popular tools including Slack, Zapier,
+            Salesforce, HubSpot, and more. You can also build custom
+            integrations using our REST API and webhooks.
+          </text>
+        </accordion-content>
+      </accordion-item>
+    </accordion>
+  </ui>
+</lcui-app>

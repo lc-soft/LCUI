@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <accordion class="accordion-disabled-demo">
+      <accordion-item value="item-1">
+        <accordion-trigger>
+          <text>Can I access my account history?</text>
+        </accordion-trigger>
+        <accordion-content>
+          <text>
+            Yes, you can view your complete account history including all
+            transactions, plan changes, and support tickets in the Account
+            History section of your dashboard.
+          </text>
+        </accordion-content>
+      </accordion-item>
+      <accordion-item value="item-2" disabled="true">
+        <accordion-trigger>
+          <text>Premium feature information</text>
+        </accordion-trigger>
+        <accordion-content>
+          <text>
+            This section contains information about premium features. Upgrade
+            your plan to access this content.
+          </text>
+        </accordion-content>
+      </accordion-item>
+      <accordion-item value="item-3">
+        <accordion-trigger>
+          <text>How do I update my email address?</text>
+        </accordion-trigger>
+        <accordion-content>
+          <text>
+            You can update your email address in your account settings.
+            You'll receive a verification email at your new address to confirm
+            the change.
+          </text>
+        </accordion-content>
+      </accordion-item>
+    </accordion>
+  </ui>
+</lcui-app>

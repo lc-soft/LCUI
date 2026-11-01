@@ -1,0 +1,134 @@
+# Accordion
+
+垂直堆叠的多组标题与内容，用于一次展开一个或多个分区。
+
+<WidgetExample name="accordion-demo" />
+
+## 适用场景
+
+- **适用**：FAQ、设置分组、账单说明等需要按标题展开内容的页面
+- **适用**：内容较长但同一时间只需阅读其中一部分
+- **不适用**：需要并排切换的选项卡（使用 `select` 或后续 tabs 部件）
+- **不适用**：需要模态确认或阻断操作的场景（使用 `dialog`）
+
+## 用法
+
+```tsx
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@lcui/react"
+```
+
+```tsx
+<Accordion defaultValue="shipping">
+  <AccordionItem value="shipping">
+    <AccordionTrigger>What are your shipping options?</AccordionTrigger>
+    <AccordionContent>
+      We offer standard, express, and overnight shipping.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+```
+
+## 组合
+
+使用以下组合来构建 `Accordion`：
+
+```
+Accordion
+├── AccordionItem
+│   ├── AccordionTrigger
+│   └── AccordionContent
+└── AccordionItem
+    ├── AccordionTrigger
+    └── AccordionContent
+```
+
+## 示例
+
+### 基础
+
+单开模式，默认展开第一项；再次点击已展开项会收起。
+
+<WidgetExample name="accordion-basic-demo" />
+
+### 多开
+
+设置 `multiple` 后，各项独立展开，可同时打开多个分区。
+
+<WidgetExample name="accordion-multiple" />
+
+### 禁用
+
+在 `AccordionItem` 上设置 `disabled`，该项的点击和 Enter/Space 都不会切换。
+
+<WidgetExample name="accordion-disabled" />
+
+### 边框
+
+主题已为 item 提供底部分隔线；示例额外给根节点加外边框和圆角，并给 item 加水平内边距。
+
+<WidgetExample name="accordion-borders" />
+
+### 卡片
+
+将 Accordion 放进 Card，用于账单、订阅等设置区块。
+
+<WidgetExample name="accordion-card" />
+
+### 自定义触发器
+
+需要完全自定义标题栏时，可以不用 `AccordionTrigger`，在任意 item 后代上声明 `data-accordion-trigger="true"`。此时不会自动创建箭头，焦点与展开/收起视觉由调用方负责。
+
+<WidgetExample name="accordion-custom-trigger" />
+
+## API 参考
+
+### Accordion
+
+手风琴根节点，管理展开集合、单开/多开和 `change` 事件。
+
+<FieldTable name="accordion" />
+
+### AccordionItem
+
+单个分区，持有 `open` 状态和节点 `value`。
+
+<FieldTable name="accordion-item" />
+
+### AccordionTrigger
+
+标题行，默认带有右侧箭头；`chevron="false"` 可关闭。
+
+<FieldTable name="accordion-trigger" />
+
+### AccordionContent
+
+分区内容，item 为 closed 时不参与显示。
+
+<FieldTable name="accordion-content" />
+
+## 注意事项
+
+:::note
+**没有展开/收起动画**。LCUI 的 CSS 引擎不支持 transition/animation，状态切换是瞬时的。
+:::
+
+:::info
+**初始化不触发事件**。`defaultValue` / `value` 以及解析阶段的 item `open` 只同步状态；用户点击、Enter/Space 或 `ui_accordion_item_set_open()` 才会发出 `change`。`ui_accordion_set_value()` 是静默的受控同步。
+:::
+
+:::info
+**`change` 载荷是本次切换项的 value**。root 的 `value` 属性保存完整集合（逗号分隔），监听器中可读取 `ui_accordion_get_value(root)`；一次设置多个值时不会逐个发事件。
+:::
+
+:::tip
+**`data-accordion-trigger` 是 LCUI 扩展**。它只作为行为标记，不参与 CSS 选择器；自定义触发器需要自行设置焦点，并用 `accordion-item:open` / `accordion-item:closed` 写展开状态样式。
+:::
+
+:::caution
+**键盘只支持 Enter/Space**。trigger 可通过 Tab 聚焦，未实现方向键、Home/End 的 roving tabindex。单开模式自动关闭其它项时，被关闭项不会额外发出 `open`/`close`。
+:::

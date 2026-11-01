@@ -1,0 +1,134 @@
+# Accordion
+
+Vertically stacked sections with headers and content, expanding one or more panels at a time.
+
+<WidgetExample name="accordion-demo" />
+
+## Use cases
+
+- **Suitable**: FAQ pages, grouped settings, billing details, and other pages where content is revealed by a header
+- **Suitable**: Long content where only part of it needs to be read at a time
+- **Not suitable**: Side-by-side tabs (use `select` or a future tabs widget)
+- **Not suitable**: Modal confirmation or blocking flows (use `dialog`)
+
+## Usage
+
+```tsx
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@lcui/react"
+```
+
+```tsx
+<Accordion defaultValue="shipping">
+  <AccordionItem value="shipping">
+    <AccordionTrigger>What are your shipping options?</AccordionTrigger>
+    <AccordionContent>
+      We offer standard, express, and overnight shipping.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+```
+
+## Composition
+
+Use the following composition to build an `Accordion`:
+
+```
+Accordion
+├── AccordionItem
+│   ├── AccordionTrigger
+│   └── AccordionContent
+└── AccordionItem
+    ├── AccordionTrigger
+    └── AccordionContent
+```
+
+## Examples
+
+### Basic
+
+Single-open mode with the first item expanded by default; clicking an expanded item collapses it.
+
+<WidgetExample name="accordion-basic-demo" />
+
+### Multiple
+
+With `multiple`, each item expands independently and several sections can be open at once.
+
+<WidgetExample name="accordion-multiple" />
+
+### Disabled
+
+Set `disabled` on an `AccordionItem` to ignore click and Enter/Space for that item.
+
+<WidgetExample name="accordion-disabled" />
+
+### Borders
+
+The theme already gives each item a bottom divider; the example adds an outer border and rounded corners to the root and horizontal padding to each item.
+
+<WidgetExample name="accordion-borders" />
+
+### Card
+
+Place the Accordion inside a Card for billing, subscription, and other settings blocks.
+
+<WidgetExample name="accordion-card" />
+
+### Custom trigger
+
+When the header needs full custom markup, skip `AccordionTrigger` and declare `data-accordion-trigger="true"` on any item descendant. No chevron is created automatically; focus and expanded/collapsed visuals are the caller's responsibility.
+
+<WidgetExample name="accordion-custom-trigger" />
+
+## API Reference
+
+### Accordion
+
+The accordion root, which manages the open set, single/multiple mode, and the `change` event.
+
+<FieldTable name="accordion" />
+
+### AccordionItem
+
+A single section that holds its `open` state and item `value`.
+
+<FieldTable name="accordion-item" />
+
+### AccordionTrigger
+
+The header row with a chevron on the right by default; set `chevron="false"` to remove it.
+
+<FieldTable name="accordion-trigger" />
+
+### AccordionContent
+
+The section content; it does not participate in display while the item is closed.
+
+<FieldTable name="accordion-content" />
+
+## Caveats
+
+:::note
+**No expand/collapse animation**. LCUI's CSS engine does not support transitions or animations, so state changes are instant.
+:::
+
+:::info
+**Initialization does not emit events**. `defaultValue` / `value` and item `open` during parsing only synchronize state; `change` is emitted only for user clicks, Enter/Space, or `ui_accordion_item_set_open()`. `ui_accordion_set_value()` is a silent controlled sync.
+:::
+
+:::info
+**The `change` payload is the value of the toggled item**. The root `value` attribute holds the full comma-separated set; read it with `ui_accordion_get_value(root)` inside a listener. Setting multiple values at once does not emit one event per item.
+:::
+
+:::tip
+**`data-accordion-trigger` is an LCUI extension**. It is a behavior marker only and does not participate in CSS selectors; custom triggers must handle focus themselves and use `accordion-item:open` / `accordion-item:closed` for expanded-state styles.
+:::
+
+:::caution
+**Keyboard support is limited to Enter/Space**. Triggers can be focused with Tab; arrow keys and Home/End roving tabindex are not implemented. When single mode auto-closes other items, those items do not emit additional `open`/`close` events.
+:::

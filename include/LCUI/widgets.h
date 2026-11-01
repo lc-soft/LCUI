@@ -31,6 +31,7 @@
 #include "widgets/icon.h"
 #include "widgets/badge.h"
 #include "widgets/card.h"
+#include "widgets/accordion.h"
 #include "widgets/collapsible.h"
 #include "widgets/dropdown_menu.h"
 #include "widgets/alert.h"

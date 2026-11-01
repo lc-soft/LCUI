@@ -47,6 +47,7 @@ void lcui_widgets_init(void)
         ui_register_field_title();
         ui_register_badge();
         ui_register_card();
+        ui_register_accordion();
         ui_register_collapsible();
         ui_register_dropdown_menu();
         ui_register_alert();

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <accordion class="accordion-custom-trigger-demo" default-value="account">
+      <accordion-item value="account">
+        <button variant="ghost" size="sm" data-accordion-trigger="true">
+          Account settings
+        </button>
+        <accordion-content>
+          <text>
+            Update your profile, email address, and password from the account
+            settings panel.
+          </text>
+        </accordion-content>
+      </accordion-item>
+      <accordion-item value="billing">
+        <accordion-trigger>
+          <text>Billing &amp; invoices</text>
+        </accordion-trigger>
+        <accordion-content>
+          <text>
+            View invoices, update your payment method, or download receipts
+            for your records.
+          </text>
+        </accordion-content>
+      </accordion-item>
+    </accordion>
+  </ui>
+</lcui-app>

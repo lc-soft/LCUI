@@ -31,6 +31,7 @@
       "slug": "widgets",
       "label": { "en": "Widgets", "zh-CN": "组件" },
       "items": [
+        { "slug": "accordion", "label": { "en": "Accordion", "zh-CN": "Accordion 手风琴" } },
         { "slug": "anchor", "label": { "en": "Anchor", "zh-CN": "Anchor 锚点" } },
         { "slug": "alert", "label": { "en": "Alert", "zh-CN": "Alert 提示" } },
         { "slug": "attachment", "label": { "en": "Attachment", "zh-CN": "Attachment 附件" } },

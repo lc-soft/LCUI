@@ -713,3 +713,30 @@ li {
   color: #666666;
   font-size: 13px;
 }
+
+.accordion-demo {
+  width: 512px;
+}
+.accordion-basic-demo {
+  width: 512px;
+}
+.accordion-multiple-demo {
+  width: 512px;
+}
+.accordion-disabled-demo {
+  width: 512px;
+}
+.accordion-borders-demo {
+  width: 512px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+}
+.accordion-borders-item {
+  padding: 0 16px;
+}
+.accordion-card-demo {
+  width: 384px;
+}
+.accordion-custom-trigger-demo {
+  width: 512px;
+}

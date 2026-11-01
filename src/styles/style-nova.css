@@ -787,6 +787,54 @@ dropdown-menu-radio-item:checked .dropdown-menu-indicator {
   visibility: visible;
 }
 
+/* accordion: structural rules live in src/widgets/accordion.c */
+
+accordion-item {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+accordion-item:last {
+  border-bottom: 0;
+}
+
+accordion-trigger {
+  @apply text-sm font-medium;
+  padding: 10px 0;
+  border-radius: 6px;
+}
+
+accordion-trigger:hover,
+accordion-trigger:hover text {
+  @apply underline;
+}
+
+accordion-trigger text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+accordion-trigger-icon {
+  @apply text-muted-foreground;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
+}
+
+accordion-content {
+  @apply text-sm;
+  padding-bottom: 10px;
+}
+
+accordion-item:disabled accordion-trigger {
+  opacity: 0.5;
+}
+
+accordion-item:disabled accordion-trigger:hover,
+accordion-item:disabled accordion-trigger:hover text {
+  text-decoration-line: none;
+}
+
 /* breadcrumb: structural rules live in src/widgets/breadcrumb.c */
 
 breadcrumb {
