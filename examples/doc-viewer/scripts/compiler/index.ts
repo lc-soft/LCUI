@@ -77,6 +77,7 @@ async function compilePage(
   localeAppDir: string,
   examplesOutDir: string,
   snippets: SnippetRegistry,
+  emittedDemos: Set<string>,
 ): Promise<CompiledExample[]> {
   const mdxPath = join(DOCS_DIR, locale, section.slug, `${itemSlug}.mdx`);
 
@@ -107,6 +108,7 @@ async function compilePage(
     section: section.slug,
     slug: itemSlug,
     snippets,
+    emittedDemos,
   });
 
   console.log(`  [ok] ${locale}/${section.slug}/${itemSlug}`);
@@ -149,6 +151,7 @@ async function main(): Promise<void> {
   ensureDir(examplesOutDir);
 
   const snippets = new SnippetRegistry();
+  const emittedDemos = new Set<string>();
 
   for (const locale of locales) {
     console.log(`\n[locale] ${locale}`);
@@ -163,6 +166,7 @@ async function main(): Promise<void> {
           localeAppDir,
           examplesOutDir,
           snippets,
+          emittedDemos,
         );
       }
     }
@@ -197,7 +201,7 @@ async function main(): Promise<void> {
         if (section) {
           await compilePage(
             locale, section, slug, join(APP_DIR, locale),
-            examplesOutDir, snippets);
+            examplesOutDir, snippets, emittedDemos);
         }
       }
     });

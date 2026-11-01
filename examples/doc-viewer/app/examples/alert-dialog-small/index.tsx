@@ -21,7 +21,7 @@ export default function AlertDialogSmallDemo() {
             <Text className="demo-tab" data-value="xml">XML</Text>
           </Widget>
         </Widget>
-        <Widget className="code-block-body active" data-language="tsx" data-file="example.tsx" data-source="examples/alert-dialog-small/5">
+        <Widget className="code-block-body active" data-language="tsx" data-file="example.tsx" data-source="examples/alert-dialog-small/0">
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
@@ -182,7 +182,7 @@ export default function AlertDialogSmallDemo() {
             <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
-        <Widget className="code-block-body" data-language="tsx" data-file="main.c" data-source="examples/alert-dialog-small/6" style={{ display: "none" }}>
+        <Widget className="code-block-body" data-language="tsx" data-file="main.c" data-source="examples/alert-dialog-small/1" style={{ display: "none" }}>
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
@@ -219,7 +219,7 @@ export default function AlertDialogSmallDemo() {
             <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
-        <Widget className="code-block-body" data-language="c" data-file="main.c" data-source="examples/alert-dialog-small/7" style={{ display: "none" }}>
+        <Widget className="code-block-body" data-language="c" data-file="main.c" data-source="examples/alert-dialog-small/2" style={{ display: "none" }}>
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
@@ -296,7 +296,7 @@ export default function AlertDialogSmallDemo() {
             <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
-        <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/alert-dialog-small/8" style={{ display: "none" }}>
+        <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/alert-dialog-small/3" style={{ display: "none" }}>
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
@@ -409,7 +409,7 @@ export default function AlertDialogSmallDemo() {
             <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
-        <Widget className="code-block-body" data-language="xml" data-file="main.c" data-source="examples/alert-dialog-small/9" style={{ display: "none" }}>
+        <Widget className="code-block-body" data-language="xml" data-file="main.c" data-source="examples/alert-dialog-small/4" style={{ display: "none" }}>
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "144px" }}>
             <ScrollAreaContent className="code-block-scroll-content">

@@ -21,7 +21,7 @@ export default function AttachmentBasicDemo() {
             <Text className="demo-tab" data-value="xml">XML</Text>
           </Widget>
         </Widget>
-        <Widget className="code-block-body active" data-language="tsx" data-file="example.tsx" data-source="examples/attachment-basic/5">
+        <Widget className="code-block-body active" data-language="tsx" data-file="example.tsx" data-source="examples/attachment-basic/0">
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
@@ -382,7 +382,7 @@ export default function AttachmentBasicDemo() {
             <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
-        <Widget className="code-block-body" data-language="tsx" data-file="main.c" data-source="examples/attachment-basic/6" style={{ display: "none" }}>
+        <Widget className="code-block-body" data-language="tsx" data-file="main.c" data-source="examples/attachment-basic/1" style={{ display: "none" }}>
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
@@ -419,7 +419,7 @@ export default function AttachmentBasicDemo() {
             <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
-        <Widget className="code-block-body" data-language="c" data-file="main.c" data-source="examples/attachment-basic/7" style={{ display: "none" }}>
+        <Widget className="code-block-body" data-language="c" data-file="main.c" data-source="examples/attachment-basic/2" style={{ display: "none" }}>
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
@@ -880,7 +880,7 @@ export default function AttachmentBasicDemo() {
             <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
-        <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/attachment-basic/8" style={{ display: "none" }}>
+        <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/attachment-basic/3" style={{ display: "none" }}>
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
@@ -1185,7 +1185,7 @@ export default function AttachmentBasicDemo() {
             <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
-        <Widget className="code-block-body" data-language="xml" data-file="main.c" data-source="examples/attachment-basic/9" style={{ display: "none" }}>
+        <Widget className="code-block-body" data-language="xml" data-file="main.c" data-source="examples/attachment-basic/4" style={{ display: "none" }}>
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "144px" }}>
             <ScrollAreaContent className="code-block-scroll-content">

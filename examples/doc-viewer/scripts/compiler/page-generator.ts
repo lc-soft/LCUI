@@ -1018,6 +1018,13 @@ export interface GeneratePageFilesOptions {
    * Each compiled example is written to `${examplesOutDir}/<name>/`.
    */
   examplesOutDir: string;
+  /**
+   * Example names whose shared demo widget and snippets were already
+   * emitted in this compile run.  Demos are shared across locales and
+   * pages, so generating them twice would register duplicate snippet ids
+   * and rewrite the same index.tsx with a different id range.
+   */
+  emittedDemos: Set<string>;
   parsed: ParsedMdx;
   compiledExamples: CompiledExample[];
   locale: string;
@@ -1030,7 +1037,7 @@ export async function generatePageFiles(
   opts: GeneratePageFilesOptions,
 ): Promise<void> {
   const { repoRoot, outDir, examplesOutDir, parsed, compiledExamples,
-          section, snippets } = opts;
+          section, snippets, emittedDemos } = opts;
 
   const isWidgetPage = section === "widgets";
   const hasExamples = compiledExamples.length > 0;
@@ -1054,6 +1061,10 @@ export async function generatePageFiles(
     // directory is shared across widget pages, so the same example can
     // be referenced from more than one page without duplication.
     for (const ex of compiledExamples) {
+      if (emittedDemos.has(ex.name)) {
+        continue;
+      }
+      emittedDemos.add(ex.name);
       const demoDir = join(examplesOutDir, ex.name);
       mkdirSync(demoDir, { recursive: true });
       // index.tsx is regenerated on every compile (derived from MDX +

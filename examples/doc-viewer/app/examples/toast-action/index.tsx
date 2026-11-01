@@ -15,7 +15,7 @@ export default function ToastActionDemo() {
             <Text className="demo-tab active" data-value="c">C</Text>
           </Widget>
         </Widget>
-        <Widget className="code-block-body active" data-language="c" data-file="main.c" data-source="examples/toast-action/1">
+        <Widget className="code-block-body active" data-language="c" data-file="main.c" data-source="examples/toast-action/0">
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
