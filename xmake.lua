@@ -110,3 +110,20 @@ target("lcui")
         "libui-xml"
     )
     add_headerfiles("include/LCUI.h", "include/(LCUI/**.h)")
+    -- lcui is a self-contained package: the umbrella header LCUI.h includes each
+    -- sub-library's flat root header, so those headers must be installed together
+    -- with lcui for consumers to be able to #include <LCUI.h>.
+    -- Iterate over lib/* instead of listing every sub-library: the set of
+    -- sub-libraries changes over time (ui-cursor, ui-router and worker were
+    -- merged away) and the loop adapts on its own. A directory counts as a
+    -- sub-library only when it has its own xmake.lua -- lib/ui-router is a
+    -- leftover holding nothing but a generated config header.
+    for _, subdir in ipairs(os.filedirs("lib/*")) do
+        local incdir = subdir:gsub("\\", "/") .. "/include"
+        if os.isfile(subdir .. "/xmake.lua") and os.isdir(incdir) then
+            add_headerfiles(incdir .. "/(**.h)")
+        end
+    end
+    -- Merge the sub-library archives into lcui.lib so that the published
+    -- library is self-contained, as the xmake registry package expects.
+    set_policy("build.merge_archive", true)
