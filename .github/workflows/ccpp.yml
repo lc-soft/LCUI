@@ -180,6 +180,9 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           release_name: LCUI ${{ env.REL_VERSION }}
           tag: ${{ github.ref }}
-          file: ${{ env.ARTIFACT_DIR }}/*
+          # upload-release-action skips directories instead of walking them, so the
+          # glob must reach the zip file itself. "**" keeps it independent of how
+          # download-artifact nests each artifact under ARTIFACT_DIR.
+          file: ${{ env.ARTIFACT_DIR }}/**/lcui-*.zip
           overwrite: true
           file_glob: true
