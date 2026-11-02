@@ -95,6 +95,16 @@ jobs:
           xmake package
           xmake install -o dist/lcui-package
 
+      - name: Build binary archive
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        run: |
+          $plat = if ($env:RUNNER_OS -eq 'Windows') { 'windows' } else { 'linux' }
+          $version = $env:GITHUB_REF -replace '^refs/tags/v', ''
+          xmake install -o dist/lcui-bin lcui
+          Compress-Archive -Path dist/lcui-bin/* -DestinationPath "dist/lcui-$version-$plat-x64.zip"
+          Get-Item "dist/lcui-$version-$plat-x64.zip" | Select-Object Name, Length
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -127,6 +137,7 @@ jobs:
           name: lcui${{ env.TARGET_MAJOR }}-${{ env.TARGET_VERSION }}-${{ env.TARGET_KIND }} (${{ runner.os }})
           path: |
             dist/lcui-package
+            dist/lcui-*.zip
 
       - uses: actions/upload-artifact@v4
         with:
