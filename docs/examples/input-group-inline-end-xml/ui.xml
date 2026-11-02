@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <field class="input-group-inline-end">
+      <field-label for="inline-end-input">Input</field-label>
+      <input-group>
+        <textinput id="inline-end-input" type="password"
+                   class="input-group-input input-group-control"
+                   placeholder="Enter password" />
+        <input-group-addon align="inline-end">
+          <icon name="eye-off" />
+        </input-group-addon>
+      </input-group>
+      <field-description>Icon positioned at the end.</field-description>
+    </field>
+  </ui>
+</lcui-app>

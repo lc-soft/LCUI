@@ -64,6 +64,7 @@ extern void test_style_nova(void);
 extern void test_toast(void);
 extern void test_accordion(void);
 extern void test_breadcrumb(void);
+extern void test_input_group(void);
 
 static const ctest_suite_t suites[] = {
         { "settings", test_settings },
@@ -118,6 +119,7 @@ static const ctest_suite_t suites[] = {
         { "toast", test_toast },
         { "accordion", test_accordion },
         { "breadcrumb", test_breadcrumb },
+        { "input group", test_input_group },
         { NULL, NULL }
 };
 

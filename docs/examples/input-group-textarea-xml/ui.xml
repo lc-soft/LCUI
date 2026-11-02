@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <input-group class="input-group-textarea-demo">
+      <textinput class="input-group-textarea input-group-control input-group-mono"
+                 placeholder="console.log('Hello, world!');" />
+      <input-group-addon align="block-start">
+        <input-group-text class="input-group-mono">
+          <icon name="code" />
+          <text>script.js</text>
+        </input-group-text>
+        <button variant="ghost" size="icon-xs"
+                class="input-group-button input-group-block-start-action">
+          <icon name="copy" />
+        </button>
+      </input-group-addon>
+      <input-group-addon align="block-end">
+        <input-group-text><text>Line 1, Column 1</text></input-group-text>
+        <button variant="primary" size="sm"
+                class="input-group-button input-group-block-end-action">
+          <text>Run</text>
+          <icon name="arrow-enter-left" />
+        </button>
+      </input-group-addon>
+    </input-group>
+  </ui>
+</lcui-app>

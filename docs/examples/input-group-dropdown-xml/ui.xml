@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <widget class="input-group-dropdown-demo clip-safe">
+      <input-group>
+        <textinput class="input-group-input input-group-control"
+                   placeholder="Enter file name" />
+        <input-group-addon align="inline-end">
+          <dropdown-menu>
+            <dropdown-menu-trigger>
+              <button variant="ghost" size="icon-xs" class="input-group-button">
+                <icon name="more-horizontal" />
+              </button>
+            </dropdown-menu-trigger>
+            <dropdown-menu-content align="end">
+              <dropdown-menu-group>
+                <dropdown-menu-item><text>Settings</text></dropdown-menu-item>
+                <dropdown-menu-item><text>Copy path</text></dropdown-menu-item>
+                <dropdown-menu-item><text>Open location</text></dropdown-menu-item>
+              </dropdown-menu-group>
+            </dropdown-menu-content>
+          </dropdown-menu>
+        </input-group-addon>
+      </input-group>
+      <input-group>
+        <textinput class="input-group-input input-group-control"
+                   placeholder="Enter search query" />
+        <input-group-addon align="inline-end">
+          <dropdown-menu>
+            <dropdown-menu-trigger>
+              <button variant="ghost" size="xs" class="input-group-button">
+                <text>Search In...</text>
+                <icon name="chevron-down" />
+              </button>
+            </dropdown-menu-trigger>
+            <dropdown-menu-content align="end">
+              <dropdown-menu-group>
+                <dropdown-menu-item><text>Documentation</text></dropdown-menu-item>
+                <dropdown-menu-item><text>Blog Posts</text></dropdown-menu-item>
+                <dropdown-menu-item><text>Changelog</text></dropdown-menu-item>
+              </dropdown-menu-group>
+            </dropdown-menu-content>
+          </dropdown-menu>
+        </input-group-addon>
+      </input-group>
+    </widget>
+  </ui>
+</lcui-app>

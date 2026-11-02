@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <field class="input-group-inline-start">
+      <field-label for="inline-start-input">Input</field-label>
+      <input-group>
+        <textinput id="inline-start-input"
+                   class="input-group-input input-group-control"
+                   placeholder="Search..." />
+        <input-group-addon align="inline-start">
+          <icon name="search" />
+        </input-group-addon>
+      </input-group>
+      <field-description>Icon positioned at the start.</field-description>
+    </field>
+  </ui>
+</lcui-app>

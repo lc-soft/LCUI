@@ -10,6 +10,7 @@
  */
 
 #include <ui/base.h>
+#include <ui/events.h>
 #include "ui_widget_status.h"
 #include "ui_widget_style.h"
 
@@ -97,11 +98,17 @@ void ui_widget_update_status(ui_widget_t *widget)
 
 void ui_widget_set_disabled(ui_widget_t *w, bool disabled)
 {
+        ui_event_t e;
+
         w->disabled = disabled;
         if (w->disabled) {
                 ui_widget_add_status(w, "disabled");
         } else {
                 ui_widget_remove_status(w, "disabled");
+        }
+        if (w->parent) {
+                ui_event_init(&e, "disabled");
+                ui_widget_emit_event(w, e, NULL);
         }
 }
 

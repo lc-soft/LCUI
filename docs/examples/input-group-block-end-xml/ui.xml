@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <field-group class="input-group-block-end">
+      <field>
+        <field-label for="block-end-input">Input</field-label>
+        <input-group>
+          <textinput id="block-end-input"
+                     class="input-group-input input-group-control"
+                     placeholder="Enter amount" />
+          <input-group-addon align="block-end">
+            <input-group-text>
+              <text>USD</text>
+            </input-group-text>
+          </input-group-addon>
+        </input-group>
+        <field-description>Footer positioned below the input.</field-description>
+      </field>
+      <field>
+        <field-label for="block-end-textarea">Textarea</field-label>
+        <input-group>
+          <textinput id="block-end-textarea"
+                     class="input-group-textarea input-group-control"
+                     placeholder="Write a comment..." />
+          <input-group-addon align="block-end">
+            <input-group-text>
+              <text>0/280</text>
+            </input-group-text>
+            <button variant="primary" size="sm"
+                    class="input-group-button input-group-block-end-action">
+              <text>Post</text>
+            </button>
+          </input-group-addon>
+        </input-group>
+        <field-description>
+          Footer positioned below the textarea.
+        </field-description>
+      </field>
+    </field-group>
+  </ui>
+</lcui-app>

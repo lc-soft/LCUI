@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <widget class="input-group-text-demo clip-safe">
+      <input-group>
+        <input-group-addon>
+          <input-group-text><text>$</text></input-group-text>
+        </input-group-addon>
+        <textinput class="input-group-input input-group-control"
+                   placeholder="0.00" />
+        <input-group-addon align="inline-end">
+          <input-group-text><text>USD</text></input-group-text>
+        </input-group-addon>
+      </input-group>
+      <input-group>
+        <input-group-addon>
+          <input-group-text><text>https://</text></input-group-text>
+        </input-group-addon>
+        <textinput class="input-group-input input-group-control"
+                   placeholder="example.com" />
+        <input-group-addon align="inline-end">
+          <input-group-text><text>.com</text></input-group-text>
+        </input-group-addon>
+      </input-group>
+      <input-group>
+        <textinput class="input-group-input input-group-control"
+                   placeholder="Enter your username" />
+        <input-group-addon align="inline-end">
+          <input-group-text><text>@company.com</text></input-group-text>
+        </input-group-addon>
+      </input-group>
+      <input-group>
+        <textinput class="input-group-textarea input-group-control"
+                   placeholder="Enter your message" />
+        <input-group-addon align="block-end">
+          <input-group-text><text>120 characters left</text></input-group-text>
+        </input-group-addon>
+      </input-group>
+    </widget>
+  </ui>
+</lcui-app>

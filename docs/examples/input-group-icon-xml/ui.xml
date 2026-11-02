@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <widget class="input-group-icon-demo clip-safe">
+      <input-group>
+        <textinput class="input-group-input input-group-control"
+                   placeholder="Search..." />
+        <input-group-addon><icon name="search" /></input-group-addon>
+      </input-group>
+      <input-group>
+        <textinput class="input-group-input input-group-control"
+                   type="email" placeholder="Enter your email" />
+        <input-group-addon><icon name="mail" /></input-group-addon>
+      </input-group>
+      <input-group>
+        <textinput class="input-group-input input-group-control"
+                   placeholder="Card number" />
+        <input-group-addon><icon name="payment" /></input-group-addon>
+        <input-group-addon align="inline-end">
+          <icon name="checkmark" />
+        </input-group-addon>
+      </input-group>
+      <input-group>
+        <textinput class="input-group-input input-group-control"
+                   placeholder="Card number" />
+        <input-group-addon align="inline-end">
+          <icon name="star" />
+          <icon name="info" />
+        </input-group-addon>
+      </input-group>
+    </widget>
+  </ui>
+</lcui-app>

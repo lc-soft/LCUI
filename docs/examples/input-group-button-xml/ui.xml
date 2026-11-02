@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <widget class="input-group-button-demo clip-safe">
+      <input-group>
+        <textinput class="input-group-input input-group-control"
+                   placeholder="https://x.com/shadcn" />
+        <input-group-addon align="inline-end">
+          <button variant="ghost" size="icon-xs" class="input-group-button">
+            <icon name="copy" />
+          </button>
+        </input-group-addon>
+      </input-group>
+      <input-group>
+        <textinput class="input-group-input input-group-control"
+                   placeholder="Type to search..." />
+        <input-group-addon align="inline-end">
+          <button variant="secondary" size="xs" class="input-group-button">
+            <text>Search</text>
+          </button>
+        </input-group-addon>
+      </input-group>
+      <input-group>
+        <textinput class="input-group-input input-group-control"
+                   placeholder="https://" />
+        <input-group-addon align="inline-end">
+          <button variant="ghost" size="icon-xs" class="input-group-button">
+            <icon name="star" />
+          </button>
+        </input-group-addon>
+      </input-group>
+    </widget>
+  </ui>
+</lcui-app>

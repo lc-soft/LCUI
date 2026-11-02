@@ -350,6 +350,36 @@ static void should_fill_button_content_box_with_its_text_line(void)
         ui_widget_destroy(button);
 }
 
+static void should_use_explicit_size_heights(void)
+{
+        ui_widget_t *button = ui_create_button();
+
+        ui_widget_append(ui_root(), button);
+        ui_button_set_text(button, "Size");
+        ui_button_set_size(button, UI_BUTTON_SIZE_XS);
+        ui_update();
+        ctest_equal_float("xs button height", button->border_box.height, 24);
+        ctest_equal_float("xs button line height",
+                          button->computed_style.line_height, 16);
+        ui_button_set_size(button, UI_BUTTON_SIZE_SM);
+        ui_update();
+        ctest_equal_float("sm button height", button->border_box.height, 28);
+        ctest_equal_float("sm button line height",
+                          button->computed_style.line_height, 16);
+        ui_button_set_size(button, UI_BUTTON_SIZE_DEFAULT);
+        ui_update();
+        ctest_equal_float("default button height", button->border_box.height,
+                          32);
+        ctest_equal_float("default button line height",
+                          button->computed_style.line_height, 20);
+        ui_button_set_size(button, UI_BUTTON_SIZE_LG);
+        ui_update();
+        ctest_equal_float("lg button height", button->border_box.height, 36);
+        ctest_equal_float("lg button line height",
+                          button->computed_style.line_height, 24);
+        ui_widget_destroy(button);
+}
+
 static void should_not_respond_to_mouse_when_disabled(void)
 {
         ui_widget_t *button = ui_create_button();
@@ -397,6 +427,8 @@ void test_button(void)
                        should_match_heights_of_text_and_icon_buttons);
         ctest_describe("button text vertical fit",
                        should_fill_button_content_box_with_its_text_line);
+        ctest_describe("button explicit height",
+                       should_use_explicit_size_heights);
         ctest_describe("button icon size style",
                        should_apply_icon_size_independently_of_variant);
         ctest_describe("button size scale style",

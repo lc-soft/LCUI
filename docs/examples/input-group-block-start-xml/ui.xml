@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <field-group class="input-group-block-start">
+      <field>
+        <field-label for="block-start-input">Input</field-label>
+        <input-group>
+          <textinput id="block-start-input"
+                     class="input-group-input input-group-control"
+                     placeholder="Enter your name" />
+          <input-group-addon align="block-start">
+            <input-group-text>
+              <text>Full Name</text>
+            </input-group-text>
+          </input-group-addon>
+        </input-group>
+        <field-description>Header positioned above the input.</field-description>
+      </field>
+      <field>
+        <field-label for="block-start-textarea">Textarea</field-label>
+        <input-group>
+          <textinput id="block-start-textarea"
+                     class="input-group-textarea input-group-control input-group-mono"
+                     placeholder="console.log('Hello, world!');" />
+          <input-group-addon align="block-start">
+            <input-group-text class="input-group-mono">
+              <icon name="code" />
+              <text>script.js</text>
+            </input-group-text>
+            <button variant="ghost" size="icon-xs"
+                    class="input-group-button input-group-block-start-action">
+              <icon name="copy" />
+            </button>
+          </input-group-addon>
+        </input-group>
+        <field-description>
+          Header positioned above the textarea.
+        </field-description>
+      </field>
+    </field-group>
+  </ui>
+</lcui-app>

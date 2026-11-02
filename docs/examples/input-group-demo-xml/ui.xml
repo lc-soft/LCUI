@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <input-group class="input-group-demo">
+      <textinput class="input-group-input input-group-control"
+                 placeholder="Search..." />
+      <input-group-addon>
+        <icon name="search" />
+      </input-group-addon>
+      <input-group-addon align="inline-end">
+        <text>12 results</text>
+      </input-group-addon>
+    </input-group>
+  </ui>
+</lcui-app>

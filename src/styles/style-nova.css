@@ -10,6 +10,8 @@ a {
 button {
   cursor: pointer;
   box-sizing: border-box;
+  height: 32px;
+  line-height: 20px;
   @apply inline-flex items-center gap-1.5 text-center rounded-lg border border-border bg-background px-2.5 py-[5px] text-sm font-medium text-foreground;
 }
 
@@ -76,14 +78,20 @@ button:link:hover text {
 }
 
 button:xs {
+  height: 24px;
+  line-height: 16px;
   @apply gap-1 rounded-[6px] px-2 py-[3px] text-xs;
 }
 
 button:sm {
+  height: 28px;
+  line-height: 16px;
   @apply rounded-[6px] px-2 py-[5px] text-xs;
 }
 
 button:lg {
+  height: 36px;
+  line-height: 24px;
   @apply py-[5px] text-base;
 }
 
@@ -833,6 +841,115 @@ accordion-item:disabled accordion-trigger {
 accordion-item:disabled accordion-trigger:hover,
 accordion-item:disabled accordion-trigger:hover text {
   text-decoration-line: none;
+}
+
+/* input group */
+
+input-group {
+  @apply rounded-lg border border-border bg-background;
+}
+
+input-group:focused {
+  border-color: #222;
+  box-shadow: 0 0 0 3px rgba(34, 34, 34, 0.1);
+}
+
+input-group:has-disabled {
+  @apply bg-muted opacity-50;
+}
+
+input-group:disabled {
+  @apply opacity-50;
+}
+
+input-group:has-disabled input-group-addon,
+input-group:has-disabled .input-group-control,
+input-group:has-disabled button {
+  opacity: 1;
+}
+
+input-group:block {
+  height: auto;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+input-group:multiline {
+  height: auto;
+}
+
+input-group-addon {
+  color: #666666;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+input-group-addon:align-inline-start {
+  padding-left: 8px;
+}
+
+input-group-addon:align-inline-end {
+  padding-right: 8px;
+}
+
+input-group-addon:align-block-start {
+  width: 100%;
+  justify-content: flex-start;
+  padding: 8px 10px 4px;
+}
+
+input-group-addon:align-block-end {
+  width: 100%;
+  justify-content: flex-start;
+  padding: 4px 10px 8px;
+}
+
+.input-group-control {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.input-group-input,
+.input-group-textarea {
+  height: 30px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.input-group-input:focus,
+.input-group-textarea:focus {
+  border: 0;
+  box-shadow: none;
+}
+
+.input-group-textarea {
+  height: auto;
+  min-height: 64px;
+  padding: 8px 10px;
+}
+
+input-group-text {
+  gap: 8px;
+  color: #666666;
+  font-size: 14px;
+}
+
+input-group-kbd {
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  padding: 1px 4px;
+  color: #666666;
+  background: #f5f5f5;
+  font-size: 12px;
+}
+
+button.input-group-button {
+  border-radius: 8px;
 }
 
 /* breadcrumb: structural rules live in src/widgets/breadcrumb.c */

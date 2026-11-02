@@ -31,6 +31,7 @@ void lcui_widgets_init(void)
         ui_register_progress();
         ui_register_textcaret();
         ui_register_textinput();
+        ui_register_input_group();
         ui_register_router_link();
         ui_register_router_view();
         ui_register_label();

@@ -740,3 +740,57 @@ li {
 .accordion-custom-trigger-demo {
   width: 512px;
 }
+
+.input-group-demo {
+  width: 320px;
+}
+.input-group-inline-start,
+.input-group-inline-end,
+.input-group-block-start,
+.input-group-block-end {
+  width: 384px;
+}
+.input-group-mono {
+  font-family: "Geist Mono", monospace;
+}
+.input-group-block-start-action,
+.input-group-block-end-action {
+  margin-left: auto;
+}
+.input-group-icon-demo,
+.input-group-text-demo,
+.input-group-button-demo,
+.input-group-custom-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 384px;
+}
+.input-group-spinner-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 384px;
+}
+.input-group-dropdown-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 384px;
+}
+.input-group-kbd-demo {
+  width: 384px;
+}
+.input-group-textarea-demo {
+  width: 448px;
+}
+.input-group-textarea-demo .input-group-textarea {
+  min-height: 200px;
+}
+.input-group-spinner-icon {
+  width: 16px;
+  height: 16px;
+}
+.input-group-custom-control {
+  min-height: 64px;
+}

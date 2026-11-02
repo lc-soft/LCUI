@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <input-group class="input-group-custom-demo">
+      <textinput class="input-group-custom-control input-group-input input-group-control"
+                 placeholder="Autoresize textarea..." />
+      <input-group-addon align="block-end">
+        <button variant="primary" size="sm"
+                class="input-group-button input-group-block-end-action">
+          <text>Submit</text>
+        </button>
+      </input-group-addon>
+    </input-group>
+  </ui>
+</lcui-app>

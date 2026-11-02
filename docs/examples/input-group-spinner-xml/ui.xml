@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <widget class="input-group-spinner-demo clip-safe">
+      <input-group>
+        <textinput class="input-group-input input-group-control"
+                   placeholder="Searching..." />
+        <input-group-addon align="inline-end">
+          <spinner class="input-group-spinner-icon" />
+        </input-group-addon>
+      </input-group>
+      <input-group>
+        <textinput class="input-group-input input-group-control"
+                   placeholder="Processing..." />
+        <input-group-addon>
+          <spinner class="input-group-spinner-icon" />
+        </input-group-addon>
+      </input-group>
+      <input-group>
+        <textinput class="input-group-input input-group-control"
+                   placeholder="Saving changes..." />
+        <input-group-addon align="inline-end">
+          <text>Saving...</text>
+          <spinner class="input-group-spinner-icon" />
+        </input-group-addon>
+      </input-group>
+      <input-group>
+        <textinput class="input-group-input input-group-control"
+                   placeholder="Refreshing data..." />
+        <input-group-addon>
+          <spinner class="input-group-spinner-icon" />
+        </input-group-addon>
+        <input-group-addon align="inline-end">
+          <text>Please wait...</text>
+        </input-group-addon>
+      </input-group>
+    </widget>
+  </ui>
+</lcui-app>

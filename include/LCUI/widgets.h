@@ -45,3 +45,4 @@
 #include "widgets/popover.h"
 #include "widgets/toast.h"
 #include "widgets/breadcrumb.h"
+#include "widgets/input_group.h"

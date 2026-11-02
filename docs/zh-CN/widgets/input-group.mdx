@@ -1,0 +1,189 @@
+# InputGroup
+
+把输入框、图标、说明文字、按钮和下拉菜单组合成统一边框的输入区域。
+
+<WidgetExample name="input-group-demo" />
+
+## 适用场景
+
+- **适用**：搜索框、金额输入、密码框、评论框等需要前置/后置图标或操作按钮的输入区域
+- **适用**：需要把输入框和说明、计数、单位、提交按钮放在同一视觉容器内
+- **不适用**：只需要一个普通输入框（直接使用 `TextInput`）
+- **不适用**：需要多字段表单布局（使用 `Field` / `FieldGroup` 组合）
+
+## 用法
+
+```tsx
+import {
+  Icon,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+  InputGroupKbd,
+  InputGroupText,
+  InputGroupTextarea,
+} from "@lcui/react"
+```
+
+```tsx
+<InputGroup>
+  <InputGroupInput placeholder="Search..." />
+  <InputGroupAddon>
+    <Icon name="search" />
+  </InputGroupAddon>
+</InputGroup>
+```
+
+## 组合
+
+使用以下组合来构建 `InputGroup`：
+
+```
+InputGroup
+├── InputGroupInput or InputGroupTextarea
+├── InputGroupAddon
+├── InputGroupButton
+├── InputGroupText
+└── InputGroupKbd
+```
+
+## 示例
+
+### 行内起始
+
+使用 `align="inline-start"` 把图标放到输入框左侧。
+
+<WidgetExample name="input-group-inline-start" />
+
+### 行内末尾
+
+使用 `align="inline-end"` 把图标放到输入框右侧。
+
+<WidgetExample name="input-group-inline-end" />
+
+### 块级起始
+
+`block-start` 会把 addon 放到输入框上方，并让根容器切换为纵向布局。
+
+<WidgetExample name="input-group-block-start" />
+
+### 块级末尾
+
+`block-end` 会把 addon 放到输入框下方，适合单位、计数和提交按钮。
+
+<WidgetExample name="input-group-block-end" />
+
+### 图标
+
+addon 可以只放图标，也可以同时放起始和末尾图标。
+
+<WidgetExample name="input-group-icon" />
+
+### 文本
+
+使用 `InputGroupText` 放置货币符号、域名后缀等说明文本。
+
+<WidgetExample name="input-group-text" />
+
+### 按钮
+
+在 addon 中放复制、收藏或提交按钮；图标按钮使用 `icon-xs`。
+
+<WidgetExample name="input-group-button" />
+
+### Kbd
+
+使用 `InputGroupKbd` 展示键盘快捷键。
+
+<WidgetExample name="input-group-kbd" />
+
+### 下拉菜单
+
+把 `DropdownMenu` 放进 addon，为输入框提供附加操作。
+
+<WidgetExample name="input-group-dropdown" />
+
+### Spinner
+
+加载状态可以放在输入框左侧或右侧，并可与说明文字组合。
+
+<WidgetExample name="input-group-spinner" />
+
+### Textarea
+
+多行输入可以和 block-start / block-end addon 组合，用于文件名、计数和运行按钮。
+
+<WidgetExample name="input-group-textarea" />
+
+### 自定义控件
+
+第三方或自定义可聚焦控件可以通过 `ui_input_group_mark_control()` 接入输入组的聚焦与状态逻辑。
+
+<WidgetExample name="input-group-custom" />
+
+## API 参考
+
+### InputGroup
+
+输入组根容器，统一边框、圆角、focus 外框和高度。
+
+<FieldTable name="input-group" />
+
+### InputGroupAddon
+
+承载图标、文本、按钮等附加内容，通过 `align` 控制位置。
+
+<FieldTable name="input-group-addon" />
+
+### InputGroupText
+
+输入组内的 muted 说明文字容器。
+
+<FieldTable name="input-group-text" />
+
+### InputGroupKbd
+
+输入组内的键盘提示样式容器。
+
+<FieldTable name="input-group-kbd" />
+
+### InputGroupInput
+
+去掉自身边框和背景的 `TextInput`，自动撑满输入组。
+
+<FieldTable name="input-group-input" />
+
+### InputGroupTextarea
+
+基于多行 `TextInput` 的输入组多行输入。
+
+<FieldTable name="input-group-textarea" />
+
+### InputGroupButton
+
+输入组内的小尺寸按钮，默认 `ghost` + `xs`。
+
+<FieldTable name="input-group-button" />
+
+## 注意事项
+
+:::note
+**focus 与 disabled 由 C 维护**。LCUI 没有 `:focus-within` 和 `:has()`，根容器通过冒泡的 `focus`/`blur` 维护 `focused` status，并通过子控件状态维护 `has-disabled` status。
+:::
+
+:::info
+**addon 会自动排序**。无论先写输入框还是先写 addon，根容器都会按 `align` 把 inline-start / block-start 放到输入框前，inline-end / block-end 放到输入框后。
+:::
+
+:::caution
+**block 与 inline addon 不建议混用**。同一 group 混用时，block 布局优先，inline addon 会按纵向布局处理。
+:::
+
+:::caution
+**一个 group 只放一个输入控件**。addon 点击聚焦只针对第一个匹配控件；disabled 扫描覆盖整个子树。
+:::
+
+:::note
+**多行输入仍有限制**。`InputGroupTextarea` 基于多行 `TextInput`，XML 变体只展示结构，多行编辑能力由 C/TSX 工厂启用。
+:::

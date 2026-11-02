@@ -1,0 +1,189 @@
+# InputGroup
+
+Combines an input, icons, helper text, buttons, and menus into a single bordered input area.
+
+<WidgetExample name="input-group-demo" />
+
+## Use cases
+
+- **Suitable**: Search fields, amount inputs, password fields, comment boxes, and other inputs with leading/trailing icons or actions
+- **Suitable**: Keeping an input, description, counter, unit, or submit button inside one visual container
+- **Not suitable**: A plain input without addons (use `TextInput` directly)
+- **Not suitable**: Multi-field form layouts (compose with `Field` / `FieldGroup`)
+
+## Usage
+
+```tsx
+import {
+  Icon,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+  InputGroupKbd,
+  InputGroupText,
+  InputGroupTextarea,
+} from "@lcui/react"
+```
+
+```tsx
+<InputGroup>
+  <InputGroupInput placeholder="Search..." />
+  <InputGroupAddon>
+    <Icon name="search" />
+  </InputGroupAddon>
+</InputGroup>
+```
+
+## Composition
+
+Use the following composition to build an `InputGroup`:
+
+```
+InputGroup
+├── InputGroupInput or InputGroupTextarea
+├── InputGroupAddon
+├── InputGroupButton
+├── InputGroupText
+└── InputGroupKbd
+```
+
+## Examples
+
+### Inline start
+
+Use `align="inline-start"` to place an icon at the start of the input.
+
+<WidgetExample name="input-group-inline-start" />
+
+### Inline end
+
+Use `align="inline-end"` to place an icon at the end of the input.
+
+<WidgetExample name="input-group-inline-end" />
+
+### Block start
+
+`block-start` places the addon above the input and switches the root to a column layout.
+
+<WidgetExample name="input-group-block-start" />
+
+### Block end
+
+`block-end` places the addon below the input, useful for units, counters, and submit buttons.
+
+<WidgetExample name="input-group-block-end" />
+
+### Icons
+
+An addon can contain only an icon, or the group can use icons at both ends.
+
+<WidgetExample name="input-group-icon" />
+
+### Text
+
+Use `InputGroupText` for currency symbols, domain suffixes, and other helper text.
+
+<WidgetExample name="input-group-text" />
+
+### Buttons
+
+Place copy, favorite, or submit buttons in an addon; use `icon-xs` for icon-only buttons.
+
+<WidgetExample name="input-group-button" />
+
+### Kbd
+
+Use `InputGroupKbd` to show a keyboard shortcut.
+
+<WidgetExample name="input-group-kbd" />
+
+### Dropdown menu
+
+Place a `DropdownMenu` inside an addon to expose extra actions for the input.
+
+<WidgetExample name="input-group-dropdown" />
+
+### Spinner
+
+Loading states can sit before or after the input, optionally alongside helper text.
+
+<WidgetExample name="input-group-spinner" />
+
+### Textarea
+
+Multi-line input can combine with block-start and block-end addons for file names, counters, and run actions.
+
+<WidgetExample name="input-group-textarea" />
+
+### Custom control
+
+Third-party or custom focusable controls can join the group's focus and state logic through `ui_input_group_mark_control()`.
+
+<WidgetExample name="input-group-custom" />
+
+## API Reference
+
+### InputGroup
+
+The input group root, providing the shared border, radius, focus frame, and height.
+
+<FieldTable name="input-group" />
+
+### InputGroupAddon
+
+Holds icons, text, buttons, and other extras; `align` controls its position.
+
+<FieldTable name="input-group-addon" />
+
+### InputGroupText
+
+A muted helper-text container inside the group.
+
+<FieldTable name="input-group-text" />
+
+### InputGroupKbd
+
+A keyboard-shortcut container inside the group.
+
+<FieldTable name="input-group-kbd" />
+
+### InputGroupInput
+
+A `TextInput` with its own border and background removed, stretching to fill the group.
+
+<FieldTable name="input-group-input" />
+
+### InputGroupTextarea
+
+A multi-line input based on the multi-line `TextInput`.
+
+<FieldTable name="input-group-textarea" />
+
+### InputGroupButton
+
+A compact button for the group, defaulting to `ghost` + `xs`.
+
+<FieldTable name="input-group-button" />
+
+## Caveats
+
+:::note
+**Focus and disabled states are maintained in C**. LCUI has no `:focus-within` or `:has()`, so the root tracks `focused` through bubbling `focus`/`blur` events and tracks `has-disabled` from its controls.
+:::
+
+:::info
+**Addons are reordered automatically**. Whether the input or an addon is declared first, the root places inline-start / block-start addons before the input and inline-end / block-end addons after it.
+:::
+
+:::caution
+**Do not mix block and inline addons**. If both are used, block layout wins and inline addons are laid out as rows.
+:::
+
+:::caution
+**Use one input control per group**. Addon click-to-focus only targets the first matching control; disabled scanning covers the whole subtree.
+:::
+
+:::note
+**Multi-line input is still limited**. `InputGroupTextarea` is based on the multi-line `TextInput`; the XML variant shows the structure only, while the C/TSX factories enable multi-line editing.
+:::
