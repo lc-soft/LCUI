@@ -1,0 +1,143 @@
+# ButtonGroup
+
+Group related buttons, inputs or popup controls into a visually continuous button group.
+
+<WidgetExample name="button-group-demo" />
+
+## Use cases
+
+- **Use**: merging adjacent actions of the same kind, such as Archive / Report / Snooze
+- **Use**: split buttons, input + action button, or Select + input + send button
+- **Use**: nesting multiple ButtonGroups to create group spacing
+- **Don't use**: switching state between several options (use ToggleGroup or RadioGroup)
+- **Don't use**: buttons that need independent spacing and must not share borders (use Button directly)
+
+## Usage
+
+```tsx
+import {
+  Button,
+  ButtonGroup,
+  ButtonGroupSeparator,
+  ButtonGroupText,
+} from "@lcui/react"
+```
+
+```tsx
+<ButtonGroup>
+  <Button>Button 1</Button>
+  <Button>Button 2</Button>
+</ButtonGroup>
+```
+
+## Composition
+
+Use the following composition to build a `ButtonGroup`:
+
+```
+ButtonGroup
+├── Button or Input or InputGroup or Select
+├── ButtonGroupText
+├── ButtonGroupSeparator
+└── ButtonGroup
+```
+
+## Examples
+
+### Orientation
+
+Set `orientation="vertical"` to stack buttons vertically; the first/last corner radii and adjacent borders switch automatically.
+
+<WidgetExample name="button-group-orientation" />
+
+### Size
+
+The group does not enforce a single size; each child button keeps its own `size`.
+
+<WidgetExample name="button-group-size" />
+
+### Nested
+
+Nested ButtonGroups automatically get 8px spacing, which suits combinations such as an icon group plus an InputGroup.
+
+<WidgetExample name="button-group-nested" />
+
+### Separator
+
+`ButtonGroupSeparator` adds a visual divider between buttons in the same group.
+
+<WidgetExample name="button-group-separator" />
+
+### Split
+
+A primary button, a separator and an icon button form a split button.
+
+<WidgetExample name="button-group-split" />
+
+### Input
+
+An input can be a direct child of ButtonGroup and stretches with `flex: 1`.
+
+<WidgetExample name="button-group-input" />
+
+### Input Group
+
+ButtonGroup can nest an InputGroup and combine it with icon buttons or other input controls.
+
+<WidgetExample name="button-group-input-group" />
+
+### Dropdown Menu
+
+Put a DropdownMenu inside a ButtonGroup to build a primary action plus an additional actions menu.
+
+<WidgetExample name="button-group-dropdown" />
+
+### Select
+
+A Select and an input can live in the same nested ButtonGroup, combined with a send button.
+
+<WidgetExample name="button-group-select" />
+
+### Popover
+
+A Popover works as an additional action entry for a ButtonGroup.
+
+<WidgetExample name="button-group-popover" />
+
+## API Reference
+
+### ButtonGroup
+
+Button group root. Manages the orientation and the borders/corner radii of its direct children.
+
+<FieldTable name="button-group" />
+
+### ButtonGroupText
+
+Text container with a muted background and a border.
+
+<FieldTable name="button-group-text" />
+
+### ButtonGroupSeparator
+
+A 1px divider between buttons.
+
+<FieldTable name="button-group-separator" />
+
+## Caveats
+
+:::note
+**ButtonGroup is not a ToggleGroup.** It only handles layout and visual merging and keeps no selection state; use RadioGroup or a future ToggleGroup for state switching.
+:::
+
+:::info
+**Edge radii are based on direct children.** The root adds an internal marker class to direct children and uses LCUI's `first-child` / `last-child` statuses to compute edge radii and adjacent borders. Buttons wrapped in an ordinary wrapper do not participate.
+:::
+
+:::caution
+**Keep separators in the middle.** Placing them at the start or end would consume the first/last button's corner radius.
+:::
+
+:::caution
+**Horizontal separators in a vertical group must be set explicitly.** `ButtonGroupSeparator` is vertical by default; set `orientation="horizontal"` inside a vertical group.
+:::

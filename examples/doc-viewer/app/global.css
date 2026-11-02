@@ -794,3 +794,40 @@ li {
 .input-group-custom-control {
   min-height: 64px;
 }
+
+.button-group-demo {
+  width: fit-content;
+}
+.button-group-size-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: fit-content;
+}
+.button-group-nested-demo {
+  width: 384px;
+}
+
+.button-group-input-demo {
+  width: 320px;
+}
+.button-group-input-group-demo,
+.button-group-select-demo {
+  width: 384px;
+}
+
+.button-group-dropdown-demo dropdown-menu-content {
+  width: 176px;
+}
+
+.popover-task-input {
+  min-height: 64px;
+}
+.sr-only {
+  position: absolute;
+  left: -10000px;
+}
+
+.button-group-popover-demo popover-title {
+  font-size: 14px;
+}

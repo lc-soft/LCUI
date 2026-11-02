@@ -57,10 +57,10 @@ static void check_button_typography(void)
 
         ui_button_set_size(button, UI_BUTTON_SIZE_LG);
         ui_update();
-        ctest_equal_float("lg button should use text-base",
-                          button->computed_style.font_size, 16.0f);
-        ctest_equal_float("lg button should use a 24px line box",
-                          button->computed_style.line_height, 24.0f);
+        ctest_equal_float("lg button should keep text-sm",
+                          button->computed_style.font_size, 14.0f);
+        ctest_equal_float("lg button should use a 20px line box",
+                          button->computed_style.line_height, 20.0f);
 
         ui_widget_destroy(button);
 }

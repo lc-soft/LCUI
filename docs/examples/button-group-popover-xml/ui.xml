@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <button-group class="button-group-popover-demo">
+      <button variant="outline">
+        <icon name="bot" />
+        <text>Copilot</text>
+      </button>
+      <popover>
+        <popover-trigger>
+          <button variant="outline" size="icon"><icon name="chevron-down" /></button>
+        </popover-trigger>
+        <popover-content align="end">
+          <popover-header>
+            <popover-title>Start a new task with Copilot</popover-title>
+            <popover-description>Describe your task in natural language.</popover-description>
+          </popover-header>
+          <field>
+            <field-label class="sr-only" for="task">Task Description</field-label>
+            <textinput id="task" class="popover-task-input"
+                       placeholder="I need to..." />
+            <field-description>Copilot will open a pull request for review.</field-description>
+          </field>
+        </popover-content>
+      </popover>
+    </button-group>
+  </ui>
+</lcui-app>

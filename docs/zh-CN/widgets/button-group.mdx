@@ -1,0 +1,143 @@
+# ButtonGroup
+
+把一组相关按钮、输入框或弹出控件组合成视觉连续的按钮组。
+
+<WidgetExample name="button-group-demo" />
+
+## 适用场景
+
+- **适用**：把相邻的同类动作按钮合并成一组，如 Archive / Report / Snooze
+- **适用**：split button、输入框 + 操作按钮、Select + 输入框 + 发送按钮
+- **适用**：需要把多个 ButtonGroup 嵌套以形成分组间距
+- **不适用**：需要在多个选项之间切换状态（使用 ToggleGroup 或 RadioGroup）
+- **不适用**：按钮之间需要独立间距、不应共享边框的场景（直接使用 Button）
+
+## 用法
+
+```tsx
+import {
+  Button,
+  ButtonGroup,
+  ButtonGroupSeparator,
+  ButtonGroupText,
+} from "@lcui/react"
+```
+
+```tsx
+<ButtonGroup>
+  <Button>Button 1</Button>
+  <Button>Button 2</Button>
+</ButtonGroup>
+```
+
+## 组合
+
+使用以下组合来构建 `ButtonGroup`：
+
+```
+ButtonGroup
+├── Button or Input or InputGroup or Select
+├── ButtonGroupText
+├── ButtonGroupSeparator
+└── ButtonGroup
+```
+
+## 示例
+
+### 方向
+
+设置 `orientation="vertical"` 后按钮纵向排列，首尾圆角与相邻边框自动切换。
+
+<WidgetExample name="button-group-orientation" />
+
+### 尺寸
+
+按钮组不设置统一尺寸，由内部按钮各自的 `size` 决定。
+
+<WidgetExample name="button-group-size" />
+
+### 嵌套
+
+嵌套 ButtonGroup 会自动获得 8px 间距，适合图标组 + InputGroup 等组合。
+
+<WidgetExample name="button-group-nested" />
+
+### 分隔线
+
+`ButtonGroupSeparator` 用于在同组按钮之间增加视觉分隔。
+
+<WidgetExample name="button-group-separator" />
+
+### Split
+
+主按钮 + 分隔线 + 图标按钮构成 split button。
+
+<WidgetExample name="button-group-split" />
+
+### 输入框
+
+输入框可以直接作为 ButtonGroup 的子项，并自动 `flex: 1` 撑满。
+
+<WidgetExample name="button-group-input" />
+
+### 输入框组
+
+ButtonGroup 可以嵌套 InputGroup，再与图标按钮或其它输入控件组合。
+
+<WidgetExample name="button-group-input-group" />
+
+### 下拉菜单
+
+把 DropdownMenu 放进 ButtonGroup，形成主操作 + 附加操作菜单。
+
+<WidgetExample name="button-group-dropdown" />
+
+### 选择框
+
+Select 与输入框可以放在同一个嵌套 ButtonGroup 中，再与发送按钮组合。
+
+<WidgetExample name="button-group-select" />
+
+### 气泡卡片
+
+Popover 可以作为 ButtonGroup 的附加操作入口。
+
+<WidgetExample name="button-group-popover" />
+
+## API 参考
+
+### ButtonGroup
+
+按钮组根容器，管理排列方向和直接子项的边框/圆角。
+
+<FieldTable name="button-group" />
+
+### ButtonGroupText
+
+带 muted 背景和边框的说明文字容器。
+
+<FieldTable name="button-group-text" />
+
+### ButtonGroupSeparator
+
+按钮之间的 1px 分隔线。
+
+<FieldTable name="button-group-separator" />
+
+## 注意事项
+
+:::note
+**ButtonGroup 不是 ToggleGroup**。它只负责布局和视觉合并，不维护选中状态；需要状态切换时使用 RadioGroup 或后续 ToggleGroup。
+:::
+
+:::info
+**首尾圆角基于直接子项**。根容器给直接子项加内部标记 class，并利用 LCUI 的 `first-child` / `last-child` status 计算首尾圆角与相邻边框。包在普通 wrapper 里的按钮不会参与。
+:::
+
+:::caution
+**分隔线放在中间**。放在组首尾会占掉首/末按钮的圆角位置。
+:::
+
+:::caution
+**垂直组中的横向分隔线需要显式设置**。`ButtonGroupSeparator` 默认是竖线，垂直 group 中应设置 `orientation="horizontal"`。
+:::

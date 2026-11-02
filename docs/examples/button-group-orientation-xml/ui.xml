@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <button-group class="button-group-orientation-demo" orientation="vertical">
+      <button variant="outline" size="icon"><icon name="add" /></button>
+      <button variant="outline" size="icon"><icon name="subtract" /></button>
+    </button-group>
+  </ui>
+</lcui-app>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <button-group class="button-group-dropdown-demo">
+      <button variant="outline"><text>Follow</text></button>
+      <dropdown-menu>
+        <dropdown-menu-trigger>
+          <button variant="outline" size="icon"><icon name="chevron-down" /></button>
+        </dropdown-menu-trigger>
+        <dropdown-menu-content align="end">
+          <dropdown-menu-group>
+            <dropdown-menu-item><icon name="speaker-off" /><text>Mute Conversation</text></dropdown-menu-item>
+            <dropdown-menu-item><icon name="checkmark" /><text>Mark as Read</text></dropdown-menu-item>
+            <dropdown-menu-item><icon name="warning" /><text>Report Conversation</text></dropdown-menu-item>
+            <dropdown-menu-item><icon name="person-delete" /><text>Block User</text></dropdown-menu-item>
+            <dropdown-menu-item><icon name="share" /><text>Share Conversation</text></dropdown-menu-item>
+            <dropdown-menu-item><icon name="copy" /><text>Copy Conversation</text></dropdown-menu-item>
+          </dropdown-menu-group>
+          <dropdown-menu-separator />
+          <dropdown-menu-group>
+            <dropdown-menu-item variant="destructive">
+              <icon name="delete" /><text>Delete Conversation</text>
+            </dropdown-menu-item>
+          </dropdown-menu-group>
+        </dropdown-menu-content>
+      </dropdown-menu>
+    </button-group>
+  </ui>
+</lcui-app>

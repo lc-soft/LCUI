@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <button-group class="button-group-select-demo">
+      <button-group class="button-group-grow clip-safe">
+        <select value="$">
+          <select-trigger>
+            <select-value />
+          </select-trigger>
+          <portal>
+            <select-content>
+              <select-group>
+                <select-item value="$">$ US Dollar</select-item>
+                <select-item value="EUR">EUR Euro</select-item>
+                <select-item value="GBP">GBP British Pound</select-item>
+              </select-group>
+            </select-content>
+          </portal>
+        </select>
+        <textinput placeholder="10.00" />
+      </button-group>
+      <button-group class="clip-safe">
+        <button variant="outline" size="icon"><icon name="arrow-right" /></button>
+      </button-group>
+    </button-group>
+  </ui>
+</lcui-app>

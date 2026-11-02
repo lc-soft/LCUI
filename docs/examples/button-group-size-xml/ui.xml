@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <widget class="button-group-size-demo">
+      <button-group>
+        <button variant="outline" size="sm"><text>Small</text></button>
+        <button variant="outline" size="sm"><text>Button</text></button>
+        <button variant="outline" size="sm"><text>Group</text></button>
+        <button variant="outline" size="icon-sm"><icon name="add" /></button>
+      </button-group>
+      <button-group>
+        <button variant="outline"><text>Default</text></button>
+        <button variant="outline"><text>Button</text></button>
+        <button variant="outline"><text>Group</text></button>
+        <button variant="outline" size="icon"><icon name="add" /></button>
+      </button-group>
+      <button-group>
+        <button variant="outline" size="lg"><text>Large</text></button>
+        <button variant="outline" size="lg"><text>Button</text></button>
+        <button variant="outline" size="lg"><text>Group</text></button>
+        <button variant="outline" size="icon-lg"><icon name="add" /></button>
+      </button-group>
+    </widget>
+  </ui>
+</lcui-app>

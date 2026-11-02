@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <button-group class="button-group-demo">
+      <button-group>
+        <button variant="outline" size="icon">
+          <icon name="arrow-left" />
+        </button>
+      </button-group>
+      <button-group>
+        <button variant="outline"><text>Archive</text></button>
+        <button variant="outline"><text>Report</text></button>
+      </button-group>
+      <button-group>
+        <button variant="outline"><text>Snooze</text></button>
+        <dropdown-menu>
+          <dropdown-menu-trigger>
+            <button variant="outline" size="icon">
+              <icon name="more-horizontal" />
+            </button>
+          </dropdown-menu-trigger>
+          <dropdown-menu-content>
+            <dropdown-menu-group>
+              <dropdown-menu-item><text>Mark as Read</text></dropdown-menu-item>
+              <dropdown-menu-item><text>Archive</text></dropdown-menu-item>
+              <dropdown-menu-item><text>Snooze</text></dropdown-menu-item>
+              <dropdown-menu-item><text>Add to Calendar</text></dropdown-menu-item>
+              <dropdown-menu-item><text>Add to List</text></dropdown-menu-item>
+            </dropdown-menu-group>
+          </dropdown-menu-content>
+        </dropdown-menu>
+      </button-group>
+    </button-group>
+  </ui>
+</lcui-app>

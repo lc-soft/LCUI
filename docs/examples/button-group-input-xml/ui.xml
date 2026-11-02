@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <button-group class="button-group-input-demo clip-safe">
+      <textinput placeholder="Search..." />
+      <button variant="outline" size="icon"><icon name="search" /></button>
+    </button-group>
+  </ui>
+</lcui-app>

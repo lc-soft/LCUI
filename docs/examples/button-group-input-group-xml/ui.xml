@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <button-group class="button-group-input-group-demo clip-safe">
+      <button-group>
+        <button variant="outline" size="icon"><icon name="add" /></button>
+      </button-group>
+      <button-group class="button-group-grow clip-safe">
+        <input-group>
+          <textinput class="input-group-input input-group-control"
+                     placeholder="Send a message..." />
+          <input-group-addon align="inline-end">
+            <button variant="ghost" size="icon-xs" data-tooltip="Voice Mode"><icon name="device-eq" /></button>
+          </input-group-addon>
+        </input-group>
+      </button-group>
+    </button-group>
+  </ui>
+</lcui-app>

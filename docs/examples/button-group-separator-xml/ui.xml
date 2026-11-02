@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <button-group class="button-group-separator-demo">
+      <button variant="secondary" size="sm"><text>Copy</text></button>
+      <button-group-separator />
+      <button variant="secondary" size="sm"><text>Paste</text></button>
+    </button-group>
+  </ui>
+</lcui-app>

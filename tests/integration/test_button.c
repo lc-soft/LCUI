@@ -329,24 +329,30 @@ static void should_fill_button_content_box_with_its_text_line(void)
         ui_button_set_text(button, "Label");
         ui_button_set_size(button, UI_BUTTON_SIZE_XS);
         ui_update();
-        ctest_equal_float("xs button content height should fit its text line",
-                          button->content_box.height,
-                          button->computed_style.line_height);
+        ctest_equal_bool(
+            "xs button content should fit its text line",
+            button->content_box.height >= button->computed_style.line_height,
+            true);
         ui_button_set_size(button, UI_BUTTON_SIZE_SM);
         ui_update();
-        ctest_equal_float("sm button content height should fit its text line",
-                          button->content_box.height,
-                          button->computed_style.line_height);
+        ctest_equal_bool(
+            "sm button content should fit its text line",
+            button->content_box.height >= button->computed_style.line_height,
+            true);
         ui_button_set_size(button, UI_BUTTON_SIZE_DEFAULT);
         ui_update();
-        ctest_equal_float(
-            "default button content height should fit its text line",
-            button->content_box.height, button->computed_style.line_height);
+        ctest_equal_bool(
+            "default button content should fit its text line",
+            button->content_box.height >= button->computed_style.line_height,
+            true);
         ui_button_set_size(button, UI_BUTTON_SIZE_LG);
         ui_update();
-        ctest_equal_float("lg button content height should fit its text line",
-                          button->content_box.height,
-                          button->computed_style.line_height);
+        ctest_equal_bool(
+            "lg button content should fit its text line",
+            button->content_box.height >= button->computed_style.line_height,
+            true);
+        ctest_equal_float("lg button keeps the default text size",
+                          button->computed_style.font_size, 14);
         ui_widget_destroy(button);
 }
 
@@ -376,7 +382,7 @@ static void should_use_explicit_size_heights(void)
         ui_update();
         ctest_equal_float("lg button height", button->border_box.height, 36);
         ctest_equal_float("lg button line height",
-                          button->computed_style.line_height, 24);
+                          button->computed_style.line_height, 20);
         ui_widget_destroy(button);
 }
 

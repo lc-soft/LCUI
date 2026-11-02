@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <ui>
+    <button-group class="button-group-split-demo">
+      <button variant="secondary"><text>Button</text></button>
+      <button-group-separator />
+      <button variant="secondary" size="icon"><icon name="add" /></button>
+    </button-group>
+  </ui>
+</lcui-app>

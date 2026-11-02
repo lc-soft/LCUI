@@ -12,7 +12,7 @@ button {
   box-sizing: border-box;
   height: 32px;
   line-height: 20px;
-  @apply inline-flex items-center gap-1.5 text-center rounded-lg border border-border bg-background px-2.5 py-[5px] text-sm font-medium text-foreground;
+  @apply inline-flex items-center gap-1.5 text-center rounded-lg border border-border bg-background px-2.5 text-sm font-medium text-foreground;
 }
 
 button:hover {
@@ -80,19 +80,19 @@ button:link:hover text {
 button:xs {
   height: 24px;
   line-height: 16px;
-  @apply gap-1 rounded-[6px] px-2 py-[3px] text-xs;
+  @apply gap-1 rounded-[6px] px-2 text-xs;
 }
 
 button:sm {
   height: 28px;
   line-height: 16px;
-  @apply rounded-[6px] px-2 py-[5px] text-xs;
+  @apply rounded-[6px] px-2 text-xs;
 }
 
 button:lg {
   height: 36px;
-  line-height: 24px;
-  @apply py-[5px] text-base;
+  line-height: 20px;
+  @apply text-sm;
 }
 
 button:icon {
@@ -147,6 +147,15 @@ button .fui-icon {
   @apply text-base;
 }
 
+/* Icon-only buttons center the glyph with flex, so the 1px fluent-icon
+ * baseline nudge only pushes it below the visual center. */
+button:icon .fui-icon,
+button:icon-xs .fui-icon,
+button:icon-sm .fui-icon,
+button:icon-lg .fui-icon {
+  top: 0;
+}
+
 button text {
   @apply text-sm;
 }
@@ -163,7 +172,7 @@ button:icon-sm text {
 
 button:lg text,
 button:icon-lg text {
-  @apply text-base;
+  @apply text-sm;
 }
 
 button:xs .fui-icon,
@@ -893,6 +902,18 @@ input-group-addon:align-inline-end {
   padding-right: 8px;
 }
 
+input-group-addon:align-inline-start button:icon-xs,
+input-group-addon:align-inline-start button:icon-sm,
+input-group-addon:align-inline-start button:icon {
+  margin-left: -4px;
+}
+
+input-group-addon:align-inline-end button:icon-xs,
+input-group-addon:align-inline-end button:icon-sm,
+input-group-addon:align-inline-end button:icon {
+  margin-right: -4px;
+}
+
 input-group-addon:align-block-start {
   width: 100%;
   justify-content: flex-start;
@@ -950,6 +971,142 @@ input-group-kbd {
 
 button.input-group-button {
   border-radius: 8px;
+}
+
+/* button group */
+
+button-group .button-group-item-horizontal {
+  border-radius: 0;
+  border-left-width: 0;
+}
+
+button-group .button-group-item-horizontal:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+  border-left-width: 1px;
+}
+
+button-group .button-group-item-horizontal:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+button-group .button-group-embed-horizontal dropdown-menu-trigger button,
+button-group .button-group-embed-horizontal popover-trigger button,
+button-group .button-group-embed-horizontal select-trigger button {
+  border-radius: 0;
+  border-left-width: 0;
+}
+
+button-group .button-group-embed-horizontal:first-child dropdown-menu-trigger button,
+button-group .button-group-embed-horizontal:first-child popover-trigger button,
+button-group .button-group-embed-horizontal:first-child select-trigger button {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+  border-left-width: 1px;
+}
+
+button-group .button-group-embed-horizontal:last-child dropdown-menu-trigger button,
+button-group .button-group-embed-horizontal:last-child popover-trigger button,
+button-group .button-group-embed-horizontal:last-child select-trigger button {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+button-group .button-group-item-vertical {
+  border-radius: 0;
+  border-top-width: 0;
+}
+
+button-group .button-group-item-vertical:first-child {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-top-width: 1px;
+}
+
+button-group .button-group-item-vertical:last-child {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+button-group .button-group-embed-vertical dropdown-menu-trigger button,
+button-group .button-group-embed-vertical popover-trigger button,
+button-group .button-group-embed-vertical select-trigger button {
+  border-radius: 0;
+  border-top-width: 0;
+}
+
+button-group .button-group-embed-vertical:first-child dropdown-menu-trigger button,
+button-group .button-group-embed-vertical:first-child popover-trigger button,
+button-group .button-group-embed-vertical:first-child select-trigger button {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-top-width: 1px;
+}
+
+button-group .button-group-embed-vertical:last-child dropdown-menu-trigger button,
+button-group .button-group-embed-vertical:last-child popover-trigger button,
+button-group .button-group-embed-vertical:last-child select-trigger button {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+button-group .button-group-item:focus {
+  position: relative;
+  z-index: 1;
+}
+
+.button-group-grow {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+textinput.button-group-item {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+button.button-group-item,
+button-group-text.button-group-item,
+button-group-separator.button-group-item,
+select.button-group-embed {
+  flex-shrink: 0;
+}
+
+select.button-group-embed select-trigger button {
+  width: auto;
+  min-width: 0;
+}
+
+input-group.button-group-item {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
+}
+
+button-group-text {
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  background: #f5f5f5;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+button-group-separator {
+  background: #e5e5e5;
+}
+
+button-group-separator:vertical {
+  width: 1px;
+  align-self: stretch;
+}
+
+button-group-separator:horizontal {
+  width: auto;
+  height: 1px;
+  align-self: stretch;
 }
 
 /* breadcrumb: structural rules live in src/widgets/breadcrumb.c */
