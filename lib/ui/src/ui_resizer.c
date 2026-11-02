@@ -25,9 +25,34 @@ LIBUI_INLINE bool ui_widget_is_wrap(ui_widget_t *w)
                s->type_bits.white_space == CSS_WHITE_SPACE_PRE_WRAP;
 }
 
+/* 原型是否实现了 sizehint。指针始终可调用（默认原型提供空实现），
+ * 该查询只说明返回值是否来自真正的实现。 */
 bool ui_widget_has_sizehint(ui_widget_t *w)
 {
         return w->proto->has_sizehint;
+}
+
+/* sizehint 是否完整描述了整个部件（含子项）。
+ * 无流内子项的部件由自有内容层决定尺寸；有流内子项的容器必须由子项
+ * 布局推导。`sizehint_exact` 原型（text/canvas/textinput）的 hint 已覆盖
+ * 其结构性子项，可绕过该检查。该谓词只用于组合测量快路径，不决定
+ * fit-content 的数据源。 */
+bool ui_widget_sizehint_is_exact(ui_widget_t *w)
+{
+        list_node_t *node;
+
+        if (!w->proto->has_sizehint) {
+                return false;
+        }
+        if (w->proto->sizehint_exact) {
+                return true;
+        }
+        for (list_each(node, &w->children)) {
+                if (ui_widget_in_layout_flow(node->data)) {
+                        return false;
+                }
+        }
+        return true;
 }
 
 void ui_widget_get_sizehint(ui_widget_t *w, ui_sizehint_t *hint)
@@ -37,6 +62,26 @@ void ui_widget_get_sizehint(ui_widget_t *w, ui_sizehint_t *hint)
         hint->max_width = 0;
         hint->max_height = 0;
         w->proto->sizehint(w, hint);
+}
+
+/* 在忽略父级可用宽约束和上一轮 used width 的情况下取 sizehint，
+ * 用于刷新内在宽缓存。 */
+void ui_widget_get_unconstrained_sizehint(ui_widget_t *w, ui_sizehint_t *hint)
+{
+        bool saved_has_width = w->layout_constraint.has_definite_width;
+        uint8_t saved_width_type = w->computed_style.type_bits.width;
+        css_numeric_value_t saved_width = w->computed_style.width;
+        css_unit_t saved_width_unit = w->computed_style.unit_bits.width;
+
+        w->layout_constraint.has_definite_width = false;
+        if (IS_CSS_FIXED_LENGTH(&w->computed_style, width)) {
+                w->computed_style.type_bits.width = CSS_WIDTH_AUTO;
+        }
+        ui_widget_get_sizehint(w, hint);
+        w->layout_constraint.has_definite_width = saved_has_width;
+        w->computed_style.type_bits.width = saved_width_type;
+        w->computed_style.width = saved_width;
+        w->computed_style.unit_bits.width = saved_width_unit;
 }
 
 void ui_widget_set_available_width_constraint(ui_widget_t *child,

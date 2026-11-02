@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include <LCUI/widgets/breadcrumb.h>
 #include <LCUI/widgets/dropdown_menu.h>
 #include <LCUI/widgets/icon.h>
@@ -555,8 +556,13 @@ static void ui_breadcrumb_start_measure(ui_widget_t *w)
         ui_widget_t *child;
         ui_widget_t *ellipsis;
         size_t i;
+        float available;
 
         if (!data || !data->list) {
+                return;
+        }
+        available = ui_breadcrumb_available_width(w);
+        if (available <= 0.0f) {
                 return;
         }
         for (i = 0; (child = ui_widget_get_child(data->list, i)); ++i) {
@@ -566,7 +572,7 @@ static void ui_breadcrumb_start_measure(ui_widget_t *w)
         if (ellipsis) {
                 ui_widget_remove_status(ellipsis, "collapsed");
         }
-        data->measured_width = ui_breadcrumb_available_width(w);
+        data->measured_width = available;
         data->dirty = false;
         data->measuring = true;
         ui_widget_request_reflow(w);
@@ -604,6 +610,10 @@ static void ui_breadcrumb_measure(ui_widget_t *w)
         size_t capacity = 0;
 
         if (!data || !data->list) {
+                return;
+        }
+        if (container <= 0.0f) {
+                data->measuring = false;
                 return;
         }
         while (ui_widget_get_child(data->list, capacity)) {
@@ -646,6 +656,17 @@ static void ui_breadcrumb_measure(ui_widget_t *w)
                 total += data->widths[i];
         }
         total += 6.0f * (count - 1);
+        /* Publish the full intrinsic width to the layout engine. The first
+         * pass can run before child items have been measured, which would
+         * otherwise cache a min-content width and keep the breadcrumb
+         * collapsed after the parent gains its real width. */
+        if (!ui_breadcrumb_has_explicit_width(w) &&
+            fabsf(w->unconstrained_content_width - total) > 0.5f) {
+                w->unconstrained_content_width = total;
+                if (w->parent) {
+                        ui_widget_request_reflow(w->parent);
+                }
+        }
         if (total <= container) {
                 for (i = 0; i < count; ++i) {
                         ui_widget_remove_status(data->items[i], "collapsed");
@@ -716,7 +737,8 @@ static void ui_breadcrumb_on_afterlayout(ui_widget_t *w, ui_event_t *e,
         }
         ui_breadcrumb_sync_separators(data);
         ui_breadcrumb_bind_links(w, data);
-        if (w->content_box.width <= 0.0f) {
+        if (w->content_box.width <= 0.0f ||
+            ui_breadcrumb_available_width(w) <= 0.0f) {
                 return;
         }
         if (data->measuring) {
@@ -858,6 +880,21 @@ static void ui_breadcrumb_on_init(ui_widget_t *w)
         ui_widget_on(w, "afterlayout", ui_breadcrumb_on_afterlayout, NULL);
 }
 
+static void ui_breadcrumb_on_update(ui_widget_t *w, ui_task_type_t task)
+{
+        ui_breadcrumb_t *data = ui_breadcrumb_get_data(w);
+
+        if (task != UI_TASK_BEFORE_UPDATE || !data || !data->list) {
+                return;
+        }
+        /* Move items appended directly to the breadcrumb into the list
+         * before children are updated, so their intrinsic widths are
+         * available to the first layout pass. */
+        if (ui_breadcrumb_normalize(w, data)) {
+                data->dirty = true;
+        }
+}
+
 static void ui_breadcrumb_on_destroy(ui_widget_t *w)
 {
         ui_breadcrumb_t *data = ui_breadcrumb_get_data(w);
@@ -946,6 +983,7 @@ void ui_register_breadcrumb(void)
         ui_breadcrumb_prototype->init = ui_breadcrumb_on_init;
         ui_breadcrumb_prototype->destroy = ui_breadcrumb_on_destroy;
         ui_breadcrumb_prototype->setattr = ui_breadcrumb_on_setattr;
+        ui_breadcrumb_prototype->update = ui_breadcrumb_on_update;
         ui_breadcrumb_separator_prototype->init =
             ui_breadcrumb_separator_on_init;
         ui_breadcrumb_ellipsis_prototype->init = ui_breadcrumb_ellipsis_on_init;

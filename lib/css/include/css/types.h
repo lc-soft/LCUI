@@ -593,6 +593,7 @@ typedef enum css_keyword_value_t {
         CSS_KEYWORD_NONE,
         CSS_KEYWORD_AUTO,
         CSS_KEYWORD_NORMAL,
+        CSS_KEYWORD_CONTENT,
 
         CSS_KEYWORD_STATIC,
         CSS_KEYWORD_RELATIVE,

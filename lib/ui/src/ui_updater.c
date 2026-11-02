@@ -333,18 +333,43 @@ static void ui_widget_reset_size(ui_widget_t *w)
 static void ui_widget_update_size(ui_widget_t *w)
 {
         ui_resizer_t resizer;
+        ui_sizehint_t hint = { 0 };
         float available_width = 0;
         int width = (int)(w->outer_box.width * 64.f);
         int height = (int)(w->outer_box.height * 64.f);
+        bool intrinsic_width;
+        bool auto_width;
 
         ui_widget_reset_size(w);
+        /* 自动宽度的 flex/inline-block 容器在自身回流时得到的就是内在宽，
+         * 即使父级同时记录了宽度约束，也应刷新 unconstrained_*，否则动态
+         * 内容变化后会继续复用旧的内在宽度。 */
+        auto_width = !IS_CSS_FIXED_LENGTH(&w->computed_style, width);
+        intrinsic_width = auto_width && (ui_widget_has_flex_display(w) ||
+                                         w->computed_style.type_bits.display ==
+                                             CSS_DISPLAY_INLINE_BLOCK);
         ui_widget_compute_style(w);
         ui_widget_update_box_size(w);
         ui_widget_reflow_with_resizer(w, &resizer);
         w->max_content_width = w->content_box.width;
         w->max_content_height = w->content_box.height;
-        /* 仅有有效宽度约束时才更新内在尺寸缓存，避免 used size 污染。 */
-        if (!ui_widget_get_available_width(w, &available_width)) {
+        /* 仅有有效宽度约束时才更新内在尺寸缓存，避免 used size 污染；
+         * flex/inline-block 的自动宽回流是例外，其宽度本身就是内在宽。
+         * 叶子 sizehint 部件需要按无约束 sizehint 刷新，否则内容变化后
+         * 会继续用旧约束下折行的宽度。 */
+        if (auto_width && ui_widget_has_sizehint(w)) {
+                ui_widget_get_unconstrained_sizehint(w, &hint);
+                if (ui_widget_sizehint_is_exact(w)) {
+                        w->unconstrained_content_width = hint.max_width;
+                        w->unconstrained_content_height = hint.max_height;
+                } else {
+                        w->unconstrained_content_width =
+                            y_max(w->content_box.width, hint.max_width);
+                        w->unconstrained_content_height =
+                            y_max(w->content_box.height, hint.max_height);
+                }
+        } else if (intrinsic_width ||
+                   !ui_widget_get_available_width(w, &available_width)) {
                 w->unconstrained_content_width = w->content_box.width;
                 w->unconstrained_content_height = w->content_box.height;
         }

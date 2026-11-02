@@ -11,6 +11,7 @@
 
 #include <LCUI.h>
 #include <ctest-custom.h>
+#include <math.h>
 #include <string.h>
 
 static int count_children(ui_widget_t *w)
@@ -619,6 +620,179 @@ static void test_append_item(void)
         ui_clear_trash();
 }
 
+static ui_widget_t *demo_text(const char *content)
+{
+        ui_widget_t *text = ui_create_widget("text");
+
+        ui_text_set_content(text, content);
+        return text;
+}
+
+static ui_widget_t *demo_link_item(const char *path, const char *label)
+{
+        ui_widget_t *item = ui_create_breadcrumb_item();
+        ui_widget_t *link = ui_create_breadcrumb_link();
+
+        ui_widget_set_attr(item, "data-path", path);
+        ui_widget_append(link, demo_text(label));
+        ui_widget_append(item, link);
+        ui_widget_append(item, ui_create_breadcrumb_separator());
+        return item;
+}
+
+static ui_widget_t *demo_page_item(const char *path, const char *label)
+{
+        ui_widget_t *item = ui_create_breadcrumb_item();
+        ui_widget_t *page = ui_create_breadcrumb_page();
+
+        ui_widget_set_attr(item, "data-path", path);
+        ui_widget_append(page, demo_text(label));
+        ui_widget_append(item, page);
+        return item;
+}
+
+static ui_widget_t *demo_menu_item(const char *label)
+{
+        ui_widget_t *item = ui_create_dropdown_menu_item();
+
+        ui_widget_append(item, demo_text(label));
+        return item;
+}
+
+static ui_widget_t *demo_ellipsis_item(void)
+{
+        ui_widget_t *item = ui_create_breadcrumb_item();
+        ui_widget_t *menu = ui_create_dropdown_menu();
+        ui_widget_t *trigger = ui_create_dropdown_menu_trigger();
+        ui_widget_t *button = ui_create_button();
+        ui_widget_t *content = ui_create_dropdown_menu_content();
+        ui_widget_t *group = ui_create_dropdown_menu_group();
+
+        ui_button_set_variant(button, UI_BUTTON_VARIANT_GHOST);
+        ui_button_set_size(button, UI_BUTTON_SIZE_ICON_SM);
+        ui_widget_append(button, ui_create_breadcrumb_ellipsis());
+        ui_widget_append(trigger, button);
+        ui_widget_append(group, demo_menu_item("Documentation"));
+        ui_widget_append(group, demo_menu_item("Themes"));
+        ui_widget_append(group, demo_menu_item("GitHub"));
+        ui_widget_append(content, group);
+        ui_widget_append(menu, trigger);
+        ui_widget_append(menu, content);
+        ui_widget_append(item, menu);
+        ui_widget_append(item, ui_create_breadcrumb_separator());
+        return item;
+}
+
+static void test_demo_layout(void)
+{
+        ui_widget_t *box = ui_create_widget(NULL);
+        ui_widget_t *breadcrumb = ui_create_breadcrumb();
+        ui_widget_t *list;
+
+        ui_widget_set_style_string(box, "display", "flex");
+        ui_widget_set_style_string(box, "flex-direction", "column");
+        ui_widget_set_style_string(box, "align-items", "center");
+        ui_widget_set_style_string(box, "width", "100%");
+        ui_widget_append(breadcrumb, demo_link_item("/", "Home"));
+        ui_widget_append(breadcrumb, demo_ellipsis_item());
+        ui_widget_append(
+            breadcrumb,
+            demo_link_item("/Documentation/Themes/GitHub/Components",
+                           "Components"));
+        ui_widget_append(
+            breadcrumb,
+            demo_page_item("/Documentation/Themes/GitHub/Components/Breadcrumb",
+                           "Breadcrumb"));
+        ui_widget_append(box, breadcrumb);
+        ui_widget_append(ui_root(), box);
+        ui_update();
+        ui_update();
+        ui_update();
+
+        list = ui_widget_get_child(breadcrumb, 0);
+        ctest_equal_bool("demo breadcrumb should keep its full width",
+                         breadcrumb->border_box.width > 250.f, true);
+        ctest_equal_bool(
+            "demo breadcrumb list should fill the breadcrumb",
+            fabsf(list->border_box.width - breadcrumb->border_box.width) <= 1.f,
+            true);
+        ctest_equal_bool("demo breadcrumb should keep all four items",
+                         count_children(list) == 5, true);
+        ctest_equal_bool("demo breadcrumb home should be visible",
+                         ui_widget_get_child(list, 0)->border_box.width > 0.f,
+                         true);
+        ctest_equal_bool("demo breadcrumb ellipsis trigger should be visible",
+                         ui_widget_get_child(list, 1)->border_box.width > 0.f,
+                         true);
+        ctest_equal_bool("demo breadcrumb components should be visible",
+                         ui_widget_get_child(list, 2)->border_box.width > 0.f,
+                         true);
+        ctest_equal_bool(
+            "demo built-in ellipsis should stay hidden",
+            ui_widget_has_status(ui_widget_get_child(list, 3), "collapsed"),
+            true);
+        ctest_equal_bool("demo breadcrumb page should be visible",
+                         ui_widget_get_child(list, 4)->border_box.width > 0.f,
+                         true);
+
+        change_count = 0;
+        changed_key = NULL;
+        ui_widget_on(breadcrumb, "change", on_change, NULL);
+        emit_click(find_type(
+            find_item(list, "/Documentation/Themes/GitHub/Components"),
+            "breadcrumb-link"));
+        ctest_equal_int("demo components click should emit once", change_count,
+                        1);
+        ctest_equal_str("demo components click should emit the full path",
+                        changed_key, "/Documentation/Themes/GitHub/Components");
+
+        ui_widget_destroy(box);
+}
+
+static void test_status_text_updates(void)
+{
+        ui_widget_t *box = ui_create_widget(NULL);
+        ui_widget_t *status = ui_create_widget(NULL);
+        ui_widget_t *label = ui_create_widget("text");
+        ui_widget_t *value = ui_create_widget("text");
+        ui_widget_t *ref = ui_create_widget("text");
+        float width0;
+
+        ui_widget_set_style_string(box, "display", "flex");
+        ui_widget_set_style_string(box, "flex-direction", "column");
+        ui_widget_set_style_string(box, "align-items", "center");
+        ui_widget_set_style_string(box, "width", "400px");
+        ui_widget_set_style_string(status, "display", "flex");
+        ui_widget_set_style_string(status, "align-items", "center");
+        ui_widget_set_style_string(status, "gap", "6px");
+        ui_text_set_content(label, "Selected:");
+        ui_text_set_content(value, "-");
+        ui_text_set_content(ref, "/components");
+
+        ui_widget_append(status, label);
+        ui_widget_append(status, value);
+        ui_widget_append(box, status);
+        ui_widget_append(ui_root(), box);
+        ui_widget_append(ui_root(), ref);
+        ui_update();
+        width0 = status->border_box.width;
+
+        ui_text_set_content(value, "/components");
+        ui_update();
+        ui_update();
+
+        ctest_equal_bool("status text should expand with new content",
+                         status->border_box.width > width0 + 20.f, true);
+        ctest_equal_bool(
+            "status text should stay on one line",
+            value->content_box.height <= ref->content_box.height + 1.f, true);
+        ctest_equal_bool("status text should not be clipped",
+                         value->content_box.width > 50.f, true);
+
+        ui_widget_destroy(box);
+        ui_widget_destroy(ref);
+}
+
 void test_breadcrumb(void)
 {
         lcui_init();
@@ -632,5 +806,8 @@ void test_breadcrumb(void)
         ctest_describe("breadcrumb explicit", test_explicit_mode);
         ctest_describe("breadcrumb ellipsis", test_ellipsis_menu);
         ctest_describe("breadcrumb ellipsis label", test_ellipsis_custom_label);
+        ctest_describe("breadcrumb demo layout", test_demo_layout);
+        ctest_describe("breadcrumb status text update",
+                       test_status_text_updates);
         lcui_destroy();
 }

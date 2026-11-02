@@ -478,6 +478,7 @@ void ui_register_text(void)
         ui_text.prototype->destroy = ui_text_on_destroy;
         ui_text.prototype->sizehint = ui_text_on_sizehint;
         ui_text.prototype->has_sizehint = true;
+        ui_text.prototype->sizehint_exact = true;
         ui_text.prototype->resize = ui_text_on_resize;
         ui_text.prototype->update = ui_text_on_update;
         ui_text.prototype->settext = ui_text_on_parse_text;

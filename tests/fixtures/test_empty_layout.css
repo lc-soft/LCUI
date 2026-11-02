@@ -1,0 +1,109 @@
+/*
+ * tests/fixtures/test_empty_layout.css
+ *
+ * Generic empty-basic layout scenario. These rules intentionally avoid
+ * style-nova and concrete widget type selectors: the scenario uses plain
+ * widgets plus the `test-*` classes below.
+ */
+
+.test-ref {
+        width: 1000px;
+}
+
+.test-text {
+        display: block;
+        font-size: 14px;
+        line-height: 20px;
+        white-space: normal;
+}
+
+.test-learn-text {
+        display: block;
+        font-size: 12px;
+        line-height: 16px;
+        white-space: normal;
+}
+
+/* empty-basic scenario */
+
+.test-preview {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+}
+
+.test-empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 400px;
+        padding: 24px;
+        box-sizing: border-box;
+        gap: 16px;
+}
+
+.test-empty-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+}
+
+.test-empty-media {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background-color: #eeeeee;
+}
+
+.test-empty-content {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+}
+
+.test-empty-actions {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 8px;
+}
+
+.test-action-primary {
+        display: flex;
+        width: 108px;
+        height: 32px;
+        box-sizing: border-box;
+        border: 1px solid #222222;
+        border-radius: 8px;
+        background-color: #222222;
+}
+
+.test-action-secondary {
+        display: flex;
+        width: 110px;
+        height: 32px;
+        box-sizing: border-box;
+        border: 1px solid #cccccc;
+        border-radius: 8px;
+        background-color: #ffffff;
+}
+
+.test-learn {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 8px;
+        box-sizing: border-box;
+        border: 1px solid transparent;
+}
+
+.test-learn-icon {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+        background-color: #999999;
+}
+

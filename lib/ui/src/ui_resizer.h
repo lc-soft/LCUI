@@ -22,9 +22,12 @@ typedef struct ui_resizer {
         float max_main_size;
 } ui_resizer_t;
 
-/* 该部件的原型是否实现了 sizehint（默认原型是空实现）。 */
+/* 该原型是否实现了 sizehint（默认原型是空实现）。 */
 bool ui_widget_has_sizehint(ui_widget_t *w);
+/* sizehint 是否完整描述了整个部件；仅用于组合测量快路径。 */
+bool ui_widget_sizehint_is_exact(ui_widget_t *w);
 void ui_widget_get_sizehint(ui_widget_t *w, ui_sizehint_t *hint);
+void ui_widget_get_unconstrained_sizehint(ui_widget_t *w, ui_sizehint_t *hint);
 void ui_widget_set_width_fit_content(ui_widget_t *w);
 void ui_widget_set_width_fill_available(ui_widget_t *w);
 void ui_resizer_load_row_minmaxinfo(ui_resizer_t *resizer);

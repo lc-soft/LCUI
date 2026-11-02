@@ -707,7 +707,8 @@ void css_init_properties(void)
                               "|| <flex-basis> ]");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/flex-basis */
-        DEFINE_PROP(flex_basis, "flex-basis", "auto | <length>", "auto");
+        DEFINE_PROP(flex_basis, "flex-basis",
+                    "auto | content | <length> | <percentage>", "auto");
 
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/flex-direction
          */

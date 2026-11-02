@@ -235,34 +235,32 @@ static void ui_compute_row_item_flex_basis(ui_widget_t *item)
         s->flex_basis = ui_widget_fix_width(item, s->flex_basis);
 }
 
-/* 计算一个居中的自动宽度子项在给定可用宽度下的 fit-content 内容宽度：
- * 文本按其 sizehint 折行后的自然宽度收缩（shrink-to-fit），无 sizehint 的
- * 容器（如 empty-header、button）则回退到测量缓存的内容宽；两者都至少
- * 不小于 min-content。 */
+/* 计算一个 auto 宽度子项在给定可用宽度下的 fit-content 内容宽度：
+ * 自有内容尺寸（sizehint）与子项布局占用的空间尺寸按轴取最大值，再受
+ * 可用宽与 max-width 钳制。sizehint 只负责自有内容层，子项空间由布局
+ * 引擎计算；两者在 LCUI 中是同一内容区的不同表达，因此取 max 而非相加。 */
 static float ui_flexbox_fit_content_width(ui_widget_t *item, float avail_width)
 {
         ui_sizehint_t hint = { 0 };
-        float content_width;
+        float own_content;
         float max_content;
         float max_width;
 
-        /* 实现了 sizehint 的部件（文本、画布等）以测量值为准，零宽也是
-         * 合法结果；只有默认空实现的原型才回退到测量缓存。 */
-        if (ui_widget_has_sizehint(item)) {
-                ui_widget_get_sizehint(item, &hint);
-                max_content = hint.max_width;
-        } else {
-                max_content = item->unconstrained_content_width;
-        }
+        ui_widget_get_sizehint(item, &hint);
+        own_content = hint.max_width;
+        max_content = y_max(own_content, item->unconstrained_content_width);
         /* 与 used width 的 clamp 保持一致：max-width 也限制 fit-content。 */
         if (ui_widget_get_max_width(item, &max_width)) {
                 max_content =
                     y_min(max_content, css_width_to_content_box_width(
                                            &item->computed_style, max_width));
         }
-        content_width = y_min(max_content, avail_width);
-        content_width = y_max(item->min_content_width, content_width);
-        return content_width;
+        if (avail_width <= 0.0f) {
+                /* 父级尚未完成布局时可用宽可能为 0；此时不能用 0 去钳制，
+                 * 否则会把 min-content 当成内在宽缓存下来。 */
+                return y_max(item->min_content_width, max_content);
+        }
+        return y_max(item->min_content_width, y_min(max_content, avail_width));
 }
 
 /* 尝试用子项 sizehint 组合测量 flex column 容器的高度，不触发 reflow。
@@ -295,7 +293,7 @@ static float ui_flexbox_try_measure_container_height(ui_widget_t *item,
                 if (child_avail < 0) {
                         child_avail = 0;
                 }
-                if (!ui_widget_has_sizehint(child)) {
+                if (!ui_widget_sizehint_is_exact(child)) {
                         return -1;
                 }
                 ui_widget_set_available_width_constraint(
@@ -374,21 +372,19 @@ static void ui_compute_column_item_flex_basis(ui_widget_t *item)
                     s->flex_basis * item->parent->content_box.height / 100);
         } else if (!IS_CSS_FIXED_LENGTH(s, flex_basis)) {
                 float intrinsic = 0;
+                float own_height = 0;
                 float avail_width = 0;
                 bool has_constraint;
                 ui_sizehint_t hint = { 0 };
 
-                /* 父级（column 容器）记录了有效的可用宽度约束时，主轴
-                 * 内在高度按该约束宽度现算 sizehint（文本将折行），
-                 * 不回写 item->max_content_*。实现了 sizehint 的部件以测量
-                 * 值为准，零高也是合法结果；默认原型的 sizehint 是空实现
-                 * （如普通容器 widget），此时回退到测量缓存，保持其行为
-                 * 不变。 */
+                /* 自有内容尺寸与子项布局尺寸按轴取最大值。sizehint 只负责
+                 * 自有内容层；容器的主轴尺寸由子项布局推导。 */
                 has_constraint =
                     ui_widget_get_available_width(item, &avail_width);
-                if (has_constraint && ui_widget_has_sizehint(item)) {
-                        ui_widget_get_sizehint(item, &hint);
-                        intrinsic = hint.max_height;
+                ui_widget_get_sizehint(item, &hint);
+                own_height = hint.max_height;
+                if (has_constraint && ui_widget_sizehint_is_exact(item)) {
+                        intrinsic = own_height;
                 } else if (has_constraint && ui_widget_has_flex_display(item) &&
                            item->specified_style.type_bits.width ==
                                CSS_WIDTH_AUTO &&
@@ -397,10 +393,12 @@ static void ui_compute_column_item_flex_basis(ui_widget_t *item)
                                CSS_ALIGN_ITEMS_CENTER) {
                         /* 居中的 flex 容器子项会被钳制到可用宽度，其高度
                          * 需在该宽度下测量，使折行高度向上传播。 */
-                        intrinsic = ui_flexbox_measure_item_height_at_width(
-                            item, avail_width);
+                        intrinsic = y_max(
+                            own_height, ui_flexbox_measure_item_height_at_width(
+                                            item, avail_width));
                 } else {
-                        intrinsic = item->unconstrained_content_height;
+                        intrinsic = y_max(own_height,
+                                          item->unconstrained_content_height);
                 }
                 CSS_SET_FIXED_LENGTH(s, flex_basis,
                                      css_height_from_cbox(s, intrinsic));
@@ -638,7 +636,6 @@ static void ui_flexbox_compute_justify_content(ui_flexbox_context_t *ctx,
                 break;
         case CSS_JUSTIFY_CONTENT_SPACE_EVENLY:
                 *space = free_space / (line->items.length + 1);
-                *start_axis += *space;
                 break;
         case CSS_JUSTIFY_CONTENT_FLEX_END:
                 *start_axis += free_space;
@@ -1177,7 +1174,9 @@ static float ui_flexbox_compute_item_layout(ui_flexbox_context_t *ctx,
                         ui_widget_reset_width(item);
                 } else if (align == CSS_ALIGN_ITEMS_STRETCH &&
                            item->specified_style.type_bits.width ==
-                               CSS_WIDTH_AUTO) {
+                               CSS_WIDTH_AUTO &&
+                           s->type_bits.margin_left != CSS_MARGIN_AUTO &&
+                           s->type_bits.margin_right != CSS_MARGIN_AUTO) {
                         CSS_SET_FIXED_LENGTH(
                             s, width,
                             css_border_box_width_to_width(
@@ -1209,7 +1208,9 @@ static float ui_flexbox_compute_item_layout(ui_flexbox_context_t *ctx,
                         ui_widget_reset_height(item);
                 } else if (align == CSS_ALIGN_ITEMS_STRETCH &&
                            item->specified_style.type_bits.height ==
-                               CSS_HEIGHT_AUTO) {
+                               CSS_HEIGHT_AUTO &&
+                           s->type_bits.margin_top != CSS_MARGIN_AUTO &&
+                           s->type_bits.margin_bottom != CSS_MARGIN_AUTO) {
                         CSS_SET_FIXED_LENGTH(
                             s, height,
                             css_border_box_height_to_height(
@@ -1218,15 +1219,45 @@ static float ui_flexbox_compute_item_layout(ui_flexbox_context_t *ctx,
                 ui_widget_reflow_if_height_changed(item);
                 item_outer_cross = item->outer_box.height;
         }
-        switch (align) {
-        case CSS_ALIGN_ITEMS_CENTER:
-                cross_axis += (line_max_cross_size - item_outer_cross) * 0.5f;
-                break;
-        case CSS_ALIGN_ITEMS_FLEX_END:
-                cross_axis += line_max_cross_size - item_outer_cross;
-                break;
-        default:
-                break;
+        {
+                bool start_auto;
+                bool end_auto;
+
+                if (column) {
+                        start_auto =
+                            s->type_bits.margin_left == CSS_MARGIN_AUTO;
+                        end_auto = s->type_bits.margin_right == CSS_MARGIN_AUTO;
+                } else {
+                        start_auto = s->type_bits.margin_top == CSS_MARGIN_AUTO;
+                        end_auto =
+                            s->type_bits.margin_bottom == CSS_MARGIN_AUTO;
+                }
+                if (start_auto || end_auto) {
+                        float free = line_max_cross_size - item_outer_cross;
+
+                        if (free < 0) {
+                                free = 0;
+                        }
+                        if (start_auto && end_auto) {
+                                cross_axis += free * 0.5f;
+                        } else if (start_auto) {
+                                cross_axis += free;
+                        }
+                } else {
+                        switch (align) {
+                        case CSS_ALIGN_ITEMS_CENTER:
+                                cross_axis +=
+                                    (line_max_cross_size - item_outer_cross) *
+                                    0.5f;
+                                break;
+                        case CSS_ALIGN_ITEMS_FLEX_END:
+                                cross_axis +=
+                                    line_max_cross_size - item_outer_cross;
+                                break;
+                        default:
+                                break;
+                        }
+                }
         }
         item->layout_x = column ? cross_axis : main_axis;
         item->layout_y = column ? main_axis : cross_axis;

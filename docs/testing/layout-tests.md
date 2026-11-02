@@ -53,6 +53,22 @@ void test_<layout>(void)
 }
 ```
 
+## 规则契约测试
+
+除了 XML scene 场景回归，flex 布局还有一套按规则组织的契约测试：
+
+- `tests/integration/test_flex_contract.c`（suite `flex contract`）：覆盖 flex 语义（`F01`–`F19`）和常见布局（`C02`–`C10`）。
+- `tests/integration/test_sizehint.c`（suite `sizehint`）：覆盖内在尺寸（`H01`–`H16`）与 sizehint 能力矩阵。
+- `tests/integration/test_empty_layout.c`（suite `empty layout`）与 `tests/integration/test_field_layout.c`（suite `field layout`）：用默认部件 + `tests/fixtures/test_empty_layout.css` / `test_field_layout.css` 的 `test-*` class 复现 empty / field 场景，不依赖 style-nova 或具体 widget 类型。
+
+约定：
+
+- 规则 ID 与缺口清单见 `docs/testing/flex-layout-coverage-audit.md`。
+- `ctest_describe` 名称以规则 ID 开头，例如 `"F07 flex shrink"`。
+- 只断言最终几何（box、相对位置、显隐），不读 `flex_basis`、分行中间值或测量缓存字段。
+- 文本相关断言使用参照文本或相对比较，不写字体相关精确 px。
+- 场景层（真实 widget 组合）仍由 `test_flex_layout.c` 和各 widget 测试承担，契约测试不复制真实结构。
+
 ## XML fixture 三层 wrapper 约定
 
 所有布局测试的 XML 必须遵循以下三层包裹结构（参考

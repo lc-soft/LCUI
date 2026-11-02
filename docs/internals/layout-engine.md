@@ -95,6 +95,9 @@ updater 先递归处理子元素（②），再做父元素自身的重排（③
 - **column 子项的主轴 basis 必须在父级可用宽下测**。纯 `unconstrained_content_height`（无限宽单行高）会让文本退回单行，实测 5 个折行用例失败，因此 `measured_content_*` 缓存不能删。
 - **row 主轴分配结果也要记录为宽度约束**（`ui_apply_row_item_main_size`），否则 `flex: 1` 子项单独 reflow 时会退回 max-content 宽。
 - **sizehint 是否实现看 `proto->has_sizehint`**，不看返回数值是否为零。零宽/零高是合法测量结果；自定义 widget 覆盖 `sizehint` 时必须置 `has_sizehint = true`。对应查询是 `ui_widget_has_sizehint()`。
+- **sizehint 只负责自有内容层**：`ui_widget_get_sizehint()` 始终可调用（默认原型是空实现，返回 0）。fit-content 与 column basis 都按 `max(自有 hint, 子项布局尺寸)` 合并；两者在 LCUI 中是同一内容区的不同表达，因此取 max 而非相加。
+- **sizehint 内在宽缓存刷新**：自动宽叶子部件用 `ui_widget_get_unconstrained_sizehint()`（临时清除 used width 与父约束）刷新 `unconstrained_*`；auto 宽 flex/inline-block 容器用自身 `content_box` 刷新。否则内容变化后会继续复用旧约束下折行的宽度。
+- **带流内子部件的容器不参与继承来的 sizehint 快路径**：`button`、`label`、`badge` 等从 `text` 继承原型的容器也带文本层 sizehint 实现，但自身文本层通常为空。`ui_widget_sizehint_is_exact()` 在无流内子项或原型标记 `sizehint_exact`（`text`、`canvas`、`textinput`）时为 true，只用于 `ui_flexbox_try_measure_container_height()` 这类组合测量快路径。
 - **`ui_flexbox_try_measure_container_height` 测量前先 `ui_widget_reset_width(child)`**，否则 `text` 会复用上一轮布局的固定宽，不折行。
 - **每次 reflow 递增 `layout_generation`**，旧约束自动失效。flex column 单独 reflow 时，只有父级仍是 flex 容器且 `align-items: center` 才从约束重推导交叉轴宽，避免 flex→block 后使用过期约束。
 - fit-content 仍会把结果写回 `computed_style.width`（已知临时例外，见项目 `docs/layout-engine-rules.md`）。

@@ -98,7 +98,7 @@
 | I4 | 每子项每次父布局 ≤1 次 reflow | 主轴趟只写尺寸；交叉趟 `reflow_if_size_changed` | 多轮往返、抖动 |
 | I5 | row 路径逐字节不变 | row 分支保持单维回流 | 破坏精确几何断言 |
 | I6 | 居中 auto 宽子项按 fit-content 钳制 | `ui_flexbox_fit_content_width` | 单行溢出容器 |
-| I7 | fit-content 双源：实现 sizehint 的部件用测量值（零也合法）、否则 `max_content` 兜底 | `ui_flexbox_fit_content_width`、`ui_widget_has_sizehint` | button 等 flex 容器被填满；零宽内容读到过期缓存 |
+| I7 | fit-content 合并：自有 `sizehint` 与子项布局尺寸按轴取 `max`；`sizehint` 始终可调用，零值合法；`sizehint_exact` 仅用于组合测量快路径 | `ui_flexbox_fit_content_width`、`ui_widget_sizehint_is_exact` | button 等 flex 容器被填满；零宽内容读到过期缓存 |
 | I8 | 独立 reflow 时从约束重推导交叉轴宽 | `ui_flexbox_reflow` 入口 | hover/路由切换后塌成单行 |
 
 ## 5. 已知缺口 / deferred
@@ -124,3 +124,7 @@
 | 内在 / 固定 / grow / row | `indefinite width single line`、`fixed width child wrap`、`grow child main size`、`browser layout` |
 | empty / empty-basic | `empty description wrap`、`empty basic learn more centered` |
 | field-checkbox | `field checkbox description stable` |
+| field-choice-card | `field choice card alignment` |
+| sizehint 能力 | `sizehint`（`sizehint capability`、`text single line hint`、`nested container height`） |
+| flex 语义契约 | `flex contract`（`F01`–`F19`、`C02`–`C10`） |
+| widget 场景 | `empty layout`（`empty basic`）、`field layout`（`field choice card`、`field checkbox row`） |

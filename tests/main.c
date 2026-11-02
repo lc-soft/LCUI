@@ -28,6 +28,10 @@ extern void test_widget_opacity(void);
 extern void test_block_layout(void);
 extern void test_flex_layout(void);
 extern void test_flex_layout_percentage_wrap(void);
+extern void test_flex_contract(void);
+extern void test_empty_layout(void);
+extern void test_field_layout(void);
+extern void test_sizehint(void);
 extern void test_scrollbar(void);
 extern void test_scrollarea(void);
 extern void test_progress(void);
@@ -77,6 +81,10 @@ static const ctest_suite_t suites[] = {
         { "block layout", test_block_layout },
         { "flex layout", test_flex_layout },
         { "flex layout percentage wrap", test_flex_layout_percentage_wrap },
+        { "flex contract", test_flex_contract },
+        { "empty layout", test_empty_layout },
+        { "field layout", test_field_layout },
+        { "sizehint", test_sizehint },
         { "scrollbar", test_scrollbar },
         { "scrollarea", test_scrollarea },
         { "progress", test_progress },

@@ -82,6 +82,8 @@ field.has-field-content {\
 }\
 field-label.has-field {\
   width: 100%;\
+  box-sizing: border-box;\
+  flex-direction: column;\
 }\
 ";
 

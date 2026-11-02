@@ -1,0 +1,90 @@
+/*
+ * tests/fixtures/test_field_layout.css
+ *
+ * Generic field layout scenarios. These rules intentionally avoid
+ * style-nova and concrete widget type selectors: the scenarios use plain
+ * widgets plus the `test-*` classes below.
+ */
+
+.test-ref {
+        width: 1000px;
+}
+
+.test-preview {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+}
+
+.test-field-title {
+        display: block;
+        font-size: 14px;
+        line-height: 19px;
+        white-space: normal;
+}
+
+.test-field-description {
+        display: block;
+        font-size: 14px;
+        line-height: 21px;
+        white-space: normal;
+}
+
+.test-field-demo {
+        display: flex;
+        flex-direction: column;
+        width: 400px;
+}
+
+.test-radio-group {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+}
+
+.test-card {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px;
+        border: 1px solid #dddddd;
+        border-radius: 8px;
+}
+
+.test-field-row {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        padding: 4px;
+        margin: -4px;
+        box-sizing: border-box;
+}
+
+.test-field-content {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        gap: 4px;
+}
+
+.test-radio {
+        width: 16px;
+        height: 16px;
+        box-sizing: border-box;
+        border: 1px solid #999999;
+        border-radius: 8px;
+        flex-shrink: 0;
+}
+
+.test-checkbox {
+        width: 16px;
+        height: 16px;
+        box-sizing: border-box;
+        border: 1px solid #999999;
+        border-radius: 4px;
+        flex-shrink: 0;
+}

@@ -91,6 +91,8 @@ ui_widget_prototype_t *ui_create_widget_prototype(const char *name,
         } else {
                 *proto = ui_widget_default_prototype;
         }
+        /* sizehint 实现可以继承，但“完整性”标记不能继承。 */
+        proto->sizehint_exact = false;
         proto->name = y_strdup(name);
         if (dict_add(ui_widget_prototype_dict, proto->name, proto) == 0) {
                 return proto;

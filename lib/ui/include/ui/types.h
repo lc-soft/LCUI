@@ -183,9 +183,12 @@ struct ui_widget_prototype {
         void (*setattr)(ui_widget_t *, const char *, const char *);
         void (*settext)(ui_widget_t *, const char *);
         void (*sizehint)(ui_widget_t *, ui_sizehint_t *);
-        /** 原型是否实现了 sizehint（区别于默认空实现）。
-         * 覆盖 sizehint 的原型必须置为 true，否则布局按空实现处理。 */
+        /** 原型是否实现了 sizehint（默认空实现）。指针始终可调用；
+         * 该标记只表示返回值是否来自真正的实现。 */
         bool has_sizehint;
+        /** 该 sizehint 是否完整描述整个部件，即使存在结构性子项。
+         * 仅用于组合测量快路径；不继承，需显式设置。 */
+        bool sizehint_exact;
         void (*resize)(ui_widget_t *, float, float);
         void (*paint)(ui_widget_t *, pd_context_t *,
                       ui_widget_actual_style_t *);

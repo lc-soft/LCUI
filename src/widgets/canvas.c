@@ -54,7 +54,7 @@ static void ui_canvas_on_destroy(ui_widget_t *w)
         ui_canvas_context_t *ctx;
         ui_canvas_t *canvas;
 
-        canvas = ui_widget_add_data(w, ui_canvas.proto, sizeof(ui_canvas_t));
+        canvas = ui_widget_get_data(w, ui_canvas.proto);
         for (list_each(node, &canvas->contexts)) {
                 ctx = node->data;
                 ctx->available = false;
@@ -159,5 +159,6 @@ void ui_register_canvas(void)
         ui_canvas.proto->paint = ui_canvas_on_paint;
         ui_canvas.proto->sizehint = ui_canvas_on_sizehint;
         ui_canvas.proto->has_sizehint = true;
+        ui_canvas.proto->sizehint_exact = true;
         ui_canvas.proto->resize = ui_canvas_on_resize;
 }

@@ -252,6 +252,56 @@ static void test_composition_helpers(void)
         ui_widget_destroy(attachment);
 }
 
+static void test_geometry(void)
+{
+        ui_widget_t *attachment = ui_create_attachment();
+        ui_widget_t *media = ui_create_attachment_media();
+        ui_widget_t *content = ui_create_attachment_content();
+        ui_widget_t *title = ui_create_attachment_title();
+        ui_widget_t *description = ui_create_attachment_description();
+        ui_widget_t *actions = ui_create_attachment_actions();
+        ui_widget_t *action = ui_create_widget(NULL);
+        float media_x, action_right, content_right;
+
+        ui_text_set_content(title, "Report.pdf");
+        ui_text_set_content(description, "PDF - 2.4 MB");
+        ui_widget_set_style_string(attachment, "width", "400px");
+        ui_widget_set_style_string(action, "width", "30px");
+        ui_widget_set_style_string(action, "height", "20px");
+
+        ui_widget_append(content, title);
+        ui_widget_append(content, description);
+        ui_widget_append(actions, action);
+        ui_widget_append(attachment, media);
+        ui_widget_append(attachment, content);
+        ui_widget_append(attachment, actions);
+        ui_widget_append(ui_root(), attachment);
+        ui_update();
+
+        ui_widget_get_offset(media, attachment, &media_x, NULL);
+        action_right = 0;
+        ui_widget_get_offset(actions, attachment, &action_right, NULL);
+        action_right += actions->border_box.width;
+        content_right = 0;
+        ui_widget_get_offset(content, attachment, &content_right, NULL);
+        content_right += content->border_box.width;
+
+        ctest_equal_bool(
+            "attachment media should be 40px wide",
+            media->border_box.width >= 39.f && media->border_box.width <= 41.f,
+            true);
+        ctest_equal_bool("attachment content should take the remaining width",
+                         content->border_box.width > 250.f, true);
+        ctest_equal_bool("attachment actions should stick to the trailing edge",
+                         action_right >= 388.f && action_right <= 392.f, true);
+        ctest_equal_bool("attachment content should not overlap the actions",
+                         content_right <= action_right - 30.f + 1.f, true);
+        ctest_equal_bool("attachment media should start after the padding",
+                         media_x >= 8.f && media_x <= 12.f, true);
+
+        ui_widget_destroy(attachment);
+}
+
 void test_attachment(void)
 {
         lcui_init();
@@ -263,5 +313,6 @@ void test_attachment(void)
         ctest_describe("attachment loading shimmer", test_loading_shimmer);
         ctest_describe("attachment composition helpers",
                        test_composition_helpers);
+        ctest_describe("attachment geometry", test_geometry);
         lcui_destroy();
 }
