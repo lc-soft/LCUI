@@ -9,313 +9,19 @@ export default function ButtonGroupDropdownDemo() {
       <Widget className="code-block">
         <Widget className="code-block-header">
           <Widget className="demo-files">
-            <Text className="demo-tab active" data-language="tsx" data-value="example.tsx">example.tsx</Text>
-            <Text className="demo-tab" data-language="tsx" data-value="main.c" style={{ display: "none" }}>main.c</Text>
-            <Text className="demo-tab" data-language="c" data-value="main.c" style={{ display: "none" }}>main.c</Text>
+            <Text className="demo-tab active" data-language="c" data-value="main.c">main.c</Text>
             <Text className="demo-tab" data-language="xml" data-value="ui.xml" style={{ display: "none" }}>ui.xml</Text>
             <Text className="demo-tab" data-language="xml" data-value="main.c" style={{ display: "none" }}>main.c</Text>
+            <Text className="demo-tab" data-language="tsx" data-value="example.tsx" style={{ display: "none" }}>example.tsx</Text>
+            <Text className="demo-tab" data-language="tsx" data-value="main.c" style={{ display: "none" }}>main.c</Text>
           </Widget>
           <Widget className="demo-languages">
-            <Text className="demo-tab active" data-value="tsx">TSX</Text>
-            <Text className="demo-tab" data-value="c">C</Text>
+            <Text className="demo-tab active" data-value="c">C</Text>
             <Text className="demo-tab" data-value="xml">XML</Text>
+            <Text className="demo-tab" data-value="tsx">TSX</Text>
           </Widget>
         </Widget>
-        <Widget className="code-block-body active" data-language="tsx" data-file="example.tsx" data-source="examples/button-group-dropdown/0">
-          <CodeBlockCopy />
-          <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
-            <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{`  [color=#8250df]Button[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`  [color=#8250df]ButtonGroup[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`  [color=#8250df]DropdownMenu[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`  [color=#8250df]DropdownMenuContent[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`  [color=#8250df]DropdownMenuGroup[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`  [color=#8250df]DropdownMenuItem[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">8</Text>
-                <Text className="code-line">{`  [color=#8250df]DropdownMenuSeparator[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">9</Text>
-                <Text className="code-line">{`  [color=#8250df]DropdownMenuTrigger[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">10</Text>
-                <Text className="code-line">{`  [color=#8250df]Icon[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">11</Text>
-                <Text className="code-line">{`  [color=#8250df]Text[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">12</Text>
-                <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">13</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">14</Text>
-                <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]Example[/color]([color=#0550ae][/color]) {`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">15</Text>
-                <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">16</Text>
-                <Text className="code-line">{`    [color=#116329]<[color=#0550ae]ButtonGroup[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">17</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color]>[/color]Follow[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">18</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]DropdownMenu[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">19</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]DropdownMenuTrigger[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">20</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"icon"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">21</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"chevron-down"[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">22</Text>
-                <Text className="code-line">{`          [color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">23</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]DropdownMenuTrigger[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">24</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]DropdownMenuContent[/color] [color=#0550ae]align[/color]=[color=#0a3069]"end"[/color] [color=#0550ae]className[/color]=[color=#0a3069]"w-44"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">25</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]DropdownMenuGroup[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">26</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">27</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"speaker-off"[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">28</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Text[/color]>[/color]Mute Conversation[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">29</Text>
-                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">30</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">31</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"checkmark"[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">32</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Text[/color]>[/color]Mark as Read[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">33</Text>
-                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">34</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">35</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"warning"[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">36</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Text[/color]>[/color]Report Conversation[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">37</Text>
-                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">38</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">39</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"person-delete"[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">40</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Text[/color]>[/color]Block User[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">41</Text>
-                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">42</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">43</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"share"[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">44</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Text[/color]>[/color]Share Conversation[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">45</Text>
-                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">46</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">47</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"copy"[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">48</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Text[/color]>[/color]Copy Conversation[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">49</Text>
-                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">50</Text>
-                <Text className="code-line">{`          [color=#116329]</[color=#0550ae]DropdownMenuGroup[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">51</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]DropdownMenuSeparator[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">52</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]DropdownMenuGroup[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">53</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]DropdownMenuItem[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"destructive"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">54</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"delete"[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">55</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Text[/color]>[/color]Delete Conversation[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">56</Text>
-                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">57</Text>
-                <Text className="code-line">{`          [color=#116329]</[color=#0550ae]DropdownMenuGroup[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">58</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]DropdownMenuContent[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">59</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]DropdownMenu[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">60</Text>
-                <Text className="code-line">{`    [color=#116329]</[color=#0550ae]ButtonGroup[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">61</Text>
-                <Text className="code-line">{`  );`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">62</Text>
-                <Text className="code-line">{`}`}</Text>
-              </Widget>
-            </ScrollAreaContent>
-            <Scrollbar />
-            <Scrollbar orientation="horizontal" />
-          </ScrollArea>
-        </Widget>
-        <Widget className="code-block-body" data-language="tsx" data-file="main.c" data-source="examples/button-group-dropdown/1" style={{ display: "none" }}>
-          <CodeBlockCopy />
-          <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
-            <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]"example.h"[/color][/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]button_group_dropdown_tsx_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`}`}</Text>
-              </Widget>
-            </ScrollAreaContent>
-            <Scrollbar />
-            <Scrollbar orientation="horizontal" />
-          </ScrollArea>
-        </Widget>
-        <Widget className="code-block-body" data-language="c" data-file="main.c" data-source="examples/button-group-dropdown/2" style={{ display: "none" }}>
+        <Widget className="code-block-body active" data-language="c" data-file="main.c" data-source="examples/button-group-dropdown/0">
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
@@ -604,7 +310,7 @@ export default function ButtonGroupDropdownDemo() {
             <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
-        <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/button-group-dropdown/3" style={{ display: "none" }}>
+        <Widget className="code-block-body" data-language="xml" data-file="ui.xml" data-source="examples/button-group-dropdown/1" style={{ display: "none" }}>
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
@@ -729,7 +435,7 @@ export default function ButtonGroupDropdownDemo() {
             <Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Widget>
-        <Widget className="code-block-body" data-language="xml" data-file="main.c" data-source="examples/button-group-dropdown/4" style={{ display: "none" }}>
+        <Widget className="code-block-body" data-language="xml" data-file="main.c" data-source="examples/button-group-dropdown/2" style={{ display: "none" }}>
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "144px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
@@ -755,6 +461,300 @@ export default function ButtonGroupDropdownDemo() {
               </Widget>
               <Widget className="code-line-row">
                 <Text className="code-line-number">6</Text>
+                <Text className="code-line">{`}`}</Text>
+              </Widget>
+            </ScrollAreaContent>
+            <Scrollbar />
+            <Scrollbar orientation="horizontal" />
+          </ScrollArea>
+        </Widget>
+        <Widget className="code-block-body" data-language="tsx" data-file="example.tsx" data-source="examples/button-group-dropdown/3" style={{ display: "none" }}>
+          <CodeBlockCopy />
+          <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
+            <ScrollAreaContent className="code-block-scroll-content">
+              <Widget className="code-line-row">
+                <Text className="code-line-number">1</Text>
+                <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">2</Text>
+                <Text className="code-line">{`  [color=#8250df]Button[/color],`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">3</Text>
+                <Text className="code-line">{`  [color=#8250df]ButtonGroup[/color],`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">4</Text>
+                <Text className="code-line">{`  [color=#8250df]DropdownMenu[/color],`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">5</Text>
+                <Text className="code-line">{`  [color=#8250df]DropdownMenuContent[/color],`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">6</Text>
+                <Text className="code-line">{`  [color=#8250df]DropdownMenuGroup[/color],`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">7</Text>
+                <Text className="code-line">{`  [color=#8250df]DropdownMenuItem[/color],`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">8</Text>
+                <Text className="code-line">{`  [color=#8250df]DropdownMenuSeparator[/color],`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">9</Text>
+                <Text className="code-line">{`  [color=#8250df]DropdownMenuTrigger[/color],`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">10</Text>
+                <Text className="code-line">{`  [color=#8250df]Icon[/color],`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">11</Text>
+                <Text className="code-line">{`  [color=#8250df]Text[/color],`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">12</Text>
+                <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">13</Text>
+                <Text className="code-line">{` `}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">14</Text>
+                <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]Example[/color]([color=#0550ae][/color]) {`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">15</Text>
+                <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">16</Text>
+                <Text className="code-line">{`    [color=#116329]<[color=#0550ae]ButtonGroup[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">17</Text>
+                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color]>[/color]Follow[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">18</Text>
+                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]DropdownMenu[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">19</Text>
+                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]DropdownMenuTrigger[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">20</Text>
+                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"icon"[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">21</Text>
+                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"chevron-down"[/color] />[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">22</Text>
+                <Text className="code-line">{`          [color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">23</Text>
+                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]DropdownMenuTrigger[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">24</Text>
+                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]DropdownMenuContent[/color] [color=#0550ae]align[/color]=[color=#0a3069]"end"[/color] [color=#0550ae]className[/color]=[color=#0a3069]"w-44"[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">25</Text>
+                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]DropdownMenuGroup[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">26</Text>
+                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">27</Text>
+                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"speaker-off"[/color] />[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">28</Text>
+                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Text[/color]>[/color]Mute Conversation[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">29</Text>
+                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">30</Text>
+                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">31</Text>
+                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"checkmark"[/color] />[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">32</Text>
+                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Text[/color]>[/color]Mark as Read[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">33</Text>
+                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">34</Text>
+                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">35</Text>
+                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"warning"[/color] />[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">36</Text>
+                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Text[/color]>[/color]Report Conversation[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">37</Text>
+                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">38</Text>
+                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">39</Text>
+                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"person-delete"[/color] />[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">40</Text>
+                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Text[/color]>[/color]Block User[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">41</Text>
+                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">42</Text>
+                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">43</Text>
+                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"share"[/color] />[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">44</Text>
+                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Text[/color]>[/color]Share Conversation[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">45</Text>
+                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">46</Text>
+                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">47</Text>
+                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"copy"[/color] />[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">48</Text>
+                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Text[/color]>[/color]Copy Conversation[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">49</Text>
+                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">50</Text>
+                <Text className="code-line">{`          [color=#116329]</[color=#0550ae]DropdownMenuGroup[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">51</Text>
+                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]DropdownMenuSeparator[/color] />[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">52</Text>
+                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]DropdownMenuGroup[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">53</Text>
+                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]DropdownMenuItem[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"destructive"[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">54</Text>
+                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"delete"[/color] />[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">55</Text>
+                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Text[/color]>[/color]Delete Conversation[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">56</Text>
+                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">57</Text>
+                <Text className="code-line">{`          [color=#116329]</[color=#0550ae]DropdownMenuGroup[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">58</Text>
+                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]DropdownMenuContent[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">59</Text>
+                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]DropdownMenu[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">60</Text>
+                <Text className="code-line">{`    [color=#116329]</[color=#0550ae]ButtonGroup[/color]>[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">61</Text>
+                <Text className="code-line">{`  );`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">62</Text>
+                <Text className="code-line">{`}`}</Text>
+              </Widget>
+            </ScrollAreaContent>
+            <Scrollbar />
+            <Scrollbar orientation="horizontal" />
+          </ScrollArea>
+        </Widget>
+        <Widget className="code-block-body" data-language="tsx" data-file="main.c" data-source="examples/button-group-dropdown/4" style={{ display: "none" }}>
+          <CodeBlockCopy />
+          <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
+            <ScrollAreaContent className="code-block-scroll-content">
+              <Widget className="code-line-row">
+                <Text className="code-line-number">1</Text>
+                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">2</Text>
+                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]"example.h"[/color][/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">3</Text>
+                <Text className="code-line">{` `}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">4</Text>
+                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]button_group_dropdown_tsx_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">5</Text>
+                <Text className="code-line">{`{`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">6</Text>
+                <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
+              </Widget>
+              <Widget className="code-line-row">
+                <Text className="code-line-number">7</Text>
                 <Text className="code-line">{`}`}</Text>
               </Widget>
             </ScrollAreaContent>

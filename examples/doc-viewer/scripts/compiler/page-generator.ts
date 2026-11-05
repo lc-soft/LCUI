@@ -663,15 +663,13 @@ function renderSections(
 function buildDemoIndexTsx(ex: CompiledExample, snippets: SnippetRegistry): string {
   const componentName = pascalCase(ex.name) + "Demo";
 
-  // Sort variants so tsx comes first — on_ready picks the first
-  // language tab as the default, and tsx is the primary language for
-  // this doc-viewer.  Other variants keep their original relative
-  // order after tsx.
+  // Sort variants so C comes first — on_ready picks the first language
+  // tab as the default.  The preview always renders the C demo, so the
+  // code panel starts on the implementation that matches it.  Other
+  // variants keep their original relative order after C.
   //
-  // Within each variant, sort files so that `.tsx` (and `.ts`/`.jsx`)
-  // files come before `.c`/`.h`/`.xml` — the first file of the
-  // default tsx language is the one auto-selected on mount, and
-  // framework code is more interesting than the surrounding boilerplate.
+  // Within each variant, keep `.tsx` (and `.ts`/`.jsx`) files first so
+  // the TSX panel opens on framework code; C variants only have main.c.
   const frameworkExt = /\.(tsx|ts|jsx)$/i;
   const sortedVariants = ex.variants.map((v) => ({
     ...v,
@@ -681,12 +679,12 @@ function buildDemoIndexTsx(ex: CompiledExample, snippets: SnippetRegistry): stri
       return aF - bF;
     }),
   })).sort((a, b) => {
-    if (a.id === "tsx") return -1;
-    if (b.id === "tsx") return 1;
+    if (a.id === "c") return -1;
+    if (b.id === "c") return 1;
     return 0;
   });
 
-  // Default language is the first in sortedVariants (tsx).
+  // Default language is the first in sortedVariants (c).
   // Default file is the first file of the default variant.
   const defaultLanguage = sortedVariants[0].id;
   const defaultFile = sortedVariants[0].files[0].filename;
