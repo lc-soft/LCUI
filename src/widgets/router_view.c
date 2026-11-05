@@ -1,4 +1,4 @@
-﻿/*
+/*
  * src/widgets/router_view.c: -- Router view widget
  *
  * Copyright (c) 2023-2026, Liu Chao <hello@lcui.dev> All rights reserved.
@@ -48,6 +48,14 @@ static ui_widget_t *ui_router_view_get_matched(ui_widget_t *w,
                 name = "default";
         }
         component_name = router_route_record_get_component(record, name);
+        /* Sibling navigation often keeps the layout component at this index
+         * (e.g. /docs/a -> /docs/b still renders the same docs layout).
+         * Recreating it would rebuild the whole subtree: sidebar scroll
+         * position, link active state and any local state would reset. */
+        if (component_name && view->matched_widget &&
+            ui_check_widget_type(view->matched_widget, component_name)) {
+                return view->matched_widget;
+        }
         if (view->keep_alive) {
                 component = dict_fetch_value(view->cache, component_name);
                 if (!component) {
@@ -65,14 +73,21 @@ static void ui_router_view_on_route_update(void *w, const router_route_t *to,
                                            const router_route_t *from)
 {
         ui_router_view_t *view;
+        ui_widget_t *matched;
 
         view = ui_widget_get_data(w, ui_router_view_proto);
+        matched = ui_router_view_get_matched(w, to);
+        if (matched && matched == view->matched_widget) {
+                /* Same component instance: keep it mounted so its subtree is
+                 * not torn down and rebuilt. */
+                return;
+        }
         if (view->matched_widget && view->keep_alive) {
                 ui_widget_unlink(view->matched_widget);
         }
-        view->matched_widget = ui_router_view_get_matched(w, to);
+        view->matched_widget = matched;
         ui_widget_empty(w);
-        ui_widget_append(w, view->matched_widget);
+        ui_widget_append(w, matched);
 }
 
 static void ui_router_view_on_ready(ui_widget_t *w, ui_event_t *e, void *arg)
@@ -130,6 +145,7 @@ static void ui_router_view_on_init(ui_widget_t *w)
                                   sizeof(ui_router_view_t));
         view->router = NULL;
         view->watcher = NULL;
+        view->matched_widget = NULL;
         dict_init_string_copy_key_type(&view->cache_dict_type);
         view->cache = dict_create(&view->cache_dict_type, NULL);
         view->keep_alive = false;

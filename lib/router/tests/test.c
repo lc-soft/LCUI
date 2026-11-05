@@ -211,6 +211,16 @@ void test_router_matcher(void)
         str = router_route_get_param(route, "username");
         ctest_equal_str("match('/users/root').route.params.username", str,
                         "root");
+        record = router_route_get_matched_record(route, 0);
+        ctest_equal_str(
+            "match('/users/root').route.matched[0]",
+            record ? router_route_record_get_component(record, NULL) : NULL,
+            "user-show");
+        record = router_route_get_matched_record(route, 1);
+        ctest_equal_str(
+            "match('/users/root').route.matched[1]",
+            record ? router_route_record_get_component(record, NULL) : NULL,
+            "user-overview");
         router_resolved_destroy(resolved);
 
         location = router_location_create("user#posts", NULL);
@@ -564,6 +574,69 @@ void test_router_history(void)
         router_destroy(router);
 }
 
+static void test_router_nested_layout(void)
+{
+        router_t *router = router_create(NULL);
+        router_config_t *config;
+        router_route_record_t *layout;
+        router_route_t *route;
+        router_resolved_t *resolved;
+        router_location_t *location;
+        const router_route_record_t *record;
+
+        config = router_config_create();
+        router_config_set_path(config, "/widgets");
+        router_config_set_component(config, NULL, "widgets-layout");
+        layout = router_add_route_record(router, config, NULL);
+        router_config_destroy(config);
+
+        config = router_config_create();
+        router_config_set_path(config, "");
+        router_config_set_component(config, NULL, "widgets-page");
+        router_add_route_record(router, config, layout);
+        router_config_destroy(config);
+
+        config = router_config_create();
+        router_config_set_path(config, "button");
+        router_config_set_component(config, NULL, "widgets-button-page");
+        router_add_route_record(router, config, layout);
+        router_config_destroy(config);
+
+        location = router_location_create(NULL, "/widgets");
+        resolved = router_resolve(router, location, false);
+        router_location_destroy(location);
+        route = router_resolved_get_route(resolved);
+        record = router_route_get_matched_record(route, 0);
+        ctest_equal_str(
+            "nested match('/widgets')[0]",
+            record ? router_route_record_get_component(record, NULL) : NULL,
+            "widgets-layout");
+        record = router_route_get_matched_record(route, 1);
+        ctest_equal_str(
+            "nested match('/widgets')[1]",
+            record ? router_route_record_get_component(record, NULL) : NULL,
+            "widgets-page");
+        router_resolved_destroy(resolved);
+
+        location = router_location_create(NULL, "/widgets/button");
+        resolved = router_resolve(router, location, false);
+        router_location_destroy(location);
+        route = router_resolved_get_route(resolved);
+        record = router_route_get_matched_record(route, 0);
+        ctest_equal_str(
+            "nested match('/widgets/button')[0]",
+            record ? router_route_record_get_component(record, NULL) : NULL,
+            "widgets-layout");
+        record = router_route_get_matched_record(route, 1);
+        ctest_equal_str(
+            "nested match('/widgets/button')[1]",
+            record ? router_route_record_get_component(record, NULL) : NULL,
+            "widgets-button-page");
+        router_resolved_destroy(resolved);
+
+        router_destroy(router);
+}
+
 int main(void)
 {
         logger_set_level(LOGGER_LEVEL_OFF);
@@ -571,6 +644,7 @@ int main(void)
         ctest_describe("router location", test_router_location);
         ctest_describe("router route", test_router_route);
         ctest_describe("router matcher", test_router_matcher);
+        ctest_describe("router nested layout", test_router_nested_layout);
         ctest_describe("router history", test_router_history);
         return ctest_finish();
 }

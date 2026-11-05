@@ -98,6 +98,42 @@ void test_router_components(void)
              !ui_widget_has_class(link_foo, "router-link-active")),
             true);
 
+        /* Sibling routes that share the same component must reuse the mounted
+         * instance instead of rebuilding the subtree. */
+        config = router_config_create();
+        router_config_set_path(config, "/same/a");
+        router_config_set_component(config, NULL, "same");
+        router_add_route_record(router, config, NULL);
+        router_config_destroy(config);
+
+        config = router_config_create();
+        router_config_set_path(config, "/same/b");
+        router_config_set_component(config, NULL, "same");
+        router_add_route_record(router, config, NULL);
+        router_config_destroy(config);
+
+        ui_create_widget_prototype("same", NULL);
+        {
+                router_location_t *location =
+                    router_location_create(NULL, "/same/a");
+                ui_widget_t *first;
+
+                router_push(router, location);
+                router_location_destroy(location);
+                ui_update();
+                first = ui_router_view_get_matched_widget(view);
+                ctest_equal_bool("[/same/a] should render <same>",
+                                 first && ui_check_widget_type(first, "same"),
+                                 true);
+                location = router_location_create(NULL, "/same/b");
+                router_push(router, location);
+                router_location_destroy(location);
+                ui_update();
+                ctest_equal_bool(
+                    "[/same/b] should keep the mounted <same> instance",
+                    ui_router_view_get_matched_widget(view) == first, true);
+        }
+
         ui_destroy();
         router_destroy(router);
 }
