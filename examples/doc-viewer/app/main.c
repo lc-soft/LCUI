@@ -23,6 +23,7 @@
 #include "main.h"
 #include "components/list.h"
 #include "locale.h"
+#include "theme.h"
 #include <stdio.h>
 
 static void register_semantic_text_aliases(void)
@@ -46,11 +47,13 @@ int main(int argc, char *argv[])
 
         router_t *router = router_get_by_name("AppRouter");
         const char *locale = app_get_locale();
+
+        app_apply_theme();
         char initial_path[128];
         router_location_t *location;
 
-        snprintf(initial_path, sizeof(initial_path), "/%s/overview/quick-start",
-                 locale ? locale : "en");
+        snprintf(initial_path, sizeof(initial_path),
+                 "/%s/docs/overview/quick-start", locale ? locale : "en");
         location = router_location_create(NULL, initial_path);
         router_push(router, location);
         router_location_destroy(location);

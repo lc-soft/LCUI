@@ -1,0 +1,19 @@
+﻿import {
+  PropsWithChildren,
+  ScrollArea,
+  ScrollAreaContent,
+  Scrollbar,
+} from "@lcui/react";
+import DocsSidebar from "../../components/sidebar";
+
+export default function EnDocsLayout({ children }: PropsWithChildren) {
+  return (
+    <div className="flex flex-1 min-h-0 h-full">
+      <DocsSidebar locale="en" />
+      <ScrollArea className="flex-1">
+        <ScrollAreaContent>{children}</ScrollAreaContent>
+        <Scrollbar direction="vertical" />
+      </ScrollArea>
+    </div>
+  );
+}

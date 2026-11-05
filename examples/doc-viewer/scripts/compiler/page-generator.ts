@@ -1163,7 +1163,7 @@ export async function generateRouteTitles(
     const localeKey = locale as "en" | "zh-CN";
     for (const section of opts.sidebar) {
       for (const item of section.items) {
-        const path = `/${locale}/${section.slug}/${item.slug}`;
+        const path = `/${locale}/docs/${section.slug}/${item.slug}`;
         const title = item.label[localeKey];
         rows.push(
           `    { "${path}", ${wideStringLiteral(title)} },`,

@@ -8,6 +8,7 @@
 #include "navbar.h"
 #include "route-titles.h"
 #include "../locale.h"
+#include "../theme.h"
 
 typedef struct {
         navbar_react_t base;
@@ -35,25 +36,13 @@ static navbar_t *navbar_get(ui_widget_t *w)
 static void navbar_apply_locale(ui_widget_t *w, const char *locale)
 {
         navbar_t *that = navbar_get(w);
-        ui_widget_t *buttons[2] = {
-                that->base.refs.locale_en,
-                that->base.refs.locale_zh,
-        };
-        const char *button_locales[2] = { "en", "zh-CN" };
 
         if (that->current_locale) {
                 ui_widget_remove_class(ui_root(), that->current_locale);
         }
         ui_widget_add_class(ui_root(), locale);
-        for (int i = 0; i < 2; ++i) {
-                if (!buttons[i]) {
-                        continue;
-                }
-                if (strcmp(button_locales[i], locale) == 0) {
-                        ui_widget_add_class(buttons[i], "active");
-                } else {
-                        ui_widget_remove_class(buttons[i], "active");
-                }
+        if (that->base.refs.lang_group) {
+                ui_widget_set_attr(that->base.refs.lang_group, "value", locale);
         }
 }
 
@@ -86,8 +75,8 @@ static void navbar_navigate_to(ui_widget_t *w, const char *locale)
         if (suffix) {
                 snprintf(new_path, sizeof(new_path), "/%s%s", locale, suffix);
         } else {
-                snprintf(new_path, sizeof(new_path), "/%s/overview/quick-start",
-                         locale);
+                snprintf(new_path, sizeof(new_path),
+                         "/%s/docs/overview/quick-start", locale);
         }
         location = router_location_create(NULL, new_path);
         router_replace(that->router, location);
@@ -116,13 +105,71 @@ static void navbar_set_locale(ui_widget_t *w, const char *locale)
  * read its data-locale attribute and forward to navbar_set_locale.
  * --------------------------------------------------------------------- */
 
-static void navbar_on_locale_click(ui_widget_t *w, ui_event_t *e, void *arg)
+static ui_widget_t *navbar_owner(ui_widget_t *w)
 {
-        const char *locale = ui_widget_get_attr(w, "data-locale");
-        if (!locale) {
+        return ui_widget_get_closest(w, "navbar");
+}
+
+static void navbar_on_locale_change(ui_widget_t *w, ui_event_t *e, void *arg)
+{
+        ui_widget_t *item = arg;
+        ui_widget_t *navbar = navbar_owner(w);
+        const char *locale = item ? ui_widget_get_attr(item, "value") : NULL;
+
+        if (!locale || !navbar) {
                 return;
         }
-        navbar_set_locale(w->parent->parent->parent, locale);
+        navbar_set_locale(navbar, locale);
+}
+
+static void navbar_on_theme_click(ui_widget_t *w, ui_event_t *e, void *arg)
+{
+        if (strcmp(app_get_theme(), "dark") == 0) {
+                app_set_theme("light");
+        } else {
+                app_set_theme("dark");
+        }
+        app_apply_theme();
+}
+
+static void navbar_replace(ui_widget_t *navbar, const char *path)
+{
+        navbar_t *that = navbar_get(navbar);
+        router_location_t *location;
+
+        if (!that || !that->router) {
+                return;
+        }
+        location = router_location_create(NULL, path);
+        router_replace(that->router, location);
+        router_location_destroy(location);
+}
+
+static void navbar_on_nav_click(ui_widget_t *w, ui_event_t *e, void *arg)
+{
+        ui_widget_t *navbar = arg ? arg : navbar_owner(w);
+        navbar_t *that;
+        const char *nav = ui_widget_get_attr(w, "data-nav");
+        const char *locale;
+        char path[160];
+
+        if (!nav || !navbar) {
+                return;
+        }
+        that = navbar_get(navbar);
+        locale = that && that->current_locale ? that->current_locale
+                                              : app_get_locale();
+        if (strcmp(nav, "home") == 0) {
+                snprintf(path, sizeof(path), "/%s/home", locale);
+        } else if (strcmp(nav, "docs") == 0) {
+                snprintf(path, sizeof(path), "/%s/docs/overview/quick-start",
+                         locale);
+        } else if (strcmp(nav, "widgets") == 0) {
+                snprintf(path, sizeof(path), "/%s/docs/widgets", locale);
+        } else {
+                return;
+        }
+        navbar_replace(navbar, path);
 }
 
 /* -----------------------------------------------------------------------
@@ -130,12 +177,47 @@ static void navbar_on_locale_click(ui_widget_t *w, ui_event_t *e, void *arg)
  * current router location.
  * --------------------------------------------------------------------- */
 
+/* The docs are generated per locale, but the sidebar and other shared
+ * widgets render both languages and rely on the root locale class.  Keep
+ * that class in sync with the locale segment of the current route so a
+ * direct visit to /zh-CN/... or /en/... shows the matching language. */
+static void navbar_sync_locale_from_path(ui_widget_t *w, const char *path)
+{
+        navbar_t *that = navbar_get(w);
+        const char *start;
+        const char *slash;
+        char locale[16];
+        size_t length;
+
+        if (!path || path[0] != '/') {
+                return;
+        }
+        start = path + 1;
+        slash = strchr(start, '/');
+        if (!slash) {
+                return;
+        }
+        length = (size_t)(slash - start);
+        if (length == 0 || length >= sizeof(locale)) {
+                return;
+        }
+        memcpy(locale, start, length);
+        locale[length] = 0;
+        if (strcmp(locale, "en") != 0 && strcmp(locale, "zh-CN") != 0) {
+                return;
+        }
+        navbar_apply_locale(w, locale);
+        free(that->current_locale);
+        that->current_locale = y_strdup(locale);
+}
+
 static void navbar_apply_route(ui_widget_t *w, const char *path)
 {
         navbar_t *that = navbar_get(w);
         const wchar_t *title;
         wchar_t buf[256];
 
+        navbar_sync_locale_from_path(w, path);
         if (path && that->base.refs.path) {
                 ui_text_set_content(that->base.refs.path, path);
         }
@@ -170,15 +252,12 @@ static void navbar_init(ui_widget_t *w)
         that = navbar_get(w);
         that->current_locale = NULL;
 
-        /* lcui-cli only emits a click binding for the *first* ref that
-         * uses a given onClick name.  The EN button already has its
-         * binding wired up by navbar_load_template; mirror it onto the
-         * zh-CN button so both share the same click handler.  The
-         * handler reads data-locale off the clicked widget, so both
-         * paths flow through navbar_set_locale. */
-        if (that->base.refs.locale_zh) {
-                ui_widget_on(that->base.refs.locale_zh, "click",
-                             navbar_on_locale_click, w);
+        /* lcui-cli binds every ref that declares an onClick handler, so the
+         * nav buttons and theme button are already wired. The language menu
+         * reports selection through a radio-group value-change event. */
+        if (that->base.refs.locale_menu) {
+                ui_widget_on(that->base.refs.locale_menu, "value-change",
+                             navbar_on_locale_change, w);
         }
 
         that->router = router_get_by_name("AppRouter");

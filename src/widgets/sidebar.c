@@ -112,7 +112,7 @@ sidebar-group {\
 sidebar-group-label {\
   display: flex;\
   align-items: center;\
-  height: 32px;\
+  line-height: 32px;\
   padding: 0 8px;\
 }\
 sidebar-group-action {\
@@ -548,7 +548,7 @@ void ui_register_sidebar(void)
         ui_sidebar_group_prototype =
             ui_create_widget_prototype("sidebar-group", NULL);
         ui_sidebar_group_label_prototype =
-            ui_create_widget_prototype("sidebar-group-label", NULL);
+            ui_create_widget_prototype("sidebar-group-label", "text");
         ui_sidebar_group_action_prototype =
             ui_create_widget_prototype("sidebar-group-action", NULL);
         ui_sidebar_group_content_prototype =

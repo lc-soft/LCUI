@@ -82,6 +82,7 @@ textinput {
 
 h1, h2, h3, h4, h5, h6 {
   @apply font-bold text-gray-900 leading-normal;
+  line-height: 1.4;
 }
 h1 {
   @apply text-4xl  mb-4;
@@ -830,4 +831,75 @@ li {
 
 .button-group-popover-demo popover-title {
   font-size: 14px;
+}
+
+/* -- Home ------------------------------------------------------------- */
+
+.home-page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 96px 48px;
+}
+
+.home-title {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.home-desc {
+  margin-top: 16px;
+  font-size: 18px;
+  color: #666666;
+}
+
+/* -- Widgets index ---------------------------------------------------- */
+
+.widgets-index {
+  width: 100%;
+  max-width: 960px;
+  padding: 40px 48px;
+}
+
+.widgets-index-title {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.widgets-index-desc {
+  margin-top: 12px;
+  font-size: 16px;
+  color: #666666;
+}
+
+.widgets-index-heading {
+  margin-top: 40px;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.widgets-index-row {
+  display: flex;
+  flex-direction: row;
+  margin-top: 28px;
+}
+
+.widgets-index-cell {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+}
+
+.widgets-index-item {
+  width: fit-content;
+  font-size: 16px;
+}
+
+/* The router outlet sits between the page body and the docs layout; give it
+ * the body's height so the docs ScrollArea can size itself and scroll. */
+.app-body router-view {
+  height: 100%;
 }

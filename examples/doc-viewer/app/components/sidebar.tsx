@@ -1,4 +1,11 @@
-import { RouterLink, ScrollArea, ScrollAreaContent, Scrollbar, Text } from "@lcui/react";
+﻿import {
+  FunctionWidget,
+  RouterLink,
+  ScrollArea,
+  ScrollAreaContent,
+  Scrollbar,
+  Text,
+} from "@lcui/react";
 import sidebarData from "../../../../docs/sidebars.json";
 
 interface SidebarItemData {
@@ -20,7 +27,7 @@ interface SidebarSection {
 function getItemLabel(
   section: SidebarSection,
   item: SidebarItemData,
-  locale: "zh-CN" | "en"
+  locale: "zh-CN" | "en",
 ): string {
   if (locale !== "zh-CN" || section.slug !== "widgets") {
     return item.label[locale];
@@ -36,42 +43,48 @@ function getItemLabel(
   );
 }
 
-export default function DocsSidebar() {
+const DocsSidebar: FunctionWidget = ({
+  locale,
+}: {
+  locale: "zh-CN" | "en";
+}) => {
   return (
-    <ScrollArea className="flex-1 min-h-0 w-full">
-      {/* ScrollArea only tracks its first <ScrollAreaContent>, so both locales
-       * live inside one content and CSS toggles which language block is shown. */}
-      <ScrollAreaContent>
-        {(["zh-CN", "en"] as const).map((locale) => (
-          <div key={locale} className={`lang ${locale}`}>
-            {(sidebarData as { sidebar: SidebarSection[] }).sidebar.map(
-              (section: SidebarSection) => (
-                <sidebar-group key={section.slug}>
-                  <sidebar-group-label>
-                    <Text>{section.label[locale]}</Text>
-                  </sidebar-group-label>
-                  <sidebar-group-content>
-                    <sidebar-menu>
-                      {section.items.map((item: SidebarItemData) => (
-                        <sidebar-menu-item key={item.slug}>
-                          <RouterLink
-                            to={`/${locale}/${section.slug}/${item.slug}`}
-                            className="sidebar-menu-button w-fit gap-0 font-medium leading-[30px]"
-                            activeClass="active"
-                          >
-                            {getItemLabel(section, item, locale)}
-                          </RouterLink>
-                        </sidebar-menu-item>
-                      ))}
-                    </sidebar-menu>
-                  </sidebar-group-content>
-                </sidebar-group>
-              )
-            )}
-          </div>
-        ))}
-      </ScrollAreaContent>
-      <Scrollbar direction="vertical" />
-    </ScrollArea>
+    <sidebar className="bg-transparent h-full">
+      <ScrollArea className="flex-1 min-h-0 w-full">
+        {/* ScrollArea only tracks its first <ScrollAreaContent>, so both locales
+         * live inside one content and CSS toggles which language block is shown. */}
+        <ScrollAreaContent>
+          {(sidebarData as { sidebar: SidebarSection[] }).sidebar.map(
+            (section: SidebarSection) => (
+              <sidebar-group key={section.slug}>
+                <sidebar-group-label>
+                  {section.label[locale]}
+                </sidebar-group-label>
+                <sidebar-group-content>
+                  <sidebar-menu>
+                    {section.items.map((item: SidebarItemData) => (
+                      <sidebar-menu-item key={item.slug}>
+                        <RouterLink
+                          to={`/${locale}/docs/${section.slug}/${item.slug}`}
+                          className="sidebar-menu-button w-fit gap-0 font-medium leading-[30px]"
+                          activeClass="active"
+                        >
+                          {getItemLabel(section, item, locale)}
+                        </RouterLink>
+                      </sidebar-menu-item>
+                    ))}
+                  </sidebar-menu>
+                </sidebar-group-content>
+              </sidebar-group>
+            ),
+          )}
+        </ScrollAreaContent>
+        <Scrollbar direction="vertical" />
+      </ScrollArea>
+    </sidebar>
   );
-}
+};
+
+DocsSidebar.shouldPreRender = true;
+
+export default DocsSidebar;

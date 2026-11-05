@@ -17,7 +17,22 @@ docs/
     {widget}-basic-tsx/main.c example.tsx # TSX 变体
 examples/doc-viewer/
   scripts/compiler/                    # MDX → page.tsx 编译管线
+  app/
+    layout.tsx                         # 顶层：Navbar + 子路由出口
+    {locale}/docs/layout.tsx           # 文档侧栏 + 内容滚动区
+    {locale}/docs/{section}/{slug}/    # 生成的文档页（/locale/docs/...）
+    {locale}/docs/widgets/page.tsx     # 部件索引页（手写）
+    {locale}/home/page.tsx             # Home 页（手写）
+    theme.c / theme.h                  # 主题状态与持久化
 ```
+
+路由约定（2026-11 起）：
+
+- 文档页统一为 `/{locale}/docs/{section}/{slug}`；`/` 与 `/{locale}/docs` 会重定向。
+- 生成页由编译器输出到 `app/{locale}/docs/...`；手写页（Home、部件索引）与生成页结构相同，需要自行提供 `page.c` / `page.h` 骨架。
+- 导航栏与文档侧栏分属两层 layout：根 `layout.tsx` 只有 Navbar，`{locale}/docs/layout.tsx` 提供侧栏。
+- 顶栏按钮使用 Button 的 `ghost` / `secondary` 变体；语言菜单与主题按钮使用 `icon` 尺寸的 ghost 按钮。
+- 共享组件（如 sidebar）依赖 root 的 `en` / `zh-CN` class 切换语言；该 class 由 navbar 根据 URL 的 locale 段同步。
 
 ## Widget 页面模板
 
@@ -215,7 +230,7 @@ docs/examples/{name}-tsx/
 ```
 
 - **三变体必齐**：C、XML、TSX 三种实现都要提供。即使 widget 暂未在 `@lcui/react` 中导出，也要给出 TSX 变体作为前瞻占位（example.tsx 仅作为代码块展示，不会实际编译）。
-- **TSX 优先展示**：编译器按 `tsx > xml > c` 排序变体，TSX 是默认激活的标签。
+- **C 优先展示**：编译器按 `c > xml > tsx` 排序变体，C / `main.c` 是默认激活的标签；预览固定渲染 C 实现。
 - C 变体的 main.c 须定义 `{widget}_{variant}_init(ui_widget_t *parent)`
 - TSX 变体的 main.c 须 `#include "example.h"` 并调用 `example_load()`
 - 编译器自动用 highlight.js 高亮并提取 local symbols

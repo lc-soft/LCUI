@@ -155,7 +155,7 @@ async function main(): Promise<void> {
 
   for (const locale of locales) {
     console.log(`\n[locale] ${locale}`);
-    const localeAppDir = join(APP_DIR, locale);
+    const localeAppDir = join(APP_DIR, locale, "docs");
     ensureDir(localeAppDir);
     for (const section of sidebar) {
       for (const item of section.items) {
@@ -200,7 +200,7 @@ async function main(): Promise<void> {
         const section = sidebar.find((s) => s.slug === sectionDir);
         if (section) {
           await compilePage(
-            locale, section, slug, join(APP_DIR, locale),
+            locale, section, slug, join(APP_DIR, locale, "docs"),
             examplesOutDir, snippets, emittedDemos);
         }
       }
