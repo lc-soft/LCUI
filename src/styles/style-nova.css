@@ -7,7 +7,8 @@ a {
   cursor: pointer;
 }
 
-button {
+button,
+.button {
   cursor: pointer;
   box-sizing: border-box;
   height: 32px;
@@ -19,69 +20,87 @@ button {
   @apply inline-flex items-center gap-1.5 text-center rounded-lg border border-border bg-background px-2.5 text-sm font-medium text-foreground;
 }
 
-button:hover {
+button:hover,
+.button:hover {
   @apply bg-muted text-foreground;
 }
 
-button:outline {
+button:outline,
+.button-outline {
   @apply border-border bg-background text-foreground;
 }
 
-button:outline:hover {
+button:outline:hover,
+.button-outline:hover {
   @apply bg-muted text-foreground;
 }
 
-button:primary {
+button:primary,
+.button-primary {
   @apply border-transparent bg-primary text-primary-foreground;
 }
 
-button:primary:hover {
+button:primary:hover,
+.button-primary:hover {
   @apply bg-neutral-600 text-primary-foreground;
 }
 
-button:secondary {
+button:secondary,
+.button-secondary {
   @apply border-secondary bg-secondary text-secondary-foreground;
 }
 
-button:secondary:hover {
+button:secondary:hover,
+.button-secondary:hover {
   @apply bg-neutral-200 text-secondary-foreground;
 }
 
-button:ghost {
+button:ghost,
+.button-ghost {
   @apply border-transparent bg-transparent text-foreground;
 }
 
-button:ghost:hover {
+button:ghost:hover,
+.button-ghost:hover {
   @apply bg-muted text-foreground;
 }
 
-button:destructive {
+button:destructive,
+.button-destructive {
   @apply border-transparent bg-destructive-muted text-destructive;
 }
 
-button:destructive:hover {
+button:destructive:hover,
+.button-destructive:hover {
   @apply bg-red-100 text-destructive;
 }
 
-button:link {
+button:link,
+.button-link {
   @apply border-transparent bg-transparent text-primary;
 }
 
-button:link:hover {
+button:link:hover,
+.button-link:hover {
   @apply bg-transparent text-primary;
 }
 
 button:link,
-button:link text {
+button:link text,
+.button-link,
+.button-link text {
   @apply underline-offset-4;
 }
 
 button:link:hover,
-button:link:hover text {
+button:link:hover text,
+.button-link:hover,
+.button-link:hover text {
   @apply underline;
 }
 
-button:xs {
+button:xs,
+.button-xs {
   height: 24px;
   line-height: 16px;
   padding-top: 3px;
@@ -89,7 +108,8 @@ button:xs {
   @apply gap-1 rounded-[6px] px-2 text-xs;
 }
 
-button:sm {
+button:sm,
+.button-sm {
   height: 28px;
   line-height: 16px;
   padding-top: 5px;
@@ -97,7 +117,8 @@ button:sm {
   @apply rounded-[6px] px-2 text-xs;
 }
 
-button:lg {
+button:lg,
+.button-lg {
   height: 36px;
   line-height: 20px;
   padding-top: 7px;
@@ -105,27 +126,33 @@ button:lg {
   @apply text-sm;
 }
 
-button:icon {
+button:icon,
+.button-icon {
   @apply justify-center h-8 w-8 p-0;
 }
 
-button:icon-xs {
+button:icon-xs,
+.button-icon-xs {
   @apply justify-center h-6 w-6 rounded-[6px] p-0 text-xs;
 }
 
-button:icon-sm {
+button:icon-sm,
+.button-icon-sm {
   @apply justify-center h-7 w-7 rounded-[6px] p-0 text-xs;
 }
 
-button:icon-lg {
+button:icon-lg,
+.button-icon-lg {
   @apply justify-center h-9 w-9 p-0;
 }
 
-button:disabled {
+button:disabled,
+.button:disabled {
   @apply opacity-50 pointer-events-none;
 }
 
-button:active {
+button:active,
+.button:active {
   @apply relative top-px bg-neutral-300;
 }
 
@@ -149,7 +176,8 @@ button:destructive:active {
   @apply bg-red-200 text-destructive;
 }
 
-button:link:active {
+button:link:active,
+.button-link:active {
   @apply bg-transparent text-primary underline;
 }
 

@@ -1,20 +1,6 @@
-#include <router.h>
 #include "page.tsx.h"
 #include "page.h"
 
-static void widgets_index_on_nav(ui_widget_t *w, ui_event_t *e, void *arg)
-{
-        const char *path = ui_widget_get_attr(w, "data-to");
-        router_t *router = router_get_by_name("AppRouter");
-        router_location_t *location;
-
-        if (!path || !router) {
-                return;
-        }
-        location = router_location_create(NULL, path);
-        router_replace(router, location);
-        router_location_destroy(location);
-}
 typedef struct {
         en_docs_widgets_page_react_t base;
 } en_docs_widgets_page_t;

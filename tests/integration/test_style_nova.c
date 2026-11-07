@@ -436,6 +436,89 @@ static void check_attachment_theme(void)
         ui_widget_destroy(attachment);
 }
 
+static void check_button_class_variant(void)
+{
+        ui_widget_t *button = ui_create_button();
+        ui_widget_t *proxy = ui_create_widget(NULL);
+
+        ui_widget_add_class(proxy, "button");
+        ui_widget_append(ui_root(), button);
+        ui_widget_append(ui_root(), proxy);
+        ui_update();
+
+        ctest_equal_float("class .button should match the button height",
+                          proxy->computed_style.height,
+                          button->computed_style.height);
+        ctest_equal_float("class .button should match the button line height",
+                          proxy->computed_style.line_height,
+                          button->computed_style.line_height);
+        ctest_equal_float("class .button should match the button padding",
+                          proxy->computed_style.padding_top,
+                          button->computed_style.padding_top);
+        ctest_equal_float("class .button should center text with padding",
+                          proxy->computed_style.padding_top, 5.0f);
+
+        ui_widget_destroy(button);
+        ui_widget_destroy(proxy);
+        ui_clear_trash();
+}
+
+static void check_button_class_variants(void)
+{
+        ui_widget_t *primary = ui_create_button();
+        ui_widget_t *secondary = ui_create_button();
+        ui_widget_t *xs = ui_create_button();
+        ui_widget_t *lg = ui_create_button();
+        ui_widget_t *primary_proxy = ui_create_widget(NULL);
+        ui_widget_t *secondary_proxy = ui_create_widget(NULL);
+        ui_widget_t *xs_proxy = ui_create_widget(NULL);
+        ui_widget_t *lg_proxy = ui_create_widget(NULL);
+
+        ui_button_set_variant(primary, UI_BUTTON_VARIANT_PRIMARY);
+        ui_button_set_variant(secondary, UI_BUTTON_VARIANT_SECONDARY);
+        ui_button_set_size(xs, UI_BUTTON_SIZE_XS);
+        ui_button_set_size(lg, UI_BUTTON_SIZE_LG);
+        ui_widget_add_class(primary_proxy, "button button-primary");
+        ui_widget_add_class(secondary_proxy, "button button-secondary");
+        ui_widget_add_class(xs_proxy, "button button-xs");
+        ui_widget_add_class(lg_proxy, "button button-lg");
+        ui_widget_append(ui_root(), primary);
+        ui_widget_append(ui_root(), secondary);
+        ui_widget_append(ui_root(), xs);
+        ui_widget_append(ui_root(), lg);
+        ui_widget_append(ui_root(), primary_proxy);
+        ui_widget_append(ui_root(), secondary_proxy);
+        ui_widget_append(ui_root(), xs_proxy);
+        ui_widget_append(ui_root(), lg_proxy);
+        ui_update();
+
+        ctest_equal_bool("class .button-primary should match primary colors",
+                         primary_proxy->computed_style.background_color ==
+                             primary->computed_style.background_color,
+                         true);
+        ctest_equal_bool(
+            "class .button-secondary should match secondary colors",
+            secondary_proxy->computed_style.background_color ==
+                secondary->computed_style.background_color,
+            true);
+        ctest_equal_float("class .button-xs should match xs height",
+                          xs_proxy->computed_style.height,
+                          xs->computed_style.height);
+        ctest_equal_float("class .button-lg should match lg height",
+                          lg_proxy->computed_style.height,
+                          lg->computed_style.height);
+
+        ui_widget_destroy(primary);
+        ui_widget_destroy(secondary);
+        ui_widget_destroy(xs);
+        ui_widget_destroy(lg);
+        ui_widget_destroy(primary_proxy);
+        ui_widget_destroy(secondary_proxy);
+        ui_widget_destroy(xs_proxy);
+        ui_widget_destroy(lg_proxy);
+        ui_clear_trash();
+}
+
 void test_style_nova(void)
 {
         lcui_init();
@@ -443,6 +526,10 @@ void test_style_nova(void)
         ctest_describe("style-nova: label", check_label_typography);
         ctest_describe("style-nova: button typography",
                        check_button_typography);
+        ctest_describe("style-nova: button class variant",
+                       check_button_class_variant);
+        ctest_describe("style-nova: button class variants",
+                       check_button_class_variants);
         ctest_describe("style-nova: button icon typography",
                        check_button_icon_typography);
         ctest_describe("style-nova: button interaction",

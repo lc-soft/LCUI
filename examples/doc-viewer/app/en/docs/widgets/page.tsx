@@ -1,4 +1,4 @@
-import { Button, Text } from "@lcui/react";
+import { RouterLink, Text } from "@lcui/react";
 import sidebarData from "../../../../../../docs/sidebars.json";
 
 interface SidebarItemData {
@@ -39,14 +39,12 @@ export default function EnWidgetsPage() {
         <div className="widgets-index-row" key={index}>
           {row.map((item) => (
             <div className="widgets-index-cell" key={item.slug}>
-              <Button
-                variant="link"
-                className="widgets-index-item"
-                data-to={`/en/docs/widgets/${item.slug}`}
-                onClick="widgets_index_on_nav"
+              <RouterLink
+                className="button button-link button-sm widgets-index-item"
+                to={`/en/docs/widgets/${item.slug}`}
               >
                 <Text>{item.label.en}</Text>
-              </Button>
+              </RouterLink>
             </div>
           ))}
         </div>
