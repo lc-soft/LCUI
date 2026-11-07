@@ -54,6 +54,8 @@ module.exports = {
     "opacity",
     "whitespace",
     "cursor",
+    "position",
+    "inset",
     "textDecoration",
     "textUnderlineOffset",
   ],

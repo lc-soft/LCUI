@@ -40,7 +40,12 @@ export default function Navbar() {
         <dropdown-menu $ref="locale_menu">
           <dropdown-menu-trigger>
             <Button variant="ghost" size="icon" $ref="locale_btn">
-              <icon name="local-language" />
+              <Text className="relative left-[3px] text-xs">
+                文
+              </Text>
+              <Text className="relative bottom-[-5px] right-[3px] text-xs">
+                A
+              </Text>
             </Button>
           </dropdown-menu-trigger>
           <dropdown-menu-content align="end">
