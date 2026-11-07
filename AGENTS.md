@@ -292,6 +292,16 @@ close->tab_index = 0;
   不像 SVG 可以通过宽高工具类（`size-4` / `w-4` / `h-4`）控制；
   给图标写 `size-*` 类是无效的，属于常见错误。
 
+### 按钮文本垂直居中
+
+`button` 继承 `text` 原型，标签是部件**自身文本**，不是 flex 子项，`align-items: center`
+不会让它居中，文本仍从 content-box 顶部排起（表现为贴顶或被裁）。
+
+- 文本按钮用上下 padding 居中：`(height - 2px border - line-height) / 2`
+  - 默认 32/20 → 5px；`xs` 24/16 → 3px；`sm` 28/16 → 5px；`lg` 36/20 → 7px
+- 图标按钮用 `p-0`，图标是子部件，由 flex 居中；不要给它们加垂直 padding
+- 修改按钮高度或 `line-height` 时必须同步重算 padding，否则文本会再次贴顶
+
 ### 带图标按钮
 
 - 带图标且带标签的 `button`，标签必须作为独立的 `text` 子部件追加；不得使用

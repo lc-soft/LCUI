@@ -12,6 +12,10 @@ button {
   box-sizing: border-box;
   height: 32px;
   line-height: 20px;
+  /* Text is the widget's own content, not a flex item, so it needs explicit
+   * vertical padding to sit centered: (32 - 2px border - 20px line) / 2. */
+  padding-top: 5px;
+  padding-bottom: 5px;
   @apply inline-flex items-center gap-1.5 text-center rounded-lg border border-border bg-background px-2.5 text-sm font-medium text-foreground;
 }
 
@@ -80,18 +84,24 @@ button:link:hover text {
 button:xs {
   height: 24px;
   line-height: 16px;
+  padding-top: 3px;
+  padding-bottom: 3px;
   @apply gap-1 rounded-[6px] px-2 text-xs;
 }
 
 button:sm {
   height: 28px;
   line-height: 16px;
+  padding-top: 5px;
+  padding-bottom: 5px;
   @apply rounded-[6px] px-2 text-xs;
 }
 
 button:lg {
   height: 36px;
   line-height: 20px;
+  padding-top: 7px;
+  padding-bottom: 7px;
   @apply text-sm;
 }
 
