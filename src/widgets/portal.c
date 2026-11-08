@@ -326,6 +326,9 @@ static void ui_portal_on_anchor_scroll(ui_widget_t *w, ui_event_t *e, void *arg)
                 return;
         }
         for (i = 0; i < data->scroll_parent_count; ++i) {
+                if (!data->scroll_parents[i]) {
+                        continue;
+                }
                 top = ui_scrollarea_get_scroll_top(data->scroll_parents[i]);
                 left = ui_scrollarea_get_scroll_left(data->scroll_parents[i]);
                 dx += left - data->scroll_lefts[i];
@@ -343,6 +346,25 @@ static void ui_portal_on_anchor_scroll(ui_widget_t *w, ui_event_t *e, void *arg)
         ui_widget_request_update(portal);
 }
 
+static void ui_portal_on_scroll_parent_destroy(ui_widget_t *w, ui_event_t *e,
+                                               void *arg)
+{
+        ui_portal_t *data = ui_portal_get_data(e->data);
+        size_t i;
+
+        /* Only the scroll parent itself dying invalidates the stored pointer.
+         * The event object keeps the original target, so a forwarded event
+         * from somewhere else is ignored. */
+        if (!data || e->target != w) {
+                return;
+        }
+        for (i = 0; i < data->scroll_parent_count; ++i) {
+                if (data->scroll_parents[i] == w) {
+                        data->scroll_parents[i] = NULL;
+                }
+        }
+}
+
 static void ui_portal_clear_scroll_parents(ui_portal_t *data)
 {
         size_t i;
@@ -350,10 +372,13 @@ static void ui_portal_clear_scroll_parents(ui_portal_t *data)
         for (i = 0; i < data->scroll_parent_count; ++i) {
                 ui_widget_t *w = data->scroll_parents[i];
 
-                if (w && w->state != UI_WIDGET_STATE_DELETED) {
-                        ui_widget_off(w, "scroll", ui_portal_on_anchor_scroll,
-                                      data->owner);
+                if (!w) {
+                        continue;
                 }
+                ui_widget_off(w, "scroll", ui_portal_on_anchor_scroll,
+                              data->owner);
+                ui_widget_off(w, "destroy", ui_portal_on_scroll_parent_destroy,
+                              data->owner);
         }
         free(data->scroll_parents);
         free(data->scroll_tops);
@@ -407,6 +432,8 @@ static void ui_portal_bind_scroll_parents(ui_portal_t *data)
         for (i = 0; i < count; ++i) {
                 ui_widget_on(data->scroll_parents[i], "scroll",
                              ui_portal_on_anchor_scroll, data->owner);
+                ui_widget_on(data->scroll_parents[i], "destroy",
+                             ui_portal_on_scroll_parent_destroy, data->owner);
         }
 }
 

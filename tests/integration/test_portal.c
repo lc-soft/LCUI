@@ -342,6 +342,98 @@ static void test_follow_anchor_scroll(void)
         ui_clear_trash();
 }
 
+/* A scroll parent can be destroyed before the portal that tracks it: the
+ * router replaces the docs layout while the old page (and its dropdown
+ * portals) still wait in the trash. The portal must not touch the freed
+ * widget when it is destroyed later. */
+static void test_scroll_parent_destroyed_first(void)
+{
+        ui_widget_t *container = ui_create_scrollarea();
+        ui_widget_t *scroll_content = ui_create_scrollarea_content();
+        ui_widget_t *anchor = ui_create_button();
+        ui_widget_t *portal = ui_create_portal();
+        ui_widget_t *content = ui_create_widget(NULL);
+
+        ui_widget_set_style_string(content, "position", "absolute");
+        ui_widget_set_style_string(container, "position", "absolute");
+        ui_widget_set_style_string(container, "left", "0");
+        ui_widget_set_style_string(container, "top", "0");
+        ui_widget_set_style_string(container, "width", "300px");
+        ui_widget_set_style_string(container, "height", "200px");
+        ui_widget_set_style_string(scroll_content, "height", "600px");
+        ui_widget_append(scroll_content, anchor);
+        ui_widget_append(container, scroll_content);
+        ui_root_append(container);
+
+        ui_widget_append(ui_root(), portal);
+        ui_portal_set_content(portal, content);
+        ui_portal_set_anchor(portal, anchor);
+        ui_portal_set_follow_anchor(portal, true);
+        ui_portal_open(portal);
+        ui_update();
+
+        ui_widget_destroy(container);
+        ui_widget_destroy(portal);
+        ui_clear_trash();
+
+        ctest_equal_int("portal should survive its scroll parent",
+                        ui_get_portal_root() != NULL, 1);
+}
+
+/* Destroy events bubble up to ancestors. A descendant dying must not
+ * invalidate the portal's scroll-parent binding. */
+static void test_follow_survives_descendant_destroy(void)
+{
+        ui_widget_t *container = ui_create_scrollarea();
+        ui_widget_t *scroll_content = ui_create_scrollarea_content();
+        ui_widget_t *anchor = ui_create_button();
+        ui_widget_t *sibling = ui_create_button();
+        ui_widget_t *portal = ui_create_portal();
+        ui_widget_t *content = ui_create_widget(NULL);
+        float cy0, cy1, ay0, ay1;
+
+        ui_widget_set_style_string(content, "position", "absolute");
+        ui_widget_set_style_string(container, "position", "absolute");
+        ui_widget_set_style_string(container, "left", "0");
+        ui_widget_set_style_string(container, "top", "0");
+        ui_widget_set_style_string(container, "width", "300px");
+        ui_widget_set_style_string(container, "height", "200px");
+        ui_widget_set_style_string(scroll_content, "height", "600px");
+        ui_widget_set_style_string(anchor, "position", "absolute");
+        ui_widget_set_style_string(anchor, "left", "20px");
+        ui_widget_set_style_string(anchor, "top", "60px");
+        ui_widget_set_style_string(anchor, "width", "80px");
+        ui_widget_set_style_string(anchor, "height", "32px");
+        ui_widget_append(scroll_content, anchor);
+        ui_widget_append(scroll_content, sibling);
+        ui_widget_append(container, scroll_content);
+        ui_root_append(container);
+
+        ui_widget_append(ui_root(), portal);
+        ui_portal_set_content(portal, content);
+        ui_portal_set_anchor(portal, anchor);
+        ui_portal_set_follow_anchor(portal, true);
+        ui_portal_open(portal);
+        ui_update();
+        ui_widget_get_offset(content, ui_root(), NULL, &cy0);
+        ui_widget_get_offset(anchor, ui_root(), NULL, &ay0);
+
+        ui_widget_destroy(sibling);
+        ui_scrollarea_set_scroll_top(container, 50);
+        ui_update();
+        ui_widget_get_offset(content, ui_root(), NULL, &cy1);
+        ui_widget_get_offset(anchor, ui_root(), NULL, &ay1);
+
+        ctest_equal_bool("portal follow should survive descendant destroy",
+                         fabsf((cy1 - ay1) - (cy0 - ay0)) <= 1, true);
+        ctest_equal_bool("portal follow should still track the anchor",
+                         ay1 < ay0 - 1, true);
+
+        ui_widget_destroy(portal);
+        ui_widget_destroy(container);
+        ui_clear_trash();
+}
+
 void test_portal(void)
 {
         lcui_init();
@@ -364,5 +456,9 @@ void test_portal(void)
                        test_capturing_content_closes_other_outside_close);
         ctest_describe("portal follow anchor scroll",
                        test_follow_anchor_scroll);
+        ctest_describe("portal scroll parent destroyed first",
+                       test_scroll_parent_destroyed_first);
+        ctest_describe("portal follow after descendant destroy",
+                       test_follow_survives_descendant_destroy);
         lcui_destroy();
 }

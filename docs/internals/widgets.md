@@ -469,6 +469,38 @@ void *emit_arg)`：
 
 widget 销毁时先 emit `destroy` 事件（handler 可访问 widget），然后 `list_destroy_without_node` 销毁所有 listeners（每个 listener 的 `destroy_data` 回调释放 `listener->data`）。因此 destroy handler 内可以安全使用 `e->data`（listener 仍存活），但 destroy handler 之后 listener 及其 data 都已释放。
 
+### 跨树缓存的指针必须在 destroy 事件里失效
+
+`ui_widget_destroy()` 是**立即 `free`**，不会把 `state` 标成 `UI_WIDGET_STATE_DELETED`
+（只有走 `ui_widget_remove()` 进 trash 的部件才会被标为该状态）。因此**不能**用
+`w->state != UI_WIDGET_STATE_DELETED` 判断缓存的 widget 指针是否还活着：指针可能早已
+被释放，读到的 `state` 是已释放内存。
+
+持有跨树指针的一方必须同时注册 `destroy` 监听，在目标部件销毁时把指针置 NULL：
+
+```c
+ui_widget_on(target, "destroy", on_target_destroy, owner);
+
+static void on_target_destroy(ui_widget_t *w, ui_event_t *e, void *arg)
+{
+        /* 事件对象的 target 始终是原触发部件；用它确认是目标自身在销毁，
+         * 而不是别处 emit 后冒泡上来的事件 */
+        if (e->target != w) {
+                return;
+        }
+        /* 把 owner 里缓存的 w 置 NULL */
+}
+```
+
+`ui_widget_destroy()` 在 emit `destroy` 之前已经把部件从父级 `unlink`，所以常见的销毁路径
+不会冒泡到祖先；`e->target == w` 判断是防止其它路径在部件仍挂树时 emit 造成误判。
+
+实际案例：`portal` 的 `scroll_parents` 缓存了祖先 `scrollarea` 指针。切换 locale 时，
+外层 router-view 先销毁旧 docs layout（包含 ScrollArea），内层 router-view 已把旧页面
+移入 trash；页面里的 dropdown portal 比 scrollarea 活得更久，销毁时 `ui_widget_off`
+访问了已释放的 scrollarea。修复方式：绑定滚动父级时同时注册 `destroy` 监听置空数组项，
+解绑时把两类监听一起 `ui_widget_off`。
+
 ### 子节点先于父节点销毁（影响 mutation observer）
 
 `ui_widget_destroy(w)`（`lib/ui/src/ui_widget.c:46`）的实际顺序是：
