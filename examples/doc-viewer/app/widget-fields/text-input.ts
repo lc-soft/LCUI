@@ -11,4 +11,13 @@ export const textInputFields: FieldData[] = [
       "zh-CN": "输入为空时显示的占位文本。",
     },
   },
+  {
+    name: "multiline",
+    type: "boolean",
+    default: "false",
+    description: {
+      en: "Enables multi-line editing: newlines are kept and the widget sizes for multiple lines.",
+      "zh-CN": "启用多行编辑：保留换行符，并按多行高度自适应。",
+    },
+  },
 ];

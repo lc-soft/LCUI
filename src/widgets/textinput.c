@@ -434,6 +434,11 @@ void ui_textinput_enable_style_tag(ui_widget_t *widget, bool enable)
 
 void ui_textinput_enable_multiline(ui_widget_t *w, bool enable)
 {
+        ui_textinput_t *edit = ui_widget_get_data(w, ui_textinput_proto);
+
+        if (edit) {
+                edit->is_multiline_mode = enable;
+        }
         if (enable) {
                 ui_widget_set_style_keyword_value(w, css_prop_white_space,
                                                   CSS_KEYWORD_AUTO);
@@ -828,6 +833,13 @@ static void ui_textinput_on_ready(ui_widget_t *w, ui_event_t *e, void *arg)
         ui_textinput_update_caret(w);
 }
 
+static bool ui_textinput_attr_to_bool(const char *value)
+{
+        return value &&
+               (strcmp(value, "true") == 0 || strcmp(value, "yes") == 0 ||
+                strcmp(value, "on") == 0 || strcmp(value, "1") == 0);
+}
+
 static void ui_textinput_on_set_attr(ui_widget_t *w, const char *name,
                                      const char *val)
 {
@@ -839,6 +851,9 @@ static void ui_textinput_on_set_attr(ui_widget_t *w, const char *name,
                 } else {
                         ui_textinput_set_password_char(w, 0);
                 }
+        } else if (strcmp(name, "multiline") == 0) {
+                ui_textinput_enable_multiline(w,
+                                              ui_textinput_attr_to_bool(val));
         }
 }
 

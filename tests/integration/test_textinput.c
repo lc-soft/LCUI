@@ -12,6 +12,34 @@
 #include <LCUI.h>
 #include <ctest-custom.h>
 
+static void check_multiline_attr(void)
+{
+        ui_widget_t *single = ui_create_widget("textinput");
+        ui_widget_t *multi = ui_create_widget("textinput");
+        ui_event_t e = { 0 };
+
+        ui_widget_set_attr(multi, "multiline", "true");
+        ui_root_append(single);
+        ui_root_append(multi);
+        ui_update();
+
+        ui_event_init(&e, "textinput");
+        e.text.text = L"a\nb";
+        e.text.length = 3;
+        ui_widget_emit_event(single, e, NULL);
+        ui_widget_emit_event(multi, e, NULL);
+        ui_update();
+
+        ctest_equal_bool("single-line input should drop newline characters",
+                         ui_textinput_get_text_length(single) == 2, true);
+        ctest_equal_bool("multiline input should keep newline characters",
+                         ui_textinput_get_text_length(multi) == 3, true);
+
+        ui_widget_destroy(single);
+        ui_widget_destroy(multi);
+        ui_clear_trash();
+}
+
 void test_textinput(void)
 {
         ui_widget_t *w;
@@ -72,5 +100,6 @@ void test_textinput(void)
         ctest_equal_bool("should retrieve identical inserted wide string",
                          wcscmp(L"hello, world!", wcs) == 0, true);
         ui_widget_destroy(w);
+        check_multiline_attr();
         lcui_destroy();
 }
