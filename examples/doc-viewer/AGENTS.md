@@ -308,6 +308,31 @@ xmake build doc-viewer
 
 > ⚠️ `bun run compile` 自动复制 `widget-fields/` 并触发页面生成；任何一步失败都会产生连锁错误。`lcui build` 输出末尾的 `unknown target(lcui) for doc-viewer.deps!` 警告无害，是已知问题，可忽略。
 
+## 离屏渲染截图
+
+`examples/doc-viewer/scripts/render-offscreen.ps1` 在不打开窗口、不移动鼠标的情况下把指定路由渲染成 PNG，适合无法手动肉眼检查的验证场景（CI、agent）：
+
+```powershell
+# 渲染单个路由
+powershell -NoProfile -ExecutionPolicy Bypass -File examples/doc-viewer/scripts/render-offscreen.ps1 `
+    -Route "/zh-CN/docs/widgets/button-group" `
+    -OutPrefix "$env:TEMP\opencode\button-group"
+
+# 渲染多个滚动位置
+powershell -NoProfile -ExecutionPolicy Bypass -File examples/doc-viewer/scripts/render-offscreen.ps1 `
+    -Route "/en/docs/widgets" -ScrollTops "0,600" `
+    -OutPrefix "$env:TEMP\opencode\en-widgets"
+```
+
+- 输出文件为 `<OutPrefix>-<ScrollTop>.png`，默认尺寸 1920x1040（按 `ui_get_actual_scale()` 换算）。
+- 脚本临时改写 `app/main.c`：替换初始路由，并用离屏 `ui_widget_render` 渲染 root 后直接
+  `lcui_destroy()`，不进入 `app_run()` 主循环。
+- 结束时从内存备份恢复 `main.c` 并重新构建；**不使用** `git checkout`，因此不会丢弃
+  `main.c` 的未提交改动。若中途异常，`finally` 仍会恢复。
+- 初始路由与 `ui_widget_resize(...)` / `return app_run();` 的文本发生变化会让替换失配，
+  脚本会报 `patch did not apply`，需同步更新脚本里的匹配文本。
+- 滚动截图选择当前树中高度最大的 `scrollarea`，即文档正文滚动区（侧栏滚动区更矮）。
+
 ## Demo 变体命名约定
 
 `docs/examples/` 下的 demo 目录名是文档里 `<WidgetExample name="...">` 的 `name` 属性值：
