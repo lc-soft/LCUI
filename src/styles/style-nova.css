@@ -1581,7 +1581,7 @@ sidebar {
 }
 
 sidebar-group-label {
-  @apply text-xs text-muted-foreground;
+  @apply text-xs text-muted-foreground leading-8;
   border-radius: 6px;
   font-weight: 500;
 }

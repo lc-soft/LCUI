@@ -1663,7 +1663,7 @@ static const struct {
         { "}\n", 2 },
         { "sidebar-group-label {\n", 22 },
         { "  font-size: 12px;\n", 19 },
-        { "  line-height: 16px;\n", 21 },
+        { "  line-height: 32px;\n", 21 },
         { "  color: #666666;\n", 18 },
         { "  border-radius: 6px;\n", 22 },
         { "  font-weight: 500;\n", 20 },

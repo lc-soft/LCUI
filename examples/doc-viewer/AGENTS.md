@@ -79,6 +79,10 @@ WidgetName
 
 #### # 标题与简介
 - H1 标题：组件名（英文，PascalCase）
+- 标题的 leading 由 `app/global.css` 统一为 `1.4`；`text-*` 工具类会同时输出配套
+  line-height（如 `text-4xl` 的 40px），Tailwind 没有「取消」它的工具，必须在
+  `@apply` 里紧跟 `text-*` 之后追加 `leading-[1.4]`（`@apply` 保留声明顺序，后写
+  的声明生效）。否则单行标题的降部会被内容框裁掉
 - 紧跟一段功能描述（一至两句话）
 
 #### WidgetExample（demo 嵌入）

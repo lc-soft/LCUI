@@ -78,29 +78,36 @@ textinput {
  *
  * These are registered as `text` widget aliases in app/main.c.  Each
  * tag maps to a tailwind size on the default type scale; p shares the
- * h6 size and is distinguished only by weight. */
+ * h6 size and is distinguished only by weight.
+ *
+ * `text-*` utilities also emit a paired line-height (e.g. text-4xl is
+ * 36px/40px). That is tighter than the semantic 1.4 and, because text
+ * baselines are laid out from the font ascent/descent, it clips the
+ * descenders of single-line titles. Tailwind has no "unset" for the
+ * paired line-height, so every heading appends `leading-[1.4]` right
+ * after its `text-*` utility; @apply keeps declaration order, so the
+ * later line-height wins inside the same rule. */
 
 h1, h2, h3, h4, h5, h6 {
-  @apply font-bold text-gray-900 leading-normal;
-  line-height: 1.4;
+  @apply font-bold text-gray-900;
 }
 h1 {
-  @apply text-4xl  mb-4;
+  @apply text-4xl mb-4 leading-[1.4];
 }
 h2 {
-  @apply text-3xl  mt-8 mb-3;
+  @apply text-3xl mt-8 mb-3 leading-[1.4];
 }
 h3 {
-  @apply text-2xl  mt-6 mb-2;
+  @apply text-2xl mt-6 mb-2 leading-[1.4];
 }
 h4 {
-  @apply text-xl   mt-6 mb-2;
+  @apply text-xl mt-6 mb-2 leading-[1.4];
 }
 h5 {
-  @apply text-lg   mt-4 mb-2;
+  @apply text-lg mt-4 mb-2 leading-[1.4];
 }
 h6 {
-  @apply text-base mt-4 mb-2;
+  @apply text-base mt-4 mb-2 leading-[1.4];
 }
 p {
   @apply text-base text-gray-800 mb-3 leading-relaxed;
