@@ -6,6 +6,9 @@ target("doc-viewer")
     set_rundir("dist")
     add_deps("lcui")
     add_files("app/**.c")
+    if is_plat("windows") then
+        add_cxflags("/utf-8", {tools = "cl"})
+    end
     add_installfiles("dist/(assets/*)")
     after_build(function (target)
         local src = path.join(os.projectdir(), "docs", "examples", "assets", "attachment")

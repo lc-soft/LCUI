@@ -1096,7 +1096,6 @@ home-column {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  min-height: 120px;
   padding: 14px;
   border-radius: 10px;
   background: #f7f7f7;
@@ -1249,15 +1248,6 @@ home-column {
 
 .home-danger {
   margin-top: 4px;
-}
-
-.home-account item,
-.home-shortcuts item {
-  min-height: 76px;
-}
-
-.home-card item {
-  align-items: flex-start;
 }
 
 .home-danger item-media {

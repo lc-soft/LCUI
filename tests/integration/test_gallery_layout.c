@@ -733,6 +733,66 @@ static void test_production_empty_icon(void)
                           icon_center, box_center);
 }
 
+static void test_home_item_actions_center(void)
+{
+        ui_widget_t *card = ui_create_card();
+        ui_widget_t *body = ui_create_card_content();
+        ui_widget_t *item = ui_create_item();
+        ui_widget_t *media = ui_create_item_media();
+        ui_widget_t *media_icon = ui_create_fluent_icon("settings");
+        ui_widget_t *content = ui_create_item_content();
+        ui_widget_t *title = ui_create_item_title();
+        ui_widget_t *description = ui_create_item_description();
+        ui_widget_t *actions = ui_create_item_actions();
+        ui_widget_t *icon = ui_create_fluent_icon("chevron-right");
+        float x = 0;
+        float y = 0;
+        float item_center;
+        float icon_center;
+
+        ui_widget_add_class(card, "home-card");
+        ui_widget_add_class(body, "home-card-body home-shortcuts");
+        ui_widget_set_attr(media, "variant", "icon");
+        ui_text_set_content(title, "Change transfer limit");
+        ui_text_set_content(description,
+                            "Adjust how much you can send from your balance.");
+        ui_widget_append(media, media_icon);
+        ui_widget_append(content, title);
+        ui_widget_append(content, description);
+        ui_widget_append(actions, icon);
+        ui_widget_append(item, media);
+        ui_widget_append(item, content);
+        ui_widget_append(item, actions);
+        ui_widget_append(body, item);
+        ui_widget_append(card, body);
+        ui_widget_append(ui_root(), card);
+        ui_load_css_string_global_chunks();
+        ui_update();
+        ui_update();
+
+        item_center = item->border_box.height * 0.5f;
+        ctest_equal_float("home item media icon should be 16px wide",
+                          media_icon->border_box.width, 16.0f);
+        ctest_equal_float("home item media icon should be 16px high",
+                          media_icon->border_box.height, 16.0f);
+        ctest_equal_float("home item media should align with the title line",
+                          media->computed_style.padding_top, 1.5f);
+        ui_widget_get_offset(icon, item, &x, &y);
+        icon_center = y + icon->border_box.height * 0.5f;
+
+        ctest_equal_int("home item should center its children",
+                        item->computed_style.type_bits.align_items,
+                        CSS_ALIGN_ITEMS_CENTER);
+        ctest_equal_int("home item actions should keep auto align-self",
+                        actions->computed_style.type_bits.align_self,
+                        CSS_ALIGN_SELF_AUTO);
+        ctest_equal_float("home item action icon should be vertically centered",
+                          icon_center, item_center);
+
+        ui_widget_destroy(card);
+        ui_clear_trash();
+}
+
 static void test_gallery_empty_hover(void)
 {
         static const float widths[] = { 1600, 1500, 1400, 1300, 1280,
@@ -884,6 +944,8 @@ void test_gallery_layout(void)
         ctest_describe("production description hover",
                        test_production_description_hover);
         ctest_describe("production empty icon", test_production_empty_icon);
+        ctest_describe("production item actions",
+                       test_home_item_actions_center);
 
         home_scene_destroy();
         lcui_destroy();
