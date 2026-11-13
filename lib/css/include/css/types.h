@@ -102,6 +102,7 @@ typedef enum {
         css_prop_justify_content,
         css_prop_align_content,
         css_prop_align_items,
+        css_prop_align_self,
         css_prop_row_gap,
         css_prop_column_gap,
         // flex style end
@@ -152,6 +153,15 @@ typedef enum {
         CSS_ALIGN_ITEMS_CENTER,
         CSS_ALIGN_ITEMS_BASELINE
 } css_align_items_t;
+
+typedef enum {
+        CSS_ALIGN_SELF_AUTO,
+        CSS_ALIGN_SELF_STRETCH,
+        CSS_ALIGN_SELF_FLEX_START,
+        CSS_ALIGN_SELF_FLEX_END,
+        CSS_ALIGN_SELF_CENTER,
+        CSS_ALIGN_SELF_BASELINE
+} css_align_self_t;
 
 typedef enum {
         CSS_BACKGROUND_COLOR_INHERIT,
@@ -824,6 +834,7 @@ typedef struct css_computed_style {
                 uint8_t justify_content : 3;
                 uint8_t align_content : 3;
                 uint8_t align_items : 3;
+                uint8_t align_self : 3;
                 uint8_t row_gap : 2;
                 uint8_t column_gap : 2;
 

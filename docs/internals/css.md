@@ -83,6 +83,16 @@ Rank 值（`selector.c:18-24`）：
 - `table-layout: auto | fixed`（默认 `auto`）
 - `border-spacing: <length>{1,2}`（默认 `0`）
 
+## Flex 交叉轴对齐
+
+- `align-items`：`normal | stretch | flex-start | flex-end | center`，默认 `normal`
+  （按 `stretch` 处理）。
+- `align-self`：`auto | normal | stretch | flex-start | flex-end | center`，默认
+  `auto`。
+- `align-self: auto` 使用父容器的 `align-items`；其它值只覆盖当前 flex item 的交叉轴
+  对齐，不改变其他子项。
+- 当前不支持 `baseline` 取值（枚举存在，但 CSS 解析器尚未注册对应关键字）。
+
 ## 布局选择原则
 
 **优先使用 `block` + `inline-block`**。LCUI 的 block/inline-block 布局比 flex 简单、效率高。`flex` 只在以下场景使用：

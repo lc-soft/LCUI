@@ -1524,6 +1524,7 @@ static char **css_computed_style_copy_font_family(char *const *font_family)
         X(justify_content, TYPE_BITS)             \
         X(align_content, TYPE_BITS)               \
         X(align_items, TYPE_BITS)                 \
+        X(align_self, TYPE_BITS)                  \
         X(row_gap, LENGTH)                        \
         X(column_gap, LENGTH)                     \
         X(color, VALUE_TYPE)                      \

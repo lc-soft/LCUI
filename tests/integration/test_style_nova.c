@@ -148,16 +148,24 @@ static void check_badge_typography(void)
 static void check_item_typography(void)
 {
         ui_widget_t *item = ui_create_item();
+        ui_widget_t *media = ui_create_item_media();
         ui_widget_t *title = ui_create_item_title();
         ui_widget_t *description = ui_create_item_description();
 
         ui_text_set_content(title, "Title");
         ui_text_set_content(description, "Description");
+        ui_widget_append(item, media);
         ui_widget_append(item, title);
         ui_widget_append(item, description);
         ui_root_append(item);
         ui_update();
 
+        ctest_equal_int("item should center cross-axis items",
+                        item->computed_style.type_bits.align_items,
+                        CSS_ALIGN_ITEMS_CENTER);
+        ctest_equal_int("item media should align to flex-start",
+                        media->computed_style.type_bits.align_self,
+                        CSS_ALIGN_SELF_FLEX_START);
         ctest_equal_float("default item title should use text-sm",
                           title->computed_style.font_size, 14.0f);
         ctest_equal_float("default item description should use text-sm",

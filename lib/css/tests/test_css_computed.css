@@ -60,3 +60,15 @@
   display: flex;
   gap: 25% 50%;
 }
+
+.align-self-start {
+  align-self: flex-start;
+}
+
+.align-self-center {
+  align-self: center;
+}
+
+.align-self-auto {
+  align-self: auto;
+}

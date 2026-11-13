@@ -89,7 +89,8 @@
 
 1. `layout_generation++`。
 2. **居中列容器交叉轴重推导**：若容器是 column、`width:auto`、父级仍是 flex 容器且
-   `align-items:center` 且有有效宽约束，则从约束重算 fit-content 宽并落地
+   有效交叉轴对齐为 `center`（`align-self:auto` 时取父级 `align-items`）且有有效宽
+   约束，则从约束重算 fit-content 宽并落地
    （规范 §9.4「treating used size as its definite cross size」）。
 3. 解析 row/column gap，映射 main/cross。
 4. 按主轴方向加载 min/max info。
@@ -108,7 +109,7 @@
    - `resolve_main_sizes`：分配主轴空间（grow/shrink/auto margin），只写尺寸。
    - `resolve_cross_sizes`：固化交叉尺寸、定位；把宽高合并为一次条件 reflow。
    - `ui_flexbox_layout_out_of_flow`：主布局结束后定位绝对定位子项；静态位置按
-     “容器中唯一 flex item”计算（`justify-content` + `align-items`）。
+     “容器中唯一 flex item”计算（`justify-content` + 有效交叉轴对齐）。
    - `display:none` 子项在收集阶段直接跳过，不进入 `line->items`，gap、justify
      和分行都只统计流内子项。
 
@@ -135,6 +136,7 @@
 | I8 | 独立 reflow 时从约束重推导交叉轴宽 | `ui_flexbox_reflow` 入口 | hover/路由切换后塌成单行 |
 | I9 | 测量前恢复子项声明的宽高和双向 margin | `ui_flexbox_try_measure_container_height` | shrink 高度、旧 auto margin 污染内在高度 |
 | I10 | 测量宽只解析一次，快路径、reflow、缓存键共用 | `ui_flexbox_resolve_measure_width` | 同结构因路径不同而折行/父高不一致 |
+| I11 | flex item 的交叉轴对齐统一由 `align-self` 解析，`auto` 继承父级 `align-items` | `ui_flexbox_get_align_self` | 单个 item 无法覆盖父级对齐，或测量/布局使用不同对齐值 |
 
 ## 5. 已知缺口 / deferred
 
@@ -152,6 +154,7 @@
 | 规则 | 测试 |
 |---|---|
 | 换行 / 约束 | `flex layout` → `flex column text wrap`、`constraint refresh` |
+| 交叉轴对齐 | `flex layout` → `align self`；`style nova` → `style-nova: item` |
 | 百分比 / auto 宽度 | `css computed` → `percentage width with indefinite parent`；`home layout` |
 | 零尺寸内容 | `zero height text ignores stale cache` |
 | 单独重排稳定 | `standalone reflow stays wrapped`、`empty description reflow stable` |

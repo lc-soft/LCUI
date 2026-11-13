@@ -70,6 +70,28 @@ typedef struct ui_flexbox_context {
         list_t out_of_flow_items;
 } ui_flexbox_context_t;
 
+/* Resolve an item's cross-axis alignment. `align-self: auto` inherits the
+ * container's align-items; every other value overrides it for this item. */
+static css_align_items_t ui_flexbox_get_align_self(
+    const css_computed_style_t *item, const css_computed_style_t *container)
+{
+        switch (item->type_bits.align_self) {
+        case CSS_ALIGN_SELF_STRETCH:
+                return CSS_ALIGN_ITEMS_STRETCH;
+        case CSS_ALIGN_SELF_FLEX_START:
+                return CSS_ALIGN_ITEMS_FLEX_START;
+        case CSS_ALIGN_SELF_FLEX_END:
+                return CSS_ALIGN_ITEMS_FLEX_END;
+        case CSS_ALIGN_SELF_CENTER:
+                return CSS_ALIGN_ITEMS_CENTER;
+        case CSS_ALIGN_SELF_BASELINE:
+                return CSS_ALIGN_ITEMS_BASELINE;
+        case CSS_ALIGN_SELF_AUTO:
+        default:
+                return container->type_bits.align_items;
+        }
+}
+
 typedef struct ui_flexbox_main_contribution {
         float non_percentage_size;
         float percentage;
@@ -772,7 +794,8 @@ static float ui_flexbox_resolve_measure_width(ui_flexbox_context_t *ctx,
                 if (avail < 0) {
                         avail = 0;
                 }
-                if (ctx->widget->computed_style.type_bits.align_items ==
+                if (ui_flexbox_get_align_self(s,
+                                              &ctx->widget->computed_style) ==
                         CSS_ALIGN_ITEMS_STRETCH &&
                     s->type_bits.margin_left != CSS_MARGIN_AUTO &&
                     s->type_bits.margin_right != CSS_MARGIN_AUTO) {
@@ -1429,7 +1452,8 @@ static void ui_flexbox_resolve_cross_sizes(ui_flexbox_context_t *ctx)
                         } else {
                                 main_axis += ui_flexbox_compute_item_layout(
                                     ctx, child, main_axis, cross_axis,
-                                    s->type_bits.align_items,
+                                    ui_flexbox_get_align_self(
+                                        &child->computed_style, s),
                                     line_max_cross_size);
                         }
                         if (ui_widget_in_layout_flow(child)) {
@@ -1503,9 +1527,11 @@ static float ui_flexbox_static_main_offset(ui_flexbox_context_t *ctx,
 }
 
 static float ui_flexbox_static_cross_offset(ui_flexbox_context_t *ctx,
-                                            float item_size)
+                                            ui_widget_t *item, float item_size)
 {
         css_computed_style_t *s = &ctx->widget->computed_style;
+        css_align_items_t align =
+            ui_flexbox_get_align_self(&item->computed_style, s);
         float start = ctx->column_direction ? s->padding_left : s->padding_top;
         float free = (ctx->column_direction ? ctx->widget->content_box.width
                                             : ctx->widget->content_box.height) -
@@ -1514,7 +1540,7 @@ static float ui_flexbox_static_cross_offset(ui_flexbox_context_t *ctx,
         if (free < 0) {
                 free = 0;
         }
-        switch (s->type_bits.align_items) {
+        switch (align) {
         case CSS_ALIGN_ITEMS_FLEX_END:
                 return start + free;
         case CSS_ALIGN_ITEMS_CENTER:
@@ -1544,7 +1570,8 @@ static void ui_flexbox_layout_out_of_flow(ui_flexbox_context_t *ctx)
                 cross_size = ctx->column_direction ? item->outer_box.width
                                                    : item->outer_box.height;
                 main_axis = ui_flexbox_static_main_offset(ctx, main_size);
-                cross_axis = ui_flexbox_static_cross_offset(ctx, cross_size);
+                cross_axis =
+                    ui_flexbox_static_cross_offset(ctx, item, cross_size);
                 item->layout_x = ctx->column_direction ? cross_axis : main_axis;
                 item->layout_y = ctx->column_direction ? main_axis : cross_axis;
                 ui_widget_update_box_position(item);
@@ -1583,7 +1610,8 @@ void ui_flexbox_reflow(ui_widget_t *w, ui_resizer_t *resizer)
             !IS_CSS_FIXED_LENGTH(&w->computed_style, width) && ps &&
             (ps->type_bits.display == CSS_DISPLAY_FLEX ||
              ps->type_bits.display == CSS_DISPLAY_INLINE_FLEX) &&
-            ps->type_bits.align_items == CSS_ALIGN_ITEMS_CENTER) {
+            ui_flexbox_get_align_self(&w->computed_style, ps) ==
+                CSS_ALIGN_ITEMS_CENTER) {
                 float avail = 0;
 
                 if (ui_widget_get_available_width(w, &avail)) {

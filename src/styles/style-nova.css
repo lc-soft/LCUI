@@ -438,7 +438,8 @@ card:sm card-footer {
 }
 
 item {
-  @apply flex items-center gap-2.5 rounded-lg border border-transparent px-3 py-2.5 text-sm;
+  @apply flex gap-2.5 rounded-lg border border-transparent px-3 py-2.5 text-sm;
+  align-items: center;
 }
 
 item:sm {
@@ -472,10 +473,18 @@ item-actions {
 
 item-media {
   @apply gap-2;
+  align-self: flex-start;
 }
 
 item-media:icon {
   @apply flex items-center justify-center;
+  padding-top: 1.5px;
+  font-size: 16px;
+}
+
+item-media:icon icon {
+  width: 16px;
+  height: 16px;
   font-size: 16px;
 }
 

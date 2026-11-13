@@ -791,6 +791,82 @@ static void test_flex_layout_320(void)
                             &w->border_box, &rect);
 }
 
+static void test_align_self(void)
+{
+        ui_widget_t *container;
+        ui_widget_t *child;
+        ui_rect_t rect;
+
+        ui_widget_resize(ui_root(), 800, 600);
+        container = ui_create_widget(NULL);
+        ui_widget_set_style_string(container, "display", "flex");
+        ui_widget_set_style_string(container, "align-items", "center");
+        ui_widget_set_style_string(container, "width", "200px");
+        ui_widget_set_style_string(container, "height", "100px");
+        ui_widget_append(ui_root(), container);
+
+        child = ui_create_widget(NULL);
+        ui_widget_set_style_string(child, "width", "20px");
+        ui_widget_set_style_string(child, "height", "20px");
+        ui_widget_append(container, child);
+
+        child = ui_create_widget(NULL);
+        ui_widget_set_style_string(child, "width", "20px");
+        ui_widget_set_style_string(child, "height", "20px");
+        ui_widget_set_style_string(child, "align-self", "flex-start");
+        ui_widget_append(container, child);
+
+        child = ui_create_widget(NULL);
+        ui_widget_set_style_string(child, "width", "20px");
+        ui_widget_set_style_string(child, "height", "20px");
+        ui_widget_set_style_string(child, "align-self", "flex-end");
+        ui_widget_append(container, child);
+
+        child = ui_create_widget(NULL);
+        ui_widget_set_style_string(child, "width", "20px");
+        ui_widget_set_style_string(child, "height", "20px");
+        ui_widget_set_style_string(child, "align-self", "center");
+        ui_widget_append(container, child);
+        ui_update();
+
+        rect.width = 20;
+        rect.height = 20;
+        rect.x = 0;
+        rect.y = 40;
+        child = ui_widget_get_child(container, 0);
+        ctest_equal_ui_rect("align-self auto should use parent center",
+                            &child->border_box, &rect);
+
+        rect.x = 20;
+        rect.y = 0;
+        child = ui_widget_get_child(container, 1);
+        ctest_equal_ui_rect("align-self flex-start should override center",
+                            &child->border_box, &rect);
+
+        rect.x = 40;
+        rect.y = 80;
+        child = ui_widget_get_child(container, 2);
+        ctest_equal_ui_rect("align-self flex-end should override center",
+                            &child->border_box, &rect);
+
+        rect.x = 60;
+        rect.y = 40;
+        child = ui_widget_get_child(container, 3);
+        ctest_equal_ui_rect("align-self center should match parent center",
+                            &child->border_box, &rect);
+
+        child = ui_widget_get_child(container, 1);
+        ui_widget_set_style_string(child, "align-self", "flex-end");
+        ui_update();
+        rect.x = 20;
+        rect.y = 80;
+        ctest_equal_ui_rect("changing align-self should reflow the item",
+                            &child->border_box, &rect);
+
+        ui_widget_destroy(container);
+        ui_clear_trash();
+}
+
 static void test_flex_layout_gap(void)
 {
         ui_widget_t *root;
@@ -1708,6 +1784,7 @@ void test_flex_layout(void)
         ctest_describe("root width 1280px", test_flex_layout_1280);
         ctest_describe("root width 600px", test_flex_layout_600);
         ctest_describe("root width 320px", test_flex_layout_320);
+        ctest_describe("align self", test_align_self);
         ctest_describe("flex gap", test_flex_layout_gap);
         ctest_describe("choice card", test_choice_card);
         ctest_describe("flex column text wrap",

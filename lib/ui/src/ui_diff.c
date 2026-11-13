@@ -261,6 +261,7 @@ bool ui_style_diff_has_layout_change(ui_style_diff_t *diff, ui_widget_t *w)
                a->type_bits.justify_content != b->type_bits.justify_content ||
                a->type_bits.align_content != b->type_bits.align_content ||
                a->type_bits.align_items != b->type_bits.align_items ||
+               a->type_bits.align_self != b->type_bits.align_self ||
                a->flex_grow != b->flex_grow ||
                a->flex_shrink != b->flex_shrink ||
                a->type_bits.flex_basis != b->type_bits.flex_basis ||
@@ -306,6 +307,7 @@ void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w)
                     IS_LENGTH_PROP_CHANGED(margin_right) ||
                     IS_LENGTH_PROP_CHANGED(margin_top) ||
                     IS_LENGTH_PROP_CHANGED(margin_bottom) ||
+                    IS_PROP_TYPE_CHANGED(align_self) ||
                     (ui_widget_has_flex_display(w->parent) &&
                      (IS_PROP_TYPE_CHANGED(flex_grow) ||
                       IS_PROP_TYPE_CHANGED(flex_shrink) ||

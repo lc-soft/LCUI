@@ -104,7 +104,7 @@ updater 先递归处理子元素（②），再做父元素自身的重排（③
 - **带流内子部件的容器不参与继承来的 sizehint 快路径**：`button`、`label`、`badge` 等从 `text` 继承原型的容器也带文本层 sizehint 实现，但自身文本层通常为空。`ui_widget_sizehint_is_exact()` 在无流内子项或原型标记 `sizehint_exact`（`text`、`canvas`、`textinput`）时为 true，只用于 `ui_flexbox_try_measure_container_height()` 这类组合测量快路径。
 - **组合测量前必须恢复完整声明状态**：先对每个子项调用 `ui_widget_reset_width()` 和 `ui_widget_reset_height()`，再读取 margin、盒模型或 sizehint。否则 shrink 后的 computed height 和上一轮 auto margin 会被误当作内在尺寸。
 - **`text` 的 sizehint 不得把绘制层留在测量态**：测量可临时把 TextLayer 的 fixed size 设为 0、修改 max size 并重新排版。paint 前必须按**当前渲染 `style->content_box` 的物理尺寸**重新设置 fixed/max size 并排版，不能用上一轮布局记录的物理尺寸。否则 hover 重排会按文本实际宽居中，文字左右跳动；shimmer/spinner 等离屏捕获提升 device scale 时，则会把长文本按旧 scale 的宽度裁掉尾部。
-- **每次 reflow 递增 `layout_generation`**，旧约束自动失效。flex column 单独 reflow 时，只有父级仍是 flex 容器且 `align-items: center` 才从约束重推导交叉轴宽，避免 flex→block 后使用过期约束。
+- **每次 reflow 递增 `layout_generation`**，旧约束自动失效。flex column 单独 reflow 时，只有父级仍是 flex 容器且有效交叉轴对齐为 `center`（`align-self: auto` 取父级 `align-items`）才从约束重推导交叉轴宽，避免 flex→block 后使用过期约束。
 - fit-content 仍会把结果写回 `computed_style.width`（已知临时例外，见项目 `docs/layout-engine-rules.md`）。
 
 flex column 的入口分为测量 / 布局两段：`ui_flexbox_measure()` 收集并解析 basis，`ui_flexbox_layout()` 分行、分配主轴/交叉轴并定位。
@@ -207,7 +207,7 @@ ui_block_layout_reflow(w, resizer):
 
 ```
 ui_flexbox_reflow(w, resizer):
-  ① layout_generation++；居中 auto 宽 column 从持久约束重推导交叉轴宽
+  ① layout_generation++；有效对齐为 center 的 auto 宽 column 从持久约束重推导交叉轴宽
   ② ui_flexbox_measure(&ctx)
      - collect_in_flow_items：逐子项 reset_layout → 记录宽度约束 →
        重解析 flex_basis（column 会用约束宽测 sizehint）

@@ -81,6 +81,40 @@ static void test_button_focus_style(void)
         css_computed_style_destroy(&computed);
 }
 
+static void test_align_self_style(void)
+{
+        css_selector_t *selector;
+        css_style_decl_t *result;
+        css_computed_style_t computed;
+
+        selector = css_selector_create(".align-self-start");
+        result = css_select_style(selector);
+        css_cascade_style(result, &computed);
+        ctest_equal_int("align-self flex-start", computed.type_bits.align_self,
+                        CSS_ALIGN_SELF_FLEX_START);
+        css_style_decl_destroy(result);
+        css_selector_destroy(selector);
+        css_computed_style_destroy(&computed);
+
+        selector = css_selector_create(".align-self-center");
+        result = css_select_style(selector);
+        css_cascade_style(result, &computed);
+        ctest_equal_int("align-self center", computed.type_bits.align_self,
+                        CSS_ALIGN_SELF_CENTER);
+        css_style_decl_destroy(result);
+        css_selector_destroy(selector);
+        css_computed_style_destroy(&computed);
+
+        selector = css_selector_create(".align-self-auto");
+        result = css_select_style(selector);
+        css_cascade_style(result, &computed);
+        ctest_equal_int("align-self auto", computed.type_bits.align_self,
+                        CSS_ALIGN_SELF_AUTO);
+        css_style_decl_destroy(result);
+        css_selector_destroy(selector);
+        css_computed_style_destroy(&computed);
+}
+
 void test_container_style(void)
 {
         css_selector_t *selector;
@@ -318,6 +352,7 @@ void test_css_computed(void)
         fclose(fp);
 
         ctest_describe(".primary.button:focus", test_button_focus_style);
+        ctest_describe("align-self", test_align_self_style);
         ctest_describe(".container", test_container_style);
         ctest_describe(".button.borderless", test_button_borderless_style);
         ctest_describe(".w-[360px]", test_w360px_style);

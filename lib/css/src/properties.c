@@ -740,6 +740,11 @@ void css_init_properties(void)
                     "normal | stretch | flex-start | flex-end | center",
                     "normal");
 
+        /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/align-self */
+        DEFINE_PROP(align_self, "align-self",
+                    "auto | normal | stretch | flex-start | flex-end | center",
+                    "auto");
+
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/row-gap */
         DEFINE_PROP(row_gap, "row-gap", "normal | <length-percentage>",
                     "normal");

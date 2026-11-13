@@ -534,7 +534,6 @@ static const struct {
         { "}\n", 2 },
         { "item {\n", 7 },
         { "  display: flex;\n", 17 },
-        { "  align-items: center;\n", 23 },
         { "  gap: 10px;\n", 13 },
         { "  border-radius: 8px;\n", 22 },
         { "  border-width: 1px;\n", 21 },
@@ -545,6 +544,7 @@ static const struct {
         { "  padding-bottom: 10px;\n", 24 },
         { "  font-size: 14px;\n", 19 },
         { "  line-height: 20px;\n", 21 },
+        { "  align-items: center;\n", 23 },
         { "}\n", 2 },
         { "item:sm {\n", 10 },
         { "  gap: 10px;\n", 13 },
@@ -582,11 +582,18 @@ static const struct {
         { "}\n", 2 },
         { "item-media {\n", 13 },
         { "  gap: 8px;\n", 12 },
+        { "  align-self: flex-start;\n", 26 },
         { "}\n", 2 },
         { "item-media:icon {\n", 18 },
         { "  display: flex;\n", 17 },
         { "  align-items: center;\n", 23 },
         { "  justify-content: center;\n", 27 },
+        { "  padding-top: 1.5px;\n", 22 },
+        { "  font-size: 16px;\n", 19 },
+        { "}\n", 2 },
+        { "item-media:icon icon {\n", 23 },
+        { "  width: 16px;\n", 15 },
+        { "  height: 16px;\n", 16 },
         { "  font-size: 16px;\n", 19 },
         { "}\n", 2 },
         { "item-media:image {\n", 19 },
@@ -1778,7 +1785,7 @@ static const struct {
         { "  color: #000;\n", 15 },
         { "}\n", 2 },
 };
-static const size_t css_str_style_nova_total_length = 32978;
+static const size_t css_str_style_nova_total_length = 33101;
 static inline void ui_load_css_string_style_nova_chunks(void)
 {
         size_t i;
