@@ -12,6 +12,34 @@
 #include <LCUI.h>
 #include <ctest-custom.h>
 
+static void check_password_input(void)
+{
+        ui_widget_t *w = ui_create_widget("textinput");
+        wchar_t wcs[64];
+
+        ui_textinput_set_password_char(w, L'*');
+        ui_textinput_set_text_w(w, L"secret");
+        ui_widget_update(w);
+
+        ctest_equal_bool("password input should keep the text length",
+                         ui_textinput_get_text_length(w) == 6, true);
+        ctest_equal_bool("password input should preserve the underlying text",
+                         ui_textinput_get_text_w(w, 0, 64, wcs) == 6 &&
+                             wcscmp(wcs, L"secret") == 0,
+                         true);
+
+        ui_textinput_set_password_char(w, 0);
+        ui_widget_update(w);
+        ctest_equal_bool(
+            "disabling password masking should restore the plain text",
+            ui_textinput_get_text_w(w, 0, 64, wcs) == 6 &&
+                wcscmp(wcs, L"secret") == 0,
+            true);
+
+        ui_widget_destroy(w);
+        ui_clear_trash();
+}
+
 static void check_multiline_attr(void)
 {
         ui_widget_t *single = ui_create_widget("textinput");
@@ -100,6 +128,7 @@ void test_textinput(void)
         ctest_equal_bool("should retrieve identical inserted wide string",
                          wcscmp(L"hello, world!", wcs) == 0, true);
         ui_widget_destroy(w);
+        check_password_input();
         check_multiline_attr();
         lcui_destroy();
 }

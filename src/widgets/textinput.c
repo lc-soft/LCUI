@@ -296,7 +296,7 @@ static void textinput_process_textblock(ui_widget_t *widget,
                 break;
         }
         if (edit->password_char && txtblk->owner == TEXTBLOCK_OWNER_SOURCE) {
-                wchar_t *text = malloc(sizeof(wchar_t) * txtblk->length + 1);
+                wchar_t *text = malloc(sizeof(wchar_t) * (txtblk->length + 1));
                 wcsncpy(text, txtblk->text, txtblk->length + 1);
                 fillchar(text, edit->password_char);
                 layer = edit->layer_mask;
