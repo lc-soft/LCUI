@@ -31,6 +31,10 @@ extern void test_flex_layout_percentage_wrap(void);
 extern void test_flex_contract(void);
 extern void test_empty_layout(void);
 extern void test_field_layout(void);
+extern void test_home_layout(void);
+extern void test_background_style(void);
+extern void test_style_refresh(void);
+extern void test_flex_hidden_gap(void);
 extern void test_sizehint(void);
 extern void test_scrollbar(void);
 extern void test_scrollarea(void);
@@ -87,6 +91,10 @@ static const ctest_suite_t suites[] = {
         { "flex contract", test_flex_contract },
         { "empty layout", test_empty_layout },
         { "field layout", test_field_layout },
+        { "home layout", test_home_layout },
+        { "background style", test_background_style },
+        { "style refresh", test_style_refresh },
+        { "flex hidden gap", test_flex_hidden_gap },
         { "sizehint", test_sizehint },
         { "scrollbar", test_scrollbar },
         { "scrollarea", test_scrollarea },

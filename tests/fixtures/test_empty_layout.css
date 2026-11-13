@@ -70,6 +70,37 @@
         gap: 8px;
 }
 
+.test-empty-hover-box {
+        display: flex;
+        flex-direction: column;
+        width: 300px;
+}
+
+.test-empty-hover-box empty,
+.test-empty-hover-box empty-header,
+.test-empty-hover-box empty-content,
+.test-empty-hover-box button {
+        flex-shrink: 0;
+}
+
+.test-empty-hover-box empty {
+        width: 100%;
+}
+
+.test-empty-hover-box empty-header {
+        width: 100%;
+}
+
+.test-empty-hover-box empty-content {
+        width: 100%;
+        align-items: center;
+}
+
+.test-empty-hover-box empty-description {
+        width: 100%;
+        text-align: center;
+}
+
 .test-action-primary {
         display: flex;
         width: 108px;

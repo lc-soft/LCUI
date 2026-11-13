@@ -10,6 +10,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include "test.h"
 #include "ctest.h"
 #include "../include/css.h"
@@ -266,6 +267,34 @@ void test_flex_gap_percentage(void)
         css_computed_style_destroy(&computed);
 }
 
+static void test_percentage_width_indefinite_parent(void)
+{
+        css_computed_style_t parent;
+        css_computed_style_t child;
+        css_metrics_t metrics;
+
+        memset(&parent, 0, sizeof(parent));
+        memset(&metrics, 0, sizeof(metrics));
+        parent.type_bits.display = CSS_DISPLAY_BLOCK;
+        parent.type_bits.width = CSS_WIDTH_AUTO;
+
+        memset(&child, 0, sizeof(child));
+        child.type_bits.display = CSS_DISPLAY_BLOCK;
+        child.type_bits.width = CSS_WIDTH_SET;
+        child.unit_bits.width = CSS_UNIT_PERCENT;
+        child.width = 100;
+
+        css_compute_absolute_values(&parent, &child, &metrics);
+        ctest_equal_int("percentage against an auto parent becomes auto",
+                        child.type_bits.width, CSS_WIDTH_AUTO);
+
+        child.type_bits.width = CSS_WIDTH_SET;
+        child.type_bits.display = CSS_DISPLAY_INLINE;
+        css_compute_absolute_values(&parent, &child, &metrics);
+        ctest_equal_int("inline percentage becomes fit-content",
+                        child.type_bits.width, CSS_WIDTH_FIT_CONTENT);
+}
+
 void test_css_computed(void)
 {
         size_t n;
@@ -299,6 +328,8 @@ void test_css_computed(void)
         ctest_describe(".flex-gap-axis", test_flex_gap_axis);
         ctest_describe(".flex-gap-normal", test_flex_gap_normal);
         ctest_describe(".flex-gap-percentage", test_flex_gap_percentage);
+        ctest_describe("percentage width with indefinite parent",
+                       test_percentage_width_indefinite_parent);
 
         css_destroy();
 }

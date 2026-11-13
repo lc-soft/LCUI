@@ -87,26 +87,31 @@ updater 先递归处理子元素（②），再做父元素自身的重排（③
 | 布局约束 | `layout_constraint.{has_definite_width, available_width, source, generation}` | 父布局写入；`ui_widget_get_available_width` 校验 `source == parent` 且 `generation == parent->layout_generation` |
 | used size | `content_box` / `border_box` / `outer_box` | 每轮布局重算 |
 | 内在缓存 | `max_content_*`、`min_content_*`、`unconstrained_content_*` | 子项 `update_size` 写入；有有效宽度约束时不更新 `unconstrained_*`，避免 used size 污染 |
-| 测量缓存 | `measured_content_width/height` + `has_measured` | 在给定宽度下测折行高时缓存；`should_reflow` 或宽度变化时失效 |
+| 测量缓存 | `measured_content_width/height` + `has_measured` | 在给定宽度下测折行高时缓存；`request_reflow` 按依赖链使自身/祖先缓存失效，宽度变化也会失效 |
 
 规则：
 
 - **约束必须在子项 `reset_layout` 之后记录**（`ui_flexbox_record_width_constraint`）。否则会读到上一轮布局写入的 `margin: auto` 实际值，算出过窄的可用宽。
-- **column 子项的主轴 basis 必须在父级可用宽下测**。纯 `unconstrained_content_height`（无限宽单行高）会让文本退回单行，实测 5 个折行用例失败，因此 `measured_content_*` 缓存不能删。
+- **百分比宽度在包含块宽度不确定时按 `auto` 处理**：块级流内元素交给父布局分配宽度，行内/绝对定位元素退回 fit-content。CSS 计算层不得把未解析的百分数（如 `100`）当作像素写进 `width`。
+- **column 子项的主轴 basis 必须在父级可用宽下测**。auto/百分比宽度的 block/flex 容器都遵守此规则；纯 `unconstrained_content_height`（无限宽单行高）会让文本退回单行，因此 `measured_content_*` 缓存不能删。`ui_flexbox_item_max_main_size()` 在同宽测量有效时也必须用该结果，否则内容收起会被旧的大高度阻止。
+- **测量宽只解析一次**。`ui_flexbox_resolve_measure_width()` 按 stretch/fit-content 或百分比得到 CSS 宽，经 `ui_widget_fix_width()` 应用 min/max 后换算为内容宽。组合测量、嵌套 reflow、used width 和 `measured_content_width` 共用该值；auto 宽的同轮提前返回也要校验缓存宽。
+- **组合测量必须累加子项 outer height**。固定高子项的 sizehint 仍可能只是文本行高，必须优先采用声明高度并做 min/max 与盒模型换算；auto 高子项才直接使用内容 sizehint。快路径与 reflow 路径都返回容器 content-box 高度，不能重复加入容器 padding/border。
+- **测量缓存按依赖失效，而非按更新标志失效**。`request_reflow` 清除自身与祖先的 `has_measured`；同轮后续 basis 趟即使 `should_reflow` 仍置位，也能复用刚测得的同宽结果。
 - **row 主轴分配结果也要记录为宽度约束**（`ui_apply_row_item_main_size`），否则 `flex: 1` 子项单独 reflow 时会退回 max-content 宽。
 - **sizehint 是否实现看 `proto->has_sizehint`**，不看返回数值是否为零。零宽/零高是合法测量结果；自定义 widget 覆盖 `sizehint` 时必须置 `has_sizehint = true`。对应查询是 `ui_widget_has_sizehint()`。
 - **sizehint 只负责自有内容层**：`ui_widget_get_sizehint()` 始终可调用（默认原型是空实现，返回 0）。fit-content 与 column basis 都按 `max(自有 hint, 子项布局尺寸)` 合并；两者在 LCUI 中是同一内容区的不同表达，因此取 max 而非相加。
 - **sizehint 内在宽缓存刷新**：自动宽叶子部件用 `ui_widget_get_unconstrained_sizehint()`（临时清除 used width 与父约束）刷新 `unconstrained_*`；auto 宽 flex/inline-block 容器用自身 `content_box` 刷新。否则内容变化后会继续复用旧约束下折行的宽度。
 - **带流内子部件的容器不参与继承来的 sizehint 快路径**：`button`、`label`、`badge` 等从 `text` 继承原型的容器也带文本层 sizehint 实现，但自身文本层通常为空。`ui_widget_sizehint_is_exact()` 在无流内子项或原型标记 `sizehint_exact`（`text`、`canvas`、`textinput`）时为 true，只用于 `ui_flexbox_try_measure_container_height()` 这类组合测量快路径。
-- **`ui_flexbox_try_measure_container_height` 测量前先 `ui_widget_reset_width(child)`**，否则 `text` 会复用上一轮布局的固定宽，不折行。
+- **组合测量前必须恢复完整声明状态**：先对每个子项调用 `ui_widget_reset_width()` 和 `ui_widget_reset_height()`，再读取 margin、盒模型或 sizehint。否则 shrink 后的 computed height 和上一轮 auto margin 会被误当作内在尺寸。
+- **`text` 的 sizehint 不得把绘制层留在测量态**：测量可临时把 TextLayer 的 fixed size 设为 0、修改 max size 并重新排版。paint 前必须按**当前渲染 `style->content_box` 的物理尺寸**重新设置 fixed/max size 并排版，不能用上一轮布局记录的物理尺寸。否则 hover 重排会按文本实际宽居中，文字左右跳动；shimmer/spinner 等离屏捕获提升 device scale 时，则会把长文本按旧 scale 的宽度裁掉尾部。
 - **每次 reflow 递增 `layout_generation`**，旧约束自动失效。flex column 单独 reflow 时，只有父级仍是 flex 容器且 `align-items: center` 才从约束重推导交叉轴宽，避免 flex→block 后使用过期约束。
 - fit-content 仍会把结果写回 `computed_style.width`（已知临时例外，见项目 `docs/layout-engine-rules.md`）。
 
 flex column 的入口分为测量 / 布局两段：`ui_flexbox_measure()` 收集并解析 basis，`ui_flexbox_layout()` 分行、分配主轴/交叉轴并定位。
 
-相关回归测试：`flex layout` → `measure cache`、`measure cache invalidates on content change`、`zero height text ignores stale cache`、`field checkbox description stable`。
+相关回归测试：`flex layout` → `measure cache`、`measure cache invalidates on content change`、`zero height text ignores stale cache`、`fixed height intrinsic restoration`、`auto margin intrinsic height`、`measurement path width consistency`、`percentage measurement constraints`；`gallery layout` → `gallery empty hover` 覆盖百分比宽父级、折行文本、固定高按钮和 `clip-safe` padding；`browser layout` 覆盖百分比 min-height 的父高变化重算。
 
-项目内速查：`docs/layout-engine-rules.md`（值模型、I1–I8 不变量、已知缺口）；设计文档：`docs/superpowers/specs/2026-10-11-flex-column-text-wrap-design.md`、`2026-10-25-layout-two-phase-design.md`。
+项目内速查：`docs/layout-engine-rules.md`（值模型、I1–I10 不变量、已知缺口）；设计文档：`docs/superpowers/specs/2026-10-11-flex-column-text-wrap-design.md`、`2026-10-25-layout-two-phase-design.md`。
 
 ## 更新周期
 
@@ -192,6 +197,7 @@ ui_block_layout_reflow(w, resizer):
      - 计算容器总高度
   ④ update(ctx)       — 计算每个子元素的位置
      - 遍历行列表，累加 x（同行内）和 y（行间）
+     - 百分比 height/min-height/max-height 在父高变化后重置并条件 reflow
      - 对 inline 元素做 vertical-align（middle/bottom）
      - 设置 child->layout_x, layout_y → ui_widget_update_box_position()
   ⑤ w->proto->resize(w, w, w->content_box.*)
@@ -210,9 +216,11 @@ ui_flexbox_reflow(w, resizer):
   ③ ui_flexbox_layout(&ctx)
      - break_into_lines（非内在路径）
      - resolve_main_sizes：grow/shrink 分配并落到子项
-     - resolve_cross_sizes：提交容器交叉尺寸、定位；流外子项按文档顺序
-       在本趟逐项布局
-  ④ w->proto->resize(w, w->content_box.*)
+     - resolve_cross_sizes：提交容器交叉尺寸、定位
+  ④ ui_flexbox_layout_out_of_flow(&ctx)
+     - 主布局结束后按“唯一 flex item”规则定位绝对定位子项
+     - display:none 子项在收集阶段跳过，不进入 line->items
+  ⑤ w->proto->resize(w, w->content_box.*)
 ```
 
 约束、缓存与 sizehint 的细节见[约束模型与测量缓存](#约束模型与测量缓存flex-column)。

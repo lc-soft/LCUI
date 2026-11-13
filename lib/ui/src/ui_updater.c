@@ -90,8 +90,19 @@ void ui_widget_request_update(ui_widget_t *w)
 
 void ui_widget_request_reflow(ui_widget_t *w)
 {
+        ui_widget_t *ancestor;
+
         w->update.should_reflow = true;
         ui_widget_request_update(w);
+        /* A reflow request can change the intrinsic height cached on the
+         * widget itself or on any ancestor that contains it. Invalidate by
+         * dependency rather than by the transient should_reflow flag: the
+         * flag remains set while the parent performs its nested measurement,
+         * but a fresh same-width result must still be reusable in later flex
+         * basis passes. */
+        for (ancestor = w; ancestor; ancestor = ancestor->parent) {
+                ancestor->has_measured = false;
+        }
 }
 
 void ui_widget_set_rules(ui_widget_t *w, const ui_widget_rules_t *rules)
@@ -442,7 +453,10 @@ size_t ui_updater_update_widget(ui_updater_t *updater, ui_widget_t *w)
                         }
 #endif
                         ui_widget_update_style(w);
-                        ui_widget_update_box_size(w);
+                        if (updater->refresh_all ||
+                            ui_style_diff_has_layout_change(&style_diff, w)) {
+                                ui_widget_update_box_size(w);
+                        }
                         ui_widget_update_box_position(w);
                         ui_style_diff_end(&style_diff, w);
                         if (w->proto && w->proto->update) {

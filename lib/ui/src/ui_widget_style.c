@@ -9,6 +9,8 @@
  * in the LICENSE.TXT file in the root directory of this source tree.
  */
 
+#include <stdio.h>
+#include <string.h>
 #include <css.h>
 #include <ui/base.h>
 #include <ui/metrics.h>
@@ -320,13 +322,31 @@ void ui_widget_set_style_keyword_value(ui_widget_t *w, int key,
         ui_widget_set_style(w, key, &v);
 }
 
-static void ui_widget_on_image_load(ui_image_event_t *e)
+void ui_widget_resolve_background(ui_widget_t *w)
 {
         float scale;
-        ui_widget_t *w = e->data;
-        pd_canvas_t *img = &e->image->data;
+        float old_width;
+        float old_height;
+        float old_x;
+        float old_y;
+        ui_image_t *image;
+        pd_canvas_t *img;
         css_computed_style_t *s = &w->computed_style;
         ui_rect_t *box;
+
+        if (!s->background_image) {
+                return;
+        }
+        image = ui_get_image(s->background_image);
+        if (!image || image->state != UI_IMAGE_STATE_COMPLETE ||
+            image->error != PD_OK) {
+                return;
+        }
+        img = &image->data;
+        old_width = s->background_width;
+        old_height = s->background_height;
+        old_x = s->background_position_x;
+        old_y = s->background_position_y;
 
         switch (s->type_bits.background_clip) {
         case CSS_BACKGROUND_CLIP_PADDING_BOX:
@@ -392,7 +412,7 @@ static void ui_widget_on_image_load(ui_image_event_t *e)
                     s->background_width * img->height / img->width);
         }
         // See more:
-        // https://developer.mozilla.org/en-US/docs/Web/CSS/background-position#regarding_percentages
+        // https://developer.mozilla.org/en-US/docs/Web/CSS/background-position#regarding-percentages
         if (IS_CSS_PERCENTAGE(s, background_position_x)) {
                 CSS_SET_FIXED_LENGTH(s, background_position_x,
                                      (box->width - s->background_width) *
@@ -403,7 +423,17 @@ static void ui_widget_on_image_load(ui_image_event_t *e)
                                      (box->height - s->background_height) *
                                          s->background_position_y / 100.f);
         }
-        ui_widget_mark_dirty_rect(w, NULL, UI_BOX_TYPE_BORDER_BOX);
+        if (s->background_width != old_width ||
+            s->background_height != old_height ||
+            s->background_position_x != old_x ||
+            s->background_position_y != old_y) {
+                ui_widget_mark_dirty_rect(w, NULL, UI_BOX_TYPE_BORDER_BOX);
+        }
+}
+
+static void ui_widget_on_image_load(ui_image_event_t *e)
+{
+        ui_widget_resolve_background(e->data);
 }
 
 static void ui_widget_on_image_load_start(ui_image_event_t *e)
@@ -459,11 +489,14 @@ void ui_widget_compute_style(ui_widget_t *w)
 void ui_widget_update_style(ui_widget_t *w)
 {
         ui_image_t *image;
-        css_computed_style_t *s = &w->specified_style;
+        css_computed_style_t new_style;
         css_style_decl_t *style;
+        char *old_background = NULL;
+        bool reuse_background;
 
-        ui_widget_destroy_background_style(w);
-        css_computed_style_destroy(s);
+        if (w->computed_style.background_image) {
+                old_background = y_strdup(w->computed_style.background_image);
+        }
         style = css_style_decl_create();
         if (w->custom_style) {
                 css_style_decl_merge(style, w->custom_style);
@@ -471,16 +504,32 @@ void ui_widget_update_style(ui_widget_t *w)
         css_style_decl_merge(style, w->matched_style);
         ui_widget_update_style_dependencies(w, style);
         css_cascade_style_with_parent(
-            style, w->parent ? &w->parent->specified_style : NULL, s);
+            style, w->parent ? &w->parent->specified_style : NULL, &new_style);
         css_style_decl_destroy(style);
-        w->computed_style = *s;
-        // 增加 UIImage 的引用次数，让它在部件销毁和背景图改变前一直可用
-        if (s->background_image) {
-                image = ui_image_create(s->background_image);
+
+        /* Rebuild the background image only when the URL changed. Recreating
+         * it would fire the load handler, which resolves cover geometry from
+         * the box current at that moment; a style refresh is not a reason to
+         * throw the crop away. */
+        reuse_background =
+            old_background && new_style.background_image &&
+            strcmp(old_background, new_style.background_image) == 0;
+        if (!reuse_background) {
+                ui_widget_destroy_background_style(w);
+        }
+        css_computed_style_destroy(&w->specified_style);
+        w->specified_style = new_style;
+        w->computed_style = new_style;
+        if (reuse_background) {
+                ui_widget_resolve_background(w);
+        } else if (new_style.background_image) {
+                // 增加 UIImage 的引用次数，让它在部件销毁和背景图改变前一直可用
+                image = ui_image_create(new_style.background_image);
                 ui_image_on_load(image, ui_widget_on_image_load, w);
                 ui_image_on_progress(image, ui_widget_on_image_load_start, w);
                 ui_image_on_progress(image, ui_widget_on_image_progress, w);
         }
+        free(old_background);
         ui_widget_compute_style(w);
 }
 

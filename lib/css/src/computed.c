@@ -1188,9 +1188,23 @@ static void compute_absolute_width(const css_computed_style_t *parent,
                 if (unit != CSS_UNIT_PERCENT) {
                         break;
                 }
-                if (!parent ||
-                    !compute_content_box_fixed_width(parent, &parent_value)) {
+                if (!parent) {
                         s->type_bits.width = CSS_WIDTH_FIT_CONTENT;
+                        break;
+                }
+                if (!compute_content_box_fixed_width(parent, &parent_value)) {
+                        /* A percentage width against an indefinite containing
+                         * block behaves like auto for in-flow block boxes:
+                         * the parent layout resolves it.  Inline and
+                         * out-of-flow boxes shrink to fit instead.  Leaving
+                         * the raw percentage number as pixels would size the
+                         * box to e.g. 100px and make the subtree flicker. */
+                        if (is_css_display_inline(s) ||
+                            css_computed_position(s) > CSS_POSITION_RELATIVE) {
+                                s->type_bits.width = CSS_WIDTH_FIT_CONTENT;
+                        } else {
+                                s->type_bits.width = CSS_WIDTH_AUTO;
+                        }
                         break;
                 }
                 if (css_computed_position(s) > CSS_POSITION_RELATIVE) {

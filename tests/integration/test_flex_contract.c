@@ -715,6 +715,46 @@ static void test_out_of_flow_children(void)
         ui_widget_destroy(row);
 }
 
+/* F15: absolute static position follows justify-content / align-items. */
+static void test_out_of_flow_static_position(void)
+{
+        ui_widget_t *row = create_flex("row", 200, 100);
+        ui_widget_t *visible = create_block(50, 20);
+        ui_widget_t *absolute = create_block(20, 10);
+
+        set_style(row, "justify-content", "flex-end");
+        set_style(row, "align-items", "center");
+        set_style(absolute, "position", "absolute");
+        ui_widget_append(row, visible);
+        ui_widget_append(row, absolute);
+        append_root(row);
+        ui_update();
+
+        ctest_equal_bool("F15 static x follows justify-content flex-end",
+                         close_to(absolute->border_box.x, 180, TOL), true);
+        ctest_equal_bool("F15 static y follows align-items center",
+                         close_to(absolute->border_box.y, 45, TOL), true);
+
+        set_style(row, "justify-content", "flex-start");
+        set_style(row, "align-items", "flex-start");
+        ui_update();
+        ctest_equal_bool("F15 flex-start static x",
+                         close_to(absolute->border_box.x, 0, TOL), true);
+        ctest_equal_bool("F15 flex-start static y",
+                         close_to(absolute->border_box.y, 0, TOL), true);
+
+        set_px(absolute, "left", 12);
+        set_px(absolute, "top", 8);
+        ui_update();
+        ui_update();
+        ctest_equal_float("F15 left inset overrides static x",
+                          absolute->border_box.x, 12.f);
+        ctest_equal_float("F15 top inset overrides static y",
+                          absolute->border_box.y, 8.f);
+
+        ui_widget_destroy(row);
+}
+
 /* F16: unset flex-direction inherits the parent direction. */
 static void test_direction_inheritance(void)
 {
@@ -1153,6 +1193,8 @@ void test_flex_contract(void)
         ctest_describe("F13 box-sizing border-box", test_box_sizing_border_box);
         ctest_describe("F14 inline-flex", test_inline_flex);
         ctest_describe("F15 out-of-flow children", test_out_of_flow_children);
+        ctest_describe("F15 absolute static position",
+                       test_out_of_flow_static_position);
         ctest_describe("F16 direction inheritance", test_direction_inheritance);
         ctest_describe("F17 repeated updates stable",
                        test_repeated_updates_stable);

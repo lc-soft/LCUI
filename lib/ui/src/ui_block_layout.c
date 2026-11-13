@@ -345,7 +345,11 @@ static void ui_block_layout_update(ui_block_layout_context_t *ctx)
                                 continue;
                         }
                         if (IS_CSS_PERCENTAGE(&child->specified_style,
-                                              height)) {
+                                              height) ||
+                            IS_CSS_PERCENTAGE(&child->specified_style,
+                                              min_height) ||
+                            IS_CSS_PERCENTAGE(&child->specified_style,
+                                              max_height)) {
                                 ui_widget_reset_height(child);
                                 ui_widget_reflow_if_height_changed(child);
                         }

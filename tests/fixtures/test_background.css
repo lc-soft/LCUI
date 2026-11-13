@@ -1,0 +1,25 @@
+/*
+ * tests/fixtures/test_background.css
+ *
+ * Background image geometry: a fixed box with a cover/center image and a
+ * resizable parent used to check that layout changes re-resolve the crop.
+ */
+
+.test-background-parent {
+        display: block;
+        width: 200px;
+}
+
+.test-background-parent-narrow {
+        width: 100px;
+}
+
+.test-background {
+        display: block;
+        width: 100%;
+        height: 100px;
+        background-image: url("test_background.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+}

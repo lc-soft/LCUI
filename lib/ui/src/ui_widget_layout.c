@@ -203,6 +203,7 @@ void ui_widget_reflow_with_resizer(ui_widget_t *w, ui_resizer_t *resizer)
                              str, w->max_content_width, w->max_content_height);
         }
 #endif
+        ui_widget_resolve_background(w);
         ui_widget_post_event(w, &ev, NULL, NULL);
         ui_widget_add_state(w, UI_WIDGET_STATE_LAYOUTED);
 }

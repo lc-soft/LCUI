@@ -34,4 +34,5 @@ typedef struct ui_widget_style_diff_t_ {
 
 void ui_style_diff_init(ui_style_diff_t *diff, ui_widget_t *w);
 void ui_style_diff_begin(ui_style_diff_t *diff, ui_widget_t *w);
+bool ui_style_diff_has_layout_change(ui_style_diff_t *diff, ui_widget_t *w);
 void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w);

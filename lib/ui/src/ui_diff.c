@@ -188,6 +188,92 @@ static void ui_style_diff_update_dependent_children(ui_style_diff_t *diff,
         diff->has_style_snapshot = false;
 }
 
+bool ui_style_diff_has_layout_change(ui_style_diff_t *diff, ui_widget_t *w)
+{
+        css_computed_style_t *a = &diff->style;
+        css_computed_style_t *b = &w->computed_style;
+
+        return a->type_bits.display != b->type_bits.display ||
+               a->type_bits.position != b->type_bits.position ||
+               a->type_bits.box_sizing != b->type_bits.box_sizing ||
+               a->type_bits.width != b->type_bits.width ||
+               a->unit_bits.width != b->unit_bits.width ||
+               a->width != b->width ||
+               a->type_bits.height != b->type_bits.height ||
+               a->unit_bits.height != b->unit_bits.height ||
+               a->height != b->height ||
+               a->type_bits.min_width != b->type_bits.min_width ||
+               a->unit_bits.min_width != b->unit_bits.min_width ||
+               a->min_width != b->min_width ||
+               a->type_bits.min_height != b->type_bits.min_height ||
+               a->unit_bits.min_height != b->unit_bits.min_height ||
+               a->min_height != b->min_height ||
+               a->type_bits.max_width != b->type_bits.max_width ||
+               a->unit_bits.max_width != b->unit_bits.max_width ||
+               a->max_width != b->max_width ||
+               a->type_bits.max_height != b->type_bits.max_height ||
+               a->unit_bits.max_height != b->unit_bits.max_height ||
+               a->max_height != b->max_height ||
+               a->type_bits.margin_left != b->type_bits.margin_left ||
+               a->unit_bits.margin_left != b->unit_bits.margin_left ||
+               a->margin_left != b->margin_left ||
+               a->type_bits.margin_right != b->type_bits.margin_right ||
+               a->unit_bits.margin_right != b->unit_bits.margin_right ||
+               a->margin_right != b->margin_right ||
+               a->type_bits.margin_top != b->type_bits.margin_top ||
+               a->unit_bits.margin_top != b->unit_bits.margin_top ||
+               a->margin_top != b->margin_top ||
+               a->type_bits.margin_bottom != b->type_bits.margin_bottom ||
+               a->unit_bits.margin_bottom != b->unit_bits.margin_bottom ||
+               a->margin_bottom != b->margin_bottom ||
+               a->type_bits.padding_left != b->type_bits.padding_left ||
+               a->unit_bits.padding_left != b->unit_bits.padding_left ||
+               a->padding_left != b->padding_left ||
+               a->type_bits.padding_right != b->type_bits.padding_right ||
+               a->unit_bits.padding_right != b->unit_bits.padding_right ||
+               a->padding_right != b->padding_right ||
+               a->type_bits.padding_top != b->type_bits.padding_top ||
+               a->unit_bits.padding_top != b->unit_bits.padding_top ||
+               a->padding_top != b->padding_top ||
+               a->type_bits.padding_bottom != b->type_bits.padding_bottom ||
+               a->unit_bits.padding_bottom != b->unit_bits.padding_bottom ||
+               a->padding_bottom != b->padding_bottom ||
+               a->type_bits.border_top_style != b->type_bits.border_top_style ||
+               a->unit_bits.border_top_width != b->unit_bits.border_top_width ||
+               a->border_top_width != b->border_top_width ||
+               a->type_bits.border_right_style !=
+                   b->type_bits.border_right_style ||
+               a->unit_bits.border_right_width !=
+                   b->unit_bits.border_right_width ||
+               a->border_right_width != b->border_right_width ||
+               a->type_bits.border_bottom_style !=
+                   b->type_bits.border_bottom_style ||
+               a->unit_bits.border_bottom_width !=
+                   b->unit_bits.border_bottom_width ||
+               a->border_bottom_width != b->border_bottom_width ||
+               a->type_bits.border_left_style !=
+                   b->type_bits.border_left_style ||
+               a->unit_bits.border_left_width !=
+                   b->unit_bits.border_left_width ||
+               a->border_left_width != b->border_left_width ||
+               a->type_bits.flex_direction != b->type_bits.flex_direction ||
+               a->type_bits.flex_wrap != b->type_bits.flex_wrap ||
+               a->type_bits.justify_content != b->type_bits.justify_content ||
+               a->type_bits.align_content != b->type_bits.align_content ||
+               a->type_bits.align_items != b->type_bits.align_items ||
+               a->flex_grow != b->flex_grow ||
+               a->flex_shrink != b->flex_shrink ||
+               a->type_bits.flex_basis != b->type_bits.flex_basis ||
+               a->unit_bits.flex_basis != b->unit_bits.flex_basis ||
+               a->flex_basis != b->flex_basis ||
+               a->type_bits.row_gap != b->type_bits.row_gap ||
+               a->unit_bits.row_gap != b->unit_bits.row_gap ||
+               a->row_gap != b->row_gap ||
+               a->type_bits.column_gap != b->type_bits.column_gap ||
+               a->unit_bits.column_gap != b->unit_bits.column_gap ||
+               a->column_gap != b->column_gap;
+}
+
 void ui_style_diff_end(ui_style_diff_t *diff, ui_widget_t *w)
 {
         ui_mutation_record_t *record;

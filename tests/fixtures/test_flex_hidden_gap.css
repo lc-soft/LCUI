@@ -1,0 +1,24 @@
+/*
+ * tests/fixtures/test_flex_hidden_gap.css
+ *
+ * A row with one hidden sibling and one fixed-size visible item.  The gap
+ * must only be inserted between in-flow items.
+ */
+
+.test-hg-row {
+        display: inline-flex;
+        flex-direction: row;
+        gap: 6px;
+}
+
+.test-hg-hidden {
+        display: none;
+        width: 33px;
+        height: 20px;
+}
+
+.test-hg-visible {
+        width: 28px;
+        height: 20px;
+        flex-shrink: 1;
+}

@@ -20,13 +20,22 @@
    `max_content_*` 每轮都会被 used size 覆盖；有有效宽度约束时不更新
    `unconstrained_content_*`，它是布局可用的可信内在尺寸。
 5. **测量缓存**：`measured_content_width/height` + `has_measured`。用于“在给定宽度下
-   测折行高”的快路径；`should_reflow` 或缓存宽度变化时失效。
+   测折行高”的快路径；缓存宽度变化时失效。`ui_widget_request_reflow()` 会清空部件
+   自身及所有祖先的 `has_measured`，因此同一轮 flex basis 各趟可以复用新结果，而
+   内容或样式变化后又必须重新测量；不能用更新期间持续置位的 `should_reflow`
+   充当缓存失效条件。
 
 规则：
 
 - 父级分配的可用宽只能写入布局约束，不能依赖 `computed_style` 承载——
   `reset_size()` 会把它擦除。
 - `computed_style` 只承载 CSS 语义；布局结果不应永久写回。
+- 父级宽度不确定时，块级流内元素的百分比 `width` 计算为 `auto`（由父布局
+  分配），行内/绝对定位元素为 fit-content。不得保留原始百分数并把 `100`
+  当像素使用，否则整棵子树会按 100px 排版。
+- 在 column flex 容器里，`width:auto` 与百分比宽度的 block/flex 容器子项都会在
+  父宽确定时记录内容宽约束，并在该宽度下重新测量 auto 高度。父宽不确定时百分比
+  仍按既有规则退回 auto/fit-content，不能提前把百分数当像素使用。
 
 > 现状例外：居中 auto 宽子项的 fit-content 钳制、以及居中列容器的交叉轴重推导，
 > 仍会把 used width 写入 `computed_style.width`。它们每次都从约束重算、不依赖
@@ -37,17 +46,36 @@
 ### 写入
 
 - 时机：flex column 容器在每个子项 `reset_layout` 之后、主轴测量之前，由
-  `ui_flexbox_record_width_constraint()` 为 in-flow 且 `width:auto` 的子项记录。
-  晚于 `reset_layout` 是为了避免读到上一轮布局写入的 `margin: auto` 实际值。
-- 值：`available_width = 容器 content_box.width − margin − border − padding`
-  （不小于 0）。
+  `ui_flexbox_record_width_constraint()` 为 in-flow 且 `width:auto` 或百分比宽度的
+  子项记录。晚于 `reset_layout` 是为了避免读到上一轮布局写入的 `margin:auto`
+  实际值。
+- 值：由 `ui_flexbox_resolve_measure_width()` 只解析一次。auto 按有效 align 与
+  auto-margin 规则选择 stretch 可用宽或 fit-content；百分比先由 `compute_style`
+  解析成固定 CSS 宽。两者随后都经 `ui_widget_fix_width()` 应用 min/max，再换算成
+  非负的子项内容宽。该值同时用于组合测量、嵌套 reflow、used width 落地和
+  `measured_content_width`，不得在后续路径另算另一套宽度。
 - 门控：仅当容器交叉轴（宽）为确定值（`IS_CSS_FIXED_LENGTH(width)`）。
 - 版本：`generation = 容器 layout_generation`（每次 reflow 递增）。
 
 ### 读取
 
 - 文本 `sizehint` 的宽优先级：自身固定宽 > 有效约束 > `max-width` > 不限。
-- `ui_flexbox_compute_column_item_flex_basis()` 用有效约束宽现算折行高。
+- `ui_flexbox_compute_column_item_flex_basis()` 用有效约束宽现算折行高，适用于
+  `width:auto` 和百分比宽度的 flex 容器子项。按 max-content 宽度得到的
+  `unconstrained_content_height` 可能少算折行，固定高子项的文本 sizehint 也可能小于
+  声明高度；两者都不能直接当作 stacked children 的完整 outer height，否则父容器
+  高度偏小、子项被 flex shrink 压扁。
+- 无回流的组合测量快路径先对每个子项调用 `ui_widget_reset_width()` 和
+  `ui_widget_reset_height()`，再读取 margin、盒模型或 sizehint。这样固定高使用恢复
+  后的声明高度而不是上一轮 shrink 结果，auto margin 也不会混入内在高度。
+- 快路径按子项 outer height 累加：声明固定高时经 `fix_height` 和盒模型换算，
+  auto 高时才使用内容 sizehint。返回值与 reflow 路径一致，都是容器的 content-box
+  高度；容器自身 padding/border 在 flex basis 换算时统一加入。
+- auto 宽子项的“已测量”提前返回也必须比较当前约束宽与缓存宽；只有同宽结果
+  才能复用，不能在宽度解析变化后继续返回旧高度。
+- `ui_flexbox_item_max_main_size()` 在同宽测量有效时同样使用
+  `measured_content_height`，不得在内容收起后再用更大的旧
+  `unconstrained_content_height` 充当主轴尺寸下限。
 
 ### 失效
 
@@ -78,8 +106,11 @@
 2. **`ui_flexbox_layout`**：
    - `break_into_lines`：按主轴可用尺寸分行（非内在路径）。
    - `resolve_main_sizes`：分配主轴空间（grow/shrink/auto margin），只写尺寸。
-   - `resolve_cross_sizes`：固化交叉尺寸、定位；把宽高合并为一次条件 reflow；
-     流外子项按文档顺序在各趟逐项布局。
+   - `resolve_cross_sizes`：固化交叉尺寸、定位；把宽高合并为一次条件 reflow。
+   - `ui_flexbox_layout_out_of_flow`：主布局结束后定位绝对定位子项；静态位置按
+     “容器中唯一 flex item”计算（`justify-content` + `align-items`）。
+   - `display:none` 子项在收集阶段直接跳过，不进入 `line->items`，gap、justify
+     和分行都只统计流内子项。
 
 ### 3.3 reflow 传播
 
@@ -87,6 +118,8 @@
   （经 `ui_style_diff_end` 的 `inner_changed`）。
 - 挂载（`ui_widget_append`）：只 `request_reflow(parent)` + 递归刷新子孙**样式**；
   子孙 reflow 依赖样式差异间接触发，或父级重排时被动布局。
+- block 定位阶段遇到百分比 `height`、`min-height` 或 `max-height` 时都会重置高度
+  并条件 reflow，确保父级内容高变化后，百分比最小/最大高度也重新解析。
 
 ## 4. 不变量清单
 
@@ -100,6 +133,8 @@
 | I6 | 居中 auto 宽子项按 fit-content 钳制 | `ui_flexbox_fit_content_width` | 单行溢出容器 |
 | I7 | fit-content 合并：自有 `sizehint` 与子项布局尺寸按轴取 `max`；`sizehint` 始终可调用，零值合法；`sizehint_exact` 仅用于组合测量快路径 | `ui_flexbox_fit_content_width`、`ui_widget_sizehint_is_exact` | button 等 flex 容器被填满；零宽内容读到过期缓存 |
 | I8 | 独立 reflow 时从约束重推导交叉轴宽 | `ui_flexbox_reflow` 入口 | hover/路由切换后塌成单行 |
+| I9 | 测量前恢复子项声明的宽高和双向 margin | `ui_flexbox_try_measure_container_height` | shrink 高度、旧 auto margin 污染内在高度 |
+| I10 | 测量宽只解析一次，快路径、reflow、缓存键共用 | `ui_flexbox_resolve_measure_width` | 同结构因路径不同而折行/父高不一致 |
 
 ## 5. 已知缺口 / deferred
 
@@ -117,6 +152,7 @@
 | 规则 | 测试 |
 |---|---|
 | 换行 / 约束 | `flex layout` → `flex column text wrap`、`constraint refresh` |
+| 百分比 / auto 宽度 | `css computed` → `percentage width with indefinite parent`；`home layout` |
 | 零尺寸内容 | `zero height text ignores stale cache` |
 | 单独重排稳定 | `standalone reflow stays wrapped`、`empty description reflow stable` |
 | 重新挂载 / row grow 宽 | `field checkbox description stable`（remount、field-content standalone reflow） |
@@ -128,3 +164,12 @@
 | sizehint 能力 | `sizehint`（`sizehint capability`、`text single line hint`、`nested container height`） |
 | flex 语义契约 | `flex contract`（`F01`–`F19`、`C02`–`C10`） |
 | widget 场景 | `empty layout`（`empty basic`）、`field layout`（`field choice card`、`field checkbox row`） |
+| 百分比父级 / 固定高子项 | `gallery layout`（`gallery empty hover`）、`card`（`card basic header`） |
+| shrink / auto margin 重测 | `flex layout`（`fixed height intrinsic restoration`、`auto margin intrinsic height`） |
+| 测量路径与盒模型一致 | `flex layout`（`measurement path width consistency`、`percentage measurement constraints`） |
+| 百分比高度失效 | `flex layout`（`browser layout`）、`block layout` |
+| Home clip-safe 间距 | `gallery layout`（`clip-safe body should keep ... padding`） |
+| block 内容展开/收起 | `gallery layout`（`gallery accordion resize`） |
+| text sizehint / hover 绘制稳定 | `gallery layout`（`production description hover`） |
+| 捕获 scale / 文本完整性 | `shimmer`（`shimmer text capture`） |
+| Home 首挂与重挂布局 | `gallery layout`（`gallery initial mount`、`gallery remount`）、`production empty icon` |

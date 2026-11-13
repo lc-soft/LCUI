@@ -23,6 +23,8 @@ void ui_widget_set_available_width_constraint(ui_widget_t *child,
                                               ui_widget_t *source,
                                               unsigned generation);
 bool ui_widget_get_available_width(ui_widget_t *w, float *available_width);
+void ui_widget_reset_height(ui_widget_t *w);
+void ui_widget_update_style(ui_widget_t *w);
 
 #define SCROLLBAR_WIDTH 10
 
@@ -1459,6 +1461,195 @@ static void test_fixed_width_child_wraps_own_width(void)
         ui_widget_destroy(ref);
 }
 
+static ui_widget_t *build_fixed_height_column(ui_widget_t **item,
+                                              ui_widget_t **button)
+{
+        ui_widget_t *outer = ui_create_widget(NULL);
+
+        *item = ui_create_widget(NULL);
+        *button = ui_create_button();
+        ui_widget_set_style_string(outer, "display", "flex");
+        ui_widget_set_style_string(outer, "flex-direction", "column");
+        ui_widget_set_style_string(outer, "width", "300px");
+        ui_widget_set_style_string(*item, "display", "flex");
+        ui_widget_set_style_string(*item, "flex-direction", "column");
+        ui_widget_set_style_string(*item, "width", "100%");
+        ui_widget_set_style_string(*button, "height", "32px");
+        ui_widget_set_style_string(*button, "flex-shrink", "1");
+        ui_button_set_text(*button, "Fixed height");
+        ui_widget_append(*item, *button);
+        ui_widget_append(outer, *item);
+        ui_widget_append(ui_root(), outer);
+        return outer;
+}
+
+static void test_fixed_height_child_restores_intrinsic_size(void)
+{
+        ui_widget_t *item;
+        ui_widget_t *button;
+        ui_widget_t *outer = build_fixed_height_column(&item, &button);
+
+        ui_widget_set_style_string(outer, "height", "20px");
+        ui_update();
+        ui_update();
+        ctest_equal_bool(
+            "fixed-height child should shrink in a definite parent",
+            button->border_box.height < 32.0f, true);
+
+        ui_widget_set_style_string(outer, "height", "auto");
+        ui_widget_update_style(outer);
+        ui_widget_reset_height(outer);
+        ui_widget_request_reflow(item);
+        ui_widget_reflow(outer);
+        ctest_equal_float(
+            "fixed-height child should restore its declared height",
+            button->border_box.height, 32.0f);
+        ctest_equal_bool(
+            "auto parent should contain the restored child",
+            item->content_box.height + 0.5f >= button->border_box.height, true);
+
+        ui_widget_destroy(outer);
+}
+
+static void test_auto_margins_excluded_from_intrinsic_height(void)
+{
+        ui_widget_t *item;
+        ui_widget_t *button;
+        ui_widget_t *outer = build_fixed_height_column(&item, &button);
+
+        ui_widget_set_style_string(outer, "height", "64px");
+        ui_widget_set_style_string(item, "flex-grow", "1");
+        ui_widget_set_style_string(button, "margin-top", "auto");
+        ui_update();
+        ui_update();
+        ctest_equal_bool("auto margin should be resolved in a definite parent",
+                         button->computed_style.margin_top > 1.0f, true);
+
+        ui_widget_set_style_string(outer, "height", "auto");
+        ui_widget_update_style(outer);
+        ui_widget_reset_height(outer);
+        ui_widget_request_reflow(item);
+        ui_widget_reflow(outer);
+        ctest_equal_float("auto parent should exclude the old auto margin",
+                          item->content_box.height, 32.0f);
+        ctest_equal_float(
+            "auto margin should reset during intrinsic measurement",
+            button->computed_style.margin_top, 0.0f);
+
+        ui_widget_destroy(outer);
+}
+
+static ui_widget_t *create_measure_column(void)
+{
+        ui_widget_t *w = ui_create_widget(NULL);
+
+        ui_widget_set_style_string(w, "display", "flex");
+        ui_widget_set_style_string(w, "flex-direction", "column");
+        return w;
+}
+
+static ui_widget_t *create_measure_text(void)
+{
+        ui_widget_t *w = ui_create_widget("text");
+
+        ui_widget_set_style_string(w, "white-space", "normal");
+        ui_text_set_content(w, LONG_TEXT);
+        return w;
+}
+
+static void test_measurement_paths_share_resolved_width(void)
+{
+        ui_widget_t *fast_parent = create_measure_column();
+        ui_widget_t *reflow_parent = create_measure_column();
+        ui_widget_t *fast_item = create_measure_column();
+        ui_widget_t *reflow_item = create_measure_column();
+        ui_widget_t *wrapper = create_measure_column();
+        ui_widget_t *fast_text = create_measure_text();
+        ui_widget_t *reflow_text = create_measure_text();
+
+        ui_widget_set_style_string(fast_parent, "align-items", "center");
+        ui_widget_set_style_string(reflow_parent, "align-items", "center");
+        ui_widget_set_style_string(fast_parent, "width", "400px");
+        ui_widget_set_style_string(reflow_parent, "width", "400px");
+        ui_widget_set_style_string(fast_parent, "height", "auto");
+        ui_widget_set_style_string(reflow_parent, "height", "auto");
+        ui_widget_set_style_string(fast_item, "max-width", "200px");
+        ui_widget_set_style_string(reflow_item, "max-width", "200px");
+        ui_widget_append(fast_item, fast_text);
+        ui_widget_append(wrapper, reflow_text);
+        ui_widget_append(reflow_item, wrapper);
+        ui_widget_append(fast_parent, fast_item);
+        ui_widget_append(reflow_parent, reflow_item);
+        ui_widget_append(ui_root(), fast_parent);
+        ui_widget_append(ui_root(), reflow_parent);
+        ui_update();
+        ui_update();
+
+        ctest_equal_float("fast and reflow paths should use the same width",
+                          fast_item->content_box.width,
+                          reflow_item->content_box.width);
+        ctest_equal_float(
+            "fast and reflow paths should produce the same text height",
+            fast_text->content_box.height, reflow_text->content_box.height);
+        ctest_equal_float(
+            "fast and reflow paths should produce the same parent height",
+            fast_parent->content_box.height, reflow_parent->content_box.height);
+        ctest_equal_float("fast-path cache should record the resolved width",
+                          fast_item->measured_content_width,
+                          fast_item->content_box.width);
+        ctest_equal_float("reflow cache should record the resolved width",
+                          reflow_item->measured_content_width,
+                          reflow_item->content_box.width);
+
+        ui_widget_destroy(fast_parent);
+        ui_widget_destroy(reflow_parent);
+}
+
+static void test_percentage_measurement_honors_min_max_and_box_sizing(void)
+{
+        static const char *box_sizing[] = { "content-box", "border-box" };
+        static const float expected_width[] = { 200.0f, 178.0f };
+        int i;
+
+        for (i = 0; i < 2; ++i) {
+                ui_widget_t *outer = create_measure_column();
+                ui_widget_t *item = create_measure_column();
+                ui_widget_t *text = create_measure_text();
+                ui_widget_t *reference =
+                    build_column_with_long_text(expected_width[i]);
+                ui_widget_t *reference_text = ui_widget_get_child(reference, 1);
+
+                ui_widget_set_style_string(outer, "width", "400px");
+                ui_widget_set_style_string(item, "width", "100%");
+                ui_widget_set_style_string(item, "max-width", "200px");
+                ui_widget_set_style_string(item, "box-sizing", box_sizing[i]);
+                ui_widget_set_style_string(item, "padding", "10px");
+                ui_widget_set_style_string(item, "border", "1px solid #000000");
+                ui_widget_append(item, text);
+                ui_widget_append(outer, item);
+                ui_widget_append(ui_root(), outer);
+                ui_update();
+
+                ctest_equal_float(
+                    "percentage item should apply min max before box sizing",
+                    item->content_box.width, expected_width[i]);
+                ctest_equal_float(
+                    "percentage cache should use the clamped content width",
+                    item->measured_content_width, expected_width[i]);
+                ctest_equal_float(
+                    "percentage item should wrap at its resolved width",
+                    text->content_box.height,
+                    reference_text->content_box.height);
+                ctest_equal_bool(
+                    "percentage parent should contain all wrapped lines",
+                    item->content_box.height + 0.5f >= text->border_box.height,
+                    true);
+
+                ui_widget_destroy(outer);
+                ui_widget_destroy(reference);
+        }
+}
+
 /* A flex-grow child's main size is allocated from remaining space and must
  * not diverge across repeated updates. */
 static void test_grow_child_main_size_stable(void)
@@ -1542,6 +1733,15 @@ void test_flex_layout(void)
                        test_indefinite_width_keeps_single_line);
         ctest_describe("fixed width child wrap",
                        test_fixed_width_child_wraps_own_width);
+        ctest_describe("fixed height intrinsic restoration",
+                       test_fixed_height_child_restores_intrinsic_size);
+        ctest_describe("auto margin intrinsic height",
+                       test_auto_margins_excluded_from_intrinsic_height);
+        ctest_describe("measurement path width consistency",
+                       test_measurement_paths_share_resolved_width);
+        ctest_describe(
+            "percentage measurement constraints",
+            test_percentage_measurement_honors_min_max_and_box_sizing);
         ctest_describe("grow child main size",
                        test_grow_child_main_size_stable);
         ctest_describe("constraint refresh",

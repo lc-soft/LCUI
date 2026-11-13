@@ -1,0 +1,32 @@
+/*
+ * tests/fixtures/test_card.css
+ *
+ * The card-basic demo layout.  Mirrors the rules that
+ * examples/doc-viewer/app/global.css scopes under `.card-basic-demo`.
+ */
+
+.test-card-form {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+}
+
+.test-card-field {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+}
+
+.test-card-label-row {
+        display: flex;
+        align-items: center;
+}
+
+.test-card-footer {
+        flex-direction: column;
+        gap: 8px;
+}
+
+.test-card-footer button {
+        width: 100%;
+}

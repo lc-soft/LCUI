@@ -232,6 +232,23 @@ static void ui_text_on_destroy(ui_widget_t *w)
         }
 }
 
+static void ui_text_restore_paint_size(ui_text_t *txt, int width, int height)
+{
+        list_t rects;
+
+        if (txt->layer->fixed_width == width &&
+            txt->layer->fixed_height == height &&
+            txt->layer->max_width == width &&
+            txt->layer->max_height == height) {
+                return;
+        }
+        pd_text_set_fixed_size(txt->layer, width, height);
+        pd_text_set_max_size(txt->layer, width, height);
+        list_create(&rects);
+        pd_text_update(txt->layer, &rects);
+        pd_rects_clear(&rects);
+}
+
 static void ui_text_on_sizehint(ui_widget_t *w, ui_sizehint_t *hint)
 {
         float max_width = 0, max_height = 0, avail_width = 0;
@@ -369,6 +386,8 @@ static void ui_text_on_paint(ui_widget_t *w, pd_context_t *paint,
         ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
 
         ui_text_sync_layer_scale(w, style);
+        ui_text_restore_paint_size(txt, (int)style->content_box.width,
+                                   (int)style->content_box.height);
         content_rect.width = style->content_box.width;
         content_rect.height = style->content_box.height;
         content_rect.x = style->content_box.x - style->canvas_box.x;

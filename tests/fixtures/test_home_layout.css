@@ -1,0 +1,76 @@
+/*
+ * tests/fixtures/test_home_layout.css
+ *
+ * Mirrors the doc-viewer home page structure: a scroll area, a centered
+ * max-width container with padding, and a four-column card gallery.  The
+ * `test-*` classes keep the scenario independent from style-nova.
+ */
+
+.test-home-scroll {
+        width: 100%;
+        height: 100%;
+}
+
+.test-home-page {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+}
+
+.test-home-inner {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 1560px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 72px 48px 96px;
+}
+
+.test-home-grid {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 24px;
+        width: 100%;
+        margin-top: 56px;
+}
+
+.test-home-column {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 0;
+        flex-shrink: 0;
+        gap: 24px;
+        min-width: 0;
+}
+
+.test-home-card {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        width: 100%;
+        padding: 24px;
+        border: 1px solid #e5e5e5;
+        border-radius: 12px;
+}
+
+.test-home-input {
+        height: 36px;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+}
+
+.test-home-input:focus {
+        border-color: #111111;
+}
+
+.test-home-page-active {
+        background: #ffffff;
+}
+
+.test-home-filler {
+        display: block;
+        height: 900px;
+        background: #f7f7f7;
+}

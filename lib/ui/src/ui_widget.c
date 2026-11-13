@@ -326,8 +326,6 @@ void ui_widget_update_box_position(ui_widget_t *w)
                                     w->border_box.width;
                         }
                         x -= s->right;
-                } else {
-                        x = 0;
                 }
                 if (IS_CSS_FIXED_LENGTH(s, top)) {
                         y = s->top;
@@ -337,8 +335,6 @@ void ui_widget_update_box_position(ui_widget_t *w)
                                     w->border_box.height;
                         }
                         y -= s->bottom;
-                } else {
-                        y = 0;
                 }
                 break;
         case CSS_POSITION_RELATIVE:

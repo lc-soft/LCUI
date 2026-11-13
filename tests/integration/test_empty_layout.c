@@ -136,6 +136,77 @@ static void test_empty_basic(void)
         ui_widget_destroy(ref_learn->parent);
 }
 
+/* The gallery uses the real empty widget inside a column. Its description
+ * height must come from the wrapped line boxes, and a hover-triggered reflow
+ * must not change the card height. */
+static void test_empty_hover_stability(void)
+{
+        static const float widths[] = { 340, 320, 300, 290, 280, 270, 260,
+                                        250, 240, 230, 220, 210, 200 };
+        ui_widget_t *box = create_box("test-empty-hover-box");
+        ui_widget_t *empty = ui_create_empty();
+        ui_widget_t *header = ui_create_empty_header();
+        ui_widget_t *description = ui_create_empty_description();
+        ui_widget_t *content = ui_create_empty_content();
+        ui_widget_t *button = ui_create_button();
+        ui_widget_t *w;
+        float height;
+        float card_height;
+        int i, j;
+
+        ui_text_set_content(
+            description,
+            "Upload your first master to start reaching listeners on "
+            "Spotify, Apple Music, and more.");
+        ui_button_set_text(button, "Create Release");
+        ui_button_set_variant(button, UI_BUTTON_VARIANT_PRIMARY);
+        ui_widget_append(header, description);
+        ui_widget_append(content, button);
+        ui_widget_append(empty, header);
+        ui_widget_append(empty, content);
+        ui_widget_append(box, empty);
+        ui_widget_append(ui_root(), box);
+        ui_widget_resize(ui_root(), 1280, 720);
+        ui_update();
+        ui_update();
+
+        for (j = 0; j < (int)(sizeof(widths) / sizeof(widths[0])); ++j) {
+                ui_widget_set_style_unit_value(box, css_prop_width, widths[j],
+                                               CSS_UNIT_PX);
+                for (i = 0; i < 3; ++i) {
+                        ui_update();
+                }
+                height = description->border_box.height;
+                card_height = box->border_box.height;
+                ctest_equal_bool("empty description should have a height",
+                                 height > 0.0f, true);
+
+                for (w = button; w; w = w->parent) {
+                        ui_widget_add_status(w, "hover");
+                }
+                for (i = 0; i < 3; ++i) {
+                        ui_update();
+                }
+                ctest_equal_float(
+                    "hover should keep the empty description height",
+                    description->border_box.height, height);
+                ctest_equal_float("hover should keep the empty card height",
+                                  box->border_box.height, card_height);
+
+                for (w = button; w; w = w->parent) {
+                        ui_widget_remove_status(w, "hover");
+                }
+                for (i = 0; i < 3; ++i) {
+                        ui_update();
+                }
+                ctest_equal_float(
+                    "leaving hover should keep the empty description height",
+                    description->border_box.height, height);
+        }
+
+        ui_widget_destroy(box);
+}
+
 void test_empty_layout(void)
 {
         lcui_init();
@@ -143,6 +214,7 @@ void test_empty_layout(void)
         ui_widget_set_title(ui_root(), L"test empty layout");
 
         ctest_describe("empty basic", test_empty_basic);
+        ctest_describe("empty hover stability", test_empty_hover_stability);
 
         lcui_destroy();
 }

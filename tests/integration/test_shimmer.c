@@ -760,6 +760,93 @@ static void check_content_cache_invalidates(void)
         ui_widget_destroy(sh);
 }
 
+static void render_alpha_into(ui_widget_t *w, pd_canvas_t *out, int cw, int ch)
+{
+        pd_rect_t rect = { 0, 0, cw, ch };
+        pd_context_t paint;
+
+        make_argb(out, cw, ch);
+        pd_canvas_fill(out, pd_argb(0, 0, 0, 0));
+        paint.with_alpha = true;
+        paint.rect = rect;
+        pd_canvas_init(&paint.canvas);
+        pd_canvas_quote(&paint.canvas, out, &rect);
+        ui_widget_render(w, &paint);
+}
+
+static int rightmost_alpha(pd_canvas_t *out)
+{
+        int x;
+        int y;
+
+        for (x = (int)out->width - 1; x >= 0; --x) {
+                for (y = 0; y < (int)out->height; ++y) {
+                        if (pd_canvas_get_pixel(out, (unsigned)x, (unsigned)y)
+                                .a > 20) {
+                                return x;
+                        }
+                }
+        }
+        return -1;
+}
+
+/* The shimmer capture temporarily boosts the device scale. Text must be
+ * retypeset at that scale, not restored to the previous layout pass's fixed
+ * size, otherwise the right side of a long label is clipped. */
+static void check_text_capture_full_width(void)
+{
+        const char *content_text = "design-system.zip";
+        ui_widget_t *sh = ui_create_shimmer();
+        ui_widget_t *content = ui_create_widget("shimmer-content");
+        ui_widget_t *text = ui_create_widget("text");
+        ui_widget_t *reference = ui_create_widget("text");
+        pd_canvas_t captured;
+        pd_canvas_t direct;
+        int captured_right;
+        int direct_right;
+
+        ui_metrics.dpi = 144;
+        ui_widget_set_style_string(text, "font-size", "14px");
+        ui_widget_set_style_string(text, "line-height", "20px");
+        ui_widget_set_style_string(text, "white-space", "nowrap");
+        ui_widget_set_style_string(text, "color", "#ffffff");
+        ui_text_set_content(text, content_text);
+        ui_widget_append(content, text);
+        ui_shimmer_set_content(sh, content);
+        ui_widget_append(ui_root(), sh);
+
+        ui_widget_set_style_string(reference, "width", "240px");
+        ui_widget_set_style_string(reference, "height", "20px");
+        ui_widget_set_style_string(reference, "font-size", "14px");
+        ui_widget_set_style_string(reference, "line-height", "20px");
+        ui_widget_set_style_string(reference, "white-space", "nowrap");
+        ui_widget_set_style_string(reference, "color", "#ffffff");
+        ui_text_set_content(reference, content_text);
+        ui_widget_append(ui_root(), reference);
+        ui_widget_resize(reference, 240, 20);
+
+        prime_shimmer(sh, 240, 20, 0.0f, 0.0f);
+        ui_update();
+        render_alpha_into(sh, &captured, 360, 30);
+        render_alpha_into(reference, &direct, 360, 30);
+        captured_right = rightmost_alpha(&captured);
+        direct_right = rightmost_alpha(&direct);
+
+        ctest_equal_bool("shimmer text capture should render text",
+                         captured_right > 0, true);
+        ctest_equal_bool("reference text should render text", direct_right > 0,
+                         true);
+        ctest_equal_bool(
+            "shimmer capture should not clip the end of a long text label",
+            abs(captured_right - direct_right) <= 6, true);
+
+        pd_canvas_destroy(&captured);
+        pd_canvas_destroy(&direct);
+        ui_widget_destroy(sh);
+        ui_widget_destroy(reference);
+        ui_metrics.dpi = 96;
+}
+
 void test_shimmer(void)
 {
         lcui_init();
@@ -781,6 +868,7 @@ void test_shimmer(void)
                        check_sheen_preserves_alpha);
         ctest_describe("shimmer content cache",
                        check_content_cache_invalidates);
+        ctest_describe("shimmer text capture", check_text_capture_full_width);
 
         ui_metrics.dpi = 96;
         lcui_destroy();

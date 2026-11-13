@@ -66,9 +66,14 @@ LIBUI_INLINE bool ui_widget_has_absolute_position(ui_widget_t *w)
                CSS_POSITION_ABSOLUTE;
 }
 
+LIBUI_INLINE bool ui_widget_is_display_none(ui_widget_t *w)
+{
+        return css_computed_display(&w->computed_style) == CSS_DISPLAY_NONE;
+}
+
 LIBUI_INLINE bool ui_widget_in_layout_flow(ui_widget_t *w)
 {
-        return css_computed_display(&w->computed_style) != CSS_DISPLAY_NONE &&
+        return !ui_widget_is_display_none(w) &&
                !ui_widget_has_absolute_position(w);
 }
 
@@ -94,5 +99,7 @@ LIBUI_INLINE bool ui_widget_has_flex_column_direction(ui_widget_t *w)
 
 size_t ui_widget_get_children_style_changes(ui_widget_t *w, int type,
                                             const char *name);
+
+void ui_widget_resolve_background(ui_widget_t *w);
 
 void ui_widget_destroy_style(ui_widget_t *w);

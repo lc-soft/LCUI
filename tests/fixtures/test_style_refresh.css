@@ -1,0 +1,23 @@
+/*
+ * tests/fixtures/test_style_refresh.css
+ *
+ * A plain block with an auto width/height used to check that status-driven
+ * style refreshes do not temporarily collapse the used box.
+ */
+
+.test-refresh-parent {
+        display: block;
+        width: 400px;
+}
+
+.test-refresh-box {
+        display: block;
+        padding: 10px;
+        border: 1px solid #dddddd;
+}
+
+.test-refresh-text {
+        display: block;
+        font-size: 14px;
+        line-height: 20px;
+}
