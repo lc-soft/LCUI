@@ -12,7 +12,8 @@ export default function Navbar() {
           $ref="nav_home"
           onClick="navbar_on_nav_click"
         >
-          Home
+          <Text className="lang en">Home</Text>
+          <Text className="lang zh-CN">首页</Text>
         </Button>
         <Button
           variant="ghost"
@@ -20,7 +21,8 @@ export default function Navbar() {
           $ref="nav_docs"
           onClick="navbar_on_nav_click"
         >
-          Docs
+          <Text className="lang en">Docs</Text>
+          <Text className="lang zh-CN">文档</Text>
         </Button>
         <Button
           variant="ghost"
@@ -28,7 +30,8 @@ export default function Navbar() {
           $ref="nav_widgets"
           onClick="navbar_on_nav_click"
         >
-          Widgets
+          <Text className="lang en">Widgets</Text>
+          <Text className="lang zh-CN">部件</Text>
         </Button>
       </div>
       <div className="navbar-center">
@@ -40,9 +43,7 @@ export default function Navbar() {
         <dropdown-menu $ref="locale_menu">
           <dropdown-menu-trigger>
             <Button variant="ghost" size="icon" $ref="locale_btn">
-              <Text className="relative left-[3px] text-xs">
-                文
-              </Text>
+              <Text className="relative left-[3px] text-xs">文</Text>
               <Text className="relative bottom-[-5px] right-[3px] text-xs">
                 A
               </Text>

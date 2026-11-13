@@ -21,6 +21,7 @@
  */
 
 #include "main.h"
+#include "components/home-grid.h"
 #include "components/list.h"
 #include "locale.h"
 #include "theme.h"
@@ -44,6 +45,7 @@ int main(int argc, char *argv[])
         app_init();
         register_semantic_text_aliases();
         ui_register_list_widgets();
+        ui_register_home_grid();
 
         router_t *router = router_get_by_name("AppRouter");
         const char *locale = app_get_locale();
@@ -52,8 +54,8 @@ int main(int argc, char *argv[])
         char initial_path[128];
         router_location_t *location;
 
-        snprintf(initial_path, sizeof(initial_path),
-                 "/%s/docs/overview/quick-start", locale ? locale : "en");
+        snprintf(initial_path, sizeof(initial_path), "/%s/home",
+                 locale ? locale : "en");
         location = router_location_create(NULL, initial_path);
         router_push(router, location);
         router_location_destroy(location);

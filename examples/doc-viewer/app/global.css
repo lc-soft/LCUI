@@ -846,25 +846,524 @@ li {
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 96px 48px;
+}
+
+.home-inner {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1560px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 72px 48px 96px;
+}
+
+.home-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .home-title {
-  font-size: 40px;
+  font-size: 48px;
   font-weight: 700;
   line-height: 1.4;
 }
 
 .home-desc {
-  margin-top: 16px;
+  max-width: 720px;
+  margin-top: 12px;
   font-size: 18px;
-  color: #666666;
+  line-height: 1.6;
+  color: #555555;
+  text-align: center;
+}
+
+.home-cta {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+home-grid {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 24px;
+  margin-top: 56px;
+}
+
+home-column {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  gap: 24px;
+  min-width: 0;
+}
+
+.home-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.home-card card-header {
+  gap: 12px;
+  padding: 0;
+}
+
+.home-card card-title {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.home-card card-description {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #777777;
+}
+
+.home-card .home-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+}
+
+.home-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.home-row-between {
+  justify-content: space-between;
+}
+
+.home-preview-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #777777;
+}
+
+/* Shared form pieces */
+
+.home-card field {
+  gap: 6px;
+}
+
+.home-field-row {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+
+.home-field-half {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.home-card field-label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.home-field-link {
+  font-size: 11px;
+  color: #888888;
+}
+
+.home-input {
+  height: 36px;
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+.home-textarea {
+  height: 96px;
+}
+
+.home-block-button {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Controls card */
+
+.home-controls {
+  gap: 14px;
+}
+
+.home-controls .home-row {
+  flex-wrap: nowrap;
+}
+
+.home-controls button,
+.home-controls .button {
+  flex-shrink: 0;
+}
+
+.home-controls radio-group {
+  flex-direction: row;
+  align-items: center;
+}
+
+/* Attachment card */
+
+.home-attachment-card {
+  gap: 8px;
+}
+
+/* Savings targets card */
+
+.home-goal {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  border-radius: 10px;
+  background: #f7f7f7;
+}
+
+.home-goal-label {
+  font-size: 11px;
+  color: #888888;
+}
+
+.home-goal-value {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.home-goal-progress {
+  height: 6px;
+}
+
+.home-goal-meta {
+  font-size: 12px;
+  color: #777777;
+}
+
+.home-goal-footer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.home-goal-caption {
+  font-size: 12px;
+  color: #777777;
+}
+
+.home-goal-amount {
+  font-size: 12px;
+  font-weight: 500;
+  color: #111111;
+}
+
+/* Claimable balance card */
+
+.home-claim-label {
+  font-size: 13px;
+  color: #777777;
+}
+
+.home-balance {
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.home-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: #f5b301;
+}
+
+.home-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 120px;
+  padding: 14px;
+  border-radius: 10px;
+  background: #f7f7f7;
+}
+
+.home-summary .home-row-between .home-summary-label {
+  flex: 1 1 0;
+}
+
+.home-summary .home-row-between .home-summary-value {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.home-summary .home-row-between .home-summary-total {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.home-summary-label {
+  font-size: 13px;
+  color: #777777;
+}
+
+.home-summary-value {
+  font-size: 13px;
+}
+
+.home-summary-total {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.home-divider {
+  height: 1px;
+  background: #e5e5e5;
+}
+
+/* Accordion and deployment cards */
+
+.home-accordion {
+  gap: 10px;
+}
+
+.home-accordion accordion-trigger text {
+  flex: 1 1 0;
+}
+
+.home-deployment {
+  gap: 12px;
+}
+
+.home-deploy-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: #16a34a;
+}
+
+.home-deploy-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.home-deploy-environment {
+  font-size: 12px;
+  font-weight: 600;
+  color: #555555;
+}
+
+.home-deploy-percent {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.home-deploy-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.home-deploy-steps item {
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.home-deploy-step-meta {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: #777777;
+}
+
+.home-deploy-actions {
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.home-deploy-redeploy {
+  flex-shrink: 0;
+}
+
+/* Milestone, payout and account cards */
+
+.home-milestone,
+.home-payout,
+.home-account {
+  gap: 8px;
+}
+
+.home-account {
+  gap: 20px;
+}
+
+.home-payout .home-textarea {
+  height: 60px;
+}
+
+.home-payout-amount {
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.home-select {
+  width: 100%;
+  height: 36px;
+  justify-content: space-between;
+}
+
+.home-payout dropdown-menu,
+.home-payout dropdown-menu-trigger {
+  width: 100%;
+}
+
+.home-slider {
+  height: 6px;
+  border-radius: 3px;
+  background: #eeeeee;
+}
+
+.home-slider-fill {
+  width: 25%;
+  height: 6px;
+  border-radius: 3px;
+  background: #111111;
+}
+
+.home-danger {
+  margin-top: 4px;
+}
+
+.home-account item,
+.home-shortcuts item {
+  min-height: 76px;
+}
+
+.home-card item {
+  align-items: flex-start;
+}
+
+.home-danger item-media {
+  color: #e7000b;
+}
+
+/* Empty card */
+
+.home-empty empty,
+.home-empty empty-header,
+.home-empty empty-content,
+.home-empty button {
+  flex-shrink: 0;
+}
+
+.home-empty empty {
+  width: 100%;
+}
+
+.home-empty empty-header {
+  width: 100%;
+}
+
+.home-empty empty-title,
+.home-empty empty-description {
+  text-align: center;
+}
+
+.home-empty empty-content {
+  width: 100%;
+  align-items: center;
+}
+
+.home-empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #f5f5f5;
+}
+
+.home-empty-icon icon {
+  top: 0;
+  height: 16px;
+  font-size: 16px;
+  line-height: 16px;
+}
+
+/* Notifications card */
+
+.home-alerts {
+  gap: 12px;
+}
+
+.home-alert-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+/* Align the 16px control with the first text line instead of its box top. */
+.home-alert-row checkbox {
+  margin-top: 2px;
+}
+
+.home-alert-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  gap: 2px;
+}
+
+.home-alert-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.home-alert-desc {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #777777;
+}
+
+/* Shortcuts card */
+
+.home-shortcuts {
+  gap: 10px;
+}
+
+.home-shortcuts breadcrumb {
+  width: 260px;
+}
+
+/* The vertical docs scroll area fills the viewport; wide content (code
+ * blocks) must not stretch the scroll content, otherwise `margin: auto`
+ * pages center inside an off-screen wider box. */
+.docs-scroll-content {
+  min-width: 0;
 }
 
 /* -- Widgets index ---------------------------------------------------- */
 
 .widgets-index {
-  width: 100%;
   max-width: 960px;
   padding: 40px 48px;
 }

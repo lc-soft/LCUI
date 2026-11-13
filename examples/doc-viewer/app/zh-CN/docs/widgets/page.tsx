@@ -28,7 +28,7 @@ function chunk(source: SidebarItemData[], size: number): SidebarItemData[][] {
 
 export default function ZhCnWidgetsPage() {
   return (
-    <div className="widgets-index">
+    <div className="doc-page widgets-index">
       <Text className="widgets-index-title">部件</Text>
       <Text className="widgets-index-desc">
         这里可以找到当前提供的全部部件。

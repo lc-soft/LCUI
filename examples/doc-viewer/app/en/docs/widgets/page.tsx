@@ -29,7 +29,7 @@ function chunk(source: SidebarItemData[], size: number): SidebarItemData[][] {
 
 export default function EnWidgetsPage() {
   return (
-    <div className="widgets-index">
+    <div className="doc-page widgets-index">
       <Text className="widgets-index-title">Widgets</Text>
       <Text className="widgets-index-desc">
         Here you can find all widgets available in the library.

@@ -36,6 +36,24 @@
   gap: 8px;
 }
 
+/* Narrow windows: drop the path/version/GitHub columns so the three nav
+ * buttons keep their full width instead of being clipped by the column. */
+.navbar.compact {
+  padding: 0 8px;
+  gap: 8px;
+}
+
+.navbar.compact .navbar-center,
+.navbar.compact .navbar-version,
+.navbar.compact .navbar-link {
+  display: none;
+}
+
+.navbar.compact .navbar-left,
+.navbar.compact .navbar-right {
+  flex: 0 0 auto;
+}
+
 .navbar-path {
   width: 100%;
   max-width: 320px;

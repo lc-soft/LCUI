@@ -149,6 +149,33 @@ overview、handbook 等页面结构更自由，仅要求：
 2. `##` 小节自由组织
 3. 示例代码块须带 `title="..."` 元数据
 
+手写页面（Home、部件索引）另有一条硬性约定：**页面组件的根节点必须是 `div`**。
+`lcui build` 会把根元素类型作为 page 原型的父原型（例如根节点是 `<ScrollArea>` 时，
+生成的 page 原型继承 `scrollarea`），但生成的 `page.c` 的 init 不会调用父原型的 init，
+运行时会因为缺少部件内部数据而崩溃。需要滚动时用
+`<div className="w-full h-full"><ScrollArea …>…</ScrollArea></div>` 包裹。
+
+Home 页的卡片画廊使用 `app/components/home-grid.c` 的 `home-grid` 部件：卡片是它的
+直接子节点，用 `data-column="1..4"` 指定所属列（不写则按声明顺序轮转）。可见
+`home-column` 使用 `flex: 1 1 0` 与 `min-width: 0` 自动均分画廊实际宽度，不写固定像素
+列宽；部件只按 root 宽度切换列的显示状态：窗口 ≥1400px 显示 4 列，≥1024px 隐藏第
+3 列，更窄时只保留第 1、4 列。窗口尺寸经 root 的 `afterlayout` 触发显示状态更新；
+不要在 grid 的 `resize` 回调里写列样式，否则本次 updater 结束时会清掉尚未执行的
+子项样式更新。grid 在 `link` 事件中会提前标记 pending，确保预渲染页面首次挂载或
+从其它路由切回时，第一轮布局就完成列分配并使用正确宽度。新增卡片时同步调整
+`data-column`，保持各列总高度接近。
+
+画廊卡片必须使用真实 `card` 部件：外层 `<card>`，内容用 `<card-content>`；有标题/描述
+的卡片用 `<card-header>` + `<card-title>` + `<card-description>`，不要再用
+`.home-preview-title` 之类的自定义文本模拟。`home-card` / `home-card-body` 只负责
+画廊的边框、圆角和间距，不重新实现 Card 的结构。
+
+TSX 里给**容器部件**（`accordion-trigger`、`accordion-content`、`input-group-text`、
+`badge` 等）写字符串子节点不会显示：编译器会把纯文本写成该部件自身的 `text` 属性，
+只有 `text` 原型及其衍生的部件（`text`、`button`、`item-title`、`empty-title` 等）会
+渲染。给容器加文字必须显式写 `<Text>…</Text>`。`clip-safe` 只加在卡片 body 等内层
+容器上；加到卡片本身时它的 `margin: -4px` 会把卡片推出列边界并吞掉边框。
+
 ## 文档工作流
 
 以中文文档为主，英文文档在中文文档更新完毕后再全量翻译。
@@ -314,7 +341,7 @@ xmake build doc-viewer
 
 ## 离屏渲染截图
 
-`examples/doc-viewer/scripts/render-offscreen.ps1` 在不打开窗口、不移动鼠标的情况下把指定路由渲染成 PNG，适合无法手动肉眼检查的验证场景（CI、agent）：
+`examples/doc-viewer/scripts/render-offscreen.ps1` 在不打开窗口、不移动鼠标的情况下把指定路由渲染成 PNG，适合无法手动肉眼检查的验证场景（CI、agent）。脚本用 `Start-Process -WindowStyle Hidden` 启动进程，控制台窗口也不会出现；Windows 虚拟桌面的窗口归属由系统按启动进程时所在桌面决定，进程无法选择桌面，隐藏窗口是避免影响其它桌面的唯一可靠方式。
 
 ```powershell
 # 渲染单个路由

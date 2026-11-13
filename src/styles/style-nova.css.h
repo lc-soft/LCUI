@@ -852,13 +852,14 @@ static const struct {
         { "}\n", 2 },
         { "dropdown-menu-label {\n", 22 },
         { "  display: block;\n", 18 },
-        { "  padding-left: 8px;\n", 21 },
-        { "  padding-right: 8px;\n", 22 },
-        { "  padding-top: 6px;\n", 20 },
-        { "  padding-bottom: 6px;\n", 23 },
-        { "  font-size: 14px;\n", 19 },
-        { "  line-height: 20px;\n", 21 },
+        { "  padding-left: 6px;\n", 21 },
+        { "  padding-right: 6px;\n", 22 },
+        { "  padding-top: 4px;\n", 20 },
+        { "  padding-bottom: 4px;\n", 23 },
+        { "  font-size: 12px;\n", 19 },
+        { "  line-height: 16px;\n", 21 },
         { "  font-weight: 500;\n", 20 },
+        { "  color: #666666;\n", 18 },
         { "}\n", 2 },
         { "dropdown-menu-item,\n", 20 },
         { "dropdown-menu-checkbox-item,\n", 29 },
@@ -1777,7 +1778,7 @@ static const struct {
         { "  color: #000;\n", 15 },
         { "}\n", 2 },
 };
-static const size_t css_str_style_nova_total_length = 32960;
+static const size_t css_str_style_nova_total_length = 32978;
 static inline void ui_load_css_string_style_nova_chunks(void)
 {
         size_t i;

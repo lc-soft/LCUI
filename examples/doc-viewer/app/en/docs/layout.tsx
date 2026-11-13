@@ -1,4 +1,4 @@
-﻿import {
+import {
   PropsWithChildren,
   ScrollArea,
   ScrollAreaContent,
@@ -11,7 +11,9 @@ export default function EnDocsLayout({ children }: PropsWithChildren) {
     <div className="flex flex-1 min-h-0 h-full pl-2">
       <DocsSidebar locale="en" />
       <ScrollArea className="flex-1">
-        <ScrollAreaContent>{children}</ScrollAreaContent>
+        <ScrollAreaContent className="docs-scroll-content">
+          {children}
+        </ScrollAreaContent>
         <Scrollbar direction="vertical" />
       </ScrollArea>
     </div>

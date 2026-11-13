@@ -749,7 +749,7 @@ dropdown-menu-group {
 
 dropdown-menu-label {
   display: block;
-  @apply px-2 py-1.5 text-sm font-medium;
+  @apply px-1.5 py-1 text-xs font-medium text-muted-foreground;
 }
 
 dropdown-menu-item,

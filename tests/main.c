@@ -32,6 +32,7 @@ extern void test_flex_contract(void);
 extern void test_empty_layout(void);
 extern void test_field_layout(void);
 extern void test_home_layout(void);
+extern void test_gallery_layout(void);
 extern void test_background_style(void);
 extern void test_style_refresh(void);
 extern void test_flex_hidden_gap(void);
@@ -92,6 +93,7 @@ static const ctest_suite_t suites[] = {
         { "empty layout", test_empty_layout },
         { "field layout", test_field_layout },
         { "home layout", test_home_layout },
+        { "gallery layout", test_gallery_layout },
         { "background style", test_background_style },
         { "style refresh", test_style_refresh },
         { "flex hidden gap", test_flex_hidden_gap },

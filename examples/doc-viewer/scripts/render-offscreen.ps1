@@ -77,16 +77,28 @@ $code = @"
 #include <pandagl.h>
 #include <ui/metrics.h>
 
-/* 取当前树中高度最大的 scrollarea，文档页里即正文滚动区。 */
+/* 取当前树中高度最大的非侧栏 scrollarea，文档页里即正文滚动区。
+ * 侧栏自己也有 ScrollArea，且与正文等高，只按高度会误选。 */
+static bool debug_inside_sidebar(ui_widget_t *w)
+{
+        for (w = w->parent; w; w = w->parent) {
+                if (ui_check_widget_type(w, "sidebar")) {
+                        return true;
+                }
+        }
+        return false;
+}
+
 static void debug_find_scrollarea(ui_widget_t *w, void *arg)
 {
         ui_widget_t **target = arg;
 
-        if (w->type && strcmp(w->type, "scrollarea") == 0) {
-                if (!*target ||
-                    w->border_box.height > (*target)->border_box.height) {
-                        *target = w;
-                }
+        if (!ui_check_widget_type(w, "scrollarea") ||
+            debug_inside_sidebar(w)) {
+                return;
+        }
+        if (!*target || w->border_box.height > (*target)->border_box.height) {
+                *target = w;
         }
 }
 
@@ -152,7 +164,7 @@ $restore = {
 try {
     $patched = $originalLf.Replace("#include `"main.h`"", "#include `"main.h`"`n$code")
     $patched = $patched.Replace(
-        "        snprintf(initial_path, sizeof(initial_path),`n                 `"/%s/docs/overview/quick-start`", locale ? locale : `"en`");",
+        "        snprintf(initial_path, sizeof(initial_path), `"/%s/home`",`n                 locale ? locale : `"en`");",
         "        snprintf(initial_path, sizeof(initial_path), `"%s`", `"$Route`");")
     $patched = $patched.Replace(
         "        ui_widget_resize(ui_root(), 1280, 720);`n        lcui_bind_window_state(ui_root(), `"main`");`n`n        return app_run();",
@@ -169,10 +181,20 @@ try {
         Pop-Location
     }
 
-    $p = Start-Process -FilePath $exe -WorkingDirectory (Join-Path $root "examples\doc-viewer\dist") -PassThru
+    $logDir = Join-Path $env:TEMP "opencode"
+    if (-not (Test-Path $logDir)) {
+        New-Item -ItemType Directory -Path $logDir | Out-Null
+    }
+    $errLog = Join-Path $logDir "docview-render.log"
+    $p = Start-Process -FilePath $exe -WorkingDirectory (Join-Path $root "examples\doc-viewer\dist") -WindowStyle Hidden -RedirectStandardError $errLog -RedirectStandardOutput (Join-Path $logDir "docview-render.out") -PassThru
     $p.WaitForExit(120000) | Out-Null
     if (-not $p.HasExited) {
         Stop-Process -Id $p.Id -Force
+    } else {
+        Write-Output ("render exited: {0}" -f $p.ExitCode)
+    }
+    if (Test-Path $errLog) {
+        Get-Content $errLog -ErrorAction SilentlyContinue | Select-Object -Last 20
     }
 } finally {
     & $restore

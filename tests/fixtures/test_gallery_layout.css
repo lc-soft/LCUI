@@ -1,0 +1,88 @@
+/*
+ * tests/fixtures/test_gallery_layout.css
+ *
+ * Mirrors the doc-viewer home gallery: a scroll area, a centered
+ * max-width page container, and the home-grid widget with flexible
+ * columns.  The `test-*` classes keep the fixture independent from
+ * style-nova.
+ */
+
+* {
+        box-sizing: border-box;
+}
+
+.test-home-scroll {
+        width: 100%;
+        height: 100%;
+}
+
+.test-home-page {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+}
+
+.test-home-inner {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 1560px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 72px 48px 96px;
+}
+
+home-grid {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 24px;
+        margin-top: 56px;
+}
+
+home-column {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 0;
+        gap: 24px;
+        min-width: 0;
+}
+
+.test-home-card {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        border: 1px solid #e5e5e5;
+        border-radius: 12px;
+}
+
+.test-home-card .test-home-card-body {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 20px;
+}
+
+.test-home-body-block {
+        height: 200px;
+        background: #f7f7f7;
+}
+
+.test-home-empty empty,
+.test-home-empty empty-header,
+.test-home-empty empty-content,
+.test-home-empty button {
+        flex-shrink: 0;
+}
+
+.test-home-empty empty {
+        width: 100%;
+}
+
+.test-home-empty empty-header {
+        width: 100%;
+}
+
+.test-home-empty empty-description {
+        text-align: center;
+}

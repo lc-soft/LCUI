@@ -215,17 +215,26 @@ static void navbar_apply_route(ui_widget_t *w, const char *path)
 {
         navbar_t *that = navbar_get(w);
         const wchar_t *title;
+        const char *last_segment;
         wchar_t buf[256];
 
         navbar_sync_locale_from_path(w, path);
         if (path && that->base.refs.path) {
                 ui_text_set_content(that->base.refs.path, path);
         }
-        title = route_title_for(path);
-        if (title && *title) {
-                swprintf(buf, 256, L"%ls \u00b7 LCUI", title);
+        last_segment = path ? strrchr(path, '/') : NULL;
+        if (last_segment && strcmp(last_segment, "/home") == 0) {
+                /* Mirror the product page titles used by documentation sites:
+                 * the home title is the product name plus its tagline. */
+                wcscpy(buf,
+                       L"LCUI - The C library for building user interfaces");
         } else {
-                wcscpy(buf, L"LCUI");
+                title = route_title_for(path);
+                if (title && *title) {
+                        swprintf(buf, 256, L"%ls \u00b7 LCUI", title);
+                } else {
+                        wcscpy(buf, L"LCUI");
+                }
         }
         ui_widget_set_title(ui_root(), buf);
 }
@@ -300,9 +309,19 @@ ui_widget_t *ui_create_navbar(void)
         return ui_create_widget_with_prototype(navbar_proto);
 }
 
+static void navbar_on_resize(ui_widget_t *w, float width, float height)
+{
+        if (width < 700.0f) {
+                ui_widget_add_class(w, "compact");
+        } else {
+                ui_widget_remove_class(w, "compact");
+        }
+}
+
 void ui_register_navbar(void)
 {
         navbar_init_prototype();
         navbar_proto->init = navbar_init;
         navbar_proto->destroy = navbar_destroy;
+        navbar_proto->resize = navbar_on_resize;
 }
