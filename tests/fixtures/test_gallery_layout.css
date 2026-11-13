@@ -63,6 +63,16 @@ home-column {
         padding: 20px;
 }
 
+/* A hover-only layout change with no geometric effect: `position` forces the
+ * status refresh through the reflow path while the final box stays stable. */
+.test-home-card-body:hover {
+        position: relative;
+}
+
+.test-home-empty button:hover {
+        position: relative;
+}
+
 .test-home-body-block {
         height: 200px;
         background: #f7f7f7;

@@ -100,6 +100,9 @@ LIBUI_INLINE bool ui_widget_has_flex_column_direction(ui_widget_t *w)
 size_t ui_widget_get_children_style_changes(ui_widget_t *w, int type,
                                             const char *name);
 
+size_t ui_widget_get_self_style_changes(ui_widget_t *w, int type,
+                                        const char *name);
+
 void ui_widget_resolve_background(ui_widget_t *w);
 
 void ui_widget_destroy_style(ui_widget_t *w);

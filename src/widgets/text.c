@@ -26,6 +26,7 @@ typedef struct ui_text_task {
 
 typedef struct ui_text {
         wchar_t *content;
+        wchar_t *base_content;
         bool trimming;
         ui_widget_t *widget;
         pd_text_t *layer;
@@ -52,6 +53,36 @@ static bool ui_text_content_equal(const wchar_t *a, const wchar_t *b)
         return wcscmp(a, b) == 0;
 }
 
+static int ui_text_apply_content_w(ui_widget_t *w, const wchar_t *text)
+{
+        ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
+        wchar_t *content, *newtext;
+
+        content = y_wcsdup(text ? text : L"");
+        if (!content) {
+                return -ENOMEM;
+        }
+        newtext = y_wcsdup(content);
+        if (!newtext) {
+                free(content);
+                return -ENOMEM;
+        }
+        if (txt->trimming) {
+                y_wcstrim(newtext, content, NULL);
+        }
+        if (txt->content) {
+                free(txt->content);
+        }
+        txt->content = content;
+        if (txt->task.content) {
+                free(txt->task.content);
+        }
+        txt->task.update_content = true;
+        txt->task.content = newtext;
+        ui_widget_request_update(w);
+        return 0;
+}
+
 static bool parse_boolean(const char *str)
 {
         if (strcmp(str, "on") == 0 || strcmp(str, "true") == 0 ||
@@ -69,7 +100,7 @@ static void ui_text_on_parse_attr(ui_widget_t *w, const char *name,
         if (strcmp(name, "trimming") == 0) {
                 if (parse_boolean(value) != txt->trimming) {
                         txt->trimming = !txt->trimming;
-                        ui_text_set_content_w(w, txt->content);
+                        ui_text_apply_content_w(w, txt->content);
                 }
                 return;
         }
@@ -150,7 +181,8 @@ static void ui_text_on_update_style(ui_widget_t *w)
                              style.white_space != CSS_WHITE_SPACE_NOWRAP);
         pd_text_set_word_break(txt->layer, style.word_break);
         if (content_changed) {
-                ui_text_set_content_w(w, style.content);
+                ui_text_apply_content_w(
+                    w, style.content ? style.content : txt->base_content);
         }
         pd_text_set_style(txt->layer, &text_style);
         pd_text_set_underline(
@@ -206,6 +238,7 @@ static void ui_text_on_init(ui_widget_t *w)
         txt->task.update_content = false;
         txt->task.content = NULL;
         txt->content = NULL;
+        txt->base_content = NULL;
         txt->trimming = true;
         txt->layer = pd_text_create();
         pd_text_set_autowrap(txt->layer, true);
@@ -226,6 +259,7 @@ static void ui_text_on_destroy(ui_widget_t *w)
         ui_text_style_destroy(&txt->style);
         pd_text_destroy(txt->layer);
         free(txt->content);
+        free(txt->base_content);
         if (txt->task.content) {
                 free(txt->task.content);
                 txt->task.content = NULL;
@@ -412,35 +446,25 @@ static void ui_text_on_paint(ui_widget_t *w, pd_context_t *paint,
 int ui_text_set_content_w(ui_widget_t *w, const wchar_t *text)
 {
         ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
-        wchar_t *content, *newtext = NULL;
+        wchar_t *base_content = NULL;
+        int ret = 0;
 
         if (text) {
-                /* Snapshot the source before releasing the previous buffer.
-                 * Callers may pass txt->content itself, so reading text after
-                 * the free below would be a use-after-free. */
-                content = y_wcsdup(text);
-                if (!content) {
+                /* Snapshot the source before releasing the previous buffer. */
+                base_content = y_wcsdup(text);
+                if (!base_content) {
                         return -ENOMEM;
                 }
-                newtext = y_wcsdup(content);
-                if (!newtext) {
-                        free(content);
-                        return -ENOMEM;
-                }
-                if (txt->content) {
-                        free(txt->content);
-                }
-                txt->content = content;
-                if (txt->trimming) {
-                        y_wcstrim(newtext, content, NULL);
+        }
+        if (!txt->style.content) {
+                ret = ui_text_apply_content_w(w, text);
+                if (ret != 0) {
+                        free(base_content);
+                        return ret;
                 }
         }
-        if (txt->task.content) {
-                free(txt->task.content);
-        }
-        txt->task.update_content = true;
-        txt->task.content = newtext;
-        ui_widget_request_update(w);
+        free(txt->base_content);
+        txt->base_content = base_content;
         return 0;
 }
 
@@ -461,6 +485,12 @@ size_t ui_text_get_content_w(ui_widget_t *w, wchar_t *buf, size_t size)
 {
         ui_text_t *txt = ui_widget_get_data(w, ui_text.prototype);
 
+        if (!txt->content) {
+                if (buf && size > 0) {
+                        buf[0] = 0;
+                }
+                return 0;
+        }
         if (buf && size > 0) {
                 wcsncpy(buf, txt->content, size);
                 buf[size - 1] = 0;

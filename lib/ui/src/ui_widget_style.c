@@ -112,8 +112,9 @@ static void ui_widget_update_style_dependencies(ui_widget_t *w,
         }
 }
 
-size_t ui_widget_get_children_style_changes(ui_widget_t *w, int type,
-                                            const char *name)
+static size_t ui_widget_get_style_changes(ui_widget_t *w, int type,
+                                          const char *name, size_t first_group,
+                                          size_t last_group)
 {
         css_selector_t *s;
         list_t selector_names;
@@ -168,7 +169,7 @@ size_t ui_widget_get_children_style_changes(ui_widget_t *w, int type,
                 if (i == n) {
                         continue;
                 }
-                for (i = 1; i < css_get_groups_length(); ++i) {
+                for (i = first_group; i < last_group; ++i) {
                         count += css_query_selector_from_group(
                             (int)i, selector_name, s, NULL);
                 }
@@ -180,6 +181,19 @@ size_t ui_widget_get_children_style_changes(ui_widget_t *w, int type,
         }
         free(names);
         return count;
+}
+
+size_t ui_widget_get_children_style_changes(ui_widget_t *w, int type,
+                                            const char *name)
+{
+        return ui_widget_get_style_changes(w, type, name, 1,
+                                           css_get_groups_length());
+}
+
+size_t ui_widget_get_self_style_changes(ui_widget_t *w, int type,
+                                        const char *name)
+{
+        return ui_widget_get_style_changes(w, type, name, 0, 1);
 }
 
 void ui_widget_update_children_style(ui_widget_t *w)

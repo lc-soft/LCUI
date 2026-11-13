@@ -25,6 +25,7 @@ extern void test_text_decoration(void);
 extern void test_textinput(void);
 extern void test_font_face(void);
 extern void test_widget_opacity(void);
+extern void test_widget_status(void);
 extern void test_block_layout(void);
 extern void test_flex_layout(void);
 extern void test_flex_layout_percentage_wrap(void);
@@ -86,6 +87,7 @@ static const ctest_suite_t suites[] = {
         { "textinput", test_textinput },
         { "font face", test_font_face },
         { "widget opacity", test_widget_opacity },
+        { "widget status", test_widget_status },
         { "block layout", test_block_layout },
         { "flex layout", test_flex_layout },
         { "flex layout percentage wrap", test_flex_layout_percentage_wrap },

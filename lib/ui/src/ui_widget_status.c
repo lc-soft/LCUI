@@ -29,16 +29,23 @@ static void ui_widget_refresh_children_by_status(ui_widget_t *w)
 
 static int ui_wdiget_handle_status_change(ui_widget_t *w, const char *name)
 {
-        ui_widget_request_refresh_style(w);
         if (w->state < UI_WIDGET_STATE_READY ||
             w->state == UI_WIDGET_STATE_DELETED) {
+                ui_widget_request_refresh_style(w);
                 return 1;
         }
         if (w->extra && w->extra->rules.ignore_status_change) {
                 return 0;
         }
+        /* A status on this widget can also affect descendant selectors.
+         * Refresh the subtree first; only refresh the widget itself when a
+         * matching self selector exists. */
         if (ui_widget_get_children_style_changes(w, 1, name) > 0) {
                 ui_widget_refresh_children_by_status(w);
+                return 1;
+        }
+        if (ui_widget_get_self_style_changes(w, 1, name) > 0) {
+                ui_widget_request_refresh_style(w);
                 return 1;
         }
         return 0;
