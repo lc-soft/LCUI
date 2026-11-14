@@ -801,7 +801,7 @@ const HomeGallery: FunctionWidget = ({ locale }: { locale: Locale }) => {
                     </card-description>
                     <field>
                       <field-label>{copy.payout_currency_label}</field-label>
-                      <dropdown-menu>
+                      <dropdown-menu match-trigger-width="true">
                         <dropdown-menu-trigger>
                           <Button variant="outline" className="home-select">
                             <Text>{copy.payout_currency}</Text>

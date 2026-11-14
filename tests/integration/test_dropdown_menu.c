@@ -232,6 +232,25 @@ static void test_open_close_api(void)
         destroy_fixture(&fx);
 }
 
+static void test_match_trigger_width(void)
+{
+        dropdown_fixture_t fx;
+
+        build_fixture(&fx);
+        ui_widget_set_style_string(fx.trigger, "width", "320px");
+        ui_widget_set_attr(fx.menu, "match-trigger-width", "true");
+        append_item(fx.content, "A menu item");
+        settle();
+        ui_dropdown_menu_open(fx.menu);
+        settle();
+
+        ctest_equal_float("menu content should match the trigger width",
+                          fx.content->border_box.width,
+                          fx.trigger->border_box.width);
+
+        destroy_fixture(&fx);
+}
+
 static void test_trigger_click(void)
 {
         dropdown_fixture_t fx;
@@ -725,6 +744,7 @@ void test_dropdown_menu(void)
         ctest_describe("dropdown menu default state", test_default_state);
         ctest_describe("dropdown menu default open", test_default_open);
         ctest_describe("dropdown menu open close api", test_open_close_api);
+        ctest_describe("dropdown menu trigger width", test_match_trigger_width);
         ctest_describe("dropdown menu trigger click", test_trigger_click);
         ctest_describe("dropdown menu data trigger", test_data_trigger);
         ctest_describe("dropdown menu outside and escape",

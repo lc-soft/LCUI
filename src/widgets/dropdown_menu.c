@@ -52,6 +52,7 @@ typedef struct ui_dropdown_menu {
         bool submenu;
         bool reveal_pending;
         bool focus_pending;
+        bool match_trigger_width;
         int settle_stage;
         wchar_t typeahead[32];
         size_t typeahead_len;
@@ -1030,6 +1031,11 @@ static void ui_dropdown_menu_open_data(ui_dropdown_menu_t *data)
         }
         ui_dropdown_key_menu = data;
         ui_portal_set_anchor(data->portal, data->trigger);
+        if (data->match_trigger_width) {
+                ui_widget_set_style_unit_value(data->content, css_prop_width,
+                                               data->trigger->border_box.width,
+                                               CSS_UNIT_PX);
+        }
         ui_dropdown_menu_apply_placement(data);
         ui_widget_refresh_children_style(data->content);
         ui_widget_set_style_keyword_value(data->content, css_prop_visibility,
@@ -1067,6 +1073,9 @@ static void ui_dropdown_menu_on_set_attr(ui_widget_t *w, const char *name,
                 if (!ui_widget_get_attr(w, "open")) {
                         ui_dropdown_menu_open_data(data);
                 }
+        } else if (strcmp(name, "match-trigger-width") == 0) {
+                data->match_trigger_width =
+                    ui_dropdown_menu_value_is_true(value);
         }
 }
 
