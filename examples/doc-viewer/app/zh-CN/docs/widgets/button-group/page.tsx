@@ -42,29 +42,57 @@ export default function ButtonGroupDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "144px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#8250df]Button[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  [color=#8250df]ButtonGroup[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#8250df]ButtonGroupSeparator[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#8250df]ButtonGroupText[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`  [color=#8250df]Button[/color],`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`  [color=#8250df]ButtonGroup[/color],`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`  [color=#8250df]ButtonGroupSeparator[/color],`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`  [color=#8250df]ButtonGroupText[/color],`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] {`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#d2a8ff]Button[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  [color=#d2a8ff]ButtonGroup[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#d2a8ff]ButtonGroupSeparator[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#d2a8ff]ButtonGroupText[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`} [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -80,21 +108,41 @@ export default function ButtonGroupDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "104px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]ButtonGroup[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]ButtonGroup[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]Button[/color]>[/color]Button 1[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]Button[/color]>[/color]Button 2[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`</[color=#8250df]ButtonGroup[/color]>`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]Button[/color]>[/color]Button 1[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]Button[/color]>[/color]Button 2[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`</[color=#8250df]ButtonGroup[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]ButtonGroup[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]Button[/color]>[/color]Button 1[color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]Button[/color]>[/color]Button 2[color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`</[color=#d2a8ff]ButtonGroup[/color]>`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -105,7 +153,7 @@ export default function ButtonGroupDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>组合</h2>
-        <p>{`使用以下组合来构建 [bgcolor=#eee] ButtonGroup [/bgcolor]：`}</p>
+        <p>{`使用以下组合来构建 [bgcolor=#7f7f7f29] ButtonGroup [/bgcolor]：`}</p>
         <Widget className="code-block" data-language="text" data-source="zh-CN/widgets/button-group/2">
           <Widget className="code-block-header">
             <Text className="code-block-title">TEXT</Text>
@@ -114,11 +162,20 @@ export default function ButtonGroupDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "124px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Text className="code-line">{`ButtonGroup`}</Text>
-                <Text className="code-line">{`├── Button or Input or InputGroup or Select`}</Text>
-                <Text className="code-line">{`├── ButtonGroupText`}</Text>
-                <Text className="code-line">{`├── ButtonGroupSeparator`}</Text>
-                <Text className="code-line">{`└── ButtonGroup`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Text className="code-line">{`ButtonGroup`}</Text>
+                  <Text className="code-line">{`├── Button or Input or InputGroup or Select`}</Text>
+                  <Text className="code-line">{`├── ButtonGroupText`}</Text>
+                  <Text className="code-line">{`├── ButtonGroupSeparator`}</Text>
+                  <Text className="code-line">{`└── ButtonGroup`}</Text>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Text className="code-line">{`ButtonGroup`}</Text>
+                  <Text className="code-line">{`├── Button or Input or InputGroup or Select`}</Text>
+                  <Text className="code-line">{`├── ButtonGroupText`}</Text>
+                  <Text className="code-line">{`├── ButtonGroupSeparator`}</Text>
+                  <Text className="code-line">{`└── ButtonGroup`}</Text>
+                </Widget>
               </ScrollAreaContent>
               <Scrollbar />
               <Scrollbar orientation="horizontal" />
@@ -129,22 +186,22 @@ export default function ButtonGroupDocPage() {
       <Widget className="doc-section">
         <h2>示例</h2>
         <h3>方向</h3>
-        <p>{`设置 [bgcolor=#eee] orientation="vertical" [/bgcolor] 后按钮纵向排列，首尾圆角与相邻边框自动切换。`}</p>
+        <p>{`设置 [bgcolor=#7f7f7f29] orientation="vertical" [/bgcolor] 后按钮纵向排列，首尾圆角与相邻边框自动切换。`}</p>
         <ButtonGroupOrientationDemo />
         <h3>尺寸</h3>
-        <p>{`按钮组不设置统一尺寸，由内部按钮各自的 [bgcolor=#eee] size [/bgcolor] 决定。`}</p>
+        <p>{`按钮组不设置统一尺寸，由内部按钮各自的 [bgcolor=#7f7f7f29] size [/bgcolor] 决定。`}</p>
         <ButtonGroupSizeDemo />
         <h3>嵌套</h3>
         <p>{`嵌套 ButtonGroup 会自动获得 8px 间距，适合图标组 + InputGroup 等组合。`}</p>
         <ButtonGroupNestedDemo />
         <h3>分隔线</h3>
-        <p>{`[bgcolor=#eee] ButtonGroupSeparator [/bgcolor] 用于在同组按钮之间增加视觉分隔。`}</p>
+        <p>{`[bgcolor=#7f7f7f29] ButtonGroupSeparator [/bgcolor] 用于在同组按钮之间增加视觉分隔。`}</p>
         <ButtonGroupSeparatorDemo />
         <h3>Split</h3>
         <p>{`主按钮 + 分隔线 + 图标按钮构成 split button。`}</p>
         <ButtonGroupSplitDemo />
         <h3>输入框</h3>
-        <p>{`输入框可以直接作为 ButtonGroup 的子项，并自动 [bgcolor=#eee] flex: 1 [/bgcolor] 撑满。`}</p>
+        <p>{`输入框可以直接作为 ButtonGroup 的子项，并自动 [bgcolor=#7f7f7f29] flex: 1 [/bgcolor] 撑满。`}</p>
         <ButtonGroupInputDemo />
         <h3>输入框组</h3>
         <p>{`ButtonGroup 可以嵌套 InputGroup，再与图标按钮或其它输入控件组合。`}</p>
@@ -182,7 +239,7 @@ export default function ButtonGroupDocPage() {
         <Widget className="admonition admonition-info">
           <Text className="admonition-title">信息</Text>
           <Widget className="admonition-content">
-            <p>{`[b]首尾圆角基于直接子项[/b]。根容器给直接子项加内部标记 class，并利用 LCUI 的 [bgcolor=#eee] first-child [/bgcolor] / [bgcolor=#eee] last-child [/bgcolor] status 计算首尾圆角与相邻边框。包在普通 wrapper 里的按钮不会参与。`}</p>
+            <p>{`[b]首尾圆角基于直接子项[/b]。根容器给直接子项加内部标记 class，并利用 LCUI 的 [bgcolor=#7f7f7f29] first-child [/bgcolor] / [bgcolor=#7f7f7f29] last-child [/bgcolor] status 计算首尾圆角与相邻边框。包在普通 wrapper 里的按钮不会参与。`}</p>
           </Widget>
         </Widget>
         <Widget className="admonition admonition-caution">
@@ -194,7 +251,7 @@ export default function ButtonGroupDocPage() {
         <Widget className="admonition admonition-caution">
           <Text className="admonition-title">警告</Text>
           <Widget className="admonition-content">
-            <p>{`[b]垂直组中的横向分隔线需要显式设置[/b]。[bgcolor=#eee] ButtonGroupSeparator [/bgcolor] 默认是竖线，垂直 group 中应设置 [bgcolor=#eee] orientation="horizontal" [/bgcolor]。`}</p>
+            <p>{`[b]垂直组中的横向分隔线需要显式设置[/b]。[bgcolor=#7f7f7f29] ButtonGroupSeparator [/bgcolor] 默认是竖线，垂直 group 中应设置 [bgcolor=#7f7f7f29] orientation="horizontal" [/bgcolor]。`}</p>
           </Widget>
         </Widget>
       </Widget>

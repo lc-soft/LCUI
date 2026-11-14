@@ -5,12 +5,12 @@ export default function TsxAndDevToolsDocPage() {
   return (
     <Widget className="doc-page">
       <h1>TSX 与开发工具</h1>
-      <p className="doc-page-desc">{`配合 [bgcolor=#eee] @lcui/cli [/bgcolor]，你可以用 TypeScript 搭配 JSX 语法编写声明式界面。CLI 会编译 TSX 为 C 代码，你无需手动编写部件树构建逻辑。`}</p>
+      <p className="doc-page-desc">{`配合 [bgcolor=#7f7f7f29] @lcui/cli [/bgcolor]，你可以用 TypeScript 搭配 JSX 语法编写声明式界面。CLI 会编译 TSX 为 C 代码，你无需手动编写部件树构建逻辑。`}</p>
       <p>{`这样做的好处是：声明式编程方式使得状态绑定、事件绑定和资源引入更加简洁直观，在同一份文件中处理逻辑和视图可以减少上下文切换。`}</p>
-      <p>{`不过，[bgcolor=#eee] @lcui/react [/bgcolor] 目前功能有限，你只能声明组件的状态、数据绑定和事件绑定。对于条件渲染、列表渲染等复杂操作，你仍需要编写 C 代码。`}</p>
+      <p>{`不过，[bgcolor=#7f7f7f29] @lcui/react [/bgcolor] 目前功能有限，你只能声明组件的状态、数据绑定和事件绑定。对于条件渲染、列表渲染等复杂操作，你仍需要编写 C 代码。`}</p>
       <Widget className="doc-section">
         <h2>安装开发工具</h2>
-        <p>{`[bgcolor=#eee] @lcui/cli [/bgcolor] 是一个命令行工具，集成了 TypeScript 编译器、Sass 预处理器、资源文件加载器等功能。它依赖 Node.js 运行时环境：`}</p>
+        <p>{`[bgcolor=#7f7f7f29] @lcui/cli [/bgcolor] 是一个命令行工具，集成了 TypeScript 编译器、Sass 预处理器、资源文件加载器等功能。它依赖 Node.js 运行时环境：`}</p>
         <Widget className="code-block" data-language="sh" data-source="zh-CN/devtools/tsx-and-dev-tools/0">
           <Widget className="code-block-header">
             <Text className="code-block-title">Shell</Text>
@@ -19,7 +19,12 @@ export default function TsxAndDevToolsDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Text className="code-line">{`npm install -g @lcui/cli`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Text className="code-line">{`npm install -g @lcui/cli`}</Text>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Text className="code-line">{`npm install -g @lcui/cli`}</Text>
+                </Widget>
               </ScrollAreaContent>
               <Scrollbar />
               <Scrollbar orientation="horizontal" />
@@ -42,105 +47,209 @@ export default function TsxAndDevToolsDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] { useState, [color=#8250df]TextInput[/color], [color=#8250df]Button[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] { useState, [color=#8250df]TextInput[/color], [color=#8250df]Button[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]App[/color]([color=#0550ae][/color]) {`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#cf222e]const[/color] inputRef = { [color=#0550ae]current[/color]: { [color=#0550ae]value[/color]: [color=#0a3069]""[/color] } };`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#cf222e]const[/color] \\[name, setName] = [color=#8250df]useState[/color]([color=#0a3069]"LCUI"[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Widget[/color] [color=#0550ae]className[/color]=[color=#0a3069]"container"[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Widget[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex flex-col items-center pt-6"[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">10</Text>
+                    <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Text[/color] [color=#0550ae]className[/color]=[color=#0a3069]"my-4 text-2xl text-center"[/color]>[/color]Hello, {name}![color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">11</Text>
+                    <Text className="code-line">{`        [color=#116329]<[color=#0550ae]TextInput[/color][/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">12</Text>
+                    <Text className="code-line">{`[color=#116329]          \$[color=#0550ae]ref[/color]=[color=#0a3069]{inputRef}[/color][/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">13</Text>
+                    <Text className="code-line">{`[color=#116329]          [color=#0550ae]className[/color]=[color=#0a3069]"mt-2"[/color][/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">14</Text>
+                    <Text className="code-line">{`[color=#116329]          [color=#0550ae]placeholder[/color]=[color=#0a3069]"Please input..."[/color][/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">15</Text>
+                    <Text className="code-line">{`[color=#116329]        />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">16</Text>
+                    <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color][/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">17</Text>
+                    <Text className="code-line">{`[color=#116329]          [color=#0550ae]className[/color]=[color=#0a3069]"mt-2"[/color][/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">18</Text>
+                    <Text className="code-line">{`[color=#116329]          [color=#0550ae]onClick[/color]=[color=#0a3069]{()[/color] =>[/color] setName(inputRef.current.value)}`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">19</Text>
+                    <Text className="code-line">{`        >`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">20</Text>
+                    <Text className="code-line">{`          Change`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">21</Text>
+                    <Text className="code-line">{`        [color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">22</Text>
+                    <Text className="code-line">{`      [color=#116329]</[color=#0550ae]Widget[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">23</Text>
+                    <Text className="code-line">{`    [color=#116329]</[color=#0550ae]Widget[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">24</Text>
+                    <Text className="code-line">{`  );`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">25</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]App[/color]([color=#0550ae][/color]) {`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`  [color=#cf222e]const[/color] inputRef = { [color=#0550ae]current[/color]: { [color=#0550ae]value[/color]: [color=#0a3069]""[/color] } };`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`  [color=#cf222e]const[/color] \\[name, setName] = [color=#8250df]useState[/color]([color=#0a3069]"LCUI"[/color]);`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">8</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Widget[/color] [color=#0550ae]className[/color]=[color=#0a3069]"container"[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">9</Text>
-                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Widget[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex flex-col items-center pt-6"[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">10</Text>
-                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Text[/color] [color=#0550ae]className[/color]=[color=#0a3069]"my-4 text-2xl text-center"[/color]>[/color]Hello, {name}![color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">11</Text>
-                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]TextInput[/color][/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">12</Text>
-                  <Text className="code-line">{`[color=#116329]          \$[color=#0550ae]ref[/color]=[color=#0a3069]{inputRef}[/color][/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">13</Text>
-                  <Text className="code-line">{`[color=#116329]          [color=#0550ae]className[/color]=[color=#0a3069]"mt-2"[/color][/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">14</Text>
-                  <Text className="code-line">{`[color=#116329]          [color=#0550ae]placeholder[/color]=[color=#0a3069]"Please input..."[/color][/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">15</Text>
-                  <Text className="code-line">{`[color=#116329]        />[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">16</Text>
-                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color][/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">17</Text>
-                  <Text className="code-line">{`[color=#116329]          [color=#0550ae]className[/color]=[color=#0a3069]"mt-2"[/color][/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">18</Text>
-                  <Text className="code-line">{`[color=#116329]          [color=#0550ae]onClick[/color]=[color=#0a3069]{()[/color] =>[/color] setName(inputRef.current.value)}`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">19</Text>
-                  <Text className="code-line">{`        >`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">20</Text>
-                  <Text className="code-line">{`          Change`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">21</Text>
-                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">22</Text>
-                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]Widget[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">23</Text>
-                  <Text className="code-line">{`    [color=#116329]</[color=#0550ae]Widget[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">24</Text>
-                  <Text className="code-line">{`  );`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">25</Text>
-                  <Text className="code-line">{`}`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] { useState, [color=#d2a8ff]TextInput[/color], [color=#d2a8ff]Button[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`[color=#ff7b72]export[/color] [color=#ff7b72]default[/color] [color=#ff7b72]function[/color] [color=#d2a8ff]App[/color]([color=#79c0ff][/color]) {`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#ff7b72]const[/color] inputRef = { [color=#79c0ff]current[/color]: { [color=#79c0ff]value[/color]: [color=#a5d6ff]""[/color] } };`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#ff7b72]const[/color] \\[name, setName] = [color=#d2a8ff]useState[/color]([color=#a5d6ff]"LCUI"[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`  [color=#ff7b72]return[/color] (`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]Widget[/color] [color=#79c0ff]className[/color]=[color=#a5d6ff]"container"[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]Widget[/color] [color=#79c0ff]className[/color]=[color=#a5d6ff]"flex flex-col items-center pt-6"[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">10</Text>
+                    <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]Text[/color] [color=#79c0ff]className[/color]=[color=#a5d6ff]"my-4 text-2xl text-center"[/color]>[/color]Hello, {name}![color=#7ee787]</[color=#79c0ff]Text[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">11</Text>
+                    <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]TextInput[/color][/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">12</Text>
+                    <Text className="code-line">{`[color=#7ee787]          \$[color=#79c0ff]ref[/color]=[color=#a5d6ff]{inputRef}[/color][/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">13</Text>
+                    <Text className="code-line">{`[color=#7ee787]          [color=#79c0ff]className[/color]=[color=#a5d6ff]"mt-2"[/color][/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">14</Text>
+                    <Text className="code-line">{`[color=#7ee787]          [color=#79c0ff]placeholder[/color]=[color=#a5d6ff]"Please input..."[/color][/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">15</Text>
+                    <Text className="code-line">{`[color=#7ee787]        />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">16</Text>
+                    <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]Button[/color][/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">17</Text>
+                    <Text className="code-line">{`[color=#7ee787]          [color=#79c0ff]className[/color]=[color=#a5d6ff]"mt-2"[/color][/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">18</Text>
+                    <Text className="code-line">{`[color=#7ee787]          [color=#79c0ff]onClick[/color]=[color=#a5d6ff]{()[/color] =>[/color] setName(inputRef.current.value)}`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">19</Text>
+                    <Text className="code-line">{`        >`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">20</Text>
+                    <Text className="code-line">{`          Change`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">21</Text>
+                    <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">22</Text>
+                    <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]Widget[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">23</Text>
+                    <Text className="code-line">{`    [color=#7ee787]</[color=#79c0ff]Widget[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">24</Text>
+                    <Text className="code-line">{`  );`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">25</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -151,7 +260,7 @@ export default function TsxAndDevToolsDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>React 库</h2>
-        <p>{`[bgcolor=#eee] @lcui/react [/bgcolor] 是针对 LCUI 特性和预处理器工作模式的用户界面库，提供预置组件、工具函数和 Hook 函数。`}</p>
+        <p>{`[bgcolor=#7f7f7f29] @lcui/react [/bgcolor] 是针对 LCUI 特性和预处理器工作模式的用户界面库，提供预置组件、工具函数和 Hook 函数。`}</p>
         <p>{`安装方法：`}</p>
         <Widget className="code-block" data-language="sh" data-source="zh-CN/devtools/tsx-and-dev-tools/2">
           <Widget className="code-block-header">
@@ -161,7 +270,12 @@ export default function TsxAndDevToolsDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Text className="code-line">{`npm install @lcui/react`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Text className="code-line">{`npm install @lcui/react`}</Text>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Text className="code-line">{`npm install @lcui/react`}</Text>
+                </Widget>
               </ScrollAreaContent>
               <Scrollbar />
               <Scrollbar orientation="horizontal" />
@@ -169,18 +283,18 @@ export default function TsxAndDevToolsDocPage() {
           </Widget>
         </Widget>
         <h3>组件函数</h3>
-        <p>{`预处理器会执行组件函数，收集 [bgcolor=#eee] useState [/bgcolor]、[bgcolor=#eee] useRef [/bgcolor] 等产出的数据和返回的 JSX 元素，然后转换成 C 代码。`}</p>
+        <p>{`预处理器会执行组件函数，收集 [bgcolor=#7f7f7f29] useState [/bgcolor]、[bgcolor=#7f7f7f29] useRef [/bgcolor] 等产出的数据和返回的 JSX 元素，然后转换成 C 代码。`}</p>
         <Widget className="admonition admonition-warning">
           <Text className="admonition-title">注意</Text>
           <Widget className="admonition-content">
             <ul>
-              <li><Text>{`组件函数返回值必须是一个 JSX 元素，不能是 [bgcolor=#eee] <Fragment> [/bgcolor]、null、undefined、字符串、数字等对象。`}</Text></li>
+              <li><Text>{`组件函数返回值必须是一个 JSX 元素，不能是 [bgcolor=#7f7f7f29] <Fragment> [/bgcolor]、null、undefined、字符串、数字等对象。`}</Text></li>
               <li><Text>{`暂不支持声明和传递组件 props 参数。`}</Text></li>
             </ul>
           </Widget>
         </Widget>
         <h3>状态管理</h3>
-        <p>{`[bgcolor=#eee] useState [/bgcolor] 为组件声明状态变量：`}</p>
+        <p>{`[bgcolor=#7f7f7f29] useState [/bgcolor] 为组件声明状态变量：`}</p>
         <Widget className="code-block" data-language="tsx" data-source="zh-CN/devtools/tsx-and-dev-tools/3">
           <Widget className="code-block-header">
             <Text className="code-block-title">TypeScript</Text>
@@ -189,33 +303,65 @@ export default function TsxAndDevToolsDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] { useState } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] { useState } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`[color=#cf222e]function[/color] [color=#8250df]MyComponent[/color]([color=#0550ae][/color]) {`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#cf222e]const[/color] \\[age, setAge] = [color=#8250df]useState[/color]([color=#0550ae]23[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#cf222e]const[/color] \\[name, setName] = [color=#8250df]useState[/color]([color=#0a3069]"Taylor"[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`  [color=#6e7781]// ...[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`[color=#cf222e]function[/color] [color=#8250df]MyComponent[/color]([color=#0550ae][/color]) {`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`  [color=#cf222e]const[/color] \\[age, setAge] = [color=#8250df]useState[/color]([color=#0550ae]23[/color]);`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`  [color=#cf222e]const[/color] \\[name, setName] = [color=#8250df]useState[/color]([color=#0a3069]"Taylor"[/color]);`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{`  [color=#6e7781]// ...[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{`}`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] { useState } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`[color=#ff7b72]function[/color] [color=#d2a8ff]MyComponent[/color]([color=#79c0ff][/color]) {`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#ff7b72]const[/color] \\[age, setAge] = [color=#d2a8ff]useState[/color]([color=#79c0ff]23[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#ff7b72]const[/color] \\[name, setName] = [color=#d2a8ff]useState[/color]([color=#a5d6ff]"Taylor"[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`  [color=#8b949e]// ...[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -223,12 +369,12 @@ export default function TsxAndDevToolsDocPage() {
             </ScrollArea>
           </Widget>
         </Widget>
-        <p>{`[bgcolor=#eee] useState [/bgcolor] 返回一个数组：`}</p>
+        <p>{`[bgcolor=#7f7f7f29] useState [/bgcolor] 返回一个数组：`}</p>
         <ul>
-          <li><Text>{`状态变量，初始值为你传给 [bgcolor=#eee] useState [/bgcolor] 的值。`}</Text></li>
+          <li><Text>{`状态变量，初始值为你传给 [bgcolor=#7f7f7f29] useState [/bgcolor] 的值。`}</Text></li>
           <li><Text>{`set 函数，允许你在响应交互时更改状态变量。`}</Text></li>
         </ul>
-        <p>{`[bgcolor=#eee] useState [/bgcolor] 会为组件的状态结构体添加成员，并在初始化函数中添加初始化代码：`}</p>
+        <p>{`[bgcolor=#7f7f7f29] useState [/bgcolor] 会为组件的状态结构体添加成员，并在初始化函数中添加初始化代码：`}</p>
         <Widget className="code-block" data-language="c" data-source="zh-CN/devtools/tsx-and-dev-tools/4">
           <Widget className="code-block-header">
             <Text className="code-block-title">C</Text>
@@ -237,41 +383,81 @@ export default function TsxAndDevToolsDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "204px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#6e7781]/* 组件状态结构体 */[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#6e7781]/* 组件状态结构体 */[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`[color=#cf222e]struct[/color] [color=#8250df]MyComponent_state[/color] {`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  [color=#953800]int[/color] age;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#953800]char[/color] *name;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`};`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`[color=#6e7781]/* 组件初始化函数中的代码 */[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`_that->state.age = [color=#0550ae]23[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{`_that->state.name = strdup2([color=#0a3069]"Taylor"[/color]);`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`[color=#cf222e]struct[/color] [color=#8250df]MyComponent_state[/color] {`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`  [color=#953800]int[/color] age;`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`  [color=#953800]char[/color] *name;`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`};`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{`[color=#6e7781]/* 组件初始化函数中的代码 */[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">8</Text>
-                  <Text className="code-line">{`_that->state.age = [color=#0550ae]23[/color];`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">9</Text>
-                  <Text className="code-line">{`_that->state.name = strdup2([color=#0a3069]"Taylor"[/color]);`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#8b949e]/* 组件状态结构体 */[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`[color=#ff7b72]struct[/color] [color=#d2a8ff]MyComponent_state[/color] {`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  [color=#ffa657]int[/color] age;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#ffa657]char[/color] *name;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`};`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`[color=#8b949e]/* 组件初始化函数中的代码 */[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`_that->state.age = [color=#79c0ff]23[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{`_that->state.name = strdup2([color=#a5d6ff]"Taylor"[/color]);`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -279,15 +465,15 @@ export default function TsxAndDevToolsDocPage() {
             </ScrollArea>
           </Widget>
         </Widget>
-        <p>{`状态的 set 函数会在当前作用域中插入 C 代码，例如 [bgcolor=#eee] setAge(30) [/bgcolor] 会生成 [bgcolor=#eee] _that->state.age = 30; [/bgcolor]。`}</p>
+        <p>{`状态的 set 函数会在当前作用域中插入 C 代码，例如 [bgcolor=#7f7f7f29] setAge(30) [/bgcolor] 会生成 [bgcolor=#7f7f7f29] _that->state.age = 30; [/bgcolor]。`}</p>
         <Widget className="admonition admonition-warning">
           <Text className="admonition-title">注意</Text>
           <Widget className="admonition-content">
-            <p>{`[bgcolor=#eee] useState [/bgcolor] 的参数只能是 string、number 类型。`}</p>
+            <p>{`[bgcolor=#7f7f7f29] useState [/bgcolor] 的参数只能是 string、number 类型。`}</p>
           </Widget>
         </Widget>
         <h3>引用</h3>
-        <p>{`用 [bgcolor=#eee] \$ref [/bgcolor] 属性引用部件对象：`}</p>
+        <p>{`用 [bgcolor=#7f7f7f29] \$ref [/bgcolor] 属性引用部件对象：`}</p>
         <Widget className="code-block" data-language="tsx" data-source="zh-CN/devtools/tsx-and-dev-tools/5">
           <Widget className="code-block-header">
             <Text className="code-block-title">TypeScript</Text>
@@ -296,9 +482,17 @@ export default function TsxAndDevToolsDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]TextInput[/color] \$ref=[color=#0a3069]"input"[/color] />`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]TextInput[/color] \$ref=[color=#0a3069]"input"[/color] />`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]TextInput[/color] \$ref=[color=#a5d6ff]"input"[/color] />`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -315,9 +509,17 @@ export default function TsxAndDevToolsDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`ui_textinput_set_content(_that->refs.input, [color=#0a3069]"hello"[/color]);`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`ui_textinput_set_content(_that->refs.input, [color=#0a3069]"hello"[/color]);`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`ui_textinput_set_content(_that->refs.input, [color=#a5d6ff]"hello"[/color]);`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -325,7 +527,7 @@ export default function TsxAndDevToolsDocPage() {
             </ScrollArea>
           </Widget>
         </Widget>
-        <p>{`[bgcolor=#eee] \$ref [/bgcolor] 的值也可以是 [bgcolor=#eee] useRef [/bgcolor] 返回的引用对象：`}</p>
+        <p>{`[bgcolor=#7f7f7f29] \$ref [/bgcolor] 的值也可以是 [bgcolor=#7f7f7f29] useRef [/bgcolor] 返回的引用对象：`}</p>
         <Widget className="code-block" data-language="tsx" data-source="zh-CN/devtools/tsx-and-dev-tools/7">
           <Widget className="code-block-header">
             <Text className="code-block-title">TypeScript</Text>
@@ -334,33 +536,65 @@ export default function TsxAndDevToolsDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] { useRef } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] { useRef } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`[color=#cf222e]function[/color] [color=#8250df]MyComponent[/color]([color=#0550ae][/color]) {`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#cf222e]const[/color] inputRef = [color=#8250df]useRef[/color]();`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`  [color=#cf222e]return[/color] [color=#116329]<[color=#0550ae]TextInput[/color] \$[color=#0550ae]ref[/color]=[color=#0a3069]{inputRef}[/color] />[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`[color=#cf222e]function[/color] [color=#8250df]MyComponent[/color]([color=#0550ae][/color]) {`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`  [color=#cf222e]const[/color] inputRef = [color=#8250df]useRef[/color]();`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{`  [color=#cf222e]return[/color] [color=#116329]<[color=#0550ae]TextInput[/color] \$[color=#0550ae]ref[/color]=[color=#0a3069]{inputRef}[/color] />[/color];`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{`}`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] { useRef } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`[color=#ff7b72]function[/color] [color=#d2a8ff]MyComponent[/color]([color=#79c0ff][/color]) {`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#ff7b72]const[/color] inputRef = [color=#d2a8ff]useRef[/color]();`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`  [color=#ff7b72]return[/color] [color=#7ee787]<[color=#79c0ff]TextInput[/color] \$[color=#79c0ff]ref[/color]=[color=#a5d6ff]{inputRef}[/color] />[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -368,7 +602,7 @@ export default function TsxAndDevToolsDocPage() {
             </ScrollArea>
           </Widget>
         </Widget>
-        <p>{`[bgcolor=#eee] useRef [/bgcolor] 目前只实现了 TextInput 的 value 属性读写绑定：`}</p>
+        <p>{`[bgcolor=#7f7f7f29] useRef [/bgcolor] 目前只实现了 TextInput 的 value 属性读写绑定：`}</p>
         <Widget className="code-block" data-language="tsx" data-source="zh-CN/devtools/tsx-and-dev-tools/8">
           <Widget className="code-block-header">
             <Text className="code-block-title">TypeScript</Text>
@@ -377,17 +611,33 @@ export default function TsxAndDevToolsDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "84px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`inputRef.[color=#0550ae]current[/color].[color=#0550ae]value[/color] = [color=#0a3069]"World"[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`inputRef.[color=#0550ae]current[/color].[color=#0550ae]value[/color] = [color=#0a3069]"World"[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`[color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]onClick[/color]=[color=#0a3069]{()[/color] =>[/color] setName(inputRef.current.value)}>Click[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`[color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]onClick[/color]=[color=#0a3069]{()[/color] =>[/color] setName(inputRef.current.value)}>Click[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`inputRef.[color=#79c0ff]current[/color].[color=#79c0ff]value[/color] = [color=#a5d6ff]"World"[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`[color=#7ee787]<[color=#79c0ff]Button[/color] [color=#79c0ff]onClick[/color]=[color=#a5d6ff]{()[/color] =>[/color] setName(inputRef.current.value)}>Click[color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -398,11 +648,11 @@ export default function TsxAndDevToolsDocPage() {
         <Widget className="admonition admonition-warning">
           <Text className="admonition-title">注意</Text>
           <Widget className="admonition-content">
-            <p>{`[bgcolor=#eee] @lcui/react [/bgcolor] 的 [bgcolor=#eee] useRef [/bgcolor] 和 React 的 [bgcolor=#eee] useRef [/bgcolor] 不同，仅用于引用部件对象。`}</p>
+            <p>{`[bgcolor=#7f7f7f29] @lcui/react [/bgcolor] 的 [bgcolor=#7f7f7f29] useRef [/bgcolor] 和 React 的 [bgcolor=#7f7f7f29] useRef [/bgcolor] 不同，仅用于引用部件对象。`}</p>
           </Widget>
         </Widget>
         <h3>响应事件</h3>
-        <p>{`通过 [bgcolor=#eee] on + 事件名 [/bgcolor] 属性声明事件处理函数：`}</p>
+        <p>{`通过 [bgcolor=#7f7f7f29] on + 事件名 [/bgcolor] 属性声明事件处理函数：`}</p>
         <Widget className="code-block" data-language="tsx" data-source="zh-CN/devtools/tsx-and-dev-tools/9">
           <Widget className="code-block-header">
             <Text className="code-block-title">TypeScript</Text>
@@ -411,9 +661,17 @@ export default function TsxAndDevToolsDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]Button[/color] onClick=[color=#0a3069]"handleClick"[/color]>点我</[color=#8250df]Button[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]Button[/color] onClick=[color=#0a3069]"handleClick"[/color]>点我</[color=#8250df]Button[/color]>`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]Button[/color] onClick=[color=#a5d6ff]"handleClick"[/color]>点我</[color=#d2a8ff]Button[/color]>`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -430,9 +688,17 @@ export default function TsxAndDevToolsDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`ui_widget_on(_that->refs.ref_0, [color=#0a3069]"click"[/color], handleClick, w);`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`ui_widget_on(_that->refs.ref_0, [color=#0a3069]"click"[/color], handleClick, w);`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`ui_widget_on(_that->refs.ref_0, [color=#a5d6ff]"click"[/color], handleClick, w);`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -449,65 +715,129 @@ export default function TsxAndDevToolsDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] { useState, [color=#8250df]Text[/color], [color=#8250df]Button[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] { useState, [color=#8250df]Text[/color], [color=#8250df]Button[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]Counter[/color]([color=#0550ae][/color]) {`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#cf222e]const[/color] \\[text, setText] = [color=#8250df]useState[/color]([color=#0a3069]"点我"[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`  [color=#cf222e]function[/color] [color=#8250df]handleClick[/color]([color=#0550ae][/color]) {`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`    [color=#8250df]setText[/color]([color=#0a3069]"你已点击"[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`  }`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">10</Text>
+                    <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">11</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]onClick[/color]=[color=#0a3069]{handleClick}[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">12</Text>
+                    <Text className="code-line">{`      {text}`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">13</Text>
+                    <Text className="code-line">{`    [color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">14</Text>
+                    <Text className="code-line">{`  );`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">15</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]Counter[/color]([color=#0550ae][/color]) {`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`  [color=#cf222e]const[/color] \\[text, setText] = [color=#8250df]useState[/color]([color=#0a3069]"点我"[/color]);`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{`  [color=#cf222e]function[/color] [color=#8250df]handleClick[/color]([color=#0550ae][/color]) {`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{`    [color=#8250df]setText[/color]([color=#0a3069]"你已点击"[/color]);`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">8</Text>
-                  <Text className="code-line">{`  }`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">9</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">10</Text>
-                  <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">11</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]onClick[/color]=[color=#0a3069]{handleClick}[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">12</Text>
-                  <Text className="code-line">{`      {text}`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">13</Text>
-                  <Text className="code-line">{`    [color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">14</Text>
-                  <Text className="code-line">{`  );`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">15</Text>
-                  <Text className="code-line">{`}`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] { useState, [color=#d2a8ff]Text[/color], [color=#d2a8ff]Button[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`[color=#ff7b72]export[/color] [color=#ff7b72]default[/color] [color=#ff7b72]function[/color] [color=#d2a8ff]Counter[/color]([color=#79c0ff][/color]) {`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#ff7b72]const[/color] \\[text, setText] = [color=#d2a8ff]useState[/color]([color=#a5d6ff]"点我"[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`  [color=#ff7b72]function[/color] [color=#d2a8ff]handleClick[/color]([color=#79c0ff][/color]) {`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`    [color=#d2a8ff]setText[/color]([color=#a5d6ff]"你已点击"[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`  }`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">10</Text>
+                    <Text className="code-line">{`  [color=#ff7b72]return[/color] (`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">11</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]Button[/color] [color=#79c0ff]onClick[/color]=[color=#a5d6ff]{handleClick}[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">12</Text>
+                    <Text className="code-line">{`      {text}`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">13</Text>
+                    <Text className="code-line">{`    [color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">14</Text>
+                    <Text className="code-line">{`  );`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">15</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -526,14 +856,14 @@ export default function TsxAndDevToolsDocPage() {
         <Widget className="admonition admonition-warning">
           <Text className="admonition-title">注意</Text>
           <Widget className="admonition-content">
-            <p>{`暂不支持。 我们正考虑使用 [bgcolor=#eee] <Show> [/bgcolor] 组件实现条件渲染，参考 Solid.js 的 [bgcolor=#eee] <Show> [/bgcolor]。`}</p>
+            <p>{`暂不支持。 我们正考虑使用 [bgcolor=#7f7f7f29] <Show> [/bgcolor] 组件实现条件渲染，参考 Solid.js 的 [bgcolor=#7f7f7f29] <Show> [/bgcolor]。`}</p>
           </Widget>
         </Widget>
         <h3>渲染列表</h3>
         <Widget className="admonition admonition-warning">
           <Text className="admonition-title">注意</Text>
           <Widget className="admonition-content">
-            <p>{`暂不支持。 我们正考虑使用 [bgcolor=#eee] <For> [/bgcolor] 组件实现数组遍历，参考 Solid.js 的 [bgcolor=#eee] <For> [/bgcolor]。`}</p>
+            <p>{`暂不支持。 我们正考虑使用 [bgcolor=#7f7f7f29] <For> [/bgcolor] 组件实现数组遍历，参考 Solid.js 的 [bgcolor=#7f7f7f29] <For> [/bgcolor]。`}</p>
           </Widget>
         </Widget>
       </Widget>

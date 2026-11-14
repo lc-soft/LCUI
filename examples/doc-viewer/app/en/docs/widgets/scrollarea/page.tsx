@@ -13,7 +13,7 @@ export default function ScrollareaDocPage() {
         <ul>
           <li><Text>{`[b]Suitable[/b] — content height or width may exceed the container (long lists, documents, logs).`}</Text></li>
           <li><Text>{`[b]Suitable[/b] — scrollbars needed for visual feedback.`}</Text></li>
-          <li><Text>{`[b]Not suitable[/b] — content always fits within the container (use a plain [bgcolor=#eee] widget [/bgcolor]).`}</Text></li>
+          <li><Text>{`[b]Not suitable[/b] — content always fits within the container (use a plain [bgcolor=#7f7f7f29] widget [/bgcolor]).`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
@@ -26,9 +26,17 @@ export default function ScrollareaDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]ScrollArea[/color], [color=#8250df]ScrollAreaContent[/color], [color=#8250df]Scrollbar[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]ScrollArea[/color], [color=#8250df]ScrollAreaContent[/color], [color=#8250df]Scrollbar[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] { [color=#d2a8ff]ScrollArea[/color], [color=#d2a8ff]ScrollAreaContent[/color], [color=#d2a8ff]Scrollbar[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -44,25 +52,49 @@ export default function ScrollareaDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "124px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]ScrollArea[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]ScrollArea[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ScrollAreaContent[/color]>[/color]{/* child content */}[color=#116329]</[color=#0550ae]ScrollAreaContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]Scrollbar[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]Scrollbar[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`</[color=#8250df]ScrollArea[/color]>`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ScrollAreaContent[/color]>[/color]{/* child content */}[color=#116329]</[color=#0550ae]ScrollAreaContent[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]Scrollbar[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color] />[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]Scrollbar[/color] />[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`</[color=#8250df]ScrollArea[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]ScrollArea[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]ScrollAreaContent[/color]>[/color]{/* child content */}[color=#7ee787]</[color=#79c0ff]ScrollAreaContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]Scrollbar[/color] [color=#79c0ff]orientation[/color]=[color=#a5d6ff]"horizontal"[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]Scrollbar[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`</[color=#d2a8ff]ScrollArea[/color]>`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -73,7 +105,7 @@ export default function ScrollareaDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>Composition</h2>
-        <p>{`Use the following composition to build a [bgcolor=#eee] ScrollArea [/bgcolor]:`}</p>
+        <p>{`Use the following composition to build a [bgcolor=#7f7f7f29] ScrollArea [/bgcolor]:`}</p>
         <Widget className="code-block" data-language="text" data-source="en/widgets/scrollarea/2">
           <Widget className="code-block-header">
             <Text className="code-block-title">TEXT</Text>
@@ -82,9 +114,16 @@ export default function ScrollareaDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "84px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Text className="code-line">{`ScrollArea`}</Text>
-                <Text className="code-line">{`├── ScrollAreaContent`}</Text>
-                <Text className="code-line">{`└── Scrollbar`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Text className="code-line">{`ScrollArea`}</Text>
+                  <Text className="code-line">{`├── ScrollAreaContent`}</Text>
+                  <Text className="code-line">{`└── Scrollbar`}</Text>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Text className="code-line">{`ScrollArea`}</Text>
+                  <Text className="code-line">{`├── ScrollAreaContent`}</Text>
+                  <Text className="code-line">{`└── Scrollbar`}</Text>
+                </Widget>
               </ScrollAreaContent>
               <Scrollbar />
               <Scrollbar orientation="horizontal" />
@@ -103,9 +142,17 @@ export default function ScrollareaDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]ui_widget_t[/color] *[color=#8250df]ui_create_scrollarea[/color][color=#0550ae]([color=#953800]void[/color])[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]ui_widget_t[/color] *[color=#8250df]ui_create_scrollarea[/color][color=#0550ae]([color=#953800]void[/color])[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]ui_widget_t[/color] *[color=#d2a8ff]ui_create_scrollarea[/color][color=#79c0ff]([color=#ffa657]void[/color])[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -123,9 +170,17 @@ export default function ScrollareaDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]ui_widget_t[/color] *[color=#8250df]ui_create_scrollarea_content[/color][color=#0550ae]([color=#953800]void[/color])[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]ui_widget_t[/color] *[color=#8250df]ui_create_scrollarea_content[/color][color=#0550ae]([color=#953800]void[/color])[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]ui_widget_t[/color] *[color=#d2a8ff]ui_create_scrollarea_content[/color][color=#79c0ff]([color=#ffa657]void[/color])[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -143,9 +198,17 @@ export default function ScrollareaDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]ui_scrollarea_set_scroll_top[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w, [color=#953800]float[/color] value)[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]ui_scrollarea_set_scroll_top[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w, [color=#953800]float[/color] value)[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]ui_scrollarea_set_scroll_top[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *w, [color=#ffa657]float[/color] value)[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -163,9 +226,17 @@ export default function ScrollareaDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]ui_scrollarea_set_scroll_left[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w, [color=#953800]float[/color] value)[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]ui_scrollarea_set_scroll_left[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w, [color=#953800]float[/color] value)[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]ui_scrollarea_set_scroll_left[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *w, [color=#ffa657]float[/color] value)[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -183,9 +254,17 @@ export default function ScrollareaDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]float[/color] [color=#8250df]ui_scrollarea_get_scroll_top[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w)[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]float[/color] [color=#8250df]ui_scrollarea_get_scroll_top[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w)[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]float[/color] [color=#d2a8ff]ui_scrollarea_get_scroll_top[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *w)[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -203,9 +282,17 @@ export default function ScrollareaDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]float[/color] [color=#8250df]ui_scrollarea_get_scroll_left[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w)[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]float[/color] [color=#8250df]ui_scrollarea_get_scroll_left[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w)[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]float[/color] [color=#d2a8ff]ui_scrollarea_get_scroll_left[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *w)[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -223,9 +310,17 @@ export default function ScrollareaDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]float[/color] [color=#8250df]ui_scrollarea_get_scroll_width[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w)[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]float[/color] [color=#8250df]ui_scrollarea_get_scroll_width[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w)[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]float[/color] [color=#d2a8ff]ui_scrollarea_get_scroll_width[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *w)[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -243,9 +338,17 @@ export default function ScrollareaDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]float[/color] [color=#8250df]ui_scrollarea_get_scroll_height[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w)[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]float[/color] [color=#8250df]ui_scrollarea_get_scroll_height[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w)[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]float[/color] [color=#d2a8ff]ui_scrollarea_get_scroll_height[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *w)[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -263,13 +366,25 @@ export default function ScrollareaDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "64px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]ui_scrollarea_set_wheel_scroll_direction[/color][color=#0550ae]([/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]ui_scrollarea_set_wheel_scroll_direction[/color][color=#0550ae]([/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`[color=#0550ae]    [color=#953800]ui_widget_t[/color] *w, [color=#953800]ui_scrollarea_direction_t[/color] direction)[/color];`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`[color=#0550ae]    [color=#953800]ui_widget_t[/color] *w, [color=#953800]ui_scrollarea_direction_t[/color] direction)[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]ui_scrollarea_set_wheel_scroll_direction[/color][color=#79c0ff]([/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`[color=#79c0ff]    [color=#ffa657]ui_widget_t[/color] *w, [color=#ffa657]ui_scrollarea_direction_t[/color] direction)[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -289,7 +404,7 @@ export default function ScrollareaDocPage() {
           </Widget>
           <Widget className="mdx-table-row">
             <Widget className="mdx-table-cell" style={{ width: "232px" }}>
-              <Text>{`[bgcolor=#eee] UI_SCROLLAREA_AUTO [/bgcolor]`}</Text>
+              <Text>{`[bgcolor=#7f7f7f29] UI_SCROLLAREA_AUTO [/bgcolor]`}</Text>
             </Widget>
             <Widget className="mdx-table-cell flex-grow" style={{ minWidth: "48px" }}>
               <Text>{`Vertical if content is taller; horizontal if wider`}</Text>
@@ -297,7 +412,7 @@ export default function ScrollareaDocPage() {
           </Widget>
           <Widget className="mdx-table-row">
             <Widget className="mdx-table-cell" style={{ width: "232px" }}>
-              <Text>{`[bgcolor=#eee] UI_SCROLLAREA_VERTICAL [/bgcolor]`}</Text>
+              <Text>{`[bgcolor=#7f7f7f29] UI_SCROLLAREA_VERTICAL [/bgcolor]`}</Text>
             </Widget>
             <Widget className="mdx-table-cell flex-grow" style={{ minWidth: "48px" }}>
               <Text>{`Always scroll vertically`}</Text>
@@ -305,7 +420,7 @@ export default function ScrollareaDocPage() {
           </Widget>
           <Widget className="mdx-table-row">
             <Widget className="mdx-table-cell" style={{ width: "232px" }}>
-              <Text>{`[bgcolor=#eee] UI_SCROLLAREA_HORIZONTAL [/bgcolor]`}</Text>
+              <Text>{`[bgcolor=#7f7f7f29] UI_SCROLLAREA_HORIZONTAL [/bgcolor]`}</Text>
             </Widget>
             <Widget className="mdx-table-cell flex-grow" style={{ minWidth: "48px" }}>
               <Text>{`Always scroll horizontally`}</Text>
@@ -321,9 +436,17 @@ export default function ScrollareaDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]ui_scrollarea_update[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w)[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]ui_scrollarea_update[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w)[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]ui_scrollarea_update[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *w)[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -343,17 +466,33 @@ export default function ScrollareaDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "84px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#116329]<[color=#0550ae]scrollarea[/color] [color=#0550ae]style[/color]=[color=#0a3069]"width: 300px; height: 200px;"[/color]>[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#116329]<[color=#0550ae]scrollarea[/color] [color=#0550ae]style[/color]=[color=#0a3069]"width: 300px; height: 200px;"[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#6e7781]<!-- content items -->[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`[color=#116329]</[color=#0550ae]scrollarea[/color]>[/color]`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`  [color=#6e7781]<!-- content items -->[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`[color=#116329]</[color=#0550ae]scrollarea[/color]>[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#7ee787]<[color=#79c0ff]scrollarea[/color] [color=#79c0ff]style[/color]=[color=#a5d6ff]"width: 300px; height: 200px;"[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#8b949e]<!-- content items -->[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`[color=#7ee787]</[color=#79c0ff]scrollarea[/color]>[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />

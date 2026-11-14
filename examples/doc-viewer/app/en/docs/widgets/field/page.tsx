@@ -30,8 +30,8 @@ export default function FieldDocPage() {
           <li><Text>{`[b]Use[/b]: as a unified shell for form fields (label + control + description + error)`}</Text></li>
           <li><Text>{`[b]Use[/b]: when you need to place a label and a control side-by-side in a horizontal layout`}</Text></li>
           <li><Text>{`[b]Use[/b]: to group multiple fields into a semantic group (FieldSet + FieldLegend)`}</Text></li>
-          <li><Text>{`[b]Don't[/b]: use for single-line inline text (use the [bgcolor=#eee] text [/bgcolor] widget instead)`}</Text></li>
-          <li><Text>{`[b]Don't[/b]: use in places where native HTML [bgcolor=#eee] <form> [/bgcolor] submission semantics are required (LCUI does not replicate them)`}</Text></li>
+          <li><Text>{`[b]Don't[/b]: use for single-line inline text (use the [bgcolor=#7f7f7f29] text [/bgcolor] widget instead)`}</Text></li>
+          <li><Text>{`[b]Don't[/b]: use in places where native HTML [bgcolor=#7f7f7f29] <form> [/bgcolor] submission semantics are required (LCUI does not replicate them)`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
@@ -44,9 +44,17 @@ export default function FieldDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Field[/color], [color=#8250df]FieldLabel[/color], [color=#8250df]FieldDescription[/color], [color=#8250df]FieldSet[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Field[/color], [color=#8250df]FieldLabel[/color], [color=#8250df]FieldDescription[/color], [color=#8250df]FieldSet[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] { [color=#d2a8ff]Field[/color], [color=#d2a8ff]FieldLabel[/color], [color=#d2a8ff]FieldDescription[/color], [color=#d2a8ff]FieldSet[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -62,25 +70,49 @@ export default function FieldDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "124px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]Field[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]Field[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"username"[/color]>[/color]Username[color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]TextInput[/color] [color=#0550ae]id[/color]=[color=#0a3069]"username"[/color] [color=#0550ae]placeholder[/color]=[color=#0a3069]"evil_rabbit"[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]FieldDescription[/color]>[/color]Choose a unique username.[color=#116329]</[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`</[color=#8250df]Field[/color]>`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]FieldLabel[/color] [color=#0550ae]htmlFor[/color]=[color=#0a3069]"username"[/color]>[/color]Username[color=#116329]</[color=#0550ae]FieldLabel[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]TextInput[/color] [color=#0550ae]id[/color]=[color=#0a3069]"username"[/color] [color=#0550ae]placeholder[/color]=[color=#0a3069]"evil_rabbit"[/color] />[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]FieldDescription[/color]>[/color]Choose a unique username.[color=#116329]</[color=#0550ae]FieldDescription[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`</[color=#8250df]Field[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]Field[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]FieldLabel[/color] [color=#79c0ff]htmlFor[/color]=[color=#a5d6ff]"username"[/color]>[/color]Username[color=#7ee787]</[color=#79c0ff]FieldLabel[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]TextInput[/color] [color=#79c0ff]id[/color]=[color=#a5d6ff]"username"[/color] [color=#79c0ff]placeholder[/color]=[color=#a5d6ff]"evil_rabbit"[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]FieldDescription[/color]>[/color]Choose a unique username.[color=#7ee787]</[color=#79c0ff]FieldDescription[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`</[color=#d2a8ff]Field[/color]>`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -100,18 +132,34 @@ export default function FieldDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Text className="code-line">{`Field`}</Text>
-                <Text className="code-line">{`├── FieldLabel`}</Text>
-                <Text className="code-line">{`├── TextInput / Checkbox / RadioGroup`}</Text>
-                <Text className="code-line">{`└── FieldDescription`}</Text>
-                <Text className="code-line">{` `}</Text>
-                <Text className="code-line">{`FieldSet`}</Text>
-                <Text className="code-line">{`├── FieldLegend`}</Text>
-                <Text className="code-line">{`├── FieldDescription`}</Text>
-                <Text className="code-line">{`└── FieldGroup`}</Text>
-                <Text className="code-line">{`    ├── Field`}</Text>
-                <Text className="code-line">{`    ├── FieldSeparator`}</Text>
-                <Text className="code-line">{`    └── Field`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Text className="code-line">{`Field`}</Text>
+                  <Text className="code-line">{`├── FieldLabel`}</Text>
+                  <Text className="code-line">{`├── TextInput / Checkbox / RadioGroup`}</Text>
+                  <Text className="code-line">{`└── FieldDescription`}</Text>
+                  <Text className="code-line">{` `}</Text>
+                  <Text className="code-line">{`FieldSet`}</Text>
+                  <Text className="code-line">{`├── FieldLegend`}</Text>
+                  <Text className="code-line">{`├── FieldDescription`}</Text>
+                  <Text className="code-line">{`└── FieldGroup`}</Text>
+                  <Text className="code-line">{`    ├── Field`}</Text>
+                  <Text className="code-line">{`    ├── FieldSeparator`}</Text>
+                  <Text className="code-line">{`    └── Field`}</Text>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Text className="code-line">{`Field`}</Text>
+                  <Text className="code-line">{`├── FieldLabel`}</Text>
+                  <Text className="code-line">{`├── TextInput / Checkbox / RadioGroup`}</Text>
+                  <Text className="code-line">{`└── FieldDescription`}</Text>
+                  <Text className="code-line">{` `}</Text>
+                  <Text className="code-line">{`FieldSet`}</Text>
+                  <Text className="code-line">{`├── FieldLegend`}</Text>
+                  <Text className="code-line">{`├── FieldDescription`}</Text>
+                  <Text className="code-line">{`└── FieldGroup`}</Text>
+                  <Text className="code-line">{`    ├── Field`}</Text>
+                  <Text className="code-line">{`    ├── FieldSeparator`}</Text>
+                  <Text className="code-line">{`    └── Field`}</Text>
+                </Widget>
               </ScrollAreaContent>
               <Scrollbar />
               <Scrollbar orientation="horizontal" />
@@ -169,7 +217,7 @@ export default function FieldDocPage() {
         <Widget className="admonition admonition-note">
           <Text className="admonition-title">提示</Text>
           <Widget className="admonition-content">
-            <p>{`[b]FieldLabel's click forwarding depends on the [bgcolor=#eee] for [/bgcolor] attribute[/b]. You must set [bgcolor=#eee] for="input-id" [/bgcolor] on the FieldLabel and assign the same [bgcolor=#eee] id [/bgcolor] to the target control, otherwise the click will not be forwarded.`}</p>
+            <p>{`[b]FieldLabel's click forwarding depends on the [bgcolor=#7f7f7f29] for [/bgcolor] attribute[/b]. You must set [bgcolor=#7f7f7f29] for="input-id" [/bgcolor] on the FieldLabel and assign the same [bgcolor=#7f7f7f29] id [/bgcolor] to the target control, otherwise the click will not be forwarded.`}</p>
           </Widget>
         </Widget>
       </Widget>

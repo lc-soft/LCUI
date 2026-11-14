@@ -19,8 +19,8 @@ export default function TooltipDocPage() {
         <ul>
           <li><Text>{`[b]Suitable[/b]: Icon buttons, truncated text, toolbars, and form labels that need extra context`}</Text></li>
           <li><Text>{`[b]Suitable[/b]: Short, non-interactive hints`}</Text></li>
-          <li><Text>{`[b]Not suitable[/b]: Content that requires confirmation or user action (use [bgcolor=#eee] dialog [/bgcolor] / [bgcolor=#eee] alert-dialog [/bgcolor])`}</Text></li>
-          <li><Text>{`[b]Not suitable[/b]: Long explanations or rich text (use body text or [bgcolor=#eee] field-description [/bgcolor])`}</Text></li>
+          <li><Text>{`[b]Not suitable[/b]: Content that requires confirmation or user action (use [bgcolor=#7f7f7f29] dialog [/bgcolor] / [bgcolor=#7f7f7f29] alert-dialog [/bgcolor])`}</Text></li>
+          <li><Text>{`[b]Not suitable[/b]: Long explanations or rich text (use body text or [bgcolor=#7f7f7f29] field-description [/bgcolor])`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
@@ -33,9 +33,17 @@ export default function TooltipDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Tooltip[/color], [color=#8250df]TooltipTrigger[/color], [color=#8250df]TooltipContent[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Tooltip[/color], [color=#8250df]TooltipTrigger[/color], [color=#8250df]TooltipContent[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] { [color=#d2a8ff]Tooltip[/color], [color=#d2a8ff]TooltipTrigger[/color], [color=#d2a8ff]TooltipContent[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -51,29 +59,57 @@ export default function TooltipDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "144px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]Tooltip[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]Tooltip[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]TooltipTrigger[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color]>[/color]Hover[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#116329]</[color=#0550ae]TooltipTrigger[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]TooltipContent[/color]>[/color]Add to library[color=#116329]</[color=#0550ae]TooltipContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`</[color=#8250df]Tooltip[/color]>`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]TooltipTrigger[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color]>[/color]Hover[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]TooltipTrigger[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]TooltipContent[/color]>[/color]Add to library[color=#116329]</[color=#0550ae]TooltipContent[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{`</[color=#8250df]Tooltip[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]Tooltip[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]TooltipTrigger[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]Button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color]>[/color]Hover[color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]TooltipTrigger[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]TooltipContent[/color]>[/color]Add to library[color=#7ee787]</[color=#79c0ff]TooltipContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`</[color=#d2a8ff]Tooltip[/color]>`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -84,7 +120,7 @@ export default function TooltipDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>Attribute-only usage</h2>
-        <p>{`Any widget can use the [bgcolor=#eee] data-tooltip [/bgcolor] attribute without the [bgcolor=#eee] Tooltip [/bgcolor] structure:`}</p>
+        <p>{`Any widget can use the [bgcolor=#7f7f7f29] data-tooltip [/bgcolor] attribute without the [bgcolor=#7f7f7f29] Tooltip [/bgcolor] structure:`}</p>
         <Widget className="code-block" data-language="tsx" data-source="en/widgets/tooltip/2">
           <Widget className="code-block-header">
             <Text className="code-block-title">TypeScript</Text>
@@ -93,9 +129,17 @@ export default function TooltipDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]Button[/color] data-tooltip=[color=#0a3069]"Add to library"[/color]>[color=#8250df]Hover[/color]</[color=#8250df]Button[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]Button[/color] data-tooltip=[color=#0a3069]"Add to library"[/color]>[color=#8250df]Hover[/color]</[color=#8250df]Button[/color]>`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]Button[/color] data-tooltip=[color=#a5d6ff]"Add to library"[/color]>[color=#d2a8ff]Hover[/color]</[color=#d2a8ff]Button[/color]>`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -103,7 +147,7 @@ export default function TooltipDocPage() {
             </ScrollArea>
           </Widget>
         </Widget>
-        <p>{`Use [bgcolor=#eee] data-tooltip-* [/bgcolor] to override the defaults:`}</p>
+        <p>{`Use [bgcolor=#7f7f7f29] data-tooltip-* [/bgcolor] to override the defaults:`}</p>
         <Widget className="mdx-table">
           <Widget className="mdx-table-row mdx-table-head">
             <Widget className="mdx-table-cell mdx-table-head-cell" style={{ width: "240px" }}>
@@ -118,7 +162,7 @@ export default function TooltipDocPage() {
           </Widget>
           <Widget className="mdx-table-row">
             <Widget className="mdx-table-cell" style={{ width: "240px" }}>
-              <Text>{`[bgcolor=#eee] data-tooltip [/bgcolor]`}</Text>
+              <Text>{`[bgcolor=#7f7f7f29] data-tooltip [/bgcolor]`}</Text>
             </Widget>
             <Widget className="mdx-table-cell" style={{ width: "240px" }}>
               <Text>{`Hint text (required)`}</Text>
@@ -129,57 +173,57 @@ export default function TooltipDocPage() {
           </Widget>
           <Widget className="mdx-table-row">
             <Widget className="mdx-table-cell" style={{ width: "240px" }}>
-              <Text>{`[bgcolor=#eee] data-tooltip-side [/bgcolor]`}</Text>
+              <Text>{`[bgcolor=#7f7f7f29] data-tooltip-side [/bgcolor]`}</Text>
             </Widget>
             <Widget className="mdx-table-cell" style={{ width: "240px" }}>
               <Text>{`top / right / bottom / left`}</Text>
             </Widget>
             <Widget className="mdx-table-cell" style={{ width: "88px" }}>
-              <Text>{`[bgcolor=#eee] top [/bgcolor]`}</Text>
+              <Text>{`[bgcolor=#7f7f7f29] top [/bgcolor]`}</Text>
             </Widget>
           </Widget>
           <Widget className="mdx-table-row">
             <Widget className="mdx-table-cell" style={{ width: "240px" }}>
-              <Text>{`[bgcolor=#eee] data-tooltip-align [/bgcolor]`}</Text>
+              <Text>{`[bgcolor=#7f7f7f29] data-tooltip-align [/bgcolor]`}</Text>
             </Widget>
             <Widget className="mdx-table-cell" style={{ width: "240px" }}>
               <Text>{`start / center / end`}</Text>
             </Widget>
             <Widget className="mdx-table-cell" style={{ width: "88px" }}>
-              <Text>{`[bgcolor=#eee] center [/bgcolor]`}</Text>
+              <Text>{`[bgcolor=#7f7f7f29] center [/bgcolor]`}</Text>
             </Widget>
           </Widget>
           <Widget className="mdx-table-row">
             <Widget className="mdx-table-cell" style={{ width: "240px" }}>
-              <Text>{`[bgcolor=#eee] data-tooltip-side-offset [/bgcolor]`}</Text>
+              <Text>{`[bgcolor=#7f7f7f29] data-tooltip-side-offset [/bgcolor]`}</Text>
             </Widget>
             <Widget className="mdx-table-cell" style={{ width: "240px" }}>
               <Text>{`Side offset (px)`}</Text>
             </Widget>
             <Widget className="mdx-table-cell" style={{ width: "88px" }}>
-              <Text>{`[bgcolor=#eee] 4 [/bgcolor]`}</Text>
+              <Text>{`[bgcolor=#7f7f7f29] 4 [/bgcolor]`}</Text>
             </Widget>
           </Widget>
           <Widget className="mdx-table-row">
             <Widget className="mdx-table-cell" style={{ width: "240px" }}>
-              <Text>{`[bgcolor=#eee] data-tooltip-align-offset [/bgcolor]`}</Text>
+              <Text>{`[bgcolor=#7f7f7f29] data-tooltip-align-offset [/bgcolor]`}</Text>
             </Widget>
             <Widget className="mdx-table-cell" style={{ width: "240px" }}>
               <Text>{`Align offset (px)`}</Text>
             </Widget>
             <Widget className="mdx-table-cell" style={{ width: "88px" }}>
-              <Text>{`[bgcolor=#eee] 0 [/bgcolor]`}</Text>
+              <Text>{`[bgcolor=#7f7f7f29] 0 [/bgcolor]`}</Text>
             </Widget>
           </Widget>
           <Widget className="mdx-table-row">
             <Widget className="mdx-table-cell" style={{ width: "240px" }}>
-              <Text>{`[bgcolor=#eee] data-tooltip-delay [/bgcolor]`}</Text>
+              <Text>{`[bgcolor=#7f7f7f29] data-tooltip-delay [/bgcolor]`}</Text>
             </Widget>
             <Widget className="mdx-table-cell" style={{ width: "240px" }}>
               <Text>{`Show delay (ms)`}</Text>
             </Widget>
             <Widget className="mdx-table-cell" style={{ width: "88px" }}>
-              <Text>{`[bgcolor=#eee] 0 [/bgcolor]`}</Text>
+              <Text>{`[bgcolor=#7f7f7f29] 0 [/bgcolor]`}</Text>
             </Widget>
           </Widget>
         </Widget>
@@ -191,37 +235,73 @@ export default function TooltipDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "184px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]Button[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]Button[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  data-tooltip=[color=#0a3069]"Add to library"[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  data-tooltip-side=[color=#0a3069]"left"[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  data-tooltip-side-offset=[color=#0a3069]"8"[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  data-tooltip-delay=[color=#0a3069]"200"[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`  [color=#8250df]Hover[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`</[color=#8250df]Button[/color]>`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`  data-tooltip=[color=#0a3069]"Add to library"[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`  data-tooltip-side=[color=#0a3069]"left"[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`  data-tooltip-side-offset=[color=#0a3069]"8"[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`  data-tooltip-delay=[color=#0a3069]"200"[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{`>`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{`  [color=#8250df]Hover[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">8</Text>
-                  <Text className="code-line">{`</[color=#8250df]Button[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]Button[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  data-tooltip=[color=#a5d6ff]"Add to library"[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  data-tooltip-side=[color=#a5d6ff]"left"[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  data-tooltip-side-offset=[color=#a5d6ff]"8"[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  data-tooltip-delay=[color=#a5d6ff]"200"[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`  [color=#d2a8ff]Hover[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`</[color=#d2a8ff]Button[/color]>`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -231,9 +311,9 @@ export default function TooltipDocPage() {
         </Widget>
         <ul>
           <li><Text>{`The text, side, offset, and delay are read from the attributes again every time the tooltip is shown.`}</Text></li>
-          <li><Text>{`An empty [bgcolor=#eee] data-tooltip [/bgcolor] string does not show the tooltip.`}</Text></li>
-          <li><Text>{`Widgets inside an explicit [bgcolor=#eee] Tooltip [/bgcolor] structure do not trigger attribute mode again.`}</Text></li>
-          <li><Text>{`When the trigger and content need to live in different subtrees, link them with [bgcolor=#eee] data-tooltip-trigger="key" [/bgcolor] and [bgcolor=#eee] data-tooltip-target="key" [/bgcolor].`}</Text></li>
+          <li><Text>{`An empty [bgcolor=#7f7f7f29] data-tooltip [/bgcolor] string does not show the tooltip.`}</Text></li>
+          <li><Text>{`Widgets inside an explicit [bgcolor=#7f7f7f29] Tooltip [/bgcolor] structure do not trigger attribute mode again.`}</Text></li>
+          <li><Text>{`When the trigger and content need to live in different subtrees, link them with [bgcolor=#7f7f7f29] data-tooltip-trigger="key" [/bgcolor] and [bgcolor=#7f7f7f29] data-tooltip-target="key" [/bgcolor].`}</Text></li>
         </ul>
         <h3>C convenience API</h3>
         <p>{`The C side does not need to write attributes by hand:`}</p>
@@ -245,9 +325,17 @@ export default function TooltipDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`ui_tooltip_attach(button, [color=#0a3069]"Add to library"[/color]);`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`ui_tooltip_attach(button, [color=#0a3069]"Add to library"[/color]);`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`ui_tooltip_attach(button, [color=#a5d6ff]"Add to library"[/color]);`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -264,37 +352,73 @@ export default function TooltipDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "184px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]ui_tooltip_options_t[/color] options;`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]ui_tooltip_options_t[/color] options;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`ui_tooltip_options_init(&options);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`options.content = [color=#0a3069]"Add to library"[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`options.side = UI_SIDE_RIGHT;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`options.side_offset = [color=#0550ae]8[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`options.delay = [color=#0550ae]200[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`ui_tooltip_attach_ex(button, &options);`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`ui_tooltip_options_init(&options);`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`options.content = [color=#0a3069]"Add to library"[/color];`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`options.side = UI_SIDE_RIGHT;`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{`options.side_offset = [color=#0550ae]8[/color];`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{`options.delay = [color=#0550ae]200[/color];`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">8</Text>
-                  <Text className="code-line">{`ui_tooltip_attach_ex(button, &options);`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]ui_tooltip_options_t[/color] options;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`ui_tooltip_options_init(&options);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`options.content = [color=#a5d6ff]"Add to library"[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`options.side = UI_SIDE_RIGHT;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`options.side_offset = [color=#79c0ff]8[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`options.delay = [color=#79c0ff]200[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`ui_tooltip_attach_ex(button, &options);`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -302,11 +426,11 @@ export default function TooltipDocPage() {
             </ScrollArea>
           </Widget>
         </Widget>
-        <p>{`[bgcolor=#eee] ui_tooltip_options_init() [/bgcolor] fills in the defaults (top, center, side offset 4, align offset 0, delay 0), so fields left untouched keep the default behavior.`}</p>
+        <p>{`[bgcolor=#7f7f7f29] ui_tooltip_options_init() [/bgcolor] fills in the defaults (top, center, side offset 4, align offset 0, delay 0), so fields left untouched keep the default behavior.`}</p>
       </Widget>
       <Widget className="doc-section">
         <h2>Composition</h2>
-        <p>{`Use the following composition to build a [bgcolor=#eee] Tooltip [/bgcolor]:`}</p>
+        <p>{`Use the following composition to build a [bgcolor=#7f7f7f29] Tooltip [/bgcolor]:`}</p>
         <Widget className="code-block" data-language="text" data-source="en/widgets/tooltip/6">
           <Widget className="code-block-header">
             <Text className="code-block-title">TEXT</Text>
@@ -315,9 +439,16 @@ export default function TooltipDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "84px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Text className="code-line">{`Tooltip`}</Text>
-                <Text className="code-line">{`├── TooltipTrigger`}</Text>
-                <Text className="code-line">{`└── TooltipContent (Portal)`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Text className="code-line">{`Tooltip`}</Text>
+                  <Text className="code-line">{`├── TooltipTrigger`}</Text>
+                  <Text className="code-line">{`└── TooltipContent (Portal)`}</Text>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Text className="code-line">{`Tooltip`}</Text>
+                  <Text className="code-line">{`├── TooltipTrigger`}</Text>
+                  <Text className="code-line">{`└── TooltipContent (Portal)`}</Text>
+                </Widget>
               </ScrollAreaContent>
               <Scrollbar />
               <Scrollbar orientation="horizontal" />
@@ -328,10 +459,10 @@ export default function TooltipDocPage() {
       <Widget className="doc-section">
         <h2>Examples</h2>
         <h3>Sides</h3>
-        <p>{`Use the [bgcolor=#eee] side [/bgcolor] prop to control where the tooltip appears.`}</p>
+        <p>{`Use the [bgcolor=#7f7f7f29] side [/bgcolor] prop to control where the tooltip appears.`}</p>
         <TooltipSidesDemo />
         <h3>Disabled controls</h3>
-        <p>{`A disabled control does not receive pointer events; wrap it in [bgcolor=#eee] TooltipTrigger [/bgcolor] to show the hint normally.`}</p>
+        <p>{`A disabled control does not receive pointer events; wrap it in [bgcolor=#7f7f7f29] TooltipTrigger [/bgcolor] to show the hint normally.`}</p>
         <TooltipDisabledDemo />
       </Widget>
       <Widget className="doc-section">

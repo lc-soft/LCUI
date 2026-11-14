@@ -108,10 +108,15 @@ A small Node check validates that generated CSS contains no remaining
 |---|---|---|
 | `success` | `#16a34a` | `#4ade80` |
 | `warning` | `#f5b301` | `#facc15` |
-| `code` | `#f7f7f7` | `#0d1117` |
-| `code-foreground` | `#1f2328` | `#c9d1d9` |
-| `code-header` | `#f5f5f5` | `#161b22` |
-| `code-border` | `#e5e5e5` | `#30363d` |
+| `code` | `#f7f7f7` | `#171717` |
+| `code-foreground` | `#1f2328` | `#d4d4d4` |
+| `code-header` | `#f5f5f5` | `#1f1f1f` |
+| `code-border` | `#e5e5e5` | `rgba(255, 255, 255, 0.1)` |
+
+The dark code surface uses the same neutral surface as `card` / `sidebar`
+instead of GitHub's blue-tinted `#0d1117`, so code blocks sit on the page
+background without a cold cast. Only the syntax palette keeps GitHub Dark
+colors; the container itself stays neutral.
 
 #### Admonitions
 

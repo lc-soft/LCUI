@@ -234,7 +234,7 @@ TSX 里给**容器部件**（`accordion-trigger`、`accordion-content`、`input-
 | `### H3` / `#### H4` | 节内子标题 |
 | `**bold**` | `[b]...[/b]` |
 | `*italic*` | `[i]...[/i]` |
-| `` ``code`` `` | `[bgcolor=#eee] code [/bgcolor]` |
+| `` ``code`` `` | 半透明中性底 `[bgcolor=#7f7f7f29] code [/bgcolor]` |
 | ` ```lang title="x" ` | 代码块（带 header + Copy 按钮） |
 | ` ```lang title="" ` | 代码块（无 header，仅 Copy 按钮） |
 | ` ```lang ` | 代码块（带语言名 header + Copy 按钮） |

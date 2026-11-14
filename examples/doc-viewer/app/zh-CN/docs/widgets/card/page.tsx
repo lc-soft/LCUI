@@ -23,8 +23,8 @@ export default function CardDocPage() {
         <ul>
           <li><Text>{`[b]适用[/b]：表单、账户信息、设置项、文章摘要等需要分组展示的内容`}</Text></li>
           <li><Text>{`[b]适用[/b]：需要在卡片右上角放置编辑、更多等轻量操作的场景`}</Text></li>
-          <li><Text>{`[b]不适用[/b]：需要展开/收起的大量内容（使用 [bgcolor=#eee] dialog [/bgcolor] 或独立页面）`}</Text></li>
-          <li><Text>{`[b]不适用[/b]：纯提示信息（使用 [bgcolor=#eee] alert [/bgcolor] 或 [bgcolor=#eee] toast [/bgcolor]）`}</Text></li>
+          <li><Text>{`[b]不适用[/b]：需要展开/收起的大量内容（使用 [bgcolor=#7f7f7f29] dialog [/bgcolor] 或独立页面）`}</Text></li>
+          <li><Text>{`[b]不适用[/b]：纯提示信息（使用 [bgcolor=#7f7f7f29] alert [/bgcolor] 或 [bgcolor=#7f7f7f29] toast [/bgcolor]）`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
@@ -37,9 +37,17 @@ export default function CardDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Card[/color], [color=#8250df]CardContent[/color], [color=#8250df]CardDescription[/color], [color=#8250df]CardFooter[/color], [color=#8250df]CardHeader[/color], [color=#8250df]CardTitle[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Card[/color], [color=#8250df]CardContent[/color], [color=#8250df]CardDescription[/color], [color=#8250df]CardFooter[/color], [color=#8250df]CardHeader[/color], [color=#8250df]CardTitle[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] { [color=#d2a8ff]Card[/color], [color=#d2a8ff]CardContent[/color], [color=#d2a8ff]CardDescription[/color], [color=#d2a8ff]CardFooter[/color], [color=#d2a8ff]CardHeader[/color], [color=#d2a8ff]CardTitle[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -55,53 +63,105 @@ export default function CardDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]Card[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]Card[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]CardHeader[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]CardTitle[/color]>[/color]Card Title[color=#116329]</[color=#0550ae]CardTitle[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]CardDescription[/color]>[/color]Card Description[color=#116329]</[color=#0550ae]CardDescription[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#116329]</[color=#0550ae]CardHeader[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]CardContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]p[/color]>[/color]Card Content[color=#116329]</[color=#0550ae]p[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`  [color=#116329]</[color=#0550ae]CardContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]CardFooter[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">10</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]p[/color]>[/color]Card Footer[color=#116329]</[color=#0550ae]p[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">11</Text>
+                    <Text className="code-line">{`  [color=#116329]</[color=#0550ae]CardFooter[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">12</Text>
+                    <Text className="code-line">{`</[color=#8250df]Card[/color]>`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]CardHeader[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]CardTitle[/color]>[/color]Card Title[color=#116329]</[color=#0550ae]CardTitle[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]CardDescription[/color]>[/color]Card Description[color=#116329]</[color=#0550ae]CardDescription[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]CardHeader[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]CardContent[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]p[/color]>[/color]Card Content[color=#116329]</[color=#0550ae]p[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">8</Text>
-                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]CardContent[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">9</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]CardFooter[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">10</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]p[/color]>[/color]Card Footer[color=#116329]</[color=#0550ae]p[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">11</Text>
-                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]CardFooter[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">12</Text>
-                  <Text className="code-line">{`</[color=#8250df]Card[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]Card[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]CardHeader[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]CardTitle[/color]>[/color]Card Title[color=#7ee787]</[color=#79c0ff]CardTitle[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]CardDescription[/color]>[/color]Card Description[color=#7ee787]</[color=#79c0ff]CardDescription[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]CardHeader[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]CardContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]p[/color]>[/color]Card Content[color=#7ee787]</[color=#79c0ff]p[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]CardContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]CardFooter[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">10</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]p[/color]>[/color]Card Footer[color=#7ee787]</[color=#79c0ff]p[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">11</Text>
+                    <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]CardFooter[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">12</Text>
+                    <Text className="code-line">{`</[color=#d2a8ff]Card[/color]>`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -112,7 +172,7 @@ export default function CardDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>组合</h2>
-        <p>{`使用以下组合来构建 [bgcolor=#eee] Card [/bgcolor]：`}</p>
+        <p>{`使用以下组合来构建 [bgcolor=#7f7f7f29] Card [/bgcolor]：`}</p>
         <Widget className="code-block" data-language="text" data-source="zh-CN/widgets/card/2">
           <Widget className="code-block-header">
             <Text className="code-block-title">TEXT</Text>
@@ -121,13 +181,24 @@ export default function CardDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Text className="code-line">{`Card`}</Text>
-                <Text className="code-line">{`├── CardHeader`}</Text>
-                <Text className="code-line">{`│   ├── CardTitle`}</Text>
-                <Text className="code-line">{`│   ├── CardDescription`}</Text>
-                <Text className="code-line">{`│   └── CardAction`}</Text>
-                <Text className="code-line">{`├── CardContent`}</Text>
-                <Text className="code-line">{`└── CardFooter`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Text className="code-line">{`Card`}</Text>
+                  <Text className="code-line">{`├── CardHeader`}</Text>
+                  <Text className="code-line">{`│   ├── CardTitle`}</Text>
+                  <Text className="code-line">{`│   ├── CardDescription`}</Text>
+                  <Text className="code-line">{`│   └── CardAction`}</Text>
+                  <Text className="code-line">{`├── CardContent`}</Text>
+                  <Text className="code-line">{`└── CardFooter`}</Text>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Text className="code-line">{`Card`}</Text>
+                  <Text className="code-line">{`├── CardHeader`}</Text>
+                  <Text className="code-line">{`│   ├── CardTitle`}</Text>
+                  <Text className="code-line">{`│   ├── CardDescription`}</Text>
+                  <Text className="code-line">{`│   └── CardAction`}</Text>
+                  <Text className="code-line">{`├── CardContent`}</Text>
+                  <Text className="code-line">{`└── CardFooter`}</Text>
+                </Widget>
               </ScrollAreaContent>
               <Scrollbar />
               <Scrollbar orientation="horizontal" />
@@ -138,10 +209,10 @@ export default function CardDocPage() {
       <Widget className="doc-section">
         <h2>示例</h2>
         <h3>小尺寸</h3>
-        <p>{`使用 [bgcolor=#eee] size="sm" [/bgcolor] 让卡片使用更紧凑的间距和小一号标题。`}</p>
+        <p>{`使用 [bgcolor=#7f7f7f29] size="sm" [/bgcolor] 让卡片使用更紧凑的间距和小一号标题。`}</p>
         <CardSmallDemo />
         <h3>图片</h3>
-        <p>{`在 [bgcolor=#eee] CardHeader [/bgcolor] 前放置封面内容。当前 LCUI 没有独立的 image 部件，示例使用纯色占位 [bgcolor=#eee] div [/bgcolor] 和绝对定位遮罩层模拟封面图。`}</p>
+        <p>{`在 [bgcolor=#7f7f7f29] CardHeader [/bgcolor] 前放置封面内容。当前 LCUI 没有独立的 image 部件，示例使用纯色占位 [bgcolor=#7f7f7f29] div [/bgcolor] 和绝对定位遮罩层模拟封面图。`}</p>
         <CardImageDemo />
       </Widget>
       <Widget className="doc-section">

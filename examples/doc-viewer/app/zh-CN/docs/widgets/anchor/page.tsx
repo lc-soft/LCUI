@@ -8,13 +8,13 @@ export default function AnchorDocPage() {
   return (
     <Widget className="doc-page">
       <h1>Anchor</h1>
-      <p className="doc-page-desc">{`链接部件，用法与 HTML 的 [bgcolor=#eee] <a> [/bgcolor] 标签相同，用于打开外部 URL。`}</p>
+      <p className="doc-page-desc">{`链接部件，用法与 HTML 的 [bgcolor=#7f7f7f29] <a> [/bgcolor] 标签相同，用于打开外部 URL。`}</p>
       <AnchorBasicDemo />
       <Widget className="doc-section">
         <h2>适用场景</h2>
         <ul>
           <li><Text>{`[b]适用[/b] — 在页面中放置外部链接（点击后在系统浏览器中打开）。`}</Text></li>
-          <li><Text>{`[b]不适用[/b] — 需要执行动作的按钮（用 [bgcolor=#eee] button [/bgcolor]）。`}</Text></li>
+          <li><Text>{`[b]不适用[/b] — 需要执行动作的按钮（用 [bgcolor=#7f7f7f29] button [/bgcolor]）。`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
@@ -27,9 +27,17 @@ export default function AnchorDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<a href=[color=#0a3069]"https://example.com"[/color]>链接</a>`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<a href=[color=#0a3069]"https://example.com"[/color]>链接</a>`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<a href=[color=#a5d6ff]"https://example.com"[/color]>链接</a>`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />

@@ -19,7 +19,7 @@ export default function CheckboxDocPage() {
         <ul>
           <li><Text>{`[b]Suitable[/b]: A single binary choice (accepting terms, a subscription toggle)`}</Text></li>
           <li><Text>{`[b]Suitable[/b]: Checkable items in a form`}</Text></li>
-          <li><Text>{`[b]Not suitable[/b]: Mutually exclusive choices (use [bgcolor=#eee] radio-group [/bgcolor])`}</Text></li>
+          <li><Text>{`[b]Not suitable[/b]: Mutually exclusive choices (use [bgcolor=#7f7f7f29] radio-group [/bgcolor])`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
@@ -32,9 +32,17 @@ export default function CheckboxDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Checkbox[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Checkbox[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] { [color=#d2a8ff]Checkbox[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -50,9 +58,17 @@ export default function CheckboxDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]Checkbox[/color] />`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]Checkbox[/color] />`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]Checkbox[/color] />`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -60,18 +76,18 @@ export default function CheckboxDocPage() {
             </ScrollArea>
           </Widget>
         </Widget>
-        <p>{`Use [bgcolor=#eee] checked [/bgcolor] to control the checked state; a [bgcolor=#eee] change [/bgcolor] event is emitted when it changes.`}</p>
+        <p>{`Use [bgcolor=#7f7f7f29] checked [/bgcolor] to control the checked state; a [bgcolor=#7f7f7f29] change [/bgcolor] event is emitted when it changes.`}</p>
       </Widget>
       <Widget className="doc-section">
         <h2>Examples</h2>
         <h3>Description</h3>
-        <p>{`Pair [bgcolor=#eee] FieldContent [/bgcolor] and [bgcolor=#eee] FieldDescription [/bgcolor] to add helper text to the option.`}</p>
+        <p>{`Pair [bgcolor=#7f7f7f29] FieldContent [/bgcolor] and [bgcolor=#7f7f7f29] FieldDescription [/bgcolor] to add helper text to the option.`}</p>
         <CheckboxDescriptionDemo />
         <h3>Group</h3>
-        <p>{`Combine several [bgcolor=#eee] Field [/bgcolor]s to build a checkbox list.`}</p>
+        <p>{`Combine several [bgcolor=#7f7f7f29] Field [/bgcolor]s to build a checkbox list.`}</p>
         <CheckboxGroupDemo />
         <h3>Indeterminate</h3>
-        <p>{`[bgcolor=#eee] indeterminate [/bgcolor] expresses the "some children are selected" visual state, showing a minus icon.`}</p>
+        <p>{`[bgcolor=#7f7f7f29] indeterminate [/bgcolor] expresses the "some children are selected" visual state, showing a minus icon.`}</p>
         <CheckboxIndeterminateDemo />
         <h3>Disabled</h3>
         <CheckboxDisabledDemo />
@@ -81,7 +97,7 @@ export default function CheckboxDocPage() {
         <Widget className="admonition admonition-caution">
           <Text className="admonition-title">警告</Text>
           <Widget className="admonition-content">
-            <p>{`[b]Indeterminate is a state, not a default.[/b] The indeterminate state ([bgcolor=#eee] indeterminate="true" [/bgcolor]) expresses the "some children are selected" visual state (for example, a parent checkbox when only some children are checked). Clicking an indeterminate checkbox transitions it to the checked state.`}</p>
+            <p>{`[b]Indeterminate is a state, not a default.[/b] The indeterminate state ([bgcolor=#7f7f7f29] indeterminate="true" [/bgcolor]) expresses the "some children are selected" visual state (for example, a parent checkbox when only some children are checked). Clicking an indeterminate checkbox transitions it to the checked state.`}</p>
           </Widget>
         </Widget>
       </Widget>

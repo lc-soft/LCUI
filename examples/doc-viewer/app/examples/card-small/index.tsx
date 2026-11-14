@@ -25,241 +25,481 @@ export default function CardSmallDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_feature[/color][color=#0550ae]([color=#953800]const[/color] [color=#953800]char[/color] *content)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *row = ui_create_widget([color=#0550ae]NULL[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *icon = ui_create_icon();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *text = ui_create_widget([color=#0a3069]"text"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(row, [color=#0a3069]"card-small-row"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`        ui_icon_set_name(icon, [color=#0a3069]"chevron-right"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`        ui_icon_set_size(icon, [color=#0550ae]16[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(icon, [color=#0a3069]"card-small-chevron"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`        ui_text_set_content(text, content);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`        ui_widget_append(row, icon);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`        ui_widget_append(row, text);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`        [color=#cf222e]return[/color] row;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]card_small_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *card = ui_create_card();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *header = ui_create_card_header();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *title = ui_create_card_title();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *description = ui_create_card_description();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *content = ui_create_card_content();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *[color=#953800]list[/color] = ui_create_widget([color=#0550ae]NULL[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *footer = ui_create_card_footer();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *primary = ui_create_button();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *secondary = ui_create_button();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(card, [color=#0a3069]"card-small-demo"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`        ui_card_set_size(card, UI_CARD_SIZE_SM);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`        ui_text_set_content(title, [color=#0a3069]"Scheduled reports"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{`        ui_text_set_content(description,`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">35</Text>
+                  <Text className="code-line">{`                            [color=#0a3069]"Weekly snapshots. No more manual exports."[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">36</Text>
+                  <Text className="code-line">{`        ui_widget_append(header, title);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">37</Text>
+                  <Text className="code-line">{`        ui_widget_append(header, description);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">38</Text>
+                  <Text className="code-line">{`        ui_widget_add_class([color=#953800]list[/color], [color=#0a3069]"card-small-list"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">39</Text>
+                  <Text className="code-line">{`        ui_widget_append([color=#953800]list[/color], create_feature([color=#0a3069]"Choose a schedule (daily, or "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">40</Text>
+                  <Text className="code-line">{`                                              [color=#0a3069]"weekly)."[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">41</Text>
+                  <Text className="code-line">{`        ui_widget_append(`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">42</Text>
+                  <Text className="code-line">{`            [color=#953800]list[/color], create_feature([color=#0a3069]"Send to channels or specific teammates."[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">43</Text>
+                  <Text className="code-line">{`        ui_widget_append([color=#953800]list[/color], create_feature([color=#0a3069]"Include charts, tables, and key "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">44</Text>
+                  <Text className="code-line">{`                                              [color=#0a3069]"metrics."[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">45</Text>
+                  <Text className="code-line">{`        ui_widget_append(content, [color=#953800]list[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">46</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(footer, [color=#0a3069]"card-footer-stack"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">47</Text>
+                  <Text className="code-line">{`        ui_button_set_text(primary, [color=#0a3069]"Set up scheduled reports"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">48</Text>
+                  <Text className="code-line">{`        ui_button_set_variant(primary, UI_BUTTON_VARIANT_PRIMARY);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">49</Text>
+                  <Text className="code-line">{`        ui_button_set_size(primary, UI_BUTTON_SIZE_SM);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">50</Text>
+                  <Text className="code-line">{`        ui_button_set_text(secondary, [color=#0a3069]"See what&#x27;s new"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">51</Text>
+                  <Text className="code-line">{`        ui_button_set_variant(secondary, UI_BUTTON_VARIANT_OUTLINE);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">52</Text>
+                  <Text className="code-line">{`        ui_button_set_size(secondary, UI_BUTTON_SIZE_SM);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">53</Text>
+                  <Text className="code-line">{`        ui_widget_append(footer, primary);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">54</Text>
+                  <Text className="code-line">{`        ui_widget_append(footer, secondary);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">55</Text>
+                  <Text className="code-line">{`        ui_widget_append(card, header);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">56</Text>
+                  <Text className="code-line">{`        ui_widget_append(card, content);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">57</Text>
+                  <Text className="code-line">{`        ui_widget_append(card, footer);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">58</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, card);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">59</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_feature[/color][color=#0550ae]([color=#953800]const[/color] [color=#953800]char[/color] *content)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *row = ui_create_widget([color=#0550ae]NULL[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *icon = ui_create_icon();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *text = ui_create_widget([color=#0a3069]"text"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">8</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">9</Text>
-                <Text className="code-line">{`        ui_widget_add_class(row, [color=#0a3069]"card-small-row"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">10</Text>
-                <Text className="code-line">{`        ui_icon_set_name(icon, [color=#0a3069]"chevron-right"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">11</Text>
-                <Text className="code-line">{`        ui_icon_set_size(icon, [color=#0550ae]16[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">12</Text>
-                <Text className="code-line">{`        ui_widget_add_class(icon, [color=#0a3069]"card-small-chevron"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">13</Text>
-                <Text className="code-line">{`        ui_text_set_content(text, content);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">14</Text>
-                <Text className="code-line">{`        ui_widget_append(row, icon);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">15</Text>
-                <Text className="code-line">{`        ui_widget_append(row, text);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">16</Text>
-                <Text className="code-line">{`        [color=#cf222e]return[/color] row;`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">17</Text>
-                <Text className="code-line">{`}`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">18</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">19</Text>
-                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]card_small_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">20</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">21</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *card = ui_create_card();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">22</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *header = ui_create_card_header();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">23</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *title = ui_create_card_title();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">24</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *description = ui_create_card_description();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">25</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *content = ui_create_card_content();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">26</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *[color=#953800]list[/color] = ui_create_widget([color=#0550ae]NULL[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">27</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *footer = ui_create_card_footer();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">28</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *primary = ui_create_button();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">29</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *secondary = ui_create_button();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">30</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">31</Text>
-                <Text className="code-line">{`        ui_widget_add_class(card, [color=#0a3069]"card-small-demo"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">32</Text>
-                <Text className="code-line">{`        ui_card_set_size(card, UI_CARD_SIZE_SM);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">33</Text>
-                <Text className="code-line">{`        ui_text_set_content(title, [color=#0a3069]"Scheduled reports"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">34</Text>
-                <Text className="code-line">{`        ui_text_set_content(description,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">35</Text>
-                <Text className="code-line">{`                            [color=#0a3069]"Weekly snapshots. No more manual exports."[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">36</Text>
-                <Text className="code-line">{`        ui_widget_append(header, title);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">37</Text>
-                <Text className="code-line">{`        ui_widget_append(header, description);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">38</Text>
-                <Text className="code-line">{`        ui_widget_add_class([color=#953800]list[/color], [color=#0a3069]"card-small-list"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">39</Text>
-                <Text className="code-line">{`        ui_widget_append([color=#953800]list[/color], create_feature([color=#0a3069]"Choose a schedule (daily, or "[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">40</Text>
-                <Text className="code-line">{`                                              [color=#0a3069]"weekly)."[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">41</Text>
-                <Text className="code-line">{`        ui_widget_append(`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">42</Text>
-                <Text className="code-line">{`            [color=#953800]list[/color], create_feature([color=#0a3069]"Send to channels or specific teammates."[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">43</Text>
-                <Text className="code-line">{`        ui_widget_append([color=#953800]list[/color], create_feature([color=#0a3069]"Include charts, tables, and key "[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">44</Text>
-                <Text className="code-line">{`                                              [color=#0a3069]"metrics."[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">45</Text>
-                <Text className="code-line">{`        ui_widget_append(content, [color=#953800]list[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">46</Text>
-                <Text className="code-line">{`        ui_widget_add_class(footer, [color=#0a3069]"card-footer-stack"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">47</Text>
-                <Text className="code-line">{`        ui_button_set_text(primary, [color=#0a3069]"Set up scheduled reports"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">48</Text>
-                <Text className="code-line">{`        ui_button_set_variant(primary, UI_BUTTON_VARIANT_PRIMARY);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">49</Text>
-                <Text className="code-line">{`        ui_button_set_size(primary, UI_BUTTON_SIZE_SM);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">50</Text>
-                <Text className="code-line">{`        ui_button_set_text(secondary, [color=#0a3069]"See what&#x27;s new"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">51</Text>
-                <Text className="code-line">{`        ui_button_set_variant(secondary, UI_BUTTON_VARIANT_OUTLINE);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">52</Text>
-                <Text className="code-line">{`        ui_button_set_size(secondary, UI_BUTTON_SIZE_SM);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">53</Text>
-                <Text className="code-line">{`        ui_widget_append(footer, primary);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">54</Text>
-                <Text className="code-line">{`        ui_widget_append(footer, secondary);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">55</Text>
-                <Text className="code-line">{`        ui_widget_append(card, header);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">56</Text>
-                <Text className="code-line">{`        ui_widget_append(card, content);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">57</Text>
-                <Text className="code-line">{`        ui_widget_append(card, footer);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">58</Text>
-                <Text className="code-line">{`        ui_widget_append(parent, card);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">59</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#ffa657]static[/color] [color=#ffa657]ui_widget_t[/color] *[color=#d2a8ff]create_feature[/color][color=#79c0ff]([color=#ffa657]const[/color] [color=#ffa657]char[/color] *content)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *row = ui_create_widget([color=#79c0ff]NULL[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *icon = ui_create_icon();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *text = ui_create_widget([color=#a5d6ff]"text"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(row, [color=#a5d6ff]"card-small-row"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`        ui_icon_set_name(icon, [color=#a5d6ff]"chevron-right"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`        ui_icon_set_size(icon, [color=#79c0ff]16[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(icon, [color=#a5d6ff]"card-small-chevron"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`        ui_text_set_content(text, content);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`        ui_widget_append(row, icon);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`        ui_widget_append(row, text);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`        [color=#ff7b72]return[/color] row;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]card_small_init[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *card = ui_create_card();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *header = ui_create_card_header();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *title = ui_create_card_title();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *description = ui_create_card_description();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *content = ui_create_card_content();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *[color=#ffa657]list[/color] = ui_create_widget([color=#79c0ff]NULL[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *footer = ui_create_card_footer();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *primary = ui_create_button();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *secondary = ui_create_button();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(card, [color=#a5d6ff]"card-small-demo"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`        ui_card_set_size(card, UI_CARD_SIZE_SM);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`        ui_text_set_content(title, [color=#a5d6ff]"Scheduled reports"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{`        ui_text_set_content(description,`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">35</Text>
+                  <Text className="code-line">{`                            [color=#a5d6ff]"Weekly snapshots. No more manual exports."[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">36</Text>
+                  <Text className="code-line">{`        ui_widget_append(header, title);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">37</Text>
+                  <Text className="code-line">{`        ui_widget_append(header, description);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">38</Text>
+                  <Text className="code-line">{`        ui_widget_add_class([color=#ffa657]list[/color], [color=#a5d6ff]"card-small-list"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">39</Text>
+                  <Text className="code-line">{`        ui_widget_append([color=#ffa657]list[/color], create_feature([color=#a5d6ff]"Choose a schedule (daily, or "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">40</Text>
+                  <Text className="code-line">{`                                              [color=#a5d6ff]"weekly)."[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">41</Text>
+                  <Text className="code-line">{`        ui_widget_append(`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">42</Text>
+                  <Text className="code-line">{`            [color=#ffa657]list[/color], create_feature([color=#a5d6ff]"Send to channels or specific teammates."[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">43</Text>
+                  <Text className="code-line">{`        ui_widget_append([color=#ffa657]list[/color], create_feature([color=#a5d6ff]"Include charts, tables, and key "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">44</Text>
+                  <Text className="code-line">{`                                              [color=#a5d6ff]"metrics."[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">45</Text>
+                  <Text className="code-line">{`        ui_widget_append(content, [color=#ffa657]list[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">46</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(footer, [color=#a5d6ff]"card-footer-stack"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">47</Text>
+                  <Text className="code-line">{`        ui_button_set_text(primary, [color=#a5d6ff]"Set up scheduled reports"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">48</Text>
+                  <Text className="code-line">{`        ui_button_set_variant(primary, UI_BUTTON_VARIANT_PRIMARY);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">49</Text>
+                  <Text className="code-line">{`        ui_button_set_size(primary, UI_BUTTON_SIZE_SM);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">50</Text>
+                  <Text className="code-line">{`        ui_button_set_text(secondary, [color=#a5d6ff]"See what&#x27;s new"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">51</Text>
+                  <Text className="code-line">{`        ui_button_set_variant(secondary, UI_BUTTON_VARIANT_OUTLINE);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">52</Text>
+                  <Text className="code-line">{`        ui_button_set_size(secondary, UI_BUTTON_SIZE_SM);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">53</Text>
+                  <Text className="code-line">{`        ui_widget_append(footer, primary);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">54</Text>
+                  <Text className="code-line">{`        ui_widget_append(footer, secondary);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">55</Text>
+                  <Text className="code-line">{`        ui_widget_append(card, header);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">56</Text>
+                  <Text className="code-line">{`        ui_widget_append(card, content);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">57</Text>
+                  <Text className="code-line">{`        ui_widget_append(card, footer);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">58</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, card);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">59</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -270,129 +510,257 @@ export default function CardSmallDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]card[/color] [color=#0550ae]class[/color]=[color=#0a3069]"card-small-demo"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]card-header[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]card-title[/color]>[/color]Scheduled reports[color=#116329]</[color=#0550ae]card-title[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]card-description[/color]>[/color]Weekly snapshots. No more manual exports.[color=#116329]</[color=#0550ae]card-description[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]card-header[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]card-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]class[/color]=[color=#0a3069]"card-small-list"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]class[/color]=[color=#0a3069]"card-small-row"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]icon[/color] [color=#0550ae]class[/color]=[color=#0a3069]"card-small-chevron"[/color] [color=#0550ae]name[/color]=[color=#0a3069]"chevron-right"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"16"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]text[/color]>[/color]Choose a schedule (daily, or weekly).[color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`          [color=#116329]</[color=#0550ae]div[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]class[/color]=[color=#0a3069]"card-small-row"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]icon[/color] [color=#0550ae]class[/color]=[color=#0a3069]"card-small-chevron"[/color] [color=#0550ae]name[/color]=[color=#0a3069]"chevron-right"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"16"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]text[/color]>[/color]Send to channels or specific teammates.[color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`          [color=#116329]</[color=#0550ae]div[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]class[/color]=[color=#0a3069]"card-small-row"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]icon[/color] [color=#0550ae]class[/color]=[color=#0a3069]"card-small-chevron"[/color] [color=#0550ae]name[/color]=[color=#0a3069]"chevron-right"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"16"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]text[/color]>[/color]Include charts, tables, and key metrics.[color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`          [color=#116329]</[color=#0550ae]div[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]div[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]card-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]card-footer[/color] [color=#0550ae]class[/color]=[color=#0a3069]"card-footer-stack"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"primary"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color]>[/color]Set up scheduled reports[color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color]>[/color]See what&#x27;s new[color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]card-footer[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`    [color=#116329]</[color=#0550ae]card[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`[color=#116329]</[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`    [color=#116329]<[color=#0550ae]card[/color] [color=#0550ae]class[/color]=[color=#0a3069]"card-small-demo"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]card-header[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]card-title[/color]>[/color]Scheduled reports[color=#116329]</[color=#0550ae]card-title[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]card-description[/color]>[/color]Weekly snapshots. No more manual exports.[color=#116329]</[color=#0550ae]card-description[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">8</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]card-header[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">9</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]card-content[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">10</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]class[/color]=[color=#0a3069]"card-small-list"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">11</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]class[/color]=[color=#0a3069]"card-small-row"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">12</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]icon[/color] [color=#0550ae]class[/color]=[color=#0a3069]"card-small-chevron"[/color] [color=#0550ae]name[/color]=[color=#0a3069]"chevron-right"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"16"[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">13</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]text[/color]>[/color]Choose a schedule (daily, or weekly).[color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">14</Text>
-                <Text className="code-line">{`          [color=#116329]</[color=#0550ae]div[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">15</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]class[/color]=[color=#0a3069]"card-small-row"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">16</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]icon[/color] [color=#0550ae]class[/color]=[color=#0a3069]"card-small-chevron"[/color] [color=#0550ae]name[/color]=[color=#0a3069]"chevron-right"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"16"[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">17</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]text[/color]>[/color]Send to channels or specific teammates.[color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">18</Text>
-                <Text className="code-line">{`          [color=#116329]</[color=#0550ae]div[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">19</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]class[/color]=[color=#0a3069]"card-small-row"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">20</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]icon[/color] [color=#0550ae]class[/color]=[color=#0a3069]"card-small-chevron"[/color] [color=#0550ae]name[/color]=[color=#0a3069]"chevron-right"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"16"[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">21</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]text[/color]>[/color]Include charts, tables, and key metrics.[color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">22</Text>
-                <Text className="code-line">{`          [color=#116329]</[color=#0550ae]div[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">23</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]div[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">24</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]card-content[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">25</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]card-footer[/color] [color=#0550ae]class[/color]=[color=#0a3069]"card-footer-stack"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">26</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"primary"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color]>[/color]Set up scheduled reports[color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">27</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color]>[/color]See what&#x27;s new[color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">28</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]card-footer[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">29</Text>
-                <Text className="code-line">{`    [color=#116329]</[color=#0550ae]card[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">30</Text>
-                <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ui[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">31</Text>
-                <Text className="code-line">{`[color=#116329]</[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]<?xml version=[color=#a5d6ff]"1.0"[/color] encoding=[color=#a5d6ff]"UTF-8"[/color] ?>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#7ee787]<[color=#79c0ff]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]card[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"card-small-demo"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"sm"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]card-header[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]card-title[/color]>[/color]Scheduled reports[color=#7ee787]</[color=#79c0ff]card-title[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]card-description[/color]>[/color]Weekly snapshots. No more manual exports.[color=#7ee787]</[color=#79c0ff]card-description[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]card-header[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]card-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]div[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"card-small-list"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]div[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"card-small-row"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]icon[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"card-small-chevron"[/color] [color=#79c0ff]name[/color]=[color=#a5d6ff]"chevron-right"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"16"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]text[/color]>[/color]Choose a schedule (daily, or weekly).[color=#7ee787]</[color=#79c0ff]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`          [color=#7ee787]</[color=#79c0ff]div[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]div[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"card-small-row"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]icon[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"card-small-chevron"[/color] [color=#79c0ff]name[/color]=[color=#a5d6ff]"chevron-right"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"16"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]text[/color]>[/color]Send to channels or specific teammates.[color=#7ee787]</[color=#79c0ff]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`          [color=#7ee787]</[color=#79c0ff]div[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]div[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"card-small-row"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]icon[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"card-small-chevron"[/color] [color=#79c0ff]name[/color]=[color=#a5d6ff]"chevron-right"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"16"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]text[/color]>[/color]Include charts, tables, and key metrics.[color=#7ee787]</[color=#79c0ff]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`          [color=#7ee787]</[color=#79c0ff]div[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]div[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]card-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]card-footer[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"card-footer-stack"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"primary"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"sm"[/color]>[/color]Set up scheduled reports[color=#7ee787]</[color=#79c0ff]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"sm"[/color]>[/color]See what&#x27;s new[color=#7ee787]</[color=#79c0ff]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]card-footer[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`    [color=#7ee787]</[color=#79c0ff]card[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`[color=#7ee787]</[color=#79c0ff]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -403,29 +771,57 @@ export default function CardSmallDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "144px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]card_small_xml_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, ui_create_widget([color=#0550ae]NULL[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]card_small_xml_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`        ui_widget_append(parent, ui_create_widget([color=#0550ae]NULL[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]card_small_xml_init[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, ui_create_widget([color=#79c0ff]NULL[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -436,217 +832,433 @@ export default function CardSmallDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`  [color=#8250df]Button[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  [color=#8250df]Card[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`  [color=#8250df]CardContent[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`  [color=#8250df]CardDescription[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`  [color=#8250df]CardFooter[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`  [color=#8250df]CardHeader[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`  [color=#8250df]CardTitle[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`  [color=#8250df]Icon[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`  [color=#8250df]Text[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`  [color=#8250df]Widget[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]App[/color]([color=#0550ae][/color]) {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`  [color=#cf222e]const[/color] features = \\[`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`    [color=#0a3069]"Choose a schedule (daily, or weekly)."[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`    [color=#0a3069]"Send to channels or specific teammates."[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`    [color=#0a3069]"Include charts, tables, and key metrics."[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`  ];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Card[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color] [color=#0550ae]className[/color]=[color=#0a3069]"w-full max-w-xs"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]CardHeader[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]CardTitle[/color]>[/color]Scheduled reports[color=#116329]</[color=#0550ae]CardTitle[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]CardDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`          Weekly snapshots. No more manual exports.`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]CardDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]CardHeader[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]CardContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Widget[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex flex-col gap-2 py-2"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`          {features.map((feature) => (`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]Widget[/color] [color=#0550ae]key[/color]=[color=#0a3069]{feature}[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex gap-2"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Icon[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{`[color=#116329]                [color=#0550ae]className[/color]=[color=#0a3069]"mt-0.5 shrink-0 text-muted-foreground"[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">35</Text>
+                  <Text className="code-line">{`[color=#116329]                [color=#0550ae]name[/color]=[color=#0a3069]"chevron-right"[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">36</Text>
+                  <Text className="code-line">{`[color=#116329]                [color=#0550ae]size[/color]=[color=#0a3069]{16}[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">37</Text>
+                  <Text className="code-line">{`[color=#116329]              />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">38</Text>
+                  <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Text[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex-1"[/color]>[/color]{feature}[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">39</Text>
+                  <Text className="code-line">{`            [color=#116329]</[color=#0550ae]Widget[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">40</Text>
+                  <Text className="code-line">{`          ))}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">41</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]Widget[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">42</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]CardContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">43</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]CardFooter[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex-col gap-2"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">44</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]className[/color]=[color=#0a3069]"w-full"[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"primary"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">45</Text>
+                  <Text className="code-line">{`          Set up scheduled reports`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">46</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">47</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]className[/color]=[color=#0a3069]"w-full"[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">48</Text>
+                  <Text className="code-line">{`          See what[color=#0550ae]&apos;[/color]s new`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">49</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">50</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]CardFooter[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">51</Text>
+                  <Text className="code-line">{`    [color=#116329]</[color=#0550ae]Card[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">52</Text>
+                  <Text className="code-line">{`  );`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">53</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{`  [color=#8250df]Button[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`  [color=#8250df]Card[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`  [color=#8250df]CardContent[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`  [color=#8250df]CardDescription[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`  [color=#8250df]CardFooter[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`  [color=#8250df]CardHeader[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">8</Text>
-                <Text className="code-line">{`  [color=#8250df]CardTitle[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">9</Text>
-                <Text className="code-line">{`  [color=#8250df]Icon[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">10</Text>
-                <Text className="code-line">{`  [color=#8250df]Text[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">11</Text>
-                <Text className="code-line">{`  [color=#8250df]Widget[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">12</Text>
-                <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">13</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">14</Text>
-                <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]App[/color]([color=#0550ae][/color]) {`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">15</Text>
-                <Text className="code-line">{`  [color=#cf222e]const[/color] features = \\[`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">16</Text>
-                <Text className="code-line">{`    [color=#0a3069]"Choose a schedule (daily, or weekly)."[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">17</Text>
-                <Text className="code-line">{`    [color=#0a3069]"Send to channels or specific teammates."[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">18</Text>
-                <Text className="code-line">{`    [color=#0a3069]"Include charts, tables, and key metrics."[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">19</Text>
-                <Text className="code-line">{`  ];`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">20</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">21</Text>
-                <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">22</Text>
-                <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Card[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color] [color=#0550ae]className[/color]=[color=#0a3069]"w-full max-w-xs"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">23</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]CardHeader[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">24</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]CardTitle[/color]>[/color]Scheduled reports[color=#116329]</[color=#0550ae]CardTitle[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">25</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]CardDescription[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">26</Text>
-                <Text className="code-line">{`          Weekly snapshots. No more manual exports.`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">27</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]CardDescription[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">28</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]CardHeader[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">29</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]CardContent[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">30</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Widget[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex flex-col gap-2 py-2"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">31</Text>
-                <Text className="code-line">{`          {features.map((feature) => (`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">32</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]Widget[/color] [color=#0550ae]key[/color]=[color=#0a3069]{feature}[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex gap-2"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">33</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Icon[/color][/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">34</Text>
-                <Text className="code-line">{`[color=#116329]                [color=#0550ae]className[/color]=[color=#0a3069]"mt-0.5 shrink-0 text-muted-foreground"[/color][/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">35</Text>
-                <Text className="code-line">{`[color=#116329]                [color=#0550ae]name[/color]=[color=#0a3069]"chevron-right"[/color][/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">36</Text>
-                <Text className="code-line">{`[color=#116329]                [color=#0550ae]size[/color]=[color=#0a3069]{16}[/color][/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">37</Text>
-                <Text className="code-line">{`[color=#116329]              />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">38</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]Text[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex-1"[/color]>[/color]{feature}[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">39</Text>
-                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]Widget[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">40</Text>
-                <Text className="code-line">{`          ))}`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">41</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]Widget[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">42</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]CardContent[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">43</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]CardFooter[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex-col gap-2"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">44</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]className[/color]=[color=#0a3069]"w-full"[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"primary"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">45</Text>
-                <Text className="code-line">{`          Set up scheduled reports`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">46</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">47</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]className[/color]=[color=#0a3069]"w-full"[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">48</Text>
-                <Text className="code-line">{`          See what[color=#0550ae]&apos;[/color]s new`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">49</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">50</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]CardFooter[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">51</Text>
-                <Text className="code-line">{`    [color=#116329]</[color=#0550ae]Card[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">52</Text>
-                <Text className="code-line">{`  );`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">53</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#ff7b72]import[/color] {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]Button[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]Card[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]CardContent[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]CardDescription[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]CardFooter[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]CardHeader[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]CardTitle[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]Icon[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]Text[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]Widget[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`} [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`[color=#ff7b72]export[/color] [color=#ff7b72]default[/color] [color=#ff7b72]function[/color] [color=#d2a8ff]App[/color]([color=#79c0ff][/color]) {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`  [color=#ff7b72]const[/color] features = \\[`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`    [color=#a5d6ff]"Choose a schedule (daily, or weekly)."[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`    [color=#a5d6ff]"Send to channels or specific teammates."[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`    [color=#a5d6ff]"Include charts, tables, and key metrics."[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`  ];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`  [color=#ff7b72]return[/color] (`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]Card[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"sm"[/color] [color=#79c0ff]className[/color]=[color=#a5d6ff]"w-full max-w-xs"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]CardHeader[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]CardTitle[/color]>[/color]Scheduled reports[color=#7ee787]</[color=#79c0ff]CardTitle[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]CardDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`          Weekly snapshots. No more manual exports.`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]CardDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]CardHeader[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]CardContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]Widget[/color] [color=#79c0ff]className[/color]=[color=#a5d6ff]"flex flex-col gap-2 py-2"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`          {features.map((feature) => (`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]Widget[/color] [color=#79c0ff]key[/color]=[color=#a5d6ff]{feature}[/color] [color=#79c0ff]className[/color]=[color=#a5d6ff]"flex gap-2"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`              [color=#7ee787]<[color=#79c0ff]Icon[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{`[color=#7ee787]                [color=#79c0ff]className[/color]=[color=#a5d6ff]"mt-0.5 shrink-0 text-muted-foreground"[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">35</Text>
+                  <Text className="code-line">{`[color=#7ee787]                [color=#79c0ff]name[/color]=[color=#a5d6ff]"chevron-right"[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">36</Text>
+                  <Text className="code-line">{`[color=#7ee787]                [color=#79c0ff]size[/color]=[color=#a5d6ff]{16}[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">37</Text>
+                  <Text className="code-line">{`[color=#7ee787]              />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">38</Text>
+                  <Text className="code-line">{`              [color=#7ee787]<[color=#79c0ff]Text[/color] [color=#79c0ff]className[/color]=[color=#a5d6ff]"flex-1"[/color]>[/color]{feature}[color=#7ee787]</[color=#79c0ff]Text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">39</Text>
+                  <Text className="code-line">{`            [color=#7ee787]</[color=#79c0ff]Widget[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">40</Text>
+                  <Text className="code-line">{`          ))}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">41</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]Widget[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">42</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]CardContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">43</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]CardFooter[/color] [color=#79c0ff]className[/color]=[color=#a5d6ff]"flex-col gap-2"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">44</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]Button[/color] [color=#79c0ff]className[/color]=[color=#a5d6ff]"w-full"[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"primary"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"sm"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">45</Text>
+                  <Text className="code-line">{`          Set up scheduled reports`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">46</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">47</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]Button[/color] [color=#79c0ff]className[/color]=[color=#a5d6ff]"w-full"[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"sm"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">48</Text>
+                  <Text className="code-line">{`          See what[color=#79c0ff]&apos;[/color]s new`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">49</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">50</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]CardFooter[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">51</Text>
+                  <Text className="code-line">{`    [color=#7ee787]</[color=#79c0ff]Card[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">52</Text>
+                  <Text className="code-line">{`  );`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">53</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -657,33 +1269,65 @@ export default function CardSmallDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]"example.h"[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]card_small_tsx_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]"example.h"[/color][/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]card_small_tsx_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]"example.h"[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]card_small_tsx_init[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />

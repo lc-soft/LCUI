@@ -5,8 +5,8 @@
   gap: 16px;
   height: 48px;
   padding: 0 16px;
-  background-color: #fff;
-  border-bottom: 1px solid #e8e8e8;
+  @apply bg-background dark:bg-background-dark;
+  @apply border-b border-border dark:border-border-dark;
 }
 
 .navbar-left {
@@ -60,28 +60,28 @@
   padding: 4px 12px;
   font-size: 13px;
   text-align: left;
-  color: #666;
-  background-color: #f5f5f5;
-  border: 1px solid #e8e8e8;
-  border-radius: 6px;
+  @apply text-muted-foreground bg-muted border border-border rounded-md;
+  @apply dark:text-muted-foreground-dark dark:bg-muted-dark dark:border-border-dark;
 }
 
 .navbar-version {
   font-size: 13px;
-  color: #999;
+  @apply text-muted-foreground;
+  @apply dark:text-muted-foreground-dark;
   font-family: monospace;
 }
 
 .navbar-link {
   padding: 4px 8px;
   font-size: 14px;
-  color: #333;
+  @apply text-foreground;
+  @apply dark:text-foreground-dark;
   border-radius: 6px;
 }
 
 .navbar-link:hover {
-  background-color: #f5f5f5;
-  color: #111;
+  @apply bg-muted text-foreground;
+  @apply dark:bg-muted-dark dark:text-foreground-dark;
 }
 
 /* Keep the three columns stable: controls never shrink, the path box does. */

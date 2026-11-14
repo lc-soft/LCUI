@@ -25,149 +25,297 @@ export default function AlertVariantsDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_alert[/color][color=#0550ae]([color=#953800]ui_alert_variant_t[/color] variant,[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`[color=#0550ae]                                 [color=#953800]const[/color] [color=#953800]char[/color] *icon_name, [color=#953800]const[/color] [color=#953800]char[/color] *title,[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`[color=#0550ae]                                 [color=#953800]const[/color] [color=#953800]char[/color] *description)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *alert = ui_create_alert();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`        ui_alert_set_variant(alert, variant);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`        ui_alert_set_icon(alert, icon_name);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`        ui_alert_set_title(alert, title);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`        ui_alert_set_description(alert, description);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(alert, [color=#0a3069]"mb-6"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`        [color=#cf222e]return[/color] alert;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]alert_variants_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *box = ui_create_widget([color=#0550ae]NULL[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(box, [color=#0a3069]"alert-variants-demo"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`        ui_widget_append(box, create_alert(UI_ALERT_VARIANT_INFO, [color=#0a3069]"info"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`                                           [color=#0a3069]"New feature available"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`                                           [color=#0a3069]"Try the updated dashboard."[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`        ui_widget_append(`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`            box, create_alert(UI_ALERT_VARIANT_SUCCESS, [color=#0a3069]"checkmark-circle"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`                              [color=#0a3069]"Payment successful"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`                              [color=#0a3069]"Your payment has been processed."[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`        ui_widget_append(box, create_alert(UI_ALERT_VARIANT_WARNING, [color=#0a3069]"warning"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`                                           [color=#0a3069]"Storage almost full"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`                                           [color=#0a3069]"Free up space to continue."[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`        ui_widget_append(`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`            box, create_alert(UI_ALERT_VARIANT_DESTRUCTIVE, [color=#0a3069]"error-circle"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{`                              [color=#0a3069]"Unable to save changes"[/color], [color=#0a3069]"Please try again."[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">35</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, box);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">36</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_alert[/color][color=#0550ae]([color=#953800]ui_alert_variant_t[/color] variant,[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`[color=#0550ae]                                 [color=#953800]const[/color] [color=#953800]char[/color] *icon_name, [color=#953800]const[/color] [color=#953800]char[/color] *title,[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`[color=#0550ae]                                 [color=#953800]const[/color] [color=#953800]char[/color] *description)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *alert = ui_create_alert();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">8</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">9</Text>
-                <Text className="code-line">{`        ui_alert_set_variant(alert, variant);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">10</Text>
-                <Text className="code-line">{`        ui_alert_set_icon(alert, icon_name);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">11</Text>
-                <Text className="code-line">{`        ui_alert_set_title(alert, title);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">12</Text>
-                <Text className="code-line">{`        ui_alert_set_description(alert, description);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">13</Text>
-                <Text className="code-line">{`        ui_widget_add_class(alert, [color=#0a3069]"mb-6"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">14</Text>
-                <Text className="code-line">{`        [color=#cf222e]return[/color] alert;`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">15</Text>
-                <Text className="code-line">{`}`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">16</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">17</Text>
-                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]alert_variants_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">18</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">19</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *box = ui_create_widget([color=#0550ae]NULL[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">20</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">21</Text>
-                <Text className="code-line">{`        ui_widget_add_class(box, [color=#0a3069]"alert-variants-demo"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">22</Text>
-                <Text className="code-line">{`        ui_widget_append(box, create_alert(UI_ALERT_VARIANT_INFO, [color=#0a3069]"info"[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">23</Text>
-                <Text className="code-line">{`                                           [color=#0a3069]"New feature available"[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">24</Text>
-                <Text className="code-line">{`                                           [color=#0a3069]"Try the updated dashboard."[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">25</Text>
-                <Text className="code-line">{`        ui_widget_append(`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">26</Text>
-                <Text className="code-line">{`            box, create_alert(UI_ALERT_VARIANT_SUCCESS, [color=#0a3069]"checkmark-circle"[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">27</Text>
-                <Text className="code-line">{`                              [color=#0a3069]"Payment successful"[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">28</Text>
-                <Text className="code-line">{`                              [color=#0a3069]"Your payment has been processed."[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">29</Text>
-                <Text className="code-line">{`        ui_widget_append(box, create_alert(UI_ALERT_VARIANT_WARNING, [color=#0a3069]"warning"[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">30</Text>
-                <Text className="code-line">{`                                           [color=#0a3069]"Storage almost full"[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">31</Text>
-                <Text className="code-line">{`                                           [color=#0a3069]"Free up space to continue."[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">32</Text>
-                <Text className="code-line">{`        ui_widget_append(`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">33</Text>
-                <Text className="code-line">{`            box, create_alert(UI_ALERT_VARIANT_DESTRUCTIVE, [color=#0a3069]"error-circle"[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">34</Text>
-                <Text className="code-line">{`                              [color=#0a3069]"Unable to save changes"[/color], [color=#0a3069]"Please try again."[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">35</Text>
-                <Text className="code-line">{`        ui_widget_append(parent, box);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">36</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#ffa657]static[/color] [color=#ffa657]ui_widget_t[/color] *[color=#d2a8ff]create_alert[/color][color=#79c0ff]([color=#ffa657]ui_alert_variant_t[/color] variant,[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`[color=#79c0ff]                                 [color=#ffa657]const[/color] [color=#ffa657]char[/color] *icon_name, [color=#ffa657]const[/color] [color=#ffa657]char[/color] *title,[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`[color=#79c0ff]                                 [color=#ffa657]const[/color] [color=#ffa657]char[/color] *description)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *alert = ui_create_alert();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`        ui_alert_set_variant(alert, variant);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`        ui_alert_set_icon(alert, icon_name);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`        ui_alert_set_title(alert, title);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`        ui_alert_set_description(alert, description);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(alert, [color=#a5d6ff]"mb-6"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`        [color=#ff7b72]return[/color] alert;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]alert_variants_init[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *box = ui_create_widget([color=#79c0ff]NULL[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(box, [color=#a5d6ff]"alert-variants-demo"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`        ui_widget_append(box, create_alert(UI_ALERT_VARIANT_INFO, [color=#a5d6ff]"info"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`                                           [color=#a5d6ff]"New feature available"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`                                           [color=#a5d6ff]"Try the updated dashboard."[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`        ui_widget_append(`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`            box, create_alert(UI_ALERT_VARIANT_SUCCESS, [color=#a5d6ff]"checkmark-circle"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`                              [color=#a5d6ff]"Payment successful"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`                              [color=#a5d6ff]"Your payment has been processed."[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`        ui_widget_append(box, create_alert(UI_ALERT_VARIANT_WARNING, [color=#a5d6ff]"warning"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`                                           [color=#a5d6ff]"Storage almost full"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`                                           [color=#a5d6ff]"Free up space to continue."[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`        ui_widget_append(`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`            box, create_alert(UI_ALERT_VARIANT_DESTRUCTIVE, [color=#a5d6ff]"error-circle"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{`                              [color=#a5d6ff]"Unable to save changes"[/color], [color=#a5d6ff]"Please try again."[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">35</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, box);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">36</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -178,141 +326,281 @@ export default function AlertVariantsDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]widget[/color] [color=#0550ae]class[/color]=[color=#0a3069]"alert-variants-demo"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]alert[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"info"[/color] [color=#0550ae]class[/color]=[color=#0a3069]"mb-6"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"info"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]alert-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]alert-title[/color]>[/color]New feature available[color=#116329]</[color=#0550ae]alert-title[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]alert-description[/color]>[/color]Try the updated dashboard.[color=#116329]</[color=#0550ae]alert-description[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]alert-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]alert[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]alert[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"success"[/color] [color=#0550ae]class[/color]=[color=#0a3069]"mb-6"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"checkmark-circle"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]alert-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]alert-title[/color]>[/color]Payment successful[color=#116329]</[color=#0550ae]alert-title[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]alert-description[/color]>[/color]Your payment has been processed.[color=#116329]</[color=#0550ae]alert-description[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]alert-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]alert[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]alert[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"warning"[/color] [color=#0550ae]class[/color]=[color=#0a3069]"mb-6"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"warning"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]alert-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]alert-title[/color]>[/color]Storage almost full[color=#116329]</[color=#0550ae]alert-title[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]alert-description[/color]>[/color]Free up space to continue.[color=#116329]</[color=#0550ae]alert-description[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]alert-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]alert[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]alert[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"destructive"[/color] [color=#0550ae]class[/color]=[color=#0a3069]"mb-6"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"error-circle"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]alert-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]alert-title[/color]>[/color]Unable to save changes[color=#116329]</[color=#0550ae]alert-title[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]alert-description[/color]>[/color]Please try again.[color=#116329]</[color=#0550ae]alert-description[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]alert-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]alert[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`    [color=#116329]</[color=#0550ae]widget[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{`[color=#116329]</[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`    [color=#116329]<[color=#0550ae]widget[/color] [color=#0550ae]class[/color]=[color=#0a3069]"alert-variants-demo"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]alert[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"info"[/color] [color=#0550ae]class[/color]=[color=#0a3069]"mb-6"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"info"[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]alert-content[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]alert-title[/color]>[/color]New feature available[color=#116329]</[color=#0550ae]alert-title[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">8</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]alert-description[/color]>[/color]Try the updated dashboard.[color=#116329]</[color=#0550ae]alert-description[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">9</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]alert-content[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">10</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]alert[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">11</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]alert[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"success"[/color] [color=#0550ae]class[/color]=[color=#0a3069]"mb-6"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">12</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"checkmark-circle"[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">13</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]alert-content[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">14</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]alert-title[/color]>[/color]Payment successful[color=#116329]</[color=#0550ae]alert-title[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">15</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]alert-description[/color]>[/color]Your payment has been processed.[color=#116329]</[color=#0550ae]alert-description[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">16</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]alert-content[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">17</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]alert[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">18</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]alert[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"warning"[/color] [color=#0550ae]class[/color]=[color=#0a3069]"mb-6"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">19</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"warning"[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">20</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]alert-content[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">21</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]alert-title[/color]>[/color]Storage almost full[color=#116329]</[color=#0550ae]alert-title[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">22</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]alert-description[/color]>[/color]Free up space to continue.[color=#116329]</[color=#0550ae]alert-description[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">23</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]alert-content[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">24</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]alert[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">25</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]alert[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"destructive"[/color] [color=#0550ae]class[/color]=[color=#0a3069]"mb-6"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">26</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"error-circle"[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">27</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]alert-content[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">28</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]alert-title[/color]>[/color]Unable to save changes[color=#116329]</[color=#0550ae]alert-title[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">29</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]alert-description[/color]>[/color]Please try again.[color=#116329]</[color=#0550ae]alert-description[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">30</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]alert-content[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">31</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]alert[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">32</Text>
-                <Text className="code-line">{`    [color=#116329]</[color=#0550ae]widget[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">33</Text>
-                <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ui[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">34</Text>
-                <Text className="code-line">{`[color=#116329]</[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#7ee787]<[color=#79c0ff]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]widget[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"alert-variants-demo"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]alert[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"info"[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"mb-6"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]icon[/color] [color=#79c0ff]name[/color]=[color=#a5d6ff]"info"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]alert-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]alert-title[/color]>[/color]New feature available[color=#7ee787]</[color=#79c0ff]alert-title[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]alert-description[/color]>[/color]Try the updated dashboard.[color=#7ee787]</[color=#79c0ff]alert-description[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]alert-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]alert[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]alert[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"success"[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"mb-6"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]icon[/color] [color=#79c0ff]name[/color]=[color=#a5d6ff]"checkmark-circle"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]alert-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]alert-title[/color]>[/color]Payment successful[color=#7ee787]</[color=#79c0ff]alert-title[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]alert-description[/color]>[/color]Your payment has been processed.[color=#7ee787]</[color=#79c0ff]alert-description[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]alert-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]alert[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]alert[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"warning"[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"mb-6"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]icon[/color] [color=#79c0ff]name[/color]=[color=#a5d6ff]"warning"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]alert-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]alert-title[/color]>[/color]Storage almost full[color=#7ee787]</[color=#79c0ff]alert-title[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]alert-description[/color]>[/color]Free up space to continue.[color=#7ee787]</[color=#79c0ff]alert-description[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]alert-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]alert[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]alert[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"destructive"[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"mb-6"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]icon[/color] [color=#79c0ff]name[/color]=[color=#a5d6ff]"error-circle"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]alert-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]alert-title[/color]>[/color]Unable to save changes[color=#7ee787]</[color=#79c0ff]alert-title[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]alert-description[/color]>[/color]Please try again.[color=#7ee787]</[color=#79c0ff]alert-description[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]alert-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]alert[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`    [color=#7ee787]</[color=#79c0ff]widget[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{`[color=#7ee787]</[color=#79c0ff]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -323,29 +611,57 @@ export default function AlertVariantsDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "144px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]alert_variants_xml_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, ui_create_widget([color=#0550ae]NULL[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]alert_variants_xml_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`        ui_widget_append(parent, ui_create_widget([color=#0550ae]NULL[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]alert_variants_xml_init[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, ui_create_widget([color=#79c0ff]NULL[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -356,173 +672,345 @@ export default function AlertVariantsDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Alert[/color], [color=#8250df]AlertContent[/color], [color=#8250df]AlertDescription[/color], [color=#8250df]AlertTitle[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Alert[/color], [color=#8250df]AlertContent[/color], [color=#8250df]AlertDescription[/color], [color=#8250df]AlertTitle[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  [color=#8250df]CheckmarkCircle[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`  [color=#8250df]ErrorCircle[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`  [color=#8250df]Info[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`  [color=#8250df]Warning[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/fluent-icons"[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]Example[/color]([color=#0550ae][/color]) {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]widget[/color] [color=#0550ae]className[/color]=[color=#0a3069]"block w-full max-w-md"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Alert[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"info"[/color] [color=#0550ae]className[/color]=[color=#0a3069]"mb-6"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Info[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]AlertContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertTitle[/color]>[/color]New feature available[color=#116329]</[color=#0550ae]AlertTitle[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertDescription[/color]>[/color]Try the updated dashboard.[color=#116329]</[color=#0550ae]AlertDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]AlertContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]Alert[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Alert[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"success"[/color] [color=#0550ae]className[/color]=[color=#0a3069]"mb-6"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]CheckmarkCircle[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]AlertContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertTitle[/color]>[/color]Payment successful[color=#116329]</[color=#0550ae]AlertTitle[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertDescription[/color]>[/color]Your payment has been processed.[color=#116329]</[color=#0550ae]AlertDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]AlertContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]Alert[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Alert[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"warning"[/color] [color=#0550ae]className[/color]=[color=#0a3069]"mb-6"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Warning[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]AlertContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertTitle[/color]>[/color]Storage almost full[color=#116329]</[color=#0550ae]AlertTitle[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertDescription[/color]>[/color]Free up space to continue.[color=#116329]</[color=#0550ae]AlertDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]AlertContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]Alert[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Alert[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"destructive"[/color] [color=#0550ae]className[/color]=[color=#0a3069]"mb-6"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]ErrorCircle[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">35</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]AlertContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">36</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertTitle[/color]>[/color]Unable to save changes[color=#116329]</[color=#0550ae]AlertTitle[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">37</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertDescription[/color]>[/color]Please try again.[color=#116329]</[color=#0550ae]AlertDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">38</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]AlertContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">39</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]Alert[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">40</Text>
+                  <Text className="code-line">{`    [color=#116329]</[color=#0550ae]widget[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">41</Text>
+                  <Text className="code-line">{`  );`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">42</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`  [color=#8250df]CheckmarkCircle[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`  [color=#8250df]ErrorCircle[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`  [color=#8250df]Info[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`  [color=#8250df]Warning[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/fluent-icons"[/color];`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">8</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">9</Text>
-                <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]Example[/color]([color=#0550ae][/color]) {`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">10</Text>
-                <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">11</Text>
-                <Text className="code-line">{`    [color=#116329]<[color=#0550ae]widget[/color] [color=#0550ae]className[/color]=[color=#0a3069]"block w-full max-w-md"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">12</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Alert[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"info"[/color] [color=#0550ae]className[/color]=[color=#0a3069]"mb-6"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">13</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Info[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">14</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]AlertContent[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">15</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertTitle[/color]>[/color]New feature available[color=#116329]</[color=#0550ae]AlertTitle[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">16</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertDescription[/color]>[/color]Try the updated dashboard.[color=#116329]</[color=#0550ae]AlertDescription[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">17</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]AlertContent[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">18</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]Alert[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">19</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Alert[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"success"[/color] [color=#0550ae]className[/color]=[color=#0a3069]"mb-6"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">20</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]CheckmarkCircle[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">21</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]AlertContent[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">22</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertTitle[/color]>[/color]Payment successful[color=#116329]</[color=#0550ae]AlertTitle[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">23</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertDescription[/color]>[/color]Your payment has been processed.[color=#116329]</[color=#0550ae]AlertDescription[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">24</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]AlertContent[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">25</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]Alert[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">26</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Alert[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"warning"[/color] [color=#0550ae]className[/color]=[color=#0a3069]"mb-6"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">27</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Warning[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">28</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]AlertContent[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">29</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertTitle[/color]>[/color]Storage almost full[color=#116329]</[color=#0550ae]AlertTitle[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">30</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertDescription[/color]>[/color]Free up space to continue.[color=#116329]</[color=#0550ae]AlertDescription[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">31</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]AlertContent[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">32</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]Alert[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">33</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Alert[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"destructive"[/color] [color=#0550ae]className[/color]=[color=#0a3069]"mb-6"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">34</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]ErrorCircle[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">35</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]AlertContent[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">36</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertTitle[/color]>[/color]Unable to save changes[color=#116329]</[color=#0550ae]AlertTitle[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">37</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AlertDescription[/color]>[/color]Please try again.[color=#116329]</[color=#0550ae]AlertDescription[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">38</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]AlertContent[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">39</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]Alert[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">40</Text>
-                <Text className="code-line">{`    [color=#116329]</[color=#0550ae]widget[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">41</Text>
-                <Text className="code-line">{`  );`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">42</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#ff7b72]import[/color] { [color=#d2a8ff]Alert[/color], [color=#d2a8ff]AlertContent[/color], [color=#d2a8ff]AlertDescription[/color], [color=#d2a8ff]AlertTitle[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#ff7b72]import[/color] {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]CheckmarkCircle[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]ErrorCircle[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]Info[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]Warning[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`} [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/fluent-icons"[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`[color=#ff7b72]export[/color] [color=#ff7b72]default[/color] [color=#ff7b72]function[/color] [color=#d2a8ff]Example[/color]([color=#79c0ff][/color]) {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`  [color=#ff7b72]return[/color] (`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]widget[/color] [color=#79c0ff]className[/color]=[color=#a5d6ff]"block w-full max-w-md"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]Alert[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"info"[/color] [color=#79c0ff]className[/color]=[color=#a5d6ff]"mb-6"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]Info[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]AlertContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]AlertTitle[/color]>[/color]New feature available[color=#7ee787]</[color=#79c0ff]AlertTitle[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]AlertDescription[/color]>[/color]Try the updated dashboard.[color=#7ee787]</[color=#79c0ff]AlertDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]AlertContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]Alert[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]Alert[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"success"[/color] [color=#79c0ff]className[/color]=[color=#a5d6ff]"mb-6"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]CheckmarkCircle[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]AlertContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]AlertTitle[/color]>[/color]Payment successful[color=#7ee787]</[color=#79c0ff]AlertTitle[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]AlertDescription[/color]>[/color]Your payment has been processed.[color=#7ee787]</[color=#79c0ff]AlertDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]AlertContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]Alert[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]Alert[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"warning"[/color] [color=#79c0ff]className[/color]=[color=#a5d6ff]"mb-6"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]Warning[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]AlertContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]AlertTitle[/color]>[/color]Storage almost full[color=#7ee787]</[color=#79c0ff]AlertTitle[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]AlertDescription[/color]>[/color]Free up space to continue.[color=#7ee787]</[color=#79c0ff]AlertDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]AlertContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]Alert[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]Alert[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"destructive"[/color] [color=#79c0ff]className[/color]=[color=#a5d6ff]"mb-6"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]ErrorCircle[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">35</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]AlertContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">36</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]AlertTitle[/color]>[/color]Unable to save changes[color=#7ee787]</[color=#79c0ff]AlertTitle[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">37</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]AlertDescription[/color]>[/color]Please try again.[color=#7ee787]</[color=#79c0ff]AlertDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">38</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]AlertContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">39</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]Alert[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">40</Text>
+                  <Text className="code-line">{`    [color=#7ee787]</[color=#79c0ff]widget[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">41</Text>
+                  <Text className="code-line">{`  );`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">42</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -533,33 +1021,65 @@ export default function AlertVariantsDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]"example.h"[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]alert_variants_tsx_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]"example.h"[/color][/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]alert_variants_tsx_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]"example.h"[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]alert_variants_tsx_init[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />

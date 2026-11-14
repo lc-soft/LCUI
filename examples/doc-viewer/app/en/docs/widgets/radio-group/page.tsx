@@ -20,8 +20,8 @@ export default function RadioGroupDocPage() {
         <ul>
           <li><Text>{`[b]Suitable[/b]: pick exactly one option from a mutually exclusive set (view density, sort order, single-choice enumerations).`}</Text></li>
           <li><Text>{`[b]Suitable[/b]: simple cases with a fixed 2–7 options.`}</Text></li>
-          <li><Text>{`[b]Not suitable[/b]: scenarios that allow multiple concurrent selections (use [bgcolor=#eee] checkbox [/bgcolor]).`}</Text></li>
-          <li><Text>{`[b]Not suitable[/b]: large option lists that need search or filtering (no [bgcolor=#eee] select [/bgcolor] provided yet).`}</Text></li>
+          <li><Text>{`[b]Not suitable[/b]: scenarios that allow multiple concurrent selections (use [bgcolor=#7f7f7f29] checkbox [/bgcolor]).`}</Text></li>
+          <li><Text>{`[b]Not suitable[/b]: large option lists that need search or filtering (no [bgcolor=#7f7f7f29] select [/bgcolor] provided yet).`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
@@ -34,9 +34,17 @@ export default function RadioGroupDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]RadioGroup[/color], [color=#8250df]RadioGroupItem[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]RadioGroup[/color], [color=#8250df]RadioGroupItem[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] { [color=#d2a8ff]RadioGroup[/color], [color=#d2a8ff]RadioGroupItem[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -52,25 +60,49 @@ export default function RadioGroupDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "124px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]RadioGroup[/color] value=[color=#0a3069]"comfortable"[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]RadioGroup[/color] value=[color=#0a3069]"comfortable"[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]RadioGroupItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"default"[/color] [color=#0550ae]id[/color]=[color=#0a3069]"r1"[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]RadioGroupItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"comfortable"[/color] [color=#0550ae]id[/color]=[color=#0a3069]"r2"[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]RadioGroupItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"compact"[/color] [color=#0550ae]id[/color]=[color=#0a3069]"r3"[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`</[color=#8250df]RadioGroup[/color]>`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]RadioGroupItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"default"[/color] [color=#0550ae]id[/color]=[color=#0a3069]"r1"[/color] />[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]RadioGroupItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"comfortable"[/color] [color=#0550ae]id[/color]=[color=#0a3069]"r2"[/color] />[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]RadioGroupItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"compact"[/color] [color=#0550ae]id[/color]=[color=#0a3069]"r3"[/color] />[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`</[color=#8250df]RadioGroup[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]RadioGroup[/color] value=[color=#a5d6ff]"comfortable"[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]RadioGroupItem[/color] [color=#79c0ff]value[/color]=[color=#a5d6ff]"default"[/color] [color=#79c0ff]id[/color]=[color=#a5d6ff]"r1"[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]RadioGroupItem[/color] [color=#79c0ff]value[/color]=[color=#a5d6ff]"comfortable"[/color] [color=#79c0ff]id[/color]=[color=#a5d6ff]"r2"[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]RadioGroupItem[/color] [color=#79c0ff]value[/color]=[color=#a5d6ff]"compact"[/color] [color=#79c0ff]id[/color]=[color=#a5d6ff]"r3"[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`</[color=#d2a8ff]RadioGroup[/color]>`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -81,7 +113,7 @@ export default function RadioGroupDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>Composition</h2>
-        <p>{`Use the following composition to build a [bgcolor=#eee] RadioGroup [/bgcolor]:`}</p>
+        <p>{`Use the following composition to build a [bgcolor=#7f7f7f29] RadioGroup [/bgcolor]:`}</p>
         <Widget className="code-block" data-language="text" data-source="en/widgets/radio-group/2">
           <Widget className="code-block-header">
             <Text className="code-block-title">TEXT</Text>
@@ -90,16 +122,23 @@ export default function RadioGroupDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "84px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Text className="code-line">{`RadioGroup`}</Text>
-                <Text className="code-line">{`├── RadioGroupItem`}</Text>
-                <Text className="code-line">{`└── RadioGroupItem`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Text className="code-line">{`RadioGroup`}</Text>
+                  <Text className="code-line">{`├── RadioGroupItem`}</Text>
+                  <Text className="code-line">{`└── RadioGroupItem`}</Text>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Text className="code-line">{`RadioGroup`}</Text>
+                  <Text className="code-line">{`├── RadioGroupItem`}</Text>
+                  <Text className="code-line">{`└── RadioGroupItem`}</Text>
+                </Widget>
               </ScrollAreaContent>
               <Scrollbar />
               <Scrollbar orientation="horizontal" />
             </ScrollArea>
           </Widget>
         </Widget>
-        <p>{`In practice, each item is paired with a [bgcolor=#eee] Label [/bgcolor] placed in the same flex row, with the Label's [bgcolor=#eee] for [/bgcolor] pointing at the RadioGroupItem's [bgcolor=#eee] id [/bgcolor]—clicking the Label forwards the click event to the matching item.`}</p>
+        <p>{`In practice, each item is paired with a [bgcolor=#7f7f7f29] Label [/bgcolor] placed in the same flex row, with the Label's [bgcolor=#7f7f7f29] for [/bgcolor] pointing at the RadioGroupItem's [bgcolor=#7f7f7f29] id [/bgcolor]—clicking the Label forwards the click event to the matching item.`}</p>
       </Widget>
       <Widget className="doc-section">
         <h2>Examples</h2>

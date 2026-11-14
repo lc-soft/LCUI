@@ -19,7 +19,7 @@ export default function SpinnerDocPage() {
         <ul>
           <li><Text>{`[b]适用[/b]：等待异步结果、无法预知进度的加载状态`}</Text></li>
           <li><Text>{`[b]适用[/b]：按钮、卡片等局部区域的忙碌指示`}</Text></li>
-          <li><Text>{`[b]不适用[/b]：有明确百分比或已知时长的任务进度（用 [bgcolor=#eee] progress [/bgcolor]）`}</Text></li>
+          <li><Text>{`[b]不适用[/b]：有明确百分比或已知时长的任务进度（用 [bgcolor=#7f7f7f29] progress [/bgcolor]）`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
@@ -32,9 +32,17 @@ export default function SpinnerDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Spinner[/color], [color=#8250df]SpinnerContent[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Spinner[/color], [color=#8250df]SpinnerContent[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] { [color=#d2a8ff]Spinner[/color], [color=#d2a8ff]SpinnerContent[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -50,9 +58,17 @@ export default function SpinnerDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]Spinner[/color] running={[color=#0550ae]true[/color]} speed={[color=#0550ae]1[/color]} />`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]Spinner[/color] running={[color=#0550ae]true[/color]} speed={[color=#0550ae]1[/color]} />`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]Spinner[/color] running={[color=#79c0ff]true[/color]} speed={[color=#79c0ff]1[/color]} />`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -63,7 +79,7 @@ export default function SpinnerDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>组合</h2>
-        <p>{`使用以下组合来构建 [bgcolor=#eee] Spinner [/bgcolor]：`}</p>
+        <p>{`使用以下组合来构建 [bgcolor=#7f7f7f29] Spinner [/bgcolor]：`}</p>
         <Widget className="code-block" data-language="text" data-source="zh-CN/widgets/spinner/2">
           <Widget className="code-block-header">
             <Text className="code-block-title">TEXT</Text>
@@ -72,8 +88,14 @@ export default function SpinnerDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "64px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Text className="code-line">{`Spinner`}</Text>
-                <Text className="code-line">{`└── SpinnerContent`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Text className="code-line">{`Spinner`}</Text>
+                  <Text className="code-line">{`└── SpinnerContent`}</Text>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Text className="code-line">{`Spinner`}</Text>
+                  <Text className="code-line">{`└── SpinnerContent`}</Text>
+                </Widget>
               </ScrollAreaContent>
               <Scrollbar />
               <Scrollbar orientation="horizontal" />
@@ -93,7 +115,7 @@ export default function SpinnerDocPage() {
       <Widget className="doc-section">
         <h2>API 参考</h2>
         <h3>Spinner</h3>
-        <p>{`旋转指示器容器，捕获 [bgcolor=#eee] SpinnerContent [/bgcolor] 子树并绕其中心旋转绘制。默认自带 16×16 尺寸，可用 [bgcolor=#eee] width [/bgcolor]/[bgcolor=#eee] height [/bgcolor] 覆盖。`}</p>
+        <p>{`旋转指示器容器，捕获 [bgcolor=#7f7f7f29] SpinnerContent [/bgcolor] 子树并绕其中心旋转绘制。默认自带 16×16 尺寸，可用 [bgcolor=#7f7f7f29] width [/bgcolor]/[bgcolor=#7f7f7f29] height [/bgcolor] 覆盖。`}</p>
         <FieldTable fields={spinnerFields} locale="zh-CN" />
         <h3>SpinnerContent</h3>
         <p>{`被旋转捕获的内容子树，作为 Spinner 的直接子部件使用；省略时使用默认的圆环，其中一边透明形成随旋转扫过的缺口。`}</p>

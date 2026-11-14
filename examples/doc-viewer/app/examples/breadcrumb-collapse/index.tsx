@@ -25,57 +25,113 @@ export default function BreadcrumbCollapseDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]breadcrumb_collapse_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *breadcrumb = ui_create_breadcrumb();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(breadcrumb, [color=#0a3069]"breadcrumb-collapse-demo"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`        ui_breadcrumb_build_from_path(breadcrumb,`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`                                      [color=#0a3069]"/workspace/projects/lcui/components/"[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`                                      [color=#0a3069]"breadcrumb/navigation"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`                                      [color=#0550ae]NULL[/color], [color=#0550ae]NULL[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, breadcrumb);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]breadcrumb_collapse_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *breadcrumb = ui_create_breadcrumb();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`        ui_widget_add_class(breadcrumb, [color=#0a3069]"breadcrumb-collapse-demo"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">8</Text>
-                <Text className="code-line">{`        ui_breadcrumb_build_from_path(breadcrumb,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">9</Text>
-                <Text className="code-line">{`                                      [color=#0a3069]"/workspace/projects/lcui/components/"[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">10</Text>
-                <Text className="code-line">{`                                      [color=#0a3069]"breadcrumb/navigation"[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">11</Text>
-                <Text className="code-line">{`                                      [color=#0550ae]NULL[/color], [color=#0550ae]NULL[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">12</Text>
-                <Text className="code-line">{`        ui_widget_append(parent, breadcrumb);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">13</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]breadcrumb_collapse_init[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *breadcrumb = ui_create_breadcrumb();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(breadcrumb, [color=#a5d6ff]"breadcrumb-collapse-demo"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`        ui_breadcrumb_build_from_path(breadcrumb,`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`                                      [color=#a5d6ff]"/workspace/projects/lcui/components/"[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`                                      [color=#a5d6ff]"breadcrumb/navigation"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`                                      [color=#79c0ff]NULL[/color], [color=#79c0ff]NULL[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, breadcrumb);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -86,33 +142,65 @@ export default function BreadcrumbCollapseDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]breadcrumb[/color] [color=#0550ae]class[/color]=[color=#0a3069]"breadcrumb-collapse-demo"[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`[color=#116329]               [color=#0550ae]path[/color]=[color=#0a3069]"/workspace/projects/lcui/components/breadcrumb/navigation"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`[color=#116329]</[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`    [color=#116329]<[color=#0550ae]breadcrumb[/color] [color=#0550ae]class[/color]=[color=#0a3069]"breadcrumb-collapse-demo"[/color][/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`[color=#116329]               [color=#0550ae]path[/color]=[color=#0a3069]"/workspace/projects/lcui/components/breadcrumb/navigation"[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ui[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`[color=#116329]</[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]<?xml version=[color=#a5d6ff]"1.0"[/color] encoding=[color=#a5d6ff]"UTF-8"[/color] ?>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#7ee787]<[color=#79c0ff]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]breadcrumb[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"breadcrumb-collapse-demo"[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`[color=#7ee787]               [color=#79c0ff]path[/color]=[color=#a5d6ff]"/workspace/projects/lcui/components/breadcrumb/navigation"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`[color=#7ee787]</[color=#79c0ff]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -123,29 +211,57 @@ export default function BreadcrumbCollapseDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "144px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]breadcrumb_collapse_xml_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, ui_create_widget([color=#0550ae]NULL[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]breadcrumb_collapse_xml_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`        ui_widget_append(parent, ui_create_widget([color=#0550ae]NULL[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]breadcrumb_collapse_xml_init[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, ui_create_widget([color=#79c0ff]NULL[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -156,45 +272,89 @@ export default function BreadcrumbCollapseDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Breadcrumb[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Breadcrumb[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]Example[/color]([color=#0550ae][/color]) {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Breadcrumb[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`[color=#116329]      [color=#0550ae]className[/color]=[color=#0a3069]"breadcrumb-collapse-demo w-\\[320px]"[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`[color=#116329]      [color=#0550ae]path[/color]=[color=#0a3069]"/workspace/projects/lcui/components/breadcrumb/navigation"[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`[color=#116329]    />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`  );`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]Example[/color]([color=#0550ae][/color]) {`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Breadcrumb[/color][/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`[color=#116329]      [color=#0550ae]className[/color]=[color=#0a3069]"breadcrumb-collapse-demo w-\\[320px]"[/color][/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`[color=#116329]      [color=#0550ae]path[/color]=[color=#0a3069]"/workspace/projects/lcui/components/breadcrumb/navigation"[/color][/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">8</Text>
-                <Text className="code-line">{`[color=#116329]    />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">9</Text>
-                <Text className="code-line">{`  );`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">10</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#ff7b72]import[/color] { [color=#d2a8ff]Breadcrumb[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#ff7b72]export[/color] [color=#ff7b72]default[/color] [color=#ff7b72]function[/color] [color=#d2a8ff]Example[/color]([color=#79c0ff][/color]) {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`  [color=#ff7b72]return[/color] (`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]Breadcrumb[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`[color=#7ee787]      [color=#79c0ff]className[/color]=[color=#a5d6ff]"breadcrumb-collapse-demo w-\\[320px]"[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`[color=#7ee787]      [color=#79c0ff]path[/color]=[color=#a5d6ff]"/workspace/projects/lcui/components/breadcrumb/navigation"[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`[color=#7ee787]    />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`  );`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -205,33 +365,65 @@ export default function BreadcrumbCollapseDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]"example.h"[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]breadcrumb_collapse_tsx_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]"example.h"[/color][/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]breadcrumb_collapse_tsx_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]"example.h"[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]breadcrumb_collapse_tsx_init[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />

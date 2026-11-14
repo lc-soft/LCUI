@@ -18,7 +18,7 @@ export default function BadgeDocPage() {
         <ul>
           <li><Text>{`[b]适用[/b]：在列表、卡片和表单中标记状态或分类`}</Text></li>
           <li><Text>{`[b]适用[/b]：展示简短的计数或提示文本`}</Text></li>
-          <li><Text>{`[b]不适用[/b]：需要点击行为的命令控件（用 [bgcolor=#eee] button [/bgcolor]）`}</Text></li>
+          <li><Text>{`[b]不适用[/b]：需要点击行为的命令控件（用 [bgcolor=#7f7f7f29] button [/bgcolor]）`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
@@ -31,9 +31,17 @@ export default function BadgeDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Badge[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Badge[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] { [color=#d2a8ff]Badge[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -49,9 +57,17 @@ export default function BadgeDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]Badge[/color] variant=[color=#0a3069]"secondary"[/color]>[color=#8250df]Secondary[/color]</[color=#8250df]Badge[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]Badge[/color] variant=[color=#0a3069]"secondary"[/color]>[color=#8250df]Secondary[/color]</[color=#8250df]Badge[/color]>`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]Badge[/color] variant=[color=#a5d6ff]"secondary"[/color]>[color=#d2a8ff]Secondary[/color]</[color=#d2a8ff]Badge[/color]>`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -62,7 +78,7 @@ export default function BadgeDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>变体</h2>
-        <p>{`使用 [bgcolor=#eee] variant [/bgcolor] 属性切换徽标的预置外观。`}</p>
+        <p>{`使用 [bgcolor=#7f7f7f29] variant [/bgcolor] 属性切换徽标的预置外观。`}</p>
         <BadgeVariantsDemo />
       </Widget>
       <Widget className="doc-section">
@@ -72,7 +88,7 @@ export default function BadgeDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>自定义颜色</h2>
-        <p>{`使用 [bgcolor=#eee] color [/bgcolor] 属性或 [bgcolor=#eee] ui_badge_set_color() [/bgcolor] 设置命名配色。`}</p>
+        <p>{`使用 [bgcolor=#7f7f7f29] color [/bgcolor] 属性或 [bgcolor=#7f7f7f29] ui_badge_set_color() [/bgcolor] 设置命名配色。`}</p>
         <BadgeColorsDemo />
       </Widget>
       <Widget className="doc-section">

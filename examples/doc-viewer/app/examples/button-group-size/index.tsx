@@ -25,217 +25,433 @@ export default function ButtonGroupSizeDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_text[/color][color=#0550ae]([color=#953800]const[/color] [color=#953800]char[/color] *content)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *text = ui_create_widget([color=#0a3069]"text"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`        ui_text_set_content(text, content);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`        [color=#cf222e]return[/color] text;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_text_button[/color][color=#0550ae]([color=#953800]const[/color] [color=#953800]char[/color] *label, [color=#953800]ui_button_size_t[/color] size)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *button = ui_create_button();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`        ui_button_set_variant(button, UI_BUTTON_VARIANT_OUTLINE);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`        ui_button_set_size(button, size);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`        ui_widget_append(button, create_text(label));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`        [color=#cf222e]return[/color] button;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_icon_button[/color][color=#0550ae]([color=#953800]ui_button_size_t[/color] size)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *button = ui_create_button();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`        ui_button_set_variant(button, UI_BUTTON_VARIANT_OUTLINE);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`        ui_button_set_size(button, size);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`        ui_widget_append(button, ui_create_fluent_icon([color=#0a3069]"add"[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`        [color=#cf222e]return[/color] button;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]void[/color] [color=#8250df]add_size_group[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent, [color=#953800]ui_button_size_t[/color] text_size,[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`[color=#0550ae]                           [color=#953800]ui_button_size_t[/color] icon_size, [color=#953800]const[/color] [color=#953800]char[/color] *first)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *group = ui_create_button_group();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">35</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">36</Text>
+                  <Text className="code-line">{`        ui_widget_append(group, create_text_button(first, text_size));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">37</Text>
+                  <Text className="code-line">{`        ui_widget_append(group, create_text_button([color=#0a3069]"Button"[/color], text_size));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">38</Text>
+                  <Text className="code-line">{`        ui_widget_append(group, create_text_button([color=#0a3069]"Group"[/color], text_size));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">39</Text>
+                  <Text className="code-line">{`        ui_widget_append(group, create_icon_button(icon_size));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">40</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, group);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">41</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">42</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">43</Text>
+                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]button_group_size_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">44</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">45</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *box = ui_create_widget([color=#0550ae]NULL[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">46</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">47</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(box, [color=#0a3069]"button-group-size-demo"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">48</Text>
+                  <Text className="code-line">{`        add_size_group(box, UI_BUTTON_SIZE_SM, UI_BUTTON_SIZE_ICON_SM, [color=#0a3069]"Small"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">49</Text>
+                  <Text className="code-line">{`        add_size_group(box, UI_BUTTON_SIZE_DEFAULT, UI_BUTTON_SIZE_ICON,`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">50</Text>
+                  <Text className="code-line">{`                       [color=#0a3069]"Default"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">51</Text>
+                  <Text className="code-line">{`        add_size_group(box, UI_BUTTON_SIZE_LG, UI_BUTTON_SIZE_ICON_LG, [color=#0a3069]"Large"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">52</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, box);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">53</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_text[/color][color=#0550ae]([color=#953800]const[/color] [color=#953800]char[/color] *content)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *text = ui_create_widget([color=#0a3069]"text"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`        ui_text_set_content(text, content);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">8</Text>
-                <Text className="code-line">{`        [color=#cf222e]return[/color] text;`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">9</Text>
-                <Text className="code-line">{`}`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">10</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">11</Text>
-                <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_text_button[/color][color=#0550ae]([color=#953800]const[/color] [color=#953800]char[/color] *label, [color=#953800]ui_button_size_t[/color] size)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">12</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">13</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *button = ui_create_button();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">14</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">15</Text>
-                <Text className="code-line">{`        ui_button_set_variant(button, UI_BUTTON_VARIANT_OUTLINE);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">16</Text>
-                <Text className="code-line">{`        ui_button_set_size(button, size);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">17</Text>
-                <Text className="code-line">{`        ui_widget_append(button, create_text(label));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">18</Text>
-                <Text className="code-line">{`        [color=#cf222e]return[/color] button;`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">19</Text>
-                <Text className="code-line">{`}`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">20</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">21</Text>
-                <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_icon_button[/color][color=#0550ae]([color=#953800]ui_button_size_t[/color] size)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">22</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">23</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *button = ui_create_button();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">24</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">25</Text>
-                <Text className="code-line">{`        ui_button_set_variant(button, UI_BUTTON_VARIANT_OUTLINE);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">26</Text>
-                <Text className="code-line">{`        ui_button_set_size(button, size);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">27</Text>
-                <Text className="code-line">{`        ui_widget_append(button, ui_create_fluent_icon([color=#0a3069]"add"[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">28</Text>
-                <Text className="code-line">{`        [color=#cf222e]return[/color] button;`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">29</Text>
-                <Text className="code-line">{`}`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">30</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">31</Text>
-                <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]void[/color] [color=#8250df]add_size_group[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent, [color=#953800]ui_button_size_t[/color] text_size,[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">32</Text>
-                <Text className="code-line">{`[color=#0550ae]                           [color=#953800]ui_button_size_t[/color] icon_size, [color=#953800]const[/color] [color=#953800]char[/color] *first)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">33</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">34</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *group = ui_create_button_group();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">35</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">36</Text>
-                <Text className="code-line">{`        ui_widget_append(group, create_text_button(first, text_size));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">37</Text>
-                <Text className="code-line">{`        ui_widget_append(group, create_text_button([color=#0a3069]"Button"[/color], text_size));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">38</Text>
-                <Text className="code-line">{`        ui_widget_append(group, create_text_button([color=#0a3069]"Group"[/color], text_size));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">39</Text>
-                <Text className="code-line">{`        ui_widget_append(group, create_icon_button(icon_size));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">40</Text>
-                <Text className="code-line">{`        ui_widget_append(parent, group);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">41</Text>
-                <Text className="code-line">{`}`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">42</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">43</Text>
-                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]button_group_size_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">44</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">45</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *box = ui_create_widget([color=#0550ae]NULL[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">46</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">47</Text>
-                <Text className="code-line">{`        ui_widget_add_class(box, [color=#0a3069]"button-group-size-demo"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">48</Text>
-                <Text className="code-line">{`        add_size_group(box, UI_BUTTON_SIZE_SM, UI_BUTTON_SIZE_ICON_SM, [color=#0a3069]"Small"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">49</Text>
-                <Text className="code-line">{`        add_size_group(box, UI_BUTTON_SIZE_DEFAULT, UI_BUTTON_SIZE_ICON,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">50</Text>
-                <Text className="code-line">{`                       [color=#0a3069]"Default"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">51</Text>
-                <Text className="code-line">{`        add_size_group(box, UI_BUTTON_SIZE_LG, UI_BUTTON_SIZE_ICON_LG, [color=#0a3069]"Large"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">52</Text>
-                <Text className="code-line">{`        ui_widget_append(parent, box);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">53</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#ffa657]static[/color] [color=#ffa657]ui_widget_t[/color] *[color=#d2a8ff]create_text[/color][color=#79c0ff]([color=#ffa657]const[/color] [color=#ffa657]char[/color] *content)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *text = ui_create_widget([color=#a5d6ff]"text"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`        ui_text_set_content(text, content);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`        [color=#ff7b72]return[/color] text;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`[color=#ffa657]static[/color] [color=#ffa657]ui_widget_t[/color] *[color=#d2a8ff]create_text_button[/color][color=#79c0ff]([color=#ffa657]const[/color] [color=#ffa657]char[/color] *label, [color=#ffa657]ui_button_size_t[/color] size)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *button = ui_create_button();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`        ui_button_set_variant(button, UI_BUTTON_VARIANT_OUTLINE);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`        ui_button_set_size(button, size);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`        ui_widget_append(button, create_text(label));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`        [color=#ff7b72]return[/color] button;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`[color=#ffa657]static[/color] [color=#ffa657]ui_widget_t[/color] *[color=#d2a8ff]create_icon_button[/color][color=#79c0ff]([color=#ffa657]ui_button_size_t[/color] size)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *button = ui_create_button();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`        ui_button_set_variant(button, UI_BUTTON_VARIANT_OUTLINE);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`        ui_button_set_size(button, size);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`        ui_widget_append(button, ui_create_fluent_icon([color=#a5d6ff]"add"[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`        [color=#ff7b72]return[/color] button;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`[color=#ffa657]static[/color] [color=#ffa657]void[/color] [color=#d2a8ff]add_size_group[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *parent, [color=#ffa657]ui_button_size_t[/color] text_size,[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`[color=#79c0ff]                           [color=#ffa657]ui_button_size_t[/color] icon_size, [color=#ffa657]const[/color] [color=#ffa657]char[/color] *first)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *group = ui_create_button_group();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">35</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">36</Text>
+                  <Text className="code-line">{`        ui_widget_append(group, create_text_button(first, text_size));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">37</Text>
+                  <Text className="code-line">{`        ui_widget_append(group, create_text_button([color=#a5d6ff]"Button"[/color], text_size));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">38</Text>
+                  <Text className="code-line">{`        ui_widget_append(group, create_text_button([color=#a5d6ff]"Group"[/color], text_size));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">39</Text>
+                  <Text className="code-line">{`        ui_widget_append(group, create_icon_button(icon_size));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">40</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, group);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">41</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">42</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">43</Text>
+                  <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]button_group_size_init[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">44</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">45</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *box = ui_create_widget([color=#79c0ff]NULL[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">46</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">47</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(box, [color=#a5d6ff]"button-group-size-demo"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">48</Text>
+                  <Text className="code-line">{`        add_size_group(box, UI_BUTTON_SIZE_SM, UI_BUTTON_SIZE_ICON_SM, [color=#a5d6ff]"Small"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">49</Text>
+                  <Text className="code-line">{`        add_size_group(box, UI_BUTTON_SIZE_DEFAULT, UI_BUTTON_SIZE_ICON,`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">50</Text>
+                  <Text className="code-line">{`                       [color=#a5d6ff]"Default"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">51</Text>
+                  <Text className="code-line">{`        add_size_group(box, UI_BUTTON_SIZE_LG, UI_BUTTON_SIZE_ICON_LG, [color=#a5d6ff]"Large"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">52</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, box);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">53</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -246,105 +462,209 @@ export default function ButtonGroupSizeDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]widget[/color] [color=#0550ae]class[/color]=[color=#0a3069]"button-group-size-demo"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]button-group[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color]>[/color][color=#116329]<[color=#0550ae]text[/color]>[/color]Small[color=#116329]</[color=#0550ae]text[/color]>[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color]>[/color][color=#116329]<[color=#0550ae]text[/color]>[/color]Button[color=#116329]</[color=#0550ae]text[/color]>[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color]>[/color][color=#116329]<[color=#0550ae]text[/color]>[/color]Group[color=#116329]</[color=#0550ae]text[/color]>[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"icon-sm"[/color]>[/color][color=#116329]<[color=#0550ae]icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"add"[/color] />[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]button-group[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]button-group[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color]>[/color][color=#116329]<[color=#0550ae]text[/color]>[/color]Default[color=#116329]</[color=#0550ae]text[/color]>[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color]>[/color][color=#116329]<[color=#0550ae]text[/color]>[/color]Button[color=#116329]</[color=#0550ae]text[/color]>[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color]>[/color][color=#116329]<[color=#0550ae]text[/color]>[/color]Group[color=#116329]</[color=#0550ae]text[/color]>[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"icon"[/color]>[/color][color=#116329]<[color=#0550ae]icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"add"[/color] />[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]button-group[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]button-group[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"lg"[/color]>[/color][color=#116329]<[color=#0550ae]text[/color]>[/color]Large[color=#116329]</[color=#0550ae]text[/color]>[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"lg"[/color]>[/color][color=#116329]<[color=#0550ae]text[/color]>[/color]Button[color=#116329]</[color=#0550ae]text[/color]>[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"lg"[/color]>[/color][color=#116329]<[color=#0550ae]text[/color]>[/color]Group[color=#116329]</[color=#0550ae]text[/color]>[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"icon-lg"[/color]>[/color][color=#116329]<[color=#0550ae]icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"add"[/color] />[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]button-group[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`    [color=#116329]</[color=#0550ae]widget[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`[color=#116329]</[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`    [color=#116329]<[color=#0550ae]widget[/color] [color=#0550ae]class[/color]=[color=#0a3069]"button-group-size-demo"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]button-group[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color]>[/color][color=#116329]<[color=#0550ae]text[/color]>[/color]Small[color=#116329]</[color=#0550ae]text[/color]>[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color]>[/color][color=#116329]<[color=#0550ae]text[/color]>[/color]Button[color=#116329]</[color=#0550ae]text[/color]>[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">8</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color]>[/color][color=#116329]<[color=#0550ae]text[/color]>[/color]Group[color=#116329]</[color=#0550ae]text[/color]>[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">9</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"icon-sm"[/color]>[/color][color=#116329]<[color=#0550ae]icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"add"[/color] />[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">10</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]button-group[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">11</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]button-group[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">12</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color]>[/color][color=#116329]<[color=#0550ae]text[/color]>[/color]Default[color=#116329]</[color=#0550ae]text[/color]>[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">13</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color]>[/color][color=#116329]<[color=#0550ae]text[/color]>[/color]Button[color=#116329]</[color=#0550ae]text[/color]>[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">14</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color]>[/color][color=#116329]<[color=#0550ae]text[/color]>[/color]Group[color=#116329]</[color=#0550ae]text[/color]>[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">15</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"icon"[/color]>[/color][color=#116329]<[color=#0550ae]icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"add"[/color] />[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">16</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]button-group[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">17</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]button-group[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">18</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"lg"[/color]>[/color][color=#116329]<[color=#0550ae]text[/color]>[/color]Large[color=#116329]</[color=#0550ae]text[/color]>[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">19</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"lg"[/color]>[/color][color=#116329]<[color=#0550ae]text[/color]>[/color]Button[color=#116329]</[color=#0550ae]text[/color]>[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">20</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"lg"[/color]>[/color][color=#116329]<[color=#0550ae]text[/color]>[/color]Group[color=#116329]</[color=#0550ae]text[/color]>[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">21</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"icon-lg"[/color]>[/color][color=#116329]<[color=#0550ae]icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"add"[/color] />[/color][color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">22</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]button-group[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">23</Text>
-                <Text className="code-line">{`    [color=#116329]</[color=#0550ae]widget[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">24</Text>
-                <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ui[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">25</Text>
-                <Text className="code-line">{`[color=#116329]</[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]<?xml version=[color=#a5d6ff]"1.0"[/color] encoding=[color=#a5d6ff]"UTF-8"[/color] ?>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#7ee787]<[color=#79c0ff]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]widget[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"button-group-size-demo"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]button-group[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"sm"[/color]>[/color][color=#7ee787]<[color=#79c0ff]text[/color]>[/color]Small[color=#7ee787]</[color=#79c0ff]text[/color]>[/color][color=#7ee787]</[color=#79c0ff]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"sm"[/color]>[/color][color=#7ee787]<[color=#79c0ff]text[/color]>[/color]Button[color=#7ee787]</[color=#79c0ff]text[/color]>[/color][color=#7ee787]</[color=#79c0ff]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"sm"[/color]>[/color][color=#7ee787]<[color=#79c0ff]text[/color]>[/color]Group[color=#7ee787]</[color=#79c0ff]text[/color]>[/color][color=#7ee787]</[color=#79c0ff]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"icon-sm"[/color]>[/color][color=#7ee787]<[color=#79c0ff]icon[/color] [color=#79c0ff]name[/color]=[color=#a5d6ff]"add"[/color] />[/color][color=#7ee787]</[color=#79c0ff]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]button-group[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]button-group[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color]>[/color][color=#7ee787]<[color=#79c0ff]text[/color]>[/color]Default[color=#7ee787]</[color=#79c0ff]text[/color]>[/color][color=#7ee787]</[color=#79c0ff]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color]>[/color][color=#7ee787]<[color=#79c0ff]text[/color]>[/color]Button[color=#7ee787]</[color=#79c0ff]text[/color]>[/color][color=#7ee787]</[color=#79c0ff]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color]>[/color][color=#7ee787]<[color=#79c0ff]text[/color]>[/color]Group[color=#7ee787]</[color=#79c0ff]text[/color]>[/color][color=#7ee787]</[color=#79c0ff]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"icon"[/color]>[/color][color=#7ee787]<[color=#79c0ff]icon[/color] [color=#79c0ff]name[/color]=[color=#a5d6ff]"add"[/color] />[/color][color=#7ee787]</[color=#79c0ff]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]button-group[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]button-group[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"lg"[/color]>[/color][color=#7ee787]<[color=#79c0ff]text[/color]>[/color]Large[color=#7ee787]</[color=#79c0ff]text[/color]>[/color][color=#7ee787]</[color=#79c0ff]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"lg"[/color]>[/color][color=#7ee787]<[color=#79c0ff]text[/color]>[/color]Button[color=#7ee787]</[color=#79c0ff]text[/color]>[/color][color=#7ee787]</[color=#79c0ff]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"lg"[/color]>[/color][color=#7ee787]<[color=#79c0ff]text[/color]>[/color]Group[color=#7ee787]</[color=#79c0ff]text[/color]>[/color][color=#7ee787]</[color=#79c0ff]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"icon-lg"[/color]>[/color][color=#7ee787]<[color=#79c0ff]icon[/color] [color=#79c0ff]name[/color]=[color=#a5d6ff]"add"[/color] />[/color][color=#7ee787]</[color=#79c0ff]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]button-group[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`    [color=#7ee787]</[color=#79c0ff]widget[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`[color=#7ee787]</[color=#79c0ff]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -355,29 +675,57 @@ export default function ButtonGroupSizeDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "144px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]button_group_size_xml_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, ui_create_widget([color=#0550ae]NULL[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]button_group_size_xml_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`        ui_widget_append(parent, ui_create_widget([color=#0550ae]NULL[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]button_group_size_xml_init[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, ui_create_widget([color=#79c0ff]NULL[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -388,133 +736,265 @@ export default function ButtonGroupSizeDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Button[/color], [color=#8250df]ButtonGroup[/color], [color=#8250df]Icon[/color], [color=#8250df]Widget[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Button[/color], [color=#8250df]ButtonGroup[/color], [color=#8250df]Icon[/color], [color=#8250df]Widget[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]Example[/color]([color=#0550ae][/color]) {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Widget[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex flex-col items-start gap-8"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]ButtonGroup[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color]>[/color]Small[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color]>[/color]Button[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color]>[/color]Group[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"icon-sm"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"add"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]ButtonGroup[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]ButtonGroup[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color]>[/color]Default[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color]>[/color]Button[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color]>[/color]Group[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"icon"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"add"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]ButtonGroup[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]ButtonGroup[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"lg"[/color]>[/color]Large[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"lg"[/color]>[/color]Button[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"lg"[/color]>[/color]Group[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"icon-lg"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"add"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]ButtonGroup[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`    [color=#116329]</[color=#0550ae]Widget[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`  );`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]Example[/color]([color=#0550ae][/color]) {`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Widget[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex flex-col items-start gap-8"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]ButtonGroup[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color]>[/color]Small[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">8</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color]>[/color]Button[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">9</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"sm"[/color]>[/color]Group[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">10</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"icon-sm"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">11</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"add"[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">12</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">13</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]ButtonGroup[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">14</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]ButtonGroup[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">15</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color]>[/color]Default[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">16</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color]>[/color]Button[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">17</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color]>[/color]Group[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">18</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"icon"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">19</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"add"[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">20</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">21</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]ButtonGroup[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">22</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]ButtonGroup[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">23</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"lg"[/color]>[/color]Large[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">24</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"lg"[/color]>[/color]Button[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">25</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"lg"[/color]>[/color]Group[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">26</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"icon-lg"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">27</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]Icon[/color] [color=#0550ae]name[/color]=[color=#0a3069]"add"[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">28</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">29</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]ButtonGroup[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">30</Text>
-                <Text className="code-line">{`    [color=#116329]</[color=#0550ae]Widget[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">31</Text>
-                <Text className="code-line">{`  );`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">32</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#ff7b72]import[/color] { [color=#d2a8ff]Button[/color], [color=#d2a8ff]ButtonGroup[/color], [color=#d2a8ff]Icon[/color], [color=#d2a8ff]Widget[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#ff7b72]export[/color] [color=#ff7b72]default[/color] [color=#ff7b72]function[/color] [color=#d2a8ff]Example[/color]([color=#79c0ff][/color]) {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`  [color=#ff7b72]return[/color] (`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]Widget[/color] [color=#79c0ff]className[/color]=[color=#a5d6ff]"flex flex-col items-start gap-8"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]ButtonGroup[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]Button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"sm"[/color]>[/color]Small[color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]Button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"sm"[/color]>[/color]Button[color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]Button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"sm"[/color]>[/color]Group[color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]Button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"icon-sm"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]Icon[/color] [color=#79c0ff]name[/color]=[color=#a5d6ff]"add"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]ButtonGroup[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]ButtonGroup[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]Button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color]>[/color]Default[color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]Button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color]>[/color]Button[color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]Button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color]>[/color]Group[color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]Button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"icon"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]Icon[/color] [color=#79c0ff]name[/color]=[color=#a5d6ff]"add"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]ButtonGroup[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]ButtonGroup[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]Button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"lg"[/color]>[/color]Large[color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]Button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"lg"[/color]>[/color]Button[color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]Button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"lg"[/color]>[/color]Group[color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]Button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"icon-lg"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]Icon[/color] [color=#79c0ff]name[/color]=[color=#a5d6ff]"add"[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]ButtonGroup[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`    [color=#7ee787]</[color=#79c0ff]Widget[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`  );`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -525,33 +1005,65 @@ export default function ButtonGroupSizeDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]"example.h"[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]button_group_size_tsx_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]"example.h"[/color][/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]button_group_size_tsx_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]"example.h"[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]button_group_size_tsx_init[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />

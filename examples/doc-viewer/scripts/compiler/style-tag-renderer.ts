@@ -17,28 +17,30 @@
 // hljs class → LCUI style tag mapping
 // ---------------------------------------------------------------------------
 
-interface StyleTagSet {
+export interface StyleTagSet {
   color?: string;
   bold?: boolean;
   italic?: boolean;
   bgcolor?: string;
 }
 
+export type HljsPalette = Record<string, StyleTagSet>;
+
 /**
- * Maps highlight.js token classes to LCUI text style tags.
+ * Maps highlight.js token classes to LCUI text style tags for the
+ * light theme (white code surface, dark text), mirroring GitHub Light.
  *
- * The colour palette below targets a light-themed code block (white
- * background, dark text), mirroring the GitHub Light syntax theme so
- * an MDX-derived page widget reads cleanly on the doc-viewer's light
- * surfaces.  LCUI's `[color=...]` markup only accepts hex literals,
- * so the comments next to each entry name the GitHub-Light role for
- * future maintenance.
+ * LCUI's `[color=...]` markup only accepts hex literals, so syntax
+ * colours cannot be switched by CSS alone.  The compiler therefore
+ * emits one highlighted line set per palette and the code block shows
+ * the matching set through the `.dark` class.  See
+ * HLJS_CLASS_STYLES_DARK for the paired dark palette.
  *
  * Only classes that start with "hljs-" are recognised; other sub-tokens
  * such as "function_", "class_" or "language-xml" that highlight.js
  * emits alongside "hljs-title" are ignored.
  */
-const HLJS_CLASS_STYLES: Record<string, StyleTagSet> = {
+export const HLJS_CLASS_STYLES_LIGHT: HljsPalette = {
   "hljs-keyword":        { color: "#cf222e" }, // red-700  -- keyword
   "hljs-built_in":       { color: "#953800" }, // orange-800 -- builtin
   "hljs-type":           { color: "#953800" }, // orange-800 -- type
@@ -65,10 +67,44 @@ const HLJS_CLASS_STYLES: Record<string, StyleTagSet> = {
   "hljs-link":           { color: "#0550ae" }, // blue-700 -- link
 };
 
-function styleSetForClasses(classes: string[]): StyleTagSet | null {
+/**
+ * GitHub Dark counterpart of HLJS_CLASS_STYLES_LIGHT, targeting the
+ * dark code surface (`#0d1117`) introduced by the dark theme.
+ */
+export const HLJS_CLASS_STYLES_DARK: HljsPalette = {
+  "hljs-keyword":        { color: "#ff7b72" }, // keyword
+  "hljs-built_in":       { color: "#ffa657" }, // builtin
+  "hljs-type":           { color: "#ffa657" }, // type
+  "hljs-literal":        { color: "#79c0ff" }, // literal
+  "hljs-number":         { color: "#79c0ff" }, // number
+  "hljs-string":         { color: "#a5d6ff" }, // string
+  "hljs-comment":        { color: "#8b949e" }, // comment
+  "hljs-doctag":         { color: "#8b949e" }, // doctag
+  "hljs-title":          { color: "#d2a8ff" }, // function name
+  "hljs-attr":           { color: "#79c0ff" }, // attr
+  "hljs-variable":       { color: "#79c0ff" }, // variable
+  "hljs-tag":            { color: "#7ee787" }, // tag
+  "hljs-name":           { color: "#79c0ff" }, // name
+  "hljs-meta":           { color: "#8b949e" }, // meta
+  "hljs-meta-string":    { color: "#a5d6ff" }, // meta-string
+  "hljs-params":         { color: "#79c0ff" }, // params
+  "hljs-punctuation":    { color: "#c9d1d9" }, // punctuation
+  "hljs-symbol":         { color: "#79c0ff" }, // symbol
+  "hljs-property":       { color: "#79c0ff" }, // property
+  "hljs-selector-tag":   { color: "#7ee787" }, // selector-tag
+  "hljs-selector-class": { color: "#79c0ff" }, // selector-class
+  "hljs-selector-id":    { color: "#79c0ff" }, // selector-id
+  "hljs-regexp":         { color: "#a5d6ff" }, // regexp
+  "hljs-link":           { color: "#79c0ff" }, // link
+};
+
+function styleSetForClasses(
+  classes: string[],
+  palette: HljsPalette,
+): StyleTagSet | null {
   for (const cls of classes) {
     if (!cls.startsWith("hljs-")) continue;
-    const set = HLJS_CLASS_STYLES[cls];
+    const set = palette[cls];
     if (set) return set;
   }
   return null;
@@ -129,7 +165,9 @@ function escapeStyleTagText(s: string): string {
 
 /**
  * Convert highlight.js HTML output into an array of LCUI style-tagged
- * strings, one per source line.
+ * strings, one per source line.  `palette` selects the light or dark
+ * colour mapping; the caller invokes it once per palette to emit paired
+ * line sets.
  *
  * Each line is independently balanced: any style tag opened on the
  * line is closed on the same line, so an LCUI <Text> element can
@@ -138,7 +176,10 @@ function escapeStyleTagText(s: string): string {
  * Empty source lines become a single space, so the line height stays
  * visible in the demo viewer.
  */
-export function highlightedHtmlToLines(html: string): string[] {
+export function highlightedHtmlToLines(
+  html: string,
+  palette: HljsPalette = HLJS_CLASS_STYLES_LIGHT,
+): string[] {
   // Normalise CRLF/CR to LF so line splitting is consistent regardless
   // of the source file's line endings.
   html = html.replace(/\r\n?/g, "\n");
@@ -177,7 +218,7 @@ export function highlightedHtmlToLines(html: string): string[] {
       const tag = html.slice(i, tagEnd + 1);
       const classMatch = tag.match(/class="([^"]+)"/);
       const classes = classMatch ? classMatch[1].split(/\s+/) : [];
-      const set = styleSetForClasses(classes) ?? {};
+      const set = styleSetForClasses(classes, palette) ?? {};
       stack.push(set);
       current += openTags(set);
       i = tagEnd + 1;

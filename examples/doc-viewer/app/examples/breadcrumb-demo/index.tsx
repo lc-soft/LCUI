@@ -25,421 +25,841 @@ export default function BreadcrumbDemoDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<stdio.h>[/color][/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_text[/color][color=#0550ae]([color=#953800]const[/color] [color=#953800]char[/color] *content)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *text = ui_create_widget([color=#0a3069]"text"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">8</Text>
-                <Text className="code-line">{`        ui_text_set_content(text, content);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">9</Text>
-                <Text className="code-line">{`        [color=#cf222e]return[/color] text;`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">10</Text>
-                <Text className="code-line">{`}`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">11</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">12</Text>
-                <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_link_item[/color][color=#0550ae]([color=#953800]const[/color] [color=#953800]char[/color] *path, [color=#953800]const[/color] [color=#953800]char[/color] *label)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">13</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">14</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *item = ui_create_breadcrumb_item();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">15</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *link = ui_create_breadcrumb_link();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">16</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">17</Text>
-                <Text className="code-line">{`        ui_widget_set_attr(item, [color=#0a3069]"data-path"[/color], path);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">18</Text>
-                <Text className="code-line">{`        ui_widget_append(link, create_text(label));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">19</Text>
-                <Text className="code-line">{`        ui_widget_append(item, link);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">20</Text>
-                <Text className="code-line">{`        ui_widget_append(item, ui_create_breadcrumb_separator());`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">21</Text>
-                <Text className="code-line">{`        [color=#cf222e]return[/color] item;`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">22</Text>
-                <Text className="code-line">{`}`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">23</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">24</Text>
-                <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_page_item[/color][color=#0550ae]([color=#953800]const[/color] [color=#953800]char[/color] *path, [color=#953800]const[/color] [color=#953800]char[/color] *label)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">25</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">26</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *item = ui_create_breadcrumb_item();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">27</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *page = ui_create_breadcrumb_page();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">28</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">29</Text>
-                <Text className="code-line">{`        ui_widget_set_attr(item, [color=#0a3069]"data-path"[/color], path);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">30</Text>
-                <Text className="code-line">{`        ui_widget_append(page, create_text(label));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">31</Text>
-                <Text className="code-line">{`        ui_widget_append(item, page);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">32</Text>
-                <Text className="code-line">{`        [color=#cf222e]return[/color] item;`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">33</Text>
-                <Text className="code-line">{`}`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">34</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">35</Text>
-                <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_menu_item[/color][color=#0550ae]([color=#953800]const[/color] [color=#953800]char[/color] *path, [color=#953800]const[/color] [color=#953800]char[/color] *label)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">36</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">37</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *item = ui_create_dropdown_menu_item();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">38</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">39</Text>
-                <Text className="code-line">{`        ui_widget_set_attr(item, [color=#0a3069]"data-key"[/color], path);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">40</Text>
-                <Text className="code-line">{`        ui_widget_append(item, create_text(label));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">41</Text>
-                <Text className="code-line">{`        [color=#cf222e]return[/color] item;`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">42</Text>
-                <Text className="code-line">{`}`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">43</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">44</Text>
-                <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_ellipsis_item[/color][color=#0550ae]([color=#953800]void[/color])[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">45</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">46</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *item = ui_create_breadcrumb_item();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">47</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *menu = ui_create_dropdown_menu();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">48</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *trigger = ui_create_dropdown_menu_trigger();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">49</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *button = ui_create_button();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">50</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *content = ui_create_dropdown_menu_content();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">51</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *group = ui_create_dropdown_menu_group();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">52</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">53</Text>
-                <Text className="code-line">{`        ui_button_set_variant(button, UI_BUTTON_VARIANT_GHOST);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">54</Text>
-                <Text className="code-line">{`        ui_button_set_size(button, UI_BUTTON_SIZE_ICON_SM);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">55</Text>
-                <Text className="code-line">{`        ui_widget_append(button, ui_create_breadcrumb_ellipsis());`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">56</Text>
-                <Text className="code-line">{`        ui_widget_append(trigger, button);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">57</Text>
-                <Text className="code-line">{`        ui_widget_append(group,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">58</Text>
-                <Text className="code-line">{`                         create_menu_item([color=#0a3069]"/Documentation"[/color], [color=#0a3069]"Documentation"[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">59</Text>
-                <Text className="code-line">{`        ui_widget_append(group,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">60</Text>
-                <Text className="code-line">{`                         create_menu_item([color=#0a3069]"/Documentation/Themes"[/color], [color=#0a3069]"Themes"[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">61</Text>
-                <Text className="code-line">{`        ui_widget_append(`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">62</Text>
-                <Text className="code-line">{`            group, create_menu_item([color=#0a3069]"/Documentation/Themes/GitHub"[/color], [color=#0a3069]"GitHub"[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">63</Text>
-                <Text className="code-line">{`        ui_widget_append(content, group);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">64</Text>
-                <Text className="code-line">{`        ui_widget_append(menu, trigger);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">65</Text>
-                <Text className="code-line">{`        ui_widget_append(menu, content);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">66</Text>
-                <Text className="code-line">{`        ui_widget_append(item, menu);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">67</Text>
-                <Text className="code-line">{`        ui_widget_append(item, ui_create_breadcrumb_separator());`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">68</Text>
-                <Text className="code-line">{`        [color=#cf222e]return[/color] item;`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">69</Text>
-                <Text className="code-line">{`}`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">70</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">71</Text>
-                <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]void[/color] [color=#8250df]on_change[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w, [color=#953800]ui_event_t[/color] *e, [color=#953800]void[/color] *arg)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">72</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">73</Text>
-                <Text className="code-line">{`        [color=#953800]char[/color] text\\[[color=#0550ae]512[/color]];`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">74</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">75</Text>
-                <Text className="code-line">{`        [color=#953800]snprintf[/color](text, [color=#cf222e]sizeof[/color](text), [color=#0a3069]"Selected: %s"[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">76</Text>
-                <Text className="code-line">{`                 arg ? ([color=#953800]const[/color] [color=#953800]char[/color] *)arg : [color=#0a3069]"-"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">77</Text>
-                <Text className="code-line">{`        ui_text_set_content(e->data, text);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">78</Text>
-                <Text className="code-line">{`}`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">79</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">80</Text>
-                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]breadcrumb_demo_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">81</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">82</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *box = ui_create_widget([color=#0550ae]NULL[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">83</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *breadcrumb = ui_create_breadcrumb();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">84</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *status = create_text([color=#0a3069]"Selected: -"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">85</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">86</Text>
-                <Text className="code-line">{`        ui_widget_add_class(box, [color=#0a3069]"breadcrumb-demo"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">87</Text>
-                <Text className="code-line">{`        ui_widget_append(breadcrumb, create_link_item([color=#0a3069]"/"[/color], [color=#0a3069]"Home"[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">88</Text>
-                <Text className="code-line">{`        ui_widget_append(breadcrumb, create_ellipsis_item());`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">89</Text>
-                <Text className="code-line">{`        ui_widget_append(`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">90</Text>
-                <Text className="code-line">{`            breadcrumb,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">91</Text>
-                <Text className="code-line">{`            create_link_item([color=#0a3069]"/Documentation/Themes/GitHub/Components"[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">92</Text>
-                <Text className="code-line">{`                             [color=#0a3069]"Components"[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">93</Text>
-                <Text className="code-line">{`        ui_widget_append(`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">94</Text>
-                <Text className="code-line">{`            breadcrumb,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">95</Text>
-                <Text className="code-line">{`            create_page_item(`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">96</Text>
-                <Text className="code-line">{`                [color=#0a3069]"/Documentation/Themes/GitHub/Components/Breadcrumb"[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">97</Text>
-                <Text className="code-line">{`                [color=#0a3069]"Breadcrumb"[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">98</Text>
-                <Text className="code-line">{`        ui_widget_on(breadcrumb, [color=#0a3069]"change"[/color], on_change, status);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">99</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">100</Text>
-                <Text className="code-line">{`        ui_widget_add_class(status, [color=#0a3069]"breadcrumb-demo-status"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">101</Text>
-                <Text className="code-line">{`        ui_widget_append(box, breadcrumb);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">102</Text>
-                <Text className="code-line">{`        ui_widget_append(box, status);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">103</Text>
-                <Text className="code-line">{`        ui_widget_append(parent, box);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">104</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<stdio.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_text[/color][color=#0550ae]([color=#953800]const[/color] [color=#953800]char[/color] *content)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *text = ui_create_widget([color=#0a3069]"text"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`        ui_text_set_content(text, content);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`        [color=#cf222e]return[/color] text;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_link_item[/color][color=#0550ae]([color=#953800]const[/color] [color=#953800]char[/color] *path, [color=#953800]const[/color] [color=#953800]char[/color] *label)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *item = ui_create_breadcrumb_item();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *link = ui_create_breadcrumb_link();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`        ui_widget_set_attr(item, [color=#0a3069]"data-path"[/color], path);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`        ui_widget_append(link, create_text(label));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`        ui_widget_append(item, link);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`        ui_widget_append(item, ui_create_breadcrumb_separator());`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`        [color=#cf222e]return[/color] item;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_page_item[/color][color=#0550ae]([color=#953800]const[/color] [color=#953800]char[/color] *path, [color=#953800]const[/color] [color=#953800]char[/color] *label)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *item = ui_create_breadcrumb_item();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *page = ui_create_breadcrumb_page();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`        ui_widget_set_attr(item, [color=#0a3069]"data-path"[/color], path);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`        ui_widget_append(page, create_text(label));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`        ui_widget_append(item, page);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`        [color=#cf222e]return[/color] item;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">35</Text>
+                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_menu_item[/color][color=#0550ae]([color=#953800]const[/color] [color=#953800]char[/color] *path, [color=#953800]const[/color] [color=#953800]char[/color] *label)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">36</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">37</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *item = ui_create_dropdown_menu_item();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">38</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">39</Text>
+                  <Text className="code-line">{`        ui_widget_set_attr(item, [color=#0a3069]"data-key"[/color], path);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">40</Text>
+                  <Text className="code-line">{`        ui_widget_append(item, create_text(label));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">41</Text>
+                  <Text className="code-line">{`        [color=#cf222e]return[/color] item;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">42</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">43</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">44</Text>
+                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_ellipsis_item[/color][color=#0550ae]([color=#953800]void[/color])[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">45</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">46</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *item = ui_create_breadcrumb_item();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">47</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *menu = ui_create_dropdown_menu();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">48</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *trigger = ui_create_dropdown_menu_trigger();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">49</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *button = ui_create_button();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">50</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *content = ui_create_dropdown_menu_content();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">51</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *group = ui_create_dropdown_menu_group();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">52</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">53</Text>
+                  <Text className="code-line">{`        ui_button_set_variant(button, UI_BUTTON_VARIANT_GHOST);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">54</Text>
+                  <Text className="code-line">{`        ui_button_set_size(button, UI_BUTTON_SIZE_ICON_SM);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">55</Text>
+                  <Text className="code-line">{`        ui_widget_append(button, ui_create_breadcrumb_ellipsis());`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">56</Text>
+                  <Text className="code-line">{`        ui_widget_append(trigger, button);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">57</Text>
+                  <Text className="code-line">{`        ui_widget_append(group,`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">58</Text>
+                  <Text className="code-line">{`                         create_menu_item([color=#0a3069]"/Documentation"[/color], [color=#0a3069]"Documentation"[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">59</Text>
+                  <Text className="code-line">{`        ui_widget_append(group,`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">60</Text>
+                  <Text className="code-line">{`                         create_menu_item([color=#0a3069]"/Documentation/Themes"[/color], [color=#0a3069]"Themes"[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">61</Text>
+                  <Text className="code-line">{`        ui_widget_append(`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">62</Text>
+                  <Text className="code-line">{`            group, create_menu_item([color=#0a3069]"/Documentation/Themes/GitHub"[/color], [color=#0a3069]"GitHub"[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">63</Text>
+                  <Text className="code-line">{`        ui_widget_append(content, group);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">64</Text>
+                  <Text className="code-line">{`        ui_widget_append(menu, trigger);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">65</Text>
+                  <Text className="code-line">{`        ui_widget_append(menu, content);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">66</Text>
+                  <Text className="code-line">{`        ui_widget_append(item, menu);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">67</Text>
+                  <Text className="code-line">{`        ui_widget_append(item, ui_create_breadcrumb_separator());`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">68</Text>
+                  <Text className="code-line">{`        [color=#cf222e]return[/color] item;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">69</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">70</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">71</Text>
+                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]void[/color] [color=#8250df]on_change[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w, [color=#953800]ui_event_t[/color] *e, [color=#953800]void[/color] *arg)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">72</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">73</Text>
+                  <Text className="code-line">{`        [color=#953800]char[/color] text\\[[color=#0550ae]512[/color]];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">74</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">75</Text>
+                  <Text className="code-line">{`        [color=#953800]snprintf[/color](text, [color=#cf222e]sizeof[/color](text), [color=#0a3069]"Selected: %s"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">76</Text>
+                  <Text className="code-line">{`                 arg ? ([color=#953800]const[/color] [color=#953800]char[/color] *)arg : [color=#0a3069]"-"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">77</Text>
+                  <Text className="code-line">{`        ui_text_set_content(e->data, text);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">78</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">79</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">80</Text>
+                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]breadcrumb_demo_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">81</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">82</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *box = ui_create_widget([color=#0550ae]NULL[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">83</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *breadcrumb = ui_create_breadcrumb();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">84</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *status = create_text([color=#0a3069]"Selected: -"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">85</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">86</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(box, [color=#0a3069]"breadcrumb-demo"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">87</Text>
+                  <Text className="code-line">{`        ui_widget_append(breadcrumb, create_link_item([color=#0a3069]"/"[/color], [color=#0a3069]"Home"[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">88</Text>
+                  <Text className="code-line">{`        ui_widget_append(breadcrumb, create_ellipsis_item());`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">89</Text>
+                  <Text className="code-line">{`        ui_widget_append(`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">90</Text>
+                  <Text className="code-line">{`            breadcrumb,`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">91</Text>
+                  <Text className="code-line">{`            create_link_item([color=#0a3069]"/Documentation/Themes/GitHub/Components"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">92</Text>
+                  <Text className="code-line">{`                             [color=#0a3069]"Components"[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">93</Text>
+                  <Text className="code-line">{`        ui_widget_append(`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">94</Text>
+                  <Text className="code-line">{`            breadcrumb,`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">95</Text>
+                  <Text className="code-line">{`            create_page_item(`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">96</Text>
+                  <Text className="code-line">{`                [color=#0a3069]"/Documentation/Themes/GitHub/Components/Breadcrumb"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">97</Text>
+                  <Text className="code-line">{`                [color=#0a3069]"Breadcrumb"[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">98</Text>
+                  <Text className="code-line">{`        ui_widget_on(breadcrumb, [color=#0a3069]"change"[/color], on_change, status);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">99</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">100</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(status, [color=#0a3069]"breadcrumb-demo-status"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">101</Text>
+                  <Text className="code-line">{`        ui_widget_append(box, breadcrumb);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">102</Text>
+                  <Text className="code-line">{`        ui_widget_append(box, status);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">103</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, box);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">104</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+              </Widget>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]<stdio.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`[color=#ffa657]static[/color] [color=#ffa657]ui_widget_t[/color] *[color=#d2a8ff]create_text[/color][color=#79c0ff]([color=#ffa657]const[/color] [color=#ffa657]char[/color] *content)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *text = ui_create_widget([color=#a5d6ff]"text"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`        ui_text_set_content(text, content);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`        [color=#ff7b72]return[/color] text;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`[color=#ffa657]static[/color] [color=#ffa657]ui_widget_t[/color] *[color=#d2a8ff]create_link_item[/color][color=#79c0ff]([color=#ffa657]const[/color] [color=#ffa657]char[/color] *path, [color=#ffa657]const[/color] [color=#ffa657]char[/color] *label)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *item = ui_create_breadcrumb_item();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *link = ui_create_breadcrumb_link();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`        ui_widget_set_attr(item, [color=#a5d6ff]"data-path"[/color], path);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`        ui_widget_append(link, create_text(label));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`        ui_widget_append(item, link);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`        ui_widget_append(item, ui_create_breadcrumb_separator());`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`        [color=#ff7b72]return[/color] item;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`[color=#ffa657]static[/color] [color=#ffa657]ui_widget_t[/color] *[color=#d2a8ff]create_page_item[/color][color=#79c0ff]([color=#ffa657]const[/color] [color=#ffa657]char[/color] *path, [color=#ffa657]const[/color] [color=#ffa657]char[/color] *label)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *item = ui_create_breadcrumb_item();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *page = ui_create_breadcrumb_page();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`        ui_widget_set_attr(item, [color=#a5d6ff]"data-path"[/color], path);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`        ui_widget_append(page, create_text(label));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`        ui_widget_append(item, page);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`        [color=#ff7b72]return[/color] item;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">35</Text>
+                  <Text className="code-line">{`[color=#ffa657]static[/color] [color=#ffa657]ui_widget_t[/color] *[color=#d2a8ff]create_menu_item[/color][color=#79c0ff]([color=#ffa657]const[/color] [color=#ffa657]char[/color] *path, [color=#ffa657]const[/color] [color=#ffa657]char[/color] *label)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">36</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">37</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *item = ui_create_dropdown_menu_item();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">38</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">39</Text>
+                  <Text className="code-line">{`        ui_widget_set_attr(item, [color=#a5d6ff]"data-key"[/color], path);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">40</Text>
+                  <Text className="code-line">{`        ui_widget_append(item, create_text(label));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">41</Text>
+                  <Text className="code-line">{`        [color=#ff7b72]return[/color] item;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">42</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">43</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">44</Text>
+                  <Text className="code-line">{`[color=#ffa657]static[/color] [color=#ffa657]ui_widget_t[/color] *[color=#d2a8ff]create_ellipsis_item[/color][color=#79c0ff]([color=#ffa657]void[/color])[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">45</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">46</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *item = ui_create_breadcrumb_item();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">47</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *menu = ui_create_dropdown_menu();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">48</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *trigger = ui_create_dropdown_menu_trigger();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">49</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *button = ui_create_button();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">50</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *content = ui_create_dropdown_menu_content();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">51</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *group = ui_create_dropdown_menu_group();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">52</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">53</Text>
+                  <Text className="code-line">{`        ui_button_set_variant(button, UI_BUTTON_VARIANT_GHOST);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">54</Text>
+                  <Text className="code-line">{`        ui_button_set_size(button, UI_BUTTON_SIZE_ICON_SM);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">55</Text>
+                  <Text className="code-line">{`        ui_widget_append(button, ui_create_breadcrumb_ellipsis());`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">56</Text>
+                  <Text className="code-line">{`        ui_widget_append(trigger, button);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">57</Text>
+                  <Text className="code-line">{`        ui_widget_append(group,`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">58</Text>
+                  <Text className="code-line">{`                         create_menu_item([color=#a5d6ff]"/Documentation"[/color], [color=#a5d6ff]"Documentation"[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">59</Text>
+                  <Text className="code-line">{`        ui_widget_append(group,`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">60</Text>
+                  <Text className="code-line">{`                         create_menu_item([color=#a5d6ff]"/Documentation/Themes"[/color], [color=#a5d6ff]"Themes"[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">61</Text>
+                  <Text className="code-line">{`        ui_widget_append(`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">62</Text>
+                  <Text className="code-line">{`            group, create_menu_item([color=#a5d6ff]"/Documentation/Themes/GitHub"[/color], [color=#a5d6ff]"GitHub"[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">63</Text>
+                  <Text className="code-line">{`        ui_widget_append(content, group);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">64</Text>
+                  <Text className="code-line">{`        ui_widget_append(menu, trigger);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">65</Text>
+                  <Text className="code-line">{`        ui_widget_append(menu, content);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">66</Text>
+                  <Text className="code-line">{`        ui_widget_append(item, menu);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">67</Text>
+                  <Text className="code-line">{`        ui_widget_append(item, ui_create_breadcrumb_separator());`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">68</Text>
+                  <Text className="code-line">{`        [color=#ff7b72]return[/color] item;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">69</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">70</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">71</Text>
+                  <Text className="code-line">{`[color=#ffa657]static[/color] [color=#ffa657]void[/color] [color=#d2a8ff]on_change[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *w, [color=#ffa657]ui_event_t[/color] *e, [color=#ffa657]void[/color] *arg)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">72</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">73</Text>
+                  <Text className="code-line">{`        [color=#ffa657]char[/color] text\\[[color=#79c0ff]512[/color]];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">74</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">75</Text>
+                  <Text className="code-line">{`        [color=#ffa657]snprintf[/color](text, [color=#ff7b72]sizeof[/color](text), [color=#a5d6ff]"Selected: %s"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">76</Text>
+                  <Text className="code-line">{`                 arg ? ([color=#ffa657]const[/color] [color=#ffa657]char[/color] *)arg : [color=#a5d6ff]"-"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">77</Text>
+                  <Text className="code-line">{`        ui_text_set_content(e->data, text);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">78</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">79</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">80</Text>
+                  <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]breadcrumb_demo_init[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">81</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">82</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *box = ui_create_widget([color=#79c0ff]NULL[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">83</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *breadcrumb = ui_create_breadcrumb();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">84</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *status = create_text([color=#a5d6ff]"Selected: -"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">85</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">86</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(box, [color=#a5d6ff]"breadcrumb-demo"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">87</Text>
+                  <Text className="code-line">{`        ui_widget_append(breadcrumb, create_link_item([color=#a5d6ff]"/"[/color], [color=#a5d6ff]"Home"[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">88</Text>
+                  <Text className="code-line">{`        ui_widget_append(breadcrumb, create_ellipsis_item());`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">89</Text>
+                  <Text className="code-line">{`        ui_widget_append(`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">90</Text>
+                  <Text className="code-line">{`            breadcrumb,`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">91</Text>
+                  <Text className="code-line">{`            create_link_item([color=#a5d6ff]"/Documentation/Themes/GitHub/Components"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">92</Text>
+                  <Text className="code-line">{`                             [color=#a5d6ff]"Components"[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">93</Text>
+                  <Text className="code-line">{`        ui_widget_append(`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">94</Text>
+                  <Text className="code-line">{`            breadcrumb,`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">95</Text>
+                  <Text className="code-line">{`            create_page_item(`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">96</Text>
+                  <Text className="code-line">{`                [color=#a5d6ff]"/Documentation/Themes/GitHub/Components/Breadcrumb"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">97</Text>
+                  <Text className="code-line">{`                [color=#a5d6ff]"Breadcrumb"[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">98</Text>
+                  <Text className="code-line">{`        ui_widget_on(breadcrumb, [color=#a5d6ff]"change"[/color], on_change, status);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">99</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">100</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(status, [color=#a5d6ff]"breadcrumb-demo-status"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">101</Text>
+                  <Text className="code-line">{`        ui_widget_append(box, breadcrumb);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">102</Text>
+                  <Text className="code-line">{`        ui_widget_append(box, status);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">103</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, box);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">104</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -450,157 +870,313 @@ export default function BreadcrumbDemoDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]class[/color]=[color=#0a3069]"breadcrumb-demo"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]breadcrumb[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]breadcrumb-item[/color] [color=#0550ae]data-path[/color]=[color=#0a3069]"/"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]breadcrumb-link[/color]>[/color]Home[color=#116329]</[color=#0550ae]breadcrumb-link[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]breadcrumb-separator[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]breadcrumb-item[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]breadcrumb-item[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]dropdown-menu[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]dropdown-menu-trigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`              [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"ghost"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"icon-sm"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`                [color=#116329]<[color=#0550ae]breadcrumb-ellipsis[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`              [color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`            [color=#116329]</[color=#0550ae]dropdown-menu-trigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]dropdown-menu-content[/color] [color=#0550ae]align[/color]=[color=#0a3069]"start"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`              [color=#116329]<[color=#0550ae]dropdown-menu-group[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`                [color=#116329]<[color=#0550ae]dropdown-menu-item[/color]>[/color]Documentation[color=#116329]</[color=#0550ae]dropdown-menu-item[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`                [color=#116329]<[color=#0550ae]dropdown-menu-item[/color]>[/color]Themes[color=#116329]</[color=#0550ae]dropdown-menu-item[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`                [color=#116329]<[color=#0550ae]dropdown-menu-item[/color]>[/color]GitHub[color=#116329]</[color=#0550ae]dropdown-menu-item[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`              [color=#116329]</[color=#0550ae]dropdown-menu-group[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`            [color=#116329]</[color=#0550ae]dropdown-menu-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`          [color=#116329]</[color=#0550ae]dropdown-menu[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]breadcrumb-separator[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]breadcrumb-item[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]breadcrumb-item[/color] [color=#0550ae]data-path[/color]=[color=#0a3069]"/components"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]breadcrumb-link[/color]>[/color]Components[color=#116329]</[color=#0550ae]breadcrumb-link[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]breadcrumb-separator[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]breadcrumb-item[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]breadcrumb-item[/color] [color=#0550ae]data-path[/color]=[color=#0a3069]"/components/breadcrumb"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]breadcrumb-page[/color]>[/color]Breadcrumb[color=#116329]</[color=#0550ae]breadcrumb-page[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]breadcrumb-item[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]breadcrumb[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">35</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]text[/color] [color=#0550ae]class[/color]=[color=#0a3069]"breadcrumb-demo-status"[/color]>[/color]Selected: -[color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">36</Text>
+                  <Text className="code-line">{`    [color=#116329]</[color=#0550ae]div[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">37</Text>
+                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">38</Text>
+                  <Text className="code-line">{`[color=#116329]</[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`    [color=#116329]<[color=#0550ae]div[/color] [color=#0550ae]class[/color]=[color=#0a3069]"breadcrumb-demo"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]breadcrumb[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]breadcrumb-item[/color] [color=#0550ae]data-path[/color]=[color=#0a3069]"/"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]breadcrumb-link[/color]>[/color]Home[color=#116329]</[color=#0550ae]breadcrumb-link[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">8</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]breadcrumb-separator[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">9</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]breadcrumb-item[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">10</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]breadcrumb-item[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">11</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]dropdown-menu[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">12</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]dropdown-menu-trigger[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">13</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"ghost"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"icon-sm"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">14</Text>
-                <Text className="code-line">{`                [color=#116329]<[color=#0550ae]breadcrumb-ellipsis[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">15</Text>
-                <Text className="code-line">{`              [color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">16</Text>
-                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]dropdown-menu-trigger[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">17</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]dropdown-menu-content[/color] [color=#0550ae]align[/color]=[color=#0a3069]"start"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">18</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]dropdown-menu-group[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">19</Text>
-                <Text className="code-line">{`                [color=#116329]<[color=#0550ae]dropdown-menu-item[/color]>[/color]Documentation[color=#116329]</[color=#0550ae]dropdown-menu-item[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">20</Text>
-                <Text className="code-line">{`                [color=#116329]<[color=#0550ae]dropdown-menu-item[/color]>[/color]Themes[color=#116329]</[color=#0550ae]dropdown-menu-item[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">21</Text>
-                <Text className="code-line">{`                [color=#116329]<[color=#0550ae]dropdown-menu-item[/color]>[/color]GitHub[color=#116329]</[color=#0550ae]dropdown-menu-item[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">22</Text>
-                <Text className="code-line">{`              [color=#116329]</[color=#0550ae]dropdown-menu-group[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">23</Text>
-                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]dropdown-menu-content[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">24</Text>
-                <Text className="code-line">{`          [color=#116329]</[color=#0550ae]dropdown-menu[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">25</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]breadcrumb-separator[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">26</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]breadcrumb-item[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">27</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]breadcrumb-item[/color] [color=#0550ae]data-path[/color]=[color=#0a3069]"/components"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">28</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]breadcrumb-link[/color]>[/color]Components[color=#116329]</[color=#0550ae]breadcrumb-link[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">29</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]breadcrumb-separator[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">30</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]breadcrumb-item[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">31</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]breadcrumb-item[/color] [color=#0550ae]data-path[/color]=[color=#0a3069]"/components/breadcrumb"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">32</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]breadcrumb-page[/color]>[/color]Breadcrumb[color=#116329]</[color=#0550ae]breadcrumb-page[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">33</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]breadcrumb-item[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">34</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]breadcrumb[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">35</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]text[/color] [color=#0550ae]class[/color]=[color=#0a3069]"breadcrumb-demo-status"[/color]>[/color]Selected: -[color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">36</Text>
-                <Text className="code-line">{`    [color=#116329]</[color=#0550ae]div[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">37</Text>
-                <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ui[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">38</Text>
-                <Text className="code-line">{`[color=#116329]</[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]<?xml version=[color=#a5d6ff]"1.0"[/color] encoding=[color=#a5d6ff]"UTF-8"[/color] ?>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#7ee787]<[color=#79c0ff]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]div[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"breadcrumb-demo"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]breadcrumb[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]breadcrumb-item[/color] [color=#79c0ff]data-path[/color]=[color=#a5d6ff]"/"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]breadcrumb-link[/color]>[/color]Home[color=#7ee787]</[color=#79c0ff]breadcrumb-link[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]breadcrumb-separator[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]breadcrumb-item[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]breadcrumb-item[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]dropdown-menu[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]dropdown-menu-trigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`              [color=#7ee787]<[color=#79c0ff]button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"ghost"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"icon-sm"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`                [color=#7ee787]<[color=#79c0ff]breadcrumb-ellipsis[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`              [color=#7ee787]</[color=#79c0ff]button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`            [color=#7ee787]</[color=#79c0ff]dropdown-menu-trigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]dropdown-menu-content[/color] [color=#79c0ff]align[/color]=[color=#a5d6ff]"start"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`              [color=#7ee787]<[color=#79c0ff]dropdown-menu-group[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`                [color=#7ee787]<[color=#79c0ff]dropdown-menu-item[/color]>[/color]Documentation[color=#7ee787]</[color=#79c0ff]dropdown-menu-item[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`                [color=#7ee787]<[color=#79c0ff]dropdown-menu-item[/color]>[/color]Themes[color=#7ee787]</[color=#79c0ff]dropdown-menu-item[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`                [color=#7ee787]<[color=#79c0ff]dropdown-menu-item[/color]>[/color]GitHub[color=#7ee787]</[color=#79c0ff]dropdown-menu-item[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`              [color=#7ee787]</[color=#79c0ff]dropdown-menu-group[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`            [color=#7ee787]</[color=#79c0ff]dropdown-menu-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`          [color=#7ee787]</[color=#79c0ff]dropdown-menu[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]breadcrumb-separator[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]breadcrumb-item[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]breadcrumb-item[/color] [color=#79c0ff]data-path[/color]=[color=#a5d6ff]"/components"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]breadcrumb-link[/color]>[/color]Components[color=#7ee787]</[color=#79c0ff]breadcrumb-link[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]breadcrumb-separator[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]breadcrumb-item[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]breadcrumb-item[/color] [color=#79c0ff]data-path[/color]=[color=#a5d6ff]"/components/breadcrumb"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]breadcrumb-page[/color]>[/color]Breadcrumb[color=#7ee787]</[color=#79c0ff]breadcrumb-page[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]breadcrumb-item[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]breadcrumb[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">35</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]text[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"breadcrumb-demo-status"[/color]>[/color]Selected: -[color=#7ee787]</[color=#79c0ff]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">36</Text>
+                  <Text className="code-line">{`    [color=#7ee787]</[color=#79c0ff]div[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">37</Text>
+                  <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">38</Text>
+                  <Text className="code-line">{`[color=#7ee787]</[color=#79c0ff]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -611,29 +1187,57 @@ export default function BreadcrumbDemoDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "144px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]breadcrumb_demo_xml_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, ui_create_widget([color=#0550ae]NULL[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]breadcrumb_demo_xml_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`        ui_widget_append(parent, ui_create_widget([color=#0550ae]NULL[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]breadcrumb_demo_xml_init[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, ui_create_widget([color=#79c0ff]NULL[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -644,269 +1248,537 @@ export default function BreadcrumbDemoDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{`  [color=#8250df]Breadcrumb[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`  [color=#8250df]BreadcrumbEllipsis[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`  [color=#8250df]BreadcrumbItem[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`  [color=#8250df]BreadcrumbLink[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`  [color=#8250df]BreadcrumbList[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`  [color=#8250df]BreadcrumbPage[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">8</Text>
-                <Text className="code-line">{`  [color=#8250df]BreadcrumbSeparator[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">9</Text>
-                <Text className="code-line">{`  [color=#8250df]Button[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">10</Text>
-                <Text className="code-line">{`  [color=#8250df]DropdownMenu[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">11</Text>
-                <Text className="code-line">{`  [color=#8250df]DropdownMenuContent[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">12</Text>
-                <Text className="code-line">{`  [color=#8250df]DropdownMenuGroup[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">13</Text>
-                <Text className="code-line">{`  [color=#8250df]DropdownMenuItem[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">14</Text>
-                <Text className="code-line">{`  [color=#8250df]DropdownMenuTrigger[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">15</Text>
-                <Text className="code-line">{`  [color=#8250df]Text[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">16</Text>
-                <Text className="code-line">{`  [color=#8250df]Widget[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">17</Text>
-                <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">18</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">19</Text>
-                <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]Example[/color]([color=#0550ae][/color]) {`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">20</Text>
-                <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">21</Text>
-                <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Widget[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex w-full flex-col items-center gap-2.5"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">22</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Breadcrumb[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">23</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]BreadcrumbList[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">24</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]BreadcrumbItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">25</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]BreadcrumbLink[/color]>[/color]Home[color=#116329]</[color=#0550ae]BreadcrumbLink[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">26</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]BreadcrumbSeparator[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">27</Text>
-                <Text className="code-line">{`          [color=#116329]</[color=#0550ae]BreadcrumbItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">28</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]BreadcrumbItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">29</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]DropdownMenu[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">30</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]DropdownMenuTrigger[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">31</Text>
-                <Text className="code-line">{`                [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"ghost"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"icon-sm"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">32</Text>
-                <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]BreadcrumbEllipsis[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">33</Text>
-                <Text className="code-line">{`                [color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">34</Text>
-                <Text className="code-line">{`              [color=#116329]</[color=#0550ae]DropdownMenuTrigger[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">35</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]DropdownMenuContent[/color] [color=#0550ae]align[/color]=[color=#0a3069]"start"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">36</Text>
-                <Text className="code-line">{`                [color=#116329]<[color=#0550ae]DropdownMenuGroup[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">37</Text>
-                <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">38</Text>
-                <Text className="code-line">{`                    [color=#116329]<[color=#0550ae]Text[/color]>[/color]Documentation[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">39</Text>
-                <Text className="code-line">{`                  [color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">40</Text>
-                <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">41</Text>
-                <Text className="code-line">{`                    [color=#116329]<[color=#0550ae]Text[/color]>[/color]Themes[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">42</Text>
-                <Text className="code-line">{`                  [color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">43</Text>
-                <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">44</Text>
-                <Text className="code-line">{`                    [color=#116329]<[color=#0550ae]Text[/color]>[/color]GitHub[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">45</Text>
-                <Text className="code-line">{`                  [color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">46</Text>
-                <Text className="code-line">{`                [color=#116329]</[color=#0550ae]DropdownMenuGroup[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">47</Text>
-                <Text className="code-line">{`              [color=#116329]</[color=#0550ae]DropdownMenuContent[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">48</Text>
-                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]DropdownMenu[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">49</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]BreadcrumbSeparator[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">50</Text>
-                <Text className="code-line">{`          [color=#116329]</[color=#0550ae]BreadcrumbItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">51</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]BreadcrumbItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">52</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]BreadcrumbLink[/color]>[/color]Components[color=#116329]</[color=#0550ae]BreadcrumbLink[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">53</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]BreadcrumbSeparator[/color] />[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">54</Text>
-                <Text className="code-line">{`          [color=#116329]</[color=#0550ae]BreadcrumbItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">55</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]BreadcrumbItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">56</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]BreadcrumbPage[/color]>[/color]Breadcrumb[color=#116329]</[color=#0550ae]BreadcrumbPage[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">57</Text>
-                <Text className="code-line">{`          [color=#116329]</[color=#0550ae]BreadcrumbItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">58</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]BreadcrumbList[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">59</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]Breadcrumb[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">60</Text>
-                <Text className="code-line">{`      {/* The C demo updates this line from the breadcrumb change event. */}`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">61</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Text[/color] [color=#0550ae]className[/color]=[color=#0a3069]"breadcrumb-demo-status text-\\[13px] text-muted-foreground"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">62</Text>
-                <Text className="code-line">{`        Selected: -`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">63</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">64</Text>
-                <Text className="code-line">{`    [color=#116329]</[color=#0550ae]Widget[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">65</Text>
-                <Text className="code-line">{`  );`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">66</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`  [color=#8250df]Breadcrumb[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  [color=#8250df]BreadcrumbEllipsis[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`  [color=#8250df]BreadcrumbItem[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`  [color=#8250df]BreadcrumbLink[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`  [color=#8250df]BreadcrumbList[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`  [color=#8250df]BreadcrumbPage[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`  [color=#8250df]BreadcrumbSeparator[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`  [color=#8250df]Button[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`  [color=#8250df]DropdownMenu[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`  [color=#8250df]DropdownMenuContent[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`  [color=#8250df]DropdownMenuGroup[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`  [color=#8250df]DropdownMenuItem[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`  [color=#8250df]DropdownMenuTrigger[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`  [color=#8250df]Text[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`  [color=#8250df]Widget[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]Example[/color]([color=#0550ae][/color]) {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Widget[/color] [color=#0550ae]className[/color]=[color=#0a3069]"flex w-full flex-col items-center gap-2.5"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Breadcrumb[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]BreadcrumbList[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]BreadcrumbItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]BreadcrumbLink[/color]>[/color]Home[color=#116329]</[color=#0550ae]BreadcrumbLink[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]BreadcrumbSeparator[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`          [color=#116329]</[color=#0550ae]BreadcrumbItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]BreadcrumbItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]DropdownMenu[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`              [color=#116329]<[color=#0550ae]DropdownMenuTrigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`                [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"ghost"[/color] [color=#0550ae]size[/color]=[color=#0a3069]"icon-sm"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]BreadcrumbEllipsis[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`                [color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{`              [color=#116329]</[color=#0550ae]DropdownMenuTrigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">35</Text>
+                  <Text className="code-line">{`              [color=#116329]<[color=#0550ae]DropdownMenuContent[/color] [color=#0550ae]align[/color]=[color=#0a3069]"start"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">36</Text>
+                  <Text className="code-line">{`                [color=#116329]<[color=#0550ae]DropdownMenuGroup[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">37</Text>
+                  <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">38</Text>
+                  <Text className="code-line">{`                    [color=#116329]<[color=#0550ae]Text[/color]>[/color]Documentation[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">39</Text>
+                  <Text className="code-line">{`                  [color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">40</Text>
+                  <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">41</Text>
+                  <Text className="code-line">{`                    [color=#116329]<[color=#0550ae]Text[/color]>[/color]Themes[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">42</Text>
+                  <Text className="code-line">{`                  [color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">43</Text>
+                  <Text className="code-line">{`                  [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">44</Text>
+                  <Text className="code-line">{`                    [color=#116329]<[color=#0550ae]Text[/color]>[/color]GitHub[color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">45</Text>
+                  <Text className="code-line">{`                  [color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">46</Text>
+                  <Text className="code-line">{`                [color=#116329]</[color=#0550ae]DropdownMenuGroup[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">47</Text>
+                  <Text className="code-line">{`              [color=#116329]</[color=#0550ae]DropdownMenuContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">48</Text>
+                  <Text className="code-line">{`            [color=#116329]</[color=#0550ae]DropdownMenu[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">49</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]BreadcrumbSeparator[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">50</Text>
+                  <Text className="code-line">{`          [color=#116329]</[color=#0550ae]BreadcrumbItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">51</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]BreadcrumbItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">52</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]BreadcrumbLink[/color]>[/color]Components[color=#116329]</[color=#0550ae]BreadcrumbLink[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">53</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]BreadcrumbSeparator[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">54</Text>
+                  <Text className="code-line">{`          [color=#116329]</[color=#0550ae]BreadcrumbItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">55</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]BreadcrumbItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">56</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]BreadcrumbPage[/color]>[/color]Breadcrumb[color=#116329]</[color=#0550ae]BreadcrumbPage[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">57</Text>
+                  <Text className="code-line">{`          [color=#116329]</[color=#0550ae]BreadcrumbItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">58</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]BreadcrumbList[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">59</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]Breadcrumb[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">60</Text>
+                  <Text className="code-line">{`      {/* The C demo updates this line from the breadcrumb change event. */}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">61</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]Text[/color] [color=#0550ae]className[/color]=[color=#0a3069]"breadcrumb-demo-status text-\\[13px] text-muted-foreground"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">62</Text>
+                  <Text className="code-line">{`        Selected: -`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">63</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]Text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">64</Text>
+                  <Text className="code-line">{`    [color=#116329]</[color=#0550ae]Widget[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">65</Text>
+                  <Text className="code-line">{`  );`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">66</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+              </Widget>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#ff7b72]import[/color] {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]Breadcrumb[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]BreadcrumbEllipsis[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]BreadcrumbItem[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]BreadcrumbLink[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]BreadcrumbList[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]BreadcrumbPage[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]BreadcrumbSeparator[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]Button[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]DropdownMenu[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]DropdownMenuContent[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]DropdownMenuGroup[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]DropdownMenuItem[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]DropdownMenuTrigger[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]Text[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]Widget[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`} [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`[color=#ff7b72]export[/color] [color=#ff7b72]default[/color] [color=#ff7b72]function[/color] [color=#d2a8ff]Example[/color]([color=#79c0ff][/color]) {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`  [color=#ff7b72]return[/color] (`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]Widget[/color] [color=#79c0ff]className[/color]=[color=#a5d6ff]"flex w-full flex-col items-center gap-2.5"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]Breadcrumb[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]BreadcrumbList[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]BreadcrumbItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]BreadcrumbLink[/color]>[/color]Home[color=#7ee787]</[color=#79c0ff]BreadcrumbLink[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]BreadcrumbSeparator[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`          [color=#7ee787]</[color=#79c0ff]BreadcrumbItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]BreadcrumbItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]DropdownMenu[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`              [color=#7ee787]<[color=#79c0ff]DropdownMenuTrigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`                [color=#7ee787]<[color=#79c0ff]Button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"ghost"[/color] [color=#79c0ff]size[/color]=[color=#a5d6ff]"icon-sm"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`                  [color=#7ee787]<[color=#79c0ff]BreadcrumbEllipsis[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`                [color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{`              [color=#7ee787]</[color=#79c0ff]DropdownMenuTrigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">35</Text>
+                  <Text className="code-line">{`              [color=#7ee787]<[color=#79c0ff]DropdownMenuContent[/color] [color=#79c0ff]align[/color]=[color=#a5d6ff]"start"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">36</Text>
+                  <Text className="code-line">{`                [color=#7ee787]<[color=#79c0ff]DropdownMenuGroup[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">37</Text>
+                  <Text className="code-line">{`                  [color=#7ee787]<[color=#79c0ff]DropdownMenuItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">38</Text>
+                  <Text className="code-line">{`                    [color=#7ee787]<[color=#79c0ff]Text[/color]>[/color]Documentation[color=#7ee787]</[color=#79c0ff]Text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">39</Text>
+                  <Text className="code-line">{`                  [color=#7ee787]</[color=#79c0ff]DropdownMenuItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">40</Text>
+                  <Text className="code-line">{`                  [color=#7ee787]<[color=#79c0ff]DropdownMenuItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">41</Text>
+                  <Text className="code-line">{`                    [color=#7ee787]<[color=#79c0ff]Text[/color]>[/color]Themes[color=#7ee787]</[color=#79c0ff]Text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">42</Text>
+                  <Text className="code-line">{`                  [color=#7ee787]</[color=#79c0ff]DropdownMenuItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">43</Text>
+                  <Text className="code-line">{`                  [color=#7ee787]<[color=#79c0ff]DropdownMenuItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">44</Text>
+                  <Text className="code-line">{`                    [color=#7ee787]<[color=#79c0ff]Text[/color]>[/color]GitHub[color=#7ee787]</[color=#79c0ff]Text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">45</Text>
+                  <Text className="code-line">{`                  [color=#7ee787]</[color=#79c0ff]DropdownMenuItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">46</Text>
+                  <Text className="code-line">{`                [color=#7ee787]</[color=#79c0ff]DropdownMenuGroup[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">47</Text>
+                  <Text className="code-line">{`              [color=#7ee787]</[color=#79c0ff]DropdownMenuContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">48</Text>
+                  <Text className="code-line">{`            [color=#7ee787]</[color=#79c0ff]DropdownMenu[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">49</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]BreadcrumbSeparator[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">50</Text>
+                  <Text className="code-line">{`          [color=#7ee787]</[color=#79c0ff]BreadcrumbItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">51</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]BreadcrumbItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">52</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]BreadcrumbLink[/color]>[/color]Components[color=#7ee787]</[color=#79c0ff]BreadcrumbLink[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">53</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]BreadcrumbSeparator[/color] />[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">54</Text>
+                  <Text className="code-line">{`          [color=#7ee787]</[color=#79c0ff]BreadcrumbItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">55</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]BreadcrumbItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">56</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]BreadcrumbPage[/color]>[/color]Breadcrumb[color=#7ee787]</[color=#79c0ff]BreadcrumbPage[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">57</Text>
+                  <Text className="code-line">{`          [color=#7ee787]</[color=#79c0ff]BreadcrumbItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">58</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]BreadcrumbList[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">59</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]Breadcrumb[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">60</Text>
+                  <Text className="code-line">{`      {/* The C demo updates this line from the breadcrumb change event. */}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">61</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]Text[/color] [color=#79c0ff]className[/color]=[color=#a5d6ff]"breadcrumb-demo-status text-\\[13px] text-muted-foreground"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">62</Text>
+                  <Text className="code-line">{`        Selected: -`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">63</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]Text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">64</Text>
+                  <Text className="code-line">{`    [color=#7ee787]</[color=#79c0ff]Widget[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">65</Text>
+                  <Text className="code-line">{`  );`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">66</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -917,33 +1789,65 @@ export default function BreadcrumbDemoDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]"example.h"[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]breadcrumb_demo_tsx_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]"example.h"[/color][/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]breadcrumb_demo_tsx_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]"example.h"[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]breadcrumb_demo_tsx_init[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />

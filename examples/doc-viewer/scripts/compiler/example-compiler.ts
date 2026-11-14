@@ -11,7 +11,7 @@
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import hljs from "highlight.js";
-import { highlightedHtmlToLines } from "./style-tag-renderer.ts";
+import { highlightedHtmlToLines, HLJS_CLASS_STYLES_DARK, HLJS_CLASS_STYLES_LIGHT } from "./style-tag-renderer.ts";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -27,8 +27,12 @@ export interface CompiledVariantFile {
    * style tags.  Each entry is one balanced (self-closing) line ready
    * to be embedded in a <Text> widget.  Empty lines become a single
    * space so the rendered widget keeps a non-zero height.
+   *
+   * `lines` uses the GitHub Light palette; `darkLines` uses the GitHub
+   * Dark palette and is shown when the `.dark` class is active.
    */
   lines: string[];
+  darkLines: string[];
 }
 
 export interface CompiledVariant {
@@ -136,7 +140,8 @@ function loadVariantFiles(dir: string, filenames: string[]): CompiledVariantFile
       filename,
       source,
       highlighted,
-      lines: highlightedHtmlToLines(highlighted),
+      lines: highlightedHtmlToLines(highlighted, HLJS_CLASS_STYLES_LIGHT),
+      darkLines: highlightedHtmlToLines(highlighted, HLJS_CLASS_STYLES_DARK),
     });
   }
   return files;

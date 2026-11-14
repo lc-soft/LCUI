@@ -33,7 +33,7 @@ export default function SidebarDocPage() {
         <ul>
           <li><Text>{`[b]Suitable[/b]: Primary navigation sidebars for dashboards, documentation sites, and desktop apps`}</Text></li>
           <li><Text>{`[b]Suitable[/b]: Layouts that switch between expanded, icon-collapsed, and non-collapsible modes`}</Text></li>
-          <li><Text>{`[b]Not suitable[/b]: Cases that only need a regular button group or a short list (use [bgcolor=#eee] button [/bgcolor] or [bgcolor=#eee] menu [/bgcolor])`}</Text></li>
+          <li><Text>{`[b]Not suitable[/b]: Cases that only need a regular button group or a short list (use [bgcolor=#7f7f7f29] button [/bgcolor] or [bgcolor=#7f7f7f29] menu [/bgcolor])`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
@@ -46,9 +46,17 @@ export default function SidebarDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]SidebarProvider[/color], [color=#8250df]SidebarTrigger[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]SidebarProvider[/color], [color=#8250df]SidebarTrigger[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] { [color=#d2a8ff]SidebarProvider[/color], [color=#d2a8ff]SidebarTrigger[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -64,37 +72,73 @@ export default function SidebarDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "184px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]SidebarProvider[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]SidebarProvider[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]Sidebar[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]SidebarContent[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#116329]</[color=#0550ae]Sidebar[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]main[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]SidebarTrigger[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`  [color=#116329]</[color=#0550ae]main[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`</[color=#8250df]SidebarProvider[/color]>`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]Sidebar[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]SidebarContent[/color] />[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]Sidebar[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]main[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]SidebarTrigger[/color] />[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]main[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">8</Text>
-                  <Text className="code-line">{`</[color=#8250df]SidebarProvider[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]SidebarProvider[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]Sidebar[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]SidebarContent[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]Sidebar[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]main[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]SidebarTrigger[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]main[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`</[color=#d2a8ff]SidebarProvider[/color]>`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -105,7 +149,7 @@ export default function SidebarDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>Composition</h2>
-        <p>{`Use the following composition to build a [bgcolor=#eee] Sidebar [/bgcolor]:`}</p>
+        <p>{`Use the following composition to build a [bgcolor=#7f7f7f29] Sidebar [/bgcolor]:`}</p>
         <Widget className="code-block" data-language="text" data-source="en/widgets/sidebar/2">
           <Widget className="code-block-header">
             <Text className="code-block-title">TEXT</Text>
@@ -114,23 +158,44 @@ export default function SidebarDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Text className="code-line">{`SidebarProvider`}</Text>
-                <Text className="code-line">{`├── Sidebar`}</Text>
-                <Text className="code-line">{`│   ├── SidebarHeader`}</Text>
-                <Text className="code-line">{`│   ├── SidebarContent`}</Text>
-                <Text className="code-line">{`│   │   └── SidebarGroup`}</Text>
-                <Text className="code-line">{`│   │       ├── SidebarGroupLabel`}</Text>
-                <Text className="code-line">{`│   │       ├── SidebarGroupAction`}</Text>
-                <Text className="code-line">{`│   │       └── SidebarGroupContent`}</Text>
-                <Text className="code-line">{`│   │           └── SidebarMenu`}</Text>
-                <Text className="code-line">{`│   │               └── SidebarMenuItem`}</Text>
-                <Text className="code-line">{`│   │                   ├── SidebarMenuButton (class)`}</Text>
-                <Text className="code-line">{`│   │                   ├── SidebarMenuAction`}</Text>
-                <Text className="code-line">{`│   │                   ├── SidebarMenuBadge`}</Text>
-                <Text className="code-line">{`│   │                   └── SidebarMenuSub`}</Text>
-                <Text className="code-line">{`│   ├── SidebarFooter`}</Text>
-                <Text className="code-line">{`│   └── SidebarRail`}</Text>
-                <Text className="code-line">{`└── SidebarTrigger`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Text className="code-line">{`SidebarProvider`}</Text>
+                  <Text className="code-line">{`├── Sidebar`}</Text>
+                  <Text className="code-line">{`│   ├── SidebarHeader`}</Text>
+                  <Text className="code-line">{`│   ├── SidebarContent`}</Text>
+                  <Text className="code-line">{`│   │   └── SidebarGroup`}</Text>
+                  <Text className="code-line">{`│   │       ├── SidebarGroupLabel`}</Text>
+                  <Text className="code-line">{`│   │       ├── SidebarGroupAction`}</Text>
+                  <Text className="code-line">{`│   │       └── SidebarGroupContent`}</Text>
+                  <Text className="code-line">{`│   │           └── SidebarMenu`}</Text>
+                  <Text className="code-line">{`│   │               └── SidebarMenuItem`}</Text>
+                  <Text className="code-line">{`│   │                   ├── SidebarMenuButton (class)`}</Text>
+                  <Text className="code-line">{`│   │                   ├── SidebarMenuAction`}</Text>
+                  <Text className="code-line">{`│   │                   ├── SidebarMenuBadge`}</Text>
+                  <Text className="code-line">{`│   │                   └── SidebarMenuSub`}</Text>
+                  <Text className="code-line">{`│   ├── SidebarFooter`}</Text>
+                  <Text className="code-line">{`│   └── SidebarRail`}</Text>
+                  <Text className="code-line">{`└── SidebarTrigger`}</Text>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Text className="code-line">{`SidebarProvider`}</Text>
+                  <Text className="code-line">{`├── Sidebar`}</Text>
+                  <Text className="code-line">{`│   ├── SidebarHeader`}</Text>
+                  <Text className="code-line">{`│   ├── SidebarContent`}</Text>
+                  <Text className="code-line">{`│   │   └── SidebarGroup`}</Text>
+                  <Text className="code-line">{`│   │       ├── SidebarGroupLabel`}</Text>
+                  <Text className="code-line">{`│   │       ├── SidebarGroupAction`}</Text>
+                  <Text className="code-line">{`│   │       └── SidebarGroupContent`}</Text>
+                  <Text className="code-line">{`│   │           └── SidebarMenu`}</Text>
+                  <Text className="code-line">{`│   │               └── SidebarMenuItem`}</Text>
+                  <Text className="code-line">{`│   │                   ├── SidebarMenuButton (class)`}</Text>
+                  <Text className="code-line">{`│   │                   ├── SidebarMenuAction`}</Text>
+                  <Text className="code-line">{`│   │                   ├── SidebarMenuBadge`}</Text>
+                  <Text className="code-line">{`│   │                   └── SidebarMenuSub`}</Text>
+                  <Text className="code-line">{`│   ├── SidebarFooter`}</Text>
+                  <Text className="code-line">{`│   └── SidebarRail`}</Text>
+                  <Text className="code-line">{`└── SidebarTrigger`}</Text>
+                </Widget>
               </ScrollAreaContent>
               <Scrollbar />
               <Scrollbar orientation="horizontal" />
@@ -141,10 +206,10 @@ export default function SidebarDocPage() {
       <Widget className="doc-section">
         <h2>Examples</h2>
         <h3>Collapsible groups</h3>
-        <p>{`Place a [bgcolor=#eee] SidebarGroup [/bgcolor] inside a [bgcolor=#eee] Collapsible [/bgcolor] and add [bgcolor=#eee] data-collapsible-trigger [/bgcolor] to its [bgcolor=#eee] SidebarGroupLabel [/bgcolor] to toggle the group content by clicking the group heading.`}</p>
+        <p>{`Place a [bgcolor=#7f7f7f29] SidebarGroup [/bgcolor] inside a [bgcolor=#7f7f7f29] Collapsible [/bgcolor] and add [bgcolor=#7f7f7f29] data-collapsible-trigger [/bgcolor] to its [bgcolor=#7f7f7f29] SidebarGroupLabel [/bgcolor] to toggle the group content by clicking the group heading.`}</p>
         <SidebarGroupCollapsibleDemo />
         <h3>Icon collapse</h3>
-        <p>{`With [bgcolor=#eee] collapsible="icon" [/bgcolor], collapsing keeps the icons and hides the menu labels; the trigger can expand the sidebar again.`}</p>
+        <p>{`With [bgcolor=#7f7f7f29] collapsible="icon" [/bgcolor], collapsing keeps the icons and hides the menu labels; the trigger can expand the sidebar again.`}</p>
         <SidebarCollapsedDemo />
       </Widget>
       <Widget className="doc-section">
@@ -156,7 +221,7 @@ export default function SidebarDocPage() {
         <p>{`The main sidebar panel, which handles width, border, and collapse mode.`}</p>
         <FieldTable fields={sidebarFields} locale="en" />
         <h3>SidebarTrigger</h3>
-        <p>{`A button that toggles the nearest provider; it uses the [bgcolor=#eee] panel-left [/bgcolor] icon by default.`}</p>
+        <p>{`A button that toggles the nearest provider; it uses the [bgcolor=#7f7f7f29] panel-left [/bgcolor] icon by default.`}</p>
         <FieldTable fields={sidebarTriggerFields} locale="en" />
         <h3>SidebarRail</h3>
         <p>{`A narrow trigger area along the sidebar edge that also toggles the sidebar when clicked.`}</p>
@@ -168,13 +233,13 @@ export default function SidebarDocPage() {
         <p>{`The sidebar footer container, usually for settings or account entries.`}</p>
         <FieldTable fields={sidebarFooterFields} locale="en" />
         <h3>SidebarContent</h3>
-        <p>{`The main sidebar area; it only handles flex layout, so compose [bgcolor=#eee] ScrollArea [/bgcolor] inside it when scrolling is needed.`}</p>
+        <p>{`The main sidebar area; it only handles flex layout, so compose [bgcolor=#7f7f7f29] ScrollArea [/bgcolor] inside it when scrolling is needed.`}</p>
         <FieldTable fields={sidebarContentFields} locale="en" />
         <h3>SidebarGroup</h3>
         <p>{`A sidebar group container that can hold a label, action, and content.`}</p>
         <FieldTable fields={sidebarGroupFields} locale="en" />
         <h3>SidebarGroupLabel</h3>
-        <p>{`The group heading; after you add [bgcolor=#eee] data-collapsible-trigger [/bgcolor], it toggles the outer Collapsible.`}</p>
+        <p>{`The group heading; after you add [bgcolor=#7f7f7f29] data-collapsible-trigger [/bgcolor], it toggles the outer Collapsible.`}</p>
         <FieldTable fields={sidebarGroupLabelFields} locale="en" />
         <h3>SidebarGroupAction</h3>
         <p>{`The action button on the right side of the group heading.`}</p>
@@ -201,12 +266,12 @@ export default function SidebarDocPage() {
         <p>{`The badge on the right side of a menu item.`}</p>
         <FieldTable fields={sidebarMenuBadgeFields} locale="en" />
         <h3>SidebarMenuButton</h3>
-        <p>{`[bgcolor=#eee] SidebarMenuButton [/bgcolor] does not register its own widget; it uses a class contract:`}</p>
+        <p>{`[bgcolor=#7f7f7f29] SidebarMenuButton [/bgcolor] does not register its own widget; it uses a class contract:`}</p>
         <ul>
-          <li><Text>{`Add [bgcolor=#eee] sidebar-menu-button [/bgcolor] to a [bgcolor=#eee] button [/bgcolor], [bgcolor=#eee] a [/bgcolor], or [bgcolor=#eee] RouterLink [/bgcolor]`}</Text></li>
-          <li><Text>{`Put the label in a [bgcolor=#eee] text [/bgcolor] child with the [bgcolor=#eee] sidebar-menu-label [/bgcolor] class`}</Text></li>
-          <li><Text>{`Add the [bgcolor=#eee] active [/bgcolor] class to the current item`}</Text></li>
-          <li><Text>{`In the future, [bgcolor=#eee] SidebarMenuButton [/bgcolor] in [bgcolor=#eee] @lcui/react [/bgcolor] will create a button with this class by default; when [bgcolor=#eee] render [/bgcolor] is specified, append the class to the rendered child`}</Text></li>
+          <li><Text>{`Add [bgcolor=#7f7f7f29] sidebar-menu-button [/bgcolor] to a [bgcolor=#7f7f7f29] button [/bgcolor], [bgcolor=#7f7f7f29] a [/bgcolor], or [bgcolor=#7f7f7f29] RouterLink [/bgcolor]`}</Text></li>
+          <li><Text>{`Put the label in a [bgcolor=#7f7f7f29] text [/bgcolor] child with the [bgcolor=#7f7f7f29] sidebar-menu-label [/bgcolor] class`}</Text></li>
+          <li><Text>{`Add the [bgcolor=#7f7f7f29] active [/bgcolor] class to the current item`}</Text></li>
+          <li><Text>{`In the future, [bgcolor=#7f7f7f29] SidebarMenuButton [/bgcolor] in [bgcolor=#7f7f7f29] @lcui/react [/bgcolor] will create a button with this class by default; when [bgcolor=#7f7f7f29] render [/bgcolor] is specified, append the class to the rendered child`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
@@ -214,13 +279,13 @@ export default function SidebarDocPage() {
         <Widget className="admonition admonition-note">
           <Text className="admonition-title">提示</Text>
           <Widget className="admonition-content">
-            <p>{`[bgcolor=#eee] SidebarContent [/bgcolor] does not create a ScrollArea automatically. When scrolling is needed, compose [bgcolor=#eee] ScrollArea [/bgcolor] and [bgcolor=#eee] ScrollAreaContent [/bgcolor] inside [bgcolor=#eee] SidebarContent [/bgcolor].`}</p>
+            <p>{`[bgcolor=#7f7f7f29] SidebarContent [/bgcolor] does not create a ScrollArea automatically. When scrolling is needed, compose [bgcolor=#7f7f7f29] ScrollArea [/bgcolor] and [bgcolor=#7f7f7f29] ScrollAreaContent [/bgcolor] inside [bgcolor=#7f7f7f29] SidebarContent [/bgcolor].`}</p>
           </Widget>
         </Widget>
         <Widget className="admonition admonition-caution">
           <Text className="admonition-title">警告</Text>
           <Widget className="admonition-content">
-            <p>{`Floating/inset variants, keyboard shortcuts, and cookie persistence are not supported in the current version. [bgcolor=#eee] SidebarInset [/bgcolor] is not implemented either.`}</p>
+            <p>{`Floating/inset variants, keyboard shortcuts, and cookie persistence are not supported in the current version. [bgcolor=#7f7f7f29] SidebarInset [/bgcolor] is not implemented either.`}</p>
           </Widget>
         </Widget>
       </Widget>

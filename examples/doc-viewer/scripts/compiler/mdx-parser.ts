@@ -13,7 +13,7 @@
  * LCUI does not support mixed text+element nodes.  Inline markup inside a
  * paragraph (e.g. <b>Note:</b> Run <code>ls -a</code>) is flattened into a
  * single <text> element using LCUI style tags:
- *   [b]Note:[/b] Run [bgcolor=#eee]ls -a[/bgcolor]
+ *   [b]Note:[/b] Run [bgcolor=#7f7f7f29]ls -a[/bgcolor]
  */
 
 import { fromMarkdown } from "mdast-util-from-markdown";
@@ -110,7 +110,7 @@ function tokenizeLine(line: string): Token {
  * Supported conversions:
  *   **text** / __text__  →  [b]text[/b]
  *   *text*  / _text_     →  [i]text[/i]
- *   `code`               →  [bgcolor=#eee] code [/bgcolor]  (spaces act as padding)
+ *   `code`               →  [bgcolor=#7f7f7f29] code [/bgcolor]  (spaces act as padding)
  *   [text](url)          →  text  (link text only — LCUI has no hyperlink)
  */
 export function markdownInlineToLcuiStyleTags(text: string): string {
@@ -136,7 +136,9 @@ function renderPhrasingChildren(nodes: PhrasingContent[]): string {
         out.push(`[i]${renderPhrasingChildren(node.children)}[/i]`);
         break;
       case "inlineCode":
-        out.push(`[bgcolor=#eee] ${node.value} [/bgcolor]`);
+        // Neutral translucent background: it darkens light surfaces and
+        // lightens dark ones, so the same value works in both themes.
+        out.push(`[bgcolor=#7f7f7f29] ${node.value} [/bgcolor]`);
         break;
       case "link":
         out.push(renderPhrasingChildren(node.children));

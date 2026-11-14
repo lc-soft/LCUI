@@ -8,7 +8,7 @@ export default function SassDocPage() {
       <p className="doc-page-desc">{`Sass 是一个流行的 CSS 预处理器，通过变量、嵌套规则和混合元素等功能扩展 CSS。`}</p>
       <Widget className="doc-section">
         <h2>用法</h2>
-        <p>{`[bgcolor=#eee] @lcui/cli [/bgcolor] 已内置 Sass 预处理器，在编译 [bgcolor=#eee] .sass [/bgcolor] 和 [bgcolor=#eee] .scss [/bgcolor] 后缀的文件时会自动调用，无需额外安装或配置。`}</p>
+        <p>{`[bgcolor=#7f7f7f29] @lcui/cli [/bgcolor] 已内置 Sass 预处理器，在编译 [bgcolor=#7f7f7f29] .sass [/bgcolor] 和 [bgcolor=#7f7f7f29] .scss [/bgcolor] 后缀的文件时会自动调用，无需额外安装或配置。`}</p>
         <p>{`在 TSX 中直接导入 Sass 文件：`}</p>
         <Widget className="code-block" data-language="tsx" data-source="zh-CN/devtools/sass/0">
           <Widget className="code-block-header">
@@ -18,9 +18,17 @@ export default function SassDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] [color=#0a3069]"./MyComponent.scss"[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] [color=#0a3069]"./MyComponent.scss"[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] [color=#a5d6ff]"./MyComponent.scss"[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />

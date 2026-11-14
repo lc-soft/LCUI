@@ -19,7 +19,7 @@ export default function SpinnerDocPage() {
         <ul>
           <li><Text>{`[b]Suitable[/b]: a loading state that waits for an async result whose progress cannot be predicted`}</Text></li>
           <li><Text>{`[b]Suitable[/b]: a busy indicator for a local area such as a button or a card`}</Text></li>
-          <li><Text>{`[b]Not suitable[/b]: progress with a definite percentage or a known duration (use [bgcolor=#eee] progress [/bgcolor])`}</Text></li>
+          <li><Text>{`[b]Not suitable[/b]: progress with a definite percentage or a known duration (use [bgcolor=#7f7f7f29] progress [/bgcolor])`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
@@ -32,9 +32,17 @@ export default function SpinnerDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Spinner[/color], [color=#8250df]SpinnerContent[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Spinner[/color], [color=#8250df]SpinnerContent[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] { [color=#d2a8ff]Spinner[/color], [color=#d2a8ff]SpinnerContent[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -50,9 +58,17 @@ export default function SpinnerDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]Spinner[/color] running={[color=#0550ae]true[/color]} speed={[color=#0550ae]1[/color]} />`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]Spinner[/color] running={[color=#0550ae]true[/color]} speed={[color=#0550ae]1[/color]} />`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]Spinner[/color] running={[color=#79c0ff]true[/color]} speed={[color=#79c0ff]1[/color]} />`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -63,7 +79,7 @@ export default function SpinnerDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>Composition</h2>
-        <p>{`Use the following composition to build a [bgcolor=#eee] Spinner [/bgcolor]:`}</p>
+        <p>{`Use the following composition to build a [bgcolor=#7f7f7f29] Spinner [/bgcolor]:`}</p>
         <Widget className="code-block" data-language="text" data-source="en/widgets/spinner/2">
           <Widget className="code-block-header">
             <Text className="code-block-title">TEXT</Text>
@@ -72,8 +88,14 @@ export default function SpinnerDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "64px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Text className="code-line">{`Spinner`}</Text>
-                <Text className="code-line">{`└── SpinnerContent`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Text className="code-line">{`Spinner`}</Text>
+                  <Text className="code-line">{`└── SpinnerContent`}</Text>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Text className="code-line">{`Spinner`}</Text>
+                  <Text className="code-line">{`└── SpinnerContent`}</Text>
+                </Widget>
               </ScrollAreaContent>
               <Scrollbar />
               <Scrollbar orientation="horizontal" />
@@ -93,7 +115,7 @@ export default function SpinnerDocPage() {
       <Widget className="doc-section">
         <h2>API Reference</h2>
         <h3>Spinner</h3>
-        <p>{`The spinner container; it captures the [bgcolor=#eee] SpinnerContent [/bgcolor] subtree and draws it rotated about its center. It is 16×16 by default and can be overridden with [bgcolor=#eee] width [/bgcolor]/[bgcolor=#eee] height [/bgcolor].`}</p>
+        <p>{`The spinner container; it captures the [bgcolor=#7f7f7f29] SpinnerContent [/bgcolor] subtree and draws it rotated about its center. It is 16×16 by default and can be overridden with [bgcolor=#7f7f7f29] width [/bgcolor]/[bgcolor=#7f7f7f29] height [/bgcolor].`}</p>
         <FieldTable fields={spinnerFields} locale="en" />
         <h3>SpinnerContent</h3>
         <p>{`The content subtree captured for rotation, used as a direct child of Spinner. When omitted, a default ring is used, with one side left transparent to form a gap that sweeps around as it rotates.`}</p>

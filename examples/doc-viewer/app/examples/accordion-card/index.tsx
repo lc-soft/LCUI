@@ -25,261 +25,521 @@ export default function AccordionCardDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_text[/color][color=#0550ae]([color=#953800]const[/color] [color=#953800]char[/color] *content)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *text = ui_create_widget([color=#0a3069]"text"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`        ui_text_set_content(text, content);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`        [color=#cf222e]return[/color] text;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]add_item[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *accordion, [color=#953800]const[/color] [color=#953800]char[/color] *value,[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`[color=#0550ae]                             [color=#953800]const[/color] [color=#953800]char[/color] *title, [color=#953800]const[/color] [color=#953800]char[/color] *body)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *item = ui_create_accordion_item();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *trigger = ui_create_accordion_trigger();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *content = ui_create_accordion_content();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`        ui_accordion_item_set_value(item, value);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`        ui_widget_append(trigger, create_text(title));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`        ui_widget_append(content, create_text(body));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`        ui_widget_append(item, trigger);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`        ui_widget_append(item, content);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`        ui_widget_append(accordion, item);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`        [color=#cf222e]return[/color] item;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]accordion_card_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *card = ui_create_card();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *header = ui_create_card_header();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *title = ui_create_card_title();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *description = ui_create_card_description();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *card_content = ui_create_card_content();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *accordion = ui_create_accordion();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">35</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">36</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(card, [color=#0a3069]"accordion-card-demo"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">37</Text>
+                  <Text className="code-line">{`        ui_text_set_content(title, [color=#0a3069]"Subscription & Billing"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">38</Text>
+                  <Text className="code-line">{`        ui_text_set_content(description,`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">39</Text>
+                  <Text className="code-line">{`                            [color=#0a3069]"Common questions about your account, plans, "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">40</Text>
+                  <Text className="code-line">{`                            [color=#0a3069]"payments and cancellations."[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">41</Text>
+                  <Text className="code-line">{`        ui_widget_append(header, title);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">42</Text>
+                  <Text className="code-line">{`        ui_widget_append(header, description);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">43</Text>
+                  <Text className="code-line">{`        ui_widget_append(card, header);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">44</Text>
+                  <Text className="code-line">{`        ui_widget_append(card, card_content);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">45</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">46</Text>
+                  <Text className="code-line">{`        ui_widget_set_attr(accordion, [color=#0a3069]"default-value"[/color], [color=#0a3069]"plans"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">47</Text>
+                  <Text className="code-line">{`        add_item(accordion, [color=#0a3069]"plans"[/color], [color=#0a3069]"What subscription plans do you offer?"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">48</Text>
+                  <Text className="code-line">{`                 [color=#0a3069]"We offer three subscription tiers: Starter (\$9/month), "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">49</Text>
+                  <Text className="code-line">{`                 [color=#0a3069]"Professional (\$29/month), and Enterprise (\$99/month). Each "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">50</Text>
+                  <Text className="code-line">{`                 [color=#0a3069]"plan includes increasing storage limits, API access, "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">51</Text>
+                  <Text className="code-line">{`                 [color=#0a3069]"priority support, and team collaboration features."[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">52</Text>
+                  <Text className="code-line">{`        add_item(accordion, [color=#0a3069]"billing"[/color], [color=#0a3069]"How does billing work?"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">53</Text>
+                  <Text className="code-line">{`                 [color=#0a3069]"Billing occurs automatically at the start of each billing "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">54</Text>
+                  <Text className="code-line">{`                 [color=#0a3069]"cycle. We accept all major credit cards, PayPal, and ACH "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">55</Text>
+                  <Text className="code-line">{`                 [color=#0a3069]"transfers for enterprise customers. You&#x27;ll receive an "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">56</Text>
+                  <Text className="code-line">{`                 [color=#0a3069]"invoice via email after each payment."[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">57</Text>
+                  <Text className="code-line">{`        add_item(accordion, [color=#0a3069]"cancel"[/color], [color=#0a3069]"How do I cancel my subscription?"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">58</Text>
+                  <Text className="code-line">{`                 [color=#0a3069]"You can cancel your subscription anytime from your account "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">59</Text>
+                  <Text className="code-line">{`                 [color=#0a3069]"settings. There are no cancellation fees or penalties. "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">60</Text>
+                  <Text className="code-line">{`                 [color=#0a3069]"Your access will continue until the end of your current "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">61</Text>
+                  <Text className="code-line">{`                 [color=#0a3069]"billing period."[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">62</Text>
+                  <Text className="code-line">{`        ui_widget_append(card_content, accordion);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">63</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, card);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">64</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]create_text[/color][color=#0550ae]([color=#953800]const[/color] [color=#953800]char[/color] *content)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *text = ui_create_widget([color=#0a3069]"text"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`        ui_text_set_content(text, content);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">8</Text>
-                <Text className="code-line">{`        [color=#cf222e]return[/color] text;`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">9</Text>
-                <Text className="code-line">{`}`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">10</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">11</Text>
-                <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_t[/color] *[color=#8250df]add_item[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *accordion, [color=#953800]const[/color] [color=#953800]char[/color] *value,[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">12</Text>
-                <Text className="code-line">{`[color=#0550ae]                             [color=#953800]const[/color] [color=#953800]char[/color] *title, [color=#953800]const[/color] [color=#953800]char[/color] *body)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">13</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">14</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *item = ui_create_accordion_item();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">15</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *trigger = ui_create_accordion_trigger();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">16</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *content = ui_create_accordion_content();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">17</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">18</Text>
-                <Text className="code-line">{`        ui_accordion_item_set_value(item, value);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">19</Text>
-                <Text className="code-line">{`        ui_widget_append(trigger, create_text(title));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">20</Text>
-                <Text className="code-line">{`        ui_widget_append(content, create_text(body));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">21</Text>
-                <Text className="code-line">{`        ui_widget_append(item, trigger);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">22</Text>
-                <Text className="code-line">{`        ui_widget_append(item, content);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">23</Text>
-                <Text className="code-line">{`        ui_widget_append(accordion, item);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">24</Text>
-                <Text className="code-line">{`        [color=#cf222e]return[/color] item;`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">25</Text>
-                <Text className="code-line">{`}`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">26</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">27</Text>
-                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]accordion_card_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">28</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">29</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *card = ui_create_card();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">30</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *header = ui_create_card_header();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">31</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *title = ui_create_card_title();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">32</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *description = ui_create_card_description();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">33</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *card_content = ui_create_card_content();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">34</Text>
-                <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *accordion = ui_create_accordion();`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">35</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">36</Text>
-                <Text className="code-line">{`        ui_widget_add_class(card, [color=#0a3069]"accordion-card-demo"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">37</Text>
-                <Text className="code-line">{`        ui_text_set_content(title, [color=#0a3069]"Subscription & Billing"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">38</Text>
-                <Text className="code-line">{`        ui_text_set_content(description,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">39</Text>
-                <Text className="code-line">{`                            [color=#0a3069]"Common questions about your account, plans, "[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">40</Text>
-                <Text className="code-line">{`                            [color=#0a3069]"payments and cancellations."[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">41</Text>
-                <Text className="code-line">{`        ui_widget_append(header, title);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">42</Text>
-                <Text className="code-line">{`        ui_widget_append(header, description);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">43</Text>
-                <Text className="code-line">{`        ui_widget_append(card, header);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">44</Text>
-                <Text className="code-line">{`        ui_widget_append(card, card_content);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">45</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">46</Text>
-                <Text className="code-line">{`        ui_widget_set_attr(accordion, [color=#0a3069]"default-value"[/color], [color=#0a3069]"plans"[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">47</Text>
-                <Text className="code-line">{`        add_item(accordion, [color=#0a3069]"plans"[/color], [color=#0a3069]"What subscription plans do you offer?"[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">48</Text>
-                <Text className="code-line">{`                 [color=#0a3069]"We offer three subscription tiers: Starter (\$9/month), "[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">49</Text>
-                <Text className="code-line">{`                 [color=#0a3069]"Professional (\$29/month), and Enterprise (\$99/month). Each "[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">50</Text>
-                <Text className="code-line">{`                 [color=#0a3069]"plan includes increasing storage limits, API access, "[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">51</Text>
-                <Text className="code-line">{`                 [color=#0a3069]"priority support, and team collaboration features."[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">52</Text>
-                <Text className="code-line">{`        add_item(accordion, [color=#0a3069]"billing"[/color], [color=#0a3069]"How does billing work?"[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">53</Text>
-                <Text className="code-line">{`                 [color=#0a3069]"Billing occurs automatically at the start of each billing "[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">54</Text>
-                <Text className="code-line">{`                 [color=#0a3069]"cycle. We accept all major credit cards, PayPal, and ACH "[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">55</Text>
-                <Text className="code-line">{`                 [color=#0a3069]"transfers for enterprise customers. You&#x27;ll receive an "[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">56</Text>
-                <Text className="code-line">{`                 [color=#0a3069]"invoice via email after each payment."[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">57</Text>
-                <Text className="code-line">{`        add_item(accordion, [color=#0a3069]"cancel"[/color], [color=#0a3069]"How do I cancel my subscription?"[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">58</Text>
-                <Text className="code-line">{`                 [color=#0a3069]"You can cancel your subscription anytime from your account "[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">59</Text>
-                <Text className="code-line">{`                 [color=#0a3069]"settings. There are no cancellation fees or penalties. "[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">60</Text>
-                <Text className="code-line">{`                 [color=#0a3069]"Your access will continue until the end of your current "[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">61</Text>
-                <Text className="code-line">{`                 [color=#0a3069]"billing period."[/color]);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">62</Text>
-                <Text className="code-line">{`        ui_widget_append(card_content, accordion);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">63</Text>
-                <Text className="code-line">{`        ui_widget_append(parent, card);`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">64</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#ffa657]static[/color] [color=#ffa657]ui_widget_t[/color] *[color=#d2a8ff]create_text[/color][color=#79c0ff]([color=#ffa657]const[/color] [color=#ffa657]char[/color] *content)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *text = ui_create_widget([color=#a5d6ff]"text"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`        ui_text_set_content(text, content);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`        [color=#ff7b72]return[/color] text;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`[color=#ffa657]static[/color] [color=#ffa657]ui_widget_t[/color] *[color=#d2a8ff]add_item[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *accordion, [color=#ffa657]const[/color] [color=#ffa657]char[/color] *value,[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`[color=#79c0ff]                             [color=#ffa657]const[/color] [color=#ffa657]char[/color] *title, [color=#ffa657]const[/color] [color=#ffa657]char[/color] *body)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *item = ui_create_accordion_item();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *trigger = ui_create_accordion_trigger();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *content = ui_create_accordion_content();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`        ui_accordion_item_set_value(item, value);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`        ui_widget_append(trigger, create_text(title));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`        ui_widget_append(content, create_text(body));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`        ui_widget_append(item, trigger);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`        ui_widget_append(item, content);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`        ui_widget_append(accordion, item);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`        [color=#ff7b72]return[/color] item;`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]accordion_card_init[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *card = ui_create_card();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *header = ui_create_card_header();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *title = ui_create_card_title();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *description = ui_create_card_description();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *card_content = ui_create_card_content();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *accordion = ui_create_accordion();`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">35</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">36</Text>
+                  <Text className="code-line">{`        ui_widget_add_class(card, [color=#a5d6ff]"accordion-card-demo"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">37</Text>
+                  <Text className="code-line">{`        ui_text_set_content(title, [color=#a5d6ff]"Subscription & Billing"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">38</Text>
+                  <Text className="code-line">{`        ui_text_set_content(description,`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">39</Text>
+                  <Text className="code-line">{`                            [color=#a5d6ff]"Common questions about your account, plans, "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">40</Text>
+                  <Text className="code-line">{`                            [color=#a5d6ff]"payments and cancellations."[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">41</Text>
+                  <Text className="code-line">{`        ui_widget_append(header, title);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">42</Text>
+                  <Text className="code-line">{`        ui_widget_append(header, description);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">43</Text>
+                  <Text className="code-line">{`        ui_widget_append(card, header);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">44</Text>
+                  <Text className="code-line">{`        ui_widget_append(card, card_content);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">45</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">46</Text>
+                  <Text className="code-line">{`        ui_widget_set_attr(accordion, [color=#a5d6ff]"default-value"[/color], [color=#a5d6ff]"plans"[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">47</Text>
+                  <Text className="code-line">{`        add_item(accordion, [color=#a5d6ff]"plans"[/color], [color=#a5d6ff]"What subscription plans do you offer?"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">48</Text>
+                  <Text className="code-line">{`                 [color=#a5d6ff]"We offer three subscription tiers: Starter (\$9/month), "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">49</Text>
+                  <Text className="code-line">{`                 [color=#a5d6ff]"Professional (\$29/month), and Enterprise (\$99/month). Each "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">50</Text>
+                  <Text className="code-line">{`                 [color=#a5d6ff]"plan includes increasing storage limits, API access, "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">51</Text>
+                  <Text className="code-line">{`                 [color=#a5d6ff]"priority support, and team collaboration features."[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">52</Text>
+                  <Text className="code-line">{`        add_item(accordion, [color=#a5d6ff]"billing"[/color], [color=#a5d6ff]"How does billing work?"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">53</Text>
+                  <Text className="code-line">{`                 [color=#a5d6ff]"Billing occurs automatically at the start of each billing "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">54</Text>
+                  <Text className="code-line">{`                 [color=#a5d6ff]"cycle. We accept all major credit cards, PayPal, and ACH "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">55</Text>
+                  <Text className="code-line">{`                 [color=#a5d6ff]"transfers for enterprise customers. You&#x27;ll receive an "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">56</Text>
+                  <Text className="code-line">{`                 [color=#a5d6ff]"invoice via email after each payment."[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">57</Text>
+                  <Text className="code-line">{`        add_item(accordion, [color=#a5d6ff]"cancel"[/color], [color=#a5d6ff]"How do I cancel my subscription?"[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">58</Text>
+                  <Text className="code-line">{`                 [color=#a5d6ff]"You can cancel your subscription anytime from your account "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">59</Text>
+                  <Text className="code-line">{`                 [color=#a5d6ff]"settings. There are no cancellation fees or penalties. "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">60</Text>
+                  <Text className="code-line">{`                 [color=#a5d6ff]"Your access will continue until the end of your current "[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">61</Text>
+                  <Text className="code-line">{`                 [color=#a5d6ff]"billing period."[/color]);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">62</Text>
+                  <Text className="code-line">{`        ui_widget_append(card_content, accordion);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">63</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, card);`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">64</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -290,233 +550,465 @@ export default function AccordionCardDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]<?xml version=[color=#0a3069]"1.0"[/color] encoding=[color=#0a3069]"UTF-8"[/color] ?>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]card[/color] [color=#0550ae]class[/color]=[color=#0a3069]"accordion-card-demo"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]card-header[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]card-title[/color]>[/color]Subscription [color=#0550ae]&amp;[/color] Billing[color=#116329]</[color=#0550ae]card-title[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]card-description[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`          Common questions about your account, plans, payments and`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`          cancellations.`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]card-description[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]card-header[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]card-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]accordion[/color] [color=#0550ae]default-value[/color]=[color=#0a3069]"plans"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]accordion-item[/color] [color=#0550ae]value[/color]=[color=#0a3069]"plans"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]accordion-trigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`              [color=#116329]<[color=#0550ae]text[/color]>[/color]What subscription plans do you offer?[color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`            [color=#116329]</[color=#0550ae]accordion-trigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]accordion-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`              [color=#116329]<[color=#0550ae]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`                We offer three subscription tiers: Starter (\$9/month),`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`                Professional (\$29/month), and Enterprise (\$99/month). Each`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`                plan includes increasing storage limits, API access, priority`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`                support, and team collaboration features.`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`              [color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`            [color=#116329]</[color=#0550ae]accordion-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`          [color=#116329]</[color=#0550ae]accordion-item[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]accordion-item[/color] [color=#0550ae]value[/color]=[color=#0a3069]"billing"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]accordion-trigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`              [color=#116329]<[color=#0550ae]text[/color]>[/color]How does billing work?[color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`            [color=#116329]</[color=#0550ae]accordion-trigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]accordion-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`              [color=#116329]<[color=#0550ae]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`                Billing occurs automatically at the start of each billing`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{`                cycle. We accept all major credit cards, PayPal, and ACH`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">35</Text>
+                  <Text className="code-line">{`                transfers for enterprise customers. You&#x27;ll receive an`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">36</Text>
+                  <Text className="code-line">{`                invoice via email after each payment.`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">37</Text>
+                  <Text className="code-line">{`              [color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">38</Text>
+                  <Text className="code-line">{`            [color=#116329]</[color=#0550ae]accordion-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">39</Text>
+                  <Text className="code-line">{`          [color=#116329]</[color=#0550ae]accordion-item[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">40</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]accordion-item[/color] [color=#0550ae]value[/color]=[color=#0a3069]"cancel"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">41</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]accordion-trigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">42</Text>
+                  <Text className="code-line">{`              [color=#116329]<[color=#0550ae]text[/color]>[/color]How do I cancel my subscription?[color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">43</Text>
+                  <Text className="code-line">{`            [color=#116329]</[color=#0550ae]accordion-trigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">44</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]accordion-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">45</Text>
+                  <Text className="code-line">{`              [color=#116329]<[color=#0550ae]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">46</Text>
+                  <Text className="code-line">{`                You can cancel your subscription anytime from your account`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">47</Text>
+                  <Text className="code-line">{`                settings. There are no cancellation fees or penalties. Your`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">48</Text>
+                  <Text className="code-line">{`                access will continue until the end of your current billing`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">49</Text>
+                  <Text className="code-line">{`                period.`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">50</Text>
+                  <Text className="code-line">{`              [color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">51</Text>
+                  <Text className="code-line">{`            [color=#116329]</[color=#0550ae]accordion-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">52</Text>
+                  <Text className="code-line">{`          [color=#116329]</[color=#0550ae]accordion-item[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">53</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]accordion[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">54</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]card-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">55</Text>
+                  <Text className="code-line">{`    [color=#116329]</[color=#0550ae]card[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">56</Text>
+                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">57</Text>
+                  <Text className="code-line">{`[color=#116329]</[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{`[color=#116329]<[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ui[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`    [color=#116329]<[color=#0550ae]card[/color] [color=#0550ae]class[/color]=[color=#0a3069]"accordion-card-demo"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]card-header[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]card-title[/color]>[/color]Subscription [color=#0550ae]&amp;[/color] Billing[color=#116329]</[color=#0550ae]card-title[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]card-description[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">8</Text>
-                <Text className="code-line">{`          Common questions about your account, plans, payments and`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">9</Text>
-                <Text className="code-line">{`          cancellations.`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">10</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]card-description[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">11</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]card-header[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">12</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]card-content[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">13</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]accordion[/color] [color=#0550ae]default-value[/color]=[color=#0a3069]"plans"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">14</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]accordion-item[/color] [color=#0550ae]value[/color]=[color=#0a3069]"plans"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">15</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]accordion-trigger[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">16</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]text[/color]>[/color]What subscription plans do you offer?[color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">17</Text>
-                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]accordion-trigger[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">18</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]accordion-content[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">19</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">20</Text>
-                <Text className="code-line">{`                We offer three subscription tiers: Starter (\$9/month),`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">21</Text>
-                <Text className="code-line">{`                Professional (\$29/month), and Enterprise (\$99/month). Each`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">22</Text>
-                <Text className="code-line">{`                plan includes increasing storage limits, API access, priority`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">23</Text>
-                <Text className="code-line">{`                support, and team collaboration features.`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">24</Text>
-                <Text className="code-line">{`              [color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">25</Text>
-                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]accordion-content[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">26</Text>
-                <Text className="code-line">{`          [color=#116329]</[color=#0550ae]accordion-item[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">27</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]accordion-item[/color] [color=#0550ae]value[/color]=[color=#0a3069]"billing"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">28</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]accordion-trigger[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">29</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]text[/color]>[/color]How does billing work?[color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">30</Text>
-                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]accordion-trigger[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">31</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]accordion-content[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">32</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">33</Text>
-                <Text className="code-line">{`                Billing occurs automatically at the start of each billing`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">34</Text>
-                <Text className="code-line">{`                cycle. We accept all major credit cards, PayPal, and ACH`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">35</Text>
-                <Text className="code-line">{`                transfers for enterprise customers. You&#x27;ll receive an`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">36</Text>
-                <Text className="code-line">{`                invoice via email after each payment.`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">37</Text>
-                <Text className="code-line">{`              [color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">38</Text>
-                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]accordion-content[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">39</Text>
-                <Text className="code-line">{`          [color=#116329]</[color=#0550ae]accordion-item[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">40</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]accordion-item[/color] [color=#0550ae]value[/color]=[color=#0a3069]"cancel"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">41</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]accordion-trigger[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">42</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]text[/color]>[/color]How do I cancel my subscription?[color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">43</Text>
-                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]accordion-trigger[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">44</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]accordion-content[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">45</Text>
-                <Text className="code-line">{`              [color=#116329]<[color=#0550ae]text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">46</Text>
-                <Text className="code-line">{`                You can cancel your subscription anytime from your account`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">47</Text>
-                <Text className="code-line">{`                settings. There are no cancellation fees or penalties. Your`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">48</Text>
-                <Text className="code-line">{`                access will continue until the end of your current billing`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">49</Text>
-                <Text className="code-line">{`                period.`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">50</Text>
-                <Text className="code-line">{`              [color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">51</Text>
-                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]accordion-content[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">52</Text>
-                <Text className="code-line">{`          [color=#116329]</[color=#0550ae]accordion-item[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">53</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]accordion[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">54</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]card-content[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">55</Text>
-                <Text className="code-line">{`    [color=#116329]</[color=#0550ae]card[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">56</Text>
-                <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ui[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">57</Text>
-                <Text className="code-line">{`[color=#116329]</[color=#0550ae]lcui-app[/color]>[/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]<?xml version=[color=#a5d6ff]"1.0"[/color] encoding=[color=#a5d6ff]"UTF-8"[/color] ?>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#7ee787]<[color=#79c0ff]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]card[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"accordion-card-demo"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]card-header[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]card-title[/color]>[/color]Subscription [color=#79c0ff]&amp;[/color] Billing[color=#7ee787]</[color=#79c0ff]card-title[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]card-description[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`          Common questions about your account, plans, payments and`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`          cancellations.`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]card-description[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]card-header[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]card-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]accordion[/color] [color=#79c0ff]default-value[/color]=[color=#a5d6ff]"plans"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]accordion-item[/color] [color=#79c0ff]value[/color]=[color=#a5d6ff]"plans"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]accordion-trigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`              [color=#7ee787]<[color=#79c0ff]text[/color]>[/color]What subscription plans do you offer?[color=#7ee787]</[color=#79c0ff]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`            [color=#7ee787]</[color=#79c0ff]accordion-trigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]accordion-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`              [color=#7ee787]<[color=#79c0ff]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`                We offer three subscription tiers: Starter (\$9/month),`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`                Professional (\$29/month), and Enterprise (\$99/month). Each`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`                plan includes increasing storage limits, API access, priority`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`                support, and team collaboration features.`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`              [color=#7ee787]</[color=#79c0ff]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`            [color=#7ee787]</[color=#79c0ff]accordion-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`          [color=#7ee787]</[color=#79c0ff]accordion-item[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]accordion-item[/color] [color=#79c0ff]value[/color]=[color=#a5d6ff]"billing"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]accordion-trigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`              [color=#7ee787]<[color=#79c0ff]text[/color]>[/color]How does billing work?[color=#7ee787]</[color=#79c0ff]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`            [color=#7ee787]</[color=#79c0ff]accordion-trigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]accordion-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`              [color=#7ee787]<[color=#79c0ff]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`                Billing occurs automatically at the start of each billing`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{`                cycle. We accept all major credit cards, PayPal, and ACH`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">35</Text>
+                  <Text className="code-line">{`                transfers for enterprise customers. You&#x27;ll receive an`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">36</Text>
+                  <Text className="code-line">{`                invoice via email after each payment.`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">37</Text>
+                  <Text className="code-line">{`              [color=#7ee787]</[color=#79c0ff]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">38</Text>
+                  <Text className="code-line">{`            [color=#7ee787]</[color=#79c0ff]accordion-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">39</Text>
+                  <Text className="code-line">{`          [color=#7ee787]</[color=#79c0ff]accordion-item[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">40</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]accordion-item[/color] [color=#79c0ff]value[/color]=[color=#a5d6ff]"cancel"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">41</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]accordion-trigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">42</Text>
+                  <Text className="code-line">{`              [color=#7ee787]<[color=#79c0ff]text[/color]>[/color]How do I cancel my subscription?[color=#7ee787]</[color=#79c0ff]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">43</Text>
+                  <Text className="code-line">{`            [color=#7ee787]</[color=#79c0ff]accordion-trigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">44</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]accordion-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">45</Text>
+                  <Text className="code-line">{`              [color=#7ee787]<[color=#79c0ff]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">46</Text>
+                  <Text className="code-line">{`                You can cancel your subscription anytime from your account`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">47</Text>
+                  <Text className="code-line">{`                settings. There are no cancellation fees or penalties. Your`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">48</Text>
+                  <Text className="code-line">{`                access will continue until the end of your current billing`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">49</Text>
+                  <Text className="code-line">{`                period.`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">50</Text>
+                  <Text className="code-line">{`              [color=#7ee787]</[color=#79c0ff]text[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">51</Text>
+                  <Text className="code-line">{`            [color=#7ee787]</[color=#79c0ff]accordion-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">52</Text>
+                  <Text className="code-line">{`          [color=#7ee787]</[color=#79c0ff]accordion-item[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">53</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]accordion[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">54</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]card-content[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">55</Text>
+                  <Text className="code-line">{`    [color=#7ee787]</[color=#79c0ff]card[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">56</Text>
+                  <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]ui[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">57</Text>
+                  <Text className="code-line">{`[color=#7ee787]</[color=#79c0ff]lcui-app[/color]>[/color]`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -527,29 +1019,57 @@ export default function AccordionCardDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "144px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]accordion_card_xml_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, ui_create_widget([color=#0550ae]NULL[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]accordion_card_xml_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`        ui_widget_append(parent, ui_create_widget([color=#0550ae]NULL[/color]));`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]accordion_card_xml_init[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, ui_create_widget([color=#79c0ff]NULL[/color]));`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -560,237 +1080,473 @@ export default function AccordionCardDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`  [color=#8250df]Accordion[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  [color=#8250df]AccordionContent[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`  [color=#8250df]AccordionItem[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`  [color=#8250df]AccordionTrigger[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`  [color=#8250df]Card[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`  [color=#8250df]CardContent[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`  [color=#8250df]CardDescription[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`  [color=#8250df]CardHeader[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`  [color=#8250df]CardTitle[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]Example[/color]([color=#0550ae][/color]) {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Card[/color] [color=#0550ae]className[/color]=[color=#0a3069]"w-\\[384px]"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]CardHeader[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]CardTitle[/color]>[/color]Subscription & Billing[color=#116329]</[color=#0550ae]CardTitle[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]CardDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`          Common questions about your account, plans, payments and`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`          cancellations.`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]CardDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]CardHeader[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]CardContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Accordion[/color] [color=#0550ae]defaultValue[/color]=[color=#0a3069]"plans"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AccordionItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"plans"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]AccordionTrigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`              What subscription plans do you offer?`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`            [color=#116329]</[color=#0550ae]AccordionTrigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]AccordionContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`              We offer three subscription tiers: Starter (\$9/month),`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`              Professional (\$29/month), and Enterprise (\$99/month). Each plan`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`              includes increasing storage limits, API access, priority support,`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`              and team collaboration features.`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{`            [color=#116329]</[color=#0550ae]AccordionContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">35</Text>
+                  <Text className="code-line">{`          [color=#116329]</[color=#0550ae]AccordionItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">36</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AccordionItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"billing"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">37</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]AccordionTrigger[/color]>[/color]How does billing work?[color=#116329]</[color=#0550ae]AccordionTrigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">38</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]AccordionContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">39</Text>
+                  <Text className="code-line">{`              Billing occurs automatically at the start of each billing cycle.`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">40</Text>
+                  <Text className="code-line">{`              We accept all major credit cards, PayPal, and ACH transfers for`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">41</Text>
+                  <Text className="code-line">{`              enterprise customers. You&#x27;ll receive an invoice via email after`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">42</Text>
+                  <Text className="code-line">{`              each payment.`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">43</Text>
+                  <Text className="code-line">{`            [color=#116329]</[color=#0550ae]AccordionContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">44</Text>
+                  <Text className="code-line">{`          [color=#116329]</[color=#0550ae]AccordionItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">45</Text>
+                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AccordionItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"cancel"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">46</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]AccordionTrigger[/color]>[/color]How do I cancel my subscription?[color=#116329]</[color=#0550ae]AccordionTrigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">47</Text>
+                  <Text className="code-line">{`            [color=#116329]<[color=#0550ae]AccordionContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">48</Text>
+                  <Text className="code-line">{`              You can cancel your subscription anytime from your account`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">49</Text>
+                  <Text className="code-line">{`              settings. There are no cancellation fees or penalties. Your`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">50</Text>
+                  <Text className="code-line">{`              access will continue until the end of your current billing`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">51</Text>
+                  <Text className="code-line">{`              period.`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">52</Text>
+                  <Text className="code-line">{`            [color=#116329]</[color=#0550ae]AccordionContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">53</Text>
+                  <Text className="code-line">{`          [color=#116329]</[color=#0550ae]AccordionItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">54</Text>
+                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]Accordion[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">55</Text>
+                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]CardContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">56</Text>
+                  <Text className="code-line">{`    [color=#116329]</[color=#0550ae]Card[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">57</Text>
+                  <Text className="code-line">{`  );`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">58</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{`  [color=#8250df]Accordion[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{`  [color=#8250df]AccordionContent[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`  [color=#8250df]AccordionItem[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`  [color=#8250df]AccordionTrigger[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`  [color=#8250df]Card[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`  [color=#8250df]CardContent[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">8</Text>
-                <Text className="code-line">{`  [color=#8250df]CardDescription[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">9</Text>
-                <Text className="code-line">{`  [color=#8250df]CardHeader[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">10</Text>
-                <Text className="code-line">{`  [color=#8250df]CardTitle[/color],`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">11</Text>
-                <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color];`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">12</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">13</Text>
-                <Text className="code-line">{`[color=#cf222e]export[/color] [color=#cf222e]default[/color] [color=#cf222e]function[/color] [color=#8250df]Example[/color]([color=#0550ae][/color]) {`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">14</Text>
-                <Text className="code-line">{`  [color=#cf222e]return[/color] (`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">15</Text>
-                <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Card[/color] [color=#0550ae]className[/color]=[color=#0a3069]"w-\\[384px]"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">16</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]CardHeader[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">17</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]CardTitle[/color]>[/color]Subscription & Billing[color=#116329]</[color=#0550ae]CardTitle[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">18</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]CardDescription[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">19</Text>
-                <Text className="code-line">{`          Common questions about your account, plans, payments and`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">20</Text>
-                <Text className="code-line">{`          cancellations.`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">21</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]CardDescription[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">22</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]CardHeader[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">23</Text>
-                <Text className="code-line">{`      [color=#116329]<[color=#0550ae]CardContent[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">24</Text>
-                <Text className="code-line">{`        [color=#116329]<[color=#0550ae]Accordion[/color] [color=#0550ae]defaultValue[/color]=[color=#0a3069]"plans"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">25</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AccordionItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"plans"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">26</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]AccordionTrigger[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">27</Text>
-                <Text className="code-line">{`              What subscription plans do you offer?`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">28</Text>
-                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]AccordionTrigger[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">29</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]AccordionContent[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">30</Text>
-                <Text className="code-line">{`              We offer three subscription tiers: Starter (\$9/month),`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">31</Text>
-                <Text className="code-line">{`              Professional (\$29/month), and Enterprise (\$99/month). Each plan`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">32</Text>
-                <Text className="code-line">{`              includes increasing storage limits, API access, priority support,`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">33</Text>
-                <Text className="code-line">{`              and team collaboration features.`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">34</Text>
-                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]AccordionContent[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">35</Text>
-                <Text className="code-line">{`          [color=#116329]</[color=#0550ae]AccordionItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">36</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AccordionItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"billing"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">37</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]AccordionTrigger[/color]>[/color]How does billing work?[color=#116329]</[color=#0550ae]AccordionTrigger[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">38</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]AccordionContent[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">39</Text>
-                <Text className="code-line">{`              Billing occurs automatically at the start of each billing cycle.`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">40</Text>
-                <Text className="code-line">{`              We accept all major credit cards, PayPal, and ACH transfers for`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">41</Text>
-                <Text className="code-line">{`              enterprise customers. You&#x27;ll receive an invoice via email after`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">42</Text>
-                <Text className="code-line">{`              each payment.`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">43</Text>
-                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]AccordionContent[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">44</Text>
-                <Text className="code-line">{`          [color=#116329]</[color=#0550ae]AccordionItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">45</Text>
-                <Text className="code-line">{`          [color=#116329]<[color=#0550ae]AccordionItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"cancel"[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">46</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]AccordionTrigger[/color]>[/color]How do I cancel my subscription?[color=#116329]</[color=#0550ae]AccordionTrigger[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">47</Text>
-                <Text className="code-line">{`            [color=#116329]<[color=#0550ae]AccordionContent[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">48</Text>
-                <Text className="code-line">{`              You can cancel your subscription anytime from your account`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">49</Text>
-                <Text className="code-line">{`              settings. There are no cancellation fees or penalties. Your`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">50</Text>
-                <Text className="code-line">{`              access will continue until the end of your current billing`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">51</Text>
-                <Text className="code-line">{`              period.`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">52</Text>
-                <Text className="code-line">{`            [color=#116329]</[color=#0550ae]AccordionContent[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">53</Text>
-                <Text className="code-line">{`          [color=#116329]</[color=#0550ae]AccordionItem[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">54</Text>
-                <Text className="code-line">{`        [color=#116329]</[color=#0550ae]Accordion[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">55</Text>
-                <Text className="code-line">{`      [color=#116329]</[color=#0550ae]CardContent[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">56</Text>
-                <Text className="code-line">{`    [color=#116329]</[color=#0550ae]Card[/color]>[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">57</Text>
-                <Text className="code-line">{`  );`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">58</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#ff7b72]import[/color] {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]Accordion[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]AccordionContent[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]AccordionItem[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]AccordionTrigger[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]Card[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]CardContent[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">8</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]CardDescription[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">9</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]CardHeader[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">10</Text>
+                  <Text className="code-line">{`  [color=#d2a8ff]CardTitle[/color],`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">11</Text>
+                  <Text className="code-line">{`} [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color];`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">12</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">13</Text>
+                  <Text className="code-line">{`[color=#ff7b72]export[/color] [color=#ff7b72]default[/color] [color=#ff7b72]function[/color] [color=#d2a8ff]Example[/color]([color=#79c0ff][/color]) {`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">14</Text>
+                  <Text className="code-line">{`  [color=#ff7b72]return[/color] (`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">15</Text>
+                  <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]Card[/color] [color=#79c0ff]className[/color]=[color=#a5d6ff]"w-\\[384px]"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">16</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]CardHeader[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">17</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]CardTitle[/color]>[/color]Subscription & Billing[color=#7ee787]</[color=#79c0ff]CardTitle[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">18</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]CardDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">19</Text>
+                  <Text className="code-line">{`          Common questions about your account, plans, payments and`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">20</Text>
+                  <Text className="code-line">{`          cancellations.`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">21</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]CardDescription[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">22</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]CardHeader[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">23</Text>
+                  <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]CardContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">24</Text>
+                  <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]Accordion[/color] [color=#79c0ff]defaultValue[/color]=[color=#a5d6ff]"plans"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">25</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]AccordionItem[/color] [color=#79c0ff]value[/color]=[color=#a5d6ff]"plans"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">26</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]AccordionTrigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">27</Text>
+                  <Text className="code-line">{`              What subscription plans do you offer?`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">28</Text>
+                  <Text className="code-line">{`            [color=#7ee787]</[color=#79c0ff]AccordionTrigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">29</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]AccordionContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">30</Text>
+                  <Text className="code-line">{`              We offer three subscription tiers: Starter (\$9/month),`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">31</Text>
+                  <Text className="code-line">{`              Professional (\$29/month), and Enterprise (\$99/month). Each plan`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">32</Text>
+                  <Text className="code-line">{`              includes increasing storage limits, API access, priority support,`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">33</Text>
+                  <Text className="code-line">{`              and team collaboration features.`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">34</Text>
+                  <Text className="code-line">{`            [color=#7ee787]</[color=#79c0ff]AccordionContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">35</Text>
+                  <Text className="code-line">{`          [color=#7ee787]</[color=#79c0ff]AccordionItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">36</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]AccordionItem[/color] [color=#79c0ff]value[/color]=[color=#a5d6ff]"billing"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">37</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]AccordionTrigger[/color]>[/color]How does billing work?[color=#7ee787]</[color=#79c0ff]AccordionTrigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">38</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]AccordionContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">39</Text>
+                  <Text className="code-line">{`              Billing occurs automatically at the start of each billing cycle.`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">40</Text>
+                  <Text className="code-line">{`              We accept all major credit cards, PayPal, and ACH transfers for`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">41</Text>
+                  <Text className="code-line">{`              enterprise customers. You&#x27;ll receive an invoice via email after`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">42</Text>
+                  <Text className="code-line">{`              each payment.`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">43</Text>
+                  <Text className="code-line">{`            [color=#7ee787]</[color=#79c0ff]AccordionContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">44</Text>
+                  <Text className="code-line">{`          [color=#7ee787]</[color=#79c0ff]AccordionItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">45</Text>
+                  <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]AccordionItem[/color] [color=#79c0ff]value[/color]=[color=#a5d6ff]"cancel"[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">46</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]AccordionTrigger[/color]>[/color]How do I cancel my subscription?[color=#7ee787]</[color=#79c0ff]AccordionTrigger[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">47</Text>
+                  <Text className="code-line">{`            [color=#7ee787]<[color=#79c0ff]AccordionContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">48</Text>
+                  <Text className="code-line">{`              You can cancel your subscription anytime from your account`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">49</Text>
+                  <Text className="code-line">{`              settings. There are no cancellation fees or penalties. Your`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">50</Text>
+                  <Text className="code-line">{`              access will continue until the end of your current billing`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">51</Text>
+                  <Text className="code-line">{`              period.`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">52</Text>
+                  <Text className="code-line">{`            [color=#7ee787]</[color=#79c0ff]AccordionContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">53</Text>
+                  <Text className="code-line">{`          [color=#7ee787]</[color=#79c0ff]AccordionItem[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">54</Text>
+                  <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]Accordion[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">55</Text>
+                  <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]CardContent[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">56</Text>
+                  <Text className="code-line">{`    [color=#7ee787]</[color=#79c0ff]Card[/color]>[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">57</Text>
+                  <Text className="code-line">{`  );`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">58</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />
@@ -801,33 +1557,65 @@ export default function AccordionCardDemo() {
           <CodeBlockCopy />
           <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
             <ScrollAreaContent className="code-block-scroll-content">
-              <Widget className="code-line-row">
-                <Text className="code-line-number">1</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+              <Widget className="code-block-lines code-block-lines-light">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]"example.h"[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]accordion_card_tsx_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">2</Text>
-                <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]"example.h"[/color][/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">3</Text>
-                <Text className="code-line">{` `}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">4</Text>
-                <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]accordion_card_tsx_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *parent)[/color]`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">5</Text>
-                <Text className="code-line">{`{`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">6</Text>
-                <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
-              </Widget>
-              <Widget className="code-line-row">
-                <Text className="code-line-number">7</Text>
-                <Text className="code-line">{`}`}</Text>
+              <Widget className="code-block-lines code-block-lines-dark">
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">1</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]<LCUI.h>[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">2</Text>
+                  <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]"example.h"[/color][/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">3</Text>
+                  <Text className="code-line">{` `}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">4</Text>
+                  <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]accordion_card_tsx_init[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *parent)[/color]`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">5</Text>
+                  <Text className="code-line">{`{`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">6</Text>
+                  <Text className="code-line">{`        ui_widget_append(parent, example_load());`}</Text>
+                </Widget>
+                <Widget className="code-line-row">
+                  <Text className="code-line-number">7</Text>
+                  <Text className="code-line">{`}`}</Text>
+                </Widget>
               </Widget>
             </ScrollAreaContent>
             <Scrollbar />

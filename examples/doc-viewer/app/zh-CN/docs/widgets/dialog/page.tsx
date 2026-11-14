@@ -27,7 +27,7 @@ export default function DialogDocPage() {
         <ul>
           <li><Text>{`[b]适用[/b]：表单编辑、资料修改等需要在当前页面上完成的任务`}</Text></li>
           <li><Text>{`[b]适用[/b]：展示详情、引导流程等临时打断当前操作的辅助内容`}</Text></li>
-          <li><Text>{`[b]不适用[/b]：需要用户明确选择、不允许隐式关闭的确认流程（用 [bgcolor=#eee] alert-dialog [/bgcolor]）`}</Text></li>
+          <li><Text>{`[b]不适用[/b]：需要用户明确选择、不允许隐式关闭的确认流程（用 [bgcolor=#7f7f7f29] alert-dialog [/bgcolor]）`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
@@ -40,9 +40,17 @@ export default function DialogDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Dialog[/color], [color=#8250df]DialogTrigger[/color], [color=#8250df]DialogOverlay[/color], [color=#8250df]DialogContent[/color], [color=#8250df]DialogHeader[/color], [color=#8250df]DialogTitle[/color], [color=#8250df]DialogDescription[/color], [color=#8250df]DialogFooter[/color], [color=#8250df]DialogClose[/color], [color=#8250df]Portal[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Dialog[/color], [color=#8250df]DialogTrigger[/color], [color=#8250df]DialogOverlay[/color], [color=#8250df]DialogContent[/color], [color=#8250df]DialogHeader[/color], [color=#8250df]DialogTitle[/color], [color=#8250df]DialogDescription[/color], [color=#8250df]DialogFooter[/color], [color=#8250df]DialogClose[/color], [color=#8250df]Portal[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] { [color=#d2a8ff]Dialog[/color], [color=#d2a8ff]DialogTrigger[/color], [color=#d2a8ff]DialogOverlay[/color], [color=#d2a8ff]DialogContent[/color], [color=#d2a8ff]DialogHeader[/color], [color=#d2a8ff]DialogTitle[/color], [color=#d2a8ff]DialogDescription[/color], [color=#d2a8ff]DialogFooter[/color], [color=#d2a8ff]DialogClose[/color], [color=#d2a8ff]Portal[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -58,69 +66,137 @@ export default function DialogDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]Dialog[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]Dialog[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]DialogTrigger[/color]>[/color]Open[color=#116329]</[color=#0550ae]DialogTrigger[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]Portal[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]DialogOverlay[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`      [color=#116329]<[color=#0550ae]DialogContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`        [color=#116329]<[color=#0550ae]DialogHeader[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`          [color=#116329]<[color=#0550ae]DialogTitle[/color]>[/color]Are you absolutely sure?[color=#116329]</[color=#0550ae]DialogTitle[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`          [color=#116329]<[color=#0550ae]DialogDescription[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{`            This action cannot be undone. This will permanently delete your`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">10</Text>
+                    <Text className="code-line">{`            account and remove your data from our servers.`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">11</Text>
+                    <Text className="code-line">{`          [color=#116329]</[color=#0550ae]DialogDescription[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">12</Text>
+                    <Text className="code-line">{`        [color=#116329]</[color=#0550ae]DialogHeader[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">13</Text>
+                    <Text className="code-line">{`      [color=#116329]</[color=#0550ae]DialogContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">14</Text>
+                    <Text className="code-line">{`    [color=#116329]</[color=#0550ae]DialogOverlay[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">15</Text>
+                    <Text className="code-line">{`  [color=#116329]</[color=#0550ae]Portal[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">16</Text>
+                    <Text className="code-line">{`</[color=#8250df]Dialog[/color]>`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]DialogTrigger[/color]>[/color]Open[color=#116329]</[color=#0550ae]DialogTrigger[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]Portal[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]DialogOverlay[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]DialogContent[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{`        [color=#116329]<[color=#0550ae]DialogHeader[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]DialogTitle[/color]>[/color]Are you absolutely sure?[color=#116329]</[color=#0550ae]DialogTitle[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">8</Text>
-                  <Text className="code-line">{`          [color=#116329]<[color=#0550ae]DialogDescription[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">9</Text>
-                  <Text className="code-line">{`            This action cannot be undone. This will permanently delete your`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">10</Text>
-                  <Text className="code-line">{`            account and remove your data from our servers.`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">11</Text>
-                  <Text className="code-line">{`          [color=#116329]</[color=#0550ae]DialogDescription[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">12</Text>
-                  <Text className="code-line">{`        [color=#116329]</[color=#0550ae]DialogHeader[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">13</Text>
-                  <Text className="code-line">{`      [color=#116329]</[color=#0550ae]DialogContent[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">14</Text>
-                  <Text className="code-line">{`    [color=#116329]</[color=#0550ae]DialogOverlay[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">15</Text>
-                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]Portal[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">16</Text>
-                  <Text className="code-line">{`</[color=#8250df]Dialog[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]Dialog[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]DialogTrigger[/color]>[/color]Open[color=#7ee787]</[color=#79c0ff]DialogTrigger[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]Portal[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]DialogOverlay[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]DialogContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`        [color=#7ee787]<[color=#79c0ff]DialogHeader[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]DialogTitle[/color]>[/color]Are you absolutely sure?[color=#7ee787]</[color=#79c0ff]DialogTitle[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`          [color=#7ee787]<[color=#79c0ff]DialogDescription[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{`            This action cannot be undone. This will permanently delete your`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">10</Text>
+                    <Text className="code-line">{`            account and remove your data from our servers.`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">11</Text>
+                    <Text className="code-line">{`          [color=#7ee787]</[color=#79c0ff]DialogDescription[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">12</Text>
+                    <Text className="code-line">{`        [color=#7ee787]</[color=#79c0ff]DialogHeader[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">13</Text>
+                    <Text className="code-line">{`      [color=#7ee787]</[color=#79c0ff]DialogContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">14</Text>
+                    <Text className="code-line">{`    [color=#7ee787]</[color=#79c0ff]DialogOverlay[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">15</Text>
+                    <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]Portal[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">16</Text>
+                    <Text className="code-line">{`</[color=#d2a8ff]Dialog[/color]>`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -131,7 +207,7 @@ export default function DialogDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>组合</h2>
-        <p>{`使用以下组合来构建 [bgcolor=#eee] Dialog [/bgcolor]：`}</p>
+        <p>{`使用以下组合来构建 [bgcolor=#7f7f7f29] Dialog [/bgcolor]：`}</p>
         <Widget className="code-block" data-language="text" data-source="zh-CN/widgets/dialog/2">
           <Widget className="code-block-header">
             <Text className="code-block-title">TEXT</Text>
@@ -140,15 +216,28 @@ export default function DialogDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "204px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Text className="code-line">{`Dialog`}</Text>
-                <Text className="code-line">{`├── DialogTrigger`}</Text>
-                <Text className="code-line">{`└── Portal`}</Text>
-                <Text className="code-line">{`    └── DialogOverlay`}</Text>
-                <Text className="code-line">{`        └── DialogContent`}</Text>
-                <Text className="code-line">{`            ├── DialogHeader`}</Text>
-                <Text className="code-line">{`            │   ├── DialogTitle`}</Text>
-                <Text className="code-line">{`            │   └── DialogDescription`}</Text>
-                <Text className="code-line">{`            └── DialogFooter`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Text className="code-line">{`Dialog`}</Text>
+                  <Text className="code-line">{`├── DialogTrigger`}</Text>
+                  <Text className="code-line">{`└── Portal`}</Text>
+                  <Text className="code-line">{`    └── DialogOverlay`}</Text>
+                  <Text className="code-line">{`        └── DialogContent`}</Text>
+                  <Text className="code-line">{`            ├── DialogHeader`}</Text>
+                  <Text className="code-line">{`            │   ├── DialogTitle`}</Text>
+                  <Text className="code-line">{`            │   └── DialogDescription`}</Text>
+                  <Text className="code-line">{`            └── DialogFooter`}</Text>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Text className="code-line">{`Dialog`}</Text>
+                  <Text className="code-line">{`├── DialogTrigger`}</Text>
+                  <Text className="code-line">{`└── Portal`}</Text>
+                  <Text className="code-line">{`    └── DialogOverlay`}</Text>
+                  <Text className="code-line">{`        └── DialogContent`}</Text>
+                  <Text className="code-line">{`            ├── DialogHeader`}</Text>
+                  <Text className="code-line">{`            │   ├── DialogTitle`}</Text>
+                  <Text className="code-line">{`            │   └── DialogDescription`}</Text>
+                  <Text className="code-line">{`            └── DialogFooter`}</Text>
+                </Widget>
               </ScrollAreaContent>
               <Scrollbar />
               <Scrollbar orientation="horizontal" />
@@ -158,12 +247,12 @@ export default function DialogDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>自定义关闭按钮</h2>
-        <p>{`在 Footer 中放置自己的关闭按钮（[bgcolor=#eee] DialogClose [/bgcolor] 或带 [bgcolor=#eee] data-dialog-close [/bgcolor] 的任意部件）。`}</p>
+        <p>{`在 Footer 中放置自己的关闭按钮（[bgcolor=#7f7f7f29] DialogClose [/bgcolor] 或带 [bgcolor=#7f7f7f29] data-dialog-close [/bgcolor] 的任意部件）。`}</p>
         <DialogCloseButtonDemo />
       </Widget>
       <Widget className="doc-section">
         <h2>无关闭按钮</h2>
-        <p>{`不放置 [bgcolor=#eee] DialogClose [/bgcolor] 节点即可；使用默认子树构建时可调用 [bgcolor=#eee] ui_dialog_show_close_button() [/bgcolor] 关闭右上角按钮。`}</p>
+        <p>{`不放置 [bgcolor=#7f7f7f29] DialogClose [/bgcolor] 节点即可；使用默认子树构建时可调用 [bgcolor=#7f7f7f29] ui_dialog_show_close_button() [/bgcolor] 关闭右上角按钮。`}</p>
         <DialogNoCloseButtonDemo />
       </Widget>
       <Widget className="doc-section">
@@ -173,12 +262,12 @@ export default function DialogDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>可滚动内容</h2>
-        <p>{`长内容可以在 [bgcolor=#eee] DialogContent [/bgcolor] 内使用 [bgcolor=#eee] ScrollArea [/bgcolor] 滚动，标题保持可见。`}</p>
+        <p>{`长内容可以在 [bgcolor=#7f7f7f29] DialogContent [/bgcolor] 内使用 [bgcolor=#7f7f7f29] ScrollArea [/bgcolor] 滚动，标题保持可见。`}</p>
         <DialogScrollableContentDemo />
       </Widget>
       <Widget className="doc-section">
         <h2>声明式关联</h2>
-        <p>{`脱离 [bgcolor=#eee] Dialog [/bgcolor] 子树的普通部件可以用关联键松散绑定，无需嵌套在统一容器中：`}</p>
+        <p>{`脱离 [bgcolor=#7f7f7f29] Dialog [/bgcolor] 子树的普通部件可以用关联键松散绑定，无需嵌套在统一容器中：`}</p>
         <Widget className="code-block" data-language="xml" data-source="zh-CN/widgets/dialog/3">
           <Widget className="code-block-header">
             <Text className="code-block-title">dialog-xml</Text>
@@ -187,33 +276,65 @@ export default function DialogDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]data-dialog-trigger[/color]=[color=#0a3069]"profile"[/color]>[/color]Edit Profile[color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]data-dialog-trigger[/color]=[color=#0a3069]"profile"[/color]>[/color]Edit Profile[color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`[color=#116329]<[color=#0550ae]dialog-overlay[/color] [color=#0550ae]data-dialog-target[/color]=[color=#0a3069]"profile"[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]dialog-content[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]text[/color] [color=#0550ae]class[/color]=[color=#0a3069]"text-sm"[/color]>[/color]Clicking X or Esc closes the dialog.[color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]data-dialog-close[/color]=[color=#0a3069]"profile"[/color]>[/color]Dismiss[color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`  [color=#116329]</[color=#0550ae]dialog-content[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`[color=#116329]</[color=#0550ae]dialog-overlay[/color]>[/color]`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`[color=#116329]<[color=#0550ae]dialog-overlay[/color] [color=#0550ae]data-dialog-target[/color]=[color=#0a3069]"profile"[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]dialog-content[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]text[/color] [color=#0550ae]class[/color]=[color=#0a3069]"text-sm"[/color]>[/color]Clicking X or Esc closes the dialog.[color=#116329]</[color=#0550ae]text[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]button[/color] [color=#0550ae]data-dialog-close[/color]=[color=#0a3069]"profile"[/color]>[/color]Dismiss[color=#116329]</[color=#0550ae]button[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]dialog-content[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{`[color=#116329]</[color=#0550ae]dialog-overlay[/color]>[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#7ee787]<[color=#79c0ff]button[/color] [color=#79c0ff]data-dialog-trigger[/color]=[color=#a5d6ff]"profile"[/color]>[/color]Edit Profile[color=#7ee787]</[color=#79c0ff]button[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`[color=#7ee787]<[color=#79c0ff]dialog-overlay[/color] [color=#79c0ff]data-dialog-target[/color]=[color=#a5d6ff]"profile"[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]dialog-content[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]text[/color] [color=#79c0ff]class[/color]=[color=#a5d6ff]"text-sm"[/color]>[/color]Clicking X or Esc closes the dialog.[color=#7ee787]</[color=#79c0ff]text[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]button[/color] [color=#79c0ff]data-dialog-close[/color]=[color=#a5d6ff]"profile"[/color]>[/color]Dismiss[color=#7ee787]</[color=#79c0ff]button[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]dialog-content[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`[color=#7ee787]</[color=#79c0ff]dialog-overlay[/color]>[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -224,7 +345,7 @@ export default function DialogDocPage() {
         <Widget className="admonition admonition-note">
           <Text className="admonition-title">提示</Text>
           <Widget className="admonition-content">
-            <p>{`[bgcolor=#eee] data-dialog-trigger [/bgcolor] 点击切换对应对话框，[bgcolor=#eee] data-dialog-target [/bgcolor] 指定浮层节点，[bgcolor=#eee] data-dialog-close [/bgcolor] 点击关闭。同一键可以有多个 trigger 与 close，但只允许一个 target。`}</p>
+            <p>{`[bgcolor=#7f7f7f29] data-dialog-trigger [/bgcolor] 点击切换对应对话框，[bgcolor=#7f7f7f29] data-dialog-target [/bgcolor] 指定浮层节点，[bgcolor=#7f7f7f29] data-dialog-close [/bgcolor] 点击关闭。同一键可以有多个 trigger 与 close，但只允许一个 target。`}</p>
           </Widget>
         </Widget>
       </Widget>
@@ -239,7 +360,7 @@ export default function DialogDocPage() {
         <Widget className="admonition admonition-note">
           <Text className="admonition-title">提示</Text>
           <Widget className="admonition-content">
-            <p>{`按 Esc、点击遮罩空白处或任意 [bgcolor=#eee] DialogClose [/bgcolor] / [bgcolor=#eee] data-dialog-close [/bgcolor] 节点都会关闭对话框；点击内容内部不会。Esc 生效要求焦点位于对话框内容子树内（打开时焦点会自动落在首个可聚焦元素；若内容中没有任何可聚焦部件且未注入关闭按钮，Esc 无法关闭）。shadcn 的 RTL 排版依赖 [bgcolor=#eee] direction: rtl [/bgcolor]，LCUI 暂不支持。`}</p>
+            <p>{`按 Esc、点击遮罩空白处或任意 [bgcolor=#7f7f7f29] DialogClose [/bgcolor] / [bgcolor=#7f7f7f29] data-dialog-close [/bgcolor] 节点都会关闭对话框；点击内容内部不会。Esc 生效要求焦点位于对话框内容子树内（打开时焦点会自动落在首个可聚焦元素；若内容中没有任何可聚焦部件且未注入关闭按钮，Esc 无法关闭）。shadcn 的 RTL 排版依赖 [bgcolor=#7f7f7f29] direction: rtl [/bgcolor]，LCUI 暂不支持。`}</p>
           </Widget>
         </Widget>
       </Widget>
@@ -270,7 +391,7 @@ export default function DialogDocPage() {
         <p>{`操作按钮区域，默认右对齐。`}</p>
         <FieldTable fields={dialogFooterFields} locale="zh-CN" />
         <h3>DialogClose</h3>
-        <p>{`关闭对话框的按钮。默认注入的是 ghost + icon 变体组合的标准按钮（绝对定位在右上角）； 任何带 [bgcolor=#eee] data-dialog-close [/bgcolor] 的节点都有同样的关闭行为。`}</p>
+        <p>{`关闭对话框的按钮。默认注入的是 ghost + icon 变体组合的标准按钮（绝对定位在右上角）； 任何带 [bgcolor=#7f7f7f29] data-dialog-close [/bgcolor] 的节点都有同样的关闭行为。`}</p>
         <FieldTable fields={dialogCloseFields} locale="zh-CN" />
       </Widget>
     </Widget>

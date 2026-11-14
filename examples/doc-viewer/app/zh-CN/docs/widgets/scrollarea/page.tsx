@@ -18,7 +18,7 @@ export default function ScrollareaDocPage() {
         <ul>
           <li><Text>{`[b]适用[/b] — 内容高度或宽度可能超过容器（长列表、文档、日志）。`}</Text></li>
           <li><Text>{`[b]适用[/b] — 需要滚动条可视化反馈的场景。`}</Text></li>
-          <li><Text>{`[b]不适用[/b] — 内容总是小于容器（直接用普通 [bgcolor=#eee] widget [/bgcolor] 即可）。`}</Text></li>
+          <li><Text>{`[b]不适用[/b] — 内容总是小于容器（直接用普通 [bgcolor=#7f7f7f29] widget [/bgcolor] 即可）。`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
@@ -31,9 +31,17 @@ export default function ScrollareaDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]ScrollArea[/color], [color=#8250df]ScrollAreaContent[/color], [color=#8250df]Scrollbar[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]ScrollArea[/color], [color=#8250df]ScrollAreaContent[/color], [color=#8250df]Scrollbar[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] { [color=#d2a8ff]ScrollArea[/color], [color=#d2a8ff]ScrollAreaContent[/color], [color=#d2a8ff]Scrollbar[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -49,25 +57,49 @@ export default function ScrollareaDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "124px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]ScrollArea[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]ScrollArea[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ScrollAreaContent[/color]>[/color]{/* 子内容 */}[color=#116329]</[color=#0550ae]ScrollAreaContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]Scrollbar[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]Scrollbar[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`</[color=#8250df]ScrollArea[/color]>`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ScrollAreaContent[/color]>[/color]{/* 子内容 */}[color=#116329]</[color=#0550ae]ScrollAreaContent[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]Scrollbar[/color] [color=#0550ae]orientation[/color]=[color=#0a3069]"horizontal"[/color] />[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]Scrollbar[/color] />[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`</[color=#8250df]ScrollArea[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]ScrollArea[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]ScrollAreaContent[/color]>[/color]{/* 子内容 */}[color=#7ee787]</[color=#79c0ff]ScrollAreaContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]Scrollbar[/color] [color=#79c0ff]orientation[/color]=[color=#a5d6ff]"horizontal"[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]Scrollbar[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`</[color=#d2a8ff]ScrollArea[/color]>`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -78,7 +110,7 @@ export default function ScrollareaDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>组合</h2>
-        <p>{`使用以下组合来构建 [bgcolor=#eee] ScrollArea [/bgcolor]：`}</p>
+        <p>{`使用以下组合来构建 [bgcolor=#7f7f7f29] ScrollArea [/bgcolor]：`}</p>
         <Widget className="code-block" data-language="text" data-source="zh-CN/widgets/scrollarea/2">
           <Widget className="code-block-header">
             <Text className="code-block-title">TEXT</Text>
@@ -87,9 +119,16 @@ export default function ScrollareaDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "84px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Text className="code-line">{`ScrollArea`}</Text>
-                <Text className="code-line">{`├── ScrollAreaContent`}</Text>
-                <Text className="code-line">{`└── Scrollbar`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Text className="code-line">{`ScrollArea`}</Text>
+                  <Text className="code-line">{`├── ScrollAreaContent`}</Text>
+                  <Text className="code-line">{`└── Scrollbar`}</Text>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Text className="code-line">{`ScrollArea`}</Text>
+                  <Text className="code-line">{`├── ScrollAreaContent`}</Text>
+                  <Text className="code-line">{`└── Scrollbar`}</Text>
+                </Widget>
               </ScrollAreaContent>
               <Scrollbar />
               <Scrollbar orientation="horizontal" />

@@ -35,9 +35,17 @@ export default function AlertDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Alert[/color], [color=#8250df]AlertContent[/color], [color=#8250df]AlertDescription[/color], [color=#8250df]AlertTitle[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Alert[/color], [color=#8250df]AlertContent[/color], [color=#8250df]AlertDescription[/color], [color=#8250df]AlertTitle[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] { [color=#d2a8ff]Alert[/color], [color=#d2a8ff]AlertContent[/color], [color=#d2a8ff]AlertDescription[/color], [color=#d2a8ff]AlertTitle[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -53,29 +61,57 @@ export default function AlertDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "144px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]Alert[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]Alert[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]AlertContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]AlertTitle[/color]>[/color]Payment successful[color=#116329]</[color=#0550ae]AlertTitle[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]AlertDescription[/color]>[/color]Your payment has been processed.[color=#116329]</[color=#0550ae]AlertDescription[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#116329]</[color=#0550ae]AlertContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`</[color=#8250df]Alert[/color]>`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]AlertContent[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]AlertTitle[/color]>[/color]Payment successful[color=#116329]</[color=#0550ae]AlertTitle[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]AlertDescription[/color]>[/color]Your payment has been processed.[color=#116329]</[color=#0550ae]AlertDescription[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]AlertContent[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{`</[color=#8250df]Alert[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]Alert[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]AlertContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]AlertTitle[/color]>[/color]Payment successful[color=#7ee787]</[color=#79c0ff]AlertTitle[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]AlertDescription[/color]>[/color]Your payment has been processed.[color=#7ee787]</[color=#79c0ff]AlertDescription[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]AlertContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`</[color=#d2a8ff]Alert[/color]>`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -86,7 +122,7 @@ export default function AlertDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>Composition</h2>
-        <p>{`Use the following composition to build an [bgcolor=#eee] Alert [/bgcolor]:`}</p>
+        <p>{`Use the following composition to build an [bgcolor=#7f7f7f29] Alert [/bgcolor]:`}</p>
         <Widget className="code-block" data-language="text" data-source="en/widgets/alert/2">
           <Widget className="code-block-header">
             <Text className="code-block-title">TEXT</Text>
@@ -95,12 +131,22 @@ export default function AlertDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "144px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Text className="code-line">{`Alert`}</Text>
-                <Text className="code-line">{`├── Icon`}</Text>
-                <Text className="code-line">{`├── AlertContent`}</Text>
-                <Text className="code-line">{`│   ├── AlertTitle`}</Text>
-                <Text className="code-line">{`│   └── AlertDescription`}</Text>
-                <Text className="code-line">{`└── AlertAction`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Text className="code-line">{`Alert`}</Text>
+                  <Text className="code-line">{`├── Icon`}</Text>
+                  <Text className="code-line">{`├── AlertContent`}</Text>
+                  <Text className="code-line">{`│   ├── AlertTitle`}</Text>
+                  <Text className="code-line">{`│   └── AlertDescription`}</Text>
+                  <Text className="code-line">{`└── AlertAction`}</Text>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Text className="code-line">{`Alert`}</Text>
+                  <Text className="code-line">{`├── Icon`}</Text>
+                  <Text className="code-line">{`├── AlertContent`}</Text>
+                  <Text className="code-line">{`│   ├── AlertTitle`}</Text>
+                  <Text className="code-line">{`│   └── AlertDescription`}</Text>
+                  <Text className="code-line">{`└── AlertAction`}</Text>
+                </Widget>
               </ScrollAreaContent>
               <Scrollbar />
               <Scrollbar orientation="horizontal" />
@@ -110,17 +156,17 @@ export default function AlertDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>Variants</h2>
-        <p>{`Use the [bgcolor=#eee] variant [/bgcolor] prop to switch the alert's visual semantics.`}</p>
+        <p>{`Use the [bgcolor=#7f7f7f29] variant [/bgcolor] prop to switch the alert's visual semantics.`}</p>
         <AlertVariantsDemo />
       </Widget>
       <Widget className="doc-section">
         <h2>Destructive</h2>
-        <p>{`Use [bgcolor=#eee] variant="destructive" [/bgcolor] for errors that cannot be recovered or need immediate attention.`}</p>
+        <p>{`Use [bgcolor=#7f7f7f29] variant="destructive" [/bgcolor] for errors that cannot be recovered or need immediate attention.`}</p>
         <AlertDestructiveDemo />
       </Widget>
       <Widget className="doc-section">
         <h2>Action</h2>
-        <p>{`Use [bgcolor=#eee] AlertAction [/bgcolor] to place a follow-up action related to the alert.`}</p>
+        <p>{`Use [bgcolor=#7f7f7f29] AlertAction [/bgcolor] to place a follow-up action related to the alert.`}</p>
         <AlertActionDemo />
       </Widget>
       <Widget className="doc-section">

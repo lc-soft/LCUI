@@ -290,29 +290,34 @@ static const wchar_t *pd_scan_style_tag_by_name(const wchar_t *wstr,
 static bool pd_parse_color(const char *str, pd_color_t *value)
 {
         size_t len = strlen(str);
-        int r, g, b;
+        int r, g, b, a = 255;
 
         if (str[0] != '#') {
                 return false;
         }
         if (len == 4) {
-                len = sscanf(str, "#%1X%1X%1X", &r, &g, &b);
+                if (sscanf(str, "#%1X%1X%1X", &r, &g, &b) != 3) {
+                        return false;
+                }
                 r *= 255 / 0xf;
                 g *= 255 / 0xf;
                 b *= 255 / 0xf;
         } else if (len == 7) {
-                len = sscanf(str, "#%2X%2X%2X", &r, &g, &b);
+                if (sscanf(str, "#%2X%2X%2X", &r, &g, &b) != 3) {
+                        return false;
+                }
+        } else if (len == 9) {
+                if (sscanf(str, "#%2X%2X%2X%2X", &r, &g, &b, &a) != 4) {
+                        return false;
+                }
         } else {
                 return false;
         }
-        if (len == 3) {
-                value->r = r;
-                value->g = g;
-                value->b = b;
-                value->a = 255;
-                return true;
-        }
-        return false;
+        value->r = r;
+        value->g = g;
+        value->b = b;
+        value->a = a;
+        return true;
 }
 
 /** 根据字符串中的标签得到相应的样式数据，并返回指向标签后面字符的指针 */

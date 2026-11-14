@@ -20,4 +20,13 @@ export const dropdownMenuFields: FieldData[] = [
       "zh-CN": "受控打开状态，设置后立即同步菜单。",
     },
   },
+  {
+    name: "match-trigger-width",
+    type: "boolean",
+    default: "false",
+    description: {
+      en: "Sizes the menu panel to the trigger width when it opens.",
+      "zh-CN": "打开时让菜单面板宽度与触发器一致。",
+    },
+  },
 ];

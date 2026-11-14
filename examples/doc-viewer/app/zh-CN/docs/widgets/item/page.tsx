@@ -37,9 +37,17 @@ export default function ItemDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Item[/color], [color=#8250df]ItemActions[/color], [color=#8250df]ItemContent[/color], [color=#8250df]ItemDescription[/color], [color=#8250df]ItemMedia[/color], [color=#8250df]ItemTitle[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Item[/color], [color=#8250df]ItemActions[/color], [color=#8250df]ItemContent[/color], [color=#8250df]ItemDescription[/color], [color=#8250df]ItemMedia[/color], [color=#8250df]ItemTitle[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] { [color=#d2a8ff]Item[/color], [color=#d2a8ff]ItemActions[/color], [color=#d2a8ff]ItemContent[/color], [color=#d2a8ff]ItemDescription[/color], [color=#d2a8ff]ItemMedia[/color], [color=#d2a8ff]ItemTitle[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -55,33 +63,65 @@ export default function ItemDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]Item[/color] variant=[color=#0a3069]"outline"[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]Item[/color] variant=[color=#0a3069]"outline"[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ItemContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]ItemTitle[/color]>[/color]Basic Item[color=#116329]</[color=#0550ae]ItemTitle[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]ItemDescription[/color]>[/color]A simple item with title and description.[color=#116329]</[color=#0550ae]ItemDescription[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ItemContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ItemActions[/color]>[/color][color=#116329]<[color=#0550ae]button[/color]>[/color]Action[color=#116329]</[color=#0550ae]button[/color]>[/color][color=#116329]</[color=#0550ae]ItemActions[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`</[color=#8250df]Item[/color]>`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ItemContent[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]ItemTitle[/color]>[/color]Basic Item[color=#116329]</[color=#0550ae]ItemTitle[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]ItemDescription[/color]>[/color]A simple item with title and description.[color=#116329]</[color=#0550ae]ItemDescription[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]ItemContent[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]ItemActions[/color]>[/color][color=#116329]<[color=#0550ae]button[/color]>[/color]Action[color=#116329]</[color=#0550ae]button[/color]>[/color][color=#116329]</[color=#0550ae]ItemActions[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{`</[color=#8250df]Item[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]Item[/color] variant=[color=#a5d6ff]"outline"[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]ItemContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]ItemTitle[/color]>[/color]Basic Item[color=#7ee787]</[color=#79c0ff]ItemTitle[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]ItemDescription[/color]>[/color]A simple item with title and description.[color=#7ee787]</[color=#79c0ff]ItemDescription[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]ItemContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]ItemActions[/color]>[/color][color=#7ee787]<[color=#79c0ff]button[/color]>[/color]Action[color=#7ee787]</[color=#79c0ff]button[/color]>[/color][color=#7ee787]</[color=#79c0ff]ItemActions[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`</[color=#d2a8ff]Item[/color]>`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -92,7 +132,7 @@ export default function ItemDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>组合</h2>
-        <p>{`使用以下组合来构建 [bgcolor=#eee] Item [/bgcolor]：`}</p>
+        <p>{`使用以下组合来构建 [bgcolor=#7f7f7f29] Item [/bgcolor]：`}</p>
         <Widget className="code-block" data-language="text" data-source="zh-CN/widgets/item/2">
           <Widget className="code-block-header">
             <Text className="code-block-title">TEXT</Text>
@@ -101,12 +141,22 @@ export default function ItemDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "144px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Text className="code-line">{`Item`}</Text>
-                <Text className="code-line">{`├── ItemMedia`}</Text>
-                <Text className="code-line">{`├── ItemContent`}</Text>
-                <Text className="code-line">{`│   ├── ItemTitle`}</Text>
-                <Text className="code-line">{`│   └── ItemDescription`}</Text>
-                <Text className="code-line">{`└── ItemActions`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Text className="code-line">{`Item`}</Text>
+                  <Text className="code-line">{`├── ItemMedia`}</Text>
+                  <Text className="code-line">{`├── ItemContent`}</Text>
+                  <Text className="code-line">{`│   ├── ItemTitle`}</Text>
+                  <Text className="code-line">{`│   └── ItemDescription`}</Text>
+                  <Text className="code-line">{`└── ItemActions`}</Text>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Text className="code-line">{`Item`}</Text>
+                  <Text className="code-line">{`├── ItemMedia`}</Text>
+                  <Text className="code-line">{`├── ItemContent`}</Text>
+                  <Text className="code-line">{`│   ├── ItemTitle`}</Text>
+                  <Text className="code-line">{`│   └── ItemDescription`}</Text>
+                  <Text className="code-line">{`└── ItemActions`}</Text>
+                </Widget>
               </ScrollAreaContent>
               <Scrollbar />
               <Scrollbar orientation="horizontal" />
@@ -116,22 +166,22 @@ export default function ItemDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>变体</h2>
-        <p>{`使用 [bgcolor=#eee] variant [/bgcolor] 属性更改条目的视觉样式。`}</p>
+        <p>{`使用 [bgcolor=#7f7f7f29] variant [/bgcolor] 属性更改条目的视觉样式。`}</p>
         <ItemVariantsDemo />
       </Widget>
       <Widget className="doc-section">
         <h2>尺寸</h2>
-        <p>{`使用 [bgcolor=#eee] size [/bgcolor] 属性更改条目尺寸，可选值为 [bgcolor=#eee] default [/bgcolor]、[bgcolor=#eee] sm [/bgcolor] 和 [bgcolor=#eee] xs [/bgcolor]。`}</p>
+        <p>{`使用 [bgcolor=#7f7f7f29] size [/bgcolor] 属性更改条目尺寸，可选值为 [bgcolor=#7f7f7f29] default [/bgcolor]、[bgcolor=#7f7f7f29] sm [/bgcolor] 和 [bgcolor=#7f7f7f29] xs [/bgcolor]。`}</p>
         <ItemSizeDemo />
       </Widget>
       <Widget className="doc-section">
         <h2>图标</h2>
-        <p>{`使用 [bgcolor=#eee] variant="icon" [/bgcolor] 的 [bgcolor=#eee] ItemMedia [/bgcolor] 显示图标。`}</p>
+        <p>{`使用 [bgcolor=#7f7f7f29] variant="icon" [/bgcolor] 的 [bgcolor=#7f7f7f29] ItemMedia [/bgcolor] 显示图标。`}</p>
         <ItemIconDemo />
       </Widget>
       <Widget className="doc-section">
         <h2>图片</h2>
-        <p>{`使用 [bgcolor=#eee] variant="image" [/bgcolor] 的 [bgcolor=#eee] ItemMedia [/bgcolor] 显示图片。`}</p>
+        <p>{`使用 [bgcolor=#7f7f7f29] variant="image" [/bgcolor] 的 [bgcolor=#7f7f7f29] ItemMedia [/bgcolor] 显示图片。`}</p>
         <ItemImageDemo />
       </Widget>
       <Widget className="doc-section">

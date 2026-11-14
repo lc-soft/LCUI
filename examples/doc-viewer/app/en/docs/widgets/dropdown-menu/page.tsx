@@ -39,8 +39,8 @@ export default function DropdownMenuDocPage() {
         <ul>
           <li><Text>{`[b]Suitable[/b]: User menus, inline action menus, and command lists that need groups or submenus`}</Text></li>
           <li><Text>{`[b]Suitable[/b]: Settings that show checked or selected state inside the menu`}</Text></li>
-          <li><Text>{`[b]Not suitable[/b]: Overlays that need large text input or complex forms (use [bgcolor=#eee] dialog [/bgcolor] or [bgcolor=#eee] popover [/bgcolor])`}</Text></li>
-          <li><Text>{`[b]Not suitable[/b]: Cases that only need a regular button (use [bgcolor=#eee] button [/bgcolor])`}</Text></li>
+          <li><Text>{`[b]Not suitable[/b]: Overlays that need large text input or complex forms (use [bgcolor=#7f7f7f29] dialog [/bgcolor] or [bgcolor=#7f7f7f29] popover [/bgcolor])`}</Text></li>
+          <li><Text>{`[b]Not suitable[/b]: Cases that only need a regular button (use [bgcolor=#7f7f7f29] button [/bgcolor])`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
@@ -53,41 +53,81 @@ export default function DropdownMenuDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "204px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#8250df]DropdownMenu[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  [color=#8250df]DropdownMenuTrigger[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#8250df]DropdownMenuContent[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#8250df]DropdownMenuGroup[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`  [color=#8250df]DropdownMenuItem[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`  [color=#8250df]DropdownMenuLabel[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`  [color=#8250df]DropdownMenuSeparator[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`  [color=#8250df]DropdownMenu[/color],`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`  [color=#8250df]DropdownMenuTrigger[/color],`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`  [color=#8250df]DropdownMenuContent[/color],`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`  [color=#8250df]DropdownMenuGroup[/color],`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{`  [color=#8250df]DropdownMenuItem[/color],`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{`  [color=#8250df]DropdownMenuLabel[/color],`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">8</Text>
-                  <Text className="code-line">{`  [color=#8250df]DropdownMenuSeparator[/color],`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">9</Text>
-                  <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] {`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#d2a8ff]DropdownMenu[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  [color=#d2a8ff]DropdownMenuTrigger[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#d2a8ff]DropdownMenuContent[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#d2a8ff]DropdownMenuGroup[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`  [color=#d2a8ff]DropdownMenuItem[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`  [color=#d2a8ff]DropdownMenuLabel[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`  [color=#d2a8ff]DropdownMenuSeparator[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{`} [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -103,61 +143,121 @@ export default function DropdownMenuDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]DropdownMenu[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]DropdownMenu[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]DropdownMenuTrigger[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Button[/color]>[/color]Open[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#116329]</[color=#0550ae]DropdownMenuTrigger[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]DropdownMenuContent[/color] [color=#0550ae]align[/color]=[color=#0a3069]"start"[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]DropdownMenuLabel[/color]>[/color]My Account[color=#116329]</[color=#0550ae]DropdownMenuLabel[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]DropdownMenuGroup[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`      [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]Profile[color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{`      [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]Settings[color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">10</Text>
+                    <Text className="code-line">{`    [color=#116329]</[color=#0550ae]DropdownMenuGroup[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">11</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]DropdownMenuSeparator[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">12</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]Log out[color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">13</Text>
+                    <Text className="code-line">{`  [color=#116329]</[color=#0550ae]DropdownMenuContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">14</Text>
+                    <Text className="code-line">{`</[color=#8250df]DropdownMenu[/color]>`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]DropdownMenuTrigger[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Button[/color]>[/color]Open[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]DropdownMenuTrigger[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]DropdownMenuContent[/color] [color=#0550ae]align[/color]=[color=#0a3069]"start"[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]DropdownMenuLabel[/color]>[/color]My Account[color=#116329]</[color=#0550ae]DropdownMenuLabel[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]DropdownMenuGroup[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">8</Text>
-                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]Profile[color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">9</Text>
-                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]Settings[color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">10</Text>
-                  <Text className="code-line">{`    [color=#116329]</[color=#0550ae]DropdownMenuGroup[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">11</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]DropdownMenuSeparator[/color] />[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">12</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]DropdownMenuItem[/color]>[/color]Log out[color=#116329]</[color=#0550ae]DropdownMenuItem[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">13</Text>
-                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]DropdownMenuContent[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">14</Text>
-                  <Text className="code-line">{`</[color=#8250df]DropdownMenu[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]DropdownMenu[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]DropdownMenuTrigger[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]Button[/color]>[/color]Open[color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]DropdownMenuTrigger[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]DropdownMenuContent[/color] [color=#79c0ff]align[/color]=[color=#a5d6ff]"start"[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]DropdownMenuLabel[/color]>[/color]My Account[color=#7ee787]</[color=#79c0ff]DropdownMenuLabel[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]DropdownMenuGroup[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]DropdownMenuItem[/color]>[/color]Profile[color=#7ee787]</[color=#79c0ff]DropdownMenuItem[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]DropdownMenuItem[/color]>[/color]Settings[color=#7ee787]</[color=#79c0ff]DropdownMenuItem[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">10</Text>
+                    <Text className="code-line">{`    [color=#7ee787]</[color=#79c0ff]DropdownMenuGroup[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">11</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]DropdownMenuSeparator[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">12</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]DropdownMenuItem[/color]>[/color]Log out[color=#7ee787]</[color=#79c0ff]DropdownMenuItem[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">13</Text>
+                    <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]DropdownMenuContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">14</Text>
+                    <Text className="code-line">{`</[color=#d2a8ff]DropdownMenu[/color]>`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -168,7 +268,7 @@ export default function DropdownMenuDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>Composition</h2>
-        <p>{`Use the following composition to build a [bgcolor=#eee] DropdownMenu [/bgcolor]:`}</p>
+        <p>{`Use the following composition to build a [bgcolor=#7f7f7f29] DropdownMenu [/bgcolor]:`}</p>
         <Widget className="code-block" data-language="text" data-source="en/widgets/dropdown-menu/2">
           <Widget className="code-block-header">
             <Text className="code-block-title">TEXT</Text>
@@ -177,22 +277,42 @@ export default function DropdownMenuDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Text className="code-line">{`DropdownMenu`}</Text>
-                <Text className="code-line">{`├── DropdownMenuTrigger`}</Text>
-                <Text className="code-line">{`└── DropdownMenuContent (Portal)`}</Text>
-                <Text className="code-line">{`    ├── DropdownMenuLabel`}</Text>
-                <Text className="code-line">{`    ├── DropdownMenuGroup`}</Text>
-                <Text className="code-line">{`    │   ├── DropdownMenuItem`}</Text>
-                <Text className="code-line">{`    │   └── DropdownMenuCheckboxItem`}</Text>
-                <Text className="code-line">{`    ├── DropdownMenuSeparator`}</Text>
-                <Text className="code-line">{`    ├── DropdownMenuGroup`}</Text>
-                <Text className="code-line">{`    │   └── DropdownMenuRadioGroup`}</Text>
-                <Text className="code-line">{`    │       ├── DropdownMenuRadioItem`}</Text>
-                <Text className="code-line">{`    │       └── DropdownMenuRadioItem`}</Text>
-                <Text className="code-line">{`    └── DropdownMenuSub`}</Text>
-                <Text className="code-line">{`        ├── DropdownMenuSubTrigger`}</Text>
-                <Text className="code-line">{`        └── DropdownMenuSubContent (Portal)`}</Text>
-                <Text className="code-line">{`            └── DropdownMenuItem`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Text className="code-line">{`DropdownMenu`}</Text>
+                  <Text className="code-line">{`├── DropdownMenuTrigger`}</Text>
+                  <Text className="code-line">{`└── DropdownMenuContent (Portal)`}</Text>
+                  <Text className="code-line">{`    ├── DropdownMenuLabel`}</Text>
+                  <Text className="code-line">{`    ├── DropdownMenuGroup`}</Text>
+                  <Text className="code-line">{`    │   ├── DropdownMenuItem`}</Text>
+                  <Text className="code-line">{`    │   └── DropdownMenuCheckboxItem`}</Text>
+                  <Text className="code-line">{`    ├── DropdownMenuSeparator`}</Text>
+                  <Text className="code-line">{`    ├── DropdownMenuGroup`}</Text>
+                  <Text className="code-line">{`    │   └── DropdownMenuRadioGroup`}</Text>
+                  <Text className="code-line">{`    │       ├── DropdownMenuRadioItem`}</Text>
+                  <Text className="code-line">{`    │       └── DropdownMenuRadioItem`}</Text>
+                  <Text className="code-line">{`    └── DropdownMenuSub`}</Text>
+                  <Text className="code-line">{`        ├── DropdownMenuSubTrigger`}</Text>
+                  <Text className="code-line">{`        └── DropdownMenuSubContent (Portal)`}</Text>
+                  <Text className="code-line">{`            └── DropdownMenuItem`}</Text>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Text className="code-line">{`DropdownMenu`}</Text>
+                  <Text className="code-line">{`├── DropdownMenuTrigger`}</Text>
+                  <Text className="code-line">{`└── DropdownMenuContent (Portal)`}</Text>
+                  <Text className="code-line">{`    ├── DropdownMenuLabel`}</Text>
+                  <Text className="code-line">{`    ├── DropdownMenuGroup`}</Text>
+                  <Text className="code-line">{`    │   ├── DropdownMenuItem`}</Text>
+                  <Text className="code-line">{`    │   └── DropdownMenuCheckboxItem`}</Text>
+                  <Text className="code-line">{`    ├── DropdownMenuSeparator`}</Text>
+                  <Text className="code-line">{`    ├── DropdownMenuGroup`}</Text>
+                  <Text className="code-line">{`    │   └── DropdownMenuRadioGroup`}</Text>
+                  <Text className="code-line">{`    │       ├── DropdownMenuRadioItem`}</Text>
+                  <Text className="code-line">{`    │       └── DropdownMenuRadioItem`}</Text>
+                  <Text className="code-line">{`    └── DropdownMenuSub`}</Text>
+                  <Text className="code-line">{`        ├── DropdownMenuSubTrigger`}</Text>
+                  <Text className="code-line">{`        └── DropdownMenuSubContent (Portal)`}</Text>
+                  <Text className="code-line">{`            └── DropdownMenuItem`}</Text>
+                </Widget>
               </ScrollAreaContent>
               <Scrollbar />
               <Scrollbar orientation="horizontal" />
@@ -206,28 +326,28 @@ export default function DropdownMenuDocPage() {
         <p>{`A basic menu with a group label, a separator, and a disabled item at the end.`}</p>
         <DropdownMenuBasicDemoDemo />
         <h3>Submenu</h3>
-        <p>{`Place [bgcolor=#eee] DropdownMenuSubTrigger [/bgcolor] and [bgcolor=#eee] DropdownMenuSubContent [/bgcolor] inside [bgcolor=#eee] DropdownMenuSub [/bgcolor]. Hovering or clicking the trigger opens the submenu. Submenu content is also rendered through a Portal.`}</p>
+        <p>{`Place [bgcolor=#7f7f7f29] DropdownMenuSubTrigger [/bgcolor] and [bgcolor=#7f7f7f29] DropdownMenuSubContent [/bgcolor] inside [bgcolor=#7f7f7f29] DropdownMenuSub [/bgcolor]. Hovering or clicking the trigger opens the submenu. Submenu content is also rendered through a Portal.`}</p>
         <DropdownMenuSubmenuDemo />
         <h3>Shortcuts</h3>
-        <p>{`[bgcolor=#eee] DropdownMenuShortcut [/bgcolor] only displays a shortcut hint; it does not bind a real shortcut. While the menu is open, typing a letter triggers typeahead: for example, pressing [bgcolor=#eee] s [/bgcolor] moves to the menu item that starts with S. It only changes the highlight and never runs the command. Pressing the same letter repeatedly cycles through items with the same initial.`}</p>
+        <p>{`[bgcolor=#7f7f7f29] DropdownMenuShortcut [/bgcolor] only displays a shortcut hint; it does not bind a real shortcut. While the menu is open, typing a letter triggers typeahead: for example, pressing [bgcolor=#7f7f7f29] s [/bgcolor] moves to the menu item that starts with S. It only changes the highlight and never runs the command. Pressing the same letter repeatedly cycles through items with the same initial.`}</p>
         <DropdownMenuShortcutsDemo />
         <h3>Icons</h3>
         <p>{`Place an icon before the item label to make the action easier to recognize.`}</p>
         <DropdownMenuIconsDemo />
         <h3>Checkboxes</h3>
-        <p>{`[bgcolor=#eee] DropdownMenuCheckboxItem [/bgcolor] toggles its [bgcolor=#eee] checked [/bgcolor] status when activated and keeps the menu open so several items can be toggled in a row. Set the initial state with the [bgcolor=#eee] checked [/bgcolor] attribute.`}</p>
+        <p>{`[bgcolor=#7f7f7f29] DropdownMenuCheckboxItem [/bgcolor] toggles its [bgcolor=#7f7f7f29] checked [/bgcolor] status when activated and keeps the menu open so several items can be toggled in a row. Set the initial state with the [bgcolor=#7f7f7f29] checked [/bgcolor] attribute.`}</p>
         <DropdownMenuCheckboxesDemo />
         <h3>Checkboxes with icons</h3>
         <p>{`Add icons before the checkbox labels to make each option easier to recognize. The check indicator is still inserted automatically at the right side by the widget.`}</p>
         <DropdownMenuCheckboxesIconsDemo />
         <h3>Radio group</h3>
-        <p>{`When the [bgcolor=#eee] value [/bgcolor] of [bgcolor=#eee] DropdownMenuRadioGroup [/bgcolor] matches the [bgcolor=#eee] value [/bgcolor] of a [bgcolor=#eee] DropdownMenuRadioItem [/bgcolor], that item enters the selected state. Switching options keeps the menu open.`}</p>
+        <p>{`When the [bgcolor=#7f7f7f29] value [/bgcolor] of [bgcolor=#7f7f7f29] DropdownMenuRadioGroup [/bgcolor] matches the [bgcolor=#7f7f7f29] value [/bgcolor] of a [bgcolor=#7f7f7f29] DropdownMenuRadioItem [/bgcolor], that item enters the selected state. Switching options keeps the menu open.`}</p>
         <DropdownMenuRadioGroupDemo />
         <h3>Radio with icons</h3>
         <p>{`Radio items can also show icons before their labels, which is useful for choices such as payment methods.`}</p>
         <DropdownMenuRadioIconsDemo />
         <h3>Disabled and destructive</h3>
-        <p>{`Setting [bgcolor=#eee] disabled [/bgcolor] on an item prevents pointer and keyboard activation. Setting [bgcolor=#eee] variant="destructive" [/bgcolor] renders the item in the danger color.`}</p>
+        <p>{`Setting [bgcolor=#7f7f7f29] disabled [/bgcolor] on an item prevents pointer and keyboard activation. Setting [bgcolor=#7f7f7f29] variant="destructive" [/bgcolor] renders the item in the danger color.`}</p>
         <DropdownMenuDestructiveDemo />
         <h3>Avatar menu</h3>
         <p>{`Use a circular avatar button as the trigger to build an account switcher menu.`}</p>
@@ -254,16 +374,16 @@ export default function DropdownMenuDocPage() {
         <p>{`A menu group heading that is skipped by keyboard navigation.`}</p>
         <FieldTable fields={dropdownMenuLabelFields} locale="en" />
         <h3>DropdownMenuItem</h3>
-        <p>{`A regular command item that closes the menu and emits [bgcolor=#eee] select [/bgcolor] when activated.`}</p>
+        <p>{`A regular command item that closes the menu and emits [bgcolor=#7f7f7f29] select [/bgcolor] when activated.`}</p>
         <FieldTable fields={dropdownMenuItemFields} locale="en" />
         <h3>DropdownMenuCheckboxItem</h3>
-        <p>{`A menu item with a checked state. Activating it toggles the state and emits [bgcolor=#eee] checked-change [/bgcolor].`}</p>
+        <p>{`A menu item with a checked state. Activating it toggles the state and emits [bgcolor=#7f7f7f29] checked-change [/bgcolor].`}</p>
         <FieldTable fields={dropdownMenuCheckboxItemFields} locale="en" />
         <h3>DropdownMenuRadioGroup</h3>
-        <p>{`A container that manages a mutually exclusive radio value. The checked state of its items is synchronized from [bgcolor=#eee] value [/bgcolor].`}</p>
+        <p>{`A container that manages a mutually exclusive radio value. The checked state of its items is synchronized from [bgcolor=#7f7f7f29] value [/bgcolor].`}</p>
         <FieldTable fields={dropdownMenuRadioGroupFields} locale="en" />
         <h3>DropdownMenuRadioItem</h3>
-        <p>{`A radio menu item. Activating it updates the value of its radio group and emits [bgcolor=#eee] value-change [/bgcolor].`}</p>
+        <p>{`A radio menu item. Activating it updates the value of its radio group and emits [bgcolor=#7f7f7f29] value-change [/bgcolor].`}</p>
         <FieldTable fields={dropdownMenuRadioItemFields} locale="en" />
         <h3>DropdownMenuSeparator</h3>
         <p>{`A thin divider between menu groups.`}</p>
@@ -286,19 +406,19 @@ export default function DropdownMenuDocPage() {
         <Widget className="admonition admonition-note">
           <Text className="admonition-title">提示</Text>
           <Widget className="admonition-content">
-            <p>{`[b]Menu content is managed by Portal.[/b] Put [bgcolor=#eee] DropdownMenuContent [/bgcolor] inside [bgcolor=#eee] DropdownMenu [/bgcolor]; do not mount it to [bgcolor=#eee] ui_root [/bgcolor] manually.`}</p>
+            <p>{`[b]Menu content is managed by Portal.[/b] Put [bgcolor=#7f7f7f29] DropdownMenuContent [/bgcolor] inside [bgcolor=#7f7f7f29] DropdownMenu [/bgcolor]; do not mount it to [bgcolor=#7f7f7f29] ui_root [/bgcolor] manually.`}</p>
           </Widget>
         </Widget>
         <Widget className="admonition admonition-tip">
           <Text className="admonition-title">技巧</Text>
           <Widget className="admonition-content">
-            <p>{`[b]Keyboard navigation is built in.[/b] Once the menu is open, use [bgcolor=#eee] ArrowUp [/bgcolor] / [bgcolor=#eee] ArrowDown [/bgcolor] to cycle the highlight, [bgcolor=#eee] Home [/bgcolor] / [bgcolor=#eee] End [/bgcolor] to jump to the first or last item, [bgcolor=#eee] Enter [/bgcolor] / [bgcolor=#eee] Space [/bgcolor] to activate, [bgcolor=#eee] ArrowRight [/bgcolor] to enter a submenu, [bgcolor=#eee] ArrowLeft [/bgcolor] to return to the parent, and [bgcolor=#eee] Escape [/bgcolor] to close the submenu and then the root menu.`}</p>
+            <p>{`[b]Keyboard navigation is built in.[/b] Once the menu is open, use [bgcolor=#7f7f7f29] ArrowUp [/bgcolor] / [bgcolor=#7f7f7f29] ArrowDown [/bgcolor] to cycle the highlight, [bgcolor=#7f7f7f29] Home [/bgcolor] / [bgcolor=#7f7f7f29] End [/bgcolor] to jump to the first or last item, [bgcolor=#7f7f7f29] Enter [/bgcolor] / [bgcolor=#7f7f7f29] Space [/bgcolor] to activate, [bgcolor=#7f7f7f29] ArrowRight [/bgcolor] to enter a submenu, [bgcolor=#7f7f7f29] ArrowLeft [/bgcolor] to return to the parent, and [bgcolor=#7f7f7f29] Escape [/bgcolor] to close the submenu and then the root menu.`}</p>
           </Widget>
         </Widget>
         <Widget className="admonition admonition-caution">
           <Text className="admonition-title">警告</Text>
           <Widget className="admonition-content">
-            <p>{`[b]Automatic collision flipping is not supported yet.[/b] The menu does not flip or clamp itself against window edges. Set [bgcolor=#eee] side [/bgcolor] / [bgcolor=#eee] align [/bgcolor] manually when needed.`}</p>
+            <p>{`[b]Automatic collision flipping is not supported yet.[/b] The menu does not flip or clamp itself against window edges. Set [bgcolor=#7f7f7f29] side [/bgcolor] / [bgcolor=#7f7f7f29] align [/bgcolor] manually when needed.`}</p>
           </Widget>
         </Widget>
         <Widget className="admonition admonition-caution">

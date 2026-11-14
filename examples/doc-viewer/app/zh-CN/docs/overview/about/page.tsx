@@ -13,7 +13,7 @@ export default function AboutDocPage() {
           <li><Text>{`[b]全自绘组件[/b] — 组件在多个平台中都能保持一致的外观和行为。`}</Text></li>
           <li><Text>{`[b]DPI 自适应[/b] — 自动在高分辨率屏幕上缩放 UI，保持清晰显示。`}</Text></li>
           <li><Text>{`[b]自带 CSS 引擎[/b] — 支持使用 CSS 来定义用户界面的样式和布局，对于有网页开发经验的人比较容易上手。`}</Text></li>
-          <li><Text>{`[b]提供现代化的开发工具[/b] — 通过 [bgcolor=#eee] @lcui/cli [/bgcolor] 工具，允许你使用 TypeScript 语言搭配 JSX 语法来编写用户界面。`}</Text></li>
+          <li><Text>{`[b]提供现代化的开发工具[/b] — 通过 [bgcolor=#7f7f7f29] @lcui/cli [/bgcolor] 工具，允许你使用 TypeScript 语言搭配 JSX 语法来编写用户界面。`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
@@ -54,7 +54,7 @@ export default function AboutDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>社区</h2>
-        <p>{`遇到使用问题时，可以通过 GitHub Discussions 提问（建议使用 [bgcolor=#eee] Q&A [/bgcolor] 标签）。同时我们也鼓励资深用户给新人提供帮助。`}</p>
+        <p>{`遇到使用问题时，可以通过 GitHub Discussions 提问（建议使用 [bgcolor=#7f7f7f29] Q&A [/bgcolor] 标签）。同时我们也鼓励资深用户给新人提供帮助。`}</p>
       </Widget>
     </Widget>
   );

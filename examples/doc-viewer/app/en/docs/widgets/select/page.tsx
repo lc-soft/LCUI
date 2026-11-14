@@ -26,7 +26,7 @@ export default function SelectDocPage() {
           <li><Text>{`[b]Suitable[/b]: Choosing one value from multiple options`}</Text></li>
           <li><Text>{`[b]Suitable[/b]: Forms with many options where page space should be preserved`}</Text></li>
           <li><Text>{`[b]Suitable[/b]: Options that can be grouped by category`}</Text></li>
-          <li><Text>{`[b]Not suitable[/b]: Choosing multiple values at once (use [bgcolor=#eee] checkbox [/bgcolor])`}</Text></li>
+          <li><Text>{`[b]Not suitable[/b]: Choosing multiple values at once (use [bgcolor=#7f7f7f29] checkbox [/bgcolor])`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
@@ -39,9 +39,17 @@ export default function SelectDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Select[/color], [color=#8250df]SelectTrigger[/color], [color=#8250df]SelectValue[/color], [color=#8250df]SelectContent[/color], [color=#8250df]SelectGroup[/color], [color=#8250df]SelectLabel[/color], [color=#8250df]SelectItem[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Select[/color], [color=#8250df]SelectTrigger[/color], [color=#8250df]SelectValue[/color], [color=#8250df]SelectContent[/color], [color=#8250df]SelectGroup[/color], [color=#8250df]SelectLabel[/color], [color=#8250df]SelectItem[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] { [color=#d2a8ff]Select[/color], [color=#d2a8ff]SelectTrigger[/color], [color=#d2a8ff]SelectValue[/color], [color=#d2a8ff]SelectContent[/color], [color=#d2a8ff]SelectGroup[/color], [color=#d2a8ff]SelectLabel[/color], [color=#d2a8ff]SelectItem[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -57,57 +65,113 @@ export default function SelectDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]Select[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]Select[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]SelectTrigger[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]SelectValue[/color] [color=#0550ae]placeholder[/color]=[color=#0a3069]"Select a theme"[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#116329]</[color=#0550ae]SelectTrigger[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]SelectContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]SelectGroup[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`      [color=#116329]<[color=#0550ae]SelectLabel[/color]>[/color]Theme[color=#116329]</[color=#0550ae]SelectLabel[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`      [color=#116329]<[color=#0550ae]SelectItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"light"[/color]>[/color]Light[color=#116329]</[color=#0550ae]SelectItem[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{`      [color=#116329]<[color=#0550ae]SelectItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"dark"[/color]>[/color]Dark[color=#116329]</[color=#0550ae]SelectItem[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">10</Text>
+                    <Text className="code-line">{`      [color=#116329]<[color=#0550ae]SelectItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"system"[/color]>[/color]System[color=#116329]</[color=#0550ae]SelectItem[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">11</Text>
+                    <Text className="code-line">{`    [color=#116329]</[color=#0550ae]SelectGroup[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">12</Text>
+                    <Text className="code-line">{`  [color=#116329]</[color=#0550ae]SelectContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">13</Text>
+                    <Text className="code-line">{`</[color=#8250df]Select[/color]>`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]SelectTrigger[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]SelectValue[/color] [color=#0550ae]placeholder[/color]=[color=#0a3069]"Select a theme"[/color] />[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]SelectTrigger[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]SelectContent[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]SelectGroup[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]SelectLabel[/color]>[/color]Theme[color=#116329]</[color=#0550ae]SelectLabel[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">8</Text>
-                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]SelectItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"light"[/color]>[/color]Light[color=#116329]</[color=#0550ae]SelectItem[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">9</Text>
-                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]SelectItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"dark"[/color]>[/color]Dark[color=#116329]</[color=#0550ae]SelectItem[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">10</Text>
-                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]SelectItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"system"[/color]>[/color]System[color=#116329]</[color=#0550ae]SelectItem[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">11</Text>
-                  <Text className="code-line">{`    [color=#116329]</[color=#0550ae]SelectGroup[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">12</Text>
-                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]SelectContent[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">13</Text>
-                  <Text className="code-line">{`</[color=#8250df]Select[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]Select[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]SelectTrigger[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]SelectValue[/color] [color=#79c0ff]placeholder[/color]=[color=#a5d6ff]"Select a theme"[/color] />[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]SelectTrigger[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]SelectContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]SelectGroup[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]SelectLabel[/color]>[/color]Theme[color=#7ee787]</[color=#79c0ff]SelectLabel[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]SelectItem[/color] [color=#79c0ff]value[/color]=[color=#a5d6ff]"light"[/color]>[/color]Light[color=#7ee787]</[color=#79c0ff]SelectItem[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]SelectItem[/color] [color=#79c0ff]value[/color]=[color=#a5d6ff]"dark"[/color]>[/color]Dark[color=#7ee787]</[color=#79c0ff]SelectItem[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">10</Text>
+                    <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]SelectItem[/color] [color=#79c0ff]value[/color]=[color=#a5d6ff]"system"[/color]>[/color]System[color=#7ee787]</[color=#79c0ff]SelectItem[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">11</Text>
+                    <Text className="code-line">{`    [color=#7ee787]</[color=#79c0ff]SelectGroup[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">12</Text>
+                    <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]SelectContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">13</Text>
+                    <Text className="code-line">{`</[color=#d2a8ff]Select[/color]>`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -118,7 +182,7 @@ export default function SelectDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>Composition</h2>
-        <p>{`Use the following composition to build a [bgcolor=#eee] Select [/bgcolor]:`}</p>
+        <p>{`Use the following composition to build a [bgcolor=#7f7f7f29] Select [/bgcolor]:`}</p>
         <Widget className="code-block" data-language="text" data-source="en/widgets/select/2">
           <Widget className="code-block-header">
             <Text className="code-block-title">TEXT</Text>
@@ -127,19 +191,36 @@ export default function SelectDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Text className="code-line">{`Select`}</Text>
-                <Text className="code-line">{`├── SelectTrigger`}</Text>
-                <Text className="code-line">{`│   └── SelectValue`}</Text>
-                <Text className="code-line">{`└── SelectContent`}</Text>
-                <Text className="code-line">{`    ├── SelectGroup`}</Text>
-                <Text className="code-line">{`    │   ├── SelectLabel`}</Text>
-                <Text className="code-line">{`    │   ├── SelectItem`}</Text>
-                <Text className="code-line">{`    │   └── SelectItem`}</Text>
-                <Text className="code-line">{`    ├── SelectSeparator`}</Text>
-                <Text className="code-line">{`    └── SelectGroup`}</Text>
-                <Text className="code-line">{`        ├── SelectLabel`}</Text>
-                <Text className="code-line">{`        ├── SelectItem`}</Text>
-                <Text className="code-line">{`        └── SelectItem`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Text className="code-line">{`Select`}</Text>
+                  <Text className="code-line">{`├── SelectTrigger`}</Text>
+                  <Text className="code-line">{`│   └── SelectValue`}</Text>
+                  <Text className="code-line">{`└── SelectContent`}</Text>
+                  <Text className="code-line">{`    ├── SelectGroup`}</Text>
+                  <Text className="code-line">{`    │   ├── SelectLabel`}</Text>
+                  <Text className="code-line">{`    │   ├── SelectItem`}</Text>
+                  <Text className="code-line">{`    │   └── SelectItem`}</Text>
+                  <Text className="code-line">{`    ├── SelectSeparator`}</Text>
+                  <Text className="code-line">{`    └── SelectGroup`}</Text>
+                  <Text className="code-line">{`        ├── SelectLabel`}</Text>
+                  <Text className="code-line">{`        ├── SelectItem`}</Text>
+                  <Text className="code-line">{`        └── SelectItem`}</Text>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Text className="code-line">{`Select`}</Text>
+                  <Text className="code-line">{`├── SelectTrigger`}</Text>
+                  <Text className="code-line">{`│   └── SelectValue`}</Text>
+                  <Text className="code-line">{`└── SelectContent`}</Text>
+                  <Text className="code-line">{`    ├── SelectGroup`}</Text>
+                  <Text className="code-line">{`    │   ├── SelectLabel`}</Text>
+                  <Text className="code-line">{`    │   ├── SelectItem`}</Text>
+                  <Text className="code-line">{`    │   └── SelectItem`}</Text>
+                  <Text className="code-line">{`    ├── SelectSeparator`}</Text>
+                  <Text className="code-line">{`    └── SelectGroup`}</Text>
+                  <Text className="code-line">{`        ├── SelectLabel`}</Text>
+                  <Text className="code-line">{`        ├── SelectItem`}</Text>
+                  <Text className="code-line">{`        └── SelectItem`}</Text>
+                </Widget>
               </ScrollAreaContent>
               <Scrollbar />
               <Scrollbar orientation="horizontal" />
@@ -149,12 +230,12 @@ export default function SelectDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>Groups</h2>
-        <p>{`Wrap a set of related options in [bgcolor=#eee] SelectGroup [/bgcolor] and use [bgcolor=#eee] SelectLabel [/bgcolor] as the group heading; when the panel holds several groups, use [bgcolor=#eee] SelectSeparator [/bgcolor] to draw a divider between them.`}</p>
+        <p>{`Wrap a set of related options in [bgcolor=#7f7f7f29] SelectGroup [/bgcolor] and use [bgcolor=#7f7f7f29] SelectLabel [/bgcolor] as the group heading; when the panel holds several groups, use [bgcolor=#7f7f7f29] SelectSeparator [/bgcolor] to draw a divider between them.`}</p>
         <SelectGroupsDemo />
       </Widget>
       <Widget className="doc-section">
         <h2>Align Item With Trigger</h2>
-        <p>{`By default, opening a [bgcolor=#eee] Select [/bgcolor] makes the popup [b]overlap the trigger[/b] so the [b]selected item[/b] sits at the same height as it; when nothing is selected the first item is aligned instead. If the trigger is near the bottom of the window and there is not enough room to align, the popup flips above the trigger and shows a scrollbar. Set [bgcolor=#eee] align-item-with-trigger [/bgcolor] to [bgcolor=#eee] false [/bgcolor] to disable aligning and expand the popup against the trigger edge.`}</p>
+        <p>{`By default, opening a [bgcolor=#7f7f7f29] Select [/bgcolor] makes the popup [b]overlap the trigger[/b] so the [b]selected item[/b] sits at the same height as it; when nothing is selected the first item is aligned instead. If the trigger is near the bottom of the window and there is not enough room to align, the popup flips above the trigger and shows a scrollbar. Set [bgcolor=#7f7f7f29] align-item-with-trigger [/bgcolor] to [bgcolor=#7f7f7f29] false [/bgcolor] to disable aligning and expand the popup against the trigger edge.`}</p>
         <SelectAlignItemDemo />
       </Widget>
       <Widget className="doc-section">
@@ -164,7 +245,7 @@ export default function SelectDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>Disabled</h2>
-        <p>{`Setting [bgcolor=#eee] disabled [/bgcolor] on [bgcolor=#eee] Select [/bgcolor] lowers the opacity of the trigger and stops the content panel from opening; you can also disable an individual [bgcolor=#eee] SelectItem [/bgcolor], which then cannot be selected.`}</p>
+        <p>{`Setting [bgcolor=#7f7f7f29] disabled [/bgcolor] on [bgcolor=#7f7f7f29] Select [/bgcolor] lowers the opacity of the trigger and stops the content panel from opening; you can also disable an individual [bgcolor=#7f7f7f29] SelectItem [/bgcolor], which then cannot be selected.`}</p>
         <SelectDisabledDemo />
       </Widget>
       <Widget className="doc-section">
@@ -179,7 +260,7 @@ export default function SelectDocPage() {
         <p>{`The option panel mounted at the root level through Portal.`}</p>
         <FieldTable fields={selectContentFields} locale="en" />
         <h3>SelectGroup</h3>
-        <p>{`A container that groups related options, optionally headed by a [bgcolor=#eee] SelectLabel [/bgcolor].`}</p>
+        <p>{`A container that groups related options, optionally headed by a [bgcolor=#7f7f7f29] SelectLabel [/bgcolor].`}</p>
         <FieldTable fields={selectGroupFields} locale="en" />
         <h3>SelectLabel</h3>
         <p>{`The small heading text for an option group.`}</p>

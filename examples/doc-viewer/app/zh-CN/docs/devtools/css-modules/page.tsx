@@ -8,7 +8,7 @@ export default function CssModulesDocPage() {
       <p className="doc-page-desc">{`CSS Modules 为 TSX 组件创建局部作用域的 CSS 类，避免命名冲突并提高可维护性。`}</p>
       <Widget className="doc-section">
         <h2>用法</h2>
-        <p>{`创建 [bgcolor=#eee] .module.css [/bgcolor] 后缀的文件：`}</p>
+        <p>{`创建 [bgcolor=#7f7f7f29] .module.css [/bgcolor] 后缀的文件：`}</p>
         <Widget className="code-block" data-language="css" data-source="zh-CN/devtools/css-modules/0">
           <Widget className="code-block-header">
             <Text className="code-block-title">MyComponent.module.css</Text>
@@ -17,21 +17,41 @@ export default function CssModulesDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "104px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800].card[/color] {`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800].card[/color] {`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  border: [color=#0550ae]1px[/color] solid [color=#0550ae]#eee[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  border-radius: [color=#0550ae]4px[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`  border: [color=#0550ae]1px[/color] solid [color=#0550ae]#eee[/color];`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`  border-radius: [color=#0550ae]4px[/color];`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`}`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#79c0ff].card[/color] {`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  border: [color=#79c0ff]1px[/color] solid [color=#79c0ff]#eee[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  border-radius: [color=#79c0ff]4px[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -39,7 +59,7 @@ export default function CssModulesDocPage() {
             </ScrollArea>
           </Widget>
         </Widget>
-        <p>{`在 [bgcolor=#eee] .tsx [/bgcolor] 文件中导入：`}</p>
+        <p>{`在 [bgcolor=#7f7f7f29] .tsx [/bgcolor] 文件中导入：`}</p>
         <Widget className="code-block" data-language="tsx" data-source="zh-CN/devtools/css-modules/1">
           <Widget className="code-block-header">
             <Text className="code-block-title">MyComponent.tsx</Text>
@@ -48,9 +68,17 @@ export default function CssModulesDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] styles [color=#cf222e]from[/color] [color=#0a3069]"./MyComponent.module.css"[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] styles [color=#cf222e]from[/color] [color=#0a3069]"./MyComponent.module.css"[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] styles [color=#ff7b72]from[/color] [color=#a5d6ff]"./MyComponent.module.css"[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -58,7 +86,7 @@ export default function CssModulesDocPage() {
             </ScrollArea>
           </Widget>
         </Widget>
-        <p>{`在 JSX 中用 [bgcolor=#eee] styles [/bgcolor] 对象替代字符串类名：`}</p>
+        <p>{`在 JSX 中用 [bgcolor=#7f7f7f29] styles [/bgcolor] 对象替代字符串类名：`}</p>
         <Widget className="code-block" data-language="diff" data-source="zh-CN/devtools/css-modules/2">
           <Widget className="code-block-header">
             <Text className="code-block-title">DIFF</Text>
@@ -67,13 +95,25 @@ export default function CssModulesDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "64px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`- <Widget className="card" />`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`- <Widget className="card" />`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`+ <Widget className={styles.card} />`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`+ <Widget className={styles.card} />`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`- <Widget className="card" />`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`+ <Widget className={styles.card} />`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -81,7 +121,7 @@ export default function CssModulesDocPage() {
             </ScrollArea>
           </Widget>
         </Widget>
-        <p>{`[bgcolor=#eee] @lcui/cli [/bgcolor] 编译时会将 [bgcolor=#eee] .module.css [/bgcolor] 转换为 C 标识符绑定，类名会自动生成唯一的 C 常量名，避免全局冲突。`}</p>
+        <p>{`[bgcolor=#7f7f7f29] @lcui/cli [/bgcolor] 编译时会将 [bgcolor=#7f7f7f29] .module.css [/bgcolor] 转换为 C 标识符绑定，类名会自动生成唯一的 C 常量名，避免全局冲突。`}</p>
       </Widget>
     </Widget>
   );

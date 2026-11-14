@@ -199,6 +199,17 @@ static void should_keep_color_and_bgcolor_independent_when_nested(void)
         pd_text_destroy(text);
 }
 
+static void should_parse_bgcolor_with_alpha(void)
+{
+        pd_text_t *text = make_text_with_tag(L"[bgcolor=#7f7f7f29]X[/bgcolor]");
+        pd_char_t *ch = text->lines[0]->string[0];
+
+        ctest_equal_int("alpha bgcolor line length", text->lines[0]->length, 1);
+        assert_char_back(text, 0, pd_color(0x29, 0x7f, 0x7f, 0x7f), "alpha");
+        ctest_equal_int("alpha bgcolor alpha", ch->style->back_color.a, 0x29);
+        pd_text_destroy(text);
+}
+
 void test_pandagl_text_style_tag(void)
 {
         ctest_describe("single color tag", should_apply_single_color_tag);
@@ -214,4 +225,6 @@ void test_pandagl_text_style_tag(void)
                        should_use_innermost_bgcolor_in_two_level_nesting);
         ctest_describe("nested color and bgcolor sibling",
                        should_keep_color_and_bgcolor_independent_when_nested);
+        ctest_describe("bgcolor alpha channel",
+                       should_parse_bgcolor_with_alpha);
 }

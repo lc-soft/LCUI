@@ -12,7 +12,7 @@ export default function TextInputDocPage() {
         <h2>Use cases</h2>
         <ul>
           <li><Text>{`[b]Suitable[/b] — user text input (form fields, search boxes).`}</Text></li>
-          <li><Text>{`[b]Not suitable[/b] — text display only (use [bgcolor=#eee] text [/bgcolor]).`}</Text></li>
+          <li><Text>{`[b]Not suitable[/b] — text display only (use [bgcolor=#7f7f7f29] text [/bgcolor]).`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
@@ -25,9 +25,17 @@ export default function TextInputDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]TextInput[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]TextInput[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] { [color=#d2a8ff]TextInput[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -43,9 +51,17 @@ export default function TextInputDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]TextInput[/color] placeholder=[color=#0a3069]"Enter text"[/color] />`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]TextInput[/color] placeholder=[color=#0a3069]"Enter text"[/color] />`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]TextInput[/color] placeholder=[color=#a5d6ff]"Enter text"[/color] />`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -65,9 +81,17 @@ export default function TextInputDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]int[/color] [color=#8250df]ui_textinput_set_text[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *widget, [color=#953800]const[/color] [color=#953800]char[/color] *utf8_str)[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]int[/color] [color=#8250df]ui_textinput_set_text[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *widget, [color=#953800]const[/color] [color=#953800]char[/color] *utf8_str)[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]int[/color] [color=#d2a8ff]ui_textinput_set_text[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *widget, [color=#ffa657]const[/color] [color=#ffa657]char[/color] *utf8_str)[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -85,9 +109,17 @@ export default function TextInputDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]int[/color] [color=#8250df]ui_textinput_set_text_w[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *widget, [color=#953800]const[/color] [color=#953800]wchar_t[/color] *wstr)[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]int[/color] [color=#8250df]ui_textinput_set_text_w[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *widget, [color=#953800]const[/color] [color=#953800]wchar_t[/color] *wstr)[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]int[/color] [color=#d2a8ff]ui_textinput_set_text_w[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *widget, [color=#ffa657]const[/color] [color=#ffa657]wchar_t[/color] *wstr)[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -105,13 +137,25 @@ export default function TextInputDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "64px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]size_t[/color] [color=#8250df]ui_textinput_get_text_w[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w, [color=#953800]size_t[/color] start,[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]size_t[/color] [color=#8250df]ui_textinput_get_text_w[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w, [color=#953800]size_t[/color] start,[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`[color=#0550ae]                               [color=#953800]size_t[/color] max_len, [color=#953800]wchar_t[/color] *buf)[/color];`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`[color=#0550ae]                               [color=#953800]size_t[/color] max_len, [color=#953800]wchar_t[/color] *buf)[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]size_t[/color] [color=#d2a8ff]ui_textinput_get_text_w[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *w, [color=#ffa657]size_t[/color] start,[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`[color=#79c0ff]                               [color=#ffa657]size_t[/color] max_len, [color=#ffa657]wchar_t[/color] *buf)[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -129,9 +173,17 @@ export default function TextInputDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]size_t[/color] [color=#8250df]ui_textinput_get_text_length[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w)[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]size_t[/color] [color=#8250df]ui_textinput_get_text_length[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w)[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]size_t[/color] [color=#d2a8ff]ui_textinput_get_text_length[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *w)[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -149,9 +201,17 @@ export default function TextInputDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]ui_textinput_clear_text[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *widget)[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]ui_textinput_clear_text[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *widget)[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]ui_textinput_clear_text[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *widget)[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -169,9 +229,17 @@ export default function TextInputDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]int[/color] [color=#8250df]ui_textinput_set_placeholder[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w, [color=#953800]const[/color] [color=#953800]char[/color] *str)[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]int[/color] [color=#8250df]ui_textinput_set_placeholder[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w, [color=#953800]const[/color] [color=#953800]char[/color] *str)[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]int[/color] [color=#d2a8ff]ui_textinput_set_placeholder[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *w, [color=#ffa657]const[/color] [color=#ffa657]char[/color] *str)[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -189,9 +257,17 @@ export default function TextInputDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]int[/color] [color=#8250df]ui_textinput_set_placeholder_w[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w, [color=#953800]const[/color] [color=#953800]wchar_t[/color] *wstr)[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]int[/color] [color=#8250df]ui_textinput_set_placeholder_w[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w, [color=#953800]const[/color] [color=#953800]wchar_t[/color] *wstr)[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]int[/color] [color=#d2a8ff]ui_textinput_set_placeholder_w[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *w, [color=#ffa657]const[/color] [color=#ffa657]wchar_t[/color] *wstr)[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -209,9 +285,17 @@ export default function TextInputDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]ui_textinput_set_password_char[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w, [color=#953800]wchar_t[/color] ch)[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]ui_textinput_set_password_char[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w, [color=#953800]wchar_t[/color] ch)[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]ui_textinput_set_password_char[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *w, [color=#ffa657]wchar_t[/color] ch)[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -219,7 +303,7 @@ export default function TextInputDocPage() {
             </ScrollArea>
           </Widget>
         </Widget>
-        <p>{`Masks the input with the given character (e.g. [bgcolor=#eee] L'*' [/bgcolor] for password fields).`}</p>
+        <p>{`Masks the input with the given character (e.g. [bgcolor=#7f7f7f29] L'*' [/bgcolor] for password fields).`}</p>
         <h3>`ui_textinput_enable_multiline`</h3>
         <Widget className="code-block" data-language="c" data-source="en/widgets/text-input/10">
           <Widget className="code-block-header">
@@ -229,9 +313,17 @@ export default function TextInputDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]ui_textinput_enable_multiline[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *widget, [color=#953800]bool[/color] enable)[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]ui_textinput_enable_multiline[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *widget, [color=#953800]bool[/color] enable)[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]ui_textinput_enable_multiline[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *widget, [color=#ffa657]bool[/color] enable)[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -249,9 +341,17 @@ export default function TextInputDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]ui_textinput_enable_style_tag[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *widget, [color=#953800]bool[/color] enable)[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]ui_textinput_enable_style_tag[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *widget, [color=#953800]bool[/color] enable)[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]ui_textinput_enable_style_tag[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *widget, [color=#ffa657]bool[/color] enable)[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -269,9 +369,17 @@ export default function TextInputDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]int[/color] [color=#8250df]ui_textinput_append_text_w[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *widget, [color=#953800]const[/color] [color=#953800]wchar_t[/color] *wstr)[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]int[/color] [color=#8250df]ui_textinput_append_text_w[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *widget, [color=#953800]const[/color] [color=#953800]wchar_t[/color] *wstr)[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]int[/color] [color=#d2a8ff]ui_textinput_append_text_w[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *widget, [color=#ffa657]const[/color] [color=#ffa657]wchar_t[/color] *wstr)[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -289,9 +397,17 @@ export default function TextInputDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]int[/color] [color=#8250df]ui_textinput_insert_text_w[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *widget, [color=#953800]const[/color] [color=#953800]wchar_t[/color] *wstr)[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]int[/color] [color=#8250df]ui_textinput_insert_text_w[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *widget, [color=#953800]const[/color] [color=#953800]wchar_t[/color] *wstr)[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]int[/color] [color=#d2a8ff]ui_textinput_insert_text_w[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *widget, [color=#ffa657]const[/color] [color=#ffa657]wchar_t[/color] *wstr)[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -309,9 +425,17 @@ export default function TextInputDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]ui_textinput_set_caret_blink[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w, [color=#953800]bool[/color] visible, [color=#953800]int[/color] time)[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]ui_textinput_set_caret_blink[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w, [color=#953800]bool[/color] visible, [color=#953800]int[/color] time)[/color];`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]ui_textinput_set_caret_blink[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *w, [color=#ffa657]bool[/color] visible, [color=#ffa657]int[/color] time)[/color];`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -319,7 +443,7 @@ export default function TextInputDocPage() {
             </ScrollArea>
           </Widget>
         </Widget>
-        <p>{`Controls the caret blink animation. [bgcolor=#eee] time [/bgcolor] is the blink interval in milliseconds.`}</p>
+        <p>{`Controls the caret blink animation. [bgcolor=#7f7f7f29] time [/bgcolor] is the blink interval in milliseconds.`}</p>
       </Widget>
       <Widget className="doc-section">
         <h2>XML tag</h2>
@@ -331,9 +455,17 @@ export default function TextInputDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#116329]<[color=#0550ae]textedit[/color] [color=#0550ae]placeholder[/color]=[color=#0a3069]"..."[/color] [color=#0550ae]style[/color]=[color=#0a3069]"width: 200px;"[/color] />[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#116329]<[color=#0550ae]textedit[/color] [color=#0550ae]placeholder[/color]=[color=#0a3069]"..."[/color] [color=#0550ae]style[/color]=[color=#0a3069]"width: 200px;"[/color] />[/color]`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#7ee787]<[color=#79c0ff]textedit[/color] [color=#79c0ff]placeholder[/color]=[color=#a5d6ff]"..."[/color] [color=#79c0ff]style[/color]=[color=#a5d6ff]"width: 200px;"[/color] />[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -353,7 +485,7 @@ export default function TextInputDocPage() {
           </Widget>
           <Widget className="mdx-table-row">
             <Widget className="mdx-table-cell" style={{ width: "128px" }}>
-              <Text>{`[bgcolor=#eee] placeholder [/bgcolor]`}</Text>
+              <Text>{`[bgcolor=#7f7f7f29] placeholder [/bgcolor]`}</Text>
             </Widget>
             <Widget className="mdx-table-cell flex-grow" style={{ minWidth: "48px" }}>
               <Text>{`Placeholder text`}</Text>
@@ -361,26 +493,26 @@ export default function TextInputDocPage() {
           </Widget>
           <Widget className="mdx-table-row">
             <Widget className="mdx-table-cell" style={{ width: "128px" }}>
-              <Text>{`[bgcolor=#eee] multiline [/bgcolor]`}</Text>
+              <Text>{`[bgcolor=#7f7f7f29] multiline [/bgcolor]`}</Text>
             </Widget>
             <Widget className="mdx-table-cell flex-grow" style={{ minWidth: "48px" }}>
-              <Text>{`[bgcolor=#eee] "true" [/bgcolor] for multiline mode`}</Text>
+              <Text>{`[bgcolor=#7f7f7f29] "true" [/bgcolor] for multiline mode`}</Text>
             </Widget>
           </Widget>
           <Widget className="mdx-table-row">
             <Widget className="mdx-table-cell" style={{ width: "128px" }}>
-              <Text>{`[bgcolor=#eee] readonly [/bgcolor]`}</Text>
+              <Text>{`[bgcolor=#7f7f7f29] readonly [/bgcolor]`}</Text>
             </Widget>
             <Widget className="mdx-table-cell flex-grow" style={{ minWidth: "48px" }}>
-              <Text>{`[bgcolor=#eee] "true" [/bgcolor] to make the input read-only`}</Text>
+              <Text>{`[bgcolor=#7f7f7f29] "true" [/bgcolor] to make the input read-only`}</Text>
             </Widget>
           </Widget>
           <Widget className="mdx-table-row">
             <Widget className="mdx-table-cell" style={{ width: "128px" }}>
-              <Text>{`[bgcolor=#eee] type [/bgcolor]`}</Text>
+              <Text>{`[bgcolor=#7f7f7f29] type [/bgcolor]`}</Text>
             </Widget>
             <Widget className="mdx-table-cell flex-grow" style={{ minWidth: "48px" }}>
-              <Text>{`[bgcolor=#eee] "password" [/bgcolor] to mask input`}</Text>
+              <Text>{`[bgcolor=#7f7f7f29] "password" [/bgcolor] to mask input`}</Text>
             </Widget>
           </Widget>
         </Widget>

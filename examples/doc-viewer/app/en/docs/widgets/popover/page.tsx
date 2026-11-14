@@ -22,9 +22,9 @@ export default function PopoverDocPage() {
         <ul>
           <li><Text>{`[b]Suitable[/b]: Forms, settings panels, filters, and other cases that host interactive content`}</Text></li>
           <li><Text>{`[b]Suitable[/b]: Showing a structured block of content after a click while keeping the rest of the page usable`}</Text></li>
-          <li><Text>{`[b]Not suitable[/b]: Plain text or short hints (use [bgcolor=#eee] tooltip [/bgcolor])`}</Text></li>
-          <li><Text>{`[b]Not suitable[/b]: Confirmation flows that need an overlay and focus trap (use [bgcolor=#eee] dialog [/bgcolor] / [bgcolor=#eee] alert-dialog [/bgcolor])`}</Text></li>
-          <li><Text>{`[b]Not suitable[/b]: Long content or complex panels that need continuous scrolling (use a page, [bgcolor=#eee] scrollarea [/bgcolor], or a drawer)`}</Text></li>
+          <li><Text>{`[b]Not suitable[/b]: Plain text or short hints (use [bgcolor=#7f7f7f29] tooltip [/bgcolor])`}</Text></li>
+          <li><Text>{`[b]Not suitable[/b]: Confirmation flows that need an overlay and focus trap (use [bgcolor=#7f7f7f29] dialog [/bgcolor] / [bgcolor=#7f7f7f29] alert-dialog [/bgcolor])`}</Text></li>
+          <li><Text>{`[b]Not suitable[/b]: Long content or complex panels that need continuous scrolling (use a page, [bgcolor=#7f7f7f29] scrollarea [/bgcolor], or a drawer)`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
@@ -37,9 +37,17 @@ export default function PopoverDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Popover[/color], [color=#8250df]PopoverTrigger[/color], [color=#8250df]PopoverContent[/color], [color=#8250df]PopoverHeader[/color], [color=#8250df]PopoverTitle[/color], [color=#8250df]PopoverDescription[/color], [color=#8250df]Button[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Popover[/color], [color=#8250df]PopoverTrigger[/color], [color=#8250df]PopoverContent[/color], [color=#8250df]PopoverHeader[/color], [color=#8250df]PopoverTitle[/color], [color=#8250df]PopoverDescription[/color], [color=#8250df]Button[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] { [color=#d2a8ff]Popover[/color], [color=#d2a8ff]PopoverTrigger[/color], [color=#d2a8ff]PopoverContent[/color], [color=#d2a8ff]PopoverHeader[/color], [color=#d2a8ff]PopoverTitle[/color], [color=#d2a8ff]PopoverDescription[/color], [color=#d2a8ff]Button[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -55,49 +63,97 @@ export default function PopoverDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]Popover[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]Popover[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]PopoverTrigger[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color]>[/color]Open popover[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#116329]</[color=#0550ae]PopoverTrigger[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]PopoverContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]PopoverHeader[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`      [color=#116329]<[color=#0550ae]PopoverTitle[/color]>[/color]Dimensions[color=#116329]</[color=#0550ae]PopoverTitle[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`      [color=#116329]<[color=#0550ae]PopoverDescription[/color]>[/color]Set the dimensions for the layer.[color=#116329]</[color=#0550ae]PopoverDescription[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{`    [color=#116329]</[color=#0550ae]PopoverHeader[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">10</Text>
+                    <Text className="code-line">{`  [color=#116329]</[color=#0550ae]PopoverContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">11</Text>
+                    <Text className="code-line">{`</[color=#8250df]Popover[/color]>`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]PopoverTrigger[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]Button[/color] [color=#0550ae]variant[/color]=[color=#0a3069]"outline"[/color]>[/color]Open popover[color=#116329]</[color=#0550ae]Button[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]PopoverTrigger[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]PopoverContent[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]PopoverHeader[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]PopoverTitle[/color]>[/color]Dimensions[color=#116329]</[color=#0550ae]PopoverTitle[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">8</Text>
-                  <Text className="code-line">{`      [color=#116329]<[color=#0550ae]PopoverDescription[/color]>[/color]Set the dimensions for the layer.[color=#116329]</[color=#0550ae]PopoverDescription[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">9</Text>
-                  <Text className="code-line">{`    [color=#116329]</[color=#0550ae]PopoverHeader[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">10</Text>
-                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]PopoverContent[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">11</Text>
-                  <Text className="code-line">{`</[color=#8250df]Popover[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]Popover[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]PopoverTrigger[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]Button[/color] [color=#79c0ff]variant[/color]=[color=#a5d6ff]"outline"[/color]>[/color]Open popover[color=#7ee787]</[color=#79c0ff]Button[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]PopoverTrigger[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]PopoverContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]PopoverHeader[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]PopoverTitle[/color]>[/color]Dimensions[color=#7ee787]</[color=#79c0ff]PopoverTitle[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`      [color=#7ee787]<[color=#79c0ff]PopoverDescription[/color]>[/color]Set the dimensions for the layer.[color=#7ee787]</[color=#79c0ff]PopoverDescription[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{`    [color=#7ee787]</[color=#79c0ff]PopoverHeader[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">10</Text>
+                    <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]PopoverContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">11</Text>
+                    <Text className="code-line">{`</[color=#d2a8ff]Popover[/color]>`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -108,7 +164,7 @@ export default function PopoverDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>Composition</h2>
-        <p>{`Use the following composition to build a [bgcolor=#eee] Popover [/bgcolor]:`}</p>
+        <p>{`Use the following composition to build a [bgcolor=#7f7f7f29] Popover [/bgcolor]:`}</p>
         <Widget className="code-block" data-language="text" data-source="en/widgets/popover/2">
           <Widget className="code-block-header">
             <Text className="code-block-title">TEXT</Text>
@@ -117,13 +173,24 @@ export default function PopoverDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Text className="code-line">{`Popover`}</Text>
-                <Text className="code-line">{`├── PopoverTrigger`}</Text>
-                <Text className="code-line">{`└── PopoverContent`}</Text>
-                <Text className="code-line">{`    ├── PopoverHeader`}</Text>
-                <Text className="code-line">{`    │   ├── PopoverTitle`}</Text>
-                <Text className="code-line">{`    │   └── PopoverDescription`}</Text>
-                <Text className="code-line">{`    └── (any interactive content)`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Text className="code-line">{`Popover`}</Text>
+                  <Text className="code-line">{`├── PopoverTrigger`}</Text>
+                  <Text className="code-line">{`└── PopoverContent`}</Text>
+                  <Text className="code-line">{`    ├── PopoverHeader`}</Text>
+                  <Text className="code-line">{`    │   ├── PopoverTitle`}</Text>
+                  <Text className="code-line">{`    │   └── PopoverDescription`}</Text>
+                  <Text className="code-line">{`    └── (any interactive content)`}</Text>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Text className="code-line">{`Popover`}</Text>
+                  <Text className="code-line">{`├── PopoverTrigger`}</Text>
+                  <Text className="code-line">{`└── PopoverContent`}</Text>
+                  <Text className="code-line">{`    ├── PopoverHeader`}</Text>
+                  <Text className="code-line">{`    │   ├── PopoverTitle`}</Text>
+                  <Text className="code-line">{`    │   └── PopoverDescription`}</Text>
+                  <Text className="code-line">{`    └── (any interactive content)`}</Text>
+                </Widget>
               </ScrollAreaContent>
               <Scrollbar />
               <Scrollbar orientation="horizontal" />
@@ -137,7 +204,7 @@ export default function PopoverDocPage() {
         <p>{`A basic popover with a title and a description.`}</p>
         <PopoverSimpleDemo />
         <h3>Alignment</h3>
-        <p>{`Use [bgcolor=#eee] align [/bgcolor] to control where the overlay is aligned on the side axis.`}</p>
+        <p>{`Use [bgcolor=#7f7f7f29] align [/bgcolor] to control where the overlay is aligned on the side axis.`}</p>
         <PopoverAlignDemo />
       </Widget>
       <Widget className="doc-section">
@@ -151,13 +218,13 @@ export default function PopoverDocPage() {
         <Widget className="admonition admonition-note">
           <Text className="admonition-title">提示</Text>
           <Widget className="admonition-content">
-            <p>{`Only one active popover is kept at a time; opening another popover closes the previous one. Clicking inside the content does not close the popover; to close it, call [bgcolor=#eee] ui_popover_close() [/bgcolor] or click the trigger or outside the popover.`}</p>
+            <p>{`Only one active popover is kept at a time; opening another popover closes the previous one. Clicking inside the content does not close the popover; to close it, call [bgcolor=#7f7f7f29] ui_popover_close() [/bgcolor] or click the trigger or outside the popover.`}</p>
           </Widget>
         </Widget>
         <Widget className="admonition admonition-caution">
           <Text className="admonition-title">警告</Text>
           <Widget className="admonition-content">
-            <p>{`[b]The current implementation does not include edge collision flipping or repositioning on resize.[/b] It also does not provide [bgcolor=#eee] PopoverAnchor [/bgcolor]; to move the anchor, place [bgcolor=#eee] PopoverTrigger [/bgcolor] at the target position.`}</p>
+            <p>{`[b]The current implementation does not include edge collision flipping or repositioning on resize.[/b] It also does not provide [bgcolor=#7f7f7f29] PopoverAnchor [/bgcolor]; to move the anchor, place [bgcolor=#7f7f7f29] PopoverTrigger [/bgcolor] at the target position.`}</p>
           </Widget>
         </Widget>
       </Widget>

@@ -24,8 +24,8 @@ export default function AccordionDocPage() {
         <ul>
           <li><Text>{`[b]适用[/b]：FAQ、设置分组、账单说明等需要按标题展开内容的页面`}</Text></li>
           <li><Text>{`[b]适用[/b]：内容较长但同一时间只需阅读其中一部分`}</Text></li>
-          <li><Text>{`[b]不适用[/b]：需要并排切换的选项卡（使用 [bgcolor=#eee] select [/bgcolor] 或后续 tabs 部件）`}</Text></li>
-          <li><Text>{`[b]不适用[/b]：需要模态确认或阻断操作的场景（使用 [bgcolor=#eee] dialog [/bgcolor]）`}</Text></li>
+          <li><Text>{`[b]不适用[/b]：需要并排切换的选项卡（使用 [bgcolor=#7f7f7f29] select [/bgcolor] 或后续 tabs 部件）`}</Text></li>
+          <li><Text>{`[b]不适用[/b]：需要模态确认或阻断操作的场景（使用 [bgcolor=#7f7f7f29] dialog [/bgcolor]）`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
@@ -38,29 +38,57 @@ export default function AccordionDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "144px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] {`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#8250df]Accordion[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  [color=#8250df]AccordionContent[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#8250df]AccordionItem[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#8250df]AccordionTrigger[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`  [color=#8250df]Accordion[/color],`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`  [color=#8250df]AccordionContent[/color],`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`  [color=#8250df]AccordionItem[/color],`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`  [color=#8250df]AccordionTrigger[/color],`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{`} [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] {`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#d2a8ff]Accordion[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`  [color=#d2a8ff]AccordionContent[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`  [color=#d2a8ff]AccordionItem[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`  [color=#d2a8ff]AccordionTrigger[/color],`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`} [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -76,37 +104,73 @@ export default function AccordionDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "184px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]Accordion[/color] defaultValue=[color=#0a3069]"shipping"[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]Accordion[/color] defaultValue=[color=#0a3069]"shipping"[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#116329]<[color=#0550ae]AccordionItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"shipping"[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]AccordionTrigger[/color]>[/color]What are your shipping options?[color=#116329]</[color=#0550ae]AccordionTrigger[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`    [color=#116329]<[color=#0550ae]AccordionContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`      We offer standard, express, and overnight shipping.`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`    [color=#116329]</[color=#0550ae]AccordionContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`  [color=#116329]</[color=#0550ae]AccordionItem[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`</[color=#8250df]Accordion[/color]>`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`  [color=#116329]<[color=#0550ae]AccordionItem[/color] [color=#0550ae]value[/color]=[color=#0a3069]"shipping"[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]AccordionTrigger[/color]>[/color]What are your shipping options?[color=#116329]</[color=#0550ae]AccordionTrigger[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`    [color=#116329]<[color=#0550ae]AccordionContent[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`      We offer standard, express, and overnight shipping.`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{`    [color=#116329]</[color=#0550ae]AccordionContent[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{`  [color=#116329]</[color=#0550ae]AccordionItem[/color]>[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">8</Text>
-                  <Text className="code-line">{`</[color=#8250df]Accordion[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]Accordion[/color] defaultValue=[color=#a5d6ff]"shipping"[/color]>`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`  [color=#7ee787]<[color=#79c0ff]AccordionItem[/color] [color=#79c0ff]value[/color]=[color=#a5d6ff]"shipping"[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]AccordionTrigger[/color]>[/color]What are your shipping options?[color=#7ee787]</[color=#79c0ff]AccordionTrigger[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`    [color=#7ee787]<[color=#79c0ff]AccordionContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`      We offer standard, express, and overnight shipping.`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`    [color=#7ee787]</[color=#79c0ff]AccordionContent[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`  [color=#7ee787]</[color=#79c0ff]AccordionItem[/color]>[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`</[color=#d2a8ff]Accordion[/color]>`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -117,7 +181,7 @@ export default function AccordionDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>组合</h2>
-        <p>{`使用以下组合来构建 [bgcolor=#eee] Accordion [/bgcolor]：`}</p>
+        <p>{`使用以下组合来构建 [bgcolor=#7f7f7f29] Accordion [/bgcolor]：`}</p>
         <Widget className="code-block" data-language="text" data-source="zh-CN/widgets/accordion/2">
           <Widget className="code-block-header">
             <Text className="code-block-title">TEXT</Text>
@@ -126,13 +190,24 @@ export default function AccordionDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "164px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Text className="code-line">{`Accordion`}</Text>
-                <Text className="code-line">{`├── AccordionItem`}</Text>
-                <Text className="code-line">{`│   ├── AccordionTrigger`}</Text>
-                <Text className="code-line">{`│   └── AccordionContent`}</Text>
-                <Text className="code-line">{`└── AccordionItem`}</Text>
-                <Text className="code-line">{`    ├── AccordionTrigger`}</Text>
-                <Text className="code-line">{`    └── AccordionContent`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Text className="code-line">{`Accordion`}</Text>
+                  <Text className="code-line">{`├── AccordionItem`}</Text>
+                  <Text className="code-line">{`│   ├── AccordionTrigger`}</Text>
+                  <Text className="code-line">{`│   └── AccordionContent`}</Text>
+                  <Text className="code-line">{`└── AccordionItem`}</Text>
+                  <Text className="code-line">{`    ├── AccordionTrigger`}</Text>
+                  <Text className="code-line">{`    └── AccordionContent`}</Text>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Text className="code-line">{`Accordion`}</Text>
+                  <Text className="code-line">{`├── AccordionItem`}</Text>
+                  <Text className="code-line">{`│   ├── AccordionTrigger`}</Text>
+                  <Text className="code-line">{`│   └── AccordionContent`}</Text>
+                  <Text className="code-line">{`└── AccordionItem`}</Text>
+                  <Text className="code-line">{`    ├── AccordionTrigger`}</Text>
+                  <Text className="code-line">{`    └── AccordionContent`}</Text>
+                </Widget>
               </ScrollAreaContent>
               <Scrollbar />
               <Scrollbar orientation="horizontal" />
@@ -146,10 +221,10 @@ export default function AccordionDocPage() {
         <p>{`单开模式，默认展开第一项；再次点击已展开项会收起。`}</p>
         <AccordionBasicDemoDemo />
         <h3>多开</h3>
-        <p>{`设置 [bgcolor=#eee] multiple [/bgcolor] 后，各项独立展开，可同时打开多个分区。`}</p>
+        <p>{`设置 [bgcolor=#7f7f7f29] multiple [/bgcolor] 后，各项独立展开，可同时打开多个分区。`}</p>
         <AccordionMultipleDemo />
         <h3>禁用</h3>
-        <p>{`在 [bgcolor=#eee] AccordionItem [/bgcolor] 上设置 [bgcolor=#eee] disabled [/bgcolor]，该项的点击和 Enter/Space 都不会切换。`}</p>
+        <p>{`在 [bgcolor=#7f7f7f29] AccordionItem [/bgcolor] 上设置 [bgcolor=#7f7f7f29] disabled [/bgcolor]，该项的点击和 Enter/Space 都不会切换。`}</p>
         <AccordionDisabledDemo />
         <h3>边框</h3>
         <p>{`主题已为 item 提供底部分隔线；示例额外给根节点加外边框和圆角，并给 item 加水平内边距。`}</p>
@@ -158,19 +233,19 @@ export default function AccordionDocPage() {
         <p>{`将 Accordion 放进 Card，用于账单、订阅等设置区块。`}</p>
         <AccordionCardDemo />
         <h3>自定义触发器</h3>
-        <p>{`需要完全自定义标题栏时，可以不用 [bgcolor=#eee] AccordionTrigger [/bgcolor]，在任意 item 后代上声明 [bgcolor=#eee] data-accordion-trigger="true" [/bgcolor]。此时不会自动创建箭头，焦点与展开/收起视觉由调用方负责。`}</p>
+        <p>{`需要完全自定义标题栏时，可以不用 [bgcolor=#7f7f7f29] AccordionTrigger [/bgcolor]，在任意 item 后代上声明 [bgcolor=#7f7f7f29] data-accordion-trigger="true" [/bgcolor]。此时不会自动创建箭头，焦点与展开/收起视觉由调用方负责。`}</p>
         <AccordionCustomTriggerDemo />
       </Widget>
       <Widget className="doc-section">
         <h2>API 参考</h2>
         <h3>Accordion</h3>
-        <p>{`手风琴根节点，管理展开集合、单开/多开和 [bgcolor=#eee] change [/bgcolor] 事件。`}</p>
+        <p>{`手风琴根节点，管理展开集合、单开/多开和 [bgcolor=#7f7f7f29] change [/bgcolor] 事件。`}</p>
         <FieldTable fields={accordionFields} locale="zh-CN" />
         <h3>AccordionItem</h3>
-        <p>{`单个分区，持有 [bgcolor=#eee] open [/bgcolor] 状态和节点 [bgcolor=#eee] value [/bgcolor]。`}</p>
+        <p>{`单个分区，持有 [bgcolor=#7f7f7f29] open [/bgcolor] 状态和节点 [bgcolor=#7f7f7f29] value [/bgcolor]。`}</p>
         <FieldTable fields={accordionItemFields} locale="zh-CN" />
         <h3>AccordionTrigger</h3>
-        <p>{`标题行，默认带有右侧箭头；[bgcolor=#eee] chevron="false" [/bgcolor] 可关闭。`}</p>
+        <p>{`标题行，默认带有右侧箭头；[bgcolor=#7f7f7f29] chevron="false" [/bgcolor] 可关闭。`}</p>
         <FieldTable fields={accordionTriggerFields} locale="zh-CN" />
         <h3>AccordionContent</h3>
         <p>{`分区内容，item 为 closed 时不参与显示。`}</p>
@@ -187,25 +262,25 @@ export default function AccordionDocPage() {
         <Widget className="admonition admonition-info">
           <Text className="admonition-title">信息</Text>
           <Widget className="admonition-content">
-            <p>{`[b]初始化不触发事件[/b]。[bgcolor=#eee] defaultValue [/bgcolor] / [bgcolor=#eee] value [/bgcolor] 以及解析阶段的 item [bgcolor=#eee] open [/bgcolor] 只同步状态；用户点击、Enter/Space 或 [bgcolor=#eee] ui_accordion_item_set_open() [/bgcolor] 才会发出 [bgcolor=#eee] change [/bgcolor]。[bgcolor=#eee] ui_accordion_set_value() [/bgcolor] 是静默的受控同步。`}</p>
+            <p>{`[b]初始化不触发事件[/b]。[bgcolor=#7f7f7f29] defaultValue [/bgcolor] / [bgcolor=#7f7f7f29] value [/bgcolor] 以及解析阶段的 item [bgcolor=#7f7f7f29] open [/bgcolor] 只同步状态；用户点击、Enter/Space 或 [bgcolor=#7f7f7f29] ui_accordion_item_set_open() [/bgcolor] 才会发出 [bgcolor=#7f7f7f29] change [/bgcolor]。[bgcolor=#7f7f7f29] ui_accordion_set_value() [/bgcolor] 是静默的受控同步。`}</p>
           </Widget>
         </Widget>
         <Widget className="admonition admonition-info">
           <Text className="admonition-title">信息</Text>
           <Widget className="admonition-content">
-            <p>{`[b][bgcolor=#eee] change [/bgcolor] 载荷是本次切换项的 value[/b]。root 的 [bgcolor=#eee] value [/bgcolor] 属性保存完整集合（逗号分隔），监听器中可读取 [bgcolor=#eee] ui_accordion_get_value(root) [/bgcolor]；一次设置多个值时不会逐个发事件。`}</p>
+            <p>{`[b][bgcolor=#7f7f7f29] change [/bgcolor] 载荷是本次切换项的 value[/b]。root 的 [bgcolor=#7f7f7f29] value [/bgcolor] 属性保存完整集合（逗号分隔），监听器中可读取 [bgcolor=#7f7f7f29] ui_accordion_get_value(root) [/bgcolor]；一次设置多个值时不会逐个发事件。`}</p>
           </Widget>
         </Widget>
         <Widget className="admonition admonition-tip">
           <Text className="admonition-title">技巧</Text>
           <Widget className="admonition-content">
-            <p>{`[b][bgcolor=#eee] data-accordion-trigger [/bgcolor] 是 LCUI 扩展[/b]。它只作为行为标记，不参与 CSS 选择器；自定义触发器需要自行设置焦点，并用 [bgcolor=#eee] accordion-item:open [/bgcolor] / [bgcolor=#eee] accordion-item:closed [/bgcolor] 写展开状态样式。`}</p>
+            <p>{`[b][bgcolor=#7f7f7f29] data-accordion-trigger [/bgcolor] 是 LCUI 扩展[/b]。它只作为行为标记，不参与 CSS 选择器；自定义触发器需要自行设置焦点，并用 [bgcolor=#7f7f7f29] accordion-item:open [/bgcolor] / [bgcolor=#7f7f7f29] accordion-item:closed [/bgcolor] 写展开状态样式。`}</p>
           </Widget>
         </Widget>
         <Widget className="admonition admonition-caution">
           <Text className="admonition-title">警告</Text>
           <Widget className="admonition-content">
-            <p>{`[b]键盘只支持 Enter/Space[/b]。trigger 可通过 Tab 聚焦，未实现方向键、Home/End 的 roving tabindex。单开模式自动关闭其它项时，被关闭项不会额外发出 [bgcolor=#eee] open [/bgcolor]/[bgcolor=#eee] close [/bgcolor]。`}</p>
+            <p>{`[b]键盘只支持 Enter/Space[/b]。trigger 可通过 Tab 聚焦，未实现方向键、Home/End 的 roving tabindex。单开模式自动关闭其它项时，被关闭项不会额外发出 [bgcolor=#7f7f7f29] open [/bgcolor]/[bgcolor=#7f7f7f29] close [/bgcolor]。`}</p>
           </Widget>
         </Widget>
       </Widget>

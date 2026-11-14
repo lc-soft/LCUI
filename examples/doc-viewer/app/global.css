@@ -31,7 +31,7 @@
 }
 
 .typeset {
-  color: #000;
+  @apply text-foreground dark:text-foreground-dark;
   font-family: "Geist", "Noto Sans SC", sans-serif;
 }
 
@@ -39,7 +39,11 @@ root {
   min-width: 800px;
   min-height: 480px;
 
-  @apply text-base;
+  @apply bg-background text-base text-foreground;
+}
+
+.dark {
+  @apply bg-background-dark text-foreground-dark;
 }
 
 textinput {
@@ -52,7 +56,8 @@ textinput {
   @apply px-4 py-8 max-w-3xl mx-auto;
 }
 .doc-page-desc {
-  @apply text-lg text-gray-600 mb-6 leading-relaxed;
+  @apply text-lg text-muted-foreground mb-6 leading-relaxed;
+  @apply dark:text-muted-foreground-dark;
 }
 .doc-section {
   @apply mb-8;
@@ -89,7 +94,8 @@ textinput {
  * later line-height wins inside the same rule. */
 
 h1, h2, h3, h4, h5, h6 {
-  @apply font-bold text-gray-900;
+  @apply font-bold text-foreground;
+  @apply dark:text-foreground-dark;
 }
 h1 {
   @apply text-4xl mb-4 leading-[1.4];
@@ -110,7 +116,8 @@ h6 {
   @apply text-base mt-4 mb-2 leading-[1.4];
 }
 p {
-  @apply text-base text-gray-800 mb-3 leading-relaxed;
+  @apply text-base text-foreground mb-3 leading-relaxed;
+  @apply dark:text-foreground-dark;
 }
 
 /* -- Code block card --
@@ -122,19 +129,23 @@ p {
  * (see scripts/compiler/page-generator.ts). */
 
 .code-block {
-  @apply rounded border border-gray-200 my-4 bg-white;
+  @apply rounded border border-code-border my-4 bg-code;
+  @apply dark:border-code-border-dark dark:bg-code-dark;
 }
 .code-block-header {
-  @apply flex flex-row items-center pl-3 pr-1 py-1 bg-gray-50 border-b border-gray-200 min-h-[36px];
+  @apply flex flex-row items-center pl-3 pr-1 py-1 bg-code-header border-b border-code-border min-h-[36px];
+  @apply dark:bg-code-header-dark dark:border-code-border-dark;
 }
 .code-block-title {
-  @apply flex-1 text-sm text-gray-700;
+  @apply flex-1 text-sm text-code-foreground;
+  @apply dark:text-code-foreground-dark;
 }
 .code-block-copy {
   position: absolute;
   top: 8px;
   right: 8px;
-  @apply flex gap-1 items-center px-2 py-1 text-sm text-gray-600 cursor-pointer rounded;
+  @apply flex gap-1 items-center px-2 py-1 text-sm text-code-foreground cursor-pointer rounded;
+  @apply dark:text-code-foreground-dark;
 }
 .code-block-copy text {
   white-space: nowrap;
@@ -154,10 +165,12 @@ p {
   display: inline-block;
 }
 .code-block-copy:hover {
-  @apply bg-gray-100 text-gray-900;
+  @apply bg-muted text-foreground;
+  @apply dark:bg-muted-dark dark:text-foreground-dark;
 }
 .code-block-body {
-  @apply text-sm text-gray-800 whitespace-pre;
+  @apply text-sm text-code-foreground whitespace-pre;
+  @apply dark:text-code-foreground-dark;
   position: relative;
   font-family: "Geist Mono", monospace;
 }
@@ -168,12 +181,26 @@ p {
   box-sizing: border-box;
   padding: 12px;
 }
+.code-block-lines {
+  display: flex;
+  flex-direction: column;
+}
+.code-block-lines-dark {
+  display: none;
+}
+.dark .code-block-lines-light {
+  display: none;
+}
+.dark .code-block-lines-dark {
+  display: flex;
+}
 .code-line-row {
   display: flex;
   align-items: flex-start;
 }
 .code-line-number {
-  @apply text-gray-400;
+  @apply text-muted-foreground;
+  @apply dark:text-muted-foreground-dark;
 
   flex-shrink: 0;
   width: 40px;
@@ -183,7 +210,8 @@ p {
   font-family: "Geist Mono", monospace;
 }
 .code-line {
-  @apply text-gray-800;
+  @apply text-code-foreground;
+  @apply dark:text-code-foreground-dark;
 
   flex: 0 0 auto;
   line-height: 20px;
@@ -197,7 +225,8 @@ p {
   @apply mb-6;
 }
 .demo-preview {
-  @apply px-6 py-8 bg-white border rounded-tl-md rounded-tr-md border-gray-200 flex items-center justify-center min-h-[128px];
+  @apply px-6 py-8 bg-card border rounded-tl-md rounded-tr-md border-border flex items-center justify-center min-h-[128px];
+  @apply dark:bg-card-dark dark:border-border-dark;
 }
 .demo .code-block {
   @apply rounded-tr-none rounded-tl-none border-t-0 my-0;
@@ -328,7 +357,8 @@ p {
   position: relative;
   width: 100%;
   height: 216px;
-  background-color: #94a3b8;
+  @apply bg-card-image-cover;
+  @apply dark:bg-card-image-cover-dark;
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
 }
@@ -339,7 +369,8 @@ p {
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.35);
+  @apply bg-card-image-overlay;
+  @apply dark:bg-card-image-overlay-dark;
 }
 
 .card-small-demo {
@@ -429,7 +460,8 @@ p {
 }
 
 .anchor-basic-demo:hover {
-  @apply text-blue-600 underline underline-offset-2;
+  @apply text-admonition-note underline underline-offset-2;
+  @apply dark:text-admonition-note-dark;
 }
 
 .button-size-group {
@@ -471,11 +503,13 @@ p {
   @apply px-2 py-1 text-sm rounded-lg mr-1;
 }
 .demo-tab:hover {
-  @apply bg-gray-100;
+  @apply bg-muted;
+  @apply dark:bg-muted-dark;
 }
 .demo-tab.active {
-  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
-  @apply text-gray-900 font-bold bg-white;
+  box-shadow: theme("boxShadow.sm");
+  @apply text-foreground font-bold bg-card;
+  @apply dark:text-foreground-dark dark:bg-card-dark;
 }
 
 /* -- Lists (ol/ul/li) --
@@ -495,13 +529,15 @@ li {
   display: block;
   position: relative;
   padding-left: 20px;
-  @apply text-base text-gray-800 mb-1;
+  @apply text-base text-foreground mb-1;
+  @apply dark:text-foreground-dark;
 }
 .list-marker {
   position: absolute;
   left: 0;
   top: 0;
-  @apply text-gray-700;
+  @apply text-muted-foreground;
+  @apply dark:text-muted-foreground-dark;
 }
 
 /* -- Admonitions (:::note / :::info / :::tip / :::caution / :::warning)
@@ -515,21 +551,52 @@ li {
 
 .admonition {
   display: block;
-  @apply my-4 py-3 px-4 rounded border-l-4 bg-gray-50;
+  @apply my-4 py-3 px-4 rounded border-l-4 bg-muted;
+  @apply dark:bg-muted-dark;
 }
-.admonition-note    { border-left-color: #3b82f6; }
-.admonition-info    { border-left-color: #06b6d4; }
-.admonition-tip     { border-left-color: #10b981; }
-.admonition-caution { border-left-color: #eab308; }
-.admonition-warning { border-left-color: #ef4444; }
+.admonition-note {
+  @apply border-l-admonition-note;
+  @apply dark:border-l-admonition-note-dark;
+}
+.admonition-info {
+  @apply border-l-admonition-info;
+  @apply dark:border-l-admonition-info-dark;
+}
+.admonition-tip {
+  @apply border-l-admonition-tip;
+  @apply dark:border-l-admonition-tip-dark;
+}
+.admonition-caution {
+  @apply border-l-admonition-caution;
+  @apply dark:border-l-admonition-caution-dark;
+}
+.admonition-warning {
+  @apply border-l-admonition-warning;
+  @apply dark:border-l-admonition-warning-dark;
+}
 .admonition-title {
   @apply font-bold mb-1;
 }
-.admonition-note .admonition-title    { color: #1d4ed8; }
-.admonition-info .admonition-title    { color: #0891b2; }
-.admonition-tip .admonition-title     { color: #047857; }
-.admonition-caution .admonition-title { color: #ca8a04; }
-.admonition-warning .admonition-title { color: #b91c1c; }
+.admonition-note .admonition-title {
+  @apply text-admonition-note-foreground;
+  @apply dark:text-admonition-note-foreground-dark;
+}
+.admonition-info .admonition-title {
+  @apply text-admonition-info-foreground;
+  @apply dark:text-admonition-info-foreground-dark;
+}
+.admonition-tip .admonition-title {
+  @apply text-admonition-tip-foreground;
+  @apply dark:text-admonition-tip-foreground-dark;
+}
+.admonition-caution .admonition-title {
+  @apply text-admonition-caution-foreground;
+  @apply dark:text-admonition-caution-foreground-dark;
+}
+.admonition-warning .admonition-title {
+  @apply text-admonition-warning-foreground;
+  @apply dark:text-admonition-warning-foreground-dark;
+}
 .admonition-content p,
 .admonition-content ul,
 .admonition-content ol {
@@ -546,20 +613,24 @@ li {
 
 .mdx-table {
   display: block;
-  @apply my-4 rounded border border-gray-200 bg-white;
+  @apply my-4 rounded border border-border bg-card;
+  @apply dark:border-border-dark dark:bg-card-dark;
 }
 .mdx-table-row {
   display: flex;
   flex-direction: row;
 }
 .mdx-table-head {
-  @apply bg-gray-50 border-b border-gray-200;
+  @apply bg-muted border-b border-border;
+  @apply dark:bg-muted-dark dark:border-border-dark;
 }
 .mdx-table-cell {
-  @apply px-3 py-2 text-sm text-gray-800;
+  @apply px-3 py-2 text-sm text-foreground;
+  @apply dark:text-foreground-dark;
 }
 .mdx-table-head-cell {
-  @apply font-bold text-gray-900;
+  @apply font-bold text-foreground;
+  @apply dark:text-foreground-dark;
 }
 
 /* -- DropdownMenu demos --
@@ -601,7 +672,7 @@ li {
 .sidebar-user-menu-email {
   display: block;
   padding: 0 8px 6px;
-  color: #666666;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
   font-size: 12px;
 }
 
@@ -611,7 +682,7 @@ li {
   display: flex;
   width: 100%;
   height: 500px;
-  border: 1px solid #e5e5e5;
+  @apply border border-border dark:border-border-dark;
   border-radius: 8px;
 }
 .sidebar-basic-demo .sidebar-main {
@@ -644,7 +715,7 @@ li {
 .sidebar-basic-demo .sidebar-menu-meta {
   display: block;
   font-size: 11px;
-  color: #666666;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
 }
 .sidebar-basic-demo .sidebar-scroll {
   flex: 1;
@@ -660,7 +731,7 @@ li {
   display: flex;
   width: 100%;
   height: 360px;
-  border: 1px solid #e5e5e5;
+  @apply border border-border dark:border-border-dark;
   border-radius: 8px;
 }
 .sidebar-collapsed-demo .sidebar-main {
@@ -678,14 +749,14 @@ li {
 .sidebar-collapsed-demo .sidebar-main-copy {
   display: block;
   font-size: 13px;
-  color: #666666;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 .sidebar-group-collapsible-demo {
   display: flex;
   width: 100%;
   height: 360px;
-  border: 1px solid #e5e5e5;
+  @apply border border-border dark:border-border-dark;
   border-radius: 8px;
 }
 .sidebar-group-collapsible-demo .sidebar-main {
@@ -703,7 +774,7 @@ li {
 .sidebar-group-collapsible-demo .sidebar-main-copy {
   display: block;
   font-size: 13px;
-  color: #666666;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 .breadcrumb-collapse-demo {
@@ -718,7 +789,7 @@ li {
   width: 100%;
 }
 .breadcrumb-demo-status {
-  color: #666666;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
   font-size: 13px;
 }
 
@@ -736,7 +807,7 @@ li {
 }
 .accordion-borders-demo {
   width: 512px;
-  border: 1px solid #e5e5e5;
+  @apply border border-border dark:border-border-dark;
   border-radius: 8px;
 }
 .accordion-borders-item {
@@ -875,7 +946,7 @@ li {
   margin-top: 12px;
   font-size: 18px;
   line-height: 1.6;
-  color: #555555;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
   text-align: center;
 }
 
@@ -908,9 +979,9 @@ home-column {
   flex-direction: column;
   gap: 0;
   padding: 0;
-  border: 1px solid #e5e5e5;
+  @apply border border-border dark:border-border-dark;
   border-radius: 14px;
-  background: #ffffff;
+  @apply bg-card dark:bg-card-dark;
 }
 
 .home-card card-header {
@@ -927,7 +998,7 @@ home-column {
 .home-card card-description {
   font-size: 13px;
   line-height: 1.5;
-  color: #777777;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 .home-card .home-card-body {
@@ -951,7 +1022,7 @@ home-column {
 .home-preview-desc {
   font-size: 13px;
   line-height: 1.5;
-  color: #777777;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 /* Shared form pieces */
@@ -978,7 +1049,7 @@ home-column {
 
 .home-field-link {
   font-size: 11px;
-  color: #888888;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 .home-input {
@@ -1030,12 +1101,12 @@ home-column {
   gap: 8px;
   padding: 18px;
   border-radius: 10px;
-  background: #f7f7f7;
+  @apply bg-muted dark:bg-muted-dark;
 }
 
 .home-goal-label {
   font-size: 11px;
-  color: #888888;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 .home-goal-value {
@@ -1050,7 +1121,7 @@ home-column {
 
 .home-goal-meta {
   font-size: 12px;
-  color: #777777;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 .home-goal-footer {
@@ -1063,20 +1134,20 @@ home-column {
 
 .home-goal-caption {
   font-size: 12px;
-  color: #777777;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 .home-goal-amount {
   font-size: 12px;
   font-weight: 500;
-  color: #111111;
+  @apply text-foreground dark:text-foreground-dark;
 }
 
 /* Claimable balance card */
 
 .home-claim-label {
   font-size: 13px;
-  color: #777777;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 .home-balance {
@@ -1089,7 +1160,7 @@ home-column {
   width: 8px;
   height: 8px;
   border-radius: 4px;
-  background: #f5b301;
+  @apply bg-warning dark:bg-warning-dark;
 }
 
 .home-summary {
@@ -1098,7 +1169,7 @@ home-column {
   gap: 10px;
   padding: 14px;
   border-radius: 10px;
-  background: #f7f7f7;
+  @apply bg-muted dark:bg-muted-dark;
 }
 
 .home-summary .home-row-between .home-summary-label {
@@ -1117,7 +1188,7 @@ home-column {
 
 .home-summary-label {
   font-size: 13px;
-  color: #777777;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 .home-summary-value {
@@ -1131,7 +1202,7 @@ home-column {
 
 .home-divider {
   height: 1px;
-  background: #e5e5e5;
+  @apply bg-border dark:bg-border-dark;
 }
 
 /* Accordion and deployment cards */
@@ -1152,7 +1223,7 @@ home-column {
   width: 6px;
   height: 6px;
   border-radius: 3px;
-  background: #16a34a;
+  @apply bg-success dark:bg-success-dark;
 }
 
 .home-deploy-progress {
@@ -1164,7 +1235,7 @@ home-column {
 .home-deploy-environment {
   font-size: 12px;
   font-weight: 600;
-  color: #555555;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 .home-deploy-percent {
@@ -1186,7 +1257,7 @@ home-column {
 .home-deploy-step-meta {
   flex-shrink: 0;
   font-size: 11px;
-  color: #777777;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 .home-deploy-actions {
@@ -1236,14 +1307,14 @@ home-column {
 .home-slider {
   height: 6px;
   border-radius: 3px;
-  background: #eeeeee;
+  @apply bg-muted dark:bg-muted-dark;
 }
 
 .home-slider-fill {
   width: 25%;
   height: 6px;
   border-radius: 3px;
-  background: #111111;
+  @apply bg-primary dark:bg-primary-dark;
 }
 
 .home-danger {
@@ -1251,7 +1322,7 @@ home-column {
 }
 
 .home-danger item-media {
-  color: #e7000b;
+  @apply text-destructive dark:text-destructive-dark;
 }
 
 /* Empty card */
@@ -1288,7 +1359,7 @@ home-column {
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: #f5f5f5;
+  @apply bg-muted dark:bg-muted-dark;
 }
 
 .home-empty-icon icon {
@@ -1331,7 +1402,7 @@ home-column {
 .home-alert-desc {
   font-size: 12px;
   line-height: 1.5;
-  color: #777777;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 /* Shortcuts card */
@@ -1367,7 +1438,7 @@ home-column {
 .widgets-index-desc {
   margin-top: 12px;
   font-size: 16px;
-  color: #666666;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 .widgets-index-heading {

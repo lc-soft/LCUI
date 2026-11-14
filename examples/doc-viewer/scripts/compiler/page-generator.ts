@@ -9,7 +9,7 @@ import hljs from "highlight.js";
 import type { ParsedMdx, ParsedSection } from "./mdx-parser.ts";
 import { markdownInlineToLcuiStyleTags } from "./mdx-parser.ts";
 import type { CompiledExample } from "./example-compiler.ts";
-import { highlightedHtmlToLines } from "./style-tag-renderer.ts";
+import { highlightedHtmlToLines, HLJS_CLASS_STYLES_DARK, HLJS_CLASS_STYLES_LIGHT } from "./style-tag-renderer.ts";
 
 // ---------------------------------------------------------------------------
 // Path helpers
@@ -80,6 +80,51 @@ function preserveLeadingIndent(line: string): string {
     return line;
   }
   return "\u00a0".repeat(spaces) + line.slice(i);
+}
+
+// Render one highlighted line set (light or dark) as LCUI widgets.
+// `lineIndent` is the indentation of each line node; children are
+// indented two more spaces.
+function renderCodeLineWidgets(
+  lines: string[],
+  lineIndent: string,
+  showLineNumbers: boolean,
+): string {
+  return lines
+    .map((line, index) => {
+      const content = escapeTsxTemplateContent(preserveLeadingIndent(line));
+      if (!showLineNumbers) {
+        return `${lineIndent}<Text className="code-line">{\`${content}\`}</Text>`;
+      }
+      return (
+        `${lineIndent}<Widget className="code-line-row">\n` +
+        `${lineIndent}  <Text className="code-line-number">${index + 1}</Text>\n` +
+        `${lineIndent}  <Text className="code-line">{\`${content}\`}</Text>\n` +
+        `${lineIndent}</Widget>`
+      );
+    })
+    .join("\n");
+}
+
+// Emit both palettes into sibling containers.  CSS shows
+// `.code-block-lines-light` by default and swaps to
+// `.code-block-lines-dark` under `.dark`; the hidden set is taken out
+// of flow, so the code block keeps the height of a single line set.
+function renderDualLineGroups(
+  lightLines: string[],
+  darkLines: string[],
+  groupIndent: string,
+  showLineNumbers: boolean,
+): string {
+  const lineIndent = groupIndent + "  ";
+  return (
+    `${groupIndent}<Widget className="code-block-lines code-block-lines-light">\n` +
+    `${renderCodeLineWidgets(lightLines, lineIndent, showLineNumbers)}\n` +
+    `${groupIndent}</Widget>\n` +
+    `${groupIndent}<Widget className="code-block-lines code-block-lines-dark">\n` +
+    `${renderCodeLineWidgets(darkLines, lineIndent, showLineNumbers)}\n` +
+    `${groupIndent}</Widget>`
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -320,24 +365,17 @@ function renderCodeBlock(
 ): string {
   const source = sourceLines.join("\n");
   const html = highlightCode(source, lang);
-  const lines = highlightedHtmlToLines(html);
+  const lines = highlightedHtmlToLines(html, HLJS_CLASS_STYLES_LIGHT);
+  const darkLines = highlightedHtmlToLines(html, HLJS_CLASS_STYLES_DARK);
   const visibleLines = Math.max(1, Math.min(lines.length, 10));
   const height = `${visibleLines * 20 + 24}px`;
   const showLineNumbers = shouldShowLineNumbers(lang);
-  const inner = lines
-    .map((l, index) => {
-      const content = escapeTsxTemplateContent(preserveLeadingIndent(l));
-      if (!showLineNumbers) {
-        return `${indent}        <Text className="code-line">{\`${content}\`}</Text>`;
-      }
-      return (
-        `${indent}        <Widget className="code-line-row">\n` +
-        `${indent}          <Text className="code-line-number">${index + 1}</Text>\n` +
-        `${indent}          <Text className="code-line">{\`${content}\`}</Text>\n` +
-        `${indent}        </Widget>`
-      );
-    })
-    .join("\n");
+  const inner = renderDualLineGroups(
+    lines,
+    darkLines,
+    `${indent}        `,
+    showLineNumbers,
+  );
   const id = snippets.add(snippetScope, source);
   const body =
     `${indent}  <Widget className="code-block-body">\n` +
@@ -735,17 +773,12 @@ function buildDemoIndexTsx(ex: CompiledExample, snippets: SnippetRegistry): stri
       const style = isDefault ? "" : ' style={{ display: "none" }}';
       const visibleLines = Math.max(1, Math.min(file.lines.length, 10));
       const height = `${visibleLines * 20 + 24}px`;
-      const lineWidgets = file.lines
-        .map((line, index) => {
-          const content = escapeTsxTemplateContent(preserveLeadingIndent(line));
-          return (
-            `              <Widget className="code-line-row">\n` +
-            `                <Text className="code-line-number">${index + 1}</Text>\n` +
-            `                <Text className="code-line">{\`${content}\`}</Text>\n` +
-            `              </Widget>`
-          );
-        })
-        .join("\n");
+      const lineWidgets = renderDualLineGroups(
+        file.lines,
+        file.darkLines,
+        `              `,
+        true,
+      );
       const id = snippets.add(snippetScope, file.source);
       codeBodies.push(
         `        <Widget className="${cls}" data-language="${variant.id}" data-file="${file.filename}" data-source="${id}"${style}>\n` +

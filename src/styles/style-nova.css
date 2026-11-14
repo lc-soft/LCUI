@@ -1,5 +1,5 @@
 * {
-  @apply border-border;
+  @apply border-border dark:border-border-dark;
   font-family: "Noto Sans SC", sans-serif;
 }
 
@@ -18,71 +18,72 @@ button,
   padding-top: 5px;
   padding-bottom: 5px;
   @apply inline-flex items-center gap-1.5 text-center rounded-lg border border-border bg-background px-2.5 text-sm font-medium text-foreground;
+  @apply dark:border-border-dark dark:bg-background-dark dark:text-foreground-dark;
 }
 
 button:hover,
 .button:hover {
-  @apply bg-muted text-foreground;
+  @apply bg-muted text-foreground dark:bg-muted-dark dark:text-foreground-dark;
 }
 
 button:outline,
 .button-outline {
-  @apply border-border bg-background text-foreground;
+  @apply border-border bg-background text-foreground dark:border-border-dark dark:bg-background-dark dark:text-foreground-dark;
 }
 
 button:outline:hover,
 .button-outline:hover {
-  @apply bg-muted text-foreground;
+  @apply bg-muted text-foreground dark:bg-muted-dark dark:text-foreground-dark;
 }
 
 button:primary,
 .button-primary {
-  @apply border-transparent bg-primary text-primary-foreground;
+  @apply border-transparent bg-primary text-primary-foreground dark:bg-primary-dark dark:text-primary-foreground-dark;
 }
 
 button:primary:hover,
 .button-primary:hover {
-  @apply bg-neutral-600 text-primary-foreground;
+  @apply bg-primary/90 text-primary-foreground dark:bg-primary-dark/90 dark:text-primary-foreground-dark;
 }
 
 button:secondary,
 .button-secondary {
-  @apply border-secondary bg-secondary text-secondary-foreground;
+  @apply border-secondary bg-secondary text-secondary-foreground dark:border-secondary-dark dark:bg-secondary-dark dark:text-secondary-foreground-dark;
 }
 
 button:secondary:hover,
 .button-secondary:hover {
-  @apply bg-neutral-200 text-secondary-foreground;
+  @apply bg-secondary-foreground/10 text-secondary-foreground dark:bg-secondary-foreground-dark/15 dark:text-secondary-foreground-dark;
 }
 
 button:ghost,
 .button-ghost {
-  @apply border-transparent bg-transparent text-foreground;
+  @apply border-transparent bg-transparent text-foreground dark:text-foreground-dark;
 }
 
 button:ghost:hover,
 .button-ghost:hover {
-  @apply bg-muted text-foreground;
+  @apply bg-muted text-foreground dark:bg-muted-dark dark:text-foreground-dark;
 }
 
 button:destructive,
 .button-destructive {
-  @apply border-transparent bg-destructive-muted text-destructive;
+  @apply border-transparent bg-destructive-muted text-destructive dark:bg-destructive-muted-dark dark:text-destructive-dark;
 }
 
 button:destructive:hover,
 .button-destructive:hover {
-  @apply bg-red-100 text-destructive;
+  @apply bg-destructive/15 text-destructive dark:bg-destructive-dark/15 dark:text-destructive-dark;
 }
 
 button:link,
 .button-link {
-  @apply border-transparent bg-transparent text-primary;
+  @apply border-transparent bg-transparent text-primary dark:text-primary-dark;
 }
 
 button:link:hover,
 .button-link:hover {
-  @apply bg-transparent text-primary;
+  @apply bg-transparent text-primary dark:text-primary-dark;
 }
 
 button:link,
@@ -153,32 +154,32 @@ button:disabled,
 
 button:active,
 .button:active {
-  @apply relative top-px bg-neutral-300;
+  @apply relative top-px bg-foreground/15 dark:bg-foreground-dark/15;
 }
 
 button:outline:active {
-  @apply bg-neutral-300;
+  @apply bg-foreground/15 dark:bg-foreground-dark/15;
 }
 
 button:primary:active {
-  @apply bg-neutral-700 text-primary-foreground;
+  @apply bg-primary/80 text-primary-foreground dark:bg-primary-dark/80 dark:text-primary-foreground-dark;
 }
 
 button:secondary:active {
-  @apply bg-neutral-300 text-secondary-foreground;
+  @apply bg-secondary-foreground/20 text-secondary-foreground dark:bg-secondary-foreground-dark/25 dark:text-secondary-foreground-dark;
 }
 
 button:ghost:active {
-  @apply bg-neutral-200 text-foreground;
+  @apply bg-foreground/10 text-foreground dark:bg-foreground-dark/10 dark:text-foreground-dark;
 }
 
 button:destructive:active {
-  @apply bg-red-200 text-destructive;
+  @apply bg-destructive/25 text-destructive dark:bg-destructive-dark/25 dark:text-destructive-dark;
 }
 
 button:link:active,
 .button-link:active {
-  @apply bg-transparent text-primary underline;
+  @apply bg-transparent text-primary underline dark:text-primary-dark;
 }
 
 button .fui-icon {
@@ -231,6 +232,7 @@ button:icon-lg .fui-icon {
 badge {
   box-sizing: border-box;
   @apply inline-flex items-center gap-1 h-5 rounded-full border border-primary bg-primary px-2 text-xs font-medium leading-[18px] text-primary-foreground;
+  @apply dark:border-primary-dark dark:bg-primary-dark dark:text-primary-foreground-dark;
 }
 
 badge icon {
@@ -238,19 +240,19 @@ badge icon {
 }
 
 badge:secondary {
-  @apply border-secondary bg-secondary text-secondary-foreground;
+  @apply border-secondary bg-secondary text-secondary-foreground dark:border-secondary-dark dark:bg-secondary-dark dark:text-secondary-foreground-dark;
 }
 
 badge:destructive {
-  @apply border-destructive-muted bg-destructive-muted text-destructive;
+  @apply border-destructive-muted bg-destructive-muted text-destructive dark:border-destructive-muted-dark dark:bg-destructive-muted-dark dark:text-destructive-dark;
 }
 
 badge:outline {
-  @apply border-border bg-transparent text-foreground;
+  @apply border-border bg-transparent text-foreground dark:border-border-dark dark:text-foreground-dark;
 }
 
 badge:ghost {
-  @apply border-transparent bg-transparent text-foreground;
+  @apply border-transparent bg-transparent text-foreground dark:text-foreground-dark;
 }
 
 badge:disabled {
@@ -258,27 +260,33 @@ badge:disabled {
 }
 
 .badge-color-blue {
-  @apply border-blue-100 bg-blue-50 text-blue-700;
+  @apply border-admonition-note/20 bg-admonition-note/10 text-admonition-note-foreground;
+  @apply dark:border-admonition-note-dark/30 dark:bg-admonition-note-dark/15 dark:text-admonition-note-foreground-dark;
 }
 
 .badge-color-green {
-  @apply border-green-100 bg-green-50 text-green-700;
+  @apply border-admonition-tip/20 bg-admonition-tip/10 text-admonition-tip-foreground;
+  @apply dark:border-admonition-tip-dark/30 dark:bg-admonition-tip-dark/15 dark:text-admonition-tip-foreground-dark;
 }
 
 .badge-color-sky {
-  @apply border-sky-100 bg-sky-50 text-sky-700;
+  @apply border-admonition-info/20 bg-admonition-info/10 text-admonition-info-foreground;
+  @apply dark:border-admonition-info-dark/30 dark:bg-admonition-info-dark/15 dark:text-admonition-info-foreground-dark;
 }
 
 .badge-color-purple {
   @apply border-purple-100 bg-purple-50 text-purple-700;
+  @apply dark:border-purple-900 dark:bg-purple-950 dark:text-purple-300;
 }
 
 .badge-color-red {
-  @apply border-red-100 bg-red-50 text-red-700;
+  @apply border-destructive/20 bg-destructive/10 text-destructive;
+  @apply dark:border-destructive-dark/30 dark:bg-destructive-dark/15 dark:text-destructive-dark;
 }
 
 alert {
-  @apply flex items-start gap-2 text-sm px-2.5 py-2 bg-card text-card-foreground rounded-lg border;
+  @apply flex items-start gap-2 text-sm px-2.5 py-2 bg-card text-card-foreground rounded-lg border border-border;
+  @apply dark:border-border-dark dark:bg-card-dark dark:text-card-foreground-dark;
 }
 
 alert icon {
@@ -295,7 +303,7 @@ alert-title {
 }
 
 alert-description {
-  @apply block text-muted-foreground;
+  @apply block text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 alert-action {
@@ -303,18 +311,20 @@ alert-action {
 }
 
 alert:success {
-  @apply border-green-200 bg-green-50 text-green-800;
+  @apply border-admonition-tip/30 bg-admonition-tip/10 text-admonition-tip-foreground;
+  @apply dark:border-admonition-tip-dark/30 dark:bg-admonition-tip-dark/10 dark:text-admonition-tip-foreground-dark;
 }
 
 alert:warning {
-  @apply border-yellow-300 bg-yellow-50 text-yellow-900;
+  @apply border-admonition-caution/40 bg-admonition-caution/10 text-admonition-caution-foreground;
+  @apply dark:border-admonition-caution-dark/40 dark:bg-admonition-caution-dark/10 dark:text-admonition-caution-foreground-dark;
 }
 
 alert:destructive {
-  @apply text-destructive;
+  @apply text-destructive dark:text-destructive-dark;
 }
 alert:destructive alert-description {
-  @apply text-destructive/90;
+  @apply text-destructive/90 dark:text-destructive-dark/90;
 }
 
 empty {
@@ -330,7 +340,7 @@ empty-media {
 }
 
 empty-media:icon {
-  @apply flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-foreground;
+  @apply flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-foreground dark:bg-muted-dark dark:text-foreground-dark;
 }
 
 empty-title {
@@ -338,7 +348,7 @@ empty-title {
 }
 
 empty-description {
-  @apply block text-sm leading-relaxed text-muted-foreground;
+  @apply block text-sm leading-relaxed text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 empty-content {
@@ -353,6 +363,7 @@ empty-action {
 
 card {
   @apply border border-border bg-card text-card-foreground rounded-xl text-sm;
+  @apply dark:border-border-dark dark:bg-card-dark dark:text-card-foreground-dark;
   box-sizing: border-box;
   gap: 16px;
   padding: 16px 0;
@@ -373,7 +384,9 @@ card:sm card-header {
 }
 
 card-header.border-b {
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  @apply border-border dark:border-border-dark;
   padding-bottom: 16px;
 }
 
@@ -399,7 +412,7 @@ card:sm card-title {
 }
 
 card-description {
-  @apply text-sm text-muted-foreground;
+  @apply text-sm text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 card-action {
@@ -427,7 +440,7 @@ card:sm card-content.clip-safe {
 }
 
 card-footer {
-  @apply bg-muted/50 rounded-b-xl border-t;
+  @apply bg-muted/50 rounded-b-xl border-t dark:bg-muted-dark/50 dark:border-border-dark;
   padding: 16px;
   margin-bottom: -16px;
 }
@@ -438,7 +451,7 @@ card:sm card-footer {
 }
 
 item {
-  @apply flex gap-2.5 rounded-lg border border-transparent px-3 py-2.5 text-sm;
+  @apply flex gap-2.5 rounded-lg border border-transparent px-3 py-2.5 text-sm dark:border-transparent;
   align-items: center;
 }
 
@@ -451,11 +464,11 @@ item:xs {
 }
 
 item:outline {
-  @apply border-border;
+  @apply border-border dark:border-border-dark;
 }
 
 item:muted {
-  @apply border-transparent bg-muted/50;
+  @apply border-transparent bg-muted/50 dark:bg-muted-dark/50;
 }
 
 item-content {
@@ -505,7 +518,7 @@ item-title {
 }
 
 item-description {
-  @apply block text-sm leading-normal text-muted-foreground;
+  @apply block text-sm leading-normal text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 item:xs item-description {
@@ -513,11 +526,11 @@ item:xs item-description {
 }
 
 item:interactive:hover {
-  @apply bg-neutral-100;
+  @apply bg-muted dark:bg-muted-dark;
 }
 
 item:interactive:active {
-  @apply bg-neutral-200;
+  @apply bg-foreground/10 dark:bg-foreground-dark/10;
 }
 
 item:disabled {
@@ -525,39 +538,43 @@ item:disabled {
 }
 
 attachment {
-  @apply bg-card text-card-foreground;
-  border-color: #e5e5e5;
+  @apply bg-card text-card-foreground border-border;
+  @apply dark:bg-card-dark dark:text-card-foreground-dark dark:border-border-dark;
   border-radius: 12px;
 }
 
 attachment:idle {
-  border-color: #d4d4d4;
+  @apply border-input dark:border-input-dark;
 }
 
 attachment:error {
-  border-color: rgba(239, 68, 68, 0.3);
+  @apply border-destructive/30 dark:border-destructive-dark/30;
 }
 
 attachment:error attachment-media {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
+  @apply bg-destructive/10 text-destructive dark:bg-destructive-dark/10 dark:text-destructive-dark;
 }
 
 attachment:error attachment-description {
-  color: rgba(220, 38, 38, 0.8);
+  @apply text-destructive/80 dark:text-destructive-dark/80;
 }
 
 attachment.has-trigger:hover {
-  background-color: rgba(245, 245, 245, 0.5);
+  @apply bg-muted/50 dark:bg-muted-dark/50;
 }
 
 attachment.has-trigger:active,
 attachment.has-trigger:focus {
-  box-shadow: 0 0 0 2px rgba(34, 34, 34, 0.12);
+  box-shadow: theme("boxShadow.focus-sm");
+}
+
+.dark attachment.has-trigger:active,
+.dark attachment.has-trigger:focus {
+  box-shadow: theme("boxShadow.focus-sm-dark");
 }
 
 attachment-media {
-  @apply bg-muted text-foreground;
+  @apply bg-muted text-foreground dark:bg-muted-dark dark:text-foreground-dark;
 }
 
 attachment-title {
@@ -565,7 +582,7 @@ attachment-title {
 }
 
 attachment-description {
-  @apply text-muted-foreground;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 attachment-action {
@@ -603,14 +620,13 @@ tooltip-content.tooltip-side-right {
 }
 
 .tooltip-inner {
-  @apply rounded-md px-3 py-1.5 text-xs;
-  background-color: #0a0a0a;
-  color: #ffffff;
+  @apply rounded-md px-3 py-1.5 text-xs bg-primary text-primary-foreground;
+  @apply dark:bg-primary-dark dark:text-primary-foreground-dark;
   box-sizing: border-box;
 }
 
 tooltip-content text {
-  color: #ffffff;
+  @apply text-primary-foreground dark:text-primary-foreground-dark;
 }
 
 .tooltip-arrow {
@@ -626,7 +642,7 @@ tooltip-content text {
   left: 50%;
   margin-left: -4px;
   border-width: 5px 4px 0 4px;
-  border-top-color: #0a0a0a;
+  @apply border-t-primary dark:border-t-primary-dark;
   border-right-color: transparent;
   border-bottom-color: transparent;
   border-left-color: transparent;
@@ -639,7 +655,7 @@ tooltip-content text {
   border-width: 0 4px 5px 4px;
   border-top-color: transparent;
   border-right-color: transparent;
-  border-bottom-color: #0a0a0a;
+  @apply border-b-primary dark:border-b-primary-dark;
   border-left-color: transparent;
 }
 
@@ -651,7 +667,7 @@ tooltip-content text {
   border-top-color: transparent;
   border-right-color: transparent;
   border-bottom-color: transparent;
-  border-left-color: #0a0a0a;
+  @apply border-l-primary dark:border-l-primary-dark;
 }
 
 .tooltip-arrow.tooltip-side-right {
@@ -660,7 +676,7 @@ tooltip-content text {
   margin-top: -4px;
   border-width: 4px 5px 4px 0;
   border-top-color: transparent;
-  border-right-color: #0a0a0a;
+  @apply border-r-primary dark:border-r-primary-dark;
   border-bottom-color: transparent;
   border-left-color: transparent;
 }
@@ -673,11 +689,11 @@ progress {
 }
 
 progress-track {
-  @apply w-full h-1 rounded-full bg-muted;
+  @apply w-full h-1 rounded-full bg-muted dark:bg-muted-dark;
 }
 
 progress-indicator {
-  @apply h-full rounded-full bg-primary;
+  @apply h-full rounded-full bg-primary dark:bg-primary-dark;
 }
 
 progress-label {
@@ -685,7 +701,7 @@ progress-label {
 }
 
 progress-value {
-  @apply text-sm text-muted-foreground ml-auto;
+  @apply text-sm text-muted-foreground ml-auto dark:text-muted-foreground-dark;
 }
 
 /* radio-group: structural rules live in src/widgets/radio_group.c */
@@ -695,11 +711,11 @@ radio-group {
 }
 
 radio-group-item:checked {
-  @apply border-primary bg-primary;
+  @apply border-primary bg-primary dark:border-primary-dark dark:bg-primary-dark;
 }
 
 radio-group-item .indicator {
-  @apply bg-primary-foreground;
+  @apply bg-primary-foreground dark:bg-primary-foreground-dark;
 }
 
 radio-group-item:disabled {
@@ -712,9 +728,10 @@ radio-group-item:disabled {
 
 popover-content {
   @apply border border-border bg-popover p-4 rounded-xl text-popover-foreground;
+  @apply dark:border-border-dark dark:bg-popover-dark dark:text-popover-foreground-dark;
   box-sizing: border-box;
   width: 288px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: theme("boxShadow.lg");
   font-size: 14px;
 }
 
@@ -725,7 +742,7 @@ popover-title {
 }
 
 popover-description {
-  @apply text-sm text-muted-foreground;
+  @apply text-sm text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 /* dropdown-menu: all rules live here (the widget source stays style-free). */
@@ -747,8 +764,9 @@ dropdown-menu-sub-content {
   min-width: 128px;
   pointer-events: auto;
   @apply border border-border bg-popover rounded-md text-popover-foreground;
+  @apply dark:border-border-dark dark:bg-popover-dark dark:text-popover-foreground-dark;
+  box-shadow: theme("boxShadow.md");
   padding: 4px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   font-size: 14px;
 }
 
@@ -758,7 +776,7 @@ dropdown-menu-group {
 
 dropdown-menu-label {
   display: block;
-  @apply px-1.5 py-1 text-xs font-medium text-muted-foreground;
+  @apply px-1.5 py-1 text-xs font-medium text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 dropdown-menu-item,
@@ -778,14 +796,14 @@ dropdown-menu-item:hover,
 dropdown-menu-checkbox-item:hover,
 dropdown-menu-radio-item:hover,
 dropdown-menu-sub-trigger:hover {
-  @apply bg-muted;
+  @apply bg-muted dark:bg-muted-dark;
 }
 
 dropdown-menu-item:highlighted,
 dropdown-menu-checkbox-item:highlighted,
 dropdown-menu-radio-item:highlighted,
 dropdown-menu-sub-trigger:highlighted {
-  @apply bg-muted;
+  @apply bg-muted dark:bg-muted-dark;
 }
 
 dropdown-menu-item:disabled,
@@ -799,25 +817,25 @@ dropdown-menu-sub-trigger:disabled {
 dropdown-menu-item:destructive,
 dropdown-menu-checkbox-item:destructive,
 dropdown-menu-radio-item:destructive {
-  @apply text-destructive;
+  @apply text-destructive dark:text-destructive-dark;
 }
 
 dropdown-menu-item:destructive:highlighted,
 dropdown-menu-checkbox-item:destructive:highlighted,
 dropdown-menu-radio-item:destructive:highlighted {
-  background-color: #ffe8e9;
+  @apply bg-destructive-muted dark:bg-destructive-muted-dark;
 }
 
 dropdown-menu-separator {
   display: block;
   height: 1px;
   margin: 4px -4px;
-  background-color: #e5e5e5;
+  @apply bg-border dark:bg-border-dark;
 }
 
 dropdown-menu-shortcut {
   display: inline-block;
-  @apply text-xs text-muted-foreground;
+  @apply text-xs text-muted-foreground dark:text-muted-foreground-dark;
   margin-left: auto;
   letter-spacing: 0.08em;
 }
@@ -854,7 +872,7 @@ dropdown-menu-radio-item:checked .dropdown-menu-indicator {
 /* accordion: structural rules live in src/widgets/accordion.c */
 
 accordion-item {
-  border-bottom: 1px solid #e5e5e5;
+  @apply border-b border-border dark:border-border-dark;
 }
 
 accordion-item:last {
@@ -878,7 +896,7 @@ accordion-trigger text {
 }
 
 accordion-trigger-icon {
-  @apply text-muted-foreground;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
   flex: 0 0 16px;
   width: 16px;
   height: 16px;
@@ -902,16 +920,21 @@ accordion-item:disabled accordion-trigger:hover text {
 /* input group */
 
 input-group {
-  @apply rounded-lg border border-border bg-background;
+  @apply rounded-lg border border-border bg-background dark:border-border-dark dark:bg-background-dark;
 }
 
 input-group:focused {
-  border-color: #222;
-  box-shadow: 0 0 0 3px rgba(34, 34, 34, 0.1);
+  @apply border-foreground;
+  @apply dark:border-foreground-dark;
+  box-shadow: theme("boxShadow.focus");
+}
+
+.dark input-group:focused {
+  box-shadow: theme("boxShadow.focus-dark");
 }
 
 input-group:has-disabled {
-  @apply bg-muted opacity-50;
+  @apply bg-muted opacity-50 dark:bg-muted-dark;
 }
 
 input-group:disabled {
@@ -935,7 +958,7 @@ input-group:multiline {
 }
 
 input-group-addon {
-  color: #666666;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
   gap: 8px;
   font-size: 14px;
   font-weight: 500;
@@ -1003,16 +1026,15 @@ input-group-addon:align-block-end {
 
 input-group-text {
   gap: 8px;
-  color: #666666;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
   font-size: 14px;
 }
 
 input-group-kbd {
-  border: 1px solid #e5e5e5;
+  @apply border border-border bg-muted text-muted-foreground;
+  @apply dark:border-border-dark dark:bg-muted-dark dark:text-muted-foreground-dark;
   border-radius: 4px;
   padding: 1px 4px;
-  color: #666666;
-  background: #f5f5f5;
   font-size: 12px;
 }
 
@@ -1134,15 +1156,15 @@ input-group.button-group-item {
 button-group-text {
   gap: 8px;
   padding: 10px;
-  border: 1px solid #e5e5e5;
+  @apply border border-border bg-muted;
+  @apply dark:border-border-dark dark:bg-muted-dark;
   border-radius: 8px;
-  background: #f5f5f5;
   font-size: 14px;
   font-weight: 500;
 }
 
 button-group-separator {
-  background: #e5e5e5;
+  @apply bg-border dark:bg-border-dark;
 }
 
 button-group-separator:vertical {
@@ -1163,21 +1185,21 @@ breadcrumb {
 }
 
 breadcrumb-link {
-  @apply text-muted-foreground;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
   cursor: pointer;
 }
 
 breadcrumb-link:hover {
-  @apply text-foreground;
+  @apply text-foreground dark:text-foreground-dark;
 }
 
 breadcrumb-page {
-  @apply text-foreground font-medium;
+  @apply text-foreground font-medium dark:text-foreground-dark;
 }
 
 breadcrumb-separator,
 breadcrumb-ellipsis {
-  @apply text-muted-foreground;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 breadcrumb-ellipsis {
@@ -1185,7 +1207,7 @@ breadcrumb-ellipsis {
 }
 
 breadcrumb-ellipsis:hover {
-  @apply bg-muted text-foreground;
+  @apply bg-muted text-foreground dark:bg-muted-dark dark:text-foreground-dark;
 }
 
 /* toast: structural rules live in src/widgets/toast.c */
@@ -1196,11 +1218,12 @@ toast-viewport {
 
 toast {
   @apply border border-border bg-popover text-popover-foreground rounded-2xl;
+  @apply dark:border-border-dark dark:bg-popover-dark dark:text-popover-foreground-dark;
   box-sizing: border-box;
   width: 100%;
   max-width: 384px;
   pointer-events: auto;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: theme("boxShadow.lg");
 }
 
 toast-content {
@@ -1213,7 +1236,7 @@ toast-icon {
 }
 
 toast:error toast-icon {
-  @apply text-destructive;
+  @apply text-destructive dark:text-destructive-dark;
 }
 
 toast-spinner {
@@ -1231,7 +1254,7 @@ toast-title {
 }
 
 toast-description {
-  @apply text-sm text-muted-foreground;
+  @apply text-sm text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 toast-actions {
@@ -1244,11 +1267,11 @@ toast-actions {
 }
 
 .toast-close {
-  @apply text-muted-foreground;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 .toast-close:hover {
-  @apply text-foreground;
+  @apply text-foreground dark:text-foreground-dark;
 }
 
 /* dialog / alert-dialog: structural rules (display, positioning, layout) live
@@ -1256,20 +1279,20 @@ toast-actions {
 
 dialog-overlay,
 alert-dialog-overlay {
-  background-color: rgba(0, 0, 0, 0.1);
+  @apply bg-overlay dark:bg-overlay-dark;
 }
 
 dialog-content,
 alert-dialog-content {
-  @apply p-4 rounded-xl bg-popover text-popover-foreground;
-  border: 1px solid #e5e5e5;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  @apply p-4 rounded-xl bg-popover text-popover-foreground border border-border;
+  @apply dark:border-border-dark dark:bg-popover-dark dark:text-popover-foreground-dark;
+  box-shadow: theme("boxShadow.lg");
   font-size: 14px;
 }
 
 dialog-footer,
 alert-dialog-footer {
-  @apply bg-muted/50 -mx-4 -mb-4 rounded-b-xl border-t p-4;
+  @apply bg-muted/50 -mx-4 -mb-4 rounded-b-xl border-t p-4 dark:bg-muted-dark/50 dark:border-border-dark;
 }
 
 dialog-title,
@@ -1281,7 +1304,7 @@ alert-dialog-title {
 
 dialog-description,
 alert-dialog-description {
-  @apply text-sm text-muted-foreground;
+  @apply text-sm text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 alert-dialog-content:sm alert-dialog-header {
@@ -1289,33 +1312,34 @@ alert-dialog-content:sm alert-dialog-header {
 }
 
 alert-dialog-media {
-  @apply rounded-md bg-muted;
+  @apply rounded-md bg-muted dark:bg-muted-dark;
 }
 
 alert-dialog-cancel,
 alert-dialog-action {
   @apply inline-flex items-center gap-1.5 text-center rounded-lg border border-border bg-background px-2.5 py-[5px] text-sm font-medium text-foreground;
+  @apply dark:border-border-dark dark:bg-background-dark dark:text-foreground-dark;
 }
 
 alert-dialog-cancel:hover,
 alert-dialog-action:hover {
-  @apply bg-muted text-foreground;
+  @apply bg-muted text-foreground dark:bg-muted-dark dark:text-foreground-dark;
 }
 
 alert-dialog-action:primary {
-  @apply border-transparent bg-primary text-primary-foreground;
+  @apply border-transparent bg-primary text-primary-foreground dark:bg-primary-dark dark:text-primary-foreground-dark;
 }
 
 alert-dialog-action:primary:hover {
-  @apply bg-neutral-600 text-primary-foreground;
+  @apply bg-primary/90 text-primary-foreground dark:bg-primary-dark/90 dark:text-primary-foreground-dark;
 }
 
 alert-dialog-action:destructive {
-  @apply border-transparent bg-destructive-muted text-destructive;
+  @apply border-transparent bg-destructive-muted text-destructive dark:bg-destructive-muted-dark dark:text-destructive-dark;
 }
 
 alert-dialog-action:destructive:hover {
-  @apply bg-red-100 text-destructive;
+  @apply bg-destructive/15 text-destructive dark:bg-destructive-dark/15 dark:text-destructive-dark;
 }
 
 alert-dialog-content:sm {
@@ -1330,7 +1354,7 @@ alert-dialog-content:sm {
  * rules and a hand-written box-shadow. */
 
 select-arrow {
-  @apply text-muted-foreground;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 select-value {
@@ -1344,15 +1368,16 @@ select-arrow.fui-icon {
 
 select-content {
   @apply border border-border bg-popover p-1 rounded-lg text-popover-foreground;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  @apply dark:border-border-dark dark:bg-popover-dark dark:text-popover-foreground-dark;
+  box-shadow: theme("boxShadow.md");
 }
 
 select-label {
-  @apply text-muted-foreground px-1.5 py-1 text-xs;
+  @apply text-muted-foreground px-1.5 py-1 text-xs dark:text-muted-foreground-dark;
 }
 
 select-separator {
-  @apply bg-border my-1;
+  @apply bg-border my-1 dark:bg-border-dark;
   height: 1px;
 }
 
@@ -1363,19 +1388,19 @@ select-item {
 }
 
 select-item:hover {
-  @apply bg-muted text-foreground;
+  @apply bg-muted text-foreground dark:bg-muted-dark dark:text-foreground-dark;
 }
 
 select-item:active {
-  @apply bg-neutral-200;
+  @apply bg-foreground/10 dark:bg-foreground-dark/10;
 }
 
 select-item:checked {
-  @apply bg-muted text-foreground;
+  @apply bg-muted text-foreground dark:bg-muted-dark dark:text-foreground-dark;
 }
 
 select-item:highlighted {
-  @apply bg-muted text-foreground;
+  @apply bg-muted text-foreground dark:bg-muted-dark dark:text-foreground-dark;
 }
 
 select-item .select-item-indicator {
@@ -1416,14 +1441,14 @@ select:disabled select-trigger {
 /* checkbox: structural rules live in src/widgets/checkbox.c */
 
 checkbox {
-  @apply rounded-[4px] border border-border;
+  @apply rounded-[4px] border border-border dark:border-border-dark;
   cursor: pointer;
   font-size: 14px;
 }
 
 checkbox:checked,
 checkbox:indeterminate {
-  @apply border-primary bg-primary text-primary-foreground;
+  @apply border-primary bg-primary text-primary-foreground dark:border-primary-dark dark:bg-primary-dark dark:text-primary-foreground-dark;
 }
 
 checkbox:disabled {
@@ -1486,19 +1511,19 @@ field-title {
 }
 
 field-description {
-  @apply text-sm font-normal text-muted-foreground;
+  @apply text-sm font-normal text-muted-foreground dark:text-muted-foreground-dark;
   line-height: 1.5;
   text-align: left;
 }
 
 field-separator {
   height: 1px;
-  background-color: #e5e5e5;
+  @apply bg-border dark:bg-border-dark;
   margin: 0;
 }
 
 field-label.has-field {
-  @apply rounded-lg border border-border;
+  @apply rounded-lg border border-border dark:border-border-dark;
   padding: 10px;
 }
 
@@ -1541,12 +1566,12 @@ field:horizontal select-trigger {
 }
 
 field-label.has-field:hover {
-  background-color: rgba(245, 245, 245, 0.5);
+  @apply bg-muted/50 dark:bg-muted-dark/50;
 }
 
 field-label.has-checked {
-  background-color: rgba(34, 34, 34, 0.05);
-  border-color: rgba(34, 34, 34, 0.3);
+  @apply bg-foreground/5 border-foreground/30;
+  @apply dark:bg-foreground-dark/5 dark:border-foreground-dark/30;
 }
 
 field:disabled,
@@ -1566,12 +1591,17 @@ field-separator:disabled {
 
 textinput {
   @apply h-8 rounded-lg border border-border bg-background px-2.5 py-1 text-sm text-foreground;
+  @apply dark:border-border-dark dark:bg-background-dark dark:text-foreground-dark;
   box-sizing: border-box;
 }
 
 textinput:focus {
-  @apply border-foreground;
-  box-shadow: 0 0 0 3px rgba(34, 34, 34, 0.1);
+  @apply border-foreground dark:border-foreground-dark;
+  box-shadow: theme("boxShadow.focus");
+}
+
+.dark textinput:focus {
+  box-shadow: theme("boxShadow.focus-dark");
 }
 
 textinput:disabled {
@@ -1585,22 +1615,22 @@ textinput:disabled {
 /* sidebar: structural rules live in src/widgets/sidebar.c */
 
 sidebar {
-  @apply bg-sidebar text-sidebar-foreground;
-  border-color: #e5e5e5;
+  @apply bg-sidebar text-sidebar-foreground border-sidebar-border;
+  @apply dark:bg-sidebar-dark dark:text-sidebar-foreground-dark dark:border-sidebar-border-dark;
 }
 
 sidebar-group-label {
-  @apply text-xs text-muted-foreground leading-8;
+  @apply text-xs text-muted-foreground leading-8 dark:text-muted-foreground-dark;
   border-radius: 6px;
   font-weight: 500;
 }
 
 sidebar-group-action {
-  @apply text-muted-foreground;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 sidebar-menu-badge {
-  @apply text-xs text-muted-foreground;
+  @apply text-xs text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 .sidebar-menu-button {
@@ -1615,7 +1645,7 @@ sidebar-menu-badge {
   border: 0;
   border-radius: 6px;
   background: transparent;
-  color: #171717;
+  @apply text-sidebar-foreground dark:text-sidebar-foreground-dark;
   font-size: 12.8px;
   font-weight: 400;
   text-align: left;
@@ -1623,12 +1653,12 @@ sidebar-menu-badge {
 }
 
 .sidebar-menu-button:hover {
-  @apply bg-sidebar-accent text-sidebar-accent-foreground;
+  @apply bg-sidebar-accent text-sidebar-accent-foreground dark:bg-sidebar-accent-dark dark:text-sidebar-accent-foreground-dark;
 }
 
 .sidebar-menu-button.active {
-  @apply bg-sidebar-accent text-sidebar-accent-foreground;
-  border-color: #e5e5e5;
+  @apply bg-sidebar-accent text-sidebar-accent-foreground dark:bg-sidebar-accent-dark dark:text-sidebar-accent-foreground-dark;
+  @apply border-border dark:border-border-dark;
   font-weight: 500;
 }
 
@@ -1661,19 +1691,19 @@ sidebar-menu-badge {
 }
 
 .sidebar-team-logo {
-  @apply bg-sidebar-primary text-sidebar-primary-foreground;
+  @apply bg-sidebar-primary text-sidebar-primary-foreground dark:bg-sidebar-primary-dark dark:text-sidebar-primary-foreground-dark;
 }
 
 .sidebar-avatar {
-  @apply bg-sidebar-accent text-sidebar-accent-foreground;
+  @apply bg-sidebar-accent text-sidebar-accent-foreground dark:bg-sidebar-accent-dark dark:text-sidebar-accent-foreground-dark;
 }
 
 .sidebar-more {
-  color: #666666;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 .sidebar-more icon {
-  color: #666666;
+  @apply text-muted-foreground dark:text-muted-foreground-dark;
 }
 
 
@@ -1707,5 +1737,21 @@ sidebar-provider:collapsed sidebar:icon .sidebar-user .sidebar-menu-chevron {
 
 sidebar-trigger,
 sidebar-rail {
-  @apply text-foreground;
+  @apply text-foreground dark:text-foreground-dark;
+}
+
+/* scrollbar: structural rules live in src/widgets/scrollbar.c; the thumb
+ * uses the foreground token so it stays visible on both surfaces: dark on
+ * light backgrounds, light on dark backgrounds. */
+
+scrollbar-thumb {
+  @apply bg-foreground/25 dark:bg-foreground-dark/25;
+}
+
+scrollbar-thumb:hover {
+  @apply bg-foreground/45 dark:bg-foreground-dark/45;
+}
+
+scrollbar-thumb:active {
+  @apply bg-foreground/60 dark:bg-foreground-dark/60;
 }

@@ -1,6 +1,7 @@
 module.exports = {
-  plugins: {
-    tailwindcss: {},
-    "@thedutchcoder/postcss-rem-to-px": {},
-  },
+  plugins: [
+    require("tailwindcss"),
+    require("@thedutchcoder/postcss-rem-to-px"),
+    require("../../scripts/postcss-lcui-dark"),
+  ],
 };

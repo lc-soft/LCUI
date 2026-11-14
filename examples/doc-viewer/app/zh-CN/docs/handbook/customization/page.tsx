@@ -8,7 +8,7 @@ export default function CustomizationDocPage() {
       <p className="doc-page-desc">{`你可以创建全新的部件类型，也可以在现有部件基础上进行扩展。`}</p>
       <Widget className="doc-section">
         <h2>创建自定义部件</h2>
-        <p>{`使用 [bgcolor=#eee] ui_create_widget_prototype() [/bgcolor] 注册新的部件类型：`}</p>
+        <p>{`使用 [bgcolor=#7f7f7f29] ui_create_widget_prototype() [/bgcolor] 注册新的部件类型：`}</p>
         <Widget className="code-block" data-language="c" data-source="zh-CN/handbook/customization/0">
           <Widget className="code-block-header">
             <Text className="code-block-title">src/counter.c</Text>
@@ -17,133 +17,265 @@ export default function CustomizationDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#6e7781]#[color=#cf222e]include[/color] [color=#0a3069]<LCUI.h>[/color][/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`[color=#cf222e]typedef[/color] [color=#cf222e]struct[/color] {`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`        [color=#953800]int[/color] value;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`} [color=#953800]counter_data_t[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_prototype_t[/color] *counter_proto;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]void[/color] [color=#8250df]counter_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w)[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">10</Text>
+                    <Text className="code-line">{`{`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">11</Text>
+                    <Text className="code-line">{`        [color=#953800]counter_data_t[/color] *data;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">12</Text>
+                    <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *text;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">13</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">14</Text>
+                    <Text className="code-line">{`        data = ui_widget_add_data(w, counter_proto, [color=#cf222e]sizeof[/color]([color=#953800]counter_data_t[/color]));`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">15</Text>
+                    <Text className="code-line">{`        data->value = [color=#0550ae]0[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">16</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">17</Text>
+                    <Text className="code-line">{`        text = ui_create_widget([color=#0a3069]"text"[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">18</Text>
+                    <Text className="code-line">{`        ui_text_set_content(text, [color=#0a3069]"0"[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">19</Text>
+                    <Text className="code-line">{`        ui_widget_append(w, text);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">20</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">21</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">22</Text>
+                    <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]void[/color] [color=#8250df]counter_destroy[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w)[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">23</Text>
+                    <Text className="code-line">{`{`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">24</Text>
+                    <Text className="code-line">{`        [color=#6e7781]/* 释放自有资源（如有） */[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">25</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">26</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">27</Text>
+                    <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]register_counter_widget[/color][color=#0550ae]([color=#953800]void[/color])[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">28</Text>
+                    <Text className="code-line">{`{`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">29</Text>
+                    <Text className="code-line">{`        counter_proto = ui_create_widget_prototype([color=#0a3069]"counter"[/color], [color=#0550ae]NULL[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">30</Text>
+                    <Text className="code-line">{`        counter_proto->init = counter_init;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">31</Text>
+                    <Text className="code-line">{`        counter_proto->destroy = counter_destroy;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">32</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`[color=#cf222e]typedef[/color] [color=#cf222e]struct[/color] {`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`        [color=#953800]int[/color] value;`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`} [color=#953800]counter_data_t[/color];`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_prototype_t[/color] *counter_proto;`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">8</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">9</Text>
-                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]void[/color] [color=#8250df]counter_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w)[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">10</Text>
-                  <Text className="code-line">{`{`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">11</Text>
-                  <Text className="code-line">{`        [color=#953800]counter_data_t[/color] *data;`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">12</Text>
-                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *text;`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">13</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">14</Text>
-                  <Text className="code-line">{`        data = ui_widget_add_data(w, counter_proto, [color=#cf222e]sizeof[/color]([color=#953800]counter_data_t[/color]));`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">15</Text>
-                  <Text className="code-line">{`        data->value = [color=#0550ae]0[/color];`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">16</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">17</Text>
-                  <Text className="code-line">{`        text = ui_create_widget([color=#0a3069]"text"[/color]);`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">18</Text>
-                  <Text className="code-line">{`        ui_text_set_content(text, [color=#0a3069]"0"[/color]);`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">19</Text>
-                  <Text className="code-line">{`        ui_widget_append(w, text);`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">20</Text>
-                  <Text className="code-line">{`}`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">21</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">22</Text>
-                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]void[/color] [color=#8250df]counter_destroy[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w)[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">23</Text>
-                  <Text className="code-line">{`{`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">24</Text>
-                  <Text className="code-line">{`        [color=#6e7781]/* 释放自有资源（如有） */[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">25</Text>
-                  <Text className="code-line">{`}`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">26</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">27</Text>
-                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]register_counter_widget[/color][color=#0550ae]([color=#953800]void[/color])[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">28</Text>
-                  <Text className="code-line">{`{`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">29</Text>
-                  <Text className="code-line">{`        counter_proto = ui_create_widget_prototype([color=#0a3069]"counter"[/color], [color=#0550ae]NULL[/color]);`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">30</Text>
-                  <Text className="code-line">{`        counter_proto->init = counter_init;`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">31</Text>
-                  <Text className="code-line">{`        counter_proto->destroy = counter_destroy;`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">32</Text>
-                  <Text className="code-line">{`}`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#8b949e]#[color=#ff7b72]include[/color] [color=#a5d6ff]<LCUI.h>[/color][/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`[color=#ff7b72]typedef[/color] [color=#ff7b72]struct[/color] {`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`        [color=#ffa657]int[/color] value;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`} [color=#ffa657]counter_data_t[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`[color=#ffa657]static[/color] [color=#ffa657]ui_widget_prototype_t[/color] *counter_proto;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{`[color=#ffa657]static[/color] [color=#ffa657]void[/color] [color=#d2a8ff]counter_init[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *w)[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">10</Text>
+                    <Text className="code-line">{`{`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">11</Text>
+                    <Text className="code-line">{`        [color=#ffa657]counter_data_t[/color] *data;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">12</Text>
+                    <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *text;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">13</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">14</Text>
+                    <Text className="code-line">{`        data = ui_widget_add_data(w, counter_proto, [color=#ff7b72]sizeof[/color]([color=#ffa657]counter_data_t[/color]));`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">15</Text>
+                    <Text className="code-line">{`        data->value = [color=#79c0ff]0[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">16</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">17</Text>
+                    <Text className="code-line">{`        text = ui_create_widget([color=#a5d6ff]"text"[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">18</Text>
+                    <Text className="code-line">{`        ui_text_set_content(text, [color=#a5d6ff]"0"[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">19</Text>
+                    <Text className="code-line">{`        ui_widget_append(w, text);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">20</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">21</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">22</Text>
+                    <Text className="code-line">{`[color=#ffa657]static[/color] [color=#ffa657]void[/color] [color=#d2a8ff]counter_destroy[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *w)[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">23</Text>
+                    <Text className="code-line">{`{`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">24</Text>
+                    <Text className="code-line">{`        [color=#8b949e]/* 释放自有资源（如有） */[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">25</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">26</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">27</Text>
+                    <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]register_counter_widget[/color][color=#79c0ff]([color=#ffa657]void[/color])[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">28</Text>
+                    <Text className="code-line">{`{`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">29</Text>
+                    <Text className="code-line">{`        counter_proto = ui_create_widget_prototype([color=#a5d6ff]"counter"[/color], [color=#79c0ff]NULL[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">30</Text>
+                    <Text className="code-line">{`        counter_proto->init = counter_init;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">31</Text>
+                    <Text className="code-line">{`        counter_proto->destroy = counter_destroy;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">32</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -160,57 +292,113 @@ export default function CustomizationDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]extern[/color] [color=#953800]void[/color] [color=#8250df]register_counter_widget[/color][color=#0550ae]([color=#953800]void[/color])[/color];`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]extern[/color] [color=#953800]void[/color] [color=#8250df]register_counter_widget[/color][color=#0550ae]([color=#953800]void[/color])[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`[color=#953800]int[/color] [color=#8250df]main[/color][color=#0550ae]([color=#953800]void[/color])[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`{`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *counter;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`        lcui_init();`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`        register_counter_widget();`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">10</Text>
+                    <Text className="code-line">{`        counter = ui_create_widget([color=#0a3069]"counter"[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">11</Text>
+                    <Text className="code-line">{`        ui_widget_append(ui_root(), counter);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">12</Text>
+                    <Text className="code-line">{`        [color=#cf222e]return[/color] lcui_main();`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">13</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`[color=#953800]int[/color] [color=#8250df]main[/color][color=#0550ae]([color=#953800]void[/color])[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`{`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`        [color=#953800]ui_widget_t[/color] *counter;`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{`        lcui_init();`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">8</Text>
-                  <Text className="code-line">{`        register_counter_widget();`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">9</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">10</Text>
-                  <Text className="code-line">{`        counter = ui_create_widget([color=#0a3069]"counter"[/color]);`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">11</Text>
-                  <Text className="code-line">{`        ui_widget_append(ui_root(), counter);`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">12</Text>
-                  <Text className="code-line">{`        [color=#cf222e]return[/color] lcui_main();`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">13</Text>
-                  <Text className="code-line">{`}`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]extern[/color] [color=#ffa657]void[/color] [color=#d2a8ff]register_counter_widget[/color][color=#79c0ff]([color=#ffa657]void[/color])[/color];`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`[color=#ffa657]int[/color] [color=#d2a8ff]main[/color][color=#79c0ff]([color=#ffa657]void[/color])[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`{`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`        [color=#ffa657]ui_widget_t[/color] *counter;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`        lcui_init();`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`        register_counter_widget();`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">10</Text>
+                    <Text className="code-line">{`        counter = ui_create_widget([color=#a5d6ff]"counter"[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">11</Text>
+                    <Text className="code-line">{`        ui_widget_append(ui_root(), counter);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">12</Text>
+                    <Text className="code-line">{`        [color=#ff7b72]return[/color] lcui_main();`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">13</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -221,7 +409,7 @@ export default function CustomizationDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>扩展现有部件</h2>
-        <p>{`把父类型名作为 [bgcolor=#eee] ui_create_widget_prototype() [/bgcolor] 的第二个参数传入：`}</p>
+        <p>{`把父类型名作为 [bgcolor=#7f7f7f29] ui_create_widget_prototype() [/bgcolor] 的第二个参数传入：`}</p>
         <Widget className="code-block" data-language="c" data-source="zh-CN/handbook/customization/2">
           <Widget className="code-block-header">
             <Text className="code-block-title">src/icon_button.c</Text>
@@ -230,65 +418,129 @@ export default function CustomizationDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_prototype_t[/color] *icon_button_proto;`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]ui_widget_prototype_t[/color] *icon_button_proto;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]void[/color] [color=#8250df]icon_button_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w)[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`{`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`        [color=#6e7781]/* 调用父类（button）的初始化逻辑 */[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`        icon_button_proto->proto->init(w);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`        ui_widget_add_class(w, [color=#0a3069]"icon-button"[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">10</Text>
+                    <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]register_icon_button[/color][color=#0550ae]([color=#953800]void[/color])[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">11</Text>
+                    <Text className="code-line">{`{`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">12</Text>
+                    <Text className="code-line">{`        icon_button_proto =`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">13</Text>
+                    <Text className="code-line">{`            ui_create_widget_prototype([color=#0a3069]"icon-button"[/color], [color=#0a3069]"button"[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">14</Text>
+                    <Text className="code-line">{`        icon_button_proto->init = icon_button_init;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">15</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]void[/color] [color=#8250df]icon_button_init[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w)[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`{`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`        [color=#6e7781]/* 调用父类（button）的初始化逻辑 */[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{`        icon_button_proto->proto->init(w);`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{`        ui_widget_add_class(w, [color=#0a3069]"icon-button"[/color]);`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">8</Text>
-                  <Text className="code-line">{`}`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">9</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">10</Text>
-                  <Text className="code-line">{`[color=#953800]void[/color] [color=#8250df]register_icon_button[/color][color=#0550ae]([color=#953800]void[/color])[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">11</Text>
-                  <Text className="code-line">{`{`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">12</Text>
-                  <Text className="code-line">{`        icon_button_proto =`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">13</Text>
-                  <Text className="code-line">{`            ui_create_widget_prototype([color=#0a3069]"icon-button"[/color], [color=#0a3069]"button"[/color]);`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">14</Text>
-                  <Text className="code-line">{`        icon_button_proto->init = icon_button_init;`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">15</Text>
-                  <Text className="code-line">{`}`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]static[/color] [color=#ffa657]ui_widget_prototype_t[/color] *icon_button_proto;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`[color=#ffa657]static[/color] [color=#ffa657]void[/color] [color=#d2a8ff]icon_button_init[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *w)[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`{`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`        [color=#8b949e]/* 调用父类（button）的初始化逻辑 */[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`        icon_button_proto->proto->init(w);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{`        ui_widget_add_class(w, [color=#a5d6ff]"icon-button"[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">10</Text>
+                    <Text className="code-line">{`[color=#ffa657]void[/color] [color=#d2a8ff]register_icon_button[/color][color=#79c0ff]([color=#ffa657]void[/color])[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">11</Text>
+                    <Text className="code-line">{`{`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">12</Text>
+                    <Text className="code-line">{`        icon_button_proto =`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">13</Text>
+                    <Text className="code-line">{`            ui_create_widget_prototype([color=#a5d6ff]"icon-button"[/color], [color=#a5d6ff]"button"[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">14</Text>
+                    <Text className="code-line">{`        icon_button_proto->init = icon_button_init;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">15</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -299,27 +551,27 @@ export default function CustomizationDocPage() {
         <Widget className="admonition admonition-warning">
           <Text className="admonition-title">注意</Text>
           <Widget className="admonition-content">
-            <p>{`[b]父类的 [bgcolor=#eee] init [/bgcolor] 必须手动调用。[/b] LCUI 在创建子类型部件时不会自动调用父类型的 [bgcolor=#eee] init [/bgcolor]。如果你忘记调用 [bgcolor=#eee] proto->proto->init(w) [/bgcolor]，部件会缺少父类型的基础行为（例如 [bgcolor=#eee] button [/bgcolor] 不会注册点击事件、不会设置默认样式）。`}</p>
+            <p>{`[b]父类的 [bgcolor=#7f7f7f29] init [/bgcolor] 必须手动调用。[/b] LCUI 在创建子类型部件时不会自动调用父类型的 [bgcolor=#7f7f7f29] init [/bgcolor]。如果你忘记调用 [bgcolor=#7f7f7f29] proto->proto->init(w) [/bgcolor]，部件会缺少父类型的基础行为（例如 [bgcolor=#7f7f7f29] button [/bgcolor] 不会注册点击事件、不会设置默认样式）。`}</p>
           </Widget>
         </Widget>
       </Widget>
       <Widget className="doc-section">
         <h2>部件生命周期</h2>
-        <p>{`[bgcolor=#eee] ui_widget_prototype_t [/bgcolor] 上有多个回调钩子，覆盖部件的各个生命周期阶段：`}</p>
+        <p>{`[bgcolor=#7f7f7f29] ui_widget_prototype_t [/bgcolor] 上有多个回调钩子，覆盖部件的各个生命周期阶段：`}</p>
         <ul>
-          <li><Text>{`[b][bgcolor=#eee] init [/bgcolor][/b] — 部件创建时。负责初始化自有数据、子部件、事件绑定。`}</Text></li>
-          <li><Text>{`[b][bgcolor=#eee] destroy [/bgcolor][/b] — 部件销毁时。负责释放自有内存、解绑事件。`}</Text></li>
-          <li><Text>{`[b][bgcolor=#eee] update [/bgcolor][/b] — 部件需要更新时，接收 [bgcolor=#eee] ui_task_type_t [/bgcolor] 参数标识更新类型（样式更新、属性更新等）。LCUI 内部在每帧更新循环中调用此钩子。`}</Text></li>
-          <li><Text>{`[b][bgcolor=#eee] setattr [/bgcolor][/b] — 设置 XML 属性时（用于响应属性变更）。`}</Text></li>
-          <li><Text>{`[b][bgcolor=#eee] settext [/bgcolor][/b] — 设置文本内容时。`}</Text></li>
-          <li><Text>{`[b][bgcolor=#eee] sizehint [/bgcolor][/b] — 估算部件在无外部约束时的自然尺寸约束（最小/最大内容尺寸）。布局引擎在计算子部件尺寸时会参考此结果。`}</Text></li>
-          <li><Text>{`[b][bgcolor=#eee] resize [/bgcolor][/b] — 部件尺寸变化时。接收新的内容区域宽高作为参数。`}</Text></li>
-          <li><Text>{`[b][bgcolor=#eee] paint [/bgcolor][/b] — 部件需要重绘时。用于自定义绘制逻辑。`}</Text></li>
+          <li><Text>{`[b][bgcolor=#7f7f7f29] init [/bgcolor][/b] — 部件创建时。负责初始化自有数据、子部件、事件绑定。`}</Text></li>
+          <li><Text>{`[b][bgcolor=#7f7f7f29] destroy [/bgcolor][/b] — 部件销毁时。负责释放自有内存、解绑事件。`}</Text></li>
+          <li><Text>{`[b][bgcolor=#7f7f7f29] update [/bgcolor][/b] — 部件需要更新时，接收 [bgcolor=#7f7f7f29] ui_task_type_t [/bgcolor] 参数标识更新类型（样式更新、属性更新等）。LCUI 内部在每帧更新循环中调用此钩子。`}</Text></li>
+          <li><Text>{`[b][bgcolor=#7f7f7f29] setattr [/bgcolor][/b] — 设置 XML 属性时（用于响应属性变更）。`}</Text></li>
+          <li><Text>{`[b][bgcolor=#7f7f7f29] settext [/bgcolor][/b] — 设置文本内容时。`}</Text></li>
+          <li><Text>{`[b][bgcolor=#7f7f7f29] sizehint [/bgcolor][/b] — 估算部件在无外部约束时的自然尺寸约束（最小/最大内容尺寸）。布局引擎在计算子部件尺寸时会参考此结果。`}</Text></li>
+          <li><Text>{`[b][bgcolor=#7f7f7f29] resize [/bgcolor][/b] — 部件尺寸变化时。接收新的内容区域宽高作为参数。`}</Text></li>
+          <li><Text>{`[b][bgcolor=#7f7f7f29] paint [/bgcolor][/b] — 部件需要重绘时。用于自定义绘制逻辑。`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
         <h2>自定义绘制</h2>
-        <p>{`可以重写 [bgcolor=#eee] paint [/bgcolor] 回调，在部件上绘制自定义图形：`}</p>
+        <p>{`可以重写 [bgcolor=#7f7f7f29] paint [/bgcolor] 回调，在部件上绘制自定义图形：`}</p>
         <Widget className="code-block" data-language="c" data-source="zh-CN/handbook/customization/3">
           <Widget className="code-block-header">
             <Text className="code-block-title">src/my_widget.c</Text>
@@ -328,69 +580,137 @@ export default function CustomizationDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "224px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]void[/color] [color=#8250df]my_widget_paint[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w, [color=#953800]pd_context_t[/color] *paint_ctx,[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]void[/color] [color=#8250df]my_widget_paint[/color][color=#0550ae]([color=#953800]ui_widget_t[/color] *w, [color=#953800]pd_context_t[/color] *paint_ctx,[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`[color=#0550ae]                              [color=#953800]ui_widget_actual_style_t[/color] *style)[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`{`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`        [color=#953800]pd_canvas_t[/color] *canvas = paint_ctx->canvas;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`        [color=#953800]pd_color_t[/color] color = pd_color_from_rgb([color=#0550ae]255[/color], [color=#0550ae]0[/color], [color=#0550ae]0[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`        [color=#953800]pd_rect_t[/color] rect = { style->left, style->top, w->width, w->height };`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`        pd_canvas_fill_rect(canvas, color, rect);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">10</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">11</Text>
+                    <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]void[/color] [color=#8250df]register_my_widget[/color][color=#0550ae]([color=#953800]void[/color])[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">12</Text>
+                    <Text className="code-line">{`{`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">13</Text>
+                    <Text className="code-line">{`        [color=#953800]ui_widget_prototype_t[/color] *proto =`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">14</Text>
+                    <Text className="code-line">{`            ui_create_widget_prototype([color=#0a3069]"my-widget"[/color], [color=#0550ae]NULL[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">15</Text>
+                    <Text className="code-line">{`        proto->paint = my_widget_paint;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">16</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
                 </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">2</Text>
-                  <Text className="code-line">{`[color=#0550ae]                              [color=#953800]ui_widget_actual_style_t[/color] *style)[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">3</Text>
-                  <Text className="code-line">{`{`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">4</Text>
-                  <Text className="code-line">{`        [color=#953800]pd_canvas_t[/color] *canvas = paint_ctx->canvas;`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">5</Text>
-                  <Text className="code-line">{`        [color=#953800]pd_color_t[/color] color = pd_color_from_rgb([color=#0550ae]255[/color], [color=#0550ae]0[/color], [color=#0550ae]0[/color]);`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">6</Text>
-                  <Text className="code-line">{`        [color=#953800]pd_rect_t[/color] rect = { style->left, style->top, w->width, w->height };`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">7</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">8</Text>
-                  <Text className="code-line">{`        pd_canvas_fill_rect(canvas, color, rect);`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">9</Text>
-                  <Text className="code-line">{`}`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">10</Text>
-                  <Text className="code-line">{` `}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">11</Text>
-                  <Text className="code-line">{`[color=#953800]static[/color] [color=#953800]void[/color] [color=#8250df]register_my_widget[/color][color=#0550ae]([color=#953800]void[/color])[/color]`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">12</Text>
-                  <Text className="code-line">{`{`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">13</Text>
-                  <Text className="code-line">{`        [color=#953800]ui_widget_prototype_t[/color] *proto =`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">14</Text>
-                  <Text className="code-line">{`            ui_create_widget_prototype([color=#0a3069]"my-widget"[/color], [color=#0550ae]NULL[/color]);`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">15</Text>
-                  <Text className="code-line">{`        proto->paint = my_widget_paint;`}</Text>
-                </Widget>
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">16</Text>
-                  <Text className="code-line">{`}`}</Text>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ffa657]static[/color] [color=#ffa657]void[/color] [color=#d2a8ff]my_widget_paint[/color][color=#79c0ff]([color=#ffa657]ui_widget_t[/color] *w, [color=#ffa657]pd_context_t[/color] *paint_ctx,[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">2</Text>
+                    <Text className="code-line">{`[color=#79c0ff]                              [color=#ffa657]ui_widget_actual_style_t[/color] *style)[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">3</Text>
+                    <Text className="code-line">{`{`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">4</Text>
+                    <Text className="code-line">{`        [color=#ffa657]pd_canvas_t[/color] *canvas = paint_ctx->canvas;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">5</Text>
+                    <Text className="code-line">{`        [color=#ffa657]pd_color_t[/color] color = pd_color_from_rgb([color=#79c0ff]255[/color], [color=#79c0ff]0[/color], [color=#79c0ff]0[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">6</Text>
+                    <Text className="code-line">{`        [color=#ffa657]pd_rect_t[/color] rect = { style->left, style->top, w->width, w->height };`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">7</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">8</Text>
+                    <Text className="code-line">{`        pd_canvas_fill_rect(canvas, color, rect);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">9</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">10</Text>
+                    <Text className="code-line">{` `}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">11</Text>
+                    <Text className="code-line">{`[color=#ffa657]static[/color] [color=#ffa657]void[/color] [color=#d2a8ff]register_my_widget[/color][color=#79c0ff]([color=#ffa657]void[/color])[/color]`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">12</Text>
+                    <Text className="code-line">{`{`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">13</Text>
+                    <Text className="code-line">{`        [color=#ffa657]ui_widget_prototype_t[/color] *proto =`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">14</Text>
+                    <Text className="code-line">{`            ui_create_widget_prototype([color=#a5d6ff]"my-widget"[/color], [color=#79c0ff]NULL[/color]);`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">15</Text>
+                    <Text className="code-line">{`        proto->paint = my_widget_paint;`}</Text>
+                  </Widget>
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">16</Text>
+                    <Text className="code-line">{`}`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -401,7 +721,7 @@ export default function CustomizationDocPage() {
         <Widget className="admonition admonition-warning">
           <Text className="admonition-title">注意</Text>
           <Widget className="admonition-content">
-            <p>{`[b][bgcolor=#eee] paint [/bgcolor] 只负责绘制。[/b] 部件尺寸估算由 [bgcolor=#eee] sizehint [/bgcolor] 处理；不要在 [bgcolor=#eee] paint [/bgcolor] 里修改部件尺寸或子部件树，否则可能触发无限循环。`}</p>
+            <p>{`[b][bgcolor=#7f7f7f29] paint [/bgcolor] 只负责绘制。[/b] 部件尺寸估算由 [bgcolor=#7f7f7f29] sizehint [/bgcolor] 处理；不要在 [bgcolor=#7f7f7f29] paint [/bgcolor] 里修改部件尺寸或子部件树，否则可能触发无限循环。`}</p>
           </Widget>
         </Widget>
       </Widget>
@@ -410,13 +730,13 @@ export default function CustomizationDocPage() {
         <Widget className="admonition admonition-warning">
           <Text className="admonition-title">注意</Text>
           <Widget className="admonition-content">
-            <p>{`[b][bgcolor=#eee] destroy [/bgcolor] 回调要释放自有资源。[/b] 如果自定义部件在 [bgcolor=#eee] init [/bgcolor] 里分配了内存、打开了文件、订阅了系统事件（如 [bgcolor=#eee] lcui_settings_on_deserialize [/bgcolor]），必须在 [bgcolor=#eee] destroy [/bgcolor] 里做对称释放。`}</p>
+            <p>{`[b][bgcolor=#7f7f7f29] destroy [/bgcolor] 回调要释放自有资源。[/b] 如果自定义部件在 [bgcolor=#7f7f7f29] init [/bgcolor] 里分配了内存、打开了文件、订阅了系统事件（如 [bgcolor=#7f7f7f29] lcui_settings_on_deserialize [/bgcolor]），必须在 [bgcolor=#7f7f7f29] destroy [/bgcolor] 里做对称释放。`}</p>
           </Widget>
         </Widget>
         <Widget className="admonition admonition-warning">
           <Text className="admonition-title">注意</Text>
           <Widget className="admonition-content">
-            <p>{`[b]自定义部件必须在 [bgcolor=#eee] lcui_init() [/bgcolor] 之后、首次实例化之前注册。[/b] 在 [bgcolor=#eee] main() [/bgcolor] 开头立即调用你的 [bgcolor=#eee] register_xxx() [/bgcolor] 函数是最稳妥的位置，可以确保所有使用方（XML 加载、路由实例化、TSX 编译结果）都能看到原型。`}</p>
+            <p>{`[b]自定义部件必须在 [bgcolor=#7f7f7f29] lcui_init() [/bgcolor] 之后、首次实例化之前注册。[/b] 在 [bgcolor=#7f7f7f29] main() [/bgcolor] 开头立即调用你的 [bgcolor=#7f7f7f29] register_xxx() [/bgcolor] 函数是最稳妥的位置，可以确保所有使用方（XML 加载、路由实例化、TSX 编译结果）都能看到原型。`}</p>
           </Widget>
         </Widget>
       </Widget>

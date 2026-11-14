@@ -1,34 +1,18 @@
+const { colors, boxShadow } = require("./scripts/theme-colors");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: "class",
   content: ["./src/**/*.{c,h,css}"],
   theme: {
     extend: {
-      colors: {
-        background: "#fff",
-        primary: "#222222",
-        "primary-foreground": "#ffffff",
-        secondary: "#f5f5f5",
-        "secondary-foreground": "#222222",
-        foreground: "#000",
-        border: "#e5e5e5",
-        destructive: "#e7000b",
-        "destructive-muted": "#ffe8e9",
-        muted: "#f5f5f5",
-        "muted-foreground": "#666666",
-        card: "#fff",
-        "card-foreground": "#000",
-        popover: "#fff",
-        "popover-foreground": "#222222",
-        sidebar: "#fafafa",
-        "sidebar-foreground": "#000",
-        "sidebar-primary": "#171717",
-        "sidebar-primary-foreground": "#fafafa",
-        "sidebar-accent": "#f5f5f5",
-        "sidebar-accent-foreground": "#171717",
-        "sidebar-border": "#e5e5e5",
-      },
+      colors,
+      boxShadow,
     },
   },
+  plugins: [
+    require("./scripts/tailwind-shadow-plugin")({ shadows: boxShadow }),
+  ],
   corePlugins: [
     "display",
     "flexDirection",

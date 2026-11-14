@@ -13,7 +13,7 @@ export default function AboutDocPage() {
           <li><Text>{`[b]Fully self-drawn widgets[/b] — Widgets maintain consistent appearance and behavior across platforms.`}</Text></li>
           <li><Text>{`[b]DPI-adaptive[/b] — Automatically scales the UI on high-resolution screens for crisp display.`}</Text></li>
           <li><Text>{`[b]Built-in CSS engine[/b] — Supports using CSS to define UI styles and layouts, making it easy to pick up for those with web development experience.`}</Text></li>
-          <li><Text>{`[b]Modern development tools[/b] — Through the [bgcolor=#eee] @lcui/cli [/bgcolor] tool, you can use TypeScript with JSX syntax to write user interfaces.`}</Text></li>
+          <li><Text>{`[b]Modern development tools[/b] — Through the [bgcolor=#7f7f7f29] @lcui/cli [/bgcolor] tool, you can use TypeScript with JSX syntax to write user interfaces.`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
@@ -54,7 +54,7 @@ export default function AboutDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>Community</h2>
-        <p>{`If you run into issues, you can ask questions on GitHub Discussions (use the [bgcolor=#eee] Q&A [/bgcolor] label). We also encourage experienced users to help newcomers.`}</p>
+        <p>{`If you run into issues, you can ask questions on GitHub Discussions (use the [bgcolor=#7f7f7f29] Q&A [/bgcolor] label). We also encourage experienced users to help newcomers.`}</p>
       </Widget>
     </Widget>
   );

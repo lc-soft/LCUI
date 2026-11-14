@@ -18,7 +18,7 @@ export default function BadgeDocPage() {
         <ul>
           <li><Text>{`[b]Suitable[/b]: marking a status or category in lists, cards, and forms`}</Text></li>
           <li><Text>{`[b]Suitable[/b]: showing a brief count or hint label`}</Text></li>
-          <li><Text>{`[b]Not suitable[/b]: command controls that need to be clicked (use [bgcolor=#eee] button [/bgcolor] instead)`}</Text></li>
+          <li><Text>{`[b]Not suitable[/b]: command controls that need to be clicked (use [bgcolor=#7f7f7f29] button [/bgcolor] instead)`}</Text></li>
         </ul>
       </Widget>
       <Widget className="doc-section">
@@ -31,9 +31,17 @@ export default function BadgeDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Badge[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#cf222e]import[/color] { [color=#8250df]Badge[/color] } [color=#cf222e]from[/color] [color=#0a3069]"@lcui/react"[/color]`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`[color=#ff7b72]import[/color] { [color=#d2a8ff]Badge[/color] } [color=#ff7b72]from[/color] [color=#a5d6ff]"@lcui/react"[/color]`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -49,9 +57,17 @@ export default function BadgeDocPage() {
             <CodeBlockCopy />
             <ScrollArea className="code-block-scroll" style={{ height: "44px" }}>
               <ScrollAreaContent className="code-block-scroll-content">
-                <Widget className="code-line-row">
-                  <Text className="code-line-number">1</Text>
-                  <Text className="code-line">{`<[color=#8250df]Badge[/color] variant=[color=#0a3069]"secondary"[/color]>[color=#8250df]Secondary[/color]</[color=#8250df]Badge[/color]>`}</Text>
+                <Widget className="code-block-lines code-block-lines-light">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#8250df]Badge[/color] variant=[color=#0a3069]"secondary"[/color]>[color=#8250df]Secondary[/color]</[color=#8250df]Badge[/color]>`}</Text>
+                  </Widget>
+                </Widget>
+                <Widget className="code-block-lines code-block-lines-dark">
+                  <Widget className="code-line-row">
+                    <Text className="code-line-number">1</Text>
+                    <Text className="code-line">{`<[color=#d2a8ff]Badge[/color] variant=[color=#a5d6ff]"secondary"[/color]>[color=#d2a8ff]Secondary[/color]</[color=#d2a8ff]Badge[/color]>`}</Text>
+                  </Widget>
                 </Widget>
               </ScrollAreaContent>
               <Scrollbar />
@@ -62,7 +78,7 @@ export default function BadgeDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>Variants</h2>
-        <p>{`Use the [bgcolor=#eee] variant [/bgcolor] prop to switch between the preset badge appearances.`}</p>
+        <p>{`Use the [bgcolor=#7f7f7f29] variant [/bgcolor] prop to switch between the preset badge appearances.`}</p>
         <BadgeVariantsDemo />
       </Widget>
       <Widget className="doc-section">
@@ -72,7 +88,7 @@ export default function BadgeDocPage() {
       </Widget>
       <Widget className="doc-section">
         <h2>Custom Colors</h2>
-        <p>{`Use the [bgcolor=#eee] color [/bgcolor] prop or [bgcolor=#eee] ui_badge_set_color() [/bgcolor] to apply a named color.`}</p>
+        <p>{`Use the [bgcolor=#7f7f7f29] color [/bgcolor] prop or [bgcolor=#7f7f7f29] ui_badge_set_color() [/bgcolor] to apply a named color.`}</p>
         <BadgeColorsDemo />
       </Widget>
       <Widget className="doc-section">
