@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <yutil.h>
+#include <thread.h>
 #include <pandagl.h>
 #include <ui/image.h>
 
@@ -42,6 +43,9 @@ typedef struct ui_image_mutation {
 typedef struct ui_image_loader {
         int64_t progress_tick_time;
         void (*callback)(ui_image_t *);
+
+        /** serializes the loader thread and the UI thread */
+        thread_mutex_t mutex;
 
         /** dict_t<string, ui_image_source_t*> */
         dict_t *cache;
@@ -103,20 +107,27 @@ static void ui_image_loader_process_mutation(ui_image_mutation_t *mutation)
 
 ui_image_t *ui_get_image(const char *path)
 {
-        return dict_fetch_value(ui_image_loader.cache, path);
+        ui_image_t *image;
+
+        thread_mutex_lock(&ui_image_loader.mutex);
+        image = dict_fetch_value(ui_image_loader.cache, path);
+        thread_mutex_unlock(&ui_image_loader.mutex);
+        return image;
 }
 
 ui_image_t *ui_image_create(const char *path)
 {
         ui_image_source_t *src;
 
-        src = (ui_image_source_t *)ui_get_image(path);
+        thread_mutex_lock(&ui_image_loader.mutex);
+        src = (ui_image_source_t *)dict_fetch_value(ui_image_loader.cache, path);
         if (src) {
                 src->refs_count++;
                 list_unlink(&ui_image_loader.images, &src->node);
         } else {
                 src = malloc(sizeof(ui_image_source_t));
                 if (!src) {
+                        thread_mutex_unlock(&ui_image_loader.mutex);
                         return NULL;
                 }
                 src->image.error = PD_OK;
@@ -134,13 +145,16 @@ ui_image_t *ui_image_create(const char *path)
         if (ui_image_loader.callback) {
                 ui_image_loader.callback(&src->image);
         }
+        thread_mutex_unlock(&ui_image_loader.mutex);
         return &src->image;
 }
 
 void ui_image_destroy(ui_image_t *image)
 {
+        thread_mutex_lock(&ui_image_loader.mutex);
         assert(((ui_image_source_t *)image)->refs_count > 0);
         ((ui_image_source_t *)image)->refs_count--;
+        thread_mutex_unlock(&ui_image_loader.mutex);
 }
 
 bool ui_image_add_event_listener(ui_image_t *image, ui_image_event_type_t type,
@@ -148,22 +162,29 @@ bool ui_image_add_event_listener(ui_image_t *image, ui_image_event_type_t type,
 {
         ui_image_event_t ev = { .type = type, .image = image, .data = data };
         ui_image_event_listener_t *listener;
+        bool complete;
 
-        if (image->state == UI_IMAGE_STATE_COMPLETE) {
+        thread_mutex_lock(&ui_image_loader.mutex);
+        complete = image->state == UI_IMAGE_STATE_COMPLETE;
+        if (!complete) {
+                listener = malloc(sizeof(ui_image_event_listener_t));
+                if (listener == NULL) {
+                        thread_mutex_unlock(&ui_image_loader.mutex);
+                        return false;
+                }
+                listener->type = type;
+                listener->handler = handler;
+                listener->data = data;
+                list_append(&((ui_image_source_t *)image)->listeners, listener);
+        }
+        thread_mutex_unlock(&ui_image_loader.mutex);
+        if (complete) {
                 if ((image->error == PD_OK && type == UI_IMAGE_EVENT_LOAD) ||
                     (image->error != PD_OK && type == UI_IMAGE_EVENT_ERROR)) {
                         handler(&ev);
                 }
                 return true;
         }
-        listener = malloc(sizeof(ui_image_event_listener_t));
-        if (listener == NULL) {
-                return false;
-        }
-        listener->type = type;
-        listener->handler = handler;
-        listener->data = data;
-        list_append(&((ui_image_source_t *)image)->listeners, listener);
         return true;
 }
 
@@ -177,6 +198,7 @@ bool ui_image_remove_event_listener(ui_image_t *image,
         ui_image_event_listener_t *listener;
         bool removed = false;
 
+        thread_mutex_lock(&ui_image_loader.mutex);
         for (node = list_get_first_node(&src->listeners); node; node = next) {
                 next = node->next;
                 listener = node->data;
@@ -187,6 +209,7 @@ bool ui_image_remove_event_listener(ui_image_t *image,
                         removed = true;
                 }
         }
+        thread_mutex_unlock(&ui_image_loader.mutex);
         return removed;
 }
 
@@ -263,6 +286,7 @@ void ui_load_images(void)
 {
         list_node_t *node;
 
+        thread_mutex_lock(&ui_image_loader.mutex);
         do {
                 ui_image_loader.changed = false;
                 for (list_each(node, &ui_image_loader.images)) {
@@ -272,6 +296,7 @@ void ui_load_images(void)
                         ui_image_loader_load(node->data);
                 }
         } while (ui_image_loader.changed);
+        thread_mutex_unlock(&ui_image_loader.mutex);
 }
 
 void ui_process_image_events(void)
@@ -279,28 +304,35 @@ void ui_process_image_events(void)
         int64_t now;
         list_node_t *node;
         list_t mutations;
+        list_t loading;
         ui_image_source_t *src;
         ui_image_mutation_t mutation = { .type = UI_IMAGE_EVENT_PROGRESS };
 
         now = y_gettime();
         list_create(&mutations);
+        list_create(&loading);
+        thread_mutex_lock(&ui_image_loader.mutex);
         list_concat(&mutations, &ui_image_loader.mutations);
+        if (now >= ui_image_loader.progress_tick_time) {
+                ui_image_loader.progress_tick_time =
+                    now + UI_IMAGE_PROGRESS_EVENT_INTERVAL;
+                for (list_each(node, &ui_image_loader.images)) {
+                        src = node->data;
+                        if (src->image.state == UI_IMAGE_STATE_LOADING) {
+                                list_append(&loading, src);
+                        }
+                }
+        }
+        thread_mutex_unlock(&ui_image_loader.mutex);
         for (list_each(node, &mutations)) {
                 ui_image_loader_process_mutation(node->data);
         }
         list_destroy_without_node(&mutations, free);
-        if (now < ui_image_loader.progress_tick_time) {
-                return;
+        for (list_each(node, &loading)) {
+                mutation.src = node->data;
+                ui_image_loader_process_mutation(&mutation);
         }
-        ui_image_loader.progress_tick_time =
-            now + UI_IMAGE_PROGRESS_EVENT_INTERVAL;
-        for (list_each(node, &ui_image_loader.images)) {
-                src = node->data;
-                if (src->image.state == UI_IMAGE_STATE_LOADING) {
-                        mutation.src = src;
-                        ui_image_loader_process_mutation(&mutation);
-                }
-        }
+        list_destroy(&loading, NULL);
 }
 
 void ui_clear_images(void)
@@ -309,6 +341,7 @@ void ui_clear_images(void)
         dict_entry_t *entry;
         dict_iterator_t *iter;
 
+        thread_mutex_lock(&ui_image_loader.mutex);
         iter = dict_get_safe_iterator(ui_image_loader.cache);
         while ((entry = dict_next(iter))) {
                 src = dict_get_val(entry);
@@ -322,10 +355,12 @@ void ui_clear_images(void)
                 }
         }
         dict_destroy_iterator(iter);
+        thread_mutex_unlock(&ui_image_loader.mutex);
 }
 
 void ui_init_image_loader(void)
 {
+        thread_mutex_init(&ui_image_loader.mutex);
         dict_init_string_key_type(&ui_image_loader.dict_type);
         ui_image_loader.cache = dict_create(&ui_image_loader.dict_type, NULL);
         ui_image_loader.progress_tick_time = y_gettime();
@@ -340,9 +375,12 @@ void ui_destroy_image_loader(void)
             (list_item_destructor_t)ui_image_force_destroy);
         dict_destroy(ui_image_loader.cache);
         ui_image_loader.cache = NULL;
+        thread_mutex_destroy(&ui_image_loader.mutex);
 }
 
 void ui_set_image_loader_callback(void (*callback)(ui_image_t *))
 {
+        thread_mutex_lock(&ui_image_loader.mutex);
         ui_image_loader.callback = callback;
+        thread_mutex_unlock(&ui_image_loader.mutex);
 }

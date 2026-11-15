@@ -74,16 +74,19 @@ void lcui_ui_init(void)
 {
         thread_cond_init(&lcui_ui.image_loader.cond);
         thread_mutex_init(&lcui_ui.image_loader.mutex);
+
+        ui_init();
+        ui_server_init();
+        ui_set_image_loader_callback(lcui_ui_on_load_image);
+
+        /* Start the loader only after ui_init() has created the image cache,
+         * list and mutex; the thread calls ui_load_images() immediately. */
         lcui_ui.image_loader.active = true;
         if (thread_create(&lcui_ui.image_loader.thread,
                           lcui_ui_image_loader_thread, NULL) != 0) {
                 logger_error(
                     "[lcui-ui] image loader thread creation failed!\n");
         }
-        ui_set_image_loader_callback(lcui_ui_on_load_image);
-
-        ui_init();
-        ui_server_init();
 }
 
 void lcui_ui_destroy(void)

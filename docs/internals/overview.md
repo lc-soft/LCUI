@@ -170,6 +170,12 @@ ui_update();
 
 `ui_update()` 内部完成样式计算、更新、重排，直接读 `border_box` 即可。
 
+## 图片加载
+
+- `lcui_init()` 先完成 `ui_init()`（创建图片缓存、图片列表和互斥锁）再启动 `lcui_ui_image_loader_thread`；该线程启动后立即调用 `ui_load_images()`，顺序不能反。
+- `lib/ui/src/ui_image.c` 用 `ui_image_loader.mutex` 序列化加载线程与主线程对缓存、列表和图片状态的访问；`ui_load_images()` 解码期间持锁。
+- 主线程仍可显式调用 `ui_load_images()`（测试常用），会与加载线程串行执行。
+
 ## 测试中的消息泵
 
 `helper_process_window_events(rounds)` 是测试专用 helper，循环调用 `ptk_process_native_events(PTK_PROCESS_EVENTS_ALL_IF_PRESENT)` + `sleep_ms(10)`。
