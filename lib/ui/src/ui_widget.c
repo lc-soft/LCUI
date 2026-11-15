@@ -409,6 +409,14 @@ void ui_widget_update_box_size(ui_widget_t *w)
         ui_widget_update_box_height(w);
 }
 
+void ui_widget_update_canvas_box(ui_widget_t *w)
+{
+        ui_widget_update_canvas_box_width(w);
+        ui_widget_update_canvas_box_height(w);
+        ui_widget_update_canvas_box_x(w);
+        ui_widget_update_canvas_box_y(w);
+}
+
 void ui_widget_set_content_width(ui_widget_t *w, float width)
 {
         CSS_SET_FIXED_LENGTH(&w->computed_style, width,

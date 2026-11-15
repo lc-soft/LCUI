@@ -463,6 +463,9 @@ size_t ui_updater_update_widget(ui_updater_t *updater, ui_widget_t *w)
                         }
                         ui_widget_update_box_position(w);
                         ui_style_diff_end(&style_diff, w);
+                        /* box-shadow and text decoration overflow also grow the
+                         * canvas box without changing the layout size. */
+                        ui_widget_update_canvas_box(w);
                         if (w->proto && w->proto->update) {
                                 w->proto->update(w, UI_TASK_UPDATE_STYLE);
                         }
