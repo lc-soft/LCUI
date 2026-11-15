@@ -1,55 +1,9 @@
-const { colors, boxShadow } = require("../../scripts/theme-colors");
+const { createConfig } = require("@lcui/tailwind-config");
 
 /** @type {import('tailwindcss').Config} */
-module.exports = {
-  darkMode: "class",
+module.exports = createConfig({
   content: [
     "./app/**/*.{tsx,html}",
     "../../docs/examples/**/*-tsx/example.tsx",
   ],
-  theme: {
-    extend: {
-      colors,
-      boxShadow,
-    },
-  },
-  plugins: [
-    require("../../scripts/tailwind-shadow-plugin")({ shadows: boxShadow }),
-  ],
-  corePlugins: [
-    "display",
-    "flexDirection",
-    "flexWrap",
-    "flex",
-    "flexShrink",
-    "flexGrow",
-    "alignItems",
-    "justifyContent",
-    "width",
-    "height",
-    "minWidth",
-    "minHeight",
-    "maxWidth",
-    "maxHeight",
-    "overflow",
-    "padding",
-    "margin",
-    "gap",
-    "borderRadius",
-    "borderWidth",
-    "borderColor",
-    "backgroundColor",
-    "textColor",
-    "fontFamily",
-    "fontSize",
-    "fontWeight",
-    "lineHeight",
-    "opacity",
-    "whitespace",
-    "cursor",
-    "position",
-    "inset",
-    "textDecoration",
-    "textUnderlineOffset",
-  ],
-};
+});
