@@ -8,7 +8,7 @@ target("libthread")
     if not is_plat("windows") then
         add_syslinks("pthread", "dl")
     end
-    add_deps("yutil")
+    add_deps("yutil", {public = true})
     if is_kind("static") then
         set_configvar("LIBTHREAD_STATIC_BUILD", 1)
     elseif is_plat("windows") then
@@ -22,6 +22,7 @@ target("libthread-tests")
     set_rundir("tests")
     add_files("tests/main.c", "tests/test_thread.c")
     add_deps("ctest", "libthread")
+    add_links("libthread", "yutil")
     add_rules("tests.runnable")
     add_tests("default", {group = "tests"})
 

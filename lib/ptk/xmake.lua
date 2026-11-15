@@ -42,6 +42,7 @@ target("libptk-tests")
     add_files("tests/main.c", "tests/test_steptimer.c",
               "tests/test_timer_scheduler.c")
     add_deps("ctest", "libptk")
+    add_links("libptk", "yutil")
     add_rules("tests.runnable")
     add_tests("default", {group = "tests"})
 

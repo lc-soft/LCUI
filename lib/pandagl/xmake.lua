@@ -65,6 +65,7 @@ target("pandagl-tests")
     set_rundir("tests/fixtures")
     add_files("tests/main.c", "tests/test_canvas_mask.c", "tests/test_canvas_mix.c", "tests/test_canvas_rotate.c", "tests/test_image_reader.c", "tests/test_font_load.c", "tests/test_text_edit.c", "tests/test_font_cache.c", "tests/test_text_baseline.c", "tests/test_text_style_tag.c", "tests/test_text_decoration.c")
     add_deps("ctest", "pandagl")
+    add_links("pandagl", "yutil")
     add_rules("tests.runnable")
     add_tests("default", {group = "tests"})
 
