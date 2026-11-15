@@ -35,6 +35,14 @@ LCUI_API bool lcui_set_app_id(const char *app_id);
 
 LCUI_API const char *lcui_get_app_id(void);
 
+/*
+ * Load the settings file for the given application id.
+ *
+ * `app_id` may be NULL to use the current id. Call this after `lcui_init()`;
+ * `lcui_init()` no longer loads settings by itself.
+ */
+LCUI_API bool lcui_load_settings(const char *app_id);
+
 LCUI_API uint32_t lcui_get_fps(void);
 LCUI_API void lcui_set_fps_cap(unsigned fps_cap);
 

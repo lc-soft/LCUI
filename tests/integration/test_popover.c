@@ -614,7 +614,7 @@ static void test_focus_first_focusable(void)
         settle_popover();
 
         ctest_equal_bool("open should focus the first focusable descendant",
-                         ui_get_focus() == first, true);
+                         ui_get_focus_in(ui_root()) == first, true);
 
         ui_widget_destroy(popover);
         ui_clear_trash();
@@ -630,7 +630,7 @@ static void test_focus_without_focusable(void)
         settle_popover();
 
         ctest_equal_bool("content without focusable should keep trigger focus",
-                         ui_get_focus() == trigger_button, true);
+                         ui_get_focus_in(ui_root()) == trigger_button, true);
 
         ui_widget_destroy(popover);
         ui_clear_trash();
@@ -649,7 +649,7 @@ static void test_escape_restores_focus(void)
         ui_popover_open(popover);
         settle_popover();
         ctest_equal_bool("content button should receive focus",
-                         ui_get_focus() == button, true);
+                         ui_get_focus_in(ui_root()) == button, true);
 
         ui_event_init(&event, "keydown");
         event.key.code = KEY_ESCAPE;
@@ -658,7 +658,7 @@ static void test_escape_restores_focus(void)
         ctest_equal_bool("escape should close", ui_popover_is_open(popover),
                          false);
         ctest_equal_bool("escape should restore trigger focus",
-                         ui_get_focus() == trigger_button, true);
+                         ui_get_focus_in(ui_root()) == trigger_button, true);
 
         ui_widget_destroy(popover);
         ui_clear_trash();
@@ -679,7 +679,7 @@ static void test_outside_click_keeps_focus(void)
         ctest_equal_bool("outside click should close",
                          ui_popover_is_open(popover), false);
         ctest_equal_bool("outside click should keep outside focus",
-                         ui_get_focus() == outside, true);
+                         ui_get_focus_in(ui_root()) == outside, true);
 
         ui_widget_destroy(popover);
         ui_widget_destroy(outside);

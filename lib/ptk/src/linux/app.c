@@ -140,6 +140,11 @@ bool ptk_window_is_maximized(ptk_window_t *wnd)
         return linux_app.window.is_maximized(wnd);
 }
 
+bool ptk_window_is_visible(ptk_window_t *wnd)
+{
+        return linux_app.window.is_visible(wnd);
+}
+
 void ptk_window_set_min_width(ptk_window_t *wnd, int min_width)
 {
         linux_app.window.set_min_width(wnd, min_width);

@@ -73,6 +73,9 @@ extern void test_toast(void);
 extern void test_accordion(void);
 extern void test_breadcrumb(void);
 extern void test_input_group(void);
+extern void test_window_restore(void);
+extern void test_window_api(void);
+extern void test_window_events(void);
 
 static const ctest_suite_t suites[] = {
         { "settings", test_settings },
@@ -136,6 +139,9 @@ static const ctest_suite_t suites[] = {
         { "accordion", test_accordion },
         { "breadcrumb", test_breadcrumb },
         { "input group", test_input_group },
+        { "window restore", test_window_restore },
+        { "window api", test_window_api },
+        { "window events", test_window_events },
         { NULL, NULL }
 };
 

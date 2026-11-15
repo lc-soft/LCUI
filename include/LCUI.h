@@ -21,6 +21,7 @@
 #include <LCUI/worker.h>
 #include <LCUI/app.h>
 #include <LCUI/ui.h>
+#include <LCUI/window.h>
 #include <LCUI/widgets.h>
 #include <LCUI/settings.h>
 #include <LCUI/base.h>

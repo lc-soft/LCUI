@@ -155,6 +155,7 @@ typedef struct ui_widget_update {
         bool should_update_style : 1;
         bool should_update_children : 1;
         bool should_reflow : 1;
+        uint64_t update_frame;
         ui_rect_t border_box_backup;
         ui_rect_t canvas_box_backup;
 } ui_widget_update_t;

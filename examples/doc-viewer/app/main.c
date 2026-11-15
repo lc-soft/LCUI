@@ -60,8 +60,17 @@ int main(int argc, char *argv[])
         router_push(router, location);
         router_location_destroy(location);
 
-        ui_widget_resize(ui_root(), 1280, 720);
-        lcui_bind_window_state(ui_root(), "main");
+        {
+                lcui_window_options_t opt = { 0 };
+                lcui_window_t *window;
+
+                opt.id = "main";
+                opt.width = 1280;
+                opt.height = 720;
+                window = lcui_window_create_for_widget(ui_root(), &opt);
+                lcui_load_settings("dev.lcui.doc-viewer");
+                lcui_window_show(window);
+        }
 
         return app_run();
 }

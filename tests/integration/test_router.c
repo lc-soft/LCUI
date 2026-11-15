@@ -1,6 +1,7 @@
 
 #include <router.h>
 #include <ctest.h>
+#include <LCUI/base.h>
 #include <LCUI/widgets.h>
 #include <LCUI/widgets/router.h>
 
@@ -35,10 +36,7 @@ void test_router_components(void)
         router_add_route_record(router, config, NULL);
         router_config_destroy(config);
 
-        ui_init();
-        ui_register_text();
-        ui_register_router_link();
-        ui_register_router_view();
+        lcui_init();
         ui_create_widget_prototype("foo", NULL);
         ui_create_widget_prototype("foobar", NULL);
         ui_create_widget_prototype("bar", NULL);
@@ -134,6 +132,6 @@ void test_router_components(void)
                     ui_router_view_get_matched_widget(view) == first, true);
         }
 
-        ui_destroy();
+        lcui_destroy();
         router_destroy(router);
 }

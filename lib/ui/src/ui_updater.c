@@ -401,6 +401,9 @@ static void ui_widget_update_size(ui_widget_t *w)
         }
 }
 
+static uint64_t ui_update_frame;
+static bool ui_has_deferred_updates;
+
 size_t ui_updater_update_widget(ui_updater_t *updater, ui_widget_t *w)
 {
         size_t count = 0;
@@ -424,6 +427,7 @@ size_t ui_updater_update_widget(ui_updater_t *updater, ui_widget_t *w)
 #endif
         if (ui_widget_has_update(w)) {
                 count = 1;
+                w->update.update_frame = ui_update_frame;
                 if (w->proto && w->proto->update) {
                         w->proto->update(w, UI_TASK_BEFORE_UPDATE);
                 }
@@ -525,11 +529,20 @@ static void ui_process_mutations(ui_widget_t *w)
         if (w->update.should_update_children || w->update.should_reflow) {
                 ui_widget_each(w, (ui_widget_cb)ui_process_mutations, NULL);
         }
-        w->update.should_update_self = false;
-        w->update.should_update_style = false;
-        w->update.should_refresh_style = false;
-        w->update.should_update_children = false;
-        w->update.should_reflow = false;
+        if (w->update.update_frame == ui_update_frame ||
+            !ui_widget_has_update(w)) {
+                w->update.should_update_self = false;
+                w->update.should_update_style = false;
+                w->update.should_refresh_style = false;
+                w->update.should_update_children = false;
+                w->update.should_reflow = false;
+        } else {
+                /* The widget gained pending work after the updater passed it
+                 * (e.g. it was appended or moved during this update). Keep the
+                 * flags and re-request ancestors after this pass so the next
+                 * frame can process it instead of silently dropping it. */
+                ui_has_deferred_updates = true;
+        }
         ui_widget_add_state(w, UI_WIDGET_STATE_LAYOUTED);
         if (ui_widget_has_observer(w, type)) {
                 if (w->update.border_box_backup.x != w->border_box.x) {
@@ -562,6 +575,13 @@ static void ui_process_mutations(ui_widget_t *w)
         w->update.border_box_backup = w->border_box;
 }
 
+static void ui_restore_pending_updates(ui_widget_t *w, void *arg)
+{
+        if (ui_widget_has_update(w)) {
+                ui_widget_request_update(w);
+        }
+}
+
 ui_updater_t *ui_updater_create(void)
 {
         ui_updater_t *updater = malloc(sizeof(ui_updater_t));
@@ -582,6 +602,8 @@ void ui_updater_destroy(ui_updater_t *updater)
 
 void ui_updater_update(ui_updater_t *updater, ui_widget_t *root)
 {
+        ui_update_frame++;
+        ui_has_deferred_updates = false;
         if (memcmp(&ui_metrics, &updater->metrics, sizeof(ui_metrics_t))) {
                 updater->refresh_all = true;
                 root->rendering.dirty_rect_type = UI_DIRTY_RECT_TYPE_FULL;
@@ -592,6 +614,12 @@ void ui_updater_update(ui_updater_t *updater, ui_widget_t *root)
         updater->metrics = ui_metrics;
         updater->refresh_all = false;
         ui_process_mutations(root);
+        if (ui_has_deferred_updates) {
+                if (ui_widget_has_update(root)) {
+                        ui_widget_request_update(root);
+                }
+                ui_widget_each(root, ui_restore_pending_updates, NULL);
+        }
         ui_process_mutation_observers();
         ui_process_events();
         ui_clear_trash();

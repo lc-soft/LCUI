@@ -21,22 +21,6 @@
 #include <omp.h>
 #endif
 
-#define TITLE_MAX_SIZE 256
-
-typedef struct window_mutation_record {
-        ptk_window_t *window;
-        bool update_size;
-        bool update_position;
-        bool update_title;
-        bool update_visible;
-        int x;
-        int y;
-        int width;
-        int height;
-        wchar_t title[TITLE_MAX_SIZE];
-        bool visible;
-} window_mutation_record_t;
-
 typedef struct ui_flash_rect {
         int64_t paint_time;
         pd_rect_t rect;
@@ -57,9 +41,6 @@ typedef enum {
 typedef struct ui_connection {
         ui_connection_state_t state;
 
-        /** whether new content has been rendered */
-        bool rendered;
-
         /** flashing rect list */
         list_t flash_rects;
 
@@ -72,7 +53,6 @@ typedef struct ui_connection {
 static struct ui_server {
         /** list_t<ui_connection_t> */
         list_t connections;
-        ui_mutation_observer_t *observer;
         bool paint_flashing_enabled;
         int num_rendering_threads;
 } ui_server;
@@ -143,6 +123,14 @@ ptk_window_t *ui_server_get_window(ui_widget_t *widget)
         return conn ? conn->window : NULL;
 }
 
+bool ui_server_is_widget_ready(ui_widget_t *widget)
+{
+        ui_connection_t *conn;
+
+        conn = ui_server_find_connection(widget, NULL);
+        return conn && conn->state != UI_CONNECTION_STATE_PENDING;
+}
+
 static void ui_connection_destroy(void *arg)
 {
         ui_connection_t *conn = arg;
@@ -206,11 +194,6 @@ static void ui_server_on_window_visibility_change(ptk_event_t *e, void *arg)
         conn = ui_server_find_connection(NULL, e->window);
         if (conn && conn->state == UI_CONNECTION_STATE_INITIALIZED) {
                 conn->window_visible = e->visibility_change.visible;
-                if (conn->window_visible) {
-                        ui_widget_show(conn->widget);
-                } else {
-                        ui_widget_hide(conn->widget);
-                }
         }
 }
 
@@ -299,50 +282,54 @@ static void ui_server_on_window_minmaxinfo(ptk_event_t *e, void *arg)
 static void ui_server_on_destroy_widget(ui_widget_t *widget, ui_event_t *e,
                                         void *arg)
 {
-        ui_server_disconnect(widget, NULL);
+        /* The widget's owner keeps ownership; destroying it only unbinds the
+         * connection, it must not close the platform window. */
+        ui_server_detach_widget(widget);
 }
 
 static void ui_server_refresh_window(ui_connection_t *conn)
 {
-        pd_rect_t rect;
         float scale = css_metrics_actual_scale(&conn->updater->metrics);
 
         ui_widget_mark_dirty_rect(conn->widget, NULL, UI_BOX_TYPE_GRAPH_BOX);
-        ui_compute_rect(&rect, &conn->widget->canvas_box);
-        ptk_window_set_title(conn->window, conn->widget->title);
-        if (conn->widget->computed_style.type_bits.top == CSS_TOP_AUTO) {
-                rect.y =
-                    (int)((ptk_screen_get_height() - rect.height * scale) / 2);
-        }
-        if (conn->widget->computed_style.type_bits.left == CSS_LEFT_AUTO) {
-                rect.x =
-                    (int)((ptk_screen_get_width() - rect.width * scale) / 2);
-        }
-        ptk_window_set_size(conn->window, rect.width, rect.height);
-        ptk_window_set_position(conn->window, rect.x, rect.y);
-        ptk_window_activate(conn->window);
+        ui_widget_resize(conn->widget,
+                         ptk_window_get_width(conn->window) / scale,
+                         ptk_window_get_height(conn->window) / scale);
 }
 
 void ui_server_connect(ui_widget_t *widget, ptk_window_t *window)
 {
         ui_connection_t *conn;
-        ui_mutation_observer_init_t options = { 0 };
 
         conn = malloc(sizeof(ui_connection_t));
         conn->window = window;
         conn->widget = widget;
-        conn->rendered = false;
         conn->updater = ui_updater_create();
         conn->updater->metrics.dpi = 1.f * ptk_window_get_dpi(window);
         conn->state = UI_CONNECTION_STATE_PENDING;
         conn->window_visible = ui_widget_is_visible(widget);
-        options.properties = true;
         list_create(&conn->flash_rects);
         list_append(&ui_server.connections, conn);
         ui_widget_on(widget, "destroy", ui_server_on_destroy_widget, NULL);
-        ui_mutation_observer_observe(ui_server.observer, widget, options);
         // 在同步前处理所有消息，包括窗口位置、大小变更消息，避免在初次更新时组件的位置和尺寸被窗口覆盖
         ptk_process_native_events(PTK_PROCESS_EVENTS_ALL_IF_PRESENT);
+}
+
+void ui_server_detach_widget(ui_widget_t *widget)
+{
+        ui_connection_t *conn;
+        list_node_t *node;
+
+        for (list_each(node, &ui_server.connections)) {
+                conn = node->data;
+                if (conn->widget == widget) {
+                        ui_widget_off(widget, "destroy",
+                                      ui_server_on_destroy_widget, NULL);
+                        ui_connection_destroy(conn);
+                        list_delete_node(&ui_server.connections, node);
+                        break;
+                }
+        }
 }
 
 static void get_rendering_layer_size(int *width, int *height)
@@ -482,7 +469,6 @@ static size_t ui_server_update_flash_rects(ui_connection_t *conn)
                         continue;
                 }
                 ui_server_render_flash_rect(conn, flash_rect);
-                conn->rendered = true;
         }
         return count;
 }
@@ -568,7 +554,6 @@ static size_t ui_server_render_window(ui_connection_t *conn)
         }
         free(rect_array);
         pd_rects_clear(&rects);
-        conn->rendered = count > 0;
         count += ui_server_update_flash_rects(conn);
         return count;
 }
@@ -593,113 +578,25 @@ size_t ui_server_render(void)
         return count;
 }
 
-static int window_mutation_list_add(list_t *list,
-                                    ui_mutation_record_t *mutation)
-{
-        list_node_t *node;
-        ptk_window_t *wnd;
-        ui_connection_t *conn;
-        ui_widget_t *widget = mutation->target;
-        window_mutation_record_t *wnd_mutation = NULL;
-
-        conn = ui_server_find_connection(widget, NULL);
-        if (!conn || conn->state != UI_CONNECTION_STATE_INITIALIZED) {
-                return -1;
-        }
-        wnd = conn->window;
-        for (list_each(node, list)) {
-                wnd_mutation = node->data;
-                if (wnd_mutation->window == wnd) {
-                        break;
-                }
-                wnd_mutation = NULL;
-        }
-        if (!wnd_mutation) {
-                wnd_mutation = calloc(1, sizeof(window_mutation_record_t));
-                if (!wnd_mutation) {
-                        return -ENOMEM;
-                }
-                wnd_mutation->window = wnd;
-                list_append(list, wnd_mutation);
-        }
-        wnd_mutation->update_title =
-            wnd_mutation->update_title ||
-            strcmp(mutation->property_name, "title") == 0;
-        wnd_mutation->update_visible =
-            wnd_mutation->update_visible ||
-            strcmp(mutation->property_name, "visible") == 0;
-        wnd_mutation->update_position =
-            wnd_mutation->update_position ||
-            strcmp(mutation->property_name, "x") == 0 ||
-            strcmp(mutation->property_name, "y") == 0;
-        wnd_mutation->update_size =
-            wnd_mutation->update_size ||
-            strcmp(mutation->property_name, "width") == 0 ||
-            strcmp(mutation->property_name, "height") == 0;
-        wcsncpy(wnd_mutation->title, widget->title ? widget->title : L"\0",
-                TITLE_MAX_SIZE);
-        wnd_mutation->visible = ui_widget_is_visible(widget);
-        wnd_mutation->x = ui_compute(widget->border_box.x);
-        wnd_mutation->y = ui_compute(widget->border_box.y);
-        wnd_mutation->width = ui_compute(widget->border_box.width);
-        wnd_mutation->height = ui_compute(widget->border_box.height);
-        return 0;
-}
-
-static void ui_server_on_widget_mutation(ui_mutation_list_t *mutation_list,
-                                         ui_mutation_observer_t *observer,
-                                         void *arg)
-{
-        list_node_t *node;
-        list_t wnd_mutation_list;
-        window_mutation_record_t *wnd_mutation;
-        ui_mutation_record_t *mutation;
-
-        list_create(&wnd_mutation_list);
-        for (list_each(node, mutation_list)) {
-                mutation = node->data;
-                if (mutation->type != UI_MUTATION_RECORD_TYPE_PROPERTIES ||
-                    !mutation->property_name) {
-                        continue;
-                }
-                window_mutation_list_add(&wnd_mutation_list, mutation);
-        }
-        for (list_each(node, &wnd_mutation_list)) {
-                wnd_mutation = node->data;
-                if (wnd_mutation->update_position) {
-                        ptk_window_set_position(wnd_mutation->window,
-                                                wnd_mutation->x,
-                                                wnd_mutation->y);
-                }
-                if (wnd_mutation->update_size) {
-                        ptk_window_set_size(wnd_mutation->window,
-                                            wnd_mutation->width,
-                                            wnd_mutation->height);
-                }
-                if (wnd_mutation->update_title) {
-                        ptk_window_set_title(wnd_mutation->window,
-                                             wnd_mutation->title);
-                }
-                if (wnd_mutation->update_visible) {
-                        if (wnd_mutation->visible) {
-                                ptk_window_show(wnd_mutation->window);
-                        } else {
-                                ptk_window_hide(wnd_mutation->window);
-                        }
-                }
-        }
-        list_destroy(&wnd_mutation_list, free);
-}
-
 /* 将系统光标与 hover 链同步：从 hover 目标沿祖先向上，
  * 第一个非 auto 的值生效（模拟 CSS cursor 继承语义）；
  * 全链 auto 或无目标时回写 AUTO，清掉上一次设置的自定义光标 */
 static void ui_update_cursor(void)
 {
+        list_node_t *node;
+        ui_connection_t *conn;
         ui_widget_t *w;
-        ui_widget_t *owner = ui_get_mouseover();
+        ui_widget_t *owner = NULL;
         css_cursor_t cursor = CSS_CURSOR_AUTO;
         ptk_window_t *window = NULL;
+
+        for (list_each(node, &ui_server.connections)) {
+                conn = node->data;
+                owner = ui_get_mouseover_in(conn->widget);
+                if (owner) {
+                        break;
+                }
+        }
 
         /* 单遍上行：取第一个非 auto 的 cursor 值（继承模拟），
          * 并沿父链回溯到已连接的根部件以解析窗口（hover 目标可以是任意后代） */
@@ -754,8 +651,6 @@ void ui_server_init(void)
 {
         ui_cursor_init();
         ui_server.num_rendering_threads = 4;
-        ui_server.observer =
-            ui_mutation_observer_create(ui_server_on_widget_mutation, NULL);
         ptk_on_event(PTK_EVENT_VISIBILITY_CHANGE,
                      ui_server_on_window_visibility_change, NULL);
         ptk_on_event(PTK_EVENT_MINMAXINFO, ui_server_on_window_minmaxinfo,
@@ -800,6 +695,4 @@ void ui_server_destroy(void)
                       ui_server_on_window_visibility_change);
         ptk_off_event(PTK_EVENT_DPICHANGED, ui_server_on_window_dpi_changed);
         list_destroy(&ui_server.connections, ui_connection_destroy);
-        ui_mutation_observer_destroy(ui_server.observer);
-        ui_server.observer = NULL;
 }

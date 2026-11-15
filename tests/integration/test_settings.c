@@ -143,19 +143,6 @@ static void helper_process_window_events(unsigned rounds)
         }
 }
 
-static bool helper_query_window_state(ptk_window_t *window,
-                                      lcui_window_state_t *out)
-{
-        if (!window || !out) {
-                return false;
-        }
-        ptk_window_get_position(window, &out->x, &out->y);
-        out->width = ptk_window_get_width(window);
-        out->height = ptk_window_get_height(window);
-        out->maximized = ptk_window_is_maximized(window);
-        return true;
-}
-
 static void test_settings_rendering_accessors(void)
 {
         char base_dir[256];
@@ -282,6 +269,7 @@ static void test_window_state_accessors(void)
             test_prepare_env(base_dir, sizeof(base_dir), "lcui-window-state"),
             true);
         lcui_init();
+        ctest_equal_bool("should load settings", lcui_settings_load(), true);
         state.x = -120;
         state.y = 48;
         state.width = 640;
@@ -339,75 +327,85 @@ static void test_window_state_invalid_values(void)
         lcui_destroy();
 }
 
-static void test_window_state_binding(void)
+static void test_settings_load_is_explicit(void)
 {
-        const char *app_id = "lcui-window-bind";
         char base_dir[256];
-        int new_width, new_height;
-        lcui_window_state_t saved;
-        lcui_window_state_t actual;
-        ui_widget_t *preview_widget;
-        ui_widget_t *widget;
-        ptk_window_t *window;
 
-        ctest_equal_bool("prepare window binding env",
-                         test_prepare_env(base_dir, sizeof(base_dir), app_id),
-                         true);
-        ctest_equal_bool("write stored window state",
-                         test_write_config(base_dir, app_id,
-                                           "[meta]\nversion=1\n\n"
-                                           "[window.main]\n"
-                                           "x=32\n"
-                                           "y=48\n"
-                                           "width=420\n"
-                                           "height=260\n"
-                                           "maximized=0\n\n"
-                                           "[window.preview]\n"
-                                           "x=8\n"
-                                           "y=12\n"
-                                           "width=210\n"
-                                           "height=180\n"
-                                           "maximized=0\n"),
-                         true);
+        test_prepare_env(base_dir, sizeof(base_dir), "lcui-settings-explicit");
         lcui_init();
-        ctest_equal_bool("should load settings", lcui_settings_load(), true);
-        preview_widget = ui_create_widget(NULL);
-        ctest_equal_bool("should create preview widget", preview_widget != NULL,
-                         true);
-        ctest_equal_bool("should bind pending widget state",
-                         lcui_bind_window_state(preview_widget, "preview"),
-                         true);
-        ui_root_append(preview_widget);
-        ui_update();
-        ctest_equal_int("should resize pending widget width",
-                        (int)preview_widget->border_box.width, 210);
-        ctest_equal_int("should resize pending widget height",
-                        (int)preview_widget->border_box.height, 180);
-        ui_widget_destroy(preview_widget);
-        widget = ui_root();
-        window = ui_server_get_window(widget);
-        ctest_equal_bool("should get root window", window != NULL, true);
-        helper_process_window_events(8);
-        ctest_equal_bool("should bind window state",
-                         lcui_bind_window_state(widget, "main"), true);
+        ctest_equal_bool("should not load settings in init",
+                         lcui_settings_is_loaded(), false);
+        ctest_equal_bool("should load settings explicitly",
+                         lcui_load_settings("lcui-settings-explicit"), true);
+        ctest_equal_bool("should be loaded after explicit call",
+                         lcui_settings_is_loaded(), true);
+        lcui_destroy();
+}
+
+static void test_window_state_round_trip(void)
+{
+        char base_dir[256];
+        lcui_window_options_t opt = { 0 };
+        lcui_window_t *w;
+        int x, y, cw, ch;
+        lcui_window_state_t saved;
+
+        test_prepare_env(base_dir, sizeof(base_dir), "lcui-window-roundtrip");
+        test_write_config(base_dir, "lcui-window-roundtrip",
+                          "[meta]\nversion=1\n\n"
+                          "[window.main]\nx=32\ny=48\nwidth=420\nheight=260\n"
+                          "maximized=0\n");
+        lcui_init();
+        opt.id = "main";
+        opt.width = 800;
+        opt.height = 600;
+        w = lcui_window_create(&opt);
+        ctest_equal_bool("should load window settings",
+                         lcui_load_settings("lcui-window-roundtrip"), true);
+        lcui_window_get_position(w, &x, &y);
+        lcui_window_get_size(w, &cw, &ch);
+        ctest_equal_int("should restore x", x, 32);
+        ctest_equal_int("should restore y", y, 48);
+        ctest_equal_int("should restore width", cw, 420);
+        ctest_equal_int("should restore height", ch, 260);
+        lcui_window_close(w);
         helper_process_window_events(12);
-        ctest_equal_bool("should query restored window geometry",
-                         helper_query_window_state(window, &actual), true);
-        ctest_equal_int("should restore saved width", actual.width, 420);
-        ctest_equal_int("should restore saved height", actual.height, 260);
-        ptk_window_set_size(window, 300, 220);
-        helper_process_window_events(12);
-        new_width = ptk_window_get_width(window);
-        new_height = ptk_window_get_height(window);
-        ptk_window_close(window);
-        helper_process_window_events(12);
-        ctest_equal_bool("should persist updated bound window state on close",
+        ctest_equal_bool("should persist state",
                          lcui_get_window_state("main", &saved), true);
-        ctest_equal_int("should save updated width", saved.width, new_width);
-        ctest_equal_int("should save updated height", saved.height, new_height);
-        ctest_equal_bool(
-            "should flush bound window section",
-            test_read_file_contains(base_dir, app_id, "[window.main]"), true);
+        ctest_equal_int("should persist x", saved.x, x);
+        ctest_equal_int("should persist y", saved.y, y);
+        ctest_equal_int("should persist width", saved.width, cw);
+        ctest_equal_int("should persist height", saved.height, ch);
+        lcui_window_destroy(w);
+        lcui_destroy();
+}
+
+static void test_window_state_load_before_create(void)
+{
+        char base_dir[256];
+        lcui_window_options_t opt = { 0 };
+        lcui_window_t *w;
+        int x, y, cw, ch;
+
+        test_prepare_env(base_dir, sizeof(base_dir), "lcui-window-loadfirst");
+        test_write_config(base_dir, "lcui-window-loadfirst",
+                          "[meta]\nversion=1\n\n"
+                          "[window.main]\nx=32\ny=48\nwidth=420\nheight=260\n"
+                          "maximized=0\n");
+        lcui_init();
+        ctest_equal_bool("should load settings before create",
+                         lcui_load_settings("lcui-window-loadfirst"), true);
+        opt.id = "main";
+        opt.width = 800;
+        opt.height = 600;
+        w = lcui_window_create(&opt);
+        lcui_window_get_position(w, &x, &y);
+        lcui_window_get_size(w, &cw, &ch);
+        ctest_equal_int("should apply saved x on create", x, 32);
+        ctest_equal_int("should apply saved y on create", y, 48);
+        ctest_equal_int("should apply saved width on create", cw, 420);
+        ctest_equal_int("should apply saved height on create", ch, 260);
+        lcui_window_destroy(w);
         lcui_destroy();
 }
 
@@ -417,8 +415,12 @@ void test_settings(void)
                        test_settings_rendering_accessors);
         ctest_describe("settings load/merge/validate/flush",
                        test_settings_load_merge_validate_flush);
+        ctest_describe("explicit settings loading",
+                       test_settings_load_is_explicit);
         ctest_describe("window state accessors", test_window_state_accessors);
         ctest_describe("window state invalid values",
                        test_window_state_invalid_values);
-        ctest_describe("window state binding", test_window_state_binding);
+        ctest_describe("window state round-trip", test_window_state_round_trip);
+        ctest_describe("window state load before create",
+                       test_window_state_load_before_create);
 }

@@ -275,6 +275,11 @@ static bool ptk_fb_window_is_maximized(ptk_window_t *wnd)
         return false;
 }
 
+static bool ptk_fb_window_is_visible(ptk_window_t *wnd)
+{
+        return true;
+}
+
 static ptk_window_t *ptk_fbapp_get_window_by_handle(void *handle)
 {
         return &fbapp.window;
@@ -618,6 +623,7 @@ void ptk_fbwindow_driver_init(ptk_window_driver_t *driver)
         driver->get_width = ptk_fb_window_get_width;
         driver->get_height = ptk_fb_window_get_height;
         driver->is_maximized = ptk_fb_window_is_maximized;
+        driver->is_visible = ptk_fb_window_is_visible;
         driver->get_handle = ptk_fb_window_get_handle;
         driver->set_max_width = ptk_fb_window_set_max_width;
         driver->set_max_height = ptk_fb_window_set_max_height;

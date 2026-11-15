@@ -667,7 +667,7 @@ static void ui_tooltip_module_on_mousemove(ui_widget_t *w, ui_event_t *e,
 
 static void ui_tooltip_module_on_focus(ui_widget_t *w, ui_event_t *e, void *arg)
 {
-        ui_widget_t *focus = ui_get_focus();
+        ui_widget_t *focus = ui_get_focus_in(w);
         ui_widget_t *trigger =
             ui_tooltip_find_attr_ancestor(focus, "data-tooltip-trigger");
         list_node_t *node;

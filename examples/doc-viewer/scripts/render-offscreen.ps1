@@ -167,7 +167,7 @@ try {
         "        snprintf(initial_path, sizeof(initial_path), `"/%s/home`",`n                 locale ? locale : `"en`");",
         "        snprintf(initial_path, sizeof(initial_path), `"%s`", `"$Route`");")
     $patched = $patched.Replace(
-        "        ui_widget_resize(ui_root(), 1280, 720);`n        lcui_bind_window_state(ui_root(), `"main`");`n`n        return app_run();",
+        "        {`n                lcui_window_options_t opt = { 0 };`n                lcui_window_t *window;`n`n                opt.id = `"main`";`n                opt.width = 1280;`n                opt.height = 720;`n                window = lcui_window_create_for_widget(ui_root(), &opt);`n                lcui_load_settings(`"dev.lcui.doc-viewer`");`n                lcui_window_show(window);`n        }`n`n        return app_run();",
         "        ui_widget_resize(ui_root(), $Width / ui_get_actual_scale(),`n                         $Height / ui_get_actual_scale());`n`n        debug_capture();`n        lcui_destroy();`n`n        return 0;")
     if ($patched -eq $originalLf -or $patched.Contains("return app_run();")) {
         throw "patch did not apply; examples/doc-viewer/app/main.c changed upstream"

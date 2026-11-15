@@ -40,6 +40,7 @@ struct ptk_window {
         int min_width, min_height;
         int max_width, max_height;
         bool visible;
+        bool maximized;
 
         ptk_cursor_type_t cursor;
         HCURSOR hcursor;
@@ -503,6 +504,12 @@ static LRESULT CALLBACK ptk_window_process(HWND hwnd, UINT msg, WPARAM arg1,
                 break;
         }
 #endif
+        case WM_SETFOCUS:
+                e.type = PTK_EVENT_FOCUS;
+                break;
+        case WM_KILLFOCUS:
+                e.type = PTK_EVENT_UNFOCUS;
+                break;
         default:
                 return DefWindowProc(hwnd, msg, arg1, arg2);
         }
@@ -545,6 +552,7 @@ ptk_window_t *ptk_window_create(const wchar_t *title, int x, int y, int width,
         wnd->width = width;
         wnd->height = height;
         wnd->visible = false;
+        wnd->maximized = false;
         wnd->max_width = GetSystemMetrics(SM_CXMAXTRACK);
         wnd->max_height = GetSystemMetrics(SM_CYMAXTRACK);
         pd_canvas_init(&wnd->fb);
@@ -643,10 +651,13 @@ void ptk_window_destroy(ptk_window_t *wnd)
 
 void ptk_window_set_position(ptk_window_t *wnd, int x, int y)
 {
-        x += GetSystemMetrics(SM_CXFIXEDFRAME);
-        y += GetSystemMetrics(SM_CYFIXEDFRAME);
-        SetWindowPos(wnd->hwnd, HWND_NOTOPMOST, x, y, 0, 0,
-                     SWP_NOSIZE | SWP_NOZORDER);
+        POINT p = { 0, 0 };
+        RECT rect;
+
+        ClientToScreen(wnd->hwnd, &p);
+        GetWindowRect(wnd->hwnd, &rect);
+        SetWindowPos(wnd->hwnd, HWND_NOTOPMOST, rect.left + (x - p.x),
+                     rect.top + (y - p.y), 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 }
 
 void ptk_window_get_position(ptk_window_t *wnd, int *x, int *y)
@@ -675,6 +686,10 @@ void ptk_window_set_maximized(ptk_window_t *wnd, bool maximized)
         if (!wnd || !wnd->hwnd) {
                 return;
         }
+        wnd->maximized = maximized;
+        if (!wnd->visible) {
+                return;
+        }
         ShowWindow(wnd->hwnd, maximized ? SW_MAXIMIZE : SW_RESTORE);
 }
 
@@ -692,6 +707,9 @@ void ptk_window_show(ptk_window_t *wnd)
 {
         if (!wnd->visible) {
                 ShowWindow(wnd->hwnd, SW_SHOWNORMAL);
+        }
+        if (wnd->maximized) {
+                ShowWindow(wnd->hwnd, SW_MAXIMIZE);
         }
 }
 
@@ -787,6 +805,11 @@ int ptk_window_get_height(ptk_window_t *wnd)
 bool ptk_window_is_maximized(ptk_window_t *wnd)
 {
         return wnd && wnd->hwnd && IsZoomed(wnd->hwnd) ? true : false;
+}
+
+bool ptk_window_is_visible(ptk_window_t *wnd)
+{
+        return wnd && wnd->visible;
 }
 
 void ptk_window_set_min_width(ptk_window_t *wnd, int min_width)

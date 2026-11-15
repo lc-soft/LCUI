@@ -25,6 +25,8 @@ LIBUI_SERVER_PUBLIC int ui_server_disconnect(ui_widget_t *widget,
                                              ptk_window_t *window);
 LIBUI_SERVER_PUBLIC void ui_server_connect(ui_widget_t *widget,
                                            ptk_window_t *window);
+LIBUI_SERVER_PUBLIC void ui_server_detach_widget(ui_widget_t *widget);
+LIBUI_SERVER_PUBLIC bool ui_server_is_widget_ready(ui_widget_t *widget);
 LIBUI_SERVER_PUBLIC size_t ui_server_render(void);
 LIBUI_SERVER_PUBLIC void ui_server_present(void);
 LIBUI_SERVER_PUBLIC void ui_server_update(void);

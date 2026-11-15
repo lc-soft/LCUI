@@ -34,6 +34,8 @@ struct ptk_window {
 
         /* calloc 零初始化即为 PTK_CURSOR_AUTO */
         ptk_cursor_type_t cursor;
+        bool visible;
+        bool maximized;
 
         GC gc;
         XImage *ximage;
@@ -135,7 +137,12 @@ static bool ptk_x11window__is_maximized(ptk_window_t *wnd)
         return maximized;
 }
 
-static void ptk_x11window__set_maximized(ptk_window_t *wnd, bool maximized)
+static bool ptk_x11window__is_visible(ptk_window_t *wnd)
+{
+        return wnd && wnd->visible;
+}
+
+static void ptk_x11window__apply_maximized(ptk_window_t *wnd)
 {
         Atom max_horz;
         Atom max_vert;
@@ -143,9 +150,6 @@ static void ptk_x11window__set_maximized(ptk_window_t *wnd, bool maximized)
         Window root;
         XEvent event = { 0 };
 
-        if (!wnd) {
-                return;
-        }
         root = DefaultRootWindow(x11_app.display);
         wm_state = XInternAtom(x11_app.display, "_NET_WM_STATE", False);
         max_horz =
@@ -156,13 +160,25 @@ static void ptk_x11window__set_maximized(ptk_window_t *wnd, bool maximized)
         event.xclient.window = wnd->handle;
         event.xclient.message_type = wm_state;
         event.xclient.format = 32;
-        event.xclient.data.l[0] = maximized ? 1 : 0;
+        event.xclient.data.l[0] = wnd->maximized ? 1 : 0;
         event.xclient.data.l[1] = max_horz;
         event.xclient.data.l[2] = max_vert;
         event.xclient.data.l[3] = 1;
         XSendEvent(x11_app.display, root, False,
                    SubstructureNotifyMask | SubstructureRedirectMask, &event);
         XFlush(x11_app.display);
+}
+
+static void ptk_x11window__set_maximized(ptk_window_t *wnd, bool maximized)
+{
+        if (!wnd) {
+                return;
+        }
+        wnd->maximized = maximized;
+        if (!wnd->visible) {
+                return;
+        }
+        ptk_x11window__apply_maximized(wnd);
 }
 
 static int convert_keycode(KeySym keysym)
@@ -401,6 +417,14 @@ static int x11_ptk_process_native_event(void)
                 }
                 break;
         }
+        case FocusIn:
+                e.type = PTK_EVENT_FOCUS;
+                ptk_process_event(&e);
+                break;
+        case FocusOut:
+                e.type = PTK_EVENT_UNFOCUS;
+                ptk_process_event(&e);
+                break;
         case MotionNotify:
                 e.type = PTK_EVENT_MOUSEMOVE;
                 e.mouse.x = xe.xmotion.x;
@@ -775,11 +799,16 @@ static ptk_cursor_type_t ptk_x11window__get_cursor(ptk_window_t *wnd)
 static void ptk_x11window__show(ptk_window_t *wnd)
 {
         XMapWindow(x11_app.display, wnd->handle);
+        wnd->visible = true;
+        if (wnd->maximized) {
+                ptk_x11window__apply_maximized(wnd);
+        }
 }
 
 static void ptk_x11window__hide(ptk_window_t *wnd)
 {
         XUnmapWindow(x11_app.display, wnd->handle);
+        wnd->visible = false;
 }
 
 static ptk_window_paint_t *ptk_x11window__begin_paint(ptk_window_t *wnd,
@@ -926,6 +955,7 @@ void ptk_x11window_driver_init(ptk_window_driver_t *driver)
         driver->get_width = ptk_x11window__get_width;
         driver->get_height = ptk_x11window__get_height;
         driver->is_maximized = ptk_x11window__is_maximized;
+        driver->is_visible = ptk_x11window__is_visible;
         driver->get_handle = ptk_x11window__get_handle;
         driver->set_max_width = ptk_x11window__set_max_width;
         driver->set_max_height = ptk_x11window__set_max_height;

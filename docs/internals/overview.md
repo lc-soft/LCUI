@@ -90,43 +90,56 @@ for (node = list_get_first_node(&listeners); node; node = next) {
 
 按注册时机排序（先注册先执行）：
 1. `ui_server_on_window_close` — 销毁 connection，释放 ui_connection_t
-2. `lcui_ui_on_window_destroy` — 从 windows 链表移除，全部关闭则退出
-3. `lcui_settings_on_window_close` — 同步窗口状态到 settings
+2. `lcui_window_on_ptk_close` — 按 `opt.id` 落盘窗口状态，标记窗口 closed，清空 ptk 指针，调用 `lcui_window_on_close` 回调；若 `lcui_set_quit_on_last_window(true)`（默认）且已无打开窗口，调用 `lcui_quit()`
 
-## Widget 与窗口的绑定
+## 显式窗口
 
-### ui_connection 机制
-
-`ui_server_connect(widget, window)` 创建 `ui_connection_t`，建立 widget ↔ window 的双向映射：
+`lcui_init()` 只初始化子系统，不创建窗口。应用通过 `<LCUI/window.h>` 的薄外观管理窗口：
 
 ```c
-conn->widget = widget;
-conn->window = window;
-conn->updater = ui_updater_create();
-ui_widget_on(widget, "destroy", ui_server_on_destroy_widget, NULL);
+lcui_window_options_t opt = { 0 };
+lcui_window_t *win;
+
+opt.id = "main";        /* 窗口状态读写使用的唯一标识 */
+opt.width = 1280;       /* 无保存状态时的默认内容尺寸 */
+opt.height = 720;
+win = lcui_window_create_for_widget(ui_root(), &opt);
+lcui_load_settings("com.example.app");
+lcui_window_show(win);
 ```
 
-- `ui_server_get_widget(window)` — 通过 window 查找绑定的 widget
-- `ui_server_get_window(widget)` — 通过 widget 查找绑定的 window
-- `ui_server_disconnect(widget, NULL)` — 调用 `ptk_window_close` 触发关闭流程
+- `lcui_window_create` 只建窗，初始**隐藏**；`opt.id` 在配置已加载时立即恢复几何。
+- `lcui_window_create_for_widget` 从内容部件继承标题，并在未给出宽高时继承 `border_box` 尺寸。
+- `lcui_window_show` 只置 `show_requested`；`lcui_ui_render` 渲染首帧后调用 `lcui_window_flush_show`，等该窗口的 ui-server 连接初始化完成才真正显示，因此窗口首次可见即为最终几何。
+- `lcui_window_bind_widget` 可重绑定或解绑内容（解绑走 `ui_server_detach_widget`，不关闭平台窗口），绑定同时为内容注册 `ui_set_event_scope`。一个 widget 只能属于一个窗口，绑定到新窗口时会自动从旧窗口解绑；内容 widget 销毁时窗口自动解绑，但不会关闭窗口。
+- 全屏是窗口属性：`opt.fullscreen` 或 `lcui_window_set_fullscreen`；不再有 `lcui_display_t`。多窗口由应用自行创建多个 `lcui_window_t`。
 
-### 三种显示模式
+### 配置加载顺序
 
-`lcui_ui_set_display(mode)` 控制 widget 树的窗口绑定方式：
+`lcui_init()` 不再自动读配置。允许两种顺序：
 
-| 模式 | 行为 |
-|------|------|
-| `LCUI_DISPLAY_WINDOWED` | 创建单窗口，`ui_root()` 绑定到它 |
-| `LCUI_DISPLAY_FULLSCREEN` | 同上，窗口设为全屏 |
-| `LCUI_DISPLAY_SEAMLESS` | 通过 MutationObserver 监听 root 子节点变化，每个顶级子 widget 自动创建独立窗口 |
+1. 建窗（`opt.id`）→ `lcui_load_settings(app_id)` → `show`：`lcui_load_settings` 会把已存在但尚未应用状态的窗口补上；
+2. `lcui_load_settings(app_id)` → 建窗：创建时直接应用状态。
 
 ### 窗口关闭后的生命周期处理
 
-`lcui_ui_on_window_destroy` 监听 `PTK_EVENT_CLOSE`：
-- 从 `lcui_ui.windows` 链表移除关闭的窗口
-- 如果 `quit_after_all_windows_closed` 为 true 且链表为空，调用 `ptk_app_exit(0)`
+`lcui_window_t` 维护自己的窗口链表和退出策略。最后一个窗口关闭时是否退出由
+`lcui_set_quit_on_last_window(bool)` 控制（默认 true）。应用需要“关掉窗口但继续运行”
+（例如托盘应用）时关闭该策略。`lcui_destroy()` 会兜底销毁仍存活的窗口。
 
-`lcui_ui_destroy` 末尾必须重置 `lcui_ui.mode = LCUI_DISPLAY_DEFAULT`，否则重复 `lcui_init()/lcui_destroy()` 循环后，`lcui_ui_set_display` 认为模式未变而跳过窗口创建，导致 `ui_root()` 无法绑定到窗口。
+## 多窗口事件路由
+
+`lib/ui` 的事件状态按 `ui_event_scope_t` 隔离，每个 scope 拥有自己的
+`mouse_capturer`、`touch_capturers`、`hover/active/focus` 目标和点击记录：
+
+- `ui_set_event_scope(root)` 把 `root` 子树注册为独立作用域；`lcui_window_bind_widget` 自动调用。
+- `ui_dispatch_event_to(root, e)` 以 `root` 作为命中根和事件作用域。
+- `ui_get_focus_in(w)` / `ui_get_mouseover_in(w)` 返回 `w` 所属作用域的状态；部件代码（dialog、popover、dropdown、tooltip、input-group、ui-server 光标同步）一律使用它们，不再提供全局焦点/悬停查询，避免多窗口下读错作用域。
+- 没有显式 scope 时回落到绑定 `ui_root()` 的 default scope，旧代码行为不变。
+
+`src/lcui_app.c` 按 PTK 事件里的窗口查找内容部件：鼠标/触摸/滚轮直接使用事件窗口；
+键盘/文本输入使用静态 `active_window`（由 `PTK_EVENT_FOCUS` 更新，`UNFOCUS`/`CLOSE` 清除），
+再经 `ui_dispatch_event_to` 送到对应窗口的作用域。`lib/ui` 本身不引入“活动窗口”概念。
 
 ## 尺寸处理
 
@@ -135,6 +148,14 @@ ui_widget_on(widget, "destroy", ui_server_on_destroy_widget, NULL);
 `ptk_window_set_size(width, height)` 接收的是**客户区尺寸**（不含边框/标题栏），内部通过 `convert_client_size_to_window_size` 转换为 `SetWindowPos` 需要的窗口尺寸。
 
 `ptk_window_get_width/height` 返回 `wnd->width/height`，由 `WM_SIZE` 回调更新。
+
+### 内容尺寸同步方向
+
+尺寸同步是**单向**的：窗口 → 内容部件。
+
+- 窗口尺寸变化时 `ui_server_on_window_resize` 调用 `ui_widget_resize(widget, size / scale)`。
+- 连接初始化时 `ui_server_refresh_window` 用当前客户区尺寸设置内容部件。
+- 修改内容部件尺寸**不会**反推窗口；需要改窗口请调用 `lcui_window_set_size`。
 
 ### Widget 尺寸查询
 
@@ -148,14 +169,6 @@ ui_update();
 ```
 
 `ui_update()` 内部完成样式计算、更新、重排，直接读 `border_box` 即可。
-
-### 绑定窗口时设置尺寸
-
-`lcui_bind_window_state` 中有 `ui_widget_resize(widget, state.width, state.height)`，需要显式 `(float)` 转换：
-
-```c
-ui_widget_resize(widget, (float)state.width, (float)state.height);
-```
 
 ## 测试中的消息泵
 

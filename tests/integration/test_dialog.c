@@ -278,12 +278,12 @@ static void test_dialog_focus(void)
         ui_update();
         ctest_equal_int(
             "open should focus inside content",
-            ui_get_focus() != NULL && has_ancestor(ui_get_focus(), fx.content),
+            ui_get_focus_in(ui_root()) != NULL && has_ancestor(ui_get_focus_in(ui_root()), fx.content),
             1);
         ui_dialog_close(fx.dialog);
         ui_update();
         ctest_equal_int("close should restore focus",
-                        ui_get_focus() == fx.trigger_btn, 1);
+                        ui_get_focus_in(ui_root()) == fx.trigger_btn, 1);
         dialog_fixture_teardown(&fx);
 }
 

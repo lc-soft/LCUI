@@ -16,18 +16,9 @@
 
 LCUI_BEGIN_HEADER
 
-typedef enum {
-        LCUI_DISPLAY_DEFAULT,
-        LCUI_DISPLAY_WINDOWED,
-        LCUI_DISPLAY_FULLSCREEN,
-        LCUI_DISPLAY_SEAMLESS,
-} lcui_display_t;
-
 LCUI_API size_t lcui_ui_render(void);
 
 LCUI_API void lcui_ui_update(void);
-
-LCUI_API void lcui_ui_set_display(lcui_display_t mode);
 
 LCUI_API void lcui_ui_init(void);
 

@@ -653,7 +653,7 @@ static void ui_dropdown_menu_close_data(ui_dropdown_menu_t *data)
                 return;
         }
         ui_dropdown_menu_close_subs(data->content, NULL);
-        focus = ui_get_focus();
+        focus = ui_get_focus_in(data->owner);
         data->open = false;
         data->pending_open = false;
         data->reveal_pending = false;
@@ -1018,7 +1018,7 @@ static void ui_dropdown_menu_open_data(ui_dropdown_menu_t *data)
                 }
         }
         ui_dropdown_menu_clear_last_focus(data);
-        data->last_focus = ui_get_focus();
+        data->last_focus = ui_get_focus_in(data->owner);
         if (data->last_focus) {
                 ui_widget_on(data->last_focus, "destroy",
                              ui_dropdown_menu_on_last_focus_destroy, data);
@@ -1312,8 +1312,9 @@ static void ui_dropdown_menu_on_keydown(ui_widget_t *w, ui_event_t *e,
                 ui_widget_t *sub_item = data->highlighted;
 
                 if (!sub_item && data->content &&
-                    ui_dropdown_menu_is_inside(data->content, ui_get_focus())) {
-                        sub_item = ui_get_focus();
+                    ui_dropdown_menu_is_inside(data->content,
+                                               ui_get_focus_in(data->owner))) {
+                        sub_item = ui_get_focus_in(data->owner);
                 }
                 if (sub_item && ui_dropdown_menu_is_sub_trigger(sub_item) &&
                     sub_item->parent) {

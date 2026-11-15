@@ -150,11 +150,16 @@ fabric {\
 
 int main(int argc, char **argv)
 {
+        lcui_window_options_t opt = { 0 };
+        lcui_window_t *window;
+
         lcui_init();
         Fabric_init(66, 55, 800, 600);
         ui_register_fabric();
         ui_load_css_string(app_css, __FILE__);
         ui_widget_set_title(ui_root(), L"Fabric");
         ui_root_append(ui_create_widget("fabric"));
+        window = lcui_window_create_for_widget(ui_root(), &opt);
+        lcui_window_show(window);
         return lcui_main();
 }

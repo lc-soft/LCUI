@@ -118,10 +118,16 @@ LIBUI_PUBLIC int ui_off_event(const char *event_name,
 LIBUI_PUBLIC void ui_clear_event_target(ui_widget_t *widget);
 
 /** get current focused widget */
-LIBUI_PUBLIC ui_widget_t *ui_get_focus(void);
+LIBUI_PUBLIC ui_widget_t *ui_get_focus_in(ui_widget_t *w);
 
-/** get the widget currently under the mouse pointer (mouseover target) */
-LIBUI_PUBLIC ui_widget_t *ui_get_mouseover(void);
+/** get the mouseover target inside the scope that contains w. */
+LIBUI_PUBLIC ui_widget_t *ui_get_mouseover_in(ui_widget_t *w);
+
+/** Register root as an independent event scope, e.g. one window's content. */
+LIBUI_PUBLIC void ui_set_event_scope(ui_widget_t *root);
+
+/** Dispatch an event to root's event scope. */
+LIBUI_PUBLIC int ui_dispatch_event_to(ui_widget_t *root, ui_event_t *e);
 
 /** 将一个部件设置为焦点 */
 LIBUI_PUBLIC int ui_set_focus(ui_widget_t *widget);

@@ -47,14 +47,23 @@ void lcui_init(void)
         lcui_widgets_init();
         lcui_rendering_init();
         lcui_window_state_init();
-        if (!lcui_settings_load()) {
-                logger_warning(
-                    "failed to load settings, fallback to built-in defaults\n");
+}
+
+bool lcui_load_settings(const char *app_id)
+{
+        if (app_id && !lcui_set_app_id(app_id)) {
+                return false;
         }
+        if (!lcui_settings_load()) {
+                return false;
+        }
+        lcui_window_apply_pending_states();
+        return true;
 }
 
 void lcui_destroy(void)
 {
+        lcui_window_destroy_all();
         lcui_settings_unload();
         lcui_window_state_destroy();
         lcui_rendering_destroy();

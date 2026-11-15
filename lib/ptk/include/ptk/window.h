@@ -46,6 +46,7 @@ PTK_PUBLIC ptk_cursor_type_t ptk_window_get_cursor(ptk_window_t *wnd);
 PTK_PUBLIC int ptk_window_get_width(ptk_window_t *wnd);
 PTK_PUBLIC int ptk_window_get_height(ptk_window_t *wnd);
 PTK_PUBLIC bool ptk_window_is_maximized(ptk_window_t *wnd);
+PTK_PUBLIC bool ptk_window_is_visible(ptk_window_t *wnd);
 PTK_PUBLIC void ptk_window_set_min_width(ptk_window_t *wnd, int min_width);
 PTK_PUBLIC void ptk_window_set_min_height(ptk_window_t *wnd, int min_height);
 PTK_PUBLIC void ptk_window_set_max_width(ptk_window_t *wnd, int max_width);

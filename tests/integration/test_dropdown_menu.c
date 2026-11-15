@@ -464,27 +464,27 @@ static void test_keyboard_navigation(void)
         ctest_equal_bool("open should not highlight an item",
                          ui_widget_has_status(first, "highlighted"), false);
         ctest_equal_bool("open should focus the first item",
-                         ui_get_focus() == first, true);
-        emit_keydown(ui_get_focus(), KEY_DOWN);
+                         ui_get_focus_in(ui_root()) == first, true);
+        emit_keydown(ui_get_focus_in(ui_root()), KEY_DOWN);
         ctest_equal_bool("down should highlight the first item",
                          ui_widget_has_status(first, "highlighted"), true);
-        emit_keydown(ui_get_focus(), KEY_DOWN);
+        emit_keydown(ui_get_focus_in(ui_root()), KEY_DOWN);
         ctest_equal_bool("second down should highlight the next item",
                          ui_widget_has_status(second, "highlighted"), true);
-        emit_keydown(ui_get_focus(), KEY_END);
+        emit_keydown(ui_get_focus_in(ui_root()), KEY_END);
         ctest_equal_bool("end should highlight the last item",
                          ui_widget_has_status(third, "highlighted"), true);
-        emit_keydown(ui_get_focus(), KEY_DOWN);
+        emit_keydown(ui_get_focus_in(ui_root()), KEY_DOWN);
         ctest_equal_bool("down should wrap to the first item",
                          ui_widget_has_status(first, "highlighted"), true);
-        emit_keydown(ui_get_focus(), KEY_UP);
+        emit_keydown(ui_get_focus_in(ui_root()), KEY_UP);
         ctest_equal_bool("up should wrap to the last item",
                          ui_widget_has_status(third, "highlighted"), true);
-        emit_keydown(ui_get_focus(), KEY_HOME);
+        emit_keydown(ui_get_focus_in(ui_root()), KEY_HOME);
         ctest_equal_bool("home should highlight the first item",
                          ui_widget_has_status(first, "highlighted"), true);
-        emit_keydown(ui_get_focus(), KEY_DOWN);
-        emit_keydown(ui_get_focus(), KEY_ENTER);
+        emit_keydown(ui_get_focus_in(ui_root()), KEY_DOWN);
+        emit_keydown(ui_get_focus_in(ui_root()), KEY_ENTER);
         ctest_equal_int("enter should activate the highlighted item",
                         g_select_count, 1);
         ctest_equal_bool("enter activation should report the item",
@@ -511,16 +511,16 @@ static void test_typeahead(void)
         ui_dropdown_menu_open(fx.menu);
         settle();
 
-        emit_keydown(ui_get_focus(), KEY_S);
+        emit_keydown(ui_get_focus_in(ui_root()), KEY_S);
         ctest_equal_bool("typing s should highlight Settings",
                          ui_widget_has_status(settings, "highlighted"), true);
-        emit_keydown(ui_get_focus(), KEY_S);
+        emit_keydown(ui_get_focus_in(ui_root()), KEY_S);
         ctest_equal_bool("typing s again should cycle to Support",
                          ui_widget_has_status(support, "highlighted"), true);
-        emit_keydown(ui_get_focus(), KEY_P);
+        emit_keydown(ui_get_focus_in(ui_root()), KEY_P);
         ctest_equal_bool("typing p after s should keep the current item",
                          ui_widget_has_status(support, "highlighted"), true);
-        emit_keydown(ui_get_focus(), KEY_P);
+        emit_keydown(ui_get_focus_in(ui_root()), KEY_P);
         ctest_equal_bool("typing p again should highlight Profile",
                          ui_widget_has_status(profile, "highlighted"), true);
         ctest_equal_int("typeahead should not activate an item", g_select_count,
@@ -543,13 +543,13 @@ static void test_keyboard_skips_disabled(void)
         ui_widget_set_disabled(second, true);
         ui_dropdown_menu_open(fx.menu);
         settle();
-        emit_keydown(ui_get_focus(), KEY_DOWN);
+        emit_keydown(ui_get_focus_in(ui_root()), KEY_DOWN);
         ctest_equal_bool("down should select the first enabled item",
                          ui_widget_has_status(first, "highlighted"), true);
-        emit_keydown(ui_get_focus(), KEY_DOWN);
+        emit_keydown(ui_get_focus_in(ui_root()), KEY_DOWN);
         ctest_equal_bool("down should skip disabled items",
                          ui_widget_has_status(third, "highlighted"), true);
-        emit_keydown(ui_get_focus(), KEY_UP);
+        emit_keydown(ui_get_focus_in(ui_root()), KEY_UP);
         ctest_equal_bool("up should skip disabled items",
                          ui_widget_has_status(first, "highlighted"), true);
 
@@ -627,14 +627,14 @@ static void test_submenu_keyboard(void)
                          ui_widget_has_status(sub_trigger, "highlighted"),
                          false);
         ctest_equal_bool("open should focus the sub trigger",
-                         ui_get_focus() == sub_trigger, true);
-        emit_keydown(ui_get_focus(), KEY_RIGHT);
+                         ui_get_focus_in(ui_root()) == sub_trigger, true);
+        emit_keydown(ui_get_focus_in(ui_root()), KEY_RIGHT);
         settle();
         ctest_equal_bool("right should open the submenu",
                          ui_dropdown_menu_is_open(sub), true);
         ctest_equal_bool("opened submenu should highlight its first item",
                          ui_widget_has_status(sub_item, "highlighted"), true);
-        emit_keydown(ui_get_focus(), KEY_LEFT);
+        emit_keydown(ui_get_focus_in(ui_root()), KEY_LEFT);
         ctest_equal_bool("left should close the submenu",
                          ui_dropdown_menu_is_open(sub), false);
         ctest_equal_bool("left should return focus to the sub trigger",
@@ -657,12 +657,12 @@ static void test_escape_closes_submenu_first(void)
         settle();
         click_widget(sub_trigger);
         settle();
-        emit_keydown(ui_get_focus(), KEY_ESCAPE);
+        emit_keydown(ui_get_focus_in(ui_root()), KEY_ESCAPE);
         ctest_equal_bool("escape should close the submenu first",
                          ui_dropdown_menu_is_open(sub), false);
         ctest_equal_bool("escape should keep the root menu open",
                          ui_dropdown_menu_is_open(fx.menu), true);
-        emit_keydown(ui_get_focus(), KEY_ESCAPE);
+        emit_keydown(ui_get_focus_in(ui_root()), KEY_ESCAPE);
         ctest_equal_bool("second escape should close the root menu",
                          ui_dropdown_menu_is_open(fx.menu), false);
 

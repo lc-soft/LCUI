@@ -74,14 +74,15 @@ include 不仅代码冗余，还会在生成的代码块中显式展示出来，
 ```
 schema 包含字段名、类型、`offsetof`、默认值、有效范围。`setting_fields_deserialize/serialize` 在缺省/越界时自动回填默认值并置 dirty。
 
-### Window State 绑定
+### Window State 读写
 
-`lcui_bind_window_state(widget, id)` 在首次调用时内联注册 `PTK_EVENT_CREATE` 和 `PTK_EVENT_CLOSE` 全局监听，记录 `(widget, id)` 绑定，并在绑定时从已加载的配置恢复 widget 尺寸（`ui_widget_resize`）。如果当前 widget 已经绑定了窗口（通过 `ui_server_get_widget` 检查），立即应用状态。
+窗口状态以 `window.<id>` section 存储，由 `lcui_get_window_state` / `lcui_set_window_state` 读写。
+`opt.id` 是唯一入口：`lcui_window_create` 在配置已加载时立即应用保存的几何，窗口关闭时
+`lcui_window_on_ptk_close` 读取当前客户区几何并 `lcui_settings_flush()`。
 
-- **CREATE 处理器**：通过 `ui_server_get_widget(e->window)` 找绑定的 widget → 找到 binding → 应用状态。
-- **CLOSE 处理器**：通过 `e->window` 找 binding → 同步状态到 entry 列表 → **保留 binding（不清 `widget` 指针）**（因为 widget 在模式切换后仍存活，只是窗口被销毁/重建）。
-- **Widget 销毁处理器**：仅当 widget 真正销毁时才移除 binding。
-
-这使得显式模式切换（`lcui_ui_set_display`）正常工作：旧窗口关闭时存储状态；新窗口创建并通过 `ui_server_connect` 重连到同一 widget 时，CREATE 处理器自动把状态应用到新窗口。
+- 配置未加载时建窗：`lcui_load_settings()` 会扫描已存在但未应用状态的窗口并补应用。
+- 配置未加载时关窗：不落盘（`lcui_settings_is_loaded()` 为 false），避免写出空配置。
+- `lcui_destroy()` 或强制 `lcui_window_destroy()` 仍存活的带 `id` 窗口会先保存当前几何，再销毁。
+- 旧 `lcui_bind_window_state(widget, id)` 已移除；仓库内调用点改用 `opt.id`。
 
 

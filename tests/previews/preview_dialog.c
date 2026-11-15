@@ -10,6 +10,7 @@
  */
 
 #include <LCUI.h>
+#include "preview_window.h"
 #include <ptk/main.h>
 
 /* Visual diagnostics for dialog / alert-dialog: check overlay dimming,
@@ -48,5 +49,6 @@ int main(int argc, char **argv)
         ui_widget_append(box, dialog);
         ui_widget_append(box, alert);
         ui_widget_append(ui_root(), box);
+        preview_show_default_window();
         return lcui_main();
 }

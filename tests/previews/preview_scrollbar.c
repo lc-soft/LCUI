@@ -10,6 +10,7 @@
  */
 
 #include <LCUI.h>
+#include "preview_window.h"
 #include <ptk/main.h>
 #include "../scenes/scrollbar_scene.h"
 
@@ -20,5 +21,6 @@ int main(int argc, char **argv)
         lcui_init();
         ui_widget_set_title(ui_root(), L"scrollbar preview");
         scrollbar_scene_build();
+        preview_show_default_window();
         return lcui_main();
 }

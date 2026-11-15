@@ -10,6 +10,7 @@
  */
 
 #include <LCUI.h>
+#include "preview_window.h"
 #include <ptk/main.h>
 #include "../scenes/widget_opacity_scene.h"
 
@@ -22,5 +23,6 @@ int main(int argc, char **argv)
         lcui_init();
         ui_widget_set_title(ui_root(), L"widget opacity preview");
         widget_opacity_scene_build(&scene);
+        preview_show_default_window();
         return lcui_main();
 }

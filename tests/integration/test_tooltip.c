@@ -258,7 +258,7 @@ static void test_hover_focus(void)
         ctest_equal_bool("hover should open", ui_tooltip_is_open(tooltip),
                          true);
         ctest_equal_bool("open tooltip should keep the trigger hovered",
-                         widget_is_descendant(button, ui_get_mouseover()),
+                         widget_is_descendant(button, ui_get_mouseover_in(ui_root())),
                          true);
 
         hover_at(230, 210);
@@ -793,7 +793,7 @@ static void test_tooltip_in_dialog(void)
         ctest_equal_bool("tooltip inside dialog should open",
                          ui_tooltip_is_open(tooltip), true);
         ctest_equal_bool("dialog target should keep hover",
-                         widget_is_descendant(button, ui_get_mouseover()),
+                         widget_is_descendant(button, ui_get_mouseover_in(ui_root())),
                          true);
 
         overlay = content->parent;

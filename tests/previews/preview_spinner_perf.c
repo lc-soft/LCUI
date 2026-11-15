@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <LCUI.h>
+#include "preview_window.h"
 #include <ptk/main.h>
 #include "../scenes/spinner_perf_scene.h"
 
@@ -42,5 +43,6 @@ int main(int argc, char **argv)
         ui_widget_set_title(ui_root(), L"spinner perf preview");
         spinner_perf_scene_build(&scene);
         lcui_request_frame(on_frame, NULL);
+        preview_show_default_window();
         return lcui_main();
 }

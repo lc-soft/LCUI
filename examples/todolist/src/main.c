@@ -165,6 +165,8 @@ void ui_todolist_init(void)
 int main(int argc, char **argv)
 {
         ui_widget_t *pack;
+        lcui_window_options_t opt = { 0 };
+        lcui_window_t *window;
 
         lcui_init();
         pack = ui_load_xml_file("todolist.xml");
@@ -179,5 +181,7 @@ int main(int argc, char **argv)
         ui_todolist_add(L"Build LCUI", "completed");
         ui_todolist_add(L"Read LCUI tutorials", "active");
         ui_todolist_add(L"Create my LCUI application", "active");
+        window = lcui_window_create_for_widget(ui_root(), &opt);
+        lcui_window_show(window);
         return lcui_main();
 }

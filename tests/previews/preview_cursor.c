@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <LCUI.h>
+#include "preview_window.h"
 #include <ptk/main.h>
 #include "../scenes/cursor_scene.h"
 
@@ -62,5 +63,6 @@ int main(int argc, char **argv)
         cursor_scene_build();
         build_cursor_grid(0.f, 160.f);
         ui_widget_resize(ui_root(), 720, 420);
+        preview_show_default_window();
         return lcui_main();
 }

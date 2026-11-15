@@ -14,7 +14,6 @@
 
 #include <LCUI/common.h>
 #include <stdbool.h>
-#include <ui/types.h>
 
 #define LCUI_WINDOW_STATE_SIZE_MIN 1
 #define LCUI_WINDOW_STATE_SIZE_MAX 32768
@@ -32,7 +31,6 @@ typedef struct lcui_window_state {
 LCUI_API bool lcui_get_window_state(const char *id, lcui_window_state_t *out);
 LCUI_API bool lcui_set_window_state(const char *id,
                                     const lcui_window_state_t *in);
-LCUI_API bool lcui_bind_window_state(ui_widget_t *widget, const char *id);
 
 LCUI_END_HEADER
 

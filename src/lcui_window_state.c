@@ -14,17 +14,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ui_server.h>
 #include <LCUI/settings/window_state.h>
 #include "setting_field.h"
-
-typedef struct wstate_binding {
-        ui_widget_t *widget;
-        ptk_window_t *window;
-        char *id;
-        lcui_window_state_t state;
-        bool has_state;
-} wstate_binding_t;
 
 typedef struct wstate_entry {
         char *id;
@@ -32,53 +23,8 @@ typedef struct wstate_entry {
 } wstate_entry_t;
 
 static struct wstate_module {
-        bool listeners_active;
         list_t entries;
-        list_t bindings;
 } window_state;
-
-static void wstate_on_widget_destroy(ui_widget_t *widget, ui_event_t *e,
-                                     void *arg);
-static void wstate_binding_remove(wstate_binding_t *b);
-
-static wstate_binding_t *wstate_find_binding_by_widget(ui_widget_t *widget)
-{
-        list_node_t *node;
-
-        for (list_each(node, &window_state.bindings)) {
-                wstate_binding_t *b = node->data;
-                if (b->widget == widget) {
-                        return b;
-                }
-        }
-        return NULL;
-}
-
-static wstate_binding_t *wstate_find_binding_by_window(ptk_window_t *window)
-{
-        list_node_t *node;
-
-        for (list_each(node, &window_state.bindings)) {
-                wstate_binding_t *b = node->data;
-                if (b->window == window) {
-                        return b;
-                }
-        }
-        return NULL;
-}
-
-static wstate_binding_t *wstate_find_binding_by_id(const char *id)
-{
-        list_node_t *node;
-
-        for (list_each(node, &window_state.bindings)) {
-                wstate_binding_t *b = node->data;
-                if (b->id && strcmp(b->id, id) == 0) {
-                        return b;
-                }
-        }
-        return NULL;
-}
 
 static bool wstate_id_is_valid(const char *id)
 {
@@ -124,14 +70,6 @@ static void wstate_entry_destroy(void *data)
         free(entry);
 }
 
-static void wstate_binding_destroy(void *data)
-{
-        wstate_binding_t *binding = data;
-
-        free(binding->id);
-        free(binding);
-}
-
 static wstate_entry_t *wstate_find_entry(const char *id)
 {
         list_node_t *node;
@@ -166,127 +104,6 @@ static bool wstate_set_entry(const char *id, const lcui_window_state_t *state)
         entry->state = *state;
         list_append(&window_state.entries, entry);
         return true;
-}
-
-static bool wstate_query(ptk_window_t *window, lcui_window_state_t *out)
-{
-        ptk_window_get_position(window, &out->x, &out->y);
-        out->width = ptk_window_get_width(window);
-        out->height = ptk_window_get_height(window);
-        out->maximized = ptk_window_is_maximized(window);
-        return wstate_validate(out);
-}
-
-static bool wstate_apply(ptk_window_t *window, const lcui_window_state_t *state)
-{
-        if (!wstate_validate(state)) {
-                return false;
-        }
-        ptk_window_set_position(window, state->x, state->y);
-        ptk_window_set_size(window, state->width, state->height);
-        ptk_window_set_maximized(window, state->maximized);
-        return true;
-}
-
-static void wstate_binding_sync(wstate_binding_t *binding)
-{
-        if (!binding->window) {
-                return;
-        }
-        if (!wstate_query(binding->window, &binding->state)) {
-                return;
-        }
-        binding->has_state = true;
-        if (wstate_set_entry(binding->id, &binding->state)) {
-                lcui_settings_mark_dirty();
-        }
-        lcui_settings_flush();
-}
-
-static void wstate_binding_remove(wstate_binding_t *b)
-{
-        list_node_t *node;
-
-        for (list_each(node, &window_state.bindings)) {
-                if (node->data == b) {
-                        list_delete_node(&window_state.bindings, node);
-                        break;
-                }
-        }
-        if (b->widget) {
-                ui_widget_off(b->widget, "destroy", wstate_on_widget_destroy,
-                              NULL);
-        }
-        wstate_binding_destroy(b);
-}
-
-static void wstate_on_widget_destroy(ui_widget_t *widget, ui_event_t *e,
-                                     void *arg)
-{
-        wstate_binding_t *b;
-
-        (void)e;
-        (void)arg;
-        b = wstate_find_binding_by_widget(widget);
-        if (b) {
-                wstate_binding_remove(b);
-        }
-}
-
-static void wstate_on_window_create(ptk_event_t *e, void *arg)
-{
-        wstate_binding_t *b;
-        ui_widget_t *widget;
-
-        (void)arg;
-        if (!e->window) {
-                return;
-        }
-        widget = ui_server_get_widget(e->window);
-        b = wstate_find_binding_by_widget(widget);
-        if (!b) {
-                return;
-        }
-        b->window = e->window;
-        if (b->has_state) {
-                wstate_apply(e->window, &b->state);
-        }
-}
-
-static void wstate_on_window_close(ptk_event_t *e, void *arg)
-{
-        wstate_binding_t *b;
-
-        (void)arg;
-        if (!e->window) {
-                return;
-        }
-        b = wstate_find_binding_by_window(e->window);
-        if (!b) {
-                return;
-        }
-        wstate_binding_sync(b);
-        b->window = NULL;
-}
-
-static void wstate_attach_listeners(void)
-{
-        if (window_state.listeners_active) {
-                return;
-        }
-        ptk_on_event(PTK_EVENT_CREATE, wstate_on_window_create, NULL);
-        ptk_on_event(PTK_EVENT_CLOSE, wstate_on_window_close, NULL);
-        window_state.listeners_active = true;
-}
-
-static void wstate_detach_listeners(void)
-{
-        if (!window_state.listeners_active) {
-                return;
-        }
-        ptk_off_event(PTK_EVENT_CREATE, wstate_on_window_create);
-        ptk_off_event(PTK_EVENT_CLOSE, wstate_on_window_close);
-        window_state.listeners_active = false;
 }
 
 static void wstate_serialize_window_sections(const char *id, void *ctx)
@@ -434,65 +251,16 @@ bool lcui_set_window_state(const char *id, const lcui_window_state_t *in)
         return true;
 }
 
-bool lcui_bind_window_state(ui_widget_t *widget, const char *id)
-{
-        wstate_binding_t *binding;
-        ptk_window_t *window;
-        lcui_window_state_t state;
-
-        if (!lcui_settings_is_loaded() || !wstate_id_is_valid(id)) {
-                return false;
-        }
-        binding = wstate_find_binding_by_widget(widget);
-        if (binding) {
-                return strcmp(binding->id, id) == 0;
-        }
-        if (wstate_find_binding_by_id(id)) {
-                return false;
-        }
-        binding = calloc(1, sizeof(*binding));
-        if (!binding) {
-                return false;
-        }
-        binding->id = y_strdup(id);
-        if (!binding->id) {
-                free(binding);
-                return false;
-        }
-        binding->widget = widget;
-        list_append(&window_state.bindings, binding);
-        ui_widget_on(widget, "destroy", wstate_on_widget_destroy, NULL);
-        wstate_attach_listeners();
-        if (lcui_get_window_state(id, &state)) {
-                binding->state = state;
-                binding->has_state = true;
-                ui_widget_resize(widget, (float)state.width,
-                                 (float)state.height);
-        }
-        window = ui_server_get_window(widget);
-        if (window) {
-                binding->window = window;
-                if (binding->has_state) {
-                        wstate_apply(window, &binding->state);
-                }
-        }
-        return true;
-}
-
 void lcui_window_state_init(void)
 {
         list_create(&window_state.entries);
-        list_create(&window_state.bindings);
         lcui_settings_on_deserialize(wstate_deserialize, NULL);
         lcui_settings_on_serialize(wstate_serialize, NULL);
 }
 
 void lcui_window_state_destroy(void)
 {
-        wstate_detach_listeners();
         lcui_settings_off_deserialize(wstate_deserialize, NULL);
         lcui_settings_off_serialize(wstate_serialize, NULL);
-        list_destroy(&window_state.bindings, wstate_binding_destroy);
         list_destroy(&window_state.entries, wstate_entry_destroy);
-        window_state.listeners_active = false;
 }

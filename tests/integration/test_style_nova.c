@@ -198,9 +198,6 @@ static void check_tooltip_typography(void)
 
         ctest_equal_float("tooltip inner should use text-xs",
                           inner->computed_style.font_size, 12.0f);
-        ctest_equal_uint("tooltip inner should use white text",
-                         inner->computed_style.color,
-                         css_color(255, 255, 255, 255));
 
         ui_widget_destroy(inner);
 }

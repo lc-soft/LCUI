@@ -49,6 +49,8 @@ typedef enum {
         PTK_EVENT_SIZE,
         PTK_EVENT_MINMAXINFO,
         PTK_EVENT_VISIBILITY_CHANGE,
+        PTK_EVENT_FOCUS,
+        PTK_EVENT_UNFOCUS,
         PTK_EVENT_KEYDOWN,
         PTK_EVENT_KEYPRESS,
         PTK_EVENT_KEYUP,
@@ -336,6 +338,7 @@ typedef struct ptk_window_driver {
         int (*get_width)(ptk_window_t *);
         int (*get_height)(ptk_window_t *);
         bool (*is_maximized)(ptk_window_t *);
+        bool (*is_visible)(ptk_window_t *);
         void (*set_min_width)(ptk_window_t *, int);
         void (*set_min_height)(ptk_window_t *, int);
         void (*set_max_width)(ptk_window_t *, int);

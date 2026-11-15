@@ -68,11 +68,22 @@ typedef struct ui_widget_click_record {
 	ui_widget_t *widget; /**< 被点击的部件 */
 } ui_widget_click_record_t;
 
-/** 当前功能模块的相关数据 */
-static struct ui_events {
+/** 一组部件的事件作用域，通常对应一个窗口的内容根部件 */
+typedef struct ui_event_scope {
+	ui_widget_t *root;
 	ui_widget_t *mouse_capturer;
 	list_t touch_capturers;
 	ui_widget_t *targets[UI_WIDGET_STATUS_TOTAL];
+	ui_widget_click_record_t click;
+	list_node_t node;
+} ui_event_scope_t;
+
+/** 当前功能模块的相关数据 */
+static struct ui_events {
+	ui_event_scope_t default_scope;
+
+	/** list_t<ui_event_scope_t> */
+	list_t scopes;
 
 	/** list_t<ui_event_pack_t> */
 	list_t queue;
@@ -88,10 +99,73 @@ static struct ui_events {
 	dict_type_t event_ids_type;
 
 	int base_event_id;
-	ui_widget_click_record_t click;
 } ui_events;
 
 /* clang-format on */
+
+static ui_event_scope_t *ui_event_scope_find(ui_widget_t *root)
+{
+        list_node_t *node;
+
+        for (list_each(node, &ui_events.scopes)) {
+                ui_event_scope_t *scope = node->data;
+
+                if (scope->root == root) {
+                        return scope;
+                }
+        }
+        return NULL;
+}
+
+static ui_event_scope_t *ui_event_scope_of(ui_widget_t *w)
+{
+        ui_widget_t *p;
+        ui_event_scope_t *scope;
+
+        for (p = w; p; p = p->parent) {
+                scope = ui_event_scope_find(p);
+                if (scope) {
+                        return scope;
+                }
+        }
+        return &ui_events.default_scope;
+}
+
+static ui_event_scope_t *ui_event_scope_register(ui_widget_t *root)
+{
+        ui_event_scope_t *scope;
+
+        scope = ui_event_scope_find(root);
+        if (scope) {
+                return scope;
+        }
+        scope = calloc(1, sizeof(ui_event_scope_t));
+        if (!scope) {
+                return NULL;
+        }
+        scope->root = root;
+        scope->click.interval = DBLCLICK_INTERVAL;
+        scope->node.data = scope;
+        list_create(&scope->touch_capturers);
+        list_append_node(&ui_events.scopes, &scope->node);
+        return scope;
+}
+
+void ui_set_event_scope(ui_widget_t *root)
+{
+        if (!root || root == ui_root()) {
+                return;
+        }
+        ui_event_scope_register(root);
+}
+
+static ui_event_scope_t *ui_event_scope_ensure(ui_widget_t *root)
+{
+        if (!root || root == ui_root()) {
+                return &ui_events.default_scope;
+        }
+        return ui_event_scope_register(root);
+}
 
 static int ui_use_widget_event_id(const char *event_name)
 {
@@ -248,6 +322,24 @@ LIBUI_INLINE void ui_clear_touch_capturers(list_t *list)
         list_destroy_without_node(list, ui_touch_capturer_destroy);
 }
 
+static void ui_event_scope_remove(ui_widget_t *root)
+{
+        list_node_t *node;
+        ui_event_scope_t *scope;
+
+        for (list_each(node, &ui_events.scopes)) {
+                scope = node->data;
+                if (scope->root != root) {
+                        continue;
+                }
+                list_unlink(&ui_events.scopes, &scope->node);
+                ui_clear_touch_capturers(&scope->touch_capturers);
+                list_destroy(&scope->touch_capturers, NULL);
+                free(scope);
+                return;
+        }
+}
+
 static int ui_add_touch_capturer(list_t *list, ui_widget_t *w, int point_id)
 {
         int *data;
@@ -320,7 +412,7 @@ static int ui_remove_touch_capturer(list_t *list, ui_widget_t *w, int point_id)
                 }
         }
         if (tc->points.length == 0) {
-                list_unlink(&ui_events.touch_capturers, &tc->node);
+                list_unlink(list, &tc->node);
                 free(tc);
         }
         return 0;
@@ -655,29 +747,31 @@ static void ui_widget_trigger_mouseout_event(ui_widget_t *widget,
         }
 }
 
-static void ui_widget_on_mouseover_event(ui_widget_t *widget)
+static void ui_widget_on_mouseover_event(ui_event_scope_t *scope,
+                                         ui_widget_t *widget)
 {
         ui_widget_t *parent = NULL;
 
-        if (ui_events.targets[UI_WIDGET_STATUS_HOVER] == widget) {
+        if (scope->targets[UI_WIDGET_STATUS_HOVER] == widget) {
                 return;
         }
-        parent = ui_get_same_parent(widget,
-                                    ui_events.targets[UI_WIDGET_STATUS_HOVER]);
+        parent =
+            ui_get_same_parent(widget, scope->targets[UI_WIDGET_STATUS_HOVER]);
         if (widget) {
                 ui_widget_trigger_mouseover_event(widget, parent);
         }
-        if (ui_events.targets[UI_WIDGET_STATUS_HOVER]) {
+        if (scope->targets[UI_WIDGET_STATUS_HOVER]) {
                 ui_widget_trigger_mouseout_event(
-                    ui_events.targets[UI_WIDGET_STATUS_HOVER], parent);
+                    scope->targets[UI_WIDGET_STATUS_HOVER], parent);
         }
-        ui_events.targets[UI_WIDGET_STATUS_HOVER] = widget;
+        scope->targets[UI_WIDGET_STATUS_HOVER] = widget;
 }
 
-static void ui_widget_on_mousedown_event(ui_widget_t *widget)
+static void ui_widget_on_mousedown_event(ui_event_scope_t *scope,
+                                         ui_widget_t *widget)
 {
         ui_widget_t *parent;
-        ui_widget_t *w = ui_events.targets[UI_WIDGET_STATUS_ACTIVE];
+        ui_widget_t *w = scope->targets[UI_WIDGET_STATUS_ACTIVE];
 
         if (w == widget) {
                 return;
@@ -689,61 +783,75 @@ static void ui_widget_on_mousedown_event(ui_widget_t *widget)
         for (w = widget; w && w != parent; w = w->parent) {
                 ui_widget_add_status(w, "active");
         }
-        ui_events.targets[UI_WIDGET_STATUS_ACTIVE] = widget;
+        scope->targets[UI_WIDGET_STATUS_ACTIVE] = widget;
 }
 
-static void ui_clear_mouseover_target(ui_widget_t *target)
+static void ui_clear_mouseover_target(ui_event_scope_t *scope,
+                                      ui_widget_t *target)
 {
         ui_widget_t *w;
 
         if (!target) {
-                ui_widget_on_mouseover_event(NULL);
+                ui_widget_on_mouseover_event(scope, NULL);
                 return;
         }
-        for (w = ui_events.targets[UI_WIDGET_STATUS_HOVER]; w; w = w->parent) {
+        for (w = scope->targets[UI_WIDGET_STATUS_HOVER]; w; w = w->parent) {
                 if (w == target) {
-                        ui_widget_on_mouseover_event(NULL);
+                        ui_widget_on_mouseover_event(scope, NULL);
                         break;
                 }
         }
 }
 
-static void ui_clear_mousedown_target(ui_widget_t *target)
+static void ui_clear_mousedown_target(ui_event_scope_t *scope,
+                                      ui_widget_t *target)
 {
         ui_widget_t *w;
 
         if (!target) {
-                ui_widget_on_mousedown_event(NULL);
+                ui_widget_on_mousedown_event(scope, NULL);
                 return;
         }
-        for (w = ui_events.targets[UI_WIDGET_STATUS_ACTIVE]; w; w = w->parent) {
+        for (w = scope->targets[UI_WIDGET_STATUS_ACTIVE]; w; w = w->parent) {
                 if (w == target) {
-                        ui_widget_on_mousedown_event(NULL);
+                        ui_widget_on_mousedown_event(scope, NULL);
                         break;
                 }
         }
 }
 
-static void ui_clear_focus_target(ui_widget_t *target)
+static void ui_clear_focus_target(ui_event_scope_t *scope, ui_widget_t *target)
 {
         ui_widget_t *w;
 
         if (!target) {
-                ui_events.targets[UI_WIDGET_STATUS_FOCUS] = NULL;
+                scope->targets[UI_WIDGET_STATUS_FOCUS] = NULL;
                 return;
         }
-        for (w = ui_events.targets[UI_WIDGET_STATUS_FOCUS]; w; w = w->parent) {
+        for (w = scope->targets[UI_WIDGET_STATUS_FOCUS]; w; w = w->parent) {
                 if (w == target) {
-                        ui_events.targets[UI_WIDGET_STATUS_FOCUS] = NULL;
+                        scope->targets[UI_WIDGET_STATUS_FOCUS] = NULL;
                         break;
                 }
         }
+}
+
+static void ui_event_scope_clear_target(ui_event_scope_t *scope, ui_widget_t *w)
+{
+        if (scope->mouse_capturer == w) {
+                scope->mouse_capturer = NULL;
+        }
+        ui_remove_touch_capturer(&scope->touch_capturers, w, -1);
+        ui_clear_mouseover_target(scope, w);
+        ui_clear_mousedown_target(scope, w);
+        ui_clear_focus_target(scope, w);
 }
 
 void ui_clear_event_target(ui_widget_t *w)
 {
         list_node_t *node, *prev;
         ui_event_pack_t *pack;
+        ui_event_scope_t *scope;
 
         for (list_each(node, &ui_events.queue)) {
                 prev = node->prev;
@@ -754,9 +862,11 @@ void ui_clear_event_target(ui_widget_t *w)
                         node = prev;
                 }
         }
-        ui_clear_mouseover_target(w);
-        ui_clear_mousedown_target(w);
-        ui_clear_focus_target(w);
+        for (list_each(node, &ui_events.scopes)) {
+                scope = node->data;
+                ui_event_scope_clear_target(scope, w);
+        }
+        ui_event_scope_clear_target(&ui_events.default_scope, w);
 }
 
 LIBUI_INLINE bool ui_widget_is_focusable(ui_widget_t *w)
@@ -767,35 +877,40 @@ LIBUI_INLINE bool ui_widget_is_focusable(ui_widget_t *w)
                w->tab_index >= 0 && !w->disabled;
 }
 
-ui_widget_t *ui_get_focus(void)
+ui_widget_t *ui_get_focus_in(ui_widget_t *w)
 {
-        return ui_events.targets[UI_WIDGET_STATUS_FOCUS];
+        ui_event_scope_t *scope = ui_event_scope_of(w);
+
+        return scope->targets[UI_WIDGET_STATUS_FOCUS];
 }
 
-ui_widget_t *ui_get_mouseover(void)
+ui_widget_t *ui_get_mouseover_in(ui_widget_t *w)
 {
-        return ui_events.targets[UI_WIDGET_STATUS_HOVER];
+        ui_event_scope_t *scope = ui_event_scope_of(w);
+
+        return scope->targets[UI_WIDGET_STATUS_HOVER];
 }
 
 int ui_set_focus(ui_widget_t *widget)
 {
         ui_widget_t *w;
         ui_event_t e = { 0 };
+        ui_event_scope_t *scope = ui_event_scope_of(widget);
 
         for (w = widget; w; w = w->parent) {
                 if (ui_widget_is_focusable(w)) {
                         break;
                 }
         }
-        if (ui_events.targets[UI_WIDGET_STATUS_FOCUS] == w) {
+        if (scope->targets[UI_WIDGET_STATUS_FOCUS] == w) {
                 return 0;
         }
-        if (ui_events.targets[UI_WIDGET_STATUS_FOCUS]) {
+        if (scope->targets[UI_WIDGET_STATUS_FOCUS]) {
                 e.type = UI_EVENT_BLUR;
-                e.target = ui_events.targets[UI_WIDGET_STATUS_FOCUS];
+                e.target = scope->targets[UI_WIDGET_STATUS_FOCUS];
                 ui_widget_remove_status(e.target, "focus");
                 ui_widget_post_event(e.target, &e, NULL, NULL);
-                ui_events.targets[UI_WIDGET_STATUS_FOCUS] = NULL;
+                scope->targets[UI_WIDGET_STATUS_FOCUS] = NULL;
         }
         if (!ui_widget_is_focusable(w)) {
                 return -1;
@@ -803,21 +918,22 @@ int ui_set_focus(ui_widget_t *widget)
         e.target = w;
         e.type = UI_EVENT_FOCUS;
         e.cancel_bubble = false;
-        ui_events.targets[UI_WIDGET_STATUS_FOCUS] = w;
+        scope->targets[UI_WIDGET_STATUS_FOCUS] = w;
         ui_widget_add_status(e.target, "focus");
         ui_widget_post_event(e.target, &e, NULL, NULL);
         return 0;
 }
 
-static ui_widget_t *ui_resolve_event_target(float x, float y)
+static ui_widget_t *ui_resolve_event_target(ui_event_scope_t *scope, float x,
+                                            float y)
 {
         ui_widget_t *w;
         ui_widget_t *root;
         ui_widget_t *target;
 
-        root = ui_root();
-        if (ui_events.mouse_capturer) {
-                target = ui_events.mouse_capturer;
+        root = scope->root;
+        if (scope->mouse_capturer) {
+                target = scope->mouse_capturer;
         } else {
                 target = ui_widget_get_event_target(root, x, y,
                                                     CSS_POINTER_EVENTS_AUTO);
@@ -833,12 +949,12 @@ static ui_widget_t *ui_resolve_event_target(float x, float y)
         return target;
 }
 
-static int ui_on_wheel_event(ui_event_t *origin_event)
+static int ui_on_wheel_event(ui_event_scope_t *scope, ui_event_t *origin_event)
 {
         ui_event_t e = *origin_event;
 
         e.cancel_bubble = false;
-        e.target = ui_events.targets[UI_WIDGET_STATUS_HOVER];
+        e.target = scope->targets[UI_WIDGET_STATUS_HOVER];
         if (!e.target) {
                 return -1;
         }
@@ -846,106 +962,107 @@ static int ui_on_wheel_event(ui_event_t *origin_event)
         return 0;
 }
 
-static int ui_on_mouse_event(ui_event_t *origin_event)
+static int ui_on_mouse_event(ui_event_scope_t *scope, ui_event_t *origin_event)
 {
         ui_event_t e = *origin_event;
 
         e.cancel_bubble = false;
         switch (e.type) {
         case UI_EVENT_MOUSEDOWN:
-                e.target = ui_resolve_event_target(e.mouse.x, e.mouse.y);
+                e.target = ui_resolve_event_target(scope, e.mouse.x, e.mouse.y);
                 if (!e.target) {
                         return -1;
                 }
                 ui_widget_emit_event(e.target, e, NULL);
-                ui_events.click.interval = DBLCLICK_INTERVAL;
+                scope->click.interval = DBLCLICK_INTERVAL;
                 if (e.mouse.button == UI_MOUSE_BUTTON_LEFT &&
-                    ui_events.click.widget == e.target) {
+                    scope->click.widget == e.target) {
                         int delta;
-                        delta = (int)(y_gettime() - ui_events.click.time);
-                        ui_events.click.interval = delta;
+                        delta = (int)(y_gettime() - scope->click.time);
+                        scope->click.interval = delta;
                 } else if (e.mouse.button == UI_MOUSE_BUTTON_RIGHT &&
-                           ui_events.click.widget != e.target) {
-                        ui_events.click.x = e.mouse.x;
-                        ui_events.click.y = e.mouse.y;
+                           scope->click.widget != e.target) {
+                        scope->click.x = e.mouse.x;
+                        scope->click.y = e.mouse.y;
                 }
-                ui_events.click.time = y_gettime();
-                ui_events.click.widget = e.target;
-                ui_widget_on_mousedown_event(e.target);
+                scope->click.time = y_gettime();
+                scope->click.widget = e.target;
+                ui_widget_on_mousedown_event(scope, e.target);
                 ui_set_focus(e.target);
                 break;
         case UI_EVENT_MOUSEUP:
-                e.target = ui_resolve_event_target(e.mouse.x, e.mouse.y);
+                e.target = ui_resolve_event_target(scope, e.mouse.x, e.mouse.y);
                 if (!e.target) {
                         return -1;
                 }
                 ui_widget_emit_event(e.target, e, NULL);
-                if (ui_events.targets[UI_WIDGET_STATUS_ACTIVE] != e.target ||
+                if (scope->targets[UI_WIDGET_STATUS_ACTIVE] != e.target ||
                     e.mouse.button != UI_MOUSE_BUTTON_LEFT) {
-                        ui_events.click.x = 0;
-                        ui_events.click.y = 0;
-                        ui_events.click.time = 0;
-                        ui_events.click.widget = NULL;
-                        ui_clear_mousedown_target(NULL);
+                        scope->click.x = 0;
+                        scope->click.y = 0;
+                        scope->click.time = 0;
+                        scope->click.widget = NULL;
+                        ui_clear_mousedown_target(scope, NULL);
                         break;
                 }
                 e.type = UI_EVENT_CLICK;
                 ui_widget_emit_event(e.target, e, NULL);
-                ui_clear_mousedown_target(NULL);
-                if (ui_events.click.widget != e.target) {
-                        ui_events.click.x = 0;
-                        ui_events.click.y = 0;
-                        ui_events.click.time = 0;
-                        ui_events.click.widget = NULL;
+                ui_clear_mousedown_target(scope, NULL);
+                if (scope->click.widget != e.target) {
+                        scope->click.x = 0;
+                        scope->click.y = 0;
+                        scope->click.time = 0;
+                        scope->click.widget = NULL;
                         break;
                 }
-                if (ui_events.click.interval < DBLCLICK_INTERVAL) {
+                if (scope->click.interval < DBLCLICK_INTERVAL) {
                         e.type = UI_EVENT_DBLCLICK;
-                        ui_events.click.x = 0;
-                        ui_events.click.y = 0;
-                        ui_events.click.time = 0;
-                        ui_events.click.widget = NULL;
+                        scope->click.x = 0;
+                        scope->click.y = 0;
+                        scope->click.time = 0;
+                        scope->click.widget = NULL;
                         ui_widget_emit_event(e.target, e, NULL);
                 }
-                ui_clear_mousedown_target(NULL);
+                ui_clear_mousedown_target(scope, NULL);
                 break;
         case UI_EVENT_MOUSEMOVE:
-                e.target = ui_resolve_event_target(e.mouse.x, e.mouse.y);
+                e.target = ui_resolve_event_target(scope, e.mouse.x, e.mouse.y);
                 if (!e.target) {
                         return -1;
                 }
-                if (fabs(ui_events.click.x - e.mouse.x) >= 8.f ||
-                    fabs(ui_events.click.y - e.mouse.y) >= 8.f) {
-                        ui_events.click.time = 0;
-                        ui_events.click.widget = NULL;
+                if (fabs(scope->click.x - e.mouse.x) >= 8.f ||
+                    fabs(scope->click.y - e.mouse.y) >= 8.f) {
+                        scope->click.time = 0;
+                        scope->click.widget = NULL;
                 }
                 ui_widget_emit_event(e.target, e, NULL);
                 break;
         default:
                 return -1;
         }
-        ui_widget_on_mouseover_event(e.target);
+        ui_widget_on_mouseover_event(scope, e.target);
         return 0;
 }
 
-static int ui_on_keyboard_event(ui_event_t *origin_event)
+static int ui_on_keyboard_event(ui_event_scope_t *scope,
+                                ui_event_t *origin_event)
 {
         ui_event_t e = *origin_event;
 
-        e.target = ui_events.targets[UI_WIDGET_STATUS_FOCUS];
+        e.target = scope->targets[UI_WIDGET_STATUS_FOCUS];
         if (!e.target) {
-                e.target = ui_root();
+                e.target = scope->root;
         }
         e.cancel_bubble = false;
         ui_widget_emit_event(e.target, e, NULL);
         return 0;
 }
 
-static int ui_on_text_input(ui_event_t *origin_event)
+static int ui_on_text_input(ui_event_scope_t *scope, ui_event_t *origin_event)
 {
         ui_event_t e = *origin_event;
 
-        e.target = ui_events.targets[UI_WIDGET_STATUS_FOCUS];
+        e.target = scope->targets[UI_WIDGET_STATUS_FOCUS];
         if (!e.target) {
                 return -1;
         }
@@ -955,8 +1072,8 @@ static int ui_on_text_input(ui_event_t *origin_event)
 }
 
 /** 分发触控事件给对应的部件 */
-static int ui_dispatch_touch_event(list_t *capturers, ui_touch_point_t *points,
-                                   int n_points)
+static int ui_dispatch_touch_event(ui_event_scope_t *scope, list_t *capturers,
+                                   ui_touch_point_t *points, int n_points)
 {
         int i, count;
         float scale;
@@ -965,7 +1082,7 @@ static int ui_dispatch_touch_event(list_t *capturers, ui_touch_point_t *points,
         ui_widget_t *target, *root, *w;
         ui_touch_capturer_t *tc;
 
-        root = ui_root();
+        root = scope->root;
         scale = ui_get_actual_scale();
         e.type = UI_EVENT_TOUCH;
         e.cancel_bubble = false;
@@ -1012,7 +1129,7 @@ static int ui_dispatch_touch_event(list_t *capturers, ui_touch_point_t *points,
         return count;
 }
 
-static int ui_on_touch_event(ui_event_t *e)
+static int ui_on_touch_event(ui_event_scope_t *scope, ui_event_t *e)
 {
         int i, n;
         list_t capturers;
@@ -1023,7 +1140,7 @@ static int ui_on_touch_event(ui_event_t *e)
         points = e->touch.points;
         list_create(&capturers);
         /* 合并现有的触点捕捉记录 */
-        for (list_each(node, &ui_events.touch_capturers)) {
+        for (list_each(node, &scope->touch_capturers)) {
                 ui_touch_capturer_t *tc = node->data;
                 for (i = 0; i < n; ++i) {
                         /* 如果没有触点记录，则说明是捕获全部触点 */
@@ -1041,37 +1158,40 @@ static int ui_on_touch_event(ui_event_t *e)
                         }
                 }
         }
-        ui_dispatch_touch_event(&capturers, points, n);
+        ui_dispatch_touch_event(scope, &capturers, points, n);
         ui_clear_touch_capturers(&capturers);
         return 0;
 }
 
 void ui_widget_set_mouse_capture(ui_widget_t *w)
 {
-        ui_events.mouse_capturer = w;
+        ui_event_scope_of(w)->mouse_capturer = w;
 }
 
 void ui_widget_release_mouse_capture(ui_widget_t *w)
 {
-        ui_events.mouse_capturer = NULL;
+        ui_event_scope_t *scope = ui_event_scope_of(w);
+
+        if (scope->mouse_capturer == w) {
+                scope->mouse_capturer = NULL;
+        }
 }
 
 int ui_widget_set_touch_capture(ui_widget_t *w, int point_id)
 {
-        int ret;
-        ret = ui_add_touch_capturer(&ui_events.touch_capturers, w, point_id);
-        return ret;
+        ui_event_scope_t *scope = ui_event_scope_of(w);
+
+        return ui_add_touch_capturer(&scope->touch_capturers, w, point_id);
 }
 
 int ui_widget_release_touch_capture(ui_widget_t *w, int point_id)
 {
-        int ret;
+        ui_event_scope_t *scope = ui_event_scope_of(w);
 
-        if (ui_events.touch_capturers.length <= 1) {
-                return 0;
+        if (point_id < 0) {
+                return ui_remove_touch_capturer(&scope->touch_capturers, w, -1);
         }
-        ret = ui_remove_touch_capturer(&ui_events.touch_capturers, w, point_id);
-        return ret;
+        return ui_remove_touch_capturer(&scope->touch_capturers, w, point_id);
 }
 
 static void ui_widget_on_destroy_listener(void *arg)
@@ -1087,6 +1207,7 @@ void ui_widget_destroy_listeners(ui_widget_t *w)
         ui_widget_release_mouse_capture(w);
         ui_widget_release_touch_capture(w, -1);
         ui_clear_event_target(w);
+        ui_event_scope_remove(w);
         if (w->extra) {
                 list_destroy_without_node(&w->extra->listeners,
                                           ui_widget_on_destroy_listener);
@@ -1129,17 +1250,19 @@ void ui_init_events(void)
 
         rbtree_init(&ui_events.event_names);
         list_create(&ui_events.event_mappings);
-        list_create(&ui_events.touch_capturers);
+        list_create(&ui_events.scopes);
         list_create(&ui_events.queue);
-        ui_events.targets[UI_WIDGET_STATUS_ACTIVE] = NULL;
-        ui_events.targets[UI_WIDGET_STATUS_HOVER] = NULL;
-        ui_events.targets[UI_WIDGET_STATUS_FOCUS] = NULL;
-        ui_events.mouse_capturer = NULL;
-        ui_events.click.x = 0;
-        ui_events.click.y = 0;
-        ui_events.click.time = 0;
-        ui_events.click.widget = NULL;
-        ui_events.click.interval = DBLCLICK_INTERVAL;
+        ui_events.default_scope.root = ui_root();
+        ui_events.default_scope.mouse_capturer = NULL;
+        ui_events.default_scope.targets[UI_WIDGET_STATUS_ACTIVE] = NULL;
+        ui_events.default_scope.targets[UI_WIDGET_STATUS_HOVER] = NULL;
+        ui_events.default_scope.targets[UI_WIDGET_STATUS_FOCUS] = NULL;
+        ui_events.default_scope.click.x = 0;
+        ui_events.default_scope.click.y = 0;
+        ui_events.default_scope.click.time = 0;
+        ui_events.default_scope.click.widget = NULL;
+        ui_events.default_scope.click.interval = DBLCLICK_INTERVAL;
+        list_create(&ui_events.default_scope.touch_capturers);
         ui_events.base_event_id = UI_EVENT_USER + 1000;
         dict_init_string_key_type(&ui_events.event_ids_type);
         ui_events.event_ids = dict_create(&ui_events.event_ids_type, NULL);
@@ -1149,27 +1272,37 @@ void ui_init_events(void)
         }
 }
 
-int ui_dispatch_event(ui_event_t *e)
+int ui_dispatch_event_to(ui_widget_t *root, ui_event_t *e)
 {
+        ui_event_scope_t *scope = ui_event_scope_ensure(root);
+
+        if (!scope) {
+                return -1;
+        }
         switch (e->type) {
         case UI_EVENT_WHEEL:
-                return ui_on_wheel_event(e);
+                return ui_on_wheel_event(scope, e);
         case UI_EVENT_MOUSEDOWN:
         case UI_EVENT_MOUSEMOVE:
         case UI_EVENT_MOUSEUP:
-                return ui_on_mouse_event(e);
+                return ui_on_mouse_event(scope, e);
         case UI_EVENT_KEYPRESS:
         case UI_EVENT_KEYDOWN:
         case UI_EVENT_KEYUP:
-                return ui_on_keyboard_event(e);
+                return ui_on_keyboard_event(scope, e);
         case UI_EVENT_TOUCH:
-                return ui_on_touch_event(e);
+                return ui_on_touch_event(scope, e);
         case UI_EVENT_TEXTINPUT:
-                return ui_on_text_input(e);
+                return ui_on_text_input(scope, e);
         default:
                 break;
         }
         return -1;
+}
+
+int ui_dispatch_event(ui_event_t *e)
+{
+        return ui_dispatch_event_to(ui_root(), e);
 }
 
 static void ui_on_destroy_event_pack(void *arg)
@@ -1197,9 +1330,20 @@ void ui_process_events(void)
 
 void ui_destroy_events(void)
 {
+        list_node_t *node;
+        ui_event_scope_t *scope;
+
         rbtree_destroy(&ui_events.event_names);
         dict_destroy(ui_events.event_ids);
-        ui_clear_touch_capturers(&ui_events.touch_capturers);
+        for (list_each(node, &ui_events.scopes)) {
+                scope = node->data;
+                ui_clear_touch_capturers(&scope->touch_capturers);
+                list_destroy(&scope->touch_capturers, NULL);
+                free(scope);
+        }
+        list_destroy(&ui_events.scopes, NULL);
+        ui_clear_touch_capturers(&ui_events.default_scope.touch_capturers);
+        list_destroy(&ui_events.default_scope.touch_capturers, NULL);
         list_destroy_without_node(&ui_events.queue, ui_on_destroy_event_pack);
         list_destroy(&ui_events.event_mappings, ui_event_mapping_destroy);
         ui_events.event_ids = NULL;

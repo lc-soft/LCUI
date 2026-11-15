@@ -137,6 +137,7 @@
 | I9 | 测量前恢复子项声明的宽高和双向 margin | `ui_flexbox_try_measure_container_height` | shrink 高度、旧 auto margin 污染内在高度 |
 | I10 | 测量宽只解析一次，快路径、reflow、缓存键共用 | `ui_flexbox_resolve_measure_width` | 同结构因路径不同而折行/父高不一致 |
 | I11 | flex item 的交叉轴对齐统一由 `align-self` 解析，`auto` 继承父级 `align-items` | `ui_flexbox_get_align_self` | 单个 item 无法覆盖父级对齐，或测量/布局使用不同对齐值 |
+| I12 | 更新过程中新增或移动的部件不会被本帧丢弃：`ui_process_mutations` 只清除本帧真正更新过的部件标记，未处理的部件保留标记并在帧尾重新向上请求更新 | `ui_updater_update` / `ui_process_mutations` | 在 `UI_TASK_BEFORE_UPDATE` 里创建 portal/content 时首帧样式未生效、内容意外可见（如 dropdown content 未隐藏） |
 
 ## 5. 已知缺口 / deferred
 

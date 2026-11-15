@@ -122,7 +122,7 @@ static void test_click_focuses_target(void)
         ui_widget_emit_event(label, ev, NULL);
 
         ctest_equal_bool("click should focus the target widget",
-                         ui_get_focus() == target, true);
+                         ui_get_focus_in(ui_root()) == target, true);
 
         ui_widget_destroy(label);
         ui_widget_destroy(target);

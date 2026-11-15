@@ -337,7 +337,7 @@ static void ui_dialog_open_data(ui_dialog_t *data)
         if (!data->portal || !data->content) {
                 return;
         }
-        data->last_focus = ui_get_focus();
+        data->last_focus = ui_get_focus_in(data->owner);
         if (data->last_focus) {
                 ui_widget_off(data->last_focus, "destroy",
                               ui_dialog_on_last_focus_destroy, data);

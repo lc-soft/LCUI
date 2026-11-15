@@ -315,7 +315,7 @@ static void ui_input_group_on_update(ui_widget_t *w, ui_task_type_t task)
                 return;
         }
         ui_input_group_toggle_status(
-            w, "focused", ui_input_group_contains(w, ui_get_focus()));
+            w, "focused", ui_input_group_contains(w, ui_get_focus_in(w)));
         count = ui_input_group_child_count(w);
         if (count == 0) {
                 ui_input_group_toggle_status(w, "block", false);

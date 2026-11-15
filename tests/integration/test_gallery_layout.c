@@ -305,7 +305,7 @@ static void home_scene_resize(float width, float height)
 static void home_scene_native_resize(float width, float height)
 {
         ptk_window_t *window = ui_server_get_window(ui_root());
-        float scale = ui_get_actual_scale();
+        float scale = ui_server_get_window_scale(window);
         int i;
 
         ptk_window_set_size(window, (int)(width * scale),
@@ -924,12 +924,16 @@ static void test_hover_keeps_column_width(void)
 
 void test_gallery_layout(void)
 {
+        lcui_window_options_t opt = { 0 };
+        lcui_window_t *win;
+
         lcui_init();
-        ptk_window_hide(ui_server_get_window(ui_root()));
         ui_register_home_grid();
         ui_load_css_file("test_gallery_layout.css");
         ui_widget_set_title(ui_root(), L"test gallery layout");
         home_scene_build();
+        win = lcui_window_create_for_widget(ui_root(), &opt);
+        ctest_equal_bool("should create a window", win != NULL, true);
 
         ctest_describe("gallery columns", test_columns_follow_window);
         ctest_describe("gallery initial mount", test_initial_mount_single_pass);

@@ -487,7 +487,7 @@ static void ui_popover_close_data(ui_popover_t *data)
                 data->pending_open = false;
                 return;
         }
-        ui_widget_t *focus = ui_get_focus();
+        ui_widget_t *focus = ui_get_focus_in(data->owner);
 
         data->open = false;
         data->pending_open = false;
@@ -699,7 +699,7 @@ static void ui_popover_open_data(ui_popover_t *data)
                               ui_popover_on_last_focus_destroy, data);
                 data->last_focus = NULL;
         }
-        data->last_focus = ui_get_focus();
+        data->last_focus = ui_get_focus_in(data->owner);
         if (data->last_focus) {
                 ui_widget_on(data->last_focus, "destroy",
                              ui_popover_on_last_focus_destroy, data);

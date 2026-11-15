@@ -49,6 +49,22 @@ static struct lcui_app {
         uint32_t frames_per_second;
 } lcui_app;
 static char *lcui_app_id = NULL;
+static ptk_window_t *lcui_app_active_window = NULL;
+
+static ui_widget_t *lcui_app_get_active_content(void)
+{
+        if (!lcui_app_active_window) {
+                return NULL;
+        }
+        return ui_server_get_widget(lcui_app_active_window);
+}
+
+void lcui_app_forget_window(ptk_window_t *window)
+{
+        if (lcui_app_active_window == window) {
+                lcui_app_active_window = NULL;
+        }
+}
 
 static bool lcui_app_id_is_valid(const char *app_id)
 {
@@ -95,17 +111,23 @@ static void lcui_dispatch_ui_mouse_event(ui_event_type_t type,
 {
         ui_event_t e = { 0 };
         float scale = ui_server_get_window_scale(app_evt->window);
+        ui_widget_t *content = ui_server_get_widget(app_evt->window);
 
         e.type = type;
         e.mouse.y = (float)round(app_evt->mouse.y / scale);
         e.mouse.x = (float)round(app_evt->mouse.x / scale);
-        ui_dispatch_event(&e);
+        if (content) {
+                ui_dispatch_event_to(content, &e);
+        } else {
+                ui_dispatch_event(&e);
+        }
 }
 
 static void lcui_dispatch_ui_keyboard_event(ui_event_type_t type,
                                             ptk_event_t *app_evt)
 {
         ui_event_t e = { 0 };
+        ui_widget_t *content = lcui_app_get_active_content();
 
         e.type = type;
         e.key.code = app_evt->key.code;
@@ -114,7 +136,11 @@ static void lcui_dispatch_ui_keyboard_event(ui_event_type_t type,
         e.key.shift_key = app_evt->key.shift_key;
         e.key.ctrl_key = app_evt->key.ctrl_key;
         e.key.meta_key = app_evt->key.meta_key;
-        ui_dispatch_event(&e);
+        if (content) {
+                ui_dispatch_event_to(content, &e);
+        } else {
+                ui_dispatch_event(&e);
+        }
 }
 
 static void lcui_dispatch_ui_touch_event(ptk_event_t *app_event)
@@ -122,6 +148,7 @@ static void lcui_dispatch_ui_touch_event(ptk_event_t *app_event)
         size_t i;
         ui_event_t e = { 0 };
         float scale = ui_server_get_window_scale(app_event->window);
+        ui_widget_t *content = ui_server_get_widget(app_event->window);
 
         e.type = UI_EVENT_TOUCH;
         e.touch.n_points = app_event->touch.n_points;
@@ -145,30 +172,44 @@ static void lcui_dispatch_ui_touch_event(ptk_event_t *app_event)
                 e.touch.points[i].y =
                     (float)round(app_event->touch.points[i].y / scale);
         }
-        ui_dispatch_event(&e);
+        if (content) {
+                ui_dispatch_event_to(content, &e);
+        } else {
+                ui_dispatch_event(&e);
+        }
         ui_event_destroy(&e);
 }
 
 static void lcui_dispatch_ui_textinput_event(ptk_event_t *app_evt)
 {
         ui_event_t e = { 0 };
+        ui_widget_t *content = lcui_app_get_active_content();
 
         e.type = UI_EVENT_TEXTINPUT;
         e.text.length = app_evt->text.length;
         e.text.text = y_wcsdup(app_evt->text.text);
-        ui_dispatch_event(&e);
+        if (content) {
+                ui_dispatch_event_to(content, &e);
+        } else {
+                ui_dispatch_event(&e);
+        }
         ui_event_destroy(&e);
 }
 
-static void lcui_dispatch_ui_wheel_event(app_wheel_event_t *wheel)
+static void lcui_dispatch_ui_wheel_event(ptk_event_t *app_evt)
 {
         ui_event_t e = { 0 };
+        ui_widget_t *content = ui_server_get_widget(app_evt->window);
 
         // TODO:
         e.type = UI_EVENT_WHEEL;
         e.wheel.delta_mode = UI_WHEEL_DELTA_PIXEL;
-        e.wheel.delta_y = wheel->delta_y;
-        ui_dispatch_event(&e);
+        e.wheel.delta_y = app_evt->wheel.delta_y;
+        if (content) {
+                ui_dispatch_event_to(content, &e);
+        } else {
+                ui_dispatch_event(&e);
+        }
 }
 
 static void lcui_dispatch_ui_event(ptk_event_t *app_event)
@@ -196,10 +237,23 @@ static void lcui_dispatch_ui_event(ptk_event_t *app_event)
                 lcui_dispatch_ui_touch_event(app_event);
                 break;
         case PTK_EVENT_WHEEL:
-                lcui_dispatch_ui_wheel_event(&app_event->wheel);
+                lcui_dispatch_ui_wheel_event(app_event);
                 break;
         case PTK_EVENT_COMPOSITION:
                 lcui_dispatch_ui_textinput_event(app_event);
+                break;
+        case PTK_EVENT_FOCUS:
+                lcui_app_active_window = app_event->window;
+                break;
+        case PTK_EVENT_UNFOCUS:
+                if (lcui_app_active_window == app_event->window) {
+                        lcui_app_active_window = NULL;
+                }
+                break;
+        case PTK_EVENT_CLOSE:
+                if (lcui_app_active_window == app_event->window) {
+                        lcui_app_active_window = NULL;
+                }
                 break;
         default:
                 break;
@@ -309,6 +363,7 @@ void lcui_app_init(void)
 {
         uint64_t now = (uint64_t)y_gettime();
 
+        lcui_app_active_window = NULL;
         lcui_worker_init();
         ptk_steptimer_init(&lcui_app.anim_timer);
         lcui_app.anim_timer.is_fixed_time_step = true;

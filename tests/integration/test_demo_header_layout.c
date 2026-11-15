@@ -307,10 +307,14 @@ static void run_file_width(void)
 
 void test_demo_header_layout(void)
 {
+        lcui_window_options_t opt = { 0 };
+        lcui_window_t *win;
+
         lcui_init();
-        ptk_window_hide(ui_server_get_window(ui_root()));
         ui_load_css_string_global_chunks();
         ui_widget_set_title(ui_root(), L"test demo header layout");
+        win = lcui_window_create_for_widget(ui_root(), &opt);
+        ctest_equal_bool("should create a window", win != NULL, true);
 
         ctest_describe("demo header text sized tabs", run_text_sized_tabs);
         ctest_describe("demo header fixed tabs", run_fixed_tabs);

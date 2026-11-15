@@ -105,8 +105,13 @@ static void should_clear_cursor_when_hovered_widget_destroyed(void)
 
 void test_cursor(void)
 {
+        lcui_window_options_t opt = { 0 };
+        lcui_window_t *win;
+
         lcui_init();
         cursor_scene_build();
+        win = lcui_window_create_for_widget(ui_root(), &opt);
+        ctest_equal_bool("should create a window", win != NULL, true);
         lcui_ui_update();
         window = ui_server_get_window(ui_root());
 

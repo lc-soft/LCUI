@@ -10,6 +10,7 @@
  */
 
 #include <LCUI.h>
+#include "preview_window.h"
 #include <ptk/main.h>
 #include "../scenes/shimmer_scene.h"
 
@@ -20,5 +21,6 @@ int main(int argc, char **argv)
         lcui_init();
         shimmer_scene_build(&scene);
         ui_widget_set_title(ui_root(), L"shimmer preview");
+        preview_show_default_window();
         return lcui_main();
 }

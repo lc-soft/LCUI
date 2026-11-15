@@ -219,12 +219,12 @@ static void test_addon_focus_delegation(void)
 
         emit_click(label);
         ctest_equal_bool("clicking addon focuses the input",
-                         ui_get_focus() == input, true);
+                         ui_get_focus_in(ui_root()) == input, true);
 
         ui_set_focus(outside);
         emit_click(button);
         ctest_equal_bool("clicking an addon button keeps focus off the input",
-                         ui_get_focus() == input, false);
+                         ui_get_focus_in(ui_root()) == input, false);
 
         ui_widget_destroy(group);
         ui_widget_destroy(outside);
@@ -300,7 +300,7 @@ static void test_addon_wrapper_focus(void)
 
         emit_click(label);
         ctest_equal_bool("wrapper click focuses the input",
-                         ui_get_focus() == input, true);
+                         ui_get_focus_in(ui_root()) == input, true);
 
         ui_widget_destroy(group);
         ui_clear_trash();
@@ -356,7 +356,7 @@ static void test_mark_control(void)
                          custom->computed_style.flex_grow > 0, true);
         emit_click(label);
         ctest_equal_bool("addon click focuses the marked control",
-                         ui_get_focus() == custom, true);
+                         ui_get_focus_in(ui_root()) == custom, true);
 
         ui_widget_destroy(group);
         ui_clear_trash();
@@ -383,7 +383,7 @@ static void test_root_disabled_focus(void)
         ui_set_focus(outside);
         emit_click(label);
         ctest_equal_bool("disabled group addon does not steal focus",
-                         ui_get_focus() == outside, true);
+                         ui_get_focus_in(ui_root()) == outside, true);
 
         ui_widget_destroy(group);
         ui_widget_destroy(outside);

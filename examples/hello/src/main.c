@@ -14,6 +14,8 @@ static void on_btn_click(ui_widget_t *self, ui_event_t *e, void *arg)
 int main(int argc, char **argv)
 {
         ui_widget_t *pack;
+        lcui_window_options_t opt = { 0 };
+        lcui_window_t *window;
 
         lcui_init();
         pack = ui_load_xml_file("hello.xml");
@@ -23,5 +25,7 @@ int main(int argc, char **argv)
         ui_root_append(pack);
         ui_widget_unwrap(pack);
         ui_widget_on(ui_get_widget("btn"), "click", on_btn_click, NULL);
+        window = lcui_window_create_for_widget(ui_root(), &opt);
+        lcui_window_show(window);
         return lcui_main();
 }
