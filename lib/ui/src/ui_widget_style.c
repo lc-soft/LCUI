@@ -508,6 +508,8 @@ void ui_widget_update_style(ui_widget_t *w)
         char *old_background = NULL;
         bool reuse_background;
 
+        memset(&new_style, 0, sizeof(new_style));
+
         if (w->computed_style.background_image) {
                 old_background = y_strdup(w->computed_style.background_image);
         }

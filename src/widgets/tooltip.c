@@ -941,6 +941,8 @@ static void ui_tooltip_on_content_layout(ui_widget_t *w, ui_event_t *e,
                 data->settle_stage = 2;
                 ui_widget_set_style_keyword_value(
                     data->content, css_prop_visibility, CSS_KEYWORD_VISIBLE);
+                data->content->computed_style.type_bits.visibility =
+                    CSS_VISIBILITY_VISIBLE;
         }
 }
 
@@ -953,6 +955,8 @@ static void ui_tooltip_show_data(ui_tooltip_t *data)
         if (data->content) {
                 ui_widget_set_style_keyword_value(
                     data->content, css_prop_visibility, CSS_KEYWORD_HIDDEN);
+                data->content->computed_style.type_bits.visibility =
+                    CSS_VISIBILITY_HIDDEN;
         }
         data->open = true;
         data->reveal_pending = true;

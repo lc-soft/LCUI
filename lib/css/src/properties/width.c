@@ -23,5 +23,10 @@ static void set_width(css_computed_style_t *computed, uint8_t keyword,
 int css_cascade_width(const css_style_array_value_t input,
                       css_computed_style_t *computed)
 {
+        if (input[0].type == CSS_KEYWORD_VALUE &&
+            input[0].keyword_value == CSS_KEYWORD_FIT_CONTENT) {
+                set_width(computed, CSS_WIDTH_FIT_CONTENT, 0, CSS_UNIT_PX);
+                return 0;
+        }
         return css_cascade_length_auto(input, computed, set_width);
 }
