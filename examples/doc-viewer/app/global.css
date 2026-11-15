@@ -481,17 +481,21 @@ p {
  * for language/file/source selection. */
 
 /* The header uses flex so that the file tab group, the language tab
- * group, and the copy button share a single row.  The `.demo-files`
- * and `.demo-languages` containers themselves are plain blocks; their
- * `.demo-tab` children are laid out with `display: inline-block` (see
- * "CSS `display` property" in .opencode/skills/lcui-cli/SKILL.md). */
+ * group, and the copy button share a single row.  Both tab groups are
+ * flex containers themselves: laying their tabs out as inline-block
+ * made the language group wrap whenever flex width distribution handed
+ * it one pixel less than its max-content width, which pushed TSX onto a
+ * second row after selecting a language with two files. */
 
 .code-block-header .demo-files {
   flex: 1;
+  min-width: 0;
 }
 .code-block-header .demo-languages,
 .code-block-header .demo-files {
   @apply px-1 py-1;
+  display: flex;
+  align-items: center;
 }
 
 .demo .code-block-header {
