@@ -4,7 +4,10 @@
   </a>
   <h3 align="center">LCUI</h3>
   <p align="center">
-    The C library for build user interfaces
+    The C library for building user interfaces
+  </p>
+  <p align="center">
+    <a href="README.zh-cn.md">中文</a> / <strong>English</strong>
   </p>
   <p align="center">
     <a href="https://github.com/lc-soft/LCUI/actions"><img alt="GitHub Actions" src="https://github.com/lc-soft/LCUI/workflows/C%2FC%2B%2B%20CI/badge.svg"></a>
@@ -12,299 +15,216 @@
     <img src="https://img.shields.io/github/repo-size/lc-soft/LCUI.svg" alt="Repo size">
     <img src="https://img.shields.io/github/languages/code-size/lc-soft/LCUI.svg" alt="Code size">
   </p>
+  <img src="./preview-en.png" alt="preivew">
 </p>
 
 ## Introduction
 
-[中文版说明文档](README.zh-cn.md)
-
 LCUI is a library written in C for building graphical user interfaces. Its goal is to explore and practice new ways of developing user interfaces, characterized by its small size, ease of use, and provision of convenient development tools to help developers quickly create desktop applications with graphical user interfaces.
 
-**LC** originates from the initials of the author's name. The library was initially designed to help the author develop small projects and gain development experience. However, the author did not gain a competitive advantage in the job market, which is crowded with C/C++ experts, and thus had to work in web front-end development. As a result, LCUI now leans towards integrating technologies from the web front-end domain.
+**LC** originates from the initials of the author's name. LCUI began as a way for the author to build small projects and gain development experience. He did not gain an edge in the crowded C/C++ job market, however, and had no choice but to move into web front-end development; as a result, LCUI now leans towards integrating web technologies.
 
 ### Key Features
 
-- **Cross-platform:** Supports Windows and Linux.
-- **Fully custom-drawn components:** Ensures consistent appearance and behavior of components across platforms.
-- **DPI awareness:** Automatically scales the UI on high-resolution screens to maintain a clear display.
-- **Built-in CSS engine:** Enables the use of CSS for defining UI styles and layouts, making it easier for developers with web development experience to get started.
-- **Modern development tools:** Includes tools that allow you to build user interfaces using [TypeScript](https://lcui-dev.github.io/docs/guide/typescript) with JSX syntax, the React library, and other web frontend technologies.
+- **Cross-platform:** Windows and Linux.
+- **Fully custom-drawn widgets:** consistent appearance and behavior across platforms.
+- **Rich built-in widgets:** buttons, inputs, selects, dialogs, alerts, badges, items, and more.
+- **CSS layout and styling:** approachable for developers with web experience.
+- **DPI awareness:** automatic scaling on high-resolution screens.
+- **Modern tooling:** describe UI with TypeScript + JSX + React; `lcui build` generates C source.
 
-### Development Experience Preview
+> [!WARNING]
+> This document targets the next release; some features and design are still in development. Content is for reference only.
 
-You can get an overview of the development experience for LCUI applications from the following image:
+## Core concepts
 
-![preview](preview.png)
+- **Widgets**: the UI is built from widgets; widgets nest to form a widget tree (similar to the web DOM).
+- **Events**: input events enter through a window and travel along the widget tree; focus decides where keyboard input goes.
+- **Frame loop**: the main loop processes events, updates state, repaints dirty regions, and drives animations and async work.
+- **Windows**: a window is a render target that hosts a widget tree and handles size, DPI, and close events.
 
-- **Component Development in React-like Style:** Writing UI configuration files using TypeScript. With the combined advantages of TypeScript, JSX syntax, and the LCUI React library, you can succinctly describe UI structure, resource dependencies, component states, data binding, and event binding.
-- **Various Stylesheet Writing Methods:** [Tailwind CSS](https://tailwindcss.com/), [CSS Modules](https://github.com/css-modules/css-modules), [Sass](https://sass-lang.com/), and global CSS.
-- **File-system based router:** Organize application pages in directory form, with each page corresponding to a directory. The path of the directory serves as the route for that page. With the built-in application router, you can easily implement page switching and navigation without manual route configuration.
-- **User-friendly and Modern Icon Library:** Icons are sourced from the [fluentui-system-icons](https://github.com/microsoft/fluentui-system-icons) library, with partial customization to fit LCUI's characteristics, offering similar usage patterns.
-- **Command-line Development Tool:** Run the `lcui build` command to preprocess configuration files within the app directory, then generate corresponding C source code and resource files.
+## Architecture
 
-### Architecture
+LCUI is built on top of these libraries:
 
-Over time LCUI has been built up to be based on various libraries:
+- [`lib/yutil`](./lib/yutil): common data structures and utilities.
+- [`lib/pandagl`](./lib/pandagl): fonts, text layout, image I/O, and rendering.
+- [`lib/css`](./lib/css): CSS parser and selector engine.
+- [`lib/ptk`](./lib/ptk): cross-platform message loop, windows, timers, and IME.
+- [`lib/thread`](./lib/thread): cross-platform threading.
+- [`lib/router`](./lib/router): route mapping and navigation.
+- [`lib/ui`](./lib/ui): widgets, events, styles, and drawing.
+- [`lib/ui-xml`](./lib/ui-xml): create UI from XML.
+- [`lib/ui-server`](./lib/ui-server): maps widgets to system windows.
 
-- [lib/yutil](./lib/yutil): Utility library providing common data structures and functions.
-- [lib/pandagl](./lib/pandagl): PandaGL (Panda Graphics Library), a graphics library offering font management, text layout, image processing, and rendering capabilities.
-- [lib/css](./lib/css): CSS parser and selector engine, enabling CSS parsing and selection functionalities.
-- [lib/ptk](./lib/ptk): Platform Toolkit library offering cross-platform unified system-related APIs, including message loops, window management, timers, worker threads, and input methods.
-- [lib/thread](./lib/thread): Thread library offering cross-platform multithreading capabilities.
-- [lib/router](./lib/router): Router manager offering routing and navigation functionalities.
-- [lib/ui](./lib/ui): Core UI library that manages UI components, event queues, style computation, drawing, and other essential UI functionalities.
-- [lib/ui-xml](./lib/ui-xml): XML parsing library enabling the creation of UI components from XML file content.
-- [lib/ui-server](./lib/ui-server): UI server that maps UI components to system windows, including cursor rendering for the framebuffer backend.
-
-The core source code of LCUI is located in the `src/` directory and is divided into the following modules:
-
-- **app:** Application lifecycle, event, and UI management.
-- **fonts:** Default font settings.
-- **settings:** Global settings, providing switches and parameter configurations for certain features.
-- **ui:** UI and window management.
-- **widgets:** Predefined components.
-- **worker:** Asynchronous task management.
+Core source lives in `src/`: `app`, `fonts`, `settings`, `ui`, `widgets`, `worker`.
 
 ## Quick Start
 
-Before you begin, you need to install the following software on your computer:
-
-- [Git](https://git-scm.com/download/): Version control tool used to download the source code of the example project.
-- [XMake](https://xmake.io/#/zh-cn/?id=%e5%ae%89%e8%a3%85): Build tool used to build the project.
-- [Node.js](https://nodejs.org/): JavaScript runtime environment used to run the LCUI command-line development tool.
-
-Then, run the following commands in a command-line window:
+### Run Hello World
 
 ```shell
-# Install the LCUI command-line development tool
-npm install -g @lcui/cli
+git clone https://github.com/lc-soft/LCUI.git
+cd LCUI
+xmake run hello
+```
 
-# Create an LCUI application project
+### Minimal program
+
+```c
+#include <LCUI.h>
+/* Windows: provides the WinMain → main entry wrapper */
+#include <LCUI/main.h>
+
+int main(int argc, char **argv)
+{
+        ui_widget_t *text;
+        lcui_window_t *win;
+
+        /**
+         * Build the window options
+         * title: window title
+         * id: window state id, used to save/restore geometry
+         * width/height: default client size on first run
+         */
+        lcui_window_options_t opt = {
+                .title = L"Hello",
+                .id = "main",
+                .width = 800,
+                .height = 600,
+        };
+
+        /* initialize LCUI subsystems */
+        lcui_init();
+
+        text = ui_create_widget("text");
+        ui_text_set_content(text, "Hello, LCUI!");
+        /* attach the text to the root widget so the window can render it */
+        ui_root_append(text);
+
+        /* Create the window and bind the root widget as its content; it stays hidden */
+        win = lcui_window_create_for_widget(ui_root(), &opt);
+
+        /* load the config and restore the saved window geometry */
+        lcui_load_settings("dev.example.hello");
+
+        /* Show the window; it becomes visible after the first rendered frame */
+        lcui_window_show(win);
+
+        /* run the main loop and clean up on exit */
+        return lcui_main();
+}
+```
+
+### Browse all widgets (optional)
+
+`doc-viewer` showcases all built-in widgets, styles, and interactions. Building it requires Node.js and `@lcui/cli`:
+
+```shell
+npm install -g @lcui/cli
+cd examples/doc-viewer
+npm install
+lcui build --skip-xmake
+cd ../..
+xmake run doc-viewer
+```
+
+### Create a new project
+
+`@lcui/cli` is the command-line tool for LCUI. It scaffolds projects, compiles TSX/CSS resources into C source, and works with xmake to build the app.
+
+```shell
+npm install -g @lcui/cli
 lcui create my-lcui-app
 ```
 
-Follow the prompts provided by the commands afterward.
+Follow the prompts.
 
-## Documentation
+#### Manual xmake setup
 
-- [Online Documentation](https://lcui-dev.github.io/docs/next/guides/base/)
-- [Request for Comments (RFC)](https://lcui-dev.github.io/docs/next/rfcs/)
-- [Changelog](CHANGELOG.md)
-- [Contribution Guidelines](.github/CONTRIBUTING.md)
+Without the scaffold, write `xmake.lua` directly:
 
-### Tutorials
+```lua
+add_repositories("lcui-repo https://github.com/lcui-dev/xmake-repo.git")
+add_requires("lcui")
 
-<table>
-  <thead>
-    <tr>
-      <th width="140">Title</th>
-      <th>Preview</th>
-      <th>Summary</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>
-        <a href="https://lcui-dev.github.io/docs/tutorials/kantu">Image Viewer</a>
-      </td>
-      <td><img src="./examples/kantu.jpg" alt="kantu" /></td>
-      <td>Develop an image viewer program based on the LCUI library, build its graphical interface with web technologies, implement the interface interaction logic and various functions with C language, and deeply explore the features and development techniques of LCUI in the UI aspect.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="https://lcui-dev.github.io/docs/tutorials/todolist">Todo List</a>
-      </td>
-      <td><img src="./examples/todolist.jpg" alt="kantu" /></td>
-      <td>Learn the basic concepts and usage of LCUI, as well as how to use it to build UI and implement state management, UI updates, and interactions.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="https://lcui-dev.github.io/docs/tutorials/render-fabric">Fabric</a>
-      </td>
-      <td><img src="./examples/fabric.jpg" alt="kantu" /></td>
-      <td>Rewrite the existing fabric simulation program's JavaScript source code in C language, and use the cairo graphics library for fabric rendering. Then, apply LCUI to implement fabric animation playback and interaction.</td>
-    </tr>
-    <tr>
-      <td>
-        <a href="https://lcui-dev.github.io/docs/2.x/tutorial/browser">Browser</a>
-        <b>(Outdated)</b>
-      </td>
-      <td><img src="./examples/browser.jpg" alt="browser" /></td>
-      <td>Referencing a web browser, use LCUI to implement similar UI structure, layout, style, and multi-tab management features. Utilize LCUI's routing management functionality to implement multi-tab page state management and navigation, as well as a simple file browsing page.</td>
-    </tr>
-  </tbody>
-</table>
+target("my-app")
+    set_kind("binary")
+    add_files("src/*.c")
+    add_packages("lcui")
+```
 
-## Roadmap
+Then run:
 
-Below are the items for potential future development:
+```shell
+xmake run my-app
+```
 
-- **LCUI**
+The `lcui` package is self-contained. Do not also depend on the sub-library packages (`pandagl`, `css`, `ptk`, ...) in the same target, or you will get duplicate symbols. If you only need one sub-library, use e.g. `add_requires("pandagl")`.
 
-  - Improve API design.
-  - Enhance the CSS engine to support `inherit` and `!important`.
-  - Add an [SDL](https://www.libsdl.org/) backend to replace the lib/ptk library.
-  - Adapt other open-source graphics libraries to achieve better rendering performance.
-  - Multi language support for internationalization.
-  - Optimize memory usage.
-  - Improve performance.
+## Documentation & examples
 
-- **Command-Line Tools**
+- [Online documentation](https://lcui-dev.github.io/docs/next/guides/base/)
+- [Bundled examples](examples/): `hello`, `todolist`, `fabric`, `doc-viewer`
+- Tutorials: [Image viewer](https://lcui-dev.github.io/docs/tutorials/kantu), [Todo list](https://lcui-dev.github.io/docs/tutorials/todolist), [Fabric animation](https://lcui-dev.github.io/docs/tutorials/render-fabric)
+- [RFCs](https://lcui-dev.github.io/docs/next/rfcs/) / [Changelog](CHANGELOG.md) / [Contributing](.github/CONTRIBUTING.md)
 
-  - `lcui build --watch`: Continuously monitor file changes and automatically rebuild.
-  - `lcui dev-server`: Similar to webpack-dev-server, build LCUI applications as websites to allow developers to preview UI in the browser.
-  - Add build caching to rebuild only the modified files.
+## Build and test from source
 
-- **React Component Library**  
-  Develop a component library for LCUI applications using TypeScript + React, inspired by some web frontend component libraries (e.g., [radix](https://www.radix-ui.com/), [shadcn/ui](https://ui.shadcn.com/)), and reuse components from the [LC Design](https://github.com/lcui-dev/lc-design) library.
+```shell
+git clone https://github.com/lc-soft/LCUI.git
+cd LCUI
+xmake build
+xmake test
+```
 
-- **Documentation**
-  - Tutorials
-  - Request for Comments (RFC)
+## Contributing
 
-## Contribution
+- Improve the docs and examples under `lib/`.
+- [Report issues](https://github.com/lc-soft/LCUI/issues) and verify fixes.
+- Search for [FIXME](https://github.com/lc-soft/LCUI/search?l=C&q=FIXME) / [TODO](https://github.com/lc-soft/LCUI/search?l=C&q=TODO) comments and fix them.
+- Review [pull requests](https://github.com/lc-soft/LCUI/pulls).
 
-Think LCUI is slow to update? there are many ways to [contribute](.github/CONTRIBUTING.md) to LCUI.
-
-- [Submit bugs](https://github.com/lc-soft/LCUI/issues) and help us verify fixes as they are checked in.
-- Share some interesting ideas related to GUI development in the [issues page](https://github.com/lc-soft/LCUI/issues).
-- [Search for FIXME comments](https://github.com/lc-soft/LCUI/search?l=C&q=FIXME) in the source code and try to fix them.
-- Fund the issues that interest you on [IssueHunt](https://issuehunt.io/r/lc-soft/LCUI) to attract other developers to contribute.
-- Review the [source code changes](https://github.com/lc-soft/LCUI/pulls).
-- [Contribute bug fixes](CONTRIBUTING.md).
-
-LCUI has adopted the code of conduct defined by the Contributor Covenant. This document is used across many open source communities, and we think it articulates our values well. For more, see the [Code of Conduct](CODE_OF_CONDUCT.md).
+This project follows the Contributor Covenant [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## FAQ
 
-**Compilation error**
+### Compilation errors
 
-The build configuration of this project has included the "Treat Warnings as Errors" compilation option. This might be because your compiler is relatively new and can detect more issues from the code. 
+The build treats warnings as errors. A newer compiler may report more issues. Search all `xmake.lua` files for `set_warnings("all", "error")` and remove that rule.
 
-You can try to search for all xmake.lua files that contain `set_warnings("all", "error")` and remove this rule.
+### Is this a browser engine, or an Electron-like library with an embedded browser?
 
-**Is this a browser engine? Or a development library like Electron that integrates a browser environment?**
+No. Think of it as a traditional GUI library that borrows some web technologies.
 
-No, you can think of it as a traditional GUI development library that incorporates some web technologies.
+### Why choose LCUI over other GUI libraries?
 
-**Why should I choose LCUI over other GUI libraries/frameworks?**
+Consider other GUI libraries first. LCUI currently lacks:
 
-It's recommended to prioritize other GUI libraries/frameworks, as LCUI currently lacks:
+- **Widget coverage is still limited**: common widgets are built in, but complex or specialized controls still need to be built yourself.
+- **Fast graphics rendering**: no GPU acceleration; large, complex UIs may stutter.
+- **Animation system**: limited visual feedback.
+- **Detailed documentation**: existing docs and examples are introductory; deep learning requires reading the source.
+- **Frequent updates**: limited by the maintainer's time; requested features or bugs may not be resolved.
 
-- **Rich Built-in Components:** You will need to build almost all the components in your UI from scratch, leading to higher development costs.
-- **Efficient Graphics Rendering Performance:** Interfaces with extensive and complex content may experience lag.
-- **Animation System:** The lack of visual feedback affects the user interaction experience.
-- **Detailed and User-friendly Documentation**: The existing documentation and examples are only for a simple understanding. If you want to study in depth, you need to read the source code, so the learning cost is relatively high.
-- **Active Updates**: Limited by the maintainer's personal interests and time, the update frequency of this project is very low. Therefore, the functional requirements or bugs you submit may not necessarily be resolved, especially those in the old versions.
+Given its current state, LCUI is best for simple tools with minimal UI content and interaction, or the maintainer's personal needs.
 
-Given its current state, LCUI is best suited for fulfilling the maintainer's personal needs or developing simple tools with minimal UI content and interactions.
+### If it uses TypeScript, why not just use Electron?
 
-**Support development with TypeScript? If I know how to use it, why wouldn’t I just go with Electron?**
+TypeScript is mainly used to describe UI and resource dependencies; few language features are involved, so you can follow the examples. If you have solid web experience and are willing to learn Electron, Electron is the better choice.
 
-Currently, TypeScript is primarily used to describe UI and resource dependencies, with only a few TypeScript features in use. You don’t need to study it in depth; in most cases, you can simply refer to example code for implementation.
+### Please add macOS / Android support
 
-If you have extensive web development experience and are willing to learn Electron, then Electron is clearly the better choice.
+Those ports are expensive to develop and maintain and are not currently planned. If you need them, you can try implementing them, e.g. as separate `lcui-macos` / `lcui-android` projects.
 
-**How about CSS support?**
+### I want a feature like the one in another project
 
-The following is a list of supported CSS features. Checked is supported (But does not mean full support). Unlisted properties are not supported by default.
+Open an [issue](https://github.com/lc-soft/LCUI/issues/new/choose) and fill in the template. Describe the need clearly and, if possible, include an implementation idea and references. You can also follow the existing [RFCs](https://lcui-dev.github.io/docs/next/rfcs/).
 
-<details>
-  <summary>CSS feature coverage</summary>
+### Please add Python / Go / Rust / C# / Java bindings
 
-- at rules
-  - [x] `@font-face`
-  - [ ] `@keyframes`
-  - [ ] `@media`
-- keywords
-  - [ ] `!important`
-- selectors
-  - [x] `*`
-  - [x] `type`
-  - [x] `#id`
-  - [x] `.class`
-  - [x] `:hover`
-  - [x] `:focus`
-  - [x] `:active`
-  - [x] `:first-child`
-  - [x] `:last-child`
-  - [ ] `[attr="value"]`
-  - [ ] `:not()`
-  - [ ] `:nth-child()`
-  - [ ] `parent > child`
-  - [ ] `a ~ b`
-  - [ ] `::after`
-  - [ ] `::before`
-  - [ ] ...
-- units
-  - [x] px
-  - [x] dp
-  - [x] sp
-  - [x] pt
-  - [x] %
-  - [ ] rem
-  - [ ] vh
-  - [ ] vw
-- properties
-  - [x] top, right, bottom, left
-  - [x] width, height
-  - [x] visibility
-  - [x] display
-    - [x] none
-    - [x] inline-block
-    - [x] block
-    - [x] flex
-    - [ ] inline-flex
-    - [ ] inline
-    - [ ] grid
-    - [ ] table
-    - [ ] table-cell
-    - [ ] table-row
-    - [ ] table-column
-    - [ ] ...
-  - [x] position
-    - [x] static
-    - [x] relative
-    - [x] absolute
-    - [ ] fixed
-  - [x] box-sizing
-    - [x] border-box
-    - [x] content-box
-  - [x] border
-  - [x] border-radius
-  - [x] background-color
-  - [x] background-image
-  - [x] background-position
-  - [x] background-cover
-  - [ ] background
-  - [x] pointer-events
-  - [x] cursor
-  - [x] font-face
-  - [x] font-family
-  - [x] font-size
-  - [x] font-style
-  - [x] flex
-  - [x] flex-shrink
-  - [x] flex-grow
-  - [x] flex-basis
-  - [x] flex-wrap
-  - [x] flex-direction
-  - [x] justify-content
-    - [x] flex-start
-    - [x] center
-    - [x] flex-end
-  - [x] align-items
-    - [x] flex-start
-    - [x] center
-    - [x] flex-end
-    - [x] stretch
-  - [ ] float
-  - [ ] transition
-  - [ ] transform
-  - [ ] ...
-
-</details>
+The CLI already compiles TypeScript UI descriptions into C source, which covers most needs, so the author will not add other language bindings. You are welcome to design one yourself.
 
 ## License
 
-The LCUI Project is released under [the MIT License](<(https://opensource.org/licenses/MIT)>).
+[MIT](http://opensource.org/licenses/MIT)
