@@ -1132,7 +1132,6 @@ static void ui_flexbox_break_into_lines(ui_flexbox_context_t *ctx)
         ui_widget_t *child;
         ui_flexbox_line_t *line;
         css_computed_style_t *s = &ctx->widget->computed_style;
-        css_computed_style_t *cs;
         float main_size;
         unsigned child_index = 0;
 
@@ -1156,7 +1155,6 @@ static void ui_flexbox_break_into_lines(ui_flexbox_context_t *ctx)
                         list_append(&ctx->out_of_flow_items, child);
                         continue;
                 }
-                cs = &child->computed_style;
                 main_size = ui_flexbox_item_reset_main_size(ctx, child);
                 UI_DEBUG_BEGIN;
                 UI_WIDGET_STR(child, str);
@@ -1164,8 +1162,8 @@ static void ui_flexbox_break_into_lines(ui_flexbox_context_t *ctx)
                 UI_DEBUG_MSG("line[%zu]: children[%u]=%s, size=%s, "
                              "flex_basis(%d)=%g, main_size=%g",
                              line->index, child_index, str, size_str,
-                             cs->type_bits.flex_basis, cs->flex_basis,
-                             main_size);
+                             child->computed_style.type_bits.flex_basis,
+                             child->computed_style.flex_basis, main_size);
                 child_index++;
                 UI_DEBUG_END;
                 if (s->type_bits.flex_wrap == CSS_FLEX_WRAP_WRAP &&
