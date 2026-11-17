@@ -1559,7 +1559,7 @@ enum {
  * -1 when the table is incomplete.
  */
 typedef char css_prop_table_must_cover_every_css_prop_key
-    [(CSS_PROP_TABLE_COUNT == STYLE_KEY_TOTAL) ? 1 : -1];
+    [((int)CSS_PROP_TABLE_COUNT == (int)STYLE_KEY_TOTAL) ? 1 : -1];
 
 /* Element-wise font-family comparison (used by the FONT_FAMILY kind). */
 static bool css_font_family_equal(const css_computed_style_t *a,
