@@ -8,8 +8,9 @@
     "format-examples": "prettier --write \"../../docs/examples/**/*.tsx\" && prettier --write --plugin=@prettier/plugin-xml --parser xml \"../../docs/examples/**/*.xml\""
   },
   "devDependencies": {
-    "@lcui/fluent-icons": "^2.0.0",
-    "@lcui/react": "0.6.0",
+    "@lcui/fluent-icons": "^2.1.0",
+    "@lcui/react": "^0.7.0",
+    "@lcui/tailwind-config": "^0.2.0",
     "@prettier/plugin-xml": "^3.4.2",
     "@thedutchcoder/postcss-rem-to-px": "^0.0.2",
     "@types/node": "^20.0.0",
