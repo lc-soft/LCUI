@@ -1,3 +1,9 @@
+/* Release builds define NDEBUG, which turns the assertions below into no-ops
+ * and leaves their local variables unused. Keep them active in tests. */
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
+
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>

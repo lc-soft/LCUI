@@ -95,18 +95,6 @@ static ui_widget_t *find_by_type(ui_widget_t *w, const char *type)
         return NULL;
 }
 
-static int count_by_type(ui_widget_t *w, const char *type)
-{
-        int count = ui_check_widget_type(w, type) ? 1 : 0;
-        ui_widget_t *child;
-        size_t i;
-
-        for (i = 0; (child = ui_widget_get_child(w, i)); ++i) {
-                count += count_by_type(child, type);
-        }
-        return count;
-}
-
 static bool has_indicator(ui_widget_t *item)
 {
         ui_widget_t *child;

@@ -149,15 +149,6 @@ static bool style_has_inherit(css_style_decl_t *style, int key)
                prop->value.array_value[0].keyword_value == CSS_KEYWORD_INHERIT;
 }
 
-static css_style_decl_t *select_rule(const char *selector_name)
-{
-        css_selector_t *selector = css_selector_create(selector_name);
-        css_style_decl_t *style = css_select_style(selector);
-
-        css_selector_destroy(selector);
-        return style;
-}
-
 static void test_parse_global_inherit(void)
 {
         css_style_value_t *value;

@@ -22,16 +22,6 @@ static void ad_emit_click(ui_widget_t *emitter, ui_widget_t *target)
         ui_widget_emit_event(emitter, event, NULL);
 }
 
-static size_t ad_count_children(ui_widget_t *w)
-{
-        size_t n = 0;
-
-        while (ui_widget_get_child(w, n)) {
-                ++n;
-        }
-        return n;
-}
-
 typedef struct ad_fixture {
         ui_widget_t *dialog;
         ui_widget_t *portal;

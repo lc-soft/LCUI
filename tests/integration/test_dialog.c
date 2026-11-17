@@ -278,7 +278,8 @@ static void test_dialog_focus(void)
         ui_update();
         ctest_equal_int(
             "open should focus inside content",
-            ui_get_focus_in(ui_root()) != NULL && has_ancestor(ui_get_focus_in(ui_root()), fx.content),
+            ui_get_focus_in(ui_root()) != NULL &&
+                has_ancestor(ui_get_focus_in(ui_root()), fx.content),
             1);
         ui_dialog_close(fx.dialog);
         ui_update();
@@ -771,7 +772,7 @@ static void test_dialog_close_is_ghost_button(void)
 static void test_dialog_append_body(void)
 {
         ui_widget_t *dialog = ui_create_dialog();
-        ui_widget_t *content, *child, *body, *footer;
+        ui_widget_t *content, *child, *body, *footer = NULL;
         size_t header_i = 0, body_i = 0, footer_i = 0;
         size_t i;
 
