@@ -106,9 +106,9 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
 
-      - name: Build for release
+      - name: Build for release (merged archive)
         run: |
-          xmake config -y -v -k ${{ env.TARGET_KIND }} -m release
+          xmake config -y -v -k ${{ env.TARGET_KIND }} -m release --merge-archive=y
           xmake
 
       - name: Package

@@ -27,6 +27,12 @@ option("memcheck")
     set_description("Enable memory check tools (drmemory on Windows, valgrind on Linux)")
 option_end()
 
+option("merge-archive")
+    set_default(false)
+    set_showmenu(true)
+    set_description("Merge the sub-library archives into lcui for standalone distribution")
+option_end()
+
 rule("tests.runnable")
     on_test(function (target, opt)
         import("core.base.option")
@@ -124,6 +130,9 @@ target("lcui")
             add_headerfiles(incdir .. "/(**.h)")
         end
     end
-    -- Merge the sub-library archives into lcui.lib so that the published
-    -- library is self-contained, as the xmake registry package expects.
-    set_policy("build.merge_archive", true)
+    -- Merge the sub-library archives into lcui.lib for releases that ship a
+    -- single standalone library. Development and test builds keep the archives
+    -- separate so add_deps() can export each sub-library's own links.
+    if has_config("merge-archive") then
+        set_policy("build.merge_archive", true)
+    end
