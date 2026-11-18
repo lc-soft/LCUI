@@ -13,7 +13,12 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdlib.h>
-#include <yutil.h>
+#include <stdint.h>
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <time.h>
+#endif
 #include <ctest.h>
 
 #ifdef _WIN32
@@ -41,6 +46,18 @@ static size_t tests_total = 0;
 static int test_msg_indent = 0;
 static int64_t test_start_time = 0;
 
+static int64_t ctest_now_ms(void)
+{
+#ifdef _WIN32
+        return (int64_t)GetTickCount();
+#else
+        struct timespec ts;
+
+        clock_gettime(CLOCK_MONOTONIC, &ts);
+        return (int64_t)ts.tv_sec * 1000 + (int64_t)ts.tv_nsec / 1000000;
+#endif
+}
+
 int ctest_printf(const char *fmt, ...)
 {
         int ret;
@@ -57,7 +74,7 @@ int ctest_printf(const char *fmt, ...)
 void ctest_group_begin(void)
 {
         if (test_start_time == 0) {
-                test_start_time = y_gettime();
+                test_start_time = ctest_now_ms();
         }
         test_msg_indent++;
 }
@@ -165,7 +182,7 @@ bool ctest_equal_wcs(const char *name, const wchar_t *actual,
 int ctest_finish(void)
 {
         printf(GREEN("  %zu passing") " (%ums)\n", tests_passed,
-               (unsigned)(y_gettime() - test_start_time));
+               (unsigned)(ctest_now_ms() - test_start_time));
         if (tests_total > tests_passed) {
                 printf(RED("  %zu faling\n\n"), tests_total - tests_passed);
                 return (int)(tests_total - tests_passed);
@@ -243,7 +260,7 @@ int ctest_run_suites(const ctest_suite_t *suites)
                 return 0;
         }
         if (test_start_time == 0) {
-                test_start_time = y_gettime();
+                test_start_time = ctest_now_ms();
         }
         for (s = suites; s->name; ++s) {
                 if (!ctest_should_run(s->name))
