@@ -1,5 +1,5 @@
 /*
- * tests/integration/test_gallery_layout.c
+ * examples/doc-viewer/tests/test_gallery_layout.c
  *
  * Copyright (c) 2026, Liu Chao <hello@lcui.dev> All rights reserved.
  *
@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctest-custom.h>
-#include "../../examples/doc-viewer/app/global.css.h"
+#include "../app/global.css.h"
 
 #define HOME_GRID_COLUMNS 4
 #define HOME_GAP 24.0f

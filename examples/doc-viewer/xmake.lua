@@ -21,3 +21,7 @@ target("doc-viewer")
         end
     end)
     set_warnings("all")
+
+target_end()
+
+includes("tests")

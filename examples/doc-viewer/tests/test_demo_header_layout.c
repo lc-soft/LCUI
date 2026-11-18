@@ -1,5 +1,5 @@
 /*
- * tests/integration/test_demo_header_layout.c
+ * examples/doc-viewer/tests/test_demo_header_layout.c
  *
  * Copyright (c) 2026, Liu Chao <hello@lcui.dev> All rights reserved.
  *
@@ -25,7 +25,7 @@
 #include <ctest-custom.h>
 #include <stdio.h>
 #include <string.h>
-#include "../../examples/doc-viewer/app/global.css.h"
+#include "../app/global.css.h"
 
 #define DEMO_BLOCK_WIDTH 736.0f
 

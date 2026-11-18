@@ -70,6 +70,27 @@ jobs:
       - name: Build
         run: xmake
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install doc-viewer dependencies
+        working-directory: examples/doc-viewer
+        run: bun install
+
+      - name: Install lcui-cli
+        run: npm install -g @lcui/cli
+
+      - name: Generate doc-viewer sources
+        working-directory: examples/doc-viewer
+        run: bun run compile
+
+      - name: Process doc-viewer TSX files
+        working-directory: examples/doc-viewer
+        run: lcui build
+
       - name: Run all tests
         if: runner.os == 'Windows'
         run: xmake test
@@ -104,27 +125,6 @@ jobs:
           xmake install -o dist/lcui-bin lcui
           Compress-Archive -Path dist/lcui-bin/* -DestinationPath "dist/lcui-$version-$plat-x64.zip"
           Get-Item "dist/lcui-$version-$plat-x64.zip" | Select-Object Name, Length
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - uses: oven-sh/setup-bun@v2
-
-      - name: Install doc-viewer dependencies
-        working-directory: examples/doc-viewer
-        run: bun install
-
-      - name: Install lcui-cli
-        run: npm install -g @lcui/cli
-
-      - name: Generate doc-viewer sources
-        working-directory: examples/doc-viewer
-        run: bun run compile
-
-      - name: Process doc-viewer TSX files
-        working-directory: examples/doc-viewer
-        run: lcui build
 
       - name: Build examples
         run: xmake build -yg lcui-examples
