@@ -580,15 +580,16 @@ static void ptk_x11window__activate(ptk_window_t *wnd)
 
 static void ptk_x11window__close(ptk_window_t *wnd)
 {
-        XEvent xe = { 0 };
+        ptk_event_t e = { 0 };
 
-        xe.xclient.type = ClientMessage;
-        xe.xclient.data.l[0] = x11_app.wm_delete;
-        xe.xclient.serial = 0;
-        xe.xclient.send_event = 1;
-        xe.xclient.format = 32;
-        xe.xclient.window = wnd->handle;
-        XSendEvent(x11_app.display, x11_app.win_events, 0, NoEventMask, &xe);
+        // A hidden or unmapped window has no window manager to deliver
+        // WM_DELETE_WINDOW, so emit the same close event and destroy the
+        // platform window directly. This also keeps programmatic close()
+        // deterministic on X11.
+        e.type = PTK_EVENT_CLOSE;
+        e.window = wnd;
+        ptk_process_event(&e);
+        ptk_x11window__on_destroy(wnd);
 }
 
 static void ptk_x11window__destroy(ptk_window_t *wnd)
@@ -622,12 +623,28 @@ static void ptk_x11window__set_size(ptk_window_t *wnd, int width, int height)
         if (wnd->width == width && wnd->height == height) {
                 return;
         }
+        // Keep the cached client size in sync immediately: the ConfigureNotify
+        // event from XResizeWindow() is asynchronous, so callers that query the
+        // size right after set_size() must not observe the previous value.
+        wnd->width = width;
+        wnd->height = height;
         XResizeWindow(x11_app.display, wnd->handle, width, height);
         // When XResizeWindow() is called, the x and y values in the
         // ConfigureNotify event sent by XResizeWindow() are old because the
         // position set by the previous call to XMoveWindow() has not been
         // updated. Therefore, we need to set the latest position again.
         XMoveWindow(x11_app.display, wnd->handle, wnd->x, wnd->y);
+        // X11 does not deliver ConfigureNotify for resizes of an unmapped
+        // window, so update the backing store and notify the UI immediately.
+        ptk_x11window__on_size(wnd, wnd->width, wnd->height);
+        {
+                ptk_event_t e = { 0 };
+                e.type = PTK_EVENT_SIZE;
+                e.window = wnd;
+                e.size.width = wnd->width;
+                e.size.height = wnd->height;
+                ptk_process_event(&e);
+        }
 }
 
 static void ptk_x11window__set_position(ptk_window_t *wnd, int x, int y)
@@ -642,13 +659,14 @@ static void ptk_x11window__set_position(ptk_window_t *wnd, int x, int y)
 
 static void ptk_x11window__get_position(ptk_window_t *wnd, int *x, int *y)
 {
-        if (!ptk_x11window__update_position(wnd, x, y)) {
-                if (x) {
-                        *x = wnd ? wnd->x : 0;
-                }
-                if (y) {
-                        *y = wnd ? wnd->y : 0;
-                }
+        // Return the cached position. ConfigureNotify events keep it in sync
+        // with the window manager, while XTranslateCoordinates() on a hidden
+        // or freshly created window can report an unmapped/border position.
+        if (x) {
+                *x = wnd ? wnd->x : 0;
+        }
+        if (y) {
+                *y = wnd ? wnd->y : 0;
         }
 }
 
