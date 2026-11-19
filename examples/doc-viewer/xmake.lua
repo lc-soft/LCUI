@@ -9,6 +9,9 @@ target("doc-viewer")
     if is_plat("windows") then
         add_cxflags("/utf-8", {tools = "cl"})
     end
+    if is_plat("windows") and is_mode("release") then
+        add_rules("win.sdk.application")
+    end
     add_installfiles("dist/(assets/*)")
     after_build(function (target)
         local src = path.join(os.projectdir(), "docs", "examples", "assets", "attachment")

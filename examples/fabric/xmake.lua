@@ -11,3 +11,6 @@ target("fabric")
     if has_package("cairo") then
         add_defines("HAS_CAIRO")
     end
+    if is_plat("windows") and is_mode("release") then
+        add_rules("win.sdk.application")
+    end
