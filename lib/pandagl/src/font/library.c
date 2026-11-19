@@ -916,6 +916,11 @@ static void pd_font_library_destroy_engine(void)
 #ifdef PANDAGL_HAS_FREETYPE
         pd_freetype_engine_destroy();
 #endif
+#ifdef PANDAGL_HAS_FONTCONFIG
+        /* FcInitLoadConfigAndFonts() also populates fontconfig's global
+         * caches; FcConfigDestroy() only releases the per-call config. */
+        FcFini();
+#endif
 }
 
 void pd_font_library_init(void)
