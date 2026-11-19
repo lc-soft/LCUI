@@ -354,7 +354,7 @@ void lcui_window_set_size(lcui_window_t *w, int cw, int ch)
         ptk_window_set_size(w->ptk, lcui_window_to_px(w->ptk, cw),
                             lcui_window_to_px(w->ptk, ch));
         if (w->widget) {
-                ui_widget_resize(w->widget, cw, ch);
+                ui_widget_resize(w->widget, (float)cw, (float)ch);
         }
 }
 
