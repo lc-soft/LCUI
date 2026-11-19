@@ -604,12 +604,8 @@ static void test_flex_layout_320(void)
                             &rect);
 
         rect.y += rect.height + 10;
-#ifdef _WIN32
-        rect.height = 354;
-#else
-        /* Ubuntu Mono wraps this title to an extra line on Linux. */
+        /* monospace wraps this title to an extra line. */
         rect.height = 376;
-#endif
         w = ui_widget_get_child(container, 10);
         ctest_equal_ui_rect("$('.example')[10].border_box", &w->border_box,
                             &rect);
@@ -621,12 +617,8 @@ static void test_flex_layout_320(void)
                             &rect);
 
         rect.y += rect.height + 10;
-#ifdef _WIN32
-        rect.height = 354;
-#else
-        /* Ubuntu Mono wraps this title to an extra line on Linux. */
+        /* monospace wraps this title to an extra line. */
         rect.height = 376;
-#endif
         w = ui_widget_get_child(container, 12);
         ctest_equal_ui_rect("$('.example')[12].border_box", &w->border_box,
                             &rect);

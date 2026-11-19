@@ -2,7 +2,7 @@ text,
 body {
   font-size: 14px;
   line-height: 1.6;
-  font-family: "Ubuntu Mono", "Consola";
+  font-family: monospace;
 }
 
 scrollarea-content {
