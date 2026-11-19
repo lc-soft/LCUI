@@ -5,7 +5,7 @@
       <scrollarea-content id="main">
         <w class="container">
           <w class="example">
-            <text class="example__title">(0) Default</text>
+            <text class="example__title">(0) default</text>
             <w class="example__content d-flex">
               <w class="box"></w>
               <w class="box"></w>
@@ -16,7 +16,7 @@
             </w>
           </w>
           <w class="example">
-            <text class="example__title">(1) justify-content: center;</text>
+            <text class="example__title">(1) justify-center</text>
             <w class="example__content d-flex justify-content-center">
               <w class="box"></w>
               <w class="box"></w>
@@ -27,7 +27,7 @@
             </w>
           </w>
           <w class="example">
-            <text class="example__title">(2) justify-content: flex-end;</text>
+            <text class="example__title">(2) justify-end</text>
             <w class="example__content d-flex justify-content-end">
               <w class="box"></w>
               <w class="box"></w>
@@ -38,7 +38,7 @@
             </w>
           </w>
           <w class="example">
-            <text class="example__title">(3) justify-content: space-between;</text>
+            <text class="example__title">(3) justify-between</text>
             <w class="example__content d-flex justify-content-space-between">
               <w class="box"></w>
               <w class="box"></w>
@@ -49,7 +49,7 @@
             </w>
           </w>
           <w class="example">
-            <text class="example__title">(4) justify-content: space-around;</text>
+            <text class="example__title">(4) justify-around</text>
             <w class="example__content d-flex justify-content-space-around">
               <w class="box"></w>
               <w class="box"></w>
@@ -60,7 +60,7 @@
             </w>
           </w>
           <w class="example">
-            <text class="example__title">(5) Auto margin</text>
+            <text class="example__title">(5) mx-auto</text>
             <w class="example__content d-flex justify-content-center">
               <text class="box mr-auto">mr-auto</text>
               <w class="box"></w>
@@ -69,7 +69,7 @@
             </w>
           </w>
           <w class="example">
-            <text class="example__title">(6) flex-shrink</text>
+            <text class="example__title">(6) shrink</text>
             <w class="example__content d-flex">
               <w class="box"></w>
               <w class="box"></w>
@@ -94,7 +94,7 @@
             </w>
           </w>
           <w class="example">
-            <text class="example__title">(7) flex-grow</text>
+            <text class="example__title">(7) grow</text>
             <w class="example__content d-flex">
               <text class="box flex-auto">auto</text>
               <text class="box flex-auto">auto</text>
@@ -122,7 +122,7 @@
             </w>
           </w>
           <w class="example">
-            <text class="example__title">(8) flex-wrap: wrap;</text>
+            <text class="example__title">(8) flex-wrap</text>
             <w class="example__content d-flex felx-wrap">
               <w class="box"></w>
               <w class="box"></w>
@@ -147,7 +147,7 @@
             </w>
           </w>
           <w class="example">
-            <text class="example__title">(9) flex-wrap: wrap; height: 300px;</text>
+            <text class="example__title">(9) flex-wrap h-[300px]</text>
             <w class="example__content d-flex felx-wrap h-6">
               <w class="box"></w>
               <w class="box"></w>
@@ -197,7 +197,7 @@
             </w>
           </w>
           <w class="example">
-            <text class="example__title">(11) align-items: end; height: 300px;</text>
+            <text class="example__title">(11) items-end h-[300px]</text>
             <w class="example__content d-flex felx-wrap h-6 align-items-end">
               <w class="box"></w>
               <w class="box"></w>
@@ -247,13 +247,13 @@
             </w>
           </w>
           <w class="example">
-            <text class="example__title">(13) Vertically Centered Layout</text>
+            <text class="example__title">(13) items-center justify-center</text>
             <w class="example__content d-flex h-6 justify-content-center align-items-center">
               <w class="box"></w>
             </w>
           </w>
           <w class="example">
-            <text class="example__title">(14) flex-direction: column;</text>
+            <text class="example__title">(14) flex-col</text>
             <w class="example__content d-flex flex-direction-column felx-wrap h-4">
               <w class="box"></w>
               <w class="box"></w>
@@ -278,7 +278,7 @@
             </w>
           </w>
           <w class="example example-holy-grail-layout">
-            <text class="example__title">(15) Holy Grail Layout</text>
+            <text class="example__title">(15) holy-grail</text>
             <w class="example__content">
               <text class="box w-auto layout__header">Header</text>
               <w class="layout__body">
@@ -290,7 +290,7 @@
             </w>
           </w>
           <w class="example example-holy-grail-layout">
-            <text class="example__title">(16) Holy Grail Layout (height: 300px)</text>
+            <text class="example__title">(16) holy-grail h-[300px]</text>
             <w class="example__content h-6">
               <text class="box w-auto layout__header">Header</text>
               <w class="layout__body">
@@ -302,7 +302,7 @@
             </w>
           </w>
           <w class="example example-browser">
-            <text class="example__title">(17) Browser Layout</text>
+            <text class="example__title">(17) browser</text>
             <w class="example__content h-6">
               <w class="v-browser">
                 <w id="browser-tabbar" class="v-browser__tabbar">
@@ -354,7 +354,7 @@
             </w>
           </w>
           <w class="example">
-            <text class="example__title">(18) gap: 10px;</text>
+            <text class="example__title">(18) gap-[10px]</text>
             <w class="example__content d-flex gap-2">
               <w class="box"></w>
               <w class="box"></w>
@@ -362,7 +362,7 @@
               <w class="box"></w>
               <w class="box"></w>
             </w>
-            <text class="example__title">(18.1) gap: 10px 5px; flex-wrap: wrap;</text>
+            <text class="example__title">(18.1) gap-[10px_5px] flex-wrap</text>
             <w class="example__content d-flex felx-wrap gap-2-1">
               <w class="box"></w>
               <w class="box"></w>
@@ -378,21 +378,21 @@
               <w class="box"></w>
               <w class="box"></w>
             </w>
-            <text class="example__title">(18.2) row-gap: 10px; flex-direction: column;</text>
+            <text class="example__title">(18.2) gap-y-[10px] flex-col</text>
             <w class="example__content d-flex flex-direction-column row-gap-2 h-4">
               <w class="box"></w>
               <w class="box"></w>
               <w class="box"></w>
               <w class="box"></w>
             </w>
-            <text class="example__title">(18.3) column-gap: 10px; justify-content: space-between;</text>
+            <text class="example__title">(18.3) gap-x-[10px] justify-between</text>
             <w class="example__content d-flex justify-content-space-between column-gap-2">
               <w class="box"></w>
               <w class="box"></w>
               <w class="box"></w>
               <w class="box"></w>
             </w>
-            <text class="example__title">(19) Choice card layout</text>
+            <text class="example__title">(19) choice-card</text>
             <w class="example__content example-choice-card">
               <w id="choice-card-preview" class="choice-card-preview">
                 <w id="choice-card-group" class="choice-card-group">
