@@ -195,6 +195,12 @@ PD_PUBLIC size_t pd_font_cache_count(void);
 /** 载入字体至数据库中 */
 PD_PUBLIC int pd_font_load_file(const char *filepath);
 
+/**
+ * 载入字体至数据库中，失败时不记录错误日志
+ * 适用于探测平台候选字体，避免逐个报告不存在的文件
+ */
+PD_PUBLIC int pd_font_try_load_file(const char *filepath);
+
 /** 初始化字体处理模块 */
 PD_PUBLIC void pd_font_library_init(void);
 

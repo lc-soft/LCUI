@@ -750,7 +750,7 @@ void pd_font_set_default(int id)
         }
 }
 
-int pd_font_load_file(const char *filepath)
+static int pd_font_load_file_impl(const char *filepath, bool quiet)
 {
         pd_font_face_t **fonts;
         int i, num_fonts, id;
@@ -761,7 +761,13 @@ int pd_font_load_file(const char *filepath)
         }
         num_fonts = fontlib.engine->open(filepath, &fonts);
         if (num_fonts < 1) {
-                logger_error("[font] failed to load file: %s\n", filepath);
+                if (quiet) {
+                        logger_debug("[font] skip unavailable file: %s\n",
+                                     filepath);
+                } else {
+                        logger_error("[font] failed to load file: %s\n",
+                                     filepath);
+                }
                 return -2;
         }
         for (i = 0; i < num_fonts; ++i) {
@@ -774,6 +780,16 @@ int pd_font_load_file(const char *filepath)
         }
         free(fonts);
         return 0;
+}
+
+int pd_font_load_file(const char *filepath)
+{
+        return pd_font_load_file_impl(filepath, false);
+}
+
+int pd_font_try_load_file(const char *filepath)
+{
+        return pd_font_load_file_impl(filepath, true);
 }
 
 int pd_font_render_glyph(pd_glyph_bitmap_t *buff, unsigned ch, int font_id,

@@ -21,25 +21,33 @@ static void test_segoe_ui_font_load(void)
 {
         pd_font_face_t *font;
         int id;
-        if (pd_font_load_file("C:/windows/fonts/segoeui.ttf") != 0) {
+        if (pd_font_try_load_file("C:/windows/fonts/segoeui.ttf") != 0) {
                 return;
         }
         ctest_equal_int("should load segoeui.ttf",
-                        pd_font_load_file("C:/windows/fonts/segoeui.ttf"), 0);
+                        pd_font_try_load_file("C:/windows/fonts/segoeui.ttf"),
+                        0);
         ctest_equal_int("should load segoeuib.ttf",
-                        pd_font_load_file("C:/windows/fonts/segoeuib.ttf"), 0);
+                        pd_font_try_load_file("C:/windows/fonts/segoeuib.ttf"),
+                        0);
         ctest_equal_int("should load segoeuii.ttf",
-                        pd_font_load_file("C:/windows/fonts/segoeuii.ttf"), 0);
+                        pd_font_try_load_file("C:/windows/fonts/segoeuii.ttf"),
+                        0);
         ctest_equal_int("should load segoeuil.ttf",
-                        pd_font_load_file("C:/windows/fonts/segoeuil.ttf"), 0);
+                        pd_font_try_load_file("C:/windows/fonts/segoeuil.ttf"),
+                        0);
         ctest_equal_int("should load segoeuisl.ttf",
-                        pd_font_load_file("C:/windows/fonts/segoeuisl.ttf"), 0);
+                        pd_font_try_load_file("C:/windows/fonts/segoeuisl.ttf"),
+                        0);
         ctest_equal_int("should load segoeuiz.ttf",
-                        pd_font_load_file("C:/windows/fonts/segoeuiz.ttf"), 0);
+                        pd_font_try_load_file("C:/windows/fonts/segoeuiz.ttf"),
+                        0);
         ctest_equal_int("should load seguibl.ttf",
-                        pd_font_load_file("C:/windows/fonts/seguibl.ttf"), 0);
+                        pd_font_try_load_file("C:/windows/fonts/seguibl.ttf"),
+                        0);
         ctest_equal_int("should load seguili.ttf",
-                        pd_font_load_file("C:/windows/fonts/seguili.ttf"), 0);
+                        pd_font_try_load_file("C:/windows/fonts/seguili.ttf"),
+                        0);
         id = GetSegoeUIFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_NORMAL);
         ctest_equal_bool("should resolve font (style: normal, weight: normal)",
                          id > 0, true);
@@ -97,17 +105,21 @@ static void test_arial_font_load(void)
 {
         int id;
         pd_font_face_t *font;
-        if (pd_font_load_file("C:/windows/fonts/arial.ttf") != 0) {
+        if (pd_font_try_load_file("C:/windows/fonts/arial.ttf") != 0) {
                 return;
         }
         ctest_equal_int("should load arialbd.ttf",
-                        pd_font_load_file("C:/windows/fonts/arialbd.ttf"), 0);
+                        pd_font_try_load_file("C:/windows/fonts/arialbd.ttf"),
+                        0);
         ctest_equal_int("should load ariblk.ttf",
-                        pd_font_load_file("C:/windows/fonts/ariblk.ttf"), 0);
+                        pd_font_try_load_file("C:/windows/fonts/ariblk.ttf"),
+                        0);
         ctest_equal_int("should load arialbi.ttf",
-                        pd_font_load_file("C:/windows/fonts/arialbi.ttf"), 0);
+                        pd_font_try_load_file("C:/windows/fonts/arialbi.ttf"),
+                        0);
         ctest_equal_int("should load ariali.ttf",
-                        pd_font_load_file("C:/windows/fonts/ariali.ttf"), 0);
+                        pd_font_try_load_file("C:/windows/fonts/ariali.ttf"),
+                        0);
         id = GetArialFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_NORMAL);
         ctest_equal_bool("should resolve font (style: normal, weight: normal)",
                          id > 0, true);
@@ -168,7 +180,7 @@ static void test_variable_font_weights(void)
         size_t c;
         int normal_id, medium_id, bold_id;
 
-        if (pd_font_load_file("C:/windows/fonts/NotoSansSC-VF.ttf") != 0) {
+        if (pd_font_try_load_file("C:/windows/fonts/NotoSansSC-VF.ttf") != 0) {
                 return;
         }
         for (c = 0; c < sizeof(candidates) / sizeof(candidates[0]); ++c) {
@@ -204,10 +216,10 @@ static void test_cjk_font_fallback_glyph(void)
         unsigned cjk = 0x4E2D; /* 中 */
         int latin_id, cjk_id;
 
-        if (pd_font_load_file("C:/windows/fonts/segoeui.ttf") != 0) {
+        if (pd_font_try_load_file("C:/windows/fonts/segoeui.ttf") != 0) {
                 return;
         }
-        if (pd_font_load_file("C:/windows/fonts/msyh.ttc") != 0) {
+        if (pd_font_try_load_file("C:/windows/fonts/msyh.ttc") != 0) {
                 return;
         }
         latin_id = pd_font_get_id("Segoe UI", PD_FONT_STYLE_NORMAL,
@@ -227,16 +239,16 @@ static void test_weight_fallback_safety(void)
 {
         int id;
 
-        if (pd_font_load_file("C:/windows/fonts/segoeui.ttf") != 0) {
+        if (pd_font_try_load_file("C:/windows/fonts/segoeui.ttf") != 0) {
                 return;
         }
         /* Load a sparse set of weights: Regular, Light, Semilight, Bold, Black.
          * Requests for the missing medium/semibold/extra-bold tiers must fall
          * back to a neighbour instead of dereferencing a NULL slot. */
-        pd_font_load_file("C:/windows/fonts/segoeuil.ttf");
-        pd_font_load_file("C:/windows/fonts/segoeuisl.ttf");
-        pd_font_load_file("C:/windows/fonts/segoeuib.ttf");
-        pd_font_load_file("C:/windows/fonts/seguibl.ttf");
+        pd_font_try_load_file("C:/windows/fonts/segoeuil.ttf");
+        pd_font_try_load_file("C:/windows/fonts/segoeuisl.ttf");
+        pd_font_try_load_file("C:/windows/fonts/segoeuib.ttf");
+        pd_font_try_load_file("C:/windows/fonts/seguibl.ttf");
         id = pd_font_get_id("Segoe UI", PD_FONT_STYLE_NORMAL,
                             PD_FONT_WEIGHT_SEMI_BOLD);
         ctest_equal_bool("semibold request should fall back to a face", id > 0,
@@ -256,7 +268,7 @@ void test_pandagl_font_load(void)
 {
         pd_font_library_init();
         ctest_equal_int("should load font from file",
-                        pd_font_load_file("test_font_load.ttf"), 0);
+                        pd_font_try_load_file("test_font_load.ttf"), 0);
 #ifdef _WIN32
         ctest_describe("segoe ui font load", test_segoe_ui_font_load);
         ctest_describe("arial font load", test_arial_font_load);

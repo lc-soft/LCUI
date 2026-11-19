@@ -78,10 +78,10 @@ static int scan_char_bounds(const pd_canvas_t *canvas, int x_left, int x_right,
 
 static int try_load_dual_font(void)
 {
-        if (pd_font_load_file("C:/Windows/Fonts/consola.ttf") != 0) {
+        if (pd_font_try_load_file("C:/Windows/Fonts/consola.ttf") != 0) {
                 return -1;
         }
-        if (pd_font_load_file("C:/Windows/Fonts/msyh.ttc") != 0) {
+        if (pd_font_try_load_file("C:/Windows/Fonts/msyh.ttc") != 0) {
                 return -1;
         }
         g_consolas_id = pd_font_get_id("Consolas", 0, 0);

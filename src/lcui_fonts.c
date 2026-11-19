@@ -48,9 +48,11 @@ static void lcui_windows_fonts_init(void)
                                 "C:/Windows/Fonts/NotoSansSC-VF.ttf" };
 
         for (i = 0; i < sizeof(fonts) / sizeof(char *); ++i) {
-                pd_font_load_file(fonts[i]);
+                pd_font_try_load_file(fonts[i]);
         }
-        lcui_fonts_set_default("Microsoft YaHei");
+        if (!lcui_fonts_set_default("Microsoft YaHei")) {
+                logger_warning("[font] no usable default font\n");
+        }
         pd_font_family_set_alias("serif", "Simsun");
         pd_font_family_set_alias("sans-serif", "Microsoft YaHei");
         pd_font_family_set_alias("monospace", "Consolas");
@@ -77,7 +79,7 @@ static void lcui_fc_fonts_init(void)
         for (i = 0; i < sizeof(sans) / sizeof(sans[0]); ++i) {
                 path = pd_font_find_path(sans[i]);
                 if (path) {
-                        pd_font_load_file(path);
+                        pd_font_try_load_file(path);
                         free(path);
                 }
                 if (!has_default) {
@@ -96,7 +98,7 @@ static void lcui_fc_fonts_init(void)
                 if (!path) {
                         continue;
                 }
-                pd_font_load_file(path);
+                pd_font_try_load_file(path);
                 free(path);
                 pd_font_family_set_alias("monospace", mono[i]);
                 break;
@@ -106,10 +108,13 @@ static void lcui_fc_fonts_init(void)
                 if (!path) {
                         continue;
                 }
-                pd_font_load_file(path);
+                pd_font_try_load_file(path);
                 free(path);
                 pd_font_family_set_alias("serif", serif[i]);
                 break;
+        }
+        if (!has_default) {
+                logger_warning("[font] no usable default font\n");
         }
 }
 
@@ -148,11 +153,12 @@ static void lcui_linux_fonts_init(void)
         };
 
         for (i = 0; i < sizeof(fonts) / sizeof(char *); ++i) {
-                pd_font_load_file(fonts[i]);
+                pd_font_try_load_file(fonts[i]);
         }
         // TODO: 使用系统已设置的默认字体
-        if (!lcui_fonts_set_default("Noto Sans CJK SC")) {
-                lcui_fonts_set_default("Ubuntu");
+        if (!lcui_fonts_set_default("Noto Sans CJK SC") &&
+            !lcui_fonts_set_default("Ubuntu")) {
+                logger_warning("[font] no usable default font\n");
         }
         pd_font_family_set_alias("sans-serif", "Ubuntu");
         pd_font_family_set_alias("serif", "DejaVu Serif");
