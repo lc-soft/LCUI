@@ -5,7 +5,7 @@
       <scrollarea-content id="main">
         <w class="container">
           <w class="example">
-            <text class="example__title">(0) Basic</text>
+            <text class="example__title">(0) basic</text>
             <w class="example__content">
               <w class="box w-auto"></w>
               <w class="box d-inline-block"></w>
@@ -37,7 +37,7 @@
             </w>
           </w>
           <w class="example">
-            <text class="example__title">(1) Width</text>
+            <text class="example__title">(1) w-50 w-100</text>
             <w class="example__content">
               <text class="box w-min-50 d-inline-block">min-width: 50%; display: inline-block</text>
               <text class="box w-50">width: 50%; display: block</text>
@@ -51,7 +51,7 @@
             </w>
           </w>
           <w class="example">
-            <text class="example__title">(2) Auto size</text>
+            <text class="example__title">(2) w-auto h-auto</text>
             <w class="example__content">
               <text id="test-text-auto-height" class="box h-auto w-4">block, limited width</text>
               <text id="test-text-auto-size" class="box d-inline-block w-auto h-auto">inline block, auto size</text>
@@ -59,7 +59,7 @@
             </w>
           </w>
           <w class="example">
-            <text class="example__title">(3) Margin</text>
+            <text class="example__title">(3) m-1 m--2</text>
             <w class="example__content">
               <w class="box-padding">
                 <text class="box w-auto m-2">margin: 16px</text>
@@ -82,7 +82,7 @@
             </w>
           </w>
           <w class="example">
-            <text class="example__title">(4) vertical-align</text>
+            <text class="example__title">(4) align-middle align-bottom</text>
             <w class="example__content">
               <w class="box d-inline-block"></w>
               <w class="box d-inline-block h-2"></w>
@@ -103,7 +103,7 @@
             </w>
           </w>
           <w class="example" id="example-position-absolute">
-            <text class="example__title">(5) position: absolute</text>
+            <text class="example__title">(5) absolute</text>
             <w class="example__content">
               <w id="box-absolute-top-left" class="box"></w>
               <w id="box-absolute-top-right" class="box"></w>
@@ -113,7 +113,7 @@
             </w>
           </w>
           <w class="example" id="example-dropdown-menu">
-            <text class="example__title">(6) Dropdown menu</text>
+            <text class="example__title">(6) dropdown-menu</text>
             <w class="example__content">
               <w class="dropdown-menu" id="test-dropdown-menu">
                 <text class="dropdown-item">Dropdown item text</text>
@@ -124,7 +124,7 @@
             </w>
           </w>
           <w class="example" id="example-inline-block-nesting">
-            <text class="example__title">(7) Inline block nesting</text>
+            <text class="example__title">(7) inline-block</text>
             <w class="example__content">
               <w id="example-inline-block-nesting__block-1">
                 <text class="box d-inline-block">inline-block > inline-block</text>
@@ -141,7 +141,7 @@
             </w>
           </w>
           <w class="example" id="example-progress-bar">
-            <text class="example__title">(5) Absolutely positioned progress bar</text>
+            <text class="example__title">(5) absolute-progress</text>
             <w class="example__content">
               <w class="message-box">
                 <text>loading...</text>
