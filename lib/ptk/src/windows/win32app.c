@@ -695,12 +695,20 @@ void ptk_window_set_maximized(ptk_window_t *wnd, bool maximized)
 
 void ptk_window_set_size(ptk_window_t *wnd, int width, int height)
 {
+        int client_width = width;
+        int client_height = height;
+
         if (wnd->width == width && wnd->height == height) {
                 return;
         }
         convert_client_size_to_window_size(wnd, &width, &height);
         SetWindowPos(wnd->hwnd, HWND_NOTOPMOST, 0, 0, width, height,
                      SWP_NOMOVE | SWP_NOZORDER);
+        /* Keep the cached client size in sync immediately. WM_SIZE is
+         * asynchronous, so callers that query the size right after set_size()
+         * must not observe the previous value. */
+        wnd->width = client_width;
+        wnd->height = client_height;
 }
 
 void ptk_window_show(ptk_window_t *wnd)
