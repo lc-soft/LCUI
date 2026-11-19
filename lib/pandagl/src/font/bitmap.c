@@ -11,16 +11,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <pandagl.h>
 #include "bitmap.h"
 
 void pd_glyph_bitmap_init(pd_glyph_bitmap_t *bitmap)
 {
-        bitmap->rows = 0;
-        bitmap->width = 0;
-        bitmap->top = 0;
-        bitmap->left = 0;
-        bitmap->buffer = NULL;
+        memset(bitmap, 0, sizeof(*bitmap));
 }
 
 void pd_glyph_bitmap_destroy(pd_glyph_bitmap_t *bitmap)
