@@ -9,6 +9,7 @@
  * in the LICENSE.TXT file in the root directory of this source tree.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -184,6 +185,7 @@ static void test_expand_shorthand_inherit(void)
         css_selector_t *selector;
         css_style_decl_t *style;
         const shorthand_test_case_t *test_case;
+        char name[128];
         static const char *rules[] = {
                 ".inherit-background { background: inherit; }",
                 ".inherit-background-position { background-position: inherit; "
@@ -217,9 +219,15 @@ static void test_expand_shorthand_inherit(void)
                 style = css_select_style(selector);
                 css_selector_destroy(selector);
                 for (j = 0; j < test_case->key_count; ++j) {
+                        css_propdef_t *propdef =
+                            css_get_propdef(test_case->keys[j]);
+                        snprintf(
+                            name, sizeof(name), "should expand %s to %s",
+                            test_case->selector,
+                            propdef && propdef->name ? propdef->name : "?");
                         ctest_equal_bool(
-                            "should expand shorthand inherit to each longhand",
-                            style_has_inherit(style, test_case->keys[j]), 1);
+                            name, style_has_inherit(style, test_case->keys[j]),
+                            1);
                 }
                 css_style_decl_destroy(style);
         }
@@ -230,6 +238,7 @@ static void test_default_inheritance_metadata(void)
         unsigned i, j;
         bool inherited;
         css_propdef_t *propdef;
+        char name[128];
 
         for (i = 0; i < css_get_prop_count(); ++i) {
                 inherited = false;
@@ -242,9 +251,12 @@ static void test_default_inheritance_metadata(void)
                         }
                 }
                 propdef = css_get_propdef((int)i);
-                ctest_equal_bool(
-                    "should default-inherit only the agreed properties",
-                    propdef->inherited, inherited);
+                snprintf(
+                    name, sizeof(name),
+                    "should default-inherit only the agreed properties: %s",
+                    propdef && propdef->name ? propdef->name : "?");
+                ctest_equal_bool(name, propdef && propdef->inherited,
+                                 inherited);
         }
 }
 
