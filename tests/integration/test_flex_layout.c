@@ -604,8 +604,7 @@ static void test_flex_layout_320(void)
                             &rect);
 
         rect.y += rect.height + 10;
-        /* monospace wraps this title to an extra line. */
-        rect.height = 376;
+        rect.height = 354;
         w = ui_widget_get_child(container, 10);
         ctest_equal_ui_rect("$('.example')[10].border_box", &w->border_box,
                             &rect);
@@ -617,8 +616,7 @@ static void test_flex_layout_320(void)
                             &rect);
 
         rect.y += rect.height + 10;
-        /* monospace wraps this title to an extra line. */
-        rect.height = 376;
+        rect.height = 354;
         w = ui_widget_get_child(container, 12);
         ctest_equal_ui_rect("$('.example')[12].border_box", &w->border_box,
                             &rect);
@@ -1779,8 +1777,6 @@ static void test_constraint_refreshes_after_parent_relayout(void)
 void test_flex_layout(void)
 {
         lcui_init();
-        pd_font_try_load_file("fonts/DejaVuSansMono.ttf");
-        pd_font_family_set_alias("monospace", "DejaVu Sans Mono");
         ui_widget_set_title(ui_root(), L"test flex layout");
         flex_layout_scene_build();
 

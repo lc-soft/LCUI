@@ -172,7 +172,7 @@
             </w>
           </w>
           <w class="example">
-            <text class="example__title">(10) align-items: center; height: 300px;</text>
+            <text class="example__title">(10) items-center h-[300px]</text>
             <w class="example__content d-flex felx-wrap h-6 align-items-center">
               <w class="box"></w>
               <w class="box"></w>
@@ -222,7 +222,7 @@
             </w>
           </w>
           <w class="example">
-            <text class="example__title">(12) align-items: stretch; height: 300px;</text>
+            <text class="example__title">(12) items-stretch h-[300px]</text>
             <w class="example__content d-flex felx-wrap h-6 align-items-stretch">
               <text class="h-auto box">h-auto</text>
               <text class="h-auto box">h-auto</text>

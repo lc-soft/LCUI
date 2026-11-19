@@ -816,8 +816,6 @@ static void test_block_layout_320(void)
 void test_block_layout(void)
 {
         lcui_init();
-        pd_font_try_load_file("fonts/DejaVuSansMono.ttf");
-        pd_font_family_set_alias("monospace", "DejaVu Sans Mono");
         block_layout_scene_build();
 
         ctest_describe("root width 1280px", test_block_layout_1280);
