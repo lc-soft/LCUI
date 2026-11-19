@@ -402,6 +402,11 @@ ui_tooltip_content_prototype->setattr = ui_tooltip_content_on_set_attr;
 
 ### gen-commit
 
-用于生成符合 Angular 规范的提交信息，scope 应为 `lib/` 下的库名（例如：ui、css、ptk）
-或 `src/` 下的模块名（例如：widgets、styles）；纯文档改动可不带 scope。
+用于生成符合 Angular 规范的提交信息，scope 规则：
+
+- `lib/` 下的改动使用库名（例如：ui、css、ptk）
+- `src/styles` 的改动使用 `styles`，`src/widgets` 的改动使用 `widgets`
+- `src/` 根目录及其它 `src/` 模块的改动可不写 scope
+- 纯文档改动可不带 scope
+
 标题长度限制在 80 字符以内，应结合本次会话内容生成，无需读取实际改动文件内容。
