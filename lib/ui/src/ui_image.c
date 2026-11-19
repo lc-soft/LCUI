@@ -64,7 +64,7 @@ static ui_image_loader_t ui_image_loader;
 
 static void ui_image_force_destroy(ui_image_source_t *src)
 {
-        list_destroy_without_node(&src->listeners, free);
+        list_destroy(&src->listeners, free);
         pd_image_reader_destroy(src->reader);
         pd_canvas_destroy(&src->image.data);
         free(src->image.path);
@@ -204,7 +204,7 @@ bool ui_image_remove_event_listener(ui_image_t *image,
                 listener = node->data;
                 if (listener->type == type && listener->handler == handler &&
                     listener->data == data) {
-                        list_unlink(&src->listeners, node);
+                        list_delete_node(&src->listeners, node);
                         free(listener);
                         removed = true;
                 }
