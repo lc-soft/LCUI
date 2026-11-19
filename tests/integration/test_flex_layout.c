@@ -1779,6 +1779,8 @@ static void test_constraint_refreshes_after_parent_relayout(void)
 void test_flex_layout(void)
 {
         lcui_init();
+        pd_font_try_load_file("fonts/DejaVuSansMono.ttf");
+        pd_font_family_set_alias("monospace", "DejaVu Sans Mono");
         ui_widget_set_title(ui_root(), L"test flex layout");
         flex_layout_scene_build();
 
