@@ -39,7 +39,7 @@ static void should_register_underline_keyword(void)
 
 static void should_use_none_and_auto_as_initial_values(void)
 {
-        css_computed_style_t computed;
+        css_computed_style_t computed = { 0 };
         css_style_decl_t *decl = css_style_decl_create();
 
         css_cascade_style(decl, &computed);
@@ -58,7 +58,7 @@ static void should_use_none_and_auto_as_initial_values(void)
 
 static void should_cascade_underline_and_none(void)
 {
-        css_computed_style_t computed;
+        css_computed_style_t computed = { 0 };
         css_style_decl_t *decl = css_style_decl_create();
 
         ctest_equal_bool(
@@ -88,7 +88,7 @@ static void should_expand_text_decoration_shorthand(void)
         css_parser_t *parser;
         css_selector_t *selector;
         css_style_decl_t *result;
-        css_computed_style_t computed;
+        css_computed_style_t computed = { 0 };
 
         parser = css_parser_create(__FILE__);
         css_parser_parse(
@@ -111,6 +111,7 @@ static void should_expand_text_decoration_shorthand(void)
                         CSS_TEXT_DECORATION_THICKNESS_AUTO);
         css_computed_style_destroy(&computed);
         css_style_decl_destroy(result);
+        css_selector_destroy(selector);
 
         selector = css_selector_create(".td-mixed");
         result = css_select_style(selector);
@@ -125,6 +126,7 @@ static void should_expand_text_decoration_shorthand(void)
                         CSS_TEXT_DECORATION_UNDERLINE);
         css_computed_style_destroy(&computed);
         css_style_decl_destroy(result);
+        css_selector_destroy(selector);
 
         selector = css_selector_create(".td-override");
         result = css_select_style(selector);
@@ -134,6 +136,7 @@ static void should_expand_text_decoration_shorthand(void)
                         CSS_TEXT_DECORATION_NONE);
         css_computed_style_destroy(&computed);
         css_style_decl_destroy(result);
+        css_selector_destroy(selector);
 
         selector = css_selector_create(".td-override2");
         result = css_select_style(selector);
@@ -143,11 +146,12 @@ static void should_expand_text_decoration_shorthand(void)
                         CSS_TEXT_DECORATION_UNDERLINE);
         css_computed_style_destroy(&computed);
         css_style_decl_destroy(result);
+        css_selector_destroy(selector);
 }
 
 static void should_parse_offset_and_thickness_values(void)
 {
-        css_computed_style_t computed;
+        css_computed_style_t computed = { 0 };
         css_style_decl_t *decl = css_style_decl_create();
 
         ctest_equal_bool(
@@ -207,7 +211,7 @@ static void should_parse_offset_and_thickness_values(void)
 
 static void should_convert_absolute_offset_and_thickness_units(void)
 {
-        css_computed_style_t computed;
+        css_computed_style_t computed = { 0 };
         css_metrics_t metrics = { 192.f, 2.f, 1.f, 2.f };
         css_style_decl_t *decl = css_style_decl_create();
 
@@ -232,7 +236,7 @@ static void should_convert_absolute_offset_and_thickness_units(void)
 
 static void should_keep_pixel_lengths_in_logical_css_pixels(void)
 {
-        css_computed_style_t computed;
+        css_computed_style_t computed = { 0 };
         css_metrics_t metrics = { 192.f, 1.f, 1.f, 2.f };
         css_style_decl_t *decl = css_style_decl_create();
 
@@ -270,7 +274,7 @@ static void should_reject_unsupported_decoration_lengths(void)
 
 static void should_cascade_decoration_line_longhand(void)
 {
-        css_computed_style_t computed;
+        css_computed_style_t computed = { 0 };
         css_style_decl_t *decl = css_style_decl_create();
 
         ctest_equal_bool(

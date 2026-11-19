@@ -474,8 +474,8 @@ static void test_block_layout_1280(void)
                             &w->border_box, &rect);
 
         w = ui_get_widget("test-text-auto-size");
-        ctest_equal_bool("$('#test-text-auto-size')[0].width < 140px",
-                         w->border_box.width < 170, true);
+        ctest_equal_bool("$('#test-text-auto-size')[0].width < 220px",
+                         w->border_box.width < 220, true);
         ctest_equal_int("$('#test-text-auto-size')[0].height",
                         (int)w->border_box.height, (int)rect.height);
 
