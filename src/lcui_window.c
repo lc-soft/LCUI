@@ -265,7 +265,7 @@ bool lcui_window_bind_widget(lcui_window_t *w, ui_widget_t *widget)
                 }
                 return true;
         }
-        if (!w->ptk) {
+        if (!w->ptk || w->closed) {
                 return false;
         }
         if (w->widget == widget && ui_server_get_window(widget) == w->ptk) {
@@ -353,6 +353,9 @@ void lcui_window_set_size(lcui_window_t *w, int cw, int ch)
         }
         ptk_window_set_size(w->ptk, lcui_window_to_px(w->ptk, cw),
                             lcui_window_to_px(w->ptk, ch));
+        if (w->widget) {
+                ui_widget_resize(w->widget, cw, ch);
+        }
 }
 
 void lcui_window_set_position(lcui_window_t *w, int x, int y)
