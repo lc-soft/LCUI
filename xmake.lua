@@ -1,10 +1,15 @@
 set_project("lcui")
-set_version("3.0.0-a")
+set_version("3.0.0-alpha.0")
+set_languages("c11")
 set_warnings("all", "error")
 set_policy("package.requires_lock", true)
 add_rules("mode.debug", "mode.release", "mode.coverage")
 add_rpathdirs("@loader_path/lib", "@loader_path")
 add_defines("UNICODE", "_CRT_SECURE_NO_WARNINGS", "YUTIL_EXPORTS")
+if not is_plat("windows") then
+    -- Strict C11 hides POSIX/GNU extensions behind feature macros.
+    add_defines("_GNU_SOURCE=1")
+end
 add_includedirs(
     "lib/ctest/include",
     "lib/yutil/include",

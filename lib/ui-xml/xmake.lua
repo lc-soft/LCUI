@@ -1,7 +1,7 @@
 add_requires("libxml2", {optional = true})
 
 target("libui-xml")
-    set_version("0.1.0-a")
+    set_version("1.0.0")
     add_packages("libxml2")
     if has_package("libxml2") then
         set_configvar("LIBUI_XML_HAS_LIBXML2", 1)

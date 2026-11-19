@@ -11,6 +11,10 @@
 
 #ifndef _WIN32
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 #include <errno.h>
 #include <sys/time.h>
 #include <stdbool.h>

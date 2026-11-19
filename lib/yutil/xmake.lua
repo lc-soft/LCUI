@@ -1,9 +1,5 @@
 set_warnings("all", "error")
 
--- set language: c99
-stdc = "c99"
-set_languages(stdc)
-
 -- disable some compiler errors
 add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing", "-Wno-error=expansion-to-defined")
 
@@ -14,8 +10,6 @@ add_defines("_UNICODE", "YUTIL_EXPORTS")
 
 if is_plat("windows") then
     add_defines("_CRT_SECURE_NO_WARNINGS")
-else
-    add_defines("_GNU_SOURCE=1")
 end
 
 if is_mode("release") then
@@ -34,6 +28,7 @@ option_end()
 includes("tests")
 
 target("yutil")
+    set_version("1.0.0")
     -- make as a static/shared library
     set_kind("$(kind)")
     if is_kind("shared") then

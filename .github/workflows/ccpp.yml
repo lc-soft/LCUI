@@ -29,6 +29,9 @@ jobs:
       - name: Check formatting of changed files
         run: npm run format:check -- origin/${{ github.base_ref || 'develop' }}
 
+      - name: Check version consistency
+        run: node scripts/sync-versions.mjs --check
+
   build:
     needs: format
     env:

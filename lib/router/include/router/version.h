@@ -9,8 +9,8 @@
  * LICENSE.TXT file in the root directory of this source tree.
  */
 
-#define LIBROUTER_VERSION "0.1.0-a"
-#define LIBROUTER_VERSION_MAJOR 0
-#define LIBROUTER_VERSION_MINOR 1
+#define LIBROUTER_VERSION "1.0.0"
+#define LIBROUTER_VERSION_MAJOR 1
+#define LIBROUTER_VERSION_MINOR 0
 #define LIBROUTER_VERSION_ALTER 0
 #define LIBROUTER_STATIC_BUILD 1
