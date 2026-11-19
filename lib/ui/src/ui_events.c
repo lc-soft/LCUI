@@ -218,6 +218,7 @@ int ui_get_event_id(const char *event_name)
 
 void ui_event_init(ui_event_t *e, const char *name)
 {
+        memset(e, 0, sizeof(*e));
         e->target = NULL;
         e->type = ui_use_widget_event_id(name);
         e->cancel_bubble = false;
