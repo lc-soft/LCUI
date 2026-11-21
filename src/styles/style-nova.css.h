@@ -692,14 +692,15 @@ static const struct {
         { ".card-sm .card-header.border-b {\r\n", 34 },
         { "  padding-bottom: 12px;\n", 24 },
         { "}\n", 2 },
-        { "card-title {\r\n", 14 },
+        { "card-title,\r\n", 13 },
+        { ".card-title {\r\n", 15 },
         { "  font-size: 16px;\r\n", 20 },
         { "  line-height: 24px;\r\n", 22 },
         { "  font-weight: 500;\r\n", 21 },
         { "  line-height: 1.375;\n", 22 },
         { "}\n", 2 },
         { "card-header.has-card-action,\n", 29 },
-        { ".card-action {\r\n", 16 },
+        { ".card-header.has-card-action {\r\n", 32 },
         { "  padding-right: 88px;\n", 23 },
         { "}\n", 2 },
         { "card:sm card-header.has-card-action,\n", 37 },
@@ -720,7 +721,8 @@ static const struct {
         { ".dark card-description, .dark .card-description {\r\n", 51 },
         { "  color: #a1a1a1;\n", 18 },
         { "}\n", 2 },
-        { "card-action {\r\n", 15 },
+        { "card-action,\r\n", 14 },
+        { ".card-action {\r\n", 16 },
         { "  right: 16px;\n", 15 },
         { "}\n", 2 },
         { "card:sm card-action,\n", 21 },
@@ -2503,7 +2505,7 @@ static const struct {
         { "  background-color: rgb(250 250 250 / 0.6);\n", 44 },
         { "}\n", 2 },
 };
-static const size_t css_str_style_nova_total_length = 50172;
+static const size_t css_str_style_nova_total_length = 50217;
 static inline void ui_load_css_string_style_nova_chunks(void)
 {
         size_t i;

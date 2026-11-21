@@ -414,13 +414,14 @@ card:sm card-header.border-b,
   padding-bottom: 12px;
 }
 
-card-title {
+card-title,
+.card-title {
   @apply text-base font-medium;
   line-height: 1.375;
 }
 
 card-header.has-card-action,
-.card-action {
+.card-header.has-card-action {
   padding-right: 88px;
 }
 
@@ -439,7 +440,8 @@ card-description,
   @apply text-sm text-muted-foreground dark:text-muted-foreground-dark;
 }
 
-card-action {
+card-action,
+.card-action {
   right: 16px;
 }
 
