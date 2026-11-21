@@ -105,8 +105,9 @@ void test_widget_rect(void)
         if (rects.length == 1) {
                 rect = *(pd_rect_t *)list_get(&rects, 0);
         }
-        ctest_equal_pd_rect("should match expected dirty rect", &rect,
-                            &expected_rect);
+        ctest_equal_pd_rect(
+            "should match expected dirty rect after mouse enters at (80,80)",
+            &rect, &expected_rect);
         list_destroy(&rects, free);
 
         e.mouse.x = 40;
@@ -179,8 +180,9 @@ void test_widget_rect(void)
         if (rects.length == 1) {
                 rect = *(pd_rect_t *)list_get(&rects, 0);
         }
-        ctest_equal_pd_rect("should match expected dirty rect", &rect,
-                            &expected_rect);
+        ctest_equal_pd_rect(
+            "should match expected dirty rect after mouse leaves at (150,150)",
+            &rect, &expected_rect);
         list_destroy(&rects, free);
 
         expected_ui_rect.x = 0;
@@ -197,8 +199,9 @@ void test_widget_rect(void)
         if (rects.length == 1) {
                 rect = *(pd_rect_t *)list_get(&rects, 0);
         }
-        ctest_equal_pd_rect("should match expected dirty rect", &rect,
-                            &expected_rect);
+        ctest_equal_pd_rect(
+            "should match expected dirty rect after child is destroyed", &rect,
+            &expected_rect);
         list_destroy(&rects, free);
 
         expected_ui_rect.x = 0;
@@ -215,8 +218,9 @@ void test_widget_rect(void)
         if (rects.length == 1) {
                 rect = *(pd_rect_t *)list_get(&rects, 0);
         }
-        ctest_equal_pd_rect("should match expected dirty rect", &rect,
-                            &expected_rect);
+        ctest_equal_pd_rect(
+            "should match expected dirty rect after parent is destroyed", &rect,
+            &expected_rect);
         list_destroy(&rects, free);
 
         lcui_destroy();

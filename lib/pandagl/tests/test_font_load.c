@@ -17,10 +17,29 @@
 #define GetArialFont(S, W) pd_font_get_id("Arial", S, W)
 
 #ifdef _WIN32
-static void test_segoe_ui_font_load(void)
+static void check_resolved_font(int id, pd_font_style_t style,
+                                pd_font_weight_t weight, const char *family)
 {
         pd_font_face_t *font;
-        int id;
+        char desc[160];
+
+        snprintf(desc, sizeof(desc), "should resolve %s (style=%d, weight=%d)",
+                 family, style, weight);
+        ctest_equal_bool(desc, id > 0, true);
+        if (id <= 0) {
+                return;
+        }
+        font = pd_font_get(id);
+        snprintf(desc, sizeof(desc), "should match font style: %s (style=%d)",
+                 family, style);
+        ctest_equal_int(desc, font->style, style);
+        snprintf(desc, sizeof(desc), "should match font weight: %s (weight=%d)",
+                 family, weight);
+        ctest_equal_int(desc, font->weight, weight);
+}
+
+static void test_segoe_ui_font_load(void)
+{
         if (pd_font_try_load_file("C:/windows/fonts/segoeui.ttf") != 0) {
                 return;
         }
@@ -48,63 +67,25 @@ static void test_segoe_ui_font_load(void)
         ctest_equal_int("should load seguili.ttf",
                         pd_font_try_load_file("C:/windows/fonts/seguili.ttf"),
                         0);
-        id = GetSegoeUIFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_NORMAL);
-        ctest_equal_bool("should resolve font (style: normal, weight: normal)",
-                         id > 0, true);
-        if (id > 0) {
-                font = pd_font_get(id);
-                ctest_equal_int("should match font style", font->style,
-                                PD_FONT_STYLE_NORMAL);
-                ctest_equal_int("should match font weight", font->weight,
-                                PD_FONT_WEIGHT_NORMAL);
-        }
-        id = GetSegoeUIFont(PD_FONT_STYLE_ITALIC, PD_FONT_WEIGHT_NORMAL);
-        ctest_equal_bool("should resolve font (style: italic, weight: normal)",
-                         id > 0, true);
-        if (id > 0) {
-                font = pd_font_get(id);
-                ctest_equal_int("should match font style", font->style,
-                                PD_FONT_STYLE_ITALIC);
-                ctest_equal_int("should match font weight", font->weight,
-                                PD_FONT_WEIGHT_NORMAL);
-        }
-        id = GetSegoeUIFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_BOLD);
-        ctest_equal_bool("should resolve font (style: normal, weight: bold)",
-                         id > 0, true);
-        if (id > 0) {
-                font = pd_font_get(id);
-                ctest_equal_int("should match font style", font->style,
-                                PD_FONT_STYLE_NORMAL);
-                ctest_equal_int("should match font weight", font->weight,
-                                PD_FONT_WEIGHT_BOLD);
-        }
-        id = GetSegoeUIFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_LIGHT);
-        ctest_equal_bool("should resolve font (style: normal, weight: light)",
-                         id > 0, true);
-        if (id > 0) {
-                font = pd_font_get(id);
-                ctest_equal_int("should match font style", font->style,
-                                PD_FONT_STYLE_NORMAL);
-                ctest_equal_int("should match font weight", font->weight,
-                                PD_FONT_WEIGHT_LIGHT);
-        }
-        id = GetSegoeUIFont(PD_FONT_STYLE_ITALIC, PD_FONT_WEIGHT_EXTRA_LIGHT);
-        ctest_equal_bool(
-            "should resolve font (style: italic, weight: extra light)", id > 0,
-            true);
-        if (id > 0) {
-                font = pd_font_get(id);
-                ctest_equal_int("should match font style", font->style,
-                                PD_FONT_STYLE_ITALIC);
-                ctest_equal_int("should match font weight", font->weight,
-                                PD_FONT_WEIGHT_EXTRA_LIGHT);
-        }
+        check_resolved_font(
+            GetSegoeUIFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_NORMAL),
+            PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_NORMAL, "Segoe UI");
+        check_resolved_font(
+            GetSegoeUIFont(PD_FONT_STYLE_ITALIC, PD_FONT_WEIGHT_NORMAL),
+            PD_FONT_STYLE_ITALIC, PD_FONT_WEIGHT_NORMAL, "Segoe UI");
+        check_resolved_font(
+            GetSegoeUIFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_BOLD),
+            PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_BOLD, "Segoe UI");
+        check_resolved_font(
+            GetSegoeUIFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_LIGHT),
+            PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_LIGHT, "Segoe UI");
+        check_resolved_font(
+            GetSegoeUIFont(PD_FONT_STYLE_ITALIC, PD_FONT_WEIGHT_EXTRA_LIGHT),
+            PD_FONT_STYLE_ITALIC, PD_FONT_WEIGHT_EXTRA_LIGHT, "Segoe UI");
 }
 
 static void test_arial_font_load(void)
 {
-        int id;
-        pd_font_face_t *font;
         if (pd_font_try_load_file("C:/windows/fonts/arial.ttf") != 0) {
                 return;
         }
@@ -120,56 +101,21 @@ static void test_arial_font_load(void)
         ctest_equal_int("should load ariali.ttf",
                         pd_font_try_load_file("C:/windows/fonts/ariali.ttf"),
                         0);
-        id = GetArialFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_NORMAL);
-        ctest_equal_bool("should resolve font (style: normal, weight: normal)",
-                         id > 0, true);
-        if (id > 0) {
-                font = pd_font_get(id);
-                ctest_equal_int("should match font style", font->style,
-                                PD_FONT_STYLE_NORMAL);
-                ctest_equal_int("should match font weight", font->weight,
-                                PD_FONT_WEIGHT_NORMAL);
-        }
-        id = GetArialFont(PD_FONT_STYLE_ITALIC, PD_FONT_WEIGHT_NORMAL);
-        ctest_equal_bool("should resolve font (style: italic, weight: normal)",
-                         id > 0, true);
-        if (id > 0) {
-                font = pd_font_get(id);
-                ctest_equal_int("should match font style", font->style,
-                                PD_FONT_STYLE_ITALIC);
-                ctest_equal_int("should match font weight", font->weight,
-                                PD_FONT_WEIGHT_NORMAL);
-        }
-        id = GetArialFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_BOLD);
-        ctest_equal_bool("should resolve font (style: normal, weight: bold)",
-                         id > 0, true);
-        if (id > 0) {
-                font = pd_font_get(id);
-                ctest_equal_int("should match font style", font->style,
-                                PD_FONT_STYLE_NORMAL);
-                ctest_equal_int("should match font weight", font->weight,
-                                PD_FONT_WEIGHT_BOLD);
-        }
-        id = GetArialFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_BLACK);
-        ctest_equal_bool("should resolve font (style: normal, weight: black)",
-                         id > 0, true);
-        if (id > 0) {
-                font = pd_font_get(id);
-                ctest_equal_int("should match font style", font->style,
-                                PD_FONT_STYLE_NORMAL);
-                ctest_equal_int("should match font weight", font->weight,
-                                PD_FONT_WEIGHT_BLACK);
-        }
-        id = GetSegoeUIFont(PD_FONT_STYLE_ITALIC, PD_FONT_WEIGHT_BOLD);
-        ctest_equal_bool("should resolve font (style: italic, weight: bold)",
-                         id > 0, true);
-        if (id > 0) {
-                font = pd_font_get(id);
-                ctest_equal_int("should match font style", font->style,
-                                PD_FONT_STYLE_ITALIC);
-                ctest_equal_int("should match font weight", font->weight,
-                                PD_FONT_WEIGHT_BOLD);
-        }
+        check_resolved_font(
+            GetArialFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_NORMAL),
+            PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_NORMAL, "Arial");
+        check_resolved_font(
+            GetArialFont(PD_FONT_STYLE_ITALIC, PD_FONT_WEIGHT_NORMAL),
+            PD_FONT_STYLE_ITALIC, PD_FONT_WEIGHT_NORMAL, "Arial");
+        check_resolved_font(
+            GetArialFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_BOLD),
+            PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_BOLD, "Arial");
+        check_resolved_font(
+            GetArialFont(PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_BLACK),
+            PD_FONT_STYLE_NORMAL, PD_FONT_WEIGHT_BLACK, "Arial");
+        check_resolved_font(
+            GetSegoeUIFont(PD_FONT_STYLE_ITALIC, PD_FONT_WEIGHT_BOLD),
+            PD_FONT_STYLE_ITALIC, PD_FONT_WEIGHT_BOLD, "Segoe UI");
 }
 
 static void test_variable_font_weights(void)

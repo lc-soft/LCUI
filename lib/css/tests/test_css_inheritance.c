@@ -495,6 +495,7 @@ static void test_computed_property_table_coverage(void)
         css_computed_style_t a = { 0 };
         css_computed_style_t b = { 0 };
         css_prop_key_t key;
+        char name[128];
 
         /* P-3 guard: every css_prop_key_t below STYLE_KEY_TOTAL must have a
          * generated copy/equality case. A property registered in the enum but
@@ -502,13 +503,21 @@ static void test_computed_property_table_coverage(void)
          * which aborts this debug binary instead of passing silently. Two
          * zeroed styles compare equal for every key. */
         for (key = 0; key < STYLE_KEY_TOTAL; ++key) {
-                ctest_equal_bool("should treat two zeroed styles as equal",
-                                 css_computed_style_property_equal(&a, &b, key),
-                                 1);
+                css_propdef_t *propdef = css_get_propdef(key);
+                const char *prop_name =
+                    propdef && propdef->name ? propdef->name : "?";
+
+                snprintf(name, sizeof(name),
+                         "should treat two zeroed styles as equal: %s",
+                         prop_name);
+                ctest_equal_bool(
+                    name, css_computed_style_property_equal(&a, &b, key), 1);
                 css_computed_style_copy_property(&b, &a, key);
-                ctest_equal_bool("should stay equal after a per-key copy",
-                                 css_computed_style_property_equal(&a, &b, key),
-                                 1);
+                snprintf(name, sizeof(name),
+                         "should stay equal after a per-key copy: %s",
+                         prop_name);
+                ctest_equal_bool(
+                    name, css_computed_style_property_equal(&a, &b, key), 1);
         }
         css_computed_style_destroy(&b);
 }

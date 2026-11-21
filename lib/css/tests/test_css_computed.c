@@ -195,10 +195,10 @@ void test_flex_gap_shorthand_one_value(void)
         result = css_select_style(selector);
         css_cascade_style(result, &computed);
 
-        ctest_equal_int("row-gap type", computed.type_bits.row_gap,
+        ctest_equal_int("row-gap type: .flex-gap", computed.type_bits.row_gap,
                         CSS_GAP_SET);
-        ctest_equal_int("column-gap type", computed.type_bits.column_gap,
-                        CSS_GAP_SET);
+        ctest_equal_int("column-gap type: .flex-gap",
+                        computed.type_bits.column_gap, CSS_GAP_SET);
         ctest_equal_int("row-gap unit", computed.unit_bits.row_gap,
                         CSS_UNIT_PX);
         ctest_equal_int("column-gap unit", computed.unit_bits.column_gap,
@@ -221,10 +221,10 @@ void test_flex_gap_shorthand_two_values(void)
         result = css_select_style(selector);
         css_cascade_style(result, &computed);
 
-        ctest_equal_int("row-gap type", computed.type_bits.row_gap,
-                        CSS_GAP_SET);
-        ctest_equal_int("column-gap type", computed.type_bits.column_gap,
-                        CSS_GAP_SET);
+        ctest_equal_int("row-gap type: .flex-gap-two-values",
+                        computed.type_bits.row_gap, CSS_GAP_SET);
+        ctest_equal_int("column-gap type: .flex-gap-two-values",
+                        computed.type_bits.column_gap, CSS_GAP_SET);
         check_length("row-gap", computed.row_gap, 8);
         check_length("column-gap", computed.column_gap, 16);
 
@@ -243,10 +243,10 @@ void test_flex_gap_axis(void)
         result = css_select_style(selector);
         css_cascade_style(result, &computed);
 
-        ctest_equal_int("row-gap type", computed.type_bits.row_gap,
-                        CSS_GAP_SET);
-        ctest_equal_int("column-gap type", computed.type_bits.column_gap,
-                        CSS_GAP_SET);
+        ctest_equal_int("row-gap type: .flex-gap-axis",
+                        computed.type_bits.row_gap, CSS_GAP_SET);
+        ctest_equal_int("column-gap type: .flex-gap-axis",
+                        computed.type_bits.column_gap, CSS_GAP_SET);
         check_length("row-gap", computed.row_gap, 4);
         check_length("column-gap", computed.column_gap, 20);
 
@@ -265,10 +265,10 @@ void test_flex_gap_normal(void)
         result = css_select_style(selector);
         css_cascade_style(result, &computed);
 
-        ctest_equal_int("row-gap type", computed.type_bits.row_gap,
-                        CSS_GAP_NORMAL);
-        ctest_equal_int("column-gap type", computed.type_bits.column_gap,
-                        CSS_GAP_NORMAL);
+        ctest_equal_int("row-gap type: .flex-gap-normal",
+                        computed.type_bits.row_gap, CSS_GAP_NORMAL);
+        ctest_equal_int("column-gap type: .flex-gap-normal",
+                        computed.type_bits.column_gap, CSS_GAP_NORMAL);
 
         css_style_decl_destroy(result);
         css_selector_destroy(selector);
@@ -285,10 +285,10 @@ void test_flex_gap_percentage(void)
         result = css_select_style(selector);
         css_cascade_style(result, &computed);
 
-        ctest_equal_int("row-gap type", computed.type_bits.row_gap,
-                        CSS_GAP_SET);
-        ctest_equal_int("column-gap type", computed.type_bits.column_gap,
-                        CSS_GAP_SET);
+        ctest_equal_int("row-gap type: .flex-gap-percentage",
+                        computed.type_bits.row_gap, CSS_GAP_SET);
+        ctest_equal_int("column-gap type: .flex-gap-percentage",
+                        computed.type_bits.column_gap, CSS_GAP_SET);
         ctest_equal_int("row-gap unit", computed.unit_bits.row_gap,
                         CSS_UNIT_PERCENT);
         ctest_equal_int("column-gap unit", computed.unit_bits.column_gap,

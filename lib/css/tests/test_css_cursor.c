@@ -9,6 +9,7 @@
  * in the LICENSE.TXT file in the root directory of this source tree.
  */
 
+#include <stdio.h>
 #include <css.h>
 #include <ctest.h>
 
@@ -65,18 +66,22 @@ static void should_cascade_every_cursor_value(void)
 {
         unsigned i;
         size_t n = sizeof(cursor_value_names) / sizeof(cursor_value_names[0]);
+        char name[128];
 
         for (i = 0; i < n; ++i) {
                 css_computed_style_t computed;
                 css_style_decl_t *decl = css_style_decl_create();
 
+                snprintf(name, sizeof(name), "should parse cursor value: %s",
+                         cursor_value_names[i]);
                 ctest_equal_bool(
-                    "should parse cursor value",
+                    name,
                     set_property(decl, "cursor", cursor_value_names[i]) > 0,
                     true);
                 css_cascade_style(decl, &computed);
-                ctest_equal_int("should cascade cursor value",
-                                computed.type_bits.cursor, (int)i);
+                snprintf(name, sizeof(name), "should cascade cursor value: %s",
+                         cursor_value_names[i]);
+                ctest_equal_int(name, computed.type_bits.cursor, (int)i);
                 css_computed_style_destroy(&computed);
                 css_style_decl_destroy(decl);
         }
