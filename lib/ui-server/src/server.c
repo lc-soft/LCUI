@@ -222,7 +222,7 @@ static void ui_server_on_window_resize(ptk_event_t *e, void *arg)
         float scale, width, height;
 
         conn = ui_server_find_connection(NULL, e->window);
-        if (!conn || conn->state != UI_CONNECTION_STATE_INITIALIZED) {
+        if (!conn) {
                 return;
         }
         scale = css_metrics_actual_scale(&conn->updater->metrics);
