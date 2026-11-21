@@ -73,9 +73,11 @@ extern void test_breadcrumb(void);
 extern void test_input_group(void);
 extern void test_window_restore(void);
 extern void test_window_api(void);
+extern void test_environment(void);
 extern void test_window_events(void);
 
 static const ctest_suite_t suites[] = {
+        { "environment", test_environment },
         { "settings", test_settings },
         { "clipboard", test_clipboard },
         { "mainloop", test_mainloop },
