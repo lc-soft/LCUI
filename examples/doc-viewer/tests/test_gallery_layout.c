@@ -486,18 +486,30 @@ static void test_native_window_resize(void)
         float root_width;
         int i;
         int j;
+        char desc[160];
 
         for (i = 0; i < sizeof(widths) / sizeof(widths[0]); ++i) {
                 home_scene_native_resize(widths[i], 1000.0f);
                 root_width = ui_root()->content_box.width;
                 expected = home_scene_expected_column_width(root_width);
-                ctest_equal_bool("native resize should update the root width",
-                                 fabsf(root_width - widths[i]) < 2.0f, true);
-                ctest_equal_int("native resize should update the column count",
-                                home_scene_visible_columns(), visible[i]);
+                snprintf(desc, sizeof(desc),
+                         "native resize should update the root width "
+                         "(requested=%.1f, actual=%.1f)",
+                         widths[i], root_width);
+                ctest_equal_bool(desc, fabsf(root_width - widths[i]) < 2.0f,
+                                 true);
+                snprintf(desc, sizeof(desc),
+                         "native resize should update the column count "
+                         "(width=%.1f)",
+                         widths[i]);
+                ctest_equal_int(desc, home_scene_visible_columns(), visible[i]);
+                snprintf(desc, sizeof(desc),
+                         "native resize should shrink the gallery content "
+                         "(width=%.1f, actual=%.1f, expected=%.1f)",
+                         widths[i], scene->grid->content_box.width,
+                         expected * visible[i] + HOME_GAP * (visible[i] - 1));
                 ctest_equal_float(
-                    "native resize should shrink the gallery content",
-                    scene->grid->content_box.width,
+                    desc, scene->grid->content_box.width,
                     expected * visible[i] + HOME_GAP * (visible[i] - 1));
                 for (j = 0; j < HOME_GRID_COLUMNS; ++j) {
                         if (!scene->columns[j] ||
@@ -506,9 +518,13 @@ static void test_native_window_resize(void)
                                 CSS_DISPLAY_NONE) {
                                 continue;
                         }
-                        ctest_equal_float(
-                            "native resize should update the used column width",
-                            scene->columns[j]->border_box.width, expected);
+                        snprintf(desc, sizeof(desc),
+                                 "native resize should update the used column "
+                                 "width (width=%.1f, column=%d)",
+                                 widths[i], j);
+                        ctest_equal_float(desc,
+                                          scene->columns[j]->border_box.width,
+                                          expected);
                 }
         }
 }

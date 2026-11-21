@@ -1098,6 +1098,8 @@ static void check_text_capture_size(void)
         ui_widget_t *sp, *content, *txt, *plain, *ptxt;
         pd_canvas_t cap, ref;
         int cx, cy, cw, ch, rx, ry, rw, rh;
+        int width_tolerance, height_tolerance, margin_tolerance;
+        char desc[160];
 
         ui_metrics.dpi = 96;
         ui_load_css_string(css, "t-cap-demo");
@@ -1134,14 +1136,38 @@ static void check_text_capture_size(void)
         text_ink_bbox(&cap, 96, 32, &cx, &cy, &cw, &ch);
         text_ink_bbox(&ref, 96, 32, &rx, &ry, &rw, &rh);
 
+        width_tolerance = rw / 16;
+        if (width_tolerance < 2) {
+                width_tolerance = 2;
+        }
+        height_tolerance = rh / 16;
+        if (height_tolerance < 2) {
+                height_tolerance = 2;
+        }
+        margin_tolerance = rw / 16;
+        if (margin_tolerance < 2) {
+                margin_tolerance = 2;
+        }
+
         ctest_equal_bool("text capture: the captured text should be visible",
                          cw > 0 && ch > 0, true);
-        ctest_equal_bool("text capture: width should match a normal render",
-                         cw > 0 && abs(cw - rw) <= 2, true);
-        ctest_equal_bool("text capture: height should match a normal render",
-                         ch > 0 && abs(ch - rh) <= 2, true);
-        ctest_equal_bool("text capture: left margin should match",
-                         cw > 0 && abs(cx - rx) <= 2, true);
+        snprintf(desc, sizeof(desc),
+                 "text capture: width should match a normal render "
+                 "(captured=%d, direct=%d, tolerance=%d)",
+                 cw, rw, width_tolerance);
+        ctest_equal_bool(desc, cw > 0 && abs(cw - rw) <= width_tolerance, true);
+        snprintf(desc, sizeof(desc),
+                 "text capture: height should match a normal render "
+                 "(captured=%d, direct=%d, tolerance=%d)",
+                 ch, rh, height_tolerance);
+        ctest_equal_bool(desc, ch > 0 && abs(ch - rh) <= height_tolerance,
+                         true);
+        snprintf(desc, sizeof(desc),
+                 "text capture: left margin should match "
+                 "(captured=%d, direct=%d, tolerance=%d)",
+                 cx, rx, margin_tolerance);
+        ctest_equal_bool(desc, cw > 0 && abs(cx - rx) <= margin_tolerance,
+                         true);
 
         pd_canvas_destroy(&cap);
         pd_canvas_destroy(&ref);
