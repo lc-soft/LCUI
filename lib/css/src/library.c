@@ -489,6 +489,75 @@ void css_each_style_rule(void (*callback)(css_style_rule_t *, const char *,
         dict_destroy_iterator(iter);
 }
 
+static void css_style_link_remove_rules(css_style_link_t *link,
+                                        const char *space, size_t *count)
+{
+        list_node_t *node, *next;
+        css_style_rule_t *rule;
+
+        for (node = link->styles.head.next; node; node = next) {
+                next = node->next;
+                rule = node->data;
+                if (rule->space && strcmp(rule->space, space) == 0) {
+                        list_unlink(&link->styles, node);
+                        css_style_rule_destroy(rule);
+                        ++(*count);
+                }
+        }
+}
+
+static void css_style_link_remove_rules_recursive(css_style_link_t *link,
+                                                  const char *space,
+                                                  size_t *count)
+{
+        dict_iterator_t *iter;
+        dict_entry_t *entry;
+
+        css_style_link_remove_rules(link, space, count);
+        iter = dict_get_iterator(link->parents);
+        while ((entry = dict_next(iter))) {
+                css_style_link_remove_rules_recursive(dict_get_val(entry),
+                                                      space, count);
+        }
+        dict_destroy_iterator(iter);
+}
+
+size_t css_remove_style_rules(const char *space)
+{
+        size_t count = 0;
+        dict_t *group;
+        css_style_link_t *link;
+        css_style_link_group_t *link_group;
+        dict_iterator_t *iter;
+        dict_iterator_t *iter_lg;
+        dict_entry_t *entry;
+        dict_entry_t *entry_lg;
+
+        if (!space) {
+                return 0;
+        }
+        group = list_get(&css_library.groups, 0);
+        if (!group) {
+                return 0;
+        }
+        iter = dict_get_iterator(group);
+        while ((entry = dict_next(iter))) {
+                link_group = dict_get_val(entry);
+                iter_lg = dict_get_iterator(link_group->links);
+                while ((entry_lg = dict_next(iter_lg))) {
+                        link = dict_get_val(entry_lg);
+                        css_style_link_remove_rules_recursive(link, space,
+                                                              &count);
+                }
+                dict_destroy_iterator(iter_lg);
+        }
+        dict_destroy_iterator(iter);
+        if (count > 0) {
+                dict_empty(css_library.cache, NULL);
+        }
+        return count;
+}
+
 css_style_decl_t *css_select_style(const css_selector_t *s)
 {
         list_t list;

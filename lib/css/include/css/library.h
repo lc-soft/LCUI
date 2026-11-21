@@ -41,6 +41,13 @@ LIBCSS_PUBLIC void css_each_style_rule(void (*callback)(css_style_rule_t *,
                                                         const char *, void *),
                                        void *data);
 
+/**
+ * Remove every style rule loaded with the given source name.
+ * @param[in] space The source name passed when the rules were added
+ * @return Number of removed rules
+ */
+LIBCSS_PUBLIC size_t css_remove_style_rules(const char *space);
+
 LIBCSS_PUBLIC css_style_decl_t *css_select_style(const css_selector_t *s);
 
 LIBCSS_PUBLIC css_style_decl_t *css_select_style_with_cache(

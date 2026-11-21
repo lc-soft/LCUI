@@ -20,6 +20,7 @@ extern void test_router_components(void);
 extern void test_widget_event(void);
 extern void test_widget_rect(void);
 extern void test_css_inheritance(void);
+extern void test_css_unload(void);
 extern void test_text_resize(void);
 extern void test_text_decoration(void);
 extern void test_textinput(void);
@@ -86,6 +87,7 @@ static const ctest_suite_t suites[] = {
         { "widget event", test_widget_event },
         { "widget rect", test_widget_rect },
         { "css inheritance", test_css_inheritance },
+        { "css unload", test_css_unload },
         { "text resize", test_text_resize },
         { "text decoration", test_text_decoration },
         { "textinput", test_textinput },

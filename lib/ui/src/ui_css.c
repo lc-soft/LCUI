@@ -94,6 +94,16 @@ size_t ui_load_css_string(const char *str, const char *space)
         return 0;
 }
 
+size_t ui_unload_css_string(const char *space)
+{
+        size_t count = css_remove_style_rules(space);
+
+        if (count > 0) {
+                ui_refresh_style();
+        }
+        return count;
+}
+
 void ui_init_css(void)
 {
         css_init();

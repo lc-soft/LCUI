@@ -18,6 +18,8 @@ LIBUI_END_DECLS
 
 LIBUI_PUBLIC int ui_load_css_file(const char *filepath);
 LIBUI_PUBLIC size_t ui_load_css_string(const char *str, const char *space);
+/* Remove the rules loaded with the given source name and refresh styles. */
+LIBUI_PUBLIC size_t ui_unload_css_string(const char *space);
 
 LIBUI_END_DECLS
 #endif
