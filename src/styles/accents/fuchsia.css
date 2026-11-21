@@ -1,0 +1,303 @@
+.accent-fuchsia button:primary, .accent-fuchsia .button-primary {
+  background-color: rgba(192, 38, 211, 1);
+}
+
+.accent-fuchsia button:primary, .accent-fuchsia .button-primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia.dark button:primary, .accent-fuchsia.dark .button-primary {
+  background-color: rgba(232, 121, 249, 1);
+}
+
+.accent-fuchsia.dark button:primary, .accent-fuchsia.dark .button-primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia button:primary:hover, .accent-fuchsia .button-primary:hover {
+  background-color: rgba(192, 38, 211, 0.9);
+}
+
+.accent-fuchsia button:primary:hover, .accent-fuchsia .button-primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia.dark button:primary:hover, .accent-fuchsia.dark .button-primary:hover {
+  background-color: rgba(232, 121, 249, 0.9);
+}
+
+.accent-fuchsia.dark button:primary:hover, .accent-fuchsia.dark .button-primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia button:link, .accent-fuchsia .button-link {
+  color: rgba(192, 38, 211, 1);
+}
+
+.accent-fuchsia.dark button:link, .accent-fuchsia.dark .button-link {
+  color: rgba(232, 121, 249, 1);
+}
+
+.accent-fuchsia button:link:hover, .accent-fuchsia .button-link:hover {
+  color: rgba(192, 38, 211, 1);
+}
+
+.accent-fuchsia.dark button:link:hover, .accent-fuchsia.dark .button-link:hover {
+  color: rgba(232, 121, 249, 1);
+}
+
+.accent-fuchsia button:primary:active {
+  background-color: rgba(192, 38, 211, 0.8);
+}
+
+.accent-fuchsia button:primary:active {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia.dark button:primary:active {
+  background-color: rgba(232, 121, 249, 0.8);
+}
+
+.accent-fuchsia.dark button:primary:active {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia button:link:active, .accent-fuchsia .button-link:active {
+  color: rgba(192, 38, 211, 1);
+}
+
+.accent-fuchsia.dark button:link:active, .accent-fuchsia.dark .button-link:active {
+  color: rgba(232, 121, 249, 1);
+}
+
+.accent-fuchsia badge:default, .accent-fuchsia .badge-default {
+  border-color: rgba(192, 38, 211, 1);
+}
+
+.accent-fuchsia badge:default, .accent-fuchsia .badge-default {
+  background-color: rgba(192, 38, 211, 1);
+}
+
+.accent-fuchsia badge:default, .accent-fuchsia .badge-default {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia.dark badge:default, .accent-fuchsia.dark .badge-default {
+  border-color: rgba(232, 121, 249, 1);
+}
+
+.accent-fuchsia.dark badge:default, .accent-fuchsia.dark .badge-default {
+  background-color: rgba(232, 121, 249, 1);
+}
+
+.accent-fuchsia.dark badge:default, .accent-fuchsia.dark .badge-default {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia .tooltip-inner {
+  background-color: rgba(192, 38, 211, 1);
+}
+
+.accent-fuchsia .tooltip-inner {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia.dark .tooltip-inner {
+  background-color: rgba(232, 121, 249, 1);
+}
+
+.accent-fuchsia.dark .tooltip-inner {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia tooltip-content text {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia.dark tooltip-content text {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia .tooltip-arrow.tooltip-side-top {
+  border-top-color: rgba(192, 38, 211, 1);
+}
+
+.accent-fuchsia.dark .tooltip-arrow.tooltip-side-top {
+  border-top-color: rgba(232, 121, 249, 1);
+}
+
+.accent-fuchsia .tooltip-arrow.tooltip-side-bottom {
+  border-bottom-color: rgba(192, 38, 211, 1);
+}
+
+.accent-fuchsia.dark .tooltip-arrow.tooltip-side-bottom {
+  border-bottom-color: rgba(232, 121, 249, 1);
+}
+
+.accent-fuchsia .tooltip-arrow.tooltip-side-left {
+  border-left-color: rgba(192, 38, 211, 1);
+}
+
+.accent-fuchsia.dark .tooltip-arrow.tooltip-side-left {
+  border-left-color: rgba(232, 121, 249, 1);
+}
+
+.accent-fuchsia .tooltip-arrow.tooltip-side-right {
+  border-right-color: rgba(192, 38, 211, 1);
+}
+
+.accent-fuchsia.dark .tooltip-arrow.tooltip-side-right {
+  border-right-color: rgba(232, 121, 249, 1);
+}
+
+.accent-fuchsia progress-indicator {
+  background-color: rgba(192, 38, 211, 1);
+}
+
+.accent-fuchsia.dark progress-indicator {
+  background-color: rgba(232, 121, 249, 1);
+}
+
+.accent-fuchsia radio-group-item:checked {
+  border-color: rgba(192, 38, 211, 1);
+}
+
+.accent-fuchsia radio-group-item:checked {
+  background-color: rgba(192, 38, 211, 1);
+}
+
+.accent-fuchsia.dark radio-group-item:checked {
+  border-color: rgba(232, 121, 249, 1);
+}
+
+.accent-fuchsia.dark radio-group-item:checked {
+  background-color: rgba(232, 121, 249, 1);
+}
+
+.accent-fuchsia radio-group-item .indicator {
+  background-color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia.dark radio-group-item .indicator {
+  background-color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia alert-dialog-action:primary {
+  background-color: rgba(192, 38, 211, 1);
+}
+
+.accent-fuchsia alert-dialog-action:primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia.dark alert-dialog-action:primary {
+  background-color: rgba(232, 121, 249, 1);
+}
+
+.accent-fuchsia.dark alert-dialog-action:primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia alert-dialog-action:primary:hover {
+  background-color: rgba(192, 38, 211, 0.9);
+}
+
+.accent-fuchsia alert-dialog-action:primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia.dark alert-dialog-action:primary:hover {
+  background-color: rgba(232, 121, 249, 0.9);
+}
+
+.accent-fuchsia.dark alert-dialog-action:primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia checkbox:checked, .accent-fuchsia checkbox:indeterminate {
+  border-color: rgba(192, 38, 211, 1);
+}
+
+.accent-fuchsia checkbox:checked, .accent-fuchsia checkbox:indeterminate {
+  background-color: rgba(192, 38, 211, 1);
+}
+
+.accent-fuchsia checkbox:checked, .accent-fuchsia checkbox:indeterminate {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia.dark checkbox:checked, .accent-fuchsia.dark checkbox:indeterminate {
+  border-color: rgba(232, 121, 249, 1);
+}
+
+.accent-fuchsia.dark checkbox:checked, .accent-fuchsia.dark checkbox:indeterminate {
+  background-color: rgba(232, 121, 249, 1);
+}
+
+.accent-fuchsia.dark checkbox:checked, .accent-fuchsia.dark checkbox:indeterminate {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia .sidebar-menu-button:hover {
+  background-color: rgba(192, 38, 211, 0.1);
+}
+
+.accent-fuchsia .sidebar-menu-button:hover {
+  color: rgba(192, 38, 211, 1);
+}
+
+.accent-fuchsia.dark .sidebar-menu-button:hover {
+  background-color: rgba(232, 121, 249, 0.15);
+}
+
+.accent-fuchsia.dark .sidebar-menu-button:hover {
+  color: rgba(232, 121, 249, 1);
+}
+
+.accent-fuchsia .sidebar-menu-button.active {
+  background-color: rgba(192, 38, 211, 0.1);
+}
+
+.accent-fuchsia .sidebar-menu-button.active {
+  color: rgba(192, 38, 211, 1);
+}
+
+.accent-fuchsia.dark .sidebar-menu-button.active {
+  background-color: rgba(232, 121, 249, 0.15);
+}
+
+.accent-fuchsia.dark .sidebar-menu-button.active {
+  color: rgba(232, 121, 249, 1);
+}
+
+.accent-fuchsia .sidebar-team-logo {
+  background-color: rgba(192, 38, 211, 1);
+}
+
+.accent-fuchsia .sidebar-team-logo {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia.dark .sidebar-team-logo {
+  background-color: rgba(232, 121, 249, 1);
+}
+
+.accent-fuchsia.dark .sidebar-team-logo {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-fuchsia .sidebar-avatar {
+  background-color: rgba(192, 38, 211, 0.1);
+}
+
+.accent-fuchsia .sidebar-avatar {
+  color: rgba(192, 38, 211, 1);
+}
+
+.accent-fuchsia.dark .sidebar-avatar {
+  background-color: rgba(232, 121, 249, 0.15);
+}
+
+.accent-fuchsia.dark .sidebar-avatar {
+  color: rgba(232, 121, 249, 1);
+}

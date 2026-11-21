@@ -1,0 +1,303 @@
+.accent-indigo button:primary, .accent-indigo .button-primary {
+  background-color: rgba(79, 70, 229, 1);
+}
+
+.accent-indigo button:primary, .accent-indigo .button-primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-indigo.dark button:primary, .accent-indigo.dark .button-primary {
+  background-color: rgba(129, 140, 248, 1);
+}
+
+.accent-indigo.dark button:primary, .accent-indigo.dark .button-primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-indigo button:primary:hover, .accent-indigo .button-primary:hover {
+  background-color: rgba(79, 70, 229, 0.9);
+}
+
+.accent-indigo button:primary:hover, .accent-indigo .button-primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-indigo.dark button:primary:hover, .accent-indigo.dark .button-primary:hover {
+  background-color: rgba(129, 140, 248, 0.9);
+}
+
+.accent-indigo.dark button:primary:hover, .accent-indigo.dark .button-primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-indigo button:link, .accent-indigo .button-link {
+  color: rgba(79, 70, 229, 1);
+}
+
+.accent-indigo.dark button:link, .accent-indigo.dark .button-link {
+  color: rgba(129, 140, 248, 1);
+}
+
+.accent-indigo button:link:hover, .accent-indigo .button-link:hover {
+  color: rgba(79, 70, 229, 1);
+}
+
+.accent-indigo.dark button:link:hover, .accent-indigo.dark .button-link:hover {
+  color: rgba(129, 140, 248, 1);
+}
+
+.accent-indigo button:primary:active {
+  background-color: rgba(79, 70, 229, 0.8);
+}
+
+.accent-indigo button:primary:active {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-indigo.dark button:primary:active {
+  background-color: rgba(129, 140, 248, 0.8);
+}
+
+.accent-indigo.dark button:primary:active {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-indigo button:link:active, .accent-indigo .button-link:active {
+  color: rgba(79, 70, 229, 1);
+}
+
+.accent-indigo.dark button:link:active, .accent-indigo.dark .button-link:active {
+  color: rgba(129, 140, 248, 1);
+}
+
+.accent-indigo badge:default, .accent-indigo .badge-default {
+  border-color: rgba(79, 70, 229, 1);
+}
+
+.accent-indigo badge:default, .accent-indigo .badge-default {
+  background-color: rgba(79, 70, 229, 1);
+}
+
+.accent-indigo badge:default, .accent-indigo .badge-default {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-indigo.dark badge:default, .accent-indigo.dark .badge-default {
+  border-color: rgba(129, 140, 248, 1);
+}
+
+.accent-indigo.dark badge:default, .accent-indigo.dark .badge-default {
+  background-color: rgba(129, 140, 248, 1);
+}
+
+.accent-indigo.dark badge:default, .accent-indigo.dark .badge-default {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-indigo .tooltip-inner {
+  background-color: rgba(79, 70, 229, 1);
+}
+
+.accent-indigo .tooltip-inner {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-indigo.dark .tooltip-inner {
+  background-color: rgba(129, 140, 248, 1);
+}
+
+.accent-indigo.dark .tooltip-inner {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-indigo tooltip-content text {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-indigo.dark tooltip-content text {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-indigo .tooltip-arrow.tooltip-side-top {
+  border-top-color: rgba(79, 70, 229, 1);
+}
+
+.accent-indigo.dark .tooltip-arrow.tooltip-side-top {
+  border-top-color: rgba(129, 140, 248, 1);
+}
+
+.accent-indigo .tooltip-arrow.tooltip-side-bottom {
+  border-bottom-color: rgba(79, 70, 229, 1);
+}
+
+.accent-indigo.dark .tooltip-arrow.tooltip-side-bottom {
+  border-bottom-color: rgba(129, 140, 248, 1);
+}
+
+.accent-indigo .tooltip-arrow.tooltip-side-left {
+  border-left-color: rgba(79, 70, 229, 1);
+}
+
+.accent-indigo.dark .tooltip-arrow.tooltip-side-left {
+  border-left-color: rgba(129, 140, 248, 1);
+}
+
+.accent-indigo .tooltip-arrow.tooltip-side-right {
+  border-right-color: rgba(79, 70, 229, 1);
+}
+
+.accent-indigo.dark .tooltip-arrow.tooltip-side-right {
+  border-right-color: rgba(129, 140, 248, 1);
+}
+
+.accent-indigo progress-indicator {
+  background-color: rgba(79, 70, 229, 1);
+}
+
+.accent-indigo.dark progress-indicator {
+  background-color: rgba(129, 140, 248, 1);
+}
+
+.accent-indigo radio-group-item:checked {
+  border-color: rgba(79, 70, 229, 1);
+}
+
+.accent-indigo radio-group-item:checked {
+  background-color: rgba(79, 70, 229, 1);
+}
+
+.accent-indigo.dark radio-group-item:checked {
+  border-color: rgba(129, 140, 248, 1);
+}
+
+.accent-indigo.dark radio-group-item:checked {
+  background-color: rgba(129, 140, 248, 1);
+}
+
+.accent-indigo radio-group-item .indicator {
+  background-color: rgba(250, 250, 250, 1);
+}
+
+.accent-indigo.dark radio-group-item .indicator {
+  background-color: rgba(250, 250, 250, 1);
+}
+
+.accent-indigo alert-dialog-action:primary {
+  background-color: rgba(79, 70, 229, 1);
+}
+
+.accent-indigo alert-dialog-action:primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-indigo.dark alert-dialog-action:primary {
+  background-color: rgba(129, 140, 248, 1);
+}
+
+.accent-indigo.dark alert-dialog-action:primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-indigo alert-dialog-action:primary:hover {
+  background-color: rgba(79, 70, 229, 0.9);
+}
+
+.accent-indigo alert-dialog-action:primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-indigo.dark alert-dialog-action:primary:hover {
+  background-color: rgba(129, 140, 248, 0.9);
+}
+
+.accent-indigo.dark alert-dialog-action:primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-indigo checkbox:checked, .accent-indigo checkbox:indeterminate {
+  border-color: rgba(79, 70, 229, 1);
+}
+
+.accent-indigo checkbox:checked, .accent-indigo checkbox:indeterminate {
+  background-color: rgba(79, 70, 229, 1);
+}
+
+.accent-indigo checkbox:checked, .accent-indigo checkbox:indeterminate {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-indigo.dark checkbox:checked, .accent-indigo.dark checkbox:indeterminate {
+  border-color: rgba(129, 140, 248, 1);
+}
+
+.accent-indigo.dark checkbox:checked, .accent-indigo.dark checkbox:indeterminate {
+  background-color: rgba(129, 140, 248, 1);
+}
+
+.accent-indigo.dark checkbox:checked, .accent-indigo.dark checkbox:indeterminate {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-indigo .sidebar-menu-button:hover {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.accent-indigo .sidebar-menu-button:hover {
+  color: rgba(79, 70, 229, 1);
+}
+
+.accent-indigo.dark .sidebar-menu-button:hover {
+  background-color: rgba(129, 140, 248, 0.15);
+}
+
+.accent-indigo.dark .sidebar-menu-button:hover {
+  color: rgba(129, 140, 248, 1);
+}
+
+.accent-indigo .sidebar-menu-button.active {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.accent-indigo .sidebar-menu-button.active {
+  color: rgba(79, 70, 229, 1);
+}
+
+.accent-indigo.dark .sidebar-menu-button.active {
+  background-color: rgba(129, 140, 248, 0.15);
+}
+
+.accent-indigo.dark .sidebar-menu-button.active {
+  color: rgba(129, 140, 248, 1);
+}
+
+.accent-indigo .sidebar-team-logo {
+  background-color: rgba(79, 70, 229, 1);
+}
+
+.accent-indigo .sidebar-team-logo {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-indigo.dark .sidebar-team-logo {
+  background-color: rgba(129, 140, 248, 1);
+}
+
+.accent-indigo.dark .sidebar-team-logo {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-indigo .sidebar-avatar {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.accent-indigo .sidebar-avatar {
+  color: rgba(79, 70, 229, 1);
+}
+
+.accent-indigo.dark .sidebar-avatar {
+  background-color: rgba(129, 140, 248, 0.15);
+}
+
+.accent-indigo.dark .sidebar-avatar {
+  color: rgba(129, 140, 248, 1);
+}

@@ -1,6 +1,7 @@
 import { Button, Text, Widget } from "@lcui/react";
 import "./navbar.css";
 import { repoStars } from "./repo-stars.generated";
+import { accentNames } from "./accent-palette";
 
 function formatStars(count: number): string {
   if (count < 1000) {
@@ -76,6 +77,27 @@ export default function Navbar() {
         >
           <icon name="dark-theme" />
         </Button>
+        <dropdown-menu $ref="accent_menu">
+          <dropdown-menu-trigger>
+            <Button variant="ghost" size="icon" $ref="accent_btn">
+              <icon name="color" />
+            </Button>
+          </dropdown-menu-trigger>
+          <dropdown-menu-content align="end">
+            <Widget className="accent-palette">
+              {accentNames.map((name) => (
+                <Widget
+                  key={name}
+                  className={`accent-swatch accent-swatch-${name}`}
+                  data-accent={name}
+                  onClick="navbar_on_accent_click"
+                >
+                  <icon name="checkmark" className="accent-swatch-check" />
+                </Widget>
+              ))}
+            </Widget>
+          </dropdown-menu-content>
+        </dropdown-menu>
         <Widget className="navbar-divider" />
         <a
           href="https://github.com/lc-soft/LCUI"

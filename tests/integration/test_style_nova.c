@@ -10,6 +10,7 @@
  */
 
 #include <LCUI.h>
+#include <css/style_value.h>
 #include <ctest-custom.h>
 
 static void check_label_typography(void)
@@ -141,6 +142,29 @@ static void check_badge_typography(void)
                           icon->computed_style.font_size, 12.0f);
         ctest_equal_float("badge text should use text-xs",
                           text->computed_style.font_size, 12.0f);
+        ctest_equal_bool("badge should use the primary background",
+                         badge->computed_style.background_color ==
+                             css_color(255, 0x17, 0x17, 0x17),
+                         true);
+
+        ui_badge_set_variant(badge, UI_BADGE_VARIANT_SECONDARY);
+        ui_update();
+        ctest_equal_bool("secondary badge should use the secondary background",
+                         badge->computed_style.background_color ==
+                             css_color(255, 0xf5, 0xf5, 0xf5),
+                         true);
+
+        ui_badge_set_variant(badge, UI_BADGE_VARIANT_DEFAULT);
+        ui_badge_set_color(badge, "blue");
+        ui_update();
+        ctest_equal_bool(
+            "custom badge color should win over the accent",
+            badge->computed_style.color == css_color(255, 0x1d, 0x4e, 0xd8),
+            true);
+        ctest_equal_bool("custom badge should not use the accent background",
+                         badge->computed_style.background_color ==
+                             css_color(255, 0x17, 0x17, 0x17),
+                         false);
 
         ui_widget_destroy(badge);
 }

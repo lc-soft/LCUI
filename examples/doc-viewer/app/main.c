@@ -51,6 +51,7 @@ int main(int argc, char *argv[])
         const char *locale = app_get_locale();
 
         app_apply_theme();
+        app_apply_accent();
         char initial_path[128];
         router_location_t *location;
 

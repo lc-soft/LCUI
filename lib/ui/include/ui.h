@@ -23,6 +23,7 @@
 #include <ui/rect.h>
 #include <ui/style.h>
 #include <ui/text_style.h>
+#include <ui/theme.h>
 #include <ui/updater.h>
 
 #endif

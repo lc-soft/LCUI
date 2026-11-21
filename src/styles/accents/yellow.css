@@ -1,0 +1,303 @@
+.accent-yellow button:primary, .accent-yellow .button-primary {
+  background-color: rgba(202, 138, 4, 1);
+}
+
+.accent-yellow button:primary, .accent-yellow .button-primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-yellow.dark button:primary, .accent-yellow.dark .button-primary {
+  background-color: rgba(250, 204, 21, 1);
+}
+
+.accent-yellow.dark button:primary, .accent-yellow.dark .button-primary {
+  color: rgba(23, 23, 23, 1);
+}
+
+.accent-yellow button:primary:hover, .accent-yellow .button-primary:hover {
+  background-color: rgba(202, 138, 4, 0.9);
+}
+
+.accent-yellow button:primary:hover, .accent-yellow .button-primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-yellow.dark button:primary:hover, .accent-yellow.dark .button-primary:hover {
+  background-color: rgba(250, 204, 21, 0.9);
+}
+
+.accent-yellow.dark button:primary:hover, .accent-yellow.dark .button-primary:hover {
+  color: rgba(23, 23, 23, 1);
+}
+
+.accent-yellow button:link, .accent-yellow .button-link {
+  color: rgba(202, 138, 4, 1);
+}
+
+.accent-yellow.dark button:link, .accent-yellow.dark .button-link {
+  color: rgba(250, 204, 21, 1);
+}
+
+.accent-yellow button:link:hover, .accent-yellow .button-link:hover {
+  color: rgba(202, 138, 4, 1);
+}
+
+.accent-yellow.dark button:link:hover, .accent-yellow.dark .button-link:hover {
+  color: rgba(250, 204, 21, 1);
+}
+
+.accent-yellow button:primary:active {
+  background-color: rgba(202, 138, 4, 0.8);
+}
+
+.accent-yellow button:primary:active {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-yellow.dark button:primary:active {
+  background-color: rgba(250, 204, 21, 0.8);
+}
+
+.accent-yellow.dark button:primary:active {
+  color: rgba(23, 23, 23, 1);
+}
+
+.accent-yellow button:link:active, .accent-yellow .button-link:active {
+  color: rgba(202, 138, 4, 1);
+}
+
+.accent-yellow.dark button:link:active, .accent-yellow.dark .button-link:active {
+  color: rgba(250, 204, 21, 1);
+}
+
+.accent-yellow badge:default, .accent-yellow .badge-default {
+  border-color: rgba(202, 138, 4, 1);
+}
+
+.accent-yellow badge:default, .accent-yellow .badge-default {
+  background-color: rgba(202, 138, 4, 1);
+}
+
+.accent-yellow badge:default, .accent-yellow .badge-default {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-yellow.dark badge:default, .accent-yellow.dark .badge-default {
+  border-color: rgba(250, 204, 21, 1);
+}
+
+.accent-yellow.dark badge:default, .accent-yellow.dark .badge-default {
+  background-color: rgba(250, 204, 21, 1);
+}
+
+.accent-yellow.dark badge:default, .accent-yellow.dark .badge-default {
+  color: rgba(23, 23, 23, 1);
+}
+
+.accent-yellow .tooltip-inner {
+  background-color: rgba(202, 138, 4, 1);
+}
+
+.accent-yellow .tooltip-inner {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-yellow.dark .tooltip-inner {
+  background-color: rgba(250, 204, 21, 1);
+}
+
+.accent-yellow.dark .tooltip-inner {
+  color: rgba(23, 23, 23, 1);
+}
+
+.accent-yellow tooltip-content text {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-yellow.dark tooltip-content text {
+  color: rgba(23, 23, 23, 1);
+}
+
+.accent-yellow .tooltip-arrow.tooltip-side-top {
+  border-top-color: rgba(202, 138, 4, 1);
+}
+
+.accent-yellow.dark .tooltip-arrow.tooltip-side-top {
+  border-top-color: rgba(250, 204, 21, 1);
+}
+
+.accent-yellow .tooltip-arrow.tooltip-side-bottom {
+  border-bottom-color: rgba(202, 138, 4, 1);
+}
+
+.accent-yellow.dark .tooltip-arrow.tooltip-side-bottom {
+  border-bottom-color: rgba(250, 204, 21, 1);
+}
+
+.accent-yellow .tooltip-arrow.tooltip-side-left {
+  border-left-color: rgba(202, 138, 4, 1);
+}
+
+.accent-yellow.dark .tooltip-arrow.tooltip-side-left {
+  border-left-color: rgba(250, 204, 21, 1);
+}
+
+.accent-yellow .tooltip-arrow.tooltip-side-right {
+  border-right-color: rgba(202, 138, 4, 1);
+}
+
+.accent-yellow.dark .tooltip-arrow.tooltip-side-right {
+  border-right-color: rgba(250, 204, 21, 1);
+}
+
+.accent-yellow progress-indicator {
+  background-color: rgba(202, 138, 4, 1);
+}
+
+.accent-yellow.dark progress-indicator {
+  background-color: rgba(250, 204, 21, 1);
+}
+
+.accent-yellow radio-group-item:checked {
+  border-color: rgba(202, 138, 4, 1);
+}
+
+.accent-yellow radio-group-item:checked {
+  background-color: rgba(202, 138, 4, 1);
+}
+
+.accent-yellow.dark radio-group-item:checked {
+  border-color: rgba(250, 204, 21, 1);
+}
+
+.accent-yellow.dark radio-group-item:checked {
+  background-color: rgba(250, 204, 21, 1);
+}
+
+.accent-yellow radio-group-item .indicator {
+  background-color: rgba(250, 250, 250, 1);
+}
+
+.accent-yellow.dark radio-group-item .indicator {
+  background-color: rgba(23, 23, 23, 1);
+}
+
+.accent-yellow alert-dialog-action:primary {
+  background-color: rgba(202, 138, 4, 1);
+}
+
+.accent-yellow alert-dialog-action:primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-yellow.dark alert-dialog-action:primary {
+  background-color: rgba(250, 204, 21, 1);
+}
+
+.accent-yellow.dark alert-dialog-action:primary {
+  color: rgba(23, 23, 23, 1);
+}
+
+.accent-yellow alert-dialog-action:primary:hover {
+  background-color: rgba(202, 138, 4, 0.9);
+}
+
+.accent-yellow alert-dialog-action:primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-yellow.dark alert-dialog-action:primary:hover {
+  background-color: rgba(250, 204, 21, 0.9);
+}
+
+.accent-yellow.dark alert-dialog-action:primary:hover {
+  color: rgba(23, 23, 23, 1);
+}
+
+.accent-yellow checkbox:checked, .accent-yellow checkbox:indeterminate {
+  border-color: rgba(202, 138, 4, 1);
+}
+
+.accent-yellow checkbox:checked, .accent-yellow checkbox:indeterminate {
+  background-color: rgba(202, 138, 4, 1);
+}
+
+.accent-yellow checkbox:checked, .accent-yellow checkbox:indeterminate {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-yellow.dark checkbox:checked, .accent-yellow.dark checkbox:indeterminate {
+  border-color: rgba(250, 204, 21, 1);
+}
+
+.accent-yellow.dark checkbox:checked, .accent-yellow.dark checkbox:indeterminate {
+  background-color: rgba(250, 204, 21, 1);
+}
+
+.accent-yellow.dark checkbox:checked, .accent-yellow.dark checkbox:indeterminate {
+  color: rgba(23, 23, 23, 1);
+}
+
+.accent-yellow .sidebar-menu-button:hover {
+  background-color: rgba(202, 138, 4, 0.1);
+}
+
+.accent-yellow .sidebar-menu-button:hover {
+  color: rgba(202, 138, 4, 1);
+}
+
+.accent-yellow.dark .sidebar-menu-button:hover {
+  background-color: rgba(250, 204, 21, 0.15);
+}
+
+.accent-yellow.dark .sidebar-menu-button:hover {
+  color: rgba(250, 204, 21, 1);
+}
+
+.accent-yellow .sidebar-menu-button.active {
+  background-color: rgba(202, 138, 4, 0.1);
+}
+
+.accent-yellow .sidebar-menu-button.active {
+  color: rgba(202, 138, 4, 1);
+}
+
+.accent-yellow.dark .sidebar-menu-button.active {
+  background-color: rgba(250, 204, 21, 0.15);
+}
+
+.accent-yellow.dark .sidebar-menu-button.active {
+  color: rgba(250, 204, 21, 1);
+}
+
+.accent-yellow .sidebar-team-logo {
+  background-color: rgba(202, 138, 4, 1);
+}
+
+.accent-yellow .sidebar-team-logo {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-yellow.dark .sidebar-team-logo {
+  background-color: rgba(250, 204, 21, 1);
+}
+
+.accent-yellow.dark .sidebar-team-logo {
+  color: rgba(23, 23, 23, 1);
+}
+
+.accent-yellow .sidebar-avatar {
+  background-color: rgba(202, 138, 4, 0.1);
+}
+
+.accent-yellow .sidebar-avatar {
+  color: rgba(202, 138, 4, 1);
+}
+
+.accent-yellow.dark .sidebar-avatar {
+  background-color: rgba(250, 204, 21, 0.15);
+}
+
+.accent-yellow.dark .sidebar-avatar {
+  color: rgba(250, 204, 21, 1);
+}

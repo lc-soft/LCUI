@@ -118,6 +118,42 @@
   @apply dark:bg-border-dark;
 }
 
+.accent-palette {
+  display: flex;
+  flex-wrap: wrap;
+  width: 200px;
+  gap: 6px;
+  padding: 8px;
+}
+
+.accent-swatch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.accent-swatch:hover {
+  box-shadow: 0 0 0 2px rgba(23, 23, 23, 0.18);
+}
+
+.dark .accent-swatch:hover {
+  box-shadow: 0 0 0 2px rgba(250, 250, 250, 0.28);
+}
+
+.accent-swatch .accent-swatch-check {
+  display: none;
+  font-size: 16px;
+}
+
+.accent-swatch.active .accent-swatch-check {
+  display: inline-block;
+}
+
 .navbar-link:hover {
   @apply bg-muted text-foreground;
   @apply dark:bg-muted-dark dark:text-foreground-dark;

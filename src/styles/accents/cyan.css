@@ -1,0 +1,303 @@
+.accent-cyan button:primary, .accent-cyan .button-primary {
+  background-color: rgba(8, 145, 178, 1);
+}
+
+.accent-cyan button:primary, .accent-cyan .button-primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-cyan.dark button:primary, .accent-cyan.dark .button-primary {
+  background-color: rgba(34, 211, 238, 1);
+}
+
+.accent-cyan.dark button:primary, .accent-cyan.dark .button-primary {
+  color: rgba(23, 23, 23, 1);
+}
+
+.accent-cyan button:primary:hover, .accent-cyan .button-primary:hover {
+  background-color: rgba(8, 145, 178, 0.9);
+}
+
+.accent-cyan button:primary:hover, .accent-cyan .button-primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-cyan.dark button:primary:hover, .accent-cyan.dark .button-primary:hover {
+  background-color: rgba(34, 211, 238, 0.9);
+}
+
+.accent-cyan.dark button:primary:hover, .accent-cyan.dark .button-primary:hover {
+  color: rgba(23, 23, 23, 1);
+}
+
+.accent-cyan button:link, .accent-cyan .button-link {
+  color: rgba(8, 145, 178, 1);
+}
+
+.accent-cyan.dark button:link, .accent-cyan.dark .button-link {
+  color: rgba(34, 211, 238, 1);
+}
+
+.accent-cyan button:link:hover, .accent-cyan .button-link:hover {
+  color: rgba(8, 145, 178, 1);
+}
+
+.accent-cyan.dark button:link:hover, .accent-cyan.dark .button-link:hover {
+  color: rgba(34, 211, 238, 1);
+}
+
+.accent-cyan button:primary:active {
+  background-color: rgba(8, 145, 178, 0.8);
+}
+
+.accent-cyan button:primary:active {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-cyan.dark button:primary:active {
+  background-color: rgba(34, 211, 238, 0.8);
+}
+
+.accent-cyan.dark button:primary:active {
+  color: rgba(23, 23, 23, 1);
+}
+
+.accent-cyan button:link:active, .accent-cyan .button-link:active {
+  color: rgba(8, 145, 178, 1);
+}
+
+.accent-cyan.dark button:link:active, .accent-cyan.dark .button-link:active {
+  color: rgba(34, 211, 238, 1);
+}
+
+.accent-cyan badge:default, .accent-cyan .badge-default {
+  border-color: rgba(8, 145, 178, 1);
+}
+
+.accent-cyan badge:default, .accent-cyan .badge-default {
+  background-color: rgba(8, 145, 178, 1);
+}
+
+.accent-cyan badge:default, .accent-cyan .badge-default {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-cyan.dark badge:default, .accent-cyan.dark .badge-default {
+  border-color: rgba(34, 211, 238, 1);
+}
+
+.accent-cyan.dark badge:default, .accent-cyan.dark .badge-default {
+  background-color: rgba(34, 211, 238, 1);
+}
+
+.accent-cyan.dark badge:default, .accent-cyan.dark .badge-default {
+  color: rgba(23, 23, 23, 1);
+}
+
+.accent-cyan .tooltip-inner {
+  background-color: rgba(8, 145, 178, 1);
+}
+
+.accent-cyan .tooltip-inner {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-cyan.dark .tooltip-inner {
+  background-color: rgba(34, 211, 238, 1);
+}
+
+.accent-cyan.dark .tooltip-inner {
+  color: rgba(23, 23, 23, 1);
+}
+
+.accent-cyan tooltip-content text {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-cyan.dark tooltip-content text {
+  color: rgba(23, 23, 23, 1);
+}
+
+.accent-cyan .tooltip-arrow.tooltip-side-top {
+  border-top-color: rgba(8, 145, 178, 1);
+}
+
+.accent-cyan.dark .tooltip-arrow.tooltip-side-top {
+  border-top-color: rgba(34, 211, 238, 1);
+}
+
+.accent-cyan .tooltip-arrow.tooltip-side-bottom {
+  border-bottom-color: rgba(8, 145, 178, 1);
+}
+
+.accent-cyan.dark .tooltip-arrow.tooltip-side-bottom {
+  border-bottom-color: rgba(34, 211, 238, 1);
+}
+
+.accent-cyan .tooltip-arrow.tooltip-side-left {
+  border-left-color: rgba(8, 145, 178, 1);
+}
+
+.accent-cyan.dark .tooltip-arrow.tooltip-side-left {
+  border-left-color: rgba(34, 211, 238, 1);
+}
+
+.accent-cyan .tooltip-arrow.tooltip-side-right {
+  border-right-color: rgba(8, 145, 178, 1);
+}
+
+.accent-cyan.dark .tooltip-arrow.tooltip-side-right {
+  border-right-color: rgba(34, 211, 238, 1);
+}
+
+.accent-cyan progress-indicator {
+  background-color: rgba(8, 145, 178, 1);
+}
+
+.accent-cyan.dark progress-indicator {
+  background-color: rgba(34, 211, 238, 1);
+}
+
+.accent-cyan radio-group-item:checked {
+  border-color: rgba(8, 145, 178, 1);
+}
+
+.accent-cyan radio-group-item:checked {
+  background-color: rgba(8, 145, 178, 1);
+}
+
+.accent-cyan.dark radio-group-item:checked {
+  border-color: rgba(34, 211, 238, 1);
+}
+
+.accent-cyan.dark radio-group-item:checked {
+  background-color: rgba(34, 211, 238, 1);
+}
+
+.accent-cyan radio-group-item .indicator {
+  background-color: rgba(250, 250, 250, 1);
+}
+
+.accent-cyan.dark radio-group-item .indicator {
+  background-color: rgba(23, 23, 23, 1);
+}
+
+.accent-cyan alert-dialog-action:primary {
+  background-color: rgba(8, 145, 178, 1);
+}
+
+.accent-cyan alert-dialog-action:primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-cyan.dark alert-dialog-action:primary {
+  background-color: rgba(34, 211, 238, 1);
+}
+
+.accent-cyan.dark alert-dialog-action:primary {
+  color: rgba(23, 23, 23, 1);
+}
+
+.accent-cyan alert-dialog-action:primary:hover {
+  background-color: rgba(8, 145, 178, 0.9);
+}
+
+.accent-cyan alert-dialog-action:primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-cyan.dark alert-dialog-action:primary:hover {
+  background-color: rgba(34, 211, 238, 0.9);
+}
+
+.accent-cyan.dark alert-dialog-action:primary:hover {
+  color: rgba(23, 23, 23, 1);
+}
+
+.accent-cyan checkbox:checked, .accent-cyan checkbox:indeterminate {
+  border-color: rgba(8, 145, 178, 1);
+}
+
+.accent-cyan checkbox:checked, .accent-cyan checkbox:indeterminate {
+  background-color: rgba(8, 145, 178, 1);
+}
+
+.accent-cyan checkbox:checked, .accent-cyan checkbox:indeterminate {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-cyan.dark checkbox:checked, .accent-cyan.dark checkbox:indeterminate {
+  border-color: rgba(34, 211, 238, 1);
+}
+
+.accent-cyan.dark checkbox:checked, .accent-cyan.dark checkbox:indeterminate {
+  background-color: rgba(34, 211, 238, 1);
+}
+
+.accent-cyan.dark checkbox:checked, .accent-cyan.dark checkbox:indeterminate {
+  color: rgba(23, 23, 23, 1);
+}
+
+.accent-cyan .sidebar-menu-button:hover {
+  background-color: rgba(8, 145, 178, 0.1);
+}
+
+.accent-cyan .sidebar-menu-button:hover {
+  color: rgba(8, 145, 178, 1);
+}
+
+.accent-cyan.dark .sidebar-menu-button:hover {
+  background-color: rgba(34, 211, 238, 0.15);
+}
+
+.accent-cyan.dark .sidebar-menu-button:hover {
+  color: rgba(34, 211, 238, 1);
+}
+
+.accent-cyan .sidebar-menu-button.active {
+  background-color: rgba(8, 145, 178, 0.1);
+}
+
+.accent-cyan .sidebar-menu-button.active {
+  color: rgba(8, 145, 178, 1);
+}
+
+.accent-cyan.dark .sidebar-menu-button.active {
+  background-color: rgba(34, 211, 238, 0.15);
+}
+
+.accent-cyan.dark .sidebar-menu-button.active {
+  color: rgba(34, 211, 238, 1);
+}
+
+.accent-cyan .sidebar-team-logo {
+  background-color: rgba(8, 145, 178, 1);
+}
+
+.accent-cyan .sidebar-team-logo {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-cyan.dark .sidebar-team-logo {
+  background-color: rgba(34, 211, 238, 1);
+}
+
+.accent-cyan.dark .sidebar-team-logo {
+  color: rgba(23, 23, 23, 1);
+}
+
+.accent-cyan .sidebar-avatar {
+  background-color: rgba(8, 145, 178, 0.1);
+}
+
+.accent-cyan .sidebar-avatar {
+  color: rgba(8, 145, 178, 1);
+}
+
+.accent-cyan.dark .sidebar-avatar {
+  background-color: rgba(34, 211, 238, 0.15);
+}
+
+.accent-cyan.dark .sidebar-avatar {
+  color: rgba(34, 211, 238, 1);
+}

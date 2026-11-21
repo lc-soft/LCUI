@@ -68,6 +68,7 @@ extern void test_spinner(void);
 extern void test_spinner_perf(void);
 extern void test_shimmer(void);
 extern void test_style_nova(void);
+extern void test_theme_accent(void);
 extern void test_toast(void);
 extern void test_accordion(void);
 extern void test_breadcrumb(void);
@@ -76,6 +77,7 @@ extern void test_window_restore(void);
 extern void test_window_api(void);
 extern void test_environment(void);
 extern void test_window_events(void);
+extern void test_window_icon(void);
 
 static const ctest_suite_t suites[] = {
         { "environment", test_environment },
@@ -135,6 +137,7 @@ static const ctest_suite_t suites[] = {
         { "spinner perf", test_spinner_perf },
         { "shimmer", test_shimmer },
         { "style nova", test_style_nova },
+        { "theme accent", test_theme_accent },
         { "toast", test_toast },
         { "accordion", test_accordion },
         { "breadcrumb", test_breadcrumb },
@@ -142,6 +145,7 @@ static const ctest_suite_t suites[] = {
         { "window restore", test_window_restore },
         { "window api", test_window_api },
         { "window events", test_window_events },
+        { "window icon", test_window_icon },
         { NULL, NULL }
 };
 

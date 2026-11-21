@@ -13,6 +13,7 @@
 #include <ui/css.h>
 
 #include "styles/style-nova.css.h"
+#include "styles/accents/accent-themes.h"
 
 void lcui_widgets_init(void)
 {
@@ -67,6 +68,7 @@ void lcui_widgets_init(void)
          * default CSS at equal specificity, letting style-nova.css refine the
          * look without editing the widget sources. */
         ui_load_css_string_style_nova_chunks();
+        ui_load_accent_swatches();
 }
 
 void lcui_widgets_destroy(void)

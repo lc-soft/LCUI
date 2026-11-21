@@ -232,8 +232,13 @@ button:icon-lg .fui-icon {
 badge,
 .badge {
   box-sizing: border-box;
-  @apply inline-flex items-center gap-1 h-5 rounded-full border border-primary bg-primary px-2 text-xs font-medium leading-[18px] text-primary-foreground;
-  @apply dark:border-primary-dark dark:bg-primary-dark dark:text-primary-foreground-dark;
+  @apply inline-flex items-center gap-1 h-5 rounded-full border border-secondary bg-secondary px-2 text-xs font-medium leading-[18px] text-secondary-foreground;
+  @apply dark:border-secondary-dark dark:bg-secondary-dark dark:text-secondary-foreground-dark;
+}
+
+badge:default,
+.badge-default {
+  @apply border-primary bg-primary text-primary-foreground dark:border-primary-dark dark:bg-primary-dark dark:text-primary-foreground-dark;
 }
 
 badge icon {
@@ -265,26 +270,31 @@ badge:disabled,
   @apply opacity-50;
 }
 
+badge.badge-color-blue,
 .badge-color-blue {
   @apply border-admonition-note/20 bg-admonition-note/10 text-admonition-note-foreground;
   @apply dark:border-admonition-note-dark/30 dark:bg-admonition-note-dark/15 dark:text-admonition-note-foreground-dark;
 }
 
+badge.badge-color-green,
 .badge-color-green {
   @apply border-admonition-tip/20 bg-admonition-tip/10 text-admonition-tip-foreground;
   @apply dark:border-admonition-tip-dark/30 dark:bg-admonition-tip-dark/15 dark:text-admonition-tip-foreground-dark;
 }
 
+badge.badge-color-sky,
 .badge-color-sky {
   @apply border-admonition-info/20 bg-admonition-info/10 text-admonition-info-foreground;
   @apply dark:border-admonition-info-dark/30 dark:bg-admonition-info-dark/15 dark:text-admonition-info-foreground-dark;
 }
 
+badge.badge-color-purple,
 .badge-color-purple {
   @apply border-purple-100 bg-purple-50 text-purple-700;
   @apply dark:border-purple-900 dark:bg-purple-950 dark:text-purple-300;
 }
 
+badge.badge-color-red,
 .badge-color-red {
   @apply border-destructive/20 bg-destructive/10 text-destructive;
   @apply dark:border-destructive-dark/30 dark:bg-destructive-dark/15 dark:text-destructive-dark;

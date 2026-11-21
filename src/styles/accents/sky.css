@@ -1,0 +1,303 @@
+.accent-sky button:primary, .accent-sky .button-primary {
+  background-color: rgba(2, 132, 199, 1);
+}
+
+.accent-sky button:primary, .accent-sky .button-primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-sky.dark button:primary, .accent-sky.dark .button-primary {
+  background-color: rgba(56, 189, 248, 1);
+}
+
+.accent-sky.dark button:primary, .accent-sky.dark .button-primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-sky button:primary:hover, .accent-sky .button-primary:hover {
+  background-color: rgba(2, 132, 199, 0.9);
+}
+
+.accent-sky button:primary:hover, .accent-sky .button-primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-sky.dark button:primary:hover, .accent-sky.dark .button-primary:hover {
+  background-color: rgba(56, 189, 248, 0.9);
+}
+
+.accent-sky.dark button:primary:hover, .accent-sky.dark .button-primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-sky button:link, .accent-sky .button-link {
+  color: rgba(2, 132, 199, 1);
+}
+
+.accent-sky.dark button:link, .accent-sky.dark .button-link {
+  color: rgba(56, 189, 248, 1);
+}
+
+.accent-sky button:link:hover, .accent-sky .button-link:hover {
+  color: rgba(2, 132, 199, 1);
+}
+
+.accent-sky.dark button:link:hover, .accent-sky.dark .button-link:hover {
+  color: rgba(56, 189, 248, 1);
+}
+
+.accent-sky button:primary:active {
+  background-color: rgba(2, 132, 199, 0.8);
+}
+
+.accent-sky button:primary:active {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-sky.dark button:primary:active {
+  background-color: rgba(56, 189, 248, 0.8);
+}
+
+.accent-sky.dark button:primary:active {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-sky button:link:active, .accent-sky .button-link:active {
+  color: rgba(2, 132, 199, 1);
+}
+
+.accent-sky.dark button:link:active, .accent-sky.dark .button-link:active {
+  color: rgba(56, 189, 248, 1);
+}
+
+.accent-sky badge:default, .accent-sky .badge-default {
+  border-color: rgba(2, 132, 199, 1);
+}
+
+.accent-sky badge:default, .accent-sky .badge-default {
+  background-color: rgba(2, 132, 199, 1);
+}
+
+.accent-sky badge:default, .accent-sky .badge-default {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-sky.dark badge:default, .accent-sky.dark .badge-default {
+  border-color: rgba(56, 189, 248, 1);
+}
+
+.accent-sky.dark badge:default, .accent-sky.dark .badge-default {
+  background-color: rgba(56, 189, 248, 1);
+}
+
+.accent-sky.dark badge:default, .accent-sky.dark .badge-default {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-sky .tooltip-inner {
+  background-color: rgba(2, 132, 199, 1);
+}
+
+.accent-sky .tooltip-inner {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-sky.dark .tooltip-inner {
+  background-color: rgba(56, 189, 248, 1);
+}
+
+.accent-sky.dark .tooltip-inner {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-sky tooltip-content text {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-sky.dark tooltip-content text {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-sky .tooltip-arrow.tooltip-side-top {
+  border-top-color: rgba(2, 132, 199, 1);
+}
+
+.accent-sky.dark .tooltip-arrow.tooltip-side-top {
+  border-top-color: rgba(56, 189, 248, 1);
+}
+
+.accent-sky .tooltip-arrow.tooltip-side-bottom {
+  border-bottom-color: rgba(2, 132, 199, 1);
+}
+
+.accent-sky.dark .tooltip-arrow.tooltip-side-bottom {
+  border-bottom-color: rgba(56, 189, 248, 1);
+}
+
+.accent-sky .tooltip-arrow.tooltip-side-left {
+  border-left-color: rgba(2, 132, 199, 1);
+}
+
+.accent-sky.dark .tooltip-arrow.tooltip-side-left {
+  border-left-color: rgba(56, 189, 248, 1);
+}
+
+.accent-sky .tooltip-arrow.tooltip-side-right {
+  border-right-color: rgba(2, 132, 199, 1);
+}
+
+.accent-sky.dark .tooltip-arrow.tooltip-side-right {
+  border-right-color: rgba(56, 189, 248, 1);
+}
+
+.accent-sky progress-indicator {
+  background-color: rgba(2, 132, 199, 1);
+}
+
+.accent-sky.dark progress-indicator {
+  background-color: rgba(56, 189, 248, 1);
+}
+
+.accent-sky radio-group-item:checked {
+  border-color: rgba(2, 132, 199, 1);
+}
+
+.accent-sky radio-group-item:checked {
+  background-color: rgba(2, 132, 199, 1);
+}
+
+.accent-sky.dark radio-group-item:checked {
+  border-color: rgba(56, 189, 248, 1);
+}
+
+.accent-sky.dark radio-group-item:checked {
+  background-color: rgba(56, 189, 248, 1);
+}
+
+.accent-sky radio-group-item .indicator {
+  background-color: rgba(250, 250, 250, 1);
+}
+
+.accent-sky.dark radio-group-item .indicator {
+  background-color: rgba(250, 250, 250, 1);
+}
+
+.accent-sky alert-dialog-action:primary {
+  background-color: rgba(2, 132, 199, 1);
+}
+
+.accent-sky alert-dialog-action:primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-sky.dark alert-dialog-action:primary {
+  background-color: rgba(56, 189, 248, 1);
+}
+
+.accent-sky.dark alert-dialog-action:primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-sky alert-dialog-action:primary:hover {
+  background-color: rgba(2, 132, 199, 0.9);
+}
+
+.accent-sky alert-dialog-action:primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-sky.dark alert-dialog-action:primary:hover {
+  background-color: rgba(56, 189, 248, 0.9);
+}
+
+.accent-sky.dark alert-dialog-action:primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-sky checkbox:checked, .accent-sky checkbox:indeterminate {
+  border-color: rgba(2, 132, 199, 1);
+}
+
+.accent-sky checkbox:checked, .accent-sky checkbox:indeterminate {
+  background-color: rgba(2, 132, 199, 1);
+}
+
+.accent-sky checkbox:checked, .accent-sky checkbox:indeterminate {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-sky.dark checkbox:checked, .accent-sky.dark checkbox:indeterminate {
+  border-color: rgba(56, 189, 248, 1);
+}
+
+.accent-sky.dark checkbox:checked, .accent-sky.dark checkbox:indeterminate {
+  background-color: rgba(56, 189, 248, 1);
+}
+
+.accent-sky.dark checkbox:checked, .accent-sky.dark checkbox:indeterminate {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-sky .sidebar-menu-button:hover {
+  background-color: rgba(2, 132, 199, 0.1);
+}
+
+.accent-sky .sidebar-menu-button:hover {
+  color: rgba(2, 132, 199, 1);
+}
+
+.accent-sky.dark .sidebar-menu-button:hover {
+  background-color: rgba(56, 189, 248, 0.15);
+}
+
+.accent-sky.dark .sidebar-menu-button:hover {
+  color: rgba(56, 189, 248, 1);
+}
+
+.accent-sky .sidebar-menu-button.active {
+  background-color: rgba(2, 132, 199, 0.1);
+}
+
+.accent-sky .sidebar-menu-button.active {
+  color: rgba(2, 132, 199, 1);
+}
+
+.accent-sky.dark .sidebar-menu-button.active {
+  background-color: rgba(56, 189, 248, 0.15);
+}
+
+.accent-sky.dark .sidebar-menu-button.active {
+  color: rgba(56, 189, 248, 1);
+}
+
+.accent-sky .sidebar-team-logo {
+  background-color: rgba(2, 132, 199, 1);
+}
+
+.accent-sky .sidebar-team-logo {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-sky.dark .sidebar-team-logo {
+  background-color: rgba(56, 189, 248, 1);
+}
+
+.accent-sky.dark .sidebar-team-logo {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-sky .sidebar-avatar {
+  background-color: rgba(2, 132, 199, 0.1);
+}
+
+.accent-sky .sidebar-avatar {
+  color: rgba(2, 132, 199, 1);
+}
+
+.accent-sky.dark .sidebar-avatar {
+  background-color: rgba(56, 189, 248, 0.15);
+}
+
+.accent-sky.dark .sidebar-avatar {
+  color: rgba(56, 189, 248, 1);
+}

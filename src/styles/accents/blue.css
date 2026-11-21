@@ -1,0 +1,303 @@
+.accent-blue button:primary, .accent-blue .button-primary {
+  background-color: rgba(37, 99, 235, 1);
+}
+
+.accent-blue button:primary, .accent-blue .button-primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue.dark button:primary, .accent-blue.dark .button-primary {
+  background-color: rgba(96, 165, 250, 1);
+}
+
+.accent-blue.dark button:primary, .accent-blue.dark .button-primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue button:primary:hover, .accent-blue .button-primary:hover {
+  background-color: rgba(37, 99, 235, 0.9);
+}
+
+.accent-blue button:primary:hover, .accent-blue .button-primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue.dark button:primary:hover, .accent-blue.dark .button-primary:hover {
+  background-color: rgba(96, 165, 250, 0.9);
+}
+
+.accent-blue.dark button:primary:hover, .accent-blue.dark .button-primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue button:link, .accent-blue .button-link {
+  color: rgba(37, 99, 235, 1);
+}
+
+.accent-blue.dark button:link, .accent-blue.dark .button-link {
+  color: rgba(96, 165, 250, 1);
+}
+
+.accent-blue button:link:hover, .accent-blue .button-link:hover {
+  color: rgba(37, 99, 235, 1);
+}
+
+.accent-blue.dark button:link:hover, .accent-blue.dark .button-link:hover {
+  color: rgba(96, 165, 250, 1);
+}
+
+.accent-blue button:primary:active {
+  background-color: rgba(37, 99, 235, 0.8);
+}
+
+.accent-blue button:primary:active {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue.dark button:primary:active {
+  background-color: rgba(96, 165, 250, 0.8);
+}
+
+.accent-blue.dark button:primary:active {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue button:link:active, .accent-blue .button-link:active {
+  color: rgba(37, 99, 235, 1);
+}
+
+.accent-blue.dark button:link:active, .accent-blue.dark .button-link:active {
+  color: rgba(96, 165, 250, 1);
+}
+
+.accent-blue badge:default, .accent-blue .badge-default {
+  border-color: rgba(37, 99, 235, 1);
+}
+
+.accent-blue badge:default, .accent-blue .badge-default {
+  background-color: rgba(37, 99, 235, 1);
+}
+
+.accent-blue badge:default, .accent-blue .badge-default {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue.dark badge:default, .accent-blue.dark .badge-default {
+  border-color: rgba(96, 165, 250, 1);
+}
+
+.accent-blue.dark badge:default, .accent-blue.dark .badge-default {
+  background-color: rgba(96, 165, 250, 1);
+}
+
+.accent-blue.dark badge:default, .accent-blue.dark .badge-default {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue .tooltip-inner {
+  background-color: rgba(37, 99, 235, 1);
+}
+
+.accent-blue .tooltip-inner {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue.dark .tooltip-inner {
+  background-color: rgba(96, 165, 250, 1);
+}
+
+.accent-blue.dark .tooltip-inner {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue tooltip-content text {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue.dark tooltip-content text {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue .tooltip-arrow.tooltip-side-top {
+  border-top-color: rgba(37, 99, 235, 1);
+}
+
+.accent-blue.dark .tooltip-arrow.tooltip-side-top {
+  border-top-color: rgba(96, 165, 250, 1);
+}
+
+.accent-blue .tooltip-arrow.tooltip-side-bottom {
+  border-bottom-color: rgba(37, 99, 235, 1);
+}
+
+.accent-blue.dark .tooltip-arrow.tooltip-side-bottom {
+  border-bottom-color: rgba(96, 165, 250, 1);
+}
+
+.accent-blue .tooltip-arrow.tooltip-side-left {
+  border-left-color: rgba(37, 99, 235, 1);
+}
+
+.accent-blue.dark .tooltip-arrow.tooltip-side-left {
+  border-left-color: rgba(96, 165, 250, 1);
+}
+
+.accent-blue .tooltip-arrow.tooltip-side-right {
+  border-right-color: rgba(37, 99, 235, 1);
+}
+
+.accent-blue.dark .tooltip-arrow.tooltip-side-right {
+  border-right-color: rgba(96, 165, 250, 1);
+}
+
+.accent-blue progress-indicator {
+  background-color: rgba(37, 99, 235, 1);
+}
+
+.accent-blue.dark progress-indicator {
+  background-color: rgba(96, 165, 250, 1);
+}
+
+.accent-blue radio-group-item:checked {
+  border-color: rgba(37, 99, 235, 1);
+}
+
+.accent-blue radio-group-item:checked {
+  background-color: rgba(37, 99, 235, 1);
+}
+
+.accent-blue.dark radio-group-item:checked {
+  border-color: rgba(96, 165, 250, 1);
+}
+
+.accent-blue.dark radio-group-item:checked {
+  background-color: rgba(96, 165, 250, 1);
+}
+
+.accent-blue radio-group-item .indicator {
+  background-color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue.dark radio-group-item .indicator {
+  background-color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue alert-dialog-action:primary {
+  background-color: rgba(37, 99, 235, 1);
+}
+
+.accent-blue alert-dialog-action:primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue.dark alert-dialog-action:primary {
+  background-color: rgba(96, 165, 250, 1);
+}
+
+.accent-blue.dark alert-dialog-action:primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue alert-dialog-action:primary:hover {
+  background-color: rgba(37, 99, 235, 0.9);
+}
+
+.accent-blue alert-dialog-action:primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue.dark alert-dialog-action:primary:hover {
+  background-color: rgba(96, 165, 250, 0.9);
+}
+
+.accent-blue.dark alert-dialog-action:primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue checkbox:checked, .accent-blue checkbox:indeterminate {
+  border-color: rgba(37, 99, 235, 1);
+}
+
+.accent-blue checkbox:checked, .accent-blue checkbox:indeterminate {
+  background-color: rgba(37, 99, 235, 1);
+}
+
+.accent-blue checkbox:checked, .accent-blue checkbox:indeterminate {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue.dark checkbox:checked, .accent-blue.dark checkbox:indeterminate {
+  border-color: rgba(96, 165, 250, 1);
+}
+
+.accent-blue.dark checkbox:checked, .accent-blue.dark checkbox:indeterminate {
+  background-color: rgba(96, 165, 250, 1);
+}
+
+.accent-blue.dark checkbox:checked, .accent-blue.dark checkbox:indeterminate {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue .sidebar-menu-button:hover {
+  background-color: rgba(37, 99, 235, 0.1);
+}
+
+.accent-blue .sidebar-menu-button:hover {
+  color: rgba(37, 99, 235, 1);
+}
+
+.accent-blue.dark .sidebar-menu-button:hover {
+  background-color: rgba(96, 165, 250, 0.15);
+}
+
+.accent-blue.dark .sidebar-menu-button:hover {
+  color: rgba(96, 165, 250, 1);
+}
+
+.accent-blue .sidebar-menu-button.active {
+  background-color: rgba(37, 99, 235, 0.1);
+}
+
+.accent-blue .sidebar-menu-button.active {
+  color: rgba(37, 99, 235, 1);
+}
+
+.accent-blue.dark .sidebar-menu-button.active {
+  background-color: rgba(96, 165, 250, 0.15);
+}
+
+.accent-blue.dark .sidebar-menu-button.active {
+  color: rgba(96, 165, 250, 1);
+}
+
+.accent-blue .sidebar-team-logo {
+  background-color: rgba(37, 99, 235, 1);
+}
+
+.accent-blue .sidebar-team-logo {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue.dark .sidebar-team-logo {
+  background-color: rgba(96, 165, 250, 1);
+}
+
+.accent-blue.dark .sidebar-team-logo {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-blue .sidebar-avatar {
+  background-color: rgba(37, 99, 235, 0.1);
+}
+
+.accent-blue .sidebar-avatar {
+  color: rgba(37, 99, 235, 1);
+}
+
+.accent-blue.dark .sidebar-avatar {
+  background-color: rgba(96, 165, 250, 0.15);
+}
+
+.accent-blue.dark .sidebar-avatar {
+  color: rgba(96, 165, 250, 1);
+}

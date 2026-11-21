@@ -1,0 +1,233 @@
+.accent-swatch-neutral {
+  background-color: #171717;
+}
+.accent-swatch-neutral .accent-swatch-check {
+  color: #fafafa;
+}
+.dark .accent-swatch-neutral {
+  background-color: #f5f5f5;
+}
+.dark .accent-swatch-neutral .accent-swatch-check {
+  color: #171717;
+}
+
+.accent-swatch-red {
+  background-color: #dc2626;
+}
+.accent-swatch-red .accent-swatch-check {
+  color: #fafafa;
+}
+.dark .accent-swatch-red {
+  background-color: #f87171;
+}
+.dark .accent-swatch-red .accent-swatch-check {
+  color: #fafafa;
+}
+
+.accent-swatch-orange {
+  background-color: #ea580c;
+}
+.accent-swatch-orange .accent-swatch-check {
+  color: #fafafa;
+}
+.dark .accent-swatch-orange {
+  background-color: #fb923c;
+}
+.dark .accent-swatch-orange .accent-swatch-check {
+  color: #fafafa;
+}
+
+.accent-swatch-amber {
+  background-color: #d97706;
+}
+.accent-swatch-amber .accent-swatch-check {
+  color: #fafafa;
+}
+.dark .accent-swatch-amber {
+  background-color: #fbbf24;
+}
+.dark .accent-swatch-amber .accent-swatch-check {
+  color: #171717;
+}
+
+.accent-swatch-yellow {
+  background-color: #ca8a04;
+}
+.accent-swatch-yellow .accent-swatch-check {
+  color: #fafafa;
+}
+.dark .accent-swatch-yellow {
+  background-color: #facc15;
+}
+.dark .accent-swatch-yellow .accent-swatch-check {
+  color: #171717;
+}
+
+.accent-swatch-lime {
+  background-color: #65a30d;
+}
+.accent-swatch-lime .accent-swatch-check {
+  color: #fafafa;
+}
+.dark .accent-swatch-lime {
+  background-color: #a3e635;
+}
+.dark .accent-swatch-lime .accent-swatch-check {
+  color: #171717;
+}
+
+.accent-swatch-green {
+  background-color: #16a34a;
+}
+.accent-swatch-green .accent-swatch-check {
+  color: #fafafa;
+}
+.dark .accent-swatch-green {
+  background-color: #4ade80;
+}
+.dark .accent-swatch-green .accent-swatch-check {
+  color: #171717;
+}
+
+.accent-swatch-emerald {
+  background-color: #059669;
+}
+.accent-swatch-emerald .accent-swatch-check {
+  color: #fafafa;
+}
+.dark .accent-swatch-emerald {
+  background-color: #34d399;
+}
+.dark .accent-swatch-emerald .accent-swatch-check {
+  color: #fafafa;
+}
+
+.accent-swatch-teal {
+  background-color: #0d9488;
+}
+.accent-swatch-teal .accent-swatch-check {
+  color: #fafafa;
+}
+.dark .accent-swatch-teal {
+  background-color: #2dd4bf;
+}
+.dark .accent-swatch-teal .accent-swatch-check {
+  color: #171717;
+}
+
+.accent-swatch-cyan {
+  background-color: #0891b2;
+}
+.accent-swatch-cyan .accent-swatch-check {
+  color: #fafafa;
+}
+.dark .accent-swatch-cyan {
+  background-color: #22d3ee;
+}
+.dark .accent-swatch-cyan .accent-swatch-check {
+  color: #171717;
+}
+
+.accent-swatch-sky {
+  background-color: #0284c7;
+}
+.accent-swatch-sky .accent-swatch-check {
+  color: #fafafa;
+}
+.dark .accent-swatch-sky {
+  background-color: #38bdf8;
+}
+.dark .accent-swatch-sky .accent-swatch-check {
+  color: #fafafa;
+}
+
+.accent-swatch-blue {
+  background-color: #2563eb;
+}
+.accent-swatch-blue .accent-swatch-check {
+  color: #fafafa;
+}
+.dark .accent-swatch-blue {
+  background-color: #60a5fa;
+}
+.dark .accent-swatch-blue .accent-swatch-check {
+  color: #fafafa;
+}
+
+.accent-swatch-indigo {
+  background-color: #4f46e5;
+}
+.accent-swatch-indigo .accent-swatch-check {
+  color: #fafafa;
+}
+.dark .accent-swatch-indigo {
+  background-color: #818cf8;
+}
+.dark .accent-swatch-indigo .accent-swatch-check {
+  color: #fafafa;
+}
+
+.accent-swatch-violet {
+  background-color: #7c3aed;
+}
+.accent-swatch-violet .accent-swatch-check {
+  color: #fafafa;
+}
+.dark .accent-swatch-violet {
+  background-color: #a78bfa;
+}
+.dark .accent-swatch-violet .accent-swatch-check {
+  color: #fafafa;
+}
+
+.accent-swatch-purple {
+  background-color: #9333ea;
+}
+.accent-swatch-purple .accent-swatch-check {
+  color: #fafafa;
+}
+.dark .accent-swatch-purple {
+  background-color: #c084fc;
+}
+.dark .accent-swatch-purple .accent-swatch-check {
+  color: #fafafa;
+}
+
+.accent-swatch-fuchsia {
+  background-color: #c026d3;
+}
+.accent-swatch-fuchsia .accent-swatch-check {
+  color: #fafafa;
+}
+.dark .accent-swatch-fuchsia {
+  background-color: #e879f9;
+}
+.dark .accent-swatch-fuchsia .accent-swatch-check {
+  color: #fafafa;
+}
+
+.accent-swatch-pink {
+  background-color: #db2777;
+}
+.accent-swatch-pink .accent-swatch-check {
+  color: #fafafa;
+}
+.dark .accent-swatch-pink {
+  background-color: #f472b6;
+}
+.dark .accent-swatch-pink .accent-swatch-check {
+  color: #fafafa;
+}
+
+.accent-swatch-rose {
+  background-color: #e11d48;
+}
+.accent-swatch-rose .accent-swatch-check {
+  color: #fafafa;
+}
+.dark .accent-swatch-rose {
+  background-color: #fb7185;
+}
+.dark .accent-swatch-rose .accent-swatch-check {
+  color: #fafafa;
+}

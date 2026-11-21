@@ -1,0 +1,303 @@
+.accent-red button:primary, .accent-red .button-primary {
+  background-color: rgba(220, 38, 38, 1);
+}
+
+.accent-red button:primary, .accent-red .button-primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-red.dark button:primary, .accent-red.dark .button-primary {
+  background-color: rgba(248, 113, 113, 1);
+}
+
+.accent-red.dark button:primary, .accent-red.dark .button-primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-red button:primary:hover, .accent-red .button-primary:hover {
+  background-color: rgba(220, 38, 38, 0.9);
+}
+
+.accent-red button:primary:hover, .accent-red .button-primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-red.dark button:primary:hover, .accent-red.dark .button-primary:hover {
+  background-color: rgba(248, 113, 113, 0.9);
+}
+
+.accent-red.dark button:primary:hover, .accent-red.dark .button-primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-red button:link, .accent-red .button-link {
+  color: rgba(220, 38, 38, 1);
+}
+
+.accent-red.dark button:link, .accent-red.dark .button-link {
+  color: rgba(248, 113, 113, 1);
+}
+
+.accent-red button:link:hover, .accent-red .button-link:hover {
+  color: rgba(220, 38, 38, 1);
+}
+
+.accent-red.dark button:link:hover, .accent-red.dark .button-link:hover {
+  color: rgba(248, 113, 113, 1);
+}
+
+.accent-red button:primary:active {
+  background-color: rgba(220, 38, 38, 0.8);
+}
+
+.accent-red button:primary:active {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-red.dark button:primary:active {
+  background-color: rgba(248, 113, 113, 0.8);
+}
+
+.accent-red.dark button:primary:active {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-red button:link:active, .accent-red .button-link:active {
+  color: rgba(220, 38, 38, 1);
+}
+
+.accent-red.dark button:link:active, .accent-red.dark .button-link:active {
+  color: rgba(248, 113, 113, 1);
+}
+
+.accent-red badge:default, .accent-red .badge-default {
+  border-color: rgba(220, 38, 38, 1);
+}
+
+.accent-red badge:default, .accent-red .badge-default {
+  background-color: rgba(220, 38, 38, 1);
+}
+
+.accent-red badge:default, .accent-red .badge-default {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-red.dark badge:default, .accent-red.dark .badge-default {
+  border-color: rgba(248, 113, 113, 1);
+}
+
+.accent-red.dark badge:default, .accent-red.dark .badge-default {
+  background-color: rgba(248, 113, 113, 1);
+}
+
+.accent-red.dark badge:default, .accent-red.dark .badge-default {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-red .tooltip-inner {
+  background-color: rgba(220, 38, 38, 1);
+}
+
+.accent-red .tooltip-inner {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-red.dark .tooltip-inner {
+  background-color: rgba(248, 113, 113, 1);
+}
+
+.accent-red.dark .tooltip-inner {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-red tooltip-content text {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-red.dark tooltip-content text {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-red .tooltip-arrow.tooltip-side-top {
+  border-top-color: rgba(220, 38, 38, 1);
+}
+
+.accent-red.dark .tooltip-arrow.tooltip-side-top {
+  border-top-color: rgba(248, 113, 113, 1);
+}
+
+.accent-red .tooltip-arrow.tooltip-side-bottom {
+  border-bottom-color: rgba(220, 38, 38, 1);
+}
+
+.accent-red.dark .tooltip-arrow.tooltip-side-bottom {
+  border-bottom-color: rgba(248, 113, 113, 1);
+}
+
+.accent-red .tooltip-arrow.tooltip-side-left {
+  border-left-color: rgba(220, 38, 38, 1);
+}
+
+.accent-red.dark .tooltip-arrow.tooltip-side-left {
+  border-left-color: rgba(248, 113, 113, 1);
+}
+
+.accent-red .tooltip-arrow.tooltip-side-right {
+  border-right-color: rgba(220, 38, 38, 1);
+}
+
+.accent-red.dark .tooltip-arrow.tooltip-side-right {
+  border-right-color: rgba(248, 113, 113, 1);
+}
+
+.accent-red progress-indicator {
+  background-color: rgba(220, 38, 38, 1);
+}
+
+.accent-red.dark progress-indicator {
+  background-color: rgba(248, 113, 113, 1);
+}
+
+.accent-red radio-group-item:checked {
+  border-color: rgba(220, 38, 38, 1);
+}
+
+.accent-red radio-group-item:checked {
+  background-color: rgba(220, 38, 38, 1);
+}
+
+.accent-red.dark radio-group-item:checked {
+  border-color: rgba(248, 113, 113, 1);
+}
+
+.accent-red.dark radio-group-item:checked {
+  background-color: rgba(248, 113, 113, 1);
+}
+
+.accent-red radio-group-item .indicator {
+  background-color: rgba(250, 250, 250, 1);
+}
+
+.accent-red.dark radio-group-item .indicator {
+  background-color: rgba(250, 250, 250, 1);
+}
+
+.accent-red alert-dialog-action:primary {
+  background-color: rgba(220, 38, 38, 1);
+}
+
+.accent-red alert-dialog-action:primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-red.dark alert-dialog-action:primary {
+  background-color: rgba(248, 113, 113, 1);
+}
+
+.accent-red.dark alert-dialog-action:primary {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-red alert-dialog-action:primary:hover {
+  background-color: rgba(220, 38, 38, 0.9);
+}
+
+.accent-red alert-dialog-action:primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-red.dark alert-dialog-action:primary:hover {
+  background-color: rgba(248, 113, 113, 0.9);
+}
+
+.accent-red.dark alert-dialog-action:primary:hover {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-red checkbox:checked, .accent-red checkbox:indeterminate {
+  border-color: rgba(220, 38, 38, 1);
+}
+
+.accent-red checkbox:checked, .accent-red checkbox:indeterminate {
+  background-color: rgba(220, 38, 38, 1);
+}
+
+.accent-red checkbox:checked, .accent-red checkbox:indeterminate {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-red.dark checkbox:checked, .accent-red.dark checkbox:indeterminate {
+  border-color: rgba(248, 113, 113, 1);
+}
+
+.accent-red.dark checkbox:checked, .accent-red.dark checkbox:indeterminate {
+  background-color: rgba(248, 113, 113, 1);
+}
+
+.accent-red.dark checkbox:checked, .accent-red.dark checkbox:indeterminate {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-red .sidebar-menu-button:hover {
+  background-color: rgba(220, 38, 38, 0.1);
+}
+
+.accent-red .sidebar-menu-button:hover {
+  color: rgba(220, 38, 38, 1);
+}
+
+.accent-red.dark .sidebar-menu-button:hover {
+  background-color: rgba(248, 113, 113, 0.15);
+}
+
+.accent-red.dark .sidebar-menu-button:hover {
+  color: rgba(248, 113, 113, 1);
+}
+
+.accent-red .sidebar-menu-button.active {
+  background-color: rgba(220, 38, 38, 0.1);
+}
+
+.accent-red .sidebar-menu-button.active {
+  color: rgba(220, 38, 38, 1);
+}
+
+.accent-red.dark .sidebar-menu-button.active {
+  background-color: rgba(248, 113, 113, 0.15);
+}
+
+.accent-red.dark .sidebar-menu-button.active {
+  color: rgba(248, 113, 113, 1);
+}
+
+.accent-red .sidebar-team-logo {
+  background-color: rgba(220, 38, 38, 1);
+}
+
+.accent-red .sidebar-team-logo {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-red.dark .sidebar-team-logo {
+  background-color: rgba(248, 113, 113, 1);
+}
+
+.accent-red.dark .sidebar-team-logo {
+  color: rgba(250, 250, 250, 1);
+}
+
+.accent-red .sidebar-avatar {
+  background-color: rgba(220, 38, 38, 0.1);
+}
+
+.accent-red .sidebar-avatar {
+  color: rgba(220, 38, 38, 1);
+}
+
+.accent-red.dark .sidebar-avatar {
+  background-color: rgba(248, 113, 113, 0.15);
+}
+
+.accent-red.dark .sidebar-avatar {
+  color: rgba(248, 113, 113, 1);
+}

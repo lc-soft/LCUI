@@ -20,9 +20,9 @@
 #define UI_BADGE_ARRAY_LEN(ARR) (sizeof(ARR) / sizeof((ARR)[0]))
 
 /* Track the previously applied variant/color so we remove exactly the old
- * status class or color class instead of scanning the whole table. A value of
- * -1 means it has not been applied yet. The base `badge` CSS rule already
- * provides the default variant look, so the default variant keeps no status. */
+ * status class or color class instead of scanning the whole table. The base
+ * `badge` CSS rule provides the muted secondary look; the default variant
+ * status is applied on init so an omitted variant still shows the accent. */
 typedef struct ui_badge {
         int variant;
         int color;
@@ -93,12 +93,11 @@ static void ui_badge_sync_variant(ui_widget_t *badge, int new_variant)
         if (data->variant == new_variant) {
                 return;
         }
-        if (data->variant > UI_BADGE_VARIANT_DEFAULT) {
-                ui_widget_remove_status(badge,
-                                        ui_badge_variant_names[data->variant]);
-        }
+        ui_widget_remove_status(badge, ui_badge_variant_names[data->variant]);
         data->variant = new_variant;
-        if (new_variant > UI_BADGE_VARIANT_DEFAULT) {
+        /* A named color owns the whole palette; keep the variant status off
+         * so accent rules such as `badge:default` cannot repaint it. */
+        if (data->color < 0) {
                 ui_widget_add_status(badge,
                                      ui_badge_variant_names[new_variant]);
         }
@@ -119,9 +118,14 @@ static void ui_badge_sync_color(ui_widget_t *badge, int new_color)
         }
         data->color = new_color;
         if (new_color >= 0) {
+                ui_widget_remove_status(badge,
+                                        ui_badge_variant_names[data->variant]);
                 snprintf(class_name, sizeof(class_name), "badge-color-%s",
                          ui_badge_color_names[new_color]);
                 ui_widget_add_class(badge, class_name);
+        } else {
+                ui_widget_add_status(badge,
+                                     ui_badge_variant_names[data->variant]);
         }
 }
 
@@ -134,6 +138,7 @@ static void ui_badge_on_init(ui_widget_t *badge)
             ui_widget_add_data(badge, ui_badge_prototype, sizeof(ui_badge_t));
         data->variant = UI_BADGE_VARIANT_DEFAULT;
         data->color = -1;
+        ui_widget_add_status(badge, ui_badge_variant_names[data->variant]);
 }
 
 static void ui_badge_on_set_attr(ui_widget_t *badge, const char *name,

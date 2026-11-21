@@ -132,6 +132,70 @@ static void navbar_on_theme_click(ui_widget_t *w, ui_event_t *e, void *arg)
         app_apply_theme();
 }
 
+static ui_widget_t *navbar_find_by_class(ui_widget_t *w, const char *class_name)
+{
+        list_node_t *node;
+        ui_widget_t *child;
+        ui_widget_t *found;
+
+        if (ui_widget_has_class(w, class_name)) {
+                return w;
+        }
+        list_for_each(node, &w->children)
+        {
+                child = node->data;
+                found = navbar_find_by_class(child, class_name);
+                if (found) {
+                        return found;
+                }
+        }
+        return NULL;
+}
+
+static void navbar_sync_accent(void)
+{
+        ui_widget_t *palette =
+            navbar_find_by_class(ui_root(), "accent-palette");
+        ui_widget_t *item;
+        const char *current = app_get_accent();
+        bool selected;
+
+        if (!palette) {
+                return;
+        }
+        for (item = ui_widget_get_child(palette, 0); item;
+             item = ui_widget_next(item)) {
+                const char *name = ui_widget_get_attr(item, "data-accent");
+
+                selected = name && strcmp(name, current) == 0;
+                if (selected && !ui_widget_has_class(item, "active")) {
+                        ui_widget_add_class(item, "active");
+                } else if (!selected && ui_widget_has_class(item, "active")) {
+                        ui_widget_remove_class(item, "active");
+                }
+        }
+}
+
+/* The dropdown content only becomes reachable from the root after the
+ * first update, so the initial selection is applied once the navbar has
+ * been laid out instead of during init. */
+static void navbar_on_afterlayout(ui_widget_t *w, ui_event_t *e, void *arg)
+{
+        navbar_sync_accent();
+}
+
+static void navbar_on_accent_click(ui_widget_t *w, ui_event_t *e, void *arg)
+{
+        const char *accent = ui_widget_get_attr(w, "data-accent");
+
+        if (!accent) {
+                return;
+        }
+        app_set_accent(accent);
+        app_apply_accent();
+        navbar_sync_accent();
+}
+
 static void navbar_replace(ui_widget_t *navbar, const char *path)
 {
         navbar_t *that = navbar_get(navbar);
@@ -282,6 +346,7 @@ static void navbar_init(ui_widget_t *w)
         locale = app_get_locale();
         that->current_locale = y_strdup(locale);
         navbar_apply_locale(w, locale);
+        ui_widget_on(w, "afterlayout", navbar_on_afterlayout, NULL);
         navbar_update(w);
 }
 
