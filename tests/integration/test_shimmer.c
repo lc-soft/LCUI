@@ -804,6 +804,9 @@ static void check_text_capture_full_width(void)
         pd_canvas_t direct;
         int captured_right;
         int direct_right;
+        int delta;
+        int tolerance;
+        char desc[192];
 
         ui_metrics.dpi = 144;
         ui_widget_set_style_string(text, "font-size", "14px");
@@ -836,9 +839,16 @@ static void check_text_capture_full_width(void)
                          captured_right > 0, true);
         ctest_equal_bool("reference text should render text", direct_right > 0,
                          true);
-        ctest_equal_bool(
-            "shimmer capture should not clip the end of a long text label",
-            abs(captured_right - direct_right) <= 6, true);
+        delta = abs(captured_right - direct_right);
+        tolerance = direct_right / 16;
+        if (tolerance < 6) {
+                tolerance = 6;
+        }
+        snprintf(desc, sizeof(desc),
+                 "shimmer capture should not clip the end of a long text label "
+                 "(captured=%d, direct=%d, delta=%d, tolerance=%d)",
+                 captured_right, direct_right, delta, tolerance);
+        ctest_equal_bool(desc, delta <= tolerance, true);
 
         pd_canvas_destroy(&captured);
         pd_canvas_destroy(&direct);

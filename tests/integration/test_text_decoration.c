@@ -9,6 +9,7 @@
  * LICENSE.TXT file in the root directory of this source tree.
  */
 
+#include <stdio.h>
 #include <string.h>
 #include <LCUI.h>
 #include <ctest-custom.h>
@@ -46,9 +47,12 @@ static void should_initialize_ui_text_style_cache_fields(void)
 
 static void set_text_style(const char *property, const char *value)
 {
+        char desc[128];
+
+        snprintf(desc, sizeof(desc), "should accept CSS text style: %s=%s",
+                 property, value);
         ctest_equal_int(
-            "should accept CSS text style",
-            ui_widget_set_style_string(text_widget, property, value), 0);
+            desc, ui_widget_set_style_string(text_widget, property, value), 0);
         ui_update();
 }
 
@@ -145,13 +149,17 @@ static void should_default_to_no_decoration(void)
 static void should_apply_and_remove_underline(void)
 {
         pd_canvas_t base, underline, removed;
+        char desc[128];
+        int diff;
 
         set_text_style("text-decoration", "none");
         render_text(&base);
         set_text_style("text-decoration", "underline");
         render_text(&underline);
-        ctest_equal_bool("underline should add visible pixels",
-                         count_different_pixels(&base, &underline) > 0, true);
+        diff = count_different_pixels(&base, &underline);
+        snprintf(desc, sizeof(desc),
+                 "underline should add visible pixels (diff=%d)", diff);
+        ctest_equal_bool(desc, diff > 0, true);
 
         set_text_style("text-decoration", "none");
         render_text(&removed);
@@ -194,7 +202,8 @@ static void should_move_and_resize_underline(void)
 {
         pd_canvas_t base, positive, negative, thick, zero, below_zero;
         ui_rect_t original_box;
-        int positive_y, negative_y;
+        int positive_y, negative_y, rows;
+        char desc[160];
 
         set_text_style("text-decoration", "none");
         render_text(&base);
@@ -207,16 +216,24 @@ static void should_move_and_resize_underline(void)
         render_text(&negative);
         positive_y = first_different_row(&base, &positive);
         negative_y = first_different_row(&base, &negative);
-        ctest_equal_int("positive offset should move underline downward",
-                        positive_y - negative_y, 4);
-        ctest_equal_int("two-pixel thickness should affect two rows",
-                        count_different_rows(&base, &positive), 2);
+        snprintf(desc, sizeof(desc),
+                 "positive offset should move underline downward "
+                 "(positive_y=%d, negative_y=%d)",
+                 positive_y, negative_y);
+        ctest_equal_int(desc, positive_y - negative_y, 4);
+        rows = count_different_rows(&base, &positive);
+        snprintf(desc, sizeof(desc),
+                 "two-pixel thickness should affect two rows (rows=%d)", rows);
+        ctest_equal_int(desc, rows, 2);
 
         set_text_style("text-underline-offset", "2px");
         set_text_style("text-decoration-thickness", "4px");
         render_text(&thick);
-        ctest_equal_int("four-pixel thickness should affect four rows",
-                        count_different_rows(&base, &thick), 4);
+        rows = count_different_rows(&base, &thick);
+        snprintf(desc, sizeof(desc),
+                 "four-pixel thickness should affect four rows (rows=%d)",
+                 rows);
+        ctest_equal_int(desc, rows, 4);
         set_text_style("text-decoration-thickness", "0px");
         render_text(&zero);
         ctest_equal_int("zero thickness should hide underline",
@@ -241,6 +258,8 @@ static void should_move_and_resize_underline(void)
 static void should_draw_underline_beyond_line_box(void)
 {
         pd_canvas_t base, underline;
+        char desc[160];
+        int diff;
 
         set_text_style("text-decoration", "none");
         set_text_style("text-underline-offset", "12px");
@@ -249,11 +268,19 @@ static void should_draw_underline_beyond_line_box(void)
         render_text(&base);
         set_text_style("text-decoration", "underline");
         render_text(&underline);
+        diff = count_different_pixels(&base, &underline);
+        snprintf(desc, sizeof(desc),
+                 "underline below the text box bottom should still be drawn "
+                 "(diff=%d)",
+                 diff);
+        ctest_equal_bool(desc, diff > 0, true);
+        snprintf(desc, sizeof(desc),
+                 "underline overflow should expand the canvas box "
+                 "(canvas=%.1f, border=%.1f)",
+                 text_widget->canvas_box.height,
+                 text_widget->border_box.height);
         ctest_equal_bool(
-            "underline below the text box bottom should still be drawn",
-            count_different_pixels(&base, &underline) > 0, true);
-        ctest_equal_bool(
-            "underline overflow should expand the canvas box for real clipping",
+            desc,
             text_widget->canvas_box.height > text_widget->border_box.height,
             true);
         set_text_style("text-decoration", "none");

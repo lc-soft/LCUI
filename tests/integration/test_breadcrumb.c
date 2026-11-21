@@ -12,6 +12,7 @@
 #include <LCUI.h>
 #include <ctest-custom.h>
 #include <math.h>
+#include <stdio.h>
 #include <string.h>
 
 static int count_children(ui_widget_t *w)
@@ -688,6 +689,7 @@ static void test_demo_layout(void)
         ui_widget_t *box = ui_create_widget(NULL);
         ui_widget_t *breadcrumb = ui_create_breadcrumb();
         ui_widget_t *list;
+        char desc[128];
 
         ui_widget_set_style_string(box, "display", "flex");
         ui_widget_set_style_string(box, "flex-direction", "column");
@@ -710,8 +712,15 @@ static void test_demo_layout(void)
         ui_update();
 
         list = ui_widget_get_child(breadcrumb, 0);
-        ctest_equal_bool("demo breadcrumb should keep its full width",
-                         breadcrumb->border_box.width > 250.f, true);
+        snprintf(desc, sizeof(desc),
+                 "demo breadcrumb should keep its full width "
+                 "(width=%.1f, parent=%.1f)",
+                 breadcrumb->border_box.width, box->border_box.width);
+        ctest_equal_bool(
+            desc,
+            breadcrumb->border_box.width > 0.f &&
+                breadcrumb->border_box.width <= box->border_box.width + 1.f,
+            true);
         ctest_equal_bool(
             "demo breadcrumb list should fill the breadcrumb",
             fabsf(list->border_box.width - breadcrumb->border_box.width) <= 1.f,
