@@ -504,11 +504,11 @@ p {
 
 .demo-tab {
   display: inline-block;
-  @apply px-2 py-1 text-sm rounded-lg mr-1;
+  @apply px-2 py-1 text-sm rounded-lg mr-1 cursor-pointer;
 }
 .demo-tab:hover {
-  @apply bg-muted;
-  @apply dark:bg-muted-dark;
+  @apply bg-foreground/10;
+  @apply dark:bg-foreground-dark/10;
 }
 .demo-tab.active {
   box-shadow: theme("boxShadow.sm");

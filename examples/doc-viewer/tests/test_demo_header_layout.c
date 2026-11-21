@@ -305,6 +305,41 @@ static void run_file_width(void)
         with_scene(DEMO_BLOCK_WIDTH, true, test_file_group_stays_inside_header);
 }
 
+static void test_demo_tab_hover_background(void)
+{
+        ui_widget_t *tab = ui_create_widget("text");
+        int alpha;
+
+        ui_widget_add_class(tab, "demo-tab");
+        ui_text_set_content(tab, "XML");
+        ui_widget_append(ui_root(), tab);
+        ui_update();
+
+        alpha = (int)((tab->computed_style.background_color >> 24) & 0xff);
+        ctest_equal_int("demo tab should start with a transparent background",
+                        alpha, 0);
+
+        ui_widget_add_status(tab, "hover");
+        ui_update();
+        alpha = (int)((tab->computed_style.background_color >> 24) & 0xff);
+        ctest_equal_bool("hovered demo tab should use a translucent overlay",
+                         alpha > 0 && alpha < 255, true);
+
+        ui_widget_remove_status(tab, "hover");
+        ui_widget_add_class(ui_root(), "dark");
+        ui_widget_add_status(tab, "hover");
+        ui_update();
+        alpha = (int)((tab->computed_style.background_color >> 24) & 0xff);
+        ctest_equal_bool(
+            "hovered demo tab should stay translucent in dark mode",
+            alpha > 0 && alpha < 255, true);
+
+        ui_widget_remove_status(tab, "hover");
+        ui_widget_remove_class(ui_root(), "dark");
+        ui_widget_destroy(tab);
+        ui_clear_trash();
+}
+
 void test_demo_header_layout(void)
 {
         lcui_window_options_t opt = { 0 };
@@ -322,6 +357,7 @@ void test_demo_header_layout(void)
         ctest_describe("demo header language height", run_language_height);
         ctest_describe("demo header language width", run_language_width);
         ctest_describe("demo header file width", run_file_width);
+        ctest_describe("demo header tab hover", test_demo_tab_hover_background);
 
         lcui_destroy();
 }
