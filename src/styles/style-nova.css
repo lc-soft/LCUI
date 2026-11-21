@@ -229,7 +229,8 @@ button:icon-lg .fui-icon {
   @apply text-base;
 }
 
-badge {
+badge,
+.badge {
   box-sizing: border-box;
   @apply inline-flex items-center gap-1 h-5 rounded-full border border-primary bg-primary px-2 text-xs font-medium leading-[18px] text-primary-foreground;
   @apply dark:border-primary-dark dark:bg-primary-dark dark:text-primary-foreground-dark;
@@ -239,23 +240,28 @@ badge icon {
   @apply text-xs leading-none;
 }
 
-badge:secondary {
+badge:secondary,
+.badge-secondary {
   @apply border-secondary bg-secondary text-secondary-foreground dark:border-secondary-dark dark:bg-secondary-dark dark:text-secondary-foreground-dark;
 }
 
-badge:destructive {
+badge:destructive,
+.badge-destructive {
   @apply border-destructive-muted bg-destructive-muted text-destructive dark:border-destructive-muted-dark dark:bg-destructive-muted-dark dark:text-destructive-dark;
 }
 
-badge:outline {
+badge:outline,
+.badge-outline {
   @apply border-border bg-transparent text-foreground dark:border-border-dark dark:text-foreground-dark;
 }
 
-badge:ghost {
+badge:ghost,
+.badge-ghost {
   @apply border-transparent bg-transparent text-foreground dark:text-foreground-dark;
 }
 
-badge:disabled {
+badge:disabled,
+.badge-disabled {
   @apply opacity-50;
 }
 
@@ -284,7 +290,8 @@ badge:disabled {
   @apply dark:border-destructive-dark/30 dark:bg-destructive-dark/15 dark:text-destructive-dark;
 }
 
-alert {
+alert,
+.alert {
   @apply flex items-start gap-2 text-sm px-2.5 py-2 bg-card text-card-foreground rounded-lg border border-border;
   @apply dark:border-border-dark dark:bg-card-dark dark:text-card-foreground-dark;
 }
@@ -294,36 +301,44 @@ alert icon {
   font-size: 16px;
 }
 
-alert-content {
+alert-content,
+.alert-content {
   @apply flex flex-1 flex-col gap-0.5;
 }
 
-alert-title {
+alert-title,
+.alert-title {
   @apply block font-medium;
 }
 
-alert-description {
+alert-description,
+.alert-description {
   @apply block text-muted-foreground dark:text-muted-foreground-dark;
 }
 
-alert-action {
+alert-action,
+.alert-action {
   @apply ml-auto flex;
 }
 
-alert:success {
+alert:success,
+.alert-success {
   @apply border-admonition-tip/30 bg-admonition-tip/10 text-admonition-tip-foreground;
   @apply dark:border-admonition-tip-dark/30 dark:bg-admonition-tip-dark/10 dark:text-admonition-tip-foreground-dark;
 }
 
-alert:warning {
+alert:warning,
+.alert-warning {
   @apply border-admonition-caution/40 bg-admonition-caution/10 text-admonition-caution-foreground;
   @apply dark:border-admonition-caution-dark/40 dark:bg-admonition-caution-dark/10 dark:text-admonition-caution-foreground-dark;
 }
 
-alert:destructive {
+alert:destructive,
+.alert-destructive {
   @apply text-destructive dark:text-destructive-dark;
 }
-alert:destructive alert-description {
+alert:destructive alert-description,
+.alert-destructive .alert-description {
   @apply text-destructive/90 dark:text-destructive-dark/90;
 }
 
@@ -361,7 +376,8 @@ empty-action {
 
 /* card */
 
-card {
+card,
+.card {
   @apply border border-border bg-card text-card-foreground rounded-xl text-sm;
   @apply dark:border-border-dark dark:bg-card-dark dark:text-card-foreground-dark;
   box-sizing: border-box;
@@ -369,17 +385,20 @@ card {
   padding: 16px 0;
 }
 
-card:sm {
+card:sm,
+.card-sm {
   gap: 12px;
   padding: 12px 0;
 }
 
-card-header {
+card-header,
+.card-header {
   @apply gap-1 rounded-t-xl;
   padding: 0 16px;
 }
 
-card:sm card-header {
+card:sm card-header,
+.card-sm .card-header {
   padding: 0 12px;
 }
 
@@ -390,7 +409,8 @@ card-header.border-b {
   padding-bottom: 16px;
 }
 
-card:sm card-header.border-b {
+card:sm card-header.border-b,
+.card-sm .card-header.border-b {
   padding-bottom: 12px;
 }
 
@@ -399,19 +419,23 @@ card-title {
   line-height: 1.375;
 }
 
-card-header.has-card-action {
+card-header.has-card-action,
+.card-action {
   padding-right: 88px;
 }
 
-card:sm card-header.has-card-action {
+card:sm card-header.has-card-action,
+.card-sm .card-header.has-card-action {
   padding-right: 80px;
 }
 
-card:sm card-title {
+card:sm card-title,
+.card-sm .card-title {
   @apply text-sm;
 }
 
-card-description {
+card-description,
+.card-description {
   @apply text-sm text-muted-foreground dark:text-muted-foreground-dark;
 }
 
@@ -419,15 +443,18 @@ card-action {
   right: 16px;
 }
 
-card:sm card-action {
+card:sm card-action,
+.card-sm .card-action {
   right: 12px;
 }
 
-card-content {
+card-content,
+.card-content {
   padding: 0 16px;
 }
 
-card:sm card-content {
+card:sm card-content,
+.card-sm .card-content {
   padding: 0 12px;
 }
 
@@ -435,105 +462,129 @@ card-content.clip-safe {
   padding: 4px 16px;
 }
 
-card:sm card-content.clip-safe {
+card:sm card-content.clip-safe,
+.card-sm .card-content.clip-safe {
   padding: 4px 12px;
 }
 
-card-footer {
+card-footer,
+.card-footer {
   @apply bg-muted/50 rounded-b-xl border-t dark:bg-muted-dark/50 dark:border-border-dark;
   padding: 16px;
   margin-bottom: -16px;
 }
 
-card:sm card-footer {
+card:sm card-footer,
+.card-sm .card-footer {
   padding: 12px;
   margin-bottom: -12px;
 }
 
-item {
+item,
+.item {
   @apply flex gap-2.5 rounded-lg border border-transparent px-3 py-2.5 text-sm dark:border-transparent;
   align-items: center;
 }
 
-item:sm {
+item:sm,
+.item-sm {
   @apply gap-2.5 px-3 py-2.5;
 }
 
-item:xs {
+item:xs,
+.item-xs {
   @apply gap-2 px-2.5 py-2;
 }
 
-item:outline {
+item:outline,
+.item-outline {
   @apply border-border dark:border-border-dark;
 }
 
-item:muted {
+item:muted,
+.item-muted {
   @apply border-transparent bg-muted/50 dark:bg-muted-dark/50;
 }
 
-item-content {
+item-content,
+.item-content {
   @apply flex flex-1 flex-col gap-1;
 }
 
-item:xs item-content {
+item:xs item-content,
+.item-xs .item-content {
   @apply gap-0;
 }
 
 item-media,
-item-actions {
+item-actions,
+.item-media,
+.item-actions {
   @apply flex;
 }
 
-item-media {
+item-media,
+.item-media {
   @apply gap-2;
   align-self: flex-start;
 }
 
-item-media:icon {
+item-media:icon,
+.item-media-icon {
   @apply flex items-center justify-center;
   padding-top: 1.5px;
   font-size: 16px;
 }
 
-item-media:icon icon {
+item-media:icon icon,
+.item-media-icon icon {
   width: 16px;
   height: 16px;
   font-size: 16px;
 }
 
-item-media:image {
+item-media:image,
+.item-media-image {
   @apply h-10 w-10 rounded-sm;
 }
 
-item:sm item-media:image {
+item:sm item-media:image,
+.item-sm .item-media-image {
   @apply h-8 w-8;
 }
 
-item:xs item-media:image {
+item:xs item-media:image,
+.item-xs .item-media-image {
   @apply h-6 w-6;
 }
 
-item-title {
+item-title,
+.item-title {
   @apply block text-sm font-medium leading-snug;
 }
 
-item-description {
+item-description,
+.item-description {
   @apply block text-sm leading-normal text-muted-foreground dark:text-muted-foreground-dark;
 }
 
-item:xs item-description {
+item:xs item-description,
+.item-xs .item-description {
   @apply text-xs;
 }
 
-item:interactive:hover {
+item:interactive:hover,
+.item-interactive:hover {
   @apply bg-muted dark:bg-muted-dark;
 }
 
-item:interactive:active {
+item:interactive:active,
+.item-interactive:active {
   @apply bg-foreground/10 dark:bg-foreground-dark/10;
 }
 
-item:disabled {
+item:disabled,
+.item-disabled {
   @apply opacity-50;
 }
 
