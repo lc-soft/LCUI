@@ -200,8 +200,8 @@ static int css_parser_parse_style_property_value(css_parser_t *parser)
         assert(parser->style_parser.property != NULL);
         propdef = css_get_propdef_by_name(parser->style_parser.property);
         if (!propdef) {
-                logger_error(
-                    "[css-parser] [property: %s] value type not defined\n",
+                logger_debug(
+                    "[css-parser] [property: %s] unsupported property\n",
                     parser->style_parser.property);
                 free(parser->style_parser.property);
                 parser->style_parser.property = NULL;
@@ -211,12 +211,12 @@ static int css_parser_parse_style_property_value(css_parser_t *parser)
                                              propdef, parser->buffer);
         if (result <= 0) {
                 if (propdef->key >= 0) {
-                        logger_error(
-                            "[css-parser] [property: %s] invalid value: %s\n",
-                            propdef->name, parser->buffer);
+                        logger_debug("[css-parser] [property: %s] unsupported "
+                                     "value: %s\n",
+                                     propdef->name, parser->buffer);
                 } else {
-                        logger_error("[css-parser] [shorthand property: %s] "
-                                     "invalid value: %s\n",
+                        logger_debug("[css-parser] [shorthand property: %s] "
+                                     "unsupported value: %s\n",
                                      propdef->name, parser->buffer);
                 }
         }
