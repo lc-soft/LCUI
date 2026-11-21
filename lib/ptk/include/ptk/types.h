@@ -13,6 +13,7 @@
 #define PTK_INCLUDE_PLATFORM_TYPES_H
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <pandagl/types.h>
 
 typedef pd_context_t ptk_window_paint_t;
@@ -323,6 +324,12 @@ typedef struct ptk_native_event_listener {
         void *data;
 } ptk_native_event_listener_t;
 
+typedef struct ptk_icon_image {
+        int width;
+        int height;
+        const uint32_t *argb;
+} ptk_icon_image_t;
+
 typedef struct ptk_window_driver {
         void (*hide)(ptk_window_t *);
         void (*show)(ptk_window_t *);
@@ -330,6 +337,7 @@ typedef struct ptk_window_driver {
         void (*close)(ptk_window_t *);
         void (*destroy)(ptk_window_t *);
         void (*set_title)(ptk_window_t *, const wchar_t *);
+        void (*set_icons)(ptk_window_t *, const ptk_icon_image_t *, int);
         void (*set_size)(ptk_window_t *, int, int);
         void (*set_position)(ptk_window_t *, int, int);
         void (*get_position)(ptk_window_t *, int *, int *);

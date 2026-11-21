@@ -11,10 +11,14 @@
 
 #include "ptk/app.h"
 #include "ptk/events.h"
+#include "ptk/window.h"
 
 #ifdef PTK_WIN_DESKTOP
 #pragma comment(lib, "User32")
 #pragma comment(lib, "Gdi32")
+#include <limits.h>
+#include <stdlib.h>
+#include <string.h>
 #include <windows.h>
 #include <yutil.h>
 #include <pandagl.h>
@@ -44,6 +48,9 @@ struct ptk_window {
 
         ptk_cursor_type_t cursor;
         HCURSOR hcursor;
+
+        HICON hicon_small;
+        HICON hicon_big;
 
         ptk_window_render_mode_t mode;
         HDC hdc_fb;
@@ -410,6 +417,14 @@ static LRESULT CALLBACK ptk_window_process(HWND hwnd, UINT msg, WPARAM arg1,
                                         ReleaseDC(wnd->hwnd, wnd->hdc_client);
                                 }
                         }
+                        if (wnd->hicon_small) {
+                                DestroyIcon(wnd->hicon_small);
+                                wnd->hicon_small = NULL;
+                        }
+                        if (wnd->hicon_big) {
+                                DestroyIcon(wnd->hicon_big);
+                                wnd->hicon_big = NULL;
+                        }
                         wnd->hwnd = NULL;
                         wnd->fb_bmp = NULL;
                         wnd->hdc_fb = NULL;
@@ -544,6 +559,8 @@ ptk_window_t *ptk_window_create(const wchar_t *title, int x, int y, int width,
         wnd->is_ready = false;
         wnd->cursor = PTK_CURSOR_AUTO;
         wnd->hcursor = LoadCursorW(NULL, IDC_ARROW);
+        wnd->hicon_small = NULL;
+        wnd->hicon_big = NULL;
         wnd->node.data = wnd;
         wnd->min_width = MIN_WIDTH;
         wnd->min_height = MIN_HEIGHT;
@@ -738,6 +755,138 @@ void ptk_window_hide(ptk_window_t *wnd)
 void ptk_window_set_title(ptk_window_t *wnd, const wchar_t *title)
 {
         SetWindowTextW(wnd->hwnd, title);
+}
+
+static HICON ptk_win32_create_icon(const ptk_icon_image_t *image)
+{
+        BITMAPINFOHEADER bi = { 0 };
+        ICONINFO info = { 0 };
+        HBITMAP color;
+        HBITMAP mask;
+        HICON icon;
+        void *bits;
+        unsigned char *mask_bits;
+        int mask_stride;
+        size_t size;
+
+        size = (size_t)image->width * image->height * sizeof(uint32_t);
+        bi.biSize = sizeof(bi);
+        bi.biWidth = image->width;
+        bi.biHeight = -image->height;
+        bi.biPlanes = 1;
+        bi.biBitCount = 32;
+        bi.biCompression = BI_RGB;
+        color = CreateDIBSection(NULL, (BITMAPINFO *)&bi, DIB_RGB_COLORS, &bits,
+                                 NULL, 0);
+        if (!color) {
+                return NULL;
+        }
+        memcpy(bits, image->argb, size);
+
+        mask_stride = ((image->width + 15) / 16) * 2;
+        mask_bits = calloc(1, (size_t)mask_stride * image->height);
+        if (!mask_bits) {
+                DeleteObject(color);
+                return NULL;
+        }
+        mask = CreateBitmap(image->width, image->height, 1, 1, mask_bits);
+        free(mask_bits);
+        if (!mask) {
+                DeleteObject(color);
+                return NULL;
+        }
+
+        info.fIcon = TRUE;
+        info.hbmColor = color;
+        info.hbmMask = mask;
+        icon = CreateIconIndirect(&info);
+        DeleteObject(color);
+        DeleteObject(mask);
+        return icon;
+}
+
+static int ptk_win32_icon_size_for_dpi(unsigned dpi, bool big)
+{
+        unsigned scale = dpi * 100 / 96;
+
+        if (scale >= 175) {
+                return big ? 64 : 32;
+        }
+        if (scale >= 125) {
+                return big ? 48 : 24;
+        }
+        return big ? 32 : 16;
+}
+
+static const ptk_icon_image_t *ptk_win32_pick_icon(
+    const ptk_icon_image_t *images, int count, int size)
+{
+        int i, diff;
+        int best_diff = INT_MAX;
+        const ptk_icon_image_t *best = NULL;
+
+        for (i = 0; i < count; ++i) {
+                if (images[i].width <= 0 || images[i].height <= 0 ||
+                    !images[i].argb) {
+                        continue;
+                }
+                diff =
+                    abs(images[i].width - size) + abs(images[i].height - size);
+                if (diff < best_diff) {
+                        best = &images[i];
+                        best_diff = diff;
+                }
+        }
+        return best;
+}
+
+void ptk_window_set_icons(ptk_window_t *wnd, const ptk_icon_image_t *images,
+                          int count)
+{
+        HICON small_icon = NULL;
+        HICON big_icon = NULL;
+        const ptk_icon_image_t *image;
+        unsigned dpi;
+        int small_size;
+        int big_size;
+
+        if (!wnd || !wnd->hwnd) {
+                return;
+        }
+        if (images && count > 0) {
+                dpi = ptk_window_get_dpi(wnd);
+                small_size = ptk_win32_icon_size_for_dpi(dpi, false);
+                big_size = ptk_win32_icon_size_for_dpi(dpi, true);
+                image = ptk_win32_pick_icon(images, count, small_size);
+                if (image) {
+                        small_icon = ptk_win32_create_icon(image);
+                }
+                image = ptk_win32_pick_icon(images, count, big_size);
+                if (image) {
+                        big_icon = ptk_win32_create_icon(image);
+                }
+                if (!small_icon || !big_icon) {
+                        if (small_icon) {
+                                DestroyIcon(small_icon);
+                        }
+                        if (big_icon) {
+                                DestroyIcon(big_icon);
+                        }
+                        logger_error(
+                            "[win32-app] failed to create window icon\n");
+                        return;
+                }
+        }
+        if (wnd->hicon_small) {
+                DestroyIcon(wnd->hicon_small);
+        }
+        if (wnd->hicon_big) {
+                DestroyIcon(wnd->hicon_big);
+        }
+        wnd->hicon_small = small_icon;
+        wnd->hicon_big = big_icon;
+        SendMessageW(wnd->hwnd, WM_SETICON, ICON_SMALL, (LPARAM)small_icon);
+        SendMessageW(wnd->hwnd, WM_SETICON, ICON_BIG, (LPARAM)big_icon);
 }
 
 /* 将光标类型映射为系统光标句柄；PTK_CURSOR_NONE 返回 NULL 以隐藏指针。

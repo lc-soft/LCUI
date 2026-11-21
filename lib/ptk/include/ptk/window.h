@@ -40,6 +40,8 @@ PTK_PUBLIC void ptk_window_show(ptk_window_t *wnd);
 PTK_PUBLIC void ptk_window_hide(ptk_window_t *wnd);
 PTK_PUBLIC void ptk_window_activate(ptk_window_t *wnd);
 PTK_PUBLIC void ptk_window_set_title(ptk_window_t *wnd, const wchar_t *title);
+PTK_PUBLIC void ptk_window_set_icons(ptk_window_t *wnd,
+                                     const ptk_icon_image_t *images, int count);
 PTK_PUBLIC void ptk_window_set_cursor(ptk_window_t *wnd,
                                       ptk_cursor_type_t cursor);
 PTK_PUBLIC ptk_cursor_type_t ptk_window_get_cursor(ptk_window_t *wnd);

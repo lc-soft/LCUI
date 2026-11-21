@@ -69,6 +69,8 @@ typedef struct pd_image_reader {
 PD_PUBLIC pd_image_reader_t *pd_image_reader_create(void);
 PD_PUBLIC pd_image_reader_t *pd_image_reader_create_from_file(
     const char *filename);
+PD_PUBLIC pd_image_reader_t *pd_image_reader_create_from_memory(
+    const void *data, size_t size);
 
 PD_PUBLIC void pd_image_reader_destroy(pd_image_reader_t *reader);
 PD_PUBLIC jmp_buf *pd_image_reader_jmpbuf(pd_image_reader_t *reader);

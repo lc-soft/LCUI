@@ -95,7 +95,7 @@ int pd_canvas_zoom_bilinear(const pd_canvas_t *canvas, pd_canvas_t *buff,
         pd_rect_t rect;
         pd_color_t a, b, c, d, t_color;
 
-        int x, y, i, j;
+        int x, y, i, j, sx, sy, sx1, sy1;
         float x_diff, y_diff;
         double scale_x = 0.0, scale_y = 0.0;
 
@@ -153,14 +153,14 @@ int pd_canvas_zoom_bilinear(const pd_canvas_t *canvas, pd_canvas_t *buff,
                         y = (int)(scale_y * i);
                         x_diff = (float)((scale_x * j) - x);
                         y_diff = (float)((scale_y * i) - y);
-                        a = pd_canvas_get_pixel(canvas, x + rect.x + 0,
-                                                y + rect.y + 0);
-                        b = pd_canvas_get_pixel(canvas, x + rect.x + 1,
-                                                y + rect.y + 0);
-                        c = pd_canvas_get_pixel(canvas, x + rect.x + 0,
-                                                y + rect.y + 1);
-                        d = pd_canvas_get_pixel(canvas, x + rect.x + 1,
-                                                y + rect.y + 1);
+                        sx = x + rect.x;
+                        sy = y + rect.y;
+                        sx1 = sx + 1 < rect.x + rect.width ? sx + 1 : sx;
+                        sy1 = sy + 1 < rect.y + rect.height ? sy + 1 : sy;
+                        a = pd_canvas_get_pixel(canvas, sx, sy);
+                        b = pd_canvas_get_pixel(canvas, sx1, sy);
+                        c = pd_canvas_get_pixel(canvas, sx, sy1);
+                        d = pd_canvas_get_pixel(canvas, sx1, sy1);
                         t_color.b = canvas_bilinear_resampling_core(
                             a.b, b.b, c.b, d.b, x_diff, y_diff);
                         t_color.g = canvas_bilinear_resampling_core(

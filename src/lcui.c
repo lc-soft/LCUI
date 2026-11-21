@@ -23,6 +23,7 @@ extern void lcui_rendering_init(void);
 extern void lcui_window_state_destroy(void);
 extern void lcui_window_state_init(void);
 extern void lcui_widgets_init(void);
+extern void lcui_icon_destroy_default(void);
 extern void lcui_widgets_destroy(void);
 
 const char *lcui_get_version(void)
@@ -64,6 +65,7 @@ bool lcui_load_settings(const char *app_id)
 void lcui_destroy(void)
 {
         lcui_window_destroy_all();
+        lcui_icon_destroy_default();
         lcui_settings_unload();
         lcui_window_state_destroy();
         lcui_rendering_destroy();

@@ -14,6 +14,7 @@
 #include <string.h>
 #include <LCUI.h>
 #include "lcui_app.h"
+#include "lcui_icon.h"
 
 struct lcui_window {
         list_node_t node;
@@ -23,6 +24,7 @@ struct lcui_window {
         bool show_requested;
         bool closed;
         bool state_applied;
+        bool has_custom_icon;
         int last_width;
         int last_height;
         int last_x;
@@ -165,6 +167,30 @@ static void lcui_window_ensure_list(void)
         }
 }
 
+static void lcui_window_apply_default_icon(lcui_window_t *w)
+{
+        const ptk_icon_image_t *images;
+        int count = 0;
+
+        if (!w->ptk || w->has_custom_icon) {
+                return;
+        }
+        images = lcui_icon_default_images(&count);
+        ptk_window_set_icons(w->ptk, images, count);
+}
+
+static void lcui_window_refresh_default_icons(void)
+{
+        list_node_t *node;
+
+        if (!lcui_windows.ready) {
+                return;
+        }
+        for (list_each(node, &lcui_windows.windows)) {
+                lcui_window_apply_default_icon(node->data);
+        }
+}
+
 lcui_window_t *lcui_window_create(const lcui_window_options_t *opt)
 {
         lcui_window_t *w;
@@ -186,6 +212,12 @@ lcui_window_t *lcui_window_create(const lcui_window_options_t *opt)
         lcui_window_ensure_listener();
         w->node.data = w;
         list_append_node(&lcui_windows.windows, &w->node);
+        if (opt && opt->icon) {
+                lcui_window_set_icon(w, opt->icon);
+        }
+        if (!w->has_custom_icon) {
+                lcui_window_apply_default_icon(w);
+        }
         if (opt) {
                 width = opt->width;
                 height = opt->height;
@@ -372,6 +404,77 @@ void lcui_window_set_title(lcui_window_t *w, const wchar_t *title)
                 return;
         }
         ptk_window_set_title(w->ptk, title);
+}
+
+bool lcui_window_set_icon(lcui_window_t *w, const char *file)
+{
+        lcui_icon_t icon;
+
+        if (!w || !w->ptk) {
+                return false;
+        }
+        if (!file) {
+                w->has_custom_icon = false;
+                lcui_window_apply_default_icon(w);
+                return true;
+        }
+        if (!lcui_icon_create_from_file(&icon, file)) {
+                return false;
+        }
+        ptk_window_set_icons(w->ptk, icon.image, icon.count);
+        lcui_icon_destroy(&icon);
+        w->has_custom_icon = true;
+        return true;
+}
+
+bool lcui_window_set_icon_from_data(lcui_window_t *w, const void *data,
+                                    size_t size)
+{
+        lcui_icon_t icon;
+
+        if (!w || !w->ptk) {
+                return false;
+        }
+        if (!data || size == 0) {
+                w->has_custom_icon = false;
+                lcui_window_apply_default_icon(w);
+                return true;
+        }
+        if (!lcui_icon_create_from_data(&icon, data, size)) {
+                return false;
+        }
+        ptk_window_set_icons(w->ptk, icon.image, icon.count);
+        lcui_icon_destroy(&icon);
+        w->has_custom_icon = true;
+        return true;
+}
+
+bool lcui_set_default_window_icon(const char *file)
+{
+        if (!file) {
+                lcui_icon_reset_default();
+        } else if (!lcui_icon_set_default_from_file(file)) {
+                return false;
+        }
+        lcui_window_refresh_default_icons();
+        return true;
+}
+
+bool lcui_set_default_window_icon_from_data(const void *data, size_t size)
+{
+        if (!data || size == 0) {
+                lcui_icon_reset_default();
+        } else if (!lcui_icon_set_default_from_data(data, size)) {
+                return false;
+        }
+        lcui_window_refresh_default_icons();
+        return true;
+}
+
+void lcui_set_default_window_icon_enabled(bool enable)
+{
+        lcui_icon_set_default_enabled(enable);
+        lcui_window_refresh_default_icons();
 }
 
 void lcui_window_set_maximized(lcui_window_t *w, bool maximized)

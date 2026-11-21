@@ -127,6 +127,30 @@ lcui_window_show(win);
 `lcui_set_quit_on_last_window(bool)` 控制（默认 true）。应用需要“关掉窗口但继续运行”
 （例如托盘应用）时关闭该策略。`lcui_destroy()` 会兜底销毁仍存活的窗口。
 
+## 窗口图标
+
+窗口图标分两层：LCUI 负责任何图像的解码与多尺寸生成，PTK 只接收
+`ptk_icon_image_t`（`0xAARRGGBB` 像素）并交给平台。
+
+- 创建时用 `lcui_window_options_t.icon` 指定图标文件；`NULL` 使用全局默认图标。
+- `lcui_window_set_icon(w, file)` / `lcui_window_set_icon_from_data(w, data, size)`
+  设置自定义图标；传入 `NULL` / 空数据会清除自定义图标并回退到默认图标。
+- `lcui_set_default_window_icon(file)` / `_from_data` 设置全局默认图标；
+  `lcui_set_default_window_icon(NULL)` 清除覆盖并回退到内置图标。
+- `lcui_set_default_window_icon_enabled(false)` 关闭所有默认图标；只影响没有自定义
+  图标的窗口，重新启用时会给这些窗口补上图标。
+- 内置默认图标使用 `resources/lcui-icon-{16,24,32,48,64,128}.png` 和
+  `resources/lcui-icon.png`（256），经 `npm run build-icon` 生成
+  `src/resources/lcui-icon-*.png.inc` 并编进 `lcui`。改图标后必须重新生成包含文件。
+- `src/lcui_icon.c` 的内置图标直接解码预渲染尺寸，避免 16/32px 经过运行时缩放；
+  自定义图标则从单张源图生成 16/24/32/48/64/128/256 多尺寸，再调用
+  `ptk_window_set_icons`。自定义图标在设置完成后即可释放临时 canvas。
+- PTK 平台实现：Win32 用 `CreateIconIndirect` 创建 HICON 并 `WM_SETICON`
+  （`ICON_SMALL`/`ICON_BIG`）；X11 写 `_NET_WM_ICON`；framebuffer 后端 no-op。
+- 可执行文件图标（Explorer/开始菜单）仍由 Windows `.rc` 资源决定，不属于运行时
+  窗口图标 API 的范围。仓库提供 `resources/lcui-icon.ico`（外部提供的 16/32/48/256
+  多尺寸 ICO）供 `.rc` 引用；它不参与运行时窗口图标。
+
 ## 多窗口事件路由
 
 `lib/ui` 的事件状态按 `ui_event_scope_t` 隔离，每个 scope 拥有自己的

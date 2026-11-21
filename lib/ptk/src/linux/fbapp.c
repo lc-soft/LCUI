@@ -289,6 +289,11 @@ static void ptk_fb_window_set_title(ptk_window_t *wnd, const wchar_t *title)
 {
 }
 
+static void ptk_fb_window_set_icons(ptk_window_t *wnd,
+                                    const ptk_icon_image_t *images, int count)
+{
+}
+
 static void ptk_fb_window_close(ptk_window_t *wnd)
 {
         ptk_event_t e = { 0 };
@@ -616,6 +621,7 @@ void ptk_fbwindow_driver_init(ptk_window_driver_t *driver)
         driver->hide = ptk_fb_window_hide;
         driver->activate = ptk_fb_window_activate;
         driver->set_title = ptk_fb_window_set_title;
+        driver->set_icons = ptk_fb_window_set_icons;
         driver->set_size = ptk_fb_window_set_size;
         driver->set_position = ptk_fb_window_set_position;
         driver->get_position = ptk_fb_window_get_position;

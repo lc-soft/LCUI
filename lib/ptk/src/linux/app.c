@@ -84,6 +84,15 @@ void ptk_window_set_title(ptk_window_t *wnd, const wchar_t *title)
         return linux_app.window.set_title(wnd, title);
 }
 
+void ptk_window_set_icons(ptk_window_t *wnd, const ptk_icon_image_t *images,
+                          int count)
+{
+        if (!linux_app.window.set_icons) {
+                return;
+        }
+        linux_app.window.set_icons(wnd, images, count);
+}
+
 void ptk_window_set_cursor(ptk_window_t *wnd, ptk_cursor_type_t cursor)
 {
         linux_app.window.set_cursor(wnd, cursor);

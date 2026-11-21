@@ -17,7 +17,7 @@
     "test-repo-stars": "node --test scripts/fetch-repo-stars.test.js",
     "build-styles": "node scripts/generate-accent-themes.js && lcui build src/styles/style-nova.css --force --skip-xmake && lcui build src/styles/accents --force --skip-xmake && lcui build src/styles/accent-swatches.css --force --skip-xmake",
     "build-accents": "node scripts/generate-accent-themes.js && lcui build src/styles/accents --force --skip-xmake && lcui build src/styles/accent-swatches.css --force --skip-xmake",
-    "build-icon": "xmake l cli.binutils.bin2c -i resources/lcui-icon.png -o src/resources/lcui-icon.png.h --nozeroend",
+    "build-icon": "node scripts/build-icon.mjs",
     "doc-viewer:stars": "node scripts/fetch-repo-stars.js",
     "doc-viewer:compile-docs": "npm run doc-viewer:stars && cd examples/doc-viewer && npm run compile",
     "doc-viewer:compile-tsx": "npm run doc-viewer:stars && cd examples/doc-viewer && lcui build --force --skip-xmake",

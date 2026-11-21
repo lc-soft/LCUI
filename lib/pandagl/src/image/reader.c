@@ -113,6 +113,25 @@ pd_image_reader_t *pd_image_reader_create_from_file(const char *filename)
         return reader;
 }
 
+pd_image_reader_t *pd_image_reader_create_from_memory(const void *data,
+                                                      size_t size)
+{
+        pd_image_reader_t *reader;
+        pd_file_reader_t *file_reader;
+
+        file_reader = pd_file_reader_create_from_memory(data, size);
+        if (!file_reader) {
+                return NULL;
+        }
+        reader = pd_image_reader_create();
+        if (!reader) {
+                pd_file_reader_destroy(file_reader);
+                return NULL;
+        }
+        reader->file_reader = file_reader;
+        return reader;
+}
+
 void pd_image_reader_destroy(pd_image_reader_t *reader)
 {
         if (reader->reader_data) {
@@ -164,7 +183,7 @@ pd_error_t pd_image_reader_read_header(pd_image_reader_t *reader)
                         pd_file_reader_rewind(reader->file_reader);
                         err = pd_image_reader_try_read_header(reader);
                         if (err == PD_OK) {
-                                break;
+                                return PD_OK;
                         }
                 }
         }

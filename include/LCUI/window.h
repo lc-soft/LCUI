@@ -14,6 +14,7 @@
 
 #include <LCUI/common.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <wchar.h>
 #include <ui/types.h>
 #include <ptk/types.h>
@@ -33,6 +34,8 @@ typedef struct lcui_window_options {
         int x, y;
         bool maximized;
         bool fullscreen;
+        /* Optional icon file. NULL uses the global default icon. */
+        const char *icon;
 } lcui_window_options_t;
 
 LCUI_API lcui_window_t *lcui_window_create(const lcui_window_options_t *opt);
@@ -54,6 +57,21 @@ LCUI_API void lcui_window_get_position(lcui_window_t *w, int *x, int *y);
 LCUI_API void lcui_window_set_size(lcui_window_t *w, int cw, int ch);
 LCUI_API void lcui_window_set_position(lcui_window_t *w, int x, int y);
 LCUI_API void lcui_window_set_title(lcui_window_t *w, const wchar_t *title);
+
+/* Icon APIs must be called on the UI thread. A NULL file clears the custom
+ * icon and falls back to the default icon. */
+LCUI_API bool lcui_window_set_icon(lcui_window_t *w, const char *file);
+/* NULL data or zero size clears the custom icon. */
+LCUI_API bool lcui_window_set_icon_from_data(lcui_window_t *w, const void *data,
+                                             size_t size);
+
+/* Sets the global default window icon. NULL clears the override and falls
+ * back to the built-in icon. */
+LCUI_API bool lcui_set_default_window_icon(const char *file);
+LCUI_API bool lcui_set_default_window_icon_from_data(const void *data,
+                                                     size_t size);
+LCUI_API void lcui_set_default_window_icon_enabled(bool enable);
+
 LCUI_API void lcui_window_set_maximized(lcui_window_t *w, bool maximized);
 LCUI_API void lcui_window_set_fullscreen(lcui_window_t *w, bool fullscreen);
 

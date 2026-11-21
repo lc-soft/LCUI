@@ -44,6 +44,8 @@ PD_INLINE void pd_file_reader_skip(pd_file_reader_t *reader, long bytes)
 PD_PUBLIC pd_file_reader_t *pd_file_reader_create(void);
 PD_PUBLIC pd_file_reader_t *pd_file_reader_create_from_file(
     const char *filename);
+PD_PUBLIC pd_file_reader_t *pd_file_reader_create_from_memory(const void *data,
+                                                              size_t size);
 PD_PUBLIC void pd_file_reader_destroy(pd_file_reader_t *reader);
 
 PD_END_DECLS

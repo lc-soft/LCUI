@@ -53,6 +53,7 @@ static struct ptk_x11app {
         Window win_events;
         Atom wm_delete;
         Atom wm_exit;
+        Atom net_wm_icon;
         Colormap cmap;
 
         /* 按 ptk_cursor_type_t 索引的惰性光标缓存，None(0) 表示未创建 */
@@ -617,6 +618,58 @@ static void ptk_x11window__set_title(ptk_window_t *wnd, const wchar_t *title)
         free(utf8_title);
 }
 
+static void ptk_x11window__set_icons(ptk_window_t *wnd,
+                                     const ptk_icon_image_t *images, int count)
+{
+        int i, x, y;
+        size_t pos = 0;
+        size_t size = 0;
+        unsigned long *data;
+
+        if (!wnd || !wnd->handle) {
+                return;
+        }
+        if (count <= 0 || !images) {
+                XDeleteProperty(x11_app.display, wnd->handle,
+                                x11_app.net_wm_icon);
+                return;
+        }
+        for (i = 0; i < count; ++i) {
+                if (images[i].width <= 0 || images[i].height <= 0 ||
+                    !images[i].argb) {
+                        continue;
+                }
+                size += 2 + (size_t)images[i].width * images[i].height;
+        }
+        if (size == 0) {
+                XDeleteProperty(x11_app.display, wnd->handle,
+                                x11_app.net_wm_icon);
+                return;
+        }
+        data = malloc(size * sizeof(unsigned long));
+        if (!data) {
+                return;
+        }
+        for (i = 0; i < count; ++i) {
+                if (images[i].width <= 0 || images[i].height <= 0 ||
+                    !images[i].argb) {
+                        continue;
+                }
+                data[pos++] = (unsigned long)images[i].width;
+                data[pos++] = (unsigned long)images[i].height;
+                for (y = 0; y < images[i].height; ++y) {
+                        for (x = 0; x < images[i].width; ++x) {
+                                data[pos++] =
+                                    images[i].argb[y * images[i].width + x];
+                        }
+                }
+        }
+        XChangeProperty(x11_app.display, wnd->handle, x11_app.net_wm_icon,
+                        XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
+                        (int)pos);
+        free(data);
+}
+
 static void ptk_x11window__set_size(ptk_window_t *wnd, int width, int height)
 {
         // Ignore useless events and avoid infinite window size changes
@@ -899,6 +952,8 @@ static int ptk_x11app_init(const wchar_t *name)
         x11_app.wm_delete =
             XInternAtom(x11_app.display, "WM_DELETE_WINDOW", false);
         x11_app.wm_exit = XInternAtom(x11_app.display, "WM_EXIT", false);
+        x11_app.net_wm_icon =
+            XInternAtom(x11_app.display, "_NET_WM_ICON", false);
         XSelectInput(x11_app.display, x11_app.win_events, StructureNotifyMask);
         return 0;
 }
@@ -966,6 +1021,7 @@ void ptk_x11window_driver_init(ptk_window_driver_t *driver)
         driver->destroy = ptk_x11window__destroy;
         driver->activate = ptk_x11window__activate;
         driver->set_title = ptk_x11window__set_title;
+        driver->set_icons = ptk_x11window__set_icons;
         driver->set_position = ptk_x11window__set_position;
         driver->get_position = ptk_x11window__get_position;
         driver->set_size = ptk_x11window__set_size;
