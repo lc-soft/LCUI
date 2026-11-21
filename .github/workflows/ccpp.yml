@@ -98,9 +98,45 @@ jobs:
         if: runner.os == 'Windows'
         run: xmake test
 
-      - name: Run all tests with memcheck
+      - name: Run ctest tests
         if: runner.os == 'Linux'
-        run: xvfb-run -a xmake test
+        run: xvfb-run -a xmake test "ctest-tests/*"
+
+      - name: Run pandagl tests with memcheck
+        if: runner.os == 'Linux'
+        run: xvfb-run -a xmake test "pandagl-tests/*"
+
+      - name: Run libcss tests with memcheck
+        if: runner.os == 'Linux'
+        run: xvfb-run -a xmake test "libcss-tests/*"
+
+      - name: Run libi18n tests with memcheck
+        if: runner.os == 'Linux'
+        run: xvfb-run -a xmake test "libi18n-tests/*"
+
+      - name: Run libptk tests with memcheck
+        if: runner.os == 'Linux'
+        run: xvfb-run -a xmake test "libptk-tests/*"
+
+      - name: Run librouter tests with memcheck
+        if: runner.os == 'Linux'
+        run: xvfb-run -a xmake test "librouter-tests/*"
+
+      - name: Run libthread tests with memcheck
+        if: runner.os == 'Linux'
+        run: xvfb-run -a xmake test "libthread-tests/*"
+
+      - name: Run libui-xml tests with memcheck
+        if: runner.os == 'Linux'
+        run: xvfb-run -a xmake test "libui-xml-tests/*"
+
+      - name: Run doc-viewer tests with memcheck
+        if: runner.os == 'Linux'
+        run: xvfb-run -a xmake test "doc-viewer-tests/*"
+
+      - name: Run integration tests with memcheck
+        if: runner.os == 'Linux'
+        run: xvfb-run -a xmake test "lcui-tests/*"
 
       - name: Upload reports to Codecov
         if: runner.os == 'Linux'
