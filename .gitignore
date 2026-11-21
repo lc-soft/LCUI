@@ -72,3 +72,5 @@ vsxmake*
 compile_commands.json
 docs/build/
 docs/superpowers/plans
+examples/doc-viewer/.cache/
+examples/doc-viewer/app/components/repo-stars.generated.ts

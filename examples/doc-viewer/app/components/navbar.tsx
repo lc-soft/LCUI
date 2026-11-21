@@ -1,6 +1,13 @@
-import { Button, Text } from "@lcui/react";
+import { Button, Text, Widget } from "@lcui/react";
 import "./navbar.css";
-import packageJson from "../../../../package.json";
+import { repoStars } from "./repo-stars.generated";
+
+function formatStars(count: number): string {
+  if (count < 1000) {
+    return String(count);
+  }
+  return `${Math.floor(count / 1000)}k`;
+}
 
 export default function Navbar() {
   return (
@@ -60,6 +67,7 @@ export default function Navbar() {
             </dropdown-menu-radio-group>
           </dropdown-menu-content>
         </dropdown-menu>
+        <Widget className="navbar-divider" />
         <Button
           variant="ghost"
           size="icon"
@@ -68,9 +76,31 @@ export default function Navbar() {
         >
           <icon name="dark-theme" />
         </Button>
-        <Text className="navbar-version">{packageJson.version}</Text>
-        <a href="https://github.com/lc-soft/LCUI" className="navbar-link">
-          <Text>GitHub</Text>
+        <Widget className="navbar-divider" />
+        <a
+          href="https://github.com/lc-soft/LCUI"
+          className="navbar-link navbar-icon-link"
+          title="GitHub"
+        >
+          <Widget className="navbar-icon navbar-icon-github" />
+          {repoStars.github !== null && (
+            <Text className="navbar-icon-count">
+              {formatStars(repoStars.github)}
+            </Text>
+          )}
+        </a>
+        <Widget className="navbar-divider" />
+        <a
+          href="https://gitee.com/lc-soft/LCUI"
+          className="navbar-link navbar-icon-link"
+          title="Gitee"
+        >
+          <Widget className="navbar-icon navbar-icon-gitee" />
+          {repoStars.gitee !== null && (
+            <Text className="navbar-icon-count">
+              {formatStars(repoStars.gitee)}
+            </Text>
+          )}
         </a>
       </div>
     </div>

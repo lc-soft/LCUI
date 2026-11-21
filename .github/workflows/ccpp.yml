@@ -86,6 +86,12 @@ jobs:
       - name: Install lcui-cli
         run: npm install -g @lcui/cli
 
+      - name: Test repository star script
+        run: node --test scripts/fetch-repo-stars.test.js
+
+      - name: Generate repository star counts
+        run: node scripts/fetch-repo-stars.js
+
       - name: Generate doc-viewer sources
         working-directory: examples/doc-viewer
         run: bun run compile

@@ -10,6 +10,7 @@ const sourceFiles = [
 const generatedFiles = [
   "src/styles/style-nova.css.h",
   "examples/doc-viewer/app/global.css.h",
+  "examples/doc-viewer/app/components/navbar.css.h",
 ];
 
 const colorPattern = /#[0-9a-fA-F]{3,8}\b|rgba?\(/g;

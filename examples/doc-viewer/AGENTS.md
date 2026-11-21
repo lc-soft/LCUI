@@ -310,6 +310,10 @@ interface FieldData {
 ## 构建验证
 
 ```bash
+# 在仓库根目录执行：生成 GitHub/Gitee star 数据（缓存 24 小时）
+npm run doc-viewer:stars
+
+# 以下在 examples/doc-viewer 目录执行
 bun run compile                   # 全量编译 MDX → page.tsx
 bun run compile --watch           # 监听变更
 npx lcui build app --force        # 仅编译 app 目录，重生成 C 层 .tsx.h（不更新 main.h）
@@ -335,7 +339,13 @@ xmake build doc-viewer
 
 构建或排查涉及 `@lcui/cli`、`@lcui/react`、`@lcui/fluent-icons` 的问题，以及运行 `npm install` / `npm ci` 前，必须遵循仓库根目录 `AGENTS.md` 中“lcui-toolkit 本地开发包与依赖安装”规则，核实本地开发版包的软链接；如果用户提供过本地仓库路径但当前包未链接，汇报并暂停，请用户手动修复。
 
-项目根目录 `package.json` **没有** `build-doc-viewer` 脚本；可用的是 `npm run doc-viewer:compile-docs`（等价于 doc-viewer 的 `bun run compile`）与 `npm run doc-viewer:compile-tsx`（`lcui build --skip-xmake`），或手动执行上面的三步。脚本内容变更时，更新本节以保持实际命令与文档一致。
+项目根目录 `package.json` **没有** `build-doc-viewer` 脚本；可用的是 `npm run doc-viewer:compile-docs`（先生成 star 数据，再执行 doc-viewer 的 `bun run compile`）与 `npm run doc-viewer:compile-tsx`（先生成 star 数据，再执行 `lcui build --force --skip-xmake`），或手动执行上面的三步。脚本内容变更时，更新本节以保持实际命令与文档一致。
+
+> `npm run doc-viewer:compile-docs` / `doc-viewer:compile-tsx` 会先执行
+> `npm run doc-viewer:stars`，生成 `app/components/repo-stars.generated.ts`
+> （GitHub/Gitee star 数，缓存 24 小时，文件不提交）。直接运行 `lcui build`
+> 前需要先执行一次该脚本，否则 navbar 会因缺少生成文件而编译失败；无网络时
+> 生成 `null`，界面只显示图标。
 
 > ⚠️ `bun run compile` 自动复制 `widget-fields/` 并触发页面生成；任何一步失败都会产生连锁错误。`lcui build` 输出末尾的 `unknown target(lcui) for doc-viewer.deps!` 警告无害，是已知问题，可忽略。
 

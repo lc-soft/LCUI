@@ -7,6 +7,7 @@ import {
   Scrollbar,
   Text,
 } from "@lcui/react";
+import packageJson from "../../../../package.json";
 
 type Locale = "zh-CN" | "en";
 
@@ -314,7 +315,12 @@ const HomeGallery: FunctionWidget = ({ locale }: { locale: Locale }) => {
           <div className="home-page">
             <div className="home-inner">
               <div className="home-hero">
-                <Text className="home-title">LCUI</Text>
+                <div className="home-title-row">
+                  <Text className="home-title">LCUI</Text>
+                  <badge className="home-title-badge" variant="secondary">
+                    v{packageJson.version}
+                  </badge>
+                </div>
                 <Text className="home-desc">{heroDesc[locale]}</Text>
                 <div className="home-cta">
                   <RouterLink

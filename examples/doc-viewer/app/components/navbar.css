@@ -44,8 +44,8 @@
 }
 
 .navbar.compact .navbar-center,
-.navbar.compact .navbar-version,
-.navbar.compact .navbar-link {
+.navbar.compact .navbar-link,
+.navbar.compact .navbar-divider {
   display: none;
 }
 
@@ -64,19 +64,58 @@
   @apply dark:text-muted-foreground-dark dark:bg-muted-dark dark:border-border-dark;
 }
 
-.navbar-version {
-  font-size: 13px;
-  @apply text-muted-foreground;
-  @apply dark:text-muted-foreground-dark;
-  font-family: monospace;
-}
-
 .navbar-link {
   padding: 4px 8px;
   font-size: 14px;
   @apply text-foreground;
   @apply dark:text-foreground-dark;
   border-radius: 6px;
+}
+
+.navbar-icon-link {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+}
+
+.navbar-icon {
+  width: 16px;
+  height: 16px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 16px 16px;
+}
+
+.navbar-icon-github {
+  background-image: url("../assets/github-mark-black.png");
+}
+
+.dark .navbar-icon-github {
+  background-image: url("../assets/github-mark-white.png");
+}
+
+.navbar-icon-gitee {
+  background-image: url("../assets/gitee-mark-black.png");
+}
+
+.dark .navbar-icon-gitee {
+  background-image: url("../assets/gitee-mark-white.png");
+}
+
+.navbar-icon-count {
+  font-size: 12px;
+  @apply text-muted-foreground;
+  @apply dark:text-muted-foreground-dark;
+}
+
+.navbar-divider {
+  flex: 0 0 1px;
+  width: 1px;
+  height: 16px;
+  @apply bg-border;
+  @apply dark:bg-border-dark;
 }
 
 .navbar-link:hover {
@@ -90,7 +129,6 @@
   white-space: nowrap;
 }
 
-.navbar-version,
 .navbar-link {
   flex-shrink: 0;
   white-space: nowrap;

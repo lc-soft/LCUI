@@ -945,6 +945,17 @@ li {
   line-height: 1.4;
 }
 
+.home-title-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.home-title-badge {
+  white-space: nowrap;
+}
+
 .home-desc {
   max-width: 720px;
   margin-top: 12px;
