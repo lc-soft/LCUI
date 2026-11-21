@@ -697,6 +697,7 @@ void ptk_window_set_size(ptk_window_t *wnd, int width, int height)
 {
         int client_width = width;
         int client_height = height;
+        ptk_event_t e = { 0 };
 
         if (wnd->width == width && wnd->height == height) {
                 return;
@@ -709,6 +710,12 @@ void ptk_window_set_size(ptk_window_t *wnd, int width, int height)
          * must not observe the previous value. */
         wnd->width = client_width;
         wnd->height = client_height;
+        /* Hidden windows may not receive WM_SIZE, so notify listeners now. */
+        e.type = PTK_EVENT_SIZE;
+        e.window = wnd;
+        e.size.width = client_width;
+        e.size.height = client_height;
+        ptk_process_event(&e);
 }
 
 void ptk_window_show(ptk_window_t *wnd)
