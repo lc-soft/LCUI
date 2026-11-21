@@ -243,6 +243,38 @@ char *pd_font_find_path(const char *name)
 #endif
 }
 
+char *pd_font_find_family(const char *name)
+{
+#ifdef PANDAGL_HAS_FONTCONFIG
+        char *family = NULL;
+        size_t len;
+        FcResult result;
+        FcPattern *font;
+        FcChar8 *value = NULL;
+        FcConfig *config = FcInitLoadConfigAndFonts();
+        FcPattern *pat = FcNameParse((const FcChar8 *)name);
+
+        FcConfigSubstitute(config, pat, FcMatchPattern);
+        FcDefaultSubstitute(pat);
+        if ((font = FcFontMatch(config, pat, &result))) {
+                if (FcPatternGetString(font, FC_FAMILY, 0, &value) ==
+                    FcResultMatch) {
+                        len = strlen((char *)value);
+                        family = malloc(len + 1);
+                        if (family) {
+                                memcpy(family, value, len + 1);
+                        }
+                }
+                FcPatternDestroy(font);
+        }
+        FcPatternDestroy(pat);
+        FcConfigDestroy(config);
+        return family;
+#else
+        return NULL;
+#endif
+}
+
 pd_font_face_t *pd_font_face_create(const char *family_name,
                                     const char *style_name)
 {

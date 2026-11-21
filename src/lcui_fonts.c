@@ -67,6 +67,8 @@ static void lcui_fc_fonts_init(void)
         size_t i;
         bool has_default = false;
         char *path;
+        char *family;
+        char *sans_family = NULL;
         const char *sans[] = { "Ubuntu", "Noto Sans CJK SC",
                                "WenQuanYi Micro Hei" };
         const char *mono[] = { "Ubuntu Mono", "DejaVu Sans Mono",
@@ -83,15 +85,22 @@ static void lcui_fc_fonts_init(void)
                         free(path);
                 }
                 if (!has_default) {
-                        has_default = lcui_fonts_set_default(sans[i]);
+                        family = pd_font_find_family(sans[i]);
+                        has_default =
+                            lcui_fonts_set_default(family ? family : sans[i]);
                         if (has_default) {
-                                sans_default = sans[i];
+                                sans_family = family;
+                                sans_default =
+                                    sans_family ? sans_family : sans[i];
+                        } else {
+                                free(family);
                         }
                 }
         }
         if (sans_default) {
                 pd_font_family_set_alias("sans-serif", sans_default);
         }
+        free(sans_family);
         /* monospace / serif 取第一个可定位到的族，加载后设对应通用名别名 */
         for (i = 0; i < sizeof(mono) / sizeof(mono[0]); ++i) {
                 path = pd_font_find_path(mono[i]);
@@ -100,7 +109,10 @@ static void lcui_fc_fonts_init(void)
                 }
                 pd_font_try_load_file(path);
                 free(path);
-                pd_font_family_set_alias("monospace", mono[i]);
+                family = pd_font_find_family(mono[i]);
+                pd_font_family_set_alias("monospace",
+                                         family ? family : mono[i]);
+                free(family);
                 break;
         }
         for (i = 0; i < sizeof(serif) / sizeof(serif[0]); ++i) {
@@ -110,7 +122,9 @@ static void lcui_fc_fonts_init(void)
                 }
                 pd_font_try_load_file(path);
                 free(path);
-                pd_font_family_set_alias("serif", serif[i]);
+                family = pd_font_find_family(serif[i]);
+                pd_font_family_set_alias("serif", family ? family : serif[i]);
+                free(family);
                 break;
         }
         if (!has_default) {

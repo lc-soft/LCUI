@@ -78,6 +78,9 @@ PD_PUBLIC int pd_canvas_mix_glyph_bitmap(pd_canvas_t *graph, pd_pos_t pos,
 
 PD_PUBLIC char *pd_font_find_path(const char *name);
 
+/** 查询 fontconfig 实际匹配的字体族名，失败返回 NULL */
+PD_PUBLIC char *pd_font_find_family(const char *name);
+
 /**
  * 根据字符串内容猜测字体粗细程度
  * 文档：https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight
