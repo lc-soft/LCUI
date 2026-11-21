@@ -38,7 +38,7 @@ button:outline:hover,
 
 button:primary,
 .button-primary {
-  @apply border-transparent bg-primary text-primary-foreground dark:bg-primary-dark dark:text-primary-foreground-dark;
+  @apply border-transparent bg-primary text-primary-foreground dark:border-transparent dark:bg-primary-dark dark:text-primary-foreground-dark;
 }
 
 button:primary:hover,
@@ -58,7 +58,7 @@ button:secondary:hover,
 
 button:ghost,
 .button-ghost {
-  @apply border-transparent bg-transparent text-foreground dark:text-foreground-dark;
+  @apply border-transparent bg-transparent text-foreground dark:border-transparent dark:text-foreground-dark;
 }
 
 button:ghost:hover,
@@ -68,7 +68,7 @@ button:ghost:hover,
 
 button:destructive,
 .button-destructive {
-  @apply border-transparent bg-destructive-muted text-destructive dark:bg-destructive-muted-dark dark:text-destructive-dark;
+  @apply border-transparent bg-destructive-muted text-destructive dark:border-transparent dark:bg-destructive-muted-dark dark:text-destructive-dark;
 }
 
 button:destructive:hover,
@@ -78,12 +78,12 @@ button:destructive:hover,
 
 button:link,
 .button-link {
-  @apply border-transparent bg-transparent text-primary dark:text-primary-dark;
+  @apply border-transparent bg-transparent text-primary dark:border-transparent dark:text-primary-dark;
 }
 
 button:link:hover,
 .button-link:hover {
-  @apply bg-transparent text-primary dark:text-primary-dark;
+  @apply bg-transparent text-primary dark:bg-transparent dark:text-primary-dark;
 }
 
 button:link,
@@ -179,7 +179,7 @@ button:destructive:active {
 
 button:link:active,
 .button-link:active {
-  @apply bg-transparent text-primary underline dark:text-primary-dark;
+  @apply bg-transparent text-primary underline dark:bg-transparent dark:text-primary-dark;
 }
 
 button .fui-icon {

@@ -524,6 +524,64 @@ static void check_button_class_variants(void)
         ui_clear_trash();
 }
 
+static void check_button_variant_borders_in_dark(void)
+{
+        ui_widget_t *link = ui_create_widget("button");
+        ui_widget_t *primary = ui_create_widget("button");
+        ui_widget_t *ghost = ui_create_widget("button");
+
+        ui_widget_add_class(link, "button-link");
+        ui_widget_add_class(primary, "button-primary");
+        ui_widget_add_class(ghost, "button-ghost");
+        ui_widget_append(ui_root(), link);
+        ui_widget_append(ui_root(), primary);
+        ui_widget_append(ui_root(), ghost);
+        ui_widget_add_class(ui_root(), "dark");
+        ui_update();
+
+        ctest_equal_int("dark link button border should stay transparent",
+                        (link->computed_style.border_top_color >> 24) & 0xff,
+                        0);
+        ctest_equal_int("dark primary button border should stay transparent",
+                        (primary->computed_style.border_top_color >> 24) & 0xff,
+                        0);
+        ctest_equal_int("dark ghost button border should stay transparent",
+                        (ghost->computed_style.border_top_color >> 24) & 0xff,
+                        0);
+
+        ui_widget_remove_class(ui_root(), "dark");
+        ui_widget_destroy(link);
+        ui_widget_destroy(primary);
+        ui_widget_destroy(ghost);
+        ui_clear_trash();
+}
+
+static void check_link_button_has_no_background_in_dark(void)
+{
+        ui_widget_t *link = ui_create_widget("button");
+
+        ui_widget_add_class(link, "button-link");
+        ui_widget_append(ui_root(), link);
+        ui_widget_add_class(ui_root(), "dark");
+
+        ui_widget_add_status(link, "hover");
+        ui_update();
+        ctest_equal_int(
+            "dark link button hover should keep a transparent background",
+            (link->computed_style.background_color >> 24) & 0xff, 0);
+
+        ui_widget_remove_status(link, "hover");
+        ui_widget_add_status(link, "active");
+        ui_update();
+        ctest_equal_int(
+            "dark link button active should keep a transparent background",
+            (link->computed_style.background_color >> 24) & 0xff, 0);
+
+        ui_widget_remove_class(ui_root(), "dark");
+        ui_widget_destroy(link);
+        ui_clear_trash();
+}
+
 void test_style_nova(void)
 {
         lcui_init();
@@ -539,6 +597,10 @@ void test_style_nova(void)
                        check_button_icon_typography);
         ctest_describe("style-nova: button interaction",
                        check_button_interaction_style);
+        ctest_describe("style-nova: button variant borders in dark",
+                       check_button_variant_borders_in_dark);
+        ctest_describe("style-nova: link button background in dark",
+                       check_link_button_has_no_background_in_dark);
         ctest_describe("style-nova: badge", check_badge_typography);
         ctest_describe("style-nova: item", check_item_typography);
         ctest_describe("style-nova: tooltip typography",

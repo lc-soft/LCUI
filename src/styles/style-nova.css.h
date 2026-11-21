@@ -84,6 +84,7 @@ static const struct {
         { "  color: #fafafa;\n", 18 },
         { "}\n", 2 },
         { ".dark button:primary, .dark .button-primary {\r\n", 47 },
+        { "  border-color: transparent;\r\n", 30 },
         { "  background-color: #fafafa;\r\n", 30 },
         { "  color: #171717;\n", 18 },
         { "}\n", 2 },
@@ -124,6 +125,7 @@ static const struct {
         { "  color: #0a0a0a;\n", 18 },
         { "}\n", 2 },
         { ".dark button:ghost, .dark .button-ghost {\r\n", 43 },
+        { "  border-color: transparent;\r\n", 30 },
         { "  color: #fafafa;\n", 18 },
         { "}\n", 2 },
         { "button:ghost:hover,\r\n", 21 },
@@ -142,6 +144,7 @@ static const struct {
         { "  color: #e7000b;\n", 18 },
         { "}\n", 2 },
         { ".dark button:destructive, .dark .button-destructive {\r\n", 55 },
+        { "  border-color: transparent;\r\n", 30 },
         { "  background-color: #4c0519;\r\n", 30 },
         { "  color: #ff6467;\n", 18 },
         { "}\n", 2 },
@@ -163,6 +166,7 @@ static const struct {
         { "  color: #171717;\n", 18 },
         { "}\n", 2 },
         { ".dark button:link, .dark .button-link {\r\n", 41 },
+        { "  border-color: transparent;\r\n", 30 },
         { "  color: #fafafa;\n", 18 },
         { "}\n", 2 },
         { "button:link:hover,\r\n", 20 },
@@ -171,6 +175,7 @@ static const struct {
         { "  color: #171717;\n", 18 },
         { "}\n", 2 },
         { ".dark button:link:hover, .dark .button-link:hover {\r\n", 53 },
+        { "  background-color: transparent;\r\n", 34 },
         { "  color: #fafafa;\n", 18 },
         { "}\n", 2 },
         { "button:link,\r\n", 14 },
@@ -312,6 +317,7 @@ static const struct {
         { "  text-decoration-line: underline;\n", 35 },
         { "}\n", 2 },
         { ".dark button:link:active, .dark .button-link:active {\r\n", 55 },
+        { "  background-color: transparent;\r\n", 34 },
         { "  color: #fafafa;\n", 18 },
         { "}\n", 2 },
         { "button .fui-icon {\r\n", 20 },
@@ -2438,7 +2444,7 @@ static const struct {
         { "  background-color: rgb(250 250 250 / 0.6);\n", 44 },
         { "}\n", 2 },
 };
-static const size_t css_str_style_nova_total_length = 48512;
+static const size_t css_str_style_nova_total_length = 48700;
 static inline void ui_load_css_string_style_nova_chunks(void)
 {
         size_t i;
