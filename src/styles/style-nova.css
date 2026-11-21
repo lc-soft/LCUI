@@ -837,7 +837,6 @@ dropdown-menu-shortcut {
   display: inline-block;
   @apply text-xs text-muted-foreground dark:text-muted-foreground-dark;
   margin-left: auto;
-  letter-spacing: 0.08em;
 }
 
 dropdown-menu-sub {
