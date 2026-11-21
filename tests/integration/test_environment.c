@@ -8,6 +8,8 @@ void test_environment(void)
         char *mono, *sans, *serif;
         const char *display = getenv("DISPLAY");
         const char *wayland = getenv("WAYLAND_DISPLAY");
+        int id;
+        int shown = 0;
 
         lcui_init();
         mono = pd_font_find_path("monospace");
@@ -33,6 +35,26 @@ void test_environment(void)
                               PD_FONT_WEIGHT_NORMAL),
                pd_font_get_id("serif", PD_FONT_STYLE_NORMAL,
                               PD_FONT_WEIGHT_NORMAL));
+        printf("[env] family ids: DejaVu Sans Mono=%d DejaVu Sans=%d "
+               "DejaVu Serif=%d Ubuntu=%d Inconsolata=%d\n",
+               pd_font_get_id("DejaVu Sans Mono", PD_FONT_STYLE_NORMAL,
+                              PD_FONT_WEIGHT_NORMAL),
+               pd_font_get_id("DejaVu Sans", PD_FONT_STYLE_NORMAL,
+                              PD_FONT_WEIGHT_NORMAL),
+               pd_font_get_id("DejaVu Serif", PD_FONT_STYLE_NORMAL,
+                              PD_FONT_WEIGHT_NORMAL),
+               pd_font_get_id("Ubuntu", PD_FONT_STYLE_NORMAL,
+                              PD_FONT_WEIGHT_NORMAL),
+               pd_font_get_id("Inconsolata", PD_FONT_STYLE_NORMAL,
+                              PD_FONT_WEIGHT_NORMAL));
+        for (id = 0; id < 128 && shown < 16; ++id) {
+                pd_font_face_t *face = pd_font_get(id);
+                if (!face) {
+                        continue;
+                }
+                printf("[env] loaded font[%d]: %s\n", id, face->family_name);
+                ++shown;
+        }
 
         free(mono);
         free(sans);
