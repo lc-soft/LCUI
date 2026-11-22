@@ -1,5 +1,10 @@
 #include <stdbool.h>
 
+// The fabric simulation always runs in this fixed coordinate space. The
+// viewport scales it to fit the window like CSS `object-fit: contain`.
+#define FABRIC_WORLD_WIDTH 800
+#define FABRIC_WORLD_HEIGHT 600
+
 typedef struct PointRec_ {
         double cx;
         double cy;
@@ -21,8 +26,6 @@ typedef struct SpanRec_ {
 void Fabric_getSpans(Span **outSpans, int *count);
 
 void Fabric_getPoints(Point **outPoints, int *count);
-
-void Fabric_resize(double width, double height);
 
 void Fabric_update(void);
 

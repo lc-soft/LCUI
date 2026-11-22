@@ -88,12 +88,6 @@ void addPt(double xp, double yp)
         points = newPoints;
 }
 
-void Fabric_resize(double width, double height)
-{
-        canvasWidth = width;
-        canvasHeight = height;
-}
-
 ///---OBJECTS---///
 
 // gets distance between two points (pythogorian theorum)
@@ -311,7 +305,7 @@ void Fabric_getSpans(Span **outSpans, int *count)
 void Fabric_getPoints(Point **outPoints, int *count)
 {
         *outPoints = points;
-        *count = spanCount;
+        *count = pointCount;
 }
 
 /**
@@ -319,15 +313,18 @@ void Fabric_getPoints(Point **outPoints, int *count)
  *
  * @param fw fabric width (as percentage of canvas width)
  * @param fh fabric height (as percentage of canvas height)
+ * @param world_width world width of the simulation
+ * @param world_height world height of the simulation
  */
-void Fabric_init(int fw, int fh, int canvaswidth, int canvasHeight)
+void Fabric_init(int fw, int fh, int world_width, int world_height)
 {
         int i, j, x, y;
         int htc = fw;    // fabric horizontal thread count
         int vtc = fh;    // fabric vertical thread count
 
         srand((unsigned)time(NULL));
-        Fabric_resize(canvaswidth, canvasHeight);
+        canvasWidth = world_width;
+        canvasHeight = world_height;
         grabRadius = canvasWidth / 25;
 
         // creates points
