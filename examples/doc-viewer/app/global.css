@@ -1329,7 +1329,6 @@ home-column {
   width: 25%;
   height: 6px;
   border-radius: 3px;
-  @apply bg-primary dark:bg-primary-dark;
 }
 
 .home-danger {

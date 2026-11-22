@@ -840,7 +840,7 @@ const HomeGallery: FunctionWidget = ({ locale }: { locale: Locale }) => {
                         {copy.payout_amount}
                       </Text>
                       <div className="home-slider">
-                        <div className="home-slider-fill" />
+                        <div className="home-slider-fill fill-primary" />
                       </div>
                       <div className="home-row home-row-between">
                         <Text className="home-goal-meta">

@@ -94,6 +94,22 @@
   color: rgba(23, 23, 23, 1);
 }
 
+.accent-green attachment.has-trigger:active {
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
+}
+
+.accent-green attachment.has-trigger:focus {
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
+}
+
+.accent-green.dark attachment.has-trigger:active {
+  box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.3);
+}
+
+.accent-green.dark attachment.has-trigger:focus {
+  box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.3);
+}
+
 .accent-green .tooltip-inner {
   background-color: rgba(22, 163, 74, 1);
 }
@@ -182,6 +198,22 @@
   background-color: rgba(23, 23, 23, 1);
 }
 
+.accent-green input-group:focused {
+  border-color: rgba(22, 163, 74, 1);
+}
+
+.accent-green.dark input-group:focused {
+  border-color: rgba(74, 222, 128, 1);
+}
+
+.accent-green input-group:focused {
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
+}
+
+.accent-green.dark input-group:focused {
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.3);
+}
+
 .accent-green alert-dialog-action:primary {
   background-color: rgba(22, 163, 74, 1);
 }
@@ -254,6 +286,22 @@
   color: rgba(23, 23, 23, 1);
 }
 
+.accent-green textinput:focus {
+  border-color: rgba(22, 163, 74, 1);
+}
+
+.accent-green.dark textinput:focus {
+  border-color: rgba(74, 222, 128, 1);
+}
+
+.accent-green textinput:focus {
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
+}
+
+.accent-green.dark textinput:focus {
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.3);
+}
+
 .accent-green .sidebar-menu-button:hover {
   background-color: rgba(22, 163, 74, 0.1);
 }
@@ -316,4 +364,12 @@
 
 .accent-green.dark .sidebar-avatar {
   color: rgba(74, 222, 128, 1);
+}
+
+.accent-green .fill-primary {
+  background-color: rgba(22, 163, 74, 1);
+}
+
+.accent-green.dark .fill-primary {
+  background-color: rgba(74, 222, 128, 1);
 }

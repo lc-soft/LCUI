@@ -170,6 +170,18 @@ static void format_color(theme_color_t *color, char *buf, size_t size)
                  color->color.g, color->color.b, color->alpha);
 }
 
+static void format_rule_value(const ui_theme_rule_t *rule, theme_color_t *color,
+                              char *buf, size_t size)
+{
+        if (rule->shadow > 0) {
+                snprintf(buf, size, "0 0 0 %dpx rgba(%u, %u, %u, %.2f)",
+                         rule->shadow, color->color.r, color->color.g,
+                         color->color.b, color->alpha);
+                return;
+        }
+        format_color(color, buf, size);
+}
+
 static int append_rule(char *css, size_t *length, int dark,
                        const char *selector, const char *property,
                        const char *value)
@@ -264,7 +276,7 @@ int ui_theme_set_accent_color(const char *hex)
                 if (rule->alpha >= 0) {
                         color.alpha = rule->alpha / 255.0f;
                 }
-                format_color(&color, value, sizeof(value));
+                format_rule_value(rule, &color, value, sizeof(value));
                 if (append_rule(css, &length, rule->dark, rule->selector,
                                 rule->property, value) != 0) {
                         free(css);

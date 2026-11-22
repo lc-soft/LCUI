@@ -94,6 +94,22 @@
   color: rgba(23, 23, 23, 1);
 }
 
+.accent-neutral attachment.has-trigger:active {
+  box-shadow: 0 0 0 2px rgba(23, 23, 23, 0.2);
+}
+
+.accent-neutral attachment.has-trigger:focus {
+  box-shadow: 0 0 0 2px rgba(23, 23, 23, 0.2);
+}
+
+.accent-neutral.dark attachment.has-trigger:active {
+  box-shadow: 0 0 0 2px rgba(245, 245, 245, 0.3);
+}
+
+.accent-neutral.dark attachment.has-trigger:focus {
+  box-shadow: 0 0 0 2px rgba(245, 245, 245, 0.3);
+}
+
 .accent-neutral .tooltip-inner {
   background-color: rgba(23, 23, 23, 1);
 }
@@ -182,6 +198,22 @@
   background-color: rgba(23, 23, 23, 1);
 }
 
+.accent-neutral input-group:focused {
+  border-color: rgba(23, 23, 23, 1);
+}
+
+.accent-neutral.dark input-group:focused {
+  border-color: rgba(245, 245, 245, 1);
+}
+
+.accent-neutral input-group:focused {
+  box-shadow: 0 0 0 3px rgba(23, 23, 23, 0.2);
+}
+
+.accent-neutral.dark input-group:focused {
+  box-shadow: 0 0 0 3px rgba(245, 245, 245, 0.3);
+}
+
 .accent-neutral alert-dialog-action:primary {
   background-color: rgba(23, 23, 23, 1);
 }
@@ -254,6 +286,22 @@
   color: rgba(23, 23, 23, 1);
 }
 
+.accent-neutral textinput:focus {
+  border-color: rgba(23, 23, 23, 1);
+}
+
+.accent-neutral.dark textinput:focus {
+  border-color: rgba(245, 245, 245, 1);
+}
+
+.accent-neutral textinput:focus {
+  box-shadow: 0 0 0 3px rgba(23, 23, 23, 0.2);
+}
+
+.accent-neutral.dark textinput:focus {
+  box-shadow: 0 0 0 3px rgba(245, 245, 245, 0.3);
+}
+
 .accent-neutral .sidebar-menu-button:hover {
   background-color: rgba(23, 23, 23, 0.1);
 }
@@ -316,4 +364,12 @@
 
 .accent-neutral.dark .sidebar-avatar {
   color: rgba(245, 245, 245, 1);
+}
+
+.accent-neutral .fill-primary {
+  background-color: rgba(23, 23, 23, 1);
+}
+
+.accent-neutral.dark .fill-primary {
+  background-color: rgba(245, 245, 245, 1);
 }

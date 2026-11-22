@@ -94,6 +94,22 @@
   color: rgba(250, 250, 250, 1);
 }
 
+.accent-violet attachment.has-trigger:active {
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+}
+
+.accent-violet attachment.has-trigger:focus {
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+}
+
+.accent-violet.dark attachment.has-trigger:active {
+  box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.3);
+}
+
+.accent-violet.dark attachment.has-trigger:focus {
+  box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.3);
+}
+
 .accent-violet .tooltip-inner {
   background-color: rgba(124, 58, 237, 1);
 }
@@ -182,6 +198,22 @@
   background-color: rgba(250, 250, 250, 1);
 }
 
+.accent-violet input-group:focused {
+  border-color: rgba(124, 58, 237, 1);
+}
+
+.accent-violet.dark input-group:focused {
+  border-color: rgba(167, 139, 250, 1);
+}
+
+.accent-violet input-group:focused {
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+}
+
+.accent-violet.dark input-group:focused {
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.3);
+}
+
 .accent-violet alert-dialog-action:primary {
   background-color: rgba(124, 58, 237, 1);
 }
@@ -254,6 +286,22 @@
   color: rgba(250, 250, 250, 1);
 }
 
+.accent-violet textinput:focus {
+  border-color: rgba(124, 58, 237, 1);
+}
+
+.accent-violet.dark textinput:focus {
+  border-color: rgba(167, 139, 250, 1);
+}
+
+.accent-violet textinput:focus {
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+}
+
+.accent-violet.dark textinput:focus {
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.3);
+}
+
 .accent-violet .sidebar-menu-button:hover {
   background-color: rgba(124, 58, 237, 0.1);
 }
@@ -316,4 +364,12 @@
 
 .accent-violet.dark .sidebar-avatar {
   color: rgba(167, 139, 250, 1);
+}
+
+.accent-violet .fill-primary {
+  background-color: rgba(124, 58, 237, 1);
+}
+
+.accent-violet.dark .fill-primary {
+  background-color: rgba(167, 139, 250, 1);
 }

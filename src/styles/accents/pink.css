@@ -94,6 +94,22 @@
   color: rgba(250, 250, 250, 1);
 }
 
+.accent-pink attachment.has-trigger:active {
+  box-shadow: 0 0 0 2px rgba(219, 39, 119, 0.2);
+}
+
+.accent-pink attachment.has-trigger:focus {
+  box-shadow: 0 0 0 2px rgba(219, 39, 119, 0.2);
+}
+
+.accent-pink.dark attachment.has-trigger:active {
+  box-shadow: 0 0 0 2px rgba(244, 114, 182, 0.3);
+}
+
+.accent-pink.dark attachment.has-trigger:focus {
+  box-shadow: 0 0 0 2px rgba(244, 114, 182, 0.3);
+}
+
 .accent-pink .tooltip-inner {
   background-color: rgba(219, 39, 119, 1);
 }
@@ -182,6 +198,22 @@
   background-color: rgba(250, 250, 250, 1);
 }
 
+.accent-pink input-group:focused {
+  border-color: rgba(219, 39, 119, 1);
+}
+
+.accent-pink.dark input-group:focused {
+  border-color: rgba(244, 114, 182, 1);
+}
+
+.accent-pink input-group:focused {
+  box-shadow: 0 0 0 3px rgba(219, 39, 119, 0.2);
+}
+
+.accent-pink.dark input-group:focused {
+  box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.3);
+}
+
 .accent-pink alert-dialog-action:primary {
   background-color: rgba(219, 39, 119, 1);
 }
@@ -254,6 +286,22 @@
   color: rgba(250, 250, 250, 1);
 }
 
+.accent-pink textinput:focus {
+  border-color: rgba(219, 39, 119, 1);
+}
+
+.accent-pink.dark textinput:focus {
+  border-color: rgba(244, 114, 182, 1);
+}
+
+.accent-pink textinput:focus {
+  box-shadow: 0 0 0 3px rgba(219, 39, 119, 0.2);
+}
+
+.accent-pink.dark textinput:focus {
+  box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.3);
+}
+
 .accent-pink .sidebar-menu-button:hover {
   background-color: rgba(219, 39, 119, 0.1);
 }
@@ -316,4 +364,12 @@
 
 .accent-pink.dark .sidebar-avatar {
   color: rgba(244, 114, 182, 1);
+}
+
+.accent-pink .fill-primary {
+  background-color: rgba(219, 39, 119, 1);
+}
+
+.accent-pink.dark .fill-primary {
+  background-color: rgba(244, 114, 182, 1);
 }

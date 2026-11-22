@@ -94,6 +94,22 @@
   color: rgba(23, 23, 23, 1);
 }
 
+.accent-lime attachment.has-trigger:active {
+  box-shadow: 0 0 0 2px rgba(101, 163, 13, 0.2);
+}
+
+.accent-lime attachment.has-trigger:focus {
+  box-shadow: 0 0 0 2px rgba(101, 163, 13, 0.2);
+}
+
+.accent-lime.dark attachment.has-trigger:active {
+  box-shadow: 0 0 0 2px rgba(163, 230, 53, 0.3);
+}
+
+.accent-lime.dark attachment.has-trigger:focus {
+  box-shadow: 0 0 0 2px rgba(163, 230, 53, 0.3);
+}
+
 .accent-lime .tooltip-inner {
   background-color: rgba(101, 163, 13, 1);
 }
@@ -182,6 +198,22 @@
   background-color: rgba(23, 23, 23, 1);
 }
 
+.accent-lime input-group:focused {
+  border-color: rgba(101, 163, 13, 1);
+}
+
+.accent-lime.dark input-group:focused {
+  border-color: rgba(163, 230, 53, 1);
+}
+
+.accent-lime input-group:focused {
+  box-shadow: 0 0 0 3px rgba(101, 163, 13, 0.2);
+}
+
+.accent-lime.dark input-group:focused {
+  box-shadow: 0 0 0 3px rgba(163, 230, 53, 0.3);
+}
+
 .accent-lime alert-dialog-action:primary {
   background-color: rgba(101, 163, 13, 1);
 }
@@ -254,6 +286,22 @@
   color: rgba(23, 23, 23, 1);
 }
 
+.accent-lime textinput:focus {
+  border-color: rgba(101, 163, 13, 1);
+}
+
+.accent-lime.dark textinput:focus {
+  border-color: rgba(163, 230, 53, 1);
+}
+
+.accent-lime textinput:focus {
+  box-shadow: 0 0 0 3px rgba(101, 163, 13, 0.2);
+}
+
+.accent-lime.dark textinput:focus {
+  box-shadow: 0 0 0 3px rgba(163, 230, 53, 0.3);
+}
+
 .accent-lime .sidebar-menu-button:hover {
   background-color: rgba(101, 163, 13, 0.1);
 }
@@ -316,4 +364,12 @@
 
 .accent-lime.dark .sidebar-avatar {
   color: rgba(163, 230, 53, 1);
+}
+
+.accent-lime .fill-primary {
+  background-color: rgba(101, 163, 13, 1);
+}
+
+.accent-lime.dark .fill-primary {
+  background-color: rgba(163, 230, 53, 1);
 }

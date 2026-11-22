@@ -40,6 +40,8 @@ typedef struct ui_theme_rule {
         ui_theme_token_t token;
         int dark;
         int alpha;
+        /* 0: a plain color property; > 0: box-shadow spread in pixels */
+        int shadow;
 } ui_theme_rule_t;
 
 /**

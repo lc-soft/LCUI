@@ -118,6 +118,39 @@ function extractRules(css) {
         rules.push({ selector: rule.selector, ...parsed });
       }
     });
+    /* Focus rings are box-shadows; override their color so the ring follows
+     * the accent instead of the fixed neutral `boxShadow.focus*` values. */
+    rule.walkDecls("box-shadow", (decl) => {
+      const match = decl.value.match(
+        /theme\("boxShadow\.(focus(?:-sm)?)(-dark)?"\)/
+      );
+      if (!match) {
+        return;
+      }
+      for (const part of rule.selector.split(",")) {
+        let selector = part.trim();
+        let dark = !!match[2];
+        if (selector.startsWith(".dark ")) {
+          selector = selector.slice(6).trim();
+          dark = true;
+        }
+        const key = [selector, "box-shadow", "primary", dark, match[1]].join(
+          "|"
+        );
+        if (seen.has(key)) {
+          continue;
+        }
+        seen.add(key);
+        rules.push({
+          selector,
+          property: "box-shadow",
+          token: "primary",
+          dark,
+          alpha: dark ? 0.3 : 0.2,
+          shadow: match[1] === "focus-sm" ? 2 : 3,
+        });
+      }
+    });
   });
   return rules;
 }
@@ -141,7 +174,9 @@ function cssForAccent(accent, rules) {
   return rules
     .map((rule) => {
       const selector = scopeSelector(rule.selector, accent.name, rule.dark);
-      return `${selector} {\n  ${rule.property}: ${tokenValue(tokens, rule)};\n}\n`;
+      const color = tokenValue(tokens, rule);
+      const value = rule.shadow ? `0 0 0 ${rule.shadow}px ${color}` : color;
+      return `${selector} {\n  ${rule.property}: ${value};\n}\n`;
     })
     .join("\n");
 }
@@ -177,7 +212,7 @@ function rulesHeader(rules) {
       rule.alpha === undefined ? -1 : Math.round(rule.alpha * 255);
     for (const selector of rule.selector.split(",").map((part) => part.trim())) {
       rows.push(
-        `        { "${selector}", "${rule.property}", ${TOKEN_ENUM[rule.token]}, ${rule.dark ? 1 : 0}, ${alpha} },`
+        `        { "${selector}", "${rule.property}", ${TOKEN_ENUM[rule.token]}, ${rule.dark ? 1 : 0}, ${alpha}, ${rule.shadow || 0} },`
       );
     }
   }

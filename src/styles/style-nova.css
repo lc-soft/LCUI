@@ -986,8 +986,8 @@ input-group {
 }
 
 input-group:focused {
-  @apply border-foreground;
-  @apply dark:border-foreground-dark;
+  @apply border-primary;
+  @apply dark:border-primary-dark;
   box-shadow: theme("boxShadow.focus");
 }
 
@@ -1672,7 +1672,7 @@ textinput .selection {
 }
 
 textinput:focus {
-  @apply border-foreground dark:border-foreground-dark;
+  @apply border-primary dark:border-primary-dark;
   box-shadow: theme("boxShadow.focus");
 }
 
@@ -1814,6 +1814,13 @@ sidebar-provider:collapsed sidebar:icon .sidebar-user .sidebar-menu-chevron {
 sidebar-trigger,
 sidebar-rail {
   @apply text-foreground dark:text-foreground-dark;
+}
+
+/* App-level fills that must follow the accent. The accent generator reads
+ * this rule, so app styles can opt in with the class instead of hard-coding
+ * a primary background that the accent overrides cannot see. */
+.fill-primary {
+  @apply bg-primary dark:bg-primary-dark;
 }
 
 /* scrollbar: structural rules live in src/widgets/scrollbar.c; the thumb

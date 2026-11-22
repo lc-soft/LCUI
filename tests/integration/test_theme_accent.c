@@ -153,6 +153,53 @@ static void test_accent_switch(void)
         ui_clear_trash();
 }
 
+static void test_focus_ring(void)
+{
+        ui_widget_t *input = ui_create_widget("textinput");
+
+        ui_widget_add_status(input, "focus");
+        ui_widget_append(ui_root(), input);
+        ui_theme_set_accent("green");
+        ui_update();
+        ctest_equal_bool("focus ring should use the accent",
+                         input->computed_style.box_shadow_color ==
+                             css_color(51, 0x16, 0xa3, 0x4a),
+                         true);
+        ctest_equal_bool("focus border should use the accent",
+                         input->computed_style.border_top_color ==
+                             css_color(255, 0x16, 0xa3, 0x4a),
+                         true);
+
+        ui_theme_set_accent_color("#2563eb");
+        ui_update();
+        ctest_equal_bool("custom focus ring should use the accent",
+                         input->computed_style.box_shadow_color ==
+                             css_color(51, 0x25, 0x63, 0xeb),
+                         true);
+
+        ui_theme_set_accent(NULL);
+        ui_widget_destroy(input);
+        ui_clear_trash();
+}
+
+static void test_fill_primary(void)
+{
+        ui_widget_t *fill = ui_create_widget(NULL);
+
+        ui_widget_add_class(fill, "fill-primary");
+        ui_widget_append(ui_root(), fill);
+        ui_theme_set_accent("green");
+        ui_update();
+        ctest_equal_bool("fill-primary should follow the accent",
+                         fill->computed_style.background_color ==
+                             css_color(255, 0x16, 0xa3, 0x4a),
+                         true);
+
+        ui_theme_set_accent(NULL);
+        ui_widget_destroy(fill);
+        ui_clear_trash();
+}
+
 void test_theme_accent(void)
 {
         lcui_init();
@@ -162,6 +209,8 @@ void test_theme_accent(void)
         ctest_describe("accent badge color", test_custom_badge_color);
         ctest_describe("accent swatch", test_swatch_dark);
         ctest_describe("accent switch", test_accent_switch);
+        ctest_describe("accent focus ring", test_focus_ring);
+        ctest_describe("accent fill", test_fill_primary);
 
         lcui_destroy();
 }
