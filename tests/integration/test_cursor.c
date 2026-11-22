@@ -76,11 +76,11 @@ static void should_reset_to_auto_over_plain_area(void)
                         ptk_window_get_cursor(window), PTK_CURSOR_AUTO);
 }
 
-static void should_default_button_cursor_to_pointer(void)
+static void should_default_button_cursor_to_auto(void)
 {
         move_mouse(60, 120);
-        ctest_equal_int("should show pointer over real button",
-                        ptk_window_get_cursor(window), PTK_CURSOR_POINTER);
+        ctest_equal_int("should keep the default cursor over real button",
+                        ptk_window_get_cursor(window), PTK_CURSOR_AUTO);
 }
 
 static void should_default_textinput_cursor_to_text(void)
@@ -127,7 +127,7 @@ void test_cursor(void)
         ctest_describe("none cursor", should_apply_none_cursor);
         ctest_describe("reset to auto", should_reset_to_auto_over_plain_area);
         ctest_describe("button default cursor",
-                       should_default_button_cursor_to_pointer);
+                       should_default_button_cursor_to_auto);
         ctest_describe("textinput default cursor",
                        should_default_textinput_cursor_to_text);
         ctest_describe("destroyed hover target",

@@ -9,7 +9,6 @@ a {
 
 button,
 .button {
-  cursor: pointer;
   box-sizing: border-box;
   height: 32px;
   line-height: 20px;

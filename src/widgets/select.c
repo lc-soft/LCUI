@@ -70,7 +70,6 @@ select {\
 }\
 select-trigger {\
   display: inline-block;\
-  cursor: pointer;\
 }\
 select-trigger button {\
   display: flex;\

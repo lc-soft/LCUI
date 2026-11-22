@@ -68,7 +68,6 @@ scrollbar-corner {\
 scrollbar-thumb {\
 	top: 0;\
 	left: 0;\
-	cursor: grab;\
 	width: 4px;\
 	height: 4px;\
 	position: absolute;\

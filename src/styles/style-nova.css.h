@@ -21,7 +21,6 @@ static const struct {
         { "}\n", 2 },
         { "button,\r\n", 9 },
         { ".button {\r\n", 11 },
-        { "  cursor: pointer;\r\n", 20 },
         { "  box-sizing: border-box;\r\n", 27 },
         { "  height: 32px;\r\n", 17 },
         { "  line-height: 20px;\r\n", 22 },
@@ -2545,7 +2544,7 @@ static const struct {
         { "  background-color: rgb(250 250 250 / 0.6);\n", 44 },
         { "}\n", 2 },
 };
-static const size_t css_str_style_nova_total_length = 51129;
+static const size_t css_str_style_nova_total_length = 51109;
 static inline void ui_load_css_string_style_nova_chunks(void)
 {
         size_t i;
