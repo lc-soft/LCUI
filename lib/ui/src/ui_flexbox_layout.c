@@ -1395,8 +1395,10 @@ static void ui_flexbox_resolve_cross_sizes(ui_flexbox_context_t *ctx)
         float cross_free_space;
         float cross_space;
         float line_max_cross_size;
+        float lines_cross_size;
 
         /* 合并交叉轴 hint（无论交叉尺寸是否固定都合并，保持旧行为）。 */
+        lines_cross_size = ctx->cross_size;
         ctx->cross_size = y_max(ctx->cross_size, ctx->hint_cross_size);
         if (column) {
                 cross_axis = s->padding_left;
@@ -1413,7 +1415,14 @@ static void ui_flexbox_resolve_cross_sizes(ui_flexbox_context_t *ctx)
                 }
                 cross_free_space = ctx->widget->content_box.height;
         }
-        cross_free_space -= ctx->cross_size;
+        /* A definite cross size already gives the lines their full space;
+         * don't let the container's own text sizehint shrink that area. */
+        if (column ? IS_CSS_FIXED_LENGTH(s, width)
+                   : IS_CSS_FIXED_LENGTH(s, height)) {
+                cross_free_space -= lines_cross_size;
+        } else {
+                cross_free_space -= ctx->cross_size;
+        }
         cross_space =
             ctx->lines.length > 0 ? cross_free_space / ctx->lines.length : 0;
 

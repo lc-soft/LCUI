@@ -626,6 +626,11 @@ static const struct {
         { "  background-color: #262626;\r\n", 30 },
         { "  color: #fafafa;\n", 18 },
         { "}\n", 2 },
+        { "empty-media:icon icon {\r\n", 25 },
+        { "  width: 16px;\r\n", 16 },
+        { "  height: 16px;\r\n", 17 },
+        { "  font-size: 16px;\n", 19 },
+        { "}\n", 2 },
         { "empty-title {\r\n", 15 },
         { "  display: block;\r\n", 19 },
         { "  font-size: 14px;\r\n", 20 },
@@ -2555,7 +2560,7 @@ static const struct {
         { "  background-color: rgb(250 250 250 / 0.6);\n", 44 },
         { "}\n", 2 },
 };
-static const size_t css_str_style_nova_total_length = 51394;
+static const size_t css_str_style_nova_total_length = 51473;
 static inline void ui_load_css_string_style_nova_chunks(void)
 {
         size_t i;

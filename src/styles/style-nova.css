@@ -367,6 +367,12 @@ empty-media:icon {
   @apply flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-foreground dark:bg-muted-dark dark:text-foreground-dark;
 }
 
+empty-media:icon icon {
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+}
+
 empty-title {
   @apply block text-sm font-medium;
 }
